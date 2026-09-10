@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FIEZEL — Home</title>
+<link rel="stylesheet" href="base.css">
+<style>
+  /* ===== Sapaan ===== */
+  .hello{padding:10px 0 12px}
+  .hello .eyebrow{display:block;margin-bottom:4px}
+  .hello .t-display{font-size:26px}
+  .hello-chips{display:flex;gap:8px;margin-top:10px}
+
+  /* ===== Streak / target harian ===== */
+  .ritme{display:flex;align-items:center;gap:14px;padding:12px 16px;margin-bottom:8px}
+  .ring{position:relative;flex:0 0 auto;width:56px;height:56px}
+  .ring svg{width:56px;height:56px;transform:rotate(-90deg)}
+  .ring .ring-label{
+    position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+    font:700 14px/1 var(--font-ui);font-variant-numeric:tabular-nums;
+  }
+  .ritme-text{flex:1;min-width:0}
+  .ritme-text .t-label{color:var(--muted);margin-top:1px}
+  .streak{
+    flex:0 0 auto;display:flex;flex-direction:column;align-items:center;gap:2px;
+    background:var(--sun-soft);border:1px solid var(--line);border-radius:var(--radius-md);
+    padding:8px 12px;
+  }
+  .streak .flame{display:flex;align-items:center;gap:4px;font:700 16px/1 var(--font-ui);font-variant-numeric:tabular-nums}
+  .streak .flame svg{width:16px;height:16px;stroke:var(--info);fill:var(--sun);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+  .streak .t-micro{color:var(--muted);font-weight:600}
+
+  /* ===== Kartu lanjut belajar (momen AI — Bright Mind) ===== */
+  .resume{padding:18px 18px 16px;margin-bottom:8px}
+  .resume .eyebrow{color:var(--sun);display:flex;align-items:center;gap:6px}
+  .resume .eyebrow svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+  .resume h2{position:relative;font:700 17px/1.35 var(--font-ui);margin:8px 0 4px}
+  .resume .meta{position:relative;font-size:13px;color:var(--on-core-muted);margin-bottom:12px}
+  .resume .bar{position:relative;margin-bottom:6px}
+  .resume .bar-caption{position:relative;display:flex;justify-content:space-between;font:600 12px/1.4 var(--font-ui);color:var(--on-core-muted);margin-bottom:14px}
+  .resume .bar-caption b{color:var(--sun);font-variant-numeric:tabular-nums}
+  .resume .btn{position:relative}
+
+  /* ===== Grid modul ===== */
+  .fokus-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:2px}
+  /* Kartu launch: teks di atas, tile ikon kiri-bawah — sudut kanan-bawah kartu sengaja
+     kosong sebagai zona aman dock maskot (aturan maskot DIRECTION) */
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:0}
+  .launch{
+    display:flex;flex-direction:column;align-items:flex-start;gap:4px;min-height:132px;
+    padding:14px 14px 16px;text-align:left;cursor:pointer;
+    background:var(--panel);border:1px solid var(--line-soft);border-radius:var(--radius-lg);
+    box-shadow:var(--shadow-sm);font-family:var(--font-ui);
+  }
+  .launch .tile{
+    width:44px;height:44px;margin-top:auto;border-radius:14px;background:var(--sun-soft);
+    border:1px solid var(--line);display:flex;align-items:center;justify-content:center;color:var(--text);
+  }
+  .launch .tile svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:1.75;stroke-linecap:round;stroke-linejoin:round}
+  .launch b{font-size:15px;font-weight:700;color:var(--text);line-height:1.25}
+  .launch small{font-size:13px;color:var(--muted);line-height:1.35;margin-bottom:8px}
+</style>
+</head>
+<body>
+
+  <header class="topbar">
+    <a class="brand" href="#" aria-label="FIEZEL — beranda">
+      <!-- Wordmark versi ink untuk permukaan Warm Paper -->
+      <svg viewBox="0 0 1000 260" role="img" aria-label="FIEZEL">
+        <g fill="#241A11"><rect x="30" y="30" width="42" height="200" rx="21"/><rect x="30" y="30" width="144" height="42" rx="21"/><rect x="30" y="109" width="116" height="42" rx="21"/><rect x="300" y="30" width="42" height="200" rx="21"/><rect x="300" y="30" width="144" height="42" rx="21"/><rect x="300" y="109" width="100" height="42" rx="21"/><rect x="300" y="188" width="130" height="42" rx="21"/><rect x="478" y="30" width="150" height="42" rx="21"/><rect x="478" y="188" width="150" height="42" rx="21"/><rect x="607" y="30" width="191.38" height="42" rx="21" transform="rotate(124.354 607 51)"/><rect x="662" y="30" width="42" height="200" rx="21"/><rect x="662" y="30" width="144" height="42" rx="21"/><rect x="662" y="109" width="100" height="42" rx="21"/><rect x="662" y="188" width="130" height="42" rx="21"/><rect x="840" y="30" width="42" height="200" rx="21"/><rect x="840" y="188" width="130" height="42" rx="21"/></g>
+        <g fill="#E6A800"><rect x="192" y="30" width="26" height="200" rx="13"/><rect x="240" y="106" width="26" height="124" rx="13"/></g>
+      </svg>
+    </a>
+    <span class="spacer"></span>
+    <button class="pill-btn" type="button">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3a9 9 0 1 0 3.8 17.1L21 21l-.9-5.2A9 9 0 0 0 12 3z"/><path d="M9.5 9.5a2.5 2.5 0 0 1 4.9.8c0 1.7-2.4 2.2-2.4 3.7"/><circle cx="12" cy="17" r=".4"/></svg>
+      Tanya FIEZEL
+    </button>
+    <button class="icon-btn" type="button" aria-label="Pengaturan">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8h10M18 8h2M4 16h2M10 16h10"/><circle cx="16" cy="8" r="2"/><circle cx="8" cy="16" r="2"/></svg>
+    </button>
+  </header>
+
+  <main class="page">
+
+    <!-- Sapaan -->
+    <section class="hello">
+      <span class="eyebrow">Rabu, 26 Agustus · FIEZEL Personal</span>
+      <h1 class="t-display">Sore, Rara!</h1>
+      <div class="hello-chips">
+        <button class="chip is-active" type="button">A2 <span class="chip-meta">Level kamu</span></button>
+        <button class="chip" type="button">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r=".5"/></svg>
+          Target · Sekolah
+        </button>
+      </div>
+    </section>
+
+    <!-- Streak / target harian -->
+    <section class="card ritme" aria-label="Ritme harian">
+      <div class="ring" role="img" aria-label="2 dari 5 jawaban hari ini">
+        <svg viewBox="0 0 56 56" aria-hidden="true">
+          <circle cx="28" cy="28" r="24" fill="none" stroke="#F0E4CF" stroke-width="6"/>
+          <circle cx="28" cy="28" r="24" fill="none" stroke="#FFC700" stroke-width="6" stroke-linecap="round" stroke-dasharray="60.3 150.8"/>
+        </svg>
+        <span class="ring-label num">2/5</span>
+      </div>
+      <div class="ritme-text">
+        <b class="t-body" style="font-weight:700">Target hari ini</b>
+        <p class="t-label">3 jawaban lagi, ritme kamu aman.</p>
+      </div>
+      <div class="streak">
+        <span class="flame">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2c1 4-4 5.5-4 10a4 4 0 0 0 8 .5C16 9 13 7 12 2z"/><path d="M10 16a2.4 2.4 0 1 0 4.8 0c0-1.6-1.4-2.2-2.4-4-1 1.8-2.4 2.4-2.4 4z"/></svg>
+          <span class="num">3</span>
+        </span>
+        <span class="t-micro">hari runtun</span>
+      </div>
+    </section>
+
+    <!-- Lanjut belajar: momen AI memakai panel Bright Mind -->
+    <section class="card-core resume" aria-label="Lanjut belajar">
+      <svg class="neural" viewBox="0 0 358 190" aria-hidden="true">
+        <g stroke="#FFC700" stroke-width="1" fill="none" opacity=".2">
+          <path d="M210 -10 C 250 40, 330 30, 380 70"/>
+          <path d="M240 -20 C 260 60, 340 90, 372 150"/>
+        </g>
+        <g fill="#FFC700" opacity=".4"><circle cx="330" cy="30" r="2"/><circle cx="300" cy="74" r="1.5"/><circle cx="352" cy="120" r="2"/></g>
+      </svg>
+      <span class="eyebrow">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z"/></svg>
+        Lanjut belajar · dipilih PAW
+      </span>
+      <h2>Grammar · Must dan can: wajib atau boleh</h2>
+      <p class="meta">Lesson 2 dari 17 · Jalur A2 · kemarin kamu kuat di “can”, hari ini kita rapikan “must”.</p>
+      <div class="bar" role="progressbar" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100"><i style="width:40%"></i></div>
+      <p class="bar-caption"><span>Mastery lesson</span><b>40%</b></p>
+      <button class="btn btn-sun" type="button">
+        Lanjutkan latihan
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+      </button>
+    </section>
+
+    <!-- Grid modul (IA asli: 6 launch card) -->
+    <section aria-label="Pilih fokus">
+      <div class="fokus-head">
+        <h2 class="t-h2">Pilih fokus hari ini</h2>
+        <button class="text-link" type="button">
+          Lihat peta belajar
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+        </button>
+      </div>
+      <div class="grid">
+        <button class="launch" type="button">
+          <b>Vocabulary</b><small>310 kata · A2</small>
+          <span class="tile"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 19 10.5 4h1L18 19"/><path d="M6.5 14h9"/></svg></span>
+        </button>
+        <button class="launch" type="button">
+          <b>Grammar</b><small>17 lesson · A2</small>
+          <span class="tile"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12a2 2 0 0 1-2 2H8l-4 4V6a2 2 0 0 1 2-2h13a2 2 0 0 1 2 2z"/><path d="M8 8.5h8M8 11.5h5"/></svg></span>
+        </button>
+        <button class="launch" type="button">
+          <b>Reading</b><small>50 bacaan · A2</small>
+          <span class="tile"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 6c-1.5-1.6-3.7-2-6-2v14c2.3 0 4.5.4 6 2 1.5-1.6 3.7-2 6-2V4c-2.3 0-4.5.4-6 2z"/><path d="M12 6v14"/></svg></span>
+        </button>
+        <button class="launch" type="button">
+          <b>Perpustakaan</b><small>9 buku · audiobook</small>
+          <span class="tile"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4h3v16H5zM10 4h3v16h-3z"/><path d="m15.5 5 3.5 1-3.6 14-3.4-1z"/></svg></span>
+        </button>
+        <button class="launch" type="button">
+          <b>Classroom</b><small>Materi · subtitle</small>
+          <span class="tile"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="12" rx="2"/><path d="M8 20h8M12 16v4"/></svg></span>
+        </button>
+        <button class="launch" type="button">
+          <b>Speaking + Listening</b><small>72 latihan · A1–C2</small>
+          <span class="tile"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 14v-2a8 8 0 0 1 16 0v2"/><path d="M4 14a2 2 0 0 0-2 2v1a2 2 0 0 0 2 2h1v-5zM20 14a2 2 0 0 1 2 2v1a2 2 0 0 1-2 2h-1v-5z"/></svg></span>
+        </button>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Maskot di dock (aturan baru: tidak menutupi konten, ada dismiss 44px) -->
+  <aside class="mascot-dock" aria-label="Maskot PAW">
+    <button class="mascot-dismiss" type="button" aria-label="Sembunyikan maskot">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>
+    </button>
+    <svg viewBox="56 -10 208 216" aria-hidden="true"><g>
+      <path d="M76 66 L 95 0 L 140 34 Z" fill="#FFD94F"/><path d="M90 52 L 101 17 L 125 35 Z" fill="#8C2233"/>
+      <path d="M244 66 L 225 0 L 180 34 Z" fill="#FFD94F"/><path d="M230 52 L 219 17 L 195 35 Z" fill="#8C2233"/>
+      <circle cx="160" cy="106" r="88" fill="#FFD94F"/><ellipse cx="160" cy="140" rx="36" ry="25" fill="#FFF4DA"/>
+      <path d="M153 126 L 167 126 L 160 136 Z" fill="#8C2233"/>
+      <circle cx="102" cy="126" r="11" fill="#F0A0AC"/><circle cx="218" cy="126" r="11" fill="#F0A0AC"/>
+      <g><circle cx="126" cy="98" r="14.5" fill="#33201F"/><circle cx="130" cy="93" r="5" fill="#fff"/><circle cx="122" cy="103" r="2.6" fill="#fff" opacity=".7"/></g>
+      <g><circle cx="194" cy="98" r="14.5" fill="#33201F"/><circle cx="198" cy="93" r="5" fill="#fff"/><circle cx="190" cy="103" r="2.6" fill="#fff" opacity=".7"/></g>
+      <path d="M148 148 C 154 155 166 155 172 148" stroke="#33201F" stroke-width="5.5" stroke-linecap="round" fill="none"/>
+    </g></svg>
+  </aside>
+
+  <!-- Bottom nav baru: label 12px, tab aktif tile sun-soft + dot -->
+  <nav class="bottomnav" aria-label="Navigasi utama">
+    <a class="nav-item is-active" href="#" aria-current="page">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 10.5 12 4l8 6.5V20a1 1 0 0 1-1 1h-4.5v-6h-5v6H5a1 1 0 0 1-1-1z"/></svg>
+      Home
+    </a>
+    <a class="nav-item" href="#">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="4" width="16" height="16" rx="4"/><path d="M9 15.5 11.7 9h.6l2.7 6.5M10 13.5h4"/></svg>
+      Vocab
+    </a>
+    <a class="nav-item" href="#">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12a2 2 0 0 1-2 2H8l-4 4V6a2 2 0 0 1 2-2h13a2 2 0 0 1 2 2z"/><path d="M8 8.5h8M8 11.5h5"/></svg>
+      Grammar
+    </a>
+    <a class="nav-item" href="#">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 6c-1.5-1.6-3.7-2-6-2v14c2.3 0 4.5.4 6 2 1.5-1.6 3.7-2 6-2V4c-2.3 0-4.5.4-6 2z"/><path d="M12 6v14"/></svg>
+      Reading
+    </a>
+    <a class="nav-item" href="#">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 4 3 6v14l6-2 6 2 6-2V4l-6 2-6-2z"/><path d="M9 4v14M15 6v14"/></svg>
+      Peta
+    </a>
+  </nav>
+
+</body>
+</html>

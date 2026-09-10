@@ -1,0 +1,19 @@
+ok - now wajib diisi
+ok - instalasi sehat dilaporkan sehat, tanpa peringatan karangan
+ok - shell lama yang masih dipakai adalah blocker, bukan catatan kecil
+ok - shell lebih baru dari halaman ditangani berbeda dari shell basi
+ok - penanda build yang tidak terbaca dilaporkan, bukan dianggap cocok
+ok - pembaruan yang tertahan disebut, karena pengguna tidak bisa menebaknya
+ok - service worker tidak aktif atau tidak ada dibedakan
+ok - ruang penyimpanan menipis dan hampir habis dibedakan
+ok - kuota yang tidak terbaca tidak dilaporkan sebagai masalah
+ok - cache shell yang menumpuk terdeteksi
+ok - notifikasi yang ditolak adalah blocker, karena produk ini mewajibkannya
+ok - setiap temuan yang bukan ok membawa langkah yang bisa dikerjakan
+ok - laporan tidak memuat riwayat jawaban atau isi belajar
+ok - pembacaan lingkungan tidak pernah melempar meski API tidak ada
+ok - lingkungan yang sehat terbaca apa adanya
+ok - penanda build halaman tidak boleh basi terhadap DIAG_BUILD
+ok - service worker menjawab revisi shell-nya sendiri
+
+FIEZEL install health: PASS

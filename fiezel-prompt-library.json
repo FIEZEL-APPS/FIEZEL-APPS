@@ -1,0 +1,49 @@
+{
+  "schema": "fiezel-prompt-library-v1",
+  "version": "5.19.0",
+  "generatedAt": "2026-08-14T00:00:00Z",
+  "prompts": {
+    "grammar": {
+      "fix_weak_skill": {
+        "template": "Perbaiki satu soal grammar Bahasa Inggris untuk subskill {{subskill}} (CEFR {{cefr}}) tanpa memindahkan konsep dari pelajaran lain. Item saat ini: {{itemJson}}. Temuan QA: {{finding}}. Buat 1 stem + 4 opsi + correctIndex + 3 distraktor + penjelasan, semuanya natural dan singkat untuk anak SMA Indonesia. Jangan sentuh id, family, subskill, cefr, questionType.",
+        "constraints": "focus purity; 4 opsi unik; explanation natural Bahasa Indonesia; tanpa klaim pronunciation; tanpa data pribadi"
+      },
+      "rewrite_distractor": {
+        "template": "Tulis ulang distraktor soal grammar ini agar tidak mudah ditebak pola, sambil menjaga makna pedagogis: {{itemJson}}. Distraktor lama: {{finding}}. Output: 4 opsi baru + correctIndex + distraktor dengan whyFails.",
+        "constraints": "4 opsi unik; whyFails natural; tanpa konsep lintas pelajaran"
+      }
+    },
+    "vocabulary": {
+      "expand_context": {
+        "template": "Perluas contoh kalimat untuk kata {{word}} (CEFR {{cefr}}) sehingga konteks makna jelas, tanpa mengubah sense. Kalimat lama: {{example}}. Output: example baru + examples[0].en yang sama.",
+        "constraints": "sense tetap; kalimat >= 4 kata; natural untuk Gen Alpha Indonesia; tanpa data pribadi"
+      },
+      "repair_meaning": {
+        "template": "Perbaiki makna/kolokasi kata {{word}} ({{partOfSpeech}}, CEFR {{cefr}}) yang dirasa kurang jelas. Makna lama: {{meaning}}. Output: meaning + meanings[0].meaning yang sama.",
+        "constraints": "makna konsisten dengan contoh; tanpa mengubah identitas kata"
+      }
+    },
+    "reading": {
+      "fix_weak_skill": {
+        "template": "Perbaiki satu soal reading untuk passage {{passageId}} (CEFR {{cefr}}). Pertanyaan lama: {{itemJson}}. Temuan QA: {{finding}}. Output: stem + 4 opsi + correctIndex + meta(evidence dari passage).",
+        "constraints": "evidence harus ada di passage; 4 opsi unik; tanpa mengubah passage"
+      },
+      "rewrite_repetition": {
+        "template": "Tulis ulang pertanyaan reading yang terlalu mekanis: {{finding}}. Passage: {{passageText}}. Output: stem baru + 4 opsi + correctIndex + meta(evidence).",
+        "constraints": "variasi pertanyaan asli; evidence grounded di passage"
+      }
+    },
+    "listening": {
+      "review_item": {
+        "template": "Tinjau item listening {{itemId}} (CEFR {{cefr}}): transkrip {{transcript}}. Output hanya catatan perbaikan pedagogis atau 'OK'.",
+        "constraints": "tanpa skor pronunciation; tanpa data pribadi; tanpa audio raw"
+      }
+    },
+    "speaking": {
+      "review_item": {
+        "template": "Tinjau item speaking {{itemId}} (CEFR {{cefr}}): prompt {{prompt}}. Output hanya catatan perbaikan pedagogis atau 'OK'.",
+        "constraints": "skor coverage target-language, bukan pronunciation; tanpa rekaman"
+      }
+    }
+  }
+}

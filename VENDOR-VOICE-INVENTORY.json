@@ -1,0 +1,162 @@
+{
+  "schema": "fiezel-local-voice-recovery-v1",
+  "retiredAt": "2026-08-22",
+  "retiredAtCommit": "8c8d144be8134b7b03d32528cf7f7c50cb9521df",
+  "reason": "m025-100: suara pindah ke render server (Puter txt2speech, engine generative). Model lokal tidak lagi dipakai jalur mana pun.",
+  "bundles": [
+    {
+      "dir": "vendor/kokoro-js",
+      "totalBytes": 23820396,
+      "fileCount": 10,
+      "largestFiles": [
+        {
+          "path": "wasm/ort-wasm-simd-threaded.jsep.wasm",
+          "bytes": 21596019
+        },
+        {
+          "path": "kokoro.web.js",
+          "bytes": 2136728
+        },
+        {
+          "path": "wasm/ort-wasm-simd-threaded.jsep.mjs",
+          "bytes": 44484
+        },
+        {
+          "path": "licenses/HUGGINGFACE-TRANSFORMERS-APACHE-2.0.txt",
+          "bytes": 11358
+        },
+        {
+          "path": "LICENSE",
+          "bytes": 11357
+        },
+        {
+          "path": "licenses/PHONEMIZER-APACHE-2.0.txt",
+          "bytes": 11357
+        },
+        {
+          "path": "source-patches/m0254-to-m0255-kokoro.web.zst.b64",
+          "bytes": 3520
+        },
+        {
+          "path": "source-overrides/phonemizer.js",
+          "bytes": 3215
+        },
+        {
+          "path": "source-overrides/fiezel-integration.patch",
+          "bytes": 1285
+        },
+        {
+          "path": "licenses/ONNXRUNTIME-MIT.txt",
+          "bytes": 1073
+        }
+      ]
+    },
+    {
+      "dir": "vendor/kokoro-model",
+      "totalBytes": 95509570,
+      "fileCount": 11,
+      "largestFiles": [
+        {
+          "path": "onnx/model_quantized.onnx",
+          "bytes": 92361116
+        },
+        {
+          "path": "voices/af_bella.bin",
+          "bytes": 522240
+        },
+        {
+          "path": "voices/af_heart.bin",
+          "bytes": 522240
+        },
+        {
+          "path": "voices/af_nicole.bin",
+          "bytes": 522240
+        },
+        {
+          "path": "voices/am_michael.bin",
+          "bytes": 522240
+        },
+        {
+          "path": "voices/bf_emma.bin",
+          "bytes": 522240
+        },
+        {
+          "path": "voices/bm_george.bin",
+          "bytes": 522240
+        },
+        {
+          "path": "LICENSE",
+          "bytes": 11357
+        },
+        {
+          "path": "tokenizer.json",
+          "bytes": 3498
+        },
+        {
+          "path": "tokenizer_config.json",
+          "bytes": 114
+        },
+        {
+          "path": "config.json",
+          "bytes": 45
+        }
+      ]
+    },
+    {
+      "dir": "vendor/supertonic-3",
+      "totalBytes": 158895977,
+      "fileCount": 14,
+      "largestFiles": [
+        {
+          "path": "vector_estimator.int8.onnx",
+          "bytes": 78400833
+        },
+        {
+          "path": "text_encoder.int8.onnx",
+          "bytes": 36416150
+        },
+        {
+          "path": "vocoder.int8.onnx",
+          "bytes": 25991073
+        },
+        {
+          "path": "sherpa-onnx-wasm-main-tts.wasm",
+          "bytes": 13476398
+        },
+        {
+          "path": "duration_predictor.int8.onnx",
+          "bytes": 3700147
+        },
+        {
+          "path": "voice.bin",
+          "bytes": 517168
+        },
+        {
+          "path": "unicode_indexer.bin",
+          "bytes": 262144
+        },
+        {
+          "path": "sherpa-onnx-wasm-main-tts.js",
+          "bytes": 79421
+        },
+        {
+          "path": "sherpa-onnx-tts.js",
+          "bytes": 33227
+        },
+        {
+          "path": "tts.json",
+          "bytes": 8253
+        },
+        {
+          "path": "sherpa-onnx-tts.worker.js",
+          "bytes": 4709
+        },
+        {
+          "path": "provenance/m02542-build.json",
+          "bytes": 4395
+        }
+      ]
+    }
+  ],
+  "totalBytes": 278225943
+}

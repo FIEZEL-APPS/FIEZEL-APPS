@@ -1,0 +1,76 @@
+
+=== MATRIKS SELF-TEST tools/fiezel-e2e-bridge.mjs ===
+OK   | diharapkan LULUS                          | hasil LULUS  | benar (aplikasi + jembatan sesuai kontrak)
+OK   | diharapkan GAGAL@cookie-domain            | hasil GAGAL  | cookie fz_id tanpa Domain (host-only)
+       assert gagal: cookie-domain
+OK   | diharapkan GAGAL@cookie-domain            | hasil GAGAL  | cookie fz_id Domain salah (evil.example)
+       assert gagal: cookie-present, cookie-httponly, cookie-secure, cookie-samesite-lax, cookie-domain, cookie-replayed, quota-200-after-auth, bridge-hop-stable
+OK   | diharapkan GAGAL@cookie-httponly          | hasil GAGAL  | cookie fz_id tanpa HttpOnly
+       assert gagal: cookie-httponly
+OK   | diharapkan GAGAL@cookie-samesite-lax      | hasil GAGAL  | cookie fz_id SameSite=None
+       assert gagal: cookie-samesite-lax
+OK   | diharapkan GAGAL@cookie-present           | hasil GAGAL  | tidak ada Set-Cookie sama sekali
+       assert gagal: cookie-present, cookie-httponly, cookie-secure, cookie-samesite-lax, cookie-domain, cookie-replayed, quota-200-after-auth, bridge-hop-stable
+OK   | diharapkan GAGAL@anon-200                 | hasil GAGAL  | POST /api/auth/anon menjawab 500
+       assert gagal: anon-200, cookie-present, cookie-httponly, cookie-secure, cookie-samesite-lax, cookie-domain, cookie-replayed, quota-200-after-auth, bridge-hop-stable
+OK   | diharapkan GAGAL@config-protocol          | hasil GAGAL  | /api/config membawa protocol 1.6
+       assert gagal: config-protocol
+OK   | diharapkan GAGAL@config-flags-present     | hasil GAGAL  | /api/config mengirim flags kosong
+       assert gagal: config-flags-present, server-flag-wins
+OK   | diharapkan GAGAL@quota-401-before-auth    | hasil GAGAL  | /api/quota menjawab 200 TANPA cookie (kebocoran identitas)
+       assert gagal: quota-401-before-auth
+OK   | diharapkan GAGAL@bridge-hop-stable        | hasil GAGAL  | jembatan menggantung permintaan ke-3 di satu koneksi
+       assert gagal: bridge-hop-stable
+OK   | diharapkan GAGAL@off-no-bridge-request    | hasil GAGAL  | aplikasi menembak jembatan walau semua flag off
+       assert gagal: off-no-bridge-request
+OK   | diharapkan GAGAL@disabled-no-bridge-request | hasil GAGAL  | aplikasi mengabaikan enabled:false
+       assert gagal: disabled-no-bridge-request
+OK   | diharapkan GAGAL@config-called-once       | hasil GAGAL  | aplikasi tidak pernah memanggil /api/config
+       assert gagal: config-called-once, config-protocol, config-flags-present, config-non-blocking, server-flag-wins
+OK   | diharapkan GAGAL@config-called-once       | hasil GAGAL  | aplikasi memanggil /api/config dua kali per boot
+       assert gagal: config-called-once
+OK   | diharapkan GAGAL@config-non-blocking      | hasil GAGAL  | aplikasi MENAHAN boot sampai /api/config datang
+       assert gagal: config-non-blocking
+OK   | diharapkan GAGAL@server-flag-wins         | hasil GAGAL  | aplikasi mengabaikan flag server yang false
+       assert gagal: server-flag-wins
+OK   | diharapkan GAGAL@no-workers-dev           | hasil GAGAL  | aplikasi menembak *.workers.dev langsung
+       assert gagal: no-workers-dev
+OK   | diharapkan GAGAL@cookie-replayed          | hasil GAGAL  | aplikasi membuang credentials:include (cookie tidak dikirim ulang)
+       assert gagal: cookie-present, cookie-httponly, cookie-secure, cookie-samesite-lax, cookie-domain, cookie-replayed, quota-200-after-auth, bridge-hop-stable
+OK   | diharapkan GAGAL@off-app-boots            | hasil GAGAL  | aplikasi tidak me-render apa pun
+       assert gagal: off-app-boots
+OK   | diharapkan GAGAL@off-app-boots            | hasil GAGAL  | isi HANYA markup statis, nol render JS (kontrol negatif untuk probe boot)
+       assert gagal: off-app-boots
+[PASS] SKIP tanpa FIEZEL_E2E_REPORT tetap exit 0 dan tidak menulis artefak ke akar repo :: exit=0
+[PASS] Tanpa FIEZEL_E2E_BRIDGE_BASE gerbang exit 0 (SKIP, tidak menembak jaringan dari CI) :: exit=0
+[PASS] SKIP mencetak label SKIP dan alasannya :: Untuk menjalankan sungguhan: FIEZEL_E2E_BRIDGE_BASE=https://api.fiezel.my.id node tools/fiezel-e2e-bridge.mjs
+[PASS] SKIP dilaporkan status SKIP dengan pass:null (bukan PASS palsu) :: status=SKIP pass=null
+[PASS] SKIP menyebut apa yang BELUM terbukti (batas kejujuran, bukan diam) :: stdout 803 char
+[PASS] Base URL tak sah membuat gerbang MERAH (env diset = niat menguji) :: exit=1
+[PASS] FIEZEL_E2E_ONLY dengan nama skenario tak dikenal membuat gerbang MERAH (bukan menguji nol skenario diam-diam) :: exit=1
+[PASS] Skenario BENAR: benar (aplikasi + jembatan sesuai kontrak) → gerbang LULUS :: exit=0 assertGagal=0 assertLulus=22
+[PASS] Skenario BENAR menjalankan ≥20 assert (bukan hijau karena tidak menguji apa-apa) :: assertLulus=22
+[PASS] Skenario SALAH: cookie fz_id tanpa Domain (host-only) → gerbang GAGAL di `cookie-domain` :: exit=1 assertGagal=cookie-domain
+[PASS] Skenario SALAH: cookie fz_id Domain salah (evil.example) → gerbang GAGAL di `cookie-domain` :: exit=1 assertGagal=cookie-present,cookie-httponly,cookie-secure,cookie-samesite-lax,cookie-domain,cookie-replayed,quota-200-after-auth,bridge-hop-stable
+[PASS] Skenario SALAH: cookie fz_id tanpa HttpOnly → gerbang GAGAL di `cookie-httponly` :: exit=1 assertGagal=cookie-httponly
+[PASS] Skenario SALAH: cookie fz_id SameSite=None → gerbang GAGAL di `cookie-samesite-lax` :: exit=1 assertGagal=cookie-samesite-lax
+[PASS] Skenario SALAH: tidak ada Set-Cookie sama sekali → gerbang GAGAL di `cookie-present` :: exit=1 assertGagal=cookie-present,cookie-httponly,cookie-secure,cookie-samesite-lax,cookie-domain,cookie-replayed,quota-200-after-auth,bridge-hop-stable
+[PASS] Skenario SALAH: POST /api/auth/anon menjawab 500 → gerbang GAGAL di `anon-200` :: exit=1 assertGagal=anon-200,cookie-present,cookie-httponly,cookie-secure,cookie-samesite-lax,cookie-domain,cookie-replayed,quota-200-after-auth,bridge-hop-stable
+[PASS] Skenario SALAH: /api/config membawa protocol 1.6 → gerbang GAGAL di `config-protocol` :: exit=1 assertGagal=config-protocol
+[PASS] Skenario SALAH: /api/config mengirim flags kosong → gerbang GAGAL di `config-flags-present` :: exit=1 assertGagal=config-flags-present,server-flag-wins
+[PASS] Skenario SALAH: /api/quota menjawab 200 TANPA cookie (kebocoran identitas) → gerbang GAGAL di `quota-401-before-auth` :: exit=1 assertGagal=quota-401-before-auth
+[PASS] Skenario SALAH: jembatan menggantung permintaan ke-3 di satu koneksi → gerbang GAGAL di `bridge-hop-stable` :: exit=1 assertGagal=bridge-hop-stable
+[PASS] Skenario SALAH: aplikasi menembak jembatan walau semua flag off → gerbang GAGAL di `off-no-bridge-request` :: exit=1 assertGagal=off-no-bridge-request
+[PASS] Skenario SALAH: aplikasi mengabaikan enabled:false → gerbang GAGAL di `disabled-no-bridge-request` :: exit=1 assertGagal=disabled-no-bridge-request
+[PASS] Skenario SALAH: aplikasi tidak pernah memanggil /api/config → gerbang GAGAL di `config-called-once` :: exit=1 assertGagal=config-called-once,config-protocol,config-flags-present,config-non-blocking,server-flag-wins
+[PASS] Skenario SALAH: aplikasi memanggil /api/config dua kali per boot → gerbang GAGAL di `config-called-once` :: exit=1 assertGagal=config-called-once
+[PASS] Skenario SALAH: aplikasi MENAHAN boot sampai /api/config datang → gerbang GAGAL di `config-non-blocking` :: exit=1 assertGagal=config-non-blocking
+[PASS] Skenario SALAH: aplikasi mengabaikan flag server yang false → gerbang GAGAL di `server-flag-wins` :: exit=1 assertGagal=server-flag-wins
+[PASS] Skenario SALAH: aplikasi menembak *.workers.dev langsung → gerbang GAGAL di `no-workers-dev` :: exit=1 assertGagal=no-workers-dev
+[PASS] Skenario SALAH: aplikasi membuang credentials:include (cookie tidak dikirim ulang) → gerbang GAGAL di `cookie-replayed` :: exit=1 assertGagal=cookie-present,cookie-httponly,cookie-secure,cookie-samesite-lax,cookie-domain,cookie-replayed,quota-200-after-auth,bridge-hop-stable
+[PASS] Skenario SALAH: aplikasi tidak me-render apa pun → gerbang GAGAL di `off-app-boots` :: exit=1 assertGagal=off-app-boots
+[PASS] Skenario SALAH: isi HANYA markup statis, nol render JS (kontrol negatif untuk probe boot) → gerbang GAGAL di `off-app-boots` :: exit=1 assertGagal=off-app-boots
+[PASS] Matriks memuat satu skenario benar dan ≥14 varian salah :: 21 skenario total
+[PASS] Varian salah menutup id assert yang berbeda-beda (bukan satu assert yang sama berulang) :: cookie-domain, cookie-httponly, cookie-samesite-lax, cookie-present, anon-200, config-protocol, config-flags-present, quota-401-before-auth, bridge-hop-stable, off-no-bridge-request, disabled-no-bridge-request, config-called-once, config-non-blocking, server-flag-wins, no-workers-dev, cookie-replayed, off-app-boots
+[PASS] Laporan gerbang tidak pernah ditulis ke akar repo (working tree bersih) :: E2E-BRIDGE-REPORT.json tidak ada di akar
+FIEZEL e2e-bridge selftest: PASS (32 assert, 21 skenario loopback)

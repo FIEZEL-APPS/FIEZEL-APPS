@@ -1,0 +1,37 @@
+{
+  "vocabulary": {
+    "total": 2440,
+    "unique": 2440,
+    "duplicates": 0,
+    "duplicateWordLevelPos": 0,
+    "missing": {
+      "meaning": 0,
+      "example": 0,
+      "phonetic": 0,
+      "partOfSpeech": 0
+    },
+    "needsReview": 0
+  },
+  "reading": {
+    "passages": 312,
+    "questions": 1560,
+    "duplicatePassages": 0,
+    "duplicateQuestions": 0,
+    "duplicateOptions": 0,
+    "invalidAnswers": 0
+  },
+  "grammar": {
+    "categories": 180,
+    "items": 282,
+    "invalid": 0
+  },
+  "security": {
+    "aiApiReferences": 0,
+    "apiKeyPatterns": 0
+  },
+  "architecture": {
+    "legacyVocabularyFileExists": false,
+    "masterRuntimeSource": true,
+    "runtimeVocabularySource": "vocabulary-master.json"
+  }
+}

@@ -1,0 +1,906 @@
+{
+  "schema": "fiezel-listening-exam-v1",
+  "schemaVersion": "1.0.0",
+  "version": "1.0.0",
+  "count": 8,
+  "honesty": "FIEZEL tidak memprediksi band IELTS atau skor TOEFL. Audio dihasilkan text-to-speech dari skrip orisinal, bukan rekaman ujian asli: satu suara untuk semua pembicara, dan tanpa ragam aksen yang dipakai ujian sebenarnya. Yang dilatih di sini bentuk soal, tekanan sekali dengar, dan mencatat - bukan pembiasaan aksen.",
+  "audioSource": {
+    "kind": "tts_original_script",
+    "why": "Rekaman IELTS/TOEFL asli berhak cipta dan tidak boleh didistribusikan ulang lewat aplikasi ini. Skripnya ditulis orisinal supaya bisa dibagikan bebas.",
+    "limitation": "Percakapan multi-pembicara diputar satu suara. Untuk melatih aksen, pakailah materi latihan resmi gratis dari penyelenggara ujian."
+  },
+  "examFormats": {
+    "ielts_listening_s1": {
+      "label": "IELTS Listening Section 1",
+      "replays": 1,
+      "questionsVisibleDuringAudio": true,
+      "minutes": 6,
+      "note": "Percakapan sehari-hari, biasanya isian formulir. Audio diputar SEKALI. Soalnya boleh dibaca sambil mendengar - itu memang cara ujiannya, dan justru itu keterampilannya: membaca, mendengar, dan menulis serentak."
+    },
+    "ielts_listening_s2": {
+      "label": "IELTS Listening Section 2",
+      "replays": 1,
+      "questionsVisibleDuringAudio": true,
+      "minutes": 6,
+      "note": "Monolog tentang situasi sehari-hari. Audio SEKALI. Soal denah/peta asli butuh gambar, jadi di sini digantikan pertanyaan lokasi berbentuk pilihan - itu adaptasi, bukan bentuk penuhnya."
+    },
+    "ielts_listening_s3": {
+      "label": "IELTS Listening Section 3",
+      "replays": 1,
+      "questionsVisibleDuringAudio": true,
+      "minutes": 7,
+      "note": "Diskusi akademik dua sampai empat orang. Audio SEKALI. Yang diuji: mengikuti siapa berpendapat apa, bukan sekadar menangkap fakta."
+    },
+    "ielts_listening_s4": {
+      "label": "IELTS Listening Section 4",
+      "replays": 1,
+      "questionsVisibleDuringAudio": true,
+      "minutes": 7,
+      "note": "Kuliah akademik tanpa jeda. Audio SEKALI dan tidak ada berhenti di tengah - bagian tersulit justru karena itu."
+    },
+    "toefl_listening_conversation": {
+      "label": "TOEFL iBT Listening - Conversation",
+      "replays": 1,
+      "questionsVisibleDuringAudio": false,
+      "minutes": 5,
+      "note": "Percakapan kampus. Audio SEKALI, dan soal baru muncul SETELAH audio selesai - jadi mencatat bukan pilihan, melainkan keharusan."
+    },
+    "toefl_listening_lecture": {
+      "label": "TOEFL iBT Listening - Lecture",
+      "replays": 1,
+      "questionsVisibleDuringAudio": false,
+      "minutes": 7,
+      "note": "Kuliah akademik. Audio SEKALI, soal muncul setelahnya. Tipe soalnya menguji struktur dan maksud dosen, bukan hanya isinya."
+    }
+  },
+  "sets": [
+    {
+      "id": "lx-ielts-s1",
+      "exam": "ielts_listening_s1",
+      "level": "B1",
+      "title": "Mendaftar program renang",
+      "script": "You will hear a conversation between a woman and a member of staff at a community sports centre.\n\nWOMAN: Good morning. I'd like to ask about joining the swimming programme, if that's still open.\n\nSTAFF: It is, yes. The autumn intake closes at the end of next week, so you've timed it well. Can I take a few details?\n\nWOMAN: Of course.\n\nSTAFF: Your full name first.\n\nWOMAN: It's Helena Marsh. That's H-E-L-E-N-A, and Marsh, M-A-R-S-H.\n\nSTAFF: Thank you. And an address?\n\nWOMAN: Forty-two Bridgeway Road. That's Bridgeway as one word.\n\nSTAFF: Forty-two Bridgeway Road. And the postcode?\n\nWOMAN: It's L S nine, four T P.\n\nSTAFF: Lovely. Now, a contact number.\n\nWOMAN: My mobile is oh-seven-nine-double-one, three-four-oh, six-two-eight.\n\nSTAFF: Let me read that back. Oh-seven-nine, one-one, three-four-oh, six-two-eight.\n\nWOMAN: That's it.\n\nSTAFF: Right. Which programme were you interested in? We run three. There's Beginners, which is for people who can't swim at all. There's Improvers, for people who can manage a length but want technique work. And there's Fitness, which assumes you can already swim reasonably well and focuses on stamina.\n\nWOMAN: I'd say Improvers. I learned as a child, so I'm not frightened of the water, but my technique is honestly quite poor. I get tired after about two lengths.\n\nSTAFF: Improvers sounds right. That runs on Tuesdays and Thursdays. Tuesday is seven fifteen in the evening, Thursday is six thirty. Most people pick one, but you can do both.\n\nWOMAN: Thursday would suit me better. Tuesday I don't finish work until seven.\n\nSTAFF: Thursday it is. Now, the fee. A single session per week is thirty-two pounds a month. Both sessions would be forty-eight. There's also a one-off joining fee of fifteen pounds, though that's waived if you're a student or over sixty-five.\n\nWOMAN: Neither, unfortunately. So thirty-two plus fifteen for the first month.\n\nSTAFF: That's right. And can I ask how you heard about us? It helps us know what's working.\n\nWOMAN: A colleague mentioned it. She's been coming since the spring.\n\nSTAFF: Word of mouth. That's usually the answer. One last thing — do you have any medical conditions the instructor should know about?\n\nWOMAN: I had shoulder surgery about two years ago. It's fine now, but I was told to avoid heavy overhead work for a while.\n\nSTAFF: I'll note that. The instructor will adjust the front crawl drills for you. Bring that up with her on the first evening as well, just so it's said out loud.\n\nWOMAN: I will. What should I bring?\n\nSTAFF: Swimming costume, towel, and a padlock for the lockers. We don't supply padlocks any more — too many went missing. Goggles are optional but most people find them worth having. And arrive about ten minutes early on the first night; there's a short pool induction before the session starts.\n\nWOMAN: Ten minutes early, padlock, goggles. Right. And when does it start?\n\nSTAFF: The eleventh of October. That's the Thursday after next.",
+      "questions": [
+        {
+          "id": "lx-s1-1",
+          "type": "form_completion",
+          "answerType": "completion",
+          "prompt": "Surname: ______",
+          "accept": [
+            "marsh"
+          ],
+          "explain": "Dieja langsung olehnya: M-A-R-S-H."
+        },
+        {
+          "id": "lx-s1-2",
+          "type": "form_completion",
+          "answerType": "completion",
+          "prompt": "Address: ______ Bridgeway Road",
+          "accept": [
+            "42",
+            "forty two",
+            "fortytwo"
+          ],
+          "explain": "\"Forty-two Bridgeway Road.\" Di ujian asli, angka ditulis sebagai angka."
+        },
+        {
+          "id": "lx-s1-3",
+          "type": "form_completion",
+          "answerType": "completion",
+          "prompt": "Postcode: ______",
+          "accept": [
+            "ls9 4tp",
+            "ls94tp"
+          ],
+          "explain": "\"L S nine, four T P.\" Kode pos selalu dibaca huruf demi huruf - tulis rapat tanpa ragu.",
+          "spokenAs": "L S nine, four T P"
+        },
+        {
+          "id": "lx-s1-4",
+          "type": "form_completion",
+          "answerType": "completion",
+          "prompt": "Mobile: ______",
+          "accept": [
+            "07911340628",
+            "079 11 340 628",
+            "0791 1340 628"
+          ],
+          "explain": "\"Oh-seven-nine, one-one, three-four-oh, six-two-eight.\" Petugasnya mengulang - pengulangan itu memang disediakan ujian untuk mengoreksi.",
+          "spokenAs": "Oh-seven-nine, one-one, three-four-oh, six-two-eight"
+        },
+        {
+          "id": "lx-s1-5",
+          "type": "multiple_choice",
+          "answerType": "choice",
+          "prompt": "Which programme does the woman join?",
+          "options": [
+            "Fitness",
+            "Beginners",
+            "Improvers",
+            "She has not decided"
+          ],
+          "answerIndex": 2,
+          "explain": "Ia bisa berenang tetapi tekniknya buruk dan lelah setelah dua lintasan - itu definisi Improvers yang diberikan petugas."
+        },
+        {
+          "id": "lx-s1-6",
+          "type": "form_completion",
+          "answerType": "completion",
+          "prompt": "Session day: ______",
+          "accept": [
+            "thursday"
+          ],
+          "explain": "Ia memilih Kamis karena Selasa baru selesai kerja pukul tujuh."
+        },
+        {
+          "id": "lx-s1-7",
+          "type": "form_completion",
+          "answerType": "completion",
+          "prompt": "Monthly fee: £______",
+          "accept": [
+            "32",
+            "32 pounds",
+            "thirty two"
+          ],
+          "explain": "Satu sesi per minggu = 32 pound sebulan. Jebakan di sini adalah 48, yang untuk DUA sesi."
+        },
+        {
+          "id": "lx-s1-8",
+          "type": "form_completion",
+          "answerType": "completion",
+          "prompt": "Joining fee: £______",
+          "accept": [
+            "15",
+            "15 pounds",
+            "fifteen"
+          ],
+          "explain": "Biaya sekali bayar 15 pound; ia tidak dapat pembebasan karena bukan pelajar maupun di atas 65."
+        },
+        {
+          "id": "lx-s1-9",
+          "type": "form_completion",
+          "answerType": "completion",
+          "prompt": "Must bring (not supplied): ______",
+          "accept": [
+            "padlock",
+            "a padlock"
+          ],
+          "explain": "\"We don't supply padlocks any more.\" Goggles hanya opsional - itu pembedanya."
+        },
+        {
+          "id": "lx-s1-10",
+          "type": "form_completion",
+          "answerType": "completion",
+          "prompt": "Start date: ______ October",
+          "accept": [
+            "11",
+            "11th",
+            "eleventh"
+          ],
+          "explain": "\"The eleventh of October.\""
+        }
+      ],
+      "wordCount": 522,
+      "questionCount": 10
+    },
+    {
+      "id": "lx-ielts-s2",
+      "exam": "ielts_listening_s2",
+      "level": "B2",
+      "title": "Pengarahan relawan kebun raya",
+      "script": "You will hear a talk given to new volunteers at a city botanical garden. As you listen, picture the layout of the garden as the speaker describes it.\n\nGood afternoon, and thank you all for giving up your Saturday. I'm going to walk you through the layout of the garden, because in your first few weeks the commonest question you'll be asked is simply \"where is the toilet\", and the second commonest is \"where can I get a cup of tea\".\n\nSo. You're standing at the main entrance, at the southern end of the garden. Directly ahead of you, running north, is the Central Avenue. Almost everything is reached from it.\n\nTake the first turning on your left, and you come to the Glasshouse. It's the large building on the western edge — you can't miss it, it's made of glass. That's where the tropical collection lives, and it's the warmest place in the garden, which matters in February. The Glasshouse is open every day, but the upper walkway inside it closes when it rains, because the metal gets slippery.\n\nNow, opposite the Glasshouse, on the other side of the Central Avenue, is the Rose Garden. It's the square area on the eastern side. It's at its best in June and it's essentially bare in January, so don't be surprised if visitors seem disappointed in winter.\n\nCarry on north up the Central Avenue and you'll reach a crossing point where four paths meet. The café is on the north-west corner of that crossing — so, on your left as you're walking up. It does hot drinks and sandwiches until four o'clock, and only hot drinks after that. The toilets are in the same building, round the back.\n\nFrom that same crossing, if you take the path heading east, you arrive at the Pond. It's the irregular-shaped area on the eastern side of the garden. There's a wooden platform over part of it. That platform has a weight limit and we don't allow school groups of more than fifteen onto it at once.\n\nFinally, at the northern end of the Central Avenue, is the Woodland Walk. That's the largest single area in the garden and it's deliberately left rough. There's no lighting along it, so in winter we close it at half past three, well before the rest of the garden.\n\nA few practical things. You'll each be given a radio. Please carry it, and please turn it on — a radio in a pocket that's switched off is worse than no radio, because we'll assume we can reach you. If you find a visitor who is unwell, don't move them; radio for help and stay where you are.\n\nYou'll also be asked about plants you don't recognise, constantly, and by people who assume that a volunteer knows everything. You won't, and it's absolutely fine to say so. What is not fine is guessing. Last summer a volunteer told a family that a berry was edible. It wasn't dangerous, as it turned out, but it very easily could have been. If you don't know, say you don't know and find someone who does.",
+      "questions": [
+        {
+          "id": "lx-s2-1",
+          "type": "location",
+          "answerType": "choice",
+          "prompt": "Where is the Glasshouse?",
+          "options": [
+            "On the eastern side",
+            "On the western edge",
+            "At the northern end",
+            "Beside the main entrance"
+          ],
+          "answerIndex": 1,
+          "explain": "\"The large building on the western edge.\" Rose Garden yang di sisi timur."
+        },
+        {
+          "id": "lx-s2-2",
+          "type": "detail",
+          "answerType": "choice",
+          "prompt": "What closes when it rains?",
+          "options": [
+            "The upper walkway inside the Glasshouse",
+            "The Rose Garden",
+            "The whole Glasshouse",
+            "The café"
+          ],
+          "answerIndex": 0,
+          "explain": "Yang tutup hanya jalur atasnya, karena logamnya jadi licin - bukan seluruh Glasshouse."
+        },
+        {
+          "id": "lx-s2-3",
+          "type": "location",
+          "answerType": "choice",
+          "prompt": "Where is the café?",
+          "options": [
+            "On the north-east corner of the crossing",
+            "On the north-west corner of the crossing",
+            "At the entrance",
+            "Next to the Pond"
+          ],
+          "answerIndex": 1,
+          "explain": "\"On your left as you're walking up\" - dan ia berjalan ke utara, jadi kiri = barat laut. Toilet ada di gedung yang sama."
+        },
+        {
+          "id": "lx-s2-4",
+          "type": "detail",
+          "answerType": "choice",
+          "prompt": "What restriction applies to the platform over the Pond?",
+          "options": [
+            "It is for staff only",
+            "It closes in winter",
+            "No school group larger than fifteen at once",
+            "Photography is not allowed"
+          ],
+          "answerIndex": 2,
+          "explain": "Ada batas beban, dan aturannya maksimal lima belas anak sekaligus."
+        },
+        {
+          "id": "lx-s2-5",
+          "type": "detail",
+          "answerType": "choice",
+          "prompt": "Why does the Woodland Walk close at 3.30 in winter?",
+          "options": [
+            "There is no lighting along it",
+            "It floods",
+            "It is being replanted",
+            "Volunteers finish at that time"
+          ],
+          "answerIndex": 0,
+          "explain": "Sebabnya disebut langsung: tidak ada penerangan."
+        },
+        {
+          "id": "lx-s2-6",
+          "type": "attitude",
+          "answerType": "choice",
+          "prompt": "What does the speaker say volunteers must never do?",
+          "options": [
+            "Carry a radio",
+            "Admit they are new",
+            "Guess when they do not know a plant",
+            "Talk to school groups"
+          ],
+          "answerIndex": 2,
+          "explain": "\"It's absolutely fine to say so. What is not fine is guessing.\" Contoh buah beri itu dipakai untuk menegaskannya."
+        }
+      ],
+      "wordCount": 521,
+      "questionCount": 6
+    },
+    {
+      "id": "lx-ielts-s3",
+      "exam": "ielts_listening_s3",
+      "level": "B2",
+      "title": "Diskusi proyek suhu perkotaan",
+      "script": "You will hear two students, Priya and Tom, discussing a research project with their tutor.\n\nTUTOR: So, you've had three weeks on the urban heat study. Where are you?\n\nPRIYA: We've got the temperature data — six months of it, from twelve sensors across the city. The problem is that two of the sensors clearly aren't reliable.\n\nTUTOR: In what way?\n\nPRIYA: One of them, the one in the park, reads about four degrees cooler than everything around it, consistently. At first we thought that was the effect we were looking for — trees cooling the area. But it's four degrees at three in the morning as well, and that can't be shade.\n\nTOM: We went and looked at it. It's mounted about a metre from a water feature, and it's in a metal housing that's partly in the spray.\n\nTUTOR: Ah. So it's measuring the water, not the air.\n\nTOM: More or less. And the other bad sensor is the opposite problem — it's on a south-facing wall above a car park and it reads high all afternoon.\n\nTUTOR: What have you done about them?\n\nPRIYA: That's what we disagree about. I think we should drop both sensors entirely and work with ten.\n\nTOM: And I think we should keep them but flag them, because ten sensors is thin for a city this size, and the park one is still telling us something — it's just telling us about a microclimate rather than about the district.\n\nTUTOR: Both positions are defensible. What matters is that whichever you choose, you say so plainly in the method section and explain why. The failure mode here isn't dropping data or keeping it. It's doing either quietly.\n\nPRIYA: That's fair.\n\nTUTOR: What about the comparison with the older survey?\n\nTOM: That's where we've hit a real wall. The 2015 survey used a different measurement height — they mounted at three metres, we're at two. And there's a measurable difference between those heights, especially over paved surfaces.\n\nTUTOR: So a direct comparison overstates the warming.\n\nTOM: It could, yes. We estimated the height effect at somewhere between half a degree and one degree.\n\nTUTOR: That's a wide range.\n\nTOM: It is, and we can't narrow it without doing our own paired measurements at both heights, which we don't have time for.\n\nTUTOR: Then don't narrow it. Report the range and let it stand. A wide honest interval is worth more than a narrow invented one. Priya, what's your view on the write-up?\n\nPRIYA: I want to lead with the district comparison, because that's the striking result — the difference between the industrial east and the residential north is nearly three degrees.\n\nTUTOR: And Tom?\n\nTOM: I'd rather lead with the method, because the whole result depends on whether people believe the sensors. If we open with the dramatic number, the first question in the room will be \"how do you know\", and we'll spend the entire discussion defending ourselves.\n\nTUTOR: Tom's instinct is the right one for an assessed report, though Priya's would be right for a conference talk. Different audiences. For this, method first.\n\nPRIYA: Understood.\n\nTUTOR: One more thing. Your deadline is the twelfth, but the lab shuts for maintenance on the ninth and tenth. So plan for the tenth being unusable.",
+      "questions": [
+        {
+          "id": "lx-s3-1",
+          "type": "detail",
+          "answerType": "choice",
+          "prompt": "Why does the park sensor read four degrees cooler?",
+          "options": [
+            "It is shaded by trees",
+            "It is faulty and reads randomly",
+            "It is partly in the spray from a water feature",
+            "It was installed at the wrong height"
+          ],
+          "answerIndex": 2,
+          "explain": "Awalnya mereka mengira itu efek pepohonan - tetapi selisihnya tetap ada pukul tiga pagi, jadi bukan naungan."
+        },
+        {
+          "id": "lx-s3-2",
+          "type": "speaker_opinion",
+          "answerType": "choice",
+          "prompt": "What does Priya want to do with the two bad sensors?",
+          "options": [
+            "Drop both and use ten",
+            "Keep both but flag them",
+            "Move both to new locations",
+            "Recalibrate both"
+          ],
+          "answerIndex": 0,
+          "explain": "Priya membuang, Tom mempertahankan sambil menandai - jangan tertukar."
+        },
+        {
+          "id": "lx-s3-3",
+          "type": "speaker_opinion",
+          "answerType": "choice",
+          "prompt": "Why does Tom want to keep them?",
+          "options": [
+            "He installed them himself",
+            "The tutor asked him to",
+            "Ten sensors is thin, and the park one still shows a microclimate",
+            "Removing data is against the rules"
+          ],
+          "answerIndex": 2,
+          "explain": "Dua alasan, dan keduanya harus tertangkap - jumlah sensor DAN nilai datanya yang berbeda jenis."
+        },
+        {
+          "id": "lx-s3-4",
+          "type": "attitude",
+          "answerType": "choice",
+          "prompt": "According to the tutor, what would be the real failure?",
+          "options": [
+            "Dropping the data",
+            "Keeping the data",
+            "Missing the deadline",
+            "Doing either without saying so in the method"
+          ],
+          "answerIndex": 3,
+          "explain": "\"The failure mode here isn't dropping data or keeping it. It's doing either quietly.\""
+        },
+        {
+          "id": "lx-s3-5",
+          "type": "detail",
+          "answerType": "choice",
+          "prompt": "What makes the comparison with the 2015 survey difficult?",
+          "options": [
+            "It covered fewer districts",
+            "It used a different measurement height",
+            "It measured at night only",
+            "Its data was lost"
+          ],
+          "answerIndex": 1,
+          "explain": "Tiga meter versus dua meter, dan selisihnya terukur terutama di atas permukaan beraspal."
+        },
+        {
+          "id": "lx-s3-6",
+          "type": "attitude",
+          "answerType": "choice",
+          "prompt": "What does the tutor advise about the half-to-one degree range?",
+          "options": [
+            "Ask the 2015 team for their data",
+            "Narrow it with an estimate",
+            "Leave it out entirely",
+            "Report the range as it stands"
+          ],
+          "answerIndex": 3,
+          "explain": "\"A wide honest interval is worth more than a narrow invented one.\""
+        },
+        {
+          "id": "lx-s3-7",
+          "type": "speaker_opinion",
+          "answerType": "choice",
+          "prompt": "Whose ordering does the tutor prefer for this report, and why?",
+          "options": [
+            "Tom's, because the result depends on the method being believed",
+            "Priya's, because the district difference is striking",
+            "Neither; he suggests a third order",
+            "Priya's, because it suits an assessed report"
+          ],
+          "answerIndex": 0,
+          "explain": "Tutor membedakan audiens: urutan Priya cocok untuk konferensi, urutan Tom untuk laporan yang dinilai."
+        },
+        {
+          "id": "lx-s3-8",
+          "type": "form_completion",
+          "answerType": "completion",
+          "prompt": "The lab will be unusable on the ______ and 10th.",
+          "accept": [
+            "9th",
+            "9",
+            "ninth"
+          ],
+          "explain": "Laboratorium tutup untuk perawatan tanggal 9 dan 10, sedangkan tenggatnya tanggal 12."
+        }
+      ],
+      "wordCount": 545,
+      "questionCount": 8
+    },
+    {
+      "id": "lx-ielts-s4",
+      "exam": "ielts_listening_s4",
+      "level": "C1",
+      "title": "Kuliah: sejarah waktu standar",
+      "script": "You will hear part of a lecture on the history of standardised time.\n\nBefore the middle of the nineteenth century, almost every town in Britain kept its own time, and it did so entirely reasonably. Local noon was the moment the sun stood highest over that particular place, and since the sun does not arrive everywhere at once, Bristol's noon fell about ten minutes after London's. For most of history this caused nobody any difficulty whatsoever. If your fastest communication travels at the speed of a horse, a ten-minute discrepancy between two towns is not a problem you will ever encounter.\n\nThe railway changed that, and it changed it very quickly. A timetable is a promise about when a train will be somewhere, and a promise of that kind requires everybody involved to agree on what time it is. When the Great Western Railway began operating, its timetables were printed in London time, and passengers in the west of England had to perform a small mental subtraction to know when to arrive at the station. Some of them got it wrong. More seriously, so did some signalmen — and two trains on a single track, whose crews disagree about the time by several minutes, is not a scheduling inconvenience. It is a collision.\n\nSo the railway companies imposed a single standard, and they did so before any government did. By the eighteen-fifties most British railways ran on London time. The country as a whole did not follow legally until eighteen eighty, and I want you to notice the order there, because it recurs throughout the history of technology: the practical standard arrived first, and the law caught up afterwards.\n\nResistance was real, and it was not merely sentimental. There is a well-documented case of a court in Dorset where a hearing was scheduled for ten o'clock. The judge arrived at ten o'clock railway time; the defendant arrived at ten o'clock local time, some minutes later, and the case had already been decided against him in his absence. The decision was overturned, but the incident illustrates the point: when a standard changes, the people harmed first are usually the people who were following the old rule correctly.\n\nThe same argument played out internationally, at a larger scale, and with the added difficulty that no country wished to accept another country's meridian as the reference. The conference that eventually settled on Greenwich took place in eighteen eighty-four, and the choice was less a matter of scientific merit than of shipping. A large majority of the world's charts already used Greenwich, simply because a large majority of the world's merchant tonnage was British. France abstained, and continued to define its own time by reference to Paris for another twenty-seven years.\n\nWhat I want you to take from this is not the dates. It is the shape of the process. A technology creates a coordination problem that did not previously exist. The industry most exposed to that problem solves it privately, for its own reasons, and on its own terms. The solution then spreads because it is inconvenient not to adopt it — and only at the very end does anyone write it into law. If you are looking at any modern standards dispute, that is the pattern to test your case against.",
+      "questions": [
+        {
+          "id": "lx-s4-1",
+          "type": "note_completion",
+          "answerType": "completion",
+          "prompt": "Bristol's noon fell about ______ minutes after London's.",
+          "accept": [
+            "ten",
+            "10"
+          ],
+          "explain": "Selisihnya sekitar sepuluh menit - dan tidak pernah jadi masalah selama komunikasi tercepat masih secepat kuda."
+        },
+        {
+          "id": "lx-s4-2",
+          "type": "note_completion",
+          "answerType": "completion",
+          "prompt": "The ______ Railway printed its timetables in London time.",
+          "accept": [
+            "great western",
+            "great western railway",
+            "gwr"
+          ],
+          "explain": "Great Western Railway. Penumpang di barat Inggris harus mengurangi sendiri selisihnya."
+        },
+        {
+          "id": "lx-s4-3",
+          "type": "detail",
+          "answerType": "choice",
+          "prompt": "Why was the time discrepancy dangerous on the railways?",
+          "options": [
+            "Passengers arrived late for trains",
+            "Clocks were expensive to maintain",
+            "Signalmen could disagree about the time on a single track",
+            "Timetables were printed incorrectly"
+          ],
+          "answerIndex": 2,
+          "explain": "Penumpang telat itu merepotkan; dua kereta di satu rel dengan awak yang berbeda pendapat soal waktu itu tabrakan."
+        },
+        {
+          "id": "lx-s4-4",
+          "type": "note_completion",
+          "answerType": "completion",
+          "prompt": "Britain adopted the standard in law in ______.",
+          "accept": [
+            "1880",
+            "eighteen eighty"
+          ],
+          "explain": "Standar praktisnya sudah dipakai kereta sejak 1850-an; hukumnya menyusul tahun 1880."
+        },
+        {
+          "id": "lx-s4-5",
+          "type": "organization",
+          "answerType": "choice",
+          "prompt": "What point does the court case in Dorset illustrate?",
+          "options": [
+            "Judges resisted the railways",
+            "Those harmed first are the people who followed the old rule correctly",
+            "Local time was more reliable",
+            "Courts kept the most accurate clocks"
+          ],
+          "answerIndex": 1,
+          "explain": "Terdakwa datang tepat waktu menurut waktu setempat - ia benar menurut aturan lama, dan justru itu yang merugikannya."
+        },
+        {
+          "id": "lx-s4-6",
+          "type": "note_completion",
+          "answerType": "completion",
+          "prompt": "The international conference chose Greenwich in ______.",
+          "accept": [
+            "1884",
+            "eighteen eighty four"
+          ],
+          "explain": "Dan pilihannya soal pelayaran, bukan keunggulan ilmiah: mayoritas peta dunia sudah memakai Greenwich."
+        },
+        {
+          "id": "lx-s4-7",
+          "type": "gist",
+          "answerType": "choice",
+          "prompt": "What does the speaker most want the audience to take away?",
+          "options": [
+            "The pattern: industry solves the problem first, law follows last",
+            "The exact dates of each adoption",
+            "That Britain led the world in timekeeping",
+            "That France was unreasonable"
+          ],
+          "answerIndex": 0,
+          "explain": "\"What I want you to take from this is not the dates. It is the shape of the process.\""
+        }
+      ],
+      "wordCount": 552,
+      "questionCount": 7
+    },
+    {
+      "id": "lx-toefl-conv",
+      "exam": "toefl_listening_conversation",
+      "level": "B2",
+      "title": "Percakapan: perpustakaan kampus",
+      "script": "Listen to a conversation between a student and a university librarian.\n\nSTUDENT: Excuse me, is this where I ask about interlibrary loans?\n\nLIBRARIAN: It is. What are you looking for?\n\nSTUDENT: There's a book I need for my thesis — it's a collection of essays on eighteenth-century printing, edited by someone called Whitfield. Our catalogue says we don't have it.\n\nLIBRARIAN: Let me look. Whitfield… yes, I see the record. We don't hold it, but three libraries in the consortium do. I can request it for you. The usual turnaround is about a week, sometimes ten days.\n\nSTUDENT: A week. That's — my chapter draft is due Friday.\n\nLIBRARIAN: Then the loan won't help you for Friday. But hold on. Do you need the whole book, or a particular essay?\n\nSTUDENT: One essay, mainly. Maybe two.\n\nLIBRARIAN: That changes things. For a single chapter we can usually get a scan, and scans come through much faster — often the same day, occasionally within a couple of hours if the holding library is quick. There's a limit, though. Copyright rules mean we can request one chapter, or about ten percent of the book, whichever is smaller. Not two chapters from the same volume.\n\nSTUDENT: So I'd have to choose.\n\nLIBRARIAN: For now, yes. You could request the second essay next month, once the first request has aged out. People do that. It's not elegant, but it's legitimate.\n\nSTUDENT: All right. Then I'll take the Whitfield essay — the one on provincial printers.\n\nLIBRARIAN: I'll put that through now. Can I ask what your thesis is on?\n\nSTUDENT: Book distribution outside London, roughly 1720 to 1780. Which is why the provincial printing material matters so much.\n\nLIBRARIAN: Then let me suggest something. Have you been through our own special collections?\n\nSTUDENT: I assumed they were mostly manuscripts.\n\nLIBRARIAN: There's a manuscript collection, yes, but there's also a run of printers' ledgers from two towns in the north, and I don't think they're catalogued in a way that would ever show up in your searches. They're listed under the donor's name, not the subject.\n\nSTUDENT: That's — how would anyone ever find them?\n\nLIBRARIAN: By asking someone at this desk. Which is roughly the answer to a lot of questions about our catalogue, unfortunately. It's on the list to be fixed.\n\nSTUDENT: Can I see them?\n\nLIBRARIAN: You'll need to book a reading room slot, and they don't leave the building. Bring pencils only — no pens — and you can photograph, but without flash. The booking system is on the library site under Special Collections. If the slots look full, email anyway; there's usually more room than the system suggests.\n\nSTUDENT: This might be more useful than the book.\n\nLIBRARIAN: It might well be. I'd still put the scan request through, though. Belt and braces.",
+      "questions": [
+        {
+          "id": "lx-tc-1",
+          "type": "gist_purpose",
+          "answerType": "choice",
+          "prompt": "Why does the student go to the librarian?",
+          "options": [
+            "To renew an overdue book",
+            "To ask about getting a book the library does not hold",
+            "To complain about the catalogue",
+            "To book a study room"
+          ],
+          "answerIndex": 1,
+          "explain": "Soal gist-purpose menanyakan ALASAN datang, bukan hal paling menarik yang muncul belakangan."
+        },
+        {
+          "id": "lx-tc-2",
+          "type": "detail",
+          "answerType": "choice",
+          "prompt": "Why will the interlibrary loan not solve the student's problem?",
+          "options": [
+            "The book is not in the consortium",
+            "The student has unpaid fines",
+            "It takes about a week and the draft is due Friday",
+            "The book cannot be loaned"
+          ],
+          "answerIndex": 2,
+          "explain": "Bukunya tersedia di tiga perpustakaan - masalahnya waktu, bukan ketersediaan."
+        },
+        {
+          "id": "lx-tc-3",
+          "type": "detail",
+          "answerType": "choice",
+          "prompt": "What limit applies to scanned chapters?",
+          "options": [
+            "Two chapters per book",
+            "Ten pages per request",
+            "One request per semester",
+            "One chapter or about ten percent, whichever is smaller"
+          ],
+          "answerIndex": 3,
+          "explain": "Karena itulah ia harus memilih satu esai dulu dan meminta yang kedua bulan depan."
+        },
+        {
+          "id": "lx-tc-4",
+          "type": "inference",
+          "answerType": "choice",
+          "prompt": "What can be inferred about the special collections?",
+          "options": [
+            "They have been fully digitised",
+            "They contain only manuscripts",
+            "They are closed to undergraduates",
+            "Material relevant to the student is effectively undiscoverable by searching"
+          ],
+          "answerIndex": 3,
+          "explain": "Buku besarnya terdaftar atas nama penyumbang, bukan subjek - jadi pencarian apa pun tidak akan menemukannya."
+        },
+        {
+          "id": "lx-tc-5",
+          "type": "detail",
+          "answerType": "choice",
+          "prompt": "What must the student do to consult the ledgers?",
+          "options": [
+            "Request them through interlibrary loan",
+            "Book a reading room slot and bring pencils only",
+            "Get a letter from a supervisor",
+            "Pay a handling fee"
+          ],
+          "answerIndex": 1,
+          "explain": "Tidak boleh keluar gedung, pensil saja, boleh difoto tanpa lampu kilat."
+        },
+        {
+          "id": "lx-tc-6",
+          "type": "function",
+          "answerType": "choice",
+          "prompt": "Why does the librarian say \"Belt and braces\"?",
+          "options": [
+            "To say the scan is worth requesting even though the ledgers may be better",
+            "To signal the conversation is over",
+            "To warn the student the ledgers are fragile",
+            "To suggest the student is being careless"
+          ],
+          "answerIndex": 0,
+          "explain": "Ungkapan itu berarti memakai dua pengaman sekaligus - ia menyarankan tetap meminta scan sebagai cadangan."
+        }
+      ],
+      "wordCount": 465,
+      "questionCount": 6
+    },
+    {
+      "id": "lx-toefl-lecture",
+      "exam": "toefl_listening_lecture",
+      "level": "C1",
+      "title": "Kuliah biologi: warna peringatan dan peniruan",
+      "script": "Listen to part of a lecture in a biology class.\n\nToday I want to talk about something that sounds like a paradox: why a great many animals are brightly coloured when being noticed is, on the face of it, an excellent way to get eaten.\n\nThe obvious answer is camouflage — and camouflage is real, it's everywhere, it works. But there's a whole set of species doing the opposite, deliberately, and doing it successfully. We call that aposematism: conspicuous colouring that advertises a defence.\n\nThe classic case is the poison dart frog. Bright orange, bright blue, sometimes a combination that no forest floor has ever produced naturally. And it's toxic. Now, here's the part students often get backwards. The colour is not there to warn a predator that is about to attack. It's there to be remembered by a predator that attacked something like it before, survived, and found the experience thoroughly unpleasant.\n\nThat distinction matters, because it tells you what the system requires in order to work. It requires predators that learn. It requires that the toxin be unpleasant but not usually fatal — a predator that dies learns nothing and tells nothing. And crucially, it requires that the signal be consistent. If half the orange frogs in a forest are toxic and half aren't, the lesson doesn't hold, and the whole arrangement decays.\n\nWhich brings us to the freeloaders. Some harmless species have evolved to look like the toxic ones. That's Batesian mimicry — named for Henry Bates, who noticed it in the Amazon in the eighteen-sixties. The harmless mimic gets protection without paying the metabolic cost of producing a toxin.\n\nNow think about what that does to the system. Every mimic added to the population makes the warning slightly less reliable. Predators encounter more and more orange things that turn out to be perfectly edible, and the association weakens. So there's a natural ceiling: Batesian mimicry only remains viable while mimics stay rare relative to the models. When mimics become common, the signal degrades, and — this is the interesting part — the mimics suffer too, because the protection they were free-riding on stops working.\n\nThere's a second kind, and it works completely differently. Müllerian mimicry is when two species that are both genuinely defended come to resemble each other. Two toxic butterflies, converging on the same pattern. At first that seems pointless — why would a defended species need to imitate another defended species?\n\nThe answer is about the cost of teaching. Every predator has to learn the lesson at least once, and that learning costs some individual its life. If two toxic species look different, the predator population has to learn two lessons, and each lesson is paid for in dead butterflies from that species. If they look the same, the two species share a single lesson. The teaching cost is divided. Neither is exploiting the other; both are better off.\n\nSo we have three arrangements that look superficially similar — bright warning colours, and two kinds of mimicry — and they have completely different dynamics. Aposematism is honest advertising. Batesian mimicry is parasitic on that honesty and self-limiting. Müllerian mimicry is cooperative and self-reinforcing.\n\nOne last complication, because nature rarely stays tidy. It turns out the line between Batesian and Müllerian isn't sharp. Toxicity comes in degrees. A species might be mildly unpleasant while its model is genuinely dangerous — so it's partly free-riding and partly contributing. Field studies through the nineteen-nineties kept finding cases that sat somewhere in the middle, and the current view is that these are two ends of a continuum rather than two separate phenomena.\n\nFor Thursday, read the Ruxton chapter. And come prepared to argue about the continuum claim, because it isn't universally accepted.",
+      "questions": [
+        {
+          "id": "lx-tl-1",
+          "type": "gist",
+          "answerType": "choice",
+          "prompt": "What is the lecture mainly about?",
+          "options": [
+            "How poison dart frogs produce toxins",
+            "Why some animals advertise rather than hide, and how mimicry exploits or supports it",
+            "The history of research in the Amazon",
+            "Why camouflage is the dominant strategy"
+          ],
+          "answerIndex": 1,
+          "explain": "Kamuflase dan sejarah Bates hanya disinggung; tulang punggung kuliahnya tiga mekanisme itu."
+        },
+        {
+          "id": "lx-tl-2",
+          "type": "detail",
+          "answerType": "choice",
+          "prompt": "Why must the toxin usually NOT be fatal?",
+          "options": [
+            "Predators would avoid the whole forest",
+            "Fatal toxins are metabolically expensive",
+            "Prey would also be poisoned",
+            "A predator that dies learns nothing and passes nothing on"
+          ],
+          "answerIndex": 3,
+          "explain": "Seluruh sistemnya bergantung pada predator yang selamat lalu MENGINGAT - itu sebabnya warnanya bukan peringatan bagi penyerang saat itu."
+        },
+        {
+          "id": "lx-tl-3",
+          "type": "organization",
+          "answerType": "choice",
+          "prompt": "Why is Batesian mimicry self-limiting?",
+          "options": [
+            "Mimics eventually develop real toxins",
+            "As mimics become common the warning becomes unreliable and stops protecting them",
+            "Predators evolve better eyesight",
+            "The models change colour"
+          ],
+          "answerIndex": 1,
+          "explain": "Ada langit-langit alami: peniru hanya aman selama jumlahnya tetap sedikit dibanding yang beracun."
+        },
+        {
+          "id": "lx-tl-4",
+          "type": "detail",
+          "answerType": "choice",
+          "prompt": "What is the benefit of Müllerian mimicry?",
+          "options": [
+            "Two defended species share the cost of teaching predators one lesson",
+            "It makes both species harder to see",
+            "One species avoids producing toxin",
+            "It confuses predators into attacking neither"
+          ],
+          "answerIndex": 0,
+          "explain": "Biaya pengajarannya dibagi - dan tidak ada yang menumpang, keduanya sama-sama untung."
+        },
+        {
+          "id": "lx-tl-5",
+          "type": "function",
+          "answerType": "choice",
+          "prompt": "What does the professor mean by \"the teaching cost is divided\"?",
+          "options": [
+            "The two species take turns being eaten",
+            "Predators learn twice as fast",
+            "The toxin is produced jointly",
+            "Fewer individuals die while predators learn, because one lesson covers both species"
+          ],
+          "answerIndex": 3,
+          "explain": "Setiap pelajaran dibayar dengan nyawa individu; satu pelajaran untuk dua spesies berarti korbannya lebih sedikit."
+        },
+        {
+          "id": "lx-tl-6",
+          "type": "detail",
+          "answerType": "choice",
+          "prompt": "What is the current view of the line between the two kinds of mimicry?",
+          "options": [
+            "Batesian mimicry does not really exist",
+            "They are entirely separate phenomena",
+            "They are ends of a continuum, though this is not universally accepted",
+            "Müllerian mimicry only occurs in butterflies"
+          ],
+          "answerIndex": 2,
+          "explain": "Dosen menutup dengan meminta mahasiswa siap MEMPERDEBATKAN klaim kontinuum itu - tandanya belum disepakati."
+        }
+      ],
+      "wordCount": 625,
+      "questionCount": 6
+    },
+    {
+      "id": "lx-ielts-s2-v2",
+      "exam": "ielts_listening_s2",
+      "level": "B1",
+      "title": "Pengarahan anggota baru museum kota",
+      "script": "You will hear a member of staff welcoming new members to a city museum.\n\nGood morning, everyone, and welcome. My name is Dewi, and I run the membership desk, so if you forget everything else I say today, just remember my name and come and find me.\n\nLet me start with the building. The museum has three floors. The ground floor is where you'll spend most of your time at first. The main gallery is there, straight ahead of you as you come in, and it holds the permanent collection — the objects that are always here. The children's discovery room is on the ground floor too, at the back of the building, behind the stairs, away from the entrance noise. It's the one room where the objects are meant to be handled, so nobody will tell your children off for touching things in there.\n\nThe first floor is for temporary exhibitions. Those change three or four times a year. Your membership covers them — you don't pay anything extra — but at busy times you may still need a timed ticket, which you can pick up at the front desk on your way in.\n\nThe second floor is staff only, I'm afraid. That's where the stores are, and most of the collection — far more than we can show at once — lives up there. If there's an object you've read about and you'd like to see it, please don't go up. Ask at the front desk instead, and we'll arrange a viewing for you, usually within about two weeks.\n\nNow, your card. As a member you come in free, as often as you like, and you can bring two guests with you each month at half price. The card itself takes about a week to arrive in the post. Until it does, the welcome letter you received today works as a temporary card, so keep it in your bag.\n\nA few practical things. Photography is allowed everywhere except the temporary exhibitions, but never with a flash. Large bags have to go in the lockers beside the cloakroom, on the right as you come in. The lockers take a coin, and you get the coin back when you open them again.\n\nOpening hours. We're open from nine in the morning until five in the evening, every day except Mondays. And there's one more exception: on the first Tuesday of every month we open late, at one o'clock, because the morning is used for cleaning the galleries. People forget this all the time, so write it down now.\n\nFinally, the one rule I'm strict about. Your membership card is yours and nobody else's. Please don't lend it to anyone — not to your sister, not to your best friend, not to anyone at all. Every card is checked against a name at the desk, and every year somebody stands in front of me, embarrassed, with a borrowed card we've had to keep. If a friend loves the museum, bring them in as one of your monthly guests — or better still, make them a member.",
+      "questions": [
+        {
+          "id": "lx-s2v2-1",
+          "type": "multiple_choice",
+          "answerType": "choice",
+          "prompt": "How many guests can a member bring each month at half price?",
+          "options": [
+            "Four",
+            "One",
+            "Two",
+            "Three"
+          ],
+          "answerIndex": 2,
+          "explain": "\"You can bring two guests with you each month at half price.\" Bukan gratis - setengah harga."
+        },
+        {
+          "id": "lx-s2v2-2",
+          "type": "location",
+          "answerType": "choice",
+          "prompt": "Where is the children's discovery room?",
+          "options": [
+            "At the back of the ground floor, behind the stairs",
+            "On the first floor",
+            "On the second floor",
+            "Beside the cloakroom"
+          ],
+          "answerIndex": 0,
+          "explain": "\"At the back of the building, behind the stairs\" - satu-satunya ruangan yang bendanya memang boleh disentuh."
+        },
+        {
+          "id": "lx-s2v2-3",
+          "type": "detail",
+          "answerType": "choice",
+          "prompt": "What should members do to see an object kept in the stores?",
+          "options": [
+            "Go up to the second floor",
+            "Buy a timed ticket",
+            "Wait for a temporary exhibition",
+            "Ask at the front desk to arrange a viewing"
+          ],
+          "answerIndex": 3,
+          "explain": "Lantai dua khusus staf - jangan naik; minta di meja depan dan viewing diatur sekitar dua minggu."
+        },
+        {
+          "id": "lx-s2v2-4",
+          "type": "location",
+          "answerType": "choice",
+          "prompt": "Where are the lockers for large bags?",
+          "options": [
+            "Behind the main gallery",
+            "Beside the cloakroom, on the right as you come in",
+            "At the membership desk",
+            "On the first floor"
+          ],
+          "answerIndex": 1,
+          "explain": "\"Beside the cloakroom, on the right as you come in.\" Koinnya kembali saat lokernya dibuka lagi."
+        },
+        {
+          "id": "lx-s2v2-5",
+          "type": "detail",
+          "answerType": "choice",
+          "prompt": "What happens on the first Tuesday of every month?",
+          "options": [
+            "The museum is closed all day",
+            "Members' cards are checked",
+            "Entry is free for everyone",
+            "The museum opens late, at one o'clock"
+          ],
+          "answerIndex": 3,
+          "explain": "Selasa pertama tiap bulan buka siang pukul satu karena paginya galeri dibersihkan. Jebakannya: yang tutup sepanjang hari itu hari Senin."
+        },
+        {
+          "id": "lx-s2v2-6",
+          "type": "attitude",
+          "answerType": "choice",
+          "prompt": "What is the one rule the speaker says she is strict about?",
+          "options": [
+            "Members must never lend their card to anyone",
+            "Photography is never allowed",
+            "Children must not touch the objects",
+            "Guests must pay full price"
+          ],
+          "answerIndex": 0,
+          "explain": "\"Your membership card is yours and nobody else's.\" Kartu pinjaman akan ditahan di meja depan."
+        }
+      ],
+      "wordCount": 508,
+      "questionCount": 6
+    },
+    {
+      "id": "lx-ielts-s4-v2",
+      "exam": "ielts_listening_s4",
+      "level": "C2",
+      "title": "Kuliah: kina dan monopoli obat malaria",
+      "script": "You will hear part of a lecture on the history of quinine production.\n\nFor about three hundred years, the only reliable treatment for malaria came from one source: the bark of the cinchona tree, which grows wild on the eastern slopes of the Andes, in South America. The bark was ground into a bitter powder, and later the active compound — quinine — was extracted from it directly. Whoever controlled the bark, in other words, controlled the treatment of the deadliest disease on Earth. It would be reasonable to assume that South America, holding the trees, held that control indefinitely. It did not, and the way it lost that control is the subject of today's lecture.\n\nBy the middle of the nineteenth century, the colonial powers of Europe had an enormous appetite for quinine, because their empires ran through malarial country, and both the British and the Dutch tried to solve the problem the same way: take the tree out of the Andes and grow it on plantations in Asia. The British planted extensively in India. The Dutch planted in the highlands of Java. And here is the first twist in the story: for years, both projects were failures — not because the trees died, but because they lived. They grew perfectly well. Their bark simply contained almost no quinine. The species the Europeans had managed to obtain were, pharmacologically speaking, the wrong trees.\n\nThe turning point came in eighteen sixty-five, when an English trader named Charles Ledger obtained a quantity of seed from a variety with an extraordinarily high quinine content. He offered the seeds to the British government, which — and one savours the irony — declined them. So Ledger sold them to the Dutch, for a modest sum, and the Dutch planted them in Java. That single purchase turned out to be one of the most consequential bargains of the nineteenth century. The Ledger variety thrived in the volcanic soil of the Javanese highlands, and its bark was many times richer in quinine than anything the British had planted.\n\nI should pause here for a small digression, though it is a telling one. The Indonesian word for the tree is kina — and that word is not Dutch, and it is not Malay in origin. It descends from the old Quechua name the tree carried in the Andes. The plant crossed the world, changed hands, changed continents — and kept its name the whole way. Languages, like bark, preserve things.\n\nNow, concentration. By the nineteen-thirties, the plantations of Java supplied roughly ninety percent of the world's quinine. Ninety percent — of the only effective malaria drug — from the highlands of one island. A cartel based in Amsterdam set the world price. One is tempted to call this a triumph of agricultural planning, and in a sense it was. But a supply that concentrated is not strength. It is exposure, wearing strength's clothes.\n\nThe exposure was demonstrated in nineteen forty-two, when Japan occupied Java and the Allied powers lost, at a single stroke, almost the entire world supply. Soldiers were fighting in the most malarial regions on the planet with no access to the drug. The response was a crash programme of chemistry: within a few years, synthetic substitutes had been developed and manufactured at scale, and quinine's monopoly was over — permanently.\n\nSo what should you carry out of this lecture? Not the dates, and not the botany. Carry the shape of the argument: a monopoly built on a living crop, in a single place, is a monopoly waiting for a single bad year — or a single bad war. Concentration looks like power until the day it becomes the precise mechanism of collapse.",
+      "questions": [
+        {
+          "id": "lx-s4v2-1",
+          "type": "note_completion",
+          "answerType": "completion",
+          "prompt": "For centuries, the drug was extracted from the tree's ______.",
+          "accept": [
+            "bark",
+            "the bark"
+          ],
+          "explain": "\"The bark of the cinchona tree\" - obatnya diambil dari kulit kayunya, bukan daun atau akarnya."
+        },
+        {
+          "id": "lx-s4v2-2",
+          "type": "detail",
+          "answerType": "choice",
+          "prompt": "Why were the early British and Dutch plantations failures?",
+          "options": [
+            "The trees died in the Asian climate",
+            "The trees grew well but their bark contained almost no quinine",
+            "Local farmers refused to plant them",
+            "The seeds were stolen before they could be planted"
+          ],
+          "answerIndex": 1,
+          "explain": "\"Not because the trees died, but because they lived.\" Pohonnya subur - kandungan kuininnya yang nyaris nol."
+        },
+        {
+          "id": "lx-s4v2-3",
+          "type": "note_completion",
+          "answerType": "completion",
+          "prompt": "The turning point came in ______, when Ledger obtained the seeds.",
+          "accept": [
+            "1865",
+            "eighteen sixty five",
+            "eighteen sixtyfive",
+            "eighteen sixty-five"
+          ],
+          "explain": "\"The turning point came in eighteen sixty-five.\" Di lembar jawaban, tulis 1865.",
+          "spokenAs": "eighteen sixty-five"
+        },
+        {
+          "id": "lx-s4v2-4",
+          "type": "note_completion",
+          "answerType": "completion",
+          "prompt": "After the British declined them, Ledger sold the seeds to the ______.",
+          "accept": [
+            "dutch",
+            "the dutch",
+            "dutch government",
+            "the dutch government",
+            "netherlands",
+            "the netherlands",
+            "netherlands government",
+            "holland"
+          ],
+          "explain": "Inggris menolak benihnya - \"one savours the irony\" - lalu Ledger menjualnya murah ke Belanda."
+        },
+        {
+          "id": "lx-s4v2-5",
+          "type": "organization",
+          "answerType": "choice",
+          "prompt": "Why does the lecturer mention the Indonesian word \"kina\"?",
+          "options": [
+            "To correct a common mispronunciation",
+            "To show how strongly Dutch shaped Indonesian",
+            "To show the tree kept its Andean name as it crossed the world",
+            "To explain how quinine got its chemical name"
+          ],
+          "answerIndex": 2,
+          "explain": "Digresi itu menunjukkan nama Quechua dari Andes ikut menyeberang bersama pohonnya - \"languages, like bark, preserve things\"."
+        },
+        {
+          "id": "lx-s4v2-6",
+          "type": "note_completion",
+          "answerType": "completion",
+          "prompt": "By the 1930s, Java supplied roughly ______ percent of the world's quinine.",
+          "accept": [
+            "90",
+            "ninety",
+            "90 percent",
+            "ninety percent",
+            "90 per cent",
+            "ninety per cent"
+          ],
+          "explain": "\"Roughly ninety percent\" - sembilan puluh persen pasokan dunia dari dataran tinggi satu pulau."
+        },
+        {
+          "id": "lx-s4v2-7",
+          "type": "note_completion",
+          "answerType": "completion",
+          "prompt": "After 1942, a crash programme of chemistry produced ______ substitutes for quinine.",
+          "accept": [
+            "synthetic"
+          ],
+          "explain": "\"Synthetic substitutes had been developed and manufactured at scale\" - dan monopoli kuinin tamat permanen."
+        },
+        {
+          "id": "lx-s4v2-8",
+          "type": "gist",
+          "answerType": "choice",
+          "prompt": "What does the lecturer most want the audience to take away?",
+          "options": [
+            "A monopoly concentrated in one place looks like power until it becomes the mechanism of collapse",
+            "The exact dates of the quinine trade",
+            "That the British government made a historic mistake",
+            "How synthetic drugs are manufactured"
+          ],
+          "answerIndex": 0,
+          "explain": "\"Carry the shape of the argument\" - konsentrasi tampak seperti kekuatan sampai hari ia menjadi mekanisme keruntuhannya sendiri."
+        }
+      ],
+      "wordCount": 610,
+      "questionCount": 8
+    }
+  ]
+}

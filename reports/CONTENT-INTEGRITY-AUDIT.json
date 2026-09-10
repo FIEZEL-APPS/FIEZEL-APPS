@@ -1,0 +1,30 @@
+{
+  "schema": "fiezel-content-integrity-audit-v1",
+  "generatedFrom": "content-integrity-audit.js",
+  "version": "5.19.0",
+  "inspection": {
+    "grammar.recordsInspected": 154,
+    "reading.recordsInspected": 300,
+    "reading.questionsInSource": 1500,
+    "vocabulary.recordsInspected": 1765,
+    "reading-exam.recordsInspected": 60,
+    "listening-exam.recordsInspected": 43,
+    "listening.recordsInspected": 1407,
+    "speaking.recordsInspected": 36,
+    "speaking-exam.recordsInspected": 11,
+    "writing.recordsInspected": 36,
+    "classroom.recordsInspected": 38,
+    "library.recordsInspected": 9,
+    "grammar.questionsInspected": 3850,
+    "reading.questionsInspected": 1500,
+    "vocabulary.shippedRecords": 1765,
+    "vocabulary.questionsInspected": 7060,
+    "placement.blueprintSize": 25,
+    "placement.questionsInspected": 25,
+    "placement.cefrDistribution": "{\"A1\":6,\"A2\":5,\"B1\":4,\"B2\":4,\"C1\":3,\"C2\":3}"
+  },
+  "bySeverity": {},
+  "byCode": {},
+  "findings": [],
+  "truncated": 0
+}

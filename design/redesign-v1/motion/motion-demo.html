@@ -1,0 +1,208 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>FIEZEL — Motion Demo (token baru)</title>
+<style>
+:root{
+  /* surface / ink — DIRECTION.md */
+  --bg:#FFF9EE; --panel:#FFFFFF; --panel-soft:#FFF3DC; --line:#F0E4CF;
+  --text:#241A11; --muted:#6E5E47;
+  --sun:#FFC700; --sun-deep:#E6A800; --sun-press:#CC9600; --sun-soft:#FFF3C4;
+  --sun-grad:linear-gradient(180deg,#FFDE59,#FFA500);
+  --core:#1B1418; --core-soft:#2A2126; --core-line:#3A3038;
+  --on-core:#FDFAF3; --on-core-muted:rgba(253,250,243,.68);
+  --good:#2E8B69; --good-soft:#E9F7F0; --bad:#B8432D; --bad-soft:#FDE3DE;
+  --radius-lg:24px; --radius-md:16px; --radius-sm:12px;
+  --shadow-sm:0 2px 10px rgba(36,26,17,.06); --shadow-md:0 10px 30px rgba(36,26,17,.09);
+  /* motion tokens — MOTION.md */
+  --ease:cubic-bezier(.22,.8,.28,1);
+  --ease-spring:cubic-bezier(.34,1.4,.4,1);
+  --t-press:120ms; --t-fast:160ms; --t-base:240ms; --t-slow:320ms; --t-max:420ms;
+  --stagger:60ms;
+}
+*{box-sizing:border-box;margin:0}
+body{background:var(--bg);color:var(--text);
+  font:400 15px/1.55 "Plus Jakarta Sans","FZ Plus Jakarta Sans",system-ui,sans-serif;
+  padding:24px 16px 64px;max-width:430px;margin:0 auto}
+h1{font-size:22px;font-weight:800;margin-bottom:4px}
+p.sub{color:var(--muted);font-size:13px;margin-bottom:24px}
+section{margin-bottom:28px}
+h2{font-size:13px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;
+  color:var(--muted);margin-bottom:10px}
+h2 small{font-weight:600;letter-spacing:0;text-transform:none;color:var(--sun-deep)}
+.replay{font:700 12px/1 inherit;font-family:inherit;border:1.5px solid var(--line);
+  background:var(--panel);color:var(--muted);border-radius:999px;padding:8px 14px;
+  cursor:pointer;min-height:44px}
+
+/* ===== 1) CardEntrance + stagger ===== */
+.card{background:var(--panel);border:1.5px solid var(--line);border-radius:var(--radius-md);
+  padding:14px 16px;box-shadow:var(--shadow-sm);margin-bottom:10px;font-weight:600}
+.m-stagger.play > *{opacity:0;animation:mCardIn var(--t-base) var(--ease) forwards}
+.m-stagger.play > :nth-child(2){animation-delay:var(--stagger)}
+.m-stagger.play > :nth-child(3){animation-delay:calc(var(--stagger)*2)}
+.m-stagger.play > :nth-child(4){animation-delay:calc(var(--stagger)*3)}
+@keyframes mCardIn{from{opacity:0;transform:translateY(12px) scale(.97)}
+  to{opacity:1;transform:none}}
+
+/* ===== 2) SpringButton + ScalePress ===== */
+.btn{display:block;width:100%;min-height:52px;border:none;cursor:pointer;
+  font:700 15px/1 inherit;font-family:inherit;border-radius:999px;margin-bottom:10px;
+  transition:transform var(--t-fast) var(--ease-spring),
+             box-shadow var(--t-fast) var(--ease),
+             background-color var(--t-fast) var(--ease)}
+.btn.ink{background:var(--text);color:#FDFAF3;box-shadow:0 3px 0 #0d0a06}
+.btn.sun{background:var(--sun-grad);color:var(--text);box-shadow:0 3px 0 var(--sun-deep)}
+.btn:hover{transform:translateY(-2px)}
+.btn:active{transform:translateY(1px) scale(.97);box-shadow:0 1px 0 transparent;
+  transition-duration:var(--t-press)}
+.btn:focus-visible{outline:2px solid var(--sun-deep);outline-offset:2px}
+
+/* ===== 3) SuccessPulse / ErrorShake ===== */
+.answer{background:var(--panel);border:2px solid var(--line);border-radius:var(--radius-md);
+  padding:14px 16px;margin-bottom:10px;font-weight:600;cursor:pointer;min-height:52px;
+  width:100%;text-align:left;font-family:inherit;font-size:15px;color:var(--text);
+  transition:transform var(--t-press) var(--ease)}
+.answer:active{transform:scale(.97)}
+.answer.correct{border-color:var(--good);background:var(--good-soft);color:var(--good);
+  animation:mPulse var(--t-slow) var(--ease-spring)}
+@keyframes mPulse{30%{transform:scale(1.04)}}
+.answer.wrong{border-color:var(--bad);background:var(--bad-soft);color:var(--bad);
+  animation:mShake var(--t-slow) ease-in-out}
+@keyframes mShake{0%,100%{transform:translateX(0)}20%{transform:translateX(-6px)}
+  40%{transform:translateX(6px)}60%{transform:translateX(-4px)}80%{transform:translateX(4px)}}
+
+/* ===== 4) ProgressFill (scaleX, bukan width) + NumberCount ===== */
+.xp-row{display:flex;align-items:center;gap:12px}
+.xp{flex:1;height:14px;background:var(--panel-soft);border:1px solid var(--line);
+  border-radius:999px;overflow:hidden}
+.xp > b{display:block;height:100%;border-radius:999px;background:var(--sun-grad);
+  transform:scaleX(0);transform-origin:left center;
+  transition:transform var(--t-max) var(--ease)}
+.xp-num{font-weight:700;font-variant-numeric:tabular-nums;min-width:52px;text-align:right}
+
+/* ===== 5) Panel AI core: morph 240ms + neural draw-in ===== */
+.ai-panel{background:var(--core);color:var(--on-core);border:1px solid var(--core-line);
+  border-radius:var(--radius-lg);padding:18px;opacity:0;transform:scale(.96);
+  pointer-events:none}
+.ai-panel.show{animation:mMorph var(--t-base) var(--ease) forwards;pointer-events:auto}
+@keyframes mMorph{from{opacity:0;transform:scale(.96)}to{opacity:1;transform:scale(1)}}
+.ai-panel h3{font-size:12px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--sun);margin-bottom:8px}
+.ai-panel p{color:var(--on-core-muted);font-size:13px;margin-top:8px;opacity:0}
+.ai-panel.show p{animation:mFade var(--t-fast) var(--ease) calc(var(--t-base) + 120ms) forwards}
+@keyframes mFade{to{opacity:1}}
+.neural{width:100%;height:auto;display:block}
+.neural path{fill:none;stroke:var(--sun);stroke-width:2;stroke-linecap:round;
+  stroke-dasharray:340;stroke-dashoffset:340}
+.neural circle{fill:var(--sun);opacity:0}
+.ai-panel.show .neural path{animation:mDraw var(--t-max) var(--ease) 80ms forwards}
+@keyframes mDraw{to{stroke-dashoffset:0}}
+.ai-panel.show .neural circle{animation:mFade var(--t-fast) var(--ease) calc(var(--t-max) + 80ms) forwards}
+/* GlowPulse: MAKS 2 iterasi, lalu diam — tidak ada loop partikel */
+.ai-panel.show .neural .node-hub{animation:mFade var(--t-fast) var(--ease) calc(var(--t-max) + 80ms) forwards,
+  mGlow 900ms ease-in-out calc(var(--t-max) + 240ms) 2}
+@keyframes mGlow{50%{opacity:.45}}
+
+footer{color:var(--muted);font-size:12px;border-top:1px solid var(--line);padding-top:14px}
+
+/* ===== prefers-reduced-motion: informasi tetap sampai, gerak dihilangkan ===== */
+@media (prefers-reduced-motion:reduce){
+  .m-stagger.play > *{animation:none;opacity:1;transform:none}
+  .btn,.btn:hover,.btn:active{transition:none;transform:none}
+  .answer.correct,.answer.wrong{animation:none}
+  .xp > b{transition:none}
+  .ai-panel.show{animation:none;opacity:1;transform:none}
+  .ai-panel.show .neural path{animation:none;stroke-dashoffset:0}
+  .ai-panel.show .neural circle,.ai-panel.show p{animation:none;opacity:1}
+}
+</style>
+</head>
+<body>
+<h1>FIEZEL motion demo</h1>
+<p class="sub">Token baru: <code>--ease(.22,.8,.28,1)</code> · <code>--ease-spring(.34,1.4,.4,1)</code> · 160–420ms. Transform/opacity only.</p>
+
+<section>
+  <h2>1 · CardEntrance <small>240ms + stagger 60ms — question entrance (OBSERVE)</small></h2>
+  <div class="m-stagger" id="stag">
+    <div class="card">Which sentence is correct?</div>
+    <div class="card">She go to school.</div>
+    <div class="card">She goes to school.</div>
+    <div class="card">She going to school.</div>
+  </div>
+  <button class="replay" onclick="replayStagger()">Putar ulang</button>
+</section>
+
+<section>
+  <h2>2 · SpringButton + ScalePress <small>press 120ms, rilis 160ms spring (ANALYZE)</small></h2>
+  <button class="btn ink">Nilai jawaban</button>
+  <button class="btn sun">Dengarkan</button>
+</section>
+
+<section>
+  <h2>3 · SuccessPulse / ErrorShake <small>320ms — correct/wrong (ADAPT)</small></h2>
+  <button class="answer" id="ansGood" onclick="feedback(this,'correct')">She goes to school. <em style="float:right;font-style:normal">tap = benar</em></button>
+  <button class="answer" id="ansBad" onclick="feedback(this,'wrong')">She go to school. <em style="float:right;font-style:normal">tap = salah</em></button>
+</section>
+
+<section>
+  <h2>4 · ProgressFill + NumberCount <small>420ms, scaleX &amp; tabular-nums (IMPROVE)</small></h2>
+  <div class="xp-row">
+    <div class="xp"><b id="xpBar"></b></div>
+    <span class="xp-num" id="xpNum">0 XP</span>
+  </div>
+  <button class="replay" style="margin-top:10px" onclick="fillXp()">Isi progres</button>
+</section>
+
+<section>
+  <h2>5 · Panel AI core <small>morph 240ms + neural draw-in 420ms, tanpa loop partikel</small></h2>
+  <div class="ai-panel" id="aiPanel">
+    <h3>Menganalisis polamu</h3>
+    <svg class="neural" viewBox="0 0 320 90" aria-hidden="true">
+      <path d="M14 66 C 60 66, 70 24, 116 24 S 172 66, 218 66 246 24, 306 24"/>
+      <circle cx="14" cy="66" r="4"/>
+      <circle cx="116" cy="24" r="4"/>
+      <circle cx="218" cy="66" r="4"/>
+      <circle class="node-hub" cx="306" cy="24" r="6"/>
+    </svg>
+    <p>Kamu kuat di <b style="color:var(--on-core)">simple present</b>, tapi sering tertukar subjek orang-ketiga. Latihan berikut menyesuaikan.</p>
+  </div>
+  <button class="replay" style="margin-top:10px" onclick="replayAi()">Buka panel</button>
+</section>
+
+<footer>Offline · tanpa library · menghormati <code>prefers-reduced-motion</code> (semua state akhir tetap tampil tanpa gerak).</footer>
+
+<script>
+var RM = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+function replayStagger(){
+  var el = document.getElementById('stag');
+  el.classList.remove('play'); void el.offsetWidth; el.classList.add('play');
+}
+function feedback(el, cls){
+  el.classList.remove('correct','wrong'); void el.offsetWidth; el.classList.add(cls);
+}
+/* NumberCount: rAF, ~420ms, ease-out; reduced-motion -> nilai final langsung */
+function fillXp(){
+  var bar = document.getElementById('xpBar'), num = document.getElementById('xpNum');
+  bar.style.transform = 'scaleX(0)'; void bar.offsetWidth;
+  bar.style.transform = 'scaleX(.72)';
+  var target = 720, dur = 420, t0 = null;
+  if (RM){ num.textContent = target + ' XP'; return; }
+  requestAnimationFrame(function step(t){
+    if (!t0) t0 = t;
+    var p = Math.min((t - t0) / dur, 1), e = 1 - Math.pow(1 - p, 3);
+    num.textContent = Math.round(target * e) + ' XP';
+    if (p < 1) requestAnimationFrame(step);
+  });
+}
+function replayAi(){
+  var el = document.getElementById('aiPanel');
+  el.classList.remove('show'); void el.offsetWidth; el.classList.add('show');
+}
+/* entrance awal */
+replayStagger();
+</script>
+</body>
+</html>

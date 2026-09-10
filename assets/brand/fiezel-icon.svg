@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <title>FIEZEL</title>
+  <defs>
+    <radialGradient id="field" cx="30%" cy="18%" r="92%">
+      <stop offset="0%"   stop-color="#241A1D"/>
+      <stop offset="55%"  stop-color="#140E10"/>
+      <stop offset="100%" stop-color="#070405"/>
+    </radialGradient>
+    <radialGradient id="sheen" cx="30%" cy="16%" r="86%">
+      <stop offset="0%"  stop-color="#ffffff" stop-opacity=".15"/>
+      <stop offset="62%" stop-color="#ffffff" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="ivory" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%"   stop-color="#FFFBF3"/>
+      <stop offset="100%" stop-color="#EBDBC0"/>
+    </linearGradient>
+    <linearGradient id="gold" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%"   stop-color="#F7E3AE"/>
+      <stop offset="45%"  stop-color="#DDB55F"/>
+      <stop offset="100%" stop-color="#B0812A"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="512" height="512" fill="url(#field)"/>
+  <rect width="512" height="512" fill="url(#sheen)"/>
+
+  <!-- Huruf F: batang dan dua lengan, semua ujungnya membulat supaya satu keluarga bentuk
+       dengan batang gelombang di sebelahnya. -->
+  <g fill="url(#ivory)">
+    <rect x="136" y="148" width="42"  height="216" rx="20"/>
+    <rect x="136" y="148" width="128" height="42"  rx="20"/>
+    <rect x="136" y="230" width="102" height="40"  rx="19"/>
+  </g>
+
+  <!-- Dua batang emas melanjutkan batang F menjadi gelombang suara. Jaraknya dilebarkan
+       dari draf awal supaya keduanya tidak menyatu saat ikon mengecil ke 38px. -->
+  <g fill="url(#gold)">
+    <rect x="298" y="200" width="34" height="112" rx="17"/>
+    <rect x="348" y="166" width="34" height="180" rx="17"/>
+  </g>
+</svg>

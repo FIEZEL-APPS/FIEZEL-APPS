@@ -1,0 +1,15 @@
+{
+  "status": "NOT READY",
+  "browser": "/usr/bin/chromium",
+  "counts": {
+    "pass": 0,
+    "fail": 1
+  },
+  "checks": [
+    {
+      "name": "E2E run completed",
+      "status": "FAIL",
+      "details": "WebSocket is not defined"
+    }
+  ]
+}

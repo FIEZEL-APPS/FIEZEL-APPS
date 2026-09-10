@@ -1,0 +1,82 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 320" width="100%" height="100%" role="img" aria-label="PAW #20 — PAW Pakaian Tradisional Sulawesi (Baju Bodo)">
+  
+  <defs>
+    <clipPath id="fzcEyeL"><circle cx="126" cy="98" r="16"/></clipPath>
+    <clipPath id="fzcEyeR"><circle cx="194" cy="98" r="16"/></clipPath>
+    <linearGradient id="shadesGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#334155"/>
+      <stop offset="100%" stop-color="#0F172A"/>
+    </linearGradient>
+    <linearGradient id="vrGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#06B6D4"/>
+      <stop offset="100%" stop-color="#8B5CF6"/>
+    </linearGradient>
+    <linearGradient id="batikGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#78350F"/>
+      <stop offset="50%" stop-color="#92400E"/>
+      <stop offset="100%" stop-color="#451A03"/>
+    </linearGradient>
+    <linearGradient id="goldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FDE047"/>
+      <stop offset="100%" stop-color="#CA8A04"/>
+    </linearGradient>
+    <linearGradient id="waterGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#38BDF8"/>
+      <stop offset="100%" stop-color="#0284C7"/>
+    </linearGradient>
+  </defs>
+
+  
+    <ellipse class="fz-shadow" cx="160" cy="296" rx="88" ry="11" fill="#33201F" opacity="0.13"/>
+  
+  
+  
+    <g class="fz-tail">
+      <path d="M 212 244 C 266 258 298 238 296 200 C 294 178 282 163 268 158" stroke="#EDB93A" stroke-width="25" stroke-linecap="round" fill="none"/>
+      <path d="M 284 172 C 276 163 270 159 268 158" stroke="#8C2233" stroke-width="25" stroke-linecap="round" fill="none"/>
+    </g>
+  
+  <g class="fz-character">
+    
+    <g class="fz-torso" transform="">
+      <rect x="102" y="164" width="116" height="96" rx="42" fill="#FFD94F"/>
+      
+        <ellipse cx="160" cy="225.44" rx="36" ry="28" fill="#FFF4DA"/>
+        <g class="fz-emblem" transform="translate(160,224.48000000000002) scale(1.75) translate(-12.6,-12.45)" fill="#8C2233">
+          <rect x="4.6" y="7.5" width="3.1" height="4.6" rx="1.55"/>
+          <rect x="8.9" y="5.1" width="3.1" height="7" rx="1.55"/>
+          <rect x="13.2" y="3.4" width="3.1" height="8.7" rx="1.55"/>
+          <rect x="17.5" y="6.2" width="3.1" height="5.9" rx="1.55"/>
+          <path d="M12.6 14c3.5 0 5.9 1.9 5.9 4.1 0 2-2 3.4-5.9 3.4s-5.9-1.4-5.9-3.4c0-2.2 2.4-4.1 5.9-4.1Z"/>
+        </g>
+      
+    </g>
+  
+    <rect x="94" y="164" width="132" height="88" rx="26" fill="#EA580C"/><rect x="110" y="210" width="100" height="12" fill="url(#goldGrad)"/>
+    <rect x="108" y="248" width="48" height="22" rx="11" fill="#EDB93A"/><rect x="164" y="248" width="48" height="22" rx="11" fill="#EDB93A"/>
+    
+    <g class="fz-head-wrapper" transform="rotate(0 160 106)">
+      <g class="fz-ears"><path d="M76 66 L95 0 L140 34 Q104 66 76 66 Z" fill="#FFD94F"/><path d="M90 52 L 101 17 L 125 35 Z" fill="#8C2233"/><path d="M244 66 L225 0 L180 34 Q216 66 244 66 Z" fill="#FFD94F"/><path d="M230 52 L 219 17 L 195 35 Z" fill="#8C2233"/></g>
+      <circle cx="160" cy="106" r="88" fill="#FFD94F"/>
+      <g class="fz-face">
+        <ellipse cx="160" cy="140" rx="36" ry="25" fill="#FFF4DA"/>
+        <path d="M153 126 L 167 126 L 160 136 Z" fill="#8C2233"/>
+        
+    <circle class="fz-blush" cx="102" cy="126" r="11" fill="#F0A0AC"/>
+    <circle class="fz-blush" cx="218" cy="126" r="11" fill="#F0A0AC"/>
+  
+        
+        <g class="fz-eyes">
+      <g class="fz-eye fz-eye-l"><circle cx="126" cy="98" r="16" fill="#33201F"/><circle cx="130.5" cy="92.5" r="5.5" fill="#fff"/><circle cx="121.5" cy="104" r="2.8" fill="#fff" opacity=".7"/></g>
+      <g class="fz-eye fz-eye-r"><circle cx="194" cy="98" r="16" fill="#33201F"/><circle cx="198.5" cy="92.5" r="5.5" fill="#fff"/><circle cx="189.5" cy="104" r="2.8" fill="#fff" opacity=".7"/></g>
+    </g>
+        <g class="fz-mouth"><path d="M148 148 C 154 156 166 156 172 148" stroke="#33201F" stroke-width="5.5" stroke-linecap="round" fill="none"/></g>
+        
+      </g>
+      <circle cx="160" cy="35" r="14" fill="url(#goldGrad)"/>
+    </g>
+  
+    <ellipse cx="112" cy="210" rx="14" ry="26" transform="rotate(20 112 210)" fill="#FFD94F"/><ellipse cx="208" cy="210" rx="14" ry="26" transform="rotate(-20 208 210)" fill="#FFD94F"/>
+  </g>
+  
+</svg>

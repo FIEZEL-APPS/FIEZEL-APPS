@@ -1,0 +1,247 @@
+{
+  "contrast": [
+    {
+      "id": "btn-ink",
+      "text": "Mulai belajar",
+      "fg": "rgb(253, 250, 243)",
+      "bg": "rgb(36, 26, 17)",
+      "fontSize": 15,
+      "fontWeight": "700",
+      "ratio": 16.37,
+      "required": 4.5,
+      "pass": true
+    },
+    {
+      "id": "btn-disabled",
+      "text": "Mulai belajar",
+      "fg": "rgb(110, 94, 71)",
+      "bg": "rgb(255, 243, 220)",
+      "fontSize": 15,
+      "fontWeight": "700",
+      "ratio": 5.69,
+      "required": 4.5,
+      "pass": true
+    },
+    {
+      "id": "btn-sun",
+      "text": "Lanjut",
+      "fg": "rgb(36, 26, 17)",
+      "bg": "rgb(255, 199, 0)",
+      "fontSize": 15,
+      "fontWeight": "700",
+      "ratio": 10.9,
+      "required": 4.5,
+      "pass": true
+    },
+    {
+      "id": "btn-sun-hover",
+      "text": "Lanjut",
+      "fg": "rgb(36, 26, 17)",
+      "bg": "rgb(230, 168, 0)",
+      "fontSize": 15,
+      "fontWeight": "700",
+      "ratio": 8.1,
+      "required": 4.5,
+      "pass": true
+    },
+    {
+      "id": "btn-sun-press",
+      "text": "Lanjut",
+      "fg": "rgb(36, 26, 17)",
+      "bg": "rgb(204, 150, 0)",
+      "fontSize": 15,
+      "fontWeight": "700",
+      "ratio": 6.44,
+      "required": 4.5,
+      "pass": true
+    },
+    {
+      "id": "btn-grad",
+      "text": "Mulai hari ini",
+      "fg": "rgb(36, 26, 17)",
+      "bg": "rgb(255, 194, 45)",
+      "fontSize": 15,
+      "fontWeight": "700",
+      "ratio": 10.53,
+      "required": 4.5,
+      "pass": true
+    },
+    {
+      "id": "btn-outline",
+      "text": "Keluar",
+      "fg": "rgb(36, 26, 17)",
+      "bg": "rgb(255, 255, 255)",
+      "fontSize": 15,
+      "fontWeight": "700",
+      "ratio": 17.06,
+      "required": 4.5,
+      "pass": true
+    },
+    {
+      "id": "btn-core-cta",
+      "text": "Latih pola ini",
+      "fg": "rgb(36, 26, 17)",
+      "bg": "rgb(255, 199, 0)",
+      "fontSize": 15,
+      "fontWeight": "700",
+      "ratio": 10.9,
+      "required": 4.5,
+      "pass": true
+    },
+    {
+      "id": "chip-active",
+      "text": "A2",
+      "fg": "rgb(36, 26, 17)",
+      "bg": "rgb(255, 199, 0)",
+      "fontSize": 13,
+      "fontWeight": "600",
+      "ratio": 10.9,
+      "required": 4.5,
+      "pass": true
+    },
+    {
+      "id": "badge-attn",
+      "text": "Needs attention",
+      "fg": "rgb(157, 60, 40)",
+      "bg": "rgb(253, 227, 222)",
+      "fontSize": 12,
+      "fontWeight": "700",
+      "ratio": 5.54,
+      "required": 4.5,
+      "pass": true
+    },
+    {
+      "id": "tab-active",
+      "text": "Ringkasan",
+      "fg": "rgb(253, 250, 243)",
+      "bg": "rgb(36, 26, 17)",
+      "fontSize": 13,
+      "fontWeight": "600",
+      "ratio": 16.37,
+      "required": 4.5,
+      "pass": true
+    },
+    {
+      "id": "tab-idle",
+      "text": "Adaptive Engine",
+      "fg": "rgb(110, 94, 71)",
+      "bg": "rgb(255, 243, 220)",
+      "fontSize": 13,
+      "fontWeight": "600",
+      "ratio": 5.69,
+      "required": 4.5,
+      "pass": true
+    },
+    {
+      "id": "nav-label",
+      "text": "Vocab",
+      "fg": "rgb(110, 94, 71)",
+      "bg": "rgb(255, 253, 247)",
+      "fontSize": 12,
+      "fontWeight": "600",
+      "ratio": 6.14,
+      "required": 4.5,
+      "pass": true
+    },
+    {
+      "id": "answer-default",
+      "text": "She is going to the market.",
+      "fg": "rgb(36, 26, 17)",
+      "bg": "rgb(255, 255, 255)",
+      "fontSize": 16,
+      "fontWeight": "600",
+      "ratio": 17.06,
+      "required": 4.5,
+      "pass": true
+    },
+    {
+      "id": "answer-correct",
+      "text": "She is going to the market.",
+      "fg": "rgb(36, 26, 17)",
+      "bg": "rgb(233, 247, 240)",
+      "fontSize": 16,
+      "fontWeight": "600",
+      "ratio": 15.46,
+      "required": 4.5,
+      "pass": true
+    },
+    {
+      "id": "answer-disabled",
+      "text": "She go to the market.",
+      "fg": "rgb(110, 94, 71)",
+      "bg": "rgb(255, 243, 220)",
+      "fontSize": 16,
+      "fontWeight": "600",
+      "ratio": 5.69,
+      "required": 4.5,
+      "pass": true
+    },
+    {
+      "id": "btn-dengarkan",
+      "text": "Dengarkan",
+      "fg": "rgb(253, 250, 243)",
+      "bg": "rgb(36, 26, 17)",
+      "fontSize": 15,
+      "fontWeight": "700",
+      "ratio": 16.37,
+      "required": 4.5,
+      "pass": true
+    },
+    {
+      "id": "btn-nilai",
+      "text": "Nilai jawaban",
+      "fg": "rgb(36, 26, 17)",
+      "bg": "rgb(255, 199, 0)",
+      "fontSize": 15,
+      "fontWeight": "700",
+      "ratio": 10.9,
+      "required": 4.5,
+      "pass": true
+    },
+    {
+      "id": "btn-nilai-disabled",
+      "text": "Nilai jawaban — dengarkan dulu sampai se",
+      "fg": "rgb(110, 94, 71)",
+      "bg": "rgb(255, 243, 220)",
+      "fontSize": 15,
+      "fontWeight": "700",
+      "ratio": 5.69,
+      "required": 4.5,
+      "pass": true
+    },
+    {
+      "id": "toast",
+      "text": "Core Brain aktif — jalur belajarmu diper",
+      "fg": "rgb(253, 250, 243)",
+      "bg": "rgb(36, 26, 17)",
+      "fontSize": 14,
+      "fontWeight": "500",
+      "ratio": 16.37,
+      "required": 4.5,
+      "pass": true
+    },
+    {
+      "id": "toast-action",
+      "text": "Ulangi",
+      "fg": "rgb(255, 199, 0)",
+      "bg": "rgb(36, 26, 17)",
+      "fontSize": 13,
+      "fontWeight": "700",
+      "ratio": 10.9,
+      "required": 4.5,
+      "pass": true
+    },
+    {
+      "id": "field-error",
+      "text": "Nama tidak boleh kosong.",
+      "fg": "rgb(184, 67, 45)",
+      "bg": "rgb(255, 249, 238)",
+      "fontSize": 13,
+      "fontWeight": "600",
+      "ratio": 5.17,
+      "required": 4.5,
+      "pass": true
+    }
+  ],
+  "fontFloorViolations": []
+}

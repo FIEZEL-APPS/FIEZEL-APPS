@@ -1,0 +1,567 @@
+{
+ "files": {
+  "A2_per_sentence_with_prefetch": [
+   {
+    "file": "A2_per_sentence_with_prefetch/chunk00.wav",
+    "ffprobeDurationS": 3.8761,
+    "rate": 44100,
+    "totalMs": 3876.1,
+    "headMs": 307.7,
+    "tailMs": 303.3,
+    "speechMs": 3265.1,
+    "ffmpegSilencedetect": [
+     "[silencedetect @ 0x7f4d7c001b80] silence_start: 0",
+     "[silencedetect @ 0x7f4d7c001b80] silence_end: 0.378549 | silence_duration: 0.378549",
+     "[silencedetect @ 0x7f4d7c001b80] silence_start: 3.571338",
+     "[silencedetect @ 0x7f4d7c001b80] silence_end: 3.876077 | silence_duration: 0.304739"
+    ]
+   },
+   {
+    "file": "A2_per_sentence_with_prefetch/chunk01.wav",
+    "ffprobeDurationS": 4.5153,
+    "rate": 44100,
+    "totalMs": 4515.3,
+    "headMs": 366.3,
+    "tailMs": 312.5,
+    "speechMs": 3836.5,
+    "ffmpegSilencedetect": [
+     "[silencedetect @ 0x7f6d80001b80] silence_start: 0",
+     "[silencedetect @ 0x7f6d80001b80] silence_end: 0.407143 | silence_duration: 0.407143",
+     "[silencedetect @ 0x7f6d80001b80] silence_start: 4.05805",
+     "[silencedetect @ 0x7f6d80001b80] silence_end: 4.191451 | silence_duration: 0.133401",
+     "[silencedetect @ 0x7f6d80001b80] silence_start: 4.199252",
+     "[silencedetect @ 0x7f6d80001b80] silence_end: 4.515283 | silence_duration: 0.316032"
+    ]
+   },
+   {
+    "file": "A2_per_sentence_with_prefetch/chunk02.wav",
+    "ffprobeDurationS": 3.9405,
+    "rate": 44100,
+    "totalMs": 3940.5,
+    "headMs": 320.2,
+    "tailMs": 380.1,
+    "speechMs": 3240.2,
+    "ffmpegSilencedetect": [
+     "[silencedetect @ 0x7faf6c001b80] silence_start: 0",
+     "[silencedetect @ 0x7faf6c001b80] silence_end: 0.331497 | silence_duration: 0.331497",
+     "[silencedetect @ 0x7faf6c001b80] silence_start: 0.332721",
+     "[silencedetect @ 0x7faf6c001b80] silence_end: 0.395351 | silence_duration: 0.0626304",
+     "[silencedetect @ 0x7faf6c001b80] silence_start: 2.828821",
+     "[silencedetect @ 0x7faf6c001b80] silence_end: 2.909388 | silence_duration: 0.0805669",
+     "[silencedetect @ 0x7faf6c001b80] silence_start: 3.56",
+     "[silencedetect @ 0x7faf6c001b80] silence_end: 3.940522 | silence_duration: 0.380522"
+    ]
+   },
+   {
+    "file": "A2_per_sentence_with_prefetch/chunk03.wav",
+    "ffprobeDurationS": 3.9241,
+    "rate": 44100,
+    "totalMs": 3924.1,
+    "headMs": 239.4,
+    "tailMs": 325.8,
+    "speechMs": 3358.9,
+    "ffmpegSilencedetect": [
+     "[silencedetect @ 0x7f0434001b80] silence_start: 0",
+     "[silencedetect @ 0x7f0434001b80] silence_end: 0.324218 | silence_duration: 0.324218",
+     "[silencedetect @ 0x7f0434001b80] silence_start: 3.598141",
+     "[silencedetect @ 0x7f0434001b80] silence_end: 3.924104 | silence_duration: 0.325964"
+    ]
+   },
+   {
+    "file": "A2_per_sentence_with_prefetch/chunk04.wav",
+    "ffprobeDurationS": 4.6537,
+    "rate": 44100,
+    "totalMs": 4653.7,
+    "headMs": 352.4,
+    "tailMs": 490.0,
+    "speechMs": 3811.3,
+    "ffmpegSilencedetect": [
+     "[silencedetect @ 0x7f4f20001b80] silence_start: 0",
+     "[silencedetect @ 0x7f4f20001b80] silence_end: 0.355488 | silence_duration: 0.355488",
+     "[silencedetect @ 0x7f4f20001b80] silence_start: 4.070952",
+     "[silencedetect @ 0x7f4f20001b80] silence_end: 4.13322 | silence_duration: 0.0622676",
+     "[silencedetect @ 0x7f4f20001b80] silence_start: 4.157415",
+     "[silencedetect @ 0x7f4f20001b80] silence_end: 4.653741 | silence_duration: 0.496327"
+    ]
+   },
+   {
+    "file": "A2_per_sentence_with_prefetch/chunk05.wav",
+    "ffprobeDurationS": 3.9865,
+    "rate": 44100,
+    "totalMs": 3986.5,
+    "headMs": 365.1,
+    "tailMs": 351.2,
+    "speechMs": 3270.1,
+    "ffmpegSilencedetect": [
+     "[silencedetect @ 0x7f978c001b80] silence_start: 0",
+     "[silencedetect @ 0x7f978c001b80] silence_end: 0.365465 | silence_duration: 0.365465",
+     "[silencedetect @ 0x7f978c001b80] silence_start: 3.635238",
+     "[silencedetect @ 0x7f978c001b80] silence_end: 3.986531 | silence_duration: 0.351293"
+    ]
+   }
+  ],
+  "A_per_sentence_no_prefetch": [
+   {
+    "file": "A_per_sentence_no_prefetch/chunk00.wav",
+    "ffprobeDurationS": 3.8761,
+    "rate": 44100,
+    "totalMs": 3876.1,
+    "headMs": 214.5,
+    "tailMs": 289.8,
+    "speechMs": 3371.8,
+    "ffmpegSilencedetect": [
+     "[silencedetect @ 0x7ffb50001b80] silence_start: 0",
+     "[silencedetect @ 0x7ffb50001b80] silence_end: 0.251043 | silence_duration: 0.251043",
+     "[silencedetect @ 0x7ffb50001b80] silence_start: 0.251066",
+     "[silencedetect @ 0x7ffb50001b80] silence_end: 0.320204 | silence_duration: 0.0691383",
+     "[silencedetect @ 0x7ffb50001b80] silence_start: 1.556259",
+     "[silencedetect @ 0x7ffb50001b80] silence_end: 1.614059 | silence_duration: 0.0578005",
+     "[silencedetect @ 0x7ffb50001b80] silence_start: 3.345624",
+     "[silencedetect @ 0x7ffb50001b80] silence_end: 3.398367 | silence_duration: 0.0527438",
+     "[silencedetect @ 0x7ffb50001b80] silence_start: 3.586032",
+     "[silencedetect @ 0x7ffb50001b80] silence_end: 3.876077 | silence_duration: 0.290045"
+    ]
+   },
+   {
+    "file": "A_per_sentence_no_prefetch/chunk01.wav",
+    "ffprobeDurationS": 4.5153,
+    "rate": 44100,
+    "totalMs": 4515.3,
+    "headMs": 285.1,
+    "tailMs": 369.2,
+    "speechMs": 3861.0,
+    "ffmpegSilencedetect": [
+     "[silencedetect @ 0x7f5ac0001b80] silence_start: 0",
+     "[silencedetect @ 0x7f5ac0001b80] silence_end: 0.336735 | silence_duration: 0.336735",
+     "[silencedetect @ 0x7f5ac0001b80] silence_start: 3.154717",
+     "[silencedetect @ 0x7f5ac0001b80] silence_end: 3.227143 | silence_duration: 0.0724263",
+     "[silencedetect @ 0x7f5ac0001b80] silence_start: 4.144853",
+     "[silencedetect @ 0x7f5ac0001b80] silence_end: 4.515283 | silence_duration: 0.370431"
+    ]
+   },
+   {
+    "file": "A_per_sentence_no_prefetch/chunk02.wav",
+    "ffprobeDurationS": 3.9405,
+    "rate": 44100,
+    "totalMs": 3940.5,
+    "headMs": 412.5,
+    "tailMs": 346.1,
+    "speechMs": 3182.0,
+    "ffmpegSilencedetect": [
+     "[silencedetect @ 0x7fa2f0001b80] silence_start: 0",
+     "[silencedetect @ 0x7fa2f0001b80] silence_end: 0.412971 | silence_duration: 0.412971",
+     "[silencedetect @ 0x7fa2f0001b80] silence_start: 2.944694",
+     "[silencedetect @ 0x7fa2f0001b80] silence_end: 3.030227 | silence_duration: 0.0855329",
+     "[silencedetect @ 0x7fa2f0001b80] silence_start: 3.584195",
+     "[silencedetect @ 0x7fa2f0001b80] silence_end: 3.940522 | silence_duration: 0.356327"
+    ]
+   },
+   {
+    "file": "A_per_sentence_no_prefetch/chunk03.wav",
+    "ffprobeDurationS": 3.9241,
+    "rate": 44100,
+    "totalMs": 3924.1,
+    "headMs": 313.7,
+    "tailMs": 428.1,
+    "speechMs": 3182.3,
+    "ffmpegSilencedetect": [
+     "[silencedetect @ 0x7f6f60001b80] silence_start: 0",
+     "[silencedetect @ 0x7f6f60001b80] silence_end: 0.330816 | silence_duration: 0.330816",
+     "[silencedetect @ 0x7f6f60001b80] silence_start: 0.333152",
+     "[silencedetect @ 0x7f6f60001b80] silence_end: 0.394989 | silence_duration: 0.0618367",
+     "[silencedetect @ 0x7f6f60001b80] silence_start: 2.991315",
+     "[silencedetect @ 0x7f6f60001b80] silence_end: 3.076803 | silence_duration: 0.0854875",
+     "[silencedetect @ 0x7f6f60001b80] silence_start: 3.495986",
+     "[silencedetect @ 0x7f6f60001b80] silence_end: 3.924104 | silence_duration: 0.428118"
+    ]
+   },
+   {
+    "file": "A_per_sentence_no_prefetch/chunk04.wav",
+    "ffprobeDurationS": 4.6537,
+    "rate": 44100,
+    "totalMs": 4653.7,
+    "headMs": 401.6,
+    "tailMs": 423.9,
+    "speechMs": 3828.3,
+    "ffmpegSilencedetect": [
+     "[silencedetect @ 0x7fe7d4001b80] silence_start: 0",
+     "[silencedetect @ 0x7fe7d4001b80] silence_end: 0.401565 | silence_duration: 0.401565",
+     "[silencedetect @ 0x7fe7d4001b80] silence_start: 4.130068",
+     "[silencedetect @ 0x7fe7d4001b80] silence_end: 4.202562 | silence_duration: 0.0724943",
+     "[silencedetect @ 0x7fe7d4001b80] silence_start: 4.228639",
+     "[silencedetect @ 0x7fe7d4001b80] silence_end: 4.653741 | silence_duration: 0.425102"
+    ]
+   },
+   {
+    "file": "A_per_sentence_no_prefetch/chunk05.wav",
+    "ffprobeDurationS": 3.9865,
+    "rate": 44100,
+    "totalMs": 3986.5,
+    "headMs": 393.7,
+    "tailMs": 318.0,
+    "speechMs": 3274.8,
+    "ffmpegSilencedetect": [
+     "[silencedetect @ 0x7f99f8001b80] silence_start: 0",
+     "[silencedetect @ 0x7f99f8001b80] silence_end: 0.393787 | silence_duration: 0.393787",
+     "[silencedetect @ 0x7f99f8001b80] silence_start: 3.667619",
+     "[silencedetect @ 0x7f99f8001b80] silence_end: 3.986531 | silence_duration: 0.318912"
+    ]
+   }
+  ],
+  "B_single_speak_streaming": [
+   {
+    "file": "B_single_speak_streaming/chunk00.wav",
+    "ffprobeDurationS": 3.8001,
+    "rate": 44100,
+    "totalMs": 3800.1,
+    "headMs": 366.0,
+    "tailMs": 293.9,
+    "speechMs": 3140.2,
+    "ffmpegSilencedetect": [
+     "[silencedetect @ 0x7f6e48001b80] silence_start: 0",
+     "[silencedetect @ 0x7f6e48001b80] silence_end: 0.395533 | silence_duration: 0.395533",
+     "[silencedetect @ 0x7f6e48001b80] silence_start: 1.529751",
+     "[silencedetect @ 0x7f6e48001b80] silence_end: 1.580023 | silence_duration: 0.0502721",
+     "[silencedetect @ 0x7f6e48001b80] silence_start: 3.298413",
+     "[silencedetect @ 0x7f6e48001b80] silence_end: 3.366984 | silence_duration: 0.0685714",
+     "[silencedetect @ 0x7f6e48001b80] silence_start: 3.506213",
+     "[silencedetect @ 0x7f6e48001b80] silence_end: 3.800068 | silence_duration: 0.293855"
+    ]
+   },
+   {
+    "file": "B_single_speak_streaming/chunk01.wav",
+    "ffprobeDurationS": 4.5609,
+    "rate": 44100,
+    "totalMs": 4560.9,
+    "headMs": 308.8,
+    "tailMs": 308.2,
+    "speechMs": 3943.9,
+    "ffmpegSilencedetect": [
+     "[silencedetect @ 0x7fa5e0001b80] silence_start: 0",
+     "[silencedetect @ 0x7fa5e0001b80] silence_end: 0.376236 | silence_duration: 0.376236",
+     "[silencedetect @ 0x7fa5e0001b80] silence_start: 4.147324",
+     "[silencedetect @ 0x7fa5e0001b80] silence_end: 4.243197 | silence_duration: 0.095873",
+     "[silencedetect @ 0x7fa5e0001b80] silence_start: 4.249252",
+     "[silencedetect @ 0x7fa5e0001b80] silence_end: 4.560884 | silence_duration: 0.311633"
+    ]
+   },
+   {
+    "file": "B_single_speak_streaming/chunk02.wav",
+    "ffprobeDurationS": 3.8938,
+    "rate": 44100,
+    "totalMs": 3893.8,
+    "headMs": 342.6,
+    "tailMs": 417.5,
+    "speechMs": 3133.7,
+    "ffmpegSilencedetect": [
+     "[silencedetect @ 0x7f68bc001b80] silence_start: 0",
+     "[silencedetect @ 0x7f68bc001b80] silence_end: 0.446304 | silence_duration: 0.446304",
+     "[silencedetect @ 0x7f68bc001b80] silence_start: 2.819887",
+     "[silencedetect @ 0x7f68bc001b80] silence_end: 2.926009 | silence_duration: 0.106122",
+     "[silencedetect @ 0x7f68bc001b80] silence_start: 3.468685",
+     "[silencedetect @ 0x7f68bc001b80] silence_end: 3.893787 | silence_duration: 0.425102"
+    ]
+   },
+   {
+    "file": "B_single_speak_streaming/chunk03.wav",
+    "ffprobeDurationS": 3.9637,
+    "rate": 44100,
+    "totalMs": 3963.7,
+    "headMs": 296.4,
+    "tailMs": 403.4,
+    "speechMs": 3263.9,
+    "ffmpegSilencedetect": [
+     "[silencedetect @ 0x7fe6d0001b80] silence_start: 0",
+     "[silencedetect @ 0x7fe6d0001b80] silence_end: 0.33102 | silence_duration: 0.33102",
+     "[silencedetect @ 0x7fe6d0001b80] silence_start: 0.332834",
+     "[silencedetect @ 0x7fe6d0001b80] silence_end: 0.384354 | silence_duration: 0.0515193",
+     "[silencedetect @ 0x7fe6d0001b80] silence_start: 1.623039",
+     "[silencedetect @ 0x7fe6d0001b80] silence_end: 1.680272 | silence_duration: 0.0572336",
+     "[silencedetect @ 0x7fe6d0001b80] silence_start: 3.547959",
+     "[silencedetect @ 0x7fe6d0001b80] silence_end: 3.963741 | silence_duration: 0.415782"
+    ]
+   },
+   {
+    "file": "B_single_speak_streaming/chunk04.wav",
+    "ffprobeDurationS": 4.5985,
+    "rate": 44100,
+    "totalMs": 4598.5,
+    "headMs": 319.4,
+    "tailMs": 261.2,
+    "speechMs": 4017.9,
+    "ffmpegSilencedetect": [
+     "[silencedetect @ 0x7fce44001b80] silence_start: 0",
+     "[silencedetect @ 0x7fce44001b80] silence_end: 0.365488 | silence_duration: 0.365488",
+     "[silencedetect @ 0x7fce44001b80] silence_start: 1.098435",
+     "[silencedetect @ 0x7fce44001b80] silence_end: 1.173515 | silence_duration: 0.0750794",
+     "[silencedetect @ 0x7fce44001b80] silence_start: 2.282948",
+     "[silencedetect @ 0x7fce44001b80] silence_end: 2.373628 | silence_duration: 0.0906803",
+     "[silencedetect @ 0x7fce44001b80] silence_start: 4.123061",
+     "[silencedetect @ 0x7fce44001b80] silence_end: 4.192585 | silence_duration: 0.0695238",
+     "[silencedetect @ 0x7fce44001b80] silence_start: 4.250726",
+     "[silencedetect @ 0x7fce44001b80] silence_end: 4.598549 | silence_duration: 0.347823"
+    ]
+   },
+   {
+    "file": "B_single_speak_streaming/chunk05.wav",
+    "ffprobeDurationS": 3.9865,
+    "rate": 44100,
+    "totalMs": 3986.5,
+    "headMs": 399.9,
+    "tailMs": 260.9,
+    "speechMs": 3325.7,
+    "ffmpegSilencedetect": [
+     "[silencedetect @ 0x7f1b34001b80] silence_start: 0",
+     "[silencedetect @ 0x7f1b34001b80] silence_end: 0.417959 | silence_duration: 0.417959",
+     "[silencedetect @ 0x7f1b34001b80] silence_start: 3.725306",
+     "[silencedetect @ 0x7f1b34001b80] silence_end: 3.986531 | silence_duration: 0.261224"
+    ]
+   }
+  ]
+ },
+ "scenarios": {
+  "A_per_sentence_no_prefetch": {
+   "timeToFirstSoundMs": 3449.2,
+   "generationMs": [
+    3445,
+    4098,
+    3367.6,
+    3382.4,
+    4194.2,
+    3430.7
+   ],
+   "generatedAudioS": [
+    3.8761,
+    4.5153,
+    3.9405,
+    3.9241,
+    4.6537,
+    3.9865
+   ],
+   "realtimeFactor": [
+    0.889,
+    0.908,
+    0.855,
+    0.862,
+    0.901,
+    0.861
+   ],
+   "pieces": [
+    {
+     "index": 0,
+     "startsAtCtx": 6.385488,
+     "playedDurationMs": 3876.1,
+     "scheduledAhead": false,
+     "gapToNextMs": 4088.4
+    },
+    {
+     "index": 1,
+     "startsAtCtx": 14.349932,
+     "playedDurationMs": 4515.3,
+     "scheduledAhead": false,
+     "gapToNextMs": 3379.5
+    },
+    {
+     "index": 2,
+     "startsAtCtx": 22.244717,
+     "playedDurationMs": 3940.5,
+     "scheduledAhead": false,
+     "gapToNextMs": 3373.8
+    },
+    {
+     "index": 3,
+     "startsAtCtx": 29.559002,
+     "playedDurationMs": 3924.1,
+     "scheduledAhead": false,
+     "gapToNextMs": 4179.7
+    },
+    {
+     "index": 4,
+     "startsAtCtx": 37.662766,
+     "playedDurationMs": 4653.7,
+     "scheduledAhead": false,
+     "gapToNextMs": 3426.8
+    },
+    {
+     "index": 5,
+     "startsAtCtx": 45.743311,
+     "playedDurationMs": 3986.5,
+     "scheduledAhead": false,
+     "gapToNextMs": null
+    }
+   ],
+   "gapStats": {
+    "count": 5,
+    "minMs": 3373.8,
+    "maxMs": 4179.7,
+    "meanMs": 3689.6,
+    "paragraphBoundaryMs": 3373.8
+   },
+   "wallClockTotalMs": 46782.3,
+   "audibleAudioMs": 24896.2,
+   "silenceSharePct": 46.8
+  },
+  "A2_per_sentence_with_prefetch": {
+   "timeToFirstSoundMs": 3362.4,
+   "generationMs": [
+    3357.5,
+    4080.8,
+    3391,
+    3358.6,
+    4121.7,
+    3412
+   ],
+   "generatedAudioS": [
+    3.8761,
+    4.5153,
+    3.9405,
+    3.9241,
+    4.6537,
+    3.9865
+   ],
+   "realtimeFactor": [
+    0.866,
+    0.904,
+    0.861,
+    0.856,
+    0.886,
+    0.856
+   ],
+   "pieces": [
+    {
+     "index": 0,
+     "startsAtCtx": 53.289796,
+     "playedDurationMs": 3876.1,
+     "scheduledAhead": false,
+     "gapToNextMs": 187.4
+    },
+    {
+     "index": 1,
+     "startsAtCtx": 57.353288,
+     "playedDurationMs": 4515.3,
+     "scheduledAhead": false,
+     "gapToNextMs": 12.6
+    },
+    {
+     "index": 2,
+     "startsAtCtx": 61.881179,
+     "playedDurationMs": 3940.5,
+     "scheduledAhead": false,
+     "gapToNextMs": 6.9
+    },
+    {
+     "index": 3,
+     "startsAtCtx": 65.828571,
+     "playedDurationMs": 3924.1,
+     "scheduledAhead": false,
+     "gapToNextMs": 209.0
+    },
+    {
+     "index": 4,
+     "startsAtCtx": 69.961723,
+     "playedDurationMs": 4653.7,
+     "scheduledAhead": false,
+     "gapToNextMs": 13.5
+    },
+    {
+     "index": 5,
+     "startsAtCtx": 74.628934,
+     "playedDurationMs": 3986.5,
+     "scheduledAhead": false,
+     "gapToNextMs": null
+    }
+   ],
+   "gapStats": {
+    "count": 5,
+    "minMs": 6.9,
+    "maxMs": 209.0,
+    "meanMs": 85.9,
+    "paragraphBoundaryMs": 6.9
+   },
+   "wallClockTotalMs": 28692.6,
+   "audibleAudioMs": 24896.2,
+   "silenceSharePct": 13.2
+  },
+  "B_single_speak_streaming": {
+   "timeToFirstSoundMs": 3387.8,
+   "generationMs": [
+    3376.9,
+    4184,
+    3341.8,
+    3371.4,
+    4126.5,
+    3394.4
+   ],
+   "generatedAudioS": [
+    3.8001,
+    4.5609,
+    3.8938,
+    3.9637,
+    4.5985,
+    3.9865
+   ],
+   "realtimeFactor": [
+    0.889,
+    0.917,
+    0.858,
+    0.851,
+    0.897,
+    0.851
+   ],
+   "pieces": [
+    {
+     "index": 0,
+     "startsAtCtx": 82.12898,
+     "playedDurationMs": 3164.1,
+     "scheduledAhead": false,
+     "gapToNextMs": 1435.4
+    },
+    {
+     "index": 1,
+     "startsAtCtx": 86.728571,
+     "playedDurationMs": 3967.9,
+     "scheduledAhead": true,
+     "gapToNextMs": 420.0
+    },
+    {
+     "index": 2,
+     "startsAtCtx": 91.11644,
+     "playedDurationMs": 3157.4,
+     "scheduledAhead": true,
+     "gapToNextMs": 420.0
+    },
+    {
+     "index": 3,
+     "startsAtCtx": 94.693878,
+     "playedDurationMs": 3287.9,
+     "scheduledAhead": true,
+     "gapToNextMs": 420.0
+    },
+    {
+     "index": 4,
+     "startsAtCtx": 98.401791,
+     "playedDurationMs": 3990.1,
+     "scheduledAhead": true,
+     "gapToNextMs": 420.0
+    },
+    {
+     "index": 5,
+     "startsAtCtx": 102.811859,
+     "playedDurationMs": 3349.7,
+     "scheduledAhead": true,
+     "gapToNextMs": null
+    }
+   ],
+   "gapStats": {
+    "count": 5,
+    "minMs": 420.0,
+    "maxMs": 1435.4,
+    "meanMs": 623.1,
+    "paragraphBoundaryMs": 420.0
+   },
+   "wallClockTotalMs": 27420.4,
+   "audibleAudioMs": 20917.1,
+   "silenceSharePct": 23.7
+  }
+ }
+}

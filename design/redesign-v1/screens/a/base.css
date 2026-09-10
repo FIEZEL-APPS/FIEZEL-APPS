@@ -1,0 +1,158 @@
+/* ============================================================
+   FIEZEL REBRAND — LAYAR A (onboarding / home / library)
+   Konsep: "WARM PAPER, BRIGHT MIND" — token dari DIRECTION.md
+   ============================================================ */
+
+@font-face{font-family:"FZ Plus Jakarta Sans";src:url("assets/fonts/PlusJakartaSans-400.woff2") format("woff2");font-weight:400;font-display:swap}
+@font-face{font-family:"FZ Plus Jakarta Sans";src:url("assets/fonts/PlusJakartaSans-500.woff2") format("woff2");font-weight:500;font-display:swap}
+@font-face{font-family:"FZ Plus Jakarta Sans";src:url("assets/fonts/PlusJakartaSans-600.woff2") format("woff2");font-weight:600;font-display:swap}
+@font-face{font-family:"FZ Plus Jakarta Sans";src:url("assets/fonts/PlusJakartaSans-700.woff2") format("woff2");font-weight:700;font-display:swap}
+@font-face{font-family:"FZ Fredoka";src:url("assets/fonts/Fredoka-var.woff2") format("woff2");font-weight:300 700;font-display:swap}
+
+:root{
+  /* surface */
+  --bg:#FFF9EE; --panel:#FFFFFF; --panel-soft:#FFF3DC; --line:#F0E4CF; --line-soft:#F7EFDF;
+  /* ink */
+  --text:#241A11; --muted:#6E5E47; --muted-soft:#857350;
+  /* brand energy */
+  --sun:#FFC700; --sun-deep:#E6A800; --sun-press:#CC9600; --sun-soft:#FFF3C4;
+  --sun-grad:linear-gradient(180deg,#FFDE59,#FFA500);
+  /* intelligence */
+  --core:#1B1418; --core-soft:#2A2126; --core-line:#3A3038; --on-core:#FDFAF3; --on-core-muted:rgba(253,250,243,.68);
+  /* semantic */
+  --good:#2E8B69; --good-deep:#1F6B4E; --good-soft:#E9F7F0; --bad:#B8432D; --bad-soft:#FDE3DE;
+  --info:#8C6D1F; --info-soft:#FFF3C4;
+  --radius-lg:24px; --radius-md:16px; --radius-sm:12px;
+  --shadow-sm:0 2px 10px rgba(36,26,17,.06); --shadow-md:0 10px 30px rgba(36,26,17,.09); --shadow-lg:0 24px 60px rgba(36,26,17,.15);
+  --ease:cubic-bezier(.22,.8,.28,1); --ease-spring:cubic-bezier(.34,1.4,.4,1);
+  --font-ui:"FZ Plus Jakarta Sans",-apple-system,"SF Pro Text",Inter,sans-serif;
+  --font-display:"FZ Fredoka","FZ Plus Jakarta Sans",sans-serif;
+}
+
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{background:var(--bg)}
+body{
+  width:390px;min-height:844px;margin:0 auto;position:relative;overflow-x:hidden;
+  font-family:var(--font-ui);font-size:15px;line-height:1.5;color:var(--text);
+  -webkit-font-smoothing:antialiased;
+}
+
+/* ---------- Tipe skala (lantai 12px) ---------- */
+.t-display{font-family:var(--font-display);font-weight:600;font-size:28px;line-height:1.15;letter-spacing:.1px}
+.t-h1{font-family:var(--font-display);font-weight:600;font-size:22px;line-height:1.2}
+.t-h2{font-weight:700;font-size:18px;line-height:1.3}
+.t-body{font-size:15px}
+.t-label{font-size:13px}
+.t-micro{font-size:12px}
+.eyebrow{font-size:12px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--info)}
+.num{font-weight:700;font-variant-numeric:tabular-nums}
+
+/* ---------- Fokus ---------- */
+:focus-visible{outline:2px solid var(--sun-deep);outline-offset:2px;border-radius:8px}
+
+/* ---------- Topbar ---------- */
+.topbar{
+  position:sticky;top:0;z-index:40;height:64px;
+  display:flex;align-items:center;gap:8px;padding:0 16px;
+  background:rgba(255,249,238,.9);backdrop-filter:blur(20px);
+  border-bottom:1px solid var(--line-soft);
+}
+.topbar .brand{display:flex;align-items:center;min-height:44px;padding:0 2px;text-decoration:none}
+.topbar .brand svg{height:22px;width:auto;display:block}
+.topbar .spacer{flex:1}
+.pill-btn{
+  display:inline-flex;align-items:center;gap:6px;min-height:44px;padding:0 14px;
+  background:var(--panel);border:1.5px solid var(--line);border-radius:999px;
+  font:600 12px/1 var(--font-ui);letter-spacing:.02em;color:var(--text);cursor:pointer;
+}
+.icon-btn{
+  display:inline-flex;align-items:center;justify-content:center;width:44px;height:44px;
+  background:var(--panel);border:1.5px solid var(--line);border-radius:14px;color:var(--text);cursor:pointer;
+}
+.icon-btn svg,.pill-btn svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:1.75;stroke-linecap:round;stroke-linejoin:round}
+
+/* ---------- Tombol ---------- */
+.btn{
+  display:flex;align-items:center;justify-content:center;gap:8px;width:100%;
+  min-height:52px;padding:0 20px;border-radius:var(--radius-md);border:none;cursor:pointer;
+  font:700 16px/1.2 var(--font-ui);letter-spacing:.01em;
+  transition:transform .16s var(--ease-spring),box-shadow .16s var(--ease);
+}
+.btn svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.btn-sun{background:var(--sun-grad);color:var(--text);box-shadow:0 3px 0 var(--sun-press),var(--shadow-sm)}
+.btn-sun:active{transform:translateY(2px);box-shadow:0 1px 0 var(--sun-press)}
+.btn-ink{background:var(--text);color:#FFF9EE;box-shadow:var(--shadow-sm)}
+.btn-ghost{background:var(--panel);color:var(--text);border:1.5px solid var(--line);box-shadow:var(--shadow-sm)}
+.btn-quiet{background:transparent;color:var(--muted);font-weight:600;min-height:44px;box-shadow:none}
+.text-link{
+  display:inline-flex;align-items:center;gap:4px;min-height:44px;padding:0 8px;
+  background:none;border:none;font:700 13px/1 var(--font-ui);color:var(--info);cursor:pointer;
+}
+.text-link svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+
+/* ---------- Chips ---------- */
+.chip{
+  display:inline-flex;align-items:center;gap:6px;min-height:44px;padding:0 16px;
+  background:var(--panel);border:1.5px solid var(--line);border-radius:999px;
+  font:700 13px/1 var(--font-ui);color:var(--text);cursor:pointer;white-space:nowrap;
+}
+.chip svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:1.75;stroke-linecap:round;stroke-linejoin:round}
+.chip.is-active{background:var(--text);border-color:var(--text);color:#FFF9EE}
+.chip .chip-meta{font-weight:600;color:var(--muted)}
+.chip.is-active .chip-meta{color:rgba(253,250,243,.75)}
+
+/* ---------- Kartu ---------- */
+.card{background:var(--panel);border:1px solid var(--line-soft);border-radius:var(--radius-lg);box-shadow:var(--shadow-sm)}
+.card-soft{background:var(--panel-soft);border:1px solid var(--line);border-radius:var(--radius-lg)}
+.card-core{
+  position:relative;overflow:hidden;background:var(--core);color:var(--on-core);
+  border:1px solid var(--core-line);border-radius:var(--radius-lg);box-shadow:var(--shadow-md);
+}
+
+/* garis neural halus untuk momen AI */
+.neural{position:absolute;inset:0;pointer-events:none;opacity:.5}
+
+/* ---------- Progress ---------- */
+.bar{height:8px;border-radius:999px;background:var(--line);overflow:hidden}
+.bar>i{display:block;height:100%;border-radius:999px;background:var(--sun-grad)}
+.card-core .bar{background:var(--core-soft)}
+
+/* ---------- Bottom nav ---------- */
+.bottomnav{
+  position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:390px;z-index:50;
+  display:grid;grid-template-columns:repeat(5,1fr);gap:2px;
+  padding:8px 10px calc(8px + env(safe-area-inset-bottom));
+  background:rgba(255,249,238,.94);backdrop-filter:blur(20px);
+  border-top:1px solid var(--line-soft);
+}
+.nav-item{
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;
+  min-height:56px;border-radius:var(--radius-md);border:none;background:transparent;
+  font:600 12px/1 var(--font-ui);color:var(--muted);cursor:pointer;text-decoration:none;
+}
+.nav-item svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:1.75;stroke-linecap:round;stroke-linejoin:round}
+.nav-item.is-active{background:var(--sun-soft);color:var(--text);font-weight:700;position:relative}
+.nav-item.is-active::after{content:"";width:4px;height:4px;border-radius:50%;background:var(--sun-deep);margin-top:1px}
+
+/* ---------- Maskot dock (aturan: 88px kanan-bawah, tak menutupi konten interaktif) ---------- */
+.mascot-dock{
+  position:fixed;right:12px;bottom:96px;z-index:45;width:88px;height:88px;
+  background:var(--sun-soft);border:2px solid var(--text);border-radius:var(--radius-lg);
+  box-shadow:var(--shadow-md);display:flex;align-items:center;justify-content:center;
+}
+.mascot-dock svg{width:64px;height:64px;display:block}
+.mascot-dismiss{
+  position:absolute;top:-16px;left:-16px;width:44px;height:44px;
+  display:flex;align-items:center;justify-content:center;
+  background:transparent;border:none;cursor:pointer;color:var(--text);
+}
+.mascot-dismiss::before{
+  content:"";position:absolute;inset:9px;background:var(--panel);
+  border:1.5px solid var(--line);border-radius:50%;box-shadow:var(--shadow-sm);
+}
+.mascot-dismiss svg{position:relative;width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2.25;stroke-linecap:round}
+
+/* konten diberi ruang aman dari nav + dock */
+.page{padding:0 16px 120px}
+
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}

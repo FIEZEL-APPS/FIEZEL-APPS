@@ -1,0 +1,102 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 320" width="100%" height="100%" role="img" aria-label="PAW #1 — PAW Sedang Membaca Buku Bahasa Inggris">
+  
+  <defs>
+    <clipPath id="fzcEyeL"><circle cx="126" cy="98" r="16"/></clipPath>
+    <clipPath id="fzcEyeR"><circle cx="194" cy="98" r="16"/></clipPath>
+    <linearGradient id="shadesGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#334155"/>
+      <stop offset="100%" stop-color="#0F172A"/>
+    </linearGradient>
+    <linearGradient id="vrGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#06B6D4"/>
+      <stop offset="100%" stop-color="#8B5CF6"/>
+    </linearGradient>
+    <linearGradient id="batikGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#78350F"/>
+      <stop offset="50%" stop-color="#92400E"/>
+      <stop offset="100%" stop-color="#451A03"/>
+    </linearGradient>
+    <linearGradient id="goldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FDE047"/>
+      <stop offset="100%" stop-color="#CA8A04"/>
+    </linearGradient>
+    <linearGradient id="waterGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#38BDF8"/>
+      <stop offset="100%" stop-color="#0284C7"/>
+    </linearGradient>
+  </defs>
+
+  
+    <ellipse class="fz-shadow" cx="160" cy="280" rx="95" ry="14" fill="#33201F" opacity="0.13"/>
+  
+  
+  
+    <g class="fz-tail">
+      <path d="M 210 230 C 270 235 295 270 260 280" stroke="#EDB93A" stroke-width="22" stroke-linecap="round" fill="none"/>
+      <path d="M 275 275 C 265 280 255 280 250 280" stroke="#8C2233" stroke-width="22" stroke-linecap="round" fill="none"/>
+    </g>
+  
+  <g class="fz-character">
+    
+    <g class="fz-torso" transform="">
+      <rect x="102" y="160" width="116" height="88" rx="38" fill="#FFD94F"/>
+      
+        <ellipse cx="160" cy="216.32" rx="36" ry="28" fill="#FFF4DA"/>
+        <g class="fz-emblem" transform="translate(160,215.44) scale(1.75) translate(-12.6,-12.45)" fill="#8C2233">
+          <rect x="4.6" y="7.5" width="3.1" height="4.6" rx="1.55"/>
+          <rect x="8.9" y="5.1" width="3.1" height="7" rx="1.55"/>
+          <rect x="13.2" y="3.4" width="3.1" height="8.7" rx="1.55"/>
+          <rect x="17.5" y="6.2" width="3.1" height="5.9" rx="1.55"/>
+          <path d="M12.6 14c3.5 0 5.9 1.9 5.9 4.1 0 2-2 3.4-5.9 3.4s-5.9-1.4-5.9-3.4c0-2.2 2.4-4.1 5.9-4.1Z"/>
+        </g>
+      
+    </g>
+  
+    
+    
+          <!-- Cross-legged sitting legs -->
+          <path d="M85 240 C85 270 140 275 160 260" stroke="#EDB93A" stroke-width="26" stroke-linecap="round" fill="none"/>
+          <path d="M235 240 C235 270 180 275 160 260" stroke="#EDB93A" stroke-width="26" stroke-linecap="round" fill="none"/>
+          <ellipse cx="110" cy="265" rx="16" ry="10" fill="#EDB93A"/>
+          <ellipse cx="210" cy="265" rx="16" ry="10" fill="#EDB93A"/>
+        
+    
+    <g class="fz-head-wrapper" transform="rotate(-8 160 106)">
+      <g class="fz-ears"><path d="M72 55 L85 -10 L135 25 Q96 55 72 55 Z" fill="#FFD94F"/><path d="M85 42 L 92 8 L 120 28 Z" fill="#8C2233"/><path d="M244 66 L225 0 L180 34 Q216 66 244 66 Z" fill="#FFD94F"/><path d="M230 52 L 219 17 L 195 35 Z" fill="#8C2233"/></g>
+      <circle cx="160" cy="106" r="88" fill="#FFD94F"/>
+      <g class="fz-face">
+        <ellipse cx="160" cy="140" rx="36" ry="25" fill="#FFF4DA"/>
+        <path d="M153 126 L 167 126 L 160 136 Z" fill="#8C2233"/>
+        
+    <circle class="fz-blush" cx="102" cy="126" r="11" fill="#F0A0AC"/>
+    <circle class="fz-blush" cx="218" cy="126" r="11" fill="#F0A0AC"/>
+  
+        
+        <g class="fz-eyes">
+      <g class="fz-eye fz-eye-l"><circle cx="126" cy="98" r="16" fill="#33201F"/><circle cx="130.5" cy="92.5" r="5.5" fill="#fff"/><circle cx="121.5" cy="104" r="2.8" fill="#fff" opacity=".7"/></g>
+      <g class="fz-eye fz-eye-r"><circle cx="194" cy="98" r="16" fill="#33201F"/><circle cx="198.5" cy="92.5" r="5.5" fill="#fff"/><circle cx="189.5" cy="104" r="2.8" fill="#fff" opacity=".7"/></g>
+    </g>
+        <g class="fz-mouth"><path d="M148 148 C 154 156 166 156 172 148" stroke="#33201F" stroke-width="5.5" stroke-linecap="round" fill="none"/></g>
+        
+      </g>
+      
+    </g>
+  
+    
+          <ellipse cx="112" cy="210" rx="13" ry="24" transform="rotate(35 112 210)" fill="#FFD94F"/>
+          <ellipse cx="208" cy="210" rx="13" ry="24" transform="rotate(-35 208 210)" fill="#FFD94F"/>
+        
+  </g>
+  
+          <g transform="translate(160, 225) rotate(-3)">
+            <!-- Big Open Book -->
+            <path d="M -45 -18 Q -20 -24 0 -18 Q 20 -24 45 -18 L 48 20 Q 20 14 0 20 Q -20 14 -48 20 Z" fill="#8C2233"/>
+            <path d="M -42 -15 Q -20 -20 -2 -15 L -2 17 Q -20 12 -44 17 Z" fill="#FFFBEB"/>
+            <path d="M 42 -15 Q 20 -20 2 -15 L 2 17 Q 20 12 44 17 Z" fill="#FFFBEB"/>
+            <text x="-32" y="2" font-size="11" font-weight="900" fill="#8C2233">A B</text>
+            <text x="12" y="2" font-size="11" font-weight="900" fill="#8C2233">C D</text>
+            <circle cx="-38" cy="12" r="8" fill="#FFD94F"/>
+            <circle cx="38" cy="12" r="8" fill="#FFD94F"/>
+          </g>
+        
+</svg>

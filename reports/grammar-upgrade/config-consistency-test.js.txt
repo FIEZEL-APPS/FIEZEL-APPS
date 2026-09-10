@@ -1,0 +1,25 @@
+✅ Gerbang ini terdaftar di .github/workflows/quality.yml — quality.yml
+✅ CLIENT_FLAG_DEFAULTS terbaca dari workers/api/schema.js — cfApiEnabled,cfAiEnabled,cfTtsEnabled,cfQuotaEnabled,cfAnalyticsEnabled,cfIdentityEnabled,cfSocialEnabled,cfLearnerEvidenceEnabled
+✅ KILL_SWITCH_DEFAULTS terbaca dari workers/api/schema.js — ai,tts,coach,analytics,social,learnerEvidence
+✅ Blok kode runbook bisa dipindai — 38 blok kode
+✅ Runbook memuat contoh KV cfg:flags yang bisa diperiksa gerbang — 5 contoh ditemukan
+✅ (b) NOL contoh KV bentuk datar — setiap contoh bersarang di `flags`/`enabled` — 5 contoh, semua bersarang
+✅ Blok kode yang berbicara tentang flag/konfigurasi teridentifikasi — 8 blok
+✅ (a) Setiap kunci flag di blok kode runbook ada di CLIENT_FLAG_DEFAULTS/KILL_SWITCH_DEFAULTS — semua kunci dikenal
+✅ (d) Nilai flag di contoh runbook BOOLEAN, bukan string "off"/"on"/"shadow" — semua boolean
+✅ Nama datar lama (transport/quotaUi/identity/...) TIDAK dipakai sebagai kunci JSON di blok kode — tidak ada
+✅ Runbook menandai perbaikan ini dengan penanda temuan lapangan — penanda "🔄 TEMUAN LAPANGAN 28 Agu 2026"
+✅ Runbook §4.5 menjelaskan bahwa perintah lama gagal DIAM-DIAM (bukan sekadar diganti) — menyebut route-config.js:53-54 + mergeFlags
+✅ Runbook memuat perintah verifikasi curl untuk /api/config — curl /api/config
+✅ Runbook memuat contoh MENYALAKAN satu endpoint dan contoh MEMATIKAN darurat — kedua contoh ada di §4.6 dan §4.7
+✅ (c) AI_LIMIT_PER_DAY (naskah) == FREE_AI_DAILY_LIMIT (penegakan) — naskah=25 penegakan=25 — limits.aiPerDay dikirim ke murid (route-config.js:69, route-user.js:53) dan dipakai naskah kuota; penegakannya quota-config.js
+✅ (c) TTS_CHARS_PER_DAY (naskah) == FREE_TTS_DAILY_CHARS (penegakan) — naskah=12000 penegakan=12000 — limits.ttsCharsPerDay dikirim ke murid (route-config.js:70, route-user.js:55); penegakannya quota-config.js
+✅ Penegakan FREE_AI_DAILY_LIMIT tidak DITURUNKAN (>= 25, cf-a10 §6) — 25
+✅ Penegakan FREE_TTS_DAILY_CHARS tidak DITURUNKAN (>= 12000, cf-a10 §6) — 12000
+✅ Setiap var batas di [vars] dipetakan ke penegakan ATAU dikecualikan dengan alasan tertulis — 2 dipetakan, 3 dikecualikan beralasan
+✅ Pengecualian AI_LIMIT_PER_HOUR membawa alasan (bukan didiamkan) — tidak ada batas AI per-JAM di quota-config.js untuk dipasangkan; yang ditegakkan hanya FRE…
+✅ Pengecualian GLOBAL_NEURON_CAP membawa alasan (bukan didiamkan) — plafon jatah AKUN Cloudflare (bukan per murid); pasangannya ACCOUNT_DAILY_NEURON_BUDGET=10…
+✅ Pengecualian MAX_USERS membawa alasan (bukan didiamkan) — batas kapasitas pemasangan (cermin fiezel-core-worker.js:5), bukan kuota per-pengguna; tid…
+✅ wrangler.toml menjelaskan arah penyelarasan (naskah mengikuti penegakan) — komentar menunjuk quota-config.js + gerbang ini
+
+LULUS: 23/23 pemeriksaan hijau

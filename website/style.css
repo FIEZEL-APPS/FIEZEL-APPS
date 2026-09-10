@@ -1,0 +1,1358 @@
+/* FIEZEL — landing page (/). Token tunggal ada di tokens.css; file ini hanya memakai.
+   m028-05 "CREAM · SOLAR · MAROON" — boutique premium, tanpa satu pun bidang gelap.
+   Struktur konten, urutan section, angka, dan meta SEO TIDAK diubah — ini reskin + motion. */
+
+/* ---------- dasar ---------- */
+img,svg{max-width:100%;height:auto;display:block}
+a{color:var(--maroon-deep);text-decoration:none}
+a:hover{text-decoration:underline}
+h1,h2,h3{margin:0;line-height:1.12;letter-spacing:-.02em;font-weight:800;color:var(--text)}
+p{margin:0}
+ul,ol{margin:0;padding:0;list-style:none}
+
+.wrap{width:100%;max-width:var(--maxw);margin:0 auto;padding:0 22px}
+.wrap-narrow{max-width:780px}
+.sec{padding:64px 0;position:relative}
+.sec-head{margin-bottom:26px}
+.sec-num{display:block;font-size:var(--fs-micro);font-weight:700;letter-spacing:var(--track-wide);
+  text-transform:uppercase;color:var(--maroon-soft);margin-bottom:10px}
+.sec-title{font-size:clamp(1.72rem,6.4vw,2.5rem);letter-spacing:-.03em;margin-bottom:14px;text-wrap:balance}
+.sec-title .thin{font-weight:400;color:var(--maroon-soft)}
+.body-lg{font-size:1.02rem;color:var(--body);margin-bottom:16px;max-width:60ch}
+/* eyebrow: bidang Solar lembut + tinta maroon (7,9:1). Kuning tidak pernah jadi warna teks. */
+.eyebrow{display:inline-block;font-size:var(--fs-micro);font-weight:700;letter-spacing:var(--track-wide);
+  text-transform:uppercase;color:var(--maroon-deep);background:var(--sun-soft);
+  border:1px solid var(--gold-line);border-radius:var(--radius-pill);padding:7px 16px;margin-bottom:20px}
+.fineprint{font-size:.86rem;color:var(--muted-soft);margin-top:16px}
+
+.skip{position:absolute;left:-9999px;top:0;background:var(--cream-warm);color:var(--maroon-deep);
+  border:1px solid var(--maroon);padding:10px 16px;border-radius:0 0 var(--radius-sm) 0;z-index:70;font-weight:700}
+.skip:focus{left:0}
+
+/* ---------- tombol ---------- */
+/* CTA utama: bidang Solar dengan tinta maroon #6D1926 (7,4:1) dan garis maroon 2px.
+   Maroon memegang peran "kuat" lewat tinta + garis + bayangan, bukan lewat bidang gelap. */
+.btn{display:inline-flex;align-items:center;justify-content:center;min-height:50px;padding:13px 26px;
+  border-radius:var(--radius-pill);font-weight:700;font-size:1rem;letter-spacing:.01em;
+  color:var(--maroon-deep);border:2px solid var(--maroon);text-decoration:none;white-space:nowrap}
+.btn:hover{text-decoration:none}
+.btn-primary{background:var(--sun-grad);box-shadow:0 3px 0 var(--maroon),var(--shadow-sm)}
+.btn-ghost{background:var(--cream-warm);box-shadow:0 3px 0 var(--maroon-line-strong)}
+.btn-sm{min-height:42px;padding:9px 18px;font-size:.9rem}
+@media (max-width:439px){.btn-sm{padding:8px 13px;font-size:.85rem}.brand-word{width:92px}.brand-icon{width:26px;height:26px}.topnav{gap:10px}}
+.anim .btn{transition:transform var(--fz-fast) var(--fz-spring),box-shadow var(--fz-base) var(--fz-out)}
+.anim .btn:hover{transform:translateY(-3px)}
+.anim .btn-primary:hover{box-shadow:0 6px 0 var(--maroon),var(--shadow-md)}
+.anim .btn-ghost:hover{box-shadow:0 6px 0 var(--maroon-line-strong),var(--shadow-md)}
+.anim .btn:active{transform:translateY(2px) scale(.985)}
+
+.link-arrow{font-weight:700;color:var(--maroon-deep);border-bottom:1px solid var(--maroon-line-strong);padding-bottom:2px}
+.link-arrow:hover{text-decoration:none;border-color:var(--maroon)}
+.link-arrow::after{content:" →"}
+.anim .link-arrow{transition:border-color var(--fz-fast) var(--fz-out)}
+
+/* ---------- topbar ---------- */
+.topbar{position:sticky;top:0;z-index:40;background:rgba(255,249,238,.94);backdrop-filter:blur(10px);
+  border-bottom:1px solid var(--gold-line-soft)}
+.topbar-in{display:flex;align-items:center;justify-content:space-between;gap:14px;min-height:66px}
+.brand{display:flex;align-items:center;gap:11px;color:var(--maroon-deep)}
+.brand:hover{text-decoration:none}
+.brand-icon{width:30px;height:30px;color:var(--maroon)}
+.brand-word{width:112px;height:auto;color:var(--maroon-deep)}
+.brand-word rect{fill:currentColor}
+.topnav{display:flex;align-items:center;gap:16px}
+.topnav>a:first-child{display:none;font-weight:700;color:var(--maroon-deep);font-size:.92rem;
+  letter-spacing:.02em;border-bottom:1px solid transparent}
+.topnav>a:first-child:hover{text-decoration:none;border-color:var(--maroon-line-strong)}
+/* m026 GEO: saklar bahasa manual (id<->th) — pilihan selalu menang atas deteksi IP */
+.lang-switch{font-weight:700;color:var(--maroon-deep);font-size:.88rem;line-height:1;
+  border:1px solid var(--maroon-line-strong);border-radius:999px;padding:7px 15px;white-space:nowrap}
+.lang-switch:hover{text-decoration:none;border-color:var(--maroon-deep);background:rgba(140,34,51,.06)}
+.anim .lang-switch{transition:border-color var(--fz-base) var(--fz-out),background var(--fz-base) var(--fz-out),transform var(--fz-fast) var(--fz-spring)}
+.anim .lang-switch:hover{transform:translateY(-2px)}
+
+/* ---------- masthead: WORDMARK RESMI (assets/brand/fiezel-wordmark.svg) ---------- */
+.masthead{padding:20px 0 4px;text-align:center}
+.mast-lock{display:block}
+.mast-word{width:min(74vw,296px);height:auto;margin:0 auto}
+/* tagline SATU baris di semua lebar: huruf besar+tracking hanya saat ruangnya cukup */
+.mast-sub{margin-top:12px;font-size:var(--fs-micro);font-weight:700;letter-spacing:.02em;
+  color:var(--maroon-soft);white-space:nowrap}
+.mast-rule{margin:22px auto 0;max-width:280px}
+.mast-cta{margin-top:22px}
+
+/* ---------- m029 FOCUS: judul + janji + satu jalur, di atas lipatan ----------
+   Urutan bacanya sengaja: wordmark (siapa) -> h1 (masalah apa) -> lede (bagaimana)
+   -> satu CTA (apa yang diklik) -> baris kepercayaan (kenapa aman dicoba).
+   Tagline Inggris turun pangkat jadi baris kecil di bawah wordmark: ia identitas
+   merek, bukan kalimat yang menjelaskan aplikasi ini kepada pengunjung Indonesia. */
+.mast-h1{margin:18px auto 0;max-width:17ch;
+  font-size:clamp(2rem,8.4vw,3.35rem);line-height:1.08;letter-spacing:-.035em;
+  color:var(--maroon-deep);text-wrap:balance}
+.mast-lede{margin:16px auto 0;max-width:54ch;font-size:clamp(.98rem,3.6vw,1.12rem);
+  line-height:1.6;color:var(--body);text-wrap:pretty}
+
+/* CTA hero: dua baris (aksi + apa yang didapat). .btn memaksa white-space:nowrap dan
+   align-items:center untuk tombol satu baris — keduanya dilepas di sini, bukan diubah
+   di .btn, supaya tombol lain di halaman tidak ikut berubah. */
+.btn-hero{flex-direction:column;gap:3px;white-space:normal;text-align:center;
+  padding:14px 30px;min-height:62px;max-width:100%}
+.btn-hero-main{font-size:1.06rem;font-weight:800;letter-spacing:.005em;line-height:1.25}
+.btn-hero-sub{font-size:var(--fs-label);font-weight:600;line-height:1.35;color:var(--maroon)}
+
+.mast-trust{margin:16px auto 0;max-width:46ch;font-size:var(--fs-label);
+  line-height:1.7;color:var(--muted-soft)}
+/* tautan install berdiri di barisnya sendiri: sebagai inline ia mendarat di ekor baris
+   kepercayaan dan terbaca seperti bagian dari kalimat itu, bukan sebagai tautan. */
+.mast-trust-link{display:block;width:fit-content;margin:9px auto 0;font-weight:700;
+  color:var(--maroon-deep);border-bottom:1px solid var(--maroon-line-strong);padding-bottom:1px}
+.mast-trust-link:hover{text-decoration:none;border-color:var(--maroon)}
+
+/* ---------- hero: PANGGUNG VISUAL, bukan artikel ---------- */
+.hero{position:relative;overflow:hidden;padding:4px 0 24px;
+  background:linear-gradient(180deg,var(--sun-soft) 0%,var(--cream-deep) 38%,var(--cream) 84%)}
+.cta-row{display:flex;flex-wrap:wrap;gap:14px;margin-top:26px}
+.cta-center{justify-content:center}
+
+/* ornamen dekor: sorotan Solar + busur hairline maroon (parallax lembut) */
+.decor{position:absolute;pointer-events:none;z-index:0}
+.decor-glow{top:-14%;right:-18%;width:60vw;max-width:520px;aspect-ratio:1;border-radius:50%;
+  background:radial-gradient(circle,rgba(255,199,0,.34) 0%,rgba(255,222,89,.14) 48%,transparent 72%)}
+.decor-arc{left:-16%;bottom:-24%;width:56vw;max-width:460px;aspect-ratio:1;border-radius:50%;
+  border:1px solid var(--maroon-line);box-shadow:inset 0 0 0 14px rgba(255,199,0,.10)}
+.hero>.wrap{position:relative;z-index:1}
+
+/* ============ PANGGUNG MOTION GRAPHIC (above-the-fold) ============
+   Semua gerak hanya transform + opacity, kecuali dua stroke-dashoffset (garis path
+   yang menggambar diri + ring progress) yang memang diminta owner. Tanpa library,
+   tanpa canvas. prefers-reduced-motion => pose statis rapi di blok paling bawah. */
+.showcase{position:relative;display:grid;place-items:center;margin-top:16px;
+  min-height:clamp(340px,50vh,470px);isolation:isolate}
+.showcase-fx{position:absolute;inset:0;pointer-events:none;z-index:0}
+
+/* cincin + garis path yang menggambar diri */
+.fx-lines{position:absolute;left:50%;top:50%;width:min(112%,552px);aspect-ratio:1;
+  transform:translate(-50%,-50%);overflow:visible}
+.fx-ring{fill:none;stroke:var(--maroon-line);stroke-width:1.1;transform-origin:320px 320px}
+.fx-ring-2{stroke:var(--gold-line);stroke-dasharray:4 10}
+.anim .fx-ring-1{animation:fxSpin 52s linear infinite}
+.anim .fx-ring-2{animation:fxSpin 38s linear infinite reverse}
+@keyframes fxSpin{from{transform:rotate(0)}to{transform:rotate(360deg)}}
+.fx-draw{fill:none;stroke:var(--maroon-line-strong);stroke-width:1.4;stroke-linecap:round;
+  stroke-dasharray:1200;stroke-dashoffset:1200}
+.anim .fx-draw{animation:fxDraw 5.4s var(--fz-out) .35s forwards}
+.fx-draw-2{stroke:var(--gold-line)}
+.anim .fx-draw-2{animation-duration:6.2s;animation-delay:1s}
+@keyframes fxDraw{to{stroke-dashoffset:0}}
+
+/* partikel solar halus */
+.spark{position:absolute;width:7px;height:7px;border-radius:50%;opacity:0;
+  background:radial-gradient(circle,#FFDE59 0%,rgba(255,199,0,.55) 45%,rgba(255,199,0,0) 100%)}
+.anim .spark{animation:sparkRise 9.5s ease-in-out infinite}
+@keyframes sparkRise{0%{opacity:0;transform:translate3d(0,14px,0) scale(.55)}
+  16%{opacity:.95}56%{opacity:.45}100%{opacity:0;transform:translate3d(0,-52px,0) scale(1.15)}}
+.sp1{left:9%;top:64%}
+.sp2{left:20%;top:30%;animation-delay:1.1s}
+.sp3{left:33%;top:78%;animation-delay:2.4s}
+.sp4{left:48%;top:16%;animation-delay:3.5s}
+.sp5{left:63%;top:70%;animation-delay:.6s}
+.sp6{left:76%;top:34%;animation-delay:4.4s}
+.sp7{left:88%;top:58%;animation-delay:2s}
+.sp8{left:57%;top:44%;animation-delay:5.6s}
+
+/* orbit chip skill: dua cincin berlawanan arah, label tetap tegak (counter-rotate) */
+/* diameter orbit selalu lebih kecil dari panggung supaya chip tidak pernah menabrak
+   CTA di atasnya atau terpotong tepi layar */
+.orbit{position:absolute;left:50%;top:50%;width:min(94%,318px);aspect-ratio:1;transform:translate(-50%,-50%)}
+.anim .orbit-a{animation:fxOrbit 40s linear infinite}
+.anim .orbit-b{animation:fxOrbit 32s linear infinite reverse}
+@keyframes fxOrbit{from{transform:translate(-50%,-50%) rotate(0)}to{transform:translate(-50%,-50%) rotate(360deg)}}
+.orb{position:absolute;display:inline-flex;align-items:center;gap:7px;padding:6px 11px;
+  border-radius:var(--radius-pill);background:var(--cream-warm);border:1px solid var(--maroon-line);
+  color:var(--maroon-deep);box-shadow:var(--shadow-sm);font-size:var(--fs-micro);font-weight:700;
+  letter-spacing:.08em;text-transform:uppercase;white-space:nowrap;transform:translate(-50%,-50%)}
+.orb svg{width:14px;height:14px;color:var(--maroon)}
+.anim .orbit-a .orb{animation:fxUpright 40s linear infinite reverse}
+.anim .orbit-b .orb{animation:fxUpright 32s linear infinite}
+@keyframes fxUpright{from{transform:translate(-50%,-50%) rotate(0)}to{transform:translate(-50%,-50%) rotate(360deg)}}
+.orb-1{left:50%;top:1%}
+.orb-2{left:93%;top:70%}
+.orb-3{left:7%;top:70%}
+.orb-4{left:50%;top:99%}
+.orb-5{left:95%;top:26%}
+.orb-6{left:5%;top:26%}
+
+/* mockup app di frame device: float lembut (parallax dipasang di .device oleh site.js) */
+.device{position:relative;z-index:2}
+/* spesifisitas .showcase dipakai supaya lebar frame hero tidak ditimpa .phone/.phone-sm */
+.showcase .phone-hero{width:clamp(150px,40vw,192px)}
+.anim .phone-hero{animation:deviceFloat 7.4s ease-in-out infinite}
+@keyframes deviceFloat{0%,100%{transform:translate3d(0,0,0) rotate(-.5deg)}
+  50%{transform:translate3d(0,-13px,0) rotate(.6deg)}}
+
+/* ring progress animasi */
+.fx-progress{position:absolute;top:-30px;right:-48px;width:84px;height:84px;overflow:visible;z-index:3}
+.pg-track{fill:none;stroke:var(--gold-line-soft);stroke-width:7}
+.pg-bar{fill:none;stroke:var(--maroon);stroke-width:7;stroke-linecap:round;
+  stroke-dasharray:327;stroke-dashoffset:327;transform:rotate(-90deg);transform-origin:60px 60px}
+.anim .pg-bar{animation:pgFill 7.2s var(--fz-out) infinite}
+@keyframes pgFill{0%{stroke-dashoffset:327}42%,74%{stroke-dashoffset:78}100%{stroke-dashoffset:327}}
+
+/* maskot PAW resmi (custom element) — besar, dekat panggung */
+/* posisi/lebar PAW kini dipegang pembungkus rig .fzflow-paw-rig (lihat §FZFLOW) supaya
+   SVG PAW bisa melompat ke titik temu tanpa disentuh isinya */
+
+/* chip level CEFR muncul bergantian */
+.cefr-cycle{position:absolute;z-index:3;right:0;top:50%;transform:translateY(-50%);display:grid;gap:7px;justify-items:end}
+.cefr-cycle li{padding:4px 11px;border-radius:var(--radius-pill);background:var(--sun-soft);
+  border:1px solid var(--gold-line);color:var(--maroon-deep);font-size:var(--fs-micro);font-weight:700;
+  letter-spacing:.1em;opacity:.22;font-variant-numeric:tabular-nums}
+.anim .cefr-cycle li{animation:cefrPop 7.2s ease-in-out infinite}
+.anim .cefr-cycle li:nth-child(2){animation-delay:1.2s}
+.anim .cefr-cycle li:nth-child(3){animation-delay:2.4s}
+.anim .cefr-cycle li:nth-child(4){animation-delay:3.6s}
+.anim .cefr-cycle li:nth-child(5){animation-delay:4.8s}
+.anim .cefr-cycle li:nth-child(6){animation-delay:6s}
+@keyframes cefrPop{0%{opacity:.22;transform:translateY(4px) scale(.94)}
+  7%,20%{opacity:1;transform:none}34%,100%{opacity:.22;transform:translateY(0) scale(.97)}}
+
+/* ---------- ringkasan teks (turun setelah panggung) ---------- */
+.sec-intro{padding-top:46px}
+.intro-grid{display:grid;gap:28px}
+/* h1 DAN h2: halaman Indonesia menurunkan judul ini ke <h2> (judul halaman kini di hero),
+   tetapi website/th/index.html memakai style.css yang SAMA dan masih memakai <h1> di sini.
+   Selektor tunggal akan membuat judul halaman Thai kehilangan seluruh ukurannya. */
+.intro-copy h1,.intro-copy h2{font-size:clamp(1.95rem,8vw,2.7rem);letter-spacing:-.035em;margin-bottom:16px;text-wrap:balance}
+.intro-copy .lede{font-size:1.04rem;color:var(--body);max-width:56ch}
+.intro-note{padding:24px 22px}
+.intro-note .tagline{font-size:clamp(1rem,4.2vw,1.2rem);margin:14px 0 14px}
+.intro-note-body{font-size:var(--fs-label);color:var(--muted);border-left:1px solid var(--maroon-line-strong);padding-left:12px}
+
+/* bingkai ponsel — krem, hairline maroon (dulu bezel gelap) */
+.phone{position:relative;width:196px;max-width:60vw;padding:9px;background:var(--cream-warm);
+  border:1px solid var(--maroon-line-strong);border-radius:34px;box-shadow:var(--shadow-md);margin:0}
+.phone::before{content:"";position:absolute;top:15px;left:50%;transform:translateX(-50%);width:52px;height:4px;
+  border-radius:99px;background:var(--maroon-line);z-index:2}
+.phone-screen{overflow:hidden;border-radius:26px;background:var(--cream);border:1px solid var(--line-soft)}
+.phone-screen img{width:100%;height:auto}
+.phone-sm{width:170px}
+.anim .phone{transition:transform var(--fz-slow) var(--fz-out),box-shadow var(--fz-slow) var(--fz-out)}
+.anim .phone:hover{transform:translateY(-6px);box-shadow:var(--shadow-lg)}
+
+/* maskot PAW: idle breathing */
+.paw-idle{transform-origin:50% 84%}
+.anim .paw-idle{animation:pawBreath 5.2s ease-in-out infinite}
+@keyframes pawBreath{0%,100%{transform:translateY(0) scale(1)}50%{transform:translateY(-4px) scale(1.028)}}
+
+/* ---------- statistik ---------- */
+.stats{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;margin:34px 0 8px}
+.stats li{background:var(--cream-warm);border:1px solid var(--line);border-radius:var(--radius-lg);
+  padding:18px 16px;box-shadow:var(--shadow-sm);position:relative;overflow:hidden}
+.stats li::after{content:"";position:absolute;left:16px;right:16px;top:0;height:2px;
+  background:linear-gradient(90deg,var(--maroon),var(--sun) 70%,transparent)}
+.stats b{display:block;font-size:clamp(1.8rem,7.4vw,2.25rem);font-weight:800;letter-spacing:-.04em;
+  line-height:1.05;color:var(--maroon-deep);font-variant-numeric:tabular-nums}
+.stats span{display:block;font-size:.82rem;color:var(--muted);margin-top:5px;letter-spacing:.01em}
+.anim .stats li{transition:transform var(--fz-base) var(--fz-out),box-shadow var(--fz-base) var(--fz-out)}
+.anim .stats li:hover{transform:translateY(-4px);box-shadow:var(--shadow-md)}
+
+/* ---------- marquee statistik (pelan, dekoratif) ---------- */
+.ticker{margin-top:30px;border-top:1px solid var(--gold-line-soft);border-bottom:1px solid var(--gold-line-soft);
+  overflow:hidden;padding:12px 0;background:linear-gradient(90deg,transparent,rgba(255,243,196,.5),transparent)}
+.ticker-track{display:flex;width:max-content;gap:0}
+.anim .ticker-track{animation:tick 42s linear infinite}
+.ticker-track:hover{animation-play-state:paused}
+.ticker li{display:inline-flex;align-items:center;gap:14px;padding:0 22px;font-size:var(--fs-label);
+  font-weight:700;letter-spacing:var(--track-wide);text-transform:uppercase;color:var(--maroon-mid);white-space:nowrap}
+.ticker li::after{content:"";width:5px;height:5px;border-radius:50%;background:var(--maroon-line-strong)}
+@keyframes tick{from{transform:translate3d(0,0,0)}to{transform:translate3d(-50%,0,0)}}
+
+/* ---------- tentang ---------- */
+.sec-about{padding-top:52px}
+.about-grid{display:grid;gap:34px}
+.shot-pair{display:flex;gap:16px;justify-content:center;align-items:flex-start}
+.phone-lift{margin-top:28px}
+
+/* ---------- kartu ---------- */
+.card{background:var(--cream-warm);border:1px solid var(--line);border-radius:var(--radius-lg);box-shadow:var(--shadow-sm)}
+.anim .card{transition:transform var(--fz-base) var(--fz-out),box-shadow var(--fz-base) var(--fz-out),border-color var(--fz-base)}
+
+.feat-grid{display:grid;gap:16px}
+.feat{padding:24px 22px 26px;position:relative}
+.feat h3{font-size:1.08rem;margin:14px 0 9px;letter-spacing:-.015em}
+.feat p{font-size:.95rem;color:var(--body)}
+.anim .feat:hover{transform:translateY(-5px);box-shadow:var(--shadow-lg);border-color:var(--maroon-line)}
+.ico{width:30px;height:30px;color:var(--maroon)}
+.ico-img{width:40px;height:auto}
+/* tiga permukaan krem saja: Solar lembut, kertas hangat, dan krem-maroon (blush). */
+.tint-sun{background:var(--sun-soft);border-color:var(--gold-line)}
+.tint-paper{background:var(--cream-warm)}
+.tint-blush{background:var(--blush);border-color:var(--maroon-line)}
+.tint-blush .ico{color:var(--maroon-deep)}
+.feat-mark{position:absolute;top:20px;right:22px;font-size:var(--fs-micro);font-weight:700;
+  letter-spacing:.16em;color:var(--maroon-soft);opacity:.7}
+
+.chiplist{display:flex;flex-wrap:wrap;gap:8px;margin-top:18px}
+.chiplist li{background:var(--cream-warm);border:1px solid var(--maroon-line);border-radius:var(--radius-pill);
+  padding:5px 13px;font-size:var(--fs-label);font-weight:700;color:var(--maroon-deep);font-variant-numeric:tabular-nums}
+
+/* ---------- cara pakai ---------- */
+.steps{display:grid;gap:14px}
+.step{padding:22px;display:grid;grid-template-columns:auto 1fr;gap:16px;align-items:start}
+/* badge nomor: satu-satunya bidang maroon, ukurannya kecil (38px) — tinta krem 8,4:1 */
+.step-n{display:grid;place-items:center;width:38px;height:38px;border-radius:50%;background:var(--maroon);
+  color:var(--cream);font-weight:800;font-size:1rem;font-variant-numeric:tabular-nums;
+  box-shadow:0 0 0 4px rgba(140,34,51,.10)}
+.step p{font-size:.98rem;color:var(--body);padding-top:7px}
+.steps-cta{margin-top:26px}
+.anim .step:hover{transform:translateY(-4px);box-shadow:var(--shadow-md)}
+
+/* ---------- m029 FOCUS: "apa yang terjadi saat kamu salah" ----------
+   Tiga kartu = satu putaran adaptif (jawaban -> penjelasan -> rencana berubah).
+   Kartu tengah diberi bidang blush + garis maroon karena DI SITULAH pembedanya:
+   penjelasan pola, bukan vonis benar/salah. Dua kartu lain sengaja tenang supaya
+   mata berhenti di tengah. Bidang kuning tidak dipakai sebagai warna teks. */
+.sec-dek{font-size:.96rem;color:var(--muted);max-width:52ch;margin-top:-4px}
+.loop{display:grid;gap:14px;list-style:none;padding:0;margin:0}
+.loop-step{padding:22px 20px 24px;display:flex;flex-direction:column;gap:10px}
+.loop-step:nth-child(2){background:var(--blush);border-color:var(--maroon-line)}
+.loop-n{display:flex;align-items:center;gap:10px;margin:0;
+  font-size:var(--fs-micro);font-weight:700;letter-spacing:var(--track-wide);
+  text-transform:uppercase;color:var(--maroon-soft)}
+.loop-n span{display:grid;place-items:center;width:26px;height:26px;flex:0 0 26px;
+  border-radius:50%;background:var(--maroon);color:var(--cream);
+  font-size:.8rem;font-weight:800;letter-spacing:0;font-variant-numeric:tabular-nums}
+
+/* kalimat contoh diberi bidang + garis sendiri supaya terbaca sebagai KUTIPAN SOAL,
+   bukan paragraf: coretan pada kata yang salah butuh bingkai agar tidak terlihat
+   seperti teks yang kebetulan dicoret. */
+.loop-q{margin:0;font-size:1.02rem;line-height:1.55;color:var(--maroon-deep);font-weight:600;
+  background:var(--cream);border:1px solid var(--line);border-radius:var(--radius-sm);padding:12px 14px}
+.loop-q s{color:var(--maroon);text-decoration-thickness:2px}
+.loop-q b{background:var(--sun-soft);border-radius:5px;padding:1px 5px;font-weight:800}
+
+.loop-verdict{margin:0;font-size:var(--fs-label);font-weight:800;letter-spacing:.02em;
+  display:inline-flex;align-items:center;align-self:flex-start;
+  border-radius:var(--radius-pill);padding:5px 13px}
+.loop-verdict-bad{color:var(--maroon-deep);background:var(--bad-soft);border:1px solid var(--maroon-line)}
+
+/* pilihan vs seharusnya: dua baris label/nilai, bukan kalimat — ini data soal.
+   Nilai "Seharusnya" memakai --good (hijau 1F6B4E), satu-satunya tempat warna itu
+   dipakai di halaman ini, supaya jawaban benar tidak perlu dibaca untuk dikenali. */
+.loop-ans{margin:0;display:grid;grid-template-columns:auto 1fr;gap:4px 14px;align-items:baseline}
+.loop-ans dt{font-size:var(--fs-micro);font-weight:700;letter-spacing:.12em;
+  text-transform:uppercase;color:var(--maroon-soft)}
+.loop-ans dd{margin:0;font-size:.95rem;font-weight:700;color:var(--maroon-deep)}
+.loop-ans dt:last-of-type+dd{color:var(--good)}
+
+.loop-exp{margin:0;font-size:.97rem;line-height:1.6;color:var(--text);font-weight:600}
+.loop-rule{margin:0;font-size:.92rem;line-height:1.6;color:var(--body);
+  border-left:3px solid var(--maroon);padding-left:12px}
+.loop-rule b{color:var(--maroon-deep)}
+
+.loop-plan{list-style:none;margin:0;padding:0;display:grid;gap:9px}
+.loop-plan li{font-size:.94rem;line-height:1.5;color:var(--text)}
+.loop-plan-k{display:block;font-size:var(--fs-micro);font-weight:700;
+  letter-spacing:.14em;text-transform:uppercase;color:var(--maroon-soft);margin-bottom:2px}
+
+.loop-note{margin:auto 0 0;padding-top:12px;border-top:1px dashed var(--line);
+  font-size:.86rem;line-height:1.5;color:var(--muted-soft)}
+.loop-step:nth-child(2) .loop-note{border-top-color:var(--maroon-line)}
+.loop-note b{color:var(--maroon-deep)}
+.anim .loop-step:hover{transform:translateY(-4px);box-shadow:var(--shadow-md)}
+
+/* ---------- install ---------- */
+.install-card{display:grid;gap:26px;padding:28px 22px}
+.install-card .sec-title{margin-bottom:12px}
+.howlist{display:grid;gap:10px;margin:6px 0 20px}
+.howlist li{background:var(--panel-soft);border:1px solid var(--gold-line-soft);border-radius:var(--radius-sm);
+  padding:12px 15px;font-size:.93rem;color:var(--body)}
+.howlist b{color:var(--maroon-deep)}
+.install-shot{justify-self:center}
+
+/* ---------- FAQ ---------- */
+.sec-faq{background:var(--cream-deep)}
+.faq{display:grid;gap:10px}
+.faq details{background:var(--cream-warm);border:1px solid var(--line);border-radius:var(--radius-lg);
+  box-shadow:var(--shadow-sm);overflow:hidden}
+.faq summary{list-style:none;cursor:pointer;padding:19px 54px 19px 22px;font-weight:700;font-size:1rem;
+  color:var(--maroon-deep);position:relative}
+.faq summary::-webkit-details-marker{display:none}
+.chev{position:absolute;right:22px;top:23px;width:11px;height:11px;border-right:2.5px solid var(--maroon);
+  border-bottom:2.5px solid var(--maroon);transform:rotate(45deg)}
+.anim .chev{transition:transform var(--fz-base) var(--fz-out)}
+.faq details[open] .chev{transform:rotate(-135deg) translate(-2px,-2px)}
+.faq-body{padding:0 22px 22px}
+.faq-body p{font-size:.95rem;color:var(--body)}
+.anim .faq details[open] .faq-body{animation:faqIn var(--fz-base) var(--fz-out) both}
+@keyframes faqIn{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:none}}
+
+/* ---------- CTA akhir ---------- */
+.sec-final{padding:64px 0 72px}
+.final{padding:38px 24px;text-align:center}
+.final-paw{width:64px;height:auto;margin:0 auto 16px}
+.final h2{font-size:clamp(1.6rem,6.4vw,2.35rem);letter-spacing:-.03em;margin-bottom:14px;color:var(--maroon-deep)}
+.final p{color:var(--body);max-width:48ch;margin:0 auto;font-size:1rem}
+.final .tagline{font-size:var(--fs-label);letter-spacing:.14em;margin-bottom:16px}
+.final .rule{max-width:220px;margin:20px auto 0}
+
+/* ---------- footer ---------- */
+.foot{background:var(--cream-deep);color:var(--body);padding:48px 0 0;border-top:1px solid var(--gold-line)}
+.foot-in{display:grid;gap:28px;padding-bottom:28px}
+.foot-word{width:148px;height:auto;color:var(--maroon-deep)}
+.foot-tag{margin-top:14px;color:var(--muted);font-size:.95rem}
+.foot-links{display:flex;align-items:center;gap:12px;margin-top:16px;font-weight:700;flex-wrap:wrap}
+.foot-links a,.foot-links a:visited{color:var(--maroon-deep);border-bottom:1px solid var(--maroon-line-strong);padding-bottom:1px}
+.foot-links a:hover{text-decoration:none;border-color:var(--maroon)}
+.foot-links span{color:var(--maroon-soft)}
+.foot-notes{display:grid;gap:9px}
+.foot-notes p{color:var(--muted);font-size:.87rem;max-width:52ch}
+.foot-copy{border-top:1px solid var(--gold-line-soft);padding-top:18px;padding-bottom:28px}
+.foot-copy p{color:var(--muted-soft);font-size:.82rem;letter-spacing:.08em;text-transform:uppercase}
+
+/* ---------- reveal on-scroll (fade + rise, stagger) ---------- */
+.anim .reveal{opacity:0;transform:translate3d(0,22px,0);
+  transition:opacity var(--fz-slow) var(--fz-out),transform var(--fz-slow) var(--fz-out);
+  transition-delay:calc(var(--i,0) * 70ms)}
+.anim .reveal.is-in{opacity:1;transform:none}
+
+/* ---------- hero entrance sequence: wordmark → tagline → CTA ---------- */
+.anim .seq{opacity:0;transform:translate3d(0,16px,0);animation:seqIn .72s var(--fz-out) both}
+.anim .seq-1{animation-delay:.06s}
+.anim .seq-2{animation-delay:.24s}
+.anim .seq-3{animation-delay:.40s}
+.anim .seq-4{animation-delay:.56s}
+.anim .seq-5{animation-delay:.72s}
+.anim .seq-6{animation-delay:.88s}
+@keyframes seqIn{from{opacity:0;transform:translate3d(0,16px,0)}to{opacity:1;transform:none}}
+
+/* ---------- reduced motion: pose statis rapi (panggung tetap terbaca) ---------- */
+@media (prefers-reduced-motion:reduce){
+  .reveal,.seq{opacity:1!important;transform:none!important}
+  .ticker-track{transform:none!important}
+  .spark{opacity:.5!important}
+  .fx-draw{stroke-dashoffset:0!important}
+  .pg-bar{stroke-dashoffset:78!important}
+  .cefr-cycle li{opacity:1!important;transform:none!important}
+  .phone-hero{transform:none!important}
+}
+
+/* ---------- <= 359px ---------- */
+@media (max-width:359px){
+  .hero .phone{max-width:52vw}
+  .showcase{min-height:262px}
+  /* 320-359px: hentikan tagline memaksa satu baris — di lebar ini nowrap-lah yang
+     membuat halaman meluber ke samping. */
+  .mast-sub{white-space:normal}
+  .mast-h1{font-size:1.86rem}
+}
+
+/* ---------- < 560px: chip orbit hanya ikon supaya panggung tidak padat ---------- */
+@media (max-width:559px){
+  .orb{padding:7px;gap:0}
+  .orb b{display:none}
+  .orbit{width:min(96%,306px)}
+  .fx-progress{width:70px;height:70px;top:-22px;right:-36px}
+
+  /* m029 FOCUS — HP 360-390px, layar pertama.
+     Sebelum ini panggung setinggi 50vh berdiri SEBELUM ada satu kalimat pun yang
+     menjelaskan aplikasinya, jadi di layar 360x640 pengunjung melihat wordmark +
+     animasi lalu harus scroll untuk tahu FIEZEL itu apa. Sekarang judul, CTA, dan
+     baris kepercayaan yang lebih dulu selesai dibaca; panggung menyusul di bawahnya
+     dengan tinggi yang dipangkas.
+     margin-top 28px (bukan 10px) karena .orb-1 menonjol ~15px DI ATAS kotak .showcase:
+     pada jarak lebih rapat ia mendarat persis di baris "Cara pasang ke layar utama". */
+  .showcase{min-height:clamp(268px,40vh,330px);margin-top:28px}
+  .masthead{padding:16px 0 2px}
+  .mast-word{width:min(58vw,208px)}
+  .mast-h1{margin-top:14px;max-width:15ch}
+  .mast-lede{margin-top:12px}
+
+  /* CTA selebar layar: di ibu jari, target 100% jauh lebih mudah dikenai daripada
+     pil selebar teksnya. .cta-row memakai flex, jadi lebar diatur lewat item. */
+  .mast-cta{margin-top:18px}
+  .btn-hero{width:100%;padding:14px 18px}
+  .btn-hero-sub{font-size:var(--fs-micro)}
+
+  /* partikel dikurangi setengah: di layar sempit delapan titik berkedip di belakang
+     teks membuat mata tidak punya tempat berhenti. */
+  .sp2,.sp4,.sp6,.sp8{display:none}
+
+  /* m029 FOCUS — sumber overflow horizontal di 360px (ADA SEBELUM commit ini).
+     .shot-pair adalah flex berisi dua .phone-sm: 170 + 170 + gap 16 = 356px, sementara
+     ruang isi .wrap di viewport 360px hanya 360 - (22+22) = 316px. Selisih 40px itulah
+     yang membuat seluruh halaman bisa digeser ke samping — bukan cuma seksi ini, karena
+     .sec-about tidak memotong luapan anaknya.
+     Lebar dijadikan persentase supaya pasangan ini selalu pas persis di lebar berapa pun:
+     2 x (50% - 6px) + gap 12px = 100%. */
+  .shot-pair{gap:12px}
+  .shot-pair .phone-sm{width:calc(50% - 6px);max-width:170px}
+}
+
+/* ---------- >= 560px ---------- */
+@media (min-width:560px){
+  .stats{grid-template-columns:repeat(4,1fr)}
+  .feat-grid{grid-template-columns:repeat(2,1fr)}
+  .feat-wide{grid-column:1 / -1;display:grid;grid-template-columns:1fr auto;column-gap:30px;align-items:center}
+  .feat-wide .ico{grid-row:1;grid-column:1}
+  .feat-wide h3{grid-column:1}
+  .feat-wide p{grid-column:1;max-width:46ch}
+  .feat-wide .chiplist{grid-column:2;grid-row:1 / span 3;max-width:200px;margin-top:0}
+  .steps{grid-template-columns:repeat(2,1fr)}
+  .feat-grid>.feat:last-child{grid-column:1 / -1;display:grid;grid-template-columns:auto 1fr;column-gap:22px;align-items:center}
+  .feat-grid>.feat:last-child .ico{grid-row:1 / span 2}
+  .feat-grid>.feat:last-child h3{margin-top:0}
+  .topnav>a:first-child{display:inline}
+}
+
+/* ---------- >= 900px ---------- */
+@media (min-width:900px){
+  .sec{padding:104px 0}
+  .masthead{padding:28px 0 6px}
+  /* wordmark mengecil di desktop: sejak judul asli pindah ke hero, wordmark bukan lagi
+     satu-satunya penanda halaman — ia identitas, judullah yang menjelaskan. */
+  .mast-word{width:264px}
+  .mast-rule{max-width:420px;margin-top:28px}
+  .hero{padding:8px 0 30px}
+  /* panggung dipangkas dari 58vh: judul + CTA sekarang berdiri di atasnya, dan hero
+     yang totalnya melebihi satu layar mengalahkan tujuan strip ini.
+     margin-top 44px BUKAN selera: chip orbit teratas (.orb-1, top:1% dengan
+     translate(-50%,-50%)) menonjol ~26px DI ATAS kotak .showcase, jadi jarak yang lebih
+     rapat membuatnya mendarat tepat di atas baris kepercayaan. */
+  .showcase{min-height:min(44vh,390px);margin-top:44px}
+  .mast-sub{letter-spacing:var(--track-wide);text-transform:uppercase}
+  .orbit{width:424px}
+  .fx-progress{width:92px;height:92px;top:-34px;right:-56px}
+  .intro-grid{grid-template-columns:1.16fr .84fr;align-items:center;gap:52px}
+  .intro-copy h1,.intro-copy h2{font-size:2.9rem}
+  .intro-copy .lede{font-size:1.09rem}
+  .intro-note{padding:32px 30px}
+  .phone{width:228px}
+  .stats{gap:18px;margin-top:52px}
+  .stats li{padding:24px 22px}
+  .about-grid{grid-template-columns:1.05fr .95fr;align-items:center;gap:56px}
+  .shot-pair{gap:22px}
+  .phone-sm{width:200px}
+  .feat-grid{grid-template-columns:repeat(3,1fr);gap:20px}
+  .feat-wide{grid-column:1 / span 3}
+  .feat-grid>.feat:last-child{grid-column:1 / span 2}
+  .feat-grid>.feat:last-child p{max-width:52ch}
+  .feat-wide .chiplist{max-width:240px}
+  .steps{grid-template-columns:repeat(4,1fr)}
+  /* tiga kartu = tiga kolom, tetapi BARU di 900px. Pada 560px tiga kolom menyisakan
+     ~161px per kartu, dan label "SEHARUSNYA" (12px + tracking .12em) di .loop-ans
+     tidak bisa menyusut sebanyak itu — kartunya meluber dan seluruh halaman ikut
+     bisa digeser ke samping. min-width:0 memastikan item grid boleh menyusut di
+     bawah lebar min-content-nya kalau isi baru ditambahkan nanti. */
+  .loop{grid-template-columns:repeat(3,1fr);gap:16px;align-items:stretch}
+  .loop-step{min-width:0}
+  .install-card{grid-template-columns:1.1fr auto;align-items:center;padding:46px;gap:48px}
+  .sec-final{padding:104px 0 116px}
+  .final{padding:64px 48px}
+  .foot{padding-top:72px}
+  .foot-in{grid-template-columns:1fr 1fr;gap:52px;padding-bottom:36px}
+  .foot-notes{justify-items:end;text-align:right}
+  .sec-head{margin-bottom:34px}
+}
+
+/* ============================================================
+   HAWAIIAN HULA PAW MASCOT MOTION (3s DYNAMIC CHOREOGRAPHY)
+   ============================================================ */
+.hula-paw {
+  filter: drop-shadow(0 8px 24px rgba(140, 34, 51, 0.12));
+}
+
+.hula-paw,
+.hula-paw * {
+  transform-box: view-box;
+}
+
+.hula-paw.hula-playing .fz-hula-all {
+  animation: hula-all-sway 2.4s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite;
+  transform-origin: 160px 280px;
+}
+@keyframes hula-all-sway {
+  0%, 100% { transform: rotate(0deg) translateX(0px); }
+  25% { transform: rotate(-3.5deg) translateX(-8px) translateY(-3px); }
+  50% { transform: rotate(0deg) translateX(0px) translateY(1px); }
+  75% { transform: rotate(3.5deg) translateX(8px) translateY(-3px); }
+}
+
+.hula-paw.hula-playing .fz-hula-torso {
+  animation: hula-hip-roll 2.4s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite;
+  transform-origin: 160px 240px;
+}
+@keyframes hula-hip-roll {
+  0%, 100% { transform: rotate(0deg) translateX(0px); }
+  25% { transform: rotate(4deg) translateX(-6px) scaleY(0.98); }
+  50% { transform: rotate(0deg) translateX(0px) scaleY(1); }
+  75% { transform: rotate(-4deg) translateX(6px) scaleY(0.98); }
+}
+
+.hula-paw.hula-playing .fz-skirt-layer-front {
+  animation: skirt-sway-front 2.4s cubic-bezier(0.35, 0.1, 0.25, 1) infinite;
+  transform-origin: 160px 222px;
+}
+@keyframes skirt-sway-front {
+  0%, 100% { transform: skewX(0deg) scaleX(1); }
+  25% { transform: skewX(-14deg) scaleX(1.08) translateX(-5px); }
+  50% { transform: skewX(0deg) scaleX(1); }
+  75% { transform: skewX(14deg) scaleX(1.08) translateX(5px); }
+}
+
+.hula-paw.hula-playing .fz-skirt-blade-left {
+  animation: skirt-blade-l 2.4s ease-in-out infinite;
+  transform-origin: 110px 224px;
+}
+@keyframes skirt-blade-l {
+  0%, 100% { transform: rotate(0deg); }
+  22% { transform: rotate(-18deg) scaleY(1.08); }
+  72% { transform: rotate(10deg) scaleY(0.96); }
+}
+
+.hula-paw.hula-playing .fz-skirt-blade-right {
+  animation: skirt-blade-r 2.4s ease-in-out infinite;
+  transform-origin: 210px 224px;
+}
+@keyframes skirt-blade-r {
+  0%, 100% { transform: rotate(0deg); }
+  28% { transform: rotate(-10deg) scaleY(0.96); }
+  78% { transform: rotate(18deg) scaleY(1.08); }
+}
+
+.hula-paw.hula-playing .fz-skirt-blade-center {
+  animation: skirt-blade-c 2.4s ease-in-out infinite;
+  transform-origin: 160px 224px;
+}
+@keyframes skirt-blade-c {
+  0%, 100% { transform: rotate(0deg) scaleX(1); }
+  25% { transform: rotate(-12deg) scaleX(1.1); }
+  75% { transform: rotate(12deg) scaleX(1.1); }
+}
+
+.hula-paw.hula-playing .fz-hula-head {
+  animation: hula-head-tilt 2.4s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite;
+  transform-origin: 160px 140px;
+}
+@keyframes hula-head-tilt {
+  0%, 50%, 100% { transform: rotate(0deg) translateY(0px); }
+  25% { transform: rotate(4.5deg) translateY(-2px); }
+  75% { transform: rotate(-4.5deg) translateY(-2px); }
+}
+
+.hula-paw.hula-playing .fz-haku-lei {
+  animation: haku-lei-bounce 2.4s ease-in-out infinite;
+  transform-origin: 160px 50px;
+}
+@keyframes haku-lei-bounce {
+  0%, 50%, 100% { transform: rotate(0deg) translateY(0px); }
+  25% { transform: rotate(-2.5deg) translateY(-2px); }
+  75% { transform: rotate(2.5deg) translateY(-2px); }
+}
+
+/* Continuous Tail Gentle Natural Sway */
+.hula-paw.hula-playing .fz-tail {
+  animation: hula-tail-sway 2.4s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite;
+  transform-origin: 212px 244px;
+}
+@keyframes hula-tail-sway {
+  0%, 100% { transform: rotate(0deg); }
+  25% { transform: rotate(5deg) translateY(-1px); }
+  50% { transform: rotate(0deg); }
+  75% { transform: rotate(-5deg) translateY(1px); }
+}
+
+/* Routine 1: Ocean Waves */
+.hula-paw.routine-1 .fz-arm-l {
+  animation: r1-arm-l 2.4s ease-in-out infinite;
+  transform-origin: 115px 185px;
+}
+@keyframes r1-arm-l {
+  0%, 100% { transform: rotate(-8deg) translateY(0); }
+  20% { transform: rotate(-28deg) translateY(-14px) scaleY(1.04); }
+  40% { transform: rotate(-18deg) translateY(-8px); }
+  65% { transform: rotate(12deg) translateY(6px); }
+  85% { transform: rotate(2deg) translateY(2px); }
+}
+.hula-paw.routine-1 .fz-arm-r {
+  animation: r1-arm-r 2.4s ease-in-out infinite;
+  transform-origin: 198px 182px;
+}
+@keyframes r1-arm-r {
+  0%, 100% { transform: rotate(8deg) translateY(0); }
+  20% { transform: rotate(-10deg) translateY(4px); }
+  45% { transform: rotate(4deg) translateY(2px); }
+  70% { transform: rotate(28deg) translateY(-14px) scaleY(1.04); }
+  90% { transform: rotate(18deg) translateY(-6px); }
+}
+
+/* Routine 2: Tropical Sun */
+.hula-paw.routine-2 .fz-arm-l {
+  animation: r2-arm-l 2.2s ease-in-out infinite;
+  transform-origin: 115px 185px;
+}
+@keyframes r2-arm-l {
+  0%, 100% { transform: rotate(-35deg) translateY(-20px); }
+  30% { transform: rotate(-50deg) translateY(-26px) scaleY(1.06); }
+  70% { transform: rotate(-20deg) translateY(-10px); }
+}
+.hula-paw.routine-2 .fz-arm-r {
+  animation: r2-arm-r 2.2s ease-in-out infinite;
+  transform-origin: 198px 182px;
+}
+@keyframes r2-arm-r {
+  0%, 100% { transform: rotate(35deg) translateY(-20px); }
+  30% { transform: rotate(20deg) translateY(-10px); }
+  70% { transform: rotate(50deg) translateY(-26px) scaleY(1.06); }
+}
+
+/* Routine 3: Island Breeze */
+.hula-paw.routine-3 .fz-arm-l {
+  animation: r3-arm-l 2.4s ease-in-out infinite;
+  transform-origin: 115px 185px;
+}
+@keyframes r3-arm-l {
+  0%, 100% { transform: rotate(18deg) translateX(12px) translateY(8px); }
+  50% { transform: rotate(10deg) translateX(8px) translateY(4px); }
+}
+.hula-paw.routine-3 .fz-arm-r {
+  animation: r3-arm-r 2.4s ease-in-out infinite;
+  transform-origin: 198px 182px;
+}
+@keyframes r3-arm-r {
+  0%, 100% { transform: rotate(36deg) translateY(-18px) scaleX(1.06); }
+  50% { transform: rotate(48deg) translateY(-26px) scaleX(1.08); }
+}
+
+/* Routine 4: Aloha Celebration */
+.hula-paw.routine-4 .fz-arm-l {
+  animation: r4-arm-l 2.0s cubic-bezier(0.34, 1.4, 0.64, 1) infinite;
+  transform-origin: 115px 185px;
+}
+@keyframes r4-arm-l {
+  0%, 100% { transform: rotate(-22deg) translateY(-10px); }
+  50% { transform: rotate(-44deg) translateY(-22px) scaleY(1.08); }
+}
+.hula-paw.routine-4 .fz-arm-r {
+  animation: r4-arm-r 2.0s cubic-bezier(0.34, 1.4, 0.64, 1) infinite;
+  transform-origin: 198px 182px;
+}
+@keyframes r4-arm-r {
+  0%, 100% { transform: rotate(22deg) translateY(-10px); }
+  50% { transform: rotate(44deg) translateY(-22px) scaleY(1.08); }
+}
+.hula-paw.routine-4 .fz-ear-l {
+  animation: ear-wiggle-l 1.0s ease-in-out infinite;
+  transform-origin: 108px 52px;
+}
+@keyframes ear-wiggle-l {
+  0%, 100% { transform: rotate(0deg); }
+  50% { transform: rotate(-10deg); }
+}
+.hula-paw.routine-4 .fz-ear-r {
+  animation: ear-wiggle-r 1.0s ease-in-out infinite;
+  transform-origin: 212px 52px;
+}
+@keyframes ear-wiggle-r {
+  0%, 100% { transform: rotate(0deg); }
+  50% { transform: rotate(10deg); }
+}
+
+
+
+/* ============ PANGGUNG GANDA HERO: MURID (HP) + GURU (MacBook + MIRA) ============
+   Blok ini dulu hidup sebagai <style> inline di website/index.html (commit d1b4e1e).
+   Dipindah ke sini apa adanya (nilai hex milik owner tidak diubah) karena halaman Thai
+   website/th/index.html memakai style.css yang SAMA dan kini juga merender panggung guru —
+   aturan dwibahasa menuntut satu sumber gaya, bukan salinan 280 baris di dua HTML.
+   Satu-satunya perubahan isi: animasi .mira-anim-head (miraHeadGlance) diganti oleh
+   timeline pose fzflow-mira-head di bagian FZFLOW di bawah, supaya kepala MIRA mengikuti
+   tahapan cerita (kirim -> menunggu -> senang), bukan glance lepas dari alur. */
+  /* Wordmark KelasKu untuk Guru — Satu baris horizontal ketat */
+  .kelasku-brand {
+    display: inline-flex !important;
+    align-items: baseline !important;
+    gap: 8px !important;
+    white-space: nowrap !important;
+    vertical-align: baseline !important;
+  }
+  .kelasku-main {
+    font-weight: 800 !important;
+    letter-spacing: -0.02em !important;
+    line-height: 1 !important;
+  }
+  .kelasku-tag {
+    font-weight: 600 !important;
+    font-size: 0.68em !important;
+    opacity: 0.88 !important;
+    letter-spacing: -0.01em !important;
+    line-height: 1 !important;
+  }
+
+  /* Dual Ecosystem Stage in Hero */
+  .hero-dual-stage {
+    display: grid;
+    grid-template-columns: minmax(320px, 1fr) minmax(340px, 1.25fr);
+    gap: 32px;
+    align-items: center;
+    max-width: 1240px;
+    margin: 24px auto 0;
+    padding: 0 16px;
+    position: relative;
+    z-index: 2;
+  }
+
+  /* Left Side: Student Showcase wrapper */
+  .stage-student {
+    position: relative;
+    width: 100%;
+    overflow: visible;
+  }
+  /* Preserve 100% of the original .showcase behavior */
+  .stage-student .showcase {
+    margin-top: 0;
+    min-height: clamp(340px, 48vh, 460px);
+  }
+
+  /* Right Side: Teacher MacBook Showcase wrapper */
+  .stage-teacher {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    padding-top: 50px; /* space for Mira behind screen */
+  }
+
+  /* Accurate Apple MacBook Pro Mockup */
+  .mac-container {
+    position: relative;
+    width: 100%;
+    max-width: 560px;
+    margin: 0 auto;
+    filter: drop-shadow(0 24px 48px rgba(36,26,17,0.18));
+  }
+
+  /* Teacher Mascot (MIRA) — Situated strictly BEHIND the laptop lid */
+  .mira-teacher-wrapper {
+    position: absolute;
+    top: -95px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 220px;
+    height: 202px; /* fzflow: viewBox 220x180 -> 220x260 (kaki ditambah); skala tetap 0.777 sehingga
+                      bagian atas MIRA tergambar persis seperti sebelumnya */
+    z-index: 1; /* Behind lid (z-index 2) */
+    pointer-events: none;
+  }
+  .mira-svg {
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+  }
+
+  /* Animations for MIRA */
+  /* .mira-teacher-wrapper: napas + perjalanan turun-ke-panggung kini di fzflow-mira-travel (§FZFLOW) */
+
+  /* .mira-anim-head: glance idle kini bagian dari timeline fzflow-mira-head (lihat FZFLOW) */
+
+  .anim .mira-eyelid {
+    animation: miraBlink 5.2s infinite;
+  }
+  @keyframes miraBlink {
+    0%, 46%, 50%, 96%, 100% { transform: scaleY(1); }
+    48%, 98% { transform: scaleY(0.08); }
+  }
+  .mira-eyelid {
+    transform-origin: center 80px;
+  }
+
+  /* MacBook Screen Lid */
+  .mac-lid {
+    position: relative;
+    z-index: 2; /* In front of Mira's body */
+    background: #0B0C0E;
+    border-radius: 16px 16px 0 0;
+    padding: 10px 10px 0 10px;
+    box-shadow:
+      inset 0 0 0 1.5px #A1A5A9,
+      inset 0 0 0 3px #1F2226,
+      0 -2px 8px rgba(0,0,0,0.15);
+  }
+  .mac-screen {
+    position: relative;
+    background: #0D1117;
+    border-radius: 9px 9px 0 0;
+    overflow: hidden;
+    aspect-ratio: 16 / 10;
+    border: 1px solid #1c2024;
+  }
+  .mac-screen img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: top center;
+    display: block;
+  }
+
+  /* FaceTime Notch */
+  .mac-notch {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 72px;
+    height: 14px;
+    background: #0B0C0E;
+    border-radius: 0 0 7px 7px;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.5);
+  }
+  .mac-camera {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: #111B27;
+    border: 0.8px solid #203045;
+    position: relative;
+  }
+  .mac-camera::after {
+    content: '';
+    position: absolute;
+    width: 2px;
+    height: 2px;
+    border-radius: 50%;
+    background: #2563EB;
+    top: 1px; left: 1px;
+    opacity: 0.75;
+  }
+  .mac-led {
+    width: 3px;
+    height: 3px;
+    border-radius: 50%;
+    background: #22C55E;
+    opacity: 0.85;
+    box-shadow: 0 0 4px #22C55E;
+  }
+
+  /* MacBook Keyboard Base */
+  .mac-base {
+    position: relative;
+    z-index: 3;
+    height: 14px;
+    background: linear-gradient(180deg, #D4D8DC 0%, #B8BCC0 35%, #9CA0A4 100%);
+    border-radius: 0 0 16px 16px;
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,0.7),
+      0 4px 12px rgba(0,0,0,0.18);
+  }
+  .mac-hinge {
+    position: absolute;
+    top: 0; left: 12%; right: 12%;
+    height: 3px;
+    background: #2E3236;
+    border-radius: 0 0 2px 2px;
+  }
+  .mac-scoop {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 68px;
+    height: 5px;
+    background: #7B8085;
+    border-radius: 0 0 5px 5px;
+    box-shadow: inset 0 1px 2px rgba(0,0,0,0.35);
+  }
+
+  /* Badge caption under laptop */
+  .teacher-hero-meta {
+    margin-top: 14px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  .teacher-hero-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    background: var(--cream-warm);
+    border: 1px solid var(--gold-line);
+    border-radius: var(--radius-pill);
+    padding: 6px 14px;
+    font-size: var(--fs-micro);
+    font-weight: 700;
+    color: var(--maroon-deep);
+    box-shadow: var(--shadow-sm);
+  }
+  .btn-teacher-hero {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    background: #1F7A63;
+    color: #FFFFFF !important;
+    padding: 9px 18px;
+    border-radius: var(--radius-pill);
+    font-size: var(--fs-micro);
+    font-weight: 700;
+    text-decoration: none;
+    box-shadow: 0 3px 0 #145545, var(--shadow-sm);
+    transition: transform .18s var(--fz-out);
+  }
+  .btn-teacher-hero:hover {
+    transform: translateY(-2px);
+    background: #279478;
+    color: #FFFFFF !important;
+  }
+  .btn-teacher-hero .kelasku-brand {
+    color: #FFFFFF !important;
+  }
+  .btn-teacher-hero .kelasku-main {
+    color: #FFFFFF !important;
+  }
+  .btn-teacher-hero .kelasku-tag {
+    color: rgba(255,255,255,0.85) !important;
+  }
+
+  @media (max-width: 980px) {
+    .hero-dual-stage {
+      grid-template-columns: 1fr;
+      gap: 40px;
+    }
+    .stage-teacher {
+      padding-top: 40px;
+    }
+    .mac-container {
+      max-width: 480px;
+    }
+  }
+
+/* ============ FZFLOW — ALUR GURU–MURID, PERTEMUAN MIRA×PAW, ATMOSFER SCIENTIFIC/AI ============
+   Bagian ini DIGENERATE dari /app/gen_fzflow.py (spesifikasi waktu dalam Python) — sunting
+   generatornya, bukan keyframes-nya langsung, kalau ingin mengubah koreografi.
+
+   KEPUTUSAN (a)/(b): saat brief dikerjakan, `main` (d1b4e1e) SUDAH punya ujung guru: mockup
+   MacBook (assets/shots/teacher-desktop.png) + maskot guru MIRA. Membuat mockup PC kedua atau
+   maskot guru kedua hanya akan bersaing dengan pekerjaan owner, jadi lapisan ini DIBANGUN DI
+   ATAS panggung ganda itu. MIRA diberi rig pose + kaki + lengan (elemen tambahan, bentuk asli
+   tidak diubah). PAW: SVG-nya TIDAK disentuh (gerbang palet) — ia dibungkus rig lompat
+   (.fzflow-paw-rig) dan diberi SVG kostum terpisah (.fzflow-paw-costume) yang menumpang di
+   atasnya dengan keyframes hula yang SAMA agar topi/kacamata/dasi ikut goyang kepala/pinggul.
+
+   MASTER TIMELINE 28 s (semua elemen 28 s supaya selalu sinkron; tanpa JS):
+     0–50%   dua siklus alur tugas (7 s masing-masing): kartu tugas Solar laptop -> HP,
+             lencana "1" + progres + centang di HP, kartu hasil Maroon HP -> laptop,
+             notifikasi lonceng; MIRA: condong-kirim, glance, senang (varian bounce / tilt).
+    50–58%   MIRA muncul dari balik lid laptop, melompat ke depan (z-index 1 -> 4, skala 1.25
+             = "lebih dekat") mendarat di titik temu; PAW melompat 3× dari sisi HP ke titik temu.
+    59–64%   sapaan: MIRA melambai, PAW mata-bintang + mulut "waa", hati/bintang naik.
+    64–67%   "ta-da": kedua lengan MIRA ke atas -> POOF di kepala PAW -> KOSTUM WISUDA
+             (topi toga + kacamata bulat seperti MIRA + dasi kupu) muncul di PAW.
+    67–84%   selebrasi: MIRA & PAW lompat kegirangan, PAW mata "^^", confetti hati/bintang.
+    84–87%   MIRA melambai pamit.  87–93%: MIRA melompat kembali ke balik lid (z kembali 1 di
+             puncak lompatan), PAW melompat pulang.  94%: POOF, kostum lepas.  96–100%: napas.
+
+   GEOMETRI relatif lewat custom property di .hero-dual-stage (persen panggung / px dari clamp).
+   Paket alur memakai trik pembungkus seukuran panggung (translate% = persen panggung, tanpa
+   layout per frame). Vektor lompat MIRA/PAW (--fz-mira-dx/dy, --fz-paw-dx/dy) dihitung dari
+   lebar panggung (--fz-stageW) dan tinggi showcase; breakpoint tumpuk (<=980px) menukar arah.
+
+   Lapisan B (.fzflow-atmos) memperluas semangat .showcase-fx ke seluruh panggung ganda:
+   dot-grid, aura Solar, node-network "Core Brain", label data (angka/simbol saja — netral
+   bahasa), aksara あ/カ/学/語/A/B (Mandarin dekorasi aspiratif), scan sweep. Semua pelan &
+   beropasitas rendah.
+
+   Tanpa .anim (prefers-reduced-motion): nilai dasar = pose diam yang terbaca sebagai diagram
+   (kartu tugas di puncak busur, kartu hasil di lembah, lencana/progres/notif tampil; MIRA di
+   balik laptop, PAW di rumahnya tanpa kostum). Hanya kedipan lambat MIRA yang dibiarkan hidup.
+   Warna hanya dari tokens.css + hex palet G1 milik PAW (#FFD94F/#FFF4DA/#33201F/#8C2233/#fff)
+   untuk patch ekspresi yang harus menyatu dengan bulu PAW. Tidak ada request jaringan baru. */
+.hero-dual-stage{
+  --fz-stageW:min(100vw,1240px);
+  --fz-tx:72.4%;--fz-ty:49%;      /* pusat layar laptop guru */
+  --fz-sx:22.4%;--fz-sy:50%;      /* pusat HP murid */
+  --fz-t-mid-x:47%;--fz-t-mid-y:8%;   /* puncak busur tugas (atas) */
+  --fz-r-mid-x:47%;--fz-r-mid-y:88%;  /* lembah busur hasil (bawah) */
+  --fz-ease-x:linear;--fz-ease-y:cubic-bezier(.42,0,.58,1);
+  --fz-phone-half:clamp(75px,20vw,96px);--fz-phone-halfh:clamp(162px,43vw,207px);
+  --fz-mac-half:280px;--fz-mac-halfh:calc(var(--fz-mac-half) * .625);
+  /* titik temu: MIRA turun ke kiri-bawah (ke arah HP), PAW melompat ke kanan */
+  --fz-meet-x:46%;--fz-meet-y:64%;
+  --fz-mira-scale:1.25;                      /* MIRA 'lebih dekat' saat di depan */
+  --fz-mira-dx:calc(var(--fz-stageW) * -.235);
+  --fz-mira-dy:calc(clamp(340px,48vh,460px) / 2 + 78px);
+  --fz-paw-dx:calc(var(--fz-stageW) * .25);--fz-paw-dy:0px;
+}
+.fzflow,.fzflow-atmos{position:absolute;inset:0;pointer-events:none;overflow:visible}
+.fzflow-atmos{z-index:0}
+.fzflow{z-index:5}
+
+/* ---- garis penghubung (hairline, dua busur membentuk lensa antar device) ---- */
+.fzflow-link{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
+.fzflow-link path{fill:none;stroke:var(--gold-line);stroke-width:1.2;vector-effect:non-scaling-stroke;
+  stroke-linecap:round;opacity:.55}
+.fzflow-link .fzflow-link-back{stroke:var(--maroon-line)}
+.fzflow-link-v{display:none}
+
+/* ---- paket: pembungkus seukuran panggung (X) > pembungkus (Y) > kartu di sudut (0,0) ---- */
+.fzflow-packet,.fzflow-py{position:absolute;inset:0;will-change:transform}
+.fzflow-task{transform:translateX(var(--fz-t-mid-x))}
+.fzflow-task .fzflow-py{transform:translateY(var(--fz-t-mid-y))}
+.fzflow-result{transform:translateX(var(--fz-r-mid-x))}
+.fzflow-result .fzflow-py{transform:translateY(var(--fz-r-mid-y))}
+.fzflow-card{position:absolute;left:0;top:0;transform:translate(-50%,-50%);
+  display:flex;align-items:center;gap:6px;padding:7px 10px;border-radius:var(--radius-sm);
+  font-size:var(--fs-micro);font-weight:800;letter-spacing:.06em;font-variant-numeric:tabular-nums;
+  white-space:nowrap;box-shadow:var(--shadow-md)}
+.fzflow-card svg{width:14px;height:14px;flex:none}
+.fzflow-card-task{background:var(--cream-warm);border:1px solid var(--gold-line);color:var(--maroon-deep);
+  border-left:3px solid var(--sun-deep);flex-direction:column;align-items:flex-start;gap:4px}
+.fzflow-card-task .fzflow-row{display:flex;align-items:center;gap:6px}
+.fzflow-card-task svg{color:var(--sun-deep)}
+.fzflow-card-task i{display:block;height:3px;border-radius:2px;background:var(--sun-soft);width:44px}
+.fzflow-card-task i+i{width:28px;background:var(--cream-deep)}
+.fzflow-card-result{background:var(--maroon);border:1px solid var(--maroon-deep);color:var(--cream-warm)}
+.fzflow-card-result svg{color:var(--sun-mid)}
+.anim .fzflow-task{animation:fzflow-task-x 28s linear infinite}
+.anim .fzflow-task .fzflow-py{animation:fzflow-task-y 28s linear infinite}
+.anim .fzflow-card-task{animation:fzflow-task-pop 28s var(--fz-out) infinite}
+.anim .fzflow-result{animation:fzflow-result-x 28s linear infinite}
+.anim .fzflow-result .fzflow-py{animation:fzflow-result-y 28s linear infinite}
+.anim .fzflow-card-result{animation:fzflow-result-pop 28s var(--fz-out) infinite}
+
+/* ---- sisi HP: lencana "1" + pil progres ---- */
+.fzflow-badge{position:absolute;left:calc(var(--fz-sx) + var(--fz-phone-half) - 12px);
+  top:calc(var(--fz-sy) - var(--fz-phone-halfh) + 22px);width:24px;height:24px;border-radius:50%;
+  display:grid;place-items:center;background:var(--sun);color:var(--maroon-deep);font-size:var(--fs-micro);
+  font-weight:800;border:2px solid var(--cream-warm);box-shadow:var(--shadow-sm);transform:translate(-50%,-50%)}
+.anim .fzflow-badge{animation:fzflow-badge 28s var(--fz-spring) infinite}
+.fzflow-progress{position:absolute;left:var(--fz-sx);top:calc(var(--fz-sy) + var(--fz-phone-halfh) - 42px);
+  transform:translate(-50%,-50%);display:flex;align-items:center;gap:7px;padding:6px 9px;
+  background:var(--cream-warm);border:1px solid var(--maroon-line);border-radius:var(--radius-pill);box-shadow:var(--shadow-sm)}
+.fzflow-progress .fzflow-track{width:clamp(48px,8vw,64px);height:5px;border-radius:3px;background:var(--sun-soft);overflow:hidden}
+.fzflow-progress .fzflow-bar{display:block;height:100%;width:100%;border-radius:3px;background:var(--sun-deep);
+  transform-origin:left center;transform:scaleX(.7)}
+.fzflow-progress svg{width:12px;height:12px;color:var(--maroon);opacity:0}
+.anim .fzflow-progress{animation:fzflow-progress 28s var(--fz-out) infinite}
+.anim .fzflow-bar{animation:fzflow-bar 28s var(--fz-out) infinite}
+.anim .fzflow-progress svg{animation:fzflow-check 28s var(--fz-spring) infinite}
+
+/* ---- sisi laptop: notifikasi lonceng ---- */
+.fzflow-notif{position:absolute;left:calc(var(--fz-tx) + var(--fz-mac-half) - 48px);
+  top:calc(var(--fz-ty) - var(--fz-mac-halfh) + 4px);transform:translate(-50%,-50%);
+  display:flex;align-items:center;gap:6px;padding:6px 10px;background:var(--cream-warm);
+  border:1px solid var(--maroon-line);border-radius:var(--radius-pill);box-shadow:var(--shadow-md);
+  color:var(--maroon-deep);font-size:var(--fs-micro);font-weight:800;font-variant-numeric:tabular-nums}
+.fzflow-notif svg{width:14px;height:14px;color:var(--maroon)}
+.fzflow-notif i{width:8px;height:8px;border-radius:50%;background:var(--sun);box-shadow:0 0 0 3px var(--sun-soft)}
+.anim .fzflow-notif{animation:fzflow-notif 28s var(--fz-spring) infinite}
+
+/* ---- hati/bintang di titik temu ---- */
+.fzflow-heart{position:absolute;left:calc(var(--fz-meet-x) + var(--hx,0px));top:calc(var(--fz-meet-y) + var(--hy,0px));
+  width:16px;height:16px;transform:translateY(8px) scale(.6);opacity:0}
+.fzflow-heart svg{width:100%;height:100%;display:block}
+.fzflow-heart svg path{fill:var(--maroon)}
+.fzflow-heart.fzflow-star svg path{fill:var(--sun-deep)}
+.anim .fzflow-heart{animation:fzflow-heart 28s ease-in-out infinite}
+
+/* ---- MIRA: rig pose + perjalanan ---- */
+.mira-teacher-wrapper{transform-origin:50% 100%}
+.mira-anim-head{transform-origin:110px 105px}
+.fzflow-mira-hand-r{transform-origin:136px 127px}
+.fzflow-mira-mouth{transform-origin:110px 100px}
+.fzflow-mira-bubble{transform-origin:176px 62px;opacity:0}
+.fzflow-mira-bubble circle{fill:var(--sun-soft);stroke:var(--gold-line);stroke-width:1.5}
+.fzflow-mira-bubble path{fill:var(--maroon)}
+.fzflow-mira-sparkle{opacity:0}
+.fzflow-mira-sparkle path{fill:var(--sun-mid);stroke:var(--sun-deep);stroke-width:.8;stroke-linejoin:round}
+.fzflow-mira-sparkle path:nth-child(1){transform-origin:64px 62px}
+.fzflow-mira-sparkle path:nth-child(2){transform-origin:160px 58px}
+.fzflow-mira-sparkle path:nth-child(3){transform-origin:70px 108px}
+/* kaki + lengan: tersembunyi di balik lid saat di rumah; tampak saat MIRA turun */
+.fzflow-mira-legs .fzflow-mira-skirt{fill:var(--maroon)}
+.fzflow-mira-legs .fzflow-mira-shoe{fill:var(--maroon-deep)}
+.fzflow-mira-arms{opacity:0}
+.fzflow-mira-arm-l{transform-origin:58px 150px}
+.fzflow-mira-arm-r{transform-origin:162px 150px}
+.anim .mira-teacher-wrapper{animation:fzflow-mira-travel 28s cubic-bezier(.4,0,.5,1) infinite}
+.anim .mira-anim-head{animation:fzflow-mira-head 28s ease-in-out infinite}
+.anim .mira-hands-chin{animation:fzflow-mira-chin 28s linear infinite}
+.anim .fzflow-mira-arms{animation:fzflow-mira-arms 28s linear infinite}
+.anim .fzflow-mira-arm-r{animation:fzflow-mira-arm-r 28s var(--fz-spring) infinite}
+.anim .fzflow-mira-arm-l{animation:fzflow-mira-arm-l 28s var(--fz-spring) infinite}
+.anim .fzflow-mira-hand-r{animation:fzflow-mira-hand 28s var(--fz-spring) infinite}
+.anim .fzflow-mira-bubble{animation:fzflow-mira-bubble 28s var(--fz-out) infinite}
+.anim .fzflow-mira-sparkle path{animation:fzflow-mira-sparkle 28s ease-in-out infinite}
+.anim .fzflow-mira-sparkle path:nth-child(2){animation-delay:-.25s}
+.anim .fzflow-mira-sparkle path:nth-child(3){animation-delay:-.5s}
+.anim .fzflow-mira-blush{animation:fzflow-mira-blush 28s ease-in-out infinite}
+.anim .fzflow-mira-mouth{animation:fzflow-mira-mouth 28s var(--fz-spring) infinite}
+
+/* ---- PAW: rig lompat (SVG PAW tidak disentuh) + kostum menumpang ---- */
+.showcase .fzflow-paw-rig{position:absolute;z-index:3;left:-3%;bottom:0;width:clamp(138px,37vw,236px)}
+.fzflow-paw-y{position:relative}
+.fzflow-paw-squash{transform-origin:50% 100%}
+.showcase .hero-paw{display:block;width:100%;height:auto}
+.fzflow-paw-costume{position:absolute;inset:0;width:100%;height:100%;overflow:visible;pointer-events:none}
+.fzflow-paw-costume,.fzflow-paw-costume *{transform-box:view-box}
+/* sinkron dengan koreografi hula PAW: keyframes & origin SAMA, tidak bergantung .anim (hula pun tidak) */
+.hula-playing~.fzflow-paw-costume .fzflow-pc-all{animation:hula-all-sway 2.4s cubic-bezier(0.45,0.05,0.55,0.95) infinite;transform-origin:160px 280px}
+.hula-playing~.fzflow-paw-costume .fzflow-pc-torso{animation:hula-hip-roll 2.4s cubic-bezier(0.45,0.05,0.55,0.95) infinite;transform-origin:160px 240px}
+.hula-playing~.fzflow-paw-costume .fzflow-pc-head{animation:hula-head-tilt 2.4s cubic-bezier(0.45,0.05,0.55,0.95) infinite;transform-origin:160px 140px}
+.fzflow-pc-costume{opacity:0;transform:scale(.6);transform-origin:160px 70px}
+.fzflow-pc-costume .fzflow-pc-frame{fill:none;stroke:var(--maroon);stroke-width:3.5}
+.fzflow-pc-costume .fzflow-pc-lens{fill:var(--cream-warm);opacity:.28}
+.fzflow-pc-costume .fzflow-pc-board{fill:#33201F}
+.fzflow-pc-costume .fzflow-pc-band{fill:var(--maroon)}
+.fzflow-pc-costume .fzflow-pc-tassel{stroke:var(--sun-deep);stroke-width:3;fill:none;stroke-linecap:round}
+.fzflow-pc-costume .fzflow-pc-tassel-end{fill:var(--sun)}
+.fzflow-pc-costume .fzflow-pc-tie{fill:var(--maroon)}
+.fzflow-pc-costume .fzflow-pc-knot{fill:var(--sun)}
+.fzflow-pc-star,.fzflow-pc-joy,.fzflow-pc-mouth{opacity:0}
+.fzflow-pc-star .fzflow-pc-white{fill:#fff}
+.fzflow-pc-star .fzflow-pc-pupil{fill:var(--sun-deep);stroke:var(--maroon);stroke-width:1.6;stroke-linejoin:round}
+.fzflow-pc-joy .fzflow-pc-fur{fill:#FFD94F}
+.fzflow-pc-joy .fzflow-pc-arc{fill:none;stroke:#33201F;stroke-width:6;stroke-linecap:round}
+.fzflow-pc-mouth .fzflow-pc-patch{fill:#FFF4DA}
+.fzflow-pc-mouth .fzflow-pc-open{fill:#8C2233;stroke:#33201F;stroke-width:3}
+.fzflow-pc-mouth .fzflow-pc-tongue{fill:var(--maroon-soft)}
+.fzflow-pc-poof{opacity:0;transform:scale(.2);transform-origin:160px 80px}
+.fzflow-pc-poof circle{fill:var(--sun-mid);stroke:var(--sun-deep);stroke-width:1}
+.fzflow-pc-poof circle:nth-child(even){fill:var(--cream-warm);stroke:var(--maroon-line-strong)}
+.anim .fzflow-paw-x{animation:fzflow-paw-x 28s var(--fz-out) infinite}
+.anim .fzflow-paw-y{animation:fzflow-paw-y 28s cubic-bezier(.35,0,.65,1) infinite}
+.anim .fzflow-paw-squash{animation:fzflow-paw-squash 28s ease-out infinite}
+.anim .fzflow-pc-star{animation:fzflow-pc-star 28s linear infinite}
+.anim .fzflow-pc-joy{animation:fzflow-pc-joy 28s linear infinite}
+.anim .fzflow-pc-mouth{animation:fzflow-pc-mouth 28s linear infinite}
+.anim .fzflow-pc-costume{animation:fzflow-pc-costume 28s var(--fz-spring) infinite}
+.anim .fzflow-pc-poof{animation:fzflow-pc-poof 28s ease-out infinite}
+
+/* ---- Lapisan B ---- */
+.fzflow-grid{position:absolute;inset:0;opacity:.5;
+  background-image:radial-gradient(var(--maroon-line) 1px,transparent 1.2px);background-size:22px 22px;
+  -webkit-mask-image:radial-gradient(ellipse 70% 65% at 50% 50%,#000 30%,transparent 100%);
+  mask-image:radial-gradient(ellipse 70% 65% at 50% 50%,#000 30%,transparent 100%)}
+.fzflow-aura{position:absolute;width:clamp(240px,34vw,440px);aspect-ratio:1;border-radius:50%;
+  transform:translate(-50%,-50%);opacity:.7;
+  background:radial-gradient(circle,var(--sun-mid) 0%,var(--sun-soft) 38%,transparent 70%)}
+.fzflow-aura-s{left:var(--fz-sx);top:var(--fz-sy)}
+.fzflow-aura-t{left:var(--fz-tx);top:var(--fz-ty);width:clamp(280px,40vw,520px)}
+@keyframes fzflow-aura{0%,100%{opacity:.5;transform:translate(-50%,-50%) scale(1)}50%{opacity:.85;transform:translate(-50%,-50%) scale(1.1)}}
+.anim .fzflow-aura{animation:fzflow-aura 8s ease-in-out infinite}
+.anim .fzflow-aura-t{animation-delay:-3.5s}
+.fzflow-net{position:absolute;inset:0;width:100%;height:100%;opacity:.7}
+.fzflow-net line{stroke:var(--gold-line);stroke-width:1;stroke-dasharray:5 9}
+.fzflow-net circle{fill:var(--sun-mid);stroke:var(--maroon-line-strong);stroke-width:1;transform-box:fill-box;transform-origin:center}
+.fzflow-net .fzflow-node-core{fill:var(--maroon)}
+@keyframes fzflow-node{0%,100%{transform:scale(1);opacity:.55}50%{transform:scale(1.7);opacity:1}}
+@keyframes fzflow-edge{to{stroke-dashoffset:-140}}
+.anim .fzflow-net circle{animation:fzflow-node 5.6s ease-in-out infinite}
+.anim .fzflow-net circle:nth-of-type(2n){animation-delay:-1.4s}
+.anim .fzflow-net circle:nth-of-type(3n){animation-delay:-2.8s}
+.anim .fzflow-net circle:nth-of-type(5n){animation-delay:-4.2s}
+.anim .fzflow-net line{animation:fzflow-edge 12s linear infinite}
+.anim .fzflow-net line:nth-of-type(2n){animation-direction:reverse}
+.fzflow-label{position:absolute;transform:translate(-50%,-50%);padding:4px 9px;border-radius:var(--radius-pill);
+  background:var(--cream-warm);border:1px solid var(--gold-line);color:var(--maroon-soft);
+  font-size:var(--fs-micro);font-weight:700;letter-spacing:.08em;font-variant-numeric:tabular-nums;white-space:nowrap;opacity:.6}
+.fzflow-label b{color:var(--maroon-deep)}
+@keyframes fzflow-label{0%,100%{opacity:0;transform:translate(-50%,-50%) translateY(10px)}
+  14%,44%{opacity:.85;transform:translate(-50%,-50%) translateY(0)}58%{opacity:0;transform:translate(-50%,-50%) translateY(-12px)}}
+.anim .fzflow-label{animation:fzflow-label 14s ease-in-out infinite;animation-delay:calc(var(--i,0) * -2.3s)}
+.fzflow-l1{left:46%;top:24%}.fzflow-l2{left:48%;top:66%}.fzflow-l3{left:9%;top:10%}
+.fzflow-l4{left:93%;top:14%}.fzflow-l5{left:57%;top:36%}.fzflow-l6{left:40%;top:56%}
+.fzflow-glyph{position:absolute;transform:translate(-50%,-50%);color:var(--maroon);opacity:.08;
+  font-size:clamp(1.6rem,4.2vw,3.4rem);font-weight:600;line-height:1;font-family:'Noto Sans JP','Hiragino Sans','Yu Gothic','Noto Sans Thai',var(--font)}
+@keyframes fzflow-glyph{0%,100%{transform:translate(-50%,-50%) translateY(0) rotate(-3deg);opacity:.06}
+  50%{transform:translate(-50%,-50%) translateY(-18px) rotate(3deg);opacity:.13}}
+.anim .fzflow-glyph{animation:fzflow-glyph 24s ease-in-out infinite;animation-delay:calc(var(--i,0) * -4s)}
+.fzflow-g1{left:47%;top:44%}.fzflow-g2{left:5%;top:82%}.fzflow-g3{left:95%;top:80%}
+.fzflow-g4{left:36%;top:4%}.fzflow-g5{left:60%;top:92%}.fzflow-g6{left:88%;top:36%}
+.fzflow-scan{position:absolute;left:4%;right:4%;top:0;height:2px;opacity:0;--fz-scan-h:clamp(300px,46vh,470px);
+  background:linear-gradient(90deg,transparent,var(--gold-line) 30%,var(--sun-deep) 50%,var(--gold-line) 70%,transparent);
+  box-shadow:0 0 14px 2px var(--sun-soft)}
+@keyframes fzflow-scan{0%{transform:translateY(0);opacity:0}8%{opacity:.5}88%{opacity:.5}
+  100%{transform:translateY(var(--fz-scan-h));opacity:0}}
+.anim .fzflow-scan{animation:fzflow-scan 13s linear infinite}
+
+/* ---- breakpoint tumpuk (<=980px, seirama .hero-dual-stage): HP di atas, laptop di bawah ---- */
+@media (max-width:980px){
+  .hero-dual-stage{
+    --fz-tx:50%;--fz-ty:74%;--fz-sx:50%;--fz-sy:24%;
+    --fz-t-mid-x:84%;--fz-t-mid-y:50%;--fz-r-mid-x:16%;--fz-r-mid-y:50%;
+    --fz-ease-x:cubic-bezier(.42,0,.58,1);--fz-ease-y:linear;
+    --fz-mac-half:min(240px,50vw - 32px);
+    /* titik temu di celah antara showcase dan laptop: MIRA naik, PAW turun-kanan */
+    --fz-meet-x:50%;--fz-meet-y:50%;
+    --fz-mira-scale:1;
+    --fz-mira-dx:calc(var(--fz-stageW) * .22);--fz-mira-dy:-190px;
+    --fz-paw-dx:calc(var(--fz-stageW) * .1);--fz-paw-dy:64px;
+  }
+  .fzflow-link-h{display:none}.fzflow-link-v{display:block}
+  .fzflow-scan{--fz-scan-h:clamp(600px,100vh,900px)}
+  .fzflow-aura{width:clamp(220px,60vw,360px)}
+  .fzflow-aura-t{width:clamp(260px,70vw,420px)}
+  .fzflow-l1{left:74%;top:47%}.fzflow-l2{left:24%;top:52%}.fzflow-l3{left:10%;top:6%}
+  .fzflow-l4{left:90%;top:4%}.fzflow-l5{left:86%;top:62%}.fzflow-l6{left:14%;top:38%}
+  .fzflow-g1{left:80%;top:30%}.fzflow-g2{left:8%;top:64%}.fzflow-g3{left:92%;top:88%}
+  .fzflow-g4{left:30%;top:3%}.fzflow-g5{left:50%;top:50%}.fzflow-g6{left:88%;top:18%}
+}
+/* ---- layar sangat kecil: Lapisan B disederhanakan, Lapisan A + pertemuan tetap utuh ---- */
+@media (max-width:559px){
+  .fzflow-l4,.fzflow-l5,.fzflow-l6,.fzflow-g4,.fzflow-g5,.fzflow-g6,.fzflow-net .fzflow-lite{display:none}
+  .fzflow-card{padding:6px 8px}
+  .fzflow-card-task i{width:34px}.fzflow-card-task i+i{width:22px}
+  .fzflow-progress .fzflow-track{width:44px}
+  .fzflow-grid{background-size:18px 18px}
+  .fzflow-heart{width:12px;height:12px}
+}
+@media (max-width:359px){.showcase .fzflow-paw-rig{width:112px}}
+/* ---- reduced motion: site.js tidak memasang .anim, jadi nilai dasar di atas = pose diam.
+   Satu-satunya gerak yang dibiarkan: kedipan lambat MIRA (skala kelopak saja). ---- */
+@media (prefers-reduced-motion:reduce){
+  .mira-eyelid{animation:fzflow-mira-slowblink 8s ease-in-out infinite}
+  .fzflow-progress svg{opacity:1}
+}
+@keyframes fzflow-mira-slowblink{0%,47%,53%,100%{transform:scaleY(1)}50%{transform:scaleY(.12)}}
+
+/* ---- keyframes 28 s hasil generator ---- */
+@keyframes fzflow-task-x{0%,1%{transform:translateX(var(--fz-tx));animation-timing-function:var(--fz-ease-x)}3.25%{transform:translateX(var(--fz-t-mid-x));animation-timing-function:var(--fz-ease-x)}5.5%{transform:translateX(var(--fz-sx))}25%,26%{transform:translateX(var(--fz-tx));animation-timing-function:var(--fz-ease-x)}28.25%{transform:translateX(var(--fz-t-mid-x));animation-timing-function:var(--fz-ease-x)}30.5%,100%{transform:translateX(var(--fz-sx))}}
+@keyframes fzflow-task-y{0%,1%{transform:translateY(var(--fz-ty));animation-timing-function:var(--fz-ease-y)}3.25%{transform:translateY(var(--fz-t-mid-y));animation-timing-function:var(--fz-ease-y)}5.5%{transform:translateY(var(--fz-sy))}25%,26%{transform:translateY(var(--fz-ty));animation-timing-function:var(--fz-ease-y)}28.25%{transform:translateY(var(--fz-t-mid-y));animation-timing-function:var(--fz-ease-y)}30.5%,100%{transform:translateY(var(--fz-sy))}}
+@keyframes fzflow-task-pop{0%{opacity:0;transform:translate(-50%,-50%) scale(.4)}1%,5%{opacity:1;transform:translate(-50%,-50%) scale(1)}6%{opacity:0;transform:translate(-50%,-50%) scale(.45)}25%{opacity:0;transform:translate(-50%,-50%) scale(.4)}26%,30%{opacity:1;transform:translate(-50%,-50%) scale(1)}31%,100%{opacity:0;transform:translate(-50%,-50%) scale(.45)}}
+@keyframes fzflow-result-x{0%,15%{transform:translateX(var(--fz-sx));animation-timing-function:var(--fz-ease-x)}17.5%{transform:translateX(var(--fz-r-mid-x));animation-timing-function:var(--fz-ease-x)}20%{transform:translateX(var(--fz-tx))}25%,40%{transform:translateX(var(--fz-sx));animation-timing-function:var(--fz-ease-x)}42.5%{transform:translateX(var(--fz-r-mid-x));animation-timing-function:var(--fz-ease-x)}45%,100%{transform:translateX(var(--fz-tx))}}
+@keyframes fzflow-result-y{0%,15%{transform:translateY(var(--fz-sy));animation-timing-function:var(--fz-ease-y)}17.5%{transform:translateY(var(--fz-r-mid-y));animation-timing-function:var(--fz-ease-y)}20%{transform:translateY(var(--fz-ty))}25%,40%{transform:translateY(var(--fz-sy));animation-timing-function:var(--fz-ease-y)}42.5%{transform:translateY(var(--fz-r-mid-y));animation-timing-function:var(--fz-ease-y)}45%,100%{transform:translateY(var(--fz-ty))}}
+@keyframes fzflow-result-pop{0%,14.25%{opacity:0;transform:translate(-50%,-50%) scale(.4)}15%,19.5%{opacity:1;transform:translate(-50%,-50%) scale(1)}20.5%{opacity:0;transform:translate(-50%,-50%) scale(.45)}25%,39.25%{opacity:0;transform:translate(-50%,-50%) scale(.4)}40%,44.5%{opacity:1;transform:translate(-50%,-50%) scale(1)}45.5%,100%{opacity:0;transform:translate(-50%,-50%) scale(.45)}}
+@keyframes fzflow-badge{0%,5.25%{opacity:0;transform:translate(-50%,-50%) scale(.4)}6%{opacity:1;transform:translate(-50%,-50%) scale(1.18)}6.75%,14%{opacity:1;transform:translate(-50%,-50%) scale(1)}15%{opacity:0;transform:translate(-50%,-50%) scale(.6)}25%,30.25%{opacity:0;transform:translate(-50%,-50%) scale(.4)}31%{opacity:1;transform:translate(-50%,-50%) scale(1.18)}31.75%,39%{opacity:1;transform:translate(-50%,-50%) scale(1)}40%,100%{opacity:0;transform:translate(-50%,-50%) scale(.6)}}
+@keyframes fzflow-progress{0%,6.25%{opacity:0;transform:translate(-50%,-50%) translateY(6px)}7%,14.5%{opacity:1;transform:translate(-50%,-50%) translateY(0)}15.5%{opacity:0;transform:translate(-50%,-50%) translateY(-4px)}25%,31.25%{opacity:0;transform:translate(-50%,-50%) translateY(6px)}32%,39.5%{opacity:1;transform:translate(-50%,-50%) translateY(0)}40.5%,100%{opacity:0;transform:translate(-50%,-50%) translateY(-4px)}}
+@keyframes fzflow-bar{0%,7%{transform:scaleX(0)}13.5%{transform:scaleX(1)}25%,32%{transform:scaleX(0)}38.5%,100%{transform:scaleX(1)}}
+@keyframes fzflow-check{0%,13.5%{opacity:0;transform:scale(.4)}14.25%,15%{opacity:1;transform:scale(1)}15.75%{opacity:0;transform:scale(1)}25%,38.5%{opacity:0;transform:scale(.4)}39.25%,40%{opacity:1;transform:scale(1)}40.75%,100%{opacity:0;transform:scale(1)}}
+@keyframes fzflow-notif{0%,20%{opacity:0;transform:translate(-50%,-50%) scale(.6) translateY(6px)}20.75%{opacity:1;transform:translate(-50%,-50%) scale(1.08) translateY(0)}21.5%,24%{opacity:1;transform:translate(-50%,-50%) scale(1)}24.75%{opacity:0;transform:translate(-50%,-50%) scale(.8)}25%,45%{opacity:0;transform:translate(-50%,-50%) scale(.6) translateY(6px)}45.75%{opacity:1;transform:translate(-50%,-50%) scale(1.08) translateY(0)}46.5%,49%{opacity:1;transform:translate(-50%,-50%) scale(1)}49.75%,100%{opacity:0;transform:translate(-50%,-50%) scale(.8)}}
+@keyframes fzflow-mira-head{0%{transform:none}1.1%,2.6%{transform:rotate(-7deg) translate(-3px,-2px) scale(1.04)}4.1%{transform:none}9.75%{transform:rotate(2deg)}15%{transform:rotate(-1.5deg)}19.5%{transform:none}20.6%{transform:translateY(-5px) scale(1.03)}21.75%{transform:translateY(0)}22.9%{transform:translateY(-4px) scale(1.02)}24.4%,25%{transform:none}26.1%,27.6%{transform:rotate(-7deg) translate(-3px,-2px) scale(1.04)}29.1%{transform:none}34.75%{transform:rotate(2deg)}40%{transform:rotate(-1.5deg)}44.5%{transform:none}46.4%,48.6%{transform:rotate(8deg) translate(2px,-2px) scale(1.04)}49.75%,59%{transform:none}60.5%,63%{transform:rotate(-9deg)}64.5%{transform:none}65.5%{transform:rotate(4deg) translateY(-4px)}67%{transform:none}68%{transform:translateY(-5px) rotate(-3deg)}69%{transform:translateY(0)}70%{transform:translateY(-5px) rotate(3deg)}71%{transform:translateY(0)}72%{transform:translateY(-5px) rotate(-3deg)}73%{transform:translateY(0)}74%{transform:translateY(-5px) rotate(3deg)}75%{transform:translateY(0)}76%{transform:translateY(-5px) rotate(-3deg)}77%{transform:translateY(0)}78%{transform:translateY(-5px) rotate(3deg)}79%{transform:translateY(0)}80%{transform:translateY(-5px) rotate(-3deg)}81%{transform:translateY(0)}82%{transform:translateY(-5px) rotate(3deg)}83%{transform:translateY(0)}84%{transform:rotate(-6deg)}86%,100%{transform:none}}
+@keyframes fzflow-mira-hand{0%{transform:none}0.5%{transform:rotate(-58deg) translate(6px,-4px)}1.75%{transform:rotate(-52deg) translate(6px,-4px)}2.75%,20.5%{transform:none}21.25%{transform:rotate(-22deg)}22%{transform:rotate(-38deg)}22.75%{transform:rotate(-20deg)}23.75%,25%{transform:none}25.5%{transform:rotate(-58deg) translate(6px,-4px)}26.75%{transform:rotate(-52deg) translate(6px,-4px)}27.75%,45.5%{transform:none}46.25%{transform:rotate(-22deg)}47%{transform:rotate(-38deg)}47.75%{transform:rotate(-20deg)}48.75%,100%{transform:none}}
+@keyframes fzflow-mira-bubble{0%{opacity:0;transform:scale(.5)}0.62%,2%{opacity:1;transform:scale(1)}2.75%{opacity:0;transform:translate(-10px,-6px) scale(.7)}25%{opacity:0;transform:scale(.5)}25.62%,27%{opacity:1;transform:scale(1)}27.75%,100%{opacity:0;transform:translate(-10px,-6px) scale(.7)}}
+@keyframes fzflow-mira-sparkle{0%,20.25%{opacity:0;transform:scale(.3) rotate(0)}21%{opacity:1;transform:scale(1.1) rotate(20deg)}22%{opacity:.6;transform:scale(.85) rotate(40deg)}23%{opacity:1;transform:scale(1) rotate(60deg)}24.25%{opacity:0;transform:scale(.4) rotate(80deg)}25%,45.25%{opacity:0;transform:scale(.3) rotate(0)}46%{opacity:1;transform:scale(1.1) rotate(20deg)}47%{opacity:.6;transform:scale(.85) rotate(40deg)}48%{opacity:1;transform:scale(1) rotate(60deg)}49.25%{opacity:0;transform:scale(.4) rotate(80deg)}50%,66.5%{opacity:0;transform:scale(.3) rotate(0)}67.5%{opacity:1;transform:scale(1.1) rotate(20deg)}69.5%{opacity:.6;transform:scale(.85) rotate(40deg)}71.5%{opacity:1;transform:scale(1) rotate(60deg)}74%{opacity:0;transform:scale(.4) rotate(80deg)}100%{opacity:0;transform:scale(.3) rotate(0)}}
+@keyframes fzflow-mira-blush{0%,20%{opacity:.32}21.25%,23.75%{opacity:.62}24.75%,45%{opacity:.32}46.25%,48.75%{opacity:.62}49.75%,66%{opacity:.32}68%,84%{opacity:.62}86%,100%{opacity:.32}}
+@keyframes fzflow-mira-mouth{0%,20%{transform:scale(1)}21%,23.75%{transform:scale(1.3,1.7)}24.75%,45%{transform:scale(1)}46%,48.75%{transform:scale(1.3,1.7)}49.75%,59%{transform:scale(1)}60%,63%{transform:scale(1.2,1.5)}64%,67%{transform:scale(1)}68%,84%{transform:scale(1.3,1.7)}86%,100%{transform:scale(1)}}
+@keyframes fzflow-mira-travel{0%{transform:translateX(-50%) translateY(0) scale(1);z-index:1}6.25%{transform:translateX(-50%) translateY(-5px) scale(1);z-index:1}12.5%{transform:translateX(-50%) translateY(0) scale(1);z-index:1}18.75%{transform:translateX(-50%) translateY(-5px) scale(1);z-index:1}25%{transform:translateX(-50%) translateY(0) scale(1);z-index:1}31.25%{transform:translateX(-50%) translateY(-5px) scale(1);z-index:1}37.5%{transform:translateX(-50%) translateY(0) scale(1);z-index:1}43.75%{transform:translateX(-50%) translateY(-5px) scale(1);z-index:1}50%{transform:translateX(-50%) translateY(0) scale(1);z-index:1}52%{transform:translateX(-50%) translateY(-36px) scale(1.06);z-index:1}52.5%{transform:translateX(-50%) translateY(-36px) scale(1.06);z-index:4}55.5%{transform:translate(calc(-50% + var(--fz-mira-dx) * .5),calc(var(--fz-mira-dy) * .35 - 64px)) scale(calc(var(--fz-mira-scale) * .92 + .08));z-index:4}58%{transform:translate(calc(-50% + var(--fz-mira-dx)),var(--fz-mira-dy)) scale(var(--fz-mira-scale));z-index:4}58.7%{transform:translate(calc(-50% + var(--fz-mira-dx)),var(--fz-mira-dy)) scale(calc(var(--fz-mira-scale) * 1.07),calc(var(--fz-mira-scale) * .91));z-index:4}59.5%,67%{transform:translate(calc(-50% + var(--fz-mira-dx)),var(--fz-mira-dy)) scale(var(--fz-mira-scale));z-index:4}67.6%{transform:translate(calc(-50% + var(--fz-mira-dx)),calc(var(--fz-mira-dy) - 12px)) scale(var(--fz-mira-scale));z-index:4}68.4%{transform:translate(calc(-50% + var(--fz-mira-dx)),var(--fz-mira-dy)) scale(var(--fz-mira-scale));z-index:4}69.8%{transform:translate(calc(-50% + var(--fz-mira-dx)),calc(var(--fz-mira-dy) - 12px)) scale(var(--fz-mira-scale));z-index:4}70.6%,86.5%{transform:translate(calc(-50% + var(--fz-mira-dx)),var(--fz-mira-dy)) scale(var(--fz-mira-scale));z-index:4}87.3%{transform:translate(calc(-50% + var(--fz-mira-dx)),var(--fz-mira-dy)) scale(calc(var(--fz-mira-scale) * 1.06),calc(var(--fz-mira-scale) * .91));z-index:4}90%{transform:translate(calc(-50% + var(--fz-mira-dx) * .5),calc(var(--fz-mira-dy) * .35 - 64px)) scale(calc(var(--fz-mira-scale) * .92 + .08));z-index:4}90.6%{transform:translate(calc(-50% + var(--fz-mira-dx) * .3),calc(var(--fz-mira-dy) * .2 - 70px)) scale(1.08);z-index:1}92.5%{transform:translateX(-50%) translateY(-30px) scale(1);z-index:1}93.5%{transform:translateX(-50%) translateY(0) scale(1);z-index:1}96.75%{transform:translateX(-50%) translateY(-5px) scale(1);z-index:1}100%{transform:translateX(-50%) translateY(0) scale(1);z-index:1}}
+@keyframes fzflow-mira-chin{0%,52.5%{opacity:1}53.5%,91%{opacity:0}92%,100%{opacity:1}}
+@keyframes fzflow-mira-arms{0%,52.5%{opacity:0}53.5%,91%{opacity:1}92%,100%{opacity:0}}
+@keyframes fzflow-mira-arm-r{0%,58.5%{transform:rotate(0)}59.5%{transform:rotate(-125deg)}60.5%{transform:rotate(-100deg)}61.5%{transform:rotate(-135deg)}62.5%{transform:rotate(-100deg)}63.5%{transform:rotate(-125deg)}64.5%,66.6%{transform:rotate(-132deg)}68%,84%{transform:rotate(0)}84.6%{transform:rotate(-125deg)}85.4%{transform:rotate(-98deg)}86.2%{transform:rotate(-132deg)}87.2%,100%{transform:rotate(0)}}
+@keyframes fzflow-mira-arm-l{0%,63.5%{transform:rotate(0)}64.5%,66.6%{transform:rotate(128deg)}68%,100%{transform:rotate(0)}}
+@keyframes fzflow-paw-x{0%,53%{transform:translateX(0)}59%,87%{transform:translateX(var(--fz-paw-dx))}93%,100%{transform:translateX(0)}}
+@keyframes fzflow-paw-y{0%,53%{transform:translateY(0)}54%{transform:translateY(calc(var(--fz-paw-dy) * 0.17 - 36px))}55%{transform:translateY(calc(var(--fz-paw-dy) * 0.33 - 0px))}56%{transform:translateY(calc(var(--fz-paw-dy) * 0.5 - 36px))}57%{transform:translateY(calc(var(--fz-paw-dy) * 0.67 - 0px))}58%{transform:translateY(calc(var(--fz-paw-dy) * 0.83 - 30px))}59%,67%{transform:translateY(calc(var(--fz-paw-dy) * 1 - 0px))}67.6%{transform:translateY(calc(var(--fz-paw-dy) * 1 - 16px))}68.4%{transform:translateY(calc(var(--fz-paw-dy) * 1 - 0px))}69.8%{transform:translateY(calc(var(--fz-paw-dy) * 1 - 16px))}70.6%,87%{transform:translateY(calc(var(--fz-paw-dy) * 1 - 0px))}88%{transform:translateY(calc(var(--fz-paw-dy) * 0.83 - 36px))}89%{transform:translateY(calc(var(--fz-paw-dy) * 0.67 - 0px))}90%{transform:translateY(calc(var(--fz-paw-dy) * 0.5 - 36px))}91%{transform:translateY(calc(var(--fz-paw-dy) * 0.33 - 0px))}92%{transform:translateY(calc(var(--fz-paw-dy) * 0.17 - 30px))}93%,100%{transform:translateY(0)}}
+@keyframes fzflow-paw-squash{0%,53%{transform:scale(1)}53.6%{transform:scale(1.06,.94)}54%{transform:scale(.96,1.05)}55%{transform:scale(1.06,.94)}55.6%{transform:scale(1)}57%{transform:scale(1.06,.94)}57.6%{transform:scale(1)}59%{transform:scale(1.08,.92)}59.8%{transform:scale(1)}88%{transform:scale(1.06,.94)}88.6%{transform:scale(1)}91%{transform:scale(1.06,.94)}91.6%{transform:scale(1)}93%{transform:scale(1.08,.92)}93.8%,100%{transform:scale(1)}}
+@keyframes fzflow-pc-star{0%,58.8%{opacity:0}59.6%,66.4%{opacity:1}67%,100%{opacity:0}}
+@keyframes fzflow-pc-joy{0%,67%{opacity:0}67.6%,84.5%{opacity:1}85.2%,100%{opacity:0}}
+@keyframes fzflow-pc-mouth{0%,58.8%{opacity:0}59.6%,84.5%{opacity:1}85.2%,100%{opacity:0}}
+@keyframes fzflow-pc-costume{0%,66%{opacity:0;transform:scale(.6)}66.8%{opacity:1;transform:scale(1.12)}67.6%,93.6%{opacity:1;transform:scale(1)}94.6%,100%{opacity:0;transform:scale(.6)}}
+@keyframes fzflow-pc-poof{0%,65.6%{opacity:0;transform:scale(.2)}66.4%{opacity:1;transform:scale(1)}67.6%{opacity:0;transform:scale(1.7)}93.4%{opacity:0;transform:scale(.2)}94.2%{opacity:1;transform:scale(1)}95.4%{opacity:0;transform:scale(1.7)}100%{opacity:0;transform:scale(.2)}}
+@keyframes fzflow-heart{0%,60%{opacity:0;transform:translateY(8px) scale(.6)}62%{opacity:1;transform:translateY(0) scale(1)}66%{opacity:0;transform:translateY(-34px) scale(1.1)}67%{opacity:0;transform:translateY(8px) scale(.6)}69%{opacity:1;transform:translateY(0) scale(1)}74%{opacity:0;transform:translateY(-38px) scale(1.15)}75%{opacity:0;transform:translateY(8px) scale(.6)}77%{opacity:1;transform:translateY(0) scale(1)}82.5%{opacity:0;transform:translateY(-38px) scale(1.15)}83%,100%{opacity:0;transform:translateY(8px) scale(.6)}}
+

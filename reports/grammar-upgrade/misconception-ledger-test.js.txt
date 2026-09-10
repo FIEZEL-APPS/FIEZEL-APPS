@@ -1,0 +1,14 @@
+ok - skema dan konstanta kontrak diekspor sesuai tanda tangan FINAL
+ok - update murni: ledger argumen tidak disentuh
+ok - (a) 3 bukti distraktor timing normal lintas 2 sesi -> aktif
+ok - (a-kontra) 3 bukti kuat tapi SATU sesi saja -> belum aktif
+ok - (b) 3 bukti semuanya guess -> tidak aktif
+ok - (c) miskonsepsi aktif lalu 4 benar berturut pada konsep itu -> resolved
+ok - (c-arah) satu jawaban benar menurunkan belief tapi TIDAK langsung resolved
+ok - (d) 60 hari tanpa aktivitas -> belief mendekati prior
+ok - (d-murni) decay dihitung dari argumen nowMs, bukan jam sistem
+ok - (e) state korup -> tidak melempar, ledger kosong
+ok - (e-lanjutan) bukti korup diabaikan tanpa merusak ledger sehat
+ok - (f) nama miskonsepsi sama di dua konsep berbeda tidak saling menimpa
+ok - canonical opsional: agregasi per nama kanonik saat tersedia
+Misconception Ledger: PASS

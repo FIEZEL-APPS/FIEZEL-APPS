@@ -1,0 +1,76 @@
+<!doctype html><html lang="id"><head><meta charset="utf-8">
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="mock.css"><link rel="stylesheet" href="desk.css">
+<style>
+.cols{grid-template-columns:1fr 1.35fr}
+.path{position:relative;padding-left:26px}
+.path::before{content:'';position:absolute;left:12px;top:10px;bottom:10px;width:3px;border-radius:3px;background:var(--line)}
+.node{position:relative;margin-bottom:10px}
+.node::before{content:'';position:absolute;left:-21px;top:20px;width:14px;height:14px;border-radius:50%;background:var(--paper);border:3px solid var(--line)}
+.node.done::before{background:var(--good);border-color:var(--good)}
+.node.now::before{background:var(--sun);border-color:var(--sun-deep);box-shadow:0 0 0 5px var(--sun-soft)}
+.node.now .li{border:2px solid var(--sun);box-shadow:0 4px 0 var(--sun-deep);background:#fff}
+.node .li .t{flex:1}.node .li .t b{display:block;font-size:15px}.node .li .t span{font-size:12px;color:var(--muted);font-weight:600}
+.lesson{background:var(--paper);border:1px solid var(--line);border-radius:var(--r-xl);padding:28px;box-shadow:var(--sh-sm);position:relative;overflow:hidden}
+.lesson h2{font-size:28px;margin-top:8px;max-width:420px}
+.rule{margin-top:18px;padding:16px 18px;border-radius:18px;background:var(--sun-soft);border:1px solid var(--yellow-line)}
+.rule b{color:var(--maroon)}
+.ex{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+.ex div{padding:12px 14px;border-radius:14px;background:var(--cream);font-size:14px}
+.ex div b{display:block;font-size:12px;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;margin-bottom:4px}
+.lesson .paw{position:absolute;right:26px;top:22px;width:110px}
+.mode{display:flex;gap:10px;margin-top:20px}
+.mode span{flex:1;padding:14px;border-radius:16px;border:1.5px solid var(--line);font-weight:700;font-size:14px;display:flex;align-items:center;gap:10px}
+.mode span.on{border-color:var(--ink);box-shadow:0 3px 0 var(--ink)}
+</style></head><body>
+<div class="app">
+  <aside class="side">
+    <span class="wordmark">F<b>I</b>EZEL</span>
+    <a><i data-lucide="house" class="i"></i>Hari ini</a>
+    <a class="on"><i data-lucide="zap" class="i"></i>Latihan</a>
+    <a><i data-lucide="school" class="i"></i>Kelas</a>
+    <a><i data-lucide="route" class="i"></i>Progres</a>
+    <a><i data-lucide="user-round" class="i"></i>Profil</a>
+    <span class="spacer"></span>
+    <div class="pawcard"><img src="/assets/brand/paw-mascot-head.svg" alt=""><div><b>Tanya PAW</b><span>Bingung? Tanya aja.</span></div></div>
+  </aside>
+  <main class="main">
+    <div class="mainhead">
+      <div class="row" style="gap:12px"><span class="iconbtn"><i data-lucide="arrow-left" class="i"></i></span><div><div class="eyebrow">Latihan · Grammar</div><h1 style="font-size:26px">Jalur A1</h1></div></div>
+      <div class="row"><span class="chip">A1 <i data-lucide="chevron-down" class="i sm"></i></span><a class="btn ink sm"><i data-lucide="zap" class="i sm"></i>Sesi Kilat</a></div>
+    </div>
+
+    <div class="cols mt-3">
+      <div>
+        <div class="card soft row" style="gap:14px;margin-bottom:18px"><span class="ring" style="--p:24;--c:var(--maroon)"><span>4/17</span></span><div style="flex:1"><b>Fondasi kalimat sederhana</b><div class="small muted">Ikuti urutannya, prasyarat otomatis terbuka.</div></div></div>
+        <div class="path">
+          <div class="node done"><div class="li"><span class="n" style="background:var(--good-soft);color:var(--good)"><i data-lucide="check" class="i sm"></i></span><div class="t"><b>Subject, object & possessive pronouns</b><span>Mastery 92%</span></div></div></div>
+          <div class="node done"><div class="li"><span class="n" style="background:var(--good-soft);color:var(--good)"><i data-lucide="check" class="i sm"></i></span><div class="t"><b>Verb to be: subject agreement</b><span>Mastery 85%</span></div></div></div>
+          <div class="node done"><div class="li"><span class="n" style="background:var(--good-soft);color:var(--good)"><i data-lucide="check" class="i sm"></i></span><div class="t"><b>Articles: a / an / the</b><span>Mastery 78% · ulang 3 soal</span></div></div></div>
+          <div class="node now"><div class="li"><span class="n" style="background:var(--sun)">4</span><div class="t"><b>Present Simple: habits & routines</b><span>Sedang dipelajari · 6/10 soal</span></div></div></div>
+          <div class="node"><div class="li"><span class="n" style="background:var(--cream);color:var(--muted)">5</span><div class="t"><b>Plural nouns: -s / -es / irregular</b><span>Terbuka setelah lesson 4</span></div></div></div>
+          <div class="node"><div class="li lock"><span class="n" style="background:#fff"><i data-lucide="lock" class="i sm"></i></span><div class="t"><b style="color:var(--muted)">There is / there are</b><span>Prasyarat: lesson 5</span></div></div></div>
+          <div class="node"><div class="li lock"><span class="n" style="background:#fff"><i data-lucide="lock" class="i sm"></i></span><div class="t"><b style="color:var(--muted)">Question words: what / where / when</b><span>Prasyarat: lesson 6</span></div></div></div>
+        </div>
+      </div>
+      <div class="lesson">
+        <img class="paw" src="/assets/brand/mascot/collection/paw-001-reading-book.png" alt="">
+        <span class="pill maroon">Lesson 4 · A1</span>
+        <h2>Present Simple: habits & routines</h2>
+        <div class="row mt-1" style="gap:8px"><span class="pill line"><i data-lucide="clock-3" class="i sm"></i>10 mnt</span><span class="pill line">10 soal</span><span class="pill line">Mastery 60%</span></div>
+        <div class="rule"><b>Aturan inti</b><div class="mt-1">Untuk <b>he / she / it</b>, kata kerja dapat <b>-s / -es</b>. Negatif pakai <b>doesn't</b> + kata kerja polos.</div></div>
+        <div class="ex">
+          <div><b>Positif</b>She <u>goes</u> to school by bus.</div>
+          <div><b>Negatif</b>She <u>doesn't go</u> by car.</div>
+        </div>
+        <div class="mode">
+          <span class="on"><i data-lucide="check-circle" class="i sm"></i>Pilih jawaban</span>
+          <span><i data-lucide="braces" class="i sm"></i>Lengkapi</span>
+          <span><i data-lucide="wand-sparkles" class="i sm"></i>Perbaiki kalimat</span>
+        </div>
+        <a class="btn sun block mt-3" style="height:58px">Lanjutkan lesson 4 <i data-lucide="arrow-right" class="i sm"></i></a>
+      </div>
+    </div>
+  </main>
+</div>
+<script src="/lucide.min.js"></script><script>lucide.createIcons()</script></body></html>

@@ -1,0 +1,235 @@
+{
+  "onboarding": {
+    "tinyText": [],
+    "smallTargets": [],
+    "contrast": [
+      {
+        "tag": "BUTTON",
+        "cls": "btn btn-sun",
+        "text": "Lanjut",
+        "fontSize": 16,
+        "weight": 700,
+        "ratio": 8.64,
+        "need": 4.5,
+        "pass": true,
+        "note": "key-control"
+      }
+    ],
+    "dockOverlap": [],
+    "scrollHeight": 844
+  },
+  "home": {
+    "tinyText": [],
+    "smallTargets": [],
+    "contrast": [
+      {
+        "tag": "BUTTON",
+        "cls": "chip is-active",
+        "text": "A2 Level kamu",
+        "fontSize": 13,
+        "weight": 700,
+        "ratio": 16.28,
+        "need": 4.5,
+        "pass": true,
+        "note": "key-control"
+      },
+      {
+        "tag": "SPAN",
+        "cls": "chip-meta",
+        "text": "Level kamu",
+        "fontSize": 13,
+        "weight": 600,
+        "ratio": 9.63,
+        "need": 4.5,
+        "pass": true,
+        "note": "key-control"
+      },
+      {
+        "tag": "BUTTON",
+        "cls": "btn btn-sun",
+        "text": "Lanjutkan latihan",
+        "fontSize": 16,
+        "weight": 700,
+        "ratio": 8.64,
+        "need": 4.5,
+        "pass": true,
+        "note": "key-control"
+      },
+      {
+        "tag": "A",
+        "cls": "nav-item is-active",
+        "text": "Home",
+        "fontSize": 12,
+        "weight": 700,
+        "ratio": 15.33,
+        "need": 4.5,
+        "pass": true,
+        "note": "key-control"
+      },
+      {
+        "tag": "A",
+        "cls": "nav-item",
+        "text": "Vocab",
+        "fontSize": 12,
+        "weight": 600,
+        "ratio": 5.97,
+        "need": 4.5,
+        "pass": true,
+        "note": "key-control"
+      },
+      {
+        "tag": "A",
+        "cls": "nav-item",
+        "text": "Grammar",
+        "fontSize": 12,
+        "weight": 600,
+        "ratio": 5.97,
+        "need": 4.5,
+        "pass": true,
+        "note": "key-control"
+      },
+      {
+        "tag": "A",
+        "cls": "nav-item",
+        "text": "Reading",
+        "fontSize": 12,
+        "weight": 600,
+        "ratio": 5.97,
+        "need": 4.5,
+        "pass": true,
+        "note": "key-control"
+      },
+      {
+        "tag": "A",
+        "cls": "nav-item",
+        "text": "Peta",
+        "fontSize": 12,
+        "weight": 600,
+        "ratio": 5.97,
+        "need": 4.5,
+        "pass": true,
+        "note": "key-control"
+      }
+    ],
+    "dockOverlap": [],
+    "scrollHeight": 1157
+  },
+  "library": {
+    "tinyText": [],
+    "smallTargets": [],
+    "contrast": [
+      {
+        "tag": "BUTTON",
+        "cls": "chip is-active",
+        "text": "A2 Level kamu",
+        "fontSize": 13,
+        "weight": 700,
+        "ratio": 16.28,
+        "need": 4.5,
+        "pass": true,
+        "note": "key-control"
+      },
+      {
+        "tag": "SPAN",
+        "cls": "chip-meta",
+        "text": "Level kamu",
+        "fontSize": 13,
+        "weight": 600,
+        "ratio": 9.63,
+        "need": 4.5,
+        "pass": true,
+        "note": "key-control"
+      },
+      {
+        "tag": "BUTTON",
+        "cls": "btn btn-ghost",
+        "text": "Ulangi lesson",
+        "fontSize": 15,
+        "weight": 700,
+        "ratio": 17.06,
+        "need": 4.5,
+        "pass": true,
+        "note": "key-control"
+      },
+      {
+        "tag": "BUTTON",
+        "cls": "btn btn-sun",
+        "text": "Lanjutkan",
+        "fontSize": 15,
+        "weight": 700,
+        "ratio": 8.64,
+        "need": 4.5,
+        "pass": true,
+        "note": "key-control"
+      },
+      {
+        "tag": "BUTTON",
+        "cls": "btn btn-ghost",
+        "text": "Buka lesson",
+        "fontSize": 15,
+        "weight": 700,
+        "ratio": 17.06,
+        "need": 4.5,
+        "pass": true,
+        "note": "key-control"
+      },
+      {
+        "tag": "A",
+        "cls": "nav-item",
+        "text": "Home",
+        "fontSize": 12,
+        "weight": 600,
+        "ratio": 5.97,
+        "need": 4.5,
+        "pass": true,
+        "note": "key-control"
+      },
+      {
+        "tag": "A",
+        "cls": "nav-item",
+        "text": "Vocab",
+        "fontSize": 12,
+        "weight": 600,
+        "ratio": 5.97,
+        "need": 4.5,
+        "pass": true,
+        "note": "key-control"
+      },
+      {
+        "tag": "A",
+        "cls": "nav-item is-active",
+        "text": "Grammar",
+        "fontSize": 12,
+        "weight": 700,
+        "ratio": 15.33,
+        "need": 4.5,
+        "pass": true,
+        "note": "key-control"
+      },
+      {
+        "tag": "A",
+        "cls": "nav-item",
+        "text": "Reading",
+        "fontSize": 12,
+        "weight": 600,
+        "ratio": 5.97,
+        "need": 4.5,
+        "pass": true,
+        "note": "key-control"
+      },
+      {
+        "tag": "A",
+        "cls": "nav-item",
+        "text": "Peta",
+        "fontSize": 12,
+        "weight": 600,
+        "ratio": 5.97,
+        "need": 4.5,
+        "pass": true,
+        "note": "key-control"
+      }
+    ],
+    "dockOverlap": [],
+    "scrollHeight": 1640
+  }
+}

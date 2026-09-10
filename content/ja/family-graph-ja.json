@@ -1,0 +1,54 @@
+{
+ "schema": "fiezel-japanese-family-graph-v1",
+ "target": "ja",
+ "catatan": "Graf prasyarat keluarga A1, disuntikkan ke Core Brain lewat setFamilyGraph saat bahasa target = ja. Graf Inggris tetap bawaan dan tidak tersentuh.",
+ "families": {
+  "particles": [],
+  "demonstratives": [],
+  "noun_modification": [
+   "particles"
+  ],
+  "adjectives": [
+   "particles"
+  ],
+  "existence_location": [
+   "particles"
+  ],
+  "verb_groups": [
+   "particles"
+  ],
+  "polite_forms": [
+   "verb_groups"
+  ],
+  "negation_past": [
+   "polite_forms",
+   "adjectives"
+  ],
+  "question_words": [
+   "particles",
+   "demonstratives"
+  ],
+  "counters": [
+   "existence_location"
+  ],
+  "time_expressions": [
+   "particles"
+  ],
+  "te_form": [
+   "verb_groups",
+   "polite_forms"
+  ],
+  "plain_forms": [
+   "polite_forms",
+   "te_form"
+  ],
+  "transitivity_pairs": [
+   "te_form",
+   "particles"
+  ],
+  "keigo": [
+   "plain_forms",
+   "polite_forms"
+  ]
+ }
+}

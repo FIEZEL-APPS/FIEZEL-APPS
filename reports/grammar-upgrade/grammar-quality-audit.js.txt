@@ -1,0 +1,247 @@
+{
+  "version": "5.19.0",
+  "status": "NOT READY",
+  "counts": {
+    "pass": 26,
+    "fail": 2,
+    "lessons": 328,
+    "runtimeQuestions": 8200,
+    "practiceModes": 25,
+    "crossLessonDuplicates": 0,
+    "focusLeaks": 0,
+    "provenanceViolations": 0,
+    "sequenceCueCollisions": 0,
+    "classifyFamilyIssues": 0
+  },
+  "checks": [
+    {
+      "name": "Grammar data version",
+      "status": "PASS",
+      "details": "version=5.19.0 schema=2.0.0 blueprint=focused-25-v1"
+    },
+    {
+      "name": "Grammar lesson inventory",
+      "status": "PASS",
+      "details": "declared=328 actual=328"
+    },
+    {
+      "name": "Unique lesson identities (V18: multi-template per lesson)",
+      "status": "PASS",
+      "details": "ids=328 templates=328 lessons=180"
+    },
+    {
+      "name": "Template field completeness",
+      "status": "PASS",
+      "details": "malformed=0"
+    },
+    {
+      "name": "Four-option answer integrity",
+      "status": "PASS",
+      "details": "invalid=0"
+    },
+    {
+      "name": "Per-distractor diagnosis integrity",
+      "status": "PASS",
+      "details": "invalid=0"
+    },
+    {
+      "name": "CEFR labels",
+      "status": "PASS",
+      "details": "invalid=0"
+    },
+    {
+      "name": "No generic explanation placeholders",
+      "status": "PASS",
+      "details": "generic=0"
+    },
+    {
+      "name": "Potentially valid distractors are explicitly constrained",
+      "status": "PASS",
+      "details": "unconstrained=0"
+    },
+    {
+      "name": "Unique authored stems",
+      "status": "PASS",
+      "details": "unique=328/328"
+    },
+    {
+      "name": "Unique pedagogical objectives",
+      "status": "PASS",
+      "details": "unique=328/328"
+    },
+    {
+      "name": "Known pedagogical collision regressions absent",
+      "status": "PASS",
+      "details": {
+        "zero_vs_first": 1,
+        "one_time_past_ability": 1,
+        "reported_time_shift": 1,
+        "it_cleft": 1,
+        "negative_adverbial_inversion": 1,
+        "basic_past_modal_deduction": 1
+      }
+    },
+    {
+      "name": "High-confidence semantic lesson duplicates",
+      "status": "PASS",
+      "details": "none at composite Jaccard >= 0.60"
+    },
+    {
+      "name": "Runtime question inventory",
+      "status": "PASS",
+      "details": "generated=8200 expected=8200"
+    },
+    {
+      "name": "Twenty-five questions per lesson",
+      "status": "PASS",
+      "details": "328/328 lessons complete"
+    },
+    {
+      "name": "Twenty-five distinct pedagogical modes",
+      "status": "FAIL",
+      "details": [
+        "indirect_questions_embedded_word_order",
+        "indirect_questions_embedded_word_order"
+      ]
+    },
+    {
+      "name": "Within-lesson question uniqueness",
+      "status": "PASS",
+      "details": "no repeated question or option signature"
+    },
+    {
+      "name": "Lesson focus purity",
+      "status": "PASS",
+      "details": "all 8,200 questions use the active lesson concept"
+    },
+    {
+      "name": "Option provenance contract (m025-155)",
+      "status": "PASS",
+      "details": "semua entry optionSources memenuhi kontrak own/peer/taxonomy/fallback"
+    },
+    {
+      "name": "Sequence vs decision-cue option sets differ (m025-155)",
+      "status": "PASS",
+      "details": "set opsi v5 dan v22 berbeda di setiap lesson"
+    },
+    {
+      "name": "Classify-family distractors are honest taxonomy (m025-155)",
+      "status": "PASS",
+      "details": "semua label keluarga salah berlabel taxonomy dengan alasan yang jujur"
+    },
+    {
+      "name": "A1-A2 learner text free of internal jargon (m025-160)",
+      "status": "PASS",
+      "details": "nol istilah internal & nol sebutan \"Siswa\" di teks A1-A2"
+    },
+    {
+      "name": "No source concept leaks across lessons",
+      "status": "PASS",
+      "details": "each source concept belongs to exactly one lesson suite"
+    },
+    {
+      "name": "No exact runtime duplicates across lessons",
+      "status": "PASS",
+      "details": "duplicates=0"
+    },
+    {
+      "name": "Runtime integrity validator",
+      "status": "PASS",
+      "details": "invalid=0"
+    },
+    {
+      "name": "Runtime explanations are production-ready",
+      "status": "PASS",
+      "details": "generic_or_placeholder=0"
+    },
+    {
+      "name": "Balanced mode coverage",
+      "status": "FAIL",
+      "details": {
+        "apply_form": 330,
+        "complete_sentence": 328,
+        "justify_correct": 328,
+        "recognize_rule": 328,
+        "recognize_objective": 328,
+        "sequence_reasoning": 328,
+        "identify_misconception": 328,
+        "recall_memory_cue": 326,
+        "choose_avoidance": 328,
+        "diagnose_distractor_1": 328,
+        "diagnose_distractor_2": 328,
+        "diagnose_distractor_3": 328,
+        "label_misconception_1": 328,
+        "label_misconception_2": 328,
+        "label_misconception_3": 328,
+        "repair_distractor_1": 328,
+        "repair_distractor_2": 328,
+        "repair_distractor_3": 328,
+        "contrast_distractor_1": 328,
+        "contrast_distractor_2": 328,
+        "contrast_distractor_3": 328,
+        "classify_family": 328,
+        "locate_decision_cue": 328,
+        "teach_back": 328,
+        "mastery_check": 328
+      }
+    },
+    {
+      "name": "Legacy peer-mixing generator removed",
+      "status": "PASS",
+      "details": "lesson builder no longer imports peer concepts"
+    }
+  ],
+  "samples": {
+    "TA-001": [
+      {
+        "mode": "apply_form",
+        "question": "Look! The chef ___ a new dish right now — you can smell it.",
+        "answer": "is preparing"
+      },
+      {
+        "mode": "complete_sentence",
+        "question": "Pilih versi lengkap yang pas sama pola kebiasaan atau sedang berlangsung: present simple dan present continuous:\nMy sister ___ the bus every day, so she knows the timetable.",
+        "answer": "My sister takes the bus every day, so she knows the timetable."
+      },
+      {
+        "mode": "justify_correct",
+        "question": "Kenapa “is preparing” jadi jawaban paling pas di contoh ini?\nLook! The chef ___ a new dish right now — you can smell it.",
+        "answer": "“Look!” dan “right now — you can smell it” nunjuk kejadian yang lagi jalan. Jadi “is preparing” yang pas."
+      }
+    ],
+    "TA-002": [
+      {
+        "mode": "apply_form",
+        "question": "She ___ to Lisbon exactly once, in 2019, before the pandemic changed everything.",
+        "answer": "traveled"
+      },
+      {
+        "mode": "complete_sentence",
+        "question": "Pilih versi lengkap yang pas sama pola waktu lampau yang jelas atau masih terhubung sekarang: past simple dan present perfect:\nI ___ three cups of coffee today, and the day isn't over yet.",
+        "answer": "I have drunk three cups of coffee today, and the day isn't over yet."
+      },
+      {
+        "mode": "justify_correct",
+        "question": "Kenapa “traveled” jadi jawaban paling pas di contoh ini?\nShe ___ to Lisbon exactly once, in 2019, before the pandemic changed everything.",
+        "answer": "“in 2019” itu rentang yang udah tutup, jadi past simple yang dipakai, bukan present perfect."
+      }
+    ],
+    "TA-003": [
+      {
+        "mode": "apply_form",
+        "question": "A: 'The phone's ringing!' B: 'OK, I ___ it.' (a decision made right now)",
+        "answer": "will get"
+      },
+      {
+        "mode": "complete_sentence",
+        "question": "Pilih versi lengkap yang pas sama pola rencana atau perkiraan: bentuk masa depan:\nWe ___ my cousins in Lombok next month — we booked the flights last week.",
+        "answer": "We are going to visit my cousins in Lombok next month — we booked the flights last week."
+      },
+      {
+        "mode": "justify_correct",
+        "question": "Kenapa “will get” jadi jawaban paling pas di contoh ini?\nA: 'The phone's ringing!' B: 'OK, I ___ it.' (a decision made right now)",
+        "answer": "“Will” dipakai buat keputusan yang baru diambil pas ngomong, misalnya nawarin bantuan."
+      }
+    ]
+  }
+}

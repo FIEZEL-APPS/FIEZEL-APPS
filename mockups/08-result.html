@@ -1,0 +1,46 @@
+<!doctype html><html lang="id"><head><meta charset="utf-8"><meta name="viewport" content="width=390">
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="mock.css">
+<style>
+body{background:linear-gradient(180deg,#FFE9B8 0%,#FFF9EE 45%)}
+.celebrate{display:grid;place-items:center;height:260px;position:relative}
+.celebrate .paw{width:190px;filter:drop-shadow(0 14px 24px rgba(140,34,51,.14))}
+.conf{position:absolute;width:10px;height:14px;border-radius:3px}
+.score{font-family:var(--display);font-size:64px;font-weight:700;line-height:1;text-align:center}
+.score small{font-size:22px;color:var(--muted)}
+.stats{display:flex;gap:10px}
+.stat{text-align:center}
+.stat b{font-size:24px}
+.learn{display:flex;gap:10px;align-items:center;padding:14px 16px;border-radius:18px;background:var(--paper);border:1px solid var(--line)}
+.learn .ic{width:38px;height:38px;border-radius:12px;display:grid;place-items:center;flex:none}
+</style></head><body>
+<div class="screen plain">
+  <div class="row between"><span class="eyebrow">Sesi selesai</span><span class="iconbtn"><i data-lucide="share-2" class="i sm"></i></span></div>
+  <div class="celebrate">
+    <span class="conf" style="background:var(--maroon);left:40px;top:40px;transform:rotate(20deg)"></span>
+    <span class="conf" style="background:var(--sun);left:80px;top:120px;transform:rotate(-30deg)"></span>
+    <span class="conf" style="background:#D9536A;right:60px;top:50px;transform:rotate(50deg)"></span>
+    <span class="conf" style="background:#F0A0AC;right:100px;top:150px;transform:rotate(-10deg)"></span>
+    <span class="conf" style="background:#D8B36B;left:120px;top:20px;transform:rotate(70deg)"></span>
+    <span class="conf" style="background:var(--sun-deep);right:30px;top:180px;transform:rotate(15deg)"></span>
+    <img class="paw" src="/assets/brand/mascot/collection/paw-040-gold-medal-winner.png" alt="">
+  </div>
+  <p class="score">8<small>/10</small></p>
+  <h2 style="text-align:center;margin-top:6px">Present Simple makin mantap.</h2>
+  <p class="muted small" style="text-align:center;margin-top:6px">Mastery lesson 4 naik <b class="txt-maroon">60% → 82%</b></p>
+
+  <div class="stats mt-3">
+    <div class="stat"><b>+12</b><span>XP</span></div>
+    <div class="stat"><b>4:12</b><span>waktu</span></div>
+    <div class="stat"><b style="color:var(--sun-deep)">7</b><span>hari streak</span></div>
+  </div>
+
+  <div class="mt-3 stack" style="gap:8px">
+    <div class="learn"><span class="ic" style="background:var(--bad-soft);color:var(--bad)"><i data-lucide="rotate-ccw" class="i sm"></i></span><div style="flex:1"><b class="small">2 soal untuk diulang besok</b><div class="tiny muted">don't / doesn't · has / have</div></div><i data-lucide="chevron-right" class="i sm muted"></i></div>
+    <div class="learn"><span class="ic" style="background:var(--mint);color:var(--mint-ink)"><i data-lucide="lightbulb" class="i sm"></i></span><div style="flex:1"><b class="small">Lesson 5 sudah terbuka</b><div class="tiny muted">Plural nouns · 8 menit</div></div><i data-lucide="chevron-right" class="i sm muted"></i></div>
+  </div>
+
+  <a class="btn sun block mt-3" style="height:58px">Lanjut ke lesson 5 <i data-lucide="arrow-right" class="i sm"></i></a>
+  <a class="btn block mt-1" style="height:44px;color:var(--muted);background:transparent">Kembali ke Hari ini</a>
+</div>
+<script src="/lucide.min.js"></script><script>lucide.createIcons()</script></body></html>

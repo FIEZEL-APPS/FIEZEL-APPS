@@ -1,0 +1,40 @@
+diag-panel-test
+
+kasus 1 — key diagnostics TIDAK ADA, semua API storage hilang
+  ok   panel ter-mount
+  ok   tombol Diagnostics ada
+  ok   sheet terbuka
+  ok   target = null, bukan throw
+  ok   storageEstimate menjelaskan ketidaktersediaan
+  ok   cacheInventory menjelaskan ketidaktersediaan
+  ok   runtimeStatus tidak meledak
+
+kasus 2 — jalur normal: key ada, kuota habis, cache separuh terisi
+  ok   target terbaca utuh
+  ok   runtimeDiagnostics terparse jadi array
+  ok   standalone terdeteksi true
+  ok   crossOriginIsolated terbaca
+  ok   quota & usage terisi angka
+  ok   available terhitung
+  ok   swController terbaca
+  ok   entryCount cache benar
+  ok   hanya aset kokoro yang didaftar
+  ok   WASM tercatat lengkap dengan MIME
+  ok   model 92MB memang TIDAK ada di cache
+  ok   diagBuild tampil
+
+kasus 3 — estimate() dan caches.keys() menolak
+  ok   error estimate tertangkap, bukan crash
+  ok   error caches tertangkap, bukan crash
+  ok   target tetap terbaca meski sisanya gagal
+
+kasus 4 — mount dua kali tidak menduplikasi tombol
+  ok   hanya satu host di body
+
+kasus 5 — m025-124: panelnya bisa digulir, dan bank tombol basi tidak kembali
+  ok   sheet diagnostik menggulir sendiri
+  ok   kotak diagnostik berhenti menyusut sampai nol
+  ok   bank tombol PCM dan LANGKAH tidak kembali
+  ok   sisa setelan uji lama dibersihkan, bukan ditinggal tanpa jalan keluar
+
+semua gate diag-panel LOLOS

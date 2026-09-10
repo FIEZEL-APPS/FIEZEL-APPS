@@ -1,0 +1,89 @@
+{
+  "progress": {
+    "phone": {
+      "w": 390,
+      "h": 844
+    },
+    "fonts": {
+      "jakarta": true,
+      "fredoka": true
+    },
+    "font_floor_violations": [],
+    "touch_violations": [],
+    "h_overflow": [],
+    "content_scroll": {
+      "scrollH": 696,
+      "clientH": 696,
+      "fits": true
+    },
+    "mascot_overlaps": [],
+    "broken_imgs": [],
+    "png": {
+      "size": [
+        780,
+        1688
+      ],
+      "ok": true
+    }
+  },
+  "completion": {
+    "phone": {
+      "w": 390,
+      "h": 844
+    },
+    "fonts": {
+      "jakarta": true,
+      "fredoka": true
+    },
+    "font_floor_violations": [],
+    "touch_violations": [],
+    "h_overflow": [],
+    "content_scroll": {
+      "scrollH": 696,
+      "clientH": 696,
+      "fits": true
+    },
+    "toast": {
+      "bg": "rgb(36, 26, 17)",
+      "color": "rgb(255, 249, 238)",
+      "contrast": 16.28,
+      "aa_pass": true
+    },
+    "mascot_overlaps": [],
+    "broken_imgs": [],
+    "png": {
+      "size": [
+        780,
+        1688
+      ],
+      "ok": true
+    }
+  },
+  "settings": {
+    "phone": {
+      "w": 390,
+      "h": 844
+    },
+    "fonts": {
+      "jakarta": true,
+      "fredoka": true
+    },
+    "font_floor_violations": [],
+    "touch_violations": [],
+    "h_overflow": [],
+    "content_scroll": {
+      "scrollH": 844,
+      "clientH": 844,
+      "fits": true
+    },
+    "mascot_overlaps": [],
+    "broken_imgs": [],
+    "png": {
+      "size": [
+        780,
+        1688
+      ],
+      "ok": true
+    }
+  }
+}

@@ -1,0 +1,46 @@
+name: FIEZEL Neural Vendor Repro
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'NEURAL-VOICE-SOURCE-LOCK.json'
+      - 'vendor/kokoro-js/kokoro.web.js'
+      - 'vendor/kokoro-js/source-overrides/**'
+      - 'tools/rebuild-neural-vendor.sh'
+      - '.github/workflows/neural-vendor-repro.yml'
+  push:
+    paths:
+      - 'NEURAL-VOICE-SOURCE-LOCK.json'
+      - 'vendor/kokoro-js/kokoro.web.js'
+      - 'vendor/kokoro-js/source-overrides/**'
+      - 'tools/rebuild-neural-vendor.sh'
+      - '.github/workflows/neural-vendor-repro.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  clean-room-rebuild:
+    name: Neural Vendor Clean-room Rebuild
+    runs-on: ubuntu-latest
+    # Batas keras: tanpa ini GitHub memakai 360 menit, dan satu langkah
+    # yang menggantung membakar enam jam dalam diam (lihat
+    # workflow-timeout-gate-test.js).
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Rebuild pinned Kokoro vendor and verify bytes
+        run: bash tools/rebuild-neural-vendor.sh
+      - name: Upload reproduction evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: neural-vendor-repro-${{ github.sha }}
+          path: .vendor-repro/
+          include-hidden-files: true
+          if-no-files-found: error
+          retention-days: 7

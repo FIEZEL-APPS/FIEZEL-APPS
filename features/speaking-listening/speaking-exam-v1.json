@@ -1,0 +1,874 @@
+{
+  "schema": "fiezel-speaking-exam-v1",
+  "schemaVersion": "1.0.0",
+  "version": "1.0.0",
+  "count": 17,
+  "honesty": "FIEZEL tidak memprediksi band IELTS atau skor TOEFL, dan TIDAK menilai pelafalan. Yang bisa dihitung dari transkrip hanyalah cakupan gagasan; sisanya perlu dibaca guru atau AI.",
+  "examFormats": {
+    "ielts_speaking_part1": {
+      "label": "IELTS Speaking Part 1",
+      "prepSeconds": 0,
+      "speakSeconds": 40,
+      "totalMinutes": 5,
+      "note": "Tanya jawab tentang diri sendiri dan hal sehari-hari. Jawab dua sampai tiga kalimat - satu kata membuang kesempatan, satu paragraf memakan waktu bagian berikutnya."
+    },
+    "ielts_speaking_part2": {
+      "label": "IELTS Speaking Part 2 (cue card)",
+      "prepSeconds": 60,
+      "speakSeconds": 120,
+      "totalMinutes": 4,
+      "note": "Satu menit menyiapkan catatan, lalu bicara satu sampai dua menit tanpa dipotong. Keempat butir di kartu wajib disentuh; butir terakhir yang paling sering terlewat."
+    },
+    "ielts_speaking_part3": {
+      "label": "IELTS Speaking Part 3 (diskusi)",
+      "prepSeconds": 0,
+      "speakSeconds": 60,
+      "totalMinutes": 5,
+      "note": "Diskusi abstrak yang melanjutkan topik Part 2. Yang dinilai kemampuan mengembangkan alasan, bukan kebenaran pendapatmu."
+    },
+    "toefl_speaking_task1": {
+      "label": "TOEFL iBT Speaking Task 1 (Independent)",
+      "prepSeconds": 15,
+      "speakSeconds": 45,
+      "totalMinutes": 1,
+      "note": "15 detik menyiapkan, 45 detik bicara. Nyatakan pilihanmu di kalimat pertama, lalu dua alasan dengan contoh."
+    },
+    "toefl_speaking_task2_adapted": {
+      "label": "TOEFL iBT Speaking Task 2 (Campus, adaptasi teks)",
+      "prepSeconds": 30,
+      "speakSeconds": 60,
+      "totalMinutes": 2,
+      "note": "ADAPTASI: aslinya bacaan pengumuman kampus lalu percakapan AUDIO. Di sini percakapannya disajikan tertulis, jadi yang dilatih sintesisnya - bukan menyimaknya. Ringkas pendapat pembicara DAN alasannya, jangan pendapatmu sendiri."
+    },
+    "toefl_speaking_task3_adapted": {
+      "label": "TOEFL iBT Speaking Task 3 (Akademik, adaptasi teks)",
+      "prepSeconds": 30,
+      "speakSeconds": 60,
+      "totalMinutes": 2,
+      "note": "ADAPTASI: aslinya bacaan istilah akademik lalu kuliah AUDIO berisi contoh. Di sini kuliahnya tertulis. Jelaskan istilahnya memakai contoh dari kuliah, bukan definisi buku."
+    },
+    "toefl_speaking_task4_adapted": {
+      "label": "TOEFL iBT Speaking Task 4 (Kuliah, adaptasi teks)",
+      "prepSeconds": 20,
+      "speakSeconds": 60,
+      "totalMinutes": 2,
+      "note": "ADAPTASI: aslinya hanya kuliah AUDIO tanpa bacaan. Di sini kuliahnya tertulis. Ringkas dua poin utama beserta contohnya masing-masing."
+    }
+  },
+  "rubric": {
+    "id": "fiezel-speaking-rubric-v1",
+    "scale": {
+      "min": 0,
+      "max": 4
+    },
+    "note": "Empat kriteria mengikuti keluarga kriteria IELTS Speaking. Hanya satu yang bisa dinilai mesin; tiga sisanya ditandai apa adanya beserta alasannya.",
+    "criteria": [
+      {
+        "id": "fluency_coherence",
+        "label": "Kelancaran dan keruntutan",
+        "labelEn": "Fluency and coherence",
+        "asks": "Apakah bicaranya mengalir dan mudah diikuti?",
+        "machineScored": false,
+        "why": "FIEZEL hanya membaca hasil pengenalan ucapan; jeda, ragu, dan pengulangan tidak terukur dari teksnya.",
+        "levels": [
+          "Belum terbentuk ucapan yang bisa dinilai.",
+          "Terputus-putus; hampir setiap kalimat berhenti di tengah.",
+          "Bisa diikuti, tetapi sering berhenti mencari kata dan mengulang awal kalimat.",
+          "Mengalir dengan jeda wajar; penanda hubungan dipakai walau kadang berulang.",
+          "Mengalir tanpa usaha yang terlihat; gagasan tersambung rapi tanpa mengulang penanda."
+        ]
+      },
+      {
+        "id": "lexical_resource",
+        "label": "Kekayaan kosakata",
+        "labelEn": "Lexical resource",
+        "asks": "Apakah kata-katanya cukup tepat untuk topiknya?",
+        "machineScored": true,
+        "why": "Cakupan gagasan wajib bisa dihitung dari transkrip: apakah poin yang diminta soal benar-benar disebut.",
+        "levels": [
+          "Kosakata belum cukup untuk menyampaikan maksud.",
+          "Hanya kata paling dasar; sering berhenti karena tidak tahu katanya.",
+          "Cukup untuk topik sehari-hari; kata yang kurang umum sering meleset.",
+          "Bervariasi dan umumnya tepat, termasuk beberapa kata topikal.",
+          "Luwes dan tepat, termasuk ungkapan yang wajar dipakai penutur."
+        ]
+      },
+      {
+        "id": "grammatical_range_accuracy",
+        "label": "Ragam dan ketepatan tata bahasa",
+        "labelEn": "Grammatical range and accuracy",
+        "asks": "Apakah struktur kalimatnya bervariasi dan benar?",
+        "machineScored": false,
+        "why": "Pengenalan ucapan sering memperbaiki tata bahasa sendiri saat menuliskannya, jadi menilai ini dari transkrip akan menilai mesinnya, bukan muridnya.",
+        "levels": [
+          "Struktur belum terbentuk sebagai kalimat.",
+          "Hampir seluruhnya kalimat pendek sejenis; kesalahan menghambat pemahaman.",
+          "Campuran kalimat sederhana dan majemuk; kesalahan sering tetapi maksud tertangkap.",
+          "Beragam struktur termasuk klausa kompleks; sebagian besar benar.",
+          "Ragam luas dan terkendali; kesalahan hanya sesekali."
+        ]
+      },
+      {
+        "id": "pronunciation",
+        "label": "Pelafalan",
+        "labelEn": "Pronunciation",
+        "asks": "Apakah ucapannya mudah dipahami pendengar?",
+        "machineScored": false,
+        "why": "FIEZEL TIDAK menilai pelafalan. Skor pengenalan ucapan naik-turun karena mikrofon, aksen, dan kebisingan - memakainya sebagai nilai pelafalan berarti menghukum murid atas perangkatnya.",
+        "levels": [
+          "Tidak ada ucapan yang cukup untuk dinilai pendengar mana pun.",
+          "Sulit dipahami di sebagian besar ucapan.",
+          "Bisa dipahami, tetapi pendengar perlu berusaha.",
+          "Mudah dipahami; hanya sesekali perlu diulang.",
+          "Mudah dipahami sepanjang waktu, termasuk pada kata yang panjang."
+        ]
+      }
+    ]
+  },
+  "items": [
+    {
+      "id": "speakx_0001",
+      "schema": "fiezel-speaking-item-v1",
+      "level": "B1",
+      "exam": "ielts_speaking_part1",
+      "mode": "exam_response",
+      "instruction": "Part 1. Jawab empat pertanyaan ini satu per satu, masing-masing dua sampai tiga kalimat: Where do you live? Do you prefer studying in the morning or at night? How often do you use English outside class? What kind of music do you listen to?",
+      "sampleAnswer": "I live in a small town near Surabaya, in a house with my parents and my sister. I prefer studying at night because the house is quiet and I concentrate better. I use English almost every day, mostly for reading and watching videos. I mostly listen to pop and sometimes older rock songs when I study.",
+      "requiredKeywords": [
+        "live",
+        "prefer",
+        "because",
+        "every day",
+        "listen"
+      ],
+      "scoring": {
+        "claim": "spoken_production_coverage_not_pronunciation",
+        "metric": "target_concept_coverage",
+        "threshold": 0.7
+      },
+      "privacy": {
+        "persistRawAudio": false,
+        "persistRawTranscript": false
+      },
+      "questions": [
+        "Where do you live?",
+        "Do you prefer studying in the morning or at night?",
+        "How often do you use English outside class?",
+        "What kind of music do you listen to?"
+      ]
+    },
+    {
+      "id": "speakx_0002",
+      "schema": "fiezel-speaking-item-v1",
+      "level": "B2",
+      "exam": "ielts_speaking_part1",
+      "mode": "exam_response",
+      "instruction": "Part 1. Jawab empat pertanyaan ini, masing-masing dua sampai tiga kalimat: Do you work or study? What do you enjoy most about it? Has your daily routine changed in the last year? Would you like to live in a different city?",
+      "sampleAnswer": "I am still at school, in my second year. What I enjoy most is the science subjects, because we get to test ideas instead of only memorising them. My routine has changed quite a lot this year since I started studying in the evenings. I would like to live in a bigger city eventually, mainly for the universities, although I would miss how quiet it is here.",
+      "requiredKeywords": [
+        "study",
+        "enjoy",
+        "because",
+        "changed",
+        "would like"
+      ],
+      "scoring": {
+        "claim": "spoken_production_coverage_not_pronunciation",
+        "metric": "target_concept_coverage",
+        "threshold": 0.7
+      },
+      "privacy": {
+        "persistRawAudio": false,
+        "persistRawTranscript": false
+      },
+      "questions": [
+        "Do you work or study?",
+        "What do you enjoy most about it?",
+        "Has your daily routine changed in the last year?",
+        "Would you like to live in a different city?"
+      ],
+      "targetConcepts": [
+        [
+          "study",
+          "studying",
+          "school",
+          "university",
+          "work",
+          "working",
+          "job"
+        ],
+        [
+          "enjoy",
+          "like",
+          "love",
+          "favorite",
+          "favourite"
+        ],
+        [
+          "because",
+          "since",
+          "reason"
+        ],
+        [
+          "changed",
+          "change",
+          "changes",
+          "different",
+          "the same"
+        ],
+        [
+          "would like",
+          "want to",
+          "i want",
+          "hope to",
+          "would love",
+          "plan to"
+        ]
+      ]
+    },
+    {
+      "id": "speakx_0003",
+      "schema": "fiezel-speaking-item-v1",
+      "level": "B2",
+      "exam": "ielts_speaking_part2",
+      "mode": "exam_response",
+      "instruction": "Part 2. Kamu punya satu menit untuk membuat catatan, lalu bicara satu sampai dua menit. Describe a skill you learned that took a long time to get right. Keempat butir di kartu wajib kamu sentuh.",
+      "sampleAnswer": "The skill I want to talk about is swimming, which I started learning when I was about twelve. I learned it at a public pool near my school, mostly from an older cousin rather than a real coach. It took me nearly two years to feel confident, because I was afraid of putting my face in the water and that fear slowed everything else down. What made it difficult was that progress was invisible for months; I could not see myself improving, so I almost stopped several times. I am glad I kept going, because it taught me that being slow at the start does not mean you cannot do something.",
+      "requiredKeywords": [
+        "learned",
+        "took",
+        "because",
+        "difficult",
+        "glad"
+      ],
+      "scoring": {
+        "claim": "spoken_production_coverage_not_pronunciation",
+        "metric": "target_concept_coverage",
+        "threshold": 0.7
+      },
+      "privacy": {
+        "persistRawAudio": false,
+        "persistRawTranscript": false
+      },
+      "cueCard": [
+        "what the skill was",
+        "where and how you learned it",
+        "how long it took you",
+        "and explain why it was difficult to get right"
+      ]
+    },
+    {
+      "id": "speakx_0004",
+      "schema": "fiezel-speaking-item-v1",
+      "level": "C1",
+      "exam": "ielts_speaking_part2",
+      "mode": "exam_response",
+      "instruction": "Part 2. Satu menit menyiapkan catatan, lalu bicara satu sampai dua menit. Describe a decision you made that other people disagreed with. Keempat butir wajib disentuh, termasuk butir terakhir.",
+      "sampleAnswer": "The decision I want to describe is choosing the science stream at school when almost everyone around me expected me to take social studies. I made it at the end of my first year, after a teacher showed me the kind of problems the science stream actually works on. My parents disagreed at first, mainly because they thought the workload would be too heavy alongside my other commitments, and two of my closest friends thought I was making it harder than it needed to be. Looking back, I think the disagreement was reasonable rather than wrong: they were judging from what they could see, which was how tired I already was. What convinced me to hold my position was that the reason I wanted it had not changed after a month of thinking about it.",
+      "requiredKeywords": [
+        "decision",
+        "disagreed",
+        "because",
+        "looking back",
+        "convinced"
+      ],
+      "scoring": {
+        "claim": "spoken_production_coverage_not_pronunciation",
+        "metric": "target_concept_coverage",
+        "threshold": 0.7
+      },
+      "privacy": {
+        "persistRawAudio": false,
+        "persistRawTranscript": false
+      },
+      "cueCard": [
+        "what the decision was",
+        "when you made it",
+        "who disagreed and why",
+        "and explain how you feel about it now"
+      ]
+    },
+    {
+      "id": "speakx_0005",
+      "schema": "fiezel-speaking-item-v1",
+      "level": "B2",
+      "exam": "ielts_speaking_part3",
+      "mode": "exam_response",
+      "instruction": "Part 3. Diskusi lanjutan dari topik keahlian. Jawab tiga pertanyaan ini, masing-masing empat sampai enam kalimat: Why do some people give up on a skill halfway? Should schools teach practical skills as well as academic subjects? Is it easier to learn new skills as an adult than it used to be?",
+      "sampleAnswer": "I think people give up halfway mainly because the middle of learning anything is the least rewarding part. At the start everything is new, and near the end you can see the result, but in the middle you are working hard without visible progress. Schools probably should teach practical skills, though not at the cost of academic ones; the two support each other more than people admit. As for adults, learning is easier in terms of access, since almost everything is online now, but harder in terms of time, because adults rarely get uninterrupted hours.",
+      "requiredKeywords": [
+        "because",
+        "progress",
+        "should",
+        "though",
+        "however"
+      ],
+      "scoring": {
+        "claim": "spoken_production_coverage_not_pronunciation",
+        "metric": "target_concept_coverage",
+        "threshold": 0.7
+      },
+      "privacy": {
+        "persistRawAudio": false,
+        "persistRawTranscript": false
+      },
+      "followUps": [
+        "Why do some people give up on a skill halfway?",
+        "Should schools teach practical skills as well as academic subjects?",
+        "Is it easier to learn new skills as an adult than it used to be?"
+      ],
+      "targetConcepts": [
+        [
+          "because",
+          "since",
+          "reason"
+        ],
+        [
+          "progress",
+          "improve",
+          "improving",
+          "improvement",
+          "results"
+        ],
+        [
+          "should",
+          "ought to",
+          "need to"
+        ],
+        [
+          "though",
+          "although",
+          "but",
+          "while"
+        ],
+        [
+          "however",
+          "but",
+          "though",
+          "although",
+          "on the other hand"
+        ]
+      ]
+    },
+    {
+      "id": "speakx_0006",
+      "schema": "fiezel-speaking-item-v1",
+      "level": "C1",
+      "exam": "ielts_speaking_part3",
+      "mode": "exam_response",
+      "instruction": "Part 3. Diskusi lanjutan dari topik keputusan. Jawab tiga pertanyaan ini, masing-masing empat sampai enam kalimat: Should young people always follow their parents' advice about their future? How much should a person's career be shaped by what their country needs? Do people regret decisions more when others warned them?",
+      "sampleAnswer": "I would not say young people should always follow that advice, but I would not dismiss it either, because parents are usually judging from experience that the young person does not have yet, and the disagreement is often about risk rather than about the goal itself. On careers and national need, I think there is a reasonable case for incentives but not for direction; however, a country that pushes people into fields they resent tends to get the qualification without the work. And yes, I suspect people do regret warned-against decisions more, though that may say more about how memory works than about whether the decision was wrong.",
+      "requiredKeywords": [
+        "would not",
+        "because",
+        "however",
+        "tends to",
+        "though"
+      ],
+      "scoring": {
+        "claim": "spoken_production_coverage_not_pronunciation",
+        "metric": "target_concept_coverage",
+        "threshold": 0.7
+      },
+      "privacy": {
+        "persistRawAudio": false,
+        "persistRawTranscript": false
+      },
+      "followUps": [
+        "Should young people always follow their parents' advice about their future?",
+        "How much should a person's career be shaped by what their country needs?",
+        "Do people regret decisions more when others warned them?"
+      ],
+      "targetConcepts": [
+        [
+          "would not",
+          "wouldnt",
+          "would never",
+          "i dont think",
+          "do not think"
+        ],
+        [
+          "because",
+          "since",
+          "reason",
+          "reasons",
+          "judging from",
+          "that is why"
+        ],
+        [
+          "however",
+          "but",
+          "though",
+          "although",
+          "on the other hand",
+          "yet"
+        ],
+        [
+          "tends to",
+          "tend to",
+          "usually",
+          "often",
+          "generally"
+        ],
+        [
+          "though",
+          "although",
+          "but",
+          "however",
+          "still"
+        ]
+      ]
+    },
+    {
+      "id": "speakx_0007",
+      "schema": "fiezel-speaking-item-v1",
+      "level": "B1",
+      "exam": "toefl_speaking_task1",
+      "mode": "exam_response",
+      "instruction": "Task 1. 15 detik menyiapkan, 45 detik bicara. Some students prefer to take a year off before university; others prefer to start immediately. Which do you think is better, and why? Nyatakan pilihanmu di kalimat pertama.",
+      "sampleAnswer": "I think starting immediately is better for most students. The main reason is momentum, because after twelve years of school you are already used to studying, and that habit is easy to lose in a year. For example, my cousin took a year off to work, and when he came back he told me the hardest part was not the material but simply sitting down to read again. A second reason is that a year off usually costs money rather than earning it, unless you have a specific plan.",
+      "requiredKeywords": [
+        "I think",
+        "reason",
+        "for example",
+        "second",
+        "because"
+      ],
+      "scoring": {
+        "claim": "spoken_production_coverage_not_pronunciation",
+        "metric": "target_concept_coverage",
+        "threshold": 0.7
+      },
+      "privacy": {
+        "persistRawAudio": false,
+        "persistRawTranscript": false
+      },
+      "targetConcepts": [
+        [
+          "i think",
+          "i believe",
+          "in my opinion",
+          "for me",
+          "i agree",
+          "i disagree"
+        ],
+        [
+          "reason",
+          "reasons"
+        ],
+        [
+          "for example",
+          "for instance",
+          "example",
+          "instance",
+          "such as",
+          "in my case",
+          "my cousin",
+          "my friend"
+        ],
+        [
+          "second",
+          "secondly",
+          "also",
+          "another",
+          "in addition"
+        ],
+        [
+          "because",
+          "since",
+          "the main reason"
+        ]
+      ]
+    },
+    {
+      "id": "speakx_0008",
+      "schema": "fiezel-speaking-item-v1",
+      "level": "B2",
+      "exam": "toefl_speaking_task1",
+      "mode": "exam_response",
+      "instruction": "Task 1. 15 detik menyiapkan, 45 detik bicara. Do you agree or disagree: schools should replace printed textbooks with tablets for every student? Beri dua alasan dengan contoh.",
+      "sampleAnswer": "I disagree with replacing printed textbooks completely. First, tablets create a dependency on electricity and repairs that not every school can absorb; at my old school, half the shared laptops were unusable within two years. Second, reading long passages on a screen is harder to annotate the way students actually study, at least without training. I would keep tablets for materials that change often, like exercises, and keep print for the core texts.",
+      "requiredKeywords": [
+        "disagree",
+        "first",
+        "second",
+        "for example",
+        "would keep"
+      ],
+      "scoring": {
+        "claim": "spoken_production_coverage_not_pronunciation",
+        "metric": "target_concept_coverage",
+        "threshold": 0.7
+      },
+      "privacy": {
+        "persistRawAudio": false,
+        "persistRawTranscript": false
+      },
+      "targetConcepts": [
+        [
+          "disagree",
+          "agree",
+          "oppose",
+          "against",
+          "support"
+        ],
+        [
+          "first",
+          "firstly",
+          "one reason",
+          "to begin with"
+        ],
+        [
+          "second",
+          "secondly",
+          "also",
+          "another"
+        ],
+        [
+          "for example",
+          "for instance",
+          "example",
+          "such as",
+          "in my experience",
+          "at my school",
+          "my old school"
+        ],
+        [
+          "keep",
+          "would keep",
+          "still use",
+          "stay",
+          "remain"
+        ]
+      ]
+    },
+    {
+      "id": "speakx_0009",
+      "schema": "fiezel-speaking-item-v1",
+      "level": "B2",
+      "exam": "toefl_speaking_task2_adapted",
+      "mode": "exam_response",
+      "instruction": "Task 2. Baca pengumumannya, baca tanggapan mahasiswanya, lalu 30 detik menyiapkan dan 60 detik bicara. Ringkas PENDAPAT mahasiswa itu dan ALASANNYA - bukan pendapatmu sendiri.",
+      "sampleAnswer": "The university plans to close the small study rooms in the library and turn them into a group work area. The student in the conversation disagrees with the plan for two reasons. First, she says the small rooms are the only quiet space available in the evening, and the main hall is too noisy for the kind of reading she has to do. Second, she doubts the stated reason for the change: she says the group area that already exists on the second floor is usually half empty, so the demand the university describes does not match what she sees.",
+      "requiredKeywords": [
+        "disagrees",
+        "first",
+        "second",
+        "reason",
+        "because"
+      ],
+      "scoring": {
+        "claim": "spoken_production_coverage_not_pronunciation",
+        "metric": "target_concept_coverage",
+        "threshold": 0.7
+      },
+      "privacy": {
+        "persistRawAudio": false,
+        "persistRawTranscript": false
+      },
+      "sourceText": "PENGUMUMAN UNIVERSITAS: Mulai semester depan, delapan ruang belajar kecil di lantai satu perpustakaan akan digabung menjadi satu area kerja kelompok. Alasannya: permintaan ruang kelompok meningkat, dan ruang kecil sering dipakai satu orang saja.\n\nTANGGAPAN MAHASISWA (tertulis): \"I don't think this is a good idea. Those small rooms are the only quiet place left in the evening - the main hall gets loud after six, and I can't do close reading there. And honestly, the reason they gave doesn't match what I see. There's already a group area on the second floor and it's half empty most nights. If group space were really that scarce, that floor would be full.\"",
+      "sourceNote": "ADAPTASI: percakapan mahasiswa aslinya berupa audio; di sini disajikan tertulis.",
+      "targetConcepts": [
+        [
+          "disagrees",
+          "disagree",
+          "against",
+          "does not agree",
+          "doesnt agree",
+          "opposes",
+          "not a good idea"
+        ],
+        [
+          "first",
+          "firstly",
+          "one reason"
+        ],
+        [
+          "second",
+          "secondly",
+          "also",
+          "another"
+        ],
+        [
+          "reason",
+          "reasons"
+        ],
+        [
+          "because",
+          "since",
+          "so",
+          "she says",
+          "he says",
+          "she argues",
+          "he argues"
+        ]
+      ]
+    },
+    {
+      "id": "speakx_0010",
+      "schema": "fiezel-speaking-item-v1",
+      "level": "C1",
+      "exam": "toefl_speaking_task3_adapted",
+      "mode": "exam_response",
+      "instruction": "Task 3. Baca definisinya, baca kuliahnya, lalu 30 detik menyiapkan dan 60 detik bicara. Jelaskan istilahnya MEMAKAI contoh dari kuliah, bukan definisi buku.",
+      "sampleAnswer": "The reading defines the sunk cost fallacy as continuing an effort because of what you have already spent rather than what you will gain. The professor illustrates it with two examples. In the first, a company keeps funding a software project for two more years because it had already spent four, even though the engineers had told management the design would not work. In the second, he describes finishing a bad film simply because he had paid for the ticket. Both cases show the same pattern: the money or time already spent cannot be recovered, yet it is the very thing driving the decision to continue.",
+      "requiredKeywords": [
+        "defines",
+        "example",
+        "because",
+        "already spent",
+        "both"
+      ],
+      "scoring": {
+        "claim": "spoken_production_coverage_not_pronunciation",
+        "metric": "target_concept_coverage",
+        "threshold": 0.7
+      },
+      "privacy": {
+        "persistRawAudio": false,
+        "persistRawTranscript": false
+      },
+      "sourceText": "BACAAN - Sunk Cost Fallacy: kecenderungan meneruskan sebuah usaha berdasarkan apa yang SUDAH dikeluarkan (uang, waktu, tenaga), bukan berdasarkan manfaat yang masih bisa didapat. Biaya yang sudah keluar tidak bisa ditarik kembali, sehingga secara logis ia tidak relevan untuk keputusan berikutnya.\n\nKULIAH (tertulis): \"Let me give you two examples. A software company I consulted for had spent four years on a platform. The engineers said plainly that the architecture would not scale. Management approved two more years of funding, and the argument in the meeting was, word for word, 'we've already put four years into this'. That is the fallacy, stated out loud.\n\nA smaller one, from my own life: I once sat through ninety minutes of a terrible film because I had paid for the ticket. The ticket money was gone either way. All I did was add ninety minutes to the loss.\"",
+      "sourceNote": "ADAPTASI: kuliah aslinya berupa audio; di sini disajikan tertulis.",
+      "targetConcepts": [
+        [
+          "defines",
+          "definition",
+          "defined",
+          "means",
+          "described as",
+          "describes"
+        ],
+        [
+          "example",
+          "examples",
+          "instance",
+          "for instance",
+          "case",
+          "cases"
+        ],
+        [
+          "because",
+          "since",
+          "reason"
+        ],
+        [
+          "already spent",
+          "already paid",
+          "already put",
+          "already invested",
+          "sunk"
+        ],
+        [
+          "both",
+          "each",
+          "two cases",
+          "same pattern",
+          "in both"
+        ]
+      ]
+    },
+    {
+      "id": "speakx_0011",
+      "schema": "fiezel-speaking-item-v1",
+      "level": "C1",
+      "exam": "toefl_speaking_task4_adapted",
+      "mode": "exam_response",
+      "instruction": "Task 4. Baca kuliahnya, lalu 20 detik menyiapkan dan 60 detik bicara. Ringkas DUA poin utama beserta contohnya masing-masing.",
+      "sampleAnswer": "The lecture discusses two ways animals survive cold seasons. The first is migration, moving to a warmer region before conditions become severe. The professor's example is the Arctic tern, which travels between the Arctic and the Antarctic each year, effectively following the summer. The second strategy is dormancy, reducing activity so that far less energy is needed. Here the example is the ground squirrel, whose body temperature and heart rate drop for months at a time. The professor points out that each strategy trades one cost for another: migration costs enormous energy in travel, while dormancy costs the animal the chance to feed at all.",
+      "requiredKeywords": [
+        "two",
+        "first",
+        "example",
+        "second",
+        "while"
+      ],
+      "scoring": {
+        "claim": "spoken_production_coverage_not_pronunciation",
+        "metric": "target_concept_coverage",
+        "threshold": 0.7
+      },
+      "privacy": {
+        "persistRawAudio": false,
+        "persistRawTranscript": false
+      },
+      "sourceText": "KULIAH (tertulis): \"Animals facing a cold season have broadly two options, and they cost different things.\n\nThe first is migration - leaving before conditions get severe. The Arctic tern is the extreme case: it flies between the Arctic and the Antarctic every year, so it spends most of its life in summer. But look at the price. That is an enormous amount of energy spent on travel alone.\n\nThe second option is dormancy - staying, but slowing down. The ground squirrel drops its body temperature close to freezing and its heart rate to a few beats a minute, for months. That saves a remarkable amount of energy. The cost is that it cannot feed at all during that time, so everything depends on what it stored beforehand.\"",
+      "sourceNote": "ADAPTASI: kuliah aslinya berupa audio; di sini disajikan tertulis."
+    },
+    {
+      "id": "speakx_0012",
+      "schema": "fiezel-speaking-item-v1",
+      "level": "A2",
+      "exam": "ielts_speaking_part1",
+      "mode": "exam_response",
+      "instruction": "Part 1. Jawab empat pertanyaan ini satu per satu, masing-masing satu sampai dua kalimat: How many people are there in your family? What do you usually eat for breakfast? What time do you get up in the morning? What do you do after school or work?",
+      "sampleAnswer": "There are four people in my family: my father, my mother, my brother, and me. My father works in a shop and my mother stays at home. For breakfast I usually eat fried rice and drink warm tea. I get up at five o'clock in the morning because my school is far from my house. After school I do my homework, and sometimes I play football with my friends near my house.",
+      "requiredKeywords": [
+        "family",
+        "usually",
+        "because",
+        "after",
+        "sometimes"
+      ],
+      "scoring": {
+        "claim": "spoken_production_coverage_not_pronunciation",
+        "metric": "target_concept_coverage",
+        "threshold": 0.7
+      },
+      "privacy": {
+        "persistRawAudio": false,
+        "persistRawTranscript": false
+      },
+      "questions": [
+        "How many people are there in your family?",
+        "What do you usually eat for breakfast?",
+        "What time do you get up in the morning?",
+        "What do you do after school or work?"
+      ]
+    },
+    {
+      "id": "speakx_0013",
+      "schema": "fiezel-speaking-item-v1",
+      "level": "A2",
+      "exam": "toefl_speaking_task1",
+      "mode": "exam_response",
+      "instruction": "Task 1. 15 detik menyiapkan, 45 detik bicara. Some people like watching films at home; others like watching them at the cinema. Which do you prefer, and why? Nyatakan pilihanmu di kalimat pertama, lalu beri satu alasan dan satu contoh - tiga sampai empat kalimat cukup.",
+      "sampleAnswer": "I prefer watching films at home. The main reason is that it is cheaper, because a cinema ticket costs a lot for a student like me. For example, last month I watched three films at home and I did not pay anything. I can also stop the film when I want to eat or rest.",
+      "requiredKeywords": [
+        "prefer",
+        "reason",
+        "because",
+        "for example",
+        "also"
+      ],
+      "scoring": {
+        "claim": "spoken_production_coverage_not_pronunciation",
+        "metric": "target_concept_coverage",
+        "threshold": 0.7
+      },
+      "privacy": {
+        "persistRawAudio": false,
+        "persistRawTranscript": false
+      }
+    },
+    {
+      "id": "speakx_0014",
+      "schema": "fiezel-speaking-item-v1",
+      "level": "B1",
+      "exam": "ielts_speaking_part2",
+      "mode": "exam_response",
+      "instruction": "Part 2. Kamu punya satu menit untuk membuat catatan, lalu bicara satu sampai dua menit. Describe a journey you took that you remember well. Keempat butir di kartu wajib kamu sentuh, termasuk butir terakhir.",
+      "sampleAnswer": "The journey I remember best is a train trip from Bandung to Yogyakarta with my family about two years ago. I went with my parents and my little brother, and it was our first long trip together after my father changed jobs. During the journey many small things happened: we shared food with the family sitting across from us, my brother lost his shoe under the seats, and then the whole carriage helped us look for it, which turned into a funny conversation with strangers. When we finally arrived, we were tired, but everyone was still laughing about the shoe. I still remember this journey because it was the first time in years that I saw my parents relax for a whole day, and because it showed me that a simple trip can feel special when the people around you are friendly. Even now, when we eat on a train, my brother always mentions that shoe.",
+      "requiredKeywords": [
+        "journey",
+        "went",
+        "then",
+        "because",
+        "remember"
+      ],
+      "scoring": {
+        "claim": "spoken_production_coverage_not_pronunciation",
+        "metric": "target_concept_coverage",
+        "threshold": 0.7
+      },
+      "privacy": {
+        "persistRawAudio": false,
+        "persistRawTranscript": false
+      },
+      "cueCard": [
+        "where you went",
+        "who you travelled with",
+        "what happened during the journey",
+        "and explain why you still remember it"
+      ]
+    },
+    {
+      "id": "speakx_0015",
+      "schema": "fiezel-speaking-item-v1",
+      "level": "C2",
+      "exam": "ielts_speaking_part2",
+      "mode": "exam_response",
+      "instruction": "Part 2. Satu menit menyiapkan catatan, lalu bicara satu sampai dua menit. Describe an assumption you once held that you have since abandoned. Keempat butir wajib disentuh, termasuk butir terakhir.",
+      "sampleAnswer": "I'd like to talk about an assumption I carried well into adulthood: that being busy was the same thing as being useful. I absorbed it gradually rather than adopting it consciously - at school, the students who were praised were the visibly exhausted ones, and in my first job the culture rewarded whoever replied to messages at midnight. What led me to question it was watching a colleague who worked far fewer hours than the rest of us yet consistently produced the work that actually mattered; what struck me was that she treated attention, not time, as the scarce resource. In retrospect, my busyness was often a way of avoiding the harder question of what deserved my effort at all, whereas her calm was a form of discipline I had mistaken for detachment. Abandoning that assumption has changed how I judge my own days: I now ask what I actually moved forward, not how tired I am, and I have become far more suspicious of effort that is easy to display.",
+      "requiredKeywords": [
+        "assumption",
+        "rather than",
+        "what struck me",
+        "in retrospect",
+        "whereas"
+      ],
+      "scoring": {
+        "claim": "spoken_production_coverage_not_pronunciation",
+        "metric": "target_concept_coverage",
+        "threshold": 0.7
+      },
+      "privacy": {
+        "persistRawAudio": false,
+        "persistRawTranscript": false
+      },
+      "cueCard": [
+        "what the assumption was",
+        "how you came to hold it",
+        "what led you to question it",
+        "and explain how abandoning it has changed the way you think"
+      ]
+    },
+    {
+      "id": "speakx_0016",
+      "schema": "fiezel-speaking-item-v1",
+      "level": "C2",
+      "exam": "ielts_speaking_part3",
+      "mode": "exam_response",
+      "instruction": "Part 3. Diskusi lanjutan dari topik keyakinan dan asumsi. Jawab tiga pertanyaan ini, masing-masing dua sampai tiga kalimat: Should governments try to change what citizens believe, or only how they behave? If a comforting false belief does no obvious harm, should anyone challenge it? Which beliefs that are common today do you think future generations will reject?",
+      "sampleAnswer": "I would draw a distinction between open persuasion and covert manipulation. A government that argues publicly for a change in attitude is a legitimate voice in the debate, but one that engineers belief behind closed doors has crossed a line, even if what it promotes happens to be true. On the comforting falsehood, I could accept leaving it alone provided that nothing important turns on it, but very few beliefs meet that test. Beliefs rarely stay private: once millions of people act on an illusion, it starts to shape schools, budgets and laws, and at that point challenging it becomes a duty rather than a rudeness. As for the future, on balance I suspect the way we treat animals is the likeliest candidate for condemnation, followed perhaps by how casually we surrendered our attention to machines. Predicting which belief will fall is far harder than predicting that some of them must.",
+      "requiredKeywords": [
+        "distinction",
+        "even if",
+        "provided that",
+        "on balance",
+        "suspect"
+      ],
+      "scoring": {
+        "claim": "spoken_production_coverage_not_pronunciation",
+        "metric": "target_concept_coverage",
+        "threshold": 0.7
+      },
+      "privacy": {
+        "persistRawAudio": false,
+        "persistRawTranscript": false
+      },
+      "followUps": [
+        "Should governments try to change what citizens believe, or only how they behave?",
+        "If a comforting false belief does no obvious harm, should anyone challenge it?",
+        "Which beliefs that are common today do you think future generations will reject?"
+      ]
+    },
+    {
+      "id": "speakx_0017",
+      "schema": "fiezel-speaking-item-v1",
+      "level": "C2",
+      "exam": "toefl_speaking_task4_adapted",
+      "mode": "exam_response",
+      "instruction": "Task 4. Baca kuliahnya, lalu 20 detik menyiapkan dan 60 detik bicara. Ringkas DUA mekanisme utama beserta contohnya masing-masing.",
+      "sampleAnswer": "The lecture argues that memory behaves less like a recording than like a story that is rewritten with every retelling, and it describes two mechanisms of distortion. The first is post-event information: details encountered after an event can be written back into the memory of the event itself. The example is the car-accident experiment, in which people asked about cars that 'smashed' rather than 'hit' each other later remembered broken glass that never appeared in the film. The second is imagination inflation: whereas the misleading input comes from outside in the first case, here the distortion is self-generated - adults who vividly imagined breaking a window in childhood later became more confident that it had really happened to them. In both cases, the professor's point is that remembering is an act of reconstruction, so a memory can be sincere, detailed, and wrong at the same time.",
+      "requiredKeywords": [
+        "first",
+        "second",
+        "example",
+        "whereas",
+        "in both cases"
+      ],
+      "scoring": {
+        "claim": "spoken_production_coverage_not_pronunciation",
+        "metric": "target_concept_coverage",
+        "threshold": 0.7
+      },
+      "privacy": {
+        "persistRawAudio": false,
+        "persistRawTranscript": false
+      },
+      "sourceText": "KULIAH (tertulis): \"We like to imagine memory as a recording, but it behaves more like a story that is rewritten each time it is told. Let me describe two mechanisms of distortion.\n\nThe first is post-event information. What we encounter after an event can be written back into the memory of the event itself. In a classic type of experiment, people watch a short film of a minor car accident. Those later asked how fast the cars were going when they 'smashed' into each other do not just give higher speed estimates than those asked about cars that 'hit' each other - a week later, they are also more likely to remember broken glass that was never in the film. The question has quietly edited the memory.\n\nThe second mechanism is imagination inflation. The act of imagining an event leaves a trace that can later be mistaken for the trace of a real experience. In one study, adults who spent a few minutes vividly imagining a childhood incident - breaking a window with their hand - became measurably more confident, weeks later, that it had actually happened to them. Nothing was presented as true; imagining it was enough.\"",
+      "sourceNote": "ADAPTASI: kuliah aslinya berupa audio; di sini disajikan tertulis."
+    }
+  ]
+}
