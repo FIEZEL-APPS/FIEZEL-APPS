@@ -28,14 +28,51 @@ menggunakan **Remotion**, dan berikan preview. Nusa (monyet) harus lebih kecil d
 - Showcase page: `/app/character-preview.html` — hero, Remotion motion reel (codec auto-detect
   mp4→webm fallback + posters), before/after anomaly sliders, expression gallery, consistency checklist.
 
-## Preview URL
-https://971a4388-258b-4b72-bb81-e0a9016b4652.preview.emergentagent.com/character-preview.html
+## Preview
+Open the platform Preview button, then append `/character-preview.html` to the URL.
 
 ## Re-render motion
 `cd /app/remotion && node_modules/.bin/remotion render src/index.js <CompId> /app/assets/motion/<name>.<mp4|webm>`
 
+## Update 2026-06 — hair bun consistency + blink/mouth + full Nusa pose set
+
+### Anomaly #6: Mira's hair bun (sanggul) — reported by user "letaknya tidak konsisten"
+Audit vs `_reference/mira-sheet.jpg`: bun MISSING in `full-explain` + `full-wave`, and its
+position/size drifted up to ~17% of head width across the other poses.
+Fix = `tools/mira-bun-fix.py`:
+- canonical bun sprite extracted once to `assets/characters/mira/png/parts/bun.png`
+  (taken from `full-neutral`, which is pixel-identical to the reference sheet),
+- blush-cheek pair used as the rigid head landmark (works on closed-eye poses too),
+- old/misplaced bun art erased (any brown/green pixel outside the hat crown, incl. AA halo),
+- sprite re-stamped BEHIND the character layer so the hat always overlaps it,
+- canvas padded where needed; `manifest.json` w/h + png@1x + webp regenerated.
+Applied to 13 poses (all mira full-*/head-* + team walking/shoulder-wave/highfive/hat-peek).
+`team/teaching` keeps its original bun (cheek landmark undetectable, looks correct).
+
+### Blink + mouth motion
+`tools/face-rig.py` detects the pupil pair + mouth box per pose, writes
+`assets/characters/face-rig.json`, and bakes a closed-eye variant to
+`<char>/png/blink/<pose>.png` (skin-filled eyeball + drawn lid arc, glasses/fur preserved).
+`remotion/src/Scene.jsx`: 3-frame blink every 2.7s (occasional double blink, per-character
+seed offset) + a feathered mouth patch that re-scales subtly (breathing / soft talking).
+Poses with closed/squinting eyes by design have no blink asset (celebrate, sleep, cheer,
+head-proud, highfive).
+
+### New Nusa clips
+`NusaOops` (startled hop), `NusaCurious` (head-shot, centre anchor, sway + "!" bubbles),
+`NusaThinking` ("?" bubbles). Motion Lab is now 10 clips; `tools/render-motion.sh` renders
+mp4 + webm + poster for all of them.
+
+### Preview page
+`character-preview.html`: 10-clip reel, new "Mira · Sanggul (Hair Bun)" before/after slider,
+hero fixed so Nusa (300px) is smaller than Mira (430px), copy updated, data-testids added.
+Verified by testing agent (iteration_2.json): all clips play, bun present in all 13 poses,
+scale rule holds, no console errors / broken images / overflow.
+
 ## Backlog / next
-- P1: Blink/mouth micro-animation via layered SVG parts (needs rigged art, not single PNG).
-- P1: Interactive @remotion/player embed for scrubbing.
+- P1: Interactive @remotion/player embed for scrubbing + pose toggling.
+- P2: Hat band inconsistency — `head-*` and `team/*` poses show a green ribbon band on the
+  pith hat, `full-*` poses and the reference sheet do not. Needs a decision before fixing.
+- P2: No blink asset for the `*-thinking` / `head-curious` poses (pupil detection ambiguous
+  with the eyebrows); would need hand-placed eye boxes.
 - P2: Commit fixed assets + motion back to PR branch (via "Save to GitHub").
-- P2: Auto-generate remaining pose videos (oops, thinking, curious).

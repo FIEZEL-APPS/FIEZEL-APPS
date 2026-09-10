@@ -63,14 +63,14 @@ header.hero{position:relative;z-index:1;padding:64px 0 26px}
 .btn.s{background:#fff;color:var(--forest);box-shadow:var(--ring)}
 .btn.s:hover{transform:translateY(-3px);background:var(--forest);color:#fff}
 
-.stage{position:relative;min-height:460px;display:grid;place-items:center}
+.stage{position:relative;min-height:500px}
 .stage-bg{position:absolute;inset:auto 0 6% 0;height:280px;border-radius:50%/40px;
   background:radial-gradient(closest-side,#EAF3DC,transparent);filter:blur(2px)}
-.hero-char{position:relative;height:440px;filter:drop-shadow(0 26px 26px rgba(42,35,28,.22))}
+.hero-char{position:absolute;bottom:6%;filter:drop-shadow(0 26px 26px rgba(42,35,28,.22))}
 .hero-char img{height:100%;width:auto;display:block}
-.hero-nusa{animation:floaty 4.4s ease-in-out infinite}
-.hero-mira{position:absolute;right:2%;bottom:4%;height:330px;animation:floaty 5.2s ease-in-out infinite .6s}
-.hero-mira img{height:100%}
+/* skala nyata: Nusa (monyet) lebih kecil dari Mira (manusia) */
+.hero-nusa{left:8%;height:300px;animation:floaty 4.4s ease-in-out infinite}
+.hero-mira{right:8%;height:430px;animation:floaty 5.2s ease-in-out infinite .6s}
 @keyframes floaty{0%,100%{transform:translateY(0) rotate(-.6deg)}50%{transform:translateY(-16px) rotate(.6deg)}}
 .blob{position:absolute;border-radius:50%;filter:blur(0);opacity:.9}
 
@@ -164,7 +164,7 @@ section{position:relative;z-index:1;padding:60px 0}
 .fixhead p{margin:0;font-size:13px;color:var(--ink-soft);font-weight:700}
 .compare{position:relative;aspect-ratio:1/1;background:
    repeating-conic-gradient(#eee 0 25%, #fff 0 50%) 50%/26px 26px;user-select:none;overflow:hidden;touch-action:none}
-.compare img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;padding:8%}
+.compare img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;object-position:50% 100%;padding:8%}
 .compare .after{clip-path:inset(0 0 0 var(--split,50%))}
 .compare .divider{position:absolute;top:0;bottom:0;left:var(--split,50%);width:3px;background:#fff;box-shadow:0 0 0 1px rgba(42,35,28,.15);cursor:ew-resize}
 .compare .knob{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:38px;height:38px;border-radius:50%;background:#fff;box-shadow:var(--shadow);display:grid;place-items:center;color:var(--forest)}
@@ -230,15 +230,15 @@ footer small{opacity:.8;font-weight:700}
     <div class="reveal in">
       <span class="kicker">Character Universe · Nusa &amp; Mira</span>
       <h1>Maskot yang <span class="u">hidup</span>,<br>anatomi terjaga.</h1>
-      <p class="lead">Setiap pose Nusa &amp; Mira diperiksa terhadap reference sheet — proporsi badan, tangan, rambut, topi, dan logo paw dijaga konsisten. Anomali diperbaiki, lalu dihidupkan dengan motion flat‑design.</p>
+      <p class="lead">Setiap pose Nusa &amp; Mira diperiksa terhadap reference sheet — proporsi badan, tangan, rambut, topi, dan logo paw dijaga konsisten. Anomali diperbaiki (termasuk sanggul Mira), lalu dihidupkan dengan motion flat‑design: kedip mata &amp; gerak mulut.</p>
       <div class="cta">
-        <a href="#lab" class="btn p" id="btnPlay">▶ Mainkan Motion</a>
-        <a href="#fixes" class="btn s">Lihat Perbaikan</a>
+        <a href="#lab" class="btn p" id="btnPlay" data-testid="play-motion-btn">▶ Mainkan Motion</a>
+        <a href="#fixes" class="btn s" data-testid="view-fixes-btn">Lihat Perbaikan</a>
       </div>
       <div class="stat-row">
         <div class="stat"><b>2</b><span>Karakter Kanon</span></div>
-        <div class="stat"><b>24</b><span>Pose Vektor</span></div>
-        <div class="stat"><b>5</b><span>Anomali Diperbaiki</span></div>
+        <div class="stat"><b>10</b><span>Klip Motion</span></div>
+        <div class="stat"><b>6</b><span>Anomali Diperbaiki</span></div>
         <div class="stat"><b>100%</b><span>Flat / 2D</span></div>
       </div>
     </div>
@@ -256,13 +256,13 @@ footer small{opacity:.8;font-weight:700}
     <div class="reveal">
       <span class="kicker">01 · Motion Lab · Remotion</span>
       <h2 class="h2">Animasi dirender dengan <span style="color:var(--maroon)">Remotion</span></h2>
-      <p class="sub">Tiap klip adalah video MP4 yang dirender programmatically lewat Remotion (React) — memakai <b>spring</b> &amp; easing untuk gerak halus 30fps, sementara garis, warna, dan proporsi flat‑vector tetap 100% asli.</p>
+      <p class="sub">Tiap klip adalah video yang dirender programmatically lewat Remotion (React) — memakai <b>spring</b> &amp; easing untuk gerak halus 30fps. Kini setiap karakter juga <b>berkedip</b> (aset mata tertutup dipanggang per pose) dan <b>mulutnya bergerak halus</b>, sementara garis, warna, dan proporsi flat‑vector tetap 100% asli.</p>
     </div>
     <div class="reel reveal">
       <div class="player">
         <span class="badge-note">▶ <b id="clipTitle">Nusa &amp; Mira</b></span>
         <span class="rmk" id="rmk">Rendered with Remotion</span>
-        <video id="feature" poster="/assets/motion/posters/hero.jpg" autoplay muted loop playsinline preload="auto"></video>
+        <video id="feature" data-testid="feature-video" poster="/assets/motion/posters/hero.jpg" autoplay muted loop playsinline preload="auto"></video>
       </div>
       <div class="playlist" id="playlist"></div>
     </div>
@@ -275,7 +275,7 @@ footer small{opacity:.8;font-weight:700}
     <div class="reveal">
       <span class="kicker">02 · Anomaly Audit &amp; Fix</span>
       <h2 class="h2">Sebelum → Sesudah perbaikan</h2>
-      <p class="sub">Geser slider untuk membandingkan. Dua anomali utama pada Mira diperbaiki tanpa mengubah identitas karakter, ditambah topi disamakan di semua close‑up.</p>
+      <p class="sub">Geser slider untuk membandingkan. Tiga anomali utama pada Mira diperbaiki tanpa mengubah identitas karakter, ditambah topi disamakan di semua close‑up.</p>
     </div>
     <div class="fix-grid reveal">
       <div class="fixcard">
@@ -298,11 +298,19 @@ footer small{opacity:.8;font-weight:700}
         </div>
         <div class="fixnote"><span class="ic" id="ic2"></span><span>Kompas ganda yang menggantung dihapus &amp; lengan kanan dirapikan natural. Kompas kalung di dada tetap dipertahankan.</span></div>
       </div>
+      <div class="fixcard">
+        <div class="fixhead"><h3>Mira · Sanggul (Hair Bun)</h3><p>Sanggul hilang / geser posisi antar pose → dikunci ke landmark kepala.</p></div>
+        <div class="compare" data-testid="bun-slider" data-split="50">
+          <img class="before" src="/assets/characters/_orig/mira-full-wave.png" alt="before">
+          <img class="after"  src="/assets/characters/mira/png/full-wave.png" alt="after">
+          <span class="tagB">SEBELUM</span><span class="tagA">SESUDAH</span>
+          <div class="divider"><div class="knob">⇆</div></div>
+        </div>
+        <div class="fixnote"><span class="ic" id="ic3"></span><span>Sprite sanggul kanon (dari reference sheet) di‑stamp ulang di 13 pose memakai jarak pipi sebagai landmark — posisi, ukuran, dan aksen daun hijau kini identik, selalu di belakang topi.</span></div>
+      </div>
     </div>
   </div>
 </section>
-
-<!-- GALLERY -->
 <section id="gallery">
   <div class="wrap">
     <div class="reveal">
@@ -338,7 +346,7 @@ footer small{opacity:.8;font-weight:700}
 <footer>
   <div class="wrap">
     <div class="brand"><span class="paw" id="footpaw"></span> FIEZEL Character Universe</div>
-    <small>Preview motion · aset dari PR #398 · 5 anomali diperbaiki · gaya flat‑design 2D dipertahankan</small>
+    <small>Preview motion · aset dari PR #398 · 6 anomali diperbaiki · 10 klip Remotion dengan blink + mouth motion</small>
   </div>
 </footer>
 
@@ -349,6 +357,7 @@ const CHECK='<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke=
 document.getElementById('navpaw').innerHTML=PAW;
 document.getElementById('footpaw').innerHTML=PAW;
 document.getElementById('ic1').innerHTML=CHECK; document.getElementById('ic2').innerHTML=CHECK;
+document.getElementById('ic3').innerHTML=CHECK;
 
 /* ---- Remotion clip reel ---- */
 const _t=document.createElement('video');
@@ -359,11 +368,14 @@ const MURL=f=>'/assets/motion/'+f+'.'+EXT;
 const POST=f=>'/assets/motion/posters/'+f+'.jpg';
 const CLIPS=[
   {f:'hero',           t:'Nusa & Mira',      d:'Idle + Wave · beda skala'},
-  {f:'nusa-wave',      t:'Nusa · Wave',      d:'Menyapa'},
+  {f:'nusa-wave',      t:'Nusa · Wave',      d:'Menyapa · kedip + mulut'},
   {f:'nusa-celebrate', t:'Nusa · Celebrate', d:'Melompat girang'},
+  {f:'nusa-oops',      t:'Nusa · Oops',      d:'Kaget + garuk kepala'},
+  {f:'nusa-curious',   t:'Nusa · Curious',   d:'Menoleh penasaran'},
+  {f:'nusa-thinking',  t:'Nusa · Thinking',  d:'Berpikir + gelembung ?'},
   {f:'nusa-sleep',     t:'Nusa · Sleep',     d:'Bernapas + Zzz'},
   {f:'mira-cheer',     t:'Mira · Cheer',     d:'Bersorak'},
-  {f:'mira-wave',      t:'Mira · Wave',      d:'Menyapa'},
+  {f:'mira-wave',      t:'Mira · Wave',      d:'Menyapa · kedip + mulut'},
   {f:'team-walk',      t:'Team · Walk',      d:'Berjalan menyusuri'},
 ];
 const feature=document.getElementById('feature'), clipTitle=document.getElementById('clipTitle'),
@@ -378,6 +390,7 @@ function loadClip(i){
 }
 CLIPS.forEach((c,i)=>{
   const d=document.createElement('div'); d.className='clip'+(i===0?' on':'');
+  d.setAttribute('data-testid','clip-'+c.f);
   d.innerHTML='<video src="'+MURL(c.f)+'" poster="'+POST(c.f)+'" muted loop autoplay playsinline preload="metadata"></video>'+
               '<div class="meta"><b>'+c.t+'</b><small>'+c.d+'</small></div>';
   d.onclick=()=>loadClip(i);
@@ -394,6 +407,7 @@ const GAL=[
 const gg=document.getElementById('gallery-grid');
 GAL.forEach(([c,p])=>{
   const d=document.createElement('div');d.className='gcard';
+  d.setAttribute('data-testid','gal-'+c+'-'+p);
   d.innerHTML='<div class="pic"><img loading="lazy" src="'+A+c+'/png/'+p+'.png" alt="'+c+' '+p+'"></div><small>'+c+' · '+p.replace('head-','').replace('-',' ')+'</small>';
   gg.appendChild(d);
 });
@@ -403,7 +417,7 @@ const NUSA_SPEC=[
   ['Proporsi tubuh','~3.2 kepala, badan mungil membulat'],
   ['Bulu emas + moncong krem','warna solid flat, tanpa gradasi realistis'],
   ['Bandana maroon + logo paw putih','selalu di leher, logo menghadap depan'],
-  ['Mata besar cokelat + kilau','ekspresi ramah & curious'],
+  ['Mata besar cokelat + kilau','kedip 3 frame + gerak mulut halus ✔'],
   ['Tas selempang cokelat','di pinggul kiri (kecuali head-shot)'],
   ['Ekor panjang melingkar','ikonik, ujung menggulung'],
   ['Empat jari tangan/kaki','tanpa jari cacat/berlebih'],
@@ -411,7 +425,7 @@ const NUSA_SPEC=[
 const MIRA_SPEC=[
   ['Proporsi chibi','~3 kepala, tubuh berisi & ramah'],
   ['Topi pith tan + band hijau','KINI konsisten di semua close-up ✔'],
-  ['Sanggul + aksen daun hijau','rambut cokelat tua'],
+  ['Sanggul + aksen daun hijau','posisi &amp; ukuran dikunci ke landmark kepala ✔'],
   ['Kacamata bulat + pipi merona','garis emas tipis'],
   ['Jaket hijau + kaus krem','lengan dilipat, dua saku'],
   ['Kompas kalung + badge paw emas','satu kompas saja (ganda dihapus ✔)'],
