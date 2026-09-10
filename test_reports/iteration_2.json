@@ -1,0 +1,32 @@
+{
+  "summary": "Frontend-only verification of FIEZEL character-preview.html (PR #398). All 10 motion clips play (readyState=4, videoWidth>0, currentTime advances) via .webm fallback in headless Chromium. New Nusa clips (oops/curious/thinking) + posters all HTTP 200. Bun before/after slider titled 'Mira · Sanggul (Hair Bun)' present with SEBELUM=/assets/characters/_orig/mira-full-wave.png (no bun) and SESUDAH=/assets/characters/mira/png/full-wave.png (bun present). Blink + subtle motion detected in nusa-wave and mira-wave clips via eye-band luminance sampling over 4s of playback (nusa: range 9.3, 38 darker-than-median frames; mira: range 26.75, 92 darker frames — darker frames cluster at ~1.4-1.7s indicating discrete blink events). Scale rule holds: hero Nusa 301.5px < hero Mira 430.4px. No console errors, no broken imgs, no horizontal overflow at 1920x800 or 390x844. All 13 Mira/team poses have the sanggul present.",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": [
+      {"screen": "Ekspresi gallery + hero PNGs", "issues": [
+        "Bun is present in every Mira/team pose (bug fix verified). Placement side varies with head orientation: appears upper-RIGHT of the pith hat with green leaf sprigs in most poses (full-wave, full-explain, full-cheer, head-happy, head-proud, head-thinking, team/shoulder-wave, team/highfive, team/teaching, team/walking). In three poses the bun appears on the upper-LEFT of the hat rather than upper-right and the green leaf sprig is not clearly visible: mira/full-neutral.png, mira/full-thinking.png, mira/head-explain.png. This is likely because the cheek-pair landmark in tools/mira-bun-fix.py is not perfectly mirrored for those head orientations. Bun is always drawn BEHIND the hat (canonical) and no pose has a floating/detached bun — so if the reviewer's canonical rule is 'always upper-right', flag these 3 poses; if 'follow head turn' is acceptable, this is fine.",
+        "In mira/head-explain.png specifically, the bun sits noticeably lower/left compared to head-happy and head-proud — worth a visual second look against the reference sheet."
+      ]}
+    ]
+  },
+  "test_report_links": [],
+  "action_items": [
+    "Optional: re-run tools/mira-bun-fix.py with an explicit 'always upper-right' anchor (or a face-direction flag) for mira/full-neutral, mira/full-thinking, mira/head-explain if the reference sheet mandates upper-right regardless of head turn. All other bun placements are consistent."
+  ],
+  "critical_code_review_comments": [
+    "character-preview.html slider (line 437-450) uses only mouse* + touch* events, no pointer events. Playwright's page.mouse.down/move/up dispatches PointerEvents that here get downgraded correctly and mousedown on .compare + mousemove on window works when triggered via JS dispatchEvent, so the code is functional; adding pointerdown/pointermove/pointerup listeners would make it more robust for headless tests and pen/stylus users.",
+    "10 clips × 2 codecs (mp4+webm) are loaded via <source> tags — good fallback; MP4 correctly returns error code 4 in Chromium-headless and the page swaps to webm as documented in the request. No changes needed.",
+    "No data-testid attributes anywhere on the preview page. For future automated regression testing, adding data-testid='clip-<slug>' on each .clip, data-testid='feature-video' on #feature, and data-testid='bun-slider' on the third .compare would speed up selection.",
+    "Bun sprite compositing is behind the character layer (verified in slider preview) — canonical look matches request."
+  ],
+  "updated_files": [],
+  "success_rate": {"backend": "n/a (frontend-only per request)", "frontend": "100% of stated acceptance criteria pass, with 3 minor bun-side observations flagged for review"},
+  "test_credentials": "none — static page, no auth",
+  "seed_data_creation": "none",
+  "retest_needed": false,
+  "should_main_agent_self_test": true,
+  "context_for_next_testing_agent": "Playwright headless Chromium cannot decode H.264, so always assert currentSrc.endsWith('.webm'). page.mouse-based drags on the .compare sliders did NOT move the divider in headless (real mouse events not captured), but synthesized events via page.evaluate + dispatchEvent(MouseEvent 'mousedown'/'mouseup') do work — divider.style.left updated from 50% to 9.89% and 89.93% correctly. Use that approach for slider testing. For video frame analysis, seek via `v.currentTime` after pause did NOT advance in headless (all seeks resolved at t=0); instead let the video play() and sample via requestAnimationFrame — that produced meaningful luminance variation showing blinks.",
+  "rca of the issue": "N/A — this iteration verifies fixes, no new bug found. Only design observation: mira/full-neutral, mira/full-thinking, mira/head-explain have the bun visually on the upper-LEFT of the hat instead of the canonical upper-RIGHT with leaf. Root cause is likely in /app/tools/mira-bun-fix.py where CANON_DX is computed from the cheek-pair midpoint but sign is not flipped when the head is turned in the opposite direction. Mitigation: add a per-pose FLIP_X override or detect face orientation from the eye/nose landmarks."
+}
