@@ -1,0 +1,2610 @@
+{
+ "generated": "audit multilingual th — literal id di modul terkirim, tidak terdaftar di copy-map id",
+ "total": 594,
+ "files": {
+  "content-canary.js": {
+   "count": 2,
+   "i18nWired": 0,
+   "samples": [
+    {
+     "line": 80,
+     "text": "target missing"
+    },
+    {
+     "line": 92,
+     "text": "target missing"
+    }
+   ]
+  },
+  "features/diagnostics/fiezel-module-selftests.js": {
+   "count": 4,
+   "i18nWired": 2,
+   "samples": [
+    {
+     "line": 214,
+     "text": "Kita memakai pola ini karena hasilnya masih terasa sekarang"
+    },
+    {
+     "line": 219,
+     "text": "Mari kita lihat polanya,"
+    },
+    {
+     "line": 219,
+     "text": "lalu kita coba contohnya,"
+    },
+    {
+     "line": 219,
+     "text": "dan sekarang selesai."
+    }
+   ]
+  },
+  "features/neural-voice/fiezel-diag-panel.js": {
+   "count": 25,
+   "i18nWired": 0,
+   "samples": [
+    {
+     "line": 86,
+     "text": "(modul cf-shadow belum dimuat)"
+    },
+    {
+     "line": 94,
+     "text": "(tidak ada)"
+    },
+    {
+     "line": 102,
+     "text": "(player tidak tersedia)"
+    },
+    {
+     "line": 107,
+     "text": "(player tidak tersedia)"
+    },
+    {
+     "line": 127,
+     "text": "(kill switch CF belum dimuat)"
+    },
+    {
+     "line": 134,
+     "text": "(FiezelVoiceRuntime tidak ada)"
+    },
+    {
+     "line": 148,
+     "text": "(navigator.storage.estimate tidak tersedia)"
+    },
+    {
+     "line": 188,
+     "text": "(CacheStorage tidak tersedia)"
+    },
+    {
+     "line": 211,
+     "text": "(FiezelVoiceRuntime tidak ada)"
+    },
+    {
+     "line": 227,
+     "text": "(pengunduh suara cadangan belum dimuat)"
+    },
+    {
+     "line": 236,
+     "text": " dari "
+    },
+    {
+     "line": 242,
+     "text": "Gagal membaca kemajuan: "
+    },
+    {
+     "line": 249,
+     "text": "Gagal membentuk JSON: "
+    },
+    {
+     "line": 328,
+     "text": "Cari event penting langsung di bawah. Kirim isi kotak ini ke coordinator bila perlu."
+    },
+    {
+     "line": 461,
+     "text": "<div>Bayangan CF: (ringkasan tidak terbaca)</div>"
+    },
+    {
+     "line": 465,
+     "text": "<div>(belum ada permintaan bayangan — endpoint shadow belum menyala)</div>"
+    },
+    {
+     "line": 484,
+     "text": "<th>gagal P/CF</th><th>puter</th><th>cf</th><th>selisih</th><th align=\"left\">kunci beda</th>"
+    },
+    {
+     "line": 493,
+     "text": "modul cf-shadow belum dimuat"
+    },
+    {
+     "line": 515,
+     "text": "Salin manual dari kotak"
+    },
+    {
+     "line": 518,
+     "text": "Salin manual dari kotak"
+    },
+    {
+     "line": 606,
+     "text": "diagnostic bus tidak tersedia"
+    },
+    {
+     "line": 625,
+     "text": "Tidak ada modul terdaftar."
+    },
+    {
+     "line": 658,
+     "text": "Jalur audio: modul pemutar belum dimuat."
+    },
+    {
+     "line": 672,
+     "text": "). Jalur audio kembali normal - tutup FIEZEL sepenuhnya lalu buka lagi."
+    },
+    {
+     "line": 706,
+     "text": "Ringkasan belum siap. Tutup lalu buka lagi Diagnostics."
+    }
+   ]
+  },
+  "features/mascot/fiezel-mascot.js": {
+   "count": 4,
+   "i18nWired": 0,
+   "samples": [
+    {
+     "line": 539,
+     "text": "[fiezel-mascot] setState: state tidak dikenal: \"${name}\""
+    },
+    {
+     "line": 802,
+     "text": "[fiezel-mascot] react: event tidak dikenal: \"${evt}\""
+    },
+    {
+     "line": 843,
+     "text": "[fiezel-mascot] applyFace: ekspresi tidak dikenal: \"${name}\""
+    },
+    {
+     "line": 860,
+     "text": "[fiezel-mascot] applyPose: pose tidak dikenal: \"${name}\""
+    }
+   ]
+  },
+  "features/mascot/fiezel-paw-slot.js": {
+   "count": 1,
+   "i18nWired": 0,
+   "samples": [
+    {
+     "line": 104,
+     "text": "quiz:tanpa-sesi"
+    }
+   ]
+  },
+  "features/ui/fiezel-coach-bubble.js": {
+   "count": 14,
+   "i18nWired": 1,
+   "samples": [
+    {
+     "line": 159,
+     "text": "Satu pola dulu, jangan borong semua."
+    },
+    {
+     "line": 161,
+     "text": "Dengerin dua kali sebelum lihat teksnya, ya."
+    },
+    {
+     "line": 161,
+     "text": "Ga nangkep? Wajar. Ulang sekali lagi."
+    },
+    {
+     "line": 163,
+     "text": "Dikit tapi jadi, lebih baik daripada panjang tapi ga selesai."
+    },
+    {
+     "line": 164,
+     "text": "Speaking sama Listening paling cepat naik kalau rutin."
+    },
+    {
+     "line": 166,
+     "text": "Materi ini ada subtitle Indonesianya, tenang."
+    },
+    {
+     "line": 167,
+     "text": "Ini peta kemampuanmu — bukan rapor."
+    },
+    {
+     "line": 168,
+     "text": "Jawab apa adanya, ini buat ngukur, bukan buat nilai."
+    },
+    {
+     "line": 168,
+     "text": "Ga usah tegang, ga ada yang lihat."
+    },
+    {
+     "line": 183,
+     "text": ". Itu dari bukti latihan yang udah masuk, bukan tebakan — makin sering latihan, makin akurat."
+    },
+    {
+     "line": 186,
+     "text": ". Sepuluh soal aja, ga usah lama."
+    },
+    {
+     "line": 209,
+     "text": "Buka pembimbing FIEZEL"
+    },
+    {
+     "line": 365,
+     "text": "Kasih satu tips singkat biar speaking dan listening cepat lancar."
+    },
+    {
+     "line": 406,
+     "text": "lagi mikir…"
+    }
+   ]
+  },
+  "features/brain/fiezel-tutor-brain.js": {
+   "count": 10,
+   "i18nWired": 0,
+   "samples": [
+    {
+     "line": 531,
+     "text": "\" vs bentuk benar \""
+    },
+    {
+     "line": 534,
+     "text": "Langkah 3 - jadi bentuk yang dipakai: \""
+    },
+    {
+     "line": 535,
+     "text": ": ikuti bentuk yang diminta konteksnya."
+    },
+    {
+     "line": 537,
+     "text": "Ini yang bikin pilihan tadi gagal - "
+    },
+    {
+     "line": 539,
+     "text": ". Coba pikirkan lagi dari situ."
+    },
+    {
+     "line": 541,
+     "text": ". Sekarang coba lagi."
+    },
+    {
+     "line": 542,
+     "text": ". Sekarang coba lagi."
+    },
+    {
+     "line": 551,
+     "text": "Sesi ini kamu benar-benar melewati "
+    },
+    {
+     "line": 551,
+     "text": " hal yang tadinya bikin keliru."
+    },
+    {
+     "line": 552,
+     "text": " pola yang masih mengganjal - itu yang kita kejar sesi berikutnya."
+    }
+   ]
+  },
+  "features/brain/fiezel-olm.js": {
+   "count": 12,
+   "i18nWired": 0,
+   "samples": [
+    {
+     "line": 214,
+     "text": ", jawaban berulang kali memakai bentuk \\u00ab"
+    },
+    {
+     "line": 214,
+     "text": "\\u00bb. Pola ini akan diuji ulang pada latihan berikutnya."
+    },
+    {
+     "line": 215,
+     "text": ", pola jawaban berulang kali mengarah ke \\u00ab"
+    },
+    {
+     "line": 215,
+     "text": "\\u00bb. Pola ini akan diuji ulang pada latihan berikutnya."
+    },
+    {
+     "line": 216,
+     "text": ", ada pola jawaban yang berulang dan perlu diuji ulang."
+    },
+    {
+     "line": 217,
+     "text": " sudah tidak muncul lagi \\u2014 jawaban terakhir konsisten memakai bentuk baku."
+    },
+    {
+     "line": 218,
+     "text": "Kamu memprediksi benar "
+    },
+    {
+     "line": 218,
+     "text": "%. Sebelum menjawab, coba sebutkan dulu alasan jawabanmu \\u2014 kalau alasannya belum bisa "
+    },
+    {
+     "line": 219,
+     "text": "Kamu memprediksi benar "
+    },
+    {
+     "line": 219,
+     "text": "%. Jawaban-jawabanmu lebih akurat daripada taksiranmu \\u2014 saat polanya sudah dikenali, "
+    },
+    {
+     "line": 220,
+     "text": "%) dan hasil aktual ("
+    },
+    {
+     "line": 220,
+     "text": "%) sudah sejalan. Pertahankan kebiasaan menaksir sebelum menjawab \\u2014 kebiasaan itu yang "
+    }
+   ]
+  },
+  "features/brain/fiezel-step-tutor.js": {
+   "count": 16,
+   "i18nWired": 0,
+   "samples": [
+    {
+     "line": 80,
+     "text": "coba kenali dulu — "
+    },
+    {
+     "line": 80,
+     "text": " — yang mana di kalimat ini?"
+    },
+    {
+     "line": 81,
+     "text": "dari petunjuk tadi, "
+    },
+    {
+     "line": 81,
+     "text": " mana yang paling cocok?"
+    },
+    {
+     "line": 82,
+     "text": "sekarang terapkan — "
+    },
+    {
+     "line": 83,
+     "text": " — mana yang lebih sesuai?"
+    },
+    {
+     "line": 84,
+     "text": "singkirkan yang tidak mungkin — "
+    },
+    {
+     "line": 84,
+     "text": " — pilihan mana yang gugur?"
+    },
+    {
+     "line": 85,
+     "text": "periksa lagi — "
+    },
+    {
+     "line": 85,
+     "text": " — sudah benar?"
+    },
+    {
+     "line": 86,
+     "text": "Sekarang gabungkan langkah-langkah tadi"
+    },
+    {
+     "line": 88,
+     "text": "Jawab soalnya: \""
+    },
+    {
+     "line": 89,
+     "text": "\\u0041pa jaw\\u0061banmu \\u0075ntuk so\\u0061l ini?"
+    },
+    {
+     "line": 220,
+     "text": "Sekarang gabungkan langkah-langkah tadi"
+    },
+    {
+     "line": 220,
+     "text": " — jadi jawaban soalnya: \""
+    },
+    {
+     "line": 221,
+     "text": "Jawab soalnya: \""
+    }
+   ]
+  },
+  "features/brain/fiezel-listening-adaptive.js": {
+   "count": 1,
+   "i18nWired": 0,
+   "samples": [
+    {
+     "line": 290,
+     "text": "Keputusan listening adaptif tanpa penjelasan terdaftar ("
+    }
+   ]
+  },
+  "features/brain/fiezel-speaking-adaptive.js": {
+   "count": 1,
+   "i18nWired": 0,
+   "samples": [
+    {
+     "line": 440,
+     "text": "Keputusan speaking adaptif tanpa penjelasan terdaftar ("
+    }
+   ]
+  },
+  "features/brain/fiezel-srl-coach.js": {
+   "count": 16,
+   "i18nWired": 0,
+   "samples": [
+    {
+     "line": 157,
+     "text": " — di situ jawabanmu paling sering meleset belakangan ini"
+    },
+    {
+     "line": 159,
+     "text": "Mau ke mana sesi ini"
+    },
+    {
+     "line": 160,
+     "text": " soal)"
+    },
+    {
+     "line": 165,
+     "text": "Kamu yakin "
+    },
+    {
+     "line": 165,
+     "text": " tapi benar "
+    },
+    {
+     "line": 165,
+     "text": ". Taksiranmu lebih tinggi dari hasilnya — sebelum memilih jawaban, sebutkan dulu "
+    },
+    {
+     "line": 165,
+     "text": "aturannya dalam satu kalimat; kalau kalimat itu tidak keluar, turunkan taksiranmu."
+    },
+    {
+     "line": 166,
+     "text": "Kamu menaksir "
+    },
+    {
+     "line": 166,
+     "text": " padahal benar "
+    },
+    {
+     "line": 166,
+     "text": ". Jawabanmu lebih tepat dari taksiranmu — saat pola soalnya sudah pernah kamu "
+    },
+    {
+     "line": 166,
+     "text": "kerjakan dengan benar, berani pasang taksiran yang lebih tinggi."
+    },
+    {
+     "line": 167,
+     "text": ") cocok dengan hasilnya ("
+    },
+    {
+     "line": 167,
+     "text": "). Cara menaksir seperti ini layak dipertahankan — lanjutkan menaksir sebelum melihat kunci."
+    },
+    {
+     "line": 169,
+     "text": " Tiga sesi berturut-turut taksiranmu akurat, jadi pertanyaan "
+    },
+    {
+     "line": 169,
+     "text": "keyakinan akan berhenti muncul selama "
+    },
+    {
+     "line": 169,
+     "text": " sesi ke depan."
+    }
+   ]
+  },
+  "features/brand/fiezel-choreography.js": {
+   "count": 8,
+   "i18nWired": 0,
+   "samples": [
+    {
+     "line": 55,
+     "text": "partikel emas menyala dari kegelapan dan mulai mengalir mencari huruf F"
+    },
+    {
+     "line": 59,
+     "text": "batang tegak huruf F mengental lebih dulu dari kabut partikel"
+    },
+    {
+     "line": 61,
+     "text": "dua lengan huruf F menebal dan menyusun dirinya"
+    },
+    {
+     "line": 66,
+     "text": "batang emas pertama memadat dari kabut yang menunggu"
+    },
+    {
+     "line": 69,
+     "text": "batang emas kedua memadat; wordmark kecil naik dari tepi bawah"
+    },
+    {
+     "line": 72,
+     "text": "ekualiser mengayun: batang pertama memantul pada ketukan skor"
+    },
+    {
+     "line": 78,
+     "text": "ekualiser: pantulan ketiga, ayunannya mulai mengecil"
+    },
+    {
+     "line": 81,
+     "text": "ekualiser: ketukan penutup naik ke nada kesembilan yang menggantung"
+    }
+   ]
+  },
+  "features/audio/fiezel-ui-sfx.js": {
+   "count": 8,
+   "i18nWired": 0,
+   "samples": [
+    {
+     "line": 304,
+     "text": "audio decode tidak tersedia"
+    },
+    {
+     "line": 431,
+     "text": "tidak dapat dideteksi dari web"
+    },
+    {
+     "line": 438,
+     "text": "tidak didukung peramban ini"
+    },
+    {
+     "line": 439,
+     "text": "tidak terbaca"
+    },
+    {
+     "line": 570,
+     "text": "[FiezelUiSfx] bunyi tidak dikenal: \""
+    },
+    {
+     "line": 570,
+     "text": "\" - tidak ada di manifest 27 SFX"
+    },
+    {
+     "line": 611,
+     "text": "[FiezelUiSfx] bunyi tidak dikenal: \""
+    },
+    {
+     "line": 611,
+     "text": "\" - tidak ada di manifest 27 SFX"
+    }
+   ]
+  },
+  "features/library/fiezel-library-ui.js": {
+   "count": 7,
+   "i18nWired": 1,
+   "samples": [
+    {
+     "line": 82,
+     "text": "baru menyatu ketika bloknya sudah tumbuh"
+    },
+    {
+     "line": 562,
+     "text": "<button type=\"button\" id=\"libraryPrev\" data-step=\"-1\" aria-label=\"Kalimat sebelumnya\"><i data-lucide=\"chevron-left\"></i></button>"
+    },
+    {
+     "line": 564,
+     "text": "<button type=\"button\" id=\"libraryNext\" data-step=\"1\" aria-label=\"Kalimat berikutnya\"><i data-lucide=\"chevron-right\"></i></button>"
+    },
+    {
+     "line": 718,
+     "text": "<button type=\"button\" id=\"libraryCloseOne\" aria-label=\"Tutup terjemahan\"><i data-lucide=\"x\"></i></button>"
+    },
+    {
+     "line": 771,
+     "text": "<h2>Tanya tentang bacaan ini</h2>"
+    },
+    {
+     "line": 773,
+     "text": "<textarea name=\"question\" rows=\"3\" maxlength=\"240\" placeholder=\"Contoh: kenapa pakai kata was di sini?\" required></textarea>"
+    },
+    {
+     "line": 774,
+     "text": "<div class=\"library-ask-actions\"><button type=\"button\" data-cancel>Tutup</button>"
+    }
+   ]
+  },
+  "features/speaking-listening/gems-core.js": {
+   "count": 3,
+   "i18nWired": 0,
+   "samples": [
+    {
+     "line": 73,
+     "text": "1 gem per sesi · saldo kamu: "
+    },
+    {
+     "line": 79,
+     "text": "Gem Terjemahan kamu: "
+    },
+    {
+     "line": 79,
+     "text": ". Didapat gratis dari streak jawaban benar, dipakai buat terjemahan otomatis."
+    }
+   ]
+  },
+  "features/prasasti/fiezel-prasasti-core.js": {
+   "count": 13,
+   "i18nWired": 0,
+   "samples": [
+    {
+     "line": 38,
+     "text": "Satu sesi lesson grammar penuh selesai — jalurmu resmi dimulai."
+    },
+    {
+     "line": 38,
+     "text": "Selesaikan 1 sesi lesson grammar"
+    },
+    {
+     "line": 39,
+     "text": "Lulus Ujian Skip Level — levelmu terverifikasi dari bukti, bukan klaim."
+    },
+    {
+     "line": 40,
+     "text": "Satu buku Perpustakaan dibaca sampai kalimat terakhir."
+    },
+    {
+     "line": 41,
+     "text": "Belajar bermakna 7 hari beruntun."
+    },
+    {
+     "line": 41,
+     "text": "Jaga runtun 7 hari"
+    },
+    {
+     "line": 42,
+     "text": "Belajar bermakna 30 hari beruntun."
+    },
+    {
+     "line": 42,
+     "text": "Jaga runtun 30 hari"
+    },
+    {
+     "line": 43,
+     "text": "Seratus Hari"
+    },
+    {
+     "line": 43,
+     "text": "Belajar bermakna 100 hari beruntun — kebiasaan yang sudah jadi milikmu."
+    },
+    {
+     "line": 43,
+     "text": "Jaga runtun 100 hari"
+    },
+    {
+     "line": 45,
+     "text": "5 sesi berbeda menerbitkan Gem dari runtun 5 jawaban benar."
+    },
+    {
+     "line": 45,
+     "text": "Terbitkan Gem di 5 sesi berbeda"
+    }
+   ]
+  },
+  "features/speaking-listening/fiezel-speaking-listening-addon.js": {
+   "count": 22,
+   "i18nWired": 2,
+   "samples": [
+    {
+     "line": 475,
+     "text": "sesi dengar sudah selesai"
+    },
+    {
+     "line": 483,
+     "text": "<article class=\"fsl-card\"><span class=\"fsl-kicker\">Listening berformat ujian</span><h2>IELTS &amp; TOEFL Listening</h2><p>Belum ada set untuk level ${esc(active)}. Yang sudah tersedia: ${esc(this.repo.listeningExamLevels().join(', ')||'-')}.</p></article>"
+    },
+    {
+     "line": 483,
+     "text": "Speech recognition tersedia untuk target-language coverage."
+    },
+    {
+     "line": 483,
+     "text": "Speech recognition tidak tersedia; mode rekam-dengar mandiri tetap dapat dipakai jika microphone recording tersedia."
+    },
+    {
+     "line": 483,
+     "text": "<article class=\"fsl-card\"><span class=\"fsl-kicker\">Latihan berformat ujian</span><h2>IELTS &amp; TOEFL Speaking</h2><p>Belum ada set untuk level ${esc(active)}. Yang sudah tersedia: ${esc(this.repo.examLevels().join(', ')||'-')}.</p></article>"
+    },
+    {
+     "line": 483,
+     "text": "neural belum diunduh"
+    },
+    {
+     "line": 486,
+     "text": "<section class=\"fsl-shell\"><article class=\"fsl-card\"><span class=\"fsl-kicker\">${esc(domain)}</span><h2>Pilih level</h2><div class=\"fsl-levels\">${LEVELS.map(l=>"
+    },
+    {
+     "line": 489,
+     "text": "<input class=\"fsl-input\" data-dictation autocomplete=\"off\" spellcheck=\"false\" placeholder=\"Ketik yang kamu dengar…\"><div class=\"fsl-actions\"><button class=\"fsl-primary\" data-submit>Nilai jawaban</button></div>"
+    },
+    {
+     "line": 621,
+     "text": "<small class=\"fsl-privacy\">${esc(copy.autoNote)} · butuh jaringan, hasilnya belum dikurasi</small></div>"
+    },
+    {
+     "line": 648,
+     "text": "<label class=\"fsl-notes-label\">Catatanmu (tidak disimpan)<textarea class=\"fsl-notes\" data-notes rows=\"5\" placeholder=\"Catat sambil mendengar…\"></textarea></label>"
+    },
+    {
+     "line": 680,
+     "text": "${T('skillslab.audio-tidak-can-diputar-item',{message:esc(error.message||error)})}"
+    },
+    {
+     "line": 690,
+     "text": "${T('skillslab.from-right-this-skor-practice',{correct:result.correct,total:result.total})}"
+    },
+    {
+     "line": 696,
+     "text": "<span>${row.correct?'Benar':"
+    },
+    {
+     "line": 710,
+     "text": "<button class=\"fsl-primary\" data-recognize>Mulai bicara</button>"
+    },
+    {
+     "line": 710,
+     "text": "Speech recognition tidak tersedia; gunakan rekam-dengar mandiri."
+    },
+    {
+     "line": 713,
+     "text": "}<p class=\"fsl-privacy\">Penilaian otomatis hanya spoken production / target coverage. Ini bukan pengukuran phoneme/pronunciation.</p><div class=\"fsl-actions\">${c.speechRecognition?"
+    },
+    {
+     "line": 713,
+     "text": "Speech recognition tidak tersedia; gunakan rekam-dengar mandiri tanpa skor otomatis."
+    },
+    {
+     "line": 721,
+     "text": "Tidak dapat menilai otomatis: ${esc(err.message)}."
+    },
+    {
+     "line": 757,
+     "text": "Skor ${result.score}% hanya mengukur ${result.metric.replace(/_/g,' ')}; bukan pronunciation."
+    },
+    {
+     "line": 757,
+     "text": "Skor ${result.score}%."
+    },
+    {
+     "line": 768,
+     "text": "runtun dalam sesi listening"
+    },
+    {
+     "line": 780,
+     "text": "${T('skillslab.session-complete-selesai-evidence-sidecar',{Speaking:this.domain==='listening'?'Listening':'Speaking',attempts:d.attempts,averageScore:d.averageScore??'-',passRate:d.passRate??'-'})}"
+    }
+   ]
+  },
+  "features/neural-voice/fiezel-neural-voice-config.js": {
+   "count": 2,
+   "i18nWired": 0,
+   "samples": [
+    {
+     "line": 51,
+     "text": "model berjalan di Worker; kokoro menjalankan WASM panjang di main thread dan membunuh content process iOS"
+    },
+    {
+     "line": 83,
+     "text": "Cadangan terakhir bila render server dan mesin perangkat sama-sama tidak tersedia."
+    }
+   ]
+  },
+  "features/neural-voice/fiezel-prosody.js": {
+   "count": 5,
+   "i18nWired": 0,
+   "samples": [
+    {
+     "line": 90,
+     "text": "selain itu"
+    },
+    {
+     "line": 90,
+     "text": "oleh karena itu"
+    },
+    {
+     "line": 90,
+     "text": "dengan kata lain"
+    },
+    {
+     "line": 91,
+     "text": "abis itu"
+    },
+    {
+     "line": 102,
+     "text": "yang mana"
+    }
+   ]
+  },
+  "features/search/fiezel-search.js": {
+   "count": 2,
+   "i18nWired": 0,
+   "samples": [
+    {
+     "line": 50,
+     "text": "kata bantu"
+    },
+    {
+     "line": 73,
+     "text": "perbaiki kalimat"
+    }
+   ]
+  },
+  "features/neural-voice/fiezel-cf-voice-notice.js": {
+   "count": 20,
+   "i18nWired": 0,
+   "samples": [
+    {
+     "line": 53,
+     "text": "Jatah suara hari ini sudah habis"
+    },
+    {
+     "line": 54,
+     "text": "Aku pakai suara perangkat dulu untuk sisa sesi ini. Bunyinya beda, pelajarannya tetap jalan."
+    },
+    {
+     "line": 55,
+     "text": "Perangkat ini juga belum punya suara cadangan, jadi kalimat ini belum bisa dibunyikan. Teksnya tetap bisa kamu baca, dan jatahnya kembali setelah tengah malam."
+    },
+    {
+     "line": 60,
+     "text": "Aku pakai suara perangkat dulu. Pelajarannya tidak berhenti."
+    },
+    {
+     "line": 61,
+     "text": "Suaranya belum bisa dibunyikan sekarang. Teksnya tetap ada, dan jatahnya kembali setelah tengah malam."
+    },
+    {
+     "line": 65,
+     "text": "Jatah suara hari ini hampir habis"
+    },
+    {
+     "line": 66,
+     "text": "Masih berbunyi seperti biasa. Kalau nanti habis, aku pindah ke suara perangkat."
+    },
+    {
+     "line": 67,
+     "text": "Suaranya belum berbunyi untuk kalimat ini. Teksnya tetap bisa kamu baca."
+    },
+    {
+     "line": 72,
+     "text": "Aku pakai suara perangkat untuk kalimat ini. Tunggu sebentar sebelum menekan lagi."
+    },
+    {
+     "line": 73,
+     "text": "Kalimat ini belum bisa dibunyikan. Tunggu beberapa detik lalu coba lagi — teksnya tetap ada."
+    },
+    {
+     "line": 77,
+     "text": "Layanan suara sedang istirahat sebentar"
+    },
+    {
+     "line": 78,
+     "text": "Suara dari perangkat dulu, ya. Ini bukan kesalahanmu dan tidak ada yang hilang."
+    },
+    {
+     "line": 79,
+     "text": "Aku belum berhasil membunyikan kalimat ini. Bukan kamu yang salah — teksnya tetap bisa dibaca, dan suaranya biasanya kembali dalam beberapa menit."
+    },
+    {
+     "line": 83,
+     "text": "Suara gagal disiapkan"
+    },
+    {
+     "line": 84,
+     "text": "Aku pakai suara perangkat untuk kalimat ini."
+    },
+    {
+     "line": 85,
+     "text": "Aku belum berhasil membunyikan kalimat ini. Teksnya tetap bisa kamu baca, dan kamu boleh mencoba lagi sekarang."
+    },
+    {
+     "line": 89,
+     "text": "Suara belum tersedia untuk kalimat ini"
+    },
+    {
+     "line": 91,
+     "text": "Aku belum berhasil membunyikan kalimat ini. Teksnya tetap bisa kamu baca, dan kamu boleh menekan Dengarkan lagi."
+    },
+    {
+     "line": 97,
+     "text": "Item ini tidak dinilai dan tidak dikunci."
+    },
+    {
+     "line": 130,
+     "text": " Jatah berikutnya mulai jam "
+    }
+   ]
+  },
+  "features/neural-voice/fiezel-voice-say.js": {
+   "count": 1,
+   "i18nWired": 0,
+   "samples": [
+    {
+     "line": 211,
+     "text": "giliran bicara selesai"
+    }
+   ]
+  },
+  "features/neural-voice/fiezel-speech-bridge.js": {
+   "count": 2,
+   "i18nWired": 0,
+   "samples": [
+    {
+     "line": 96,
+     "text": "murid mematikan animasi"
+    },
+    {
+     "line": 246,
+     "text": "tidak pernah mengepak di atas keheningan"
+    }
+   ]
+  },
+  "features/neural-voice/fiezel-voice-persona.js": {
+   "count": 1,
+   "i18nWired": 0,
+   "samples": [
+    {
+     "line": 55,
+     "text": "luar biasa"
+    }
+   ]
+  },
+  "features/neural-voice/fiezel-neural-voice-bootstrap.js": {
+   "count": 1,
+   "i18nWired": 0,
+   "samples": [
+    {
+     "line": 187,
+     "text": "Penyimpanan tidak cukup untuk suara offline. Butuh sekitar ${needMb} MB ruang origin, tersedia sekitar ${availableMb} MB."
+    }
+   ]
+  },
+  "features/neural-voice/fiezel-neural-voice-ios-cache-fix.js": {
+   "count": 1,
+   "i18nWired": 0,
+   "samples": [
+    {
+     "line": 111,
+     "text": "Penyimpanan tidak cukup untuk suara offline. Butuh sekitar ${Math.ceil((missingBytes+reserve)/1000000)} MB ruang origin, tersedia sekitar ${Math.floor(available/1000000)} MB."
+    }
+   ]
+  },
+  "features/neural-voice/fiezel-neural-voice-audibility-fix.js": {
+   "count": 2,
+   "i18nWired": 0,
+   "samples": [
+    {
+     "line": 148,
+     "text": "Suara neural sedang bermasalah. Audio sementara memakai suara perangkat; coba lagi setelah mesin neural siap."
+    },
+    {
+     "line": 169,
+     "text": "Aset suara offline belum lengkap. Siapkan sekali untuk mengunduh dan memverifikasi model lokal."
+    }
+   ]
+  },
+  "features/neural-voice/fiezel-voice-offline-autoload.js": {
+   "count": 6,
+   "i18nWired": 0,
+   "samples": [
+    {
+     "line": 299,
+     "text": "belum mulai"
+    },
+    {
+     "line": 301,
+     "text": "mesin suara belum dimuat"
+    },
+    {
+     "line": 304,
+     "text": "perangkat ini tidak punya Cache Storage"
+    },
+    {
+     "line": 308,
+     "text": "cache tidak bisa dibuka"
+    },
+    {
+     "line": 324,
+     "text": "sedang mengunduh"
+    },
+    {
+     "line": 327,
+     "text": "belum mulai (belum ada login terdeteksi)"
+    }
+   ]
+  },
+  "features/tutor-classroom/fiezel-tutor-v3.js": {
+   "count": 9,
+   "i18nWired": 1,
+   "samples": [
+    {
+     "line": 138,
+     "text": "Kalau aku bilang I've lost my key, masalah apa yang kemungkinan penting sekarang?"
+    },
+    {
+     "line": 151,
+     "text": "Tepat. Kehilangannya terjadi sebelumnya, tetapi akibatnya masih terhubung dengan sekarang."
+    },
+    {
+     "line": 155,
+     "text": "Lihat akibatnya, bukan hanya waktu lampau. Kunci yang hilang membuat masalah sekarang."
+    },
+    {
+     "line": 162,
+     "text": "Sekarang polanya lebih masuk akal: subjek, have atau has, lalu bentuk ketiga kata kerja."
+    },
+    {
+     "line": 173,
+     "text": "Satu jebakannya adalah went dan gone. Went adalah simple past. Setelah have, bahasa Inggris membutuhkan bentuk ketiga: gone."
+    },
+    {
+     "line": 198,
+     "text": "Kita sederhanakan jadi peta bentuk. Have atau has membuka pola, lalu kata kerja harus bentuk ketiga. Go, went, gone: setelah have, pilih gone."
+    },
+    {
+     "line": 236,
+     "text": "Kita hubungkan pertanyaanmu dengan checkpoint pelajaran. Intinya adalah hubungan antara tindakan sebelumnya dan situasi sekarang. Kita bisa memakai ide itu untuk menguji contohmu."
+    },
+    {
+     "line": 587,
+     "text": "Fiezel sedang menjelaskan…"
+    },
+    {
+     "line": 602,
+     "text": "Suara tidak berbunyi. Subtitle dan lesson state tetap aman."
+    }
+   ]
+  },
+  "features/tutor-classroom/fiezel-tutor-dialog.js": {
+   "count": 14,
+   "i18nWired": 1,
+   "samples": [
+    {
+     "line": 44,
+     "text": "ulang lagi"
+    },
+    {
+     "line": 44,
+     "text": "sekali lagi"
+    },
+    {
+     "line": 52,
+     "text": "apa itu"
+    },
+    {
+     "line": 54,
+     "text": "belum paham"
+    },
+    {
+     "line": 54,
+     "text": "tidak mengerti"
+    },
+    {
+     "line": 282,
+     "text": "Kamu adalah FIEZEL, asisten belajar berbahasa Indonesia milik "
+    },
+    {
+     "line": 283,
+     "text": "Kamu adalah FIEZEL, asisten belajar berbahasa Indonesia."
+    },
+    {
+     "line": 284,
+     "text": "Jawab pertanyaan APA PUN yang ditanyakan, termasuk yang tidak berhubungan dengan pelajaran bahasa Inggris."
+    },
+    {
+     "line": 285,
+     "text": "Jangan menolak pertanyaan hanya karena berada di luar materi, dan jangan mengalihkan balik ke materi kecuali memang diminta."
+    },
+    {
+     "line": 286,
+     "text": "Gaya bicara hangat dan wajar seperti orang yang sedang menjelaskan langsung, bukan daftar aturan."
+    },
+    {
+     "line": 287,
+     "text": "Maksimal 4 kalimat. Kalau pertanyaannya tentang bahasa Inggris, sertakan satu contoh kalimat."
+    },
+    {
+     "line": 288,
+     "text": "Kalau kamu tidak tahu jawabannya, katakan tidak tahu dengan jujur."
+    },
+    {
+     "line": 289,
+     "text": "Jangan mengulang kalimat pembuka yang sama setiap jawaban."
+    },
+    {
+     "line": 292,
+     "text": "Konteks opsional, hanya dipakai bila relevan - materi yang sedang dibuka: "
+    }
+   ]
+  },
+  "grammar-labels-id.js": {
+   "count": 130,
+   "i18nWired": 0,
+   "samples": [
+    {
+     "line": 14,
+     "text": "Kebiasaan atau sedang berlangsung: present simple dan present continuous"
+    },
+    {
+     "line": 15,
+     "text": "Waktu lampau yang jelas atau masih terhubung sekarang: past simple dan present perfect"
+    },
+    {
+     "line": 17,
+     "text": "Kejadian yang sedang berlangsung lalu terpotong: past continuous dan past simple"
+    },
+    {
+     "line": 18,
+     "text": "Menekankan lamanya atau hasilnya: present perfect continuous dan present perfect simple"
+    },
+    {
+     "line": 19,
+     "text": "Menyusun dua kejadian lampau dengan past perfect"
+    },
+    {
+     "line": 20,
+     "text": "Sedang berlangsung nanti atau sudah selesai nanti: future continuous dan future perfect"
+    },
+    {
+     "line": 21,
+     "text": "Rencana masa depan yang diceritakan dari masa lalu: would dan was going to"
+    },
+    {
+     "line": 22,
+     "text": "Menghitung lamanya sampai satu batas waktu dengan future perfect continuous"
+    },
+    {
+     "line": 23,
+     "text": "Kilas balik atau urutan maju dalam cerita: past perfect dan past simple"
+    },
+    {
+     "line": 24,
+     "text": "Kebiasaan lama: used to, would, dan past simple"
+    },
+    {
+     "line": 25,
+     "text": "Menjelaskan sebab yang berlangsung lama sebelumnya dengan past perfect continuous"
+    },
+    {
+     "line": 26,
+     "text": "Rentang waktu yang belum berakhir dengan present perfect"
+    },
+    {
+     "line": 28,
+     "text": "Kata kerja keadaan yang tidak dipakai dalam bentuk -ing"
+    },
+    {
+     "line": 31,
+     "text": "Kewajiban atau izin: memilih modal yang tepat"
+    },
+    {
+     "line": 32,
+     "text": "Menyimpulkan keadaan sekarang dengan must, might, dan can’t"
+    },
+    {
+     "line": 33,
+     "text": "Kemampuan di masa lalu: could dan was able to"
+    },
+    {
+     "line": 34,
+     "text": "Menyimpulkan kejadian lampau: must have dan can’t have"
+    },
+    {
+     "line": 35,
+     "text": "Tidak perlu atau tidak boleh: needn’t dan mustn’t"
+    },
+    {
+     "line": 36,
+     "text": "Memberi saran: should, ought to, dan had better"
+    },
+    {
+     "line": 37,
+     "text": "Tingkat keyakinan: may, might, could, dan will"
+    },
+    {
+     "line": 38,
+     "text": "Menyesali masa lalu: should have dan shouldn’t have"
+    },
+    {
+     "line": 39,
+     "text": "Menegur atau menyebut peluang yang lewat: should have dan could have"
+    },
+    {
+     "line": 40,
+     "text": "Peluang yang terlewat dengan could have"
+    },
+    {
+     "line": 41,
+     "text": "Kemungkinan atau izin dalam bahasa formal: can dan may"
+    },
+    {
+     "line": 42,
+     "text": "Menyatakan kemampuan saat modal tidak bisa dipakai: be able to"
+    },
+    {
+     "line": 45,
+     "text": "Fakta umum atau kemungkinan nyata: zero dan first conditional"
+    },
+    {
+     "line": 46,
+     "text": "Pengandaian yang tidak nyata sekarang: second conditional"
+    },
+    {
+     "line": 47,
+     "text": "Pengandaian yang tidak terjadi di masa lalu: third conditional"
+    },
+    {
+     "line": 48,
+     "text": "Sebab di masa lalu, akibat sekarang: mixed conditional"
+    },
+    {
+     "line": 49,
+     "text": "Keadaan sekarang, akibat di masa lalu: mixed conditional"
+    },
+    {
+     "line": 50,
+     "text": "Membedakan unless dan if not"
+    },
+    {
+     "line": 51,
+     "text": "Syarat dengan unless, provided that, dan as long as"
+    },
+    {
+     "line": 54,
+     "text": "Syarat yang tersirat lewat otherwise"
+    },
+    {
+     "line": 55,
+     "text": "Anak kalimat waktu memakai present setelah when dan as soon as"
+    },
+    {
+     "line": 58,
+     "text": "Kapan pelaku boleh dihilangkan dalam kalimat pasif"
+    },
+    {
+     "line": 59,
+     "text": "Kalimat pasif bersama kata modal"
+    },
+    {
+     "line": 60,
+     "text": "Pasif santai dan pasif baku: get dan be"
+    },
+    {
+     "line": 61,
+     "text": "Menyuruh orang lain mengerjakan sesuatu: have dan get something done"
+    },
+    {
+     "line": 63,
+     "text": "Pasif pelaporan: is believed dan is thought"
+    },
+    {
+     "line": 65,
+     "text": "Membedakan pasif biasa dan pasif menyuruh"
+    },
+    {
+     "line": 66,
+     "text": "Pasif setelah kata kerja: bentuk -ing atau to be done"
+    },
+    {
+     "line": 67,
+     "text": "Kalimat pasif dari kata kerja berobjek dua seperti give dan send"
+    },
+    {
+     "line": 71,
+     "text": "Urutan kata saat melaporkan pertanyaan"
+    },
+    {
+     "line": 72,
+     "text": "Melaporkan perintah dengan bentuk to"
+    },
+    {
+     "line": 73,
+     "text": "Memilih kata kerja pelaporan: suggest dan tell"
+    },
+    {
+     "line": 75,
+     "text": "Melaporkan pertanyaan ya/tidak dengan if dan whether"
+    },
+    {
+     "line": 76,
+     "text": "Melaporkan kalimat pengandaian first conditional"
+    },
+    {
+     "line": 77,
+     "text": "Pergeseran kata ganti dan kepemilikan saat melaporkan"
+    },
+    {
+     "line": 78,
+     "text": "Pola setelah deny, admit, dan apologize for"
+    },
+    {
+     "line": 79,
+     "text": "Pergeseran keterangan waktu dan tempat saat melaporkan"
+    },
+    {
+     "line": 82,
+     "text": "Penyebutan pertama dan penyebutan berikutnya: a dan the"
+    },
+    {
+     "line": 83,
+     "text": "Benda terhitung dan tak terhitung: much, many, little, few"
+    },
+    {
+     "line": 84,
+     "text": "Tanpa kata sandang untuk hal umum, the untuk hal tertentu"
+    },
+    {
+     "line": 85,
+     "text": "The untuk hal yang hanya satu dan untuk bentuk superlative"
+    },
+    {
+     "line": 87,
+     "text": "Kepemilikan sebelum kata benda dan bentuk of mine"
+    },
+    {
+     "line": 88,
+     "text": "Kata sandang pada lembaga: school, prison, hospital"
+    },
+    {
+     "line": 89,
+     "text": "Kata jumlah + of sebelum kata ganti objek"
+    },
+    {
+     "line": 90,
+     "text": "Nama diri tanpa kata sandang dan kekecualiannya"
+    },
+    {
+     "line": 93,
+     "text": "Kata depan waktu: in, on, at"
+    },
+    {
+     "line": 94,
+     "text": "Kata depan tempat: at, in, on"
+    },
+    {
+     "line": 95,
+     "text": "Kata depan yang melekat setelah kata sifat"
+    },
+    {
+     "line": 96,
+     "text": "Kata depan gerak: through, across, along, over"
+    },
+    {
+     "line": 97,
+     "text": "Partikel yang mengubah makna phrasal verb"
+    },
+    {
+     "line": 98,
+     "text": "Letak kata depan pada anak kalimat: baku dan santai"
+    },
+    {
+     "line": 99,
+     "text": "Kata depan alat dan cara: by, with, on"
+    },
+    {
+     "line": 101,
+     "text": "Kata depan setelah kata sifat perasaan: pleased with dan pleased about"
+    },
+    {
+     "line": 102,
+     "text": "Kata depan yang melekat setelah kata benda: reason for, solution to"
+    },
+    {
+     "line": 106,
+     "text": "Setelah kata depan pakai -ing, untuk menyatakan tujuan pakai to"
+    },
+    {
+     "line": 107,
+     "text": "Perubahan makna setelah remember dan forget"
+    },
+    {
+     "line": 108,
+     "text": "Bentuk to setelah too dan enough"
+    },
+    {
+     "line": 110,
+     "text": "Bentuk dasar tanpa to setelah modal, make, dan let"
+    },
+    {
+     "line": 112,
+     "text": "Menunjukkan waktu lebih awal: having done dan doing"
+    },
+    {
+     "line": 113,
+     "text": "Perubahan makna setelah regret, mean, dan go on"
+    },
+    {
+     "line": 116,
+     "text": "Anak kalimat penjelas yang wajib dan yang hanya tambahan"
+    },
+    {
+     "line": 117,
+     "text": "Memendekkan anak kalimat dengan bentuk participle"
+    },
+    {
+     "line": 118,
+     "text": "Menyatakan kepemilikan dalam anak kalimat dengan whose"
+    },
+    {
+     "line": 119,
+     "text": "Kapan kata penghubung boleh dihilangkan"
+    },
+    {
+     "line": 120,
+     "text": "Anak kalimat berjumlah: some of which dan many of whom"
+    },
+    {
+     "line": 123,
+     "text": "Membandingkan dua hal atau menyebut yang paling: comparative dan superlative"
+    },
+    {
+     "line": 124,
+     "text": "Menyatakan setara dengan as ... as"
+    },
+    {
+     "line": 125,
+     "text": "Perubahan yang terus berlanjut: the more ... the more"
+    },
+    {
+     "line": 126,
+     "text": "Membandingkan jumlah: less dan fewer"
+    },
+    {
+     "line": 128,
+     "text": "Bentuk superlative bersama ever dan present perfect"
+    },
+    {
+     "line": 132,
+     "text": "Pertanyaan negatif yang mengharapkan persetujuan"
+    },
+    {
+     "line": 133,
+     "text": "Urutan kata pada pertanyaan tidak langsung"
+    },
+    {
+     "line": 134,
+     "text": "Menyatakan senada: so do I dan neither do I"
+    },
+    {
+     "line": 135,
+     "text": "Satu kalimat cukup satu penanda negatif"
+    },
+    {
+     "line": 136,
+     "text": "Pertanyaan ulang untuk memastikan"
+    },
+    {
+     "line": 137,
+     "text": "Pertanyaan tentang subjek dan tentang objek"
+    },
+    {
+     "line": 140,
+     "text": "Kesesuaian subjek dan kata kerja saat ada sisipan"
+    },
+    {
+     "line": 141,
+     "text": "Letak kata keterangan dalam kalimat"
+    },
+    {
+     "line": 142,
+     "text": "Kata sandang yang tidak dipakai pada benda tak terhitung"
+    },
+    {
+     "line": 143,
+     "text": "Memperbaiki dua kalimat yang disambung hanya dengan koma"
+    },
+    {
+     "line": 144,
+     "text": "Pasangan kata yang mudah tertukar: affect dan effect"
+    },
+    {
+     "line": 145,
+     "text": "Memperbaiki keterangan yang menggantung tanpa pelaku jelas"
+    },
+    {
+     "line": 146,
+     "text": "Menjaga bentuk yang sejajar dalam satu rangkaian"
+    },
+    {
+     "line": 151,
+     "text": "Penghubung tujuan: so that dan in order to"
+    },
+    {
+     "line": 152,
+     "text": "Penghubung penambahan dan rasa bahasanya"
+    },
+    {
+     "line": 155,
+     "text": "Menonjolkan satu bagian kalimat: it was ... that"
+    },
+    {
+     "line": 157,
+     "text": "Memajukan bagian kalimat untuk penekanan"
+    },
+    {
+     "line": 161,
+     "text": "Menyesuaikan am, is, dan are dengan subjek"
+    },
+    {
+     "line": 162,
+     "text": "Menyatakan keberadaan: there is dan there are"
+    },
+    {
+     "line": 163,
+     "text": "Kata kepemilikan sebelum kata benda: my, your, her"
+    },
+    {
+     "line": 164,
+     "text": "Menyatakan kemampuan dengan can"
+    },
+    {
+     "line": 168,
+     "text": "Menyimpulkan kejadian yang sedang berlangsung di masa lalu"
+    },
+    {
+     "line": 170,
+     "text": "Penekanan dengan anak kalimat what"
+    },
+    {
+     "line": 171,
+     "text": "Anak kalimat ringkas berbentuk participle"
+    },
+    {
+     "line": 172,
+     "text": "Menghubungkan gagasan yang saling mengalah"
+    },
+    {
+     "line": 174,
+     "text": "Artikel a, an, dan the: memilih dari bunyi awal"
+    },
+    {
+     "line": 175,
+     "text": "Menyatakan kepemilikan dengan have got dan has got"
+    },
+    {
+     "line": 176,
+     "text": "Kata kerja lampau beraturan dan bentuk dasar sesudah did"
+    },
+    {
+     "line": 177,
+     "text": "Was dan were: bentuk lampau kata kerja be"
+    },
+    {
+     "line": 178,
+     "text": "Kata benda jamak dan perubahan ejaannya"
+    },
+    {
+     "line": 179,
+     "text": "Preposisi tempat: in, on, dan at"
+    },
+    {
+     "line": 180,
+     "text": "Present continuous: sedang berlangsung sekarang"
+    },
+    {
+     "line": 181,
+     "text": "Kata tanya dasar: who, what, where, when, why"
+    },
+    {
+     "line": 182,
+     "text": "Some, any, many, dan much sesuai jenis kata benda"
+    },
+    {
+     "line": 183,
+     "text": "Kata ganti subjek, objek, dan bentuk kepemilikan"
+    },
+    {
+     "line": 185,
+     "text": "Kalimat perintah: mulai dari kata kerja dasar"
+    },
+    {
+     "line": 186,
+     "text": "Posisi kata frekuensi: always, usually, never"
+    },
+    {
+     "line": 187,
+     "text": "Kepemilikan dengan apostrof + s: Sinta's bag"
+    },
+    {
+     "line": 188,
+     "text": "Minta dengan sopan: would like"
+    },
+    {
+     "line": 189,
+     "text": "Kesukaan dengan -ing: like, love, hate + gerund"
+    },
+    {
+     "line": 190,
+     "text": "Pengalaman hidup: present perfect dengan ever dan never"
+    },
+    {
+     "line": 191,
+     "text": "Dari dulu sampai sekarang: present perfect dengan for dan since"
+    },
+    {
+     "line": 192,
+     "text": "Harapan soal sekarang: wish + past simple"
+    },
+    {
+     "line": 194,
+     "text": "Dugaan yakin yang sudah kejadian: will have + past participle"
+    },
+    {
+     "line": 195,
+     "text": "Pasif yang lebih dulu terjadi: to have been + past participle"
+    },
+    {
+     "line": 197,
+     "text": "Komentar untuk satu klausa utuh: koma + which"
+    },
+    {
+     "line": 198,
+     "text": "The generik untuk spesies: the Sumatran tiger"
+    }
+   ]
+  },
+  "features/quota/quota-copy.js": {
+   "count": 51,
+   "i18nWired": 0,
+   "samples": [
+    {
+     "line": 65,
+     "text": "Jatah hari ini masih ada"
+    },
+    {
+     "line": 66,
+     "text": "Semua masih berjalan seperti biasa."
+    },
+    {
+     "line": 67,
+     "text": "Semua masih berjalan seperti biasa. Kalau suaranya belum keluar, teksnya tetap bisa kamu baca."
+    },
+    {
+     "line": 71,
+     "text": "Jatah suara hari ini hampir habis"
+    },
+    {
+     "line": 72,
+     "text": "Masih berbunyi seperti biasa. Kalau nanti habis, aku pindah ke suara perangkatmu."
+    },
+    {
+     "line": 73,
+     "text": "Kalimat ini belum berbunyi di perangkatmu. Teksnya tetap bisa kamu baca, dan kamu boleh menekan Dengarkan lagi."
+    },
+    {
+     "line": 79,
+     "text": "Suaranya nggak bisa dibunyikan sekarang. Teksnya tetap ada, dan jatahnya kembali sesudah tengah malam."
+    },
+    {
+     "line": 83,
+     "text": "Jatah suara hari ini sudah habis"
+    },
+    {
+     "line": 84,
+     "text": "Aku pakai suara perangkatmu dulu untuk sisa sesi ini. Bunyinya beda, pelajarannya tetap jalan."
+    },
+    {
+     "line": 85,
+     "text": "Perangkat ini belum punya suara cadangan, jadi kalimat ini nggak bisa dibunyikan. Teksnya tetap bisa kamu baca, dan jatahnya kembali sesudah tengah malam."
+    },
+    {
+     "line": 89,
+     "text": "Jatah tanya-jawab hari ini sudah habis"
+    },
+    {
+     "line": 90,
+     "text": "Penjelasan dari materi tetap muncul, dan itu nggak pakai jatah. Latihanmu jalan terus."
+    },
+    {
+     "line": 91,
+     "text": "Penjelasan dari materi tetap muncul, dan itu nggak pakai jatah. Suaranya belum keluar sekarang, jadi bacalah teksnya dulu."
+    },
+    {
+     "line": 95,
+     "text": "Jatah terjemahan hari ini sudah habis"
+    },
+    {
+     "line": 96,
+     "text": "Arti kata dari kamus di perangkat ini tetap bisa kamu buka. Sesi dengarmu nggak terpengaruh."
+    },
+    {
+     "line": 97,
+     "text": "Arti kata dari kamus di perangkat ini tetap bisa kamu buka. Suaranya belum keluar sekarang, jadi bacalah teksnya dulu."
+    },
+    {
+     "line": 102,
+     "text": "Aku pakai suara perangkatmu untuk kalimat ini. Tunggu sebentar sebelum menekan lagi."
+    },
+    {
+     "line": 103,
+     "text": "Kalimat ini belum bisa dibunyikan. Tunggu beberapa detik lalu coba lagi — teksnya tetap ada."
+    },
+    {
+     "line": 107,
+     "text": "Masih menyiapkan kalimat sebelumnya"
+    },
+    {
+     "line": 108,
+     "text": "Aku selesaikan yang tadi dulu, sebentar saja."
+    },
+    {
+     "line": 109,
+     "text": "Yang tadi belum selesai disiapkan, jadi kalimat ini belum berbunyi. Teksnya tetap bisa kamu baca sambil menunggu."
+    },
+    {
+     "line": 113,
+     "text": "Kalimatnya kepanjangan untuk sekali baca"
+    },
+    {
+     "line": 114,
+     "text": "Aku bacakan sebagian dulu. Potong jadi dua bagian kalau mau utuh."
+    },
+    {
+     "line": 115,
+     "text": "Kalimatnya kepanjangan untuk sekali dibunyikan, jadi belum ada suaranya. Teksnya tetap bisa kamu baca \\u2014 potong jadi dua bagian lalu coba lagi."
+    },
+    {
+     "line": 119,
+     "text": "Layanan suara sedang istirahat sebentar"
+    },
+    {
+     "line": 120,
+     "text": "Suara dari perangkatmu dulu, ya. Ini bukan kesalahanmu dan nggak ada yang hilang."
+    },
+    {
+     "line": 121,
+     "text": "Aku belum berhasil membunyikan kalimat ini. Bukan kamu yang salah — teksnya tetap bisa dibaca, dan suaranya biasanya kembali beberapa menit lagi."
+    },
+    {
+     "line": 125,
+     "text": "Suara gagal disiapkan"
+    },
+    {
+     "line": 126,
+     "text": "Aku pakai suara perangkatmu untuk kalimat ini."
+    },
+    {
+     "line": 127,
+     "text": "Aku belum berhasil membunyikan kalimat ini. Teksnya tetap bisa kamu baca, dan kamu boleh mencoba lagi sekarang."
+    },
+    {
+     "line": 131,
+     "text": "Suara belum tersedia untuk kalimat ini"
+    },
+    {
+     "line": 133,
+     "text": "Aku belum berhasil membunyikan kalimat ini. Teksnya tetap bisa kamu baca, dan kamu boleh menekan Dengarkan lagi."
+    },
+    {
+     "line": 139,
+     "text": "Aku belum bisa membaca sisa jatahmu"
+    },
+    {
+     "line": 140,
+     "text": "Jatahmu kemungkinan besar masih utuh — yang bermasalah catatannya, bukan kamu. Aku pakai suara perangkatmu sementara ini."
+    },
+    {
+     "line": 141,
+     "text": "Jatahmu kemungkinan besar masih utuh — yang bermasalah catatannya, bukan kamu. Kalimat ini belum bisa dibunyikan; teksnya tetap ada, dan coba lagi sebentar lagi."
+    },
+    {
+     "line": 146,
+     "text": "besok lagi"
+    },
+    {
+     "line": 148,
+     "text": "Perangkatmu sedang lepas dari internet"
+    },
+    {
+     "line": 149,
+     "text": "Suara dari perangkatmu tetap jalan, dan latihan yang sudah tersimpan tetap bisa kamu kerjakan."
+    },
+    {
+     "line": 150,
+     "text": "Kalimat ini butuh internet supaya bisa dibunyikan, jadi sekarang belum ada suaranya. Teksnya tetap bisa kamu baca, dan jatahmu nggak terpakai sama sekali."
+    },
+    {
+     "line": 156,
+     "text": "Kamu perlu masuk lagi supaya hasilmu tercatat"
+    },
+    {
+     "line": 157,
+     "text": "Masuk lagi sebentar, ya. Yang sudah selesai tetap aman."
+    },
+    {
+     "line": 158,
+     "text": "Masuk lagi sebentar, ya. Yang sudah selesai tetap aman, dan latihan berikutnya baru tercatat sesudah kamu masuk."
+    },
+    {
+     "line": 164,
+     "text": "Item ini nggak dinilai dan nggak dikunci."
+    },
+    {
+     "line": 300,
+     "text": " Jatah berikutnya mulai jam "
+    },
+    {
+     "line": 351,
+     "text": "<button type=\"button\" class=\"fz-notice-btn\" data-fz-notice-dismiss>Oke, lanjut belajar</button>"
+    },
+    {
+     "line": 371,
+     "text": "quota-copy: paymentEnabled=true belum punya naskah yang disetujui"
+    },
+    {
+     "line": 377,
+     "text": "<h2 class=\"fz-plan-title\" id=\"fzPlanTitle\">Jatah belajarmu hari ini</h2>"
+    },
+    {
+     "line": 378,
+     "text": " dari "
+    },
+    {
+     "line": 379,
+     "text": "<p class=\"fz-plan-line\">FIEZEL gratis dan nggak dijual. Jatah ini cuma penjaga supaya"
+    },
+    {
+     "line": 380,
+     "text": " semua murid kebagian, dan ia mulai lagi sendiri"
+    },
+    {
+     "line": 381,
+     "text": "<p class=\"fz-plan-line\">Kalau jatahnya habis, latihan, materi, dan progresmu tetap jalan seperti biasa.</p>"
+    }
+   ]
+  },
+  "app.js": {
+   "count": 170,
+   "i18nWired": 668,
+   "samples": [
+    {
+     "line": 109,
+     "text": "kamu bebas menjajalnya"
+    },
+    {
+     "line": 638,
+     "text": ",{kunciDikutip:quoteEmbedShort(correct),opsiDikutip:quoteEmbedShort(target.option)}),...others.map(x=>FiezelI18n.t("
+    },
+    {
+     "line": 639,
+     "text": ",{opsiDikutip:quoteEmbed(target.option)}),...others.map(x=>FiezelI18n.t("
+    },
+    {
+     "line": 641,
+     "text": ",{kunciDikutip:quoteEmbed(correct),opsiDikutip:quoteEmbed(target.option)}),FiezelI18n.t("
+    },
+    {
+     "line": 717,
+     "text": "awalan penulis soal \"Correct:\""
+    },
+    {
+     "line": 723,
+     "text": "nilai runtime bocor"
+    },
+    {
+     "line": 762,
+     "text": "penjelasan menunjuk pilihan yang tidak ada"
+    },
+    {
+     "line": 766,
+     "text": "bukti tidak ada di bacaan"
+    },
+    {
+     "line": 769,
+     "text": "identitas lesson tidak cocok"
+    },
+    {
+     "line": 899,
+     "text": ")return V.find(x=>String(x.id)===target)?.level||"
+    },
+    {
+     "line": 899,
+     "text": ")return R.find(x=>String(x.id)===target)?.level||"
+    },
+    {
+     "line": 899,
+     "text": ")return GRAMMAR_ITEMS.find(x=>x.skill===target)?.level||"
+    },
+    {
+     "line": 1076,
+     "text": ");return target==="
+    },
+    {
+     "line": 1082,
+     "text": ");if(LEVELS.includes(explicit))return explicit===level;const inferred=contentLevelFor(h?.type,h?.target||h?.reviewKey||h?.skill||"
+    },
+    {
+     "line": 1129,
+     "text": "Ujianmu kemarin terputus di soal ${iAnswered} \\u2014 percobaan terpakai, bisa diulang 24 jam lagi."
+    },
+    {
+     "line": 1132,
+     "text": "Gerbang lewati materimu kemarin terputus di soal ${iAnswered} \\u2014 percobaan terpakai, bisa dicoba lagi 24 jam lagi."
+    },
+    {
+     "line": 1266,
+     "text": ")===key||String(h.target||"
+    },
+    {
+     "line": 1299,
+     "text": "kalau bukan vocab dan bukan grammar, berarti reading"
+    },
+    {
+     "line": 1302,
+     "text": "):(q.target||q.id||"
+    },
+    {
+     "line": 1356,
+     "text": ")),key=String(h.reviewKey||h.target||"
+    },
+    {
+     "line": 1375,
+     "text": ". Karena itu ada "
+    },
+    {
+     "line": 1395,
+     "text": "Keluar sekarang dihitung gagal dan ujiannya terkunci 24 jam. Tetap keluar?"
+    },
+    {
+     "line": 1396,
+     "text": "Keluar? Tes penempatannya mulai dari awal lagi kalau kamu balik nanti."
+    },
+    {
+     "line": 1397,
+     "text": "Keluar? ${answered}/${planned} jawaban sesi ini nggak dilanjutkan."
+    },
+    {
+     "line": 1398,
+     "text": "<div class=\"modal-mark\">FIEZEL</div><h2>${measure?'Yakin keluar dari ujian?':'Yakin mau keluar?'}</h2><p>${esc(line)}</p><div class=\"modal-actions\"><button type=\"button\" id=\"quizExitConfirm\">Tetap keluar</button><button type=\"button\" class=\"primary\" id=\"quizExitStay\">Lanjut belajar</button></div>"
+    },
+    {
+     "line": 1400,
+     "text": "Percobaan terpakai. Bisa diulang 24 jam lagi."
+    },
+    {
+     "line": 1608,
+     "text": "),domain=normalizePolicyDomain(session.primaryDomain)||normalizePolicyDomain(rows[0]?.type),targetRows=target?rows.filter(h=>String(h.skill||"
+    },
+    {
+     "line": 1608,
+     "text": ")===target||String(h.target||"
+    },
+    {
+     "line": 2167,
+     "text": ")===target||String(h?.reviewKey||"
+    },
+    {
+     "line": 2167,
+     "text": ")===target||String(h?.skill||"
+    },
+    {
+     "line": 2353,
+     "text": "),target:String(o.target||"
+    },
+    {
+     "line": 2924,
+     "text": "<i data-lucide=\"circle-check-big\"></i> ${FiezelI18n.t('notif.tombol-aktif')}"
+    },
+    {
+     "line": 2926,
+     "text": "<i data-lucide=\"bell\"></i> ${FiezelI18n.t('notif.tombol-nonaktif')}"
+    },
+    {
+     "line": 2930,
+     "text": "<i data-lucide=\"bell\"></i> ${FiezelI18n.t('notif.tombol-nanti')}"
+    },
+    {
+     "line": 2932,
+     "text": "${FiezelI18n.t('notif.tombol-ingatkan')} <i data-lucide=\"bell-ring\"></i>"
+    },
+    {
+     "line": 2965,
+     "text": "<i data-lucide=\"circle-check-big\"></i><span>${FiezelI18n.t('auth.tombol-tersambung')}</span>"
+    },
+    {
+     "line": 2966,
+     "text": "<i data-lucide=\"loader-circle\"></i><span>${FiezelI18n.t('auth.tombol-menghubungkan')}</span>"
+    },
+    {
+     "line": 2971,
+     "text": "<i data-lucide=\"user-round\"></i><span>${FiezelI18n.t('auth.tombol-lanjutkan')}</span>"
+    },
+    {
+     "line": 3085,
+     "text": "Kredit AI Puter kamu habis"
+    },
+    {
+     "line": 3345,
+     "text": "gabungan = AND(statis, server) — server hanya bisa mematikan"
+    },
+    {
+     "line": 3449,
+     "text": "ini modul analytics, mungkin rusak"
+    },
+    {
+     "line": 3449,
+     "text": "ini objek asing"
+    },
+    {
+     "line": 4310,
+     "text": ">${FiezelI18n.t('masukan.batal')}</button><button class="
+    },
+    {
+     "line": 4323,
+     "text": ");/* m028 fase3: bendera panggung Skills Lab. Addon listening memaku blok tombolnya ke dasar layar (speaking-listening-addon.css), jadi ia panggung kedua yang bisa ditutupi gelembung. */document.body?.classList?.toggle?.("
+    },
+    {
+     "line": 4354,
+     "text": "}, runtun ${c.streak||0} hari, ${c.dueReviews||0} materi menunggu review, sedang membuka halaman \"${c.view||"
+    },
+    {
+     "line": 4354,
+     "text": "}\", fokus minggu ini ${c.focusLabel||"
+    },
+    {
+     "line": 4605,
+     "text": "<button type=\"button\" class=\"active-level-control\" onclick=\"openLevelPanel()\" aria-label=\"${FiezelI18n.t('level.aria-ganti')}\"><span>${FiezelI18n.t('level.label-tombol')}</span><strong>${esc(level)}</strong><small>${FiezelI18n.t('level.ganti')}</small></button>"
+    },
+    {
+     "line": 4627,
+     "text": "belum terverifikasi"
+    },
+    {
+     "line": 4632,
+     "text": "<div class=\"modal-mark\">FIEZEL LEVEL CONTROL</div><h2>${FiezelI18n.t('level.judul-panel')}</h2><p>${FiezelI18n.t('level.penjelasan-panel')}</p><div class=\"level-picker-grid\">${cards}</div>${lockNote}${examCta}<div class=\"level-source-note\">${manual?"
+    },
+    {
+     "line": 4632,
+     "text": ":''}<button type=\"button\" class=\"primary\" id=\"levelPanelClose\">${FiezelI18n.t('level.selesai')}</button></div>"
+    },
+    {
+     "line": 4815,
+     "text": "${LEVEL_GUARD_COPY.examTitle} ${target} · ${LEVEL_EXAM_SIZE} soal tanpa petunjuk"
+    },
+    {
+     "line": 4838,
+     "text": "${LEVEL_GUARD_COPY.examFail}${FiezelI18n.t('level.gagal-skor',{skor:score,total:total,akurasi:accuracy,lulus:LEVEL_EXAM_PASS})}${weak?"
+    },
+    {
+     "line": 4845,
+     "text": "<p class=\"muted\">Ujiannya berantai: level terverifikasimu sekarang <b>${esc(verified)}</b>, jadi yang boleh diuji adalah <b>${esc(nextVerifiableLevel(state)||verified)}</b>. Satu ujian, satu anak tangga.</p>"
+    },
+    {
+     "line": 4846,
+     "text": "<button type=\"button\" class=\"primary\" id=\"levelExamStart\">${esc(LEVEL_GUARD_COPY.examStart)} ${esc(target)}</button>"
+    },
+    {
+     "line": 4846,
+     "text": "<button type=\"button\" class=\"primary\" disabled aria-disabled=\"true\">Bisa diulang ${esc(levelExamCooldownLabel(availability.waitMs))}</button>"
+    },
+    {
+     "line": 4846,
+     "text": "<button type=\"button\" class=\"primary\" disabled aria-disabled=\"true\">Buka ujian ${esc(availability.next||verified)} dulu</button>"
+    },
+    {
+     "line": 4984,
+     "text": "Buka analisis personal"
+    },
+    {
+     "line": 4989,
+     "text": "Home terlalu ramai, tidak ada fokus"
+    },
+    {
+     "line": 4990,
+     "text": "SESI BERIKUTNYA · DIPILIH PAW"
+    },
+    {
+     "line": 4997,
+     "text": "${FiezelI18n.t('home.ringkas-sesi',{skill:policy.targetSkill?friendlySkillName(policy.targetSkill):friendlySkillName(policy.primaryDomain),items:policy.sessionSize,menit:policy.estimatedMinutes})}"
+    },
+    {
+     "line": 5003,
+     "text": "Selesaikan ritme hari ini"
+    },
+    {
+     "line": 5035,
+     "text": "rencana hari ini"
+    },
+    {
+     "line": 5055,
+     "text": ">RENCANA HARI INI</small>${blocks?`<ul class="
+    },
+    {
+     "line": 5055,
+     "text": ">${state.placementDone?FiezelI18n.t('ritual.kosong-placement'):FiezelI18n.t('ritual.kosong-belum-tes')}</p>`}<div class="
+    },
+    {
+     "line": 5055,
+     "text": ">${FiezelI18n.t('ritual.mulai')} <i data-lucide="
+    },
+    {
+     "line": 5124,
+     "text": " · ${mission.mustReview} soal ulang"
+    },
+    {
+     "line": 5129,
+     "text": "Selesaikan ritme hari ini"
+    },
+    {
+     "line": 5174,
+     "text": "<div><b>${FiezelI18n.t('diag.kelengkapan')}</b><br>${row.completionRate==null?'—':row.completionRate+FiezelI18n.t('diag.persen-selesai')}</div>"
+    },
+    {
+     "line": 5175,
+     "text": "<div><b>${FiezelI18n.t('diag.cakupan-target')}</b><br>${esc(coverage)}</div>"
+    },
+    {
+     "line": 5178,
+     "text": "<div><b>${FiezelI18n.t('diag.pengulangan-audio')}</b><br>${row.replayCount==null?FiezelI18n.t('diag.belum-terukur'):FiezelI18n.t('diag.replay-nilai',{total:row.replayCount,rata:row.replayAverage})}</div>"
+    },
+    {
+     "line": 5179,
+     "text": "<div><b>${FiezelI18n.t('diag.belum-dapat-diukur')}</b><br>${unknown?esc(unknown):'—'}</div></div>"
+    },
+    {
+     "line": 5234,
+     "text": "<div class=\"modal-actions backup-actions\"><button id=\"backupExport\" type=\"button\">${FiezelI18n.t('backup.buat')}</button><button id=\"backupPick\" type=\"button\">${FiezelI18n.t('backup.pilih')}</button></div>"
+    },
+    {
+     "line": 5265,
+     "text": "<div><b>${FiezelI18n.t('backup.pv-sudah-ada')}</b><br>${preview.historyRowsAlreadyPresent}</div>"
+    },
+    {
+     "line": 5542,
+     "text": ">${esc(puterAccountLabel())}</b><small>${connected?FiezelI18n.t('akun.sub-tersambung'):FiezelI18n.t('akun.sub-belum')}</small></span></div><div class="
+    },
+    {
+     "line": 5587,
+     "text": "hangatkan yang berikutnya"
+    },
+    {
+     "line": 5671,
+     "text": "<section class=\"fade classroom-page\"><div class=\"card\"><b>${FiezelI18n.t('kelas.gagal-muat')}</b><p class=\"muted\">${esc(e?.message||e)}</p></div></section>"
+    },
+    {
+     "line": 5780,
+     "text": "<div class=\"card\"><b>${FiezelI18n.t('skills.gagal-muat')}</b><p class=\"muted\">${esc(error?.message||error)}</p></div>"
+    },
+    {
+     "line": 5789,
+     "text": ",target:40,en:"
+    },
+    {
+     "line": 5790,
+     "text": ",target:40,en:"
+    },
+    {
+     "line": 5791,
+     "text": ",target:60,en:"
+    },
+    {
+     "line": 5792,
+     "text": ",target:60,en:"
+    },
+    {
+     "line": 5793,
+     "text": ",target:90,en:"
+    },
+    {
+     "line": 5794,
+     "text": ",target:90,en:"
+    },
+    {
+     "line": 5795,
+     "text": ",target:120,en:"
+    },
+    {
+     "line": 5796,
+     "text": ",target:150,en:"
+    },
+    {
+     "line": 5797,
+     "text": ",target:180,en:"
+    },
+    {
+     "line": 5839,
+     "text": "<p class=\"writing-exam\"><b>${esc(exam.label)}</b><span>${FiezelI18n.t('tulis.meta-ujian',{kata:exam.minWords,menit:exam.minutes})}</span><small>${esc(exam.note)}</small></p>"
+    },
+    {
+     "line": 5870,
+     "text": "Skala 0-4 untuk SETIAP kriteria. Acuan singkat 4: ${criteria[0].levels[4]}"
+    },
+    {
+     "line": 5870,
+     "text": "Skala 0-4 untuk setiap kriteria."
+    },
+    {
+     "line": 5889,
+     "text": "Tugas ini berbentuk ${exam.label}. Batas kata ${exam.minWords}, waktu ${exam.minutes} menit. ${exam.note}"
+    },
+    {
+     "line": 5889,
+     "text": "Tugas ini latihan fondasi, belum berbentuk soal ujian."
+    },
+    {
+     "line": 5899,
+     "text": "Nama kriteria: n/4 - satu kalimat alasan yang menunjuk bukti di tulisannya"
+    },
+    {
+     "line": 5911,
+     "text": "),examBrief:exam?`${exam.label}. Minimal ${exam.minWords} kata, ${exam.minutes} menit.`:"
+    },
+    {
+     "line": 5925,
+     "text": "><b>${FiezelI18n.t('tulis.gagal-ai')}</b><p class="
+    },
+    {
+     "line": 6093,
+     "text": ").join('')}<p class=\"fz-prasasti-note\">${FiezelI18n.t('prasasti.catatan')}</p><button class=\"primary\" onclick=\"dismissPrasastiMoment()\">${FiezelI18n.t('prasasti.simpan')} <i data-lucide=\"arrow-right\"></i></button></div>"
+    },
+    {
+     "line": 6143,
+     "text": "Servernya lambat merespons \\u2014 sesi ini pakai profil lokalmu dulu."
+    },
+    {
+     "line": 6162,
+     "text": "><b>${esc(level)} vocabulary</b><span>${FiezelI18n.t('vocab.n-kata',{jumlah:active.length})}</span></div><p class="
+    },
+    {
+     "line": 6162,
+     "text": ">${FiezelI18n.t('vocab.buka-flashcards')} <i data-lucide="
+    },
+    {
+     "line": 6200,
+     "text": "Suara sedang bermasalah di perangkatmu. Teksnya tetap bisa kamu baca, dan kamu boleh mencoba lagi nanti."
+    },
+    {
+     "line": 6254,
+     "text": ">${FiezelI18n.t('flash.kelas-kata')}<b>${esc(indonesianPartOfSpeech(v.partOfSpeech||'kata'))}</b></span></div><h2 class="
+    },
+    {
+     "line": 6254,
+     "text": "></i> ${FiezelI18n.t('flash.dengar-kata')}</button><button id="
+    },
+    {
+     "line": 6254,
+     "text": "></i> ${FiezelI18n.t('flash.dengar-kalimat')}</button><button id="
+    },
+    {
+     "line": 6282,
+     "text": ");/* [FASE-4] 09 §3.3: dikuasai dari ulangan juga pengakuan → proud. */try{pawReact("
+    },
+    {
+     "line": 6379,
+     "text": ",level:v.level,skill:`vocabulary_${type}`,target:v.id,difficulty:LEVELS.indexOf(v.level)+1,canary:v.canary||null,question:q,options,answerIndex:options.indexOf(answer),explain:{why,rule,avoid:FiezelI18n.t("
+    },
+    {
+     "line": 6423,
+     "text": "${FiezelI18n.t('grammar.ujian-skip-level',{level:examEntry?.passed?'Sudah lulus.':'Ujung jalur level ini.'})}"
+    },
+    {
+     "line": 6423,
+     "text": "Lulus — level terverifikasi dari bukti."
+    },
+    {
+     "line": 6425,
+     "text": ">${FiezelI18n.t('grammar.buka-lesson')} <i data-lucide="
+    },
+    {
+     "line": 6429,
+     "text": "${FiezelI18n.t('grammar.ujian-skip-level-level',{level:esc(level),ujian:examEntry?.passed?'Sudah lulus.':'Buka panel ujian.'})}"
+    },
+    {
+     "line": 6429,
+     "text": "Merasa sudah bisa? Buktikan kapan saja"
+    },
+    {
+     "line": 6487,
+     "text": "Materi ini baru memiliki ${questions.length} soal valid."
+    },
+    {
+     "line": 6509,
+     "text": "bukan pola yang lagi diuji"
+    },
+    {
+     "line": 6588,
+     "text": "<div class=\"card reading-exam\"><div class=\"row\"><b>${FiezelI18n.t('reading.practice-berformat-ujian')}</b><span>${FiezelI18n.t('reading.set-untuk',{length:examSets.length,level:esc(level)})}</span></div>${examSets.length?examSets.map(set=>{const f=readingExamFormat(set);return "
+    },
+    {
+     "line": 6588,
+     "text": ">${active.length?'Pilih bacaan untuk berlatih dengan urutan soal yang diajar.':'Belum tersedia untuk level ini.'}</p>${active.length?`<button onclick="
+    },
+    {
+     "line": 6588,
+     "text": ">${FiezelI18n.t('reading.buka-bacaan')} <i data-lucide="
+    },
+    {
+     "line": 6691,
+     "text": "Tipe soal: ${readingExamTypeLabel(q.type)}.${format?"
+    },
+    {
+     "line": 7022,
+     "text": ">Yang bikin tadi keliru: ${esc(String(info.why).replace(/[.\\s]+$/,''))}.</p>`:''}${info.rule?`<p class="
+    },
+    {
+     "line": 7039,
+     "text": "kita ukur ulang di sesi berikutnya"
+    },
+    {
+     "line": 7078,
+     "text": " disabled>Lanjut <i data-lucide="
+    },
+    {
+     "line": 7170,
+     "text": "<div class=\"feedback-title\"><i data-lucide=\"check\"></i><b>Tersimpan.</b></div><p class=\"muted\">Jawabanmu kecatat. Pembahasan lengkap muncul di layar hasil setelah ${cfg.placement?'tes':'ujian'} ini selesai.</p>"
+    },
+    {
+     "line": 7180,
+     "text": "Belum tepat, tidak apa-apa."
+    },
+    {
+     "line": 7180,
+     "text": "Jawaban perlu cocok dengan konteks soal."
+    },
+    {
+     "line": 7218,
+     "text": "<button id=\"breatheStop\" class=\"primary\">${FiezelI18n.t('quiz.sudahi-sesi')}</button><button id=\"breatheGo\" class=\"tutor-stuck\">${FiezelI18n.t('quiz.next-me-still-kuat')}</button>"
+    },
+    {
+     "line": 7321,
+     "text": " harus dinilai sama dengan "
+    },
+    {
+     "line": 7389,
+     "text": "<div class=\"feedback-title\"><i data-lucide=\"check\"></i><b>Tersimpan.</b></div><p class=\"muted\">Jawabanmu kecatat. Pembahasan lengkap muncul di layar hasil setelah ${cfg.placement?'tes':'ujian'} ini selesai.</p>"
+    },
+    {
+     "line": 7400,
+     "text": "Jawaban itu jebakan yang umum: ${esc(res.matchedDistractor.misconception||'bentuknya tidak cocok dengan kalimatnya')}. Yang tepat: <strong>${esc(q.clozeAnswer)}</strong>."
+    },
+    {
+     "line": 7404,
+     "text": "Belum tepat, tidak apa-apa."
+    },
+    {
+     "line": 7404,
+     "text": "Perhatikan petunjuk waktu dan bentuk kata dalam kalimat."
+    },
+    {
+     "line": 7497,
+     "text": "Strategi ini layak dipertahankan atau dinaikkan pelan-pelan."
+    },
+    {
+     "line": 7497,
+     "text": "Sesi berikutnya akan diperingan atau diturunkan difficulty-nya."
+    },
+    {
+     "line": 7497,
+     "text": "Core akan pakai hasil ini sebagai evidence untuk policy berikutnya."
+    },
+    {
+     "line": 7540,
+     "text": "<div class=\"result-level\"><span class=\"result-level-mark\">LEVEL KAMU</span><b class=\"result-level-name\">${esc(placementLevelName)}</b><span class=\"result-level-desc\">${esc(levelDescriptor(placementLevelName))}</span></div>${placementBands?"
+    },
+    {
+     "line": 7540,
+     "text": ">Level belajarmu diikutkan ke hasil tes ini, menggantikan perkiraan yang kamu pilih di awal. Kamu tetap bisa menggantinya sendiri kapan saja dari panel level.</p>`:''}${placementManualLevel?`<p class="
+    },
+    {
+     "line": 7546,
+     "text": "></i><b>${i+1}. ${esc(q.question||'')}</b></div><p>Jawabanmu <strong>${esc(yours)}</strong>${ok?' \\u2014 benar.':`. Jawaban yang paling tepat adalah <strong>${esc(key)}</strong>.`}</p>${q.explain?.why||q.explain?.rule?`<p class="
+    },
+    {
+     "line": 7547,
+     "text": "Tes level selesai"
+    },
+    {
+     "line": 7547,
+     "text": "${esc(LEVEL_GUARD_COPY.examTitle)} ${esc(cfg.levelScope||'')} selesai"
+    },
+    {
+     "line": 7547,
+     "text": "Gerbang lewati materi selesai"
+    },
+    {
+     "line": 7547,
+     "text": "Latihan selesai"
+    },
+    {
+     "line": 7547,
+     "text": ")\">Kembali ke Home</button></div>`:nextDomain?`<div class=\"result-actions\"><button class=\"primary\" onclick=\"go("
+    },
+    {
+     "line": 7547,
+     "text": ")\">Lanjut latihan berikutnya <i data-lucide=\"arrow-right\"></i></button><button class=\"ghost\" onclick=\"go("
+    },
+    {
+     "line": 7547,
+     "text": ")\">Kembali ke Home</button></div>`:`<button class=\"primary\" onclick=\"go("
+    },
+    {
+     "line": 7547,
+     "text": ")\">Kembali ke Home <i data-lucide=\"arrow-right\"></i></button>`}`,"
+    },
+    {
+     "line": 7650,
+     "text": " <button type=\"button\" class=\"core-ghost olm-dispute\" onclick=\"olmDispute('${esc(String(e.claimId))}')\">${FiezelI18n.t('progress.menurutku-salah')}</button>"
+    },
+    {
+     "line": 7694,
+     "text": "<h3>${FiezelI18n.t('progress.cuaca-sesi-terakhir')}</h3><p><b>${esc(stateLabel)}</b> · keyakinan ${Math.round((Number(st.confidence)||0)*100)}%</p>${actionLabel?"
+    },
+    {
+     "line": 7694,
+     "text": ":''}<p class=\"muted\">${FiezelI18n.t('progress.afek-dinilai-per-sesi-hanya')}</p>"
+    },
+    {
+     "line": 7746,
+     "text": "<b>${ukuran} soal${menit?"
+    },
+    {
+     "line": 7766,
+     "text": ")}</div><p class=\"muted\">${diag.weak?`Prioritas berikutnya adalah ${esc(diag.weak.name)} karena akurasinya paling rendah di antara area yang sudah terukur.`:"
+    },
+    {
+     "line": 7780,
+     "text": "><span>${esc(friendlySkillName(x.key))}</span><b>${FiezelI18n.t('progress.salah',{errors:x.errors,rate:Math.round(x.rate*100)})}</b></div>${x.common?`<p class="
+    },
+    {
+     "line": 7780,
+     "text": ">${FiezelI18n.t('progress.pilihan-paling-sering-muncul-kali',{common:esc(x.common),count:x.count})}</p>`:''}`).join('<hr>'):'<p class="
+    },
+    {
+     "line": 7782,
+     "text": "><span>${x.level===1?'Ragu':x.level===2?'Cukup yakin':'Sangat yakin'}</span><span>${x.n?x.accuracy+'% benar · selisih '+x.gap+'%':'—'}</span></div>`).join('<hr>')}<p class="
+    },
+    {
+     "line": 7783,
+     "text": "Pilihan “${esc(x.common)}” muncul ${x.count} kali."
+    },
+    {
+     "line": 7783,
+     "text": "Belum ada pilihan keliru yang cukup sering muncul."
+    },
+    {
+     "line": 7790,
+     "text": "<h3>Policy Outcome Evaluation</h3>${(()=>{const o=state.policyOutcomeMeta?.last;if(!o)return '<p>'+FiezelI18n.t('progress.belum-ada-sesi-adaptive-punya')+'</p>';return "
+    },
+    {
+     "line": 7791,
+     "text": "Belum cukup bukti"
+    },
+    {
+     "line": 7799,
+     "text": "<div class=\"stats\"><div>${stat('Akurasi',acc+'%')}</div><div>${stat('Runtun',state.streak+' hari')}</div><div>${stat('Hari ini',state.daily.attempts+' jawaban')}</div><div>${stat('Ulangan',due.length)}</div></div>"
+    },
+    {
+     "line": 7802,
+     "text": "<div class=\"row\"><b>Dibuat oleh Fitrarustqi</b><a href=\"https://instagram.com/fitrarustqi\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"creator-link\"><img src=\"./instagram.svg\" alt=\"Instagram\" width=\"22\" height=\"22\"> @fitrarustqi</a></div>"
+    },
+    {
+     "line": 7808,
+     "text": "Endpoint Creator Hub belum valid."
+    },
+    {
+     "line": 7808,
+     "text": "Puter Worker belum siap. Pastikan koneksi aktif dan login Puter selesai."
+    },
+    {
+     "line": 7874,
+     "text": "Perangkat ini mendukung getaran"
+    },
+    {
+     "line": 7874,
+     "text": "Akan aktif pada perangkat yang mendukung"
+    },
+    {
+     "line": 7878,
+     "text": ">${FiezelI18n.t('settings.otomatis-setelah-sesi-selesai-hanya')}</p></div><button id="
+    },
+    {
+     "line": 7878,
+     "text": " target="
+    },
+    {
+     "line": 7878,
+     "text": "><h3>${FiezelI18n.t('settings.masukan-untuk-pengembang')}</h3><p class="
+    },
+    {
+     "line": 7885,
+     "text": "<div class=\"modal-actions settings-actions\"><button id=\"settingsCancel\">Batal</button><button class=\"primary\" id=\"settingsSave\">${FiezelI18n.t('settings.simpan-prefs')}</button></div>"
+    },
+    {
+     "line": 8381,
+     "text": "<div class=\"modal-mark\">FIEZEL AI</div><h2>${esc(title)}</h2><p>${FiezelI18n.t('ai.fiezel-sedang-menyiapkan-penjelasan-lebih')}</p><div class=\"ai-loading\" role=\"status\" aria-live=\"polite\" aria-label=\"${FiezelI18n.t('ai.memuat-penjelasan-ai')}\"><span></span><span></span><span></span></div>"
+    },
+    {
+     "line": 8486,
+     "text": "}\\nJawaban benar: ${q.options?.[q.answerIndex]||"
+    },
+    {
+     "line": 8488,
+     "text": "<div class=\"modal-mark\">FIEZEL</div><h2>${FiezelI18n.t('settings.reset-progres')}</h2><p>${FiezelI18n.t('settings.semua-level-penguasaan-materi-riwayat')}</p><div class=\"modal-actions\"><button id=\"modalCancel\">Batal</button><button class=\"primary danger\" id=\"modalOk\">Ya, reset</button></div>"
+    },
+    {
+     "line": 8498,
+     "text": ",e=>{const el=e.target?.closest?.("
+    },
+    {
+     "line": 8610,
+     "text": "Kamu lagi offline. Sambungkan internet dulu, ya \\u2014 materi belajarnya diambil dari server."
+    },
+    {
+     "line": 8612,
+     "text": "Materi belum bisa dimuat. Servernya lagi bermasalah atau koneksimu putus-putus. Coba sekali lagi, ya."
+    },
+    {
+     "line": 8613,
+     "text": "<div class=\"error\"><p>${esc(msg)}</p><div class=\"modal-actions\"><button type=\"button\" id=\"bootRetry\" class=\"primary\">Coba lagi</button></div></div>"
+    }
+   ]
+  },
+  "features/continuity/fiezel-continuity.js": {
+   "count": 1,
+   "i18nWired": 0,
+   "samples": [
+    {
+     "line": 282,
+     "text": " + String(row.target || "
+    }
+   ]
+  },
+  "features/brand/fiezel-splash.js": {
+   "count": 1,
+   "i18nWired": 2,
+   "samples": [
+    {
+     "line": 499,
+     "text": "SFX splash tidak pernah berbunyi"
+    }
+   ]
+  },
+  "features/onboarding/fiezel-onboarding.js": {
+   "count": 4,
+   "i18nWired": 1,
+   "samples": [
+    {
+     "line": 526,
+     "text": "Ini isi aplikasinya. Sebentar saja, dua layar."
+    },
+    {
+     "line": 570,
+     "text": "Lewati langkah ini"
+    },
+    {
+     "line": 586,
+     "text": "Mulai tes penempatan"
+    },
+    {
+     "line": 587,
+     "text": "Lewati langkah ini"
+    }
+   ]
+  },
+  "features/onboarding/fiezel-tour.js": {
+   "count": 4,
+   "i18nWired": 1,
+   "samples": [
+    {
+     "line": 133,
+     "text": ".topbar-actions [aria-label=\"Buka pengaturan\"]"
+    },
+    {
+     "line": 178,
+     "text": ".topbar-actions [aria-label=\"Buka pengaturan\"]"
+    },
+    {
+     "line": 208,
+     "text": ".topbar-actions [aria-label=\"Buka pengaturan\"]"
+    },
+    {
+     "line": 321,
+     "text": "Kenalan cepat dengan FIEZEL"
+    }
+   ]
+  }
+ }
+}
