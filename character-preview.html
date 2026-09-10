@@ -1,0 +1,454 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>FIEZEL Character Universe — Nusa &amp; Mira · Motion Preview</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Nunito:ital,wght@0,400;0,600;0,700;0,800;1,600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --cream:#FBF4E4; --cream-2:#F3E8CE; --paper:#FFFDF7;
+  --forest:#2E5440; --forest-2:#3E6B4B; --leaf:#6FA368; --leaf-soft:#A8C79B;
+  --maroon:#7C2436; --maroon-2:#9A3149;
+  --gold:#D8A43C; --gold-2:#E6BF63;
+  --tan:#D9A867; --ink:#2A231C; --ink-soft:#6a5c4c;
+  --shadow: 0 18px 40px -18px rgba(42,35,28,.45);
+  --ring: 0 0 0 1px rgba(42,35,28,.08);
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0;font-family:'Nunito',system-ui,sans-serif;color:var(--ink);
+  background:
+    radial-gradient(1200px 600px at 85% -5%, #FDEFCB 0%, transparent 60%),
+    radial-gradient(1000px 700px at -10% 20%, #EAF0DC 0%, transparent 55%),
+    var(--cream);
+  overflow-x:hidden;
+}
+h1,h2,h3,.display{font-family:'Baloo 2',cursive;font-weight:800;letter-spacing:-.01em;line-height:1.05}
+::selection{background:var(--maroon);color:#fff}
+a{color:inherit}
+.wrap{max-width:1180px;margin:0 auto;padding:0 22px}
+
+/* ---------- floating jungle leaves ---------- */
+.leaves{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden}
+.leaf{position:absolute;font-size:26px;opacity:.14;animation:drift linear infinite;filter:saturate(1.2)}
+@keyframes drift{0%{transform:translateY(-12vh) rotate(0deg)}100%{transform:translateY(115vh) rotate(320deg)}}
+
+/* ---------- nav ---------- */
+nav{position:sticky;top:0;z-index:40;backdrop-filter:blur(14px);
+  background:rgba(251,244,228,.72);border-bottom:1px solid rgba(42,35,28,.08)}
+nav .wrap{display:flex;align-items:center;gap:18px;height:66px}
+.brand{display:flex;align-items:center;gap:11px;font-family:'Baloo 2';font-weight:800;font-size:20px}
+.paw{width:34px;height:34px;border-radius:12px;display:grid;place-items:center;background:var(--maroon);color:#fff;box-shadow:var(--shadow)}
+.paw svg{width:19px;height:19px}
+.navlinks{margin-left:auto;display:flex;gap:6px}
+.navlinks a{font-weight:800;font-size:14px;text-decoration:none;padding:9px 14px;border-radius:999px;color:var(--ink-soft);transition:background .25s,color .25s,transform .25s}
+.navlinks a:hover{background:var(--forest);color:#fff;transform:translateY(-1px)}
+.pill{font-family:'Nunito';font-weight:800;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--maroon);
+  background:#fff;border:1px solid rgba(124,36,54,.25);padding:6px 12px;border-radius:999px}
+
+/* ---------- hero ---------- */
+header.hero{position:relative;z-index:1;padding:64px 0 26px}
+.hero-grid{display:grid;grid-template-columns:1.05fr 1fr;gap:26px;align-items:center}
+.hero h1{font-size:clamp(38px,6vw,74px);margin:16px 0 10px}
+.hero h1 .u{color:var(--maroon)}
+.hero p.lead{font-size:19px;max-width:520px;color:var(--ink-soft);font-weight:600}
+.cta{display:flex;gap:12px;flex-wrap:wrap;margin-top:26px}
+.btn{font-family:'Baloo 2';font-weight:700;font-size:16px;border:none;cursor:pointer;padding:14px 24px;border-radius:16px;text-decoration:none;display:inline-flex;align-items:center;gap:9px;transition:transform .2s, box-shadow .2s, background .2s}
+.btn.p{background:var(--maroon);color:#fff;box-shadow:var(--shadow)}
+.btn.p:hover{transform:translateY(-3px)}
+.btn.s{background:#fff;color:var(--forest);box-shadow:var(--ring)}
+.btn.s:hover{transform:translateY(-3px);background:var(--forest);color:#fff}
+
+.stage{position:relative;min-height:460px;display:grid;place-items:center}
+.stage-bg{position:absolute;inset:auto 0 6% 0;height:280px;border-radius:50%/40px;
+  background:radial-gradient(closest-side,#EAF3DC,transparent);filter:blur(2px)}
+.hero-char{position:relative;height:440px;filter:drop-shadow(0 26px 26px rgba(42,35,28,.22))}
+.hero-char img{height:100%;width:auto;display:block}
+.hero-nusa{animation:floaty 4.4s ease-in-out infinite}
+.hero-mira{position:absolute;right:2%;bottom:4%;height:330px;animation:floaty 5.2s ease-in-out infinite .6s}
+.hero-mira img{height:100%}
+@keyframes floaty{0%,100%{transform:translateY(0) rotate(-.6deg)}50%{transform:translateY(-16px) rotate(.6deg)}}
+.blob{position:absolute;border-radius:50%;filter:blur(0);opacity:.9}
+
+.stat-row{display:flex;gap:26px;margin-top:30px;flex-wrap:wrap}
+.stat b{font-family:'Baloo 2';font-size:30px;display:block;color:var(--forest)}
+.stat span{font-size:13px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-soft)}
+
+/* ---------- section shell ---------- */
+section{position:relative;z-index:1;padding:60px 0}
+.kicker{font-weight:900;letter-spacing:.16em;text-transform:uppercase;font-size:12px;color:var(--maroon)}
+.h2{font-size:clamp(28px,4vw,44px);margin:8px 0 6px}
+.sub{color:var(--ink-soft);font-weight:600;max-width:640px;font-size:16px}
+.reveal{opacity:0;transform:translateY(26px);transition:opacity .7s cubic-bezier(.2,.7,.2,1),transform .7s cubic-bezier(.2,.7,.2,1)}
+.reveal.in{opacity:1;transform:none}
+
+/* ---------- remotion reel ---------- */
+.reel{display:grid;grid-template-columns:1fr 344px;gap:24px;margin-top:30px}
+.player{position:relative;background:#0e130d;border-radius:24px;overflow:hidden;box-shadow:var(--shadow),var(--ring);aspect-ratio:16/10}
+.player video{width:100%;height:100%;object-fit:cover;display:block}
+.rmk{position:absolute;top:16px;right:16px;background:var(--maroon);color:#fff;font-weight:800;font-size:11px;letter-spacing:.07em;padding:6px 12px;border-radius:999px;z-index:3;display:flex;align-items:center;gap:6px}
+.rmk svg{width:13px;height:13px}
+.playlist{display:flex;flex-direction:column;gap:11px;max-height:520px;overflow:auto;padding-right:4px}
+.clip{display:flex;gap:12px;align-items:center;background:var(--paper);border:1px solid rgba(42,35,28,.08);border-radius:16px;padding:9px;cursor:pointer;transition:transform .2s,border-color .2s,background .2s}
+.clip:hover{transform:translateX(3px);border-color:var(--leaf)}
+.clip.on{background:var(--forest);border-color:var(--forest)}
+.clip.on b,.clip.on small{color:#fff}
+.clip video{width:84px;height:60px;object-fit:cover;border-radius:10px;background:#e6efd6;flex:0 0 auto}
+.clip .meta b{font-family:'Baloo 2';font-size:15px;display:block;line-height:1.1}
+.clip .meta small{color:var(--ink-soft);font-weight:700;font-size:12px}
+@media(max-width:900px){.reel{grid-template-columns:1fr}.playlist{flex-direction:row;max-height:none;overflow-x:auto}.clip{flex:0 0 220px}}
+
+/* ---------- (legacy css toy, unused) ---------- */
+.lab{display:grid;grid-template-columns:320px 1fr;gap:26px;margin-top:30px;align-items:stretch}
+.panel{background:var(--paper);border-radius:24px;box-shadow:var(--shadow),var(--ring);padding:22px}
+.charswitch{display:flex;background:var(--cream-2);border-radius:14px;padding:5px;gap:5px;margin-bottom:16px}
+.charswitch button{flex:1;border:none;background:transparent;font-family:'Baloo 2';font-weight:700;font-size:15px;padding:10px;border-radius:10px;cursor:pointer;color:var(--ink-soft);transition:.2s}
+.charswitch button.on{background:#fff;color:var(--forest);box-shadow:var(--ring)}
+.poselist{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.poselist button{border:1px solid rgba(42,35,28,.1);background:#fff;border-radius:12px;padding:11px 10px;font-family:'Nunito';font-weight:800;font-size:13px;cursor:pointer;color:var(--ink);display:flex;align-items:center;gap:8px;transition:.2s}
+.poselist button:hover{transform:translateY(-2px);border-color:var(--leaf)}
+.poselist button.on{background:var(--forest);color:#fff;border-color:var(--forest)}
+.poselist .dot{width:8px;height:8px;border-radius:50%;background:var(--gold)}
+.mcontrols{margin-top:16px;display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.toggle{display:inline-flex;align-items:center;gap:9px;font-weight:800;font-size:13px;color:var(--ink-soft);cursor:pointer;user-select:none}
+.tsw{width:46px;height:26px;border-radius:999px;background:#ccc;position:relative;transition:.25s}
+.tsw::after{content:"";position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:#fff;transition:.25s}
+.toggle.on .tsw{background:var(--forest)}
+.toggle.on .tsw::after{left:23px}
+
+.viewer{background:
+   radial-gradient(120% 90% at 50% 0%, #F0F6E4 0%, #E7EFD6 45%, #DDE8CA 100%);
+   border-radius:24px;box-shadow:var(--shadow),var(--ring);position:relative;overflow:hidden;display:grid;place-items:center;min-height:520px}
+.viewer .ground{position:absolute;left:50%;bottom:14%;transform:translateX(-50%);width:300px;height:34px;border-radius:50%;background:rgba(46,84,64,.18);filter:blur(3px)}
+.stagepad{position:absolute;left:0;right:0;bottom:0;height:40%;background:linear-gradient(transparent, rgba(111,163,104,.18))}
+#hero-shadow,.mshadow{}
+.mchar{position:relative;height:400px;z-index:2;will-change:transform}
+.mchar img{height:100%;width:auto;display:block;filter:drop-shadow(0 22px 20px rgba(42,35,28,.25))}
+.badge-note{position:absolute;top:16px;left:16px;background:#fff;border-radius:999px;padding:7px 14px;font-weight:800;font-size:12px;color:var(--forest);box-shadow:var(--ring);z-index:5}
+.hint{position:absolute;bottom:16px;right:16px;font-size:12px;font-weight:700;color:var(--forest);opacity:.7;z-index:5}
+
+/* motion classes (whole-figure, style-preserving) */
+.m-idle{animation:m-idle 3.6s ease-in-out infinite}
+@keyframes m-idle{0%,100%{transform:translateY(0) rotate(0)}50%{transform:translateY(-14px) rotate(.8deg)}}
+.m-wave{animation:m-wave 1.7s ease-in-out infinite;transform-origin:60% 90%}
+@keyframes m-wave{0%,100%{transform:rotate(-3deg)}25%{transform:rotate(2.5deg)}50%{transform:rotate(-2deg)}75%{transform:rotate(3.5deg)}}
+.m-celebrate{animation:m-cel 1.1s cubic-bezier(.3,1.5,.5,1) infinite;transform-origin:50% 100%}
+@keyframes m-cel{0%,100%{transform:translateY(0) scale(1)}40%{transform:translateY(-46px) scale(1.03)}70%{transform:translateY(4px) scale(.98)}}
+.m-think{animation:m-think 4s ease-in-out infinite;transform-origin:50% 100%}
+@keyframes m-think{0%,100%{transform:rotate(-1.4deg)}50%{transform:rotate(1.4deg)}}
+.m-sleep{animation:m-sleep 3.4s ease-in-out infinite;transform-origin:50% 90%}
+@keyframes m-sleep{0%,100%{transform:scale(1) rotate(0)}50%{transform:scale(1.035,.975) rotate(.4deg)}}
+.m-oops{animation:m-oops 1.6s ease-in-out infinite}
+@keyframes m-oops{0%,100%{transform:translateX(0) rotate(0)}20%{transform:translateX(-5px) rotate(-2deg)}60%{transform:translateX(5px) rotate(2deg)}}
+.m-walk{animation:m-walk 1.1s ease-in-out infinite;transform-origin:50% 100%}
+@keyframes m-walk{0%,100%{transform:translateY(0) rotate(-1.5deg)}50%{transform:translateY(-10px) rotate(1.5deg)}}
+.m-cheer{animation:m-cheer 1.5s cubic-bezier(.3,1.4,.5,1) infinite;transform-origin:50% 100%}
+@keyframes m-cheer{0%,100%{transform:translateY(0)}45%{transform:translateY(-30px) scale(1.02)}}
+.shadow-pulse{animation:shp 3.6s ease-in-out infinite}
+@keyframes shp{0%,100%{transform:translateX(-50%) scale(1);opacity:.2}50%{transform:translateX(-50%) scale(.8);opacity:.12}}
+.paused *{animation-play-state:paused !important}
+
+.zzz{position:absolute;font-family:'Baloo 2';font-weight:800;color:var(--forest);opacity:0;z-index:6}
+.zzz.on{animation:zzz 2.6s ease-in-out infinite}
+@keyframes zzz{0%{opacity:0;transform:translate(0,0) scale(.6)}30%{opacity:.8}100%{opacity:0;transform:translate(26px,-70px) scale(1.3)}}
+
+/* ---------- before/after ---------- */
+.fix-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-top:30px}
+.fixcard{background:var(--paper);border-radius:24px;box-shadow:var(--shadow),var(--ring);overflow:hidden}
+.fixhead{padding:18px 20px;border-bottom:1px solid rgba(42,35,28,.07)}
+.fixhead h3{font-size:20px;margin:0 0 3px}
+.fixhead p{margin:0;font-size:13px;color:var(--ink-soft);font-weight:700}
+.compare{position:relative;aspect-ratio:1/1;background:
+   repeating-conic-gradient(#eee 0 25%, #fff 0 50%) 50%/26px 26px;user-select:none;overflow:hidden;touch-action:none}
+.compare img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;padding:8%}
+.compare .after{clip-path:inset(0 0 0 var(--split,50%))}
+.compare .divider{position:absolute;top:0;bottom:0;left:var(--split,50%);width:3px;background:#fff;box-shadow:0 0 0 1px rgba(42,35,28,.15);cursor:ew-resize}
+.compare .knob{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:38px;height:38px;border-radius:50%;background:#fff;box-shadow:var(--shadow);display:grid;place-items:center;color:var(--forest)}
+.compare .tagB,.compare .tagA{position:absolute;top:12px;font-size:11px;font-weight:900;letter-spacing:.1em;padding:5px 10px;border-radius:999px;color:#fff}
+.compare .tagB{left:12px;background:var(--maroon)}
+.compare .tagA{right:12px;background:var(--forest)}
+.fixnote{padding:16px 20px;font-size:13.5px;font-weight:700;color:var(--ink-soft);display:flex;gap:10px}
+.fixnote .ic{color:var(--forest);flex:0 0 auto}
+
+/* ---------- gallery ---------- */
+.gal{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:16px;margin-top:28px}
+.gcard{background:var(--paper);border-radius:20px;box-shadow:var(--ring);padding:14px;text-align:center;transition:transform .28s,box-shadow .28s;cursor:pointer}
+.gcard:hover{transform:translateY(-8px) rotate(-1deg);box-shadow:var(--shadow)}
+.gcard .pic{height:130px;display:grid;place-items:center}
+.gcard img{max-height:130px;max-width:100%;transition:transform .35s}
+.gcard:hover img{transform:scale(1.12) translateY(-4px)}
+.gcard small{display:block;margin-top:8px;font-weight:800;font-size:12px;color:var(--ink-soft);text-transform:capitalize}
+
+/* ---------- spec checklist ---------- */
+.spec{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:28px}
+.speccard{background:var(--paper);border-radius:22px;box-shadow:var(--ring);padding:22px}
+.speccard h3{margin:0 0 14px;font-size:22px;display:flex;align-items:center;gap:10px}
+.speccard h3 .tag{font-family:'Nunito';font-size:11px;font-weight:900;letter-spacing:.1em;color:#fff;padding:4px 10px;border-radius:999px}
+.chk{display:flex;align-items:flex-start;gap:11px;padding:9px 0;border-top:1px dashed rgba(42,35,28,.12);font-weight:700;font-size:14px}
+.chk:first-of-type{border-top:none}
+.chk .ok{flex:0 0 auto;width:22px;height:22px;border-radius:50%;background:var(--leaf);color:#fff;display:grid;place-items:center}
+.chk small{color:var(--ink-soft);font-weight:600;display:block}
+
+/* ---------- footer ---------- */
+footer{position:relative;z-index:1;background:var(--forest);color:#EFF4E6;margin-top:40px;padding:44px 0}
+footer .wrap{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;align-items:center}
+footer .brand{color:#fff}
+footer small{opacity:.8;font-weight:700}
+
+@media(max-width:900px){
+  .hero-grid{grid-template-columns:1fr;text-align:center}
+  .hero p.lead{margin-inline:auto}
+  .cta,.stat-row{justify-content:center}
+  .lab{grid-template-columns:1fr}
+  .fix-grid,.spec{grid-template-columns:1fr}
+  .navlinks{display:none}
+}
+</style>
+</head>
+<body>
+<div class="leaves" id="leaves"></div>
+
+<nav>
+  <div class="wrap">
+    <div class="brand"><span class="paw" id="navpaw"></span> FIEZEL <span style="color:var(--maroon)">Universe</span></div>
+    <div class="navlinks">
+      <a href="#lab">Motion Lab</a>
+      <a href="#fixes">Perbaikan</a>
+      <a href="#gallery">Ekspresi</a>
+      <a href="#spec">Konsistensi</a>
+    </div>
+    <span class="pill">PR #398 · Reviewed</span>
+  </div>
+</nav>
+
+<header class="hero">
+  <div class="wrap hero-grid">
+    <div class="reveal in">
+      <span class="kicker">Character Universe · Nusa &amp; Mira</span>
+      <h1>Maskot yang <span class="u">hidup</span>,<br>anatomi terjaga.</h1>
+      <p class="lead">Setiap pose Nusa &amp; Mira diperiksa terhadap reference sheet — proporsi badan, tangan, rambut, topi, dan logo paw dijaga konsisten. Anomali diperbaiki, lalu dihidupkan dengan motion flat‑design.</p>
+      <div class="cta">
+        <a href="#lab" class="btn p" id="btnPlay">▶ Mainkan Motion</a>
+        <a href="#fixes" class="btn s">Lihat Perbaikan</a>
+      </div>
+      <div class="stat-row">
+        <div class="stat"><b>2</b><span>Karakter Kanon</span></div>
+        <div class="stat"><b>24</b><span>Pose Vektor</span></div>
+        <div class="stat"><b>5</b><span>Anomali Diperbaiki</span></div>
+        <div class="stat"><b>100%</b><span>Flat / 2D</span></div>
+      </div>
+    </div>
+    <div class="stage">
+      <div class="stage-bg"></div>
+      <div class="hero-char hero-nusa"><img src="/assets/characters/nusa/png/full-neutral.png" alt="Nusa"></div>
+      <div class="hero-char hero-mira"><img src="/assets/characters/mira/png/full-neutral.png" alt="Mira"></div>
+    </div>
+  </div>
+</header>
+
+<!-- MOTION LAB (Remotion) -->
+<section id="lab">
+  <div class="wrap">
+    <div class="reveal">
+      <span class="kicker">01 · Motion Lab · Remotion</span>
+      <h2 class="h2">Animasi dirender dengan <span style="color:var(--maroon)">Remotion</span></h2>
+      <p class="sub">Tiap klip adalah video MP4 yang dirender programmatically lewat Remotion (React) — memakai <b>spring</b> &amp; easing untuk gerak halus 30fps, sementara garis, warna, dan proporsi flat‑vector tetap 100% asli.</p>
+    </div>
+    <div class="reel reveal">
+      <div class="player">
+        <span class="badge-note">▶ <b id="clipTitle">Nusa &amp; Mira</b></span>
+        <span class="rmk" id="rmk">Rendered with Remotion</span>
+        <video id="feature" poster="/assets/motion/posters/hero.jpg" autoplay muted loop playsinline preload="auto"></video>
+      </div>
+      <div class="playlist" id="playlist"></div>
+    </div>
+  </div>
+</section>
+
+<!-- FIXES -->
+<section id="fixes" style="background:linear-gradient(180deg, transparent, rgba(216,164,60,.08), transparent)">
+  <div class="wrap">
+    <div class="reveal">
+      <span class="kicker">02 · Anomaly Audit &amp; Fix</span>
+      <h2 class="h2">Sebelum → Sesudah perbaikan</h2>
+      <p class="sub">Geser slider untuk membandingkan. Dua anomali utama pada Mira diperbaiki tanpa mengubah identitas karakter, ditambah topi disamakan di semua close‑up.</p>
+    </div>
+    <div class="fix-grid reveal">
+      <div class="fixcard">
+        <div class="fixhead"><h3>Mira · Head “Happy”</h3><p>Topi pith hilang di semua close‑up → dikembalikan konsisten.</p></div>
+        <div class="compare" data-split="50">
+          <img class="before" src="/assets/characters/_orig/mira-head-happy.png" alt="before">
+          <img class="after"  src="/assets/characters/mira/png/head-happy.png" alt="after">
+          <span class="tagB">SEBELUM</span><span class="tagA">SESUDAH</span>
+          <div class="divider"><div class="knob">⇆</div></div>
+        </div>
+        <div class="fixnote"><span class="ic" id="ic1"></span><span>Topi safari tan + band hijau ditambahkan, sesuai reference sheet. Wajah, kacamata, kompas &amp; badge paw dipertahankan identik.</span></div>
+      </div>
+      <div class="fixcard">
+        <div class="fixhead"><h3>Mira · Full “Thinking”</h3><p>Kompas menggantung + telapak tangan cacat → dirapikan.</p></div>
+        <div class="compare" data-split="50">
+          <img class="before" src="/assets/characters/_orig/mira-full-thinking.png" alt="before">
+          <img class="after"  src="/assets/characters/mira/png/full-thinking.png" alt="after">
+          <span class="tagB">SEBELUM</span><span class="tagA">SESUDAH</span>
+          <div class="divider"><div class="knob">⇆</div></div>
+        </div>
+        <div class="fixnote"><span class="ic" id="ic2"></span><span>Kompas ganda yang menggantung dihapus &amp; lengan kanan dirapikan natural. Kompas kalung di dada tetap dipertahankan.</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- GALLERY -->
+<section id="gallery">
+  <div class="wrap">
+    <div class="reveal">
+      <span class="kicker">03 · Expression Gallery</span>
+      <h2 class="h2">Ekspresi close‑up</h2>
+      <p class="sub">Arahkan kursor untuk efek pop. Seluruh set head Mira kini selalu memakai topi &amp; kacamata bulat yang sama.</p>
+    </div>
+    <div class="gal reveal" id="gallery-grid"></div>
+  </div>
+</section>
+
+<!-- SPEC -->
+<section id="spec" style="background:linear-gradient(180deg,transparent,rgba(46,84,64,.05))">
+  <div class="wrap">
+    <div class="reveal">
+      <span class="kicker">04 · Consistency Checklist</span>
+      <h2 class="h2">Detail wajib yang dijaga di setiap pose</h2>
+      <p class="sub">Acuan verifikasi anatomi &amp; atribut khas — dicek terhadap reference sheet PR #398.</p>
+    </div>
+    <div class="spec reveal">
+      <div class="speccard">
+        <h3>🐒 Nusa <span class="tag" style="background:var(--maroon)">Tarsier Monkey</span></h3>
+        <div id="nusa-chk"></div>
+      </div>
+      <div class="speccard">
+        <h3>🧭 Mira <span class="tag" style="background:var(--forest)">Explorer</span></h3>
+        <div id="mira-chk"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div class="brand"><span class="paw" id="footpaw"></span> FIEZEL Character Universe</div>
+    <small>Preview motion · aset dari PR #398 · 5 anomali diperbaiki · gaya flat‑design 2D dipertahankan</small>
+  </div>
+</footer>
+
+<script>
+const A='/assets/characters/';
+const PAW='<svg viewBox="0 0 24 24" fill="currentColor"><circle cx="6" cy="10" r="2.1"/><circle cx="12" cy="7.6" r="2.3"/><circle cx="18" cy="10" r="2.1"/><circle cx="9" cy="14.5" r="1.7"/><circle cx="15" cy="14.5" r="1.7"/><path d="M12 12.5c3.4 0 6 2.2 6 4.6 0 2-1.8 3.1-6 3.1s-6-1.1-6-3.1c0-2.4 2.6-4.6 6-4.6z"/></svg>';
+const CHECK='<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>';
+document.getElementById('navpaw').innerHTML=PAW;
+document.getElementById('footpaw').innerHTML=PAW;
+document.getElementById('ic1').innerHTML=CHECK; document.getElementById('ic2').innerHTML=CHECK;
+
+/* ---- Remotion clip reel ---- */
+const _t=document.createElement('video');
+const canH264=!!_t.canPlayType('video/mp4; codecs="avc1.42E01E"');
+const canWebm=!!(_t.canPlayType('video/webm; codecs="vp8"')||_t.canPlayType('video/webm; codecs="vp9"'));
+const EXT = canH264 ? 'mp4' : (canWebm ? 'webm' : 'mp4');   // prefer mp4, fallback webm (Chromium w/o H264)
+const MURL=f=>'/assets/motion/'+f+'.'+EXT;
+const POST=f=>'/assets/motion/posters/'+f+'.jpg';
+const CLIPS=[
+  {f:'hero',           t:'Nusa & Mira',      d:'Idle + Wave · beda skala'},
+  {f:'nusa-wave',      t:'Nusa · Wave',      d:'Menyapa'},
+  {f:'nusa-celebrate', t:'Nusa · Celebrate', d:'Melompat girang'},
+  {f:'nusa-sleep',     t:'Nusa · Sleep',     d:'Bernapas + Zzz'},
+  {f:'mira-cheer',     t:'Mira · Cheer',     d:'Bersorak'},
+  {f:'mira-wave',      t:'Mira · Wave',      d:'Menyapa'},
+  {f:'team-walk',      t:'Team · Walk',      d:'Berjalan menyusuri'},
+];
+const feature=document.getElementById('feature'), clipTitle=document.getElementById('clipTitle'),
+      playlist=document.getElementById('playlist');
+document.getElementById('rmk').insertAdjacentHTML('afterbegin','<svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>');
+let curClip=0;
+function loadClip(i){
+  curClip=i; const c=CLIPS[i];
+  feature.poster=POST(c.f); feature.src=MURL(c.f); feature.load(); feature.play().catch(()=>{});
+  clipTitle.textContent=c.t;
+  document.querySelectorAll('.clip').forEach((el,idx)=>el.classList.toggle('on',idx===i));
+}
+CLIPS.forEach((c,i)=>{
+  const d=document.createElement('div'); d.className='clip'+(i===0?' on':'');
+  d.innerHTML='<video src="'+MURL(c.f)+'" poster="'+POST(c.f)+'" muted loop autoplay playsinline preload="metadata"></video>'+
+              '<div class="meta"><b>'+c.t+'</b><small>'+c.d+'</small></div>';
+  d.onclick=()=>loadClip(i);
+  playlist.appendChild(d);
+});
+loadClip(0);
+
+/* ---- gallery ---- */
+const GAL=[
+  ['nusa','head-happy'],['nusa','head-curious'],['nusa','head-thinking'],['nusa','head-oops'],
+  ['mira','head-happy'],['mira','head-explain'],['mira','head-proud'],['mira','head-thinking'],
+  ['team','shoulder-wave'],['team','highfive'],['team','teaching'],['team','walking']
+];
+const gg=document.getElementById('gallery-grid');
+GAL.forEach(([c,p])=>{
+  const d=document.createElement('div');d.className='gcard';
+  d.innerHTML='<div class="pic"><img loading="lazy" src="'+A+c+'/png/'+p+'.png" alt="'+c+' '+p+'"></div><small>'+c+' · '+p.replace('head-','').replace('-',' ')+'</small>';
+  gg.appendChild(d);
+});
+
+/* ---- spec checklist ---- */
+const NUSA_SPEC=[
+  ['Proporsi tubuh','~3.2 kepala, badan mungil membulat'],
+  ['Bulu emas + moncong krem','warna solid flat, tanpa gradasi realistis'],
+  ['Bandana maroon + logo paw putih','selalu di leher, logo menghadap depan'],
+  ['Mata besar cokelat + kilau','ekspresi ramah & curious'],
+  ['Tas selempang cokelat','di pinggul kiri (kecuali head-shot)'],
+  ['Ekor panjang melingkar','ikonik, ujung menggulung'],
+  ['Empat jari tangan/kaki','tanpa jari cacat/berlebih'],
+];
+const MIRA_SPEC=[
+  ['Proporsi chibi','~3 kepala, tubuh berisi & ramah'],
+  ['Topi pith tan + band hijau','KINI konsisten di semua close-up ✔'],
+  ['Sanggul + aksen daun hijau','rambut cokelat tua'],
+  ['Kacamata bulat + pipi merona','garis emas tipis'],
+  ['Jaket hijau + kaus krem','lengan dilipat, dua saku'],
+  ['Kompas kalung + badge paw emas','satu kompas saja (ganda dihapus ✔)'],
+  ['Celana khaki, kaus kaki, boots','sabuk cokelat, sepatu bertali'],
+];
+function chk(list,el){el.innerHTML=list.map(([t,s])=>'<div class="chk"><span class="ok">'+CHECK+'</span><span>'+t+'<small>'+s+'</small></span></div>').join('');}
+chk(NUSA_SPEC,document.getElementById('nusa-chk'));
+chk(MIRA_SPEC,document.getElementById('mira-chk'));
+
+/* ---- before/after sliders ---- */
+document.querySelectorAll('.compare').forEach(c=>{
+  const after=c.querySelector('.after'), div=c.querySelector('.divider');
+  let drag=false;
+  const set=x=>{const r=c.getBoundingClientRect();let p=(x-r.left)/r.width*100;p=Math.max(4,Math.min(96,p));
+    after.style.clipPath='inset(0 0 0 '+p+'%)';div.style.left=p+'%';};
+  const px=e=>e.touches?e.touches[0].clientX:e.clientX;
+  c.addEventListener('mousedown',e=>{drag=true;set(px(e));});
+  c.addEventListener('touchstart',e=>{drag=true;set(px(e));},{passive:true});
+  window.addEventListener('mousemove',e=>{if(drag)set(px(e));});
+  window.addEventListener('touchmove',e=>{if(drag)set(px(e));},{passive:true});
+  window.addEventListener('mouseup',()=>drag=false);
+  window.addEventListener('touchend',()=>drag=false);
+  after.style.clipPath='inset(0 0 0 50%)';div.style.left='50%';
+});
+
+/* ---- reveal on scroll ---- */
+const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting)e.target.classList.add('in');}),{threshold:.12});
+document.querySelectorAll('.reveal').forEach(r=>io.observe(r));
+
+/* ---- floating leaves ---- */
+const L=document.getElementById('leaves');const emo=['🍃','🌿','🍂'];
+for(let i=0;i<14;i++){const s=document.createElement('div');s.className='leaf';s.textContent=emo[i%3];
+  s.style.left=(Math.random()*100)+'%';s.style.fontSize=(16+Math.random()*26)+'px';
+  s.style.animationDuration=(11+Math.random()*16)+'s';s.style.animationDelay=(-Math.random()*18)+'s';L.appendChild(s);}
+
+/* play button focus */
+document.getElementById('btnPlay').addEventListener('click',()=>{feature.play().catch(()=>{});});
+</script>
+</body>
+</html>
