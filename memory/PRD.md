@@ -1,42 +1,41 @@
-# FIEZEL 2.0 — Full UI/UX Redesign
+# FIEZEL Character Universe — PR #398 Mascot Review + Motion Preview
 
-## Problem statement (asli)
-Redesign UI/UX FIEZEL menyeluruh: cheerful + premium + modern, palet pastel dipertahankan (light yellow, pastel pink, cream, mint, lilac, maroon), mobile-first PWA, navigasi sederhana, CTA jelas, feedback benar/salah natural. Revisi user: mock diterima; SEMUA maskot PAW tetap seperti sebelumnya; tambah panel Online & Teman yang mudah dilihat; fitur tambah teman lewat ID; tombol gabung kelas dengan kode guru.
+## Original request (Indonesian)
+Cek PR #398 (repo FIEZEL-APPS), analisa gambar mascot (Nusa & Mira) agar anatomi/detail
+konsisten dengan reference sheet (ukuran badan, tangan, rambut, topi, logo, dll). Perbaiki
+anomali secara maksimal, jaga gaya flat design / vector / 2D. Lalu buat animasi motion
+menggunakan **Remotion**, dan berikan preview. Nusa (monyet) harus lebih kecil dari Mira (manusia).
 
-## Arsitektur
-- Static PWA di root repo (index.html, app.js, style.css, features/*), preview `tools/preview-server.mjs` :3000.
-- Backend: Cloudflare Worker `workers/api` (D1). Sosial: `route-social.js`.
+## Context
+- `/app` IS the live FIEZEL-APPS repo (served statically on :3000 via `tools/preview-server.mjs`).
+- PR #398 = branch `agent/a3-m02514-cache-integrity` (SHA a2d567b). Adds `assets/characters/`
+  (Nusa monkey, Mira explorer, team, scenes) as PNG/WebP/auto-traced SVG + reference sheets.
 
-## Yang sudah diimplementasikan (Juni 2026, build m025-258)
-- `fiezel-2.css` (lapisan redesign, dimuat terakhir + masuk cache SW): token radius/shadow, tipografi Jakarta (serif dihapus dari display), tombol pill tactile (sun 3D edge, CTA utama ink), bottom nav pill dengan tab aktif kuning, kartu Hari Ini gradasi kuning + eyebrow maroon, skill hub pastel per skill (pink/mint/lilac/peach/kuning/sky), tabs segmented, opsi kuis berhuruf A–D dengan state benar/salah 3D, feedback tinted, form input membulat.
-- Panel **Online & Teman** di Home (`socialHomeBody`, data-testid `home-online-panel`): avatar teman + status online, tombol **Tambah teman** (`openAddFriendModal`) dan **Gabung kelas** (`openJoinClassModal`), tautan Lihat semua. Selalu tampil (juga saat offline/flag off).
-- Tab Teman: kartu "Tambah teman lewat ID" (input @handle → `POST /api/social/friends/add`), kartu "Gabung kelas dengan kode guru", daftar teman, kode undangan lama dipindah ke `<details>` "Cara lain".
-- Worker: route baru `POST /api/social/friends/add` {handle} (dua arah, idempoten, anti-oracle), schema.js size, client `api.friendAdd`.
-- Gabung kelas: kode disimpan ke `fiezel-onboarding-v1.classCode` (jalur yang sama dengan onboarding), memicu `FiezelLearnerFlow.pushToClass`, bisa diganti/keluar.
-- i18n: kunci `social2.*` id + th.
-- Mock design HTML statis di `/app/mockups/` (referensi arah desain).
-- Gate lokal hijau: pwa-release-coherence, install-health, boot-order, lucide-icon-coverage, th-coverage, social-frontend, social-api-contract.
+## Anomaly audit (vs reference sheets)
+- Nusa: consistent across all poses — OK.
+- Mira: (1) all `head-*` close-ups were MISSING the pith hat; (2) `full-thinking` had a
+  malformed hand holding a redundant dangling compass.
 
-- Jalur Grammar bernode (`grammar()`): ringkasan ring X/N di atas, node dot + kartu lesson, node aktif berbingkai kuning dengan progress bar + CTA `grammar-path-continue`, lesson selesai bertanda ✓, terkunci redup.
-- Progres: `cefrRoadmapMarkup` → kartu level gelap (`progress-level-card`, % menuju level berikut dari lesson grammar yang tembus ambang, track A1–C2, streak); `weeklyActivityChartMarkup` → "Minggu ini" (`progress-week-card`) dari data nyata `skillTimeline()` (kotak per hari, hari ini putus-putus). Kunci i18n `progress2.*` id+th.
+## What was done (2026-06)
+- Fixed 5 Mira assets via targeted Gemini image-edit (hat added to head-happy/explain/proud/thinking;
+  compass+hand fixed on full-thinking), background flood-filled back to transparent PNG.
+  Fixed files copied over originals in `/app/assets/characters/mira/png/`; originals kept in
+  `/app/assets/characters/_orig/`.
+- Remotion project at `/app/remotion` (src/Root.jsx, Scene.jsx). Rendered 7 clips to
+  `/app/assets/motion/` in **MP4 (H.264) + WebM (VP8)** + poster JPEGs:
+  hero, nusa-wave, nusa-celebrate, nusa-sleep, mira-cheer, mira-wave, team-walk.
+  Hero composites Nusa smaller than Mira (height 48 vs 72) for realistic scale.
+- Showcase page: `/app/character-preview.html` — hero, Remotion motion reel (codec auto-detect
+  mp4→webm fallback + posters), before/after anomaly sliders, expression gallery, consistency checklist.
 
-## Backlog
-- P1: layar hasil sesi ala mock (skor besar, mastery naik, langkah berikutnya).
-- P1: desktop layout sidebar (mock d1–d3) untuk ≥1024px.
-- P2: deploy worker (`wrangler deploy`) supaya endpoint friends/add aktif di produksi.
+## Preview URL
+https://971a4388-258b-4b72-bb81-e0a9016b4652.preview.emergentagent.com/character-preview.html
 
-## Class Hub — Kelas = Guru ↔ Murid ↔ Braincore (Sep 2026, build m025-259)
-Problem statement: rebuild "Class" di bottom nav sebagai learning hub guru–murid (audit dulu; jangan buang fondasi; Braincore di tengah loop, tanpa Puter/API key/cloud AI). Audit + flow + gap + arsitektur + 3 konsep UI: `docs/class-hub-audit.md`.
-- `features/class-hub/fiezel-braincore-review.js`: review lokal soal guru (parser impor, CEFR estimasi, skill, kesulitan via FiezelItemPrior, 9 cek kualitas, distraktor → kode taksonomi miskonsepsi, saran perbaikan, status tugas 4 warna).
-- `features/class-hub/fiezel-class-hub.js` + `class-hub.css`: wajah murid (Tugas / Kelas Saya / Progres + runner tugas di dalam Kelas) dan wajah guru (Kelas Saya / Tugas / Buat Tugas 3 langkah / Hasil / Braincore) yang dipasang di Ruang Guru sebagai view `hub` (landing default).
-- Kontrak data diperluas aditif: payload tugas `teacher`, `items[]` (soal kustom); laporan murid `assign[].s` (sedang) dan `assign[].w` (soal salah); byte limit assign 32 KB / class-report 8 KB.
-- app.js: view `classroom` → `classHubView()`; tutor bersuara tetap hidup lewat kartu "Tutor FIEZEL"; notifikasi tugas → Kelas; learner-flow merutekan blok tugas guru ke hub.
-- Gate baru `tests/class-hub-test.js` (unit + smoke DOM-stub loop penuh) masuk quality.yml.
-Backlog: satukan `route-teacher.js` (pohon konten server) sebagai sumber impor; kalibrasi review dengan bukti; ledger miskonsepsi murid dari `w[]`; i18n TH hub.
+## Re-render motion
+`cd /app/remotion && node_modules/.bin/remotion render src/index.js <CompId> /app/assets/motion/<name>.<mp4|webm>`
 
-## m025-266 — Pintu Tanya FIEZEL + gerbang layar yatim (Sep 2026, branch fix/pintu-tanya-fiezel)
-- Akar masalah: m025-254 mengganti tombol topbar "Tanya FIEZEL" dengan lonceng; `askView()` (view `ask`/`search`) yatim 11 build tanpa satu pun `go('ask')`.
-- Perbaikan: chip "Cari materi" di kepala panel pembimbing PAW (`features/ui/fiezel-coach-bubble.js`, opsi `openAsk` dari `syncCoachBubble()` app.js), i18n `coach.cari-materi` id+th.
-- Gerbang baru `tests/view-reachability-test.js` (VALID_VIEWS + alias renderInner + pintu, semua ditemukan dari kode); terdaftar di quality.yml. Merah pada app.js main, hijau sesudah.
-- Handoff: `docs/handoffs/FIEZEL-M025266-PINTU-TANYA-FIEZEL-HANDOFF.md`.
-- Backlog terdekat (PR terpisah): tiga chip + aria-label gelembung di coach-bubble masih teks Indonesia langsung (murid Thai melihat chip Indonesia).
+## Backlog / next
+- P1: Blink/mouth micro-animation via layered SVG parts (needs rigged art, not single PNG).
+- P1: Interactive @remotion/player embed for scrubbing.
+- P2: Commit fixed assets + motion back to PR branch (via "Save to GitHub").
+- P2: Auto-generate remaining pose videos (oops, thinking, curious).
