@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>FIEZEL — Character Universe (Concept Mock)</title>
+<style>
+  :root{
+    --maroon:#8C2233; --maroon-d:#6D1926; --gold:#D8B36B; --gold-d:#B8933F;
+    --cream:#FDF6EA; --paper:#FFFFFF; --ink:#2B2118; --teal:#2E7D74; --muted:#7A6E5E;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Plus Jakarta Sans',system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
+    background:radial-gradient(1200px 600px at 80% -10%, #fff6e6 0%, var(--cream) 55%);
+    color:var(--ink);line-height:1.5;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:1080px;margin:0 auto;padding:40px 20px 80px}
+  .badge{display:inline-flex;align-items:center;gap:8px;background:var(--maroon);color:#fff;
+    padding:7px 14px;border-radius:999px;font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase}
+  h1{font-size:clamp(30px,5vw,52px);line-height:1.05;margin:18px 0 10px;font-weight:800;letter-spacing:-.02em}
+  h1 .hl{color:var(--maroon)}
+  .lead{font-size:clamp(15px,2vw,19px);color:var(--muted);max-width:640px}
+  .concept-note{margin-top:16px;background:#fff;border:1px solid #efe3cf;border-left:4px solid var(--gold);
+    padding:14px 18px;border-radius:12px;font-size:14px;color:#5c5344;max-width:680px}
+  section{margin-top:56px}
+  .sec-head{display:flex;align-items:baseline;gap:12px;margin-bottom:18px;flex-wrap:wrap}
+  .sec-head h2{font-size:24px;font-weight:800;letter-spacing:-.01em}
+  .sec-head .num{font-size:13px;font-weight:800;color:var(--gold-d);background:#fff4dc;
+    border-radius:8px;padding:3px 9px}
+  .sec-head p{color:var(--muted);font-size:14px}
+  .card{background:var(--paper);border:1px solid #efe3cf;border-radius:22px;overflow:hidden;
+    box-shadow:0 22px 50px -30px rgba(140,34,51,.35)}
+  .card img{display:block;width:100%;height:auto}
+  .grid2{display:grid;grid-template-columns:1fr;gap:22px}
+  @media(min-width:820px){.grid2{grid-template-columns:1.15fr .85fr}}
+  .roles{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:14px}
+  @media(min-width:640px){.roles{grid-template-columns:repeat(3,1fr)}}
+  .role{background:#fff;border:1px solid #efe3cf;border-radius:14px;padding:12px 14px}
+  .role b{display:block;font-size:14px}
+  .role span{font-size:12.5px;color:var(--muted)}
+  .role .dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--maroon);margin-right:7px;vertical-align:middle}
+  .palette{display:flex;gap:10px;flex-wrap:wrap;margin-top:8px}
+  .sw{width:56px;text-align:center;font-size:11px;color:var(--muted)}
+  .sw i{display:block;height:44px;border-radius:12px;margin-bottom:5px;border:1px solid rgba(0,0,0,.06)}
+  .footer{margin-top:64px;text-align:center;color:var(--muted);font-size:13px}
+  .pill{display:inline-block;background:#fff;border:1px solid #efe3cf;border-radius:999px;padding:6px 13px;font-size:12.5px;margin:4px;font-weight:600}
+  .kicker{font-size:12px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--gold-d)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <span class="badge">FIEZEL · Concept Mock v0 · untuk disetujui</span>
+  <h1>Semesta Karakter <span class="hl">FIEZEL</span></h1>
+  <p class="lead">Sebuah dunia belajar bahasa yang hidup — dipandu oleh sekelompok karakter asli Indonesia. Bukan sekadar maskot baru, tapi identitas visual yang benar-benar milik FIEZEL.</p>
+  <div class="concept-note">
+    <b>Catatan:</b> Ini adalah <b>mock konsep</b> (render ilustrasi) untuk menilai <b>arah visual</b> — setuju / tolak.
+    Setelah arah disetujui, seluruh sistem akan dibangun ulang sebagai <b>vektor SVG asli yang reusable</b> (bukan gambar raster).
+    Lambang <b>telapak kaki PAW</b> tetap dipertahankan sebagai stempel merek.
+  </div>
+
+  <section>
+    <div class="sec-head"><span class="num">01</span><h2>Nusa — Sang Pemandu</h2>
+      <p>Tarsius bermata besar (satwa khas Indonesia): penasaran, cerdas, ekspresif — kuat di ukuran UI kecil maupun ilustrasi besar.</p></div>
+    <div class="card"><img src="https://static.prod-images.emergentagent.com/jobs/23d1f54c-d781-43a9-8ec7-1e26d1a2f647/images/f3ece5d788b72ed6a2553551b0cf2995cd8fc13a0f80615b017272867666e064.jpeg" alt="Nusa main character sheet"/></div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="num">02</span><h2>Cast Pendukung</h2>
+      <p>Tujuh karakter — satu keluarga visual, peran belajar berbeda.</p></div>
+    <div class="card"><img src="https://static.prod-images.emergentagent.com/jobs/23d1f54c-d781-43a9-8ec7-1e26d1a2f647/images/5fac779a531ac352e84f403a9342bdbae88bb6326714de5a39a11e671bd0544a.jpeg" alt="Supporting cast lineup"/></div>
+    <div class="roles">
+      <div class="role"><b><span class="dot"></span>Enggang</b><span>Rangkong — Speaking / berbicara</span></div>
+      <div class="role"><b><span class="dot"></span>Komo</b><span>Komodo kecil — Explorer / petualang</span></div>
+      <div class="role"><b><span class="dot"></span>Manggis</b><span>Orangutan — Reading / bijak</span></div>
+      <div class="role"><b><span class="dot"></span>Cendra</b><span>Cendrawasih — Writing / kreator</span></div>
+      <div class="role"><b><span class="dot"></span>Pesut</b><span>Lumba-lumba — Listening</span></div>
+      <div class="role"><b><span class="dot"></span>Kancil</b><span>Teman sekelas cerdik — Grammar</span></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="num">03</span><h2>Lapisan Emosi (Feedback)</h2>
+      <p>Karakter hadir sebagai lapisan emosi — tak pernah menutupi soal.</p></div>
+    <div class="grid2">
+      <div class="card"><img src="https://static.prod-images.emergentagent.com/jobs/23d1f54c-d781-43a9-8ec7-1e26d1a2f647/images/9fc0e458e0148d86359f52396149c3045f529e4f23b54861edb9287d47bfbbdc.jpeg" alt="Correct and encouraging feedback states"/></div>
+      <div>
+        <span class="kicker">Aturan Konteks</span>
+        <p style="margin-top:8px;font-size:14px;color:#5c5344">Benar → ekspresi rayakan singkat. Salah → dukungan hangat (tak pernah menghukum). Karakter <b>tidak</b> muncul di layar padat: form, pengaturan, tabel, dasbor guru.</p>
+        <div style="margin-top:14px">
+          <span class="pill">Landing</span><span class="pill">Onboarding</span><span class="pill">Placement</span>
+          <span class="pill">Soal</span><span class="pill">Progress</span><span class="pill">Celebration</span><span class="pill">Empty / Offline</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="num">04</span><h2>Landing — Dunia FIEZEL</h2>
+      <p>Karakter belajar & menjelajah bersama; ruang kosong atas untuk headline.</p></div>
+    <div class="card"><img src="https://static.prod-images.emergentagent.com/jobs/23d1f54c-d781-43a9-8ec7-1e26d1a2f647/images/807081bac210788f542741fadb7b7cffc5aa757720d40c110f1eb7ae274e0543.jpeg" alt="Landing hero scene"/></div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="num">05</span><h2>DNA Visual</h2></div>
+    <div class="palette">
+      <div class="sw"><i style="background:#8C2233"></i>Marun</div>
+      <div class="sw"><i style="background:#D8B36B"></i>Emas</div>
+      <div class="sw"><i style="background:#2E7D74"></i>Teal</div>
+      <div class="sw"><i style="background:#F0C46B"></i>Krem-emas</div>
+      <div class="sw"><i style="background:#FDF6EA"></i>Krem</div>
+      <div class="sw"><i style="background:#2B2118"></i>Tinta</div>
+    </div>
+    <p style="margin-top:14px;font-size:14px;color:#5c5344;max-width:680px">
+      Modern · premium · hangat · penasaran · cerdas · sedikit futuristik. Vector-first, soft cel-shading.
+      Jangkar merek <b>marun + emas</b> dipertahankan; aksen <b>teal</b> baru untuk nuansa "ilmiah/petualang".
+    </p>
+  </section>
+
+  <div class="footer">
+    FIEZEL Character Universe — Concept Mock v0 · Tarsius <b>Nusa</b> + 6 cast · render konsep, produksi = SVG vektor asli.<br/>
+    Setujui arah ini, atau beri tahu apa yang ingin diubah (karakter, warna, gaya).
+  </div>
+</div>
+</body>
+</html>
