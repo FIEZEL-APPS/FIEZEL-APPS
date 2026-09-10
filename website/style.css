@@ -1356,3 +1356,11 @@ ul,ol{margin:0;padding:0;list-style:none}
 @keyframes fzflow-pc-poof{0%,65.6%{opacity:0;transform:scale(.2)}66.4%{opacity:1;transform:scale(1)}67.6%{opacity:0;transform:scale(1.7)}93.4%{opacity:0;transform:scale(.2)}94.2%{opacity:1;transform:scale(1)}95.4%{opacity:0;transform:scale(1.7)}100%{opacity:0;transform:scale(.2)}}
 @keyframes fzflow-heart{0%,60%{opacity:0;transform:translateY(8px) scale(.6)}62%{opacity:1;transform:translateY(0) scale(1)}66%{opacity:0;transform:translateY(-34px) scale(1.1)}67%{opacity:0;transform:translateY(8px) scale(.6)}69%{opacity:1;transform:translateY(0) scale(1)}74%{opacity:0;transform:translateY(-38px) scale(1.15)}75%{opacity:0;transform:translateY(8px) scale(.6)}77%{opacity:1;transform:translateY(0) scale(1)}82.5%{opacity:0;transform:translateY(-38px) scale(1.15)}83%,100%{opacity:0;transform:translateY(8px) scale(.6)}}
 
+
+/* ===== FIEZEL Character Universe (Nusa + Mira) — kulit hero. Rig SVG lama disembunyikan, bukan dihapus. ===== */
+.showcase .hero-paw,.showcase .fzflow-paw-costume{display:none !important}
+.showcase .hero-nusa{display:block;width:100%;line-height:0}
+.showcase .hero-nusa img{display:block;width:100%;height:auto;filter:drop-shadow(0 10px 18px rgba(27,20,24,.18))}
+.mira-teacher-wrapper .mira-svg{display:none !important}
+.mira-teacher-wrapper .mira-img{position:absolute;left:50%;bottom:0;transform:translateX(-50%);width:172px;line-height:0}
+.mira-teacher-wrapper .mira-img img{display:block;width:100%;height:auto}
