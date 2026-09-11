@@ -13,6 +13,10 @@
   <div id="app" data-testid="app-root">
     <div class="auth-wrap"><div class="card">Memuat konsol…</div></div>
   </div>
+  <!-- Alamat backend mesin kurikulum hidup di core-config.js; fz-api.js membacanya lewat
+       FIEZEL_CURRICULUM_CONFIG.curriculumApiUrl. Tanpa baris ini konfigurasinya TIDAK ADA di
+       halaman ini dan setiap panggilan ditolak "belum dikonfigurasi" walau backendnya hidup. -->
+  <script src="./core-config.js"></script>
   <script src="./features/curriculum/fz-api.js"></script>
   <script src="./features/curriculum/teacher-console.js"></script>
 </body>

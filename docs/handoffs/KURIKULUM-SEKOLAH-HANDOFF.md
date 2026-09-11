@@ -273,3 +273,69 @@ komentar dulu.**
 Catatan jujur untuk owner: Render paket gratis tidur setelah 15 menit menganggur, jadi guru
 yang membuka konsol setelah jeda menunggu ~50 detik. Untuk dipakai guru sungguhan, paketnya
 berbayar.
+
+---
+
+## m025-301 — mesinnya DIJALANKAN, dan kabel yang hilang ketahuan
+
+m025-298 menyiapkan jalannya tanpa pernah menjalankannya. Sesi ini menjalankannya sungguhan
+— MongoDB 7.0.34 dan FastAPI hidup berdampingan, konsol dibuka di Chromium — dan justru di
+situ ketahuan bahwa **mengisi `curriculumApiUrl` saja TIDAK akan menghidupkan konsolnya.**
+
+### Kabel yang hilang
+
+`kurikulum.html` dan `misi.html` hanya memuat dua skrip: `features/curriculum/fz-api.js` dan
+modul layarnya. **`core-config.js` tidak pernah disebut di kedua halaman itu.** Padahal di
+sanalah `FIEZEL_CURRICULUM_CONFIG.curriculumApiUrl` tinggal — satu-satunya tempat `fz-api.js`
+mencari alamat backend.
+
+Diukur di peramban sebelum perbaikan, dengan backend benar-benar hidup dan alamatnya sudah
+ditempel: `kurikulum.html` melaporkan `FIEZEL_CURRICULUM_CONFIG = null`. Jadi setiap
+panggilan ditolak sebelum menyentuh jaringan, dengan kalimat yang **menuduh owner belum
+mengonfigurasi apa pun** — padahal owner sudah melakukan tepat apa yang diminta daftar
+m025-298. Kegagalan yang menyalahkan orang yang benar adalah kegagalan yang paling mahal
+dicari.
+
+Perbaikannya satu baris per halaman: `<script src="./core-config.js"></script>` **sebelum**
+`fz-api.js` (skrip klasik dieksekusi berurutan; terbalik = sama saja tidak dimuat).
+
+`tests/curriculum-config-wiring-test.js` mengunci keduanya. Daftar halamannya tidak ditulis
+tangan: gerbang memindai seluruh `*.html` di akar dan menuntut setiap halaman yang memuat
+`fz-api.js` ikut memuat `core-config.js` lebih dulu — halaman konsol berikutnya terjaga
+sendiri. Arah sebaliknya ikut dijaga: alamat bawaan di repo WAJIB tetap kosong.
+
+### Yang benar-benar dijalankan, dan hasilnya
+
+| Lapis | Hasil |
+|---|---|
+| MongoDB 7.0.34 (127.0.0.1:27017) | hidup, `dbpath` lokal |
+| FastAPI `uvicorn server:app` (:8001) | `/api/health` → `{"ok":true, curriculum_nodes:731, questions:21}` |
+| `backend/smoke_test.py` | **35 PASS / 0 FAIL** |
+| `backend/unit_test.py` | **36 PASS / 0 FAIL** |
+| `backend/tests/` (pytest) | **21 passed** |
+| `kurikulum.html` di Chromium | login token guru tembus; Kopilot Guru terisi evidence nyata (8 TP dipantau, 7 belum diajarkan, rata-rata penguasaan 15%), nol `pageerror` |
+| `misi.html` di Chromium | konfigurasi terbaca, layar murid tampil, nol `pageerror` |
+
+Alamat lokal itu **tidak ditempel ke `core-config.js`**. Ia disuntikkan di peramban saat
+pengujian, karena `http://127.0.0.1:8001` di dalam repo sama dengan pintu ke ruangan kosong
+bagi setiap orang lain — persis bug m025-294 dalam bentuk baru.
+
+### Catatan pemasangan yang baru ketahuan
+
+* `backend/tests/test_fiezel_backend.py` membaca `REACT_APP_BACKEND_URL`; tanpa variabel itu
+  ia gagal saat *collection*, bukan saat assert. Untuk pengujian lokal isi dengan alamat
+  uvicorn-nya.
+* `backend/unit_test.py` memanggil `asyncio.run` sendiri di akhir berkas. Dijalankan sebagai
+  skrip (`python unit_test.py`) ia hijau; lewat `pytest` dua fungsinya dilaporkan merah
+  karena `pytest-asyncio` memang tidak ada di `requirements.txt`. Itu cara pakainya, bukan
+  kerusakan.
+* Token owner yang dipakai suite adalah `FZ-OWNER-2026-MASTER` dari
+  `memory/test_credentials.md` — nilai yang **sudah terpublikasi di repo**. Di produksi
+  `OWNER_MASTER_TOKEN` dan `ADMIN_PASSWORD` wajib nilai baru; ini tetap keputusan owner yang
+  belum diambil (lihat catatan m025-296 di atas).
+
+### Yang MASIH milik owner
+
+Daftar m025-298 tetap berlaku utuh (MongoDB Atlas → Render → delapan variabel →
+`CORS_ORIGINS` → tempel alamatnya). Yang berubah: sekarang langkah ke-5 itu benar-benar
+membuka pintunya, karena kabel yang membuatnya sia-sia sudah tersambung dan dijaga gerbang.

@@ -1025,6 +1025,15 @@ jobs:
         # menuntut benderanya MATI di kedua jalur dan tautannya dijaga bendera - sekaligus
         # menuntut mesinnya TIDAK dihapus, supaya satu bendera cukup saat backend siap.
         run: node tests/curriculum-console-gate-test.js
+      - name: 'Halaman konsol benar-benar memuat konfigurasinya'
+        # m025-298 memindahkan alamat backend ke core-config.js dan menurunkan pintunya dari
+        # nilai itu - tetapi kurikulum.html dan misi.html tidak pernah memuat core-config.js.
+        # FIEZEL_CURRICULUM_CONFIG undefined di kedua halaman, jadi owner boleh memasang
+        # MongoDB + FastAPI dan menempelkan alamatnya: konsolnya TETAP menolak semua
+        # panggilan sambil menuduh owner belum mengonfigurasi apa pun. Gerbang memindai
+        # seluruh *.html di akar: yang memuat fz-api.js WAJIB memuat core-config.js lebih
+        # dulu, dan alamat bawaannya WAJIB tetap kosong.
+        run: node tests/curriculum-config-wiring-test.js
       - name: 'Konsol kurikulum memanggil alamat yang dikonfigurasi, bukan same-origin'
         # fz-api.js lahir dengan asumsi ingress mengarahkan /api ke FastAPI di domain yang
         # sama. Di produksi FIEZEL itu salah - fiezel.my.id hosting statis, /api/health 404.
