@@ -91,3 +91,9 @@ credentials.json
 # Bahan uji sementara content-chain-report-test.js: ditulis ke akar repo lalu dihapus
 # lagi. Pernah tersapu masuk oleh `git add -A` di m025-299 dan ikut ter-commit.
 .cc-*.json
+
+# Symlink kerja Remotion ke assets/ repo. DIBUAT tools/render-motion.sh, tidak
+# pernah dilacak: symlink direktori yang terlacak membuat setiap pemindai berkas
+# (tests/secret-scan-test.js) melempar EISDIR, dan jalur absolutnya hanya sah di
+# satu kontainer build.
+remotion/public/assets
