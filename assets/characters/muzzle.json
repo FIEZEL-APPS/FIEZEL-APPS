@@ -4,47 +4,69 @@
   "warna": {
     "mira/full-explain": {
       "hex": "#F6AB8A",
-      "sampel": 680
+      "sampel": 680,
+      "png": "assets/characters/mira/png/full-explain.png",
+      "pngSha256": "faff44a7916e253a1ba5993f380b79ddead28410fcc796cb74631fd8e60d030c"
     },
     "mira/full-neutral": {
       "hex": "#F5AB88",
-      "sampel": 686
+      "sampel": 686,
+      "png": "assets/characters/mira/png/full-neutral.png",
+      "pngSha256": "b473e73a59b1eb200a12470824245483e652639125f1b690003fefbebf6270bb"
     },
     "mira/full-wave": {
       "hex": "#F6AB89",
-      "sampel": 627
+      "sampel": 627,
+      "png": "assets/characters/mira/png/full-wave.png",
+      "pngSha256": "d2cf85213d87ffee7a60766c81c481713a9a47cf1425862cedfb2c2fca1cf079"
     },
     "mira/head-explain": {
       "hex": "#F3A887",
-      "sampel": 632
+      "sampel": 632,
+      "png": "assets/characters/mira/png/head-explain.png",
+      "pngSha256": "6ef2e58a4d66a7cf992b0e8491be44ab2f2595eb44ab4ca39edbb51007356156"
     },
     "mira/head-happy": {
       "hex": "#F3A787",
-      "sampel": 690
+      "sampel": 690,
+      "png": "assets/characters/mira/png/head-happy.png",
+      "pngSha256": "bb49c1ac77d511b8fcad4765bf16885ee650e6589029a1f710215eda38032d87"
     },
     "nusa/full-neutral": {
       "hex": "#F5DDB2",
-      "sampel": 356
+      "sampel": 356,
+      "png": "assets/characters/nusa/png/full-neutral.png",
+      "pngSha256": "0745b10214721ac7e07cec39d49d7704333cd3c9df82f616e86d63bc6ac9954c"
     },
     "nusa/full-oops": {
       "hex": "#F5DEB4",
-      "sampel": 525
+      "sampel": 525,
+      "png": "assets/characters/nusa/png/full-oops.png",
+      "pngSha256": "573d113d3f15ce00fc8f9058add2333e511d8e82856be450274c44382b276071"
     },
     "nusa/full-wave": {
       "hex": "#F4DCAE",
-      "sampel": 325
+      "sampel": 325,
+      "png": "assets/characters/nusa/png/full-wave.png",
+      "pngSha256": "0ff13b1710cc8bb46109a38df93671387de4f87fe438f983c3bbc7a6787c37bc"
     },
     "nusa/head-happy": {
       "hex": "#F4DAAE",
-      "sampel": 336
+      "sampel": 336,
+      "png": "assets/characters/nusa/png/head-happy.png",
+      "pngSha256": "7e63014398766f8457deb29d1852b28c2d68ad3e056fb7e22d4731dbfa0f9d59"
     },
     "team/shoulder-wave": {
       "hex": "#F2A684",
-      "sampel": 683
+      "sampel": 683,
+      "png": "assets/characters/team/png/shoulder-wave.png",
+      "pngSha256": "0a9328985d99bd9f66b938c9088e071327b4f51d1199874ac3da72d2f75a65f9"
     },
     "team/walking": {
       "hex": "#F3DAA9",
-      "sampel": 491
+      "sampel": 491,
+      "png": "assets/characters/team/png/walking.png",
+      "pngSha256": "eb2189caf06e055a0a0060436e93bf0e2d8a3814e056a8baa7e271cf60b0e506"
     }
   }
 }

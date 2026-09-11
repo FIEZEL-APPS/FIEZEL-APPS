@@ -15,16 +15,33 @@ Caranya: ambil piksel di dalam kotak mulut face-rig, buang yang gelap (itu
 mulutnya sendiri), lalu ambil median dari sisanya. Median, bukan rata-rata,
 supaya garis bibir atau bayangan tidak menggeser hasilnya.
 
+Setiap entri MENCATAT sha256 PNG yang disampel. Itu bukan hiasan: dengan sidik
+jari itu, "muzzle.json masih segar terhadap seninya" bisa diperiksa tanpa
+mendekode satu gambar pun — jadi gerbangnya tidak bergantung pada Pillow
+terpasang. Pillow hanya dibutuhkan untuk MENGHASILKAN ulang, bukan untuk
+memverifikasi. Alasannya konkret: CI memerahkan gerbang ini dengan
+ModuleNotFoundError karena Pillow tidak ada di sana, dan jawaban "pasang Pillow
+di CI" membuat jaminannya bergantung pada lingkungan — kalau suatu hari paket itu
+hilang, pemeriksaannya berhenti menjaga tanpa suara.
+
 Keluaran: assets/characters/muzzle.json  (dibaca tools/gen-character-art-table.mjs)
 Pemakaian: python3 tools/sample-muzzle.py [--check]
 """
-import json, os, sys, statistics
+import json, os, sys, statistics, hashlib
 from PIL import Image
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 OUT = os.path.join(ROOT, 'assets/characters/muzzle.json')
 GRID = 28              # 28x28 sampel di dalam kotak mulut
 LUMA_MIN = 150         # di atas ini dianggap kulit, di bawahnya mulut/bayangan
+
+def sha256_file(path):
+    h = hashlib.sha256()
+    with open(path, 'rb') as fh:
+        for blk in iter(lambda: fh.read(65536), b''):
+            h.update(blk)
+    return h.hexdigest()
+
 
 def sample(png, box):
     im = Image.open(os.path.join(ROOT, png)).convert('RGBA')
@@ -59,7 +76,12 @@ def build():
                 continue
             hexv, n = sample(e['png'], rig[char][pose]['faces'][0]['mouth'])
             if hexv:
-                out['warna']['%s/%s' % (char, pose)] = {'hex': hexv, 'sampel': n}
+                out['warna']['%s/%s' % (char, pose)] = {
+                    'hex': hexv,
+                    'sampel': n,
+                    'png': e['png'],
+                    'pngSha256': sha256_file(os.path.join(ROOT, e['png'])),
+                }
     return out
 
 def main():
