@@ -135,12 +135,11 @@ html.fz-booting body{overflow:hidden}
   <!-- Ruang Guru: tema terpisah untuk cangkang guru (features/teacher). Hanya aktif saat body.fz-teacher-mode. -->
   <link rel="stylesheet" href="./features/teacher/teacher-shell.css">
   <link rel="stylesheet" href="./features/class-hub/class-hub.css">
-  <!-- m026-01: motion system maskot PAW. Sengaja PALING AKHIR di antara stylesheet:
-       berkasnya memakai nama token yang bertabrakan dengan style.css (--fz-gold,
-       --fz-ink, --fz-line), jadi di sana token dipasang pada kelas .fz-mascot/.fz-motion
-       dan bukan :root. Urutan terakhir memastikan aturan penempatan maskotnya menang
-       atas ukuran wajah pembimbing lama tanpa perlu !important. -->
-  <link rel="stylesheet" href="./features/mascot/fiezel-motion.css">
+  <!-- m025-303: gerak karakter NUSA & MIRA. Pengganti fiezel-motion.css (rig PAW).
+       Tetap PALING AKHIR di antara stylesheet dengan alasan yang sama seperti
+       pendahulunya: aturan penempatan karakter harus menang atas ukuran wajah
+       pembimbing lama tanpa perlu !important. -->
+  <link rel="stylesheet" href="./features/mascot/fiezel-character.css">
   <link rel="stylesheet" href="./features/ui/fiezel-lux.css">
   <link rel="stylesheet" href="./fiezel-2.css">
 </head>
@@ -539,22 +538,29 @@ html.fz-booting body{overflow:hidden}
        SEBELUM app.js karena app.js memanggil keduanya pada cat pertama (refreshIcons dan
        syncCoachBubble). Keduanya ringan dan tidak menyentuh jaringan sama sekali. -->
   <script defer src="./features/ui/fiezel-icons.js"></script>
-  <!-- m026-01: <fiezel-mascot> WAJIB terdaftar sebelum dua berkas di bawahnya.
+  <!-- m025-303: peta 19 state ke seni Nusa/Mira/team. HASIL GENERATE dari
+       assets/characters/manifest.json; wajib mendahului komponen, yang membacanya
+       saat define. Ditanam (bukan di-fetch) supaya wajah karakter tidak menunggu
+       jaringan untuk tahu gambar mana yang dipakai. -->
+  <script defer src="./features/mascot/fiezel-character-art.js"></script>
+  <!-- m026-01/m025-303: <fiezel-mascot> WAJIB terdaftar sebelum dua berkas di bawahnya.
        fiezel-coach-bubble.js memutuskan bentuk wajah gelembung saat install(), dan
        app.js memutuskan wajah panel "Kata FIEZEL" saat cat pertama; keduanya membaca
        customElements.get('fiezel-mascot'). Kalau berkas ini datang belakangan, kedua
-       tempat itu jatuh ke ikon paw cadangan dan tidak pernah naik lagi. -->
-  <script defer src="./features/mascot/fiezel-mascot.js"></script>
+       tempat itu jatuh ke ikon cadangan dan tidak pernah naik lagi.
+       Nama elemen dan pintu self.FiezelPaw DIPERTAHANKAN saat karakternya berganti:
+       ~340 titik panggil menyatakan maksud, bukan seni. -->
+  <script defer src="./features/mascot/fiezel-character.js"></script>
   <!-- [FASE 7] Lapisan slot PAW panel (12-lesson-layer.md). Dimuat SETELAH
        fiezel-mascot.js (ia bertanya FiezelPaw.ready() sebelum memesan ruang) dan
        SEBELUM app.js (render kuis membaca self.FiezelPawSlot pra-cat). Tanpa berkas
        ini app.js jatuh mulus ke wajah quiz-mascot lama - tidak ada yang patah. -->
   <script defer src="./features/mascot/fiezel-paw-slot.js"></script>
-  <!-- Lapisan outfit kontekstual PAW (G5' — registry terkurasi, 19-outfit-system).
-       Menyuntik item ke jangkar fz-outfit-* DARI LUAR komponen; deterministik,
-       bukan ekonomi hadiah; kill switch localStorage fzPawOutfits. Tanpa berkas
-       ini PAW tampil polos - tidak ada yang patah. -->
-  <script defer src="./features/mascot/fiezel-paw-outfit.js"></script>
+  <!-- m025-303: fiezel-paw-outfit.js DIBUANG bersama rig PAW. Lapisan itu bekerja
+       dengan menyuntik item SVG ke jangkar fz-outfit-* di dalam rig vektor; seni
+       Nusa & Mira adalah gambar utuh dan tidak punya jangkar semacam itu. Nusa
+       sudah memakai bandana ber-lambang telapak dan Mira memakai pin telapak di
+       seninya sendiri, jadi peran "outfit merek" sudah terpenuhi tanpa lapisan. -->
   <script defer src="./features/ui/fiezel-coach-bubble.js"></script>
   <!-- m025-117 Core Brain v2. Dimuat SEBELUM app.js dan tidak ikut dimuat malas: kebijakan
        sesi pertama sudah membutuhkannya, dan tanpa itu murid akan mendapat satu sesi dengan

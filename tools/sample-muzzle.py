@@ -1,0 +1,79 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+FIEZEL — pengukur WARNA MONCONG per pose karakter.
+
+Kenapa ada: lapisan viseme harus MENUTUP mulut yang sudah tergambar di seni
+sebelum menggambar mulut barunya. Tanpa itu ada dua mulut sekaligus di wajah
+karakter — benar-benar terjadi dan terlihat saat dirender di Chromium.
+
+Menutupnya butuh satu warna: kulit di sekitar mulut. Warna itu DIUKUR dari
+asetnya, tidak ditulis tangan, karena Nusa (krem #F5DDB2) dan Mira (kulit
+#F5AB88) berbeda dan akan berbeda lagi kalau seninya diperbarui.
+
+Caranya: ambil piksel di dalam kotak mulut face-rig, buang yang gelap (itu
+mulutnya sendiri), lalu ambil median dari sisanya. Median, bukan rata-rata,
+supaya garis bibir atau bayangan tidak menggeser hasilnya.
+
+Keluaran: assets/characters/muzzle.json  (dibaca tools/gen-character-art-table.mjs)
+Pemakaian: python3 tools/sample-muzzle.py [--check]
+"""
+import json, os, sys, statistics
+from PIL import Image
+
+ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+OUT = os.path.join(ROOT, 'assets/characters/muzzle.json')
+GRID = 28              # 28x28 sampel di dalam kotak mulut
+LUMA_MIN = 150         # di atas ini dianggap kulit, di bawahnya mulut/bayangan
+
+def sample(png, box):
+    im = Image.open(os.path.join(ROOT, png)).convert('RGBA')
+    W, H = im.size
+    mx, my, mw, mh = box
+    light = []
+    for i in range(GRID):
+        for j in range(GRID):
+            x = int((mx + mw * i / (GRID - 1)) * W)
+            y = int((my + mh * j / (GRID - 1)) * H)
+            if 0 <= x < W and 0 <= y < H:
+                p = im.getpixel((x, y))
+                if p[3] > 200 and (0.299 * p[0] + 0.587 * p[1] + 0.114 * p[2]) > LUMA_MIN:
+                    light.append(p[:3])
+    if len(light) < 40:
+        return None, len(light)
+    med = tuple(int(statistics.median([c[k] for c in light])) for k in range(3))
+    return '#%02X%02X%02X' % med, len(light)
+
+def build():
+    rig = json.load(open(os.path.join(ROOT, 'assets/characters/face-rig.json')))
+    man = json.load(open(os.path.join(ROOT, 'assets/characters/manifest.json')))
+    out = {'generator': 'tools/sample-muzzle.py',
+           'cara': 'median piksel terang (luma>%d) di dalam kotak mulut face-rig' % LUMA_MIN,
+           'warna': {}}
+    for char in sorted(rig):
+        for pose in sorted(rig[char]):
+            e = man['characters'].get(char, {}).get(pose)
+            if not e:
+                continue
+            hexv, n = sample(e['png'], rig[char][pose]['faces'][0]['mouth'])
+            if hexv:
+                out['warna']['%s/%s' % (char, pose)] = {'hex': hexv, 'sampel': n}
+    return out
+
+def main():
+    doc = build()
+    text = json.dumps(doc, indent=2, ensure_ascii=False) + '\n'
+    if '--check' in sys.argv:
+        if not os.path.exists(OUT):
+            print('FAIL - %s belum ada' % os.path.relpath(OUT, ROOT)); sys.exit(1)
+        if open(OUT).read() != text:
+            print('FAIL - %s menyimpang dari aset — jalankan: python3 tools/sample-muzzle.py'
+                  % os.path.relpath(OUT, ROOT)); sys.exit(1)
+        print('sample-muzzle --check: PASS (%d pose)' % len(doc['warna'])); return
+    open(OUT, 'w').write(text)
+    print('json - %s (%d pose)' % (os.path.relpath(OUT, ROOT), len(doc['warna'])))
+    for k, v in doc['warna'].items():
+        print('       %-22s %s' % (k, v['hex']))
+
+if __name__ == '__main__':
+    main()
