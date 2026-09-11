@@ -144,18 +144,30 @@ test('warna moncong masih segar terhadap SEMUA masukannya (tanpa mendekode gamba
       + 'dan tidak tercatat sebagai dilewati. Jalankan: python3 tools/sample-muzzle.py');
   }
 
-  // --- 4. bita PNG tiap entri ---
-  for (const [kunci, v] of Object.entries(warna)) {
-    if (!v.png || !v.pngSha256) { masalah.push(kunci + ': tanpa sidik jari PNG'); continue; }
-    if (!exists(v.png)) { masalah.push(kunci + ': ' + v.png + ' tidak ada'); continue; }
-    const nyata = require('crypto').createHash('sha256')
-      .update(fs.readFileSync(path.join(__fzRoot, v.png))).digest('hex');
-    if (nyata !== v.pngSha256) {
-      masalah.push(kunci + ': ' + v.png + ' berubah sejak warnanya diukur'
-        + ' — jalankan: python3 tools/sample-muzzle.py');
+  // --- 4. bita PNG tiap entri, TERMASUK yang dilewati ---
+  /* Entri `dilewati` ikut diperiksa, dan itu bukan kelengkapan kosmetik: pose yang
+     dilewati dicatat karena piksel terangnya kurang PADA SENI SAAT ITU. Kalau
+     seninya digambar ulang lebih terang, alasan melewatinya gugur — tetapi tanpa
+     sidik jari, muzzle.json terus melaporkannya sebagai dilewati dan gerbang ini
+     tetap hijau. Itu persis kelas cacat yang sama dengan tiga sebelumnya di PR
+     ini: janji "SELURUH masukan" yang menyisakan satu sudut tak diperiksa. */
+  const periksaBita = (label, peta, wajibHex) => {
+    for (const [kunci, v] of Object.entries(peta)) {
+      if (!v.png || !v.pngSha256) { masalah.push(label + ' ' + kunci + ': tanpa sidik jari PNG'); continue; }
+      if (!exists(v.png)) { masalah.push(label + ' ' + kunci + ': ' + v.png + ' tidak ada'); continue; }
+      const nyata = require('crypto').createHash('sha256')
+        .update(fs.readFileSync(path.join(__fzRoot, v.png))).digest('hex');
+      if (nyata !== v.pngSha256) {
+        masalah.push(label + ' ' + kunci + ': ' + v.png + ' berubah sejak diukur'
+          + ' — jalankan: python3 tools/sample-muzzle.py');
+      }
+      if (wajibHex && !/^#[0-9A-F]{6}$/.test(v.hex || '')) {
+        masalah.push(label + ' ' + kunci + ': hex tidak sah (' + v.hex + ')');
+      }
     }
-    if (!/^#[0-9A-F]{6}$/.test(v.hex || '')) masalah.push(kunci + ': hex tidak sah (' + v.hex + ')');
-  }
+  };
+  periksaBita('warna', warna, true);
+  periksaBita('dilewati', dilewati, false);
 
   if (masalah.length) throw new Error('\n      ' + masalah.join('\n      '));
 });
