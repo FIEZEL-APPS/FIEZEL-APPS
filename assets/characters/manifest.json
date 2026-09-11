@@ -1,0 +1,236 @@
+{
+ "version": 1,
+ "style": "storybook-flat",
+ "characters": {
+  "nusa": {
+   "full-neutral": {
+    "w": 558,
+    "h": 1129,
+    "png": "assets/characters/nusa/png/full-neutral.png",
+    "png1x": "assets/characters/nusa/png@1x/full-neutral.png",
+    "webp": "assets/characters/nusa/webp/full-neutral.webp",
+    "svg": "assets/characters/nusa/svg/full-neutral.svg"
+   },
+   "full-wave": {
+    "w": 688,
+    "h": 1085,
+    "png": "assets/characters/nusa/png/full-wave.png",
+    "png1x": "assets/characters/nusa/png@1x/full-wave.png",
+    "webp": "assets/characters/nusa/webp/full-wave.webp",
+    "svg": "assets/characters/nusa/svg/full-wave.svg"
+   },
+   "full-celebrate": {
+    "w": 681,
+    "h": 1010,
+    "png": "assets/characters/nusa/png/full-celebrate.png",
+    "png1x": "assets/characters/nusa/png@1x/full-celebrate.png",
+    "webp": "assets/characters/nusa/webp/full-celebrate.webp",
+    "svg": "assets/characters/nusa/svg/full-celebrate.svg"
+   },
+   "full-thinking": {
+    "w": 650,
+    "h": 838,
+    "png": "assets/characters/nusa/png/full-thinking.png",
+    "png1x": "assets/characters/nusa/png@1x/full-thinking.png",
+    "webp": "assets/characters/nusa/webp/full-thinking.webp",
+    "svg": "assets/characters/nusa/svg/full-thinking.svg"
+   },
+   "full-oops": {
+    "w": 736,
+    "h": 1052,
+    "png": "assets/characters/nusa/png/full-oops.png",
+    "png1x": "assets/characters/nusa/png@1x/full-oops.png",
+    "webp": "assets/characters/nusa/webp/full-oops.webp",
+    "svg": "assets/characters/nusa/svg/full-oops.svg"
+   },
+   "full-sleep": {
+    "w": 802,
+    "h": 661,
+    "png": "assets/characters/nusa/png/full-sleep.png",
+    "png1x": "assets/characters/nusa/png@1x/full-sleep.png",
+    "webp": "assets/characters/nusa/webp/full-sleep.webp",
+    "svg": "assets/characters/nusa/svg/full-sleep.svg"
+   },
+   "head-happy": {
+    "w": 816,
+    "h": 927,
+    "png": "assets/characters/nusa/png/head-happy.png",
+    "png1x": "assets/characters/nusa/png@1x/head-happy.png",
+    "webp": "assets/characters/nusa/webp/head-happy.webp",
+    "svg": "assets/characters/nusa/svg/head-happy.svg"
+   },
+   "head-curious": {
+    "w": 760,
+    "h": 889,
+    "png": "assets/characters/nusa/png/head-curious.png",
+    "png1x": "assets/characters/nusa/png@1x/head-curious.png",
+    "webp": "assets/characters/nusa/webp/head-curious.webp",
+    "svg": "assets/characters/nusa/svg/head-curious.svg"
+   },
+   "head-thinking": {
+    "w": 803,
+    "h": 937,
+    "png": "assets/characters/nusa/png/head-thinking.png",
+    "png1x": "assets/characters/nusa/png@1x/head-thinking.png",
+    "webp": "assets/characters/nusa/webp/head-thinking.webp",
+    "svg": "assets/characters/nusa/svg/head-thinking.svg"
+   },
+   "head-oops": {
+    "w": 782,
+    "h": 819,
+    "png": "assets/characters/nusa/png/head-oops.png",
+    "png1x": "assets/characters/nusa/png@1x/head-oops.png",
+    "webp": "assets/characters/nusa/webp/head-oops.webp",
+    "svg": "assets/characters/nusa/svg/head-oops.svg"
+   }
+  },
+  "mira": {
+   "full-neutral": {
+    "w": 601,
+    "h": 1104,
+    "png": "assets/characters/mira/png/full-neutral.png",
+    "png1x": "assets/characters/mira/png@1x/full-neutral.png",
+    "webp": "assets/characters/mira/webp/full-neutral.webp",
+    "svg": "assets/characters/mira/svg/full-neutral.svg"
+   },
+   "full-wave": {
+    "w": 670,
+    "h": 1103,
+    "png": "assets/characters/mira/png/full-wave.png",
+    "png1x": "assets/characters/mira/png@1x/full-wave.png",
+    "webp": "assets/characters/mira/webp/full-wave.webp",
+    "svg": "assets/characters/mira/svg/full-wave.svg"
+   },
+   "full-explain": {
+    "w": 790,
+    "h": 1103,
+    "png": "assets/characters/mira/png/full-explain.png",
+    "png1x": "assets/characters/mira/png@1x/full-explain.png",
+    "webp": "assets/characters/mira/webp/full-explain.webp",
+    "svg": "assets/characters/mira/svg/full-explain.svg"
+   },
+   "full-cheer": {
+    "w": 775,
+    "h": 1102,
+    "png": "assets/characters/mira/png/full-cheer.png",
+    "png1x": "assets/characters/mira/png@1x/full-cheer.png",
+    "webp": "assets/characters/mira/webp/full-cheer.webp",
+    "svg": "assets/characters/mira/svg/full-cheer.svg"
+   },
+   "full-thinking": {
+    "w": 848,
+    "h": 1303,
+    "png": "assets/characters/mira/png/full-thinking.png",
+    "png1x": "assets/characters/mira/png@1x/full-thinking.png",
+    "webp": "assets/characters/mira/webp/full-thinking.webp",
+    "svg": "assets/characters/mira/svg/full-thinking.svg"
+   },
+   "head-happy": {
+    "w": 1024,
+    "h": 1085,
+    "png": "assets/characters/mira/png/head-happy.png",
+    "png1x": "assets/characters/mira/png@1x/head-happy.png",
+    "webp": "assets/characters/mira/webp/head-happy.webp",
+    "svg": "assets/characters/mira/svg/head-happy.svg"
+   },
+   "head-explain": {
+    "w": 1024,
+    "h": 1104,
+    "png": "assets/characters/mira/png/head-explain.png",
+    "png1x": "assets/characters/mira/png@1x/head-explain.png",
+    "webp": "assets/characters/mira/webp/head-explain.webp",
+    "svg": "assets/characters/mira/svg/head-explain.svg"
+   },
+   "head-proud": {
+    "w": 1024,
+    "h": 1032,
+    "png": "assets/characters/mira/png/head-proud.png",
+    "png1x": "assets/characters/mira/png@1x/head-proud.png",
+    "webp": "assets/characters/mira/webp/head-proud.webp",
+    "svg": "assets/characters/mira/svg/head-proud.svg"
+   },
+   "head-thinking": {
+    "w": 1024,
+    "h": 1129,
+    "png": "assets/characters/mira/png/head-thinking.png",
+    "png1x": "assets/characters/mira/png@1x/head-thinking.png",
+    "webp": "assets/characters/mira/webp/head-thinking.webp",
+    "svg": "assets/characters/mira/svg/head-thinking.svg"
+   }
+  },
+  "team": {
+   "shoulder-wave": {
+    "w": 772,
+    "h": 1104,
+    "png": "assets/characters/team/png/shoulder-wave.png",
+    "png1x": "assets/characters/team/png@1x/shoulder-wave.png",
+    "webp": "assets/characters/team/webp/shoulder-wave.webp",
+    "svg": "assets/characters/team/svg/shoulder-wave.svg"
+   },
+   "highfive": {
+    "w": 783,
+    "h": 864,
+    "png": "assets/characters/team/png/highfive.png",
+    "png1x": "assets/characters/team/png@1x/highfive.png",
+    "webp": "assets/characters/team/webp/highfive.webp",
+    "svg": "assets/characters/team/svg/highfive.svg"
+   },
+   "teaching": {
+    "w": 937,
+    "h": 761,
+    "png": "assets/characters/team/png/teaching.png",
+    "png1x": "assets/characters/team/png@1x/teaching.png",
+    "webp": "assets/characters/team/webp/teaching.webp",
+    "svg": "assets/characters/team/svg/teaching.svg"
+   },
+   "hat-peek": {
+    "w": 657,
+    "h": 1105,
+    "png": "assets/characters/team/png/hat-peek.png",
+    "png1x": "assets/characters/team/png@1x/hat-peek.png",
+    "webp": "assets/characters/team/webp/hat-peek.webp",
+    "svg": "assets/characters/team/svg/hat-peek.svg"
+   },
+   "walking": {
+    "w": 999,
+    "h": 753,
+    "png": "assets/characters/team/png/walking.png",
+    "png1x": "assets/characters/team/png@1x/walking.png",
+    "webp": "assets/characters/team/webp/walking.webp",
+    "svg": "assets/characters/team/svg/walking.svg"
+   }
+  }
+ },
+ "scenes": {
+  "hero-landing": {
+   "w": 1264,
+   "h": 848,
+   "jpg": "assets/characters/scenes/jpg/hero-landing.jpg",
+   "webp": "assets/characters/scenes/webp/hero-landing.webp"
+  },
+  "onboarding": {
+   "w": 848,
+   "h": 1264,
+   "jpg": "assets/characters/scenes/jpg/onboarding.jpg",
+   "webp": "assets/characters/scenes/webp/onboarding.webp"
+  },
+  "celebration": {
+   "w": 1024,
+   "h": 1024,
+   "jpg": "assets/characters/scenes/jpg/celebration.jpg",
+   "webp": "assets/characters/scenes/webp/celebration.webp"
+  },
+  "empty-offline": {
+   "w": 1024,
+   "h": 1024,
+   "jpg": "assets/characters/scenes/jpg/empty-offline.jpg",
+   "webp": "assets/characters/scenes/webp/empty-offline.webp"
+  }
+ },
+ "refs": {
+  "nusa-sheet": "assets/characters/_reference/nusa-sheet.jpg",
+  "mira-sheet": "assets/characters/_reference/mira-sheet.jpg",
+  "nusa-scene": "assets/characters/_reference/nusa-scene.jpg",
+  "mira-scene": "assets/characters/_reference/mira-scene.jpg"
+ }
+}
