@@ -2,9 +2,19 @@
 # Renders every mascot composition to MP4 + WebM + poster JPG.
 # WebM (VP8) is the primary source for browsers without an H.264 decoder.
 set -euo pipefail
-cd /app/remotion
-OUT=/app/assets/motion
-mkdir -p "$OUT/posters"
+
+# Jalur diturunkan dari letak skrip ini, bukan dari /app: PR yang melahirkan berkas
+# ini menuliskan /app/remotion dan /app/assets apa adanya - jalur kontainer build
+# Emergent, yang tidak ada di checkout siapa pun termasuk CI.
+ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+cd "$ROOT/remotion"
+OUT="$ROOT/assets/motion"
+mkdir -p "$OUT/posters" public
+
+# public/assets WAJIB ada supaya staticFile() Remotion melihat aset karakter, tetapi
+# ia TIDAK dilacak git (lihat .gitignore): symlink direktori yang terlacak memerahkan
+# pemindai berkas repo. Jadi dibuat di sini, tiap render, idempoten.
+ln -sfn ../assets public/assets
 
 render() {
   local comp=$1 slug=$2 poster=${3:-15}
