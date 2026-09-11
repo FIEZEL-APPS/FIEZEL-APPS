@@ -60,5 +60,8 @@ node build.mjs      # tulis 25 .dc.html + canvas.json, cek kontras WCAG
 node preview.mjs    # render tiap artboard di Chromium, laporkan luberan
 ```
 
-`build.mjs` gagal-keras kalau ada pasangan warna teks di bawah 4.5:1.
+`build.mjs` gagal-keras kalau ada pasangan warna teks di bawah 4.5:1 — keluar
+dengan kode 1 dan **tidak menulis satu artboard pun**, supaya token yang jatuh tidak
+pernah ikut terkirim. Ia juga menanggalkan spasi di ujung baris, karena gerbang A9/A10
+menolaknya lewat `git diff --check`.
 `preview.mjs` hanya menulis ke direktori scratchpad; berkas kerja tidak disentuh.

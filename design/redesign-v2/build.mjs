@@ -128,7 +128,18 @@ for (const [nama, fg, bg] of cek) {
   console.log(`  ${tanda.padEnd(9)} ${r.toFixed(2).padStart(5)}  ${nama}`);
 }
 
+/* Gagal-keras: gerbang yang cuma mencetak angka bukan gerbang. Artboard TIDAK
+   ditulis kalau ada pasangan yang jatuh - perbaiki tokennya di kit.mjs dulu. */
+if (gagal > 0) {
+  console.error(`\nGAGAL: ${gagal} pasangan warna di bawah 4.5:1. Artboard tidak ditulis.`);
+  process.exit(1);
+}
+
 /* ---------- tulis ---------- */
-for (const [nama, buat] of ART) writeFileSync(nama + '.dc.html', buat());
-writeFileSync('canvas.json', JSON.stringify(canvas, null, 2));
+/* Spasi di ujung baris ditanggalkan saat menulis: `git diff --check` di gerbang
+   A9/A10 menolaknya, dan template literal gampang meninggalkannya. */
+const rapikan = (teks) => teks.split('\n').map((b) => b.replace(/[ \t]+$/, '')).join('\n');
+
+for (const [nama, buat] of ART) writeFileSync(nama + '.dc.html', rapikan(buat()));
+writeFileSync('canvas.json', JSON.stringify(canvas, null, 2) + '\n');
 console.log(`\n${ART.length} artboard + canvas.json ditulis. ${gagal} pasangan di bawah 4.5:1.`);
