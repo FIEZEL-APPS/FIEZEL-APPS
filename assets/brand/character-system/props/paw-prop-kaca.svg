@@ -1,0 +1,9 @@
+<!-- HASIL GENERATE - jangan diedit tangan. Sumber: tools/character-system/library.mjs (PROPS). Regenerasi: node tools/export-character-system.mjs -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" role="img" aria-label="kaca pembesar">
+  <g class="fz-prop fz-prop-kaca">
+    <rect x="56" y="58" width="40" height="16" rx="8" fill="#D8B36B" transform="rotate(42 56 58)"/>
+    <circle cx="40" cy="40" r="34" fill="#EDB93A"/>
+    <circle cx="40" cy="40" r="25" fill="#9CC7E8"/>
+    <circle cx="31" cy="31" r="8" fill="#fff" opacity=".8"/>
+  </g>
+</svg>

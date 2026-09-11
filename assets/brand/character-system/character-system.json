@@ -1,0 +1,222 @@
+{
+  "generator": "tools/export-character-system.mjs",
+  "sumber": {
+    "rig": "features/mascot/fiezel-mascot.js",
+    "rigHash": "5fb6293402a49e97ae00c4277af49d3ddee51e4ad38234e6467ec309d04b7a8a",
+    "glyph": "assets/brand/fiezel-paw.svg",
+    "glyphHash": "2064b3d10991d20cddf8cc595a987f70b20b4711d05b74d3066df037b2420727"
+  },
+  "ringkasan": {
+    "master": 1,
+    "expressions": 14,
+    "poses": 16,
+    "props": 12,
+    "badge": 4,
+    "illustrations": 17
+  },
+  "adegan": [
+    {
+      "id": "empty-belum-ada-pelajaran",
+      "grup": "empty",
+      "pose": "looking",
+      "prop": "buku",
+      "badge": null,
+      "label": "PAW melihat rak pelajaran yang masih kosong"
+    },
+    {
+      "id": "empty-belum-ada-teman",
+      "grup": "empty",
+      "pose": "waving",
+      "prop": "gelembung",
+      "badge": "ring",
+      "label": "PAW melambai di ruang teman yang masih kosong"
+    },
+    {
+      "id": "empty-pencarian-kosong",
+      "grup": "empty",
+      "pose": "curious",
+      "prop": "kaca",
+      "badge": null,
+      "label": "PAW mencari dengan kaca pembesar dan tidak menemukan apa pun"
+    },
+    {
+      "id": "empty-luring",
+      "grup": "empty",
+      "pose": "calm",
+      "prop": "awan",
+      "badge": null,
+      "label": "PAW menunggu sambungan kembali"
+    },
+    {
+      "id": "success-pelajaran-selesai",
+      "grup": "success",
+      "pose": "celebrating",
+      "prop": "piala",
+      "badge": "emas",
+      "label": "PAW merayakan pelajaran yang selesai"
+    },
+    {
+      "id": "success-runtun-terjaga",
+      "grup": "success",
+      "pose": "proud",
+      "prop": "bintang",
+      "badge": "emas",
+      "label": "PAW bangga runtun belajarnya terjaga"
+    },
+    {
+      "id": "success-jawaban-benar",
+      "grup": "success",
+      "pose": "excited",
+      "prop": "centang",
+      "badge": null,
+      "label": "PAW gembira atas jawaban yang benar"
+    },
+    {
+      "id": "error-ada-yang-salah",
+      "grup": "error",
+      "pose": "confused",
+      "prop": "tanya",
+      "badge": null,
+      "label": "PAW bingung karena ada yang tidak beres"
+    },
+    {
+      "id": "error-sambungan-putus",
+      "grup": "error",
+      "pose": "concern",
+      "prop": "awan",
+      "badge": null,
+      "label": "PAW cemas karena sambungan terputus"
+    },
+    {
+      "id": "error-waktu-habis",
+      "grup": "error",
+      "pose": "surprised",
+      "prop": "jam",
+      "badge": null,
+      "label": "PAW terkejut karena waktunya habis"
+    },
+    {
+      "id": "onboarding-selamat-datang",
+      "grup": "onboarding",
+      "pose": "welcoming",
+      "prop": "hati",
+      "badge": "solid",
+      "label": "PAW menyambut murid baru"
+    },
+    {
+      "id": "onboarding-pilih-bahasa",
+      "grup": "onboarding",
+      "pose": "pointing",
+      "prop": "gelembung",
+      "badge": null,
+      "label": "PAW menunjuk pilihan bahasa"
+    },
+    {
+      "id": "onboarding-pilih-tujuan",
+      "grup": "onboarding",
+      "pose": "encouraging",
+      "prop": "lampu",
+      "badge": null,
+      "label": "PAW menyemangati murid memilih tujuan belajar"
+    },
+    {
+      "id": "onboarding-mulai-belajar",
+      "grup": "onboarding",
+      "pose": "reading",
+      "prop": "buku",
+      "badge": null,
+      "label": "PAW membuka pelajaran pertama"
+    },
+    {
+      "id": "marketing-pahlawan",
+      "grup": "marketing",
+      "pose": "presenting",
+      "prop": "bintang",
+      "badge": "solid",
+      "label": "PAW menyapa — ilustrasi utama FIEZEL"
+    },
+    {
+      "id": "marketing-kartu-bagikan",
+      "grup": "marketing",
+      "pose": "happy",
+      "prop": "piala",
+      "badge": "emas",
+      "label": "PAW pada kartu bagikan FIEZEL"
+    },
+    {
+      "id": "marketing-belajar-tiap-hari",
+      "grup": "marketing",
+      "pose": "studying",
+      "prop": "pensil",
+      "badge": null,
+      "label": "PAW belajar setiap hari"
+    }
+  ],
+  "files": {
+    "assets/brand/character-system/badge/paw-badge-emas.svg": "b8cbe9a25b6fff1bd176cf214e9153d681af9db11d0cb250718e34f7565d69b5",
+    "assets/brand/character-system/badge/paw-badge-mono.svg": "bb45f1193d15a7236dc2e35b9e07be75c4b36731638b43df9b9db7db76b34445",
+    "assets/brand/character-system/badge/paw-badge-ring.svg": "a38eaa210464d45ec182b47f1a8eca664ef67a33ac4e026f4b7e8aeeb318adac",
+    "assets/brand/character-system/badge/paw-badge-solid.svg": "519658205c731726ba84b8bd362011068bf833e8a0359caf5dd120e08b071252",
+    "assets/brand/character-system/expressions/paw-expr-calm.svg": "b12b0e63bb216a1c0b02ec25035fc64c34735530e760c917936881cdb7c6ab80",
+    "assets/brand/character-system/expressions/paw-expr-celebrating.svg": "fb70e98d60a0ff8925fb292c9887d57f457754aad27ad1588062fe6dfa280de4",
+    "assets/brand/character-system/expressions/paw-expr-concern.svg": "13279137ea6f6f3887b56c89dba436a1ef024c4bde32a39e900c26d1c9f89c86",
+    "assets/brand/character-system/expressions/paw-expr-confused.svg": "377d7dc892f118074088bb95386df93ca462ec105fdd701a28ceb8877f6ebb1b",
+    "assets/brand/character-system/expressions/paw-expr-curious.svg": "a001e8176e7906cbdbd3716acf0a1f148021c1d435c88152ed62e5ef38e7f693",
+    "assets/brand/character-system/expressions/paw-expr-encouraging.svg": "81d7e659fea4581534b2c3e0896abdfa9454752884243841a00d38b63e46d739",
+    "assets/brand/character-system/expressions/paw-expr-excited.svg": "40869113724aa4f70fcffbcfad99878d38779c09cf731795ed8c1b6834a986c0",
+    "assets/brand/character-system/expressions/paw-expr-happy.svg": "5f50edf8c0b2d9f719651b2fd1818aff65ea285b7f009eb8ac76acb8d206e243",
+    "assets/brand/character-system/expressions/paw-expr-neutral.svg": "23243a7f8d88956c7b345b8a605ae93c3498258172d10d39e0ed52053d9cd012",
+    "assets/brand/character-system/expressions/paw-expr-proud.svg": "56cf958340aa89606e3cc276f4203d36dd7ff88457bb2a4d5cf9a4fc2c9a2b94",
+    "assets/brand/character-system/expressions/paw-expr-sleepy.svg": "12acc32d79d600813cc0dab9ef913a3d28668f81b69d8492a29191ffdf3bf4d3",
+    "assets/brand/character-system/expressions/paw-expr-surprised.svg": "4729dbdddfe2608c9c0691787574958e2991d278f98b99551e106408f3640489",
+    "assets/brand/character-system/expressions/paw-expr-thinking.svg": "2d6f169157bc03e0a6041f25a3145d68759a246fa61872cb67d68472772d626c",
+    "assets/brand/character-system/expressions/paw-expr-welcoming.svg": "79faa7dded5fe4e4bec1347e42174a369e15ce1626a9f0976e247aed7687dcbe",
+    "assets/brand/character-system/illustrations/paw-empty-belum-ada-pelajaran.svg": "a7fed44d20a5877e1769ca16a99e142ea073e7b86bd0fc3baf6c7f9f8a5e7a7e",
+    "assets/brand/character-system/illustrations/paw-empty-belum-ada-teman.svg": "3c5f975f47f21098d1c34fcd37cab908e8d42f639db095f8a63de3408efe61f3",
+    "assets/brand/character-system/illustrations/paw-empty-luring.svg": "cd152de8c2a26badf3a1eeeb78ee69bc1a6b16cf98afc9ef32efaa95f3b2fa19",
+    "assets/brand/character-system/illustrations/paw-empty-pencarian-kosong.svg": "a356c2a325509d79274b5f082f1a2fae8fb0b0f43eddfd03eae9427599bbd646",
+    "assets/brand/character-system/illustrations/paw-error-ada-yang-salah.svg": "8c3d612e13a296d3fe1283a144d10e2f7dfccf22f7a7b9fe6011f9cc7a76e9c0",
+    "assets/brand/character-system/illustrations/paw-error-sambungan-putus.svg": "fedeff4fae226b0c4b5a11962c213d7b4a6adda036a8428a65fb54ba6c9a9dc9",
+    "assets/brand/character-system/illustrations/paw-error-waktu-habis.svg": "1f0482cb75fa7064c8a467aaa38afef348df0c62055a6aadddadce408975e776",
+    "assets/brand/character-system/illustrations/paw-marketing-belajar-tiap-hari.svg": "bfa8802da1eed3d6fc7e773bb3bc4c76e7887d84142f2c5d8b36304a6c7cc506",
+    "assets/brand/character-system/illustrations/paw-marketing-kartu-bagikan.svg": "8dc2a84474ef99b36cf6c5ab33b64e236f0159edc7a2e821cd2560f0403a14a6",
+    "assets/brand/character-system/illustrations/paw-marketing-pahlawan.svg": "47da4d1c3a1dcb8cad8375654b8bad1d7a5a4c7fd661ea3e970503d7cc8f7f9a",
+    "assets/brand/character-system/illustrations/paw-onboarding-mulai-belajar.svg": "43b759b0dbd5f6f745b87fbb2edcbb924f3e239d6590577f41ff4ab4b1bb1aa0",
+    "assets/brand/character-system/illustrations/paw-onboarding-pilih-bahasa.svg": "c33024b67e9f50754a9099146675eebf32c6423c38a962823f29ac98cc1c8472",
+    "assets/brand/character-system/illustrations/paw-onboarding-pilih-tujuan.svg": "fc83752baf8b5bf0c8ea09e884582b4153d15e18730d1efd452926bcec3b5700",
+    "assets/brand/character-system/illustrations/paw-onboarding-selamat-datang.svg": "c8c92d67ce2e695324edccbdffab97668870270c2cff568bd09aa134ca33a5a6",
+    "assets/brand/character-system/illustrations/paw-success-jawaban-benar.svg": "61724286c6124be828cb7eb2db257770a224bc81c63d9b7967e8f7397c106396",
+    "assets/brand/character-system/illustrations/paw-success-pelajaran-selesai.svg": "ef45f6dfbc0aa3b5158bcc04a6ee5bc7cceb165c0133c29bb0b1c486536ba0c5",
+    "assets/brand/character-system/illustrations/paw-success-runtun-terjaga.svg": "85fa7fc6609926576d0ff25aa54e2dcea4daa412c78a5a85e295573c52167ac1",
+    "assets/brand/character-system/master/paw-master.svg": "0778f4447e9e3ea3dfa533ce6a00e91eaa453dccef39899081e1c5150928683a",
+    "assets/brand/character-system/poses/paw-pose-celebrating.svg": "eef98faebc1d925a1787879bf148205dc05dfb921ed8b8cdfbadbbce22fe199b",
+    "assets/brand/character-system/poses/paw-pose-encouraging.svg": "5bd32e4778f629acd55fbdb6a2f100278c345cbcee4a90e3507794f2c365e433",
+    "assets/brand/character-system/poses/paw-pose-idle.svg": "782f19c21ed7bdf8caba4eb28ce7fa9b8a49cd89c9c09fc33c008f4e660a2aa0",
+    "assets/brand/character-system/poses/paw-pose-jumping.svg": "724dddd0cbf2ffe10d17232dbba924e17ff428a57e3a15717e5a18604884ab47",
+    "assets/brand/character-system/poses/paw-pose-listening.svg": "83a5acd0397fe32d6f01b6bad9e3875ff21f595b72ab28322dfbcc3af00e6081",
+    "assets/brand/character-system/poses/paw-pose-looking.svg": "326d50016e0d92824bbe17e019f721dec73c5446aad2dbf39338877d7cc66287",
+    "assets/brand/character-system/poses/paw-pose-pointing.svg": "87f1b353eedb6977f8c711dd0d8a62453f2fa3f90e15f64b80be80a407d8e469",
+    "assets/brand/character-system/poses/paw-pose-presenting.svg": "fcc15f25b8859e9fe66a90464ca2ca29235a06ffbe6750ddcd8ec3ce0193a593",
+    "assets/brand/character-system/poses/paw-pose-reading.svg": "c4fa435f84fec38895b0905c104f4aac1fe9738c601b55f8d79f15db8147c974",
+    "assets/brand/character-system/poses/paw-pose-running.svg": "361f30c362fc08a4690eb145061527f72aed90a3794bf811594f282365fba2f4",
+    "assets/brand/character-system/poses/paw-pose-sitting.svg": "77562cf983b56e5a4030a3acd4c746212ab971cc2b005814c3666dff8fd8ccee",
+    "assets/brand/character-system/poses/paw-pose-sleeping.svg": "6cc6bf88e4b58589180e00c613a3786ac53739080a37e1a7798d42ea3d2b52d3",
+    "assets/brand/character-system/poses/paw-pose-studying.svg": "82a7e422d0e3cc74ebf9b878e5dc1037ca31afa73eccb3fb7ef6e5688149ce43",
+    "assets/brand/character-system/poses/paw-pose-thinking.svg": "0a42483876acf19041816c301edd015aacf6108d39aac5a1c7dcb2d6f27da76f",
+    "assets/brand/character-system/poses/paw-pose-walking.svg": "a56ab21769ee344e036072d4ec86924ac40be7776b8fa8d6eb8c436df28a6c49",
+    "assets/brand/character-system/poses/paw-pose-waving.svg": "c7923c9ae432a30c1176b847c09d2e25ccf2d4855d47b2c1fe5fe8699029cecb",
+    "assets/brand/character-system/props/paw-prop-awan.svg": "448f42e88de5bd04916e85ba5845dcb59af6dba921228f734797f39e0b56dc37",
+    "assets/brand/character-system/props/paw-prop-bintang.svg": "decf0b6e2df4cd1936eb0ef0fae3410a945b57a6b048dec8f9026a1e7ea7a466",
+    "assets/brand/character-system/props/paw-prop-buku.svg": "22ff157be964d0f3eea9d3d2545944397e92e7216bf02d0df6323b255804f261",
+    "assets/brand/character-system/props/paw-prop-centang.svg": "25ee410415961b4bc12166ddc583641bff3adf6ef7751e31437d8c4fa121107a",
+    "assets/brand/character-system/props/paw-prop-gelembung.svg": "c553741855b1ff73dd998b9abdb2e2876945f542ee29462504608a2fa6a4a2b0",
+    "assets/brand/character-system/props/paw-prop-hati.svg": "20950df2460158cef273161814cb8174a74d218e9beea10c3dcf7b0b39468ed6",
+    "assets/brand/character-system/props/paw-prop-jam.svg": "c0c093f56301cc279c3a8e12a2f10b34fc60402f183df1b11c4782ebb3c6b8fe",
+    "assets/brand/character-system/props/paw-prop-kaca.svg": "6bfd5f62c1e41994eafbc316bda66886c1e5ee15535a03e3bde84da43f1e2b1c",
+    "assets/brand/character-system/props/paw-prop-lampu.svg": "8b3e63624d811d05ccbb89d5166ec0b6cbd28dc36633898f126f34a078a13cef",
+    "assets/brand/character-system/props/paw-prop-pensil.svg": "1996cda3285a9622baadb017033f14cf0e45ca452f1c36b3986561fd40d43d07",
+    "assets/brand/character-system/props/paw-prop-piala.svg": "0676f275449414247411d7d3337e36183c03836efb385e6e5a09c260d6178209",
+    "assets/brand/character-system/props/paw-prop-tanya.svg": "135f8b7d6840f548476945762479b20604de4a7731636c41cb928546aba0cc2c",
+    "mockups/character-system.html": "b72ca23f0304e51437b169893bef663bf56cfafee8b96fc313ded11d462ce1f3"
+  }
+}

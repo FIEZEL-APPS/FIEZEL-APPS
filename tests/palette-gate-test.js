@@ -78,6 +78,38 @@ const SVGS = [
   'assets/brand/mascot/paw-mascot-official.svg',
 ];
 
+/* DIREKTORI YANG DIJAGA UTUH (m025-302).
+   ----------------------------------------
+   SVGS di atas adalah daftar tulis-tangan, dan kepala daftar utang di bawah sudah
+   mencatat kelemahannya: ia hanya sekuat ingatan penyunting terakhir. Sistem karakter
+   merek (assets/brand/character-system/) lahir sebagai 64 berkas HASIL GENERATE dan akan
+   bertambah tiap kali pustaka pose/prop tumbuh — menyalin 64 nama ke SVGS berarti daftar
+   itu basi pada ekspor berikutnya, diam-diam, persis cacat yang sudah pernah terjadi.
+
+   Jadi yang didaftarkan bukan berkasnya melainkan DIREKTORINYA: setiap .svg di bawah
+   prefiks ini dijaga palet, hari ini dan pada setiap berkas baru, tanpa ada yang perlu
+   ingat menambahkannya. Ini memperKETAT gerbang, bukan melonggarkannya. */
+const SVG_DIRS = [
+  'assets/brand/character-system/',   // hasil generate tools/export-character-system.mjs
+];
+
+/** Semua .svg di bawah SVG_DIRS, ditemukan dari isi direktori — bukan daftar. */
+function svgsDiDirJaga() {
+  const out = [];
+  for (const d of SVG_DIRS) {
+    const root = path.join(__fzRoot, d);
+    if (!fs.existsSync(root)) continue;
+    (function sapu(dir) {
+      for (const e of fs.readdirSync(dir, { withFileTypes: true })) {
+        const abs = path.join(dir, e.name);
+        if (e.isDirectory()) { sapu(abs); continue; }
+        if (e.name.endsWith('.svg')) out.push(path.relative(__fzRoot, abs).split(path.sep).join('/'));
+      }
+    })(root);
+  }
+  return out.sort();
+}
+
 /* SENI KARAKTER YANG SENGAJA TIDAK DIJAGA — daftar UTANG, bukan daftar lingkup (m025-301).
    -------------------------------------------------------------------------------------
    Daftar SVGS di atas ditulis tangan, dan itu berarti gerbang ini hanya sekuat ingatan
@@ -141,7 +173,7 @@ test('inventaris: tidak ada SVG karakter yang tak bernama — lulus palet, atau 
     }
   })(__fzRoot);
 
-  const dijaga = new Set(SVGS);
+  const dijaga = new Set([...SVGS, ...svgsDiDirJaga()]);
   const tercatat = (f) => UTANG_TANPA_PALET.some((x) => (x.endsWith('/') ? f.startsWith(x) : f === x));
   const liar = ditemukan.filter((f) => !dijaga.has(f) && !tercatat(f));
 
@@ -152,9 +184,9 @@ test('inventaris: tidak ada SVG karakter yang tak bernama — lulus palet, atau 
       + '\n      (b) belum -> tulis di UTANG_TANPA_PALET dengan alasan dan tanggal, lalu'
       + '\n      sebutkan di laporan ke owner. Yang tidak sah adalah diam.');
   }
-  if (ditemukan.length < SVGS.length) {
+  if (ditemukan.length < dijaga.size) {
     throw new Error('penyapu inventaris hanya menemukan ' + ditemukan.length
-      + ' SVG karakter padahal ' + SVGS.length + ' sudah dijaga dengan tangan — '
+      + ' SVG karakter padahal ' + dijaga.size + ' sudah dijaga — '
       + 'penyapunya patah, bukan reponya menyusut');
   }
 });
@@ -219,7 +251,7 @@ test('utang palet tidak diam-diam naik ke produksi', () => {
 
 test('SVG karakter: tidak ada hex di luar palet G1', () => {
   const drift = [];
-  for (const f of SVGS) {
+  for (const f of [...SVGS, ...svgsDiDirJaga()]) {
     if (!exists(f)) { drift.push(f + ': berkas hilang'); continue; }
     const bad = offenders(read(f), f.endsWith('fiezel-paw.svg') ? MARK_INK : null);
     if (bad.length) drift.push(f + ': ' + bad.join(', '));
