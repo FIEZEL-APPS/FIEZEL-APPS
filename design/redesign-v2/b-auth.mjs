@@ -1,5 +1,5 @@
 /* Masuk, daftar, dan seluruh alur perkenalan dalam arah "Lembut". */
-import { T, D, S, R, SH, JUDUL, ic, dc, isi, kartu, tombol, chip, ikonTombol, bar, eyebrow,
+import { T, D, S, R, SH, JUDUL, ic, dc, isi, tombol, chip, ikonTombol, bar, eyebrow,
   titik, maskot, bayangan, cahaya, wordmark, TOP_SAFE } from './b-kit.mjs';
 
 /* ---------- Pembuka + pilih bahasa ---------- */

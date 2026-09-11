@@ -3,7 +3,7 @@
 
    Landing page website SENGAJA TIDAK ADA di sini — owner meminta redesain
    dibatasi ke aplikasi saja. */
-import { writeFileSync } from 'node:fs';
+import { writeFileSync, readFileSync, readdirSync } from 'node:fs';
 import { T, D } from './b-kit.mjs';
 import * as A from './b-auth.mjs';
 import * as M from './b-menu.mjs';
@@ -106,6 +106,30 @@ const canvas = {
   ],
   launch: { view: 'canvas', page: 'page-menu' }
 };
+
+/* ---------- gerbang impor tak terpakai ----------
+   Pemeriksaan pertama versi ini punya bug: ia menguji `\bnama\b` di seluruh badan
+   berkas, jadi akses properti seperti `SH.kartu` terhitung sebagai pemakaian
+   `kartu` dan impor yatim lolos. Akses properti karena itu dibuang dulu. */
+const berkasModul = readdirSync('.').filter((f) => f.endsWith('.mjs'));
+const yatim = [];
+for (const f of berkasModul) {
+  const isi = readFileSync(f, 'utf8');
+  const badan = isi
+    .replace(/^import[\s\S]*?from\s+'[^']+';/gm, '')
+    .replace(/\.\s*[A-Za-z_$][\w$]*/g, '');
+  for (const m of isi.matchAll(/import\s*\{([\s\S]*?)\}\s*from/g)) {
+    for (let n of m[1].split(',')) {
+      n = n.trim().split(/\s+as\s+/).pop().trim();
+      if (n && !new RegExp('\\b' + n + '\\b').test(badan)) yatim.push(`${f} → ${n}`);
+    }
+  }
+}
+if (yatim.length) {
+  console.error(`\nGAGAL: ${yatim.length} impor tak terpakai. Artboard tidak ditulis.`);
+  for (const y of yatim) console.error('  ' + y);
+  process.exit(1);
+}
 
 /* ---------- kontras ---------- */
 function lum(hex) {
