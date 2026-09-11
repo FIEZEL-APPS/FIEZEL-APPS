@@ -1,7 +1,7 @@
 /* Lembar sistem desain "Lembut" — rujukan untuk implementasi.
    Landing page website tidak ada di berkas ini maupun di mana pun: redesain
    dibatasi ke aplikasi atas permintaan owner. */
-import { T, D, S, R, SH, JUDUL, BADAN, MIN_MASKOT, ic, dc, kartu, tombol, chip, bar, cincin,
+import { T, D, S, R, SH, JUDUL, BADAN, MIN_MASKOT, ic, dc, tombol, chip, bar, cincin,
   eyebrow, sakelar, titik, wordmark, paw, maskot, inisial } from './b-kit.mjs';
 
 export const SISTEM = { w: 1180, h: 1700 };

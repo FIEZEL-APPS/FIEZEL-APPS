@@ -108,15 +108,83 @@ const canvas = {
 };
 
 /* ---------- gerbang impor tak terpakai ----------
-   Pemeriksaan pertama versi ini punya bug: ia menguji `\bnama\b` di seluruh badan
-   berkas, jadi akses properti seperti `SH.kartu` terhitung sebagai pemakaian
-   `kartu` dan impor yatim lolos. Akses properti karena itu dibuang dulu. */
+   Versi ini adalah perbaikan KEDUA atas gerbang yang sama, dan keduanya lahir dari
+   kesalahan yang sama: menguji `\bnama\b` terhadap teks yang bukan kode.
+
+   Putaran pertama menghitung akses properti — `SH.kartu` membuat impor `kartu`
+   yang yatim tampak terpakai. Putaran kedua: komentar dan string juga bukan kode,
+   dan modul di sini penuh komentar Indonesia yang menyebut `maskot`, `kartu`,
+   `potret` sebagai kata biasa, jadi impor yatim bernama sama akan lolos diam-diam.
+
+   Karena itu teks diambil lewat pemindai, bukan regex tunggal: komentar dan string
+   berkutip dibuang, dan di dalam template literal hanya isi ${...} yang disimpan —
+   teks harfiahnya dibuang. Itu penting karena di berkas ini hampir seluruh pemakaian
+   nyata hidup di dalam ${...}. */
+function kodeSaja(src) {
+  let out = '';
+  const tumpukan = [];
+  let i = 0;
+  const n = src.length;
+  while (i < n) {
+    const c = src[i];
+    const c2 = src.slice(i, i + 2);
+    if (tumpukan.length && tumpukan[tumpukan.length - 1] === 'tmpl') {
+      if (c === '\\') { i += 2; continue; }
+      if (c2 === '${') { tumpukan.push('expr'); i += 2; out += ' '; continue; }
+      if (c === '`') { tumpukan.pop(); i++; out += ' '; continue; }
+      i++;
+      continue;
+    }
+    if (c2 === '//') { while (i < n && src[i] !== '\n') i++; continue; }
+    if (c2 === '/*') {
+      i += 2;
+      while (i < n && src.slice(i, i + 2) !== '*/') i++;
+      i += 2; out += ' '; continue;
+    }
+    if (c === "'" || c === '"') {
+      const q = c;
+      i++;
+      while (i < n && src[i] !== q) { if (src[i] === '\\') i++; i++; }
+      i++; out += ' '; continue;
+    }
+    /* Literal regex. Tanpa ini, tanda kutip DI DALAM regex seperti
+       /from\s+'[^']+';/ terbaca sebagai awal string dan menggeser sisa berkas —
+       persis positif palsu yang muncul waktu gerbang ini pertama dipasang.
+       Heuristik bakunya: `/` memulai regex kalau karakter bermakna sebelumnya
+       bukan penutup nilai. */
+    if (c === '/') {
+      const sblm = out.replace(/\s+$/, '').slice(-1);
+      if (sblm === '' || '(,=:[!&|?{};+-*%<>~^'.includes(sblm)) {
+        i++;
+        let kelas = false;
+        while (i < n) {
+          const d = src[i];
+          if (d === '\\') { i += 2; continue; }
+          if (d === '[') kelas = true;
+          else if (d === ']') kelas = false;
+          else if (d === '/' && !kelas) break;
+          else if (d === '\n') break;
+          i++;
+        }
+        i++;
+        while (i < n && /[dgimsuvy]/.test(src[i])) i++;
+        out += ' ';
+        continue;
+      }
+    }
+    if (c === '`') { tumpukan.push('tmpl'); i++; out += ' '; continue; }
+    if (c === '{' && tumpukan.length) { tumpukan.push('brace'); i++; out += c; continue; }
+    if (c === '}' && tumpukan.length) { tumpukan.pop(); i++; out += c; continue; }
+    out += c; i++;
+  }
+  return out;
+}
+
 const berkasModul = readdirSync('.').filter((f) => f.endsWith('.mjs'));
 const yatim = [];
 for (const f of berkasModul) {
   const isi = readFileSync(f, 'utf8');
-  const badan = isi
-    .replace(/^import[\s\S]*?from\s+'[^']+';/gm, '')
+  const badan = kodeSaja(isi.replace(/^import[\s\S]*?from\s+'[^']+';/gm, ''))
     .replace(/\.\s*[A-Za-z_$][\w$]*/g, '');
   for (const m of isi.matchAll(/import\s*\{([\s\S]*?)\}\s*from/g)) {
     for (let n of m[1].split(',')) {
