@@ -3,6 +3,19 @@ const fs=require('fs'),path=require('path'),vm=require('vm');
 const root=__fzRoot;
 const version=JSON.parse(fs.readFileSync(path.join(root,'VERSION.json'))).version;
 const sw=fs.readFileSync(path.join(root,'sw.js'),'utf8');
+/* expectedShell adalah CONTOH UJI, BUKAN daftar cakupan (dijelaskan m025-301).
+   34 nama di bawah ini dipakai untuk membuktikan MEKANIKA service worker bekerja: berkas
+   yang didaftarkan benar-benar ada, dan benar-benar masuk precache. Ia TIDAK menjawab
+   pertanyaan "apakah seluruh shell ikut ter-precache" — dan pernah ada yang salah membaca
+   itu, dengan akibat nyata: index.html memuat 166 berkas, daftar ini menyebut 34, dan lima
+   peta copy-id (tempat kunci guru.* tinggal) tidak pernah ter-precache. Dasbor guru
+   menampilkan nama kunci mentah kepada pemakai luring, sementara gerbang ini hijau.
+
+   CAKUPANNYA dijaga tests/precache-covers-shell-test.js (m025-295), yang tidak memegang
+   daftar apa pun: ia MENURUNKAN syaratnya dari index.html sendiri, jadi berkas baru ikut
+   terjaga pada hari ia ditambahkan. Kalau kamu hendak menambah nama ke daftar di bawah
+   untuk "menutup lubang", berhentilah — lubangnya sudah ditutup di sana, dan daftar yang
+   berpura-pura lengkap justru mengembalikan salah-baca yang sama. */
 const expectedShell=['./','./index.html','./style.css','./version.js','./report-config.js','./core-config.js','./content-canary.js','./content-promotion.js','./content-canary-config.js','./lucide.min.js','./app.js','./validator.js','./manifest.json','./vocabulary-master.json','./reading-bank.json','./grammar-templates.json','./grammar-curriculum-v1.json','./favicon-64.png','./apple-touch-icon.png','./instagram.svg','./creator-report-setup.html','./creator-report-dashboard.html','./fiezel-report-worker.js','./features/neural-voice/fiezel-neural-voice-config.js','./features/neural-voice/fiezel-puter-voice.js','./features/neural-voice/fiezel-subtitle.js','./features/neural-voice/fiezel-subtitle-translate.js','./features/neural-voice/fiezel-voice-say.js','./features/neural-voice/fiezel-diag-panel.js','./features/speaking-listening/speaking-listening-config.js','./features/speaking-listening/fiezel-speaking-listening-addon.js','./features/speaking-listening/speaking-listening-addon.css','./features/speaking-listening/listening-bank-v1.json','./features/speaking-listening/speaking-bank-v1.json'];
 const match=sw.match(/const ASSETS=(\[[^;]+\]);/s);
 let precache=[];
@@ -39,6 +52,12 @@ const result={
   assets,
   neuralPrecache
 };
-result.pass=result.runtimeCacheStable&&result.revisionedShellCache&&result.eagerActivationDisabled&&result.staleShellOnlyInvalidation&&result.stableRuntimeNotInvalidated&&result.navigationFallbackCurrentShell&&result.shellReloadInstall&&result.neuralInstallPrecacheExcluded&&result.neuralRuntimeLookupStable&&result.heavyImplicitCacheExcluded&&result.assets.every(x=>x.exists&&x.precache);
+/* Penunjuk di komentar atas hanya sekuat keberadaan yang ditunjuknya. Kalau gerbang
+   cakupan itu terhapus atau lepas dari quality.yml, komentar di atas berubah jadi
+   janji palsu dan lubang precache terbuka lagi tanpa satu pun suara — jadi kaitannya
+   diperiksa di sini, bukan dipercaya. */
+result.coverageGateHadir=fs.existsSync(path.join(root,'tests/precache-covers-shell-test.js'))
+  &&fs.readFileSync(path.join(root,'.github/workflows/quality.yml'),'utf8').includes('precache-covers-shell-test.js');
+result.pass=result.coverageGateHadir&&result.runtimeCacheStable&&result.revisionedShellCache&&result.eagerActivationDisabled&&result.staleShellOnlyInvalidation&&result.stableRuntimeNotInvalidated&&result.navigationFallbackCurrentShell&&result.shellReloadInstall&&result.neuralInstallPrecacheExcluded&&result.neuralRuntimeLookupStable&&result.heavyImplicitCacheExcluded&&result.assets.every(x=>x.exists&&x.precache);
 console.log(JSON.stringify(result,null,2));
 process.exitCode=result.pass?0:1;

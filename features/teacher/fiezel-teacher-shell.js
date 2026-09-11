@@ -9,7 +9,39 @@
   /* m025-265 · sapuan kebocoran Thai: naskah modul ini dulu literal Indonesia, jadi murid
      yang memilih th tetap membacanya dalam bahasa Indonesia. t() fail-soft: kalau copy-map
      belum termuat, fallback id yang tampil — bukan kunci mentah. */
-  function t(k, fb) { try { var I = (typeof self !== 'undefined' ? self : this).FiezelI18n; return I && I.t ? I.t(k) : fb; } catch (_) { return fb; } }
+  /* Bendera dibaca lewat FiezelUX kalau ada; kalau tidak ada, jawabannya MATI. Sama
+     seperti uxOn() di app.js: nama tak dikenal -> false, jadi salah ketik menyembunyikan
+     permukaan (aman), bukan menyalakannya diam-diam. */
+  function uxOn(flag) {
+    try {
+      var api = (typeof self !== 'undefined' ? self : this).FiezelUX;
+      return !!(api && typeof api.on === 'function' && api.on(flag) === true);
+    } catch (_) { return false; }
+  }
+
+  /* Pintu konsol kurikulum diturunkan dari ALAMAT BACKENDNYA, bukan dari bendera yang
+     bisa disetel tangan. Alamat kosong = backend belum dipasang = pintu tertutup, apa pun
+     isi benderanya. Bendera tetap dihormati sebagai sakelar mati tambahan: keduanya harus
+     setuju untuk membuka. Kegagalan di mana pun di rantai ini menutup pintu. */
+  function konsolKurikulumSiap() {
+    try {
+      var root = (typeof self !== 'undefined' ? self : this);
+      var c = root.FIEZEL_CURRICULUM_CONFIG || {};
+      var alamat = String(c.curriculumApiUrl || '').trim();
+      if (!alamat) return false;
+      return uxOn('curriculumConsole');
+    } catch (_) { return false; }
+  }
+
+  function t(k, fb) {
+    /* FiezelI18n.t() mengembalikan KUNCINYA saat kalimatnya belum termuat. Mengembalikan
+       itu apa adanya berarti guru membaca 'guru.tab-jurnal' di layarnya, padahal kalimat
+       cadangannya sudah tertulis di pemanggil. Cadangan dipakai untuk DUA keadaan:
+       FiezelI18n tidak ada, dan kuncinya tidak terpecahkan. */
+    var s;
+    try { var I = (typeof self !== 'undefined' ? self : this).FiezelI18n; s = I && I.t ? I.t(k) : undefined; } catch (_) {}
+    return (s === undefined || s === k) ? (fb == null ? k : fb) : s;
+  }
   if (!root) return;
   var S = function () { return root.FiezelTeacherStore; };
   var el = null, env = {}, st = null, ui = { modal: null, drawer: null, filter: '', insightSkill: 'past_tense', attDate: null, pick: {}, syncing: false }, syncTimer = null, chipTimer = null, visListener = null;
@@ -384,7 +416,13 @@
       '<button type="button" class="tg-teacher" data-tg="view" data-view="settings" data-testid="tg-profile">' + icon('user-round') + '<div><b>' + esc(st.teacher.name || accountHandle() || 'Guru FIEZEL') + '</b><small>' + esc(st.teacher.school || 'Atur profil →') + '</small></div></button>' +
       (st.classes.length ? '<label class="tg-class-switch">' + t('guru.kelas-aktif', 'Kelas aktif') + '<select data-tg-select="class" data-testid="tg-class-select">' + st.classes.map(function (k) { return '<option value="' + k.id + '"' + (c && k.id === c.id ? ' selected' : '') + '>' + esc(k.name) + '</option>'; }).join('') + '</select></label>' : '') +
       '<nav class="tg-nav">' + NAV.map(function (n) { return '<button type="button" class="tg-nav-item' + (st.view === n[0] ? ' is-active' : '') + '" data-tg="view" data-view="' + n[0] + '" data-testid="tg-nav-' + n[0] + '">' + icon(n[2]) + '<span>' + n[1] + '</span></button>'; }).join('') + '</nav>' +
-      '<a class="tg-nav-item" href="./kurikulum.html" data-testid="tg-nav-curriculum">' + icon('library') + '<span>' + esc(t('guru.nav-kurikulum', 'Kurikulum & Kompetensi')) + '</span></a>' +
+      /* Pintu konsol kurikulum HANYA dibuka kalau benderanya menyala. Backend yang
+         melayaninya (/api/...) belum berjalan di produksi — diperiksa owner 7 Sep 2026,
+         404. Nama bendera yang salah ketik jatuh ke false, jadi kegagalannya menyembunyikan
+         pintu, bukan membukanya. Lihat alasan lengkap di fiezel-ux-flags.js. */
+      (konsolKurikulumSiap()
+        ? '<a class="tg-nav-item" href="./kurikulum.html" data-testid="tg-nav-curriculum">' + icon('library') + '<span>' + esc(t('guru.nav-kurikulum', 'Kurikulum & Kompetensi')) + '</span></a>'
+        : '') +
       '<div class="tg-side-foot"><div class="tg-saved" title="Perkiraan waktu administrasi yang FIEZEL kerjakan untukmu">' + icon('hourglass') + '<div><small>' + esc(t('guru.waktu-hemat', 'Waktu administrasi yang dihemat')) + '</small><b>' + Math.round(st.savedMinutes || 0) + ' menit</b></div></div>' +
       '<button type="button" class="tg-exit" data-tg="' + exitAction + '" data-testid="tg-exit">' + icon('log-out') + ' ' + exitLabel + '</button></div></aside>';
   }

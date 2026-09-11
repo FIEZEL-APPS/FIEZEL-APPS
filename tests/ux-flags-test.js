@@ -53,7 +53,12 @@ const REQUIRED = {
   leanIntro: [true, 'perkenalan <=3 layar'],
   placementLite: [true, 'placement-lite 8-12 soal'],
   sessionSummary: [true, 'Ringkasan akhir sesi'],
-  funnelTelemetry: [true, 'Instrumentasi funnel (opt-in, agregat, tanpa PII)']
+  funnelTelemetry: [true, 'Instrumentasi funnel (opt-in, agregat, tanpa PII)'],
+  /* Diperiksa owner di fiezel.my.id (7 Sep 2026): /api/health 404, /kurikulum.html 404.
+     Konsol kurikulum dilayani '/api/...' relatif origin, dan repo tidak punya
+     passenger_wsgi.py / Procfile / requirements.txt di akar - backend-nya memang belum
+     pernah dipasang. Pintunya ditutup sampai ia benar-benar berjalan; mesinnya utuh. */
+  curriculumConsole: [true, 'Fitur diizinkan; yang menentukan pintu terbuka adalah curriculumApiUrl yang bawaannya kosong (m025-298)']
 };
 
 /* -- T1: setiap bendera punya nilai yang diminta owner -------------------------------- */

@@ -157,7 +157,23 @@ const PER_PERSON_COLUMNS = ['user_id', 'install_id', 'installid', 'account_id', 
 
   // Pindai kode (tanpa komentar). `installId` hanya boleh muncul di
   // analytics-core.js, sebagai argumen visitorToken() — dan tidak pernah keluar.
-  const modules = ['analytics-core.js', 'route-events.js', 'analytics-store-d1.js', 'analytics-tables.js', 'rollup.js'];
+  /* DAFTAR MODUL DITEMUKAN DARI DIREKTORI, TIDAK DITULIS TANGAN (m025-301).
+     Kelima nama yang dulu ditulis di sini kebetulan masih tepat — diukur, sama persis
+     dengan isi workers/api/analytics/. Tapi "kebetulan masih tepat" bukan jaminan: modul
+     analytics keenam yang ditambahkan besok akan lolos pemindaian token terlarang tanpa
+     satu pun suara, dan yang lolos di sini adalah kolom PII yang sampai ke basis data.
+     Karena itu daftarnya diturunkan dari direktori. Nol nama tulisan tangan berarti nol
+     nama yang bisa terlupa.
+
+     Klien peramban (features/analytics/fiezel-analytics-client.js) SENGAJA tidak ikut ke
+     pemindaian token ini, dan alasannya perlu ditulis supaya tidak ada yang "memperbaiki"
+     lalai: berkas itu memuat 'email', 'uuid', dan 'user_agent' sebagai POLA DENYLIST
+     pemulungnya sendiri (baris ~317-320) — kode yang MENCEGAH PII, bukan yang membawanya.
+     Memasukkannya ke sini membuat gerbang merah atas penjaganya sendiri. Klien itu sudah
+     dijaga tests/analytics-client-test.js, yang MENJALANKANNYA lalu memindai payload
+     sungguhan, lengkap dengan bukti pemindainya bisa merah. */
+  const modules = fs.readdirSync(DIR).filter((f) => f.endsWith('.js')).sort();
+  check('Ada modul analytics yang ditemukan untuk dipindai', modules.length >= 5, String(modules.length));
   const codeHits = [];
   const installHits = [];
   for (const rel of modules) {

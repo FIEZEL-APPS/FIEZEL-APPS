@@ -16,7 +16,7 @@ self.FIEZEL_REQUIRE_NOTIFICATIONS=false;
 // m025-61: penanda build halaman, dipakai health check untuk membandingkan versi yang
 // benar-benar dimuat dengan shell yang dipegang service worker. Nilainya dijaga gate agar
 // selalu sama dengan DIAG_BUILD; kalau keduanya berbeda, install-health-test gagal.
-self.FIEZEL_PAGE_BUILD='m025-294';
+self.FIEZEL_PAGE_BUILD='m025-299';
 // m025-150 profil suara ElevenLabs untuk sisi klien.
 //
 // Isinya sengaja hanya penanda, BUKAN rahasia apa pun: kunci API ElevenLabs hidup di
@@ -32,6 +32,24 @@ self.FIEZEL_AUDIO_CONFIG=Object.freeze({
   voiceId:'',
   modelId:'eleven_multilingual_v2',
   settings:Object.freeze({stability:0.5,similarityBoost:0.75,speed:1})
+});
+// ── ALAMAT BACKEND MESIN KURIKULUM ──────────────────────────────────────────────────
+//
+// KOSONG = konsol kurikulum TERTUTUP. Itu bukan kelalaian, itu kontraknya: bendera
+// `curriculumConsole` diturunkan dari nilai ini, jadi tidak ada keadaan "pintu terbuka
+// tanpa backend" yang bisa dibuat tanpa berbohong di berkas ini. Pintu menuju ruangan
+// kosong pernah terjadi (m025-294 -> ditutup m025-296) dan tidak boleh terulang lewat
+// bendera yang bisa dinyalakan tangan.
+//
+// Diisi dengan alamat ABSOLUT tempat backend/ (FastAPI) benar-benar berjalan, mis.
+// 'https://fiezel-kurikulum.onrender.com'. Polanya sengaja sama dengan workerUrl di
+// bawah — itu pola yang SUDAH terbukti bekerja di produksi FIEZEL, karena
+// fiezel.my.id adalah hosting statis dan tidak pernah bisa melayani /api sendiri.
+//
+// Repo yang didistribusikan WAJIB mengirimkannya kosong: salinan orang lain tidak boleh
+// mengirim data muridnya ke server milik pemasang pertama.
+self.FIEZEL_CURRICULUM_CONFIG=Object.freeze({
+  curriculumApiUrl:''
 });
 self.FIEZEL_CORE_CONFIG=Object.freeze({
   workerUrl:'https://fiezel-core.puter.work',

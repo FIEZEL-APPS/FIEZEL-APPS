@@ -5167,6 +5167,36 @@ html body #app .social-home-launcher .launch-card{background:var(--pz-sky);borde
 .quick-practice-section {
   margin-top: 18px;
 }
+/* PINTASAN BAHASA DI LAYAR DEPAN (m025-299).
+   SENGAJA DI LUAR .quick-chips-grid dan TANPA kelas .quick-chip. Chip latihan di grid itu
+   diwarnai lewat :nth-child(n); menaruh chip bahasa di dalamnya menggeser warna SETIAP chip
+   sesudahnya - satu sisipan, empat kartu berubah rupa tanpa ada yang memintanya. Chip ini
+   juga bukan latihan: ia mengganti seluruh kursus, jadi ia memang layak terbaca berbeda. */
+.target-lang-chip {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 3px;
+  width: 100%;
+  margin: 0 0 10px;
+  padding: 11px 12px;
+  border-radius: var(--radius-lg);
+  background: var(--pz-lilac, #efe9fb);
+  border: 1.5px dashed var(--pz-lilac-line, #cbb9ee);
+  cursor: pointer;
+  text-align: left;
+  transition: transform var(--dur-s) var(--ease), box-shadow var(--dur-s) var(--ease);
+}
+.target-lang-chip:active { transform: translateY(1px); }
+/* Aktif = garis penuh, bukan putus-putus: putus-putus berarti "tawaran", penuh berarti
+   "sedang berjalan". Perbedaannya harus terbaca tanpa membaca tulisannya. */
+.target-lang-chip.is-active {
+  border-style: solid;
+  box-shadow: 0 3px 0 var(--pz-lilac-line, #cbb9ee);
+}
+.target-lang-chip .chip-label { font-weight: 700; font-size: 13px; color: var(--text); }
+.target-lang-chip .chip-sub { font-size: 11px; color: var(--muted); }
+
 .quick-chips-grid {
   display: grid;
   /* minmax(0,...): chip berisi label nowrap, jadi kolom 1fr biasa menolak menyusut di 320px. */
