@@ -1,26 +1,126 @@
 {
   "pages": [
     {
-      "id": "page-1",
+      "id": "page-arah",
+      "name": "Pilihan arah"
+    },
+    {
+      "id": "page-auth",
       "name": "Masuk & Perkenalan"
     },
     {
-      "id": "page-2",
+      "id": "page-menu",
       "name": "Menu utama"
     },
     {
-      "id": "page-3",
+      "id": "page-sesi",
       "name": "Sesi belajar"
     },
     {
-      "id": "page-4",
-      "name": "Landing & sistem"
+      "id": "page-sistem",
+      "name": "Sistem"
     }
   ],
   "artboards": [
     {
+      "file": "ArahAHome.dc.html",
+      "page": "page-arah",
+      "x": 0,
+      "y": 0,
+      "w": 390,
+      "h": 844
+    },
+    {
+      "file": "ArahALatihan.dc.html",
+      "page": "page-arah",
+      "x": 480,
+      "y": 0,
+      "w": 390,
+      "h": 844
+    },
+    {
+      "file": "ArahASoal.dc.html",
+      "page": "page-arah",
+      "x": 960,
+      "y": 0,
+      "w": 390,
+      "h": 844
+    },
+    {
+      "file": "ArahBHome.dc.html",
+      "page": "page-arah",
+      "x": 0,
+      "y": 1054,
+      "w": 390,
+      "h": 844
+    },
+    {
+      "file": "ArahBLatihan.dc.html",
+      "page": "page-arah",
+      "x": 480,
+      "y": 1054,
+      "w": 390,
+      "h": 844
+    },
+    {
+      "file": "ArahBSoal.dc.html",
+      "page": "page-arah",
+      "x": 960,
+      "y": 1054,
+      "w": 390,
+      "h": 844
+    },
+    {
+      "file": "ArahCHome.dc.html",
+      "page": "page-arah",
+      "x": 0,
+      "y": 2108,
+      "w": 390,
+      "h": 844
+    },
+    {
+      "file": "ArahCLatihan.dc.html",
+      "page": "page-arah",
+      "x": 480,
+      "y": 2108,
+      "w": 390,
+      "h": 844
+    },
+    {
+      "file": "ArahCSoal.dc.html",
+      "page": "page-arah",
+      "x": 960,
+      "y": 2108,
+      "w": 390,
+      "h": 844
+    },
+    {
+      "file": "ArahDHome.dc.html",
+      "page": "page-arah",
+      "x": 0,
+      "y": 3162,
+      "w": 390,
+      "h": 844
+    },
+    {
+      "file": "ArahDLatihan.dc.html",
+      "page": "page-arah",
+      "x": 480,
+      "y": 3162,
+      "w": 390,
+      "h": 844
+    },
+    {
+      "file": "ArahDSoal.dc.html",
+      "page": "page-arah",
+      "x": 960,
+      "y": 3162,
+      "w": 390,
+      "h": 844
+    },
+    {
       "file": "Login.dc.html",
-      "page": "page-1",
+      "page": "page-auth",
       "x": 0,
       "y": 0,
       "w": 1120,
@@ -28,7 +128,7 @@
     },
     {
       "file": "Daftar.dc.html",
-      "page": "page-1",
+      "page": "page-auth",
       "x": 1210,
       "y": 0,
       "w": 1120,
@@ -36,7 +136,7 @@
     },
     {
       "file": "Splash.dc.html",
-      "page": "page-1",
+      "page": "page-auth",
       "x": 0,
       "y": 920,
       "w": 390,
@@ -44,7 +144,7 @@
     },
     {
       "file": "Intro1.dc.html",
-      "page": "page-1",
+      "page": "page-auth",
       "x": 480,
       "y": 920,
       "w": 390,
@@ -52,7 +152,7 @@
     },
     {
       "file": "Intro2.dc.html",
-      "page": "page-1",
+      "page": "page-auth",
       "x": 960,
       "y": 920,
       "w": 390,
@@ -60,7 +160,7 @@
     },
     {
       "file": "Intro3.dc.html",
-      "page": "page-1",
+      "page": "page-auth",
       "x": 1440,
       "y": 920,
       "w": 390,
@@ -68,7 +168,7 @@
     },
     {
       "file": "ObNama.dc.html",
-      "page": "page-1",
+      "page": "page-auth",
       "x": 1920,
       "y": 920,
       "w": 390,
@@ -76,7 +176,7 @@
     },
     {
       "file": "ObTujuan.dc.html",
-      "page": "page-1",
+      "page": "page-auth",
       "x": 2400,
       "y": 920,
       "w": 390,
@@ -84,7 +184,7 @@
     },
     {
       "file": "ObTes.dc.html",
-      "page": "page-1",
+      "page": "page-auth",
       "x": 2880,
       "y": 920,
       "w": 390,
@@ -92,7 +192,7 @@
     },
     {
       "file": "ObSelesai.dc.html",
-      "page": "page-1",
+      "page": "page-auth",
       "x": 3360,
       "y": 920,
       "w": 390,
@@ -100,7 +200,7 @@
     },
     {
       "file": "Main.dc.html",
-      "page": "page-2",
+      "page": "page-menu",
       "x": 0,
       "y": 0,
       "w": 390,
@@ -108,7 +208,7 @@
     },
     {
       "file": "MainThai.dc.html",
-      "page": "page-2",
+      "page": "page-menu",
       "x": 480,
       "y": 0,
       "w": 390,
@@ -116,7 +216,7 @@
     },
     {
       "file": "Latihan.dc.html",
-      "page": "page-2",
+      "page": "page-menu",
       "x": 960,
       "y": 0,
       "w": 390,
@@ -124,7 +224,7 @@
     },
     {
       "file": "KelasKu.dc.html",
-      "page": "page-2",
+      "page": "page-menu",
       "x": 1440,
       "y": 0,
       "w": 390,
@@ -132,7 +232,7 @@
     },
     {
       "file": "Progres.dc.html",
-      "page": "page-2",
+      "page": "page-menu",
       "x": 1920,
       "y": 0,
       "w": 390,
@@ -140,7 +240,7 @@
     },
     {
       "file": "Profil.dc.html",
-      "page": "page-2",
+      "page": "page-menu",
       "x": 2400,
       "y": 0,
       "w": 390,
@@ -148,7 +248,7 @@
     },
     {
       "file": "Pengaturan.dc.html",
-      "page": "page-2",
+      "page": "page-menu",
       "x": 2880,
       "y": 0,
       "w": 390,
@@ -156,7 +256,7 @@
     },
     {
       "file": "Peta.dc.html",
-      "page": "page-3",
+      "page": "page-sesi",
       "x": 0,
       "y": 0,
       "w": 390,
@@ -164,7 +264,7 @@
     },
     {
       "file": "Soal.dc.html",
-      "page": "page-3",
+      "page": "page-sesi",
       "x": 480,
       "y": 0,
       "w": 390,
@@ -172,7 +272,7 @@
     },
     {
       "file": "Benar.dc.html",
-      "page": "page-3",
+      "page": "page-sesi",
       "x": 960,
       "y": 0,
       "w": 390,
@@ -180,7 +280,7 @@
     },
     {
       "file": "Salah.dc.html",
-      "page": "page-3",
+      "page": "page-sesi",
       "x": 1440,
       "y": 0,
       "w": 390,
@@ -188,7 +288,7 @@
     },
     {
       "file": "Hasil.dc.html",
-      "page": "page-3",
+      "page": "page-sesi",
       "x": 1920,
       "y": 0,
       "w": 390,
@@ -196,25 +296,16 @@
     },
     {
       "file": "TanyaMira.dc.html",
-      "page": "page-3",
+      "page": "page-sesi",
       "x": 2400,
       "y": 0,
       "w": 390,
       "h": 844
     },
     {
-      "file": "Landing.dc.html",
-      "page": "page-4",
-      "x": 0,
-      "y": 0,
-      "w": 1440,
-      "h": 3480,
-      "print": "flow"
-    },
-    {
       "file": "Sistem.dc.html",
-      "page": "page-4",
-      "x": 1530,
+      "page": "page-sistem",
+      "x": 0,
       "y": 0,
       "w": 1180,
       "h": 1250
@@ -222,32 +313,64 @@
   ],
   "annotations": [
     {
-      "id": "catatan-arah",
-      "page": "page-1",
+      "id": "catatan-arah-a",
+      "page": "page-arah",
+      "x": 1500,
+      "y": 0,
+      "w": 460,
+      "text": "ARAH A — \"Kartu Tebal\". Kartu bergaris 2,5px dengan bayangan padat tanpa blur, huruf Fredoka yang membulat, warna datar terang.\nPaling ramai dan paling ramah anak. Cocok kalau muridnya SMP ke bawah."
+    },
+    {
+      "id": "catatan-arah-b",
+      "page": "page-arah",
+      "x": 1500,
+      "y": 1054,
+      "w": 460,
+      "text": "ARAH B — \"Lembut\". Tidak ada garis tepi sama sekali; kedalaman datang dari bayangan halus dan ruang kosong. Huruf Quicksand, pastel diredam, elemen lebih sedikit per layar.\nPaling tenang. Paling tidak melelahkan dipakai lama."
+    },
+    {
+      "id": "catatan-arah-c",
+      "page": "page-arah",
+      "x": 1500,
+      "y": 2108,
+      "w": 460,
+      "text": "ARAH C — \"Editorial Rimba\". Hijau rimba jadi permukaan utama, bukan aksen. Judul berhuruf serif Lora, kartu krem bergaris rambut emas, angka besar.\nPaling dewasa — condong ke murid SMA dan ke guru.\nCATATAN PENTING: serif melanggar BRAND-GUIDE (\"tidak ada serif\") dan gerbang tests/paw-mascot-test.js. Memilih arah ini berarti panduan merek dan gerbangnya ikut diperbarui — keputusan owner, bukan keputusanku."
+    },
+    {
+      "id": "catatan-arah-d",
+      "page": "page-arah",
+      "x": 1500,
+      "y": 3162,
+      "w": 460,
+      "text": "ARAH D — \"Blok Warna\". Tidak ada kartu sama sekali: layar disusun dari pita warna penuh dari tepi ke tepi. Huruf Archivo tebal, warna jenuh, maskot tampil besar.\nPaling berani dan paling dekat ke referensi kedua yang kamu kirim."
+    },
+    {
+      "id": "catatan-maskot",
+      "page": "page-arah",
+      "x": 0,
+      "y": -170,
+      "w": 700,
+      "text": "Aturan maskot sesudah temuan \"badannya bocor\": maskot berdiri di panggung miliknya sendiri yang ukurannya mengikuti rasio aspek gambar, tanpa offset negatif, dan wadahnya tidak boleh lebih pendek dari panggungnya. Hiasan warna memakai gradasi yang meluruh, bukan bentuk padat yang dipotong wadah dan terbaca sebagai bercak bersudut.\nGerbang di arah-preview.mjs memeriksa tiap gambar terhadap wadah pemotongnya dan melaporkan sisi yang jatuh di luar. Sekarang: 12 layar, 0 bocor."
+    },
+    {
+      "id": "catatan-lingkup",
+      "page": "page-auth",
       "x": 0,
       "y": -150,
-      "w": 620,
-      "text": "Arah \"Ekspedisi\" — bahasa tata letak dari tiga referensi (panel terbelah, blok warna penuh, tombol pil, titik indikator) dipasang di atas merek FIEZEL yang sudah ada: marun + emas dari panduan merek, hijau rimba + krem dari seni Mira & Nusa.\nIsian form mengikuti auth yang benar-benar ada di kode: nama + kata sandi, Google, Puter, dan lanjut tanpa akun. Tombol Google di sini penampung — aset resminya menyusul."
+      "w": 560,
+      "text": "Landing page website SENGAJA tidak ada di kanvas ini — redesain dibatasi ke aplikasi saja atas permintaan owner.\nHalaman-halaman sesudah \"Pilihan arah\" adalah rancangan lengkap versi pertama, disimpan sebagai pembanding. Begitu satu arah dipilih, seluruh layar dibangun ulang dalam arah itu."
     },
     {
       "id": "catatan-dwibahasa",
-      "page": "page-2",
+      "page": "page-menu",
       "x": 0,
       "y": -150,
       "w": 560,
-      "text": "Hari ini dan Hari ini (Thai) memakai satu tata letak dengan dua bank copy, cerminan pasangan copy-id dan copy-th di app. Nilai Thai diambil dari bank yang sudah ada kalau kuncinya tersedia.\nSetiap teks di semua artboard harus mendarat sebagai pasangan kunci ID+TH waktu diimplementasi — belum ada kunci yang dibuat di tahap mock ini."
-    },
-    {
-      "id": "catatan-klaim",
-      "page": "page-4",
-      "x": 0,
-      "y": -150,
-      "w": 560,
-      "text": "Angka di landing memakai angka resmi panduan merek (129 grammar lesson / 3.225 soal, 1.765 kosakata, 300 bacaan / 1.500 soal, 36 listening + 36 speaking) tanpa dibulatkan, dan bagian \"Apa yang FIEZEL tidak janjikan\" menjaga aturan klaim jujur: tidak ada klaim offline penuh, jaminan hasil, atau sertifikasi CEFR."
+      "text": "Hari ini dan Hari ini (Thai) memakai satu tata letak dengan dua bank copy, cerminan pasangan berkas copy-id dan copy-th di app.\nSetiap teks di semua artboard harus mendarat sebagai pasangan kunci ID+TH waktu diimplementasi — belum ada kunci yang dibuat di tahap mock ini."
     }
   ],
   "launch": {
     "view": "canvas",
-    "page": "page-1"
+    "page": "page-arah"
   }
 }
