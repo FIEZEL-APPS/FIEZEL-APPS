@@ -26,7 +26,12 @@
     'bahasa.ja': 'Bahasa Jepang',
     'bahasa.en-catatan': 'Kursus lengkap',
     'bahasa.ja-catatan': 'Tingkat A1/N5 · masih draf',
-    'bahasa.ja-peringatan': 'Kursus Jepang masih tahap awal: baru tingkat A1, belum ada latihan menyimak, dan naskahnya belum ditinjau penutur asli.',
+    'bahasa.ja-peringatan': 'Kursus Jepang masih tahap awal: baru tingkat A1; latihan menyimak, berbicara, dan menulis belum ada sehingga kartunya disembunyikan; naskahnya belum ditinjau penutur asli.',
+    'bahasa.chip-coba-ja': 'Coba Bahasa Jepang',
+    'bahasa.chip-coba-ja-sub': 'Tingkat A1/N5 · masih draf',
+    'bahasa.chip-aktif-ja': 'Bahasa Jepang aktif',
+    'bahasa.chip-kembali-en': 'Ketuk untuk kembali ke Bahasa Inggris',
+    'bahasa.chip-aria': 'Ganti bahasa yang dipelajari',
     'bahasa.berganti': 'Sekarang belajar {bahasa}.'
   });
 })();

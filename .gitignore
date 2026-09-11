@@ -87,3 +87,7 @@ credentials.json
 *.key
 .credentials
 .wrangler/
+
+# Bahan uji sementara content-chain-report-test.js: ditulis ke akar repo lalu dihapus
+# lagi. Pernah tersapu masuk oleh `git add -A` di m025-299 dan ikut ter-commit.
+.cc-*.json

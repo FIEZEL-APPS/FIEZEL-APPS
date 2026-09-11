@@ -35,6 +35,39 @@
        `phase-*` di #globalSky, dan palet langit yang bergerak sepanjang hari.
        Yang HIDUP: jam celestial itu sendiri (murid memakainya untuk tahu jam),
        hanya saja panggungnya satu, bukan empat. */
+    /* "KONSOL KURIKULUM — pintu yang menuju ruangan kosong." Diperiksa owner sendiri di
+       fiezel.my.id pada 7 September 2026: /api/health menjawab 404, /kurikulum.html juga.
+
+       Seluruh isi kurikulum.html dilayani features/curriculum/fz-api.js yang memanggil
+       '/api/...' relatif ke origin yang sama, jadi halaman itu menuntut server FastAPI
+       berjalan di domain yang sama dengan PWA-nya. Repo ini tidak memuat satu pun berkas
+       yang memberi tahu hosting cara menjalankannya: tidak ada passenger_wsgi.py, tidak
+       ada Procfile, requirements.txt hanya ada di dalam backend/ dan bukan di akar.
+
+       Yang MATI: tautan "Kurikulum & Kompetensi" di sidebar Ruang Guru — pintunya saja.
+       Yang HIDUP: seluruh backend/, kurikulum.html, misi.html, dan modul
+       features/curriculum/ tetap utuh dan tetap diuji. Begitu backend benar-benar
+       berjalan, satu bendera ini membalikkannya - tidak ada kode yang perlu ditulis ulang.
+
+       Pintu yang terbuka ke ruangan kosong lebih merugikan daripada fitur yang belum ada:
+       yang belum ada tidak menjanjikan apa-apa. */
+    /* DITURUNKAN DARI ALAMAT, BUKAN DISETEL TANGAN (m025-298). Nilai di sini adalah
+       bawaan saat alamatnya kosong; pembacanya di fiezel-teacher-shell.js membuka pintu
+       hanya kalau FIEZEL_CURRICULUM_CONFIG.curriculumApiUrl benar-benar terisi.
+
+       Alasannya: bendera manual bisa dinyalakan orang yang lupa memasang backend-nya, dan
+       itu mengembalikan persis bug yang ditutup m025-296 - guru menekan tautan lalu
+       menemukan halaman mati. Mengikat pintu ke alamatnya membuat keadaan "menyala tanpa
+       backend" mustahil dibuat tanpa berbohong di core-config.js.
+
+       NILAI true DI SINI TIDAK MEMBUKA APA PUN dengan sendirinya: ia hanya berarti
+       "fitur ini diizinkan tampil". Yang benar-benar membuka adalah alamat backend, yang
+       bawaannya KOSONG. Menyetelnya false tetap berfungsi sebagai sakelar mati paksa,
+       mis. saat backend sedang bermasalah dan pintunya perlu ditutup tanpa menyunting
+       alamatnya. Satu hal yang perlu diisi owner, bukan dua - dan sakelar matinya tetap
+       ada saat dibutuhkan. */
+    curriculumConsole: true,
+
     scenePhases: false,
 
     /* "Ujian per skill — muncul setelah N sesi atau dari placement." Yang mati:

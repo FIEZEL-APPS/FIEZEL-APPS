@@ -520,3 +520,101 @@ yang cocok jatuh ke "kehidupan sehari-hari": kasar, tetapi jujur.
 Utang yang masih berdiri, dan tidak boleh hilang dari catatan: seluruh naskah Jepang berstatus
 **DRAFT AI** dan wajib ditinjau penutur asli; sidecar Thai belum ada; menyimak dan berbicara
 belum punya bank Jepang sama sekali.
+
+---
+
+## m025-297 — kursus Jepang berhenti menawarkan latihan berbahasa Inggris
+
+Sesudah m025-293, murid yang memilih Bahasa Jepang mendapat bank tata bahasa, kosakata, dan
+bacaan berbahasa Jepang. Tiga permukaan lain **tidak punya versi Jepang sama sekali** dan
+tetap ditawarkan:
+
+| Permukaan | Bank yang dipakai | Isinya |
+|---|---|---|
+| Menyimak | `listening-bank-v1.json` | Inggris |
+| Berbicara | `speaking-bank-v1.json` | Inggris |
+| Menulis | `writing-prompts-v1.json` | *"Describe your day today…"*, fokus `present simple` |
+
+Jadi murid memilih Jepang, membuka "Latihan bicara & dengar", lalu **mendengar bahasa
+Inggris** — atau diminta menulis kalimat Inggris dengan fokus tata bahasa Inggris. Tidak ada
+satu kalimat pun yang memberitahunya.
+
+Itu bukan sekadar fitur yang belum lengkap. Peringatan di pemilih bahasa **sudah berjanji**
+sejak m025-290 bahwa latihan menyimak belum ada; layarnya yang tidak menepati janji itu.
+Aplikasi yang mengatakan satu hal dan melakukan hal lain lebih merusak kepercayaan daripada
+aplikasi yang mengaku belum punya.
+
+### Yang dilakukan
+
+Dua penjaga, keduanya di titik permukaannya ditawarkan: `latihanCards()` (kartu Latihan) dan
+`todayPlanBlocks()` (blok dengar/bicara di rencana harian). Diukur dengan menjalankan
+`latihanCards()` langsung:
+
+| Bahasa target | Kartu yang muncul |
+|---|---|
+| `en` | vocab, grammar, reading, **skills, writing**, library |
+| `ja` | vocab, grammar, reading, library |
+
+Peringatan pemilih bahasa diperbarui — dari "belum ada latihan menyimak" menjadi menyebut
+**ketiganya** beserta konsekuensinya ("kartunya disembunyikan"), id dan th.
+
+### Gerbang yang MENUNTUT DIRINYA DICABUT
+
+`tests/japanese-surface-honesty-test.js` tidak memakai daftar tertulis. Ia membaca
+**ADA-TIDAKNYA** `listening-bank-ja` / `speaking-bank-ja` / `writing-prompts-ja` di direktori
+`content/ja/`. Selama berkas itu belum ada, ia menuntut penjaganya ada. **Begitu berkasnya
+dibuat, gerbang ini berbalik dan menuntut penjaganya dicabut** — lengkap dengan pesan yang
+mengatakan persis itu.
+
+Alasannya: penjaga yang ditinggalkan setelah kontennya siap adalah fitur yang hilang
+diam-diam, dan itu sama buruknya dengan menawarkan yang kosong. Gerbang yang hanya menjaga
+satu arah akan membuat kesalahan kedua tak terlihat selamanya.
+
+Bahwa berkas ini ikut berubah di m025-297: ritual bump menyentuh `DIAG_BUILD` di
+`features/neural-voice/fiezel-diag-panel.js`; panel diagnostiknya sendiri tidak berubah
+perilaku.
+
+---
+
+## m025-299 — kursus Jepang satu ketuk dari layar depan
+
+Sejak m025-290 kursus Jepang benar-benar bisa dipakai. Satu-satunya jalan menuju ke sana:
+**Pengaturan → Profil → "Bahasa yang dipelajari"**. Murid yang tidak tahu menu itu ada tidak
+akan pernah menemukannya — dan fitur yang tidak ditemukan sama nilainya dengan fitur yang
+tidak ada. 234 butir tata bahasa, 1.370 kosakata, dan 150 bacaan berdiri di balik pintu yang
+tidak pernah dilewati siapa pun.
+
+`targetLangChipMarkup()` menaruh pintasannya di layar depan. **Dua arah dengan sengaja**:
+chip yang sama yang membawa murid ke Jepang juga membawanya kembali. Pintu masuk tanpa pintu
+keluar di layar yang sama adalah perangkap — murid akan mencarinya di Pengaturan, yaitu
+tempat yang justru ingin dihindari.
+
+Diukur dengan menjalankan fungsinya, bukan membaca kodenya:
+
+| Bahasa aktif | Judul chip | Aksi saat diketuk |
+|---|---|---|
+| `en` | "Coba Bahasa Jepang" | pindah ke `ja` |
+| `ja` | "Bahasa Jepang aktif" | kembali ke `en` |
+
+Bahasa bawaan tidak tersentuh: chip ini **menawarkan**, tidak pernah memindahkan sendiri.
+
+### Kesalahan yang kubuat sendiri dan kutangkap sebelum mendarat
+
+Versi pertama menaruh chip ini sebagai anggota **pertama** `.quick-chips-grid`. Chip latihan
+di grid itu diwarnai lewat `:nth-child(n)` — jadi satu sisipan menggeser warna **setiap chip
+sesudahnya**: Kosakata mengambil warna chip bahasa, Tata Bahasa mengambil warna Kosakata, dan
+seterusnya. Empat kartu berubah rupa tanpa ada yang memintanya, dan tidak satu pun gerbang
+akan melihatnya karena tidak ada yang rusak secara fungsional.
+
+Chip dipindah ke LUAR grid dan dilepas dari kelas `.quick-chip`. Alasannya juga bukan cuma
+teknis: chip ini mengganti **seluruh kursus**, bukan membuka satu latihan, jadi ia memang
+layak terbaca berbeda. Garis putus-putus = tawaran; garis penuh = sedang berjalan.
+
+### Naskahnya
+
+Lima kunci baru di `copy-id-bahasa.js` + `copy-th-bahasa.js`, lengkap sepasang. Gerbang
+menuntut setiap kunci yang dipakai chip ini punya kembaran Thai — pintasan yang hanya bisa
+dibaca murid Indonesia bukan pintasan bagi murid Thai.
+
+Bahwa berkas ini ikut berubah: ritual bump menyentuh `DIAG_BUILD`; panel diagnostiknya
+sendiri tidak berubah perilaku.

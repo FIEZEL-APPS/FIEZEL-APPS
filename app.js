@@ -17,7 +17,7 @@ const APP_VERSION=self.FIEZEL_VERSION||'5.19.0';
    FIEZEL_UX_FLAGS milik berkas benderanya, kunci demi kunci, dan MERAH kalau
    keduanya menyimpang satu nilai pun. Jadi ini duplikasi berpagar, bukan dua
    sumber kebenaran yang saling bersaing. */
-const UX_FALLBACK_FLAGS={scenePhases:false,skillExams:false,skillsLabDestination:false,personalJourneyTab:false,voicePackGate:false,tutorRole:false,todayHome:true,fourTabNav:true,leanIntro:true,placementLite:true,sessionSummary:true,funnelTelemetry:true};
+const UX_FALLBACK_FLAGS={curriculumConsole:true,scenePhases:false,skillExams:false,skillsLabDestination:false,personalJourneyTab:false,voicePackGate:false,tutorRole:false,todayHome:true,fourTabNav:true,leanIntro:true,placementLite:true,sessionSummary:true,funnelTelemetry:true};
 /* Nama tak dikenal -> false di KEDUA jalur: salah ketik mematikan fitur (aman),
    bukan menyalakannya diam-diam. */
 function uxOn(flag){
@@ -7062,8 +7062,19 @@ function latihanCards(){
      dilihat murid. Porsi HARIANNYA sudah dilebur: todayPlanBlocks() menaruh blok
      dengar/bicara di dalam kartu Hari ini, jadi murid yang hanya mengikuti sesi
      harian tetap mendapatkannya tanpa pernah membuka kartu ini. */
-  cards.push({view:'skills',icon:'skills',label:FiezelI18n.t('latihan.bicara-dengar'),note:FiezelI18n.t('latihan.bicara-dengar-note')});
-  cards.push({view:'writing',icon:'writing',label:'Writing',note:FiezelI18n.t('latihan.writing-note')});
+  /* Menyimak, berbicara, dan menulis BELUM punya bank Jepang: listening-bank-v1.json dan
+     speaking-bank-v1.json berbahasa Inggris, dan writing-prompts-v1.json meminta murid
+     menulis kalimat Inggris dengan fokus tata bahasa Inggris ("Describe your day...",
+     focus 'present simple'). Menawarkannya kepada murid yang memilih Jepang berarti
+     aplikasi mengatakan satu hal dan melakukan hal lain - dan peringatan di pemilih
+     bahasa memang sudah berjanji latihan itu belum ada. Kartunya disembunyikan sampai
+     banknya benar-benar dibuat; tests/japanese-surface-honesty-test.js mengikat penjaga
+     ini ke ADA-TIDAKNYA berkas di content/ja/, jadi ia menuntut dicabut begitu isinya siap. */
+  const punyaKontenJa=activeTargetLang()!=='ja';
+  if(punyaKontenJa){
+    cards.push({view:'skills',icon:'skills',label:FiezelI18n.t('latihan.bicara-dengar'),note:FiezelI18n.t('latihan.bicara-dengar-note')});
+    cards.push({view:'writing',icon:'writing',label:'Writing',note:FiezelI18n.t('latihan.writing-note')});
+  }
   cards.push({view:'library',icon:'library',label:FiezelI18n.t('home.library-card'),note:FiezelI18n.t('latihan.library-note')});
   return cards.map(c=>`<button class="launch-card" onclick="go('${esc(c.view)}')" aria-label="${esc(c.label)}"><span class="launch-icon"><i class="fz-i" data-fz-icon="${esc(c.icon)}" aria-hidden="true"></i></span><span><small>${esc(c.note)}</small><b>${esc(c.label)}</b></span><i data-lucide="arrow-up-right"></i></button>`).join('');
 }
@@ -7187,7 +7198,9 @@ function todayPlanBlocks(now=Date.now()){
      mendaratkan murid di kartu "gagal dimuat" lebih buruk daripada tidak menjanjikan. */
   const punyaSuara=!!self.FiezelSLAddon||!!self.FIEZEL_SPEAKING_LISTENING_CONFIG;
   const sudahAda=out.some(x=>/dengar|bicara|simak/i.test(x.label+' '+x.why));
-  if(punyaSuara&&!sudahAda&&out.length)out.push({label:FiezelI18n.t('latihan.bicara-dengar'),why:FiezelI18n.t('latihan.bicara-dengar-note')});
+  /* Alasan sama dengan latihanCards(): bank dengar/bicara Jepang belum ada, jadi rencana
+     harian murid Jepang tidak boleh menyelipkan latihan berbahasa Inggris. */
+  if(punyaSuara&&!sudahAda&&out.length&&activeTargetLang()!=='ja')out.push({label:FiezelI18n.t('latihan.bicara-dengar'),why:FiezelI18n.t('latihan.bicara-dengar-note')});
   return out;
 }
 /* Ringkasan angka untuk baris "{soal} soal . sekitar {menit} menit". Diambil dari
@@ -7286,6 +7299,7 @@ function todayHomeMarkup(){
       <h4 style="margin:0;font-size:13px;font-weight:700;color:var(--text)">Latihan Singkat 3 Menit</h4>
       <small style="color:var(--muted)">${FiezelI18n.t('home.pilih-fokus-label')}</small>
     </div>
+    ${targetLangChipMarkup()}
     <div class="quick-chips-grid">
       <button type="button" class="quick-chip" onclick="go('vocab')">
         <span class="chip-label"><i class="fz-i" data-fz-icon="vocab" style="width:14px;height:14px;display:inline-flex"></i> Kosakata</span>
@@ -11600,6 +11614,27 @@ window.setLearnerLocalePreference=setLearnerLocalePreference;
    (graduation-cap vs languages) supaya perbedaannya terbaca sebelum labelnya dibaca.
    Kalimatnya hidup di pasangan copy-id/copy-th-bahasa.js; tidak ada satu pun kalimat murid
    yang ditulis langsung di sini. */
+/* PINTASAN BAHASA DI LAYAR DEPAN (m025-299).
+   Sejak m025-290 kursus Jepang benar-benar bisa dipakai, tetapi satu-satunya jalan ke sana
+   adalah Pengaturan -> Profil -> "Bahasa yang dipelajari". Murid yang tidak tahu menu itu
+   ada tidak akan pernah menemukannya, dan fitur yang tidak ditemukan sama nilainya dengan
+   fitur yang tidak ada.
+
+   DUA ARAH dengan sengaja: chip yang sama yang membawa murid ke Jepang juga membawanya
+   kembali. Pintu masuk tanpa pintu keluar di layar yang sama adalah perangkap - murid akan
+   mencarinya di Pengaturan, yaitu tempat yang justru ingin kita hindari.
+
+   Bahasa bawaan tidak tersentuh: chip ini MENAWARKAN, tidak pernah memindahkan sendiri. */
+function targetLangChipMarkup(){
+  const ja=activeTargetLang()==='ja';
+  const tujuan=ja?'en':'ja';
+  const judul=ja?FiezelI18n.t('bahasa.chip-aktif-ja'):FiezelI18n.t('bahasa.chip-coba-ja');
+  const sub=ja?FiezelI18n.t('bahasa.chip-kembali-en'):FiezelI18n.t('bahasa.chip-coba-ja-sub');
+  return `<button type="button" class="target-lang-chip${ja?' is-active':''}" onclick="setTargetLangPreference('${tujuan}')" aria-label="${esc(FiezelI18n.t('bahasa.chip-aria'))}">
+      <span class="chip-label"><i class="fz-i" data-fz-icon="graduation-cap" style="width:14px;height:14px;display:inline-flex"></i> ${esc(judul)}</span>
+      <span class="chip-sub">${esc(sub)}</span>
+    </button>`;
+}
 function targetLangRowMarkup(){
   const active=activeTargetLang();
   const options=[['en',FiezelI18n.t('bahasa.en'),FiezelI18n.t('bahasa.en-catatan')],['ja',FiezelI18n.t('bahasa.ja'),FiezelI18n.t('bahasa.ja-catatan')]]

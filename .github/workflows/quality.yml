@@ -1010,6 +1010,57 @@ jobs:
         # Assert intinya karena itu bukan soal bentuk: evidence tiap soal WAJIB substring
         # persis dari teks bacaannya sendiri.
         run: node tests/japanese-reading-bank-test.js
+      - name: 'Konsol kurikulum: pintu ke ruangan kosong wajib tertutup'
+        # m025-294 memasang tautan Kurikulum di sidebar Ruang Guru. Isinya dilayani
+        # features/curriculum/fz-api.js yang memanggil '/api/...' relatif ke origin yang
+        # sama, jadi ia menuntut FastAPI berjalan di domain yang sama dengan PWA. Diperiksa
+        # owner di fiezel.my.id (7 Sep 2026): /api/health 404, /kurikulum.html 404. Repo
+        # juga tidak punya passenger_wsgi.py / Procfile / requirements.txt di akar. Gerbang
+        # menuntut benderanya MATI di kedua jalur dan tautannya dijaga bendera - sekaligus
+        # menuntut mesinnya TIDAK dihapus, supaya satu bendera cukup saat backend siap.
+        run: node tests/curriculum-console-gate-test.js
+      - name: 'Konsol kurikulum memanggil alamat yang dikonfigurasi, bukan same-origin'
+        # fz-api.js lahir dengan asumsi ingress mengarahkan /api ke FastAPI di domain yang
+        # sama. Di produksi FIEZEL itu salah - fiezel.my.id hosting statis, /api/health 404.
+        # Backend FIEZEL yang sudah hidup dipanggil lewat alamat absolut dari konfigurasi
+        # (CORE_CONFIG.workerUrl); konsol kurikulum kini mengikuti pola yang sama, dan
+        # PINTUNYA DITURUNKAN DARI ALAMAT ITU - alamat kosong = pintu tertutup, sehingga
+        # tidak ada keadaan "menyala tanpa backend" yang bisa dibuat lewat bendera.
+        run: node tests/curriculum-api-base-test.js
+      - name: 'Kursus Jepang bisa dicapai satu ketuk dari layar depan'
+        # Sejak m025-290 kursus Jepang bisa dipakai, tetapi satu-satunya jalan ke sana
+        # adalah Pengaturan -> Profil -> "Bahasa yang dipelajari". Murid yang tidak tahu
+        # menu itu ada tidak akan pernah menemukannya, dan fitur yang tidak ditemukan sama
+        # nilainya dengan fitur yang tidak ada. Gerbang menuntut pintasannya ADA, benar-benar
+        # DIPANGGIL dari layar depan, DUA ARAH (pintu masuk tanpa pintu keluar adalah
+        # perangkap), dan naskahnya lewat kunci i18n dengan kembaran Thai lengkap.
+        run: node tests/target-lang-shortcut-test.js
+      - name: 'Kursus Jepang tidak menawarkan latihan berbahasa Inggris'
+        # Murid memilih Jepang; bank tata bahasa, kosakata, dan bacaan berganti. Menyimak,
+        # berbicara, dan menulis TIDAK punya versi Jepang - listening/speaking-bank-v1.json
+        # berbahasa Inggris dan writing-prompts-v1.json meminta menulis kalimat Inggris
+        # dengan fokus tata bahasa Inggris. Menawarkannya berarti aplikasi mengatakan satu
+        # hal dan melakukan hal lain. Gerbang mengikat penjaganya ke ADA-TIDAKNYA berkas di
+        # content/ja/, jadi ia BERBALIK menuntut penjaga dicabut begitu banknya dibuat.
+        run: node tests/japanese-surface-honesty-test.js
+      - name: 'Pembungkus i18n memakai kalimat cadangannya, bukan nama kuncinya'
+        # FiezelI18n.t() mengembalikan KUNCINYA saat kalimatnya belum termuat - itu
+        # disengaja supaya lubangnya terlihat. Tetapi pembungkus t(kunci, cadangan) di
+        # modul-modul fitur mengembalikan kunci itu apa adanya, jadi guru membaca
+        # 'guru.tab-jurnal' di layarnya padahal kalimat cadangannya sudah tertulis satu
+        # baris di sebelahnya. Gerbang MENJALANKAN tiap pembungkus dengan FiezelI18n palsu
+        # yang meniru kunci-tak-ditemukan, jadi ia tidak bisa dilewati dengan menulis ulang
+        # polanya. Assert arah sebaliknya menjaga terjemahan Thai tidak mati diam-diam.
+        run: node tests/i18n-fallback-wrapper-test.js
+      - name: 'Setiap berkas yang dimuat index.html benar-benar diprecache'
+        # Akar masalah frasa hantu di Ruang Guru: 'guru.merek-tag' hidup di
+        # copy-id-feat-d.js, dimuat index.html, dan TIDAK ADA di ASSETS sw.js. PWA yang
+        # terpasang dilayani dari cache shell; berkas yang tidak diprecache hanya sampai
+        # kalau jaringan sedang baik. Di jaringan buruk seluruh kunci di dalamnya tampil
+        # sebagai nama kunci. pwa-cache-test memeriksa DAFTAR TETAP dan karena itu buta
+        # terhadap berkas yang ditambahkan sesudah daftarnya ditulis; gerbang ini
+        # menurunkan tuntutannya dari index.html sendiri.
+        run: node tests/precache-covers-shell-test.js
       - name: 'Sumbu bahasa target: kunci murid Inggris identik byte per byte'
         # Menambah bahasa kedua punya satu cara gampang dan satu cara benar. Yang gampang:
         # beri SEMUA kunci awalan bahasa, termasuk kunci Inggris. Sekali dikirim, setiap murid
