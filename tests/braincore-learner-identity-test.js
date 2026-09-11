@@ -367,7 +367,7 @@ async function babWorker() {
   const badSub = await app.call('GET', '/api/owner/learner-evidence?sub=bukan-uuid', { headers: ownerHeaders });
   check('(E) `sub` cacat -> 400, bukan 404 (nol oracle keberadaan identitas)',
     badSub.status === 400, String(badSub.status));
-  const unknownSub = await app.call('GET', '/api/owner/learner-evidence?sub=motion-design-build-1', { headers: ownerHeaders });
+  const unknownSub = await app.call('GET', '/api/owner/learner-evidence?sub=99999999-9999-4999-8999-999999999999', { headers: ownerHeaders });
   check('(E) `sub` tak dikenal -> 200 dengan ringkasan measured:false (bukan kebocoran)',
     unknownSub.status === 200 && unknownSub.json.summary.measured === false, JSON.stringify(unknownSub.json && unknownSub.json.summary));
 
@@ -838,7 +838,7 @@ async function babDashboard() {
     mod.learnerLabel({ sub: 'a83f21c4-0000-4000-8000-000000000000', name: null, nameSource: 'none' }) === 'murid a83f21c4');
   check('(K) nameSource asing dari API dinormalkan ke "none"',
     mod.sanitizeLearnerRow({ sub: '11111111-1111-4111-8111-111111111111', name: 'X', nameSource: 'karangan' }).nameSource === 'none');
-  check('(E) HTML dashboard memuat tautan pilih-murid ber-sub', /learner=motion-design-build-1/.test(html));
+  check('(E) HTML dashboard memuat tautan pilih-murid ber-sub', /learner=11111111-1111-4111-8111-111111111111/.test(html));
   check('(E) HTML dashboard memuat angka keputusan Braincore murid itu', /42/.test(html));
   check('(E) HTML dashboard memuat kalibrasi 84%', /84%/.test(html));
   check('(E) HTML dashboard memuat perpindahan mastery m60-80 -> m80-100',
