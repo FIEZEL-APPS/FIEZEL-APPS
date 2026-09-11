@@ -33,9 +33,18 @@ ANATOMI SUARA MONYET YANG DIPAKAI (empat tekstur dasar):
   whoop   — glide naik lebar dengan ekor. Bunyi "rayakan".
 
 PEMAKAIAN:
-  python3 tools/synth-monkey-sfx.py            # tulis tekstur + SFX + manifest
-  python3 tools/synth-monkey-sfx.py --check    # verifikasi tanpa menulis
-  python3 tools/synth-monkey-sfx.py --probe DIR  # tulis ke DIR untuk dengar dulu
+  python3 tools/synth-monkey-sfx.py --probe DIR  # tulis ke DIR untuk didengar dulu
+  python3 tools/synth-monkey-sfx.py --apply       # tulis ke repo (MENIMPA SFX kapal)
+  python3 tools/synth-monkey-sfx.py --check       # verifikasi tanpa menulis
+
+KENAPA --apply WAJIB, dan ini bukan kehati-hatian teoretis. Skrip ini menulis ke
+assets/audio/sfx/paw_*.{ogg,mp3} — berkas yang SEDANG dikapalkan ke murid, dan
+salah satunya splash_paw_appear yang dipakai cap splash. Versi pertama berkas ini
+menimpa kelimanya begitu dijalankan tanpa argumen, dan itu benar-benar terjadi
+saat menguji mode --check: lima SFX produksi tertimpa tanpa satu pun pertanyaan,
+padahal keputusan owner saat itu adalah MENUNDA pergantian suara. Dipulihkan
+lewat git, tetapi hanya karena kebetulan ada yang memeriksa git status.
+Menimpa aset kapal harus jadi keputusan yang diketik, bukan efek samping.
 ============================================================
 """
 import sys, os, json, math, hashlib, wave, struct
@@ -277,6 +286,18 @@ def measure(sig):
         'centroid_hz': round(centroid, 1),
     }
 
+def sha256_pcm(sig):
+    """Sidik jari SINYAL, bukan berkas.
+
+    Kenapa PCM dan bukan hash berkas .ogg/.mp3: yang ingin dijaga adalah
+    "berkas yang dikapalkan benar-benar lahir dari kode sintesis INI". Hash
+    berkas terkode tidak bisa menjawab itu — encoder Vorbis/LAME versi berbeda
+    menghasilkan byte berbeda dari sinyal yang sama persis, jadi gerbangnya akan
+    merah di mesin lain tanpa ada yang salah. Sidik jari PCM float32 bebas dari
+    encoder: ia berubah kalau dan hanya kalau SINYALNYA berubah."""
+    return hashlib.sha256(sig.astype(np.float32).tobytes()).hexdigest()
+
+
 def sha256_file(p):
     h = hashlib.sha256()
     with open(p, 'rb') as fh:
@@ -314,9 +335,23 @@ def build():
 def main():
     args = sys.argv[1:]
     check = '--check' in args
+    apply_to_repo = '--apply' in args
     probe = None
     if '--probe' in args:
-        probe = args[args.index('--probe') + 1]
+        i = args.index('--probe') + 1
+        if i >= len(args):
+            print('synth-monkey-sfx: --probe butuh direktori tujuan.\n'
+                  '  contoh: python3 tools/synth-monkey-sfx.py --probe /tmp/dengar-dulu')
+            sys.exit(2)
+        probe = args[i]
+
+    if not check and not probe and not apply_to_repo:
+        print('synth-monkey-sfx: menolak menulis ke repo tanpa --apply.\n'
+              '  Skrip ini MENIMPA assets/audio/sfx/paw_*.{ogg,mp3} yang sedang dikapalkan\n'
+              '  (termasuk splash_paw_appear yang dipakai cap splash).\n'
+              '  Dengarkan dulu : python3 tools/synth-monkey-sfx.py --probe /tmp/dengar\n'
+              '  Baru terapkan  : python3 tools/synth-monkey-sfx.py --apply')
+        sys.exit(2)
 
     tex, sfx = build()
 
@@ -341,19 +376,32 @@ def main():
         if not os.path.exists(mpath):
             errs.append('manifest belum ada — jalankan tanpa --check dulu')
         else:
-            old = json.load(open(mpath))
-            for base, sig, _ in plan:
+            with open(mpath) as fh:
+                old = json.load(fh)
+            for base, sig, (kind, key) in plan:
+                rel_base = os.path.relpath(base, ROOT)
+                # LAPIS 1 — kode vs aset: sinyal yang baru disintesis harus cocok
+                # dengan sidik jari yang tercatat. Inilah yang menangkap "kodenya
+                # diubah tapi lupa regenerasi", dan lapis inilah yang dulu TIDAK
+                # ADA: versi pertama hanya membandingkan berkas dengan manifest,
+                # dan keduanya selalu dicommit bersama, jadi drift kode lolos
+                # hijau (temuan review gitar-bot, PR #401).
+                if old.get(kind, {}).get(key, {}).get('pcm') != sha256_pcm(sig):
+                    errs.append(rel_base + ' — sinyalnya beda dari yang tercatat; '
+                                'kode sintesis berubah tanpa regenerasi aset')
+                # LAPIS 2 — aset vs manifest: menangkap berkas yang disunting
+                # sesudah dicommit.
                 for ext in ('.ogg', '.mp3'):
                     rel = os.path.relpath(base + ext, ROOT)
                     if not os.path.exists(base + ext):
                         errs.append(rel + ' hilang'); continue
                     if old.get('files', {}).get(rel) != sha256_file(base + ext):
-                        errs.append(rel + ' menyimpang dari hasil sintesis')
+                        errs.append(rel + ' disunting sesudah di-generate')
         for e in errs:
             print('FAIL - ' + e)
         if errs:
             print('\nsynth-monkey-sfx --check: FAIL (%d)' % len(errs)); sys.exit(1)
-        print('synth-monkey-sfx --check: PASS')
+        print('synth-monkey-sfx --check: PASS (sinyal + berkas cocok)')
         return
 
     for base, sig, (kind, key) in plan:
@@ -362,12 +410,19 @@ def main():
             if p.endswith(('.ogg', '.mp3')):
                 manifest['files'][rel] = sha256_file(p)
         manifest[kind][key] = measure(sig)
+        manifest[kind][key]['pcm'] = sha256_pcm(sig)
         print('aud  - %s (.wav/.ogg/.mp3)  %s' % (os.path.relpath(base, out_root), measure(sig)))
 
     if not probe:
         mpath = os.path.join(ROOT, 'assets/audio/monkey-sfx-manifest.json')
-        json.dump(manifest, open(mpath, 'w'), indent=2, ensure_ascii=False)
-        open(mpath, 'a').write('\n')
+        # Satu handle, satu penulisan: versi pertama menulis JSON lalu MENAMBAHKAN
+        # baris baru lewat handle kedua, dan itu hanya selamat karena CPython
+        # menutup handle pertama seketika lewat refcount. Di implementasi lain
+        # tulisan JSON-nya bisa belum sampai ke disk saat append berjalan, dan
+        # manifestnya rusak (temuan review gitar-bot, PR #401).
+        with open(mpath, 'w') as fh:
+            json.dump(manifest, fh, indent=2, ensure_ascii=False)
+            fh.write('\n')
         print('man  - ' + os.path.relpath(mpath, ROOT))
     print('\nsynth-monkey-sfx: SELESAI')
 
