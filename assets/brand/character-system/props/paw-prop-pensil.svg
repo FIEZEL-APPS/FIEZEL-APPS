@@ -1,0 +1,10 @@
+<!-- HASIL GENERATE - jangan diedit tangan. Sumber: tools/character-system/library.mjs (PROPS). Regenerasi: node tools/export-character-system.mjs -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" role="img" aria-label="pensil">
+  <g class="fz-prop fz-prop-pensil">
+    <rect x="38" y="10" width="24" height="64" rx="12" fill="#FFD94F"/>
+    <rect x="38" y="10" width="24" height="16" rx="12" fill="#F0A0AC"/>
+    <rect x="38" y="24" width="24" height="6" fill="#EDB93A"/>
+    <path d="M38 66h24l-12 24Z" fill="#D8B36B"/>
+    <path d="M43.6 78h12.8L50 90Z" fill="#33201F"/>
+  </g>
+</svg>

@@ -1,0 +1,12 @@
+<!-- HASIL GENERATE - jangan diedit tangan. Sumber: tools/character-system/library.mjs (PROPS). Regenerasi: node tools/export-character-system.mjs -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" role="img" aria-label="lampu ide">
+  <g class="fz-prop fz-prop-lampu">
+    <circle cx="50" cy="44" r="28" fill="#FFD94F"/>
+    <circle cx="40" cy="35" r="9" fill="#fff" opacity=".75"/>
+    <rect x="36" y="70" width="28" height="9" rx="4.5" fill="#D8B36B"/>
+    <rect x="36" y="83" width="28" height="9" rx="4.5" fill="#D8B36B"/>
+    <rect x="45" y="0" width="10" height="14" rx="5" fill="#EDB93A"/>
+    <rect x="10" y="12" width="10" height="16" rx="5" fill="#EDB93A" transform="rotate(-38 15 20)"/>
+    <rect x="80" y="12" width="10" height="16" rx="5" fill="#EDB93A" transform="rotate(38 85 20)"/>
+  </g>
+</svg>

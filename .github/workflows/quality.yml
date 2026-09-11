@@ -340,6 +340,14 @@ jobs:
           node tests/e5-checksum-gate-test.js
           node tests/pawprint-geometry-gate-test.js
           node tests/palette-gate-test.js
+          # m025-302: SISTEM KARAKTER MEREK (assets/brand/character-system/) — 64 aset
+          # hasil generate dari rig yang sama. Ditaruh tepat sesudah gerbang palet karena
+          # keduanya menjaga kontrak yang sama dari dua sisi: palette-gate menjaga WARNANYA
+          # (lewat SVG_DIRS, jadi berkas baru ikut terjaga tanpa ada yang perlu ingat),
+          # gerbang ini menjaga bahwa aset itu benar-benar lahir dari rig dan glyph merek —
+          # ia menjalankan `tools/export-character-system.mjs --check`, jadi SVG yang
+          # disunting tangan memerahkannya.
+          node tests/character-system-gate-test.js
           node tests/keyframe-rotation-gate-test.js
           node tests/event-vocabulary-gate-test.js
           node tests/voice-offline-fallback-test.js

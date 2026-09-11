@@ -1,0 +1,7 @@
+<!-- HASIL GENERATE - jangan diedit tangan. Sumber: tools/character-system/library.mjs (PROPS). Regenerasi: node tools/export-character-system.mjs -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" role="img" aria-label="hati">
+  <g class="fz-prop fz-prop-hati">
+    <path d="M50 88C18 68 8 52 8 36 8 21 19 11 33 11c8 0 15 4 17 10 2-6 9-10 17-10 14 0 25 10 25 25 0 16-10 32-42 52Z" fill="#F0A0AC"/>
+    <path d="M28 24c-7 0-12 5-12 12h9c0-5 3-8 7-8Z" fill="#fff" opacity=".85"/>
+  </g>
+</svg>

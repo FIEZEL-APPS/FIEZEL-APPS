@@ -1,0 +1,12 @@
+<!-- HASIL GENERATE - jangan diedit tangan. Sumber: tools/character-system/library.mjs (PROPS). Regenerasi: node tools/export-character-system.mjs -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" role="img" aria-label="gelembung percakapan">
+  <g class="fz-prop fz-prop-gelembung">
+    <rect x="4" y="10" width="92" height="62" rx="26" fill="#D8B36B"/>
+    <path d="M28 64h28l-20 28Z" fill="#D8B36B"/>
+    <rect x="9" y="15" width="82" height="52" rx="21" fill="#fff"/>
+    <path d="M31 60h20l-14 21Z" fill="#fff"/>
+    <circle cx="32" cy="41" r="7" fill="#D8B36B"/>
+    <circle cx="50" cy="41" r="7" fill="#D8B36B"/>
+    <circle cx="68" cy="41" r="7" fill="#D8B36B"/>
+  </g>
+</svg>

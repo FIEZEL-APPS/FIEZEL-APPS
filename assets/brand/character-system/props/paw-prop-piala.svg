@@ -1,0 +1,11 @@
+<!-- HASIL GENERATE - jangan diedit tangan. Sumber: tools/character-system/library.mjs (PROPS). Regenerasi: node tools/export-character-system.mjs -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" role="img" aria-label="piala">
+  <g class="fz-prop fz-prop-piala">
+    <path d="M24 10h52v26c0 16-12 28-26 28S24 52 24 36Z" fill="#FFD94F"/>
+    <path d="M24 18H12c0 16 7 23 16 24Z" fill="#EDB93A"/>
+    <path d="M76 18h12c0 16-7 23-16 24Z" fill="#EDB93A"/>
+    <rect x="42" y="62" width="16" height="16" rx="8" fill="#EDB93A"/>
+    <rect x="22" y="78" width="56" height="14" rx="7" fill="#D8B36B"/>
+    <circle cx="50" cy="32" r="11" fill="#fff" opacity=".8"/>
+  </g>
+</svg>
