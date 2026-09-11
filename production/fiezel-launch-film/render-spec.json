@@ -1,0 +1,36 @@
+{
+  "campaign": "THE WAY YOU LEARN",
+  "brand": "FIEZEL",
+  "master": {
+    "duration_seconds": 43,
+    "width": 1080,
+    "height": 1920,
+    "aspect_ratio": "9:16",
+    "frame_rate_delivery": 24,
+    "video_codec": "H.264",
+    "pixel_format": "yuv420p",
+    "audio_sample_rate_hz": 48000,
+    "audio_channels": 2
+  },
+  "language_strategy": {
+    "voice_over": "English",
+    "subtitle_versions": ["Indonesian", "Thai"],
+    "simultaneous_multilingual_subtitles": false
+  },
+  "social_cutdowns_seconds": [15, 10, 6],
+  "instagram_story_scenes": 5,
+  "safe_area": {
+    "keep_primary_text_inside_horizontal_percent": 80,
+    "avoid_bottom_ui_zone_percent": 15
+  },
+  "product_truthfulness": {
+    "real_ui_required_in_final": true,
+    "proxy_ui_allowed_for_animatic_only": true,
+    "fabricated_features_allowed": false
+  },
+  "paw": {
+    "canonical_asset": "design/paw-redesign/assets/paw-master.svg",
+    "redesign_allowed": false,
+    "robot_conversion_allowed": false
+  }
+}
