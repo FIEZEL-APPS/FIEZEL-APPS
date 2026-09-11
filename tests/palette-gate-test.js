@@ -62,20 +62,18 @@ function offenders(text, extra) {
 
 /* ---------- berkas SVG karakter: lingkup penuh ---------- */
 
+/* m025-303: daftar ini dulu berisi seluruh seni tubuh PAW (rig, ekspor pose,
+   kembar website). Semuanya terhapus bersama rig: karakter aplikasi kini Nusa &
+   Mira, seni gambar raster dengan palet storybook-flat sendiri — palet G1 adalah
+   palet KARAKTER PAW dan tidak berlaku untuk mereka.
+
+   Yang tersisa dan tetap dijaga adalah MARKA TELAPAK, dan itu memang masih hidup:
+   favicon, cap splash, dan lima tempat di UI memakainya, dan Nusa sendiri
+   membawanya di bandana. Tinta markanya (#2B2118) sudah dikecualikan MARK_INK
+   sejak awal karena ia bukan warna tubuh karakter. */
 const SVGS = [
   'assets/brand/fiezel-paw.svg',
-  'assets/brand/paw-mascot-full.svg',
-  'assets/brand/paw-mascot-head.svg',
   'website/assets/brand/fiezel-paw.svg',
-  'website/assets/brand/paw-mascot-full.svg',
-  'website/assets/brand/paw-mascot-head.svg',
-  'assets/marketing/mascot-poses/paw-mascot-full-celebrating.svg',
-  'assets/marketing/mascot-poses/paw-mascot-head-listening.svg',
-  'assets/marketing/mascot-poses/paw-mascot-head-proud.svg',
-  // m025-301: dua pose ini SUDAH sesuai G1 dan cuma belum pernah didaftarkan.
-  // Diukur, bukan diasumsikan — keduanya lolos tanpa satu pun warna di luar palet.
-  'assets/brand/mascot/paw-mascot-head.svg',
-  'assets/brand/mascot/paw-mascot-official.svg',
 ];
 
 /* DIREKTORI YANG DIJAGA UTUH (m025-302).
@@ -90,7 +88,10 @@ const SVGS = [
    prefiks ini dijaga palet, hari ini dan pada setiap berkas baru, tanpa ada yang perlu
    ingat menambahkannya. Ini memperKETAT gerbang, bukan melonggarkannya. */
 const SVG_DIRS = [
-  'assets/brand/character-system/',   // hasil generate tools/export-character-system.mjs
+  /* kosong sejak m025-303: assets/brand/character-system/ (sistem karakter PAW)
+     terhapus bersama rig-nya. Mekanismenya SENGAJA ditinggal hidup — begitu ada
+     direktori seni vektor ber-palet G1 lagi, satu baris di sini menjaga seluruh
+     isinya, termasuk berkas yang ditambahkan besok. */
 ];
 
 /** Semua .svg di bawah SVG_DIRS, ditemukan dari isi direktori — bukan daftar. */
@@ -136,12 +137,15 @@ function svgsDiDirJaga() {
    Jadi yang dijaga di bawah BUKAN warnanya, melainkan BATAS UTANG ini: berkas karakter
    baru — atau berkas lama yang naik dari mockup ke produksi — tidak bisa lagi menyelinap
    tanpa nama. Ia harus lulus palet, atau ditulis di sini sebagai keputusan bertanggal. */
+/* m025-303: daftar utang ini KOSONG sekarang, dan itu bukan karena dimaafkan —
+   105 berkas yang tercatat di sini (100 pose koleksi, dua Hawaii, hello + kembarnya)
+   benar-benar DIHAPUS dari repo bersama seluruh seni PAW. Utang lunas dengan cara
+   yang paling bersih: subjeknya tidak ada lagi.
+
+   Daftarnya ditinggal ada, bukan dibuang, supaya jalur sahnya tetap terbuka: seni
+   karakter baru yang belum lulus palet harus ditulis di sini dengan alasan dan
+   tanggal, bukan didiamkan. */
 const UTANG_TANPA_PALET = [
-  'assets/brand/mascot/collection/',                       // 100 pose, palet Tailwind, hanya di mockups/
-  'assets/brand/mascot/paw-mascot-hawaiian.svg',            // palet Material, tidak dikapalkan
-  'assets/brand/mascot/paw-mascot-hawaiian-sunglasses.svg', // palet Material, tidak dikapalkan
-  'assets/brand/mascot/paw-mascot-hello.svg',               // kuning tetangga, hanya .png-nya di mockups/
-  'website/assets/brand/paw-mascot-hello.svg',              // kembar website dari yang di atas
 ];
 /* design/ adalah prototipe yang tidak pernah dimuat produksi (sama seperti pengecualian
    di css-keyframe-uniq-test), jadi ia di luar lingkup, bukan utang. */
@@ -262,50 +266,19 @@ test('SVG karakter: tidak ada hex di luar palet G1', () => {
   }
 });
 
-/* ---------- komponen rig: lingkup penuh berkas ---------- */
+/* m025-303: dua tes komponen (fiezel-mascot.js dan bagian MASKOT fiezel-motion.css)
+   diangkat bersama berkasnya. Keduanya menjaga agar warna TUBUH PAW — termasuk
+   confetti yang dirender komponennya — tidak pernah menyimpang dari palet tertutup
+   G1. Rig itu tidak ada lagi.
 
-test('fiezel-mascot.js: tidak ada hex di luar palet G1 (termasuk confetti)', () => {
-  // Confetti IKUT dijaga: ia dirender dari CONF_COLORS di berkas ini dan tampil
-  // menempel pada karakter. #F8CF4D adalah drift dokumen yang dikapalkan ke
-  // runtime, #4FC79B tidak pernah ada di palet mana pun.
-  const bad = offenders(read('features/mascot/fiezel-mascot.js'));
-  if (bad.length) throw new Error(bad.join(', '));
-});
-
-/* ---------- fiezel-motion.css: hanya bagian karakter ---------- */
-
-test('fiezel-motion.css: bagian MASKOT/STATE bebas hex di luar G1', () => {
-  const css = read('features/mascot/fiezel-motion.css');
-  // Irisan berbasis penanda bagian. Kalau penandanya hilang, GAGAL — lingkup yang
-  // menyusut diam-diam lebih buruk daripada tes yang minta diperbarui. (Catatan
-  // untuk penulis ulang motion CSS: pertahankan penanda MASKOT, MICRO-INTERACTIONS
-  // UI, dan 4 STATE TAMBAHAN, atau perbarui irisan gerbang ini dalam PR yang sama.)
-  const cut = (from, to) => {
-    const a = css.indexOf(from);
-    const b = css.indexOf(to);
-    if (a === -1 || b === -1 || b < a) {
-      throw new Error('penanda bagian "' + from.slice(0, 30) + '…" tidak ditemukan — '
-        + 'struktur berkas berubah, perbarui irisan gerbang ini');
-    }
-    return css.slice(a, b);
-  };
-  // Dua tata letak dikenal: berkas lama menaruh "4 STATE TAMBAHAN" SESUDAH blok
-  // MICRO-INTERACTIONS UI (perlu irisan kedua sampai PENEMPATAN); berkas hasil
-  // penulisan ulang Wave I menaruh seluruh bagian karakter berurutan sebelum blok
-  // chrome, sehingga irisan pertama sudah memuat semuanya — irisan kedua justru
-  // akan menyeret chrome (tombol/XP bar) ke lingkup karakter dan gagal palsu.
-  let character =
-    cut('================= MASKOT =================', '================= MICRO-INTERACTIONS UI');
-  if (css.indexOf('4 STATE TAMBAHAN') === -1) {
-    throw new Error('penanda "4 STATE TAMBAHAN" hilang dari berkas — '
-      + 'struktur berkas berubah, perbarui irisan gerbang ini');
-  }
-  if (!character.includes('4 STATE TAMBAHAN')) {
-    character += cut('4 STATE TAMBAHAN', 'PENEMPATAN DI FIEZEL-APPS');
-  }
-  const bad = offenders(character);
-  if (bad.length) throw new Error(bad.join(', '));
-});
+   Penggantinya, features/mascot/fiezel-character.js dan fiezel-character.css,
+   SENGAJA tidak dimasukkan ke gerbang ini, dan alasannya perlu terang supaya
+   tidak terbaca sebagai kelalaian: keduanya nyaris tidak membawa warna sama
+   sekali. Seni Nusa & Mira adalah gambar raster ber-palet storybook-flat sendiri;
+   satu-satunya warna di kode adalah tinta mulut viseme dan warna moncong, dan
+   warna moncong itu DIUKUR dari asetnya oleh tools/sample-muzzle.py, bukan
+   ditulis tangan — dijaga tests/character-art-gate-test.js. Memaksakan palet G1
+   ke atasnya berarti menuntut karakter baru memakai palet karakter lama. */
 
 console.log('');
 if (failures.length) {

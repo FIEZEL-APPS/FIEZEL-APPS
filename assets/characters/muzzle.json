@@ -1,0 +1,50 @@
+{
+  "generator": "tools/sample-muzzle.py",
+  "cara": "median piksel terang (luma>150) di dalam kotak mulut face-rig",
+  "warna": {
+    "mira/full-explain": {
+      "hex": "#F6AB8A",
+      "sampel": 680
+    },
+    "mira/full-neutral": {
+      "hex": "#F5AB88",
+      "sampel": 686
+    },
+    "mira/full-wave": {
+      "hex": "#F6AB89",
+      "sampel": 627
+    },
+    "mira/head-explain": {
+      "hex": "#F3A887",
+      "sampel": 632
+    },
+    "mira/head-happy": {
+      "hex": "#F3A787",
+      "sampel": 690
+    },
+    "nusa/full-neutral": {
+      "hex": "#F5DDB2",
+      "sampel": 356
+    },
+    "nusa/full-oops": {
+      "hex": "#F5DEB4",
+      "sampel": 525
+    },
+    "nusa/full-wave": {
+      "hex": "#F4DCAE",
+      "sampel": 325
+    },
+    "nusa/head-happy": {
+      "hex": "#F4DAAE",
+      "sampel": 336
+    },
+    "team/shoulder-wave": {
+      "hex": "#F2A684",
+      "sampel": 683
+    },
+    "team/walking": {
+      "hex": "#F3DAA9",
+      "sampel": 491
+    }
+  }
+}

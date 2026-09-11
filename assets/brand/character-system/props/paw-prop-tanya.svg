@@ -1,8 +1,0 @@
-<!-- HASIL GENERATE - jangan diedit tangan. Sumber: tools/character-system/library.mjs (PROPS). Regenerasi: node tools/export-character-system.mjs -->
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" role="img" aria-label="tanda tanya">
-  <g class="fz-prop fz-prop-tanya">
-    <circle cx="50" cy="50" r="46" fill="#FFD94F"/>
-    <path d="M50 20c-13 0-22 9-22 20h15c0-4 3-7 7-7s7 3 7 7c0 6-13 9-13 20v3h14v-2c0-8 14-11 14-23 0-11-9-18-22-18Z" fill="#8C2233"/>
-    <circle cx="50" cy="74" r="7" fill="#8C2233"/>
-  </g>
-</svg>

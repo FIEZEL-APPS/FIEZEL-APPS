@@ -97,10 +97,16 @@ const CANON = shapeOf(ASSET);
 // Badan-penuh yang wajib membawa emblem dada. Kembar website dijaga byte demi
 // byte oleh e5-checksum-gate, jadi tidak perlu diulang di sini. Ekspor kepala
 // saja bebas — tidak ada dada di bingkainya.
-const FULL_BODY = [
-  'assets/brand/paw-mascot-full.svg',
-  'assets/marketing/mascot-poses/paw-mascot-full-celebrating.svg',
-];
+/* m025-303: FULL_BODY dan tiga tes yang memakainya diangkat bersama rig PAW.
+   Ketiganya memeriksa EMBLEM DADA di tubuh maskot — subjek yang benar-benar tidak
+   ada lagi: karakter aplikasi kini Nusa & Mira (seni gambar), dan lambang telapak
+   melekat di seni mereka sendiri (bandana Nusa, pin Mira), bukan digambar ulang
+   dari koordinat oleh rig.
+
+   Yang TETAP dijaga berkas ini, dan itu justru inti namanya: GEOMETRI MARKA
+   TELAPAK — bahwa assets/brand/fiezel-paw.svg masih bentuk arah 02 (empat balok
+   beda tinggi + satu bantalan) dan ICONS.paw identik dengannya. Marka itu tetap
+   dipakai favicon, cap splash, dan lima tempat di UI. */
 
 test('fiezel-paw.svg masih bentuk arah 02 — empat balok beda tinggi, satu bantalan', () => {
   if (CANON.bars.length !== 4 || !CANON.pad) throw new Error('berkas kanon rusak');
@@ -112,36 +118,8 @@ test('ICONS.paw identik dengan berkas kanon (perpanjangan gerbang lama)', () => 
   assertShapeMatches('ICONS.paw', pawBlock(read('features/ui/fiezel-icons.js')), CANON);
 });
 
-test('emblem dada rig memakai koordinat fiezel-paw.svg', () => {
-  const rig = read('features/mascot/fiezel-mascot.js');
-  assertShapeMatches('grup fz-emblem di rig', groupBlock(rig, 'fz-emblem'), CANON);
-});
 
-test('bantalan tangan TIDAK ADA — glyph hanya di dada (keputusan OWNER)', () => {
-  // Sanksi lama A-9 (fz-pads kanan + perluasan fz-pads-l kiri) dicabut oleh
-  // keputusan OWNER di papan edit: "untuk logo ini jangan tempatkan di
-  // tangannya, cukup di dada". Bantalan yang muncul kembali — dengan koordinat
-  // kanon sekalipun — adalah pelanggaran keputusan itu, bukan detail gaya.
-  const offenders = [];
-  const scan = (label, src) => {
-    for (const cls of ['fz-pads-l', 'fz-pads']) {
-      if (new RegExp('class="[^"]*\\b' + cls + '\\b').test(src)) offenders.push(label + ' → ' + cls);
-    }
-  };
-  scan('features/mascot/fiezel-mascot.js', read('features/mascot/fiezel-mascot.js'));
-  for (const f of FULL_BODY) if (exists(f)) scan(f, read(f));
-  if (offenders.length) {
-    throw new Error('bantalan tangan masih ada: ' + offenders.join(', ')
-      + ' — hapus grupnya; ekspor menyusul saat di-generate ulang dari rig');
-  }
-});
 
-test('ekspor badan-penuh membawa emblem dengan koordinat yang sama', () => {
-  for (const f of FULL_BODY) {
-    if (!exists(f)) throw new Error(f + ' hilang');
-    assertShapeMatches('emblem di ' + f, groupBlock(read(f), 'fz-emblem'), CANON);
-  }
-});
 
 console.log('');
 if (failures.length) {

@@ -327,28 +327,26 @@ jobs:
           node tests/css-keyframe-uniq-test.js
           node tests/pastel-field-contrast-test.js
           node tests/topbar-logo-contrast-test.js
+          # m025-303: tests/paw-mascot-test.js kini menjaga LAMBANG TELAPAK dan SPLASH saja
+          # - bagian rig dan lapisan outfit diangkat bersama berkasnya. Splash SENGAJA tidak
+          # disentuh dalam perpindahan karakter ini (permintaan OWNER: biarkan seperti
+          # sekarang sampai ada penggantinya), jadi gerbangnya tetap utuh.
           node tests/paw-mascot-test.js
-          # m025-246 (edge case wajib OWNER): "Kurangi-gerak: 14 state maskot harus punya
-          # fallback statis - verifikasi dengan test." Ditaruh tepat di sini karena ia
-          # memperluas kontrak yang sama dengan tests/paw-mascot-test.js: satu sumber bentuk,
-          # dan sekarang juga satu bingkai statis per state.
-          node tests/mascot-reduced-motion-test.js
-          # Lima gerbang redesign maskot PAW (spec §35 "New regression nets" + A-10).
-          # Ditaruh tepat sesudah tests/paw-mascot-test.js karena kelimanya memperluas kontrak
-          # yang gerbang itu mulai jaga: satu sumber bentuk (geometri + checksum ekspor),
-          # palet karakter tertutup G1, tubuh bebas rotasi, dan kosakata event react().
-          node tests/e5-checksum-gate-test.js
+          # m025-303: tiga gerbang rig PAW - e5-checksum-gate, mascot-reduced-motion, dan
+          # keyframe-rotation-gate - DIHAPUS bersama rig-nya, dan jaminannya PINDAH, bukan
+          # hilang. tests/character-art-gate-test.js mewarisi ketiganya:
+          #   satu sumber bentuk  -> peta state->seni & warna moncong wajib hasil generate
+          #                          yang segar dari assets/characters/ (berkas yang
+          #                          disunting tangan memerahkannya);
+          #   bingkai statis      -> 19 state lengkap tanpa lubang, plus blok kurangi-gerak
+          #                          yang benar-benar mematikan animasi, transisi, dan kedip;
+          #   tubuh tidak liar    -> amplitudo dan durasi gerak tertahan.
+          # Plus satu jaminan tanpa pendahulu, karena cacatnya baru mungkin ada di sistem
+          # gambar: setiap seni yang ditunjuk peta wajib ada di disk DAN ikut precache.
+          # Rig SVG inline tidak bisa 404; gambar bisa, dan murid luring melihat lubang.
+          node tests/character-art-gate-test.js
           node tests/pawprint-geometry-gate-test.js
           node tests/palette-gate-test.js
-          # m025-302: SISTEM KARAKTER MEREK (assets/brand/character-system/) — 64 aset
-          # hasil generate dari rig yang sama. Ditaruh tepat sesudah gerbang palet karena
-          # keduanya menjaga kontrak yang sama dari dua sisi: palette-gate menjaga WARNANYA
-          # (lewat SVG_DIRS, jadi berkas baru ikut terjaga tanpa ada yang perlu ingat),
-          # gerbang ini menjaga bahwa aset itu benar-benar lahir dari rig dan glyph merek —
-          # ia menjalankan `tools/export-character-system.mjs --check`, jadi SVG yang
-          # disunting tangan memerahkannya.
-          node tests/character-system-gate-test.js
-          node tests/keyframe-rotation-gate-test.js
           node tests/event-vocabulary-gate-test.js
           node tests/voice-offline-fallback-test.js
           node tests/voice-fallback-chain-test.js
