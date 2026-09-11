@@ -45,8 +45,10 @@ def sample(png, box):
     return '#%02X%02X%02X' % med, len(light)
 
 def build():
-    rig = json.load(open(os.path.join(ROOT, 'assets/characters/face-rig.json')))
-    man = json.load(open(os.path.join(ROOT, 'assets/characters/manifest.json')))
+    with open(os.path.join(ROOT, 'assets/characters/face-rig.json')) as fh:
+        rig = json.load(fh)
+    with open(os.path.join(ROOT, 'assets/characters/manifest.json')) as fh:
+        man = json.load(fh)
     out = {'generator': 'tools/sample-muzzle.py',
            'cara': 'median piksel terang (luma>%d) di dalam kotak mulut face-rig' % LUMA_MIN,
            'warna': {}}
@@ -66,11 +68,14 @@ def main():
     if '--check' in sys.argv:
         if not os.path.exists(OUT):
             print('FAIL - %s belum ada' % os.path.relpath(OUT, ROOT)); sys.exit(1)
-        if open(OUT).read() != text:
+        with open(OUT) as fh:
+            sekarang = fh.read()
+        if sekarang != text:
             print('FAIL - %s menyimpang dari aset — jalankan: python3 tools/sample-muzzle.py'
                   % os.path.relpath(OUT, ROOT)); sys.exit(1)
         print('sample-muzzle --check: PASS (%d pose)' % len(doc['warna'])); return
-    open(OUT, 'w').write(text)
+    with open(OUT, 'w') as fh:
+        fh.write(text)
     print('json - %s (%d pose)' % (os.path.relpath(OUT, ROOT), len(doc['warna'])))
     for k, v in doc['warna'].items():
         print('       %-22s %s' % (k, v['hex']))

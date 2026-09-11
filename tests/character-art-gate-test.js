@@ -181,10 +181,64 @@ test('rig PAW benar-benar pergi — tidak ada rujukan tersisa di shell', () => {
 
 test('kurangi-gerak benar-benar mematikan animasi, transisi, dan kedip', () => {
   const css = read(CSS);
-  const blok = css.slice(css.indexOf('@media (prefers-reduced-motion: reduce)'));
-  if (!blok) throw new Error('blok prefers-reduced-motion tidak ada di ' + CSS);
-  if (!/animation:\s*none\s*!important/.test(blok)) throw new Error('animation tidak dimatikan di blok kurangi-gerak');
-  if (!/transition:\s*none\s*!important/.test(blok)) throw new Error('transition tidak dimatikan di blok kurangi-gerak');
+  const at = css.indexOf('@media (prefers-reduced-motion: reduce)');
+  if (at < 0) throw new Error('blok prefers-reduced-motion tidak ada di ' + CSS);
+
+  /* Irisan blok dihitung dengan MENGHITUNG KURUNG, bukan dengan mencari '}'
+     pertama: blok ini berisi aturan bersarang, dan irisan yang salah membuat
+     seluruh pemeriksaan di bawah memeriksa teks yang salah. */
+  let depth = 0, end = -1;
+  for (let i = css.indexOf('{', at); i < css.length; i++) {
+    if (css[i] === '{') depth++;
+    else if (css[i] === '}') { depth--; if (depth === 0) { end = i; break; } }
+  }
+  if (end < 0) throw new Error('blok kurangi-gerak tidak tertutup di ' + CSS);
+  const blok = css.slice(css.indexOf('{', at) + 1, end);
+
+  /* Aturan dipecah per-selektor. VERSI PERTAMA GERBANG INI HANYA MENCARI
+     "animation: none !important" DI MANA PUN DI DALAM BLOK, dan itu lubang yang
+     benar-benar menganga: sebuah suntingan salah menaruh aturan .fz-viseme-cover
+     (position:absolute; filter:blur) ke dalam blok ini dan menjadikan .fz-art
+     sebagai salah satu selektornya. Akibatnya untuk murid yang meminta kurangi-
+     gerak: karakternya BURAM dan runtuh posisinya, DAN animasinya tetap jalan —
+     kebalikan persis dari tujuan blok ini. Gerbang lama tetap hijau, karena
+     aturan .fz-viseme-shape yang selamat sudah cukup memuaskan pencarian string.
+     Ditemukan review gitar-bot di PR #401, bukan olehku.
+     Karena itu sekarang yang diperiksa adalah SELEKTORNYA, satu per satu. */
+  const aturan = [];
+  for (const m of blok.matchAll(/([^{}]+)\{([^{}]*)\}/g)) {
+    aturan.push({
+      selektor: m[1].replace(/\/\*[\s\S]*?\*\//g, ' ').split(',').map((x) => x.trim()).filter(Boolean),
+      isi: m[2],
+    });
+  }
+  if (!aturan.length) throw new Error('tidak ada aturan terbaca di blok kurangi-gerak');
+
+  const punya = (sel, prop) => aturan.some((r) =>
+    r.selektor.some((x) => x === sel) && new RegExp(prop + ':\\s*none\\s*!important').test(r.isi));
+
+  for (const sel of ['fiezel-mascot .fz-art', 'fiezel-mascot .fz-viseme-shape']) {
+    if (!punya(sel, 'animation')) {
+      throw new Error('"' + sel + '" TIDAK mendapat animation:none !important di blok kurangi-gerak'
+        + ' — animasinya tetap jalan untuk murid yang memintanya berhenti');
+    }
+  }
+  if (!punya('fiezel-mascot', 'transform')) {
+    throw new Error('"fiezel-mascot" tidak mendapat transform:none !important — geser lookAt tetap hidup');
+  }
+
+  /* Blok kurangi-gerak hanya boleh MEMATIKAN, tidak pernah MENGGAMBAR ULANG.
+     Properti tata letak atau visual di sini berarti ada aturan yang tersasar
+     masuk — persis cacat di atas. */
+  const terlarang = /(^|[\s;])(position|inset|top|left|right|bottom|filter|background|border-radius|width|height)\s*:/;
+  for (const r of aturan) {
+    if (terlarang.test(r.isi)) {
+      throw new Error('aturan "' + r.selektor.join(', ') + '" membawa properti tata letak/visual ke dalam '
+        + 'blok kurangi-gerak: ' + r.isi.trim().slice(0, 80)
+        + ' — blok ini hanya boleh mematikan gerak, bukan menggambar ulang karakter');
+    }
+  }
+
   const comp = read(COMP);
   if (!/_blink[\s\S]{0,400}?reducedMotion\(\)/.test(comp) && !/reducedMotion\(\)[\s\S]{0,200}?return/.test(comp)) {
     throw new Error('kedip tidak menghormati kurangi-gerak di ' + COMP

@@ -122,22 +122,12 @@ fiezel-mascot.st-curious      .fz-art { animation: fzCharSway 3.4s ease-in-out i
    dimatikan di sisi JavaScript. */
 @media (prefers-reduced-motion: reduce) {
   fiezel-mascot .fz-art,
-  /* Penutup: mengisi kotak mulut dengan warna moncong terukur, menyembunyikan
-   mulut yang sudah tergambar di seni. Sedikit blur di tepinya supaya batas
-   kotaknya tidak terbaca sebagai tambalan persegi. */
-fiezel-mascot .fz-viseme-cover {
-  position: absolute;
-  /* TIDAK memuai ke ATAS, dan itu bukan detail kosmetik: kotak mulut face-rig
-     mulai tepat di bawah hidung, jadi penutup yang memuai ke atas memakan hidung
-     karakter. Terlihat jelas saat dirender — Nusa kehilangan hidungnya di setiap
-     bingkai bicara. Sisi bawah/samping boleh memuai supaya batasnya tidak
-     terbaca sebagai tambalan persegi. */
-  inset: 10% -4% -6% -4%;
-  border-radius: 50%;
-  filter: blur(2.5px);
-}
-
-fiezel-mascot .fz-viseme-shape {
-  position: relative; animation: none !important; transition: none !important; }
-  fiezel-mascot { transform: none !important; transition: none !important; }
+  fiezel-mascot .fz-viseme-shape {
+    animation: none !important;
+    transition: none !important;
+  }
+  fiezel-mascot {
+    transform: none !important;
+    transition: none !important;
+  }
 }
