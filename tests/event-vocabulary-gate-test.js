@@ -32,23 +32,36 @@ function test(name, fn) {
   catch (e) { failures.push(name); console.log('FAIL - ' + name + ': ' + e.message); }
 }
 
-const MASCOT = read('features/mascot/fiezel-mascot.js');
+const MASCOT = read('features/mascot/fiezel-character.js');
 const APP = read('app.js');
 
-/** Kosakata = label case di badan react(evt). Dibatasi dari kepala metode sampai
- *  metode berikutnya supaya case milik switch lain tidak ikut terseret. */
+/** Kosakata = kunci peta TARGET di komponen karakter.
+ *
+ *  m025-303: dulu kosakata dibaca sebagai label `case "x":` di dalam switch
+ *  react(). Komponen Nusa & Mira menyimpannya sebagai PETA OBJEK (TARGET), bukan
+ *  switch — bentuk kodenya berubah, KONTRAKNYA tidak: peta itu tetap satu-satunya
+ *  tempat kosakata event hidup, dan gerbang ini tetap menuntut setiap event yang
+ *  dipancarkan app.js ada di dalamnya.
+ *
+ *  Ambang 15 dipertahankan apa adanya, dan alasannya juga sama: kalau suatu hari
+ *  strukturnya berubah lagi sehingga pemindai ini menjaring nyaris kosong,
+ *  gerbangnya harus BERTERIAK, bukan diam-diam lulus dengan kosakata kosong. */
 function vocabulary() {
-  const start = MASCOT.indexOf('react(evt');
-  if (start === -1) throw new Error('metode react() tidak ditemukan di fiezel-mascot.js');
-  const end = MASCOT.indexOf('\n    lookAt(', start);
+  const start = MASCOT.indexOf('var TARGET = {');
+  if (start === -1) throw new Error('peta TARGET tidak ditemukan di fiezel-character.js');
+  const end = MASCOT.indexOf('};', start);
   const body = MASCOT.slice(start, end === -1 ? MASCOT.length : end);
-  const vocab = [...body.matchAll(/case "([\w-]+)":/g)].map((m) => m[1]);
-  if (vocab.length < 15) {
-    throw new Error('hanya ' + vocab.length + ' event terbaca dari switch react() — '
+  /* Kunci boleh ber-kutip ('speak-start') atau telanjang (correct). */
+  const vocab = [...body.matchAll(/(?:^|[{,])\s*'([\w-]+)'\s*:/g)].map((m) => m[1])
+    .concat([...body.matchAll(/(?:^|[{,])\s*([A-Za-z_]\w*)\s*:/g)].map((m) => m[1]));
+  const uniq = [...new Set(vocab)];
+  if (uniq.length < 15) {
+    throw new Error('hanya ' + uniq.length + ' event terbaca dari peta TARGET react() — '
       + 'strukturnya berubah dan gerbang ini buta');
   }
-  return new Set(vocab);
+  return new Set(uniq);
 }
+
 
 /** Benar-benar kode, bukan komentar? app.js menulis komentar panjang yang ikut
  *  menyebut pawReact (mis. "…lewat corong pawReact (gerbang…)" di dekat 'wake') —
@@ -107,12 +120,16 @@ function eventLiterals(args) {
 }
 
 test('react() masih memperingatkan event tak dikenal, bukan diam', () => {
-  const start = MASCOT.indexOf('react(evt');
-  if (start === -1) throw new Error('metode react() tidak ditemukan di fiezel-mascot.js');
-  const end = MASCOT.indexOf('\n    lookAt(', start);
+  /* m025-303: dulu dicari sebagai `default: console.warn` di switch. Komponen
+     Nusa & Mira memakai peta objek, jadi cabang "tak dikenal" adalah penjaga
+     `if (!tgt)`. Yang dituntut gerbang ini TIDAK berubah: cabang itu wajib
+     berteriak, bukan diam. */
+  const start = MASCOT.indexOf('El.prototype.react');
+  if (start === -1) throw new Error('metode react() tidak ditemukan di fiezel-character.js');
+  const end = MASCOT.indexOf('El.prototype.applyFace', start);
   const body = MASCOT.slice(start, end === -1 ? MASCOT.length : end);
-  if (!/default:\s*\n?\s*console\.warn/.test(body)) {
-    throw new Error('cabang default react() tidak memanggil console.warn — '
+  if (!/if\s*\(!tgt\)[\s\S]{0,600}?console\.warn/.test(body)) {
+    throw new Error('cabang event tak dikenal di react() tidak memanggil console.warn — '
       + 'tanpa peringatan, event mati berikutnya juga akan mati diam-diam');
   }
 });
