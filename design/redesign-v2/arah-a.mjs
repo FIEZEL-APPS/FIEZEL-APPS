@@ -1,8 +1,7 @@
 /* ARAH A — "Kartu Tebal".
    Kartu bergaris tebal dengan bayangan padat tanpa blur, huruf Fredoka yang
    membulat, warna datar terang. Paling ramai dan paling ramah anak. */
-import { dcArah, tautanHuruf, isi, maskot, potret, bayangan, S, ic, NAV,
-  PHONE_W, PHONE_H } from './arah-kit.mjs';
+import { dcArah, tautanHuruf, isi, maskot, bayangan, S, ic, NAV } from './arah-kit.mjs';
 
 const HURUF = [['Fredoka', [400, 500, 600, 700]], ['Nunito', [400, 600, 700, 800]]];
 const TAUTAN = tautanHuruf(HURUF);

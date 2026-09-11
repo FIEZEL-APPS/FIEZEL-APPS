@@ -1,6 +1,6 @@
 /* Masuk, daftar, dan seluruh alur perkenalan. */
-import { T, S, ic, dc, btn, chip, card, bar, dots, eyebrow, wordmark, paw, avatar, iconBtn,
-  PHONE_W, PHONE_H, TOP_SAFE } from './kit.mjs';
+import { T, S, ic, dc, btn, chip, bar, dots, eyebrow, wordmark, iconBtn, PHONE_W, PHONE_H,
+  TOP_SAFE } from './kit.mjs';
 
 /* Kolom isi telepon dengan ruang status bar asli dibiarkan kosong. */
 function sheet(body, pad = 22) {

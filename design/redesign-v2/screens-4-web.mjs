@@ -1,7 +1,7 @@
 /* Lembar sistem desain.
    Landing page website SENGAJA tidak ada di sini — owner meminta redesain
    dibatasi ke aplikasi saja. */
-import { T, DOM, S, ic, dc, btn, chip, bar, eyebrow, wordmark, paw, FONT } from './kit.mjs';
+import { T, DOM, S, ic, dc, btn, chip, bar, eyebrow, wordmark } from './kit.mjs';
 
 export const SISTEM = { w: 1180, h: 1250 };
 

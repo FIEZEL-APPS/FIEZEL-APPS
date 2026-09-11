@@ -1,6 +1,6 @@
 /* Lima tab menu utama + pengaturan. */
-import { T, DOM, S, ic, dc, btn, chip, card, bar, eyebrow, paw, avatar, iconBtn, navBar,
-  appHeader, PHONE_W, PHONE_H, TOP_SAFE } from './kit.mjs';
+import { T, DOM, S, ic, dc, chip, bar, eyebrow, paw, avatar, iconBtn, navBar, appHeader,
+  PHONE_W, PHONE_H, TOP_SAFE } from './kit.mjs';
 
 function sheet(body, pad = 20) {
   return `<div style="position: absolute; inset: ${TOP_SAFE}px ${pad}px 0 ${pad}px;">${body}</div>`;
