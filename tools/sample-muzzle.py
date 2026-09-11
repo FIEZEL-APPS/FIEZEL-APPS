@@ -113,6 +113,12 @@ def build():
             else:
                 out['dilewati'][kunci] = {
                     'png': e['png'],
+                    # Sidik jari juga untuk yang DILEWATI: kalau seninya kelak
+                    # digambar ulang sehingga piksel terangnya cukup, pose ini
+                    # berhenti pantas dilewati. Tanpa sha256, muzzle.json akan
+                    # terus mencatatnya sebagai dilewati dan gerbangnya tetap
+                    # hijau — absen yang disengaja berubah diam-diam jadi basi.
+                    'pngSha256': sha256_file(os.path.join(ROOT, e['png'])),
                     'sampelTerang': n,
                     'alasan': 'piksel terang < %d, warna moncong tidak bisa diukur andal' % MIN_SAMPEL,
                 }
