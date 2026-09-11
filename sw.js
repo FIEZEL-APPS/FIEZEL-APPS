@@ -53,7 +53,7 @@ const CACHE=`fiezel-v${self.FIEZEL_VERSION}`;
 // dilayani dan kedua berkas baru tidak pernah sampai ke pengguna lama - aplikasi mereka
 // akan menjalankan app.js baru tanpa berkas benderanya, dan seluruh bendera jatuh ke
 // salinan bawaan di app.js. Naik SEKALI untuk seluruh gelombang.
-const SW_REV='m025-303-nusa-mira-20260911';
+const SW_REV='m025-300-nusa-mira-20260911';
 const SHELL_CACHE=`fiezel-shell-${SW_REV}`;
 // m025-61: health check menanyakan revisi shell langsung ke worker yang sedang aktif.
 // Menebaknya dari nama cache tidak cukup: cache lama bisa tertinggal, sedangkan jawaban ini
@@ -110,7 +110,7 @@ const ASSETS=['./','./index.html','./style.css','./features/mascot/fiezel-charac
   // titik koma di dalam komentar array ini - pwa-cache-test memotong daftar di situ.)
 
   /* m025-303: SENI KARAKTER yang benar-benar dipakai 19 state, WebP saja.
-     Direktori assets/characters/ berisi 39 MB (PNG 21 MB, SVG 5,1 MB, WebP 2,1 MB);
+     Direktori assets/characters/ berisi 39 MB -- PNG 21 MB, SVG 5,1 MB, WebP 2,1 MB --
      mem-precache seluruhnya menaikkan shell PWA ratusan kali lipat untuk aset yang
      sebagian besar tidak pernah tampil. Yang masuk hanya berkas yang ditunjuk peta
      state (dan frame kedipnya), diturunkan dari fiezel-character-art.js - bukan
