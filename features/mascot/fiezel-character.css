@@ -1,0 +1,133 @@
+/* ============================================================
+   FIEZEL — gerak & tata letak karakter <fiezel-mascot> (NUSA & MIRA)
+   ============================================================
+   Pengganti features/mascot/fiezel-motion.css. Berkas lama menganimasi BAGIAN
+   TUBUH sebuah rig SVG (telinga, lengan, ekor, kelopak) dengan puluhan keyframe.
+   Seni Nusa/Mira adalah gambar utuh, jadi tidak ada bagian tubuh yang bisa
+   diputar sendiri — yang tersisa, dan yang memang cukup, adalah gerak SELURUH
+   karakter: napas, pantulan, goyang, getar.
+
+   Itu BUKAN penurunan mutu diam-diam, dan perlu ditulis terang: ekspresi kini
+   dibawa oleh seninya sendiri (19 pose berbeda), bukan oleh animasi. Yang hilang
+   adalah gerak anggota badan per-state; yang didapat adalah wajah yang benar
+   sejak bingkai pertama, tanpa menunggu animasi berjalan.
+
+   Semua durasi memakai token yang sama dengan berkas lama supaya ritme aplikasi
+   tidak berubah.
+   ============================================================ */
+
+fiezel-mascot {
+  display: block;
+  position: relative;
+  line-height: 0;
+  /* Digeser lookAt(); 0 kalau kurangi-gerak. */
+  transform: translateX(var(--fz-look-x, 0));
+  transition: transform .28s cubic-bezier(.2, .7, .3, 1);
+}
+
+fiezel-mascot .fz-art {
+  display: block;
+  width: 100%;
+  height: auto;
+  /* Rasio dipasang inline dari manifest: mencegah tata letak melompat saat
+     gambar selesai dimuat (CLS), yang dulu tidak mungkin terjadi karena rig
+     lama berupa SVG inline tanpa pemuatan. */
+  object-fit: contain;
+  -webkit-user-drag: none;
+  user-select: none;
+}
+
+/* ---------- lapisan viseme ---------- */
+/* .fz-viseme = KOTAK mulut dari face-rig.json (posisi + ukuran kotak).
+   .fz-viseme-shape = BENTUK mulut di dalam kotak itu (ukuran dari viseme).
+   Pemisahan ini wajib: satu elemen untuk keduanya membuat bentuknya diukur
+   terhadap seluruh tubuh. */
+fiezel-mascot .fz-viseme {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+fiezel-mascot .fz-viseme[hidden] { display: none; }
+
+/* Penutup: mengisi kotak mulut dengan warna moncong terukur, menyembunyikan
+   mulut yang sudah tergambar di seni. Sedikit blur di tepinya supaya batas
+   kotaknya tidak terbaca sebagai tambalan persegi. */
+fiezel-mascot .fz-viseme-cover {
+  position: absolute;
+  /* TIDAK memuai ke ATAS, dan itu bukan detail kosmetik: kotak mulut face-rig
+     mulai tepat di bawah hidung, jadi penutup yang memuai ke atas memakan hidung
+     karakter. Terlihat jelas saat dirender — Nusa kehilangan hidungnya di setiap
+     bingkai bicara. Sisi bawah/samping boleh memuai supaya batasnya tidak
+     terbaca sebagai tambalan persegi. */
+  inset: 10% -4% -6% -4%;
+  border-radius: 50%;
+  filter: blur(2.5px);
+}
+
+fiezel-mascot .fz-viseme-shape {
+  position: relative;
+  display: block;
+  background: var(--fz-mouth-ink, #6d2230);
+  transition: width .06s linear, height .06s linear, border-radius .06s linear;
+}
+
+/* ---------- gerak dasar ---------- */
+
+@keyframes fzCharBreathe {
+  0%, 100% { transform: translateY(0) scaleY(1); }
+  50%      { transform: translateY(-1.5%) scaleY(1.012); }
+}
+@keyframes fzCharBob {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-4%); }
+}
+@keyframes fzCharPop {
+  0%   { transform: scale(1); }
+  35%  { transform: scale(1.06); }
+  100% { transform: scale(1); }
+}
+@keyframes fzCharShake {
+  0%, 100% { transform: translateX(0); }
+  25%      { transform: translateX(-2%); }
+  75%      { transform: translateX(2%); }
+}
+@keyframes fzCharSway {
+  0%, 100% { transform: rotate(-1.2deg); }
+  50%      { transform: rotate(1.2deg); }
+}
+
+/* Napas pelan adalah keadaan dasar: karakter yang benar-benar diam terbaca
+   sebagai stiker. Kedip ditangani komponen (tukar bingkai), bukan di sini. */
+fiezel-mascot .fz-art { animation: fzCharBreathe 4.2s ease-in-out infinite; }
+
+fiezel-mascot.st-greeting     .fz-art,
+fiezel-mascot.st-welcome-back .fz-art { animation: fzCharBob 1.1s ease-in-out 2; }
+fiezel-mascot.st-celebrating  .fz-art,
+fiezel-mascot.st-completion   .fz-art,
+fiezel-mascot.st-milestone    .fz-art,
+fiezel-mascot.st-level-up     .fz-art { animation: fzCharPop .5s cubic-bezier(.2,.9,.3,1.2) 2; }
+fiezel-mascot.st-confused     .fz-art { animation: fzCharShake .28s ease-in-out 3; }
+fiezel-mascot.st-love         .fz-art,
+fiezel-mascot.st-proud        .fz-art { animation: fzCharPop .6s ease-out 1; }
+fiezel-mascot.st-sleepy       .fz-art { animation: fzCharBreathe 6.5s ease-in-out infinite; }
+fiezel-mascot.st-thinking     .fz-art,
+fiezel-mascot.st-curious      .fz-art { animation: fzCharSway 3.4s ease-in-out infinite; }
+
+/* ---------- kurangi-gerak ----------
+   Di sistem gambar ini jaminannya LEBIH KUAT daripada rig lama: tiap state sudah
+   berupa bingkai statis yang berbeda, jadi mematikan animasi tidak menghapus satu
+   pun informasi. Yang dimatikan hanya napas, pantulan, dan geser lookAt; kedip
+   dimatikan di sisi JavaScript. */
+@media (prefers-reduced-motion: reduce) {
+  fiezel-mascot .fz-art,
+  fiezel-mascot .fz-viseme-shape {
+    animation: none !important;
+    transition: none !important;
+  }
+  fiezel-mascot {
+    transform: none !important;
+    transition: none !important;
+  }
+}

@@ -1,0 +1,355 @@
+#!/usr/bin/env node
+/**
+ * Gerbang SENI KARAKTER NUSA & MIRA (m025-303).
+ *
+ * Berkas ini MENGGANTIKAN tiga gerbang yang dulu menjaga rig SVG PAW dan terangkat
+ * bersamanya. Yang diwarisi bukan kodenya melainkan jaminannya, dan itu ditulis di
+ * sini supaya perpindahan ini tidak pernah terbaca sebagai kelonggaran:
+ *
+ *   e5-checksum-gate-test      -> "satu sumber bentuk". Dulu: hash rig kanonik +
+ *     manifest ekspor. Kini: peta state->seni dan warna moncong WAJIB hasil
+ *     generate yang segar dari assets/characters/. Berkas yang disunting tangan
+ *     atau basi terhadap asetnya memerahkan gerbang ini.
+ *
+ *   mascot-reduced-motion-test -> "setiap state punya bingkai statis". Dulu peta
+ *     state->ekspresi. Kini lebih kuat: setiap state MEMANG bingkai statis, dan
+ *     yang dituntut adalah kelengkapan peta (19 state, nol lubang) plus blok
+ *     kurangi-gerak yang benar-benar mematikan animasi.
+ *
+ *   keyframe-rotation-gate     -> "tubuh tidak diputar". Aturan itu lahir karena
+ *     memutar tubuh rig vektor merusak pivot anggota badannya. Seni gambar tidak
+ *     punya pivot, jadi aturannya tidak bisa dipindahkan apa adanya; yang
+ *     dipindahkan adalah maksudnya — gerak harus KECIL dan tertahan.
+ *
+ * Ditambah satu jaminan yang tidak punya pendahulu, karena cacatnya baru mungkin
+ * ada di sistem gambar: setiap berkas seni yang ditunjuk peta harus BENAR-BENAR
+ * ADA di disk dan ikut di-precache. Rig SVG inline tidak bisa 404; gambar bisa,
+ * dan murid luring akan melihat lubang di tempat karakternya.
+ */
+'use strict';
+const __fzRoot = require('path').join(__dirname, '..');
+
+const fs = require('fs');
+const path = require('path');
+const { spawnSync } = require('child_process');
+
+const read = (f) => fs.readFileSync(path.join(__fzRoot, f), 'utf8');
+const exists = (f) => fs.existsSync(path.join(__fzRoot, f));
+
+let pass = 0;
+const failures = [];
+function test(name, fn) {
+  try { fn(); pass++; console.log('ok - ' + name); }
+  catch (e) { failures.push(name); console.log('FAIL - ' + name + ': ' + e.message); }
+}
+
+const COMP = 'features/mascot/fiezel-character.js';
+const CSS = 'features/mascot/fiezel-character.css';
+const TABLE = 'features/mascot/fiezel-character-art.js';
+
+/** Memuat tabel seni hasil generate di luar DOM. */
+function loadArt() {
+  const sandbox = { self: {} };
+  require('vm').runInNewContext(read(TABLE), sandbox, { filename: TABLE });
+  const A = sandbox.self.FiezelCharacterArt;
+  if (!A) throw new Error(TABLE + ' tidak memasang self.FiezelCharacterArt');
+  return A;
+}
+
+/** 19 state dari komponen — sumbernya komponen, bukan daftar kedua di gerbang ini. */
+function statesFromComponent() {
+  const src = read(COMP);
+  const m = /var STATES = \[([\s\S]*?)\];/.exec(src);
+  if (!m) throw new Error('daftar STATES tidak ditemukan di ' + COMP);
+  return [...m[1].matchAll(/'([\w-]+)'/g)].map((x) => x[1]);
+}
+
+/* ---------- 1. satu sumber bentuk: hasil generate wajib segar ---------- */
+
+test('peta state->seni adalah hasil generate yang segar dari manifest', () => {
+  const r = spawnSync(process.execPath,
+    [path.join(__fzRoot, 'tools/gen-character-art-table.mjs'), '--check'],
+    { cwd: __fzRoot, encoding: 'utf8' });
+  if (r.status !== 0) {
+    throw new Error(((r.stdout || '') + (r.stderr || '')).trim()
+      + '\n      Perbaikannya SELALU sama: jalankan `node tools/gen-character-art-table.mjs`, '
+      + 'jangan menyunting tabelnya dengan tangan.');
+  }
+});
+
+test('warna moncong masih segar terhadap SEMUA masukannya (tanpa mendekode gambar)', () => {
+  /* KENAPA SIDIK JARI, BUKAN MENJALANKAN ULANG PENYAMPELNYA.
+     Versi pertama gerbang ini menjalankan `python3 tools/sample-muzzle.py --check`,
+     yang memerlukan Pillow. CI tidak punya Pillow, jadi gerbangnya MERAH dengan
+     ModuleNotFoundError — gagal karena lingkungan, bukan karena ada cacat.
+     Memasang Pillow di CI ditolak: jaminannya lalu bergantung pada satu paket
+     tetap terpasang, dan kalau ia hilang, pemeriksaan berhenti menjaga tanpa suara.
+
+     VERSI KEDUA MENGOREKSI ITU TAPI MENGKLAIM TERLALU BANYAK, dan review gitar-bot
+     menangkapnya: ia hanya memeriksa sha256 PNG, sambil menulis "mustahil basi
+     tanpa ketahuan". Tiga sumber kebasian lolos diam-diam — kotak mulut yang
+     bergeser di face-rig.json (hex berubah, PNG tidak), parameter penyampel yang
+     diubah, dan pose baru yang tidak pernah disampel (sekadar absen, dan satu-
+     satunya lantai adalah ambang tulisan tangan). Itu pola yang sama dengan dua
+     cacat sebelumnya di PR ini: komentar menjanjikan lebih dari yang diperiksa kode.
+
+     Versi ini memeriksa SELURUH masukan yang menentukan hasil: bita PNG, sha256
+     face-rig.json, parameter penyampel, dan KELENGKAPAN — yang terakhir diturunkan
+     dari manifest + face-rig, bukan dari ambang tulisan tangan. */
+  const doc = JSON.parse(read('assets/characters/muzzle.json'));
+  const warna = doc.warna || {};
+  const dilewati = doc.dilewati || {};
+  const masukan = doc.masukan || {};
+  const masalah = [];
+
+  // --- 1. sidik jari face-rig: kotak mulut bergeser tanpa resampling ---
+  if (!masukan.faceRigSha256) {
+    masalah.push('muzzle.json tanpa sidik jari face-rig — regenerasi: python3 tools/sample-muzzle.py');
+  } else {
+    const nyata = require('crypto').createHash('sha256')
+      .update(fs.readFileSync(path.join(__fzRoot, 'assets/characters/face-rig.json'))).digest('hex');
+    if (nyata !== masukan.faceRigSha256) {
+      masalah.push('face-rig.json berubah sejak warna moncong diukur — kotak mulutnya bergeser, '
+        + 'warnanya belum diukur ulang. Jalankan: python3 tools/sample-muzzle.py');
+    }
+  }
+
+  // --- 2. parameter penyampel: dibaca dari sumbernya, bukan disalin ke sini ---
+  const py = read('tools/sample-muzzle.py');
+  const angka = (nama) => {
+    const m = new RegExp('^' + nama + '\\s*=\\s*(\\d+)', 'm').exec(py);
+    if (!m) throw new Error('konstanta ' + nama + ' tidak ditemukan di tools/sample-muzzle.py');
+    return Number(m[1]);
+  };
+  for (const [konst, kunci] of [['GRID', 'grid'], ['LUMA_MIN', 'lumaMin'], ['MIN_SAMPEL', 'minSampel']]) {
+    const sekarang = angka(konst);
+    if (masukan[kunci] !== sekarang) {
+      masalah.push(konst + ' penyampel kini ' + sekarang + ' tetapi warna diukur dengan '
+        + masukan[kunci] + ' — hasilnya tidak lagi lahir dari parameter yang berlaku');
+    }
+  }
+
+  // --- 3. KELENGKAPAN diturunkan dari berkas, bukan dari ambang tulisan tangan ---
+  const rig = JSON.parse(read('assets/characters/face-rig.json'));
+  const man = JSON.parse(read('assets/characters/manifest.json'));
+  const seharusnya = [];
+  for (const char of Object.keys(rig)) {
+    for (const pose of Object.keys(rig[char])) {
+      if ((man.characters[char] || {})[pose]) seharusnya.push(char + '/' + pose);
+    }
+  }
+  const luput = seharusnya.filter((k) => !(k in warna) && !(k in dilewati));
+  if (luput.length) {
+    masalah.push(luput.join(', ') + ' — punya kotak mulut DAN aset, tetapi tidak pernah disampel '
+      + 'dan tidak tercatat sebagai dilewati. Jalankan: python3 tools/sample-muzzle.py');
+  }
+
+  // --- 4. bita PNG tiap entri, TERMASUK yang dilewati ---
+  /* Entri `dilewati` ikut diperiksa, dan itu bukan kelengkapan kosmetik: pose yang
+     dilewati dicatat karena piksel terangnya kurang PADA SENI SAAT ITU. Kalau
+     seninya digambar ulang lebih terang, alasan melewatinya gugur — tetapi tanpa
+     sidik jari, muzzle.json terus melaporkannya sebagai dilewati dan gerbang ini
+     tetap hijau. Itu persis kelas cacat yang sama dengan tiga sebelumnya di PR
+     ini: janji "SELURUH masukan" yang menyisakan satu sudut tak diperiksa. */
+  const periksaBita = (label, peta, wajibHex) => {
+    for (const [kunci, v] of Object.entries(peta)) {
+      if (!v.png || !v.pngSha256) { masalah.push(label + ' ' + kunci + ': tanpa sidik jari PNG'); continue; }
+      if (!exists(v.png)) { masalah.push(label + ' ' + kunci + ': ' + v.png + ' tidak ada'); continue; }
+      const nyata = require('crypto').createHash('sha256')
+        .update(fs.readFileSync(path.join(__fzRoot, v.png))).digest('hex');
+      if (nyata !== v.pngSha256) {
+        masalah.push(label + ' ' + kunci + ': ' + v.png + ' berubah sejak diukur'
+          + ' — jalankan: python3 tools/sample-muzzle.py');
+      }
+      if (wajibHex && !/^#[0-9A-F]{6}$/.test(v.hex || '')) {
+        masalah.push(label + ' ' + kunci + ': hex tidak sah (' + v.hex + ')');
+      }
+    }
+  };
+  periksaBita('warna', warna, true);
+  periksaBita('dilewati', dilewati, false);
+
+  if (masalah.length) throw new Error('\n      ' + masalah.join('\n      '));
+});
+
+test('tabel seni tidak menyebut satu pun warna yang ditulis tangan', () => {
+  /* Setiap hex di tabel WAJIB berasal dari muzzle.json. Kalau ada yang lain, ia
+     lahir dari tangan seseorang dan akan menyimpang dari seninya diam-diam. */
+  const diukur = new Set(Object.values(JSON.parse(read('assets/characters/muzzle.json')).warna)
+    .map((v) => v.hex.toUpperCase()));
+  const dipakai = [...read(TABLE).matchAll(/#([0-9a-fA-F]{6})\b/g)].map((m) => ('#' + m[1]).toUpperCase());
+  const liar = [...new Set(dipakai)].filter((h) => !diukur.has(h));
+  if (liar.length) throw new Error(liar.join(', ') + ' — tidak ada di assets/characters/muzzle.json');
+});
+
+/* ---------- 2. kelengkapan: 19 state, nol lubang ---------- */
+
+test('setiap state komponen punya seni — tidak ada state yang tampil kosong', () => {
+  const A = loadArt();
+  const states = statesFromComponent();
+  if (states.length < 19) throw new Error('hanya ' + states.length + ' state terbaca — pemindainya patah');
+  const lubang = states.filter((s) => !A.forState(s));
+  if (lubang.length) throw new Error(lubang.join(', ') + ' — state tanpa seni');
+  const lebih = A.states.filter((s) => states.indexOf(s) < 0);
+  if (lebih.length) throw new Error(lebih.join(', ') + ' — seni untuk state yang tidak ada di komponen');
+});
+
+test('state yang hidup lama punya frame kedip — karakter tidak membeku', () => {
+  const A = loadArt();
+  /* idle/listening/speaking/greeting bisa bertahan puluhan detik di layar. Tanpa
+     kedip, karakternya terbaca sebagai stiker yang ditempel, bukan makhluk. */
+  const wajib = ['idle', 'listening', 'speaking', 'greeting'];
+  const tanpa = wajib.filter((s) => !(A.forState(s) || {}).blink);
+  if (tanpa.length) throw new Error(tanpa.join(', ') + ' — state hidup-lama tanpa frame kedip');
+});
+
+test('setiap berkas seni yang ditunjuk peta benar-benar ada di disk', () => {
+  const A = loadArt();
+  const hilang = [];
+  for (const s of A.states) {
+    const a = A.forState(s);
+    if (!exists(a.src)) hilang.push(s + ' -> ' + a.src);
+    if (a.blink && !exists(a.blink)) hilang.push(s + ' (kedip) -> ' + a.blink);
+  }
+  if (hilang.length) throw new Error('\n      ' + hilang.join('\n      '));
+});
+
+test('seni yang dipakai ikut di-precache — murid luring tidak melihat lubang', () => {
+  const A = loadArt();
+  const sw = read('sw.js');
+  const luput = [];
+  for (const s of A.states) {
+    const a = A.forState(s);
+    if (sw.indexOf("'./" + a.src + "'") < 0) luput.push(s + ' -> ' + a.src);
+    if (a.blink && sw.indexOf("'./" + a.blink + "'") < 0) luput.push(s + ' (kedip) -> ' + a.blink);
+  }
+  if (luput.length) {
+    throw new Error('\n      ' + luput.join('\n      ')
+      + '\n      — tidak ada di ASSETS sw.js. Rig SVG lama tidak bisa 404; gambar bisa.');
+  }
+});
+
+/* ---------- 3. shell dan pemuatan ---------- */
+
+test('komponen dan tabelnya dimuat index.html dengan urutan yang benar', () => {
+  const html = read('index.html');
+  const iTable = html.indexOf('features/mascot/fiezel-character-art.js');
+  const iComp = html.indexOf('features/mascot/fiezel-character.js');
+  const iCss = html.indexOf('features/mascot/fiezel-character.css');
+  if (iTable === -1) throw new Error('fiezel-character-art.js tidak dimuat index.html');
+  if (iComp === -1) throw new Error('fiezel-character.js tidak dimuat index.html');
+  if (iCss === -1) throw new Error('fiezel-character.css tidak ditautkan index.html');
+  if (iTable > iComp) {
+    throw new Error('tabel seni dimuat SESUDAH komponen — komponen membacanya saat define, '
+      + 'jadi urutan ini membuat setiap state jatuh ke seni kosong');
+  }
+});
+
+test('rig PAW benar-benar pergi — tidak ada rujukan tersisa di shell', () => {
+  const sisa = [];
+  for (const f of ['index.html', 'sw.js']) {
+    const src = read(f);
+    for (const mati of ['fiezel-mascot.js', 'fiezel-motion.css', 'fiezel-paw-outfit.js']) {
+      if (src.indexOf('/' + mati) >= 0) sisa.push(f + ' -> ' + mati);
+    }
+  }
+  if (sisa.length) throw new Error(sisa.join(', ') + ' — berkas ini sudah dihapus; rujukannya akan 404');
+});
+
+/* ---------- 4. gerak: kecil, tertahan, dan bisa dimatikan ---------- */
+
+test('kurangi-gerak benar-benar mematikan animasi, transisi, dan kedip', () => {
+  const css = read(CSS);
+  const at = css.indexOf('@media (prefers-reduced-motion: reduce)');
+  if (at < 0) throw new Error('blok prefers-reduced-motion tidak ada di ' + CSS);
+
+  /* Irisan blok dihitung dengan MENGHITUNG KURUNG, bukan dengan mencari '}'
+     pertama: blok ini berisi aturan bersarang, dan irisan yang salah membuat
+     seluruh pemeriksaan di bawah memeriksa teks yang salah. */
+  let depth = 0, end = -1;
+  for (let i = css.indexOf('{', at); i < css.length; i++) {
+    if (css[i] === '{') depth++;
+    else if (css[i] === '}') { depth--; if (depth === 0) { end = i; break; } }
+  }
+  if (end < 0) throw new Error('blok kurangi-gerak tidak tertutup di ' + CSS);
+  const blok = css.slice(css.indexOf('{', at) + 1, end);
+
+  /* Aturan dipecah per-selektor. VERSI PERTAMA GERBANG INI HANYA MENCARI
+     "animation: none !important" DI MANA PUN DI DALAM BLOK, dan itu lubang yang
+     benar-benar menganga: sebuah suntingan salah menaruh aturan .fz-viseme-cover
+     (position:absolute; filter:blur) ke dalam blok ini dan menjadikan .fz-art
+     sebagai salah satu selektornya. Akibatnya untuk murid yang meminta kurangi-
+     gerak: karakternya BURAM dan runtuh posisinya, DAN animasinya tetap jalan —
+     kebalikan persis dari tujuan blok ini. Gerbang lama tetap hijau, karena
+     aturan .fz-viseme-shape yang selamat sudah cukup memuaskan pencarian string.
+     Ditemukan review gitar-bot di PR #401, bukan olehku.
+     Karena itu sekarang yang diperiksa adalah SELEKTORNYA, satu per satu. */
+  const aturan = [];
+  for (const m of blok.matchAll(/([^{}]+)\{([^{}]*)\}/g)) {
+    aturan.push({
+      selektor: m[1].replace(/\/\*[\s\S]*?\*\//g, ' ').split(',').map((x) => x.trim()).filter(Boolean),
+      isi: m[2],
+    });
+  }
+  if (!aturan.length) throw new Error('tidak ada aturan terbaca di blok kurangi-gerak');
+
+  const punya = (sel, prop) => aturan.some((r) =>
+    r.selektor.some((x) => x === sel) && new RegExp(prop + ':\\s*none\\s*!important').test(r.isi));
+
+  for (const sel of ['fiezel-mascot .fz-art', 'fiezel-mascot .fz-viseme-shape']) {
+    if (!punya(sel, 'animation')) {
+      throw new Error('"' + sel + '" TIDAK mendapat animation:none !important di blok kurangi-gerak'
+        + ' — animasinya tetap jalan untuk murid yang memintanya berhenti');
+    }
+  }
+  if (!punya('fiezel-mascot', 'transform')) {
+    throw new Error('"fiezel-mascot" tidak mendapat transform:none !important — geser lookAt tetap hidup');
+  }
+
+  /* Blok kurangi-gerak hanya boleh MEMATIKAN, tidak pernah MENGGAMBAR ULANG.
+     Properti tata letak atau visual di sini berarti ada aturan yang tersasar
+     masuk — persis cacat di atas. */
+  const terlarang = /(^|[\s;])(position|inset|top|left|right|bottom|filter|background|border-radius|width|height)\s*:/;
+  for (const r of aturan) {
+    if (terlarang.test(r.isi)) {
+      throw new Error('aturan "' + r.selektor.join(', ') + '" membawa properti tata letak/visual ke dalam '
+        + 'blok kurangi-gerak: ' + r.isi.trim().slice(0, 80)
+        + ' — blok ini hanya boleh mematikan gerak, bukan menggambar ulang karakter');
+    }
+  }
+
+  const comp = read(COMP);
+  if (!/_blink[\s\S]{0,400}?reducedMotion\(\)/.test(comp) && !/reducedMotion\(\)[\s\S]{0,200}?return/.test(comp)) {
+    throw new Error('kedip tidak menghormati kurangi-gerak di ' + COMP
+      + ' — CSS saja tidak cukup, kedip ditukar dari JavaScript');
+  }
+});
+
+test('gerak karakter tertahan: amplitudo kecil, durasi tidak kilat', () => {
+  const css = read(CSS);
+  /* Warisan maksud keyframe-rotation-gate: yang dijaga bukan "tanpa rotasi"
+     (seni gambar tidak punya pivot yang bisa rusak) melainkan bahwa geraknya
+     tidak pernah menjadi guncangan. Angka di bawah sengaja longgar — yang
+     ditangkap adalah kesalahan besar, bukan selera. */
+  for (const m of css.matchAll(/rotate\((-?[\d.]+)deg\)/g)) {
+    if (Math.abs(Number(m[1])) > 8) throw new Error('rotasi ' + m[1] + 'deg terlalu besar untuk karakter');
+  }
+  for (const m of css.matchAll(/scale\(([\d.]+)\)/g)) {
+    const v = Number(m[1]);
+    if (v > 1.2 || v < 0.85) throw new Error('skala ' + v + ' terlalu ekstrem untuk karakter');
+  }
+  for (const m of css.matchAll(/animation:\s*fzChar\w+\s+([\d.]+)s/g)) {
+    if (Number(m[1]) < 0.2) throw new Error('durasi animasi ' + m[1] + 's terlalu kilat — terbaca sebagai kedutan');
+  }
+});
+
+test('karakter tetap hiasan: aria-hidden dan alt kosong', () => {
+  const comp = read(COMP);
+  if (!/setAttribute\('aria-hidden', 'true'\)/.test(comp)) {
+    throw new Error('elemen tidak menyetel aria-hidden — karakter hiasan tidak boleh dibaca pembaca layar');
+  }
+  if (!/_img\.alt = ''/.test(comp)) throw new Error('gambar karakter tidak ber-alt kosong');
+});
+
+console.log('\nFIEZEL gerbang seni karakter: ' + (failures.length ? 'FAIL (' + failures.length + ')' : 'PASS ' + pass));
+process.exit(failures.length ? 1 : 0);

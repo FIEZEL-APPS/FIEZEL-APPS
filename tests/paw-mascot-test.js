@@ -31,7 +31,14 @@ const ICONS = read('features/ui/fiezel-icons.js');
 const BUBBLE = read('features/ui/fiezel-coach-bubble.js');
 const CSS = read('style.css');
 const ASSET = read('assets/brand/fiezel-paw.svg');
-const RIG = read('features/mascot/fiezel-mascot.js');
+/* m025-303: dua tes yang memeriksa EMBLEM DADA di rig SVG PAW diangkat dari sini
+   bersama rig-nya. Subjeknya benar-benar tidak ada lagi: karakter aplikasi kini
+   Nusa & Mira (seni gambar), dan lambang telapak yang dulu digambar di dada rig
+   kini melekat di seni mereka sendiri — bandana Nusa dan pin Mira.
+   Yang TIDAK ikut diangkat, dan itu intinya: seluruh jaminan tentang LAMBANG
+   TELAPAK sebagai marka merek (satu sumber bentuk, ICONS.paw identik dengan
+   berkas kanon, tanpa emoji, warna tidak dipaku, kelahiran dari partikel di
+   splash) tetap di berkas ini dan tetap menjaga. */
 
 /**
  * Potongan definisi ikon paw saja.
@@ -90,49 +97,8 @@ test('hanya ada SATU sumber bentuk PAW, dan keduanya identik', () => {
   if (inline.pad !== asset.pad) throw new Error('bantalan menyimpang antara ikon dan berkas aset');
 });
 
-/**
- * Potongan grup emblem dada di dalam rig maskot penuh (fiezel-mascot.js).
- *
- * Rig punya rect lain yang lolos regex balok (kaki 48x22, headphone) — jadi yang
- * diiris HANYA grup fz-pawprint, dari pembukanya sampai penutup grup pertama.
- */
-function rigEmblemBlock() {
-  const start = RIG.indexOf('id="fz-pawprint');
-  if (start === -1) throw new Error('grup fz-pawprint tidak ada di rig maskot');
-  const end = RIG.indexOf('</g>', start);
-  return RIG.slice(start, end);
-}
 
-test('emblem dada maskot = glyph fiezel-paw.svg, koordinat APA ADANYA', () => {
-  // Keputusan OWNER (proof sheet v2): glyph paw hanya di dada, dan wujudnya
-  // instansi PERSIS dari aset kanonik — bukan gambar ulang yang mirip.
-  const emblem = shapeOf(rigEmblemBlock());
-  const asset = shapeOf(ASSET);
-  if (emblem.bars.length !== 4) {
-    throw new Error('emblem dada punya ' + emblem.bars.length + ' balok, glyph kanonik punya empat');
-  }
-  for (let i = 0; i < 4; i++) {
-    if (emblem.bars[i] !== asset.bars[i]) {
-      throw new Error('balok ' + (i + 1) + ' emblem dada menyimpang dari aset:\n      rig   '
-        + emblem.bars[i] + '\n      aset  ' + asset.bars[i]);
-    }
-  }
-  if (emblem.pad !== asset.pad) throw new Error('bantalan emblem dada menyimpang dari aset');
-});
 
-test('glyph paw di rig hanya SATU: di dada — tangan polos', () => {
-  // Aturan chest-only. Dua instansi glyph di badan berarti seseorang mengembalikan
-  // bantalan tangan (fz-pads) yang sudah dipensiunkan OWNER.
-  const n = (RIG.match(/M12\.6 14/g) || []).length;
-  if (n !== 1) throw new Error('jalur bantalan glyph muncul ' + n + ' kali di rig, harusnya tepat satu (dada)');
-  if (/class="[^"]*fz-pads/.test(RIG)) {
-    throw new Error('kelas fz-pads masih ada di rig; bantalan tangan sudah pensiun');
-  }
-  // Aproksimasi emblem lama (elips rx=10 ry=8) tidak boleh kembali menggantikan glyph asli.
-  if (/rx="10" ry="8"/.test(RIG)) {
-    throw new Error('aproksimasi emblem lama (rx="10" ry="8") masih ada di rig');
-  }
-});
 
 test('tidak ada emoji sebagai bentuk PAW', () => {
   // Larangan brief A.5. Emoji hanya boleh jadi placeholder eksplorasi.
@@ -445,178 +411,22 @@ test('popup yang tersisa di kuis tetap punya jalan keluar', () => {
  * setiap perubahan fiezel-mascot.js / fiezel-motion.css.
  */
 
-test('kanal rotasi/skala tuple memakai gaya CSS ber-origin (styleAt), bukan atribut berpivot bake', () => {
-  if (!/el\.style\.transformBox = "view-box"/.test(RIG)
-    || !/el\.style\.transformOrigin = `\$\{p\[0\]\}px \$\{p\[1\]\}px`/.test(RIG)) {
-    throw new Error('helper styleAt (transform-box:view-box + transform-origin=pivot) hilang dari rig');
-  }
-  // Kanal rotasi (lengan/telinga/ekor) tidak boleh kembali ke setT+rotAt — itu
-  // persis pola yang berpivot ganda di bawah origin CSS fiezel-motion.css.
-  if (/setT\("\.fz-(arm|ear|tail)[^"]*",\s*rotAt/.test(RIG)) {
-    throw new Error('kanal rotasi tuple kembali ditulis sebagai atribut berpivot bake (setT+rotAt)');
-  }
-  // Kanal skala (dada/blush/mata/kaki/bayangan/fz-all) juga tidak boleh kembali
-  // ke atribut scaleAt — fill-box global :123 membuatnya berpivot ganda juga.
-  if (/setAttribute\("transform",\s*scaleAt/.test(RIG) || /setT\("[^"]*",\s*scaleAt/.test(RIG)) {
-    throw new Error('kanal skala tuple kembali ditulis sebagai atribut scaleAt berpivot bake');
-  }
-});
+/* m025-303: BAGIAN RIG DAN OUTFIT DIANGKAT DARI BERKAS INI.
+   ----------------------------------------------------------
+   Yang diangkat: tes kanal transform tuple rig, reset gaya inline rig, probe bbox
+   QA, dan seluruh lapisan outfit G5'. Semuanya menguji features/mascot/fiezel-mascot.js
+   dan features/mascot/fiezel-paw-outfit.js, dua berkas yang sudah tidak ada:
+   karakter aplikasi kini Nusa & Mira, seni gambar, bukan rig SVG berpivot.
+   Lapisan outfit ikut hilang karena ia bekerja dengan menyuntik item ke jangkar
+   fz-outfit-* DI DALAM rig; gambar utuh tidak punya jangkar. Peran "outfit merek"
+   sudah dibawa seni Nusa & Mira sendiri (bandana telapak dan pin telapak).
 
-test('reset rig membersihkan gaya transform inline yang dipasang styleAt', () => {
-  // Tanpa pembersihan ini, origin/transform inline pose lama menempel ke state
-  // berikutnya — bentuk kebocoran yang tidak terlihat di frame pertama.
-  const n = (RIG.match(/el\.style\.transform = ""; el\.style\.transformOrigin = ""; el\.style\.transformBox = "";/g) || []).length;
-  if (n < 2) {
-    throw new Error('pembersihan gaya transform inline hanya ' + n + ' situs; _rigReset dan _costumeReset dua-duanya wajib membersihkan');
-  }
-});
-
-test('probe render bbox tersedia untuk QA', () => {
-  if (!fs.existsSync(path.join(__fzRoot, 'features/mascot/qa/bbox-probe.mjs'))) {
-    throw new Error('features/mascot/qa/bbox-probe.mjs hilang — satu-satunya verifikasi RENDER anatomi rig');
-  }
-});
-
-/* ============================================================
-   LAPISAN OUTFIT (G5') — dijalankan sungguhan, bukan diregex.
-   Berkasnya adalah IIFE yang menempel ke `window`, jadi cukup diberi
-   dokumen palsu: resolver `outfitFor` lalu bisa dipanggil langsung dan
-   yang diuji adalah PERILAKUNYA, bukan penampakan sumbernya.
-
-   Kenapa perlu gerbang: keputusan OWNER 2026-08-31 ("mascot pakai topi
-   tidur hilangkan sepenuhnya dari aplikasi tanpa terkecuali", dan tiap
-   sesi memakai item tertentu) tidak dijaga apa pun sebelum ini. OF-08
-   sendiri dulu terpasang lewat DUA cabang - state 'sleepy' dan idle di
-   jam malam - jadi mencabut satu baris saja tidak cukup, dan tidak ada
-   yang akan memberi tahu kalau salah satunya kembali.
-   ============================================================ */
-function loadOutfitLayer() {
-  const doc = {
-    readyState: 'complete', body: {}, documentElement: {},
-    querySelectorAll: () => [], addEventListener: () => {}
-  };
-  const win = { document: doc };
-  const before = global.window;
-  global.window = win;
-  try {
-    delete require.cache[require.resolve('../features/mascot/fiezel-paw-outfit.js')];
-    require('../features/mascot/fiezel-paw-outfit.js');
-  } finally {
-    if (before === undefined) delete global.window; else global.window = before;
-  }
-  if (!win.FiezelPawOutfit) throw new Error('lapisan outfit tidak menempel ke window');
-  return win.FiezelPawOutfit;
-}
-
-const OUTFIT = loadOutfitLayer();
-/* Semua layar nyata app.js (VALID_VIEWS) + semua state komponen yang bisa
-   dilihat resolver. Sapuan penuh, bukan contoh yang dipilih-pilih. */
-const VIEWS = ['home', 'vocab', 'grammar', 'reading', 'skills', 'listening', 'speaking',
-  'writing', 'test', 'progress', 'classroom', 'library', 'ask', 'search', 'online', ''];
-const STATES = ['idle', 'sleepy', 'listening', 'lesson-start', 'welcome-back', 'level-up',
-  'milestone', 'celebrating', 'completion', 'curious', 'proud', 'sad'];
-
-test('topi tidur OF-08 tidak punya SATU pun jalan tersisa di aplikasi', () => {
-  // Sapuan penuh layar x state x 24 jam. Cabang jam-malam itulah yang dulu
-  // membuat OWNER melihat topi tidur di hampir tiap layar (ia belajar 01.50-02.17),
-  // jadi jamnya ikut disapu - bukan hanya siang hari yang kebetulan lolos.
-  if (OUTFIT.registry['OF-08']) throw new Error('OF-08 masih ada barisnya di registry');
-  const bocor = [];
-  for (const v of VIEWS) for (const st of STATES) for (let jam = 0; jam < 24; jam++) {
-    const id = OUTFIT.outfitFor(st, v, jam);
-    for (const one of (Array.isArray(id) ? id : [id])) {
-      if (one === 'OF-08') bocor.push(st + '/' + (v || '(kosong)') + '/' + jam);
-    }
-  }
-  if (bocor.length) throw new Error('topi tidur masih muncul di ' + bocor.length + ' kombinasi, mis. ' + bocor[0]);
-});
-
-test('resolver tidak pernah memulangkan item yang tidak ada barisnya', () => {
-  // Registry TERTUTUP (19 §1.2): id yang tidak terdaftar berarti PAW telanjang
-  // secara diam-diam, bukan error - persis kelas bug yang bikin maskot "hilang".
-  for (const v of VIEWS) for (const st of STATES) for (const jam of [3, 9, 15, 22]) {
-    const id = OUTFIT.outfitFor(st, v, jam);
-    if (id === null) continue;
-    for (const one of (Array.isArray(id) ? id : [id])) {
-      if (!OUTFIT.registry[one]) throw new Error('outfitFor(' + st + ',' + v + ',' + jam + ') -> ' + one + ' yang tidak ada di registry');
-    }
-  }
-});
-
-test('tiap sesi memakai outfit yang diminta OWNER, dan tidak berubah menurut jam', () => {
-  // Kalimat OWNER 2026-08-31, harfiah: test = ransel + bunga, grammar = pensil,
-  // reading = syal, writing = topi. "Tidak berubah menurut jam" bagian penting:
-  // sebelum ini pakaian bisa berganti sendiri di malam hari.
-  const minta = { test: ['OF-01', 'OF-03'], grammar: 'OF-07', reading: 'OF-04', writing: 'OF-02' };
-  for (const [layar, harap] of Object.entries(minta)) {
-    for (const jam of [0, 6, 13, 21, 23]) {
-      const dapat = OUTFIT.outfitFor('idle', layar, jam);
-      const a = JSON.stringify(Array.isArray(harap) ? harap : [harap]);
-      const b = JSON.stringify(Array.isArray(dapat) ? dapat : [dapat]);
-      if (a !== b) throw new Error('layar ' + layar + ' jam ' + jam + ': harap ' + a + ' dapat ' + b);
-    }
-  }
-});
-
-test('kombo sesi Tes tidak menabrakkan dua item di slot yang sama', () => {
-  // 19 SS6.2: hard max dua, dan tidak pernah dua penghuni slot yang sama -
-  // kalau tabrakan, item kedua menimpa item pertama dan salah satunya lenyap.
-  const dipakai = {};
-  for (const id of OUTFIT.outfitFor('idle', 'test', 12)) {
-    const slot = OUTFIT.registry[id].slot;
-    for (const nama of ['head', 'front', 'back']) {
-      if (!slot[nama]) continue;
-      if (dipakai[nama]) throw new Error('slot ' + nama + ' diperebutkan ' + dipakai[nama] + ' dan ' + id);
-      dipakai[nama] = id;
-    }
-  }
-});
-
-test('state listening tidak pernah dapat outfit — headset penghuni slot kepala', () => {
-  // OWNER: "LISTENING SUDAH BENAR PAKAI HEADSET, JANGAN DIUBAH LAGI".
-  //
-  // Aturan 19 SS6.2 yang sebenarnya: tidak boleh dua penghuni slot KEPALA, dan
-  // headphone (fz-acc) ikut dihitung penghuni kepala. Headphone hanya hidup
-  // selama STATE 'listening' - bukan selama layar Listening terbuka - jadi
-  // gerbangnya pun terikat state, di SEMUA layar, bukan hanya dua layar itu.
-  // (Menuntut layar Listening telanjang total justru salah sasaran: ransel
-  // duduk di slot back+front dan tidak pernah bisa menimpa headset.)
-  const bocor = [];
-  for (const v of VIEWS) for (const jam of [2, 14, 22]) {
-    const id = OUTFIT.outfitFor('listening', v, jam);
-    if (id !== null) bocor.push(v + '/' + jam + ' -> ' + JSON.stringify(id));
-  }
-  if (bocor.length) throw new Error('slot kepala direbut dari headset: ' + bocor[0] + ' (total ' + bocor.length + ')');
-});
-
-test('peta layar sendiri tidak pernah menaruh item kepala di listening/speaking', () => {
-  // Cabang terpisah dari yang di atas: kalau suatu saat seseorang menambahkan
-  // baris listening/speaking ke peta LAYAR, tes di atas masih bisa lolos lewat
-  // state tertentu. Ini menagih petanya langsung.
-  const src = read('features/mascot/fiezel-paw-outfit.js');
-  const peta = /var LAYAR = \{([\s\S]*?)\n  \};/.exec(src);
-  if (!peta) throw new Error('peta LAYAR tidak ditemukan — struktur resolver berubah, gerbang ini buta');
-  if (/\b(listening|speaking)\s*:/.test(peta[1])) {
-    throw new Error('listening/speaking masuk peta LAYAR; OWNER menyuruh layar itu tidak diubah lagi');
-  }
-});
-
-test('maks dua item, dan hanya sesi Tes yang memakai dua', () => {
-  for (const v of VIEWS) for (const st of STATES) for (const jam of [4, 11, 20]) {
-    const id = OUTFIT.outfitFor(st, v, jam);
-    const n = Array.isArray(id) ? id.length : (id ? 1 : 0);
-    if (n > 2) throw new Error('layar ' + v + ' state ' + st + ' memakai ' + n + ' item (cap 19 SS6.2 = 2)');
-    if (n === 2 && v !== 'test') throw new Error('kombo dua item bocor ke layar ' + v);
-  }
-});
-
-test('milestone tetap mengalahkan peta layar — toga tidak boleh tertutup pakaian sesi', () => {
-  // Anti-inflasi 13: toga hanya muncul di milestone nyata. Kalau peta layar
-  // menang, toga tidak akan pernah terlihat lagi karena tiap sesi punya pakaian.
-  for (const v of VIEWS) for (const st of ['level-up', 'milestone']) {
-    if (OUTFIT.outfitFor(st, v, 12) !== 'OF-05') throw new Error('toga kalah oleh peta layar di ' + v + '/' + st);
-  }
-});
+   Yang TIDAK diangkat, dan itu sebabnya berkas ini tetap hidup: seluruh jaminan
+   tentang LAMBANG TELAPAK dan SPLASH — satu sumber bentuk, ICONS.paw identik
+   dengan berkas kanon, tanpa emoji, warna tidak dipaku, kelahiran dari partikel,
+   marka sebelum partikel padam, kelahiran logo topbar, dan gerak per-halaman.
+   Splash sengaja TIDAK disentuh dalam perpindahan karakter ini (permintaan OWNER:
+   biarkan sampai ada penggantinya), jadi gerbangnya pun tetap utuh. */
 
 console.log('');
 if (failures.length) {
