@@ -77,33 +77,76 @@ test('peta state->seni adalah hasil generate yang segar dari manifest', () => {
   }
 });
 
-test('warna moncong masih segar terhadap seninya (tanpa perlu mendekode gambar)', () => {
+test('warna moncong masih segar terhadap SEMUA masukannya (tanpa mendekode gambar)', () => {
   /* KENAPA SIDIK JARI, BUKAN MENJALANKAN ULANG PENYAMPELNYA.
      Versi pertama gerbang ini menjalankan `python3 tools/sample-muzzle.py --check`,
      yang memerlukan Pillow. CI tidak punya Pillow, jadi gerbangnya MERAH dengan
      ModuleNotFoundError — gagal karena lingkungan, bukan karena ada cacat.
+     Memasang Pillow di CI ditolak: jaminannya lalu bergantung pada satu paket
+     tetap terpasang, dan kalau ia hilang, pemeriksaan berhenti menjaga tanpa suara.
 
-     Jawaban yang menggoda adalah "pasang Pillow di CI". Itu ditolak: jaminannya
-     lalu bergantung pada satu paket tetap terpasang, dan kalau suatu hari ia
-     hilang, pemeriksaan ini berhenti menjaga TANPA SUARA. Gerbang yang diam saat
-     seharusnya berteriak adalah cacat yang sudah dua kali muncul di PR ini.
+     VERSI KEDUA MENGOREKSI ITU TAPI MENGKLAIM TERLALU BANYAK, dan review gitar-bot
+     menangkapnya: ia hanya memeriksa sha256 PNG, sambil menulis "mustahil basi
+     tanpa ketahuan". Tiga sumber kebasian lolos diam-diam — kotak mulut yang
+     bergeser di face-rig.json (hex berubah, PNG tidak), parameter penyampel yang
+     diubah, dan pose baru yang tidak pernah disampel (sekadar absen, dan satu-
+     satunya lantai adalah ambang tulisan tangan). Itu pola yang sama dengan dua
+     cacat sebelumnya di PR ini: komentar menjanjikan lebih dari yang diperiksa kode.
 
-     Jadi muzzle.json sekarang mencatat sha256 setiap PNG yang disampelnya, dan
-     kesegaran diperiksa dengan membandingkan sidik jari itu — mustahil basi tanpa
-     ketahuan, dan bisa dijalankan di mana pun tanpa pustaka gambar. Pillow kini
-     hanya dibutuhkan untuk MENG-GENERATE, bukan untuk MEMVERIFIKASI. */
+     Versi ini memeriksa SELURUH masukan yang menentukan hasil: bita PNG, sha256
+     face-rig.json, parameter penyampel, dan KELENGKAPAN — yang terakhir diturunkan
+     dari manifest + face-rig, bukan dari ambang tulisan tangan. */
   const doc = JSON.parse(read('assets/characters/muzzle.json'));
   const warna = doc.warna || {};
-  if (Object.keys(warna).length < 8) {
-    throw new Error('assets/characters/muzzle.json hanya punya ' + Object.keys(warna).length
-      + ' pose — terlalu sedikit, penyampelnya patah atau berkasnya basi');
-  }
+  const dilewati = doc.dilewati || {};
+  const masukan = doc.masukan || {};
   const masalah = [];
-  for (const [kunci, v] of Object.entries(warna)) {
-    if (!v.png || !v.pngSha256) {
-      masalah.push(kunci + ': tanpa sidik jari PNG — regenerasi dengan python3 tools/sample-muzzle.py');
-      continue;
+
+  // --- 1. sidik jari face-rig: kotak mulut bergeser tanpa resampling ---
+  if (!masukan.faceRigSha256) {
+    masalah.push('muzzle.json tanpa sidik jari face-rig — regenerasi: python3 tools/sample-muzzle.py');
+  } else {
+    const nyata = require('crypto').createHash('sha256')
+      .update(fs.readFileSync(path.join(__fzRoot, 'assets/characters/face-rig.json'))).digest('hex');
+    if (nyata !== masukan.faceRigSha256) {
+      masalah.push('face-rig.json berubah sejak warna moncong diukur — kotak mulutnya bergeser, '
+        + 'warnanya belum diukur ulang. Jalankan: python3 tools/sample-muzzle.py');
     }
+  }
+
+  // --- 2. parameter penyampel: dibaca dari sumbernya, bukan disalin ke sini ---
+  const py = read('tools/sample-muzzle.py');
+  const angka = (nama) => {
+    const m = new RegExp('^' + nama + '\\s*=\\s*(\\d+)', 'm').exec(py);
+    if (!m) throw new Error('konstanta ' + nama + ' tidak ditemukan di tools/sample-muzzle.py');
+    return Number(m[1]);
+  };
+  for (const [konst, kunci] of [['GRID', 'grid'], ['LUMA_MIN', 'lumaMin'], ['MIN_SAMPEL', 'minSampel']]) {
+    const sekarang = angka(konst);
+    if (masukan[kunci] !== sekarang) {
+      masalah.push(konst + ' penyampel kini ' + sekarang + ' tetapi warna diukur dengan '
+        + masukan[kunci] + ' — hasilnya tidak lagi lahir dari parameter yang berlaku');
+    }
+  }
+
+  // --- 3. KELENGKAPAN diturunkan dari berkas, bukan dari ambang tulisan tangan ---
+  const rig = JSON.parse(read('assets/characters/face-rig.json'));
+  const man = JSON.parse(read('assets/characters/manifest.json'));
+  const seharusnya = [];
+  for (const char of Object.keys(rig)) {
+    for (const pose of Object.keys(rig[char])) {
+      if ((man.characters[char] || {})[pose]) seharusnya.push(char + '/' + pose);
+    }
+  }
+  const luput = seharusnya.filter((k) => !(k in warna) && !(k in dilewati));
+  if (luput.length) {
+    masalah.push(luput.join(', ') + ' — punya kotak mulut DAN aset, tetapi tidak pernah disampel '
+      + 'dan tidak tercatat sebagai dilewati. Jalankan: python3 tools/sample-muzzle.py');
+  }
+
+  // --- 4. bita PNG tiap entri ---
+  for (const [kunci, v] of Object.entries(warna)) {
+    if (!v.png || !v.pngSha256) { masalah.push(kunci + ': tanpa sidik jari PNG'); continue; }
     if (!exists(v.png)) { masalah.push(kunci + ': ' + v.png + ' tidak ada'); continue; }
     const nyata = require('crypto').createHash('sha256')
       .update(fs.readFileSync(path.join(__fzRoot, v.png))).digest('hex');
@@ -113,6 +156,7 @@ test('warna moncong masih segar terhadap seninya (tanpa perlu mendekode gambar)'
     }
     if (!/^#[0-9A-F]{6}$/.test(v.hex || '')) masalah.push(kunci + ': hex tidak sah (' + v.hex + ')');
   }
+
   if (masalah.length) throw new Error('\n      ' + masalah.join('\n      '));
 });
 

@@ -1,6 +1,13 @@
 {
   "generator": "tools/sample-muzzle.py",
   "cara": "median piksel terang (luma>150) di dalam kotak mulut face-rig",
+  "masukan": {
+    "faceRig": "assets/characters/face-rig.json",
+    "faceRigSha256": "04aaa39191cff6d248606020ff25f2041a5ef7e7bbc3068965db1033eb7ed7ae",
+    "grid": 28,
+    "lumaMin": 150,
+    "minSampel": 40
+  },
   "warna": {
     "mira/full-explain": {
       "hex": "#F6AB8A",
@@ -68,5 +75,6 @@
       "png": "assets/characters/team/png/walking.png",
       "pngSha256": "eb2189caf06e055a0a0060436e93bf0e2d8a3814e056a8baa7e271cf60b0e506"
     }
-  }
+  },
+  "dilewati": {}
 }
