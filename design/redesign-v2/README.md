@@ -1,86 +1,111 @@
-# Redesign v2 — mock desain aplikasi FIEZEL
+# Redesain aplikasi FIEZEL — arah "Lembut"
 
-Mock desain untuk **aplikasi saja**. Landing page website sengaja tidak ada di sini:
-owner meminta redesain dibatasi ke aplikasi.
+Mock desain untuk **aplikasi saja**. Landing page website sengaja tidak ada di sini
+maupun di berkas mana pun: owner meminta redesain dibatasi ke aplikasi.
 
-Kanvas berisi dua hal:
+Owner memilih **arah B "Lembut"** dari empat arah yang diajukan. Seluruh layar
+aplikasi dibangun ulang dalam arah itu — 24 artboard.
 
-1. **Pilihan arah** — empat arah desain yang berbeda betul di kartu, huruf, warna, dan
-   cara maskot ditampilkan. Tiga layar per arah (Hari ini, Latihan, Soal).
-2. **Rancangan lengkap versi pertama** — 24 artboard, disimpan sebagai pembanding
-   sampai satu arah dipilih. Begitu owner memilih, seluruh layar dibangun ulang
-   dalam arah itu.
+## Watak arah ini
 
-## Empat arah
+Tidak ada garis tepi di mana pun. Kedalaman datang dari bayangan halus dan ruang
+kosong, bukan dari garis. Huruf membulat, pastel diredam, dan elemen per layar
+sengaja lebih sedikit daripada yang muat.
 
-| Arah | Kartu | Huruf | Watak |
-| --- | --- | --- | --- |
-| **A — Kartu Tebal** | garis 2,5px, bayangan padat tanpa blur | Fredoka + Nunito | paling ramai, ramah anak |
-| **B — Lembut** | tanpa garis tepi, bayangan halus, radius besar | Quicksand + Nunito | paling tenang, paling lapang |
-| **C — Editorial Rimba** | krem bergaris rambut emas, radius kecil | Lora (serif) + Work Sans | paling dewasa, condong ke SMA dan guru |
-| **D — Blok Warna** | tanpa kartu; pita warna penuh dari tepi ke tepi | Archivo | paling berani |
+| | |
+| --- | --- |
+| Huruf judul | Quicksand 700 |
+| Huruf badan | Nunito 400–700 |
+| Huruf Thai | Noto Sans Thai — Quicksand dan Nunito tidak punya glif Thai |
+| Latar | `#FBF7F3` · Kertas `#FFFFFF` |
+| Aksen | `#9B3A4A` (marun diredam) |
+| Kedalaman | `0 14px 32px rgba(46,39,36,.07)` — tidak ada `border` |
+| Radius | kartu 28 · ubin 26 · pil 999 |
 
-**Arah C punya konsekuensi.** `assets/brand/BRAND-GUIDE.md` menyatakan "Plus Jakarta Sans
-untuk semuanya… tidak ada huruf display kedua, tidak ada serif", dan
-`tests/paw-mascot-test.js` menjaganya. Memilih C berarti panduan merek dan gerbang itu
-ikut diperbarui — keputusan owner.
+Enam ranah latihan punya blok pastel diredam dengan tinta gelap masing-masing.
+Semua pasangan teks/latar lolos WCAG AA; gerbang di `build.mjs` menolak build
+kalau ada yang jatuh.
 
-## Aturan maskot
+## Isi
 
-Owner menemukan maskot yang "warnanya atau badannya bocor" di rancangan pertama. Memang
-benar: gambar dipasang dengan offset negatif di dalam wadah ber-`overflow: hidden`, jadi
-kaki dan ekornya terpotong tepi kartu; dan hiasan lingkaran padat yang ikut terpotong
-wadah terbaca sebagai bercak bersudut.
+| Halaman kanvas | Artboard |
+| --- | --- |
+| Menu utama | `Main` `MainThai` `Latihan` `KelasKu` `Progres` `Profil` `Pengaturan` |
+| Masuk & Perkenalan | `Login` `Daftar` `Splash` `Intro1` `Intro2` `Intro3` `ObNama` `ObTujuan` `ObTes` `ObSelesai` |
+| Sesi belajar | `Peta` `Soal` `Benar` `Salah` `Hasil` `TanyaMira` |
+| Sistem desain | `Sistem` |
 
-Aturan yang berlaku sekarang, dipakai keempat arah (`arah-kit.mjs`):
+`Main.dc.html` adalah artboard pintu masuk.
 
-1. Maskot berdiri di **panggung miliknya sendiri** — kotak yang ukurannya dihitung dari
-   rasio aspek gambar (`RASIO`), jadi tidak ada sisi yang terpotong.
+## Lima aturan maskot
+
+Lahir dari dua temuan owner, dan keduanya dijaga gerbang otomatis.
+
+**"Badannya bocor."** Gambar dipasang dengan offset negatif di dalam wadah
+ber-`overflow: hidden`, jadi kaki Mira dan ekor Nusa terpotong tepi kartu; hiasan
+lingkaran padat yang ikut terpotong wadah terbaca sebagai bercak bersudut.
+
+**"Mascot di Tanya Mira jelek sekali."** Pose `head-explain` dipakai sebagai avatar
+34px di tiap gelembung. Komposisinya lebar — topi lebar, tangan menunjuk, sanggul di
+luar kepala — jadi begitu diperkecil, wajahnya tinggal belasan piksel.
+
+Aturannya sekarang, di `b-kit.mjs`:
+
+1. Maskot berdiri di **panggung miliknya sendiri** — kotak seukuran rasio aspek
+   gambar (`RASIO`), jadi tidak ada sisi yang terpotong.
 2. **Tidak ada offset negatif.** Tidak pernah.
-3. Wadah yang memuat panggung tidak boleh lebih pendek dari panggungnya.
-4. Hiasan warna memakai `radial-gradient` yang meluruh ke transparan (`cahaya()`), bukan
-   bentuk padat yang dipotong wadah.
+3. Wadah tidak boleh lebih pendek dari panggungnya.
+4. Hiasan warna memakai `radial-gradient` yang meluruh (`cahaya()`), bukan bentuk padat.
+5. Maskot **tidak pernah dirender di bawah `MIN_MASKOT` = 72px** pada sisi panjangnya.
+   Untuk tempat yang lebih sempit dipakai `paw()` atau `inisial()` — bukan wajah yang
+   diperkecil. `maskot()` dan `potret()` melempar galat kalau dilanggar.
 
-`arah-preview.mjs` memeriksa **tiap gambar terhadap wadah pemotongnya** dan melaporkan sisi
-yang jatuh di luar. Angka sekarang: 12 layar, **0 bocor**.
+Tanya Mira sekarang menampilkan Mira **sekali** di kartu pembuka pada 118px, dan
+gelembung sesudahnya tidak memakai wajah sama sekali — posisi dan warna sudah cukup
+memberi tahu siapa yang bicara.
 
 ## Diikat ke kenyataan kode, bukan dikarang
 
 - **Navigasi bawah** memakai lima tab yang ada di `index.html`:
   Latihan · KelasKu · Hari ini · Progres · Profil.
 - **Auth** memakai jalur yang benar-benar ada: nama + kata sandi
-  (`features/auth/fiezel-account.js`), Masuk dengan Google (`features/auth/fiezel-google.js`),
-  Lanjutkan dengan Puter, dan lanjut tanpa akun.
+  (`features/auth/fiezel-account.js`), Masuk dengan Google
+  (`features/auth/fiezel-google.js`), Lanjutkan dengan Puter, dan lanjut tanpa akun.
 - **Ikon** diambil dari `lucide.min.js` yang sudah dipakai app (`icons.json`).
 - **Maskot** memakai aset asli `assets/characters/` (Nusa & Mira, 9 pose).
 - **Dua bahasa**: `Main` dan `MainThai` adalah satu tata letak dengan dua bank copy,
   cerminan pasangan `copy-id-*` / `copy-th-*`.
+
+### Satu penyimpangan yang disengaja dari sketsa yang dipilih
+
+Sketsa arah B memakai navigasi bawah **berikon saja**. Versi penuh ini menambahkan
+label di bawah ikon: lima tujuan dengan ikon yang tidak jelas sendirinya (KelasKu vs
+Progres) tidak boleh bergantung pada tebakan, apalagi di aplikasi dua bahasa.
+Kalau owner lebih suka versi tanpa label, hapus `label` di `nav()` di `b-kit.mjs`.
 
 ## Utang yang harus dibayar saat implementasi
 
 1. **Belum ada kunci i18n yang dibuat.** Semua teks di artboard masih literal. Waktu
    diimplementasi, setiap kalimat wajib mendarat sebagai pasangan
    `copy-id-<domain>` + `copy-th-<domain>` sesuai CLAUDE.md.
-2. **Huruf Thai.** Plus Jakarta Sans tidak punya glif Thai. Mock memasangkan
-   `Noto Sans Thai`; keputusan final perlu diambil sebelum implementasi, dan berbeda
-   per arah (Fredoka, Quicksand, Lora, dan Archivo juga tidak punya glif Thai).
-3. **Tombol Google** digambar sebagai penampung netral — aset resmi Google
-   menggantikannya di produksi.
+2. **Huruf Thai** perlu diputuskan resmi. Mock memasangkan `Noto Sans Thai`.
+3. **Tombol Google** digambar sebagai penampung netral — aset resmi menggantikannya.
 
 ## Cara membangun ulang
 
 ```bash
 cd design/redesign-v2
-node build.mjs         # 36 artboard + canvas.json, cek kontras WCAG
-node preview.mjs       # render rancangan versi pertama, laporkan luberan
-node arah-preview.mjs  # render empat arah + gerbang maskot-bocor
+node build.mjs    # 24 artboard + canvas.json, gerbang kontras
+node preview.mjs  # render di Chromium, gerbang luberan + maskot
 ```
 
-`build.mjs` gagal-keras kalau ada pasangan warna teks di bawah 4.5:1 — keluar dengan kode 1
-dan **tidak menulis satu artboard pun**, supaya token yang jatuh tidak pernah ikut terkirim.
-Ia juga menanggalkan spasi di ujung baris, karena gerbang A9/A10 menolaknya lewat
-`git diff --check`.
+**`build.mjs` gagal-keras** kalau ada pasangan warna teks di bawah 4.5:1 — keluar dengan
+kode 1 dan tidak menulis satu artboard pun. Ia juga menanggalkan spasi di ujung baris,
+karena gerbang A9/A10 menolaknya lewat `git diff --check`.
 
-`preview.mjs` dan `arah-preview.mjs` hanya menulis ke direktori scratchpad; berkas kerja
-tidak disentuh. `fonts.mjs` mengunduh huruf Google sekali lalu memakainya lokal, supaya
-perbedaan tipografi antar-arah benar-benar terlihat saat dirender.
+**`preview.mjs` gagal-keras** kalau ada isi yang meluber keluar bingkai, maskot yang
+terpotong wadahnya, atau maskot di bawah 72px. Angka sekarang: 24 layar, 0 luberan,
+0 bocor, 0 terlalu kecil. Ia hanya menulis ke direktori scratchpad.
+
+`fonts.mjs` mengunduh huruf Google sekali lalu memakainya lokal, supaya pratinjau tidak
+bergantung jaringan dan tipografinya benar-benar terlihat saat dirender.
