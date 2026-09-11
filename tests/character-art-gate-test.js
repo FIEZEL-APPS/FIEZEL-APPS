@@ -77,20 +77,43 @@ test('peta state->seni adalah hasil generate yang segar dari manifest', () => {
   }
 });
 
-test('warna moncong adalah hasil UKUR dari aset, bukan angka tulisan tangan', () => {
-  const r = spawnSync('python3',
-    [path.join(__fzRoot, 'tools/sample-muzzle.py'), '--check'],
-    { cwd: __fzRoot, encoding: 'utf8' });
-  if (r.error && r.error.code === 'ENOENT') {
-    console.log('     (python3 tidak ada di lingkungan ini — pemeriksaan kesegaran dilewati,'
-      + ' tetapi keberadaan berkasnya tetap dituntut di bawah)');
-    if (!exists('assets/characters/muzzle.json')) throw new Error('assets/characters/muzzle.json tidak ada');
-    return;
+test('warna moncong masih segar terhadap seninya (tanpa perlu mendekode gambar)', () => {
+  /* KENAPA SIDIK JARI, BUKAN MENJALANKAN ULANG PENYAMPELNYA.
+     Versi pertama gerbang ini menjalankan `python3 tools/sample-muzzle.py --check`,
+     yang memerlukan Pillow. CI tidak punya Pillow, jadi gerbangnya MERAH dengan
+     ModuleNotFoundError — gagal karena lingkungan, bukan karena ada cacat.
+
+     Jawaban yang menggoda adalah "pasang Pillow di CI". Itu ditolak: jaminannya
+     lalu bergantung pada satu paket tetap terpasang, dan kalau suatu hari ia
+     hilang, pemeriksaan ini berhenti menjaga TANPA SUARA. Gerbang yang diam saat
+     seharusnya berteriak adalah cacat yang sudah dua kali muncul di PR ini.
+
+     Jadi muzzle.json sekarang mencatat sha256 setiap PNG yang disampelnya, dan
+     kesegaran diperiksa dengan membandingkan sidik jari itu — mustahil basi tanpa
+     ketahuan, dan bisa dijalankan di mana pun tanpa pustaka gambar. Pillow kini
+     hanya dibutuhkan untuk MENG-GENERATE, bukan untuk MEMVERIFIKASI. */
+  const doc = JSON.parse(read('assets/characters/muzzle.json'));
+  const warna = doc.warna || {};
+  if (Object.keys(warna).length < 8) {
+    throw new Error('assets/characters/muzzle.json hanya punya ' + Object.keys(warna).length
+      + ' pose — terlalu sedikit, penyampelnya patah atau berkasnya basi');
   }
-  if (r.status !== 0) {
-    throw new Error(((r.stdout || '') + (r.stderr || '')).trim()
-      + '\n      Jalankan: python3 tools/sample-muzzle.py');
+  const masalah = [];
+  for (const [kunci, v] of Object.entries(warna)) {
+    if (!v.png || !v.pngSha256) {
+      masalah.push(kunci + ': tanpa sidik jari PNG — regenerasi dengan python3 tools/sample-muzzle.py');
+      continue;
+    }
+    if (!exists(v.png)) { masalah.push(kunci + ': ' + v.png + ' tidak ada'); continue; }
+    const nyata = require('crypto').createHash('sha256')
+      .update(fs.readFileSync(path.join(__fzRoot, v.png))).digest('hex');
+    if (nyata !== v.pngSha256) {
+      masalah.push(kunci + ': ' + v.png + ' berubah sejak warnanya diukur'
+        + ' — jalankan: python3 tools/sample-muzzle.py');
+    }
+    if (!/^#[0-9A-F]{6}$/.test(v.hex || '')) masalah.push(kunci + ': hex tidak sah (' + v.hex + ')');
   }
+  if (masalah.length) throw new Error('\n      ' + masalah.join('\n      '));
 });
 
 test('tabel seni tidak menyebut satu pun warna yang ditulis tangan', () => {
