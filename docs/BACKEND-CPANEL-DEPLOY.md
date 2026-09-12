@@ -81,6 +81,41 @@ tidak ada gerbang yang bisa menjaganya.
 
 ---
 
+## 0d. `requirements.txt` adalah freeze UTUH — dan itu pernah bocor
+
+Semua 127 dependensi dipaku persis (`==`), termasuk yang ditarik transitif. Itu bukan
+kerapian: kalau satu saja mengambang, versinya ditentukan oleh **hari kapan pip kebetulan
+dijalankan**, bukan oleh repo ini — dan kerusakannya muncul sebagai deploy gagal tanpa
+satu pun diff yang bisa ditunjuk.
+
+Ini pernah terjadi. Tiga commit langsung ke `main` (`62380627`, `7c3fa7f3`, `81f98f5f`,
+8 Sep 2026) mengejar kegagalan deploy Render dengan mencabut pin satu per satu. Empat
+hilang sama sekali — `pydantic`, `pydantic_core`, `packaging`, `librt` — dan satu
+(`shellingham`) **diturunkan dari 1.5.4 yang sehat ke 1.5.0 yang sudah ditarik PyPI**
+("Incorrect package metadata"), yang membuat pip memperingatkannya di setiap build.
+
+Padahal akar kegagalannya bukan paketnya sama sekali, melainkan versi Python (§0c).
+
+`tests/backend-env-contract-test.js` kini menjaga tiga hal, ketiganya dibuktikan merah
+lebih dulu: setiap baris dipaku persis `==`, tidak ada paket dipaku dua kali (pip memakai
+yang terakhir, jadi yang di atas diabaikan diam-diam), dan tidak ada pin ke rilis yang
+terbukti ditarik.
+
+**Batas gerbang itu, dan cara menutupnya.** Ia menangkap pin yang DILONGGARKAN, bukan pin
+yang DIHAPUS — menemukan yang dihapus menuntut meresolusi seluruh pohon ke PyPI, dan
+gerbangnya offline. Kalau kamu menyunting `requirements.txt` besar-besaran, jalankan ini
+dan pastikan hasilnya nol:
+
+```bash
+python3.11 -m venv /tmp/v && /tmp/v/bin/pip install --dry-run \
+  --report /tmp/r.json -r backend/requirements.txt
+```
+
+Lalu bandingkan jumlah paket di `/tmp/r.json` dengan jumlah baris `==` di
+`requirements.txt`. Diukur 12 Sep 2026: **127 dipaku, 127 terpasang, nol mengambang.**
+
+---
+
 ## 0. Dua hal yang harus diterima sejak awal
 
 **MongoDB tidak bisa dipasang di shared hosting cPanel.** Ia butuh proses daemon dan
