@@ -1034,6 +1034,18 @@ jobs:
         # seluruh *.html di akar: yang memuat fz-api.js WAJIB memuat core-config.js lebih
         # dulu, dan alamat bawaannya WAJIB tetap kosong.
         run: node tests/curriculum-config-wiring-test.js
+      - name: 'Kontrak pemasangan backend: env lengkap, CORS tertutup, lifespan tertutupi'
+        # Backend backend/ dipasang permanen di cPanel, dan tiga cacat di jalur itu semuanya
+        # GAGAL DALAM DIAM - API menjawab 200 sementara yang penting tidak terjadi. Diukur,
+        # bukan disimpulkan: (1) Passenger berbicara WSGI, a2wsgi tidak menjalankan lifespan
+        # ASGI, jadi @app.on_event("startup") dilewati - indeks unik, akun owner, dan semaian
+        # kurikulum tidak pernah dibuat, status tetap 200 OK; penawarnya bootstrap.py.
+        # (2) CORS bawaan "*" bersama allow_credentials=True: pada starlette 0.37.2 request
+        # lintas-situs yang membawa cookie dijawab dengan origin penuntutnya DIPANTULKAN,
+        # jadi situs mana pun bisa membaca data murid yang sedang login. (3) env wajib dibaca
+        # os.environ[...] sehingga yang kurang mematikan server saat start - daftarnya
+        # dipindai dari backend/*.py, jadi env berikutnya ikut terjaga sendiri.
+        run: node tests/backend-env-contract-test.js
       - name: 'Konsol kurikulum memanggil alamat yang dikonfigurasi, bukan same-origin'
         # fz-api.js lahir dengan asumsi ingress mengarahkan /api ke FastAPI di domain yang
         # sama. Di produksi FIEZEL itu salah - fiezel.my.id hosting statis, /api/health 404.

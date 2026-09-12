@@ -34,6 +34,17 @@ coordination/
 tools/
 workers/
 deploy/
+# `backend/` adalah layanan FastAPI yang dipasang TERPISAH di ~/fiezel-api (Passenger),
+# bukan bagian dari cangkang murid. Nol berkasnya dirujuk index.html atau ASSETS sw.js —
+# diperiksa, bukan diduga. Ia ada di sini karena pola `*.py` di bawah membuang 15 berkas
+# Python-nya TETAPI MELEWATKAN dua sisanya: `requirements.txt` dan `.env.example`. Yang
+# kedua itu persis yang dilarang blok "HARNESS DEBUG & SKRIP OPS" di bawah — ia menyebut
+# NAMA setiap rahasia (JWT_SECRET, OWNER_MASTER_TOKEN, MONGO_URL) dan seluruh prosedur
+# pemasangan. Nilai rahasianya memang nol, dan itu bukan alasan menyajikannya: berkas
+# bernama `.env.example` di URL publik adalah undangan untuk mencoba `.env` di jalur yang
+# sama. Mengecualikan direktorinya menutup keduanya sekaligus, dan menutup berkas bukan-.py
+# berikutnya yang ditambahkan ke backend tanpa ada yang ingat memperbarui daftar ini.
+backend/
 
 # --- perkakas pengembangan: TIDAK pernah dimuat runtime ---
 # Diverifikasi satu per satu sebelum dimasukkan: `audit/` dan `analysis/` HANYA muncul di
@@ -58,6 +69,12 @@ ecohero-quest/
 # nama secret, dan bentuk endpoint internal kalau disajikan sebagai teks.
 *.sh
 *.mjs
+# Seluruh keluarga .env, di kedalaman mana pun. `backend/` di atas sudah menutup satu-satunya
+# yang ada hari ini; pola ini menutup yang BERIKUTNYA, di direktori mana pun, tanpa menunggu
+# seseorang ingat. `.env` asli tidak pernah ter-commit (dijaga .gitignore dan
+# tests/backend-env-contract-test.js), jadi baris ini adalah sabuk kedua, bukan yang pertama.
+.env
+.env.*
 m02526-*
 tools/dev/audit-harness.html
 tools/dev/sfx-preview.html

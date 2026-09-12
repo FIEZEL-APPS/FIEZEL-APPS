@@ -37,6 +37,12 @@ CONTENT-ADOPTION-PROOF.json
 
 .env
 .env.*
+# ...KECUALI templatnya. `.env.example` TIDAK berisi rahasia — ia justru DAFTAR nama
+# yang harus diisi, dan tanpa ikut ter-commit pemasang berikutnya tidak punya apa pun
+# untuk disalin. tests/backend-env-contract-test.js menuntutnya ada, jadi tanpa baris
+# ini gerbang itu hijau di mesin penulisnya dan MERAH di CI.
+!.env.example
+!**/.env.example
 push-secrets*.json
 push-secrets*.txt
 fiezel-autonomy-config.json
