@@ -163,6 +163,30 @@ test('passenger_wsgi mengekspor nama `application` yang dicari Passenger', () =>
 
 /* ── 4. Gerbang ini sendiri terdaftar ───────────────────────────────────────────── */
 
+/* ── 5. Versi Python dipaku di repo, bukan di dashboard ────────────────────────── */
+
+test('backend memaku versi Python-nya sendiri', () => {
+  assert.ok(ada('backend/.python-version'),
+    'backend/.python-version hilang. Tanpa berkas ini penyedia hosting memakai Python ' +
+    'TERBARU miliknya, dan paket yang dipaku repo ini tidak punya wheel untuk versi itu. ' +
+    'Terukur di Render 12 Sep 2026 dengan Python 3.14: pip mengunduh wheel cp314 lalu ' +
+    'menyerah dengan ResolutionImpossible pada grpcio-status — bukan karena versinya salah, ' +
+    'melainkan karena google-api-core menuntut >=1.75.1 KHUSUS di python_version >= "3.14" ' +
+    '(di 3.11 batasnya >=1.49.1 dan pin 1.71.2 memenuhinya). Menambal requirements.txt ' +
+    'memadamkan api satu per satu; memaku versi Python memadamkan sumbernya.');
+});
+
+test('versi Python yang dipaku adalah versi yang punya wheel untuk paket terpaku', () => {
+  if (!ada('backend/.python-version')) return; // sudah dilaporkan assert di atas
+  const v = baca('backend/.python-version').trim();
+  assert.ok(/^3\.11\.\d+$/.test(v),
+    'backend/.python-version berisi "' + v + '". Harus 3.11.x. Diukur di PyPI: ' +
+    'pymongo 4.6.3 — driver MongoDB, tanpa dia TIDAK ADA yang jalan — hanya punya wheel ' +
+    'untuk cp37..cp312. Di 3.13 ke atas pip terpaksa mengompilasi dari sumber C, dan ' +
+    'hosting tanpa compiler gagal di tengah pemasangan. Menaikkan angka ini menuntut ' +
+    'menaikkan pin pymongo lebih dulu, bukan sebaliknya.');
+});
+
 test('gerbang ini terdaftar di quality.yml', () => {
   assert.ok(baca('.github/workflows/quality.yml').indexOf('backend-env-contract-test.js') >= 0,
     'gerbang belum terdaftar di quality.yml — ia tidak akan pernah berjalan di CI');
