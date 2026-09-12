@@ -219,16 +219,20 @@ const LEVEL_GUARD_COPY=__fzI18nTable({},()=>({
 }));
 const SUNRISE_MINUTE=6*60;
 const SUNSET_MINUTE=18*60;
+// Arah "Lembut": langit tetap BERGERAK sepanjang hari - itu yang membuat aplikasi terasa
+// hidup - tetapi amplitudonya diturunkan drastis. Kuning penuh #FFC700 di tengah hari dulu
+// mengubah seluruh halaman jadi kuning dan mengalahkan setiap kartu di atasnya; sekarang
+// puncaknya hanya #F4EDE6, sehingga yang berpindah adalah SUHU warna, bukan warnanya.
 const SCENE_STOPS=[
-  {minute:0,top:'#EFE0C4',bottom:'#FFF9EE'},
-  {minute:285,top:'#F3DCC2',bottom:'#FFF9EE'},
-  {minute:360,top:'#FFD9B8',bottom:'#FFFAF2'},
-  {minute:480,top:'#FFE5A8',bottom:'#FFF9EE'},
-  {minute:720,top:'#FFC700',bottom:'#FFFBF4'},
-  {minute:960,top:'#FFDCA0',bottom:'#FFF9EE'},
-  {minute:1080,top:'#FFC9A6',bottom:'#FFF6EA'},
-  {minute:1140,top:'#F6D2B4',bottom:'#FFF7EC'},
-  {minute:1440,top:'#EFE0C4',bottom:'#FFF9EE'}
+  {minute:0,top:'#EDE8E6',bottom:'#FBF7F3'},
+  {minute:285,top:'#F0E9E6',bottom:'#FBF7F3'},
+  {minute:360,top:'#F3E7E6',bottom:'#FDFAF7'},
+  {minute:480,top:'#F4EDE6',bottom:'#FBF7F3'},
+  {minute:720,top:'#F7EFE4',bottom:'#FDFAF7'},
+  {minute:960,top:'#F4EDE6',bottom:'#FBF7F3'},
+  {minute:1080,top:'#F3E7E6',bottom:'#FBF7F3'},
+  {minute:1140,top:'#F0E4E4',bottom:'#FBF7F3'},
+  {minute:1440,top:'#EDE8E6',bottom:'#FBF7F3'}
 ];
 const DEFAULT_REPORT_ENDPOINT=String(self.FIEZEL_REPORT_ENDPOINT||'').trim();
 /* m025-135: satu perangkat, banyak murid. Sebelum ini seluruh kemajuan hidup di SATU kunci
@@ -4293,7 +4297,7 @@ function mixHex(a,b,ratio){const x=hexRgb(a),y=hexRgb(b),t=Math.max(0,Math.min(1
    yang dipasang updateCelestialClock() tidak pernah menyebut dua warna berbeda.
    Interpolasi 9 perhentian di bawah tetap utuh dan tetap diuji; ia hanya tidak
    lagi dipanggil dari jalur murid. */
-const SCENE_STATIC_PALETTE=Object.freeze({top:'#FFE9B8',bottom:'#FFF9EE'});
+const SCENE_STATIC_PALETTE=Object.freeze({top:'#F4EDE6',bottom:'#FBF7F3'});
 const SCENE_STATIC_PHASE='day';
 /* Mode gelap dihapus sesuai permintaan OWNER: aplikasi terkunci ke tampilan terang cream. */
 function activeThemeMode(){ return 'light'; }
@@ -8944,7 +8948,7 @@ function writingLocalReview(prompt,text){
 function celebrate(){
   if(prefersReducedMotion()||state.preferences?.motion===false)return false;
   const host=document.createElement('div');host.className='fz-confetti';
-  const colors=['#FFC700','#EE5D4A','#A8DCC4','#C9BCE4','#C9A24B'];
+  const colors=['#F7EACB','#F8DDE3','#D5EBE5','#E5DDF3','#D8E8F4'];
   for(let i=0;i<18;i++){
     const bit=document.createElement('i');
     bit.style.left=Math.random()*100+'%';

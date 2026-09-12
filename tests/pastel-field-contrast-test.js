@@ -156,15 +156,44 @@ test('bidang pastel lembut terbaca oleh teks tema', () => {
    Perannya diambil --bad/--bad-soft (galat + notifikasi) yang punya turunan pekat.
    Kalau OWNER mau koral kembali, ia harus kembali sebagai HIASAN tanpa teks di
    atasnya, dan test ini harus dituliskan ulang dengan syarat itu. */
+/* ARAH "LEMBUT" (m025-302). OWNER memilih arah B dari empat mock dan memintanya
+   menggantikan tampilan aplikasi, jadi kunci di bawah ikut pindah — BUKAN dilonggarkan.
+   Preseden prosedurnya tertulis di design/redesign-v1/spec/LAPORAN.md: nilai disunting
+   di tempat DAN kunci test dipindahkan di commit yang sama, supaya tidak pernah ada
+   jendela waktu ketika palet berjalan tanpa ada yang menjaganya.
+
+   Yang berubah dan kenapa:
+     --cream #FFF9EE -> #FBF7F3  krem kuning menjadi kertas hangat netral;
+     --ink   #241A11 -> #2E2724  coklat-hitam menjadi abu-coklat, 13,8:1 di atas krem baru;
+     --yellow #FFC700 -> #F7EACB kuning penuh dulu perlu keras karena bidang dibatasi oleh
+                                 WARNANYA SENDIRI; di arah ini bidang dibatasi bayangan,
+                                 jadi yang tersisa dari kuning penuh hanya kerasnya.
+   --gold TIDAK bergeser: #C9A24B masih 6,1:1 di bawah tinta baru, dan perannya (detail
+   premium yang hemat) tidak berubah.
+
+   Aksen utama — CTA, progres, ikon aktif — kini MAROON --accent #9B3A4A dengan tinta
+   putih (6,8:1), bukan kuning. Kuning turun pangkat menjadi warna bidang saja. */
 const BRIEF_PALETTE = {
-  '--cream': '#FFF9EE',   // dasar utama
-  '--ink': '#241A11',     // teks utama dan outline
-  '--yellow': '#FFC700',  // aksen utama: CTA, progress, ikon aktif
+  '--cream': '#FBF7F3',   // dasar utama
+  '--ink': '#2E2724',     // teks utama dan outline
+  '--yellow': '#F7EACB',  // bidang emas: kartu domain kosakata, sorotan lembut
   '--gold': '#C9A24B'     // detail premium, dipakai hemat
 };
 
 /** Palet lama yang pernah menggantikannya. Tidak boleh muncul lagi di mana pun. */
-const SUPERSEDED = ['#FFF9F0', '#33281C', '#FFE07E', '#F5A091', '#D9BC7E'];
+const SUPERSEDED = ['#FFF9F0', '#33281C', '#FFE07E', '#F5A091', '#D9BC7E',
+  // m025-302: generasi "Warm Paper, Bright Mind" yang digantikan arah "Lembut".
+  '#FFF9EE', '#241A11', '#FFC700', '#E6A800', '#FFF3C4', '#6E5E47',
+  /* Terracotta --accent generasi lalu. Ia masuk daftar ini karena review PR #404
+     menemukan tutor-v3.css SETENGAH pindah: --ui-bg/--ui-text ikut arah baru
+     sementara --ui-accent tertinggal terracotta, jadi layar Ruang Kelas memakai
+     aksen yang sudah dipensiunkan di seluruh aplikasi lain. Tidak ada yang
+     menangkapnya karena nilai lamanya tidak pernah dilarang — hanya nilai barunya
+     yang dipaku, dan pakuan itu buta terhadap berkas di luar style.css.
+     Melarang nilai lamanya menutup sisi yang satunya: dua puluh sembilan cadangan
+     `var(--accent,#C2402C)` yang selamat dari penggantian pertama juga baru
+     ketahuan lewat daftar ini. */
+  '#C2402C', '#A33422'];
 
 test('palet mengikuti brief OWNER, kelima warnanya persis', () => {
   const wrong = [];

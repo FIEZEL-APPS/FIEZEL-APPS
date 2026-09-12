@@ -131,3 +131,89 @@ fiezel-mascot.st-curious      .fz-art { animation: fzCharSway 3.4s ease-in-out i
     transition: none !important;
   }
 }
+
+/* ============================================================
+   POTONGAN KEPALA UNTUK CAP KECIL (.has-mascot)
+   ============================================================
+   REGRESI YANG DIPERBAIKI DI SINI. Kelas `has-mascot` masih dipasang dari JS
+   (app.js pawFaceMarkup, fiezel-coach-bubble pawHost) dan masih dirujuk oleh tiga
+   komentar sebagai "resep yang MEMOTONG badan jadi lingkaran" — tetapi resepnya
+   sendiri tinggal di fiezel-motion.css dan TIDAK ikut pindah ketika berkas ini
+   menggantikannya (m025-303). Sejak itu cap kecil merender pose BERTUBUH PENUH apa
+   adanya: di wadah 42px, full-neutral (558x1129) terukur 38x77 — badannya meluber
+   keluar lingkaran dan wajahnya tinggal ±12px. Itulah "maskotnya jelek sekali" yang
+   dilaporkan OWNER pada layar Tanya.
+
+   ADA DUA SEBAB, dan yang kedua tidak akan terlihat dari membaca kaskade saja —
+   ia ditemukan dengan mengukur kotak grid di Chromium:
+
+   1. TIDAK ADA PEMOTONGAN. Tanpa resep di bawah, pose bertubuh penuh dipasang utuh
+      ke dalam cap bulat. Ambangnya bukan selera: di bawah ~72px sisi terpanjang,
+      pose bertubuh penuh tidak menyisakan piksel yang cukup untuk sebuah wajah.
+
+   2. BANTALAN TOMBOL UMUM. `body button{padding:13px 20px}` di fiezel-2.css berlaku
+      juga pada FAB bulat 58x58 yang isinya cuma seekor maskot. Kotak ISI-nya karena
+      itu tinggal 58-40-2 = 16 lebar dan 58-26-2 = 30 tinggi, dan `width:100%` si
+      maskot patuh dengan setia: 15x30 di dalam lingkaran 58px. Memotong kepala saja
+      tidak akan menolong — yang dipotong tetap akan 15px.
+
+   Pemotongannya memakai object-fit:cover, bukan lebar-178%-lalu-digeser seperti resep
+   lama: perhitungannya lalu diserahkan ke browser dari rasio gambar yang sebenarnya,
+   jadi ia tetap benar untuk KESEMBILAN BELAS pose (rasionya 802x661 sampai 558x1129)
+   tanpa satu pun angka ajaib per pose. */
+/* Tiga selektor, dan yang terpanjang bukan hiasan. Bantalan tombol umum di fiezel-2.css
+   ditulis `body.fz-lux button` — kekhususan (0,1,2), sama persis dengan `body
+   button.has-mascot`, dan berkas itu dimuat SESUDAH berkas ini, jadi pada seri yang
+   seimbang ia yang menang. `body.fz-lux button.has-mascot` (0,2,2) memutus seri itu
+   tanpa satu pun `!important`. */
+body.fz-lux button.has-mascot,
+body button.has-mascot,
+.has-mascot {
+  padding: 0;
+  place-items: stretch;
+  /* Trek `1fr`, bukan `auto`. Trek `auto` diukur dari isinya, dan isinya sebuah gambar
+     bertubuh tinggi — jadi kolomnya menyusut ke 27,7px di dalam lingkaran 58px meski
+     bantalannya sudah nol. `1fr` mengambil ukurannya dari WADAH yang sudah pasti, jadi
+     tidak ada lagi jalan bagi rasio gambar untuk menentukan lebar cap. */
+  grid-template-columns: 1fr;
+  grid-template-rows: 1fr;
+}
+
+/* Pemotongan dipasang di MASKOTNYA, bukan di wadahnya, dan itu bukan selera struktur:
+   `.fz-coach-bubble` menyimpan cincin denyut `.fz-coach-pulse` berukuran 78x78 yang
+   memang HARUS meluap keluar tombol 58px. `overflow:hidden` di wadah akan memotong
+   cincin itu dan mematikan denyutnya. `border-radius:inherit` membuat maskot memotong
+   dirinya sendiri mengikuti lengkung wadah, jadi sudut persegi gambar tidak pernah
+   muncul di luar lingkaran dan denyutnya tetap hidup. */
+.has-mascot fiezel-mascot {
+  /* `!important` di dua properti ini, dan alasannya perlu dibaca sebelum dicabut:
+     fiezel-coach-bubble.js memasang `style="width:100%;height:100%"` SEBARIS, dan gaya
+     sebaris menang atas stylesheet mana pun. Gaya sebaris itu dulu sabuk pengaman supaya
+     maskot tidak meluber menutupi CTA dan nav; sekarang maskotnya memotong dirinya
+     sendiri di bawah sini, jadi sabuk itu sudah tidak memikul apa pun. */
+  /* `auto`, BUKAN `100%`. Persen di sini melingkar: lebar trek grid diukur dari isi,
+     sedangkan isi diminta selebar persen dari trek itu. Browser memutus lingkaran itu
+     dengan ukuran INTRINSIK gambar, dan hasilnya 28x57 di dalam lingkaran 58px —
+     lebih baik dari 15x30, tetap salah. Dengan `auto` tidak ada yang melingkar:
+     `place-items:stretch` di atas yang merentangkan item ke seluruh kotak isi, dan
+     kotak itu sudah punya ukuran pasti dari wadahnya. */
+  width: auto !important;
+  height: auto !important;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+  border-radius: inherit;
+}
+.has-mascot fiezel-mascot .fz-art {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  /* 50% mendatar = wajah di tengah; 6% menurun = tepat di bawah ubun-ubun, jadi
+     lingkarannya tidak memotong telinga Nusa maupun poni Mira. */
+  object-position: 50% 6%;
+}
+/* Lapisan viseme dimatikan di cap kecil: kotak mulutnya dihitung terhadap gambar yang
+   UTUH, jadi di atas gambar yang dipotong ia mendarat di tempat yang salah. Pada cap
+   42px mulut viseme juga di bawah satu piksel — tidak ada yang hilang selain salah
+   tempat. */
+.has-mascot fiezel-mascot .fz-viseme { display: none; }

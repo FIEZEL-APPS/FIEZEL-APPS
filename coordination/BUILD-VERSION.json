@@ -1,7 +1,7 @@
 {
-  "version": "m025-301",
-  "claimedBy": "branch claude/focused-noether-55ocsp",
-  "claimedAt": "2026-09-11T19:06:35.915Z",
-  "reason": "konsol kurikulum benar-benar hidup: halaman memuat core-config.js",
+  "version": "m025-302",
+  "claimedBy": "branch claude/optimistic-galileo-p03jpj",
+  "claimedAt": "2026-09-11T20:26:50.015Z",
+  "reason": "arah Lembut: palet, material, radius, dan tipografi aplikasi",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }

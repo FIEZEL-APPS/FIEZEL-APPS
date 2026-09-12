@@ -242,11 +242,14 @@
   var PERSIST_UNTIL_DISMISSED = true;
 
   /**
-   * Warna. Tinta gelap di atas bidang krem — dua-duanya token yang sudah ada di style.css
-   * (--ink #241A11, --cream-deep #FFF3DC). Rasionya dihitung ulang oleh gerbang, jadi
-   * mengubah salah satu hex di sini akan memerahkan CI kalau jatuh di bawah 4,5:1.
+   * Warna. Tinta gelap di atas bidang kertas hangat — dua-duanya token yang sudah ada di
+   * style.css (--ink, --panel-soft, --yellow-deep). Ketiganya ikut bergeser ke arah
+   * "Lembut" (m025-302) bersama tokennya; kalau hex di sini tidak ikut, gerbang (d3)
+   * berhenti menemukan pasangannya di CSS dan CI merah. Rasionya dihitung ulang oleh
+   * gerbang, jadi mengubah salah satu hex di sini akan memerahkan CI kalau jatuh di
+   * bawah 4,5:1 (sekarang 12,5:1).
    */
-  var COLORS = Object.freeze({ fg: '#241A11', bg: '#FFF3DC', border: '#E6A800' });
+  var COLORS = Object.freeze({ fg: '#2E2724', bg: '#F6F1EA', border: '#EFDFB8' });
   var MIN_TOUCH_PX = 44;
 
   /**

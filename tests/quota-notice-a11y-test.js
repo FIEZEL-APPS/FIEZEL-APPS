@@ -371,7 +371,8 @@ test('(d3) kontras 4,5:1 dan target sentuh 44px ditegakkan, bukan kebetulan', ()
   };
   const r = ratio(Copy.COLORS.fg, Copy.COLORS.bg);
   assert.ok(r >= 4.5, 'kontras tinta/bidang pemberitahuan ' + r.toFixed(2) + ':1 di bawah 4,5:1');
-  assert.ok(ratio(Copy.COLORS.fg, '#FFC700') >= 4.5, 'tinta tombol di atas kuning gagal 4,5:1');
+  // --yellow, nilainya dipaku oleh tests/pastel-field-contrast-test.js.
+  assert.ok(ratio(Copy.COLORS.fg, '#F7EACB') >= 4.5, 'tinta tombol di atas kuning gagal 4,5:1');
   assert.strictEqual(Copy.MIN_TOUCH_PX, 44);
   const btn = (cssSource.match(/\.fz-notice-btn\{[^}]*\}/) || [''])[0];
   assert.ok(/min-height:44px/.test(btn) && /min-width:44px/.test(btn),
