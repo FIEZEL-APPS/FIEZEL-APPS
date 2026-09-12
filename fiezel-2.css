@@ -1,12 +1,12 @@
 /* FIEZEL 2.0 — lapisan redesign (dimuat SETELAH style.css & fiezel-lux.css).
    Prinsip: token dulu, komponen kemudian. Maskot PAW tidak disentuh. */
 :root{
-  --radius-xl:28px;--radius-lg:24px;--radius-md:18px;--radius-sm:14px;--radius-xs:10px;
-  --shadow-sm:0 2px 10px rgba(36,26,17,.05);--shadow-md:0 12px 32px rgba(36,26,17,.08);--shadow-lg:0 24px 56px rgba(36,26,17,.12);
+  --radius-xl:34px;--radius-lg:28px;--radius-md:22px;--radius-sm:18px;--radius-xs:14px;
+  --shadow-sm:0 6px 16px rgba(46,39,36,.06);--shadow-md:0 14px 32px rgba(46,39,36,.07);--shadow-lg:0 20px 44px rgba(46,39,36,.10);
   --fz-display:'FZ Plus Jakarta Sans',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
-  --maroon:#8C2233;--maroon-deep:#6D1926;--maroon-soft:#F7E3E6;
-  --pz-sky:#E2EFF9;--pz-sky-line:#C3DAEE;--pz-sky-ink:#2A5C86;
-  --lift-sun:0 4px 0 var(--sun-deep);--lift-ink:0 4px 0 #000;--lift-line:0 3px 0 var(--line);
+  --maroon:#9B3A4A;--maroon-deep:#7E2D3B;--maroon-soft:#F6E9EB;
+  --pz-sky:#D8E8F4;--pz-sky-line:#C7DCEC;--pz-sky-ink:#2A566F;
+  --lift-sun:0 8px 18px rgba(155,58,74,.18);--lift-ink:0 10px 24px rgba(46,39,36,.16);--lift-line:0 4px 12px rgba(46,39,36,.06);
 }
 html[lang="th"]{--fz-display:'Noto Sans Thai Looped','FZ Plus Jakarta Sans',-apple-system,sans-serif}
 body{letter-spacing:-.005em}
@@ -25,22 +25,22 @@ body.fz-lux .version,body .version{display:none}
 body button,body.fz-lux button{border-radius:999px;font-weight:700;padding:13px 20px}
 body button:hover,body.fz-lux button:hover{transform:none}
 body button:active,body.fz-lux button:active{transform:translateY(2px) scale(1);transition-duration:.08s}
-body button.primary,body .primary,body.fz-lux button.primary,body.fz-lux .primary,body.fz-lux .primary.luxe,body.fz-lux .quiz-next:not(:disabled){background:var(--sun);color:var(--text);border:0;border-radius:999px;box-shadow:var(--lift-sun)}
-body button.primary:hover,body .primary:hover,body.fz-lux .primary:hover,body.fz-lux .primary.luxe:hover{background:var(--sun);border-color:var(--sun);box-shadow:var(--lift-sun),var(--shadow-sm)}
-body .primary:active,body.fz-lux .primary:active{transform:translateY(3px);box-shadow:0 1px 0 var(--sun-deep)}
-body .primary.luxe,body .today-cta,body.fz-lux .primary.luxe,body.fz-lux .today-cta,body.fz-lux .quiz-next:not(:disabled){background:var(--text);color:var(--on-core);border-color:var(--text);box-shadow:var(--lift-ink)}
-body .primary.luxe:hover,body .today-cta:hover,body.fz-lux .primary.luxe:hover,body.fz-lux .today-cta:hover{background:var(--ink-hover);color:var(--on-core);border-color:var(--ink-hover);box-shadow:var(--lift-ink)}
-body .today-cta .fz-i,body .today-cta i,body .primary.luxe i{color:var(--sun)}
+body button.primary,body .primary,body.fz-lux button.primary,body.fz-lux .primary,body.fz-lux .primary.luxe,body.fz-lux .quiz-next:not(:disabled){background:var(--accent);color:#FFFFFF;border:0;border-radius:999px;box-shadow:var(--lift-sun)}
+body button.primary:hover,body .primary:hover,body.fz-lux .primary:hover,body.fz-lux .primary.luxe:hover{background:var(--accent-strong);border-color:var(--accent-strong);color:#FFFFFF;box-shadow:var(--lift-sun),var(--shadow-sm)}
+body .primary:active,body.fz-lux .primary:active{transform:translateY(2px);box-shadow:0 4px 10px rgba(155,58,74,.16)}
+body .primary.luxe,body .today-cta,body.fz-lux .primary.luxe,body.fz-lux .today-cta,body.fz-lux .quiz-next:not(:disabled){background:var(--accent);color:#FFFFFF;border-color:var(--accent);box-shadow:var(--lift-sun)}
+body .primary.luxe:hover,body .today-cta:hover,body.fz-lux .primary.luxe:hover,body.fz-lux .today-cta:hover{background:var(--accent-strong);color:#FFFFFF;border-color:var(--accent-strong);box-shadow:var(--lift-sun)}
+body .today-cta .fz-i,body .today-cta i,body .primary.luxe i{color:#F7EACB}
 body .text-button,body.fz-lux .text-button{box-shadow:none;background:transparent;border-color:transparent}
 body button:disabled,body.fz-lux button:disabled{box-shadow:none;transform:none}
 body .today-cta{min-height:56px;font-size:1.05rem;margin-top:var(--sp-3)}
 body .today-cta-soft{border-radius:999px}
 body .modal-actions button{min-height:48px}
-body .danger,body.fz-lux .danger{background:var(--panel);color:var(--bad);border:1.5px solid #F6D3C9;box-shadow:0 3px 0 #F6D3C9}
+body .danger,body.fz-lux .danger{background:var(--panel);color:var(--bad);border:0;box-shadow:0 6px 16px rgba(160,58,48,.12)}
 
 /* ---------- kartu ---------- */
 body.fz-lux .card,body .card{border-radius:var(--radius-lg);box-shadow:var(--shadow-sm);padding:var(--sp-5)}
-body.fz-lux .today-card,body .today-card{border-radius:var(--radius-xl);box-shadow:var(--shadow-sm);background:linear-gradient(160deg,#FFF6D6 0%,#FFE9A3 100%);border-color:var(--pz-yellow-line)}
+body.fz-lux .today-card,body .today-card{border-radius:var(--radius-xl);box-shadow:var(--shadow-sm);background:linear-gradient(160deg,#FBF3E2 0%,#F3E3C0 100%);border-color:transparent}
 body.fz-lux .today-card .today-blocks li,body .today-card .today-blocks li{background:rgba(255,255,255,.72);border-color:rgba(255,255,255,.9);border-radius:var(--radius-sm)}
 body.fz-lux .today-card .today-eyebrow,body .today-card .today-eyebrow{background:var(--maroon);color:#fff;padding:5px 10px;border-radius:999px;letter-spacing:.1em;font-size:.68rem}
 body.fz-lux .today-rhythm-bar .rhythm-track,body .today-rhythm-bar .rhythm-track{background:rgba(36,26,17,.08)}
