@@ -29,7 +29,7 @@
        (vendor/supertonic-3, 13 MB) di klien, dan tanpa token itu Chromium menolak
        WebAssembly.instantiate - model 152 MB yang sudah diunduh jadi tidak terpakai. -->
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval' https://js.puter.com https://accounts.google.com; connect-src 'self' https: wss:; img-src 'self' data: blob:; style-src 'self' 'unsafe-inline' https://accounts.google.com; frame-src 'self' https://accounts.google.com; media-src 'self' blob: data:; worker-src 'self' blob:">
-  <meta name="theme-color" content="#FFF9EE">
+  <meta name="theme-color" content="#FBF7F3">
   <!-- Mode gelap dihapus: color-scheme dipaku light agar kontrol form/scrollbar selalu terang. -->
   <meta name="color-scheme" content="light">
   <meta name="description" content="FIEZEL adalah aplikasi belajar bahasa Inggris adaptif untuk vocabulary, grammar, reading, speaking, listening, dan tes diagnostik CEFR.">
@@ -66,7 +66,7 @@ html.fz-booting body{overflow:hidden}
 #fiezelBootSplash{--fz-b1:0ms;--fz-b2:240ms;--fz-b3:470ms;--fz-b4:690ms;--fz-b5:870ms;--fz-b6:1060ms;--fz-b7:1150ms;--fz-b8:1400ms;--fz-b9:1520ms;--fz-b10:1655ms;--fz-b11:1780ms;--fz-b12:1900ms}
 /* Salinan APA ADANYA dari style.css (diperiksa tests/splash-first-paint-test.js). */
 .fiezel-wordmark{display:block;width:100%;height:auto}
-.fiezel-splash,.fiezel-ob{--fz-bg:#FFF9EE;--fz-paper:#FFFFFF;--fz-ink:#241A11;--fz-ink-muted:#6E5E47;--fz-accent:#241A11;--fz-accent-deep:#120C07;--fz-gold:#E6A800;--fz-soft:#FFF3C4;--fz-line:#F0E4CF;--fz-sun:#FFC700;--fz-sun-soft:#FFF3C4;--fz-sun-press:#CC9600;--fz-sun-grad:linear-gradient(180deg,#FFDE59,#FFA500);--fz-info:#7A5F1B;--fz-core:#1B1418;--fz-core-soft:#2A2126;--fz-on-core:#FDFAF3;--fz-display:'FZ Instrument Serif',Georgia,'Times New Roman',serif;--fz-heading:'FZ Plus Jakarta Sans',-apple-system,'Segoe UI',sans-serif;--fz-body:'FZ Plus Jakarta Sans',-apple-system,'Segoe UI',sans-serif}
+.fiezel-splash,.fiezel-ob{--fz-bg:#FBF7F3;--fz-paper:#FFFFFF;--fz-ink:#2E2724;--fz-ink-muted:#6E635C;--fz-accent:#9B3A4A;--fz-accent-deep:#7E2D3B;--fz-gold:#7A5512;--fz-soft:#F6E9EB;--fz-line:#EFE7DE;--fz-sun:#F7EACB;--fz-sun-soft:#FBF3E2;--fz-sun-press:#EFDFB8;--fz-sun-grad:linear-gradient(180deg,#F7EACB,#EFDFB8);--fz-info:#7A5512;--fz-core:#1B1418;--fz-core-soft:#2A2126;--fz-on-core:#FDFAF3;--fz-display:'FZ Plus Jakarta Sans',-apple-system,'Segoe UI',sans-serif;--fz-heading:'FZ Plus Jakarta Sans',-apple-system,'Segoe UI',sans-serif;--fz-body:'FZ Plus Jakarta Sans',-apple-system,'Segoe UI',sans-serif}
 .fiezel-splash,.fiezel-ob{position:fixed;inset:0;z-index:2147482000;display:flex;flex-direction:column;background:var(--fz-bg);font-family:var(--fz-body);color:var(--fz-ink);padding-top:max(18px,env(safe-area-inset-top));animation:fzm-page-in .4s cubic-bezier(.22,.61,.36,1) both}
 .fiezel-splash[hidden]{display:none}
 .fiezel-splash.is-leaving,.fiezel-ob.is-leaving{animation:fzm-page-out .3s ease-in both}
@@ -83,7 +83,7 @@ html.fz-booting body{overflow:hidden}
 .fiezel-logo .fz-f,.fiezel-logo .fz-bar{transform-box:fill-box}
 .fiezel-splash-brand .fiezel-splash-word{position:absolute;display:block;left:0;right:0;margin:0 auto;bottom:calc(7vh + env(safe-area-inset-bottom,0px));width:min(52vw,238px);text-align:center;opacity:0;transform:translateY(14px);will-change:transform,opacity;pointer-events:none}
 .fiezel-splash-brand .fiezel-wordmark{display:block;width:min(30vw,132px);height:auto;margin:0 auto}
-.fiezel-splash-brand .fiezel-splash-tag{font-family:var(--fz-body);font-size:12px;letter-spacing:.30em;text-transform:uppercase;color:#FFC700;margin:14px 0 0;white-space:nowrap}
+.fiezel-splash-brand .fiezel-splash-tag{font-family:var(--fz-body);font-size:12px;letter-spacing:.30em;text-transform:uppercase;color:#FFD94F;margin:14px 0 0;white-space:nowrap}
 @keyframes fz-fade-in{from{opacity:0}to{opacity:1}}
 .fiezel-splash-still .fz-splash-canvas{display:none}
 .fiezel-splash-still .fz-fgroup,.fiezel-splash-still .fz-barsgroup{opacity:1}
@@ -135,12 +135,11 @@ html.fz-booting body{overflow:hidden}
   <!-- Ruang Guru: tema terpisah untuk cangkang guru (features/teacher). Hanya aktif saat body.fz-teacher-mode. -->
   <link rel="stylesheet" href="./features/teacher/teacher-shell.css">
   <link rel="stylesheet" href="./features/class-hub/class-hub.css">
-  <!-- m026-01: motion system maskot PAW. Sengaja PALING AKHIR di antara stylesheet:
-       berkasnya memakai nama token yang bertabrakan dengan style.css (--fz-gold,
-       --fz-ink, --fz-line), jadi di sana token dipasang pada kelas .fz-mascot/.fz-motion
-       dan bukan :root. Urutan terakhir memastikan aturan penempatan maskotnya menang
-       atas ukuran wajah pembimbing lama tanpa perlu !important. -->
-  <link rel="stylesheet" href="./features/mascot/fiezel-motion.css">
+  <!-- m025-303: gerak karakter NUSA & MIRA. Pengganti fiezel-motion.css (rig PAW).
+       Tetap PALING AKHIR di antara stylesheet dengan alasan yang sama seperti
+       pendahulunya: aturan penempatan karakter harus menang atas ukuran wajah
+       pembimbing lama tanpa perlu !important. -->
+  <link rel="stylesheet" href="./features/mascot/fiezel-character.css">
   <link rel="stylesheet" href="./features/ui/fiezel-lux.css">
   <link rel="stylesheet" href="./fiezel-2.css">
 </head>
@@ -149,7 +148,7 @@ html.fz-booting body{overflow:hidden}
        features/brand/fiezel-splash.js mengadopsi elemen ini lewat [data-fiezel-boot-splash]
        alih-alih membuat lapisan kedua, jadi animasi yang sudah berjalan diteruskan, bukan
        diulang dari awal setelah boot selesai. -->
-  <div id="fiezelBootSplash" class="fiezel-splash fiezel-splash-dark" data-fiezel-boot-splash role="dialog" aria-label="Selamat datang di FIEZEL"><div class="fiezel-splash-body fiezel-splash-brand"><canvas class="fz-splash-canvas" aria-hidden="true"></canvas><svg class="fiezel-logo" viewBox="0 0 512 512" role="img" aria-label="FIEZEL"><defs><linearGradient id="fzsGold" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#FFD94F"/><stop offset="100%" stop-color="#F0C241"/></linearGradient></defs><g class="fz-fgroup" fill="#FFF4DA"><rect class="fz-f fz-f1" x="136" y="148" width="42"  height="216" rx="20"/><rect class="fz-f fz-f2" x="136" y="148" width="128" height="42"  rx="20"/><rect class="fz-f fz-f3" x="136" y="230" width="102" height="40"  rx="19"/></g><g class="fz-barsgroup" fill="url(#fzsGold)"><rect class="fz-bar fz-bar1" x="298" y="200" width="34" height="112" rx="17"/><rect class="fz-bar fz-bar2" x="348" y="166" width="34" height="180" rx="17"/></g></svg><div class="fiezel-splash-word"><svg class="fiezel-wordmark" viewBox="0 0 1000 260" role="img" aria-label="FIEZEL"><defs><linearGradient id="fzsIv" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#FFFBF3"/><stop offset="100%" stop-color="#EBDBC0"/></linearGradient><linearGradient id="fzsGo" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#FFDE59"/><stop offset="45%" stop-color="#FFC700"/><stop offset="100%" stop-color="#E6A800"/></linearGradient></defs><g fill="url(#fzsIv)"><rect x="30" y="30" width="42" height="200" rx="21"/><rect x="30" y="30" width="144" height="42" rx="21"/><rect x="30" y="109" width="116" height="42" rx="21"/><rect x="300" y="30" width="42" height="200" rx="21"/><rect x="300" y="30" width="144" height="42" rx="21"/><rect x="300" y="109" width="100" height="42" rx="21"/><rect x="300" y="188" width="130" height="42" rx="21"/><rect x="478" y="30" width="150" height="42" rx="21"/><rect x="478" y="188" width="150" height="42" rx="21"/><rect x="607" y="30" width="191.38" height="42" rx="21" transform="rotate(124.354 607 51)"/><rect x="662" y="30" width="42" height="200" rx="21"/><rect x="662" y="30" width="144" height="42" rx="21"/><rect x="662" y="109" width="100" height="42" rx="21"/><rect x="662" y="188" width="130" height="42" rx="21"/><rect x="840" y="30" width="42" height="200" rx="21"/><rect x="840" y="188" width="130" height="42" rx="21"/></g><g fill="url(#fzsGo)"><rect x="192" y="30" width="26" height="200" rx="13"/><rect x="240" y="106" width="26" height="124" rx="13"/></g></svg><p class="fiezel-splash-tag">ADAPTIVE ENGLISH</p></div></div></div>
+  <div id="fiezelBootSplash" class="fiezel-splash fiezel-splash-dark" data-fiezel-boot-splash role="dialog" aria-label="Selamat datang di FIEZEL"><div class="fiezel-splash-body fiezel-splash-brand"><canvas class="fz-splash-canvas" aria-hidden="true"></canvas><svg class="fiezel-logo" viewBox="0 0 512 512" role="img" aria-label="FIEZEL"><defs><linearGradient id="fzsGold" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#FFD94F"/><stop offset="100%" stop-color="#F0C241"/></linearGradient></defs><g class="fz-fgroup" fill="#FFF4DA"><rect class="fz-f fz-f1" x="136" y="148" width="42"  height="216" rx="20"/><rect class="fz-f fz-f2" x="136" y="148" width="128" height="42"  rx="20"/><rect class="fz-f fz-f3" x="136" y="230" width="102" height="40"  rx="19"/></g><g class="fz-barsgroup" fill="url(#fzsGold)"><rect class="fz-bar fz-bar1" x="298" y="200" width="34" height="112" rx="17"/><rect class="fz-bar fz-bar2" x="348" y="166" width="34" height="180" rx="17"/></g></svg><div class="fiezel-splash-word"><svg class="fiezel-wordmark" viewBox="0 0 1000 260" role="img" aria-label="FIEZEL"><defs><linearGradient id="fzsIv" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#FFFBF3"/><stop offset="100%" stop-color="#EBDBC0"/></linearGradient><linearGradient id="fzsGo" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#FFD94F"/><stop offset="45%" stop-color="#F5CE45"/><stop offset="100%" stop-color="#F0C241"/></linearGradient></defs><g fill="url(#fzsIv)"><rect x="30" y="30" width="42" height="200" rx="21"/><rect x="30" y="30" width="144" height="42" rx="21"/><rect x="30" y="109" width="116" height="42" rx="21"/><rect x="300" y="30" width="42" height="200" rx="21"/><rect x="300" y="30" width="144" height="42" rx="21"/><rect x="300" y="109" width="100" height="42" rx="21"/><rect x="300" y="188" width="130" height="42" rx="21"/><rect x="478" y="30" width="150" height="42" rx="21"/><rect x="478" y="188" width="150" height="42" rx="21"/><rect x="607" y="30" width="191.38" height="42" rx="21" transform="rotate(124.354 607 51)"/><rect x="662" y="30" width="42" height="200" rx="21"/><rect x="662" y="30" width="144" height="42" rx="21"/><rect x="662" y="109" width="100" height="42" rx="21"/><rect x="662" y="188" width="130" height="42" rx="21"/><rect x="840" y="30" width="42" height="200" rx="21"/><rect x="840" y="188" width="130" height="42" rx="21"/></g><g fill="url(#fzsGo)"><rect x="192" y="30" width="26" height="200" rx="13"/><rect x="240" y="106" width="26" height="124" rx="13"/></g></svg><p class="fiezel-splash-tag">ADAPTIVE ENGLISH</p></div></div></div>
   <script>
 
     /* Jaring pengaman storage: di iframe preview yang di-sandbox tanpa allow-same-origin,
@@ -278,7 +277,7 @@ html.fz-booting body{overflow:hidden}
           var retry = doc.createElement('button');
           retry.type = 'button';
           retry.textContent = isTh ? 'โหลดใหม่อีกครั้ง' : 'Muat ulang';
-          retry.style.cssText = 'margin-top:18px;min-height:48px;padding:0 20px;border:0;border-radius:12px;background:#FFC700;color:#241A11;font:700 16px -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif';
+          retry.style.cssText = 'margin-top:18px;min-height:48px;padding:0 20px;border:0;border-radius:12px;background:#9B3A4A;color:#FFFFFF;font:700 16px -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif';
           retry.addEventListener('click', function () {
             try { window.location.reload(); } catch (e) { window.location.href = window.location.href; }
           });
@@ -539,22 +538,29 @@ html.fz-booting body{overflow:hidden}
        SEBELUM app.js karena app.js memanggil keduanya pada cat pertama (refreshIcons dan
        syncCoachBubble). Keduanya ringan dan tidak menyentuh jaringan sama sekali. -->
   <script defer src="./features/ui/fiezel-icons.js"></script>
-  <!-- m026-01: <fiezel-mascot> WAJIB terdaftar sebelum dua berkas di bawahnya.
+  <!-- m025-303: peta 19 state ke seni Nusa/Mira/team. HASIL GENERATE dari
+       assets/characters/manifest.json; wajib mendahului komponen, yang membacanya
+       saat define. Ditanam (bukan di-fetch) supaya wajah karakter tidak menunggu
+       jaringan untuk tahu gambar mana yang dipakai. -->
+  <script defer src="./features/mascot/fiezel-character-art.js"></script>
+  <!-- m026-01/m025-303: <fiezel-mascot> WAJIB terdaftar sebelum dua berkas di bawahnya.
        fiezel-coach-bubble.js memutuskan bentuk wajah gelembung saat install(), dan
        app.js memutuskan wajah panel "Kata FIEZEL" saat cat pertama; keduanya membaca
        customElements.get('fiezel-mascot'). Kalau berkas ini datang belakangan, kedua
-       tempat itu jatuh ke ikon paw cadangan dan tidak pernah naik lagi. -->
-  <script defer src="./features/mascot/fiezel-mascot.js"></script>
+       tempat itu jatuh ke ikon cadangan dan tidak pernah naik lagi.
+       Nama elemen dan pintu self.FiezelPaw DIPERTAHANKAN saat karakternya berganti:
+       ~340 titik panggil menyatakan maksud, bukan seni. -->
+  <script defer src="./features/mascot/fiezel-character.js"></script>
   <!-- [FASE 7] Lapisan slot PAW panel (12-lesson-layer.md). Dimuat SETELAH
        fiezel-mascot.js (ia bertanya FiezelPaw.ready() sebelum memesan ruang) dan
        SEBELUM app.js (render kuis membaca self.FiezelPawSlot pra-cat). Tanpa berkas
        ini app.js jatuh mulus ke wajah quiz-mascot lama - tidak ada yang patah. -->
   <script defer src="./features/mascot/fiezel-paw-slot.js"></script>
-  <!-- Lapisan outfit kontekstual PAW (G5' — registry terkurasi, 19-outfit-system).
-       Menyuntik item ke jangkar fz-outfit-* DARI LUAR komponen; deterministik,
-       bukan ekonomi hadiah; kill switch localStorage fzPawOutfits. Tanpa berkas
-       ini PAW tampil polos - tidak ada yang patah. -->
-  <script defer src="./features/mascot/fiezel-paw-outfit.js"></script>
+  <!-- m025-303: fiezel-paw-outfit.js DIBUANG bersama rig PAW. Lapisan itu bekerja
+       dengan menyuntik item SVG ke jangkar fz-outfit-* di dalam rig vektor; seni
+       Nusa & Mira adalah gambar utuh dan tidak punya jangkar semacam itu. Nusa
+       sudah memakai bandana ber-lambang telapak dan Mira memakai pin telapak di
+       seninya sendiri, jadi peran "outfit merek" sudah terpenuhi tanpa lapisan. -->
   <script defer src="./features/ui/fiezel-coach-bubble.js"></script>
   <!-- m025-117 Core Brain v2. Dimuat SEBELUM app.js dan tidak ikut dimuat malas: kebijakan
        sesi pertama sudah membutuhkannya, dan tanpa itu murid akan mendapat satu sesi dengan

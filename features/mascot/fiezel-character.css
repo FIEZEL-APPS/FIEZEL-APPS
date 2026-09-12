@@ -1,0 +1,219 @@
+/* ============================================================
+   FIEZEL — gerak & tata letak karakter <fiezel-mascot> (NUSA & MIRA)
+   ============================================================
+   Pengganti features/mascot/fiezel-motion.css. Berkas lama menganimasi BAGIAN
+   TUBUH sebuah rig SVG (telinga, lengan, ekor, kelopak) dengan puluhan keyframe.
+   Seni Nusa/Mira adalah gambar utuh, jadi tidak ada bagian tubuh yang bisa
+   diputar sendiri — yang tersisa, dan yang memang cukup, adalah gerak SELURUH
+   karakter: napas, pantulan, goyang, getar.
+
+   Itu BUKAN penurunan mutu diam-diam, dan perlu ditulis terang: ekspresi kini
+   dibawa oleh seninya sendiri (19 pose berbeda), bukan oleh animasi. Yang hilang
+   adalah gerak anggota badan per-state; yang didapat adalah wajah yang benar
+   sejak bingkai pertama, tanpa menunggu animasi berjalan.
+
+   Semua durasi memakai token yang sama dengan berkas lama supaya ritme aplikasi
+   tidak berubah.
+   ============================================================ */
+
+fiezel-mascot {
+  display: block;
+  position: relative;
+  line-height: 0;
+  /* Digeser lookAt(); 0 kalau kurangi-gerak. */
+  transform: translateX(var(--fz-look-x, 0));
+  transition: transform .28s cubic-bezier(.2, .7, .3, 1);
+}
+
+fiezel-mascot .fz-art {
+  display: block;
+  width: 100%;
+  height: auto;
+  /* Rasio dipasang inline dari manifest: mencegah tata letak melompat saat
+     gambar selesai dimuat (CLS), yang dulu tidak mungkin terjadi karena rig
+     lama berupa SVG inline tanpa pemuatan. */
+  object-fit: contain;
+  -webkit-user-drag: none;
+  user-select: none;
+}
+
+/* ---------- lapisan viseme ---------- */
+/* .fz-viseme = KOTAK mulut dari face-rig.json (posisi + ukuran kotak).
+   .fz-viseme-shape = BENTUK mulut di dalam kotak itu (ukuran dari viseme).
+   Pemisahan ini wajib: satu elemen untuk keduanya membuat bentuknya diukur
+   terhadap seluruh tubuh. */
+fiezel-mascot .fz-viseme {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+fiezel-mascot .fz-viseme[hidden] { display: none; }
+
+/* Penutup: mengisi kotak mulut dengan warna moncong terukur, menyembunyikan
+   mulut yang sudah tergambar di seni. Sedikit blur di tepinya supaya batas
+   kotaknya tidak terbaca sebagai tambalan persegi. */
+fiezel-mascot .fz-viseme-cover {
+  position: absolute;
+  /* TIDAK memuai ke ATAS, dan itu bukan detail kosmetik: kotak mulut face-rig
+     mulai tepat di bawah hidung, jadi penutup yang memuai ke atas memakan hidung
+     karakter. Terlihat jelas saat dirender — Nusa kehilangan hidungnya di setiap
+     bingkai bicara. Sisi bawah/samping boleh memuai supaya batasnya tidak
+     terbaca sebagai tambalan persegi. */
+  inset: 10% -4% -6% -4%;
+  border-radius: 50%;
+  filter: blur(2.5px);
+}
+
+fiezel-mascot .fz-viseme-shape {
+  position: relative;
+  display: block;
+  background: var(--fz-mouth-ink, #6d2230);
+  transition: width .06s linear, height .06s linear, border-radius .06s linear;
+}
+
+/* ---------- gerak dasar ---------- */
+
+@keyframes fzCharBreathe {
+  0%, 100% { transform: translateY(0) scaleY(1); }
+  50%      { transform: translateY(-1.5%) scaleY(1.012); }
+}
+@keyframes fzCharBob {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-4%); }
+}
+@keyframes fzCharPop {
+  0%   { transform: scale(1); }
+  35%  { transform: scale(1.06); }
+  100% { transform: scale(1); }
+}
+@keyframes fzCharShake {
+  0%, 100% { transform: translateX(0); }
+  25%      { transform: translateX(-2%); }
+  75%      { transform: translateX(2%); }
+}
+@keyframes fzCharSway {
+  0%, 100% { transform: rotate(-1.2deg); }
+  50%      { transform: rotate(1.2deg); }
+}
+
+/* Napas pelan adalah keadaan dasar: karakter yang benar-benar diam terbaca
+   sebagai stiker. Kedip ditangani komponen (tukar bingkai), bukan di sini. */
+fiezel-mascot .fz-art { animation: fzCharBreathe 4.2s ease-in-out infinite; }
+
+fiezel-mascot.st-greeting     .fz-art,
+fiezel-mascot.st-welcome-back .fz-art { animation: fzCharBob 1.1s ease-in-out 2; }
+fiezel-mascot.st-celebrating  .fz-art,
+fiezel-mascot.st-completion   .fz-art,
+fiezel-mascot.st-milestone    .fz-art,
+fiezel-mascot.st-level-up     .fz-art { animation: fzCharPop .5s cubic-bezier(.2,.9,.3,1.2) 2; }
+fiezel-mascot.st-confused     .fz-art { animation: fzCharShake .28s ease-in-out 3; }
+fiezel-mascot.st-love         .fz-art,
+fiezel-mascot.st-proud        .fz-art { animation: fzCharPop .6s ease-out 1; }
+fiezel-mascot.st-sleepy       .fz-art { animation: fzCharBreathe 6.5s ease-in-out infinite; }
+fiezel-mascot.st-thinking     .fz-art,
+fiezel-mascot.st-curious      .fz-art { animation: fzCharSway 3.4s ease-in-out infinite; }
+
+/* ---------- kurangi-gerak ----------
+   Di sistem gambar ini jaminannya LEBIH KUAT daripada rig lama: tiap state sudah
+   berupa bingkai statis yang berbeda, jadi mematikan animasi tidak menghapus satu
+   pun informasi. Yang dimatikan hanya napas, pantulan, dan geser lookAt; kedip
+   dimatikan di sisi JavaScript. */
+@media (prefers-reduced-motion: reduce) {
+  fiezel-mascot .fz-art,
+  fiezel-mascot .fz-viseme-shape {
+    animation: none !important;
+    transition: none !important;
+  }
+  fiezel-mascot {
+    transform: none !important;
+    transition: none !important;
+  }
+}
+
+/* ============================================================
+   POTONGAN KEPALA UNTUK CAP KECIL (.has-mascot)
+   ============================================================
+   REGRESI YANG DIPERBAIKI DI SINI. Kelas `has-mascot` masih dipasang dari JS
+   (app.js pawFaceMarkup, fiezel-coach-bubble pawHost) dan masih dirujuk oleh tiga
+   komentar sebagai "resep yang MEMOTONG badan jadi lingkaran" — tetapi resepnya
+   sendiri tinggal di fiezel-motion.css dan TIDAK ikut pindah ketika berkas ini
+   menggantikannya (m025-303). Sejak itu cap kecil merender pose BERTUBUH PENUH apa
+   adanya: di wadah 42px, full-neutral (558x1129) terukur 38x77 — badannya meluber
+   keluar lingkaran dan wajahnya tinggal ±12px. Itulah "maskotnya jelek sekali" yang
+   dilaporkan OWNER pada layar Tanya.
+
+   ADA DUA SEBAB, dan yang kedua tidak akan terlihat dari membaca kaskade saja —
+   ia ditemukan dengan mengukur kotak grid di Chromium:
+
+   1. TIDAK ADA PEMOTONGAN. Tanpa resep di bawah, pose bertubuh penuh dipasang utuh
+      ke dalam cap bulat. Ambangnya bukan selera: di bawah ~72px sisi terpanjang,
+      pose bertubuh penuh tidak menyisakan piksel yang cukup untuk sebuah wajah.
+
+   2. BANTALAN TOMBOL UMUM. `body button{padding:13px 20px}` di fiezel-2.css berlaku
+      juga pada FAB bulat 58x58 yang isinya cuma seekor maskot. Kotak ISI-nya karena
+      itu tinggal 58-40-2 = 16 lebar dan 58-26-2 = 30 tinggi, dan `width:100%` si
+      maskot patuh dengan setia: 15x30 di dalam lingkaran 58px. Memotong kepala saja
+      tidak akan menolong — yang dipotong tetap akan 15px.
+
+   Pemotongannya memakai object-fit:cover, bukan lebar-178%-lalu-digeser seperti resep
+   lama: perhitungannya lalu diserahkan ke browser dari rasio gambar yang sebenarnya,
+   jadi ia tetap benar untuk KESEMBILAN BELAS pose (rasionya 802x661 sampai 558x1129)
+   tanpa satu pun angka ajaib per pose. */
+/* Tiga selektor, dan yang terpanjang bukan hiasan. Bantalan tombol umum di fiezel-2.css
+   ditulis `body.fz-lux button` — kekhususan (0,1,2), sama persis dengan `body
+   button.has-mascot`, dan berkas itu dimuat SESUDAH berkas ini, jadi pada seri yang
+   seimbang ia yang menang. `body.fz-lux button.has-mascot` (0,2,2) memutus seri itu
+   tanpa satu pun `!important`. */
+body.fz-lux button.has-mascot,
+body button.has-mascot,
+.has-mascot {
+  padding: 0;
+  place-items: stretch;
+  /* Trek `1fr`, bukan `auto`. Trek `auto` diukur dari isinya, dan isinya sebuah gambar
+     bertubuh tinggi — jadi kolomnya menyusut ke 27,7px di dalam lingkaran 58px meski
+     bantalannya sudah nol. `1fr` mengambil ukurannya dari WADAH yang sudah pasti, jadi
+     tidak ada lagi jalan bagi rasio gambar untuk menentukan lebar cap. */
+  grid-template-columns: 1fr;
+  grid-template-rows: 1fr;
+}
+
+/* Pemotongan dipasang di MASKOTNYA, bukan di wadahnya, dan itu bukan selera struktur:
+   `.fz-coach-bubble` menyimpan cincin denyut `.fz-coach-pulse` berukuran 78x78 yang
+   memang HARUS meluap keluar tombol 58px. `overflow:hidden` di wadah akan memotong
+   cincin itu dan mematikan denyutnya. `border-radius:inherit` membuat maskot memotong
+   dirinya sendiri mengikuti lengkung wadah, jadi sudut persegi gambar tidak pernah
+   muncul di luar lingkaran dan denyutnya tetap hidup. */
+.has-mascot fiezel-mascot {
+  /* `!important` di dua properti ini, dan alasannya perlu dibaca sebelum dicabut:
+     fiezel-coach-bubble.js memasang `style="width:100%;height:100%"` SEBARIS, dan gaya
+     sebaris menang atas stylesheet mana pun. Gaya sebaris itu dulu sabuk pengaman supaya
+     maskot tidak meluber menutupi CTA dan nav; sekarang maskotnya memotong dirinya
+     sendiri di bawah sini, jadi sabuk itu sudah tidak memikul apa pun. */
+  /* `auto`, BUKAN `100%`. Persen di sini melingkar: lebar trek grid diukur dari isi,
+     sedangkan isi diminta selebar persen dari trek itu. Browser memutus lingkaran itu
+     dengan ukuran INTRINSIK gambar, dan hasilnya 28x57 di dalam lingkaran 58px —
+     lebih baik dari 15x30, tetap salah. Dengan `auto` tidak ada yang melingkar:
+     `place-items:stretch` di atas yang merentangkan item ke seluruh kotak isi, dan
+     kotak itu sudah punya ukuran pasti dari wadahnya. */
+  width: auto !important;
+  height: auto !important;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+  border-radius: inherit;
+}
+.has-mascot fiezel-mascot .fz-art {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  /* 50% mendatar = wajah di tengah; 6% menurun = tepat di bawah ubun-ubun, jadi
+     lingkarannya tidak memotong telinga Nusa maupun poni Mira. */
+  object-position: 50% 6%;
+}
+/* Lapisan viseme dimatikan di cap kecil: kotak mulutnya dihitung terhadap gambar yang
+   UTUH, jadi di atas gambar yang dipotong ia mendarat di tempat yang salah. Pada cap
+   42px mulut viseme juga di bawah satu piksel — tidak ada yang hilang selain salah
+   tempat. */
+.has-mascot fiezel-mascot .fz-viseme { display: none; }

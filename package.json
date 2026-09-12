@@ -10,6 +10,8 @@
     "i18n:check": "node tools/sync-th-i18n.js --check",
     "mascot:export": "node tools/export-mascot.mjs",
     "mascot:check": "node tools/export-mascot.mjs --check",
+    "character:export": "node tools/export-character-system.mjs",
+    "character:check": "node tools/export-character-system.mjs --check",
     "test:gems": "node tests/gems-test.js",
     "test:grammar-curriculum": "node tests/grammar-curriculum-test.js",
     "test:grammar-unlock": "node tests/grammar-unlock-test.js",
