@@ -39,6 +39,71 @@ sambil tetap memakai Atlas. Periksa ini **sebelum** mengerjakan langkah lain.
 
 ---
 
+## 1b. Subdomain dan DNS — DUA HAL YANG TERPISAH DI PEMASANGAN INI
+
+Dua jebakan di sini sudah benar-benar menjegal pemasangan (12 Sep 2026), dan keduanya
+**tidak** muncul sebagai galat yang menyebut sebabnya. Bacalah sebelum membuat subdomain.
+
+### `api.fiezel.my.id` dan `owner.fiezel.my.id` SUDAH TERPAKAI — jangan pakai keduanya
+
+Keduanya adalah *custom domain* Worker Cloudflare yang **sedang melayani murid**:
+
+| Hostname | Dipegang oleh | Sumbernya di repo |
+|---|---|---|
+| `api.fiezel.my.id` | Worker `fiezel-api` (gerbang API murid) | `workers/api/wrangler.toml` → `routes`, dan `mw-edge.js` → `TRUSTED_EDGE_HOSTS` |
+| `owner.fiezel.my.id` | Worker `fiezel-owner` (dashboard owner) | `workers/owner/wrangler.toml` |
+
+Diukur dari luar, bukan dibaca dari berkas:
+
+```
+api.fiezel.my.id      -> 104.21.69.172, 172.67.210.146   (anycast Cloudflare)
+owner.fiezel.my.id    -> 104.21.69.172, 172.67.210.146   (anycast Cloudflare)
+fiezel.my.id          -> 195.88.211.212                  (server cPanel ArenHost)
+www / mail / cpanel   -> 195.88.211.212
+konsol / kurikulum    -> (tidak ada record — bebas)
+```
+
+Backend FastAPI ini adalah layanan **kedua** yang berdiri sendiri; ia butuh hostname
+sendiri. Mengarahkan ulang `api.fiezel.my.id` ke cPanel akan **mematikan gerbang API
+murid**. Pakai nama yang belum terpakai — panduan ini memakai `konsol.fiezel.my.id`.
+
+Jangan pula mengosongkan `~/public_html/api` dan `~/public_html/owner`: keduanya berisi
+jembatan PHP cadangan yang **memuat nilai secret** (lihat `deploy/edge/README.md`).
+
+### DNS otoritatif ada di Cloudflare, jadi membuat subdomain di cPanel TIDAK cukup
+
+Nameserver `fiezel.my.id` sudah pindah ke Cloudflare (`sydney.ns.cloudflare.com` /
+`syeef.ns.cloudflare.com`). Akibatnya: subdomain yang kamu buat lewat cPanel → *Domains*
+hanya membuat vhost dan zona **lokal** di server itu. Dunia luar tidak pernah melihatnya,
+dan tidak ada wildcard yang menolongmu — `*.fiezel.my.id` tidak ada (dibuktikan di tabel
+di atas: nama acak pun tidak menjawab).
+
+Gejalanya muncul jauh kemudian, saat AutoSSL, sebagai pesan yang menyalahkan DNS tanpa
+menyebut Cloudflare:
+
+```
+Domain Control Validation failed: ... responded with 404 (Not Found).
+The domain "..." resolved to an IP address "172.67.210.146" that does not
+exist on this server. DNS-based DCV also failed.
+```
+
+Urutan yang benar, dan urutannya penting:
+
+1. **Cloudflare → DNS → Add record.** Type `A`, Name `konsol`, IPv4
+   `195.88.211.212` (cPanel → *Server Information* → Shared IP Address — pakai
+   angka milikmu sendiri, jangan salin buta angka di sini), Proxy status
+   **DNS only (awan ABU-ABU)**.
+   Awan oranye membuat Let's Encrypt-nya cPanel tetap gagal: permintaan validasinya
+   berhenti di Cloudflare dan tidak pernah sampai ke cPanel.
+2. **cPanel → Domains → Create A New Domain** `konsol.fiezel.my.id`.
+3. Tunggu record menyebar (biasanya 1-2 menit di Cloudflare), pastikan dulu:
+   `konsol.fiezel.my.id` harus menjawab IP cPanel-mu, bukan IP Cloudflare.
+4. **cPanel → SSL/TLS Status → Run AutoSSL** untuk hostname itu.
+
+SSL baru dibutuhkan di langkah 7. Langkah 2-6 (unggah kode, buat aplikasi Python,
+pasang dependensi, isi `.env`, jalankan `bootstrap.py`) **tidak** menunggu sertifikat —
+kerjakan sambil menunggu kalau AutoSSL masih antre.
+
 ## 2. Unggah kode
 
 Unggah **isi** direktori `backend/` ke `~/fiezel-api` di akunmu (File Manager atau
@@ -56,7 +121,7 @@ cPanel → **Setup Python App** → Create Application:
 |---|---|
 | Python version | 3.11 (atau 3.10; jangan di bawah 3.9) |
 | Application root | `fiezel-api` |
-| Application URL | subdomain sendiri, mis. `api.fiezel.my.id` |
+| Application URL | subdomain yang kamu buat di langkah 1b, mis. `konsol.fiezel.my.id` |
 | Application startup file | `passenger_wsgi.py` |
 | Application Entry point | `application` |
 
@@ -184,7 +249,7 @@ SIAP. curriculum_nodes=731 questions=21
 cPanel → Setup Python App → **Restart**. Lalu:
 
 ```
-https://api.fiezel.my.id/api/health
+https://konsol.fiezel.my.id/api/health
 ```
 
 Harus menjawab JSON dengan `curriculum_nodes` **bukan nol**, dan angkanya **sama**
@@ -199,7 +264,7 @@ Isi alamatnya di `core-config.js` **pada pemasangan**, bukan di repo:
 
 ```js
 self.FIEZEL_CURRICULUM_CONFIG=Object.freeze({
-  curriculumApiUrl:'https://api.fiezel.my.id'
+  curriculumApiUrl:'https://konsol.fiezel.my.id'
 });
 ```
 
@@ -223,6 +288,9 @@ data murid ke server pemasang pertama. Jadi sunting berkas yang sudah terunggah 
 | Timeout ke Atlas | IP server belum masuk Network Access Atlas |
 | Konsol di aplikasi tetap mati | `curriculumApiUrl` belum diisi di `public_html/app/core-config.js` |
 | Galat CORS di Console peramban | `CORS_ORIGINS` belum memuat asal aplikasimu persis (skema + host) |
+| AutoSSL gagal: "DCV failed ... 404" / "resolved to an IP that does not exist on this server" | record DNS-nya belum ada di **Cloudflare**, atau ada tapi awannya oranye. Lihat langkah 1b |
+| Subdomain baru tidak menjawab apa pun dari luar | dibuat di cPanel saja; DNS otoritatif ada di Cloudflare (langkah 1b) |
+| Gerbang API murid tiba-tiba mati sesudah menyentuh DNS | `api.fiezel.my.id` diarahkan ulang ke cPanel. Kembalikan ke record proxied Worker (langkah 1b) |
 
 ---
 
