@@ -146,9 +146,27 @@ sementara `users.email` dan `attempts.idempotency_key` tidak punya indeks unik
 hanya data yang pelan-pelan rusak), akun ownermu tidak pernah lahir, dan
 databasenya kosong.
 
-`bootstrap.py` **aman dijalankan berulang**. Jalankan lagi setiap kali menaikkan
-versi yang menambah indeks. Ia juga cara sah memulihkan sandi owner yang lupa: ubah
-`ADMIN_PASSWORD` di `.env`, jalankan ulang.
+`bootstrap.py` **aman dijalankan berulang** — termasuk aman untuk sandimu. Jalankan
+lagi setiap kali menaikkan versi yang menambah indeks.
+
+**Ia TIDAK akan menimpa sandi owner yang sudah ada.** Kalau sandi di database berbeda
+dari `ADMIN_PASSWORD`, ia melaporkannya dan **membiarkannya**:
+
+```
+owner     : kamu@contoh.com sudah ada, sandinya BEDA dari .env — DIBIARKAN.
+            Pakai --reset-owner-password kalau memang mau menimpanya.
+```
+
+Itu perbaikan dari review PR #405. Versi pertama selalu menyelaraskan sandi, sehingga
+menjalankan ulang bootstrap untuk urusan indeks akan diam-diam mengembalikan sandimu
+ke nilai basi di `.env`. Sumbernya bahkan lebih luas dari itu: `server.py` memanggil
+`seed_owner()` di **setiap** start, jadi setiap restart uvicorn ikut menimpanya.
+
+**Memulihkan sandi owner yang lupa** — ubah `ADMIN_PASSWORD` di `.env`, lalu:
+
+```bash
+python bootstrap.py --reset-owner-password
+```
 
 Keluarannya menyebut angka, bukan "selesai":
 
@@ -201,6 +219,7 @@ data murid ke server pemasang pertama. Jadi sunting berkas yang sudah terunggah 
 | Mati saat start, `KeyError` | ada env wajib yang kosong. Jalankan `python bootstrap.py` — ia menyebutkan nama yang hilang |
 | `/api/health` hidup tapi `curriculum_nodes: 0` | `bootstrap.py` belum dijalankan (lihat langkah 6) |
 | Login owner ditolak | sama — `seed_owner()` ada di dalam bootstrap |
+| Lupa sandi owner | ubah `ADMIN_PASSWORD` di `.env`, lalu `python bootstrap.py --reset-owner-password` |
 | Timeout ke Atlas | IP server belum masuk Network Access Atlas |
 | Konsol di aplikasi tetap mati | `curriculumApiUrl` belum diisi di `public_html/app/core-config.js` |
 | Galat CORS di Console peramban | `CORS_ORIGINS` belum memuat asal aplikasimu persis (skema + host) |

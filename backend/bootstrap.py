@@ -13,12 +13,17 @@ versi yang menambah indeks:
     cd ~/fiezel-api && source ~/virtualenv/fiezel-api/3.11/bin/activate
     python bootstrap.py
 
-AMAN DIJALANKAN BERULANG. Ketiga langkahnya idempoten dan itu disengaja:
+AMAN DIJALANKAN BERULANG, dan sejak review PR #405 itu berlaku juga untuk sandi:
   - `create_index` pada indeks yang sudah ada adalah no-op di MongoDB;
-  - `seed_owner()` hanya membuat kalau belum ada, dan kalau sudah ada ia
-    MENYELARASKAN sandinya dengan ADMIN_PASSWORD — env adalah sumber kebenaran,
-    jadi menjalankan ulang berkas ini juga cara sah memulihkan sandi owner;
+  - `seed_owner()` membuat owner kalau belum ada, tetapi TIDAK menimpa sandi yang
+    sudah ada kecuali diminta tegas dengan `--reset-owner-password`. Versi pertama
+    selalu menimpanya, sehingga menjalankan ulang berkas ini untuk urusan indeks
+    diam-diam mengembalikan sandi owner ke nilai di .env;
   - penyemaian kurikulum hanya berjalan kalau koleksinya benar-benar kosong.
+
+MEMULIHKAN SANDI OWNER YANG LUPA: ubah ADMIN_PASSWORD di .env, lalu
+
+    python bootstrap.py --reset-owner-password
 
 Keluarannya sengaja menyebut ANGKA, bukan "selesai": pemasangan yang gagal separuh
 harus terbaca dari layar, bukan dari tebakan.
@@ -87,8 +92,21 @@ async def main():
     await ensure_indexes()
     print("indeks    : terpasang")
 
-    await auth.seed_owner()
-    print(f"owner     : {os.environ['ADMIN_EMAIL']} (sandi diselaraskan dengan ADMIN_PASSWORD)")
+    reset = "--reset-owner-password" in sys.argv
+    status = await auth.seed_owner(sync_password=reset)
+    email = os.environ["ADMIN_EMAIL"]
+    if status == "dibuat":
+        print(f"owner     : {email} DIBUAT")
+    elif status == "sudah-sesuai":
+        print(f"owner     : {email} sudah ada, sandinya sudah sesuai .env")
+    elif status == "sandi-ditimpa":
+        print(f"owner     : {email} sandinya DITIMPA dengan ADMIN_PASSWORD (diminta tegas)")
+    else:
+        # Dilaporkan, bukan diperbaiki diam-diam. Sandi yang berbeda bisa berarti
+        # ownernya sengaja menggantinya — menimpanya tanpa diminta mengunci dia
+        # dari akunnya sendiri tanpa jejak.
+        print(f"owner     : {email} sudah ada, sandinya BEDA dari .env — DIBIARKAN.")
+        print("            Pakai --reset-owner-password kalau memang mau menimpanya.")
 
     if await db.curriculum_nodes.count_documents({}) == 0:
         await seed_curriculum()
