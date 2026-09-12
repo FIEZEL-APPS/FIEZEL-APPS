@@ -808,8 +808,13 @@ input[type="checkbox"],input[type="radio"]{min-width:24px;min-height:24px}
      terracotta sebagai AKSEN untuk dua balok. Tidak ada warna baru yang ditambahkan. */
   --wordmark-ink-hi:#2E2724;
   --wordmark-ink-lo:#4A382A;
-  --wordmark-accent-hi:#C9432F;
-  --wordmark-accent-lo:#A33422;
+  /* m025-302: kedua balok ikut pindah ke maroon, dan itu MENGIKUTI aturan yang sudah
+     tertulis di komentar di atas — "terracotta sebagai AKSEN" bukan warna merdeka milik
+     wordmark, melainkan peran AKSEN palet yang kebetulan terracotta waktu itu. Aksennya
+     kini maroon, jadi balok ikut. Bandingkan dengan logo splash di fiezel-splash.js yang
+     TIDAK ikut: di sana paletnya ditandai terkunci oleh ruling OWNER, di sini tidak. */
+  --wordmark-accent-hi:#B8485C;
+  --wordmark-accent-lo:#9B3A4A;
   --green:#2E8B69;
   --green-soft:#E9F7F0;
   --red:#B8432D;
@@ -854,7 +859,7 @@ input[type="checkbox"],input[type="radio"]{min-width:24px;min-height:24px}
   --good-soft:#E9F7F0;
   --bad:#AC3E2A;
   --bad-soft:#FDE3DE;
-  /* --info adalah SATU-SATUNYA kuning yang boleh jadi teks: #7A5F1B di atas cream 5,9:1. */
+  /* --info adalah SATU-SATUNYA kuning yang boleh jadi teks: #7A5512 di atas cream 6,3:1. */
   --info:#7A5512;
   --info-soft:#FBF3E2;
   /* Cincin fokus tunggal untuk seluruh aplikasi.
@@ -1255,7 +1260,7 @@ html:has(body.reduce-motion){scroll-behavior:auto!important}/* v30 2026-08-29: t
 }
 
 /* m025-30 neural voice rate control */
-.neural-voice-choice input[type="range"]{width:100%;accent-color:var(--accent,#C2402C);height:28px}
+.neural-voice-choice input[type="range"]{width:100%;accent-color:var(--accent,#9B3A4A);height:28px}
 .neural-voice-choice input[type="range"]:disabled{opacity:.5}
 
 /* m025-32 Indonesian optional voice block */
@@ -1273,7 +1278,7 @@ html:has(body.reduce-motion){scroll-behavior:auto!important}/* v30 2026-08-29: t
 .classroom-board ul{margin:.6rem 0 0;padding-left:1.1rem;line-height:1.6}
 .classroom-subtitle-card{padding:16px;border-radius:var(--radius-md);background:var(--panel,#fff);color:var(--text,#2E2724);border:1px solid var(--line,#EFE7DE)}
 .classroom-en{font-weight:600;line-height:1.5;margin:.3rem 0}
-.classroom-id{color:var(--accent,#C2402C);font-weight:600;line-height:1.5;margin:.2rem 0;min-height:1.4em}
+.classroom-id{color:var(--accent,#9B3A4A);font-weight:600;line-height:1.5;margin:.2rem 0;min-height:1.4em}
 .classroom-options{display:grid;gap:9px}
 .classroom-option{text-align:left;padding:14px;border-radius:var(--radius-sm);min-height:48px}
 .classroom-option.is-correct{border-color:var(--good-bright);background:var(--good-soft)}
@@ -1286,7 +1291,7 @@ html:has(body.reduce-motion){scroll-behavior:auto!important}/* v30 2026-08-29: t
 body.voice-bundle-locked{overflow:hidden}
 body.voice-bundle-locked .bottomnav,body.voice-bundle-locked .app-header{pointer-events:none;opacity:.3}
 .voice-bundle-panel{width:min(520px,100%);display:grid;gap:10px;padding:20px;border-radius:var(--radius-lg);background:var(--panel,#fff);color:var(--text,#2E2724);border:1px solid var(--line,#EFE7DE);box-shadow:var(--shadow-lg)}
-.voice-bundle-mark{font:700 11px/1.4 -apple-system,system-ui,sans-serif;letter-spacing:.12em;color:var(--accent,#C2402C)}
+.voice-bundle-mark{font:700 11px/1.4 -apple-system,system-ui,sans-serif;letter-spacing:.12em;color:var(--accent,#9B3A4A)}
 .voice-bundle-panel h2{margin:0}
 .voice-bundle-panel p{margin:0;color:var(--muted,#6E635C);line-height:1.55}
 .voice-bundle-track{height:8px;border-radius:var(--radius-pill);background:var(--line-soft,var(--panel-soft));overflow:hidden}
@@ -1300,7 +1305,7 @@ body.voice-bundle-locked .bottomnav,body.voice-bundle-locked .app-header{pointer
 /* m025-44 FIEZEL Library: shelf, reader, audiobook, tap-to-translate */
 .library-page{display:grid;gap:14px}
 .library-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:11px}
-.library-card{display:grid;grid-template-columns:56px 1fr;gap:12px;align-items:start;text-align:left;padding:15px;border-radius:var(--radius-md);border:1px solid var(--line,#EFE7DE);background:var(--panel,#fff);color:var(--text,#2E2724);border-left:4px solid var(--book-accent,#C2402C)}
+.library-card{display:grid;grid-template-columns:56px 1fr;gap:12px;align-items:start;text-align:left;padding:15px;border-radius:var(--radius-md);border:1px solid var(--line,#EFE7DE);background:var(--panel,#fff);color:var(--text,#2E2724);border-left:4px solid var(--book-accent,#9B3A4A)}
 .library-cover{font-size:2rem;line-height:1}
 .library-meta{display:grid;gap:3px}
 .library-meta b{font-size:1.02rem}
@@ -1317,14 +1322,14 @@ body.voice-bundle-locked .bottomnav,body.voice-bundle-locked .app-header{pointer
 .library-text{display:grid;gap:2px}
 .library-chapter{margin:16px 0 6px;font-size:1.05rem}
 .library-sentence{display:block;width:100%;text-align:left;padding:7px 10px;border:none;border-radius:var(--radius-xs);background:transparent;color:var(--text,#2E2724);font:500 1.06rem/1.72 -apple-system,system-ui,sans-serif}
-.library-sentence[data-active]{background:var(--panel-soft,#f6eef0);box-shadow:inset 3px 0 0 var(--accent,#C2402C)}
+.library-sentence[data-active]{background:var(--panel-soft,#f6eef0);box-shadow:inset 3px 0 0 var(--accent,#9B3A4A)}
 /* m025-45: the translation floats in the middle of the screen. The book stays visible
    behind it and a tap outside dismisses it - a reader, not a modal. */
 .library-translation-layer{position:fixed;inset:0;z-index:78;display:grid;place-items:center;padding:20px;background:rgba(7,13,29,.28);backdrop-filter:blur(2px)}
 .library-translation-card{width:min(460px,100%);display:grid;gap:7px;padding:18px 18px 14px;border-radius:var(--radius-lg);background:var(--panel,#fff);border:1px solid var(--line,#EFE7DE);box-shadow:var(--shadow-lg)}
-.library-translation-mark{font:700 10px/1.4 -apple-system,system-ui,sans-serif;letter-spacing:.12em;color:var(--accent,#C2402C)}
+.library-translation-mark{font:700 10px/1.4 -apple-system,system-ui,sans-serif;letter-spacing:.12em;color:var(--accent,#9B3A4A)}
 .library-translation-en{margin:0;font-weight:600;line-height:1.5}
-.library-translation-id{margin:0;color:var(--accent,#C2402C);font-weight:600;line-height:1.5}
+.library-translation-id{margin:0;color:var(--accent,#9B3A4A);font-weight:600;line-height:1.5}
 .library-translation-actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
 #libraryCloseOne{margin-left:auto;width:44px;padding:0}
 .library-translation-actions button{min-height:42px;padding:0 13px;border-radius:var(--radius-sm)}
@@ -1347,13 +1352,13 @@ body.voice-bundle-locked .bottomnav,body.voice-bundle-locked .app-header{pointer
 .library-speed{flex:0 0 auto;min-width:62px;padding:0 12px;border-radius:var(--radius-sm);text-align:center;font-weight:700;font-variant-numeric:tabular-nums}
 .library-ask-sheet{position:fixed;inset:0;z-index:80;display:grid;place-items:center;padding:16px;background:rgba(7,13,29,.5)}
 .library-ask-panel{width:min(480px,100%);display:grid;gap:9px;padding:20px;border-radius:var(--radius-lg);background:var(--panel,#fff);color:var(--text,#2E2724)}
-.library-ask-mark{font:700 11px/1.4 -apple-system,system-ui,sans-serif;letter-spacing:.12em;color:var(--accent,#C2402C)}
+.library-ask-mark{font:700 11px/1.4 -apple-system,system-ui,sans-serif;letter-spacing:.12em;color:var(--accent,#9B3A4A)}
 .library-ask-panel h2{margin:0}
 .library-ask-quote{margin:0;padding:9px 11px;border-radius:var(--radius-sm);background:var(--panel-soft,#f6eef0);line-height:1.5}
 .library-ask-panel textarea{width:100%;padding:11px;border-radius:var(--radius-sm);border:1px solid var(--line,#EFE7DE);font:inherit;resize:vertical}
 .library-ask-actions{display:flex;gap:8px;justify-content:flex-end}
 .library-ask-actions button{min-height:46px;padding:0 16px;border-radius:var(--radius-sm)}
-.library-ask-answer{margin:0;line-height:1.55;color:var(--accent,#C2402C);font-weight:600}
+.library-ask-answer{margin:0;line-height:1.55;color:var(--accent,#9B3A4A);font-weight:600}
 .library-ask-answer:empty{display:none}
 @media (max-width:620px){.library-sentence{font-size:1.02rem}}
 @media (prefers-reduced-motion:reduce){.library-progress-line span{transition:none}}
@@ -1430,10 +1435,10 @@ body.voice-bundle-locked .bottomnav,body.voice-bundle-locked .app-header{pointer
 .fz-tour-card p{margin:0;font-size:.86rem;line-height:1.6;color:var(--muted,#6E635C)}
 .fz-tour-dots{display:flex;gap:6px}
 .fz-tour-dot{width:6px;height:6px;border-radius:50%;background:var(--line,#e9dfe1)}
-.fz-tour-dot.is-active{background:var(--accent,#C2402C);width:18px;border-radius:3px}
+.fz-tour-dot.is-active{background:var(--accent,#9B3A4A);width:18px;border-radius:3px}
 .fz-tour-actions{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:16px}
 .fz-tour-skip{min-height:44px;padding:10px 14px;border:0;background:transparent;color:var(--muted,#6E635C);font:inherit;font-size:.82rem;font-weight:700;cursor:pointer}
-.fz-tour-next{min-height:44px;padding:11px 22px;border:0;border-radius:var(--radius-sm);background:var(--accent,#C2402C);color:#fff;font:inherit;font-size:.86rem;font-weight:700;cursor:pointer}
+.fz-tour-next{min-height:44px;padding:11px 22px;border:0;border-radius:var(--radius-sm);background:var(--accent,#9B3A4A);color:#fff;font:inherit;font-size:.86rem;font-weight:700;cursor:pointer}
 /* Kurangi-gerak: sorotannya tetap ada, hanya perpindahannya yang tidak dianimasikan. */
 .fz-tour-still .fz-tour-hole{transition:none}
 .fz-tour-still .fz-tour-card{animation:none}
@@ -1544,7 +1549,7 @@ body.voice-bundle-locked .bottomnav,body.voice-bundle-locked .app-header{pointer
    FIEZEL brand: Percik + splash + onboarding
    Sumber warna dan tipografi: FIEZEL_Complete_Design_Specification.pdf, bagian 2 dan 15.
    Token di bawah SENGAJA dinamai --fz-* dan dilingkupi ke elemen `.fiezel-*` saja - ini
-   BUKAN skema warna aplikasi (yang tetap --accent:#C2402C dkk di :root atas). Menyamakan
+   BUKAN skema warna aplikasi (yang tetap --accent maroon dkk di :root atas). Menyamakan
    keduanya berarti mengecat ulang puluhan layar lain yang tidak diminta pada redesign ini;
    splash dan onboarding adalah lapisan tersendiri sehingga aman dilingkupi sendiri.
    ======================================================================================== */
@@ -3535,23 +3540,23 @@ html.fiezel-ui-v6 .launcher-shell{
 .active-level-control,.home-level-context{display:inline-flex;align-items:center;gap:7px;border:1px solid var(--line,#eadfce);border-radius:var(--radius-sm);background:var(--panel,#fff);color:var(--ink,#2E2724);cursor:pointer;box-shadow:none}
 .active-level-control{flex:0 0 auto;flex-direction:column;align-items:flex-start;padding:10px 13px;min-width:118px;text-align:left}
 .active-level-control span,.active-level-control small{font-size:.66rem;color:var(--muted,#746958);line-height:1.1}
-.active-level-control strong{font-size:1rem;line-height:1.1;color:var(--accent,#c2402c)}
+.active-level-control strong{font-size:1rem;line-height:1.1;color:var(--accent,#9B3A4A)}
 /* v6.1 (O4 §2.5): glow hover dihapus — umpan balik hover sudah dibawa border-color. */
-.active-level-control:hover,.home-level-context:hover{border-color:var(--accent,#c2402c);transform:translateY(-1px)}
+.active-level-control:hover,.home-level-context:hover{border-color:var(--accent,#9B3A4A);transform:translateY(-1px)}
 .home-level-context{padding:4px 9px;font-size:.68rem;font-weight:700;white-space:nowrap}
 .level-picker-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px;margin:18px 0}
 .level-picker-card{display:grid;gap:5px;min-height:88px;padding:13px;text-align:left;border:1px solid var(--line,#eadfce);border-radius:var(--radius-md);background:var(--panel,#fff);color:var(--ink,#2E2724);cursor:pointer}
-.level-picker-card strong{font-size:1.15rem;color:var(--accent,#c2402c)}
+.level-picker-card strong{font-size:1.15rem;color:var(--accent,#9B3A4A)}
 .level-picker-card span{font-size:.72rem;line-height:1.35;color:var(--muted,#746958)}
-.level-picker-card.is-active{border-color:var(--accent,#c2402c);background:color-mix(in srgb,var(--accent,#c2402c) 8%,var(--panel,#fff));box-shadow:0 0 0 2px color-mix(in srgb,var(--accent,#c2402c) 16%,transparent)}
+.level-picker-card.is-active{border-color:var(--accent,#9B3A4A);background:color-mix(in srgb,var(--accent,#9B3A4A) 8%,var(--panel,#fff));box-shadow:0 0 0 2px color-mix(in srgb,var(--accent,#9B3A4A) 16%,transparent)}
 .level-source-note,.level-scope-note,.grammar-level-note{display:flex;flex-wrap:wrap;gap:5px 10px;align-items:baseline;padding:12px 14px;margin:0 0 16px;border-radius:var(--radius-md);background:var(--panel-soft,#f8f1e7);color:var(--ink,#2E2724);font-size:.83rem}
 .level-source-note{display:block;margin-top:10px}
-.level-source-note b{color:var(--accent,#c2402c)}
+.level-source-note b{color:var(--accent,#9B3A4A)}
 .level-scope-note span,.grammar-level-note span,.grammar-level-note small{color:var(--muted,#746958)}
 .grammar-level-note{display:grid;gap:4px}
-.grammar-level-note b{color:var(--accent,#c2402c)}
+.grammar-level-note b{color:var(--accent,#9B3A4A)}
 .skill-level-note{margin-top:10px;font-size:.82rem;color:var(--muted,#746958)}
-.skill-level-note b{color:var(--accent,#c2402c)}
+.skill-level-note b{color:var(--accent,#9B3A4A)}
 @media(max-width:620px){
   .section-head{align-items:flex-start;flex-direction:column}
   .section-head .active-level-control{align-self:stretch;flex-direction:row;align-items:center;justify-content:space-between}
@@ -3568,7 +3573,7 @@ html.fiezel-ui-v6 .launcher-shell{
 /* m025-138: kontrak ujian dan rubrik Writing. Batas kata sengaja dibuat menonjol -
    di IELTS, tulisan di bawah batas kena penalti sebelum isinya sempat dinilai. */
 .writing-exam{display:grid;gap:3px;margin:0 0 10px;padding:11px 13px;border-radius:var(--radius-sm);background:var(--panel-soft,#f8f1e7);font-size:.8rem}
-.writing-exam b{color:var(--accent,#c2402c)}
+.writing-exam b{color:var(--accent,#9B3A4A)}
 .writing-exam span{font-weight:600}
 .writing-exam small{color:var(--muted,#746958);line-height:1.4}
 .writing-focus{margin:6px 0 0;font-size:.78rem;color:var(--muted,#746958)}
@@ -3578,13 +3583,13 @@ html.fiezel-ui-v6 .launcher-shell{
 .writing-checklist li{display:grid;gap:2px;padding:9px 11px;border-radius:var(--radius-sm);border-left:3px solid var(--line,#eadfce);background:var(--panel-soft,#f8f1e7);font-size:.79rem}
 .writing-checklist li span{color:var(--muted,#746958);line-height:1.45}
 .writing-check.is-ok{border-left-color:#3f8f5f}
-.writing-check.is-perhatikan{border-left-color:var(--accent,#c2402c)}
+.writing-check.is-perhatikan{border-left-color:var(--accent,#9B3A4A)}
 .writing-check.is-ai{border-left-color:#7a6cc4}
 /* m025-139: jalur Reading berformat ujian. Kontraknya (panjang, jumlah soal, waktu)
    ditaruh di muka karena itulah yang membedakannya dari bacaan latihan biasa. */
 .reading-exam{display:grid;gap:11px;margin:0 0 16px}
 .reading-exam-set{display:grid;gap:4px;padding:12px 13px;border-radius:var(--radius-sm);background:var(--panel-soft,#f8f1e7)}
-.reading-exam-set span{font-size:.75rem;font-weight:600;color:var(--accent,#c2402c)}
+.reading-exam-set span{font-size:.75rem;font-weight:600;color:var(--accent,#9B3A4A)}
 .reading-exam-set small{font-size:.74rem;line-height:1.45;color:var(--muted,#746958)}
 .reading-exam-set button{justify-self:start;margin-top:5px}
 
@@ -4150,7 +4155,7 @@ body.fz-lesson-mode .topline{position:sticky;top:0;z-index:30;
 .level-exam-cta span{font-size:.74rem;color:var(--muted,#746958)}
 .level-exam-facts{display:grid;gap:6px;margin:12px 0;padding-left:18px;font-size:.8rem;line-height:1.45}
 .level-trust-banner{display:grid;gap:10px;padding:15px 16px;margin:0 0 16px;border-radius:var(--radius-md);border:1px solid var(--line,#eadfce);background:var(--panel,#fff)}
-.level-trust-banner.is-locked{border-color:color-mix(in srgb,var(--accent,#c2402c) 40%,transparent);background:color-mix(in srgb,var(--accent,#c2402c) 6%,var(--panel,#fff))}
+.level-trust-banner.is-locked{border-color:color-mix(in srgb,var(--accent,#9B3A4A) 40%,transparent);background:color-mix(in srgb,var(--accent,#9B3A4A) 6%,var(--panel,#fff))}
 .level-trust-banner.is-probation{border-color:color-mix(in srgb,var(--yellow-deep,#b8862b) 42%,transparent);background:color-mix(in srgb,var(--yellow-deep,#b8862b) 7%,var(--panel,#fff))}
 .level-trust-head{display:grid;gap:4px}
 .level-trust-head b{font-size:.98rem}
@@ -4161,8 +4166,8 @@ body.fz-lesson-mode .topline{position:sticky;top:0;z-index:30;
 .level-trust-ladder li b{font-size:.88rem;color:var(--ink,#2E2724)}
 .level-trust-ladder li.is-done{border-color:color-mix(in srgb,var(--good,#3f7d4e) 45%,transparent)}
 .level-trust-ladder li.is-done b{color:var(--good,#3f7d4e)}
-.level-trust-ladder li.is-open{border-color:color-mix(in srgb,var(--accent,#c2402c) 48%,transparent)}
-.level-trust-ladder li.is-open b{color:var(--accent,#c2402c)}
+.level-trust-ladder li.is-open{border-color:color-mix(in srgb,var(--accent,#9B3A4A) 48%,transparent)}
+.level-trust-ladder li.is-open b{color:var(--accent,#9B3A4A)}
 .level-trust-actions{display:flex;flex-wrap:wrap;gap:8px}
 /* m025-166 popup gerbang masuk level. Isinya HANYA transform+opacity - tidak ada properti
    layout yang dianimasikan, jadi tidak ada reflow per frame di ponsel murah. Pop masuk
@@ -4184,7 +4189,7 @@ body.fz-lesson-mode .topline{position:sticky;top:0;z-index:30;
    SATU-SATUNYA kuning-tinta yang boleh jadi teks (lihat komentar token v6), dan ukurannya
    dinaikkan ke lantai 12px. Bidang chip (border/latar kuning tipis) tidak berubah. */
 .level-trust-chip{justify-self:start;color:var(--info,#7A5F1B);font-size:.75rem}
-.level-trust-chip-cta{justify-self:start;margin-top:4px;padding:7px 13px;border-radius:var(--radius-pill);border:1px solid color-mix(in srgb,var(--accent,#c2402c) 42%,transparent);background:transparent;color:var(--accent,#c2402c);font-size:.76rem;font-weight:700}
+.level-trust-chip-cta{justify-self:start;margin-top:4px;padding:7px 13px;border-radius:var(--radius-pill);border:1px solid color-mix(in srgb,var(--accent,#9B3A4A) 42%,transparent);background:transparent;color:var(--accent,#9B3A4A);font-size:.76rem;font-weight:700}
 @keyframes fzLevelEntryPop{from{opacity:0;transform:scale(.9) translate3d(0,10px,0)}60%{opacity:1;transform:scale(1.01) translate3d(0,0,0)}to{opacity:1;transform:scale(1) translate3d(0,0,0)}}
 @keyframes fzLevelEntryRise{from{opacity:0;transform:translate3d(0,7px,0)}to{opacity:1;transform:none}}
 @media (prefers-reduced-motion:reduce){

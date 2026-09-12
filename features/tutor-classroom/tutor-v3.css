@@ -1,5 +1,5 @@
 /* FIEZEL UI v6 — coherent adaptive-learning shell + Classroom v3 */
-html.fiezel-ui-v6{--ui-bg:#FBF7F3;--ui-surface:rgba(255,253,248,.92);--ui-surface-rgb:255,253,248;--ui-tint-soft:#FBF3E2;--ui-chrome-dusk:rgba(251,247,243,.86);--ui-shimmer-a:#F6EDDD;--ui-shimmer-b:#FFFCF5;--ui-surface-strong:#fffdf8;--ui-line:rgba(36,26,17,.11);--ui-edge:rgba(255,255,255,.74);--ui-chrome:rgba(251,247,243,.84);--ui-tint:#FFFCF5;--ui-tint-cool:#F8F6EF;--ui-tint-line:#F0E6D6;--ui-hero:linear-gradient(145deg,#FFF8EA 0%,#FFF1D6 55%,#FFE6B4 100%);--ui-bundle:linear-gradient(135deg,rgba(255,243,214,.94),rgba(253,236,231,.94));--ui-bundle-line:rgba(201,162,75,.34);--ui-text:#2E2724;--ui-muted:#6E635C;--ui-ink-soft:#4E4130;--ui-accent:#C2402C;--ui-accent-soft:#FDE3DE;--ui-indigo:#8E5B33;--ui-teal:#1E7F72;--ui-warn:#9E6B18;--ui-track:#F0E4CF;--ui-radius:22px;--ui-shadow:0 18px 55px rgba(36,26,17,.12)}
+html.fiezel-ui-v6{--ui-bg:#FBF7F3;--ui-surface:rgba(253,250,247,.92);--ui-surface-rgb:253,250,247;--ui-tint-soft:#FBF3E2;--ui-chrome-dusk:rgba(251,247,243,.86);--ui-shimmer-a:#F3EFE9;--ui-shimmer-b:#FDFAF7;--ui-surface-strong:#FDFAF7;--ui-line:rgba(46,39,36,.06);--ui-edge:rgba(255,255,255,.74);--ui-chrome:rgba(251,247,243,.84);--ui-tint:#FDFAF7;--ui-tint-cool:#F6F1EA;--ui-tint-line:#EFE7DE;--ui-hero:linear-gradient(145deg,#FDFAF7 0%,#FBF3E2 55%,#F3E3C0 100%);--ui-bundle:linear-gradient(135deg,rgba(247,234,203,.94),rgba(246,233,235,.94));--ui-bundle-line:rgba(122,85,18,.20);--ui-text:#2E2724;--ui-muted:#6E635C;--ui-ink-soft:#544A44;--ui-accent:#9B3A4A;--ui-accent-soft:#F6E9EB;--ui-indigo:#8E5B33;--ui-teal:#1E7F72;--ui-warn:#9E6B18;--ui-track:#EFE7DE;--ui-radius:22px;--ui-shadow:0 20px 44px rgba(46,39,36,.10)}
 /* m025-113 (brief redesign 4). Dua kabut radial di bawah ini BIRU (#5b9bec, #715bda) -
    sisa palet v6 lama - dan merekalah yang membuat marun merek terbaca lumpur di setiap
    layar. Diganti satu kabut marun tunggal dengan bobot yang sama, jadi kedalamannya tetap
@@ -99,20 +99,20 @@ html.fiezel-ui-v6 body.scene-dusk .topbar,html.fiezel-ui-v6 body.scene-night .to
 /* m025-42 press-to-talk dock: one round button, centred, always reachable in Classroom */
 .tutor-talk-dock{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(78px + env(safe-area-inset-bottom,0));z-index:55;display:grid;justify-items:center;gap:6px;pointer-events:none}
 .tutor-talk-dock>*{pointer-events:auto}
-.tutor-talk-button{width:74px;height:74px;border-radius:50%;display:grid;place-items:center;border:none;color:#fff;background:linear-gradient(160deg,#C2402C,#b8455a);box-shadow:0 16px 36px rgba(140,34,51,.42);position:relative}
+.tutor-talk-button{width:74px;height:74px;border-radius:50%;display:grid;place-items:center;border:none;color:#fff;background:linear-gradient(160deg,#9B3A4A,#7E2D3B);box-shadow:0 16px 36px rgba(140,34,51,.42);position:relative}
 .tutor-talk-button i{width:28px;height:28px}
 .tutor-talk-ring{position:absolute;inset:-6px;border-radius:50%;border:2px solid rgba(140,34,51,.5);opacity:0}
-.tutor-talk-button.is-listening{background:linear-gradient(160deg,#e0526f,#f0844d)}
+.tutor-talk-button.is-listening{background:linear-gradient(160deg,#B8485C,#9B3A4A)}
 .tutor-talk-button.is-listening .tutor-talk-ring{opacity:1;animation:tutorTalkPulse 1.4s ease-out infinite}
-.tutor-talk-button.is-thinking{background:linear-gradient(160deg,#1f9d6f,#C2402C)}
-.tutor-talk-hint{margin:0;font:600 .78rem/1.3 -apple-system,system-ui,sans-serif;color:var(--text,#1d1114);background:var(--panel,#fff);padding:4px 10px;border-radius:999px;border:1px solid var(--line,#e9dfe1)}
+.tutor-talk-button.is-thinking{background:linear-gradient(160deg,#1D5C52,#9B3A4A)}
+.tutor-talk-hint{margin:0;font:600 .78rem/1.3 -apple-system,system-ui,sans-serif;color:var(--text,#2E2724);background:var(--panel,#fff);padding:4px 10px;border-radius:999px;border:1px solid var(--line,#e9dfe1)}
 @keyframes tutorTalkPulse{0%{transform:scale(1);opacity:.65}100%{transform:scale(1.35);opacity:0}}
 .tutor-talk-sheet{position:fixed;inset:0;z-index:75;display:grid;place-items:center;padding:16px;background:rgba(26,12,18,.5)}
-.tutor-talk-panel{width:min(480px,100%);display:grid;gap:10px;padding:20px;border-radius:24px;background:var(--panel,#fff);color:var(--text,#1d1114)}
-.tutor-talk-mark{font:700 11px/1.4 -apple-system,system-ui,sans-serif;letter-spacing:.12em;color:var(--accent,#C2402C)}
+.tutor-talk-panel{width:min(480px,100%);display:grid;gap:10px;padding:20px;border-radius:24px;background:var(--panel,#fff);color:var(--text,#2E2724)}
+.tutor-talk-mark{font:700 11px/1.4 -apple-system,system-ui,sans-serif;letter-spacing:.12em;color:var(--accent,#9B3A4A)}
 .tutor-talk-panel h2{margin:0}
 .tutor-talk-panel p{margin:0;color:var(--muted,#6b5a60);line-height:1.5}
-.tutor-talk-panel textarea{width:100%;padding:12px;border-radius:14px;border:1px solid var(--line,#e9dfe1);font:inherit;resize:vertical;background:var(--surface-solid,#fff);color:var(--text,#1d1114)}
+.tutor-talk-panel textarea{width:100%;padding:12px;border-radius:14px;border:1px solid var(--line,#e9dfe1);font:inherit;resize:vertical;background:var(--surface-solid,#fff);color:var(--text,#2E2724)}
 .tutor-talk-actions{display:flex;gap:9px;justify-content:flex-end}
 .tutor-talk-actions button{min-height:48px;padding:0 18px;border-radius:14px}
 @media (max-width:620px){.tutor-talk-button{width:66px;height:66px}}
