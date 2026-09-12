@@ -85,16 +85,26 @@ berbicara ASGI, dan `a2wsgi` yang menjembatani. Tanpa itu aplikasinya mati saat 
 
 ## 5. Isi `.env`
 
-Salin `.env.example` jadi `.env` di `~/fiezel-api`, lalu isi **ketujuhnya**:
+Salin `.env.example` jadi `.env` di `~/fiezel-api`, lalu isi:
 
 ```bash
 cp .env.example .env
 nano .env
 ```
 
-Ketujuh env itu dibaca dengan `os.environ["NAMA"]` — bukan `.get()` — jadi yang
-kurang membuat server **mati saat start**, bukan jalan setengah. Itu disengaja:
-pemasangan separuh lebih berbahaya daripada pemasangan yang menolak menyala.
+Ketujuhnya **tidak sama daruratnya**. Lima yang pertama menghalangi pemasangan dan
+diblokir `bootstrap.py`; dua yang terakhir hanya mematikan satu fitur dan cuma
+diperingatkan — jadi kamu bisa memasang **hari ini** walau belum punya semuanya:
+
+| Env | Kalau kosong |
+|---|---|
+| `MONGO_URL`, `DB_NAME` | server mati saat impor — dibaca di tingkat modul `db.py` |
+| `ADMIN_EMAIL`, `ADMIN_PASSWORD` | `bootstrap.py` tidak bisa membuat akun ownermu |
+| `JWT_SECRET` | nol orang bisa login |
+| `OWNER_MASTER_TOKEN` | hanya rute khusus owner yang menolak |
+| `EMERGENT_AUTH_SESSION_URL` | hanya tombol "Masuk dengan Google" yang mati; login email+sandi tetap penuh |
+
+Jadi kalau kamu belum punya alamat penukar sesi Google, **kosongkan saja dan lanjut**.
 
 Bangkitkan dua rahasianya dengan:
 

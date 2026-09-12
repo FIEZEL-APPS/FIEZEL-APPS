@@ -34,28 +34,42 @@ load_dotenv()
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
-WAJIB = (
-    "MONGO_URL",
-    "DB_NAME",
-    "ADMIN_EMAIL",
-    "ADMIN_PASSWORD",
-    "JWT_SECRET",
-    "OWNER_MASTER_TOKEN",
-    "EMERGENT_AUTH_SESSION_URL",
-)
+# Ketujuh env TIDAK sama daruratnya, dan menyamakannya adalah cacat: versi pertama
+# berkas ini menuntut semuanya, sehingga pemasang yang belum punya alamat login Google
+# terhalang memasang apa pun — padahal alamat itu hanya dibaca ketika rute
+# /google/session benar-benar dipanggil. Diperiksa satu per satu di kode, bukan diduga:
+#
+#   MONGO_URL, DB_NAME          db.py tingkat MODUL  -> server mati saat impor
+#   ADMIN_EMAIL, ADMIN_PASSWORD di dalam seed_owner()-> bootstrap ini butuh
+#   JWT_SECRET                  saat menandatangani  -> tanpa ini TIDAK ADA yang bisa login
+#   OWNER_MASTER_TOKEN          rute khusus owner    -> rute itu saja yang mati
+#   EMERGENT_AUTH_SESSION_URL   rute /google/session -> login Google saja yang mati
+WAJIB = ("MONGO_URL", "DB_NAME", "ADMIN_EMAIL", "ADMIN_PASSWORD", "JWT_SECRET")
+
+# Kurang salah satu ini TIDAK menghalangi pemasangan; ia mematikan satu fitur saja.
+# Diperingatkan keras, bukan diblokir — supaya pemasangan tetap bisa jalan hari ini
+# dan pemasang TAHU persis apa yang belum hidup, bukan menemukannya sebagai 500.
+OPSIONAL = {
+    "OWNER_MASTER_TOKEN": "rute khusus owner akan menolak semua permintaan",
+    "EMERGENT_AUTH_SESSION_URL": "login Google akan gagal (login email/sandi tetap jalan)",
+}
 
 
 def periksa_env():
-    """Gagal di sini, dengan nama yang hilang disebutkan.
+    """Gagal untuk yang benar-benar menghalangi; peringatkan untuk yang mematikan satu fitur.
 
-    Tanpa ini, env yang kurang muncul sebagai KeyError telanjang dari kedalaman
-    impor — pesan yang tidak memberi tahu pemasang apa pun tentang apa yang kurang.
+    Tanpa ini, env yang kurang muncul sebagai KeyError telanjang dari kedalaman impor —
+    pesan yang tidak memberi tahu pemasang apa pun tentang apa yang kurang.
     """
     hilang = [n for n in WAJIB if not os.environ.get(n)]
     if hilang:
         print("GAGAL: env wajib belum diisi -> " + ", ".join(hilang), file=sys.stderr)
         print("Isi di berkas .env (lihat .env.example), lalu jalankan lagi.", file=sys.stderr)
         raise SystemExit(2)
+
+    for nama, akibat in OPSIONAL.items():
+        if not os.environ.get(nama):
+            print(f"PERINGATAN: {nama} kosong -> {akibat}", file=sys.stderr)
 
 
 async def main():
