@@ -339,3 +339,71 @@ bagi setiap orang lain — persis bug m025-294 dalam bentuk baru.
 Daftar m025-298 tetap berlaku utuh (MongoDB Atlas → Render → delapan variabel →
 `CORS_ORIGINS` → tempel alamatnya). Yang berubah: sekarang langkah ke-5 itu benar-benar
 membuka pintunya, karena kabel yang membuatnya sia-sia sudah tersambung dan dijaga gerbang.
+
+---
+
+## m025-303 — alamat backend disambungkan, DAN DIVERIFIKASI
+
+`curriculumApiUrl` diisi `https://fiezel-apps.onrender.com`, sehingga penjaga pintu
+(m025-298) membuka tautan "Kurikulum & Kompetensi" di sidebar Ruang Guru.
+
+Ini menuntaskan PR #395 (8 Sep), yang sengaja dibiarkan draf dengan satu syarat:
+
+> Syarat gabung: owner membuka `https://fiezel-apps.onrender.com/api/health` di browser
+> dan melihat balasan JSON.
+
+**Syarat itu terpenuhi 12 Sep 2026.** Owner membukanya dan menempelkan jawabannya:
+
+```json
+{"ok":true,"service":"fiezel-learning-engine","curriculum_nodes":731,"questions":21,"attempts":0}
+```
+
+Angka `731` itu bukan sekadar "hidup": ia **sama persis** dengan yang dicetak
+`backend/bootstrap.py` saat menyemai Atlas pada hari yang sama
+(`SIAP. curriculum_nodes=731 questions=21`). Jadi yang dibuktikan bukan cuma servernya
+menjawab, melainkan servernya menunjuk **database yang benar**. Pintu ini tidak dibuka
+atas dasar tebakan.
+
+### Jalan yang ditempuh sebelum sampai ke sini
+
+Pemasangan backend permanen dicoba lebih dulu di cPanel ArenHost dan **gagal** — bukan
+karena kodenya, melainkan karena Passenger tidak pernah dijalankan server itu walau menu
+"Setup Python App" tersedia. Tiga lokasi dicoba, ketiganya 404 dalam 1-2 milidetik.
+Catatan lengkapnya, berikut tes 30 detik yang membuktikannya sebelum orang membuang
+waktu berjam-jam, ada di `docs/BACKEND-CPANEL-DEPLOY.md` §0a.
+
+Render sendiri gagal tiga hari sebelumnya karena tidak ada berkas yang menentukan versi
+Python — akar yang sudah dicatat PR #395 sebagai utang dan baru ditutup m025-302
+(`backend/.python-version` = 3.11.9, dijaga dua assert di
+`tests/backend-env-contract-test.js`). Sesudah itu deploy-nya bersih: wheel `cp311`,
+`Application startup complete`, live.
+
+### Gerbang ketiga ikut diselaraskan
+
+PR #395 melonggarkan dua gerbang yang menuntut `curriculumApiUrl` **selalu kosong**
+(`curriculum-api-base-test.js`, `curriculum-console-gate-test.js`), dengan alasan yang
+masih berlaku: `CORE_CONFIG.workerUrl` di berkas yang sama sudah lama berisi alamat
+operator, dan FIEZEL tanpa langkah build tidak punya tempat lain menaruh alamat.
+
+Yang tidak bisa diketahui PR #395: `curriculum-config-wiring-test.js` lahir **sesudahnya**
+(PR #403, 11 Sep) dan mewarisi tuntutan lama itu. Ia karena itu satu-satunya yang merah
+saat alamatnya benar-benar diisi, dan kini diselaraskan dengan dua yang lain —
+**kosong ATAU https tanpa ekor garis miring**. Dibuktikan masih bisa merah:
+alamat `http://` -> merah, ekor `/` -> merah.
+
+Yang menjaga bug pintu-ke-ruangan-kosong tetap **tidak** dilonggarkan di mana pun: ia
+assert di `curriculum-console-gate-test.js` yang MENJALANKAN penjaganya
+(alamat kosong -> pintu tertutup).
+
+### Yang harus owner tahu
+
+**Render paket gratis tidur setelah 15 menit menganggur.** Guru yang membuka konsol
+sesudah jeda menunggu ~50 detik sebelum halamannya hidup. Untuk dipakai guru sungguhan
+sehari-hari, paketnya perlu berbayar.
+
+**Login Google belum hidup** (`EMERGENT_AUTH_SESSION_URL` ada di Render, pastikan
+diawali `https://`). Login email+sandi jalan penuh, termasuk akun owner.
+
+**Sandi owner yang berlaku** adalah yang tersimpan di `.env` pemasangan, bukan nilai
+`ADMIN_PASSWORD` di Render: `seed_owner()` sengaja tidak menimpa sandi owner yang sudah
+ada (perbaikan dari review PR #405).

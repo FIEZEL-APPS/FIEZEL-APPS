@@ -76,16 +76,36 @@ halaman.forEach((h) => {
   });
 });
 
-/* Arah sebaliknya: alamat bawaan WAJIB tetap kosong di repo yang didistribusikan. Gerbang
-   ini menambah kabel yang hilang; ia tidak boleh berubah jadi alasan menyalakan pintunya
-   dengan alamat milik pemasang pertama. */
-test('alamat bawaan di core-config.js tetap kosong', () => {
+/* KOREKSI ASSERT (m025-303) — sepasang dengan koreksi yang sama di
+   curriculum-api-base-test.js dan curriculum-console-gate-test.js (PR #395, 8 Sep).
+
+   Versi pertama assert ini menuntut alamatnya SELALU kosong di repo. Tuntutan itu lebih
+   ketat daripada praktik repo ini sendiri dan mustahil dipenuhi begitu backend-nya
+   benar-benar dipasang: `CORE_CONFIG.workerUrl` di berkas yang sama sudah lama berisi
+   alamat operator (`https://fiezel-core.puter.work`), dan FIEZEL tidak punya langkah
+   build — tidak ada tempat lain untuk menaruh alamat selain core-config.js. Repo ini
+   milik satu operator (CLAUDE.md).
+
+   Gerbang ini lahir di PR #403 (11 Sep), SESUDAH PR #395 menulis koreksinya, jadi ia
+   mewarisi tuntutan lama tanpa ikut dikoreksi. Kalau dibiarkan, ia satu-satunya yang
+   merah saat alamatnya benar-benar diisi — dan yang dijaganya sudah dijaga assert lain
+   yang lebih tepat sasaran.
+
+   Yang menjaga bug pintu-ke-ruangan-kosong BUKAN assert ini, melainkan assert di
+   curriculum-console-gate-test.js yang MENJALANKAN penjaganya (alamat kosong -> pintu
+   tertutup). Itu tetap utuh dan tidak dilonggarkan di mana pun. */
+test('alamat di core-config.js kosong ATAU https tanpa ekor garis miring', () => {
   const cfg = baca('core-config.js');
   const m = cfg.match(/curriculumApiUrl\s*:\s*'([^']*)'/);
   assert.ok(m, 'curriculumApiUrl tidak ditemukan di core-config.js');
-  assert.strictEqual(m[1], '',
-    'curriculumApiUrl terisi di repo. Salinan repo ini tidak boleh mengirim data murid ' +
-    'ke server milik pemasang pertama — alamat diisi di pemasangan, bukan di git.');
+  const v = m[1];
+  if (v === '') return;                      // backend belum dipasang — sah, pintu tertutup
+  assert.ok(/^https:\/\/[^\s'"]+$/.test(v),
+    "curriculumApiUrl terisi tetapi bukan https yang sah: '" + v + "' — token guru dan " +
+    'jawaban murid tidak boleh lewat jalur terbuka');
+  assert.ok(!/\/$/.test(v),
+    "curriculumApiUrl diakhiri garis miring ('" + v + "') — tulis tanpa ekor. base() di " +
+    'fz-api memang membuangnya, jadi ini soal satu bentuk kanonik, bukan panggilan gagal');
 });
 
 test('gerbang ini terdaftar di .github/workflows/quality.yml', () => {
