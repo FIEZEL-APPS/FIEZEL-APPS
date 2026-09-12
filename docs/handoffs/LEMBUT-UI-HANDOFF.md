@@ -118,8 +118,35 @@ Ditahan dengan sengaja, bukan terlupakan:
 3. **Kartu hitam "LEVEL KAMU" di Progres** dibiarkan — ia elemen kontras yang disengaja, bukan
    sisa palet lama. Kalau OWNER mau ia ikut melembut, itu permintaan terpisah.
 4. **Palet logo splash tidak digeser.** `features/brand/fiezel-splash.js` menandainya "terkunci
-   (ruling OWNER)". Wordmark justru **diselaraskan ke ramp logo itu** (`#FFD94F→#F0C241`) supaya
-   splash tidak punya dua emas berbeda. Jangan menggeser salah satunya sendirian.
+   (ruling OWNER)". Wordmark splash justru **diselaraskan ke ramp logo itu** (`#FFD94F→#F0C241`)
+   supaya splash tidak punya dua emas berbeda. Jangan menggeser salah satunya sendirian.
+
+   **Wordmark TOPBAR beda perlakuan, dan bedanya punya alasan.** `--wordmark-accent-hi/lo` di
+   `style.css` IKUT pindah ke maroon, karena komentarnya sendiri sudah menyatakan aturannya:
+   "terracotta sebagai AKSEN" bukan warna merdeka milik wordmark, melainkan peran AKSEN palet
+   yang kebetulan terracotta waktu itu. Aksennya pindah, jadi balok ikut. Logo splash tidak
+   punya kalimat seperti itu — yang ia punya justru tanda terkunci. Jadi aturannya: **ikuti apa
+   yang tertulis di tempat warnanya didefinisikan**, jangan menyamaratakan "semua merah harus
+   sama" ke arah mana pun.
+
+## Gerbang hanya memaku nilai BARU — itu setengah perlindungan
+
+Ini pelajaran dari review PR #404, dan ia berlaku untuk setiap penggantian palet berikutnya.
+
+`tests/pastel-field-contrast-test.js` memaku nilai **baru** (`BRIEF_PALETTE`) dan pakuan itu
+hanya membaca `style.css`. Nilai **lama** tidak dilarang di mana pun, jadi berkas lain bebas
+menyimpannya dan tidak ada gerbang yang merah. Akibatnya nyata: `features/tutor-classroom/tutor-v3.css`
+lolos **setengah pindah** — `--ui-bg`/`--ui-text` ikut arah baru sementara `--ui-accent`
+tertinggal terracotta, jadi layar Ruang Kelas memakai aksen yang sudah dipensiunkan di seluruh
+aplikasi lain.
+
+Yang menutupnya adalah sisi satunya: memasukkan nilai lama ke daftar `SUPERSEDED`, yang memindai
+lima berkas dan menolak nilai itu muncul lagi di mana pun. Daftar itu langsung membayar sendiri —
+ia menemukan **29 cadangan `var(--accent,#C2402C)`** di `style.css` yang selamat dari penggantian
+pertama karena peta penggantinya tidak memuat hex itu.
+
+**Jadi setiap kali kamu memindahkan sebuah token: paku nilai barunya DAN larang nilai lamanya.**
+Memaku yang baru saja hanya menjaga satu berkas; melarang yang lama menjaga semuanya.
 
 ## Jebakan yang akan memakan waktumu
 
