@@ -126,7 +126,22 @@ export const BYTE_LIMITS = Object.freeze({
   // Nama panggilan murid (maks 24 char sesudah normalisasi) + amplop JSON.
   // Kecil dengan sengaja: payload kecil = CPU kecil, dan rute ini dipanggil
   // setiap murid maksimum sekali sehari.
-  '/api/learner/name': 512
+  '/api/learner/name': 512,
+  // --- SLOT 5: warisan Puter (route-legacy.js) — endpoint yang belum punya cap
+  //     di daftar di atas. Angka diambil dari fiezel-core-worker.js:446-626.
+  '/api/admin/configure': 4096,     // owner: vapidPublicKey + cronToken
+  '/api/admin/status': 512,         // GET, tanpa body
+  '/api/reminders/due': 2048,       // cron: filter + pagination
+  '/api/reminders/ack': 4096,       // cron: id + kind + status + evidence
+  '/api/brain/attempts': 100000,    // batch upload s/d 100 attempt records
+  '/api/evolution/config': 8192,    // owner: konfigurasi evolusi konten
+  '/api/evolution/status': 512,     // GET, tanpa body
+  '/api/content/qa/review': 20000,  // owner: item soal untuk QA review
+  '/api/content/patch/candidate': 20000, // owner: item soal untuk patch
+  '/api/content/self-refine': 20000,// owner: konten untuk self-refine + ledger
+  '/api/feedback/list': 512,        // GET, tanpa body
+  '/api/feedback/clear': 512,       // POST, tanpa body berarti
+  '/api/push/public-key': 512       // GET, tanpa body
 });
 
 /** Cap terakhir untuk path yang tidak terdaftar: kecil, sengaja. */

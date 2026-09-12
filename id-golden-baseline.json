@@ -1,7 +1,7 @@
 {
   "schema": "id-golden-baseline/1",
-  "generatedAt": "2026-09-11T20:46:58.407Z",
-  "root": "/home/user/FIEZEL-APPS",
+  "generatedAt": "2026-09-12T10:45:36.313Z",
+  "root": "C:\\Users\\hp\\fiezel-apps",
   "files": {
     "grammar-explanations-id.json": "90912890391b2e491f31a6558aec5b7cecccbf56bc7c341fb1106291b5c721b6",
     "grammar-misconception-id.json": "eab4688fcf4a38a1201a95b01c6d8d2abe521515016eef4af579e8b0b3a9490b",
@@ -19,7 +19,7 @@
   },
   "literals": {
     "count": 3229,
-    "sha256": "b83e6fa431d7d6c47c6f5c6c28ad48b0daba3e4655bc0d9f7d9fe0750da4df23",
+    "sha256": "ecd5adc339e8c8679539aaca354fe8540ad7bc342870b1643b90f7d133501104",
     "list": [
       "\n      SETELAH beat concern ≤1000ms selesai (13 §2.2), bukan menimpanya. Tanpa bunyi:\n      SFX hint sudah dipensiunkan (20 §4); cooldown 8 detiknya dijaga komponen. */\n   setTimeout(()=>{try{pawReact(",
       "\n      case 'silent':                        // L5: kalau mulut sempat mulai (taksiran L3 kandas), tutup SEKARANG\n        degradedLatch = false;\n        closeTurn(false);\n        break;\n      case 'interrupt':                     // stop(): snap tutup\n        degradedLatch = false;\n        closeTurn(true);\n        break;\n      default:\n        break;                              // fase asing dari versi fasad lebih baru: diabaikan tanpa suara\n    }\n  }\n\n  try { doc.addEventListener('fiezel-speech', onSpeech); } catch (_) {}\n\n  /* Suara terdegradasi (audibility-fix): mulut mati SEKETIKA dan tidak boleh\n     hidup lagi untuk sisa giliran — apa pun yang masih dikirim lapisan bawah. */\n  try {\n    root.addEventListener('fiezel-neural-voice-degraded', function () {\n      if (turn) closeTurn(true);\n      degradedLatch = true;                 // dilepas oleh end/silent/interrupt fasad berikutnya\n    });\n  } catch (_) {}\n\n  /* Permukaan kecil untuk Diagnostics/tes — bukan API pemanggil biasa:\n     satu-satunya pintu bicara tetap FiezelVoiceSay.say(). */\n  root.FiezelSpeechBridge = Object.freeze({\n    SCHEMA: SCHEMA,\n    speaking: function () { return !!turn; },\n    degraded: function () { return !!degradedLatch; },\n    motionAllowed: motionAllowed\n  });\n})(typeof self !== 'undefined' ? self : (typeof window !== 'undefined' ? window : this));\n",
@@ -1303,7 +1303,7 @@
       "Datang lagi di hari lain",
       "Dengan cara tenang dan sopan",
       "Dengan kemarahan dan bentakan",
-      "Dengan melanjutkan, kamu menyetujui progres belajarmu disimpan di akun Puter milikmu sendiri.",
+      "Dengan melanjutkan, kamu menyetujui progres belajarmu disimpan di akun Google milikmu sendiri.",
       "Dengan pembayaran yang besar",
       "Dengan rasa takut akan ujian itu",
       "Dengan tenang dan penuh perhatian",
@@ -1574,7 +1574,7 @@
       "Jawabanmu {yours}. Jawaban yang paling tepat adalah {key}.",
       "Jawabannya nggak datang dalam waktu yang wajar. Periksa sambungan internetmu lalu coba lagi.",
       "Jelaskan dengan cara yang lebih sederhana",
-      "Jendela login Puter terbuka sebentar di atas FIEZEL, lalu tertutup sendiri begitu selesai - kamu tidak akan dipindahkan ke browser lain.",
+      "Jendela login Google terbuka dengan aman di atas FIEZEL, lalu tertutup sendiri begitu selesai.",
       "Jendela masuk akun diblokir peramban. Izinkan jendela pop-up untuk situs ini, lalu coba lagi.",
       "Jendela yang ia pecahkan di kelas",
       "Jeruk yang ia jual di luar rumah sakit",
@@ -2534,7 +2534,7 @@
       "Semua masih berjalan seperti biasa.",
       "Semua masih berjalan seperti biasa. Kalau suaranya belum keluar, teksnya tetap bisa kamu baca.",
       "Semua materi dan latihan akan mengikuti level yang kamu pilih.",
-      "Semua materi dan latihan tetap jalan tanpa akun — tutor AI dan suara neural baru bisa dipakai kalau kamu masuk akun Puter dan ada jaringan.",
+      "Semua materi dan latihan tetap jalan tanpa akun — tutor AI dan sinkronisasi tersambung saat kamu masuk akun Google.",
       "Semua materi, latihan, penjelasan bawaan, dan progresmu jalan seperti biasa — nggak ada yang ikut terkunci. Limitnya diperbarui {waktuReset}.",
       "Semua materi, latihan, tutor AI, dan rekomendasi akan mengikuti level yang kamu pilih.",
       "Semua pisang goreng yang mereka bawa",

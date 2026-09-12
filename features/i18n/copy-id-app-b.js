@@ -35,7 +35,7 @@
     // app.js:2758 — status idle
     'auth.status-idle': 'Progres belajar, streak, dan AI tutor tersimpan di akunmu.',
     // app.js:2753 — status pending
-    'auth.status-menghubungkan': 'Menghubungkan ke Puter…',
+    'auth.status-menghubungkan': 'Menghubungkan ke Google…',
     // app.js:2752 — status signed_in (karakter … asli)
     'auth.status-tersambung': 'Akun tersambung. Membuka FIEZEL…',
     // app.js:2836 — toast lanjut tanpa akun
@@ -43,7 +43,7 @@
     // app.js:2762 — toast completeAuthGate
     'auth.toast-tersambung': 'Akun FIEZEL tersambung.',
     // app.js:2758 — tombol idle
-    'auth.tombol-lanjutkan': 'Lanjutkan dengan Puter',
+    'auth.tombol-lanjutkan': 'Lanjutkan dengan Google',
     // app.js:2753 — tombol pending
     'auth.tombol-menghubungkan': 'Menghubungkan…',
     // app.js:2752 — tombol signed_in (hanya isi <span>)
@@ -188,9 +188,9 @@
     'auth.gate-body': 'Akunmu menyimpan progres belajar, streak, dan AI tutor supaya tetap sama di setiap perangkat.',
     'auth.status-check': 'Memeriksa status akun…',
     'auth.skip-btn': 'Lanjut tanpa akun',
-    'auth.skip-help': 'Semua materi dan latihan tetap jalan tanpa akun — tutor AI dan suara neural baru bisa dipakai kalau kamu masuk akun Puter dan ada jaringan.',
-    'auth.puter-help': 'Jendela login Puter terbuka sebentar di atas FIEZEL, lalu tertutup sendiri begitu selesai - kamu tidak akan dipindahkan ke browser lain.',
-    'auth.legal-note': 'Dengan melanjutkan, kamu menyetujui progres belajarmu disimpan di akun Puter milikmu sendiri.',
+    'auth.skip-help': 'Semua materi dan latihan tetap jalan tanpa akun — tutor AI dan sinkronisasi tersambung saat kamu masuk akun Google.',
+    'auth.puter-help': 'Jendela login Google terbuka dengan aman di atas FIEZEL, lalu tertutup sendiri begitu selesai.',
+    'auth.legal-note': 'Dengan melanjutkan, kamu menyetujui progres belajarmu disimpan di akun Google milikmu sendiri.',
 
     'notif.gate-badge': 'FIEZEL REMINDER',
     'notif.gate-title': 'Mau diingatkan?',

@@ -22,6 +22,7 @@ sini yang menjadi urutan resmi.
 | `0011_auth_roles.sql` | `fiezel-core` (binding `CORE_DB`) | `auth_account`, `auth_login_handle`, `auth_credential`, `teacher_invite`, `teacher_profile`, `friend_request`, `notification`, `push_subscription` |
 | `0012_teacher_content.sql` | `fiezel-core` (binding `CORE_DB`) | `tc_node`, `tc_question`, `tc_assignment`, `tc_assignment_target`, `tc_lesson_evidence`, `tc_class`, `tc_class_report` |
 | `0013_oauth_email.sql` | `fiezel-core` (binding `CORE_DB`) | `auth_oauth_identity`, `auth_email`, `ux_auth_oauth_sub_provider` |
+| `0014_legacy_puter.sql` | `fiezel-core` (binding `CORE_DB`) | `push_subscriptions`, `brain_attempts`, `policy_outcomes`, `feedback`, `evolution_ledger` |
 
 Tabel di atas adalah **satu-satunya** daftar berkas→database yang ditulis manusia.
 `tools/d1-schema-check.mjs` dan `tests/d1-schema-contract-test.js` **menurunkan** peta itu
@@ -100,6 +101,8 @@ wrangler d1 execute fiezel-core --remote --file=migrations/0011_auth_roles.sql
 wrangler d1 execute fiezel-core --remote --file=migrations/0012_teacher_content.sql
 # --- fiezel-core: identitas Google + email (keputusan OWNER 6 Sep 2026) ---
 wrangler d1 execute fiezel-core --remote --file=migrations/0013_oauth_email.sql
+# --- fiezel-core: tabel warisan Puter KV (SLOT 5) ---
+wrangler d1 execute fiezel-core --remote --file=migrations/0014_legacy_puter.sql
 ```
 
 `0009_learner_evidence.sql` masuk `fiezel-core` dan **bukan** `fiezel-evidence`,

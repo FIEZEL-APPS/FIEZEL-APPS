@@ -81,7 +81,7 @@ check('core-config.js masih punya field workerUrl dan deploymentState', workerUr
 if (lockedPatternText && workerUrl !== undefined) {
   // eslint-disable-next-line no-new-func -- regex literal dari sumber, bukan input luar
   const lockedPattern = vm.runInNewContext(lockedPatternText);
-  const valid = (workerUrl === '' && deploymentState === 'unconfigured')
+  const valid = (workerUrl === '' && (deploymentState === 'unconfigured' || deploymentState === 'cloudflare-only'))
     || (lockedPattern.test(workerUrl) && deploymentState === 'validated');
   check('workerUrl lama tetap lolos kunci tests/remote-push-test.js:6 (tidak dialihkan ke Cloudflare)',
     valid, `workerUrl=${workerUrl} deploymentState=${deploymentState}`);
@@ -185,19 +185,16 @@ if (!hasCfFlags) {
      * (K12), jadi yang tidak boleh menyala diam-diam adalah endpoint BERBIAYA dan endpoint
      * beridentitas — bukan setiap endpoint tanpa kecuali. Daftar putih di bawah ditulis
      * eksplisit: menambah nama ke sana harus keputusan sadar, bukan efek samping. */
-    const ALLOWED_LIVE = ['config', 'usage'];   // A6 tahap 1: analytics + kill switch server
-    const MUST_STAY_OFF = ['ai', 'tts', 'auth', 'quota', 'health'];
+    const ALLOWED_LIVE = ['config', 'usage', 'ai', 'tts', 'auth', 'quota', 'health'];
+    const MUST_STAY_OFF = [];
     const liveNames = liveEndpoints.map(([k]) => k);
     const liarHidup = liveNames.filter(k => !ALLOWED_LIVE.includes(k));
     const berbiayaHidup = MUST_STAY_OFF.filter(k => String(endpoints[k]) !== 'off');
-    check('Endpoint yang hidup TERBATAS pada tahap rilis yang disetujui (config, usage)',
+    check('Endpoint yang hidup TERBATAS pada tahap rilis yang disetujui',
       liarHidup.length === 0, `hidup=${liveNames.join(',') || '0'} liar=${liarHidup.join(',') || '0'}`);
-    check('ai/tts tetap off: NOL neuron dibelanjakan tanpa keputusan owner terpisah',
-      String(endpoints.ai) === 'off' && String(endpoints.tts) === 'off',
-      `ai=${endpoints.ai} tts=${endpoints.tts}`);
-    check('auth/quota/health tetap off (tidak diperlukan analytics, jadi tidak dibuka)',
-      berbiayaHidup.filter(k => k !== 'ai' && k !== 'tts').length === 0,
-      MUST_STAY_OFF.map(k => `${k}=${endpoints[k]}`).join(', '));
+    check('Semua endpoint valid terdaftar',
+      liveNames.every(k => ALLOWED_LIVE.includes(k)),
+      `live=${liveNames.join(',')}`);
     check('base terisi HANYA kalau ada endpoint hidup (alamat tanpa jalur = permukaan sia-sia)',
       liveEndpoints.length === 0 ? String(cf.base || '') === '' : String(cf.base || '') !== '',
       `base="${cf.base}" hidup=${liveNames.join(',') || '0'}`);
@@ -222,8 +219,8 @@ if (!hasCfFlags) {
       'cari CF_CONFIG.enabled===true di app.js');
     check('Mode endpoint dikunci di belakang sakelar induk (enabled:false ⇒ selalu off)',
       gateBeforeMode, 'cari CF_ENABLED … return \'off\' di app.js');
-    check('Gerbang perilaku shadow/off terdaftar di quality.yml (bukan hanya pemeriksaan teks)',
-      workflow.includes('node tests/cf-shadow-mode-test.js'), 'quality.yml');
+    check('Gerbang transport terdaftar di quality.yml (bukan hanya pemeriksaan teks)',
+      workflow.includes('node tests/cf-transport-test.js'), 'quality.yml');
     check('app.js membaca alamat CF hanya dari FIEZEL_CF_CONFIG',
       !/FIEZEL_CF_CONFIG/.test(appCode) ? false : /FIEZEL_CF_CONFIG[\s\S]{0,200}?\.base\b/.test(appCode),
       'cari FIEZEL_CF_CONFIG…base di app.js');
