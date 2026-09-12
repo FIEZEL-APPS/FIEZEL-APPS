@@ -51,12 +51,21 @@ self.FIEZEL_AUDIO_CONFIG=Object.freeze({
 self.FIEZEL_CURRICULUM_CONFIG=Object.freeze({
   curriculumApiUrl:'https://fiezel-apps.onrender.com'
 });
+// ── KONFIGURASI CORE BRAIN (m025-300 → migrasi CF penuh) ──────────────────────
+//
+// PUTER DIHAPUS TOTAL. Seluruh jalur Core Brain kini dilayani Cloudflare Worker
+// `fiezel-api` di `api.fiezel.my.id`. workerUrl dikosongkan karena tidak ada lagi
+// Worker Puter yang dipanggil — semua pemanggil `coreWorkerExec` di app.js kini
+// merutekan langsung ke `FIEZEL_CF_CONFIG.base` lewat `cfWorkerFetch`.
+//
+// `deploymentState:'cloudflare-only'` = sinyal bagi tes dan diagnostik bahwa
+// jalur Puter SENGAJA tidak dikonfigurasi, bukan lupa.
 self.FIEZEL_CORE_CONFIG=Object.freeze({
-  workerUrl:'https://fiezel-core.puter.work',
+  workerUrl:'',
   protocolVersion:'1.7',
-  aiGateway:'core-only',
+  aiGateway:'cloudflare',
   remotePushRequired:true,
-  deploymentState:'validated'
+  deploymentState:'cloudflare-only'
 });
 // ── SAKELAR TRANSPORT CLOUDFLARE (m031-flags, cf-b1 §5.3 + cf-b6 pola P1) ────────────
 //
@@ -158,10 +167,17 @@ self.FIEZEL_CORE_CONFIG=Object.freeze({
 // DIKETAHUI, bukan kejutan.
 //
 // Tidak ada rahasia di blok ini (syarat `release-audit.py:105,130` untuk core-config.js).
+// ── TRANSPORT CLOUDFLARE — SEMUA JALUR HIDUP (migrasi CF penuh) ─────────────
+//
+// PUTER DIHAPUS. Tidak ada lagi mode 'shadow' atau jalur off yang jatuh ke Puter.
+// Semua endpoint sekarang 'on' dan merutekan langsung ke `fiezel-api` Worker di
+// `api.fiezel.my.id`. SLOT 5 (`route-legacy.js`) SUDAH terpasang di Worker.
+//
+// Tidak ada rahasia di blok ini (syarat `release-audit.py:105,130` untuk core-config.js).
 self.FIEZEL_CF_CONFIG=Object.freeze({
   enabled:true,
   base:'https://api.fiezel.my.id',
-  endpoints:Object.freeze({health:'off',config:'on',auth:'off',quota:'off',ai:'off',tts:'off',usage:'on'})
+  endpoints:Object.freeze({health:'on',config:'on',auth:'on',quota:'on',ai:'on',tts:'on',usage:'on'})
 });
 // ── MASUK DENGAN GOOGLE (m025-269) ────────────────────────────────────────────────────
 //

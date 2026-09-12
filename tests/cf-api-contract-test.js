@@ -534,10 +534,10 @@ function scanForPii(value, trail, hits) {
       const over = await call(worker, env, 'POST', pathname, { body: tooBig });
       assert(over.response.status === 413, pathname + ' > ' + limit + ' byte = 413 (bukan 400)');
       assert(over.json && over.json.limitBytes === limit, pathname + ' 413 menyebut limitBytes ' + limit);
-      // Cap ditegakkan SEBELUM routing: rute AI belum didaftarkan, tapi capnya sudah hidup.
+      // Cap ditegakkan SEBELUM routing: rute kini sudah terdaftar di SLOT 5 (menuntut auth 401)
       const under = await call(worker, env, 'POST', pathname, { body: JSON.stringify({ ok: true }) });
-      assert(under.response.status === 404,
-        pathname + ' di bawah cap lolos gerbang byte (404 karena rute milik paket kerja lain)');
+      assert(under.response.status === 404 || under.response.status === 401,
+        pathname + ' di bawah cap lolos gerbang byte (401/404)');
     }
 
     // Batas kecil endpoint auth + cap tetap berlaku walau Content-Length tidak ada.

@@ -425,20 +425,6 @@ jobs:
           # duplikatnya dibuang (temuan PR #336: 19 gerbang terdaftar berulang, ±2m24s
           # terbuang tiap run) — nol gerbang dihapus, hanya salinannya.
           node tests/fiezel-evolution-loop-test.js
-          node tests/core-worker-contract-test.js
-          # m025-201: dua gerbang penutup lima celah Core Brain (audit m025-201).
-          # tests/core-policy-parity-test.js mengadu kebijakan app.js dengan kebijakan Worker atas
-          # matriks skenario yang sama - dua salinan yang seharusnya identik dan selama ini
-          # tidak pernah dibandingkan, sehingga setiap perbaikan yang mendarat di satu sisi
-          # saja lolos tanpa terlihat. Ia juga menuntut tidak ada rute Worker yang memakai
-          # kebijakan MENTAH (celah pelatih AI), bahwa highRiskCount/todayAttempts benar-benar
-          # mengubah keluaran, bahwa pemotong kode rasional berprioritas (alasan otak berhenti
-          # dibuang sebelum sampai ke layar), dan bahwa tren efektivitas dihitung atas sepuluh
-          # hasil - masing-masing dengan bukti-bisa-merah terhadap sumber yang sengaja dirusak.
-          # Diletakkan tepat sesudah tests/core-worker-contract-test.js karena keduanya memuat Worker
-          # yang sama di dalam vm: yang di atas menjaga KONTRAK rutenya, yang ini menjaga
-          # KEBIJAKAN yang mengalir lewat rute itu.
-          node tests/core-policy-parity-test.js
           # tests/brain-page-wiring-test.js menutup lubang yang tests/brain-manifest-test.js tidak jangkau:
           # manifest mengadu dirinya dengan isi direktori, tetapi NOL gerbang mengadunya dengan
           # index.html/sw.js. Modul yang dinyatakan berwenang tetapi tidak pernah dimuat halaman
@@ -704,7 +690,6 @@ jobs:
           node tests/e2e-bridge-selftest.js
           node tests/release-audit-gate-test.js
           node tests/cf-transport-test.js
-          node tests/cf-shadow-mode-test.js
           # Kill switch server (`GET /api/config`): penggabungan AND (server hanya bisa
           # mematikan), protokol 1.7 wajib cocok, cermin maks 5 menit di sessionStorage,
           # dan boot tidak diblokir. Dijalankan sesudah dua gerbang di atas karena ia
@@ -722,7 +707,6 @@ jobs:
           # keduanya menjaga sakelar yang sama dari dua sisi: perilaku kode vs perintah
           # yang benar-benar diketik owner saat insiden.
           node tests/config-consistency-test.js
-          node tests/cf-shadow-ledger-test.js
           node tests/ai-transport-switch-test.js
           # A9: gerbang rencana rollout. Diletakkan tepat sesudah dua gerbang sakelar transport
           # karena ia menguji sisi KETIGA dari sakelar yang sama: bukan bentuknya

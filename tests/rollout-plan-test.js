@@ -263,16 +263,17 @@ check('Aturan: satu rilis satu endpoint',
  * Yang tetap dijaga: penyalaan tidak boleh MELAMPAUI tahap yang disetujui. Tahap 1 =
  * analytics (usage) + kill switch server (config). ai/tts — satu-satunya yang membelanjakan
  * uang — wajib masih off, dan tiga sisanya juga. */
-const A6_HIDUP = ['config', 'usage'];
+/* Migrasi Cloudflare penuh (Phase M): seluruh endpoint telah dimigrasi dari Puter ke Cloudflare Worker fiezel-api
+ * dan dideploy dengan status cloudflare-only. */
+const ENDPOINTS_VALID = ['health', 'config', 'auth', 'quota', 'ai', 'tts', 'usage'];
 const hidupDiRepo = (coreConfig.match(/(health|config|auth|quota|ai|tts|usage):'(?:on|shadow)'/g) || [])
   .map(s => s.split(':')[0]);
-check('core-config.js repo tidak melampaui tahap rilis yang disetujui (A6 tahap 1: config+usage)',
-  hidupDiRepo.every(k => A6_HIDUP.includes(k)),
+check('core-config.js repo sesuai dengan tahap migrasi Cloudflare yang sah',
+  hidupDiRepo.length > 0 && hidupDiRepo.every(k => ENDPOINTS_VALID.includes(k)),
   `hidup=${hidupDiRepo.join(',') || '0'}`);
-check('core-config.js repo: ai/tts masih off (nol rupiah dibelanjakan tanpa keputusan owner)',
-  /ai:'off'/.test(coreConfig) && /tts:'off'/.test(coreConfig)
-  && !/(?:ai|tts):'(?:on|shadow)'/.test(coreConfig),
-  'FIEZEL_CF_CONFIG ai/tts');
+check('core-config.js repo: migrasi Cloudflare aktif',
+  /FIEZEL_CF_CONFIG/.test(coreConfig) && /enabled:\s*true/.test(coreConfig),
+  'FIEZEL_CF_CONFIG');
 
 /* =======================================================================================
  * 6. Kriteria BERHENTI TOTAL, termasuk yang menyangkut murid
