@@ -334,7 +334,23 @@ async def logout(request: Request, response: Response):
     return {"ok": True}
 
 
-async def seed_owner():
+async def seed_owner(sync_password: bool = False):
+    """Pastikan akun owner ada. Mengembalikan status supaya pemanggil bisa melaporkannya.
+
+    `sync_password` bawaannya False, dan itu perbaikan jebakan nyata. Versi sebelumnya
+    SELALU menimpa sandi owner begitu ia berbeda dari ADMIN_PASSWORD — dan fungsi ini
+    dipanggil dari DUA tempat: bootstrap.py (yang dokumennya menyuruh dijalankan ulang
+    setiap kali ada indeks baru) DAN server.py saat startup (yaitu setiap restart
+    uvicorn). Begitu aplikasi punya rute ganti sandi, sandi owner akan diam-diam
+    kembali ke nilai basi di .env pada restart berikutnya, tanpa jejak apa pun.
+
+    Hari ini rute ganti sandi itu belum ada, jadi belum ada yang rusak. Tetapi biaya
+    menutupnya sekarang nyaris nol, sedangkan menemukannya nanti berarti owner
+    terkunci dari akunnya sendiri tanpa tahu sebabnya.
+
+    Membuat owner yang BELUM ADA tetap tanpa syarat — itu yang membuat pemasangan baru
+    bisa jalan. Yang kini butuh izin tegas hanyalah MENIMPA sandi yang sudah ada.
+    """
     email = os.environ["ADMIN_EMAIL"].lower()
     pwd = os.environ["ADMIN_PASSWORD"]
     existing = await db.users.find_one({"email": email})
@@ -342,6 +358,11 @@ async def seed_owner():
         await db.users.insert_one({"user_id": f"user_{uuid.uuid4().hex[:12]}", "email": email,
                                    "name": "Owner FIEZEL", "role": "owner", "provider": "fiezel",
                                    "password_hash": hash_password(pwd), "class_ids": [], "created_at": now()})
-    elif not verify_password(pwd, existing.get("password_hash") or ""):
-        await db.users.update_one({"email": email}, {"$set": {"password_hash": hash_password(pwd),
-                                                              "role": "owner"}})
+        return "dibuat"
+    if verify_password(pwd, existing.get("password_hash") or ""):
+        return "sudah-sesuai"
+    if not sync_password:
+        return "beda-dibiarkan"
+    await db.users.update_one({"email": email}, {"$set": {"password_hash": hash_password(pwd),
+                                                          "role": "owner"}})
+    return "sandi-ditimpa"
