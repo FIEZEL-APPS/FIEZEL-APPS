@@ -407,4 +407,3 @@ diawali `https://`). Login email+sandi jalan penuh, termasuk akun owner.
 **Sandi owner yang berlaku** adalah yang tersimpan di `.env` pemasangan, bukan nilai
 `ADMIN_PASSWORD` di Render: `seed_owner()` sengaja tidak menimpa sandi owner yang sudah
 ada (perbaikan dari review PR #405).
-
