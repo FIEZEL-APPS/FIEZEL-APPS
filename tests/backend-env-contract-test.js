@@ -161,6 +161,67 @@ test('passenger_wsgi mengekspor nama `application` yang dicari Passenger', () =>
     'Passenger mencari variabel bernama `application`; tanpa itu hasilnya 503 tanpa petunjuk');
 });
 
+/* ── 3b. requirements.txt tetap freeze yang utuh ────────────────────────────────── */
+
+/* KENAPA ASSERT INI ADA — kejadian nyata, 8-12 Sep 2026.
+   Tiga commit langsung ke main (62380627, 7c3fa7f3, 81f98f5f) mengejar kegagalan deploy
+   Render dengan MENCABUT pin paket satu per satu. Yang hilang sama sekali ada empat:
+   pydantic, pydantic_core, packaging, librt. FastAPI dan mypy tetap menariknya sendiri,
+   jadi deploy-nya "berhasil" — tetapi versinya sejak itu ditentukan oleh HARI KAPAN pip
+   kebetulan dijalankan, bukan oleh repo ini. Deploy bulan depan bisa rusak tanpa ada yang
+   mengubah apa pun, dan tidak akan ada diff yang bisa ditunjuk.
+
+   Akar kegagalan yang dikejar tiga commit itu ternyata bukan paketnya sama sekali,
+   melainkan versi Python (lihat assert .python-version di atas). Menambal requirements.txt
+   memadamkan api satu per satu; memaku versi Python memadamkan sumbernya.
+
+   BATAS JUJUR GERBANG INI: ia menangkap pin yang DILONGGARKAN (== jadi >=, atau baris
+   tanpa versi), bukan pin yang DIHAPUS — menemukan yang dihapus menuntut meresolusi
+   seluruh pohon dependensi ke PyPI, dan gerbang ini offline. Yang dihapus diperiksa
+   tangan 12 Sep 2026 dengan `pip install --dry-run --report` di Python 3.11:
+   127 dipaku, 127 terpasang, nol mengambang, nol versi melenceng. Ulangi cara itu kalau
+   requirements.txt disunting besar-besaran lagi. */
+
+const REQ = baca('backend/requirements.txt');
+const barisReq = REQ.split('\n')
+  .map((l) => l.trim())
+  .filter((l) => l && !l.startsWith('#'));
+
+test('setiap dependensi backend dipaku persis dengan ==', () => {
+  const longgar = barisReq.filter((l) => !/^[A-Za-z0-9][A-Za-z0-9._-]*==[^\s;]+$/.test(l));
+  assert.strictEqual(longgar.length, 0,
+    'baris yang tidak dipaku persis: ' + longgar.join(', ') + '. Satu baris yang longgar ' +
+    'berarti versinya ditentukan oleh hari kapan pip kebetulan dijalankan, bukan oleh repo ' +
+    'ini — dan kerusakannya muncul sebagai deploy yang gagal tanpa satu pun diff untuk ' +
+    'ditunjuk (terjadi 8 Sep 2026)');
+});
+
+test('tidak ada paket yang dipaku dua kali', () => {
+  const hitung = new Map();
+  barisReq.forEach((l) => {
+    const n = l.split('==')[0].replace(/[-_.]+/g, '-').toLowerCase();
+    hitung.set(n, (hitung.get(n) || 0) + 1);
+  });
+  const ganda = [...hitung.entries()].filter(([, c]) => c > 1).map(([n]) => n);
+  assert.strictEqual(ganda.length, 0,
+    'dipaku lebih dari sekali: ' + ganda.join(', ') + '. pip memakai yang TERAKHIR dibaca, ' +
+    'jadi yang di atas diam-diam diabaikan — persis bentuk kesalahan yang lolos review ' +
+    'karena kedua barisnya terlihat benar sendiri-sendiri');
+});
+
+test('tidak ada pin ke rilis yang sudah ditarik PyPI', () => {
+  /* Daftar ini BUKAN katalog yanked PyPI — mustahil dan tidak perlu. Ia mencatat rilis
+     yang benar-benar pernah masuk ke berkas ini dan terbukti ditarik, supaya tidak
+     kembali lewat revert atau salin-tempel. shellingham 1.5.0 ("Incorrect package
+     metadata") masuk lewat 81f98f5f yang MENURUNKANNYA dari 1.5.4 yang sehat; pip
+     memperingatkannya di setiap build dan rilis yang ditarik bisa dihapus kapan saja. */
+  const DITARIK = ['shellingham==1.5.0', 'shellingham==1.5.1'];
+  const ketemu = DITARIK.filter((d) => barisReq.includes(d));
+  assert.strictEqual(ketemu.length, 0,
+    'dipaku ke rilis yang ditarik PyPI: ' + ketemu.join(', ') + ' — pip memperingatkannya ' +
+    'di setiap build, dan rilis yang ditarik bisa lenyap dari PyPI kapan saja');
+});
+
 /* ── 4. Gerbang ini sendiri terdaftar ───────────────────────────────────────────── */
 
 /* ── 5. Versi Python dipaku di repo, bukan di dashboard ────────────────────────── */
