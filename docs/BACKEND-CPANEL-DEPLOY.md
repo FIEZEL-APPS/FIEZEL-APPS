@@ -9,6 +9,78 @@ Semua perilaku yang disebut di sini **diukur**, bukan dikira — versi persis da
 
 ---
 
+## 0a. BUKTIKAN PASSENGER HIDUP SEBELUM MENGERJAKAN APA PUN — 30 detik
+
+**Adanya menu "Setup Python App" TIDAK membuktikan Passenger berjalan.** Diukur di
+ArenHost 12 Sep 2026: menunya ada, aplikasi bisa dibuat, statusnya *started*, `.htaccess`
+berisi `PassengerAppRoot`/`PassengerBaseURI`/`PassengerPython` yang benar — dan Passenger
+**tidak pernah sekali pun dijalankan**. Tiga lokasi berbeda dicoba (subdomain dengan docroot
+di luar `public_html`, subdomain dengan docroot di dalamnya, dan path di bawah domain utama);
+ketiganya menjawab **404 dalam 1–2 milidetik**, dan nol log Passenger terbentuk.
+
+Versi pertama panduan ini hanya menyuruh memastikan menunya ADA. Itu tidak cukup, dan
+kekurangan itulah yang membuat satu pemasangan menghabiskan berjam-jam sebelum sebabnya
+terlihat. Jadi jalankan tes ini **lebih dulu**, sebelum menyentuh Atlas, unggahan, atau env:
+
+```bash
+mkdir -p ~/uji-passenger && cd ~/uji-passenger
+printf 'def application(e,s):\n s("200 OK",[("Content-Type","text/plain")])\n return [b"PASSENGER HIDUP"]\n' > passenger_wsgi.py
+```
+
+Buat aplikasi Python di cPanel yang menunjuk `uji-passenger`, lalu:
+
+```bash
+curl -sS -o /tmp/u.txt -w 'status=%{http_code} waktu=%{time_total}s\n' \
+  -H "Host: <alamat-aplikasinya>" http://127.0.0.1/ ; cat /tmp/u.txt
+```
+
+| Hasil | Artinya |
+|---|---|
+| `PASSENGER HIDUP`, waktu **ratusan ms** | Passenger berjalan. Lanjutkan panduan ini. |
+| 404 dalam **1–2 ms** | Passenger MATI. Berhenti; panduan ini tidak akan bisa diselesaikan. |
+
+Waktunya sama pentingnya dengan statusnya: **404 seketika berarti web server menjawab
+sendiri tanpa pernah memanggil Python.** Kalau hasilnya mati, minta hosting menyalakannya,
+atau pasang backend di luar (Render — lihat §0b) sambil tetap memakai Atlas.
+
+---
+
+## 0b. cPanel MENIMPA `passenger_wsgi.py` — setiap kali
+
+Setiap kali aplikasi Python dibuat atau disimpan ulang, cPanel menulis ulang
+`passenger_wsgi.py` di Application root dengan stub buatannya sendiri. Stub itu memuat
+berkas bernama `passenger_wsgi.py` lewat path relatif — yaitu **dirinya sendiri** — dan
+berakhir sebagai `RecursionError: maximum recursion depth exceeded`, yang sampai ke browser
+sebagai **500 tanpa petunjuk**.
+
+Jadi sesudah **setiap** kali menekan SAVE di Setup Python App, tulis ulang berkasnya:
+
+```bash
+cd ~/fiezel-api && printf '%s\n' 'import os, sys' \
+  'sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))' \
+  'from a2wsgi import ASGIMiddleware' 'from server import app' \
+  'application = ASGIMiddleware(app)' > passenger_wsgi.py && cat passenger_wsgi.py
+```
+
+Kalau `cat` menampilkan baris diawali `import importlib.machinery`, itu stub cPanel — ulangi.
+
+---
+
+## 0c. Versi Python dipaku DI REPO, bukan di dashboard
+
+`backend/.python-version` berisi `3.11.9` dan `tests/backend-env-contract-test.js`
+menegakkannya. Alasannya diukur, bukan gaya: `pymongo 4.6.3` hanya punya wheel untuk
+cp37–cp312. Di Python 3.13 ke atas pip terpaksa mengompilasi dari sumber C dan gagal di
+hosting tanpa compiler; di 3.14 ia bahkan tidak sampai ke sana — `google-api-core`
+menuntut `grpcio-status>=1.75.1` khusus pada `python_version >= "3.14"`, dan pemasangan
+mati sebagai `ResolutionImpossible` (diukur di Render, 12 Sep 2026).
+
+Berkas itu dibaca Render dan sebagian besar PaaS lain. Menyetel `PYTHON_VERSION` di
+dashboard juga bekerja, tetapi setelan dashboard tidak ikut ter-clone bersama repo dan
+tidak ada gerbang yang bisa menjaganya.
+
+---
+
 ## 0. Dua hal yang harus diterima sejak awal
 
 **MongoDB tidak bisa dipasang di shared hosting cPanel.** Ia butuh proses daemon dan
