@@ -1,7 +1,7 @@
 {
-  "version": "m025-302",
-  "claimedBy": "branch claude/optimistic-galileo-p03jpj",
-  "claimedAt": "2026-09-11T20:26:50.015Z",
-  "reason": "arah Lembut: palet, material, radius, dan tipografi aplikasi",
+  "version": "m025-303",
+  "claimedBy": "branch claude/sambung-kurikulum",
+  "claimedAt": "2026-09-12T08:55:48.664Z",
+  "reason": "m025-303: sambungkan konsol kurikulum ke backend Render yang sudah diverifikasi",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }
