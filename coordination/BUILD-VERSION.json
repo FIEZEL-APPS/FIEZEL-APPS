@@ -1,7 +1,7 @@
 {
-  "version": "m025-308",
-  "claimedBy": "branch claude/fiezel-repo-review-iqr7gc",
-  "claimedAt": "2026-09-13T14:09:44.482Z",
-  "reason": "overlay th + perbaikan gerbang CI (naik ulang keempat: main mengambil m025-307)",
+  "version": "m025-309",
+  "claimedBy": "branch claude/wizardly-franklin-x2irnj",
+  "claimedAt": "2026-09-13T16:30:40.251Z",
+  "reason": "PAW di Worker, anti-bocor galat ke murid, penanda tata kelola rute owner",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }

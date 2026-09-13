@@ -109,6 +109,16 @@ async function runLegacyModel(ctx, input, options) {
   }
 }
 
+/**
+ * Apakah kegagalan ini datang dari jalur ANGGARAN, bukan dari model. runLegacyModel()
+ * menandai penolakan plafon dengan `fiezelBudgetDenied`, jadi itu yang dibaca - bukan
+ * mencocokkan teks pesan, yang bisa berubah tanpa ada yang sadar.
+ */
+function isBudgetDenial(error) {
+  if (error && error.fiezelBudgetDenied === true) return true;
+  return /^ai_account_cap\b/.test(String((error && error.message) || ''));
+}
+
 // Helper pembaca JSON yang aman
 async function readJson(ctx) {
   if (ctx.bodyText !== undefined) {
@@ -192,7 +202,11 @@ export const ROUTES = [
       return jsonError(400, 'prompt_too_long', { max: 12000 }, opt);
     }
     
-    let text = 'Halo! Saya Nusa & Mira, asisten belajar FIEZEL.';
+    // m025-309: naskah ini menyebut maskot LAMA. Penggantian maskot (m025-307, PR #408)
+    // mengganti Nusa & Mira dengan PAW di seluruh klien, tetapi kalimat ini hidup di Worker -
+    // di luar jangkauan pemindaian berkas klien - jadi ia tertinggal. Ia bukan naskah mati:
+    // inilah yang dibaca murid setiap kali AI tidak tersedia.
+    let text = 'Halo! Saya PAW, asisten belajar FIEZEL.';
     if (ctx.env.AI) {
       try {
         const messages = [
@@ -201,8 +215,14 @@ export const ROUTES = [
         ];
         const res = await runLegacyModel(ctx, { messages });
         if (res?.response) text = res.response;
-      } catch (e) {
-        text = `AI response fallback: ${e.message || 'error'}`;
+      } catch (_) {
+        // m025-309: dulu baris ini menulis `AI response fallback: ${e.message}` ke MURID.
+        // Selama panggilan model tidak ditakar, catch ini praktis hanya kena galat penyedia
+        // yang jarang. Sesudah penakaran masuk (m025-308), PENOLAKAN PLAFON lewat sini juga -
+        // jalur yang memang akan sering terjadi begitu kolam 10.000 neuron/hari menipis - dan
+        // murid akan membaca "AI response fallback: ai_account_cap:...". Itu galat mentah yang
+        // dibocorkan ke murid. Teks sapaan di atas dipertahankan: murid mendapat kalimat yang
+        // bisa dibaca, bukan alasan internal yang bukan salahnya.
       }
     }
     
@@ -296,7 +316,16 @@ export const ROUTES = [
         const res = await runLegacyModel(ctx, { messages });
         review = { review: res?.response, schema: 'fiezel-content-qa-v1', authority: 'advisory-only' };
       } catch (e) {
-        review = { status: 'review_error', error: e.message };
+        // m025-309: cabang ini dulu MEMBUANG penanda tata kelola yang dijanjikan kontrak
+        // rute di atas - schema DAN authority:'advisory-only' hilang dari respons. Konsumen
+        // yang membaca 'authority' untuk memutuskan boleh-tidaknya hasil ini diperlakukan
+        // sebagai nasihat belaka akan melihatnya TIDAK ADA - gagal ke arah yang salah.
+        // Sekaligus e.message mentah diganti status yang stabil dan bisa dipilah.
+        review = {
+          status: isBudgetDenial(e) ? 'budget_exhausted' : 'review_error',
+          schema: 'fiezel-content-qa-v1',
+          authority: 'advisory-only'
+        };
       }
     }
     
@@ -310,7 +339,22 @@ export const ROUTES = [
     if (!(await isOwner(ctx))) return jsonError(403, 'forbidden', {}, opt);
     
     const body = await readJson(ctx);
-    let patch = { candidate: null, schema: 'fiezel-content-patch-v1' };
+    /* m025-309: 'authority' dan 'gateStatus' dulu HANYA hidup di komentar kontrak di atas,
+       tidak pernah di satu pun objek respons rute ini. Tiga akibatnya:
+       (1) Konsumen tidak punya cara membedakan kandidat yang BELUM lolos gerbang lokal dari
+           hasil terverifikasi. Yang hilang justru peringatannya.
+       (2) features/brain/fiezel-content-chain.js memindahkan gateStatus DARI
+           'UNVERIFIED_LOCAL_GATES_REQUIRED' ke LOCAL_GATES_PASSED/FAILED - ia memindahkan
+           nilai yang tidak pernah dikirim worker.
+       (3) product-audit.js meng-assert sumber Worker memuat "authority:'candidate-only'" dan
+           "UNVERIFIED_LOCAL_GATES_REQUIRED". Selama keduanya hanya ada di komentar, audit
+           tata kelola itu lolos berkat PROSA, bukan berkat perilaku. */
+    let patch = {
+      candidate: null,
+      schema: 'fiezel-content-patch-v1',
+      authority: 'candidate-only',
+      gateStatus: 'UNVERIFIED_LOCAL_GATES_REQUIRED'
+    };
     if (ctx.env.AI) {
       try {
         const messages = [
@@ -318,9 +362,20 @@ export const ROUTES = [
           { role: 'user', content: JSON.stringify(body) }
         ];
         const res = await runLegacyModel(ctx, { messages });
-        patch = { patch: res?.response, schema: 'fiezel-content-patch-v1' };
+        patch = {
+          patch: res?.response,
+          schema: 'fiezel-content-patch-v1',
+          authority: 'candidate-only',
+          gateStatus: 'UNVERIFIED_LOCAL_GATES_REQUIRED'
+        };
       } catch (e) {
-        patch = { error: e.message };
+        patch = {
+          candidate: null,
+          status: isBudgetDenial(e) ? 'budget_exhausted' : 'patch_error',
+          schema: 'fiezel-content-patch-v1',
+          authority: 'candidate-only',
+          gateStatus: 'UNVERIFIED_LOCAL_GATES_REQUIRED'
+        };
       }
     }
     
