@@ -63,31 +63,67 @@ memesan kelebihan aman untuk dompet, memesan kekurangan tidak.
 
 ---
 
-## 5. LANGKAH BERIKUTNYA — terbuka, menunggu OWNER
+## 5. KEEMPAT BUTIR ITU SUDAH DIKERJAKAN (m025-310)
 
-1. **Titik buta gerbang cap.** Assert C1-C5 di `tests/ai-account-cap-gate-test.js` hanya
-   menemukan modul yang mendefinisikan `registerXxxRoutes(`. Modul berbentuk
-   `export const ROUTES` — seperti `route-legacy.js` — lolos dari tuntutan fixture
-   sepenuhnya. Melebarkannya menuntut lima fixture baru.
+Bagian ini dulu berisi empat butir terbuka. OWNER meminta semuanya dilanjutkan; berikut
+hasilnya, termasuk yang TIDAK selesai.
 
-2. **Perakitan tanda terima terduplikasi.** `route-legacy.js` kini memanggil
-   `ModelCallGate.makeReservation()` sendiri dan menyalin resolver `umd()` dari
-   `route-wiring.js`. `model-call-gate.js` secara eksplisit memperingatkan agar bentuk
-   tanda terima tidak diketik di dua tempat yang bisa menyimpang. Menyatukannya adalah
-   refactor tersendiri.
+### 5.1 Titik buta gerbang cap — SELESAI
+Penemuan C1-C5 hanya mengenali modul ber-`registerXxxRoutes(`. Modul ber-`export const
+ROUTES` — seperti `route-legacy.js` — lolos sepenuhnya, padahal ia memanggil model di lima
+rutenya. C3b kini menemukannya PER-RUTE: dari 22 rute, hanya 5 yang sumbernya menyentuh
+jalur model yang masuk daftar fixture. Kelimanya diverifikasi runtime (reservasi terjadi
+sebelum panggilan model, penghitung bergerak).
 
-3. **Maskot & aset.** MIRA sisi guru di `landing.html` belum diputuskan, dan direktori
-   `assets/characters/` 39 MB masih dikonsumsi `remotion/src/Scene.jsx`,
-   `design/redesign-v2/`, serta `character-preview.html`.
+Dua arahnya dibuktikan, bukan diklaim: menyisipkan panggilan model ke `/api/activity`
+(tanpa fixture) memerahkan C4 dengan pesan yang menyebut rutenya; membatalkannya
+menghijaukannya lagi.
 
-4. **Utang naskah dua bahasa.** Naskah sisi Worker (`route-legacy.js`) seluruhnya
-   Indonesia saja, di luar sistem `FiezelI18n`. Murid Thai membacanya sebagai layar
-   campur. Memindahkannya ke pasangan copy-id/copy-th menuntut i18n sisi server yang
-   belum ada. Dicatat sebagai utang bertanggal 2026-09-13.
+### 5.2 Perakitan tanda terima terduplikasi — SELESAI
+`workers/api/ai/neuron-reservation.js` kini satu-satunya perakit, dipakai
+`route-wiring.js` dan `route-legacy.js`. Resolver `umd()` yang tadinya disalin ikut
+tinggal satu. `const ModelCallGate` di route-wiring dihapus (kode mati); IMPOR-nya tidak,
+karena load-bearing untuk urutan evaluasi.
+
+Refactor ini langsung memerahkan C3b yang baru dibuat — pendeteksinya buta terhadap satu
+lapis indireksi. Itu justru bukti penjaga non-kehampaan bekerja. Pendeteksi kini menyemai
+nama yang diimpor dari modul yang mencapai chokepoint lalu menutupnya transitif.
+
+### 5.3 Aset maskot 39 MB — SELESAI SEBAGIAN, sisanya keputusan OWNER
+`assets/characters/` (39 MB) + `assets/motion/` (9,1 MB) berhenti diunggah ke produksi.
+Dibuktikan tidak dipakai: nol di ASSETS sw.js, nol tautan dari halaman terkirim, dan
+assert F gerbang deploy memindai seluruh sumber aplikasi untuk tiap direktori terkecuali.
+
+**DIKECUALIKAN, BUKAN DIHAPUS.** `remotion/src/Scene.jsx` masih merender video darinya.
+Menghapus 48 MB itu tetap keputusan OWNER — belum diambil.
+
+**MIRA di `landing.html` TIDAK disentuh.** Ia SVG inline dengan animasi sendiri
+(`miraBreathe`, `miraBlink`), bukan rujukan ke direktori itu. Menggantinya dengan PAW
+adalah pekerjaan desain pada halaman pemasaran, bukan penggantian mekanis — dan
+mengerjakannya asal-asalan membuat halaman itu lebih buruk, bukan lebih baik. Menunggu
+arahan OWNER.
+
+### 5.4 Utang naskah Thai sisi Worker — SELESAI SEBAGIAN
+Tiga kalimat yang sampai ke murid kini dikirim sebagai `copyKey` + `text`, dengan
+pasangan `copy-id-worker.js` / `copy-th-worker.js`. Klien memakai kuncinya lewat
+`workerCopy()` dan jatuh ke `text` bila kunci kosong atau belum bernaskah.
+
+**SISA UTANG, bertanggal 2026-09-13:** judul notifikasi push
+(`'Waktunya Belajar FIEZEL! ✨'`) masih Indonesia saja. Penghalangnya BUKAN
+terjemahannya — itu bisa ditulis — melainkan `sw.js` tidak punya runtime i18n sama sekali
+dan tidak tahu locale murid saat notifikasi tiba. Itu rancangan tersendiri, bukan
+tambalan, dan sengaja tidak dikebut di sini.
+
+## 6. YANG MASIH MENUNGGU OWNER
+
+1. Menghapus (bukan sekadar berhenti mengirim) 48 MB `assets/characters/` +
+   `assets/motion/` — `remotion/` masih memakainya.
+2. Mengganti MIRA di `landing.html` dengan PAW — pekerjaan desain.
+3. i18n untuk judul notifikasi push di service worker.
 
 ---
 
-## 6. LANJUTAN m025-310 — plafon akun ada, tetapi jatah MURID dan tombol mati belum
+## 7. LANJUTAN m025-311 — plafon akun ada, tetapi jatah MURID dan tombol mati belum
 
 Penakaran m025-309 di atas menutup pertanyaan **"berapa tagihannya"**. Ia TIDAK menutup dua
 pertanyaan lain, dan keduanya ditemukan saat OWNER bertanya "apakah sistemnya sudah menerapkan
@@ -183,7 +219,7 @@ menyelamatkannya adalah gerbang yang menguji URUTAN penolakan, bukan hanya hasil
   menuntut rute melaporkan "tidak terlayani" ke gerbang — perubahan kontrak, bukan tambalan.
   **Hanya kasus 200 ini yang masih terbuka**; lihat butir di bawah untuk yang sudah ditutup.
 
-### Ditutup sesudah review: jatah ditagih untuk permintaan yang ditolak SEBELUM model
+### 7.1 Ditutup sesudah review: jatah ditagih untuk permintaan yang ditolak SEBELUM model
 
 Review bot menemukan kasus yang BERBEDA dari utang di atas, dan pengukurannya membenarkannya:
 handler SLOT 5 menolak sebagian permintaan sebelum model pernah dipanggil
@@ -206,3 +242,40 @@ ditambahi properti, asumsi yang tidak perlu diambil.
 Dijaga empat assert di `tests/ai-legacy-spend-gate-test.js` butir (d2) — termasuk assert
 KEBALIKANNYA ("yang dilayani tetap ditagih"), supaya "jangan tagih yang gagal" tidak diam-diam
 menjadi "jangan tagih apa pun" — dan tiga mutasi yang ketiganya memerahkannya.
+
+### 7.2 Tabrakan dengan #412, dan satu lubang yang ia bongkar
+
+#412 mendarat saat cabang ini berjalan dan mengambil **m025-310 yang sama**; build ini jadi
+**m025-311**. Penyelesaiannya dinilai per berkas, bukan "pertahankan milik sendiri":
+
+| Berkas | Putusan | Alasan |
+|---|---|---|
+| `route-legacy.js` impor | **gabungan** | refactor #412 (`ai/neuron-reservation.js`) lebih baik — ia menutup §5.2, satu perakit untuk dua jalur. Impor `aiSpendGate` milik cabang ini dipertahankan di sampingnya; sisi #412 tidak tahu-menahu soal gerbang belanja. |
+| handoff §5 | **ambil #412** | ia memperbarui 5.2–5.4 jadi SELESAI dengan bukti; bagian cabang ini digeser jadi §7. |
+| artefak `reports/` | **ambil #412** | ditulis ulang gerbangnya sendiri. |
+
+**Perubahan cabang ini MEMBUTAKAN gerbang #412, dan penjaganya menangkapnya.** `AI_SPEND_ROUTES`
+membuat `export const ROUTES` berhenti menjadi literal array (`RAW_ROUTES.map(...)`, dan
+`RAW_ROUTES` sengaja tidak diekspor supaya tidak ada jalan memasang SLOT 5 tanpa gerbangnya).
+Pendeteksi C3b mencari `export const ROUTES = [`, jadi `route-legacy.js` keluar dari daftar
+modul yang dipindai: **C3c memerah dengan `index.js:0/6`** — kelima rute berbayar tidak
+terlihat sama sekali. Penjaga non-kehampaan itu bekerja tepat seperti yang dirancang.
+
+Perbaikannya menggeneralisasi pendeteksi, bukan melemahkan struktur gerbang belanja: satu
+penolong `routeTableAt()` membaca tabel di tempat ia DIDEKLARASIKAN, dan ia dipakai **dua
+tempat** — filter `arrayModules` dan pemindai entri. Generalisasi separuh (hanya pemindainya)
+sempat dicoba dan modulnya tetap tidak masuk daftar: ia membuat pendeteksi buta dengan cara
+yang lebih sulit dilihat.
+
+**Lubang yang ikut terbongkar, dan ditutup di sini.** C3b dan C3c keduanya dibuka dengan
+`arrayModules.length === 0 ||`, jadi keduanya LULUS kalau daftarnya kosong. Diuji dengan
+memaksa `routeTableAt()` mengembalikan `-1`: gerbang **HIJAU** padahal tidak melihat satu pun
+rute berbayar — persis keadaan yang komentar C3c sebut "lebih berbahaya daripada tidak ada
+gerbang", lewat pintu yang ia sendiri tidak jaga. Ditutup assert **C3a** (daftar modul array
+tidak boleh kosong), dan mutasi yang sama kini memerahkannya.
+
+**Assert cabang ini sendiri juga basi karena refactor #412** dan diperbaiki, bukan dihapus: ia
+menuntut `reserveAccountNeurons(` ada DI `route-legacy.js` — memakukan TEMPAT, bukan
+perlindungan, sehingga memerah atas refactor yang justru benar. Sekarang ia mengikuti
+indireksinya: rute memanggil perakit bersama, DAN perakit itu memesan serta gagal-tertutup.
+Mutasi "perakit berhenti memesan neuron" memerahkannya.

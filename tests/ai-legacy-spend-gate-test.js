@@ -28,6 +28,9 @@ const check = (name, ok, details) => {
 
 const legacyPath = path.join(root, 'workers', 'api', 'route-legacy.js');
 const legacy = fs.readFileSync(legacyPath, 'utf8');
+// Beberapa assert diperiksa pada KODE, bukan pada komentar: berkas itu MENJELASKAN kenapa
+// pembatas laju lama dihapus, jadi menguji teks mentah akan memerah karena penjelasannya sendiri.
+const legacyCode = legacy.split('\n').filter((l) => !/^\s*(\/\/|\*|\/\*)/.test(l)).join('\n');
 
 /* ============ BAGIAN 1: STATIS — cakupan daftar terhadap KENYATAAN berkas ============ */
 
@@ -72,16 +75,32 @@ check('RAW_ROUTES TIDAK diekspor', !/export\s+const\s+RAW_ROUTES/.test(legacy),
 // Pembatas laju in-memory tidak boleh kembali: ia hidup di memori satu isolate (hitungannya
 // nol lagi setiap isolate baru) dan angkanya 40/jam = 960/hari, 38x plafon 25/hari yang
 // dipilih owner. Menyimpan keduanya = dua mekanisme untuk satu maksud.
-// Diperiksa pada KODE, bukan pada komentar: berkas itu MENJELASKAN kenapa pembatas lama
-// dihapus, jadi menguji teks mentah akan memerah karena penjelasannya sendiri.
-const legacyCode = legacy.split('\n').filter((l) => !/^\s*(\/\/|\*|\/\*)/.test(l)).join('\n');
 check('pembatas laju in-memory tidak kembali', !/allowAiRequest|aiRateLimiter/.test(legacyCode),
   'pembatas laju per-isolate kembali; ia tidak membatasi apa pun dan menyamarkan kuota yang sungguhan');
 
 // Plafon neuron AKUN harus TETAP di chokepoint: ia menjaga tagihan owner, gerbang rute
 // menjaga pembagian antar murid. Keduanya harus berlaku sendiri-sendiri.
-check('plafon neuron akun tetap di runLegacyModel', /reserveAccountNeurons\(/.test(legacy) && /fiezelBudgetDenied/.test(legacy),
-  'plafon neuron akun hilang dari chokepoint');
+// Plafon neuron AKUN harus TETAP berlaku, dan terpisah dari gerbang jatah murid: yang satu
+// menjaga kolam owner, yang lain menjaga pembagian antar murid. Assert ini MENGIKUTI
+// indireksinya, tidak memakukan lokasinya: m025-310 memindahkan perakitan tanda terima dari
+// route-legacy.js ke ai/neuron-reservation.js supaya tidak ada dua salinan yang bisa
+// menyimpang. Versi pertama assert ini menuntut `reserveAccountNeurons(` ada DI
+// route-legacy.js, jadi ia memerah atas refactor yang justru benar - memakukan tempat, bukan
+// perlindungan. Yang dituntut sekarang: rute memanggil perakit bersama itu, DAN perakit itu
+// benar-benar memesan serta gagal-tertutup.
+const reservePath = path.join(root, 'workers', 'api', 'ai', 'neuron-reservation.js');
+if (fs.existsSync(reservePath)) {
+  const reserve = fs.readFileSync(reservePath, 'utf8');
+  check('rute SLOT 5 memanggil perakit tanda terima bersama', /runMeteredModel\(/.test(legacyCode),
+    'route-legacy tidak memanggil runMeteredModel; jalur neuronnya tidak bisa dilacak dari sini');
+  check('perakit bersama memesan neuron akun dan gagal-TERTUTUP',
+    /reserveAccountNeurons\(/.test(reserve) && /fiezelBudgetDenied/.test(reserve),
+    'perakit bersama tidak lagi memesan neuron akun / tidak menandai penolakan anggaran');
+} else {
+  // Perakit bersama belum ada (mis. pohon sebelum m025-310): plafonnya harus di rutenya.
+  check('plafon neuron akun ada di runLegacyModel', /reserveAccountNeurons\(/.test(legacy) && /fiezelBudgetDenied/.test(legacy),
+    'plafon neuron akun hilang dari chokepoint');
+}
 
 const wiring = fs.readFileSync(path.join(root, 'workers', 'api', 'route-wiring.js'), 'utf8');
 check('aiSpendGate memakai enforceQuota yang SAMA, bukan salinan',

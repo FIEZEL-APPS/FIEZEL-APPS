@@ -10,24 +10,15 @@
  */
 
 import { jsonResponse, jsonError } from './errors.js';
-import { reserveAccountNeurons, releaseAccountNeurons } from './ai/ai-account-budget.js';
+/* m025-310: perakitan tanda terima dan resolver umd() DULU disalin ke berkas ini dari
+   route-wiring.js. Dua salinan bebas menyimpang, dan yang menyimpang adalah jalur biaya.
+   Keduanya kini tinggal di ai/neuron-reservation.js - satu tempat, dipakai kedua jalur. */
+import { runMeteredModel } from './ai/neuron-reservation.js';
+/* m025-311: gerbang belanja per-rute (kuota harian murid + flag matikan AI). Ia hidup di
+   route-wiring.js supaya rute SLOT 5 memakai `enforceQuota`/`checkAiEnabled` YANG SAMA
+   dengan jalur berpipa - bukan salinan kedua, dengan alasan yang sama seperti komentar
+   di atas: dua mekanisme untuk satu maksud adalah cara celah berikutnya lahir. */
 import { aiSpendGate } from './route-wiring.js';
-import * as modelGateNs from './ai/model-call-gate.js';
-
-/**
- * Ambil ekspor modul UMD `model-call-gate.js` baik saat ia di-bundle sebagai CJS (esbuild
- * memberi `module`, hasilnya jadi `default`) maupun saat dieksekusi sebagai ESM murni
- * (hasilnya hanya ada di `globalThis`). Resolver ini disalin dari route-wiring.js supaya
- * kedua jalur memakai cara yang sama; menuliskannya berbeda berarti satu jalur bisa
- * mendapat `null` di runtime yang tidak diuji.
- */
-function umd(ns, globalName) {
-  const g = typeof globalThis !== 'undefined' ? globalThis : {};
-  if (ns && ns.default && typeof ns.default === 'object') return ns.default;
-  if (g[globalName]) return g[globalName];
-  return ns || null;
-}
-const ModelCallGate = umd(modelGateNs, 'FiezelModelCallGate');
 
 // == PANGGILAN MODEL DI BERKAS INI WAJIB BERPLAFON (m025-308) =========================
 //
@@ -58,7 +49,9 @@ const ModelCallGate = umd(modelGateNs, 'FiezelModelCallGate');
 // untuk SATU AKUN, dan GLOBAL_NEURON_CAP dipasang 8.000. Satu jalur tanpa plafon cukup
 // untuk menghabiskannya, dan yang kehilangan AI sesudahnya adalah murid sungguhan.
 //
-// URUTANNYA BUKAN SELERA, dan ditiru dari route-ai.js:
+// URUTANNYA BUKAN SELERA, dan ditiru dari route-ai.js. Sejak m025-310 ketiga langkah itu
+// DIJALANKAN di ai/neuron-reservation.js#runMeteredModel(), bukan di berkas ini - yang
+// berpindah tempatnya, bukan urutannya:
 //   1. PESAN dulu (reserveAccountNeurons) - penolakan di sini tidak pernah menjadi tagihan,
 //      karena permintaannya bahkan tidak menjadi permintaan;
 //   2. bawa tanda terima ke chokepoint (runReservedModel) - tanpa tanda terima yang sah ia
@@ -74,40 +67,18 @@ const LEGACY_MODEL_ID = '@cf/meta/llama-3.1-8b-instruct';
 const LEGACY_MODEL_NEURONS = 12.5;
 
 async function runLegacyModel(ctx, input, options) {
-  const env = (ctx && ctx.env) || {};
-  // Nama binding: CORE_DB di wrangler.toml, DB di harness uji. Keduanya diterima, sama
-  // seperti quotaDb() di route-wiring.js.
-  const db = env.CORE_DB || env.DB || null;
-  const now = Number(ctx && ctx.now) || Date.now();
-  const neurons = LEGACY_MODEL_NEURONS;
-
-  const out = await reserveAccountNeurons({ db, env, neurons, now });
-  if (!out || out.allowed !== true) {
-    // Fail-CLOSED. Jatah akun habis, D1 mati, atau tabelnya belum ada - ketiganya berarti
-    // kami tidak boleh membelanjakan neuron, dan ketiganya sampai ke pemanggil sebagai
-    // lemparan supaya cabang cadangan yang SUDAH ADA di setiap rute yang menanganinya.
-    const err = new Error('ai_account_cap:' + String((out && out.reason) || 'unreadable'));
-    err.fiezelBudgetDenied = true;
-    throw err;
-  }
-
-  const reservation = ModelCallGate.makeReservation({
-    neurons,
-    cap: out.cap,
-    usedBefore: out.usedBefore,
-    release: () => releaseAccountNeurons({ db, env, neurons, now }),
+  // Fail-CLOSED tetap seperti semula: jatah habis, D1 mati, atau tabel anggaran belum ada
+  // sama-sama sampai ke sini sebagai LEMPARAN ber-fiezelBudgetDenied, supaya cabang
+  // cadangan yang sudah ada di setiap rute menanganinya. Yang berpindah hanya TEMPAT
+  // perakitannya, bukan perilakunya.
+  return runMeteredModel({
+    env: (ctx && ctx.env) || {},
+    modelId: LEGACY_MODEL_ID,
+    input,
+    options: options || {},
+    neurons: LEGACY_MODEL_NEURONS,
+    now: Number(ctx && ctx.now) || Date.now()
   });
-
-  try {
-    return await ModelCallGate.runReservedModel({
-      env, modelId: LEGACY_MODEL_ID, input, options: options || {}, reservation,
-    });
-  } catch (err) {
-    if (ModelCallGate.releasableFailure(err)) {
-      await ModelCallGate.releaseReservation(reservation, String((err && err.message) || 'provider_failed'));
-    }
-    throw err;
-  }
 }
 
 /**
@@ -207,7 +178,14 @@ const RAW_ROUTES = [
     // mengganti Nusa & Mira dengan PAW di seluruh klien, tetapi kalimat ini hidup di Worker -
     // di luar jangkauan pemindaian berkas klien - jadi ia tertinggal. Ia bukan naskah mati:
     // inilah yang dibaca murid setiap kali AI tidak tersedia.
+    /* m025-310: kalimat ini lahir di SERVER, jadi ia tidak pernah lewat FiezelI18n dan
+       murid Thai membacanya dalam bahasa Indonesia - layar campur, bukan teks hilang.
+       route-quota.js sudah menetapkan aturannya: "Server mengirim FAKTA + copyKey, bukan
+       kalimat." `copyKey` dikirim DI SAMPING `text`, bukan menggantikannya, supaya klien
+       lama tetap bekerja apa adanya. Ia dikosongkan begitu model benar-benar menjawab,
+       karena jawaban model bukan naskah kami dan tidak punya terjemahan. */
     let text = 'Halo! Saya PAW, asisten belajar FIEZEL.';
+    let copyKey = 'worker.chat.fallback';
     if (ctx.env.AI) {
       try {
         const messages = [
@@ -215,7 +193,7 @@ const RAW_ROUTES = [
           { role: 'user', content: String(prompt || '') }
         ];
         const res = await runLegacyModel(ctx, { messages });
-        if (res?.response) text = res.response;
+        if (res?.response) { text = res.response; copyKey = ''; }
       } catch (_) {
         // m025-309: dulu baris ini menulis `AI response fallback: ${e.message}` ke MURID.
         // Selama panggilan model tidak ditakar, catch ini praktis hanya kena galat penyedia
@@ -229,6 +207,7 @@ const RAW_ROUTES = [
     
     return jsonResponse({
       text,
+      copyKey,
       protocol: '1.7',
       schema: 'fiezel-ai-response-v1'
     }, { status: 200, ...opt });
@@ -278,7 +257,9 @@ const RAW_ROUTES = [
     const body = await readJson(ctx);
     const { snapshot, evidence, policy, outcomes, profile, brain } = body;
     
+    // m025-310: sama seperti /api/ai/chat di atas - FAKTA + copyKey, bukan kalimat.
     let text = 'Tetap semangat belajar! Kamu sudah membuat kemajuan yang baik.';
+    let copyKey = 'worker.coach.default';
     if (ctx.env.AI) {
       try {
         const systemPrompt = `You are a warm, encouraging pedagogical coach for FIEZEL English learning app. deterministic policy is authoritative. Profile=${JSON.stringify(profile||{})}, Brain=${JSON.stringify(brain||{})}`;
@@ -287,14 +268,16 @@ const RAW_ROUTES = [
           { role: 'user', content: `Snapshot: ${JSON.stringify(snapshot||{})}, Policy: ${JSON.stringify(policy||{})}, Outcomes: ${JSON.stringify(outcomes||[])}` }
         ];
         const res = await runLegacyModel(ctx, { messages });
-        if (res?.response) text = res.response;
-      } catch (e) {
+        if (res?.response) { text = res.response; copyKey = ''; }
+      } catch (_) {
         text = 'Lanjutkan latihanmu untuk memperkuat pemahaman!';
+        copyKey = 'worker.coach.fallback';
       }
     }
     
     return jsonResponse({
       text,
+      copyKey,
       protocol: '1.7'
     }, { status: 200, ...opt });
   }],

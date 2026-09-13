@@ -2,13 +2,18 @@
   "schema": "fiezel-ai-account-cap-gate-v1",
   "pass": true,
   "counts": {
-    "pass": 53,
+    "pass": 71,
     "fail": 0
   },
   "discoveredRoutes": [
     "POST /api/ai/task <- ai/route-ai.js",
     "POST /api/tts/render <- tts/route-tts.js",
-    "GET /api/tts/manifest <- tts/route-tts.js"
+    "GET /api/tts/manifest <- tts/route-tts.js",
+    "POST /api/ai/chat <- route-legacy.js",
+    "POST /api/ai/translate <- route-legacy.js",
+    "POST /api/coach/context <- route-legacy.js",
+    "POST /api/content/qa/review <- route-legacy.js",
+    "POST /api/content/patch/candidate <- route-legacy.js"
   ],
   "modelCapableModules": [
     "ai/route-ai.js",
@@ -111,9 +116,24 @@
       "details": "registerTtsRoutes"
     },
     {
+      "name": "C3a. Ada modul rute berbentuk array yang terdeteksi (pendeteksinya tidak buta)",
+      "status": "PASS",
+      "details": "nol modul array terdeteksi; routeTableAt()/reachesChokepoint() kemungkinan patah, dan C3b-C3c-C4 semuanya lulus hampa kalau dibiarkan"
+    },
+    {
+      "name": "C3b. Modul rute berbentuk array ikut ditemukan, dan rutenya terbaca",
+      "status": "PASS",
+      "details": "modul=index.js,route-legacy.js rute terbaca=28"
+    },
+    {
+      "name": "C3c. Penemuan modul array tidak hampa: ada rute model yang benar-benar terbaca",
+      "status": "PASS",
+      "details": "index.js:0/6 route-legacy.js:5/22"
+    },
+    {
       "name": "C4. Setiap rute dari modul model-capable punya fixture di gerbang ini",
       "status": "PASS",
-      "details": "POST /api/ai/task, POST /api/tts/render, GET /api/tts/manifest"
+      "details": "POST /api/ai/task, POST /api/tts/render, GET /api/tts/manifest, POST /api/ai/chat, POST /api/ai/translate, POST /api/coach/context, POST /api/content/qa/review, POST /api/content/patch/candidate"
     },
     {
       "name": "C5[POST /api/ai/task] perilaku model cocok dengan deklarasi fixture",
@@ -128,7 +148,7 @@
     {
       "name": "C7[POST /api/ai/task] penghitung ai_account_day benar-benar bergerak",
       "status": "PASS",
-      "details": "[{\"day\":\"2026-09-13\",\"neurons\":60,\"requests\":1,\"touched_at\":1789328191837}]"
+      "details": "[{\"day\":\"2026-09-13\",\"neurons\":60,\"requests\":1,\"touched_at\":1789334804551}]"
     },
     {
       "name": "C5[POST /api/tts/render] perilaku model cocok dengan deklarasi fixture",
@@ -143,7 +163,7 @@
     {
       "name": "C7[POST /api/tts/render] penghitung ai_account_day benar-benar bergerak",
       "status": "PASS",
-      "details": "[{\"day\":\"2026-09-13\",\"neurons\":33,\"requests\":1,\"touched_at\":1789328191850}]"
+      "details": "[{\"day\":\"2026-09-13\",\"neurons\":33,\"requests\":1,\"touched_at\":1789334804569}]"
     },
     {
       "name": "C5[GET /api/tts/manifest] perilaku model cocok dengan deklarasi fixture",
@@ -154,6 +174,81 @@
       "name": "C6[GET /api/tts/manifest] rute non-model TIDAK menyentuh binding AI",
       "status": "PASS",
       "details": "ai@-1"
+    },
+    {
+      "name": "C5[POST /api/ai/chat] perilaku model cocok dengan deklarasi fixture",
+      "status": "PASS",
+      "details": "expectModel=true ranModel=true status=200"
+    },
+    {
+      "name": "C6[POST /api/ai/chat] reservasi neuron akun terjadi SEBELUM panggilan model",
+      "status": "PASS",
+      "details": "reserve@1 ai@2 status=200"
+    },
+    {
+      "name": "C7[POST /api/ai/chat] penghitung ai_account_day benar-benar bergerak",
+      "status": "PASS",
+      "details": "[{\"day\":\"2026-08-27\",\"neurons\":13,\"requests\":1,\"touched_at\":1787799600000}]"
+    },
+    {
+      "name": "C5[POST /api/ai/translate] perilaku model cocok dengan deklarasi fixture",
+      "status": "PASS",
+      "details": "expectModel=true ranModel=true status=200"
+    },
+    {
+      "name": "C6[POST /api/ai/translate] reservasi neuron akun terjadi SEBELUM panggilan model",
+      "status": "PASS",
+      "details": "reserve@1 ai@2 status=200"
+    },
+    {
+      "name": "C7[POST /api/ai/translate] penghitung ai_account_day benar-benar bergerak",
+      "status": "PASS",
+      "details": "[{\"day\":\"2026-08-27\",\"neurons\":13,\"requests\":1,\"touched_at\":1787799600000}]"
+    },
+    {
+      "name": "C5[POST /api/coach/context] perilaku model cocok dengan deklarasi fixture",
+      "status": "PASS",
+      "details": "expectModel=true ranModel=true status=200"
+    },
+    {
+      "name": "C6[POST /api/coach/context] reservasi neuron akun terjadi SEBELUM panggilan model",
+      "status": "PASS",
+      "details": "reserve@1 ai@2 status=200"
+    },
+    {
+      "name": "C7[POST /api/coach/context] penghitung ai_account_day benar-benar bergerak",
+      "status": "PASS",
+      "details": "[{\"day\":\"2026-08-27\",\"neurons\":13,\"requests\":1,\"touched_at\":1787799600000}]"
+    },
+    {
+      "name": "C5[POST /api/content/qa/review] perilaku model cocok dengan deklarasi fixture",
+      "status": "PASS",
+      "details": "expectModel=true ranModel=true status=200"
+    },
+    {
+      "name": "C6[POST /api/content/qa/review] reservasi neuron akun terjadi SEBELUM panggilan model",
+      "status": "PASS",
+      "details": "reserve@1 ai@2 status=200"
+    },
+    {
+      "name": "C7[POST /api/content/qa/review] penghitung ai_account_day benar-benar bergerak",
+      "status": "PASS",
+      "details": "[{\"day\":\"2026-08-27\",\"neurons\":13,\"requests\":1,\"touched_at\":1787799600000}]"
+    },
+    {
+      "name": "C5[POST /api/content/patch/candidate] perilaku model cocok dengan deklarasi fixture",
+      "status": "PASS",
+      "details": "expectModel=true ranModel=true status=200"
+    },
+    {
+      "name": "C6[POST /api/content/patch/candidate] reservasi neuron akun terjadi SEBELUM panggilan model",
+      "status": "PASS",
+      "details": "reserve@1 ai@2 status=200"
+    },
+    {
+      "name": "C7[POST /api/content/patch/candidate] penghitung ai_account_day benar-benar bergerak",
+      "status": "PASS",
+      "details": "[{\"day\":\"2026-08-27\",\"neurons\":13,\"requests\":1,\"touched_at\":1787799600000}]"
     },
     {
       "name": "D1. /api/ai/task TANPA deps.accountBudget = 503, BUKAN dilayani",
@@ -258,7 +353,7 @@
     {
       "name": "H1. Panggilan model yang GAGAL melepas reservasinya kembali",
       "status": "PASS",
-      "details": "releaseSql=true row={\"day\":\"2026-09-13\",\"neurons\":0,\"requests\":0,\"touched_at\":1789328191873}"
+      "details": "releaseSql=true row={\"day\":\"2026-09-13\",\"neurons\":0,\"requests\":0,\"touched_at\":1789334804600}"
     },
     {
       "name": "H2. Amplopnya melaporkan pelepasan itu, dan murid tetap dilayani 200",
@@ -268,7 +363,7 @@
     {
       "name": "H3. TIMEOUT tidak melepas neuron (model sudah bekerja, biayanya nyata)",
       "status": "PASS",
-      "details": "released=false row={\"day\":\"2026-09-13\",\"neurons\":60,\"requests\":1,\"touched_at\":1789328191883}"
+      "details": "released=false row={\"day\":\"2026-09-13\",\"neurons\":60,\"requests\":1,\"touched_at\":1789334804604}"
     },
     {
       "name": "H4. Keputusan boleh-dilepas tinggal di SATU tempat (releasableFailure)",
