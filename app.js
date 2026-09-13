@@ -1941,7 +1941,24 @@ function braincoreEvidenceEmitSnapshot(nowMs=Date.now()){
     if(accuracy==null){
       const history=(state.history||[]).filter(h=>historyMatchesActive(h,activeLevel));
       const recent=history.slice(-20);
-      accuracy=recent.length?Math.round(recent.filter(h=>h.ok).length/recent.length*100):(history.length?Math.round(history.filter(h=>h.ok).length/history.length*100):50);
+      /* m025-307: cadangan terakhir DULU `50`, dan itu melanggar kanon repo ini sendiri.
+         Untuk murid yang benar-benar baru - nol policyOutcome, nol riwayat - `accuracy`
+         menjadi 50: bukan null, bukan ditandai kurang data, melainkan angka yang tampak
+         seperti hasil pengukuran. Dan fungsi ini bukan penghias layar; ia membangun
+         buildLearnerEvidenceEvent, lane bukti belajar yang TERSINKRON KE GURU. Jadi guru
+         bisa melihat murid yang belum menjawab satu soal pun tercatat akurasi 50%.
+
+         Aturannya sudah diputuskan dan diuji di lane metrik: riwayat kosong -> accuracy
+         null DAN ditandai insufficient (tests/learning-metrics-test.js), nilai
+         insufficient tidak dirilis (tests/metrics-digest-test.js), dan
+         tests/personal-journey-test.js menyatakan maksudnya: "tidak menebak skill yang
+         belum diukur".
+
+         null adalah jalur yang DIDUKUNG, bukan kekosongan yang tidak tertangani:
+         bucketCalibration() di fiezel-braincore-evidence.js memulai dengan
+         `if (a === null) return null`. Jadi yang terkirim ke guru adalah "belum
+         terukur", bukan tebakan yang menyamar sebagai ukuran. */
+      accuracy=recent.length?Math.round(recent.filter(h=>h.ok).length/recent.length*100):(history.length?Math.round(history.filter(h=>h.ok).length/history.length*100):null);
     }
     let improvementDelta=latest?.accuracyDelta??0;
     const input=M.fromSnapshot(snapshot,{
@@ -4885,7 +4902,21 @@ async function attemptGoogleSignIn(){
           setAuthGateState('error',{message:hasil?.message||FiezelI18n.t('google.gagal')});
         }
       },{width:280});
-      if(res?.ok&&window.google?.accounts?.id?.prompt){
+      // m025-307: res.ok DULU hanya dibaca sebagai syarat memanggil prompt(), dan cabang
+      // gagalnya tidak ada - jadi saat renderButton mengembalikan {ok:false} (skrip Google
+      // tidak bisa dimuat, clientId belum dikonfigurasi, tidak ada host), alurnya jatuh ke
+      // `return true` sambil meninggalkan gerbang di keadaan 'pending'. Murid melihat spinner
+      // yang tidak pernah berhenti: tanpa teks galat, tanpa tombol Google, dan tanpa jalan ke
+      // tombol masuk FIEZEL di bawahnya. Di jaringan sekolah yang memblokir accounts.google.com
+      // itu keadaan sehari-hari, bukan kasus tepi.
+      //
+      // fiezel-google.js menyatakan kontraknya eksplisit di baris 205: pemanggil WAJIB
+      // bereaksi pada {ok:false} dengan menampilkan cadangan.
+      if(!res?.ok){
+        setAuthGateState('error',{message:res?.message||FiezelI18n.t('google.gagal-muat','Tombol Google belum bisa dimuat. Masuk dengan akun FIEZEL di bawah, ya.')});
+        return false;
+      }
+      if(window.google?.accounts?.id?.prompt){
         window.google.accounts.id.prompt((notification)=>{
           if(notification.isNotDisplayed()||notification.isSkippedMoment()){}
         });
@@ -5537,7 +5568,32 @@ function cfShadowProbe(path,options,answer){
 }
 // Jalur Cloudflare murni — Puter telah dihapus sepenuhnya.
 // Semua panggilan coreWorkerExec langsung dilayani oleh Cloudflare Worker fiezel-api.
-async function corePuterExec(path,options={}){const url=(self.CORE_WORKER_URL||'')+path;if(self.puter?.workers?.exec)return puter.workers.exec(url,options);const sdk=await (self.awaitPuter?self.awaitPuter():null);if(sdk?.workers?.exec)return sdk.workers.exec(url,options);return cfWorkerFetch(path,options)}
+//
+// m025-307: dua cabang Puter di fungsi ini DIBUANG, bukan komentarnya yang diperlunak.
+// Sebuah tinjauan otomatis menandai komentar di atas sebagai bohong ("kodenya menambahkan
+// kembali jalur Puter sebagai cadangan") dan menyarankan menulis ulang komentarnya jadi
+// "CF-first-with-Puter-fallback". Diperiksa sampai ke sumbernya, saran itu SALAH ARAH:
+//
+//   - `awaitPuter()` sudah menjadi STUB yang selalu mengembalikan null (lihat deklarasinya
+//     di dekat puterAuthAvailable/puterSignedIn, yang juga sudah dipaku `false`);
+//   - tidak ada satu pun berkas yang memuat js.puter.com sebagai <script> lagi, jadi
+//     `self.puter` tidak pernah terisi;
+//   - core-config.js menyatakan deploymentState:'cloudflare-only', "jalur Puter SENGAJA
+//     tidak dikonfigurasi, bukan lupa".
+//
+// Jadi `self.puter?.workers?.exec` selalu undefined dan `await awaitPuter()` selalu null:
+// kedua cabang itu MATI, dan komentarnya justru benar secara perilaku. Menulis ulang komentar jadi
+// "ada cadangan Puter" akan membuatnya BOHONG - menjanjikan jalur mundur yang tidak ada.
+//
+// Yang benar-benar bermasalah adalah kode matinya, karena ia membuat pembaca (dan peninjau
+// otomatis) menyimpulkan ada jalur mundur. Dibuang, jadi kode dan komentar sama-sama jujur.
+//
+// KONSEKUENSI YANG PERLU DISADARI, dan sengaja ditulis di sini: `coreWorkerExec` merutekan
+// mode 'off' ke fungsi ini. Karena tidak ada transport lain, mode 'off' TETAP mendarat di
+// Cloudflare. Artinya sakelar 'off' tidak bisa lagi mematikan CF - ia hanya menandai niat.
+// Itu bukan regresi yang diperkenalkan di sini (perilakunya identik sebelum dan sesudah),
+// tetapi ia perlu diketahui siapa pun yang mengandalkannya sebagai killswitch.
+async function corePuterExec(path,options={}){return cfWorkerFetch(path,options)}
 async function coreWorkerExec(path,options={}){
   const mode=cfEndpointMode(path);
   if(mode==='off')return corePuterExec(path,options);
@@ -8115,7 +8171,6 @@ function neuralRateLabel(v){return v<0.9?FiezelI18n.t('suara.lebih-pelan',{nilai
    signIn() di atas sesi yang masih hidup akan kembali ke akun yang sama tanpa pernah
    menanyakan apa pun - persis kegagalan diam-diam yang membuat tombol seperti ini
    terasa rusak. Keluar dulu, baru masuk. */
-let puterAccountCache=null;
 function puterAccountLabel(){return '';}
 async function refreshPuterAccountCard(){return;}
 async function signOutPuterAccount(){return;}
