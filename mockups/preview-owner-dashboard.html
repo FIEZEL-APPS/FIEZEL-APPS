@@ -1222,7 +1222,7 @@ footer{
         </div>
       </div>
 
-      
+
 
       <main>
         <div class="stat-cards-grid">
@@ -1316,7 +1316,7 @@ footer{
       <div class="warn">Angka ini ESTIMASI PERANGKAT, bukan orang. Satu orang dengan dua perangkat = dua hitungan; menghapus data browser = perangkat baru; dua orang satu perangkat = satu hitungan. "Aktif" = hari dengan ≥5 jawaban (ambang yang sama dengan cincin misi murid).</div>
       <div class="warn">WAU dan MAU sengaja RENTANG, bukan satu angka (penanda estimasi dari job rollup menyala): token perangkat dirotasi tiap 24 jam dan pepper lama dihapus, jadi menyambungkan perangkat lintas hari mustahil. Batas bawah = perangkat harian terbanyak, batas atas = jumlah seluruh hari.</div>
       <div class="note">DAU/WAU/MAU dibaca dari baris agregat harian yang dibekukan job rollup — dashboard tidak pernah menyentuh tabel token per-perangkat.</div>
-      
+
     </div>
   </section>
 
@@ -1360,7 +1360,7 @@ footer{
         · Hanya cache MISS yang ditagih. TARIF TIDAK DISIMPAN PER HARI: tidak ada tabel biaya di database ini dan tidak boleh ada, jadi tarif di atas dipakai ulang untuk SEMUA hari. Mengubahnya mengubah angka bulan lalu juga — ini estimasi sekarang, bukan jejak audit.
       </div>
       <div class="warn">Penyebut "perangkat aktif" adalah UNDER-COUNT (murid offline tidak terlihat), jadi biaya/perangkat aktif adalah BATAS ATAS, bukan angka pasti. Bila TTS berjalan on-device, biaya TTS nyata NOL dan yang perlu dipantau justru bandwidth model.</div>
-      
+
     </div>
   </section>
 
@@ -1405,7 +1405,7 @@ footer{
       Belajar offline berhari-hari juga menurunkan retensi tanpa ada murid yang hilang.
       Safari membatasi storage skrip 7 hari → cohort iOS bisa tampak berhenti di D7.</div>
       <div class="note">Persentase disembunyikan bila cohort &lt; 30: angka presisi di atas cohort kecil adalah derau, bukan sinyal.</div>
-      
+
     </div>
   </section>
 
@@ -1508,10 +1508,10 @@ footer{
     <line x1="0" y1="46" x2="100" y2="46" stroke="var(--spark-grid)" stroke-width="1" stroke-dasharray="2,2"/>
     <polyline fill="none" stroke="var(--spark-line)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" points="0.00,13.92 16.67,9.96 33.33,12.33 50.00,6.00 66.67,13.13 83.33,9.17 100.00,7.58"/></svg>
     <div class="card-footer">
-      
+
       <div class="warn">Token = bisa PROKSI (karakter ÷ 4). Jalur server tidak menandai hari mana yang memakai proksi, jadi peringatan ini dicetak tanpa syarat: perlakukan biaya LLM sebagai estimasi kasar.</div>
       <div class="note">Semua angka AI lahir di Worker (server-side), bukan dari klien — di situlah biaya lahir. Rincian kode error dibaca dari tabel dimensi pemakaian (bucket <code>ai_err:*</code>), bukan dari metrik terpisah per kode.</div>
-      
+
     </div>
   </section>
 
@@ -1548,7 +1548,7 @@ footer{
     <div class="kv"><span>429 dari AI</span><b>12</b></div>
     <div class="kv"><span>Breaker terbuka</span><b>0 (nol terukur)</b></div>
     <div class="card-footer">
-      
+
       <div class="note">KEPUTUSAN KUOTA: kalau baris di atas berbunyi "belum ada pengukuran", tidak ada satu pun angka di halaman ini yang boleh dipakai untuk menaikkan atau menurunkan kuota. Yang belum diukur tidak bisa dipangkas.</div>
       <div class="note">Dicatat server-side tepat di cabang yang mengembalikan 429. Angka naik = murid ditolak; itu keputusan biaya yang terlihat, bukan bug yang disembunyikan.</div>
     </div>
@@ -1576,9 +1576,9 @@ footer{
     <div class="kv"><span>Hari rollup GAGAL</span><b>0 (nol terukur)</b></div>
     <div class="kv"><span>Rentang hari yang terbaca</span><b>2026-08-20 → 2026-08-26</b></div>
     <div class="card-footer">
-      
+
       <div class="note">Semua angka historis dimulai dari tanggal pengumpulan di atas. Sebelum tanggal itu tidak ada data — bukan nol, tetapi tidak diketahui.</div>
-      
+
     </div>
   </section>
 
@@ -1590,12 +1590,12 @@ footer{
     </div>
   </div>
 
-  
+
     <section>
       <span class="card-full-inner" id="teachers"></span>
       <h2><span><svg class="ico" viewBox="0 0 24 24"><path d="m4 6 8-4 8 4-8 4-8-4Z"/><path d="m18 10 4 2v6a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2v-6l4-2"/><path d="M12 10v12"/></svg> Kelola Token &amp; Undangan Guru</span><span class="section-badge">Manajemen Akses</span></h2>
-      
-      
+
+
     <div style="background:#fff;border:1px solid var(--line);border-radius:12px;padding:18px;margin-bottom:20px;">
       <h3 style="margin-top:0;margin-bottom:6px;color:var(--ink);">+ Buat Undangan &amp; Token Guru Baru</h3>
       <div style="font-size:13px;color:var(--muted);margin-bottom:16px;">
@@ -1635,8 +1635,8 @@ footer{
         </div>
       </form>
     </div>
-  
-      
+
+
     <div style="background:#fff;border:1px dashed var(--line);border-radius:12px;padding:14px 16px;margin-bottom:20px;">
       <form method="GET" action="/" style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
         <input type="hidden" name="action" value="revoke_invite">
@@ -1645,7 +1645,7 @@ footer{
         <button type="submit" style="background:#c62828;color:#fff;box-shadow:0 2px 0 #8e1c1c;">Cabut Token</button>
       </form>
     </div>
-  
+
       <h3 style="color:var(--text-main);margin-top:20px;margin-bottom:8px;">Riwayat Undangan &amp; Token Guru</h3>
       <div class="note">Belum ada token undangan yang dicetak.</div>
       <h3 style="color:var(--text-main);margin-top:20px;margin-bottom:8px;">Daftar Guru Terdaftar &amp; Aktif</h3>
@@ -1654,7 +1654,7 @@ footer{
         Undangan guru bersifat sekali pakai. Masa aktif default adalah 90 hari. Begitu guru mengaktifkan token di aplikasi, peran akunnya langsung dipromosikan ke <code>teacher</code> dan profil sekolahnya tersimpan aman di basis data server.
       </div>
     </section>
-  
+
 
   <section>
     <span class="card-full-inner" id="export"></span>
