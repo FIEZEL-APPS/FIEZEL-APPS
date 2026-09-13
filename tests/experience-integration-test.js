@@ -7,11 +7,19 @@ const read=name=>fs.readFileSync(path.join(root,name),'utf8');
    DIHAPUS oleh 73cd02a (migrasi Puter -> Cloudflare). Dibaca wajib di lingkup modul seperti
    dulu, gerbang ini mati ENOENT sebelum satu assert pun jalan - 25+ assert lain yang masih
    sah ikut tidak pernah dijalankan. readOpt mengembalikan '' bila berkasnya tiada, dan assert
-   yang menyangkut ketiganya diubah jadi penjaga TERBALIK di bawah. Pemindaian rahasia di
-   akhir berkas tetap utuh: ia memindai gabungan, dan berkas yang ada tetap ikut terpindai. */
-const readOpt=name=>{const p=path.join(root,name);return fs.existsSync(p)?fs.readFileSync(p,'utf8'):''};
+   yang menyangkut ketiganya diubah jadi penjaga TERBALIK di bawah - dikunci ke KEBERADAAN
+   berkas, bukan ke isinya (alasannya di blok berikutnya). Pemindaian rahasia di akhir berkas
+   tetap utuh: ia memindai gabungan, dan berkas yang ada tetap ikut terpindai. */
+const adaBerkas=name=>fs.existsSync(path.join(root,name));
+const readOpt=name=>adaBerkas(name)?read(name):'';
 const app=read('app.js'),css=read('style.css'),html=read('index.html');
 const worker=readOpt('fiezel-report-worker.js'),setup=readOpt('creator-report-setup.html'),dashboard=readOpt('creator-report-dashboard.html');
+/* m025-308: penjaga terbalik di bawah dikunci ke KEBERADAAN berkas, bukan ke isinya.
+   Menulis `!worker||...` berarti berkas nol-byte lolos diam-diam - persis pada saat
+   seseorang sedang setengah jalan menghidupkan kembali Worker laporan, ketika sanitasi
+   dan batas ukuran paling dibutuhkan. Gerbang saudaranya (tests/search-feedback-test.js,
+   tests/ui-structure-test.js) sudah memakai bendera keberadaan; ketiganya kini sebahasa. */
+const workerAda=adaBerkas('fiezel-report-worker.js'),setupAda=adaBerkas('creator-report-setup.html'),dashboardAda=adaBerkas('creator-report-dashboard.html');
 // AI-20 F06 (kategori 2a, UNION-CORPUS): naskah Indonesia boleh PINDAH byte-identik ke
 // copy-map features/i18n/copy-id-*.js (dijaga tests/id-golden-snapshot-test.js). Literal naskah
 // karena itu dicari di gabungan app.js + copy-map id; identifier kode tetap dicek di app.js.
@@ -67,11 +75,11 @@ check(/hostname\.endsWith\('\.puter\.work'\)/.test(app),'Report endpoint is not 
    Diubah jadi penjaga TERBALIK, bukan dibuang: selama berkasnya tiada, assert lewat; begitu
    ada yang MENGHIDUPKANNYA kembali, seluruh kontrak lama langsung berlaku lagi - termasuk
    sanitasi dan batas ukuran, yang justru bagian paling berbahaya untuk kembali tanpa penjaga. */
-check(!worker||(/sanitizeReport/.test(worker)&&/weakSkills:Array\.isArray/.test(worker)&&/MAX_BODY_BYTES/.test(worker)),'Worker report whitelist or size validation missing');
-check(!worker||(/CONFIG_LEARNER/.test(worker)&&/boundIds/.test(worker)&&/caller\.identifiers/.test(worker)),'Worker is not bound to the first learner account');
-check(!worker||(/isOwner/.test(worker)&&/Creator account required/.test(worker)&&/me\.puter\.kv/.test(worker)),'Owner-only centralized report storage missing');
-check(!setup||(/puter\.workers\.create/.test(setup)&&/puter\.fs\.write/.test(setup)),'One-click Worker deployment missing');
-check(!dashboard||(/puter\.workers\.exec/.test(dashboard)&&/fiezel-learning-report\.csv/.test(dashboard)),'Creator dashboard or CSV export missing');
+check(!workerAda||(/sanitizeReport/.test(worker)&&/weakSkills:Array\.isArray/.test(worker)&&/MAX_BODY_BYTES/.test(worker)),'Worker report whitelist or size validation missing');
+check(!workerAda||(/CONFIG_LEARNER/.test(worker)&&/boundIds/.test(worker)&&/caller\.identifiers/.test(worker)),'Worker is not bound to the first learner account');
+check(!workerAda||(/isOwner/.test(worker)&&/Creator account required/.test(worker)&&/me\.puter\.kv/.test(worker)),'Owner-only centralized report storage missing');
+check(!setupAda||(/puter\.workers\.create/.test(setup)&&/puter\.fs\.write/.test(setup)),'One-click Worker deployment missing');
+check(!dashboardAda||(/puter\.workers\.exec/.test(dashboard)&&/fiezel-learning-report\.csv/.test(dashboard)),'Creator dashboard or CSV export missing');
 
 const runtime=[html,app,worker,setup,dashboard,read('report-config.js')].join('\n');
 check(!/(AIza[0-9A-Za-z_-]{20,}|sk-[0-9A-Za-z_-]{20,}|Bearer\s+[A-Za-z0-9._-]{20,})/.test(runtime),'Secret-like credential found in runtime files');
