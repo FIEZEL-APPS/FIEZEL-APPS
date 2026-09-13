@@ -296,8 +296,15 @@ test('Fiezel AI answers anything, and says plainly when it cannot', () => {
   // W4-QA — union W2: kalimatnya PINDAH byte-identik ke copy-id-feat-b.js (AI-02 F01);
   // sah bila masih inline ATAU dirender lewat kunci i18n yang nilainya memuat kalimat sama.
   const featBCopySrc = fs.readFileSync('features/i18n/copy-id-feat-b.js', 'utf8');
-  assert.ok(/login Puter dulu/.test(chatSrc) ||
-    (/T\('tutor\.ai-need-login'\)/.test(chatSrc) && /login Puter dulu/.test(featBCopySrc)),
+  /* m025-308: assert lama menuntut naskah "login Puter dulu". Puter dicabut 73cd02a, dan
+     naskahnya memang SUDAH diperbarui dengan benar ke solusi yang berlaku sekarang
+     ("pastikan koneksi internet aktif") - jadi yang tertinggal assert-nya, bukan produknya.
+     Maksudnya dipertahankan utuh: pesan itu harus MENYEBUT SOLUSI NYATA, bukan sekadar
+     mengeluh gagal. Karena itu yang dijaga tetap dua hal - kuncinya benar-benar dipakai,
+     DAN nilainya menyebut tindakan yang bisa dilakukan murid. */
+  assert.ok(/T\('tutor\.ai-need-login'\)/.test(chatSrc),
+    'kunci tutor.ai-need-login tidak dipakai; murid tidak diberi tahu apa-apa');
+  assert.ok(/koneksi internet/.test(featBCopySrc),
     'and it names the actual fix');
 });
 
