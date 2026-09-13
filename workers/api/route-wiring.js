@@ -499,6 +499,66 @@ function wrapQuota(handler) {
   };
 }
 
+/**
+ * [L1] GERBANG BELANJA AI UNTUK RUTE SLOT 5 (route-legacy.js).
+ *
+ * LUBANG YANG DITUTUP, dan kenapa ia lolos dua kali sebelumnya:
+ *
+ * P3 memasang gerbang flag + jembatan kuota pada rute yang keluar dari `registerAiRoutes`,
+ * S3 memasangnya pada rute TTS sesudah menembak produksi hidup. Keduanya memasang pagar
+ * pada JALUR, dan pagar jalur hanya melindungi jalur yang dilewati. `route-legacy.js`
+ * disebar mentah di route-slots.js (`...LEGACY_ROUTES`) - ia tidak pernah lewat
+ * `wrapMetered`, jadi tidak pernah lewat keduanya. Akibatnya, pada rute yang justru
+ * dipakai aplikasi:
+ *
+ *   - `POST /api/ai/chat`      <- app.js:coreWorkerExec('/api/ai/chat'), jalur tutor UTAMA
+ *   - `POST /api/ai/translate` <- features/neural-voice/fiezel-subtitle-translate.js
+ *   - `POST /api/coach/context`
+ *
+ *   kuota harian per murid TIDAK berlaku  -> satu murid bisa menghabiskan kolam neuron
+ *                                            seluruh murid; plafon akun menahan TAGIHAN,
+ *                                            bukan KEADILAN antar murid;
+ *   flag `cfAiEnabled` TIDAK berlaku      -> "matikan AI" tidak mematikan jalur utama.
+ *
+ * Jadi yang salah bukan "dua rute terlewat" melainkan tempat pagarnya: ia dipasang pada
+ * pipa, sedangkan yang membelanjakan uang adalah RUTE. Gerbang ini karena itu diekspor,
+ * supaya slot yang tidak memakai pipa tetap memakai MEKANISME YANG SAMA - `enforceQuota`
+ * dan `checkAiEnabled` yang itu juga, bukan salinan kedua. Dua mekanisme untuk satu maksud
+ * adalah cara celah ketiga lahir; baris ini ada supaya tidak ada celah ketiga.
+ *
+ * URUTANNYA SAMA DENGAN P3/S3, dan itu bukan selera:
+ *   1. identitas (401) - keadaan otentikasi tidak boleh terbaca dari selisih 401/403;
+ *   2. flag AI (403)   - fail-CLOSED, termasuk ketika flag TIDAK TERBACA;
+ *   3. store kuota ada (503) - tidak bisa menghitung jatah berarti tidak boleh belanja;
+ *   4. reserve kuota per murid (429 kalau habis) - SEBELUM handler, jadi `quotaCharged`
+ *      benar secara struktur;
+ *   5. handler -> commit / rollback, diurus `enforceQuota` sendiri.
+ *
+ * Plafon neuron AKUN tetap di `runLegacyModel()` dan TIDAK dipindah ke sini: ia menjaga
+ * kolam owner, gerbang ini menjaga pembagian antar murid, dan keduanya harus tetap berlaku
+ * walau satu jalur baru lupa memakai gerbang ini.
+ */
+export function aiSpendGate(bucket, handler) {
+  return async (ctx) => {
+    const guard = requireIdentity(ctx);
+    if (guard) return guard;
+
+    const flag = await checkAiEnabled(ctx.env);
+    if (!flag.allowed) {
+      return RouteAi.aiDisabledResponse({ reason: flag.reason, headers: ctx.corsHeaders || null });
+    }
+
+    // Tanpa bucket, rute ini tidak menagih jatah MURID (dipakai rute owner: lihat
+    // AI_SPEND_ROUTES di route-legacy.js). Flag + plafon akun tetap berlaku.
+    if (!bucket) return handler(ctx);
+
+    if (!quotaDb(ctx.env)) {
+      return jsonError(503, ERR.UNAVAILABLE, {}, { headers: Object.assign({}, ctx.corsHeaders, NO_STORE_HEADERS) });
+    }
+    return enforceQuota(bucket, 1)(quotaCtxFor(ctx), () => handler(ctx));
+  };
+}
+
 function wrapAnalytics(handler) {
   return async (ctx) =>
     handler({ request: requestFor(ctx), env: analyticsEnv(ctx.env), ctx: ctx.executionCtx });

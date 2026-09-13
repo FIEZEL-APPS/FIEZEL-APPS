@@ -291,6 +291,16 @@ jobs:
           # 50% untuk murid tanpa riwayat lalu mengirimnya ke guru. Keduanya hijau di
           # sisi penyedia sebelum gerbang ini ada.
           node tests/caller-reacts-test.js
+          # m025-309: kelas bug yang sama pada RUTE, bukan pipa. P3 memasang gerbang flag +
+          # kuota pada rute yang lewat wrapMetered, S3 menambahkannya untuk TTS sesudah
+          # menembak produksi hidup - tetapi SLOT 5 (route-legacy.js) disebar mentah dan
+          # tidak lewat keduanya, jadi /api/ai/chat, jalur tutor yang dipakai app.js, tidak
+          # punya kuota harian per murid dan tidak bisa dimatikan oleh flag. Gerbang ini
+          # menemukan SETIAP rute yang memanggil model dari isi berkas lalu menuntutnya
+          # digerbangi, dan menguji perilakunya terhadap SQL kuota sungguhan (node:sqlite
+          # + migrasi 0001_quota.sql): jatah habis -> 429 tanpa menyentuh model, tanpa D1
+          # -> 503 fail-closed, terjemahan memakai SUB-kuota.
+          node tests/ai-legacy-spend-gate-test.js
           node tests/boot-order-test.js
           node tests/splash-first-paint-test.js
           node tests/teacher-instant-boot-test.js

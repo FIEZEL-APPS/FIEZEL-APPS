@@ -11,6 +11,7 @@
 
 import { jsonResponse, jsonError } from './errors.js';
 import { reserveAccountNeurons, releaseAccountNeurons } from './ai/ai-account-budget.js';
+import { aiSpendGate } from './route-wiring.js';
 import * as modelGateNs from './ai/model-call-gate.js';
 
 /**
@@ -162,19 +163,19 @@ function isCronAuthorized(ctx) {
   return !!(token && ctx.env.CRON_TOKEN && token === ctx.env.CRON_TOKEN);
 }
 
-// Helper pembatasan laju permintaan AI (40 per jam per user)
-const aiRateLimiter = new Map();
-function allowAiRequest(sub) {
-  const now = Date.now();
-  const windowMs = 3600000;
-  const history = (aiRateLimiter.get(sub) || []).filter(ts => now - ts < windowMs);
-  if (history.length >= 40) return false;
-  history.push(now);
-  aiRateLimiter.set(sub, history);
-  return true;
-}
+// m025-309: pembatas laju in-memory (`allowAiRequest`, 40/jam per sub) DIHAPUS, bukan
+// dilonggarkan - ia diganti kuota harian per murid yang sungguhan (AI_SPEND_ROUTES di bawah).
+// Tiga alasan ia tidak pernah benar-benar membatasi:
+//   1. Map-nya hidup di MEMORI SATU ISOLATE. Cloudflare menjalankan banyak isolate dan
+//      mendaur-ulangnya kapan saja, jadi hitungannya kembali nol tanpa pola yang bisa
+//      diandalkan - murid yang sama bisa dilayani isolate yang belum pernah melihatnya.
+//   2. Angkanya sendiri terlalu besar: 40/jam = 960/hari, sedangkan plafon yang dipilih
+//      owner (quota-config.js) adalah 25/hari.
+//   3. Ia hanya dipasang di /api/ai/translate, sementara empat rute lain yang memanggil
+//      model yang sama tidak punya pembatas apa pun.
+// Menyimpan keduanya berarti dua mekanisme untuk satu maksud - cara celah berikutnya lahir.
 
-export const ROUTES = [
+const RAW_ROUTES = [
   // ==========================================
   // Endpoint AI (Cloudflare Workers AI)
   // ==========================================
@@ -218,7 +219,6 @@ export const ROUTES = [
     const opt = { headers: ctx.corsHeaders };
     const sub = ctx.identity?.sub;
     if (!sub) return jsonError(401, 'unauthorized', {}, opt);
-    if (!allowAiRequest(sub)) return jsonError(429, 'rate_limit_exceeded', {}, opt);
     
     const body = await readJson(ctx);
     const { text, targetLocale } = body;
@@ -726,3 +726,48 @@ export const ROUTES = [
     return jsonResponse({ config, ledgerEntries }, { status: 200, ...opt });
   }]
 ];
+
+/* ===================== GERBANG BELANJA AI (m025-309) ============================= */
+
+/**
+ * Rute di SLOT 5 yang benar-benar memanggil model, dan bucket kuota murid yang ditagih.
+ *
+ * Daftar ini adalah SATU-SATUNYA tempat keputusan itu hidup, dan itu disengaja: gerbang
+ * `tests/ai-legacy-spend-gate-test.js` membaca berkas ini, mencari SETIAP rute yang badan
+ * handlernya memanggil `runLegacyModel(`, lalu menuntut rute itu ada di sini. Jadi rute
+ * keenam yang kelak memanggil model akan MEMERAHKAN gerbang, bukan lolos diam-diam - persis
+ * cara lubang ini lahir pertama kali (pagar dipasang pada pipa, rute baru lewat pipa lain).
+ *
+ * BUCKET, dan alasan tiap pilihan:
+ *   - 'ai'          : permintaan tutor biasa. 25/hari (quota-config.js FREE_AI_DAILY_LIMIT).
+ *   - 'aiTranslate' : SUB-kuota di dalam 'ai' (15/hari) - satu terjemahan menaikkan
+ *                     keduanya. Nilainya dipilih owner supaya terjemahan subtitle tidak
+ *                     bisa menghabiskan jatah penjelasan tutor, yang nilai belajarnya lebih
+ *                     tinggi per permintaan. bucketFor() di route-wiring.js memetakan
+ *                     /api/ai/task?task=translate_subtitle ke bucket yang SAMA, jadi kedua
+ *                     jalur terjemahan berbagi satu jatah, bukan dua.
+ *   - null          : rute OWNER (dijaga isOwner di dalam handler). Tidak menagih jatah
+ *                     MURID dengan sengaja: menagihnya berarti sesi QA owner memakan 25/hari
+ *                     milik owner sebagai murid, dan yang perlu dijaga di sini adalah
+ *                     TAGIHAN, yang sudah dijaga plafon neuron akun di runLegacyModel().
+ *                     Flag `cfAiEnabled` TETAP berlaku: "matikan AI" harus mematikan
+ *                     belanja owner juga, karena neuronnya dari kolam yang sama.
+ */
+export const AI_SPEND_ROUTES = Object.freeze({
+  '/api/ai/chat': 'ai',
+  '/api/ai/translate': 'aiTranslate',
+  '/api/coach/context': 'ai',
+  '/api/content/qa/review': null,
+  '/api/content/patch/candidate': null
+});
+
+/**
+ * Dipasang DI SINI dan bukan di route-slots.js supaya tidak ada jalan memasang SLOT 5 tanpa
+ * gerbangnya: `ROUTES` yang diekspor berkas ini adalah satu-satunya bentuk yang ada, dan
+ * `RAW_ROUTES` tidak diekspor.
+ */
+export const ROUTES = RAW_ROUTES.map(([method, path, handler]) =>
+  Object.prototype.hasOwnProperty.call(AI_SPEND_ROUTES, path)
+    ? [method, path, aiSpendGate(AI_SPEND_ROUTES[path], handler)]
+    : [method, path, handler]
+);
