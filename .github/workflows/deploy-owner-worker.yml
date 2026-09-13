@@ -1,0 +1,42 @@
+# Deploy Worker `fiezel-owner` (workers/owner) ke Cloudflare.
+name: FIEZEL Owner Worker Deploy
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: fiezel-owner-worker-deploy
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    if: github.event_name == 'workflow_dispatch' && github.actor == 'FIEZEL-APPS'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Deploy Worker fiezel-owner
+        working-directory: workers/owner
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          node --check index.js
+          node --check queries.js
+          node <<'JS'
+          const fs = require('fs');
+          let toml = fs.readFileSync('wrangler.toml', 'utf8');
+          const rblok = /\[\[routes\]\]\s*\npattern\s*=\s*"owner\.fiezel\.my\.id"[\s\S]*?custom_domain\s*=\s*true\s*\n/;
+          if (rblok.test(toml)) {
+            toml = toml.replace(rblok, '# (blok routes dilepas saat deploy: token CI tanpa izin zona; custom domain live tetap menempel)\n');
+            fs.writeFileSync('wrangler.toml', toml);
+          }
+          JS
+          npx --yes wrangler@3 deploy
