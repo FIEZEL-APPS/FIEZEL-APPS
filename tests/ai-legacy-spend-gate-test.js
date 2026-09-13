@@ -259,10 +259,30 @@ const MIGRATIONS = ['0001_quota.sql', '0005_ai_account_budget.sql']
       const ownerRoute = listed.find((p) => tableSrc.includes("'" + p + "': null"));
       check('ada rute owner tanpa bucket untuk diperiksa', !!ownerRoute, 'tidak ada entri null di AI_SPEND_ROUTES');
       if (ownerRoute) {
-        const r = await hit(ownerRoute, ctxFor(makeEnv(db, { flag: false }), { item: {} }));
-        check('rute owner: flag mati tetap 403', r.status === 403, 'status=' + r.status);
+        const rOff = await hit(ownerRoute, ctxFor(makeEnv(db, { flag: false }), { item: {} }));
+        check('rute owner: flag mati tetap 403 (kolam neuron yang sama)', rOff.status === 403, 'status=' + rOff.status);
         check('rute owner: tidak menagih jatah murid', !quotaRow(db) || Number(quotaRow(db).ai_used) === 0,
           'ai_used=' + (quotaRow(db) && quotaRow(db).ai_used));
+
+        // Rute owner TIDAK boleh dituntut identitas MURID oleh gerbang ini: otentikasinya
+        // `isOwner()` (Authorization: Bearer + OWNER_TOKEN_HASH), bukan cookie sesi murid.
+        // Kalau gerbang menjawab 401 lebih dulu, alat owner yang sah - yang memang tidak
+        // punya sesi murid - berhenti bekerja, dan gerbangnya memutus alat tanpa
+        // melindungi apa pun. Yang harus terjadi: permintaan MENCAPAI handler, lalu
+        // handler-nya sendiri yang menolak 403 'forbidden' karena token owner tidak ada.
+        const db2 = makeD1(MIGRATIONS);
+        const rNoId = await hit(ownerRoute, ctxFor(makeEnv(db2), { item: {} }, { verified: false }));
+        check('rute owner: gerbang TIDAK menuntut identitas murid (bukan 401)', rNoId.status !== 401,
+          'gerbang menjawab 401; alat owner tanpa sesi murid akan patah');
+        check('rute owner: penolakannya datang dari isOwner (403 forbidden)',
+          rNoId.status === 403 && rNoId.body && rNoId.body.error === 'forbidden',
+          'status=' + rNoId.status + ' error=' + JSON.stringify(rNoId.body && rNoId.body.error));
+
+        // Kebalikannya untuk rute BERBUCKET: di sana identitas WAJIB, karena jatah murid
+        // ditagih dan menagih subjek yang salah lebih buruk daripada menolak.
+        const db3 = makeD1(MIGRATIONS);
+        const rBucket = await hit('/api/ai/chat', ctxFor(makeEnv(db3), { prompt: 'hai' }, { verified: false }));
+        check('rute berbucket: identitas TETAP wajib (401)', rBucket.status === 401, 'status=' + rBucket.status);
       }
     }
   } else if (mod) {

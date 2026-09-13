@@ -84,3 +84,78 @@ memesan kelebihan aman untuk dompet, memesan kekurangan tidak.
    Indonesia saja, di luar sistem `FiezelI18n`. Murid Thai membacanya sebagai layar
    campur. Memindahkannya ke pasangan copy-id/copy-th menuntut i18n sisi server yang
    belum ada. Dicatat sebagai utang bertanggal 2026-09-13.
+
+---
+
+## 6. LANJUTAN m025-310 — plafon akun ada, tetapi jatah MURID dan tombol mati belum
+
+Penakaran m025-309 di atas menutup pertanyaan **"berapa tagihannya"**. Ia TIDAK menutup dua
+pertanyaan lain, dan keduanya ditemukan saat OWNER bertanya "apakah sistemnya sudah menerapkan
+jatah AI per akun murid?" — pertanyaan yang jawabannya ternyata *belum*, di jalur yang justru
+paling dipakai.
+
+### Apa yang bolong
+
+Kuota harian per murid (`quota/quota-config.js`: 25 ai/hari, 15 di antaranya terjemahan) dan
+gerbang flag `cfAiEnabled` **keduanya dipasang pada PIPA**, bukan pada rute: P3 membungkus rute
+yang keluar dari `registerAiRoutes`, S3 menambahkannya untuk TTS. SLOT 5 disebar mentah di
+`route-slots.js` (`...LEGACY_ROUTES`) — ia tidak pernah lewat `wrapMetered`, jadi tidak pernah
+lewat keduanya. Akibatnya, pada rute yang benar-benar dipakai aplikasi:
+
+| | `/api/ai/task` | `/api/ai/chat` (dipakai app.js:coreWorkerExec) |
+|---|---|---|
+| wajib login | ya | ya |
+| plafon neuron akun | ya | ya (m025-309) |
+| **kuota harian per murid** | ya | **tidak** |
+| **flag `cfAiEnabled`** | ya | **tidak** |
+
+Dua akibatnya berbeda sifat, dan keduanya nyata:
+
+1. **Plafon akun menjaga TAGIHAN, bukan KEADILAN.** Satu murid rajin — atau satu skrip dengan
+   satu sesi sah — bisa menghabiskan kolam 8.000 neuron milik seluruh murid dalam sehari.
+   Tagihannya tetap aman; yang hilang adalah AI bagi murid lain.
+2. **"Matikan AI" tidak mematikan jalur utama.** Itu lubang P3/S3 yang KEMBALI lewat jalur
+   ketiga — bukan varian baru.
+
+### Apa yang dikerjakan
+
+`aiSpendGate(bucket, handler)` diekspor dari `route-wiring.js` dan dipakai `route-legacy.js`
+lewat tabel `AI_SPEND_ROUTES`. Ia memakai `enforceQuota` dan `checkAiEnabled` **yang itu juga** —
+bukan salinan: dua mekanisme untuk satu maksud adalah cara celah keempat lahir. Urutannya sama
+dengan P3/S3: identitas (401) → flag (403) → store kuota ada (503) → reserve (429) → handler →
+commit/rollback.
+
+Bucket: `ai` untuk chat dan coach, `aiTranslate` untuk terjemahan (SUB-kuota — satu terjemahan
+menaikkan keduanya, jadi subtitle tidak bisa memakan jatah penjelasan tutor), dan `null` untuk
+dua rute OWNER: menagih jatah MURID di sana berarti sesi QA owner memakan 25/hari miliknya
+sebagai murid, sedangkan yang perlu dijaga di sana adalah tagihan — sudah dijaga plafon akun.
+Flag tetap berlaku untuk rute owner, karena neuronnya dari kolam yang sama.
+
+`allowAiRequest` (pembatas laju in-memory, 40/jam) **dihapus, bukan dilonggarkan**: Map-nya hidup
+di memori satu isolate sehingga hitungannya nol lagi setiap isolate baru, angkanya 40/jam =
+960/hari (38× plafon 25/hari yang dipilih OWNER), dan ia hanya dipasang di satu dari lima rute.
+
+### Titik buta nomor 1 di bagian 5: sebagian TERTUTUP
+
+Butir 5.1 di atas benar — `tests/ai-account-cap-gate-test.js` hanya menemukan modul berbentuk
+`registerXxxRoutes(`, jadi modul `export const ROUTES` lolos. `tests/ai-legacy-spend-gate-test.js`
+tidak menunggu lima fixture itu: ia MEMBACA `route-legacy.js`, mencari setiap rute yang badan
+handlernya memanggil `runLegacyModel(`, lalu menuntut rute itu terdaftar di `AI_SPEND_ROUTES`.
+Rute keenam yang kelak memanggil model akan memerahkan gerbang walau tidak ada yang ingat
+memperbarui daftarnya. Perilakunya diuji terhadap SQL kuota SUNGGUHAN (`node:sqlite` + migrasi
+`0001_quota.sql`), bukan terhadap tiruan: jatah habis → 429 tanpa menyentuh model, tanpa D1 →
+503 fail-closed, terjemahan menaikkan kedua penghitung. Empat mutasi diuji dan keempatnya
+memerahkannya.
+
+Yang MASIH terbuka dari 5.1: gerbang cap untuk modul `export const ROUTES` **lain** (kalau kelak
+ada) tetap tidak menuntut fixture. Yang ditutup di sini khusus SLOT 5.
+
+### Masih terbuka sesudah ini
+
+- **Batas 12.000 char di `/api/ai/chat`** tidak diselaraskan dengan `FREE_MAX_PROMPT_CHARS`
+  (4.000) milik jalur berkuota. Menurunkannya mengubah perilaku permukaan yang hidup, jadi ia
+  KEPUTUSAN OWNER, bukan perapian. Dicatat 2026-09-13.
+- **Kuota `ai` ditagih walau model gagal** dan rute menjawab teks cadangan: `enforceQuota`
+  meng-commit karena handler mengembalikan 200. Konservatif ke arah melindungi kolam, tetapi
+  tidak adil bagi murid yang tidak mendapat jawaban. Memperbaikinya menuntut rute melaporkan
+  "tidak terlayani" ke gerbang — perubahan kontrak, bukan tambalan.

@@ -540,17 +540,32 @@ function wrapQuota(handler) {
  */
 export function aiSpendGate(bucket, handler) {
   return async (ctx) => {
-    const guard = requireIdentity(ctx);
-    if (guard) return guard;
-
+    // Flag DULU, dan ia berlaku untuk SEMUA rute di sini - termasuk rute owner, karena
+    // neuronnya dari kolam yang sama: "matikan AI" yang tidak mematikan belanja owner
+    // bukan tombol mati. Ia juga penolakan termurah yang ada, jadi ia mendahului kerja
+    // apa pun yang lebih mahal.
     const flag = await checkAiEnabled(ctx.env);
     if (!flag.allowed) {
       return RouteAi.aiDisabledResponse({ reason: flag.reason, headers: ctx.corsHeaders || null });
     }
 
-    // Tanpa bucket, rute ini tidak menagih jatah MURID (dipakai rute owner: lihat
-    // AI_SPEND_ROUTES di route-legacy.js). Flag + plafon akun tetap berlaku.
+    // Tanpa bucket = rute OWNER (lihat AI_SPEND_ROUTES di route-legacy.js). Dua hal
+    // sekaligus dilakukan di sini, dan keduanya disengaja:
+    //   - jatah MURID tidak ditagih (yang dijaga di sana adalah tagihan, dan itu tugas
+    //     plafon neuron akun di runLegacyModel());
+    //   - identitas murid TIDAK dituntut. Rute owner memakai otentikasinya SENDIRI
+    //     (`isOwner()`: Authorization: Bearer + OWNER_TOKEN_HASH), bukan cookie identitas
+    //     murid. Menuntut requireIdentity() di sini akan menjawab 401 kepada alat owner
+    //     yang memang tidak punya sesi murid - gerbang yang memutus alat yang sah, bukan
+    //     gerbang yang melindungi apa pun. Rutenya sendiri tetap menolak yang bukan owner.
     if (!bucket) return handler(ctx);
+
+    // Dari sini ke bawah jatah MURID ditagih, jadi identitas wajib: tanpa subjek
+    // terverifikasi tidak ada yang bisa ditagih, dan menagih subjek yang salah lebih
+    // buruk daripada menolak. 401 mendahului 429 supaya keadaan otentikasi tidak terbaca
+    // dari selisih jawabannya.
+    const guard = requireIdentity(ctx);
+    if (guard) return guard;
 
     if (!quotaDb(ctx.env)) {
       return jsonError(503, ERR.UNAVAILABLE, {}, { headers: Object.assign({}, ctx.corsHeaders, NO_STORE_HEADERS) });
