@@ -108,50 +108,63 @@ const workerPath = path.join(__fzRoot, 'fiezel-core-worker.js');
 const adaWorker = fs.existsSync(workerPath);
 const worker = adaWorker ? fs.readFileSync(workerPath, 'utf8') : '';
 
-ok(worker.includes("'/api/feedback'"), 'Worker belum punya rute pengiriman feedback');
-ok(worker.includes("'/api/feedback/list'"), 'Worker belum punya rute pembacaan feedback');
+if (adaWorker) {
+  ok(worker.includes("'/api/feedback'"), 'Worker belum punya rute pengiriman feedback');
+  ok(worker.includes("'/api/feedback/list'"), 'Worker belum punya rute pembacaan feedback');
 
-// Membaca kiriman orang lain adalah hak OWNER saja. Rute daftar TANPA penjaga ini
-// membuat setiap pengguna bisa membaca keluhan pengguna lain.
-const listAt = worker.indexOf("'/api/feedback/list'");
-ok(/isOwner\(user\)/.test(worker.slice(listAt, listAt + 400)),
-  'rute pembacaan feedback tidak dijaga isOwner');
-const clearAt = worker.indexOf("'/api/feedback/clear'");
-ok(/isOwner\(user\)/.test(worker.slice(clearAt, clearAt + 300)),
-  'rute penghapusan feedback tidak dijaga isOwner');
+  // Membaca kiriman orang lain adalah hak OWNER saja. Rute daftar TANPA penjaga ini
+  // membuat setiap pengguna bisa membaca keluhan pengguna lain.
+  const listAt = worker.indexOf("'/api/feedback/list'");
+  ok(/isOwner\(user\)/.test(worker.slice(listAt, listAt + 400)),
+    'rute pembacaan feedback tidak dijaga isOwner');
+  const clearAt = worker.indexOf("'/api/feedback/clear'");
+  ok(/isOwner\(user\)/.test(worker.slice(clearAt, clearAt + 300)),
+    'rute penghapusan feedback tidak dijaga isOwner');
 
-// Terbuka tanpa login adalah pilihan OWNER, jadi rem globalnya wajib ada.
-const postAt = worker.indexOf("router.post('/api/feedback'");
-ok(/allowFeedback\(\)/.test(worker.slice(postAt, postAt + 400)),
-  'rute pengiriman feedback tidak dibatasi laju');
+  // Terbuka tanpa login adalah pilihan OWNER, jadi rem globalnya wajib ada.
+  const postAt = worker.indexOf("router.post('/api/feedback'");
+  ok(/allowFeedback\(\)/.test(worker.slice(postAt, postAt + 400)),
+    'rute pengiriman feedback tidak dibatasi laju');
 
-// Penyimpanan berupa cincin: tanpa batas, satu pengirim bertekad bisa menumbuhkannya
-// sampai KV tidak bisa dibaca lagi.
-ok(/slice\(-FEEDBACK_MAX\)/.test(worker), 'penyimpanan feedback tidak dibatasi');
-ok(/FEEDBACK_MAX_TEXT/.test(worker), 'panjang teks feedback tidak dibatasi');
+  // Penyimpanan berupa cincin: tanpa batas, satu pengirim bertekad bisa menumbuhkannya
+  // sampai KV tidak bisa dibaca lagi.
+  ok(/slice\(-FEEDBACK_MAX\)/.test(worker), 'penyimpanan feedback tidak dibatasi');
+  ok(/FEEDBACK_MAX_TEXT/.test(worker), 'panjang teks feedback tidak dibatasi');
 
-/* ---- teks anonim tidak boleh menjadi markup ---------------------------- */
+  /* ---- teks anonim tidak boleh menjadi markup ---------------------------- */
 
-ok(/replace\(\/\[<>\]\/g/.test(worker),
-  'teks feedback tidak dibersihkan dari penanda sudut di Worker');
+  ok(/replace\(\/\[<>\]\/g/.test(worker),
+    'teks feedback tidak dibersihkan dari penanda sudut di Worker');
+} else {
+  /* m025-308: Worker tiada -> seluruh kontrak di atas MENUNGGU subjeknya, tidak dibuang.
+     Begitu berkasnya kembali, blok itu langsung menuntut rute, kepemilikan owner, batas
+     ukuran, dan sanitasi <> seperti semula. */
+  ok(!fs.existsSync(workerPath), 'fiezel-core-worker.js ada tetapi tidak terbaca');
+}
 
 /* m025-308: creator-report-dashboard.html juga dihapus 73cd02a - penjaga yang sama. */
 const dashboardPath = path.join(__fzRoot, 'creator-report-dashboard.html');
 const adaDashboard = fs.existsSync(dashboardPath);
 const dashboard = adaDashboard ? fs.readFileSync(dashboardPath, 'utf8') : '';
-ok(dashboard.includes('feedbackList'), 'dasbor belum menampilkan masukan pengguna');
+if (adaDashboard) {
+  ok(dashboard.includes('feedbackList'), 'dasbor belum menampilkan masukan pengguna');
 
-// Lapis yang sesungguhnya. Pembersih di Worker hanyalah jaring kedua; yang menentukan
-// adalah dasbor menuliskan kiriman anonim sebagai TEKS.
-//
-// Pemeriksaannya sengaja mutlak - nol penugasan innerHTML di seluruh berkas - bukan
-// "innerHTML di dekat kata feedback". Versi longgar itu tertipu oleh komentar yang
-// justru menjelaskan larangannya, dan pemeriksaan yang lolos karena salah membaca
-// lebih berbahaya daripada tidak ada pemeriksaan.
-const assignments = (dashboard.match(/\.innerHTML\s*=/g) || []);
-ok(assignments.length === 0,
-  'dasbor menulis lewat innerHTML (' + assignments.length + 'x); kiriman anonim harus lewat textContent');
-ok(/textContent/.test(dashboard), 'dasbor tidak menulis lewat textContent sama sekali');
+  // Lapis yang sesungguhnya. Pembersih di Worker hanyalah jaring kedua; yang menentukan
+  // adalah dasbor menuliskan kiriman anonim sebagai TEKS.
+  //
+  // Pemeriksaannya sengaja mutlak - nol penugasan innerHTML di seluruh berkas - bukan
+  // "innerHTML di dekat kata feedback". Versi longgar itu tertipu oleh komentar yang
+  // justru menjelaskan larangannya, dan pemeriksaan yang lolos karena salah membaca
+  // lebih berbahaya daripada tidak ada pemeriksaan.
+  const assignments = (dashboard.match(/\.innerHTML\s*=/g) || []);
+  ok(assignments.length === 0,
+    'dasbor menulis lewat innerHTML (' + assignments.length + 'x); kiriman anonim harus lewat textContent');
+  ok(/textContent/.test(dashboard), 'dasbor tidak menulis lewat textContent sama sekali');
+} else {
+  /* m025-308: dasbor tiada -> larangan innerHTML menunggu subjeknya. Justru bagian ini
+     yang paling berbahaya kembali tanpa penjaga, jadi kontraknya dipertahankan utuh. */
+  ok(!fs.existsSync(dashboardPath), 'creator-report-dashboard.html ada tetapi tidak terbaca');
+}
 
 console.log('m025-102 pencarian + feedback: ' + passed + ' pemeriksaan lolos');
 
