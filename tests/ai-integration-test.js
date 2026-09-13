@@ -24,7 +24,15 @@ if(fs.existsSync(i18nRuntime)){
 vm.runInContext(app,context,{filename:'app.js'});
 const response=text=>({ok:true,status:200,json:async()=>({text,model:'gpt-5.4-nano',via:'fiezel-core-worker',protocol:'1.7'})});
 setTimeout(async()=>{try{
-  assert(html.indexOf('https://js.puter.com/v2/')>=0&&html.indexOf('https://js.puter.com/v2/')<html.indexOf('./version.js'),'Puter.js script order is invalid');
+  /* m025-307: assert ini dulu menuntut tag <script> js.puter.com ADA dan mendahului
+     version.js. Migrasi ke Cloudflare (73cd02a2) menghapus tag itu, dan core-config.js
+     menyatakan alasannya eksplisit: deploymentState:'cloudflare-only', "jalur Puter
+     SENGAJA tidak dikonfigurasi, bukan lupa". Jadi urutan tag yang sudah tidak ada
+     bukan kontrak lagi; yang WAJIB dijaga adalah kebalikannya - SDK Puter tidak boleh
+     kembali diam-diam ke jalur boot murid. Assert-nya dibalik arah, bukan dibuang:
+     membuangnya akan membuat penambahan ulang js.puter.com lolos tanpa satu pun
+     gerbang merah. */
+  assert(!/<script[^>]+js\.puter\.com/.test(html),'Puter SDK kembali dimuat index.html - deploymentState cloudflare-only dilanggar');
   assert(html.indexOf('./core-config.js')>0&&html.indexOf('./core-config.js')<html.indexOf('./app.js'),'Core config script order is invalid');
   assert(css.includes('.ai-btn')&&css.includes('@keyframes aiBounce'),'AI styles are missing');
   let prompt='',requestPayload=null,coachPayload=null;context.puter={workers:{exec:async(url,opts)=>{const body=JSON.parse(opts.body||'{}');prompt=body.prompt||'';requestPayload=body;if(String(url).includes('/api/coach/context'))coachPayload=body;return response(String(url).includes('/api/coach/context')?'Coach aman.':'Jawaban AI aman.')}}};

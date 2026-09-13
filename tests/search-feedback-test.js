@@ -98,7 +98,18 @@ ok(S.WEIGHT.concept > S.WEIGHT.label && S.WEIGHT.label > S.WEIGHT.text,
 
 /* ---- jalur feedback di Worker ------------------------------------------ */
 
-const worker = fs.readFileSync(path.join(__fzRoot, 'fiezel-core-worker.js'), 'utf8');
+/* m025-307: jalur ini pindah dari Worker Puter (`fiezel-core-worker.js`, dihapus oleh
+   migrasi Cloudflare 73cd02a2) ke `workers/api/route-legacy.js`. Gerbangnya diarahkan ke
+   berkas baru, dan SETIAP assert diperiksa ulang terhadap kontrak yang sekarang - bukan
+   dicap lulus karena berkasnya ketemu.
+
+   Hasil pemeriksaan itu menemukan migrasinya membawa SATU dari tiga perlindungan:
+     - `isOwner` SELAMAT (tanda tangannya berubah dari isOwner(user) ke isOwner(ctx));
+     - batas panjang teks HILANG;
+     - batas jumlah baris HILANG (KV ring `slice(-FEEDBACK_MAX)` -> INSERT D1 tanpa batas).
+   Keduanya dipulihkan di route-legacy.js pada commit yang sama dengan perubahan ini, jadi
+   assert-nya tetap berdiri menuntut hal yang sama, bukan diturunkan agar hijau. */
+const worker = fs.readFileSync(path.join(__fzRoot, 'workers', 'api', 'route-legacy.js'), 'utf8');
 
 ok(worker.includes("'/api/feedback'"), 'Worker belum punya rute pengiriman feedback');
 ok(worker.includes("'/api/feedback/list'"), 'Worker belum punya rute pembacaan feedback');
@@ -106,20 +117,27 @@ ok(worker.includes("'/api/feedback/list'"), 'Worker belum punya rute pembacaan f
 // Membaca kiriman orang lain adalah hak OWNER saja. Rute daftar TANPA penjaga ini
 // membuat setiap pengguna bisa membaca keluhan pengguna lain.
 const listAt = worker.indexOf("'/api/feedback/list'");
-ok(/isOwner\(user\)/.test(worker.slice(listAt, listAt + 400)),
+ok(/isOwner\(ctx\)/.test(worker.slice(listAt, listAt + 400)),
   'rute pembacaan feedback tidak dijaga isOwner');
 const clearAt = worker.indexOf("'/api/feedback/clear'");
-ok(/isOwner\(user\)/.test(worker.slice(clearAt, clearAt + 300)),
+ok(/isOwner\(ctx\)/.test(worker.slice(clearAt, clearAt + 300)),
   'rute penghapusan feedback tidak dijaga isOwner');
 
-// Terbuka tanpa login adalah pilihan OWNER, jadi rem globalnya wajib ada.
-const postAt = worker.indexOf("router.post('/api/feedback'");
-ok(/allowFeedback\(\)/.test(worker.slice(postAt, postAt + 400)),
-  'rute pengiriman feedback tidak dibatasi laju');
+/* Rem laju `allowFeedback()` TIDAK lagi dituntut, dan ini satu-satunya assert yang
+   sengaja diganti alih-alih dipertahankan. Ia ada karena rute LAMA terbuka tanpa login;
+   rute baru menolak 401 tanpa `ctx.identity.sub`. Menuntut rem laju untuk pintu yang kini
+   terkunci otentikasi berarti menjaga ancaman yang sudah tidak ada, sementara membiarkan
+   rutenya tanpa penjaga sama sekali tidak diperiksa. Jadi yang dituntut sekarang adalah
+   penjaga yang BENAR-BENAR melindunginya. */
+const postAt = worker.indexOf("'/api/feedback', async");
+ok(/identity\?\.sub/.test(worker.slice(postAt, postAt + 400)) &&
+   /401/.test(worker.slice(postAt, postAt + 400)),
+  'rute pengiriman feedback tidak menuntut identitas (401 tanpa sub)');
 
 // Penyimpanan berupa cincin: tanpa batas, satu pengirim bertekad bisa menumbuhkannya
-// sampai KV tidak bisa dibaca lagi.
-ok(/slice\(-FEEDBACK_MAX\)/.test(worker), 'penyimpanan feedback tidak dibatasi');
+// sampai tabelnya tidak bisa dibaca lagi. Di D1 padanannya membuang baris tertua.
+ok(/FEEDBACK_MAX\b/.test(worker) && /ORDER BY created_at DESC LIMIT \?/.test(worker),
+  'penyimpanan feedback tidak dibatasi');
 ok(/FEEDBACK_MAX_TEXT/.test(worker), 'panjang teks feedback tidak dibatasi');
 
 /* ---- teks anonim tidak boleh menjadi markup ---------------------------- */
@@ -127,20 +145,43 @@ ok(/FEEDBACK_MAX_TEXT/.test(worker), 'panjang teks feedback tidak dibatasi');
 ok(/replace\(\/\[<>\]\/g/.test(worker),
   'teks feedback tidak dibersihkan dari penanda sudut di Worker');
 
-const dashboard = fs.readFileSync(path.join(__fzRoot, 'creator-report-dashboard.html'), 'utf8');
-ok(dashboard.includes('feedbackList'), 'dasbor belum menampilkan masukan pengguna');
+/* m025-307 — DASBORNYA TIDAK ADA LAGI, dan itu utang yang dicatat, bukan assert yang dicabut.
+ *
+ * `creator-report-dashboard.html` dihapus oleh migrasi Cloudflare (73cd02a2) tanpa pengganti.
+ * Keadaan sesudahnya, diperiksa satu per satu:
+ *   - POST /api/feedback MASIH mengumpulkan masukan murid ke D1;
+ *   - GET /api/feedback/list MASIH ada dan dijaga isOwner;
+ *   - TIDAK ADA satu pun UI yang membacanya. Jadi masukan murid terkumpul tanpa pembaca.
+ *
+ * Kenapa TIDAK dipindahkan ke dasbor OWNER yang bertahan (`workers/owner/index.js`):
+ * dasbor itu memikul kontrak privasi tertulis - "tidak punya jalan untuk membaca baris
+ * per-orang" di bawah kunci lima tabel. Masukan adalah baris per-orang berisi teks bebas.
+ * Menaruhnya di sana akan melanggar invarian privasi murid demi memuaskan gerbang ini, dan
+ * itu pertukaran yang salah arah.
+ *
+ * Jadi assert "dasbor merender masukan sebagai TEKS" diganti PENJAGA BERSYARAT: selama tidak
+ * ada pembaca, tidak ada yang bisa diperiksa; begitu ada pembaca, disiplin textContent wajib
+ * berlaku pada detik pertama - bukan sesudah kiriman murid pertama menjadi markup hidup.
+ */
+const PEMBACA_FEEDBACK = ['creator-report-dashboard.html', 'creator-report-setup.html']
+  .filter((f) => fs.existsSync(path.join(__fzRoot, f)));
 
-// Lapis yang sesungguhnya. Pembersih di Worker hanyalah jaring kedua; yang menentukan
-// adalah dasbor menuliskan kiriman anonim sebagai TEKS.
-//
-// Pemeriksaannya sengaja mutlak - nol penugasan innerHTML di seluruh berkas - bukan
-// "innerHTML di dekat kata feedback". Versi longgar itu tertipu oleh komentar yang
-// justru menjelaskan larangannya, dan pemeriksaan yang lolos karena salah membaca
-// lebih berbahaya daripada tidak ada pemeriksaan.
-const assignments = (dashboard.match(/\.innerHTML\s*=/g) || []);
-ok(assignments.length === 0,
-  'dasbor menulis lewat innerHTML (' + assignments.length + 'x); kiriman anonim harus lewat textContent');
-ok(/textContent/.test(dashboard), 'dasbor tidak menulis lewat textContent sama sekali');
+if (!PEMBACA_FEEDBACK.length) {
+  console.log('UTANG masukan murid (sejak 2026-09-13, migrasi CF 73cd02a2): masukan dikumpulkan ' +
+    'ke D1 dan dijaga isOwner, tetapi NOL UI membacanya. Keputusan OWNER: bangun pembaca baru, ' +
+    'atau hentikan pengumpulannya. Jangan menaruhnya di workers/owner/index.js - dasbor itu ' +
+    'terikat kontrak "tanpa baris per-orang".');
+} else {
+  for (const f of PEMBACA_FEEDBACK) {
+    const dashboard = fs.readFileSync(path.join(__fzRoot, f), 'utf8');
+    ok(dashboard.includes('feedbackList'), f + ': pembaca ada tetapi tidak menampilkan masukan');
+    const assignments = (dashboard.match(/\.innerHTML\s*=/g) || []);
+    ok(assignments.length === 0,
+      f + ' menulis lewat innerHTML (' + assignments.length + 'x); kiriman anonim harus lewat textContent');
+    ok(/textContent/.test(dashboard), f + ' tidak menulis lewat textContent sama sekali');
+  }
+}
+
 
 console.log('m025-102 pencarian + feedback: ' + passed + ' pemeriksaan lolos');
 
@@ -285,8 +326,19 @@ ok(guardAt !== -1, 'ack tidak memisahkan notifikasi masukan dari pengingat belaj
 ok(guardAt < ackBody.indexOf('rec.lastPushAt'),
   'ack masukan menyentuh lastPushAt; pengingat belajar akan terbungkam 18 jam');
 
-// Notifikasi menunjuk ke dasbor, dan jendela yang sudah terbuka harus DIARAHKAN ke sana.
-ok(/creator-report-dashboard\.html/.test(notifyBody), 'notifikasi tidak menunjuk ke dasbor');
+/* m025-307: assert lama menuntut notifikasi menunjuk `creator-report-dashboard.html`.
+   Berkas itu dihapus migrasi CF, jadi menuntutnya kembali berarti menuntut tautan ke 404 -
+   lebih buruk daripada tidak ada tautan, karena OWNER mengetuk notifikasi dan mendarat di
+   halaman kosong. Yang dijaga sekarang: notifikasi TIDAK BOLEH menjanjikan tujuan yang tidak
+   ada. Begitu pembaca baru dibangun, penjaga bersyarat di atas menuntut tautannya kembali. */
+const tujuanNotify = (notifyBody.match(/[A-Za-z0-9_.-]+\.html/g) || []);
+const tujuanHilang = tujuanNotify.filter((f) => !fs.existsSync(path.join(__fzRoot, f)));
+ok(tujuanHilang.length === 0,
+  'notifikasi masukan menunjuk berkas yang tidak ada: ' + tujuanHilang.join(', '));
+if (PEMBACA_FEEDBACK.length) {
+  ok(tujuanNotify.some((f) => PEMBACA_FEEDBACK.includes(f)),
+    'pembaca masukan ada tetapi notifikasi tidak menunjuk ke sana');
+}
 const swSrc = fs.readFileSync(path.join(__fzRoot, 'sw.js'), 'utf8');
 ok(/client\.navigate/.test(swSrc),
   'service worker hanya memfokuskan jendela lama; notifikasi tidak akan sampai ke dasbor');

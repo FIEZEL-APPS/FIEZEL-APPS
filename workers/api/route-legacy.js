@@ -23,6 +23,25 @@ async function readJson(ctx) {
   }
 }
 
+// ── BATAS PENYIMPANAN FEEDBACK (m025-307) ────────────────────────────────────────────
+//
+// Worker Puter lama menjaga TIGA hal pada jalur feedback, dan migrasi ke D1 membawa
+// hanya satu (penjaga isOwner). Yang hilang: batas panjang teks dan batas jumlah baris.
+// Keduanya dipulihkan di sini, karena keduanya melindungi hal yang nyata:
+//
+//   - tanpa FEEDBACK_MAX_TEXT, satu murid yang sudah masuk bisa menulis satu baris
+//     sebesar apa pun ke D1; `JSON.stringify(body)` menyimpan badan permintaan apa adanya;
+//   - tanpa FEEDBACK_MAX, tabelnya tumbuh tanpa batas. Pembacaan memang LIMIT 200, jadi
+//     pertumbuhannya TIDAK TERLIHAT dari layar OWNER - ia hanya terlihat pada tagihan dan
+//     pada hari tabelnya terlalu besar untuk dibaca.
+//
+// Rem laju `allowFeedback()` milik Worker lama TIDAK dipulihkan, dan itu disengaja: ia ada
+// karena rute lamanya terbuka tanpa login. Rute baru menolak 401 tanpa `ctx.identity.sub`,
+// jadi pintu yang dijaganya sudah terkunci oleh otentikasi. Alasan ini ditulis di
+// tests/search-feedback-test.js supaya tidak dibaca sebagai perlindungan yang terlupakan.
+const FEEDBACK_MAX = 500;
+const FEEDBACK_MAX_TEXT = 4000;
+
 // Helper otentikasi Owner
 async function isOwner(ctx) {
   const authHeader = ctx.request.headers.get('authorization') || '';
@@ -328,10 +347,26 @@ export const ROUTES = [
     const body = await readJson(ctx);
     const now = ctx.now || Date.now();
     
+    // Dipotong SEBELUM disimpan, bukan divalidasi lalu ditolak: keluhan murid yang
+    // kepanjangan tetap sampai ke OWNER dalam bentuk terpotong, dan itu lebih berguna
+    // daripada 413 yang membuat murid mengira laporannya terkirim padahal tidak.
+    // Penanda sudut dibuang SEBELUM disimpan, sama seperti Worker lama. Ini pertahanan
+    // berlapis, bukan pengganti escaping di penyaji: dasbor OWNER membaca kembali baris ini,
+    // dan teks yang disimpan mentah berarti satu kiriman murid bisa menjadi markup hidup di
+    // layar OWNER. Migrasi ke D1 menjatuhkan pembersihan ini; dipulihkan di m025-307.
+    let data = JSON.stringify(body).replace(/[<>]/g, '');
+    if (data.length > FEEDBACK_MAX_TEXT) data = data.slice(0, FEEDBACK_MAX_TEXT);
+    
     if (ctx.env.CORE_DB) {
       await ctx.env.CORE_DB.prepare(
         `INSERT INTO feedback (sub, kind, data, created_at) VALUES (?, ?, ?, ?)`
-      ).bind(sub, body.kind || 'feedback', JSON.stringify(body), now).run().catch(() => {});
+      ).bind(sub, String(body.kind || 'feedback').slice(0, 64), data, now).run().catch(() => {});
+      // Cincin: padanan D1 dari `slice(-FEEDBACK_MAX)` milik Worker lama. Yang dibuang
+      // adalah baris TERTUA, jadi keluhan terbaru - yang paling mungkin masih relevan -
+      // yang bertahan.
+      await ctx.env.CORE_DB.prepare(
+        `DELETE FROM feedback WHERE id NOT IN (SELECT id FROM feedback ORDER BY created_at DESC LIMIT ?)`
+      ).bind(FEEDBACK_MAX).run().catch(() => {});
     }
     
     return jsonResponse({ success: true, receivedAt: now }, { status: 200, ...opt });
