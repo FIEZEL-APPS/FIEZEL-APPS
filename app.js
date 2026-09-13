@@ -12108,6 +12108,26 @@ function aiErrorMessage(err){
  * untuk sisa umur halaman (latch `aiTaskProtocolOk`) alih-alih ditampilkan: server yang
  * menjawab dengan kontrak lain adalah server yang belum boleh dipercaya.
  */
+
+/* m025-310: helper ini DI DALAM blok sentinel, dan itu disengaja.
+   tests/ai-transport-switch-test.js mengevaluasi POTONGAN app.js antara
+   AI-TASK-TRANSPORT-BEGIN/END di sandbox terpisah. Jalur /api/ai/chat di dalam potongan
+   itu memanggil helper ini, jadi mendefinisikannya DI LUAR membuat gerbang mati dengan
+   "workerCopy is not defined" - dan itu memang yang terjadi pada versi pertama perubahan
+   ini. Ditemukan gerbangnya, bukan lolos.
+
+   Naskah yang LAHIR DI WORKER tidak pernah lewat FiezelI18n, jadi murid Thai membacanya
+   dalam bahasa Indonesia - layar campur, bukan teks hilang. Worker mengirim copyKey di
+   samping text; fungsi ini memilih kuncinya kalau ada dan terdaftar, lalu jatuh ke text
+   kalau tidak. Dua arah kejatuhan itu disengaja: klien yang bicara dengan Worker LAMA
+   (tanpa copyKey) tetap bekerja, dan kunci yang belum punya naskah tidak pernah
+   menampilkan kunci mentah ke murid. */
+function workerCopy(data){
+  const key=String(data&&data.copyKey||'').trim();
+  if(!key)return String(data&&data.text||'');
+  const out=FiezelI18n.t(key);
+  return (out&&out!==key)?out:String(data&&data.text||'');
+}
 const AI_TASK_REQUEST_SCHEMA='fiezel-ai-task-v2';
 const AI_TASK_RESPONSE_SCHEMA='fiezel-ai-response-v2';
 const AI_TASK_PATH='/api/ai/task';
@@ -12448,19 +12468,6 @@ function renderAIError(title,err,retry){
 function currentAIRequest(id,epoch){return id===aiRequestSeq&&epoch===modalEpoch}
 function aiProfileContext(){const s=buildLearningSnapshot();return{activeLevel:s.activeLevel||getActiveLevel(),estimatedLevel:s.estimatedLevel,totalAttempts:s.totalAttempts,totalAccuracy:s.totalAccuracy,domainAccuracy:Object.fromEntries(Object.entries(s.domains).map(([k,v])=>[k,v.recentAccuracy??v.accuracy])),weakSkills:s.weakSkills.slice(0,3),dueReviews:s.dueReviews,streakDays:s.streakDays,goalProfile:String(state.preferences?.goalProfile||'general').slice(0,30),timeZone:studyTimeZone(),learnerLocale:String(state.preferences?.learnerLocale||(self.FiezelI18n?.getLocale?.())||'id')}}
 function renderCoachResult(text,meta){$('modalPanel').innerHTML=`<div class="modal-mark">FIEZEL AI COACH</div><h2>${esc(personalize(FiezelI18n.t('coach.plan-title',{name:learnerName()})))}</h2>${meta?.degraded===true?`<p class="ai-degraded-note" data-ai-degraded="1"><i data-lucide="cloud-cog"></i> ${esc(meta?.note||AI_TASK_COPY.degraded.note)}</p>`:''}<div class="ai-answer coach-answer">${renderMarkdown(text)}</div><p class="ai-disclosure"><i data-lucide="shield-check"></i> ${FiezelI18n.t('ai.dibuat-ringkasan-latihanmu-bukan-isi')}</p><div class="modal-actions"><button id="coachMap">${FiezelI18n.t('ai.peta-study')}</button><button class="primary" id="coachStart">${state.adaptiveReady?FiezelI18n.t('coach.start-practice'):FiezelI18n.t('coach.start-test')}</button></div>`;$('coachMap').onclick=()=>{closeModal();go('progress')};$('coachStart').onclick=()=>{closeModal();state.adaptiveReady?startAdaptive():go('test')};enhanceUI()}
-/* m025-310: naskah yang LAHIR DI WORKER tidak pernah lewat FiezelI18n, jadi murid Thai
-   membacanya dalam bahasa Indonesia - layar campur, bukan teks hilang. Worker kini
-   mengirim `copyKey` di samping `text`; fungsi ini memilih kuncinya kalau ada dan
-   terdaftar, lalu jatuh ke `text` kalau tidak. Dua arah kejatuhan itu disengaja: klien
-   yang bicara dengan Worker LAMA (tanpa copyKey) tetap bekerja, dan kunci yang belum
-   punya naskah tidak pernah menampilkan kunci mentah ke murid. */
-function workerCopy(data){
-  const key=String(data&&data.copyKey||'').trim();
-  if(!key)return String(data&&data.text||'');
-  const out=FiezelI18n.t(key);
-  return (out&&out!==key)?out:String(data&&data.text||'');
-}
-
 async function askCoachAI(){const id=++aiRequestSeq,epoch=openAILoading(personalize(FiezelI18n.t('ai.menganalisis-skill-name')));const coachNow=Date.now(),snapshot=buildLearningSnapshot(),evidence=remoteLearnerEvidenceSnapshot(coachNow),policy=applyCoreBrain(buildAdaptivePolicy(coachNow),coachNow),outcomes=recentPolicyOutcomes(5),brain=coreBrainDigest(coachNow),profile=aiProfileContext();try{
   // Jalur CF: `context_coach` ada di registry Worker dengan input terstruktur yang sama
   // bentuknya dengan payload lama - jadi yang berubah hanya sampul (`schema`+`task`+
