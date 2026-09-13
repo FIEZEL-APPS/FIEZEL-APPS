@@ -183,19 +183,44 @@ test('id Background Fetch: halaman dan service worker sepakat, dan cache lain di
   }
 });
 
-test('"Ganti akun" keluar dulu, baru masuk', () => {
-  const fn = /async function runPuterSwitchAccount\(\)\{[\s\S]*?\n\}/.exec(APP);
-  if (!fn) throw new Error('runPuterSwitchAccount tidak ditemukan');
-  const out = fn[0].indexOf('signOutPuterAccount()');
-  const inn = fn[0].indexOf('auth.signIn()');
-  if (out < 0) throw new Error('tidak keluar lebih dulu; Puter akan memakai sesi lama dan akunnya tidak pernah berganti');
-  if (inn < 0 || out > inn) throw new Error('urutannya terbalik: signIn dipanggil sebelum signOut');
+/* m025-308: DUA ASSERT DI BAWAH DIARAHKAN ULANG, BUKAN DILONGGARKAN.
+   Keduanya dulu menuntut mesin PUTER: runPuterSwitchAccount(), signOutPuterAccount(),
+   auth.signIn(), dan id tombol accountSwitch/accountSignOut. Seluruh mesin itu dicabut
+   oleh 2db8622 ("remove puter panel card") sesudah migrasi ke Cloudflare + Google,
+   sehingga gerbang ini merah atas KETIADAAN kode yang memang sengaja dihapus - bukan
+   atas cacat.
+
+   Yang dijaga TIDAK berubah, dan itu intinya:
+     1. murid harus punya jalan keluar yang terlihat;
+     2. keluar harus BENAR-BENAR membuang sesi, supaya "ganti akun" tidak diam-diam
+        memakai ulang sesi lama - persis cacat yang assert Puter dulu jaga.
+   Yang berubah hanya NAMA jalurnya: btnFiezelLogout + FiezelAccount.logout() +
+   FiezelGoogle.signOut(), lalu btnFiezelOpenAuth untuk masuk lagi. */
+
+test('keluar benar-benar membuang sesi, bukan cuma menyembunyikan status', () => {
+  const fn = /\$\('btnFiezelLogout'\)\?\.addEventListener\([\s\S]*?\n  \}\);/.exec(APP);
+  if (!fn) throw new Error('handler btnFiezelLogout tidak ditemukan');
+  if (fn[0].indexOf('FiezelAccount?.logout?.()') < 0)
+    throw new Error('sesi FIEZEL tidak dibuang; masuk berikutnya akan memakai ulang sesi lama');
+  if (fn[0].indexOf('FiezelGoogle?.signOut?.()') < 0)
+    throw new Error('status Google tidak dilupakan; layar akan berbohong "kamu masuk sebagai ..." sesudah keluar');
 });
 
-test('kartu akun menawarkan keluar DAN ganti akun', () => {
-  if (!APP.includes('accountSignOut')) throw new Error('tidak ada tombol keluar');
-  if (!APP.includes('accountSwitch')) throw new Error('tidak ada tombol ganti akun');
-  if (!APP.includes('bindAccountSettingControls()')) throw new Error('tombolnya tidak pernah disambungkan');
+test('kartu akun menawarkan keluar DAN jalan masuk lagi', () => {
+  if (!APP.includes('id="btnFiezelLogout"')) throw new Error('tidak ada tombol keluar');
+  if (!APP.includes('id="btnFiezelOpenAuth"')) throw new Error('tidak ada jalan masuk/ganti akun');
+  if (!APP.includes("$('btnFiezelLogout')?.addEventListener"))
+    throw new Error('tombol keluar tidak pernah disambungkan');
+  if (!APP.includes("$('btnFiezelOpenAuth')?.addEventListener"))
+    throw new Error('tombol masuk tidak pernah disambungkan');
+  /* Temuan review Gitar atas perbaikan m025-308 ini sendiri, dan ia benar: assert lama
+     menunjuk bindAccountSettingControls(), padahal 2db8622 mengosongkan fungsi itu jadi
+     stub tanpa badan ("kontrol Akun Puter dinetralkan"). Menjaga stub kosong berarti
+     binder yang SEBENARNYA boleh dicabut tanpa memerahkan apa pun. Yang benar-benar
+     menyambungkan btnFiezelOpenAuth dan btnFiezelLogout adalah bindFiezelAccountControls(),
+     jadi itu yang dijaga - dan dijaga pada PEMANGGILANNYA, bukan pada definisinya. */
+  if (!APP.includes('bindFiezelAccountControls();'))
+    throw new Error('bindFiezelAccountControls() tidak pernah DIPANGGIL; kartu akun tidak tersambung');
 });
 
 test('pengaturan tidak lagi menjual unduhan kepada murid', () => {
