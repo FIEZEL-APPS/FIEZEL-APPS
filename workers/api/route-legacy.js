@@ -10,23 +10,10 @@
  */
 
 import { jsonResponse, jsonError } from './errors.js';
-import { reserveAccountNeurons, releaseAccountNeurons } from './ai/ai-account-budget.js';
-import * as modelGateNs from './ai/model-call-gate.js';
-
-/**
- * Ambil ekspor modul UMD `model-call-gate.js` baik saat ia di-bundle sebagai CJS (esbuild
- * memberi `module`, hasilnya jadi `default`) maupun saat dieksekusi sebagai ESM murni
- * (hasilnya hanya ada di `globalThis`). Resolver ini disalin dari route-wiring.js supaya
- * kedua jalur memakai cara yang sama; menuliskannya berbeda berarti satu jalur bisa
- * mendapat `null` di runtime yang tidak diuji.
- */
-function umd(ns, globalName) {
-  const g = typeof globalThis !== 'undefined' ? globalThis : {};
-  if (ns && ns.default && typeof ns.default === 'object') return ns.default;
-  if (g[globalName]) return g[globalName];
-  return ns || null;
-}
-const ModelCallGate = umd(modelGateNs, 'FiezelModelCallGate');
+/* m025-310: perakitan tanda terima dan resolver umd() DULU disalin ke berkas ini dari
+   route-wiring.js. Dua salinan bebas menyimpang, dan yang menyimpang adalah jalur biaya.
+   Keduanya kini tinggal di ai/neuron-reservation.js - satu tempat, dipakai kedua jalur. */
+import { runMeteredModel } from './ai/neuron-reservation.js';
 
 // == PANGGILAN MODEL DI BERKAS INI WAJIB BERPLAFON (m025-308) =========================
 //
@@ -57,7 +44,9 @@ const ModelCallGate = umd(modelGateNs, 'FiezelModelCallGate');
 // untuk SATU AKUN, dan GLOBAL_NEURON_CAP dipasang 8.000. Satu jalur tanpa plafon cukup
 // untuk menghabiskannya, dan yang kehilangan AI sesudahnya adalah murid sungguhan.
 //
-// URUTANNYA BUKAN SELERA, dan ditiru dari route-ai.js:
+// URUTANNYA BUKAN SELERA, dan ditiru dari route-ai.js. Sejak m025-310 ketiga langkah itu
+// DIJALANKAN di ai/neuron-reservation.js#runMeteredModel(), bukan di berkas ini - yang
+// berpindah tempatnya, bukan urutannya:
 //   1. PESAN dulu (reserveAccountNeurons) - penolakan di sini tidak pernah menjadi tagihan,
 //      karena permintaannya bahkan tidak menjadi permintaan;
 //   2. bawa tanda terima ke chokepoint (runReservedModel) - tanpa tanda terima yang sah ia
@@ -73,40 +62,18 @@ const LEGACY_MODEL_ID = '@cf/meta/llama-3.1-8b-instruct';
 const LEGACY_MODEL_NEURONS = 12.5;
 
 async function runLegacyModel(ctx, input, options) {
-  const env = (ctx && ctx.env) || {};
-  // Nama binding: CORE_DB di wrangler.toml, DB di harness uji. Keduanya diterima, sama
-  // seperti quotaDb() di route-wiring.js.
-  const db = env.CORE_DB || env.DB || null;
-  const now = Number(ctx && ctx.now) || Date.now();
-  const neurons = LEGACY_MODEL_NEURONS;
-
-  const out = await reserveAccountNeurons({ db, env, neurons, now });
-  if (!out || out.allowed !== true) {
-    // Fail-CLOSED. Jatah akun habis, D1 mati, atau tabelnya belum ada - ketiganya berarti
-    // kami tidak boleh membelanjakan neuron, dan ketiganya sampai ke pemanggil sebagai
-    // lemparan supaya cabang cadangan yang SUDAH ADA di setiap rute yang menanganinya.
-    const err = new Error('ai_account_cap:' + String((out && out.reason) || 'unreadable'));
-    err.fiezelBudgetDenied = true;
-    throw err;
-  }
-
-  const reservation = ModelCallGate.makeReservation({
-    neurons,
-    cap: out.cap,
-    usedBefore: out.usedBefore,
-    release: () => releaseAccountNeurons({ db, env, neurons, now }),
+  // Fail-CLOSED tetap seperti semula: jatah habis, D1 mati, atau tabel anggaran belum ada
+  // sama-sama sampai ke sini sebagai LEMPARAN ber-fiezelBudgetDenied, supaya cabang
+  // cadangan yang sudah ada di setiap rute menanganinya. Yang berpindah hanya TEMPAT
+  // perakitannya, bukan perilakunya.
+  return runMeteredModel({
+    env: (ctx && ctx.env) || {},
+    modelId: LEGACY_MODEL_ID,
+    input,
+    options: options || {},
+    neurons: LEGACY_MODEL_NEURONS,
+    now: Number(ctx && ctx.now) || Date.now()
   });
-
-  try {
-    return await ModelCallGate.runReservedModel({
-      env, modelId: LEGACY_MODEL_ID, input, options: options || {}, reservation,
-    });
-  } catch (err) {
-    if (ModelCallGate.releasableFailure(err)) {
-      await ModelCallGate.releaseReservation(reservation, String((err && err.message) || 'provider_failed'));
-    }
-    throw err;
-  }
 }
 
 /**

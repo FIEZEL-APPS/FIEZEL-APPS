@@ -535,8 +535,25 @@ const ROUTE_FIXTURES = {
   /* Nama fungsi di modul ini yang BENAR-BENAR memanggil model. Diturunkan, bukan diketik:
      fungsi yang tubuhnya menyentuh chokepoint atau binding. Handler yang memanggil salah
      satunya dihitung sebagai jalur berbayar. */
-  const modelCallingNames = (src) => {
+  const modelCallingNames = (src, rel) => {
     const names = new Set();
+    /* BENIH: nama yang DIIMPOR dari modul yang mencapai chokepoint. Tanpa ini, pendeteksi
+       hanya melihat satu lapis - ia menemukan fungsi yang memanggil runReservedModel()
+       SENDIRI, dan menjadi BUTA begitu perakitannya dipindah ke modul bersama (m025-310:
+       runLegacyModel berhenti memanggil chokepoint langsung dan mulai memanggil
+       runMeteredModel). Kebutaan itu tertangkap C3c, bukan lolos - dan inilah perbaikannya.
+       Impor dari modul yang TIDAK mencapai chokepoint (mis. errors.js) tidak ikut jadi benih. */
+    const bodies = [];
+    const impRe = /import\s*\{([^}]*)\}\s*from\s*'(\.[^']+\.js)'/g;
+    let im;
+    while ((im = impRe.exec(src))) {
+      const spec = path.posix.normalize(path.posix.join(path.posix.dirname(rel), im[2]));
+      if (!reachesChokepoint(spec)) continue;
+      for (const raw of im[1].split(',')) {
+        const nm = raw.trim().split(/\s+as\s+/).pop().trim();
+        if (nm) names.add(nm);
+      }
+    }
     const re = /(?:async\s+)?function\s+([A-Za-z0-9_$]+)\s*\([^)]*\)\s*\{/g;
     let m;
     while ((m = re.exec(src))) {
@@ -550,7 +567,22 @@ const ROUTE_FIXTURES = {
       }
       if (end < 0) continue;
       const body = src.slice(i, end + 1);
-      if (/runReservedModel\s*\(/.test(body) || /\bAI\s*\.\s*run\s*\(/.test(body)) names.add(m[1]);
+      bodies.push({ name: m[1], body });
+    }
+    /* PENUTUPAN TRANSITIF di dalam modul. Satu lintasan hanya menemukan fungsi yang
+       menyentuh chokepoint SENDIRI; ia buta terhadap pembungkus yang memanggil pembungkus.
+       Diulang sampai tidak ada nama baru, jadi rantai sepanjang apa pun di dalam satu
+       berkas tetap terjaring. */
+    let tumbuh = true;
+    while (tumbuh) {
+      tumbuh = false;
+      for (const { name, body } of bodies) {
+        if (names.has(name)) continue;
+        const menyentuh = /runReservedModel\s*\(/.test(body)
+          || /\bAI\s*\.\s*run\s*\(/.test(body)
+          || [...names].some((n) => new RegExp('\\b' + n + '\\s*\\(').test(body));
+        if (menyentuh) { names.add(name); tumbuh = true; }
+      }
     }
     return names;
   };
@@ -562,7 +594,7 @@ const ROUTE_FIXTURES = {
   const arrayFindings = [];
   for (const rel of arrayModules) {
     const src = stripComments(fs.readFileSync(path.join(API_DIR, rel), 'utf8'));
-    const callers = modelCallingNames(src);
+    const callers = modelCallingNames(src, rel);
     const entries = scanTopLevelEntries(src);
     for (const entry of entries) {
       const head = /^\[\s*'([A-Z]+)'\s*,\s*'([^']+)'/.exec(entry);
