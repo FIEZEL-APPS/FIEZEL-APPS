@@ -143,7 +143,7 @@ const CONTENT_CANARY_CONFIG=self.FIEZEL_CONTENT_CANARY_CONFIG||{schema:'fiezel-c
 let contentCanaryRuntime={status:'baseline',reason:'not_loaded',config:null};
 let contentPromotionRuntime={schema:'fiezel-content-promotion-v1',status:'hold',reason:'not_loaded'};
 const CORE_CONFIG=self.FIEZEL_CORE_CONFIG||{};
-const CORE_WORKER_URL=String(CORE_CONFIG.workerUrl||'').trim().replace(/\/$/,'');
+const CORE_WORKER_URL=String(self.FIEZEL_CF_CONFIG?.base||CORE_CONFIG.workerUrl||'').trim().replace(/\/$/,'');
 const CORE_PROTOCOL_VERSION=String(CORE_CONFIG.protocolVersion||'1.7');
 const REMOTE_PUSH_REQUIRED=CORE_CONFIG.remotePushRequired!==false;
 const CORE_AI_GATEWAY=String(CORE_CONFIG.aiGateway||'core-only');
@@ -4528,17 +4528,9 @@ function hideNotificationGate(){const gate=$('welcome');if(!gate)return;gate.cla
 // SDK Puter dimuat async (lihat ./fiezel-puter-ready.js). Dua pemeriksaan di bawah ini
 // tetap sinkron dan tetap menjawab "sekarang" - itu yang dibutuhkan jalur render. Yang
 // TIDAK boleh dilakukan lagi adalah menyimpulkan "Puter tidak tersedia" dari jawaban
-// "belum ada sekarang": setiap jalur yang bisa menunggu, menunggu lewat awaitPuter().
-function puterAuthAvailable(){return typeof puter!=='undefined'&&!!puter?.auth}
-function puterSignedIn(){try{return puterAuthAvailable()&&puter.auth.isSignedIn?.()===true}catch{return false}}
-// Menunggu SDK-nya tiba. Mengembalikan objek puter atau null kalau ia memang tidak akan
-// datang (offline, diblokir, layanan mati) - jadi pemanggil punya jawaban yang pasti,
-// bukan penantian tanpa ujung.
-async function awaitPuter(timeoutMs){
-  if(typeof puter!=='undefined'&&puter)return puter;
-  try{const sdk=await self.FiezelPuterReady?.ready?.(timeoutMs);if(sdk)return sdk}catch{}
-  return typeof puter!=='undefined'&&puter?puter:null
-}
+function puterAuthAvailable(){return false}
+function puterSignedIn(){return false}
+async function awaitPuter(timeoutMs){return null}
 function setAuthGateState(status,detail){
   const gate=$('authGate'),button=$('authGateButton'),stateText=$('authGateStatus'),skip=$('authGateSkip');if(!gate)return;
   // Sama seperti gerbang notifikasi: akun yang sudah tersambung tidak boleh memunculkan
@@ -4564,11 +4556,11 @@ function setAuthGateState(status,detail){
   // "Lanjut tanpa akun" ditekan: nadanya sama dengan 'declined' di gerbang notifikasi -
   // tidak ada yang gagal, tidak ada yang tertahan.
   else if(status==='skipped'){stateText.textContent=FiezelI18n.t('auth.status-dilewati');stateText.className='auth-status';button.disabled=true;if(skip)skip.disabled=true}
-  else{stateText.textContent=FiezelI18n.t('auth.status-idle');stateText.className='auth-status';button.disabled=false;button.innerHTML=`<i data-lucide="user-round"></i><span>${FiezelI18n.t('auth.tombol-lanjutkan')}</span>`;if(skip)skip.disabled=false}
+  else{stateText.textContent=FiezelI18n.t('auth.status-idle');stateText.className='auth-status';button.disabled=false;button.innerHTML=`<svg class="google-logo" width="22" height="22" viewBox="0 0 24 24" aria-hidden="true"><path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.665-5.17 3.665-9.17z"/><path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.25v3.15C3.26 21.36 7.33 24 12 24z"/><path fill="#FBBC05" d="M5.28 14.27c-.25-.72-.38-1.49-.38-2.27s.13-1.55.38-2.27V6.58H1.25C.45 8.18 0 9.99 0 12s.45 3.82 1.25 5.42l4.03-3.15z"/><path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.33 0 3.26 2.64 1.25 6.58l4.03 3.15c.95-2.83 3.6-4.98 6.72-4.98z"/></svg><span>${FiezelI18n.t('auth.tombol-lanjutkan')}</span>`;if(skip)skip.disabled=false}
   refreshIcons()
 }
 function hideAuthGate(){const gate=$('authGate');if(!gate)return;gate.classList.remove('show');setTimeout(()=>{gate.classList.add('hidden');releaseGateFocus()},300)}
-async function completeAuthGate(){await activateAccountStateFromPuter();document.body?.classList?.remove?.('auth-locked');setAuthGateState('signed_in');setTimeout(hideAuthGate,220);showToast(FiezelI18n.t('auth.toast-tersambung'));armOfflineVoiceAutoload();runPendingAfterGateFn()}
+async function completeAuthGate(){try{if(puterSignedIn())await activateAccountStateFromPuter()}catch(_){}document.body?.classList?.remove?.('auth-locked');setAuthGateState('signed_in');setTimeout(hideAuthGate,220);showToast(FiezelI18n.t('auth.toast-tersambung'));armOfflineVoiceAutoload();runPendingAfterGateFn()}
 function runPendingAfterGateFn(){if(!pendingAfterGateFn)return;const fn=pendingAfterGateFn;pendingAfterGateFn=null;setTimeout(fn,240)/* v06: tunggu gerbang benar-benar turun sebelum kuis mendorong stage */}
 // m026-02 AKAR: gerbang akun dipasang di SETIAP boot tanpa memori apa pun, dan satu-satunya
 // tombolnya adalah "Lanjutkan dengan Puter" - jadi murid yang tidak mau (atau belum bisa)
@@ -4793,6 +4785,36 @@ async function attemptPuterSignIn(){
   // Tenggat ditangkap di sini juga, bukan dibiarkan lewat: hasilnya harus sama seperti
   // kegagalan login lain - tombolnya hidup kembali dan bisa ditekan.
   catch(error){if(puterSignedIn()){await completeAuthGate();return true}setAuthGateState('error',error);return false}
+}
+async function attemptGoogleSignIn(){
+  if(!self.FiezelGoogle?.available?.()){
+    setAuthGateState('error',{message:FiezelI18n.t('google.belum-aktif','Masuk dengan Google belum aktif di aplikasi ini.')});
+    return false;
+  }
+  setAuthGateState('pending');
+  try{
+    const mount=$('authGateGoogleMount');
+    if(mount&&self.FiezelGoogle?.renderButton){
+      mount.style.display='block';
+      const res=await self.FiezelGoogle.renderButton(mount,async(hasil)=>{
+        if(hasil?.ok){
+          await completeAuthGate();
+        }else{
+          setAuthGateState('error',{message:hasil?.message||FiezelI18n.t('google.gagal')});
+        }
+      },{width:280});
+      if(res?.ok&&window.google?.accounts?.id?.prompt){
+        window.google.accounts.id.prompt((notification)=>{
+          if(notification.isNotDisplayed()||notification.isSkippedMoment()){}
+        });
+      }
+      return true;
+    }
+    return false;
+  }catch(error){
+    setAuthGateState('error',error);
+    return false;
+  }
 }
 function lastLearningAt(){
   const historyAt=(state.history||[]).reduce((m,x)=>Math.max(m,Number(x?.at)||0),0);const sessionAt=(state.sessionHistory||[]).reduce((m,x)=>Math.max(m,Date.parse(x?.at||'')||0),0);return Math.max(historyAt,sessionAt)
@@ -5431,18 +5453,11 @@ function cfShadowProbe(path,options,answer){
     }).catch(()=>{})
   }catch{}
 }
-// Jalur Puter hari ini, dipindahkan APA ADANYA (dulu badan coreWorkerExec). Dulu baris
-// terakhirnya langsung melempar 'puter_workers_unavailable' begitu global `puter` tidak
-// terlihat; dengan SDK yang async itu berarti setiap panggilan Core Brain pada detik-detik
-// pertama boot gagal pada boot yang sebenarnya sehat. SDK-nya ditunggu dulu.
-async function corePuterExec(path,options={}){if(!CORE_WORKER_URL)throw new Error('core_worker_not_configured');const url=CORE_WORKER_URL+path;if(self.puter?.workers?.exec)return puter.workers.exec(url,options);const sdk=await awaitPuter();if(sdk?.workers?.exec)return sdk.workers.exec(url,options);throw new Error('puter_workers_unavailable')}
+// Jalur Cloudflare murni — Puter telah dihapus sepenuhnya.
+// Semua panggilan coreWorkerExec langsung dilayani oleh Cloudflare Worker fiezel-api.
+async function corePuterExec(path,options={}){return cfWorkerFetch(path,options)}
 async function coreWorkerExec(path,options={}){
-  const mode=cfEndpointMode(path);
-  if(mode==='on')return cfWorkerFetch(path,options);
-  if(mode!=='shadow')return corePuterExec(path,options);   // 'off' = jalur hari ini, nol tambahan
-  const answer=corePuterExec(path,options);                 // jawaban murid: Puter, selalu
-  cfShadowProbe(path,options,answer);                       // salinan ke CF, hasilnya dibuang
-  return answer;
+  return cfWorkerFetch(path,options);
 }
 /* CF-TRANSPORT-END */
 async function coreBrainHealth(){
@@ -5463,7 +5478,7 @@ function remoteActivitySnapshot(){const snap=buildLearningSnapshot(),reviews=due
   // dengan bukti belajarnya - bukan pihak ketiga mana pun.
   learnerName:String(state.userName||'').trim().slice(0,24),
   evidence:remoteLearnerEvidenceSnapshot()}}
-async function syncRemoteLearningActivity(){if(!CORE_WORKER_URL||localStorage.getItem('fiezel-remote-push')!=='active')return false;try{if(puterSignedIn())await activateAccountStateFromPuter();if(!activeAccountUuid)return false;const r=await coreWorkerExec('/api/activity',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({activity:remoteActivitySnapshot()})});return !!r.ok}catch{return false}}
+async function syncRemoteLearningActivity(){if(!CORE_WORKER_URL||localStorage.getItem('fiezel-remote-push')!=='active')return false;try{const r=await coreWorkerExec('/api/activity',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({activity:remoteActivitySnapshot()})});return !!r.ok}catch{return false}}
 function queueRemoteActivitySync(){if(!CORE_WORKER_URL)return;clearTimeout(remoteActivitySyncTimer);remoteActivitySyncTimer=setTimeout(()=>syncRemoteLearningActivity(),1800);remoteActivitySyncTimer?.unref?.()}
 
 async function showStudyNotification(kind,body){
@@ -11435,7 +11450,48 @@ function tutorCenterView(){
   const shell=self.FiezelTeacherShell;
   if(shell&&self.FiezelTeacherStore){
     setApp('<div id="fzTeacherShell" class="teacher-shell-root"></div>');
-    shell.mount($('fzTeacherShell'),{toast:showToast,afterRender:refreshIcons,exit:()=>go('home')});
+    shell.mount($('fzTeacherShell'),{
+      toast:showToast,
+      afterRender:refreshIcons,
+      exit:(opts)=>{
+        try{
+          if(typeof history!=='undefined'&&history.replaceState&&typeof location!=='undefined'){
+            const u=new URL(location.href);
+            if(u.searchParams.has('teacher')){
+              u.searchParams.delete('teacher');
+              const clean=u.pathname+(u.search?u.search:'')+(u.hash?u.hash:'');
+              history.replaceState(null,document.title||'',clean);
+            }
+          }
+        }catch(_){}
+        if(state.preferences?.role==='guru'&&!isVerifiedTeacher()){
+          state.preferences={...state.preferences,role:'murid'};
+          try{save()}catch(_){}
+        }
+        if(opts?.target==='landing'){
+          try{
+            if(location.pathname.includes('/app')){
+              location.href='../#hero';
+              return;
+            }
+            if(document.referrer){
+              try{
+                const ref=new URL(document.referrer);
+                if(ref.origin===location.origin&&(ref.pathname.includes('/website')||ref.pathname.includes('landing.html'))){
+                  location.href=document.referrer;
+                  return;
+                }
+              }catch(_){}
+            }
+            location.href='../#hero';
+          }catch(_){
+            location.href='../#hero';
+          }
+          return;
+        }
+        go('home');
+      }
+    });
     return;
   }
   setApp('<div id="fzTutorCenter" class="tutor-center-shell"></div>');
@@ -13633,7 +13689,7 @@ window.queueSocialEvidence=queueSocialEvidence;window.socialSummaryCardMarkup=so
 setTimeout(()=>{try{socialCore()?.flushOutbox()}catch(_){}},4500);
 /* ============================== akhir blok SOSIAL (SLOT 7) ========================== */
 window.istilahMurid=istilahMurid;/* dipapar untuk gerbang QA: penerjemah enum harus bisa disapu penuh */window.__getFiezelData=()=>({vocab:V.length,reading:R.length,grammar:Object.keys(G).length});window.__fiezelAudit={showBrandSplash,showOnboarding,prefersReducedMotion,readInstallHealth,installHealthReportMarkup,buildBackupFile,previewRestoreForState,applyRestore,continuitySettingsMarkup,academicReadinessMarkup,unifiedSkillsMarkup,buildPersonalJourney,journeyMarkup,setGoalProfile,loadState,sanitizeState,validateQuestion,makeGrammarQuestion,makeReadingQuestion,makeVocabQuestion,buildGrammarLessonQuestions,buildPlacement,/* m025-246: dipapar untuk regression-test - gerbang itu harus bisa MENANYAKAN ukuran rencana penempatan, bukan memaku 25 dan merah setiap kali ukurannya berubah dengan sengaja. */placementSize,placementBlueprint,/* cetak biru PENUH dipapar terpisah: gerbang harus tetap bisa menjaga invarian 'penempatan penuh memuat ketiga jenis konten' walau jalur murid memakai cetak biru lite */PLACEMENT_BLUEPRINT_FULL:PLACEMENT_BLUEPRINT,buildAdaptivePool,getScenePalette,getCelestialState,getDiagnosticProfile,buildLearningSnapshot,buildLearnerEvidenceModel,remoteLearnerEvidenceSnapshot,deriveAdaptivePolicy,buildAdaptivePolicy,adaptivePolicyRequestPayload,sanitizeAdaptivePolicy,/* m025-201: dipapar untuk tests/core-policy-parity-test.js - gerbang paritas tidak bisa membandingkan apa yang tidak bisa ia panggil */capRationaleCodes,policyEffectiveness,sanitizePolicyEffectiveness,resolveAdaptivePolicy,evaluatePolicyOutcome,sanitizePolicyOutcome,recordPolicyOutcomeFromSession,backfillPolicyOutcomes,recentPolicyOutcomes,policyOutcomeSummary,buildALRSContext,selectALRSDecision,buildCreatorReport,validReportEndpoint,forgettingProbability,scheduleNext,coreBrainMemory,tutorSession,tutorObserve,misconceptionLedgerRead,misconceptionLedgerActive,coreBrainAttempts,quizPredictedSuccess,evidenceKappa,bktRead,bktRecord,bktShadowMarkup,brainManifestMarkup,learningTelemetryMode,learningTelemetryEmitAnswer,learningTelemetryStudyDay,braincoreEvidenceMode,braincoreEvidenceCohort,braincoreEvidenceCohortForBuild,braincoreEvidenceDay,braincoreEvidenceEmitSnapshot,braincoreEvidenceEmitDecision,braincoreEvidenceFlush,braincoreEvidenceObserveSession,braincoreDecisionReason,braincoreEvidenceAnyLaneActive,identityEvidenceMode,learnerNameSyncToServer,maybeSyncLearnerName,identityEvidenceActive,identityEvidenceMirror,identityEvidenceFlush,forgetLearnerEvidence,confusionMatrixRead,confusionMatrixRecord,affectObserve,affectSessionSync,affectTargetSuccess,listeningAdaptivePolicy,olmPanelMarkup,coreBrainPanelMarkup,diagnosticEvidenceReady,skillTimeline,errorPatterns,confusionPairs,diagnosticReport,confidenceCalibration,dueItems,selectLoginMessage,notificationPermission,checkStudyReminders,lastLearningAt,beginLearningSession,abandonActiveSession,completeActiveSession,/* Fase 3 (C5): kalibrasi item, cloze, OLM negotiated, SRL, speaking adaptif, step tutor */itemCalibrationRead,itemCalibrationObserve,itemCalibrationEffective,calibrationItemId,ensureClozeBank,makeClozeQuestion,clozeAdaptivePicks,clozeSkillReady,clozeProductionRecord,olmSummarizeInput,olmDispute,olmProbeNextSkill,olmProbeConsume,olmNegotiationRead,srlSessionPlan,srlPredictPrompt,srlCaptureConfidence,srlReflect,srlSessionSync,speakingCoverageRows,speakingAdaptiveEvidence,speakingAdaptivePolicy,stepTutorGuidance,stepTutorGuidanceMarkup,record,quizLoop,startAdaptive};
-window.startVocabQuiz=startVocabQuiz;window.buildAdaptivePool=buildAdaptivePool;window.buildGrammarLessonQuestions=buildGrammarLessonQuestions;window.getScenePalette=getScenePalette;window.getCelestialState=getCelestialState;window.playFeedbackSound=playFeedbackSound;window.updateMastery=updateMastery;window.markMastered=markMastered;window.__getFiezelState=()=>state;window.__fiezelValidViews=()=>[...VALID_VIEWS];window.__fiezelDueReviews=()=>dueItems().length;window.buildAdaptivePolicy=buildAdaptivePolicy;window.studyDayKey=studyDayKey;window.startAdaptive=startAdaptive;window.showToast=showToast;window.answerFeedbackSignal=answerFeedbackSignal;window.practiceSkill=practiceSkill;window.openReadingLevel=openReadingLevel;window.startReadingRandom=startReadingRandom;window.startReadingAdaptive=startReadingAdaptive;window.startPlacement=startPlacement;window.startLevelPractice=startLevelPractice;window.startAdaptive=startAdaptive;window.resetProgress=resetProgress;window.closeModal=closeModal;window.openSettings=openSettings;window.openReportPreview=openReportPreview;window.sendCreatorReport=sendCreatorReport;window.askCoachAI=askCoachAI;window.dismissWelcome=dismissWelcome;window.requestStudyNotificationPermission=requestStudyNotificationPermission;window.declineStudyNotifications=declineStudyNotifications;window.skipPuterSignIn=skipPuterSignIn;window.shouldPresentPuterPopup=shouldPresentPuterPopup;window.notifyAppUpdateIfNew=notifyAppUpdateIfNew;window.setConfidence=setConfidence;window.explainWithAI=explainWithAI;window.explainWordWithAI=explainWordWithAI;window.olmDispute=olmDispute;/* Fase 3 (C5 butir 3): handler tombol sanggah di panel OLM */
+window.startVocabQuiz=startVocabQuiz;window.buildAdaptivePool=buildAdaptivePool;window.buildGrammarLessonQuestions=buildGrammarLessonQuestions;window.getScenePalette=getScenePalette;window.getCelestialState=getCelestialState;window.playFeedbackSound=playFeedbackSound;window.updateMastery=updateMastery;window.markMastered=markMastered;window.__getFiezelState=()=>state;window.__fiezelValidViews=()=>[...VALID_VIEWS];window.__fiezelDueReviews=()=>dueItems().length;window.buildAdaptivePolicy=buildAdaptivePolicy;window.studyDayKey=studyDayKey;window.startAdaptive=startAdaptive;window.showToast=showToast;window.answerFeedbackSignal=answerFeedbackSignal;window.practiceSkill=practiceSkill;window.openReadingLevel=openReadingLevel;window.startReadingRandom=startReadingRandom;window.startReadingAdaptive=startReadingAdaptive;window.startPlacement=startPlacement;window.startLevelPractice=startLevelPractice;window.startAdaptive=startAdaptive;window.resetProgress=resetProgress;window.closeModal=closeModal;window.openSettings=openSettings;window.openReportPreview=openReportPreview;window.sendCreatorReport=sendCreatorReport;window.askCoachAI=askCoachAI;window.dismissWelcome=dismissWelcome;window.requestStudyNotificationPermission=requestStudyNotificationPermission;window.declineStudyNotifications=declineStudyNotifications;window.skipPuterSignIn=skipPuterSignIn;window.attemptGoogleSignIn=attemptGoogleSignIn;window.shouldPresentPuterPopup=shouldPresentPuterPopup;window.notifyAppUpdateIfNew=notifyAppUpdateIfNew;window.setConfidence=setConfidence;window.explainWithAI=explainWithAI;window.explainWordWithAI=explainWordWithAI;window.olmDispute=olmDispute;/* Fase 3 (C5 butir 3): handler tombol sanggah di panel OLM */
 // m025-84: dipasang di ujung berkas, saat go()/state/VALID_VIEWS sudah ada, dan SEBELUM
 // load() supaya navigasi pertama pun sudah terekam di riwayat.
 function installBackNav(){

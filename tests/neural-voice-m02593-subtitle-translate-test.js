@@ -119,7 +119,7 @@ const translator = require('../features/neural-voice/fiezel-subtitle-translate.j
 
   /* ---- pendaftaran ------------------------------------------------------ */
 
-  const worker = fs.readFileSync(path.join(__fzRoot, 'fiezel-core-worker.js'), 'utf8');
+  const worker = fs.readFileSync(path.join(__fzRoot, 'workers', 'api', 'route-legacy.js'), 'utf8');
   ok(worker.includes("'/api/ai/translate'"), 'Worker belum punya endpoint terjemahan');
   // Teks pelajaran adalah data. Tanpa penegasan ini, bacaan yang memuat kalimat
   // menyerupai perintah bisa membelokkan keluaran dari terjemahan menjadi jawaban.

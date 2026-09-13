@@ -127,6 +127,16 @@
   function exitPreview() {
     try { sessionStorage.removeItem('fz-teacher-preview'); } catch (_) {}
     try { sessionStorage.removeItem('fiezel-teacher-v1-preview'); } catch (_) {}
+    try {
+      if (typeof location !== 'undefined' && typeof history !== 'undefined' && history.replaceState) {
+        var u = new URL(location.href);
+        if (u.searchParams.has('teacher')) {
+          u.searchParams.delete('teacher');
+          var clean = u.pathname + (u.search ? u.search : '') + (u.hash ? u.hash : '');
+          history.replaceState(null, (typeof document !== 'undefined' && document.title) || '', clean);
+        }
+      }
+    } catch (_) {}
     try { S().setPreview(false); } catch (_) {}
   }
 
@@ -348,7 +358,7 @@
              (root.FiezelAccount && root.FiezelAccount.state && root.FiezelAccount.state() && root.FiezelAccount.state().role === 'teacher');
     } catch (_) { return false; }
   }
-  function exit() {
+  function exit(opts) {
     if (isTeacherRole()) {
       if (confirm('Keluar dari akun guru?')) {
         if (root.FiezelAccount && root.FiezelAccount.logout) {
@@ -360,7 +370,11 @@
       return;
     }
     unmount();
-    if (env.exit) env.exit();
+    if (env.exit) {
+      env.exit(opts);
+    } else if (opts && opts.target === 'landing') {
+      try { location.href = '../#hero'; } catch (_) {}
+    }
   }
 
   /*
@@ -740,10 +754,16 @@
     switch (act) {
       case 'view': st.view = btn.getAttribute('data-view'); if (btn.getAttribute('data-skill')) ui.insightSkill = btn.getAttribute('data-skill'); ui.modal = null; ui.drawer = null; ui.filter = ''; break;
       case 'account': openAccount(btn.getAttribute('data-mode') || 'login'); return;
-      case 'exit': persist(); exit(); return;
+      case 'exit':
+        if (previewOn || (typeof sessionStorage !== 'undefined' && sessionStorage.getItem('fz-teacher-preview') === '1')) {
+          exitPreview(); previewOn = false; exit({ target: 'student' });
+        } else {
+          persist(); exit();
+        }
+        return;
       /* Keluar demo TIDAK memanggil persist(): yang tersimpan hanya penyimpanan pratinjau,
          dan yang diinginkan justru membuangnya. */
-      case 'demo-exit': exitPreview(); previewOn = false; exit(); return;
+      case 'demo-exit': exitPreview(); previewOn = false; exit({ target: 'landing' }); return;
       case 'demo-activate': openAccount('teacher'); return;
       case 'logout':
         persist();

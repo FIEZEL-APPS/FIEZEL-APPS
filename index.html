@@ -28,7 +28,7 @@
        'wasm-unsafe-eval' WAJIB ada: mesin suara neural mengompilasi sherpa-onnx .wasm
        (vendor/supertonic-3, 13 MB) di klien, dan tanpa token itu Chromium menolak
        WebAssembly.instantiate - model 152 MB yang sudah diunduh jadi tidak terpakai. -->
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval' https://js.puter.com https://accounts.google.com; connect-src 'self' https: wss:; img-src 'self' data: blob:; style-src 'self' 'unsafe-inline' https://accounts.google.com; frame-src 'self' https://accounts.google.com; media-src 'self' blob: data:; worker-src 'self' blob:">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval' https://accounts.google.com; connect-src 'self' https: wss:; img-src 'self' data: blob:; style-src 'self' 'unsafe-inline' https://accounts.google.com; frame-src 'self' https://accounts.google.com; media-src 'self' blob: data:; worker-src 'self' blob:">
   <meta name="theme-color" content="#FBF7F3">
   <!-- Mode gelap dihapus: color-scheme dipaku light agar kontrol form/scrollbar selalu terang. -->
   <meta name="color-scheme" content="light">
@@ -143,6 +143,7 @@ html.fz-booting body{overflow:hidden}
   <link rel="stylesheet" href="./features/mascot/fiezel-motion.css">
   <link rel="stylesheet" href="./features/ui/fiezel-lux.css">
   <link rel="stylesheet" href="./fiezel-2.css">
+  <link rel="stylesheet" href="./features/ui/fiezel-marshmallow.css">
 </head>
 <body class="scene-day">
   <!-- Splash frame-pertama. Isinya WAJIB sama persis dengan FiezelSplash.markup(); modul
@@ -356,20 +357,21 @@ html.fz-booting body{overflow:hidden}
        browser yang terlihat dan tidak ada nama murid di layar sistem. -->
   <div id="authGate" class="welcome auth-gate hidden" role="dialog" aria-modal="true" aria-labelledby="authGateTitle" aria-describedby="authGateBody">
     <div class="welcome-panel auth-panel">
-      <img class="auth-mark" src="./assets/brand/fiezel-icon-192.png" alt="" width="72" height="72" decoding="async">
+      <img class="auth-mark auth-vector-hero" src="./assets/characters/team/svg/shoulder-wave.svg" alt="Nusa & Mira" width="110" height="110" decoding="async">
       <h2 id="authGateTitle" data-i18n="auth.gate-title">Masuk ke FIEZEL</h2>
       <p id="authGateBody" data-i18n="auth.gate-body">Akunmu menyimpan progres belajar, streak, dan AI tutor supaya tetap sama di setiap perangkat.</p>
       <p id="authGateStatus" class="auth-status" role="status" data-i18n="auth.status-check">Memeriksa status akun…</p>
-      <button id="authGateButton" type="button" class="auth-primary" onclick="attemptPuterSignIn()"><i data-lucide="user-round"></i><span data-i18n="auth.tombol-lanjutkan">Lanjutkan dengan Puter</span></button>
+      <button id="authGateButton" type="button" class="auth-primary auth-google-btn" onclick="attemptGoogleSignIn()"><svg class="google-logo" width="22" height="22" viewBox="0 0 24 24" aria-hidden="true"><path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.665-5.17 3.665-9.17z"/><path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.25v3.15C3.26 21.36 7.33 24 12 24z"/><path fill="#FBBC05" d="M5.28 14.27c-.25-.72-.38-1.49-.38-2.27s.13-1.55.38-2.27V6.58H1.25C.45 8.18 0 9.99 0 12s.45 3.82 1.25 5.42l4.03-3.15z"/><path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.33 0 3.26 2.64 1.25 6.58l4.03 3.15c.95-2.83 3.6-4.98 6.72-4.98z"/></svg><span data-i18n="auth.tombol-lanjutkan">Lanjutkan dengan Google</span></button>
+      <div id="authGateGoogleMount" class="auth-gate-google-mount" style="display:none"></div>
       <!-- m026-02: jalan keluar yang selalu ada, meniru notificationGateSkip "Nanti saja"
            persis satu-banding-satu. Tanpa tombol ini, murid yang tidak mau (atau tidak
            bisa) login terkurung di balik .auth-locked - dark-pattern yang sama yang sudah
            dibongkar OWNER di gerbang notifikasi. Pengaturan > Akun Puter adalah jalan
            masuknya kembali. -->
       <button id="authGateSkip" data-testid="auth-gate-skip" type="button" class="text-button wide" onclick="skipPuterSignIn()" data-i18n="auth.skip-btn">Lanjut tanpa akun</button>
-      <p id="authGateSkipHelp" class="auth-help" data-i18n="auth.skip-help">Semua materi dan latihan tetap jalan tanpa akun — tutor AI dan suara neural baru bisa dipakai kalau kamu masuk akun Puter dan ada jaringan.</p>
-      <p id="authGateHelp" class="auth-help" data-i18n="auth.puter-help">Jendela login Puter terbuka sebentar di atas FIEZEL, lalu tertutup sendiri begitu selesai - kamu tidak akan dipindahkan ke browser lain.</p>
-      <p class="auth-legal" data-i18n="auth.legal-note">Dengan melanjutkan, kamu menyetujui progres belajarmu disimpan di akun Puter milikmu sendiri.</p>
+      <p id="authGateSkipHelp" class="auth-help" data-i18n="auth.skip-help">Semua materi dan latihan tetap jalan tanpa akun — tutor AI dan sinkronisasi tersambung saat kamu masuk akun Google.</p>
+      <p id="authGateHelp" class="auth-help" data-i18n="auth.puter-help">Jendela login Google terbuka dengan aman di atas FIEZEL, lalu tertutup sendiri begitu selesai.</p>
+      <p class="auth-legal" data-i18n="auth.legal-note">Dengan melanjutkan, kamu menyetujui progres belajarmu disimpan di akun Google milikmu sendiri.</p>
     </div>
   </div>
 
@@ -458,8 +460,6 @@ html.fz-booting body{overflow:hidden}
           type="fiezel/lazy" - browser tidak mengambilnya saat mengurai, dan
           ./fiezel-lazy-loader.js mengangkatnya jadi <script> sungguhan setelah layar
           pertama tercat, atau lebih awal kalau murid membukanya duluan. -->
-  <script async id="fiezelPuterSdk" src="https://js.puter.com/v2/"></script>
-  <script defer src="./fiezel-puter-ready.js"></script>
   <script defer src="./lucide.min.js"></script>
   <script defer src="./version.js"></script>
   <script defer src="./report-config.js"></script>

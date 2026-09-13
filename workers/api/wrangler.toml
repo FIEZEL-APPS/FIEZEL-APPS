@@ -254,11 +254,19 @@ binding = "AI"
 #                      terakhir hari itu tiba. Tanpa job ini kontrak privasi
 #                      BOHONG — token harian tidak pernah dihapus dan pepper
 #                      tidak pernah dirotasi.
+#   \"17 * * * *\"   (c) evaluasi pengingat belajar + kirim push (menggantikan
+#                      GitHub Actions workflow `push-reminders.yml`). Menit ke-17
+#                      tiap jam, sama persis dengan jadwal lama di GHA. Job ini
+#                      menggantikan `push-dispatcher.mjs` yang berjalan di atas
+#                      Node.js + `web-push`: kini seluruh logika push ada di dalam
+#                      Worker sendiri. Token `CRON_TOKEN` divalidasi di dalam
+#                      handler; tanpa token, permintaan `POST /api/reminders/due`
+#                      dari luar Cron Trigger ditolak.
 #
 # Cron cadangan TIDAK dipasang: kalau satu eksekusi gagal, yang berikutnya
 # mengerjakan hal yang sama (kedua job idempoten).
 [triggers]
-crons = ["*/5 * * * *", "5 17 * * *"]
+crons = ["*/5 * * * *", "5 17 * * *", "17 * * * *"]
 
 # ============================================================================
 # YANG SENGAJA TIDAK ADA DI SINI, DAN ALASANNYA

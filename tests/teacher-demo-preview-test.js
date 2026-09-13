@@ -159,6 +159,29 @@ test('R7 · naskah pita demo lahir dua bahasa', () => {
   assert.ok(/[฀-๿]/.test(thBlock), 'nilai th untuk pita demo tidak ber-aksara Thai');
 });
 
+/* ----------------------------------------------------------- R8 · kembali ke hero --- */
+
+test('R8 · keluar demo membersihkan URL teacher=preview dan mengarahkan ke landing page hero', () => {
+  assert.ok(/case 'demo-exit':[\s\S]{0,140}exit\(\{\s*target:\s*'landing'\s*\}\)/.test(shellCode),
+    'case demo-exit harus memanggil exit dengan target landing agar kembali ke hero');
+  assert.ok(/function exitPreview\(\)[\s\S]{0,500}replaceState/.test(shellCode),
+    'exitPreview harus membersihkan query parameter teacher via replaceState agar tidak re-arm');
+  const appSrc = read('app.js');
+  assert.ok(/opts\?\.target\s*===\s*'landing'[\s\S]{0,400}\.\.\/#hero/.test(appSrc),
+    'app.js exit callback harus mengarahkan target landing ke ../#hero');
+});
+
+/* --------------------------------------------------------- R9 · sidebar exit demo --- */
+
+test('R9 · tombol keluar di sidebar saat mode demo memanggil exitPreview', () => {
+  const i = shellCode.indexOf("case 'exit':");
+  const exitCase = shellCode.slice(i, i + 350);
+  assert.ok(/previewOn[\s\S]{0,120}exitPreview\(\)/.test(exitCase),
+    'case exit harus membersihkan pratinjau jika previewOn menyala');
+  assert.ok(/exit\(\{\s*target:\s*'student'\s*\}\)/.test(exitCase),
+    'case exit harus mengarahkan ke target student');
+});
+
 let failures = 0;
 for (const [n, fn] of tests) {
   try { fn(); console.log('ok - ' + n); }

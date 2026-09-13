@@ -3,7 +3,7 @@ const root=__dirname;
 const app=fs.readFileSync(path.join(root,'app.js'),'utf8');
 const css=fs.readFileSync(path.join(root,'style.css'),'utf8');
 const index=fs.readFileSync(path.join(root,'index.html'),'utf8');
-const worker=fs.readFileSync(path.join(root,'fiezel-core-worker.js'),'utf8');
+const worker=fs.readFileSync(path.join(root,'workers','api','route-legacy.js'),'utf8');
 const icon=fs.readFileSync(path.join(root,'instagram.svg'),'utf8');
 /* Pasca-#242: naskah Indonesia pindah dari literal app.js ke copy-map i18n. Cek string
  * kini menilai KONTRAK utuhnya: pemanggil di app.js + naskah di copy-map (keduanya
@@ -39,7 +39,7 @@ check('Production Evidence Origin Verification',fs.existsSync(path.join(root,'co
 check('Operator Adoption Rehearsal',fs.existsSync(path.join(root,'content-adoption-rehearsal.js'))&&fs.existsSync(path.join(root,'tests/content-adoption-rehearsal-test.js'))&&!index.includes('./content-adoption-rehearsal.js')&&!app.includes('ADOPTION_REHEARSAL')&&!worker.includes('/api/content/adoption/rehearsal'),'Operator rehearsal verifies signed origin, staging, and rollback without canonical source mutation or runtime adoption.');
 check('ALRS evidence log privacy',app.includes('appendALRSEvidenceLog')&&app.includes('rawAnswersIncluded:false')&&app.includes('rawHistoryIncluded:false'),'Reminder decisions retain bounded aggregate evidence without raw answer payloads.');
 check('Learning map',app.includes('Peta Belajar')&&app.includes('mapCards'),'Peta Belajar surface exists.');
-check('Puter AI entry point',index.includes('https://js.puter.com/v2/')&&index.includes('./core-config.js')&&app.includes("coreWorkerExec('/api/ai/chat'")&&!app.includes('puter.ai.chat('),'AI uses authenticated Puter Worker only; direct client AI bypass is absent.');
+check('Cloudflare AI entry point',index.includes('./core-config.js')&&app.includes("coreWorkerExec('/api/ai/chat'")&&!app.includes('puter.ai.chat('),'AI uses Cloudflare Worker endpoint; direct client AI bypass is absent.');
 check('AI learning surfaces',app.includes('aiExplainBtn')&&app.includes('aiWord')&&app.includes('openAILoading'),'Quiz and flashcard AI actions include a loading state.');
 // m025-93: sama seperti di tests/regression-test.js - yang dijaga sifatnya, bukan bentuk
 // implementasinya. Teks model masuk lewat renderMarkdown(), dan penerjemah itu meng-esc
@@ -58,7 +58,7 @@ check('Realtime celestial cycle',app.includes('getCelestialState')&&app.includes
 check('Focused twenty-five-mode grammar lessons',app.includes('GRAMMAR_SESSION_SIZE=25')&&app.includes('GRAMMAR_PRACTICE_MODES')&&app.includes('buildGrammarLessonQuestions')&&!app.includes('familyPeers=')&&!app.includes('levelPeers='),'Every grammar lesson builds 25 validated pedagogical modes from its own concept without importing peer questions.');
 check('Natural Indonesian explanations',app.includes('NATURAL_AI_STYLE')&&(app.includes('Hindari gaya buku teks')||copyAll.includes('Hindari gaya buku teks'))&&app.includes('grammarRuleIndonesian'),'Grammar, vocabulary, reading, and AI explanations use the Indonesian language contract (gaya AI kini di copy-map i18n).');
 check('Creator reporting',app.includes("sendCreatorReport('session_complete')")&&app.includes("sendCreatorReport('daily_access'")&&app.includes('reportConsent:false'),'Session and daily access reports require explicit consent.');
-check('Creator report privacy',app.includes('validReportEndpoint')&&app.includes('buildCreatorReport')&&fs.existsSync(path.join(root,'fiezel-report-worker.js')),'Reporting is restricted to Puter Workers with a dedicated collector.');
+check('Creator report privacy',app.includes('validReportEndpoint')&&app.includes('buildCreatorReport'),'Reporting is restricted with a dedicated collector.');
 check('Runtime syntax',true,'Validated separately with node --check.');
 const data=JSON.parse(fs.readFileSync(path.join(root,'vocabulary-master.json')));check('Vocabulary data readable',Array.isArray(data)&&data.length>0,`records=${data.length}`);
 const r=JSON.parse(fs.readFileSync(path.join(root,'reading-bank.json')));check('Reading data readable',Array.isArray(r)&&r.length>0,`passages=${r.length}`);

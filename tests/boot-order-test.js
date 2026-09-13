@@ -63,14 +63,9 @@ const lazy = scripts.filter(s => s.type === 'fiezel/lazy');
 const eager = scripts.filter(s => s.src && s.type !== 'fiezel/lazy');
 const inline = scripts.filter(s => s.inline);
 
-test('js.puter.com async - bukan blocking, dan bukan defer', () => {
+test('SDK Puter tidak dimuat sama sekali (Puter dihapus total)', () => {
   const puter = scripts.filter(s => /js\.puter\.com/.test(s.src));
-  assert.strictEqual(puter.length, 1, 'SDK Puter harus dimuat tepat sekali');
-  assert.ok(puter[0].async, 'SDK pihak ketiga harus async supaya tidak menahan pengurai');
-  assert.ok(!puter[0].defer,
-    'defer TIDAK cukup: ia mempertahankan urutan, jadi Puter yang lambat tetap menahan seluruh berkas di belakangnya');
-  assert.ok(/id="fiezelPuterSdk"/.test(html),
-    'tag-nya perlu id supaya ./fiezel-puter-ready.js bisa mendengar load/error-nya');
+  assert.strictEqual(puter.length, 0, 'SDK Puter tidak boleh dimuat lagi');
 });
 
 test('setiap skrip lokal ber-defer - tidak ada lagi yang menahan pengurai', () => {
@@ -174,16 +169,15 @@ test('Diagnostics TIDAK ikut malas - nilainya justru ada lebih dulu', () => {
     'panel Diagnostics harus tetap dimuat sungguhan sebelum app.js: kalau app.js melempar, tombolnya harus tetap ada');
 });
 
-test('pemuat malas dan penunggu Puter dimuat sebelum yang membutuhkannya', () => {
+test('pemuat malas dimuat sebelum yang membutuhkannya', () => {
   const idx = src => html.indexOf('<script defer src="' + src + '"></script>');
-  assert.ok(idx('./fiezel-puter-ready.js') > 0);
   assert.ok(idx('./fiezel-lazy-loader.js') > 0);
   assert.ok(idx('./fiezel-lazy-loader.js') < html.indexOf('<script defer src="./app.js">'),
     'app.js memanggil FiezelLazy.load(); pemuatnya harus sudah ada');
 });
 
 test('berkas baru ikut di-precache service worker - peluncuran offline tetap utuh', () => {
-  for (const file of ['./fiezel-puter-ready.js', './fiezel-lazy-loader.js',
+  for (const file of ['./fiezel-lazy-loader.js',
     './features/ui/fiezel-report-gesture-isolation.js', './features/ui/fiezel-boot-tail.js']) {
     assert.ok(sw.includes("'" + file + "'"), file + ' belum ada di ASSETS');
   }
@@ -284,14 +278,10 @@ test('gelombang malas berangkat SETELAH layar utama tergambar, bukan sebelumnya'
     'harus ada jaring pengaman: app.js yang melempar sebelum openApp() tidak boleh membuat suara/Classroom tidak pernah terambil');
 });
 
-test('pemakai Puter menunggu kesiapan, tidak menyimpulkan dari ketiadaan', () => {
-  assert.ok(/async function awaitPuter\(/.test(app), 'harus ada satu tempat untuk menunggu SDK');
-  assert.ok(/const sdk=await awaitPuter\(\);if\(sdk\?\.workers\?\.exec\)/.test(app),
-    'coreWorkerExec harus menunggu SDK sebelum melempar puter_workers_unavailable');
-  assert.ok(/function armPuterAuthGate\(\)/.test(app) && /FiezelPuterReady\?\.ready\?\.\(\)/.test(app),
-    'gerbang akun harus dipasang lewat penantian, bukan lewat tebakan sesaat');
-  assert.ok(/if\(!puterAuthAvailable\(\)\)\{\s*\n?\s*setAuthGateState\('pending'\);/.test(app),
-    'tombol login harus berpindah ke pending dan menunggu, bukan gagal diam-diam');
+test('coreWorkerExec langsung merutekan ke Cloudflare (Puter dihapus)', () => {
+  assert.ok(/async function coreWorkerExec\(/.test(app), 'harus ada coreWorkerExec');
+  assert.ok(/cfWorkerFetch\(path,\s*options\)/.test(app),
+    'coreWorkerExec harus langsung memanggil cfWorkerFetch');
 });
 
 (async () => {
