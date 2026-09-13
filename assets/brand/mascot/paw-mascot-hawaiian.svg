@@ -30,7 +30,7 @@
 
   <!-- ROOT CHARACTER GROUP -->
   <g class="fz-all">
-    
+
     <!-- 1. TAIL (100% Exact Landing Page Anatomy & Continuous Stroke) -->
     <g class="fz-tail">
       <path d="M 212 244 C 266 258 298 238 296 200 C 294 178 282 163 268 158" stroke="#EDB93A" stroke-width="25" stroke-linecap="round" fill="none"/>
@@ -42,7 +42,7 @@
       <g class="fz-torso">
         <!-- Main Torso Box -->
         <rect x="102" y="164" width="116" height="96" rx="42" fill="#FFD94F"/>
-        
+
         <!-- Chest Patch & FIEZEL Pawprint Emblem -->
         <g class="fz-chest">
           <ellipse cx="160" cy="226" rx="36" ry="28" fill="#FFF4DA"/>
@@ -61,14 +61,14 @@
         <g class="fz-hula-skirt">
           <!-- Shadow Base of Skirt -->
           <path d="M100 226 Q160 236 220 226 L226 274 Q160 286 94 274 Z" fill="#1B5E20" opacity="0.75"/>
-          
+
           <!-- Left Grass Blades -->
           <g class="fz-skirt-blade-left">
             <path d="M102 224 Q88 248 92 278 Q106 254 114 226 Z" fill="url(#leafGrad1)"/>
             <path d="M110 224 Q98 252 104 282 Q118 254 122 226 Z" fill="url(#leafGrad2)"/>
             <path d="M118 225 Q108 255 116 284 Q128 256 130 226 Z" fill="url(#leafGrad1)"/>
           </g>
-          
+
           <!-- Center Grass Blades -->
           <g class="fz-skirt-blade-center">
             <path d="M126 226 Q122 258 128 285 Q138 258 138 227 Z" fill="url(#leafGrad2)"/>
@@ -78,14 +78,14 @@
             <path d="M166 227 Q174 260 180 287 Q188 260 178 227 Z" fill="url(#leafGrad2)"/>
             <path d="M176 226 Q186 258 194 285 Q200 258 188 227 Z" fill="url(#leafGrad1)"/>
           </g>
-          
+
           <!-- Right Grass Blades -->
           <g class="fz-skirt-blade-right">
             <path d="M186 225 Q200 255 206 284 Q214 256 198 226 Z" fill="url(#leafGrad2)"/>
             <path d="M196 224 Q212 252 218 282 Q224 254 208 226 Z" fill="url(#leafGrad1)"/>
             <path d="M206 224 Q226 248 230 278 Q234 254 218 226 Z" fill="url(#leafGrad2)"/>
           </g>
-          
+
           <!-- Skirt Front Layer & Golden Band with Hibiscus Belt Brooch -->
           <g class="fz-skirt-layer-front">
             <path d="M102 224 C138 236 182 236 218 224 C214 254 186 284 160 288 C134 284 106 254 102 224 Z" fill="#4CAF50" opacity="0.35"/>
@@ -109,7 +109,7 @@
           <path d="M76 66 L95 0 L140 34 Q104 66 76 66 Z" fill="#FFD94F"/>
           <path d="M90 52 L 101 17 L 125 35 Z" fill="#8C2233"/>
         </g>
-        
+
         <!-- Right Ear -->
         <g class="fz-ear fz-ear-r">
           <path d="M244 66 L225 0 L180 34 Q216 66 244 66 Z" fill="#FFD94F"/>
@@ -128,7 +128,7 @@
           <!-- Blushing Cheeks -->
           <circle class="fz-blush" cx="102" cy="126" r="11" fill="#F0A0AC"/>
           <circle class="fz-blush" cx="218" cy="126" r="11" fill="#F0A0AC"/>
-          
+
           <!-- Eyes with Sparkling Highlights -->
           <g class="fz-eyes">
             <g class="fz-eye fz-eye-l">
@@ -171,7 +171,7 @@
             </g>
             <circle cx="0" cy="0" r="3.5" fill="#FFD54F"/><circle cx="0" cy="0" r="1.5" fill="#E65100"/>
           </g>
-          
+
           <!-- Flower 2: White-Yellow Plumeria -->
           <g transform="translate(138, 40) scale(1.05)">
             <g fill="url(#flowerPlumeria)">
@@ -179,7 +179,7 @@
             </g>
             <circle cx="1" cy="0" r="3" fill="#FBC02D"/>
           </g>
-          
+
           <!-- Flower 3: Red Grand Hibiscus (Center) -->
           <g transform="translate(164, 38) scale(1.15)">
             <g fill="url(#flowerHibiscus)">
@@ -187,7 +187,7 @@
             </g>
             <circle cx="0" cy="0" r="4" fill="#FFF59D"/><circle cx="0" cy="0" r="2" fill="#E91E63"/>
           </g>
-          
+
           <!-- Flower 4: White Plumeria -->
           <g transform="translate(190, 42) scale(1.02)">
             <g fill="url(#flowerPlumeria)">
@@ -195,7 +195,7 @@
             </g>
             <circle cx="0" cy="0" r="2.8" fill="#FBC02D"/>
           </g>
-          
+
           <!-- Flower 5: Pink Blossom -->
           <g transform="translate(216, 50) scale(0.92)">
             <g fill="#FF4081">
