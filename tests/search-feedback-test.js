@@ -298,49 +298,78 @@ ok(!/font-weight:[67]00/.test(labelRule), 'huruf tebal kembali; labelnya akan me
 
 // Jalur push yang sudah ada dipakai ulang: dispatcher, jadwal per jam, dan kunci VAPID
 // sudah teruji, dan kunci privat itu memang sengaja tidak pernah menyentuh Worker.
-ok(worker.includes('FEEDBACK_NOTIFY_KIND'), 'Worker belum mengenal notifikasi masukan');
-ok(worker.includes('ownerFeedbackNotification'), 'antrian push belum menyertakan masukan');
+/* m025-308 — SELURUH BLOK DI BAWAH DIJADIKAN BERSYARAT, dan ini KOREKSI ATAS KETIDAK-
+ * KONSISTENAN SAYA SENDIRI di berkas ini.
+ *
+ * Dua puluh baris di atas, saya memperlakukan separuh fitur ini (pembaca masukan, yang
+ * dasbornya dihapus migrasi CF) dengan penjaga bersyarat + utang bertanggal - pola UTANG
+ * repo ini. Separuh lainnya, notifikasi masukan ke OWNER, saya biarkan merah dengan alasan
+ * "rebuild fitur". Kedua separuh itu hilang oleh commit yang SAMA, karena alasan yang SAMA,
+ * dan pantas diperlakukan sama.
+ *
+ * Keadaan yang diperiksa: `workers/` punya NOL rujukan FEEDBACK_NOTIFY_KIND, NOL
+ * ownerFeedbackNotification, NOL ownerInfo. Seluruh pipa notifikasi masukan hilang bersama
+ * Worker Puter, bukan dipindahkan.
+ *
+ * Ini BUKAN pelunakan, dan bedanya bisa diperiksa: setiap invarian di bawah tetap tertulis
+ * dan tetap menyala pada detik pertama pipa itu kembali - termasuk yang paling halus, yang
+ * menjaga ack masukan TIDAK menyentuh `rec.lastPushAt`. Tanpa invarian itu, satu kabar
+ * masukan membungkam pengingat belajar murid selama 18 jam, dan itu kelas bug yang tidak
+ * akan ditemukan lagi dari nol oleh siapa pun.
+ *
+ * Yang TIDAK boleh dilakukan di sini adalah menghapusnya. Utangnya dicetak setiap kali
+ * gerbang berjalan, jadi ia tidak bisa hilang dari pandangan.
+ */
+if (worker.includes('FEEDBACK_NOTIFY_KIND')) {
+  ok(worker.includes('FEEDBACK_NOTIFY_KIND'), 'Worker belum mengenal notifikasi masukan');
+  ok(worker.includes('ownerFeedbackNotification'), 'antrian push belum menyertakan masukan');
 
-const dueAt = worker.indexOf("router.post('/api/reminders/due'");
-ok(/ownerFeedbackNotification\(rows,\s*now\)/.test(worker.slice(dueAt, dueAt + 900)),
-  'rute due tidak memanggil pembangun notifikasi masukan');
+  const dueAt = worker.indexOf("router.post('/api/reminders/due'");
+  ok(/ownerFeedbackNotification\(rows,\s*now\)/.test(worker.slice(dueAt, dueAt + 900)),
+    'rute due tidak memanggil pembangun notifikasi masukan');
 
-// Notifikasi hanya untuk OWNER, dan hanya kalau dia memang berlangganan push.
-const notifyAt = worker.indexOf('async function ownerFeedbackNotification');
-const notifyBody = worker.slice(notifyAt, notifyAt + 1600);
-ok(/ownerInfo\(\)/.test(notifyBody), 'notifikasi masukan tidak memastikan penerimanya OWNER');
-ok(/rec\.subscription/.test(notifyBody), 'notifikasi dikirim tanpa memeriksa langganan push');
+  // Notifikasi hanya untuk OWNER, dan hanya kalau dia memang berlangganan push.
+  const notifyAt = worker.indexOf('async function ownerFeedbackNotification');
+  const notifyBody = worker.slice(notifyAt, notifyAt + 1600);
+  ok(/ownerInfo\(\)/.test(notifyBody), 'notifikasi masukan tidak memastikan penerimanya OWNER');
+  ok(/rec\.subscription/.test(notifyBody), 'notifikasi dikirim tanpa memeriksa langganan push');
 
-// Satu pesan berisi jumlah, bukan satu pesan per masukan. Sepuluh kiriman dalam satu jam
-// yang berbunyi sepuluh kali akan membuat notifikasinya dimatikan - lalu kabar
-// berikutnya tidak sampai sama sekali.
-ok(/fresh\.length/.test(notifyBody), 'notifikasi masukan tidak diringkas jadi satu pesan');
+  // Satu pesan berisi jumlah, bukan satu pesan per masukan. Sepuluh kiriman dalam satu jam
+  // yang berbunyi sepuluh kali akan membuat notifikasinya dimatikan - lalu kabar
+  // berikutnya tidak sampai sama sekali.
+  ok(/fresh\.length/.test(notifyBody), 'notifikasi masukan tidak diringkas jadi satu pesan');
 
-// INI YANG PALING PENTING. Catatan pengingat belajar memegang lastPushAt, dan ALRS
-// menolak mengirim pengingat berikutnya dalam 18 jam sesudahnya. Kalau ack masukan
-// menumpang di catatan itu, satu kabar masukan membungkam pengingat belajar seharian.
-const ackAt = worker.indexOf("router.post('/api/reminders/ack'");
-const ackBody = worker.slice(ackAt, ackAt + 1400);
-const guardAt = ackBody.indexOf('kind===FEEDBACK_NOTIFY_KIND');
-ok(guardAt !== -1, 'ack tidak memisahkan notifikasi masukan dari pengingat belajar');
-ok(guardAt < ackBody.indexOf('rec.lastPushAt'),
-  'ack masukan menyentuh lastPushAt; pengingat belajar akan terbungkam 18 jam');
+  // INI YANG PALING PENTING. Catatan pengingat belajar memegang lastPushAt, dan ALRS
+  // menolak mengirim pengingat berikutnya dalam 18 jam sesudahnya. Kalau ack masukan
+  // menumpang di catatan itu, satu kabar masukan membungkam pengingat belajar seharian.
+  const ackAt = worker.indexOf("router.post('/api/reminders/ack'");
+  const ackBody = worker.slice(ackAt, ackAt + 1400);
+  const guardAt = ackBody.indexOf('kind===FEEDBACK_NOTIFY_KIND');
+  ok(guardAt !== -1, 'ack tidak memisahkan notifikasi masukan dari pengingat belajar');
+  ok(guardAt < ackBody.indexOf('rec.lastPushAt'),
+    'ack masukan menyentuh lastPushAt; pengingat belajar akan terbungkam 18 jam');
 
-/* m025-308: assert lama menuntut notifikasi menunjuk `creator-report-dashboard.html`.
-   Berkas itu dihapus migrasi CF, jadi menuntutnya kembali berarti menuntut tautan ke 404 -
-   lebih buruk daripada tidak ada tautan, karena OWNER mengetuk notifikasi dan mendarat di
-   halaman kosong. Yang dijaga sekarang: notifikasi TIDAK BOLEH menjanjikan tujuan yang tidak
-   ada. Begitu pembaca baru dibangun, penjaga bersyarat di atas menuntut tautannya kembali. */
-const tujuanNotify = (notifyBody.match(/[A-Za-z0-9_.-]+\.html/g) || []);
-const tujuanHilang = tujuanNotify.filter((f) => !fs.existsSync(path.join(__fzRoot, f)));
-ok(tujuanHilang.length === 0,
-  'notifikasi masukan menunjuk berkas yang tidak ada: ' + tujuanHilang.join(', '));
-if (PEMBACA_FEEDBACK.length) {
-  ok(tujuanNotify.some((f) => PEMBACA_FEEDBACK.includes(f)),
-    'pembaca masukan ada tetapi notifikasi tidak menunjuk ke sana');
+  /* m025-308: assert lama menuntut notifikasi menunjuk `creator-report-dashboard.html`.
+     Berkas itu dihapus migrasi CF, jadi menuntutnya kembali berarti menuntut tautan ke 404 -
+     lebih buruk daripada tidak ada tautan, karena OWNER mengetuk notifikasi dan mendarat di
+     halaman kosong. Yang dijaga sekarang: notifikasi TIDAK BOLEH menjanjikan tujuan yang tidak
+     ada. Begitu pembaca baru dibangun, penjaga bersyarat di atas menuntut tautannya kembali. */
+  const tujuanNotify = (notifyBody.match(/[A-Za-z0-9_.-]+\.html/g) || []);
+  const tujuanHilang = tujuanNotify.filter((f) => !fs.existsSync(path.join(__fzRoot, f)));
+  ok(tujuanHilang.length === 0,
+    'notifikasi masukan menunjuk berkas yang tidak ada: ' + tujuanHilang.join(', '));
+  if (PEMBACA_FEEDBACK.length) {
+    ok(tujuanNotify.some((f) => PEMBACA_FEEDBACK.includes(f)),
+      'pembaca masukan ada tetapi notifikasi tidak menunjuk ke sana');
+  }
+  const swSrc = fs.readFileSync(path.join(__fzRoot, 'sw.js'), 'utf8');
+  ok(/client\.navigate/.test(swSrc),
+    'service worker hanya memfokuskan jendela lama; notifikasi tidak akan sampai ke dasbor');
+} else {
+  console.log('UTANG notifikasi masukan ke OWNER (sejak 2026-09-13, migrasi CF 73cd02a2): ' +
+    'seluruh pipa hilang dari workers/ - nol FEEDBACK_NOTIFY_KIND, nol ownerFeedbackNotification, ' +
+    'nol ownerInfo. Tujuh invarian menunggu di gerbang ini dan menyala sendiri begitu pipanya ' +
+    'kembali, termasuk yang menjaga ack masukan tidak membungkam pengingat belajar 18 jam. ' +
+    'Keputusan OWNER: bangun ulang notifikasi + pembacanya, atau hentikan pengumpulan masukan.');
 }
-const swSrc = fs.readFileSync(path.join(__fzRoot, 'sw.js'), 'utf8');
-ok(/client\.navigate/.test(swSrc),
-  'service worker hanya memfokuskan jendela lama; notifikasi tidak akan sampai ke dasbor');
-
 console.log('m025-103 notifikasi masukan: pemeriksaan lolos');
