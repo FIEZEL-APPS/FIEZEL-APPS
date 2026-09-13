@@ -34,7 +34,7 @@
 
   <!-- ROOT CHARACTER GROUP -->
   <g class="fz-all">
-    
+
     <!-- 1. TAIL -->
     <g class="fz-tail">
       <path d="M 212 244 C 266 258 298 238 296 200 C 294 178 282 163 268 158" stroke="#EDB93A" stroke-width="25" stroke-linecap="round" fill="none"/>
@@ -45,7 +45,7 @@
     <g class="fz-body">
       <g class="fz-torso">
         <rect x="102" y="164" width="116" height="96" rx="42" fill="#FFD94F"/>
-        
+
         <!-- Chest Patch & FIEZEL Pawprint Emblem -->
         <g class="fz-chest">
           <ellipse cx="160" cy="226" rx="36" ry="28" fill="#FFF4DA"/>
@@ -103,7 +103,7 @@
           <path d="M76 66 L95 0 L140 34 Q104 66 76 66 Z" fill="#FFD94F"/>
           <path d="M90 52 L 101 17 L 125 35 Z" fill="#8C2233"/>
         </g>
-        
+
         <!-- Right Ear -->
         <g class="fz-ear fz-ear-r">
           <path d="M244 66 L225 0 L180 34 Q216 66 244 66 Z" fill="#FFD94F"/>
@@ -119,7 +119,7 @@
           <path d="M153 126 L 167 126 L 160 136 Z" fill="#8C2233"/>
           <circle class="fz-blush" cx="102" cy="126" r="11" fill="#F0A0AC"/>
           <circle class="fz-blush" cx="218" cy="126" r="11" fill="#F0A0AC"/>
-          
+
           <!-- Eyes -->
           <g class="fz-eyes">
             <g class="fz-eye fz-eye-l">
