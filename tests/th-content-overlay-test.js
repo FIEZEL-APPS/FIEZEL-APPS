@@ -1,8 +1,8 @@
-// m025-306 — gerbang untuk OVERLAY Thai pada WRITING dan READING-EXAM.
+// m025-307 — gerbang untuk OVERLAY Thai pada WRITING dan READING-EXAM.
 //
 // Kenapa gerbang ini ada, dan kenapa bentuknya seperti ini.
 //
-// Sebelum m025-306, `applyContentLocale()` menyalin dari `writing-prompts-th.json` hanya
+// Sebelum m025-307, `applyContentLocale()` menyalin dari `writing-prompts-th.json` hanya
 // `honesty` dan `rubric.criteria`, dan dari `reading-exam-th.json` hanya `honesty` dan
 // `formats`. Sisanya MENGANGGUR — bukan "belum diterjemahkan", melainkan sudah
 // diterjemahkan, sudah ikut terunduh ke perangkat murid, lalu tidak pernah dibaca:
@@ -79,7 +79,7 @@ const THAI = /[\u0E00-\u0E7F]/;
 // sengaja, karena istilah tata bahasa dan nama ujian (present simple, IELTS Task 2) memang
 // tetap Inggris di dalam kalimat Thai yang benar — menuntut kemurnian di sini akan
 // memerahkan terjemahan yang betul. Konsekuensinya jujur: pemeriksaan ini menangkap bidang
-// yang TIDAK tersentuh overlay (jatuh utuh ke bahasa Indonesia, kasus yang m025-306 tutup),
+// yang TIDAK tersentuh overlay (jatuh utuh ke bahasa Indonesia, kasus yang m025-307 tutup),
 // dan TIDAK menangkap kalimat Thai yang kebetulan menyelipkan satu frasa Indonesia. Yang
 // kedua itu tugas tests/th-bank-purity-test.js, yang memeriksa isi sidecar-nya.
 const cukupThai = s => { const t = String(s || ''); return t.length > 0 && THAI.test(t); };

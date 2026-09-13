@@ -24,10 +24,10 @@
     'ask.materi-terkait': 'Materi terkait',
     // app.js:3988 — status menunggu jawaban AI
     'ask.memikirkan': 'FIEZEL sedang memikirkan jawabannya…',
-    // app.js:2928 — galat layanan Puter tidak tersedia
-    'auth.galat-layanan': 'Layanan akun Puter belum bisa dihubungi. Periksa koneksi lalu coba lagi.',
+    // app.js:2928 — galat layanan tidak tersedia
+    'auth.galat-layanan': 'Layanan akun belum bisa dihubungi. Periksa koneksi lalu coba lagi.',
     // app.js:2934 — new Error(t(...)): pesan Error tampil di status auth
-    'auth.galat-timeout': 'Login Puter tidak merespons. Periksa jendela loginnya, atau coba lagi.',
+    'auth.galat-timeout': 'Login tidak merespons. Periksa jendela loginnya, atau coba lagi.',
     // app.js:2937 — login belum selesai; slug netral (belum+selesai = 2 COMMON lexer gerbang)
     'auth.galat-unfinished': 'Login belum selesai. Coba lagi.',
     // app.js:2757 — status skipped
