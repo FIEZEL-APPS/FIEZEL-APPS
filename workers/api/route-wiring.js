@@ -498,6 +498,118 @@ function wrapQuota(handler) {
   };
 }
 
+/**
+ * [L1] GERBANG BELANJA AI UNTUK RUTE SLOT 5 (route-legacy.js).
+ *
+ * LUBANG YANG DITUTUP, dan kenapa ia lolos dua kali sebelumnya:
+ *
+ * P3 memasang gerbang flag + jembatan kuota pada rute yang keluar dari `registerAiRoutes`,
+ * S3 memasangnya pada rute TTS sesudah menembak produksi hidup. Keduanya memasang pagar
+ * pada JALUR, dan pagar jalur hanya melindungi jalur yang dilewati. `route-legacy.js`
+ * disebar mentah di route-slots.js (`...LEGACY_ROUTES`) - ia tidak pernah lewat
+ * `wrapMetered`, jadi tidak pernah lewat keduanya. Akibatnya, pada rute yang justru
+ * dipakai aplikasi:
+ *
+ *   - `POST /api/ai/chat`      <- app.js:coreWorkerExec('/api/ai/chat'), jalur tutor UTAMA
+ *   - `POST /api/ai/translate` <- features/neural-voice/fiezel-subtitle-translate.js
+ *   - `POST /api/coach/context`
+ *
+ *   kuota harian per murid TIDAK berlaku  -> satu murid bisa menghabiskan kolam neuron
+ *                                            seluruh murid; plafon akun menahan TAGIHAN,
+ *                                            bukan KEADILAN antar murid;
+ *   flag `cfAiEnabled` TIDAK berlaku      -> "matikan AI" tidak mematikan jalur utama.
+ *
+ * Jadi yang salah bukan "dua rute terlewat" melainkan tempat pagarnya: ia dipasang pada
+ * pipa, sedangkan yang membelanjakan uang adalah RUTE. Gerbang ini karena itu diekspor,
+ * supaya slot yang tidak memakai pipa tetap memakai MEKANISME YANG SAMA - `enforceQuota`
+ * dan `checkAiEnabled` yang itu juga, bukan salinan kedua. Dua mekanisme untuk satu maksud
+ * adalah cara celah ketiga lahir; baris ini ada supaya tidak ada celah ketiga.
+ *
+ * URUTANNYA SAMA DENGAN P3/S3, dan itu bukan selera:
+ *   1. identitas (401) - keadaan otentikasi tidak boleh terbaca dari selisih 401/403;
+ *   2. flag AI (403)   - fail-CLOSED, termasuk ketika flag TIDAK TERBACA;
+ *   3. store kuota ada (503) - tidak bisa menghitung jatah berarti tidak boleh belanja;
+ *   4. reserve kuota per murid (429 kalau habis) - SEBELUM handler, jadi `quotaCharged`
+ *      benar secara struktur;
+ *   5. handler -> commit / rollback, diurus `enforceQuota` sendiri.
+ *
+ * Plafon neuron AKUN tetap di `runLegacyModel()` dan TIDAK dipindah ke sini: ia menjaga
+ * kolam owner, gerbang ini menjaga pembagian antar murid, dan keduanya harus tetap berlaku
+ * walau satu jalur baru lupa memakai gerbang ini.
+ */
+export function aiSpendGate(bucket, handler) {
+  return async (ctx) => {
+    // URUTAN 401 -> 403, DAN KENAPA IA TIDAK BOLEH DIBALIK.
+    //
+    // Komentar P3 di bawah menuliskannya sebagai aturan: penolakan flag diletakkan SESUDAH
+    // identitas diperiksa "jadi urutan penolakan tetap 401 sebelum 403 - keadaan otentikasi
+    // tidak boleh terbaca dari perbedaan ini". Itu sifat keamanan, bukan selera: kalau flag
+    // menjawab 403 lebih dulu, siapa pun di internet bisa membedakan "token ini sah" dari
+    // "tidak sah" hanya dari selisih kode jawaban, tanpa pernah punya kredensial.
+    //
+    // Versi pertama gerbang ini MELANGGARNYA - flag ditaruh paling depan supaya rute owner
+    // (yang tidak punya sesi murid) tidak terbentur 401. tests/cf-api-contract-test.js
+    // menangkapnya: ia mengirim badan kecil tanpa identitas dan menuntut 401, lalu menerima
+    // 403. Tesnya benar dan pagarnya salah.
+    //
+    // Yang benar bukan memilih salah satu, melainkan memisahkan dua jenis rute:
+    //   - rute BERJATAH (bucket ada)  -> identitas DULU (401), baru flag (403). Kanon P3
+    //     dipulihkan, dan memang jatah murid tidak bisa ditagih tanpa subjek terverifikasi.
+    //   - rute OWNER (bucket null)    -> TIDAK menuntut identitas murid sama sekali, jadi
+    //     tidak ada 401 yang bisa mendahului apa pun dan pertanyaan urutannya tidak lahir.
+    //     Otentikasinya `isOwner()` (Authorization: Bearer + OWNER_TOKEN_HASH); menuntut
+    //     sesi murid di sana memutus alat owner yang sah tanpa melindungi apa pun.
+    if (bucket) {
+      const guard = requireIdentity(ctx);
+      if (guard) return guard;
+    }
+
+    // Flag berlaku untuk KEDUA jenis rute - termasuk rute owner, karena neuronnya dari
+    // kolam yang sama: "matikan AI" yang tidak mematikan belanja owner bukan tombol mati.
+    const flag = await checkAiEnabled(ctx.env);
+    if (!flag.allowed) {
+      return RouteAi.aiDisabledResponse({ reason: flag.reason, headers: ctx.corsHeaders || null });
+    }
+
+    // Rute owner: jatah MURID tidak ditagih dengan sengaja. Yang perlu dijaga di sana adalah
+    // TAGIHAN, dan itu tugas plafon neuron akun di runLegacyModel(). Rutenya sendiri tetap
+    // menolak siapa pun yang bukan owner.
+    if (!bucket) return handler(ctx);
+
+    if (!quotaDb(ctx.env)) {
+      return jsonError(503, ERR.UNAVAILABLE, {}, { headers: Object.assign({}, ctx.corsHeaders, NO_STORE_HEADERS) });
+    }
+
+    // JATAH HANYA DITAGIH KALAU MURIDNYA DILAYANI.
+    //
+    // `enforceQuota` meng-commit setiap kali `next()` kembali tanpa melempar, dan ia
+    // SENGAJA tidak memeriksa status jawabannya (itu bukan urusannya). Tetapi handler SLOT 5
+    // menolak sebagian permintaan SEBELUM model pernah dipanggil - `prompt_too_long` (400),
+    // `text_too_long` (400) - dan penolakan itu di-RETURN, bukan dilempar. Tanpa baris di
+    // bawah, murid yang menempelkan teks terlalu panjang kehilangan satu dari 25 jatah
+    // hariannya untuk permintaan yang ditolak server dan tidak pernah menyentuh model.
+    // Diukur: 400 prompt_too_long, nol panggilan model, `ai_used` tetap naik 1.
+    //
+    // Yang dipakai untuk membatalkannya adalah kanal yang MEMANG dirancang, bukan mekanisme
+    // baru: `commitD1` menerima `actual` per-bucket, di-clamp ke yang direservasi dan
+    // minimal 0 (quota-store-d1.js), jadi `actual:{<bucket>:0}` menagih nol sekaligus
+    // melepas `held`. `enforceQuota` membacanya dari `result.actual`.
+    //
+    // Hasil handler dibungkus lalu dibuka kembali, dan itu disengaja: menempelkan `.actual`
+    // ke objek `Response` bekerja di Node hari ini, tetapi ia mengandalkan objek bawaan
+    // runtime tetap bisa ditambahi properti - asumsi yang tidak perlu diambil untuk apa pun.
+    const out = await enforceQuota(bucket, 1)(quotaCtxFor(ctx), async () => {
+      const response = await handler(ctx);
+      // >= 400 berarti murid TIDAK dilayani. Cadangan 200 saat model gagal TETAP ditagih,
+      // dan itu utang yang sudah tercatat bertanggal di PENAKARAN-NEURON-HANDOFF.md §6 -
+      // di sana modelnya memang sudah disentuh, di sini belum pernah.
+      const served = !(response && Number(response.status) >= 400);
+      return { __response: response, actual: served ? undefined : { [bucket]: 0 } };
+    });
+    return out && out.__response ? out.__response : out;
+  };
+}
+
 function wrapAnalytics(handler) {
   return async (ctx) =>
     handler({ request: requestFor(ctx), env: analyticsEnv(ctx.env), ctx: ctx.executionCtx });
