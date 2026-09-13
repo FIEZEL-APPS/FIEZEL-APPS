@@ -30,13 +30,4 @@ jobs:
         run: |
           node --check index.js
           node --check queries.js
-          node <<'JS'
-          const fs = require('fs');
-          let toml = fs.readFileSync('wrangler.toml', 'utf8');
-          const rblok = /\[\[routes\]\]\s*\npattern\s*=\s*"owner\.fiezel\.my\.id"[\s\S]*?custom_domain\s*=\s*true\s*\n/;
-          if (rblok.test(toml)) {
-            toml = toml.replace(rblok, '# (blok routes dilepas saat deploy: token CI tanpa izin zona; custom domain live tetap menempel)\n');
-            fs.writeFileSync('wrangler.toml', toml);
-          }
-          JS
           npx --yes wrangler@3 deploy
