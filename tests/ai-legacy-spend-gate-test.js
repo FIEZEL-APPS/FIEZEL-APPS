@@ -189,6 +189,26 @@ const MIGRATIONS = ['0001_quota.sql', '0005_ai_account_budget.sql']
         'kuota ditagih padahal permintaannya ditolak');
     }
 
+    // (b2) URUTAN 401 SEBELUM 403 - sifat keamanan, bukan kosmetik.
+    //
+    // Kanon P3 (komentar di route-wiring.js): penolakan flag diletakkan SESUDAH identitas
+    // "supaya keadaan otentikasi tidak boleh terbaca dari perbedaan ini". Kalau flag
+    // menjawab lebih dulu, siapa pun di internet bisa membedakan token yang sah dari yang
+    // tidak, hanya dari selisih 401/403, tanpa pernah punya kredensial.
+    //
+    // Versi pertama gerbang belanja ini melanggarnya dan tests/cf-api-contract-test.js yang
+    // menangkapnya (ia menuntut 401 untuk badan kecil tanpa identitas, dan menerima 403).
+    // Assert di bawah memindahkan penjagaan itu ke sini juga, supaya sifatnya dijaga di
+    // tempat yang menjelaskan ALASANNYA, bukan hanya sebagai efek samping tes kontrak.
+    {
+      const db = makeD1(MIGRATIONS); aiCalls = 0;
+      // Keduanya salah sekaligus: tanpa identitas DAN flag mati. Yang benar: 401.
+      const r = await hit('/api/ai/chat', ctxFor(makeEnv(db, { flag: false }), { prompt: 'hai' }, { verified: false }));
+      check('rute berjatah: tanpa identitas + flag mati -> 401, BUKAN 403', r.status === 401,
+        'status=' + r.status + '; kalau 403, keadaan otentikasi bisa dibaca dari selisih kode jawaban');
+      check('urutan itu tidak membelanjakan model', aiCalls === 0, 'panggilan=' + aiCalls);
+    }
+
     // (c) jalur normal: murid tetap dilayani, dan kuotanya naik tepat satu.
     {
       const db = makeD1(MIGRATIONS); aiCalls = 0;
@@ -220,6 +240,37 @@ const MIGRATIONS = ['0001_quota.sql', '0005_ai_account_budget.sql']
       check('jatah habis: model TIDAK disentuh', aiCalls === 0, 'panggilan=' + aiCalls);
       check('jatah habis: amplop quota_exhausted', r.body && r.body.error === 'quota_exhausted', JSON.stringify(r.body && r.body.error));
       check('jatah habis: pemakaian berhenti tepat di batas', row && Number(row.ai_used) === limAi, 'used=' + (row && row.ai_used));
+    }
+
+    // (d2) JATAH HANYA DITAGIH KALAU MURIDNYA DILAYANI.
+    //
+    // Handler SLOT 5 menolak sebagian permintaan SEBELUM model dipanggil (`prompt_too_long`,
+    // `text_too_long`) dan penolakannya di-RETURN, bukan dilempar - sedangkan `enforceQuota`
+    // meng-commit setiap kali next() kembali tanpa melempar dan sengaja tidak memeriksa
+    // status. Tanpa penjagaan, murid yang menempelkan teks terlalu panjang kehilangan satu
+    // dari 25 jatah hariannya untuk permintaan yang ditolak server dan tidak pernah
+    // menyentuh model. Ditemukan review bot, lalu DIUKUR: 400, nol panggilan model,
+    // ai_used tetap naik 1.
+    {
+      const cfgMax = Number((legacy.match(/prompt\.length\s*>\s*(\d+)/) || [])[1]);
+      check('batas panjang prompt terbaca dari route-legacy.js', Number.isFinite(cfgMax) && cfgMax > 0, 'cfgMax=' + cfgMax);
+      const db = makeD1(MIGRATIONS); aiCalls = 0;
+      const r = await hit('/api/ai/chat', ctxFor(makeEnv(db), { prompt: 'x'.repeat(cfgMax + 1) }));
+      const row = quotaRow(db);
+      check('prompt terlalu panjang -> 400', r.status === 400, 'status=' + r.status);
+      check('prompt terlalu panjang: model tidak disentuh', aiCalls === 0, 'panggilan=' + aiCalls);
+      check('ditolak sebelum model -> jatah murid TIDAK ditagih',
+        !row || Number(row.ai_used) === 0,
+        'ai_used=' + (row && row.ai_used) + '; murid kehilangan jatah untuk permintaan yang ditolak server');
+      check('ditolak sebelum model -> tidak ada reservasi menggantung',
+        !row || Number(row.ai_held) === 0, 'ai_held=' + (row && row.ai_held));
+
+      // Kebalikannya harus TETAP berlaku: yang dilayani tetap ditagih. Tanpa assert ini,
+      // "jangan tagih yang gagal" bisa diam-diam menjadi "jangan tagih apa pun".
+      const db2 = makeD1(MIGRATIONS); aiCalls = 0;
+      await hit('/api/ai/chat', ctxFor(makeEnv(db2), { prompt: 'pendek' }));
+      const row2 = quotaRow(db2);
+      check('yang DILAYANI tetap ditagih', row2 && Number(row2.ai_used) === 1, 'ai_used=' + (row2 && row2.ai_used));
     }
 
     // (e) terjemahan memakai SUB-kuota: ia menaikkan aiTranslate DAN ai, jadi subtitle

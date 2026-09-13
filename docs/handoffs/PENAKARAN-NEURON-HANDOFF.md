@@ -150,12 +150,59 @@ memerahkannya.
 Yang MASIH terbuka dari 5.1: gerbang cap untuk modul `export const ROUTES` **lain** (kalau kelak
 ada) tetap tidak menuntut fixture. Yang ditutup di sini khusus SLOT 5.
 
+### Kesalahan rancangan yang tertangkap gerbang repo, dan pelajarannya
+
+Versi pertama `aiSpendGate()` menaruh gerbang flag **paling depan** supaya rute owner — yang
+tidak punya sesi murid — tidak terbentur 401. Itu melanggar aturan yang sudah tertulis di
+komentar P3: penolakan flag diletakkan SESUDAH identitas "supaya keadaan otentikasi tidak
+boleh terbaca dari perbedaan ini". Konsekuensinya bukan kosmetik: dengan 403 di depan, siapa
+pun di internet bisa membedakan token yang sah dari yang tidak hanya dari selisih kode
+jawaban, tanpa pernah punya kredensial.
+
+`tests/cf-api-contract-test.js` yang menangkapnya — ia mengirim badan kecil tanpa identitas ke
+ketiga rute dan menuntut 401, lalu menerima 403. **Tesnya benar dan pagarnya salah.**
+
+Yang benar bukan memilih salah satu melainkan memisahkan dua jenis rute: rute BERJATAH
+menuntut identitas dulu (401 → 403, kanon P3 pulih), rute OWNER tidak menuntut identitas
+murid sama sekali sehingga pertanyaan urutannya tidak lahir. Sifat itu sekarang dipaku di
+DUA tempat — tes kontrak dan `tests/ai-legacy-spend-gate-test.js` butir (b2), yang menjelaskan
+alasannya di tempat — dan mutasi "flag dikembalikan ke depan" memerahkan keduanya.
+
+Pelajaran yang layak dibawa: pagar baru yang dipasang demi satu kasus khusus (rute owner tanpa
+sesi murid) bisa mematahkan sifat keamanan yang sudah dimenangkan di tempat lain. Yang
+menyelamatkannya adalah gerbang yang menguji URUTAN penolakan, bukan hanya hasil akhirnya.
+
 ### Masih terbuka sesudah ini
 
 - **Batas 12.000 char di `/api/ai/chat`** tidak diselaraskan dengan `FREE_MAX_PROMPT_CHARS`
   (4.000) milik jalur berkuota. Menurunkannya mengubah perilaku permukaan yang hidup, jadi ia
   KEPUTUSAN OWNER, bukan perapian. Dicatat 2026-09-13.
-- **Kuota `ai` ditagih walau model gagal** dan rute menjawab teks cadangan: `enforceQuota`
-  meng-commit karena handler mengembalikan 200. Konservatif ke arah melindungi kolam, tetapi
-  tidak adil bagi murid yang tidak mendapat jawaban. Memperbaikinya menuntut rute melaporkan
-  "tidak terlayani" ke gerbang — perubahan kontrak, bukan tambalan.
+- **Kuota `ai` ditagih walau model gagal** dan rute menjawab teks cadangan **200**:
+  `enforceQuota` meng-commit karena handler mengembalikan tanpa melempar. Konservatif ke arah
+  melindungi kolam, tetapi tidak adil bagi murid yang tidak mendapat jawaban. Memperbaikinya
+  menuntut rute melaporkan "tidak terlayani" ke gerbang — perubahan kontrak, bukan tambalan.
+  **Hanya kasus 200 ini yang masih terbuka**; lihat butir di bawah untuk yang sudah ditutup.
+
+### Ditutup sesudah review: jatah ditagih untuk permintaan yang ditolak SEBELUM model
+
+Review bot menemukan kasus yang BERBEDA dari utang di atas, dan pengukurannya membenarkannya:
+handler SLOT 5 menolak sebagian permintaan sebelum model pernah dipanggil
+(`prompt_too_long`, `text_too_long` → 400) dan penolakan itu **di-return, bukan dilempar** —
+sedangkan `enforceQuota` meng-commit setiap kali `next()` kembali tanpa melempar dan sengaja
+tidak memeriksa status jawaban. Diukur pada handler yang sungguhan: **400, nol panggilan
+model, `ai_used` tetap naik 1**. Murid yang menempelkan teks terlalu panjang kehilangan satu
+dari 25 jatah hariannya untuk permintaan yang ditolak server.
+
+Bedanya dengan utang di atas menentukan: di sana model sudah disentuh (tagihan sudah terjadi),
+di sini belum pernah.
+
+Ditutup dengan kanal yang MEMANG dirancang, bukan mekanisme baru: `commitD1` menerima `actual`
+per-bucket, di-clamp ke yang direservasi dan minimal 0, jadi `actual:{<bucket>:0}` menagih nol
+sekaligus melepas `held` — dan `enforceQuota` membacanya dari `result.actual`. Hasil handler
+dibungkus lalu dibuka kembali daripada menempelkan `.actual` ke objek `Response`: yang
+belakangan bekerja di Node hari ini tetapi mengandalkan objek bawaan runtime tetap bisa
+ditambahi properti, asumsi yang tidak perlu diambil.
+
+Dijaga empat assert di `tests/ai-legacy-spend-gate-test.js` butir (d2) — termasuk assert
+KEBALIKANNYA ("yang dilayani tetap ditagih"), supaya "jangan tagih yang gagal" tidak diam-diam
+menjadi "jangan tagih apa pun" — dan tiga mutasi yang ketiganya memerahkannya.

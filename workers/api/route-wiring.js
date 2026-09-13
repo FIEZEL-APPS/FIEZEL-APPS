@@ -540,37 +540,74 @@ function wrapQuota(handler) {
  */
 export function aiSpendGate(bucket, handler) {
   return async (ctx) => {
-    // Flag DULU, dan ia berlaku untuk SEMUA rute di sini - termasuk rute owner, karena
-    // neuronnya dari kolam yang sama: "matikan AI" yang tidak mematikan belanja owner
-    // bukan tombol mati. Ia juga penolakan termurah yang ada, jadi ia mendahului kerja
-    // apa pun yang lebih mahal.
+    // URUTAN 401 -> 403, DAN KENAPA IA TIDAK BOLEH DIBALIK.
+    //
+    // Komentar P3 di bawah menuliskannya sebagai aturan: penolakan flag diletakkan SESUDAH
+    // identitas diperiksa "jadi urutan penolakan tetap 401 sebelum 403 - keadaan otentikasi
+    // tidak boleh terbaca dari perbedaan ini". Itu sifat keamanan, bukan selera: kalau flag
+    // menjawab 403 lebih dulu, siapa pun di internet bisa membedakan "token ini sah" dari
+    // "tidak sah" hanya dari selisih kode jawaban, tanpa pernah punya kredensial.
+    //
+    // Versi pertama gerbang ini MELANGGARNYA - flag ditaruh paling depan supaya rute owner
+    // (yang tidak punya sesi murid) tidak terbentur 401. tests/cf-api-contract-test.js
+    // menangkapnya: ia mengirim badan kecil tanpa identitas dan menuntut 401, lalu menerima
+    // 403. Tesnya benar dan pagarnya salah.
+    //
+    // Yang benar bukan memilih salah satu, melainkan memisahkan dua jenis rute:
+    //   - rute BERJATAH (bucket ada)  -> identitas DULU (401), baru flag (403). Kanon P3
+    //     dipulihkan, dan memang jatah murid tidak bisa ditagih tanpa subjek terverifikasi.
+    //   - rute OWNER (bucket null)    -> TIDAK menuntut identitas murid sama sekali, jadi
+    //     tidak ada 401 yang bisa mendahului apa pun dan pertanyaan urutannya tidak lahir.
+    //     Otentikasinya `isOwner()` (Authorization: Bearer + OWNER_TOKEN_HASH); menuntut
+    //     sesi murid di sana memutus alat owner yang sah tanpa melindungi apa pun.
+    if (bucket) {
+      const guard = requireIdentity(ctx);
+      if (guard) return guard;
+    }
+
+    // Flag berlaku untuk KEDUA jenis rute - termasuk rute owner, karena neuronnya dari
+    // kolam yang sama: "matikan AI" yang tidak mematikan belanja owner bukan tombol mati.
     const flag = await checkAiEnabled(ctx.env);
     if (!flag.allowed) {
       return RouteAi.aiDisabledResponse({ reason: flag.reason, headers: ctx.corsHeaders || null });
     }
 
-    // Tanpa bucket = rute OWNER (lihat AI_SPEND_ROUTES di route-legacy.js). Dua hal
-    // sekaligus dilakukan di sini, dan keduanya disengaja:
-    //   - jatah MURID tidak ditagih (yang dijaga di sana adalah tagihan, dan itu tugas
-    //     plafon neuron akun di runLegacyModel());
-    //   - identitas murid TIDAK dituntut. Rute owner memakai otentikasinya SENDIRI
-    //     (`isOwner()`: Authorization: Bearer + OWNER_TOKEN_HASH), bukan cookie identitas
-    //     murid. Menuntut requireIdentity() di sini akan menjawab 401 kepada alat owner
-    //     yang memang tidak punya sesi murid - gerbang yang memutus alat yang sah, bukan
-    //     gerbang yang melindungi apa pun. Rutenya sendiri tetap menolak yang bukan owner.
+    // Rute owner: jatah MURID tidak ditagih dengan sengaja. Yang perlu dijaga di sana adalah
+    // TAGIHAN, dan itu tugas plafon neuron akun di runLegacyModel(). Rutenya sendiri tetap
+    // menolak siapa pun yang bukan owner.
     if (!bucket) return handler(ctx);
-
-    // Dari sini ke bawah jatah MURID ditagih, jadi identitas wajib: tanpa subjek
-    // terverifikasi tidak ada yang bisa ditagih, dan menagih subjek yang salah lebih
-    // buruk daripada menolak. 401 mendahului 429 supaya keadaan otentikasi tidak terbaca
-    // dari selisih jawabannya.
-    const guard = requireIdentity(ctx);
-    if (guard) return guard;
 
     if (!quotaDb(ctx.env)) {
       return jsonError(503, ERR.UNAVAILABLE, {}, { headers: Object.assign({}, ctx.corsHeaders, NO_STORE_HEADERS) });
     }
-    return enforceQuota(bucket, 1)(quotaCtxFor(ctx), () => handler(ctx));
+
+    // JATAH HANYA DITAGIH KALAU MURIDNYA DILAYANI.
+    //
+    // `enforceQuota` meng-commit setiap kali `next()` kembali tanpa melempar, dan ia
+    // SENGAJA tidak memeriksa status jawabannya (itu bukan urusannya). Tetapi handler SLOT 5
+    // menolak sebagian permintaan SEBELUM model pernah dipanggil - `prompt_too_long` (400),
+    // `text_too_long` (400) - dan penolakan itu di-RETURN, bukan dilempar. Tanpa baris di
+    // bawah, murid yang menempelkan teks terlalu panjang kehilangan satu dari 25 jatah
+    // hariannya untuk permintaan yang ditolak server dan tidak pernah menyentuh model.
+    // Diukur: 400 prompt_too_long, nol panggilan model, `ai_used` tetap naik 1.
+    //
+    // Yang dipakai untuk membatalkannya adalah kanal yang MEMANG dirancang, bukan mekanisme
+    // baru: `commitD1` menerima `actual` per-bucket, di-clamp ke yang direservasi dan
+    // minimal 0 (quota-store-d1.js), jadi `actual:{<bucket>:0}` menagih nol sekaligus
+    // melepas `held`. `enforceQuota` membacanya dari `result.actual`.
+    //
+    // Hasil handler dibungkus lalu dibuka kembali, dan itu disengaja: menempelkan `.actual`
+    // ke objek `Response` bekerja di Node hari ini, tetapi ia mengandalkan objek bawaan
+    // runtime tetap bisa ditambahi properti - asumsi yang tidak perlu diambil untuk apa pun.
+    const out = await enforceQuota(bucket, 1)(quotaCtxFor(ctx), async () => {
+      const response = await handler(ctx);
+      // >= 400 berarti murid TIDAK dilayani. Cadangan 200 saat model gagal TETAP ditagih,
+      // dan itu utang yang sudah tercatat bertanggal di PENAKARAN-NEURON-HANDOFF.md §6 -
+      // di sana modelnya memang sudah disentuh, di sini belum pernah.
+      const served = !(response && Number(response.status) >= 400);
+      return { __response: response, actual: served ? undefined : { [bucket]: 0 } };
+    });
+    return out && out.__response ? out.__response : out;
   };
 }
 
