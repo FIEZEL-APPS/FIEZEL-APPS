@@ -3,7 +3,15 @@ require('./app-report-control-path-test.js');
 const fs=require('fs'),path=require('path');
 const root=__fzRoot;
 const read=name=>fs.readFileSync(path.join(root,name),'utf8');
-const app=read('app.js'),css=read('style.css'),html=read('index.html'),worker=read('fiezel-report-worker.js'),setup=read('creator-report-setup.html'),dashboard=read('creator-report-dashboard.html');
+/* m025-308: fiezel-report-worker.js, creator-report-setup.html dan creator-report-dashboard.html
+   DIHAPUS oleh 73cd02a (migrasi Puter -> Cloudflare). Dibaca wajib di lingkup modul seperti
+   dulu, gerbang ini mati ENOENT sebelum satu assert pun jalan - 25+ assert lain yang masih
+   sah ikut tidak pernah dijalankan. readOpt mengembalikan '' bila berkasnya tiada, dan assert
+   yang menyangkut ketiganya diubah jadi penjaga TERBALIK di bawah. Pemindaian rahasia di
+   akhir berkas tetap utuh: ia memindai gabungan, dan berkas yang ada tetap ikut terpindai. */
+const readOpt=name=>{const p=path.join(root,name);return fs.existsSync(p)?fs.readFileSync(p,'utf8'):''};
+const app=read('app.js'),css=read('style.css'),html=read('index.html');
+const worker=readOpt('fiezel-report-worker.js'),setup=readOpt('creator-report-setup.html'),dashboard=readOpt('creator-report-dashboard.html');
 // AI-20 F06 (kategori 2a, UNION-CORPUS): naskah Indonesia boleh PINDAH byte-identik ke
 // copy-map features/i18n/copy-id-*.js (dijaga tests/id-golden-snapshot-test.js). Literal naskah
 // karena itu dicari di gabungan app.js + copy-map id; identifier kode tetap dicek di app.js.
@@ -51,11 +59,19 @@ check(/function buildCreatorReport/.test(app)&&/session_complete/.test(app)&&/da
 check(/queueCreatorReport/.test(app)&&/flushReportQueue/.test(app),'Report retry queue missing');
 check(/reportConsent:false/.test(app)&&/openReportPreview/.test(app),'Explicit reporting consent/privacy preview missing');
 check(/hostname\.endsWith\('\.puter\.work'\)/.test(app),'Report endpoint is not restricted to HTTPS Puter Workers');
-check(/sanitizeReport/.test(worker)&&/weakSkills:Array\.isArray/.test(worker)&&/MAX_BODY_BYTES/.test(worker),'Worker report whitelist or size validation missing');
-check(/CONFIG_LEARNER/.test(worker)&&/boundIds/.test(worker)&&/caller\.identifiers/.test(worker),'Worker is not bound to the first learner account');
-check(/isOwner/.test(worker)&&/Creator account required/.test(worker)&&/me\.puter\.kv/.test(worker),'Owner-only centralized report storage missing');
-check(/puter\.workers\.create/.test(setup)&&/puter\.fs\.write/.test(setup),'One-click Worker deployment missing');
-check(/puter\.workers\.exec/.test(dashboard)&&/fiezel-learning-report\.csv/.test(dashboard),'Creator dashboard or CSV export missing');
+/* m025-308: lima assert di bawah menjaga kontrak Worker laporan era PUTER - sanitasi
+   whitelist, batas ukuran badan, pengikatan ke akun murid pertama, penyimpanan khusus
+   owner, deploy satu-klik, dan ekspor CSV. Ketiga berkasnya dihapus 73cd02a, jadi assert
+   itu kehilangan subjeknya; memaksanya tetap wajib berarti gerbang ini merah selamanya
+   atas fitur yang memang sengaja dipensiunkan.
+   Diubah jadi penjaga TERBALIK, bukan dibuang: selama berkasnya tiada, assert lewat; begitu
+   ada yang MENGHIDUPKANNYA kembali, seluruh kontrak lama langsung berlaku lagi - termasuk
+   sanitasi dan batas ukuran, yang justru bagian paling berbahaya untuk kembali tanpa penjaga. */
+check(!worker||(/sanitizeReport/.test(worker)&&/weakSkills:Array\.isArray/.test(worker)&&/MAX_BODY_BYTES/.test(worker)),'Worker report whitelist or size validation missing');
+check(!worker||(/CONFIG_LEARNER/.test(worker)&&/boundIds/.test(worker)&&/caller\.identifiers/.test(worker)),'Worker is not bound to the first learner account');
+check(!worker||(/isOwner/.test(worker)&&/Creator account required/.test(worker)&&/me\.puter\.kv/.test(worker)),'Owner-only centralized report storage missing');
+check(!setup||(/puter\.workers\.create/.test(setup)&&/puter\.fs\.write/.test(setup)),'One-click Worker deployment missing');
+check(!dashboard||(/puter\.workers\.exec/.test(dashboard)&&/fiezel-learning-report\.csv/.test(dashboard)),'Creator dashboard or CSV export missing');
 
 const runtime=[html,app,worker,setup,dashboard,read('report-config.js')].join('\n');
 check(!/(AIza[0-9A-Za-z_-]{20,}|sk-[0-9A-Za-z_-]{20,}|Bearer\s+[A-Za-z0-9._-]{20,})/.test(runtime),'Secret-like credential found in runtime files');

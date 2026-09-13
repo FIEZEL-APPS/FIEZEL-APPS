@@ -4,8 +4,18 @@ const root=__fzRoot;
 const html=fs.readFileSync(path.join(root,'index.html'),'utf8');
 const css=fs.readFileSync(path.join(root,'style.css'),'utf8');
 const app=fs.readFileSync(path.join(root,'app.js'),'utf8');
-const setup=fs.readFileSync(path.join(root,'creator-report-setup.html'),'utf8');
-const dashboard=fs.readFileSync(path.join(root,'creator-report-dashboard.html'),'utf8');
+/* m025-308: kedua halaman bantuan (creator-report-setup.html, creator-report-dashboard.html)
+   DIHAPUS oleh 73cd02a saat migrasi Puter -> Cloudflare. Gerbang ini masih membacanya di
+   lingkup modul, sehingga SELURUH gerbang mati dengan ENOENT sebelum satu assert pun
+   berjalan - 27 assert lain yang masih sah ikut tidak pernah dijalankan.
+   Dibaca kondisional sekarang, dan assert-nya jadi penjaga TERBALIK di bawah: yang dijaga
+   bukan lagi bentuk halaman yang tidak ada, melainkan bahwa penghapusannya TETAP berlaku. */
+const auxSetupPath=path.join(root,'creator-report-setup.html');
+const auxDashPath=path.join(root,'creator-report-dashboard.html');
+const auxSetupAda=fs.existsSync(auxSetupPath);
+const auxDashAda=fs.existsSync(auxDashPath);
+const setup=auxSetupAda?fs.readFileSync(auxSetupPath,'utf8'):'';
+const dashboard=auxDashAda?fs.readFileSync(auxDashPath,'utf8'):'';
 const failures=[];
 const check=(ok,message)=>{if(!ok)failures.push(message)};
 
@@ -87,8 +97,16 @@ check(/width:calc\(100% - 16px\)/.test(css),'Mobile bottom navigation lacks a vi
 check(/max-height:min\(760px,88vh\);overflow:auto/.test(css),'Modal content is not viewport bounded.');
 check(/prefers-reduced-motion:reduce/.test(css)&&/\.reduce-motion \*/.test(css),'Reduced-motion coverage is incomplete.');
 check(!/[🔊🗣✨💡🏠📚📈]/u.test(app+html),'Runtime UI still uses legacy control emoji instead of the icon library.');
-check(/type="button" id="deploy"/.test(setup)&&/type="button" id="load"/.test(dashboard),'Auxiliary pages contain implicit buttons.');
-check(/<meta name="viewport"/.test(setup)&&/<meta name="viewport"/.test(dashboard),'Auxiliary pages are not mobile-ready.');
+/* m025-308: dua assert lama di sini memeriksa BENTUK creator-report-setup.html dan
+   creator-report-dashboard.html (tombol eksplisit, meta viewport). Kedua halaman itu sudah
+   dihapus 73cd02a, jadi assert-nya tidak lagi punya subjek. Diganti penjaga terbalik -
+   kalau salah satu halaman itu dihidupkan lagi, ia WAJIB memenuhi kontrak lama itu, bukan
+   masuk diam-diam tanpa tombol eksplisit dan tanpa meta viewport. Jadi cakupannya tidak
+   dibuang: ia menunggu subjeknya. */
+check(!auxSetupAda||(/type="button" id="deploy"/.test(setup)&&/<meta name="viewport"/.test(setup)),
+  'creator-report-setup.html hidup lagi tanpa tombol eksplisit / meta viewport.');
+check(!auxDashAda||(/type="button" id="load"/.test(dashboard)&&/<meta name="viewport"/.test(dashboard)),
+  'creator-report-dashboard.html hidup lagi tanpa tombol eksplisit / meta viewport.');
 
 // m025-93 (brief redesign Bab 2, bug kritis #2). OWNER: "bottom navigation bar menimpa
 // konten saat scroll - teks/angka terpotong di belakang nav pill".
