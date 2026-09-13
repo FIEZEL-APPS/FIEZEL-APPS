@@ -31,11 +31,23 @@ const ModelCallGate = umd(modelGateNs, 'FiezelModelCallGate');
 // == PANGGILAN MODEL DI BERKAS INI WAJIB BERPLAFON (m025-308) =========================
 //
 // KENAPA INI ADA. Berkas ini DULU menyentuh binding Workers AI secara langsung di LIMA
-// tempat: /api/ai/chat, /api/ai/translate, /api/coach/context, /api/content/qa/review,
-// /api/content/patch/candidate, dan /api/content/self-refine. Tidak satu pun lewat
-// penghitung neuron tingkat akun, dan ketiga rute pertama HIDUP dipanggil klien (app.js
-// memanggil /api/ai/chat dan /api/coach/context). Jadi jalur ini membelanjakan neuron
-// Workers AI tanpa plafon apa pun - bukan plafon yang longgar, melainkan NOL plafon.
+// tempat, dan daftar ini sengaja tepat karena orang berikutnya akan MENGAUDIT cakupan plafon
+// terhadapnya:
+//   1. /api/ai/chat
+//   2. /api/ai/translate
+//   3. /api/coach/context
+//   4. /api/content/qa/review
+//   5. /api/content/patch/candidate
+// /api/content/self-refine SENGAJA TIDAK ada di daftar ini: ia hanya menulis ke
+// evolution_ledger dan tidak pernah memanggil model, jadi ia tidak butuh pembungkus.
+// (Versi pertama komentar ini menulis "LIMA" lalu menyebut ENAM rute, dengan self-refine
+// ikut terbawa. Kekeliruannya bukan kosmetik: pengaudit berikutnya akan mencari pembungkus
+// yang hilang pada rute yang memang tidak pernah memerlukannya.)
+//
+// Tidak satu pun dari kelima itu lewat penghitung neuron tingkat akun, dan ketiga yang
+// pertama HIDUP dipanggil klien (app.js memanggil /api/ai/chat dan /api/coach/context). Jadi
+// jalur ini membelanjakan neuron Workers AI tanpa plafon apa pun - bukan plafon yang longgar,
+// melainkan NOL plafon.
 //
 // tests/ai-account-cap-gate-test.js butir A1 menangkapnya dengan MEMINDAI SUMBER: binding
 // itu hanya boleh dieja di ai/model-call-gate.js. Gerbang itu memerah karena berkas ini
