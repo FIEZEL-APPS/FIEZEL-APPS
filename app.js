@@ -5569,7 +5569,8 @@ function cfShadowProbe(path,options,answer){
 // Jalur Cloudflare murni — Puter telah dihapus sepenuhnya.
 // Semua panggilan coreWorkerExec langsung dilayani oleh Cloudflare Worker fiezel-api.
 //
-// m025-307: dua cabang Puter di fungsi ini DIBUANG, bukan komentarnya yang diperlunak.
+// m025-307: dua cabang Puter di fungsi ini SENGAJA DIPERTAHANKAN, dan ini catatan atas
+// kesalahan yang hampir mendarat.
 // Sebuah tinjauan otomatis menandai komentar di atas sebagai bohong ("kodenya menambahkan
 // kembali jalur Puter sebagai cadangan") dan menyarankan menulis ulang komentarnya jadi
 // "CF-first-with-Puter-fallback". Diperiksa sampai ke sumbernya, saran itu SALAH ARAH:
@@ -5581,19 +5582,27 @@ function cfShadowProbe(path,options,answer){
 //   - core-config.js menyatakan deploymentState:'cloudflare-only', "jalur Puter SENGAJA
 //     tidak dikonfigurasi, bukan lupa".
 //
-// Jadi `self.puter?.workers?.exec` selalu undefined dan `await awaitPuter()` selalu null:
-// kedua cabang itu MATI, dan komentarnya justru benar secara perilaku. Menulis ulang komentar jadi
-// "ada cadangan Puter" akan membuatnya BOHONG - menjanjikan jalur mundur yang tidak ada.
+// Jadi DI PERAMBAN `self.puter?.workers?.exec` selalu undefined dan `await awaitPuter()`
+// selalu null: kedua cabang itu tidak pernah dipakai murid, dan komentar di atas benar secara
+// perilaku produksi. Menulis ulang komentar jadi "ada cadangan Puter" akan membuatnya BOHONG.
 //
-// Yang benar-benar bermasalah adalah kode matinya, karena ia membuat pembaca (dan peninjau
-// otomatis) menyimpulkan ada jalur mundur. Dibuang, jadi kode dan komentar sama-sama jujur.
+// TETAPI cabangnya TIDAK BOLEH DIBUANG, dan itu pelajaran yang dibayar: saya meruntuhkan
+// fungsi ini jadi `return cfWorkerFetch(...)` dengan alasan "kodenya mati", lalu LIMA gerbang
+// berubah merah - ai-integration, cf-client-timeout, cf-config-killswitch, deploy-site-gate,
+// e2e-level-grammar. Sebabnya: gerbang-gerbang itu MENYUNTIKKAN `context.puter.workers.exec`
+// sebagai seam untuk memeriksa jalur transport tanpa jaringan sungguhan. Jadi cabang ini mati
+// bagi murid dan HIDUP bagi gerbang.
+//
+// "Kode mati" karena itu bukan kesimpulan yang boleh diambil dari pembacaan runtime peramban
+// saja. Ia harus diuji terhadap gerbangnya juga - dan di sini gerbangnyalah yang memegang
+// kontraknya.
 //
 // KONSEKUENSI YANG PERLU DISADARI, dan sengaja ditulis di sini: `coreWorkerExec` merutekan
 // mode 'off' ke fungsi ini. Karena tidak ada transport lain, mode 'off' TETAP mendarat di
 // Cloudflare. Artinya sakelar 'off' tidak bisa lagi mematikan CF - ia hanya menandai niat.
 // Itu bukan regresi yang diperkenalkan di sini (perilakunya identik sebelum dan sesudah),
 // tetapi ia perlu diketahui siapa pun yang mengandalkannya sebagai killswitch.
-async function corePuterExec(path,options={}){return cfWorkerFetch(path,options)}
+async function corePuterExec(path,options={}){const url=(self.CORE_WORKER_URL||'')+path;if(self.puter?.workers?.exec)return puter.workers.exec(url,options);const sdk=await (self.awaitPuter?self.awaitPuter():null);if(sdk?.workers?.exec)return sdk.workers.exec(url,options);return cfWorkerFetch(path,options)}
 async function coreWorkerExec(path,options={}){
   const mode=cfEndpointMode(path);
   if(mode==='off')return corePuterExec(path,options);
@@ -5924,7 +5933,17 @@ function openApp(){
   // Mengambilnya lebih awal (mis. begitu DOM siap) justru merebut pita dari app.js dan
   // ~2,7 MB JSON kontennya di jaringan seluler, sehingga penghematannya hilang seluruhnya.
   try{self.FiezelLazy?.start?.()}catch{}
-  startReminderEngine();showBrandSplash();if(CORE_WORKER_URL){coreBrainHealth().then(health=>{const quietToast=m=>{try{if(self.FiezelStage?.lessonMode?.())return console.debug('FIEZEL:',m);showToast(m)}catch(_){showToast(m)}};/* q19-P3: jargon infra tidak memotong ujian pertama */if(!health.ok){if(REMOTE_PUSH_REQUIRED)quietToast(FiezelI18n.t('sys.core-belum-tersambung'));return}return ensureRemotePushSubscription().then(result=>{if(result.ok){syncRemoteLearningActivity();quietToast(FiezelI18n.t('sys.core-push-aktif'))}else if(REMOTE_PUSH_REQUIRED)quietToast(FiezelI18n.t('sys.core-push-belum'))})})}// m025-42: the third install prompt. It runs after the notification gate clears so the
+  startReminderEngine();showBrandSplash();/* m025-307: probe /health DULU menyala hanya dengan syarat CORE_WORKER_URL ada. Sebelum
+   migrasi Cloudflare syarat itu praktis tidak pernah terpenuhi (CORE_CONFIG.workerUrl
+   kosong), jadi cacatnya tidak terlihat. Sesudah migrasi, CORE_WORKER_URL diambil dari
+   FIEZEL_CF_CONFIG.base yang SELALU terisi - jadi setiap boot menembakkan satu permintaan
+   jaringan, termasuk boot di perangkat yang sedang luring. Yang didapat murid luring dari
+   itu: satu permintaan gagal, satu toast 'core belum tersambung', dan nol informasi baru -
+   ia sudah tahu dirinya luring.
+
+   `onLine===false` dipakai sebagai satu-satunya sinyal, bukan `!onLine`: nilai true bisa
+   bohong (terhubung Wi-Fi tanpa internet), tetapi false dapat dipercaya. Jadi yang
+   dilewati hanya keadaan yang jelas luring, dan keadaan ragu tetap mencoba. */if(CORE_WORKER_URL&&self.navigator?.onLine!==false){coreBrainHealth().then(health=>{const quietToast=m=>{try{if(self.FiezelStage?.lessonMode?.())return console.debug('FIEZEL:',m);showToast(m)}catch(_){showToast(m)}};/* q19-P3: jargon infra tidak memotong ujian pertama */if(!health.ok){if(REMOTE_PUSH_REQUIRED)quietToast(FiezelI18n.t('sys.core-belum-tersambung'));return}return ensureRemotePushSubscription().then(result=>{if(result.ok){syncRemoteLearningActivity();quietToast(FiezelI18n.t('sys.core-push-aktif'))}else if(REMOTE_PUSH_REQUIRED)quietToast(FiezelI18n.t('sys.core-push-belum'))})})}// m025-42: the third install prompt. It runs after the notification gate clears so the
 // three popups never stack, and it silences itself for good once both bundles exist.
 // m025-96: gerbang unduhan suara dipensiunkan - tidak ada lagi bundel yang diunduh.
 // m025-254: kunci "target harian WAJIB" (m025-42/43) DIHAPUS seluruhnya - modul, lembar,

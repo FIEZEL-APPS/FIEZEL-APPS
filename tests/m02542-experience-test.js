@@ -296,9 +296,22 @@ test('Fiezel AI answers anything, and says plainly when it cannot', () => {
   // W4-QA — union W2: kalimatnya PINDAH byte-identik ke copy-id-feat-b.js (AI-02 F01);
   // sah bila masih inline ATAU dirender lewat kunci i18n yang nilainya memuat kalimat sama.
   const featBCopySrc = fs.readFileSync('features/i18n/copy-id-feat-b.js', 'utf8');
-  assert.ok(/login Puter dulu/.test(chatSrc) ||
-    (/T\('tutor\.ai-need-login'\)/.test(chatSrc) && /login Puter dulu/.test(featBCopySrc)),
-    'and it names the actual fix');
+  /* m025-307: assert ini DULU menuntut kalimatnya berbunyi "login Puter dulu". Puter sudah
+     pensiun (deploymentState 'cloudflare-only'), jadi menuntutnya kembali berarti menuntut
+     FIEZEL menyuruh murid melakukan sesuatu yang tidak mungkin lagi ia lakukan - nasihat yang
+     SALAH, bukan sekadar usang. Naskahnya sudah benar di main ("pastikan koneksi internet
+     aktif"), dan gerbangnyalah yang tertinggal.
+
+     Maksud assert aslinya tetap dijaga: pesan ketidaktersediaan harus MENYEBUT jalan keluar,
+     bukan hanya mengumumkan kegagalan. Ditambah satu pagar baru - ia tidak boleh kembali
+     menyuruh murid login Puter. */
+  assert.ok(/T\('tutor\.ai-need-login'\)/.test(chatSrc), 'the reason is rendered through the i18n key');
+  const alasanId = (/'tutor\.ai-need-login':\s*'([^']*)'/.exec(featBCopySrc) || [])[1] || '';
+  assert.ok(alasanId.length > 0, 'tutor.ai-need-login tidak ada di copy-id-feat-b.js');
+  assert.ok(/koneksi|internet|jaringan/i.test(alasanId),
+    'and it names the actual fix (jalan keluarnya, bukan hanya kegagalannya): ' + alasanId);
+  assert.ok(!/puter/i.test(alasanId),
+    'pesan ketidaktersediaan menyuruh murid login Puter, yang sudah tidak mungkin: ' + alasanId);
 });
 
 test('Speaking and Listening no longer carries an optional voice setup', () => {
