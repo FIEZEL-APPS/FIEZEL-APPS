@@ -213,7 +213,14 @@ test('kartu akun menawarkan keluar DAN jalan masuk lagi', () => {
     throw new Error('tombol keluar tidak pernah disambungkan');
   if (!APP.includes("$('btnFiezelOpenAuth')?.addEventListener"))
     throw new Error('tombol masuk tidak pernah disambungkan');
-  if (!APP.includes('bindAccountSettingControls()')) throw new Error('kendali kartu akun tidak pernah disambungkan');
+  /* Temuan review Gitar atas perbaikan m025-308 ini sendiri, dan ia benar: assert lama
+     menunjuk bindAccountSettingControls(), padahal 2db8622 mengosongkan fungsi itu jadi
+     stub tanpa badan ("kontrol Akun Puter dinetralkan"). Menjaga stub kosong berarti
+     binder yang SEBENARNYA boleh dicabut tanpa memerahkan apa pun. Yang benar-benar
+     menyambungkan btnFiezelOpenAuth dan btnFiezelLogout adalah bindFiezelAccountControls(),
+     jadi itu yang dijaga - dan dijaga pada PEMANGGILANNYA, bukan pada definisinya. */
+  if (!APP.includes('bindFiezelAccountControls();'))
+    throw new Error('bindFiezelAccountControls() tidak pernah DIPANGGIL; kartu akun tidak tersambung');
 });
 
 test('pengaturan tidak lagi menjual unduhan kepada murid', () => {
