@@ -1414,9 +1414,8 @@ function renderLearnerDirectory(m) {
       lane bukti per-murid belum dinyalakan. Ini BUKAN "nol murid".</div>`;
   }
   if (!d.learners.length) {
-    return `<div class="note">BELUM ADA MURID yang mengirim bukti per-murid pada periode ini.
-      Lane ini menuntut PERSETUJUAN tiap murid (Pengaturan &rsaquo; Bukti belajar per murid);
-      daftar kosong berarti belum ada yang menyetujuinya, bukan belum ada yang belajar.</div>`;
+    return `<div class="note">BELUM ADA MURID yang terdaftar atau mengirim bukti pada periode ini.
+      Murid yang memasukkan nama di perkenalan akan otomatis tersinkron ke daftar ini.</div>`;
   }
   const rows = d.learners.map((x) => {
     const selected = m.learnerSub === x.sub;
