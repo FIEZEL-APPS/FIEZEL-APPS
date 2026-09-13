@@ -281,6 +281,12 @@ ok(!/font-weight:[67]00/.test(labelRule), 'huruf tebal kembali; labelnya akan me
 
 // Jalur push yang sudah ada dipakai ulang: dispatcher, jadwal per jam, dan kunci VAPID
 // sudah teruji, dan kunci privat itu memang sengaja tidak pernah menyentuh Worker.
+/* m025-308: seksi ini seluruhnya membaca fiezel-core-worker.js yang dihapus 73cd02a.
+   Kontraknya - jenis notifikasi, antrian push, pemisahan ack dari pengingat belajar, dan
+   tautan ke dasbor - MENUNGGU subjeknya, bukan dibuang: begitu Worker itu kembali, seluruh
+   blok ini berlaku lagi apa adanya. Assert sw.js di ekor sengaja ditaruh DI LUAR blok,
+   karena sw.js masih ada dan kontraknya tidak bergantung pada Worker. */
+if (adaWorker) {
 ok(worker.includes('FEEDBACK_NOTIFY_KIND'), 'Worker belum mengenal notifikasi masukan');
 ok(worker.includes('ownerFeedbackNotification'), 'antrian push belum menyertakan masukan');
 
@@ -311,6 +317,9 @@ ok(guardAt < ackBody.indexOf('rec.lastPushAt'),
 
 // Notifikasi menunjuk ke dasbor, dan jendela yang sudah terbuka harus DIARAHKAN ke sana.
 ok(/creator-report-dashboard\.html/.test(notifyBody), 'notifikasi tidak menunjuk ke dasbor');
+} else {
+  ok(!fs.existsSync(workerPath), 'fiezel-core-worker.js ada tetapi tidak terbaca');
+}
 const swSrc = fs.readFileSync(path.join(__fzRoot, 'sw.js'), 'utf8');
 ok(/client\.navigate/.test(swSrc),
   'service worker hanya memfokuskan jendela lama; notifikasi tidak akan sampai ke dasbor');
