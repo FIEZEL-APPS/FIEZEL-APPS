@@ -3,7 +3,7 @@
   var I18N = (root && root.FiezelI18n) || (typeof FiezelI18n !== 'undefined' ? FiezelI18n : null);
   if (!I18N || typeof I18N.registerCopy !== 'function') return;
   var MAP = {
-    'ai.ai-belum-siap-login-puter': 'AI ยังไม่พร้อม ต้องเข้าสู่ระบบ Puter และเชื่อมต่ออินเทอร์เน็ต',
+    'ai.ai-belum-siap-login-puter': 'AI ยังไม่พร้อม ต้องการการเชื่อมต่ออินเทอร์เน็ต',
     'ai.ai-coach-core-merespons': 'AI Coach Core ตอบกลับ {status}',
     'ai.ai-core-merespons': 'AI core ตอบกลับ {status}',
     'ai.ai-core-tidak-mengembalikan-answer': 'AI Core ไม่ได้ส่งคำตอบแบบข้อความกลับมา',

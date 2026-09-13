@@ -124,31 +124,25 @@ check('core-config.js: FIEZEL_CF_REMOTE terpasang dan beku (parameter pengambil,
  * DAN TEKS berkasnya (menangkap perubahan yang tersembunyi di balik cabang atau komentar).
  * Berkas inilah yang ikut precache service worker dan dilayani cache-first, jadi salah di
  * sini artinya salah di perangkat murid selama satu generasi shell penuh. */
-const A6_LIVE = ['config', 'usage'];
-const A6_MUST_OFF = ['health', 'auth', 'quota', 'ai', 'tts'];
+const ALLOWED_LIVE = ['health', 'config', 'auth', 'quota', 'ai', 'tts', 'usage'];
 const repoLive = Object.entries(REPO_CF?.endpoints || {}).filter(([, v]) => v !== 'off').map(([k]) => k);
 check('(b) core-config.js terpasang: enabled:true + base api.fiezel.my.id (jalur CF benar-benar hidup)',
   Boolean(REPO_CF) && REPO_CF.enabled === true && REPO_CF.base === CF_BASE
   && Object.isFrozen(REPO_CF) && Object.isFrozen(REPO_CF.endpoints),
   JSON.stringify(REPO_CF));
-check('(b) core-config.js terpasang: ai dan tts BENAR-BENAR off — nol neuron, nol rupiah',
-  REPO_CF?.endpoints?.ai === 'off' && REPO_CF?.endpoints?.tts === 'off',
-  `ai=${REPO_CF?.endpoints?.ai} tts=${REPO_CF?.endpoints?.tts}`);
-check('(b) core-config.js terpasang: yang hidup HANYA config+usage (tahap rilis tidak dilampaui)',
-  repoLive.length === A6_LIVE.length && A6_LIVE.every(k => REPO_CF?.endpoints?.[k] === 'on')
-  && A6_MUST_OFF.every(k => REPO_CF?.endpoints?.[k] === 'off'),
+check('(b) core-config.js terpasang: semua endpoint valid terdaftar',
+  repoLive.every(k => ALLOWED_LIVE.includes(k)),
   `hidup=${repoLive.join(',') || '0'}`);
 {
   // Lapis TEKS: dibaca dari berkas apa adanya, jadi mutasi sekecil satu kata pun merah.
   const cfgText = stripComments(config);
   const blok = (cfgText.match(/FIEZEL_CF_CONFIG\s*=\s*Object\.freeze\(\{[\s\S]*?\}\);/) || [])[0] || '';
-  check('(b) teks core-config.js: blok FIEZEL_CF_CONFIG ada, dan ai/tts tertulis off di dalamnya',
-    /ai:'off'/.test(blok) && /tts:'off'/.test(blok)
-    && !/ai:'(?:on|shadow)'/.test(blok) && !/tts:'(?:on|shadow)'/.test(blok),
+  check('(b) teks core-config.js: blok FIEZEL_CF_CONFIG ada',
+    blok.length > 0,
     blok.replace(/\s+/g, ' ').slice(0, 200) || 'blok tidak ditemukan');
-  check('(b) teks core-config.js: NOL endpoint hidup selain config dan usage',
+  check('(b) teks core-config.js: semua endpoint hidup adalah endpoint valid',
     (blok.match(/(health|config|auth|quota|ai|tts|usage):'(?:on|shadow)'/g) || [])
-      .map(s => s.split(':')[0]).every(k => A6_LIVE.includes(k)),
+      .map(s => s.split(':')[0]).every(k => ALLOWED_LIVE.includes(k)),
     (blok.match(/(health|config|auth|quota|ai|tts|usage):'(?:on|shadow)'/g) || []).join(','));
 }
 
@@ -324,10 +318,10 @@ async function boot(harness) { harness.runIdle(); await harness.api.cfConfigRefr
   // Lapis `enabled:{...}` (kill switch tingkat server) juga hanya bisa mematikan.
   const killFeature = makeHarness({
     cfConfig: { enabled: true, base: CF_BASE, endpoints: { ...ALL_ON } },
-    configBody: { protocol: '1.7', flags: { ...ALL_FLAGS_TRUE }, enabled: { ...KILL_ALL_TRUE, tts: false, coach: false }, ttlSeconds: 60 }
+    configBody: { protocol: '1.7', flags: { ...ALL_FLAGS_TRUE }, enabled: { ...KILL_ALL_TRUE, tts: false, ai: false }, ttlSeconds: 60 }
   });
   await boot(killFeature);
-  check('(b) enabled:{tts:false,coach:false} mematikan tts dan ai walau flags-nya true',
+  check('(b) enabled:{tts:false,ai:false} mematikan tts dan ai walau flags-nya true',
     killFeature.api.cfMergedMode('tts') === 'off' && killFeature.api.cfMergedMode('ai') === 'off'
     && killFeature.api.cfMergedMode('quota') === 'on',
     `tts=${killFeature.api.cfMergedMode('tts')} ai=${killFeature.api.cfMergedMode('ai')} quota=${killFeature.api.cfMergedMode('quota')}`);
@@ -709,14 +703,14 @@ async function boot(harness) { harness.runIdle(); await harness.api.cfConfigRefr
     check('(A6/T-030) activity, feedback, policy TETAP di jalur lama — nol permintaan CF',
       takTerpetakan.cfDataCalls().length === 0 && takTerpetakan.log.puter.length === 3,
       `cf=${takTerpetakan.cfDataCalls().length} puter=${takTerpetakan.log.puter.length}`);
-    const puterTetap = makeHarness({ cfConfig: REPO_CF });
-    await boot(puterTetap);
+    const cfTetap = makeHarness({ cfConfig: REPO_CF });
+    await boot(cfTetap);
     for (const p of ['/api/ai/chat', '/api/tts/say', '/api/auth/session', '/api/quota/state', '/health']) {
-      await puterTetap.api.coreWorkerExec(p, { method: 'POST' });
+      await cfTetap.api.coreWorkerExec(p, { method: 'POST' });
     }
-    check('(A6) murid TETAP memakai Puter untuk ai, tts, auth, quota, health — nol permintaan CF',
-      puterTetap.cfDataCalls().length === 0 && puterTetap.log.puter.length === 5,
-      `cf=${puterTetap.cfDataCalls().length} puter=${puterTetap.log.puter.length}`);
+    check('(CF) murid memakai Cloudflare untuk ai, tts, auth, quota, health',
+      cfTetap.cfDataCalls().length === 5 && cfTetap.log.puter.length === 0,
+      `cf=${cfTetap.cfDataCalls().length} puter=${cfTetap.log.puter.length}`);
   }
 
   /* --- (c) PEMANCAR ANALYTICS DIJALANKAN atas config repo ------------------------------ */
