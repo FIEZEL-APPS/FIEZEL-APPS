@@ -11450,7 +11450,48 @@ function tutorCenterView(){
   const shell=self.FiezelTeacherShell;
   if(shell&&self.FiezelTeacherStore){
     setApp('<div id="fzTeacherShell" class="teacher-shell-root"></div>');
-    shell.mount($('fzTeacherShell'),{toast:showToast,afterRender:refreshIcons,exit:()=>go('home')});
+    shell.mount($('fzTeacherShell'),{
+      toast:showToast,
+      afterRender:refreshIcons,
+      exit:(opts)=>{
+        try{
+          if(typeof history!=='undefined'&&history.replaceState&&typeof location!=='undefined'){
+            const u=new URL(location.href);
+            if(u.searchParams.has('teacher')){
+              u.searchParams.delete('teacher');
+              const clean=u.pathname+(u.search?u.search:'')+(u.hash?u.hash:'');
+              history.replaceState(null,document.title||'',clean);
+            }
+          }
+        }catch(_){}
+        if(state.preferences?.role==='guru'&&!isVerifiedTeacher()){
+          state.preferences={...state.preferences,role:'murid'};
+          try{save()}catch(_){}
+        }
+        if(opts?.target==='landing'){
+          try{
+            if(location.pathname.includes('/app')){
+              location.href='../#hero';
+              return;
+            }
+            if(document.referrer){
+              try{
+                const ref=new URL(document.referrer);
+                if(ref.origin===location.origin&&(ref.pathname.includes('/website')||ref.pathname.includes('landing.html'))){
+                  location.href=document.referrer;
+                  return;
+                }
+              }catch(_){}
+            }
+            location.href='../#hero';
+          }catch(_){
+            location.href='../#hero';
+          }
+          return;
+        }
+        go('home');
+      }
+    });
     return;
   }
   setApp('<div id="fzTutorCenter" class="tutor-center-shell"></div>');
