@@ -1069,9 +1069,40 @@ function applyContentLocale(){
         return thC ? Object.assign({}, c, thC) : c;
       });
     }
+    // m025-308: prompt + catatan tugas ujian. Terjemahannya sudah ikut terunduh sejak
+    // writing-prompts-th.json dibuat, lalu MENGANGGUR karena overlay hanya menyalin honesty
+    // dan rubrik - 45 petunjuk dan 5 catatan ujian sampai ke murid Thai dalam bahasa Indonesia.
+    //
+    // `hint` th ditulis ke slot `id_hint`, nama bidang WARISAN yang dibaca penyaji
+    // (app.js writingView). Menamainya ulang jadi `hint` akan memutus jalur `id` yang
+    // byte-identik, jadi yang berpindah adalah ISInya, bukan nama slotnya.
+    if(thReady.writing.prompts && Array.isArray(WRITING_BANK._orig.prompts)){
+      WRITING_BANK.prompts = WRITING_BANK._orig.prompts.map(p=>{
+        const t = thReady.writing.prompts[String(p?.id||'')];
+        if(!t) return p;
+        const out = Object.assign({}, p);
+        if(t.hint) out.id_hint = t.hint;
+        if(t.focus) out.focus = t.focus;
+        return out;
+      });
+    }
+    // examTasks: HANYA `note` yang diterjemahkan. `label` adalah nama ujian (IELTS/TOEFL),
+    // dan `minWords`/`minutes` adalah kontrak penilaian - satu angka bergeser dan murid
+    // dinilai atas target yang berbeda dari ujian aslinya. Jadi bidangnya disebut satu per
+    // satu, bukan Object.assign yang menelan apa pun yang kelak muncul di sidecar.
+    if(thReady.writing.examTasks && WRITING_BANK._orig.examTasks){
+      const src = WRITING_BANK._orig.examTasks, out = {};
+      for(const k of Object.keys(src)){
+        const t = thReady.writing.examTasks[k];
+        out[k] = t?.note ? Object.assign({}, src[k], {note:t.note}) : src[k];
+      }
+      WRITING_BANK.examTasks = out;
+    }
   } else if(WRITING_BANK?._orig) {
     WRITING_BANK.honesty = WRITING_BANK._orig.honesty;
     if(WRITING_BANK.rubric) WRITING_BANK.rubric.criteria = WRITING_BANK._orig.rubric.criteria;
+    if(Array.isArray(WRITING_BANK._orig.prompts)) WRITING_BANK.prompts = WRITING_BANK._orig.prompts;
+    if(WRITING_BANK._orig.examTasks) WRITING_BANK.examTasks = JSON.parse(JSON.stringify(WRITING_BANK._orig.examTasks));
   }
   if(thReady?.reading && READING_EXAM){
     if(!READING_EXAM._orig) READING_EXAM._orig = JSON.parse(JSON.stringify(READING_EXAM));
@@ -1081,9 +1112,37 @@ function applyContentLocale(){
         if(READING_EXAM.examFormats[k]) Object.assign(READING_EXAM.examFormats[k], thReady.reading.formats[k]);
       }
     }
+    // m025-308: umpan balik per soal. Sama seperti writing: 8 set / 96 soal terjemahan `why`
+    // dan `whyOthersFail` sudah ada di perangkat murid dan tidak pernah dipakai, jadi setiap
+    // penjelasan sesudah menjawab berbahasa Indonesia.
+    //
+    // makeExamReadingQuestion() membaca q.explain.why -> why dan q.explain.whyOthersFail ->
+    // distractor, jadi overlay bekerja di tingkat SUMBER, bukan di objek soal yang sudah jadi.
+    //
+    // Yang TIDAK disentuh, dan alasannya keras: `stem`, `options`, `answerIndex`, dan
+    // `evidence`. Ketiga yang pertama adalah objek ujinya - satu pilihan bergeser menilai
+    // murid salah atas jawaban yang benar, tanpa jejak. `evidence` adalah kutipan verbatim
+    // dari teks berbahasa Inggris; menerjemahkannya membuat murid mencari kalimat yang tidak
+    // ada di bacaan.
+    if(thReady.reading.passages && Array.isArray(READING_EXAM._orig.passages)){
+      const pTh = thReady.reading.passages;
+      READING_EXAM.passages = READING_EXAM._orig.passages.map(p=>{
+        const e = pTh[String(p?.id||'')];
+        if(!e?.questions || !Array.isArray(p.questions)) return p;
+        return Object.assign({}, p, {questions:p.questions.map(q=>{
+          const t = e.questions[String(q?.id||'')];
+          if(!t) return q;
+          const ex = Object.assign({}, q.explain||{});
+          if(t.why) ex.why = t.why;
+          if(t.whyOthersFail) ex.whyOthersFail = t.whyOthersFail;
+          return Object.assign({}, q, {explain:ex});
+        })});
+      });
+    }
   } else if(READING_EXAM?._orig) {
     READING_EXAM.honesty = READING_EXAM._orig.honesty;
     if(READING_EXAM.examFormats) READING_EXAM.examFormats = JSON.parse(JSON.stringify(READING_EXAM._orig.examFormats));
+    if(Array.isArray(READING_EXAM._orig.passages)) READING_EXAM.passages = READING_EXAM._orig.passages;
   }
   // --- BANK SOAL: reading A1/A2, cloze, diagnosis miskonsepsi (m025-230) ---------------
   // Tiga sidecar ini menutup jalur yang dulu TIDAK PERNAH punya overlay: murid Thai membaca
@@ -1882,7 +1941,24 @@ function braincoreEvidenceEmitSnapshot(nowMs=Date.now()){
     if(accuracy==null){
       const history=(state.history||[]).filter(h=>historyMatchesActive(h,activeLevel));
       const recent=history.slice(-20);
-      accuracy=recent.length?Math.round(recent.filter(h=>h.ok).length/recent.length*100):(history.length?Math.round(history.filter(h=>h.ok).length/history.length*100):50);
+      /* m025-308: cadangan terakhir DULU `50`, dan itu melanggar kanon repo ini sendiri.
+         Untuk murid yang benar-benar baru - nol policyOutcome, nol riwayat - `accuracy`
+         menjadi 50: bukan null, bukan ditandai kurang data, melainkan angka yang tampak
+         seperti hasil pengukuran. Dan fungsi ini bukan penghias layar; ia membangun
+         buildLearnerEvidenceEvent, lane bukti belajar yang TERSINKRON KE GURU. Jadi guru
+         bisa melihat murid yang belum menjawab satu soal pun tercatat akurasi 50%.
+
+         Aturannya sudah diputuskan dan diuji di lane metrik: riwayat kosong -> accuracy
+         null DAN ditandai insufficient (tests/learning-metrics-test.js), nilai
+         insufficient tidak dirilis (tests/metrics-digest-test.js), dan
+         tests/personal-journey-test.js menyatakan maksudnya: "tidak menebak skill yang
+         belum diukur".
+
+         null adalah jalur yang DIDUKUNG, bukan kekosongan yang tidak tertangani:
+         bucketCalibration() di fiezel-braincore-evidence.js memulai dengan
+         `if (a === null) return null`. Jadi yang terkirim ke guru adalah "belum
+         terukur", bukan tebakan yang menyamar sebagai ukuran. */
+      accuracy=recent.length?Math.round(recent.filter(h=>h.ok).length/recent.length*100):(history.length?Math.round(history.filter(h=>h.ok).length/history.length*100):null);
     }
     let improvementDelta=latest?.accuracyDelta??0;
     const input=M.fromSnapshot(snapshot,{
@@ -4826,7 +4902,21 @@ async function attemptGoogleSignIn(){
           setAuthGateState('error',{message:hasil?.message||FiezelI18n.t('google.gagal')});
         }
       },{width:280});
-      if(res?.ok&&window.google?.accounts?.id?.prompt){
+      // m025-308: res.ok DULU hanya dibaca sebagai syarat memanggil prompt(), dan cabang
+      // gagalnya tidak ada - jadi saat renderButton mengembalikan {ok:false} (skrip Google
+      // tidak bisa dimuat, clientId belum dikonfigurasi, tidak ada host), alurnya jatuh ke
+      // `return true` sambil meninggalkan gerbang di keadaan 'pending'. Murid melihat spinner
+      // yang tidak pernah berhenti: tanpa teks galat, tanpa tombol Google, dan tanpa jalan ke
+      // tombol masuk FIEZEL di bawahnya. Di jaringan sekolah yang memblokir accounts.google.com
+      // itu keadaan sehari-hari, bukan kasus tepi.
+      //
+      // fiezel-google.js menyatakan kontraknya eksplisit di baris 205: pemanggil WAJIB
+      // bereaksi pada {ok:false} dengan menampilkan cadangan.
+      if(!res?.ok){
+        setAuthGateState('error',{message:res?.message||FiezelI18n.t('google.gagal-muat','Tombol Google belum bisa dimuat. Masuk dengan akun FIEZEL di bawah, ya.')});
+        return false;
+      }
+      if(window.google?.accounts?.id?.prompt){
         window.google.accounts.id.prompt((notification)=>{
           if(notification.isNotDisplayed()||notification.isSkippedMoment()){}
         });
@@ -5478,6 +5568,40 @@ function cfShadowProbe(path,options,answer){
 }
 // Jalur Cloudflare murni — Puter telah dihapus sepenuhnya.
 // Semua panggilan coreWorkerExec langsung dilayani oleh Cloudflare Worker fiezel-api.
+//
+// m025-308: dua cabang Puter di fungsi ini SENGAJA DIPERTAHANKAN, dan ini catatan atas
+// kesalahan yang hampir mendarat.
+// Sebuah tinjauan otomatis menandai komentar di atas sebagai bohong ("kodenya menambahkan
+// kembali jalur Puter sebagai cadangan") dan menyarankan menulis ulang komentarnya jadi
+// "CF-first-with-Puter-fallback". Diperiksa sampai ke sumbernya, saran itu SALAH ARAH:
+//
+//   - `awaitPuter()` sudah menjadi STUB yang selalu mengembalikan null (lihat deklarasinya
+//     di dekat puterAuthAvailable/puterSignedIn, yang juga sudah dipaku `false`);
+//   - tidak ada satu pun berkas yang memuat js.puter.com sebagai <script> lagi, jadi
+//     `self.puter` tidak pernah terisi;
+//   - core-config.js menyatakan deploymentState:'cloudflare-only', "jalur Puter SENGAJA
+//     tidak dikonfigurasi, bukan lupa".
+//
+// Jadi DI PERAMBAN `self.puter?.workers?.exec` selalu undefined dan `await awaitPuter()`
+// selalu null: kedua cabang itu tidak pernah dipakai murid, dan komentar di atas benar secara
+// perilaku produksi. Menulis ulang komentar jadi "ada cadangan Puter" akan membuatnya BOHONG.
+//
+// TETAPI cabangnya TIDAK BOLEH DIBUANG, dan itu pelajaran yang dibayar: saya meruntuhkan
+// fungsi ini jadi `return cfWorkerFetch(...)` dengan alasan "kodenya mati", lalu LIMA gerbang
+// berubah merah - ai-integration, cf-client-timeout, cf-config-killswitch, deploy-site-gate,
+// e2e-level-grammar. Sebabnya: gerbang-gerbang itu MENYUNTIKKAN `context.puter.workers.exec`
+// sebagai seam untuk memeriksa jalur transport tanpa jaringan sungguhan. Jadi cabang ini mati
+// bagi murid dan HIDUP bagi gerbang.
+//
+// "Kode mati" karena itu bukan kesimpulan yang boleh diambil dari pembacaan runtime peramban
+// saja. Ia harus diuji terhadap gerbangnya juga - dan di sini gerbangnyalah yang memegang
+// kontraknya.
+//
+// KONSEKUENSI YANG PERLU DISADARI, dan sengaja ditulis di sini: `coreWorkerExec` merutekan
+// mode 'off' ke fungsi ini. Karena tidak ada transport lain, mode 'off' TETAP mendarat di
+// Cloudflare. Artinya sakelar 'off' tidak bisa lagi mematikan CF - ia hanya menandai niat.
+// Itu bukan regresi yang diperkenalkan di sini (perilakunya identik sebelum dan sesudah),
+// tetapi ia perlu diketahui siapa pun yang mengandalkannya sebagai killswitch.
 async function corePuterExec(path,options={}){const url=(self.CORE_WORKER_URL||'')+path;if(self.puter?.workers?.exec)return puter.workers.exec(url,options);const sdk=await (self.awaitPuter?self.awaitPuter():null);if(sdk?.workers?.exec)return sdk.workers.exec(url,options);return cfWorkerFetch(path,options)}
 async function coreWorkerExec(path,options={}){
   const mode=cfEndpointMode(path);
@@ -5809,7 +5933,17 @@ function openApp(){
   // Mengambilnya lebih awal (mis. begitu DOM siap) justru merebut pita dari app.js dan
   // ~2,7 MB JSON kontennya di jaringan seluler, sehingga penghematannya hilang seluruhnya.
   try{self.FiezelLazy?.start?.()}catch{}
-  startReminderEngine();showBrandSplash();if(CORE_WORKER_URL&&navigator.onLine!==false){coreBrainHealth().then(health=>{const quietToast=m=>{try{if(self.FiezelStage?.lessonMode?.())return console.debug('FIEZEL:',m);showToast(m)}catch(_){showToast(m)}};/* q19-P3: jargon infra tidak memotong ujian pertama */if(!health.ok){if(REMOTE_PUSH_REQUIRED)quietToast(FiezelI18n.t('sys.core-belum-tersambung'));return}return ensureRemotePushSubscription().then(result=>{if(result.ok){syncRemoteLearningActivity();quietToast(FiezelI18n.t('sys.core-push-aktif'))}else if(REMOTE_PUSH_REQUIRED)quietToast(FiezelI18n.t('sys.core-push-belum'))})})}// m025-42: the third install prompt. It runs after the notification gate clears so the
+  startReminderEngine();showBrandSplash();/* m025-308: probe /health DULU menyala hanya dengan syarat CORE_WORKER_URL ada. Sebelum
+   migrasi Cloudflare syarat itu praktis tidak pernah terpenuhi (CORE_CONFIG.workerUrl
+   kosong), jadi cacatnya tidak terlihat. Sesudah migrasi, CORE_WORKER_URL diambil dari
+   FIEZEL_CF_CONFIG.base yang SELALU terisi - jadi setiap boot menembakkan satu permintaan
+   jaringan, termasuk boot di perangkat yang sedang luring. Yang didapat murid luring dari
+   itu: satu permintaan gagal, satu toast 'core belum tersambung', dan nol informasi baru -
+   ia sudah tahu dirinya luring.
+
+   `onLine===false` dipakai sebagai satu-satunya sinyal, bukan `!onLine`: nilai true bisa
+   bohong (terhubung Wi-Fi tanpa internet), tetapi false dapat dipercaya. Jadi yang
+   dilewati hanya keadaan yang jelas luring, dan keadaan ragu tetap mencoba. */if(CORE_WORKER_URL&&self.navigator?.onLine!==false){coreBrainHealth().then(health=>{const quietToast=m=>{try{if(self.FiezelStage?.lessonMode?.())return console.debug('FIEZEL:',m);showToast(m)}catch(_){showToast(m)}};/* q19-P3: jargon infra tidak memotong ujian pertama */if(!health.ok){if(REMOTE_PUSH_REQUIRED)quietToast(FiezelI18n.t('sys.core-belum-tersambung'));return}return ensureRemotePushSubscription().then(result=>{if(result.ok){syncRemoteLearningActivity();quietToast(FiezelI18n.t('sys.core-push-aktif'))}else if(REMOTE_PUSH_REQUIRED)quietToast(FiezelI18n.t('sys.core-push-belum'))})})}// m025-42: the third install prompt. It runs after the notification gate clears so the
 // three popups never stack, and it silences itself for good once both bundles exist.
 // m025-96: gerbang unduhan suara dipensiunkan - tidak ada lagi bundel yang diunduh.
 // m025-254: kunci "target harian WAJIB" (m025-42/43) DIHAPUS seluruhnya - modul, lembar,
@@ -8056,7 +8190,6 @@ function neuralRateLabel(v){return v<0.9?FiezelI18n.t('suara.lebih-pelan',{nilai
    signIn() di atas sesi yang masih hidup akan kembali ke akun yang sama tanpa pernah
    menanyakan apa pun - persis kegagalan diam-diam yang membuat tombol seperti ini
    terasa rusak. Keluar dulu, baru masuk. */
-let puterAccountCache=null;
 function puterAccountLabel(){return '';}
 async function refreshPuterAccountCard(){return;}
 async function signOutPuterAccount(){return;}
@@ -13682,7 +13815,7 @@ if(typeof document!=='undefined'&&document.addEventListener){
   });
 }
 /* ============================== akhir blok SOSIAL (SLOT 7) ========================== */
-window.istilahMurid=istilahMurid;/* dipapar untuk gerbang QA: penerjemah enum harus bisa disapu penuh */window.__getFiezelData=()=>({vocab:V.length,reading:R.length,grammar:Object.keys(G).length});window.__fiezelAudit={showBrandSplash,showOnboarding,prefersReducedMotion,readInstallHealth,installHealthReportMarkup,buildBackupFile,previewRestoreForState,applyRestore,continuitySettingsMarkup,academicReadinessMarkup,unifiedSkillsMarkup,buildPersonalJourney,journeyMarkup,setGoalProfile,loadState,sanitizeState,validateQuestion,makeGrammarQuestion,makeReadingQuestion,makeVocabQuestion,buildGrammarLessonQuestions,buildPlacement,/* m025-246: dipapar untuk regression-test - gerbang itu harus bisa MENANYAKAN ukuran rencana penempatan, bukan memaku 25 dan merah setiap kali ukurannya berubah dengan sengaja. */placementSize,placementBlueprint,/* cetak biru PENUH dipapar terpisah: gerbang harus tetap bisa menjaga invarian 'penempatan penuh memuat ketiga jenis konten' walau jalur murid memakai cetak biru lite */PLACEMENT_BLUEPRINT_FULL:PLACEMENT_BLUEPRINT,buildAdaptivePool,getScenePalette,getCelestialState,getDiagnosticProfile,buildLearningSnapshot,buildLearnerEvidenceModel,remoteLearnerEvidenceSnapshot,deriveAdaptivePolicy,buildAdaptivePolicy,adaptivePolicyRequestPayload,sanitizeAdaptivePolicy,/* m025-201: dipapar untuk tests/core-policy-parity-test.js - gerbang paritas tidak bisa membandingkan apa yang tidak bisa ia panggil */capRationaleCodes,policyEffectiveness,sanitizePolicyEffectiveness,resolveAdaptivePolicy,evaluatePolicyOutcome,sanitizePolicyOutcome,recordPolicyOutcomeFromSession,backfillPolicyOutcomes,recentPolicyOutcomes,policyOutcomeSummary,buildALRSContext,selectALRSDecision,buildCreatorReport,validReportEndpoint,forgettingProbability,scheduleNext,coreBrainMemory,tutorSession,tutorObserve,misconceptionLedgerRead,misconceptionLedgerActive,coreBrainAttempts,quizPredictedSuccess,evidenceKappa,bktRead,bktRecord,bktShadowMarkup,brainManifestMarkup,learningTelemetryMode,learningTelemetryEmitAnswer,learningTelemetryStudyDay,braincoreEvidenceMode,braincoreEvidenceCohort,braincoreEvidenceCohortForBuild,braincoreEvidenceDay,braincoreEvidenceEmitSnapshot,activeLevelOverallMastery,braincoreEvidenceEmitDecision,braincoreEvidenceFlush,braincoreEvidenceObserveSession,braincoreDecisionReason,braincoreEvidenceAnyLaneActive,identityEvidenceMode,learnerNameSyncToServer,maybeSyncLearnerName,identityEvidenceActive,identityEvidenceMirror,identityEvidenceFlush,forgetLearnerEvidence,confusionMatrixRead,confusionMatrixRecord,affectObserve,affectSessionSync,affectTargetSuccess,listeningAdaptivePolicy,olmPanelMarkup,coreBrainPanelMarkup,diagnosticEvidenceReady,skillTimeline,errorPatterns,confusionPairs,diagnosticReport,confidenceCalibration,dueItems,selectLoginMessage,notificationPermission,checkStudyReminders,lastLearningAt,beginLearningSession,abandonActiveSession,completeActiveSession,/* Fase 3 (C5): kalibrasi item, cloze, OLM negotiated, SRL, speaking adaptif, step tutor */itemCalibrationRead,itemCalibrationObserve,itemCalibrationEffective,calibrationItemId,ensureClozeBank,makeClozeQuestion,clozeAdaptivePicks,clozeSkillReady,clozeProductionRecord,olmSummarizeInput,olmDispute,olmProbeNextSkill,olmProbeConsume,olmNegotiationRead,srlSessionPlan,srlPredictPrompt,srlCaptureConfidence,srlReflect,srlSessionSync,speakingCoverageRows,speakingAdaptiveEvidence,speakingAdaptivePolicy,stepTutorGuidance,stepTutorGuidanceMarkup,record,quizLoop,startAdaptive};
+window.istilahMurid=istilahMurid;/* dipapar untuk gerbang QA: penerjemah enum harus bisa disapu penuh */window.__getFiezelData=()=>({vocab:V.length,reading:R.length,grammar:Object.keys(G).length});window.__fiezelAudit={showBrandSplash,showOnboarding,prefersReducedMotion,readInstallHealth,installHealthReportMarkup,buildBackupFile,previewRestoreForState,applyRestore,continuitySettingsMarkup,academicReadinessMarkup,unifiedSkillsMarkup,buildPersonalJourney,journeyMarkup,setGoalProfile,loadState,sanitizeState,validateQuestion,makeGrammarQuestion,makeReadingQuestion,makeVocabQuestion,buildGrammarLessonQuestions,buildPlacement,/* m025-246: dipapar untuk regression-test - gerbang itu harus bisa MENANYAKAN ukuran rencana penempatan, bukan memaku 25 dan merah setiap kali ukurannya berubah dengan sengaja. */placementSize,placementBlueprint,/* cetak biru PENUH dipapar terpisah: gerbang harus tetap bisa menjaga invarian 'penempatan penuh memuat ketiga jenis konten' walau jalur murid memakai cetak biru lite */PLACEMENT_BLUEPRINT_FULL:PLACEMENT_BLUEPRINT,buildAdaptivePool,getScenePalette,getCelestialState,getDiagnosticProfile,buildLearningSnapshot,buildLearnerEvidenceModel,remoteLearnerEvidenceSnapshot,deriveAdaptivePolicy,buildAdaptivePolicy,adaptivePolicyRequestPayload,sanitizeAdaptivePolicy,/* m025-201: dipapar untuk tests/core-policy-parity-test.js - gerbang paritas tidak bisa membandingkan apa yang tidak bisa ia panggil */capRationaleCodes,policyEffectiveness,sanitizePolicyEffectiveness,resolveAdaptivePolicy,evaluatePolicyOutcome,sanitizePolicyOutcome,recordPolicyOutcomeFromSession,backfillPolicyOutcomes,recentPolicyOutcomes,policyOutcomeSummary,buildALRSContext,selectALRSDecision,buildCreatorReport,validReportEndpoint,forgettingProbability,scheduleNext,coreBrainMemory,tutorSession,tutorObserve,misconceptionLedgerRead,misconceptionLedgerActive,coreBrainAttempts,quizPredictedSuccess,evidenceKappa,bktRead,bktRecord,bktShadowMarkup,brainManifestMarkup,learningTelemetryMode,learningTelemetryEmitAnswer,learningTelemetryStudyDay,braincoreEvidenceMode,braincoreEvidenceCohort,braincoreEvidenceCohortForBuild,braincoreEvidenceDay,braincoreEvidenceEmitSnapshot,activeLevelOverallMastery,braincoreEvidenceEmitDecision,braincoreEvidenceFlush,braincoreEvidenceObserveSession,braincoreDecisionReason,braincoreEvidenceAnyLaneActive,identityEvidenceMode,learnerNameSyncToServer,maybeSyncLearnerName,identityEvidenceActive,identityEvidenceMirror,identityEvidenceFlush,forgetLearnerEvidence,confusionMatrixRead,confusionMatrixRecord,affectObserve,affectSessionSync,affectTargetSuccess,listeningAdaptivePolicy,olmPanelMarkup,coreBrainPanelMarkup,diagnosticEvidenceReady,skillTimeline,errorPatterns,confusionPairs,diagnosticReport,confidenceCalibration,dueItems,selectLoginMessage,notificationPermission,checkStudyReminders,lastLearningAt,beginLearningSession,abandonActiveSession,completeActiveSession,/* Fase 3 (C5): kalibrasi item, cloze, OLM negotiated, SRL, speaking adaptif, step tutor */itemCalibrationRead,itemCalibrationObserve,itemCalibrationEffective,calibrationItemId,ensureClozeBank,makeClozeQuestion,clozeAdaptivePicks,clozeSkillReady,clozeProductionRecord,olmSummarizeInput,olmDispute,olmProbeNextSkill,olmProbeConsume,olmNegotiationRead,srlSessionPlan,srlPredictPrompt,srlCaptureConfidence,srlReflect,srlSessionSync,speakingCoverageRows,speakingAdaptiveEvidence,speakingAdaptivePolicy,stepTutorGuidance,stepTutorGuidanceMarkup,record,quizLoop,startAdaptive,/* m025-308: dipapar untuk tests/th-content-overlay-test.js. Gerbang itu harus bisa memanggil overlay yang SUNGGUHAN lalu membacanya lewat jalur baca yang dipakai penyaji - kalau ia hanya boleh memeriksa isi sidecar, ia mengulang kebutaan yang justru membiarkan 45 petunjuk writing dan 96 umpan balik reading-exam menganggur. */applyContentLocale,writingPromptPool,writingExamTask,readingExamSets,makeExamReadingQuestion};
 window.startVocabQuiz=startVocabQuiz;window.buildAdaptivePool=buildAdaptivePool;window.buildGrammarLessonQuestions=buildGrammarLessonQuestions;window.getScenePalette=getScenePalette;window.getCelestialState=getCelestialState;window.playFeedbackSound=playFeedbackSound;window.updateMastery=updateMastery;window.markMastered=markMastered;window.__getFiezelState=()=>state;window.__fiezelValidViews=()=>[...VALID_VIEWS];window.__fiezelDueReviews=()=>dueItems().length;window.buildAdaptivePolicy=buildAdaptivePolicy;window.studyDayKey=studyDayKey;window.startAdaptive=startAdaptive;window.showToast=showToast;window.answerFeedbackSignal=answerFeedbackSignal;window.practiceSkill=practiceSkill;window.openReadingLevel=openReadingLevel;window.startReadingRandom=startReadingRandom;window.startReadingAdaptive=startReadingAdaptive;window.startPlacement=startPlacement;window.startLevelPractice=startLevelPractice;window.startAdaptive=startAdaptive;window.resetProgress=resetProgress;window.closeModal=closeModal;window.openSettings=openSettings;window.openReportPreview=openReportPreview;window.sendCreatorReport=sendCreatorReport;window.askCoachAI=askCoachAI;window.dismissWelcome=dismissWelcome;window.requestStudyNotificationPermission=requestStudyNotificationPermission;window.declineStudyNotifications=declineStudyNotifications;window.skipPuterSignIn=skipPuterSignIn;window.attemptGoogleSignIn=attemptGoogleSignIn;window.shouldPresentPuterPopup=shouldPresentPuterPopup;window.notifyAppUpdateIfNew=notifyAppUpdateIfNew;window.setConfidence=setConfidence;window.explainWithAI=explainWithAI;window.explainWordWithAI=explainWordWithAI;window.olmDispute=olmDispute;/* Fase 3 (C5 butir 3): handler tombol sanggah di panel OLM */
 // m025-84: dipasang di ujung berkas, saat go()/state/VALID_VIEWS sudah ada, dan SEBELUM
 // load() supaya navigasi pertama pun sudah terekam di riwayat.
