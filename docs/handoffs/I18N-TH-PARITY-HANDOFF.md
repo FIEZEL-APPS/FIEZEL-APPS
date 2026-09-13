@@ -204,3 +204,71 @@ perlu disunting — dan satu assertnya menyebut kasus ini dengan nama: berkas TE
 menggantikan. Precache membuat kuncinya benar-benar sampai; pembungkus membuat layarnya
 anggun kalau suatu hari ada yang tidak sampai lagi. Yang pertama memperbaiki sebabnya, yang
 kedua memperbaiki akibatnya.
+
+## m025-305 — terjemahan yang SUDAH terkirim tapi tidak pernah dibaca
+
+Dokumen di atas menutup lubang **pendaftaran** (domain copy-map yang tidak pernah terukur).
+Bagian ini mencatat lubang yang berbeda bentuk dan sama akibatnya: terjemahan yang lengkap,
+sudah ikut terunduh ke perangkat murid, lalu **menganggur** karena overlay-nya tidak
+menyalinnya.
+
+`applyContentLocale()` di `app.js` menyalin dari `writing-prompts-th.json` hanya `honesty` dan
+`rubric.criteria`, dan dari `reading-exam-th.json` hanya `honesty` dan `formats`. Yang
+tertinggal:
+
+| Sidecar | Menganggur | Yang dibaca murid Thai |
+| --- | --- | --- |
+| `writing-prompts-th.json` | 45 prompt (`hint` + `focus`), 5 catatan tugas ujian | petunjuk dan fokus layar Writing, catatan IELTS/TOEFL |
+| `reading-exam-th.json` | 8 set / 96 soal (`why` + `whyOthersFail`) | SELURUH umpan balik sesudah menjawab di reading-exam |
+
+Semuanya berbahasa Indonesia, di dalam cangkang antarmuka yang sudah Thai.
+
+### Kenapa tidak ada gerbang yang merah
+
+Sebab yang persis sama dengan m025-231. Gerbang purity bertanya **"apakah ISI sidecar
+bersih?"** — dan jawabannya memang selalu ya, karena terjemahannya ada dan benar. Tidak ada
+yang bertanya **"apakah isinya SAMPAI ke penyaji?"**. `tests/th-exam-overlay-test.js` menutup
+pertanyaan kedua itu untuk bank ujian Listening/Speaking; Writing dan reading-exam tidak
+dijaga siapa pun.
+
+Pelajarannya bukan "tambah satu gerbang lagi", melainkan: **setiap sidecar baru butuh DUA
+pemeriksaan — isinya bersih, dan isinya terbaca.** Yang pertama tanpa yang kedua adalah hijau
+yang berarti "tidak diukur".
+
+### Kontrak yang dipaku `tests/th-content-overlay-test.js`
+
+Gerbangnya memanggil `applyContentLocale()` yang **sungguhan** di dalam `vm`, lalu membaca
+hasilnya lewat jalur baca yang dipakai penyaji (`writingPromptPool`, `writingExamTask`,
+`makeExamReadingQuestion`) — bukan memeriksa berkas JSON-nya. Kait untuk itu dipapar di
+`window.__fiezelAudit`. Tiga mutasi diuji dan ketiganya memerahkannya (31/31 → 26/30, 26/30,
+30/31), jadi gerbangnya bukan hiasan.
+
+Yang dijaga, dan alasan tiap pagarnya:
+
+1. **`hint` th ditulis ke slot `id_hint`.** Itu nama bidang WARISAN yang dibaca penyaji.
+   Menamainya ulang jadi `hint` memutus jalur `id` yang byte-identik — jadi yang berpindah
+   ISInya, bukan nama slotnya.
+2. **`examTasks`: HANYA `note` yang diterjemahkan.** `label` adalah nama ujian; `minWords` dan
+   `minutes` adalah **kontrak penilaian**. Satu angka bergeser dan murid dinilai atas target
+   yang berbeda dari ujian aslinya. Karena itu bidangnya disebut satu per satu, bukan
+   `Object.assign` yang menelan apa pun yang kelak muncul di sidecar — dan gerbangnya
+   menembakkan sidecar sintetis yang MENCOBA menggeser angka itu.
+3. **`stem`, `options`, `answerIndex` tidak tersentuh, diperiksa di SELURUH bank.** Ini objek
+   ujinya. Satu pilihan bergeser menilai murid **salah atas jawaban yang benar, tanpa jejak** —
+   kerusakan yang tidak terlihat sebagai teks salah, melainkan sebagai nilai yang salah.
+4. **`evidence` tetap kutipan verbatim berbahasa Inggris.** Menerjemahkannya menyuruh murid
+   mencari kalimat yang tidak ada di bacaan.
+5. **Pulih ke `id` wajib byte-identik dengan sumber di disk.** Overlay menulis ke objek
+   bersama; yang tidak bisa dibalik membuat murid Indonesia yang pernah menyentuh locale th
+   membaca Thai.
+6. **Gagal-lunak, dua bentuk.** Sidecar belum mendarat, dan sidecar SEPARUH mendarat (bentuk
+   nyata dari `Promise.all` yang sebagian gagal) — keduanya tidak boleh melempar. Yang
+   melempar di sini mematikan sesi belajar.
+
+### Batas yang jujur
+
+Pemeriksaan "ber-aksara Thai" di gerbang ini menuntut **ada** aksara Thai, bukan 100%, karena
+istilah tata bahasa dan nama ujian memang tetap Inggris di dalam kalimat Thai yang benar.
+Konsekuensinya: ia menangkap bidang yang tidak tersentuh overlay (kasus yang m025-305 tutup),
+dan **tidak** menangkap kalimat Thai yang menyelipkan satu frasa Indonesia. Yang kedua tetap
+tugas `tests/th-bank-purity-test.js`.

@@ -1069,9 +1069,40 @@ function applyContentLocale(){
         return thC ? Object.assign({}, c, thC) : c;
       });
     }
+    // m025-305: prompt + catatan tugas ujian. Terjemahannya sudah ikut terunduh sejak
+    // writing-prompts-th.json dibuat, lalu MENGANGGUR karena overlay hanya menyalin honesty
+    // dan rubrik - 45 petunjuk dan 5 catatan ujian sampai ke murid Thai dalam bahasa Indonesia.
+    //
+    // `hint` th ditulis ke slot `id_hint`, nama bidang WARISAN yang dibaca penyaji
+    // (app.js writingView). Menamainya ulang jadi `hint` akan memutus jalur `id` yang
+    // byte-identik, jadi yang berpindah adalah ISInya, bukan nama slotnya.
+    if(thReady.writing.prompts && Array.isArray(WRITING_BANK._orig.prompts)){
+      WRITING_BANK.prompts = WRITING_BANK._orig.prompts.map(p=>{
+        const t = thReady.writing.prompts[String(p?.id||'')];
+        if(!t) return p;
+        const out = Object.assign({}, p);
+        if(t.hint) out.id_hint = t.hint;
+        if(t.focus) out.focus = t.focus;
+        return out;
+      });
+    }
+    // examTasks: HANYA `note` yang diterjemahkan. `label` adalah nama ujian (IELTS/TOEFL),
+    // dan `minWords`/`minutes` adalah kontrak penilaian - satu angka bergeser dan murid
+    // dinilai atas target yang berbeda dari ujian aslinya. Jadi bidangnya disebut satu per
+    // satu, bukan Object.assign yang menelan apa pun yang kelak muncul di sidecar.
+    if(thReady.writing.examTasks && WRITING_BANK._orig.examTasks){
+      const src = WRITING_BANK._orig.examTasks, out = {};
+      for(const k of Object.keys(src)){
+        const t = thReady.writing.examTasks[k];
+        out[k] = t?.note ? Object.assign({}, src[k], {note:t.note}) : src[k];
+      }
+      WRITING_BANK.examTasks = out;
+    }
   } else if(WRITING_BANK?._orig) {
     WRITING_BANK.honesty = WRITING_BANK._orig.honesty;
     if(WRITING_BANK.rubric) WRITING_BANK.rubric.criteria = WRITING_BANK._orig.rubric.criteria;
+    if(Array.isArray(WRITING_BANK._orig.prompts)) WRITING_BANK.prompts = WRITING_BANK._orig.prompts;
+    if(WRITING_BANK._orig.examTasks) WRITING_BANK.examTasks = JSON.parse(JSON.stringify(WRITING_BANK._orig.examTasks));
   }
   if(thReady?.reading && READING_EXAM){
     if(!READING_EXAM._orig) READING_EXAM._orig = JSON.parse(JSON.stringify(READING_EXAM));
@@ -1081,9 +1112,37 @@ function applyContentLocale(){
         if(READING_EXAM.examFormats[k]) Object.assign(READING_EXAM.examFormats[k], thReady.reading.formats[k]);
       }
     }
+    // m025-305: umpan balik per soal. Sama seperti writing: 8 set / 96 soal terjemahan `why`
+    // dan `whyOthersFail` sudah ada di perangkat murid dan tidak pernah dipakai, jadi setiap
+    // penjelasan sesudah menjawab berbahasa Indonesia.
+    //
+    // makeExamReadingQuestion() membaca q.explain.why -> why dan q.explain.whyOthersFail ->
+    // distractor, jadi overlay bekerja di tingkat SUMBER, bukan di objek soal yang sudah jadi.
+    //
+    // Yang TIDAK disentuh, dan alasannya keras: `stem`, `options`, `answerIndex`, dan
+    // `evidence`. Ketiga yang pertama adalah objek ujinya - satu pilihan bergeser menilai
+    // murid salah atas jawaban yang benar, tanpa jejak. `evidence` adalah kutipan verbatim
+    // dari teks berbahasa Inggris; menerjemahkannya membuat murid mencari kalimat yang tidak
+    // ada di bacaan.
+    if(thReady.reading.passages && Array.isArray(READING_EXAM._orig.passages)){
+      const pTh = thReady.reading.passages;
+      READING_EXAM.passages = READING_EXAM._orig.passages.map(p=>{
+        const e = pTh[String(p?.id||'')];
+        if(!e?.questions || !Array.isArray(p.questions)) return p;
+        return Object.assign({}, p, {questions:p.questions.map(q=>{
+          const t = e.questions[String(q?.id||'')];
+          if(!t) return q;
+          const ex = Object.assign({}, q.explain||{});
+          if(t.why) ex.why = t.why;
+          if(t.whyOthersFail) ex.whyOthersFail = t.whyOthersFail;
+          return Object.assign({}, q, {explain:ex});
+        })});
+      });
+    }
   } else if(READING_EXAM?._orig) {
     READING_EXAM.honesty = READING_EXAM._orig.honesty;
     if(READING_EXAM.examFormats) READING_EXAM.examFormats = JSON.parse(JSON.stringify(READING_EXAM._orig.examFormats));
+    if(Array.isArray(READING_EXAM._orig.passages)) READING_EXAM.passages = READING_EXAM._orig.passages;
   }
   // --- BANK SOAL: reading A1/A2, cloze, diagnosis miskonsepsi (m025-230) ---------------
   // Tiga sidecar ini menutup jalur yang dulu TIDAK PERNAH punya overlay: murid Thai membaca
@@ -13632,7 +13691,7 @@ window.queueSocialEvidence=queueSocialEvidence;window.socialSummaryCardMarkup=so
 // karena murid menutup aplikasi saat offline berangkat di sini.
 setTimeout(()=>{try{socialCore()?.flushOutbox()}catch(_){}},4500);
 /* ============================== akhir blok SOSIAL (SLOT 7) ========================== */
-window.istilahMurid=istilahMurid;/* dipapar untuk gerbang QA: penerjemah enum harus bisa disapu penuh */window.__getFiezelData=()=>({vocab:V.length,reading:R.length,grammar:Object.keys(G).length});window.__fiezelAudit={showBrandSplash,showOnboarding,prefersReducedMotion,readInstallHealth,installHealthReportMarkup,buildBackupFile,previewRestoreForState,applyRestore,continuitySettingsMarkup,academicReadinessMarkup,unifiedSkillsMarkup,buildPersonalJourney,journeyMarkup,setGoalProfile,loadState,sanitizeState,validateQuestion,makeGrammarQuestion,makeReadingQuestion,makeVocabQuestion,buildGrammarLessonQuestions,buildPlacement,/* m025-246: dipapar untuk regression-test - gerbang itu harus bisa MENANYAKAN ukuran rencana penempatan, bukan memaku 25 dan merah setiap kali ukurannya berubah dengan sengaja. */placementSize,placementBlueprint,/* cetak biru PENUH dipapar terpisah: gerbang harus tetap bisa menjaga invarian 'penempatan penuh memuat ketiga jenis konten' walau jalur murid memakai cetak biru lite */PLACEMENT_BLUEPRINT_FULL:PLACEMENT_BLUEPRINT,buildAdaptivePool,getScenePalette,getCelestialState,getDiagnosticProfile,buildLearningSnapshot,buildLearnerEvidenceModel,remoteLearnerEvidenceSnapshot,deriveAdaptivePolicy,buildAdaptivePolicy,adaptivePolicyRequestPayload,sanitizeAdaptivePolicy,/* m025-201: dipapar untuk tests/core-policy-parity-test.js - gerbang paritas tidak bisa membandingkan apa yang tidak bisa ia panggil */capRationaleCodes,policyEffectiveness,sanitizePolicyEffectiveness,resolveAdaptivePolicy,evaluatePolicyOutcome,sanitizePolicyOutcome,recordPolicyOutcomeFromSession,backfillPolicyOutcomes,recentPolicyOutcomes,policyOutcomeSummary,buildALRSContext,selectALRSDecision,buildCreatorReport,validReportEndpoint,forgettingProbability,scheduleNext,coreBrainMemory,tutorSession,tutorObserve,misconceptionLedgerRead,misconceptionLedgerActive,coreBrainAttempts,quizPredictedSuccess,evidenceKappa,bktRead,bktRecord,bktShadowMarkup,brainManifestMarkup,learningTelemetryMode,learningTelemetryEmitAnswer,learningTelemetryStudyDay,braincoreEvidenceMode,braincoreEvidenceCohort,braincoreEvidenceCohortForBuild,braincoreEvidenceDay,braincoreEvidenceEmitSnapshot,braincoreEvidenceEmitDecision,braincoreEvidenceFlush,braincoreEvidenceObserveSession,braincoreDecisionReason,braincoreEvidenceAnyLaneActive,identityEvidenceMode,learnerNameSyncToServer,maybeSyncLearnerName,identityEvidenceActive,identityEvidenceMirror,identityEvidenceFlush,forgetLearnerEvidence,confusionMatrixRead,confusionMatrixRecord,affectObserve,affectSessionSync,affectTargetSuccess,listeningAdaptivePolicy,olmPanelMarkup,coreBrainPanelMarkup,diagnosticEvidenceReady,skillTimeline,errorPatterns,confusionPairs,diagnosticReport,confidenceCalibration,dueItems,selectLoginMessage,notificationPermission,checkStudyReminders,lastLearningAt,beginLearningSession,abandonActiveSession,completeActiveSession,/* Fase 3 (C5): kalibrasi item, cloze, OLM negotiated, SRL, speaking adaptif, step tutor */itemCalibrationRead,itemCalibrationObserve,itemCalibrationEffective,calibrationItemId,ensureClozeBank,makeClozeQuestion,clozeAdaptivePicks,clozeSkillReady,clozeProductionRecord,olmSummarizeInput,olmDispute,olmProbeNextSkill,olmProbeConsume,olmNegotiationRead,srlSessionPlan,srlPredictPrompt,srlCaptureConfidence,srlReflect,srlSessionSync,speakingCoverageRows,speakingAdaptiveEvidence,speakingAdaptivePolicy,stepTutorGuidance,stepTutorGuidanceMarkup,record,quizLoop,startAdaptive};
+window.istilahMurid=istilahMurid;/* dipapar untuk gerbang QA: penerjemah enum harus bisa disapu penuh */window.__getFiezelData=()=>({vocab:V.length,reading:R.length,grammar:Object.keys(G).length});window.__fiezelAudit={showBrandSplash,showOnboarding,prefersReducedMotion,readInstallHealth,installHealthReportMarkup,buildBackupFile,previewRestoreForState,applyRestore,continuitySettingsMarkup,academicReadinessMarkup,unifiedSkillsMarkup,buildPersonalJourney,journeyMarkup,setGoalProfile,loadState,sanitizeState,validateQuestion,makeGrammarQuestion,makeReadingQuestion,makeVocabQuestion,buildGrammarLessonQuestions,buildPlacement,/* m025-246: dipapar untuk regression-test - gerbang itu harus bisa MENANYAKAN ukuran rencana penempatan, bukan memaku 25 dan merah setiap kali ukurannya berubah dengan sengaja. */placementSize,placementBlueprint,/* cetak biru PENUH dipapar terpisah: gerbang harus tetap bisa menjaga invarian 'penempatan penuh memuat ketiga jenis konten' walau jalur murid memakai cetak biru lite */PLACEMENT_BLUEPRINT_FULL:PLACEMENT_BLUEPRINT,buildAdaptivePool,getScenePalette,getCelestialState,getDiagnosticProfile,buildLearningSnapshot,buildLearnerEvidenceModel,remoteLearnerEvidenceSnapshot,deriveAdaptivePolicy,buildAdaptivePolicy,adaptivePolicyRequestPayload,sanitizeAdaptivePolicy,/* m025-201: dipapar untuk tests/core-policy-parity-test.js - gerbang paritas tidak bisa membandingkan apa yang tidak bisa ia panggil */capRationaleCodes,policyEffectiveness,sanitizePolicyEffectiveness,resolveAdaptivePolicy,evaluatePolicyOutcome,sanitizePolicyOutcome,recordPolicyOutcomeFromSession,backfillPolicyOutcomes,recentPolicyOutcomes,policyOutcomeSummary,buildALRSContext,selectALRSDecision,buildCreatorReport,validReportEndpoint,forgettingProbability,scheduleNext,coreBrainMemory,tutorSession,tutorObserve,misconceptionLedgerRead,misconceptionLedgerActive,coreBrainAttempts,quizPredictedSuccess,evidenceKappa,bktRead,bktRecord,bktShadowMarkup,brainManifestMarkup,learningTelemetryMode,learningTelemetryEmitAnswer,learningTelemetryStudyDay,braincoreEvidenceMode,braincoreEvidenceCohort,braincoreEvidenceCohortForBuild,braincoreEvidenceDay,braincoreEvidenceEmitSnapshot,braincoreEvidenceEmitDecision,braincoreEvidenceFlush,braincoreEvidenceObserveSession,braincoreDecisionReason,braincoreEvidenceAnyLaneActive,identityEvidenceMode,learnerNameSyncToServer,maybeSyncLearnerName,identityEvidenceActive,identityEvidenceMirror,identityEvidenceFlush,forgetLearnerEvidence,confusionMatrixRead,confusionMatrixRecord,affectObserve,affectSessionSync,affectTargetSuccess,listeningAdaptivePolicy,olmPanelMarkup,coreBrainPanelMarkup,diagnosticEvidenceReady,skillTimeline,errorPatterns,confusionPairs,diagnosticReport,confidenceCalibration,dueItems,selectLoginMessage,notificationPermission,checkStudyReminders,lastLearningAt,beginLearningSession,abandonActiveSession,completeActiveSession,/* Fase 3 (C5): kalibrasi item, cloze, OLM negotiated, SRL, speaking adaptif, step tutor */itemCalibrationRead,itemCalibrationObserve,itemCalibrationEffective,calibrationItemId,ensureClozeBank,makeClozeQuestion,clozeAdaptivePicks,clozeSkillReady,clozeProductionRecord,olmSummarizeInput,olmDispute,olmProbeNextSkill,olmProbeConsume,olmNegotiationRead,srlSessionPlan,srlPredictPrompt,srlCaptureConfidence,srlReflect,srlSessionSync,speakingCoverageRows,speakingAdaptiveEvidence,speakingAdaptivePolicy,stepTutorGuidance,stepTutorGuidanceMarkup,record,quizLoop,startAdaptive,/* m025-305: dipapar untuk tests/th-content-overlay-test.js. Gerbang itu harus bisa memanggil overlay yang SUNGGUHAN lalu membacanya lewat jalur baca yang dipakai penyaji - kalau ia hanya boleh memeriksa isi sidecar, ia mengulang kebutaan yang justru membiarkan 45 petunjuk writing dan 96 umpan balik reading-exam menganggur. */applyContentLocale,writingPromptPool,writingExamTask,readingExamSets,makeExamReadingQuestion};
 window.startVocabQuiz=startVocabQuiz;window.buildAdaptivePool=buildAdaptivePool;window.buildGrammarLessonQuestions=buildGrammarLessonQuestions;window.getScenePalette=getScenePalette;window.getCelestialState=getCelestialState;window.playFeedbackSound=playFeedbackSound;window.updateMastery=updateMastery;window.markMastered=markMastered;window.__getFiezelState=()=>state;window.__fiezelValidViews=()=>[...VALID_VIEWS];window.__fiezelDueReviews=()=>dueItems().length;window.buildAdaptivePolicy=buildAdaptivePolicy;window.studyDayKey=studyDayKey;window.startAdaptive=startAdaptive;window.showToast=showToast;window.answerFeedbackSignal=answerFeedbackSignal;window.practiceSkill=practiceSkill;window.openReadingLevel=openReadingLevel;window.startReadingRandom=startReadingRandom;window.startReadingAdaptive=startReadingAdaptive;window.startPlacement=startPlacement;window.startLevelPractice=startLevelPractice;window.startAdaptive=startAdaptive;window.resetProgress=resetProgress;window.closeModal=closeModal;window.openSettings=openSettings;window.openReportPreview=openReportPreview;window.sendCreatorReport=sendCreatorReport;window.askCoachAI=askCoachAI;window.dismissWelcome=dismissWelcome;window.requestStudyNotificationPermission=requestStudyNotificationPermission;window.declineStudyNotifications=declineStudyNotifications;window.skipPuterSignIn=skipPuterSignIn;window.shouldPresentPuterPopup=shouldPresentPuterPopup;window.notifyAppUpdateIfNew=notifyAppUpdateIfNew;window.setConfidence=setConfidence;window.explainWithAI=explainWithAI;window.explainWordWithAI=explainWordWithAI;window.olmDispute=olmDispute;/* Fase 3 (C5 butir 3): handler tombol sanggah di panel OLM */
 // m025-84: dipasang di ujung berkas, saat go()/state/VALID_VIEWS sudah ada, dan SEBELUM
 // load() supaya navigasi pertama pun sudah terekam di riwayat.
