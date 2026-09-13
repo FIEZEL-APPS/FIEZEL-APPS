@@ -1,6 +1,9 @@
 import React from 'react';
 import {Composition, AbsoluteFill, useCurrentFrame, useVideoConfig, interpolate} from 'remotion';
 import {Jungle, Mascot, Caption} from './Scene.jsx';
+import {FiezelHeroMotion} from './FiezelHeroMotion.jsx';
+import {MagicalBookMotion} from './MagicalBookMotion.jsx';
+import {PenyuMotion} from './PenyuMotion.jsx';
 
 const FPS = 30;
 
@@ -36,7 +39,10 @@ const WalkScene = () => {
 
 export const RemotionRoot = () => (
   <>
+    <Composition id="FiezelHero" component={FiezelHeroMotion} durationInFrames={180} fps={60} width={1920} height={1080}/>
     <Composition id="Hero" component={Hero} durationInFrames={150} fps={FPS} width={1280} height={720}/>
+    <Composition id="MagicalBook" component={MagicalBookMotion} durationInFrames={180} fps={60} width={1920} height={1080}/>
+    <Composition id="PenyuMotion" component={PenyuMotion} durationInFrames={150} fps={FPS} width={1280} height={720}/>
     <Composition id="NusaWave" component={Solo} durationInFrames={90} fps={FPS} width={900} height={900}
       defaultProps={{char:'nusa', pose:'full-wave', motion:'wave', height:70}}/>
     <Composition id="NusaCelebrate" component={Solo} durationInFrames={104} fps={FPS} width={900} height={900}
