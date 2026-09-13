@@ -269,7 +269,23 @@ export const ROUTES = [
     if (!(await isOwner(ctx))) return jsonError(403, 'forbidden', {}, opt);
     
     const body = await readJson(ctx);
-    let patch = { candidate: null, schema: 'fiezel-content-patch-v1' };
+    /* m025-308: 'authority' dan 'gateStatus' dulu HANYA hidup di komentar kontrak di atas,
+       tidak pernah di satu pun objek respons rute ini - tidak di default, tidak di cabang
+       sukses, tidak di cabang galat. Tiga akibatnya:
+       (1) Konsumen tidak punya cara membedakan kandidat yang BELUM lolos gerbang lokal dari
+           hasil yang sudah diverifikasi. Yang hilang justru peringatannya.
+       (2) features/brain/fiezel-content-chain.js memindahkan gateStatus DARI
+           'UNVERIFIED_LOCAL_GATES_REQUIRED' ke LOCAL_GATES_PASSED/FAILED - ia memindahkan
+           nilai yang tidak pernah dikirim worker.
+       (3) product-audit.js meng-assert sumber Worker memuat "authority:'candidate-only'" dan
+           "UNVERIFIED_LOCAL_GATES_REQUIRED". Selama keduanya hanya ada di komentar, audit
+           tata kelola itu lolos berkat PROSA, bukan berkat perilaku. */
+    let patch = {
+      candidate: null,
+      schema: 'fiezel-content-patch-v1',
+      authority: 'candidate-only',
+      gateStatus: 'UNVERIFIED_LOCAL_GATES_REQUIRED'
+    };
     if (ctx.env.AI) {
       try {
         const messages = [
@@ -277,7 +293,12 @@ export const ROUTES = [
           { role: 'user', content: JSON.stringify(body) }
         ];
         const res = await runLegacyModel(ctx, { messages });
-        patch = { patch: res?.response, schema: 'fiezel-content-patch-v1' };
+        patch = {
+          patch: res?.response,
+          schema: 'fiezel-content-patch-v1',
+          authority: 'candidate-only',
+          gateStatus: 'UNVERIFIED_LOCAL_GATES_REQUIRED'
+        };
       } catch (e) {
         // m025-308: sama seperti /api/content/qa/review di atas - status yang stabil
         // menggantikan e.message mentah, dan schema yang dijanjikan kontrak rute tidak
@@ -288,7 +309,9 @@ export const ROUTES = [
         patch = {
           candidate: null,
           status: isBudgetDenial(e) ? 'budget_exhausted' : 'patch_error',
-          schema: 'fiezel-content-patch-v1'
+          schema: 'fiezel-content-patch-v1',
+          authority: 'candidate-only',
+          gateStatus: 'UNVERIFIED_LOCAL_GATES_REQUIRED'
         };
       }
     }
