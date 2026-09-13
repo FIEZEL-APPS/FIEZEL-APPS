@@ -164,3 +164,56 @@ gerbang yang sama pada checkout `origin/main` BERSIH lewat `git worktree`:
 merah yang persis sama. Diff cabang ini tidak menyentuh satu pun berkas backend,
 AI, analytics, atau Puter — `core-config.js` hanya berubah nomor build, dan
 `index.html` hanya bagian maskot.
+
+### Gerbang masuk: satu permukaan Nusa & Mira yang TERLEWAT olehku
+
+Temuan review Gitar, dan temuan ini benar. `index.html:360` — gambar utama
+layar `#authGate`, yaitu layar masuk yang dilihat murid — menunjuk
+`./assets/characters/team/svg/shoulder-wave.svg` dengan alt "Nusa & Mira".
+
+Ini BUKAN kategori yang sama dengan dua permukaan yang sengaja kubiarkan:
+`landing.html` adalah halaman pemasaran sisi guru di website, dan
+`assets/characters/` adalah pipeline video. Gerbang masuk ada DI DALAM aplikasi,
+dilihat murid, dan menonjol. Permintaan OWNER berbunyi "gantikan seluruh maskot
+sekarang" — layar ini termasuk. Aku melewatkannya; daftar "sengaja tidak
+disentuh" di atas karena itu tidak lengkap sampai commit ini.
+
+Asalnya dari pekerjaan Google-auth yang sudah ter-merge di main, jadi ia masuk
+ke cabang ini lewat merge, bukan lewat revert.
+
+Menggantinya memperbaiki TIGA hal sekaligus, dan dua di antaranya tidak
+dilaporkan siapa pun:
+
+1. Maskotnya benar lagi — PAW, bukan karakter yang baru saja dipensiunkan.
+2. `assets/characters/team/svg/shoulder-wave.svg` berukuran **293 KB**.
+   `assets/brand/paw-mascot-full.svg` berukuran **5 KB**: 98% lebih kecil, di
+   layar pertama yang dimuat murid yang belum masuk.
+3. SVG lama itu **tidak pernah ada di daftar precache** — tidak di cabang ini,
+   tidak juga di `origin/main` (diperiksa: nol kecocokan). Jadi gerbang masuk
+   luring selama ini menampilkan gambar rusak. Penggantinya didaftarkan ke
+   `ASSETS`, jadi sekarang benar-benar luring.
+
+Aset penggantinya sengaja yang TERKUNCI CHECKSUM (`assets/brand/paw-mascot-full.svg`
+ada di `mascot-checksums.json`), supaya ia tidak bisa melenceng diam-diam.
+
+Hasil akhir `ASSETS`: 232 entri, nol duplikat, setiap entri ada di disk.
+Nol rujukan `assets/characters` tersisa di seluruh cangkang aplikasi.
+
+### Satu temuan yang SENGAJA tidak kuperbaiki
+
+`index.html` menautkan `./features/ui/fiezel-marshmallow.css` yang tidak ada.
+Gitar menyebutnya dibawa oleh merge ini; itu keliru, dan bedanya penting:
+
+- `git log -S` → tag ditambahkan `73cd02a` (migrasi Puter → Cloudflare);
+- `git log --all --diff-filter=A` → berkas itu **tidak pernah ada** di riwayat,
+  di cabang mana pun;
+- `git show origin/main:index.html` → tag yang sama ada di main baris 145 SEKARANG.
+
+Jadi 404-nya sudah tayang dari main hari ini dan tidak lahir di sini. Ia tidak
+bersinggungan dengan maskot, jadi menambalnya di PR maskot hanya mencampur diff.
+Sudah dibalas di thread-nya dengan bukti + tambalan satu baris, menunggu putusan
+OWNER: cabut tag-nya, ATAU tulis berkasnya lalu daftarkan ke `ASSETS`.
+
+Catatan: `73cd02a` kini terbukti meninggalkan DUA jenis rujukan menggantung —
+empat entri precache (sudah dibereskan di sini karena kena jalur PR ini) dan satu
+tag stylesheet (menunggu OWNER).
