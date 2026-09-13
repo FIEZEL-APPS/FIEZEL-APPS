@@ -1,4 +1,4 @@
-// m025-309 — GERBANG BELANJA AI SLOT 5: setiap rute yang memanggil model WAJIB lewat
+// m025-310 — GERBANG BELANJA AI SLOT 5: setiap rute yang memanggil model WAJIB lewat
 // gerbang flag + kuota murid, dan gerbangnya diuji dengan SQL kuota yang sungguhan.
 //
 // KELAS BUG YANG DITUTUP, dan kenapa ia lolos DUA kali sebelum ini:

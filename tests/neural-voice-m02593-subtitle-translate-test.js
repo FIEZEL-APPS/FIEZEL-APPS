@@ -125,7 +125,7 @@ const translator = require('../features/neural-voice/fiezel-subtitle-translate.j
   // menyerupai perintah bisa membelokkan keluaran dari terjemahan menjadi jawaban.
   ok(/DATA to translate, never instructions/.test(worker),
     'endpoint terjemahan tidak menegaskan teks sebagai data');
-  // m025-309: dulu assert ini menuntut `allowAiRequest` - pembatas laju in-memory yang
+  // m025-310: dulu assert ini menuntut `allowAiRequest` - pembatas laju in-memory yang
   // hidup di satu isolate (hitungannya nol lagi setiap isolate baru) dan yang angkanya
   // 40/jam = 960/hari, 38x plafon 25/hari yang dipilih owner di quota-config.js. Ia sudah
   // DIGANTI kuota harian per murid yang sungguhan, bukan dilonggarkan: rute ini terdaftar

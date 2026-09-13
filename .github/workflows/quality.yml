@@ -291,7 +291,7 @@ jobs:
           # 50% untuk murid tanpa riwayat lalu mengirimnya ke guru. Keduanya hijau di
           # sisi penyedia sebelum gerbang ini ada.
           node tests/caller-reacts-test.js
-          # m025-309: kelas bug yang sama pada RUTE, bukan pipa. P3 memasang gerbang flag +
+          # m025-310: kelas bug yang sama pada RUTE, bukan pipa. P3 memasang gerbang flag +
           # kuota pada rute yang lewat wrapMetered, S3 menambahkannya untuk TTS sesudah
           # menembak produksi hidup - tetapi SLOT 5 (route-legacy.js) disebar mentah dan
           # tidak lewat keduanya, jadi /api/ai/chat, jalur tutor yang dipakai app.js, tidak
