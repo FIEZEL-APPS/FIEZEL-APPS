@@ -61,8 +61,12 @@ import { buildExtraRoutes } from './route-wiring.js';
 /* --- SLOT 4: ANALYTICS (analytics/route-events.js) — /api/usage/events,
  *             /api/usage/retention, /api/usage/pepper                [TERPASANG] */
 /* --- SLOT 5: WARISAN PUTER (route-legacy.js) — /api/policy/*, /api/activity,
- *             /api/feedback, /api/push/*                             [BELUM] */
-// import { ROUTES as LEGACY_ROUTES } from './route-legacy.js';
+ *             /api/feedback, /api/push/*, /api/brain/*, /api/coach/*,
+ *             /api/admin/*, /api/reminders/*, /api/evolution/*,
+ *             /api/content/*                                          [TERPASANG]
+ * Seluruh 22 endpoint yang sebelumnya dilayani Worker Puter kini tinggal di sini.
+ * Puter DIHAPUS TOTAL — lihat core-config.js. */
+import { ROUTES as LEGACY_ROUTES } from './route-legacy.js';
 /* --- SLOT 6: STATUS CRON (cron-status.js) — /api/owner/cron-status   [TERPASANG] */
 import { ROUTES as CRON_STATUS_ROUTES } from './cron-status.js';
 /* --- SLOT 7: SOSIAL (route-social.js) — /api/social/profile/*, /api/social/friends*,
@@ -131,7 +135,7 @@ import { ROUTES as GOOGLE_AUTH_ROUTES } from './route-auth-google.js';
 
 export const EXTRA_ROUTES = [
   ...buildExtraRoutes(),  /* SLOT 1-4 */
-  // ...LEGACY_ROUTES,    /* SLOT 5 */
+  ...LEGACY_ROUTES,       /* SLOT 5 — warisan Puter, kini Cloudflare */
   ...CRON_STATUS_ROUTES,  /* SLOT 6 */
   ...SOCIAL_ROUTES,       /* SLOT 7 */
   ...EVIDENCE_OWNER_ROUTES, /* SLOT 8 */

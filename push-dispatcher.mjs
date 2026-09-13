@@ -1,11 +1,13 @@
 import webpush from 'web-push';
-const required=['FIEZEL_CORE_WORKER_URL','FIEZEL_REMINDER_CRON_TOKEN','VAPID_PUBLIC_KEY','VAPID_PRIVATE_KEY','VAPID_SUBJECT'];
-for(const k of required)if(!process.env[k])throw new Error(`Missing ${k}`);
-const base=process.env.FIEZEL_CORE_WORKER_URL.replace(/\/$/,'');
+const cronToken = process.env.FIEZEL_REMINDER_CRON_TOKEN || process.env.CRON_TOKEN;
+const base = (process.env.FIEZEL_CORE_WORKER_URL || process.env.CF_API_BASE || 'https://api.fiezel.my.id').replace(/\/$/,'');
+const required = ['VAPID_PUBLIC_KEY','VAPID_PRIVATE_KEY','VAPID_SUBJECT'];
+for (const k of required) if (!process.env[k]) throw new Error(`Missing ${k}`);
+if (!cronToken) throw new Error('Missing CRON_TOKEN or FIEZEL_REMINDER_CRON_TOKEN');
 // RFC 8030: Topic header MUST be 1-32 chars and only URL-safe base64 [A-Za-z0-9_-].
 // Legacy/stale records may carry tags with spaces or non-ASCII -> would 400 BadWebPushTopic.
-const safeTopic=(t)=>{const s=String(t||'fiezel').replace(/[^A-Za-z0-9_-]+/g,'-').slice(0,32).replace(/^[-_]+/,'');return s||'fiezel'};
-const auth={Authorization:`Bearer ${process.env.FIEZEL_REMINDER_CRON_TOKEN}`,'Content-Type':'application/json'};
+const safeTopic = (t) => { const s = String(t || 'fiezel').replace(/[^A-Za-z0-9_-]+/g, '-').slice(0, 32).replace(/^[-_]+/, ''); return s || 'fiezel'; };
+const auth = { Authorization: `Bearer ${cronToken}`, 'Content-Type': 'application/json' };
 webpush.setVapidDetails(process.env.VAPID_SUBJECT,process.env.VAPID_PUBLIC_KEY,process.env.VAPID_PRIVATE_KEY);
 const dueRes=await fetch(`${base}/api/reminders/due`,{method:'POST',headers:auth});if(!dueRes.ok)throw new Error(`due endpoint ${dueRes.status}: ${await dueRes.text()}`);
 const payload=await dueRes.json();let sent=0,failed=0,suppressed=0;

@@ -32,8 +32,8 @@
   const config = Object.freeze({
     schema: 'fiezel-neural-voice-v4',
 
-    /* ---- jalur utama: render di server, nol unduhan ---- */
-    provider: 'puter-txt2speech',
+    /* ---- jalur utama: render di server Cloudflare, nol unduhan ---- */
+    provider: 'cf-tts',
     engine: 'generative',
     lang: 'en-US',
     requiresDownload: false,
