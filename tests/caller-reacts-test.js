@@ -1,4 +1,4 @@
-// m025-307 — PEMANGGIL WAJIB BEREAKSI: gerbang untuk kelas bug yang muncul TIGA KALI.
+// m025-308 — PEMANGGIL WAJIB BEREAKSI: gerbang untuk kelas bug yang muncul TIGA KALI.
 //
 // Pola yang sama, tiga kemunculan, satu hari:
 //
@@ -31,7 +31,7 @@ const app = fs.readFileSync(path.join(root, 'app.js'), 'utf8');
 //
 // Kontraknya tertulis di features/auth/fiezel-google.js: renderButton mengembalikan
 // {ok:false, error:'script'|'no_host'|'not_configured', message} dan pemanggil WAJIB
-// menampilkan cadangan. Sebelum m025-307, pemanggilnya membaca res.ok HANYA sebagai syarat
+// menampilkan cadangan. Sebelum m025-308, pemanggilnya membaca res.ok HANYA sebagai syarat
 // memanggil prompt() dan tidak punya cabang gagal - jadi alurnya jatuh ke `return true`
 // sambil meninggalkan gerbang auth di 'pending': spinner yang tidak pernah berhenti, tanpa
 // teks galat, tanpa tombol Google, tanpa jalan ke tombol masuk FIEZEL di bawahnya.
@@ -71,7 +71,7 @@ if (gsiAt !== -1) {
 // (2) Bukti belajar TIDAK BOLEH memfabrikasi akurasi untuk murid tanpa riwayat.
 //
 // braincoreEvidenceEmitSnapshot() membangun buildLearnerEvidenceEvent, lane bukti belajar
-// yang TERSINKRON KE GURU. Sebelum m025-307, cadangan terakhirnya `50`: murid yang belum
+// yang TERSINKRON KE GURU. Sebelum m025-308, cadangan terakhirnya `50`: murid yang belum
 // menjawab satu soal pun tercatat akurasi 50% di layar guru - angka yang tampak seperti
 // hasil pengukuran.
 //

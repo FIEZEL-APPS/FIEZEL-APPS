@@ -4,7 +4,7 @@ const root=__fzRoot;
 const html=fs.readFileSync(path.join(root,'index.html'),'utf8');
 const css=fs.readFileSync(path.join(root,'style.css'),'utf8');
 const app=fs.readFileSync(path.join(root,'app.js'),'utf8');
-/* m025-307: kedua halaman bantu (`creator-report-setup.html`,
+/* m025-308: kedua halaman bantu (`creator-report-setup.html`,
    `creator-report-dashboard.html`) dihapus migrasi Cloudflare (73cd02a2). Dua assert yang
    membacanya diubah jadi PENJAGA BERSYARAT atas halaman bantu APA PUN yang ada hari ini -
    bukan dibuang, dan bukan dipaku ke dua nama berkas yang kebetulan dulu ada. Bentuk ini
@@ -110,7 +110,7 @@ for(const h of HALAMAN_BANTU){
   check(/<meta name="viewport"/.test(h.src),'Halaman bantu '+h.nama+' tidak siap layar ponsel (tanpa meta viewport).');
 }
 if(!HALAMAN_BANTU.length){
-  console.log('CATATAN m025-307: nol halaman bantu di root - creator-report-setup.html dan '+
+  console.log('CATATAN m025-308: nol halaman bantu di root - creator-report-setup.html dan '+
     'creator-report-dashboard.html dihapus migrasi CF. Penjaga di atas menyala sendiri begitu '+
     'halaman bantu berikutnya dibuat.');
 }

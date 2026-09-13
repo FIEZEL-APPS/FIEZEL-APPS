@@ -296,7 +296,7 @@ test('Fiezel AI answers anything, and says plainly when it cannot', () => {
   // W4-QA — union W2: kalimatnya PINDAH byte-identik ke copy-id-feat-b.js (AI-02 F01);
   // sah bila masih inline ATAU dirender lewat kunci i18n yang nilainya memuat kalimat sama.
   const featBCopySrc = fs.readFileSync('features/i18n/copy-id-feat-b.js', 'utf8');
-  /* m025-307: assert ini DULU menuntut kalimatnya berbunyi "login Puter dulu". Puter sudah
+  /* m025-308: assert ini DULU menuntut kalimatnya berbunyi "login Puter dulu". Puter sudah
      pensiun (deploymentState 'cloudflare-only'), jadi menuntutnya kembali berarti menuntut
      FIEZEL menyuruh murid melakukan sesuatu yang tidak mungkin lagi ia lakukan - nasihat yang
      SALAH, bukan sekadar usang. Naskahnya sudah benar di main ("pastikan koneksi internet

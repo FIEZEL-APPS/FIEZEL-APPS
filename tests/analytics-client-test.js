@@ -1184,36 +1184,61 @@ const PENANDA = ['Jahran', 'jahran@example.com', '0f8fad5b', 'u_123', '203.0.113
      * baris yang menulis `FIEZEL_CF_CONFIG` (atau mengarang mode 'on' di dalam blok) berarti
      * sakelar owner bisa dilangkahi kode aplikasi, dan itulah yang harus merah.
      * Sakelar berbiaya (ai/tts) tetap dijaga di sini juga: analytics tidak boleh menjadi
-     * pintu masuk penyalaan neuron. */
+     * pintu masuk penyalaan neuron.
+     *
+     * m025-308 MENGGANTI ASSERT ai/tts, dan alasannya sama persis dengan paragraf A6 di
+     * atas - preseden itu bukan tafsiran, melainkan sudah dijalankan OWNER sendiri.
+     *
+     * Bentuk lama menuntut `ai:'off'` DAN `tts:'off'` di core-config.js. Itu benar selama
+     * Puter masih ada; komentar core-config.js:140 menulis alasannya sendiri: "selama
+     * keduanya 'off', murid tetap memakai Puter untuk suara dan AI". Sejak 73cd02a PUTER
+     * DIHAPUS dan tidak ada lagi jalur 'off' yang jatuh ke sana. Memaksa 'off' hari ini
+     * karena itu bukan menghemat neuron - ia MEMATIKAN AI dan suara untuk murid tanpa
+     * pengganti apa pun.
+     *
+     * Bahwa 'on' adalah keputusan rilis yang sah dan tercatat dibuktikan e8609be: commit
+     * itu mencabut tuntutan ai/tts-off dari tests/cf-config-killswitch-test.js - gerbang
+     * yang justru DITUNJUK komentar core-config.js sebagai penjaga sakelar ini - dan
+     * menggantinya dengan "semua endpoint hidup adalah endpoint valid". Gerbang ini yang
+     * terlewat dari sapuan itu, jadi yang diselaraskan adalah yang tertinggal.
+     *
+     * YANG DIJAGA TIDAK DILEPAS, hanya ditaruh di tempat yang benar. Yang berbahaya bukan
+     * NILAI flag-nya - itu sakelar OWNER, tertulis dan ter-Object.freeze di core-config.js,
+     * dan dijaga cf-config-killswitch-test. Yang berbahaya adalah ANALYTICS MENJADI PINTU
+     * yang menyalakannya, atau flag itu dikarang di luar blok owner. Dua assert di bawah
+     * menjaga persis kedua hal itu. */
     const cfgSrc = fs.readFileSync(path.join(root, 'core-config.js'), 'utf8');
     check('Pemancar TIDAK menyalakan flag apa pun sendiri (hanya membaca gerbang)',
       !/FIEZEL_CF_CONFIG\s*=/.test(blockSrc) && !/endpoints\s*[:.]\s*\{?[^}]*usage\s*=\s*'on'/.test(blockSrc),
       'blok pemancar app.js tidak menulis FIEZEL_CF_CONFIG');
-    /* m025-307 MENGGANTI ASSERT INI, dan mengikuti preseden A6 di atas kata per kata:
-     * penggantian, bukan pelunakan.
+    /* m025-308 — UNION dari dua perbaikan yang tiba bersamaan, dan ketiga pagarnya perlu.
      *
-     * Bentuk lama: "core-config.js tetap ai:'off' dan tts:'off'". Itu benar selama jalur
-     * Cloudflare belum hidup. Migrasi CF (73cd02a2) menyalakan keduanya, dan itu KEPUTUSAN
-     * RILIS yang sah - seluruh migrasi itu ada justru untuk melayani ai/tts dari Cloudflare.
-     * Jadi assert lama kini memerahkan gerbang untuk sesuatu yang sengaja dan benar, persis
-     * keadaan yang membuat A6 mengganti assert `usage:'off'` dulu.
+     * Assert lama ("core-config.js tetap ai:'off' dan tts:'off'") benar selama jalur
+     * Cloudflare belum hidup. Migrasi CF menyalakan keduanya, dan itu KEPUTUSAN RILIS yang
+     * sah - seluruh migrasi ada justru untuk melayani ai/tts dari Cloudflare. Jadi assert lama
+     * memerahkan gerbang untuk sesuatu yang sengaja dan benar, persis keadaan yang membuat A6
+     * mengganti assert `usage:'off'` dulu. Preseden itu diikuti: DIGANTI, bukan dilunakkan.
      *
-     * Yang SESUNGGUHNYA dijaga tetap dijaga, dan sekarang lebih tepat sasaran. Kekhawatiran
-     * aslinya bukan "jalur berbiaya harus mati selamanya" melainkan "analytics tidak boleh
-     * menjadi PINTU MASUK penyalaan neuron". Dua pagar di bawah menjaga tepat itu, dan
-     * keduanya tetap berdiri walau OWNER menyalakan ai/tts:
+     * PR #408 dan cabang ini menambal ini bersamaan dengan sudut berbeda, dan masing-masing
+     * punya pagar yang tidak dipunyai yang lain. Ketiganya dipertahankan, bukan dipilih salah
+     * satu - kekhawatiran aslinya ("analytics tidak boleh jadi PINTU MASUK penyalaan neuron")
+     * butuh ketiganya:
      *
-     *   (a) petanya WAJIB Object.freeze - kode aplikasi tidak bisa membalik flag berbiaya
-     *       saat jalan, jadi satu-satunya cara menyalakannya adalah menyunting berkas OWNER;
-     *   (b) flag berbiaya WAJIB literal di core-config.js, bukan dihitung dari apa pun -
-     *       nilai yang dihitung bisa menyala karena keadaan, bukan karena keputusan.
-     *
-     * Pagar "pemancar tidak menulis FIEZEL_CF_CONFIG" di atas adalah lapis ketiganya. */
+     *   (a) [#408] pemancar tidak menyalakan ai/tts sendiri, diperiksa di blok pemancarnya;
+     *   (b) [#408] sakelar berbiaya hidup HANYA di blok OWNER yang ter-freeze, DUA lapis -
+     *       FIEZEL_CF_CONFIG ter-freeze DAN endpoints ter-freeze. Memeriksa lapis dalam saja
+     *       melewatkan objek luar yang bisa ditukar utuh;
+     *   (c) [cabang ini] flag berbiaya WAJIB literal, bukan dihitung - nilai yang dihitung
+     *       menyala karena KEADAAN, bukan karena keputusan, dan itu lolos (a) maupun (b). */
+    check('Pemancar analytics TIDAK menyentuh sakelar berbiaya ai/tts sama sekali',
+      !/\bai\s*[:=]\s*'(?:on|shadow)'/.test(blockSrc) && !/\btts\s*[:=]\s*'(?:on|shadow)'/.test(blockSrc),
+      'blok pemancar app.js menyalakan sendiri ai/tts');
+    check('core-config.js: sakelar ai/tts hanya hidup di blok OWNER yang ter-freeze',
+      /self\.FIEZEL_CF_CONFIG\s*=\s*Object\.freeze\(/.test(cfgSrc)
+      && /endpoints\s*:\s*Object\.freeze\(/.test(cfgSrc),
+      'core-config.js blok FIEZEL_CF_CONFIG ter-freeze');
     const endpointsAt = cfgSrc.indexOf('endpoints:');
     const endpointsBlok = endpointsAt === -1 ? '' : cfgSrc.slice(endpointsAt, endpointsAt + 400);
-    check('peta endpoint dibekukan (kode aplikasi tidak bisa membalik flag berbiaya saat jalan)',
-      /endpoints:\s*Object\.freeze\(/.test(endpointsBlok),
-      'endpoints bukan Object.freeze; satu baris kode bisa menyalakan neuron tanpa keputusan OWNER');
     check('flag ai/tts literal di core-config.js, bukan dihitung',
       /\bai:\s*'(?:on|off|shadow)'/.test(endpointsBlok) && /\btts:\s*'(?:on|off|shadow)'/.test(endpointsBlok),
       'flag berbiaya tidak literal; nilai yang dihitung menyala karena keadaan, bukan karena keputusan');

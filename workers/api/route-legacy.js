@@ -23,7 +23,7 @@ async function readJson(ctx) {
   }
 }
 
-// ── BATAS PENYIMPANAN FEEDBACK (m025-307) ────────────────────────────────────────────
+// ── BATAS PENYIMPANAN FEEDBACK (m025-308) ────────────────────────────────────────────
 //
 // Worker Puter lama menjaga TIGA hal pada jalur feedback, dan migrasi ke D1 membawa
 // hanya satu (penjaga isOwner). Yang hilang: batas panjang teks dan batas jumlah baris.
@@ -353,7 +353,7 @@ export const ROUTES = [
     // Penanda sudut dibuang SEBELUM disimpan, sama seperti Worker lama. Ini pertahanan
     // berlapis, bukan pengganti escaping di penyaji: dasbor OWNER membaca kembali baris ini,
     // dan teks yang disimpan mentah berarti satu kiriman murid bisa menjadi markup hidup di
-    // layar OWNER. Migrasi ke D1 menjatuhkan pembersihan ini; dipulihkan di m025-307.
+    // layar OWNER. Migrasi ke D1 menjatuhkan pembersihan ini; dipulihkan di m025-308.
     let data = JSON.stringify(body).replace(/[<>]/g, '');
     if (data.length > FEEDBACK_MAX_TEXT) data = data.slice(0, FEEDBACK_MAX_TEXT);
     

@@ -205,7 +205,7 @@ menggantikan. Precache membuat kuncinya benar-benar sampai; pembungkus membuat l
 anggun kalau suatu hari ada yang tidak sampai lagi. Yang pertama memperbaiki sebabnya, yang
 kedua memperbaiki akibatnya.
 
-## m025-307 — terjemahan yang SUDAH terkirim tapi tidak pernah dibaca
+## m025-308 — terjemahan yang SUDAH terkirim tapi tidak pernah dibaca
 
 Dokumen di atas menutup lubang **pendaftaran** (domain copy-map yang tidak pernah terukur).
 Bagian ini mencatat lubang yang berbeda bentuk dan sama akibatnya: terjemahan yang lengkap,
@@ -269,6 +269,6 @@ Yang dijaga, dan alasan tiap pagarnya:
 
 Pemeriksaan "ber-aksara Thai" di gerbang ini menuntut **ada** aksara Thai, bukan 100%, karena
 istilah tata bahasa dan nama ujian memang tetap Inggris di dalam kalimat Thai yang benar.
-Konsekuensinya: ia menangkap bidang yang tidak tersentuh overlay (kasus yang m025-307 tutup),
+Konsekuensinya: ia menangkap bidang yang tidak tersentuh overlay (kasus yang m025-308 tutup),
 dan **tidak** menangkap kalimat Thai yang menyelipkan satu frasa Indonesia. Yang kedua tetap
 tugas `tests/th-bank-purity-test.js`.

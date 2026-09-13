@@ -4,7 +4,7 @@ const fs=require('fs'),path=require('path');
 const root=__fzRoot;
 const read=name=>fs.readFileSync(path.join(root,name),'utf8');
 const app=read('app.js'),css=read('style.css'),html=read('index.html');
-/* m025-307: `fiezel-report-worker.js`, `creator-report-setup.html`, dan
+/* m025-308: `fiezel-report-worker.js`, `creator-report-setup.html`, dan
    `creator-report-dashboard.html` dihapus oleh migrasi Cloudflare (73cd02a2). Gerbang ini
    dulu membaca ketiganya. Setiap assert yang bergantung padanya diperiksa satu per satu,
    BUKAN dibuang bersama berkasnya - hasilnya di bawah. */

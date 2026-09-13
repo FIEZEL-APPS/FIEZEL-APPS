@@ -24,7 +24,7 @@ if(fs.existsSync(i18nRuntime)){
 vm.runInContext(app,context,{filename:'app.js'});
 const response=text=>({ok:true,status:200,json:async()=>({text,model:'gpt-5.4-nano',via:'fiezel-core-worker',protocol:'1.7'})});
 setTimeout(async()=>{try{
-  /* m025-307: assert ini dulu menuntut tag <script> js.puter.com ADA dan mendahului
+  /* m025-308: assert ini dulu menuntut tag <script> js.puter.com ADA dan mendahului
      version.js. Migrasi ke Cloudflare (73cd02a2) menghapus tag itu, dan core-config.js
      menyatakan alasannya eksplisit: deploymentState:'cloudflare-only', "jalur Puter
      SENGAJA tidak dikonfigurasi, bukan lupa". Jadi urutan tag yang sudah tidak ada

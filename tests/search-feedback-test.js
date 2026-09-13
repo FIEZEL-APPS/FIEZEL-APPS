@@ -98,7 +98,7 @@ ok(S.WEIGHT.concept > S.WEIGHT.label && S.WEIGHT.label > S.WEIGHT.text,
 
 /* ---- jalur feedback di Worker ------------------------------------------ */
 
-/* m025-307: jalur ini pindah dari Worker Puter (`fiezel-core-worker.js`, dihapus oleh
+/* m025-308: jalur ini pindah dari Worker Puter (`fiezel-core-worker.js`, dihapus oleh
    migrasi Cloudflare 73cd02a2) ke `workers/api/route-legacy.js`. Gerbangnya diarahkan ke
    berkas baru, dan SETIAP assert diperiksa ulang terhadap kontrak yang sekarang - bukan
    dicap lulus karena berkasnya ketemu.
@@ -145,7 +145,7 @@ ok(/FEEDBACK_MAX_TEXT/.test(worker), 'panjang teks feedback tidak dibatasi');
 ok(/replace\(\/\[<>\]\/g/.test(worker),
   'teks feedback tidak dibersihkan dari penanda sudut di Worker');
 
-/* m025-307 — DASBORNYA TIDAK ADA LAGI, dan itu utang yang dicatat, bukan assert yang dicabut.
+/* m025-308 — DASBORNYA TIDAK ADA LAGI, dan itu utang yang dicatat, bukan assert yang dicabut.
  *
  * `creator-report-dashboard.html` dihapus oleh migrasi Cloudflare (73cd02a2) tanpa pengganti.
  * Keadaan sesudahnya, diperiksa satu per satu:
@@ -326,7 +326,7 @@ ok(guardAt !== -1, 'ack tidak memisahkan notifikasi masukan dari pengingat belaj
 ok(guardAt < ackBody.indexOf('rec.lastPushAt'),
   'ack masukan menyentuh lastPushAt; pengingat belajar akan terbungkam 18 jam');
 
-/* m025-307: assert lama menuntut notifikasi menunjuk `creator-report-dashboard.html`.
+/* m025-308: assert lama menuntut notifikasi menunjuk `creator-report-dashboard.html`.
    Berkas itu dihapus migrasi CF, jadi menuntutnya kembali berarti menuntut tautan ke 404 -
    lebih buruk daripada tidak ada tautan, karena OWNER mengetuk notifikasi dan mendarat di
    halaman kosong. Yang dijaga sekarang: notifikasi TIDAK BOLEH menjanjikan tujuan yang tidak
