@@ -28,15 +28,15 @@
     // app.js:5221 — accountSettingsMarkup: catatan tanpa akun
     'akun.catatan-tanpa': 'Belajar tetap jalan penuh tanpa akun. Masuk hanya menambahkan tutor AI, suara neural, dan sinkron progres antar perangkat.',
     // app.js:5220 — accountSettingsMarkup: catatan tersambung
-    'akun.catatan-tersambung': 'Ganti akun akan keluar dulu, lalu membuka login Puter - tanpa itu Puter langsung memakai sesi lama dan akunnya tidak pernah benar-benar berganti.',
+    'akun.catatan-tersambung': 'Ganti akun akan keluar dulu, lalu membuka login kembali.',
     // app.js:5171 — signOutPuterAccount: Error
-    'akun.err-layanan': 'Layanan akun Puter belum bisa dihubungi.',
+    'akun.err-layanan': 'Layanan akun belum bisa dihubungi.',
     // app.js:5217 — accountSettingsMarkup: tombol ganti
     'akun.ganti': 'Ganti akun',
     // app.js:5217 — accountSettingsMarkup: tombol keluar
     'akun.keluar': 'Keluar',
     // app.js:5218 — accountSettingsMarkup: tombol masuk
-    'akun.masuk': 'Masuk ke akun Puter',
+    'akun.masuk': 'Masuk ke akun',
     // app.js:5155 — puterAccountLabel: tersambung
     'akun.tersambung': 'Akun tersambung',
     // app.js:5188 — runPuterSwitchAccount: toast
@@ -335,7 +335,7 @@
     // app.js:5791 — startAdaptive: toast pool kurang
     'adaptif.toast-pool-kurang': 'Profil adaptif belum memiliki area yang cukup terukur. Lanjutkan latihan level terlebih dahulu.',
     // app.js:5222 — accountSettingsMarkup: judul kartu
-    'akun.judul': 'Akun Puter',
+    'akun.judul': 'Akun',
     // app.js:5222 — accountSettingsMarkup: keterangan kartu
     'akun.keterangan': 'Progres belajar, streak, dan tutor AI tersimpan di akun ini.',
     // app.js:5222 — accountSettingsMarkup: sub belum
