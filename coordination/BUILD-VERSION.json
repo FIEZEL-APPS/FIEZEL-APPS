@@ -1,7 +1,7 @@
 {
-  "version": "m025-305",
+  "version": "m025-306",
   "claimedBy": "branch claude/wizardly-franklin-x2irnj",
-  "claimedAt": "2026-09-13T09:19:23.743Z",
+  "claimedAt": "2026-09-13T10:52:27.816Z",
   "reason": "PAW kembali: maskot lama menggantikan Nusa & Mira",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }

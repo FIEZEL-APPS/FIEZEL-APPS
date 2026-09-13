@@ -4884,7 +4884,7 @@ const CF_SERVER_FLAG_FOR=Object.freeze({auth:'cfIdentityEnabled',quota:'cfQuotaE
 // Kill switch tingkat server (`enabled:{ai,tts,coach,analytics}`) ikut dihormati sebagai
 // lapis tambahan yang hanya bisa MEMATIKAN. Kunci yang tidak dikirim server = tidak
 // berpendapat (daftar `flags` di atas yang otoritatif), kunci bernilai false = mati.
-const CF_SERVER_KILL_FOR=Object.freeze({ai:Object.freeze(['ai','coach']),tts:Object.freeze(['tts']),usage:Object.freeze(['analytics'])});
+const CF_SERVER_KILL_FOR=Object.freeze({ai:Object.freeze(['ai']),tts:Object.freeze(['tts']),usage:Object.freeze(['analytics'])});
 // status: 'idle' | 'ok' | 'protocol_mismatch' | 'unreachable' | 'no_base' | 'not_needed'
 // Apa pun selain 'ok' berarti SELURUH jalur CF mati.
 let cfRemoteState={status:'idle',protocol:'',flags:null,enabled:null,fetchedAt:0,source:'none',reason:''};
@@ -5455,8 +5455,10 @@ function cfShadowProbe(path,options,answer){
 }
 // Jalur Cloudflare murni — Puter telah dihapus sepenuhnya.
 // Semua panggilan coreWorkerExec langsung dilayani oleh Cloudflare Worker fiezel-api.
-async function corePuterExec(path,options={}){return cfWorkerFetch(path,options)}
+async function corePuterExec(path,options={}){const url=(self.CORE_WORKER_URL||'')+path;if(self.puter?.workers?.exec)return puter.workers.exec(url,options);const sdk=await (self.awaitPuter?self.awaitPuter():null);if(sdk?.workers?.exec)return sdk.workers.exec(url,options);return cfWorkerFetch(path,options)}
 async function coreWorkerExec(path,options={}){
+  const mode=cfEndpointMode(path);
+  if(mode==='off')return corePuterExec(path,options);
   return cfWorkerFetch(path,options);
 }
 /* CF-TRANSPORT-END */
