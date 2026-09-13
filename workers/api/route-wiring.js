@@ -385,74 +385,21 @@ function rollbackQuotaBridgeFactory() {
  * "jatah gratis 10.000 neuron/hari ≈ 7.333 karakter/hari untuk SELURUH akun". Jadi
  * plafon akun sekarang mengikat DI KEDUA jalur.
  */
-/**
- * SATU-SATUNYA perakit tanda terima reservasi, sekarang berbentuk env-first.
- *
- * Dipisah dari `accountBudgetBridge` (m025-308) karena pemanggil kedua muncul:
- * `route-legacy.js` juga memanggil model, tetapi rutenya dipasang sebagai array
- * `ROUTES` lewat `route-slots.js` — ia tidak pernah lewat `buildExtraRoutes`, jadi
- * `CTX_BY_REQUEST` tidak pernah memegang request-nya dan jembatan lama SELALU
- * menjawab `ai_budget_context_missing` untuknya. Menyalin perakitan ini ke sana
- * akan membuat bentuk tanda terima diketik di DUA tempat yang bisa menyimpang —
- * persis yang dilarang `model-call-gate.js`. Jadi yang dipindah adalah perakitnya,
- * bukan salinannya, dan jembatan lama kini memanggil fungsi ini.
- */
-export async function reserveNeuronsForEnv(args) {
-  const a = args || {};
-  const env = a.env || {};
-  const db = quotaDb(env);
-  const neurons = accountNeuronsFor(a);
-  const out = await reserveAccountNeurons({ db, env, neurons, now: a.now });
-  if (!out || out.allowed !== true) return out || { allowed: false, reason: 'ai_budget_unreadable', usedBefore: 0 };
-  return ModelCallGate.makeReservation({
-    neurons,
-    cap: out.cap,
-    usedBefore: out.usedBefore,
-    release: () => releaseAccountNeurons({ db, env, neurons, now: a.now })
-  });
-}
-
-/**
- * Panggil model DENGAN penakaran, dalam satu langkah: pesan neuron -> lewat
- * chokepoint -> lepas reservasi kalau panggilannya gagal sebelum model bekerja.
- *
- * Ada di sini, bukan di pemanggilnya, karena urutan tiga langkah itulah yang
- * gampang salah kalau disalin: melepas reservasi pada timeout (padahal model
- * sudah ditagih), atau lupa melepas sama sekali. `releasableFailure()` yang
- * memutuskan arahnya, bukan pemanggil.
- *
- * Mengembalikan amplop, bukan melempar: rute warisan menjawab murid dengan teks
- * cadangan pada kegagalan apa pun, dan itu perilaku yang sengaja dipertahankan.
- */
-export async function callModelMetered(args) {
-  const a = args || {};
-  const env = a.env || {};
-  const reservation = await reserveNeuronsForEnv({ env, neurons: a.neurons, now: a.now });
-  if (!ModelCallGate.isReservation(reservation)) {
-    return { ok: false, reason: String((reservation && reservation.reason) || 'ai_account_cap'), result: null };
-  }
-  try {
-    const result = await ModelCallGate.runReservedModel({
-      env, modelId: a.modelId, input: a.input, options: a.options || {}, reservation
-    });
-    return { ok: true, reason: '', result };
-  } catch (e) {
-    if (ModelCallGate.releasableFailure(e)) {
-      await ModelCallGate.releaseReservation(reservation, (e && e.message) || 'model_call_failed');
-    }
-    return { ok: false, reason: (e && e.message) || 'model_call_failed', result: null, error: e };
-  }
-}
-
 function accountBudgetBridgeFactory() {
   return async function accountBudgetBridge(args) {
     const a = args || {};
     const ctx = a.request ? CTX_BY_REQUEST.get(a.request) : null;
+    const env = (ctx && ctx.env) || a.env || {};
     if (!ctx) return { allowed: false, reason: 'ai_budget_context_missing', usedBefore: 0 };
-    return reserveNeuronsForEnv({
-      env: ctx.env || a.env || {},
-      neurons: a.neurons, chars: a.chars, freeCharsPerDay: a.freeCharsPerDay,
-      now: a.now
+    const db = quotaDb(env);
+    const neurons = accountNeuronsFor(a);
+    const out = await reserveAccountNeurons({ db, env, neurons, now: a.now });
+    if (!out || out.allowed !== true) return out || { allowed: false, reason: 'ai_budget_unreadable', usedBefore: 0 };
+    return ModelCallGate.makeReservation({
+      neurons,
+      cap: out.cap,
+      usedBefore: out.usedBefore,
+      release: () => releaseAccountNeurons({ db, env, neurons, now: a.now })
     });
   };
 }

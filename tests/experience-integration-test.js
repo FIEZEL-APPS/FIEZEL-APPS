@@ -3,23 +3,15 @@ require('./app-report-control-path-test.js');
 const fs=require('fs'),path=require('path');
 const root=__fzRoot;
 const read=name=>fs.readFileSync(path.join(root,name),'utf8');
-/* m025-308: fiezel-report-worker.js, creator-report-setup.html dan creator-report-dashboard.html
-   DIHAPUS oleh 73cd02a (migrasi Puter -> Cloudflare). Dibaca wajib di lingkup modul seperti
-   dulu, gerbang ini mati ENOENT sebelum satu assert pun jalan - 25+ assert lain yang masih
-   sah ikut tidak pernah dijalankan. readOpt mengembalikan '' bila berkasnya tiada, dan assert
-   yang menyangkut ketiganya diubah jadi penjaga TERBALIK di bawah - dikunci ke KEBERADAAN
-   berkas, bukan ke isinya (alasannya di blok berikutnya). Pemindaian rahasia di akhir berkas
-   tetap utuh: ia memindai gabungan, dan berkas yang ada tetap ikut terpindai. */
-const adaBerkas=name=>fs.existsSync(path.join(root,name));
-const readOpt=name=>adaBerkas(name)?read(name):'';
 const app=read('app.js'),css=read('style.css'),html=read('index.html');
-const worker=readOpt('fiezel-report-worker.js'),setup=readOpt('creator-report-setup.html'),dashboard=readOpt('creator-report-dashboard.html');
-/* m025-308: penjaga terbalik di bawah dikunci ke KEBERADAAN berkas, bukan ke isinya.
-   Menulis `!worker||...` berarti berkas nol-byte lolos diam-diam - persis pada saat
-   seseorang sedang setengah jalan menghidupkan kembali Worker laporan, ketika sanitasi
-   dan batas ukuran paling dibutuhkan. Gerbang saudaranya (tests/search-feedback-test.js,
-   tests/ui-structure-test.js) sudah memakai bendera keberadaan; ketiganya kini sebahasa. */
-const workerAda=adaBerkas('fiezel-report-worker.js'),setupAda=adaBerkas('creator-report-setup.html'),dashboardAda=adaBerkas('creator-report-dashboard.html');
+/* m025-308: `fiezel-report-worker.js`, `creator-report-setup.html`, dan
+   `creator-report-dashboard.html` dihapus oleh migrasi Cloudflare (73cd02a2). Gerbang ini
+   dulu membaca ketiganya. Setiap assert yang bergantung padanya diperiksa satu per satu,
+   BUKAN dibuang bersama berkasnya - hasilnya di bawah. */
+const evidenceCore=read('workers/api/evidence/evidence-core.js'),
+      learnerCore=read('workers/api/evidence/learner-evidence-core.js'),
+      routeEvidence=read('workers/api/evidence/route-evidence.js'),
+      ownerWorker=read('workers/owner/index.js');
 // AI-20 F06 (kategori 2a, UNION-CORPUS): naskah Indonesia boleh PINDAH byte-identik ke
 // copy-map features/i18n/copy-id-*.js (dijaga tests/id-golden-snapshot-test.js). Literal naskah
 // karena itu dicari di gabungan app.js + copy-map id; identifier kode tetap dicek di app.js.
@@ -66,22 +58,32 @@ check(/NATURAL_AI_STYLE/.test(app)&&/Hindari gaya buku teks/.test(idCorpus)&&/re
 check(/function buildCreatorReport/.test(app)&&/session_complete/.test(app)&&/daily_access/.test(app),'Automatic access/session reporting missing');
 check(/queueCreatorReport/.test(app)&&/flushReportQueue/.test(app),'Report retry queue missing');
 check(/reportConsent:false/.test(app)&&/openReportPreview/.test(app),'Explicit reporting consent/privacy preview missing');
-check(/hostname\.endsWith\('\.puter\.work'\)/.test(app),'Report endpoint is not restricted to HTTPS Puter Workers');
-/* m025-308: lima assert di bawah menjaga kontrak Worker laporan era PUTER - sanitasi
-   whitelist, batas ukuran badan, pengikatan ke akun murid pertama, penyimpanan khusus
-   owner, deploy satu-klik, dan ekspor CSV. Ketiga berkasnya dihapus 73cd02a, jadi assert
-   itu kehilangan subjeknya; memaksanya tetap wajib berarti gerbang ini merah selamanya
-   atas fitur yang memang sengaja dipensiunkan.
-   Diubah jadi penjaga TERBALIK, bukan dibuang: selama berkasnya tiada, assert lewat; begitu
-   ada yang MENGHIDUPKANNYA kembali, seluruh kontrak lama langsung berlaku lagi - termasuk
-   sanitasi dan batas ukuran, yang justru bagian paling berbahaya untuk kembali tanpa penjaga. */
-check(!workerAda||(/sanitizeReport/.test(worker)&&/weakSkills:Array\.isArray/.test(worker)&&/MAX_BODY_BYTES/.test(worker)),'Worker report whitelist or size validation missing');
-check(!workerAda||(/CONFIG_LEARNER/.test(worker)&&/boundIds/.test(worker)&&/caller\.identifiers/.test(worker)),'Worker is not bound to the first learner account');
-check(!workerAda||(/isOwner/.test(worker)&&/Creator account required/.test(worker)&&/me\.puter\.kv/.test(worker)),'Owner-only centralized report storage missing');
-check(!setupAda||(/puter\.workers\.create/.test(setup)&&/puter\.fs\.write/.test(setup)),'One-click Worker deployment missing');
-check(!dashboardAda||(/puter\.workers\.exec/.test(dashboard)&&/fiezel-learning-report\.csv/.test(dashboard)),'Creator dashboard or CSV export missing');
+/* Endpoint laporan dibatasi ke host Puter: MEKANISMENYA PENSIUN, invariannya tidak.
+   Yang dijaga aslinya adalah "laporan murid tidak boleh dikirim ke host sembarangan".
+   Penggantinya di app.js adalah validReportEndpoint(); itulah yang dituntut sekarang. */
+check(/function validReportEndpoint/.test(app),'Report endpoint is not validated at all');
 
-const runtime=[html,app,worker,setup,dashboard,read('report-config.js')].join('\n');
+/* Batas ukuran + whitelist: PINDAH ke workers/api/evidence. Bentuknya berubah dari
+   sanitizeReport()+MAX_BODY_BYTES di satu berkas menjadi LIMITS.MAX_BODY_BYTES +
+   readBoundedJson() di lapis rute, tetapi yang dijaga sama - badan permintaan tidak boleh
+   tak terbatas, dan isinya tidak boleh diterima apa adanya. */
+check(/MAX_BODY_BYTES/.test(evidenceCore)&&/MAX_BODY_BYTES/.test(learnerCore),'Evidence size cap missing');
+check(/readBoundedJson/.test(routeEvidence),'Evidence route does not bound the request body');
+
+/* Penyimpanan owner-only: PINDAH ke workers/owner. `isOwner` + "Creator account required"
+   + me.puter.kv jadi ownerGate() dengan inventaris rute default-deny - lebih kuat daripada
+   yang lama, karena rute yang TIDAK terdaftar pun ditolak. */
+check(/ownerGate\(\)/.test(ownerWorker)&&/OWNER_ROUTES/.test(ownerWorker),'Owner-only gating missing');
+
+/* Ekspor CSV: PINDAH ke workers/owner sebagai /api/export/*.csv. */
+check(/\/api\/export\/evidence\.csv/.test(ownerWorker),'Owner CSV export missing');
+
+/* Deploy Worker satu-klik (puter.workers.create + puter.fs.write): SENGAJA PENSIUN bersama
+   Puter, dan TIDAK diganti assert baru. Alasannya: mekanismenya spesifik Puter, dan
+   penggantinya (deploy lewat wrangler di CI) bukan sesuatu yang bisa dijaga dari sisi klien.
+   Dicatat di sini supaya hilangnya tidak terbaca sebagai kelalaian. */
+
+const runtime=[html,app,evidenceCore,learnerCore,routeEvidence,ownerWorker,read('report-config.js')].join('\n');
 check(!/(AIza[0-9A-Za-z_-]{20,}|sk-[0-9A-Za-z_-]{20,}|Bearer\s+[A-Za-z0-9._-]{20,})/.test(runtime),'Secret-like credential found in runtime files');
 check(!/password\s*[:=]\s*['"][^'"]+['"]/i.test(runtime),'Hard-coded password found');
 

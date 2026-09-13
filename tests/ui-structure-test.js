@@ -4,18 +4,16 @@ const root=__fzRoot;
 const html=fs.readFileSync(path.join(root,'index.html'),'utf8');
 const css=fs.readFileSync(path.join(root,'style.css'),'utf8');
 const app=fs.readFileSync(path.join(root,'app.js'),'utf8');
-/* m025-308: kedua halaman bantuan (creator-report-setup.html, creator-report-dashboard.html)
-   DIHAPUS oleh 73cd02a saat migrasi Puter -> Cloudflare. Gerbang ini masih membacanya di
-   lingkup modul, sehingga SELURUH gerbang mati dengan ENOENT sebelum satu assert pun
-   berjalan - 27 assert lain yang masih sah ikut tidak pernah dijalankan.
-   Dibaca kondisional sekarang, dan assert-nya jadi penjaga TERBALIK di bawah: yang dijaga
-   bukan lagi bentuk halaman yang tidak ada, melainkan bahwa penghapusannya TETAP berlaku. */
-const auxSetupPath=path.join(root,'creator-report-setup.html');
-const auxDashPath=path.join(root,'creator-report-dashboard.html');
-const auxSetupAda=fs.existsSync(auxSetupPath);
-const auxDashAda=fs.existsSync(auxDashPath);
-const setup=auxSetupAda?fs.readFileSync(auxSetupPath,'utf8'):'';
-const dashboard=auxDashAda?fs.readFileSync(auxDashPath,'utf8'):'';
+/* m025-308: kedua halaman bantu (`creator-report-setup.html`,
+   `creator-report-dashboard.html`) dihapus migrasi Cloudflare (73cd02a2). Dua assert yang
+   membacanya diubah jadi PENJAGA BERSYARAT atas halaman bantu APA PUN yang ada hari ini -
+   bukan dibuang, dan bukan dipaku ke dua nama berkas yang kebetulan dulu ada. Bentuk ini
+   lebih kuat daripada yang lama: halaman bantu BARU langsung ikut terjaga tanpa ada daftar
+   yang perlu disunting, persis pelajaran precache-covers-shell. */
+const HALAMAN_BANTU = fs.readdirSync(root)
+  .filter((f) => /\.html$/.test(f))
+  .filter((f) => !['index.html', '404.html', 'landing.html'].includes(f))
+  .map((f) => ({ nama: f, src: fs.readFileSync(path.join(root, f), 'utf8') }));
 const failures=[];
 const check=(ok,message)=>{if(!ok)failures.push(message)};
 
@@ -97,16 +95,25 @@ check(/width:calc\(100% - 16px\)/.test(css),'Mobile bottom navigation lacks a vi
 check(/max-height:min\(760px,88vh\);overflow:auto/.test(css),'Modal content is not viewport bounded.');
 check(/prefers-reduced-motion:reduce/.test(css)&&/\.reduce-motion \*/.test(css),'Reduced-motion coverage is incomplete.');
 check(!/[🔊🗣✨💡🏠📚📈]/u.test(app+html),'Runtime UI still uses legacy control emoji instead of the icon library.');
-/* m025-308: dua assert lama di sini memeriksa BENTUK creator-report-setup.html dan
-   creator-report-dashboard.html (tombol eksplisit, meta viewport). Kedua halaman itu sudah
-   dihapus 73cd02a, jadi assert-nya tidak lagi punya subjek. Diganti penjaga terbalik -
-   kalau salah satu halaman itu dihidupkan lagi, ia WAJIB memenuhi kontrak lama itu, bukan
-   masuk diam-diam tanpa tombol eksplisit dan tanpa meta viewport. Jadi cakupannya tidak
-   dibuang: ia menunggu subjeknya. */
-check(!auxSetupAda||(/type="button" id="deploy"/.test(setup)&&/<meta name="viewport"/.test(setup)),
-  'creator-report-setup.html hidup lagi tanpa tombol eksplisit / meta viewport.');
-check(!auxDashAda||(/type="button" id="load"/.test(dashboard)&&/<meta name="viewport"/.test(dashboard)),
-  'creator-report-dashboard.html hidup lagi tanpa tombol eksplisit / meta viewport.');
+for(const h of HALAMAN_BANTU){
+  /* Invarian aslinya PUNYA SYARAT, dan syaratnya penting: <button> tanpa type hanya
+     berbahaya DI DALAM <form>, karena di sana ia default 'submit' dan satu klik memuat ulang
+     halaman - kehilangan apa pun yang sudah diisi. Di luar form ia tidak punya yang
+     dikirimkan, jadi menuntut type di sana memerahkan gerbang untuk hal yang tidak merugikan
+     siapa pun (versi pertama penjaga ini melakukan itu: 21 tombol di preview-redesign.html,
+     nol form). Jadi yang diperiksa hanya halaman yang benar-benar punya form. */
+  if(!/<form/i.test(h.src))continue;
+  const implisit=(h.src.match(/<button(?![^>]*\stype=)/g)||[]).length;
+  check(implisit===0,'Halaman bantu '+h.nama+' punya '+implisit+' <button> tanpa type eksplisit di dalam halaman berform.');
+}
+for(const h of HALAMAN_BANTU){
+  check(/<meta name="viewport"/.test(h.src),'Halaman bantu '+h.nama+' tidak siap layar ponsel (tanpa meta viewport).');
+}
+if(!HALAMAN_BANTU.length){
+  console.log('CATATAN m025-308: nol halaman bantu di root - creator-report-setup.html dan '+
+    'creator-report-dashboard.html dihapus migrasi CF. Penjaga di atas menyala sendiri begitu '+
+    'halaman bantu berikutnya dibuat.');
+}
 
 // m025-93 (brief redesign Bab 2, bug kritis #2). OWNER: "bottom navigation bar menimpa
 // konten saat scroll - teks/angka terpotong di belakang nav pill".

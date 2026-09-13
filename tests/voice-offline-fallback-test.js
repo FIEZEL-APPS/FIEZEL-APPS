@@ -221,6 +221,19 @@ test('kartu akun menawarkan keluar DAN jalan masuk lagi', () => {
      jadi itu yang dijaga - dan dijaga pada PEMANGGILANNYA, bukan pada definisinya. */
   if (!APP.includes('bindFiezelAccountControls();'))
     throw new Error('bindFiezelAccountControls() tidak pernah DIPANGGIL; kartu akun tidak tersambung');
+
+/* m025-308 [dari cabang PR #409] — PAGAR MAJU yang tidak ada di kedua assert di atas.
+ *
+ * Keduanya menjaga bahwa jalan keluar SEKARANG berfungsi. Tidak ada yang menjaga bahwa jalur
+ * Puter tidak KEMBALI. Arahnya kebalikan dari tes lama: dulu kartu Puter WAJIB ada, sekarang
+ * ia wajib tetap pensiun - karena penghapusannya keputusan OWNER (2db8622), dan keputusan
+ * yang tidak dijaga gerbang bisa dibatalkan diam-diam oleh perubahan berikutnya tanpa satu
+ * pun gerbang berubah merah. Itu persis kelas kegagalan yang membuat PR ini ada. */
+test('jalur akun Puter TETAP pensiun', () => {
+  const fn = /async function runPuterSwitchAccount\(\)\{[\s\S]*?\}/.exec(APP);
+  if (!fn) throw new Error('runPuterSwitchAccount hilang seluruhnya; tes ini perlu disesuaikan, jangan dibiarkan hijau');
+  if (/auth\.signIn\(\)/.test(fn[0])) throw new Error('jalur ganti akun Puter hidup lagi; kartunya dipensiunkan atas permintaan OWNER');
+});
 });
 
 test('pengaturan tidak lagi menjual unduhan kepada murid', () => {

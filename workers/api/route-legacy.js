@@ -10,54 +10,113 @@
  */
 
 import { jsonResponse, jsonError } from './errors.js';
-import { callModelMetered } from './route-wiring.js';
+import { reserveAccountNeurons, releaseAccountNeurons } from './ai/ai-account-budget.js';
+import * as modelGateNs from './ai/model-call-gate.js';
 
 /**
- * m025-308 - RUTE INI DULU MEMANGGIL `ctx.env.AI.run(...)` LANGSUNG, LIMA KALI.
- *
- * Akibatnya bukan kosmetik. `ai/model-call-gate.js` ada supaya binding Workers AI
- * hanya dieja di SATU titik cekik yang menakar belanja; lima panggilan di berkas ini
- * memintasnya, jadi sebagian rute /api/ai/* membelanjakan neuron TANPA dihitung
- * terhadap plafon akun - sementara plafon 10.000 neuron/hari itu ditanggung bersama
- * SELURUH murid. Yang memakan jatah tanpa tercatat membuat jatah habis lebih cepat
- * daripada yang diketahui siapa pun, dan AI mati untuk murid sungguhan.
- * `tests/ai-account-cap-gate-test.js` assert A1 memerahkan celah ini.
- *
- * Biayanya: model di sini `@cf/meta/llama-3.1-8b-instruct`, yang tidak punya angka
- * terukur sendiri di `ai/ai-tasks.js`. Saudara terdekatnya yang terukur adalah
- * varian `-fp8` (12,5 neuron/permintaan), dan varian non-fp8 tidak lebih murah dari
- * itu. Jadi dibulatkan KE ATAS ke 13: memesan kelebihan aman untuk dompet, memesan
- * kekurangan tidak - arah yang sama yang dipilih `accountNeuronsFor()`.
+ * Ambil ekspor modul UMD `model-call-gate.js` baik saat ia di-bundle sebagai CJS (esbuild
+ * memberi `module`, hasilnya jadi `default`) maupun saat dieksekusi sebagai ESM murni
+ * (hasilnya hanya ada di `globalThis`). Resolver ini disalin dari route-wiring.js supaya
+ * kedua jalur memakai cara yang sama; menuliskannya berbeda berarti satu jalur bisa
+ * mendapat `null` di runtime yang tidak diuji.
  */
+function umd(ns, globalName) {
+  const g = typeof globalThis !== 'undefined' ? globalThis : {};
+  if (ns && ns.default && typeof ns.default === 'object') return ns.default;
+  if (g[globalName]) return g[globalName];
+  return ns || null;
+}
+const ModelCallGate = umd(modelGateNs, 'FiezelModelCallGate');
+
+// == PANGGILAN MODEL DI BERKAS INI WAJIB BERPLAFON (m025-308) =========================
+//
+// KENAPA INI ADA. Berkas ini DULU menyentuh binding Workers AI secara langsung di LIMA
+// tempat, dan daftar ini sengaja tepat karena orang berikutnya akan MENGAUDIT cakupan plafon
+// terhadapnya:
+//   1. /api/ai/chat
+//   2. /api/ai/translate
+//   3. /api/coach/context
+//   4. /api/content/qa/review
+//   5. /api/content/patch/candidate
+// /api/content/self-refine SENGAJA TIDAK ada di daftar ini: ia hanya menulis ke
+// evolution_ledger dan tidak pernah memanggil model, jadi ia tidak butuh pembungkus.
+// (Versi pertama komentar ini menulis "LIMA" lalu menyebut ENAM rute, dengan self-refine
+// ikut terbawa. Kekeliruannya bukan kosmetik: pengaudit berikutnya akan mencari pembungkus
+// yang hilang pada rute yang memang tidak pernah memerlukannya.)
+//
+// Tidak satu pun dari kelima itu lewat penghitung neuron tingkat akun, dan ketiga yang
+// pertama HIDUP dipanggil klien (app.js memanggil /api/ai/chat dan /api/coach/context). Jadi
+// jalur ini membelanjakan neuron Workers AI tanpa plafon apa pun - bukan plafon yang longgar,
+// melainkan NOL plafon.
+//
+// tests/ai-account-cap-gate-test.js butir A1 menangkapnya dengan MEMINDAI SUMBER: binding
+// itu hanya boleh dieja di ai/model-call-gate.js. Gerbang itu memerah karena berkas ini
+// mengejanya juga, dan merahnya benar.
+//
+// Kolam yang dijaga bukan angka abstrak: jatah gratis Workers AI adalah 10.000 neuron/hari
+// untuk SATU AKUN, dan GLOBAL_NEURON_CAP dipasang 8.000. Satu jalur tanpa plafon cukup
+// untuk menghabiskannya, dan yang kehilangan AI sesudahnya adalah murid sungguhan.
+//
+// URUTANNYA BUKAN SELERA, dan ditiru dari route-ai.js:
+//   1. PESAN dulu (reserveAccountNeurons) - penolakan di sini tidak pernah menjadi tagihan,
+//      karena permintaannya bahkan tidak menjadi permintaan;
+//   2. bawa tanda terima ke chokepoint (runReservedModel) - tanpa tanda terima yang sah ia
+//      MELEMPAR model_call_unreserved sebelum satu byte sampai ke provider;
+//   3. LEPAS hanya untuk kegagalan yang memang tidak pernah menyentuh model. Batas mana yang
+//      boleh dilepas diputuskan SATU tempat: model-call-gate.js#releasableFailure(). Timeout
+//      TIDAK dilepas - model yang sudah bekerja tetap ditagih, dan melepasnya berarti
+//      berbohong ke arah yang mahal.
 const LEGACY_MODEL_ID = '@cf/meta/llama-3.1-8b-instruct';
-const LEGACY_NEURONS_PER_REQUEST = 13;
+// Biaya per permintaan. Angka 12,5 diambil dari kepala ai-tasks.js, yang mencatatnya terukur
+// untuk keluarga llama-3.1-8b. Kalau model di atas diganti, angka ini WAJIB ikut diperiksa:
+// biaya yang ditebak terlalu rendah membuat plafon berhenti melindungi.
+const LEGACY_MODEL_NEURONS = 12.5;
 
-/**
- * Sengaja MELEMPAR pada kegagalan apa pun - termasuk penolakan plafon. Kelima
- * pemanggil di bawah sudah punya `catch` yang menjawab murid dengan teks cadangan,
- * jadi bentuk ini membuat penakaran masuk TANPA mengubah satu pun perilaku yang
- * dilihat murid: gagal panggil = teks cadangan, persis seperti sebelumnya.
- */
-/**
- * Apakah kegagalan ini datang dari jalur ANGGARAN, bukan dari model. Dipakai rute
- * owner untuk memberi status yang bisa dipilah ('budget_exhausted') alih-alih
- * membuang string galat mentah ke badan respons.
- */
-function isBudgetDenial(error) {
-  const m = String((error && error.message) || '');
-  return /^(ai_account_cap|ai_budget_|model_call_unreserved|ai_binding_missing)/.test(m);
+async function runLegacyModel(ctx, input, options) {
+  const env = (ctx && ctx.env) || {};
+  // Nama binding: CORE_DB di wrangler.toml, DB di harness uji. Keduanya diterima, sama
+  // seperti quotaDb() di route-wiring.js.
+  const db = env.CORE_DB || env.DB || null;
+  const now = Number(ctx && ctx.now) || Date.now();
+  const neurons = LEGACY_MODEL_NEURONS;
+
+  const out = await reserveAccountNeurons({ db, env, neurons, now });
+  if (!out || out.allowed !== true) {
+    // Fail-CLOSED. Jatah akun habis, D1 mati, atau tabelnya belum ada - ketiganya berarti
+    // kami tidak boleh membelanjakan neuron, dan ketiganya sampai ke pemanggil sebagai
+    // lemparan supaya cabang cadangan yang SUDAH ADA di setiap rute yang menanganinya.
+    const err = new Error('ai_account_cap:' + String((out && out.reason) || 'unreadable'));
+    err.fiezelBudgetDenied = true;
+    throw err;
+  }
+
+  const reservation = ModelCallGate.makeReservation({
+    neurons,
+    cap: out.cap,
+    usedBefore: out.usedBefore,
+    release: () => releaseAccountNeurons({ db, env, neurons, now }),
+  });
+
+  try {
+    return await ModelCallGate.runReservedModel({
+      env, modelId: LEGACY_MODEL_ID, input, options: options || {}, reservation,
+    });
+  } catch (err) {
+    if (ModelCallGate.releasableFailure(err)) {
+      await ModelCallGate.releaseReservation(reservation, String((err && err.message) || 'provider_failed'));
+    }
+    throw err;
+  }
 }
 
-async function runLegacyModel(ctx, input) {
-  const out = await callModelMetered({
-    env: ctx.env,
-    modelId: LEGACY_MODEL_ID,
-    input,
-    neurons: LEGACY_NEURONS_PER_REQUEST,
-    now: Date.now()
-  });
-  if (!out.ok) throw out.error || new Error(out.reason || 'model_call_failed');
-  return out.result;
+/**
+ * Apakah kegagalan ini datang dari jalur ANGGARAN, bukan dari model. runLegacyModel()
+ * menandai penolakan plafon dengan `fiezelBudgetDenied`, jadi itu yang dibaca - bukan
+ * mencocokkan teks pesan, yang bisa berubah tanpa ada yang sadar.
+ */
+function isBudgetDenial(error) {
+  if (error && error.fiezelBudgetDenied === true) return true;
+  return /^ai_account_cap\b/.test(String((error && error.message) || ''));
 }
 
 // Helper pembaca JSON yang aman
@@ -71,6 +130,25 @@ async function readJson(ctx) {
     return {};
   }
 }
+
+// ── BATAS PENYIMPANAN FEEDBACK (m025-308) ────────────────────────────────────────────
+//
+// Worker Puter lama menjaga TIGA hal pada jalur feedback, dan migrasi ke D1 membawa
+// hanya satu (penjaga isOwner). Yang hilang: batas panjang teks dan batas jumlah baris.
+// Keduanya dipulihkan di sini, karena keduanya melindungi hal yang nyata:
+//
+//   - tanpa FEEDBACK_MAX_TEXT, satu murid yang sudah masuk bisa menulis satu baris
+//     sebesar apa pun ke D1; `JSON.stringify(body)` menyimpan badan permintaan apa adanya;
+//   - tanpa FEEDBACK_MAX, tabelnya tumbuh tanpa batas. Pembacaan memang LIMIT 200, jadi
+//     pertumbuhannya TIDAK TERLIHAT dari layar OWNER - ia hanya terlihat pada tagihan dan
+//     pada hari tabelnya terlalu besar untuk dibaca.
+//
+// Rem laju `allowFeedback()` milik Worker lama TIDAK dipulihkan, dan itu disengaja: ia ada
+// karena rute lamanya terbuka tanpa login. Rute baru menolak 401 tanpa `ctx.identity.sub`,
+// jadi pintu yang dijaganya sudah terkunci oleh otentikasi. Alasan ini ditulis di
+// tests/search-feedback-test.js supaya tidak dibaca sebagai perlindungan yang terlupakan.
+const FEEDBACK_MAX = 500;
+const FEEDBACK_MAX_TEXT = 4000;
 
 // Helper otentikasi Owner
 async function isOwner(ctx) {
@@ -124,10 +202,10 @@ export const ROUTES = [
       return jsonError(400, 'prompt_too_long', { max: 12000 }, opt);
     }
     
-    // m025-308: naskah ini masih menyebut maskot LAMA. Penggantian maskot (m025-307,
-    // PR #408) mengganti Nusa & Mira dengan PAW di seluruh klien, tetapi kalimat ini
-    // hidup di Worker - di luar jangkauan pemindaian berkas klien - jadi ia tertinggal.
-    // Ia bukan naskah mati: inilah yang dibaca murid setiap kali AI tidak tersedia.
+    // m025-309: naskah ini menyebut maskot LAMA. Penggantian maskot (m025-307, PR #408)
+    // mengganti Nusa & Mira dengan PAW di seluruh klien, tetapi kalimat ini hidup di Worker -
+    // di luar jangkauan pemindaian berkas klien - jadi ia tertinggal. Ia bukan naskah mati:
+    // inilah yang dibaca murid setiap kali AI tidak tersedia.
     let text = 'Halo! Saya PAW, asisten belajar FIEZEL.';
     if (ctx.env.AI) {
       try {
@@ -138,14 +216,13 @@ export const ROUTES = [
         const res = await runLegacyModel(ctx, { messages });
         if (res?.response) text = res.response;
       } catch (_) {
-        // m025-308: dulu baris ini menulis `AI response fallback: ${e.message}` ke MURID.
+        // m025-309: dulu baris ini menulis `AI response fallback: ${e.message}` ke MURID.
         // Selama panggilan model tidak ditakar, catch ini praktis hanya kena galat penyedia
-        // yang jarang. Sesudah penakaran masuk, PENOLAKAN PLAFON lewat sini juga - jalur
-        // yang memang akan sering terjadi begitu kolam 10.000 neuron/hari menipis - dan
-        // murid akan membaca "AI response fallback: ai_account_cap". Itu galat mentah yang
-        // dibocorkan ke murid, hal yang dilarang kontrak jawaban kami. Teks sapaan di atas
-        // dipertahankan apa adanya: murid mendapat kalimat yang bisa dibaca, bukan alasan
-        // internal yang bukan salahnya dan tidak bisa ditindaklanjutinya.
+        // yang jarang. Sesudah penakaran masuk (m025-308), PENOLAKAN PLAFON lewat sini juga -
+        // jalur yang memang akan sering terjadi begitu kolam 10.000 neuron/hari menipis - dan
+        // murid akan membaca "AI response fallback: ai_account_cap:...". Itu galat mentah yang
+        // dibocorkan ke murid. Teks sapaan di atas dipertahankan: murid mendapat kalimat yang
+        // bisa dibaca, bukan alasan internal yang bukan salahnya.
       }
     }
     
@@ -239,18 +316,11 @@ export const ROUTES = [
         const res = await runLegacyModel(ctx, { messages });
         review = { review: res?.response, schema: 'fiezel-content-qa-v1', authority: 'advisory-only' };
       } catch (e) {
-        // m025-308: DUA hal diperbaiki di sini, dan yang kedua lebih serius dari yang
-        // pertama.
-        // (1) e.message mentah dibuang ke badan respons. Sesudah penakaran masuk, yang
-        //     mengalir lewat sini bukan lagi hanya galat penyedia yang jarang - penolakan
-        //     plafon ikut lewat sini, jadi string internal seperti 'ai_account_cap' jadi
-        //     keluaran rutin. Diganti status yang stabil dan bisa dipilah.
-        // (2) Cabang ini MEMBUANG penanda tata kelola yang dijanjikan kontrak rute di
-        //     atas: schema DAN authority:'advisory-only' hilang dari respons. Konsumen
-        //     yang membaca 'authority' untuk memutuskan boleh-tidaknya hasil ini
-        //     diperlakukan sebagai nasihat belaka akan melihatnya TIDAK ADA, bukan
-        //     'advisory-only' - gagal ke arah yang salah. Cacat itu sudah lama, tetapi
-        //     perubahan ini yang membuatnya sering terjadi, jadi diperbaiki sekalian.
+        // m025-309: cabang ini dulu MEMBUANG penanda tata kelola yang dijanjikan kontrak
+        // rute di atas - schema DAN authority:'advisory-only' hilang dari respons. Konsumen
+        // yang membaca 'authority' untuk memutuskan boleh-tidaknya hasil ini diperlakukan
+        // sebagai nasihat belaka akan melihatnya TIDAK ADA - gagal ke arah yang salah.
+        // Sekaligus e.message mentah diganti status yang stabil dan bisa dipilah.
         review = {
           status: isBudgetDenial(e) ? 'budget_exhausted' : 'review_error',
           schema: 'fiezel-content-qa-v1',
@@ -269,11 +339,10 @@ export const ROUTES = [
     if (!(await isOwner(ctx))) return jsonError(403, 'forbidden', {}, opt);
     
     const body = await readJson(ctx);
-    /* m025-308: 'authority' dan 'gateStatus' dulu HANYA hidup di komentar kontrak di atas,
-       tidak pernah di satu pun objek respons rute ini - tidak di default, tidak di cabang
-       sukses, tidak di cabang galat. Tiga akibatnya:
+    /* m025-309: 'authority' dan 'gateStatus' dulu HANYA hidup di komentar kontrak di atas,
+       tidak pernah di satu pun objek respons rute ini. Tiga akibatnya:
        (1) Konsumen tidak punya cara membedakan kandidat yang BELUM lolos gerbang lokal dari
-           hasil yang sudah diverifikasi. Yang hilang justru peringatannya.
+           hasil terverifikasi. Yang hilang justru peringatannya.
        (2) features/brain/fiezel-content-chain.js memindahkan gateStatus DARI
            'UNVERIFIED_LOCAL_GATES_REQUIRED' ke LOCAL_GATES_PASSED/FAILED - ia memindahkan
            nilai yang tidak pernah dikirim worker.
@@ -300,12 +369,6 @@ export const ROUTES = [
           gateStatus: 'UNVERIFIED_LOCAL_GATES_REQUIRED'
         };
       } catch (e) {
-        // m025-308: sama seperti /api/content/qa/review di atas - status yang stabil
-        // menggantikan e.message mentah, dan schema yang dijanjikan kontrak rute tidak
-        // lagi hilang di cabang galat. Di sini taruhannya lebih tinggi: kontraknya
-        // 'candidate-only' + UNVERIFIED_LOCAL_GATES_REQUIRED, jadi respons tanpa penanda
-        // skema adalah respons yang kehilangan justru peringatan bahwa isinya BELUM
-        // diverifikasi dan tidak boleh diterapkan begitu saja.
         patch = {
           candidate: null,
           status: isBudgetDenial(e) ? 'budget_exhausted' : 'patch_error',
@@ -437,10 +500,26 @@ export const ROUTES = [
     const body = await readJson(ctx);
     const now = ctx.now || Date.now();
     
+    // Dipotong SEBELUM disimpan, bukan divalidasi lalu ditolak: keluhan murid yang
+    // kepanjangan tetap sampai ke OWNER dalam bentuk terpotong, dan itu lebih berguna
+    // daripada 413 yang membuat murid mengira laporannya terkirim padahal tidak.
+    // Penanda sudut dibuang SEBELUM disimpan, sama seperti Worker lama. Ini pertahanan
+    // berlapis, bukan pengganti escaping di penyaji: dasbor OWNER membaca kembali baris ini,
+    // dan teks yang disimpan mentah berarti satu kiriman murid bisa menjadi markup hidup di
+    // layar OWNER. Migrasi ke D1 menjatuhkan pembersihan ini; dipulihkan di m025-308.
+    let data = JSON.stringify(body).replace(/[<>]/g, '');
+    if (data.length > FEEDBACK_MAX_TEXT) data = data.slice(0, FEEDBACK_MAX_TEXT);
+
     if (ctx.env.CORE_DB) {
       await ctx.env.CORE_DB.prepare(
         `INSERT INTO feedback (sub, kind, data, created_at) VALUES (?, ?, ?, ?)`
-      ).bind(sub, body.kind || 'feedback', JSON.stringify(body), now).run().catch(() => {});
+      ).bind(sub, String(body.kind || 'feedback').slice(0, 64), data, now).run().catch(() => {});
+      // Cincin: padanan D1 dari `slice(-FEEDBACK_MAX)` milik Worker lama. Yang dibuang
+      // adalah baris TERTUA, jadi keluhan terbaru - yang paling mungkin masih relevan -
+      // yang bertahan.
+      await ctx.env.CORE_DB.prepare(
+        `DELETE FROM feedback WHERE id NOT IN (SELECT id FROM feedback ORDER BY created_at DESC LIMIT ?)`
+      ).bind(FEEDBACK_MAX).run().catch(() => {});
     }
     
     return jsonResponse({ success: true, receivedAt: now }, { status: 200, ...opt });
