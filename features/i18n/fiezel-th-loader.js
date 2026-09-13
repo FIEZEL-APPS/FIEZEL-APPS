@@ -32,6 +32,8 @@
   // Sejalan 1:1 dengan skrip th di locale-assets-th.json (dataset JSON di-fetch, bukan disuntik).
   var TH_SCRIPTS = [
     './features/i18n/copy-th-core.js',
+    // m025-310: kembaran th untuk naskah yang lahir di Worker (copy-id-worker.js).
+    './features/i18n/copy-th-worker.js',
     './features/i18n/copy-th-app-a.js',
     './features/i18n/copy-th-app-b.js',
     './features/i18n/copy-th-app-c.js',

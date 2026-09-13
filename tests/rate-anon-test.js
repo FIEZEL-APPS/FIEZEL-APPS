@@ -531,8 +531,21 @@ async function captureConsole(fn) {
     assert(budget.accountCapNeurons({ GLOBAL_NEURON_CAP: '8000' }) === 8000, '(g3) plafon efektif memakai var yang sah (8.000)');
     assert(/WHERE day = \?1 AND neurons \+ \?2 <= \?4/.test(budget.ACCOUNT_SQL.reserve),
       '(g4) reservasi neuron ATOMIK: syarat plafon ada di dalam WHERE, bukan baca-lalu-tulis');
-    assert(/accountBudget/.test(wiring) && /reserveAccountNeurons/.test(wiring),
-      '(g5) route-wiring.js benar-benar MENYUNTIKKAN pagar akun ke deps AI (bukan modul yang tidak dipanggil siapa pun)');
+    /* m025-310: perakitan tanda terima pindah ke ai/neuron-reservation.js supaya
+       route-wiring.js dan route-legacy.js berhenti merakitnya sendiri-sendiri. Assert ini
+       DULU menuntut 'reserveAccountNeurons' dieja di route-wiring.js, dan itu berhenti
+       cocok setelah pemindahan. Yang dijanjikannya bukan ejaan itu, melainkan "pagar akun
+       benar-benar tersambung, bukan modul yang tidak dipanggil siapa pun" - jadi yang
+       dituntut sekarang adalah SELURUH RANTAINYA, bukan satu ejaan di satu berkas.
+       Hasilnya lebih kuat, bukan lebih longgar: memutus rantai di titik mana pun kini
+       merah, termasuk perakit yang berhenti memanggil buku anggaran. */
+    const reservasi = mustRead(path.join(API_DIR, 'ai/neuron-reservation.js'), 'workers/api/ai/neuron-reservation.js');
+    assert(/accountBudget/.test(wiring) && /reserveNeurons\s*\(/.test(wiring),
+      '(g5a) route-wiring.js menyuntikkan pagar akun ke deps AI dan memanggil perakit reservasi');
+    assert(/reserveAccountNeurons/.test(reservasi) && /makeReservation/.test(reservasi),
+      '(g5b) perakit reservasi benar-benar memanggil buku anggaran dan mencetak tanda terima lewat chokepoint');
+    assert(/releaseAccountNeurons/.test(reservasi),
+      '(g5c) perakit reservasi bisa MELEPAS neuron kembali - tanpa ini kegagalan penyedia menagih murid untuk model yang tidak pernah bekerja');
     assert(/if \(!budget \|\| budget\.allowed !== true\)/.test(routeAi),
       '(g5) route-ai.js MENOLAK ketika pagar akun menjawab tidak-boleh');
 

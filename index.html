@@ -509,6 +509,11 @@ html.fz-booting body{overflow:hidden}
   <script defer src="./features/i18n/copy-id-feat-d.js"></script>
   <script defer src="./features/i18n/copy-id-gems.js"></script>
   <script defer src="./features/i18n/copy-id-quota.js"></script>
+  <!-- m025-310: naskah yang LAHIR DI WORKER. route-legacy.js mengirim copyKey di samping
+       text; tanpa berkas ini terdaftar, kuncinya tidak pernah punya naskah dan klien diam-diam
+       jatuh ke kalimat Indonesia dari server - persis layar campur yang mau dihindari.
+       Kembaran th-nya disuntik fiezel-th-loader.js, bukan di sini (aset th tidak statis). -->
+  <script defer src="./features/i18n/copy-id-worker.js"></script>
   <script defer src="./features/i18n/copy-id-settings-locale.js"></script>
   <!-- m025-246: naskah BARU gelombang penyederhanaan pengalaman (navigasi 4 tab, Home
        "Hari ini", ringkasan sesi, tema malam, keadaan gagal audio). Berkas terpisah dengan

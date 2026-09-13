@@ -63,7 +63,7 @@ import { FREE_BUCKET_LIMITS } from './quota/quota-config.js';
 // P3 - penegakan flag server DI JALUR PERMINTAAN, bukan sekadar dilaporkan ke klien.
 import { checkAiEnabled, checkTtsEnabled } from './feature-gate.js';
 // P3 - pagar neuron tingkat AKUN (jatah vendor), berbeda dari kuota per-murid.
-import { reserveAccountNeurons, releaseAccountNeurons } from './ai/ai-account-budget.js';
+import { reserveNeurons } from './ai/neuron-reservation.js';
 import { QUOTA_CONFIG } from './quota/quota-config.js';
 import { registerQuotaRoutes, enforceQuota, NO_STORE_HEADERS } from './quota/route-quota.js';
 import { sweepExpiredReservations, reconcileHeld } from './quota/quota-store-d1.js';
@@ -113,7 +113,12 @@ function umd(ns, globalName) {
   return ns || null;
 }
 
-const ModelCallGate = umd(modelGateNs, 'FiezelModelCallGate');
+/* m025-310: `const ModelCallGate = umd(...)` DIHAPUS dari sini - perakitan tanda terima
+   pindah ke ai/neuron-reservation.js, jadi berkas ini tidak lagi memanggil satu pun
+   methodnya dan bindingnya menjadi kode mati. IMPOR di atas SENGAJA TIDAK ikut dihapus:
+   ia load-bearing untuk URUTAN, bukan untuk nilainya - route-ai.js dan route-tts.js
+   mengambil chokepoint lewat globalThis, jadi modulnya wajib dievaluasi lebih dulu.
+   Menghapus impornya = `ModelCallGate is undefined` di jalur permintaan. */
 const RouteAi = umd(routeAiNs, 'FiezelRouteAi');
 const RouteTts = umd(routeTtsNs, 'FiezelRouteTts');
 
@@ -391,16 +396,10 @@ function accountBudgetBridgeFactory() {
     const ctx = a.request ? CTX_BY_REQUEST.get(a.request) : null;
     const env = (ctx && ctx.env) || a.env || {};
     if (!ctx) return { allowed: false, reason: 'ai_budget_context_missing', usedBefore: 0 };
-    const db = quotaDb(env);
-    const neurons = accountNeuronsFor(a);
-    const out = await reserveAccountNeurons({ db, env, neurons, now: a.now });
-    if (!out || out.allowed !== true) return out || { allowed: false, reason: 'ai_budget_unreadable', usedBefore: 0 };
-    return ModelCallGate.makeReservation({
-      neurons,
-      cap: out.cap,
-      usedBefore: out.usedBefore,
-      release: () => releaseAccountNeurons({ db, env, neurons, now: a.now })
-    });
+    // m025-310: perakitannya pindah ke ai/neuron-reservation.js dan dipakai bersama
+    // route-legacy.js. BERAPA neuron yang dipesan tetap diputuskan di sini, karena itu
+    // memang berbeda per jalur (accountNeuronsFor menurunkannya dari chars untuk TTS).
+    return reserveNeurons({ env, neurons: accountNeuronsFor(a), now: a.now });
   };
 }
 

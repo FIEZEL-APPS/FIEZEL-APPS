@@ -63,24 +63,60 @@ memesan kelebihan aman untuk dompet, memesan kekurangan tidak.
 
 ---
 
-## 5. LANGKAH BERIKUTNYA — terbuka, menunggu OWNER
+## 5. KEEMPAT BUTIR ITU SUDAH DIKERJAKAN (m025-310)
 
-1. **Titik buta gerbang cap.** Assert C1-C5 di `tests/ai-account-cap-gate-test.js` hanya
-   menemukan modul yang mendefinisikan `registerXxxRoutes(`. Modul berbentuk
-   `export const ROUTES` — seperti `route-legacy.js` — lolos dari tuntutan fixture
-   sepenuhnya. Melebarkannya menuntut lima fixture baru.
+Bagian ini dulu berisi empat butir terbuka. OWNER meminta semuanya dilanjutkan; berikut
+hasilnya, termasuk yang TIDAK selesai.
 
-2. **Perakitan tanda terima terduplikasi.** `route-legacy.js` kini memanggil
-   `ModelCallGate.makeReservation()` sendiri dan menyalin resolver `umd()` dari
-   `route-wiring.js`. `model-call-gate.js` secara eksplisit memperingatkan agar bentuk
-   tanda terima tidak diketik di dua tempat yang bisa menyimpang. Menyatukannya adalah
-   refactor tersendiri.
+### 5.1 Titik buta gerbang cap — SELESAI
+Penemuan C1-C5 hanya mengenali modul ber-`registerXxxRoutes(`. Modul ber-`export const
+ROUTES` — seperti `route-legacy.js` — lolos sepenuhnya, padahal ia memanggil model di lima
+rutenya. C3b kini menemukannya PER-RUTE: dari 22 rute, hanya 5 yang sumbernya menyentuh
+jalur model yang masuk daftar fixture. Kelimanya diverifikasi runtime (reservasi terjadi
+sebelum panggilan model, penghitung bergerak).
 
-3. **Maskot & aset.** MIRA sisi guru di `landing.html` belum diputuskan, dan direktori
-   `assets/characters/` 39 MB masih dikonsumsi `remotion/src/Scene.jsx`,
-   `design/redesign-v2/`, serta `character-preview.html`.
+Dua arahnya dibuktikan, bukan diklaim: menyisipkan panggilan model ke `/api/activity`
+(tanpa fixture) memerahkan C4 dengan pesan yang menyebut rutenya; membatalkannya
+menghijaukannya lagi.
 
-4. **Utang naskah dua bahasa.** Naskah sisi Worker (`route-legacy.js`) seluruhnya
-   Indonesia saja, di luar sistem `FiezelI18n`. Murid Thai membacanya sebagai layar
-   campur. Memindahkannya ke pasangan copy-id/copy-th menuntut i18n sisi server yang
-   belum ada. Dicatat sebagai utang bertanggal 2026-09-13.
+### 5.2 Perakitan tanda terima terduplikasi — SELESAI
+`workers/api/ai/neuron-reservation.js` kini satu-satunya perakit, dipakai
+`route-wiring.js` dan `route-legacy.js`. Resolver `umd()` yang tadinya disalin ikut
+tinggal satu. `const ModelCallGate` di route-wiring dihapus (kode mati); IMPOR-nya tidak,
+karena load-bearing untuk urutan evaluasi.
+
+Refactor ini langsung memerahkan C3b yang baru dibuat — pendeteksinya buta terhadap satu
+lapis indireksi. Itu justru bukti penjaga non-kehampaan bekerja. Pendeteksi kini menyemai
+nama yang diimpor dari modul yang mencapai chokepoint lalu menutupnya transitif.
+
+### 5.3 Aset maskot 39 MB — SELESAI SEBAGIAN, sisanya keputusan OWNER
+`assets/characters/` (39 MB) + `assets/motion/` (9,1 MB) berhenti diunggah ke produksi.
+Dibuktikan tidak dipakai: nol di ASSETS sw.js, nol tautan dari halaman terkirim, dan
+assert F gerbang deploy memindai seluruh sumber aplikasi untuk tiap direktori terkecuali.
+
+**DIKECUALIKAN, BUKAN DIHAPUS.** `remotion/src/Scene.jsx` masih merender video darinya.
+Menghapus 48 MB itu tetap keputusan OWNER — belum diambil.
+
+**MIRA di `landing.html` TIDAK disentuh.** Ia SVG inline dengan animasi sendiri
+(`miraBreathe`, `miraBlink`), bukan rujukan ke direktori itu. Menggantinya dengan PAW
+adalah pekerjaan desain pada halaman pemasaran, bukan penggantian mekanis — dan
+mengerjakannya asal-asalan membuat halaman itu lebih buruk, bukan lebih baik. Menunggu
+arahan OWNER.
+
+### 5.4 Utang naskah Thai sisi Worker — SELESAI SEBAGIAN
+Tiga kalimat yang sampai ke murid kini dikirim sebagai `copyKey` + `text`, dengan
+pasangan `copy-id-worker.js` / `copy-th-worker.js`. Klien memakai kuncinya lewat
+`workerCopy()` dan jatuh ke `text` bila kunci kosong atau belum bernaskah.
+
+**SISA UTANG, bertanggal 2026-09-13:** judul notifikasi push
+(`'Waktunya Belajar FIEZEL! ✨'`) masih Indonesia saja. Penghalangnya BUKAN
+terjemahannya — itu bisa ditulis — melainkan `sw.js` tidak punya runtime i18n sama sekali
+dan tidak tahu locale murid saat notifikasi tiba. Itu rancangan tersendiri, bukan
+tambalan, dan sengaja tidak dikebut di sini.
+
+## 6. YANG MASIH MENUNGGU OWNER
+
+1. Menghapus (bukan sekadar berhenti mengirim) 48 MB `assets/characters/` +
+   `assets/motion/` — `remotion/` masih memakainya.
+2. Mengganti MIRA di `landing.html` dengan PAW — pekerjaan desain.
+3. i18n untuk judul notifikasi push di service worker.

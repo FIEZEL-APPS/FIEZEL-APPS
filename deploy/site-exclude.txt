@@ -121,3 +121,31 @@ package-lock.json
 *.bak
 *.orig
 *.rej
+
+# --- ASET MASKOT PENSIUN + PERKAKAS DESAIN (m025-310) ---
+# 48 MB aset karakter Nusa & Mira plus 10 MB mockup desain terunggah ke produksi pada
+# SETIAP deploy, padahal tidak satu pun halaman yang dikirim memakainya. Dibuktikan, bukan
+# diduga: nol kemunculan `assets/characters` di daftar ASSETS sw.js, dan nol tautan ke
+# character-preview.html dari index.html, landing.html, kurikulum.html maupun misi.html.
+# MIRA yang masih hidup di landing.html adalah SVG INLINE - ia tidak menyentuh direktori ini
+# sama sekali, jadi mengecualikannya tidak mengubah satu piksel pun halaman itu.
+#
+# DIKECUALIKAN, BUKAN DIHAPUS. Berkasnya tetap di repo karena masih ada yang memakainya di
+# luar situs murid: remotion/src/Scene.jsx merender video darinya, dan character-preview.html
+# adalah alat pratinjau. Menghapusnya adalah keputusan OWNER yang terpisah; yang diselesaikan
+# di sini adalah ongkos pengirimannya, yang tidak menuntut keputusan siapa pun karena murid
+# memang tidak pernah memintanya.
+#
+# design/ SENGAJA TIDAK IKUT, dan itu koreksi yang dibuat gerbang ini sendiri. Versi pertama
+# blok ini mengecualikannya sebagai "mockup desain" berdasarkan nol rujukan di index.html dan
+# landing.html - pemeriksaan yang TERLALU SEMPIT: design/ dimuat splash dan SFX lewat modul,
+# bukan lewat tag di HTML. deploy-site-gate-test memerahkannya seketika. Dibiarkan terkirim.
+#
+# character-preview.html IKUT dikecualikan, dan itu wajib: ia satu-satunya konsumen
+# assets/motion, jadi mengirimnya tanpa asetnya berarti menyajikan halaman yang 404 di setiap
+# gambar. Polanya sama dengan tools/dev/*.html yang sudah dikecualikan di atas.
+assets/characters/
+assets/motion/
+character-preview.html
+remotion/
+test_reports/
