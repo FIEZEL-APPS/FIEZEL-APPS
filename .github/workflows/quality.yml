@@ -278,7 +278,7 @@ jobs:
           # hanya berisi kunci listen_sc_*, jadi tidak pernah kena sasaran sekali pun.
           # tests/th-exam-overlay-test.js memeriksa jalur bacanya, bukan datanya.
           node tests/th-exam-overlay-test.js
-          # m025-305: kelas bug yang sama, dua jalur lain. th-exam-overlay menjaga bank ujian
+          # m025-306: kelas bug yang sama, dua jalur lain. th-exam-overlay menjaga bank ujian
           # Listening/Speaking; Writing dan reading-exam tidak dijaga siapa pun, dan di situ
           # 45 petunjuk prompt + 5 catatan tugas ujian + 96 umpan balik per-soal sudah
           # diterjemahkan, sudah terunduh ke perangkat murid, lalu MENGANGGUR karena overlay
