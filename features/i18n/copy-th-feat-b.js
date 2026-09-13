@@ -273,7 +273,7 @@
     // ---------- tutor.* (voice chat) ----------
     'tutor.module-missing': 'โมดูลติวเตอร์ยังไม่ถูกโหลด',
     'tutor.ai-need-internet': 'สำหรับคำถามอิสระนอกบทเรียน FIEZEL AI ต้องต่ออินเทอร์เน็ต',
-    'tutor.ai-need-login': 'สำหรับคำถามอิสระนอกบทเรียน เข้าสู่ระบบ Puter ก่อนผ่านเมนูการตั้งค่า',
+    'tutor.ai-need-login': 'สำหรับคำถามอิสระนอกบทเรียน ตรวจสอบให้แน่ใจว่าเชื่อมต่ออินเทอร์เน็ตแล้ว',
     'tutor.talk-aria': 'กดแล้วพูดกับ Fiezel',
     'tutor.talk-hint': 'กดแล้วพูด',
     'tutor.no-voice-captured': 'ยังไม่มีเสียงที่จับได้',
@@ -303,7 +303,7 @@
     'coach.fiezel-pembimbing-you': '<span><b>FIEZEL</b><small class="fz-coach-status">ผู้ช่วยสอนของคุณ</small></span>',
     'coach.ga-ada-yang-dengerin-selain': 'ไม่มีใครฟังอยู่นอกจากคุณกับเรา',
     'coach.gimana-cara-cepat-inget-vocab': 'มีวิธีจำคำศัพท์ใหม่ให้เร็วไหม?',
-    'coach.gue-again-ga-can-nyambung': 'ตอนนี้เรายังต่อกับสมอง AI ไม่ได้ (ต้องเข้าสู่ระบบ Puter + อินเทอร์เน็ต) แต่แบบฝึกหัดยังเดินต่อได้ปกตินะ — อยากให้เราเป็นเพื่อนเริ่มจากตรงไหนดี?',
+    'coach.gue-again-ga-can-nyambung': 'ตอนนี้เรายังต่อกับสมอง AI ไม่ได้ (ต้องใช้อินเทอร์เน็ต) แต่แบบฝึกหัดยังเดินต่อได้ปกตินะ — อยากให้เราเป็นเพื่อนเริ่มจากตรงไหนดี?',
     'coach.gue-udah-siapin-rencana-hari': 'เราวางแผนของวันนี้ไว้ให้แล้ว เหลือแค่ลงมือ',
     'coach.kata-new-that-kayak-koin': 'คำใหม่ก็เหมือนเหรียญ — สะสมทีละนิดทีละหน่อย',
     'coach.kenapa-me-sering-wrong-at': 'ทำไมฉันพลาดที่ grammar บ่อย? ช่วยอธิบายสั้น ๆ',

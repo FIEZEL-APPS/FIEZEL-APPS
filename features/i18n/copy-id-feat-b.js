@@ -276,7 +276,7 @@
     // ---------- features/tutor-classroom/fiezel-tutor-voice-chat.js ----------
     'tutor.module-missing': 'Modul tutor belum termuat.',
     'tutor.ai-need-internet': 'Untuk pertanyaan bebas di luar materi, FIEZEL AI perlu koneksi internet.',
-    'tutor.ai-need-login': 'Untuk pertanyaan bebas di luar materi, login Puter dulu lewat menu pengaturan.',
+    'tutor.ai-need-login': 'Untuk pertanyaan bebas di luar materi, pastikan koneksi internet aktif.',
     'tutor.talk-aria': 'Tekan lalu bicara ke Fiezel',
     'tutor.talk-hint': 'Tekan lalu bicara',
     'tutor.no-voice-captured': 'Belum ada suara yang tertangkap',
@@ -314,7 +314,7 @@
     // features/ui/fiezel-coach-bubble.js:349
     'coach.gimana-cara-cepat-inget-vocab': 'Gimana cara cepat inget kosakata baru?',
     // features/ui/fiezel-coach-bubble.js:178
-    'coach.gue-again-ga-can-nyambung': 'Gue lagi ga bisa nyambung ke otak AI-nya (butuh login Puter + internet). Tapi latihannya jalan terus kok — mau gue temenin mulai dari mana?',
+    'coach.gue-again-ga-can-nyambung': 'Gue lagi ga bisa nyambung ke otak AI-nya (butuh koneksi internet). Tapi latihannya jalan terus kok — mau gue temenin mulai dari mana?',
     // features/ui/fiezel-coach-bubble.js:144
     'coach.gue-udah-siapin-rencana-hari': 'Gue udah siapin rencana hari ini, tinggal jalan.',
     // features/ui/fiezel-coach-bubble.js:145

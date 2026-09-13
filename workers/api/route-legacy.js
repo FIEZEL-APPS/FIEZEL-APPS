@@ -93,6 +93,7 @@ export const ROUTES = [
       text,
       protocol: '1.7',
       schema: 'fiezel-ai-response-v1'
+    }, { status: 200, ...opt });
   }],
   
   // 2. POST /api/ai/translate
