@@ -173,7 +173,14 @@ export const ROUTES = [
     // mengganti Nusa & Mira dengan PAW di seluruh klien, tetapi kalimat ini hidup di Worker -
     // di luar jangkauan pemindaian berkas klien - jadi ia tertinggal. Ia bukan naskah mati:
     // inilah yang dibaca murid setiap kali AI tidak tersedia.
+    /* m025-310: kalimat ini lahir di SERVER, jadi ia tidak pernah lewat FiezelI18n dan
+       murid Thai membacanya dalam bahasa Indonesia - layar campur, bukan teks hilang.
+       route-quota.js sudah menetapkan aturannya: "Server mengirim FAKTA + copyKey, bukan
+       kalimat." `copyKey` dikirim DI SAMPING `text`, bukan menggantikannya, supaya klien
+       lama tetap bekerja apa adanya. Ia dikosongkan begitu model benar-benar menjawab,
+       karena jawaban model bukan naskah kami dan tidak punya terjemahan. */
     let text = 'Halo! Saya PAW, asisten belajar FIEZEL.';
+    let copyKey = 'worker.chat.fallback';
     if (ctx.env.AI) {
       try {
         const messages = [
@@ -181,7 +188,7 @@ export const ROUTES = [
           { role: 'user', content: String(prompt || '') }
         ];
         const res = await runLegacyModel(ctx, { messages });
-        if (res?.response) text = res.response;
+        if (res?.response) { text = res.response; copyKey = ''; }
       } catch (_) {
         // m025-309: dulu baris ini menulis `AI response fallback: ${e.message}` ke MURID.
         // Selama panggilan model tidak ditakar, catch ini praktis hanya kena galat penyedia
@@ -195,6 +202,7 @@ export const ROUTES = [
     
     return jsonResponse({
       text,
+      copyKey,
       protocol: '1.7',
       schema: 'fiezel-ai-response-v1'
     }, { status: 200, ...opt });
@@ -245,7 +253,9 @@ export const ROUTES = [
     const body = await readJson(ctx);
     const { snapshot, evidence, policy, outcomes, profile, brain } = body;
     
+    // m025-310: sama seperti /api/ai/chat di atas - FAKTA + copyKey, bukan kalimat.
     let text = 'Tetap semangat belajar! Kamu sudah membuat kemajuan yang baik.';
+    let copyKey = 'worker.coach.default';
     if (ctx.env.AI) {
       try {
         const systemPrompt = `You are a warm, encouraging pedagogical coach for FIEZEL English learning app. deterministic policy is authoritative. Profile=${JSON.stringify(profile||{})}, Brain=${JSON.stringify(brain||{})}`;
@@ -254,14 +264,16 @@ export const ROUTES = [
           { role: 'user', content: `Snapshot: ${JSON.stringify(snapshot||{})}, Policy: ${JSON.stringify(policy||{})}, Outcomes: ${JSON.stringify(outcomes||[])}` }
         ];
         const res = await runLegacyModel(ctx, { messages });
-        if (res?.response) text = res.response;
-      } catch (e) {
+        if (res?.response) { text = res.response; copyKey = ''; }
+      } catch (_) {
         text = 'Lanjutkan latihanmu untuk memperkuat pemahaman!';
+        copyKey = 'worker.coach.fallback';
       }
     }
     
     return jsonResponse({
       text,
+      copyKey,
       protocol: '1.7'
     }, { status: 200, ...opt });
   }],
