@@ -24,7 +24,16 @@ if(fs.existsSync(i18nRuntime)){
 vm.runInContext(app,context,{filename:'app.js'});
 const response=text=>({ok:true,status:200,json:async()=>({text,model:'gpt-5.4-nano',via:'fiezel-core-worker',protocol:'1.7'})});
 setTimeout(async()=>{try{
-  assert(html.indexOf('https://js.puter.com/v2/')>=0&&html.indexOf('https://js.puter.com/v2/')<html.indexOf('./version.js'),'Puter.js script order is invalid');
+  /* m025-308: assert lama menuntut tag <script src="https://js.puter.com/v2/"> ADA di
+     index.html dan dimuat sebelum ./version.js. SDK itu dicabut 73cd02a (migrasi Puter ->
+     Cloudflare); empat kemunculan "js.puter.com" yang tersisa di index.html semuanya ada di
+     dalam KOMENTAR, bukan tag skrip. Karena assert() melempar, gerbang ini mati di baris
+     pertama dan 24 assert lain - timeout, respons usang yang menimpa modal baru, larangan
+     bypass puter.ai.chat langsung - tidak pernah dijalankan sama sekali.
+     Dibalik arahnya: yang dijaga sekarang adalah migrasinya TETAP berlaku, yaitu SDK pihak
+     ketiga itu tidak boleh diam-diam kembali ke jalur muat. Urutan yang masih hidup
+     (core-config.js sebelum app.js) tetap dijaga assert berikutnya, tidak disentuh. */
+  assert(!/<script[^>]+https:\/\/js\.puter\.com/.test(html),'SDK Puter kembali dimuat di index.html; migrasi ke Cloudflare seharusnya mencabutnya');
   assert(html.indexOf('./core-config.js')>0&&html.indexOf('./core-config.js')<html.indexOf('./app.js'),'Core config script order is invalid');
   assert(css.includes('.ai-btn')&&css.includes('@keyframes aiBounce'),'AI styles are missing');
   let prompt='',requestPayload=null,coachPayload=null;context.puter={workers:{exec:async(url,opts)=>{const body=JSON.parse(opts.body||'{}');prompt=body.prompt||'';requestPayload=body;if(String(url).includes('/api/coach/context'))coachPayload=body;return response(String(url).includes('/api/coach/context')?'Coach aman.':'Jawaban AI aman.')}}};
