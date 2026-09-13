@@ -38,6 +38,16 @@ const LEGACY_NEURONS_PER_REQUEST = 13;
  * jadi bentuk ini membuat penakaran masuk TANPA mengubah satu pun perilaku yang
  * dilihat murid: gagal panggil = teks cadangan, persis seperti sebelumnya.
  */
+/**
+ * Apakah kegagalan ini datang dari jalur ANGGARAN, bukan dari model. Dipakai rute
+ * owner untuk memberi status yang bisa dipilah ('budget_exhausted') alih-alih
+ * membuang string galat mentah ke badan respons.
+ */
+function isBudgetDenial(error) {
+  const m = String((error && error.message) || '');
+  return /^(ai_account_cap|ai_budget_|model_call_unreserved|ai_binding_missing)/.test(m);
+}
+
 async function runLegacyModel(ctx, input) {
   const out = await callModelMetered({
     env: ctx.env,
@@ -229,7 +239,23 @@ export const ROUTES = [
         const res = await runLegacyModel(ctx, { messages });
         review = { review: res?.response, schema: 'fiezel-content-qa-v1', authority: 'advisory-only' };
       } catch (e) {
-        review = { status: 'review_error', error: e.message };
+        // m025-308: DUA hal diperbaiki di sini, dan yang kedua lebih serius dari yang
+        // pertama.
+        // (1) e.message mentah dibuang ke badan respons. Sesudah penakaran masuk, yang
+        //     mengalir lewat sini bukan lagi hanya galat penyedia yang jarang - penolakan
+        //     plafon ikut lewat sini, jadi string internal seperti 'ai_account_cap' jadi
+        //     keluaran rutin. Diganti status yang stabil dan bisa dipilah.
+        // (2) Cabang ini MEMBUANG penanda tata kelola yang dijanjikan kontrak rute di
+        //     atas: schema DAN authority:'advisory-only' hilang dari respons. Konsumen
+        //     yang membaca 'authority' untuk memutuskan boleh-tidaknya hasil ini
+        //     diperlakukan sebagai nasihat belaka akan melihatnya TIDAK ADA, bukan
+        //     'advisory-only' - gagal ke arah yang salah. Cacat itu sudah lama, tetapi
+        //     perubahan ini yang membuatnya sering terjadi, jadi diperbaiki sekalian.
+        review = {
+          status: isBudgetDenial(e) ? 'budget_exhausted' : 'review_error',
+          schema: 'fiezel-content-qa-v1',
+          authority: 'advisory-only'
+        };
       }
     }
     
@@ -253,7 +279,17 @@ export const ROUTES = [
         const res = await runLegacyModel(ctx, { messages });
         patch = { patch: res?.response, schema: 'fiezel-content-patch-v1' };
       } catch (e) {
-        patch = { error: e.message };
+        // m025-308: sama seperti /api/content/qa/review di atas - status yang stabil
+        // menggantikan e.message mentah, dan schema yang dijanjikan kontrak rute tidak
+        // lagi hilang di cabang galat. Di sini taruhannya lebih tinggi: kontraknya
+        // 'candidate-only' + UNVERIFIED_LOCAL_GATES_REQUIRED, jadi respons tanpa penanda
+        // skema adalah respons yang kehilangan justru peringatan bahwa isinya BELUM
+        // diverifikasi dan tidak boleh diterapkan begitu saja.
+        patch = {
+          candidate: null,
+          status: isBudgetDenial(e) ? 'budget_exhausted' : 'patch_error',
+          schema: 'fiezel-content-patch-v1'
+        };
       }
     }
     
