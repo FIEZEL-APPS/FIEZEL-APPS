@@ -356,7 +356,7 @@ export const ROUTES = [
     // layar OWNER. Migrasi ke D1 menjatuhkan pembersihan ini; dipulihkan di m025-308.
     let data = JSON.stringify(body).replace(/[<>]/g, '');
     if (data.length > FEEDBACK_MAX_TEXT) data = data.slice(0, FEEDBACK_MAX_TEXT);
-    
+
     if (ctx.env.CORE_DB) {
       await ctx.env.CORE_DB.prepare(
         `INSERT INTO feedback (sub, kind, data, created_at) VALUES (?, ?, ?, ?)`
