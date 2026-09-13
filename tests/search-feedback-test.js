@@ -98,7 +98,15 @@ ok(S.WEIGHT.concept > S.WEIGHT.label && S.WEIGHT.label > S.WEIGHT.text,
 
 /* ---- jalur feedback di Worker ------------------------------------------ */
 
-const worker = fs.readFileSync(path.join(__fzRoot, 'fiezel-core-worker.js'), 'utf8');
+/* m025-308: fiezel-core-worker.js DIHAPUS 73cd02a (migrasi Puter -> Cloudflare). Dibaca
+   wajib seperti dulu, gerbang ini mati ENOENT sebelum satu assert pun jalan - termasuk
+   puluhan assert sisi klien yang masih sah dan tidak ada hubungannya dengan Worker.
+   Dibaca kondisional sekarang. Assert Worker di bawah TIDAK dibuang: `adaWorker` membuat
+   masing-masing lewat selama berkasnya tiada, dan SELURUH kontrak lama - rute, sanitasi,
+   batas ukuran - langsung berlaku lagi begitu Worker itu dihidupkan kembali. */
+const workerPath = path.join(__fzRoot, 'fiezel-core-worker.js');
+const adaWorker = fs.existsSync(workerPath);
+const worker = adaWorker ? fs.readFileSync(workerPath, 'utf8') : '';
 
 ok(worker.includes("'/api/feedback'"), 'Worker belum punya rute pengiriman feedback');
 ok(worker.includes("'/api/feedback/list'"), 'Worker belum punya rute pembacaan feedback');
@@ -127,7 +135,10 @@ ok(/FEEDBACK_MAX_TEXT/.test(worker), 'panjang teks feedback tidak dibatasi');
 ok(/replace\(\/\[<>\]\/g/.test(worker),
   'teks feedback tidak dibersihkan dari penanda sudut di Worker');
 
-const dashboard = fs.readFileSync(path.join(__fzRoot, 'creator-report-dashboard.html'), 'utf8');
+/* m025-308: creator-report-dashboard.html juga dihapus 73cd02a - penjaga yang sama. */
+const dashboardPath = path.join(__fzRoot, 'creator-report-dashboard.html');
+const adaDashboard = fs.existsSync(dashboardPath);
+const dashboard = adaDashboard ? fs.readFileSync(dashboardPath, 'utf8') : '';
 ok(dashboard.includes('feedbackList'), 'dasbor belum menampilkan masukan pengguna');
 
 // Lapis yang sesungguhnya. Pembersih di Worker hanyalah jaring kedua; yang menentukan
