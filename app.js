@@ -8029,82 +8029,21 @@ function neuralRateLabel(v){return v<0.9?FiezelI18n.t('suara.lebih-pelan',{nilai
    menanyakan apa pun - persis kegagalan diam-diam yang membuat tombol seperti ini
    terasa rusak. Keluar dulu, baru masuk. */
 let puterAccountCache=null;
-function puterAccountLabel(){
-  const user=puterAccountCache;
-  if(!user)return puterSignedIn()?FiezelI18n.t('akun.tersambung'):FiezelI18n.t('akun.belum-tersambung');
-  return String(user.username||user.email||FiezelI18n.t('akun.tersambung'));
-}
-async function refreshPuterAccountCard(){
-  const el=$('accountName');if(!el)return;
-  try{
-    const sdk=await awaitPuter(4000);
-    puterAccountCache=await sdk?.auth?.getUser?.()||null;
-  }catch{puterAccountCache=null}
-  const target=$('accountName');if(target)target.textContent=puterAccountLabel();
-}
-/** Keluar dari akun. Statusnya dibiarkan dibaca ulang oleh boot berikutnya - gerbang
- *  login yang sudah ada adalah tempat yang benar untuk memutuskan apa selanjutnya, dan
- *  menyalinnya ke sini berarti dua tempat yang bisa menyimpang. */
-async function signOutPuterAccount(){
-  const sdk=await awaitPuter(6000);
-  if(!sdk?.auth?.signOut)throw new Error(FiezelI18n.t('akun.err-layanan'));
-  await sdk.auth.signOut();
-  puterAccountCache=null;
-}
-async function runPuterSignOut(){
-  const button=$('accountSignOut');if(button)button.disabled=true;
-  try{await signOutPuterAccount();showToast(FiezelI18n.t('akun.toast-keluar'));setTimeout(()=>location.reload(),700)}
-  catch(error){showToast(aiErrorMessage(error));if(button)button.disabled=false}
-}
-async function runPuterSwitchAccount(){
-  const button=$('accountSwitch');if(button)button.disabled=true;
-  try{
-    await signOutPuterAccount();
-    const sdk=await awaitPuter(6000);
-    if(!sdk?.auth?.signIn)throw new Error('Layanan akun Puter belum bisa dihubungi.');
-    await sdk.auth.signIn();
-    await activateAccountStateFromPuter(sdk);
-    showToast(FiezelI18n.t('akun.toast-ganti'));
-    setTimeout(()=>location.reload(),700);
-  }catch(error){
-    // Login yang dibatalkan meninggalkan perangkat dalam keadaan SUDAH keluar, dan
-    // membiarkannya di halaman yang sama akan menampilkan aplikasi milik akun yang tidak
-    // lagi login. Memuat ulang mengembalikannya ke gerbang login yang benar.
-    showToast(aiErrorMessage(error));
-    setTimeout(()=>location.reload(),1200);
-  }
-}
-/**
- * m026-02: jalan masuk kembali setelah "Lanjut tanpa akun".
- *
- * Penanda lewat DIHAPUS di sini - kalau tidak, gerbangnya akan menolak tampil dan tombol
- * ini menjadi tombol yang tidak melakukan apa-apa pada boot berikutnya.
- */
+function puterAccountLabel(){return '';}
+async function refreshPuterAccountCard(){return;}
+async function signOutPuterAccount(){return;}
+async function runPuterSignOut(){return;}
+async function runPuterSwitchAccount(){return;}
 async function runPuterSignInFromSettings(){
-  const button=$('accountSignIn');if(button)button.disabled=true;
-  try{localStorage.removeItem(PUTER_AUTH_SKIP_KEY)}catch{}
-  try{state.preferences={...state.preferences,puterAuthSkipped:false};save()}catch{}
-  closeModal();
-  setAuthGateState('idle');
-  return attemptPuterSignIn();
+  // m025-306: PUTER_AUTH_SKIP_KEY dinetralkan
+  return false;
 }
 function accountSettingsMarkup(){
-  const connected=puterSignedIn();
-  // Tanpa akun, tombol "Ganti akun"/"Keluar" tidak punya apa pun untuk digantikan; yang
-  // dibutuhkan murid yang tadi memilih "Lanjut tanpa akun" adalah satu pintu masuk.
-  const actions=connected
-    ?`<button type="button" id="accountSwitch"><i data-lucide="user-round"></i> ${FiezelI18n.t('akun.ganti')}</button><button type="button" id="accountSignOut" class="danger"><i data-lucide="arrow-up-right"></i> ${FiezelI18n.t('akun.keluar')}</button>`
-    :`<button type="button" id="accountSignIn" class="primary"><i data-lucide="user-round"></i> ${FiezelI18n.t('akun.masuk')}</button>`;
-  const note=connected
-    ?FiezelI18n.t('akun.catatan-tersambung')
-    :FiezelI18n.t('akun.catatan-tanpa');
-  return `<div class="card account-card"><h3>${FiezelI18n.t('akun.judul')}</h3><p class="muted">${FiezelI18n.t('akun.keterangan')}</p><div class="setting-row"><span class="setting-icon"><i data-lucide="user-round"></i></span><span><b id="accountName">${esc(puterAccountLabel())}</b><small>${connected?FiezelI18n.t('akun.sub-tersambung'):FiezelI18n.t('akun.sub-belum')}</small></span></div><div class="actions">${actions}</div><p class="muted">${esc(note)}</p></div>`
+  // m025-306: kartu Akun Puter di Pengaturan dihapus total atas permintaan OWNER (accountSignIn).
+  return '';
 }
 function bindAccountSettingControls(){
-  $('accountSwitch')?.addEventListener('click',runPuterSwitchAccount);
-  $('accountSignIn')?.addEventListener('click',runPuterSignInFromSettings);
-  $('accountSignOut')?.addEventListener('click',runPuterSignOut);
-  refreshPuterAccountCard();
+  // m025-306: kontrol Akun Puter dinetralkan (accountSignIn).
 }
 
 /* =====================================================================================
@@ -11735,10 +11674,8 @@ function setThemePreference(){
 }
 window.setThemePreference=setThemePreference;
 function openSettings(){const p=state.preferences||defaultPreferences,endpoint=p.reportEndpoint||'';
-  // Kartu Akun Puter dibungkus lipatan bersarang, BUKAN dipindah atau dihapus: elemennya
-  // tetap di DOM (bindAccountSettingControls dan refreshPuterAccountCard tetap menemukannya),
-  // tetapi 330 px penjelasan akun tidak lagi ikut terbuka saat panel baru dibuka.
-  const grupProfil=`<label class="endpoint-label">${FiezelI18n.t('onboarding.name-field-label')}<input id="settingLearnerName" type="text" value="${esc(state.userName||'')}" maxlength="24" placeholder="${FiezelI18n.t('settings.nama-you')}" autocomplete="given-name"></label>${learnerLocaleRowMarkup()}${targetLangRowMarkup()}${studentRegistrationMarkup()}`+settingsFold(FiezelI18n.t('settings.akun-puter'),accountSettingsMarkup(),false,'settings-subfold');
+  // m025-306: Kartu Akun Puter dihapus total dari Pengaturan atas permintaan OWNER.
+  const grupProfil=`<label class="endpoint-label">${FiezelI18n.t('onboarding.name-field-label')}<input id="settingLearnerName" type="text" value="${esc(state.userName||'')}" maxlength="24" placeholder="${FiezelI18n.t('settings.nama-you')}" autocomplete="given-name"></label>${learnerLocaleRowMarkup()}${targetLangRowMarkup()}${studentRegistrationMarkup()}`;
   const grupBelajar=`<div class="settings-list"><button type="button" class="setting-row setting-row-action" onclick="replayTour()"><span class="setting-icon"><i data-lucide="rotate-ccw"></i></span><span><b>${FiezelI18n.t('settings.redo-kenalan-cepat')}</b><small>${FiezelI18n.t('settings.menjalankan-ulang-tur-menu-awal')}</small></span><i data-lucide="chevron-right"></i></button><label class="setting-row"><span class="setting-icon"><i data-lucide="wand-sparkles"></i></span><span><b>${FiezelI18n.t('settings.animation-label')}</b><small>${FiezelI18n.t('settings.transisi-halaman-kartu-popup-feedback')}</small></span><input id="settingMotion" type="checkbox" ${p.motion?'checked':''}></label><label class="setting-row"><span class="setting-icon"><i data-lucide="vibrate"></i></span><span><b>${FiezelI18n.t('settings.vibration-label')}</b><small>${typeof navigator!=='undefined'&&typeof navigator.vibrate==='function'?FiezelI18n.t('settings.vibration-supported'):FiezelI18n.t('settings.vibration-fallback')}</small></span><input id="settingHaptics" type="checkbox" ${p.haptics?'checked':''}></label>${gemsSettingsRowMarkup()}</div>`;  const grupSuara=`<div class="settings-list"><label class="setting-row"><span class="setting-icon"><i data-lucide="bell-check"></i></span><span><b>${FiezelI18n.t('settings.pengingat-study')}</b><small>${esc(reminderSettingHint())}</small></span><input id="settingReminders" type="checkbox" ${remindersActive()?'checked':''} ${notificationPermission()==='denied'||notificationPermission()==='unsupported'?'disabled':''} aria-label="${FiezelI18n.t('settings.reminder-aria')}"></label><label class="setting-row"><span class="setting-icon"><i data-lucide="badge-check"></i></span><span><b>${FiezelI18n.t('settings.suara-answer')}</b><small>${FiezelI18n.t('settings.bunyi-naik-when-right-bunyi')}</small></span><input id="settingFeedbackSounds" type="checkbox" ${p.feedbackSounds!==false?'checked':''}></label><div class="setting-row" id="audioDiagRow"><span class="setting-icon"><i data-lucide="smartphone"></i></span><span><b>${FiezelI18n.t('settings.status-bunyi-perangkat')}</b><small id="audioDiagText">${FiezelI18n.t('settings.audio-checking')}</small></span></div></div><div id="voiceSettingsCard">${neuralVoiceStatusMarkup()}</div>`;
   // Tombol bersihkan-cache duduk di antara Backup dan Kesehatan Instalasi: kartu diagnosis
   // itulah yang melaporkan shell usang, jadi tombol perbaikannya berdampingan dengannya.
