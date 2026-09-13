@@ -12,8 +12,8 @@ const GRAMMAR_DECLARED_COUNT=JSON.parse(fs.readFileSync('./grammar-templates.jso
 const assert=(ok,msg)=>{if(!ok)throw new Error(msg)};
 
 assert(/const APP_VERSION=self\.FIEZEL_VERSION/.test(app)&&fs.readFileSync(path.join(root,'version.js'),'utf8').includes(`'${VERSION}'`),'runtime version matches VERSION.json');
-assert(html.indexOf('https://js.puter.com/v2/')>=0&&html.indexOf('https://js.puter.com/v2/')<html.indexOf('./version.js'),'Puter.js must load before FIEZEL runtime scripts');
-assert(/async function askFiezelAI/.test(app)&&/coreWorkerExec\('\/api\/ai\/chat'/.test(app)&&!/puter\.ai\.chat\(/.test(app),'Core-only Puter AI gateway missing or direct bypass present');
+assert(html.indexOf('./version.js')>=0&&html.indexOf('./core-config.js')>=0,'Runtime scripts must load in index.html');
+assert(/async function askFiezelAI/.test(app)&&/coreWorkerExec\('\/api\/ai\/chat'/.test(app)&&!/puter\.ai\.chat\(/.test(app),'Core AI gateway missing or direct bypass present');
 assert(/function openAILoading/.test(app)&&/function renderAIResult/.test(app)&&/function renderAIError/.test(app),'AI modal states missing');
 assert(/id="aiExplainBtn"/.test(app)&&/id="aiWord"/.test(app),'AI entry buttons missing');
 assert(/window\.explainWithAI=explainWithAI/.test(app)&&/window\.explainWordWithAI=explainWordWithAI/.test(app),'AI handlers are not exposed');

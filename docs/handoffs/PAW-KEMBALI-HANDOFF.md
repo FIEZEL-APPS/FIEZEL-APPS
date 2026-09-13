@@ -96,3 +96,71 @@ berlaku lagi:
 ## Verifikasi
 
 279 gerbang `quality.yml` dijalankan lokal.
+
+---
+
+## Ronde 2 — CI, merge main, dan dua temuan review
+
+### A9 + A10: spasi ekor (diperbaiki, commit `1bb10a1`)
+
+Keduanya merah karena satu sebab: `git diff --check $BASE_SHA...HEAD` di
+`tools/fiezel-guardians.mjs:129` menolak spasi ekor pada baris yang DITAMBAHKAN.
+Aset PAW lahir kembali lewat revert, jadi seluruh isinya terbaca sebagai baris
+tambahan — padahal berkasnya sendiri tidak berubah sejak dulu. 105 berkas
+dirapikan; nol tumpang tindih dengan berkas terkunci checksum, perubahan murni
+spasi (diverifikasi dengan menciutkan seluruh runtun spasi), dan 14 SVG yang
+gagal di-parse XML ketat sudah gagal SEBELUM commit itu.
+
+### A14: bukan milik PR ini
+
+`HttpError: 500` pada `GET /issues/408/comments` — outage GitHub API yang sama
+yang membuat pembuatan PR gagal berulang kali saat itu. Nol baris diff tersentuh.
+
+### A11: main bergerak, nomor build bertabrakan
+
+`origin/main` maju ke `01c5a13` dan MENGAMBIL m025-304 untuk dirinya sendiri,
+jadi m025-304 di cabang ini jadi tabrakan. A11 menuntut `headDiag == baseDiag+1`.
+Diselesaikan dengan merge `origin/main` lalu `tools/bump-build.mjs` → **m025-305**.
+
+### Satu cacat yang ditemukan SAAT menyelesaikan konflik merge
+
+Konflik `sw.js` jatuh di baris pembuka `const ASSETS=[...]`. Kalau sisi HEAD
+diambil bulat-bulat, EMPAT entri non-maskot ikut hidup kembali:
+`fiezel-puter-ready.js`, `creator-report-setup.html`,
+`creator-report-dashboard.html`, `fiezel-report-worker.js`.
+
+Keempat berkas itu **sudah tidak ada di disk** — dihapus pada migrasi
+Puter → Cloudflare (`73cd02a`), bukan oleh #401. Revert memulihkan daftar
+precache pra-#401 apa adanya, jadi keempatnya kembali sebagai entri basi.
+Akibatnya bukan kosmetik: `cache.addAll()` menolak SELURUH promise-nya kalau
+satu URL saja 404 — service worker gagal install, dan seluruh lapisan luring
+mati diam-diam.
+
+Resolusinya karena itu bukan "pilih satu sisi": daftar diambil dari main, lalu
+entri Nusa/Mira (3 modul rig + 19 aset `assets/characters/`) dibuang dan 3 modul
+PAW dimasukkan. Hasil akhir diverifikasi terprogram: 231 entri, nol duplikat,
+dan **setiap entri ada di disk**.
+
+### Dua temuan review Gitar — keduanya diverifikasi benar, keduanya diperbaiki
+
+1. `static get expressions()` dideklarasikan DUA KALI dengan badan identik
+   (yang kedua membayangi yang pertama). Sisa salin-tempel dari rig lama; satu
+   dibuang.
+2. `_blinkLoop()` memanggil `matchMedia(...)` dan `document.body.classList`
+   telanjang, padahal `_reducedMotion()` di berkas yang sama sudah membungkus
+   keduanya dengan `typeof matchMedia === 'function'` + try/catch. Sekarang
+   `_blinkLoop()` mendelegasikan ke helper itu — perilakunya identik saat
+   keduanya tersedia, dan tidak lagi melempar saat tidak.
+
+Keduanya menyentuh `fiezel-mascot.js` yang PUNYA kembar terkunci checksum, jadi
+`tools/export-mascot.mjs` dijalankan sesudahnya. Hash **rig** tidak berubah
+(`5fb6293402a4…`) karena kunci itu menghitung geometri rig, bukan logika JS —
+hanya hash berkas kembarnya yang naik. `--check` PASS.
+
+### Gerbang yang merah dan BUKAN milik PR ini
+
+Dua belas gerbang backend/Cloudflare/AI merah. Diverifikasi dengan menjalankan
+gerbang yang sama pada checkout `origin/main` BERSIH lewat `git worktree`:
+merah yang persis sama. Diff cabang ini tidak menyentuh satu pun berkas backend,
+AI, analytics, atau Puter — `core-config.js` hanya berubah nomor build, dan
+`index.html` hanya bagian maskot.
