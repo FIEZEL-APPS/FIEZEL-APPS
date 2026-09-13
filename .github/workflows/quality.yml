@@ -278,6 +278,19 @@ jobs:
           # hanya berisi kunci listen_sc_*, jadi tidak pernah kena sasaran sekali pun.
           # tests/th-exam-overlay-test.js memeriksa jalur bacanya, bukan datanya.
           node tests/th-exam-overlay-test.js
+          # m025-308: kelas bug yang sama, dua jalur lain. th-exam-overlay menjaga bank ujian
+          # Listening/Speaking; Writing dan reading-exam tidak dijaga siapa pun, dan di situ
+          # 45 petunjuk prompt + 5 catatan tugas ujian + 96 umpan balik per-soal sudah
+          # diterjemahkan, sudah terunduh ke perangkat murid, lalu MENGANGGUR karena overlay
+          # hanya menyalin honesty/rubrik/format. Gerbang ini memanggil applyContentLocale()
+          # yang sungguhan lalu membacanya lewat jalur baca penyaji.
+          node tests/th-content-overlay-test.js
+          # m025-308: kelas bug yang sama pada PEMANGGIL, bukan penyedia. Dua yang
+          # tertangkap: attemptGoogleSignIn yang membiarkan gerbang auth tertinggal di
+          # spinner saat renderButton gagal, dan bukti belajar yang memfabrikasi akurasi
+          # 50% untuk murid tanpa riwayat lalu mengirimnya ke guru. Keduanya hijau di
+          # sisi penyedia sebelum gerbang ini ada.
+          node tests/caller-reacts-test.js
           node tests/boot-order-test.js
           node tests/splash-first-paint-test.js
           node tests/teacher-instant-boot-test.js

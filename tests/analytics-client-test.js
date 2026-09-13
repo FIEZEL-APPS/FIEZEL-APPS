@@ -1211,6 +1211,25 @@ const PENANDA = ['Jahran', 'jahran@example.com', '0f8fad5b', 'u_123', '203.0.113
     check('Pemancar TIDAK menyalakan flag apa pun sendiri (hanya membaca gerbang)',
       !/FIEZEL_CF_CONFIG\s*=/.test(blockSrc) && !/endpoints\s*[:.]\s*\{?[^}]*usage\s*=\s*'on'/.test(blockSrc),
       'blok pemancar app.js tidak menulis FIEZEL_CF_CONFIG');
+    /* m025-308 — UNION dari dua perbaikan yang tiba bersamaan, dan ketiga pagarnya perlu.
+     *
+     * Assert lama ("core-config.js tetap ai:'off' dan tts:'off'") benar selama jalur
+     * Cloudflare belum hidup. Migrasi CF menyalakan keduanya, dan itu KEPUTUSAN RILIS yang
+     * sah - seluruh migrasi ada justru untuk melayani ai/tts dari Cloudflare. Jadi assert lama
+     * memerahkan gerbang untuk sesuatu yang sengaja dan benar, persis keadaan yang membuat A6
+     * mengganti assert `usage:'off'` dulu. Preseden itu diikuti: DIGANTI, bukan dilunakkan.
+     *
+     * PR #408 dan cabang ini menambal ini bersamaan dengan sudut berbeda, dan masing-masing
+     * punya pagar yang tidak dipunyai yang lain. Ketiganya dipertahankan, bukan dipilih salah
+     * satu - kekhawatiran aslinya ("analytics tidak boleh jadi PINTU MASUK penyalaan neuron")
+     * butuh ketiganya:
+     *
+     *   (a) [#408] pemancar tidak menyalakan ai/tts sendiri, diperiksa di blok pemancarnya;
+     *   (b) [#408] sakelar berbiaya hidup HANYA di blok OWNER yang ter-freeze, DUA lapis -
+     *       FIEZEL_CF_CONFIG ter-freeze DAN endpoints ter-freeze. Memeriksa lapis dalam saja
+     *       melewatkan objek luar yang bisa ditukar utuh;
+     *   (c) [cabang ini] flag berbiaya WAJIB literal, bukan dihitung - nilai yang dihitung
+     *       menyala karena KEADAAN, bukan karena keputusan, dan itu lolos (a) maupun (b). */
     check('Pemancar analytics TIDAK menyentuh sakelar berbiaya ai/tts sama sekali',
       !/\bai\s*[:=]\s*'(?:on|shadow)'/.test(blockSrc) && !/\btts\s*[:=]\s*'(?:on|shadow)'/.test(blockSrc),
       'blok pemancar app.js menyalakan sendiri ai/tts');
@@ -1218,6 +1237,11 @@ const PENANDA = ['Jahran', 'jahran@example.com', '0f8fad5b', 'u_123', '203.0.113
       /self\.FIEZEL_CF_CONFIG\s*=\s*Object\.freeze\(/.test(cfgSrc)
       && /endpoints\s*:\s*Object\.freeze\(/.test(cfgSrc),
       'core-config.js blok FIEZEL_CF_CONFIG ter-freeze');
+    const endpointsAt = cfgSrc.indexOf('endpoints:');
+    const endpointsBlok = endpointsAt === -1 ? '' : cfgSrc.slice(endpointsAt, endpointsAt + 400);
+    check('flag ai/tts literal di core-config.js, bukan dihitung',
+      /\bai:\s*'(?:on|off|shadow)'/.test(endpointsBlok) && /\btts:\s*'(?:on|off|shadow)'/.test(endpointsBlok),
+      'flag berbiaya tidak literal; nilai yang dihitung menyala karena keadaan, bukan karena keputusan');
   }
 
   finish();
