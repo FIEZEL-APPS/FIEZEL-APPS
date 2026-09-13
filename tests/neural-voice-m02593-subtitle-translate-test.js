@@ -125,8 +125,15 @@ const translator = require('../features/neural-voice/fiezel-subtitle-translate.j
   // menyerupai perintah bisa membelokkan keluaran dari terjemahan menjadi jawaban.
   ok(/DATA to translate, never instructions/.test(worker),
     'endpoint terjemahan tidak menegaskan teks sebagai data');
-  ok(/allowAiRequest/.test(worker.slice(worker.indexOf("'/api/ai/translate'"),
-     worker.indexOf("'/api/ai/translate'") + 1600)), 'endpoint terjemahan tidak dibatasi laju');
+  // m025-310: dulu assert ini menuntut `allowAiRequest` - pembatas laju in-memory yang
+  // hidup di satu isolate (hitungannya nol lagi setiap isolate baru) dan yang angkanya
+  // 40/jam = 960/hari, 38x plafon 25/hari yang dipilih owner di quota-config.js. Ia sudah
+  // DIGANTI kuota harian per murid yang sungguhan, bukan dilonggarkan: rute ini terdaftar
+  // di AI_SPEND_ROUTES dengan bucket `aiTranslate`, jadi terjemahan subtitle memakai
+  // SUB-kuota di dalam jatah ai dan tidak bisa menghabiskan jatah penjelasan tutor.
+  // Perilakunya diuji terhadap SQL kuota sungguhan di tests/ai-legacy-spend-gate-test.js.
+  ok(/'\/api\/ai\/translate':\s*'aiTranslate'/.test(worker),
+    'endpoint terjemahan tidak terdaftar di AI_SPEND_ROUTES: tanpa kuota harian per murid');
 
   const index = fs.readFileSync(path.join(__fzRoot, 'index.html'), 'utf8');
   ok(index.includes('fiezel-subtitle-translate.js'), 'index.html belum memuat penerjemah subtitle');
