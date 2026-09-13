@@ -1,0 +1,122 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="56 -10 208 216" role="img"
+     aria-label="PAW — ikon kepala maskot FIEZEL (master rig, neutral state)">
+  <!-- ============================================================
+       FIEZEL PAW — HEAD-ONLY MASTER EXPORT (neutral state)
+       Derivation: the fz-head subtree of assets/paw-master.svg,
+       byte-equal geometry, cropped to the production head-crop
+       viewBox of assets/brand/paw-mascot-head.svg (56 -10 208 216).
+       Carries the full head rig (ears, lids, pupils, brows, 10-shape
+       mouth set) so head-crop usages stay animation-ready.
+       Clip ids namespaced -head; per-instance-uid required if inlined
+       ([P0-1] rule). See assets/README.md.
+       ============================================================ -->
+  <defs>
+    <clipPath id="fzcEyeL-head"><circle cx="126" cy="98" r="16"/></clipPath>
+    <clipPath id="fzcEyeR-head"><circle cx="194" cy="98" r="16"/></clipPath>
+  </defs>
+
+  <g id="paw-head" class="fz-head"><!-- P2: tx -6..6, ty -4..4; neutral 0,0 -->
+    <g id="paw-ear-l" class="fz-ear fz-ear-l"><!-- P3: rotate @ (108,52); literal - = perk, + = droop; -14..+18 -->
+      <path id="paw-ear-l-outer" d="M76 66 L95 0 L140 34 Q104 66 76 66 Z" fill="#FFD94F"/>
+      <path id="paw-ear-l-inner" d="M90 52 L 101 17 L 125 35 Z" fill="#8C2233"/>
+    </g>
+    <g id="paw-ear-r" class="fz-ear fz-ear-r"><!-- P4: rotate @ (212,52); literal + = perk, - = droop; -18..+14 -->
+      <path id="paw-ear-r-outer" d="M244 66 L225 0 L180 34 Q216 66 244 66 Z" fill="#FFD94F"/>
+      <path id="paw-ear-r-inner" d="M230 52 L 219 17 L 195 35 Z" fill="#8C2233"/>
+    </g>
+    <circle id="paw-skull" cx="160" cy="106" r="88" fill="#FFD94F"/>
+
+    <g id="paw-face" class="fz-face">
+      <ellipse id="paw-muzzle" cx="160" cy="140" rx="36" ry="25" fill="#FFF4DA"/>
+      <path id="paw-nose" d="M153 126 L 167 126 L 160 136 Z" fill="#8C2233"/>
+      <circle id="paw-blush-l" class="fz-blush" cx="102" cy="126" r="11" fill="#F0A0AC"/>
+      <circle id="paw-blush-r" class="fz-blush" cx="218" cy="126" r="11" fill="#F0A0AC"/>
+
+      <g id="paw-eyes" class="fz-eyes"><!-- P9 gaze: translate ±7/±5 -->
+        <g id="paw-eye-open" class="fz-eye-open"><!-- P10 eye pop: scale .95..1.12 -->
+          <g id="paw-eye-l" class="fz-eye fz-eye-l">
+            <circle id="paw-eye-l-disc" cx="126" cy="98" r="16" fill="#33201F"/>
+            <g id="paw-pupil-l" class="fz-pupil" clip-path="url(#fzcEyeL-head)"><!-- P8: tx ±6, ty ±5 -->
+              <circle cx="130.5" cy="92.5" r="5.5" fill="#fff"/>
+              <circle cx="121.5" cy="104" r="2.8" fill="#fff" opacity=".7"/>
+            </g>
+            <g id="paw-lid-up-l" class="fz-lid-up" clip-path="url(#fzcEyeL-head)"><!-- P5: ty 0..34 -->
+              <circle cx="126" cy="62" r="17" fill="#FFD94F"/>
+            </g>
+            <g id="paw-lid-low-l" class="fz-lid-low" clip-path="url(#fzcEyeL-head)"><!-- P7: ty 0..-14 -->
+              <circle cx="126" cy="134" r="17" fill="#FFD94F"/>
+            </g>
+          </g>
+          <g id="paw-eye-r" class="fz-eye fz-eye-r">
+            <circle id="paw-eye-r-disc" cx="194" cy="98" r="16" fill="#33201F"/>
+            <g id="paw-pupil-r" class="fz-pupil" clip-path="url(#fzcEyeR-head)">
+              <circle cx="198.5" cy="92.5" r="5.5" fill="#fff"/>
+              <circle cx="189.5" cy="104" r="2.8" fill="#fff" opacity=".7"/>
+            </g>
+            <g id="paw-lid-up-r" class="fz-lid-up" clip-path="url(#fzcEyeR-head)"><!-- P6 -->
+              <circle cx="194" cy="62" r="17" fill="#FFD94F"/>
+            </g>
+            <g id="paw-lid-low-r" class="fz-lid-low" clip-path="url(#fzcEyeR-head)"><!-- P7 -->
+              <circle cx="194" cy="134" r="17" fill="#FFD94F"/>
+            </g>
+          </g>
+        </g>
+        <g id="paw-eye-happy" class="fz-eye-happy" opacity="0">
+          <path d="M112 101 C 119 90 133 90 140 101" stroke="#33201F" stroke-width="7"
+                stroke-linecap="round" fill="none"/>
+          <path d="M180 101 C 187 90 201 90 208 101" stroke="#33201F" stroke-width="7"
+                stroke-linecap="round" fill="none"/>
+        </g>
+        <g id="paw-eye-love" class="fz-eye-love" opacity="0" fill="#D9536A">
+          <g transform="translate(126,98)"><g class="fz-heart-eye">
+            <path d="M0 13 C -8.5 5.5 -15 1 -15 -5.5 C -15 -11.5 -10.6 -15 -6.8 -15 C -3.4 -15 -0.9 -12.8 0 -10.2 C 0.9 -12.8 3.4 -15 6.8 -15 C 10.6 -15 15 -11.5 15 -5.5 C 15 1 8.5 5.5 0 13 Z"/>
+            <circle cx="-5" cy="-8" r="3" fill="#fff" opacity=".85"/>
+          </g></g>
+          <g transform="translate(194,98)"><g class="fz-heart-eye">
+            <path d="M0 13 C -8.5 5.5 -15 1 -15 -5.5 C -15 -11.5 -10.6 -15 -6.8 -15 C -3.4 -15 -0.9 -12.8 0 -10.2 C 0.9 -12.8 3.4 -15 6.8 -15 C 10.6 -15 15 -11.5 15 -5.5 C 15 1 8.5 5.5 0 13 Z"/>
+            <circle cx="-5" cy="-8" r="3" fill="#fff" opacity=".85"/>
+          </g></g>
+        </g>
+        <g id="paw-lids" class="fz-lids"><!-- P20 fast blink; hidden at rest via inline transform -->
+          <g id="paw-lid-l" class="fz-lid" transform="translate(0,80) scale(1,0)">
+            <circle cx="126" cy="98" r="18" fill="#FFD94F"/>
+            <path d="M114 99 C 120 105 132 105 138 99" stroke="#33201F" stroke-width="5" stroke-linecap="round" fill="none"/>
+          </g>
+          <g id="paw-lid-r" class="fz-lid fz-lid-r" transform="translate(0,80) scale(1,0)">
+            <circle cx="194" cy="98" r="18" fill="#FFD94F"/>
+            <path d="M182 99 C 188 105 200 105 206 99" stroke="#33201F" stroke-width="5" stroke-linecap="round" fill="none"/>
+          </g>
+        </g>
+      </g>
+
+      <g id="paw-brows" class="fz-brows" opacity="0" stroke="#33201F" stroke-width="5.5" stroke-linecap="round" fill="none">
+        <path id="paw-brow-l" class="fz-brow-l" d="M115 70 Q 125 63.5 135 66.5" stroke-width="5"/><!-- P11 -->
+        <path id="paw-brow-r" class="fz-brow-r" d="M185 66.5 Q 195 63.5 205 70" stroke-width="5"/><!-- P12 -->
+      </g>
+
+      <g id="paw-mouth" class="fz-mouth"><!-- P13: exactly one shape visible -->
+        <path id="paw-m-smile" class="fz-m fz-m-smile" d="M148 148 C 154 155 166 155 172 148"
+              stroke="#33201F" stroke-width="5.5" stroke-linecap="round" fill="none"/>
+        <path id="paw-m-soft" class="fz-m fz-m-soft" style="display:none" d="M152 149 C 156 153 164 153 168 149"
+              stroke="#33201F" stroke-width="5" stroke-linecap="round" fill="none"/>
+        <path id="paw-m-open" class="fz-m fz-m-open" style="display:none"
+              d="M145 146 C 148 162 172 162 175 146 C 165 150 155 150 145 146 Z" fill="#33201F"/>
+        <circle id="paw-m-o" class="fz-m fz-m-o" style="display:none" cx="160" cy="151" r="6.5" fill="#33201F"/>
+        <ellipse id="paw-m-sp1" class="fz-m fz-m-sp1" style="display:none" cx="160" cy="151" rx="5" ry="3.4" fill="#33201F"/>
+        <ellipse id="paw-m-sp2" class="fz-m fz-m-sp2" style="display:none" cx="160" cy="151" rx="7.5" ry="6" fill="#33201F"/>
+        <path id="paw-m-wave" class="fz-m fz-m-wave" style="display:none" d="M147 150 Q 153 145 160 150 Q 167 155 173 150"
+              stroke="#33201F" stroke-width="5.5" stroke-linecap="round" fill="none"/>
+        <path id="paw-m-flat" class="fz-m fz-m-flat" style="display:none" d="M150 150 L 170 150"
+              stroke="#33201F" stroke-width="5.5" stroke-linecap="round" fill="none"/>
+        <path id="paw-m-concern" class="fz-m fz-m-concern" style="display:none" d="M150 152 C 155 148.5 165 148.5 170 152"
+              stroke="#33201F" stroke-width="5" stroke-linecap="round" fill="none"/>
+        <path id="paw-m-sad" class="fz-m fz-m-sad" style="display:none" d="M148 154 C 154 147 166 147 172 154"
+              stroke="#33201F" stroke-width="5.5" stroke-linecap="round" fill="none"/>
+      </g>
+
+      <g id="paw-sweat" class="fz-acc fz-sweat" opacity="0">
+        <path d="M80 72 C 88 84 90 92 90 98 A 10 10 0 1 1 70 98 C 70 92 72 84 80 72 Z" fill="#9CC7E8"/>
+      </g>
+    </g><!-- /fz-face -->
+  </g><!-- /fz-head -->
+</svg>

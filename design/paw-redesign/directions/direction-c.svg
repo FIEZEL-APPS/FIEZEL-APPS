@@ -1,0 +1,196 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 320 300" role="img"
+     aria-label="Pau — Direction C (Expressive) concept: welcoming spark pose">
+  <!-- ============================================================
+       FIEZEL Pau — DIRECTION C: PAU EXPRESSIVE — full-body concept
+       Pose shown: "welcoming spark" (greeting/encouraging blend)
+       - eyes r16 with separated pupil-highlight cluster + parametric lids
+       - brows visible (raised, friendly) as first-class animated parts
+       - open-smile mouth from the extended 9-shape mouth set
+       - asymmetric ear perk (emotion channel), 2-bone tail flicked up
+       - raised right arm w/ paw pads, open left arm, head lean by
+         TRANSLATE only (no body rotation, no mirroring)
+       Palette (closed): #FFD94F #EDB93A #FFF4DA #8C2233 #33201F
+                         #F0A0AC #D8B36B #D9536A (+#9CC7E8 sweat, hidden)
+       Geometry grammar: circles / capsules / triangles only.
+       ============================================================ -->
+  <defs>
+    <!-- fz-pawprint: EXACT geometry of assets/brand/fiezel-paw.svg (viewBox 0 0 24 24;
+         same source as ICONS.paw, guarded by paw-mascot-test.js). Binding rule
+         (systems/15-pawprint-alignment.md): every visible palm pad AND the chest emblem
+         on Pau is a uniformly scaled, unrotated-or-pivot-rotated <use> INSTANCE of this
+         group — never a hand-drawn approximation. Fill is fixed maroon #8C2233 on the
+         mascot (fiezel-paw.svg's #2B2118 is not in the mascot's closed palette; in-app
+         ICONS.paw themes freely — that is a different, sanctioned context).
+         Ink bbox: x 4.6–20.6, y 3.4–21.5 (16.0 × 18.1), ink center (12.6, 12.45). -->
+    <g id="fz-pawprint" fill="#8C2233">
+      <rect x="4.6" y="7.5" width="3.1" height="4.6" rx="1.55"/>
+      <rect x="8.9" y="5.1" width="3.1" height="7" rx="1.55"/>
+      <rect x="13.2" y="3.4" width="3.1" height="8.7" rx="1.55"/>
+      <rect x="17.5" y="6.2" width="3.1" height="5.9" rx="1.55"/>
+      <path d="M12.6 14c3.5 0 5.9 1.9 5.9 4.1 0 2-2 3.4-5.9 3.4s-5.9-1.4-5.9-3.4c0-2.2 2.4-4.1 5.9-4.1Z"/>
+    </g>
+    <!-- per-eye clips so lids/pupils can never escape the eye disc -->
+    <clipPath id="fzcEyeL"><circle cx="126" cy="98" r="16"/></clipPath>
+    <clipPath id="fzcEyeR"><circle cx="194" cy="98" r="16"/></clipPath>
+    <!-- tail tip mask (local coords of fz-tail-tip, rotates with it) -->
+    <mask id="fzcTailTip" maskUnits="userSpaceOnUse" x="230" y="120" width="110" height="120">
+      <path d="M296 200 C 295 180 284 164 268 158" stroke="#fff" stroke-width="25"
+            fill="none" stroke-linecap="round"/>
+    </mask>
+  </defs>
+
+  <ellipse class="fz-shadow" cx="160" cy="284" rx="86" ry="10" fill="#000" opacity=".08"/>
+
+  <g class="fz-all">
+    <!-- ================= TAIL: 2-bone secondary emotion channel ========= -->
+    <g class="fz-tail">
+      <g class="fz-tail-base"><!-- param: rotate -8..+8 deg @ (212,244) -->
+        <path d="M212 244 C 266 258 298 238 296 200" stroke="#EDB93A"
+              stroke-width="25" fill="none" stroke-linecap="round"/>
+      </g>
+      <g class="fz-tail-tip" transform="rotate(18 296 200)"><!-- param: rotate -20..+20 deg @ joint (296,200); shown: +18 interest flick -->
+        <path d="M296 200 C 295 180 284 164 268 158" stroke="#EDB93A"
+              stroke-width="25" fill="none" stroke-linecap="round"/>
+        <g mask="url(#fzcTailTip)">
+          <circle class="fz-ring" cx="268" cy="158" r="15" fill="#8C2233"/>
+        </g>
+      </g>
+    </g>
+
+    <!-- ================= BODY (never rotated, never mirrored) =========== -->
+    <g class="fz-body">
+      <rect x="102" y="164" width="116" height="96" rx="42" fill="#FFD94F"/>
+      <ellipse class="fz-foot fz-foot-l" cx="132" cy="257" rx="24" ry="11" fill="#EDB93A"/>
+      <ellipse class="fz-foot fz-foot-r" cx="188" cy="257" rx="24" ry="11" fill="#EDB93A"/>
+      <!-- chest patch + paw emblem (identity lock) -->
+      <g class="fz-chest"><!-- param: scale 1..1.06 (proud puff) -->
+        <ellipse cx="160" cy="226" rx="36" ry="28" fill="#FFF4DA"/>
+        <!-- chest emblem = fz-pawprint instance: ink-center at (160,225), s=1.75 -->
+        <g class="fz-emblem" transform="translate(160,225) scale(1.75) translate(-12.6,-12.45)">
+          <use xlink:href="#fz-pawprint" href="#fz-pawprint"/>
+        </g>
+      </g>
+
+      <!-- ============ HEAD GROUP (new): lean by translate only ========== -->
+      <g class="fz-head" transform="translate(2,-2)"><!-- param: tx -6..6, ty -4..4 -->
+        <!-- ears: independent L/R rotation, overlap-safe deep bases -->
+        <g class="fz-ear fz-ear-l" transform="rotate(-8 108 52)"><!-- param: -14..+18 deg; shown: -8 perk -->
+          <path d="M76 66 L 95 0 L 140 34 Z" fill="#FFD94F"/>
+          <path d="M90 52 L 101 17 L 125 35 Z" fill="#8C2233"/>
+        </g>
+        <g class="fz-ear fz-ear-r" transform="rotate(4 212 52)"><!-- param: -18..+14 deg; shown: +4 relaxed -->
+          <path d="M244 66 L 225 0 L 180 34 Z" fill="#FFD94F"/>
+          <path d="M230 52 L 219 17 L 195 35 Z" fill="#8C2233"/>
+        </g>
+        <circle cx="160" cy="106" r="88" fill="#FFD94F"/>
+
+        <!-- ============ FACE RIG ============ -->
+        <g class="fz-face">
+          <ellipse cx="160" cy="140" rx="36" ry="25" fill="#FFF4DA"/>
+          <path d="M153 126 L 167 126 L 160 136 Z" fill="#8C2233"/>
+          <circle class="fz-blush" cx="102" cy="126" r="11" fill="#F0A0AC"/>
+          <circle class="fz-blush" cx="218" cy="126" r="11" fill="#F0A0AC"/>
+
+          <g class="fz-eyes"><!-- gaze: translate ±7/±5 (existing lookAt contract) -->
+            <g class="fz-eye-open">
+              <!-- LEFT eye: disc + separated pupil cluster + parametric lids -->
+              <g class="fz-eye fz-eye-l">
+                <circle cx="126" cy="98" r="16" fill="#33201F"/>
+                <g class="fz-pupil" clip-path="url(#fzcEyeL)"><!-- param: tx ±6, ty ±5 inside disc -->
+                  <circle cx="130.5" cy="92.5" r="5.5" fill="#fff"/>
+                  <circle cx="121.5" cy="104" r="2.8" fill="#fff" opacity=".7"/>
+                </g>
+                <g class="fz-lid-up" clip-path="url(#fzcEyeL)"><!-- param: ty 0..34 (0=open, 34=closed) -->
+                  <circle cx="126" cy="62" r="17" fill="#FFD94F"/>
+                </g>
+                <g class="fz-lid-low" clip-path="url(#fzcEyeL)"><!-- param: ty 0..-14 (smile squint) -->
+                  <circle cx="126" cy="134" r="17" fill="#FFD94F"/>
+                </g>
+              </g>
+              <!-- RIGHT eye -->
+              <g class="fz-eye fz-eye-r">
+                <circle cx="194" cy="98" r="16" fill="#33201F"/>
+                <g class="fz-pupil" clip-path="url(#fzcEyeR)">
+                  <circle cx="198.5" cy="92.5" r="5.5" fill="#fff"/>
+                  <circle cx="189.5" cy="104" r="2.8" fill="#fff" opacity=".7"/>
+                </g>
+                <g class="fz-lid-up" clip-path="url(#fzcEyeR)">
+                  <circle cx="194" cy="62" r="17" fill="#FFD94F"/>
+                </g>
+                <g class="fz-lid-low" clip-path="url(#fzcEyeR)">
+                  <circle cx="194" cy="134" r="17" fill="#FFD94F"/>
+                </g>
+              </g>
+            </g>
+            <!-- variant eye sets kept from current rig (identity continuity) -->
+            <g class="fz-eye-happy" opacity="0">
+              <path d="M112 101 C 119 90 133 90 140 101" stroke="#33201F" stroke-width="7"
+                    stroke-linecap="round" fill="none"/>
+              <path d="M180 101 C 187 90 201 90 208 101" stroke="#33201F" stroke-width="7"
+                    stroke-linecap="round" fill="none"/>
+            </g>
+            <g class="fz-eye-love" opacity="0" fill="#D9536A">
+              <g transform="translate(126,98)"><path d="M0 13 C -8.5 5.5 -15 1 -15 -5.5 C -15 -11.5 -10.6 -15 -6.8 -15 C -3.4 -15 -0.9 -12.8 0 -10.2 C 0.9 -12.8 3.4 -15 6.8 -15 C 10.6 -15 15 -11.5 15 -5.5 C 15 1 8.5 5.5 0 13 Z"/></g>
+              <g transform="translate(194,98)"><path d="M0 13 C -8.5 5.5 -15 1 -15 -5.5 C -15 -11.5 -10.6 -15 -6.8 -15 C -3.4 -15 -0.9 -12.8 0 -10.2 C 0.9 -12.8 3.4 -15 6.8 -15 C 10.6 -15 15 -11.5 15 -5.5 C 15 1 8.5 5.5 0 13 Z"/></g>
+            </g>
+            <!-- fast blink layer (scale-based, kept from production rig) -->
+            <g class="fz-lids" opacity="0">
+              <g class="fz-lid"><circle cx="126" cy="98" r="18" fill="#FFD94F"/>
+                <path d="M114 99 C 120 105 132 105 138 99" stroke="#33201F" stroke-width="5" stroke-linecap="round" fill="none"/></g>
+              <g class="fz-lid fz-lid-r"><circle cx="194" cy="98" r="18" fill="#FFD94F"/>
+                <path d="M182 99 C 188 105 200 105 206 99" stroke="#33201F" stroke-width="5" stroke-linecap="round" fill="none"/></g>
+            </g>
+          </g>
+
+          <!-- BROWS: first-class, curved capsules, per-side transforms -->
+          <g class="fz-brows" stroke="#33201F" stroke-width="5.5" stroke-linecap="round" fill="none">
+            <path class="fz-brow-l" d="M115 70 Q 125 63.5 135 66.5" stroke-width="5"/><!-- param: ty -8..6, rot -14..14 -->
+            <path class="fz-brow-r" d="M185 66.5 Q 195 63.5 205 70" stroke-width="5"/>
+          </g>
+
+          <!-- MOUTH SET (9 shapes; open-smile shown) -->
+          <g class="fz-mouth">
+            <path class="fz-m fz-m-smile" style="display:none" d="M148 148 C 154 155 166 155 172 148"
+                  stroke="#33201F" stroke-width="5.5" stroke-linecap="round" fill="none"/>
+            <path class="fz-m fz-m-soft" style="display:none" d="M152 149 C 156 153 164 153 168 149"
+                  stroke="#33201F" stroke-width="5" stroke-linecap="round" fill="none"/>
+            <path class="fz-m fz-m-open" d="M145 146 C 148 162 172 162 175 146 C 165 150 155 150 145 146 Z"
+                  fill="#33201F"/>
+            <circle class="fz-m fz-m-o" style="display:none" cx="160" cy="151" r="6.5" fill="#33201F"/>
+            <ellipse class="fz-m fz-m-sp1" style="display:none" cx="160" cy="151" rx="5" ry="3.4" fill="#33201F"/>
+            <ellipse class="fz-m fz-m-sp2" style="display:none" cx="160" cy="151" rx="7.5" ry="6" fill="#33201F"/>
+            <path class="fz-m fz-m-wave" style="display:none" d="M147 150 Q 153 145 160 150 Q 167 155 173 150"
+                  stroke="#33201F" stroke-width="5.5" stroke-linecap="round" fill="none"/>
+            <path class="fz-m fz-m-flat" style="display:none" d="M150 150 L 170 150"
+                  stroke="#33201F" stroke-width="5.5" stroke-linecap="round" fill="none"/>
+            <path class="fz-m fz-m-concern" style="display:none" d="M150 152 C 155 148.5 165 148.5 170 152"
+                  stroke="#33201F" stroke-width="5" stroke-linecap="round" fill="none"/>
+            <path class="fz-m fz-m-sad" style="display:none" d="M148 154 C 154 147 166 147 172 154"
+                  stroke="#33201F" stroke-width="5.5" stroke-linecap="round" fill="none"/>
+          </g>
+
+          <g class="fz-acc fz-sweat" opacity="0">
+            <path d="M80 72 C 88 84 90 92 90 98 A 10 10 0 1 1 70 98 C 70 92 72 84 80 72 Z" fill="#9CC7E8"/>
+          </g>
+        </g><!-- /fz-face -->
+      </g><!-- /fz-head -->
+
+      <!-- ================= ARMS: both pivot at shoulder ================ -->
+      <g class="fz-arm fz-arm-l" transform="rotate(105 115 185)"><!-- param: rot -30..130 @ shoulder (115,185); shown: raised open wave -->
+        <ellipse cx="115" cy="211" rx="14" ry="30" fill="#FFD94F"/>
+        <ellipse cx="115" cy="211" rx="14" ry="30" fill="#000" opacity=".04"/>
+        <!-- palm pads = fz-pawprint instance: ink-center (115,233), s=1.35; rotates only with the arm pivot -->
+        <g class="fz-pads fz-pads-l" opacity="1" transform="translate(115,233) scale(1.35) translate(-12.6,-12.45)">
+          <use xlink:href="#fz-pawprint" href="#fz-pawprint"/>
+        </g>
+      </g>
+      <g class="fz-arm fz-arm-r" transform="rotate(-14 198 182)"><!-- param: rot -130..30 @ shoulder (198,182); shown: slightly open -->
+        <ellipse cx="198" cy="206" rx="14" ry="30" fill="#FFD94F"/>
+        <!-- palm pads = fz-pawprint instance: ink-center (198,228), s=1.35 -->
+        <g class="fz-pads fz-pads-r" opacity="0" transform="translate(198,228) scale(1.35) translate(-12.6,-12.45)">
+          <use xlink:href="#fz-pawprint" href="#fz-pawprint"/>
+        </g>
+      </g>
+    </g><!-- /fz-body -->
+  </g><!-- /fz-all -->
+</svg>
