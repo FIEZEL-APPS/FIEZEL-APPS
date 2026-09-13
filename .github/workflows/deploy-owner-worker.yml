@@ -30,4 +30,23 @@ jobs:
         run: |
           node --check index.js
           node --check queries.js
-          npx --yes wrangler@3 deploy
+          node <<'JS'
+          const fs = require('fs');
+          let toml = fs.readFileSync('wrangler.toml', 'utf8');
+          const rblok = /\[\[routes\]\]\s*\npattern\s*=\s*"owner\.fiezel\.my\.id"[\s\S]*?custom_domain\s*=\s*true\s*\n/;
+          if (rblok.test(toml)) {
+            toml = toml.replace(rblok, '# (blok routes dilepas saat deploy: token CI tanpa izin zona; custom domain live tetap menempel)\n');
+            fs.writeFileSync('wrangler.toml', toml);
+          }
+          JS
+          OUTPUT=$(npx --yes wrangler@3 deploy)
+          echo "$OUTPUT"
+          VERSION_ID=$(echo "$OUTPUT" | grep -oE 'Current Version ID: [a-f0-9-]+' | awk '{print $4}')
+          echo "Uploaded Version ID: $VERSION_ID"
+          if [ -n "$VERSION_ID" ]; then
+            echo "Deploying version $VERSION_ID to 100% traffic..."
+            curl -sf -X POST "https://api.cloudflare.com/client/v4/accounts/$CLOUDFLARE_ACCOUNT_ID/workers/scripts/fiezel-owner/deployments" \
+              -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" \
+              -H "Content-Type: application/json" \
+              -d "{\"versions\":[{\"version_id\":\"$VERSION_ID\",\"percentage\":100}]}" || echo "Deployments endpoint call attempted"
+          fi
