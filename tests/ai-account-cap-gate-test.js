@@ -311,6 +311,18 @@ async function issueIdentity(worker, env) {
  * menyentuhnya (kalau ternyata menyentuh, deklarasi ini tidak bisa dipakai menyembunyikan
  * jalur berbayar).
  */
+/* Rute owner di route-legacy.js dijaga isOwner(), yang mem-SHA-256 token Bearer dan
+   membandingkannya dengan env.OWNER_TOKEN_HASH. Hash-nya dihitung di sini dari tokennya,
+   bukan diketik sebagai konstanta hex: konstanta yang diketik akan diam-diam berhenti
+   cocok kalau algoritmanya berubah, dan fixture-nya akan lolos sebagai 403 yang tidak
+   pernah menyentuh model - persis kegagalan senyap yang gerbang ini ada untuk mencegah. */
+const OWNER_TOKEN = 'uji-owner-token-0123456789';
+const OWNER_TOKEN_HASH = require('crypto').createHash('sha256').update(OWNER_TOKEN).digest('hex');
+const OWNER_FIXTURE = {
+  headers: { authorization: 'Bearer ' + OWNER_TOKEN },
+  bootOptions: { vars: { OWNER_TOKEN_HASH } }
+};
+
 const ROUTE_FIXTURES = {
   'POST /api/ai/task': {
     expectModel: true,
@@ -329,7 +341,31 @@ const ROUTE_FIXTURES = {
     })
   },
   // Katalog publik. Tidak menyentuh model, dan itu DIBUKTIKAN, bukan dipercaya.
-  'GET /api/tts/manifest': { expectModel: false, needsIdentity: false }
+  'GET /api/tts/manifest': { expectModel: false, needsIdentity: false },
+
+  /* --- SLOT 5 (route-legacy.js). Kelimanya ditemukan C3b, bukan diketik sebagai daftar.
+     Sebelum C3b ada, kelima rute ini memanggil model TANPA satu pun fixture yang
+     membuktikan apa yang mereka lakukan. --- */
+  'POST /api/ai/chat': {
+    expectModel: true, needsIdentity: true,
+    body: JSON.stringify({ task: 'chat', prompt: 'Apa beda "in" dan "on"?' })
+  },
+  'POST /api/ai/translate': {
+    expectModel: true, needsIdentity: true,
+    body: JSON.stringify({ text: 'The cat is on the table.', targetLocale: 'Indonesian' })
+  },
+  'POST /api/coach/context': {
+    expectModel: true, needsIdentity: true,
+    body: JSON.stringify({ snapshot: {}, policy: {}, outcomes: [] })
+  },
+  'POST /api/content/qa/review': {
+    expectModel: true, needsIdentity: false, ...OWNER_FIXTURE,
+    body: JSON.stringify({ stem: 'She ___ to school.', options: ['go', 'goes'], correctIndex: 1 })
+  },
+  'POST /api/content/patch/candidate': {
+    expectModel: true, needsIdentity: false, ...OWNER_FIXTURE,
+    body: JSON.stringify({ itemId: 'r0001#1', finding: { category: 'clarity' } })
+  }
 };
 
 /* ============================================================ MAIN ================= */
@@ -454,6 +490,105 @@ const ROUTE_FIXTURES = {
     for (const fn of registerFns) mod[fn](router, {});
     for (const [method, p] of sink) discovered.push({ key: method + ' ' + p, method, path: p, module: rel });
   }
+  /* ---------- C3b. MODUL RUTE BERBENTUK ARRAY `export const ROUTES` ------
+   *
+   * LUBANG YANG DITUTUP BAGIAN INI. Penemuan di atas hanya mengenali modul yang
+   * MENDEFINISIKAN `registerXxxRoutes(`. `route-slots.js` memasang beberapa modul
+   * dengan pola lain: `import { ROUTES } from './route-legacy.js'`. Modul seperti itu
+   * LOLOS SEPENUHNYA dari C1-C5 - termasuk `route-legacy.js`, yang memanggil model di
+   * lima rutenya. Selama lubang ini terbuka, satu jalur berbayar bisa hidup tanpa satu
+   * pun fixture yang membuktikan apa yang dilakukannya, dan A1 tidak menangkapnya karena
+   * modul itu memakai chokepoint dengan benar.
+   *
+   * KENAPA PER-RUTE, BUKAN SEMUA. `route-legacy.js` mengekspor 22 rute; hanya lima yang
+   * menyentuh model. Menuntut 22 fixture berarti 17 di antaranya membuktikan hal yang
+   * sudah pasti, dengan ongkos boot Worker + D1 + owner-token per rute - gerbang lambat
+   * yang mengajari orang mengabaikannya. Jadi yang masuk `discovered` hanya rute yang
+   * SUMBERNYA menyentuh jalur model.
+   *
+   * ARAHNYA TETAP DUA. Keanggotaan tidak diketik tangan: ia diturunkan dari sumber.
+   * Begitu ada yang menambahkan panggilan model ke rute mana pun di modul ini, rute itu
+   * OTOMATIS masuk `discovered`, tidak punya fixture, dan C4 merah - "lupa = merah,
+   * bukan murah", persis seperti jalur `registerXxxRoutes`. Sebaliknya, rute yang
+   * berhenti memanggil model akan keluar sendiri.
+   *
+   * BATASNYA DISEBUT TERANG-TERANGAN: penemuan ini membaca SUMBER, bukan jejak runtime.
+   * Yang dibuktikan runtime tetap C5-C7 di bawah, yang menjalankan rutenya sungguhan. */
+  const scanTopLevelEntries = (src) => {
+    const at = src.search(/export\s+const\s+ROUTES\s*=\s*\[/);
+    if (at < 0) return [];
+    const out = [];
+    let i = src.indexOf('[', at), depth = 0, entryAt = -1, quote = null;
+    for (; i < src.length; i++) {
+      const c = src[i];
+      if (quote) { if (c === quote && src[i - 1] !== '\\') quote = null; continue; }
+      if (c === "'" || c === '"' || c === '`') { quote = c; continue; }
+      if (c === '[') { depth += 1; if (depth === 2) entryAt = i; }
+      else if (c === ']') {
+        depth -= 1;
+        if (depth === 1 && entryAt >= 0) { out.push(src.slice(entryAt, i + 1)); entryAt = -1; }
+        if (depth === 0) break;
+      }
+    }
+    return out;
+  };
+  /* Nama fungsi di modul ini yang BENAR-BENAR memanggil model. Diturunkan, bukan diketik:
+     fungsi yang tubuhnya menyentuh chokepoint atau binding. Handler yang memanggil salah
+     satunya dihitung sebagai jalur berbayar. */
+  const modelCallingNames = (src) => {
+    const names = new Set();
+    const re = /(?:async\s+)?function\s+([A-Za-z0-9_$]+)\s*\([^)]*\)\s*\{/g;
+    let m;
+    while ((m = re.exec(src))) {
+      let i = src.indexOf('{', m.index + m[0].length - 1), depth = 0, end = -1, quote = null;
+      for (let j = i; j < src.length; j++) {
+        const c = src[j];
+        if (quote) { if (c === quote && src[j - 1] !== '\\') quote = null; continue; }
+        if (c === "'" || c === '"' || c === '`') { quote = c; continue; }
+        if (c === '{') depth += 1;
+        else if (c === '}') { depth -= 1; if (depth === 0) { end = j; break; } }
+      }
+      if (end < 0) continue;
+      const body = src.slice(i, end + 1);
+      if (/runReservedModel\s*\(/.test(body) || /\bAI\s*\.\s*run\s*\(/.test(body)) names.add(m[1]);
+    }
+    return names;
+  };
+
+  const arrayModules = API_FILES.filter((rel) => {
+    const src = stripComments(fs.readFileSync(path.join(API_DIR, rel), 'utf8'));
+    return /export\s+const\s+ROUTES\s*=\s*\[/.test(src) && reachesChokepoint(rel);
+  });
+  const arrayFindings = [];
+  for (const rel of arrayModules) {
+    const src = stripComments(fs.readFileSync(path.join(API_DIR, rel), 'utf8'));
+    const callers = modelCallingNames(src);
+    const entries = scanTopLevelEntries(src);
+    for (const entry of entries) {
+      const head = /^\[\s*'([A-Z]+)'\s*,\s*'([^']+)'/.exec(entry);
+      if (!head) continue;
+      const touchesModel = [...callers].some((n) => new RegExp('\\b' + n + '\\s*\\(').test(entry))
+        || /runReservedModel\s*\(/.test(entry) || /\bAI\s*\.\s*run\s*\(/.test(entry);
+      arrayFindings.push({ key: head[1] + ' ' + head[2], method: head[1], path: head[2], module: rel, touchesModel });
+    }
+  }
+  check('C3b. Modul rute berbentuk array ikut ditemukan, dan rutenya terbaca',
+    arrayModules.length === 0 || arrayFindings.length > 0,
+    'modul=' + (arrayModules.join(',') || '(tidak ada)') + ' rute terbaca=' + arrayFindings.length);
+  /* Versi pertama assert ini menuntut SETIAP modul array punya rute model, dan itu KELIRU:
+     index.js adalah pintu Worker - ia mencapai chokepoint karena mengimpor segalanya,
+     sementara rutenya sendiri tidak memanggil model. Menuntutnya merah selamanya atas
+     sesuatu yang benar. Yang dijaga sekarang adalah NON-KEHAMPAAN: kalau pemindai entri
+     atau pendeteksi pemanggil model patah, arrayFindings jadi kosong atau semua rute
+     terbaca "tidak menyentuh model" - dan C4 di bawah akan lewat karena tidak ada yang
+     ditemukan. Gerbang yang hijau karena pemindainya rusak lebih berbahaya daripada tidak
+     ada gerbang, jadi keadaan itu dibuat MERAH di sini. */
+  check('C3c. Penemuan modul array tidak hampa: ada rute model yang benar-benar terbaca',
+    arrayModules.length === 0 || arrayFindings.some((r) => r.touchesModel),
+    arrayModules.map((rel) => rel + ':' + arrayFindings.filter((r) => r.module === rel && r.touchesModel).length
+      + '/' + arrayFindings.filter((r) => r.module === rel).length).join(' '));
+  for (const r of arrayFindings) if (r.touchesModel) discovered.push(r);
+
   const missingFixture = discovered.filter((r) => !ROUTE_FIXTURES[r.key]);
   check('C4. Setiap rute dari modul model-capable punya fixture di gerbang ini',
     missingFixture.length === 0,
@@ -466,12 +601,13 @@ const ROUTE_FIXTURES = {
   for (const route of discovered) {
     const fixture = ROUTE_FIXTURES[route.key];
     if (!fixture) continue;
-    const booted = boot(worker);
+    const booted = boot(worker, fixture.bootOptions || {});
     await prepareDb(booted);
     instrument(booted.core, booted.timeline);
     const cookie = fixture.needsIdentity ? await issueIdentity(worker, booted.env) : null;
     const res = await booted.call(route.method, route.path, {
       cookie: cookie || undefined,
+      headers: fixture.headers,
       body: fixture.body === undefined ? undefined : fixture.body
     });
     const firstAi = booted.timeline.findIndex((e) => e.kind === 'ai');
