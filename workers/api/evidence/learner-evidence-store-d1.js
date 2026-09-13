@@ -86,18 +86,19 @@ export const SQL = Object.freeze({
     'INSERT INTO learner_evidence_state (sub, first_day, last_day, updated_at, evidence_n, decision_n, last_level, last_mastery, last_trend, last_misconception, last_calibration, last_improvement, last_decision, last_outcome, last_recommendation) VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11, ?12, ?13, ?14, ?15) ON CONFLICT(sub) DO UPDATE SET first_day = excluded.first_day, last_day = excluded.last_day, updated_at = excluded.updated_at, evidence_n = excluded.evidence_n, decision_n = excluded.decision_n, last_level = excluded.last_level, last_mastery = excluded.last_mastery, last_trend = excluded.last_trend, last_misconception = excluded.last_misconception, last_calibration = excluded.last_calibration, last_improvement = excluded.last_improvement, last_decision = excluded.last_decision, last_outcome = excluded.last_outcome, last_recommendation = excluded.last_recommendation',
 
   // --- baca owner ----------------------------------------------------------
-  // DUA kueri, bukan satu JOIN, dan itu keputusan: nama murid tinggal di
-  // `social_profile` (lane sosial) sedangkan penghitung tinggal di lane ini.
-  // Membacanya terpisah membuat kegagalan lane sosial (tabel belum dimigrasi,
-  // fitur sosial mati) berakhir sebagai "murid tanpa nama" alih-alih sebagai
-  // direktori yang gagal total — dan menyembunyikan murid tanpa nama akan
-  // membuat owner mengira dia tidak ada.
+  // Menggabungkan murid yang sudah memiliki bukti belajar (learner_evidence_state)
+  // dan murid yang baru bergabung / mendaftar nama (learner_name) agar seluruh
+  // murid langsung terlihat di direktori dashboard owner.
   readLearnerDirectory:
     'SELECT sub, first_day, last_day, evidence_n, decision_n, last_level, last_mastery, last_trend, last_outcome FROM learner_evidence_state WHERE last_day >= ?1 ORDER BY last_day DESC LIMIT ?2',
+  readLearnerNamesDirectory:
+    'SELECT sub, name_day FROM learner_name WHERE name_day >= ?1 ORDER BY name_day DESC LIMIT ?2',
   readLearnerProfile:
     'SELECT handle, display_name FROM social_profile WHERE sub = ?1',
   readLearnerEvidenceRows:
     'SELECT day, received_at, event, dims FROM learner_evidence WHERE sub = ?1 AND day >= ?2 AND day <= ?3 ORDER BY day ASC LIMIT ?4',
+  insertInitialState:
+    'INSERT OR IGNORE INTO learner_evidence_state (sub, first_day, last_day, updated_at, evidence_n, decision_n) VALUES (?1, ?2, ?3, ?4, 0, 0)',
 
   // --- retensi -------------------------------------------------------------
   purgeLearnerEvidence:
@@ -188,6 +189,9 @@ function placeholders(count, start) {
  */
 export async function writeLearnerName(db, sub, name, day, nowMs) {
   await db.prepare(SQL.upsertLearnerName).bind(sub, name, day, Number(nowMs) || 0).run();
+  try {
+    await db.prepare(SQL.insertInitialState).bind(sub, day, day, Number(nowMs) || 0).run();
+  } catch (_) {}
   return true;
 }
 
@@ -269,7 +273,44 @@ export async function writeLearnerEvidence(db, sub, day, events, nowMs) {
 export async function readLearnerDirectory(db, sinceDay, limit) {
   const cap = Math.min(LEARNER_EVIDENCE_LIMITS.DIRECTORY_MAX, Math.max(1, Math.trunc(Number(limit) || 0) || LEARNER_EVIDENCE_LIMITS.DIRECTORY_MAX));
   const res = await db.prepare(SQL.readLearnerDirectory).bind(sinceDay, cap).all();
-  const rows = (res && res.results) || [];
+  let rows = (res && res.results) || [];
+
+  // Sertakan murid yang mendaftar nama di learner_name pada rentang hari ini
+  // tetapi belum memiliki baris bukti di learner_evidence_state
+  try {
+    const knownSubs = new Set(rows.map((r) => r.sub));
+    const nameRes = await db.prepare(SQL.readLearnerNamesDirectory).bind(sinceDay, cap).all();
+    const candidates = ((nameRes && nameRes.results) || []).filter((nr) => !knownSubs.has(nr.sub));
+    if (candidates.length > 0) {
+      const revokedSubs = new Set();
+      try {
+        const cSql = 'SELECT sub, revoked_at FROM learner_evidence_consent WHERE sub IN (' + placeholders(candidates.length, 1) + ')';
+        const cRes = await db.prepare(cSql).bind(...candidates.map((c) => c.sub)).all();
+        for (const c of (cRes && cRes.results) || []) {
+          if (c.revoked_at !== null && c.revoked_at !== undefined) revokedSubs.add(c.sub);
+        }
+      } catch (_) {}
+      for (const nr of candidates) {
+        if (!revokedSubs.has(nr.sub)) {
+          knownSubs.add(nr.sub);
+          rows.push({
+            sub: nr.sub,
+            first_day: nr.name_day || sinceDay,
+            last_day: nr.name_day || sinceDay,
+            evidence_n: 0,
+            decision_n: 0,
+            last_level: null,
+            last_mastery: null,
+            last_trend: null,
+            last_outcome: null
+          });
+        }
+      }
+      rows.sort((a, b) => (b.last_day > a.last_day ? 1 : b.last_day < a.last_day ? -1 : 0));
+      if (rows.length > cap) rows = rows.slice(0, cap);
+    }
+  } catch { /* learner_name belum ada atau gagal = fail-soft */ }
+
   if (!rows.length) return rows;
   const subs = rows.map((r) => r.sub);
 
