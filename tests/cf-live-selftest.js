@@ -70,9 +70,12 @@ const check = (name, ok, details) => {
 const FLAGS_BENAR = {
   cfApiEnabled: true, cfAiEnabled: true, cfTtsEnabled: false,
   cfQuotaEnabled: true, cfAnalyticsEnabled: true, cfIdentityEnabled: true,
-  cfSocialEnabled: false
+  cfSocialEnabled: false,
+  // m025-311: ikut ditambahkan supaya tiruan ini SEPADAN dengan yang disajikan Worker
+  // sungguhan (workers/api/schema.js). Tanpa ini skenario BENAR merah atas tiruannya sendiri.
+  cfLearnerEvidenceEnabled: false
 };
-const KILL_BENAR = { ai: true, tts: false, coach: false, analytics: true, social: false };
+const KILL_BENAR = { ai: true, tts: false, coach: false, analytics: true, social: false, learnerEvidence: false };
 
 function buildCookie(mut) {
   const bits = ['fz_id=eyJ2IjoxfQ.tandatangan'];

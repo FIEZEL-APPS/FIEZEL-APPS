@@ -116,14 +116,21 @@ const FLAGS_DIHARAPKAN = Object.freeze({
   cfAiEnabled: true,        // docs/MASTER-BROADCAST.md:124 — dinyalakan 28 Ags 18:20, terverifikasi
   cfTtsEnabled: false,      // docs/MASTER-BROADCAST.md:127 — TETAP mati; korpus penuh +-US$9,07
   cfAnalyticsEnabled: true, // commit 692bc5c + wrangler.toml ANALYTICS_ENABLED="on"
-  cfSocialEnabled: false    // SLOT 7 belum diputuskan owner
+  cfSocialEnabled: false,   // SLOT 7 belum diputuskan owner
+  // m025-311: DITAMBAHKAN karena produksi MENYAJIKANNYA dan gerbang ini tidak mengenalinya,
+  // sehingga `config-flags-declared` merah pada jalan live pertama sejak 30 Ags. Flag ini
+  // bukan hal baru di produksi - ia sudah dideklarasikan di workers/api/schema.js
+  // (CLIENT_FLAG_DEFAULTS, default false) sejak SLOT 9 lahir; yang basi adalah TABEL DI SINI.
+  // Nilainya false: lane bukti per-murid "LAHIR MATI" sesuai aturan produksi di wrangler.toml.
+  cfLearnerEvidenceEnabled: false
 });
 const KILL_DIHARAPKAN = Object.freeze({
   ai: true,        // sepadan dengan cfAiEnabled
   tts: false,      // sepadan dengan cfTtsEnabled
   coach: false,    // belum diputuskan owner
   analytics: true, // sepadan dengan cfAnalyticsEnabled
-  social: false    // sepadan dengan cfSocialEnabled
+  social: false,   // sepadan dengan cfSocialEnabled
+  learnerEvidence: false  // m025-311: sepadan dengan cfLearnerEvidenceEnabled; alasan sama
 });
 
 const FOREIGN_ORIGIN = 'https://evil.example';
