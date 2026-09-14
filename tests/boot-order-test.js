@@ -21,6 +21,18 @@
  *     tambalan yang membungkus tetangganya) dan Classroom harus bergantung pada grup suara.
  *  4. Semua berkas baru harus ikut di-precache service worker, atau peluncuran offline
  *     akan kehilangan bagian yang justru dipindahkan ke jalur malas.
+ *
+ * m025-314 — SATU PENGECUALIAN, DAN INI ALASANNYA YANG DITULIS PENUH.
+ * `<script type="application/ld+json">` BUKAN skrip. Peramban tidak pernah
+ * mengeksekusinya, tidak pernah menghentikan pengurai untuknya, dan isinya tidak bisa
+ * melempar ReferenceError — ia blok DATA yang dibaca crawler. Seluruh alasan yang
+ * ditulis di butir 2 dan di cek "splash cat-pertama" berbicara tentang skrip yang
+ * BERJALAN; menghitung blok data ke dalamnya membuat gerbang menolak structured data
+ * SEO tanpa satu pun bita perilaku berubah. Itu bukan penjagaan, itu salah alamat.
+ *
+ * Pengecualiannya sengaja dibuat SEMPIT dan berbayar: hanya type persis
+ * "application/ld+json", dan setiap blok yang dikecualikan WAJIB lolos JSON.parse.
+ * Blok yang isinya bukan JSON sah berarti ia bukan data — dan gerbang memerah.
  */
 const assert = require('assert');
 const fs = require('fs');
@@ -59,9 +71,23 @@ while ((m = scriptRe.exec(scanHtml)) !== null) {
   });
 }
 
-const lazy = scripts.filter(s => s.type === 'fiezel/lazy');
-const eager = scripts.filter(s => s.src && s.type !== 'fiezel/lazy');
-const inline = scripts.filter(s => s.inline);
+// Blok data structured-data dipisahkan dari skrip sungguhan (lihat catatan m025-314 di
+// kepala berkas). `dataBlocks` tetap diperiksa — pengecualiannya berbayar, bukan gratis.
+const dataBlocks = scripts.filter(s => s.type === 'application/ld+json');
+const kode = scripts.filter(s => s.type !== 'application/ld+json');
+
+const lazy = kode.filter(s => s.type === 'fiezel/lazy');
+const eager = kode.filter(s => s.src && s.type !== 'fiezel/lazy');
+const inline = kode.filter(s => s.inline);
+
+test('blok application/ld+json benar-benar DATA - setiap satu lolos JSON.parse', () => {
+  for (const b of dataBlocks) {
+    const mulai = scanHtml.indexOf('>', b.at) + 1;
+    const isi = html.slice(mulai, html.indexOf('</script>', mulai));
+    assert.doesNotThrow(() => JSON.parse(isi),
+      'blok ld+json pada offset ' + b.at + ' bukan JSON sah - ia tidak berhak atas pengecualian skrip-data');
+  }
+});
 
 test('SDK Puter tidak dimuat sama sekali (Puter dihapus total)', () => {
   const puter = scripts.filter(s => /js\.puter\.com/.test(s.src));
@@ -188,9 +214,11 @@ test('berkas baru ikut di-precache service worker - peluncuran offline tetap utu
 
 test('splash cat-pertama tetap yang pertama diurai', () => {
   const splashAt = html.indexOf('id="fiezelBootSplash"');
-  const firstScriptAt = html.indexOf('<script');
-  assert.ok(splashAt > 0 && splashAt < firstScriptAt,
-    'splash harus diurai sebelum <script> pertama - itu satu-satunya alasan ia tercat lebih dulu');
+  // Yang dijaga adalah skrip yang BERJALAN. Blok application/ld+json tidak dieksekusi
+  // peramban, jadi ia tidak pernah menahan cat pertama (lihat catatan m025-314 di kepala).
+  const firstCodeAt = kode.length ? kode[0].at : -1;
+  assert.ok(splashAt > 0 && firstCodeAt > 0 && splashAt < firstCodeAt,
+    'splash harus diurai sebelum <script> yang BERJALAN pertama - itu satu-satunya alasan ia tercat lebih dulu');
 });
 
 // --- perilaku pemuat, bukan sekadar bentuk dokumen -------------------------------------
