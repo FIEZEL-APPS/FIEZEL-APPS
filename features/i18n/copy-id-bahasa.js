@@ -26,7 +26,7 @@
     'bahasa.ja': 'Bahasa Jepang',
     'bahasa.en-catatan': 'Kursus lengkap',
     'bahasa.ja-catatan': 'Tingkat A1/N5 · masih draf',
-    // m025-311: menulis DIKELUARKAN dari daftar yang belum ada - banknya sudah dibuat
+    // m025-312: menulis DIKELUARKAN dari daftar yang belum ada - banknya sudah dibuat
     // (24 prompt N5, dua untuk tiap keluarga silabus) dan kartunya sudah ditawarkan.
     // Menyimak dan berbicara tetap disebut, dan alasannya kini disebut apa adanya:
     // bukan "banknya belum ditulis" melainkan suaranya masih bahasa Inggris.

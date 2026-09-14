@@ -46,7 +46,7 @@ const isiJa = fs.existsSync(path.join(__fzRoot, 'content/ja'))
   ? fs.readdirSync(path.join(__fzRoot, 'content/ja'))
   : [];
 
-/* m025-311: GERBANG INI BERBALIK, persis seperti yang dijanjikan versi sebelumnya.
+/* m025-312: GERBANG INI BERBALIK, persis seperti yang dijanjikan versi sebelumnya.
    Dulu ia menuntut KETIGA permukaan disembunyikan. Sekarang menulis punya banknya
    (content/ja/writing-prompts-ja.json), jadi yang dijaga berbalik arah untuknya: kartunya
    WAJIB ditawarkan. Menyembunyikan permukaan yang isinya sudah siap adalah fitur yang
@@ -168,7 +168,7 @@ test('peringatan pemilih bahasa jujur: menyebut yang belum ada, TIDAK menyebut y
     assert.ok(kalimat.includes(kata),
       'peringatan tidak menyebut "' + kata + '" — murid tidak diberi tahu apa yang belum ada');
   });
-  /* m025-311: arah kedua, dan inilah yang membuat peringatan ini tetap jujur seiring waktu.
+  /* m025-312: arah kedua, dan inilah yang membuat peringatan ini tetap jujur seiring waktu.
      Menulis sudah ada. Peringatan yang masih mendaftarnya sebagai "belum ada" membuat murid
      melewatkan latihan yang sebenarnya tersedia - salah ke arah yang berlawanan, tetapi
      tetap salah. */

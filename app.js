@@ -4311,7 +4311,7 @@ async function load(){const root=document.baseURI;/* W1 P0-1 (16-001): fetch ban
     // dua bahasa sekaligus di tingkat yang belum sampai ke situ.
     const jaRead=await optional('content/ja/reading-bank-ja.json',null);
     if(Array.isArray(jaRead)&&jaRead.length)R=jaRead;
-    // m025-311: bank menulis Jepang. Bentuknya identik dengan writing-prompts-v1.json
+    // m025-312: bank menulis Jepang. Bentuknya identik dengan writing-prompts-v1.json
     // (schema, rubric, prompts[]), jadi penyaji dan penilai membacanya lewat jalur yang
     // sama tanpa cabang kedua. Medan `en` menyimpan naskah JEPANG - nama itu warisan dari
     // bank Inggris dan sengaja tidak diganti, karena penyaji membacanya apa adanya.
@@ -7259,7 +7259,7 @@ function latihanCards(){
      bahasa memang sudah berjanji latihan itu belum ada. Kartunya disembunyikan sampai
      banknya benar-benar dibuat; tests/japanese-surface-honesty-test.js mengikat penjaga
      ini ke ADA-TIDAKNYA berkas di content/ja/, jadi ia menuntut dicabut begitu isinya siap. */
-  /* m025-311: PENJAGA INI DIPECAH, dan pemecahannya yang penting.
+  /* m025-312: PENJAGA INI DIPECAH, dan pemecahannya yang penting.
      Menulis kini punya banknya sendiri (content/ja/writing-prompts-ja.json, 24 prompt N5,
      dua untuk tiap keluarga silabus), jadi menyembunyikan kartunya dari murid Jepang
      berarti fitur yang hilang diam-diam - sama buruknya dengan menawarkan yang kosong.
