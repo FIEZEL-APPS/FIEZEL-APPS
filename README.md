@@ -1,4 +1,4 @@
-# FIEZEL
+# FIEZEL 5.19.0
 
 **Personal English OS** — aplikasi belajar bahasa Inggris adaptif berbasis PWA.
 Grammar, kosakata, reading, speaking, dan listening dipetakan ke CEFR A1–C2.
