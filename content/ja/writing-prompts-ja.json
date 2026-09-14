@@ -1,0 +1,402 @@
+{
+  "schema": "fiezel-writing-prompts-v1",
+  "schemaVersion": "1.0.0",
+  "version": "1.0.0",
+  "targetLang": "ja",
+  "promptCount": 24,
+  "minPromptsPerLevel": 6,
+  "targetUnit": "characters",
+  "catatan": "Medan `en` menyimpan naskah prompt BAHASA JEPANG, bukan Inggris. Namanya warisan dari bank Inggris dan dibaca penyaji apa adanya (app.js:1076); mengganti namanya berarti menyunting penyaji untuk nol manfaat bagi murid. `target` dihitung dalam KARAKTER, bukan kata - kalimat Jepang N5 tidak dipisah spasi, jadi hitungan kata tidak berarti apa-apa di sini.",
+  "cakupan": "Dua prompt untuk TIAP dari 12 keluarga tata bahasa N5 di content/ja/grammar-templates-ja.json. Bukan dua puluh empat prompt yang kebetulan terpikir: tiap keluarga silabus benar-benar punya latihan menulisnya.",
+  "honesty": "FIEZEL tidak memprediksi skor IELTS atau TOEFL. Rubrik ini alat latihan dan umpan balik; band resmi hanya keluar dari ujian resmi.",
+  "rubric": {
+    "id": "fiezel-writing-rubric-v1",
+    "scale": {
+      "min": 0,
+      "max": 4
+    },
+    "note": "Lima kriteria, masing-masing 0-4. Empat kriteria pertama mengikuti keluarga kriteria IELTS Writing; yang kelima memisahkan nada dan kerapian supaya bisa dilatih sendiri.",
+    "criteria": [
+      {
+        "id": "task_response",
+        "label": "Penuntasan tugas",
+        "labelEn": "Task achievement / response",
+        "asks": "Apakah semua yang diminta soal benar-benar dijawab, dan posisinya jelas?",
+        "levels": [
+          "Belum menjawab tugasnya, atau menulis topik yang berbeda.",
+          "Menyentuh topik tetapi sebagian besar permintaan soal terlewat; posisi tidak terbaca.",
+          "Menjawab sebagian besar permintaan; posisinya ada tetapi berpindah-pindah atau kurang berkembang.",
+          "Menjawab seluruh permintaan dengan posisi jelas; sebagian gagasan masih tipis dukungannya.",
+          "Menjawab seluruh permintaan dengan posisi jelas dan konsisten; tiap gagasan utama dikembangkan dengan alasan atau contoh yang relevan."
+        ]
+      },
+      {
+        "id": "coherence_cohesion",
+        "label": "Keruntutan dan keterkaitan",
+        "labelEn": "Coherence and cohesion",
+        "asks": "Apakah alurnya bisa diikuti tanpa membaca ulang?",
+        "levels": [
+          "Tidak ada alur yang bisa diikuti.",
+          "Gagasan berloncatan; hampir tanpa paragraf atau penanda hubungan.",
+          "Ada paragraf, tetapi sebagian gagasan tidak pada tempatnya atau penandanya diulang-ulang.",
+          "Paragraf logis dengan penanda yang tepat; sesekali hubungan antarkalimat terasa longgar.",
+          "Setiap paragraf punya satu gagasan pusat, urutannya beralasan, dan rujukan antarkalimat mengalir tanpa mengulang penanda."
+        ]
+      },
+      {
+        "id": "lexical_resource",
+        "label": "Kekayaan kosakata",
+        "labelEn": "Lexical resource",
+        "asks": "Apakah katanya cukup tepat dan bervariasi untuk topiknya?",
+        "levels": [
+          "Kosakata terlalu sedikit untuk menyampaikan maksud.",
+          "Hanya kata paling dasar; pengulangan berat dan sering salah pilih kata.",
+          "Cukup untuk topik sehari-hari; kata yang kurang umum sering meleset maknanya.",
+          "Bervariasi dan umumnya tepat, termasuk beberapa kata topikal; kesalahan sesekali tidak mengganggu.",
+          "Luwes dan tepat, termasuk kolokasi dan ungkapan yang wajar; salah pilih kata sangat jarang."
+        ]
+      },
+      {
+        "id": "grammatical_range_accuracy",
+        "label": "Ragam dan ketepatan tata bahasa",
+        "labelEn": "Grammatical range and accuracy",
+        "asks": "Apakah struktur kalimatnya bervariasi dan benar?",
+        "levels": [
+          "Struktur belum terbentuk sebagai kalimat.",
+          "Hampir seluruhnya kalimat pendek sejenis; kesalahan menghambat pemahaman.",
+          "Campuran kalimat sederhana dan majemuk; kesalahan sering tetapi maksud masih tertangkap.",
+          "Beragam struktur termasuk klausa kompleks; sebagian besar kalimat bebas kesalahan.",
+          "Ragam struktur luas dan terkendali; kesalahan hanya sesekali dan tidak mengganggu."
+        ]
+      },
+      {
+        "id": "register_mechanics",
+        "label": "Nada dan kerapian",
+        "labelEn": "Register and mechanics",
+        "asks": "Apakah nadanya cocok dengan pembacanya, dan tanda bacanya rapi?",
+        "levels": [
+          "Nada dan kerapian belum bisa dinilai.",
+          "Nada tidak cocok dengan tugasnya; ejaan dan tanda baca banyak menyimpang.",
+          "Nada berpindah-pindah antara formal dan santai; kesalahan ejaan atau tanda baca cukup terlihat.",
+          "Nada sesuai tugasnya; kesalahan ejaan dan tanda baca sedikit.",
+          "Nada konsisten dan pas untuk pembacanya; ejaan, tanda baca, dan pemenggalan paragraf rapi."
+        ]
+      }
+    ]
+  },
+  "examTasks": [],
+  "prompts": [
+    {
+      "id": "w-ja-a1-01",
+      "level": "A1",
+      "jlpt": "N5",
+      "family": "particles",
+      "genre": "descriptive",
+      "examTask": null,
+      "minutes": 10,
+      "target": 60,
+      "en": "一日の ことを、「は」「を」「に」「で」を つかって 五つの 文で 書いて ください。",
+      "id_hint": "Ceritakan harimu dalam lima kalimat memakai partikel は・を・に・で.",
+      "focus": "partikel は・を・に・で dalam kalimat sehari-hari"
+    },
+    {
+      "id": "w-ja-a1-02",
+      "level": "A1",
+      "jlpt": "N5",
+      "family": "particles",
+      "genre": "narrative",
+      "examTask": null,
+      "minutes": 10,
+      "target": 60,
+      "en": "きのう だれと どこで なにを しましたか。「と」と「で」を つかって 書いて ください。",
+      "id_hint": "Kemarin dengan siapa, di mana, dan melakukan apa? Pakai partikel と dan で.",
+      "focus": "partikel と (bersama) dan で (tempat kegiatan)"
+    },
+    {
+      "id": "w-ja-a1-03",
+      "level": "A1",
+      "jlpt": "N5",
+      "family": "demonstratives",
+      "genre": "descriptive",
+      "examTask": null,
+      "minutes": 10,
+      "target": 60,
+      "en": "つくえの 上の ものを、「これ」「それ」「あれ」を つかって せつめいして ください。",
+      "id_hint": "Jelaskan benda-benda di atas meja memakai これ・それ・あれ.",
+      "focus": "これ／それ／あれ menurut jarak dari pembicara"
+    },
+    {
+      "id": "w-ja-a1-04",
+      "level": "A1",
+      "jlpt": "N5",
+      "family": "demonstratives",
+      "genre": "transactional",
+      "examTask": null,
+      "minutes": 10,
+      "target": 60,
+      "en": "みせで ほしい ものを、「この」「その」「あの」を つかって 書いて ください。",
+      "id_hint": "Tulis barang yang kamu mau di toko memakai この・その・あの.",
+      "focus": "この／その／あの sebagai penerang kata benda"
+    },
+    {
+      "id": "w-ja-a1-05",
+      "level": "A1",
+      "jlpt": "N5",
+      "family": "noun_modification",
+      "genre": "personal",
+      "examTask": null,
+      "minutes": 10,
+      "target": 60,
+      "en": "かぞくの しごとと くにを、「の」を つかって 書いて ください。",
+      "id_hint": "Tulis pekerjaan dan asal keluargamu memakai partikel の.",
+      "focus": "の untuk kepemilikan, asal, dan jenis"
+    },
+    {
+      "id": "w-ja-a1-06",
+      "level": "A1",
+      "jlpt": "N5",
+      "family": "noun_modification",
+      "genre": "descriptive",
+      "examTask": null,
+      "minutes": 10,
+      "target": 60,
+      "en": "へやの ものが だれの ものか、「わたしの」「ともだちの」の ように 書いて ください。",
+      "id_hint": "Tulis milik siapa benda-benda di kamarmu, seperti わたしの／ともだちの.",
+      "focus": "urutan の: pemilik lebih dulu, benda kemudian"
+    },
+    {
+      "id": "w-ja-a1-07",
+      "level": "A1",
+      "jlpt": "N5",
+      "family": "adjectives",
+      "genre": "descriptive",
+      "examTask": null,
+      "minutes": 10,
+      "target": 60,
+      "en": "すきな まちを、い形容詞と な形容詞を つかって 書いて ください。",
+      "id_hint": "Tulis tentang kota favoritmu memakai kata sifat -i dan -na.",
+      "focus": "kata sifat い vs な sebelum kata benda"
+    },
+    {
+      "id": "w-ja-a1-08",
+      "level": "A1",
+      "jlpt": "N5",
+      "family": "adjectives",
+      "genre": "narrative",
+      "examTask": null,
+      "minutes": 10,
+      "target": 60,
+      "en": "きのうの てんきを、「あつかったです」「しずかでした」の ように 書いて ください。",
+      "id_hint": "Tulis cuaca kemarin, seperti あつかったです／しずかでした.",
+      "focus": "bentuk lampau kata sifat い dan な"
+    },
+    {
+      "id": "w-ja-a1-09",
+      "level": "A1",
+      "jlpt": "N5",
+      "family": "existence_location",
+      "genre": "descriptive",
+      "examTask": null,
+      "minutes": 10,
+      "target": 60,
+      "en": "へやに なにが ありますか。「あります」と「います」を つかって 書いて ください。",
+      "id_hint": "Ada apa saja di kamarmu? Pakai あります dan います.",
+      "focus": "あります untuk benda, います untuk makhluk hidup"
+    },
+    {
+      "id": "w-ja-a1-10",
+      "level": "A1",
+      "jlpt": "N5",
+      "family": "existence_location",
+      "genre": "descriptive",
+      "examTask": null,
+      "minutes": 10,
+      "target": 60,
+      "en": "ねこは どこに いますか。「うえ」「した」「なか」を つかって 書いて ください。",
+      "id_hint": "Di mana kucingnya? Pakai うえ・した・なか.",
+      "focus": "kata posisi + の + に"
+    },
+    {
+      "id": "w-ja-a1-11",
+      "level": "A1",
+      "jlpt": "N5",
+      "family": "verb_groups",
+      "genre": "personal",
+      "examTask": null,
+      "minutes": 10,
+      "target": 60,
+      "en": "まいにち する ことを 五つ、ます形で 書いて ください。",
+      "id_hint": "Tulis lima hal yang kamu lakukan setiap hari dalam bentuk ます.",
+      "focus": "akar ます dari godan, ichidan, dan kata kerja tak beraturan"
+    },
+    {
+      "id": "w-ja-a1-12",
+      "level": "A1",
+      "jlpt": "N5",
+      "family": "verb_groups",
+      "genre": "descriptive",
+      "examTask": null,
+      "minutes": 10,
+      "target": 60,
+      "en": "「たべる」「のむ」「いく」「する」を つかって、みじかい 文を 四つ 書いて ください。",
+      "id_hint": "Buat empat kalimat pendek memakai たべる・のむ・いく・する.",
+      "focus": "golongan kata kerja dan bentuk sopannya"
+    },
+    {
+      "id": "w-ja-a1-13",
+      "level": "A1",
+      "jlpt": "N5",
+      "family": "polite_forms",
+      "genre": "planning",
+      "examTask": null,
+      "minutes": 10,
+      "target": 60,
+      "en": "あしたの よていを 「ます」と「ません」で 書いて ください。",
+      "id_hint": "Tulis rencanamu besok memakai ます dan ません.",
+      "focus": "ます／ません untuk rencana dan penolakan"
+    },
+    {
+      "id": "w-ja-a1-14",
+      "level": "A1",
+      "jlpt": "N5",
+      "family": "polite_forms",
+      "genre": "narrative",
+      "examTask": null,
+      "minutes": 10,
+      "target": 60,
+      "en": "せんしゅう した ことと しなかった ことを 「ました」「ませんでした」で 書いて ください。",
+      "id_hint": "Tulis apa yang kamu lakukan dan tidak lakukan minggu lalu.",
+      "focus": "ました／ませんでした untuk lampau"
+    },
+    {
+      "id": "w-ja-a1-15",
+      "level": "A1",
+      "jlpt": "N5",
+      "family": "negation_past",
+      "genre": "narrative",
+      "examTask": null,
+      "minutes": 10,
+      "target": 60,
+      "en": "きのう しなかった ことを 三つ 書いて ください。",
+      "id_hint": "Tulis tiga hal yang tidak kamu lakukan kemarin.",
+      "focus": "bentuk lampau negatif ませんでした"
+    },
+    {
+      "id": "w-ja-a1-16",
+      "level": "A1",
+      "jlpt": "N5",
+      "family": "negation_past",
+      "genre": "personal",
+      "examTask": null,
+      "minutes": 10,
+      "target": 60,
+      "en": "こどもの とき すきじゃなかった たべものを 書いて ください。",
+      "id_hint": "Tulis makanan yang tidak kamu sukai waktu kecil.",
+      "focus": "negatif lampau kata benda dan kata sifat な"
+    },
+    {
+      "id": "w-ja-a1-17",
+      "level": "A1",
+      "jlpt": "N5",
+      "family": "question_words",
+      "genre": "transactional",
+      "examTask": null,
+      "minutes": 10,
+      "target": 60,
+      "en": "あたらしい ともだちに する しつもんを 五つ 書いて ください。",
+      "id_hint": "Tulis lima pertanyaan untuk teman baru.",
+      "focus": "なに・だれ・どこ・いつ + か di akhir kalimat"
+    },
+    {
+      "id": "w-ja-a1-18",
+      "level": "A1",
+      "jlpt": "N5",
+      "family": "question_words",
+      "genre": "transactional",
+      "examTask": null,
+      "minutes": 10,
+      "target": 60,
+      "en": "みせの 人に きく しつもんを 「いくら」「どこ」「なに」で 書いて ください。",
+      "id_hint": "Tulis pertanyaan untuk penjaga toko memakai いくら・どこ・なに.",
+      "focus": "kata tanya harga, tempat, dan benda"
+    },
+    {
+      "id": "w-ja-a1-19",
+      "level": "A1",
+      "jlpt": "N5",
+      "family": "counters",
+      "genre": "descriptive",
+      "examTask": null,
+      "minutes": 10,
+      "target": 60,
+      "en": "かばんの なかの ものを、かずを つけて 書いて ください。",
+      "id_hint": "Tulis isi tasmu lengkap dengan jumlahnya.",
+      "focus": "penggolong つ・ほん・まい"
+    },
+    {
+      "id": "w-ja-a1-20",
+      "level": "A1",
+      "jlpt": "N5",
+      "family": "counters",
+      "genre": "personal",
+      "examTask": null,
+      "minutes": 10,
+      "target": 60,
+      "en": "かぞくの にんずうと としを 書いて ください。",
+      "id_hint": "Tulis jumlah anggota keluargamu dan umur mereka.",
+      "focus": "penggolong にん (termasuk ひとり／ふたり) dan さい"
+    },
+    {
+      "id": "w-ja-a1-21",
+      "level": "A1",
+      "jlpt": "N5",
+      "family": "time_expressions",
+      "genre": "planning",
+      "examTask": null,
+      "minutes": 10,
+      "target": 60,
+      "en": "一しゅうかんの よていを、ようびと じかんを つけて 書いて ください。",
+      "id_hint": "Tulis jadwal satu minggumu lengkap dengan hari dan jam.",
+      "focus": "ようび, penanda bulan/tanggal, dan に pada waktu tertentu"
+    },
+    {
+      "id": "w-ja-a1-22",
+      "level": "A1",
+      "jlpt": "N5",
+      "family": "time_expressions",
+      "genre": "personal",
+      "examTask": null,
+      "minutes": 10,
+      "target": 60,
+      "en": "なんじに おきて なんじに ねますか。じかんを つけて 書いて ください。",
+      "id_hint": "Jam berapa kamu bangun dan tidur? Tulis dengan jamnya.",
+      "focus": "じ／ふん dan partikel に untuk jam"
+    },
+    {
+      "id": "w-ja-a1-23",
+      "level": "A1",
+      "jlpt": "N5",
+      "family": "te_form",
+      "genre": "narrative",
+      "examTask": null,
+      "minutes": 10,
+      "target": 60,
+      "en": "あさ する ことを 「~て、~て」で つないで 書いて ください。",
+      "id_hint": "Tulis kegiatan paginya, disambung dengan bentuk ~て.",
+      "focus": "pembentukan bentuk て per golongan kata kerja"
+    },
+    {
+      "id": "w-ja-a1-24",
+      "level": "A1",
+      "jlpt": "N5",
+      "family": "te_form",
+      "genre": "descriptive",
+      "examTask": null,
+      "minutes": 10,
+      "target": 60,
+      "en": "いま して いる ことを 「~ています」で 書いて ください。",
+      "id_hint": "Tulis apa yang sedang kamu lakukan sekarang memakai ~ています.",
+      "focus": "ています untuk kegiatan yang sedang berlangsung"
+    }
+  ]
+}

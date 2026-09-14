@@ -618,3 +618,79 @@ dibaca murid Indonesia bukan pintasan bagi murid Thai.
 
 Bahwa berkas ini ikut berubah: ritual bump menyentuh `DIAG_BUILD`; panel diagnostiknya
 sendiri tidak berubah perilaku.
+
+---
+
+## m025-312 — menulis lahir, kosakata genap 1.000, dan keluarga waktu berhenti tertinggal
+
+Otoritas tetap OWNER. Bagian ini **laporan**, bukan usulan: seluruh isinya sudah mendarat di
+cabang ini dan lolos gerbangnya.
+
+### 1. Permukaan MENULIS Jepang lahir, dan penjaganya dicabut dengan jujur
+
+`content/ja/writing-prompts-ja.json` berisi 24 prompt A1/N5, dua per masing-masing dua belas
+keluarga silabus — cakupannya diikat ke bank tata bahasa, bukan ke angka yang diketik, jadi
+keluarga baru di silabus otomatis menuntut prompt barunya.
+
+Sejak m025-297, kartu Menulis disembunyikan dari murid Jepang karena banknya berbahasa
+Inggris. Kartu itu kini **keluar dari penjaga bahasa**, dan `japanese-surface-honesty-test.js`
+ikut dibalik: dulu ia menuntut kartu itu tersembunyi, sekarang ia menuntut kartu itu terlihat —
+dan ia membuktikannya dengan pencocokan kurung kurawal sungguhan, bukan dengan menebak dari
+indentasi. Versi pertama assert-nya TIDAK menggigit: ia tetap hijau waktu kartunya kusembunyikan
+lagi. Diganti, lalu dibuktikan dua arah (ditawarkan → hijau, disembunyikan → merah).
+
+**Menyimak dan Berbicara tetap dijaga, dan itu bukan kemalasan.** Tumpukan audio dipaku ke
+`en-US` (`features/speaking-listening/fiezel-speaking-listening-addon.js`, `language:'en-US'`,
+ditegakkan `tests/audio-locale-guard-test.js`). Bank Jepang untuk dua permukaan itu akan membuat
+aplikasi **memutar audio Inggris dan mendengarkan ucapan Inggris sambil mengaku mengajar
+Jepang** — persis kebohongan yang `japanese-surface-honesty-test.js` ada untuk mencegah.
+Urutannya: perbaiki pengunci lokal dulu, banknya menyusul.
+
+### 2. Kosakata N5: 486 → 1.000
+
+514 entri baru, masing-masing lengkap sampai kalimat contohnya. Yang menahan mutunya bukan
+mata manusia melainkan saringan yang sama dengan entri lama — dan saringan itu memang menangkap
+sesuatu: satu putaran menghasilkan 49 entri tanpa `status:'complete'`, yang artinya app.js akan
+menyaringnya habis dan kartunya **tidak pernah sampai ke murid** meski berkasnya terlihat penuh.
+Satu putaran lain meloloskan baris rusak (`半分food` dengan terjemahan `X`) yang memenuhi semua
+syarat lama; syaratnya diperketat (harus berakhir 。！？, nol huruf Latin, terjemahan ≥ 8 aksara)
+lalu seluruh 1.884 entri diaudit ulang — nol cacat sekelasnya tersisa.
+
+Dua cacat pembukuan ikut diperbaiki: `jumlah` di bank sempat menyalin hitungan **sumber** alih-alih
+hitungan banknya sendiri (N3 mengaku 279 padahal banknya 278), dan `sumber` di
+`docs/japanese/kosakata-jlpt.json` masih mengklaim dua berkas owner untuk berkas yang kini
+berisi 1.885 entri — 514 di antaranya ditulis FIEZEL, bukan milik owner, dan kini berdiri
+sebagai baris sumber ketiga.
+
+### 3. `time_expressions` 12 → 20 subskill
+
+Keluarga ini satu-satunya yang di bawah 16 subskill, dan angka "18 template" menutupi sebabnya:
+**7 dari 18 menumpuk di satu subskill** (`no_ni_with_relative_time`). Murid yang menghabiskan
+keluarga ini bertemu pola yang sama berulang-ulang. Delapan template baru (JP-TM-119…126) menutup
+lubang N5 yang nyata: penghitung じ dan ねん, じかん untuk lama waktu, ぐらい vs ごろ, rentang
+から…まで, まえ sesudah jumlah, まえに sesudah kata kerja kamus, dan bacaan tak beraturan ついたち.
+
+### Keadaan kursus Jepang sesudah m025-312
+
+| Bagian | Inggris | Jepang |
+|---|---|---|
+| Tata bahasa | 139 template | **242 butir A1** (12 keluarga, 16–22 subskill) |
+| Kosakata | 2.440 entri | **1.884 entri, N5 genap 1.000** |
+| Bacaan | 312 bacaan | **150 bacaan A1–C1** |
+| Menulis | ada | **24 prompt A1/N5** |
+| Menyimak | ada | **belum ada — diblokir pengunci `en-US`** |
+| Berbicara | ada | **belum ada — diblokir pengunci `en-US`** |
+
+### Utang yang masih berdiri
+
+1. **Seluruh naskah Jepang berstatus DRAFT AI** dan wajib ditinjau penutur asli sebelum dipakai
+   menilai murid. Dinyatakan di `provenans` tiap bank; bukan sesuatu yang dianggap selesai.
+2. **Tingkat JLPT adalah perkiraan**, bukan daftar resmi Japan Foundation (yang memang tidak
+   lagi diterbitkan sejak 2010). Dinyatakan di `catatan` berkas sumber.
+3. **Menyimak dan berbicara** menunggu pengunci lokal audio dibongkar — keputusan owner, karena
+   ia menyentuh tumpukan suara yang sudah stabil.
+4. **Sidecar Thai untuk isi bank Jepang** belum ada. Naskah antarmukanya sudah dua bahasa;
+   isi banknya belum.
+
+Bahwa `features/neural-voice/fiezel-diag-panel.js` ikut berubah di m025-312: ritual bump
+menyentuh `DIAG_BUILD`. Panel diagnostiknya sendiri tidak berubah perilaku.
