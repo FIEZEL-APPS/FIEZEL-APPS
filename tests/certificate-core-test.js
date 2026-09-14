@@ -18,6 +18,9 @@
  *   C6  determinisme   — masukan sama => keluaran sama persis
  *   C7  masa berlaku   — sertifikat kedaluwarsa; isValid() menolak di luar jendela
  *   C8  integritas     — sesi tak diawasi tidak menyamar sebagai sesi diawasi
+ *   C9  beku ke dalam  — sertifikat terbit tidak bisa disunting SETELAH diterbitkan,
+ *                        termasuk struktur bersarangnya; Object.freeze dangkal saja
+ *                        meninggalkan jendela pemalsuan sebelum server menandatangani
  */
 'use strict';
 const __fzRoot = require('path').join(__dirname, '..');
@@ -158,6 +161,36 @@ const proctored = C.issue(
 );
 ok(proctored.certificate.proctored === true && proctored.certificate.screenExits === 2,
   'C8: status pengawasan dan jumlah keluar layar ikut ke sertifikat');
+
+/* ---- C9 · beku sampai ke struktur bersarang ------------------------------- */
+
+// Nilai diperiksa SETELAH percobaan tulis, bukan lewat assert.throws: dalam mode
+// non-strict penulisan ke objek beku gagal DIAM, dan yang dijaga kontrak ini adalah
+// nilainya tidak berubah — bukan cara kegagalannya.
+const frozen = C.issue(twoSkills, { issuedAt }).certificate;
+
+try { frozen.level = 'C2'; } catch (e) { /* strict mode melempar; itu sah */ }
+ok(frozen.level === 'A2', 'C9: level tidak bisa ditimpa setelah terbit');
+
+try { frozen.skills.reading = 'C2'; } catch (e) { /* idem */ }
+ok(frozen.skills.reading === 'A2',
+  'C9: level per-skill tidak bisa dinaikkan lewat objek bersarang');
+
+try { frozen.skills.listening = 'B2'; } catch (e) { /* idem */ }
+ok(frozen.skills.listening === null,
+  'C9: skill tak terukur tidak bisa diisi belakangan');
+
+try { frozen.measuredSkills.push('speaking'); } catch (e) { /* idem */ }
+ok(frozen.measuredSkills.indexOf('speaking') === -1,
+  'C9: daftar skill terukur tidak bisa ditambahi skill yang tak pernah diuji');
+
+try { frozen.itemsBySkill.grammar = 9999; } catch (e) { /* idem */ }
+ok(frozen.itemsBySkill.grammar === 20,
+  'C9: jumlah soal tidak bisa digelembungkan setelah terbit');
+
+ok(Object.isFrozen(frozen) && Object.isFrozen(frozen.skills) &&
+   Object.isFrozen(frozen.itemsBySkill) && Object.isFrozen(frozen.measuredSkills),
+  'C9: sertifikat DAN ketiga struktur bersarangnya beku');
 
 /* -------------------------------------------------------------------------- */
 

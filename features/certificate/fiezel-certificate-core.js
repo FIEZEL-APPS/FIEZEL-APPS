@@ -259,14 +259,20 @@
 
     var integrity = isPlainObject(evidence.integrity) ? evidence.integrity : {};
 
+    // BEKU SAMPAI KE DALAM, bukan hanya di permukaan. Object.freeze itu DANGKAL: tanpa
+    // membekukan ketiga struktur bersarang di bawah, `cert.skills.reading = 'C2'` dan
+    // `cert.measuredSkills.push('speaking')` tetap berhasil — menaikkan level dan mengaku
+    // menguji skill yang tidak pernah diuji, tepat pada jendela antara penerbitan dan
+    // penandatanganan server. Itu persis pemalsuan yang seluruh modul ini ada untuk
+    // mencegahnya, jadi kebekuannya harus sedalam klaimnya.
     return {
       ok: true,
       certificate: Object.freeze({
         schema: SCHEMA,
         level: overall,
-        skills: levelsBySkill,          // null = tidak diukur, JANGAN dibaca sebagai 0
-        itemsBySkill: itemsBySkill,
-        measuredSkills: measured.slice(),
+        skills: Object.freeze(levelsBySkill),  // null = tidak diukur, JANGAN dibaca sebagai 0
+        itemsBySkill: Object.freeze(itemsBySkill),
+        measuredSkills: Object.freeze(measured.slice()),
         totalItems: totalItems,
         issuedAt: issuedAt,
         expiresAt: issuedAt + VALIDITY_DAYS * 86400000,
