@@ -1,0 +1,1365 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="FiezelDrop">
+  <meta name="theme-color" content="#090d16">
+  <title>FiezelDrop — Remote Mouse & Transfer</title>
+  <script src="/qrcode.min.js"></script>
+  <style>
+    :root {
+      --bg: #090d16;
+      --card-bg: rgba(23, 32, 54, 0.7);
+      --card-border: rgba(255, 255, 255, 0.1);
+      --primary: #38bdf8;
+      --primary-glow: rgba(56, 189, 248, 0.25);
+      --accent: #10b981;
+      --text: #f8fafc;
+      --text-muted: #94a3b8;
+      --danger: #f43f5e;
+      --font: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+    }
+
+    body {
+      background-color: var(--bg);
+      background-image: 
+        radial-gradient(at 0% 0%, rgba(56, 189, 248, 0.12) 0px, transparent 50%),
+        radial-gradient(at 100% 100%, rgba(16, 185, 129, 0.1) 0px, transparent 50%);
+      background-attachment: fixed;
+      color: var(--text);
+      font-family: var(--font);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      padding: env(safe-area-inset-top, 16px) 16px env(safe-area-inset-bottom, 24px) 16px;
+      touch-action: pan-y;
+    }
+
+    .container {
+      max-width: 820px;
+      margin: 0 auto;
+      width: 100%;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Top Bar */
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 0 16px 0;
+      border-bottom: 1px solid var(--card-border);
+      margin-bottom: 16px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .brand-icon {
+      width: 38px;
+      height: 38px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, #0284c7, #10b981);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      box-shadow: 0 4px 14px var(--primary-glow);
+    }
+
+    .brand h1 {
+      font-size: 19px;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+    }
+
+    .device-pill {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 14px;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid var(--card-border);
+      border-radius: 20px;
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #eab308;
+      box-shadow: 0 0 8px #eab308;
+    }
+    .status-dot.online {
+      background: #10b981;
+      box-shadow: 0 0 8px #10b981;
+    }
+
+    /* QR / Connection Card (Khusus Laptop) */
+    #qrSection {
+      background: var(--card-bg);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid var(--card-border);
+      border-radius: 18px;
+      padding: 20px;
+      margin-bottom: 20px;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 24px;
+    }
+
+    .qr-box {
+      background: #ffffff;
+      padding: 12px;
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+    }
+
+    .qr-info {
+      flex: 1;
+      min-width: 260px;
+    }
+
+    .qr-info h2 {
+      font-size: 18px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .qr-info p {
+      font-size: 14px;
+      color: var(--text-muted);
+      line-height: 1.5;
+      margin-bottom: 12px;
+    }
+
+    .ip-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(56, 189, 248, 0.12);
+      border: 1px solid rgba(56, 189, 248, 0.3);
+      padding: 8px 14px;
+      border-radius: 10px;
+      font-family: monospace;
+      font-size: 14px;
+      color: var(--primary);
+      cursor: pointer;
+    }
+
+    /* Back Tap Guide Banner */
+    .back-tap-banner {
+      background: linear-gradient(135deg, rgba(16, 185, 129, 0.15), rgba(56, 189, 248, 0.1));
+      border: 1px solid rgba(16, 185, 129, 0.35);
+      border-radius: 14px;
+      padding: 14px 16px;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      cursor: pointer;
+    }
+
+    .back-tap-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: #34d399;
+      margin-bottom: 3px;
+    }
+
+    .back-tap-sub {
+      font-size: 12px;
+      color: var(--text-muted);
+      line-height: 1.4;
+    }
+
+    /* Tabs */
+    .tabs {
+      display: flex;
+      gap: 6px;
+      background: rgba(255, 255, 255, 0.04);
+      padding: 5px;
+      border-radius: 14px;
+      margin-bottom: 16px;
+      border: 1px solid var(--card-border);
+      overflow-x: auto;
+    }
+
+    .tab-btn {
+      flex: 1;
+      min-width: 100px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding: 10px 10px;
+      background: transparent;
+      border: none;
+      border-radius: 10px;
+      color: var(--text-muted);
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all 0.2s ease;
+    }
+
+    .tab-btn.active {
+      background: var(--primary);
+      color: #031422;
+      box-shadow: 0 4px 12px var(--primary-glow);
+    }
+
+    .badge-count {
+      background: rgba(0, 0, 0, 0.25);
+      padding: 2px 6px;
+      border-radius: 10px;
+      font-size: 11px;
+    }
+
+    /* Tab Content */
+    .tab-content {
+      display: none;
+      flex-direction: column;
+      gap: 14px;
+      flex: 1;
+    }
+
+    .tab-content.active {
+      display: flex;
+    }
+
+    .card {
+      background: var(--card-bg);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid var(--card-border);
+      border-radius: 18px;
+      padding: 18px;
+    }
+
+    /* ========================================================
+       TRACKPAD & REMOTE MOUSE STYLES
+       ======================================================== */
+    .trackpad-card {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      min-height: 480px;
+      padding: 14px;
+    }
+
+    .trackpad-surface {
+      flex: 1;
+      min-height: 280px;
+      background: rgba(15, 23, 42, 0.7);
+      border: 2px dashed rgba(56, 189, 248, 0.3);
+      border-radius: 18px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      touch-action: none; /* Mencegah pull-to-refresh & zoom */
+      position: relative;
+      cursor: crosshair;
+      overflow: hidden;
+    }
+
+    .trackpad-surface.active {
+      border-color: var(--primary);
+      background: rgba(56, 189, 248, 0.05);
+    }
+
+    .trackpad-hint {
+      color: rgba(255, 255, 255, 0.25);
+      font-size: 14px;
+      text-align: center;
+      pointer-events: none;
+      line-height: 1.6;
+    }
+
+    /* Ripple effect saat klik trackpad */
+    .trackpad-ripple {
+      position: absolute;
+      width: 40px;
+      height: 40px;
+      background: rgba(56, 189, 248, 0.4);
+      border-radius: 50%;
+      transform: translate(-50%, -50%) scale(0);
+      animation: ripple 0.35s ease-out forwards;
+      pointer-events: none;
+    }
+
+    @keyframes ripple {
+      to {
+        transform: translate(-50%, -50%) scale(2.5);
+        opacity: 0;
+      }
+    }
+
+    /* Tombol Klik Kiri & Kanan Bawah */
+    .mouse-click-bar {
+      display: flex;
+      gap: 10px;
+      height: 64px;
+    }
+
+    .btn-mouse-click {
+      flex: 1;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid var(--card-border);
+      border-radius: 14px;
+      color: var(--text);
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: background 0.1s, transform 0.05s;
+    }
+
+    .btn-mouse-click:active {
+      background: var(--primary);
+      color: #031422;
+      transform: scale(0.97);
+    }
+
+    /* Keyboard & Quick Actions Bar */
+    .quick-controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .btn-quick {
+      flex: 1;
+      min-width: 58px;
+      padding: 10px 8px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--card-border);
+      border-radius: 10px;
+      color: #e2e8f0;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      text-align: center;
+    }
+
+    .btn-quick:active {
+      background: rgba(255, 255, 255, 0.2);
+    }
+
+    .btn-quick.primary {
+      background: linear-gradient(135deg, rgba(56, 189, 248, 0.2), rgba(14, 165, 233, 0.1));
+      border-color: rgba(56, 189, 248, 0.4);
+      color: var(--primary);
+    }
+
+    /* Hidden input untuk memicu keyboard iPhone */
+    #hiddenInput {
+      position: absolute;
+      opacity: 0;
+      top: -100px;
+      left: -100px;
+      height: 1px;
+      width: 1px;
+    }
+
+    /* Modal Panduan Ketuk Belakang */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.75);
+      backdrop-filter: blur(8px);
+      z-index: 10000;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .modal-card {
+      background: #0f172a;
+      border: 1px solid var(--card-border);
+      border-radius: 20px;
+      padding: 24px;
+      max-width: 480px;
+      width: 100%;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.8);
+    }
+
+    .modal-title {
+      font-size: 18px;
+      font-weight: 700;
+      margin-bottom: 12px;
+      color: #38bdf8;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .step-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin: 16px 0;
+      font-size: 13px;
+      line-height: 1.5;
+      color: #cbd5e1;
+    }
+
+    .step-item {
+      display: flex;
+      gap: 10px;
+    }
+
+    .step-num {
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: var(--primary);
+      color: #031422;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      font-size: 12px;
+    }
+
+    .btn-close-modal {
+      width: 100%;
+      padding: 12px;
+      background: var(--primary);
+      border: none;
+      border-radius: 12px;
+      color: #031422;
+      font-weight: 700;
+      font-size: 14px;
+      cursor: pointer;
+    }
+
+    /* Clipboard & Transfer Section */
+    textarea {
+      width: 100%;
+      height: 110px;
+      background: rgba(0, 0, 0, 0.3);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      padding: 14px;
+      color: var(--text);
+      font-family: inherit;
+      font-size: 15px;
+      resize: vertical;
+      outline: none;
+      user-select: text;
+    }
+
+    .btn-send {
+      padding: 12px 20px;
+      background: linear-gradient(135deg, #0ea5e9, #0284c7);
+      border: none;
+      border-radius: 12px;
+      color: #ffffff;
+      font-weight: 600;
+      font-size: 15px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    .clip-item {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      user-select: text;
+    }
+
+    .clip-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    .clip-text {
+      font-size: 14px;
+      line-height: 1.5;
+      white-space: pre-wrap;
+      word-break: break-word;
+      color: #e2e8f0;
+      user-select: text;
+    }
+
+    .btn-copy {
+      padding: 6px 12px;
+      background: rgba(56, 189, 248, 0.15);
+      border: 1px solid rgba(56, 189, 248, 0.3);
+      border-radius: 8px;
+      color: var(--primary);
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      align-self: flex-end;
+    }
+
+    /* Dropzone */
+    .dropzone {
+      border: 2px dashed rgba(56, 189, 248, 0.4);
+      background: rgba(56, 189, 248, 0.03);
+      border-radius: 18px;
+      padding: 30px 16px;
+      text-align: center;
+      cursor: pointer;
+    }
+
+    .mobile-buttons {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      width: 100%;
+      max-width: 340px;
+      margin: 16px auto 0 auto;
+    }
+
+    .btn-action-large {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      padding: 14px 20px;
+      border-radius: 14px;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+    }
+
+    .btn-gallery {
+      background: linear-gradient(135deg, #10b981, #059669);
+      color: #fff;
+    }
+
+    .btn-document {
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid var(--card-border);
+      color: var(--text);
+    }
+
+    #progressBox {
+      display: none;
+      background: rgba(0, 0, 0, 0.4);
+      border: 1px solid var(--card-border);
+      border-radius: 14px;
+      padding: 14px;
+      margin-top: 14px;
+    }
+
+    .progress-bar-bg {
+      height: 8px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 4px;
+      overflow: hidden;
+      margin: 8px 0;
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #38bdf8, #10b981);
+    }
+
+    /* File items */
+    .file-card {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid var(--card-border);
+      border-radius: 14px;
+      padding: 12px 14px;
+      gap: 12px;
+      margin-bottom: 10px;
+    }
+
+    .btn-download {
+      padding: 8px 14px;
+      background: rgba(16, 185, 129, 0.15);
+      border: 1px solid rgba(16, 185, 129, 0.35);
+      border-radius: 8px;
+      color: #34d399;
+      font-size: 13px;
+      font-weight: 600;
+      text-decoration: none;
+      flex-shrink: 0;
+    }
+
+    .btn-open-folder {
+      margin-top: 14px;
+      width: 100%;
+      padding: 12px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      color: var(--text);
+      font-weight: 600;
+      font-size: 14px;
+      cursor: pointer;
+    }
+
+    /* Toast */
+    #toast {
+      position: fixed;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%) translateY(-100px);
+      background: rgba(15, 23, 42, 0.95);
+      border: 1px solid var(--primary);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+      backdrop-filter: blur(12px);
+      padding: 12px 20px;
+      border-radius: 12px;
+      color: var(--text);
+      font-size: 14px;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      z-index: 99999;
+      transition: transform 0.3s cubic-bezier(0.18, 0.89, 0.32, 1.28);
+    }
+
+    #toast.show {
+      transform: translateX(-50%) translateY(0);
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 30px 10px;
+      color: var(--text-muted);
+      font-size: 14px;
+    }
+
+    .hidden { display: none !important; }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <!-- Header -->
+    <header>
+      <div class="brand">
+        <div class="brand-icon">🖱️</div>
+        <div>
+          <h1>FiezelDrop Remote</h1>
+          <p style="font-size: 11px; color: var(--text-muted);">Remote Mouse & Universal Clipboard</p>
+        </div>
+      </div>
+      <div style="display:flex; align-items:center; gap:8px;">
+        <a href="/sentinel.html" style="text-decoration:none; display:flex; align-items:center; gap:6px; padding:6px 12px; background:rgba(239,68,68,0.15); border:1px solid rgba(239,68,68,0.4); border-radius:20px; font-size:12px; font-weight:700; color:#f87171; transition:0.2s;">
+          <span>🚨</span> <span>Ghost Sentinel</span>
+        </a>
+        <div class="device-pill">
+          <span class="status-dot" id="statusDot"></span>
+          <span id="deviceStatus">Menghubungkan...</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- Banner Ketuk Belakang iPhone (Back Tap Guide) -->
+    <div class="back-tap-banner" onclick="openBackTapModal()">
+      <div>
+        <div class="back-tap-title">⚡ Setup "Ketuk Belakang iPhone 2x"</div>
+        <div class="back-tap-sub">Salin teks dari laptop seketika tanpa membuka aplikasi apapun!</div>
+      </div>
+      <span style="font-size: 20px;">👉</span>
+    </div>
+
+    <!-- QR Code Section (Laptop only) -->
+    <section id="qrSection">
+      <div class="qr-box" id="qrContainer"></div>
+      <div class="qr-info">
+        <h2>Hubungkan iPhone Anda</h2>
+        <p>Arahkan kamera iPhone ke kode QR di samping untuk langsung mengendalikan mouse laptop & kirim data.</p>
+        <div class="ip-badge" id="ipBadge" title="Klik untuk salin alamat">
+          <span>🔗</span> <span id="ipUrl">Memuat IP...</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Tabs Navigation -->
+    <div class="tabs">
+      <button class="tab-btn active" onclick="switchTab('remote')">
+        🖱️ Trackpad
+      </button>
+      <button class="tab-btn" onclick="switchTab('clipboard')">
+        📋 Clipboard
+      </button>
+      <button class="tab-btn" onclick="switchTab('transfer')">
+        📤 Kirim File
+      </button>
+      <button class="tab-btn" onclick="switchTab('received')">
+        📥 Diterima <span class="badge-count" id="badgeCount">0</span>
+      </button>
+      <button class="tab-btn" style="color:#ef4444; border-color:rgba(239,68,68,0.3);" onclick="location.href='/sentinel.html'">
+        🚨 Pelacak Senyap
+      </button>
+    </div>
+
+    <!-- TAB 1: REMOTE MOUSE & TRACKPAD -->
+    <div id="tab-remote" class="tab-content active">
+      <div class="card trackpad-card">
+        <!-- Permukaan Sentuh Trackpad -->
+        <div class="trackpad-surface" id="trackpad">
+          <div class="trackpad-hint" id="trackpadHint">
+            <span style="font-size: 28px;">👆</span><br>
+            <strong>Sentuh & Geser di Sini</strong><br>
+            1 jari: Gerak mouse · Tap 1 jari: Klik kiri<br>
+            Tap 2 jari: Klik kanan · Geser 2 jari: Scroll
+          </div>
+        </div>
+
+        <!-- Tombol Klik Kiri & Kanan Fisik -->
+        <div class="mouse-click-bar">
+          <button class="btn-mouse-click" id="btnLeftClick" onclick="sendClick('left')">
+            <span>🖱️</span> Klik Kiri
+          </button>
+          <button class="btn-mouse-click" id="btnRightClick" onclick="sendClick('right')">
+            <span>🖱️</span> Klik Kanan
+          </button>
+        </div>
+
+        <!-- Tombol Keyboard & Media Kontrol -->
+        <div class="quick-controls">
+          <button class="btn-quick primary" onclick="focusKeyboard()">
+            ⌨️ Keyboard
+          </button>
+          <button class="btn-quick" onclick="sendKey('ENTER')">
+            ↵ Enter
+          </button>
+          <button class="btn-quick" onclick="sendKey('BACKSPACE')">
+            ⌫ Hapus
+          </button>
+          <button class="btn-quick" onclick="sendKey('SPACE')">
+            ␣ Spasi
+          </button>
+          <button class="btn-quick" onclick="sendKey('ESC')">
+            ⎋ Esc
+          </button>
+          <button class="btn-quick" onclick="sendKey('DESKTOP')">
+            🖥️ Desktop
+          </button>
+        </div>
+
+        <!-- Media Bar -->
+        <div class="quick-controls">
+          <button class="btn-quick" onclick="sendKey('VOLDOWN')">
+            🔉 Vol -
+          </button>
+          <button class="btn-quick" onclick="sendKey('VOLUP')">
+            🔊 Vol +
+          </button>
+          <button class="btn-quick" onclick="sendKey('MUTE')">
+            🔇 Mute
+          </button>
+          <button class="btn-quick" onclick="sendKey('PLAYPAUSE')">
+            ⏯ Play/Pause
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 2: CLIPBOARD -->
+    <div id="tab-clipboard" class="tab-content">
+      <div class="card">
+        <textarea id="clipText" placeholder="Ketik atau tempel teks di sini... (Di laptop: cukup tekan Ctrl+C di mana saja, teks otomatis terkirim ke iPhone!)"></textarea>
+        <button class="btn-send" onclick="sendClipboard()">
+          <span>🚀</span> Kirim Teks
+        </button>
+      </div>
+
+      <div class="card">
+        <h3 style="font-size: 14px; font-weight: 700; margin-bottom: 12px; color: var(--text-muted);">
+          Riwayat Clipboard Tersinkronisasi
+        </h3>
+        <div id="clipHistory">
+          <div class="empty-state">Belum ada riwayat clipboard. Coba tekan Ctrl+C di laptop Anda!</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 3: KIRIM FOTO & FILE -->
+    <div id="tab-transfer" class="tab-content">
+      <div class="card">
+        <div class="dropzone" id="dropzone" onclick="triggerFileInput()">
+          <div style="font-size: 40px; margin-bottom: 10px;">📸</div>
+          <div style="font-size: 16px; font-weight: 700; margin-bottom: 4px;">Kirim Foto / Video Kualitas Asli</div>
+          <div style="font-size: 13px; color: var(--text-muted);">Tanpa kompresi, resolusi 100% penuh via Wi-Fi lokal</div>
+
+          <div class="mobile-buttons" onclick="event.stopPropagation()">
+            <button class="btn-action-large btn-gallery" onclick="document.getElementById('inputGallery').click()">
+              <span>🖼️</span> Pilih Foto / Video dari Galeri
+            </button>
+            <button class="btn-action-large btn-document" onclick="document.getElementById('inputFile').click()">
+              <span>📁</span> Pilih Berkas Dokumen
+            </button>
+          </div>
+
+          <input type="file" id="inputGallery" multiple accept="image/*,video/*" class="hidden" onchange="handleFiles(this.files)">
+          <input type="file" id="inputFile" multiple class="hidden" onchange="handleFiles(this.files)">
+        </div>
+
+        <div id="progressBox">
+          <div style="display: flex; justify-content: space-between; font-size: 13px; font-weight: 600;">
+            <span id="progressFilename">Mengunggah...</span>
+            <span id="progressPercent" style="color: var(--primary);">0%</span>
+          </div>
+          <div class="progress-bar-bg">
+            <div class="progress-bar-fill" id="progressBar"></div>
+          </div>
+          <div style="display: flex; justify-content: space-between; font-size: 11px; color: var(--text-muted);">
+            <span id="progressSpeed">0 KB/s</span>
+            <span>Mengirim langsung via Wi-Fi...</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 4: FILE DITERIMA -->
+    <div id="tab-received" class="tab-content">
+      <div class="card">
+        <h3 style="font-size: 14px; font-weight: 700; margin-bottom: 12px; color: var(--text-muted);">
+          Berkas di Folder Laptop
+        </h3>
+        <div id="fileList">
+          <div class="empty-state">Belum ada file di folder.</div>
+        </div>
+        <button class="btn-open-folder" id="btnOpenFolder" onclick="openLaptopFolder()">
+          📂 Buka Folder "Dari_iPhone" di Windows Explorer
+        </button>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Hidden Input untuk Keyboard iPhone -->
+  <input type="text" id="hiddenInput" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+
+  <!-- MODAL PANDUAN KETUK BELAKANG 2X (APPLE BACK TAP) -->
+  <div class="modal-overlay" id="backTapModal">
+    <div class="modal-card">
+      <div class="modal-title">
+        <span>⚡</span> Setup Ketuk Belakang 2x iPhone
+      </div>
+      <p style="font-size: 13px; color: var(--text-muted); line-height: 1.5;">
+        Fitur ini membuat Anda bisa menyalin teks dari laptop ke iPhone hanya dengan mengetuk punggung iPhone 2 kali, <strong>tanpa perlu membuka aplikasi!</strong>
+      </p>
+
+      <div class="step-list">
+        <div class="step-item">
+          <div class="step-num">1</div>
+          <div>Buka aplikasi <strong>Pintasan (Shortcuts)</strong> bawaan iPhone $\rightarrow$ Tap tanda <strong>+</strong> di kanan atas.</div>
+        </div>
+        <div class="step-item">
+          <div class="step-num">2</div>
+          <div>
+            Tambah tindakan: <strong>"Dapatkan Konten URL"</strong>.<br>
+            Masukkan URL berikut:
+            <div style="margin-top: 6px; display: flex; gap: 6px;">
+              <input type="text" id="shortcutUrlInput" readonly style="flex:1; background: rgba(0,0,0,0.4); border: 1px solid var(--card-border); padding: 6px 10px; border-radius: 8px; color: var(--primary); font-family: monospace; font-size: 12px;" value="http://192.168.110.116:5050/api/clip">
+              <button onclick="copyShortcutUrl()" style="padding: 6px 10px; background: var(--primary); border: none; border-radius: 8px; font-weight: 700; font-size: 11px; cursor: pointer; color:#000;">Salin</button>
+            </div>
+          </div>
+        </div>
+        <div class="step-item">
+          <div class="step-num">3</div>
+          <div>Tambah tindakan berikutnya: <strong>"Salin ke Papan Klip"</strong> (Copy to Clipboard). Simpan dengan nama <em>"Paste dari Laptop"</em>.</div>
+        </div>
+        <div class="step-item">
+          <div class="step-num">4</div>
+          <div>
+            Buka <strong>Pengaturan iPhone</strong> $\rightarrow$ <strong>Aksesibilitas</strong> $\rightarrow$ <strong>Sentuh</strong> $\rightarrow$ <strong>Ketuk Bagian Belakang</strong> $\rightarrow$ <strong>Ketuk 2 Kali</strong> $\rightarrow$ Pilih <em>"Paste dari Laptop"</em>.
+          </div>
+        </div>
+      </div>
+
+      <button class="btn-close-modal" onclick="closeBackTapModal()">
+        Saya Mengerti, Tutup Panduan
+      </button>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div id="toast">
+    <span id="toastIcon">✨</span>
+    <span id="toastMsg">Notifikasi</span>
+  </div>
+
+  <script>
+    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+    const deviceName = isIOS ? 'iPhone' : 'Laptop';
+    let ws = null;
+    let serverInfo = null;
+
+    if (isIOS) {
+      document.getElementById('qrSection').style.display = 'none';
+      document.getElementById('btnOpenFolder').style.display = 'none';
+    }
+
+    function showToast(msg, icon = '✨') {
+      const toast = document.getElementById('toast');
+      document.getElementById('toastIcon').textContent = icon;
+      document.getElementById('toastMsg').textContent = msg;
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 3500);
+    }
+
+    function switchTab(tabName) {
+      document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+      event.currentTarget.classList.add('active');
+      document.getElementById('tab-' + tabName).classList.add('active');
+    }
+
+    function openBackTapModal() {
+      document.getElementById('backTapModal').style.display = 'flex';
+    }
+    function closeBackTapModal() {
+      document.getElementById('backTapModal').style.display = 'none';
+    }
+    function copyShortcutUrl() {
+      const input = document.getElementById('shortcutUrlInput');
+      navigator.clipboard.writeText(input.value);
+      showToast('URL Pintasan tersalin!', '📋');
+    }
+
+    // --- WEBSOCKET CONNECTION (REAL-TIME TRACKPAD & INPUT) ---
+    function initWebSocket() {
+      const protocol = location.protocol === 'https:' ? 'wss:' : 'ws:';
+      ws = new WebSocket(`${protocol}//${location.host}`);
+
+      const dot = document.getElementById('statusDot');
+      const statusText = document.getElementById('deviceStatus');
+
+      ws.onopen = () => {
+        dot.classList.add('online');
+        statusText.textContent = `${deviceName} Terhubung`;
+      };
+
+      ws.onclose = () => {
+        dot.classList.remove('online');
+        statusText.textContent = 'Menghubungkan ulang...';
+        setTimeout(initWebSocket, 1500);
+      };
+
+      ws.onerror = () => {
+        ws.close();
+      };
+    }
+
+    function sendWs(data) {
+      if (ws && ws.readyState === WebSocket.OPEN) {
+        ws.send(JSON.stringify(data));
+      }
+    }
+
+    function sendClick(button) {
+      sendWs({ type: 'click', button });
+      if (navigator.vibrate) navigator.vibrate([25]);
+    }
+
+    function sendKey(key) {
+      sendWs({ type: 'key', key });
+      if (navigator.vibrate) navigator.vibrate([20]);
+    }
+
+    // --- KEYBOARD HANDLING ---
+    const hiddenInput = document.getElementById('hiddenInput');
+    function focusKeyboard() {
+      hiddenInput.focus();
+      showToast('Ketik dari keyboard iPhone Anda...', '⌨️');
+    }
+
+    hiddenInput.addEventListener('input', (e) => {
+      if (e.data) {
+        sendWs({ type: 'text', text: e.data });
+      }
+      hiddenInput.value = '';
+    });
+
+    hiddenInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Backspace') {
+        sendWs({ type: 'key', key: 'BACKSPACE' });
+      } else if (e.key === 'Enter') {
+        sendWs({ type: 'key', key: 'ENTER' });
+      }
+    });
+
+    // --- TRACKPAD MULTI-TOUCH ENGINE ---
+    const trackpad = document.getElementById('trackpad');
+    let touchStartX = 0;
+    let touchStartY = 0;
+    let lastTouchX = 0;
+    let lastTouchY = 0;
+    let touchStartTime = 0;
+    let hasMoved = false;
+    let touchCount = 0;
+
+    const SENSITIVITY = 1.6;
+
+    trackpad.addEventListener('touchstart', (e) => {
+      e.preventDefault();
+      trackpad.classList.add('active');
+      touchCount = e.touches.length;
+      touchStartTime = Date.now();
+      hasMoved = false;
+
+      if (e.touches.length === 1) {
+        touchStartX = e.touches[0].clientX;
+        touchStartY = e.touches[0].clientY;
+        lastTouchX = touchStartX;
+        lastTouchY = touchStartY;
+      } else if (e.touches.length === 2) {
+        lastTouchY = (e.touches[0].clientY + e.touches[1].clientY) / 2;
+      }
+    }, { passive: false });
+
+    trackpad.addEventListener('touchmove', (e) => {
+      e.preventDefault();
+      if (e.touches.length === 1) {
+        const curX = e.touches[0].clientX;
+        const curY = e.touches[0].clientY;
+
+        const dx = Math.round((curX - lastTouchX) * SENSITIVITY);
+        const dy = Math.round((curY - lastTouchY) * SENSITIVITY);
+
+        if (Math.abs(curX - touchStartX) > 4 || Math.abs(curY - touchStartY) > 4) {
+          hasMoved = true;
+        }
+
+        if (dx !== 0 || dy !== 0) {
+          sendWs({ type: 'mouse', dx, dy });
+        }
+
+        lastTouchX = curX;
+        lastTouchY = curY;
+      } else if (e.touches.length === 2) {
+        // Two finger scroll
+        const avgY = (e.touches[0].clientY + e.touches[1].clientY) / 2;
+        const scrollDelta = Math.round((avgY - lastTouchY) * 2.5);
+
+        if (Math.abs(scrollDelta) > 1) {
+          hasMoved = true;
+          // Inverted for natural touch scrolling: drag down scrolls down
+          sendWs({ type: 'scroll', dy: scrollDelta * 15 });
+        }
+        lastTouchY = avgY;
+      }
+    }, { passive: false });
+
+    trackpad.addEventListener('touchend', (e) => {
+      e.preventDefault();
+      trackpad.classList.remove('active');
+      const touchDuration = Date.now() - touchStartTime;
+
+      // Deteksi TAP (Klik tanpa geser)
+      if (!hasMoved && touchDuration < 280) {
+        if (touchCount === 1) {
+          // 1 finger tap = Left Click
+          sendClick('left');
+          createRipple(lastTouchX, lastTouchY);
+        } else if (touchCount === 2) {
+          // 2 finger tap = Right Click
+          sendClick('right');
+          createRipple(lastTouchX, lastTouchY);
+        }
+      }
+    }, { passive: false });
+
+    function createRipple(clientX, clientY) {
+      const rect = trackpad.getBoundingClientRect();
+      const ripple = document.createElement('div');
+      ripple.className = 'trackpad-ripple';
+      ripple.style.left = (clientX - rect.left) + 'px';
+      ripple.style.top = (clientY - rect.top) + 'px';
+      trackpad.appendChild(ripple);
+      setTimeout(() => ripple.remove(), 400);
+    }
+
+    // --- SSE & CLIPBOARD AUTO-SYNC ---
+    function initSSE() {
+      const evtSource = new EventSource('/api/events');
+      evtSource.onmessage = (e) => {
+        try {
+          const msg = JSON.parse(e.data);
+          if (msg.type === 'init') {
+            renderClipboardHistory(msg.clipboard);
+            renderFileList(msg.files);
+          } else if (msg.type === 'clipboard') {
+            onNewClipboard(msg.data);
+          } else if (msg.type === 'file_received') {
+            onNewFile(msg.file);
+          }
+        } catch (err) {}
+      };
+    }
+
+    async function sendClipboard() {
+      const input = document.getElementById('clipText');
+      const text = input.value.trim();
+      if (!text) return;
+
+      try {
+        const res = await fetch('/api/clipboard', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ text, sender: deviceName })
+        });
+        if ((await res.json()).ok) {
+          input.value = '';
+          showToast('Teks terkirim ke semua perangkat!', '🚀');
+        }
+      } catch (err) {}
+    }
+
+    function onNewClipboard(item) {
+      showToast(`Teks baru dari ${item.sender}!`, '📋');
+      renderClipboardItem(item, true);
+    }
+
+    function renderClipboardHistory(history) {
+      const container = document.getElementById('clipHistory');
+      if (!history || history.length === 0) return;
+      container.innerHTML = '';
+      history.forEach(item => renderClipboardItem(item, false));
+    }
+
+    function renderClipboardItem(item, prepend = false) {
+      const container = document.getElementById('clipHistory');
+      const empty = container.querySelector('.empty-state');
+      if (empty) empty.remove();
+
+      const card = document.createElement('div');
+      card.className = 'clip-item';
+      const timeStr = new Date(item.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+      card.innerHTML = `
+        <div class="clip-header">
+          <span>${item.sender}</span>
+          <span>${timeStr}</span>
+        </div>
+        <div class="clip-text">${escapeHtml(item.text)}</div>
+        <button class="btn-copy" onclick="copyText(this, ${JSON.stringify(item.text)})">
+          📋 Salin
+        </button>
+      `;
+
+      if (prepend) container.prepend(card);
+      else container.appendChild(card);
+    }
+
+    async function copyText(btn, text) {
+      try {
+        await navigator.clipboard.writeText(text);
+        btn.textContent = '✓ Tersalin!';
+        btn.style.color = '#10b981';
+        showToast('Teks tersalin ke clipboard!', '📋');
+        if (navigator.vibrate) navigator.vibrate([35]);
+        setTimeout(() => { btn.textContent = '📋 Salin'; btn.style.color = ''; }, 2000);
+      } catch (e) {}
+    }
+
+    // --- STATUS & QR CODE ---
+    async function loadStatus() {
+      try {
+        const res = await fetch('/api/status');
+        const data = await res.json();
+        serverInfo = data;
+
+        document.getElementById('ipUrl').textContent = data.url;
+        document.getElementById('shortcutUrlInput').value = data.clipUrl;
+
+        if (!isIOS) {
+          const qrContainer = document.getElementById('qrContainer');
+          qrContainer.innerHTML = '';
+          new QRCode(qrContainer, {
+            text: data.url,
+            width: 130,
+            height: 130,
+            colorDark: '#0f172a',
+            colorLight: '#ffffff',
+            correctLevel: QRCode.CorrectLevel.M
+          });
+        }
+      } catch (err) {}
+    }
+
+    // --- FILE TRANSFER ---
+    function triggerFileInput() {
+      if (isIOS) return;
+      document.getElementById('inputFile').click();
+    }
+
+    async function handleFiles(files) {
+      if (!files || files.length === 0) return;
+      const arr = Array.from(files);
+      for (let i = 0; i < arr.length; i++) {
+        await uploadSingleFile(arr[i], i + 1, arr.length);
+      }
+      showToast(`Semua (${arr.length}) file selesai dikirim!`, '✅');
+      document.getElementById('inputGallery').value = '';
+      document.getElementById('inputFile').value = '';
+    }
+
+    function uploadSingleFile(file, index, total) {
+      return new Promise((resolve) => {
+        const progressBox = document.getElementById('progressBox');
+        const progressBar = document.getElementById('progressBar');
+        const progressPercent = document.getElementById('progressPercent');
+        const progressFilename = document.getElementById('progressFilename');
+        const progressSpeed = document.getElementById('progressSpeed');
+
+        progressBox.style.display = 'block';
+        progressFilename.textContent = `[${index}/${total}] ${file.name}`;
+
+        const xhr = new XMLHttpRequest();
+        let startTime = Date.now();
+
+        xhr.upload.onprogress = (e) => {
+          if (e.lengthComputable) {
+            const percent = Math.round((e.loaded / e.total) * 100);
+            progressBar.style.width = percent + '%';
+            progressPercent.textContent = percent + '%';
+            const elapsed = (Date.now() - startTime) / 1000;
+            if (elapsed > 0.2) {
+              progressSpeed.textContent = `${formatBytes(e.loaded / elapsed)}/s`;
+            }
+          }
+        };
+
+        xhr.onload = () => {
+          progressBar.style.width = '100%';
+          if (index === total) {
+            setTimeout(() => { progressBox.style.display = 'none'; }, 400);
+          }
+          resolve();
+        };
+
+        xhr.onerror = () => resolve();
+        xhr.open('POST', '/api/upload-file');
+        xhr.setRequestHeader('x-filename', encodeURIComponent(file.name));
+        xhr.setRequestHeader('x-sender', deviceName);
+        xhr.send(file);
+      });
+    }
+
+    function onNewFile(file) {
+      showToast(`File diterima: ${file.name}`, '📥');
+      renderFileCard(file, true);
+      const countEl = document.getElementById('badgeCount');
+      countEl.textContent = parseInt(countEl.textContent || '0') + 1;
+    }
+
+    function renderFileList(files) {
+      const list = document.getElementById('fileList');
+      const badge = document.getElementById('badgeCount');
+      badge.textContent = files ? files.length : 0;
+      if (!files || files.length === 0) return;
+      list.innerHTML = '';
+      files.forEach(f => renderFileCard(f, false));
+    }
+
+    function renderFileCard(file, prepend = false) {
+      const list = document.getElementById('fileList');
+      const empty = list.querySelector('.empty-state');
+      if (empty) empty.remove();
+
+      const card = document.createElement('div');
+      card.className = 'file-card';
+      card.innerHTML = `
+        <div style="min-width:0;">
+          <div style="font-size:14px; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${escapeHtml(file.name)}</div>
+          <div style="font-size:12px; color:var(--text-muted);">${formatBytes(file.size)}</div>
+        </div>
+        <a href="${file.url}" download="${escapeHtml(file.name)}" class="btn-download">⬇ Unduh</a>
+      `;
+      if (prepend) list.prepend(card);
+      else list.appendChild(card);
+    }
+
+    async function openLaptopFolder() {
+      try {
+        const res = await fetch('/api/open-folder', { method: 'POST' });
+        if ((await res.json()).ok) showToast('Folder dibuka di Laptop!', '📂');
+      } catch (err) {}
+    }
+
+    function formatBytes(bytes) {
+      if (!bytes || bytes === 0) return '0 B';
+      const k = 1024;
+      const sizes = ['B', 'KB', 'MB', 'GB'];
+      const i = Math.floor(Math.log(bytes) / Math.log(k));
+      return (bytes / Math.pow(k, i)).toFixed(1) + ' ' + sizes[i];
+    }
+
+    function escapeHtml(str) {
+      return str.replace(/[&<>'"]/g, tag => ({
+        '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;'
+      }[tag] || tag));
+    }
+
+    // Auto reconnect on tab switch / wake from sleep
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'visible') {
+        if (!ws || ws.readyState === WebSocket.CLOSED || ws.readyState === WebSocket.CLOSING) {
+          initWebSocket();
+        }
+        loadStatus();
+      }
+    });
+
+    // Startup
+    loadStatus();
+    initSSE();
+    initWebSocket();
+  </script>
+</body>
+</html>
