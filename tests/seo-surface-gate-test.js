@@ -55,6 +55,25 @@
  *   (G) Halaman yang didaftarkan di sitemap tidak boleh `noindex`.
  *   (H) Setiap blok <script type="application/ld+json"> adalah JSON yang sah. Satu koma
  *       nyasar membuat SELURUH blok dibuang parser Google, diam-diam.
+ *   (I) TIDAK ADA rating atau ulasan yang tidak punya sumber. Ditambahkan m025-314 sesudah
+ *       commit 32131d8 memasang `aggregateRating` ratingValue 4.9 / ratingCount 128 di
+ *       EMPAT permukaan sekaligus, plus baris "★★★★★ 4.9 / 5.0 dari 128 ulasan pembelajar"
+ *       di beranda id dan th sebagai "bukti visual"-nya. Angka itu tidak punya sumber:
+ *       nol endpoint, nol tabel, nol layar pengumpul ulasan di seluruh repo — setiap
+ *       kemunculan kata "review" di app.js dan backend/ adalah review PENGULANGAN
+ *       BERJARAK, bukan ulasan pengguna.
+ *
+ *       Kenapa ini kelas yang sama dengan (B) dan (E), bukan urusan selera: rating yang
+ *       tidak bisa ditelusuri adalah pelanggaran kebijakan spam structured data Google,
+ *       dan sanksinya TINGKAT SITUS. Yang dicabut bukan bintangnya saja melainkan SELURUH
+ *       rich result fiezel.my.id — termasuk FAQPage yang dibangun gerbang ini sendiri.
+ *       Jadi memasangnya bukan menambah peluang, melainkan mempertaruhkan seluruh
+ *       pekerjaan SEO ini demi satu baris yang tidak benar. Ia juga memberi tahu murid
+ *       sesuatu yang tidak ada.
+ *
+ *       Penjagaannya SENGAJA total, bukan ambang: selama repo tidak punya pipeline ulasan,
+ *       tidak ada nilai yang sah untuk ditulis. Kalau suatu hari pipeline itu ada,
+ *       cabut penjagaan ini SECARA SADAR dan tunjuk sumbernya di sini.
  *
  * Nol jaringan: semuanya dibaca dari berkas di repo.
  * Print-only: tidak menulis berkas apa pun; exit 1 bila ada FAIL.
@@ -341,6 +360,31 @@ function aturanDisallow(teks) {
       buruk.length === 0,
       buruk.map((b) => 'Disallow: ' + b).join(', ') + ' — /app/ adalah SPA; memblokirnya berarti Googlebot merender halaman kosong');
   }
+}
+
+/* ======================================== (I) rating tanpa sumber ====================== */
+
+{
+  // Ditaruh di sini, BUKAN di dalam pemeriksa JSON-LD, karena fabrikasinya hidup di DUA
+  // tempat sekaligus: simpul schema DAN teks kasatmata yang dipasang untuk "mendukung"-nya.
+  // Mencabut salah satunya saja meninggalkan separuh cacat — schema tanpa teks tetap
+  // melanggar pedoman Google, teks tanpa schema tetap berbohong kepada murid.
+  const RE_SCHEMA = /"(aggregateRating|ratingValue|ratingCount|reviewCount)"\s*:/;
+  const RE_TEKS = /(\d[\d.,]*\s*\/\s*5(\.0)?\s*<\/strong>|ulasan pembelajar|รีวิวผู้เรียน|★★★★★)/;
+
+  const schema = [];
+  const teks = [];
+  for (const rel of SEMUA_HALAMAN) {
+    const html = baca(rel);
+    if (RE_SCHEMA.test(html)) schema.push(rel);
+    if (RE_TEKS.test(html)) teks.push(rel);
+  }
+  check('(I) tidak ada aggregateRating/ratingValue/ratingCount di structured data',
+    schema.length === 0,
+    schema.join(', ') + ' — repo ini nol pipeline ulasan; rating yang tidak bisa ditelusuri adalah pelanggaran kebijakan spam Google yang sanksinya TINGKAT SITUS');
+  check('(I) tidak ada klaim rating/ulasan kasatmata yang tidak punya sumber',
+    teks.length === 0,
+    teks.join(', ') + ' — teks bintang/“N ulasan” tanpa pipeline ulasan adalah klaim yang dibaca murid dan tidak benar');
 }
 
 /* ======================================== (G) sitemap tidak memuat noindex ============= */
