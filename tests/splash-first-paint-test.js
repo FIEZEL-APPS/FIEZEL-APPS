@@ -175,9 +175,20 @@ test('splash ada di markup statis, BUKAN dibuat setelah boot selesai', () => {
     'index.html harus memuat splash frame-pertama dengan atribut adopsi');
 });
 
-test('splash berada di ATAS setiap <script> - inilah satu-satunya alasan ia tercat lebih dulu', () => {
+test('splash berada di ATAS setiap <script> yang berjalan - inilah satu-satunya alasan ia tercat lebih dulu', () => {
   const splashAt = html.indexOf('id="fiezelBootSplash"');
-  const firstScriptAt = html.indexOf('<script');
+  // m025-314: `<script type="application/ld+json">` adalah blok DATA untuk crawler —
+  // peramban tidak pernah mengeksekusinya dan tidak pernah menahan pengurai untuknya,
+  // jadi ia tidak bisa menunda cat pertama. Yang dihitung di sini skrip yang BERJALAN.
+  // Alasan penuh dan syarat pengecualiannya ada di kepala tests/boot-order-test.js.
+  const firstScriptAt = (() => {
+    const re = /<script\b([^>]*)>/g;
+    let m;
+    while ((m = re.exec(html)) !== null) {
+      if (!/\stype="application\/ld\+json"/.test(m[1])) return m.index;
+    }
+    return -1;
+  })();
   assert.ok(splashAt > 0 && firstScriptAt > 0, 'markup splash dan <script> harus ada');
   assert.ok(splashAt < firstScriptAt,
     'splash harus diurai sebelum <script> pertama; di belakangnya ia menunggu js.puter.com dan ~2,7 MB JSON');
