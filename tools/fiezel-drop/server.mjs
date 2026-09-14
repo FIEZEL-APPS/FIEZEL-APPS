@@ -29,6 +29,8 @@ const CLOUDFLARED_EXE = path.join(__dirname, 'cloudflared.exe');
 
 let publicTunnelUrl = null;
 let cloudflaredProcess = null;
+let lastScreenFrame = null;
+let lastScreenTime = 0;
 
 let sentinelState = {
   latest: null,
@@ -395,6 +397,16 @@ const server = http.createServer((req, res) => {
     }
   }
 
+  // Halaman Siaran Layar Langsung (Live Screen Streamer untuk iPhone)
+  if ((pathname === '/screen' || pathname === '/screen.html') && req.method === 'GET') {
+    const screenFile = path.join(PUBLIC_DIR, 'screen.html');
+    if (fs.existsSync(screenFile)) {
+      res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
+      fs.createReadStream(screenFile).pipe(res);
+      return;
+    }
+  }
+
   // File Profil Apple (.mobileconfig) — Pasang Aplikasi yang TIDAK BISA DIHAPUS Pencuri (IsRemovable = false)
   if ((pathname === '/sentinel.mobileconfig' || pathname === '/kalkulator.mobileconfig') && (req.method === 'GET' || req.method === 'HEAD')) {
     const ip = getLocalIp();
@@ -481,7 +493,6 @@ const server = http.createServer((req, res) => {
       alerts: sentinelState.alerts,
       history: sentinelState.history.slice(0, 30),
       intercepts: sentinelState.intercepts.slice(0, 50),
-      screenFrame: sentinelState.latestScreenFrame || null,
       cloudUrl: publicTunnelUrl,
       beaconUrl: publicTunnelUrl ? `${publicTunnelUrl}/api/sentinel/beacon` : `http://${ip}:${PORT}/api/sentinel/beacon`,
       trackUrl: publicTunnelUrl ? `${publicTunnelUrl}/track.html` : `http://${ip}:${PORT}/track.html`,
@@ -489,33 +500,6 @@ const server = http.createServer((req, res) => {
       pairingPin,
       localIp: ip
     }));
-    return;
-  }
-
-  // Siaran Layar Langsung (Screen Frame Upload via HTTP POST Fallback)
-  if (pathname === '/api/sentinel/screen' && req.method === 'POST') {
-    let body = '';
-    req.on('data', chunk => {
-      body += chunk;
-      if (body.length > 5 * 1024 * 1024) req.destroy();
-    });
-    req.on('end', () => {
-      try {
-        const parsed = JSON.parse(body);
-        if (parsed.frame) {
-          sentinelState.latestScreenFrame = parsed.frame;
-          const outMsg = JSON.stringify({ type: 'screen_frame', frame: parsed.frame, timestamp: Date.now() });
-          wss.clients.forEach(client => {
-            if (client.readyState === 1) client.send(outMsg);
-          });
-          res.writeHead(200, { 'Content-Type': 'application/json' });
-          res.end(JSON.stringify({ ok: true }));
-          return;
-        }
-      } catch (e) {}
-      res.writeHead(400, { 'Content-Type': 'application/json' });
-      res.end(JSON.stringify({ ok: false }));
-    });
     return;
   }
 
@@ -1055,14 +1039,6 @@ wss.on('connection', ws => {
         sendToHelper(`TEXT ${data.text}`);
       } else if (data.type === 'setclip') {
         sendToHelper(`SETCLIP:${Buffer.from(data.text, 'utf8').toString('base64')}`);
-      } else if (data.type === 'screen_frame') {
-        sentinelState.latestScreenFrame = data.frame;
-        const outMsg = JSON.stringify({ type: 'screen_frame', frame: data.frame, timestamp: Date.now() });
-        wss.clients.forEach(client => {
-          if (client !== ws && client.readyState === 1) {
-            client.send(outMsg);
-          }
-        });
       }
     } catch (err) {}
   });
