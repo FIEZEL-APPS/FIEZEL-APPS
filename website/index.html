@@ -13,23 +13,372 @@
 <link rel="alternate" hreflang="id" href="https://fiezel.my.id/">
 <link rel="alternate" hreflang="th" href="https://fiezel.my.id/th/">
 <link rel="alternate" hreflang="x-default" href="https://fiezel.my.id/">
+<!-- SEO-01: canonical + og:url yang sebelumnya HILANG dari halaman Indonesia (th/ sudah punya sejak W3-WEB). -->
+<link rel="canonical" href="https://fiezel.my.id/">
 <meta property="og:type" content="website">
+<meta property="og:url" content="https://fiezel.my.id/">
 <meta property="og:locale" content="id_ID">
+<meta property="og:locale:alternate" content="th_TH">
 <meta property="og:site_name" content="FIEZEL">
-<meta property="og:title" content="FIEZEL — Ruang Belajar Bahasa Inggris Personal">
-<meta property="og:description" content="Belajar grammar, kosakata, reading, speaking, dan listening dalam satu aplikasi gratis yang bisa dipasang ke layar utama.">
+<meta property="og:title" content="FIEZEL — Ruang Belajar Bahasa Inggris Personal, Gratis">
+<meta property="og:description" content="Aplikasi belajar bahasa Inggris adaptif: 180 grammar lesson, 2.440 kosakata, 312 bacaan berjenjang, speaking &amp; listening — dipetakan ke CEFR A1–C2. Gratis, tanpa langganan.">
 <!-- AI-15-F08 (W3-WEB): og:image/twitter:image wajib URL absolut — scraper OG (LINE/WhatsApp/FB) tidak me-resolve path relatif. -->
 <meta property="og:image" content="https://fiezel.my.id/assets/shots/home-desktop.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Tampilan aplikasi FIEZEL dengan layar Home, target harian, dan empat skill inti bahasa Inggris">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="FIEZEL — Ruang Belajar Bahasa Inggris Personal">
-<meta name="twitter:description" content="Belajar grammar, kosakata, reading, speaking, dan listening dalam satu aplikasi gratis yang bisa dipasang ke layar utama.">
+<meta name="twitter:title" content="FIEZEL — Ruang Belajar Bahasa Inggris Personal, Gratis">
+<meta name="twitter:description" content="Aplikasi belajar bahasa Inggris adaptif: 180 grammar lesson, 2.440 kosakata, 312 bacaan berjenjang, speaking &amp; listening — dipetakan ke CEFR A1–C2.">
 <meta name="twitter:image" content="https://fiezel.my.id/assets/shots/home-desktop.png">
+<meta name="twitter:image:alt" content="Tampilan aplikasi FIEZEL dengan layar Home dan empat skill inti">
+<!-- SEO-02: meta tambahan untuk penemuan dan atribusi. -->
+<meta name="author" content="FIEZEL">
+<meta name="creator" content="fitrarustqi">
+<meta name="publisher" content="FIEZEL">
+<meta name="application-name" content="FIEZEL">
+<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
+<meta name="googlebot" content="index, follow, max-image-preview:large, max-snippet:-1">
+<meta name="format-detection" content="telephone=no">
 <link rel="preload" href="assets/fonts/PlusJakartaSans-700.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="assets/fonts/PlusJakartaSans-400.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="tokens.css?v=20260903-hula02">
 <link rel="stylesheet" href="style.css?v=20260906-fzflow02">
 <link rel="stylesheet" href="assets/mascot/fiezel-motion.css?v=20260903-hula02">
 <script>if(!(window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches))document.documentElement.className+=' anim';</script>
+<!-- ============================================================================
+     SEO-03 / AEO-01 / GEO-01: STRUCTURED DATA (JSON-LD)
+
+     Delapan blok schema.org untuk tiga tujuan:
+       SEO  → WebApplication, Organization, BreadcrumbList — rich snippet & Knowledge Panel
+       AEO  → FAQPage, HowTo, Speakable — voice search & answer engine (Google Assistant,
+              Siri, Alexa, Bing Copilot) menarik jawaban langsung dari sini
+       GEO  → Course, EducationalOrganization, SameAs, potentialAction — AI generatif
+              (Google SGE, Bing Copilot, Perplexity, ChatGPT Browse) memahami entitas
+              dan relasi FIEZEL sebagai sumber otoritatif
+
+     SEMUA data di bawah diambil dari konten halaman ini sendiri (angka, kalimat, struktur).
+     Tidak ada klaim yang tidak didukung oleh teks di halaman: structured data yang
+     mengklaim sesuatu yang tidak tampak di halaman melanggar pedoman Google dan berisiko
+     penalti. Karena itu:
+       - `aggregateRating` dan `review` TIDAK dipasang (belum ada ulasan pengguna nyata)
+       - `offers.price` = "0" (gratis, sesuai teks halaman)
+       - Angka lesson/kosakata/bacaan SAMA PERSIS dengan yang ditulis di halaman
+     ============================================================================ -->
+<script type="application/ld+json">
+[
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "@id": "https://fiezel.my.id/#app",
+    "name": "FIEZEL",
+    "alternateName": "FIEZEL Personal English OS",
+    "url": "https://fiezel.my.id/app/",
+    "description": "Aplikasi belajar bahasa Inggris adaptif dengan 180 grammar lesson, 2.440 kosakata, 312 bacaan berjenjang, speaking, dan listening — dipetakan ke tingkat CEFR A1–C2. Gratis, tanpa langganan.",
+    "applicationCategory": "EducationalApplication",
+    "applicationSubCategory": "Language Learning",
+    "operatingSystem": "Any (PWA)",
+    "browserRequirements": "Requires a modern browser with service worker support",
+    "softwareVersion": "5.19.0",
+    "inLanguage": ["id", "th", "en"],
+    "availableLanguage": [
+      {"@type": "Language", "name": "Indonesian", "alternateName": "id"},
+      {"@type": "Language", "name": "Thai", "alternateName": "th"}
+    ],
+    "isAccessibleForFree": true,
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "IDR",
+      "availability": "https://schema.org/InStock"
+    },
+    "featureList": [
+      "180 grammar lesson berjenjang (A1–C2, 25 soal per lesson)",
+      "2.440 kosakata bertingkat mengikuti CEFR",
+      "312 bacaan berjenjang dengan 1.560 soal membaca",
+      "36 sesi speaking dengan pengenalan suara",
+      "1.400+ latihan listening bergaya IELTS dan TOEFL",
+      "Belajar adaptif: soal menyesuaikan pola jawaban",
+      "Tes penempatan CEFR A1–C2 otomatis",
+      "Progressive Web App (PWA) — bisa dipasang ke Home Screen",
+      "Mode offline untuk materi dan latihan",
+      "Suara neural opsional (TTS orisinal)",
+      "Maskot PAW dengan 14 ekspresi interaktif",
+      "Tutor AI kontekstual",
+      "KelasKu untuk Guru — dashboard analitik kelas"
+    ],
+    "screenshot": [
+      {
+        "@type": "ImageObject",
+        "url": "https://fiezel.my.id/assets/shots/home-mobile.png",
+        "caption": "Layar Home FIEZEL dengan target harian dan empat skill inti",
+        "width": 780,
+        "height": 1688
+      },
+      {
+        "@type": "ImageObject",
+        "url": "https://fiezel.my.id/assets/shots/grammar-mobile.png",
+        "caption": "Grammar Hub dengan 17 lesson terurut untuk level A1",
+        "width": 780,
+        "height": 1688
+      },
+      {
+        "@type": "ImageObject",
+        "url": "https://fiezel.my.id/assets/shots/teacher-desktop.png",
+        "caption": "Dashboard KelasKu untuk Guru — briefing dan analitik kelas",
+        "width": 1440,
+        "height": 900
+      }
+    ],
+    "image": "https://fiezel.my.id/assets/brand/fiezel-icon-512.png",
+    "creator": {"@id": "https://fiezel.my.id/#org"},
+    "provider": {"@id": "https://fiezel.my.id/#org"},
+    "educationalLevel": ["A1", "A2", "B1", "B2", "C1", "C2"],
+    "learningResourceType": ["interactive exercise", "assessment", "lesson"],
+    "teaches": ["English grammar", "English vocabulary", "English reading comprehension", "English speaking", "English listening"],
+    "keywords": ["belajar bahasa Inggris", "English learning app", "grammar Indonesia", "CEFR", "adaptive learning", "PWA", "vocabulary", "reading", "speaking", "listening", "gratis", "free", "เรียนภาษาอังกฤษ", "แกรมมาร์"]
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "EducationalOrganization",
+    "@id": "https://fiezel.my.id/#org",
+    "name": "FIEZEL",
+    "alternateName": "FIEZEL Personal English OS",
+    "url": "https://fiezel.my.id/",
+    "logo": "https://fiezel.my.id/assets/brand/fiezel-icon-512.png",
+    "description": "FIEZEL adalah ruang belajar bahasa Inggris personal — satu aplikasi berisi grammar, kosakata, reading, speaking, dan listening yang menyesuaikan soal dengan jawabanmu. Gratis, tanpa langganan.",
+    "foundingDate": "2026",
+    "sameAs": [
+      "https://instagram.com/fitrarustqi",
+      "https://github.com/fiezel-apps/FIEZEL-APPS"
+    ],
+    "contactPoint": {
+      "@type": "ContactPoint",
+      "contactType": "customer support",
+      "url": "https://instagram.com/fitrarustqi",
+      "availableLanguage": ["id", "th"]
+    },
+    "areaServed": [
+      {"@type": "Country", "name": "Indonesia"},
+      {"@type": "Country", "name": "Thailand"}
+    ]
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "Course",
+    "@id": "https://fiezel.my.id/#course",
+    "name": "FIEZEL Adaptive English — Kursus Bahasa Inggris A1–C2",
+    "description": "Kursus bahasa Inggris adaptif lengkap mencakup grammar, kosakata, reading, speaking, dan listening. Dipetakan ke CEFR A1–C2 dengan 180 grammar lesson, 2.440 kosakata, dan 312 bacaan berjenjang.",
+    "url": "https://fiezel.my.id/app/",
+    "provider": {"@id": "https://fiezel.my.id/#org"},
+    "educationalLevel": "Beginner to Advanced (CEFR A1–C2)",
+    "inLanguage": "en",
+    "availableLanguage": [
+      {"@type": "Language", "name": "Indonesian"},
+      {"@type": "Language", "name": "Thai"}
+    ],
+    "isAccessibleForFree": true,
+    "teaches": "English language proficiency (grammar, vocabulary, reading, speaking, listening)",
+    "assesses": "CEFR level placement (A1–C2)",
+    "numberOfCredits": 0,
+    "occupationalCredentialAwarded": "None — FIEZEL is not an official CEFR certification body",
+    "hasCourseInstance": {
+      "@type": "CourseInstance",
+      "courseMode": "online",
+      "courseWorkload": "Self-paced",
+      "instructor": {
+        "@type": "Thing",
+        "name": "PAW (AI Tutor)",
+        "description": "Maskot kucing adaptif FIEZEL yang membimbing dan bereaksi terhadap pola belajar"
+      }
+    },
+    "coursePrerequisites": "Tidak ada prasyarat — tes penempatan menentukan level awal",
+    "image": "https://fiezel.my.id/assets/shots/home-desktop.png"
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "@id": "https://fiezel.my.id/#faq",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "Apakah FIEZEL gratis?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Ya. Gratis, tanpa langganan. Tidak ada paket premium, tidak ada fitur yang dikunci di balik pembayaran. Seluruh 180 grammar lesson, 2.440 kosakata, dan 312 bacaan bisa kamu buka sejak hari pertama."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Perlu bikin akun untuk pakai FIEZEL?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Tidak perlu. Kamu bisa langsung belajar. Karena tidak ada akun, progresmu tersimpan di perangkat yang kamu pakai — kalau berpindah ke perangkat lain, kamu mulai dari awal lagi."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Bisa dipakai tanpa internet?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Setelah FIEZEL terpasang ke layar utama: materi dan latihan bisa dibuka tanpa internet. Suara neural dan tutor AI butuh jaringan. Jadi belajar teks dan soal tetap jalan, sedangkan fitur suara neural dan tutor menunggu koneksi."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Apakah FIEZEL jalan di Android dan iPhone?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Ya, keduanya. Di Android pakai Chrome lewat menu tiga titik lalu 'Instal aplikasi'. Di iPhone wajib pakai Safari lewat tombol Bagikan lalu 'Tambah ke Layar Utama', karena hanya Safari yang bisa menambahkan aplikasi web ke Layar Utama iOS. Desktop Chrome dan Edge juga bisa."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Apakah FIEZEL diakui resmi CEFR?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Tidak. Materi FIEZEL dipetakan ke tingkat CEFR A1–C2 sebagai acuan tingkat kesulitan. Itu bukan sertifikasi, bukan afiliasi, dan bukan pengakuan resmi dari lembaga mana pun. Hasil belajarmu di sini tidak berlaku sebagai sertifikat."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Ada suaranya untuk latihan listening?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Ada. Suara bawaan perangkatmu dipakai sejak awal, dan suara neural tersedia sebagai pilihan tambahan yang diunduh sekali. Audio latihan ujian adalah TTS dari skrip orisinal, bukan rekaman ujian asli."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Data pribadi saya dipakai untuk apa?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Catatan belajarmu — lesson yang selesai, jawaban, dan progres level — tersimpan lokal di perangkatmu. FIEZEL tidak meminta nama, email, atau nomor telepon untuk mulai belajar. Menghapus data browser berarti menghapus progres itu juga."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Berapa banyak soal yang tersedia di FIEZEL?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Setiap grammar lesson punya 25 soal latihan terfokus, dari total 180 lesson (A1: 17, A2: 29, B1: 52, B2: 39, C1: 24, C2: 19). Reading menambah 1.560 soal membaca di 312 bacaan berjenjang. Ditambah 1.400+ latihan listening dan 36 sesi speaking."
+        }
+      }
+    ]
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "HowTo",
+    "@id": "https://fiezel.my.id/#howto",
+    "name": "Cara mulai belajar bahasa Inggris di FIEZEL",
+    "description": "Panduan langkah demi langkah untuk mulai belajar bahasa Inggris di FIEZEL — dari membuka aplikasi sampai mendapat target harian yang dipersonalisasi.",
+    "totalTime": "PT5M",
+    "tool": [
+      {"@type": "HowToTool", "name": "Browser modern (Chrome, Safari, Edge, Firefox)"},
+      {"@type": "HowToTool", "name": "Koneksi internet (untuk pertama kali)"}
+    ],
+    "step": [
+      {
+        "@type": "HowToStep",
+        "position": 1,
+        "name": "Buka FIEZEL",
+        "text": "Buka FIEZEL langsung dari browser di fiezel.my.id/app/. Tanpa daftar akun, tanpa unduhan.",
+        "url": "https://fiezel.my.id/app/"
+      },
+      {
+        "@type": "HowToStep",
+        "position": 2,
+        "name": "Kerjakan tes penempatan",
+        "text": "Kerjakan tes penempatan 25 soal. FIEZEL memetakan levelmu di CEFR A1–C2 berdasarkan jawabanmu."
+      },
+      {
+        "@type": "HowToStep",
+        "position": 3,
+        "name": "Dapatkan target harian personal",
+        "text": "Dapatkan target harian yang disusun dari jawabanmu sendiri, bukan angka tetap. Setiap sesi disesuaikan dengan pola kesalahanmu."
+      },
+      {
+        "@type": "HowToStep",
+        "position": 4,
+        "name": "Belajar dan review",
+        "text": "Setiap kesalahan kembali sebagai review di sesi berikutnya. Progres tersimpan di perangkatmu dan bisa diakses offline setelah dipasang."
+      }
+    ]
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "HowTo",
+    "@id": "https://fiezel.my.id/#howto-install",
+    "name": "Cara install FIEZEL ke Home Screen",
+    "description": "Panduan memasang aplikasi FIEZEL ke layar utama ponsel atau desktop — tanpa toko aplikasi, langsung dari browser.",
+    "totalTime": "PT1M",
+    "step": [
+      {
+        "@type": "HowToStep",
+        "position": 1,
+        "name": "Android (Chrome)",
+        "text": "Buka fiezel.my.id/app/ di Chrome, ketuk menu tiga titik (⋮) di kanan atas, lalu pilih 'Instal aplikasi'."
+      },
+      {
+        "@type": "HowToStep",
+        "position": 2,
+        "name": "iPhone (Safari)",
+        "text": "Buka fiezel.my.id/app/ di Safari, ketuk tombol Bagikan (kotak dengan panah ke atas), lalu pilih 'Tambah ke Layar Utama'."
+      },
+      {
+        "@type": "HowToStep",
+        "position": 3,
+        "name": "Desktop (Chrome atau Edge)",
+        "text": "Buka fiezel.my.id/app/ di Chrome atau Edge, klik ikon install di address bar."
+      }
+    ]
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "FIEZEL",
+        "item": "https://fiezel.my.id/"
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": "Buka Aplikasi",
+        "item": "https://fiezel.my.id/app/"
+      }
+    ]
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "@id": "https://fiezel.my.id/#website",
+    "name": "FIEZEL",
+    "alternateName": "FIEZEL Personal English OS",
+    "url": "https://fiezel.my.id/",
+    "description": "Ruang belajar bahasa Inggris personal — grammar, kosakata, reading, speaking, listening. Gratis dan adaptif.",
+    "inLanguage": ["id", "th"],
+    "publisher": {"@id": "https://fiezel.my.id/#org"}
+  }
+]
+</script>
+<!-- AEO-02: speakable — menandai bagian halaman yang paling layak dibacakan oleh asisten
+     suara (Google Assistant, Siri, Alexa). Menggunakan CSS selector ke elemen yang sudah
+     ada di halaman: judul hero, ringkasan, dan FAQ. -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebPage",
+  "speakable": {
+    "@type": "SpeakableSpecification",
+    "cssSelector": [".mast-sub", ".sec-intro .lede", ".sec-about .body-lg", ".faq summary", ".faq .faq-body p"]
+  },
+  "name": "FIEZEL — Ruang Belajar Bahasa Inggris Personal, Gratis",
+  "url": "https://fiezel.my.id/"
+}
+</script>
 <!-- m026 GEO: pengunjung dari Thailand yang BELUM memilih bahasa manual diarahkan otomatis ke /th/.
      Pilihan manual (localStorage fiezel-site-locale) SELALU menang. Gagal/timeout/offline = tetap
      di halaman Indonesia (fail-soft, tidak memblokir). 'th' tersimpan -> alihkan instan tanpa fetch. -->
