@@ -1,3 +1,30 @@
+# robots.txt — FIEZEL (https://fiezel.my.id)
+# Izinkan semua crawler mengindeks halaman publik.
+# Halaman internal (backend, workers, tools) diblokir.
+
 User-agent: *
-Disallow: /
-Allow: /tree/main
+Allow: /
+Disallow: /backend/
+Disallow: /workers/
+Disallow: /tools/
+Disallow: /node_modules/
+Disallow: /tests/
+Disallow: /analysis/
+Disallow: /coordination/
+Disallow: /deploy/
+Disallow: /memory/
+Disallow: /reports/
+Disallow: /audit/
+Disallow: /test_reports/
+Disallow: /*.json$
+Disallow: /*.js$
+
+# Izinkan crawler mengakses halaman utama & landing
+Allow: /index.html
+Allow: /landing.html
+Allow: /tentang.html
+Allow: /manifest.json
+Allow: /sitemap.xml
+
+# Sitemap
+Sitemap: https://fiezel.my.id/sitemap.xml
