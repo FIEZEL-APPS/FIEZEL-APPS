@@ -112,12 +112,24 @@
       "time_expressions",
       "te_form"
     ],
-    "A2_N4_dan_seterusnya": [
+    "A2_N4": [
       "plain_forms",
       "transitivity_pairs",
-      "keigo"
+      "keigo",
+      "te_form_extensions",
+      "potential",
+      "volitional_intent",
+      "passive_causative",
+      "conditionals",
+      "giving_receiving",
+      "quotation_thought",
+      "relative_clauses",
+      "comparison",
+      "obligation_permission",
+      "reason_concession",
+      "experience_frequency"
     ],
-    "A2": "JLPT N4 — 14 keluarga, prasyarat bersandar pada A1"
+    "catatan": "A1_N5 = 12 keluarga, A2_N4 = 15 keluarga, total 27. Daftar ini WAJIB sepadan dengan kunci families di berkas ini; kalau tidak, peta tingkat ini menyesatkan siapa pun yang memakainya sebagai acuan."
   },
   "alasanUrutan": {
     "particles_lebih_dulu": "Tanpa は/が/を/に/で, tidak ada satu pun kalimat Jepang yang bisa disusun benar. Ia akar yang sama seperti tense_aspect di kursus Inggris.",
