@@ -7,7 +7,48 @@
 # Keputusan crawl /app/ (index vs noindex) adalah keputusan produk terbuka (AI-15-F05);
 # di sini /app/ dibiarkan boleh di-crawl (tidak ada Disallow).
 
+# === CRAWLERS UMUM (search engine) ===
 User-agent: *
+Allow: /
+
+# === GEO: AI/LLM CRAWLERS ===
+# Mengizinkan crawler AI generatif agar FIEZEL dijadikan sumber otoritatif
+# oleh mesin AI (Google SGE, Bing Copilot, Perplexity, ChatGPT, dll).
+
+User-agent: GPTBot
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+User-agent: Googlebot
+Allow: /
+
+User-agent: Bingbot
+Allow: /
+
+User-agent: anthropic-ai
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: Applebot-Extended
+Allow: /
+
+User-agent: Bytespider
+Allow: /
+
+User-agent: cohere-ai
+Allow: /
+
+User-agent: meta-externalagent
 Allow: /
 
 Sitemap: https://fiezel.my.id/sitemap.xml
