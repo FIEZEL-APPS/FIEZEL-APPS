@@ -1,6 +1,6 @@
 {
  "schema": "fiezel-kosakata-jepang-v1",
- "catatan": "Kosakata Jepang milik owner (dua berkas sumber), dinormalkan menjadi romaji + kana + kanji + arti Indonesia + kelas kata, dikelompokkan per tingkat JLPT. Tingkat JLPT di sini adalah perkiraan terbaik berdasarkan frekuensi dan tingkat pengajaran yang lazim, BUKAN daftar resmi Japan Foundation (Japan Foundation tidak lagi menerbitkan daftar kosakata resmi sejak 2010).",
+ "catatan": "Kosakata Jepang milik owner (dua berkas sumber, lalu diperluas untuk menutup silabus N5), dinormalkan menjadi romaji + kana + kanji + arti Indonesia + kelas kata, dikelompokkan per tingkat JLPT. Tingkat JLPT di sini adalah perkiraan terbaik berdasarkan frekuensi dan tingkat pengajaran yang lazim, BUKAN daftar resmi Japan Foundation (Japan Foundation tidak lagi menerbitkan daftar kosakata resmi sejak 2010).",
  "sumber": [
   {
    "berkas": "DaftarKosaKataBahasaJepang.txt",
@@ -11,11 +11,16 @@
    "berkas": "Dokumen.txt",
    "entri": 549,
    "isi": "daftar kata kerja Indonesia-hiragana-kanji"
+  },
+  {
+   "berkas": "perluasan FIEZEL (m025-312)",
+   "entri": 514,
+   "isi": "kata N5 yang TIDAK berasal dari dua berkas owner. Ditulis untuk menutup silabus N5 sampai 1.000 kata: rumah tangga, keluarga, tubuh dan kesehatan, cuaca, perjalanan, sekolah, pekerjaan, dan kata kerja harian. Sama seperti sisa berkas ini, tingkat JLPT-nya perkiraan dan naskahnya berstatus DRAFT AI — belum ditinjau penutur asli."
   }
  ],
- "total": 1371,
+ "total": 1885,
  "jumlah": {
-  "N5": 486,
+  "N5": 1000,
   "N4": 327,
   "N3": 279,
   "N2": 202,
@@ -4095,6 +4100,4118 @@
     "pos": "verb",
     "verbGroup": "ichidan",
     "src": "katakerja#72"
+   },
+   {
+    "romaji": "ichi",
+    "kana": "いち",
+    "kanji": "一",
+    "id": "satu",
+    "pos": "number",
+    "src": "kosakata#ja_vocab_01372"
+   },
+   {
+    "romaji": "san",
+    "kana": "さん",
+    "kanji": "三",
+    "id": "tiga",
+    "pos": "number",
+    "src": "kosakata#ja_vocab_01373"
+   },
+   {
+    "romaji": "yon",
+    "kana": "よん",
+    "kanji": "四",
+    "id": "empat",
+    "pos": "number",
+    "src": "kosakata#ja_vocab_01374"
+   },
+   {
+    "romaji": "go",
+    "kana": "ご",
+    "kanji": "五",
+    "id": "lima",
+    "pos": "number",
+    "src": "kosakata#ja_vocab_01375"
+   },
+   {
+    "romaji": "roku",
+    "kana": "ろく",
+    "kanji": "六",
+    "id": "enam",
+    "pos": "number",
+    "src": "kosakata#ja_vocab_01376"
+   },
+   {
+    "romaji": "nana",
+    "kana": "なな",
+    "kanji": "七",
+    "id": "tujuh",
+    "pos": "number",
+    "src": "kosakata#ja_vocab_01377"
+   },
+   {
+    "romaji": "hachi",
+    "kana": "はち",
+    "kanji": "八",
+    "id": "delapan",
+    "pos": "number",
+    "src": "kosakata#ja_vocab_01378"
+   },
+   {
+    "romaji": "kyuu",
+    "kana": "きゅう",
+    "kanji": "九",
+    "id": "sembilan",
+    "pos": "number",
+    "src": "kosakata#ja_vocab_01379"
+   },
+   {
+    "romaji": "juu",
+    "kana": "じゅう",
+    "kanji": "十",
+    "id": "sepuluh",
+    "pos": "number",
+    "src": "kosakata#ja_vocab_01380"
+   },
+   {
+    "romaji": "hyaku",
+    "kana": "ひゃく",
+    "kanji": "百",
+    "id": "seratus",
+    "pos": "number",
+    "src": "kosakata#ja_vocab_01381"
+   },
+   {
+    "romaji": "sen",
+    "kana": "せん",
+    "kanji": "千",
+    "id": "seribu",
+    "pos": "number",
+    "src": "kosakata#ja_vocab_01382"
+   },
+   {
+    "romaji": "man",
+    "kana": "まん",
+    "kanji": "万",
+    "id": "sepuluh ribu",
+    "pos": "number",
+    "src": "kosakata#ja_vocab_01383"
+   },
+   {
+    "romaji": "zero",
+    "kana": "ゼロ",
+    "kanji": "ゼロ",
+    "id": "nol",
+    "pos": "number",
+    "src": "kosakata#ja_vocab_01384"
+   },
+   {
+    "romaji": "yottsu",
+    "kana": "よっつ",
+    "kanji": "四つ",
+    "id": "empat buah",
+    "pos": "number",
+    "src": "kosakata#ja_vocab_01385"
+   },
+   {
+    "romaji": "itsutsu",
+    "kana": "いつつ",
+    "kanji": "五つ",
+    "id": "lima buah",
+    "pos": "number",
+    "src": "kosakata#ja_vocab_01386"
+   },
+   {
+    "romaji": "muttsu",
+    "kana": "むっつ",
+    "kanji": "六つ",
+    "id": "enam buah",
+    "pos": "number",
+    "src": "kosakata#ja_vocab_01387"
+   },
+   {
+    "romaji": "nanatsu",
+    "kana": "ななつ",
+    "kanji": "七つ",
+    "id": "tujuh buah",
+    "pos": "number",
+    "src": "kosakata#ja_vocab_01388"
+   },
+   {
+    "romaji": "yattsu",
+    "kana": "やっつ",
+    "kanji": "八つ",
+    "id": "delapan buah",
+    "pos": "number",
+    "src": "kosakata#ja_vocab_01389"
+   },
+   {
+    "romaji": "kokonotsu",
+    "kana": "ここのつ",
+    "kanji": "九つ",
+    "id": "sembilan buah",
+    "pos": "number",
+    "src": "kosakata#ja_vocab_01390"
+   },
+   {
+    "romaji": "too",
+    "kana": "とお",
+    "kanji": "十",
+    "id": "sepuluh buah",
+    "pos": "number",
+    "src": "kosakata#ja_vocab_01391"
+   },
+   {
+    "romaji": "getsuyoubi",
+    "kana": "げつようび",
+    "kanji": "月曜日",
+    "id": "hari Senin",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01392"
+   },
+   {
+    "romaji": "kayoubi",
+    "kana": "かようび",
+    "kanji": "火曜日",
+    "id": "hari Selasa",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01393"
+   },
+   {
+    "romaji": "suiyoubi",
+    "kana": "すいようび",
+    "kanji": "水曜日",
+    "id": "hari Rabu",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01394"
+   },
+   {
+    "romaji": "mokuyoubi",
+    "kana": "もくようび",
+    "kanji": "木曜日",
+    "id": "hari Kamis",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01395"
+   },
+   {
+    "romaji": "kinyoubi",
+    "kana": "きんようび",
+    "kanji": "金曜日",
+    "id": "hari Jumat",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01396"
+   },
+   {
+    "romaji": "doyoubi",
+    "kana": "どようび",
+    "kanji": "土曜日",
+    "id": "hari Sabtu",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01397"
+   },
+   {
+    "romaji": "nichiyoubi",
+    "kana": "にちようび",
+    "kanji": "日曜日",
+    "id": "hari Minggu",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01398"
+   },
+   {
+    "romaji": "kyou",
+    "kana": "きょう",
+    "kanji": "今日",
+    "id": "hari ini",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01399"
+   },
+   {
+    "romaji": "kinou",
+    "kana": "きのう",
+    "kanji": "昨日",
+    "id": "kemarin",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01400"
+   },
+   {
+    "romaji": "ban",
+    "kana": "ばん",
+    "kanji": "晩",
+    "id": "malam",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01401"
+   },
+   {
+    "romaji": "ato",
+    "kana": "あと",
+    "kanji": "後",
+    "id": "sesudah, nanti",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01402"
+   },
+   {
+    "romaji": "tonari",
+    "kana": "となり",
+    "kanji": "隣",
+    "id": "sebelah",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01403"
+   },
+   {
+    "romaji": "chikaku",
+    "kana": "ちかく",
+    "kanji": "近く",
+    "id": "dekat, sekitar",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01404"
+   },
+   {
+    "romaji": "kissaten",
+    "kana": "きっさてん",
+    "kanji": "喫茶店",
+    "id": "kedai kopi",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01405"
+   },
+   {
+    "romaji": "byouin",
+    "kana": "びょういん",
+    "kanji": "病院",
+    "id": "rumah sakit",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01406"
+   },
+   {
+    "romaji": "ginkou",
+    "kana": "ぎんこう",
+    "kanji": "銀行",
+    "id": "bank",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01407"
+   },
+   {
+    "romaji": "yuubinkyoku",
+    "kana": "ゆうびんきょく",
+    "kanji": "郵便局",
+    "id": "kantor pos",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01408"
+   },
+   {
+    "romaji": "kouen",
+    "kana": "こうえん",
+    "kanji": "公園",
+    "id": "taman",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01409"
+   },
+   {
+    "romaji": "biru",
+    "kana": "ビル",
+    "kanji": "ビル",
+    "id": "gedung",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01410"
+   },
+   {
+    "romaji": "denwa",
+    "kana": "でんわ",
+    "kanji": "電話",
+    "id": "telepon",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01411"
+   },
+   {
+    "romaji": "boushi",
+    "kana": "ぼうし",
+    "kanji": "帽子",
+    "id": "topi",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01412"
+   },
+   {
+    "romaji": "meishi",
+    "kana": "めいし",
+    "kanji": "名刺",
+    "id": "kartu nama",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01413"
+   },
+   {
+    "romaji": "enpitsu",
+    "kana": "えんぴつ",
+    "kanji": "鉛筆",
+    "id": "pensil",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01414"
+   },
+   {
+    "romaji": "pen",
+    "kana": "ペン",
+    "kanji": "ペン",
+    "id": "pulpen",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01415"
+   },
+   {
+    "romaji": "nooto",
+    "kana": "ノート",
+    "kanji": "ノート",
+    "id": "buku catatan",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01416"
+   },
+   {
+    "romaji": "niwa",
+    "kana": "にわ",
+    "kanji": "庭",
+    "id": "halaman, taman rumah",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01417"
+   },
+   {
+    "romaji": "chikatetsu",
+    "kana": "ちかてつ",
+    "kanji": "地下鉄",
+    "id": "kereta bawah tanah",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01418"
+   },
+   {
+    "romaji": "takushii",
+    "kana": "タクシー",
+    "kanji": "タクシー",
+    "id": "taksi",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01419"
+   },
+   {
+    "romaji": "michi",
+    "kana": "みち",
+    "kanji": "道",
+    "id": "jalan",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01420"
+   },
+   {
+    "romaji": "otousan",
+    "kana": "おとうさん",
+    "kanji": "お父さん",
+    "id": "ayah (orang lain)",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01421"
+   },
+   {
+    "romaji": "kyoudai",
+    "kana": "きょうだい",
+    "kanji": "兄弟",
+    "id": "saudara kandung",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01422"
+   },
+   {
+    "romaji": "shujin",
+    "kana": "しゅじん",
+    "kanji": "主人",
+    "id": "suami (sendiri)",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01423"
+   },
+   {
+    "romaji": "okusan",
+    "kana": "おくさん",
+    "kanji": "奥さん",
+    "id": "istri (orang lain)",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01424"
+   },
+   {
+    "romaji": "kodomo",
+    "kana": "こども",
+    "kanji": "子供",
+    "id": "anak",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01425"
+   },
+   {
+    "romaji": "otoko",
+    "kana": "おとこ",
+    "kanji": "男",
+    "id": "laki-laki",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01426"
+   },
+   {
+    "romaji": "onna",
+    "kana": "おんna",
+    "kanji": "女",
+    "id": "perempuan",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01427"
+   },
+   {
+    "romaji": "otona",
+    "kana": "おとな",
+    "kanji": "大人",
+    "id": "orang dewasa",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01428"
+   },
+   {
+    "romaji": "isha",
+    "kana": "いしゃ",
+    "kanji": "医者",
+    "id": "dokter",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01429"
+   },
+   {
+    "romaji": "kaishain",
+    "kana": "かいしゃいん",
+    "kanji": "会社員",
+    "id": "karyawan",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01430"
+   },
+   {
+    "romaji": "ekiin",
+    "kana": "えきいん",
+    "kanji": "駅員",
+    "id": "petugas stasiun",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01431"
+   },
+   {
+    "romaji": "keikan",
+    "kana": "けいかん",
+    "kanji": "警官",
+    "id": "polisi",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01432"
+   },
+   {
+    "romaji": "kangofu",
+    "kana": "かんごふ",
+    "kanji": "看護婦",
+    "id": "perawat",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01433"
+   },
+   {
+    "romaji": "gohan",
+    "kana": "ごはん",
+    "kanji": "ご飯",
+    "id": "nasi, makanan",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01434"
+   },
+   {
+    "romaji": "tamago",
+    "kana": "たまご",
+    "kanji": "卵",
+    "id": "telur",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01435"
+   },
+   {
+    "romaji": "ringo",
+    "kana": "りんご",
+    "kanji": "林檎",
+    "id": "apel",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01436"
+   },
+   {
+    "romaji": "mikan",
+    "kana": "みかん",
+    "kanji": "蜜柑",
+    "id": "jeruk",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01437"
+   },
+   {
+    "romaji": "okashi",
+    "kana": "おかし",
+    "kanji": "お菓子",
+    "id": "kue, camilan",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01438"
+   },
+   {
+    "romaji": "satou",
+    "kana": "さとう",
+    "kanji": "砂糖",
+    "id": "gula",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01439"
+   },
+   {
+    "romaji": "gyuunyuu",
+    "kana": "ぎゅうにゅう",
+    "kanji": "牛乳",
+    "id": "susu sapi",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01440"
+   },
+   {
+    "romaji": "sake",
+    "kana": "さけ",
+    "kanji": "酒",
+    "id": "minuman beralkohol",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01441"
+   },
+   {
+    "romaji": "daidokoro",
+    "kana": "だいどころ",
+    "kanji": "台所",
+    "id": "dapur",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01442"
+   },
+   {
+    "romaji": "genkan",
+    "kana": "げんかん",
+    "kanji": "玄関",
+    "id": "pintu depan",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01443"
+   },
+   {
+    "romaji": "reizouko",
+    "kana": "れいぞうこ",
+    "kanji": "冷蔵庫",
+    "id": "kulkas",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01444"
+   },
+   {
+    "romaji": "sentakuki",
+    "kana": "せんたくき",
+    "kanji": "洗濯機",
+    "id": "mesin cuci",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01445"
+   },
+   {
+    "romaji": "asatte",
+    "kana": "あさって",
+    "kanji": "明後日",
+    "id": "lusa",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01446"
+   },
+   {
+    "romaji": "ototoi",
+    "kana": "おととい",
+    "kanji": "一昨日",
+    "id": "kemarin lusa",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01447"
+   },
+   {
+    "romaji": "kesa",
+    "kana": "けさ",
+    "kanji": "今朝",
+    "id": "pagi ini",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01448"
+   },
+   {
+    "romaji": "konban",
+    "kana": "こんばん",
+    "kanji": "今晩",
+    "id": "malam ini",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01449"
+   },
+   {
+    "romaji": "mainichi",
+    "kana": "まいにち",
+    "kanji": "毎日",
+    "id": "setiap hari",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01450"
+   },
+   {
+    "romaji": "maiasa",
+    "kana": "まいあさ",
+    "kanji": "毎朝",
+    "id": "setiap pagi",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01451"
+   },
+   {
+    "romaji": "maiban",
+    "kana": "まいばん",
+    "kanji": "毎晩",
+    "id": "setiap malam",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01452"
+   },
+   {
+    "romaji": "maishuu",
+    "kana": "まいしゅう",
+    "kanji": "毎週",
+    "id": "setiap minggu",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01453"
+   },
+   {
+    "romaji": "maitsuki",
+    "kana": "まいつき",
+    "kanji": "毎月",
+    "id": "setiap bulan",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01454"
+   },
+   {
+    "romaji": "mainen",
+    "kana": "まいねん",
+    "kanji": "毎年",
+    "id": "setiap tahun",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01455"
+   },
+   {
+    "romaji": "senshuu",
+    "kana": "せんしゅう",
+    "kanji": "先週",
+    "id": "minggu lalu",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01456"
+   },
+   {
+    "romaji": "raishuu",
+    "kana": "らいしゅう",
+    "kanji": "来週",
+    "id": "minggu depan",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01457"
+   },
+   {
+    "romaji": "kongetsu",
+    "kana": "こんげつ",
+    "kanji": "今月",
+    "id": "bulan ini",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01458"
+   },
+   {
+    "romaji": "sengetsu",
+    "kana": "せんげつ",
+    "kanji": "先月",
+    "id": "bulan lalu",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01459"
+   },
+   {
+    "romaji": "kotoshi",
+    "kana": "ことし",
+    "kanji": "今年",
+    "id": "tahun ini",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01460"
+   },
+   {
+    "romaji": "kyonen",
+    "kana": "きょねん",
+    "kanji": "去年",
+    "id": "tahun lalu",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01461"
+   },
+   {
+    "romaji": "rainen",
+    "kana": "らいねん",
+    "kanji": "来年",
+    "id": "tahun depan",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01462"
+   },
+   {
+    "romaji": "shuumatsu",
+    "kana": "しゅうまつ",
+    "kanji": "週末",
+    "id": "akhir pekan",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01463"
+   },
+   {
+    "romaji": "gozen",
+    "kana": "ごぜん",
+    "kanji": "午前",
+    "id": "pagi (sebelum tengah hari)",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01464"
+   },
+   {
+    "romaji": "yuugata",
+    "kana": "ゆうがた",
+    "kanji": "夕方",
+    "id": "sore",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01465"
+   },
+   {
+    "romaji": "yuube",
+    "kana": "ゆうべ",
+    "kanji": "昨夜",
+    "id": "tadi malam",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01466"
+   },
+   {
+    "romaji": "sugu",
+    "kana": "すぐ",
+    "kanji": "すぐ",
+    "id": "segera",
+    "pos": "adverb",
+    "src": "kosakata#ja_vocab_01467"
+   },
+   {
+    "romaji": "mou",
+    "kana": "もう",
+    "kanji": "もう",
+    "id": "sudah",
+    "pos": "adverb",
+    "src": "kosakata#ja_vocab_01468"
+   },
+   {
+    "romaji": "minna",
+    "kana": "みんな",
+    "kanji": "皆",
+    "id": "semua orang",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01469"
+   },
+   {
+    "romaji": "hoka",
+    "kana": "ほか",
+    "kanji": "他",
+    "id": "lain",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01470"
+   },
+   {
+    "romaji": "tsugi",
+    "kana": "つぎ",
+    "kanji": "次",
+    "id": "berikutnya",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01471"
+   },
+   {
+    "romaji": "saisho",
+    "kana": "さいしょ",
+    "kanji": "最初",
+    "id": "pertama, awal",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01472"
+   },
+   {
+    "romaji": "saigo",
+    "kana": "さいご",
+    "kanji": "最後",
+    "id": "terakhir",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01473"
+   },
+   {
+    "romaji": "ichinichi",
+    "kana": "いちにち",
+    "kanji": "一日",
+    "id": "satu hari",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01474"
+   },
+   {
+    "romaji": "isshuukan",
+    "kana": "いっしゅうかん",
+    "kanji": "一週間",
+    "id": "satu minggu",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01475"
+   },
+   {
+    "romaji": "nanpun",
+    "kana": "なんぷん",
+    "kanji": "何分",
+    "id": "berapa menit",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01476"
+   },
+   {
+    "romaji": "nannichi",
+    "kana": "なんにち",
+    "kanji": "何日",
+    "id": "tanggal berapa",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01477"
+   },
+   {
+    "romaji": "nanyoubi",
+    "kana": "なんようび",
+    "kanji": "何曜日",
+    "id": "hari apa",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01478"
+   },
+   {
+    "romaji": "nangatsu",
+    "kana": "なんがつ",
+    "kanji": "何月",
+    "id": "bulan apa",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01479"
+   },
+   {
+    "romaji": "nansai",
+    "kana": "なんさい",
+    "kanji": "何歳",
+    "id": "berapa umur",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01480"
+   },
+   {
+    "romaji": "nanmai",
+    "kana": "なんまい",
+    "kanji": "何枚",
+    "id": "berapa lembar",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01481"
+   },
+   {
+    "romaji": "nanbon",
+    "kana": "なんぼん",
+    "kanji": "何本",
+    "id": "berapa batang",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01482"
+   },
+   {
+    "romaji": "nannin",
+    "kana": "なんにん",
+    "kanji": "何人",
+    "id": "berapa orang",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01483"
+   },
+   {
+    "romaji": "ikutsu",
+    "kana": "いくつ",
+    "kanji": "幾つ",
+    "id": "berapa buah",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01484"
+   },
+   {
+    "romaji": "ikura",
+    "kana": "いくら",
+    "kanji": "幾ら",
+    "id": "berapa harganya",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01485"
+   },
+   {
+    "romaji": "naze",
+    "kana": "なぜ",
+    "kanji": "何故",
+    "id": "mengapa",
+    "pos": "adverb",
+    "src": "kosakata#ja_vocab_01486"
+   },
+   {
+    "romaji": "donna",
+    "kana": "どんな",
+    "kanji": "どんな",
+    "id": "bagaimana, seperti apa",
+    "pos": "adjective",
+    "src": "kosakata#ja_vocab_01487"
+   },
+   {
+    "romaji": "dochira",
+    "kana": "どちら",
+    "kanji": "どちら",
+    "id": "yang mana, ke mana (sopan)",
+    "pos": "pronoun",
+    "src": "kosakata#ja_vocab_01488"
+   },
+   {
+    "romaji": "shizuka",
+    "kana": "しずか",
+    "kanji": "静か",
+    "id": "tenang, sepi",
+    "pos": "adjective-na",
+    "src": "kosakata#ja_vocab_01489"
+   },
+   {
+    "romaji": "nigiyaka",
+    "kana": "にぎやか",
+    "kanji": "賑やか",
+    "id": "ramai",
+    "pos": "adjective-na",
+    "src": "kosakata#ja_vocab_01490"
+   },
+   {
+    "romaji": "kirei",
+    "kana": "きれい",
+    "kanji": "綺麗",
+    "id": "cantik, bersih",
+    "pos": "adjective-na",
+    "src": "kosakata#ja_vocab_01491"
+   },
+   {
+    "romaji": "genki",
+    "kana": "げんき",
+    "kanji": "元気",
+    "id": "sehat, bersemangat",
+    "pos": "adjective-na",
+    "src": "kosakata#ja_vocab_01492"
+   },
+   {
+    "romaji": "byouki",
+    "kana": "びょうき",
+    "kanji": "病気",
+    "id": "sakit, penyakit",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01493"
+   },
+   {
+    "romaji": "hima",
+    "kana": "ひま",
+    "kanji": "暇",
+    "id": "senggang",
+    "pos": "adjective-na",
+    "src": "kosakata#ja_vocab_01494"
+   },
+   {
+    "romaji": "kantan",
+    "kana": "かんたん",
+    "kanji": "簡単",
+    "id": "mudah, sederhana",
+    "pos": "adjective-na",
+    "src": "kosakata#ja_vocab_01495"
+   },
+   {
+    "romaji": "taisetsu",
+    "kana": "たいせつ",
+    "kanji": "大切",
+    "id": "penting, berharga",
+    "pos": "adjective-na",
+    "src": "kosakata#ja_vocab_01496"
+   },
+   {
+    "romaji": "benri",
+    "kana": "べんり",
+    "kanji": "便利",
+    "id": "praktis",
+    "pos": "adjective-na",
+    "src": "kosakata#ja_vocab_01497"
+   },
+   {
+    "romaji": "fuben",
+    "kana": "ふべん",
+    "kanji": "不便",
+    "id": "tidak praktis",
+    "pos": "adjective-na",
+    "src": "kosakata#ja_vocab_01498"
+   },
+   {
+    "romaji": "kirai",
+    "kana": "きらい",
+    "kanji": "嫌い",
+    "id": "tidak suka",
+    "pos": "adjective-na",
+    "src": "kosakata#ja_vocab_01499"
+   },
+   {
+    "romaji": "jouzu",
+    "kana": "じょうず",
+    "kanji": "上手",
+    "id": "mahir",
+    "pos": "adjective-na",
+    "src": "kosakata#ja_vocab_01500"
+   },
+   {
+    "romaji": "heta",
+    "kana": "へた",
+    "kanji": "下手",
+    "id": "tidak mahir",
+    "pos": "adjective-na",
+    "src": "kosakata#ja_vocab_01501"
+   },
+   {
+    "romaji": "yuumei",
+    "kana": "ゆうめい",
+    "kanji": "有名",
+    "id": "terkenal",
+    "pos": "adjective-na",
+    "src": "kosakata#ja_vocab_01502"
+   },
+   {
+    "romaji": "shinsetsu",
+    "kana": "しんせつ",
+    "kanji": "親切",
+    "id": "ramah, baik hati",
+    "pos": "adjective-na",
+    "src": "kosakata#ja_vocab_01503"
+   },
+   {
+    "romaji": "kitanai",
+    "kana": "きたない",
+    "kanji": "汚い",
+    "id": "kotor",
+    "pos": "adjective-i",
+    "src": "kosakata#ja_vocab_01504"
+   },
+   {
+    "romaji": "tsuyoi",
+    "kana": "つよい",
+    "kanji": "強い",
+    "id": "kuat",
+    "pos": "adjective-i",
+    "src": "kosakata#ja_vocab_01505"
+   },
+   {
+    "romaji": "yowai",
+    "kana": "よわい",
+    "kanji": "弱い",
+    "id": "lemah",
+    "pos": "adjective-i",
+    "src": "kosakata#ja_vocab_01506"
+   },
+   {
+    "romaji": "nigai",
+    "kana": "にがい",
+    "kanji": "苦い",
+    "id": "pahit",
+    "pos": "adjective-i",
+    "src": "kosakata#ja_vocab_01507"
+   },
+   {
+    "romaji": "suppai",
+    "kana": "すっぱい",
+    "kanji": "酸っぱい",
+    "id": "asam",
+    "pos": "adjective-i",
+    "src": "kosakata#ja_vocab_01508"
+   },
+   {
+    "romaji": "marui",
+    "kana": "まるい",
+    "kanji": "丸い",
+    "id": "bulat",
+    "pos": "adjective-i",
+    "src": "kosakata#ja_vocab_01509"
+   },
+   {
+    "romaji": "kiiroi",
+    "kana": "きいろい",
+    "kanji": "黄色い",
+    "id": "kuning",
+    "pos": "adjective-i",
+    "src": "kosakata#ja_vocab_01510"
+   },
+   {
+    "romaji": "chairoi",
+    "kana": "ちゃいろい",
+    "kanji": "茶色い",
+    "id": "cokelat",
+    "pos": "adjective-i",
+    "src": "kosakata#ja_vocab_01511"
+   },
+   {
+    "romaji": "murasaki",
+    "kana": "むらさき",
+    "kanji": "紫",
+    "id": "ungu",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01512"
+   },
+   {
+    "romaji": "gakkou",
+    "kana": "がっこう",
+    "kanji": "学校",
+    "id": "sekolah",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01513"
+   },
+   {
+    "romaji": "daigaku",
+    "kana": "だいがく",
+    "kanji": "大学",
+    "id": "universitas",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01514"
+   },
+   {
+    "romaji": "toshokan",
+    "kana": "としょかん",
+    "kanji": "図書館",
+    "id": "perpustakaan",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01515"
+   },
+   {
+    "romaji": "shokudou",
+    "kana": "しょくどう",
+    "kanji": "食堂",
+    "id": "kantin",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01516"
+   },
+   {
+    "romaji": "jimusho",
+    "kana": "じむしょ",
+    "kanji": "事務所",
+    "id": "kantor",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01517"
+   },
+   {
+    "romaji": "mise",
+    "kana": "みせ",
+    "kanji": "店",
+    "id": "toko",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01518"
+   },
+   {
+    "romaji": "pan-ya",
+    "kana": "パンや",
+    "kanji": "パン屋",
+    "id": "toko roti",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01519"
+   },
+   {
+    "romaji": "hanaya",
+    "kana": "はなや",
+    "kanji": "花屋",
+    "id": "toko bunga",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01520"
+   },
+   {
+    "romaji": "yaoya",
+    "kana": "やおや",
+    "kanji": "八百屋",
+    "id": "toko sayur",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01521"
+   },
+   {
+    "romaji": "sakanaya",
+    "kana": "さかなや",
+    "kanji": "魚屋",
+    "id": "toko ikan",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01522"
+   },
+   {
+    "romaji": "kusuriya",
+    "kana": "くすりや",
+    "kanji": "薬屋",
+    "id": "apotek",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01523"
+   },
+   {
+    "romaji": "suupaa",
+    "kana": "スーパー",
+    "kanji": "スーパー",
+    "id": "swalayan",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01524"
+   },
+   {
+    "romaji": "kuukou",
+    "kana": "くうこう",
+    "kanji": "空港",
+    "id": "bandara",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01525"
+   },
+   {
+    "romaji": "minato",
+    "kana": "みなと",
+    "kanji": "港",
+    "id": "pelabuhan",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01526"
+   },
+   {
+    "romaji": "basutei",
+    "kana": "バスてい",
+    "kanji": "バス停",
+    "id": "halte bus",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01527"
+   },
+   {
+    "romaji": "kouban",
+    "kana": "こうばん",
+    "kanji": "交番",
+    "id": "pos polisi",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01528"
+   },
+   {
+    "romaji": "jinja",
+    "kana": "じんじゃ",
+    "kanji": "神社",
+    "id": "kuil Shinto",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01529"
+   },
+   {
+    "romaji": "otera",
+    "kana": "おてら",
+    "kanji": "お寺",
+    "id": "kuil Buddha",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01530"
+   },
+   {
+    "romaji": "mori",
+    "kana": "もり",
+    "kanji": "森",
+    "id": "hutan",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01531"
+   },
+   {
+    "romaji": "furo",
+    "kana": "ふろ",
+    "kanji": "風呂",
+    "id": "kamar mandi, bak mandi",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01532"
+   },
+   {
+    "romaji": "machi",
+    "kana": "まち",
+    "kanji": "町",
+    "id": "kota kecil",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01533"
+   },
+   {
+    "romaji": "mura",
+    "kana": "むら",
+    "kanji": "村",
+    "id": "desa",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01534"
+   },
+   {
+    "romaji": "shima",
+    "kana": "しま",
+    "kanji": "島",
+    "id": "pulau",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01535"
+   },
+   {
+    "romaji": "sora",
+    "kana": "そら",
+    "kanji": "空",
+    "id": "langit",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01536"
+   },
+   {
+    "romaji": "tsuki",
+    "kana": "つき",
+    "kanji": "月",
+    "id": "bulan",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01537"
+   },
+   {
+    "romaji": "taiyou",
+    "kana": "たいよう",
+    "kanji": "太陽",
+    "id": "matahari",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01538"
+   },
+   {
+    "romaji": "ame",
+    "kana": "あめ",
+    "kanji": "雨",
+    "id": "hujan",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01539"
+   },
+   {
+    "romaji": "kumo",
+    "kana": "くも",
+    "kanji": "雲",
+    "id": "awan",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01540"
+   },
+   {
+    "romaji": "tenki",
+    "kana": "てんき",
+    "kanji": "天気",
+    "id": "cuaca",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01541"
+   },
+   {
+    "romaji": "aki",
+    "kana": "あき",
+    "kanji": "秋",
+    "id": "musim gugur",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01542"
+   },
+   {
+    "romaji": "mizuumi",
+    "kana": "みずうみ",
+    "kanji": "湖",
+    "id": "danau",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01543"
+   },
+   {
+    "romaji": "agaru",
+    "kana": "あがる",
+    "kanji": "上がる",
+    "id": "naik",
+    "pos": "verb",
+    "src": "kosakata#ja_vocab_01544"
+   },
+   {
+    "romaji": "sagaru",
+    "kana": "さがる",
+    "kanji": "下がる",
+    "id": "turun",
+    "pos": "verb",
+    "src": "kosakata#ja_vocab_01545"
+   },
+   {
+    "romaji": "wakareru",
+    "kana": "わかれる",
+    "kanji": "別れる",
+    "id": "berpisah",
+    "pos": "verb",
+    "src": "kosakata#ja_vocab_01546"
+   },
+   {
+    "romaji": "kowasu",
+    "kana": "こわす",
+    "kanji": "壊す",
+    "id": "merusak",
+    "pos": "verb",
+    "src": "kosakata#ja_vocab_01547"
+   },
+   {
+    "romaji": "kureru",
+    "kana": "くれる",
+    "kanji": "くれる",
+    "id": "memberi (kepada saya)",
+    "pos": "verb",
+    "src": "kosakata#ja_vocab_01548"
+   },
+   {
+    "romaji": "kata",
+    "kana": "かた",
+    "kanji": "肩",
+    "id": "bahu",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01549"
+   },
+   {
+    "romaji": "yubi",
+    "kana": "ゆび",
+    "kanji": "指",
+    "id": "jari",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01550"
+   },
+   {
+    "romaji": "mune",
+    "kana": "むね",
+    "kanji": "胸",
+    "id": "dada",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01551"
+   },
+   {
+    "romaji": "karada",
+    "kana": "からだ",
+    "kanji": "体",
+    "id": "badan, tubuh",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01552"
+   },
+   {
+    "romaji": "hige",
+    "kana": "ひげ",
+    "kanji": "髭",
+    "id": "kumis, janggut",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01553"
+   },
+   {
+    "romaji": "namida",
+    "kana": "なみだ",
+    "kanji": "涙",
+    "id": "air mata",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01554"
+   },
+   {
+    "romaji": "koe",
+    "kana": "こえ",
+    "kanji": "声",
+    "id": "suara",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01555"
+   },
+   {
+    "romaji": "iro",
+    "kana": "いろ",
+    "kanji": "色",
+    "id": "warna",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01556"
+   },
+   {
+    "romaji": "katachi",
+    "kana": "かたち",
+    "kanji": "形",
+    "id": "bentuk",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01557"
+   },
+   {
+    "romaji": "oto",
+    "kana": "おと",
+    "kanji": "音",
+    "id": "bunyi",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01558"
+   },
+   {
+    "romaji": "nioi",
+    "kana": "におい",
+    "kanji": "匂い",
+    "id": "bau, aroma",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01559"
+   },
+   {
+    "romaji": "aji",
+    "kana": "あじ",
+    "kanji": "味",
+    "id": "rasa",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01560"
+   },
+   {
+    "romaji": "kimochi",
+    "kana": "きもち",
+    "kanji": "気持ち",
+    "id": "perasaan",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01561"
+   },
+   {
+    "romaji": "kokoro",
+    "kana": "こころ",
+    "kanji": "心",
+    "id": "hati",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01562"
+   },
+   {
+    "romaji": "chikara",
+    "kana": "ちから",
+    "kanji": "力",
+    "id": "tenaga, kekuatan",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01563"
+   },
+   {
+    "romaji": "yasumi",
+    "kana": "やすみ",
+    "kanji": "休み",
+    "id": "libur, istirahat",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01564"
+   },
+   {
+    "romaji": "shigoto",
+    "kana": "しごと",
+    "kanji": "仕事",
+    "id": "pekerjaan",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01565"
+   },
+   {
+    "romaji": "shiken",
+    "kana": "しけん",
+    "kanji": "試験",
+    "id": "ujian",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01566"
+   },
+   {
+    "romaji": "jugyou",
+    "kana": "じゅぎょう",
+    "kanji": "授業",
+    "id": "pelajaran, kelas",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01567"
+   },
+   {
+    "romaji": "seito",
+    "kana": "せいと",
+    "kanji": "生徒",
+    "id": "murid",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01568"
+   },
+   {
+    "romaji": "kyoukasho",
+    "kana": "きょうかしょ",
+    "kanji": "教科書",
+    "id": "buku pelajaran",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01569"
+   },
+   {
+    "romaji": "keshigomu",
+    "kana": "けしゴム",
+    "kanji": "消しゴム",
+    "id": "penghapus",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01570"
+   },
+   {
+    "romaji": "monogatari",
+    "kana": "ものがたり",
+    "kanji": "物語",
+    "id": "cerita",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01571"
+   },
+   {
+    "romaji": "shousetsu",
+    "kana": "しょうせつ",
+    "kanji": "小説",
+    "id": "novel",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01572"
+   },
+   {
+    "romaji": "hagaki",
+    "kana": "はがき",
+    "kanji": "葉書",
+    "id": "kartu pos",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01573"
+   },
+   {
+    "romaji": "fuutou",
+    "kana": "ふうとう",
+    "kanji": "封筒",
+    "id": "amplop",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01574"
+   },
+   {
+    "romaji": "juusho",
+    "kana": "じゅうしょ",
+    "kanji": "住所",
+    "id": "alamat",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01575"
+   },
+   {
+    "romaji": "denwabangou",
+    "kana": "でんわばんごう",
+    "kanji": "電話番号",
+    "id": "nomor telepon",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01576"
+   },
+   {
+    "romaji": "chizu",
+    "kana": "ちず",
+    "kanji": "地図",
+    "id": "peta",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01577"
+   },
+   {
+    "romaji": "shashin",
+    "kana": "しゃしん",
+    "kanji": "写真",
+    "id": "foto",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01578"
+   },
+   {
+    "romaji": "ongaku",
+    "kana": "おんがく",
+    "kanji": "音楽",
+    "id": "musik",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01579"
+   },
+   {
+    "romaji": "eiga",
+    "kana": "えいが",
+    "kanji": "映画",
+    "id": "film",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01580"
+   },
+   {
+    "romaji": "yakyuu",
+    "kana": "やきゅう",
+    "kanji": "野球",
+    "id": "bisbol",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01581"
+   },
+   {
+    "romaji": "suiei",
+    "kana": "すいえい",
+    "kanji": "水泳",
+    "id": "renang",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01582"
+   },
+   {
+    "romaji": "ryokou",
+    "kana": "りょこう",
+    "kanji": "旅行",
+    "id": "perjalanan",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01583"
+   },
+   {
+    "romaji": "kaimono",
+    "kana": "かいもの",
+    "kanji": "買い物",
+    "id": "belanja",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01584"
+   },
+   {
+    "romaji": "ryouri",
+    "kana": "りょうり",
+    "kanji": "料理",
+    "id": "masakan, memasak",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01585"
+   },
+   {
+    "romaji": "sentaku",
+    "kana": "せんたく",
+    "kanji": "洗濯",
+    "id": "mencuci pakaian",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01586"
+   },
+   {
+    "romaji": "sanpo",
+    "kana": "さんぽ",
+    "kanji": "散歩",
+    "id": "jalan-jalan",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01587"
+   },
+   {
+    "romaji": "shumi",
+    "kana": "しゅみ",
+    "kanji": "趣味",
+    "id": "hobi",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01588"
+   },
+   {
+    "romaji": "totemo",
+    "kana": "とても",
+    "kanji": "とても",
+    "id": "sangat",
+    "pos": "adverb",
+    "src": "kosakata#ja_vocab_01589"
+   },
+   {
+    "romaji": "amari",
+    "kana": "あまり",
+    "kanji": "あまり",
+    "id": "tidak begitu",
+    "pos": "adverb",
+    "src": "kosakata#ja_vocab_01590"
+   },
+   {
+    "romaji": "zutto",
+    "kana": "ずっと",
+    "kanji": "ずっと",
+    "id": "terus-menerus",
+    "pos": "adverb",
+    "src": "kosakata#ja_vocab_01591"
+   },
+   {
+    "romaji": "zenzen",
+    "kana": "ぜんぜん",
+    "kanji": "全然",
+    "id": "sama sekali tidak",
+    "pos": "adverb",
+    "src": "kosakata#ja_vocab_01592"
+   },
+   {
+    "romaji": "tabun",
+    "kana": "たぶん",
+    "kanji": "多分",
+    "id": "mungkin",
+    "pos": "adverb",
+    "src": "kosakata#ja_vocab_01593"
+   },
+   {
+    "romaji": "kitto",
+    "kana": "きっと",
+    "kanji": "きっと",
+    "id": "pasti",
+    "pos": "adverb",
+    "src": "kosakata#ja_vocab_01594"
+   },
+   {
+    "romaji": "issho",
+    "kana": "いっしょ",
+    "kanji": "一緒",
+    "id": "bersama",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01595"
+   },
+   {
+    "romaji": "dandan",
+    "kana": "だんだん",
+    "kanji": "段々",
+    "id": "lambat laun",
+    "pos": "adverb",
+    "src": "kosakata#ja_vocab_01596"
+   },
+   {
+    "romaji": "yukkuri",
+    "kana": "ゆっくり",
+    "kanji": "ゆっくり",
+    "id": "pelan-pelan",
+    "pos": "adverb",
+    "src": "kosakata#ja_vocab_01597"
+   },
+   {
+    "romaji": "hanbun",
+    "kana": "はんぶん",
+    "kanji": "半分",
+    "id": "setengah",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01598"
+   },
+   {
+    "romaji": "hotondo",
+    "kana": "ほとんど",
+    "kanji": "殆ど",
+    "id": "hampir semua",
+    "pos": "adverb",
+    "src": "kosakata#ja_vocab_01599"
+   },
+   {
+    "romaji": "taitei",
+    "kana": "たいてい",
+    "kanji": "大抵",
+    "id": "biasanya",
+    "pos": "adverb",
+    "src": "kosakata#ja_vocab_01600"
+   },
+   {
+    "romaji": "yoku",
+    "kana": "よく",
+    "kanji": "よく",
+    "id": "sering, dengan baik",
+    "pos": "adverb",
+    "src": "kosakata#ja_vocab_01601"
+   },
+   {
+    "romaji": "sorekara",
+    "kana": "それから",
+    "kanji": "それから",
+    "id": "lalu, setelah itu",
+    "pos": "conjunction",
+    "src": "kosakata#ja_vocab_01602"
+   },
+   {
+    "romaji": "soshite",
+    "kana": "そして",
+    "kanji": "そして",
+    "id": "dan, lalu",
+    "pos": "conjunction",
+    "src": "kosakata#ja_vocab_01603"
+   },
+   {
+    "romaji": "demo",
+    "kana": "でも",
+    "kanji": "でも",
+    "id": "tetapi",
+    "pos": "conjunction",
+    "src": "kosakata#ja_vocab_01604"
+   },
+   {
+    "romaji": "shikashi",
+    "kana": "しかし",
+    "kanji": "しかし",
+    "id": "akan tetapi",
+    "pos": "conjunction",
+    "src": "kosakata#ja_vocab_01605"
+   },
+   {
+    "romaji": "dakara",
+    "kana": "だから",
+    "kanji": "だから",
+    "id": "karena itu",
+    "pos": "conjunction",
+    "src": "kosakata#ja_vocab_01606"
+   },
+   {
+    "romaji": "mazu",
+    "kana": "まず",
+    "kanji": "まず",
+    "id": "pertama-tama",
+    "pos": "adverb",
+    "src": "kosakata#ja_vocab_01607"
+   },
+   {
+    "romaji": "daijoubu",
+    "kana": "だいじょうぶ",
+    "kanji": "大丈夫",
+    "id": "tidak apa-apa",
+    "pos": "adjective-na",
+    "src": "kosakata#ja_vocab_01608"
+   },
+   {
+    "romaji": "zannen",
+    "kana": "ざんねん",
+    "kanji": "残念",
+    "id": "sayang sekali",
+    "pos": "adjective-na",
+    "src": "kosakata#ja_vocab_01609"
+   },
+   {
+    "romaji": "arigatou",
+    "kana": "ありがとう",
+    "kanji": "ありがとう",
+    "id": "terima kasih",
+    "pos": "phrase",
+    "src": "kosakata#ja_vocab_01610"
+   },
+   {
+    "romaji": "konnichiwa",
+    "kana": "こんにちは",
+    "kanji": "こんにちは",
+    "id": "selamat siang",
+    "pos": "phrase",
+    "src": "kosakata#ja_vocab_01611"
+   },
+   {
+    "romaji": "ohayou",
+    "kana": "おはよう",
+    "kanji": "おはよう",
+    "id": "selamat pagi",
+    "pos": "phrase",
+    "src": "kosakata#ja_vocab_01612"
+   },
+   {
+    "romaji": "konbanwa",
+    "kana": "こんばんは",
+    "kanji": "こんばんは",
+    "id": "selamat malam",
+    "pos": "phrase",
+    "src": "kosakata#ja_vocab_01613"
+   },
+   {
+    "romaji": "sayounara",
+    "kana": "さようなら",
+    "kanji": "さようなら",
+    "id": "selamat tinggal",
+    "pos": "phrase",
+    "src": "kosakata#ja_vocab_01614"
+   },
+   {
+    "romaji": "oyasumi",
+    "kana": "おやすみ",
+    "kanji": "おやすみ",
+    "id": "selamat tidur",
+    "pos": "phrase",
+    "src": "kosakata#ja_vocab_01615"
+   },
+   {
+    "romaji": "onegai",
+    "kana": "おねがい",
+    "kanji": "お願い",
+    "id": "permohonan",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01616"
+   },
+   {
+    "romaji": "uwagi",
+    "kana": "うわぎ",
+    "kanji": "上着",
+    "id": "jaket",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01617"
+   },
+   {
+    "romaji": "kooto",
+    "kana": "コート",
+    "kanji": "コート",
+    "id": "mantel",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01618"
+   },
+   {
+    "romaji": "kutsushita",
+    "kana": "くつした",
+    "kanji": "靴下",
+    "id": "kaus kaki",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01619"
+   },
+   {
+    "romaji": "tebukuro",
+    "kana": "てぶくろ",
+    "kanji": "手袋",
+    "id": "sarung tangan",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01620"
+   },
+   {
+    "romaji": "yubiwa",
+    "kana": "ゆびわ",
+    "kanji": "指輪",
+    "id": "cincin",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01621"
+   },
+   {
+    "romaji": "sekken",
+    "kana": "せっけん",
+    "kanji": "石鹸",
+    "id": "sabun",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01622"
+   },
+   {
+    "romaji": "haburashi",
+    "kana": "はブラシ",
+    "kanji": "歯ブラシ",
+    "id": "sikat gigi",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01623"
+   },
+   {
+    "romaji": "kushi",
+    "kana": "くし",
+    "kanji": "櫛",
+    "id": "sisir",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01624"
+   },
+   {
+    "romaji": "kagami",
+    "kana": "かがみ",
+    "kanji": "鏡",
+    "id": "cermin",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01625"
+   },
+   {
+    "romaji": "chawan",
+    "kana": "ちゃわん",
+    "kanji": "茶碗",
+    "id": "mangkuk nasi",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01626"
+   },
+   {
+    "romaji": "fooku",
+    "kana": "フォーク",
+    "kanji": "フォーク",
+    "id": "garpu",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01627"
+   },
+   {
+    "romaji": "nabe",
+    "kana": "なべ",
+    "kanji": "鍋",
+    "id": "panci",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01628"
+   },
+   {
+    "romaji": "yakan",
+    "kana": "やかん",
+    "kanji": "薬缶",
+    "id": "ceret",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01629"
+   },
+   {
+    "romaji": "tana",
+    "kana": "たな",
+    "kanji": "棚",
+    "id": "rak",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01630"
+   },
+   {
+    "romaji": "hondana",
+    "kana": "ほんだな",
+    "kanji": "本棚",
+    "id": "rak buku",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01631"
+   },
+   {
+    "romaji": "hikidashi",
+    "kana": "ひきだし",
+    "kanji": "引き出し",
+    "id": "laci",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01632"
+   },
+   {
+    "romaji": "futon",
+    "kana": "ふとん",
+    "kanji": "布団",
+    "id": "futon, kasur",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01633"
+   },
+   {
+    "romaji": "makura",
+    "kana": "まくら",
+    "kanji": "枕",
+    "id": "bantal",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01634"
+   },
+   {
+    "romaji": "moufu",
+    "kana": "もうふ",
+    "kanji": "毛布",
+    "id": "selimut",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01635"
+   },
+   {
+    "romaji": "tatami",
+    "kana": "たたみ",
+    "kanji": "畳",
+    "id": "tatami",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01636"
+   },
+   {
+    "romaji": "kagu",
+    "kana": "かぐ",
+    "kanji": "家具",
+    "id": "perabot",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01637"
+   },
+   {
+    "romaji": "tori",
+    "kana": "とり",
+    "kanji": "鳥",
+    "id": "burung",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01638"
+   },
+   {
+    "romaji": "mushi",
+    "kana": "むし",
+    "kanji": "虫",
+    "id": "serangga",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01639"
+   },
+   {
+    "romaji": "uma",
+    "kana": "うま",
+    "kanji": "馬",
+    "id": "kuda",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01640"
+   },
+   {
+    "romaji": "ushi",
+    "kana": "うし",
+    "kanji": "牛",
+    "id": "sapi",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01641"
+   },
+   {
+    "romaji": "buta",
+    "kana": "ぶた",
+    "kanji": "豚",
+    "id": "babi",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01642"
+   },
+   {
+    "romaji": "hitsuji",
+    "kana": "ひつじ",
+    "kanji": "羊",
+    "id": "domba",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01643"
+   },
+   {
+    "romaji": "kuma",
+    "kana": "くま",
+    "kanji": "熊",
+    "id": "beruang",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01644"
+   },
+   {
+    "romaji": "zou",
+    "kana": "ぞう",
+    "kanji": "象",
+    "id": "gajah",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01645"
+   },
+   {
+    "romaji": "tora",
+    "kana": "とら",
+    "kanji": "虎",
+    "id": "harimau",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01646"
+   },
+   {
+    "romaji": "usagi",
+    "kana": "うさぎ",
+    "kanji": "兎",
+    "id": "kelinci",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01647"
+   },
+   {
+    "romaji": "nezumi",
+    "kana": "ねずみ",
+    "kanji": "鼠",
+    "id": "tikus",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01648"
+   },
+   {
+    "romaji": "kame",
+    "kana": "かめ",
+    "kanji": "亀",
+    "id": "kura-kura",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01649"
+   },
+   {
+    "romaji": "hebi",
+    "kana": "へび",
+    "kanji": "蛇",
+    "id": "ular",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01650"
+   },
+   {
+    "romaji": "chou",
+    "kana": "ちょう",
+    "kanji": "蝶",
+    "id": "kupu-kupu",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01651"
+   },
+   {
+    "romaji": "ari",
+    "kana": "あり",
+    "kanji": "蟻",
+    "id": "semut",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01652"
+   },
+   {
+    "romaji": "kusa",
+    "kana": "くさ",
+    "kanji": "草",
+    "id": "rumput",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01653"
+   },
+   {
+    "romaji": "happa",
+    "kana": "はっぱ",
+    "kanji": "葉っぱ",
+    "id": "daun",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01654"
+   },
+   {
+    "romaji": "tane",
+    "kana": "たね",
+    "kanji": "種",
+    "id": "biji",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01655"
+   },
+   {
+    "romaji": "eda",
+    "kana": "えだ",
+    "kanji": "枝",
+    "id": "ranting",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01656"
+   },
+   {
+    "romaji": "ume",
+    "kana": "うめ",
+    "kanji": "梅",
+    "id": "bunga plum",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01657"
+   },
+   {
+    "romaji": "take",
+    "kana": "たけ",
+    "kanji": "竹",
+    "id": "bambu",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01658"
+   },
+   {
+    "romaji": "kome",
+    "kana": "こめ",
+    "kanji": "米",
+    "id": "beras",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01659"
+   },
+   {
+    "romaji": "imo",
+    "kana": "いも",
+    "kanji": "芋",
+    "id": "ubi",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01660"
+   },
+   {
+    "romaji": "ninjin",
+    "kana": "にんじん",
+    "kanji": "人参",
+    "id": "wortel",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01661"
+   },
+   {
+    "romaji": "tamanegi",
+    "kana": "たまねぎ",
+    "kanji": "玉葱",
+    "id": "bawang bombai",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01662"
+   },
+   {
+    "romaji": "jagaimo",
+    "kana": "じゃがいも",
+    "kanji": "じゃが芋",
+    "id": "kentang",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01663"
+   },
+   {
+    "romaji": "daikon",
+    "kana": "だいこん",
+    "kanji": "大根",
+    "id": "lobak",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01664"
+   },
+   {
+    "romaji": "nasu",
+    "kana": "なす",
+    "kanji": "茄子",
+    "id": "terung",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01665"
+   },
+   {
+    "romaji": "kyuuri",
+    "kana": "きゅうり",
+    "kanji": "胡瓜",
+    "id": "mentimun",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01666"
+   },
+   {
+    "romaji": "kabocha",
+    "kana": "かぼちゃ",
+    "kanji": "南瓜",
+    "id": "labu",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01667"
+   },
+   {
+    "romaji": "ichigo",
+    "kana": "いちご",
+    "kanji": "苺",
+    "id": "stroberi",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01668"
+   },
+   {
+    "romaji": "budou",
+    "kana": "ぶどう",
+    "kanji": "葡萄",
+    "id": "anggur",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01669"
+   },
+   {
+    "romaji": "momo",
+    "kana": "もも",
+    "kanji": "桃",
+    "id": "persik",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01670"
+   },
+   {
+    "romaji": "nashi",
+    "kana": "なし",
+    "kanji": "梨",
+    "id": "pir",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01671"
+   },
+   {
+    "romaji": "remon",
+    "kana": "レモン",
+    "kanji": "レモン",
+    "id": "lemon",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01672"
+   },
+   {
+    "romaji": "suika",
+    "kana": "すいか",
+    "kanji": "西瓜",
+    "id": "semangka",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01673"
+   },
+   {
+    "romaji": "meron",
+    "kana": "メロン",
+    "kanji": "メロン",
+    "id": "melon",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01674"
+   },
+   {
+    "romaji": "kippu",
+    "kana": "きっぷ",
+    "kanji": "切符",
+    "id": "karcis",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01675"
+   },
+   {
+    "romaji": "noriba",
+    "kana": "のりば",
+    "kanji": "乗り場",
+    "id": "tempat naik",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01676"
+   },
+   {
+    "romaji": "shuppatsu",
+    "kana": "しゅっぱつ",
+    "kanji": "出発",
+    "id": "keberangkatan",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01677"
+   },
+   {
+    "romaji": "touchaku",
+    "kana": "とうちゃく",
+    "kanji": "到着",
+    "id": "kedatangan",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01678"
+   },
+   {
+    "romaji": "ryoukin",
+    "kana": "りょうきん",
+    "kanji": "料金",
+    "id": "biaya, tarif",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01679"
+   },
+   {
+    "romaji": "satsu",
+    "kana": "さつ",
+    "kanji": "札",
+    "id": "uang kertas",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01680"
+   },
+   {
+    "romaji": "kouka",
+    "kana": "こうか",
+    "kanji": "硬貨",
+    "id": "uang logam",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01681"
+   },
+   {
+    "romaji": "otsuri",
+    "kana": "おつり",
+    "kanji": "お釣り",
+    "id": "uang kembalian",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01682"
+   },
+   {
+    "romaji": "zeikin",
+    "kana": "ぜいきん",
+    "kanji": "税金",
+    "id": "pajak",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01683"
+   },
+   {
+    "romaji": "genkin",
+    "kana": "げんきん",
+    "kanji": "現金",
+    "id": "uang tunai",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01684"
+   },
+   {
+    "romaji": "reshiito",
+    "kana": "レシート",
+    "kanji": "レシート",
+    "id": "struk",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01685"
+   },
+   {
+    "romaji": "fukuro",
+    "kana": "ふくろ",
+    "kanji": "袋",
+    "id": "kantong",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01686"
+   },
+   {
+    "romaji": "hako",
+    "kana": "はこ",
+    "kanji": "箱",
+    "id": "kotak",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01687"
+   },
+   {
+    "romaji": "hanataba",
+    "kana": "はなたば",
+    "kanji": "花束",
+    "id": "buket bunga",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01688"
+   },
+   {
+    "romaji": "kaigi",
+    "kana": "かいぎ",
+    "kanji": "会議",
+    "id": "rapat",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01689"
+   },
+   {
+    "romaji": "jikan",
+    "kana": "じかん",
+    "kanji": "時間",
+    "id": "waktu",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01690"
+   },
+   {
+    "romaji": "yotei",
+    "kana": "よてい",
+    "kanji": "予定",
+    "id": "rencana",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01691"
+   },
+   {
+    "romaji": "yoyaku",
+    "kana": "よやく",
+    "kanji": "予約",
+    "id": "reservasi",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01692"
+   },
+   {
+    "romaji": "junbi",
+    "kana": "じゅんび",
+    "kanji": "準備",
+    "id": "persiapan",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01693"
+   },
+   {
+    "romaji": "setsumei",
+    "kana": "せつめい",
+    "kanji": "説明",
+    "id": "penjelasan",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01694"
+   },
+   {
+    "romaji": "shitsumon",
+    "kana": "しつもん",
+    "kanji": "質問",
+    "id": "pertanyaan",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01695"
+   },
+   {
+    "romaji": "kotae",
+    "kana": "こたえ",
+    "kanji": "答え",
+    "id": "jawaban",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01696"
+   },
+   {
+    "romaji": "imi",
+    "kana": "いみ",
+    "kanji": "意味",
+    "id": "arti, makna",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01697"
+   },
+   {
+    "romaji": "riyuu",
+    "kana": "りゆう",
+    "kanji": "理由",
+    "id": "alasan",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01698"
+   },
+   {
+    "romaji": "houhou",
+    "kana": "ほうほう",
+    "kanji": "方法",
+    "id": "cara, metode",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01699"
+   },
+   {
+    "romaji": "kekka",
+    "kana": "けっか",
+    "kanji": "結果",
+    "id": "hasil",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01700"
+   },
+   {
+    "romaji": "mondai",
+    "kana": "もんだい",
+    "kanji": "問題",
+    "id": "masalah, soal",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01701"
+   },
+   {
+    "romaji": "hanashi",
+    "kana": "はなし",
+    "kanji": "話",
+    "id": "cerita, pembicaraan",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01702"
+   },
+   {
+    "romaji": "soudan",
+    "kana": "そうだん",
+    "kanji": "相談",
+    "id": "konsultasi",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01703"
+   },
+   {
+    "romaji": "renraku",
+    "kana": "れんらく",
+    "kanji": "連絡",
+    "id": "kontak, kabar",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01704"
+   },
+   {
+    "romaji": "soba",
+    "kana": "そば",
+    "kanji": "側",
+    "id": "dekat, samping",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01705"
+   },
+   {
+    "romaji": "mawari",
+    "kana": "まわり",
+    "kanji": "周り",
+    "id": "sekeliling",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01706"
+   },
+   {
+    "romaji": "mannaka",
+    "kana": "まんなか",
+    "kanji": "真ん中",
+    "id": "tengah-tengah",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01707"
+   },
+   {
+    "romaji": "mukou",
+    "kana": "むこう",
+    "kanji": "向こう",
+    "id": "seberang",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01708"
+   },
+   {
+    "romaji": "sumi",
+    "kana": "すみ",
+    "kanji": "隅",
+    "id": "sudut, pojok",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01709"
+   },
+   {
+    "romaji": "tooku",
+    "kana": "とおく",
+    "kanji": "遠く",
+    "id": "jauh",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01710"
+   },
+   {
+    "romaji": "kochira",
+    "kana": "こちら",
+    "kanji": "こちら",
+    "id": "sini, ini (sopan)",
+    "pos": "pronoun",
+    "src": "kosakata#ja_vocab_01711"
+   },
+   {
+    "romaji": "sochira",
+    "kana": "そちら",
+    "kanji": "そちら",
+    "id": "situ, itu (sopan)",
+    "pos": "pronoun",
+    "src": "kosakata#ja_vocab_01712"
+   },
+   {
+    "romaji": "massugu",
+    "kana": "まっすぐ",
+    "kanji": "真っ直ぐ",
+    "id": "lurus",
+    "pos": "adverb",
+    "src": "kosakata#ja_vocab_01713"
+   },
+   {
+    "romaji": "kado",
+    "kana": "かど",
+    "kanji": "角",
+    "id": "sudut jalan",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01714"
+   },
+   {
+    "romaji": "kousaten",
+    "kana": "こうさてん",
+    "kanji": "交差点",
+    "id": "persimpangan",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01715"
+   },
+   {
+    "romaji": "shingou",
+    "kana": "しんごう",
+    "kanji": "信号",
+    "id": "lampu lalu lintas",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01716"
+   },
+   {
+    "romaji": "kaidan",
+    "kana": "かいだん",
+    "kanji": "階段",
+    "id": "tangga",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01717"
+   },
+   {
+    "romaji": "iriguchi",
+    "kana": "いりぐち",
+    "kanji": "入口",
+    "id": "pintu masuk",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01718"
+   },
+   {
+    "romaji": "deguchi",
+    "kana": "でぐち",
+    "kanji": "出口",
+    "id": "pintu keluar",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01719"
+   },
+   {
+    "romaji": "uketsuke",
+    "kana": "うけつけ",
+    "kanji": "受付",
+    "id": "resepsionis",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01720"
+   },
+   {
+    "romaji": "madoguchi",
+    "kana": "まどぐち",
+    "kanji": "窓口",
+    "id": "loket",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01721"
+   },
+   {
+    "romaji": "rouka",
+    "kana": "ろうか",
+    "kanji": "廊下",
+    "id": "koridor",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01722"
+   },
+   {
+    "romaji": "okujou",
+    "kana": "おくじょう",
+    "kanji": "屋上",
+    "id": "atap gedung",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01723"
+   },
+   {
+    "romaji": "chika",
+    "kana": "ちか",
+    "kanji": "地下",
+    "id": "bawah tanah",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01724"
+   },
+   {
+    "romaji": "ikkai",
+    "kana": "いっかい",
+    "kanji": "一階",
+    "id": "lantai satu",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01725"
+   },
+   {
+    "romaji": "nikai",
+    "kana": "にかい",
+    "kanji": "二階",
+    "id": "lantai dua",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01726"
+   },
+   {
+    "romaji": "itai",
+    "kana": "いたい",
+    "kanji": "痛い",
+    "id": "sakit, nyeri",
+    "pos": "adjective-i",
+    "src": "kosakata#ja_vocab_01727"
+   },
+   {
+    "romaji": "nurui",
+    "kana": "ぬるい",
+    "kanji": "温い",
+    "id": "suam-suam kuku",
+    "pos": "adjective-i",
+    "src": "kosakata#ja_vocab_01728"
+   },
+   {
+    "romaji": "katai",
+    "kana": "かたい",
+    "kanji": "固い",
+    "id": "keras",
+    "pos": "adjective-i",
+    "src": "kosakata#ja_vocab_01729"
+   },
+   {
+    "romaji": "yawarakai",
+    "kana": "やわらかい",
+    "kanji": "柔らかい",
+    "id": "lembut",
+    "pos": "adjective-i",
+    "src": "kosakata#ja_vocab_01730"
+   },
+   {
+    "romaji": "fukai",
+    "kana": "ふかい",
+    "kanji": "深い",
+    "id": "dalam",
+    "pos": "adjective-i",
+    "src": "kosakata#ja_vocab_01731"
+   },
+   {
+    "romaji": "asai",
+    "kana": "あさい",
+    "kanji": "浅い",
+    "id": "dangkal",
+    "pos": "adjective-i",
+    "src": "kosakata#ja_vocab_01732"
+   },
+   {
+    "romaji": "urusai",
+    "kana": "うるさい",
+    "kanji": "煩い",
+    "id": "berisik",
+    "pos": "adjective-i",
+    "src": "kosakata#ja_vocab_01733"
+   },
+   {
+    "romaji": "anzen",
+    "kana": "あんぜん",
+    "kanji": "安全",
+    "id": "aman",
+    "pos": "adjective-na",
+    "src": "kosakata#ja_vocab_01734"
+   },
+   {
+    "romaji": "kowai",
+    "kana": "こわい",
+    "kanji": "怖い",
+    "id": "menakutkan",
+    "pos": "adjective-i",
+    "src": "kosakata#ja_vocab_01735"
+   },
+   {
+    "romaji": "hazukashii",
+    "kana": "はずかしい",
+    "kanji": "恥ずかしい",
+    "id": "malu",
+    "pos": "adjective-i",
+    "src": "kosakata#ja_vocab_01736"
+   },
+   {
+    "romaji": "natsukashii",
+    "kana": "なつかしい",
+    "kanji": "懐かしい",
+    "id": "membuat rindu",
+    "pos": "adjective-i",
+    "src": "kosakata#ja_vocab_01737"
+   },
+   {
+    "romaji": "mendou",
+    "kana": "めんどう",
+    "kanji": "面倒",
+    "id": "merepotkan",
+    "pos": "adjective-na",
+    "src": "kosakata#ja_vocab_01738"
+   },
+   {
+    "romaji": "shitsurei",
+    "kana": "しつれい",
+    "kanji": "失礼",
+    "id": "tidak sopan",
+    "pos": "adjective-na",
+    "src": "kosakata#ja_vocab_01739"
+   },
+   {
+    "romaji": "hitsuyou",
+    "kana": "ひつよう",
+    "kanji": "必要",
+    "id": "perlu",
+    "pos": "adjective-na",
+    "src": "kosakata#ja_vocab_01740"
+   },
+   {
+    "romaji": "juuyou",
+    "kana": "じゅうよう",
+    "kanji": "重要",
+    "id": "penting",
+    "pos": "adjective-na",
+    "src": "kosakata#ja_vocab_01741"
+   },
+   {
+    "romaji": "tokubetsu",
+    "kana": "とくべつ",
+    "kanji": "特別",
+    "id": "khusus",
+    "pos": "adjective-na",
+    "src": "kosakata#ja_vocab_01742"
+   },
+   {
+    "romaji": "hen",
+    "kana": "へん",
+    "kanji": "変",
+    "id": "aneh",
+    "pos": "adjective-na",
+    "src": "kosakata#ja_vocab_01743"
+   },
+   {
+    "romaji": "okashii",
+    "kana": "おかしい",
+    "kanji": "可笑しい",
+    "id": "lucu, aneh",
+    "pos": "adjective-i",
+    "src": "kosakata#ja_vocab_01744"
+   },
+   {
+    "romaji": "rippa",
+    "kana": "りっぱ",
+    "kanji": "立派",
+    "id": "megah, hebat",
+    "pos": "adjective-na",
+    "src": "kosakata#ja_vocab_01745"
+   },
+   {
+    "romaji": "majime",
+    "kana": "まじめ",
+    "kanji": "真面目",
+    "id": "serius, rajin",
+    "pos": "adjective-na",
+    "src": "kosakata#ja_vocab_01746"
+   },
+   {
+    "romaji": "shoujiki",
+    "kana": "しょうじき",
+    "kanji": "正直",
+    "id": "jujur",
+    "pos": "adjective-na",
+    "src": "kosakata#ja_vocab_01747"
+   },
+   {
+    "romaji": "tsuzuku",
+    "kana": "つづく",
+    "kanji": "続く",
+    "id": "berlanjut",
+    "pos": "verb",
+    "src": "kosakata#ja_vocab_01748"
+   },
+   {
+    "romaji": "renshuu",
+    "kana": "れんしゅう",
+    "kanji": "練習",
+    "id": "latihan",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01749"
+   },
+   {
+    "romaji": "shokuji",
+    "kana": "しょくじ",
+    "kanji": "食事",
+    "id": "makan, santapan",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01750"
+   },
+   {
+    "romaji": "unten",
+    "kana": "うんてん",
+    "kanji": "運転",
+    "id": "mengemudi",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01751"
+   },
+   {
+    "romaji": "shinpai",
+    "kana": "しんぱい",
+    "kanji": "心配",
+    "id": "khawatir",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01752"
+   },
+   {
+    "romaji": "anshin",
+    "kana": "あんしん",
+    "kanji": "安心",
+    "id": "lega",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01753"
+   },
+   {
+    "romaji": "gaman",
+    "kana": "がまん",
+    "kanji": "我慢",
+    "id": "menahan diri",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01754"
+   },
+   {
+    "romaji": "doryoku",
+    "kana": "どりょく",
+    "kanji": "努力",
+    "id": "usaha",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01755"
+   },
+   {
+    "romaji": "seikou",
+    "kana": "せいこう",
+    "kanji": "成功",
+    "id": "keberhasilan",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01756"
+   },
+   {
+    "romaji": "shippai",
+    "kana": "しっぱい",
+    "kanji": "失敗",
+    "id": "kegagalan",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01757"
+   },
+   {
+    "romaji": "kansha",
+    "kana": "かんしゃ",
+    "kanji": "感謝",
+    "id": "rasa terima kasih",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01758"
+   },
+   {
+    "romaji": "pasokon",
+    "kana": "パソコン",
+    "kanji": "パソコン",
+    "id": "komputer",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01759"
+   },
+   {
+    "romaji": "keitai",
+    "kana": "けいたい",
+    "kanji": "携帯",
+    "id": "ponsel",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01760"
+   },
+   {
+    "romaji": "meeru",
+    "kana": "メール",
+    "kanji": "メール",
+    "id": "surel",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01761"
+   },
+   {
+    "romaji": "intaanetto",
+    "kana": "インターネット",
+    "kanji": "インターネット",
+    "id": "internet",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01762"
+   },
+   {
+    "romaji": "bangumi",
+    "kana": "ばんぐみ",
+    "kanji": "番組",
+    "id": "acara siaran",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01763"
+   },
+   {
+    "romaji": "kiji",
+    "kana": "きじ",
+    "kanji": "記事",
+    "id": "artikel",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01764"
+   },
+   {
+    "romaji": "denchi",
+    "kana": "でんち",
+    "kanji": "電池",
+    "id": "baterai",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01765"
+   },
+   {
+    "romaji": "dougu",
+    "kana": "どうぐ",
+    "kanji": "道具",
+    "id": "alat",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01766"
+   },
+   {
+    "romaji": "hasami",
+    "kana": "はさみ",
+    "kanji": "鋏",
+    "id": "gunting",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01767"
+   },
+   {
+    "romaji": "nori",
+    "kana": "のり",
+    "kanji": "糊",
+    "id": "lem",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01768"
+   },
+   {
+    "romaji": "kokuban",
+    "kana": "こくばん",
+    "kanji": "黒板",
+    "id": "papan tulis",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01769"
+   },
+   {
+    "romaji": "kabin",
+    "kana": "かびん",
+    "kanji": "花瓶",
+    "id": "vas bunga",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01770"
+   },
+   {
+    "romaji": "ningyou",
+    "kana": "にんぎょう",
+    "kanji": "人形",
+    "id": "boneka",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01771"
+   },
+   {
+    "romaji": "omocha",
+    "kana": "おもちゃ",
+    "kanji": "玩具",
+    "id": "mainan",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01772"
+   },
+   {
+    "romaji": "gomi",
+    "kana": "ごみ",
+    "kanji": "塵",
+    "id": "sampah",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01773"
+   },
+   {
+    "romaji": "gomibako",
+    "kana": "ごみばこ",
+    "kanji": "ごみ箱",
+    "id": "tempat sampah",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01774"
+   },
+   {
+    "romaji": "yuka",
+    "kana": "ゆか",
+    "kanji": "床",
+    "id": "lantai",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01775"
+   },
+   {
+    "romaji": "yane",
+    "kana": "やね",
+    "kanji": "屋根",
+    "id": "atap",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01776"
+   },
+   {
+    "romaji": "denkyuu",
+    "kana": "でんきゅう",
+    "kanji": "電球",
+    "id": "bohlam",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01777"
+   },
+   {
+    "romaji": "suidou",
+    "kana": "すいどう",
+    "kanji": "水道",
+    "id": "air ledeng",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01778"
+   },
+   {
+    "romaji": "koori",
+    "kana": "こおり",
+    "kanji": "氷",
+    "id": "es",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01779"
+   },
+   {
+    "romaji": "oyu",
+    "kana": "おゆ",
+    "kanji": "お湯",
+    "id": "air panas",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01780"
+   },
+   {
+    "romaji": "netsu",
+    "kana": "ねつ",
+    "kanji": "熱",
+    "id": "demam",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01781"
+   },
+   {
+    "romaji": "chuusha",
+    "kana": "ちゅうしゃ",
+    "kanji": "注射",
+    "id": "suntikan",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01782"
+   },
+   {
+    "romaji": "tanjoubi",
+    "kana": "たんじょうび",
+    "kanji": "誕生日",
+    "id": "hari ulang tahun",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01783"
+   },
+   {
+    "romaji": "kekkon",
+    "kana": "けっこん",
+    "kanji": "結婚",
+    "id": "pernikahan",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01784"
+   },
+   {
+    "romaji": "shinseki",
+    "kana": "しんせき",
+    "kanji": "親戚",
+    "id": "kerabat",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01785"
+   },
+   {
+    "romaji": "shiai",
+    "kana": "しあい",
+    "kanji": "試合",
+    "id": "pertandingan",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01786"
+   },
+   {
+    "romaji": "matsuri",
+    "kana": "まつり",
+    "kanji": "祭り",
+    "id": "festival",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01787"
+   },
+   {
+    "romaji": "hanabi",
+    "kana": "はなび",
+    "kanji": "花火",
+    "id": "kembang api",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01788"
+   },
+   {
+    "romaji": "ensoku",
+    "kana": "えんそく",
+    "kanji": "遠足",
+    "id": "karyawisata",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01789"
+   },
+   {
+    "romaji": "sotsugyou",
+    "kana": "そつぎょう",
+    "kanji": "卒業",
+    "id": "kelulusan",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01790"
+   },
+   {
+    "romaji": "nyuugaku",
+    "kana": "にゅうがく",
+    "kanji": "入学",
+    "id": "masuk sekolah",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01791"
+   },
+   {
+    "romaji": "repooto",
+    "kana": "レポート",
+    "kanji": "レポート",
+    "id": "laporan",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01792"
+   },
+   {
+    "romaji": "happyou",
+    "kana": "はっぴょう",
+    "kanji": "発表",
+    "id": "presentasi",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01793"
+   },
+   {
+    "romaji": "supiichi",
+    "kana": "スピーチ",
+    "kanji": "スピーチ",
+    "id": "pidato",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01794"
+   },
+   {
+    "romaji": "kaiwa",
+    "kana": "かいわ",
+    "kanji": "会話",
+    "id": "percakapan",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01795"
+   },
+   {
+    "romaji": "hatsuon",
+    "kana": "はつおん",
+    "kanji": "発音",
+    "id": "pelafalan",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01796"
+   },
+   {
+    "romaji": "tango",
+    "kana": "たんご",
+    "kanji": "単語",
+    "id": "kosakata",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01797"
+   },
+   {
+    "romaji": "bunpou",
+    "kana": "ぶんぽう",
+    "kanji": "文法",
+    "id": "tata bahasa",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01798"
+   },
+   {
+    "romaji": "kanji",
+    "kana": "かんじ",
+    "kanji": "漢字",
+    "id": "huruf kanji",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01799"
+   },
+   {
+    "romaji": "hiragana",
+    "kana": "ひらがな",
+    "kanji": "平仮名",
+    "id": "huruf hiragana",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01800"
+   },
+   {
+    "romaji": "katakana",
+    "kana": "カタカナ",
+    "kanji": "片仮名",
+    "id": "huruf katakana",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01801"
+   },
+   {
+    "romaji": "honyaku",
+    "kana": "ほんやく",
+    "kanji": "翻訳",
+    "id": "terjemahan",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01802"
+   },
+   {
+    "romaji": "seikai",
+    "kana": "せいかい",
+    "kanji": "正解",
+    "id": "jawaban benar",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01803"
+   },
+   {
+    "romaji": "machigai",
+    "kana": "まちがい",
+    "kanji": "間違い",
+    "id": "kesalahan",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01804"
+   },
+   {
+    "romaji": "tensuu",
+    "kana": "てんすう",
+    "kanji": "点数",
+    "id": "nilai, skor",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01805"
+   },
+   {
+    "romaji": "seiseki",
+    "kana": "せいせき",
+    "kanji": "成績",
+    "id": "prestasi, nilai rapor",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01806"
+   },
+   {
+    "romaji": "menkyo",
+    "kana": "めんきょ",
+    "kanji": "免許",
+    "id": "surat izin",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01807"
+   },
+   {
+    "romaji": "kokuseki",
+    "kana": "こくせき",
+    "kanji": "国籍",
+    "id": "kewarganegaraan",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01808"
+   },
+   {
+    "romaji": "gaikoku",
+    "kana": "がいこく",
+    "kanji": "外国",
+    "id": "luar negeri",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01809"
+   },
+   {
+    "romaji": "gaikokujin",
+    "kana": "がいこくじん",
+    "kanji": "外国人",
+    "id": "orang asing",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01810"
+   },
+   {
+    "romaji": "eigo",
+    "kana": "えいご",
+    "kanji": "英語",
+    "id": "bahasa Inggris",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01811"
+   },
+   {
+    "romaji": "kisetsu",
+    "kana": "きせつ",
+    "kanji": "季節",
+    "id": "musim",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01812"
+   },
+   {
+    "romaji": "kion",
+    "kana": "きおん",
+    "kanji": "気温",
+    "id": "suhu udara",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01813"
+   },
+   {
+    "romaji": "taifuu",
+    "kana": "たいふう",
+    "kanji": "台風",
+    "id": "topan",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01814"
+   },
+   {
+    "romaji": "jishin",
+    "kana": "じしん",
+    "kanji": "地震",
+    "id": "gempa bumi",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01815"
+   },
+   {
+    "romaji": "kaminari",
+    "kana": "かみなり",
+    "kanji": "雷",
+    "id": "petir",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01816"
+   },
+   {
+    "romaji": "kiri",
+    "kana": "きり",
+    "kanji": "霧",
+    "id": "kabut",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01817"
+   },
+   {
+    "romaji": "hare",
+    "kana": "はれ",
+    "kanji": "晴れ",
+    "id": "cerah",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01818"
+   },
+   {
+    "romaji": "kumori",
+    "kana": "くもり",
+    "kanji": "曇り",
+    "id": "berawan",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01819"
+   },
+   {
+    "romaji": "mushiatsui",
+    "kana": "むしあつい",
+    "kanji": "蒸し暑い",
+    "id": "panas lembap",
+    "pos": "adjective-i",
+    "src": "kosakata#ja_vocab_01820"
+   },
+   {
+    "romaji": "ondo",
+    "kana": "おんど",
+    "kanji": "温度",
+    "id": "suhu",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01821"
+   },
+   {
+    "romaji": "tenkiyohou",
+    "kana": "てんきよほう",
+    "kanji": "天気予報",
+    "id": "ramalan cuaca",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01822"
+   },
+   {
+    "romaji": "asahi",
+    "kana": "あさひ",
+    "kanji": "朝日",
+    "id": "matahari pagi",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01823"
+   },
+   {
+    "romaji": "yuuhi",
+    "kana": "ゆうひ",
+    "kanji": "夕日",
+    "id": "matahari senja",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01824"
+   },
+   {
+    "romaji": "hikari",
+    "kana": "ひかり",
+    "kanji": "光",
+    "id": "cahaya",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01825"
+   },
+   {
+    "romaji": "kage",
+    "kana": "かげ",
+    "kanji": "影",
+    "id": "bayangan",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01826"
+   },
+   {
+    "romaji": "hoshizora",
+    "kana": "ほしぞら",
+    "kanji": "星空",
+    "id": "langit berbintang",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01827"
+   },
+   {
+    "romaji": "ryokan",
+    "kana": "りょかん",
+    "kanji": "旅館",
+    "id": "penginapan tradisional",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01828"
+   },
+   {
+    "romaji": "minshuku",
+    "kana": "みんしゅく",
+    "kanji": "民宿",
+    "id": "losmen keluarga",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01829"
+   },
+   {
+    "romaji": "nimotsu",
+    "kana": "にもつ",
+    "kanji": "荷物",
+    "id": "barang bawaan",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01830"
+   },
+   {
+    "romaji": "suutsukeesu",
+    "kana": "スーツケース",
+    "kanji": "スーツケース",
+    "id": "koper",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01831"
+   },
+   {
+    "romaji": "kankou",
+    "kana": "かんこう",
+    "kanji": "観光",
+    "id": "wisata",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01832"
+   },
+   {
+    "romaji": "kankoukyaku",
+    "kana": "かんこうきゃく",
+    "kanji": "観光客",
+    "id": "wisatawan",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01833"
+   },
+   {
+    "romaji": "annai",
+    "kana": "あんない",
+    "kanji": "案内",
+    "id": "panduan, mengantar",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01834"
+   },
+   {
+    "romaji": "bengoshi",
+    "kana": "べんごし",
+    "kanji": "弁護士",
+    "id": "pengacara",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01835"
+   },
+   {
+    "romaji": "kyaku",
+    "kana": "きゃく",
+    "kanji": "客",
+    "id": "tamu, pelanggan",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01836"
+   },
+   {
+    "romaji": "ten-in",
+    "kana": "てんいん",
+    "kanji": "店員",
+    "id": "pelayan toko",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01837"
+   },
+   {
+    "romaji": "untenshu",
+    "kana": "うんてんしゅ",
+    "kanji": "運転手",
+    "id": "sopir",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01838"
+   },
+   {
+    "romaji": "buchou",
+    "kana": "ぶちょう",
+    "kanji": "部長",
+    "id": "manajer",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01839"
+   },
+   {
+    "romaji": "koujou",
+    "kana": "こうじょう",
+    "kanji": "工場",
+    "id": "pabrik",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01840"
+   },
+   {
+    "romaji": "kuukan",
+    "kana": "くうかん",
+    "kanji": "空間",
+    "id": "ruang",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01841"
+   },
+   {
+    "romaji": "basho",
+    "kana": "ばしょ",
+    "kanji": "場所",
+    "id": "tempat",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01842"
+   },
+   {
+    "romaji": "shurui",
+    "kana": "しゅるい",
+    "kanji": "種類",
+    "id": "jenis",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01843"
+   },
+   {
+    "romaji": "bubun",
+    "kana": "ぶぶん",
+    "kanji": "部分",
+    "id": "bagian",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01844"
+   },
+   {
+    "romaji": "kazu",
+    "kana": "かず",
+    "kanji": "数",
+    "id": "angka, jumlah",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01845"
+   },
+   {
+    "romaji": "chigai",
+    "kana": "ちがい",
+    "kanji": "違い",
+    "id": "perbedaan",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01846"
+   },
+   {
+    "romaji": "tanin",
+    "kana": "たにん",
+    "kanji": "他人",
+    "id": "orang lain",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01847"
+   },
+   {
+    "romaji": "koto",
+    "kana": "こと",
+    "kanji": "事",
+    "id": "hal",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01848"
+   },
+   {
+    "romaji": "tokoro",
+    "kana": "ところ",
+    "kanji": "所",
+    "id": "tempat",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01849"
+   },
+   {
+    "romaji": "toki",
+    "kana": "とき",
+    "kanji": "時",
+    "id": "waktu, saat",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01850"
+   },
+   {
+    "romaji": "aida",
+    "kana": "あいだ",
+    "kanji": "間",
+    "id": "selama, antara",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01851"
+   },
+   {
+    "romaji": "koro",
+    "kana": "ころ",
+    "kanji": "頃",
+    "id": "sekitar (waktu)",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01852"
+   },
+   {
+    "romaji": "ue-no",
+    "kana": "うわさ",
+    "kanji": "噂",
+    "id": "kabar burung",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01853"
+   },
+   {
+    "romaji": "yotei-hyou",
+    "kana": "よていひょう",
+    "kanji": "予定表",
+    "id": "jadwal",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01854"
+   },
+   {
+    "romaji": "kaidan-shitsu",
+    "kana": "かいぎしつ",
+    "kanji": "会議室",
+    "id": "ruang rapat",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01855"
+   },
+   {
+    "romaji": "kyuukei",
+    "kana": "きゅうけい",
+    "kanji": "休憩",
+    "id": "istirahat",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01856"
+   },
+   {
+    "romaji": "tsugou",
+    "kana": "つごう",
+    "kanji": "都合",
+    "id": "keadaan, kesempatan",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01857"
+   },
+   {
+    "romaji": "sewa",
+    "kana": "せわ",
+    "kanji": "世話",
+    "id": "perawatan, bantuan",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01858"
+   },
+   {
+    "romaji": "shuukan",
+    "kana": "しゅうかん",
+    "kanji": "習慣",
+    "id": "kebiasaan",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01859"
+   },
+   {
+    "romaji": "bunka",
+    "kana": "ぶんか",
+    "kanji": "文化",
+    "id": "budaya",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01860"
+   },
+   {
+    "romaji": "rekishi",
+    "kana": "れきし",
+    "kanji": "歴史",
+    "id": "sejarah",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01861"
+   },
+   {
+    "romaji": "shakai",
+    "kana": "しゃかい",
+    "kanji": "社会",
+    "id": "masyarakat",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01862"
+   },
+   {
+    "romaji": "seikatsu",
+    "kana": "せいかつ",
+    "kanji": "生活",
+    "id": "kehidupan",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01863"
+   },
+   {
+    "romaji": "keiken",
+    "kana": "けいけん",
+    "kanji": "経験",
+    "id": "pengalaman",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01864"
+   },
+   {
+    "romaji": "kibou",
+    "kana": "きぼう",
+    "kanji": "希望",
+    "id": "harapan",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01865"
+   },
+   {
+    "romaji": "mokuhyou",
+    "kana": "もくひょう",
+    "kanji": "目標",
+    "id": "target",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01866"
+   },
+   {
+    "romaji": "chuui",
+    "kana": "ちゅうい",
+    "kanji": "注意",
+    "id": "perhatian, peringatan",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01867"
+   },
+   {
+    "romaji": "kiken",
+    "kana": "きけん",
+    "kanji": "危険",
+    "id": "bahaya",
+    "pos": "adjective-na",
+    "src": "kosakata#ja_vocab_01868"
+   },
+   {
+    "romaji": "jiko",
+    "kana": "じこ",
+    "kanji": "事故",
+    "id": "kecelakaan",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01869"
+   },
+   {
+    "romaji": "kaji",
+    "kana": "かじ",
+    "kanji": "火事",
+    "id": "kebakaran",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01870"
+   },
+   {
+    "romaji": "kega",
+    "kana": "けが",
+    "kanji": "怪我",
+    "id": "luka",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01871"
+   },
+   {
+    "romaji": "kusuriyubi",
+    "kana": "くすり",
+    "kanji": "薬",
+    "id": "obat",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01872"
+   },
+   {
+    "romaji": "nyuuin",
+    "kana": "にゅういん",
+    "kanji": "入院",
+    "id": "rawat inap",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01873"
+   },
+   {
+    "romaji": "taiin",
+    "kana": "たいいん",
+    "kanji": "退院",
+    "id": "keluar dari rumah sakit",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01874"
+   },
+   {
+    "romaji": "kenkou",
+    "kana": "けんこう",
+    "kanji": "健康",
+    "id": "kesehatan",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01875"
+   },
+   {
+    "romaji": "undou",
+    "kana": "うんどう",
+    "kanji": "運動",
+    "id": "olahraga",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01876"
+   },
+   {
+    "romaji": "akachan",
+    "kana": "あかちゃん",
+    "kanji": "赤ちゃん",
+    "id": "bayi",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01877"
+   },
+   {
+    "romaji": "futago",
+    "kana": "ふたご",
+    "kanji": "双子",
+    "id": "anak kembar",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01878"
+   },
+   {
+    "romaji": "mago",
+    "kana": "まご",
+    "kanji": "孫",
+    "id": "cucu",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01879"
+   },
+   {
+    "romaji": "oji",
+    "kana": "おじ",
+    "kanji": "叔父",
+    "id": "paman",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01880"
+   },
+   {
+    "romaji": "oba",
+    "kana": "おば",
+    "kanji": "叔母",
+    "id": "bibi",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01881"
+   },
+   {
+    "romaji": "itoko",
+    "kana": "いとこ",
+    "kanji": "従兄弟",
+    "id": "sepupu",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01882"
+   },
+   {
+    "romaji": "nikki",
+    "kana": "にっき",
+    "kanji": "日記",
+    "id": "buku harian",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01883"
+   },
+   {
+    "romaji": "shoukai",
+    "kana": "しょうかい",
+    "kanji": "紹介",
+    "id": "perkenalan",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01884"
+   },
+   {
+    "romaji": "odori",
+    "kana": "おどり",
+    "kanji": "踊り",
+    "id": "tarian",
+    "pos": "noun",
+    "src": "kosakata#ja_vocab_01885"
    }
   ],
   "N4": [
@@ -11760,5 +15877,6 @@
     "src": "katakerja#494"
    }
   ]
- }
+ },
+ "catatanJumlah": "862 + 549 + 514 = 1.925 baris di berkas asalnya, sedangkan berkas ini berisi 1.885 entri. Selisih 40 baris berasal dari normalisasi dua berkas owner (sebelum m025-312) dan ALASANNYA TIDAK TERCATAT — dicatat di sini supaya pembaca tidak menjumlahkan ketiganya lalu menyimpulkan 40 kata hilang diam-diam dari perluasan ini; perluasan m025-312 menyumbang 514 baris dan 514 entri, tanpa satu pun yang gugur."
 }
