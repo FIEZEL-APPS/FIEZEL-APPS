@@ -21,6 +21,18 @@
  *     tambalan yang membungkus tetangganya) dan Classroom harus bergantung pada grup suara.
  *  4. Semua berkas baru harus ikut di-precache service worker, atau peluncuran offline
  *     akan kehilangan bagian yang justru dipindahkan ke jalur malas.
+ *
+ * m025-314 — SATU PENGECUALIAN, DAN INI ALASANNYA YANG DITULIS PENUH.
+ * `<script type="application/ld+json">` BUKAN skrip. Peramban tidak pernah
+ * mengeksekusinya, tidak pernah menghentikan pengurai untuknya, dan isinya tidak bisa
+ * melempar ReferenceError — ia blok DATA yang dibaca crawler. Seluruh alasan yang
+ * ditulis di butir 2 dan di cek "splash cat-pertama" berbicara tentang skrip yang
+ * BERJALAN; menghitung blok data ke dalamnya membuat gerbang menolak structured data
+ * SEO tanpa satu pun bita perilaku berubah. Itu bukan penjagaan, itu salah alamat.
+ *
+ * Pengecualiannya sengaja dibuat SEMPIT dan berbayar: hanya type persis
+ * "application/ld+json", dan setiap blok yang dikecualikan WAJIB lolos JSON.parse.
+ * Blok yang isinya bukan JSON sah berarti ia bukan data — dan gerbang memerah.
  */
 const assert = require('assert');
 const fs = require('fs');
@@ -39,25 +51,6 @@ const app = fs.readFileSync('./app.js', 'utf8');
 // berkas, dan tanpa ini gate ini akan menghitung kalimat sebagai tag. Panjangnya dijaga
 // tetap sama (diganti spasi) supaya offset yang dipakai perbandingan posisi tidak bergeser.
 const scanHtml = html.replace(/<!--[\s\S]*?-->/g, c => ' '.repeat(c.length));
-/* NILAI `type=` DIBACA TOLERAN, dan itu penting DUA ARAH.
-   ------------------------------------------------------------------------------------
-   HTML mengizinkan tiga bentuk penulisan — type="x", type='x', dan type=x tanpa kutip —
-   dan mengizinkan parameter di belakangnya (type="text/javascript; charset=utf-8").
-   Pemadanan yang hanya mengenal satu bentuk salah ke DUA arah sekaligus:
-
-     - blok DATA berkutip tunggal (type='application/ld+json') terbaca sebagai type kosong
-       lalu dianggap EKSEKUTABEL — kebocoran yang justru baru saja ditutup, lahir kembali;
-     - skrip NYATA ber-parameter (type="text/javascript; charset=utf-8") tidak cocok dengan
-       daftar tipe yang ter-anchor, lalu dianggap DATA — gerbangnya berhenti menggigit
-       tepat pada berkas yang seharusnya ia tangkap.
-
-   Arah kedua yang lebih mahal: gerbang yang diam lebih buruk daripada gerbang yang cerewet.
-   Karena itu parameter dipotong di ';' dan pembandingannya huruf-kecil. */
-function scriptType(attrs) {
-  const m = /\stype\s*=\s*("([^"]*)"|'([^']*)'|([^\s"'>]+))/i.exec(String(attrs || ''));
-  const raw = m ? (m[2] !== undefined ? m[2] : m[3] !== undefined ? m[3] : m[4] || '') : '';
-  return raw.split(';')[0].trim().toLowerCase();
-}
 // Semua tag <script> dalam urutan dokumen, beserta atribut yang menentukan kapan ia jalan.
 const scripts = [];
 const scriptRe = /<script\b([^>]*)>/g;
@@ -71,40 +64,30 @@ while ((m = scriptRe.exec(scanHtml)) !== null) {
     inline: !src,
     async: /\sasync(\s|=|$)/.test(attrs),
     defer: /\sdefer(\s|=|$)/.test(attrs),
-    type: scriptType(attrs),
+    type: (/\stype="([^"]+)"/.exec(attrs) || [])[1] || '',
     group: (/\sdata-fiezel-lazy="([^"]+)"/.exec(attrs) || [])[1] || '',
     when: (/\sdata-fiezel-lazy-when="([^"]+)"/.exec(attrs) || [])[1] || '',
     needs: (/\sdata-fiezel-lazy-needs="([^"]+)"/.exec(attrs) || [])[1] || ''
   });
 }
 
-/* BLOK <script> BER-TYPE DATA BUKAN SKRIP, dan gerbang ini tidak boleh memperlakukannya
-   begitu.
-   ============================================================================
-   Peramban HANYA mengeksekusi <script> yang type-nya kosong atau salah satu tipe JavaScript.
-   Tipe lain — `application/ld+json` (JSON-LD Schema.org), `application/json`, `importmap`,
-   `text/template` — diurai sebagai DATA lalu diabaikan mesin skrip. Ia tidak pernah jalan,
-   jadi ia tidak bisa melempar ReferenceError, dan ia tidak menahan cat pertama.
+// Blok data structured-data dipisahkan dari skrip sungguhan (lihat catatan m025-314 di
+// kepala berkas). `dataBlocks` tetap diperiksa — pengecualiannya berbayar, bukan gratis.
+const dataBlocks = scripts.filter(s => s.type === 'application/ld+json');
+const kode = scripts.filter(s => s.type !== 'application/ld+json');
 
-   Keduanya persis yang dijaga dua aturan di bawah ("hanya skrip boot splash yang boleh
-   inline" dan "splash cat-pertama tetap yang pertama diurai"), jadi menghitung blok data ke
-   dalamnya membuat gerbang ini merah atas sesuatu yang tidak mungkin menimbulkan cacat yang
-   ia cari.
+const lazy = kode.filter(s => s.type === 'fiezel/lazy');
+const eager = kode.filter(s => s.src && s.type !== 'fiezel/lazy');
+const inline = kode.filter(s => s.inline);
 
-   Itu bukan hipotesis. Commit SEO c4e506d menambahkan satu blok JSON-LD di <head> — wajib
-   untuk Google Rich Results — dan gerbang ini langsung merah di `main` dengan dua kegagalan:
-   "ada 2 blok inline" (blok kedua itu JSON-LD) dan "splash harus diurai sebelum <script>
-   pertama" (yang "pertama" itu juga JSON-LD, di <head>, sebelum markup splash di <body>).
-   Sejak itu SETIAP PR terhadap main ikut merah, termasuk PR yang tidak menyentuh index.html.
-
-   Perbaikannya di gerbang, bukan di index.html: memindahkan atau membuang JSON-LD akan
-   membatalkan tujuan commit SEO itu demi menyenangkan sebuah tes. */
-const EXEC_TYPES = /^(module|text\/javascript|application\/javascript|application\/ecmascript|text\/ecmascript)$/i;
-const isExecutable = (s) => !s.type || EXEC_TYPES.test(s.type);
-
-const lazy = scripts.filter(s => s.type === 'fiezel/lazy');
-const eager = scripts.filter(s => s.src && s.type !== 'fiezel/lazy');
-const inline = scripts.filter(s => s.inline && isExecutable(s));
+test('blok application/ld+json benar-benar DATA - setiap satu lolos JSON.parse', () => {
+  for (const b of dataBlocks) {
+    const mulai = scanHtml.indexOf('>', b.at) + 1;
+    const isi = html.slice(mulai, html.indexOf('</script>', mulai));
+    assert.doesNotThrow(() => JSON.parse(isi),
+      'blok ld+json pada offset ' + b.at + ' bukan JSON sah - ia tidak berhak atas pengecualian skrip-data');
+  }
+});
 
 test('SDK Puter tidak dimuat sama sekali (Puter dihapus total)', () => {
   const puter = scripts.filter(s => /js\.puter\.com/.test(s.src));
@@ -231,13 +214,11 @@ test('berkas baru ikut di-precache service worker - peluncuran offline tetap utu
 
 test('splash cat-pertama tetap yang pertama diurai', () => {
   const splashAt = html.indexOf('id="fiezelBootSplash"');
-  /* Yang diukur adalah skrip pertama yang BISA JALAN. Blok data (JSON-LD SEO di <head>)
-     tidak dieksekusi dan tidak menahan cat, jadi memakai indexOf('<script') mentah akan
-     menyalahkan splash atas sesuatu yang tidak pernah menundanya. */
-  const firstExec = scripts.find(isExecutable);
-  const firstScriptAt = firstExec ? firstExec.at : html.length;
-  assert.ok(splashAt > 0 && splashAt < firstScriptAt,
-    'splash harus diurai sebelum <script> pertama yang dieksekusi - itu satu-satunya alasan ia tercat lebih dulu');
+  // Yang dijaga adalah skrip yang BERJALAN. Blok application/ld+json tidak dieksekusi
+  // peramban, jadi ia tidak pernah menahan cat pertama (lihat catatan m025-314 di kepala).
+  const firstCodeAt = kode.length ? kode[0].at : -1;
+  assert.ok(splashAt > 0 && firstCodeAt > 0 && splashAt < firstCodeAt,
+    'splash harus diurai sebelum <script> yang BERJALAN pertama - itu satu-satunya alasan ia tercat lebih dulu');
 });
 
 // --- perilaku pemuat, bukan sekadar bentuk dokumen -------------------------------------

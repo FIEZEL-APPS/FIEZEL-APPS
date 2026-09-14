@@ -175,27 +175,20 @@ test('splash ada di markup statis, BUKAN dibuat setelah boot selesai', () => {
     'index.html harus memuat splash frame-pertama dengan atribut adopsi');
 });
 
-test('splash berada di ATAS setiap <script> - inilah satu-satunya alasan ia tercat lebih dulu', () => {
+test('splash berada di ATAS setiap <script> yang berjalan - inilah satu-satunya alasan ia tercat lebih dulu', () => {
   const splashAt = html.indexOf('id="fiezelBootSplash"');
-  /* KELAS CACAT YANG SAMA dengan tests/boot-order-test.js, dan dipatahkan commit yang sama
-     (SEO c4e506d). indexOf('<script') mentah ikut menghitung blok ber-type DATA —
-     <script type="application/ld+json"> milik Schema.org di <head> — padahal peramban tidak
-     pernah mengeksekusinya dan ia tidak menahan cat satu milidetik pun. Yang dijaga aturan
-     ini adalah skrip pertama yang BISA JALAN; blok data bukan salah satunya. */
-  const EXEC_TYPES = /^(module|text\/javascript|application\/javascript|application\/ecmascript|text\/ecmascript)$/i;
-  const firstScriptAt = (function () {
+  // m025-314: `<script type="application/ld+json">` adalah blok DATA untuk crawler —
+  // peramban tidak pernah mengeksekusinya dan tidak pernah menahan pengurai untuknya,
+  // jadi ia tidak bisa menunda cat pertama. Yang dihitung di sini skrip yang BERJALAN.
+  // Alasan penuh dan syarat pengecualiannya ada di kepala tests/boot-order-test.js.
+  const firstScriptAt = (() => {
     const re = /<script\b([^>]*)>/g;
     let m;
     while ((m = re.exec(html)) !== null) {
-      /* Toleran terhadap kutip ganda/tunggal/tanpa kutip dan parameter ';charset=…' —
-         lihat alasan lengkapnya di scriptType() pada tests/boot-order-test.js. */
-      const tm = /\stype\s*=\s*("([^"]*)"|'([^']*)'|([^\s"'>]+))/i.exec(m[1]);
-      const type = (tm ? (tm[2] !== undefined ? tm[2] : tm[3] !== undefined ? tm[3] : tm[4] || '') : '')
-        .split(';')[0].trim().toLowerCase();
-      if (!type || EXEC_TYPES.test(type)) return m.index;
+      if (!/\stype="application\/ld\+json"/.test(m[1])) return m.index;
     }
     return -1;
-  }());
+  })();
   assert.ok(splashAt > 0 && firstScriptAt > 0, 'markup splash dan <script> harus ada');
   assert.ok(splashAt < firstScriptAt,
     'splash harus diurai sebelum <script> pertama; di belakangnya ia menunggu js.puter.com dan ~2,7 MB JSON');
