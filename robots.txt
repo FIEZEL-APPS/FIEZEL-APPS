@@ -1,30 +1,28 @@
-# robots.txt — FIEZEL (https://fiezel.my.id)
-# Izinkan semua crawler mengindeks halaman publik.
-# Halaman internal (backend, workers, tools) diblokir.
+# robots.txt AKAR REPO — dan yang penting justru ADA DI MANA ia berakhir.
+#
+# Berkas ini diterbitkan ke ~/public_html/app/ (lihat .cpanel.yml dan
+# .github/workflows/deploy-site.yml), jadi alamatnya https://fiezel.my.id/app/robots.txt.
+# Crawler TIDAK PERNAH membaca robots.txt dari subdirektori: satu-satunya berkas yang
+# mengikat untuk seluruh host adalah https://fiezel.my.id/robots.txt, dan itu berasal
+# dari website/robots.txt. Berkas ini INERT. Kalau kamu datang ke sini untuk membuka
+# blokir Googlebot atau mendaftarkan sitemap, tempatnya website/robots.txt.
+#
+# KENAPA IA TETAP ADA, DAN KENAPA ISINYA "Allow: /"
+# Sebelum m025-314 isinya `Disallow: /`. Selama ia hanya tersaji di /app/ itu tidak
+# berakibat apa pun — tetapi ia adalah ranjau: siapa pun yang suatu hari memindahkan
+# berkas akar ke root domain akan men-deindeks SELURUH situs dengan satu perintah yang
+# terlihat seperti bawaan. Keadaan yang aman-kalau-salah-pindah adalah mengizinkan,
+# bukan melarang, jadi itu yang ditulis di sini.
+#
+# YANG SENGAJA TIDAK ADA DI SINI: `Disallow: /*.js$` dan `Disallow: /*.json$`.
+# Keduanya sempat ditambahkan pada commit SEO c4e506d dan keduanya BERBAHAYA untuk
+# aplikasi ini: /app/ adalah SPA yang seluruh isinya dirender JavaScript, dan bank
+# soalnya .json. Memblokir .js/.json berarti meminta Googlebot merender halaman tanpa
+# berkas yang membuat halaman itu ada — hasilnya halaman kosong di indeks, bukan
+# halaman yang terlindungi. Dijaga tests/seo-surface-gate-test.js cek (F).
 
 User-agent: *
 Allow: /
-Disallow: /backend/
-Disallow: /workers/
-Disallow: /tools/
-Disallow: /node_modules/
-Disallow: /tests/
-Disallow: /analysis/
-Disallow: /coordination/
-Disallow: /deploy/
-Disallow: /memory/
-Disallow: /reports/
-Disallow: /audit/
-Disallow: /test_reports/
-Disallow: /*.json$
-Disallow: /*.js$
 
-# Izinkan crawler mengakses halaman utama & landing
-Allow: /index.html
-Allow: /landing.html
-Allow: /tentang.html
-Allow: /manifest.json
-Allow: /sitemap.xml
-
-# Sitemap
+# Sitemap yang MENGIKAT ada di root domain, bukan di sini.
 Sitemap: https://fiezel.my.id/sitemap.xml
