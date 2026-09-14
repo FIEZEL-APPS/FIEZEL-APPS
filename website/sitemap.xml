@@ -24,6 +24,27 @@
     <xhtml:link rel="alternate" hreflang="th" href="https://fiezel.my.id/th/"/>
     <xhtml:link rel="alternate" hreflang="x-default" href="https://fiezel.my.id/"/>
   </url>
+  <!-- SEO-05: halaman Tentang — halaman statis murni (tanpa JS) yang ditulis untuk
+       dirangkum Google AI Overview dan mesin jawaban lain. Pasangan id/th saling
+       menunjuk; keduanya BENAR-BENAR diterbitkan dari website/ ke root domain. -->
+  <url>
+    <loc>https://fiezel.my.id/tentang.html</loc>
+    <lastmod>2026-09-14</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+    <xhtml:link rel="alternate" hreflang="id" href="https://fiezel.my.id/tentang.html"/>
+    <xhtml:link rel="alternate" hreflang="th" href="https://fiezel.my.id/th/tentang.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://fiezel.my.id/tentang.html"/>
+  </url>
+  <url>
+    <loc>https://fiezel.my.id/th/tentang.html</loc>
+    <lastmod>2026-09-14</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="id" href="https://fiezel.my.id/tentang.html"/>
+    <xhtml:link rel="alternate" hreflang="th" href="https://fiezel.my.id/th/tentang.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://fiezel.my.id/tentang.html"/>
+  </url>
   <url>
     <loc>https://fiezel.my.id/app/</loc>
     <lastmod>2026-09-14</lastmod>

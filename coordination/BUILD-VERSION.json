@@ -1,7 +1,7 @@
 {
-  "version": "m025-314",
+  "version": "m025-315",
   "claimedBy": "branch claude/happy-albattani-fqfijv",
-  "claimedAt": "2026-09-14T13:35:11.445Z",
-  "reason": "audit UI/UX sumbu bahasa: penjaga rute + prompt AI ikut kursus",
+  "claimedAt": "2026-09-14T19:36:28.595Z",
+  "reason": "audit UI/UX sumbu bahasa: penjaga rute + prompt AI ikut kursus (rebase di atas m025-314)",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }

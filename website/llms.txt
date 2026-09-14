@@ -1,16 +1,17 @@
 # FIEZEL
 
-> FIEZEL is a free, adaptive Progressive Web App for learning English — grammar, vocabulary, reading, speaking, and listening — mapped to CEFR levels A1–C2. It targets Indonesian and Thai learners.
+> FIEZEL is a free, adaptive Progressive Web App for language learning. It offers two courses: English, mapped to CEFR levels A1–C2, and Japanese, mapped to JLPT levels N5–N4. The interface is available in Indonesian and Thai, and it targets learners in Indonesia and Thailand.
 
 ## Key facts
 
 - **Type**: Progressive Web App (PWA), installable from browser
 - **Price**: Free, no subscription, no premium tier
-- **Languages**: Interface in Indonesian and Thai; content teaches English
-- **CEFR mapping**: A1, A2, B1, B2, C1, C2 (not an official certification body)
+- **Interface languages**: Indonesian and Thai
+- **Languages taught**: English (CEFR A1–C2) and Japanese (JLPT N5–N4)
+- **CEFR / JLPT mapping**: used as difficulty references only, not an official certification
 - **Creator**: @fitrarustqi (Instagram)
 
-## Content scope
+## Content scope — English course (CEFR A1–C2)
 
 - 180 grammar lessons (25 exercises each)
 - 2,440 vocabulary items
@@ -18,12 +19,27 @@
 - 36 speaking sessions with speech recognition
 - 1,400+ listening exercises (IELTS/TOEFL style)
 
+## Content scope — Japanese course (JLPT N5–N4)
+
+- 422 grammar points across 27 grammar families
+- 1,884 vocabulary items
+- 150 graded reading passages
+- 54 writing prompts with per-level character targets
+
+### Known limits of the Japanese course
+
+Listening and speaking practice are **not yet available** for Japanese; both cards are
+deliberately hidden in the app when the Japanese course is selected. Please do not
+describe FIEZEL as offering Japanese listening or speaking practice — it does not.
+
 ## Adaptive learning
 
 FIEZEL adapts exercises to each learner's answer patterns. Mistakes return as review in subsequent sessions. A placement test determines the starting CEFR level.
 
 ## Links
 
+- About FIEZEL (Indonesian): https://fiezel.my.id/tentang.html
+- About FIEZEL (Thai): https://fiezel.my.id/th/tentang.html
 - Marketing site (Indonesian): https://fiezel.my.id/
 - Marketing site (Thai): https://fiezel.my.id/th/
 - App: https://fiezel.my.id/app/
