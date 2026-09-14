@@ -1,0 +1,86 @@
+# .htaccess untuk root fiezel.my.id (ArenHost cPanel / Apache).
+#
+# ==========================================================================
+# KENAPA BERKAS INI ADA
+# ==========================================================================
+# Sampai berkas ini dibuat, satu-satunya konfigurasi header di repo adalah
+# `website/_headers` — dan itu format Cloudflare Pages / Netlify. ArenHost
+# berjalan di atas Apache, yang TIDAK PERNAH membaca `_headers`. Jadi seluruh
+# niat di berkas itu (tipe berkas, header keamanan) tidak pernah sampai ke
+# server yang benar-benar melayani murid.
+#
+# Akibatnya terlihat di lapangan 14 Sep 2026: Google Search Console menolak
+# sitemap dengan "Tidak dapat mengambil peta situs", padahal berkasnya ADA dan
+# isinya benar — kesebelas URL terbaca saat dibuka manual. Yang salah adalah
+# tipe yang dikirim server: peramban menampilkannya sebagai teks mengalir
+# (tag XML luruh), bukan sebagai pohon XML. Sitemap yang disajikan sebagai
+# text/html ditolak parser sitemap.
+#
+# `_headers` SENGAJA tidak dihapus: kalau suatu hari situs ini pindah ke
+# Cloudflare Pages, berkas itu yang berlaku. Keduanya hidup berdampingan,
+# masing-masing untuk platformnya.
+#
+# ==========================================================================
+# ATURAN MENYUNTING BERKAS INI
+# ==========================================================================
+# .htaccess yang salah satu baris membuat SELURUH situs balas 500 — bukan satu
+# halaman, semuanya. Karena itu berkas ini sengaja dijaga MINIMAL, dan blok
+# yang bergantung pada modul Apache dibungkus <IfModule>: kalau modulnya tidak
+# ada di paket hosting, bloknya dilewati diam-diam alih-alih menjatuhkan situs.
+#
+# Direktif yang hanya ada di Apache 2.4 (Require, FilesMatch dengan Require)
+# TIDAK dipakai di sini: paket cPanel tidak selalu 2.4, dan kegagalannya bukan
+# "aturan diabaikan" melainkan 500 di seluruh domain.
+#
+# Sesudah menyunting, WAJIB dibuka manual: https://fiezel.my.id/ dan
+# https://fiezel.my.id/sitemap.xml. Jangan percaya "seharusnya jalan".
+
+# ==========================================================================
+# TIPE BERKAS — sebab langsung sitemap ditolak Google
+# ==========================================================================
+# Apache biasanya sudah tahu .xml, tetapi sebagian paket cPanel menimpanya
+# dengan handler yang mengirim text/html. Menyatakannya di sini membuat
+# perilakunya tidak lagi bergantung pada konfigurasi bawaan hosting.
+AddType application/xml .xml
+
+# GEO: llms.txt dan llms-full.txt dibaca crawler AI. Keduanya WAJIB text/plain;
+# disajikan sebagai octet-stream ia terunduh, bukan terbaca.
+AddType text/plain .txt
+
+# Play Store TWA: .well-known/assetlinks.json HARUS application/json. Kalau
+# cPanel mengirimnya sebagai text/plain, verifikasi Digital Asset Links gagal
+# dan aplikasi terpasang menampilkan bilah alamat peramban di atas layar —
+# gejala yang mudah disalahartikan sebagai bug aplikasi. Lihat
+# docs/PLAYSTORE-TWA-RUNBOOK.md langkah 6.
+AddType application/json .json
+
+# Charset eksplisit supaya aksara Thai di /th/ tidak bergantung tebakan peramban.
+AddDefaultCharset UTF-8
+
+# ==========================================================================
+# HEADER KEAMANAN — memindahkan niat _headers ke platform yang benar
+# ==========================================================================
+# Nilainya disalin apa adanya dari website/_headers supaya kedua berkas tidak
+# berselisih kalau situs ini suatu saat pindah platform.
+<IfModule mod_headers.c>
+  # Hormati tipe yang dinyatakan di atas; larang peramban menebak sendiri.
+  # Tanpa ini, satu berkas bertipe salah bisa diperlakukan sebagai hal lain.
+  Header always set X-Content-Type-Options "nosniff"
+  Header always set X-Frame-Options "SAMEORIGIN"
+  Header always set Referrer-Policy "strict-origin-when-cross-origin"
+</IfModule>
+
+# ==========================================================================
+# YANG SENGAJA TIDAK ADA DI SINI
+# ==========================================================================
+# 1. Kebijakan cache dari _headers TIDAK diporting. Aturan cache untuk /app/
+#    bersinggungan dengan service worker (sw.js punya strategi cache-first
+#    sendiri dengan SW_REV sebagai kunci), dan menyetel Cache-Control dari
+#    Apache tanpa memetakan interaksinya lebih dulu bisa membuat murid
+#    memegang cangkang lama tanpa jalan pulih. Itu pekerjaan tersendiri dengan
+#    pengujiannya sendiri, bukan tempelan di berkas ini.
+#
+# 2. Blokir berkas berawalan titik TIDAK ditambahkan. Apache sudah memblokir
+#    .ht* lewat konfigurasi bawaannya, dan repo ini tidak pernah mengunggah
+#    .git ke public_html — jadi aturan itu akan menjaga sesuatu yang memang
+#    tidak ada, dengan risiko sintaks yang nyata.
