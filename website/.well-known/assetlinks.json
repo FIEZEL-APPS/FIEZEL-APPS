@@ -1,0 +1,13 @@
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "id.my.fiezel.twa",
+      "sha256_cert_fingerprints": [
+        "ISI_SIDIK_JARI_UPLOAD_KEY_DI_SINI",
+        "ISI_SIDIK_JARI_PLAY_APP_SIGNING_DI_SINI"
+      ]
+    }
+  }
+]
