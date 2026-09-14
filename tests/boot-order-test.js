@@ -39,6 +39,25 @@ const app = fs.readFileSync('./app.js', 'utf8');
 // berkas, dan tanpa ini gate ini akan menghitung kalimat sebagai tag. Panjangnya dijaga
 // tetap sama (diganti spasi) supaya offset yang dipakai perbandingan posisi tidak bergeser.
 const scanHtml = html.replace(/<!--[\s\S]*?-->/g, c => ' '.repeat(c.length));
+/* NILAI `type=` DIBACA TOLERAN, dan itu penting DUA ARAH.
+   ------------------------------------------------------------------------------------
+   HTML mengizinkan tiga bentuk penulisan — type="x", type='x', dan type=x tanpa kutip —
+   dan mengizinkan parameter di belakangnya (type="text/javascript; charset=utf-8").
+   Pemadanan yang hanya mengenal satu bentuk salah ke DUA arah sekaligus:
+
+     - blok DATA berkutip tunggal (type='application/ld+json') terbaca sebagai type kosong
+       lalu dianggap EKSEKUTABEL — kebocoran yang justru baru saja ditutup, lahir kembali;
+     - skrip NYATA ber-parameter (type="text/javascript; charset=utf-8") tidak cocok dengan
+       daftar tipe yang ter-anchor, lalu dianggap DATA — gerbangnya berhenti menggigit
+       tepat pada berkas yang seharusnya ia tangkap.
+
+   Arah kedua yang lebih mahal: gerbang yang diam lebih buruk daripada gerbang yang cerewet.
+   Karena itu parameter dipotong di ';' dan pembandingannya huruf-kecil. */
+function scriptType(attrs) {
+  const m = /\stype\s*=\s*("([^"]*)"|'([^']*)'|([^\s"'>]+))/i.exec(String(attrs || ''));
+  const raw = m ? (m[2] !== undefined ? m[2] : m[3] !== undefined ? m[3] : m[4] || '') : '';
+  return raw.split(';')[0].trim().toLowerCase();
+}
 // Semua tag <script> dalam urutan dokumen, beserta atribut yang menentukan kapan ia jalan.
 const scripts = [];
 const scriptRe = /<script\b([^>]*)>/g;
@@ -52,7 +71,7 @@ while ((m = scriptRe.exec(scanHtml)) !== null) {
     inline: !src,
     async: /\sasync(\s|=|$)/.test(attrs),
     defer: /\sdefer(\s|=|$)/.test(attrs),
-    type: (/\stype="([^"]+)"/.exec(attrs) || [])[1] || '',
+    type: scriptType(attrs),
     group: (/\sdata-fiezel-lazy="([^"]+)"/.exec(attrs) || [])[1] || '',
     when: (/\sdata-fiezel-lazy-when="([^"]+)"/.exec(attrs) || [])[1] || '',
     needs: (/\sdata-fiezel-lazy-needs="([^"]+)"/.exec(attrs) || [])[1] || ''
