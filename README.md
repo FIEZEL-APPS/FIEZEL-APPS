@@ -1,71 +1,100 @@
-# FIEZEL 5.19.0
+# FIEZEL
 
-FIEZEL adalah Personal English OS. Build 5.19.0 mengintegrasikan **Speaking + Listening Skills Lab**, **Core Brain adaptif**, dan jalur **local neural voice** yang tetap menjaga privasi, biaya runtime nol, serta kompatibilitas state lama.
+**Personal English OS** — aplikasi belajar bahasa Inggris adaptif berbasis PWA.
+Grammar, kosakata, reading, speaking, dan listening dipetakan ke CEFR A1–C2.
+Gratis, tanpa langganan, tanpa akun.
 
-Handoff berikutnya memakai master prompt v2.0 dan roadmap berbasis gerbang bukti. Baca `docs/handoffs/FIEZEL-5.18.0-NEXT-HANDOFF-MASTER-PROMPT.md` bersama `docs/FIEZEL-PRODUCT-ROADMAP-2026-2027.md`. GitHub dan archive wajib direkonsiliasi sebelum promosi bila version surfaces berbeda.
+🌐 [fiezel.my.id](https://fiezel.my.id/) · 🚀 [Buka Aplikasi](https://fiezel.my.id/app/) · 🇹🇭 [ภาษาไทย](https://fiezel.my.id/th/)
 
-## Struktur repo
+---
 
-Sampai m025-253 akar repo memuat 498 berkas terlacak: aplikasi, 243 gerbang uji, dan 129
-dokumen handoff bercampur dalam satu daftar. m025-254 memisahkannya — akar kini hanya berisi
-apa yang benar-benar dijalankan atau disajikan aplikasi.
+## Konten
+
+| Skill | Jumlah | Detail |
+| --- | --- | --- |
+| Grammar | 180 lesson × 25 soal | A1: 17 · A2: 29 · B1: 52 · B2: 39 · C1: 24 · C2: 19 |
+| Vocabulary | 2.440 entri | Bertingkat mengikuti CEFR |
+| Reading | 312 passage / 1.560 soal | Bacaan berjenjang A1–C2 |
+| Listening | 1.407 item bank + 36 latihan | Bergaya IELTS & TOEFL |
+| Speaking | 36 sesi | Dengan pengenalan suara browser |
+
+## Fitur utama
+
+- **Belajar adaptif** — soal menyesuaikan pola jawaban, bukan urutan tetap. Kesalahan kembali sebagai review di sesi berikutnya.
+- **Tes penempatan CEFR** — 25 soal menentukan level awal (A1–C2).
+- **Progressive Web App** — dipasang ke Home Screen dari browser, bekerja offline setelah terpasang.
+- **Suara neural lokal** — Kokoro.js + ONNX Runtime Web/WASM, ~119 MB diunduh sekali. Sebelum siap, memakai browser Speech Synthesis.
+- **Tanpa akun** — progres tersimpan lokal di perangkat. Tidak ada API key vendor, paid inference, atau subscription.
+- **Dua bahasa antarmuka** — Indonesia dan Thai. Sistem i18n registry-based (`FiezelI18n.t()`).
+- **PAW** — maskot kucing geometris dengan 14 ekspresi interaktif yang bereaksi terhadap pola belajar.
+- **Tutor AI** — penjelasan kontekstual dalam sesi belajar.
+- **KelasKu untuk Guru** — dashboard analitik kelas dengan briefing otomatis.
+
+## Arsitektur
+
+```
+fiezel.my.id/app/     ← PWA (index.html + app.js + sw.js)
+fiezel.my.id/         ← Marketing site (website/)
+api.fiezel.my.id      ← Cloudflare Worker (workers/api/)
+```
 
 | Tempat | Isinya |
 | --- | --- |
-| akar | shell aplikasi (`index.html`, `app.js`, `style.css`, `sw.js`), konfigurasi, bank data JSON, dan skrip rilis yang dipanggil CI (`validator.js`, `*-audit.js`, `release-audit.py`) |
-| `tests/` | seluruh gerbang mutu (`*-test.js`, `*-selftest.js`). Jalankan dari akar repo: `node tests/<nama>-test.js` |
-| `features/` | modul fitur yang dimuat `index.html` dan di-precache `sw.js` |
-| `tools/` | perkakas rilis dan pemeliharaan; `tools/dev/` untuk harness sekali pakai dan probe |
-| `docs/` | dokumen arsitektur, kontrak, runbook; `docs/handoffs/` untuk seluruh handoff milestone |
-| `reports/` | laporan audit dan berkas bukti (evidence, red-proof, checkpoint) |
-| `workers/`, `deploy/` | Cloudflare Worker dan berkas penyebaran |
+| akar | Shell aplikasi (`index.html`, `app.js`, `style.css`, `sw.js`), konfigurasi (`core-config.js`), bank data JSON |
+| `features/` | 33 modul fitur yang dimuat shell dan di-precache `sw.js` |
+| `tests/` | 278 gerbang mutu. Jalankan dari akar: `node tests/<nama>-test.js` |
+| `website/` | Situs marketing (id + th), sitemap, robots.txt, llms.txt |
+| `workers/` | Cloudflare Worker (api, owner) |
+| `deploy/` | Konfigurasi dan skrip deploy edge |
+| `docs/` | Arsitektur, kontrak, runbook; `docs/handoffs/` untuk handoff milestone |
+| `reports/` | Laporan audit dan evidence |
+| `tools/` | Perkakas rilis; `tools/dev/` untuk harness sekali pakai |
+| `design/` | Aset desain dan brief redesign |
 
-Gerbang di `tests/` membaca berkas produksi lewat `__fzRoot` (alias `path.join(__dirname, '..')`),
-jadi maknanya sama persis seperti saat berkas itu masih di akar. Jalankan gerbang dari akar repo.
+## Versi & build
 
-## Fitur 5.18
+| Penanda | Nilai |
+| --- | --- |
+| `FIEZEL_PAGE_BUILD` | `m025-313` |
+| `SW_REV` | `m025-313-paw-kembali-20260913` |
+| Grammar schema | `2.0.0` |
+| Practice blueprint | `focused-25-v1` |
+| Core protocol | `1.7` |
 
-- 36 latihan Listening dan 36 latihan Speaking, masing-masing mencakup A1–C2.
-- State sidecar terpisah di `fiezel-sl-v1-state`; raw audio, transcript, dan jawaban dictation tidak disimpan.
-- Listening tidak dapat dinilai sebelum audio benar-benar berhasil diputar.
-- Skor Speaking mengukur target-language coverage, bukan pronunciation atau kualitas fonem.
-- Kokoro.js 1.2.1 dan model q8 berjalan lokal melalui ONNX Runtime Web/WASM.
-- Model neural sekitar 119 MB hanya diunduh setelah tombol **Siapkan suara offline** ditekan. Sebelum siap, FIEZEL memakai browser Speech Synthesis.
-- Tidak ada API key vendor, paid inference, subscription, atau remote inference.
+Ketiga penanda build (`core-config.js`, `fiezel-diag-panel.js`, `sw.js`) harus dinaikkan bersamaan.
 
-## Baseline content
-
-- Vocabulary: 2.440 entri (+605 wave-2, +70 C1 kurasi gen2 non-duplikat).
-- Grammar: 248 template / 179 lesson unik (gen2 +26 subskill baru; wave-2 +69 varian latihan) × 25 mode.
-- Reading: 312 passages / 1.560 questions.
-- Cloze: 209 item (gen2 +25, wave-2 +61) + alternates (cloze-alternates-v1.json).
-- Listening: 1.407 item bank + 36 latihan Skills Lab.
-- Speaking: 36 item.
-- Grammar schema: `2.0.0`.
-- Practice blueprint: `focused-25-v1`.
-- Core protocol: `1.7`.
-- Shadow/Canary release config: OFF.
-
-## Quality commands
+## Quality gate
 
 ```bash
-node validator.js
+# Gerbang utama
 node tests/regression-test.js
-node content-audit.js
-node product-audit.js
-node grammar-quality-audit.js
-node tests/speaking-listening-test.js
-node neural-voice-test.js
-node neural-voice-http-test.js
-node tests/pwa-cache-test.js
 node tests/http-smoke-test.js
-python3 release-audit.py
+node tests/a11y-test.js
+node tests/pwa-cache-test.js
+node tests/pwa-release-coherence-test.js
+node tests/th-coverage-test.js
+
+# Semua gerbang (lihat .github/workflows/quality.yml)
+# CI menjalankan 278 gerbang pada setiap PR
 ```
 
 Aplikasi harus dijalankan melalui HTTP/HTTPS, bukan `file://`.
 
-## Release boundary
+## SEO / AEO / GEO
 
-Automated source, schema, content, privacy, PWA, asset-hash, HTTP, dan regression gates lulus. **Real-device neural voice promotion masih pending**: cold start, peak memory, latency, offline synthesis, audio unlock, interruption, dan network trace harus dibuktikan pada perangkat target sebelum build ini disebut production-ready.
+Situs marketing dilengkapi:
+- **SEO**: JSON-LD structured data (8 schema per halaman), canonical, hreflang, Open Graph, Twitter Cards, sitemap dengan priority/lastmod
+- **AEO**: FAQPage, HowTo, SpeakableSpecification untuk voice search
+- **GEO**: `llms.txt` + `llms-full.txt` untuk AI crawler, robots.txt mengizinkan 12 AI agent (GPTBot, ClaudeBot, PerplexityBot, dll.)
 
-External Puter deployment, scheduler/VAPID, live canary/promotion, real production evidence origin, production rehearsal, dan canonical adoption produksi juga tidak dianggap LIVE hanya karena source capability tersedia.
+## Instalasi
+
+| Platform | Cara |
+| --- | --- |
+| Android (Chrome) | Menu ⋮ → "Instal aplikasi" |
+| iPhone (Safari) | Bagikan → "Tambah ke Layar Utama" |
+| Desktop (Chrome/Edge) | Ikon install di address bar |
+
+## Lisensi & kredit
+
+Dibuat oleh [@fitrarustqi](https://instagram.com/fitrarustqi).
