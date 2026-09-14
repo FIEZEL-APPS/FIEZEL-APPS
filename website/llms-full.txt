@@ -1,0 +1,112 @@
+# FIEZEL — Full Description for AI Systems
+
+> FIEZEL ("Personal English OS") is a free, adaptive Progressive Web App for learning English. It covers grammar, vocabulary, reading, speaking, and listening across CEFR levels A1–C2. It primarily serves Indonesian and Thai learners.
+
+## Identity
+
+- **Name**: FIEZEL
+- **Full name**: FIEZEL Personal English OS
+- **Type**: Progressive Web App (installable from browser, works offline)
+- **Price**: Completely free — no subscription, no premium tier, no paywalled features
+- **Creator**: @fitrarustqi on Instagram
+- **Source**: https://github.com/fiezel-apps/FIEZEL-APPS
+- **Primary URL**: https://fiezel.my.id/
+- **App URL**: https://fiezel.my.id/app/
+
+## Target audience
+
+Indonesian and Thai learners of English, from absolute beginner (A1) to advanced (C2). The app interface is available in Indonesian and Thai. No account is required — learners start immediately.
+
+## Content inventory
+
+### Grammar
+180 lessons organized by CEFR level:
+- A1: 17 lessons
+- A2: 29 lessons
+- B1: 52 lessons
+- B2: 39 lessons
+- C1: 24 lessons
+- C2: 19 lessons
+Each lesson contains 25 focused exercises.
+
+### Vocabulary
+2,440 vocabulary items organized by CEFR level, with contextual exercises.
+
+### Reading
+312 graded reading passages with 1,560 comprehension questions, leveled from A1 to C2.
+
+### Speaking
+36 speaking sessions using the browser's speech recognition API.
+
+### Listening
+1,400+ listening exercises in IELTS and TOEFL style. Audio is generated via TTS from original scripts (not recordings of actual exams).
+
+## Adaptive learning system
+
+FIEZEL's core feature is adaptive learning:
+1. A placement test (25 questions) maps the learner to a CEFR level (A1–C2).
+2. Exercises adjust to the learner's answer patterns — not a fixed sequence.
+3. Mistakes return as spaced review in subsequent sessions.
+4. Daily targets are personalized based on the learner's error patterns, not a fixed number.
+
+## Technical architecture
+
+- **PWA**: Installable on Android (Chrome), iPhone (Safari), and desktop browsers (Chrome, Edge).
+- **Offline**: After installation, lessons and exercises work without internet. Neural voice and AI tutor require connectivity.
+- **No account required**: Progress is stored locally on the device. Clearing browser data deletes progress.
+- **Mascot**: PAW, a geometric cat mascot with 14 interactive expressions that reacts to learning patterns.
+- **AI Tutor**: Contextual AI tutor available for guided explanations.
+- **KelasKu for Teachers**: A classroom analytics dashboard for educators.
+
+## CEFR disclaimer
+
+FIEZEL maps its content to CEFR A1–C2 levels as a difficulty reference. This is NOT an official certification, affiliation, or endorsement from any CEFR body. Results from FIEZEL do not constitute a certificate.
+
+## Privacy
+
+- No name, email, or phone number required to start learning.
+- Learning records (completed lessons, answers, level progress) are stored locally on the learner's device.
+- Clearing browser data erases progress.
+- Full privacy policy: https://fiezel.my.id/privacy/
+
+## Installation guides
+
+- **Android (Chrome)**: Open fiezel.my.id/app/ → three-dot menu (⋮) → "Install app"
+- **iPhone (Safari)**: Open fiezel.my.id/app/ → Share button → "Add to Home Screen"
+- **Desktop (Chrome/Edge)**: Open fiezel.my.id/app/ → install icon in address bar
+- Detailed guide: https://fiezel.my.id/install/
+
+## Localized pages
+
+| Page | Indonesian | Thai |
+|------|-----------|------|
+| Marketing | https://fiezel.my.id/ | https://fiezel.my.id/th/ |
+| Install guide | https://fiezel.my.id/install/ | https://fiezel.my.id/th/install/ |
+| Privacy | https://fiezel.my.id/privacy/ | https://fiezel.my.id/th/privacy/ |
+| Terms | https://fiezel.my.id/terms/ | https://fiezel.my.id/th/terms/ |
+
+## Frequently asked questions
+
+**Is FIEZEL free?**
+Yes. Free, no subscription. No premium package, no features locked behind payment. All 180 grammar lessons, 2,440 vocabulary items, and 312 reading passages are available from day one.
+
+**Do I need an account?**
+No. You can start learning immediately. Because there are no accounts, your progress is stored on the device you use — switching to another device means starting over.
+
+**Can I use it offline?**
+After installing FIEZEL to the home screen: content and exercises work without internet. Neural voice and AI tutor need a connection.
+
+**Does it work on Android and iPhone?**
+Yes, both. On Android use Chrome via the three-dot menu. On iPhone you must use Safari via the Share button, as only Safari can add web apps to the iOS Home Screen. Desktop Chrome and Edge also work.
+
+**Is FIEZEL officially CEFR-certified?**
+No. FIEZEL content is mapped to CEFR A1–C2 as a difficulty reference only. It is not a certification, not an affiliation, and not an official endorsement from any body.
+
+**Is there audio for listening practice?**
+Yes. Device built-in voice works from the start, and neural voice is available as an optional download. Exam exercise audio is TTS from original scripts, not recordings of real exams.
+
+**What is my personal data used for?**
+Your learning records — completed lessons, answers, and level progress — are stored locally on your device. FIEZEL does not ask for name, email, or phone number to start learning.
+
+**How many exercises are available?**
+Each grammar lesson has 25 focused exercises, across 180 total lessons. Reading adds 1,560 comprehension questions across 312 graded passages. Plus 1,400+ listening exercises and 36 speaking sessions.

@@ -1,0 +1,32 @@
+# FIEZEL
+
+> FIEZEL is a free, adaptive Progressive Web App for learning English — grammar, vocabulary, reading, speaking, and listening — mapped to CEFR levels A1–C2. It targets Indonesian and Thai learners.
+
+## Key facts
+
+- **Type**: Progressive Web App (PWA), installable from browser
+- **Price**: Free, no subscription, no premium tier
+- **Languages**: Interface in Indonesian and Thai; content teaches English
+- **CEFR mapping**: A1, A2, B1, B2, C1, C2 (not an official certification body)
+- **Creator**: @fitrarustqi (Instagram)
+
+## Content scope
+
+- 180 grammar lessons (25 exercises each)
+- 2,440 vocabulary items
+- 312 graded reading passages with 1,560 comprehension questions
+- 36 speaking sessions with speech recognition
+- 1,400+ listening exercises (IELTS/TOEFL style)
+
+## Adaptive learning
+
+FIEZEL adapts exercises to each learner's answer patterns. Mistakes return as review in subsequent sessions. A placement test determines the starting CEFR level.
+
+## Links
+
+- Marketing site (Indonesian): https://fiezel.my.id/
+- Marketing site (Thai): https://fiezel.my.id/th/
+- App: https://fiezel.my.id/app/
+- Privacy policy: https://fiezel.my.id/privacy/
+- Terms: https://fiezel.my.id/terms/
+- Detailed description: https://fiezel.my.id/llms-full.txt
