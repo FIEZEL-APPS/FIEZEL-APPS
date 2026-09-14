@@ -4311,6 +4311,12 @@ async function load(){const root=document.baseURI;/* W1 P0-1 (16-001): fetch ban
     // dua bahasa sekaligus di tingkat yang belum sampai ke situ.
     const jaRead=await optional('content/ja/reading-bank-ja.json',null);
     if(Array.isArray(jaRead)&&jaRead.length)R=jaRead;
+    // m025-311: bank menulis Jepang. Bentuknya identik dengan writing-prompts-v1.json
+    // (schema, rubric, prompts[]), jadi penyaji dan penilai membacanya lewat jalur yang
+    // sama tanpa cabang kedua. Medan `en` menyimpan naskah JEPANG - nama itu warisan dari
+    // bank Inggris dan sengaja tidak diganti, karena penyaji membacanya apa adanya.
+    const jaWrite=await optional('content/ja/writing-prompts-ja.json',null);
+    if(jaWrite&&Array.isArray(jaWrite.prompts)&&jaWrite.prompts.length)WRITING_BANK=jaWrite;
     if(jaBank&&Array.isArray(jaBank.templates)&&jaBank.templates.length){
       G=jaBank;
       // Graf keluarga Jepang menggantikan graf Inggris SELAMA bahasa ini aktif. Graf lesson
@@ -7253,11 +7259,20 @@ function latihanCards(){
      bahasa memang sudah berjanji latihan itu belum ada. Kartunya disembunyikan sampai
      banknya benar-benar dibuat; tests/japanese-surface-honesty-test.js mengikat penjaga
      ini ke ADA-TIDAKNYA berkas di content/ja/, jadi ia menuntut dicabut begitu isinya siap. */
-  const punyaKontenJa=activeTargetLang()!=='ja';
-  if(punyaKontenJa){
+  /* m025-311: PENJAGA INI DIPECAH, dan pemecahannya yang penting.
+     Menulis kini punya banknya sendiri (content/ja/writing-prompts-ja.json, 24 prompt N5,
+     dua untuk tiap keluarga silabus), jadi menyembunyikan kartunya dari murid Jepang
+     berarti fitur yang hilang diam-diam - sama buruknya dengan menawarkan yang kosong.
+     Menyimak dan berbicara TETAP dijaga, dan bukan karena banknya belum ditulis:
+     tumpukan audio dipaku ke en-US (fiezel-speaking-listening-addon.js language:'en-US',
+     dijaga tests/audio-locale-guard-test.js). Menawarkannya sekarang berarti aplikasi
+     MEMUTAR SUARA INGGRIS dan MENDENGARKAN UCAPAN INGGRIS sambil mengaku mengajar Jepang.
+     Bank tanpa suara yang benar bukan fitur, melainkan kebohongan baru. */
+  const punyaSkillsJa=activeTargetLang()!=='ja';
+  if(punyaSkillsJa){
     cards.push({view:'skills',icon:'skills',label:FiezelI18n.t('latihan.bicara-dengar'),note:FiezelI18n.t('latihan.bicara-dengar-note')});
-    cards.push({view:'writing',icon:'writing',label:'Writing',note:FiezelI18n.t('latihan.writing-note')});
   }
+  cards.push({view:'writing',icon:'writing',label:'Writing',note:FiezelI18n.t('latihan.writing-note')});
   cards.push({view:'library',icon:'library',label:FiezelI18n.t('home.library-card'),note:FiezelI18n.t('latihan.library-note')});
   return cards.map(c=>`<button class="launch-card" onclick="go('${esc(c.view)}')" aria-label="${esc(c.label)}"><span class="launch-icon"><i class="fz-i" data-fz-icon="${esc(c.icon)}" aria-hidden="true"></i></span><span><small>${esc(c.note)}</small><b>${esc(c.label)}</b></span><i data-lucide="arrow-up-right"></i></button>`).join('');
 }
