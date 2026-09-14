@@ -116,14 +116,21 @@ const FLAGS_DIHARAPKAN = Object.freeze({
   cfAiEnabled: true,        // docs/MASTER-BROADCAST.md:124 — dinyalakan 28 Ags 18:20, terverifikasi
   cfTtsEnabled: false,      // docs/MASTER-BROADCAST.md:127 — TETAP mati; korpus penuh +-US$9,07
   cfAnalyticsEnabled: true, // commit 692bc5c + wrangler.toml ANALYTICS_ENABLED="on"
-  cfSocialEnabled: false    // SLOT 7 belum diputuskan owner
+  cfSocialEnabled: false,   // SLOT 7 belum diputuskan owner
+  // m025-311: DITAMBAHKAN karena produksi MENYAJIKANNYA dan gerbang ini tidak mengenalinya,
+  // sehingga `config-flags-declared` merah pada jalan live pertama sejak 30 Ags. Flag ini
+  // bukan hal baru di produksi - ia sudah dideklarasikan di workers/api/schema.js
+  // (CLIENT_FLAG_DEFAULTS, default false) sejak SLOT 9 lahir; yang basi adalah TABEL DI SINI.
+  // Nilainya false: lane bukti per-murid "LAHIR MATI" sesuai aturan produksi di wrangler.toml.
+  cfLearnerEvidenceEnabled: false
 });
 const KILL_DIHARAPKAN = Object.freeze({
   ai: true,        // sepadan dengan cfAiEnabled
   tts: false,      // sepadan dengan cfTtsEnabled
   coach: false,    // belum diputuskan owner
   analytics: true, // sepadan dengan cfAnalyticsEnabled
-  social: false    // sepadan dengan cfSocialEnabled
+  social: false,   // sepadan dengan cfSocialEnabled
+  learnerEvidence: false  // m025-311: sepadan dengan cfLearnerEvidenceEnabled; alasan sama
 });
 
 const FOREIGN_ORIGIN = 'https://evil.example';
@@ -363,6 +370,33 @@ async function run() {
   check('me-not-404', '/api/user/me BUKAN 404', me.status !== 404, 'status=' + me.status);
   check('me-401', '/api/user/me mengembalikan 401 tanpa cookie',
     me.status === 401, 'status=' + me.status);
+
+  /* --- 3b. RUTE SLOT 5 BERBAYAR: 401 SEBELUM 403, DIBUKTIKAN DI PRODUKSI (m025-311) ---
+   *
+   * Gerbang ini sebelumnya hanya menembak /api/ai/task dan /api/quota. Rute AI yang
+   * BENAR-BENAR dipakai aplikasi adalah /api/ai/chat (app.js:coreWorkerExec) dan
+   * /api/ai/translate (modul subtitle), keduanya di SLOT 5 - jadi "terbukti hidup" tidak
+   * pernah mencakup jalur tutor utama. Ditutup di sini.
+   *
+   * YANG DIUJI, dan kenapa ia aman ditembak ke produksi: permintaan tanpa cookie ditolak
+   * SEBELUM badan dibaca, sebelum kuota dipesan, dan sebelum model disentuh - jadi ia tidak
+   * menulis state murid dan tidak membelanjakan neuron sepeser pun.
+   *
+   * 401, BUKAN 403, dan itu bukan kosmetik: kanon P3 menaruh penolakan flag SESUDAH
+   * identitas "supaya keadaan otentikasi tidak boleh terbaca dari perbedaan ini". Kalau
+   * produksi menjawab 403 di sini, gerbang belanjanya terpasang dengan urutan yang bocor -
+   * siapa pun bisa membedakan token sah dari tidak sah hanya dari selisih kode jawaban. */
+  for (const slot5 of ['/api/ai/chat', '/api/ai/translate', '/api/coach/context']) {
+    const r = await call('POST', slot5, { body: '{}' });
+    const nama = slot5.replace(/^\/api\//, '').replace(/\//g, '-');
+    check('slot5-' + nama + '-not-404', slot5 + ' terpasang (BUKAN 404)',
+      r.status !== 404, 'status=' + r.status);
+    check('slot5-' + nama + '-401', slot5 + ' menjawab 401 tanpa cookie (401 mendahului 403)',
+      r.status === 401,
+      'status=' + r.status + (r.status === 403
+        ? ' -> gerbang belanja terpasang dengan urutan BOCOR: flag mendahului identitas'
+        : ''));
+  }
 
   /* --- 4. POST /api/auth/anon + bentuk cookie ---------------------------------------- */
   // Permintaan ini juga menjadi KONTROL POSITIF untuk cap byte di butir 6:
