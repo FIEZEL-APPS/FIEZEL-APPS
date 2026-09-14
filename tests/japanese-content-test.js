@@ -74,7 +74,7 @@ function bankJepang() {
       const doc = JSON.parse(fs.readFileSync(path.join(dir, f), 'utf8'));
       const kunciArray = Object.keys(doc).find((k) => Array.isArray(doc[k]) && doc[k].length
         && doc[k][0] && typeof doc[k][0] === 'object' && doc[k][0].stem);
-      if (kunciArray) keluar.push({ berkas: path.relative(__fzRoot, path.join(dir, f)), butir: doc[kunciArray] });
+      if (kunciArray) keluar.push({ berkas: path.relative(__fzRoot, path.join(dir, f)), butir: doc[kunciArray], doc: doc });
     });
   });
   return keluar;
@@ -241,6 +241,75 @@ test('id butir unik di seluruh bank', () => {
     else lihat.set(t.id, b.berkas);
   }));
   assert.deepStrictEqual(kembar, [], 'id kembar: ' + kembar.join(', '));
+});
+
+test('kepala bank tidak berbohong tentang isinya (jumlah, keluarga, cefr, jlpt)', () => {
+  /* KENAPA ASSERT INI ADA
+     Medan kepala ini tidak dibaca app.js maupun gerbang mana pun — ia murni keterangan diri.
+     Justru itu bahayanya: ia bisa menyimpang tanpa satu pun gerbang memerah. Terjadi sungguhan
+     saat m025-313, waktu penggabungan dua cabang menulis ulang `keluarga` dari objek
+     jumlah-per-keluarga menjadi bilangan 27, dan membiarkan `catatan` berbunyi "A1/N5" padahal
+     banknya sudah berisi 180 butir A2/N4. Yang menemukannya peninjau, bukan gerbang. Sekarang
+     gerbangnya yang menemukan. Medan yang TIDAK ADA tidak dituntut — bank boleh sederhana;
+     yang dilarang adalah medan yang ada lalu berbohong. */
+  const salah = [];
+  bank.forEach((b) => {
+    const d = b.doc;
+    const isi = b.butir;
+    if (typeof d.jumlah === 'number' && d.jumlah !== isi.length) {
+      salah.push(b.berkas + ': jumlah ' + d.jumlah + ' padahal isinya ' + isi.length + ' butir');
+    }
+    const keluargaIsi = [...new Set(isi.map((t) => t.family))].sort();
+    if (d.keluarga && typeof d.keluarga === 'object' && !Array.isArray(d.keluarga)) {
+      const kepala = Object.keys(d.keluarga).sort();
+      if (kepala.join('|') !== keluargaIsi.join('|')) {
+        salah.push(b.berkas + ': daftar keluarga di kepala tidak sepadan dengan isinya');
+      }
+      const total = Object.values(d.keluarga).reduce((a, n) => a + Number(n || 0), 0);
+      if (total !== isi.length) {
+        salah.push(b.berkas + ': jumlah per keluarga menjumlah ' + total + ', isinya ' + isi.length);
+      }
+      keluargaIsi.forEach((f) => {
+        const nyata = isi.filter((t) => t.family === f).length;
+        if (Number(d.keluarga[f]) !== nyata) {
+          salah.push(b.berkas + ': keluarga ' + f + ' ditulis ' + d.keluarga[f] + ', nyatanya ' + nyata);
+        }
+      });
+    } else if (typeof d.keluarga !== 'undefined') {
+      /* BENTUKNYA ikut dijaga, bukan cuma nilainya. Penyimpangan m025-313 yang asli adalah
+         objek jumlah-per-keluarga MEROSOT menjadi bilangan 27 — dan bilangan itu KEBETULAN
+         sama dengan banyaknya keluarga, jadi assert yang hanya memeriksa nilai akan lolos.
+         Versi pertama assert ini memang lolos; dibuktikan dengan memutasikannya. Rincian
+         per keluarga adalah satu-satunya bentuk yang bisa dibantah oleh isi berkasnya, jadi
+         bentuk itulah yang dituntut. */
+      salah.push(b.berkas + ': keluarga harus objek jumlah-per-keluarga, bukan ' +
+        (Array.isArray(d.keluarga) ? 'array' : typeof d.keluarga) +
+        ' — rincian per keluarga yang merosot jadi satu angka tidak bisa dibantah isinya');
+    }
+    [['cefr', 'cefr'], ['jlpt', 'jlpt']].forEach(([medan, kunciButir]) => {
+      if (!Array.isArray(d[medan])) return;
+      const nyata = [...new Set(isi.map((t) => t[kunciButir]))].filter(Boolean).sort();
+      const kepala = [...d[medan]].sort();
+      if (kepala.join('|') !== nyata.join('|')) {
+        salah.push(b.berkas + ': ' + medan + ' kepala [' + kepala + '] vs isi [' + nyata + ']');
+      }
+    });
+    /* `catatan` prosa bebas, jadi yang dituntut cuma satu hal: kalau ia MENYEBUT tingkat,
+       tingkat yang disebutnya harus benar-benar ada di banknya. */
+    if (typeof d.catatan === 'string') {
+      const nyataJlpt = new Set(isi.map((t) => t.jlpt).filter(Boolean));
+      ['N5', 'N4', 'N3', 'N2', 'N1'].forEach((lv) => {
+        const disebut = new RegExp('(^|[^A-Za-z0-9])' + lv + '([^0-9]|$)').test(d.catatan);
+        if (disebut && !nyataJlpt.has(lv)) {
+          salah.push(b.berkas + ': catatan menyebut ' + lv + ' padahal tidak ada butirnya');
+        }
+        if (!disebut && nyataJlpt.has(lv) && /\b(N[1-5])\b/.test(d.catatan)) {
+          salah.push(b.berkas + ': catatan menyebut tingkat lain tetapi melewatkan ' + lv);
+        }
+      });
+    }
+  });
+  assert.deepStrictEqual(salah, [], salah.join(' | '));
 });
 
 test('gerbang ini terdaftar di .github/workflows/quality.yml', () => {

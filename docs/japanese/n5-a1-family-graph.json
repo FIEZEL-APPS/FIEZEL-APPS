@@ -2,27 +2,134 @@
   "schema": "fiezel-japanese-family-graph-proposal-v0",
   "status": "USULAN — menunggu persetujuan owner. Belum disuntikkan ke mesin mana pun.",
   "target": "ja",
-  "catatan": "Bentuknya sengaja sama dengan PREREQUISITES di features/brain/fiezel-core-brain.js: peta keluarga -> daftar keluarga prasyarat. Tingkat kedalaman DI DALAM keluarga tetap ditangani urutan CEFR, persis seperti di kursus Inggris.",
+  "catatan": "Bentuknya sengaja sama dengan PREREQUISITES di features/brain/fiezel-core-brain.js: peta keluarga -> daftar keluarga prasyarat. Tingkat kedalaman DI DALAM keluarga tetap ditangani urutan CEFR, persis seperti di kursus Inggris. m025-312: ditambah 14 keluarga A2/N4; prasyaratnya menunjuk keluarga A1/N5 supaya diagnosis akar masalah turun ke lapis yang benar, bukan berhenti di keluarga N4.",
   "families": {
     "particles": [],
     "demonstratives": [],
-    "noun_modification": ["particles"],
-    "adjectives": ["particles"],
-    "existence_location": ["particles"],
-    "verb_groups": ["particles"],
-    "polite_forms": ["verb_groups"],
-    "negation_past": ["polite_forms", "adjectives"],
-    "question_words": ["particles", "demonstratives"],
-    "counters": ["existence_location"],
-    "time_expressions": ["particles"],
-    "te_form": ["verb_groups", "polite_forms"],
-    "plain_forms": ["polite_forms", "te_form"],
-    "transitivity_pairs": ["te_form", "particles"],
-    "keigo": ["plain_forms", "polite_forms"]
+    "noun_modification": [
+      "particles"
+    ],
+    "adjectives": [
+      "particles"
+    ],
+    "existence_location": [
+      "particles"
+    ],
+    "verb_groups": [
+      "particles"
+    ],
+    "polite_forms": [
+      "verb_groups"
+    ],
+    "negation_past": [
+      "polite_forms",
+      "adjectives"
+    ],
+    "question_words": [
+      "particles",
+      "demonstratives"
+    ],
+    "counters": [
+      "existence_location"
+    ],
+    "time_expressions": [
+      "particles"
+    ],
+    "te_form": [
+      "verb_groups",
+      "polite_forms"
+    ],
+    "plain_forms": [
+      "polite_forms",
+      "te_form",
+      "verb_groups"
+    ],
+    "transitivity_pairs": [
+      "existence_location",
+      "particles",
+      "te_form",
+      "verb_groups"
+    ],
+    "keigo": [
+      "plain_forms",
+      "polite_forms"
+    ],
+    "te_form_extensions": [
+      "te_form"
+    ],
+    "potential": [
+      "verb_groups",
+      "plain_forms"
+    ],
+    "volitional_intent": [
+      "polite_forms",
+      "verb_groups"
+    ],
+    "passive_causative": [
+      "verb_groups",
+      "plain_forms"
+    ],
+    "conditionals": [
+      "plain_forms"
+    ],
+    "giving_receiving": [
+      "particles",
+      "te_form"
+    ],
+    "quotation_thought": [
+      "plain_forms"
+    ],
+    "relative_clauses": [
+      "noun_modification",
+      "plain_forms"
+    ],
+    "comparison": [
+      "adjectives"
+    ],
+    "obligation_permission": [
+      "negation_past",
+      "te_form_extensions"
+    ],
+    "reason_concession": [
+      "plain_forms"
+    ],
+    "experience_frequency": [
+      "plain_forms"
+    ]
   },
   "cakupanTingkat": {
-    "A1_N5": ["particles", "demonstratives", "noun_modification", "adjectives", "existence_location", "verb_groups", "polite_forms", "negation_past", "question_words", "counters", "time_expressions", "te_form"],
-    "A2_N4_dan_seterusnya": ["plain_forms", "transitivity_pairs", "keigo"]
+    "A1_N5": [
+      "particles",
+      "demonstratives",
+      "noun_modification",
+      "adjectives",
+      "existence_location",
+      "verb_groups",
+      "polite_forms",
+      "negation_past",
+      "question_words",
+      "counters",
+      "time_expressions",
+      "te_form"
+    ],
+    "A2_N4": [
+      "plain_forms",
+      "transitivity_pairs",
+      "keigo",
+      "te_form_extensions",
+      "potential",
+      "volitional_intent",
+      "passive_causative",
+      "conditionals",
+      "giving_receiving",
+      "quotation_thought",
+      "relative_clauses",
+      "comparison",
+      "obligation_permission",
+      "reason_concession",
+      "experience_frequency"
+    ],
+    "catatan": "A1_N5 = 12 keluarga, A2_N4 = 15 keluarga, total 27. Daftar ini WAJIB sepadan dengan kunci families di berkas ini; kalau tidak, peta tingkat ini menyesatkan siapa pun yang memakainya sebagai acuan."
   },
   "alasanUrutan": {
     "particles_lebih_dulu": "Tanpa は/が/を/に/で, tidak ada satu pun kalimat Jepang yang bisa disusun benar. Ia akar yang sama seperti tense_aspect di kursus Inggris.",
