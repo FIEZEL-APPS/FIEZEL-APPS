@@ -1017,6 +1017,17 @@ jobs:
         # Assert intinya karena itu bukan soal bentuk: evidence tiap soal WAJIB substring
         # persis dari teks bacaannya sendiri.
         run: node tests/japanese-reading-bank-test.js
+      - name: 'Paritas Thai isi bank Jepang: utangnya disensus, bukan tak terlihat'
+        # th-coverage dan th-ui-leak hanya menjangkau naskah ANTARMUKA (yang lahir lewat
+        # FiezelI18n.t()). Isi bank lahir lewat jalur lain - dimuat sebagai JSON, dirender
+        # apa adanya - jadi ia lolos keduanya. Terukur: antarmuka 2.452/2.452 punya kembaran
+        # Thai, isi bank Jepang 0 dari 15.364 medan. Murid Thai mendapat tombol berbahasa
+        # Thai lalu arti kata dan penjelasan berbahasa Indonesia: layar campur.
+        # Gerbang ini TIDAK menuntut 15.364 terjemahan hari ini - itu merah permanen, dan
+        # gerbang merah permanen adalah gerbang yang dimatikan orang. Ia menuntut SENSUS
+        # yang benar: menambah isi Indonesia tanpa Thai memerahkannya sampai angkanya
+        # ditulis ulang bertanggal, dan Thai yang sudah ditulis wajib ikut tercatat.
+        run: node tests/japanese-th-parity-test.js
       - name: 'Konsol kurikulum: pintu ke ruangan kosong wajib tertutup'
         # m025-294 memasang tautan Kurikulum di sidebar Ruang Guru. Isinya dilayani
         # features/curriculum/fz-api.js yang memanggil '/api/...' relatif ke origin yang
