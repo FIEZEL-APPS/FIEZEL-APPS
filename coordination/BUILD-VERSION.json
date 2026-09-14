@@ -1,7 +1,7 @@
 {
-  "version": "m025-312",
-  "claimedBy": "branch claude/wizardly-franklin-x2irnj",
-  "claimedAt": "2026-09-14T00:01:39.586Z",
-  "reason": "bank menulis Jepang N5: 24 prompt, dua per keluarga silabus",
+  "version": "m025-311",
+  "claimedBy": "branch claude/ai-legacy-quota-bridge",
+  "claimedAt": "2026-09-13T21:23:21.723Z",
+  "reason": "gerbang belanja AI per-rute SLOT 5: kuota harian murid + flag matikan AI, sesudah merge m025-310",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }

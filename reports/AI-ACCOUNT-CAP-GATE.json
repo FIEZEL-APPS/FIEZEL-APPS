@@ -2,7 +2,7 @@
   "schema": "fiezel-ai-account-cap-gate-v1",
   "pass": true,
   "counts": {
-    "pass": 70,
+    "pass": 71,
     "fail": 0
   },
   "discoveredRoutes": [
@@ -116,6 +116,11 @@
       "details": "registerTtsRoutes"
     },
     {
+      "name": "C3a. Ada modul rute berbentuk array yang terdeteksi (pendeteksinya tidak buta)",
+      "status": "PASS",
+      "details": "nol modul array terdeteksi; routeTableAt()/reachesChokepoint() kemungkinan patah, dan C3b-C3c-C4 semuanya lulus hampa kalau dibiarkan"
+    },
+    {
       "name": "C3b. Modul rute berbentuk array ikut ditemukan, dan rutenya terbaca",
       "status": "PASS",
       "details": "modul=index.js,route-legacy.js rute terbaca=28"
@@ -143,7 +148,7 @@
     {
       "name": "C7[POST /api/ai/task] penghitung ai_account_day benar-benar bergerak",
       "status": "PASS",
-      "details": "[{\"day\":\"2026-09-13\",\"neurons\":60,\"requests\":1,\"touched_at\":1789330625010}]"
+      "details": "[{\"day\":\"2026-09-13\",\"neurons\":60,\"requests\":1,\"touched_at\":1789335033024}]"
     },
     {
       "name": "C5[POST /api/tts/render] perilaku model cocok dengan deklarasi fixture",
@@ -158,7 +163,7 @@
     {
       "name": "C7[POST /api/tts/render] penghitung ai_account_day benar-benar bergerak",
       "status": "PASS",
-      "details": "[{\"day\":\"2026-09-13\",\"neurons\":33,\"requests\":1,\"touched_at\":1789330625030}]"
+      "details": "[{\"day\":\"2026-09-13\",\"neurons\":33,\"requests\":1,\"touched_at\":1789335033036}]"
     },
     {
       "name": "C5[GET /api/tts/manifest] perilaku model cocok dengan deklarasi fixture",
@@ -348,7 +353,7 @@
     {
       "name": "H1. Panggilan model yang GAGAL melepas reservasinya kembali",
       "status": "PASS",
-      "details": "releaseSql=true row={\"day\":\"2026-09-13\",\"neurons\":0,\"requests\":0,\"touched_at\":1789330625071}"
+      "details": "releaseSql=true row={\"day\":\"2026-09-13\",\"neurons\":0,\"requests\":0,\"touched_at\":1789335033073}"
     },
     {
       "name": "H2. Amplopnya melaporkan pelepasan itu, dan murid tetap dilayani 200",
@@ -358,7 +363,7 @@
     {
       "name": "H3. TIMEOUT tidak melepas neuron (model sudah bekerja, biayanya nyata)",
       "status": "PASS",
-      "details": "released=false row={\"day\":\"2026-09-13\",\"neurons\":60,\"requests\":1,\"touched_at\":1789330625076}"
+      "details": "released=false row={\"day\":\"2026-09-13\",\"neurons\":60,\"requests\":1,\"touched_at\":1789335033078}"
     },
     {
       "name": "H4. Keputusan boleh-dilepas tinggal di SATU tempat (releasableFailure)",

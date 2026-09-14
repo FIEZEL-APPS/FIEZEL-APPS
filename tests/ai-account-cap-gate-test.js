@@ -514,8 +514,38 @@ const ROUTE_FIXTURES = {
    *
    * BATASNYA DISEBUT TERANG-TERANGAN: penemuan ini membaca SUMBER, bukan jejak runtime.
    * Yang dibuktikan runtime tetap C5-C7 di bawah, yang menjalankan rutenya sungguhan. */
+  /* m025-311: DI MANA tabel rute sebuah modul dideklarasikan.
+     Tabelnya tidak selalu literal di `export const ROUTES`. Sejak gerbang belanja per-rute
+     dipasang, route-legacy.js mendeklarasikan tabelnya sebagai `const RAW_ROUTES = [...]`
+     lalu mengekspor `ROUTES = RAW_ROUTES.map(...)` yang membungkus setiap handler - justru
+     supaya TIDAK ADA jalan memasang SLOT 5 tanpa gerbangnya (RAW_ROUTES sengaja tidak
+     diekspor).
+     Penolong ini dipakai DUA tempat - filter `arrayModules` DAN pemindai entri - karena
+     keduanya menjawab pertanyaan yang sama. Versi sebelumnya hanya menggeneralisasi
+     pemindainya, dan modulnya tetap tidak masuk daftar: setengah generalisasi membuat
+     pendeteksi buta dengan cara yang lebih sulit dilihat.
+     Ini kelas yang SAMA dengan benih impor di modelCallingNames(): satu lapis indireksi
+     baru tidak boleh membutakan pendeteksi. Kalau ia tetap buta, C3c yang memerah. */
+  const routeTableAt = (src) => {
+    const direct = src.search(/export\s+const\s+ROUTES\s*=\s*\[/);
+    if (direct >= 0) return direct;
+    const derived = src.match(/export\s+const\s+ROUTES\s*=\s*([A-Za-z0-9_$]+)\s*\./);
+    if (!derived) return -1;
+    return src.search(new RegExp('const\\s+' + derived[1] + '\\s*=\\s*\\['));
+  };
+
   const scanTopLevelEntries = (src) => {
-    const at = src.search(/export\s+const\s+ROUTES\s*=\s*\[/);
+    /* Tempat tabelnya diputuskan routeTableAt(); lihat alasannya di sana. Sejak gerbang
+       belanja per-rute dipasang, route-legacy.js mendeklarasikan tabelnya sebagai
+       `const RAW_ROUTES = [...]` lalu mengekspor `ROUTES = RAW_ROUTES.map(...)` yang
+       membungkus setiap handler - justru supaya TIDAK ADA jalan memasang SLOT 5 tanpa
+       gerbangnya (RAW_ROUTES sengaja tidak diekspor).
+       Pendeteksi ini karena itu mencari tabelnya di tempat ia DIDEKLARASIKAN, bukan hanya
+       di nama yang diekspor. Ini generalisasi yang SAMA kelasnya dengan benih impor di
+       modelCallingNames() di bawah: satu lapis indireksi baru tidak boleh membuat
+       pendeteksi buta. Dan kalau ia tetap buta, C3c-lah yang memerah - bukan gerbang ini
+       yang lolos diam-diam. */
+    const at = routeTableAt(src);
     if (at < 0) return [];
     const out = [];
     let i = src.indexOf('[', at), depth = 0, entryAt = -1, quote = null;
@@ -589,7 +619,7 @@ const ROUTE_FIXTURES = {
 
   const arrayModules = API_FILES.filter((rel) => {
     const src = stripComments(fs.readFileSync(path.join(API_DIR, rel), 'utf8'));
-    return /export\s+const\s+ROUTES\s*=\s*\[/.test(src) && reachesChokepoint(rel);
+    return routeTableAt(src) >= 0 && reachesChokepoint(rel);
   });
   const arrayFindings = [];
   for (const rel of arrayModules) {
@@ -604,6 +634,21 @@ const ROUTE_FIXTURES = {
       arrayFindings.push({ key: head[1] + ' ' + head[2], method: head[1], path: head[2], module: rel, touchesModel });
     }
   }
+  /* m025-311: C3a - DAFTAR MODUL ARRAY TIDAK BOLEH KOSONG.
+     C3b dan C3c keduanya dibuka dengan `arrayModules.length === 0 ||`, jadi keduanya LULUS
+     kalau daftar modulnya kosong. Itu berarti membutakan FILTER-nya (bukan pemindainya)
+     meloloskan seluruh rantai C3b-C3c-C4 diam-diam - diuji dengan memaksa routeTableAt()
+     mengembalikan -1: gerbang ini HIJAU, padahal kelima rute berbayar SLOT 5 tidak terlihat
+     sama sekali. Tepat keadaan yang komentar C3c sebut "lebih berbahaya daripada tidak ada
+     gerbang", lewat pintu yang ia sendiri tidak jaga.
+     Kosong di sini BUKAN keadaan sah: repo ini punya modul rute berbentuk array yang
+     mencapai chokepoint (index.js sebagai pintu Worker, route-legacy.js sebagai SLOT 5).
+     Kalau keduanya benar-benar hilang kelak, assert ini yang memaksa orang membaca ulang
+     bagian ini - bukan gerbang yang hijau karena tidak melihat apa-apa. */
+  check('C3a. Ada modul rute berbentuk array yang terdeteksi (pendeteksinya tidak buta)',
+    arrayModules.length > 0,
+    'nol modul array terdeteksi; routeTableAt()/reachesChokepoint() kemungkinan patah, dan ' +
+    'C3b-C3c-C4 semuanya lulus hampa kalau dibiarkan');
   check('C3b. Modul rute berbentuk array ikut ditemukan, dan rutenya terbaca',
     arrayModules.length === 0 || arrayFindings.length > 0,
     'modul=' + (arrayModules.join(',') || '(tidak ada)') + ' rute terbaca=' + arrayFindings.length);
