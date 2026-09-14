@@ -32,21 +32,30 @@
   <meta name="theme-color" content="#FBF7F3">
   <!-- Mode gelap dihapus: color-scheme dipaku light agar kontrol form/scrollbar selalu terang. -->
   <meta name="color-scheme" content="light">
-  <meta name="description" content="FIEZEL adalah aplikasi belajar bahasa Inggris adaptif untuk vocabulary, grammar, reading, speaking, listening, dan tes diagnostik CEFR.">
+  <meta name="description" content="FIEZEL adalah aplikasi belajar bahasa adaptif: kursus Bahasa Inggris (CEFR A1–C2) dan Bahasa Jepang (JLPT N5–N4), dengan vocabulary, grammar, reading, dan AI Tutor. Gratis dan bisa dipakai offline.">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <link rel="manifest" href="./manifest.json">
   <link rel="icon" href="./favicon-64.png">
   <link rel="apple-touch-icon" href="./apple-touch-icon.png">
   <title>FIEZEL | Belajar Bahasa Inggris &amp; Jepang — Indonesia &amp; Thailand</title>
-  <!-- SEO: Canonical & hreflang multi-region -->
-  <link rel="canonical" href="https://fiezel.my.id/">
-  <link rel="alternate" hreflang="id" href="https://fiezel.my.id/">
-  <link rel="alternate" hreflang="th" href="https://fiezel.my.id/">
-  <link rel="alternate" hreflang="x-default" href="https://fiezel.my.id/">
+  <!-- SEO: kanonik BERKAS INI, bukan kanonik yang kita inginkan.
+       Berkas ini diterbitkan ke ~/public_html/app/ (lihat .cpanel.yml dan
+       .github/workflows/deploy-site.yml), jadi URL-nya https://fiezel.my.id/app/ — bukan
+       root domain, yang disajikan dari website/. Kanonik yang menunjuk "/" dulu meminta
+       Google MEMBUANG /app/ dari indeks sambil sitemap root justru mendaftarkannya:
+       dua perintah yang berlawanan, dan Google menyelesaikannya dengan mengabaikan
+       keduanya. Dijaga tests/seo-surface-gate-test.js cek (B).
+
+       hreflang SENGAJA TIDAK ADA di sini. Cangkang aplikasi ini SATU URL untuk semua
+       bahasa — ganti bahasa terjadi di dalam aplikasi, bukan dengan pindah alamat. Tiga
+       baris hreflang yang semuanya menunjuk URL yang sama bukan "hreflang minimal", ia
+       pasangan yang bertentangan dengan dirinya sendiri dan dibuang Google tanpa pesan
+       galat. Pasangan id/th yang SUNGGUHAN ada di website/ (root dan /th/). -->
+  <link rel="canonical" href="https://fiezel.my.id/app/">
   <!-- SEO: Open Graph -->
   <meta property="og:type" content="website">
-  <meta property="og:url" content="https://fiezel.my.id/">
+  <meta property="og:url" content="https://fiezel.my.id/app/">
   <meta property="og:title" content="FIEZEL — Belajar Bahasa Inggris &amp; Jepang, Adaptif &amp; Gratis">
   <meta property="og:description" content="FIEZEL adalah platform belajar bahasa Inggris dan Jepang adaptif berbasis AI untuk pelajar Indonesia dan Thailand. Vocabulary, Grammar, Reading, Speaking, Listening, AI Tutor, dan tes CEFR. Gratis, berjalan offline.">
   <meta property="og:image" content="https://fiezel.my.id/assets/brand/fiezel-icon-512.png">
@@ -67,12 +76,12 @@
     "@context": "https://schema.org",
     "@graph": [
       {
-        "@type": "SoftwareApplication",
+        "@type": "WebApplication",
         "@id": "https://fiezel.my.id/#app",
         "name": "FIEZEL",
         "alternateName": ["Fiezel", "FIEZEL App", "FIEZEL Personal English OS", "แอปเรียนภาษา FIEZEL"],
-        "url": "https://fiezel.my.id/",
-        "description": "FIEZEL adalah platform belajar bahasa adaptif berbasis AI untuk pelajar di Indonesia dan Thailand. Tersedia kursus Bahasa Inggris (English) dan Bahasa Jepang (Japanese/日本語). Fitur lengkap: Vocabulary, Grammar, Reading, Speaking, Listening, AI Tutor, tes CEFR, tes JLPT, dan Teacher Dashboard. Gratis dan tersedia offline.",
+        "url": "https://fiezel.my.id/app/",
+        "description": "FIEZEL adalah platform belajar bahasa adaptif berbasis AI untuk pelajar di Indonesia dan Thailand. Tersedia kursus Bahasa Inggris (CEFR A1–C2) dan Bahasa Jepang (JLPT N5–N4). Vocabulary, Grammar, Reading, AI Tutor, dan Teacher Dashboard; Speaking dan Listening tersedia untuk kursus Inggris. Gratis dan bisa dipakai offline.",
         "applicationCategory": "EducationalApplication",
         "operatingSystem": ["Web", "Android", "iOS"],
         "offers": {
@@ -82,15 +91,15 @@
           "availability": "https://schema.org/InStock"
         },
         "featureList": [
-          "Kursus Bahasa Inggris adaptif (A1–B2 CEFR)",
-          "Kursus Bahasa Jepang adaptif (N5–N3 JLPT)",
+          "Kursus Bahasa Inggris adaptif (CEFR A1–C2)",
+          "Kursus Bahasa Jepang adaptif (JLPT N5–N4)",
           "Vocabulary adaptif dengan spaced repetition",
-          "Grammar interaktif dengan penjelasan lokal",
-          "Reading comprehension dengan teks autentik",
-          "Speaking practice dengan AI feedback",
-          "Listening dengan neural voice lokal offline",
-          "Tes diagnostik CEFR dan JLPT otomatis",
-          "AI Tutor personal 24/7",
+          "Grammar interaktif dengan penjelasan berbahasa Indonesia dan Thai",
+          "Reading comprehension berjenjang",
+          "Speaking practice dengan AI feedback (kursus Inggris)",
+          "Listening dengan neural voice lokal offline (kursus Inggris)",
+          "Tes penempatan CEFR otomatis",
+          "AI Tutor personal",
           "Teacher Dashboard untuk guru",
           "Duel Belajar antar murid",
           "Offline-first PWA",
@@ -105,12 +114,12 @@
             { "@type": "Country", "name": "Thailand" }
           ]
         },
-        "screenshot": "https://fiezel.my.id/assets/brand/screenshot-home.png",
+        "screenshot": "https://fiezel.my.id/assets/shots/home-desktop.png",
         "image": "https://fiezel.my.id/assets/brand/fiezel-icon-512.png"
       },
       {
-        "@type": "Organization",
-        "@id": "https://fiezel.my.id/#organization",
+        "@type": "EducationalOrganization",
+        "@id": "https://fiezel.my.id/#org",
         "name": "FIEZEL",
         "alternateName": ["Fiezel", "แฟลซเซิล"],
         "url": "https://fiezel.my.id/",
@@ -131,7 +140,7 @@
         "name": "FIEZEL",
         "description": "Platform belajar Bahasa Inggris dan Bahasa Jepang adaptif untuk pelajar Indonesia dan Thailand",
         "inLanguage": ["id", "th"],
-        "publisher": { "@id": "https://fiezel.my.id/#organization" }
+        "publisher": { "@id": "https://fiezel.my.id/#org" }
       }
     ]
   }

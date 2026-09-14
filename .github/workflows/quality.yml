@@ -802,6 +802,13 @@ jobs:
           # sudah pernah dicabut audit D16.
           node tests/app-interaction-policy-test.js
           node tests/deploy-site-gate-test.js
+          # m025-314: sepupu deploy-site-gate. Yang di atas menjaga CARA berkas diterbitkan;
+          # yang ini menjaga agar berkasnya tidak BERBOHONG tentang alamat hasilnya. Repo
+          # punya dua permukaan terbit (akar -> /app/, website/ -> root domain), dan sampai
+          # gerbang ini ada tidak satu pun dari 278 gerbang membandingkan alamat yang
+          # DIKLAIM kanonik/sitemap/hreflang dengan alamat tempat berkasnya benar-benar
+          # mendarat. Commit SEO c4e506d melewati seluruh CI dengan kanonik menunjuk 404.
+          node tests/seo-surface-gate-test.js
           node tests/coordination-guard-test.js
 
       # =================================================================================

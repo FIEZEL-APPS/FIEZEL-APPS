@@ -53,13 +53,7 @@ const CACHE=`fiezel-v${self.FIEZEL_VERSION}`;
 // dilayani dan kedua berkas baru tidak pernah sampai ke pengguna lama - aplikasi mereka
 // akan menjalankan app.js baru tanpa berkas benderanya, dan seluruh bendera jatuh ke
 // salinan bawaan di app.js. Naik SEKALI untuk seluruh gelombang.
-// m025-314: fondasi sertifikat CEFR (features/certificate/, workers/api/certificate/,
-// naskah id+th, dua gerbang) + kerangka Play Store TWA. Daftar precache TIDAK berubah dan
-// tidak satu pun berkas shell disunting — modul-modul itu belum dipasang ke index.html,
-// karena UI asesmen dan route API-nya menyusul. Revisi tetap naik karena A7/A11 menuntut
-// DIAG_BUILD +1 untuk setiap product release, dan ketiga penanda wajib bergerak bersamaan.
-// Jadi kenaikan ini menjaga koherensi penanda, BUKAN menandai cangkang baru.
-const SW_REV='m025-314-sertifikat-cefr-20260914';
+const SW_REV='m025-314-paw-kembali-20260913';
 const SHELL_CACHE=`fiezel-shell-${SW_REV}`;
 // m025-61: health check menanyakan revisi shell langsung ke worker yang sedang aktif.
 // Menebaknya dari nama cache tidak cukup: cache lama bisa tertinggal, sedangkan jawaban ini
