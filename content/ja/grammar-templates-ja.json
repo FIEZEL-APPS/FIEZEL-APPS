@@ -20,10 +20,10 @@
   "polite_forms": 20,
   "question_words": 20,
   "te_form": 20,
-  "time_expressions": 18,
+  "time_expressions": 26,
   "verb_groups": 20
  },
- "jumlah": 234,
+ "jumlah": 242,
  "templates": [
   {
    "id": "JP-AD-101",
@@ -13382,6 +13382,494 @@
     "howToAvoidId": "Ucapkan kalimatnya besok: kalau kata itu jadi berarti hari lain, berarti tanpa に.",
     "memoryCue": "Today travels light.",
     "memoryCueId": "Hari ini bepergian tanpa beban."
+   }
+  },
+  {
+   "id": "JP-TM-119",
+   "family": "time_expressions",
+   "skill": "time_expressions",
+   "subskill": "hour_counter_ji",
+   "cefr": "A1",
+   "jlpt": "N5",
+   "marker": "ji-names-the-hour",
+   "questionType": "multiple_choice",
+   "pedagogicalObjective": "Choose the counter JI for the hour position on a clock",
+   "pedagogicalObjectiveId": "Memilih penghitung じ untuk posisi jam pada arloji",
+   "misconceptionTargeted": "Learner reaches for JIKAN, the span counter, when naming a point on the clock",
+   "misconceptionTargetedId": "Murid memakai じかん — penghitung lama waktu — padahal yang disebut titik pada jam",
+   "reasoningOperation": "ask whether the number names WHEN or HOW LONG -> WHEN takes JI",
+   "reasoningOperationId": "tanyakan apakah angkanya menyebut KAPAN atau BERAPA LAMA -> KAPAN memakai じ",
+   "stem": "まいあさ 6___に おきます。",
+   "stemKana": "まいあさ ろく___に おきます。",
+   "furigana": [],
+   "options": [
+    "じ",
+    "じかん",
+    "ふん",
+    "ねん"
+   ],
+   "correctIndex": 0,
+   "distractors": [
+    {
+     "option": "じかん",
+     "misconception": "duration counter used for a clock position",
+     "misconceptionId": "penghitung lama waktu dipakai untuk posisi jam",
+     "whyFails": "JIKAN measures how long something lasts, so it cannot be followed by NI to mark when you wake up.",
+     "whyFailsId": "じかん mengukur berapa lama sesuatu berlangsung, jadi ia tidak bisa diikuti に untuk menandai kapan kamu bangun."
+    },
+    {
+     "option": "ふん",
+     "misconception": "minute counter placed in the hour slot",
+     "misconceptionId": "penghitung menit ditaruh di slot jam",
+     "whyFails": "FUN counts minutes; 6 FUN would mean six minutes past the hour, not six o'clock.",
+     "whyFailsId": "ふん menghitung menit; 6ふん berarti enam menit, bukan pukul enam."
+    },
+    {
+     "option": "ねん",
+     "misconception": "year counter used for a clock time",
+     "misconceptionId": "penghitung tahun dipakai untuk jam",
+     "whyFails": "NEN counts years and belongs to the calendar, not to the face of a clock.",
+     "whyFailsId": "ねん menghitung tahun dan milik kalender, bukan muka jam."
+    }
+   ],
+   "explanation": {
+    "whyCorrect": "A point on the clock is the number plus JI, and that phrase takes NI: 6 JI NI.",
+    "whyCorrectId": "Titik pada jam adalah angka + じ, dan frasa itu memakai に: 6じに.",
+    "rule": "JI names the hour; the whole clock phrase takes NI.",
+    "ruleId": "じ menyebut jam; seluruh frasa jam memakai に.",
+    "whyOthersFail": "JIKAN measures a span, FUN counts minutes, and NEN counts years.",
+    "whyOthersFailId": "じかん mengukur rentang, ふん menghitung menit, dan ねん menghitung tahun.",
+    "howToAvoid": "If you can answer WHEN with it, use JI.",
+    "howToAvoidId": "Kalau ia menjawab KAPAN, pakai じ.",
+    "memoryCue": "JI points at the clock, JIKAN measures it.",
+    "memoryCueId": "じ menunjuk jam, じかん mengukurnya."
+   }
+  },
+  {
+   "id": "JP-TM-120",
+   "family": "time_expressions",
+   "skill": "time_expressions",
+   "subskill": "jikan_for_duration",
+   "cefr": "A1",
+   "jlpt": "N5",
+   "marker": "jikan-measures-the-span",
+   "questionType": "multiple_choice",
+   "pedagogicalObjective": "Choose JIKAN when the number says how long something takes",
+   "pedagogicalObjectiveId": "Memilih じかん ketika angkanya menyebut berapa lama sesuatu berlangsung",
+   "misconceptionTargeted": "Learner uses JI, the clock-position counter, to express a length of time",
+   "misconceptionTargetedId": "Murid memakai じ — penghitung posisi jam — untuk menyatakan lamanya waktu",
+   "reasoningOperation": "see KAKARIMASU (it takes ...) -> the number must be a span, so JIKAN",
+   "reasoningOperationId": "lihat かかります (memakan waktu) -> angkanya pasti rentang, jadi じかん",
+   "stem": "バスで 1___ かかります。",
+   "stemKana": "バスで いち___ かかります。",
+   "furigana": [],
+   "options": [
+    "じかん",
+    "じ",
+    "ごろ",
+    "ばんめ"
+   ],
+   "correctIndex": 0,
+   "distractors": [
+    {
+     "option": "じ",
+     "misconception": "clock-position counter used for a span",
+     "misconceptionId": "penghitung posisi jam dipakai untuk rentang",
+     "whyFails": "JI names one o'clock as a position, and KAKARIMASU needs a length, not a position.",
+     "whyFailsId": "じ menyebut pukul satu sebagai posisi, sedangkan かかります butuh lama waktu, bukan posisi."
+    },
+    {
+     "option": "ごろ",
+     "misconception": "approximation word attached to a span",
+     "misconceptionId": "kata perkiraan ditempel ke rentang",
+     "whyFails": "GORO softens a point in time, so it cannot attach to the amount KAKARIMASU is asking for.",
+     "whyFailsId": "ごろ memperkirakan titik waktu, jadi ia tidak bisa menempel pada jumlah yang diminta かかります."
+    },
+    {
+     "option": "ばんめ",
+     "misconception": "ordinal suffix used as a time counter",
+     "misconceptionId": "akhiran urutan dipakai sebagai penghitung waktu",
+     "whyFails": "BANME makes a rank (first, second) and never states how long something lasts.",
+     "whyFailsId": "ばんめ membuat urutan (pertama, kedua) dan tidak pernah menyatakan lamanya sesuatu."
+    }
+   ],
+   "explanation": {
+    "whyCorrect": "KAKARIMASU asks how long, and a length of hours is the number plus JIKAN.",
+    "whyCorrectId": "かかります menanyakan berapa lama, dan lama dalam jam adalah angka + じかん.",
+    "rule": "JIKAN for how long, JI for when.",
+    "ruleId": "じかん untuk berapa lama, じ untuk kapan.",
+    "whyOthersFail": "JI is a position, GORO approximates a position, and BANME is a rank.",
+    "whyOthersFailId": "じ itu posisi, ごろ memperkirakan posisi, dan ばんめ itu urutan.",
+    "howToAvoid": "Verbs like KAKARIMASU always want a span, so reach for JIKAN.",
+    "howToAvoidId": "Kata kerja seperti かかります selalu minta rentang, jadi pakailah じかん.",
+    "memoryCue": "KAN is the extra bit that stretches JI into a span.",
+    "memoryCueId": "かん adalah tambahan yang merenggangkan じ menjadi rentang."
+   }
+  },
+  {
+   "id": "JP-TM-121",
+   "family": "time_expressions",
+   "skill": "time_expressions",
+   "subskill": "gurai_for_quantity",
+   "cefr": "A1",
+   "jlpt": "N5",
+   "marker": "gurai-approximates-an-amount",
+   "questionType": "multiple_choice",
+   "pedagogicalObjective": "Use GURAI to approximate an amount of time, not GORO",
+   "pedagogicalObjectiveId": "Memakai ぐらい untuk memperkirakan jumlah waktu, bukan ごろ",
+   "misconceptionTargeted": "Learner treats GORO and GURAI as interchangeable approximators",
+   "misconceptionTargetedId": "Murid menganggap ごろ dan ぐらい bisa saling menggantikan",
+   "reasoningOperation": "see JIKAN (a span) -> the approximator must be GURAI, not GORO",
+   "reasoningOperationId": "lihat じかん (rentang) -> kata perkiraannya pasti ぐらい, bukan ごろ",
+   "stem": "まいにち 2じかん___ べんきょうします。",
+   "stemKana": "まいにち にじかん___ べんきょうします。",
+   "furigana": [],
+   "options": [
+    "ぐらい",
+    "ごろ",
+    "までに",
+    "ずつに"
+   ],
+   "correctIndex": 0,
+   "distractors": [
+    {
+     "option": "ごろ",
+     "misconception": "point approximator attached to a duration",
+     "misconceptionId": "perkiraan titik ditempel ke lama waktu",
+     "whyFails": "GORO attaches only to a position in time such as 3 JI; 2 JIKAN GORO is not Japanese.",
+     "whyFailsId": "ごろ hanya menempel pada posisi waktu seperti 3じ; 2じかんごろ bukan bahasa Jepang."
+    },
+    {
+     "option": "までに",
+     "misconception": "deadline marker used as an approximator",
+     "misconceptionId": "penanda tenggat dipakai sebagai perkiraan",
+     "whyFails": "MADE NI sets a deadline for a one-time action and cannot soften a daily amount.",
+     "whyFailsId": "までに menetapkan tenggat untuk tindakan sekali, dan tidak bisa memperkirakan jumlah harian."
+    },
+    {
+     "option": "ずつに",
+     "misconception": "distributive ZUTSU given an extra NI",
+     "misconceptionId": "ずつ distributif diberi に tambahan",
+     "whyFails": "ZUTSU already distributes an amount and never takes NI after it.",
+     "whyFailsId": "ずつ sudah membagi jumlah dan tidak pernah diikuti に."
+    }
+   ],
+   "explanation": {
+    "whyCorrect": "2 JIKAN is an amount, and amounts are approximated with GURAI.",
+    "whyCorrectId": "2じかん adalah jumlah, dan jumlah diperkirakan dengan ぐらい.",
+    "rule": "GORO for a point in time, GURAI for an amount.",
+    "ruleId": "ごろ untuk titik waktu, ぐらい untuk jumlah.",
+    "whyOthersFail": "GORO needs a position, MADE NI needs a deadline, and ZUTSU never takes NI.",
+    "whyOthersFailId": "ごろ butuh posisi, までに butuh tenggat, dan ずつ tidak pernah memakai に.",
+    "howToAvoid": "If a counter of length is in front of it, the approximator is GURAI.",
+    "howToAvoidId": "Kalau di depannya ada penghitung lama waktu, perkiraannya ぐらい.",
+    "memoryCue": "GORO points, GURAI measures.",
+    "memoryCueId": "ごろ menunjuk, ぐらい mengukur."
+   }
+  },
+  {
+   "id": "JP-TM-122",
+   "family": "time_expressions",
+   "skill": "time_expressions",
+   "subskill": "kara_made_time_range",
+   "cefr": "A1",
+   "jlpt": "N5",
+   "marker": "kara-opens-the-time-range",
+   "questionType": "multiple_choice",
+   "pedagogicalObjective": "Open a time range with KARA when MADE already closes it",
+   "pedagogicalObjectiveId": "Membuka rentang waktu dengan から ketika まで sudah menutupnya",
+   "misconceptionTargeted": "Learner marks both ends of a range with MADE, leaving it without a starting point",
+   "misconceptionTargetedId": "Murid menandai kedua ujung rentang dengan まで, sehingga rentangnya tanpa titik awal",
+   "reasoningOperation": "spot MADE at the far end -> the near end must be KARA",
+   "reasoningOperationId": "lihat まで di ujung jauh -> ujung dekatnya pasti から",
+   "stem": "9じ___ 5じまで はたらきます。",
+   "stemKana": "くじ___ ごじまで はたらきます。",
+   "furigana": [],
+   "options": [
+    "から",
+    "まで",
+    "に",
+    "で"
+   ],
+   "correctIndex": 0,
+   "distractors": [
+    {
+     "option": "まで",
+     "misconception": "both ends of the range marked as endpoints",
+     "misconceptionId": "kedua ujung rentang ditandai sebagai titik akhir",
+     "whyFails": "Two MADE in one sentence give the range two finishing lines and no start.",
+     "whyFailsId": "Dua まで dalam satu kalimat memberi rentang dua garis akhir dan tanpa awal."
+    },
+    {
+     "option": "に",
+     "misconception": "point marker used where a starting point is needed",
+     "misconceptionId": "penanda titik dipakai di tempat yang butuh titik awal",
+     "whyFails": "NI pins one moment, so it cannot open a range that MADE is already closing.",
+     "whyFailsId": "に memaku satu saat, jadi ia tidak bisa membuka rentang yang sudah ditutup まで."
+    },
+    {
+     "option": "で",
+     "misconception": "place or means particle borrowed for time",
+     "misconceptionId": "partikel tempat atau alat dipinjam untuk waktu",
+     "whyFails": "DE marks where or by what means an action happens, never the start of a time range.",
+     "whyFailsId": "で menandai di mana atau dengan apa sesuatu terjadi, bukan awal rentang waktu."
+    }
+   ],
+   "explanation": {
+    "whyCorrect": "A stretch of time runs KARA (from) ... MADE (until), so the first slot is KARA.",
+    "whyCorrectId": "Rentang waktu berjalan から (dari) ... まで (sampai), jadi slot pertamanya から.",
+    "rule": "KARA opens a range, MADE closes it.",
+    "ruleId": "から membuka rentang, まで menutupnya.",
+    "whyOthersFail": "MADE repeats the ending, NI pins a single moment, and DE belongs to place or means.",
+    "whyOthersFailId": "まで mengulang akhiran, に memaku satu saat, dan で milik tempat atau alat.",
+    "howToAvoid": "Find MADE first, then put KARA at the other end.",
+    "howToAvoidId": "Cari まで dulu, lalu taruh から di ujung satunya.",
+    "memoryCue": "KARA starts, MADE stops.",
+    "memoryCueId": "から mulai, まで berhenti."
+   }
+  },
+  {
+   "id": "JP-TM-123",
+   "family": "time_expressions",
+   "skill": "time_expressions",
+   "subskill": "mae_after_number_time",
+   "cefr": "A1",
+   "jlpt": "N5",
+   "marker": "mae-counts-backwards-from-now",
+   "questionType": "multiple_choice",
+   "pedagogicalObjective": "Attach MAE to an amount of time to say how long ago something happened",
+   "pedagogicalObjectiveId": "Menempelkan まえ pada jumlah waktu untuk menyatakan berapa lama yang lalu",
+   "misconceptionTargeted": "Learner picks a forward-looking word for an event that already happened",
+   "misconceptionTargetedId": "Murid memilih kata yang menghadap ke depan untuk peristiwa yang sudah terjadi",
+   "reasoningOperation": "see KIMASHITA (past) -> the time word must point backwards, so MAE",
+   "reasoningOperationId": "lihat きました (lampau) -> kata waktunya harus menunjuk ke belakang, jadi まえ",
+   "stem": "2ねん___に にほんへ きました。",
+   "stemKana": "にねん___に にほんへ きました。",
+   "furigana": [],
+   "options": [
+    "まえ",
+    "ご",
+    "ごろ",
+    "から"
+   ],
+   "correctIndex": 0,
+   "distractors": [
+    {
+     "option": "ご",
+     "misconception": "forward-looking GO used with a past event",
+     "misconceptionId": "ご yang menghadap ke depan dipakai untuk peristiwa lampau",
+     "whyFails": "2 NEN GO means two years from a future point, which clashes with KIMASHITA.",
+     "whyFailsId": "2ねんご berarti dua tahun dari titik di masa depan, bertabrakan dengan きました."
+    },
+    {
+     "option": "ごろ",
+     "misconception": "approximator attached to a span instead of a point",
+     "misconceptionId": "kata perkiraan ditempel ke rentang, bukan titik",
+     "whyFails": "GORO softens a position such as 3 JI and cannot follow the amount 2 NEN.",
+     "whyFailsId": "ごろ memperkirakan posisi seperti 3じ dan tidak bisa mengikuti jumlah 2ねん."
+    },
+    {
+     "option": "から",
+     "misconception": "range opener used where a single past moment is meant",
+     "misconceptionId": "pembuka rentang dipakai padahal yang dimaksud satu saat lampau",
+     "whyFails": "2 NEN KARA NI is not a phrase; KARA opens a stretch and does not take NI after it.",
+     "whyFailsId": "2ねんからに bukan frasa; から membuka rentang dan tidak diikuti に."
+    }
+   ],
+   "explanation": {
+    "whyCorrect": "An amount plus MAE counts backwards from now, matching the past verb KIMASHITA.",
+    "whyCorrectId": "Jumlah + まえ menghitung mundur dari sekarang, cocok dengan kata kerja lampau きました.",
+    "rule": "Amount + MAE = that long ago.",
+    "ruleId": "Jumlah + まえ = selama itu yang lalu.",
+    "whyOthersFail": "GO looks forward, GORO needs a point, and KARA opens a range.",
+    "whyOthersFailId": "ご menghadap ke depan, ごろ butuh titik, dan から membuka rentang.",
+    "howToAvoid": "Check the tense of the verb before choosing MAE or GO.",
+    "howToAvoidId": "Periksa kala kata kerjanya sebelum memilih まえ atau ご.",
+    "memoryCue": "MAE is the past standing in front of you.",
+    "memoryCueId": "まえ adalah masa lalu yang berdiri di depanmu."
+   }
+  },
+  {
+   "id": "JP-TM-124",
+   "family": "time_expressions",
+   "skill": "time_expressions",
+   "subskill": "mae_ni_before_verb",
+   "cefr": "A1",
+   "jlpt": "N5",
+   "marker": "mae-ni-follows-a-dictionary-verb",
+   "questionType": "multiple_choice",
+   "pedagogicalObjective": "Order two actions with dictionary form plus MAE NI",
+   "pedagogicalObjectiveId": "Mengurutkan dua tindakan dengan bentuk kamus + まえに",
+   "misconceptionTargeted": "Learner attaches the after-word straight to a verb, where Japanese demands a different shape",
+   "misconceptionTargetedId": "Murid menempelkan kata 'sesudah' langsung ke kata kerja, padahal Jepang menuntut bentuk lain",
+   "reasoningOperation": "the tooth-brushing comes first -> the sleeping clause is the later one, so MAE NI",
+   "reasoningOperationId": "menyikat gigi lebih dulu -> klausa tidur yang belakangan, jadi まえに",
+   "stem": "ねる___に はを みがきます。",
+   "stemKana": "ねる___に はを みがきます。",
+   "furigana": [],
+   "options": [
+    "まえ",
+    "あと",
+    "ごろ",
+    "から"
+   ],
+   "correctIndex": 0,
+   "distractors": [
+    {
+     "option": "あと",
+     "misconception": "ATO joined to a dictionary verb with NI",
+     "misconceptionId": "あと disambung ke kata kerja kamus dengan に",
+     "whyFails": "ATO needs the TA form and the particle DE, so NERU ATO NI is not a possible shape.",
+     "whyFailsId": "あと butuh bentuk た dan partikel で, jadi ねるあとに bukan bentuk yang mungkin."
+    },
+    {
+     "option": "ごろ",
+     "misconception": "approximator used to order two actions",
+     "misconceptionId": "kata perkiraan dipakai untuk mengurutkan dua tindakan",
+     "whyFails": "GORO attaches to a clock or calendar point, never to a verb.",
+     "whyFailsId": "ごろ menempel pada titik jam atau kalender, bukan pada kata kerja."
+    },
+    {
+     "option": "から",
+     "misconception": "KARA read as a sequencer and then given NI",
+     "misconceptionId": "から dibaca sebagai pengurut lalu diberi に",
+     "whyFails": "KARA after a verb means because or after, and it never takes NI.",
+     "whyFailsId": "から sesudah kata kerja berarti karena atau sesudah, dan tidak pernah memakai に."
+    }
+   ],
+   "explanation": {
+    "whyCorrect": "Dictionary form plus MAE NI says the main action happens before that event.",
+    "whyCorrectId": "Bentuk kamus + まえに menyatakan tindakan utama terjadi sebelum peristiwa itu.",
+    "rule": "Dictionary form + MAE NI; TA form + ATO DE.",
+    "ruleId": "Bentuk kamus + まえに; bentuk た + あとで.",
+    "whyOthersFail": "ATO wants TA plus DE, GORO wants a time point, and KARA never takes NI.",
+    "whyOthersFailId": "あと minta bentuk た dan で, ごろ minta titik waktu, dan から tidak pernah memakai に.",
+    "howToAvoid": "Look at the verb shape: plain dictionary form only fits MAE NI.",
+    "howToAvoidId": "Lihat bentuk kata kerjanya: bentuk kamus polos hanya cocok dengan まえに.",
+    "memoryCue": "MAE takes the plain verb; ATO takes the past one.",
+    "memoryCueId": "まえ memakai kata kerja polos; あと memakai yang lampau."
+   }
+  },
+  {
+   "id": "JP-TM-125",
+   "family": "time_expressions",
+   "skill": "time_expressions",
+   "subskill": "nen_counter_for_years",
+   "cefr": "A1",
+   "jlpt": "N5",
+   "marker": "nen-names-the-year",
+   "questionType": "multiple_choice",
+   "pedagogicalObjective": "Choose the counter NEN to name a calendar year",
+   "pedagogicalObjectiveId": "Memilih penghitung ねん untuk menyebut tahun kalender",
+   "misconceptionTargeted": "Learner reaches for a month or day counter when the number is a four-digit year",
+   "misconceptionTargetedId": "Murid memakai penghitung bulan atau tanggal padahal angkanya tahun empat digit",
+   "reasoningOperation": "a four-digit number in a date slot -> it names the year, so NEN",
+   "reasoningOperationId": "angka empat digit di slot tanggal -> ia menyebut tahun, jadi ねん",
+   "stem": "わたしは 2010___に うまれました。",
+   "stemKana": "わたしは にせんじゅう___に うまれました。",
+   "furigana": [],
+   "options": [
+    "ねん",
+    "がつ",
+    "にち",
+    "じかん"
+   ],
+   "correctIndex": 0,
+   "distractors": [
+    {
+     "option": "がつ",
+     "misconception": "month counter used for a year number",
+     "misconceptionId": "penghitung bulan dipakai untuk angka tahun",
+     "whyFails": "GATSU names one of the twelve months, so it cannot follow 2010.",
+     "whyFailsId": "がつ menyebut satu dari dua belas bulan, jadi ia tidak bisa mengikuti 2010."
+    },
+    {
+     "option": "にち",
+     "misconception": "date counter used for a year number",
+     "misconceptionId": "penghitung tanggal dipakai untuk angka tahun",
+     "whyFails": "NICHI counts days inside a month and stops at 31.",
+     "whyFailsId": "にち menghitung tanggal dalam sebulan dan berhenti di 31."
+    },
+    {
+     "option": "じかん",
+     "misconception": "duration counter used inside a date",
+     "misconceptionId": "penghitung lama waktu dipakai di dalam tanggal",
+     "whyFails": "JIKAN measures a span of hours and never names a year.",
+     "whyFailsId": "じかん mengukur rentang jam dan tidak pernah menyebut tahun."
+    }
+   ],
+   "explanation": {
+    "whyCorrect": "A calendar year is the number plus NEN, and the whole date takes NI.",
+    "whyCorrectId": "Tahun kalender adalah angka + ねん, dan seluruh tanggal memakai に.",
+    "rule": "NEN for years, GATSU for months, NICHI for days.",
+    "ruleId": "ねん untuk tahun, がつ untuk bulan, にち untuk tanggal.",
+    "whyOthersFail": "GATSU tops out at twelve, NICHI at thirty-one, and JIKAN is not a date at all.",
+    "whyOthersFailId": "がつ berhenti di dua belas, にち di tiga puluh satu, dan じかん bukan tanggal sama sekali.",
+    "howToAvoid": "Read the size of the number: four digits means a year.",
+    "howToAvoidId": "Baca besar angkanya: empat digit berarti tahun.",
+    "memoryCue": "Year to NEN, month to GATSU, day to NICHI.",
+    "memoryCueId": "Tahun ke ねん, bulan ke がつ, tanggal ke にち."
+   }
+  },
+  {
+   "id": "JP-TM-126",
+   "family": "time_expressions",
+   "skill": "time_expressions",
+   "subskill": "tsuitachi_irregular_date",
+   "cefr": "A1",
+   "jlpt": "N5",
+   "marker": "tsuitachi-is-the-first-of-the-month",
+   "questionType": "multiple_choice",
+   "pedagogicalObjective": "Read the first day of a month as TSUITACHI instead of a regular NICHI count",
+   "pedagogicalObjectiveId": "Membaca hari pertama sebuah bulan sebagai ついたち, bukan hitungan にち biasa",
+   "misconceptionTargeted": "Learner applies the regular number-plus-NICHI pattern to the irregular first of the month",
+   "misconceptionTargetedId": "Murid memakai pola angka + にち yang biasa pada tanggal satu yang tidak beraturan",
+   "reasoningOperation": "the date is the 1st of a month -> its reading is irregular, so TSUITACHI",
+   "reasoningOperationId": "tanggalnya satu dalam sebulan -> bacaannya tidak beraturan, jadi ついたち",
+   "stem": "4がつ___に あいましょう。",
+   "stemKana": "しがつ___に あいましょう。",
+   "furigana": [],
+   "options": [
+    "ついたち",
+    "いちにち",
+    "いちび",
+    "ひとつ"
+   ],
+   "correctIndex": 0,
+   "distractors": [
+    {
+     "option": "いちにち",
+     "misconception": "the regular count read as a date",
+     "misconceptionId": "hitungan biasa dibaca sebagai tanggal",
+     "whyFails": "ICHI NICHI means one whole day as a length, not the first of the month.",
+     "whyFailsId": "いちにち berarti satu hari penuh sebagai lama waktu, bukan tanggal satu."
+    },
+    {
+     "option": "いちび",
+     "misconception": "the kanji for day read with the wrong sound",
+     "misconceptionId": "kanji hari dibaca dengan bunyi yang keliru",
+     "whyFails": "BI is not a reading used for dates; it appears in words such as YOUBI, never alone after a number.",
+     "whyFailsId": "び bukan bacaan untuk tanggal; ia muncul di kata seperti ようび, tidak pernah sendiri sesudah angka."
+    },
+    {
+     "option": "ひとつ",
+     "misconception": "the general counter used for a calendar date",
+     "misconceptionId": "penghitung umum dipakai untuk tanggal kalender",
+     "whyFails": "HITOTSU counts objects and cannot name a day on the calendar.",
+     "whyFailsId": "ひとつ menghitung benda dan tidak bisa menyebut hari pada kalender."
+    }
+   ],
+   "explanation": {
+    "whyCorrect": "The 1st of any month is read TSUITACHI, one of the irregular date readings.",
+    "whyCorrectId": "Tanggal satu bulan apa pun dibaca ついたち, salah satu bacaan tanggal yang tidak beraturan.",
+    "rule": "Days 1 to 10 have their own readings; 1 is TSUITACHI.",
+    "ruleId": "Tanggal 1 sampai 10 punya bacaan sendiri; tanggal 1 adalah ついたち.",
+    "whyOthersFail": "ICHI NICHI is a length, BI is not a date reading, and HITOTSU counts objects.",
+    "whyOthersFailId": "いちにち itu lama waktu, び bukan bacaan tanggal, dan ひとつ menghitung benda.",
+    "howToAvoid": "Learn the first ten dates as words, not as sums.",
+    "howToAvoidId": "Hafalkan sepuluh tanggal pertama sebagai kata, bukan sebagai hitungan.",
+    "memoryCue": "The month starts with TSUITACHI, never ICHI NICHI.",
+    "memoryCueId": "Bulan dimulai dengan ついたち, tidak pernah いちにち."
    }
   },
   {
