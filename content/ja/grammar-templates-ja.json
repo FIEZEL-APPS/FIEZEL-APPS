@@ -9,13 +9,41 @@
     "N4",
     "N5"
   ],
-  "catatan": "Bank soal A1/N5 Jepang. Bentuknya SAMA PERSIS dengan grammar-templates.json Inggris, jadi ia lewat jalur hidrasi yang sama di app.js — seluruh mesin adaptif (alokator, ingatan soal, tutor brain) ikut tanpa kode paralel.",
+  "catatan": "Bank soal Jepang DUA TINGKAT: A1/N5 dan A2/N4 dalam satu berkas. Bentuknya SAMA PERSIS dengan grammar-templates.json Inggris, jadi ia lewat jalur hidrasi yang sama di app.js — seluruh mesin adaptif (alokator, ingatan soal, tutor brain) ikut tanpa kode paralel.",
   "provenans": {
     "sumberSilabus": "Minna no Nihongo dan Irodori dipakai SEBAGAI SILABUS SAJA: poin tata bahasa apa, urutannya bagaimana, di tingkat berapa. NOL kalimat, dialog, teks, atau daftar kosakata yang direproduksi atau diturunkan — setiap stem, pilihan, pengecoh, dan penjelasan ditulis baru.",
     "akibatLisensi": "Karena tidak ada teks Irodori yang dipakai, FIEZEL TIDAK terikat kewajiban gratis-selamanya dari lisensinya.",
     "statusNaskah": "Kalimat Jepang dan penjelasan Inggris/Indonesia berstatus DRAFT AI dan wajib direview penutur asli sebelum dipakai menilai murid."
   },
-  "keluarga": 27,
+  "keluarga": {
+    "adjectives": 22,
+    "comparison": 12,
+    "conditionals": 12,
+    "counters": 22,
+    "demonstratives": 18,
+    "existence_location": 18,
+    "experience_frequency": 12,
+    "giving_receiving": 12,
+    "keigo": 12,
+    "negation_past": 18,
+    "noun_modification": 16,
+    "obligation_permission": 12,
+    "particles": 22,
+    "passive_causative": 12,
+    "plain_forms": 12,
+    "polite_forms": 20,
+    "potential": 12,
+    "question_words": 20,
+    "quotation_thought": 12,
+    "reason_concession": 12,
+    "relative_clauses": 12,
+    "te_form": 20,
+    "te_form_extensions": 12,
+    "time_expressions": 26,
+    "transitivity_pairs": 12,
+    "verb_groups": 20,
+    "volitional_intent": 12
+  },
   "jumlah": 422,
   "templates": [
     {
