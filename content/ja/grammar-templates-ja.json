@@ -35,9 +35,16 @@
   "passive_causative": 6,
   "conditionals": 6,
   "transitivity_pairs": 6,
-  "giving_receiving": 6
+  "giving_receiving": 6,
+  "quotation_thought": 6,
+  "relative_clauses": 6,
+  "comparison": 6,
+  "obligation_permission": 6,
+  "reason_concession": 6,
+  "experience_frequency": 6,
+  "keigo": 6
  },
- "jumlah": 282,
+ "jumlah": 324,
  "templates": [
   {
    "id": "JP-AD-101",
@@ -17683,6 +17690,2568 @@
     "howToAvoidId": "Cocokkan dua hal: arahnya, lalu rasa hormatnya.",
     "memoryCue": "Up gives KUDASARU.",
     "memoryCueId": "Dari atas memberi くださる。"
+   }
+  },
+  {
+   "id": "JP-N4-QT-01",
+   "family": "quotation_thought",
+   "skill": "quotation_thought",
+   "subskill": "to_iu_indirect_quote",
+   "cefr": "A2",
+   "jlpt": "N4",
+   "marker": "quotation-to-iu-plain-before",
+   "questionType": "multiple_choice",
+   "pedagogicalObjective": "Report speech with a plain form before TO IIMASHITA",
+   "pedagogicalObjectiveId": "Melaporkan ucapan dengan bentuk biasa sebelum といいました",
+   "misconceptionTargeted": "Learner keeps the polite MASU form inside the quote, doubling the politeness",
+   "misconceptionTargetedId": "Murid mempertahankan bentuk sopan ます di dalam kutipan, menggandakan kesopanannya",
+   "reasoningOperation": "check what sits before TO -> an indirect quote takes the plain form",
+   "reasoningOperationId": "periksa apa yang duduk sebelum と -> kutipan tak langsung memakai bentuk biasa",
+   "stem": "母は あした 雨が ___ と 言いました。(ふる)",
+   "stemKana": "はははあした あめが ___ と いいました。(ふる)",
+   "furigana": [],
+   "options": [
+    "ふる",
+    "ふります",
+    "ふって",
+    "ふりまして"
+   ],
+   "correctIndex": 0,
+   "distractors": [
+    {
+     "option": "ふります",
+     "misconception": "the polite form inside an indirect quote",
+     "misconceptionId": "bentuk sopan di dalam kutipan tak langsung",
+     "whyFails": "Politeness belongs to IIMASHITA at the end, not inside the quoted clause.",
+     "whyFailsId": "Kesopanannya milik いいました di akhir, bukan di dalam klausa yang dikutip."
+    },
+    {
+     "option": "ふって",
+     "misconception": "the TE form before TO",
+     "misconceptionId": "bentuk て sebelum と",
+     "whyFails": "A TE form cannot close a quoted clause.",
+     "whyFailsId": "Bentuk て tidak bisa menutup klausa yang dikutip."
+    },
+    {
+     "option": "ふりまして",
+     "misconception": "a polite TE form, doubling both errors",
+     "misconceptionId": "bentuk て sopan, menggandakan kedua kesalahan",
+     "whyFails": "It is polite where it should be plain, and unfinished where it should close.",
+     "whyFailsId": "Ia sopan di tempat yang harus biasa, dan belum selesai di tempat yang harus menutup."
+    }
+   ],
+   "explanation": {
+    "whyCorrect": "An indirect quote closes in plain form before TO: AME GA FURU TO IIMASHITA.",
+    "whyCorrectId": "Kutipan tak langsung ditutup bentuk biasa sebelum と: あめが ふる と いいました。",
+    "rule": "Plain form + TO + verb of saying or thinking.",
+    "ruleId": "Bentuk biasa + と + verba mengatakan atau berpikir.",
+    "whyOthersFail": "The wrong options are polite inside the quote or leave the clause unfinished.",
+    "whyOthersFailId": "Pilihan salah bersikap sopan di dalam kutipan atau membiarkan klausanya belum selesai.",
+    "howToAvoid": "Politeness lives at the end of the sentence, once.",
+    "howToAvoidId": "Kesopanan tinggal di akhir kalimat, sekali saja.",
+    "memoryCue": "Inside TO, stay plain.",
+    "memoryCueId": "Di dalam と, tetap biasa."
+   }
+  },
+  {
+   "id": "JP-N4-QT-02",
+   "family": "quotation_thought",
+   "skill": "quotation_thought",
+   "subskill": "to_omou_opinion",
+   "cefr": "A2",
+   "jlpt": "N4",
+   "marker": "quotation-to-omou-opinion",
+   "questionType": "multiple_choice",
+   "pedagogicalObjective": "State an opinion with a plain clause before TO OMOIMASU",
+   "pedagogicalObjectiveId": "Menyatakan pendapat dengan klausa biasa sebelum とおもいます",
+   "misconceptionTargeted": "Learner adds DESU inside the clause, treating the quote as a full polite sentence",
+   "misconceptionTargetedId": "Murid menambahkan です di dalam klausanya, menganggap kutipan itu kalimat sopan utuh",
+   "reasoningOperation": "check the clause before TO -> an adjective clause ends plain",
+   "reasoningOperationId": "periksa klausa sebelum と -> klausa berkata sifat berakhir biasa",
+   "stem": "この しごとは ___ と 思います。(むずかしい)",
+   "stemKana": "この しごとは ___ と おもいます。(むずかしい)",
+   "furigana": [],
+   "options": [
+    "むずかしい",
+    "むずかしいです",
+    "むずかしくて",
+    "むずかしいだ"
+   ],
+   "correctIndex": 0,
+   "distractors": [
+    {
+     "option": "むずかしいです",
+     "misconception": "DESU inside the quoted clause",
+     "misconceptionId": "です di dalam klausa yang dikutip",
+     "whyFails": "OMOIMASU already carries the politeness for the whole sentence.",
+     "whyFailsId": "おもいます sudah membawa kesopanan untuk seluruh kalimat."
+    },
+    {
+     "option": "むずかしくて",
+     "misconception": "the TE form of an i-adjective",
+     "misconceptionId": "bentuk て kata sifat -i",
+     "whyFails": "KUTE joins clauses; it cannot end the one being quoted.",
+     "whyFailsId": "くて menyambung klausa; ia tidak bisa mengakhiri yang sedang dikutip."
+    },
+    {
+     "option": "むずかしいだ",
+     "misconception": "DA added to an i-adjective",
+     "misconceptionId": "だ ditambahkan ke kata sifat -i",
+     "whyFails": "I-adjectives never take DA; only nouns and na-adjectives do.",
+     "whyFailsId": "Kata sifat -i tidak pernah memakai だ; hanya kata benda dan kata sifat -na."
+    }
+   ],
+   "explanation": {
+    "whyCorrect": "An i-adjective is already a complete plain predicate: MUZUKASHII TO OMOIMASU.",
+    "whyCorrectId": "Kata sifat -i sudah menjadi predikat biasa yang lengkap: むずかしい と おもいます。",
+    "rule": "Plain clause + TO OMOU. An i-adjective needs nothing added.",
+    "ruleId": "Klausa biasa + とおもう. Kata sifat -i tidak perlu tambahan.",
+    "whyOthersFail": "DESU is politeness in the wrong place, KUTE joins, DA is ungrammatical here.",
+    "whyOthersFailId": "です kesopanan di tempat yang salah, くて menyambung, だ tidak gramatikal di sini.",
+    "howToAvoid": "If it can end a plain sentence, it can sit before TO.",
+    "howToAvoidId": "Kalau ia bisa mengakhiri kalimat biasa, ia bisa duduk sebelum と。",
+    "memoryCue": "I-adjectives stand alone.",
+    "memoryCueId": "Kata sifat -i berdiri sendiri."
+   }
+  },
+  {
+   "id": "JP-N4-QT-03",
+   "family": "quotation_thought",
+   "skill": "quotation_thought",
+   "subskill": "noun_da_before_to",
+   "cefr": "A2",
+   "jlpt": "N4",
+   "marker": "quotation-noun-da-before-to",
+   "questionType": "multiple_choice",
+   "pedagogicalObjective": "Add DA after a noun before TO OMOU, because a noun cannot close a clause alone",
+   "pedagogicalObjectiveId": "Menambahkan だ sesudah kata benda sebelum とおもう, karena kata benda tidak bisa menutup klausa sendiri",
+   "misconceptionTargeted": "Learner drops DA, leaving a bare noun where a predicate is required",
+   "misconceptionTargetedId": "Murid menghilangkan だ, menyisakan kata benda telanjang di tempat yang menuntut predikat",
+   "reasoningOperation": "check the word class -> a noun needs DA to become a plain predicate",
+   "reasoningOperationId": "periksa jenis katanya -> kata benda butuh だ untuk menjadi predikat biasa",
+   "stem": "あの 人は 学生___ と 思います。",
+   "stemKana": "あの ひとは がくせい___ と おもいます。",
+   "furigana": [],
+   "options": [
+    "だ",
+    "です",
+    "である だ",
+    "の"
+   ],
+   "correctIndex": 0,
+   "distractors": [
+    {
+     "option": "です",
+     "misconception": "the polite copula inside the quoted clause",
+     "misconceptionId": "kopula sopan di dalam klausa yang dikutip",
+     "whyFails": "Politeness belongs to OMOIMASU; the quote needs the plain DA.",
+     "whyFailsId": "Kesopanannya milik おもいます; kutipannya butuh だ yang biasa."
+    },
+    {
+     "option": "である だ",
+     "misconception": "two copulas stacked",
+     "misconceptionId": "dua kopula ditumpuk",
+     "whyFails": "DE ARU is already the plain copula, so DA cannot follow it.",
+     "whyFailsId": "である sudah kopula biasa, jadi だ tidak bisa mengikutinya."
+    },
+    {
+     "option": "の",
+     "misconception": "a linking particle where a predicate is needed",
+     "misconceptionId": "penanda penyambung di tempat yang butuh predikat",
+     "whyFails": "NO joins two nouns; it cannot close the quoted clause.",
+     "whyFailsId": "の menyambung dua kata benda; ia tidak bisa menutup klausa yang dikutip."
+    }
+   ],
+   "explanation": {
+    "whyCorrect": "A noun needs DA to become a plain predicate before TO: GAKUSEI DA TO OMOIMASU.",
+    "whyCorrectId": "Kata benda butuh だ untuk menjadi predikat biasa sebelum と: がくせい だ と おもいます。",
+    "rule": "Noun + DA + TO OMOU. I-adjective + TO OMOU, with nothing added.",
+    "ruleId": "Kata benda + だ + とおもう. Kata sifat -i + とおもう, tanpa tambahan.",
+    "whyOthersFail": "DESU is politeness misplaced, DE ARU DA doubles, NO links nouns.",
+    "whyOthersFailId": "です kesopanan yang salah tempat, である だ menggandakan, の menyambung kata benda.",
+    "howToAvoid": "Ask whether the word can end a sentence by itself. A noun cannot.",
+    "howToAvoidId": "Tanyakan apakah katanya bisa mengakhiri kalimat sendiri. Kata benda tidak bisa.",
+    "memoryCue": "Nouns borrow DA.",
+    "memoryCueId": "Kata benda meminjam だ。"
+   }
+  },
+  {
+   "id": "JP-N4-QT-04",
+   "family": "quotation_thought",
+   "skill": "quotation_thought",
+   "subskill": "ka_dou_ka_embedded_question",
+   "cefr": "A2",
+   "jlpt": "N4",
+   "marker": "quotation-ka-dou-ka",
+   "questionType": "multiple_choice",
+   "pedagogicalObjective": "Embed a yes-no question with KA DOU KA",
+   "pedagogicalObjectiveId": "Menyisipkan pertanyaan ya-tidak dengan かどうか",
+   "misconceptionTargeted": "Learner embeds it with KA alone, which suits question words not yes-no questions",
+   "misconceptionTargetedId": "Murid menyisipkannya dengan か saja, yang cocok untuk kata tanya bukan pertanyaan ya-tidak",
+   "reasoningOperation": "ask whether the inner question has a question word -> no question word takes KA DOU KA",
+   "reasoningOperationId": "tanyakan apakah pertanyaan dalamnya punya kata tanya -> tanpa kata tanya memakai かどうか",
+   "stem": "あの 店が あいている ___ 知りません。",
+   "stemKana": "あの みせが あいている ___ しりません。",
+   "furigana": [],
+   "options": [
+    "かどうか",
+    "かが",
+    "のを",
+    "とか"
+   ],
+   "correctIndex": 0,
+   "distractors": [
+    {
+     "option": "かが",
+     "misconception": "KA plus a subject marker",
+     "misconceptionId": "か ditambah penanda subjek",
+     "whyFails": "The embedded question is the object of SHIRIMASEN, and KA GA is not a pattern.",
+     "whyFailsId": "Pertanyaan yang disisipkan itu objek しりません, dan かが bukan pola."
+    },
+    {
+     "option": "のを",
+     "misconception": "a nominaliser plus O, which states a fact not a question",
+     "misconceptionId": "pembenda ditambah を, yang menyatakan fakta bukan pertanyaan",
+     "whyFails": "NO O reports something known; the speaker says they do not know.",
+     "whyFailsId": "のを melaporkan sesuatu yang diketahui; pembicara menyatakan tidak tahu."
+    },
+    {
+     "option": "とか",
+     "misconception": "a listing particle meaning things like",
+     "misconceptionId": "penanda daftar yang berarti dan semacamnya",
+     "whyFails": "TOKA lists examples and does not embed a question.",
+     "whyFailsId": "とか mendaftar contoh dan tidak menyisipkan pertanyaan."
+    }
+   ],
+   "explanation": {
+    "whyCorrect": "A yes-no question inside a sentence becomes KA DOU KA: AITE IRU KA DOU KA.",
+    "whyCorrectId": "Pertanyaan ya-tidak di dalam kalimat menjadi かどうか: あいている かどうか。",
+    "rule": "KA DOU KA = whether or not. A question word already supplies the KA.",
+    "ruleId": "かどうか = apakah atau tidak. Kata tanya sudah menyediakan か-nya.",
+    "whyOthersFail": "The three alternatives mark a subject, a fact, or a list.",
+    "whyOthersFailId": "Tiga pilihan lain menandai subjek, fakta, atau daftar.",
+    "howToAvoid": "No question word inside? Then you need DOU KA.",
+    "howToAvoidId": "Tidak ada kata tanya di dalam? Maka kamu butuh どうか。",
+    "memoryCue": "Yes or no takes DOU KA.",
+    "memoryCueId": "Ya atau tidak memakai どうか。"
+   }
+  },
+  {
+   "id": "JP-N4-QT-05",
+   "family": "quotation_thought",
+   "skill": "quotation_thought",
+   "subskill": "to_itte_imashita_reported",
+   "cefr": "A2",
+   "jlpt": "N4",
+   "marker": "quotation-to-itte-ita-reported",
+   "questionType": "multiple_choice",
+   "pedagogicalObjective": "Report what someone was saying with TO ITTE IMASHITA",
+   "pedagogicalObjectiveId": "Melaporkan apa yang dikatakan seseorang dengan といっていました",
+   "misconceptionTargeted": "Learner uses TO IIMASHITA for information heard earlier and still relevant",
+   "misconceptionTargetedId": "Murid memakai といいました untuk informasi yang didengar lebih dulu dan masih relevan",
+   "reasoningOperation": "ask whether you are passing on news -> passing it on takes TO ITTE IMASHITA",
+   "reasoningOperationId": "tanyakan apakah kamu meneruskan kabar -> meneruskannya memakai といっていました",
+   "stem": "田中さんは きょう やすむ ___。だから 来ません。",
+   "stemKana": "たなかさんは きょう やすむ ___。だから きません。",
+   "furigana": [],
+   "options": [
+    "と 言って いました",
+    "と 言います",
+    "と 言おう",
+    "と 言われて"
+   ],
+   "correctIndex": 0,
+   "distractors": [
+    {
+     "option": "と 言います",
+     "misconception": "the present form, as if said habitually",
+     "misconceptionId": "bentuk sekarang, seolah dikatakan berulang",
+     "whyFails": "IIMASU reads as a habit or a general statement, not news you carry.",
+     "whyFailsId": "いいます terbaca sebagai kebiasaan atau pernyataan umum, bukan kabar yang kamu bawa."
+    },
+    {
+     "option": "と 言おう",
+     "misconception": "the volitional, let us say",
+     "misconceptionId": "bentuk kehendak, ayo katakan",
+     "whyFails": "That proposes speaking rather than reporting what was spoken.",
+     "whyFailsId": "Itu mengusulkan berbicara bukan melaporkan yang sudah dibicarakan."
+    },
+    {
+     "option": "と 言われて",
+     "misconception": "the passive TE form, was told",
+     "misconceptionId": "bentuk て pasif, diberi tahu",
+     "whyFails": "It leaves the sentence unfinished and shifts who spoke.",
+     "whyFailsId": "Ia membiarkan kalimatnya belum selesai dan memindahkan siapa yang berbicara."
+    }
+   ],
+   "explanation": {
+    "whyCorrect": "You are passing on what Tanaka said, which is TO ITTE IMASHITA.",
+    "whyCorrectId": "Kamu meneruskan apa yang dikatakan Tanaka, dan itu といっていました。",
+    "rule": "TO ITTE IMASHITA = reporting words you heard and still hold.",
+    "ruleId": "といっていました = melaporkan kata-kata yang kamu dengar dan masih kamu bawa.",
+    "whyOthersFail": "IIMASU is habitual, IIOU proposes, IWARETE changes the speaker.",
+    "whyOthersFailId": "いいます kebiasaan, いおう mengusulkan, いわれて mengubah pembicaranya.",
+    "howToAvoid": "Carrying a message? Use the TE IMASHITA form.",
+    "howToAvoidId": "Membawa pesan? Pakai bentuk ていました。",
+    "memoryCue": "Messages arrive in TE ITA.",
+    "memoryCueId": "Pesan datang dalam ていた。"
+   }
+  },
+  {
+   "id": "JP-N4-QT-06",
+   "family": "quotation_thought",
+   "skill": "quotation_thought",
+   "subskill": "tte_casual_quote",
+   "cefr": "A2",
+   "jlpt": "N4",
+   "marker": "quotation-casual-tte",
+   "questionType": "multiple_choice",
+   "pedagogicalObjective": "Recognise TTE as the casual replacement for TO in speech",
+   "pedagogicalObjectiveId": "Mengenali って sebagai pengganti santai と dalam percakapan",
+   "misconceptionTargeted": "Learner reads TTE as a typo and picks the formal TO in a clearly casual line",
+   "misconceptionTargetedId": "Murid menganggap って salah tulis lalu memilih と yang formal dalam kalimat yang jelas santai",
+   "reasoningOperation": "read the register -> casual speech shortens TO to TTE",
+   "reasoningOperationId": "baca ragamnya -> percakapan santai memendekkan と menjadi って",
+   "stem": "「ゆうくん、あした 来ない ___ 言ってたよ。」",
+   "stemKana": "「ゆうくん、あした こない ___ いってたよ。」",
+   "furigana": [],
+   "options": [
+    "って",
+    "と申し",
+    "というふうに",
+    "ということを"
+   ],
+   "correctIndex": 0,
+   "distractors": [
+    {
+     "option": "と申し",
+     "misconception": "a humble formal verb fragment in a casual line",
+     "misconceptionId": "pecahan verba formal merendah dalam kalimat santai",
+     "whyFails": "MOUSHI belongs to business Japanese, not to a line ending in YO.",
+     "whyFailsId": "もうし milik bahasa Jepang bisnis, bukan kalimat yang diakhiri よ。"
+    },
+    {
+     "option": "というふうに",
+     "misconception": "a long explanatory phrase in a short casual line",
+     "misconceptionId": "frasa penjelas panjang dalam kalimat santai yang pendek",
+     "whyFails": "It is grammatical but far heavier than the sentence register allows.",
+     "whyFailsId": "Itu gramatikal tetapi jauh lebih berat daripada yang diizinkan ragam kalimatnya."
+    },
+    {
+     "option": "ということを",
+     "misconception": "a nominalised quote taking O",
+     "misconceptionId": "kutipan dibendakan yang memakai を",
+     "whyFails": "ITTETA here needs a quote marker, not an object phrase.",
+     "whyFailsId": "いってた di sini butuh penanda kutipan, bukan frasa objek."
+    }
+   ],
+   "explanation": {
+    "whyCorrect": "The line is casual, and casual speech shortens TO to TTE.",
+    "whyCorrectId": "Kalimatnya santai, dan percakapan santai memendekkan と menjadi って。",
+    "rule": "TTE = casual TO. ITTETA = casual ITTE ITA.",
+    "ruleId": "って = と santai. いってた = いっていた santai.",
+    "whyOthersFail": "The alternatives are formal, heavy, or grammatically misplaced.",
+    "whyOthersFailId": "Pilihan lain formal, berat, atau salah tempat secara tata bahasa.",
+    "howToAvoid": "Match the quote marker to the register around it.",
+    "howToAvoidId": "Cocokkan penanda kutipannya dengan ragam di sekelilingnya.",
+    "memoryCue": "Casual clips TO to TTE.",
+    "memoryCueId": "Santai memotong と jadi って。"
+   }
+  },
+  {
+   "id": "JP-N4-RC-01",
+   "family": "relative_clauses",
+   "skill": "relative_clauses",
+   "subskill": "plain_verb_modifies_noun",
+   "cefr": "A2",
+   "jlpt": "N4",
+   "marker": "relative-plain-verb-before-noun",
+   "questionType": "multiple_choice",
+   "pedagogicalObjective": "Modify a noun with a plain verb clause placed directly in front of it",
+   "pedagogicalObjectiveId": "Menerangkan kata benda dengan klausa verba biasa yang diletakkan langsung di depannya",
+   "misconceptionTargeted": "Learner inserts NO between the clause and the noun, as with two nouns",
+   "misconceptionTargetedId": "Murid menyisipkan の antara klausa dan kata bendanya, seperti pada dua kata benda",
+   "reasoningOperation": "check what modifies the noun -> a verb clause attaches with nothing between",
+   "reasoningOperationId": "periksa apa yang menerangkan kata bendanya -> klausa verba menempel tanpa apa pun di antaranya",
+   "stem": "きのう ___ 本は とても おもしろかったです。(よむ)",
+   "stemKana": "きのう ___ ほんは とても おもしろかったです。(よむ)",
+   "furigana": [],
+   "options": [
+    "よんだ",
+    "よんだの",
+    "よみました",
+    "よんで"
+   ],
+   "correctIndex": 0,
+   "distractors": [
+    {
+     "option": "よんだの",
+     "misconception": "NO inserted between a clause and its noun",
+     "misconceptionId": "の disisipkan antara klausa dan kata bendanya",
+     "whyFails": "NO joins two nouns; a verb clause needs no bridge to the noun.",
+     "whyFailsId": "の menyambung dua kata benda; klausa verba tidak perlu jembatan ke kata bendanya."
+    },
+    {
+     "option": "よみました",
+     "misconception": "the polite form inside a modifying clause",
+     "misconceptionId": "bentuk sopan di dalam klausa penerang",
+     "whyFails": "Modifying clauses stay plain; politeness sits at the end of the sentence.",
+     "whyFailsId": "Klausa penerang tetap biasa; kesopanan duduk di akhir kalimat."
+    },
+    {
+     "option": "よんで",
+     "misconception": "the TE form, which joins actions instead of modifying",
+     "misconceptionId": "bentuk て, yang menyambung perbuatan bukan menerangkan",
+     "whyFails": "YONDE HON reads as read, and then a book.",
+     "whyFailsId": "よんで ほん terbaca sebagai membaca, lalu buku."
+    }
+   ],
+   "explanation": {
+    "whyCorrect": "A plain past clause modifies the noun directly: KINOU YONDA HON.",
+    "whyCorrectId": "Klausa lampau biasa menerangkan kata bendanya langsung: きのう よんだ ほん。",
+    "rule": "Verb clause + noun = no connector. Noun + noun = NO.",
+    "ruleId": "Klausa verba + kata benda = tanpa penyambung. Kata benda + kata benda = の。",
+    "whyOthersFail": "NO is for nouns, MASU is politeness misplaced, TE joins actions.",
+    "whyOthersFailId": "の untuk kata benda, ます kesopanan yang salah tempat, て menyambung perbuatan.",
+    "howToAvoid": "Ask what is doing the describing. A verb needs no bridge.",
+    "howToAvoidId": "Tanyakan apa yang sedang menerangkan. Verba tidak butuh jembatan.",
+    "memoryCue": "Verbs touch nouns directly.",
+    "memoryCueId": "Verba menyentuh kata benda langsung."
+   }
+  },
+  {
+   "id": "JP-N4-RC-02",
+   "family": "relative_clauses",
+   "skill": "relative_clauses",
+   "subskill": "ga_inside_relative_clause",
+   "cefr": "A2",
+   "jlpt": "N4",
+   "marker": "relative-ga-inside-clause",
+   "questionType": "multiple_choice",
+   "pedagogicalObjective": "Mark the subject inside a relative clause with GA, not WA",
+   "pedagogicalObjectiveId": "Menandai subjek di dalam klausa relatif dengan が, bukan は",
+   "misconceptionTargeted": "Learner uses WA inside the clause, which belongs to the main sentence topic",
+   "misconceptionTargetedId": "Murid memakai は di dalam klausanya, padahal itu milik topik kalimat utama",
+   "reasoningOperation": "find the clause boundary -> inside a clause the subject takes GA",
+   "reasoningOperationId": "temukan batas klausanya -> di dalam klausa subjeknya memakai が",
+   "stem": "父___ つくった りょうりは おいしいです。",
+   "stemKana": "ちち___ つくった りょうりは おいしいです。",
+   "furigana": [],
+   "options": [
+    "が",
+    "は",
+    "も",
+    "に"
+   ],
+   "correctIndex": 0,
+   "distractors": [
+    {
+     "option": "は",
+     "misconception": "a topic marker inside a relative clause",
+     "misconceptionId": "penanda topik di dalam klausa relatif",
+     "whyFails": "WA sets the topic of a sentence; RYOURI WA already holds that role.",
+     "whyFailsId": "は menetapkan topik kalimat; りょうりは sudah memegang peran itu."
+    },
+    {
+     "option": "も",
+     "misconception": "an also marker where a plain subject is meant",
+     "misconceptionId": "penanda juga padahal maksudnya subjek biasa",
+     "whyFails": "MO adds the sense of too, which the sentence does not need.",
+     "whyFailsId": "も menambah makna juga, yang tidak dibutuhkan kalimatnya."
+    },
+    {
+     "option": "に",
+     "misconception": "a target marker for the cook",
+     "misconceptionId": "penanda sasaran untuk yang memasak",
+     "whyFails": "CHICHI is the one cooking, not a destination.",
+     "whyFailsId": "ちち yang memasak, bukan tujuan."
+    }
+   ],
+   "explanation": {
+    "whyCorrect": "Inside the clause the cook is the subject, so GA is right: CHICHI GA TSUKUTTA RYOURI.",
+    "whyCorrectId": "Di dalam klausanya yang memasak itu subjeknya, jadi が yang benar: ちちが つくった りょうり。",
+    "rule": "One WA per sentence, and it belongs to the main topic.",
+    "ruleId": "Satu は per kalimat, dan ia milik topik utamanya.",
+    "whyOthersFail": "WA competes with the main topic, MO adds a meaning, NI moves the role.",
+    "whyOthersFailId": "は bersaing dengan topik utamanya, も menambah makna, に memindahkan perannya.",
+    "howToAvoid": "Inside clauses, always GA.",
+    "howToAvoidId": "Di dalam klausa, selalu が。",
+    "memoryCue": "WA outside, GA inside.",
+    "memoryCueId": "は di luar, が di dalam."
+   }
+  },
+  {
+   "id": "JP-N4-RC-03",
+   "family": "relative_clauses",
+   "skill": "relative_clauses",
+   "subskill": "adjective_clause_with_iru",
+   "cefr": "A2",
+   "jlpt": "N4",
+   "marker": "relative-clause-te-iru-modifier",
+   "questionType": "multiple_choice",
+   "pedagogicalObjective": "Modify a noun with a TE IRU clause to describe what someone is doing",
+   "pedagogicalObjectiveId": "Menerangkan kata benda dengan klausa ている untuk menggambarkan yang sedang dilakukan seseorang",
+   "misconceptionTargeted": "Learner uses the dictionary form, losing the in-progress sense the picture needs",
+   "misconceptionTargetedId": "Murid memakai bentuk kamus, kehilangan makna sedang berlangsung yang dibutuhkan gambarannya",
+   "reasoningOperation": "ask whether the action is in progress -> in progress keeps TE IRU inside the clause",
+   "reasoningOperationId": "tanyakan apakah perbuatannya berlangsung -> yang berlangsung mempertahankan ている di dalam klausanya",
+   "stem": "あそこで ___ 人は わたしの 姉です。(はなす)",
+   "stemKana": "あそこで ___ ひとは わたしの あねです。(はなす)",
+   "furigana": [],
+   "options": [
+    "はなして いる",
+    "はなす",
+    "はなした",
+    "はなして います"
+   ],
+   "correctIndex": 0,
+   "distractors": [
+    {
+     "option": "はなす",
+     "misconception": "the dictionary form for someone mid-conversation",
+     "misconceptionId": "bentuk kamus untuk orang yang sedang bercakap",
+     "whyFails": "HANASU HITO means a person who talks in general, not one talking now.",
+     "whyFailsId": "はなす ひと berarti orang yang bicara secara umum, bukan yang sedang bicara sekarang."
+    },
+    {
+     "option": "はなした",
+     "misconception": "the past form, describing someone who spoke",
+     "misconceptionId": "bentuk lampau, menggambarkan orang yang tadi bicara",
+     "whyFails": "The sister is visible over there, talking at this moment.",
+     "whyFailsId": "Kakaknya terlihat di sana, sedang bicara saat ini."
+    },
+    {
+     "option": "はなして います",
+     "misconception": "the polite form inside a modifying clause",
+     "misconceptionId": "bentuk sopan di dalam klausa penerang",
+     "whyFails": "IMASU is politeness; inside the clause it must be the plain IRU.",
+     "whyFailsId": "います itu kesopanan; di dalam klausanya ia harus いる yang biasa."
+    }
+   ],
+   "explanation": {
+    "whyCorrect": "She is talking right now, and clauses stay plain: HANASHITE IRU HITO.",
+    "whyCorrectId": "Dia sedang bicara sekarang, dan klausanya tetap biasa: はなして いる ひと。",
+    "rule": "TE IRU keeps its meaning inside a clause, but drops to plain IRU.",
+    "ruleId": "ている mempertahankan maknanya di dalam klausa, tetapi turun ke いる yang biasa.",
+    "whyOthersFail": "The dictionary form generalises, the past finishes it, IMASU is too polite.",
+    "whyOthersFailId": "Bentuk kamus mengumumkan, lampau menyelesaikannya, います terlalu sopan.",
+    "howToAvoid": "Keep the aspect, drop the politeness.",
+    "howToAvoidId": "Pertahankan aspeknya, gugurkan kesopanannya.",
+    "memoryCue": "IRU inside, IMASU outside.",
+    "memoryCueId": "いる di dalam, います di luar."
+   }
+  },
+  {
+   "id": "JP-N4-RC-04",
+   "family": "relative_clauses",
+   "skill": "relative_clauses",
+   "subskill": "negative_clause_modifier",
+   "cefr": "A2",
+   "jlpt": "N4",
+   "marker": "relative-negative-nai-modifier",
+   "questionType": "multiple_choice",
+   "pedagogicalObjective": "Modify a noun with a plain negative clause",
+   "pedagogicalObjectiveId": "Menerangkan kata benda dengan klausa ingkar biasa",
+   "misconceptionTargeted": "Learner uses the polite negative MASEN inside the clause",
+   "misconceptionTargetedId": "Murid memakai ingkar sopan ません di dalam klausanya",
+   "reasoningOperation": "negate plainly -> NAI can modify a noun directly",
+   "reasoningOperationId": "ingkarkan secara biasa -> ない bisa menerangkan kata benda langsung",
+   "stem": "にくを ___ 人の ために、やさいの りょうりを つくります。(たべる)",
+   "stemKana": "にくを ___ ひとの ために、やさいの りょうりを つくります。(たべる)",
+   "furigana": [],
+   "options": [
+    "たべない",
+    "たべません",
+    "たべなくて",
+    "たべないの"
+   ],
+   "correctIndex": 0,
+   "distractors": [
+    {
+     "option": "たべません",
+     "misconception": "the polite negative inside a clause",
+     "misconceptionId": "ingkar sopan di dalam klausa",
+     "whyFails": "MASEN is politeness, which belongs to the final verb TSUKURIMASU.",
+     "whyFailsId": "ません itu kesopanan, yang milik verba akhir つくります。"
+    },
+    {
+     "option": "たべなくて",
+     "misconception": "the negative TE form, which joins clauses",
+     "misconceptionId": "bentuk て ingkar, yang menyambung klausa",
+     "whyFails": "NAKUTE links two statements instead of describing HITO.",
+     "whyFailsId": "なくて menyambung dua pernyataan bukan menerangkan ひと。"
+    },
+    {
+     "option": "たべないの",
+     "misconception": "NO added between clause and noun",
+     "misconceptionId": "の ditambahkan antara klausa dan kata bendanya",
+     "whyFails": "NAI already modifies the noun; NO adds a bridge that is not needed.",
+     "whyFailsId": "ない sudah menerangkan kata bendanya; の menambah jembatan yang tidak perlu."
+    }
+   ],
+   "explanation": {
+    "whyCorrect": "A plain negative modifies the noun directly: NIKU O TABENAI HITO.",
+    "whyCorrectId": "Ingkar biasa menerangkan kata bendanya langsung: にくを たべない ひと。",
+    "rule": "NAI behaves like an i-adjective, so it can sit in front of a noun.",
+    "ruleId": "ない berperilaku seperti kata sifat -i, jadi ia bisa berdiri di depan kata benda.",
+    "whyOthersFail": "MASEN is polite, NAKUTE joins, NAI NO adds a needless bridge.",
+    "whyOthersFailId": "ません itu sopan, なくて menyambung, ないの menambah jembatan yang tak perlu.",
+    "howToAvoid": "If a form can end a plain sentence, it can modify a noun.",
+    "howToAvoidId": "Kalau sebuah bentuk bisa mengakhiri kalimat biasa, ia bisa menerangkan kata benda.",
+    "memoryCue": "NAI describes like an adjective.",
+    "memoryCueId": "ない menerangkan seperti kata sifat."
+   }
+  },
+  {
+   "id": "JP-N4-RC-05",
+   "family": "relative_clauses",
+   "skill": "relative_clauses",
+   "subskill": "place_clause_modifier",
+   "cefr": "A2",
+   "jlpt": "N4",
+   "marker": "relative-clause-place-noun",
+   "questionType": "multiple_choice",
+   "pedagogicalObjective": "Build a clause that describes a place, keeping the particle inside the clause",
+   "pedagogicalObjectiveId": "Membentuk klausa yang menerangkan tempat, dengan penandanya tetap di dalam klausa",
+   "misconceptionTargeted": "Learner moves the place particle outside, breaking the clause",
+   "misconceptionTargetedId": "Murid memindahkan penanda tempatnya ke luar, sehingga klausanya rusak",
+   "reasoningOperation": "keep the clause whole -> the particle that belongs to the inner verb stays inside",
+   "reasoningOperationId": "jaga klausanya utuh -> penanda yang milik verba di dalam tetap di dalam",
+   "stem": "わたしが ___ まちは 海が きれいです。(すむ)",
+   "stemKana": "わたしが ___ まちは うみが きれいです。(すむ)",
+   "furigana": [],
+   "options": [
+    "すんで いる",
+    "すんで います",
+    "すむの",
+    "すみます"
+   ],
+   "correctIndex": 0,
+   "distractors": [
+    {
+     "option": "すんで います",
+     "misconception": "the polite form inside a clause",
+     "misconceptionId": "bentuk sopan di dalam klausa",
+     "whyFails": "The final predicate is KIREI DESU; politeness belongs there.",
+     "whyFailsId": "Predikat akhirnya きれいです; kesopanannya milik di situ."
+    },
+    {
+     "option": "すむの",
+     "misconception": "NO between clause and noun",
+     "misconceptionId": "の antara klausa dan kata bendanya",
+     "whyFails": "A verb clause touches the noun directly, with no NO.",
+     "whyFailsId": "Klausa verba menyentuh kata bendanya langsung, tanpa の。"
+    },
+    {
+     "option": "すみます",
+     "misconception": "the polite form, and also the wrong aspect",
+     "misconceptionId": "bentuk sopan, dan aspeknya juga salah",
+     "whyFails": "Living somewhere is an ongoing state, so SUNDE IRU is the natural choice.",
+     "whyFailsId": "Tinggal di suatu tempat itu keadaan berlangsung, jadi すんでいる pilihan yang wajar."
+    }
+   ],
+   "explanation": {
+    "whyCorrect": "Living there is an ongoing state and clauses stay plain: SUNDE IRU MACHI.",
+    "whyCorrectId": "Tinggal di sana itu keadaan berlangsung dan klausanya tetap biasa: すんで いる まち。",
+    "rule": "SUMU takes TE IRU for the state of living somewhere.",
+    "ruleId": "すむ memakai ている untuk keadaan tinggal di suatu tempat.",
+    "whyOthersFail": "Two options are polite inside the clause and one adds NO.",
+    "whyOthersFailId": "Dua pilihan bersikap sopan di dalam klausa dan satu menambah の。",
+    "howToAvoid": "Say the clause alone first. If it works plain, it works as a modifier.",
+    "howToAvoidId": "Sebutkan klausanya sendiri dulu. Kalau ia jalan dalam bentuk biasa, ia jalan sebagai penerang.",
+    "memoryCue": "SUMU lives in TE IRU.",
+    "memoryCueId": "すむ tinggal dalam ている。"
+   }
+  },
+  {
+   "id": "JP-N4-RC-06",
+   "family": "relative_clauses",
+   "skill": "relative_clauses",
+   "subskill": "clause_with_adjective_predicate",
+   "cefr": "A2",
+   "jlpt": "N4",
+   "marker": "relative-clause-na-adjective",
+   "questionType": "multiple_choice",
+   "pedagogicalObjective": "Use NA when a na-adjective modifies a noun inside a longer description",
+   "pedagogicalObjectiveId": "Memakai な saat kata sifat -na menerangkan kata benda dalam gambaran yang lebih panjang",
+   "misconceptionTargeted": "Learner drops NA because the sentence already feels long enough",
+   "misconceptionTargetedId": "Murid menghilangkan な karena kalimatnya terasa sudah cukup panjang",
+   "reasoningOperation": "check the adjective type -> a na-adjective always needs NA before a noun",
+   "reasoningOperationId": "periksa jenis kata sifatnya -> kata sifat -na selalu butuh な sebelum kata benda",
+   "stem": "この まちで いちばん ___ 場所を おしえて ください。(しずか)",
+   "stemKana": "この まちで いちばん ___ ばしょを おしえて ください。(しずか)",
+   "furigana": [],
+   "options": [
+    "しずかな",
+    "しずか",
+    "しずかの",
+    "しずかに"
+   ],
+   "correctIndex": 0,
+   "distractors": [
+    {
+     "option": "しずか",
+     "misconception": "the bare stem before a noun",
+     "misconceptionId": "batang telanjang sebelum kata benda",
+     "whyFails": "SHIZUKA is a na-adjective, and it cannot touch a noun without NA.",
+     "whyFailsId": "しずか itu kata sifat -na, dan ia tidak bisa menyentuh kata benda tanpa な。"
+    },
+    {
+     "option": "しずかの",
+     "misconception": "NO used where NA is required",
+     "misconceptionId": "の dipakai di tempat yang menuntut な",
+     "whyFails": "NO joins nouns; SHIZUKA is an adjective, so it takes NA.",
+     "whyFailsId": "の menyambung kata benda; しずか itu kata sifat, jadi ia memakai な。"
+    },
+    {
+     "option": "しずかに",
+     "misconception": "the adverb form before a noun",
+     "misconceptionId": "bentuk keterangan sebelum kata benda",
+     "whyFails": "NI makes it describe a verb, not the noun BASHO.",
+     "whyFailsId": "に membuatnya menerangkan verba, bukan kata benda ばしょ。"
+    }
+   ],
+   "explanation": {
+    "whyCorrect": "SHIZUKA is a na-adjective, so it takes NA before the noun: SHIZUKA NA BASHO.",
+    "whyCorrectId": "しずか itu kata sifat -na, jadi ia memakai な sebelum kata bendanya: しずかな ばしょ。",
+    "rule": "na-adjective + NA + noun. i-adjective + noun, nothing between.",
+    "ruleId": "kata sifat -na + な + kata benda. kata sifat -i + kata benda, tanpa apa pun.",
+    "whyOthersFail": "The bare stem cannot modify, NO is for nouns, NI describes a verb.",
+    "whyOthersFailId": "Batang telanjang tidak bisa menerangkan, の untuk kata benda, に menerangkan verba.",
+    "howToAvoid": "Learn each adjective with its connector attached.",
+    "howToAvoidId": "Pelajari setiap kata sifat bersama penyambungnya.",
+    "memoryCue": "NA marks the na-family.",
+    "memoryCueId": "な menandai keluarga -na。"
+   }
+  },
+  {
+   "id": "JP-N4-CM-01",
+   "family": "comparison",
+   "skill": "comparison",
+   "subskill": "yori_hou_ga",
+   "cefr": "A2",
+   "jlpt": "N4",
+   "marker": "comparison-yori-hou-ga",
+   "questionType": "multiple_choice",
+   "pedagogicalObjective": "Compare two things with YORI on the lower item and HOU GA on the higher",
+   "pedagogicalObjectiveId": "Membandingkan dua hal dengan より pada yang lebih rendah dan ほうが pada yang lebih tinggi",
+   "misconceptionTargeted": "Learner puts YORI on the preferred item, reversing the comparison",
+   "misconceptionTargetedId": "Murid menaruh より pada yang lebih disukai, membalik perbandingannya",
+   "reasoningOperation": "decide which one wins -> the winner takes HOU GA, the other takes YORI",
+   "reasoningOperationId": "tentukan mana yang menang -> yang menang memakai ほうが, yang lain memakai より",
+   "stem": "でんしゃ___ バスの ほうが やすいです。",
+   "stemKana": "でんしゃ___ バスの ほうが やすいです。",
+   "furigana": [],
+   "options": [
+    "より",
+    "ほうが",
+    "のほうが",
+    "から"
+   ],
+   "correctIndex": 0,
+   "distractors": [
+    {
+     "option": "ほうが",
+     "misconception": "HOU GA on both sides of the comparison",
+     "misconceptionId": "ほうが di kedua sisi perbandingan",
+     "whyFails": "Only one side carries HOU GA; the other must take YORI.",
+     "whyFailsId": "Hanya satu sisi yang membawa ほうが; sisi lainnya harus memakai より。"
+    },
+    {
+     "option": "のほうが",
+     "misconception": "a second NO HOU GA, doubling the winner",
+     "misconceptionId": "のほうが kedua, menggandakan yang menang",
+     "whyFails": "That marks both as the cheaper one, which cannot be true.",
+     "whyFailsId": "Itu menandai keduanya sebagai yang lebih murah, dan itu tidak mungkin."
+    },
+    {
+     "option": "から",
+     "misconception": "a source or reason particle inside a comparison",
+     "misconceptionId": "penanda sumber atau alasan di dalam perbandingan",
+     "whyFails": "KARA gives a starting point or a reason, not a comparison.",
+     "whyFailsId": "から memberi titik awal atau alasan, bukan perbandingan."
+    }
+   ],
+   "explanation": {
+    "whyCorrect": "The bus is cheaper, so the train takes YORI: DENSHA YORI BASU NO HOU GA YASUI.",
+    "whyCorrectId": "Busnya lebih murah, jadi keretanya memakai より: でんしゃより バスの ほうが やすい。",
+    "rule": "A YORI B NO HOU GA = B more than A.",
+    "ruleId": "A より B のほうが = B lebih daripada A.",
+    "whyOthersFail": "Doubling HOU GA marks two winners, and KARA changes the relationship.",
+    "whyOthersFailId": "Menggandakan ほうが menandai dua pemenang, dan から mengubah hubungannya.",
+    "howToAvoid": "Point at the winner first, then attach YORI to the loser.",
+    "howToAvoidId": "Tunjuk yang menang dulu, lalu tempelkan より ke yang kalah.",
+    "memoryCue": "HOU GA wins, YORI loses.",
+    "memoryCueId": "ほうが menang, より kalah."
+   }
+  },
+  {
+   "id": "JP-N4-CM-02",
+   "family": "comparison",
+   "skill": "comparison",
+   "subskill": "ichiban_superlative",
+   "cefr": "A2",
+   "jlpt": "N4",
+   "marker": "comparison-ichiban-superlative",
+   "questionType": "multiple_choice",
+   "pedagogicalObjective": "Mark the top of a group with ICHIBAN and a range with DE or NO NAKA DE",
+   "pedagogicalObjectiveId": "Menandai yang teratas dalam kelompok dengan いちばん dan cakupannya dengan で atau のなかで",
+   "misconceptionTargeted": "Learner uses MOTTO, which means more rather than most",
+   "misconceptionTargetedId": "Murid memakai もっと, yang berarti lebih bukan paling",
+   "reasoningOperation": "decide between more and most -> most within a group takes ICHIBAN",
+   "reasoningOperationId": "pilih antara lebih dan paling -> paling di dalam kelompok memakai いちばん",
+   "stem": "クラスの 中で 田中さんが ___ せが 高いです。",
+   "stemKana": "クラスの なかで たなかさんが ___ せが たかいです。",
+   "furigana": [],
+   "options": [
+    "いちばん",
+    "もっと",
+    "ずっと",
+    "とても"
+   ],
+   "correctIndex": 0,
+   "distractors": [
+    {
+     "option": "もっと",
+     "misconception": "MOTTO, which compares against something unstated",
+     "misconceptionId": "もっと, yang membandingkan dengan sesuatu yang tak disebut",
+     "whyFails": "MOTTO means more than before or more than that, never the top of a set.",
+     "whyFailsId": "もっと berarti lebih dari sebelumnya atau lebih dari itu, bukan puncak sebuah kelompok."
+    },
+    {
+     "option": "ずっと",
+     "misconception": "ZUTTO, which intensifies a comparison by far",
+     "misconceptionId": "ずっと, yang menguatkan perbandingan jauh lebih",
+     "whyFails": "ZUTTO needs something to be far taller than; a group needs ICHIBAN.",
+     "whyFailsId": "ずっと butuh pembanding untuk jauh lebih tinggi; kelompok butuh いちばん。"
+    },
+    {
+     "option": "とても",
+     "misconception": "TOTEMO, a plain intensifier",
+     "misconceptionId": "とても, penguat biasa",
+     "whyFails": "TOTEMO says very tall, which makes no ranking at all.",
+     "whyFailsId": "とても berarti sangat tinggi, yang tidak membuat peringkat sama sekali."
+    }
+   ],
+   "explanation": {
+    "whyCorrect": "KURASU NO NAKA DE sets a group, and the top of a group is ICHIBAN.",
+    "whyCorrectId": "クラスのなかで menetapkan kelompoknya, dan puncak kelompok adalah いちばん。",
+    "rule": "Range + ICHIBAN + adjective = the most within that range.",
+    "ruleId": "Cakupan + いちばん + kata sifat = paling di dalam cakupan itu.",
+    "whyOthersFail": "MOTTO and ZUTTO compare with something else; TOTEMO only intensifies.",
+    "whyOthersFailId": "もっと dan ずっと membandingkan dengan hal lain; とても hanya menguatkan.",
+    "howToAvoid": "A group in the sentence almost always calls for ICHIBAN.",
+    "howToAvoidId": "Adanya kelompok dalam kalimat hampir selalu menuntut いちばん。",
+    "memoryCue": "Group means ICHIBAN.",
+    "memoryCueId": "Kelompok berarti いちばん。"
+   }
+  },
+  {
+   "id": "JP-N4-CM-03",
+   "family": "comparison",
+   "skill": "comparison",
+   "subskill": "hodo_negative_comparison",
+   "cefr": "A2",
+   "jlpt": "N4",
+   "marker": "comparison-hodo-negative",
+   "questionType": "multiple_choice",
+   "pedagogicalObjective": "Say one thing is not as much as another with HODO plus a negative",
+   "pedagogicalObjectiveId": "Menyatakan satu hal tidak sebanyak yang lain dengan ほど + ingkar",
+   "misconceptionTargeted": "Learner uses YORI with a negative, which states the opposite ranking",
+   "misconceptionTargetedId": "Murid memakai より dengan ingkar, yang menyatakan peringkat sebaliknya",
+   "reasoningOperation": "notice the negative ending -> HODO pairs with a negative",
+   "reasoningOperationId": "perhatikan akhiran ingkarnya -> ほど berpasangan dengan ingkar",
+   "stem": "きょうは きのう___ さむく ありません。",
+   "stemKana": "きょうは きのう___ さむく ありません。",
+   "furigana": [],
+   "options": [
+    "ほど",
+    "より",
+    "のほうが",
+    "まで"
+   ],
+   "correctIndex": 0,
+   "distractors": [
+    {
+     "option": "より",
+     "misconception": "YORI with a negative predicate",
+     "misconceptionId": "より dengan predikat ingkar",
+     "whyFails": "KINOU YORI SAMUKU ARIMASEN is unnatural; HODO is the form used with negatives.",
+     "whyFailsId": "きのうより さむくありません tidak wajar; ほど bentuk yang dipakai dengan ingkar."
+    },
+    {
+     "option": "のほうが",
+     "misconception": "a winner marker in a sentence that denies a ranking",
+     "misconceptionId": "penanda pemenang dalam kalimat yang menyangkal peringkat",
+     "whyFails": "The sentence says today is less cold, so nothing is being crowned.",
+     "whyFailsId": "Kalimatnya menyatakan hari ini kurang dingin, jadi tidak ada yang dinobatkan."
+    },
+    {
+     "option": "まで",
+     "misconception": "MADE, a limit particle",
+     "misconceptionId": "まで, penanda batas",
+     "whyFails": "MADE marks up to a point in space or time, not a comparison.",
+     "whyFailsId": "まで menandai sampai suatu titik ruang atau waktu, bukan perbandingan."
+    }
+   ],
+   "explanation": {
+    "whyCorrect": "A negative comparison uses HODO: KINOU HODO SAMUKU ARIMASEN.",
+    "whyCorrectId": "Perbandingan ingkar memakai ほど: きのう ほど さむく ありません。",
+    "rule": "A HODO B negative = A is not as B as that.",
+    "ruleId": "A ほど B ingkar = A tidak se-B seperti itu.",
+    "whyOthersFail": "YORI wants an affirmative, NO HOU GA crowns a winner, MADE marks a limit.",
+    "whyOthersFailId": "より menuntut afirmatif, のほうが menobatkan pemenang, まで menandai batas.",
+    "howToAvoid": "See a negative ending? Reach for HODO.",
+    "howToAvoidId": "Melihat akhiran ingkar? Pakai ほど。",
+    "memoryCue": "Negative pairs with HODO.",
+    "memoryCueId": "Ingkar berpasangan dengan ほど。"
+   }
+  },
+  {
+   "id": "JP-N4-CM-04",
+   "family": "comparison",
+   "skill": "comparison",
+   "subskill": "dochira_ga_question",
+   "cefr": "A2",
+   "jlpt": "N4",
+   "marker": "comparison-dochira-ga-question",
+   "questionType": "multiple_choice",
+   "pedagogicalObjective": "Ask which of two is more with DOCHIRA GA",
+   "pedagogicalObjectiveId": "Menanyakan mana dari dua yang lebih dengan どちらが",
+   "misconceptionTargeted": "Learner uses DORE, which asks among three or more",
+   "misconceptionTargetedId": "Murid memakai どれ, yang menanyakan di antara tiga atau lebih",
+   "reasoningOperation": "count the options -> exactly two takes DOCHIRA",
+   "reasoningOperationId": "hitung pilihannya -> tepat dua memakai どちら",
+   "stem": "コーヒーと おちゃと、___ 好きですか。",
+   "stemKana": "コーヒーと おちゃと、___ すきですか。",
+   "furigana": [],
+   "options": [
+    "どちらが",
+    "どれが",
+    "なにが",
+    "だれが"
+   ],
+   "correctIndex": 0,
+   "distractors": [
+    {
+     "option": "どれが",
+     "misconception": "DORE, which asks among three or more",
+     "misconceptionId": "どれ, yang menanyakan di antara tiga atau lebih",
+     "whyFails": "Only two drinks are listed, so DORE overshoots.",
+     "whyFailsId": "Hanya dua minuman yang disebut, jadi どれ berlebihan."
+    },
+    {
+     "option": "なにが",
+     "misconception": "NANI, an open what question",
+     "misconceptionId": "なに, pertanyaan apa yang terbuka",
+     "whyFails": "NANI opens the field again after the sentence already narrowed it to two.",
+     "whyFailsId": "なに membuka pilihannya lagi padahal kalimatnya sudah menyempitkannya ke dua."
+    },
+    {
+     "option": "だれが",
+     "misconception": "DARE, which asks about people",
+     "misconceptionId": "だれ, yang menanyakan orang",
+     "whyFails": "Coffee and tea are not people.",
+     "whyFailsId": "Kopi dan teh bukan orang."
+    }
+   ],
+   "explanation": {
+    "whyCorrect": "Two items are offered, so the question word is DOCHIRA GA.",
+    "whyCorrectId": "Dua benda yang ditawarkan, jadi kata tanyanya どちらが。",
+    "rule": "Two -> DOCHIRA. Three or more -> DORE.",
+    "ruleId": "Dua -> どちら. Tiga atau lebih -> どれ。",
+    "whyOthersFail": "DORE, NANI, and DARE each widen or misdirect the question.",
+    "whyOthersFailId": "どれ, なに, dan だれ masing-masing melebarkan atau menyalahkan arah pertanyaannya.",
+    "howToAvoid": "Count the nouns before the question word.",
+    "howToAvoidId": "Hitung kata bendanya sebelum kata tanyanya.",
+    "memoryCue": "Two choices, DOCHIRA.",
+    "memoryCueId": "Dua pilihan, どちら。"
+   }
+  },
+  {
+   "id": "JP-N4-CM-05",
+   "family": "comparison",
+   "skill": "comparison",
+   "subskill": "onaji_kurai_similar",
+   "cefr": "A2",
+   "jlpt": "N4",
+   "marker": "comparison-onaji-kurai",
+   "questionType": "multiple_choice",
+   "pedagogicalObjective": "Say two things are about the same with ONAJI KURAI",
+   "pedagogicalObjectiveId": "Menyatakan dua hal kurang lebih sama dengan おなじくらい",
+   "misconceptionTargeted": "Learner uses ONAJI alone before an adjective, where it cannot stand",
+   "misconceptionTargetedId": "Murid memakai おなじ sendiri sebelum kata sifat, tempat ia tidak bisa berdiri",
+   "reasoningOperation": "check what follows -> before an adjective, sameness needs KURAI",
+   "reasoningOperationId": "periksa apa yang menyusul -> sebelum kata sifat, kesamaan butuh くらい",
+   "stem": "この かばんは あの かばんと ___ おもいです。",
+   "stemKana": "この かばんは あの かばんと ___ おもいです。",
+   "furigana": [],
+   "options": [
+    "おなじくらい",
+    "おなじ",
+    "おなじの",
+    "おなじに"
+   ],
+   "correctIndex": 0,
+   "distractors": [
+    {
+     "option": "おなじ",
+     "misconception": "ONAJI alone before an adjective",
+     "misconceptionId": "おなじ sendiri sebelum kata sifat",
+     "whyFails": "ONAJI modifies nouns; before an adjective it needs KURAI.",
+     "whyFailsId": "おなじ menerangkan kata benda; sebelum kata sifat ia butuh くらい。"
+    },
+    {
+     "option": "おなじの",
+     "misconception": "ONAJI plus NO, which points at a noun",
+     "misconceptionId": "おなじ ditambah の, yang menunjuk kata benda",
+     "whyFails": "ONAJI NO means the same one, a thing, not a degree.",
+     "whyFailsId": "おなじの berarti yang sama, sebuah benda, bukan kadar."
+    },
+    {
+     "option": "おなじに",
+     "misconception": "the adverbial NI form",
+     "misconceptionId": "bentuk keterangan に",
+     "whyFails": "ONAJI NI describes how an action is done, not how heavy something is.",
+     "whyFailsId": "おなじに menggambarkan cara perbuatan dilakukan, bukan seberapa berat sesuatu."
+    }
+   ],
+   "explanation": {
+    "whyCorrect": "Equal degree before an adjective is ONAJI KURAI: ONAJI KURAI OMOI.",
+    "whyCorrectId": "Kadar yang setara sebelum kata sifat adalah おなじくらい: おなじくらい おもい。",
+    "rule": "ONAJI + noun. ONAJI KURAI + adjective.",
+    "ruleId": "おなじ + kata benda. おなじくらい + kata sifat.",
+    "whyOthersFail": "ONAJI alone needs a noun, NO points at a thing, NI describes an action.",
+    "whyOthersFailId": "おなじ sendiri butuh kata benda, の menunjuk benda, に menggambarkan perbuatan.",
+    "howToAvoid": "Ask what comes next. An adjective needs KURAI in front of it.",
+    "howToAvoidId": "Tanyakan apa yang menyusul. Kata sifat butuh くらい di depannya.",
+    "memoryCue": "Degree needs KURAI.",
+    "memoryCueId": "Kadar butuh くらい。"
+   }
+  },
+  {
+   "id": "JP-N4-CM-06",
+   "family": "comparison",
+   "skill": "comparison",
+   "subskill": "yori_with_verb_clause",
+   "cefr": "A2",
+   "jlpt": "N4",
+   "marker": "comparison-yori-verb-clause",
+   "questionType": "multiple_choice",
+   "pedagogicalObjective": "Compare two actions by putting a plain verb clause before YORI",
+   "pedagogicalObjectiveId": "Membandingkan dua perbuatan dengan menaruh klausa verba biasa sebelum より",
+   "misconceptionTargeted": "Learner uses a noun form only, so verbs cannot be compared at all",
+   "misconceptionTargetedId": "Murid hanya memakai bentuk benda, sehingga verba tidak bisa dibandingkan",
+   "reasoningOperation": "check what YORI attaches to -> a plain verb clause may precede it",
+   "reasoningOperationId": "periksa より menempel pada apa -> klausa verba biasa boleh mendahuluinya",
+   "stem": "バスで ___ より、あるいた ほうが はやいです。(行く)",
+   "stemKana": "バスで ___ より、あるいた ほうが はやいです。(いく)",
+   "furigana": [],
+   "options": [
+    "行く",
+    "行きます",
+    "行って",
+    "行きの"
+   ],
+   "correctIndex": 0,
+   "distractors": [
+    {
+     "option": "行きます",
+     "misconception": "the polite form before YORI",
+     "misconceptionId": "bentuk sopan sebelum より",
+     "whyFails": "The comparison is inside the sentence; politeness sits at the end.",
+     "whyFailsId": "Perbandingannya di dalam kalimat; kesopanan duduk di akhir."
+    },
+    {
+     "option": "行って",
+     "misconception": "the TE form before YORI",
+     "misconceptionId": "bentuk て sebelum より",
+     "whyFails": "A TE form joins actions and cannot close the compared clause.",
+     "whyFailsId": "Bentuk て menyambung perbuatan dan tidak bisa menutup klausa yang dibandingkan."
+    },
+    {
+     "option": "行きの",
+     "misconception": "a noun-like form with NO",
+     "misconceptionId": "bentuk seperti kata benda dengan の",
+     "whyFails": "IKI NO is not how a verb enters a comparison.",
+     "whyFailsId": "いきの bukan cara verba masuk ke dalam perbandingan."
+    }
+   ],
+   "explanation": {
+    "whyCorrect": "A plain verb clause can precede YORI: BASU DE IKU YORI, ARUITA HOU GA HAYAI.",
+    "whyCorrectId": "Klausa verba biasa boleh mendahului より: バスで いく より、あるいた ほうが はやい。",
+    "rule": "Plain verb + YORI compares actions, not just things.",
+    "ruleId": "Verba biasa + より membandingkan perbuatan, bukan hanya benda.",
+    "whyOthersFail": "MASU is politeness misplaced, TE joins, NO nominalises wrongly.",
+    "whyOthersFailId": "ます kesopanan yang salah tempat, て menyambung, の membendakan secara salah.",
+    "howToAvoid": "Anything that can end a plain sentence can sit before YORI.",
+    "howToAvoidId": "Apa pun yang bisa mengakhiri kalimat biasa bisa duduk sebelum より。",
+    "memoryCue": "Plain clause, then YORI.",
+    "memoryCueId": "Klausa biasa, lalu より。"
+   }
+  },
+  {
+   "id": "JP-N4-OB-01",
+   "family": "obligation_permission",
+   "skill": "obligation_permission",
+   "subskill": "nakereba_naranai",
+   "cefr": "A2",
+   "jlpt": "N4",
+   "marker": "obligation-nakereba-naranai",
+   "questionType": "multiple_choice",
+   "pedagogicalObjective": "State an obligation with NAKEREBA NARIMASEN",
+   "pedagogicalObjectiveId": "Menyatakan kewajiban dengan なければなりません",
+   "misconceptionTargeted": "Learner uses TE WA IKEMASEN, which forbids instead of requiring",
+   "misconceptionTargetedId": "Murid memakai てはいけません, yang melarang bukan mewajibkan",
+   "reasoningOperation": "decide between must and must not -> must takes NAKEREBA NARIMASEN",
+   "reasoningOperationId": "pilih antara harus dan tidak boleh -> harus memakai なければなりません",
+   "stem": "あした 8時までに 学校へ ___ なりません。(来る)",
+   "stemKana": "あした はちじまでに がっこうへ ___ なりません。(くる)",
+   "furigana": [],
+   "options": [
+    "こなければ",
+    "きては",
+    "こられなければ",
+    "こなくては いけなく"
+   ],
+   "correctIndex": 0,
+   "distractors": [
+    {
+     "option": "きては",
+     "misconception": "the TE WA pattern, which forbids coming",
+     "misconceptionId": "pola ては, yang melarang datang",
+     "whyFails": "KITE WA NARIMASEN forbids arriving, the opposite of the rule stated.",
+     "whyFailsId": "きてはなりません melarang datang, kebalikan dari aturan yang dinyatakan."
+    },
+    {
+     "option": "こられなければ",
+     "misconception": "the potential inside the obligation pattern",
+     "misconceptionId": "potensial di dalam pola kewajiban",
+     "whyFails": "That says one must be able to come, not that one must come.",
+     "whyFailsId": "Itu berarti harus BISA datang, bukan harus datang."
+    },
+    {
+     "option": "こなくては いけなく",
+     "misconception": "two obligation patterns spliced together",
+     "misconceptionId": "dua pola kewajiban disambung jadi satu",
+     "whyFails": "NAKUTE WA IKEMASEN is complete on its own; splicing it onto NARIMASEN breaks it.",
+     "whyFailsId": "なくてはいけません sudah lengkap sendiri; menyambungkannya ke なりません merusaknya."
+    }
+   ],
+   "explanation": {
+    "whyCorrect": "KURU becomes KONAI, then NAI takes KEREBA: KONAKEREBA NARIMASEN.",
+    "whyCorrectId": "くる menjadi こない, lalu ない memakai ければ: こなければ なりません。",
+    "rule": "Obligation = plain negative + KEREBA NARIMASEN.",
+    "ruleId": "Kewajiban = ingkar biasa + ければなりません。",
+    "whyOthersFail": "TE WA forbids, the potential changes the meaning, and the last option mixes patterns.",
+    "whyOthersFailId": "ては melarang, potensial mengubah maknanya, dan pilihan terakhir mencampur pola.",
+    "howToAvoid": "Obligation is built on the NEGATIVE: if not doing it, it will not do.",
+    "howToAvoidId": "Kewajiban dibangun di atas INGKAR: kalau tidak melakukannya, tidak jadi.",
+    "memoryCue": "Must = double negative.",
+    "memoryCueId": "Harus = ingkar ganda."
+   }
+  },
+  {
+   "id": "JP-N4-OB-02",
+   "family": "obligation_permission",
+   "skill": "obligation_permission",
+   "subskill": "nakute_mo_ii",
+   "cefr": "A2",
+   "jlpt": "N4",
+   "marker": "obligation-nakute-mo-ii",
+   "questionType": "multiple_choice",
+   "pedagogicalObjective": "Say something is not necessary with NAKUTE MO II DESU",
+   "pedagogicalObjectiveId": "Menyatakan sesuatu tidak perlu dengan なくてもいいです",
+   "misconceptionTargeted": "Learner uses TE MO II, which grants permission to do it instead",
+   "misconceptionTargetedId": "Murid memakai てもいい, yang justru memberi izin melakukannya",
+   "reasoningOperation": "decide between need not and may -> need not takes NAKUTE MO II",
+   "reasoningOperationId": "pilih antara tidak perlu dan boleh -> tidak perlu memakai なくてもいい",
+   "stem": "あしたは やすみですから、早く ___ いいです。(おきる)",
+   "stemKana": "あしたは やすみですから、はやく ___ いいです。(おきる)",
+   "furigana": [],
+   "options": [
+    "おきなくても",
+    "おきても",
+    "おきなければ",
+    "おきられなくても"
+   ],
+   "correctIndex": 0,
+   "distractors": [
+    {
+     "option": "おきても",
+     "misconception": "TE MO II, which permits getting up early",
+     "misconceptionId": "てもいい, yang mengizinkan bangun pagi",
+     "whyFails": "It permits rather than excuses, so YASUMI loses its point.",
+     "whyFailsId": "Itu mengizinkan bukan membebaskan, jadi やすみ kehilangan intinya."
+    },
+    {
+     "option": "おきなければ",
+     "misconception": "the obligation stem without its ending",
+     "misconceptionId": "batang kewajiban tanpa akhirannya",
+     "whyFails": "NAKEREBA leads to NARIMASEN, not to II DESU.",
+     "whyFailsId": "なければ menuju なりません, bukan ke いいです。"
+    },
+    {
+     "option": "おきられなくても",
+     "misconception": "the potential negative, about inability",
+     "misconceptionId": "ingkar potensial, tentang ketidakmampuan",
+     "whyFails": "That excuses not being able to wake, which is not the holiday reason.",
+     "whyFailsId": "Itu membebaskan dari tidak bisa bangun, dan itu bukan alasan hari liburnya."
+    }
+   ],
+   "explanation": {
+    "whyCorrect": "A day off means waking early is unnecessary: OKINAKUTE MO II DESU.",
+    "whyCorrectId": "Hari libur berarti bangun pagi tidak perlu: おきなくても いいです。",
+    "rule": "TE MO II = may. NAKUTE MO II = need not.",
+    "ruleId": "てもいい = boleh. なくてもいい = tidak perlu.",
+    "whyOthersFail": "One permits, one starts an obligation, one talks about ability.",
+    "whyOthersFailId": "Satu mengizinkan, satu memulai kewajiban, satu membicarakan kemampuan.",
+    "howToAvoid": "Look for NAKUTE. It is the difference between may and need not.",
+    "howToAvoidId": "Cari なくて. Itulah pembeda antara boleh dan tidak perlu.",
+    "memoryCue": "NAKUTE frees you.",
+    "memoryCueId": "なくて membebaskanmu."
+   }
+  },
+  {
+   "id": "JP-N4-OB-03",
+   "family": "obligation_permission",
+   "skill": "obligation_permission",
+   "subskill": "ta_hou_ga_ii_advice",
+   "cefr": "A2",
+   "jlpt": "N4",
+   "marker": "obligation-ta-hou-ga-ii",
+   "questionType": "multiple_choice",
+   "pedagogicalObjective": "Give advice with TA HOU GA II, built on the plain past",
+   "pedagogicalObjectiveId": "Memberi saran dengan たほうがいい, dibangun di atas lampau biasa",
+   "misconceptionTargeted": "Learner uses the dictionary form, which weakens the advice pattern",
+   "misconceptionTargetedId": "Murid memakai bentuk kamus, yang melemahkan pola sarannya",
+   "reasoningOperation": "check the base -> HOU GA II for advice sits on the TA form",
+   "reasoningOperationId": "periksa dasarnya -> ほうがいい untuk saran duduk di bentuk た",
+   "stem": "ねつが あるなら、病院へ ___ ほうが いいですよ。(行く)",
+   "stemKana": "ねつが あるなら、びょういんへ ___ ほうが いいですよ。(いく)",
+   "furigana": [],
+   "options": [
+    "行った",
+    "行く",
+    "行って",
+    "行かない"
+   ],
+   "correctIndex": 0,
+   "distractors": [
+    {
+     "option": "行く",
+     "misconception": "the dictionary form before HOU GA II",
+     "misconceptionId": "bentuk kamus sebelum ほうがいい",
+     "whyFails": "IKU HOU GA II is heard but the taught advice form is ITTA HOU GA II.",
+     "whyFailsId": "いくほうがいい terdengar tetapi bentuk saran yang diajarkan いったほうがいい。"
+    },
+    {
+     "option": "行って",
+     "misconception": "the TE form before HOU GA II",
+     "misconceptionId": "bentuk て sebelum ほうがいい",
+     "whyFails": "A TE form cannot modify HOU.",
+     "whyFailsId": "Bentuk て tidak bisa menerangkan ほう。"
+    },
+    {
+     "option": "行かない",
+     "misconception": "the negative, advising against going",
+     "misconceptionId": "ingkar, menyarankan tidak pergi",
+     "whyFails": "With a fever the advice is to go, so the negative reverses it.",
+     "whyFailsId": "Dengan demam sarannya pergi, jadi ingkar membaliknya."
+    }
+   ],
+   "explanation": {
+    "whyCorrect": "Advice uses the plain past: ITTA HOU GA II DESU YO.",
+    "whyCorrectId": "Saran memakai lampau biasa: いった ほうが いいですよ。",
+    "rule": "TA HOU GA II = you had better. NAI HOU GA II = you had better not.",
+    "ruleId": "たほうがいい = sebaiknya. ないほうがいい = sebaiknya jangan.",
+    "whyOthersFail": "The dictionary form is weaker, TE cannot modify, and the negative inverts the advice.",
+    "whyOthersFailId": "Bentuk kamus lebih lemah, て tidak bisa menerangkan, dan ingkar membalik sarannya.",
+    "howToAvoid": "Advice looks backwards: the TA form points forward in meaning.",
+    "howToAvoidId": "Saran tampak menoleh ke belakang: bentuk た justru menunjuk ke depan maknanya.",
+    "memoryCue": "Advice wears TA.",
+    "memoryCueId": "Saran memakai た。"
+   }
+  },
+  {
+   "id": "JP-N4-OB-04",
+   "family": "obligation_permission",
+   "skill": "obligation_permission",
+   "subskill": "nai_hou_ga_ii",
+   "cefr": "A2",
+   "jlpt": "N4",
+   "marker": "obligation-nai-hou-ga-ii",
+   "questionType": "multiple_choice",
+   "pedagogicalObjective": "Advise against something with NAI HOU GA II",
+   "pedagogicalObjectiveId": "Menyarankan jangan melakukan sesuatu dengan ないほうがいい",
+   "misconceptionTargeted": "Learner uses TE WA IKEMASEN, which forbids rather than advises",
+   "misconceptionTargetedId": "Murid memakai てはいけません, yang melarang bukan menyarankan",
+   "reasoningOperation": "weigh advice against prohibition -> a friend advising takes NAI HOU GA II",
+   "reasoningOperationId": "timbang saran versus larangan -> teman yang menyarankan memakai ないほうがいい",
+   "stem": "つかれて いるなら、今日は ___ ほうが いいよ。(はたらく)",
+   "stemKana": "つかれて いるなら、きょうは ___ ほうが いいよ。(はたらく)",
+   "furigana": [],
+   "options": [
+    "はたらかない",
+    "はたらいては",
+    "はたらけない",
+    "はたらかなくて"
+   ],
+   "correctIndex": 0,
+   "distractors": [
+    {
+     "option": "はたらいては",
+     "misconception": "the prohibition pattern inside an advice frame",
+     "misconceptionId": "pola larangan di dalam rangka saran",
+     "whyFails": "HATARAITE WA leads to IKEMASEN, not to HOU GA II.",
+     "whyFailsId": "はたらいては menuju いけません, bukan ke ほうがいい。"
+    },
+    {
+     "option": "はたらけない",
+     "misconception": "the potential negative, about being unable",
+     "misconceptionId": "ingkar potensial, tentang tidak mampu",
+     "whyFails": "That says one cannot work, while the advice is not to.",
+     "whyFailsId": "Itu berarti tidak bisa bekerja, sedangkan sarannya jangan bekerja."
+    },
+    {
+     "option": "はたらかなくて",
+     "misconception": "the negative TE form, which joins clauses",
+     "misconceptionId": "bentuk て ingkar, yang menyambung klausa",
+     "whyFails": "NAKUTE joins statements and cannot modify HOU.",
+     "whyFailsId": "なくて menyambung pernyataan dan tidak bisa menerangkan ほう。"
+    }
+   ],
+   "explanation": {
+    "whyCorrect": "Advice against acting uses the plain negative: HATARAKANAI HOU GA II.",
+    "whyCorrectId": "Saran untuk tidak berbuat memakai ingkar biasa: はたらかない ほうが いい。",
+    "rule": "NAI HOU GA II advises; TE WA IKEMASEN forbids.",
+    "ruleId": "ないほうがいい menyarankan; てはいけません melarang.",
+    "whyOthersFail": "The alternatives forbid, talk about ability, or only join clauses.",
+    "whyOthersFailId": "Pilihan lain melarang, membicarakan kemampuan, atau hanya menyambung klausa.",
+    "howToAvoid": "YO at the end signals friendly advice, not a rule.",
+    "howToAvoidId": "よ di akhir menandakan saran akrab, bukan aturan.",
+    "memoryCue": "Friends advise, signs forbid.",
+    "memoryCueId": "Teman menyarankan, rambu melarang."
+   }
+  },
+  {
+   "id": "JP-N4-OB-05",
+   "family": "obligation_permission",
+   "skill": "obligation_permission",
+   "subskill": "hazu_ga_nai_vs_naranai",
+   "cefr": "A2",
+   "jlpt": "N4",
+   "marker": "obligation-must-vs-expectation",
+   "questionType": "multiple_choice",
+   "pedagogicalObjective": "Keep obligation apart from expectation when both use a negative",
+   "pedagogicalObjectiveId": "Memisahkan kewajiban dari dugaan saat keduanya memakai ingkar",
+   "misconceptionTargeted": "Learner reads every NARANAI as an obligation, even when the sentence expects something",
+   "misconceptionTargetedId": "Murid membaca setiap ならない sebagai kewajiban, bahkan saat kalimatnya menduga sesuatu",
+   "reasoningOperation": "read what the speaker claims -> a rule takes NAKEREBA NARANAI",
+   "reasoningOperationId": "baca apa yang diklaim pembicara -> aturan memakai なければならない",
+   "stem": "この しごとは 今日中に ___ なりません。(おわる)",
+   "stemKana": "この しごとは きょうじゅうに ___ なりません。(おわる)",
+   "furigana": [],
+   "options": [
+    "おわらせなければ",
+    "おわらなければ",
+    "おわっては",
+    "おわれなければ"
+   ],
+   "correctIndex": 0,
+   "distractors": [
+    {
+     "option": "おわらなければ",
+     "misconception": "the intransitive verb, which cannot be commanded of a person",
+     "misconceptionId": "verba intransitif, yang tidak bisa diperintahkan ke orang",
+     "whyFails": "OWARU happens by itself; a duty falls on the person, so the transitive is needed.",
+     "whyFailsId": "おわる terjadi sendiri; kewajiban jatuh pada orangnya, jadi yang transitif dibutuhkan."
+    },
+    {
+     "option": "おわっては",
+     "misconception": "the prohibition pattern",
+     "misconceptionId": "pola larangan",
+     "whyFails": "That forbids finishing, which is the opposite of the duty.",
+     "whyFailsId": "Itu melarang menyelesaikan, kebalikan dari kewajibannya."
+    },
+    {
+     "option": "おわれなければ",
+     "misconception": "the potential negative",
+     "misconceptionId": "ingkar potensial",
+     "whyFails": "That makes the rule about being able to finish rather than finishing.",
+     "whyFailsId": "Itu membuat aturannya soal bisa menyelesaikan bukan menyelesaikan."
+    }
+   ],
+   "explanation": {
+    "whyCorrect": "The duty falls on a person, so the transitive OWARASERU is needed: OWARASENAKEREBA NARIMASEN.",
+    "whyCorrectId": "Kewajibannya jatuh pada orang, jadi transitif おわらせる dibutuhkan: おわらせなければ なりません。",
+    "rule": "Obligations need a verb a person can perform.",
+    "ruleId": "Kewajiban butuh verba yang bisa dilakukan orang.",
+    "whyOthersFail": "The intransitive removes the actor, and the other two change the rule entirely.",
+    "whyOthersFailId": "Yang intransitif menghapus pelakunya, dan dua lainnya mengubah aturannya sama sekali.",
+    "howToAvoid": "Ask who must act. If a person must, choose the transitive.",
+    "howToAvoidId": "Tanyakan siapa yang harus berbuat. Kalau orang yang harus, pilih yang transitif.",
+    "memoryCue": "Duties need doers.",
+    "memoryCueId": "Kewajiban butuh pelaku."
+   }
+  },
+  {
+   "id": "JP-N4-OB-06",
+   "family": "obligation_permission",
+   "skill": "obligation_permission",
+   "subskill": "te_wa_dame_casual",
+   "cefr": "A2",
+   "jlpt": "N4",
+   "marker": "obligation-te-wa-dame-casual",
+   "questionType": "multiple_choice",
+   "pedagogicalObjective": "Use TE WA DAME in casual speech where TE WA IKEMASEN would be formal",
+   "pedagogicalObjectiveId": "Memakai てはだめ dalam percakapan santai, tempat てはいけません terasa formal",
+   "misconceptionTargeted": "Learner uses the formal prohibition with a close friend, sounding like a notice board",
+   "misconceptionTargetedId": "Murid memakai larangan formal kepada teman dekat, terdengar seperti papan pengumuman",
+   "reasoningOperation": "read the register -> casual prohibition uses DAME",
+   "reasoningOperationId": "baca ragamnya -> larangan santai memakai だめ",
+   "stem": "「ここで ゲームを ___ だめだよ。」",
+   "stemKana": "「ここで ゲームを ___ だめだよ。」",
+   "furigana": [],
+   "options": [
+    "しては",
+    "しなくては",
+    "できては",
+    "するのは"
+   ],
+   "correctIndex": 0,
+   "distractors": [
+    {
+     "option": "しなくては",
+     "misconception": "the negative version, which demands playing",
+     "misconceptionId": "versi ingkar, yang justru menuntut bermain",
+     "whyFails": "SHINAKUTE WA DAME means you must play, the opposite.",
+     "whyFailsId": "しなくてはだめ berarti kamu harus bermain, kebalikannya."
+    },
+    {
+     "option": "できては",
+     "misconception": "the potential inside a prohibition",
+     "misconceptionId": "potensial di dalam larangan",
+     "whyFails": "DEKITE WA DAME forbids being able to, which makes no sense here.",
+     "whyFailsId": "できてはだめ melarang mampu, dan itu tidak masuk akal di sini."
+    },
+    {
+     "option": "するのは",
+     "misconception": "a nominalised clause where the fixed pattern wants TE WA",
+     "misconceptionId": "klausa dibendakan padahal pola bakunya menuntut ては",
+     "whyFails": "The casual pattern is TE WA DAME, not NO WA DAME.",
+     "whyFailsId": "Pola santainya てはだめ, bukan のはだめ。"
+    }
+   ],
+   "explanation": {
+    "whyCorrect": "Casual prohibition is TE WA DAME: SHITE WA DAME DA YO.",
+    "whyCorrectId": "Larangan santai adalah てはだめ: しては だめだよ。",
+    "rule": "TE WA DAME (casual) = TE WA IKEMASEN (formal).",
+    "ruleId": "てはだめ (santai) = てはいけません (formal).",
+    "whyOthersFail": "NAKUTE WA reverses it, the potential is nonsense here, NO WA is the wrong frame.",
+    "whyOthersFailId": "なくては membaliknya, potensial tidak masuk akal di sini, のは rangka yang salah.",
+    "howToAvoid": "The WA stays; only the tail changes with register.",
+    "howToAvoidId": "は-nya tetap; hanya ekornya yang berubah menurut ragam.",
+    "memoryCue": "DAME is IKEMASEN in slippers.",
+    "memoryCueId": "だめ itu いけません bersandal jepit."
+   }
+  },
+  {
+   "id": "JP-N4-RS-01",
+   "family": "reason_concession",
+   "skill": "reason_concession",
+   "subskill": "node_soft_reason",
+   "cefr": "A2",
+   "jlpt": "N4",
+   "marker": "reason-node-soft",
+   "questionType": "multiple_choice",
+   "pedagogicalObjective": "Give a reason softly with NODE, which suits explanations and requests",
+   "pedagogicalObjectiveId": "Memberi alasan dengan lembut memakai ので, yang cocok untuk penjelasan dan permintaan",
+   "misconceptionTargeted": "Learner uses KARA everywhere, which can sound like pushing the reason",
+   "misconceptionTargetedId": "Murid memakai から di mana-mana, yang bisa terdengar memaksakan alasannya",
+   "reasoningOperation": "weigh how forceful the reason is -> a polite request prefers NODE",
+   "reasoningOperationId": "timbang seberapa memaksa alasannya -> permintaan sopan lebih memilih ので",
+   "stem": "あたまが いたい___、早く 帰らせて いただけませんか。",
+   "stemKana": "あたまが いたい___、はやく かえらせて いただけませんか。",
+   "furigana": [],
+   "options": [
+    "ので",
+    "から",
+    "のに",
+    "けど"
+   ],
+   "correctIndex": 0,
+   "distractors": [
+    {
+     "option": "から",
+     "misconception": "KARA in a carefully polite request",
+     "misconceptionId": "から dalam permintaan yang sangat sopan",
+     "whyFails": "KARA is correct grammar but pushes the reason at a listener you are deferring to.",
+     "whyFailsId": "から gramatikal tetapi mendorong alasannya ke pendengar yang sedang kamu hormati."
+    },
+    {
+     "option": "のに",
+     "misconception": "NONI, which concedes instead of explaining",
+     "misconceptionId": "のに, yang mengalah bukan menjelaskan",
+     "whyFails": "NONI means although, so it denies the link the request depends on.",
+     "whyFailsId": "のに berarti meskipun, jadi ia menyangkal kaitan yang menjadi dasar permintaannya."
+    },
+    {
+     "option": "けど",
+     "misconception": "KEDO, a casual but",
+     "misconceptionId": "けど, tetapi yang santai",
+     "whyFails": "KEDO contrasts, and its register clashes with ITADAKEMASEN KA.",
+     "whyFailsId": "けど mempertentangkan, dan ragamnya bertabrakan dengan いただけませんか。"
+    }
+   ],
+   "explanation": {
+    "whyCorrect": "A deferential request pairs with the softer NODE: ITAI NODE.",
+    "whyCorrectId": "Permintaan yang merendah berpasangan dengan ので yang lebih lembut: いたい ので。",
+    "rule": "NODE = explains gently. KARA = states the cause plainly.",
+    "ruleId": "ので = menjelaskan dengan lembut. から = menyatakan sebabnya lugas.",
+    "whyOthersFail": "KARA is pushier, NONI concedes, KEDO contrasts and is too casual.",
+    "whyOthersFailId": "から lebih mendorong, のに mengalah, けど mempertentangkan dan terlalu santai.",
+    "howToAvoid": "The politer the ending, the more NODE fits the front.",
+    "howToAvoidId": "Semakin sopan akhirannya, semakin cocok ので di depannya.",
+    "memoryCue": "Polite tail, NODE head.",
+    "memoryCueId": "Ekor sopan, kepala ので。"
+   }
+  },
+  {
+   "id": "JP-N4-RS-02",
+   "family": "reason_concession",
+   "skill": "reason_concession",
+   "subskill": "kara_plain_reason",
+   "cefr": "A2",
+   "jlpt": "N4",
+   "marker": "reason-kara-direct",
+   "questionType": "multiple_choice",
+   "pedagogicalObjective": "Give a direct reason with KARA before a plain consequence",
+   "pedagogicalObjectiveId": "Memberi alasan langsung dengan から sebelum akibat yang lugas",
+   "misconceptionTargeted": "Learner uses NONI, reading the pair as a contrast instead of a cause",
+   "misconceptionTargetedId": "Murid memakai のに, membaca pasangannya sebagai pertentangan bukan sebab",
+   "reasoningOperation": "ask whether the second clause follows from the first -> following takes KARA",
+   "reasoningOperationId": "tanyakan apakah klausa kedua mengikuti yang pertama -> yang mengikuti memakai から",
+   "stem": "あしたは テストが ある___、今日は 早く ねます。",
+   "stemKana": "あしたは テストが ある___、きょうは はやく ねます。",
+   "furigana": [],
+   "options": [
+    "から",
+    "のに",
+    "ても",
+    "ながら"
+   ],
+   "correctIndex": 0,
+   "distractors": [
+    {
+     "option": "のに",
+     "misconception": "NONI, which sets up a contradiction",
+     "misconceptionId": "のに, yang menyiapkan pertentangan",
+     "whyFails": "Sleeping early follows naturally from a test, so nothing is contradicted.",
+     "whyFailsId": "Tidur lebih awal wajar mengikuti adanya ujian, jadi tidak ada yang dipertentangkan."
+    },
+    {
+     "option": "ても",
+     "misconception": "TE MO, even though",
+     "misconceptionId": "ても, meskipun",
+     "whyFails": "That would say despite the test, which the sentence does not mean.",
+     "whyFailsId": "Itu akan berarti meski ada ujian, dan itu bukan maksud kalimatnya."
+    },
+    {
+     "option": "ながら",
+     "misconception": "NAGARA, while doing",
+     "misconceptionId": "ながら, sambil melakukan",
+     "whyFails": "NAGARA needs two simultaneous actions by one person.",
+     "whyFailsId": "ながら butuh dua perbuatan bersamaan oleh satu orang."
+    }
+   ],
+   "explanation": {
+    "whyCorrect": "The early night follows from the test, so KARA carries the cause.",
+    "whyCorrectId": "Tidur awalnya mengikuti adanya ujian, jadi から yang membawa sebabnya.",
+    "rule": "KARA = because, and the result follows naturally.",
+    "ruleId": "から = karena, dan akibatnya mengikuti dengan wajar.",
+    "whyOthersFail": "NONI and TE MO both contradict, NAGARA needs simultaneity.",
+    "whyOthersFailId": "のに dan ても sama-sama mempertentangkan, ながら butuh kebersamaan waktu.",
+    "howToAvoid": "Ask if the second half makes sense as a result. If yes, KARA.",
+    "howToAvoidId": "Tanyakan apakah separuh keduanya masuk akal sebagai akibat. Kalau ya, から。",
+    "memoryCue": "Result follows KARA.",
+    "memoryCueId": "Akibat mengikuti から。"
+   }
+  },
+  {
+   "id": "JP-N4-RS-03",
+   "family": "reason_concession",
+   "skill": "reason_concession",
+   "subskill": "noni_unexpected",
+   "cefr": "A2",
+   "jlpt": "N4",
+   "marker": "reason-noni-unexpected",
+   "questionType": "multiple_choice",
+   "pedagogicalObjective": "Mark an unexpected result with NONI, although this, still that",
+   "pedagogicalObjectiveId": "Menandai akibat yang tak terduga dengan のに, meski ini, tetap itu",
+   "misconceptionTargeted": "Learner uses KARA, which makes the surprising result sound normal",
+   "misconceptionTargetedId": "Murid memakai から, yang membuat akibat mengejutkannya terdengar wajar",
+   "reasoningOperation": "ask whether the result surprises -> a surprising result takes NONI",
+   "reasoningOperationId": "tanyakan apakah akibatnya mengejutkan -> akibat yang mengejutkan memakai のに",
+   "stem": "たくさん べんきょうした___、しけんに おちました。",
+   "stemKana": "たくさん べんきょうした___、しけんに おちました。",
+   "furigana": [],
+   "options": [
+    "のに",
+    "から",
+    "ので",
+    "たら"
+   ],
+   "correctIndex": 0,
+   "distractors": [
+    {
+     "option": "から",
+     "misconception": "KARA, which would make failing the natural result of studying",
+     "misconceptionId": "から, yang akan membuat gagal sebagai akibat wajar dari belajar",
+     "whyFails": "That reverses the sense: studying should not cause failure.",
+     "whyFailsId": "Itu membalik maknanya: belajar seharusnya tidak menyebabkan kegagalan."
+    },
+    {
+     "option": "ので",
+     "misconception": "NODE, a gentler because with the same problem",
+     "misconceptionId": "ので, karena yang lebih lembut dengan masalah yang sama",
+     "whyFails": "Softening the cause does not fix the fact that it is not a cause.",
+     "whyFailsId": "Melembutkan sebabnya tidak memperbaiki kenyataan bahwa itu bukan sebab."
+    },
+    {
+     "option": "たら",
+     "misconception": "TARA, which sets a condition",
+     "misconceptionId": "たら, yang menetapkan syarat",
+     "whyFails": "The studying already happened, so there is no condition left to set.",
+     "whyFailsId": "Belajarnya sudah terjadi, jadi tidak ada syarat yang perlu ditetapkan."
+    }
+   ],
+   "explanation": {
+    "whyCorrect": "Studying hard and still failing is a contradiction, which is what NONI marks.",
+    "whyCorrectId": "Belajar keras tetapi tetap gagal itu pertentangan, dan itulah yang ditandai のに。",
+    "rule": "NONI = although, and the speaker is surprised or disappointed.",
+    "ruleId": "のに = meskipun, dan pembicara terkejut atau kecewa.",
+    "whyOthersFail": "KARA and NODE make it a cause; TARA turns it into a condition.",
+    "whyOthersFailId": "から dan ので menjadikannya sebab; たら mengubahnya jadi syarat.",
+    "howToAvoid": "If the two halves fight each other, you want NONI.",
+    "howToAvoidId": "Kalau kedua separuhnya saling bertentangan, kamu butuh のに。",
+    "memoryCue": "Contradiction wears NONI.",
+    "memoryCueId": "Pertentangan memakai のに。"
+   }
+  },
+  {
+   "id": "JP-N4-RS-04",
+   "family": "reason_concession",
+   "skill": "reason_concession",
+   "subskill": "kedo_contrast",
+   "cefr": "A2",
+   "jlpt": "N4",
+   "marker": "reason-kedo-contrast",
+   "questionType": "multiple_choice",
+   "pedagogicalObjective": "Contrast two clauses with KEDO in everyday speech",
+   "pedagogicalObjectiveId": "Mempertentangkan dua klausa dengan けど dalam percakapan sehari-hari",
+   "misconceptionTargeted": "Learner uses NONI, which adds complaint the sentence does not carry",
+   "misconceptionTargetedId": "Murid memakai のに, yang menambahkan keluhan yang tidak dibawa kalimatnya",
+   "reasoningOperation": "ask whether the speaker complains -> a neutral contrast takes KEDO",
+   "reasoningOperationId": "tanyakan apakah pembicara mengeluh -> pertentangan netral memakai けど",
+   "stem": "この みせは たかい___、りょうりは おいしいです。",
+   "stemKana": "この みせは たかい___、りょうりは おいしいです。",
+   "furigana": [],
+   "options": [
+    "けど",
+    "のに",
+    "から",
+    "し"
+   ],
+   "correctIndex": 0,
+   "distractors": [
+    {
+     "option": "のに",
+     "misconception": "NONI, which adds disappointment",
+     "misconceptionId": "のに, yang menambahkan kekecewaan",
+     "whyFails": "NONI complains, while this sentence balances a minus against a plus.",
+     "whyFailsId": "のに mengeluh, sedangkan kalimat ini menimbang kekurangan dengan kelebihan."
+    },
+    {
+     "option": "から",
+     "misconception": "KARA, which would make price the reason for the taste",
+     "misconceptionId": "から, yang akan menjadikan harga sebagai alasan rasanya",
+     "whyFails": "Expensive does not cause delicious in the sense meant here.",
+     "whyFailsId": "Mahal tidak menyebabkan lezat dalam makna yang dimaksud di sini."
+    },
+    {
+     "option": "し",
+     "misconception": "SHI, which lists reasons on the same side",
+     "misconceptionId": "し, yang mendaftar alasan di sisi yang sama",
+     "whyFails": "SHI adds another point in agreement, not a contrast.",
+     "whyFailsId": "し menambah poin lain yang searah, bukan pertentangan."
+    }
+   ],
+   "explanation": {
+    "whyCorrect": "A plain contrast between price and taste takes KEDO.",
+    "whyCorrectId": "Pertentangan biasa antara harga dan rasa memakai けど。",
+    "rule": "KEDO = but, neutral. NONI = although, with feeling.",
+    "ruleId": "けど = tetapi, netral. のに = meskipun, dengan perasaan.",
+    "whyOthersFail": "NONI complains, KARA causes, SHI agrees.",
+    "whyOthersFailId": "のに mengeluh, から menyebabkan, し menyetujui.",
+    "howToAvoid": "No complaint in the voice? Then KEDO.",
+    "howToAvoidId": "Tidak ada keluhan dalam nadanya? Maka けど。",
+    "memoryCue": "KEDO is a calm but.",
+    "memoryCueId": "けど itu tetapi yang tenang."
+   }
+  },
+  {
+   "id": "JP-N4-RS-05",
+   "family": "reason_concession",
+   "skill": "reason_concession",
+   "subskill": "shi_listing_reasons",
+   "cefr": "A2",
+   "jlpt": "N4",
+   "marker": "reason-shi-listing",
+   "questionType": "multiple_choice",
+   "pedagogicalObjective": "List two supporting reasons with SHI",
+   "pedagogicalObjectiveId": "Mendaftar dua alasan yang searah dengan し",
+   "misconceptionTargeted": "Learner uses KARA twice, which stacks two separate causes awkwardly",
+   "misconceptionTargetedId": "Murid memakai から dua kali, yang menumpuk dua sebab terpisah secara kaku",
+   "reasoningOperation": "ask whether reasons point the same way -> same direction takes SHI",
+   "reasoningOperationId": "tanyakan apakah alasannya searah -> yang searah memakai し",
+   "stem": "この へやは ひろい___、あかるいですから、ここに しましょう。",
+   "stemKana": "この へやは ひろい___、あかるいですから、ここに しましょう。",
+   "furigana": [],
+   "options": [
+    "し",
+    "のに",
+    "ても",
+    "より"
+   ],
+   "correctIndex": 0,
+   "distractors": [
+    {
+     "option": "のに",
+     "misconception": "NONI, which contradicts the second reason",
+     "misconceptionId": "のに, yang mempertentangkan alasan kedua",
+     "whyFails": "Both spacious and bright are advantages, so nothing is contradicted.",
+     "whyFailsId": "Luas dan terang keduanya keuntungan, jadi tidak ada yang dipertentangkan."
+    },
+    {
+     "option": "ても",
+     "misconception": "TE MO, even though it is spacious",
+     "misconceptionId": "ても, meski luas",
+     "whyFails": "That treats spaciousness as a drawback.",
+     "whyFailsId": "Itu memperlakukan keluasan sebagai kekurangan."
+    },
+    {
+     "option": "より",
+     "misconception": "YORI, a comparison marker",
+     "misconceptionId": "より, penanda perbandingan",
+     "whyFails": "Nothing is being compared; two qualities are being added up.",
+     "whyFailsId": "Tidak ada yang dibandingkan; dua sifat sedang dijumlahkan."
+    }
+   ],
+   "explanation": {
+    "whyCorrect": "Spacious and bright both argue for the room, so SHI lists them.",
+    "whyCorrectId": "Luas dan terang sama-sama mendukung ruangan itu, jadi し mendaftarnya.",
+    "rule": "SHI = and what is more, reasons pointing the same way.",
+    "ruleId": "し = dan lagi pula, alasan yang searah.",
+    "whyOthersFail": "NONI and TE MO turn an advantage into an obstacle; YORI compares.",
+    "whyOthersFailId": "のに dan ても mengubah keuntungan menjadi hambatan; より membandingkan.",
+    "howToAvoid": "Count the arrows. Two arrows the same way means SHI.",
+    "howToAvoidId": "Hitung panahnya. Dua panah searah berarti し。",
+    "memoryCue": "SHI adds up.",
+    "memoryCueId": "し menjumlahkan."
+   }
+  },
+  {
+   "id": "JP-N4-RS-06",
+   "family": "reason_concession",
+   "skill": "reason_concession",
+   "subskill": "tame_ni_purpose_vs_reason",
+   "cefr": "A2",
+   "jlpt": "N4",
+   "marker": "reason-tame-ni-purpose",
+   "questionType": "multiple_choice",
+   "pedagogicalObjective": "Use TAME NI for purpose after a dictionary form",
+   "pedagogicalObjectiveId": "Memakai ために untuk tujuan sesudah bentuk kamus",
+   "misconceptionTargeted": "Learner uses YOU NI, which suits goals beyond direct control",
+   "misconceptionTargetedId": "Murid memakai ように, yang cocok untuk tujuan di luar kendali langsung",
+   "reasoningOperation": "ask whether the goal is under your control -> controllable goals take TAME NI",
+   "reasoningOperationId": "tanyakan apakah tujuannya dalam kendalimu -> tujuan yang terkendali memakai ために",
+   "stem": "日本で ___ ために、毎日 かんじを おぼえて います。(はたらく)",
+   "stemKana": "にほんで ___ ために、まいにち かんじを おぼえて います。(はたらく)",
+   "furigana": [],
+   "options": [
+    "はたらく",
+    "はたらける",
+    "はたらいて",
+    "はたらきます"
+   ],
+   "correctIndex": 0,
+   "distractors": [
+    {
+     "option": "はたらける",
+     "misconception": "the potential, which pushes the sentence toward YOU NI",
+     "misconceptionId": "potensial, yang mendorong kalimatnya ke ように",
+     "whyFails": "A potential goal you cannot fully control pairs with YOU NI, not TAME NI.",
+     "whyFailsId": "Tujuan potensial yang tidak sepenuhnya kamu kendalikan berpasangan dengan ように, bukan ために。"
+    },
+    {
+     "option": "はたらいて",
+     "misconception": "the TE form before TAME NI",
+     "misconceptionId": "bentuk て sebelum ために",
+     "whyFails": "TAME NI needs a dictionary form or a noun plus NO.",
+     "whyFailsId": "ために butuh bentuk kamus atau kata benda + の。"
+    },
+    {
+     "option": "はたらきます",
+     "misconception": "the polite form inside the clause",
+     "misconceptionId": "bentuk sopan di dalam klausanya",
+     "whyFails": "Politeness belongs to the final verb, OBOETE IMASU.",
+     "whyFailsId": "Kesopanannya milik verba akhir, おぼえています。"
+    }
+   ],
+   "explanation": {
+    "whyCorrect": "Working in Japan is the speakers own aim, so the dictionary form plus TAME NI fits.",
+    "whyCorrectId": "Bekerja di Jepang itu tujuan pembicara sendiri, jadi bentuk kamus + ために yang cocok.",
+    "rule": "TAME NI = in order to, for goals you control. YOU NI = so that, for goals you hope for.",
+    "ruleId": "ために = untuk, bagi tujuan yang kamu kendalikan. ように = agar, bagi tujuan yang kamu harapkan.",
+    "whyOthersFail": "The potential leans to YOU NI, TE breaks the pattern, MASU is politeness misplaced.",
+    "whyOthersFailId": "Potensial condong ke ように, て merusak polanya, ます kesopanan yang salah tempat.",
+    "howToAvoid": "Can you decide to do it? Then TAME NI.",
+    "howToAvoidId": "Bisakah kamu memutuskan melakukannya? Maka ために。",
+    "memoryCue": "My plan, TAME NI.",
+    "memoryCueId": "Rencanaku, ために。"
+   }
+  },
+  {
+   "id": "JP-N4-EX-01",
+   "family": "experience_frequency",
+   "skill": "experience_frequency",
+   "subskill": "ta_koto_ga_aru",
+   "cefr": "A2",
+   "jlpt": "N4",
+   "marker": "experience-ta-koto-ga-aru",
+   "questionType": "multiple_choice",
+   "pedagogicalObjective": "Report life experience with TA KOTO GA ARU",
+   "pedagogicalObjectiveId": "Melaporkan pengalaman hidup dengan たことがある",
+   "misconceptionTargeted": "Learner uses the plain past, which reports one occasion rather than experience",
+   "misconceptionTargetedId": "Murid memakai lampau biasa, yang melaporkan satu kejadian bukan pengalaman",
+   "reasoningOperation": "ask whether the point is ever in your life -> experience takes TA KOTO GA ARU",
+   "reasoningOperationId": "tanyakan apakah intinya pernah dalam hidupmu -> pengalaman memakai たことがある",
+   "stem": "わたしは 一度 ふじさんに ___ ことが あります。(のぼる)",
+   "stemKana": "わたしは いちど ふじさんに ___ ことが あります。(のぼる)",
+   "furigana": [],
+   "options": [
+    "のぼった",
+    "のぼる",
+    "のぼって",
+    "のぼれた"
+   ],
+   "correctIndex": 0,
+   "distractors": [
+    {
+     "option": "のぼる",
+     "misconception": "the dictionary form before KOTO GA ARU",
+     "misconceptionId": "bentuk kamus sebelum ことがある",
+     "whyFails": "NOBORU KOTO GA ARU means it sometimes happens, not that you once did it.",
+     "whyFailsId": "のぼることがある berarti kadang terjadi, bukan bahwa kamu pernah melakukannya."
+    },
+    {
+     "option": "のぼって",
+     "misconception": "the TE form before KOTO",
+     "misconceptionId": "bentuk て sebelum こと",
+     "whyFails": "KOTO needs a clause that can end plainly, and TE cannot.",
+     "whyFailsId": "こと butuh klausa yang bisa berakhir biasa, dan て tidak bisa."
+    },
+    {
+     "option": "のぼれた",
+     "misconception": "the potential past, about having been able",
+     "misconceptionId": "lampau potensial, tentang pernah bisa",
+     "whyFails": "That reports ability on one occasion, not the experience itself.",
+     "whyFailsId": "Itu melaporkan kemampuan pada satu kesempatan, bukan pengalamannya sendiri."
+    }
+   ],
+   "explanation": {
+    "whyCorrect": "Experience uses the plain past before KOTO GA ARU: NOBOTTA KOTO GA ARIMASU.",
+    "whyCorrectId": "Pengalaman memakai lampau biasa sebelum ことがある: のぼった ことが あります。",
+    "rule": "TA KOTO GA ARU = have ever. RU KOTO GA ARU = sometimes happens.",
+    "ruleId": "たことがある = pernah. ることがある = kadang terjadi.",
+    "whyOthersFail": "The dictionary form changes it to a habit, TE breaks the frame, the potential shifts the claim.",
+    "whyOthersFailId": "Bentuk kamus mengubahnya jadi kebiasaan, て merusak rangkanya, potensial menggeser klaimnya.",
+    "howToAvoid": "Ever in your life? Then the TA form.",
+    "howToAvoidId": "Pernah dalam hidupmu? Maka bentuk た。",
+    "memoryCue": "TA for ever, RU for sometimes.",
+    "memoryCueId": "た untuk pernah, る untuk kadang."
+   }
+  },
+  {
+   "id": "JP-N4-EX-02",
+   "family": "experience_frequency",
+   "skill": "experience_frequency",
+   "subskill": "ru_koto_ga_aru_occasional",
+   "cefr": "A2",
+   "jlpt": "N4",
+   "marker": "experience-ru-koto-ga-aru",
+   "questionType": "multiple_choice",
+   "pedagogicalObjective": "Report an occasional habit with RU KOTO GA ARU",
+   "pedagogicalObjectiveId": "Melaporkan kebiasaan yang kadang terjadi dengan ることがある",
+   "misconceptionTargeted": "Learner uses TA KOTO GA ARU, turning a habit into a one-time experience",
+   "misconceptionTargetedId": "Murid memakai たことがある, mengubah kebiasaan menjadi pengalaman sekali",
+   "reasoningOperation": "ask whether it still happens now and then -> now and then takes RU KOTO GA ARU",
+   "reasoningOperationId": "tanyakan apakah ia masih terjadi kadang-kadang -> kadang-kadang memakai ることがある",
+   "stem": "いそがしい ときは、ひるごはんを ___ ことが あります。(たべない)",
+   "stemKana": "いそがしい ときは、ひるごはんを ___ ことが あります。(たべない)",
+   "furigana": [],
+   "options": [
+    "たべない",
+    "たべなかった",
+    "たべなくて",
+    "たべられない"
+   ],
+   "correctIndex": 0,
+   "distractors": [
+    {
+     "option": "たべなかった",
+     "misconception": "the past form, reporting a finished experience",
+     "misconceptionId": "bentuk lampau, melaporkan pengalaman yang selesai",
+     "whyFails": "TABENAKATTA KOTO GA ARU says it once happened; the sentence says it still does.",
+     "whyFailsId": "たべなかったことがある berarti pernah terjadi; kalimatnya menyatakan masih terjadi."
+    },
+    {
+     "option": "たべなくて",
+     "misconception": "the negative TE form",
+     "misconceptionId": "bentuk て ingkar",
+     "whyFails": "NAKUTE joins clauses and cannot sit before KOTO.",
+     "whyFailsId": "なくて menyambung klausa dan tidak bisa duduk sebelum こと。"
+    },
+    {
+     "option": "たべられない",
+     "misconception": "the potential negative, about inability",
+     "misconceptionId": "ingkar potensial, tentang tidak mampu",
+     "whyFails": "The speaker chooses to skip lunch; ability is not the issue.",
+     "whyFailsId": "Pembicara memilih melewatkan makan siang; kemampuan bukan soalnya."
+    }
+   ],
+   "explanation": {
+    "whyCorrect": "A recurring habit takes the plain non-past before KOTO GA ARU: TABENAI KOTO GA ARIMASU.",
+    "whyCorrectId": "Kebiasaan yang berulang memakai bentuk biasa bukan-lampau sebelum ことがある: たべない ことが あります。",
+    "rule": "RU or NAI + KOTO GA ARU = there are times when.",
+    "ruleId": "る atau ない + ことがある = ada kalanya.",
+    "whyOthersFail": "The past makes it a memory, TE breaks the frame, the potential changes the claim.",
+    "whyOthersFailId": "Lampau menjadikannya ingatan, て merusak rangkanya, potensial mengubah klaimnya.",
+    "howToAvoid": "Does it still happen? Keep the verb non-past.",
+    "howToAvoidId": "Apakah masih terjadi? Pertahankan verbanya bukan-lampau.",
+    "memoryCue": "Still happening, still RU.",
+    "memoryCueId": "Masih terjadi, masih る。"
+   }
+  },
+  {
+   "id": "JP-N4-EX-03",
+   "family": "experience_frequency",
+   "skill": "experience_frequency",
+   "subskill": "nagara_simultaneous",
+   "cefr": "A2",
+   "jlpt": "N4",
+   "marker": "experience-nagara-simultaneous",
+   "questionType": "multiple_choice",
+   "pedagogicalObjective": "Join two simultaneous actions by one person with NAGARA on the MASU stem",
+   "pedagogicalObjectiveId": "Menggabungkan dua perbuatan bersamaan oleh satu orang dengan ながら pada batang ます",
+   "misconceptionTargeted": "Learner attaches NAGARA to a dictionary form or uses it for two different people",
+   "misconceptionTargetedId": "Murid menempelkan ながら ke bentuk kamus atau memakainya untuk dua orang berbeda",
+   "reasoningOperation": "check one actor and two actions -> NAGARA attaches to the MASU stem",
+   "reasoningOperationId": "periksa satu pelaku dua perbuatan -> ながら menempel ke batang ます",
+   "stem": "おんがくを ___ ながら、そうじを します。(きく)",
+   "stemKana": "おんがくを ___ ながら、そうじを します。(きく)",
+   "furigana": [],
+   "options": [
+    "きき",
+    "きく",
+    "きいて",
+    "きいた"
+   ],
+   "correctIndex": 0,
+   "distractors": [
+    {
+     "option": "きく",
+     "misconception": "NAGARA on the dictionary form",
+     "misconceptionId": "ながら pada bentuk kamus",
+     "whyFails": "NAGARA joins the MASU stem, so KIKU must become KIKI.",
+     "whyFailsId": "ながら bergabung ke batang ます, jadi きく harus menjadi きき。"
+    },
+    {
+     "option": "きいて",
+     "misconception": "NAGARA on the TE form",
+     "misconceptionId": "ながら pada bentuk て",
+     "whyFails": "The TE form already joins clauses; NAGARA needs the bare stem.",
+     "whyFailsId": "Bentuk て sudah menyambung klausa; ながら butuh batang telanjang."
+    },
+    {
+     "option": "きいた",
+     "misconception": "NAGARA on the past form",
+     "misconceptionId": "ながら pada bentuk lampau",
+     "whyFails": "Tense belongs to the final verb, SHIMASU.",
+     "whyFailsId": "Kala itu milik verba akhir, します。"
+    }
+   ],
+   "explanation": {
+    "whyCorrect": "NAGARA attaches to the MASU stem KIKI: KIKINAGARA SOUJI O SHIMASU.",
+    "whyCorrectId": "ながら menempel ke batang ます きき: ききながら そうじを します。",
+    "rule": "MASU stem + NAGARA = doing both at once, one person.",
+    "ruleId": "Batang ます + ながら = melakukan keduanya sekaligus, satu orang.",
+    "whyOthersFail": "The dictionary, TE, and past forms all give NAGARA the wrong base.",
+    "whyOthersFailId": "Bentuk kamus, て, dan lampau semuanya memberi ながら dasar yang salah.",
+    "howToAvoid": "Strip MASU, keep the stem, add NAGARA.",
+    "howToAvoidId": "Buang ます, pertahankan batangnya, tambahkan ながら。",
+    "memoryCue": "NAGARA rides the stem.",
+    "memoryCueId": "ながら menumpang batangnya."
+   }
+  },
+  {
+   "id": "JP-N4-EX-04",
+   "family": "experience_frequency",
+   "skill": "experience_frequency",
+   "subskill": "mae_ni_before",
+   "cefr": "A2",
+   "jlpt": "N4",
+   "marker": "experience-mae-ni-dictionary",
+   "questionType": "multiple_choice",
+   "pedagogicalObjective": "Say before doing something with a dictionary form plus MAE NI",
+   "pedagogicalObjectiveId": "Menyatakan sebelum melakukan sesuatu dengan bentuk kamus + まえに",
+   "misconceptionTargeted": "Learner uses the past form because the action happens earlier in time",
+   "misconceptionTargetedId": "Murid memakai bentuk lampau karena perbuatannya terjadi lebih dulu",
+   "reasoningOperation": "remember MAE NI always takes a dictionary form, whatever the tense outside",
+   "reasoningOperationId": "ingat まえに selalu memakai bentuk kamus, apa pun kala di luarnya",
+   "stem": "ねる ___、はを みがきました。",
+   "stemKana": "ねる ___、はを みがきました。",
+   "furigana": [],
+   "options": [
+    "まえに",
+    "あとで",
+    "ながら",
+    "うちに"
+   ],
+   "correctIndex": 0,
+   "distractors": [
+    {
+     "option": "あとで",
+     "misconception": "ATO DE, which reverses the order",
+     "misconceptionId": "あとで, yang membalik urutannya",
+     "whyFails": "Brushing after sleeping is not what the sentence describes.",
+     "whyFailsId": "Menyikat gigi sesudah tidur bukan yang digambarkan kalimatnya."
+    },
+    {
+     "option": "ながら",
+     "misconception": "NAGARA, making both happen at once",
+     "misconceptionId": "ながら, membuat keduanya terjadi sekaligus",
+     "whyFails": "Sleeping and brushing cannot be simultaneous.",
+     "whyFailsId": "Tidur dan menyikat gigi tidak bisa bersamaan."
+    },
+    {
+     "option": "うちに",
+     "misconception": "UCHI NI, meaning while a state lasts",
+     "misconceptionId": "うちに, berarti selagi keadaan berlangsung",
+     "whyFails": "NERU UCHI NI would mean while asleep, which is impossible here.",
+     "whyFailsId": "ねるうちに akan berarti selagi tidur, dan itu mustahil di sini."
+    }
+   ],
+   "explanation": {
+    "whyCorrect": "Before an action is dictionary form + MAE NI, even when the main verb is past.",
+    "whyCorrectId": "Sebelum sebuah perbuatan memakai bentuk kamus + まえに, bahkan saat verba utamanya lampau.",
+    "rule": "MAE NI keeps the dictionary form; ATO DE takes the TA form.",
+    "ruleId": "まえに mempertahankan bentuk kamus; あとで memakai bentuk た。",
+    "whyOthersFail": "ATO DE reverses the order, NAGARA overlaps them, UCHI NI needs a lasting state.",
+    "whyOthersFailId": "あとで membalik urutannya, ながら menumpangkan keduanya, うちに butuh keadaan yang berlangsung.",
+    "howToAvoid": "MAE NI never changes tense. Let the final verb do that.",
+    "howToAvoidId": "まえに tidak pernah berubah kala. Biarkan verba akhirnya yang melakukannya.",
+    "memoryCue": "MAE NI stays dictionary.",
+    "memoryCueId": "まえに tetap bentuk kamus."
+   }
+  },
+  {
+   "id": "JP-N4-EX-05",
+   "family": "experience_frequency",
+   "skill": "experience_frequency",
+   "subskill": "ato_de_after",
+   "cefr": "A2",
+   "jlpt": "N4",
+   "marker": "experience-ato-de-ta-form",
+   "questionType": "multiple_choice",
+   "pedagogicalObjective": "Say after doing something with the TA form plus ATO DE",
+   "pedagogicalObjectiveId": "Menyatakan sesudah melakukan sesuatu dengan bentuk た + あとで",
+   "misconceptionTargeted": "Learner uses the dictionary form, mirroring MAE NI incorrectly",
+   "misconceptionTargetedId": "Murid memakai bentuk kamus, menyalin まえに secara keliru",
+   "reasoningOperation": "check the pattern -> ATO DE takes the TA form, unlike MAE NI",
+   "reasoningOperationId": "periksa polanya -> あとで memakai bentuk た, berbeda dari まえに",
+   "stem": "ごはんを ___ あとで、くすりを のんで ください。(たべる)",
+   "stemKana": "ごはんを ___ あとで、くすりを のんで ください。(たべる)",
+   "furigana": [],
+   "options": [
+    "たべた",
+    "たべる",
+    "たべて",
+    "たべながら"
+   ],
+   "correctIndex": 0,
+   "distractors": [
+    {
+     "option": "たべる",
+     "misconception": "the dictionary form before ATO DE",
+     "misconceptionId": "bentuk kamus sebelum あとで",
+     "whyFails": "ATO DE needs a completed action, so the TA form is required.",
+     "whyFailsId": "あとで butuh perbuatan yang selesai, jadi bentuk た yang diperlukan."
+    },
+    {
+     "option": "たべて",
+     "misconception": "the TE form before ATO DE",
+     "misconceptionId": "bentuk て sebelum あとで",
+     "whyFails": "TE joins clauses on its own and cannot modify ATO.",
+     "whyFailsId": "て menyambung klausa sendiri dan tidak bisa menerangkan あと。"
+    },
+    {
+     "option": "たべながら",
+     "misconception": "NAGARA, making eating and taking medicine simultaneous",
+     "misconceptionId": "ながら, membuat makan dan minum obat bersamaan",
+     "whyFails": "The instruction is to take the medicine afterwards.",
+     "whyFailsId": "Instruksinya minum obat sesudahnya."
+    }
+   ],
+   "explanation": {
+    "whyCorrect": "ATO DE requires a finished action: TABETA ATO DE.",
+    "whyCorrectId": "あとで menuntut perbuatan yang selesai: たべた あとで。",
+    "rule": "MAE NI + dictionary. ATO DE + TA. The pair is asymmetric on purpose.",
+    "ruleId": "まえに + kamus. あとで + た. Pasangannya sengaja tidak simetris.",
+    "whyOthersFail": "The dictionary form breaks the rule, TE joins, NAGARA overlaps.",
+    "whyOthersFailId": "Bentuk kamus melanggar aturannya, て menyambung, ながら menumpangkan.",
+    "howToAvoid": "Learn the pair together so the asymmetry sticks.",
+    "howToAvoidId": "Pelajari pasangannya bersama supaya ketidaksimetrisannya menempel.",
+    "memoryCue": "Finished first, so TA.",
+    "memoryCueId": "Selesai dulu, jadi た。"
+   }
+  },
+  {
+   "id": "JP-N4-EX-06",
+   "family": "experience_frequency",
+   "skill": "experience_frequency",
+   "subskill": "kai_frequency_counter",
+   "cefr": "A2",
+   "jlpt": "N4",
+   "marker": "experience-frequency-per-week",
+   "questionType": "multiple_choice",
+   "pedagogicalObjective": "Express frequency with a time span, NI, and a counted number of times",
+   "pedagogicalObjectiveId": "Menyatakan frekuensi dengan rentang waktu, に, dan jumlah kali",
+   "misconceptionTargeted": "Learner drops NI, so the span and the count sit together with no link",
+   "misconceptionTargetedId": "Murid menghilangkan に, sehingga rentang dan jumlahnya berdampingan tanpa sambungan",
+   "reasoningOperation": "put the span first -> attach NI -> then the count",
+   "reasoningOperationId": "taruh rentangnya dulu -> tempelkan に -> baru jumlahnya",
+   "stem": "わたしは 一週間___ 三回 プールへ 行きます。",
+   "stemKana": "わたしは いっしゅうかん___ さんかい プールへ いきます。",
+   "furigana": [],
+   "options": [
+    "に",
+    "で",
+    "を",
+    "は"
+   ],
+   "correctIndex": 0,
+   "distractors": [
+    {
+     "option": "で",
+     "misconception": "DE, which marks a means or a limit",
+     "misconceptionId": "で, yang menandai alat atau batas",
+     "whyFails": "ISSHUUKAN DE means within one week as a deadline, not a repeating rate.",
+     "whyFailsId": "いっしゅうかんで berarti dalam satu minggu sebagai tenggat, bukan laju berulang."
+    },
+    {
+     "option": "を",
+     "misconception": "an object marker on a time span",
+     "misconceptionId": "penanda objek pada rentang waktu",
+     "whyFails": "A week is not the object of going to the pool.",
+     "whyFailsId": "Satu minggu bukan objek dari pergi ke kolam."
+    },
+    {
+     "option": "は",
+     "misconception": "a topic marker, which breaks the frequency phrase",
+     "misconceptionId": "penanda topik, yang memecah frasa frekuensinya",
+     "whyFails": "That makes the week the topic instead of the rate.",
+     "whyFailsId": "Itu menjadikan minggunya topik, bukan lajunya."
+    }
+   ],
+   "explanation": {
+    "whyCorrect": "Frequency is span + NI + count: ISSHUUKAN NI SANKAI.",
+    "whyCorrectId": "Frekuensi adalah rentang + に + jumlah: いっしゅうかんに さんかい。",
+    "rule": "NI is the per in three times per week.",
+    "ruleId": "に adalah per dalam tiga kali per minggu.",
+    "whyOthersFail": "DE sets a deadline, O makes it an object, WA makes it the topic.",
+    "whyOthersFailId": "で menetapkan tenggat, を menjadikannya objek, は menjadikannya topik.",
+    "howToAvoid": "Read NI as per, and the phrase falls into place.",
+    "howToAvoidId": "Baca に sebagai per, dan frasanya langsung pas.",
+    "memoryCue": "NI means per.",
+    "memoryCueId": "に berarti per."
+   }
+  },
+  {
+   "id": "JP-N4-KG-01",
+   "family": "keigo",
+   "skill": "keigo",
+   "subskill": "o_ni_naru_honorific",
+   "cefr": "A2",
+   "jlpt": "N4",
+   "marker": "keigo-o-ni-naru-respect",
+   "questionType": "multiple_choice",
+   "pedagogicalObjective": "Raise the listener with O plus stem plus NI NARU",
+   "pedagogicalObjectiveId": "Meninggikan lawan bicara dengan お + batang + になる",
+   "misconceptionTargeted": "Learner uses the humble pattern for the listener, lowering the wrong person",
+   "misconceptionTargetedId": "Murid memakai pola merendah untuk lawan bicara, merendahkan orang yang salah",
+   "reasoningOperation": "decide whose action it is -> the listener action rises with O NI NARU",
+   "reasoningOperationId": "tentukan perbuatan siapa -> perbuatan lawan bicara ditinggikan dengan おになる",
+   "stem": "社長は もう しんぶんを お___ に なりましたか。(よむ)",
+   "stemKana": "しゃちょうは もう しんぶんを お___ に なりましたか。(よむ)",
+   "furigana": [],
+   "options": [
+    "よみ",
+    "よむ",
+    "よんで",
+    "よまれ"
+   ],
+   "correctIndex": 0,
+   "distractors": [
+    {
+     "option": "よむ",
+     "misconception": "the dictionary form inside the O NI NARU frame",
+     "misconceptionId": "bentuk kamus di dalam rangka おになる",
+     "whyFails": "The frame takes the MASU stem, so YOMU must become YOMI.",
+     "whyFailsId": "Rangkanya memakai batang ます, jadi よむ harus menjadi よみ。"
+    },
+    {
+     "option": "よんで",
+     "misconception": "the TE form inside the frame",
+     "misconceptionId": "bentuk て di dalam rangkanya",
+     "whyFails": "O YONDE NI NARU is not a pattern; the stem is required.",
+     "whyFailsId": "およんでになる bukan pola; batangnya yang diperlukan."
+    },
+    {
+     "option": "よまれ",
+     "misconception": "a passive stem inside the frame",
+     "misconceptionId": "batang pasif di dalam rangkanya",
+     "whyFails": "The passive honorific YOMAREMASU exists, but it does not combine with O NI NARU.",
+     "whyFailsId": "Bentuk hormat pasif よまれます ada, tetapi ia tidak digabung dengan おになる。"
+    }
+   ],
+   "explanation": {
+    "whyCorrect": "The honorific frame is O + MASU stem + NI NARU: O YOMI NI NARIMASHITA KA.",
+    "whyCorrectId": "Rangka hormatnya adalah お + batang ます + になる: およみに なりましたか。",
+    "rule": "O + stem + NI NARU raises the other person.",
+    "ruleId": "お + batang + になる meninggikan orang lain.",
+    "whyOthersFail": "The dictionary, TE, and passive stems all break the fixed frame.",
+    "whyOthersFailId": "Batang kamus, て, dan pasif semuanya merusak rangka bakunya.",
+    "howToAvoid": "Strip MASU to find the stem the frame needs.",
+    "howToAvoidId": "Buang ます untuk menemukan batang yang dibutuhkan rangkanya.",
+    "memoryCue": "O wraps the stem.",
+    "memoryCueId": "お membungkus batangnya."
+   }
+  },
+  {
+   "id": "JP-N4-KG-02",
+   "family": "keigo",
+   "skill": "keigo",
+   "subskill": "o_suru_humble",
+   "cefr": "A2",
+   "jlpt": "N4",
+   "marker": "keigo-o-suru-humble",
+   "questionType": "multiple_choice",
+   "pedagogicalObjective": "Lower yourself with O plus stem plus SURU when you act for someone above you",
+   "pedagogicalObjectiveId": "Merendahkan diri dengan お + batang + する saat kita berbuat bagi orang di atas kita",
+   "misconceptionTargeted": "Learner uses the honorific O NI NARU for their own action, raising themselves",
+   "misconceptionTargetedId": "Murid memakai bentuk hormat おになる untuk perbuatannya sendiri, meninggikan diri",
+   "reasoningOperation": "decide whose action it is -> your own action lowers with O SURU",
+   "reasoningOperationId": "tentukan perbuatan siapa -> perbuatanmu sendiri direndahkan dengan おする",
+   "stem": "にもつを お___ しましょうか。(もつ)",
+   "stemKana": "にもつを お___ しましょうか。(もつ)",
+   "furigana": [],
+   "options": [
+    "もち",
+    "もつ",
+    "もって",
+    "もたれ"
+   ],
+   "correctIndex": 0,
+   "distractors": [
+    {
+     "option": "もつ",
+     "misconception": "the dictionary form inside the O SURU frame",
+     "misconceptionId": "bentuk kamus di dalam rangka おする",
+     "whyFails": "The frame needs the MASU stem MOCHI.",
+     "whyFailsId": "Rangkanya butuh batang ます もち。"
+    },
+    {
+     "option": "もって",
+     "misconception": "the TE form inside the frame",
+     "misconceptionId": "bentuk て di dalam rangkanya",
+     "whyFails": "O MOTTE SHIMASU is not the humble pattern.",
+     "whyFailsId": "おもってします bukan pola merendah."
+    },
+    {
+     "option": "もたれ",
+     "misconception": "a passive stem, which raises rather than lowers",
+     "misconceptionId": "batang pasif, yang meninggikan bukan merendahkan",
+     "whyFails": "The passive is used for respect toward others, not humility about yourself.",
+     "whyFailsId": "Pasif dipakai untuk menghormati orang lain, bukan merendahkan diri sendiri."
+    }
+   ],
+   "explanation": {
+    "whyCorrect": "Offering to carry for a superior is O + stem + SURU: O MOCHI SHIMASHOU KA.",
+    "whyCorrectId": "Menawarkan membawakan untuk atasan adalah お + batang + する: おもちしましょうか。",
+    "rule": "O SURU lowers me; O NI NARU raises you.",
+    "ruleId": "おする merendahkan saya; おになる meninggikan kamu.",
+    "whyOthersFail": "The alternatives break the frame or point the respect the wrong way.",
+    "whyOthersFailId": "Pilihan lain merusak rangkanya atau mengarahkan hormatnya ke arah yang salah.",
+    "howToAvoid": "Ask who acts. If it is me, the frame ends in SURU.",
+    "howToAvoidId": "Tanyakan siapa yang berbuat. Kalau saya, rangkanya berakhir する。",
+    "memoryCue": "My hands, O SURU.",
+    "memoryCueId": "Tanganku, おする。"
+   }
+  },
+  {
+   "id": "JP-N4-KG-03",
+   "family": "keigo",
+   "skill": "keigo",
+   "subskill": "irassharu_special_honorific",
+   "cefr": "A2",
+   "jlpt": "N4",
+   "marker": "keigo-irassharu-special",
+   "questionType": "multiple_choice",
+   "pedagogicalObjective": "Use IRASSHARU as the special honorific for coming, going, and being",
+   "pedagogicalObjectiveId": "Memakai いらっしゃる sebagai bentuk hormat khusus untuk datang, pergi, dan berada",
+   "misconceptionTargeted": "Learner builds O KI NI NARU by rule instead of using the special verb",
+   "misconceptionTargetedId": "Murid membentuk おきになる dengan aturan alih-alih memakai verba khususnya",
+   "reasoningOperation": "check whether a special honorific exists -> if it does, the rule form is not used",
+   "reasoningOperationId": "periksa apakah ada bentuk hormat khususnya -> kalau ada, bentuk aturannya tidak dipakai",
+   "stem": "先生は あした 学校に ___か。",
+   "stemKana": "せんせいは あした がっこうに ___か。",
+   "furigana": [],
+   "options": [
+    "いらっしゃいます",
+    "おきに なります",
+    "こられて います",
+    "まいります"
+   ],
+   "correctIndex": 0,
+   "distractors": [
+    {
+     "option": "おきに なります",
+     "misconception": "the rule-built honorific where a special verb exists",
+     "misconceptionId": "bentuk hormat beraturan padahal ada verba khususnya",
+     "whyFails": "KURU has the special honorific IRASSHARU, so the built form is not used.",
+     "whyFailsId": "くる punya bentuk hormat khusus いらっしゃる, jadi bentuk yang dibangun tidak dipakai."
+    },
+    {
+     "option": "こられて います",
+     "misconception": "the passive honorific in a progressive frame",
+     "misconceptionId": "hormat pasif dalam rangka progresif",
+     "whyFails": "That describes an ongoing state, and the question asks about tomorrow.",
+     "whyFailsId": "Itu menggambarkan keadaan berlangsung, sedangkan pertanyaannya soal besok."
+    },
+    {
+     "option": "まいります",
+     "misconception": "MAIRU, the humble verb for my own going",
+     "misconceptionId": "まいります, verba merendah untuk kepergian saya sendiri",
+     "whyFails": "MAIRIMASU lowers the speaker, but the subject here is the teacher.",
+     "whyFailsId": "まいります merendahkan pembicara, padahal subjeknya di sini gurunya."
+    }
+   ],
+   "explanation": {
+    "whyCorrect": "KURU, IKU and IRU all share the honorific IRASSHARU: IRASSHAIMASU KA.",
+    "whyCorrectId": "くる, いく, dan いる sama-sama memakai bentuk hormat いらっしゃる: いらっしゃいますか。",
+    "rule": "Special honorifics beat rule-built ones whenever they exist.",
+    "ruleId": "Bentuk hormat khusus mengalahkan yang dibangun aturan setiap kali ia ada.",
+    "whyOthersFail": "One builds the form by rule, one is progressive, one lowers the wrong person.",
+    "whyOthersFailId": "Satu membangun bentuknya dengan aturan, satu progresif, satu merendahkan orang yang salah.",
+    "howToAvoid": "Memorise the special set first; the rule is only for verbs without one.",
+    "howToAvoidId": "Hafalkan kumpulan khususnya dulu; aturannya hanya untuk verba yang tidak punya.",
+    "memoryCue": "Three verbs, one IRASSHARU.",
+    "memoryCueId": "Tiga verba, satu いらっしゃる。"
+   }
+  },
+  {
+   "id": "JP-N4-KG-04",
+   "family": "keigo",
+   "skill": "keigo",
+   "subskill": "itadaku_humble_receive",
+   "cefr": "A2",
+   "jlpt": "N4",
+   "marker": "keigo-itadaku-humble-receive",
+   "questionType": "multiple_choice",
+   "pedagogicalObjective": "Use ITADAKU as the humble verb for receiving or eating",
+   "pedagogicalObjectiveId": "Memakai いただく sebagai verba merendah untuk menerima atau makan",
+   "misconceptionTargeted": "Learner uses MORAU with a superior, which is grammatical but too flat",
+   "misconceptionTargetedId": "Murid memakai もらう dengan atasan, gramatikal tetapi terlalu datar",
+   "reasoningOperation": "weigh who gave it -> a gift from above is received with ITADAKU",
+   "reasoningOperationId": "timbang siapa yang memberi -> pemberian dari atas diterima dengan いただく",
+   "stem": "部長から おみやげを ___。",
+   "stemKana": "ぶちょうから おみやげを ___。",
+   "furigana": [],
+   "options": [
+    "いただきました",
+    "もらいました",
+    "くださいました",
+    "さしあげました"
+   ],
+   "correctIndex": 0,
+   "distractors": [
+    {
+     "option": "もらいました",
+     "misconception": "the plain receiving verb used with a department head",
+     "misconceptionId": "verba menerima biasa dipakai dengan kepala bagian",
+     "whyFails": "MORAIMASHITA is correct but drops the humility BUCHOU calls for.",
+     "whyFailsId": "もらいました benar tetapi menggugurkan kerendahan yang dituntut ぶちょう。"
+    },
+    {
+     "option": "くださいました",
+     "misconception": "the honorific giving verb with the wrong subject",
+     "misconceptionId": "verba memberi hormat dengan subjek yang salah",
+     "whyFails": "KUDASAIMASHITA needs the giver as subject, but KARA marks the source.",
+     "whyFailsId": "くださいました butuh pemberi sebagai subjek, padahal から menandai sumbernya."
+    },
+    {
+     "option": "さしあげました",
+     "misconception": "the humble giving verb, pointing outward",
+     "misconceptionId": "verba memberi merendah, mengarah ke luar",
+     "whyFails": "SASHIAGEMASHITA means I gave to someone above me.",
+     "whyFailsId": "さしあげました berarti saya memberi kepada orang di atas saya."
+    }
+   ],
+   "explanation": {
+    "whyCorrect": "Receiving from a superior uses the humble ITADAKU: ITADAKIMASHITA.",
+    "whyCorrectId": "Menerima dari atasan memakai bentuk merendah いただく: いただきました。",
+    "rule": "MORAU -> ITADAKU when you receive. AGERU -> SASHIAGERU when you give.",
+    "ruleId": "もらう -> いただく saat kamu menerima. あげる -> さしあげる saat kamu memberi.",
+    "whyOthersFail": "MORAU is too flat, KUDASARU needs another subject, SASHIAGERU reverses the direction.",
+    "whyOthersFailId": "もらう terlalu datar, くださる butuh subjek lain, さしあげる membalik arahnya.",
+    "howToAvoid": "Direction first, then politeness level.",
+    "howToAvoidId": "Arah dulu, baru tingkat kesopanan.",
+    "memoryCue": "KARA plus above equals ITADAKU.",
+    "memoryCueId": "から ditambah atasan sama dengan いただく。"
+   }
+  },
+  {
+   "id": "JP-N4-KG-05",
+   "family": "keigo",
+   "skill": "keigo",
+   "subskill": "osshaimasu_special",
+   "cefr": "A2",
+   "jlpt": "N4",
+   "marker": "keigo-ossharu-special-say",
+   "questionType": "multiple_choice",
+   "pedagogicalObjective": "Use OSSHARU as the honorific verb for saying",
+   "pedagogicalObjectiveId": "Memakai おっしゃる sebagai verba hormat untuk mengatakan",
+   "misconceptionTargeted": "Learner builds O II NI NARU or uses MOUSU, which lowers the speaker instead",
+   "misconceptionTargetedId": "Murid membentuk おいいになる atau memakai もうす, yang justru merendahkan pembicara",
+   "reasoningOperation": "check who spoke -> a superior speaking takes OSSHARU",
+   "reasoningOperationId": "periksa siapa yang berbicara -> atasan yang berbicara memakai おっしゃる",
+   "stem": "お名前は 何と ___ますか。",
+   "stemKana": "おなまえは なんと ___ますか。",
+   "furigana": [],
+   "options": [
+    "おっしゃい",
+    "もうし",
+    "いい",
+    "いわれ"
+   ],
+   "correctIndex": 0,
+   "distractors": [
+    {
+     "option": "もうし",
+     "misconception": "MOUSU, the humble verb for my own name",
+     "misconceptionId": "もうす, verba merendah untuk nama saya sendiri",
+     "whyFails": "MOUSHIMASU lowers the speaker, but the question asks the listener name.",
+     "whyFailsId": "もうします merendahkan pembicara, padahal pertanyaannya menanyakan nama lawan bicara."
+    },
+    {
+     "option": "いい",
+     "misconception": "the plain verb stem with no respect at all",
+     "misconceptionId": "batang verba biasa tanpa hormat sama sekali",
+     "whyFails": "IIMASU KA is flat, and O NAMAE has already raised the register.",
+     "whyFailsId": "いいますか datar, dan おなまえ sudah meninggikan ragamnya."
+    },
+    {
+     "option": "いわれ",
+     "misconception": "the passive honorific, possible but not the taught form here",
+     "misconceptionId": "hormat pasif, mungkin tetapi bukan bentuk yang diajarkan di sini",
+     "whyFails": "IWAREMASU can show respect, yet OSSHAIMASU is the standard for this question.",
+     "whyFailsId": "いわれます bisa menunjukkan hormat, tetapi おっしゃいます baku untuk pertanyaan ini."
+    }
+   ],
+   "explanation": {
+    "whyCorrect": "Asking a listener name politely uses OSSHARU: NAN TO OSSHAIMASU KA.",
+    "whyCorrectId": "Menanyakan nama lawan bicara dengan sopan memakai おっしゃる: なんと おっしゃいますか。",
+    "rule": "IU -> OSSHARU for others, MOUSU for yourself.",
+    "ruleId": "いう -> おっしゃる untuk orang lain, もうす untuk diri sendiri.",
+    "whyOthersFail": "MOUSU lowers the wrong person, IIMASU is flat, IWAREMASU is not the taught form.",
+    "whyOthersFailId": "もうす merendahkan orang yang salah, いいます datar, いわれます bukan bentuk yang diajarkan.",
+    "howToAvoid": "The O in O NAMAE tells you the whole sentence must stay raised.",
+    "howToAvoidId": "お pada おなまえ memberi tahu bahwa seluruh kalimatnya harus tetap tinggi.",
+    "memoryCue": "O NAMAE calls for OSSHARU.",
+    "memoryCueId": "おなまえ menuntut おっしゃる。"
+   }
+  },
+  {
+   "id": "JP-N4-KG-06",
+   "family": "keigo",
+   "skill": "keigo",
+   "subskill": "haiken_humble_look",
+   "cefr": "A2",
+   "jlpt": "N4",
+   "marker": "keigo-haiken-humble-look",
+   "questionType": "multiple_choice",
+   "pedagogicalObjective": "Use HAIKEN SURU as the humble verb for looking at something of a superior",
+   "pedagogicalObjectiveId": "Memakai はいけんする sebagai verba merendah untuk melihat milik atasan",
+   "misconceptionTargeted": "Learner uses GORAN NI NARU, the honorific, for their own looking",
+   "misconceptionTargetedId": "Murid memakai ごらんになる, bentuk hormat, untuk melihatnya sendiri",
+   "reasoningOperation": "decide whose eyes are looking -> my own looking lowers to HAIKEN SURU",
+   "reasoningOperationId": "tentukan mata siapa yang melihat -> melihat dengan mata sendiri direndahkan menjadi はいけんする",
+   "stem": "しゃちょうの 書類を ___ しても いいですか。",
+   "stemKana": "しゃちょうの しょるいを ___ しても いいですか。",
+   "furigana": [],
+   "options": [
+    "はいけん",
+    "ごらん",
+    "おみ",
+    "みられ"
+   ],
+   "correctIndex": 0,
+   "distractors": [
+    {
+     "option": "ごらん",
+     "misconception": "GORAN, the honorific for someone else looking",
+     "misconceptionId": "ごらん, hormat untuk orang lain yang melihat",
+     "whyFails": "GORAN NI NARU raises the looker, but the looker here is the speaker.",
+     "whyFailsId": "ごらんになる meninggikan yang melihat, padahal yang melihat di sini pembicara."
+    },
+    {
+     "option": "おみ",
+     "misconception": "a rule-built humble form where a special verb exists",
+     "misconceptionId": "bentuk merendah beraturan padahal ada verba khususnya",
+     "whyFails": "MIRU has the special humble HAIKEN SURU, so O MI SHIMASU is not used.",
+     "whyFailsId": "みる punya bentuk merendah khusus はいけんする, jadi おみします tidak dipakai."
+    },
+    {
+     "option": "みられ",
+     "misconception": "the passive, which shifts who is seen",
+     "misconceptionId": "pasif, yang memindahkan siapa yang dilihat",
+     "whyFails": "MIRARETE MO II asks whether being seen is acceptable.",
+     "whyFailsId": "みられてもいい menanyakan apakah dilihat itu boleh."
+    }
+   ],
+   "explanation": {
+    "whyCorrect": "My own looking at a superior document lowers to HAIKEN SURU: HAIKEN SHITE MO II DESU KA.",
+    "whyCorrectId": "Saya melihat dokumen atasan direndahkan menjadi はいけんする: はいけんしても いいですか。",
+    "rule": "MIRU -> GORAN NI NARU for others, HAIKEN SURU for yourself.",
+    "ruleId": "みる -> ごらんになる untuk orang lain, はいけんする untuk diri sendiri.",
+    "whyOthersFail": "GORAN raises the wrong person, O MI is not used, the passive changes the subject.",
+    "whyOthersFailId": "ごらん meninggikan orang yang salah, おみ tidak dipakai, pasif mengubah subjeknya.",
+    "howToAvoid": "Every keigo choice starts with one question: whose action is it?",
+    "howToAvoidId": "Setiap pilihan keigo dimulai satu pertanyaan: perbuatan siapa ini?",
+    "memoryCue": "My eyes, HAIKEN.",
+    "memoryCueId": "Mataku, はいけん。"
    }
   }
  ]
