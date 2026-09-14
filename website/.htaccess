@@ -1,0 +1,100 @@
+# FIEZEL production - fiezel.my.id (LiteSpeed / cPanel ArenHost)
+#
+# ==========================================================================
+# BERKAS INI ADALAH SALINAN UTUH YANG DILAYANI DI public_html/.htaccess
+# ==========================================================================
+# BUKAN potongan, BUKAN tambahan. Ia boleh di-upload menimpa berkas di server
+# apa adanya. Itu keputusan sadar, dan sebabnya pahit: versi pertama berkas ini
+# (14 Sep 2026) hanya memuat baris SEO yang baru ditambahkan, tanpa aturan
+# produksi yang sudah lebih dulu hidup di server. Berkas seperti itu adalah
+# ranjau — siapa pun yang meng-upload-nya "karena ada di repo" akan mematikan
+# redirect HTTPS, mematikan suara neural (WASM tidak lagi bertipe benar), dan
+# mengunci murid di cangkang lama (sw.js kehilangan no-cache).
+#
+# ATURANNYA SATU: kalau kamu menyunting .htaccess di server, salin balik ke
+# sini. Kalau kamu menyunting di sini, upload utuh. Dua salinan yang berbeda
+# diam-diam lebih berbahaya daripada tidak punya salinan sama sekali.
+#
+# ==========================================================================
+# ATURAN MENYUNTING
+# ==========================================================================
+# .htaccess yang salah satu baris membuat SELURUH domain balas 500 — bukan satu
+# halaman, semuanya. Setiap blok yang bergantung modul dibungkus <IfModule>
+# supaya dilewati diam-diam kalau modulnya absen. Direktif khusus Apache 2.4
+# (Require) TIDAK dipakai: kegagalannya bukan "aturan diabaikan", melainkan 500.
+#
+# Sesudah menyunting, WAJIB dibuka manual: https://fiezel.my.id/ dan
+# https://fiezel.my.id/sitemap.xml. Jangan percaya "seharusnya jalan".
+
+Options -Indexes
+RewriteEngine On
+RewriteCond %{HTTPS} !=on
+RewriteRule ^(.*)$ https://%{HTTP_HOST}/$1 [R=301,L]
+
+# --------------------------------------------------------------------------
+# TIPE BERKAS APLIKASI — jangan dihapus, ketiganya menopang runtime PWA
+# --------------------------------------------------------------------------
+# .wasm salah tipe = ONNX Runtime menolak memuatnya = suara neural mati.
+AddType application/wasm .wasm
+AddType application/octet-stream .onnx .bin
+AddType font/woff2 .woff2
+
+# --------------------------------------------------------------------------
+# CACHE — ini jalur pembaruan aplikasi, bukan optimasi
+# --------------------------------------------------------------------------
+# sw.js WAJIB no-cache. Kalau ia di-cache, service worker tidak pernah tahu ada
+# revisi baru dan murid memegang cangkang lama tanpa jalan pulih.
+<FilesMatch "^(sw\.js|core-config\.js|version\.js|index\.html)$">
+  <IfModule mod_headers.c>
+    Header set Cache-Control "no-cache, must-revalidate"
+  </IfModule>
+</FilesMatch>
+
+# Aset berat ber-hash: aman di-cache setahun, dan memang harus — 119 MB model
+# suara tidak boleh diunduh ulang tiap kunjungan.
+<FilesMatch "\.(onnx|wasm|bin|woff2)$">
+  <IfModule mod_headers.c>
+    Header set Cache-Control "public, max-age=31536000, immutable"
+  </IfModule>
+</FilesMatch>
+
+# ==========================================================================
+# TIPE BERKAS SEO/GEO — ditambahkan 14 Sep 2026
+# ==========================================================================
+# SEBABNYA konkret: Google Search Console menolak sitemap fiezel.my.id dengan
+# "Tidak dapat mengambil peta situs", padahal berkasnya ADA dan kesebelas URL-nya
+# terbaca saat dibuka manual. Yang salah tipe yang dikirim server — peramban
+# menampilkannya sebagai teks mengalir (tag XML luruh), bukan pohon XML.
+# Sitemap yang disajikan sebagai text/html ditolak parser sitemap.
+#
+# Sebelum ini satu-satunya konfigurasi header di repo adalah website/_headers,
+# dan itu format Cloudflare Pages / Netlify yang TIDAK PERNAH dibaca LiteSpeed.
+# Repo punya konfigurasi untuk platform yang tidak dipakai, dan nol untuk yang
+# dipakai. _headers sengaja tidak dihapus: ia berlaku kalau situs pindah ke
+# Cloudflare Pages.
+AddType application/xml .xml
+
+# llms.txt dan llms-full.txt dibaca crawler AI. Keduanya WAJIB text/plain;
+# disajikan sebagai octet-stream ia terunduh, bukan terbaca.
+AddType text/plain .txt
+
+# Play Store TWA: .well-known/assetlinks.json HARUS application/json. Kalau
+# dikirim sebagai text/plain, verifikasi Digital Asset Links gagal dan aplikasi
+# terpasang menampilkan bilah alamat peramban di atas layar — gejala yang mudah
+# disalahartikan sebagai bug aplikasi. Lihat docs/PLAYSTORE-TWA-RUNBOOK.md §6.
+AddType application/json .json
+
+# Charset eksplisit supaya aksara Thai di /th/ tidak bergantung tebakan peramban.
+AddDefaultCharset UTF-8
+
+# --------------------------------------------------------------------------
+# HEADER KEAMANAN — memindahkan niat _headers ke platform yang benar
+# --------------------------------------------------------------------------
+# Nilainya disalin apa adanya dari website/_headers supaya kedua berkas tidak
+# berselisih kalau situs ini suatu saat pindah platform.
+<IfModule mod_headers.c>
+  # Hormati tipe yang dinyatakan di atas; larang peramban menebak sendiri.
+  Header always set X-Content-Type-Options "nosniff"
+  Header always set X-Frame-Options "SAMEORIGIN"
+  Header always set Referrer-Policy "strict-origin-when-cross-origin"
+</IfModule>

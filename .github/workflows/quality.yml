@@ -468,6 +468,8 @@ jobs:
           node tests/personal-journey-ui-test.js
           node tests/skills-evidence-test.js
           node tests/skills-dashboard-test.js
+          node tests/certificate-core-test.js
+          node tests/certificate-sign-test.js
           node tests/academic-readiness-test.js
           node tests/library-integrity-test.js
           node tests/pwa-cache-test.js
