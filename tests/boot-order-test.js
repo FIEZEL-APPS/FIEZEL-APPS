@@ -59,9 +59,33 @@ while ((m = scriptRe.exec(scanHtml)) !== null) {
   });
 }
 
+/* BLOK <script> BER-TYPE DATA BUKAN SKRIP, dan gerbang ini tidak boleh memperlakukannya
+   begitu.
+   ============================================================================
+   Peramban HANYA mengeksekusi <script> yang type-nya kosong atau salah satu tipe JavaScript.
+   Tipe lain — `application/ld+json` (JSON-LD Schema.org), `application/json`, `importmap`,
+   `text/template` — diurai sebagai DATA lalu diabaikan mesin skrip. Ia tidak pernah jalan,
+   jadi ia tidak bisa melempar ReferenceError, dan ia tidak menahan cat pertama.
+
+   Keduanya persis yang dijaga dua aturan di bawah ("hanya skrip boot splash yang boleh
+   inline" dan "splash cat-pertama tetap yang pertama diurai"), jadi menghitung blok data ke
+   dalamnya membuat gerbang ini merah atas sesuatu yang tidak mungkin menimbulkan cacat yang
+   ia cari.
+
+   Itu bukan hipotesis. Commit SEO c4e506d menambahkan satu blok JSON-LD di <head> — wajib
+   untuk Google Rich Results — dan gerbang ini langsung merah di `main` dengan dua kegagalan:
+   "ada 2 blok inline" (blok kedua itu JSON-LD) dan "splash harus diurai sebelum <script>
+   pertama" (yang "pertama" itu juga JSON-LD, di <head>, sebelum markup splash di <body>).
+   Sejak itu SETIAP PR terhadap main ikut merah, termasuk PR yang tidak menyentuh index.html.
+
+   Perbaikannya di gerbang, bukan di index.html: memindahkan atau membuang JSON-LD akan
+   membatalkan tujuan commit SEO itu demi menyenangkan sebuah tes. */
+const EXEC_TYPES = /^(module|text\/javascript|application\/javascript|application\/ecmascript|text\/ecmascript)$/i;
+const isExecutable = (s) => !s.type || EXEC_TYPES.test(s.type);
+
 const lazy = scripts.filter(s => s.type === 'fiezel/lazy');
 const eager = scripts.filter(s => s.src && s.type !== 'fiezel/lazy');
-const inline = scripts.filter(s => s.inline);
+const inline = scripts.filter(s => s.inline && isExecutable(s));
 
 test('SDK Puter tidak dimuat sama sekali (Puter dihapus total)', () => {
   const puter = scripts.filter(s => /js\.puter\.com/.test(s.src));
@@ -188,9 +212,13 @@ test('berkas baru ikut di-precache service worker - peluncuran offline tetap utu
 
 test('splash cat-pertama tetap yang pertama diurai', () => {
   const splashAt = html.indexOf('id="fiezelBootSplash"');
-  const firstScriptAt = html.indexOf('<script');
+  /* Yang diukur adalah skrip pertama yang BISA JALAN. Blok data (JSON-LD SEO di <head>)
+     tidak dieksekusi dan tidak menahan cat, jadi memakai indexOf('<script') mentah akan
+     menyalahkan splash atas sesuatu yang tidak pernah menundanya. */
+  const firstExec = scripts.find(isExecutable);
+  const firstScriptAt = firstExec ? firstExec.at : html.length;
   assert.ok(splashAt > 0 && splashAt < firstScriptAt,
-    'splash harus diurai sebelum <script> pertama - itu satu-satunya alasan ia tercat lebih dulu');
+    'splash harus diurai sebelum <script> pertama yang dieksekusi - itu satu-satunya alasan ia tercat lebih dulu');
 });
 
 // --- perilaku pemuat, bukan sekadar bentuk dokumen -------------------------------------
