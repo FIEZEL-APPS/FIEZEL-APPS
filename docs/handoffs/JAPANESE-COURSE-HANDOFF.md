@@ -618,3 +618,89 @@ dibaca murid Indonesia bukan pintasan bagi murid Thai.
 
 Bahwa berkas ini ikut berubah: ritual bump menyentuh `DIAG_BUILD`; panel diagnostiknya
 sendiri tidak berubah perilaku.
+
+---
+
+## m025-312 — N4 masuk: 15 keluarga, 180 butir A2
+
+**Status: TERKIRIM.** Otoritas rilis tetap di OWNER; berkas ini mencatat apa yang sudah ada
+supaya sesi berikutnya tidak mengarang ulang.
+
+### Sebelum
+
+Bank Jepang hanya punya satu tingkat: **N5/A1**, 234 butir di 12 keluarga. Murid yang selesai
+N5 tidak punya ke mana pergi — kursusnya berhenti, bukan naik.
+
+### Sesudah
+
+`content/ja/grammar-templates-ja.json` berisi **414 butir**: 234 N5 ditambah **180 N4**, tersebar
+**12 butir di tiap 15 keluarga N4**. Graf keluarga naik 15 → 27, dan tiga slot yang sudah
+dicadangkan dari awal (`keigo`, `plain_forms`, `transitivity_pairs`) akhirnya DIPAKAI.
+
+| gelombang | butir N4 | per keluarga |
+|---|---|---|
+| pertama (cakupan) | 90 | 6 |
+| kedua (kedalaman) | 180 | 12 |
+
+Dua belas butir itu **dua belas subskill berbeda**, bukan dua belas variasi kalimat dari satu
+subskill. Itu keputusan yang menentukan: enam per keluarga berarti murid menghabiskan satu
+keluarga dalam satu sesi lalu melihat butir yang sama berulang, dan alokator adaptifnya
+kehilangan bahan untuk memutar.
+
+### Kenapa satu berkas, bukan bank kedua
+
+Bank ini memakai NAMA MEDAN yang sama dengan `grammar-templates.json` Inggris, jadi butir A2
+lewat alokator, ingatan soal, dan tutor brain YANG SAMA. Satu mesin, dua bahasa. Itu janji yang
+dijaga `japanese-course-wiring-test` dan `japanese-bank-survives-load-test`; siapa pun yang
+tergoda membuat jalur muat kedua akan memerahkan keduanya, dan memang seharusnya begitu.
+
+### Prasyarat: UNION, bukan timpa
+
+Tiga keluarga baru bertabrakan nama dengan slot yang sudah ada di graf. Versi pertama memakai
+`setdefault`, yang **diam-diam mempertahankan prasyarat lama** dan membuang yang baru.
+Tertangkap bukan oleh gerbang, tetapi dari hitungan: 15 + 14 seharusnya 29, yang keluar 27.
+Prasyaratnya sekarang di-UNION:
+
+| keluarga | prasyarat |
+|---|---|
+| `plain_forms` | polite_forms, te_form, verb_groups |
+| `transitivity_pairs` | existence_location, particles, te_form, verb_groups |
+| `keigo` | plain_forms, polite_forms |
+
+### Kontrak per butir dipaksa oleh pembangunnya
+
+Tiap butir punya 20 medan, 4 pilihan, 3 pengecoh **bernama** (masing-masing dengan miskonsepsi
+dan `whyFails`, id dan en), dan 10 bagian penjelasan. Penolong penulisannya memaksa kontrak itu
+lewat assert internal — termasuk bahwa teks tiap pengecoh cocok **persis** dengan salah satu
+pilihan yang salah. Jadi pengecoh yang ditulis untuk pilihan yang tidak ada di daftar
+memerahkan pembangunnya, bukan diam-diam lolos ke bank. Satu pilihan kembar (`あければ` dua
+kali) tertangkap begitu, bukan oleh mata.
+
+### YANG BELUM SEPADAN — jangan diklaim selesai
+
+1. **N5 masih lebih padat per keluarga**: 234/12 = ±19,5 lawan 12 di N4. Dua belas cukup untuk
+   satu putaran adaptif penuh per keluarga tanpa butir berulang, tetapi itu bukan paritas.
+2. **Menyimak, berbicara, dan menulis masih NOL bank Jepang.** Yang menahan murid Jepang dari
+   mendapat latihan berbahasa Inggris tanpa diberi tahu hanyalah penjaga di `app.js`, dan
+   `japanese-surface-honesty-test` membaca ada-tidaknya bank dari isi direktori `content/ja/` —
+   begitu `listening-bank-ja.json` benar-benar dibuat, gerbang itu BERBALIK dan menuntut
+   penjaganya dicabut. Penjaga yang ditinggalkan sesudah kontennya ada adalah fitur yang hilang
+   diam-diam.
+3. Kosakata dan bacaan Jepang **belum** diperluas ke N4; yang dilengkapi tingkatnya baru bank
+   tata bahasanya.
+
+### Langkah berikutnya, menurut urutan nilainya bagi murid
+
+1. `vocabulary-ja.json` dan `reading-bank-ja.json` naik ke N4 — tanpa itu murid N4 membaca dan
+   menghafal pada tingkat N5 sambil berlatih tata bahasa N4.
+2. Salah satu dari menyimak/berbicara/menulis dibuat versi Jepangnya, lalu penjaganya dicabut
+   dan gerbang kejujurannya diperbarui pada langkah yang SAMA.
+3. Kalau kepadatan N4 mau disamakan dengan N5, targetnya ±20 per keluarga (≈300 butir).
+
+### Nomor build
+
+m025-311 → **m025-312**, keempat berkasnya bersama lewat `tools/bump-build.mjs`. Bank ini
+DIPRECACHE `sw.js`; tanpa `SW_REV` baru, murid yang sudah memasang PWA-nya tetap memegang bank
+lama secara offline — dan offline justru keadaan yang paling sering di lapangan. Bahwa
+`features/neural-voice/fiezel-diag-panel.js` ikut berubah: itu ritual bump menyentuh
+`DIAG_BUILD`; panel diagnostiknya sendiri tidak berubah perilaku.
