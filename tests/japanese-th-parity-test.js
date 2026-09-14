@@ -39,11 +39,18 @@
 // Sensus yang cocok = hijau. Itu bukan klaim "sudah dua bahasa"; itu klaim "kami tahu
 // persis seberapa jauh dari dua bahasa, dan angkanya tidak bergerak tanpa ada yang tahu".
 //
-// SIDECAR
-// -------
-// Terjemahan Thai boleh datang dua cara: medan Thai inline di banknya, atau berkas sidecar
-// `content/ja/<nama-bank>-th.json` (pola yang sudah dipakai kursus Inggris lewat
-// `vocabulary-th.json`). Keduanya dihitung, jadi gerbang ini tidak memaksa satu bentuk.
+// DI MANA TERJEMAHAN THAI BOLEH DITARUH
+// -------------------------------------
+// Jalur yang dipahami gerbang ini: sidecar `content/ja/<nama-bank>-th.json` (pola yang sudah
+// dipakai kursus Inggris lewat `vocabulary-th.json`).
+//
+// Ia TIDAK memungut medan saudara Thai di dalam banknya sendiri (`th_hint` di samping
+// `id_hint`, dan sejenisnya), karena menebak nama-nama medan yang belum ada menghasilkan
+// kebutaan yang sama — hanya lebih sulit dilihat. Tetapi ia juga tidak diam soal itu:
+// assert `NOL Thai yang tidak terhitung` memerah begitu ada aksara Thai di bank yang tidak
+// lewat jalur yang ia pahami, lalu menyebut dua jalan keluarnya. Jadi terjemahan yang
+// ditulis dengan bentuk yang belum didukung TIDAK hilang dalam diam; ia menghentikan CI
+// sampai seseorang memutuskan bentuknya.
 
 'use strict';
 
@@ -151,13 +158,26 @@ function sidecarTh(nama) {
   return n;
 }
 
+/** Setiap string ber-aksara Thai di mana pun dalam sebuah dokumen, tanpa peduli nama medannya. */
+function semuaThai(v, keluar = []) {
+  if (typeof v === 'string') { if (THAI.test(v)) keluar.push(v); return keluar; }
+  if (Array.isArray(v)) { v.forEach((x) => semuaThai(x, keluar)); return keluar; }
+  if (v && typeof v === 'object') Object.values(v).forEach((x) => semuaThai(x, keluar));
+  return keluar;
+}
+
 const diukur = new Map();
 for (const nama of bankJepang()) {
   if (TANPA_TEKS_MURID.has(nama)) continue;
-  const medan = medanMurid(nama, bacaJson(path.join(DIR_JA, nama)));
+  const doc = bacaJson(path.join(DIR_JA, nama));
+  const medan = medanMurid(nama, doc);
+  const thDiMedan = medan.filter((s) => THAI.test(s)).length;
   diukur.set(nama, {
     medan: medan.length,
-    berTh: medan.filter((s) => THAI.test(s)).length + sidecarTh(nama),
+    berTh: thDiMedan + sidecarTh(nama),
+    // Thai yang ADA di banknya tapi TIDAK lewat medan yang dipungut. Dihitung terpisah
+    // karena ia menandai pemungut yang buta, bukan utang yang lunas.
+    thTakTerhitung: semuaThai(doc).length - thDiMedan,
   });
 }
 
@@ -224,6 +244,36 @@ test('UTANG YANG LUNAS WAJIB DICORET: jumlah medan ber-Thai cocok sensus', () =>
     '\n    Terjemahan Thai yang sudah ditulis wajib tercatat — sensus yang menyebut nol padahal ' +
     '\n    sudah ada isinya menyembunyikan kemajuan, persis seperti yang menyebut nol utang ' +
     '\n    padahal masih berutang.');
+});
+
+test('NOL Thai yang tidak terhitung — pemungut yang buta menolak jadi hijau', () => {
+  /*
+   * Ditemukan review bot di PR ini, dan benar. Versi pertama gerbang ini menjanjikan
+   * terjemahan dihitung "inline atau lewat sidecar" — padahal `medanMurid()` hanya memungut
+   * medan SISI INDONESIA. Satu-satunya bentuk inline yang benar-benar terdeteksi adalah
+   * MENIMPA medan Indonesia dengan Thai, dan itu justru cara yang merusak murid Indonesia.
+   *
+   * Cara paling wajar menulis terjemahan — menambah medan saudara (`th_hint` di samping
+   * `id_hint`, `th` di samping `id`) — tidak pernah terbaca. Diuji: dua prompt diberi
+   * `th_hint`, gerbang tetap melaporkan "0/15364, sensus cocok" dan HIJAU. Persis kasus
+   * utang-lunas yang ia klaim tangkap.
+   *
+   * Yang TIDAK kupilih sebagai perbaikan: menebak nama-nama medan saudara dan memungutnya.
+   * Menebak salah menghasilkan kebutaan yang sama, hanya lebih sulit dilihat.
+   *
+   * Yang dipakai: gerbang ini menolak hijau kalau banknya memuat aksara Thai yang tidak
+   * tercatat lewat jalur yang ia pahami. Ia tidak perlu tahu nama medannya — cukup tahu
+   * bahwa ada Thai di sana yang tidak ia hitung, lalu menyebut dua jalan keluarnya.
+   */
+  const buta = [...diukur].filter(([, x]) => x.thTakTerhitung > 0)
+    .map(([n, x]) => n + ': ' + x.thTakTerhitung + ' string Thai tidak terhitung');
+  assert.deepStrictEqual(buta, [],
+    buta.length + ' bank memuat Thai yang tidak masuk sensus:\n    ' + buta.join('\n    ') +
+    '\n\n    Ada terjemahan Thai di bank ini yang gerbang ini TIDAK bisa hitung, jadi ia' +
+    '\n    menolak melaporkan paritas yang ia tahu salah. Dua jalan keluar:' +
+    '\n      (a) pindahkan terjemahannya ke sidecar content/ja/<bank>-th.json, ATAU' +
+    '\n      (b) lebarkan medanMurid() supaya memungut medan saudara Thai itu,' +
+    '\n          lalu perbarui `berTh` di SENSUS.');
 });
 
 test('tiap baris sensus bertanggal dan beralasan', () => {
