@@ -177,7 +177,21 @@ test('splash ada di markup statis, BUKAN dibuat setelah boot selesai', () => {
 
 test('splash berada di ATAS setiap <script> - inilah satu-satunya alasan ia tercat lebih dulu', () => {
   const splashAt = html.indexOf('id="fiezelBootSplash"');
-  const firstScriptAt = html.indexOf('<script');
+  /* KELAS CACAT YANG SAMA dengan tests/boot-order-test.js, dan dipatahkan commit yang sama
+     (SEO c4e506d). indexOf('<script') mentah ikut menghitung blok ber-type DATA —
+     <script type="application/ld+json"> milik Schema.org di <head> — padahal peramban tidak
+     pernah mengeksekusinya dan ia tidak menahan cat satu milidetik pun. Yang dijaga aturan
+     ini adalah skrip pertama yang BISA JALAN; blok data bukan salah satunya. */
+  const EXEC_TYPES = /^(module|text\/javascript|application\/javascript|application\/ecmascript|text\/ecmascript)$/i;
+  const firstScriptAt = (function () {
+    const re = /<script\b([^>]*)>/g;
+    let m;
+    while ((m = re.exec(html)) !== null) {
+      const type = (/\stype="([^"]+)"/.exec(m[1]) || [])[1] || '';
+      if (!type || EXEC_TYPES.test(type)) return m.index;
+    }
+    return -1;
+  }());
   assert.ok(splashAt > 0 && firstScriptAt > 0, 'markup splash dan <script> harus ada');
   assert.ok(splashAt < firstScriptAt,
     'splash harus diurai sebelum <script> pertama; di belakangnya ia menunggu js.puter.com dan ~2,7 MB JSON');
