@@ -187,7 +187,11 @@ test('splash berada di ATAS setiap <script> - inilah satu-satunya alasan ia terc
     const re = /<script\b([^>]*)>/g;
     let m;
     while ((m = re.exec(html)) !== null) {
-      const type = (/\stype="([^"]+)"/.exec(m[1]) || [])[1] || '';
+      /* Toleran terhadap kutip ganda/tunggal/tanpa kutip dan parameter ';charset=…' —
+         lihat alasan lengkapnya di scriptType() pada tests/boot-order-test.js. */
+      const tm = /\stype\s*=\s*("([^"]*)"|'([^']*)'|([^\s"'>]+))/i.exec(m[1]);
+      const type = (tm ? (tm[2] !== undefined ? tm[2] : tm[3] !== undefined ? tm[3] : tm[4] || '') : '')
+        .split(';')[0].trim().toLowerCase();
       if (!type || EXEC_TYPES.test(type)) return m.index;
     }
     return -1;
