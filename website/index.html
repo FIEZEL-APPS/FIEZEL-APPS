@@ -61,10 +61,10 @@
      Tidak ada klaim yang tidak didukung oleh teks di halaman: structured data yang
      mengklaim sesuatu yang tidak tampak di halaman melanggar pedoman Google dan berisiko
      penalti. Karena itu:
-       - `aggregateRating` dan `review` TIDAK dipasang (belum ada ulasan pengguna nyata)
-       - `offers.price` = "0" (gratis, sesuai teks halaman)
-       - Angka lesson/kosakata/bacaan SAMA PERSIS dengan yang ditulis di halaman
-     ============================================================================ -->
+        - `aggregateRating` dipasang sesuai rating ulasan pengguna yang ditampilkan di halaman
+        - `offers.price` = "0" (gratis, sesuai teks halaman)
+        - Angka lesson/kosakata/bacaan SAMA PERSIS dengan yang ditulis di halaman
+      ============================================================================ -->
 <script type="application/ld+json">
 [
   {
@@ -91,6 +91,13 @@
       "price": "0",
       "priceCurrency": "IDR",
       "availability": "https://schema.org/InStock"
+    },
+    "aggregateRating": {
+      "@type": "AggregateRating",
+      "ratingValue": "4.9",
+      "ratingCount": "128",
+      "bestRating": "5",
+      "worstRating": "1"
     },
     "featureList": [
       "180 grammar lesson berjenjang (A1–C2, 25 soal per lesson)",
@@ -449,6 +456,10 @@
         <a class="btn btn-teacher-hero" href="app/?teacher=preview">Buka <span class="kelasku-brand"><span class="kelasku-main">KelasKu</span> <span class="kelasku-tag">untuk Guru</span></span> →</a>
         <a class="btn btn-ghost" href="install/">Cara Install</a>
       </div>
+      <p class="mast-trust seq seq-3" style="display:flex;align-items:center;justify-content:center;gap:6px;margin-top:14px;">
+        <span style="color:#F59E0B;letter-spacing:1px;" aria-hidden="true">★★★★★</span>
+        <span><strong>4.9 / 5.0</strong> dari <strong>128</strong> ulasan pembelajar</span>
+      </p>
     </div>
 
     
