@@ -129,6 +129,38 @@
 
     /* ── Edge case: gerbang akun saat offline ──────────────────── */
     'account.offline-lanjut': 'ไปต่อโดยไม่ใช้บัญชี',
-    'account.offline-catatan': 'ตอนนี้ไม่มีสัญญาณ คุณเริ่มเรียนได้เลย แล้วค่อยเชื่อมบัญชีทีหลังก็ได้'
+    'account.offline-catatan': 'ตอนนี้ไม่มีสัญญาณ คุณเริ่มเรียนได้เลย แล้วค่อยเชื่อมบัญชีทีหลังก็ได้',
+
+    /* ── SUMBU BAHASA (m025-314) ────────────────────────────────
+       Padanan satu-satu dari blok penutup copy-id-redesign.js. Nama skill sengaja
+       PENDEK: keenamnya duduk di kartu selebar setengah layar 360 px, dan terjemahan
+       yang benar tapi panjang akan terpotong — sama rusaknya dengan tidak diterjemahkan. */
+    'skill.vocab': 'คำศัพท์',
+    'skill.grammar': 'ไวยากรณ์',
+    'skill.reading': 'การอ่าน',
+    'skill.writing': 'การเขียน',
+    'skill.listening': 'การฟัง',
+    'skill.speaking': 'การพูด',
+
+    'home.sapaan-runtun-aktif': 'ต่อเนื่อง {hari} วันแล้ว! เยี่ยมมาก {nama} วันนี้ไปต่ออีก 10 นาทีไหม',
+    'home.paw-avatar-aria': 'มาสคอต PAW',
+    'home.paw-bubble-title': 'PAW บอกว่า',
+    'home.ritme-harian': 'จังหวะประจำวัน',
+    'home.ritme-harian-hitung': '({selesai}/{target} ข้อ)',
+    'home.latihan-singkat': 'ฝึกสั้น ๆ 3 นาที',
+    'home.chip-vocab-sub': 'การ์ดเร็ว 10 ใบ',
+    'home.chip-grammar-sub': 'รูปประโยค',
+    'home.chip-dengar': 'ฟัง',
+    'home.chip-dengar-sub': 'เสียงสั้น ๆ',
+    'home.classroom-eyebrow': 'เร็ว ๆ นี้',
+    'home.classroom-card': 'ห้องเรียนของฉัน',
+
+    'latihan.lanjut-eyebrow': 'ทำต่อจากล่าสุด · ระดับ {level}',
+    'latihan.lanjut-sub': 'เรียนบทนี้ให้จบเพื่อยืนยันความเข้าใจของคุณ',
+    'latihan.booster-tag': 'AI Booster',
+    'latihan.booster-sub': 'ความแม่นยำ {akurasi}% · แนะนำให้ฝึก {menit} นาที',
+    'latihan.booster-cta': 'ฝึก',
+
+    'flash.suara-belum-ada': 'ยังไม่มีเสียงสำหรับ{bahasa} เราจึงซ่อนปุ่มฟังไว้ก่อน เพื่อไม่ให้คุณจำคำอ่านที่ผิดไป'
   });
 }());

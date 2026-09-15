@@ -1,14 +1,40 @@
 {
   "schema": "fiezel-th-ui-leak-v1",
-  "generatedAt": "2026-09-14T16:05:34.481Z",
+  "generatedAt": "2026-09-14T23:00:23.599Z",
   "files": {
     "app.js": {
-      "leaks": 1,
-      "budget": 1,
+      "leaks": 3,
+      "budget": 3,
       "sample": [
         {
-          "line": 8987,
+          "line": 7660,
+          "text": "Selesaikan ritme hari ini"
+        },
+        {
+          "line": 9077,
           "text": "Nama kriteria: n/4 - satu kalimat alasan yang menunjuk bukti di tulisannya"
+        },
+        {
+          "line": 13689,
+          "text": "Latihan"
+        }
+      ]
+    },
+    "features/brain/fiezel-listening-adaptive.js": {
+      "leaks": 3,
+      "budget": 3,
+      "sample": [
+        {
+          "line": 93,
+          "text": "Akurasi di bawah target dan replay sudah penuh, jadi klip dipendekkan satu tingkat."
+        },
+        {
+          "line": 94,
+          "text": "Akurasi di bawah target meski replay penuh dan klip pendek, jadi kecepatan diperlambat satu pita."
+        },
+        {
+          "line": 95,
+          "text": "Akurasi berada di dalam pita target (±0.1), jadi kesulitan dipertahankan — di sinilah belajar paling efisien."
         }
       ]
     },
@@ -22,13 +48,27 @@
         }
       ]
     },
+    "features/brain/fiezel-step-tutor.js": {
+      "leaks": 1,
+      "budget": 1,
+      "sample": [
+        {
+          "line": 86,
+          "text": "Sekarang gabungkan langkah-langkah tadi"
+        }
+      ]
+    },
     "features/brain/fiezel-tutor-brain.js": {
-      "leaks": 3,
-      "budget": 3,
+      "leaks": 4,
+      "budget": 4,
       "sample": [
         {
           "line": 538,
           "text": "Belum tepat, dan itu wajar di bagian ini."
+        },
+        {
+          "line": 541,
+          "text": ". Sekarang coba lagi."
         },
         {
           "line": 543,
@@ -40,19 +80,49 @@
         }
       ]
     },
+    "features/class-hub/fiezel-braincore-review.js": {
+      "leaks": 2,
+      "budget": 2,
+      "sample": [
+        {
+          "line": 30,
+          "text": "Latihan membaca terpandu"
+        },
+        {
+          "line": 30,
+          "text": "Latihan menyimak detail"
+        }
+      ]
+    },
     "features/class-hub/fiezel-class-hub.js": {
-      "leaks": 1,
-      "budget": 1,
+      "leaks": 5,
+      "budget": 5,
       "sample": [
         {
           "line": 241,
           "text": "Tugas disimpan sebagai"
+        },
+        {
+          "line": 241,
+          "text": ". Lanjutkan kapan saja."
+        },
+        {
+          "line": 257,
+          "text": "Latihan ·"
+        },
+        {
+          "line": 393,
+          "text": "Latihan · ±"
+        },
+        {
+          "line": 415,
+          "text": "Latihan — umpan balik tiap soal"
         }
       ]
     },
     "features/curriculum/learning-mission.js": {
-      "leaks": 19,
-      "budget": 19,
+      "leaks": 20,
+      "budget": 20,
       "sample": [
         {
           "line": 36,
@@ -99,6 +169,26 @@
         {
           "line": 34,
           "text": "Nama panggilan"
+        }
+      ]
+    },
+    "features/learner-flow/fiezel-learner-flow.js": {
+      "leaks": 1,
+      "budget": 1,
+      "sample": [
+        {
+          "line": 239,
+          "text": ", jadi pola ini akan diulang lagi besok. Sekarang kita lanjut ke"
+        }
+      ]
+    },
+    "features/learner-flow/fiezel-review-bank.js": {
+      "leaks": 1,
+      "budget": 1,
+      "sample": [
+        {
+          "line": 215,
+          "text": "Sekarang buka."
         }
       ]
     },
@@ -179,9 +269,13 @@
       ]
     },
     "features/prasasti/fiezel-prasasti-core.js": {
-      "leaks": 3,
-      "budget": 3,
+      "leaks": 5,
+      "budget": 5,
       "sample": [
+        {
+          "line": 38,
+          "text": "Selesaikan 1 sesi lesson grammar"
+        },
         {
           "line": 41,
           "text": "Belajar bermakna 7 hari beruntun."
@@ -193,6 +287,10 @@
         {
           "line": 43,
           "text": "Belajar bermakna 100 hari beruntun — kebiasaan yang sudah jadi milikmu."
+        },
+        {
+          "line": 45,
+          "text": "Kolektor Runtun"
         }
       ]
     },
@@ -299,11 +397,79 @@
           "text": "Nama satu spesies diperlakukan tunggal, jadi \\"
         }
       ]
+    },
+    "features/teacher/fiezel-teacher-shell.js": {
+      "leaks": 4,
+      "budget": 4,
+      "sample": [
+        {
+          "line": 492,
+          "text": "Akurasi"
+        },
+        {
+          "line": 504,
+          "text": "Latihan ·"
+        },
+        {
+          "line": 687,
+          "text": "📖 Kosakata Kunci:"
+        },
+        {
+          "line": 704,
+          "text": "Latihan"
+        }
+      ]
+    },
+    "features/teacher/fiezel-teacher-store.js": {
+      "leaks": 3,
+      "budget": 3,
+      "sample": [
+        {
+          "line": 358,
+          "text": ". Aku bangga. Lanjutkan ritmenya — 1 sesi kecil tiap hari lebih ampuh daripada 1 sesi panjang seminggu."
+        },
+        {
+          "line": 364,
+          "text": "• Akurasi keseluruhan:"
+        },
+        {
+          "line": 383,
+          "text": "Akurasi"
+        }
+      ]
+    },
+    "features/tutor-action-center/fiezel-tutor-action-center.js": {
+      "leaks": 3,
+      "budget": 3,
+      "sample": [
+        {
+          "line": 351,
+          "text": "Latihan terkirim"
+        },
+        {
+          "line": 361,
+          "text": "Latihan yang dikirim muncul di Today Plan murid sebagai “Latihan dari tutor”."
+        },
+        {
+          "line": 416,
+          "text": "Latihan dikirim ke"
+        }
+      ]
+    },
+    "features/tutor-classroom/fiezel-tutor-v3.js": {
+      "leaks": 1,
+      "budget": 1,
+      "sample": [
+        {
+          "line": 175,
+          "text": "Sekarang polanya lebih masuk akal: subjek, have atau has, lalu bentuk ketiga kata kerja."
+        }
+      ]
     }
   },
   "copyKeys": {
-    "id": 2494,
-    "th": 2496,
+    "id": 2495,
+    "th": 2497,
     "idTanpaTh": 0
   },
   "pass": true
