@@ -1118,6 +1118,16 @@ jobs:
         # Gerbang ini membaca daftar kunci LANGSUNG DARI SUMBER, jadi ia ikut tumbuh saat kunci
         # baru lahir dan tidak bisa basi diam-diam.
         run: node tests/target-language-axis-test.js
+      - name: 'Progres tiap bahasa benar-benar berdiri sendiri'
+        # Gerbang di atas menguji MODUL sumbu bahasa dan hijau 10/10 sejak ia lahir —
+        # sementara app.js tidak pernah memanggilnya untuk membentuk satu pun kunci
+        # penyimpanan. Modul yang benar, diuji dengan benar, dan tidak dipakai: kelas cacat
+        # yang tidak bisa dilihat gerbang yang memeriksa modul. Gerbang ini MENJALANKAN
+        # jalur simpan/muat yang sungguhan di kedua bahasa — menjawab soal di Inggris,
+        # berganti ke Jepang, menjawab lagi, lalu pulang — dan menuntut tiga janji:
+        # progres berdiri sendiri, kembali tidak menghapus apa pun, dan kunci Inggris
+        # tidak bergeser sebita pun.
+        run: node tests/target-lang-progress-isolation-test.js
       - name: 'Wave E4: post-test tertunda / probe retensi (fiezel-post-test)'
         # Modul murni baru features/brain/fiezel-retention-probe.js: penjadwal probe retensi
         # deterministik (offset 3/7/21 hari, jitter seeded per lessonId+userSeed) +
