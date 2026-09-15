@@ -37,7 +37,24 @@ const root = __fzRoot;
 
 let pass = 0;
 const failures = [];
-function test(name, fn) { try { fn(); pass++; } catch (err) { failures.push(name + ' — ' + err.message); } }
+function test(name, fn) {
+  let hasil;
+  try { hasil = fn(); }
+  catch (err) { failures.push(name + ' — ' + err.message); return; }
+  /* Sebuah assert async yang dijalankan runner SINKRON akan selalu "lulus": fn() hanya
+     mengembalikan Promise, dan penolakannya tidak pernah sampai ke sini. Gerbang yang
+     lulus tanpa menguji apa pun lebih berbahaya daripada gerbang yang tidak ada, jadi
+     runner ini MENOLAK menghitungnya — pakai testAsync(). */
+  if (hasil && typeof hasil.then === 'function') {
+    failures.push(name + ' — assert async didaftarkan lewat test() sinkron; pakai testAsync()');
+    hasil.catch(() => {});
+    return;
+  }
+  pass++;
+}
+/** Assert yang harus di-await. Dikumpulkan dulu, dijalankan berurutan sebelum ringkasan. */
+const antrianAsync = [];
+function testAsync(name, fn) { antrianAsync.push([name, fn]); }
 
 /** Satu aplikasi baru dengan localStorage bersih. Dikembalikan bersama pintu-pintu ujinya. */
 function bootApp(seedRaw) {
@@ -268,16 +285,87 @@ test('boot ulang membaca kembali kursus yang aktif, bukan kembali ke Inggris dia
   assert.ok(!s.grammar.present_perfect, 'boot ulang mencampur progres Inggris ke kursus Jepang');
 });
 
+/* ────────────────────────────────────────────────────────────────────────────
+   4. MASUK AKUN TIDAK BOLEH MENELANTARKAN PROGRES BAHASA LAIN
+
+   Sumbu bahasa melahirkan ruang nama kunci BARU (`<dasar>@ja`, `<sisi>:<uuid>@ja`).
+   Migrasi sekali-jalan yang memindahkan progres anonim ke ruang akun ditulis SEBELUM
+   ruang nama itu ada, jadi ia hanya mengenal kunci dasar yang datar. Murid yang belajar
+   Jepang tanpa akun lalu masuk akun karena itu kehilangan SELURUH progres Jepangnya:
+   tidak terhapus, hanya ditinggal di kunci anonim yang tidak pernah dibaca lagi. Persis
+   kelas kegagalan senyap yang gerbang ini ada untuk mencegahnya — dan ia lahir dari
+   perbaikan ini sendiri, bukan dari kode lama.
+   ──────────────────────────────────────────────────────────────────────────── */
+
+/** Meniru murid yang masuk akun: jalankan migrasi akun yang SUNGGUHAN, bukan tiruannya. */
+async function masukAkun(app, uuid) {
+  app.ctx.puter = { auth: { getUser: async () => ({ uuid }) } };
+  return app.ctx.window.__fiezelAudit.activateAccountStateFromPuter(app.ctx.puter);
+}
+
+testAsync('masuk akun membawa serta progres JEPANG, bukan hanya Inggris', async () => {
+  const app = bootApp();
+  app.jawab('present_perfect', 'B1');
+  app.ganti('ja');
+  app.jawab('i_adjective_before_noun_no_na', 'A1');
+  const jepangSebelum = app.st().grammar.i_adjective_before_noun_no_na.mastery;
+  assert.strictEqual(jepangSebelum, 100, 'prasyarat: progres Jepang belum tertulis');
+
+  await masukAkun(app, 'uuid-murid-1');
+
+  const s = app.A.loadState();
+  assert.strictEqual(s.preferences.targetLang, 'ja', 'kursus aktif hilang saat masuk akun');
+  assert.ok(s.grammar.i_adjective_before_noun_no_na,
+    'progres JEPANG hilang saat murid masuk akun — ia ditinggal di kunci anonim @ja yang tidak pernah dibaca lagi');
+  assert.strictEqual(s.grammar.i_adjective_before_noun_no_na.mastery, 100,
+    'progres Jepang sampai ke ruang akun tetapi tidak utuh');
+});
+
+testAsync('masuk akun juga memindahkan progres INGGRIS seperti sebelum sumbu bahasa lahir', async () => {
+  const app = bootApp();
+  app.jawab('present_perfect', 'B1');
+  await masukAkun(app, 'uuid-murid-2');
+  const s = app.A.loadState();
+  assert.ok(s.grammar.present_perfect, 'progres Inggris hilang saat masuk akun — regresi pada jalur yang sudah lama benar');
+});
+
+testAsync('side-state otak per bahasa ikut pindah ke ruang akun', async () => {
+  const app = bootApp();
+  app.ganti('ja');
+  /* Murid ini BENAR-BENAR belajar di kursus Jepang. Tanpa itu blob dasarnya kosong, migrasi
+     akun melewatinya (perilaku lama: akun baru tanpa bukti = state baru), sumbu bahasa ikut
+     kembali ke 'en', dan assert di bawah akan membaca kunci Inggris - menguji lubang skenario,
+     bukan perilaku produk. */
+  app.jawab('i_adjective_before_noun_no_na', 'A1');
+  /* Tulis lewat kunci PRODUKSI, supaya yang diuji jalur sungguhan bukan tebakan nama kunci. */
+  const kunciJa = app.ctx.window.__fiezelAudit.sideStateKey('fiezel-mastery-bkt-v1');
+  assert.ok(kunciJa.indexOf('@ja') > 0, 'prasyarat: kunci side-state Jepang tidak bersumbu bahasa (' + kunciJa + ')');
+  app.store[kunciJa] = JSON.stringify({ bukti: 'jepang' });
+
+  await masukAkun(app, 'uuid-murid-3');
+
+  const kunciAkunJa = app.ctx.window.__fiezelAudit.sideStateKey('fiezel-mastery-bkt-v1');
+  assert.ok(kunciAkunJa.indexOf('uuid-murid-3') > 0, 'prasyarat: kunci side-state belum masuk ruang akun');
+  assert.ok(app.store[kunciAkunJa] != null,
+    'side-state otak Jepang (BKT) tidak ikut pindah ke ruang akun — bukti penguasaan murid ditinggal di kunci anonim');
+  assert.strictEqual(JSON.parse(app.store[kunciAkunJa]).bukti, 'jepang', 'side-state Jepang pindah tetapi isinya bukan miliknya');
+});
+
 test('gerbang ini terdaftar di .github/workflows/quality.yml', () => {
   assert.ok(fs.readFileSync(path.join(root, '.github/workflows/quality.yml'), 'utf8')
     .indexOf('target-lang-progress-isolation-test.js') >= 0, 'gerbang belum terdaftar di quality.yml');
 });
 
-const total = pass + failures.length;
-if (failures.length) {
-  failures.forEach((f) => console.error('FAIL: ' + f));
-  console.error('target-lang-progress-isolation-test GAGAL: ' + failures.length + ' assert merah');
+(async () => {
+  for (const [name, fn] of antrianAsync) {
+    try { await fn(); pass++; } catch (err) { failures.push(name + ' — ' + err.message); }
+  }
+  const total = pass + failures.length;
+  if (failures.length) {
+    failures.forEach((f) => console.error('FAIL: ' + f));
+    console.error('target-lang-progress-isolation-test GAGAL: ' + failures.length + ' assert merah');
+    console.log('target-lang-progress-isolation-test: ' + pass + '/' + total + ' assert PASS');
+    process.exit(1);
+  }
   console.log('target-lang-progress-isolation-test: ' + pass + '/' + total + ' assert PASS');
-  process.exit(1);
-}
-console.log('target-lang-progress-isolation-test: ' + pass + '/' + total + ' assert PASS');
+})();
