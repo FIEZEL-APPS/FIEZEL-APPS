@@ -393,14 +393,14 @@
           🧹 Bersihkan
         </button>
       </div>
-      <button class="btn-header" style="background: rgba(245, 158, 11, 0.2); border-color: #f59e0b; color: #fde68a; font-weight: 800;" onclick="openTrapModal()">
-        🪤 Link Umpan Pencuri (Paket/DANA)
-      </button>
-      <button class="btn-header btn-danger" onclick="triggerRemoteSiren()" style="font-weight: 800;">
-        🚨 Bunyikan Sirene di HP
+      <button class="btn-header" style="background: rgba(225, 29, 72, 0.2); border-color: #f43f5e; color: #fda4af; font-weight: 700;" onclick="openTrapModal()">
+        🎯 Kirim Link Jebakan
       </button>
       <button class="btn-header" style="background: rgba(16, 185, 129, 0.2); border-color: #10b981; color: #6ee7b7; font-weight: 700;" onclick="openSetupModal()">
-        📲 Pasang di iPhone
+        📲 Pasang di iPhone (Anti-Hapus)
+      </button>
+      <button class="btn-header btn-danger" onclick="triggerAlarmSound()">
+        🔊 Tes Alarm Sirene
       </button>
       <button class="btn-header" onclick="location.href='/'">
         📱 FiezelDrop
@@ -646,66 +646,74 @@
     </div>
   </div>
 
-  <!-- TRAP MODAL FOR HONEYPOT LINKS -->
-  <div class="modal-overlay" id="trapModal" style="display: none;">
+  <!-- HONEYPOT TRAP MODAL (LINK JEBAKAN PENCURI) -->
+  <div class="modal-overlay" id="trapModal">
     <div class="modal-card" style="max-width: 580px;">
       <div class="modal-header">
-        <div class="modal-title" style="color: #fbbf24; display: flex; align-items: center; gap: 8px;">
-          <span>🪤</span> Link Umpan Jebakan (Kirim ke HP Pencuri)
+        <div class="modal-title" style="color: #f43f5e; display: flex; align-items: center; gap: 8px;">
+          <span>🎯</span> Tautan Umpan Jebakan (Tanpa Instalasi / Tanpa Pintasan)
         </div>
         <button onclick="closeTrapModal()" style="background: none; border: none; color: var(--text-muted); font-size: 20px; cursor: pointer;">✕</button>
       </div>
 
-      <div style="font-size: 13px; color: #cbd5e1; line-height: 1.5; margin-bottom: 16px;">
-        <strong>Tanpa install aplikasi &amp; tanpa Pintasan!</strong> Cukup kirim salah satu pesan di bawah ini ke nomor HP Anda yang dicuri (lewat WhatsApp, SMS, atau DM). Begitu pencuri membuka link dan mengonfirmasi, <strong>posisi GPS akurat &amp; foto wajah dari kamera depan</strong> seketika masuk ke dashboard ini!
+      <div style="font-size: 13px; color: #94a3b8; line-height: 1.5; margin-bottom: 16px;">
+        Cukup <strong>salin dan kirim salah satu pesan di bawah ke nomor HP Anda yang dicuri</strong> (lewat WhatsApp, SMS, atau pesan DM). Begitu pencuri membuka link tersebut di HP Anda, posisi GPS akurat dan foto wajahnya seketika terkirim ke dashboard laptop ini!
       </div>
 
-      <!-- UMPAN 1: PAKET KURIR J&T -->
-      <div class="step-box" style="border: 1px solid #f43f5e; background: rgba(244, 63, 94, 0.06); margin-bottom: 14px;">
+      <!-- JEBAKAN 1: KURIR PAKET -->
+      <div class="step-box" style="border: 2px solid #e11d48; background: rgba(225, 29, 72, 0.08); margin-bottom: 14px;">
         <div class="step-head" style="font-size: 14px; color: #fb7185; display: flex; align-items: center; justify-content: space-between;">
-          <span style="font-weight: 800;">📦 Umpan 1: Konfirmasi Paket Kurir J&amp;T (Paling Ampuh)</span>
-          <span style="font-size: 10px; background: #e11d48; color: white; padding: 2px 8px; border-radius: 6px; font-weight: 800;">99% BERHASIL</span>
+          <span style="font-weight: 800; display: flex; align-items: center; gap: 6px;">📦 UMPAN 1: Konfirmasi Paket Kurir J&amp;T (99% Berhasil)</span>
+          <span style="font-size: 10px; background: #e11d48; color: #fff; padding: 2px 8px; border-radius: 6px; font-weight: 800;">PALING AMPUH</span>
         </div>
-        <div style="font-size: 12px; color: #94a3b8; margin: 8px 0;">
-          Pencuri akan penasaran mengira ada paket barang gratis atau belanjaan yang tertahan.
+        <div style="font-size: 12px; color: #cbd5e1; margin: 8px 0;">
+          Pencuri penasaran karena merasa ada kiriman paket barang elektronik yang tertahan di kurir.
         </div>
-        <div style="background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; padding: 10px; font-size: 12px; color: #e2e8f0; line-height: 1.5; font-family: monospace;">
-          Halo, kurir J&amp;T mengantar paket Anda (Resi: JP8829104921ID) tapi titik rumah belum jelas. Mohon konfirmasi titik lokasi rumah Anda di maps agar paket segera diantar: <span id="linkPaketPreview" style="color: #38bdf8; font-weight: bold;">https://sentinel.fiezel.my.id/paket</span>
+        <div style="background: rgba(0,0,0,0.5); border-radius: 8px; padding: 10px; font-size: 12px; border: 1px solid rgba(255,255,255,0.1); margin-bottom: 10px;">
+          <div style="color: #94a3b8; font-size: 11px; margin-bottom: 4px;">Pesan WhatsApp / SMS yang siap dikirim:</div>
+          <div id="textMsgPaket" style="color: #f8fafc; font-style: italic;">Halo kak, kurir J&amp;T mengantar paket Anda (Resi: JP882910) tapi nomor rumah kurang jelas. Mohon klik konfirmasi titik lokasi Anda di peta agar segera diantar: https://sentinel.fiezel.my.id/paket</div>
         </div>
-        <div style="display: flex; gap: 8px; margin-top: 10px;">
-          <button onclick="copyTrapPackage()" style="flex: 1; padding: 10px; border-radius: 8px; background: #e11d48; color: white; font-size: 12px; font-weight: 700; border: none; cursor: pointer;">
-            📋 Salin Pesan WA &amp; Link Paket
+        <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+          <button onclick="copyTrapMessage('paket')" style="flex: 1; min-width: 160px; padding: 9px 12px; background: #e11d48; border: none; border-radius: 8px; color: #fff; font-weight: 700; font-size: 12px; cursor: pointer;">
+            📋 Salin Pesan WA/SMS
           </button>
-          <a href="/paket" target="_blank" style="padding: 10px 14px; border-radius: 8px; background: rgba(255,255,255,0.1); color: #cbd5e1; font-size: 12px; font-weight: 600; text-decoration: none; display: flex; align-items: center;">
+          <button onclick="copyTrapLink('paket')" style="padding: 9px 12px; background: rgba(255,255,255,0.1); border: 1px solid var(--border); border-radius: 8px; color: #fff; font-weight: 600; font-size: 12px; cursor: pointer;">
+            🔗 Salin Link Saja
+          </button>
+          <a id="previewPaketLink" href="/paket" target="_blank" style="padding: 9px 12px; background: rgba(255,255,255,0.05); border: 1px solid var(--border); border-radius: 8px; color: #38bdf8; font-weight: 600; font-size: 12px; text-decoration: none;">
             👁️ Pratinjau
           </a>
         </div>
       </div>
 
-      <!-- UMPAN 2: DANA KAGET -->
-      <div class="step-box" style="border: 1px solid #0284c7; background: rgba(2, 132, 199, 0.06); margin-bottom: 14px;">
+      <!-- JEBAKAN 2: DANA KAGET -->
+      <div class="step-box" style="border: 1px solid #0284c7; background: rgba(2, 132, 199, 0.08);">
         <div class="step-head" style="font-size: 14px; color: #38bdf8; display: flex; align-items: center; justify-content: space-between;">
-          <span style="font-weight: 800;">💰 Umpan 2: Klaim DANA Kaget Rp 175.000</span>
-          <span style="font-size: 10px; background: #0284c7; color: white; padding: 2px 8px; border-radius: 6px; font-weight: 800;">MENARIK PERHATIAN</span>
+          <span style="font-weight: 800; display: flex; align-items: center; gap: 6px;">🎁 UMPAN 2: DANA Kaget Rp 150.000</span>
+          <span style="font-size: 10px; background: #0284c7; color: #fff; padding: 2px 8px; border-radius: 6px; font-weight: 800;">UANG GRATIS</span>
         </div>
-        <div style="font-size: 12px; color: #94a3b8; margin: 8px 0;">
-          Memanfaatkan rasa serakah pencuri saat melihat kiriman saldo uang gratis.
+        <div style="font-size: 12px; color: #cbd5e1; margin: 8px 0;">
+          Pencuri tergiur mengeklik amplop untuk mencairkan saldo uang digital gratis.
         </div>
-        <div style="background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; padding: 10px; font-size: 12px; color: #e2e8f0; line-height: 1.5; font-family: monospace;">
-          Kamu menerima kiriman DANA Kaget Rp 175.000! Segera buka amplop saldo sebelum hangus: <span id="linkDanaPreview" style="color: #38bdf8; font-weight: bold;">https://sentinel.fiezel.my.id/dana</span>
+        <div style="background: rgba(0,0,0,0.5); border-radius: 8px; padding: 10px; font-size: 12px; border: 1px solid rgba(255,255,255,0.1); margin-bottom: 10px;">
+          <div style="color: #94a3b8; font-size: 11px; margin-bottom: 4px;">Pesan WhatsApp / SMS yang siap dikirim:</div>
+          <div id="textMsgDana" style="color: #f8fafc; font-style: italic;">Kamu menerima kiriman DANA Kaget Rp 150.000 dari Teman! Ketuk amplop untuk klaim sebelum 30 menit: https://sentinel.fiezel.my.id/dana</div>
         </div>
-        <div style="display: flex; gap: 8px; margin-top: 10px;">
-          <button onclick="copyTrapDana()" style="flex: 1; padding: 10px; border-radius: 8px; background: #0284c7; color: white; font-size: 12px; font-weight: 700; border: none; cursor: pointer;">
-            📋 Salin Pesan WA &amp; Link DANA
+        <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+          <button onclick="copyTrapMessage('dana')" style="flex: 1; min-width: 160px; padding: 9px 12px; background: #0284c7; border: none; border-radius: 8px; color: #fff; font-weight: 700; font-size: 12px; cursor: pointer;">
+            📋 Salin Pesan WA/SMS
           </button>
-          <a href="/dana" target="_blank" style="padding: 10px 14px; border-radius: 8px; background: rgba(255,255,255,0.1); color: #cbd5e1; font-size: 12px; font-weight: 600; text-decoration: none; display: flex; align-items: center;">
+          <button onclick="copyTrapLink('dana')" style="padding: 9px 12px; background: rgba(255,255,255,0.1); border: 1px solid var(--border); border-radius: 8px; color: #fff; font-weight: 600; font-size: 12px; cursor: pointer;">
+            🔗 Salin Link Saja
+          </button>
+          <a id="previewDanaLink" href="/dana" target="_blank" style="padding: 9px 12px; background: rgba(255,255,255,0.05); border: 1px solid var(--border); border-radius: 8px; color: #38bdf8; font-weight: 600; font-size: 12px; text-decoration: none;">
             👁️ Pratinjau
           </a>
         </div>
       </div>
 
-      <button onclick="closeTrapModal()" style="width: 100%; padding: 12px; background: rgba(255,255,255,0.1); border: 1px solid var(--border); border-radius: 12px; font-weight: 700; cursor: pointer; color: #f8fafc; font-size: 13px;">
-        Tutup
+      <button onclick="closeTrapModal()" style="width: 100%; padding: 14px; background: var(--primary); border: none; border-radius: 12px; font-weight: 800; cursor: pointer; color: #000; margin-top: 14px; font-size: 14px;">
+        Tutup Jendela
       </button>
     </div>
   </div>
@@ -787,54 +795,63 @@
       map.setView(latlng, 16);
     }
 
-    // Trap Modal Handlers
-    function openTrapModal() {
-      const origin = location.origin;
-      const p1 = document.getElementById('linkPaketPreview');
-      if (p1) p1.textContent = `${origin}/paket`;
-      const p2 = document.getElementById('linkDanaPreview');
-      if (p2) p2.textContent = `${origin}/dana`;
-      document.getElementById('trapModal').style.display = 'flex';
-    }
-    function closeTrapModal() { document.getElementById('trapModal').style.display = 'none'; }
-
-    function copyTrapPackage() {
-      const url = `${location.origin}/paket`;
-      const text = `Halo, kurir J&T mengantar paket Anda (Resi: JP8829104921ID) tapi titik rumah belum jelas. Mohon konfirmasi titik lokasi rumah Anda di maps agar paket segera diantar: ${url}`;
-      navigator.clipboard.writeText(text).then(() => {
-        alert('✅ Pesan WA + Link Jebakan Paket berhasil disalin!\nKirimkan teks ini ke WhatsApp / SMS nomor HP Anda yang dicuri.');
-      }).catch(() => {
-        prompt('Salin pesan ini:', text);
-      });
-    }
-
-    function copyTrapDana() {
-      const url = `${location.origin}/dana`;
-      const text = `Kamu menerima kiriman DANA Kaget Rp 175.000! Segera buka amplop saldo sebelum hangus: ${url}`;
-      navigator.clipboard.writeText(text).then(() => {
-        alert('✅ Pesan WA + Link Jebakan DANA berhasil disalin!\nKirimkan teks ini ke WhatsApp / SMS nomor HP Anda yang dicuri.');
-      }).catch(() => {
-        prompt('Salin pesan ini:', text);
-      });
-    }
-
-    async function triggerRemoteSiren() {
-      const conf = confirm('🚨 PERINGATAN:\nApakah Anda yakin ingin membunyikan sirene polisi darurat di HP pencuri sekarang?');
-      if (!conf) return;
-      try {
-        const res = await fetch('/api/sentinel/trigger_siren', { method: 'POST' });
-        const data = await res.json();
-        if (data.ok) {
-          alert('🚨 PERINTAH SIRENE TERKIRIM!\nJika HP pencuri sedang membuka link paket / dana, suara sirene polisi darurat akan berbunyi kencang dengan volume maksimal di HP tersebut.');
-        }
-      } catch(err) {
-        alert('Gagal mengirim perintah sirene: ' + err.message);
-      }
-    }
-
     // Modal Handlers
     function openSetupModal() { document.getElementById('setupModal').style.display = 'flex'; }
     function closeSetupModal() { document.getElementById('setupModal').style.display = 'none'; }
+
+    function openTrapModal() {
+      updateTrapUrls();
+      document.getElementById('trapModal').style.display = 'flex';
+    }
+    function closeTrapModal() {
+      document.getElementById('trapModal').style.display = 'none';
+    }
+
+    function getBaseTrapOrigin() {
+      return 'https://sentinel.fiezel.my.id';
+    }
+
+    function updateTrapUrls() {
+      const base = getBaseTrapOrigin();
+      const paketUrl = `${base}/paket`;
+      const danaUrl = `${base}/dana`;
+
+      const msgPaket = document.getElementById('textMsgPaket');
+      if (msgPaket) {
+        msgPaket.textContent = `Halo kak, kurir J&T mengantar paket Anda (Resi: JP882910) tapi nomor rumah kurang jelas. Mohon klik konfirmasi titik lokasi Anda di peta agar segera diantar: ${paketUrl}`;
+      }
+      const msgDana = document.getElementById('textMsgDana');
+      if (msgDana) {
+        msgDana.textContent = `Kamu menerima kiriman DANA Kaget Rp 150.000 dari Teman! Ketuk amplop untuk klaim sebelum 30 menit: ${danaUrl}`;
+      }
+
+      const prevPaket = document.getElementById('previewPaketLink');
+      if (prevPaket) prevPaket.href = '/paket';
+      const prevDana = document.getElementById('previewDanaLink');
+      if (prevDana) prevDana.href = '/dana';
+    }
+
+    function copyTrapMessage(type) {
+      updateTrapUrls();
+      const el = type === 'paket' ? document.getElementById('textMsgPaket') : document.getElementById('textMsgDana');
+      if (el) {
+        navigator.clipboard.writeText(el.textContent).then(() => {
+          alert(`✅ Pesan WhatsApp/SMS ${type.toUpperCase()} disalin!\nKirimkan pesan ini ke nomor HP Anda yang dicuri.`);
+        }).catch(() => {
+          prompt('Salin pesan ini:', el.textContent);
+        });
+      }
+    }
+
+    function copyTrapLink(type) {
+      const base = getBaseTrapOrigin();
+      const url = `${base}/${type}`;
+      navigator.clipboard.writeText(url).then(() => {
+        alert(`✅ Link ${type.toUpperCase()} disalin:\n${url}`);
+      }).catch(() => {
+        prompt('Salin link ini:', url);
+      });
+    }
     function copyBeaconUrl() {
       const input = document.getElementById('beaconUrlInput');
       if (input) {

