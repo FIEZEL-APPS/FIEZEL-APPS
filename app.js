@@ -1564,6 +1564,12 @@ function targetLangOfRaw(raw){
   try{return self.FiezelTargetLanguage?.normalize?.(v)||'en'}catch(_){return v==='ja'?'ja':'en'}
 }
 /** Kunci progres untuk sebuah bahasa. Bahasa bawaan mengembalikan kunci dasar APA ADANYA. */
+/** Daftar bahasa yang dikenal sumbu. Dibaca dari modulnya supaya bahasa ketiga yang lahir
+ *  nanti ikut termigrasi tanpa menyunting jalur migrasi lagi. */
+function targetLangsKnown(){
+  try{const l=self.FiezelTargetLanguage?.all?.();if(Array.isArray(l)&&l.length)return l}catch(_){}
+  return ['en','ja'];
+}
 function progressStorageKey(baseKey,lang){
   try{return self.FiezelTargetLanguage?.key?.(String(baseKey||''),lang)??String(baseKey||'')}
   catch(_){return String(baseKey||'')}
@@ -1670,20 +1676,43 @@ async function activateAccountStateFromPuter(sdk=self.puter){
     if(!raw){
       let legacy=null;try{legacy=JSON.parse(localStorage.getItem(LEGACY_STATE_KEY))}catch{}
       const legacyOwner=String(localStorage.getItem(LEGACY_STATE_OWNER_KEY)||'');
-      const hasLegacyData=legacy&&(
-        Number(legacy.totalAnswered||0)>0||String(legacy.userName||'').trim()||legacy.placementDone||
-        Object.keys(legacy.vocab||{}).length||Object.keys(legacy.grammar||{}).length||Object.keys(legacy.reading||{}).length
+      /* m025-317: progres tiap bahasa hidup di kuncinya sendiri, jadi blob dasar milik murid
+         yang HANYA belajar Jepang bisa tampak kosong - totalAnswered, penempatan, dan ketiga
+         bank penguasaan semuanya ada di <dasar>@ja. Menilai "ada isinya" dari blob dasar saja
+         akan membuat migrasi melewatinya, dan murid itu masuk akun ke progres kosong. */
+      const adaIsinya=(blob)=>!!blob&&(
+        Number(blob.totalAnswered||0)>0||String(blob.userName||'').trim()||blob.placementDone||
+        Object.keys(blob.vocab||{}).length||Object.keys(blob.grammar||{}).length||Object.keys(blob.reading||{}).length
       );
+      /* Kunci progres per bahasa milik ruang ANONIM, dipasangkan dengan tujuannya di ruang akun. */
+      const progresBahasa=targetLangsKnown()
+        .filter((lang)=>progressStorageKey(LEGACY_STATE_KEY,lang)!==LEGACY_STATE_KEY)
+        .map((lang)=>({asal:progressStorageKey(LEGACY_STATE_KEY,lang),tujuan:progressStorageKey(key,lang)}))
+        .map((p)=>{let blob=null;try{blob=JSON.parse(localStorage.getItem(p.asal))}catch{}return {...p,blob}})
+        .filter((p)=>p.blob!==null);
+      const hasLegacyData=adaIsinya(legacy)||progresBahasa.some((p)=>adaIsinya(p.blob));
       if(hasLegacyData&&(!legacyOwner||legacyOwner===uuid)){
         raw={...legacy,ownerUuid:uuid};localStorage.setItem(LEGACY_STATE_OWNER_KEY,uuid);
         localStorage.setItem(key,JSON.stringify(raw));localStorage.removeItem(LEGACY_STATE_KEY);
+        /* Idempoten seperti migrasi side-state: progres akun yang sudah ada tidak pernah ditimpa. */
+        for(const p of progresBahasa){
+          try{
+            if(localStorage.getItem(p.tujuan)!==null)continue;
+            localStorage.setItem(p.tujuan,JSON.stringify(p.blob));
+            localStorage.removeItem(p.asal);
+          }catch{}
+        }
       }
     }
     activeAccountUuid=uuid;activeStateStorageKey=key;
     /* S1: side-state otak ikut pindah ke ruang akun ini SEBELUM state dibaca, supaya
        pembaca pertama (coreBrainCache di bawah) sudah melihat kunci yang benar. */
     migrateSideStateToAccount(uuid);
-    state=sanitizeState(raw||defaultState);state.ownerUuid=uuid;coreBrainCache=null;save();
+    /* m025-317: WAJIB lewat loadState(), bukan sanitizeState(raw). `raw` adalah blob DASAR,
+       dan sejak progres tiap bahasa punya kuncinya sendiri, blob dasar milik murid Jepang
+       tidak memuat progresnya. Membangun state dari raw lalu save() akan menulis progres
+       KOSONG ke <key>@ja - menimpa persis yang baru saja dimigrasikan, satu baris di atas. */
+    state=loadState(key);state.ownerUuid=uuid;coreBrainCache=null;save();
     /* m025-182 W2-STATE: state akun bisa membawa learnerLocale berbeda dari state legacy yang
        dimuat saat boot — locale disinkronkan SEBELUM render() di bawah supaya cat pertama akun
        ini sudah berbahasa miliknya (listener onChange yang dipasang di boot ikut menyetel lang). */
@@ -3193,14 +3222,20 @@ function migrateSideStateToAccount(uuid){
   try{pemilik=String(localStorage.getItem(SIDE_STATE_OWNER_KEY)||'')}catch{}
   if(pemilik&&pemilik!==id)return 0;
   let dipindah=0;
-  for(const base of sideStateBaseKeys()){
+  /* Setiap bahasa punya kuncinya sendiri sejak m025-317, dan migrasi ini lahir sebelum
+     ruang nama itu ada. Melewatkan varian @lang berarti murid yang belajar Jepang tanpa
+     akun kehilangan SELURUH bukti otak Jepangnya begitu ia masuk akun - tidak terhapus,
+     hanya ditinggal di kunci yang tidak pernah dibaca lagi. Untuk 'en' progressStorageKey
+     mengembalikan kunci APA ADANYA, jadi putaran pertama identik dengan perilaku lama. */
+  for(const base of sideStateBaseKeys())for(const lang of targetLangsKnown()){
     try{
-      const tujuan=base+':'+id;
+      const asal=progressStorageKey(base,lang);
+      const tujuan=progressStorageKey(base+':'+id,lang);
       if(localStorage.getItem(tujuan)!==null)continue;
-      const lama=localStorage.getItem(base);
+      const lama=localStorage.getItem(asal);
       if(lama===null)continue;
       localStorage.setItem(tujuan,lama);
-      localStorage.removeItem(base);
+      localStorage.removeItem(asal);
       dipindah++;
     }catch{}
   }
@@ -14193,7 +14228,7 @@ if(typeof document!=='undefined'&&document.addEventListener){
   });
 }
 /* ============================== akhir blok SOSIAL (SLOT 7) ========================== */
-window.istilahMurid=istilahMurid;/* dipapar untuk gerbang QA: penerjemah enum harus bisa disapu penuh */window.__getFiezelData=()=>({vocab:V.length,reading:R.length,grammar:Object.keys(G).length});window.__fiezelAudit={showBrandSplash,showOnboarding,prefersReducedMotion,readInstallHealth,installHealthReportMarkup,buildBackupFile,previewRestoreForState,applyRestore,continuitySettingsMarkup,academicReadinessMarkup,unifiedSkillsMarkup,buildPersonalJourney,journeyMarkup,setGoalProfile,loadState,sanitizeState,validateQuestion,makeGrammarQuestion,makeReadingQuestion,makeVocabQuestion,buildGrammarLessonQuestions,buildPlacement,/* m025-246: dipapar untuk regression-test - gerbang itu harus bisa MENANYAKAN ukuran rencana penempatan, bukan memaku 25 dan merah setiap kali ukurannya berubah dengan sengaja. */placementSize,placementBlueprint,/* cetak biru PENUH dipapar terpisah: gerbang harus tetap bisa menjaga invarian 'penempatan penuh memuat ketiga jenis konten' walau jalur murid memakai cetak biru lite */PLACEMENT_BLUEPRINT_FULL:PLACEMENT_BLUEPRINT,buildAdaptivePool,getScenePalette,getCelestialState,getDiagnosticProfile,buildLearningSnapshot,buildLearnerEvidenceModel,remoteLearnerEvidenceSnapshot,deriveAdaptivePolicy,buildAdaptivePolicy,adaptivePolicyRequestPayload,sanitizeAdaptivePolicy,/* m025-201: dipapar untuk tests/core-policy-parity-test.js - gerbang paritas tidak bisa membandingkan apa yang tidak bisa ia panggil */capRationaleCodes,policyEffectiveness,sanitizePolicyEffectiveness,resolveAdaptivePolicy,evaluatePolicyOutcome,sanitizePolicyOutcome,recordPolicyOutcomeFromSession,backfillPolicyOutcomes,recentPolicyOutcomes,policyOutcomeSummary,buildALRSContext,selectALRSDecision,buildCreatorReport,validReportEndpoint,forgettingProbability,scheduleNext,coreBrainMemory,tutorSession,tutorObserve,misconceptionLedgerRead,misconceptionLedgerActive,coreBrainAttempts,quizPredictedSuccess,evidenceKappa,bktRead,bktRecord,bktShadowMarkup,brainManifestMarkup,learningTelemetryMode,learningTelemetryEmitAnswer,learningTelemetryStudyDay,braincoreEvidenceMode,braincoreEvidenceCohort,braincoreEvidenceCohortForBuild,braincoreEvidenceDay,braincoreEvidenceEmitSnapshot,activeLevelOverallMastery,braincoreEvidenceEmitDecision,braincoreEvidenceFlush,braincoreEvidenceObserveSession,braincoreDecisionReason,braincoreEvidenceAnyLaneActive,identityEvidenceMode,learnerNameSyncToServer,maybeSyncLearnerName,identityEvidenceActive,identityEvidenceMirror,identityEvidenceFlush,forgetLearnerEvidence,confusionMatrixRead,confusionMatrixRecord,affectObserve,affectSessionSync,affectTargetSuccess,listeningAdaptivePolicy,olmPanelMarkup,coreBrainPanelMarkup,diagnosticEvidenceReady,skillTimeline,errorPatterns,confusionPairs,diagnosticReport,confidenceCalibration,dueItems,selectLoginMessage,notificationPermission,checkStudyReminders,lastLearningAt,beginLearningSession,abandonActiveSession,completeActiveSession,/* Fase 3 (C5): kalibrasi item, cloze, OLM negotiated, SRL, speaking adaptif, step tutor */itemCalibrationRead,itemCalibrationObserve,itemCalibrationEffective,calibrationItemId,ensureClozeBank,makeClozeQuestion,clozeAdaptivePicks,clozeSkillReady,clozeProductionRecord,olmSummarizeInput,olmDispute,olmProbeNextSkill,olmProbeConsume,olmNegotiationRead,srlSessionPlan,srlPredictPrompt,srlCaptureConfidence,srlReflect,srlSessionSync,speakingCoverageRows,speakingAdaptiveEvidence,speakingAdaptivePolicy,stepTutorGuidance,stepTutorGuidanceMarkup,record,quizLoop,startAdaptive,/* m025-308: dipapar untuk tests/th-content-overlay-test.js. Gerbang itu harus bisa memanggil overlay yang SUNGGUHAN lalu membacanya lewat jalur baca yang dipakai penyaji - kalau ia hanya boleh memeriksa isi sidecar, ia mengulang kebutaan yang justru membiarkan 45 petunjuk writing dan 96 umpan balik reading-exam menganggur. */applyContentLocale,writingPromptPool,writingExamTask,readingExamSets,makeExamReadingQuestion,/* m025-314: dipapar untuk tests/target-lang-surface-guard-test.js. Gerbang itu harus bisa MEMANGGIL daftar kartu yang sungguhan lalu membacanya, bukan menebak dari pola teks di app.js - penjaga yang hanya diuji lewat grep akan tetap hijau saat kartunya dipindah ke fungsi lain. */latihanCards,skillHubModel,skillHubMarkup,continueLearningCard,aiBoosterCard,targetLangSurfaceBlocked,targetLangVoiceBlocked,courseLanguageLabel,/* `state` adalah binding modul, jadi ia TIDAK muncul sebagai properti global di vm - gerbang yang perlu menggeser bahasa target atau membaca layar aktif tidak punya jalan lain. Diekspor sebagai FUNGSI, bukan nilai: salinan yang diambil saat berkas dimuat akan basi begitu state ditugaskan ulang (loadState dipanggil lagi saat akun berpindah). */liveState:()=>state,/* B1 (m025-317): dipapar untuk tests/target-lang-progress-isolation-test.js. Gerbang itu harus MENJALANKAN jalur simpan/muat yang sungguhan di kedua bahasa - sumbu yang hanya diuji lewat modulnya adalah persis cara cacat ini bertahan berbulan-bulan. */saveFlushWrite,switchTargetLangStorage,progressStorageKey,pickProgress,sideStateKey,PROGRESS_STATE_FIELDS,PROGRESS_PREF_FIELDS};
+window.istilahMurid=istilahMurid;/* dipapar untuk gerbang QA: penerjemah enum harus bisa disapu penuh */window.__getFiezelData=()=>({vocab:V.length,reading:R.length,grammar:Object.keys(G).length});window.__fiezelAudit={showBrandSplash,showOnboarding,prefersReducedMotion,readInstallHealth,installHealthReportMarkup,buildBackupFile,previewRestoreForState,applyRestore,continuitySettingsMarkup,academicReadinessMarkup,unifiedSkillsMarkup,buildPersonalJourney,journeyMarkup,setGoalProfile,loadState,sanitizeState,validateQuestion,makeGrammarQuestion,makeReadingQuestion,makeVocabQuestion,buildGrammarLessonQuestions,buildPlacement,/* m025-246: dipapar untuk regression-test - gerbang itu harus bisa MENANYAKAN ukuran rencana penempatan, bukan memaku 25 dan merah setiap kali ukurannya berubah dengan sengaja. */placementSize,placementBlueprint,/* cetak biru PENUH dipapar terpisah: gerbang harus tetap bisa menjaga invarian 'penempatan penuh memuat ketiga jenis konten' walau jalur murid memakai cetak biru lite */PLACEMENT_BLUEPRINT_FULL:PLACEMENT_BLUEPRINT,buildAdaptivePool,getScenePalette,getCelestialState,getDiagnosticProfile,buildLearningSnapshot,buildLearnerEvidenceModel,remoteLearnerEvidenceSnapshot,deriveAdaptivePolicy,buildAdaptivePolicy,adaptivePolicyRequestPayload,sanitizeAdaptivePolicy,/* m025-201: dipapar untuk tests/core-policy-parity-test.js - gerbang paritas tidak bisa membandingkan apa yang tidak bisa ia panggil */capRationaleCodes,policyEffectiveness,sanitizePolicyEffectiveness,resolveAdaptivePolicy,evaluatePolicyOutcome,sanitizePolicyOutcome,recordPolicyOutcomeFromSession,backfillPolicyOutcomes,recentPolicyOutcomes,policyOutcomeSummary,buildALRSContext,selectALRSDecision,buildCreatorReport,validReportEndpoint,forgettingProbability,scheduleNext,coreBrainMemory,tutorSession,tutorObserve,misconceptionLedgerRead,misconceptionLedgerActive,coreBrainAttempts,quizPredictedSuccess,evidenceKappa,bktRead,bktRecord,bktShadowMarkup,brainManifestMarkup,learningTelemetryMode,learningTelemetryEmitAnswer,learningTelemetryStudyDay,braincoreEvidenceMode,braincoreEvidenceCohort,braincoreEvidenceCohortForBuild,braincoreEvidenceDay,braincoreEvidenceEmitSnapshot,activeLevelOverallMastery,braincoreEvidenceEmitDecision,braincoreEvidenceFlush,braincoreEvidenceObserveSession,braincoreDecisionReason,braincoreEvidenceAnyLaneActive,identityEvidenceMode,learnerNameSyncToServer,maybeSyncLearnerName,identityEvidenceActive,identityEvidenceMirror,identityEvidenceFlush,forgetLearnerEvidence,confusionMatrixRead,confusionMatrixRecord,affectObserve,affectSessionSync,affectTargetSuccess,listeningAdaptivePolicy,olmPanelMarkup,coreBrainPanelMarkup,diagnosticEvidenceReady,skillTimeline,errorPatterns,confusionPairs,diagnosticReport,confidenceCalibration,dueItems,selectLoginMessage,notificationPermission,checkStudyReminders,lastLearningAt,beginLearningSession,abandonActiveSession,completeActiveSession,/* Fase 3 (C5): kalibrasi item, cloze, OLM negotiated, SRL, speaking adaptif, step tutor */itemCalibrationRead,itemCalibrationObserve,itemCalibrationEffective,calibrationItemId,ensureClozeBank,makeClozeQuestion,clozeAdaptivePicks,clozeSkillReady,clozeProductionRecord,olmSummarizeInput,olmDispute,olmProbeNextSkill,olmProbeConsume,olmNegotiationRead,srlSessionPlan,srlPredictPrompt,srlCaptureConfidence,srlReflect,srlSessionSync,speakingCoverageRows,speakingAdaptiveEvidence,speakingAdaptivePolicy,stepTutorGuidance,stepTutorGuidanceMarkup,record,quizLoop,startAdaptive,/* m025-308: dipapar untuk tests/th-content-overlay-test.js. Gerbang itu harus bisa memanggil overlay yang SUNGGUHAN lalu membacanya lewat jalur baca yang dipakai penyaji - kalau ia hanya boleh memeriksa isi sidecar, ia mengulang kebutaan yang justru membiarkan 45 petunjuk writing dan 96 umpan balik reading-exam menganggur. */applyContentLocale,writingPromptPool,writingExamTask,readingExamSets,makeExamReadingQuestion,/* m025-314: dipapar untuk tests/target-lang-surface-guard-test.js. Gerbang itu harus bisa MEMANGGIL daftar kartu yang sungguhan lalu membacanya, bukan menebak dari pola teks di app.js - penjaga yang hanya diuji lewat grep akan tetap hijau saat kartunya dipindah ke fungsi lain. */latihanCards,skillHubModel,skillHubMarkup,continueLearningCard,aiBoosterCard,targetLangSurfaceBlocked,targetLangVoiceBlocked,courseLanguageLabel,/* `state` adalah binding modul, jadi ia TIDAK muncul sebagai properti global di vm - gerbang yang perlu menggeser bahasa target atau membaca layar aktif tidak punya jalan lain. Diekspor sebagai FUNGSI, bukan nilai: salinan yang diambil saat berkas dimuat akan basi begitu state ditugaskan ulang (loadState dipanggil lagi saat akun berpindah). */liveState:()=>state,/* B1 (m025-317): dipapar untuk tests/target-lang-progress-isolation-test.js. Gerbang itu harus MENJALANKAN jalur simpan/muat yang sungguhan di kedua bahasa - sumbu yang hanya diuji lewat modulnya adalah persis cara cacat ini bertahan berbulan-bulan. */saveFlushWrite,switchTargetLangStorage,progressStorageKey,pickProgress,sideStateKey,PROGRESS_STATE_FIELDS,PROGRESS_PREF_FIELDS,/* Migrasi sekali-jalan saat murid masuk akun. Dipapar karena inilah satu-satunya jalur yang bisa MENELANTARKAN progres bahasa: ia lahir sebelum ruang nama @lang ada. Gerbang harus menjalankannya, bukan membaca namanya. */activateAccountStateFromPuter,migrateSideStateToAccount};
 window.startVocabQuiz=startVocabQuiz;window.buildAdaptivePool=buildAdaptivePool;window.buildGrammarLessonQuestions=buildGrammarLessonQuestions;window.getScenePalette=getScenePalette;window.getCelestialState=getCelestialState;window.playFeedbackSound=playFeedbackSound;window.updateMastery=updateMastery;window.markMastered=markMastered;window.__getFiezelState=()=>state;window.__fiezelValidViews=()=>[...VALID_VIEWS];window.__fiezelDueReviews=()=>dueItems().length;window.buildAdaptivePolicy=buildAdaptivePolicy;window.studyDayKey=studyDayKey;window.startAdaptive=startAdaptive;window.showToast=showToast;window.answerFeedbackSignal=answerFeedbackSignal;window.practiceSkill=practiceSkill;window.openReadingLevel=openReadingLevel;window.startReadingRandom=startReadingRandom;window.startReadingAdaptive=startReadingAdaptive;window.startPlacement=startPlacement;window.startLevelPractice=startLevelPractice;window.startAdaptive=startAdaptive;window.resetProgress=resetProgress;window.closeModal=closeModal;window.openSettings=openSettings;window.openReportPreview=openReportPreview;window.sendCreatorReport=sendCreatorReport;window.askCoachAI=askCoachAI;window.dismissWelcome=dismissWelcome;window.requestStudyNotificationPermission=requestStudyNotificationPermission;window.declineStudyNotifications=declineStudyNotifications;window.skipPuterSignIn=skipPuterSignIn;window.attemptGoogleSignIn=attemptGoogleSignIn;window.shouldPresentPuterPopup=shouldPresentPuterPopup;window.notifyAppUpdateIfNew=notifyAppUpdateIfNew;window.setConfidence=setConfidence;window.explainWithAI=explainWithAI;window.explainWordWithAI=explainWordWithAI;window.olmDispute=olmDispute;/* Fase 3 (C5 butir 3): handler tombol sanggah di panel OLM */
 // m025-84: dipasang di ujung berkas, saat go()/state/VALID_VIEWS sudah ada, dan SEBELUM
 // load() supaya navigasi pertama pun sudah terekam di riwayat.
