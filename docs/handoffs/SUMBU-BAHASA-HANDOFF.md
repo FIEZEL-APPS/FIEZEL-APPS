@@ -1,6 +1,6 @@
-# Sumbu bahasa FIEZEL — handoff m025-314
+# Sumbu bahasa FIEZEL — handoff m025-317
 
-**Otoritas: OWNER.** Dokumen ini melaporkan apa yang SUDAH dikerjakan di m025-314 dan
+**Otoritas: OWNER.** Dokumen ini melaporkan apa yang SUDAH dikerjakan sampai m025-317 dan
 menyerahkan daftar yang BELUM, lengkap dengan alasan kenapa sisanya tidak dikerjakan
 sekaligus. Ia bukan laporan "selesai".
 
@@ -14,10 +14,13 @@ Audit lengkap beserta nomor baris: `reports/AUDIT-UI-UX-BAHASA-2026-09-14.md` (1
 
 ## Status
 
-**Sebagian.** 7 dari 16 temuan diperbaiki di m025-314. Sembilan sisanya dicatat terbuka,
-dan **satu di antaranya P0** — lihat "Langkah berikutnya" di bawah. Kursus Jepang hari ini
-sudah tidak lagi menawarkan permukaan berbahasa Inggris dan tutor AI-nya sudah menyebut
-kursus yang benar, tetapi **progresnya masih dipakai bersama dengan kursus Inggris.**
+**Sebagian.** 7 dari 16 temuan diperbaiki di m025-314; butir P0 ("progres tiap bahasa
+berdiri sendiri") dibayar di **m025-317** dan ikut menutup sebagian butir 2 dan 3 yang
+lama. Enam sisanya masih terbuka dan **tidak ada lagi yang P0** — lihat "Langkah
+berikutnya" di bawah. Kursus Jepang hari ini sudah tidak menawarkan permukaan berbahasa
+Inggris, tutor AI-nya menyebut kursus yang benar, dan progresnya sudah berdiri sendiri.
+Yang belum: **isi** kursus Jepang (cloze, set ujian, jalur Thai) masih berbahasa Inggris
+atau Indonesia.
 
 Dua sumbu yang sepanjang dokumen ini dibedakan tegas, karena keduanya paling mudah tertukar:
 
@@ -60,34 +63,53 @@ MEMANGGIL daftar kartunya di kedua bahasa, bukan memindai pola teks.
 
 ---
 
-## Langkah berikutnya — berurutan, yang pertama P0
+## Yang ditambahkan m025-317 — progres tiap bahasa berdiri sendiri
 
-### 1. (P0) Pisahkan progres per bahasa — `sideStateKey()`
+Butir P0 di bawah sudah dibayar. `sideStateKey()` sendiri **tidak** diubah menjadi
+bersumbu bahasa — cara itu akan memindahkan seluruh isi state, termasuk hal-hal yang
+memang milik murid dan bukan milik kursus. Yang dilakukan: state dibelah tiga golongan,
+dan hanya golongan progres yang ikut bahasa.
 
-`features/brain/fiezel-target-language.js` sudah ada, murni, dan diuji 10/10 hijau.
-**Tetapi `app.js` tidak pernah memanggilnya untuk membentuk satu pun kunci penyimpanan.**
+| Golongan | Isi | Disimpan di |
+|---|---|---|
+| `PROGRESS_STATE_FIELDS` | `level`, penempatan, `history`, `wrongAnswers`, `vocab`/`grammar`/`reading`, BKT & kebijakan adaptif, sesi | kunci bahasa |
+| `PROGRESS_PREF_FIELDS` | `activeLevel`, `selfAssessedLevel`, `levelMode` | kunci bahasa |
+| `GLOBAL_RHYTHM_FIELDS` | `streak`, `daily`, `learningDays` | kunci dasar |
+| sisanya | preferensi, identitas, sumbu bahasa itu sendiri | kunci dasar |
 
-```js
-// app.js — hari ini
-function sideStateKey(base){return activeAccountUuid?base+':'+activeAccountUuid:base}
-```
+**Streak sengaja TIDAK ikut bahasa.** Ia mengukur kebiasaan murid, bukan kemajuan satu
+kursus; mengikatnya ke bahasa akan membakar streak tujuh hari begitu murid mencoba kursus
+lain sekali. Ini keputusan produk, bukan kebetulan implementasi — kalau suatu hari ingin
+diubah, ubah daftar `GLOBAL_RHYTHM_FIELDS`, jangan menambal di tempat lain.
 
-Akibatnya BKT, matriks konfusi, ledger miskonsepsi, kalibrasi item, jadwal ingatan, dan
-state murid utama **dipakai bersama** kursus Inggris dan Jepang.
-`tests/target-language-axis-test.js` tidak menangkapnya karena ia menguji MODULNYA, bukan
-pemakaiannya.
+**Bahasa Inggris tidak dibelah.** `loadState()` mengembalikan blob dasar apa adanya untuk
+`en` dan `saveFlushWrite()` menulis satu blob utuh, jadi kunci lama identik bita per bita
+dan **tidak ada migrasi** yang perlu dijalankan pada murid yang sudah ada. Bahasa lain
+membaca progres dari `<dasar>@<lang>`; kalau belum ada, ia mulai dari nol dan tidak pernah
+mewarisi progres Inggris.
 
-Yang membuatnya P0: pemilih bahasa menjanjikan kepada murid *"Progres tiap bahasa berdiri
-sendiri. Berganti tidak menghapus apa pun."* (`bahasa.penjelasan`). Paruh keduanya benar;
-paruh pertamanya belum.
+**Urutan di `switchTargetLangStorage()` adalah bagian dari perbaikannya:** siram progres
+bahasa LAMA dulu, baru geser sumbu di blob global, baru muat ulang. Menggeser lebih dulu
+menyalin progres lama ke kunci bahasa baru — jebakan ini tertangkap saat implementasi, dan
+sekarang ada assert khusus yang memutasi state tanpa menyimpan supaya jebakannya benar-benar
+tergigit.
 
-Arah yang disarankan: `sideStateKey()` memanggil
-`FiezelTargetLanguage.key(base, activeTargetLang())`. Kunci Inggris tetap identik byte per
-byte — itu janji inti modulnya — jadi murid Inggris yang sudah ada tidak membayar apa pun.
-Butuh PR sendiri: menyentuh setiap pembaca state, dan perlu gerbang yang menguji PEMAKAIAN,
-bukan modulnya lagi.
+**Gerbang:** `tests/target-lang-progress-isolation-test.js` (12 assert) menjalankan jalur
+simpan/muat yang sungguhan di kedua bahasa — jawab di Inggris, pindah ke Jepang, jawab lagi,
+pulang — dan menuntut tiga janji: progres berdiri sendiri, kembali tidak menghapus apa pun,
+dan kunci Inggris tidak bergeser sebita pun.
 
-### 2. (P1) Jepit level ke cakupan bank yang aktif
+---
+
+## Langkah berikutnya — berurutan, tidak ada lagi yang P0
+
+### ~~1. (P0) Pisahkan progres per bahasa~~ — SELESAI di m025-317
+
+Lihat bagian "Yang ditambahkan m025-317" di atas. Janji `bahasa.penjelasan` kepada murid
+(*"Progres tiap bahasa berdiri sendiri. Berganti tidak menghapus apa pun."*) kini benar
+pada kedua paruhnya.
+
+### 2. (P1) Jepit level ke cakupan bank yang aktif — sebagian terbayar
 
 `getActiveLevel()` juga tidak bersumbu bahasa. Cakupan bank Jepang hari ini:
 
@@ -96,14 +118,18 @@ bukan modulnya lagi.
 | tata bahasa | 242 | 180 | 0 |
 | menulis | 24 | 30 | 0 |
 
-Murid B1 di kursus Inggris yang mencoba Jepang menemukan Grammar dan Writing **kosong**,
-tanpa satu kalimat penjelasan. Turunan langsung dari butir 1.
+Sesudah m025-317 `level` dan `activeLevel` sudah ikut bahasa, jadi murid B1 Inggris yang
+mencoba Jepang tidak lagi membawa B1-nya ke sana — ia mulai dari A1 di kursus itu. Yang
+**belum**: tidak ada yang mencegah murid menaikkan levelnya sendiri ke B1 di kursus Jepang
+lalu menemukan Grammar dan Writing **kosong**, tanpa satu kalimat penjelasan. Jepitannya
+harus datang dari cakupan bank, bukan dari pemisahan penyimpanan.
 
 ### 3. (P1) Bank cloze dan set ujian membaca ikut bersumbu bahasa
 
-`ensureClozeBank()` selalu menarik `cloze-bank-v1.json` (kalimat Inggris), dan
-`clozeSkillReady()` hanya menanyakan penguasaan BKT — pada state BKT yang dibagi bersama
-(butir 1). `READING_EXAM` (delapan teks IELTS/TOEFL berbahasa Inggris) dimuat dan
+`ensureClozeBank()` selalu menarik `cloze-bank-v1.json` (kalimat Inggris). State BKT-nya
+sendiri sudah tidak lagi dibagi sesudah m025-317, jadi `clozeSkillReady()` kini menanyakan
+penguasaan yang benar — tetapi **kalimat yang disodorkan tetap berbahasa Inggris** di
+kursus Jepang. `READING_EXAM` (delapan teks IELTS/TOEFL berbahasa Inggris) dimuat dan
 ditawarkan di Ruang Reading tanpa cabang bahasa.
 
 ### 4. (P1) Jalur Thai untuk kursus Jepang
@@ -144,6 +170,7 @@ tata bahasa Inggris yang disajikan tanpa memeriksa bahasa target.
 
 ```
 node tests/target-lang-surface-guard-test.js
+node tests/target-lang-progress-isolation-test.js
 node tests/japanese-surface-honesty-test.js
 node tests/target-language-axis-test.js
 node tests/th-ui-leak-test.js
