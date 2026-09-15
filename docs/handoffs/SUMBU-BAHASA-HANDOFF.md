@@ -94,7 +94,29 @@ menyalin progres lama ke kunci bahasa baru — jebakan ini tertangkap saat imple
 sekarang ada assert khusus yang memutasi state tanpa menyimpan supaya jebakannya benar-benar
 tergigit.
 
-**Gerbang:** `tests/target-lang-progress-isolation-test.js` (12 assert) menjalankan jalur
+**Ruang nama baru menuntut migrasinya ikut diperbarui — ini sudah menggigit sekali.**
+Sumbu bahasa melahirkan kunci `<dasar>@ja` dan `<sisi>:<uuid>@ja`. Migrasi sekali-jalan yang
+memindahkan progres anonim ke ruang akun (`activateAccountStateFromPuter()` dan
+`migrateSideStateToAccount()`) ditulis jauh sebelum ruang nama itu ada, jadi ia hanya mengenal
+kunci datar. Murid yang belajar Jepang tanpa akun lalu masuk akun kehilangan seluruh progres
+Jepangnya — tidak terhapus, hanya ditinggal di kunci yang tidak pernah dibaca lagi.
+
+Ada TIGA titik, dan dua saja tidak cukup:
+
+1. `migrateSideStateToAccount()` berputar atas `targetLangsKnown()`;
+2. `activateAccountStateFromPuter()` memindahkan `<LEGACY>@lang` → `<akun>@lang`, **dan**
+   menilai "ada isinya" dari blob `@lang` juga — blob dasar milik murid yang hanya belajar
+   Jepang memang tampak kosong, sehingga cabang migrasinya tidak akan pernah jalan;
+3. satu baris sesudahnya, state dibangun lewat `loadState(key)`, bukan `sanitizeState(raw)`.
+   `raw` adalah blob DASAR; membangun darinya lalu `save()` menulis progres KOSONG ke
+   `<akun>@ja`, menimpa persis yang baru dipindahkan.
+
+**Kalau bahasa ketiga lahir:** `targetLangsKnown()` membacanya sendiri dari
+`FiezelTargetLanguage.all()`, jadi ketiga titik di atas ikut tanpa disunting. Yang TIDAK ikut
+otomatis: ruang nama baru apa pun di luar ketiganya. Periksa migrasi setiap kali sebuah kunci
+penyimpanan baru lahir.
+
+**Gerbang:** `tests/target-lang-progress-isolation-test.js` (15 assert) menjalankan jalur
 simpan/muat yang sungguhan di kedua bahasa — jawab di Inggris, pindah ke Jepang, jawab lagi,
 pulang — dan menuntut tiga janji: progres berdiri sendiri, kembali tidak menghapus apa pun,
 dan kunci Inggris tidak bergeser sebita pun.
