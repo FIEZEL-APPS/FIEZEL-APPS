@@ -185,7 +185,13 @@ test('splash berada di ATAS setiap <script> yang berjalan - inilah satu-satunya 
     const re = /<script\b([^>]*)>/g;
     let m;
     while ((m = re.exec(html)) !== null) {
-      if (!/\stype="application\/ld\+json"/.test(m[1])) return m.index;
+      /* Dibaca toleran, sama seperti scriptType() di tests/boot-order-test.js — kutip
+         tunggal, tanpa kutip, huruf besar, dan parameter ';charset=…' semuanya sah menurut
+         HTML. Lihat alasan lengkapnya di berkas itu. */
+      const tm = /\stype\s*=\s*("([^"]*)"|'([^']*)'|([^\s"'>]+))/i.exec(m[1]);
+      const tipe = (tm ? (tm[2] !== undefined ? tm[2] : tm[3] !== undefined ? tm[3] : tm[4] || '') : '')
+        .split(';')[0].trim().toLowerCase();
+      if (tipe !== 'application/ld+json') return m.index;
     }
     return -1;
   })();
