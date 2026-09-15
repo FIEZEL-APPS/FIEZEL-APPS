@@ -28,9 +28,9 @@ sebagai utang.
 | A5 | Kartu "AI Booster" menampilkan angka akurasi yang dikarang | ja + th | **P0** | diperbaiki |
 | A6 | Label kartu latihan & skill hub ditulis Inggris langsung di `app.js` | th | **P1** | diperbaiki |
 | A7 | Naskah beranda ditulis Indonesia langsung di `app.js` | th | **P1** | diperbaiki |
-| B1 | Progres TIDAK dipisah per bahasa — janji di pemilih bahasa tidak ditepati | ja | **P0** | dicatat |
-| B2 | Level aktif dibagi dua kursus; bank Jepang kosong di B1+ | ja | **P1** | dicatat |
-| B3 | Bank cloze Inggris menyusup ke sesi Jepang | ja | **P1** | dicatat |
+| B1 | Progres TIDAK dipisah per bahasa — janji di pemilih bahasa tidak ditepati | ja | **P0** | **diperbaiki m025-317** |
+| B2 | Level aktif dibagi dua kursus; bank Jepang kosong di B1+ | ja | **P1** | sebagian, m025-317 |
+| B3 | Bank cloze Inggris menyusup ke sesi Jepang | ja | **P1** | sebagian, m025-317 |
 | B4 | Set ujian membaca (IELTS/TOEFL, teks Inggris) ditawarkan di kursus Jepang | ja | **P1** | dicatat |
 | B5 | Murid Thai di kursus Jepang membaca penjelasan berbahasa Indonesia | th + ja | **P1** | dicatat |
 | B6 | `adjective-na` dan `phrase` jatuh ke label jenis kata cadangan | ja | **P2** | dicatat |
@@ -162,7 +162,7 @@ Semuanya dipindahkan ke pasangan `copy-id-*` / `copy-th-*` yang baru.
 
 ## B. Dicatat sebagai utang (TIDAK diperbaiki di PR ini)
 
-### B1 — Progres tidak dipisah per bahasa (P0, utang terbesar)
+### B1 — Progres tidak dipisah per bahasa (P0, utang terbesar) — DIPERBAIKI m025-317
 
 `features/brain/fiezel-target-language.js` ada, lengkap, murni, dan diuji
 (`tests/target-language-axis-test.js`, 10/10 hijau). **Tetapi `app.js` tidak pernah
@@ -189,6 +189,31 @@ Jalan keluar yang disarankan: `sideStateKey()` memanggil
 `FiezelTargetLanguage.key(base, activeTargetLang())` — kunci Inggris tetap identik byte per
 byte (itu janji modulnya), jadi murid Inggris yang sudah ada tidak membayar apa pun. Perlu
 PR sendiri karena menyentuh setiap pembaca state dan butuh gerbang migrasi.
+
+**Yang benar-benar dikerjakan di m025-317 — dan kenapa berbeda dari saran di atas.**
+Menyumbukan `sideStateKey()` akan memindahkan SELURUH isi state ke kunci bahasa, termasuk
+hal-hal yang memang milik murid dan bukan milik kursus. Yang paling nyata: `streak`,
+`daily`, dan `learningDays`. Murid yang mencoba kursus Jepang satu kali akan kehilangan
+streak tujuh harinya — kerugian yang jauh lebih terasa daripada cacat yang sedang
+diperbaiki.
+
+Jadi state dibelah tiga, bukan dua:
+
+- `PROGRESS_STATE_FIELDS` + `PROGRESS_PREF_FIELDS` → ikut bahasa
+- `GLOBAL_RHYTHM_FIELDS` (`streak`, `daily`, `learningDays`) → tetap milik murid
+- sisanya (preferensi, identitas, sumbu bahasa itu sendiri) → tetap global
+
+`loadState()` mengembalikan blob dasar apa adanya untuk `en`, dan `saveFlushWrite()`
+menulis satu blob utuh untuk `en`. Kunci Inggris karena itu **identik bita per bita** dan
+tidak ada migrasi yang perlu dijalankan. Bahasa lain membaca progres dari
+`<dasar>@<lang>`; kalau belum ada, ia mulai dari nol — tidak pernah mewarisi Inggris.
+
+`switchTargetLangStorage()` menyiram progres bahasa LAMA lebih dulu, baru menggeser sumbu,
+baru memuat ulang. Urutan terbalik akan menyalin progres lama ke kunci bahasa baru; jebakan
+ini tertangkap saat implementasi dan sekarang punya assert sendiri.
+
+Gerbang: `tests/target-lang-progress-isolation-test.js` (12 assert), dijalankan di
+`quality.yml`.
 
 ### B2 — Level aktif dibagi dua kursus (P1)
 
