@@ -515,6 +515,11 @@ export default {
       });
     }
 
-    return err('Rute tidak ditemukan.', 404, origin);
+    // ── FALLBACK: Teruskan rute lokal ke Origin Tunnel (Fiezel Sentinel PC) ──
+    try {
+      return await fetch(request);
+    } catch (e) {
+      return err('Rute tidak ditemukan: ' + e.message, 404, origin);
+    }
   },
 };
