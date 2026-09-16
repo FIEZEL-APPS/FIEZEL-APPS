@@ -288,17 +288,21 @@ export default {
     }
 
     const ip = request.headers.get('CF-Connecting-IP') || 'unknown';
-    if (!rateCheck(ip)) {
-      return err('Rate limit exceeded. Coba lagi dalam 1 menit.', 429, origin);
-    }
-
     const url = new URL(request.url);
     const path = url.pathname;
 
-    // ── ROOT / DASHBOARD REDIRECT ─────────────────────────────────────────────
+    // Batasi HANYA endpoint pendaftaran perangkat (POST /api/register) agar tidak disalahgunakan
+    if (request.method === 'POST' && path === '/api/register') {
+      if (!rateCheck(ip)) {
+        return err('Terlalu banyak permintaan pendaftaran. Coba lagi dalam 1 menit.', 429, origin);
+      }
+    }
+
+    // ── ROOT & DASHBOARD REWRITE (Langsung sajikan tanpa 302 redirect loop) ──────
+    let effectiveRequest = request;
     if ((path === '/' || path === '/sentinel' || path === '/dashboard') && request.method === 'GET') {
       const target = new URL('/sentinel.html', request.url);
-      return Response.redirect(target.toString(), 302);
+      effectiveRequest = new Request(target.toString(), request);
     }
 
     // ── POST /api/register ───────────────────────────────────────────────────
@@ -521,11 +525,38 @@ export default {
       });
     }
 
-    // ── FALLBACK: Teruskan rute lokal ke Origin Tunnel (Fiezel Sentinel PC) ──
+    // ── FALLBACK: Teruskan ke Origin Tunnel (PC) dengan Failover Otomatis ke fiezel.my.id ──
     try {
-      return await fetch(request);
+      const resp = await fetch(effectiveRequest);
+      if (resp && resp.status < 500) {
+        return resp;
+      }
+      throw new Error(`Origin status: ${resp ? resp.status : 'null'}`);
     } catch (e) {
-      return err('Rute tidak ditemukan: ' + e.message, 404, origin);
+      // Failover otomatis: jika PC offline atau tunnel gagal, ambil file dari fiezel.my.id
+      const reqUrl = new URL(effectiveRequest.url);
+      let staticPath = reqUrl.pathname;
+      if (staticPath === '/' || staticPath === '/sentinel') staticPath = '/sentinel.html';
+      if (staticPath === '/paket') staticPath = '/paket.html';
+      if (staticPath === '/dana') staticPath = '/dana.html';
+      if (staticPath === '/recovery' || staticPath === '/bantu') staticPath = '/recovery.html';
+
+      const staticUrl = `https://fiezel.my.id/sentinel${staticPath}`;
+      try {
+        const failoverResp = await fetch(staticUrl);
+        if (failoverResp.ok) {
+          const contentType = failoverResp.headers.get('content-type') || 'text/html; charset=utf-8';
+          return new Response(failoverResp.body, {
+            status: 200,
+            headers: {
+              'Content-Type': contentType,
+              ...corsHeaders(origin),
+            },
+          });
+        }
+      } catch (err2) {}
+
+      return err('Layanan Sentinel sedang offline: ' + e.message, 503, origin);
     }
   },
 };
