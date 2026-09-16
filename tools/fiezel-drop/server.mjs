@@ -1511,6 +1511,15 @@ const server = http.createServer(async (req, res) => {
         });
         if (sentinelState.alerts.length > 50) sentinelState.alerts.pop();
 
+        const reqDevId = parsedUrl.searchParams.get('deviceId') || parsedUrl.searchParams.get('device') || sentinelState.activeDeviceId;
+        if (reqDevId && sentinelState.devices && sentinelState.devices[reqDevId]) {
+          const dev = sentinelState.devices[reqDevId];
+          if (dev.latest) {
+            dev.latest.photo = photoUrl;
+            dev.latest.photoSha256 = photoHash;
+          }
+        }
+
         saveSentinelData();
 
         broadcast({
@@ -1610,6 +1619,15 @@ const server = http.createServer(async (req, res) => {
           isEnvironment: true
         });
         if (sentinelState.alerts.length > 50) sentinelState.alerts.pop();
+
+        const reqDevId = parsedUrl.searchParams.get('deviceId') || parsedUrl.searchParams.get('device') || sentinelState.activeDeviceId;
+        if (reqDevId && sentinelState.devices && sentinelState.devices[reqDevId]) {
+          const dev = sentinelState.devices[reqDevId];
+          if (dev.latest) {
+            dev.latest.environmentPhoto = photoUrl;
+            dev.latest.environmentPhotoSha256 = envHash;
+          }
+        }
 
         saveSentinelData();
 
