@@ -131,6 +131,10 @@
       z-index: 500;
     }
 
+    .sidebar > * {
+      flex-shrink: 0 !important;
+    }
+
     /* Alert Banner */
     .alert-card {
       background: rgba(16, 185, 129, 0.12);
@@ -184,6 +188,7 @@
       border: 1px solid var(--border);
       border-radius: 14px;
       padding: 14px;
+      flex-shrink: 0 !important;
     }
 
     .card-title {
@@ -298,6 +303,9 @@
       scroll-margin-top: 130px;
       position: relative;
       z-index: 10;
+      flex-shrink: 0 !important;
+      min-height: fit-content !important;
+      overflow: visible !important;
     }
 
     .radar-btn {
@@ -655,7 +663,7 @@
       </div>
 
       <!-- 📡 RADAR PENCARI HP DI RUMAH (SONAR & BUMP DETECTOR) -->
-      <div class="card" id="homeRadarCard" style="border: 1px solid rgba(56, 189, 248, 0.4); background: linear-gradient(180deg, rgba(15, 23, 42, 0.95), rgba(8, 47, 73, 0.35)); position: relative; overflow: hidden; margin-bottom: 12px; transition: all 0.3s;">
+      <div class="card" id="homeRadarCard" style="border: 1px solid rgba(56, 189, 248, 0.4); background: linear-gradient(180deg, rgba(15, 23, 42, 0.95), rgba(8, 47, 73, 0.35)); position: relative; overflow: visible; flex-shrink: 0; min-height: fit-content; margin-bottom: 12px; transition: all 0.3s;">
         <div class="card-title" style="color: #38bdf8; display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
           <span style="display: flex; align-items: center; gap: 6px; font-weight: 800;">📡 RADAR PENCARI HP (RUMAH)</span>
           <span id="radarStatusBadge" style="font-size: 10px; padding: 2px 8px; border-radius: 999px; background: rgba(56, 189, 248, 0.2); color: #38bdf8; font-weight: 800; border: 1px solid rgba(56,189,248,0.3);">STANDBY</span>
