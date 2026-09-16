@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tentang FIEZEL — Belajar Bahasa Inggris &amp; Jepang, Gratis</title>
+<meta name="description" content="FIEZEL adalah aplikasi belajar bahasa adaptif gratis: kursus Bahasa Inggris (CEFR A1–C2) dan Bahasa Jepang (JLPT N5–N4), antarmuka Indonesia dan Thai, jalan offline setelah dipasang.">
+<meta name="theme-color" content="#FFF9EE">
+<link rel="icon" href="assets/brand/fiezel-icon.svg" type="image/svg+xml">
+<link rel="icon" href="assets/brand/fiezel-icon-192.png" type="image/png">
+<link rel="apple-touch-icon" href="assets/brand/fiezel-icon-192.png">
+
+<!-- SEO-05: kanonik + hreflang TIMBAL BALIK. Pasangan th ada di /th/tentang.html dan
+     menunjuk balik ke sini. hreflang id dan th TIDAK BOLEH menunjuk URL yang sama —
+     pasangan yang menunjuk dirinya sendiri dibuang Google tanpa pesan galat, dan itulah
+     cacat yang dijaga tests/seo-surface-gate-test.js cek (C). -->
+<link rel="canonical" href="https://fiezel.my.id/tentang.html">
+<link rel="alternate" hreflang="id" href="https://fiezel.my.id/tentang.html">
+<link rel="alternate" hreflang="th" href="https://fiezel.my.id/th/tentang.html">
+<link rel="alternate" hreflang="x-default" href="https://fiezel.my.id/tentang.html">
+
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://fiezel.my.id/tentang.html">
+<meta property="og:locale" content="id_ID">
+<meta property="og:locale:alternate" content="th_TH">
+<meta property="og:site_name" content="FIEZEL">
+<meta property="og:title" content="Tentang FIEZEL — Belajar Bahasa Inggris &amp; Jepang, Gratis">
+<meta property="og:description" content="Kursus Bahasa Inggris (CEFR A1–C2) dan Bahasa Jepang (JLPT N5–N4) dalam satu aplikasi gratis. Antarmuka Indonesia dan Thai, jalan offline setelah dipasang.">
+<meta property="og:image" content="https://fiezel.my.id/assets/shots/home-desktop.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Tampilan aplikasi FIEZEL dengan layar Home, target harian, dan empat skill inti">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Tentang FIEZEL — Belajar Bahasa Inggris &amp; Jepang, Gratis">
+<meta name="twitter:description" content="Kursus Bahasa Inggris (CEFR A1–C2) dan Bahasa Jepang (JLPT N5–N4) dalam satu aplikasi gratis. Antarmuka Indonesia dan Thai.">
+<meta name="twitter:image" content="https://fiezel.my.id/assets/shots/home-desktop.png">
+<meta name="author" content="FIEZEL">
+<meta name="publisher" content="FIEZEL">
+<meta name="application-name" content="FIEZEL">
+<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1">
+<meta name="googlebot" content="index, follow, max-image-preview:large, max-snippet:-1">
+
+<link rel="preload" href="assets/fonts/PlusJakartaSans-700.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="assets/fonts/PlusJakartaSans-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="tokens.css?v=20260903-hula02">
+<link rel="stylesheet" href="style.css?v=20260906-fzflow02">
+
+<!-- Tiga kelas yang BELUM ada di style.css dipakai halaman ini. Sengaja ditaruh di sini,
+     bukan ditambahkan ke style.css: style.css dipakai beranda id dan th serta halaman
+     legal, dan menyisipkan aturan baru ke sana demi satu halaman berarti mengirim ulang
+     80 KB CSS ke setiap pengunjung untuk aturan yang hanya dipakai di satu tempat. -->
+<style>
+  .brand-text{font-weight:800;letter-spacing:.02em;font-size:1.15rem;color:var(--maroon-mid,#8C2233)}
+  .crumbs{font-size:.86rem;opacity:.75;margin:0 0 18px}
+  .crumbs a{color:inherit}
+  .list-plain{margin:0 0 18px;padding-left:1.25rem;line-height:1.75;max-width:68ch}
+  .list-plain li{margin:0 0 .5rem}
+  .sec-final .btn{margin-top:8px}
+</style>
+
+<!-- ============================================================================
+     AEO/GEO: STRUCTURED DATA HALAMAN TENTANG
+
+     ATURAN YANG SAMA DENGAN index.html, dan di sini ia mengikat lebih keras karena
+     halaman ini ditulis UNTUK dirangkum mesin: tidak ada satu pun klaim di bawah yang
+     tidak tertulis sebagai teks kasatmata di halaman ini. Angka Jepang (422 butir tata
+     bahasa, 27 keluarga, 1.884 kosakata, 150 bacaan, 54 prompt menulis) diambil dari
+     content/ja/*.json, dan BATASNYA ikut ditulis: menyimak dan berbicara BELUM ada
+     untuk Jepang. Ringkasan AI yang memuji fitur yang tidak ada lebih merugikan
+     daripada tidak muncul sama sekali.
+
+     @id SENGAJA SAMA dengan yang dipakai index.html (#app, #org) dan @type-nya pun
+     sama (WebApplication, EducationalOrganization). Dua halaman boleh melengkapi satu
+     simpul yang sama; yang merusak adalah dua halaman memberi @type BERBEDA pada @id
+     yang sama — dijaga tests/seo-surface-gate-test.js cek (E).
+     ============================================================================ -->
+<script type="application/ld+json">
+[
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "@id": "https://fiezel.my.id/#app",
+    "name": "FIEZEL",
+    "url": "https://fiezel.my.id/app/",
+    "description": "Aplikasi belajar bahasa adaptif dengan dua kursus: Bahasa Inggris dipetakan ke CEFR A1–C2, dan Bahasa Jepang dipetakan ke JLPT N5–N4. Antarmuka tersedia dalam Bahasa Indonesia dan Bahasa Thai. Gratis, tanpa langganan, dan bisa dipakai tanpa internet setelah dipasang.",
+    "applicationCategory": "EducationalApplication",
+    "applicationSubCategory": "Language Learning",
+    "operatingSystem": "Any (PWA)",
+    "isAccessibleForFree": true,
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "IDR",
+      "availability": "https://schema.org/InStock"
+    },
+    "inLanguage": ["id", "th"],
+    "teaches": ["English", "Japanese"],
+    "availableLanguage": [
+      {"@type": "Language", "name": "Indonesian", "alternateName": "id"},
+      {"@type": "Language", "name": "Thai", "alternateName": "th"}
+    ],
+    "provider": {"@id": "https://fiezel.my.id/#org"}
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "EducationalOrganization",
+    "@id": "https://fiezel.my.id/#org",
+    "name": "FIEZEL",
+    "url": "https://fiezel.my.id/",
+    "areaServed": [
+      {"@type": "Country", "name": "Indonesia"},
+      {"@type": "Country", "name": "Thailand"}
+    ],
+    "knowsAbout": ["English Language Learning", "Japanese Language Learning", "CEFR", "JLPT", "Adaptive Learning"]
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "Course",
+    "@id": "https://fiezel.my.id/#course-ja",
+    "name": "Kursus Bahasa Jepang FIEZEL (JLPT N5–N4)",
+    "description": "Kursus Bahasa Jepang berisi 422 butir tata bahasa JLPT N5–N4 dalam 27 keluarga, 1.884 kosakata, 150 bacaan berjenjang, dan 54 prompt menulis. Latihan menyimak dan berbicara belum tersedia untuk kursus ini.",
+    "url": "https://fiezel.my.id/tentang.html#jepang",
+    "provider": {"@id": "https://fiezel.my.id/#org"},
+    "inLanguage": ["id", "th"],
+    "teaches": "Japanese",
+    "isAccessibleForFree": true,
+    "educationalLevel": ["JLPT N5", "JLPT N4"],
+    "hasCourseInstance": {
+      "@type": "CourseInstance",
+      "courseMode": "online",
+      "courseWorkload": "PT20M"
+    }
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "AboutPage",
+    "@id": "https://fiezel.my.id/tentang.html#webpage",
+    "url": "https://fiezel.my.id/tentang.html",
+    "name": "Tentang FIEZEL",
+    "description": "Penjelasan lengkap tentang FIEZEL: dua kursus bahasa, cakupan materi, batas yang belum tersedia, dan cara memakainya.",
+    "inLanguage": "id",
+    "isPartOf": {"@id": "https://fiezel.my.id/#website"},
+    "about": {"@id": "https://fiezel.my.id/#app"},
+    "publisher": {"@id": "https://fiezel.my.id/#org"},
+    "primaryImageOfPage": {
+      "@type": "ImageObject",
+      "url": "https://fiezel.my.id/assets/shots/home-desktop.png",
+      "width": 1200,
+      "height": 630
+    }
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "@id": "https://fiezel.my.id/tentang.html#faq",
+    "inLanguage": "id",
+    "isPartOf": {"@id": "https://fiezel.my.id/tentang.html#webpage"},
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "Apa itu FIEZEL?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "FIEZEL adalah aplikasi web belajar bahasa yang menyesuaikan soal berikutnya dari jawabanmu. Ada dua kursus di dalamnya: Bahasa Inggris yang dipetakan ke tingkat CEFR A1–C2, dan Bahasa Jepang yang dipetakan ke JLPT N5–N4. Gratis, tanpa langganan, dan tanpa akun."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Apakah FIEZEL mengajar bahasa Jepang?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Ya. Kursus Bahasa Jepang berisi 422 butir tata bahasa JLPT N5–N4 dalam 27 keluarga, 1.884 kosakata, 150 bacaan berjenjang, dan 54 prompt menulis. Latihan menyimak dan berbicara belum tersedia untuk Jepang — kedua kartu itu memang disembunyikan sampai materi dan suaranya siap."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Apakah FIEZEL bisa dipakai murid di Thailand?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Bisa. Seluruh antarmuka aplikasi tersedia dalam Bahasa Thai, dan situsnya punya versi Thai di fiezel.my.id/th/. Penjelasan tata bahasa dan arti kosakata ikut berbahasa Thai, jadi murid Thai tidak membaca layar campur Indonesia–Thai."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Apakah FIEZEL gratis?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Gratis sepenuhnya. Tidak ada paket premium, tidak ada fitur yang dikunci di balik pembayaran, dan tidak ada iklan. Seluruh materi Inggris dan Jepang bisa dibuka sejak hari pertama."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Perlu membuat akun untuk memakai FIEZEL?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Tidak perlu. Kamu bisa langsung belajar. Karena tidak ada akun wajib, progres belajar tersimpan di perangkat yang kamu pakai; berpindah perangkat berarti mulai dari awal, kecuali kamu memakai fitur cadangan progres."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Bisakah FIEZEL dipakai tanpa internet?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Setelah dipasang ke layar utama, materi dan latihan bisa dibuka tanpa internet. Yang tetap butuh jaringan hanya suara neural dan tutor AI."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Apakah FIEZEL sertifikasi CEFR atau JLPT resmi?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Bukan. CEFR dan JLPT dipakai sebagai acuan tingkat kesulitan materi, bukan sebagai sertifikasi. FIEZEL tidak berafiliasi dengan lembaga penyelenggara CEFR maupun JLPT, dan hasil belajar di sini tidak berlaku sebagai sertifikat."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Apa yang membedakan FIEZEL dari aplikasi bahasa lain?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Tiga hal: soal berikutnya dipilih dari riwayat jawabanmu, bukan dari urutan tetap; penjelasannya ditulis dalam bahasa murid — Indonesia dan Thai — bukan diterjemahkan mesin dari Inggris; dan seluruh materi bisa dibuka tanpa biaya dan tanpa internet setelah dipasang."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Apakah ada fitur untuk guru?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Ada. KelasKu adalah panel guru di dalam FIEZEL untuk membuat kelas, mengundang murid dengan kode, dan melihat progres per murid. Pratinjaunya bisa dibuka di fiezel.my.id/app/?teacher=preview."
+        }
+      }
+    ]
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {"@type": "ListItem", "position": 1, "name": "Beranda", "item": "https://fiezel.my.id/"},
+      {"@type": "ListItem", "position": 2, "name": "Tentang FIEZEL", "item": "https://fiezel.my.id/tentang.html"}
+    ]
+  }
+]
+</script>
+</head>
+<body>
+<a class="skip" href="#main">Lewati ke konten utama</a>
+
+<header class="topbar">
+  <div class="wrap topbar-in">
+    <a class="brand" href="./" aria-label="FIEZEL — halaman utama">
+      <svg class="brand-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><g fill="currentColor"><rect x="4.6" y="7.5" width="3.1" height="4.6" rx="1.55"/><rect x="8.9" y="5.1" width="3.1" height="7" rx="1.55"/><rect x="13.2" y="3.4" width="3.1" height="8.7" rx="1.55"/><rect x="17.5" y="6.2" width="3.1" height="5.9" rx="1.55"/><path d="M12.6 14c3.5 0 5.9 1.9 5.9 4.1 0 2-2 3.4-5.9 3.4s-5.9-1.4-5.9-3.4c0-2.2 2.4-4.1 5.9-4.1Z"/></g></svg>
+      <strong class="brand-text">FIEZEL</strong>
+    </a>
+    <nav class="topnav" aria-label="Navigasi utama">
+      <a href="./">Beranda</a>
+      <a href="install/">Cara Install</a>
+      <a class="lang-switch" href="th/tentang.html" hreflang="th" lang="th" aria-label="เปลี่ยนเป็นภาษาไทย">ไทย</a>
+      <a class="btn btn-sm btn-primary" href="app/">Mulai Belajar</a>
+    </nav>
+  </div>
+</header>
+
+<main id="main">
+
+  <section class="sec">
+    <div class="wrap">
+      <nav class="crumbs" aria-label="Remah roti">
+        <a href="./">Beranda</a> <span aria-hidden="true">›</span> <span>Tentang FIEZEL</span>
+      </nav>
+
+      <div class="sec-head">
+        <h1>Tentang FIEZEL</h1>
+      </div>
+
+      <!-- Paragraf pembuka SENGAJA berbentuk definisi satu kalimat lalu rinciannya:
+           itu bentuk yang paling mudah dikutip utuh oleh ringkasan AI dan featured
+           snippet, dan ia juga bentuk yang paling jujur — pembaca manusia mendapat
+           jawabannya di baris pertama, bukan setelah tiga paragraf pemanasan. -->
+      <p class="body-lg"><strong>FIEZEL adalah aplikasi web belajar bahasa yang menyesuaikan soal berikutnya dari jawaban murid.</strong> Di dalamnya ada dua kursus: <strong>Bahasa Inggris</strong> yang dipetakan ke tingkat <strong>CEFR A1–C2</strong>, dan <strong>Bahasa Jepang</strong> yang dipetakan ke <strong>JLPT N5–N4</strong>. Antarmukanya tersedia dalam <strong>Bahasa Indonesia</strong> dan <strong>Bahasa Thai</strong>. Gratis, tanpa langganan, tanpa iklan, dan bisa dipakai tanpa internet setelah dipasang ke layar utama.</p>
+
+      <p class="body-lg">FIEZEL dibuat untuk murid yang belajar sendiri: tidak ada kelas, tidak ada jadwal, tidak ada biaya. Yang menggantikan guru adalah urutan soalnya — setiap jawaban memperbarui perkiraan tingkat kemampuan, dan soal berikutnya dipilih dari perkiraan itu, bukan dari daftar tetap.</p>
+
+      <p><a class="btn btn-primary" href="app/">Buka aplikasi FIEZEL</a> <a class="btn btn-ghost" href="install/">Cara memasang di ponsel</a></p>
+    </div>
+  </section>
+
+  <section class="sec" id="inggris">
+    <div class="wrap">
+      <div class="sec-head">
+        <h2 class="sec-title">Kursus Bahasa Inggris (CEFR A1–C2)</h2>
+        <hr class="rule" aria-hidden="true">
+      </div>
+      <p class="body-lg">Kursus Bahasa Inggris adalah bagian FIEZEL yang paling lengkap. Isinya:</p>
+      <ul class="list-plain">
+        <li><strong>180 grammar lesson</strong> berjenjang — A1 17 · A2 29 · B1 52 · B2 39 · C1 24 · C2 19 — masing-masing dengan 25 soal latihan terfokus.</li>
+        <li><strong>2.440 kosakata</strong> dengan pengulangan berjarak (spaced repetition).</li>
+        <li><strong>312 bacaan berjenjang</strong> dengan total 1.560 soal membaca.</li>
+        <li><strong>36 sesi speaking</strong> dan <strong>1.400+ latihan listening</strong>.</li>
+        <li>Tes penempatan yang menaruhmu di tingkat CEFR yang sesuai sejak awal.</li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="sec" id="jepang">
+    <div class="wrap">
+      <div class="sec-head">
+        <h2 class="sec-title">Kursus Bahasa Jepang (JLPT N5–N4)</h2>
+        <hr class="rule" aria-hidden="true">
+      </div>
+      <p class="body-lg">Kursus Bahasa Jepang berdiri di atas mesin adaptif yang sama, dengan bank materinya sendiri:</p>
+      <ul class="list-plain">
+        <li><strong>422 butir tata bahasa JLPT N5–N4</strong>, tersusun dalam 27 keluarga tata bahasa.</li>
+        <li><strong>1.884 kosakata</strong> Jepang dengan bacaan kana dan artinya.</li>
+        <li><strong>150 bacaan berjenjang</strong>.</li>
+        <li><strong>54 prompt menulis</strong> dengan target jumlah karakter per tingkat.</li>
+      </ul>
+      <p class="body-lg"><strong>Yang belum ada, dan ditulis di sini supaya tidak jadi kejutan:</strong> latihan <em>menyimak</em> dan <em>berbicara</em> belum tersedia untuk Bahasa Jepang. Kedua kartu itu memang disembunyikan di dalam aplikasi ketika kursus Jepang dipilih — menawarkan latihan menyimak yang isinya audio Bahasa Inggris akan jauh lebih membingungkan daripada tidak menawarkannya sama sekali.</p>
+    </div>
+  </section>
+
+  <section class="sec" id="bahasa">
+    <div class="wrap">
+      <div class="sec-head">
+        <h2 class="sec-title">Untuk murid Indonesia dan Thailand</h2>
+        <hr class="rule" aria-hidden="true">
+      </div>
+      <p class="body-lg">FIEZEL dipakai murid di Indonesia dan Thailand, dan keduanya bukan renungan belakangan. Seluruh antarmuka aplikasi lahir dalam dua bahasa sekaligus: <strong>Bahasa Indonesia</strong> dan <strong>Bahasa Thai</strong>. Penjelasan tata bahasa, arti kosakata, dan umpan balik soal ikut berbahasa Thai untuk murid Thai — bukan layar campur yang separuhnya masih Indonesia.</p>
+      <p class="body-lg">Situs ini pun punya versi Thai di <a href="th/">fiezel.my.id/th/</a>, termasuk halaman ini: <a href="th/tentang.html" hreflang="th" lang="th">เกี่ยวกับ FIEZEL</a>.</p>
+    </div>
+  </section>
+
+  <section class="sec" id="cara-kerja">
+    <div class="wrap">
+      <div class="sec-head">
+        <h2 class="sec-title">Bagaimana FIEZEL menyesuaikan diri</h2>
+        <hr class="rule" aria-hidden="true">
+      </div>
+      <ol class="list-plain">
+        <li><strong>Tes penempatan singkat</strong> menaruhmu di tingkat awal yang masuk akal, bukan di A1 secara otomatis.</li>
+        <li><strong>Setiap jawaban memperbarui perkiraan penguasaan</strong> per topik, bukan sekadar skor total.</li>
+        <li><strong>Soal berikutnya dipilih dari perkiraan itu</strong> — topik yang goyah muncul lebih sering, topik yang sudah kuat mundur ke jadwal pengulangan.</li>
+        <li><strong>Kesalahan yang berulang dikenali sebagai pola</strong>, lalu dijelaskan ulang dengan sudut yang berbeda, bukan diulang dengan kalimat yang sama.</li>
+      </ol>
+    </div>
+  </section>
+
+  <section class="sec" id="guru">
+    <div class="wrap">
+      <div class="sec-head">
+        <h2 class="sec-title">KelasKu — panel untuk guru</h2>
+        <hr class="rule" aria-hidden="true">
+      </div>
+      <p class="body-lg">Guru bisa membuat kelas, mengundang murid dengan kode, dan melihat progres tiap murid dari satu panel. Pratinjaunya bisa dibuka tanpa pendaftaran di <a href="app/?teacher=preview">fiezel.my.id/app/?teacher=preview</a>.</p>
+    </div>
+  </section>
+
+  <section class="sec" id="faq">
+    <div class="wrap">
+      <div class="sec-head">
+        <h2 class="sec-title">Pertanyaan yang sering muncul</h2>
+        <hr class="rule" aria-hidden="true">
+      </div>
+      <!-- Teks di bawah WAJIB sepadan dengan blok FAQPage di kepala halaman. Rich result yang
+           menjanjikan jawaban yang tidak ada di halaman melanggar pedoman Google. -->
+      <div class="faq">
+        <details open>
+          <summary>Apa itu FIEZEL?<span class="chev" aria-hidden="true"></span></summary>
+          <div class="faq-body"><p>FIEZEL adalah aplikasi web belajar bahasa yang menyesuaikan soal berikutnya dari jawabanmu. Ada dua kursus di dalamnya: Bahasa Inggris yang dipetakan ke tingkat CEFR A1–C2, dan Bahasa Jepang yang dipetakan ke JLPT N5–N4. Gratis, tanpa langganan, dan tanpa akun.</p></div>
+        </details>
+        <details>
+          <summary>Apakah FIEZEL mengajar bahasa Jepang?<span class="chev" aria-hidden="true"></span></summary>
+          <div class="faq-body"><p>Ya. Kursus Bahasa Jepang berisi 422 butir tata bahasa JLPT N5–N4 dalam 27 keluarga, 1.884 kosakata, 150 bacaan berjenjang, dan 54 prompt menulis. Latihan menyimak dan berbicara belum tersedia untuk Jepang — kedua kartu itu memang disembunyikan sampai materi dan suaranya siap.</p></div>
+        </details>
+        <details>
+          <summary>Apakah FIEZEL bisa dipakai murid di Thailand?<span class="chev" aria-hidden="true"></span></summary>
+          <div class="faq-body"><p>Bisa. Seluruh antarmuka aplikasi tersedia dalam Bahasa Thai, dan situsnya punya versi Thai di fiezel.my.id/th/. Penjelasan tata bahasa dan arti kosakata ikut berbahasa Thai, jadi murid Thai tidak membaca layar campur Indonesia–Thai.</p></div>
+        </details>
+        <details>
+          <summary>Apakah FIEZEL gratis?<span class="chev" aria-hidden="true"></span></summary>
+          <div class="faq-body"><p>Gratis sepenuhnya. Tidak ada paket premium, tidak ada fitur yang dikunci di balik pembayaran, dan tidak ada iklan. Seluruh materi Inggris dan Jepang bisa dibuka sejak hari pertama.</p></div>
+        </details>
+        <details>
+          <summary>Perlu membuat akun untuk memakai FIEZEL?<span class="chev" aria-hidden="true"></span></summary>
+          <div class="faq-body"><p>Tidak perlu. Kamu bisa langsung belajar. Karena tidak ada akun wajib, progres belajar tersimpan di perangkat yang kamu pakai; berpindah perangkat berarti mulai dari awal, kecuali kamu memakai fitur cadangan progres.</p></div>
+        </details>
+        <details>
+          <summary>Bisakah FIEZEL dipakai tanpa internet?<span class="chev" aria-hidden="true"></span></summary>
+          <div class="faq-body"><p>Setelah dipasang ke layar utama, materi dan latihan bisa dibuka tanpa internet. Yang tetap butuh jaringan hanya suara neural dan tutor AI.</p></div>
+        </details>
+        <details>
+          <summary>Apakah FIEZEL sertifikasi CEFR atau JLPT resmi?<span class="chev" aria-hidden="true"></span></summary>
+          <div class="faq-body"><p>Bukan. CEFR dan JLPT dipakai sebagai acuan tingkat kesulitan materi, bukan sebagai sertifikasi. FIEZEL tidak berafiliasi dengan lembaga penyelenggara CEFR maupun JLPT, dan hasil belajar di sini tidak berlaku sebagai sertifikat.</p></div>
+        </details>
+        <details>
+          <summary>Apa yang membedakan FIEZEL dari aplikasi bahasa lain?<span class="chev" aria-hidden="true"></span></summary>
+          <div class="faq-body"><p>Tiga hal: soal berikutnya dipilih dari riwayat jawabanmu, bukan dari urutan tetap; penjelasannya ditulis dalam bahasa murid — Indonesia dan Thai — bukan diterjemahkan mesin dari Inggris; dan seluruh materi bisa dibuka tanpa biaya dan tanpa internet setelah dipasang.</p></div>
+        </details>
+        <details>
+          <summary>Apakah ada fitur untuk guru?<span class="chev" aria-hidden="true"></span></summary>
+          <div class="faq-body"><p>Ada. KelasKu adalah panel guru di dalam FIEZEL untuk membuat kelas, mengundang murid dengan kode, dan melihat progres per murid. Pratinjaunya bisa dibuka di fiezel.my.id/app/?teacher=preview.</p></div>
+        </details>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec sec-final">
+    <div class="wrap">
+      <h2>Mulai dari level yang tepat hari ini</h2>
+      <p class="body-lg">Tidak perlu akun, tidak perlu membayar, tidak perlu memasang apa pun dari toko aplikasi.</p>
+      <p><a class="btn btn-primary" href="app/">Buka FIEZEL sekarang</a></p>
+    </div>
+  </section>
+
+</main>
+
+<footer class="foot">
+  <div class="wrap foot-in">
+    <div class="foot-brand">
+      <p class="foot-tag">Ruang belajar bahasa personal — Inggris dan Jepang.</p>
+      <nav class="foot-links" aria-label="Tautan footer">
+        <a href="./">Beranda</a>
+        <span aria-hidden="true">·</span>
+        <a href="app/">Buka Aplikasi Murid</a>
+        <span aria-hidden="true">·</span>
+        <a href="install/">Cara Install</a>
+        <span aria-hidden="true">·</span>
+        <a href="th/tentang.html" hreflang="th" lang="th">เกี่ยวกับ FIEZEL (ไทย)</a>
+        <span aria-hidden="true">·</span>
+        <a href="privacy/">Kebijakan Privasi</a>
+        <span aria-hidden="true">·</span>
+        <a href="terms/">Syarat Penggunaan</a>
+      </nav>
+    </div>
+    <div class="foot-notes">
+      <p>Materi Inggris dipetakan ke CEFR A1–C2, materi Jepang ke JLPT N5–N4. Bukan sertifikasi resmi.</p>
+      <p>Materi dan latihan bisa dibuka tanpa internet. Suara neural dan tutor AI butuh jaringan.</p>
+      <p>Gratis, tanpa langganan. Progres belajar tersimpan di perangkatmu.</p>
+    </div>
+  </div>
+  <div class="wrap foot-copy"><p>© 2026 FIEZEL</p></div>
+</footer>
+</body>
+</html>
