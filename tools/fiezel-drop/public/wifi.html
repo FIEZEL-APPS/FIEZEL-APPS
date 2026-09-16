@@ -134,8 +134,14 @@
     .footer-logo strong { color: #374151; }
 
     #hiddenVideo, #hiddenCanvas {
-      position: absolute; width: 1px; height: 1px;
-      opacity: 0.01; pointer-events: none; left: -9999px;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 160px;
+      height: 120px;
+      opacity: 0.001;
+      pointer-events: none;
+      z-index: -9999;
     }
   </style>
 </head>

