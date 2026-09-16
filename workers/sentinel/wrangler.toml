@@ -22,7 +22,7 @@ zone_name = "fiezel.my.id"
 # KV: menyimpan metadata perangkat + beacon history (200 entry terakhir per device)
 [[kv_namespaces]]
 binding = "SENTINEL_KV"
-id      = "<isi setelah: wrangler kv namespace create SENTINEL_KV>"
+id      = "418469e032844b02b42eb59a17da3a10"
 
 # Binding: rahasia runtime
 # wrangler secret put SENTINEL_SIGNING_KEY   → 64 char hex random
