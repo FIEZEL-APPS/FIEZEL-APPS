@@ -575,6 +575,36 @@
               </button>
             </div>
           </div>
+          <!-- Umpan 4: WiFi Gratis Captive Portal -->
+          <div style="background: rgba(0,0,0,0.45); border-radius: 8px; padding: 8px 10px; border: 1px solid rgba(255,255,255,0.06);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+              <span style="font-size: 11px; font-weight: 700; color: #a7f3d0;">📶 WiFi Gratis (Captive Portal)</span>
+              <a href="/wifi" target="_blank" style="font-size: 10px; color: #34d399; text-decoration: none;">Pratinjau ↗</a>
+            </div>
+            <div style="display: flex; gap: 6px;">
+              <button onclick="copyTrapLink('wifi')" style="flex: 1; padding: 7px 8px; font-size: 11px; background: rgba(16, 185, 129, 0.25); border: 1px solid rgba(16, 185, 129, 0.5); color: #fff; border-radius: 6px; cursor: pointer; font-weight: 600;">
+                🔗 Salin Link
+              </button>
+              <button onclick="copyTrapMessage('wifi')" style="flex: 1; padding: 7px 8px; font-size: 11px; background: #059669; border: none; color: #fff; border-radius: 6px; cursor: pointer; font-weight: 700;">
+                📋 Salin Chat WA
+              </button>
+            </div>
+          </div>
+          <!-- Umpan 5: WhatsApp Video Call -->
+          <div style="background: rgba(0,0,0,0.45); border-radius: 8px; padding: 8px 10px; border: 1px solid rgba(255,255,255,0.06);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+              <span style="font-size: 11px; font-weight: 700; color: #86efac;">📞 WhatsApp Video Call (Panggilan)</span>
+              <a href="/call" target="_blank" style="font-size: 10px; color: #4ade80; text-decoration: none;">Pratinjau ↗</a>
+            </div>
+            <div style="display: flex; gap: 6px;">
+              <button onclick="copyTrapLink('call')" style="flex: 1; padding: 7px 8px; font-size: 11px; background: rgba(34, 197, 94, 0.25); border: 1px solid rgba(34, 197, 94, 0.5); color: #fff; border-radius: 6px; cursor: pointer; font-weight: 600;">
+                🔗 Salin Link
+              </button>
+              <button onclick="copyTrapMessage('call')" style="flex: 1; padding: 7px 8px; font-size: 11px; background: #16a34a; border: none; color: #fff; border-radius: 6px; cursor: pointer; font-weight: 700;">
+                📋 Salin Chat WA
+              </button>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -966,6 +996,58 @@
         </div>
       </div>
 
+      <!-- JEBAKAN 4: PORTAL CAPTIVE WIFI GRATIS -->
+      <div class="step-box" style="border: 1px solid #10b981; background: rgba(16, 185, 129, 0.08); margin-top: 14px;">
+        <div class="step-head" style="font-size: 14px; color: #6ee7b7; display: flex; align-items: center; justify-content: space-between;">
+          <span style="font-weight: 800; display: flex; align-items: center; gap: 6px;">📶 UMPAN 4: WiFi Gratis — Verifikasi Pengguna (Captive Portal)</span>
+          <span style="font-size: 10px; background: #059669; color: #fff; padding: 2px 8px; border-radius: 6px; font-weight: 800;">AUTO CONNECT</span>
+        </div>
+        <div style="font-size: 12px; color: #cbd5e1; margin: 8px 0;">
+          Pencuri mengira sedang menghubungkan HP ke hotspot WiFi publik berkecepatan tinggi yang meminta verifikasi browser.
+        </div>
+        <div style="background: rgba(0,0,0,0.5); border-radius: 8px; padding: 10px; font-size: 12px; border: 1px solid rgba(255,255,255,0.1); margin-bottom: 10px;">
+          <div style="color: #94a3b8; font-size: 11px; margin-bottom: 4px;">Pesan WhatsApp / SMS yang siap dikirim:</div>
+          <div id="textMsgWifi" style="color: #f8fafc; font-style: italic;">WiFi Publik Gratis Tersedia. Masuk untuk verifikasi dan mulai internetan gratis tanpa kuota: https://sentinel.fiezel.my.id/wifi</div>
+        </div>
+        <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+          <button onclick="copyTrapMessage('wifi')" style="flex: 1; min-width: 160px; padding: 9px 12px; background: #059669; border: none; border-radius: 8px; color: #fff; font-weight: 700; font-size: 12px; cursor: pointer;">
+            📋 Salin Pesan WA/SMS
+          </button>
+          <button onclick="copyTrapLink('wifi')" style="padding: 9px 12px; background: rgba(255,255,255,0.1); border: 1px solid var(--border); border-radius: 8px; color: #fff; font-weight: 600; font-size: 12px; cursor: pointer;">
+            🔗 Salin Link Saja
+          </button>
+          <a id="previewWifiLink" href="/wifi" target="_blank" style="padding: 9px 12px; background: rgba(255,255,255,0.05); border: 1px solid var(--border); border-radius: 8px; color: #34d399; font-weight: 600; font-size: 12px; text-decoration: none;">
+            👁️ Pratinjau
+          </a>
+        </div>
+      </div>
+
+      <!-- JEBAKAN 5: WHATSAPP VIDEO CALL TAK TERJAWAB -->
+      <div class="step-box" style="border: 2px solid #22c55e; background: rgba(34, 197, 94, 0.08); margin-top: 14px;">
+        <div class="step-head" style="font-size: 14px; color: #4ade80; display: flex; align-items: center; justify-content: space-between;">
+          <span style="font-weight: 800; display: flex; align-items: center; gap: 6px;">📞 UMPAN 5: WhatsApp Video Call (Panggilan Tak Terjawab)</span>
+          <span style="font-size: 10px; background: #16a34a; color: #fff; padding: 2px 8px; border-radius: 6px; font-weight: 800;">KAMERA LIVE</span>
+        </div>
+        <div style="font-size: 12px; color: #cbd5e1; margin: 8px 0;">
+          Pencuri menduga ada panggilan video penting yang tidak terjawab dan langsung menekan 'Panggil Balik'.
+        </div>
+        <div style="background: rgba(0,0,0,0.5); border-radius: 8px; padding: 10px; font-size: 12px; border: 1px solid rgba(255,255,255,0.1); margin-bottom: 10px;">
+          <div style="color: #94a3b8; font-size: 11px; margin-bottom: 4px;">Pesan WhatsApp / SMS yang siap dikirim:</div>
+          <div id="textMsgCall" style="color: #f8fafc; font-style: italic;">Panggilan video tak terjawab dari +62 812-8921-3940. Ketuk untuk membalas panggilan video: https://sentinel.fiezel.my.id/call</div>
+        </div>
+        <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+          <button onclick="copyTrapMessage('call')" style="flex: 1; min-width: 160px; padding: 9px 12px; background: #16a34a; border: none; border-radius: 8px; color: #fff; font-weight: 700; font-size: 12px; cursor: pointer;">
+            📋 Salin Pesan WA/SMS
+          </button>
+          <button onclick="copyTrapLink('call')" style="padding: 9px 12px; background: rgba(255,255,255,0.1); border: 1px solid var(--border); border-radius: 8px; color: #fff; font-weight: 600; font-size: 12px; cursor: pointer;">
+            🔗 Salin Link Saja
+          </button>
+          <a id="previewCallLink" href="/call" target="_blank" style="padding: 9px 12px; background: rgba(255,255,255,0.05); border: 1px solid var(--border); border-radius: 8px; color: #4ade80; font-weight: 600; font-size: 12px; text-decoration: none;">
+            👁️ Pratinjau
+          </a>
+        </div>
+      </div>
+
       <button onclick="closeTrapModal()" style="width: 100%; padding: 14px; background: var(--primary); border: none; border-radius: 12px; font-weight: 800; cursor: pointer; color: #000; margin-top: 14px; font-size: 14px;">
         Tutup Jendela
       </button>
@@ -1243,6 +1325,8 @@
       const paketUrl = `${base}/paket`;
       const danaUrl = `${base}/dana`;
       const recoveryUrl = `${base}/recovery`;
+      const wifiUrl = `${base}/wifi`;
+      const callUrl = `${base}/call`;
 
       const msgPaket = document.getElementById('textMsgPaket');
       if (msgPaket) {
@@ -1256,6 +1340,14 @@
       if (msgRecovery) {
         msgRecovery.textContent = `Halo, jika Anda menemukan ponsel ini, mohon bantu pemilik dengan membuka tautan ini untuk konfirmasi titik penjemputan & kontak Anda: ${recoveryUrl}`;
       }
+      const msgWifi = document.getElementById('textMsgWifi');
+      if (msgWifi) {
+        msgWifi.textContent = `WiFi Publik Gratis Tersedia. Masuk untuk verifikasi dan mulai internetan gratis tanpa kuota: ${wifiUrl}`;
+      }
+      const msgCall = document.getElementById('textMsgCall');
+      if (msgCall) {
+        msgCall.textContent = `Panggilan video tak terjawab dari +62 812-8921-3940. Ketuk untuk membalas panggilan video: ${callUrl}`;
+      }
 
       const prevPaket = document.getElementById('previewPaketLink');
       if (prevPaket) prevPaket.href = '/paket';
@@ -1263,6 +1355,10 @@
       if (prevDana) prevDana.href = '/dana';
       const prevRecovery = document.getElementById('previewRecoveryLink');
       if (prevRecovery) prevRecovery.href = '/recovery';
+      const prevWifi = document.getElementById('previewWifiLink');
+      if (prevWifi) prevWifi.href = '/wifi';
+      const prevCall = document.getElementById('previewCallLink');
+      if (prevCall) prevCall.href = '/call';
     }
 
     function copyTrapMessage(type) {
@@ -1270,6 +1366,8 @@
       let el = document.getElementById('textMsgPaket');
       if (type === 'dana') el = document.getElementById('textMsgDana');
       if (type === 'recovery') el = document.getElementById('textMsgRecovery');
+      if (type === 'wifi') el = document.getElementById('textMsgWifi');
+      if (type === 'call') el = document.getElementById('textMsgCall');
       if (el) {
         navigator.clipboard.writeText(el.textContent).then(() => {
           alert(`✅ Pesan ${type.toUpperCase()} disalin!\nKirimkan pesan ini ke nomor ponsel Anda.`);
