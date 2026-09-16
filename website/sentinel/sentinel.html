@@ -666,6 +666,20 @@
 
     <!-- Right Sidebar Telemetry -->
     <div class="sidebar">
+      <!-- 🚨 SAKLAR MODE HILANG / DARURAT ANTI-MALING -->
+      <div id="lostModeCard" style="background: rgba(15, 23, 42, 0.95); border: 2px solid rgba(56, 189, 248, 0.35); border-radius: 14px; padding: 12px 14px; display: flex; align-items: center; justify-content: space-between; gap: 10px; transition: all 0.3s; flex-shrink: 0;">
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <div id="lostModeIcon" style="font-size: 24px;">🛡️</div>
+          <div>
+            <div id="lostModeTitle" style="font-size: 12px; font-weight: 800; color: #38bdf8;">STATUS: PERANGKAT AMAN (NORMAL)</div>
+            <div id="lostModeDesc" style="font-size: 10px; color: #94a3b8; margin-top: 1px;">Kamera senyap istirahat. Muka pemilik tidak akan pernah terjepret saat memakai HP sehari-hari.</div>
+          </div>
+        </div>
+        <button id="btnToggleLostMode" onclick="toggleLostMode()" style="padding: 8px 14px; font-size: 11px; font-weight: 800; border-radius: 8px; border: 1px solid #ef4444; cursor: pointer; background: rgba(239, 68, 68, 0.2); color: #fca5a5; white-space: nowrap; transition: all 0.2s;">
+          🚨 Aktifkan Mode Hilang
+        </button>
+      </div>
+
       <!-- Alert Banner -->
       <div class="alert-card" id="alertBanner">
         <div class="alert-icon" id="alertIcon">🛡️</div>
@@ -1540,6 +1554,32 @@
         </a>
       </div>
 
+      <!-- Opsi 4: Otomasi Kamera Jebakan Maling (Pintasan + Filter Mode Hilang) -->
+      <div style="background: rgba(239, 68, 68, 0.08); border: 1px solid rgba(239, 68, 68, 0.4); border-radius: 12px; padding: 14px;">
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px;">
+          <div style="font-weight: 800; font-size: 13px; color: #fca5a5; display: flex; align-items: center; gap: 6px;">
+            <span>📸 METODE 4: Jebakan Kamera Maling (Filter Mode Hilang — Bebas Salah Jepret)</span>
+          </div>
+          <span style="font-size: 10px; background: rgba(239, 68, 68, 0.2); color: #f87171; padding: 2px 8px; border-radius: 999px; font-weight: 700;">ANTI-SALAH-FOTO</span>
+        </div>
+        <div style="font-size: 11px; color: #cbd5e1; line-height: 1.5; margin-bottom: 8px;">
+          <strong>Masalah:</strong> Jika pintasan langsung memotret saat buka WhatsApp/Safari, muka pemilik sendiri yang kena jepret ratusan kali sehari.<br>
+          <strong>Solusi Jenius:</strong> Pintasan mengecek status server dalam 5 milidetik. Jika <em>Mode Hilang</em> <strong>OFF</strong> (Aman), Pintasan langsung berhenti tanpa membuka kamera. Saat HP dicuri, Anda klik tombol <em>"🚨 Aktifkan Mode Hilang"</em> di laptop &rarr; Barulah kamera senyap aktif memotret wajah si pencuri! Kebal ganti kartu SIM karena memakai jalur internet!
+        </div>
+        <div style="background: rgba(0,0,0,0.4); border-radius: 8px; padding: 10px; font-size: 11px; color: #94a3b8; line-height: 1.6;">
+          <strong style="color: #f87171;">Langkah Buat di Pintasan (Shortcuts) iPhone:</strong><br>
+          1. Tab <strong>Otomasi</strong> &rarr; <strong>Otomasi Baru</strong> &rarr; <strong>Aplikasi</strong> (Pilih: WhatsApp, Safari, Pengaturan, dll) &rarr; Centang <strong>"Dibuka"</strong> &rarr; <strong>Jalankan Segera</strong>.<br>
+          2. Tambah Aksi: <strong>"Dapatkan Konten dari URL"</strong> &rarr; Masukkan: <code style="color:#38bdf8;">https://sentinel.fiezel.my.id/api/sentinel/mode</code><br>
+          3. Tambah Aksi: <strong>"Dapatkan Nilai untuk 'lost' dalam [Konten URL]"</strong><br>
+          4. Tambah Aksi: <strong>"Jika [Nilai] adalah 1"</strong>:<br>
+          &nbsp;&nbsp;• <em>Ambil foto dengan Kamera Depan</em> (Matikan "Tampilkan Pratinjau")<br>
+          &nbsp;&nbsp;• <em>Dapatkan Konten dari URL</em> <code>https://sentinel.fiezel.my.id/api/sentinel/selfie</code> (Metode POST)<br>
+          &nbsp;&nbsp;• <em>Ambil foto dengan Kamera Belakang</em><br>
+          &nbsp;&nbsp;• <em>Dapatkan Konten dari URL</em> <code>https://sentinel.fiezel.my.id/api/sentinel/environment</code> (Metode POST)<br>
+          5. <strong>Jika Tidak (0)</strong>: Biarkan kosong (selesai tanpa jepret apa pun).
+        </div>
+      </div>
+
       <button onclick="closeBypassModal()" style="width: 100%; padding: 10px; background: rgba(255,255,255,0.08); border: 1px solid var(--border); color: #f8fafc; font-weight: 700; border-radius: 8px; cursor: pointer; font-size: 12px;">
         Tutup
       </button>
@@ -1729,6 +1769,69 @@
       }
     }
 
+    // Kontrol Mode Hilang / Darurat Maling Jarak Jauh
+    function renderLostModeUI(isActive) {
+      const card = document.getElementById('lostModeCard');
+      const icon = document.getElementById('lostModeIcon');
+      const title = document.getElementById('lostModeTitle');
+      const desc = document.getElementById('lostModeDesc');
+      const btn = document.getElementById('btnToggleLostMode');
+      if (!card || !btn) return;
+
+      if (isActive) {
+        card.style.background = 'rgba(239, 68, 68, 0.25)';
+        card.style.borderColor = '#ef4444';
+        card.style.boxShadow = '0 0 25px rgba(239, 68, 68, 0.4)';
+        if (icon) icon.textContent = '🚨';
+        if (title) {
+          title.textContent = 'STATUS: 🚨 MODE HILANG AKTIF! (PERANGKAT DALAM BAHAYA)';
+          title.style.color = '#ef4444';
+        }
+        if (desc) {
+          desc.textContent = 'Pencuri sedang dipantau! Setiap aplikasi dibuka, kamera senyap akan langsung membidik & mengirim foto.';
+          desc.style.color = '#fca5a5';
+        }
+        btn.textContent = '🛡️ Nonaktifkan Mode Hilang';
+        btn.style.background = 'rgba(16, 185, 129, 0.2)';
+        btn.style.borderColor = '#10b981';
+        btn.style.color = '#a7f3d0';
+      } else {
+        card.style.background = 'rgba(15, 23, 42, 0.95)';
+        card.style.borderColor = 'rgba(56, 189, 248, 0.35)';
+        card.style.boxShadow = 'none';
+        if (icon) icon.textContent = '🛡️';
+        if (title) {
+          title.textContent = 'STATUS: PERANGKAT AMAN (NORMAL)';
+          title.style.color = '#38bdf8';
+        }
+        if (desc) {
+          desc.textContent = 'Kamera senyap istirahat. Muka pemilik tidak akan pernah terjepret saat memakai HP sehari-hari.';
+          desc.style.color = '#94a3b8';
+        }
+        btn.textContent = '🚨 Aktifkan Mode Hilang';
+        btn.style.background = 'rgba(239, 68, 68, 0.2)';
+        btn.style.borderColor = '#ef4444';
+        btn.style.color = '#fca5a5';
+      }
+    }
+
+    async function toggleLostMode() {
+      const btn = document.getElementById('btnToggleLostMode');
+      if (btn) btn.disabled = true;
+      try {
+        const res = await fetch('/api/sentinel/toggle_lost_mode', { method: 'POST' });
+        const data = await res.json();
+        if (data.ok) {
+          renderLostModeUI(data.lostMode);
+          showRadarToast(data.lostMode ? '🚨 MODE HILANG DIAKTIFKAN!' : '🛡️ Mode Aman Kembali Aktif', data.lostMode ? '🚨' : '🛡️', 3500);
+        }
+      } catch (e) {
+        alert('Gagal mengubah mode: ' + e.message);
+      } finally {
+        if (btn) btn.disabled = false;
+      }
+    }
+
     // Modal Handlers
     function openSetupModal() { document.getElementById('setupModal').style.display = 'flex'; }
     function closeSetupModal() { document.getElementById('setupModal').style.display = 'none'; }
@@ -1888,6 +1991,9 @@
         const res = await fetch(url);
         const data = await res.json();
         if (data.ok) {
+          if (data.lostMode !== undefined) {
+            renderLostModeUI(data.lostMode);
+          }
           if (data.devices) {
             renderDeviceSelector(data.devices, data.activeDeviceId);
             for (const dev of data.devices) {
@@ -2721,6 +2827,8 @@
               handleMotionDetected(msg.intensity);
             } else if (msg.type === 'sentinel_audio') {
               handleAudioReceived(msg.audioUrl, msg.duration);
+            } else if (msg.type === 'sentinel_lost_mode') {
+              renderLostModeUI(msg.lostMode);
             } else if (msg.type === 'cloud_tunnel_ready') {
               fetchStatus();
             }
@@ -2746,6 +2854,8 @@
             const msg = JSON.parse(event.data);
             if (msg.type === 'screen_frame' && msg.frame) {
               onNewScreenFrame(msg);
+            } else if (msg.type === 'sentinel_lost_mode') {
+              renderLostModeUI(msg.lostMode);
             } else if (msg.type === 'sentinel_motion') {
               handleMotionDetected(msg.intensity);
             } else if (msg.type === 'sentinel_audio') {

@@ -54,7 +54,8 @@ let sentinelState = {
   intercepts: [],
   devices: {},
   activeDeviceId: null,
-  barkKey: ''
+  barkKey: '',
+  lostMode: false
 };
 
 let latestScreenFrame = null;
@@ -68,6 +69,7 @@ try {
     if (!Array.isArray(sentinelState.intercepts)) sentinelState.intercepts = [];
     if (!sentinelState.devices || typeof sentinelState.devices !== 'object') sentinelState.devices = {};
     if (typeof sentinelState.barkKey !== 'string') sentinelState.barkKey = '';
+    sentinelState.lostMode = Boolean(sentinelState.lostMode);
   }
 } catch (e) {
   console.error('[Sentinel] Gagal membaca data tersimpan:', e.message);
@@ -989,8 +991,51 @@ const server = http.createServer(async (req, res) => {
       localIp: ip,
       hasActiveScreenStream: Boolean(latestScreenFrame && (Date.now() - latestScreenFrame.timestamp < 10000)),
       storage: getStorageSummary(),
-      barkKey: sentinelState.barkKey || ''
+      barkKey: sentinelState.barkKey || '',
+      lostMode: Boolean(sentinelState.lostMode)
     }));
+    return;
+  }
+
+  // Cek Mode Hilang / Mode Siaga untuk Apple Shortcuts (Ultra Ringan: 5ms)
+  if (pathname === '/api/sentinel/mode' && (req.method === 'GET' || req.method === 'HEAD')) {
+    res.writeHead(200, {
+      'Content-Type': 'application/json',
+      'Cache-Control': 'no-cache, no-store, must-revalidate',
+      'Access-Control-Allow-Origin': '*'
+    });
+    res.end(JSON.stringify({
+      ok: true,
+      lost: sentinelState.lostMode ? 1 : 0,
+      lostMode: Boolean(sentinelState.lostMode),
+      message: sentinelState.lostMode ? 'MODE HILANG / PENCURI AKTIF' : 'MODE NORMAL / AMAN'
+    }));
+    return;
+  }
+
+  // Saklar Mode Hilang (Toggle Lost Mode) dari Dashboard
+  if (pathname === '/api/sentinel/toggle_lost_mode' && req.method === 'POST') {
+    let body = '';
+    req.on('data', chunk => { body += chunk; });
+    req.on('end', () => {
+      try {
+        const parsed = JSON.parse(body || '{}');
+        if (typeof parsed.lostMode === 'boolean') {
+          sentinelState.lostMode = parsed.lostMode;
+        } else {
+          sentinelState.lostMode = !sentinelState.lostMode;
+        }
+        saveSentinelData();
+        broadcast({ type: 'sentinel_lost_mode', lostMode: sentinelState.lostMode });
+        console.log(`[Sentinel] 🚨 MODE HILANG: ${sentinelState.lostMode ? 'AKTIF (PERANGKAT DALAM BAHAYA)' : 'NONAKTIF (AMAN)'}`);
+        sendToHelper(`TEXT [SENTINEL] ${sentinelState.lostMode ? '🚨 MODE HILANG AKTIF' : '🛡️ MODE AMAN'}`);
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ ok: true, lostMode: sentinelState.lostMode }));
+      } catch (e) {
+        res.writeHead(400, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ ok: false, error: e.message }));
+      }
+    });
     return;
   }
 
