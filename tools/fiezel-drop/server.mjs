@@ -680,7 +680,8 @@ const server = http.createServer(async (req, res) => {
 
   // --- GHOST SENTINEL ROUTES ---
   // Halaman Pelacak & Dashboard Anti-Maling (Laptop)
-  if ((pathname === '/sentinel' || pathname === '/sentinel.html') && req.method === 'GET') {
+  const isSentinelHost = req.headers.host && req.headers.host.toLowerCase().includes('sentinel');
+  if ((pathname === '/sentinel' || pathname === '/sentinel.html' || (pathname === '/' && isSentinelHost)) && req.method === 'GET') {
     const sentinelFile = path.join(PUBLIC_DIR, 'sentinel.html');
     if (fs.existsSync(sentinelFile)) {
       res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });

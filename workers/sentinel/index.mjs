@@ -295,6 +295,12 @@ export default {
     const url = new URL(request.url);
     const path = url.pathname;
 
+    // ── ROOT / DASHBOARD REDIRECT ─────────────────────────────────────────────
+    if ((path === '/' || path === '/sentinel' || path === '/dashboard') && request.method === 'GET') {
+      const target = new URL('/sentinel.html', request.url);
+      return Response.redirect(target.toString(), 302);
+    }
+
     // ── POST /api/register ───────────────────────────────────────────────────
     if (path === '/api/register' && request.method === 'POST') {
       let body;
