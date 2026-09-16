@@ -36,6 +36,10 @@ const ENVIRONMENT_DIR = path.join(SAVE_DIR, 'Lingkungan');
 if (!fs.existsSync(ENVIRONMENT_DIR)) {
   fs.mkdirSync(ENVIRONMENT_DIR, { recursive: true });
 }
+const AUDIO_DIR = path.join(SAVE_DIR, 'Rekaman_Suara');
+if (!fs.existsSync(AUDIO_DIR)) {
+  fs.mkdirSync(AUDIO_DIR, { recursive: true });
+}
 const SENTINEL_DATA_FILE = path.join(SAVE_DIR, 'sentinel_data.json');
 const SENTINEL_TUNNEL_FILE = path.join(SAVE_DIR, 'sentinel_tunnel_url.txt');
 const CLOUDFLARED_EXE = path.join(__dirname, 'cloudflared.exe');
@@ -194,7 +198,8 @@ function getStorageSummary() {
   const env = getFolderStats(ENVIRONMENT_DIR);
   const scr = getFolderStats(SCREENSHOTS_DIR);
   const rec = getFolderStats(RECORDINGS_DIR);
-  const totalBytes = mug.totalBytes + env.totalBytes + scr.totalBytes + rec.totalBytes;
+  const aud = getFolderStats(AUDIO_DIR);
+  const totalBytes = mug.totalBytes + env.totalBytes + scr.totalBytes + rec.totalBytes + aud.totalBytes;
   const maxBytes = STORAGE_CONFIG.MAX_TOTAL_MB * 1024 * 1024;
   return {
     usedMb: Number((totalBytes / (1024 * 1024)).toFixed(1)),
@@ -204,7 +209,8 @@ function getStorageSummary() {
       mugshots: mug.count,
       environment: env.count,
       screenshots: scr.count,
-      recordings: rec.count
+      recordings: rec.count,
+      audio: aud.count
     }
   };
 }
@@ -215,8 +221,9 @@ function autoCleanStorage(options = {}) {
   const environment = getFolderStats(ENVIRONMENT_DIR);
   const screenshots = getFolderStats(SCREENSHOTS_DIR);
   const recordings = getFolderStats(RECORDINGS_DIR);
+  const audio = getFolderStats(AUDIO_DIR);
 
-  const totalUsedBytes = mugshots.totalBytes + environment.totalBytes + screenshots.totalBytes + recordings.totalBytes;
+  const totalUsedBytes = mugshots.totalBytes + environment.totalBytes + screenshots.totalBytes + recordings.totalBytes + audio.totalBytes;
   const maxBytes = STORAGE_CONFIG.MAX_TOTAL_MB * 1024 * 1024;
   const thresholdBytes = maxBytes * STORAGE_CONFIG.CLEANUP_THRESHOLD_RATIO;
   const isNearMax = totalUsedBytes >= thresholdBytes;
@@ -637,6 +644,11 @@ const MIME_TYPES = {
   '.svg': 'image/svg+xml',
   '.mp4': 'video/mp4',
   '.mov': 'video/quicktime',
+  '.webm': 'audio/webm',
+  '.ogg': 'audio/ogg',
+  '.wav': 'audio/wav',
+  '.mp3': 'audio/mpeg',
+  '.m4a': 'audio/mp4',
   '.pdf': 'application/pdf',
   '.txt': 'text/plain; charset=utf-8',
   '.zip': 'application/zip',
@@ -1539,6 +1551,127 @@ const server = http.createServer(async (req, res) => {
     }
   }
 
+  // ── SIMPAN REKAMAN SUARA SEKITAR (5–10 DETIK) ──
+  if (pathname === '/api/sentinel/audio' && req.method === 'POST') {
+    let body = '';
+    req.on('data', chunk => { body += chunk; });
+    req.on('end', () => {
+      try {
+        const payload = JSON.parse(body);
+        if (!payload.audio) {
+          res.writeHead(400, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify({ ok: false, error: 'No audio data' }));
+          return;
+        }
+
+        let base64Data = payload.audio;
+        let ext = '.webm';
+        if (base64Data.startsWith('data:audio/mp4') || base64Data.startsWith('data:audio/m4a')) ext = '.mp4';
+        else if (base64Data.startsWith('data:audio/wav')) ext = '.wav';
+        else if (base64Data.startsWith('data:audio/ogg')) ext = '.ogg';
+
+        if (base64Data.includes(',')) {
+          base64Data = base64Data.split(',')[1];
+        }
+
+        const buffer = Buffer.from(base64Data, 'base64');
+        const filename = `ambient_${Date.now()}${ext}`;
+        const filePath = path.join(AUDIO_DIR, filename);
+        fs.writeFileSync(filePath, buffer);
+
+        const audioUrl = `/api/sentinel/audio/${filename}`;
+        const dur = payload.duration ? ` (${payload.duration}s)` : '';
+        const entry = addIntercept({
+          type: 'audio',
+          label: `🎙️ Rekaman Suara Lingkungan${dur}`,
+          value: audioUrl,
+          lat: payload.lat,
+          lon: payload.lon
+        });
+
+        broadcast({
+          type: 'sentinel_audio',
+          audioUrl,
+          filename,
+          duration: payload.duration || 5,
+          timestamp: Date.now()
+        });
+
+        console.log(`[Sentinel Audio] 🎙️ Rekaman suara sekitar diterima: ${filename} (${buffer.length} bytes)`);
+        sendToHelper(`TEXT [RADAR] 🎙️ REKAMAN SUARA SEKITAR DITERIMA!`);
+
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ ok: true, filename, audioUrl }));
+      } catch (err) {
+        console.error('[Sentinel Audio Error]', err);
+        res.writeHead(500, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ ok: false, error: err.message }));
+      }
+    });
+    return;
+  }
+
+  // Sajikan File Rekaman Suara Sekitar
+  if (pathname.startsWith('/api/sentinel/audio/') && (req.method === 'GET' || req.method === 'HEAD')) {
+    const filename = path.basename(pathname.substring('/api/sentinel/audio/'.length));
+    const filePath = path.join(AUDIO_DIR, filename);
+    if (fs.existsSync(filePath)) {
+      const stat = fs.statSync(filePath);
+      const ext = path.extname(filename).toLowerCase();
+      const cType = MIME_TYPES[ext] || 'audio/webm';
+      res.writeHead(200, {
+        'Content-Type': cType,
+        'Content-Length': stat.size,
+        'Accept-Ranges': 'bytes'
+      });
+      if (req.method === 'HEAD') {
+        res.end();
+      } else {
+        fs.createReadStream(filePath).pipe(res);
+      }
+      return;
+    } else {
+      res.writeHead(404, { 'Content-Type': 'text/plain' });
+      res.end('Audio tidak ditemukan');
+      return;
+    }
+  }
+
+  // ── SENSOR GERAK / HP TERSENGGOL DI RUMAH (BUMP DETECTOR) ──
+  if (pathname === '/api/sentinel/motion' && req.method === 'POST') {
+    let body = '';
+    req.on('data', chunk => { body += chunk; });
+    req.on('end', () => {
+      try {
+        const payload = JSON.parse(body || '{}');
+        const intensity = payload.intensity || 'Normal';
+        const entry = addIntercept({
+          type: 'motion',
+          label: '🎯 HP TERSENGGOL / BERGERAK!',
+          value: `Gerakan terdeteksi (Gaya: ${intensity} m/s²). HP baru saja digoyang atau diangkat!`,
+          lat: payload.lat,
+          lon: payload.lon
+        });
+
+        broadcast({
+          type: 'sentinel_motion',
+          intensity,
+          timestamp: Date.now()
+        });
+
+        console.log(`[Sentinel Radar] 🎯 HP TERSENGGOL! Gerakan terdeteksi: ${intensity} m/s²`);
+        sendToHelper(`TEXT [RADAR] 🎯 HP TERSENGGOL / BERGERAK! (Akselerasi: ${intensity})`);
+
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ ok: true, entry }));
+      } catch (err) {
+        res.writeHead(400, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ ok: false, error: err.message }));
+      }
+    });
+    return;
+  }
+
   // Rekam Data yang Dimasukkan / Disalin Pencuri (Live Intercept)
   if (pathname === '/api/sentinel/intercept' && req.method === 'POST') {
     let body = '';
@@ -1665,13 +1798,38 @@ const server = http.createServer(async (req, res) => {
     return;
   }
 
-  // Picu Bunyi Dering Pencarian / Find-My Chime dari Dasbor Laptop
+  // Picu Bunyi Dering Pencarian / Radar Sonar / Sirine dari Dasbor Laptop
   if (pathname === '/api/sentinel/trigger_chime' && req.method === 'POST') {
-    broadcast({ type: 'play_chime', timestamp: Date.now() });
-    console.log('[Sentinel] 🔔 Sinyal Dering Pencarian Dikirim ke Perangkat Target');
-    sendToHelper('TEXT [SENTINEL] 🔔 DERING PENCARIAN DIPICU!');
-    res.writeHead(200, { 'Content-Type': 'application/json' });
-    res.end(JSON.stringify({ ok: true, message: 'Chime signal broadcasted' }));
+    let body = '';
+    req.on('data', chunk => { body += chunk; });
+    req.on('end', () => {
+      let mode = 'sonar';
+      let duration = 5;
+      try {
+        if (body) {
+          const parsed = JSON.parse(body);
+          if (parsed.mode) mode = parsed.mode;
+          if (parsed.duration) duration = parsed.duration;
+        }
+      } catch (e) {}
+
+      if (mode === 'stop') {
+        broadcast({ type: 'stop_chime', timestamp: Date.now() });
+        console.log('[Sentinel] ⏹️ Sinyal Hentikan Bunyi Dikirim ke Perangkat');
+        sendToHelper('TEXT [SENTINEL] ⏹️ BUNYI DIHENTIKAN');
+      } else if (mode === 'record_audio') {
+        broadcast({ type: 'record_audio', duration, timestamp: Date.now() });
+        console.log('[Sentinel] 🎙️ Perintah Rekam Suara Sekitar Dikirim ke Perangkat');
+        sendToHelper('TEXT [SENTINEL] 🎙️ MEREKAM SUARA SEKITAR (5s)...');
+      } else {
+        broadcast({ type: 'play_chime', mode, timestamp: Date.now() });
+        console.log(`[Sentinel] 🔔 Sinyal Dering/Radar (${mode.toUpperCase()}) Dikirim ke Target`);
+        sendToHelper(`TEXT [SENTINEL] 🔔 RADAR PENCARI: ${mode.toUpperCase()} DIPICU!`);
+      }
+
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ ok: true, mode, message: `Radar command ${mode} broadcasted` }));
+    });
     return;
   }
 

