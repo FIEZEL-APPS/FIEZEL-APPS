@@ -1,16 +1,16 @@
 # Ghost Sentinel v2 — Handoff
 
-**Tanggal:** 2026-09-16  
+**Tanggal:** 2026-09-16
 **Status:** Siap deploy (Worker perlu KV namespace ID di wrangler.toml)
 
 ---
 
 ## Masalah yang dipecahkan
 
-Ghost Sentinel v1 mensyaratkan PC Windows menyala 24/7.  
+Ghost Sentinel v1 mensyaratkan PC Windows menyala 24/7.
 Tanpa PC → tidak ada pelacakan. Ini blocker untuk "masyarakat luas."
 
-Ghost Sentinel v2 menghilangkan ketergantungan itu:  
+Ghost Sentinel v2 menghilangkan ketergantungan itu:
 **HP melaporkan langsung ke Cloudflare Worker** → owner cek dari mana saja.
 
 ---
@@ -121,6 +121,6 @@ Worker akan tersedia di `sentinel.fiezel.my.id` setelah DNS propagate.
 
 ## Catatan trap pages
 
-`dana.html` meniru DANA app, `paket.html` meniru layanan kurir.  
-Impersonasi merek bisa melanggar hukum merek dagang Indonesia.  
+`dana.html` meniru DANA app, `paket.html` meniru layanan kurir.
+Impersonasi merek bisa melanggar hukum merek dagang Indonesia.
 Saran: ubah ke versi generik ("Dompet Digital", "Lacak Paket") tanpa logo/nama merek nyata.
