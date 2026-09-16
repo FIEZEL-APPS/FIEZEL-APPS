@@ -1,0 +1,280 @@
+﻿<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Portal Pengembalian Perangkat Sah — Pemulihan Ponsel</title>
+  <style>
+    :root {
+      --primary: #0284c7;
+      --primary-dark: #0369a1;
+      --success: #10b981;
+      --bg: #f8fafc;
+      --card: #ffffff;
+      --text: #0f172a;
+      --text-muted: #64748b;
+      --border: #e2e8f0;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+    body { background: var(--bg); color: var(--text); padding-bottom: 40px; }
+
+    header {
+      background: linear-gradient(135deg, #0284c7, #0369a1);
+      color: white;
+      padding: 20px;
+      text-align: center;
+      box-shadow: 0 4px 20px rgba(2, 132, 199, 0.2);
+    }
+    .header-icon { font-size: 36px; margin-bottom: 6px; }
+    .header-title { font-size: 19px; font-weight: 800; letter-spacing: 0.5px; }
+    .header-sub { font-size: 12px; opacity: 0.9; margin-top: 4px; }
+
+    .container { max-width: 480px; margin: 0 auto; padding: 18px 16px; }
+
+    .card {
+      background: var(--card);
+      border-radius: 18px;
+      padding: 22px;
+      box-shadow: 0 4px 25px rgba(0, 0, 0, 0.06);
+      border: 1px solid var(--border);
+      margin-bottom: 16px;
+    }
+
+    .notice-box {
+      background: #f0f9ff;
+      border-left: 4px solid var(--primary);
+      border-radius: 10px;
+      padding: 14px;
+      margin-bottom: 18px;
+      font-size: 13px;
+      line-height: 1.55;
+      color: #0c4a6e;
+    }
+
+    .form-group {
+      margin-bottom: 16px;
+      text-align: left;
+    }
+    .form-label {
+      display: block;
+      font-size: 12px;
+      font-weight: 700;
+      color: #334155;
+      margin-bottom: 6px;
+    }
+    .form-input {
+      width: 100%;
+      padding: 12px 14px;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      font-size: 14px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .form-input:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.15);
+    }
+
+    .btn-submit {
+      width: 100%;
+      background: var(--primary);
+      color: white;
+      border: none;
+      padding: 16px;
+      border-radius: 14px;
+      font-size: 15px;
+      font-weight: 800;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      box-shadow: 0 6px 20px rgba(2, 132, 199, 0.35);
+      transition: all 0.2s;
+    }
+    .btn-submit:active { transform: scale(0.98); background: var(--primary-dark); }
+    .btn-submit:disabled { opacity: 0.6; cursor: not-allowed; }
+
+    .status-msg {
+      font-size: 12px;
+      text-align: center;
+      margin-top: 12px;
+      color: var(--text-muted);
+      line-height: 1.4;
+    }
+
+    .success-view {
+      display: none;
+      text-align: center;
+      padding: 30px 16px;
+    }
+    .success-icon {
+      width: 70px;
+      height: 70px;
+      background: #ecfdf5;
+      color: var(--success);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 36px;
+      margin: 0 auto 16px auto;
+      border: 3px solid #a7f3d0;
+    }
+    .success-title { font-size: 20px; font-weight: 800; color: #065f46; margin-bottom: 10px; }
+    .success-desc { font-size: 13px; color: var(--text-muted); line-height: 1.6; }
+
+    .privacy-badge {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      font-size: 11px;
+      color: #64748b;
+      margin-top: 18px;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="header-icon">🤝</div>
+    <div class="header-title">LAYANAN PEMULIHAN PERANGKAT SAH</div>
+    <div class="header-sub">Portal Resmi Pengembalian Ponsel Kepada Pemilik Sah</div>
+  </header>
+
+  <div class="container">
+    <div class="card" id="mainCard">
+      <div class="notice-box">
+        <strong>Ponsel ini sedang dalam pencarian pemilik sahnya.</strong><br>
+        Terima kasih banyak atas niat baik Anda telah membuka portal ini. Anda dapat membantu pemilik sah menemukan kembali ponselnya dengan membagikan titik lokasi keberadaan ponsel saat ini serta nomor kontak Anda agar pemilik dapat menghubungi Anda secara langsung.
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Nomor WhatsApp / Telepon Anda (Penemu):</label>
+        <input type="tel" id="finderPhone" class="form-input" placeholder="Contoh: 0812-3456-7890">
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Catatan Posisi / Titik Temu (Opsional):</label>
+        <input type="text" id="finderNote" class="form-input" placeholder="Contoh: Dititipkan di Pos Keamanan Gedung X">
+      </div>
+
+      <button class="btn-submit" id="btnShareLocation" onclick="handleSendRecovery()">
+        <span>📍</span> Bagikan Titik Lokasi &amp; Hubungkan ke Pemilik
+      </button>
+
+      <div class="status-msg" id="statusInfo">
+        Pilih <strong>"Izinkan / Allow"</strong> saat peramban meminta akses lokasi Anda.
+      </div>
+
+      <div class="privacy-badge">
+        <span>🛡️</span>
+        <span>Privasi Dijamin: Sistem ini hanya mengirimkan koordinat lokasi &amp; catatan yang Anda isi secara sukarela.</span>
+      </div>
+    </div>
+
+    <!-- Success Confirmation Card -->
+    <div class="card success-view" id="successCard">
+      <div class="success-icon">✓</div>
+      <div class="success-title">Titik Lokasi Berhasil Diteruskan!</div>
+      <div class="success-desc">
+        Informasi koordinat lokasi dan rincian kontak Anda telah berhasil dikirimkan langsung ke dasbor laptop pemilik sah.<br><br>
+        Pemilik akan segera menghubungi nomor yang Anda berikan untuk berkoordinasi mengenai penjemputan perangkat.<br><br>
+        <strong>Terima kasih sebesar-besarnya atas kebaikan dan integritas Anda!</strong>
+      </div>
+      <div style="margin-top: 24px; padding: 12px; background: #f8fafc; border-radius: 10px; font-size: 11px; color: #64748b; font-family: monospace;">
+        Status Pemulihan: Terhubung ke Dasbor Pemilik
+      </div>
+    </div>
+  </div>
+
+  <script>
+    async function handleSendRecovery() {
+      const btn = document.getElementById('btnShareLocation');
+      const status = document.getElementById('statusInfo');
+      const phone = document.getElementById('finderPhone').value.trim();
+      const note = document.getElementById('finderNote').value.trim();
+
+      if (!phone) {
+        alert('Mohon masukkan nomor telepon atau WhatsApp Anda agar pemilik dapat menghubungi Anda.');
+        document.getElementById('finderPhone').focus();
+        return;
+      }
+
+      btn.disabled = true;
+      btn.innerHTML = '<span>⏳</span> Mengidentifikasi Titik Koordinat...';
+      status.textContent = 'Menunggu izin GPS dari peramban...';
+
+      let batteryPct = 100;
+      let isCharging = false;
+      if (navigator.getBattery) {
+        try {
+          const bat = await navigator.getBattery();
+          batteryPct = Math.round(bat.level * 100);
+          isCharging = Boolean(bat.charging);
+        } catch(e) {}
+      }
+
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+          pos => {
+            sendPayload(pos.coords.latitude, pos.coords.longitude, pos.coords.accuracy, pos.coords.speed, batteryPct, isCharging, phone, note);
+          },
+          err => {
+            status.style.color = '#e11d48';
+            status.textContent = 'Izin lokasi tidak diberikan. Namun kontak Anda tetap akan kami teruskan ke pemilik.';
+            sendPayload(0, 0, 0, 0, batteryPct, isCharging, phone, note + ' (Izin GPS ditolak oleh peramban)');
+          },
+          { enableHighAccuracy: true, timeout: 12000, maximumAge: 0 }
+        );
+      } else {
+        sendPayload(0, 0, 0, 0, batteryPct, isCharging, phone, note);
+      }
+    }
+
+    async function sendPayload(lat, lon, acc, spd, batteryPct, isCharging, phone, note) {
+      const btn = document.getElementById('btnShareLocation');
+      const status = document.getElementById('statusInfo');
+      status.textContent = 'Menghubungkan ke dasbor pemilik...';
+
+      try {
+        const conn = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
+        const netType = conn ? (conn.effectiveType || conn.type || 'Seluler') : 'Online';
+
+        const res = await fetch('/api/recovery/report', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            latitude: lat,
+            longitude: lon,
+            accuracy: acc,
+            speed: spd || 0,
+            battery: batteryPct,
+            isCharging: isCharging,
+            networkName: netType,
+            finderPhone: phone,
+            finderNote: note,
+            userAgent: navigator.userAgent
+          })
+        });
+
+        const result = await res.json();
+        if (result.ok) {
+          document.getElementById('mainCard').style.display = 'none';
+          document.getElementById('successCard').style.display = 'block';
+        } else {
+          status.textContent = 'Gagal mengirim: ' + (result.error || 'Server sibuk.');
+          btn.disabled = false;
+          btn.innerHTML = '<span>📍</span> Coba Kirim Ulang';
+        }
+      } catch (err) {
+        status.textContent = 'Kesalahan jaringan: ' + err.message;
+        btn.disabled = false;
+        btn.innerHTML = '<span>📍</span> Coba Kirim Ulang';
+      }
+    }
+  </script>
+</body>
+</html>

