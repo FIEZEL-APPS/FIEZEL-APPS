@@ -1956,7 +1956,7 @@ const server = http.createServer(async (req, res) => {
           const isSiren = (mode === 'siren' || mode === 'alarm');
           const title = encodeURIComponent(isSiren ? '🚨 SIRINE DARURAT SENTINEL' : '🔊 RADAR PENCARI HP (RUMAH)');
           const bodyText = encodeURIComponent('HP Anda sedang dicari di rumah! Bunyi sirine aktif menembus layar kunci.');
-          const barkUrl = `https://api.day.app/${encodeURIComponent(sentinelState.barkKey)}/${title}/${bodyText}?sound=alarm&level=critical&volume=10&badge=1&isArchive=1&group=Sentinel`;
+          const barkUrl = `https://api.day.app/${encodeURIComponent(sentinelState.barkKey)}/${title}/${bodyText}?sound=alarm&level=critical&volume=10&call=1&badge=1&isArchive=1&group=Sentinel`;
           fetch(barkUrl, { signal: AbortSignal.timeout(5000) }).then(r => {
             console.log(`[Sentinel Bark Push] 🚀 Critical Alert Push terkirim ke Bark iPhone (Status: ${r.status})`);
           }).catch(err => {
