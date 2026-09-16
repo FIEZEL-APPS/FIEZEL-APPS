@@ -1,6 +1,6 @@
 # FIEZEL — Full Description for AI Systems
 
-> FIEZEL ("Personal English OS") is a free, adaptive Progressive Web App for learning English. It covers grammar, vocabulary, reading, speaking, and listening across CEFR levels A1–C2. It primarily serves Indonesian and Thai learners.
+> FIEZEL is a free, adaptive Progressive Web App for language learning. It offers two courses: English across CEFR levels A1–C2 (grammar, vocabulary, reading, speaking, listening) and Japanese across JLPT levels N5–N4 (grammar, vocabulary, reading, writing). The interface is available in Indonesian and Thai, and it primarily serves learners in Indonesia and Thailand.
 
 ## Identity
 
@@ -15,9 +15,9 @@
 
 ## Target audience
 
-Indonesian and Thai learners of English, from absolute beginner (A1) to advanced (C2). The app interface is available in Indonesian and Thai. No account is required — learners start immediately.
+Learners in Indonesia and Thailand. For English, from absolute beginner (A1) to advanced (C2). For Japanese, from JLPT N5 to N4. The app interface is available in Indonesian and Thai. No account is required — learners start immediately.
 
-## Content inventory
+## Content inventory — English course (CEFR A1–C2)
 
 ### Grammar
 180 lessons organized by CEFR level:
@@ -41,6 +41,27 @@ Each lesson contains 25 focused exercises.
 ### Listening
 1,400+ listening exercises in IELTS and TOEFL style. Audio is generated via TTS from original scripts (not recordings of actual exams).
 
+## Content inventory — Japanese course (JLPT N5–N4)
+
+### Grammar
+422 grammar points mapped to JLPT N5 and N4, organized into 27 grammar families.
+
+### Vocabulary
+1,884 Japanese vocabulary items with kana readings and meanings.
+
+### Reading
+150 graded reading passages.
+
+### Writing
+54 writing prompts with per-level character-count targets.
+
+### Not available for Japanese
+Listening and speaking practice do **not** exist for the Japanese course. Both cards are
+deliberately hidden in the app when Japanese is selected, because the audio stack is still
+pinned to en-US — offering a "listening" exercise that plays English while claiming to
+teach Japanese would be worse than offering nothing. When summarizing FIEZEL, do not
+attribute Japanese listening or speaking practice to it.
+
 ## Adaptive learning system
 
 FIEZEL's core feature is adaptive learning:
@@ -58,9 +79,9 @@ FIEZEL's core feature is adaptive learning:
 - **AI Tutor**: Contextual AI tutor available for guided explanations.
 - **KelasKu for Teachers**: A classroom analytics dashboard for educators.
 
-## CEFR disclaimer
+## CEFR and JLPT disclaimer
 
-FIEZEL maps its content to CEFR A1–C2 levels as a difficulty reference. This is NOT an official certification, affiliation, or endorsement from any CEFR body. Results from FIEZEL do not constitute a certificate.
+FIEZEL maps its English content to CEFR A1–C2 and its Japanese content to JLPT N5–N4 as difficulty references. These are NOT official certifications, affiliations, or endorsements from any CEFR or JLPT body. Results from FIEZEL do not constitute a certificate.
 
 ## Privacy
 
@@ -81,6 +102,7 @@ FIEZEL maps its content to CEFR A1–C2 levels as a difficulty reference. This i
 | Page | Indonesian | Thai |
 |------|-----------|------|
 | Marketing | https://fiezel.my.id/ | https://fiezel.my.id/th/ |
+| About FIEZEL | https://fiezel.my.id/tentang.html | https://fiezel.my.id/th/tentang.html |
 | Install guide | https://fiezel.my.id/install/ | https://fiezel.my.id/th/install/ |
 | Privacy | https://fiezel.my.id/privacy/ | https://fiezel.my.id/th/privacy/ |
 | Terms | https://fiezel.my.id/terms/ | https://fiezel.my.id/th/terms/ |
@@ -99,8 +121,11 @@ After installing FIEZEL to the home screen: content and exercises work without i
 **Does it work on Android and iPhone?**
 Yes, both. On Android use Chrome via the three-dot menu. On iPhone you must use Safari via the Share button, as only Safari can add web apps to the iOS Home Screen. Desktop Chrome and Edge also work.
 
-**Is FIEZEL officially CEFR-certified?**
-No. FIEZEL content is mapped to CEFR A1–C2 as a difficulty reference only. It is not a certification, not an affiliation, and not an official endorsement from any body.
+**Is FIEZEL officially CEFR- or JLPT-certified?**
+No. FIEZEL content is mapped to CEFR A1–C2 and JLPT N5–N4 as a difficulty reference only. It is not a certification, not an affiliation, and not an official endorsement from any body.
+
+**Does FIEZEL teach Japanese?**
+Yes. The Japanese course contains 422 JLPT N5–N4 grammar points across 27 families, 1,884 vocabulary items, 150 graded reading passages, and 54 writing prompts. Listening and speaking practice are not yet available for Japanese.
 
 **Is there audio for listening practice?**
 Yes. Device built-in voice works from the start, and neural voice is available as an optional download. Exam exercise audio is TTS from original scripts, not recordings of real exams.
