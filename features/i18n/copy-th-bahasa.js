@@ -30,6 +30,7 @@
     'bahasa.chip-aktif-ja': 'กำลังเรียนภาษาญี่ปุ่น',
     'bahasa.chip-kembali-en': 'แตะเพื่อกลับไปเรียนภาษาอังกฤษ',
     'bahasa.chip-aria': 'เปลี่ยนภาษาที่กำลังเรียน',
-    'bahasa.berganti': 'ตอนนี้กำลังเรียน{bahasa}'
+    'bahasa.berganti': 'ตอนนี้กำลังเรียน{bahasa}',
+    'bahasa.permukaan-terkunci': 'ยังไม่มีแบบฝึกนี้สำหรับ{bahasa} เพราะเสียงยังเป็นภาษาอังกฤษ เราจึงซ่อนไว้ก่อน'
   });
 })();

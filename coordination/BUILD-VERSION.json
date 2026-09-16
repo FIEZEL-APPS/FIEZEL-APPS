@@ -1,7 +1,7 @@
 {
-  "version": "m025-315",
-  "claimedBy": "branch claude/tender-pascal-krkg8l",
-  "claimedAt": "2026-09-14T20:36:33.136Z",
-  "reason": "fondasi sertifikat CEFR + kerangka Play Store TWA + .htaccess",
+  "version": "m025-317",
+  "claimedBy": "branch claude/happy-albattani-fqfijv",
+  "claimedAt": "2026-09-15T18:17:44.945Z",
+  "reason": "B1: progres tiap bahasa berdiri sendiri di penyimpanan",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }

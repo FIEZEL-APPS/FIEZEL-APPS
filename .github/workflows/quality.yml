@@ -1080,6 +1080,17 @@ jobs:
         # hal dan melakukan hal lain. Gerbang mengikat penjaganya ke ADA-TIDAKNYA berkas di
         # content/ja/, jadi ia BERBALIK menuntut penjaga dicabut begitu banknya dibuat.
         run: node tests/japanese-surface-honesty-test.js
+      - name: 'Penjaga bahasa target duduk di rute, bukan di kartu'
+        # Gerbang japanese-surface-honesty di atas HIJAU sepanjang audit m025-314, dan tetap
+        # ada tiga pintu ke latihan dengar/bicara yang tidak dijaganya: kartu skill hub di
+        # Beranda, chip "Dengar" di Beranda, dan rute go()/renderInner itu sendiri. Chip
+        # "Dengar" bahkan berdiri tepat di bawah chip yang mengantar murid ke Bahasa Jepang.
+        # Sebabnya penjaganya dipasang di DAFTAR KARTU, jadi setiap permukaan baru lahir
+        # tanpa penjaga. Gerbang ini menjaga invarian yang berbeda: rutenya yang menolak,
+        # dan kartu hanya kesopanan di atas penolakan itu. Ia MEMUAT app.js di vm lalu
+        # MEMANGGIL daftar kartunya di kedua bahasa - kartu yang dipindah ke fungsi lain
+        # tetap terbaca, karena yang dibaca keluarannya, bukan pola teksnya.
+        run: node tests/target-lang-surface-guard-test.js
       - name: 'Pembungkus i18n memakai kalimat cadangannya, bukan nama kuncinya'
         # FiezelI18n.t() mengembalikan KUNCINYA saat kalimatnya belum termuat - itu
         # disengaja supaya lubangnya terlihat. Tetapi pembungkus t(kunci, cadangan) di
@@ -1107,6 +1118,16 @@ jobs:
         # Gerbang ini membaca daftar kunci LANGSUNG DARI SUMBER, jadi ia ikut tumbuh saat kunci
         # baru lahir dan tidak bisa basi diam-diam.
         run: node tests/target-language-axis-test.js
+      - name: 'Progres tiap bahasa benar-benar berdiri sendiri'
+        # Gerbang di atas menguji MODUL sumbu bahasa dan hijau 10/10 sejak ia lahir —
+        # sementara app.js tidak pernah memanggilnya untuk membentuk satu pun kunci
+        # penyimpanan. Modul yang benar, diuji dengan benar, dan tidak dipakai: kelas cacat
+        # yang tidak bisa dilihat gerbang yang memeriksa modul. Gerbang ini MENJALANKAN
+        # jalur simpan/muat yang sungguhan di kedua bahasa — menjawab soal di Inggris,
+        # berganti ke Jepang, menjawab lagi, lalu pulang — dan menuntut tiga janji:
+        # progres berdiri sendiri, kembali tidak menghapus apa pun, dan kunci Inggris
+        # tidak bergeser sebita pun.
+        run: node tests/target-lang-progress-isolation-test.js
       - name: 'Wave E4: post-test tertunda / probe retensi (fiezel-post-test)'
         # Modul murni baru features/brain/fiezel-retention-probe.js: penjadwal probe retensi
         # deterministik (offset 3/7/21 hari, jitter seeded per lessonId+userSeed) +
