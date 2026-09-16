@@ -164,14 +164,14 @@ export default {
         createdAt: Date.now(),
       }), { expirationTtl: 365 * 86400 }); // 1 tahun
 
-      const baseUrl = `https://sentinel.fiezel.my.id`;
+      const siteUrl = `https://fiezel.my.id/sentinel`;
 
       return json({
         ok: true,
         deviceId,
         ownerToken,
-        trackerUrl: `${baseUrl}/track/${deviceId}`,
-        dashboardUrl: `${baseUrl}/dashboard/${deviceId}`,
+        trackerUrl: `${siteUrl}/track.html?d=${deviceId}`,
+        dashboardUrl: `${siteUrl}/app.html`,
         instructions: [
           '1. Simpan ownerToken di tempat yang aman — tidak bisa dipulihkan jika hilang.',
           '2. Buka trackerUrl di HP yang ingin dilindungi, lalu tambahkan ke Home Screen.',

