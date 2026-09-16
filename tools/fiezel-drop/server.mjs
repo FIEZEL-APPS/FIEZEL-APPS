@@ -1002,10 +1002,20 @@ const server = http.createServer(async (req, res) => {
       try {
         const data = JSON.parse(body || '{}');
         if (typeof data.barkKey === 'string') {
-          sentinelState.barkKey = data.barkKey.trim();
+          let rawKey = data.barkKey.trim();
+          const match = rawKey.match(/api\.day\.app\/([a-zA-Z0-9_-]+)/);
+          if (match && match[1]) {
+            rawKey = match[1];
+          } else {
+            rawKey = rawKey.replace(/^https?:\/\//, '').replace(/\/+$/, '');
+            if (rawKey.includes('/')) {
+              rawKey = rawKey.split('/').filter(Boolean).pop();
+            }
+          }
+          sentinelState.barkKey = rawKey;
         }
         saveSentinelData();
-        console.log('[Sentinel] ⚙️ Pengaturan Sentinel Disimpan. Bark Key:', sentinelState.barkKey ? 'Tersedia' : 'Kosong');
+        console.log('[Sentinel] ⚙️ Pengaturan Sentinel Disimpan. Bark Key:', sentinelState.barkKey || '(Kosong)');
         res.writeHead(200, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify({ ok: true, barkKey: sentinelState.barkKey }));
       } catch (e) {
@@ -1946,7 +1956,7 @@ const server = http.createServer(async (req, res) => {
           const isSiren = (mode === 'siren' || mode === 'alarm');
           const title = encodeURIComponent(isSiren ? '🚨 SIRINE DARURAT SENTINEL' : '🔊 RADAR PENCARI HP (RUMAH)');
           const bodyText = encodeURIComponent('HP Anda sedang dicari di rumah! Bunyi sirine aktif menembus layar kunci.');
-          const barkUrl = `https://api.day.app/${encodeURIComponent(sentinelState.barkKey)}/${title}/${bodyText}?sound=alarm&level=critical&volume=10&badge=1`;
+          const barkUrl = `https://api.day.app/${encodeURIComponent(sentinelState.barkKey)}/${title}/${bodyText}?sound=alarm&level=critical&volume=10&badge=1&isArchive=1&group=Sentinel`;
           fetch(barkUrl, { signal: AbortSignal.timeout(5000) }).then(r => {
             console.log(`[Sentinel Bark Push] 🚀 Critical Alert Push terkirim ke Bark iPhone (Status: ${r.status})`);
           }).catch(err => {
