@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ghost Sentinel — Anti-Maling & Pelacak HP | FIEZEL</title>
+  <meta name="description" content="Lindungi HP-mu dari pencurian. Lacak lokasi, lihat foto pelaku, dan kirim alarm jarak jauh — gratis, tanpa akun, tanpa aplikasi tambahan.">
+  <meta property="og:title" content="Ghost Sentinel — Pelacak HP Tersembunyi">
+  <meta property="og:description" content="HP hilang? Lacak lokasi, foto pelaku, kirim alarm — dari mana pun, tanpa PC.">
+  <meta property="og:type" content="website">
+  <link rel="canonical" href="https://fiezel.my.id/sentinel/">
+  <style>
+    :root{
+      --bg:#030712;--card:rgba(15,23,42,.8);--border:rgba(255,255,255,.1);
+      --primary:#38bdf8;--accent:#10b981;--danger:#ef4444;
+      --text:#f8fafc;--muted:#94a3b8;
+      --font:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+    }
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{background:var(--bg);color:var(--text);font-family:var(--font);
+      line-height:1.6;overflow-x:hidden}
+
+    /* Nav */
+    nav{
+      position:sticky;top:0;z-index:100;
+      background:rgba(3,7,18,.92);backdrop-filter:blur(16px);
+      border-bottom:1px solid var(--border);
+      padding:12px 20px;display:flex;align-items:center;justify-content:space-between;
+    }
+    .nav-brand{display:flex;align-items:center;gap:8px;font-size:15px;font-weight:800;
+      text-decoration:none;color:var(--text)}
+    .nav-brand span{color:var(--danger)}
+    .nav-icon{width:32px;height:32px;border-radius:8px;
+      background:linear-gradient(135deg,#ef4444,#8b5cf6);
+      display:flex;align-items:center;justify-content:center;font-size:17px}
+    .nav-cta{
+      padding:8px 16px;border-radius:8px;background:var(--primary);
+      color:#000;font-size:13px;font-weight:700;text-decoration:none;
+      transition:opacity .2s;
+    }
+    .nav-cta:hover{opacity:.85}
+
+    /* Hero */
+    .hero{
+      text-align:center;padding:80px 20px 60px;
+      background:radial-gradient(ellipse at 50% 0%, rgba(239,68,68,.15) 0%, transparent 70%);
+    }
+    .hero-badge{
+      display:inline-flex;align-items:center;gap:6px;
+      background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.3);
+      border-radius:20px;padding:5px 14px;font-size:12px;font-weight:700;color:#fca5a5;
+      margin-bottom:20px;
+    }
+    .hero h1{font-size:clamp(32px,6vw,56px);font-weight:900;line-height:1.1;
+      margin-bottom:16px;letter-spacing:-1px}
+    .hero h1 .hl{color:var(--primary)}
+    .hero p{font-size:clamp(14px,2vw,18px);color:var(--muted);max-width:560px;
+      margin:0 auto 32px}
+    .hero-btns{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+    .btn-hero-main{
+      padding:14px 28px;border-radius:12px;background:var(--primary);
+      color:#000;font-size:15px;font-weight:800;text-decoration:none;
+      transition:transform .2s,box-shadow .2s;
+    }
+    .btn-hero-main:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(56,189,248,.3)}
+    .btn-hero-sec{
+      padding:14px 28px;border-radius:12px;
+      background:rgba(255,255,255,.07);border:1px solid var(--border);
+      color:var(--text);font-size:15px;font-weight:700;text-decoration:none;
+      transition:background .2s;
+    }
+    .btn-hero-sec:hover{background:rgba(255,255,255,.12)}
+
+    /* Stats bar */
+    .stats{
+      display:flex;justify-content:center;gap:clamp(24px,5vw,64px);
+      padding:24px 20px;border-top:1px solid var(--border);border-bottom:1px solid var(--border);
+      background:rgba(255,255,255,.02);flex-wrap:wrap;
+    }
+    .stat{text-align:center}
+    .stat-num{font-size:28px;font-weight:900;color:var(--primary)}
+    .stat-lbl{font-size:12px;color:var(--muted);margin-top:2px}
+
+    /* Section */
+    section{padding:64px 20px;max-width:1100px;margin:0 auto}
+    .section-tag{font-size:12px;font-weight:700;color:var(--primary);
+      letter-spacing:.1em;text-transform:uppercase;margin-bottom:10px}
+    .section-title{font-size:clamp(24px,4vw,36px);font-weight:900;margin-bottom:14px}
+    .section-sub{font-size:15px;color:var(--muted);max-width:560px;margin-bottom:40px;line-height:1.7}
+
+    /* Feature grid */
+    .feat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:20px}
+    .feat-card{
+      background:var(--card);border:1px solid var(--border);border-radius:16px;padding:24px;
+      transition:border-color .2s,transform .2s;
+    }
+    .feat-card:hover{border-color:rgba(56,189,248,.4);transform:translateY(-2px)}
+    .feat-icon{font-size:32px;margin-bottom:14px}
+    .feat-title{font-size:16px;font-weight:800;margin-bottom:8px}
+    .feat-desc{font-size:13px;color:var(--muted);line-height:1.6}
+    .feat-tag{
+      display:inline-block;margin-top:10px;padding:3px 10px;border-radius:20px;
+      font-size:11px;font-weight:700;background:rgba(16,185,129,.15);color:#6ee7b7;
+    }
+
+    /* How it works */
+    .steps{display:flex;flex-direction:column;gap:0}
+    .step{
+      display:flex;gap:20px;padding:24px 0;
+      border-bottom:1px solid var(--border);align-items:flex-start;
+    }
+    .step:last-child{border:none}
+    .step-num{
+      flex-shrink:0;width:40px;height:40px;border-radius:12px;
+      background:rgba(56,189,248,.15);border:1px solid rgba(56,189,248,.3);
+      display:flex;align-items:center;justify-content:center;
+      font-size:16px;font-weight:900;color:var(--primary);
+    }
+    .step-content{}
+    .step-title{font-size:16px;font-weight:800;margin-bottom:4px}
+    .step-desc{font-size:13px;color:var(--muted);line-height:1.6}
+
+    /* Comparison */
+    .compare-table{width:100%;border-collapse:collapse;font-size:13px}
+    .compare-table th{
+      padding:12px 16px;text-align:left;font-size:11px;letter-spacing:.08em;
+      text-transform:uppercase;color:var(--muted);border-bottom:1px solid var(--border);
+    }
+    .compare-table td{
+      padding:12px 16px;border-bottom:1px solid rgba(255,255,255,.04);
+    }
+    .compare-table tr:last-child td{border:none}
+    .check{color:var(--accent);font-weight:700}
+    .cross{color:var(--danger)}
+    .highlight-col{background:rgba(56,189,248,.06);font-weight:700}
+
+    /* CTA section */
+    .cta-section{
+      text-align:center;padding:80px 20px;
+      background:radial-gradient(ellipse at 50% 100%, rgba(56,189,248,.1) 0%, transparent 70%);
+    }
+    .cta-section h2{font-size:clamp(24px,4vw,40px);font-weight:900;margin-bottom:12px}
+    .cta-section p{color:var(--muted);font-size:15px;margin-bottom:28px}
+
+    /* FAQ */
+    .faq-item{border-bottom:1px solid var(--border);padding:20px 0}
+    .faq-q{font-size:15px;font-weight:700;cursor:pointer;display:flex;
+      justify-content:space-between;align-items:center;gap:10px}
+    .faq-q::after{content:'＋';font-size:18px;color:var(--muted);flex-shrink:0}
+    .faq-item.open .faq-q::after{content:'－'}
+    .faq-a{font-size:13px;color:var(--muted);line-height:1.7;
+      max-height:0;overflow:hidden;transition:max-height .3s}
+    .faq-item.open .faq-a{max-height:200px;padding-top:10px}
+
+    /* Footer */
+    footer{
+      border-top:1px solid var(--border);padding:24px 20px;text-align:center;
+      font-size:12px;color:var(--muted);
+    }
+    footer a{color:var(--muted);text-decoration:none}
+    footer a:hover{color:var(--text)}
+
+    @media(max-width:640px){
+      .hero{padding:60px 20px 40px}
+      section{padding:40px 20px}
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <a href="https://fiezel.my.id/" class="nav-brand">
+    <div class="nav-icon">🛡️</div>
+    Ghost <span>Sentinel</span>
+  </a>
+  <a href="https://sentinel.fiezel.my.id/" class="nav-cta">Buka Dashboard →</a>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-badge">🔴 LIVE — Gratis Selamanya</div>
+  <h1>HP Hilang?<br>Lacak <span class="hl">Sekarang</span></h1>
+  <p>Pasang sekali di HP-mu. Jika dicuri, kamu bisa melihat lokasi real-time, foto pelaku, dan membunyikan alarm — dari mana pun, tanpa PC menyala, tanpa aplikasi.</p>
+  <div class="hero-btns">
+    <a href="https://sentinel.fiezel.my.id/" class="btn-hero-main">🛡️ Setup Sekarang — Gratis</a>
+    <a href="#how" class="btn-hero-sec">Cara Kerja ↓</a>
+  </div>
+</div>
+
+<!-- STATS -->
+<div class="stats">
+  <div class="stat">
+    <div class="stat-num">0 Rp</div>
+    <div class="stat-lbl">Biaya selamanya</div>
+  </div>
+  <div class="stat">
+    <div class="stat-num">60 dtk</div>
+    <div class="stat-lbl">Interval update lokasi</div>
+  </div>
+  <div class="stat">
+    <div class="stat-num">0 App</div>
+    <div class="stat-lbl">Tidak perlu install apapun</div>
+  </div>
+  <div class="stat">
+    <div class="stat-num">24/7</div>
+    <div class="stat-lbl">Aktif tanpa PC</div>
+  </div>
+</div>
+
+<!-- FEATURES -->
+<section>
+  <div class="section-tag">Fitur</div>
+  <h2 class="section-title">Semua yang Kamu Butuhkan</h2>
+  <p class="section-sub">Ghost Sentinel bekerja senyap di balik tampilan kalkulator. Maling tidak akan tahu bahwa HP sedang melaporkan lokasinya.</p>
+
+  <div class="feat-grid">
+    <div class="feat-card">
+      <div class="feat-icon">📍</div>
+      <div class="feat-title">GPS Real-time</div>
+      <div class="feat-desc">Lokasi akurat dikirim setiap 60 detik dengan koordinat GPS, akurasi meter, dan rute perjalanan di peta.</div>
+      <div class="feat-tag">Otomatis</div>
+    </div>
+    <div class="feat-card">
+      <div class="feat-icon">📸</div>
+      <div class="feat-title">Foto Pelaku Senyap</div>
+      <div class="feat-desc">Kamera depan dan belakang memotret pelaku secara diam-diam, dikirim langsung ke dashboardmu.</div>
+      <div class="feat-tag">Tanpa notifikasi</div>
+    </div>
+    <div class="feat-card">
+      <div class="feat-icon">🔔</div>
+      <div class="feat-title">Alarm Jarak Jauh</div>
+      <div class="feat-desc">Bunyikan alarm keras dari browser mana pun — bahkan saat HP dalam saku pelaku.</div>
+      <div class="feat-tag">Langsung</div>
+    </div>
+    <div class="feat-card">
+      <div class="feat-icon">🔒</div>
+      <div class="feat-title">Pesan Kunci Layar</div>
+      <div class="feat-desc">Tampilkan pesan di layar HP: nama kamu, nomor kontak, dan permintaan dikembalikan.</div>
+      <div class="feat-tag">Persuasif</div>
+    </div>
+    <div class="feat-card">
+      <div class="feat-icon">☁️</div>
+      <div class="feat-title">Tanpa PC Menyala</div>
+      <div class="feat-desc">Data tersimpan di cloud. PC kamu boleh mati — pelacak tetap aktif dan bisa dicek dari HP lain.</div>
+      <div class="feat-tag">Cloud-native</div>
+    </div>
+    <div class="feat-card">
+      <div class="feat-icon">⚡</div>
+      <div class="feat-title">Alert Otomatis</div>
+      <div class="feat-desc">Notifikasi otomatis jika charger dicabut, HP bergerak tiba-tiba, atau baterai kritis.</div>
+      <div class="feat-tag">Pintar</div>
+    </div>
+    <div class="feat-card">
+      <div class="feat-icon">🗺️</div>
+      <div class="feat-title">Rute di Peta</div>
+      <div class="feat-desc">Lihat semua titik lokasi pelaku dalam satu peta interaktif. Zoom ke manapun dengan satu klik.</div>
+      <div class="feat-tag">Interaktif</div>
+    </div>
+    <div class="feat-card">
+      <div class="feat-icon">📦</div>
+      <div class="feat-title">Export Bukti</div>
+      <div class="feat-desc">Download laporan lengkap: koordinat GPS, foto, IP address, dan waktu — siap dibawa ke kantor polisi.</div>
+      <div class="feat-tag">Untuk laporan polisi</div>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section id="how" style="background:rgba(255,255,255,.01);border-radius:20px;padding:48px 40px;max-width:800px">
+  <div class="section-tag">Cara Kerja</div>
+  <h2 class="section-title">Setup 3 Langkah, Selesai</h2>
+  <div class="steps">
+    <div class="step">
+      <div class="step-num">1</div>
+      <div class="step-content">
+        <div class="step-title">Buat Token di Dashboard</div>
+        <div class="step-desc">Buka dashboard, klik "Setup Perangkat Baru", beri nama HP-mu. Sistem otomatis membuat Device ID dan Owner Token unik. <strong>Simpan token ini</strong> — kamu butuhkan untuk login.</div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">2</div>
+      <div class="step-content">
+        <div class="step-title">Pindai QR di HP yang Dilindungi</div>
+        <div class="step-desc">QR code akan muncul setelah setup. Pindai dari HP tersebut, halaman terbuka. Klik "Tambahkan ke Layar Utama" (iOS) atau "Pasang aplikasi" (Android). Selesai — ikon kalkulator muncul di Home Screen.</div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">3</div>
+      <div class="step-content">
+        <div class="step-title">Monitor dari Mana Pun</div>
+        <div class="step-desc">Jika HP hilang, buka dashboard dari browser mana pun, masuk dengan Device ID + Owner Token. Lihat peta lokasi real-time, kirim alarm, atau minta foto pelaku — tanpa perlu PC menyala.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- COMPARISON -->
+<section>
+  <div class="section-tag">Perbandingan</div>
+  <h2 class="section-title">Kenapa Ghost Sentinel?</h2>
+  <div style="overflow-x:auto">
+  <table class="compare-table">
+    <thead>
+      <tr>
+        <th>Fitur</th>
+        <th class="highlight-col">Ghost Sentinel</th>
+        <th>Find My iPhone</th>
+        <th>Google Find My Device</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Gratis selamanya</td>
+        <td class="check highlight-col">✓</td>
+        <td class="check">✓</td>
+        <td class="check">✓</td>
+      </tr>
+      <tr>
+        <td>Tanpa akun Apple/Google</td>
+        <td class="check highlight-col">✓</td>
+        <td class="cross">✗</td>
+        <td class="cross">✗</td>
+      </tr>
+      <tr>
+        <td>Foto pelaku tersembunyi</td>
+        <td class="check highlight-col">✓</td>
+        <td class="cross">✗</td>
+        <td class="cross">✗</td>
+      </tr>
+      <tr>
+        <td>Bekerja tanpa unlock HP</td>
+        <td class="check highlight-col">✓</td>
+        <td class="cross">✗</td>
+        <td class="cross">✗</td>
+      </tr>
+      <tr>
+        <td>Cross-platform (iOS + Android)</td>
+        <td class="check highlight-col">✓</td>
+        <td class="cross">iOS saja</td>
+        <td class="cross">Android saja</td>
+      </tr>
+      <tr>
+        <td>Alarm jarak jauh</td>
+        <td class="check highlight-col">✓</td>
+        <td class="check">✓</td>
+        <td class="check">✓</td>
+      </tr>
+      <tr>
+        <td>Export bukti untuk polisi</td>
+        <td class="check highlight-col">✓</td>
+        <td class="cross">✗</td>
+        <td class="cross">✗</td>
+      </tr>
+      <tr>
+        <td>PC tidak perlu menyala</td>
+        <td class="check highlight-col">✓</td>
+        <td class="check">✓</td>
+        <td class="check">✓</td>
+      </tr>
+    </tbody>
+  </table>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section style="max-width:700px">
+  <div class="section-tag">FAQ</div>
+  <h2 class="section-title">Pertanyaan Umum</h2>
+
+  <div class="faq-item">
+    <div class="faq-q" onclick="toggleFaq(this)">Apakah harus install aplikasi?</div>
+    <div class="faq-a">Tidak. Ghost Sentinel adalah PWA (Progressive Web App). Kamu hanya perlu membuka URL di browser, lalu tambahkan ke Home Screen. Tidak perlu App Store atau Play Store.</div>
+  </div>
+  <div class="faq-item">
+    <div class="faq-q" onclick="toggleFaq(this)">Apakah maling bisa tahu kalau HP dilacak?</div>
+    <div class="faq-a">Sangat sulit. Tampilan kalkulator terlihat persis seperti kalkulator biasa. Transmisi data berjalan di balik layar, tidak ada notifikasi atau indikator yang terlihat.</div>
+  </div>
+  <div class="faq-item">
+    <div class="faq-q" onclick="toggleFaq(this)">Apa yang terjadi jika maling mematikan HP?</div>
+    <div class="faq-a">Data terakhir sebelum HP mati sudah tersimpan di cloud. Saat HP dinyalakan kembali dan terhubung internet, transmisi otomatis dilanjutkan.</div>
+  </div>
+  <div class="faq-item">
+    <div class="faq-q" onclick="toggleFaq(this)">Apakah menguras baterai?</div>
+    <div class="faq-a">Minimal. Tracker hanya aktif saat kalkulator dibuka, atau mengirim beacon kecil setiap 60 detik saat berjalan di background. Konsumsi baterai jauh lebih kecil dari aplikasi chat biasa.</div>
+  </div>
+  <div class="faq-item">
+    <div class="faq-q" onclick="toggleFaq(this)">Data disimpan di mana?</div>
+    <div class="faq-a">Di Cloudflare KV (edge network global). Data disimpan 60 hari dan hanya bisa diakses dengan Owner Token milikmu. Kami tidak menyimpan token — jika hilang, tidak bisa dipulihkan.</div>
+  </div>
+  <div class="faq-item">
+    <div class="faq-q" onclick="toggleFaq(this)">Apakah legal?</div>
+    <div class="faq-a">Ya, untuk perangkat yang kamu miliki. Melacak HP sendiri yang dicuri adalah hak pemilik dan diakui sebagai bukti oleh penegak hukum. Jangan gunakan untuk melacak HP orang lain tanpa izin.</div>
+  </div>
+</section>
+
+<!-- CTA -->
+<div class="cta-section">
+  <h2>Pasang Sekarang,<br>Sebelum Terlambat</h2>
+  <p>Kamu tidak akan menyesal sampai HP-mu benar-benar hilang. Setup hanya butuh 3 menit.</p>
+  <a href="https://sentinel.fiezel.my.id/" class="btn-hero-main">🛡️ Mulai Setup Gratis →</a>
+</div>
+
+<footer>
+  <p>
+    Ghost Sentinel adalah bagian dari <a href="https://fiezel.my.id/">FIEZEL</a> —
+    aplikasi belajar bahasa Inggris gratis. ·
+    <a href="https://fiezel.my.id/privacy/">Privasi</a> ·
+    <a href="https://fiezel.my.id/terms/">Syarat</a>
+  </p>
+  <p style="margin-top:6px;font-size:11px">
+    Data terenkripsi · Hosted di Cloudflare · Tidak dijual ke pihak ketiga
+  </p>
+</footer>
+
+<script>
+function toggleFaq(el) {
+  el.closest('.faq-item').classList.toggle('open');
+}
+</script>
+</body>
+</html>

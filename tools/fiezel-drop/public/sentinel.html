@@ -3,2139 +3,717 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Ghost Sentinel — Anti-Maling Senyap & Pelacak Jarak Jauh</title>
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <title>Ghost Sentinel — Dashboard</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-  <script src="/qrcode.min.js"></script>
   <style>
-    :root {
-      --bg: #030712;
-      --panel: rgba(15, 23, 42, 0.85);
-      --border: rgba(255, 255, 255, 0.1);
-      --primary: #38bdf8;
-      --accent: #10b981;
-      --danger: #ef4444;
-      --danger-glow: rgba(239, 68, 68, 0.4);
-      --text: #f8fafc;
-      --text-muted: #94a3b8;
-      --font: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, sans-serif;
+    :root{
+      --bg:#030712;--panel:rgba(15,23,42,.9);--border:rgba(255,255,255,.1);
+      --primary:#38bdf8;--accent:#10b981;--danger:#ef4444;--warn:#f59e0b;
+      --text:#f8fafc;--muted:#94a3b8;
+      --font:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+    }
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{background:var(--bg);color:var(--text);font-family:var(--font);min-height:100vh}
+    header{
+      background:rgba(15,23,42,.97);border-bottom:1px solid var(--border);
+      padding:12px 20px;display:flex;align-items:center;justify-content:space-between;
+      position:sticky;top:0;z-index:1000;
+    }
+    .brand{display:flex;align-items:center;gap:10px}
+    .brand-icon{
+      width:38px;height:38px;border-radius:10px;
+      background:linear-gradient(135deg,#ef4444,#8b5cf6);
+      display:flex;align-items:center;justify-content:center;font-size:20px;
+      box-shadow:0 0 14px rgba(239,68,68,.4);
+    }
+    .brand-name{font-size:16px;font-weight:800}
+    .brand-name span{color:var(--danger)}
+    .live-badge{
+      display:flex;align-items:center;gap:6px;
+      background:rgba(16,185,129,.15);border:1px solid rgba(16,185,129,.4);
+      border-radius:20px;padding:5px 12px;font-size:12px;font-weight:700;color:#34d399;
+    }
+    .dot-pulse{
+      width:8px;height:8px;border-radius:50%;background:#34d399;
+      animation:pulse 1.5s ease-in-out infinite;
+    }
+    @keyframes pulse{0%,100%{opacity:1;box-shadow:0 0 0 0 rgba(52,211,153,.6)}
+      50%{opacity:.7;box-shadow:0 0 0 6px rgba(52,211,153,0)}}
+    .dot-pulse.offline{background:var(--danger);animation:none}
+
+    /* Layout */
+    .layout{display:grid;grid-template-columns:340px 1fr;min-height:calc(100vh - 62px)}
+    @media(max-width:768px){.layout{grid-template-columns:1fr;grid-template-rows:auto 300px}}
+
+    /* Sidebar */
+    .sidebar{
+      border-right:1px solid var(--border);overflow-y:auto;
+      background:rgba(10,15,28,.6);
+    }
+    .sidebar-section{padding:16px;border-bottom:1px solid var(--border)}
+    .section-title{font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.08em;
+      text-transform:uppercase;margin-bottom:12px}
+
+    /* Auth panel */
+    #authPanel{padding:20px}
+    #authPanel h3{font-size:16px;font-weight:800;margin-bottom:6px}
+    #authPanel p{font-size:13px;color:var(--muted);line-height:1.5;margin-bottom:16px}
+    .input-row{display:flex;flex-direction:column;gap:8px;margin-bottom:12px}
+    .input-row label{font-size:12px;font-weight:600;color:var(--muted)}
+    .input-row input{
+      background:rgba(255,255,255,.07);border:1px solid var(--border);
+      border-radius:8px;padding:10px 12px;color:var(--text);font-size:13px;
+      outline:none;width:100%;font-family:monospace;
+    }
+    .input-row input:focus{border-color:var(--primary)}
+    .btn-primary{
+      width:100%;padding:12px;border-radius:10px;border:none;
+      background:var(--primary);color:#000;font-size:14px;font-weight:700;
+      cursor:pointer;transition:opacity .2s;
+    }
+    .btn-primary:hover{opacity:.85}
+    .btn-sm{
+      padding:6px 12px;border-radius:8px;border:none;font-size:12px;
+      font-weight:600;cursor:pointer;transition:all .2s;
+    }
+    .btn-danger{background:rgba(239,68,68,.15);border:1px solid rgba(239,68,68,.4);color:#fca5a5}
+    .btn-accent{background:rgba(16,185,129,.15);border:1px solid rgba(16,185,129,.4);color:#34d399}
+    .btn-blue{background:rgba(56,189,248,.15);border:1px solid rgba(56,189,248,.4);color:#7dd3fc}
+
+    /* Status cards */
+    .stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+    .stat-card{
+      background:rgba(255,255,255,.04);border:1px solid var(--border);
+      border-radius:12px;padding:12px;
+    }
+    .stat-label{font-size:11px;color:var(--muted);margin-bottom:4px}
+    .stat-val{font-size:18px;font-weight:800;font-family:monospace}
+    .stat-val.green{color:var(--accent)}
+    .stat-val.red{color:var(--danger)}
+    .stat-val.blue{color:var(--primary)}
+    .stat-val.yellow{color:var(--warn)}
+
+    /* Beacon feed */
+    #beaconFeed{max-height:400px;overflow-y:auto}
+    .beacon-item{
+      padding:10px 14px;border-bottom:1px solid rgba(255,255,255,.04);
+      cursor:pointer;transition:background .15s;
+    }
+    .beacon-item:hover{background:rgba(255,255,255,.04)}
+    .beacon-item.alert{border-left:3px solid var(--danger)}
+    .beacon-ts{font-size:11px;color:var(--muted);margin-bottom:3px}
+    .beacon-coord{font-size:12px;font-family:monospace;color:var(--primary)}
+    .beacon-meta{font-size:11px;color:var(--muted);margin-top:2px}
+    .badge{
+      display:inline-flex;align-items:center;gap:4px;
+      font-size:10px;font-weight:700;border-radius:6px;padding:2px 6px;
+      margin-left:4px;
+    }
+    .badge-red{background:rgba(239,68,68,.2);color:#fca5a5}
+    .badge-green{background:rgba(16,185,129,.2);color:#6ee7b7}
+    .badge-blue{background:rgba(56,189,248,.2);color:#7dd3fc}
+
+    /* Map */
+    #map{width:100%;height:calc(100vh - 62px)}
+    @media(max-width:768px){#map{height:300px}}
+
+    /* Command panel */
+    .cmd-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+    .cmd-btn{
+      padding:10px;border-radius:10px;border:none;font-size:13px;font-weight:600;
+      cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:4px;
+      transition:all .2s;
+    }
+    .cmd-btn:active{transform:scale(.95)}
+    .cmd-btn.chime{background:rgba(251,191,36,.15);border:1px solid rgba(251,191,36,.4);color:#fbbf24}
+    .cmd-btn.alarm{background:rgba(239,68,68,.15);border:1px solid rgba(239,68,68,.4);color:#fca5a5}
+    .cmd-btn.photo{background:rgba(56,189,248,.15);border:1px solid rgba(56,189,248,.4);color:#7dd3fc}
+    .cmd-btn.lock{background:rgba(139,92,246,.15);border:1px solid rgba(139,92,246,.4);color:#c4b5fd}
+    .cmd-icon{font-size:22px}
+
+    /* Photo lightbox */
+    #lightbox{
+      display:none;position:fixed;inset:0;background:rgba(0,0,0,.95);
+      z-index:9999;align-items:center;justify-content:center;flex-direction:column;
+      padding:20px;
+    }
+    #lightbox img{max-width:90%;max-height:80vh;border-radius:12px;object-fit:contain}
+    #lightbox .lb-close{
+      position:absolute;top:16px;right:16px;background:rgba(255,255,255,.1);
+      border:none;border-radius:50%;width:40px;height:40px;color:#fff;
+      font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;
+    }
+    #lightbox .lb-info{color:var(--muted);font-size:12px;margin-top:10px;text-align:center}
+
+    /* Setup wizard */
+    #setupWizard{display:none;position:fixed;inset:0;background:rgba(3,7,18,.98);
+      z-index:8888;overflow-y:auto;padding:40px 20px}
+    .wizard-step{max-width:500px;margin:0 auto}
+    .wizard-title{font-size:24px;font-weight:900;margin-bottom:8px}
+    .wizard-sub{color:var(--muted);font-size:14px;margin-bottom:24px;line-height:1.6}
+    .wizard-card{
+      background:rgba(255,255,255,.05);border:1px solid var(--border);
+      border-radius:16px;padding:20px;margin-bottom:16px;
+    }
+    #qrContainer svg{max-width:200px;margin:0 auto;display:block}
+    #trackerUrlBox{
+      background:rgba(255,255,255,.07);border:1px solid var(--border);border-radius:8px;
+      padding:10px 12px;font-family:monospace;font-size:11px;word-break:break-all;
+      color:var(--primary);margin:10px 0;
     }
 
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-
-    body {
-      background: var(--bg);
-      color: var(--text);
-      font-family: var(--font);
-      height: 100vh;
-      display: flex;
-      flex-direction: column;
-      overflow: hidden;
+    /* Toast */
+    #toast{
+      display:none;position:fixed;bottom:24px;left:50%;transform:translateX(-50%);
+      background:rgba(15,23,42,.97);border:1px solid var(--border);
+      border-radius:12px;padding:10px 20px;font-size:13px;font-weight:600;
+      z-index:9998;white-space:nowrap;
     }
 
-    /* Top Bar */
-    header {
-      background: rgba(15, 23, 42, 0.95);
-      border-bottom: 1px solid var(--border);
-      padding: 10px 20px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      z-index: 1000;
-    }
-
-    .brand {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-
-    .radar-icon {
-      width: 36px;
-      height: 36px;
-      border-radius: 10px;
-      background: linear-gradient(135deg, #ef4444, #8b5cf6);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 20px;
-      box-shadow: 0 0 16px var(--danger-glow);
-    }
-
-    .brand-title {
-      font-size: 17px;
-      font-weight: 800;
-      letter-spacing: 0.5px;
-    }
-    .brand-title span { color: var(--danger); }
-
-    .header-actions {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-
-    .btn-header {
-      padding: 8px 14px;
-      border-radius: 8px;
-      font-size: 12px;
-      font-weight: 600;
-      cursor: pointer;
-      border: 1px solid var(--border);
-      background: rgba(255, 255, 255, 0.05);
-      color: var(--text);
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      transition: all 0.2s;
-    }
-
-    .btn-header:hover {
-      background: rgba(255, 255, 255, 0.1);
-    }
-
-    .btn-danger {
-      background: rgba(239, 68, 68, 0.2);
-      border-color: rgba(239, 68, 68, 0.5);
-      color: #fca5a5;
-    }
-
-    /* Layout Main */
-    .main-layout {
-      flex: 1;
-      display: flex;
-      position: relative;
-      overflow: hidden;
-    }
-
-    /* Map Viewport */
-    #map {
-      flex: 1;
-      height: 100%;
-      background: #020617;
-      z-index: 1;
-    }
-
-    /* Sidebar Telemetry */
-    .sidebar {
-      width: 380px;
-      background: var(--panel);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
-      border-left: 1px solid var(--border);
-      display: flex;
-      flex-direction: column;
-      gap: 14px;
-      padding: 16px;
-      overflow-y: auto;
-      z-index: 500;
-    }
-
-    /* Alert Banner */
-    .alert-card {
-      background: rgba(16, 185, 129, 0.12);
-      border: 1px solid rgba(16, 185, 129, 0.35);
-      border-radius: 12px;
-      padding: 12px 14px;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      transition: all 0.3s;
-    }
-
-    .alert-card.danger {
-      background: rgba(239, 68, 68, 0.2);
-      border-color: #ef4444;
-      animation: alertPulse 1.2s infinite alternate;
-    }
-
-    @keyframes alertPulse {
-      from { box-shadow: 0 0 10px rgba(239, 68, 68, 0.2); }
-      to { box-shadow: 0 0 25px rgba(239, 68, 68, 0.6); }
-    }
-
-    .alert-icon { font-size: 24px; flex-shrink: 0; }
-    .alert-title { font-size: 13px; font-weight: 700; color: #34d399; }
-    .alert-card.danger .alert-title { color: #f87171; }
-    .alert-desc { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
-
-    /* Card Panels */
-    .card {
-      background: rgba(255, 255, 255, 0.03);
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      padding: 14px;
-    }
-
-    .card-title {
-      font-size: 12px;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      color: var(--text-muted);
-      margin-bottom: 10px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-
-    /* Location Details */
-    .coord-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 8px;
-      margin-bottom: 10px;
-    }
-
-    .coord-item {
-      background: rgba(0, 0, 0, 0.3);
-      padding: 8px 10px;
-      border-radius: 8px;
-    }
-
-    .coord-lbl { font-size: 10px; color: var(--text-muted); text-transform: uppercase; }
-    .coord-val { font-size: 14px; font-family: monospace; font-weight: 700; color: var(--primary); }
-
-    .address-text {
-      font-size: 12px;
-      line-height: 1.4;
-      color: #e2e8f0;
-      margin-bottom: 12px;
-      min-height: 34px;
-    }
-
-    .btn-maps {
-      width: 100%;
-      padding: 10px;
-      background: linear-gradient(135deg, #0284c7, #0ea5e9);
-      border: none;
-      border-radius: 10px;
-      color: white;
-      font-weight: 700;
-      font-size: 13px;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 6px;
-      text-decoration: none;
-    }
-
-    /* Device Metrics */
-    .metric-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 7px 0;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-      font-size: 13px;
-    }
-    .metric-row:last-child { border-bottom: none; }
-    .metric-lbl { color: var(--text-muted); font-size: 12px; }
-    .metric-val { font-weight: 600; color: var(--text); }
-
-    /* Photo Mugshot Evidence */
-    .mugshot-container {
-      position: relative;
-      width: 100%;
-      height: 180px;
-      background: #000;
-      border-radius: 10px;
-      overflow: hidden;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      border: 1px solid rgba(239, 68, 68, 0.4);
-    }
-
-    .mugshot-img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
-
-    .mugshot-empty {
-      color: var(--text-muted);
-      font-size: 12px;
-      text-align: center;
-      padding: 20px;
-    }
-
-    .mugshot-badge {
-      position: absolute;
-      top: 8px;
-      right: 8px;
-      background: rgba(239, 68, 68, 0.85);
-      color: white;
-      font-size: 10px;
-      font-weight: 700;
-      padding: 3px 8px;
-      border-radius: 6px;
-      text-transform: uppercase;
-    }
-
-    /* Setup Modal */
-    .modal-overlay {
-      display: none;
-      position: fixed;
-      inset: 0;
-      background: rgba(0, 0, 0, 0.85);
-      backdrop-filter: blur(10px);
-      z-index: 10000;
-      align-items: center;
-      justify-content: center;
-      padding: 20px;
-    }
-
-    .modal-card {
-      background: #0f172a;
-      border: 1px solid var(--border);
-      border-radius: 20px;
-      padding: 24px;
-      max-width: 580px;
-      width: 100%;
-      max-height: 90vh;
-      overflow-y: auto;
-      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
-    }
-
-    .modal-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 16px;
-    }
-    .modal-title { font-size: 17px; font-weight: 800; color: var(--primary); }
-
-    .step-box {
-      background: rgba(255, 255, 255, 0.03);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 14px;
-      margin-bottom: 12px;
-    }
-    .step-head { font-size: 13px; font-weight: 700; color: #34d399; margin-bottom: 6px; }
-    .step-body { font-size: 12px; color: var(--text-muted); line-height: 1.5; }
-
-    .url-input-box {
-      display: flex;
-      gap: 6px;
-      margin-top: 8px;
-    }
-    .url-input-box input {
-      flex: 1;
-      background: rgba(0, 0, 0, 0.5);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 6px 10px;
-      color: var(--primary);
-      font-family: monospace;
-      font-size: 12px;
-    }
-    .btn-copy-url {
-      padding: 6px 12px;
-      background: var(--primary);
-      border: none;
-      border-radius: 8px;
-      color: #030712;
-      font-weight: 700;
-      font-size: 11px;
-      cursor: pointer;
-    }
-
-    /* Radar Blinking Dot in Leaflet */
-    .radar-marker {
-      width: 22px;
-      height: 22px;
-      border-radius: 50%;
-      background: #ef4444;
-      border: 3px solid white;
-      box-shadow: 0 0 15px #ef4444;
-      animation: radarPulse 1.5s infinite;
-    }
-
-    @keyframes radarPulse {
-      0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
-      70% { box-shadow: 0 0 0 25px rgba(239, 68, 68, 0); }
-      100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
-    }
-
-    /* Print Stylesheet untuk Laporan Resmi Kepolisian (PDF) */
-    @media print {
-      body * { visibility: hidden !important; }
-      #evidenceModal, #evidenceModal * { visibility: visible !important; }
-      #evidenceModal {
-        position: absolute !important;
-        left: 0 !important;
-        top: 0 !important;
-        width: 100% !important;
-        height: auto !important;
-        background: white !important;
-        padding: 0 !important;
-        margin: 0 !important;
-        display: block !important;
-        backdrop-filter: none !important;
-      }
-      .modal-card {
-        background: white !important;
-        border: none !important;
-        box-shadow: none !important;
-        padding: 0 !important;
-        max-width: 100% !important;
-      }
-      .no-print { display: none !important; }
-      .evidence-paper {
-        box-shadow: none !important;
-        padding: 10mm 15mm !important;
-        border-radius: 0 !important;
-        width: 100% !important;
-      }
-    }
+    /* Scrollbar */
+    ::-webkit-scrollbar{width:4px}
+    ::-webkit-scrollbar-track{background:transparent}
+    ::-webkit-scrollbar-thumb{background:rgba(255,255,255,.15);border-radius:2px}
   </style>
 </head>
 <body>
 
-  <!-- Top Bar -->
-  <header>
-    <div class="brand">
-      <div class="radar-icon">📡</div>
-      <div>
-        <div class="brand-title">GHOST <span>SENTINEL</span></div>
-        <div style="font-size: 10px; color: var(--text-muted); letter-spacing: 0.5px;">STEALTH ANTI-THEFT &amp; GLOBAL GPS TELEMETRY</div>
+<header>
+  <div class="brand">
+    <div class="brand-icon">🛡️</div>
+    <div>
+      <div class="brand-name">Ghost <span>Sentinel</span></div>
+      <div style="font-size:10px;color:var(--muted)" id="deviceNameHeader">Memuat…</div>
+    </div>
+  </div>
+  <div class="live-badge">
+    <div class="dot-pulse" id="liveDot"></div>
+    <span id="liveLabel">Menghubungkan…</span>
+  </div>
+</header>
+
+<div class="layout">
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+
+    <!-- Auth panel (sebelum login) -->
+    <div id="authPanel">
+      <h3>🔐 Masuk ke Dashboard</h3>
+      <p>Masukkan Device ID dan Owner Token yang kamu simpan saat setup.</p>
+      <div class="input-row">
+        <label>Device ID</label>
+        <input id="inpDeviceId" placeholder="XXXX-XXXX-XXXX" maxlength="14" autocomplete="off"/>
       </div>
+      <div class="input-row">
+        <label>Owner Token</label>
+        <input id="inpToken" type="password" placeholder="Token 64-karakter" autocomplete="off"/>
+      </div>
+      <button class="btn-primary" onclick="doAuth()">Masuk &rarr;</button>
+      <div style="margin-top:14px;text-align:center">
+        <button class="btn-sm btn-accent" onclick="showSetupWizard()">
+          ✨ Setup Perangkat Baru
+        </button>
+      </div>
+      <div id="authError" style="color:#fca5a5;font-size:12px;margin-top:10px;display:none"></div>
     </div>
 
-    <div class="header-actions">
-      <div id="tunnelStatusBadge" style="font-size: 11px; padding: 6px 12px; border-radius: 8px; background: rgba(56, 189, 248, 0.1); border: 1px solid rgba(56, 189, 248, 0.3); color: #38bdf8; font-weight: 700; display: flex; align-items: center; gap: 6px;">
-        <span style="display:inline-block; width:8px; height:8px; border-radius:50%; background:#38bdf8; animation: pulse 1s infinite alternate;"></span>
-        <span>Menghubungkan Tunnel...</span>
-      </div>
-      <div id="storageWidget" style="font-size: 11px; padding: 5px 10px; border-radius: 8px; background: rgba(255,255,255,0.06); border: 1px solid var(--border); display: flex; align-items: center; gap: 8px;">
-        <span>💾</span>
-        <div>
-          <div style="display: flex; gap: 6px; font-weight: 700; align-items: center;">
-            <span id="storageUsageText" style="color:#f8fafc;">-- / 500 MB</span>
-            <span id="storagePercentText" style="color: #10b981; font-size: 10px;">(0%)</span>
-          </div>
-          <div style="width: 110px; background: rgba(255,255,255,0.1); height: 4px; border-radius: 2px; margin-top: 3px; overflow: hidden;">
-            <div id="storageProgressBar" style="width: 0%; height: 100%; background: #10b981; transition: width 0.3s;"></div>
-          </div>
-        </div>
-        <button id="btnCleanStorage" onclick="triggerStorageCleanup()" title="Pembersihan otomatis aktif. Klik untuk bersihkan data lama sekarang." style="background: rgba(56, 189, 248, 0.15); border: 1px solid rgba(56, 189, 248, 0.4); color: #38bdf8; border-radius: 5px; padding: 3px 6px; font-size: 10px; cursor: pointer; font-weight: 600;">
-          🧹 Bersihkan
-        </button>
-        <button id="btnBackupDesktop" onclick="triggerBackupDesktop()" title="Simpan seluruh foto bukti, video layar, dan log koordinat ke Desktop laptop sebagai file ZIP." style="background: rgba(16, 185, 129, 0.2); border: 1px solid rgba(16, 185, 129, 0.5); color: #6ee7b7; border-radius: 5px; padding: 3px 8px; font-size: 10px; cursor: pointer; font-weight: 700;">
-          💾 Backup Desktop
-        </button>
-      </div>
-      <button class="btn-header" style="background: rgba(14, 165, 233, 0.2); border-color: #0ea5e9; color: #7dd3fc; font-weight: 700;" onclick="openEvidenceModal()">
-        📄 Ekspor Bukti Resmi (PDF)
-      </button>
-      <button class="btn-header" style="background: rgba(225, 29, 72, 0.2); border-color: #f43f5e; color: #fda4af; font-weight: 700;" onclick="openTrapModal()">
-        🎯 Kirim Link Jebakan
-      </button>
-      <button class="btn-header" style="background: rgba(16, 185, 129, 0.2); border-color: #10b981; color: #6ee7b7; font-weight: 700;" onclick="openSetupModal()">
-        📲 Pasang di iPhone (Anti-Hapus)
-      </button>
-      <button class="btn-header" style="background: rgba(245, 158, 11, 0.2); border-color: #f59e0b; color: #fde68a; font-weight: 700;" onclick="triggerRemoteChime()" title="Bunyikan suara dering alarm pencarian keras di browser target HP">
-        🔔 Bunyikan Dering Pencarian
-      </button>
-      <button class="btn-header btn-danger" onclick="triggerAlarmSound()">
-        🔊 Tes Alarm Sirene
-      </button>
-      <button class="btn-header" onclick="location.href='/'">
-        📱 FiezelDrop
-      </button>
-    </div>
-  </header>
+    <!-- Dashboard (setelah login) -->
+    <div id="dashPanel" style="display:none">
 
-  <!-- Main Viewport -->
-  <div class="main-layout">
-    <!-- Leaflet Map -->
-    <div id="map"></div>
-
-    <!-- Right Sidebar Telemetry -->
-    <div class="sidebar">
-      <!-- Alert Banner -->
-      <div class="alert-card" id="alertBanner">
-        <div class="alert-icon" id="alertIcon">🛡️</div>
-        <div>
-          <div class="alert-title" id="alertTitle">SISTEM SENYAP AKTIF</div>
-          <div class="alert-desc" id="alertDesc">Menunggu sinyal beacon terkini dari iPhone...</div>
-        </div>
-      </div>
-
-      <!-- Location Card -->
-      <div class="card">
-        <div class="card-title">
-          <span>📍 Koordinat GPS Terkini</span>
-          <span style="font-size: 10px; color: var(--primary);" id="gpsAccuracy">± 0 m</span>
-        </div>
-        <div class="coord-grid">
-          <div class="coord-item">
-            <div class="coord-lbl">Latitude</div>
-            <div class="coord-val" id="valLat">-0.000000</div>
+      <!-- Stat cards -->
+      <div class="sidebar-section">
+        <div class="section-title">Status Perangkat</div>
+        <div class="stat-grid">
+          <div class="stat-card">
+            <div class="stat-label">Terakhir Aktif</div>
+            <div class="stat-val blue" id="statLastSeen">—</div>
           </div>
-          <div class="coord-item">
-            <div class="coord-lbl">Longitude</div>
-            <div class="coord-val" id="valLon">0.000000</div>
+          <div class="stat-card">
+            <div class="stat-label">Total Beacon</div>
+            <div class="stat-val green" id="statTotal">0</div>
           </div>
-        </div>
-
-        <div style="font-size: 11px; color: var(--text-muted); margin-bottom: 6px;">
-          <strong>Format Derajat (DMS):</strong> <span id="valDms" style="color: #cbd5e1; font-family: monospace;">--</span>
-        </div>
-
-        <div class="address-text" id="valAddress" style="font-size: 12px; line-height: 1.4; color: #f8fafc; margin-bottom: 8px;">
-          Memuat alamat lokasi terkini...
-        </div>
-
-        <!-- Detail Wilayah Terstruktur -->
-        <div style="background: rgba(0,0,0,0.35); border-radius: 8px; padding: 8px 10px; margin-bottom: 10px; border: 1px solid rgba(255,255,255,0.06); font-size: 11px;">
-          <div style="display: flex; justify-content: space-between; padding: 3px 0;">
-            <span style="color: var(--text-muted);">🏡 Dusun / Jalan:</span>
-            <span id="valHamlet" style="font-weight: 600; color: #f8fafc;">--</span>
+          <div class="stat-card">
+            <div class="stat-label">Baterai</div>
+            <div class="stat-val yellow" id="statBattery">—</div>
           </div>
-          <div style="display: flex; justify-content: space-between; padding: 3px 0;">
-            <span style="color: var(--text-muted);">📍 Desa / Kelurahan:</span>
-            <span id="valVillage" style="font-weight: 600; color: #f8fafc;">--</span>
-          </div>
-          <div style="display: flex; justify-content: space-between; padding: 3px 0;">
-            <span style="color: var(--text-muted);">🏛️ Kecamatan:</span>
-            <span id="valDistrict" style="font-weight: 600; color: #f8fafc;">--</span>
-          </div>
-          <div style="display: flex; justify-content: space-between; padding: 3px 0;">
-            <span style="color: var(--text-muted);">🏢 Kabupaten / Kota:</span>
-            <span id="valRegency" style="font-weight: 600; color: #38bdf8;">--</span>
-          </div>
-          <div style="display: flex; justify-content: space-between; padding: 3px 0;">
-            <span style="color: var(--text-muted);">🗺️ Provinsi:</span>
-            <span id="valProvince" style="font-weight: 600; color: #f8fafc;">--</span>
-          </div>
-        </div>
-
-        <!-- Tombol Navigasi Cepat Multi-Aplikasi -->
-        <div style="display: flex; flex-direction: column; gap: 6px;">
-          <a href="#" target="_blank" class="btn-maps" id="btnGoogleMaps">
-            <span>🗺️</span> Buka Navigasi di Google Maps
-          </a>
-          <div style="display: flex; gap: 6px;">
-            <a href="#" target="_blank" id="btnStreetView" style="flex: 1; padding: 8px; background: rgba(56, 189, 248, 0.15); border: 1px solid rgba(56, 189, 248, 0.4); border-radius: 8px; color: #38bdf8; font-weight: 700; font-size: 11px; text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 4px;">
-              <span>📷</span> Street View 360°
-            </a>
-            <a href="#" target="_blank" id="btnWaze" style="flex: 1; padding: 8px; background: rgba(16, 185, 129, 0.15); border: 1px solid rgba(16, 185, 129, 0.4); border-radius: 8px; color: #34d399; font-weight: 700; font-size: 11px; text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 4px;">
-              <span>🚗</span> Buka di Waze
-            </a>
+          <div class="stat-card">
+            <div class="stat-label">Jaringan</div>
+            <div class="stat-val blue" id="statNetwork">—</div>
           </div>
         </div>
       </div>
 
-      <!-- Device Status Card -->
-      <div class="card">
-        <div class="card-title">
-          <span>📱 Status &amp; Aktivitas Telemetri</span>
-          <span style="font-size: 10px; color: #34d399;" id="valLastSeen">Online</span>
-        </div>
-        <div class="metric-row">
-          <span class="metric-lbl">Status Baterai</span>
-          <span class="metric-val" id="valBattery">--%</span>
-        </div>
-        <div class="metric-row">
-          <span class="metric-lbl">Jaringan / Operator</span>
-          <span class="metric-val" id="valNetwork">--</span>
-        </div>
-        <div class="metric-row">
-          <span class="metric-lbl">Kecepatan &amp; Latensi</span>
-          <span class="metric-val" id="valNetSpeed">--</span>
-        </div>
-        <div class="metric-row">
-          <span class="metric-lbl">Sensor Gerak (Motion)</span>
-          <span class="metric-val" id="valActivity">Diam / Stationary</span>
-        </div>
-        <div class="metric-row">
-          <span class="metric-lbl">Kecepatan Gerak (GPS)</span>
-          <span class="metric-val" id="valSpeed">0 km/h</span>
-        </div>
-        <div class="metric-row">
-          <span class="metric-lbl">IP Publik &amp; Model</span>
-          <span class="metric-val" id="valClientIp">--</span>
-        </div>
-        <div class="metric-row">
-          <span class="metric-lbl">Pemicu Laporan Terakhir</span>
-          <span class="metric-val" id="valTrigger">Manual Ping</span>
-        </div>
-      </div>
-
-      <!-- Dual-Angle Visual Evidence Card (Wajah + Area Lingkungan Depan) -->
-      <div class="card">
-        <div class="card-title">
-          <span>📸 Barang Bukti Visual Dua Arah (Dual-Angle)</span>
-          <span style="font-size: 10px; color: #38bdf8;" id="badgeDualPhoto">Depan + Belakang</span>
-        </div>
-        
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 4px;">
-          <!-- Sudut 1: Kamera Depan (Wajah) -->
-          <div>
-            <div style="font-size: 11px; font-weight: 700; color: #cbd5e1; margin-bottom: 4px; display: flex; align-items: center; gap: 4px;">
-              <span>👤</span> Wajah (Depan)
-            </div>
-            <div class="mugshot-container" id="mugshotBox" style="height: 145px;">
-              <div class="mugshot-empty" style="font-size: 10px;">Belum ada foto wajah</div>
-            </div>
-          </div>
-
-          <!-- Sudut 2: Kamera Belakang (Area di Depan Pencuri) -->
-          <div>
-            <div style="font-size: 11px; font-weight: 700; color: #38bdf8; margin-bottom: 4px; display: flex; align-items: center; gap: 4px;">
-              <span>🔭</span> Area Depan (Belakang)
-            </div>
-            <div class="mugshot-container" id="envPhotoBox" style="height: 145px; border-color: rgba(56, 189, 248, 0.3);">
-              <div class="mugshot-empty" style="font-size: 10px; color: #64748b;">Belum ada foto area/lingkungan</div>
-            </div>
-          </div>
-        </div>
-        <div style="font-size: 10px; color: var(--text-muted); margin-top: 6px; text-align: center;">
-          💡 <em>Klik foto untuk zoom HD atau mengunduh bukti.</em>
-        </div>
-      </div>
-
-      <!-- Live Screen Stream Monitor Card -->
-      <div class="card" id="screenStreamCard">
-        <div class="card-title">
-          <span style="display: flex; align-items: center; gap: 6px;">
-            <span style="width: 8px; height: 8px; border-radius: 50%; background: #94a3b8;" id="screenLiveDot"></span>
-            📱 Layar iPhone Langsung (Live Stream)
-          </span>
-          <span style="font-size: 10px; color: #94a3b8; font-family: monospace;" id="screenFpsBadge">Offline</span>
-        </div>
-
-        <div style="position: relative; width: 100%; height: 260px; background: #000; border-radius: 10px; overflow: hidden; display: flex; align-items: center; justify-content: center; border: 1px solid rgba(239, 68, 68, 0.4);">
-          <img id="liveScreenFeed" style="max-width: 100%; max-height: 100%; object-fit: contain; display: none;" alt="Live Screen Stream" />
-          <div id="screenEmptyPlaceholder" style="color: var(--text-muted); font-size: 12px; text-align: center; padding: 20px; line-height: 1.5;">
-            Siaran layar belum dimulai.<br>
-            <a id="btnOpenScreenGuide" href="/screen.html" target="_blank" style="display: inline-block; margin-top: 10px; padding: 6px 14px; background: #ef4444; color: white; border-radius: 8px; font-weight: 700; text-decoration: none; font-size: 11px; box-shadow: 0 4px 12px rgba(239, 68, 68, 0.4);">
-              🔴 Buka Siaran Layar di iPhone
-            </a>
-          </div>
-          <div id="recordingBadge" style="position: absolute; top: 8px; left: 8px; background: rgba(239, 68, 68, 0.9); color: white; font-size: 11px; font-weight: 800; padding: 4px 9px; border-radius: 6px; display: none; align-items: center; gap: 6px; z-index: 10; box-shadow: 0 0 12px rgba(239, 68, 68, 0.6);">
-            <span style="width: 8px; height: 8px; border-radius: 50%; background: white; animation: pulse 0.8s infinite alternate;"></span>
-            <span>REC <span id="recordingBadgeTimer">00:00</span></span>
-          </div>
-          <div id="screenTimestamp" style="position: absolute; bottom: 6px; left: 8px; font-size: 10px; color: rgba(255,255,255,0.7); font-family: monospace; background: rgba(0,0,0,0.6); padding: 2px 6px; border-radius: 4px; display: none;"></div>
-        </div>
-
-        <div style="display: flex; gap: 6px; margin-top: 8px;">
-          <button onclick="toggleScreenFullscreen()" style="flex: 1; padding: 7px; border-radius: 6px; background: rgba(255,255,255,0.08); border: 1px solid var(--border); color: #cbd5e1; font-size: 11px; cursor: pointer; font-weight: 600;">
-            ⛶ Layar Penuh
+      <!-- Commands -->
+      <div class="sidebar-section">
+        <div class="section-title">Perintah Jarak Jauh</div>
+        <div class="cmd-grid">
+          <button class="cmd-btn chime" onclick="sendCmd('chime')">
+            <span class="cmd-icon">🔔</span>Bunyi
           </button>
-          <button onclick="captureScreenSnapshot()" style="flex: 1; padding: 7px; border-radius: 6px; background: rgba(255,255,255,0.08); border: 1px solid var(--border); color: #cbd5e1; font-size: 11px; cursor: pointer; font-weight: 600;">
-            📸 Jepret Bukti Layar
+          <button class="cmd-btn alarm" onclick="sendCmd('alarm')">
+            <span class="cmd-icon">🚨</span>Alarm
           </button>
-        </div>
-
-        <!-- Tombol Kontrol Rekam Layar -->
-        <div style="margin-top: 8px; display: flex; gap: 6px;">
-          <button id="btnStartRecord" onclick="startScreenRecording()" style="flex: 1; padding: 9px; border-radius: 8px; background: linear-gradient(135deg, #ef4444, #dc2626); border: none; color: white; font-size: 12px; font-weight: 800; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; box-shadow: 0 4px 15px rgba(239, 68, 68, 0.4);">
-            <span style="width: 8px; height: 8px; border-radius: 50%; background: white;"></span>
-            <span>🔴 Mulai Rekam Layar</span>
+          <button class="cmd-btn photo" onclick="sendCmd('photo')">
+            <span class="cmd-icon">📸</span>Foto
           </button>
-          <button id="btnStopRecord" onclick="stopScreenRecording()" style="flex: 1; padding: 9px; border-radius: 8px; background: #ef4444; border: none; color: white; font-size: 12px; font-weight: 800; cursor: pointer; display: none; align-items: center; justify-content: center; gap: 6px; animation: alertPulse 1s infinite;">
-            <span style="width: 8px; height: 8px; background: white; border-radius: 2px;"></span>
-            <span>⏹️ Berhenti &amp; Simpan (<span id="recordTimer">00:00</span>)</span>
-          </button>
-        </div>
-
-        <div id="recordingStatusMsg" style="margin-top: 6px; font-size: 11px; color: #34d399; text-align: center; display: none;"></div>
-
-        <div style="margin-top: 6px; display: flex; justify-content: space-between; align-items: center; font-size: 11px; padding-top: 4px; border-top: 1px dashed rgba(255,255,255,0.08);">
-          <span style="color: var(--text-muted);" id="recordedFilesCount">💾 Video tersimpan di laptop</span>
-          <button onclick="openRecordingsFolder()" style="background: none; border: none; color: #38bdf8; font-size: 11px; font-weight: 700; cursor: pointer; text-decoration: underline;">
-            📁 Buka Folder Rekaman
+          <button class="cmd-btn lock" onclick="promptLock()">
+            <span class="cmd-icon">🔒</span>Pesan
           </button>
         </div>
       </div>
 
-      <!-- Live Intercept Feed / Riwayat Input & Aktivitas Pencuri -->
-      <div class="card">
-        <div class="card-title">
-          <span>⚡ Feed Intersepsi Data &amp; Aktivitas</span>
-          <span style="font-size: 10px; color: #34d399;" id="feedLiveBadge">LIVE</span>
-        </div>
-        <div id="liveActivityFeed" style="display: flex; flex-direction: column; gap: 8px; max-height: 220px; overflow-y: auto; padding-right: 4px;">
-          <div style="font-size: 11px; color: var(--text-muted); text-align: center; padding: 12px 0;">
-            Menunggu data baru atau perubahan dari iPhone...
-          </div>
+      <!-- Beacon feed -->
+      <div class="sidebar-section">
+        <div class="section-title">Riwayat Lokasi</div>
+        <div id="beaconFeed"></div>
+      </div>
+
+      <!-- Actions -->
+      <div class="sidebar-section">
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <button class="btn-sm btn-blue" onclick="loadData()">🔄 Refresh</button>
+          <button class="btn-sm btn-blue" onclick="exportEvidence()">📦 Export Bukti</button>
+          <button class="btn-sm btn-danger" onclick="doLogout()">⇢ Keluar</button>
         </div>
       </div>
 
     </div>
   </div>
 
-  <!-- SETUP MODAL FOR IPHONE -->
-  <div class="modal-overlay" id="setupModal">
-    <div class="modal-card">
-      <div class="modal-header">
-        <div class="modal-title">📲 Hubungkan iPhone Anda (1-Klik &amp; Anti-Hapus)</div>
-        <button onclick="closeSetupModal()" style="background: none; border: none; color: var(--text-muted); font-size: 20px; cursor: pointer;">✕</button>
+  <!-- MAP -->
+  <div id="map"></div>
+</div>
+
+<!-- Lightbox -->
+<div id="lightbox">
+  <button class="lb-close" onclick="closeLightbox()">✕</button>
+  <img id="lbImg" src="" alt="Bukti foto">
+  <div class="lb-info" id="lbInfo"></div>
+</div>
+
+<!-- Setup Wizard -->
+<div id="setupWizard">
+  <div class="wizard-step">
+    <div style="font-size:48px;margin-bottom:16px">🛡️</div>
+    <div class="wizard-title">Setup Ghost Sentinel</div>
+    <div class="wizard-sub">Lindungi HP-mu. Jika hilang atau dicuri, kamu bisa lacak lokasinya, lihat foto pelaku, dan kirim perintah jarak jauh — tanpa perlu PC menyala.</div>
+
+    <div class="wizard-card">
+      <div style="font-size:14px;font-weight:700;margin-bottom:8px">Langkah 1 — Beri nama perangkat</div>
+      <div class="input-row">
+        <input id="wizName" placeholder="Contoh: iPhone Mama, Redmi Adik" style="margin:0"/>
       </div>
-
-      <!-- METODE 1: PROFIL RESMI APPLE (.mobileconfig) — TIDAK BISA DIHAPUS PENCURI -->
-      <div class="step-box" style="border: 2px solid #10b981; background: rgba(16, 185, 129, 0.08);">
-        <div class="step-head" style="font-size: 15px; color: #34d399; display: flex; align-items: center; justify-content: space-between;">
-          <span style="display: flex; align-items: center; gap: 8px;">👑 METODE 1: File Profil Apple (.mobileconfig) — 1-Klik Langsung Terpasang</span>
-          <span style="font-size: 10px; background: #10b981; color: #000; padding: 2px 8px; border-radius: 6px; font-weight: 800;">DIREKOMENDASIKAN</span>
-        </div>
-        <div class="step-body" style="margin-top: 8px; line-height: 1.5;">
-          Cukup unduh <strong>1 file profil Apple</strong> di bawah. Sekali pasang, iPhone langsung terprogram otomatis tanpa perlu atur Pintasan (Shortcuts) yang membingungkan:
-        </div>
-
-        <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; margin: 16px 0; gap: 10px;">
-          <div id="trackQrCode" style="background: white; padding: 12px; border-radius: 12px; display: inline-block;"></div>
-          <div style="font-size: 11px; color: var(--primary); font-family: monospace; word-break: break-all; text-align: center;" id="trackUrlText">
-            Memuat tautan profil...
-          </div>
-          <a id="btnDownloadProfile" href="/sentinel.mobileconfig" download="Kalkulator.mobileconfig" style="display: inline-flex; align-items: center; gap: 8px; background: #10b981; color: #022c22; font-weight: 800; font-size: 13px; padding: 10px 20px; border-radius: 10px; text-decoration: none; margin-top: 4px;">
-            📥 Unduh File Profil (.mobileconfig)
-          </a>
-        </div>
-
-        <div style="background: rgba(0,0,0,0.4); border-radius: 10px; padding: 12px; font-size: 12px; line-height: 1.6; border: 1px solid rgba(255,255,255,0.08);">
-          <strong style="color: #6ee7b7;">Langkah Pasang di iPhone (Sangat Mudah):</strong><br>
-          <strong>1.</strong> Buka <strong>Kamera iPhone</strong> &rarr; Arahkan ke QR Code di atas &rarr; Ketuk tautan &rarr; Ketuk <strong>"Izinkan" (Allow)</strong> saat muncul notifikasi Profil Diunduh.<br>
-          <strong>2.</strong> Buka <strong>Pengaturan (Settings)</strong> iPhone &rarr; Ketuk menu <strong>"Profil Diunduh"</strong> di paling atas &rarr; Ketuk <strong>"Pasang" (Install)</strong>.<br>
-          <div style="margin-top: 8px; padding-top: 8px; border-top: 1px dashed rgba(255,255,255,0.12); color: #cbd5e1;">
-            ✨ <strong>Proteksi Anti-Maling Spesial:</strong><br>
-            • 🔒 <strong>TIDAK BISA DIHAPUS PENCURI</strong>: Ikon "Kalkulator" diproteksi konfigurasi sistem Apple. Tombol silang/hapus ditiadakan dari layar utama!<br>
-            • 🎭 <strong>KAMUFLASE 100% PERSIS KALKULATOR</strong>: Tidak ada tulisan link/URL mencurigakan dan tanpa browser bar Safari.<br>
-            • 📸 <strong>KAMERA DEPAN SENYAP</strong>: Setiap tombol kalkulator ditekan pencuri, kamera depan seketika menjepret wajahnya diam-diam lalu koordinat GPS + foto langsung terkirim ke laptop!
-          </div>
-        </div>
-      </div>
-
-      <!-- METODE 2: KODE HUBUNG / PIN CEPAT -->
-      <div class="step-box" style="border: 1px solid rgba(56, 189, 248, 0.4); background: rgba(56, 189, 248, 0.05); margin-top: 14px;">
-        <div class="step-head" style="color: #38bdf8; font-size: 14px; display: flex; align-items: center; justify-content: space-between;">
-          <span>🔑 METODE 2: Hubungkan Cepat Menggunakan Kode PIN</span>
-        </div>
-        <div class="step-body" style="margin-top: 8px;">
-          Buka tautan langsung di Safari iPhone atau gunakan PIN rahasia Anda:
-          
-          <div style="display: flex; align-items: center; gap: 12px; margin: 12px 0;">
-            <div>
-              <label style="font-size: 11px; color: var(--text-muted); display: block; margin-bottom: 4px;">Kode PIN Perangkat:</label>
-              <div style="display: flex; gap: 6px;">
-                <input type="text" id="inputPinField" value="7890" maxlength="8" style="background: rgba(0,0,0,0.5); border: 1px solid var(--border); border-radius: 8px; padding: 6px 10px; color: #38bdf8; font-family: monospace; font-size: 15px; font-weight: 800; width: 80px; text-align: center;">
-                <button onclick="savePinChange()" style="padding: 6px 12px; background: #0284c7; border: none; border-radius: 8px; color: #fff; font-weight: 700; font-size: 11px; cursor: pointer;">Simpan</button>
-              </div>
-            </div>
-            <div style="flex: 1; font-size: 11px; color: #94a3b8; line-height: 1.5;">
-              💡 <strong>Membuka Menu Pemilik di iPhone:</strong><br>
-              Di layar kalkulator iPhone, ketik PIN lalu tekan tombol <strong>=</strong> (contoh: <code style="color:#38bdf8; font-weight:bold;">7890=</code>) untuk membuka menu pemilik.
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- METODE 3: SIARAN LAYAR LANGSUNG (REPLAYKIT) -->
-      <div class="step-box" style="border: 1px solid rgba(239, 68, 68, 0.4); background: rgba(239, 68, 68, 0.05); margin-top: 14px;">
-        <div class="step-head" style="color: #f87171; font-size: 14px; display: flex; align-items: center; justify-content: space-between;">
-          <span>🔴 METODE 3: Siaran Layar Langsung (Live Screen Stream 5.000 KM)</span>
-          <span style="font-size: 10px; background: #ef4444; color: #fff; padding: 2px 8px; border-radius: 6px; font-weight: 800;">REAL-TIME</span>
-        </div>
-        <div class="step-body" style="margin-top: 8px;">
-          Tonton isi layar iPhone detik demi detik dari laptop saat pencuri membuka aplikasi (Instagram, Pengaturan, WhatsApp, dll.):
-          <div style="margin: 12px 0;">
-            <a id="modalScreenLink" href="/screen.html" target="_blank" style="display: flex; align-items: center; justify-content: center; gap: 8px; padding: 12px; background: #ef4444; color: white; font-weight: 800; border-radius: 10px; text-decoration: none; font-size: 13px; box-shadow: 0 4px 15px rgba(239, 68, 68, 0.4);">
-              <span>🔴 Buka Siaran Layar di iPhone</span>
-            </a>
-          </div>
-          <div style="font-size: 11px; color: #94a3b8; line-height: 1.5;">
-            💡 <strong>Cara Pakai:</strong> Buka tautan di Safari iPhone &rarr; Ketuk <strong>"Mulai Siaran Layar"</strong> &rarr; Ketuk <strong>"Mulai Siaran"</strong> pada konfirmasi sistem Apple. Layar iPhone seketika tersiar langsung ke dashboard laptop Anda.
-          </div>
-        </div>
-      </div>
-
-      <button onclick="closeSetupModal()" style="width: 100%; padding: 14px; background: var(--primary); border: none; border-radius: 12px; font-weight: 800; cursor: pointer; color: #000; margin-top: 14px; font-size: 14px;">
-        Selesai &amp; Tutup
-      </button>
     </div>
-  </div>
 
-  <!-- HONEYPOT TRAP MODAL (LINK JEBAKAN PENCURI) -->
-  <div class="modal-overlay" id="trapModal">
-    <div class="modal-card" style="max-width: 580px;">
-      <div class="modal-header">
-        <div class="modal-title" style="color: #f43f5e; display: flex; align-items: center; gap: 8px;">
-          <span>🎯</span> Tautan Umpan Jebakan (Tanpa Instalasi / Tanpa Pintasan)
-        </div>
-        <button onclick="closeTrapModal()" style="background: none; border: none; color: var(--text-muted); font-size: 20px; cursor: pointer;">✕</button>
-      </div>
+    <button class="btn-primary" onclick="doRegister()">
+      🔑 Buat Device Token
+    </button>
 
-      <div style="font-size: 13px; color: #94a3b8; line-height: 1.5; margin-bottom: 16px;">
-        Cukup <strong>salin dan kirim salah satu pesan di bawah ke nomor HP Anda yang dicuri</strong> (lewat WhatsApp, SMS, atau pesan DM). Begitu pencuri membuka link tersebut di HP Anda, posisi GPS akurat dan foto wajahnya seketika terkirim ke dashboard laptop ini!
-      </div>
+    <!-- Hasil registrasi -->
+    <div id="wizResult" style="display:none;margin-top:20px">
+      <div class="wizard-card">
+        <div style="font-size:14px;font-weight:700;color:#34d399;margin-bottom:12px">
+          ✅ Berhasil! Simpan informasi ini sekarang.
+        </div>
+        <div style="font-size:12px;color:var(--muted);margin-bottom:6px">Owner Token (JANGAN BAGIKAN):</div>
+        <div id="wizToken" style="background:rgba(0,0,0,.4);border:1px solid var(--border);
+          border-radius:8px;padding:10px;font-family:monospace;font-size:11px;word-break:break-all;
+          color:#fbbf24;margin-bottom:12px"></div>
 
-      <!-- JEBAKAN 1: KURIR PAKET -->
-      <div class="step-box" style="border: 2px solid #e11d48; background: rgba(225, 29, 72, 0.08); margin-bottom: 14px;">
-        <div class="step-head" style="font-size: 14px; color: #fb7185; display: flex; align-items: center; justify-content: space-between;">
-          <span style="font-weight: 800; display: flex; align-items: center; gap: 6px;">📦 UMPAN 1: Konfirmasi Paket Kurir J&amp;T (99% Berhasil)</span>
-          <span style="font-size: 10px; background: #e11d48; color: #fff; padding: 2px 8px; border-radius: 6px; font-weight: 800;">PALING AMPUH</span>
-        </div>
-        <div style="font-size: 12px; color: #cbd5e1; margin: 8px 0;">
-          Pencuri penasaran karena merasa ada kiriman paket barang elektronik yang tertahan di kurir.
-        </div>
-        <div style="background: rgba(0,0,0,0.5); border-radius: 8px; padding: 10px; font-size: 12px; border: 1px solid rgba(255,255,255,0.1); margin-bottom: 10px;">
-          <div style="color: #94a3b8; font-size: 11px; margin-bottom: 4px;">Pesan WhatsApp / SMS yang siap dikirim:</div>
-          <div id="textMsgPaket" style="color: #f8fafc; font-style: italic;">Halo kak, kurir J&amp;T mengantar paket Anda (Resi: JP882910) tapi nomor rumah kurang jelas. Mohon klik konfirmasi titik lokasi Anda di peta agar segera diantar: https://sentinel.fiezel.my.id/paket</div>
-        </div>
-        <div style="display: flex; gap: 8px; flex-wrap: wrap;">
-          <button onclick="copyTrapMessage('paket')" style="flex: 1; min-width: 160px; padding: 9px 12px; background: #e11d48; border: none; border-radius: 8px; color: #fff; font-weight: 700; font-size: 12px; cursor: pointer;">
-            📋 Salin Pesan WA/SMS
-          </button>
-          <button onclick="copyTrapLink('paket')" style="padding: 9px 12px; background: rgba(255,255,255,0.1); border: 1px solid var(--border); border-radius: 8px; color: #fff; font-weight: 600; font-size: 12px; cursor: pointer;">
-            🔗 Salin Link Saja
-          </button>
-          <a id="previewPaketLink" href="/paket" target="_blank" style="padding: 9px 12px; background: rgba(255,255,255,0.05); border: 1px solid var(--border); border-radius: 8px; color: #38bdf8; font-weight: 600; font-size: 12px; text-decoration: none;">
-            👁️ Pratinjau
-          </a>
-        </div>
-      </div>
+        <div style="font-size:12px;color:var(--muted);margin-bottom:6px">Device ID:</div>
+        <div id="wizDevId" style="background:rgba(0,0,0,.4);border:1px solid var(--border);
+          border-radius:8px;padding:10px;font-family:monospace;font-size:13px;color:var(--primary);
+          margin-bottom:12px"></div>
 
-      <!-- JEBAKAN 2: DANA KAGET -->
-      <div class="step-box" style="border: 1px solid #0284c7; background: rgba(2, 132, 199, 0.08);">
-        <div class="step-head" style="font-size: 14px; color: #38bdf8; display: flex; align-items: center; justify-content: space-between;">
-          <span style="font-weight: 800; display: flex; align-items: center; gap: 6px;">🎁 UMPAN 2: DANA Kaget Rp 150.000</span>
-          <span style="font-size: 10px; background: #0284c7; color: #fff; padding: 2px 8px; border-radius: 6px; font-weight: 800;">UANG GRATIS</span>
+        <div style="font-size:12px;color:var(--muted);margin-bottom:6px">
+          Langkah 2 — Pindai QR ini dari HP yang ingin dilindungi, lalu tambahkan ke Home Screen:
         </div>
-        <div style="font-size: 12px; color: #cbd5e1; margin: 8px 0;">
-          Pencuri tergiur mengeklik amplop untuk mencairkan saldo uang digital gratis.
-        </div>
-        <div style="background: rgba(0,0,0,0.5); border-radius: 8px; padding: 10px; font-size: 12px; border: 1px solid rgba(255,255,255,0.1); margin-bottom: 10px;">
-          <div style="color: #94a3b8; font-size: 11px; margin-bottom: 4px;">Pesan WhatsApp / SMS yang siap dikirim:</div>
-          <div id="textMsgDana" style="color: #f8fafc; font-style: italic;">Kamu menerima kiriman DANA Kaget Rp 150.000 dari Teman! Ketuk amplop untuk klaim sebelum 30 menit: https://sentinel.fiezel.my.id/dana</div>
-        </div>
-        <div style="display: flex; gap: 8px; flex-wrap: wrap;">
-          <button onclick="copyTrapMessage('dana')" style="flex: 1; min-width: 160px; padding: 9px 12px; background: #0284c7; border: none; border-radius: 8px; color: #fff; font-weight: 700; font-size: 12px; cursor: pointer;">
-            📋 Salin Pesan WA/SMS
-          </button>
-          <button onclick="copyTrapLink('dana')" style="padding: 9px 12px; background: rgba(255,255,255,0.1); border: 1px solid var(--border); border-radius: 8px; color: #fff; font-weight: 600; font-size: 12px; cursor: pointer;">
-            🔗 Salin Link Saja
-          </button>
-          <a id="previewDanaLink" href="/dana" target="_blank" style="padding: 9px 12px; background: rgba(255,255,255,0.05); border: 1px solid var(--border); border-radius: 8px; color: #38bdf8; font-weight: 600; font-size: 12px; text-decoration: none;">
-            👁️ Pratinjau
-          </a>
-        </div>
-      </div>
+        <div id="wizQR" style="text-align:center;padding:16px;background:#fff;border-radius:12px;margin-bottom:12px"></div>
+        <div id="wizTrackerUrl" class="trackerUrlBox" style="background:rgba(255,255,255,.07);border:1px solid var(--border);
+          border-radius:8px;padding:10px 12px;font-family:monospace;font-size:11px;word-break:break-all;
+          color:var(--primary);margin-bottom:12px"></div>
 
-      <!-- OPSI 3: PORTAL PENEMU SAH (TRANSPARAN & RESMI) -->
-      <div class="step-box" style="border: 2px solid #10b981; background: rgba(16, 185, 129, 0.08); margin-top: 14px;">
-        <div class="step-head" style="font-size: 14px; color: #34d399; display: flex; align-items: center; justify-content: space-between;">
-          <span style="font-weight: 800; display: flex; align-items: center; gap: 6px;">🤝 JALUR RESMI: Portal Penemu Sah (Pengembalian Sukarela)</span>
-          <span style="font-size: 10px; background: #10b981; color: #022c22; padding: 2px 8px; border-radius: 6px; font-weight: 800;">ETIS &amp; TRANSPARAN</span>
-        </div>
-        <div style="font-size: 12px; color: #cbd5e1; margin: 8px 0;">
-          Gunakan tautan ini jika Anda mengasumsikan ponsel ditemukan oleh orang beritikad baik (satpam, kasir, warga) dan ingin membantu mengembalikannya.
-        </div>
-        <div style="background: rgba(0,0,0,0.5); border-radius: 8px; padding: 10px; font-size: 12px; border: 1px solid rgba(255,255,255,0.1); margin-bottom: 10px;">
-          <div style="color: #94a3b8; font-size: 11px; margin-bottom: 4px;">Pesan SMS / WhatsApp untuk penemu:</div>
-          <div id="textMsgRecovery" style="color: #f8fafc; font-style: italic;">Halo, jika Anda menemukan ponsel ini, mohon bantu pemilik dengan membuka tautan ini untuk konfirmasi titik penjemputan &amp; kontak Anda: https://sentinel.fiezel.my.id/recovery</div>
-        </div>
-        <div style="display: flex; gap: 8px; flex-wrap: wrap;">
-          <button onclick="copyTrapMessage('recovery')" style="flex: 1; min-width: 160px; padding: 9px 12px; background: #10b981; border: none; border-radius: 8px; color: #022c22; font-weight: 800; font-size: 12px; cursor: pointer;">
-            📋 Salin Pesan WA/SMS
-          </button>
-          <button onclick="copyTrapLink('recovery')" style="padding: 9px 12px; background: rgba(255,255,255,0.1); border: 1px solid var(--border); border-radius: 8px; color: #fff; font-weight: 600; font-size: 12px; cursor: pointer;">
-            🔗 Salin Link Saja
-          </button>
-          <a id="previewRecoveryLink" href="/recovery" target="_blank" style="padding: 9px 12px; background: rgba(255,255,255,0.05); border: 1px solid var(--border); border-radius: 8px; color: #34d399; font-weight: 600; font-size: 12px; text-decoration: none;">
-            👁️ Pratinjau
-          </a>
-        </div>
-      </div>
-
-      <button onclick="closeTrapModal()" style="width: 100%; padding: 14px; background: var(--primary); border: none; border-radius: 12px; font-weight: 800; cursor: pointer; color: #000; margin-top: 14px; font-size: 14px;">
-        Tutup Jendela
-      </button>
-    </div>
-  </div>
-
-  <!-- EVIDENCE REPORT MODAL (SURAT BUKTI KEPOLISIAN & BERITA ACARA RESMI) -->
-  <div class="modal-overlay" id="evidenceModal" style="align-items: flex-start; overflow-y: auto; padding: 20px 10px;">
-    <div class="modal-card" style="max-width: 860px; width: 100%; background: #0f172a; border: 1px solid rgba(56, 189, 248, 0.4); margin: auto;">
-      <div class="modal-header no-print" style="border-bottom: 1px solid var(--border); padding-bottom: 12px; margin-bottom: 16px;">
-        <div class="modal-title" style="color: #38bdf8; display: flex; align-items: center; gap: 8px;">
-          <span>📄</span> Berita Acara Bukti Telemetri Perangkat (Laporan Resmi Kepolisian)
-        </div>
-        <div style="display: flex; gap: 8px;">
-          <button onclick="printEvidenceReport()" style="padding: 8px 16px; background: #10b981; color: #022c22; font-weight: 800; border: none; border-radius: 8px; cursor: pointer; font-size: 13px; display: flex; align-items: center; gap: 6px;">
-            🖨️ Cetak / Simpan PDF
-          </button>
-          <button onclick="closeEvidenceModal()" style="background: none; border: none; color: var(--text-muted); font-size: 20px; cursor: pointer;">✕</button>
-        </div>
-      </div>
-
-      <!-- Printable Report Paper -->
-      <div id="printableEvidenceReport" class="evidence-paper" style="background: white; color: #0f172a; padding: 32px; border-radius: 12px; font-family: 'Times New Roman', Times, serif; line-height: 1.4; box-shadow: 0 4px 20px rgba(0,0,0,0.2);">
-        
-        <!-- Official Kop -->
-        <div style="text-align: center; border-bottom: 3px double #000; padding-bottom: 14px; margin-bottom: 20px;">
-          <div style="font-size: 13px; font-weight: bold; letter-spacing: 1px;">LAMPIRAN ALAT BUKTI ELEKTRONIK &amp; TELEMETRI DIGITAL RESMI</div>
-          <div style="font-size: 18px; font-weight: 900; margin: 4px 0; text-transform: uppercase;">BERITA ACARA REKAM JEJAK &amp; KOORDINAT LOKASI PERANGKAT</div>
-          <div style="font-size: 11px; color: #475569; font-family: sans-serif;">Dihasilkan secara mandiri melalui Sistem Pemulihan Pribadi — Ghost Sentinel Forensics</div>
-          <div style="font-size: 12px; font-weight: bold; margin-top: 6px; font-family: monospace;">Nomor Berkas: <span id="reportRefId">GS-REC-2026-XXXX</span> | Waktu Cetak: <span id="reportPrintDate">--</span></div>
+        <div style="font-size:12px;color:var(--muted);margin-bottom:10px">
+          Langkah 3 — Buka dashboard ini lagi, masukkan Device ID + Owner Token di atas.
         </div>
 
-        <!-- Section 1: Data Identitas Perangkat -->
-        <div style="margin-bottom: 18px;">
-          <div style="font-size: 13px; font-weight: bold; background: #e2e8f0; padding: 5px 8px; border-left: 4px solid #0284c7; margin-bottom: 8px; text-transform: uppercase;">
-            I. Rincian &amp; Status Perangkat Terakhir
-          </div>
-          <table style="width: 100%; border-collapse: collapse; font-size: 12px; font-family: sans-serif;">
-            <tr>
-              <td style="width: 25%; padding: 5px 8px; font-weight: bold; border: 1px solid #cbd5e1; background: #f8fafc;">Jenis Perangkat &amp; Layar</td>
-              <td style="width: 25%; padding: 5px 8px; border: 1px solid #cbd5e1;" id="repDeviceModel">Apple iPhone / Mobile</td>
-              <td style="width: 25%; padding: 5px 8px; font-weight: bold; border: 1px solid #cbd5e1; background: #f8fafc;">Status Daya (Baterai)</td>
-              <td style="width: 25%; padding: 5px 8px; border: 1px solid #cbd5e1;" id="repBattery">--</td>
-            </tr>
-            <tr>
-              <td style="padding: 5px 8px; font-weight: bold; border: 1px solid #cbd5e1; background: #f8fafc;">Alamat IP &amp; Gateway</td>
-              <td style="padding: 5px 8px; border: 1px solid #cbd5e1;" id="repIpAddress">--</td>
-              <td style="padding: 5px 8px; font-weight: bold; border: 1px solid #cbd5e1; background: #f8fafc;">Operator ISP &amp; Nomor AS (ASN)</td>
-              <td style="padding: 5px 8px; border: 1px solid #cbd5e1;" id="repNetwork">--</td>
-            </tr>
-            <tr>
-              <td style="padding: 5px 8px; font-weight: bold; border: 1px solid #cbd5e1; background: #f8fafc;">Status Gerak &amp; Kecepatan</td>
-              <td style="padding: 5px 8px; border: 1px solid #cbd5e1;" id="repActivity">Diam / Berpindah</td>
-              <td style="padding: 5px 8px; font-weight: bold; border: 1px solid #cbd5e1; background: #f8fafc;">Pemicu Terakhir (Trigger)</td>
-              <td style="padding: 5px 8px; border: 1px solid #cbd5e1;" id="repTrigger">--</td>
-            </tr>
-          </table>
-        </div>
-
-        <!-- Section 2: Titik Koordinat GPS Terkini -->
-        <div style="margin-bottom: 18px;">
-          <div style="font-size: 13px; font-weight: bold; background: #e2e8f0; padding: 5px 8px; border-left: 4px solid #0284c7; margin-bottom: 8px; text-transform: uppercase;">
-            II. Koordinat Lokasi Presisi Terakhir (GPS Fix)
-          </div>
-          <div style="background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 6px; padding: 10px; font-family: sans-serif; font-size: 12px;">
-            <div style="display: flex; justify-content: space-between; margin-bottom: 6px;">
-              <span><strong>Latitude:</strong> <span id="repLat" style="font-family: monospace; font-weight: bold;">--</span></span>
-              <span><strong>Longitude:</strong> <span id="repLon" style="font-family: monospace; font-weight: bold;">--</span></span>
-              <span><strong>Radius Akurasi:</strong> <span id="repAccuracy">± 0 m</span></span>
-            </div>
-            <div style="margin-top: 6px;">
-              <strong>Alamat Teridentifikasi:</strong>
-              <div id="repAddress" style="color: #0f172a; margin-top: 2px;">--</div>
-            </div>
-            <div style="margin-top: 6px; font-size: 11px; color: #0284c7;">
-              <strong>Tautan Google Maps:</strong> <span id="repMapsUrl" style="word-break: break-all;">--</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- Section 3: Tabel Rekam Jejak Kronologis (Timeline) -->
-        <div style="margin-bottom: 18px;">
-          <div style="font-size: 13px; font-weight: bold; background: #e2e8f0; padding: 5px 8px; border-left: 4px solid #0284c7; margin-bottom: 8px; text-transform: uppercase;">
-            III. Kronologi Rekam Jejak Pergerakan Terkini (Timeline)
-          </div>
-          <table style="width: 100%; border-collapse: collapse; font-size: 11px; font-family: sans-serif;" id="repHistoryTable">
-            <thead>
-              <tr style="background: #f1f5f9; text-align: left;">
-                <th style="padding: 5px 6px; border: 1px solid #cbd5e1; width: 35px; text-align: center;">No</th>
-                <th style="padding: 5px 6px; border: 1px solid #cbd5e1; width: 140px;">Waktu Terdeteksi</th>
-                <th style="padding: 5px 6px; border: 1px solid #cbd5e1;">Titik Koordinat (Lat, Lon)</th>
-                <th style="padding: 5px 6px; border: 1px solid #cbd5e1; width: 80px;">Akurasi</th>
-                <th style="padding: 5px 6px; border: 1px solid #cbd5e1; width: 140px;">Status / Pemicu</th>
-              </tr>
-            </thead>
-            <tbody id="repHistoricRows">
-              <tr>
-                <td colspan="5" style="text-align: center; padding: 8px; border: 1px solid #cbd5e1; color: #64748b;">Memuat data jejak koordinat...</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-
-        <!-- Section 4: Dokumentasi Visual Dua Arah (Wajah & Lingkungan Depan) -->
-        <div style="margin-bottom: 22px;">
-          <div style="font-size: 13px; font-weight: bold; background: #e2e8f0; padding: 5px 8px; border-left: 4px solid #0284c7; margin-bottom: 8px; text-transform: uppercase;">
-            IV. Dokumentasi Bukti Visual Dua Arah (Wajah Pemegang &amp; Area di Depan Pencuri)
-          </div>
-          <div id="repPhotoContainer" style="display: flex; gap: 14px; flex-wrap: wrap; margin-top: 8px;">
-            <div style="font-size: 11px; color: #64748b; font-family: sans-serif;">Belum ada foto bukti visual pada sesi ini.</div>
-          </div>
-        </div>
-
-        <!-- Section 5: Lembar Tanda Tangan & Pernyataan -->
-        <div style="margin-top: 30px; font-size: 12px; font-family: sans-serif;">
-          <div style="font-style: italic; font-size: 11px; color: #475569; margin-bottom: 24px;">
-            Demikian berita acara dan lampiran bukti telemetri ini dicetak secara sah dan otomatis dari sistem pelacak perangkat pribadi guna melengkapi berkas pelaporan resmi kepada pihak yang berwajib.
-          </div>
-          <div style="display: flex; justify-content: space-between; text-align: center; margin-top: 20px;">
-            <div style="width: 42%;">
-              <div>Pelapor / Pemilik Sah Perangkat,</div>
-              <div style="height: 60px;"></div>
-              <div style="border-bottom: 1px solid #000; font-weight: bold;">( ..................................................... )</div>
-            </div>
-            <div style="width: 42%;">
-              <div>Petugas Penerima Laporan,</div>
-              <div style="height: 60px;"></div>
-              <div style="border-bottom: 1px solid #000; font-weight: bold;">( ..................................................... )</div>
-            </div>
-          </div>
-        </div>
-
-      </div>
-
-      <div class="no-print" style="margin-top: 14px; display: flex; gap: 8px;">
-        <button onclick="printEvidenceReport()" style="flex: 1; padding: 14px; background: #10b981; color: #022c22; font-weight: 800; border: none; border-radius: 10px; cursor: pointer; font-size: 14px;">
-          🖨️ Cetak / Simpan sebagai Dokumen PDF
-        </button>
-        <button onclick="closeEvidenceModal()" style="padding: 14px 20px; background: rgba(255,255,255,0.1); border: 1px solid var(--border); color: #f8fafc; font-weight: 700; border-radius: 10px; cursor: pointer;">
-          Tutup Jendela
+        <button class="btn-primary" onclick="closeWizardAndFill()">
+          ➡️ Lanjut ke Dashboard
         </button>
       </div>
     </div>
+
+    <button class="btn-sm btn-danger" style="width:100%;margin-top:16px" onclick="document.getElementById('setupWizard').style.display='none'">
+      Batal
+    </button>
   </div>
+</div>
 
-  <!-- MODAL ZOOM FOTO BUKTI / MUGSHOT VIEWER -->
-  <div class="modal-overlay" id="photoViewerModal" style="display: none; align-items: center; justify-content: center; z-index: 11000; background: rgba(0,0,0,0.85); backdrop-filter: blur(8px);">
-    <div style="background: #0f172a; border: 1px solid rgba(255,255,255,0.15); border-radius: 16px; width: 92%; max-width: 600px; padding: 18px; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.7); display: flex; flex-direction: column; gap: 14px;">
-      <div style="display: flex; justify-content: space-between; align-items: center;">
-        <div style="display: flex; align-items: center; gap: 8px;">
-          <span style="font-size: 18px;">📸</span>
-          <div>
-            <div id="photoViewerTitle" style="font-weight: 800; font-size: 15px; color: #f8fafc;">Foto Bukti Wajah (HD Zoom)</div>
-            <div id="photoViewerTimestamp" style="font-size: 11px; color: #94a3b8; font-family: monospace;">--</div>
-          </div>
-        </div>
-        <button onclick="closePhotoViewer()" style="background: rgba(255,255,255,0.1); border: none; color: #cbd5e1; width: 32px; height: 32px; border-radius: 50%; font-size: 16px; cursor: pointer; display: flex; align-items: center; justify-content: center;">✕</button>
-      </div>
+<!-- Toast -->
+<div id="toast"></div>
 
-      <div style="background: #000; border-radius: 12px; overflow: hidden; max-height: 70vh; display: flex; align-items: center; justify-content: center; border: 1px solid rgba(255,255,255,0.08);">
-        <img id="photoViewerImg" src="" style="width: 100%; height: auto; max-height: 65vh; object-fit: contain;" alt="Tangkapan Wajah Pemegang" />
-      </div>
+<script>
+'use strict';
 
-      <div id="photoViewerHashBox" style="display: none; font-size: 10px; color: #94a3b8; font-family: monospace; background: rgba(0,0,0,0.5); padding: 8px 12px; border-radius: 8px; border: 1px dashed rgba(255,255,255,0.15); word-break: break-all;">
-        <span style="color: #38bdf8; font-weight: bold;">SHA-256 Integritas Digital:</span><br>
-        <span id="photoViewerHashVal" style="color: #f8fafc;">--</span>
-      </div>
+const CLOUD = 'https://sentinel.fiezel.my.id';
+let SESSION = {
+  deviceId: localStorage.getItem('sz_dash_device') || '',
+  token: localStorage.getItem('sz_dash_token') || '',
+  data: null,
+};
+let MAP, routeLine, markers = [];
 
-      <div style="display: flex; gap: 8px;">
-        <a id="btnDownloadPhoto" href="#" download="foto_bukti_sentinel.jpg" target="_blank" style="flex: 1; padding: 12px; background: #3b82f6; color: white; font-weight: 700; border-radius: 8px; text-decoration: none; text-align: center; font-size: 13px;">
-          ⬇️ Unduh Foto HD
-        </a>
-        <button onclick="closePhotoViewer()" style="padding: 12px 18px; background: rgba(255,255,255,0.08); border: 1px solid var(--border); color: #cbd5e1; font-weight: 600; border-radius: 8px; cursor: pointer; font-size: 13px;">
-          Tutup
-        </button>
-      </div>
-    </div>
-  </div>
+// ═══════════════════════════════════════════════════════════════
+// MAP INIT
+// ═══════════════════════════════════════════════════════════════
+function initMap() {
+  MAP = L.map('map', { zoomControl: true }).setView([-2.5, 118], 5);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '© OSM',
+    maxZoom: 19,
+  }).addTo(MAP);
+}
+initMap();
 
-  <script>
-    // Inisialisasi Peta Leaflet
-    let map = L.map('map', {
-      zoomControl: false
-    }).setView([-6.2088, 106.8456], 13); // Default Jakarta
+// ═══════════════════════════════════════════════════════════════
+// AUTH
+// ═══════════════════════════════════════════════════════════════
+function doAuth() {
+  const id = document.getElementById('inpDeviceId').value.trim().toUpperCase();
+  const token = document.getElementById('inpToken').value.trim();
+  if (!id || !token) { showAuthError('Isi kedua kolom.'); return; }
 
-    L.control.zoom({ position: 'topright' }).addTo(map);
+  SESSION.deviceId = id;
+  SESSION.token = token;
+  localStorage.setItem('sz_dash_device', id);
+  localStorage.setItem('sz_dash_token', token);
+  startDashboard();
+}
 
-    // Layer Satelit & Street
-    const streetLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      maxZoom: 19,
-      attribution: '© OpenStreetMap'
+function showAuthError(msg) {
+  const el = document.getElementById('authError');
+  el.textContent = msg;
+  el.style.display = 'block';
+}
+
+function doLogout() {
+  SESSION = { deviceId: '', token: '', data: null };
+  localStorage.removeItem('sz_dash_device');
+  localStorage.removeItem('sz_dash_token');
+  document.getElementById('dashPanel').style.display = 'none';
+  document.getElementById('authPanel').style.display = 'block';
+  document.getElementById('liveLabel').textContent = 'Offline';
+  document.getElementById('liveDot').classList.add('offline');
+  clearMap();
+}
+
+function startDashboard() {
+  document.getElementById('authPanel').style.display = 'none';
+  document.getElementById('authError').style.display = 'none';
+  document.getElementById('dashPanel').style.display = 'block';
+  loadData();
+  setInterval(loadData, 30_000); // auto-refresh 30 dtk
+}
+
+// ═══════════════════════════════════════════════════════════════
+// LOAD DATA DARI CLOUD
+// ═══════════════════════════════════════════════════════════════
+async function loadData() {
+  if (!SESSION.deviceId || !SESSION.token) return;
+  try {
+    const res = await fetch(`${CLOUD}/api/data/${SESSION.deviceId}`, {
+      headers: { 'X-Owner-Token': SESSION.token },
+      signal: AbortSignal.timeout(8000),
     });
+    if (!res.ok) {
+      if (res.status === 401) { showAuthError('Token salah atau expired.'); doLogout(); return; }
+      setOffline(); return;
+    }
+    const d = await res.json();
+    SESSION.data = d;
+    renderDashboard(d);
+    setOnline();
+  } catch (e) {
+    setOffline();
+  }
+}
 
-    const satelliteLayer = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
-      maxZoom: 19,
-      attribution: '© Esri Satellite'
+function setOnline() {
+  document.getElementById('liveLabel').textContent = 'Live';
+  document.getElementById('liveDot').classList.remove('offline');
+}
+function setOffline() {
+  document.getElementById('liveLabel').textContent = 'Offline';
+  document.getElementById('liveDot').classList.add('offline');
+}
+
+// ═══════════════════════════════════════════════════════════════
+// RENDER DASHBOARD
+// ═══════════════════════════════════════════════════════════════
+function renderDashboard(d) {
+  document.getElementById('deviceNameHeader').textContent = d.device.name || d.device.deviceId;
+  document.getElementById('statTotal').textContent = d.totalBeacons;
+
+  if (d.lastSeen) {
+    document.getElementById('statLastSeen').textContent = relTime(d.lastSeen);
+  }
+
+  const latest = d.beacons[0];
+  if (latest) {
+    const bat = latest.battery;
+    document.getElementById('statBattery').textContent = bat != null ? `${bat}%${latest.charging ? ' ⚡' : ''}` : '—';
+    document.getElementById('statNetwork').textContent = latest.network || '—';
+  }
+
+  renderBeaconFeed(d.beacons);
+  renderMap(d.beacons);
+}
+
+function renderBeaconFeed(beacons) {
+  const feed = document.getElementById('beaconFeed');
+  feed.innerHTML = '';
+  beacons.slice(0, 50).forEach((b, i) => {
+    const el = document.createElement('div');
+    el.className = 'beacon-item' + (b.alert ? ' alert' : '');
+    el.onclick = () => focusBeacon(b, i);
+
+    const hasPhoto = b.selfie || b.environment;
+    const coord = b.lat ? `${b.lat.toFixed(5)}, ${b.lon.toFixed(5)}` : '(lokasi tidak ada)';
+
+    el.innerHTML = `
+      <div class="beacon-ts">${fmtTs(b.ts)}${b.alert ? '<span class="badge badge-red">⚠️ Alert</span>' : ''}</div>
+      <div class="beacon-coord">${coord}</div>
+      <div class="beacon-meta">
+        ${b.accuracy ? `±${b.accuracy}m · ` : ''}
+        ${b.battery != null ? `🔋${b.battery}% · ` : ''}
+        ${b.network ? b.network + ' · ' : ''}
+        ${b.ip ? b.ip : ''}
+        ${hasPhoto ? '<span class="badge badge-blue">📸</span>' : ''}
+      </div>
+    `;
+    feed.appendChild(el);
+  });
+}
+
+function renderMap(beacons) {
+  clearMap();
+  const pts = beacons.filter(b => b.lat).map(b => [b.lat, b.lon]);
+  if (!pts.length) return;
+
+  // Rute
+  routeLine = L.polyline(pts, { color: '#38bdf8', weight: 2, opacity: 0.7 }).addTo(MAP);
+
+  // Markers
+  beacons.filter(b => b.lat).slice(0, 50).forEach((b, i) => {
+    const isLatest = i === 0;
+    const color = b.alert ? '#ef4444' : isLatest ? '#10b981' : '#38bdf8';
+    const icon = L.divIcon({
+      html: `<div style="width:12px;height:12px;border-radius:50%;background:${color};
+             border:2px solid #fff;box-shadow:0 0 6px ${color}"></div>`,
+      className: '', iconAnchor: [6, 6],
     });
+    const m = L.marker([b.lat, b.lon], { icon }).addTo(MAP);
+    m.bindPopup(buildPopup(b));
+    markers.push(m);
+  });
 
-    satelliteLayer.addTo(map); // Default satelit
+  MAP.fitBounds(routeLine.getBounds(), { padding: [30, 30] });
 
-    L.control.layers({
-      "🛰️ Tampilan Satelit": satelliteLayer,
-      "🗺️ Peta Jalan (Street)": streetLayer
-    }, null, { position: 'topright' }).addTo(map);
+  // Photo markers
+  beacons.filter(b => b.lat && (b.selfie || b.environment)).slice(0, 20).forEach(b => {
+    const photo = b.selfie || b.environment;
+    const thumbIcon = L.divIcon({
+      html: `<img src="${photo}" style="width:36px;height:36px;border-radius:6px;
+             object-fit:cover;border:2px solid #ef4444;cursor:pointer">`,
+      className: '', iconAnchor: [18, 18],
+    });
+    const m = L.marker([b.lat, b.lon], { icon: thumbIcon, zIndexOffset: 1000 }).addTo(MAP);
+    m.on('click', () => openLightbox(photo, b));
+    markers.push(m);
+  });
+}
 
-    // Marker & Radar Circle
-    let radarMarker = null;
-    let accuracyCircle = null;
-    let routePolyline = null;
-    let breadcrumbCoords = [];
+function clearMap() {
+  if (routeLine) { MAP.removeLayer(routeLine); routeLine = null; }
+  markers.forEach(m => MAP.removeLayer(m));
+  markers = [];
+}
 
-    function updateMapPosition(lat, lon, accuracy) {
-      const latlng = [lat, lon];
-      breadcrumbCoords.push(latlng);
+function buildPopup(b) {
+  const coord = b.lat ? `${b.lat.toFixed(5)}, ${b.lon.toFixed(5)}` : '—';
+  const mapsUrl = b.lat ? `https://www.google.com/maps?q=${b.lat},${b.lon}` : '#';
+  let html = `<div style="font-size:12px;min-width:200px">
+    <div style="font-weight:700;margin-bottom:6px">${fmtTs(b.ts)}</div>
+    <div style="color:#666;margin-bottom:4px">${coord}</div>
+    ${b.accuracy ? `<div>Akurasi: ±${b.accuracy} m</div>` : ''}
+    ${b.battery != null ? `<div>Baterai: ${b.battery}%${b.charging?' ⚡':''}</div>` : ''}
+    ${b.ip ? `<div>IP: ${b.ip}</div>` : ''}
+    <a href="${mapsUrl}" target="_blank" style="color:#0284c7;font-size:11px">
+      🗺️ Buka di Google Maps
+    </a>`;
+  if (b.selfie) html += `<br><img src="${b.selfie}" style="width:100%;border-radius:6px;margin-top:6px;cursor:pointer" onclick="openLightbox('${b.selfie.substring(0,30)}…',null)">`;
+  html += '</div>';
+  return html;
+}
 
-      if (!radarMarker) {
-        const radarIcon = L.divIcon({
-          className: 'radar-marker',
-          iconSize: [22, 22],
-          iconAnchor: [11, 11]
-        });
-        radarMarker = L.marker(latlng, { icon: radarIcon }).addTo(map);
-      } else {
-        radarMarker.setLatLng(latlng);
-      }
+function focusBeacon(b, i) {
+  if (!b.lat) return;
+  MAP.setView([b.lat, b.lon], 16);
+  if (markers[i]) markers[i].openPopup();
+}
 
-      if (!accuracyCircle) {
-        accuracyCircle = L.circle(latlng, {
-          radius: accuracy || 15,
-          color: '#ef4444',
-          fillColor: '#ef4444',
-          fillOpacity: 0.15,
-          weight: 1
-        }).addTo(map);
-      } else {
-        accuracyCircle.setLatLng(latlng);
-        accuracyCircle.setRadius(accuracy || 15);
-      }
+// ═══════════════════════════════════════════════════════════════
+// COMMANDS
+// ═══════════════════════════════════════════════════════════════
+async function sendCmd(type, extra = {}) {
+  if (!SESSION.deviceId || !SESSION.token) return;
+  try {
+    const res = await fetch(`${CLOUD}/api/command/${SESSION.deviceId}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'X-Owner-Token': SESSION.token },
+      body: JSON.stringify({ type, ...extra }),
+      signal: AbortSignal.timeout(6000),
+    });
+    const d = await res.json();
+    if (d.ok) showToast(`✅ Perintah "${type}" diantrekan — akan dieksekusi saat HP online.`);
+    else showToast(`❌ Gagal: ${d.error}`);
+  } catch { showToast('❌ Gagal menghubungi server.'); }
+}
 
-      // Draw breadcrumb path
-      if (breadcrumbCoords.length > 1) {
-        if (!routePolyline) {
-          routePolyline = L.polyline(breadcrumbCoords, {
-            color: '#38bdf8',
-            weight: 3,
-            dashArray: '6, 8',
-            opacity: 0.8
-          }).addTo(map);
-        } else {
-          routePolyline.setLatLngs(breadcrumbCoords);
-        }
-      }
+function promptLock() {
+  const msg = prompt('Pesan yang ditampilkan di layar HP:\n(Kosongkan untuk pesan default)', 'HP ini dilaporkan hilang. Hubungi pemilik: 08xx-xxxx-xxxx');
+  if (msg === null) return;
+  sendCmd('lock_msg', { message: msg || 'HP ini dilaporkan hilang. Hubungi pemilik.' });
+}
 
-      map.setView(latlng, 16);
+// ═══════════════════════════════════════════════════════════════
+// EXPORT BUKTI
+// ═══════════════════════════════════════════════════════════════
+function exportEvidence() {
+  if (!SESSION.data) return;
+  const d = SESSION.data;
+  let txt = `=== GHOST SENTINEL — LAPORAN BUKTI ===\n`;
+  txt += `Perangkat : ${d.device.name}\n`;
+  txt += `Device ID : ${d.device.deviceId}\n`;
+  txt += `Dibuat    : ${fmtTs(d.device.createdAt)}\n`;
+  txt += `Dibuat    : ${new Date().toLocaleString('id-ID')}\n`;
+  txt += `Total beacon : ${d.totalBeacons}\n\n`;
+  txt += `=== RIWAYAT LOKASI ===\n`;
+  d.beacons.forEach((b, i) => {
+    txt += `\n[${i + 1}] ${fmtTs(b.ts)}\n`;
+    txt += `  Koordinat : ${b.lat ? `${b.lat}, ${b.lon}` : 'tidak ada'}\n`;
+    if (b.accuracy) txt += `  Akurasi   : ±${b.accuracy} m\n`;
+    if (b.battery != null) txt += `  Baterai   : ${b.battery}%\n`;
+    if (b.ip) txt += `  IP        : ${b.ip}\n`;
+    if (b.network) txt += `  Jaringan  : ${b.network}\n`;
+    if (b.alert) txt += `  ⚠️ ALERT: ${b.alertReason || 'tidak diketahui'}\n`;
+    if (b.lat) txt += `  Maps      : https://www.google.com/maps?q=${b.lat},${b.lon}\n`;
+  });
+
+  const blob = new Blob([txt], { type: 'text/plain' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `ghost-sentinel-${d.device.deviceId}-${Date.now()}.txt`;
+  a.click();
+  showToast('📦 Laporan bukti diunduh.');
+}
+
+// ═══════════════════════════════════════════════════════════════
+// SETUP WIZARD
+// ═══════════════════════════════════════════════════════════════
+function showSetupWizard() {
+  document.getElementById('setupWizard').style.display = 'block';
+  document.getElementById('wizResult').style.display = 'none';
+}
+
+async function doRegister() {
+  const name = document.getElementById('wizName').value.trim() || 'Perangkat Saya';
+  try {
+    const res = await fetch(`${CLOUD}/api/register`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name }),
+      signal: AbortSignal.timeout(8000),
+    });
+    const d = await res.json();
+    if (!d.ok) { showToast('❌ Gagal mendaftar. Coba lagi.'); return; }
+
+    document.getElementById('wizToken').textContent = d.ownerToken;
+    document.getElementById('wizDevId').textContent = d.deviceId;
+    document.getElementById('wizTrackerUrl').textContent = d.trackerUrl;
+
+    // QR code
+    const qrDiv = document.getElementById('wizQR');
+    qrDiv.innerHTML = '';
+    if (window.QRCode) {
+      new QRCode(qrDiv, { text: d.trackerUrl, width: 180, height: 180, colorDark: '#000', colorLight: '#fff' });
+    } else {
+      qrDiv.textContent = d.trackerUrl;
     }
 
-    // Modal Handlers
-    function openSetupModal() { document.getElementById('setupModal').style.display = 'flex'; }
-    function closeSetupModal() { document.getElementById('setupModal').style.display = 'none'; }
-
-    function openTrapModal() {
-      updateTrapUrls();
-      document.getElementById('trapModal').style.display = 'flex';
-    }
-    function closeTrapModal() {
-      document.getElementById('trapModal').style.display = 'none';
-    }
-
-    function getBaseTrapOrigin() {
-      return 'https://sentinel.fiezel.my.id';
-    }
-
-    function updateTrapUrls() {
-      const base = getBaseTrapOrigin();
-      const paketUrl = `${base}/paket`;
-      const danaUrl = `${base}/dana`;
-      const recoveryUrl = `${base}/recovery`;
-
-      const msgPaket = document.getElementById('textMsgPaket');
-      if (msgPaket) {
-        msgPaket.textContent = `Halo kak, kurir J&T mengantar paket Anda (Resi: JP882910) tapi nomor rumah kurang jelas. Mohon klik konfirmasi titik lokasi Anda di peta agar segera diantar: ${paketUrl}`;
-      }
-      const msgDana = document.getElementById('textMsgDana');
-      if (msgDana) {
-        msgDana.textContent = `Kamu menerima kiriman DANA Kaget Rp 150.000 dari Teman! Ketuk amplop untuk klaim sebelum 30 menit: ${danaUrl}`;
-      }
-      const msgRecovery = document.getElementById('textMsgRecovery');
-      if (msgRecovery) {
-        msgRecovery.textContent = `Halo, jika Anda menemukan ponsel ini, mohon bantu pemilik dengan membuka tautan ini untuk konfirmasi titik penjemputan & kontak Anda: ${recoveryUrl}`;
-      }
-
-      const prevPaket = document.getElementById('previewPaketLink');
-      if (prevPaket) prevPaket.href = '/paket';
-      const prevDana = document.getElementById('previewDanaLink');
-      if (prevDana) prevDana.href = '/dana';
-      const prevRecovery = document.getElementById('previewRecoveryLink');
-      if (prevRecovery) prevRecovery.href = '/recovery';
-    }
-
-    function copyTrapMessage(type) {
-      updateTrapUrls();
-      let el = document.getElementById('textMsgPaket');
-      if (type === 'dana') el = document.getElementById('textMsgDana');
-      if (type === 'recovery') el = document.getElementById('textMsgRecovery');
-      if (el) {
-        navigator.clipboard.writeText(el.textContent).then(() => {
-          alert(`✅ Pesan ${type.toUpperCase()} disalin!\nKirimkan pesan ini ke nomor ponsel Anda.`);
-        }).catch(() => {
-          prompt('Salin pesan ini:', el.textContent);
-        });
-      }
-    }
-
-    function copyTrapLink(type) {
-      const base = getBaseTrapOrigin();
-      const url = `${base}/${type}`;
-      navigator.clipboard.writeText(url).then(() => {
-        alert(`✅ Link ${type.toUpperCase()} disalin:\n${url}`);
-      }).catch(() => {
-        prompt('Salin link ini:', url);
-      });
-    }
-    function copyBeaconUrl() {
-      const input = document.getElementById('beaconUrlInput');
-      if (input) {
-        navigator.clipboard.writeText(input.value);
-        alert('URL Beacon disalin ke clipboard!');
-      }
-    }
-
-    function copyBeaconGetUrl() {
-      const input = document.getElementById('beaconGetUrlInput');
-      if (input) {
-        navigator.clipboard.writeText(input.value);
-        alert('Link Jebakan disalin! Cukup tempel di tindakan Buka URL di iPhone.');
-      }
-    }
-
-    let currentQrUrl = null;
-    function renderQr(url) {
-      if (!url || url === currentQrUrl) return;
-      currentQrUrl = url;
-      const qrEl = document.getElementById('trackQrCode');
-      const txtEl = document.getElementById('trackUrlText');
-      if (txtEl) txtEl.textContent = url;
-      if (qrEl && typeof QRCode !== 'undefined') {
-        qrEl.innerHTML = '';
-        new QRCode(qrEl, {
-          text: url,
-          width: 160,
-          height: 160,
-          colorDark: '#000000',
-          colorLight: '#ffffff',
-          correctLevel: QRCode.CorrectLevel.M
-        });
-      }
-    }
-
-    // Alarm Siren Sound
-    let audioCtx = null;
-    function triggerAlarmSound() {
-      try {
-        if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        let osc = audioCtx.createOscillator();
-        let gain = audioCtx.createGain();
-        osc.type = 'sawtooth';
-        osc.frequency.setValueAtTime(800, audioCtx.currentTime);
-        osc.frequency.linearRampToValueAtTime(1400, audioCtx.currentTime + 0.3);
-        osc.frequency.linearRampToValueAtTime(800, audioCtx.currentTime + 0.6);
-        gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
-        gain.gain.linearRampToValueAtTime(0.01, audioCtx.currentTime + 0.8);
-        osc.connect(gain);
-        gain.connect(audioCtx.destination);
-        osc.start();
-        osc.stop(audioCtx.currentTime + 0.8);
-      } catch(e) {}
-    }
-
-    // Trigger Simulasi Jebakan
-    async function triggerTestBeacon() {
-      try {
-        const res = await fetch('/api/sentinel/test', { method: 'POST' });
-        const data = await res.json();
-        if (data.ok) {
-          fetchStatus();
-        }
-      } catch (err) {
-        alert('Gagal trigger simulasi: ' + err.message);
-      }
-    }
-
-    // Polling / SSE Telemetry Data
-    async function fetchStatus() {
-      try {
-        const res = await fetch('/api/sentinel/status');
-        const data = await res.json();
-        if (data.ok) {
-          const profileLink = data.profileUrl || data.trackUrl;
-          if (profileLink) {
-            renderQr(profileLink);
-            const btnProf = document.getElementById('btnDownloadProfile');
-            if (btnProf && data.profileUrl) btnProf.href = data.profileUrl;
-          }
-          if (data.screenUrl) {
-            const btnScreen = document.getElementById('btnOpenScreenGuide');
-            if (btnScreen) btnScreen.href = data.screenUrl;
-            const modalScreen = document.getElementById('modalScreenLink');
-            if (modalScreen) modalScreen.href = data.screenUrl;
-          }
-          if (data.pairingPin) {
-            const topPin = document.getElementById('topPinVal');
-            if (topPin) topPin.textContent = data.pairingPin;
-            const inputPin = document.getElementById('inputPinField');
-            if (inputPin && document.activeElement !== inputPin) {
-              inputPin.value = data.pairingPin;
-            }
-          }
-          if (data.beaconUrl) {
-            const input = document.getElementById('beaconUrlInput');
-            if (input) input.value = data.beaconUrl;
-            const inputGet = document.getElementById('beaconGetUrlInput');
-            if (inputGet) inputGet.value = `${data.beaconUrl}?alert=airplane_mode_trap`;
-          }
-          const tunnelBadge = document.getElementById('tunnelStatusBadge');
-          if (tunnelBadge) {
-            if (data.cloudUrl) {
-              tunnelBadge.innerHTML = `<span style="display:inline-block; width:8px; height:8px; border-radius:50%; background:#10b981;"></span><span>🌐 5.000 KM Cloudflare: <strong style="color:white">ONLINE</strong></span>`;
-              tunnelBadge.style.color = '#38bdf8';
-              tunnelBadge.style.borderColor = '#38bdf8';
-            } else {
-              tunnelBadge.innerHTML = `<span style="display:inline-block; width:8px; height:8px; border-radius:50%; background:#10b981;"></span><span>📡 Wi-Fi Lokal (${data.localIp || 'OK'})</span>`;
-              tunnelBadge.style.color = '#a7f3d0';
-              tunnelBadge.style.borderColor = 'rgba(16, 185, 129, 0.3)';
-            }
-          }
-          if (data.history) {
-            latestHistoryCache = data.history;
-          }
-          if (data.current) {
-            renderTelemetry(data.current, data.alerts);
-          }
-          if (data.intercepts) {
-            renderIntercepts(data.intercepts);
-          }
-          if (data.storage) {
-            renderStorageWidget(data.storage);
-          }
-        }
-      } catch (err) {}
-    }
-
-    function renderStorageWidget(storage) {
-      const usageEl = document.getElementById('storageUsageText');
-      const percentEl = document.getElementById('storagePercentText');
-      const barEl = document.getElementById('storageProgressBar');
-      if (!usageEl || !percentEl || !barEl) return;
-
-      usageEl.textContent = `${storage.usedMb} / ${storage.maxMb} MB`;
-      percentEl.textContent = `(${storage.percentUsed}%)`;
-      barEl.style.width = `${Math.max(2, storage.percentUsed)}%`;
-
-      if (storage.percentUsed >= 85) {
-        barEl.style.background = '#ef4444';
-        percentEl.style.color = '#ef4444';
-      } else if (storage.percentUsed >= 65) {
-        barEl.style.background = '#f59e0b';
-        percentEl.style.color = '#f59e0b';
-      } else {
-        barEl.style.background = '#10b981';
-        percentEl.style.color = '#10b981';
-      }
-    }
-
-    async function triggerStorageCleanup() {
-      const btn = document.getElementById('btnCleanStorage');
-      if (btn) {
-        btn.textContent = '⏳ Membersihkan...';
-        btn.disabled = true;
-      }
-      try {
-        const res = await fetch('/api/sentinel/clean_storage', { method: 'POST' });
-        const data = await res.json();
-        if (data.ok) {
-          renderStorageWidget(data);
-          alert(`✅ Pembersihan Otomatis Selesai!\n• File lama dibersihkan: ${data.deletedCount} file\n• Ruang dibebaskan: ${data.freedMb} MB\n• Ruang terpakai sekarang: ${data.usedMb} / ${data.maxMb} MB (${data.percentUsed}%)`);
-        } else {
-          alert('Gagal membersihkan: ' + (data.error || 'Unknown error'));
-        }
-      } catch (err) {
-        alert('Gagal terhubung ke server pembersihan: ' + err.message);
-      } finally {
-        if (btn) {
-          btn.textContent = '🧹 Bersihkan';
-          btn.disabled = false;
-        }
-      }
-    }
-
-    async function triggerBackupDesktop() {
-      const btn = document.getElementById('btnBackupDesktop');
-      if (btn) {
-        btn.textContent = '⏳ Mengompres...';
-        btn.disabled = true;
-      }
-      try {
-        const res = await fetch('/api/sentinel/backup_desktop', { method: 'POST' });
-        const data = await res.json();
-        if (data.ok) {
-          alert(`✅ BERKAS BUKTI TELAH DIAMANKAN KE DESKTOP!\n\n• Nama Arsip: ${data.filename}\n• Ukuran: ${data.sizeMb} MB\n• Lokasi: ${data.path}\n\nSeluruh 70+ foto wajah, rekaman layar, cuplikan layar, dan riwayat koordinat GPS telah disalin aman ke Desktop laptop Anda.`);
-        } else {
-          alert('Gagal membuat arsip backup: ' + (data.error || 'Unknown error'));
-        }
-      } catch (err) {
-        alert('Gagal menghubungi server backup: ' + err.message);
-      } finally {
-        if (btn) {
-          btn.textContent = '💾 Backup Desktop';
-          btn.disabled = false;
-        }
-      }
-    }
-
-    async function savePinChange() {
-      const pinInput = document.getElementById('inputPinField');
-      if (!pinInput) return;
-      const pin = pinInput.value.trim();
-      if (!pin) return;
-      try {
-        const res = await fetch('/api/sentinel/pin', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ pin })
-        });
-        const data = await res.json();
-        if (data.ok) {
-          alert('✅ PIN Perangkat berhasil diperbarui ke: ' + data.pin);
-          const topPin = document.getElementById('topPinVal');
-          if (topPin) topPin.textContent = data.pin;
-        } else {
-          alert('Gagal simpan PIN: ' + (data.error || 'Unknown error'));
-        }
-      } catch (err) {
-        alert('Gagal simpan PIN: ' + err.message);
-      }
-    }
-
-    let latestHistoryCache = [];
-    let sentinelLatestCache = null;
-
-    function openEvidenceModal() {
-      populateEvidenceReport(sentinelLatestCache, latestHistoryCache);
-      document.getElementById('evidenceModal').style.display = 'flex';
-    }
-
-    function closeEvidenceModal() {
-      document.getElementById('evidenceModal').style.display = 'none';
-    }
-
-    function printEvidenceReport() {
-      window.print();
-    }
-
-    function populateEvidenceReport(telemetry, history) {
-      const now = new Date();
-      const refId = 'GS-REC-' + now.toISOString().slice(0, 10).replace(/-/g, '') + '-' + (telemetry && telemetry.id ? String(telemetry.id).slice(-4).toUpperCase() : '8890');
-      const refEl = document.getElementById('reportRefId');
-      if (refEl) refEl.textContent = refId;
-      const dateEl = document.getElementById('reportPrintDate');
-      if (dateEl) dateEl.textContent = now.toLocaleString('id-ID', { dateStyle: 'full', timeStyle: 'medium' });
-
-      if (telemetry) {
-        const devEl = document.getElementById('repDeviceModel');
-        let devStr = (telemetry.platform || 'Apple iPhone / Mobile');
-        if (telemetry.screen) devStr += ` [Layar: ${telemetry.screen}]`;
-        if (telemetry.hardware && telemetry.hardware.gpu) devStr += ` [GPU: ${telemetry.hardware.gpu}]`;
-        if (devEl) devEl.textContent = devStr;
-
-        const batEl = document.getElementById('repBattery');
-        if (batEl) {
-          if (telemetry.batteryLevel !== null && telemetry.batteryLevel !== undefined) {
-            batEl.textContent = `${telemetry.batteryLevel}% ${telemetry.isCharging ? '(Sedang Mengisi Daya / Dicas)' : '(Daya Baterai)'}`;
-          } else {
-            batEl.textContent = 'Dibatasi Sandbox Apple WebKit (Keamanan Privasi iOS)';
-          }
-        }
-
-        const ipEl = document.getElementById('repIpAddress');
-        if (ipEl) {
-          let ipText = telemetry.clientIp || 'Terhubung via Cloudflare Secure Proxy';
-          if (telemetry.ipLocation) ipText += ` (${telemetry.ipLocation})`;
-          ipEl.textContent = ipText;
-        }
-
-        const netEl = document.getElementById('repNetwork');
-        if (netEl) {
-          let netStr = telemetry.isp || telemetry.networkName || 'Provider Seluler';
-          if (telemetry.as) netStr += ` [${telemetry.as}]`;
-          else if (telemetry.networkType && telemetry.networkType !== 'Seluler / Wi-Fi') netStr += ` [${telemetry.networkType}]`;
-          netEl.textContent = netStr;
-        }
-
-        const actEl = document.getElementById('repActivity');
-        if (actEl) {
-          actEl.textContent = `${telemetry.activity || 'Diam (Stasioner)'} [Kecepatan: ${telemetry.speed || 0} km/h]`;
-        }
-
-        const trigEl = document.getElementById('repTrigger');
-        if (trigEl) trigEl.textContent = (telemetry.alertType || 'Normal Telemetry Ping').toUpperCase();
-        const latEl = document.getElementById('repLat');
-        if (latEl) latEl.textContent = Number(telemetry.lat).toFixed(6);
-        const lonEl = document.getElementById('repLon');
-        if (lonEl) lonEl.textContent = Number(telemetry.lon).toFixed(6);
-        const accEl = document.getElementById('repAccuracy');
-        if (accEl) accEl.textContent = `± ${telemetry.accuracy || 10} meter`;
-        
-        const addr = telemetry.address || document.getElementById('valAddress').textContent || 'Lokasi Terdeteksi';
-        const addrEl = document.getElementById('repAddress');
-        if (addrEl) addrEl.textContent = addr;
-        
-        const mapsUrl = `https://www.google.com/maps?q=${telemetry.lat},${telemetry.lon}`;
-        const mapsLinkEl = document.getElementById('repMapsUrl');
-        if (mapsLinkEl) mapsLinkEl.innerHTML = `<a href="${mapsUrl}" target="_blank" style="color:#0284c7; text-decoration:underline;">${mapsUrl}</a>`;
-
-        const photoBox = document.getElementById('repPhotoContainer');
-        if (photoBox) {
-          let html = '<div style="display: flex; gap: 16px; flex-wrap: wrap;">';
-          if (telemetry.photo) {
-            html += `
-              <div style="border: 2px solid #0f172a; padding: 6px; border-radius: 8px; text-align: center; width: 240px; background: #fff;">
-                <img src="${telemetry.photo}" style="width: 100%; height: 160px; object-fit: cover; border-radius: 6px; display: block;" alt="Foto Wajah Bukti" />
-                <div style="font-size: 10px; font-weight: bold; margin-top: 5px; font-family: sans-serif; color: #000;">1. Kamera Depan: Wajah Pemegang</div>
-                <div style="font-size: 9px; color: #64748b; font-family: monospace;">${new Date(telemetry.timestamp).toLocaleTimeString('id-ID')}</div>
-                ${telemetry.photoSha256 ? `<div style="font-size: 8px; color: #334155; font-family: monospace; word-break: break-all; margin-top: 5px; background: #f8fafc; padding: 4px; border: 1px dashed #cbd5e1; border-radius: 4px; text-align: left;"><strong>Integritas Bukti (SHA-256):</strong><br>${telemetry.photoSha256}</div>` : ''}
-              </div>
-            `;
-          }
-          if (telemetry.environmentPhoto) {
-            html += `
-              <div style="border: 2px solid #0284c7; padding: 6px; border-radius: 8px; text-align: center; width: 240px; background: #fff;">
-                <img src="${telemetry.environmentPhoto}" style="width: 100%; height: 160px; object-fit: cover; border-radius: 6px; display: block;" alt="Foto Lingkungan Sekitar" />
-                <div style="font-size: 10px; font-weight: bold; margin-top: 5px; font-family: sans-serif; color: #0369a1;">2. Kamera Belakang: Area di Depan Pencuri</div>
-                <div style="font-size: 9px; color: #64748b; font-family: monospace;">${new Date(telemetry.timestamp).toLocaleTimeString('id-ID')}</div>
-                ${telemetry.environmentPhotoSha256 ? `<div style="font-size: 8px; color: #334155; font-family: monospace; word-break: break-all; margin-top: 5px; background: #f8fafc; padding: 4px; border: 1px dashed #cbd5e1; border-radius: 4px; text-align: left;"><strong>Integritas Bukti (SHA-256):</strong><br>${telemetry.environmentPhotoSha256}</div>` : ''}
-              </div>
-            `;
-          }
-          if (!telemetry.photo && !telemetry.environmentPhoto) {
-            html += `<div style="font-size: 11px; color: #64748b; font-family: sans-serif;">Belum ada foto bukti visual yang tersimpan pada sesi ini.</div>`;
-          }
-          html += '</div>';
-          photoBox.innerHTML = html;
-        }
-      }
-
-      const rowsBox = document.getElementById('repHistoricRows');
-      if (rowsBox) {
-        const histList = (Array.isArray(history) && history.length > 0) ? history : (telemetry ? [telemetry] : []);
-        if (histList.length === 0) {
-          rowsBox.innerHTML = `<tr><td colspan="5" style="text-align: center; padding: 8px; border: 1px solid #cbd5e1; color: #64748b;">Belum ada rekam jejak koordinat.</td></tr>`;
-        } else {
-          rowsBox.innerHTML = histList.slice(0, 20).map((h, idx) => `
-            <tr style="border-bottom: 1px solid #cbd5e1; ${idx % 2 === 1 ? 'background: #f8fafc;' : ''}">
-              <td style="padding: 4px 6px; border: 1px solid #cbd5e1; text-align: center;">${idx + 1}</td>
-              <td style="padding: 4px 6px; border: 1px solid #cbd5e1; font-family: monospace;">${new Date(h.timestamp).toLocaleString('id-ID', { dateStyle: 'short', timeStyle: 'medium' })}</td>
-              <td style="padding: 4px 6px; border: 1px solid #cbd5e1; font-family: monospace; font-weight: bold;">
-                <a href="https://www.google.com/maps?q=${h.lat},${h.lon}" target="_blank" style="color: #0284c7; text-decoration: none;">
-                  [${Number(h.lat).toFixed(6)}, ${Number(h.lon).toFixed(6)}]
-                </a>
-              </td>
-              <td style="padding: 4px 6px; border: 1px solid #cbd5e1; text-align: center;">± ${h.accuracy || 10} m</td>
-              <td style="padding: 4px 6px; border: 1px solid #cbd5e1;">${escapeHtml(h.alertType || 'Beacon')}</td>
-            </tr>
-          `).join('');
-        }
-      }
-    }
-
-    function renderTelemetry(telemetry, alerts) {
-      if (!telemetry) return;
-      sentinelLatestCache = telemetry;
-
-      document.getElementById('valLat').textContent = Number(telemetry.lat).toFixed(6);
-      document.getElementById('valLon').textContent = Number(telemetry.lon).toFixed(6);
-      document.getElementById('gpsAccuracy').textContent = `± ${telemetry.accuracy || 5} m`;
-      
-      const batEl = document.getElementById('valBattery');
-      if (batEl) {
-        if (telemetry.batteryLevel !== null && telemetry.batteryLevel !== undefined) {
-          batEl.innerHTML = `${telemetry.batteryLevel}% ${telemetry.isCharging ? '<span style="color:#10b981; font-weight:800;">⚡ (Sedang Dicas)</span>' : '<span style="color:#94a3b8;">🔋 (Baterai)</span>'}`;
-        } else {
-          batEl.innerHTML = `<span style="color:#f59e0b; font-size:11px;">🔒 Dibatasi Sandbox Apple iOS</span>`;
-        }
-      }
-
-      const netEl = document.getElementById('valNetwork');
-      if (netEl) {
-        netEl.textContent = telemetry.networkName || (telemetry.isp ? `${telemetry.isp} (${telemetry.org || ''})` : 'Provider Seluler');
-      }
-
-      const netSpeedEl = document.getElementById('valNetSpeed');
-      if (netSpeedEl) {
-        let speedText = '';
-        if (telemetry.as) speedText += `${telemetry.as}`;
-        if (telemetry.ipLocation) speedText += ` • ${telemetry.ipLocation}`;
-        if (telemetry.downlink) speedText += ` (${telemetry.downlink} Mbps)`;
-        netSpeedEl.textContent = speedText || (telemetry.networkType || 'Internet Publik');
-      }
-
-      const actEl = document.getElementById('valActivity');
-      if (actEl) {
-        actEl.textContent = telemetry.activity || 'Diam / Stationary';
-        if (telemetry.activity && (telemetry.activity.includes('Bergerak') || telemetry.activity.includes('Kendaraan') || telemetry.activity.includes('Motor'))) {
-          actEl.style.color = '#38bdf8';
-        } else {
-          actEl.style.color = '#f8fafc';
-        }
-      }
-
-      document.getElementById('valSpeed').textContent = `${telemetry.speed || 0} km/h`;
-      
-      const ipEl = document.getElementById('valClientIp');
-      if (ipEl) {
-        let ipDisp = telemetry.clientIp ? `${telemetry.clientIp}` : '';
-        if (telemetry.ipLocation) ipDisp += ` (${telemetry.ipLocation})`;
-        if (telemetry.platform) ipDisp += ` [${telemetry.platform}]`;
-        ipEl.textContent = ipDisp || '--';
-      }
-
-      document.getElementById('valTrigger').textContent = telemetry.alertType || 'Normal Beacon';
-
-      // DMS Coordinates
-      const dmsEl = document.getElementById('valDms');
-      if (dmsEl) {
-        dmsEl.textContent = `${toDMS(telemetry.lat, true)} ${toDMS(telemetry.lon, false)}`;
-      }
-
-      // Tombol Navigasi Cepat Multi-Aplikasi
-      const gmapsLink = `https://www.google.com/maps/dir/?api=1&destination=${telemetry.lat},${telemetry.lon}`;
-      const streetViewLink = `https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=${telemetry.lat},${telemetry.lon}`;
-      const wazeLink = `https://waze.com/ul?ll=${telemetry.lat},${telemetry.lon}&navigate=yes`;
-      
-      const btnGmaps = document.getElementById('btnGoogleMaps');
-      if (btnGmaps) btnGmaps.href = gmapsLink;
-      const btnStreet = document.getElementById('btnStreetView');
-      if (btnStreet) btnStreet.href = streetViewLink;
-      const btnWaze = document.getElementById('btnWaze');
-      if (btnWaze) btnWaze.href = wazeLink;
-
-      // Update Map
-      updateMapPosition(telemetry.lat, telemetry.lon, telemetry.accuracy);
-
-      // Alert state
-      const alertCard = document.getElementById('alertBanner');
-      if (telemetry.alertType === 'finder_authorized_report') {
-        alertCard.className = 'alert-card';
-        alertCard.style.borderColor = '#10b981';
-        alertCard.style.background = 'rgba(16, 185, 129, 0.15)';
-        document.getElementById('alertIcon').textContent = '🤝';
-        document.getElementById('alertTitle').textContent = 'PENEMU BERNIAT MENGEMBALIKAN HP!';
-        document.getElementById('alertDesc').textContent = 'Penemu mengirimkan titik lokasi & nomor kontak. Cek Aktivitas Masuk!';
-        playChimeSound();
-      } else if (telemetry.alertType && (telemetry.alertType.includes('airplane') || telemetry.alertType.includes('trap'))) {
-        alertCard.className = 'alert-card danger';
-        alertCard.style.borderColor = '';
-        alertCard.style.background = '';
-        document.getElementById('alertIcon').textContent = '🚨';
-        document.getElementById('alertTitle').textContent = 'WASPADA: JEBAKAN TERPICU!';
-        document.getElementById('alertDesc').textContent = 'Perangkat membuka link verifikasi! Lokasi seketika diamankan.';
-        triggerAlarmSound();
-      } else if (telemetry.alertType && telemetry.alertType.includes('battery')) {
-        alertCard.className = 'alert-card danger';
-        alertCard.style.borderColor = '';
-        alertCard.style.background = '';
-        document.getElementById('alertIcon').textContent = '⚠️';
-        document.getElementById('alertTitle').textContent = 'BATERAI KRITIS: POSISI TERAKHIR';
-        document.getElementById('alertDesc').textContent = 'Laporan darurat sebelum perangkat kehabisan daya.';
-      } else {
-        alertCard.className = 'alert-card';
-        alertCard.style.borderColor = '';
-        alertCard.style.background = '';
-        document.getElementById('alertIcon').textContent = '🛡️';
-        document.getElementById('alertTitle').textContent = 'SISTEM SENYAP AKTIF';
-        document.getElementById('alertDesc').textContent = `Beacon diterima: ${new Date(telemetry.timestamp).toLocaleTimeString()}`;
-      }
-
-      // Reverse geocoding alamat berjenjang via server proxy
-      if (telemetry.structuredAddress) {
-        populateAddressFields(telemetry.structuredAddress);
-      } else {
-        reverseGeocode(telemetry.lat, telemetry.lon);
-      }
-
-      // Dual-Angle Visual Evidence (Kamera Depan & Kamera Belakang)
-      const mugshotBox = document.getElementById('mugshotBox');
-      if (mugshotBox) {
-        if (telemetry.photo) {
-          mugshotBox.innerHTML = `
-            <div class="mugshot-badge">🚨 WAJAH (DEPAN)</div>
-            <img src="${telemetry.photo}" class="mugshot-img" alt="Wajah Pemegang Perangkat" onclick="openPhotoViewer('${escapeJs(telemetry.photo)}', ${telemetry.timestamp || Date.now()}, 'Foto Wajah Pemegang (Kamera Depan)', '${escapeJs(telemetry.photoSha256 || '')}')" style="cursor: zoom-in;" title="Klik untuk memperbesar foto wajah" />
-          `;
-        } else {
-          mugshotBox.innerHTML = `<div class="mugshot-empty" style="font-size: 10px;">Belum ada foto wajah</div>`;
-        }
-      }
-
-      const envPhotoBox = document.getElementById('envPhotoBox');
-      if (envPhotoBox) {
-        if (telemetry.environmentPhoto) {
-          envPhotoBox.innerHTML = `
-            <div class="mugshot-badge" style="background: rgba(14, 165, 233, 0.9);">🔭 AREA DEPAN (BELAKANG)</div>
-            <img src="${telemetry.environmentPhoto}" class="mugshot-img" alt="Area di Depan Pencuri" onclick="openPhotoViewer('${escapeJs(telemetry.environmentPhoto)}', ${telemetry.timestamp || Date.now()}, 'Foto Area & Lingkungan Depan (Kamera Belakang)', '${escapeJs(telemetry.environmentPhotoSha256 || '')}')" style="cursor: zoom-in;" title="Klik untuk memperbesar foto area depan" />
-          `;
-        } else {
-          envPhotoBox.innerHTML = `<div class="mugshot-empty" style="font-size: 10px; color: #64748b;">Belum ada foto area/lingkungan</div>`;
-        }
-      }
-    }
-
-    function toDMS(deg, isLat) {
-      if (deg === undefined || deg === null || isNaN(deg)) return '--';
-      const dir = isLat ? (deg >= 0 ? 'N' : 'S') : (deg >= 0 ? 'E' : 'W');
-      const d = Math.abs(deg);
-      const degrees = Math.floor(d);
-      const minutesNotTruncated = (d - degrees) * 60;
-      const minutes = Math.floor(minutesNotTruncated);
-      const seconds = ((minutesNotTruncated - minutes) * 60).toFixed(2);
-      return `${degrees}°${minutes}'${seconds}"${dir}`;
-    }
-
-    function populateAddressFields(data) {
-      if (!data) return;
-      const addrEl = document.getElementById('valAddress');
-      if (addrEl && (data.displayName || data.display_name)) {
-        addrEl.textContent = data.displayName || data.display_name;
-      }
-
-      const hamletEl = document.getElementById('valHamlet');
-      if (hamletEl) hamletEl.textContent = data.hamlet || data.suburb || data.road || '--';
-
-      const villageEl = document.getElementById('valVillage');
-      if (villageEl) villageEl.textContent = data.village || '--';
-
-      const distEl = document.getElementById('valDistrict');
-      if (distEl) distEl.textContent = data.district || '--';
-
-      const regEl = document.getElementById('valRegency');
-      if (regEl) regEl.textContent = data.regency || '--';
-
-      const provEl = document.getElementById('valProvince');
-      if (provEl) provEl.textContent = data.province || '--';
-    }
-
-    async function reverseGeocode(lat, lon) {
-      if (!lat || !lon) return;
-      try {
-        const res = await fetch(`/api/sentinel/geocode?lat=${lat}&lon=${lon}`);
-        const data = await res.json();
-        if (data && data.ok) {
-          populateAddressFields(data);
-        } else if (data && data.displayName) {
-          populateAddressFields(data);
-        }
-      } catch(e) {
-        console.warn('Geocoding error:', e);
-      }
-    }
-
-    function openPhotoViewer(url, timestamp, title, hash) {
-      const modal = document.getElementById('photoViewerModal');
-      const img = document.getElementById('photoViewerImg');
-      const titleElem = document.getElementById('photoViewerTitle');
-      const timeElem = document.getElementById('photoViewerTimestamp');
-      const downloadBtn = document.getElementById('btnDownloadPhoto');
-      const hashBox = document.getElementById('photoViewerHashBox');
-      const hashVal = document.getElementById('photoViewerHashVal');
-      if (!modal || !img) return;
-      img.src = url;
-      if (titleElem && title) titleElem.textContent = title;
-      if (timeElem) timeElem.textContent = timestamp ? `Waktu: ${new Date(timestamp).toLocaleString('id-ID')}` : 'Waktu: Baru saja';
-      if (downloadBtn) downloadBtn.href = url;
-      if (hashBox && hashVal) {
-        if (hash) {
-          hashVal.textContent = hash;
-          hashBox.style.display = 'block';
-        } else {
-          hashBox.style.display = 'none';
-        }
-      }
-      modal.style.display = 'flex';
-    }
-
-    function closePhotoViewer() {
-      const modal = document.getElementById('photoViewerModal');
-      if (modal) modal.style.display = 'none';
-    }
-
-    async function triggerRemoteChime() {
-      if (!confirm('Picu nada dering pencarian (Find-My Chime) di HP target sekarang?')) return;
-      try {
-        const res = await fetch('/api/sentinel/trigger_chime', { method: 'POST' });
-        const data = await res.json();
-        if (data.ok) {
-          alert('🔔 Sinyal dering pencarian berhasil dikirim ke perangkat target!');
-        } else {
-          alert('Gagal mengirim sinyal dering: ' + (data.error || 'Server error'));
-        }
-      } catch (err) {
-        alert('Terjadi kesalahan jaringan: ' + err.message);
-      }
-    }
-
-    function playChimeSound() {
-      try {
-        const ctx = new (window.AudioContext || window.webkitAudioContext)();
-        const osc = ctx.createOscillator();
-        const gain = ctx.createGain();
-        osc.type = 'sine';
-        osc.frequency.setValueAtTime(587.33, ctx.currentTime); // D5
-        osc.frequency.setValueAtTime(880.00, ctx.currentTime + 0.1); // A5
-        gain.gain.setValueAtTime(0.2, ctx.currentTime);
-        gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.4);
-        osc.connect(gain);
-        gain.connect(ctx.destination);
-        osc.start();
-        osc.stop(ctx.currentTime + 0.4);
-      } catch (e) {}
-    }
-
-    function escapeHtml(str) {
-      return String(str || '').replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
-    }
-    function escapeJs(str) {
-      return String(str || '').replace(/['\\]/g, '\\$&');
-    }
-
-    function renderIntercepts(intercepts) {
-      const box = document.getElementById('liveActivityFeed');
-      if (!box) return;
-      if (!Array.isArray(intercepts) || intercepts.length === 0) {
-        box.innerHTML = `<div style="font-size: 11px; color: var(--text-muted); text-align: center; padding: 12px 0;">Menunggu data baru atau perubahan dari iPhone...</div>`;
-        return;
-      }
-      box.innerHTML = intercepts.map(item => `
-        <div style="background: rgba(0, 0, 0, 0.45); border: 1px solid rgba(56, 189, 248, 0.25); border-radius: 10px; padding: 10px; display: flex; flex-direction: column; gap: 4px;">
-          <div style="display: flex; justify-content: space-between; align-items: center; font-size: 11px;">
-            <span style="color: #38bdf8; font-weight: 700;">${escapeHtml(item.label || '⌨️ Data Masuk')}</span>
-            <span style="color: #94a3b8; font-family: monospace;">${new Date(item.timestamp).toLocaleTimeString()}</span>
-          </div>
-          <div style="display: flex; align-items: center; justify-content: space-between; background: rgba(0,0,0,0.6); padding: 6px 8px; border-radius: 6px; margin-top: 2px;">
-            <code style="font-size: 13px; color: #34d399; font-weight: 700; word-break: break-all;">${escapeHtml(item.value)}</code>
-            <button onclick="navigator.clipboard.writeText('${escapeJs(item.value)}'); alert('Data disalin ke clipboard!');" style="margin-left: 8px; padding: 4px 8px; border: none; background: rgba(255,255,255,0.1); color: #fff; font-size: 11px; font-weight: 600; border-radius: 4px; cursor: pointer;">Salin</button>
-          </div>
-          ${item.photo ? `<div style="margin-top: 4px;"><img src="${item.photo}" onclick="openPhotoViewer('${escapeJs(item.photo)}', ${item.timestamp || 'Date.now()'})" style="width: 100%; max-height: 80px; object-fit: cover; border-radius: 6px; cursor: zoom-in;" title="Klik untuk memperbesar foto bukti" /></div>` : ''}
-        </div>
-      `).join('');
-    }
-
-    // SSE Real-time Listener
-    function initEventStream() {
-      try {
-        const evtSource = new EventSource('/api/events');
-        evtSource.onmessage = (event) => {
-          try {
-            const msg = JSON.parse(event.data);
-            if (msg.type === 'sentinel_beacon' && msg.current) {
-              renderTelemetry(msg.current, msg.alerts);
-            } else if (msg.type === 'sentinel_intercept' && msg.intercept) {
-              playChimeSound();
-              fetchStatus();
-            } else if (msg.type === 'cloud_tunnel_ready') {
-              fetchStatus();
-            }
-          } catch(e) {}
-        };
-      } catch(e) {}
-    }
-
-    initEventStream();
-
-    // --- WEBSOCKET LIVE SCREEN BROADCAST STREAM ---
-    let screenWs = null;
-    let frameCountThisSecond = 0;
-    let lastFpsCalc = Date.now();
-    let screenLastReceived = 0;
-
-    function connectScreenWs() {
-      try {
-        const protocol = location.protocol === 'https:' ? 'wss:' : 'ws:';
-        screenWs = new WebSocket(`${protocol}//${location.host}`);
-        screenWs.onmessage = (event) => {
-          try {
-            const msg = JSON.parse(event.data);
-            if (msg.type === 'screen_frame' && msg.frame) {
-              onNewScreenFrame(msg);
-            }
-          } catch(e) {}
-        };
-        screenWs.onclose = () => {
-          setTimeout(connectScreenWs, 2500);
-        };
-        screenWs.onerror = () => {
-          try { screenWs.close(); } catch(e) {}
-        };
-      } catch(e) {}
-    }
-
-    function onNewScreenFrame(msg) {
-      const img = document.getElementById('liveScreenFeed');
-      const placeholder = document.getElementById('screenEmptyPlaceholder');
-      const fpsBadge = document.getElementById('screenFpsBadge');
-      const timeEl = document.getElementById('screenTimestamp');
-      const liveDot = document.getElementById('screenLiveDot');
-
-      if (img && placeholder) {
-        img.src = msg.frame;
-        img.style.display = 'block';
-        placeholder.style.display = 'none';
-        if (timeEl) {
-          timeEl.style.display = 'block';
-          timeEl.textContent = new Date(msg.timestamp || Date.now()).toLocaleTimeString();
-        }
-      }
-
-      if (isRecording && recordCanvas && recordCtx) {
-        const tempImg = new Image();
-        tempImg.onload = () => {
-          recordCtx.drawImage(tempImg, 0, 0, recordCanvas.width, recordCanvas.height);
-          recordCtx.fillStyle = 'rgba(0,0,0,0.65)';
-          recordCtx.fillRect(10, recordCanvas.height - 35, 280, 24);
-          recordCtx.fillStyle = '#34d399';
-          recordCtx.font = 'bold 12px monospace';
-          recordCtx.fillText(`BUKTI: ${new Date().toLocaleString('id-ID')}`, 15, recordCanvas.height - 18);
-        };
-        tempImg.src = msg.frame;
-      }
-
-      screenLastReceived = Date.now();
-      frameCountThisSecond++;
-      if (Date.now() - lastFpsCalc >= 1000) {
-        if (fpsBadge) {
-          fpsBadge.textContent = `${frameCountThisSecond} FPS (LIVE)`;
-          fpsBadge.style.color = '#34d399';
-        }
-        if (liveDot) liveDot.style.background = '#34d399';
-        frameCountThisSecond = 0;
-        lastFpsCalc = Date.now();
-      }
-
-      if (msg.lat && msg.lon && (!radarMarker || Math.abs(msg.lat - valLat) > 0.0001)) {
-        document.getElementById('valLat').textContent = Number(msg.lat).toFixed(6);
-        document.getElementById('valLon').textContent = Number(msg.lon).toFixed(6);
-        updateMapPosition(msg.lat, msg.lon, 10);
-      }
-      if (msg.battery) {
-        document.getElementById('valBattery').textContent = `${msg.battery}%`;
-      }
-    }
-
-    function toggleScreenFullscreen() {
-      const img = document.getElementById('liveScreenFeed');
-      if (!img || img.style.display === 'none') {
-        alert('Siaran layar belum aktif.');
-        return;
-      }
-      if (!document.fullscreenElement) {
-        img.requestFullscreen().catch(() => {});
-      } else {
-        document.exitFullscreen().catch(() => {});
-      }
-    }
-
-    function captureScreenSnapshot() {
-      const img = document.getElementById('liveScreenFeed');
-      if (!img || img.style.display === 'none' || !img.src) {
-        alert('Belum ada frame siaran layar untuk disimpan!');
-        return;
-      }
-      const a = document.createElement('a');
-      a.href = img.src;
-      a.download = `layar_iphone_${Date.now()}.jpg`;
-      a.click();
-    }
-
-    // --- SCREEN RECORDER ENGINE (HTML5 MediaRecorder + Canvas) ---
-    const recordCanvas = document.createElement('canvas');
-    const recordCtx = recordCanvas.getContext('2d');
-    let mediaRecorder = null;
-    let recordedChunks = [];
-    let recordStartTime = 0;
-    let recordTimerInterval = null;
-    let isRecording = false;
-    let recordCanvasStream = null;
-
-    function startScreenRecording() {
-      const img = document.getElementById('liveScreenFeed');
-      if (!img || img.style.display === 'none' || !img.src) {
-        alert('Siaran layar belum aktif. Buka siaran layar dari iPhone terlebih dahulu.');
-        return;
-      }
-
-      recordedChunks = [];
-      isRecording = true;
-      recordStartTime = Date.now();
-
-      recordCanvas.width = img.naturalWidth || 480;
-      recordCanvas.height = img.naturalHeight || 854;
-      recordCtx.drawImage(img, 0, 0, recordCanvas.width, recordCanvas.height);
-
-      try {
-        recordCanvasStream = recordCanvas.captureStream(10);
-      } catch (e) {
-        alert('Browser tidak mendukung captureStream: ' + e.message);
-        isRecording = false;
-        return;
-      }
-
-      let mime = 'video/webm;codecs=vp8';
-      if (!MediaRecorder.isTypeSupported(mime)) {
-        mime = 'video/webm';
-      }
-      if (!MediaRecorder.isTypeSupported(mime)) {
-        mime = '';
-      }
-
-      try {
-        const options = mime ? { mimeType: mime } : {};
-        mediaRecorder = new MediaRecorder(recordCanvasStream, options);
-      } catch (e) {
-        alert('MediaRecorder gagal diinisialisasi: ' + e.message);
-        isRecording = false;
-        return;
-      }
-
-      mediaRecorder.ondataavailable = (e) => {
-        if (e.data && e.data.size > 0) {
-          recordedChunks.push(e.data);
-        }
-      };
-
-      mediaRecorder.onstop = () => {
-        finishAndSaveRecording();
-      };
-
-      mediaRecorder.start(1000); // 1 detik chunk
-
-      // Update UI
-      document.getElementById('btnStartRecord').style.display = 'none';
-      const btnStop = document.getElementById('btnStopRecord');
-      btnStop.style.display = 'flex';
-
-      const recBadge = document.getElementById('recordingBadge');
-      if (recBadge) recBadge.style.display = 'flex';
-
-      const timerEl = document.getElementById('recordingBadgeTimer');
-      const stopTimerEl = document.getElementById('recordTimer');
-
-      recordTimerInterval = setInterval(() => {
-        const elapsed = Math.floor((Date.now() - recordStartTime) / 1000);
-        const m = String(Math.floor(elapsed / 60)).padStart(2, '0');
-        const s = String(elapsed % 60).padStart(2, '0');
-        const str = `${m}:${s}`;
-        if (timerEl) timerEl.textContent = str;
-        if (stopTimerEl) stopTimerEl.textContent = str;
-      }, 500);
-
-      const statusMsg = document.getElementById('recordingStatusMsg');
-      if (statusMsg) {
-        statusMsg.style.display = 'block';
-        statusMsg.style.color = '#ef4444';
-        statusMsg.textContent = '🔴 Perekaman video bukti layar sedang berjalan...';
-      }
-    }
-
-    function stopScreenRecording() {
-      if (!isRecording) return;
-      isRecording = false;
-      clearInterval(recordTimerInterval);
-
-      const recBadge = document.getElementById('recordingBadge');
-      if (recBadge) recBadge.style.display = 'none';
-
-      document.getElementById('btnStartRecord').style.display = 'flex';
-      document.getElementById('btnStopRecord').style.display = 'none';
-
-      if (mediaRecorder && mediaRecorder.state !== 'inactive') {
-        mediaRecorder.stop();
-      }
-    }
-
-    async function finishAndSaveRecording() {
-      if (!recordedChunks || recordedChunks.length === 0) {
-        alert('Tidak ada data rekaman.');
-        return;
-      }
-
-      const blob = new Blob(recordedChunks, { type: 'video/webm' });
-      const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
-      const filename = `rekaman_iphone_${timestamp}.webm`;
-
-      // 1. Download langsung di browser laptop
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = filename;
-      a.click();
-
-      // 2. Upload otomatis ke server laptop untuk disimpan di C:\Users\hp\Downloads\Dari_iPhone\Rekaman_Layar\
-      const statusMsg = document.getElementById('recordingStatusMsg');
-      if (statusMsg) {
-        statusMsg.style.display = 'block';
-        statusMsg.style.color = '#38bdf8';
-        statusMsg.textContent = '⏳ Mengamankan rekaman ke folder laptop...';
-      }
-
-      try {
-        const res = await fetch('/api/sentinel/save_recording', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'video/webm',
-            'x-filename': encodeURIComponent(filename)
-          },
-          body: blob
-        });
-        const result = await res.json();
-        if (result.ok) {
-          if (statusMsg) {
-            statusMsg.style.color = '#34d399';
-            statusMsg.innerHTML = `✅ Rekaman tersimpan: <strong>${filename}</strong>`;
-            setTimeout(() => { statusMsg.style.display = 'none'; }, 8000);
-          }
-          fetchRecordingsCount();
-        }
-      } catch (err) {
-        if (statusMsg) {
-          statusMsg.style.color = '#34d399';
-          statusMsg.textContent = '✅ Rekaman berhasil diunduh ke laptop!';
-          setTimeout(() => { statusMsg.style.display = 'none'; }, 5000);
-        }
-      }
-    }
-
-    async function openRecordingsFolder() {
-      try {
-        const res = await fetch('/api/sentinel/open_recordings', { method: 'POST' });
-        const data = await res.json();
-        if (!data.ok) {
-          alert('Gagal membuka folder: ' + (data.error || 'Unknown'));
-        }
-      } catch (e) {
-        alert('Gagal membuka folder: ' + e.message);
-      }
-    }
-
-    async function fetchRecordingsCount() {
-      try {
-        const res = await fetch('/api/sentinel/recordings');
-        const data = await res.json();
-        if (data.ok && Array.isArray(data.files)) {
-          const el = document.getElementById('recordedFilesCount');
-          if (el) el.textContent = `📁 ${data.files.length} file rekaman di laptop`;
-        }
-      } catch(e) {}
-    }
-
-    fetchRecordingsCount();
-
-    setInterval(() => {
-      if (screenLastReceived > 0 && Date.now() - screenLastReceived > 5000) {
-        const fpsBadge = document.getElementById('screenFpsBadge');
-        const liveDot = document.getElementById('screenLiveDot');
-        if (fpsBadge) {
-          fpsBadge.textContent = 'Siaran Terhenti';
-          fpsBadge.style.color = '#eab308';
-        }
-        if (liveDot) liveDot.style.background = '#eab308';
-      }
-    }, 3000);
-
-    connectScreenWs();
-
-    // Polling setiap 3 detik
-    fetchStatus();
-    setInterval(fetchStatus, 3000);
-  </script>
+    // Simpan sementara untuk tombol "Lanjut"
+    window._wizData = d;
+    document.getElementById('wizResult').style.display = 'block';
+    showToast('✅ Perangkat berhasil didaftarkan!');
+  } catch { showToast('❌ Gagal menghubungi server.'); }
+}
+
+function closeWizardAndFill() {
+  const d = window._wizData;
+  if (!d) return;
+  document.getElementById('setupWizard').style.display = 'none';
+  document.getElementById('inpDeviceId').value = d.deviceId;
+  document.getElementById('inpToken').value = d.ownerToken;
+  doAuth();
+}
+
+// ═══════════════════════════════════════════════════════════════
+// LIGHTBOX
+// ═══════════════════════════════════════════════════════════════
+function openLightbox(src, beacon) {
+  document.getElementById('lbImg').src = src;
+  document.getElementById('lbInfo').textContent = beacon ? fmtTs(beacon.ts) + (beacon.lat ? ` · ${beacon.lat.toFixed(5)}, ${beacon.lon.toFixed(5)}` : '') : '';
+  document.getElementById('lightbox').style.display = 'flex';
+}
+function closeLightbox() {
+  document.getElementById('lightbox').style.display = 'none';
+}
+
+// ═══════════════════════════════════════════════════════════════
+// TOAST
+// ═══════════════════════════════════════════════════════════════
+function showToast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.style.display = 'block';
+  clearTimeout(window._toastTimer);
+  window._toastTimer = setTimeout(() => { el.style.display = 'none'; }, 4000);
+}
+
+// ═══════════════════════════════════════════════════════════════
+// TIME HELPERS
+// ═══════════════════════════════════════════════════════════════
+function fmtTs(ts) {
+  return new Date(ts).toLocaleString('id-ID', { dateStyle: 'short', timeStyle: 'medium' });
+}
+function relTime(ts) {
+  const diff = Date.now() - ts;
+  if (diff < 60000) return 'Baru';
+  if (diff < 3600000) return `${Math.floor(diff/60000)} mnt lalu`;
+  if (diff < 86400000) return `${Math.floor(diff/3600000)} jam lalu`;
+  return fmtTs(ts);
+}
+
+// ═══════════════════════════════════════════════════════════════
+// INIT — auto-login jika token tersimpan
+// ═══════════════════════════════════════════════════════════════
+if (SESSION.deviceId && SESSION.token) {
+  document.getElementById('inpDeviceId').value = SESSION.deviceId;
+  document.getElementById('inpToken').value = SESSION.token;
+  startDashboard();
+}
+</script>
+<script src="/qrcode.min.js"></script>
 </body>
 </html>

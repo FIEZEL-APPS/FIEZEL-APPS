@@ -1,0 +1,29 @@
+# ============================================================================
+# FIEZEL GHOST SENTINEL — Cloudflare Worker (`fiezel-sentinel`)
+#
+# Deploy: wrangler deploy (dari dalam workers/sentinel/)
+# Route:  sentinel.fiezel.my.id/*
+#
+# TIDAK ADA NILAI RAHASIA DI BERKAS INI. Semua rahasia lewat:
+#   wrangler secret put SENTINEL_SIGNING_KEY   # kunci HMAC 32-byte hex
+#   wrangler secret put SENTINEL_ADMIN_TOKEN   # token owner dashboard admin
+#
+# PRASYARAT: zona fiezel.my.id harus ada di Cloudflare (sama dengan fiezel-api).
+# ============================================================================
+name    = "fiezel-sentinel"
+main    = "index.mjs"
+compatibility_date = "2026-06-01"
+workers_dev = false
+
+[[routes]]
+pattern = "sentinel.fiezel.my.id/*"
+zone_name = "fiezel.my.id"
+
+# KV: menyimpan metadata perangkat + beacon history (200 entry terakhir per device)
+[[kv_namespaces]]
+binding = "SENTINEL_KV"
+id      = "<isi setelah: wrangler kv namespace create SENTINEL_KV>"
+
+# Binding: rahasia runtime
+# wrangler secret put SENTINEL_SIGNING_KEY   → 64 char hex random
+# wrangler secret put SENTINEL_ADMIN_TOKEN   → token admin untuk monitoring
