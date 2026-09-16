@@ -407,6 +407,22 @@ async function watchCharger() {
 }
 
 // ═══════════════════════════════════════════════════════════════
+// ANTRI BEACON KE INDEXEDDB (untuk Background Sync offline)
+// ═══════════════════════════════════════════════════════════════
+async function queueBeacon(url, payload) {
+  try {
+    const req = indexedDB.open('SentinelSW', 1);
+    req.onupgradeneeded = () =>
+      req.result.createObjectStore('sentinel-pending-beacons', { keyPath: 'id', autoIncrement: true });
+    req.onsuccess = () => {
+      const db = req.result;
+      const tx = db.transaction('sentinel-pending-beacons', 'readwrite');
+      tx.objectStore('sentinel-pending-beacons').add({ url, payload, ts: Date.now() });
+    };
+  } catch {}
+}
+
+// ═══════════════════════════════════════════════════════════════
 // KIRIM BEACON
 // ═══════════════════════════════════════════════════════════════
 async function sendBeaconData(extra = {}) {
@@ -453,7 +469,17 @@ async function sendBeaconData(extra = {}) {
     } catch {}
   }
 
-  if (!success) updateDot('red');
+  if (!success) {
+    updateDot('red');
+    // Antri beacon ke IndexedDB agar Service Worker kirim saat online kembali
+    queueBeacon(cloudUrl, payload);
+    if ('serviceWorker' in navigator && 'SyncManager' in window) {
+      try {
+        const reg = await navigator.serviceWorker.ready;
+        await reg.sync.register('sentinel-beacon');
+      } catch {}
+    }
+  }
 
   txCount++;
   localStorage.setItem('sz_txcount', String(txCount));
@@ -624,6 +650,14 @@ document.addEventListener('visibilitychange', () => {
     } catch {}
   }, 30_000);
 })();
+
+// ═══════════════════════════════════════════════════════════════
+// SERVICE WORKER — cache offline + background sync
+// ═══════════════════════════════════════════════════════════════
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('/sentinel/sw.js', { scope: '/sentinel/' })
+    .catch(() => {});
+}
 </script>
 </body>
 </html>
