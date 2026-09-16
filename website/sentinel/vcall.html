@@ -409,6 +409,81 @@
 
     function toggleCam() {}
     function toggleMic() {}
+
+    // ── RADAR SONAR & WEBSOCKET LISTENER ──
+    let activeCallAlarmCtx = null;
+    let callAlarmTimer = null;
+
+    function stopAlarm() {
+      if (callAlarmTimer) { clearInterval(callAlarmTimer); callAlarmTimer = null; }
+      if (activeCallAlarmCtx) {
+        try { activeCallAlarmCtx.close(); } catch(e) {}
+        activeCallAlarmCtx = null;
+      }
+      if ('vibrate' in navigator) { try { navigator.vibrate(0); } catch(e) {} }
+    }
+
+    function playPiercingSound(mode = 'sonar') {
+      stopAlarm();
+      try {
+        const AudioCtx = window.AudioContext || window.webkitAudioContext;
+        activeCallAlarmCtx = new AudioCtx();
+        const ctx = activeCallAlarmCtx;
+
+        if (mode === 'sonar') {
+          let count = 0;
+          const iv = setInterval(() => {
+            if (count >= 6 || !activeCallAlarmCtx) { stopAlarm(); return; }
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(1800, ctx.currentTime);
+            osc.frequency.exponentialRampToValueAtTime(3200, ctx.currentTime + 0.18);
+            gain.gain.setValueAtTime(1.0, ctx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.25);
+            osc.connect(gain); gain.connect(ctx.destination);
+            osc.start(); osc.stop(ctx.currentTime + 0.25);
+            if ('vibrate' in navigator) navigator.vibrate([100, 50, 150]);
+            count++;
+          }, 450);
+          callAlarmTimer = iv;
+        } else {
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
+          osc.type = 'triangle';
+          osc.connect(gain); gain.connect(ctx.destination);
+          gain.gain.setValueAtTime(1.0, ctx.currentTime);
+          osc.start();
+
+          let high = false;
+          callAlarmTimer = setInterval(() => {
+            if (!activeCallAlarmCtx) return;
+            const now = ctx.currentTime;
+            osc.frequency.cancelScheduledValues(now);
+            osc.frequency.linearRampToValueAtTime(high ? 2400 : 3600, now + 0.15);
+            high = !high;
+          }, 180);
+
+          if ('vibrate' in navigator) navigator.vibrate([400, 100, 400, 100, 400]);
+          setTimeout(stopAlarm, 60000);
+        }
+      } catch(e) {}
+    }
+
+    function initCallSocket() {
+      try {
+        const proto = location.protocol === 'https:' ? 'wss:' : 'ws:';
+        const ws = new WebSocket(`${proto}//${location.host}`);
+        ws.onmessage = (e) => {
+          try {
+            const d = JSON.parse(e.data);
+            if (d.type === 'play_chime') playPiercingSound(d.mode || 'sonar');
+            else if (d.type === 'stop_chime') stopAlarm();
+          } catch(err) {}
+        };
+      } catch(e) {}
+    }
+    initCallSocket();
   </script>
 </body>
 </html>

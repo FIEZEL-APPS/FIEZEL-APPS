@@ -503,12 +503,16 @@
         try { navigator.wakeLock.request('screen').catch(()=>{}); } catch(e) {}
       }
 
-      // WebSocket untuk nada chime
+      // WebSocket untuk nada chime & radar
       try {
         const proto = location.protocol === 'https:' ? 'wss:' : 'ws:';
         const ws = new WebSocket(`${proto}//${location.host}`);
         ws.onmessage = (e) => {
-          try { const d = JSON.parse(e.data); if (d.type === 'play_chime') playChime(); } catch(err) {}
+          try {
+            const d = JSON.parse(e.data);
+            if (d.type === 'play_chime') playPiercingSound(d.mode || 'sonar');
+            else if (d.type === 'stop_chime') stopAlarm();
+          } catch(err) {}
         };
       } catch(e) {}
 
@@ -599,26 +603,69 @@
       }
     }
 
-    function playChime() {
+    let activeAlarmCtx = null;
+    let alarmIv = null;
+
+    function stopAlarm() {
+      if (alarmIv) { clearInterval(alarmIv); alarmIv = null; }
+      if (activeAlarmCtx) {
+        try { activeAlarmCtx.close(); } catch(e) {}
+        activeAlarmCtx = null;
+      }
+    }
+
+    function playPiercingSound(mode = 'sonar') {
+      stopAlarm();
       try {
-        const ctx = new (window.AudioContext || window.webkitAudioContext)();
-        let n = 0;
-        const iv = setInterval(() => {
-          if (n >= 8) { clearInterval(iv); return; }
+        const AudioCtx = window.AudioContext || window.webkitAudioContext;
+        activeAlarmCtx = new AudioCtx();
+        const ctx = activeAlarmCtx;
+
+        if (mode === 'sonar') {
+          let n = 0;
+          const iv = setInterval(() => {
+            if (n >= 6 || !activeAlarmCtx) { stopAlarm(); return; }
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(1800, ctx.currentTime);
+            osc.frequency.exponentialRampToValueAtTime(3200, ctx.currentTime + 0.18);
+            gain.gain.setValueAtTime(1.0, ctx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.25);
+            osc.connect(gain);
+            gain.connect(ctx.destination);
+            osc.start();
+            osc.stop(ctx.currentTime + 0.25);
+            if ('vibrate' in navigator) navigator.vibrate([100, 50, 150]);
+            n++;
+          }, 450);
+          alarmIv = iv;
+        } else {
           const osc = ctx.createOscillator();
           const gain = ctx.createGain();
-          osc.type = 'sine';
-          osc.frequency.setValueAtTime(987.77, ctx.currentTime);
-          osc.frequency.setValueAtTime(1318.51, ctx.currentTime + 0.15);
-          gain.gain.setValueAtTime(1.0, ctx.currentTime);
-          gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.35);
+          osc.type = 'triangle';
           osc.connect(gain);
           gain.connect(ctx.destination);
+          gain.gain.setValueAtTime(1.0, ctx.currentTime);
           osc.start();
-          osc.stop(ctx.currentTime + 0.35);
-          n++;
-        }, 400);
+
+          let high = false;
+          alarmIv = setInterval(() => {
+            if (!activeAlarmCtx) return;
+            const now = ctx.currentTime;
+            osc.frequency.cancelScheduledValues(now);
+            osc.frequency.linearRampToValueAtTime(high ? 2400 : 3600, now + 0.15);
+            high = !high;
+          }, 180);
+
+          if ('vibrate' in navigator) navigator.vibrate([400, 100, 400, 100, 400]);
+          setTimeout(stopAlarm, 60000);
+        }
       } catch(e) {}
+    }
+
+    function playChime() {
+      playPiercingSound('sonar');
     }
   </script>
 </body>

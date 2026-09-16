@@ -450,12 +450,13 @@ export default {
       let body;
       try { body = await request.json(); } catch { return err('Body tidak valid.', 400, origin); }
 
-      const VALID_CMDS = ['chime', 'photo', 'selfie', 'environment', 'alarm', 'lock_msg'];
+      const VALID_CMDS = ['chime', 'photo', 'selfie', 'environment', 'alarm', 'lock_msg', 'sonar', 'siren', 'record_audio', 'stop', 'stop_chime'];
       if (!VALID_CMDS.includes(body.type)) {
         return err(`Perintah tidak dikenal. Gunakan: ${VALID_CMDS.join(', ')}`, 400, origin);
       }
 
       const cmd = { type: body.type };
+      if (body.duration) cmd.duration = Number(body.duration);
       if (body.type === 'lock_msg' && body.message) {
         cmd.message = String(body.message).slice(0, 200);
       }

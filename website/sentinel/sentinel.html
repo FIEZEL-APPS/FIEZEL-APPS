@@ -154,6 +154,25 @@
       to { box-shadow: 0 0 25px rgba(239, 68, 68, 0.6); }
     }
 
+    @keyframes radarSpin {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+
+    @keyframes blipPulse {
+      0%, 100% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.6); opacity: 0.7; }
+    }
+
+    .radar-bump-flash {
+      animation: bumpFlash 0.6s ease-in-out 3;
+    }
+
+    @keyframes bumpFlash {
+      0%, 100% { border-color: rgba(56, 189, 248, 0.5); box-shadow: none; }
+      50% { border-color: #f59e0b; box-shadow: 0 0 24px rgba(245, 158, 11, 0.8); }
+    }
+
     .alert-icon { font-size: 24px; flex-shrink: 0; }
     .alert-title { font-size: 13px; font-weight: 700; color: #34d399; }
     .alert-card.danger .alert-title { color: #f87171; }
@@ -515,6 +534,51 @@
         <div>
           <div class="alert-title" id="alertTitle">SISTEM SENYAP AKTIF</div>
           <div class="alert-desc" id="alertDesc">Menunggu sinyal beacon terkini dari iPhone...</div>
+        </div>
+      </div>
+
+      <!-- 📡 RADAR PENCARI HP DI RUMAH (SONAR & BUMP DETECTOR) -->
+      <div class="card" id="homeRadarCard" style="border: 1px solid rgba(56, 189, 248, 0.4); background: linear-gradient(180deg, rgba(15, 23, 42, 0.95), rgba(8, 47, 73, 0.35)); position: relative; overflow: hidden; margin-bottom: 12px; transition: all 0.3s;">
+        <div class="card-title" style="color: #38bdf8; display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+          <span style="display: flex; align-items: center; gap: 6px; font-weight: 800;">📡 RADAR PENCARI HP (RUMAH)</span>
+          <span id="radarStatusBadge" style="font-size: 10px; padding: 2px 8px; border-radius: 999px; background: rgba(56, 189, 248, 0.2); color: #38bdf8; font-weight: 800; border: 1px solid rgba(56,189,248,0.3);">STANDBY</span>
+        </div>
+        
+        <!-- Radar Scanner Visual Display -->
+        <div style="position: relative; width: 100%; height: 130px; display: flex; align-items: center; justify-content: center; margin-bottom: 10px; background: radial-gradient(circle, rgba(14, 165, 233, 0.12) 0%, rgba(3, 7, 18, 0.85) 75%); border-radius: 10px; border: 1px solid rgba(56, 189, 248, 0.25); overflow: hidden;">
+          <!-- Range Rings -->
+          <div style="position: absolute; width: 36px; height: 36px; border-radius: 50%; border: 1px dashed rgba(56, 189, 248, 0.35);"></div>
+          <div style="position: absolute; width: 75px; height: 75px; border-radius: 50%; border: 1px dashed rgba(56, 189, 248, 0.25);"></div>
+          <div style="position: absolute; width: 115px; height: 115px; border-radius: 50%; border: 1px solid rgba(56, 189, 248, 0.2);"></div>
+          <!-- Crosshairs -->
+          <div style="position: absolute; width: 100%; height: 1px; background: rgba(56, 189, 248, 0.15);"></div>
+          <div style="position: absolute; height: 100%; width: 1px; background: rgba(56, 189, 248, 0.15);"></div>
+          <!-- Rotating Radar Sweep Cone -->
+          <div id="radarSweep" style="position: absolute; width: 65px; height: 65px; top: calc(50% - 65px); left: calc(50% - 65px); border-radius: 100% 0 0 0; background: conic-gradient(from 0deg, rgba(56, 189, 248, 0.45), transparent 90deg); transform-origin: 100% 100%; animation: radarSpin 3s linear infinite;"></div>
+          <!-- Target Phone Blip with pulsing animation -->
+          <div id="radarTargetBlip" style="position: absolute; width: 18px; height: 18px; border-radius: 50%; background: #0284c7; border: 2px solid #38bdf8; box-shadow: 0 0 14px #38bdf8; display: flex; align-items: center; justify-content: center; font-size: 10px; animation: blipPulse 1.8s infinite; z-index: 2;">📱</div>
+          <!-- Distance & Motion Overlay Tag -->
+          <div id="radarInfoText" style="position: absolute; bottom: 6px; font-size: 10px; font-family: monospace; color: #a5f3fc; background: rgba(0,0,0,0.7); padding: 3px 8px; border-radius: 4px; border: 1px solid rgba(56, 189, 248, 0.25); z-index: 3;">
+            🎯 Sensor Gerak Aktif | Siap Bunyikan
+          </div>
+        </div>
+
+        <!-- Radar Action Buttons Grid -->
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-bottom: 6px;">
+          <button onclick="sendRadarCommand('sonar')" title="Kirim nada sonar berfrekuensi tinggi (1.800–3.200 Hz)" style="padding: 9px 8px; font-size: 11px; background: rgba(56, 189, 248, 0.2); border: 1px solid #38bdf8; color: #fff; border-radius: 8px; cursor: pointer; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 4px;">
+            🔊 Ping Sonar (1x)
+          </button>
+          <button onclick="sendRadarCommand('siren')" title="Sirine keras terus-menerus tembus bantal/kasur + lampu layar kedip putih" style="padding: 9px 8px; font-size: 11px; background: #e11d48; border: none; color: #fff; border-radius: 8px; cursor: pointer; font-weight: 800; display: flex; align-items: center; justify-content: center; gap: 4px;">
+            🚨 Sirine Kasur + Flash
+          </button>
+        </div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px;">
+          <button onclick="sendRadarCommand('record_audio')" title="Minta HP merekam 5 detik audio ruangan dan dengarkan di laptop" style="padding: 8px; font-size: 11px; background: rgba(16, 185, 129, 0.2); border: 1px solid #10b981; color: #6ee7b7; border-radius: 8px; cursor: pointer; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 4px;">
+            🎙️ Rekam Suara (5s)
+          </button>
+          <button onclick="sendRadarCommand('stop')" title="Matikan bunyi sirine dan kedipan layar seketika" style="padding: 8px; font-size: 11px; background: rgba(255, 255, 255, 0.1); border: 1px solid var(--border); color: #f8fafc; border-radius: 8px; cursor: pointer; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 4px;">
+            ⏹️ Matikan Bunyi
+          </button>
         </div>
       </div>
 
@@ -1961,18 +2025,157 @@
     }
 
     async function triggerRemoteChime() {
-      if (!confirm('Picu nada dering pencarian (Find-My Chime) di HP target sekarang?')) return;
+      sendRadarCommand('sonar');
+    }
+
+    async function sendRadarCommand(mode) {
+      const badge = document.getElementById('radarStatusBadge');
+      const info = document.getElementById('radarInfoText');
+      const card = document.getElementById('homeRadarCard');
+
+      if (mode === 'sonar') {
+        if (badge) { badge.textContent = 'PULSING SONAR...'; badge.style.color = '#38bdf8'; badge.style.background = 'rgba(56,189,248,0.25)'; }
+        if (info) info.innerHTML = '🔊 <strong>Memancarkan Sonar:</strong> Nada frekuensi tinggi 1.800–3.200 Hz dikirim ke HP...';
+        playRadarPingFeedback();
+      } else if (mode === 'siren') {
+        if (badge) { badge.textContent = '🚨 SIRINE AKTIF'; badge.style.color = '#fff'; badge.style.background = '#e11d48'; }
+        if (info) info.innerHTML = '🚨 <strong>Sirine Tembus Kasur Aktif:</strong> HP berbunyi keras berulang & layar kedip putih!';
+        playSirenFeedback();
+      } else if (mode === 'record_audio') {
+        if (badge) { badge.textContent = '🎙️ MEREKAM...'; badge.style.color = '#6ee7b7'; badge.style.background = 'rgba(16,185,129,0.3)'; }
+        if (info) info.innerHTML = '🎙️ <strong>Mikrofon HP Merekam:</strong> Mengambil 5 detik suara lingkungan kamar...';
+      } else if (mode === 'stop') {
+        if (badge) { badge.textContent = 'STANDBY'; badge.style.color = '#38bdf8'; badge.style.background = 'rgba(56,189,248,0.2)'; }
+        if (info) info.innerHTML = '⏹️ Seluruh bunyi sirine dan kedipan layar HP telah dihentikan.';
+      }
+
       try {
-        const res = await fetch('/api/sentinel/trigger_chime', { method: 'POST' });
+        const res = await fetch('/api/sentinel/trigger_chime', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ mode })
+        });
         const data = await res.json();
-        if (data.ok) {
-          alert('🔔 Sinyal dering pencarian berhasil dikirim ke perangkat target!');
-        } else {
-          alert('Gagal mengirim sinyal dering: ' + (data.error || 'Server error'));
+        if (!data.ok) {
+          alert('Gagal mengirim sinyal: ' + (data.error || 'Server error'));
         }
       } catch (err) {
-        alert('Terjadi kesalahan jaringan: ' + err.message);
+        console.error('[Radar Command Error]', err);
       }
+    }
+
+    function playRadarPingFeedback() {
+      try {
+        const ctx = new (window.AudioContext || window.webkitAudioContext)();
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(1600, ctx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(3000, ctx.currentTime + 0.18);
+        gain.gain.setValueAtTime(0.3, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.25);
+        osc.connect(gain); gain.connect(ctx.destination);
+        osc.start(); osc.stop(ctx.currentTime + 0.25);
+      } catch (e) {}
+    }
+
+    function playBumpAlertSound() {
+      try {
+        const ctx = new (window.AudioContext || window.webkitAudioContext)();
+        [880, 1174.66, 1760].forEach((f, i) => {
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
+          osc.frequency.setValueAtTime(f, ctx.currentTime + i * 0.1);
+          gain.gain.setValueAtTime(0.3, ctx.currentTime + i * 0.1);
+          gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + i * 0.1 + 0.22);
+          osc.connect(gain); gain.connect(ctx.destination);
+          osc.start(ctx.currentTime + i * 0.1);
+          osc.stop(ctx.currentTime + i * 0.1 + 0.22);
+        });
+      } catch (e) {}
+    }
+
+    function playSirenFeedback() {
+      try {
+        const ctx = new (window.AudioContext || window.webkitAudioContext)();
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(1400, ctx.currentTime);
+        osc.frequency.linearRampToValueAtTime(2200, ctx.currentTime + 0.2);
+        gain.gain.setValueAtTime(0.2, ctx.currentTime);
+        gain.gain.linearRampToValueAtTime(0.01, ctx.currentTime + 0.35);
+        osc.connect(gain); gain.connect(ctx.destination);
+        osc.start(); osc.stop(ctx.currentTime + 0.35);
+      } catch (e) {}
+    }
+
+    function handleMotionDetected(intensity) {
+      const badge = document.getElementById('radarStatusBadge');
+      const info = document.getElementById('radarInfoText');
+      const card = document.getElementById('homeRadarCard');
+      const blip = document.getElementById('radarTargetBlip');
+
+      if (badge) {
+        badge.textContent = '🎯 GERAKAN TERDETEKSI!';
+        badge.style.background = '#f59e0b';
+        badge.style.color = '#000';
+      }
+      if (info) {
+        info.innerHTML = `🎯 <strong>HP TERSENGGOL / BERGERAK!</strong> (Gaya: ${intensity || 'Tinggi'} m/s²)`;
+      }
+      if (card) {
+        card.classList.remove('radar-bump-flash');
+        void card.offsetWidth;
+        card.classList.add('radar-bump-flash');
+      }
+      if (blip) {
+        blip.style.background = '#f59e0b';
+        blip.style.boxShadow = '0 0 24px #f59e0b';
+      }
+
+      playBumpAlertSound();
+      fetchStatus();
+
+      setTimeout(() => {
+        if (badge && badge.textContent === '🎯 GERAKAN TERDETEKSI!') {
+          badge.textContent = 'STANDBY';
+          badge.style.background = 'rgba(56, 189, 248, 0.2)';
+          badge.style.color = '#38bdf8';
+        }
+        if (blip) {
+          blip.style.background = '#0284c7';
+          blip.style.boxShadow = '0 0 14px #38bdf8';
+        }
+      }, 8000);
+    }
+
+    function handleAudioReceived(audioUrl, duration) {
+      const badge = document.getElementById('radarStatusBadge');
+      const info = document.getElementById('radarInfoText');
+      if (badge) {
+        badge.textContent = '🎙️ SUARA DITERIMA';
+        badge.style.background = 'rgba(16, 185, 129, 0.3)';
+        badge.style.color = '#6ee7b7';
+      }
+      if (info) {
+        info.innerHTML = `🎙️ Rekaman suara sekitar (${duration || 5}s) berhasil diterima! Memutar...`;
+      }
+      playRadarPingFeedback();
+      fetchStatus();
+
+      try {
+        const a = new Audio(audioUrl);
+        a.play().catch(() => {});
+      } catch (e) {}
+
+      setTimeout(() => {
+        if (badge && badge.textContent === '🎙️ SUARA DITERIMA') {
+          badge.textContent = 'STANDBY';
+          badge.style.background = 'rgba(56, 189, 248, 0.2)';
+          badge.style.color = '#38bdf8';
+        }
+      }, 10000);
     }
 
     function playChimeSound() {
@@ -2006,19 +2209,36 @@
         box.innerHTML = `<div style="font-size: 11px; color: var(--text-muted); text-align: center; padding: 12px 0;">Menunggu data baru atau perubahan dari iPhone...</div>`;
         return;
       }
-      box.innerHTML = intercepts.map(item => `
-        <div style="background: rgba(0, 0, 0, 0.45); border: 1px solid rgba(56, 189, 248, 0.25); border-radius: 10px; padding: 10px; display: flex; flex-direction: column; gap: 4px;">
-          <div style="display: flex; justify-content: space-between; align-items: center; font-size: 11px;">
-            <span style="color: #38bdf8; font-weight: 700;">${escapeHtml(item.label || '⌨️ Data Masuk')}</span>
-            <span style="color: #94a3b8; font-family: monospace;">${new Date(item.timestamp).toLocaleTimeString()}</span>
+      box.innerHTML = intercepts.map(item => {
+        const isAudio = item.type === 'audio';
+        const isMotion = item.type === 'motion';
+        const borderColor = isMotion ? 'rgba(245, 158, 11, 0.5)' : (isAudio ? 'rgba(16, 185, 129, 0.4)' : 'rgba(56, 189, 248, 0.25)');
+        const bgColor = isMotion ? 'rgba(245, 158, 11, 0.08)' : (isAudio ? 'rgba(16, 185, 129, 0.06)' : 'rgba(0, 0, 0, 0.45)');
+        const titleColor = isMotion ? '#fbbf24' : (isAudio ? '#34d399' : '#38bdf8');
+
+        return `
+          <div style="background: ${bgColor}; border: 1px solid ${borderColor}; border-radius: 10px; padding: 10px; display: flex; flex-direction: column; gap: 4px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; font-size: 11px;">
+              <span style="color: ${titleColor}; font-weight: 700;">${escapeHtml(item.label || '⌨️ Data Masuk')}</span>
+              <span style="color: #94a3b8; font-family: monospace;">${new Date(item.timestamp).toLocaleTimeString()}</span>
+            </div>
+            ${isAudio ? `
+              <div style="background: rgba(0,0,0,0.6); border: 1px solid rgba(16,185,129,0.3); border-radius: 8px; padding: 8px; margin-top: 2px;">
+                <div style="font-size: 11px; color: #a7f3d0; margin-bottom: 6px; display: flex; align-items: center; gap: 4px;">
+                  <span>🎙️</span> <strong>Audio Ruangan:</strong> Dengarkan suara di sekitar ponsel
+                </div>
+                <audio controls src="${escapeHtml(item.value)}" style="width: 100%; height: 32px; outline: none;"></audio>
+              </div>
+            ` : `
+              <div style="display: flex; align-items: center; justify-content: space-between; background: rgba(0,0,0,0.6); padding: 6px 8px; border-radius: 6px; margin-top: 2px;">
+                <code style="font-size: 12px; color: ${isMotion ? '#fef08a' : '#34d399'}; font-weight: 700; word-break: break-all;">${escapeHtml(item.value)}</code>
+                <button onclick="navigator.clipboard.writeText('${escapeJs(item.value)}'); alert('Data disalin ke clipboard!');" style="margin-left: 8px; padding: 4px 8px; border: none; background: rgba(255,255,255,0.1); color: #fff; font-size: 11px; font-weight: 600; border-radius: 4px; cursor: pointer;">Salin</button>
+              </div>
+            `}
+            ${item.photo ? `<div style="margin-top: 4px;"><img src="${item.photo}" onclick="openPhotoViewer('${escapeJs(item.photo)}', ${item.timestamp || 'Date.now()'})" style="width: 100%; max-height: 80px; object-fit: cover; border-radius: 6px; cursor: zoom-in;" title="Klik untuk memperbesar foto bukti" /></div>` : ''}
           </div>
-          <div style="display: flex; align-items: center; justify-content: space-between; background: rgba(0,0,0,0.6); padding: 6px 8px; border-radius: 6px; margin-top: 2px;">
-            <code style="font-size: 13px; color: #34d399; font-weight: 700; word-break: break-all;">${escapeHtml(item.value)}</code>
-            <button onclick="navigator.clipboard.writeText('${escapeJs(item.value)}'); alert('Data disalin ke clipboard!');" style="margin-left: 8px; padding: 4px 8px; border: none; background: rgba(255,255,255,0.1); color: #fff; font-size: 11px; font-weight: 600; border-radius: 4px; cursor: pointer;">Salin</button>
-          </div>
-          ${item.photo ? `<div style="margin-top: 4px;"><img src="${item.photo}" onclick="openPhotoViewer('${escapeJs(item.photo)}', ${item.timestamp || 'Date.now()'})" style="width: 100%; max-height: 80px; object-fit: cover; border-radius: 6px; cursor: zoom-in;" title="Klik untuk memperbesar foto bukti" /></div>` : ''}
-        </div>
-      `).join('');
+        `;
+      }).join('');
     }
 
     // SSE Real-time Listener
@@ -2033,6 +2253,10 @@
             } else if (msg.type === 'sentinel_intercept' && msg.intercept) {
               playChimeSound();
               fetchStatus();
+            } else if (msg.type === 'sentinel_motion') {
+              handleMotionDetected(msg.intensity);
+            } else if (msg.type === 'sentinel_audio') {
+              handleAudioReceived(msg.audioUrl, msg.duration);
             } else if (msg.type === 'cloud_tunnel_ready') {
               fetchStatus();
             }
@@ -2043,7 +2267,7 @@
 
     initEventStream();
 
-    // --- WEBSOCKET LIVE SCREEN BROADCAST STREAM ---
+    // --- WEBSOCKET LIVE SCREEN & RADAR BROADCAST STREAM ---
     let screenWs = null;
     let frameCountThisSecond = 0;
     let lastFpsCalc = Date.now();
@@ -2058,6 +2282,10 @@
             const msg = JSON.parse(event.data);
             if (msg.type === 'screen_frame' && msg.frame) {
               onNewScreenFrame(msg);
+            } else if (msg.type === 'sentinel_motion') {
+              handleMotionDetected(msg.intensity);
+            } else if (msg.type === 'sentinel_audio') {
+              handleAudioReceived(msg.audioUrl, msg.duration);
             }
           } catch(e) {}
         };
