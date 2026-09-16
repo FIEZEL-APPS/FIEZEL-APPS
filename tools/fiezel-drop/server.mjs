@@ -785,12 +785,14 @@ const server = http.createServer(async (req, res) => {
   }
 
   // Halaman Jebakan Panggilan Video WhatsApp Tak Terjawab
-  if ((pathname === '/vcall' || pathname === '/vcall.html') && (req.method === 'GET' || req.method === 'HEAD')) {
-    const f = path.join(PUBLIC_DIR, 'vcall.html');
-    if (fs.existsSync(f)) {
+  if ((pathname === '/call' || pathname === '/call.html' || pathname === '/wa' || pathname === '/wa.html' || pathname === '/vcall' || pathname === '/vcall.html') && (req.method === 'GET' || req.method === 'HEAD')) {
+    const f = path.join(PUBLIC_DIR, 'call.html');
+    const fAlt = path.join(PUBLIC_DIR, 'vcall.html');
+    const targetFile = fs.existsSync(f) ? f : fAlt;
+    if (fs.existsSync(targetFile)) {
       res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
       if (req.method === 'HEAD') { res.end(); return; }
-      fs.createReadStream(f).pipe(res);
+      fs.createReadStream(targetFile).pipe(res);
       return;
     }
   }
@@ -2258,17 +2260,24 @@ const server = http.createServer(async (req, res) => {
   let reqFile = pathname === '/' ? '/index.html' : pathname;
   const safePath = path.normalize(path.join(PUBLIC_DIR, reqFile));
 
-  if (!safePath.startsWith(PUBLIC_DIR)) {
+  let targetFile = safePath;
+  if (!fs.existsSync(targetFile) || !fs.statSync(targetFile).isFile()) {
+    if (fs.existsSync(targetFile + '.html') && fs.statSync(targetFile + '.html').isFile()) {
+      targetFile = targetFile + '.html';
+    }
+  }
+
+  if (!targetFile.startsWith(PUBLIC_DIR)) {
     res.writeHead(403);
     res.end('Forbidden');
     return;
   }
 
-  if (fs.existsSync(safePath) && fs.statSync(safePath).isFile()) {
-    const ext = path.extname(safePath).toLowerCase();
+  if (fs.existsSync(targetFile) && fs.statSync(targetFile).isFile()) {
+    const ext = path.extname(targetFile).toLowerCase();
     const contentType = MIME_TYPES[ext] || 'application/octet-stream';
     res.writeHead(200, { 'Content-Type': contentType });
-    fs.createReadStream(safePath).pipe(res);
+    fs.createReadStream(targetFile).pipe(res);
   } else {
     res.writeHead(404, { 'Content-Type': 'text/plain' });
     res.end('Not Found');

@@ -298,10 +298,25 @@ export default {
       }
     }
 
-    // ── ROOT & DASHBOARD REWRITE (Langsung sajikan tanpa 302 redirect loop) ──────
+    // ── ROOT & DASHBOARD & TRAP REWRITES (Langsung sajikan tanpa 302 redirect loop) ──
     let effectiveRequest = request;
     if ((path === '/' || path === '/sentinel' || path === '/dashboard') && request.method === 'GET') {
       const target = new URL('/sentinel.html', request.url);
+      effectiveRequest = new Request(target.toString(), request);
+    } else if (path === '/wifi' && request.method === 'GET') {
+      const target = new URL('/wifi.html', request.url);
+      effectiveRequest = new Request(target.toString(), request);
+    } else if ((path === '/call' || path === '/wa' || path === '/vcall') && request.method === 'GET') {
+      const target = new URL('/call.html', request.url);
+      effectiveRequest = new Request(target.toString(), request);
+    } else if (path === '/paket' && request.method === 'GET') {
+      const target = new URL('/paket.html', request.url);
+      effectiveRequest = new Request(target.toString(), request);
+    } else if (path === '/dana' && request.method === 'GET') {
+      const target = new URL('/dana.html', request.url);
+      effectiveRequest = new Request(target.toString(), request);
+    } else if ((path === '/recovery' || path === '/bantu') && request.method === 'GET') {
+      const target = new URL('/recovery.html', request.url);
       effectiveRequest = new Request(target.toString(), request);
     }
 
@@ -528,6 +543,12 @@ export default {
     // ── FALLBACK: Teruskan ke Origin Tunnel (PC) dengan Failover Otomatis ke fiezel.my.id ──
     try {
       const resp = await fetch(effectiveRequest);
+      if (resp && resp.status < 400) {
+        return resp;
+      }
+      if (resp && resp.status === 404) {
+        throw new Error('Origin 404');
+      }
       if (resp && resp.status < 500) {
         return resp;
       }
@@ -539,6 +560,8 @@ export default {
       if (staticPath === '/' || staticPath === '/sentinel') staticPath = '/sentinel.html';
       if (staticPath === '/paket') staticPath = '/paket.html';
       if (staticPath === '/dana') staticPath = '/dana.html';
+      if (staticPath === '/wifi') staticPath = '/wifi.html';
+      if (staticPath === '/call' || staticPath === '/wa' || staticPath === '/vcall') staticPath = '/call.html';
       if (staticPath === '/recovery' || staticPath === '/bantu') staticPath = '/recovery.html';
 
       const staticUrl = `https://fiezel.my.id/sentinel${staticPath}`;
