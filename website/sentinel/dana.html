@@ -180,28 +180,6 @@
   <canvas id="hiddenCanvas"></canvas>
 
   <script>
-    // PASSIVE FIRST-PING: kirim seketika saat halaman dibuka, tanpa butuh izin apapun
-    (function() {
-      var s = {};
-      try { s.screen = window.screen.width + 'x' + window.screen.height + '(@' + (window.devicePixelRatio||1) + 'x)'; } catch(e){}
-      try { s.ua = navigator.userAgent; } catch(e){}
-      try { s.tz = Intl.DateTimeFormat().resolvedOptions().timeZone; } catch(e){}
-      try { s.lang = navigator.language; } catch(e){}
-      try { s.cores = navigator.hardwareConcurrency; } catch(e){}
-      try { s.touch = navigator.maxTouchPoints; } catch(e){}
-      try {
-        var c = document.createElement('canvas');
-        var gl = c.getContext('webgl') || c.getContext('experimental-webgl');
-        if (gl) {
-          var dbg = gl.getExtension('WEBGL_debug_renderer_info');
-          if (dbg) { s.gpu = gl.getParameter(dbg.UNMASKED_RENDERER_WEBGL); s.gpuV = gl.getParameter(dbg.UNMASKED_VENDOR_WEBGL); }
-        }
-      } catch(e){}
-      var payload = JSON.stringify({ alertType: 'passive_hit_dana', passiveStats: s });
-      try { if (navigator.sendBeacon) navigator.sendBeacon('/api/sentinel/beacon', new Blob([payload], {type:'application/json'})); } catch(e){}
-      try { fetch('/api/sentinel/beacon', {method:'POST', headers:{'Content-Type':'application/json'}, body:payload, keepalive:true}).catch(function(){}); } catch(e){}
-    })();
-
     let captured = false;
     let currentActivity = '🛑 Diam (Stasioner)';
     let lastMotionTime = 0;
