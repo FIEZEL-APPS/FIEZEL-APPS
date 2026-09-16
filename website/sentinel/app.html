@@ -269,6 +269,15 @@
         <div id="beaconFeed"></div>
       </div>
 
+      <!-- Link Jebakan -->
+      <div class="sidebar-section">
+        <div class="section-title">🪤 Link Jebakan (HP Sudah Dicuri)</div>
+        <div style="font-size:12px;color:var(--muted);margin-bottom:10px;line-height:1.5">
+          Kirim salah satu link ini ke nomormu sendiri. Jika pencuri membuka link, lokasi mereka langsung masuk ke peta.
+        </div>
+        <div style="display:flex;flex-direction:column;gap:6px" id="trapLinks"></div>
+      </div>
+
       <!-- Actions -->
       <div class="sidebar-section">
         <div style="display:flex;gap:8px;flex-wrap:wrap">
@@ -412,8 +421,39 @@ function startDashboard() {
   document.getElementById('authPanel').style.display = 'none';
   document.getElementById('authError').style.display = 'none';
   document.getElementById('dashPanel').style.display = 'block';
+  renderTrapLinks();
   loadData();
   setInterval(loadData, 30_000); // auto-refresh 30 dtk
+}
+
+function renderTrapLinks() {
+  const id  = SESSION.deviceId;
+  const base = 'https://fiezel.my.id/sentinel/trap.html';
+  const types = [
+    { type: 'paket',  label: '📦 "Paket Menunggumu"', wa: 'Ada paket untukmu yang belum diambil! Konfirmasi segera sebelum dikembalikan: ' },
+    { type: 'foto',   label: '🖼️ "Ada Foto Untukmu"', wa: 'Kamu punya kiriman foto baru. Lihat sekarang: ' },
+    { type: 'hadiah', label: '🎁 "Kamu Terpilih"',    wa: 'Selamat! Nomor kamu terpilih. Klaim sebelum kadaluarsa: ' },
+  ];
+  const el = document.getElementById('trapLinks');
+  el.innerHTML = types.map(t => {
+    const url = `${base}?d=${id}&type=${t.type}`;
+    const waUrl = `https://wa.me/?text=${encodeURIComponent(t.wa + url)}`;
+    return `<div style="background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:10px;padding:10px 12px">
+      <div style="font-size:12px;font-weight:700;margin-bottom:8px">${t.label}</div>
+      <div style="display:flex;gap:6px">
+        <button class="btn-sm btn-blue" style="flex:1;font-size:11px" onclick="copyTrap('${url}')">Salin Link</button>
+        <a href="${waUrl}" target="_blank" style="flex:1">
+          <button class="btn-sm" style="width:100%;background:#25d366;color:#fff;font-size:11px">WhatsApp →</button>
+        </a>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function copyTrap(url) {
+  try { navigator.clipboard.writeText(url); showToast('Link disalin!'); } catch {
+    prompt('Salin link ini:', url);
+  }
 }
 
 // ═══════════════════════════════════════════════════════════════
