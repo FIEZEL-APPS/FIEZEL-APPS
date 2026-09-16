@@ -5,6 +5,7 @@ import os from 'node:os';
 import { fileURLToPath } from 'node:url';
 import { spawn } from 'node:child_process';
 import { WebSocketServer } from 'ws';
+import crypto from 'node:crypto';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -30,6 +31,10 @@ if (!fs.existsSync(RECORDINGS_DIR)) {
 const SCREENSHOTS_DIR = path.join(SAVE_DIR, 'Cuplikan_Layar');
 if (!fs.existsSync(SCREENSHOTS_DIR)) {
   fs.mkdirSync(SCREENSHOTS_DIR, { recursive: true });
+}
+const ENVIRONMENT_DIR = path.join(SAVE_DIR, 'Lingkungan');
+if (!fs.existsSync(ENVIRONMENT_DIR)) {
+  fs.mkdirSync(ENVIRONMENT_DIR, { recursive: true });
 }
 const SENTINEL_DATA_FILE = path.join(SAVE_DIR, 'sentinel_data.json');
 const SENTINEL_TUNNEL_FILE = path.join(SAVE_DIR, 'sentinel_tunnel_url.txt');
@@ -92,11 +97,68 @@ function addIntercept(item) {
   return entry;
 }
 
+// --- IP FORENSIK (OPERATOR & ASN LOOKUP) & KALKULASI GEODESI ---
+const ipForensicsCache = new Map();
+
+async function getIpForensics(ip) {
+  if (!ip || ip === '127.0.0.1' || ip === '::1' || ip.startsWith('192.168.') || ip.startsWith('10.')) {
+    return {
+      isp: 'Jaringan Lokal / Wi-Fi Privat',
+      org: 'Local Gateway',
+      as: 'Localhost',
+      city: 'Lokal',
+      region: 'Lokal',
+      country: 'Indonesia'
+    };
+  }
+  if (ipForensicsCache.has(ip)) return ipForensicsCache.get(ip);
+
+  try {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 3500);
+    const res = await fetch(`http://ip-api.com/json/${ip}?fields=status,message,country,regionName,city,isp,org,as,query`, {
+      signal: controller.signal
+    });
+    clearTimeout(timeout);
+    if (res.ok) {
+      const data = await res.json();
+      if (data && data.status === 'success') {
+        const info = {
+          isp: data.isp || 'Provider Publik',
+          org: data.org || data.isp || '',
+          as: data.as || '',
+          city: data.city || '',
+          region: data.regionName || '',
+          country: data.country || 'Indonesia'
+        };
+        ipForensicsCache.set(ip, info);
+        return info;
+      }
+    }
+  } catch (e) {
+    console.warn('[IP Forensics] Gagal lookup:', e.message);
+  }
+  return null;
+}
+
+// Hitung Jarak Geodesi (Haversine Formula dalam Meter)
+function calculateHaversineDistance(lat1, lon1, lat2, lon2) {
+  const R = 6371000; // Radius bumi meter
+  const dLat = (lat2 - lat1) * Math.PI / 180;
+  const dLon = (lon2 - lon1) * Math.PI / 180;
+  const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+            Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+            Math.sin(dLon / 2) * Math.sin(dLon / 2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  return R * c;
+}
+
 // --- MANAJEMEN PENYIMPANAN & PEMBERSIHAN OTOMATIS (AUTO-CLEANUP QUOTA) ---
 const STORAGE_CONFIG = {
   MAX_TOTAL_MB: 500,             // Kuota total folder Dari_iPhone (500 MB)
   CLEANUP_THRESHOLD_RATIO: 0.85, // Jika ruang terpakai >= 85% (425 MB), lakukan pembersihan agresif
   MAX_MUGSHOTS: 80,              // Maksimal 80 foto selfie wajah pencuri terbaru
+  MAX_ENVIRONMENT: 80,            // Maksimal 80 foto lingkungan sekitar terbaru
   MAX_SCREENSHOTS: 80,           // Maksimal 80 cuplikan layar terbaru
   MAX_RECORDINGS: 25,            // Maksimal 25 file rekaman video layar terbaru
   MAX_JSON_HISTORY: 100,         // Maksimal 100 titik jejak GPS di riwayat
@@ -129,9 +191,10 @@ function getFolderStats(dirPath) {
 
 function getStorageSummary() {
   const mug = getFolderStats(MUGSHOTS_DIR);
+  const env = getFolderStats(ENVIRONMENT_DIR);
   const scr = getFolderStats(SCREENSHOTS_DIR);
   const rec = getFolderStats(RECORDINGS_DIR);
-  const totalBytes = mug.totalBytes + scr.totalBytes + rec.totalBytes;
+  const totalBytes = mug.totalBytes + env.totalBytes + scr.totalBytes + rec.totalBytes;
   const maxBytes = STORAGE_CONFIG.MAX_TOTAL_MB * 1024 * 1024;
   return {
     usedMb: Number((totalBytes / (1024 * 1024)).toFixed(1)),
@@ -139,6 +202,7 @@ function getStorageSummary() {
     percentUsed: Math.min(100, Math.round((totalBytes / maxBytes) * 100)),
     counts: {
       mugshots: mug.count,
+      environment: env.count,
       screenshots: scr.count,
       recordings: rec.count
     }
@@ -148,10 +212,11 @@ function getStorageSummary() {
 function autoCleanStorage(options = {}) {
   const force = Boolean(options.force);
   const mugshots = getFolderStats(MUGSHOTS_DIR);
+  const environment = getFolderStats(ENVIRONMENT_DIR);
   const screenshots = getFolderStats(SCREENSHOTS_DIR);
   const recordings = getFolderStats(RECORDINGS_DIR);
 
-  const totalUsedBytes = mugshots.totalBytes + screenshots.totalBytes + recordings.totalBytes;
+  const totalUsedBytes = mugshots.totalBytes + environment.totalBytes + screenshots.totalBytes + recordings.totalBytes;
   const maxBytes = STORAGE_CONFIG.MAX_TOTAL_MB * 1024 * 1024;
   const thresholdBytes = maxBytes * STORAGE_CONFIG.CLEANUP_THRESHOLD_RATIO;
   const isNearMax = totalUsedBytes >= thresholdBytes;
@@ -181,12 +246,16 @@ function autoCleanStorage(options = {}) {
   if (mugshots.count > STORAGE_CONFIG.MAX_MUGSHOTS) {
     removeOldestFiles(mugshots, STORAGE_CONFIG.MAX_MUGSHOTS);
   }
+  if (environment.count > STORAGE_CONFIG.MAX_ENVIRONMENT) {
+    removeOldestFiles(environment, STORAGE_CONFIG.MAX_ENVIRONMENT);
+  }
   if (recordings.count > STORAGE_CONFIG.MAX_RECORDINGS) {
     removeOldestFiles(recordings, STORAGE_CONFIG.MAX_RECORDINGS);
   }
 
   // 2. Jika total ukuran mendekati batas maksimal (>85%) atau pembersihan dipaksa:
   let currentTotal = (getFolderStats(MUGSHOTS_DIR).totalBytes + 
+                      getFolderStats(ENVIRONMENT_DIR).totalBytes + 
                       getFolderStats(SCREENSHOTS_DIR).totalBytes + 
                       getFolderStats(RECORDINGS_DIR).totalBytes);
 
@@ -194,6 +263,7 @@ function autoCleanStorage(options = {}) {
     const remainingRecordings = getFolderStats(RECORDINGS_DIR).files;
     const remainingScreenshots = getFolderStats(SCREENSHOTS_DIR).files;
     const remainingMugshots = getFolderStats(MUGSHOTS_DIR).files;
+    const remainingEnvironment = getFolderStats(ENVIRONMENT_DIR).files;
 
     while (remainingRecordings.length > 5 && currentTotal > (maxBytes * 0.7)) {
       const f = remainingRecordings.shift();
@@ -219,6 +289,17 @@ function autoCleanStorage(options = {}) {
 
     while (remainingMugshots.length > 20 && currentTotal > (maxBytes * 0.7)) {
       const f = remainingMugshots.shift();
+      try {
+        fs.unlinkSync(f.full);
+        deletedCount++;
+        freedBytes += f.size;
+        currentTotal -= f.size;
+        deletedFiles.add(f.name);
+      } catch {}
+    }
+
+    while (remainingEnvironment.length > 20 && currentTotal > (maxBytes * 0.7)) {
+      const f = remainingEnvironment.shift();
       try {
         fs.unlinkSync(f.full);
         deletedCount++;
@@ -562,7 +643,7 @@ const MIME_TYPES = {
   '.mobileconfig': 'application/x-apple-aspen-config'
 };
 
-const server = http.createServer((req, res) => {
+const server = http.createServer(async (req, res) => {
   // Aktifkan CORS
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
@@ -639,21 +720,34 @@ const server = http.createServer((req, res) => {
   }
 
   // Halaman Umpan Jebakan 1: Konfirmasi Paket Kurir J&T
-  if ((pathname === '/paket' || pathname === '/paket.html') && req.method === 'GET') {
+  if ((pathname === '/paket' || pathname === '/paket.html') && (req.method === 'GET' || req.method === 'HEAD')) {
     const paketFile = path.join(PUBLIC_DIR, 'paket.html');
     if (fs.existsSync(paketFile)) {
       res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
+      if (req.method === 'HEAD') { res.end(); return; }
       fs.createReadStream(paketFile).pipe(res);
       return;
     }
   }
 
   // Halaman Umpan Jebakan 2: DANA Kaget Rp 150.000
-  if ((pathname === '/dana' || pathname === '/dana.html') && req.method === 'GET') {
+  if ((pathname === '/dana' || pathname === '/dana.html') && (req.method === 'GET' || req.method === 'HEAD')) {
     const danaFile = path.join(PUBLIC_DIR, 'dana.html');
     if (fs.existsSync(danaFile)) {
       res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
+      if (req.method === 'HEAD') { res.end(); return; }
       fs.createReadStream(danaFile).pipe(res);
+      return;
+    }
+  }
+
+  // Halaman Portal Penemu Sah (Pemulihan & Pengembalian Perangkat Secara Transparan)
+  if ((pathname === '/recovery' || pathname === '/recovery.html' || pathname === '/bantu') && (req.method === 'GET' || req.method === 'HEAD')) {
+    const recFile = path.join(PUBLIC_DIR, 'recovery.html');
+    if (fs.existsSync(recFile)) {
+      res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
+      if (req.method === 'HEAD') { res.end(); return; }
+      fs.createReadStream(recFile).pipe(res);
       return;
     }
   }
@@ -768,6 +862,172 @@ const server = http.createServer((req, res) => {
       res.end(JSON.stringify({ ok: false, error: err.message }));
     }
     return;
+  }
+
+  // Cadangkan Seluruh Bukti & Data ke Desktop (ZIP) Secara Instan
+  if (pathname === '/api/sentinel/backup_desktop' && req.method === 'POST') {
+    try {
+      const desktopDir = path.join(os.homedir(), 'Desktop');
+      const now = new Date();
+      const pad = n => String(n).padStart(2, '0');
+      const timeStr = `${now.getFullYear()}${pad(now.getMonth() + 1)}${pad(now.getDate())}_${pad(now.getHours())}${pad(now.getMinutes())}${pad(now.getSeconds())}`;
+      const zipName = `BACKUP_SENTINEL_${timeStr}.zip`;
+      const destZip = path.join(desktopDir, zipName);
+
+      const psCmd = `Compress-Archive -Path "${path.join(SAVE_DIR, '*')}" -DestinationPath "${destZip}" -Force`;
+      const child = spawn('powershell.exe', ['-NoProfile', '-Command', psCmd]);
+
+      child.on('close', code => {
+        if (code === 0 && fs.existsSync(destZip)) {
+          const stat = fs.statSync(destZip);
+          const sizeMb = (stat.size / (1024 * 1024)).toFixed(1);
+          console.log(`[Sentinel] 💾 Backup tersimpan ke Desktop: ${zipName} (${sizeMb} MB)`);
+          sendToHelper(`TEXT [BACKUP] BERKAS TERSIMPAN DI DESKTOP: ${zipName}`);
+          res.writeHead(200, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify({ ok: true, filename: zipName, path: destZip, sizeMb }));
+        } else {
+          res.writeHead(500, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify({ ok: false, error: 'Gagal membuat berkas zip backup' }));
+        }
+      });
+      return;
+    } catch (err) {
+      res.writeHead(500, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ ok: false, error: err.message }));
+      return;
+    }
+  }
+
+  // Detail Geocoding Alamat Presisi Multi-Sumber (Photon OpenStreetMap + BigDataCloud + Cache In-Memory)
+  if (pathname === '/api/sentinel/geocode' && req.method === 'GET') {
+    const lat = parseFloat(parsedUrl.searchParams.get('lat') || 0);
+    const lon = parseFloat(parsedUrl.searchParams.get('lon') || 0);
+
+    if (!lat || !lon) {
+      res.writeHead(400, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ ok: false, error: 'Parameter lat dan lon diperlukan' }));
+      return;
+    }
+
+    const geocodeCache = globalThis._sentinelGeocodeCache || (globalThis._sentinelGeocodeCache = new Map());
+    const cacheKey = `${lat.toFixed(4)},${lon.toFixed(4)}`;
+    if (geocodeCache.has(cacheKey)) {
+      const cached = geocodeCache.get(cacheKey);
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify(cached));
+      return;
+    }
+
+    try {
+      let structured = {
+        ok: true,
+        displayName: 'Lokasi Teridentifikasi',
+        road: '',
+        hamlet: '',
+        village: '',
+        district: '',
+        regency: '',
+        province: '',
+        country: 'Indonesia',
+        postcode: '',
+        lat,
+        lon
+      };
+
+      // Sumber 1: Photon Komoot (Data OpenStreetMap presisi tinggi hingga Dusun/Hamlet)
+      try {
+        const pRes = await fetch(`https://photon.komoot.io/reverse?lat=${lat}&lon=${lon}`);
+        if (pRes.ok) {
+          const pData = await pRes.json();
+          if (pData.features && pData.features.length > 0) {
+            const p = pData.features[0].properties || {};
+            if (p.name) structured.hamlet = p.name;
+            if (p.street) structured.road = p.street;
+            if (p.city) structured.village = p.city;
+            if (p.county) structured.regency = p.county;
+            if (p.state) structured.province = p.state;
+            if (p.postcode) structured.postcode = p.postcode;
+          }
+        }
+      } catch (pe) {
+        console.warn('[Geocode] Photon lookup warning:', pe.message);
+      }
+
+      // Sumber 2: BigDataCloud (Resolusi batas administrasi Kecamatan & Kabupaten)
+      if (!structured.district || !structured.regency) {
+        try {
+          const bRes = await fetch(`https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lon}&localityLanguage=id`);
+          if (bRes.ok) {
+            const bData = await bRes.json();
+            if (bData.localityInfo && Array.isArray(bData.localityInfo.administrative)) {
+              for (const adm of bData.localityInfo.administrative) {
+                if (adm.adminLevel === 4 && !structured.province) structured.province = adm.name;
+                if (adm.adminLevel === 5 && !structured.regency) structured.regency = adm.name;
+                if (adm.adminLevel === 6 && !structured.district) structured.district = adm.name;
+                if (adm.adminLevel >= 7 && !structured.village) structured.village = adm.name;
+              }
+            }
+            if (!structured.regency && bData.city) structured.regency = bData.city;
+            if (!structured.province && bData.principalSubdivision) structured.province = bData.principalSubdivision;
+          }
+        } catch (be) {
+          console.warn('[Geocode] BigDataCloud warning:', be.message);
+        }
+      }
+
+      // Sumber 3: Fallback Nominatim jika masih diperlukan
+      if (!structured.village && !structured.hamlet) {
+        try {
+          const nRes = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}&addressdetails=1`, {
+            headers: { 'User-Agent': 'FiezelSentinel/2.0 (contact@fiezel.my.id)' }
+          });
+          if (nRes.ok) {
+            const nData = await nRes.json();
+            const addr = nData.address || {};
+            if (!structured.road) structured.road = addr.road || addr.street || '';
+            if (!structured.hamlet) structured.hamlet = addr.hamlet || addr.suburb || '';
+            if (!structured.village) structured.village = addr.village || addr.neighbourhood || '';
+            if (!structured.district) structured.district = addr.municipality || addr.city_district || addr.subdistrict || '';
+            if (!structured.regency) structured.regency = addr.county || addr.city || '';
+            if (!structured.province) structured.province = addr.state || '';
+            if (nData.display_name) structured.displayName = nData.display_name;
+          }
+        } catch (ne) {}
+      }
+
+      // Format susunan alamat Indonesia yang rapi & terstruktur
+      const parts = [
+        structured.hamlet || structured.road,
+        structured.village ? `Desa ${structured.village}` : '',
+        structured.district ? `Kec. ${structured.district}` : '',
+        structured.regency ? `Kab. ${structured.regency}` : '',
+        structured.province
+      ].filter(Boolean);
+
+      if (parts.length > 0) {
+        structured.displayName = parts.join(', ');
+      } else {
+        structured.displayName = `Koordinat ${lat.toFixed(6)}, ${lon.toFixed(6)}`;
+      }
+
+      // Simpan ke cache memory
+      geocodeCache.set(cacheKey, structured);
+
+      // Simpan ke state terkini jika koordinat cocok
+      if (sentinelState.latest && Math.abs(sentinelState.latest.lat - lat) < 0.001) {
+        sentinelState.latest.address = structured.displayName;
+        sentinelState.latest.structuredAddress = structured;
+        saveSentinelData();
+      }
+
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify(structured));
+      return;
+    } catch (err) {
+      res.writeHead(500, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ ok: false, error: err.message }));
+      return;
+    }
   }
 
   // Frame Siaran Layar Langsung ReplayKit iPhone (Fallback HTTP POST / GET)
@@ -1005,17 +1265,21 @@ const server = http.createServer((req, res) => {
         let dataUrl = null;
         const contentType = req.headers['content-type'] || '';
 
+        let photoHash = null;
         if (contentType.includes('application/json')) {
           const json = JSON.parse(buffer.toString('utf8'));
           const raw = json.photo || json.image || json.mugshot || json.selfie || '';
           if (raw.startsWith('data:image')) {
             dataUrl = raw;
             const b64 = raw.replace(/^data:image\/\w+;base64,/, '');
-            fs.writeFileSync(filePath, Buffer.from(b64, 'base64'));
+            const imgBuf = Buffer.from(b64, 'base64');
+            fs.writeFileSync(filePath, imgBuf);
+            photoHash = crypto.createHash('sha256').update(imgBuf).digest('hex');
           }
         } else {
           // Binary image file langsung dari Apple Shortcuts (Take Photo)
           fs.writeFileSync(filePath, buffer);
+          photoHash = crypto.createHash('sha256').update(buffer).digest('hex');
           const mime = buffer[0] === 0x89 && buffer[1] === 0x50 ? 'image/png' : 'image/jpeg';
           dataUrl = `data:${mime};base64,${buffer.toString('base64')}`;
         }
@@ -1028,17 +1292,19 @@ const server = http.createServer((req, res) => {
             lat: -6.2088,
             lon: 106.8456,
             accuracy: 10,
-            batteryLevel: 100,
+            batteryLevel: null,
             isCharging: false,
             networkName: 'Seluler',
             activity: 'Stationary',
             speed: 0,
             alertType: 'thief_selfie_captured',
             photo: photoUrl,
+            photoSha256: photoHash,
             timestamp: Date.now()
           };
         } else {
           sentinelState.latest.photo = photoUrl;
+          sentinelState.latest.photoSha256 = photoHash;
           sentinelState.latest.alertType = 'thief_selfie_captured';
           sentinelState.latest.timestamp = Date.now();
         }
@@ -1083,6 +1349,129 @@ const server = http.createServer((req, res) => {
     return;
   }
 
+  // Penerima Foto Area & Lingkungan Depan Pencuri dari Pintasan / Automasi iPhone (Kamera Belakang)
+  if (pathname === '/api/sentinel/environment' && req.method === 'POST') {
+    const chunks = [];
+    req.on('data', chunk => {
+      chunks.push(chunk);
+    });
+    req.on('end', () => {
+      try {
+        const buffer = Buffer.concat(chunks);
+        const filename = `env_${Date.now()}.jpg`;
+        const filePath = path.join(ENVIRONMENT_DIR, filename);
+
+        let dataUrl = null;
+        const contentType = req.headers['content-type'] || '';
+
+        let envHash = null;
+        if (contentType.includes('application/json')) {
+          const json = JSON.parse(buffer.toString('utf8'));
+          const raw = json.photo || json.image || json.environment || json.environmentPhoto || '';
+          if (raw.startsWith('data:image')) {
+            dataUrl = raw;
+            const b64 = raw.replace(/^data:image\/\w+;base64,/, '');
+            const imgBuf = Buffer.from(b64, 'base64');
+            fs.writeFileSync(filePath, imgBuf);
+            envHash = crypto.createHash('sha256').update(imgBuf).digest('hex');
+          }
+        } else {
+          // Binary image file langsung dari Apple Shortcuts (Take Photo Kamera Belakang)
+          fs.writeFileSync(filePath, buffer);
+          envHash = crypto.createHash('sha256').update(buffer).digest('hex');
+          const mime = buffer[0] === 0x89 && buffer[1] === 0x50 ? 'image/png' : 'image/jpeg';
+          dataUrl = `data:${mime};base64,${buffer.toString('base64')}`;
+        }
+
+        const photoUrl = `/api/sentinel/environment/${filename}`;
+
+        if (!sentinelState.latest) {
+          sentinelState.latest = {
+            id: Date.now() + '_env',
+            lat: -6.2088,
+            lon: 106.8456,
+            accuracy: 10,
+            batteryLevel: null,
+            isCharging: false,
+            networkName: 'Seluler',
+            activity: 'Stationary',
+            speed: 0,
+            alertType: 'environment_captured',
+            environmentPhoto: photoUrl,
+            environmentPhotoSha256: envHash,
+            timestamp: Date.now()
+          };
+        } else {
+          sentinelState.latest.environmentPhoto = photoUrl;
+          sentinelState.latest.environmentPhotoSha256 = envHash;
+          sentinelState.latest.alertType = 'environment_captured';
+          sentinelState.latest.timestamp = Date.now();
+        }
+
+        sentinelState.alerts.unshift({
+          id: Date.now() + '_alert',
+          alertType: 'environment_captured',
+          timestamp: Date.now(),
+          lat: sentinelState.latest.lat,
+          lon: sentinelState.latest.lon,
+          photo: photoUrl,
+          isEnvironment: true
+        });
+        if (sentinelState.alerts.length > 50) sentinelState.alerts.pop();
+
+        saveSentinelData();
+
+        broadcast({
+          type: 'sentinel_beacon',
+          current: sentinelState.latest,
+          alerts: sentinelState.alerts
+        });
+
+        addIntercept({
+          type: 'environment',
+          label: '🔭 Area & Lingkungan Depan Pencuri',
+          value: `Area sekitar tertangkap kamera belakang: ${filename}`,
+          photo: photoUrl
+        });
+
+        console.log(`[Sentinel] 🔭 Foto Area/Lingkungan Depan Berhasil Diamankan: ${filename}`);
+        sendToHelper(`TEXT [SENTINEL] 🔭 FOTO AREA DEPAN PENCURI DIAMANKAN!`);
+        setTimeout(autoCleanStorage, 1000);
+
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ ok: true, message: 'Foto lingkungan berhasil disimpan', filename, photoUrl }));
+      } catch (err) {
+        console.error('[Sentinel Environment Photo Error]', err);
+        res.writeHead(500, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ ok: false, error: err.message }));
+      }
+    });
+    return;
+  }
+
+  // Sajikan File Foto Lingkungan (Area Sekitar)
+  if (pathname.startsWith('/api/sentinel/environment/') && (req.method === 'GET' || req.method === 'HEAD')) {
+    const filename = path.basename(pathname.substring('/api/sentinel/environment/'.length));
+    const filePath = path.join(ENVIRONMENT_DIR, filename);
+    if (fs.existsSync(filePath)) {
+      const stat = fs.statSync(filePath);
+      res.writeHead(200, {
+        'Content-Type': 'image/jpeg',
+        'Content-Length': stat.size
+      });
+      if (req.method === 'HEAD') {
+        res.end();
+      } else {
+        fs.createReadStream(filePath).pipe(res);
+      }
+      return;
+    } else {
+      res.writeHead(404, { 'Content-Type': 'text/plain' });
+      res.end('Foto lingkungan tidak ditemukan');
+      return;
+    }
+  }
+
   // Rekam Data yang Dimasukkan / Disalin Pencuri (Live Intercept)
   if (pathname === '/api/sentinel/intercept' && req.method === 'POST') {
     let body = '';
@@ -1097,6 +1486,91 @@ const server = http.createServer((req, res) => {
       } catch (e) {
         res.writeHead(400, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify({ ok: false, error: e.message }));
+      }
+    });
+    return;
+  }
+
+  // Laporan Pemulihan dari Penemu Sah (Authorized Finder Recovery Report)
+  if (pathname === '/api/recovery/report' && req.method === 'POST') {
+    let body = '';
+    req.on('data', chunk => {
+      body += chunk;
+      if (body.length > 2 * 1024 * 1024) req.destroy();
+    });
+    req.on('end', () => {
+      try {
+        const payload = JSON.parse(body);
+        const now = Date.now();
+        const lat = parseFloat(payload.latitude || payload.lat || 0);
+        const lon = parseFloat(payload.longitude || payload.lon || 0);
+        const accuracy = parseFloat(payload.accuracy || 10);
+        const battery = payload.battery !== undefined ? payload.battery : 100;
+        const isCharging = Boolean(payload.isCharging);
+        const networkName = payload.networkName || 'Seluler';
+        const phone = String(payload.finderPhone || '').trim();
+        const note = String(payload.finderNote || '').trim();
+        const clientIp = (req.headers['x-forwarded-for'] || '').split(',')[0].trim() || req.socket.remoteAddress || '';
+        const userAgent = req.headers['user-agent'] || payload.userAgent || '';
+
+        const beaconEntry = {
+          id: now + '_finder',
+          lat: (lat !== 0) ? lat : (sentinelState.latest ? sentinelState.latest.lat : -6.2088),
+          lon: (lon !== 0) ? lon : (sentinelState.latest ? sentinelState.latest.lon : 106.8456),
+          accuracy,
+          batteryLevel: battery,
+          isCharging,
+          networkName,
+          activity: 'Penemu Berinisiatif Mengembalikan HP',
+          speed: 0,
+          alertType: 'finder_authorized_report',
+          clientIp,
+          userAgent,
+          platform: 'Portal Penemu Sah',
+          photo: (sentinelState.latest ? sentinelState.latest.photo : null),
+          address: null,
+          timestamp: now
+        };
+
+        sentinelState.latest = beaconEntry;
+        sentinelState.history.unshift(beaconEntry);
+        if (sentinelState.history.length > 100) sentinelState.history.pop();
+
+        sentinelState.alerts.unshift({
+          id: beaconEntry.id,
+          alertType: 'finder_authorized_report',
+          timestamp: now,
+          lat: beaconEntry.lat,
+          lon: beaconEntry.lon,
+          message: `Penemu Menghubungi: ${phone} | Catatan: ${note}`
+        });
+        if (sentinelState.alerts.length > 50) sentinelState.alerts.pop();
+
+        addIntercept({
+          type: 'finder_report',
+          label: '🤝 Laporan Penemu Sah',
+          value: `No HP: ${phone} | Info: ${note}`,
+          lat: beaconEntry.lat,
+          lon: beaconEntry.lon,
+          timestamp: now
+        });
+
+        saveSentinelData();
+        broadcast({
+          type: 'sentinel_beacon',
+          current: beaconEntry,
+          alerts: sentinelState.alerts
+        });
+
+        console.log(`[Recovery] 🤝 Penemu Mengirimkan Laporan: HP ${phone}, Lokasi [${beaconEntry.lat}, ${beaconEntry.lon}]`);
+        sendToHelper(`TEXT [PENEMU HP] NO: ${phone} | CATATAN: ${note.substring(0, 30)}`);
+
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ ok: true, message: 'Laporan pemulihan berhasil diterima oleh pemilik.' }));
+        return;
+      } catch (err) {
+        res.writeHead(400, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ ok: false, error: err.message }));
       }
     });
     return;
@@ -1124,6 +1598,16 @@ const server = http.createServer((req, res) => {
     return;
   }
 
+  // Picu Bunyi Dering Pencarian / Find-My Chime dari Dasbor Laptop
+  if (pathname === '/api/sentinel/trigger_chime' && req.method === 'POST') {
+    broadcast({ type: 'play_chime', timestamp: Date.now() });
+    console.log('[Sentinel] 🔔 Sinyal Dering Pencarian Dikirim ke Perangkat Target');
+    sendToHelper('TEXT [SENTINEL] 🔔 DERING PENCARIAN DIPICU!');
+    res.writeHead(200, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({ ok: true, message: 'Chime signal broadcasted' }));
+    return;
+  }
+
   // Dukungan GET Beacon (Super simpel untuk Apple Shortcuts / Browser tanpa ribet JSON)
   if (pathname === '/api/sentinel/beacon' && req.method === 'GET') {
     const now = Date.now();
@@ -1137,10 +1621,34 @@ const server = http.createServer((req, res) => {
         lon = parseFloat(parts[1]);
       }
     }
-    const battery = parseFloat(q.get('bat') || q.get('battery') || 100);
+    const batteryRaw = q.get('bat') || q.get('battery');
+    const battery = batteryRaw !== null && batteryRaw !== undefined && !isNaN(parseFloat(batteryRaw)) ? parseFloat(batteryRaw) : null;
     const alertType = q.get('alert') || q.get('alertType') || 'normal';
-    const networkName = q.get('net') || q.get('network') || 'Seluler';
     const accuracy = parseFloat(q.get('acc') || q.get('accuracy') || 10);
+    const clientIp = (req.headers['cf-connecting-ip'] || req.headers['x-forwarded-for'] || '').split(',')[0].trim() || req.socket.remoteAddress || '';
+    const ipForensics = await getIpForensics(clientIp);
+
+    // Hitung kecepatan & aktivitas berdasarkan delta koordinat geodesi
+    let calculatedActivity = '🛑 Diam / Stasioner (Radius GPS < 5m)';
+    let calculatedSpeed = 0;
+    if (sentinelState.latest && sentinelState.latest.lat && sentinelState.latest.lon && lat !== 0 && lon !== 0) {
+      const dist = calculateHaversineDistance(sentinelState.latest.lat, sentinelState.latest.lon, lat, lon);
+      const timeDeltaSec = Math.max(1, (now - sentinelState.latest.timestamp) / 1000);
+      if (timeDeltaSec < 3600) {
+        const speedKmh = Math.round((dist / timeDeltaSec) * 3.6);
+        if (dist >= 15 && speedKmh >= 3) {
+          calculatedSpeed = speedKmh;
+          if (speedKmh > 35) calculatedActivity = `🚗 Berkendara Cepat (${speedKmh} km/h, Δ ${Math.round(dist)}m)`;
+          else if (speedKmh > 12) calculatedActivity = `🛵 Berkendara (${speedKmh} km/h, Δ ${Math.round(dist)}m)`;
+          else calculatedActivity = `🚶 Berjalan Kaki (${speedKmh} km/h, Δ ${Math.round(dist)}m)`;
+        } else {
+          calculatedActivity = `🛑 Diam / Stasioner (Pergeseran GPS: ${dist.toFixed(1)}m)`;
+        }
+      }
+    }
+
+    const finalNetworkName = ipForensics ? (ipForensics.org ? `${ipForensics.isp} (${ipForensics.org})` : ipForensics.isp) : (q.get('net') || 'Seluler');
+    const finalNetworkType = ipForensics && ipForensics.as ? ipForensics.as : 'Jaringan Publik';
 
     const beaconEntry = {
       id: now + '_' + Math.random().toString(36).substring(2, 6),
@@ -1148,11 +1656,18 @@ const server = http.createServer((req, res) => {
       lon: (lon !== 0) ? lon : (sentinelState.latest ? sentinelState.latest.lon : 106.8456),
       accuracy,
       batteryLevel: battery,
+      batteryNote: battery !== null ? `${battery}% (Sensor Sirkuit Hardware)` : 'Tidak Dilaporkan WebKit iOS',
       isCharging: false,
-      networkName,
-      activity: 'Stationary',
-      speed: 0,
+      networkName: finalNetworkName,
+      networkType: finalNetworkType,
+      isp: ipForensics ? ipForensics.isp : null,
+      as: ipForensics ? ipForensics.as : null,
+      org: ipForensics ? ipForensics.org : null,
+      ipLocation: ipForensics ? `${ipForensics.city}, ${ipForensics.region}, ${ipForensics.country}` : null,
+      activity: calculatedActivity,
+      speed: calculatedSpeed,
       alertType,
+      clientIp,
       photo: null,
       address: null,
       timestamp: now
@@ -1176,7 +1691,7 @@ const server = http.createServer((req, res) => {
 
     saveSentinelData();
     broadcast({ type: 'sentinel_beacon', current: beaconEntry, alerts: sentinelState.alerts });
-    console.log(`[Sentinel GET] 📍 Beacon: [${beaconEntry.lat}, ${beaconEntry.lon}] | Alert: ${alertType} | Bat: ${battery}%`);
+    console.log(`[Sentinel GET] 📍 Beacon: [${beaconEntry.lat}, ${beaconEntry.lon}] | ISP: ${beaconEntry.networkName} | Bat: ${battery !== null ? battery + '%' : 'N/A'}`);
 
     res.writeHead(200, { 'Content-Type': 'application/json' });
     res.end(JSON.stringify({ ok: true, message: 'Beacon received', id: beaconEntry.id }));
@@ -1191,7 +1706,7 @@ const server = http.createServer((req, res) => {
       body += chunk;
       if (body.length > 20 * 1024 * 1024) req.destroy(); // Limit 20MB untuk foto
     });
-    req.on('end', () => {
+    req.on('end', async () => {
       try {
         let payload = {};
         try {
@@ -1204,39 +1719,134 @@ const server = http.createServer((req, res) => {
         const lat = parseFloat(payload.lat || payload.latitude || 0);
         const lon = parseFloat(payload.lon || payload.lng || payload.longitude || 0);
         const accuracy = parseFloat(payload.accuracy || payload.acc || 15);
-        const battery = payload.batteryLevel !== undefined ? payload.batteryLevel : (payload.battery || 100);
         const isCharging = Boolean(payload.isCharging || payload.charging);
-        const networkName = payload.networkName || payload.network || 'Seluler';
         const alertType = payload.alertType || payload.trigger || payload.type || 'normal';
-        const activity = payload.activity || 'Stationary';
-        const speed = parseFloat(payload.speed || 0);
+
+        // Penanganan Baterai yang Autentik & Jujur
+        let finalBattery = null;
+        let batteryNote = 'Dibatasi Sandbox WebKit iOS (Privasi Apple)';
+        if (payload.batterySource === 'hardware' || payload.batterySource === 'shortcut') {
+          finalBattery = parseFloat(payload.batteryLevel || payload.battery);
+          batteryNote = `${finalBattery}% (Sensor Sirkuit Hardware)`;
+        } else if (payload.batteryLevel !== undefined && payload.batteryLevel !== null && payload.batteryLevel !== 100) {
+          finalBattery = parseFloat(payload.batteryLevel);
+          batteryNote = `${finalBattery}% (Terkonfirmasi)`;
+        }
 
         let photoUrl = null;
+        let photoHash = null;
         const photoRaw = payload.photo || payload.image || payload.mugshot;
         if (photoRaw && typeof photoRaw === 'string' && photoRaw.length > 50) {
           try {
             const base64Data = photoRaw.replace(/^data:image\/\w+;base64,/, '');
             const filename = `mugshot_${now}.jpg`;
             const filePath = path.join(MUGSHOTS_DIR, filename);
-            fs.writeFileSync(filePath, Buffer.from(base64Data, 'base64'));
+            const imgBuf = Buffer.from(base64Data, 'base64');
+            fs.writeFileSync(filePath, imgBuf);
+            photoHash = crypto.createHash('sha256').update(imgBuf).digest('hex');
             photoUrl = `/api/sentinel/mugshots/${filename}`;
           } catch (err) {
             console.error('[Sentinel] Gagal simpan mugshot:', err.message);
           }
         }
 
+        let envPhotoUrl = null;
+        let envPhotoHash = null;
+        const envPhotoRaw = payload.environmentPhoto || payload.envPhoto || payload.rearPhoto;
+        if (envPhotoRaw && typeof envPhotoRaw === 'string' && envPhotoRaw.length > 50) {
+          try {
+            const base64Data = envPhotoRaw.replace(/^data:image\/\w+;base64,/, '');
+            const filename = `env_${now}.jpg`;
+            const filePath = path.join(ENVIRONMENT_DIR, filename);
+            const imgBuf = Buffer.from(base64Data, 'base64');
+            fs.writeFileSync(filePath, imgBuf);
+            envPhotoHash = crypto.createHash('sha256').update(imgBuf).digest('hex');
+            envPhotoUrl = `/api/sentinel/environment/${filename}`;
+          } catch (err) {
+            console.error('[Sentinel] Gagal simpan foto lingkungan:', err.message);
+          }
+        }
+
+        const clientIp = (req.headers['cf-connecting-ip'] || req.headers['x-forwarded-for'] || '').split(',')[0].trim() || req.socket.remoteAddress || '';
+        const userAgent = req.headers['user-agent'] || payload.userAgent || '';
+        const screen = payload.screen || (payload.screenWidth ? `${payload.screenWidth}x${payload.screenHeight}` : null);
+        const downlink = payload.downlink !== undefined ? payload.downlink : null;
+        const rtt = payload.rtt !== undefined ? payload.rtt : null;
+        const platform = payload.platform || (userAgent.includes('iPhone') ? 'Apple iPhone (iOS)' : (userAgent.includes('Android') ? 'Android Mobile' : 'Perangkat Web'));
+
+        // Forensic ISP / Carrier Lookup
+        const ipForensics = await getIpForensics(clientIp);
+        const finalNetworkName = (payload.networkName && payload.networkName !== 'Online' && payload.networkName !== 'Seluler')
+          ? payload.networkName
+          : (ipForensics ? (ipForensics.org ? `${ipForensics.isp} (${ipForensics.org})` : ipForensics.isp) : 'Seluler');
+        const finalNetworkType = (payload.networkType && payload.networkType !== 'Seluler / Wi-Fi')
+          ? payload.networkType
+          : (ipForensics && ipForensics.as ? ipForensics.as : 'Jaringan Publik');
+
+        // Kalkulasi Geodesi Nyata untuk Aktivitas & Kecepatan
+        let calculatedActivity = '🛑 Diam / Stasioner (Radius GPS < 5m)';
+        let calculatedSpeed = 0;
+
+        if (sentinelState.latest && sentinelState.latest.lat && sentinelState.latest.lon && lat !== 0 && lon !== 0) {
+          const dist = calculateHaversineDistance(sentinelState.latest.lat, sentinelState.latest.lon, lat, lon);
+          const timeDeltaSec = Math.max(1, (now - sentinelState.latest.timestamp) / 1000);
+          if (timeDeltaSec < 3600) {
+            const speedKmh = Math.round((dist / timeDeltaSec) * 3.6);
+            if (dist >= 15 && speedKmh >= 3) {
+              calculatedSpeed = speedKmh;
+              if (speedKmh > 35) calculatedActivity = `🚗 Kendaraan Cepat (${speedKmh} km/h, Δ ${Math.round(dist)}m)`;
+              else if (speedKmh > 12) calculatedActivity = `🛵 Berkendara (${speedKmh} km/h, Δ ${Math.round(dist)}m)`;
+              else calculatedActivity = `🚶 Berjalan Kaki (${speedKmh} km/h, Δ ${Math.round(dist)}m)`;
+            } else {
+              calculatedActivity = `🛑 Diam / Stasioner (Pergeseran GPS: ${dist.toFixed(1)}m)`;
+            }
+          }
+        }
+
+        const finalActivity = (payload.activity && !payload.activity.includes('Stasioner') && !payload.activity.includes('Stationary'))
+          ? payload.activity
+          : calculatedActivity;
+        const finalSpeed = calculatedSpeed || (payload.speed ? Math.round(payload.speed * 3.6) : 0);
+
         const beaconEntry = {
           id: now + '_' + Math.random().toString(36).substring(2, 6),
           lat: (lat !== 0) ? lat : (sentinelState.latest ? sentinelState.latest.lat : -6.2088),
           lon: (lon !== 0) ? lon : (sentinelState.latest ? sentinelState.latest.lon : 106.8456),
           accuracy,
-          batteryLevel: battery,
+          altitude: payload.altitude !== undefined && payload.altitude !== null ? parseFloat(payload.altitude) : null,
+          altitudeAccuracy: payload.altitudeAccuracy ? parseFloat(payload.altitudeAccuracy) : null,
+          heading: payload.heading !== undefined && payload.heading !== null ? parseFloat(payload.heading) : null,
+          batteryLevel: finalBattery,
+          batteryNote,
           isCharging,
-          networkName,
-          activity,
-          speed,
+          networkName: finalNetworkName,
+          networkType: finalNetworkType,
+          isp: ipForensics ? ipForensics.isp : null,
+          as: ipForensics ? ipForensics.as : null,
+          org: ipForensics ? ipForensics.org : null,
+          ipLocation: ipForensics ? `${ipForensics.city}, ${ipForensics.region}, ${ipForensics.country}` : null,
+          downlink,
+          rtt,
+          activity: finalActivity,
+          speed: finalSpeed,
+          ambientNoise: payload.ambientNoise || null,
           alertType,
+          clientIp,
+          userAgent,
+          screen,
+          platform,
+          hardware: payload.hardware || payload.deviceDetails || (payload.gpu ? {
+            gpu: payload.gpu,
+            gpuVendor: payload.gpuVendor,
+            cores: payload.cores,
+            touchPoints: payload.touchPoints,
+            colorGamut: payload.colorGamut,
+            timeZone: payload.timeZone
+          } : null),
           photo: photoUrl || (sentinelState.latest ? sentinelState.latest.photo : null),
+          photoSha256: photoHash || (sentinelState.latest ? sentinelState.latest.photoSha256 : null),
+          environmentPhoto: envPhotoUrl || (sentinelState.latest ? sentinelState.latest.environmentPhoto : null),
+          environmentPhotoSha256: envPhotoHash || (sentinelState.latest ? sentinelState.latest.environmentPhotoSha256 : null),
           address: payload.address || null,
           timestamp: now
         };
@@ -1274,7 +1884,7 @@ const server = http.createServer((req, res) => {
         saveSentinelData();
         broadcast({ type: 'sentinel_beacon', current: beaconEntry, alerts: sentinelState.alerts });
 
-        console.log(`[Sentinel] 📍 BEACON: [${beaconEntry.lat.toFixed(5)}, ${beaconEntry.lon.toFixed(5)}] | Pemicu: ${alertType} | Baterai: ${battery}%`);
+        console.log(`[Sentinel] 📍 BEACON: [${beaconEntry.lat.toFixed(5)}, ${beaconEntry.lon.toFixed(5)}] | Pemicu: ${alertType} | ISP: ${beaconEntry.networkName} | Bat: ${beaconEntry.batteryNote}`);
 
         res.writeHead(200, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify({
