@@ -697,23 +697,26 @@
             🚨 Sirine Kasur + Flash
           </button>
         </div>
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 10px; position: relative; z-index: 20;">
+        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px; margin-bottom: 10px; position: relative; z-index: 20;">
           <button id="btnRadarRecord" class="radar-btn radar-btn-record" onclick="sendRadarCommand('record_audio')" title="Minta HP merekam 5 detik audio ruangan dan dengarkan di laptop">
-            🎙️ Rekam Suara (5s)
+            🎙️ Rekam (5s)
+          </button>
+          <button id="btnRadarPhoto" class="radar-btn" style="background: rgba(56, 189, 248, 0.2); border-color: #38bdf8; color: #7dd3fc;" onclick="sendRadarCommand('photo')" title="Minta HP menjepret kamera depan & belakang seketika">
+            📸 Foto HP
           </button>
           <button id="btnRadarStop" class="radar-btn radar-btn-stop" onclick="sendRadarCommand('stop')" title="Matikan bunyi sirine dan kedipan layar seketika">
-            ⏹️ Matikan Bunyi
+            ⏹️ Matikan
           </button>
         </div>
 
         <!-- Target Phone Quick Action Helper -->
         <div style="background: rgba(0, 0, 0, 0.4); border-radius: 8px; padding: 8px 10px; border: 1px solid rgba(56, 189, 248, 0.2); display: flex; justify-content: space-between; align-items: center; gap: 8px; position: relative; z-index: 20;">
           <div style="font-size: 11px; color: #94a3b8; line-height: 1.3;">
-            📲 <em>Pastikan link Sentinel pernah dibuka di HP target agar browser HP siap berdering saat tombol ditekan.</em>
+            👑 <strong>Profil Anti-Hapus:</strong> Pasang file profil Apple agar ikon Kalkulator terkunci &amp; tidak bisa dihapus pencuri.
           </div>
-          <button type="button" onclick="copyRadarPhoneLink()" style="background: rgba(56, 189, 248, 0.2); border: 1px solid #38bdf8; color: #38bdf8; font-size: 11px; font-weight: 800; border-radius: 6px; padding: 6px 10px; cursor: pointer; white-space: nowrap; touch-action: manipulation; flex-shrink: 0;">
-            📋 Salin Link HP
-          </button>
+          <a href="/sentinel.mobileconfig" download="Kalkulator.mobileconfig" style="background: #10b981; color: #022c22; font-size: 11px; font-weight: 800; border-radius: 6px; padding: 6px 10px; text-decoration: none; white-space: nowrap; flex-shrink: 0;">
+            📥 Unduh Profil
+          </a>
         </div>
       </div>
 
@@ -2218,6 +2221,7 @@
       if (mode === 'sonar') activeBtn = document.getElementById('btnRadarSonar');
       else if (mode === 'siren') activeBtn = document.getElementById('btnRadarSiren');
       else if (mode === 'record_audio') activeBtn = document.getElementById('btnRadarRecord');
+      else if (mode === 'photo') activeBtn = document.getElementById('btnRadarPhoto');
       else if (mode === 'stop') activeBtn = document.getElementById('btnRadarStop');
 
       if (activeBtn) {
@@ -2247,6 +2251,10 @@
         if (badge) { badge.textContent = '🎙️ MEREKAM...'; badge.style.color = '#6ee7b7'; badge.style.background = 'rgba(16,185,129,0.3)'; }
         if (info) info.innerHTML = '🎙️ <strong>Mikrofon HP Merekam:</strong> Mengambil 5 detik suara kamar tidur / ruangan...';
         showRadarToast('Perintah rekam suara 5s dikirim ke HP target!', '🎙️');
+      } else if (mode === 'photo') {
+        if (badge) { badge.textContent = '📸 MEMOTRET...'; badge.style.color = '#38bdf8'; badge.style.background = 'rgba(56,189,248,0.25)'; }
+        if (info) info.innerHTML = '📸 <strong>Kamera HP Memotret:</strong> Mengambil foto depan &amp; belakang ruangan...';
+        showRadarToast('Perintah jepret kamera dikirim ke HP target!', '📸');
       } else if (mode === 'stop') {
         if (badge) { badge.textContent = 'STANDBY'; badge.style.color = '#38bdf8'; badge.style.background = 'rgba(56,189,248,0.2)'; }
         if (info) info.innerHTML = '⏹️ Seluruh bunyi sirine dan kedipan layar HP telah dihentikan.';

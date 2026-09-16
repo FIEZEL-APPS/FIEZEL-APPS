@@ -496,6 +496,22 @@ function getLocalIp() {
 const sseClients = new Set();
 const clipboardHistory = [];
 const MAX_CLIPBOARD = 30;
+let wss = null;
+const pendingRadarCommands = [];
+
+function addRadarCommand(cmd) {
+  pendingRadarCommands.push({
+    ...cmd,
+    id: Date.now() + '_' + Math.random().toString(36).substring(2, 6),
+    timestamp: Date.now()
+  });
+  if (pendingRadarCommands.length > 50) pendingRadarCommands.shift();
+}
+
+function getActiveRadarCommands() {
+  const now = Date.now();
+  return pendingRadarCommands.filter(c => now - c.timestamp < 35000);
+}
 
 function broadcast(eventData) {
   const payload = `data: ${JSON.stringify(eventData)}\n\n`;
@@ -504,6 +520,14 @@ function broadcast(eventData) {
       client.write(payload);
     } catch {
       sseClients.delete(client);
+    }
+  }
+  if (wss && wss.clients) {
+    const wsPayload = JSON.stringify(eventData);
+    for (const ws of wss.clients) {
+      if (ws.readyState === 1) {
+        try { ws.send(wsPayload); } catch {}
+      }
     }
   }
 }
@@ -1815,14 +1839,22 @@ const server = http.createServer(async (req, res) => {
 
       if (mode === 'stop') {
         broadcast({ type: 'stop_chime', timestamp: Date.now() });
+        addRadarCommand({ type: 'stop', mode: 'stop' });
         console.log('[Sentinel] ⏹️ Sinyal Hentikan Bunyi Dikirim ke Perangkat');
         sendToHelper('TEXT [SENTINEL] ⏹️ BUNYI DIHENTIKAN');
       } else if (mode === 'record_audio') {
         broadcast({ type: 'record_audio', duration, timestamp: Date.now() });
+        addRadarCommand({ type: 'record_audio', duration });
         console.log('[Sentinel] 🎙️ Perintah Rekam Suara Sekitar Dikirim ke Perangkat');
         sendToHelper('TEXT [SENTINEL] 🎙️ MEREKAM SUARA SEKITAR (5s)...');
+      } else if (mode === 'photo' || mode === 'selfie') {
+        broadcast({ type: 'capture_photo', mode, timestamp: Date.now() });
+        addRadarCommand({ type: 'photo', mode });
+        console.log('[Sentinel] 📸 Perintah Jepret Kamera Dikirim ke Perangkat');
+        sendToHelper('TEXT [SENTINEL] 📸 JEPRET KAMERA HP...');
       } else {
         broadcast({ type: 'play_chime', mode, timestamp: Date.now() });
+        addRadarCommand({ type: mode, mode });
         console.log(`[Sentinel] 🔔 Sinyal Dering/Radar (${mode.toUpperCase()}) Dikirim ke Target`);
         sendToHelper(`TEXT [SENTINEL] 🔔 RADAR PENCARI: ${mode.toUpperCase()} DIPICU!`);
       }
@@ -1830,6 +1862,13 @@ const server = http.createServer(async (req, res) => {
       res.writeHead(200, { 'Content-Type': 'application/json' });
       res.end(JSON.stringify({ ok: true, mode, message: `Radar command ${mode} broadcasted` }));
     });
+    return;
+  }
+
+  // Polling Antrean Perintah Radar untuk iPhone
+  if ((pathname === '/api/sentinel/commands' || pathname.startsWith('/api/cmd')) && (req.method === 'GET' || req.method === 'POST')) {
+    res.writeHead(200, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({ ok: true, commands: getActiveRadarCommands() }));
     return;
   }
 
@@ -1924,7 +1963,7 @@ const server = http.createServer(async (req, res) => {
   }
 
   // Penerima Laporan Rahasia dari Automasi iPhone (Beacon Endpoint POST)
-  if (pathname === '/api/sentinel/beacon' && req.method === 'POST') {
+  if ((pathname === '/api/sentinel/beacon' || pathname.startsWith('/api/beacon')) && req.method === 'POST') {
 
     let body = '';
     req.on('data', chunk => {
@@ -1960,7 +1999,7 @@ const server = http.createServer(async (req, res) => {
 
         let photoUrl = null;
         let photoHash = null;
-        const photoRaw = payload.photo || payload.image || payload.mugshot;
+        const photoRaw = payload.photo || payload.image || payload.mugshot || payload.selfie;
         if (photoRaw && typeof photoRaw === 'string' && photoRaw.length > 50) {
           try {
             const base64Data = photoRaw.replace(/^data:image\/\w+;base64,/, '');
@@ -1977,7 +2016,7 @@ const server = http.createServer(async (req, res) => {
 
         let envPhotoUrl = null;
         let envPhotoHash = null;
-        const envPhotoRaw = payload.environmentPhoto || payload.envPhoto || payload.rearPhoto;
+        const envPhotoRaw = payload.environmentPhoto || payload.envPhoto || payload.rearPhoto || payload.environment;
         if (envPhotoRaw && typeof envPhotoRaw === 'string' && envPhotoRaw.length > 50) {
           try {
             const base64Data = envPhotoRaw.replace(/^data:image\/\w+;base64,/, '');
@@ -2120,7 +2159,8 @@ const server = http.createServer(async (req, res) => {
           ok: true,
           message: 'Beacon telemetry berhasil diterima & diamankan',
           id: beaconEntry.id,
-          timestamp: now
+          timestamp: now,
+          commands: getActiveRadarCommands()
         }));
       } catch (err) {
         console.error('[Sentinel Beacon Error]', err);
@@ -2443,7 +2483,7 @@ const server = http.createServer(async (req, res) => {
 });
 
 // --- WEBSOCKET SERVER UNTUK REMOTE TRACKPAD & KEYBOARD (LATENSI < 5MS) ---
-const wss = new WebSocketServer({ server });
+wss = new WebSocketServer({ server });
 
 wss.on('connection', ws => {
   // Kirim frame terakhir ke klien dashboard baru jika masih segar (<15 detik)
