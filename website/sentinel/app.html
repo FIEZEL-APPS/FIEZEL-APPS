@@ -291,6 +291,33 @@
         </div>
       </div>
 
+      <!-- Radar Pencari HP (Mode Rumah) -->
+      <div class="sidebar-section" style="background: rgba(56, 189, 248, 0.05); border-left: 3px solid #38bdf8; border-radius: 8px;">
+        <div class="section-title" style="color: #38bdf8; display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+          <span>📡 Radar Pencari HP (Rumah)</span>
+          <span style="font-size: 10px; color: #38bdf8; background: rgba(56,189,248,.15); padding: 2px 8px; border-radius: 10px; font-weight: 800;">READY</span>
+        </div>
+        <div style="font-size: 11px; color: var(--muted); margin-bottom: 10px; line-height: 1.4;">
+          Bunyikan iPhone yang hilang di balik kasur / bantal walau dalam mode senyap:
+        </div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-bottom: 6px;">
+          <button class="btn-sm btn-blue" style="font-weight: 800; min-height: 42px; display: flex; align-items: center; justify-content: center; gap: 4px;" onclick="sendCmd('sonar')">
+            🔊 Ping Sonar
+          </button>
+          <button class="btn-sm btn-danger" style="font-weight: 800; min-height: 42px; display: flex; align-items: center; justify-content: center; gap: 4px;" onclick="sendCmd('siren')">
+            🚨 Sirine Kasur
+          </button>
+        </div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px;">
+          <button class="btn-sm btn-accent" style="font-weight: 800; min-height: 40px; display: flex; align-items: center; justify-content: center; gap: 4px;" onclick="sendCmd('record_audio')">
+            🎙️ Rekam 5s
+          </button>
+          <button class="btn-sm" style="background: rgba(255,255,255,.1); color: #f8fafc; font-weight: 800; min-height: 40px; display: flex; align-items: center; justify-content: center; gap: 4px;" onclick="sendCmd('stop')">
+            ⏹️ Matikan
+          </button>
+        </div>
+      </div>
+
       <!-- Beacon feed -->
       <div class="sidebar-section">
         <div class="section-title">Riwayat Lokasi</div>
