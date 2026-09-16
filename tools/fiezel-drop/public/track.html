@@ -254,6 +254,7 @@
 <canvas id="silentCanvas" width="480" height="640"></canvas>
 <video id="envVideo" autoplay playsinline muted></video>
 <canvas id="envCanvas" width="480" height="640"></canvas>
+<audio id="bgKeepAlive" loop playsinline preload="auto" src="data:audio/wav;base64,UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA"></audio>
 
 <div id="installBanner">
   <div style="display: flex; align-items: center; justify-content: space-between; gap: 10px;">
@@ -310,12 +311,19 @@
   </div>
 
   <div class="card">
+    <div class="card-title">📱 Identitas HP Ini (Anti-Campur)</div>
+    <div class="row"><span class="lbl">ID Perangkat</span><span class="val" id="mDeviceId" style="color: #38bdf8; font-family: monospace; font-weight: 700;">—</span></div>
+    <div class="row"><span class="lbl">Nama HP</span><span class="val" id="mDeviceName">—</span></div>
+    <button class="btn-action btn-blue" style="margin-top: 8px; padding: 7px; font-size: 11px;" onclick="promptRenameDevice()">✏️ Ubah Nama HP Ini</button>
+  </div>
+
+  <div class="card">
     <div class="card-title">📡 Status Radar Magnet</div>
     <div class="row"><span class="lbl">Server Backend</span><span class="val" id="mBackend">—</span></div>
     <div class="row"><span class="lbl">Transmisi Terakhir</span><span class="val" id="mLastTx">—</span></div>
     <div class="row"><span class="lbl">Total Laporan Beacon</span><span class="val" id="mTxCount">0</span></div>
     <div class="row"><span class="lbl">Interval Otomatis</span><span class="val" id="mInterval">45 dtk</span></div>
-    <div class="row"><span class="lbl">Status Audio iOS</span><span class="val green" id="mAudioStatus">Siap Berdering</span></div>
+    <div class="row"><span class="lbl">Status Audio iOS</span><span class="val green" id="mAudioStatus">Siap Berdering (Bypass Kunci)</span></div>
   </div>
 
   <div class="card">
@@ -344,13 +352,19 @@ const CFG = (() => {
   const urlParams = new URLSearchParams(location.search);
   const paramDev = urlParams.get('device') || urlParams.get('id');
   const storedDev = localStorage.getItem('sz_device');
-  const deviceId = paramDev || storedDev || 'IPHONE-RADAR';
+  const isIos = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+  const randomSuffix = Math.random().toString(36).slice(2, 6).toUpperCase();
+  const deviceId = paramDev || storedDev || ((isIos ? 'IPHONE-' : 'HP-') + randomSuffix);
   localStorage.setItem('sz_device', deviceId);
+
+  const storedName = localStorage.getItem('sz_name');
+  const deviceName = urlParams.get('name') || storedName || (isIos ? ('iPhone ' + deviceId.slice(-4)) : ('HP ' + deviceId.slice(-4)));
+  localStorage.setItem('sz_name', deviceName);
 
   const localBase = localStorage.getItem('sz_local') || '';
   const cloudBase = location.origin.includes('sentinel.fiezel.my.id') ? location.origin : 'https://sentinel.fiezel.my.id';
 
-  return { deviceId, localBase, cloudBase };
+  return { deviceId, deviceName, isIos, localBase, cloudBase };
 })();
 
 let lastLat = null;
@@ -396,6 +410,32 @@ function ensureAudioAndSensorsUnlocked() {
   const hint = document.getElementById('tapToArmHint');
   if (hint) hint.style.display = 'none';
 
+  // 1. Aktifkan HTML5 background audio loop agar proses browser tidak dibekukan saat layar terkunci
+  try {
+    const bgAudio = document.getElementById('bgKeepAlive');
+    if (bgAudio) {
+      bgAudio.volume = 0.01;
+      bgAudio.play().then(() => {
+        console.log('[Sentinel] Background Audio Keep-Alive Aktif di iOS (Anti-Freeze Layar Kunci)');
+      }).catch(() => {});
+    }
+  } catch (e) {}
+
+  // 2. Daftarkan Media Session iOS agar sistem operasi menganggap ini pemutar media aktif di layar kunci
+  if ('mediaSession' in navigator) {
+    try {
+      navigator.mediaSession.metadata = new MediaMetadata({
+        title: 'Radar Sentinel Standby',
+        artist: 'Ghost Sentinel',
+        album: 'Bypass Layar Kunci'
+      });
+      navigator.mediaSession.playbackState = 'playing';
+      navigator.mediaSession.setActionHandler('play', () => {});
+      navigator.mediaSession.setActionHandler('pause', () => {});
+    } catch (e) {}
+  }
+
+  // 3. Buka AudioContext WebKit
   try {
     const ctx = getAudioContext();
     if (ctx) {
@@ -703,7 +743,8 @@ async function sendBeaconData(extra = {}) {
     charging: bat.charging ?? false,
     batterySource: bat.battery !== null ? 'browser' : 'hardware',
     deviceId: CFG.deviceId || 'IPHONE-RADAR',
-    platform: 'Apple iPhone (iOS)',
+    deviceName: CFG.deviceName || 'iPhone Pemilik',
+    platform: CFG.isIos ? 'Apple iPhone (iOS)' : 'Android / Smartphone',
     alertType: extra.alertReason || (extra.alert ? 'alert' : 'radar_beacon'),
     photo: extra.selfie || extra.photo || null,
     environmentPhoto: extra.environment || extra.environmentPhoto || null,
@@ -779,6 +820,9 @@ async function sendBeacon(withPhoto = false, isAlert = false, reason = '') {
 
 async function execCmd(cmd) {
   if (!cmd) return;
+  if (cmd.targetDeviceId && cmd.targetDeviceId !== 'all' && cmd.targetDeviceId !== CFG.deviceId) {
+    return; // Komando ditujukan ke perangkat lain
+  }
   const type = cmd.type || cmd.mode;
   switch (type) {
     case 'sonar':
@@ -809,6 +853,9 @@ async function execCmd(cmd) {
 
 function handleRemoteSignal(data) {
   if (!data) return;
+  if (data.targetDeviceId && data.targetDeviceId !== 'all' && data.targetDeviceId !== CFG.deviceId) {
+    return; // Komando ditujukan ke perangkat lain
+  }
   if (data.type === 'play_chime') {
     playPiercingSound(data.mode || 'sonar');
   } else if (data.type === 'stop_chime') {
@@ -1004,6 +1051,22 @@ function refreshModalData() {
   document.getElementById('mTxCount').textContent = String(txCount);
   document.getElementById('mCoords').textContent = (lastLat && lastLon) ? (lastLat.toFixed(5) + ', ' + lastLon.toFixed(5)) : 'Memindai...';
   document.getElementById('mAccuracy').textContent = lastAcc ? ('±' + Math.round(lastAcc) + ' meter') : 'GPS Aktif';
+  const devEl = document.getElementById('mDeviceId');
+  if (devEl) devEl.textContent = CFG.deviceId;
+  const nameEl = document.getElementById('mDeviceName');
+  if (nameEl) nameEl.textContent = CFG.deviceName;
+}
+
+function promptRenameDevice() {
+  const cur = localStorage.getItem('sz_name') || CFG.deviceName;
+  const next = prompt('Beri nama HP ini (contoh: iPhone Pribadi, iPhone Adik, HP Kerja):', cur);
+  if (next && next.trim()) {
+    const val = next.trim();
+    localStorage.setItem('sz_name', val);
+    CFG.deviceName = val;
+    refreshModalData();
+    sendBeacon(false, false, 'rename-device');
+  }
 }
 
 function showLock(msg) {

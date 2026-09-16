@@ -603,6 +603,19 @@
     </div>
 
     <div class="header-actions">
+      <!-- Pemilih Perangkat (Multi-Device Selector) -->
+      <div id="deviceSelectorWrap" style="display: flex; align-items: center; gap: 6px; background: rgba(56, 189, 248, 0.12); border: 1px solid rgba(56, 189, 248, 0.35); border-radius: 8px; padding: 4px 10px;">
+        <span style="font-size: 13px;">📱</span>
+        <select id="deviceSelector" onchange="switchDevice(this.value)" style="background: transparent; color: #38bdf8; border: none; font-size: 11px; font-weight: 700; outline: none; cursor: pointer; max-width: 170px;">
+          <option value="all" style="background:#0f172a; color:#fff;">🌐 Semua Perangkat (Auto)</option>
+        </select>
+      </div>
+
+      <!-- Tombol Reset Data Campur -->
+      <button class="btn-header" style="background: rgba(239, 68, 68, 0.15); border-color: rgba(239, 68, 68, 0.4); color: #fca5a5; font-weight: 700;" onclick="resetJumbledData()" title="Bersihkan riwayat koordinat yang tercampur saat mengetes banyak HP">
+        🧹 Reset Data Campur
+      </button>
+
       <div id="tunnelStatusBadge" style="font-size: 11px; padding: 6px 12px; border-radius: 8px; background: rgba(56, 189, 248, 0.1); border: 1px solid rgba(56, 189, 248, 0.3); color: #38bdf8; font-weight: 700; display: flex; align-items: center; gap: 6px;">
         <span style="display:inline-block; width:8px; height:8px; border-radius:50%; background:#38bdf8; animation: pulse 1s infinite alternate;"></span>
         <span>Menghubungkan Tunnel...</span>
@@ -707,6 +720,25 @@
           <button id="btnRadarStop" class="radar-btn radar-btn-stop" onclick="sendRadarCommand('stop')" title="Matikan bunyi sirine dan kedipan layar seketika">
             ⏹️ Matikan
           </button>
+        </div>
+
+        <!-- Apple Find My 1-Klik Bypass HP Terkunci & Hening -->
+        <div style="margin-top: 10px; margin-bottom: 8px; padding: 10px 12px; background: rgba(2, 132, 199, 0.15); border: 1px solid rgba(56, 189, 248, 0.4); border-radius: 10px; position: relative; z-index: 20;">
+          <div style="font-size: 11px; font-weight: 800; color: #38bdf8; margin-bottom: 4px; display: flex; align-items: center; justify-content: space-between;">
+            <span style="display: flex; align-items: center; gap: 6px;">🍏 BYPASS HP TERKUNCI (APPLE FIND MY)</span>
+            <span style="font-size: 9px; padding: 1px 6px; background: #0284c7; color: #fff; border-radius: 4px; font-weight: 700;">RESMI APPLE</span>
+          </div>
+          <div style="font-size: 10px; color: #94a3b8; line-height: 1.4; margin-bottom: 8px;">
+            Bunyikan alarm resmi Apple. <strong>Menembus layar mati, tombol hening (Silent Mute Switch), dan tanpa perlu buka aplikasi kalkulator!</strong>
+          </div>
+          <div style="display: flex; gap: 6px;">
+            <a href="https://www.icloud.com/find" target="_blank" rel="noopener" style="flex: 1; display: flex; align-items: center; justify-content: center; gap: 6px; background: linear-gradient(135deg, #0284c7, #2563eb); color: white; text-decoration: none; font-size: 11px; font-weight: 700; padding: 8px 10px; border-radius: 8px; box-shadow: 0 4px 12px rgba(2, 132, 199, 0.4);">
+              🔊 Putar Bunyi via Lacak Apple ↗
+            </a>
+            <button onclick="openBypassModal()" style="background: rgba(245, 158, 11, 0.2); border: 1px solid rgba(245, 158, 11, 0.5); color: #fde68a; border-radius: 8px; padding: 8px 10px; font-size: 11px; font-weight: 700; cursor: pointer; white-space: nowrap;">
+              ⚡ Solusi Lain HP Terkunci
+            </button>
+          </div>
         </div>
 
         <!-- Target Phone Quick Action Helper -->
@@ -1429,6 +1461,91 @@
     </div>
   </div>
 
+  <!-- MODAL SOLUSI HP TERKUNCI & HENING (BYPASS LOCKSCREEN & SILENT MODE) -->
+  <div class="modal-overlay" id="bypassModal" style="display: none; align-items: center; justify-content: center; z-index: 10000; background: rgba(0,0,0,0.85); backdrop-filter: blur(8px);">
+    <div style="background: #0f172a; border: 1px solid rgba(56, 189, 248, 0.4); border-radius: 16px; width: 92%; max-width: 620px; padding: 22px; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.8); display: flex; flex-direction: column; gap: 14px; max-height: 85vh; overflow-y: auto;">
+      <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 12px;">
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <span style="font-size: 24px;">⚡</span>
+          <div>
+            <div style="font-weight: 800; font-size: 16px; color: #38bdf8;">Solusi Pasti HP Terkunci &amp; Hening (Bypass Total)</div>
+            <div style="font-size: 11px; color: #94a3b8;">Menembus layar mati, layar terkunci, dan tombol hening (Silent Switch)</div>
+          </div>
+        </div>
+        <button onclick="closeBypassModal()" style="background: rgba(255,255,255,0.1); border: none; color: #cbd5e1; width: 32px; height: 32px; border-radius: 50%; font-size: 16px; cursor: pointer; display: flex; align-items: center; justify-content: center;">✕</button>
+      </div>
+
+      <!-- Opsi 1: Otomasi Pintasan SMS Apple (100% Native, Tanpa Aplikasi Tambahan) -->
+      <div style="background: rgba(255,255,255,0.04); border: 1px solid rgba(56, 189, 248, 0.3); border-radius: 12px; padding: 14px;">
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px;">
+          <div style="font-weight: 800; font-size: 13px; color: #f8fafc; display: flex; align-items: center; gap: 6px;">
+            <span>📱 METODE 1: Otomasi Pesan Rahasia Apple (Pintasan / Shortcuts)</span>
+          </div>
+          <span style="font-size: 10px; background: rgba(16, 185, 129, 0.2); color: #6ee7b7; padding: 2px 8px; border-radius: 999px; font-weight: 700;">PALING AMPUH &amp; GRATIS</span>
+        </div>
+        <div style="font-size: 11px; color: #cbd5e1; line-height: 1.5; margin-bottom: 10px;">
+          iPhone Anda bisa disetel untuk <strong>langsung teriak volume 100% &amp; senter kedip</strong> ketika menerima SMS/iMessage/WA dengan kata kunci rahasia (contoh: <code>!RADAR</code>). Ini berjalan 100% native di background iOS tanpa perlu membuka aplikasi apa pun!
+        </div>
+        <div style="background: rgba(0,0,0,0.4); border-radius: 8px; padding: 10px; font-size: 11px; color: #94a3b8; line-height: 1.6;">
+          <strong style="color: #38bdf8;">Cara Pasang di iPhone (Hanya 1 Menit):</strong><br>
+          1. Buka aplikasi bawaan <strong>Pintasan (Shortcuts)</strong> di iPhone &rarr; Pilih tab <strong>Otomasi</strong> &rarr; <strong>Otomasi Baru</strong>.<br>
+          2. Pilih <strong>Pesan (Message)</strong> &rarr; Isi "Pesan Berisi": <code>!RADAR</code> &rarr; Pilih <strong>Jalankan Segera</strong> (Run Immediately).<br>
+          3. Tambahkan 3 Aksi:<br>
+          &nbsp;&nbsp;• <strong>Atur Volume ke 100%</strong><br>
+          &nbsp;&nbsp;• <strong>Nyalakan Lampu Kilat</strong> (Senter)<br>
+          &nbsp;&nbsp;• <strong>Ucapkan Teks</strong>: <em>"HP DI SINI! HP DI SINI!"</em> (atau Putar Bunyi Sirine)<br>
+          4. Simpan. Kapan pun HP hilang terkunci di kasur/sofa, kirim SMS <code>!RADAR</code> dari laptop atau HP lain &rarr; HP langsung berteriak keras!
+        </div>
+      </div>
+
+      <!-- Opsi 2: Bark Critical Push Notifikasi (Apple Critical Alert Entitlement) -->
+      <div style="background: rgba(255,255,255,0.04); border: 1px solid rgba(245, 158, 11, 0.3); border-radius: 12px; padding: 14px;">
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px;">
+          <div style="font-weight: 800; font-size: 13px; color: #f8fafc; display: flex; align-items: center; gap: 6px;">
+            <span>🔔 METODE 2: Bark Push Kritis (Apple Critical Alert)</span>
+          </div>
+          <span style="font-size: 10px; background: rgba(245, 158, 11, 0.2); color: #fde68a; padding: 2px 8px; border-radius: 999px; font-weight: 700;">1-KLIK DARI LAPTOP</span>
+        </div>
+        <div style="font-size: 11px; color: #cbd5e1; line-height: 1.5; margin-bottom: 8px;">
+          Aplikasi <strong>Bark</strong> (gratis resmi di Apple App Store) memiliki izin <strong>Critical Alert</strong> dari Apple yang dapat membunyikan sirine di iPhone yang terkunci &amp; dalam mode hening langsung lewat internet!
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 8px;">
+          <div style="font-size: 11px; color: #94a3b8;">
+            1. Pasang <a href="https://apps.apple.com/app/bark-customed-notifications/id1403753865" target="_blank" rel="noopener" style="color:#38bdf8; text-decoration:underline;">Bark di App Store</a> &rarr; Buka aplikasi untuk melihat <strong>Device Key</strong> Anda.<br>
+            2. Masukkan Bark Device Key Anda di bawah ini:
+          </div>
+          <div style="display: flex; gap: 8px;">
+            <input type="text" id="barkKeyField" placeholder="Contoh: hg8K9sLk2mn..." style="flex: 1; background: rgba(0,0,0,0.5); border: 1px solid var(--border); color: #fff; padding: 8px 12px; border-radius: 8px; font-size: 12px; font-family: monospace; outline: none;">
+            <button onclick="saveBarkKey()" style="padding: 8px 16px; background: #10b981; color: #022c22; font-weight: 800; border: none; border-radius: 8px; font-size: 12px; cursor: pointer;">
+              💾 Simpan
+            </button>
+          </div>
+          <div id="barkKeyStatusMsg" style="font-size: 11px; color: #6ee7b7; display: none;"></div>
+        </div>
+      </div>
+
+      <!-- Opsi 3: Apple Find My (Lacak iPhone) Resmi -->
+      <div style="background: rgba(255,255,255,0.04); border: 1px solid rgba(2, 132, 199, 0.3); border-radius: 12px; padding: 14px;">
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px;">
+          <div style="font-weight: 800; font-size: 13px; color: #f8fafc;">
+            🍏 METODE 3: Apple "Lacak" (iCloud Find My)
+          </div>
+          <span style="font-size: 10px; background: rgba(2, 132, 199, 0.2); color: #7dd3fc; padding: 2px 8px; border-radius: 999px; font-weight: 700;">BUILT-IN IPHONE</span>
+        </div>
+        <div style="font-size: 11px; color: #cbd5e1; line-height: 1.5; margin-bottom: 8px;">
+          Gunakan tombol resmi Putar Bunyi dari Apple. Langsung membunyikan speaker iPhone dengan nada tinggi yang menembus mode diam &amp; layar kunci.
+        </div>
+        <a href="https://www.icloud.com/find" target="_blank" rel="noopener" style="display: inline-flex; align-items: center; gap: 6px; padding: 8px 14px; background: #0284c7; color: white; border-radius: 8px; font-size: 11px; font-weight: 700; text-decoration: none;">
+          Buka iCloud Find My ↗
+        </a>
+      </div>
+
+      <button onclick="closeBypassModal()" style="width: 100%; padding: 10px; background: rgba(255,255,255,0.08); border: 1px solid var(--border); color: #f8fafc; font-weight: 700; border-radius: 8px; cursor: pointer; font-size: 12px;">
+        Tutup
+      </button>
+    </div>
+  </div>
+
   <script>
     // Inisialisasi Peta Leaflet
     let map = L.map('map', {
@@ -1455,55 +1572,161 @@
       "🗺️ Peta Jalan (Street)": streetLayer
     }, null, { position: 'topright' }).addTo(map);
 
-    // Marker & Radar Circle
+    // Marker & Radar Circle per Perangkat (Anti-Campur)
+    let selectedDeviceId = 'all';
+    let deviceMapData = {}; // { [devId]: { marker, circle, polyline, coords: [] } }
     let radarMarker = null;
     let accuracyCircle = null;
     let routePolyline = null;
     let breadcrumbCoords = [];
 
-    function updateMapPosition(lat, lon, accuracy) {
+    function clearAllMapData() {
+      for (const devId in deviceMapData) {
+        const item = deviceMapData[devId];
+        if (item.marker) map.removeLayer(item.marker);
+        if (item.circle) map.removeLayer(item.circle);
+        if (item.polyline) map.removeLayer(item.polyline);
+      }
+      deviceMapData = {};
+      if (radarMarker) { map.removeLayer(radarMarker); radarMarker = null; }
+      if (accuracyCircle) { map.removeLayer(accuracyCircle); accuracyCircle = null; }
+      if (routePolyline) { map.removeLayer(routePolyline); routePolyline = null; }
+      breadcrumbCoords = [];
+    }
+
+    function updateMapPosition(lat, lon, accuracy, devId = 'default', devName = 'iPhone') {
+      if (!lat || !lon) return;
       const latlng = [lat, lon];
+
+      if (!deviceMapData[devId]) {
+        deviceMapData[devId] = {
+          marker: null,
+          circle: null,
+          polyline: null,
+          coords: []
+        };
+      }
+      const dData = deviceMapData[devId];
+      dData.coords.push(latlng);
       breadcrumbCoords.push(latlng);
 
-      if (!radarMarker) {
+      if (!dData.marker) {
         const radarIcon = L.divIcon({
           className: 'radar-marker',
           iconSize: [22, 22],
           iconAnchor: [11, 11]
         });
-        radarMarker = L.marker(latlng, { icon: radarIcon }).addTo(map);
+        dData.marker = L.marker(latlng, { icon: radarIcon }).addTo(map);
+        dData.marker.bindTooltip(devName || devId, { permanent: true, direction: 'top', offset: [0, -10], className: 'radar-tooltip' });
+        radarMarker = dData.marker;
       } else {
-        radarMarker.setLatLng(latlng);
+        dData.marker.setLatLng(latlng);
+        dData.marker.setTooltipContent(devName || devId);
       }
 
-      if (!accuracyCircle) {
-        accuracyCircle = L.circle(latlng, {
+      if (!dData.circle) {
+        dData.circle = L.circle(latlng, {
           radius: accuracy || 15,
           color: '#ef4444',
           fillColor: '#ef4444',
           fillOpacity: 0.15,
           weight: 1
         }).addTo(map);
+        accuracyCircle = dData.circle;
       } else {
-        accuracyCircle.setLatLng(latlng);
-        accuracyCircle.setRadius(accuracy || 15);
+        dData.circle.setLatLng(latlng);
+        dData.circle.setRadius(accuracy || 15);
       }
 
-      // Draw breadcrumb path
-      if (breadcrumbCoords.length > 1) {
-        if (!routePolyline) {
-          routePolyline = L.polyline(breadcrumbCoords, {
+      // Garis jejak breadcrumb khusus perangkat ini saja
+      if (dData.coords.length > 1) {
+        if (!dData.polyline) {
+          dData.polyline = L.polyline(dData.coords, {
             color: '#38bdf8',
             weight: 3,
             dashArray: '6, 8',
             opacity: 0.8
           }).addTo(map);
+          routePolyline = dData.polyline;
         } else {
-          routePolyline.setLatLngs(breadcrumbCoords);
+          dData.polyline.setLatLngs(dData.coords);
         }
       }
 
-      map.setView(latlng, 16);
+      if (selectedDeviceId === 'all' || selectedDeviceId === devId) {
+        map.setView(latlng, 16);
+      }
+    }
+
+    function openBypassModal() {
+      document.getElementById('bypassModal').style.display = 'flex';
+    }
+    function closeBypassModal() {
+      document.getElementById('bypassModal').style.display = 'none';
+    }
+
+    async function saveBarkKey() {
+      const field = document.getElementById('barkKeyField');
+      const msg = document.getElementById('barkKeyStatusMsg');
+      if (!field) return;
+      const key = field.value.trim();
+      try {
+        const res = await fetch('/api/sentinel/save_settings', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ barkKey: key })
+        });
+        const d = await res.json();
+        if (d.ok) {
+          if (msg) {
+            msg.textContent = '✅ Bark Key tersimpan! Push Kritis siap membunyikan HP terkunci.';
+            msg.style.display = 'block';
+          }
+          showRadarToast('Bark Key tersimpan! Critical Push aktif.', '✅', 4000);
+        }
+      } catch (err) {
+        alert('Gagal menyimpan Bark Key: ' + err.message);
+      }
+    }
+
+    function renderDeviceSelector(devices, activeId) {
+      const sel = document.getElementById('deviceSelector');
+      if (!sel) return;
+      if (!devices || !Array.isArray(devices) || devices.length === 0) {
+        sel.innerHTML = '<option value="all">🌐 Semua Perangkat (Auto)</option>';
+        return;
+      }
+      const currentVal = sel.value || selectedDeviceId;
+      let html = '<option value="all">🌐 Semua Perangkat (' + devices.length + ' HP)</option>';
+      for (const dev of devices) {
+        const batStr = dev.batteryLevel !== null && dev.batteryLevel !== undefined ? ` (${dev.batteryLevel}%)` : '';
+        const selectedAttr = (dev.id === currentVal) ? ' selected' : '';
+        html += `<option value="${dev.id}"${selectedAttr}>📱 ${dev.name || dev.id}${batStr}</option>`;
+      }
+      sel.innerHTML = html;
+    }
+
+    async function switchDevice(devId) {
+      selectedDeviceId = devId || 'all';
+      showRadarToast(devId === 'all' ? 'Menampilkan semua perangkat' : `Fokus ke HP: ${devId}`, '📱', 3000);
+      await fetchStatus();
+    }
+
+    async function resetJumbledData() {
+      const ok = confirm('Apakah Anda yakin ingin MERESET seluruh data pelacakan yang campur aduk?\\n\\nIni akan menghapus riwayat titik koordinat, foto pengujian, dan peringatan lama agar 3 HP Anda dapat dipantau secara bersih.');
+      if (!ok) return;
+
+      try {
+        const res = await fetch('/api/sentinel/reset_data', { method: 'POST' });
+        const d = await res.json();
+        if (d.ok) {
+          clearAllMapData();
+          showRadarToast('🧹 Seluruh data campur aduk berhasil dibersihkan total!', '✨', 5000);
+          await fetchStatus();
+        }
+      } catch (err) {
+        alert('Gagal mereset data: ' + err.message);
+      }
     }
 
     // Modal Handlers
@@ -1661,9 +1884,24 @@
     // Polling / SSE Telemetry Data
     async function fetchStatus() {
       try {
-        const res = await fetch('/api/sentinel/status');
+        const url = (selectedDeviceId && selectedDeviceId !== 'all') ? `/api/sentinel/status?deviceId=${encodeURIComponent(selectedDeviceId)}` : '/api/sentinel/status';
+        const res = await fetch(url);
         const data = await res.json();
         if (data.ok) {
+          if (data.devices) {
+            renderDeviceSelector(data.devices, data.activeDeviceId);
+            for (const dev of data.devices) {
+              if (dev.lat && dev.lon) {
+                updateMapPosition(dev.lat, dev.lon, dev.accuracy, dev.id, dev.name);
+              }
+            }
+          }
+          if (data.barkKey) {
+            const bf = document.getElementById('barkKeyField');
+            if (bf && document.activeElement !== bf && !bf.value) {
+              bf.value = data.barkKey;
+            }
+          }
           const profileLink = data.profileUrl || data.trackUrl;
           if (profileLink) {
             renderQr(profileLink);
@@ -2016,7 +2254,7 @@
       if (btnWaze) btnWaze.href = wazeLink;
 
       // Update Map
-      updateMapPosition(telemetry.lat, telemetry.lon, telemetry.accuracy);
+      updateMapPosition(telemetry.lat, telemetry.lon, telemetry.accuracy, telemetry.deviceId, telemetry.deviceName);
 
       // Alert state
       const alertCard = document.getElementById('alertBanner');
@@ -2270,7 +2508,7 @@
         const res = await fetch('/api/sentinel/trigger_chime', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ mode })
+          body: JSON.stringify({ mode, targetDeviceId: selectedDeviceId })
         });
         const data = await res.json();
         if (!data.ok) {
