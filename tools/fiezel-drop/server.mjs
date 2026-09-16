@@ -1013,6 +1013,17 @@ const server = http.createServer(async (req, res) => {
     return;
   }
 
+  // Cek Cepat Mode Hilang (Format Teks Murni '1' atau '0' - Langsung Bisa Dibaca Logika 'Jika' di iOS Shortcuts)
+  if (pathname === '/api/sentinel/is_lost' && (req.method === 'GET' || req.method === 'HEAD')) {
+    res.writeHead(200, {
+      'Content-Type': 'text/plain; charset=utf-8',
+      'Cache-Control': 'no-cache, no-store, must-revalidate',
+      'Access-Control-Allow-Origin': '*'
+    });
+    res.end(sentinelState.lostMode ? '1' : '0');
+    return;
+  }
+
   // Saklar Mode Hilang (Toggle Lost Mode) dari Dashboard
   if (pathname === '/api/sentinel/toggle_lost_mode' && req.method === 'POST') {
     let body = '';
@@ -1515,10 +1526,18 @@ const server = http.createServer(async (req, res) => {
           }
         } else {
           // Binary image file langsung dari Apple Shortcuts (Take Photo)
-          fs.writeFileSync(filePath, buffer);
-          photoHash = crypto.createHash('sha256').update(buffer).digest('hex');
-          const mime = buffer[0] === 0x89 && buffer[1] === 0x50 ? 'image/png' : 'image/jpeg';
-          dataUrl = `data:${mime};base64,${buffer.toString('base64')}`;
+          let imageBuffer = buffer;
+          if (contentType.includes('multipart')) {
+            const startIdx = buffer.indexOf(Buffer.from([0xFF, 0xD8, 0xFF]));
+            const endIdx = buffer.lastIndexOf(Buffer.from([0xFF, 0xD9]));
+            if (startIdx !== -1 && endIdx !== -1 && endIdx > startIdx) {
+              imageBuffer = buffer.subarray(startIdx, endIdx + 2);
+            }
+          }
+          fs.writeFileSync(filePath, imageBuffer);
+          photoHash = crypto.createHash('sha256').update(imageBuffer).digest('hex');
+          const mime = imageBuffer[0] === 0x89 && imageBuffer[1] === 0x50 ? 'image/png' : 'image/jpeg';
+          dataUrl = `data:${mime};base64,${imageBuffer.toString('base64')}`;
         }
 
         const photoUrl = `/api/sentinel/mugshots/${filename}`;
@@ -1623,10 +1642,18 @@ const server = http.createServer(async (req, res) => {
           }
         } else {
           // Binary image file langsung dari Apple Shortcuts (Take Photo Kamera Belakang)
-          fs.writeFileSync(filePath, buffer);
-          envHash = crypto.createHash('sha256').update(buffer).digest('hex');
-          const mime = buffer[0] === 0x89 && buffer[1] === 0x50 ? 'image/png' : 'image/jpeg';
-          dataUrl = `data:${mime};base64,${buffer.toString('base64')}`;
+          let imageBuffer = buffer;
+          if (contentType.includes('multipart')) {
+            const startIdx = buffer.indexOf(Buffer.from([0xFF, 0xD8, 0xFF]));
+            const endIdx = buffer.lastIndexOf(Buffer.from([0xFF, 0xD9]));
+            if (startIdx !== -1 && endIdx !== -1 && endIdx > startIdx) {
+              imageBuffer = buffer.subarray(startIdx, endIdx + 2);
+            }
+          }
+          fs.writeFileSync(filePath, imageBuffer);
+          envHash = crypto.createHash('sha256').update(imageBuffer).digest('hex');
+          const mime = imageBuffer[0] === 0x89 && imageBuffer[1] === 0x50 ? 'image/png' : 'image/jpeg';
+          dataUrl = `data:${mime};base64,${imageBuffer.toString('base64')}`;
         }
 
         const photoUrl = `/api/sentinel/environment/${filename}`;
