@@ -64,7 +64,7 @@ var FOCUS = {
 
   var EXPLAIN = {
     gist: function (character, answer) {
-      return t('fsl.explain-gist', 'Sepanjang audio, ' + character + ' terutama membicarakan hal ini — jadi jawaban yang benar: “' + answer + '”.', {character: character, answer: answer});
+      return t('fsl.explain-gist', 'Sepanjang audio, ' + character + ' terutama membicarakan hal ini, jadi jawaban yang benar: “' + answer + '”.', {character: character, answer: answer});
     },
     detail: function (character, answer) {
       return t('fsl.explain-detail', 'Detail ini disebutkan langsung di audio: “' + answer + '”.', {character: character, answer: answer});
@@ -162,7 +162,7 @@ function buildLevel(level, source) {
         maxReplays: 2,
         pedagogy: {
           focus: 'accurate decoding and word segmentation',
-          scenario: scene.topic + ' — ' + scene.setting,
+          scenario: scene.topic + ' (' + scene.setting + ')',
           character: scene.character
         },
         privacy: { rawLearnerResponseRequiredForPersistence: false },
@@ -186,7 +186,7 @@ function buildLevel(level, source) {
         maxReplays: 2,
         pedagogy: {
           focus: FOCUS[q.mode],
-          scenario: scene.topic + ' — ' + scene.setting,
+          scenario: scene.topic + ' (' + scene.setting + ')',
           character: scene.character
         },
         privacy: { rawLearnerResponseRequiredForPersistence: false },
