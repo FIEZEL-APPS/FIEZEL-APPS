@@ -9729,7 +9729,7 @@ function flashcards(level){
     // gratis secara UX; kalau ia menggeser kartu, stop() membatalkan yang masih menganggur.
     const nextCard=pool[i+1]||null;
     $('speakWord')?.addEventListener('click',e=>{e.stopPropagation();audio.play(v.word,{contentType:'word',next:nextCard?nextCard.word:''})});$('speakSentence')?.addEventListener('click',e=>{e.stopPropagation();audio.play(v.example,{contentType:'sentence',next:nextCard?nextCard.example:''})});$('aiWord').onclick=e=>{e.stopPropagation();explainWordWithAI(v)};
-    $('learning').onclick=e=>{e.stopPropagation();updateMastery('vocab',v.id,false);save();showToast(FiezelI18n.t('flash.toast-progres'))};
+    $('learning').onclick=e=>{e.stopPropagation();updateMastery('vocab',v.id,false);save();showToast(FiezelI18n.t('flash.toast-progres'));i++;draw()};
     $('mastered').onclick=e=>{e.stopPropagation();markMastered('vocab',v.id);haptic('success');showToast(FiezelI18n.t('flash.toast-dikuasai'));/* [FASE-4] 09 §3.3: kartu dikuasai = pengakuan → proud. */try{pawReact('badge-earned')}catch(_){}i++;draw()};
     bindSwipe($('flashcard'),()=>{audio.stop();i++;draw()},()=>{audio.stop();i=Math.max(0,i-1);draw()})
   };
@@ -10934,6 +10934,7 @@ function quizLoop(cfg){
     bar.innerHTML=`<button type="button" id="quizFloatingNext" class="quiz-floating-next-btn primary luxe"><span>${FiezelI18n.t('quiz.next-btn')}</span> <i data-lucide="arrow-right"></i></button>`;
     document.body.appendChild(bar);
     bar.querySelector('#quizFloatingNext').onclick=()=>{
+     haptic('tap');
      bar.remove();
      $('quizNext')?.click();
     };
