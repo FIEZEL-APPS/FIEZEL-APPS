@@ -79,7 +79,7 @@ body.fz-lux .progress-tab.active,body .progress-tab.active{background:var(--pane
 
 /* ---------- kuis: opsi berhuruf + umpan balik sheet ---------- */
 body.fz-lux .quiz-topbar,body .quiz-topbar{align-items:center}
-body.fz-lux .quiz-exit,body .quiz-exit{border-radius:999px;width:42px;min-width:42px;height:42px;padding:0;display:grid;place-items:center;box-shadow:none}
+body.fz-lux .quiz-exit,body .quiz-exit{border-radius:999px;width:44px;min-width:44px;height:44px;padding:0;display:grid;place-items:center;box-shadow:none}
 body.fz-lux .quiz-exit-label,body .quiz-exit-label{display:none}
 body.fz-lux .quiz-progress-bar,body .quiz-progress-bar{border-radius:999px;background:rgba(36,26,17,.08)}
 body.fz-lux .quiz-progress-bar b,body .quiz-progress-bar b{background:var(--sun);border-radius:999px}
@@ -91,14 +91,14 @@ body.fz-lux .option,body .option{border-radius:18px;border:1.5px solid var(--lin
 body.fz-lux .option::before,body .option::before{counter-increment:fz2opt;content:counter(fz2opt,upper-alpha);position:absolute;left:14px;top:50%;transform:translateY(-50%);width:32px;height:32px;border-radius:11px;background:var(--panel-soft);color:var(--muted);display:grid;place-items:center;font-size:.8rem;font-weight:700}
 body.fz-lux .option:not(:disabled):hover,body .option:not(:disabled):hover{background:var(--surface-tint);border-color:var(--sun);box-shadow:0 3px 0 var(--sun-deep)}
 body.fz-lux .option:active,body .option:active{transform:translateY(2px);box-shadow:0 1px 0 var(--line)}
-body.fz-lux .option.correct,body .option.correct,body.fz-lux .option.correct:disabled,body .option.correct:disabled{border-color:var(--good-bright);background:var(--good-soft);box-shadow:0 3px 0 var(--good-bright)}
+body.fz-lux .option.correct,body .option.correct,body.fz-lux .option.correct:disabled,body .option.correct:disabled{border-color:var(--good-bright);background:var(--good-soft);color:var(--good);box-shadow:0 3px 0 var(--good-bright)}
 body.fz-lux .option.correct::before,body .option.correct::before{background:var(--good-bright);color:#fff;content:"✓"}
-body.fz-lux .option.wrong,body .option.wrong,body.fz-lux .option.wrong:disabled,body .option.wrong:disabled{border-color:var(--bad);background:var(--bad-soft);box-shadow:0 3px 0 var(--bad)}
+body.fz-lux .option.wrong,body .option.wrong,body.fz-lux .option.wrong:disabled,body .option.wrong:disabled{border-color:var(--bad);background:var(--bad-soft);color:var(--bad);box-shadow:0 3px 0 var(--bad)}
 body.fz-lux .option.wrong::before,body .option.wrong::before{background:var(--bad);color:#fff;content:"✕"}
-body.fz-lux .option:disabled:not(.correct):not(.wrong),body .option:disabled:not(.correct):not(.wrong){opacity:.55;box-shadow:none}
+body.fz-lux .option:disabled:not(.correct):not(.wrong),body .option:disabled:not(.correct):not(.wrong){opacity:.78;color:var(--muted);box-shadow:none}
 body.fz-lux .feedback,body .feedback{border-radius:20px;padding:16px 18px;background:var(--surface-tint);border:1px solid var(--line);font-size:.95rem}
 body.fz-lux .feedback.feedback-success,body .feedback.feedback-success,body.fz-lux .feedback.is-correct,body .feedback.is-correct{background:var(--good-soft);border-color:#CDE9DD}
-body.fz-lux .feedback.feedback-error,body .feedback.feedback-error,body.fz-lux .feedback.is-wrong,body .feedback.is-wrong{background:#FFF1EE;border-color:#F6D3C9}
+body.fz-lux .feedback.feedback-error,body .feedback.feedback-error,body.fz-lux .feedback.is-wrong,body .feedback.is-wrong{background:#FFF5F2;border-color:#F5C6BC}
 body.fz-lux .feedback-title,body .feedback-title{font-family:var(--fz-display);font-weight:700;font-size:1.15rem;letter-spacing:-.02em}
 
 /* ---------- form ---------- */

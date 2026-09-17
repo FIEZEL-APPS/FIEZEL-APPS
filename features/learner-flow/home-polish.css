@@ -18,9 +18,9 @@
 #app .learner-flow-launcher .launch-icon{width:52px;height:52px;border-radius:16px;display:grid;place-items:center;background:rgba(255,255,255,.55);backdrop-filter:blur(10px);align-self:start;box-shadow:inset 0 0 0 1px rgba(255,255,255,.6)}
 #app .learner-flow-launcher .launch-card [data-lucide]{width:22px;height:22px;opacity:.7;align-self:end}
 #app .learner-flow-launcher .learn-launch{background:linear-gradient(135deg,var(--yellow-soft) 0%,#FFE9B3 55%,#FFD97A 100%);color:var(--ink)}
-#app .learner-flow-launcher .tutor-launch{background:linear-gradient(135deg,var(--ink) 0%,#3B2A1C 100%);color:#fff}
-#app .learner-flow-launcher .tutor-launch .launch-icon{background:rgba(255,255,255,.12);box-shadow:inset 0 0 0 1px rgba(255,255,255,.18)}
-#app .learner-flow-launcher .tutor-launch small{color:rgba(255,255,255,.72);opacity:1}
+#app .learner-flow-launcher .tutor-launch{background:linear-gradient(135deg,#FFF5F2 0%,#FDE8E1 55%,#F8D5C8 100%);color:var(--ink);border:1px solid rgba(155,58,74,.15)}
+#app .learner-flow-launcher .tutor-launch .launch-icon{background:rgba(255,255,255,.8);color:var(--accent);box-shadow:inset 0 0 0 1px rgba(155,58,74,.18)}
+#app .learner-flow-launcher .tutor-launch small{color:var(--muted);opacity:1}
 #app .learner-flow-launcher .duel-invite-card{grid-column:1/-1;min-height:112px;background:linear-gradient(135deg,var(--good-soft),#DDF5E6);color:var(--ink);outline:2px dashed var(--good);outline-offset:-8px}
 @media (max-width:720px){#app .learner-flow-launcher{grid-template-columns:1fr}#app .learner-flow-launcher .launch-card{min-height:140px;padding:18px 20px}#app .learner-flow-launcher .launch-card b{font-size:1.15rem}}
 
@@ -31,6 +31,6 @@
    definisi, bukan enam". ---- */
 @media (prefers-reduced-motion:reduce){#app .learner-flow-launcher .launch-card{transition:none}}
 #app .learner-flow-launcher{background:transparent;padding:0;border:0;box-shadow:none}
-#app .learner-flow-launcher .tutor-launch b,#app .learner-flow-launcher .tutor-launch>span{color:#fff}
-#app .learner-flow-launcher .tutor-launch [data-lucide]{color:var(--yellow);opacity:.9}
+#app .learner-flow-launcher .tutor-launch b,#app .learner-flow-launcher .tutor-launch>span{color:var(--ink)}
+#app .learner-flow-launcher .tutor-launch [data-lucide]{color:var(--accent);opacity:.9}
 #app .learner-flow-launcher .learn-launch b,#app .learner-flow-launcher .learn-launch>span{color:var(--ink)}
