@@ -10859,7 +10859,7 @@ function quizLoop(cfg){
     // tebakan yang murah. Diajukan sesudah audio soal sekarang berangkat, bukan di draw(),
     // supaya tidak pernah bersaing dengan rekaman yang sedang ditunggu murid.
     const nextListening=remaining.find(x=>x&&x.type==='listening'&&x.script&&x.script!==q.script);
-    try{const played=await audio.play(q.script,{speed:currentListenSpeed,contentType:'listening',suppressSubtitles:true,next:nextListening?nextListening.script:''});
+    try{const played=await audio.play(q.script,{contentType:'listening',suppressSubtitles:true,speed:currentListenSpeed,next:nextListening?nextListening.script:''});
      // Fase 2 (B3 butir 6): replay dihitung hanya untuk pemutaran yang BERBUNYI - putaran
      // pertama bukan replay, dan pemutaran gagal bukan bukti apa pun. Nilainya dibaca
      // evidenceKappa (diskon jawaban benar berbekal banyak replay) dan riwayat listening.

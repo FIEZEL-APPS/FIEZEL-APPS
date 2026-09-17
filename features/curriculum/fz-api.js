@@ -79,25 +79,89 @@
 
   function pct(v) { return v == null ? '—' : Math.round(v) + '%'; }
 
+  /* ---------------------------------------------------------------- KelasKu
+
+     SATU pintu, dua langkah, dan langkah pertamanya TIDAK menyentuh mesin
+     kurikulum sama sekali:
+
+       1. minta tiket ke Worker KelasKu (`credentials:'include'`, karena
+          identitasnya hidup di cookie HttpOnly yang hanya peramban yang bisa
+          mengirimkannya);
+       2. serahkan tiket itu ke mesin kurikulum, yang menukarnya dengan sesinya
+          sendiri.
+
+     Kenapa dua langkah dan bukan satu: cookie KelasKu terikat domain
+     .fiezel.my.id dan tidak akan pernah terkirim ke mesin kurikulum yang berdiri
+     di domain lain. Yang menyeberang karena itu bukan cookie, melainkan
+     pernyataan sekali-pakai berumur dua menit tentang siapa pemegangnya.
+
+     Alamat Worker dibaca dari FIEZEL_CF_CONFIG — konfigurasi yang SAMA yang
+     dipakai KelasKu sendiri (features/auth/fiezel-account.js). Menyalin alamatnya
+     ke berkas ini akan melahirkan sumber kedua yang bisa menyimpang diam-diam. */
+
+  /* Naskah pintu KelasKu lahir dua bahasa (copy-id-kelasku.js + copy-th-kelasku.js).
+     FiezelI18n.t() mengembalikan KUNCINYA saat naskahnya belum termuat — dan halaman
+     konsol memang tidak memuat lapisan i18n hari ini — jadi pembungkus ini mengembalikan
+     kalimat cadangan Indonesia, bukan nama kunci. Guru tidak boleh membaca
+     'kelasku.belum-masuk' di layarnya. */
+  function t(kunci, cadangan) {
+    var s;
+    try { var I = root.FiezelI18n; s = I && I.t ? I.t(kunci) : undefined; } catch (_) {}
+    return (s === undefined || s === kunci) ? cadangan : s;
+  }
+
+  function kelaskuBase() {
+    try {
+      var c = root.FIEZEL_CF_CONFIG || {};
+      if (c.enabled === false) return '';
+      return String(c.base || '').trim().replace(/\/$/, '');
+    } catch (_) { return ''; }
+  }
+
+  function ambilTiket() {
+    var akar = kelaskuBase();
+    if (!akar) {
+      return Promise.reject(new Error(t('kelasku.belum-tersambung',
+        'Akun KelasKu belum tersambung di aplikasi ini.') +
+        ' (FIEZEL_CF_CONFIG kosong atau dimatikan)'));
+    }
+    return fetch(akar + '/api/account/curriculum-ticket', {
+      method: 'POST', credentials: 'include', mode: 'cors', cache: 'no-store',
+      headers: { 'Content-Type': 'application/json' }, body: '{}'
+    }).then(function (r) {
+      return r.json().catch(function () { return null; }).then(function (data) {
+        if (r.status === 401) {
+          throw new Error(t('kelasku.belum-masuk',
+            'Kamu belum masuk KelasKu. Masuk dulu di aplikasi FIEZEL, lalu kembali ke sini.'));
+        }
+        if (r.status === 503) {
+          throw new Error(t('kelasku.jembatan-mati',
+            'Jembatan KelasKu belum dinyalakan di server.') + ' (CURRICULUM_TICKET_KEY)');
+        }
+        if (!r.ok || !data || !data.ticket) {
+          throw new Error(t('kelasku.tiket-gagal', 'Gagal mengambil tiket KelasKu.'));
+        }
+        return data.ticket;
+      });
+    });
+  }
+
+  function masukKelasKu(classCode) {
+    return ambilTiket().then(function (tiket) {
+      return api('/auth/kelasku', { body: { ticket: tiket, class_code: classCode || null } });
+    }).then(function (u) { setToken(u.access_token); return u; });
+  }
+
   root.FZEngine = {
     api: api, esc: esc, toast: toast, pct: pct, token: token, setToken: setToken,
+    kelaskuBase: kelaskuBase,
     login: {
-      teacherToken: function (tok, name) {
-        return api('/auth/teacher/token', { body: { token: tok, name: name } })
-          .then(function (u) { setToken(u.access_token); return u; });
-      },
-      studentLogin: function (email, password) {
-        return api('/auth/login', { body: { email: email, password: password } })
-          .then(function (u) { setToken(u.access_token); return u; });
-      },
-      studentRegister: function (payload) {
-        return api('/auth/register', { body: payload }).then(function (u) { setToken(u.access_token); return u; });
-      },
-      googleSession: function (sessionId, classCode) {
-        return api('/auth/google/session', { body: { session_id: sessionId, class_code: classCode || null } })
-          .then(function (u) { setToken(u.access_token); return u; });
-      },
+      /* Guru DAN murid memakai jalan yang sama. Bedanya hanya satu: murid boleh
+         menyertakan kode kelas, dan peran keduanya datang dari D1 KelasKu —
+         tidak ada tempat di klien yang bisa menaikkan peran seseorang. */
+      kelasku: masukKelasKu,
       me: function () { return api('/auth/me'); },
+      joinClass: function (code) { return api('/auth/join-class', { body: { class_code: code } }); },
       logout: function () { return api('/auth/logout', { method: 'POST', body: {} }).then(function () { setToken(''); }); }
     }
   };

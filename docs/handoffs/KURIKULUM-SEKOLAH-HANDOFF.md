@@ -373,7 +373,7 @@ Catatan lengkapnya, berikut tes 30 detik yang membuktikannya sebelum orang membu
 waktu berjam-jam, ada di `docs/BACKEND-CPANEL-DEPLOY.md` §0a.
 
 Render sendiri gagal tiga hari sebelumnya karena tidak ada berkas yang menentukan versi
-Python — akar yang sudah dicatat PR #395 sebagai utang dan baru ditutup m025-302
+Python — akar yang sudah dicatat PR #395 sebagai utang dan baru ditutup m025-318
 (`backend/.python-version` = 3.11.9, dijaga dua assert di
 `tests/backend-env-contract-test.js`). Sesudah itu deploy-nya bersih: wheel `cp311`,
 `Application startup complete`, live.
@@ -407,3 +407,81 @@ diawali `https://`). Login email+sandi jalan penuh, termasuk akun owner.
 **Sandi owner yang berlaku** adalah yang tersimpan di `.env` pemasangan, bukan nilai
 `ADMIN_PASSWORD` di Render: `seed_owner()` sengaja tidak menimpa sandi owner yang sudah
 ada (perbaikan dari review PR #405).
+
+---
+
+## m025-318 — tiga pintu dicabut, tersisa satu: KelasKu
+
+Keputusan owner, 14 September 2026, setelah menemukan sendiri bahwa layar
+`kurikulum.html` meminta token `FZG-XXXXXXXX` yang **tidak bisa dibuat dari dashboard
+mana pun**: *"cabut seluruhnya, cukup token KelasKu saja; begitu juga dengan murid,
+cukup dengan memasukkan kode KelasKu."*
+
+### Kenapa dua daftar guru bisa ada sekaligus
+
+FIEZEL punya dua server, dan sampai commit ini keduanya punya daftar penggunanya
+sendiri:
+
+| | KelasKu (aplikasi) | Mesin kurikulum (konsol) |
+|---|---|---|
+| Server | Worker `fiezel-api` | FastAPI + MongoDB |
+| Daftar undangan | D1 `teacher_invite` | Mongo `teacher_invites` |
+| Ditukar di | `POST /api/account/teacher-activate` | `POST /api/auth/teacher/token` |
+| Diterbitkan dari | dashboard owner | **tidak ada antarmuka — hanya curl** |
+
+Dashboard owner menulis ke D1; konsol kurikulum membaca Mongo. Dua kotak yang tidak
+pernah saling melihat, jadi token dari dashboard memang tidak akan pernah dikenali di
+konsol. Ditambah `OWNER_MASTER_TOKEN` — kunci utama yang dikirim di setiap permintaan,
+tidak pernah berputar, dan nilainya sudah terpublikasi di repo.
+
+### Yang dicabut, beserta rutenya
+
+`POST /auth/teacher/token`, `POST /auth/register`, `POST /auth/login`,
+`POST /auth/google/session`, `POST|GET /owner/teacher-invites`, header `X-Owner-Token`,
+seluruh penyimpanan `password_hash`/bcrypt, `seed_owner()`, dan bendera
+`--reset-owner-password`. Empat env ikut mati: `ADMIN_EMAIL`, `ADMIN_PASSWORD`,
+`OWNER_MASTER_TOKEN`, `EMERGENT_AUTH_SESSION_URL`.
+
+Dicabut **beserta rutenya**, bukan hanya dari layar: pintu yang hilang dari layar tetapi
+hidup di server bukan pintu tertutup — ia pintu yang tidak terlihat.
+
+### Yang menggantikannya: tiket, bukan kata sandi
+
+Cookie identitas KelasKu HttpOnly dan terikat `.fiezel.my.id`, jadi ia tidak akan pernah
+terkirim ke mesin kurikulum yang berdiri di domain lain. Yang menyeberang karena itu
+bukan cookie dan bukan kata sandi, melainkan **tiket sekali-pakai berumur dua menit**:
+
+1. `POST /api/account/curriculum-ticket` di Worker (dijaga `roleGate`, peran dibaca dari
+   D1 pada permintaan itu juga) menerbitkan tiket ber-HMAC;
+2. `POST /api/auth/kelasku` di FastAPI memverifikasinya, membakar `jti`-nya, dan
+   menukarnya dengan sesi mesin kurikulum.
+
+Konsekuensi yang disengaja:
+
+* **Peran diselaraskan setiap masuk**, bukan hanya saat akun dibuat. Guru yang dicabut
+  owner di KelasKu kehilangan akses di sini pada tiket berikutnya — tanpa ada yang perlu
+  ingat mencabutnya dua kali.
+* **Peran tak dikenal jatuh ke murid**, bukan guru. Kegagalan pemetaan menutup pintu.
+* **Tiket sekali pakai.** `jti` unik + indeks TTL di `kelasku_tickets`: tiket yang
+  terpungut dari log tidak bisa dipakai ulang, dan barisnya membuang dirinya sendiri.
+* **Murid cukup kode kelas.** Tidak ada pendaftaran, tidak ada sandi ketiga.
+
+### Kunci bersama, dan satu-satunya cara ia bisa salah
+
+`CURRICULUM_TICKET_KEY` wajib **sama persis** di `.env` backend dan di
+`wrangler secret` Worker. Berbeda = setiap tiket ditolak, dan penolakannya sengaja tidak
+menyebut sebabnya (membedakan "tanda tangan salah" dari "kedaluwarsa" memberi peta kepada
+pemalsu). Karena itu `bootstrap.py` menolak kunci yang absen atau lebih pendek dari 32
+karakter: gagal saat pemasangan, bukan 401 misterius pada guru pertama.
+
+Bentuk tiket ditulis dua kali (WebCrypto di Worker, CPython di backend) karena tidak ada
+satu berkas yang bisa dijalankan keduanya. `tests/curriculum-ticket-parity-test.js`
+MENJALANKAN kedua sisi atas vektor yang sama, dua arah, plus penolakan — kalau salah satu
+sisi mengubah urutan ruas JSON atau padding base64url, gerbang itu merah sebelum
+produksi.
+
+### Yang masih milik owner
+
+Satu nilai baru di Worker: `wrangler secret put CURRICULUM_TICKET_KEY` dengan nilai yang
+sama seperti di `.env` backend. Tanpa itu tombol "Masuk dengan akun KelasKu" menjawab
+"jembatan belum dinyalakan" — terang-terangan, bukan diam.

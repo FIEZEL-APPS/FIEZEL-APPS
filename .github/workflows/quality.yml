@@ -1046,6 +1046,21 @@ jobs:
         # menuntut benderanya MATI di kedua jalur dan tautannya dijaga bendera - sekaligus
         # menuntut mesinnya TIDAK dihapus, supaya satu bendera cukup saat backend siap.
         run: node tests/curriculum-console-gate-test.js
+      - name: 'Konsol kurikulum hanya punya SATU pintu: KelasKu'
+        # Keputusan owner 14 Sep 2026: guru dan murid yang sudah punya akun KelasKu tidak
+        # boleh diminta identitas kedua. Tiga pintu lama di mesin kurikulum (token FZG-,
+        # email+sandi, sesi Google) DICABUT, termasuk rutenya di server - pintu yang hilang
+        # dari layar tapi hidup di server bukan pintu tertutup, ia pintu tak terlihat.
+        # Gerbang menyisir naskah layar DAN rute server, lalu menuntut jalur penggantinya
+        # terpasang di ketiga lapis (klien, Worker, FastAPI).
+        run: node tests/curriculum-single-door-test.js
+      - name: 'Tiket KelasKu: penanda tangan JS dan pembaca Python sepakat bit per bit'
+        # Tiket ditandatangani di Workers (WebCrypto) dan dibaca di CPython. Bentuknya
+        # terpaksa ditulis dua kali, dan dua tulisan yang menyimpang baru ketahuan di
+        # produksi sebagai "tiket ditolak" tanpa sebab. Gerbang MENJALANKAN kedua sisi atas
+        # vektor yang sama, dua arah, plus penolakan (tanda tangan rusak, kedaluwarsa,
+        # salah audience, kunci lemah).
+        run: node tests/curriculum-ticket-parity-test.js
       - name: 'Halaman konsol benar-benar memuat konfigurasinya'
         # m025-298 memindahkan alamat backend ke core-config.js dan menurunkan pintunya dari
         # nilai itu - tetapi kurikulum.html dan misi.html tidak pernah memuat core-config.js.

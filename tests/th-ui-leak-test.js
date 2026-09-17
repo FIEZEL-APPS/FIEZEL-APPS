@@ -84,7 +84,7 @@ const ALLOWLIST = Object.freeze({
 
      YANG PERLU DIKETAHUI TERUS TERANG, dan sengaja ditulis di sini supaya tidak hilang:
      learning-mission.js adalah LAYAR MURID (misi.html), bukan layar guru. Kalau kelak ada
-     murid Thai yang dibukakan konsol ini, 19 kalimat itu sampai kepadanya dalam bahasa
+     murid Thai yang dibukakan konsol ini, 16 kalimat itu sampai kepadanya dalam bahasa
      Indonesia. Selama kursusnya memang Kurikulum Merdeka, itu konsekuensi yang diterima
      sadar - bukan kebocoran yang terlewat.
 
@@ -92,8 +92,12 @@ const ALLOWLIST = Object.freeze({
      berkas lain. Jalan keluarnya, kalau FIEZEL kelak membawa kurikulum negara lain, adalah
      paket kurikulum per-negara - bukan menerjemahkan istilah regulasi Indonesia. */
   /* 19 -> 20 (m025-314): satu label gerbang masuk ikut terlihat. Alasan entri ini tidak
-     berubah — konten Kurikulum Merdeka, keputusan owner 7 September 2026. */
-  'features/curriculum/learning-mission.js': 20,
+     berubah — konten Kurikulum Merdeka, keputusan owner 7 September 2026.
+
+     20 -> 17 (m025-318): formulir daftar/masuk email+sandi dan tombol "Masuk dengan Google"
+     dicabut bersama pintu-pintunya, jadi tiga kalimatnya ikut hilang dari layar. Ratchet
+     TURUN — angka ini menyatakan utang yang tersisa, bukan jatah yang boleh dipakai. */
+  'features/curriculum/learning-mission.js': 17,
   'features/curriculum/teacher-console.js': 56,                 // konsol guru Kurikulum Merdeka
   /* KONTEN KURIKULUM NASIONAL INDONESIA, bukan naskah antarmuka. Empat literalnya adalah
      nama Fase resmi Kurikulum Merdeka dan dua saran pedagogis di dalam paket materinya.
