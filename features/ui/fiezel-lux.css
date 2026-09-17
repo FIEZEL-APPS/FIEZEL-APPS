@@ -64,7 +64,7 @@ body.fz-lux .app{max-width:720px;padding:14px 18px calc(124px + env(safe-area-in
 /* ---------- topbar ---------- */
 /* m025-267: pita topbar, ukuran brand, dan chip ikon yang dulu di sini DIPINDAH ke
    style.css "Top bar" - satu definisi. Blur-nya juga melanggar keputusan baterai m025-81. */
-body.fz-lux .ask-button{width:auto;height:42px;flex-direction:row;padding:0 14px 0 12px;gap:8px}
+body.fz-lux .ask-button{width:auto;height:44px;min-height:44px;flex-direction:row;padding:0 14px 0 12px;gap:8px}
 body.fz-lux .ask-button .fiezel-ask-mark{height:16px;width:auto}
 body.fz-lux .ask-button .ask-label{font-size:.8rem;font-weight:700;letter-spacing:.01em;text-transform:none}
 

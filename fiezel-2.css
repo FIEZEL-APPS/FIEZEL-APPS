@@ -79,7 +79,7 @@ body.fz-lux .progress-tab.active,body .progress-tab.active{background:var(--pane
 
 /* ---------- kuis: opsi berhuruf + umpan balik sheet ---------- */
 body.fz-lux .quiz-topbar,body .quiz-topbar{align-items:center}
-body.fz-lux .quiz-exit,body .quiz-exit{border-radius:999px;width:42px;min-width:42px;height:42px;padding:0;display:grid;place-items:center;box-shadow:none}
+body.fz-lux .quiz-exit,body .quiz-exit{border-radius:999px;width:44px;min-width:44px;height:44px;padding:0;display:grid;place-items:center;box-shadow:none}
 body.fz-lux .quiz-exit-label,body .quiz-exit-label{display:none}
 body.fz-lux .quiz-progress-bar,body .quiz-progress-bar{border-radius:999px;background:rgba(36,26,17,.08)}
 body.fz-lux .quiz-progress-bar b,body .quiz-progress-bar b{background:var(--sun);border-radius:999px}

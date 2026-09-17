@@ -764,7 +764,7 @@ input[type="checkbox"],input[type="radio"]{min-width:24px;min-height:24px}
   background:linear-gradient(135deg,#EA580C,#C2410C);
   color:#fff;transition:transform .15s ease,box-shadow .15s ease;
 }
-.quiz-floating-next-btn:active{transform:scale(.98)}
+.quiz-floating-next-btn:active{transform:scale(.96);transition-duration:.08s}
 .quiz-floating-next-btn svg{width:20px;height:20px}
 .quiz-shell{padding-bottom:84px!important}
 /* ==========================================================================
@@ -3322,6 +3322,7 @@ eteach) dan tawaran berhenti (reathe).
     58%{transform:scale(1.12) translateY(-1px)}
     100%{transform:scale(1) translateY(0)}
   }
+}
 /* ==========================================================================
    KelasKu Wordmark — Brand Typography & Contextual Styling
    Signature Plus Jakarta Sans 800 with emerald/sage #1F7A63 identity.
