@@ -13,7 +13,14 @@
 <link rel="alternate" hreflang="id" href="https://fiezel.my.id/install/">
 <link rel="alternate" hreflang="th" href="https://fiezel.my.id/th/install/">
 <link rel="alternate" hreflang="x-default" href="https://fiezel.my.id/install/">
+<!-- SEO-05: canonical + og:url yang HILANG dari halaman install Indonesia — pasangan th-nya
+     (th/install/index.html) sudah punya keduanya sejak W3-WEB. Halaman yang didaftarkan di
+     sitemap tanpa canonical membiarkan Google memilih sendiri URL mana yang mewakilinya,
+     termasuk varian berparameter. Dijaga tests/seo-surface-gate-test.js cek (B). -->
+<link rel="canonical" href="https://fiezel.my.id/install/">
 <meta property="og:type" content="website">
+<meta property="og:url" content="https://fiezel.my.id/install/">
+<meta property="og:locale" content="id_ID">
 <meta property="og:title" content="Cara Install FIEZEL di Android, iPhone, dan Desktop">
 <meta property="og:description" content="Panduan pasang FIEZEL ke layar utama lewat Chrome, Safari, atau desktop. Setelah terpasang, materi dan latihan bisa dibuka tanpa internet.">
 <!-- AI-15-F08 (W3-WEB): og:image wajib URL absolut — path "../" tak bisa di-resolve scraper OG. -->

@@ -42,8 +42,8 @@ api.fiezel.my.id      ← Cloudflare Worker (workers/api/)
 | --- | --- |
 | akar | Shell aplikasi (`index.html`, `app.js`, `style.css`, `sw.js`), konfigurasi (`core-config.js`), bank data JSON |
 | `features/` | 33 modul fitur yang dimuat shell dan di-precache `sw.js` |
-| `tests/` | 278 gerbang mutu. Jalankan dari akar: `node tests/<nama>-test.js` |
-| `website/` | Situs marketing (id + th), sitemap, robots.txt, llms.txt |
+| `tests/` | 279 gerbang mutu. Jalankan dari akar: `node tests/<nama>-test.js` |
+| `website/` | Situs marketing (id + th) yang terbit di ROOT domain: beranda, tentang, install, legal, sitemap, robots.txt, llms.txt. Akar repo terbit di `/app/` — dua permukaan berbeda, dijaga `tests/seo-surface-gate-test.js` |
 | `workers/` | Cloudflare Worker (api, owner) |
 | `deploy/` | Konfigurasi dan skrip deploy edge |
 | `docs/` | Arsitektur, kontrak, runbook; `docs/handoffs/` untuk handoff milestone |
@@ -55,8 +55,8 @@ api.fiezel.my.id      ← Cloudflare Worker (workers/api/)
 
 | Penanda | Nilai |
 | --- | --- |
-| `FIEZEL_PAGE_BUILD` | `m025-313` |
-| `SW_REV` | `m025-313-paw-kembali-20260913` |
+| `FIEZEL_PAGE_BUILD` | `m025-314` |
+| `SW_REV` | `m025-314-paw-kembali-20260913` |
 | Grammar schema | `2.0.0` |
 | Practice blueprint | `focused-25-v1` |
 | Core protocol | `1.7` |
@@ -75,7 +75,7 @@ node tests/pwa-release-coherence-test.js
 node tests/th-coverage-test.js
 
 # Semua gerbang (lihat .github/workflows/quality.yml)
-# CI menjalankan 278 gerbang pada setiap PR
+# CI menjalankan 279 gerbang pada setiap PR
 ```
 
 Aplikasi harus dijalankan melalui HTTP/HTTPS, bukan `file://`.

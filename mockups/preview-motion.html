@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Original 2D Vector Character Animation - Penyu Laut (5 Detik)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@700;800&family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0C3847;
+      --card: #0F495C;
+      --accent: #5EEAD4;
+      --text: #F0FDFA;
+      --sub: #99F6E4;
+    }
+    body {
+      margin: 0;
+      padding: 40px 20px;
+      background: radial-gradient(circle at 50% 20%, #155B70 0%, #0A2F3D 75%, #051A22 100%);
+      font-family: 'Nunito', sans-serif;
+      color: var(--text);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+      box-sizing: border-box;
+    }
+    .container {
+      max-width: 960px;
+      width: 100%;
+      background: rgba(15, 73, 92, 0.75);
+      backdrop-filter: blur(16px);
+      border-radius: 28px;
+      padding: 34px;
+      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.45);
+      border: 1.5px solid rgba(94, 234, 212, 0.25);
+    }
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(45, 212, 191, 0.18);
+      color: #5EEAD4;
+      font-weight: 800;
+      font-size: 14px;
+      padding: 6px 18px;
+      border-radius: 20px;
+      margin-bottom: 14px;
+      border: 1px solid rgba(94, 234, 212, 0.35);
+    }
+    h1 {
+      font-family: 'Baloo 2', cursive;
+      font-size: 38px;
+      margin: 0 0 10px 0;
+      color: #FFFFFF;
+      line-height: 1.15;
+    }
+    p {
+      color: var(--sub);
+      margin: 0 0 26px 0;
+      font-size: 16px;
+      line-height: 1.55;
+    }
+    .video-wrapper {
+      position: relative;
+      border-radius: 22px;
+      overflow: hidden;
+      aspect-ratio: 16 / 9;
+      background: #000;
+      box-shadow: 0 20px 45px rgba(0,0,0,0.5);
+      border: 2px solid rgba(94, 234, 212, 0.3);
+    }
+    video {
+      width: 100%;
+      height: 100%;
+      display: block;
+      object-fit: cover;
+    }
+    .tech-title {
+      font-family: 'Baloo 2', cursive;
+      font-size: 24px;
+      margin: 34px 0 16px 0;
+      color: #FFFFFF;
+    }
+    .tech-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+      gap: 16px;
+    }
+    .tech-card {
+      background: rgba(10, 47, 61, 0.65);
+      border-radius: 18px;
+      padding: 18px;
+      border: 1px solid rgba(94, 234, 212, 0.2);
+    }
+    .tech-time {
+      font-size: 12px;
+      font-weight: 800;
+      color: #042F2E;
+      background: #5EEAD4;
+      display: inline-block;
+      padding: 3px 10px;
+      border-radius: 8px;
+      margin-bottom: 10px;
+    }
+    .tech-heading {
+      font-weight: 800;
+      font-size: 16px;
+      color: #FFFFFF;
+      margin-bottom: 6px;
+    }
+    .tech-desc {
+      font-size: 13px;
+      color: #CCFBF1;
+      line-height: 1.45;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; flex-wrap:wrap; gap:10px;">
+      <div class="badge">🐢 100% ORIGINAL 2D VECTOR RIG &amp; ANIMATION</div>
+      <a href="preview-magical-book.html" style="color:#5EEAD4; text-decoration:none; font-weight:700; font-size:14px; background:rgba(94,234,212,0.15); padding:6px 14px; border-radius:12px; border:1px solid rgba(94,234,212,0.3);">✨ Lihat Motion: Magical Book (3s Seamless Loop) →</a>
+    </div>
+    <h1>Animasi Vektor 2D Karakter Penyu Laut (5 Detik)</h1>
+    <p>Didesain dari nol menggunakan <b>pure vector SVG rig</b> dengan pergerakan artikulasi anatomis berkelanjutan pada tiap frame (bukan gambar raster statis/flipbook).</p>
+    
+    <div class="video-wrapper">
+      <video controls autoplay loop playsinline poster="../assets/motion/posters/penyu-motion.jpg">
+        <source src="../assets/motion/penyu-motion.mp4" type="video/mp4">
+        <source src="../assets/motion/penyu-motion.webm" type="video/webm">
+        Browser Anda tidak mendukung tag video HTML5.
+      </video>
+    </div>
+
+    <div class="tech-title">Gerakan Anatomi &amp; Ekspresi Vektor:</div>
+    <div class="tech-grid">
+      <div class="tech-card">
+        <span class="tech-time">0.0s – 1.6s</span>
+        <div class="tech-heading">🌊 Dayungan Sayap &amp; Meluncur</div>
+        <div class="tech-desc">
+          Sirip dada kiri &amp; kanan berputar dinamis dengan rotasi sendi bahu sinusoidal (<i>power stroke &amp; recovery stroke</i>). Badan terdorong maju dengan dorongan ombak hidrodinamis, sirip belakang bergerak sebagai kemudi.
+        </div>
+      </div>
+
+      <div class="tech-card">
+        <span class="tech-time">1.6s – 3.2s</span>
+        <div class="tech-heading">👀 Menoleh, Kedip &amp; Senyum</div>
+        <div class="tech-desc">
+          Leher memanjang dan kepala berputar menoleh ke arah penonton (kamera). Pupil mata melirik, kelopak mata berkedip 4 frame secara halus, mulut membuka tersenyum lebar sambil meniup aliran gelembung air 🫧.
+        </div>
+      </div>
+
+      <div class="tech-card">
+        <span class="tech-time">3.2s – 4.0s</span>
+        <div class="tech-heading">👋 Melambaikan Sirip Kanan</div>
+        <div class="tech-desc">
+          Sirip kanan berganti mode gerak: terangkat tinggi dan melambaikan tangan (*wave greeting*) ke penonton dengan ayunan berulang yang ceria.
+        </div>
+      </div>
+
+      <div class="tech-card">
+        <span class="tech-time">4.0s – 5.0s</span>
+        <div class="tech-heading">✨ Meluncur ke Permukaan</div>
+        <div class="tech-desc">
+          Penyu memiringkan cangkang ke atas (*pitch up* -14°), mendayung kedua sirip dengan kayuhan cepat bertenaga, dan meluncur ke arah cahaya matahari di permukaan air.
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

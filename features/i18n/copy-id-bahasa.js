@@ -36,6 +36,11 @@
     'bahasa.chip-aktif-ja': 'Bahasa Jepang aktif',
     'bahasa.chip-kembali-en': 'Ketuk untuk kembali ke Bahasa Inggris',
     'bahasa.chip-aria': 'Ganti bahasa yang dipelajari',
-    'bahasa.berganti': 'Sekarang belajar {bahasa}.'
+    'bahasa.berganti': 'Sekarang belajar {bahasa}.',
+    // m025-314: penolakan rute. Muncul saat murid sampai ke permukaan yang isinya belum
+    // ada untuk bahasa yang sedang dipelajari - lewat riwayat, tautan lama, atau layar
+    // yang tersimpan dari sebelum ia berganti kursus. Ia menyebut ALASANNYA, karena
+    // pintu yang menolak tanpa berkata apa-apa terbaca sebagai aplikasi yang rusak.
+    'bahasa.permukaan-terkunci': 'Latihan ini belum ada untuk {bahasa}. Suaranya masih bahasa Inggris, jadi latihannya disembunyikan dulu.'
   });
 })();

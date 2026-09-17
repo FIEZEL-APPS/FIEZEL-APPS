@@ -1,0 +1,820 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ghost Sentinel — Dashboard</title>
+  <link rel="canonical" href="https://fiezel.my.id/sentinel/app.html">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css"/>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+  <style>
+    :root{
+      --bg:#030712;--panel:rgba(15,23,42,.9);--border:rgba(255,255,255,.1);
+      --primary:#38bdf8;--accent:#10b981;--danger:#ef4444;--warn:#f59e0b;
+      --text:#f8fafc;--muted:#94a3b8;
+      --font:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+    }
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{background:var(--bg);color:var(--text);font-family:var(--font);min-height:100vh}
+    header{
+      background:rgba(15,23,42,.97);border-bottom:1px solid var(--border);
+      padding:12px 20px;display:flex;align-items:center;justify-content:space-between;
+      position:sticky;top:0;z-index:1000;
+    }
+    .brand{display:flex;align-items:center;gap:10px}
+    .brand-icon{
+      width:38px;height:38px;border-radius:10px;
+      background:linear-gradient(135deg,#ef4444,#8b5cf6);
+      display:flex;align-items:center;justify-content:center;font-size:20px;
+      box-shadow:0 0 14px rgba(239,68,68,.4);
+    }
+    .brand-name{font-size:16px;font-weight:800}
+    .brand-name span{color:var(--danger)}
+    .live-badge{
+      display:flex;align-items:center;gap:6px;
+      background:rgba(16,185,129,.15);border:1px solid rgba(16,185,129,.4);
+      border-radius:20px;padding:5px 12px;font-size:12px;font-weight:700;color:#34d399;
+    }
+    .dot-pulse{
+      width:8px;height:8px;border-radius:50%;background:#34d399;
+      animation:pulse 1.5s ease-in-out infinite;
+    }
+    @keyframes pulse{0%,100%{opacity:1;box-shadow:0 0 0 0 rgba(52,211,153,.6)}
+      50%{opacity:.7;box-shadow:0 0 0 6px rgba(52,211,153,0)}}
+    .dot-pulse.offline{background:var(--danger);animation:none}
+
+    /* Layout */
+    .layout{display:grid;grid-template-columns:340px 1fr;min-height:calc(100vh - 62px)}
+    @media(max-width:768px){.layout{grid-template-columns:1fr;grid-template-rows:auto 300px}}
+
+    /* Sidebar */
+    .sidebar{
+      border-right:1px solid var(--border);overflow-y:auto;
+      background:rgba(10,15,28,.6);
+    }
+    .sidebar-section{padding:16px;border-bottom:1px solid var(--border)}
+    .section-title{font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.08em;
+      text-transform:uppercase;margin-bottom:12px}
+
+    /* Auth panel */
+    #authPanel{padding:20px}
+    #authPanel h3{font-size:16px;font-weight:800;margin-bottom:6px}
+    #authPanel p{font-size:13px;color:var(--muted);line-height:1.5;margin-bottom:16px}
+    .input-row{display:flex;flex-direction:column;gap:8px;margin-bottom:12px}
+    .input-row label{font-size:12px;font-weight:600;color:var(--muted)}
+    .input-row input{
+      background:rgba(255,255,255,.07);border:1px solid var(--border);
+      border-radius:8px;padding:10px 12px;color:var(--text);font-size:13px;
+      outline:none;width:100%;font-family:monospace;
+    }
+    .input-row input:focus{border-color:var(--primary)}
+    .btn-primary{
+      width:100%;padding:12px;border-radius:10px;border:none;
+      background:var(--primary);color:#000;font-size:14px;font-weight:700;
+      cursor:pointer;transition:opacity .2s;
+    }
+    .btn-primary:hover{opacity:.85}
+    .btn-sm{
+      padding:6px 12px;border-radius:8px;border:none;font-size:12px;
+      font-weight:600;cursor:pointer;transition:all .2s;
+    }
+    .btn-danger{background:rgba(239,68,68,.15);border:1px solid rgba(239,68,68,.4);color:#fca5a5}
+    .btn-accent{background:rgba(16,185,129,.15);border:1px solid rgba(16,185,129,.4);color:#34d399}
+    .btn-blue{background:rgba(56,189,248,.15);border:1px solid rgba(56,189,248,.4);color:#7dd3fc}
+
+    /* Status cards */
+    .stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+    .stat-card{
+      background:rgba(255,255,255,.04);border:1px solid var(--border);
+      border-radius:12px;padding:12px;
+    }
+    .stat-label{font-size:11px;color:var(--muted);margin-bottom:4px}
+    .stat-val{font-size:18px;font-weight:800;font-family:monospace}
+    .stat-val.green{color:var(--accent)}
+    .stat-val.red{color:var(--danger)}
+    .stat-val.blue{color:var(--primary)}
+    .stat-val.yellow{color:var(--warn)}
+
+    /* Beacon feed */
+    #beaconFeed{max-height:400px;overflow-y:auto}
+    .beacon-item{
+      padding:10px 14px;border-bottom:1px solid rgba(255,255,255,.04);
+      cursor:pointer;transition:background .15s;
+    }
+    .beacon-item:hover{background:rgba(255,255,255,.04)}
+    .beacon-item.alert{border-left:3px solid var(--danger)}
+    .beacon-ts{font-size:11px;color:var(--muted);margin-bottom:3px}
+    .beacon-coord{font-size:12px;font-family:monospace;color:var(--primary)}
+    .beacon-meta{font-size:11px;color:var(--muted);margin-top:2px}
+    .badge{
+      display:inline-flex;align-items:center;gap:4px;
+      font-size:10px;font-weight:700;border-radius:6px;padding:2px 6px;
+      margin-left:4px;
+    }
+    .badge-red{background:rgba(239,68,68,.2);color:#fca5a5}
+    .badge-green{background:rgba(16,185,129,.2);color:#6ee7b7}
+    .badge-blue{background:rgba(56,189,248,.2);color:#7dd3fc}
+
+    /* Map */
+    #map{width:100%;height:calc(100vh - 62px)}
+    @media(max-width:768px){#map{height:300px}}
+
+    /* Command panel */
+    .cmd-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+    .cmd-btn{
+      padding:10px;border-radius:10px;border:none;font-size:13px;font-weight:600;
+      cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:4px;
+      transition:all .2s;
+    }
+    .cmd-btn:active{transform:scale(.95)}
+    .cmd-btn.chime{background:rgba(251,191,36,.15);border:1px solid rgba(251,191,36,.4);color:#fbbf24}
+    .cmd-btn.alarm{background:rgba(239,68,68,.15);border:1px solid rgba(239,68,68,.4);color:#fca5a5}
+    .cmd-btn.photo{background:rgba(56,189,248,.15);border:1px solid rgba(56,189,248,.4);color:#7dd3fc}
+    .cmd-btn.lock{background:rgba(139,92,246,.15);border:1px solid rgba(139,92,246,.4);color:#c4b5fd}
+    .cmd-icon{font-size:22px}
+
+    /* Photo lightbox */
+    #lightbox{
+      display:none;position:fixed;inset:0;background:rgba(0,0,0,.95);
+      z-index:9999;align-items:center;justify-content:center;flex-direction:column;
+      padding:20px;
+    }
+    #lightbox img{max-width:90%;max-height:80vh;border-radius:12px;object-fit:contain}
+    #lightbox .lb-close{
+      position:absolute;top:16px;right:16px;background:rgba(255,255,255,.1);
+      border:none;border-radius:50%;width:40px;height:40px;color:#fff;
+      font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;
+    }
+    #lightbox .lb-info{color:var(--muted);font-size:12px;margin-top:10px;text-align:center}
+
+    /* Setup wizard */
+    #setupWizard{display:none;position:fixed;inset:0;background:rgba(3,7,18,.98);
+      z-index:8888;overflow-y:auto;padding:40px 20px}
+    .wizard-step{max-width:500px;margin:0 auto}
+    .wizard-title{font-size:24px;font-weight:900;margin-bottom:8px}
+    .wizard-sub{color:var(--muted);font-size:14px;margin-bottom:24px;line-height:1.6}
+    .wizard-card{
+      background:rgba(255,255,255,.05);border:1px solid var(--border);
+      border-radius:16px;padding:20px;margin-bottom:16px;
+    }
+    #qrContainer svg{max-width:200px;margin:0 auto;display:block}
+    #trackerUrlBox{
+      background:rgba(255,255,255,.07);border:1px solid var(--border);border-radius:8px;
+      padding:10px 12px;font-family:monospace;font-size:11px;word-break:break-all;
+      color:var(--primary);margin:10px 0;
+    }
+
+    /* Toast */
+    #toast{
+      display:none;position:fixed;bottom:24px;left:50%;transform:translateX(-50%);
+      background:rgba(15,23,42,.97);border:1px solid var(--border);
+      border-radius:12px;padding:10px 20px;font-size:13px;font-weight:600;
+      z-index:9998;white-space:nowrap;
+    }
+
+    /* Scrollbar */
+    ::-webkit-scrollbar{width:4px}
+    ::-webkit-scrollbar-track{background:transparent}
+    ::-webkit-scrollbar-thumb{background:rgba(255,255,255,.15);border-radius:2px}
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="brand">
+    <div class="brand-icon">🛡️</div>
+    <div>
+      <div class="brand-name">Ghost <span>Sentinel</span></div>
+      <div style="font-size:10px;color:var(--muted)" id="deviceNameHeader">Cloud Telemetry</div>
+    </div>
+  </div>
+  <div style="display:flex;align-items:center;gap:10px">
+    <a href="https://sentinel.fiezel.my.id/sentinel.html" target="_blank" style="text-decoration:none">
+      <button class="btn-sm btn-blue" style="font-size:11px;font-weight:700;display:flex;align-items:center;gap:4px">
+        <span>🖥️</span> Dashboard PC
+      </button>
+    </a>
+    <div class="live-badge">
+      <div class="dot-pulse" id="liveDot"></div>
+      <span id="liveLabel">Menghubungkan…</span>
+    </div>
+  </div>
+</header>
+
+<div class="layout">
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+
+    <!-- Auth panel (sebelum login) -->
+    <div id="authPanel">
+      <h3>🔐 Masuk ke Dashboard</h3>
+      <p>Masukkan Device ID dan Owner Token yang kamu simpan saat setup.</p>
+      <div class="input-row">
+        <label>Device ID</label>
+        <input id="inpDeviceId" placeholder="XXXX-XXXX-XXXX" maxlength="14" autocomplete="off"/>
+      </div>
+      <div class="input-row">
+        <label>Owner Token</label>
+        <input id="inpToken" type="password" placeholder="Token 64-karakter" autocomplete="off"/>
+      </div>
+      <button class="btn-primary" onclick="doAuth()">Masuk &rarr;</button>
+      <div style="margin-top:14px;text-align:center">
+        <button class="btn-sm btn-accent" onclick="showSetupWizard()">
+          ✨ Setup Perangkat Baru
+        </button>
+      </div>
+      <div id="authError" style="color:#fca5a5;font-size:12px;margin-top:10px;display:none"></div>
+
+      <!-- Quick Trap Links Tanpa Login -->
+      <div style="margin-top:24px;padding-top:16px;border-top:1px solid var(--border)">
+        <div style="font-size:12px;font-weight:800;color:#fda4af;margin-bottom:6px">🎯 Link Jebakan Siap Kirim (Langsung)</div>
+        <div style="font-size:11px;color:var(--muted);margin-bottom:12px;line-height:1.4">
+          HP sudah dicuri? Kirim tautan di bawah ke nomormu via SMS/WA. Saat dibuka maling, posisi GPS &amp; foto langsung tertangkap:
+        </div>
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <div style="background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:10px;padding:10px">
+            <div style="font-size:12px;font-weight:700;color:#fda4af;margin-bottom:2px">📦 Paket Kurir J&amp;T (99% Dibuka)</div>
+            <div style="font-size:10px;color:var(--muted);margin-bottom:6px">https://sentinel.fiezel.my.id/paket</div>
+            <button class="btn-sm btn-danger" style="width:100%" onclick="copyTrap('https://sentinel.fiezel.my.id/paket')">Salin Link Paket</button>
+          </div>
+          <div style="background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:10px;padding:10px">
+            <div style="font-size:12px;font-weight:700;color:#7dd3fc;margin-bottom:2px">🎁 DANA Kaget Rp 150.000</div>
+            <div style="font-size:10px;color:var(--muted);margin-bottom:6px">https://sentinel.fiezel.my.id/dana</div>
+            <button class="btn-sm btn-blue" style="width:100%" onclick="copyTrap('https://sentinel.fiezel.my.id/dana')">Salin Link DANA</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Dashboard (setelah login) -->
+    <div id="dashPanel" style="display:none">
+
+      <!-- Stat cards -->
+      <div class="sidebar-section">
+        <div class="section-title">Status Perangkat</div>
+        <div class="stat-grid">
+          <div class="stat-card">
+            <div class="stat-label">Terakhir Aktif</div>
+            <div class="stat-val blue" id="statLastSeen">—</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Total Beacon</div>
+            <div class="stat-val green" id="statTotal">0</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Baterai</div>
+            <div class="stat-val yellow" id="statBattery">—</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Jaringan</div>
+            <div class="stat-val blue" id="statNetwork">—</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Commands -->
+      <div class="sidebar-section">
+        <div class="section-title">Perintah Jarak Jauh</div>
+        <div class="cmd-grid">
+          <button class="cmd-btn chime" onclick="sendCmd('chime')">
+            <span class="cmd-icon">🔔</span>Bunyi
+          </button>
+          <button class="cmd-btn alarm" onclick="sendCmd('alarm')">
+            <span class="cmd-icon">🚨</span>Alarm
+          </button>
+          <button class="cmd-btn photo" onclick="sendCmd('photo')">
+            <span class="cmd-icon">📸</span>Foto
+          </button>
+          <button class="cmd-btn lock" onclick="promptLock()">
+            <span class="cmd-icon">🔒</span>Pesan
+          </button>
+        </div>
+      </div>
+
+      <!-- Radar Pencari HP (Mode Rumah) -->
+      <div class="sidebar-section" style="background: rgba(56, 189, 248, 0.05); border-left: 3px solid #38bdf8; border-radius: 8px;">
+        <div class="section-title" style="color: #38bdf8; display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+          <span>📡 Radar Pencari HP (Rumah)</span>
+          <span style="font-size: 10px; color: #38bdf8; background: rgba(56,189,248,.15); padding: 2px 8px; border-radius: 10px; font-weight: 800;">READY</span>
+        </div>
+        <div style="font-size: 11px; color: var(--muted); margin-bottom: 10px; line-height: 1.4;">
+          Bunyikan iPhone yang hilang di balik kasur / bantal walau dalam mode senyap:
+        </div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-bottom: 6px;">
+          <button class="btn-sm btn-blue" style="font-weight: 800; min-height: 42px; display: flex; align-items: center; justify-content: center; gap: 4px;" onclick="sendCmd('sonar')">
+            🔊 Ping Sonar
+          </button>
+          <button class="btn-sm btn-danger" style="font-weight: 800; min-height: 42px; display: flex; align-items: center; justify-content: center; gap: 4px;" onclick="sendCmd('siren')">
+            🚨 Sirine Kasur
+          </button>
+        </div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px;">
+          <button class="btn-sm btn-accent" style="font-weight: 800; min-height: 40px; display: flex; align-items: center; justify-content: center; gap: 4px;" onclick="sendCmd('record_audio')">
+            🎙️ Rekam 5s
+          </button>
+          <button class="btn-sm" style="background: rgba(255,255,255,.1); color: #f8fafc; font-weight: 800; min-height: 40px; display: flex; align-items: center; justify-content: center; gap: 4px;" onclick="sendCmd('stop')">
+            ⏹️ Matikan
+          </button>
+        </div>
+      </div>
+
+      <!-- Beacon feed -->
+      <div class="sidebar-section">
+        <div class="section-title">Riwayat Lokasi</div>
+        <div id="beaconFeed"></div>
+      </div>
+
+      <!-- Link Jebakan -->
+      <div class="sidebar-section">
+        <div class="section-title">🪤 Link Jebakan (HP Sudah Dicuri)</div>
+        <div style="font-size:12px;color:var(--muted);margin-bottom:10px;line-height:1.5">
+          Kirim salah satu link ini ke nomormu sendiri. Jika pencuri membuka link, lokasi mereka langsung masuk ke peta.
+        </div>
+        <div style="display:flex;flex-direction:column;gap:6px" id="trapLinks"></div>
+      </div>
+
+      <!-- Actions -->
+      <div class="sidebar-section">
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <button class="btn-sm btn-blue" onclick="loadData()">🔄 Refresh</button>
+          <button class="btn-sm btn-blue" onclick="exportEvidence()">📦 Export Bukti</button>
+          <button class="btn-sm btn-danger" onclick="doLogout()">⇢ Keluar</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- MAP -->
+  <div id="map"></div>
+</div>
+
+<!-- Lightbox -->
+<div id="lightbox">
+  <button class="lb-close" onclick="closeLightbox()">✕</button>
+  <img id="lbImg" src="" alt="Bukti foto">
+  <div class="lb-info" id="lbInfo"></div>
+</div>
+
+<!-- Setup Wizard -->
+<div id="setupWizard">
+  <div class="wizard-step">
+    <div style="font-size:48px;margin-bottom:16px">🛡️</div>
+    <div class="wizard-title">Setup Ghost Sentinel</div>
+    <div class="wizard-sub">Lindungi HP-mu. Jika hilang atau dicuri, kamu bisa lacak lokasinya, lihat foto pelaku, dan kirim perintah jarak jauh — tanpa perlu PC menyala.</div>
+
+    <div class="wizard-card">
+      <div style="font-size:14px;font-weight:700;margin-bottom:8px">Langkah 1 — Beri nama perangkat</div>
+      <div class="input-row">
+        <input id="wizName" placeholder="Contoh: iPhone Mama, Redmi Adik" style="margin:0"/>
+      </div>
+    </div>
+
+    <button class="btn-primary" onclick="doRegister()">
+      🔑 Buat Device Token
+    </button>
+
+    <!-- Hasil registrasi -->
+    <div id="wizResult" style="display:none;margin-top:20px">
+      <div class="wizard-card">
+        <div style="font-size:14px;font-weight:700;color:#34d399;margin-bottom:12px">
+          ✅ Berhasil! Simpan informasi ini sekarang.
+        </div>
+        <div style="font-size:12px;color:var(--muted);margin-bottom:6px">Owner Token (JANGAN BAGIKAN):</div>
+        <div id="wizToken" style="background:rgba(0,0,0,.4);border:1px solid var(--border);
+          border-radius:8px;padding:10px;font-family:monospace;font-size:11px;word-break:break-all;
+          color:#fbbf24;margin-bottom:12px"></div>
+
+        <div style="font-size:12px;color:var(--muted);margin-bottom:6px">Device ID:</div>
+        <div id="wizDevId" style="background:rgba(0,0,0,.4);border:1px solid var(--border);
+          border-radius:8px;padding:10px;font-family:monospace;font-size:13px;color:var(--primary);
+          margin-bottom:12px"></div>
+
+        <div style="font-size:12px;color:var(--muted);margin-bottom:6px">
+          Langkah 2 — Pindai QR ini dari HP yang ingin dilindungi, lalu tambahkan ke Home Screen:
+        </div>
+        <div id="wizQR" style="text-align:center;padding:16px;background:#fff;border-radius:12px;margin-bottom:12px"></div>
+        <div id="wizTrackerUrl" class="trackerUrlBox" style="background:rgba(255,255,255,.07);border:1px solid var(--border);
+          border-radius:8px;padding:10px 12px;font-family:monospace;font-size:11px;word-break:break-all;
+          color:var(--primary);margin-bottom:12px"></div>
+
+        <div style="font-size:12px;color:var(--muted);margin-bottom:10px">
+          Langkah 3 — Buka dashboard ini lagi, masukkan Device ID + Owner Token di atas.
+        </div>
+
+        <button class="btn-primary" onclick="closeWizardAndFill()">
+          ➡️ Lanjut ke Dashboard
+        </button>
+      </div>
+    </div>
+
+    <button class="btn-sm btn-danger" style="width:100%;margin-top:16px" onclick="document.getElementById('setupWizard').style.display='none'">
+      Batal
+    </button>
+  </div>
+</div>
+
+<!-- Toast -->
+<div id="toast"></div>
+
+<script>
+'use strict';
+
+const CLOUD = 'https://sentinel.fiezel.my.id';
+let SESSION = {
+  deviceId: localStorage.getItem('sz_dash_device') || '',
+  token: localStorage.getItem('sz_dash_token') || '',
+  data: null,
+};
+let MAP, routeLine, markers = [];
+
+// ═══════════════════════════════════════════════════════════════
+// MAP INIT
+// ═══════════════════════════════════════════════════════════════
+function initMap() {
+  MAP = L.map('map', { zoomControl: true }).setView([-2.5, 118], 5);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '© OSM',
+    maxZoom: 19,
+  }).addTo(MAP);
+}
+initMap();
+
+// ═══════════════════════════════════════════════════════════════
+// AUTH
+// ═══════════════════════════════════════════════════════════════
+function doAuth() {
+  const id = document.getElementById('inpDeviceId').value.trim().toUpperCase();
+  const token = document.getElementById('inpToken').value.trim();
+  if (!id || !token) { showAuthError('Isi kedua kolom.'); return; }
+
+  SESSION.deviceId = id;
+  SESSION.token = token;
+  localStorage.setItem('sz_dash_device', id);
+  localStorage.setItem('sz_dash_token', token);
+  startDashboard();
+}
+
+function showAuthError(msg) {
+  const el = document.getElementById('authError');
+  el.textContent = msg;
+  el.style.display = 'block';
+}
+
+function doLogout() {
+  SESSION = { deviceId: '', token: '', data: null };
+  localStorage.removeItem('sz_dash_device');
+  localStorage.removeItem('sz_dash_token');
+  document.getElementById('dashPanel').style.display = 'none';
+  document.getElementById('authPanel').style.display = 'block';
+  document.getElementById('liveLabel').textContent = 'Offline';
+  document.getElementById('liveDot').classList.add('offline');
+  clearMap();
+}
+
+function startDashboard() {
+  document.getElementById('authPanel').style.display = 'none';
+  document.getElementById('authError').style.display = 'none';
+  document.getElementById('dashPanel').style.display = 'block';
+  renderTrapLinks();
+  loadData();
+  setInterval(loadData, 30_000); // auto-refresh 30 dtk
+}
+
+function renderTrapLinks() {
+  generateTrapLinks();
+}
+
+function generateTrapLinks() {
+  const base = 'https://fiezel.my.id/sentinel';
+  const id = SESSION.deviceId;
+  const types = [
+    { label: '💙 DANA Kaget',       url: `${base}/dana.html?d=${id}`,             wa: '🎁 Kamu dapat DANA Kaget! Buka sekarang sebelum kedaluwarsa: ' },
+    { label: '📦 Paket Menunggumu', url: `${base}/paket.html?d=${id}`,            wa: '📦 Ada paket untukmu yang belum diambil! Konfirmasi segera: ' },
+    { label: '🖼️ Ada Foto Untukmu', url: `${base}/trap.html?d=${id}&type=foto`,   wa: 'Kamu punya kiriman foto baru. Lihat sekarang: ' },
+    { label: '🎁 Kamu Terpilih',    url: `${base}/trap.html?d=${id}&type=hadiah`, wa: 'Selamat! Nomor kamu terpilih. Klaim sebelum kadaluarsa: ' },
+  ];
+  const el = document.getElementById('trapLinks');
+  el.innerHTML = types.map(t => {
+    const waUrl = `https://wa.me/?text=${encodeURIComponent(t.wa + t.url)}`;
+    return `<div style="background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:10px;padding:10px 12px">
+      <div style="font-size:12px;font-weight:700;margin-bottom:4px">${t.label}</div>
+      <div style="font-size:10px;color:var(--muted);margin-bottom:8px;word-break:break-all">${t.url}</div>
+      <div style="display:flex;gap:6px">
+        <button class="btn-sm btn-blue" style="flex:1;font-size:11px" onclick="copyTrap('${encodeURIComponent(t.url)}')">Salin Link</button>
+        <a href="${waUrl}" target="_blank" style="flex:1">
+          <button class="btn-sm" style="width:100%;background:#25d366;color:#fff;font-size:11px">WhatsApp →</button>
+        </a>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function copyTrap(encodedUrl) {
+  const url = decodeURIComponent(encodedUrl);
+  try { navigator.clipboard.writeText(url); showToast('Link disalin!'); } catch {
+    prompt('Salin link ini:', url);
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════
+// LOAD DATA DARI CLOUD
+// ═══════════════════════════════════════════════════════════════
+async function loadData() {
+  if (!SESSION.deviceId || !SESSION.token) return;
+  try {
+    const res = await fetch(`${CLOUD}/api/data/${SESSION.deviceId}`, {
+      headers: { 'X-Owner-Token': SESSION.token },
+      signal: AbortSignal.timeout(8000),
+    });
+    if (!res.ok) {
+      if (res.status === 401) { showAuthError('Token salah atau expired.'); doLogout(); return; }
+      setOffline(); return;
+    }
+    const d = await res.json();
+    SESSION.data = d;
+    renderDashboard(d);
+    setOnline();
+  } catch (e) {
+    setOffline();
+  }
+}
+
+function setOnline() {
+  document.getElementById('liveLabel').textContent = 'Live';
+  document.getElementById('liveDot').classList.remove('offline');
+}
+function setOffline() {
+  document.getElementById('liveLabel').textContent = 'Offline';
+  document.getElementById('liveDot').classList.add('offline');
+}
+
+// ═══════════════════════════════════════════════════════════════
+// RENDER DASHBOARD
+// ═══════════════════════════════════════════════════════════════
+function renderDashboard(d) {
+  document.getElementById('deviceNameHeader').textContent = d.device.name || d.device.deviceId;
+  document.getElementById('statTotal').textContent = d.totalBeacons;
+
+  if (d.lastSeen) {
+    document.getElementById('statLastSeen').textContent = relTime(d.lastSeen);
+  }
+
+  const latest = d.beacons[0];
+  if (latest) {
+    const bat = latest.battery;
+    document.getElementById('statBattery').textContent = bat != null ? `${bat}%${latest.charging ? ' ⚡' : ''}` : '—';
+    document.getElementById('statNetwork').textContent = latest.network || '—';
+  }
+
+  renderBeaconFeed(d.beacons);
+  renderMap(d.beacons);
+}
+
+function renderBeaconFeed(beacons) {
+  const feed = document.getElementById('beaconFeed');
+  feed.innerHTML = '';
+  beacons.slice(0, 50).forEach((b, i) => {
+    const el = document.createElement('div');
+    el.className = 'beacon-item' + (b.alert ? ' alert' : '');
+    el.onclick = () => focusBeacon(b, i);
+
+    const hasPhoto = b.selfie || b.environment;
+    const coord = b.lat ? `${b.lat.toFixed(5)}, ${b.lon.toFixed(5)}` : '(lokasi tidak ada)';
+
+    el.innerHTML = `
+      <div class="beacon-ts">${fmtTs(b.ts)}${b.alert ? '<span class="badge badge-red">⚠️ Alert</span>' : ''}</div>
+      <div class="beacon-coord">${coord}</div>
+      <div class="beacon-meta">
+        ${b.accuracy ? `±${b.accuracy}m · ` : ''}
+        ${b.battery != null ? `🔋${b.battery}% · ` : ''}
+        ${b.network ? b.network + ' · ' : ''}
+        ${b.ip ? b.ip : ''}
+        ${hasPhoto ? '<span class="badge badge-blue">📸</span>' : ''}
+      </div>
+    `;
+    feed.appendChild(el);
+  });
+}
+
+function renderMap(beacons) {
+  clearMap();
+  const pts = beacons.filter(b => b.lat).map(b => [b.lat, b.lon]);
+  if (!pts.length) return;
+
+  // Rute
+  routeLine = L.polyline(pts, { color: '#38bdf8', weight: 2, opacity: 0.7 }).addTo(MAP);
+
+  // Markers
+  beacons.filter(b => b.lat).slice(0, 50).forEach((b, i) => {
+    const isLatest = i === 0;
+    const color = b.alert ? '#ef4444' : isLatest ? '#10b981' : '#38bdf8';
+    const icon = L.divIcon({
+      html: `<div style="width:12px;height:12px;border-radius:50%;background:${color};
+             border:2px solid #fff;box-shadow:0 0 6px ${color}"></div>`,
+      className: '', iconAnchor: [6, 6],
+    });
+    const m = L.marker([b.lat, b.lon], { icon }).addTo(MAP);
+    m.bindPopup(buildPopup(b));
+    markers.push(m);
+  });
+
+  MAP.fitBounds(routeLine.getBounds(), { padding: [30, 30] });
+
+  // Photo markers
+  beacons.filter(b => b.lat && (b.selfie || b.environment)).slice(0, 20).forEach(b => {
+    const photo = b.selfie || b.environment;
+    const thumbIcon = L.divIcon({
+      html: `<img src="${photo}" style="width:36px;height:36px;border-radius:6px;
+             object-fit:cover;border:2px solid #ef4444;cursor:pointer">`,
+      className: '', iconAnchor: [18, 18],
+    });
+    const m = L.marker([b.lat, b.lon], { icon: thumbIcon, zIndexOffset: 1000 }).addTo(MAP);
+    m.on('click', () => openLightbox(photo, b));
+    markers.push(m);
+  });
+}
+
+function clearMap() {
+  if (routeLine) { MAP.removeLayer(routeLine); routeLine = null; }
+  markers.forEach(m => MAP.removeLayer(m));
+  markers = [];
+}
+
+function buildPopup(b) {
+  const coord = b.lat ? `${b.lat.toFixed(5)}, ${b.lon.toFixed(5)}` : '—';
+  const mapsUrl = b.lat ? `https://www.google.com/maps?q=${b.lat},${b.lon}` : '#';
+  let html = `<div style="font-size:12px;min-width:200px">
+    <div style="font-weight:700;margin-bottom:6px">${fmtTs(b.ts)}</div>
+    <div style="color:#666;margin-bottom:4px">${coord}</div>
+    ${b.accuracy ? `<div>Akurasi: ±${b.accuracy} m</div>` : ''}
+    ${b.battery != null ? `<div>Baterai: ${b.battery}%${b.charging?' ⚡':''}</div>` : ''}
+    ${b.ip ? `<div>IP: ${b.ip}</div>` : ''}
+    <a href="${mapsUrl}" target="_blank" style="color:#0284c7;font-size:11px">
+      🗺️ Buka di Google Maps
+    </a>`;
+  if (b.selfie) html += `<br><img src="${b.selfie}" style="width:100%;border-radius:6px;margin-top:6px;cursor:pointer" onclick="openLightbox('${b.selfie.substring(0,30)}…',null)">`;
+  html += '</div>';
+  return html;
+}
+
+function focusBeacon(b, i) {
+  if (!b.lat) return;
+  MAP.setView([b.lat, b.lon], 16);
+  if (markers[i]) markers[i].openPopup();
+}
+
+// ═══════════════════════════════════════════════════════════════
+// COMMANDS
+// ═══════════════════════════════════════════════════════════════
+async function sendCmd(type, extra = {}) {
+  if (!SESSION.deviceId || !SESSION.token) return;
+  try {
+    const res = await fetch(`${CLOUD}/api/command/${SESSION.deviceId}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'X-Owner-Token': SESSION.token },
+      body: JSON.stringify({ type, ...extra }),
+      signal: AbortSignal.timeout(6000),
+    });
+    const d = await res.json();
+    if (d.ok) showToast(`✅ Perintah "${type}" diantrekan — akan dieksekusi saat HP online.`);
+    else showToast(`❌ Gagal: ${d.error}`);
+  } catch { showToast('❌ Gagal menghubungi server.'); }
+}
+
+function promptLock() {
+  const msg = prompt('Pesan yang ditampilkan di layar HP:\n(Kosongkan untuk pesan default)', 'HP ini dilaporkan hilang. Hubungi pemilik: 08xx-xxxx-xxxx');
+  if (msg === null) return;
+  sendCmd('lock_msg', { message: msg || 'HP ini dilaporkan hilang. Hubungi pemilik.' });
+}
+
+// ═══════════════════════════════════════════════════════════════
+// EXPORT BUKTI
+// ═══════════════════════════════════════════════════════════════
+function exportEvidence() {
+  if (!SESSION.data) return;
+  const d = SESSION.data;
+  let txt = `=== GHOST SENTINEL — LAPORAN BUKTI ===\n`;
+  txt += `Perangkat : ${d.device.name}\n`;
+  txt += `Device ID : ${d.device.deviceId}\n`;
+  txt += `Dibuat    : ${fmtTs(d.device.createdAt)}\n`;
+  txt += `Dibuat    : ${new Date().toLocaleString('id-ID')}\n`;
+  txt += `Total beacon : ${d.totalBeacons}\n\n`;
+  txt += `=== RIWAYAT LOKASI ===\n`;
+  d.beacons.forEach((b, i) => {
+    txt += `\n[${i + 1}] ${fmtTs(b.ts)}\n`;
+    txt += `  Koordinat : ${b.lat ? `${b.lat}, ${b.lon}` : 'tidak ada'}\n`;
+    if (b.accuracy) txt += `  Akurasi   : ±${b.accuracy} m\n`;
+    if (b.battery != null) txt += `  Baterai   : ${b.battery}%\n`;
+    if (b.ip) txt += `  IP        : ${b.ip}\n`;
+    if (b.network) txt += `  Jaringan  : ${b.network}\n`;
+    if (b.alert) txt += `  ⚠️ ALERT: ${b.alertReason || 'tidak diketahui'}\n`;
+    if (b.lat) txt += `  Maps      : https://www.google.com/maps?q=${b.lat},${b.lon}\n`;
+  });
+
+  const blob = new Blob([txt], { type: 'text/plain' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `ghost-sentinel-${d.device.deviceId}-${Date.now()}.txt`;
+  a.click();
+  showToast('📦 Laporan bukti diunduh.');
+}
+
+// ═══════════════════════════════════════════════════════════════
+// SETUP WIZARD
+// ═══════════════════════════════════════════════════════════════
+function showSetupWizard() {
+  document.getElementById('setupWizard').style.display = 'block';
+  document.getElementById('wizResult').style.display = 'none';
+}
+
+async function doRegister() {
+  const name = document.getElementById('wizName').value.trim() || 'Perangkat Saya';
+  try {
+    const res = await fetch(`${CLOUD}/api/register`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name }),
+      signal: AbortSignal.timeout(8000),
+    });
+    const d = await res.json();
+    if (!d.ok) { showToast('❌ Gagal mendaftar. Coba lagi.'); return; }
+
+    document.getElementById('wizToken').textContent = d.ownerToken;
+    document.getElementById('wizDevId').textContent = d.deviceId;
+    document.getElementById('wizTrackerUrl').textContent = d.trackerUrl;
+
+    // QR code
+    const qrDiv = document.getElementById('wizQR');
+    qrDiv.innerHTML = '';
+    if (window.QRCode) {
+      new QRCode(qrDiv, { text: d.trackerUrl, width: 180, height: 180, colorDark: '#000', colorLight: '#fff' });
+    } else {
+      qrDiv.textContent = d.trackerUrl;
+    }
+
+    // Simpan sementara untuk tombol "Lanjut"
+    window._wizData = d;
+    document.getElementById('wizResult').style.display = 'block';
+    showToast('✅ Perangkat berhasil didaftarkan!');
+  } catch { showToast('❌ Gagal menghubungi server.'); }
+}
+
+function closeWizardAndFill() {
+  const d = window._wizData;
+  if (!d) return;
+  document.getElementById('setupWizard').style.display = 'none';
+  document.getElementById('inpDeviceId').value = d.deviceId;
+  document.getElementById('inpToken').value = d.ownerToken;
+  doAuth();
+}
+
+// ═══════════════════════════════════════════════════════════════
+// LIGHTBOX
+// ═══════════════════════════════════════════════════════════════
+function openLightbox(src, beacon) {
+  document.getElementById('lbImg').src = src;
+  document.getElementById('lbInfo').textContent = beacon ? fmtTs(beacon.ts) + (beacon.lat ? ` · ${beacon.lat.toFixed(5)}, ${beacon.lon.toFixed(5)}` : '') : '';
+  document.getElementById('lightbox').style.display = 'flex';
+}
+function closeLightbox() {
+  document.getElementById('lightbox').style.display = 'none';
+}
+
+// ═══════════════════════════════════════════════════════════════
+// TOAST
+// ═══════════════════════════════════════════════════════════════
+function showToast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.style.display = 'block';
+  clearTimeout(window._toastTimer);
+  window._toastTimer = setTimeout(() => { el.style.display = 'none'; }, 4000);
+}
+
+// ═══════════════════════════════════════════════════════════════
+// TIME HELPERS
+// ═══════════════════════════════════════════════════════════════
+function fmtTs(ts) {
+  return new Date(ts).toLocaleString('id-ID', { dateStyle: 'short', timeStyle: 'medium' });
+}
+function relTime(ts) {
+  const diff = Date.now() - ts;
+  if (diff < 60000) return 'Baru';
+  if (diff < 3600000) return `${Math.floor(diff/60000)} mnt lalu`;
+  if (diff < 86400000) return `${Math.floor(diff/3600000)} jam lalu`;
+  return fmtTs(ts);
+}
+
+// ═══════════════════════════════════════════════════════════════
+// INIT — auto-login jika token tersimpan
+// ═══════════════════════════════════════════════════════════════
+if (SESSION.deviceId && SESSION.token) {
+  document.getElementById('inpDeviceId').value = SESSION.deviceId;
+  document.getElementById('inpToken').value = SESSION.token;
+  startDashboard();
+}
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+</body>
+</html>

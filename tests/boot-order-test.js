@@ -51,6 +51,35 @@ const app = fs.readFileSync('./app.js', 'utf8');
 // berkas, dan tanpa ini gate ini akan menghitung kalimat sebagai tag. Panjangnya dijaga
 // tetap sama (diganti spasi) supaya offset yang dipakai perbandingan posisi tidak bergeser.
 const scanHtml = html.replace(/<!--[\s\S]*?-->/g, c => ' '.repeat(c.length));
+/* NILAI `type=` DIBACA TOLERAN — kutip ganda, kutip tunggal, tanpa kutip, dan parameter.
+   ----------------------------------------------------------------------------------------
+   Pengecualian JSON-LD di atas sudah benar arah kebijakannya (hanya application/ld+json, dan
+   setiap blok wajib lolos JSON.parse). Yang belum benar adalah cara nilainya DIBACA.
+
+   HTML mengizinkan tiga bentuk penulisan atribut — type="x", type='x', type=x — dan
+   mengizinkan parameter di belakangnya (type="text/javascript; charset=utf-8"). Pemadanan
+   /\stype="([^"]+)"/ hanya mengenal bentuk pertama, jadi dua bentuk sah lainnya terbaca
+   sebagai type KOSONG lalu dianggap skrip biasa. Akibatnya gerbang MERAH untuk blok data
+   yang sah:
+
+       <script type='application/ld+json'>   -> merah palsu
+       <script type=application/ld+json>     -> merah palsu
+       <script type="APPLICATION/LD+JSON">   -> merah palsu   (perbandingan peka huruf)
+
+   Arahnya memang aman — merah, bukan diam — jadi ini bukan lubang keamanan gerbang. Tetapi
+   merah palsu punya biayanya sendiri: ia menghukum penulisan HTML yang sah, dan gerbang yang
+   merah tanpa sebab adalah gerbang yang lama-lama diabaikan orang.
+
+   Kenapa parameter ikut dipotong: `type="application/ld+json; charset=utf-8"` juga blok data,
+   dan tanpa pemotongan ia tidak akan cocok dengan perbandingan yang ter-anchor.
+
+   Yang TIDAK berubah: skrip yang benar-benar dieksekusi tetap tertangkap di setiap bentuk —
+   itu invarian yang dijaga matriks di badan PR dan tidak boleh dilonggarkan demi kerapian. */
+function scriptType(attrs) {
+  const m = /\stype\s*=\s*("([^"]*)"|'([^']*)'|([^\s"'>]+))/i.exec(String(attrs || ''));
+  const raw = m ? (m[2] !== undefined ? m[2] : m[3] !== undefined ? m[3] : m[4] || '') : '';
+  return raw.split(';')[0].trim().toLowerCase();
+}
 // Semua tag <script> dalam urutan dokumen, beserta atribut yang menentukan kapan ia jalan.
 const scripts = [];
 const scriptRe = /<script\b([^>]*)>/g;
@@ -64,7 +93,7 @@ while ((m = scriptRe.exec(scanHtml)) !== null) {
     inline: !src,
     async: /\sasync(\s|=|$)/.test(attrs),
     defer: /\sdefer(\s|=|$)/.test(attrs),
-    type: (/\stype="([^"]+)"/.exec(attrs) || [])[1] || '',
+    type: scriptType(attrs),
     group: (/\sdata-fiezel-lazy="([^"]+)"/.exec(attrs) || [])[1] || '',
     when: (/\sdata-fiezel-lazy-when="([^"]+)"/.exec(attrs) || [])[1] || '',
     needs: (/\sdata-fiezel-lazy-needs="([^"]+)"/.exec(attrs) || [])[1] || ''

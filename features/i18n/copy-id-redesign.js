@@ -122,6 +122,49 @@
 
     /* ── Edge case: gerbang akun saat offline ───────────────────────────────── */
     'account.offline-lanjut': 'Lanjut tanpa akun',
-    'account.offline-catatan': 'Tidak ada jaringan. Kamu bisa langsung belajar; akun bisa disambungkan nanti.'
+    'account.offline-catatan': 'Tidak ada jaringan. Kamu bisa langsung belajar; akun bisa disambungkan nanti.',
+
+    /* ── SUMBU BAHASA: naskah yang dulu ditulis langsung di app.js (m025-314) ───
+       Audit reports/AUDIT-UI-UX-BAHASA-2026-09-14.md menemukan naskah beranda dan tab
+       Latihan ditulis sebagai literal di app.js — sebagian Inggris, sebagian Indonesia.
+       Yang Inggris sampai ke murid id MAUPUN th; yang Indonesia sampai ke murid th.
+       tests/th-ui-leak-test.js tidak melihatnya karena kata-katanya di luar daftar
+       ID_WORDS-nya; itu blind spot gerbang, bukan izin. */
+
+    /* Nama skill. Dipakai kartu tab Latihan, kartu skill hub, chip cepat, dan judul
+       halaman Writing — SATU sumber, supaya nama yang sama tidak lahir empat kali. */
+    'skill.vocab': 'Kosakata',
+    'skill.grammar': 'Tata Bahasa',
+    'skill.reading': 'Membaca',
+    'skill.writing': 'Menulis',
+    'skill.listening': 'Menyimak',
+    'skill.speaking': 'Berbicara',
+
+    /* Beranda: sapaan maskot, ritme harian, chip latihan singkat. */
+    'home.sapaan-runtun-aktif': 'Runtun {hari} hari! Mantap sekali, {nama}. Siap lanjut 10 menit hari ini?',
+    'home.paw-avatar-aria': 'Maskot PAW',
+    'home.paw-bubble-title': 'Kata PAW',
+    'home.ritme-harian': 'Ritme Harian',
+    'home.ritme-harian-hitung': '({selesai}/{target} soal)',
+    'home.latihan-singkat': 'Latihan Singkat 3 Menit',
+    'home.chip-vocab-sub': '10 kartu cepat',
+    'home.chip-grammar-sub': 'Pola kalimat',
+    'home.chip-dengar': 'Dengar',
+    'home.chip-dengar-sub': 'Audio pendek',
+    'home.classroom-eyebrow': 'Segera hadir',
+    'home.classroom-card': 'KelasKu',
+
+    /* Tab Latihan: dua kartu yang dulu mengarang isinya (lihat §A4/A5 di laporan audit).
+       Judul materinya kini dibaca dari riwayat murid, jadi yang tersisa di sini hanya
+       bingkainya — dan bingkai itu tidak boleh menjanjikan angka apa pun sendiri. */
+    'latihan.lanjut-eyebrow': 'Lanjutkan terakhir · Level {level}',
+    'latihan.lanjut-sub': 'Selesaikan materi untuk memperkuat bukti kemahiran',
+    'latihan.booster-tag': 'AI Booster',
+    'latihan.booster-sub': 'Akurasi {akurasi}% · Disarankan latihan {menit} menit',
+    'latihan.booster-cta': 'Latih',
+
+    /* Flashcard: tombol dengar disembunyikan saat kursusnya belum punya suara sendiri,
+       dan alasannya dikatakan — tombol yang hilang tanpa penjelasan terbaca sebagai bug. */
+    'flash.suara-belum-ada': 'Suara untuk {bahasa} belum tersedia, jadi tombol dengar disembunyikan supaya kamu tidak menirukan pelafalan yang salah.'
   });
 }());

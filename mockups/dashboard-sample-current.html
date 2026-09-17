@@ -1,0 +1,420 @@
+<!doctype html><html lang="id"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow"><title>FIEZEL · Dashboard Owner</title>
+<style>
+:root{--cream:#FFF8ED;--ink:#2B2118;--yellow:#FFD23F;--line:#E7DCC9;--muted:#6B5C49;--warn:#8A5A00}
+*{box-sizing:border-box}
+body{margin:0;background:var(--cream);color:var(--ink);font:16px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif}
+header{padding:18px 16px 8px;border-bottom:3px solid var(--yellow)}
+h1{margin:0;font-size:20px;letter-spacing:-.01em}
+.sub{color:var(--muted);font-size:13px;margin-top:4px}
+nav{display:flex;gap:8px;flex-wrap:wrap;padding:12px 16px}
+nav a{padding:7px 13px;border:1px solid var(--line);border-radius:999px;text-decoration:none;color:var(--ink);font-size:14px;background:#fff}
+nav a[aria-current="page"]{background:var(--yellow);border-color:var(--ink);font-weight:600}
+main{padding:0 16px 40px;display:grid;gap:14px;grid-template-columns:1fr}
+@media(min-width:640px){main{grid-template-columns:repeat(2,minmax(0,1fr))}h1{font-size:24px}}
+@media(min-width:1024px){main{grid-template-columns:repeat(3,minmax(0,1fr))}}
+section{background:#fff;border:1px solid var(--line);border-radius:14px;padding:14px}
+section h2{margin:0 0 10px;font-size:13px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
+.kv{display:flex;justify-content:space-between;gap:10px;padding:6px 0;border-bottom:1px dashed var(--line);font-size:15px}
+.kv:last-of-type{border-bottom:0}
+.kv b{font-variant-numeric:tabular-nums;font-weight:700}
+.big{font-size:30px;font-weight:800;font-variant-numeric:tabular-nums;line-height:1.1;margin:2px 0 8px}
+.note{margin-top:10px;font-size:12px;color:var(--muted);border-left:3px solid var(--yellow);padding-left:9px}
+.warn{margin-top:10px;font-size:12px;color:var(--warn);background:#FFF4D6;border:1px solid var(--yellow);border-radius:9px;padding:8px 9px}
+.assume{margin-top:10px;font-size:12px;color:var(--muted);background:var(--cream);border:1px dashed var(--line);border-radius:9px;padding:8px 9px}
+.assume code{font-size:11px}
+.nodata{margin-top:10px;font-size:12px;color:#4A3A22;background:#F2ECE0;border:1px dashed var(--muted);border-radius:9px;padding:8px 9px}
+.empty{margin:0 16px 14px;padding:12px 13px;border:2px solid var(--ink);border-radius:12px;background:#FFF4D6;font-size:13px;line-height:1.45}
+.empty b{display:block;font-size:14px;margin-bottom:4px}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th,td{text-align:right;padding:5px 4px;border-bottom:1px solid var(--line);font-variant-numeric:tabular-nums}
+th:first-child,td:first-child{text-align:left}
+tr.sel td{background:#FFF3CE}
+.muted-mark{color:var(--muted);font-size:11px}
+h4{margin:12px 0 4px;font-size:13px;letter-spacing:.02em;text-transform:uppercase;color:var(--muted)}
+svg{display:block;width:100%;height:52px;margin:6px 0 2px}
+footer{padding:0 16px 34px;color:var(--muted);font-size:12px}
+form{padding:16px;max-width:420px}
+input{width:100%;padding:11px;font-size:16px;border:1px solid var(--line);border-radius:10px;background:#fff;color:var(--ink)}
+button{margin-top:10px;padding:11px 16px;font-size:15px;font-weight:700;border:1px solid var(--ink);border-radius:10px;background:var(--yellow);color:var(--ink)}
+</style></head><body>
+<header>
+  <h1>FIEZEL · Dashboard Owner</h1>
+  <div class="sub">Periode <b>7 hari</b> · 2026-08-20 → 2026-08-26 (hari WIB, zona murid) ·
+  rollup terakhir 2026-08-26 · dirender 2026-08-26T12:00:00.000Z</div>
+</header>
+<nav><a href="/?period=today">Hari ini</a><a href="/?period=7d" aria-current="page">7 hari</a><a href="/?period=30d">30 hari</a><a href="/?period=90d">90 hari</a><a href="/logout" style="margin-left:auto">Keluar</a></nav>
+
+<main>
+
+  <section>
+    <h2>⬇️ Ekspor data (CSV)</h2>
+    <div class="note">Berkas mengikuti periode yang sedang dipilih (<b>7 hari</b>) dan
+    berisi angka yang SAMA dengan yang dirender di halaman ini — nol data tambahan, nol dimensi
+    baru. Setiap berkas membawa baris <code>measurement_state</code> supaya "belum diukur" tidak
+    pernah terbaca sebagai "nol" setelah berkas ini beredar terlepas dari dashboard.</div>
+    <p>
+      <a href="/api/export/summary.csv?period=7d">Ringkasan metrik</a> ·
+      <a href="/api/export/series.csv?period=7d">Deret harian (tren)</a> ·
+      <a href="/api/export/retention.csv?period=7d">Retensi per kohor</a> ·
+      <a href="/api/export/evidence.csv?period=7d">Bukti belajar Braincore</a>
+    </p>
+    <div class="note">Untuk pembaca mesin, JSON yang setara sudah ada di
+    <code>/api/summary</code>, <code>/api/series</code>, dan <code>/api/retention</code>.</div>
+  </section>
+
+
+  <section>
+    <h2>👥 User growth</h2>
+    <div class="big">1.420</div>
+    <div class="kv"><span>Perangkat baru (periode)</span><b>1.420</b></div>
+    <div class="kv"><span>Aplikasi dibuka (periode) <small style="color:var(--muted)">pembukaan, bukan orang unik</small></span><b>8.930</b></div>
+    <div class="kv"><span>Pembukaan dengan akun tertaut</span><b>5.410</b></div>
+    <div class="kv"><span>Laporan hari-aktif</span><b>6.200</b></div>
+    <svg viewBox="0 0 100 50" preserveAspectRatio="none" role="img" aria-label="tren new_users">
+    <rect x="0" y="0" width="100" height="50" fill="#FFF8ED"/><polyline fill="none" stroke="#2B2118" stroke-width="2" points="0.00,14.50 16.67,9.25 33.33,11.88 50.00,4.00 66.67,15.38 83.33,10.13 100.00,8.38"/></svg>
+    <div class="warn">Angka ini ESTIMASI PERANGKAT, bukan orang. Satu orang dengan dua perangkat = dua hitungan; menghapus data browser = perangkat baru; dua orang satu perangkat = satu hitungan.</div>
+    <div class="note">"Aplikasi dibuka" adalah BATAS BAWAH: PWA yang dibuka dari precache tanpa jaringan tidak pernah mengirim event, jadi ia tidak terhitung.</div>
+    <div class="kv"><span>Uninstall / churn</span><b>tidak bisa diukur dari data yang kita simpan</b></div><div class="nodata">Kenapa: Tidak ada heartbeat klien</div>
+  </section>
+
+  <section>
+    <h2>🔥 Active users (DAU / WAU / MAU)</h2>
+    <div class="big">123</div>
+    <div class="kv"><span>DAU (hari rollup terakhir)</span><b>123</b></div>
+    <div class="kv"><span>WAU <small style="color:var(--muted)">rentang batas bawah–atas</small></span><b>456–560</b></div>
+    <div class="kv"><span>MAU <small style="color:var(--muted)">rentang batas bawah–atas</small></span><b>789–900</b></div>
+    <div class="kv"><span>Stickiness DAU/MAU</span><b>13,7%–15,6%</b></div>
+    <div class="kv"><span>Puncak DAU pada periode</span><b>145</b></div>
+    <div class="kv"><span>Rata-rata DAU pada periode</span><b>118,5</b></div>
+    <div class="kv"><span>Hari DAU terrollup pada periode <small style="color:var(--muted)">dari 7 hari</small></span><b>7</b></div>
+    <svg viewBox="0 0 100 50" preserveAspectRatio="none" role="img" aria-label="tren dau">
+    <rect x="0" y="0" width="100" height="50" fill="#FFF8ED"/><polyline fill="none" stroke="#2B2118" stroke-width="2" points="0.00,9.04 16.67,7.36 33.33,5.68 50.00,4.00 66.67,8.37 83.33,6.35 100.00,4.67"/></svg>
+    <div class="warn">Angka ini ESTIMASI PERANGKAT, bukan orang. Satu orang dengan dua perangkat = dua hitungan; menghapus data browser = perangkat baru; dua orang satu perangkat = satu hitungan. "Aktif" = hari dengan ≥5 jawaban (ambang yang sama dengan cincin misi murid).</div>
+    <div class="warn">WAU dan MAU sengaja RENTANG, bukan satu angka (penanda estimasi dari job rollup menyala): token perangkat dirotasi tiap 24 jam dan pepper lama dihapus, jadi menyambungkan perangkat lintas hari mustahil. Batas bawah = perangkat harian terbanyak, batas atas = jumlah seluruh hari.</div>
+    <div class="note">DAU/WAU/MAU dibaca dari baris agregat harian yang dibekukan job rollup — dashboard tidak pernah menyentuh tabel token per-perangkat.</div>
+    
+  </section>
+
+  <section>
+    <h2>↩️ Retention (observed)</h2>
+    <table><thead><tr><th>Offset</th><th>Kembali</th><th>Cohort</th><th>%</th><th>Kohor</th></tr></thead>
+    <tbody><tr><td>D1</td><td>85</td><td>n=120</td><td>70,8%</td><td>6</td></tr><tr><td>D3</td><td>62</td><td>n=115</td><td>53,9%</td><td>5</td></tr><tr><td>D7</td><td>45</td><td>n=100</td><td>45,0%</td><td>4</td></tr></tbody></table>
+    <div class="note">Kolom Cohort (n=) diturunkan dari baris offset D0 kohor yang sama; skema retensi tidak menyimpan ukuran kohor sebagai kolom sendiri. Penyebut tiap baris hanya menjumlahkan kohor yang BENAR-BENAR punya pengamatan di offset itu — kohor yang belum cukup tua tidak diseret masuk sebagai "hilang". Kolom terakhir = jumlah kohor yang menyumbang, supaya "0%" tidak tertukar dengan "nol kohor".</div>
+    <div class="warn">PERINGATAN ESTIMASI PERANGKAT: cohort dibangun dari perangkat, bukan orang.
+    Ganti perangkat atau hapus data browser terlihat sebagai "berhenti" walau muridnya tetap belajar.
+    Belajar offline berhari-hari juga menurunkan retensi tanpa ada murid yang hilang.
+    Safari membatasi storage skrip 7 hari → cohort iOS bisa tampak berhenti di D7.</div>
+    <div class="note">Persentase disembunyikan bila cohort &lt; 30: angka presisi di atas cohort kecil adalah derau, bukan sinyal.</div>
+    
+  </section>
+
+  <section>
+    <h2>📚 Learning activity</h2>
+    <div class="kv"><span>Jawaban</span><b>48.920</b></div>
+    <div class="kv"><span>Jawaban benar</span><b>41.200</b></div>
+    <div class="kv"><span>Akurasi</span><b>84,2%</b></div>
+    <div class="kv"><span>Sesi dimulai</span><b>3.400</b></div>
+    <div class="kv"><span>Sesi tuntas</span><b>3.100</b></div>
+    <div class="kv"><span>Pelajaran dimulai</span><b>2.900</b></div>
+    <div class="kv"><span>Pelajaran tuntas</span><b>2.750</b></div>
+    <div class="kv"><span>Rasio tuntas</span><b>94,8%</b></div>
+    <svg viewBox="0 0 100 50" preserveAspectRatio="none" role="img" aria-label="tren answers">
+    <rect x="0" y="0" width="100" height="50" fill="#FFF8ED"/><polyline fill="none" stroke="#2B2118" stroke-width="2" points="0.00,12.62 16.67,8.85 33.33,7.77 50.00,4.00 66.67,11.00 83.33,7.23 100.00,7.12"/></svg>
+    <div class="note">Dilaporkan sendiri oleh klien (self-reported): bisa kurang (murid offline) dan bisa lebih (klien dimodifikasi). Angka biaya TIDAK pernah memakai kanal ini.</div>
+  </section>
+
+  <section>
+    <h2>🤖 AI usage</h2>
+    <div class="kv"><span>Permintaan AI</span><b>1.540</b></div>
+    <div class="kv"><span>Berhasil</span><b>1.512</b></div>
+    <div class="kv"><span>Gagal</span><b>28</b></div>
+    <div class="kv"><span>Permintaan / perangkat aktif</span><b>12,52</b></div>
+    <div class="kv"><span>Token masuk</span><b>320.000</b></div>
+    <div class="kv"><span>Token keluaran</span><b>140.000</b></div>
+    <div class="kv"><span>Error 429</span><b>12</b></div>
+    <div class="kv"><span>Timeout</span><b>8</b></div>
+    <div class="kv"><span>Error 4xx</span><b>3</b></div>
+    <div class="kv"><span>Error 5xx</span><b>5</b></div>
+    <div class="kv"><span>Error lain</span><b>0 (nol terukur)</b></div>
+    <div class="kv"><span>Error rate</span><b>1,8%</b></div>
+    <svg viewBox="0 0 100 50" preserveAspectRatio="none" role="img" aria-label="tren ai_calls">
+    <rect x="0" y="0" width="100" height="50" fill="#FFF8ED"/><polyline fill="none" stroke="#2B2118" stroke-width="2" points="0.00,10.00 16.67,6.57 33.33,10.86 50.00,4.00 66.67,13.43 83.33,8.29 100.00,4.86"/></svg>
+    
+    <div class="warn">Token = bisa PROKSI (karakter ÷ 4). Jalur server tidak menandai hari mana yang memakai proksi, jadi peringatan ini dicetak tanpa syarat: perlakukan biaya LLM sebagai estimasi kasar.</div>
+    <div class="note">Semua angka AI lahir di Worker (server-side), bukan dari klien — di situlah biaya lahir. Rincian kode error dibaca dari tabel dimensi pemakaian (bucket <code>ai_err:*</code>), bukan dari metrik terpisah per kode.</div>
+    
+  </section>
+
+  <section>
+    <h2>🗣️ TTS usage</h2>
+    <div class="kv"><span>Permintaan TTS</span><b>3.800</b></div>
+    <div class="kv"><span>Cache hit</span><b>2.660</b></div>
+    <div class="kv"><span>Cache miss (berbayar)</span><b>1.140</b></div>
+    <div class="kv"><span>Cache hit rate</span><b>70,0%</b></div>
+    <div class="kv"><span>Karakter dirender</span><b>114.000</b></div>
+    <div class="kv"><span>≈ Menit audio <small style="color:var(--muted)">1.005 char/menit</small></span><b>113,4</b></div>
+    <div class="kv"><span>Berhasil</span><b>3.790</b></div>
+    <div class="kv"><span>Gagal</span><b>10</b></div>
+    <div class="kv"><span>Gagal 429</span><b>6</b></div>
+    <div class="kv"><span>Gagal timeout</span><b>2</b></div>
+    <div class="kv"><span>Gagal 5xx</span><b>2</b></div>
+    <div class="note">Hanya cache MISS yang berbiaya. Mesin suara on-device dihitung terpisah dan tidak masuk biaya; bandwidth model on-device (±152 MB/perangkat) TIDAK terukur skema ini.</div>
+  </section>
+
+  <section>
+    <h2>🏗️ Infrastructure</h2>
+    <div class="kv"><span>Breaker terbuka</span><b>0 (nol terukur)</b></div>
+    <div class="kv"><span>Breaker pulih</span><b>0 (nol terukur)</b></div>
+    <div class="kv"><span>Event analytics diterima</span><b>125.000</b></div>
+    <div class="note">Hanya tiga baris di atas yang benar-benar ada di tabel agregat. Permintaan Worker, objek/byte R2, error backend, dan latensi p50/p95 hidup di Analytics API Cloudflare (butuh token akun) — lihat baris "tidak bisa diukur" di bawah.</div>
+    <div class="kv"><span>Latensi p95 Worker</span><b>tidak bisa diukur dari data yang kita simpan</b></div><div class="nodata">Kenapa: Hanya ada di Cloudflare Analytics API</div>
+  </section>
+
+  <section>
+    <h2>💰 Cost estimation</h2>
+    <div class="big">US$14,85</div>
+    <div class="kv"><span>TTS</span><b>US$1,71</b></div>
+    <div class="kv"><span>LLM</span><b>US$0,07</b></div>
+    <div class="kv"><span>Biaya / perangkat aktif</span><b>US$0,0245</b></div>
+    <div class="assume">ASUMSI YANG DIPAKAI (bukan angka ajaib — sumber: reports/cf-a10-cost.md + cf-a10-cost-model.json):<br>
+      · TTS <code>workers-ai aura-1</code> = <code>US$15,00</code> per 1 juta karakter<br>
+      · <code>chars_per_audio_min = 1.005</code> (kalibrasi 273 aset audio nyata)<br>
+      · LLM <code>@cf/meta/llama-3.1-8b-instruct-fp8-fast</code> = <code>US$0,045</code> masuk / <code>US$0,384</code> keluar per 1 juta token<br>
+      · Rumus: <code>tts = char_dirender/1e6 × tarif</code>; <code>llm = tok_in/1e6 × tarif_in + tok_out/1e6 × tarif_out</code>; <code>total = tts + llm + infra − kredit</code><br>
+      · Hanya cache MISS yang ditagih. TARIF TIDAK DISIMPAN PER HARI: tidak ada tabel biaya di database ini dan tidak boleh ada, jadi tarif di atas dipakai ulang untuk SEMUA hari. Mengubahnya mengubah angka bulan lalu juga — ini estimasi sekarang, bukan jejak audit.
+    </div>
+    
+    <div class="warn">Penyebut "perangkat aktif" adalah UNDER-COUNT (murid offline tidak terlihat), jadi biaya/perangkat aktif adalah BATAS ATAS, bukan angka pasti. Token keluaran = proksi char/4 → biaya LLM adalah estimasi kasar. Bila TTS berjalan on-device, biaya TTS nyata NOL dan yang perlu dipantau justru bandwidth model.</div>
+  </section>
+
+  <section>
+    <h2>⚠️ Quota exhaustion</h2>
+    <div class="big">4</div>
+    <div class="kv"><span>Penolakan karena kuota habis <small style="color:var(--muted)">penolakan, bukan perangkat</small></span><b>4</b></div>
+    <div class="kv"><span>· kuota AI</span><b>3</b></div>
+    <div class="kv"><span>· kuota TTS</span><b>1</b></div>
+    <div class="kv"><span>· kuota terjemahan</span><b>0 (nol terukur)</b></div>
+    <div class="kv"><span>429 dari AI</span><b>12</b></div>
+    <div class="kv"><span>Breaker terbuka</span><b>0 (nol terukur)</b></div>
+    
+    <div class="note">KEPUTUSAN KUOTA: kalau baris di atas berbunyi "belum ada pengukuran", tidak ada satu pun angka di halaman ini yang boleh dipakai untuk menaikkan atau menurunkan kuota. Yang belum diukur tidak bisa dipangkas.</div>
+    <div class="note">Dicatat server-side tepat di cabang yang mengembalikan 429. Angka naik = murid ditolak; itu keputusan biaya yang terlihat, bukan bug yang disembunyikan.</div>
+  </section>
+
+  <section>
+    <h2>🔎 Data quality</h2>
+    <div class="kv"><span>Keadaan pengukuran</span><b>terukur</b></div>
+    <div class="kv"><span>Pengumpulan dimulai</span><b>2026-07-15</b></div>
+    <div class="kv"><span>Hari terkumpul</span><b>40 hari</b></div>
+    <div class="kv"><span>Hari dalam periode <small style="color:var(--muted)">dari 7 hari</small></span><b>7 hari</b></div>
+    <div class="kv"><span>Hari rollup GAGAL</span><b>0 (nol terukur)</b></div>
+    <div class="kv"><span>Rentang hari yang terbaca</span><b>2026-08-20 → 2026-08-26</b></div>
+    
+    <div class="note">Semua angka historis dimulai dari tanggal pengumpulan di atas. Sebelum tanggal itu tidak ada data — bukan nol, tetapi tidak diketahui.</div>
+    
+  </section>
+
+  <section><h2>🧠 Braincore evidence</h2>
+    <div class="big">42</div>
+    <div class="kv"><span>Murid terukur (periode) <small style="color:var(--muted)">cohort acak berotasi 14 hari</small></span><b>42</b></div>
+    <div class="kv"><span>Bukti belajar terkirim <small style="color:var(--muted)">event learner_evidence</small></span><b>185</b></div>
+    <div class="kv"><span>Keputusan Braincore <small style="color:var(--muted)">event braincore_decision</small></span><b>94</b></div>
+    <h3>Tren mastery</h3><div class="kv"><span>up</span><b>25 (60%)</b></div><div class="kv"><span>flat</span><b>12 (29%)</b></div><div class="kv"><span>down</span><b>5 (12%)</b></div>
+    <h3>Sebaran mastery</h3><div class="kv"><span>m0-40</span><b>4 (10%)</b></div><div class="kv"><span>m40-60</span><b>11 (26%)</b></div><div class="kv"><span>m60-80</span><b>18 (43%)</b></div><div class="kv"><span>m80-100</span><b>9 (21%)</b></div>
+    <h3>Tren miskonsepsi</h3><div class="kv"><span>none</span><b>22 (52%)</b></div><div class="kv"><span>mc1</span><b>12 (29%)</b></div><div class="kv"><span>mc2-3</span><b>6 (14%)</b></div><div class="kv"><span>mc4p</span><b>2 (5%)</b></div>
+    <h3>Famili skill miskonsepsi</h3><div class="kv"><span>grammar-tenses</span><b>10 (50%)</b></div><div class="kv"><span>reading-inference</span><b>2 (10%)</b></div><div class="kv"><span>vocab-phrasal</span><b>8 (40%)</b></div>
+    <h3>Kalibrasi kesulitan</h3><div class="kv"><span>too_easy</span><b>3 (7%)</b></div><div class="kv"><span>calibrated</span><b>32 (76%)</b></div><div class="kv"><span>too_hard</span><b>7 (17%)</b></div>
+    <h3>Galat kalibrasi</h3><div class="kv"><span>e0-10</span><b>20 (48%)</b></div><div class="kv"><span>e10-20</span><b>15 (36%)</b></div><div class="kv"><span>e20-40</span><b>5 (12%)</b></div><div class="kv"><span>e40p</span><b>2 (5%)</b></div>
+    <h3>Alasan keputusan Braincore</h3><div class="kv"><span>advance</span><b>30 (32%)</b></div><div class="kv"><span>reinforce</span><b>45 (48%)</b></div><div class="kv"><span>remediate</span><b>4 (4%)</b></div><div class="kv"><span>scaffold</span><b>15 (16%)</b></div>
+    <h3>Hasil kebijakan</h3><div class="kv"><span>positive</span><b>60 (64%)</b></div><div class="kv"><span>mixed</span><b>22 (23%)</b></div><div class="kv"><span>negative</span><b>8 (9%)</b></div><div class="kv"><span>insufficient</span><b>4 (4%)</b></div>
+    <h3>Rekomendasi kebijakan</h3><div class="kv"><span>next_topic</span><b>50 (53%)</b></div><div class="kv"><span>repeat_with_hint</span><b>28 (30%)</b></div><div class="kv"><span>review_prerequisite</span><b>16 (17%)</b></div>
+    <h3>Tren perbaikan belajar</h3><div class="kv"><span>improving</span><b>28 (67%)</b></div><div class="kv"><span>steady</span><b>10 (24%)</b></div><div class="kv"><span>declining</span><b>4 (10%)</b></div>
+    <h3>Per hari</h3>
+    <table><tr><th>hari</th><th>murid baru</th><th>bukti</th><th>keputusan</th></tr><tr><td>2026-08-26</td><td>12</td><td>35</td><td>18</td></tr><tr><td>2026-08-25</td><td>10</td><td>30</td><td>15</td></tr></table>
+    <div class="note">"Murid terukur" dijumlahkan dari murid BARU per hari; satu murid yang aktif tiga hari
+      terhitung tiga kali. Angka unik lintas-hari TIDAK dihitung, dan itu disengaja: menghitungnya menuntut
+      menyimpan pengenal lebih lama daripada yang dibenarkan.</div>
+    <div class="note">NOL identitas di panel ini. Yang tersimpan di server hanyalah bucket berenum tertutup;
+      nama murid, jawaban, dan riwayat tidak pernah meninggalkan perangkat.</div>
+  </section>
+  <section><h2>🧑‍🎓 Murid per orang (Braincore)</h2>
+    <table><tr><th>murid</th><th>aktivitas terakhir</th><th>bukti</th><th>keputusan</th>
+    <th>level</th><th>mastery</th><th>tren</th></tr><tr class="sel">
+      <td><a href="/?period=7d&amp;learner=a1b2c3d4e5f67890">Budi Santoso</a></td>
+      <td>2026-08-26</td>
+      <td>45</td>
+      <td>22</td>
+      <td>A2</td>
+      <td>m60-80</td>
+      <td>up</td>
+    </tr><tr>
+      <td><a href="/?period=7d&amp;learner=f0e1d2c3b4a56789">@siti_english</a> <span class="muted-mark">(bukan nama perkenalan)</span></td>
+      <td>2026-08-25</td>
+      <td>30</td>
+      <td>15</td>
+      <td>B1</td>
+      <td>m80-100</td>
+      <td>flat</td>
+    </tr></table>
+    <div class="note">Nama diambil dari yang DIKETIK murid di langkah pertama perkenalan
+      (<code>learner_name</code>, wajib diisi, terikat <code>identity.sub</code>). Profil sosial
+      (<code>social_profile</code>) hanya cadangan untuk murid lama. Baris "murid &lt;8 hex sub&gt;"
+      berarti murid itu mendaftar sebelum nama disimpan di server, atau namanya belum sampai —
+      bukan perilaku normal untuk murid baru.</div>
+    <h3>Budi Santoso</h3>
+    <div class="big">22</div>
+    <div class="kv"><span>Keputusan Braincore (periode)</span><b>22</b></div>
+    <div class="kv"><span>Bukti belajar (periode)</span><b>45</b></div>
+    <div class="kv"><span>Hari aktif (periode)</span><b>6</b></div>
+    <div class="kv"><span>Rentang terukur</span><b>2026-08-20 – 2026-08-26</b></div>
+    <div class="kv"><span>Perpindahan mastery <small style="color:var(--muted)">bucket pertama → bucket terakhir pada periode ini</small></span><b>m40-60 &amp;rarr; m60-80</b></div>
+    <div class="kv"><span>Kalibrasi kesulitan <small style="color:var(--muted)">bagian bukti yang menilai kesulitan &quot;calibrated&quot;</small></span><b>80%</b></div>
+    <div class="kv"><span>Miskonsepsi (bucket terakhir)</span><b>grammar-tenses</b></div>
+    <h4>Tren mastery</h4><div class="kv"><span>up</span><b>15 (68%)</b></div><div class="kv"><span>flat</span><b>5 (23%)</b></div><div class="kv"><span>down</span><b>2 (9%)</b></div>
+    <h4>Sebaran mastery</h4><div class="kv"><span>m0-40</span><b>0 (0%)</b></div><div class="kv"><span>m40-60</span><b>5 (23%)</b></div><div class="kv"><span>m60-80</span><b>15 (68%)</b></div><div class="kv"><span>m80-100</span><b>2 (9%)</b></div>
+    <h4>Famili skill miskonsepsi</h4><div class="kv"><span>grammar-tenses</span><b>2 (100%)</b></div>
+    <h4>Kalibrasi kesulitan</h4><div class="kv"><span>too_easy</span><b>1 (5%)</b></div><div class="kv"><span>calibrated</span><b>18 (82%)</b></div><div class="kv"><span>too_hard</span><b>3 (14%)</b></div>
+    <h4>Alasan keputusan</h4><div class="kv"><span>advance</span><b>8 (36%)</b></div><div class="kv"><span>reinforce</span><b>12 (55%)</b></div><div class="kv"><span>scaffold</span><b>2 (9%)</b></div>
+    <h4>Hasil kebijakan</h4><div class="kv"><span>positive</span><b>16 (73%)</b></div><div class="kv"><span>mixed</span><b>4 (18%)</b></div><div class="kv"><span>negative</span><b>2 (9%)</b></div>
+    <h4>Rekomendasi</h4><div class="kv"><span>next_topic</span><b>14 (64%)</b></div><div class="kv"><span>repeat_with_hint</span><b>8 (36%)</b></div>
+    <h4>Tren perbaikan belajar</h4><div class="kv"><span>improving</span><b>18 (82%)</b></div><div class="kv"><span>steady</span><b>3 (14%)</b></div><div class="kv"><span>declining</span><b>1 (5%)</b></div>
+    <h4>Keputusan Braincore terakhir</h4>
+    <table><tr><th>hari</th><th>keputusan</th><th>level</th><th>hasil</th><th>rekomendasi</th>
+      <th>Δ mastery</th><th>kepatuhan</th></tr><tr><td>2026-08-26</td><td>advance</td><td>A2</td>
+      <td>positive</td><td>next_topic</td>
+      <td>+5</td><td>high</td></tr></table>
+    <div class="note">Panel ini memuat data BERIDENTITAS, atas persetujuan tiap murid, dan
+      terpisah dari panel agregat di atas (yang tetap anonim dan tetap memakai cohort acak
+      14 hari). Retensi bukti per-murid <b>180 hari</b>; murid yang mencabut persetujuannya
+      menghapus buktinya, dan barisnya hilang dari daftar ini.</div>
+  </section>
+  
+    <section>
+      <h2>🎓 Kelola Token &amp; Undangan Guru</h2>
+      
+      
+    <div style="background:#fff;border:1px solid var(--line);border-radius:10px;padding:16px;margin-bottom:20px;">
+      <h3 style="margin-top:0;margin-bottom:8px;color:var(--ink);">+ Buat Undangan &amp; Token Guru Baru</h3>
+      <div style="font-size:13px;color:var(--muted);margin-bottom:16px;">
+        Owner dapat mencetak token untuk guru. Guru kemudian memasukkan kode token ini di aplikasi FIEZEL untuk membuka portal guru dan mengelola materi kelas.
+      </div>
+      <form method="GET" action="/" style="display:grid;grid-template-columns:repeat(auto-fit, minmax(200px, 1fr));gap:12px;align-items:end;">
+        <input type="hidden" name="action" value="mint_teacher">
+        <div>
+          <label for="f_teacherName" style="display:block;font-size:12px;font-weight:bold;margin-bottom:4px;color:var(--ink);">Nama Guru</label>
+          <input id="f_teacherName" name="teacherName" type="text" placeholder="Contoh: Mardhiana Hamzah" maxlength="60" required style="width:100%;box-sizing:border-box;">
+        </div>
+        <div>
+          <label for="f_institution" style="display:block;font-size:12px;font-weight:bold;margin-bottom:4px;color:var(--ink);">Nama Sekolah / Instansi</label>
+          <input id="f_institution" name="institution" type="text" placeholder="Contoh: MTsN 5 ACEH BESAR" maxlength="80" required style="width:100%;box-sizing:border-box;">
+        </div>
+        <div>
+          <label for="f_institutionType" style="display:block;font-size:12px;font-weight:bold;margin-bottom:4px;color:var(--ink);">Jenis Instansi</label>
+          <select id="f_institutionType" name="institutionType" style="width:100%;box-sizing:border-box;">
+            <option value="school" selected>Sekolah (school)</option>
+            <option value="tutoring">Bimbel (tutoring)</option>
+            <option value="course">Kursus (course)</option>
+            <option value="other">Lainnya (other)</option>
+          </select>
+        </div>
+        <div>
+          <label for="f_days" style="display:block;font-size:12px;font-weight:bold;margin-bottom:4px;color:var(--ink);">Masa Aktif Token</label>
+          <select id="f_days" name="days" style="width:100%;box-sizing:border-box;">
+            <option value="14">14 Hari</option>
+            <option value="30">30 Hari (1 Bulan)</option>
+            <option value="90" selected>90 Hari (3 Bulan)</option>
+            <option value="180">180 Hari (6 Bulan)</option>
+            <option value="365">365 Hari (1 Tahun)</option>
+          </select>
+        </div>
+        <div style="grid-column:1/-1;text-align:right;margin-top:6px;">
+          <button type="submit" style="background:var(--ink);color:#fff;padding:10px 20px;border:none;border-radius:6px;font-weight:bold;cursor:pointer;">+ Buat Token Guru</button>
+        </div>
+      </form>
+    </div>
+  
+      
+    <div style="background:#fff;border:1px dashed var(--line);border-radius:10px;padding:14px;margin-bottom:20px;">
+      <form method="GET" action="/" style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
+        <input type="hidden" name="action" value="revoke_invite">
+        <label for="f_revoke_code" style="font-size:12px;font-weight:bold;color:var(--muted);white-space:nowrap;">Cabut Token Manual:</label>
+        <input id="f_revoke_code" name="code" type="text" placeholder="Ketik atau tempel 32 karakter kode token Crockford" maxlength="32" required style="flex:1;min-width:260px;box-sizing:border-box;">
+        <button type="submit" style="background:#c62828;color:#fff;padding:8px 16px;border:none;border-radius:6px;font-weight:bold;cursor:pointer;">Cabut Token</button>
+      </form>
+    </div>
+  
+      <h3 style="color:var(--ink);margin-top:20px;margin-bottom:8px;">Riwayat Undangan &amp; Token Guru</h3>
+      
+      <div style="overflow-x:auto;margin-bottom:24px;">
+        <table>
+          <thead>
+            <tr>
+              <th>Guru</th>
+              <th>Sekolah / Instansi</th>
+              <th>Jenis</th>
+              <th>Status</th>
+              <th>Dibuat (WIB)</th>
+              <th>Berlaku Hingga</th>
+              <th style="text-align:center;">Aksi</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+        <td><b>Mardhiana Hamzah</b></td>
+        <td>MTsN 5 ACEH BESAR</td>
+        <td>school</td>
+        <td><span style="background:#e8f5e9;color:#2e7d32;padding:2px 8px;border-radius:10px;font-weight:bold;font-size:11px;">AKTIF</span></td>
+        <td>2026-09-13</td>
+        <td>2026-12-11</td>
+        <td style="text-align:center;">
+          <form method="GET" action="/" style="display:inline;margin:0;">
+            <input type="hidden" name="action" value="revoke_invite">
+            <input type="hidden" name="codeHash" value="abc">
+            <button type="submit" style="background:#c62828;color:#fff;border:none;padding:4px 10px;border-radius:4px;font-size:11px;font-weight:bold;cursor:pointer;">Cabut</button>
+          </form>
+        </td>
+      </tr>
+          </tbody>
+        </table>
+      </div>
+    
+      <h3 style="color:var(--ink);margin-top:20px;margin-bottom:8px;">Daftar Guru Terdaftar &amp; Aktif</h3>
+      
+      <div style="overflow-x:auto;">
+        <table>
+          <thead>
+            <tr>
+              <th>Handle Akun</th>
+              <th>Nama Guru</th>
+              <th>Sekolah / Instansi</th>
+              <th>Jenis</th>
+              <th>Status</th>
+              <th>Aktivasi (WIB)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+        <td><code>mardhiana</code></td>
+        <td><b>Mardhiana Hamzah</b></td>
+        <td>MTsN 5 ACEH BESAR</td>
+        <td>school</td>
+        <td><span style="background:#e8f5e9;color:#2e7d32;padding:2px 8px;border-radius:10px;font-weight:bold;font-size:11px;">active</span></td>
+        <td>2026-09-13</td>
+      </tr>
+          </tbody>
+        </table>
+      </div>
+    
+      <div class="note" style="margin-top:16px;">
+        Undangan guru bersifat sekali pakai. Masa aktif default adalah 90 hari. Begitu guru mengaktifkan token di aplikasi, peran akunnya langsung dipromosikan ke <code>teacher</code> dan profil sekolahnya tersimpan aman di basis data server.
+      </div>
+    </section>
+  
+
+</main>
+<footer>Sumber: TIGA tabel agregat saja — metrik harian (bentuk panjang: hari × nama metrik × nilai), dimensi pemakaian berenum tertutup, dan retensi kohor. Tabel token perangkat dan bahan rahasia rotasi ADA di database yang sama tetapi TIDAK PERNAH dibaca halaman ini. Dashboard ini tidak punya jalan untuk membaca baris per-orang, dan tidak menampilkan identitas, surel, isi jawaban, maupun percakapan AI.
+Baris bertanda “tidak bisa diukur dari data yang kita simpan” adalah batas nyata skema, bukan kerusakan: menambah tabel untuk menutupnya melanggar kunci lima tabel yang menjaga privasi murid.
+Kontrak: EXEC-BRIEF-CF.md "KONTRAK ANALYTICS PRIVASI-MAKSIMAL" · bentuk tabel: workers/api/migrations/0002_analytics.sql · rumus biaya: reports/cf-a10-cost.md.</footer>
+</body></html>
