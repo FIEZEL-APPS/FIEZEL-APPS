@@ -482,7 +482,7 @@ input[type="checkbox"],input[type="radio"]{min-width:24px;min-height:24px}
 .flash-front{transform:rotateY(0deg);justify-content:space-between}
 .flash-front-main{margin:auto 0;display:flex;flex-direction:column;align-items:center}
 .flash-front .word{
-  font-family:var(--fz-display);font-size:clamp(2.1rem,6vw,2.9rem);
+  font-family:var(--fz-heading);font-size:clamp(2.1rem,6vw,2.9rem);
   font-weight:800;letter-spacing:-.025em;line-height:1.15;margin:2px 0;
   color:var(--text);
 }
@@ -493,7 +493,7 @@ input[type="checkbox"],input[type="radio"]{min-width:24px;min-height:24px}
   text-transform:uppercase;color:var(--muted);margin:0 0 4px;
 }
 .flash-meaning{
-  font-family:var(--fz-display);font-size:clamp(1.5rem,4.8vw,2.1rem);
+  font-family:var(--fz-heading);font-size:clamp(1.5rem,4.8vw,2.1rem);
   font-weight:800;letter-spacing:-.02em;line-height:1.22;color:var(--text);
   margin:0 0 10px;word-break:break-word;
 }
