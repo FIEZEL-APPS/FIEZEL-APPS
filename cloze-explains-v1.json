@@ -3,7 +3,7 @@
   "description": "Pembahasan terkurasi untuk cloze-bank-v1.json (repair A08-F6: explain tautologis diganti penjelasan Indonesia sederhana ramah SMP-SMA, bersumber dari explanation template grammar-nya via templateId + kurasi manual m025-178). Kunci = id item cloze. Digabung deterministik oleh tools/build-cloze-bank.js saat build; kunci basi menghentikan build.",
   "explains": {
     "TA-001-cz0": {
-      "why": "“Look!” dan “right now — you can smell it” nunjuk kejadian yang lagi jalan. Jadi “is preparing” yang pas.",
+      "why": "“Look!” dan “right now. You can smell it” nunjuk kejadian yang lagi jalan. Jadi “is preparing” yang pas.",
       "rule": "Kejadian yang lagi jalan pakai am, is, atau are + kata kerja -ing. Kebiasaan yang berulang pakai bentuk sekarang biasa.",
       "memory": "Ada “Look!”, berarti lihat bentuk -ing-nya.",
       "avoid": "Tulis bentuk lengkapnya, jangan hanya kata dasarnya."
@@ -131,7 +131,7 @@
     "CO-005-cz0": {
       "why": "“Unless” udah berarti “if ... not”, jadi syarat belajar lebih giat nyambung tanpa kata negatif tambahan.",
       "rule": "“Unless” sama dengan “if ... not”. Kata ini nggak boleh digabung sama kata negatif lain di anak kalimat yang sama.",
-      "memory": "“Unless” udah berarti “if not” — jangan pernah nulis “unless not”.",
+      "memory": "“Unless” udah berarti “if not”; jangan pernah nulis “unless not”.",
       "avoid": "Tulis bentuk lengkapnya, jangan hanya kata dasarnya."
     },
     "PA-002-cz0": {
@@ -437,7 +437,7 @@
     "b4_024-cz0": {
       "why": "“It was Sarah that broke the vase” ngikutin kerangka it-cleft yang baku. Urutannya: It, bentuk be, bagian yang ditonjolin, that, sisa anak kalimatnya.",
       "rule": "It-cleft: It + was atau is + bagian yang ditonjolin + that + sisa kalimat aslinya.",
-      "memory": "It was [yang ditonjolin] that [sisanya] — jangan pernah misahin “It was”.",
+      "memory": "It was [yang ditonjolin] that [sisanya]: jangan pernah misahin “It was”.",
       "avoid": "Tulis bentuk lengkapnya, jangan hanya kata dasarnya."
     },
     "b5_001-cz0": {
@@ -521,7 +521,7 @@
     "b5_017-cz0": {
       "why": "“Many of whom” madukan kata jumlah sama kata penghubung “whom” buat nunjuk balik ke “volunteers”.",
       "rule": "Kata jumlah + of + whom atau which nyambungin anak kalimat penjelas ke sebagian kelompok yang udah disebut. Contohnya many of whom dan some of which.",
-      "memory": "Many of whom dan some of which — kata jumlah dulu, terus “of”, terus kata penghubungnya.",
+      "memory": "Many of whom dan some of which: kata jumlah dulu, terus “of”, terus kata penghubungnya.",
       "avoid": "Tulis bentuk lengkapnya, jangan hanya kata dasarnya."
     },
     "b5_019-cz0": {
@@ -551,7 +551,7 @@
     "b5_024-cz0": {
       "why": "“Such was the impact” majuin “such” dengan pembalikan penuh antara kata kerja dan subjeknya. Itu pola penekanan sastra yang udah tetap.",
       "rule": "Such + was atau were + subjek + that + anak kalimat akibat itu pola pembalikan tetap di ragam resmi atau sastra.",
-      "memory": "Such was the impact that ... — “such” memimpin, kata kerjanya langsung nyusul.",
+      "memory": "Such was the impact that ...: “such” memimpin, kata kerjanya langsung nyusul.",
       "avoid": "Tulis bentuk lengkapnya, jangan hanya kata dasarnya."
     },
     "A1-003-cz0": {
@@ -605,7 +605,7 @@
     "C2-005-cz0": {
       "why": "Seluruh anak kalimat what jadi satu subjek tunggal, dan “was” nyambungin langsung ke “a clear decision”.",
       "rule": "Pola penekanan pakai what: What + anak kalimat + be + bagian yang ditonjolin. Anak kalimat what itu satu kesatuan subjek.",
-      "memory": "What we needed was X — satu anak kalimat what, satu gagasan tunggal.",
+      "memory": "What we needed was X: satu anak kalimat what, satu gagasan tunggal.",
       "avoid": "Tulis bentuk lengkapnya, jangan hanya kata dasarnya."
     },
     "C2-006-cz0": {

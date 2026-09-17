@@ -370,6 +370,24 @@ const HEURISTIC_PATH_ALLOWLIST = [
       + 'jebakan Ghost Sentinel bisa berjalan offline. Berkas ini memuat data URI gambar '
       + 'PNG kecil yang dikodekan Base64 — bukan rahasia, melainkan aset ikon bawaan '
       + 'pustaka. Kode sumber asli tersedia publik; integritas berkas dijaga oleh commit.'
+  },
+  {
+    /* SALINAN BYTE-IDENTIK dari entri tepat di atas, di rumah barunya.
+       Diukur, bukan diduga: sha256 kedua berkas sama persis
+       (c541ef06327885a8415bca8df6071e14189b4855336def4f36db54bde8484f36, 19.927 bita).
+       Halaman Ghost Sentinel dipindahkan ke website/sentinel/ pada 16 Sep 2026 lewat
+       5e1c4daa, dan pustakanya ikut disalin — pemindai dengan benar menemukannya lagi
+       di jalur baru, karena daftar maaf ini memang dikunci JALUR, bukan isi.
+
+       Entri ini karena itu tidak melonggarkan apa pun yang belum dimaafkan: ia
+       menyatakan ulang keputusan yang sama untuk berkas yang sama. Kalau suatu hari
+       isinya BERUBAH, sha256 di komentar ini yang menjadi jejak untuk memeriksanya
+       kembali — dan saat salinan lamanya dihapus, entri di atas yang harus ikut pergi. */
+    prefix: 'website/sentinel/qrcode.min.js',
+    reason: 'Salinan byte-identik dari tools/fiezel-drop/public/qrcode.min.js (pustaka QR '
+      + 'pihak ketiga) yang ikut pindah bersama halaman Ghost Sentinel ke website/sentinel/. '
+      + 'Yang tertangkap adalah data URI PNG bawaan pustakanya — aset ikon, bukan kredensial. '
+      + 'Tak satu baris pun ditulis proyek ini.'
   }
 ];
 

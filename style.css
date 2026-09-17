@@ -317,7 +317,7 @@ input[type="checkbox"],input[type="radio"]{min-width:24px;min-height:24px}
    layar lebar supaya hierarki soal > pilihan > pembahasan terbaca tanpa membaca. */
 /* v6.1 (O4 §5): soal = teks TERBESAR di pelajaran aktif (24–28px, di atas .lesson-title
    24px dan h1 halaman yang didemosi ke h2). Menggantikan nilai interim i10 2026-08-28. */
-.question{font-size:clamp(var(--fs-h1),1.1rem + 1.8vw,1.75rem);line-height:var(--lh-tight);margin:8px 0 18px;font-weight:700;letter-spacing:-.01em}
+.question{font-size:clamp(var(--fs-h1),1.1rem + 1.8vw,1.75rem);line-height:1.4;margin:8px 0 18px;font-weight:700;letter-spacing:-.01em;white-space:pre-line;word-break:break-word}
 /* i10 2026-08-28 (O5 §3a): banner kata target soal vocab — KATA-nya memimpin layar dengan
    serif display (sekeluarga dengan .word di flashcard), pelafalan menumpang di baseline. */
 .vocab-focus{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;margin:2px 0 0}
@@ -676,14 +676,14 @@ input[type="checkbox"],input[type="radio"]{min-width:24px;min-height:24px}
 
 /* ---------- misc feature blocks (progress / diagnostics) ---------- */
 .adaptive-note{margin-top:8px}
-.passage{background:var(--surface-cool);border:1px solid var(--line);border-radius:var(--radius-md);padding:18px;margin-bottom:14px}
-.passage h3{margin:5px 0 8px;font-size:1.02rem}
-.passage p{white-space:pre-wrap}
+.passage{background:var(--surface-cool);border:1px solid var(--line);border-radius:var(--radius-lg, 16px);padding:20px 22px;margin-bottom:18px}
+.passage h3{margin:4px 0 10px;font-size:1.15rem;font-weight:700}
+.passage p{white-space:pre-wrap;word-break:break-word}
 /* i10 2026-08-28 (O5 §4a): kartu bacaan = halaman buku, bukan kartu UI — judul serif
    display, ukuran baca 1rem, jarak baris 1.85, lebar baris dibatasi 62ch. */
-.card-reading{background:var(--panel);box-shadow:none;border:1px solid var(--line-soft)}
-.passage-reading h3{font-family:"Instrument Serif",serif;font-size:1.45rem;line-height:1.2;margin:6px 0 10px}
-.passage-reading p{font-size:1rem;line-height:1.85;color:var(--text);max-width:62ch}
+.card-reading{background:var(--panel);box-shadow:none;border:1px solid var(--line-soft);border-radius:var(--radius-lg, 18px)}
+.passage-reading h3{font-family:"Instrument Serif",serif;font-size:1.55rem;line-height:1.25;margin:4px 0 12px;color:var(--ink)}
+.passage-reading p{font-size:1.04rem;line-height:1.85;color:var(--text);max-width:64ch;letter-spacing:0.005em}
 .flash-back .muted{margin-top:12px}
 /* ==========================================================================
    Popup keyakinan (m025-133)
@@ -4569,7 +4569,7 @@ body.fz-lesson-mode.fz-stage-quiz .quiz-shell{padding-bottom:calc(28px + env(saf
   position:relative;flex:1 1 auto;min-width:0;
   padding:12px 14px;border:1.5px solid var(--line);border-radius:18px;background:var(--panel-soft);
 }
-.quiz-bubble .question{margin:0;font-size:clamp(1.02rem,4.4vw,1.24rem);line-height:1.35}
+.quiz-bubble .question{margin:0;font-size:clamp(1.02rem,4.4vw,1.24rem);line-height:1.4}
 /* Ekor gelembung dari border transparan - ikut tema, nol aset tambahan. */
 .quiz-bubble::before,.quiz-bubble::after{content:'';position:absolute;top:50%;transform:translateY(-50%);border:9px solid transparent}
 .quiz-bubble::before{left:-19px;border-right-color:var(--line)}
@@ -4859,7 +4859,8 @@ body.fz-stage-grammar-lesson .section-head h1{font-family:var(--fz-heading);font
 :lang(th) .launcher-copy h1,
 :lang(th) .launcher-copy h1.login-message{line-height:1.4;letter-spacing:normal}
 :lang(th) .hero h2{line-height:1.35;letter-spacing:normal}
-:lang(th) .question{line-height:1.5;letter-spacing:normal}
+:lang(th) .question{line-height:1.6;letter-spacing:normal;white-space:pre-line}
+:lang(th) .option{line-height:1.6;letter-spacing:normal}
 :lang(th) .section-head p{line-height:1.5}
 :lang(th) .launch-card b{line-height:1.45;letter-spacing:normal}
 :lang(th) .launch-card small{line-height:1.45}

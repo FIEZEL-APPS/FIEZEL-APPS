@@ -85,9 +85,9 @@ body.fz-lux .quiz-progress-bar,body .quiz-progress-bar{border-radius:999px;backg
 body.fz-lux .quiz-progress-bar b,body .quiz-progress-bar b{background:var(--sun);border-radius:999px}
 body.fz-lux .quiz-next,body .quiz-next{border-radius:999px;background:var(--text);color:var(--on-core);border-color:var(--text);box-shadow:var(--lift-ink)}
 body.fz-lux .quiz-next:disabled,body .quiz-next:disabled{background:var(--panel-soft);color:var(--text-disabled);border-color:var(--line);box-shadow:none}
-body.fz-lux .question,body .question{font-family:var(--fz-display);font-weight:700;letter-spacing:-.02em;font-size:1.35rem;line-height:1.35}
-body.fz-lux .options,body .options{gap:10px;counter-reset:fz2opt}
-body.fz-lux .option,body .option{border-radius:18px;border:1.5px solid var(--line);background:var(--panel);box-shadow:var(--lift-line);min-height:56px;padding:14px 16px 14px 60px;font-weight:600;position:relative}
+body.fz-lux .question,body .question{font-family:var(--fz-display);font-weight:700;letter-spacing:-.01em;font-size:1.35rem;line-height:1.45;white-space:pre-line;word-break:break-word}
+body.fz-lux .options,body .options{gap:12px;counter-reset:fz2opt}
+body.fz-lux .option,body .option{border-radius:18px;border:1.5px solid var(--line);background:var(--panel);box-shadow:var(--lift-line);min-height:56px;padding:14px 16px 14px 60px;font-weight:600;font-size:1.02rem;line-height:1.45;word-break:break-word;position:relative}
 body.fz-lux .option::before,body .option::before{counter-increment:fz2opt;content:counter(fz2opt,upper-alpha);position:absolute;left:14px;top:50%;transform:translateY(-50%);width:32px;height:32px;border-radius:11px;background:var(--panel-soft);color:var(--muted);display:grid;place-items:center;font-size:.8rem;font-weight:700}
 body.fz-lux .option:not(:disabled):hover,body .option:not(:disabled):hover{background:var(--surface-tint);border-color:var(--sun);box-shadow:0 3px 0 var(--sun-deep)}
 body.fz-lux .option:active,body .option:active{transform:translateY(2px);box-shadow:0 1px 0 var(--line)}

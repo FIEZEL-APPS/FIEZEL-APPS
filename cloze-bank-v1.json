@@ -23,37 +23,37 @@
     {
       "templateId": "PR-001",
       "reason": "answer_too_short",
-      "detail": "jawaban \"on\" <3 karakter — grading edit-distance tidak andal"
+      "detail": "jawaban \"on\" <3 karakter: grading edit-distance tidak andal"
     },
     {
       "templateId": "RC-001",
       "reason": "no_blank_marker",
-      "detail": "stem tidak memuat ___ — jawaban template bukan token/frasa di dalam kalimat target"
+      "detail": "stem tidak memuat ___: jawaban template bukan token/frasa di dalam kalimat target"
     },
     {
       "templateId": "EC-001",
       "reason": "no_blank_marker",
-      "detail": "stem tidak memuat ___ — jawaban template bukan token/frasa di dalam kalimat target"
+      "detail": "stem tidak memuat ___: jawaban template bukan token/frasa di dalam kalimat target"
     },
     {
       "templateId": "PA-004",
       "reason": "multi_blank",
-      "detail": "stem memuat 2 blank dengan jawaban gabungan \"have / repaired\" — pemecahan per posisi tidak mekanis"
+      "detail": "stem memuat 2 blank dengan jawaban gabungan \"have / repaired\": pemecahan per posisi tidak mekanis"
     },
     {
       "templateId": "AR-002",
       "reason": "answer_not_typable",
-      "detail": "jawaban \"(no article)\" adalah placeholder meta — jawaban sebenarnya \"tidak ada kata\", mustahil diketik di mode produksi"
+      "detail": "jawaban \"(no article)\" adalah placeholder meta: jawaban sebenarnya \"tidak ada kata\", mustahil diketik di mode produksi"
     },
     {
       "templateId": "PR-002",
       "reason": "multi_blank",
-      "detail": "stem memuat 2 blank dengan jawaban gabungan \"at / on\" — pemecahan per posisi tidak mekanis"
+      "detail": "stem memuat 2 blank dengan jawaban gabungan \"at / on\": pemecahan per posisi tidak mekanis"
     },
     {
       "templateId": "PR-003",
       "reason": "answer_too_short",
-      "detail": "jawaban \"of\" <3 karakter — grading edit-distance tidak andal"
+      "detail": "jawaban \"of\" <3 karakter: grading edit-distance tidak andal"
     },
     {
       "templateId": "RC-002",
@@ -63,17 +63,17 @@
     {
       "templateId": "EC-002",
       "reason": "no_blank_marker",
-      "detail": "stem tidak memuat ___ — jawaban template bukan token/frasa di dalam kalimat target"
+      "detail": "stem tidak memuat ___: jawaban template bukan token/frasa di dalam kalimat target"
     },
     {
       "templateId": "EC-003",
       "reason": "no_blank_marker",
-      "detail": "stem tidak memuat ___ — jawaban template bukan token/frasa di dalam kalimat target"
+      "detail": "stem tidak memuat ___: jawaban template bukan token/frasa di dalam kalimat target"
     },
     {
       "templateId": "RS-006",
       "reason": "multi_blank",
-      "detail": "stem memuat 2 blank dengan jawaban gabungan \"rained / would cancel\" — pemecahan per posisi tidak mekanis"
+      "detail": "stem memuat 2 blank dengan jawaban gabungan \"rained / would cancel\": pemecahan per posisi tidak mekanis"
     },
     {
       "templateId": "AR-004",
@@ -83,72 +83,72 @@
     {
       "templateId": "EC-004",
       "reason": "no_blank_marker",
-      "detail": "stem tidak memuat ___ — jawaban template bukan token/frasa di dalam kalimat target"
+      "detail": "stem tidak memuat ___: jawaban template bukan token/frasa di dalam kalimat target"
     },
     {
       "templateId": "EC-005",
       "reason": "no_blank_marker",
-      "detail": "stem tidak memuat ___ — jawaban template bukan token/frasa di dalam kalimat target"
+      "detail": "stem tidak memuat ___: jawaban template bukan token/frasa di dalam kalimat target"
     },
     {
       "templateId": "b4_017",
       "reason": "answer_too_short",
-      "detail": "jawaban \"go\" <3 karakter — grading edit-distance tidak andal"
+      "detail": "jawaban \"go\" <3 karakter: grading edit-distance tidak andal"
     },
     {
       "templateId": "b4_018",
       "reason": "no_blank_marker",
-      "detail": "stem tidak memuat ___ — jawaban template bukan token/frasa di dalam kalimat target"
+      "detail": "stem tidak memuat ___: jawaban template bukan token/frasa di dalam kalimat target"
     },
     {
       "templateId": "b4_021",
       "reason": "no_blank_marker",
-      "detail": "stem tidak memuat ___ — jawaban template bukan token/frasa di dalam kalimat target"
+      "detail": "stem tidak memuat ___: jawaban template bukan token/frasa di dalam kalimat target"
     },
     {
       "templateId": "b4_023",
       "reason": "answer_too_short",
-      "detail": "jawaban \"so\" <3 karakter — grading edit-distance tidak andal"
+      "detail": "jawaban \"so\" <3 karakter: grading edit-distance tidak andal"
     },
     {
       "templateId": "b5_009",
       "reason": "multi_blank",
-      "detail": "stem memuat 2 blank dengan jawaban gabungan \"he; his\" — pemecahan per posisi tidak mekanis"
+      "detail": "stem memuat 2 blank dengan jawaban gabungan \"he; his\": pemecahan per posisi tidak mekanis"
     },
     {
       "templateId": "b5_013",
       "reason": "multi_blank",
-      "detail": "stem memuat 2 blank dengan jawaban gabungan \"by; by\" — pemecahan per posisi tidak mekanis"
+      "detail": "stem memuat 2 blank dengan jawaban gabungan \"by; by\": pemecahan per posisi tidak mekanis"
     },
     {
       "templateId": "b5_014",
       "reason": "answer_too_short",
-      "detail": "jawaban \"to\" <3 karakter — grading edit-distance tidak andal"
+      "detail": "jawaban \"to\" <3 karakter: grading edit-distance tidak andal"
     },
     {
       "templateId": "b5_018",
       "reason": "multi_blank",
-      "detail": "stem memuat 2 blank dengan jawaban gabungan \"have; had\" — pemecahan per posisi tidak mekanis"
+      "detail": "stem memuat 2 blank dengan jawaban gabungan \"have; had\": pemecahan per posisi tidak mekanis"
     },
     {
       "templateId": "b5_020",
       "reason": "no_blank_marker",
-      "detail": "stem tidak memuat ___ — jawaban template bukan token/frasa di dalam kalimat target"
+      "detail": "stem tidak memuat ___: jawaban template bukan token/frasa di dalam kalimat target"
     },
     {
       "templateId": "A1-008",
       "reason": "answer_too_short",
-      "detail": "jawaban \"an\" <3 karakter — grading edit-distance tidak andal"
+      "detail": "jawaban \"an\" <3 karakter: grading edit-distance tidak andal"
     },
     {
       "templateId": "A1-012",
       "reason": "no_blank_marker",
-      "detail": "stem tidak memuat ___ — jawaban template bukan token/frasa di dalam kalimat target"
+      "detail": "stem tidak memuat ___: jawaban template bukan token/frasa di dalam kalimat target"
     },
     {
       "templateId": "A1-013",
       "reason": "answer_too_short",
-      "detail": "jawaban \"on\" <3 karakter — grading edit-distance tidak andal"
+      "detail": "jawaban \"on\" <3 karakter: grading edit-distance tidak andal"
     },
     {
       "templateId": "AR-006",
@@ -158,57 +158,57 @@
     {
       "templateId": "CG-001",
       "reason": "answer_too_short",
-      "detail": "jawaban \"am\" <3 karakter — grading edit-distance tidak andal"
+      "detail": "jawaban \"am\" <3 karakter: grading edit-distance tidak andal"
     },
     {
       "templateId": "NN-001",
       "reason": "no_blank_marker",
-      "detail": "stem tidak memuat ___ — jawaban template bukan token/frasa di dalam kalimat target"
+      "detail": "stem tidak memuat ___: jawaban template bukan token/frasa di dalam kalimat target"
     },
     {
       "templateId": "CG-003",
       "reason": "answer_too_short",
-      "detail": "jawaban \"is\" <3 karakter — grading edit-distance tidak andal"
+      "detail": "jawaban \"is\" <3 karakter: grading edit-distance tidak andal"
     },
     {
       "templateId": "PR-101",
       "reason": "answer_too_short",
-      "detail": "jawaban \"at\" <3 karakter — grading edit-distance tidak andal"
+      "detail": "jawaban \"at\" <3 karakter: grading edit-distance tidak andal"
     },
     {
       "templateId": "AR-101",
       "reason": "answer_too_short",
-      "detail": "jawaban \"a\" <3 karakter — grading edit-distance tidak andal"
+      "detail": "jawaban \"a\" <3 karakter: grading edit-distance tidak andal"
     },
     {
       "templateId": "PR-008",
       "reason": "answer_too_short",
-      "detail": "jawaban \"in\" <3 karakter — grading edit-distance tidak andal"
+      "detail": "jawaban \"in\" <3 karakter: grading edit-distance tidak andal"
     },
     {
       "templateId": "EC-039",
       "reason": "no_blank_marker",
-      "detail": "stem tidak memuat ___ — jawaban template bukan token/frasa di dalam kalimat target"
+      "detail": "stem tidak memuat ___: jawaban template bukan token/frasa di dalam kalimat target"
     },
     {
       "templateId": "PR-013",
       "reason": "answer_too_short",
-      "detail": "jawaban \"on\" <3 karakter — grading edit-distance tidak andal"
+      "detail": "jawaban \"on\" <3 karakter: grading edit-distance tidak andal"
     },
     {
       "templateId": "EC-006",
       "reason": "no_blank_marker",
-      "detail": "stem tidak memuat ___ — jawaban template bukan token/frasa di dalam kalimat target"
+      "detail": "stem tidak memuat ___: jawaban template bukan token/frasa di dalam kalimat target"
     },
     {
       "templateId": "A1-201",
       "reason": "answer_too_short",
-      "detail": "jawaban \"go\" <3 karakter — grading edit-distance tidak andal"
+      "detail": "jawaban \"go\" <3 karakter: grading edit-distance tidak andal"
     },
     {
       "templateId": "LD-201",
       "reason": "answer_too_short",
-      "detail": "jawaban \"so\" <3 karakter — grading edit-distance tidak andal"
+      "detail": "jawaban \"so\" <3 karakter: grading edit-distance tidak andal"
     },
     {
       "templateId": "AR-201",
@@ -218,47 +218,47 @@
     {
       "templateId": "TA-204",
       "reason": "multi_blank",
-      "detail": "stem memuat 2 blank dengan jawaban gabungan \"had / started\" — pemecahan per posisi tidak mekanis"
+      "detail": "stem memuat 2 blank dengan jawaban gabungan \"had / started\": pemecahan per posisi tidak mekanis"
     },
     {
       "templateId": "EC-201",
       "reason": "no_blank_marker",
-      "detail": "stem tidak memuat ___ — jawaban template bukan token/frasa di dalam kalimat target"
+      "detail": "stem tidak memuat ___: jawaban template bukan token/frasa di dalam kalimat target"
     },
     {
       "templateId": "EC-202",
       "reason": "no_blank_marker",
-      "detail": "stem tidak memuat ___ — jawaban template bukan token/frasa di dalam kalimat target"
+      "detail": "stem tidak memuat ___: jawaban template bukan token/frasa di dalam kalimat target"
     },
     {
       "templateId": "PR-201",
       "reason": "answer_too_short",
-      "detail": "jawaban \"at\" <3 karakter — grading edit-distance tidak andal"
+      "detail": "jawaban \"at\" <3 karakter: grading edit-distance tidak andal"
     },
     {
       "templateId": "EC-203",
       "reason": "no_blank_marker",
-      "detail": "stem tidak memuat ___ — jawaban template bukan token/frasa di dalam kalimat target"
+      "detail": "stem tidak memuat ___: jawaban template bukan token/frasa di dalam kalimat target"
     },
     {
       "templateId": "EC-204",
       "reason": "no_blank_marker",
-      "detail": "stem tidak memuat ___ — jawaban template bukan token/frasa di dalam kalimat target"
+      "detail": "stem tidak memuat ___: jawaban template bukan token/frasa di dalam kalimat target"
     },
     {
       "templateId": "RS-207",
       "reason": "multi_blank",
-      "detail": "stem memuat 2 blank dengan jawaban gabungan \"I; my\" — pemecahan per posisi tidak mekanis"
+      "detail": "stem memuat 2 blank dengan jawaban gabungan \"I; my\": pemecahan per posisi tidak mekanis"
     },
     {
       "templateId": "CM-205",
       "reason": "multi_blank",
-      "detail": "stem memuat 2 blank dengan jawaban gabungan \"have; seen\" — pemecahan per posisi tidak mekanis"
+      "detail": "stem memuat 2 blank dengan jawaban gabungan \"have; seen\": pemecahan per posisi tidak mekanis"
     },
     {
       "templateId": "EC-205",
       "reason": "no_blank_marker",
-      "detail": "stem tidak memuat ___ — jawaban template bukan token/frasa di dalam kalimat target"
+      "detail": "stem tidak memuat ___: jawaban template bukan token/frasa di dalam kalimat target"
     }
   ],
   "items": [
@@ -267,7 +267,7 @@
       "templateId": "TA-001",
       "skill": "present_simple_vs_continuous",
       "level": "A2",
-      "sentence": "Look! The chef ___ a new dish right now — you can smell it.",
+      "sentence": "Look! The chef ___ a new dish right now. You can smell it.",
       "blank": {
         "answer": "is preparing",
         "alternates": [
@@ -298,7 +298,7 @@
         }
       ],
       "explain": {
-        "why": "“Look!” dan “right now — you can smell it” nunjuk kejadian yang lagi jalan. Jadi “is preparing” yang pas.",
+        "why": "“Look!” dan “right now. You can smell it” nunjuk kejadian yang lagi jalan. Jadi “is preparing” yang pas.",
         "rule": "Kejadian yang lagi jalan pakai am, is, atau are + kata kerja -ing. Kebiasaan yang berulang pakai bentuk sekarang biasa.",
         "memory": "Ada “Look!”, berarti lihat bentuk -ing-nya.",
         "avoid": "Tulis bentuk lengkapnya, jangan hanya kata dasarnya."
@@ -513,7 +513,7 @@
       "templateId": "CO-002",
       "skill": "second_conditional_unreal_present",
       "level": "B1",
-      "sentence": "If I ___ the lottery, I would travel the world — but I never even buy a ticket.",
+      "sentence": "If I ___ the lottery, I would travel the world, but I never even buy a ticket.",
       "blank": {
         "answer": "won",
         "alternates": [
@@ -553,7 +553,7 @@
       "templateId": "PA-001",
       "skill": "agent_omission_when_irrelevant",
       "level": "B1",
-      "sentence": "The bridge ___ in 1932 — nobody knows who built it, so don't name anyone.",
+      "sentence": "The bridge ___ in 1932. Nobody knows who built it, so don't name anyone.",
       "blank": {
         "answer": "was constructed",
         "alternates": [
@@ -882,7 +882,7 @@
       "templateId": "TA-007",
       "skill": "future_continuous_vs_future_perfect",
       "level": "B2",
-      "sentence": "Don't call at 8pm — at that moment I ___ dinner with my in-laws.",
+      "sentence": "Don't call at 8pm. At that moment I ___ dinner with my in-laws.",
       "blank": {
         "answer": "will be having",
         "alternates": [
@@ -890,7 +890,7 @@
           "will be eating",
           "'ll be eating"
         ],
-        "position": 37
+        "position": 36
       },
       "distractors": [
         {
@@ -902,7 +902,7 @@
         {
           "text": "will have had",
           "misconception": "wrongly applies future perfect, implying the dinner is finished by 8pm",
-          "whyFailsId": "“will have had” nyatain acaranya udah rampung sebelum jam segitu — kebalikan dari yang diminta soalnya.",
+          "whyFailsId": "“will have had” nyatain acaranya udah rampung sebelum jam segitu, kebalikan dari yang diminta soalnya.",
           "misconceptionId": "future perfect dipakai keliru, makan malamnya jadi seolah kelar sebelum jam delapan."
         },
         {
@@ -965,13 +965,13 @@
       "templateId": "MO-004",
       "skill": "deduction_past_must_have_vs_cant_have",
       "level": "B2",
-      "sentence": "The lights are off and his car isn't here — he ___ left for work already. (you are sure)",
+      "sentence": "The lights are off and his car isn't here, so he ___ left for work already. (you are sure)",
       "blank": {
         "answer": "must have",
         "alternates": [
           "must've"
         ],
-        "position": 47
+        "position": 49
       },
       "distractors": [
         {
@@ -1005,7 +1005,7 @@
       "templateId": "MO-005",
       "skill": "necessity_absence_neednt_vs_mustnt",
       "level": "B1",
-      "sentence": "You ___ bring your passport to the local gym — a membership card is enough.",
+      "sentence": "You ___ bring your passport to the local gym. A membership card is enough.",
       "blank": {
         "answer": "needn't",
         "alternates": [
@@ -1159,7 +1159,7 @@
       "explain": {
         "why": "“Unless” udah berarti “if ... not”, jadi syarat belajar lebih giat nyambung tanpa kata negatif tambahan.",
         "rule": "“Unless” sama dengan “if ... not”. Kata ini nggak boleh digabung sama kata negatif lain di anak kalimat yang sama.",
-        "memory": "“Unless” udah berarti “if not” — jangan pernah nulis “unless not”.",
+        "memory": "“Unless” udah berarti “if not”; jangan pernah nulis “unless not”.",
         "avoid": "Tulis bentuk lengkapnya, jangan hanya kata dasarnya."
       }
     },
@@ -1344,7 +1344,7 @@
         {
           "text": "suggested us",
           "misconception": "copies the object pattern of 'tell/ask' (verb + object) onto 'suggest', which doesn't take a direct personal object this way",
-          "whyFailsId": "nyelipin “us” di belakang kata kerja usulnya bikin polanya rusak — usulan di kalimat ini nggak butuh sasaran orang.",
+          "whyFailsId": "nyelipin “us” di belakang kata kerja usulnya bikin polanya rusak; usulan di kalimat ini nggak butuh sasaran orang.",
           "misconceptionId": "pola objek punya tell dan ask ditempelin ke “suggest”."
         }
       ],
@@ -1519,7 +1519,7 @@
       "templateId": "CM-002",
       "skill": "as_as_equality_vs_comparative",
       "level": "A2",
-      "sentence": "This laptop is ___ my old one — both take exactly ten seconds to start up.",
+      "sentence": "This laptop is ___ my old one. Both take exactly ten seconds to start up.",
       "blank": {
         "answer": "as fast as",
         "alternates": [
@@ -1751,7 +1751,7 @@
       "templateId": "MO-006",
       "skill": "advice_should_vs_ought_to_vs_had_better",
       "level": "B1",
-      "sentence": "You ___ leave now — if you miss this train, there isn't another one until tomorrow. (strong warning)",
+      "sentence": "You ___ leave now. If you miss this train, there isn't another one until tomorrow. (strong warning)",
       "blank": {
         "answer": "had better",
         "alternates": [
@@ -1791,14 +1791,14 @@
       "templateId": "MO-007",
       "skill": "speculation_scale_may_might_could_vs_will",
       "level": "B1",
-      "sentence": "I'm not sure where Sam is — he ___ still be stuck in traffic.",
+      "sentence": "I'm not sure where Sam is. He ___ still be stuck in traffic.",
       "blank": {
         "answer": "might",
         "alternates": [
           "may",
           "could"
         ],
-        "position": 31
+        "position": 30
       },
       "distractors": [
         {
@@ -1832,13 +1832,13 @@
       "templateId": "MO-008",
       "skill": "past_regret_should_have_vs_shouldnt_have",
       "level": "B2",
-      "sentence": "He's exhausted today — he ___ up so late watching movies last night.",
+      "sentence": "He's exhausted today. He ___ up so late watching movies last night.",
       "blank": {
         "answer": "shouldn't have stayed",
         "alternates": [
           "should not have stayed"
         ],
-        "position": 26
+        "position": 25
       },
       "distractors": [
         {
@@ -2195,7 +2195,7 @@
       "templateId": "GI-004",
       "skill": "verb_pattern_try_meaning_change",
       "level": "B2",
-      "sentence": "If the file won't open, try ___ the computer — that usually fixes it.",
+      "sentence": "If the file won't open, try ___ the computer. That usually fixes it.",
       "blank": {
         "answer": "restarting",
         "alternates": [],
@@ -2271,7 +2271,7 @@
       "templateId": "RC-004",
       "skill": "preposition_placement_formal_vs_informal_relative_clause",
       "level": "C1",
-      "sentence": "This is the colleague ___ I was speaking earlier — a very formal way to phrase it.",
+      "sentence": "This is the colleague ___ I was speaking earlier (a very formal way to phrase it).",
       "blank": {
         "answer": "with whom",
         "alternates": [
@@ -2283,7 +2283,7 @@
         {
           "text": "with who",
           "misconception": "using subject-form 'who' after a fronted preposition, which requires the object form",
-          "whyFailsId": "“with who” masang bentuk pelaku “who” tepat di belakang kata depannya — kombinasi yang justru dilarang di gaya formal.",
+          "whyFailsId": "“with who” masang bentuk pelaku “who” tepat di belakang kata depannya, kombinasi yang justru dilarang di gaya formal.",
           "misconceptionId": "bentuk subjek “who” dipakai sesudah kata depan yang dimajuin, padahal yang diminta bentuk objek."
         },
         {
@@ -2591,7 +2591,7 @@
       "templateId": "b4_004",
       "skill": "modal_perfect_could_have_missed_opportunity",
       "level": "B2",
-      "sentence": "You ____ the job — they offered it, but you turned it down. (just a fact, no criticism)",
+      "sentence": "You ____ the job. They offered it, but you turned it down. (just a fact, no criticism)",
       "blank": {
         "answer": "could have taken",
         "alternates": [
@@ -3268,7 +3268,7 @@
       "explain": {
         "why": "“It was Sarah that broke the vase” ngikutin kerangka it-cleft yang baku. Urutannya: It, bentuk be, bagian yang ditonjolin, that, sisa anak kalimatnya.",
         "rule": "It-cleft: It + was atau is + bagian yang ditonjolin + that + sisa kalimat aslinya.",
-        "memory": "It was [yang ditonjolin] that [sisanya] — jangan pernah misahin “It was”.",
+        "memory": "It was [yang ditonjolin] that [sisanya]: jangan pernah misahin “It was”.",
         "avoid": "Tulis bentuk lengkapnya, jangan hanya kata dasarnya."
       }
     },
@@ -3360,7 +3360,7 @@
       "templateId": "b5_003",
       "skill": "modal_of_criticism_should_have_vs_could_have_contrast",
       "level": "B2",
-      "sentence": "You ____ more carefully before signing — now we're stuck with these terms. (criticism)",
+      "sentence": "You ____ more carefully before signing. Now we're stuck with these terms. (criticism)",
       "blank": {
         "answer": "should have read",
         "alternates": [
@@ -3832,7 +3832,7 @@
       "explain": {
         "why": "“Many of whom” madukan kata jumlah sama kata penghubung “whom” buat nunjuk balik ke “volunteers”.",
         "rule": "Kata jumlah + of + whom atau which nyambungin anak kalimat penjelas ke sebagian kelompok yang udah disebut. Contohnya many of whom dan some of which.",
-        "memory": "Many of whom dan some of which — kata jumlah dulu, terus “of”, terus kata penghubungnya.",
+        "memory": "Many of whom dan some of which: kata jumlah dulu, terus “of”, terus kata penghubungnya.",
         "avoid": "Tulis bentuk lengkapnya, jangan hanya kata dasarnya."
       }
     },
@@ -3965,7 +3965,7 @@
       "templateId": "b5_023",
       "skill": "negative_adverbial_inversion_never_rarely_not_only",
       "level": "C1",
-      "sentence": "____ such a disorganized meeting before — nothing was decided at all.",
+      "sentence": "____ such a disorganized meeting before. Nothing was decided at all.",
       "blank": {
         "answer": "Never have I attended",
         "alternates": [
@@ -4038,7 +4038,7 @@
       "explain": {
         "why": "“Such was the impact” majuin “such” dengan pembalikan penuh antara kata kerja dan subjeknya. Itu pola penekanan sastra yang udah tetap.",
         "rule": "Such + was atau were + subjek + that + anak kalimat akibat itu pola pembalikan tetap di ragam resmi atau sastra.",
-        "memory": "Such was the impact that ... — “such” memimpin, kata kerjanya langsung nyusul.",
+        "memory": "Such was the impact that ...: “such” memimpin, kata kerjanya langsung nyusul.",
         "avoid": "Tulis bentuk lengkapnya, jangan hanya kata dasarnya."
       }
     },
@@ -4395,7 +4395,7 @@
       "explain": {
         "why": "Seluruh anak kalimat what jadi satu subjek tunggal, dan “was” nyambungin langsung ke “a clear decision”.",
         "rule": "Pola penekanan pakai what: What + anak kalimat + be + bagian yang ditonjolin. Anak kalimat what itu satu kesatuan subjek.",
-        "memory": "What we needed was X — satu anak kalimat what, satu gagasan tunggal.",
+        "memory": "What we needed was X: satu anak kalimat what, satu gagasan tunggal.",
         "avoid": "Tulis bentuk lengkapnya, jangan hanya kata dasarnya."
       }
     },
@@ -4823,7 +4823,7 @@
         {
           "text": "always drink",
           "misconception": "leaving the bare verb with no third-person marking after a singular subject",
-          "whyFailsId": "“always drink” kehilangan akhiran -s padahal subjeknya “my sister” — posisi “always”-nya udah bener, bentuk kata kerjanya yang salah.",
+          "whyFailsId": "“always drink” kehilangan akhiran -s padahal subjeknya “my sister”; posisi “always”-nya udah bener, bentuk kata kerjanya yang salah.",
           "misconceptionId": "kata kerja dasar dibiarin polos padahal subjeknya orang ketiga tunggal."
         },
         {
@@ -5054,7 +5054,7 @@
       "templateId": "CO-008",
       "skill": "wish_unreal_present_past_simple",
       "level": "B1",
-      "sentence": "I wish I ___ closer to the office — the trip takes two hours a day.",
+      "sentence": "I wish I ___ closer to the office. The trip takes two hours a day.",
       "blank": {
         "answer": "lived",
         "alternates": [
@@ -5134,7 +5134,7 @@
       "templateId": "TA-013",
       "skill": "future_perfect_epistemic_past_assumption",
       "level": "C2",
-      "sentence": "You ___ the news by now — the memo about the merger went to every department on Monday morning.",
+      "sentence": "You ___ the news by now. The memo about the merger went to every department on Monday morning.",
       "blank": {
         "answer": "will have heard",
         "alternates": [
@@ -5148,7 +5148,7 @@
         {
           "text": "will hear",
           "misconception": "reading 'by now' as a point still ahead and choosing a plain prediction about the future",
-          "whyFailsId": "“will hear” ngeramal kejadian yang belum terjadi, padahal memonya udah nyebar dari Senin — bentuk ini nggak cocok sama “by now”.",
+          "whyFailsId": "“will hear” ngeramal kejadian yang belum terjadi, padahal memonya udah nyebar dari Senin; bentuk ini nggak cocok sama “by now”.",
           "misconceptionId": "“by now” dibaca kayak titik yang masih di depan."
         },
         {
@@ -5515,7 +5515,7 @@
       "explain": {
         "why": "Subjeknya “you”, jadi pakai “have”. Buat nanya, “have” maju ke depan: “Have you got ...?”",
         "rule": "Pertanyaan have got: majuin have atau has ke depan subjek, got tetap di belakang. Jangan tambah do.",
-        "memory": "“Have you got ...?” — nggak perlu “do”.",
+        "memory": "“Have you got ...?”: nggak perlu “do”.",
         "avoid": "Kalau ada “got”, jangan pakai “do”. Majuin “have” atau “has” ke depan subjeknya."
       }
     },
@@ -5567,11 +5567,11 @@
       "templateId": "QF-001",
       "skill": "question_words_basic",
       "level": "A1",
-      "sentence": "___ does the movie start? — At seven o'clock.",
+      "sentence": "“___ does the movie start?” “At seven o'clock.”",
       "blank": {
         "answer": "When",
         "alternates": [],
-        "position": 0
+        "position": 1
       },
       "distractors": [
         {
@@ -5900,7 +5900,7 @@
       "explain": {
         "why": "“Time” nggak bisa dihitung satu-satu dan kalimatnya negatif. Jadi pasangannya “much”.",
         "rule": "“Much” buat benda tak terhitung, “many” buat benda jamak yang bisa dihitung. Di kalimat negatif dan tanya, dua-duanya paling wajar.",
-        "memory": "Not much time — waktu mengalir, kursi dihitung.",
+        "memory": "Not much time: waktu mengalir, kursi dihitung.",
         "avoid": "Tanya dua hal: bendanya bisa dihitung atau nggak, dan kalimatnya negatif atau nggak."
       }
     },
@@ -5909,7 +5909,7 @@
       "templateId": "CM-006",
       "skill": "as_as_equality_vs_comparative",
       "level": "A2",
-      "sentence": "The sequel is ___ the first film — the first one still makes people laugh more.",
+      "sentence": "The sequel is ___ the first film. The first one still makes people laugh more.",
       "blank": {
         "answer": "not as funny as",
         "alternates": [
@@ -5959,7 +5959,7 @@
         {
           "text": "across",
           "misconception": "uses the side-to-side crossing preposition for movement that follows a line",
-          "whyFailsId": "“across” artinya motong dari sisi satu ke sisi lain, padahal lautnya terus di kanan selama sejam — mereka nyusurin pantai.",
+          "whyFailsId": "“across” artinya motong dari sisi satu ke sisi lain, padahal lautnya terus di kanan selama sejam; mereka nyusurin pantai.",
           "misconceptionId": "kata depan buat nyeberang dipakai buat gerakan yang nyusurin garis."
         },
         {
@@ -6110,7 +6110,7 @@
       "templateId": "TA-017",
       "skill": "future_forms_plan_vs_prediction",
       "level": "B1",
-      "sentence": "We ___ my cousins in Lombok next month — we booked the flights last week.",
+      "sentence": "We ___ my cousins in Lombok next month. We booked the flights last week.",
       "blank": {
         "answer": "are going to visit",
         "alternates": [],
@@ -6120,7 +6120,7 @@
         {
           "text": "will visit",
           "misconception": "uses the moment-of-speaking decision form for a plan made before speaking",
-          "whyFailsId": "“will” nandain keputusan yang baru diambil saat ngomong, padahal tiketnya udah dibeli minggu lalu — dan soalnya jelas minta rencana yang udah ada.",
+          "whyFailsId": "“will” nandain keputusan yang baru diambil saat ngomong, padahal tiketnya udah dibeli minggu lalu, dan soalnya jelas minta rencana yang udah ada.",
           "misconceptionId": "bentuk keputusan spontan dipakai buat rencana yang udah diputuskan sebelum ngomong."
         },
         {
@@ -6176,12 +6176,12 @@
         {
           "text": "should",
           "misconception": "deduction confused with expectation/advice",
-          "whyFailsId": "“should be cooking” nyatain harapan atau saran, padahal kalimatnya narik kesimpulan dari bukti yang kecium dan kedengeran — dan soalnya jelas minta kesimpulan terkuat.",
+          "whyFailsId": "“should be cooking” nyatain harapan atau saran, padahal kalimatnya narik kesimpulan dari bukti yang kecium dan kedengeran, dan soalnya jelas minta kesimpulan terkuat.",
           "misconceptionId": "menyatakan harapan atau saran, padahal kalimatnya lagi menyimpulkan dari bukti."
         }
       ],
       "explain": {
-        "why": "Dua bukti langsung — bau bawang dan bunyi panci — bikin kesimpulannya nyaris pasti, dan kesimpulan yakin yang positif pakai “must”.",
+        "why": "Dua bukti langsung (bau bawang dan bunyi panci) bikin kesimpulannya nyaris pasti, dan kesimpulan yakin yang positif pakai “must”.",
         "rule": "Skala kesimpulan sekarang: “must” = hampir pasti benar; “might/could” = mungkin; “can't” = hampir pasti salah. “Can” dan “should” nggak ada di skala ini.",
         "memory": "Bukti kuat mendukung = must. Bukti kuat menolak = can't. Ragu = might.",
         "avoid": "Daftar dulu buktinya, terus cocokin kekuatannya: bukti kuat mendukung → must, lemah atau campur → might, bukti kuat menolak → can't."
@@ -6229,7 +6229,7 @@
         }
       ],
       "explain": {
-        "why": "“Hear” itu kata kerja panca indera, dan buat kata kerja panca indera bahasa Inggris pakai “could” polos di masa lampau — termasuk buat satu kejadian tertentu kayak konser semalam.",
+        "why": "“Hear” itu kata kerja panca indera, dan buat kata kerja panca indera bahasa Inggris pakai “could” polos di masa lampau, termasuk buat satu kejadian tertentu kayak konser semalam.",
         "rule": "Buat kata kerja panca indera dan pikiran (see, hear, smell, understand, remember), kemampuan lampau di kejadian apa pun pakai “could” + kata kerja dasar; aturan pencapaian yang maksa “was able to” berlaku buat aksi, bukan panca indera.",
         "memory": "Panca indera di masa lampau = could + kata kerja dasar, tanpa “to”.",
         "avoid": "Cek dulu jenis kata kerjanya: kalau see/hear/smell/understand, langsung pakai “could” dan sambungkan ke kata kerja dasar tanpa “to”."
@@ -6240,7 +6240,7 @@
       "templateId": "MO-012",
       "skill": "necessity_absence_neednt_vs_mustnt",
       "level": "B1",
-      "sentence": "You ___ tell anyone about the surprise party — it has to stay a secret until Saturday.",
+      "sentence": "You ___ tell anyone about the surprise party. It has to stay a secret until Saturday.",
       "blank": {
         "answer": "mustn't",
         "alternates": [],
@@ -6250,7 +6250,7 @@
         {
           "text": "needn't",
           "misconception": "reads a prohibition as mere absence of necessity",
-          "whyFailsId": "“needn't tell” bikin ceritanya jadi opsional — boleh tapi nggak wajib — padahal “has to stay a secret” ngelarang cerita sama sekali.",
+          "whyFailsId": "“needn't tell” bikin ceritanya jadi opsional (boleh tapi nggak wajib), padahal “has to stay a secret” ngelarang cerita sama sekali.",
           "misconceptionId": "larangan beneran dibaca cuma sebagai ‘nggak perlu’, padahal aksinya memang dilarang."
         },
         {
@@ -6392,11 +6392,11 @@
       "templateId": "MO-033",
       "skill": "advice_should_vs_ought_to_vs_had_better",
       "level": "B1",
-      "sentence": "That cough sounds bad — you ___ to see a doctor before it gets worse.",
+      "sentence": "That cough sounds bad. You ___ to see a doctor before it gets worse.",
       "blank": {
         "answer": "ought",
         "alternates": [],
-        "position": 28
+        "position": 27
       },
       "distractors": [
         {
@@ -6460,7 +6460,7 @@
         "why": "“I've checked ... twice” dan “I'm completely sure” itu tanda keyakinan yang kuat. Jadi modal ramalan yakin “will” yang pas.",
         "rule": "“Will” buat ramalan yang yakin. “May”, “might”, dan “could” buat tingkat dugaan yang lebih lemah. Cocokin modalnya sama seyakin apa buktinya.",
         "memory": "“Completely sure” pasangannya “will”, bukan “might”.",
-        "avoid": "Cari kata-kata keyakinan kayak “I'm sure” atau fakta yang udah dicek. Kalau ada, jangan ragu-ragu — pakai “will”."
+        "avoid": "Cari kata-kata keyakinan kayak “I'm sure” atau fakta yang udah dicek. Kalau ada, jangan ragu-ragu: pakai “will”."
       }
     },
     {
@@ -6468,11 +6468,11 @@
       "templateId": "PR-035",
       "skill": "phrasal_verb_particle_changes_meaning",
       "level": "B1",
-      "sentence": "The music is too loud for the baby — could you turn it ___ a little?",
+      "sentence": "The music is too loud for the baby. Could you turn it ___ a little?",
       "blank": {
         "answer": "down",
         "alternates": [],
-        "position": 55
+        "position": 54
       },
       "distractors": [
         {
@@ -6498,7 +6498,7 @@
         "why": "“Turn down” berarti ngurangin volume sebagian. Itu cocok sama “too loud” sekaligus permintaan halus “a little”.",
         "rule": "Sama kata “turn”, tiap partikel bikin kata kerja yang beda: “turn down” ngecilin, “turn up” ngegedein, “turn off” matiin total, “turn over” ngebalik.",
         "memory": "Kegedean suaranya? “Turn it down”. Ada “a little”, berarti bukan “off”.",
-        "avoid": "Hafalin tiap “turn + partikel” sebagai kosakata sendiri. Cek juga petunjuk bertingkat kayak “a little” — itu nyingkirin partikel total kayak “off”."
+        "avoid": "Hafalin tiap “turn + partikel” sebagai kosakata sendiri. Cek juga petunjuk bertingkat kayak “a little”; itu nyingkirin partikel total kayak “off”."
       }
     },
     {
@@ -6529,13 +6529,13 @@
           "text": "old too",
           "misconception": "scrambling the word order and attaching 'too' after the adjective as if it worked like 'enough'",
           "whyFailsId": "“too” wajib di depan kata sifatnya; ditaruh di belakang, polanya rusak.",
-          "misconceptionId": "urutan katanya diacak — “too” ditempel di belakang kayak aturan “enough”."
+          "misconceptionId": "urutan katanya diacak: “too” ditempel di belakang kayak aturan “enough”."
         }
       ],
       "explain": {
         "why": "“Isn't old enough to watch” pakai pola kata sifat + “enough” + bentuk “to”. Umurnya belum nyampe syarat buat nonton film itu.",
         "rule": "Kata sifat + “enough” + bentuk “to” berarti kecukupan: “old enough to watch”. “Too” + kata sifat + bentuk “to” berarti kelebihan. “Enough” di belakang kata sifat, “too” di depannya.",
-        "memory": "“Old enough”, tapi “too young” — “enough” di belakang, “too” di depan.",
+        "memory": "“Old enough”, tapi “too young”: “enough” di belakang, “too” di depan.",
         "avoid": "Ingat aturan cerminnya: “too” jalan di depan kata sifat, “enough” jalan di belakangnya. Habis itu baru “to” + kata kerja."
       }
     },
@@ -6574,7 +6574,7 @@
         "why": "“Coffee” di sini zat yang nggak dihitung satu-satu. Bentuk perbandingan jumlah buat benda begitu ya “less”: drink less coffee.",
         "rule": "“Less” + benda yang nggak bisa dihitung satu-satu, kayak “less coffee” atau “less time”. “Fewer” + benda jamak terhitung, kayak “fewer cups”. Jangan ketuker dua arah.",
         "memory": "Zat yang dituang pakai “less”; barang yang dihitung pakai “fewer”.",
-        "avoid": "Uji bendanya: bisa nggak bilang “satu kopi, dua kopi” dalam makna ini? Buat zat yang diminum, nggak bisa — jadi pakai “less”."
+        "avoid": "Uji bendanya: bisa nggak bilang “satu kopi, dua kopi” dalam makna ini? Buat zat yang diminum, nggak bisa, jadi pakai “less”."
       }
     },
     {
@@ -6582,7 +6582,7 @@
       "templateId": "QN-038",
       "skill": "agreement_structures_so_do_i_neither_do_i",
       "level": "B1",
-      "sentence": "A: 'I've already seen that film twice.' B: '___ I — it's brilliant.'",
+      "sentence": "A: 'I've already seen that film twice.' B: '___ I. It's brilliant.'",
       "blank": {
         "answer": "So have",
         "alternates": [],
@@ -6611,7 +6611,7 @@
       "explain": {
         "why": "Kalimat “A” positif dan pakai kata bantu “have” di “I've seen”. Jadi persetujuannya majuin kata bantu yang sama: “So have I”.",
         "rule": "“So” atau “Neither” + kata bantu + subjek: kutubnya ngikutin kalimat asli (“so” positif, “neither” negatif), dan kata bantunya harus niru yang dipakai kalimat itu, entah “have”, “do”, “be”, atau modal.",
-        "memory": "“I've seen” dibalas “So HAVE I” — salin kata bantunya, jangan otomatis “do”.",
+        "memory": "“I've seen” dibalas “So HAVE I”: salin kata bantunya, jangan otomatis “do”.",
         "avoid": "Garisbawahi kata bantu di kalimat penutur pertama, terus salin persis kata bantu itu di belakang “so” atau “neither”."
       }
     },
@@ -6904,7 +6904,7 @@
       "templateId": "GI-010",
       "skill": "verb_pattern_meaning_change_stop",
       "level": "B2",
-      "sentence": "After the doctor's warning, he stopped ____ completely — he hasn't touched a cigarette since.",
+      "sentence": "After the doctor's warning, he stopped ____ completely. He hasn't touched a cigarette since.",
       "blank": {
         "answer": "smoking",
         "alternates": [],
@@ -6980,11 +6980,11 @@
       "templateId": "TA-019",
       "skill": "present_perfect_continuous_vs_present_perfect_simple",
       "level": "B2",
-      "sentence": "Her hands are covered in flour — she ___ bread all afternoon, and the first batch still isn't in the oven.",
+      "sentence": "Her hands are covered in flour. She ___ bread all afternoon, and the first batch still isn't in the oven.",
       "blank": {
         "answer": "has been baking",
         "alternates": [],
-        "position": 37
+        "position": 36
       },
       "distractors": [
         {
@@ -7056,7 +7056,7 @@
       "templateId": "MO-016",
       "skill": "deduction_past_must_have_vs_cant_have",
       "level": "B2",
-      "sentence": "Anna ___ taken the 7:40 train — I stood on that platform the whole time and never saw her.",
+      "sentence": "Anna ___ taken the 7:40 train. I stood on that platform the whole time and never saw her.",
       "blank": {
         "answer": "can't have",
         "alternates": [],
@@ -7208,11 +7208,11 @@
       "templateId": "MO-017",
       "skill": "past_regret_should_have_vs_shouldnt_have",
       "level": "B2",
-      "sentence": "The client is angry — we ___ them about the delay, but we kept quiet.",
+      "sentence": "The client is angry. We ___ them about the delay, but we kept quiet.",
       "blank": {
         "answer": "should have warned",
         "alternates": [],
-        "position": 25
+        "position": 24
       },
       "distractors": [
         {
@@ -7360,7 +7360,7 @@
       "templateId": "MO-018",
       "skill": "modal_of_criticism_should_have_vs_could_have_contrast",
       "level": "B2",
-      "sentence": "We took the bus to the airport, but we ____ a taxi — either way was fine.",
+      "sentence": "We took the bus to the airport, but we ____ a taxi. Either way was fine.",
       "blank": {
         "answer": "could have taken",
         "alternates": [],
@@ -7408,7 +7408,7 @@
         {
           "text": "provided that",
           "misconception": "Uses a positive required-condition connector where a negative exception is meant.",
-          "whyFailsId": "“provided that” malah bikin berangkat sekarang jadi syarat buat ketinggalan kereta — kebalikan dari maksud peringatannya.",
+          "whyFailsId": "“provided that” malah bikin berangkat sekarang jadi syarat buat ketinggalan kereta, kebalikan dari maksud peringatannya.",
           "misconceptionId": "penghubung syarat positif dipakai padahal yang dimaksud kekecualian negatif."
         },
         {
@@ -7427,7 +7427,7 @@
       "explain": {
         "why": "“Unless you leave right now” berarti kecuali kalau kamu berangkat sekarang. Berangkat sekarang itu satu-satunya jalan biar nggak ketinggalan kereta, pas sama peringatannya.",
         "rule": "Unless berarti kecuali kalau, alias kekecualian negatif. Provided that dan as long as nyatain syarat positif yang wajib dipenuhi. Arah logikanya berlawanan.",
-        "memory": "Unless = kecuali kalau — satu-satunya pintu keluar dari hasil buruk.",
+        "memory": "Unless = kecuali kalau: satu-satunya pintu keluar dari hasil buruk.",
         "avoid": "Coba parafrase: kalau “kecuali kalau” bikin kalimatnya masuk akal, jawabannya unless. Kalau “cuma kalau” yang pas, pakai provided that atau as long as."
       }
     },
@@ -7503,7 +7503,7 @@
       "explain": {
         "why": "“Denied taking” pakai pola tetap deny + bentuk -ing: tindakan yang dibantah langsung nempel sebagai bentuk -ing, tanpa kata depan dan tanpa “to”.",
         "rule": "Deny + bentuk -ing langsung tanpa kata depan; apologize for + bentuk -ing pakai kata depan dulu; admit + bentuk -ing langsung. Tiap kata kerja pelapor ngunci polanya sendiri.",
-        "memory": "Deny + bentuk -ing langsung — tanpa “to”, tanpa “for”.",
+        "memory": "Deny + bentuk -ing langsung: tanpa “to”, tanpa “for”.",
         "avoid": "Hafalin tiap kata kerja pelapor bareng polanya sebagai satu paket: deny doing, admit doing, apologize FOR doing."
       }
     },
@@ -7693,7 +7693,7 @@
       "explain": {
         "why": "“Some of which” madukan kata jumlah sama kata penghubung buat benda, “which”, buat nunjuk balik ke “paintings” di anak kalimat penjelas tambahan.",
         "rule": "Di pola kata jumlah + of + kata penghubung, kata penghubungnya harus cocok sama yang ditunjuk: which buat benda (some of which), whom buat orang (many of whom).",
-        "memory": "Lukisan, buku, ide — “some of WHICH”; relawan, murid — “many of WHOM”.",
+        "memory": "Lukisan, buku, ide: “some of WHICH”; relawan, murid: “many of WHOM”.",
         "avoid": "Cek dulu anak kalimatnya nunjuk balik ke apa: benda pakai which, orang pakai whom. Terus jaga urutannya: kata jumlah + of + kata penghubung."
       }
     },
@@ -7718,7 +7718,7 @@
         {
           "text": "more cheaper",
           "misconception": "doubles the comparative marking by putting 'more' before an adjective already ending in '-er'",
-          "whyFailsId": "“More cheaper” nandain perbandingan dua kali — “more” dan “-er” kerjaannya sama, jadi cukup “cheaper” aja.",
+          "whyFailsId": "“More cheaper” nandain perbandingan dua kali: “more” dan “-er” kerjaannya sama, jadi cukup “cheaper” aja.",
           "misconceptionId": "komparatifnya ditandain dobel: “more” ditumpuk di depan kata yang udah ber-“-er”."
         },
         {
@@ -7740,7 +7740,7 @@
       "templateId": "A1-022",
       "skill": "adverb_of_manner_ly_vs_adjective_after_verb",
       "level": "A2",
-      "sentence": "Please carry the glasses ___ — they break easily.",
+      "sentence": "Please carry the glasses ___. They break easily.",
       "blank": {
         "answer": "carefully",
         "alternates": [
@@ -7812,7 +7812,7 @@
       "explain": {
         "why": "“Water” nggak bisa dihitung satu-satu dan nggak ada bentuk jamaknya di sini, jadi nanyanya pakai “How much”.",
         "rule": "“How much” buat nomina tak tercacah; “How many” buat nomina jamak tercacah: “How much water”, “How many bottles”.",
-        "memory": "“How much water, how many bottles” — nominanya yang nentuin kata tanyanya.",
+        "memory": "“How much water, how many bottles”: nominanya yang nentuin kata tanyanya.",
         "avoid": "Lihat nominanya dulu: kalau nggak bisa dihitung satu-satu, tanyanya pakai “How much”."
       }
     },
@@ -7821,14 +7821,14 @@
       "templateId": "A1-024",
       "skill": "indefinite_compounds_something_anything_nothing",
       "level": "A2",
-      "sentence": "The fridge was empty — there was ___ inside at all.",
+      "sentence": "The fridge was empty. There was ___ inside at all.",
       "blank": {
         "answer": "nothing",
         "alternates": [
           "no food",
           "not a thing"
         ],
-        "position": 33
+        "position": 32
       },
       "distractors": [
         {
@@ -7887,15 +7887,15 @@
         {
           "text": "so that",
           "misconception": "uses the purpose connector 'so that' where a plain reason connector is needed",
-          "whyFailsId": "“So that” ngumumin tujuan yang mau dicapai Dewi, padahal capek banget itu bukan tujuannya — itu alasannya, jadi klausanya butuh “because”.",
+          "whyFailsId": "“So that” ngumumin tujuan yang mau dicapai Dewi, padahal capek banget itu bukan tujuannya; itu alasannya, jadi klausanya butuh “because”.",
           "misconceptionId": "“so that” yang buat tujuan dipasang ke klausa alasan."
         }
       ],
       "explain": {
         "why": "“She was very tired after work” jelasin kenapa Dewi tidur cepet, dan klausa alasan dibukanya pakai “because”.",
         "rule": "“Because” buat alasan; “so” buat akibat: alasan + “so” + akibat, atau akibat + “because” + alasan. Pakai salah satunya aja per kalimat.",
-        "memory": "Alasan dapet “because”, akibat dapet “so” — pilih satu, jangan dua-duanya.",
-        "avoid": "Tanya klausa mana yang jawab “kenapa?” — klausa itu mulainya pakai “because”; klausa hasilnya yang dapet “so”."
+        "memory": "Alasan dapet “because”, akibat dapet “so”: pilih satu, jangan dua-duanya.",
+        "avoid": "Tanya klausa mana yang jawab “kenapa?”: klausa itu mulainya pakai “because”; klausa hasilnya yang dapet “so”."
       }
     },
     {
@@ -7913,19 +7913,19 @@
         {
           "text": "already",
           "misconception": "puts 'already' at the end of a negative statement where 'yet' belongs",
-          "whyFailsId": "“Hasn't finished her homework already” tabrakan: “already” bilang udah selesai, “hasn't” bilang belum — kalimat negatif biasa nutupnya pakai “yet”.",
+          "whyFailsId": "“Hasn't finished her homework already” tabrakan: “already” bilang udah selesai, “hasn't” bilang belum; kalimat negatif biasa nutupnya pakai “yet”.",
           "misconceptionId": "“already” ditaruh di ujung kalimat negatif yang harusnya ditutup “yet”."
         },
         {
           "text": "just",
           "misconception": "drags 'just' to the end of the clause instead of mid-position between the auxiliary and the participle",
-          "whyFailsId": "“Just” butuh posisi tengah — “has just finished” — jadi kalau diparkir di ujung klausa negatif ini dia nggak bisa nempel ke kata kerjanya.",
+          "whyFailsId": "“Just” butuh posisi tengah (“has just finished”), jadi kalau diparkir di ujung klausa negatif ini dia nggak bisa nempel ke kata kerjanya.",
           "misconceptionId": "“just” diseret ke ujung klausa, padahal tempatnya di tengah antara kata bantu dan participle."
         },
         {
           "text": "still",
           "misconception": "parks 'still' at the end of a negative clause instead of before the auxiliary",
-          "whyFailsId": "“Still” harus berdiri sebelum kata bantu negatif — “still hasn't finished”; kalau slotnya di ujung klausa, bahasa Inggris gantinya “yet”.",
+          "whyFailsId": "“Still” harus berdiri sebelum kata bantu negatif (“still hasn't finished”); kalau slotnya di ujung klausa, bahasa Inggris gantinya “yet”.",
           "misconceptionId": "“still” diparkir di ujung kalimat negatif, padahal tempatnya sebelum kata bantu."
         }
       ],
@@ -7941,11 +7941,11 @@
       "templateId": "b6_001",
       "skill": "reflexive_pronouns_myself_vs_each_other",
       "level": "B1",
-      "sentence": "Nobody helped me — I taught ___ to swim by watching videos.",
+      "sentence": "Nobody helped me. I taught ___ to swim by watching videos.",
       "blank": {
         "answer": "myself",
         "alternates": [],
-        "position": 28
+        "position": 27
       },
       "distractors": [
         {
@@ -7970,7 +7970,7 @@
       "explain": {
         "why": "Subjek “I” dan objeknya orang yang sama, jadi objeknya harus refleksif yang cocok: “myself”.",
         "rule": "Kalau subjek dan objek orangnya sama, pakai refleksif yang seiring sama subjeknya: “I” → “myself”, “he” → “himself”, “we” → “ourselves”. “Each other” butuh dua orang atau lebih yang saling.",
-        "memory": "“I” ngaca dan lihat “myself” — bukan “me”, bukan “-self” punya orang lain.",
+        "memory": "“I” ngaca dan lihat “myself”: bukan “me”, bukan “-self” punya orang lain.",
         "avoid": "Cocokin dulu objek ke subjek: orangnya sama berarti bentuk “-self”, dan bentuk “-self”-nya harus ngikutin orang si subjek."
       }
     },
@@ -7989,7 +7989,7 @@
         {
           "text": "it",
           "misconception": "uses definite 'it' after 'a new' where the indefinite substitute 'one' is needed",
-          "whyFailsId": "“A new it” nggak jalan: “it” nunjuk persis kamera lama, sementara “a new” ngenalin kamera lain yang belum jelas — slot itu jatahnya “one”.",
+          "whyFailsId": "“A new it” nggak jalan: “it” nunjuk persis kamera lama, sementara “a new” ngenalin kamera lain yang belum jelas; slot itu jatahnya “one”.",
           "misconceptionId": "“it” yang definit dipasang sesudah “a new”, padahal slotnya minta pengganti tak tentu “one”."
         },
         {
@@ -8001,7 +8001,7 @@
         {
           "text": "camera one",
           "misconception": "repeats the replaced noun and stacks the substitute 'one' after it",
-          "whyFailsId": "“A new camera one” nyebut bendanya dua kali — sekali “camera”, sekali pengganti “one”; bahasa Inggris cuma pakai salah satu, nomina atau “one”.",
+          "whyFailsId": "“A new camera one” nyebut bendanya dua kali: sekali “camera”, sekali pengganti “one”; bahasa Inggris cuma pakai salah satu, nomina atau “one”.",
           "misconceptionId": "nominanya diulang terus masih ditumpuk lagi sama pengganti “one”."
         }
       ],
@@ -8052,7 +8052,7 @@
       "explain": {
         "why": "Yang bikin kesal itu kelakuan berulang orang lain yang bisa dia ubah sendiri, dan bingkainya memang “wish + subjek + would + kata dasar”: “I wish he would stop”.",
         "rule": "Pakai “wish + would” buat ngeluh soal kebiasaan orang lain yang kamu pengin berubah; “wish + past simple” buat keadaan, dan “I wish I would” nggak ada karena tindakanmu sendiri kamu yang pegang kendalinya.",
-        "memory": "Kebiasaan nyebelin? “I wish they would stop” — “would” buat yang disengaja.",
+        "memory": "Kebiasaan nyebelin? “I wish they would stop”: “would” buat yang disengaja.",
         "avoid": "Kalau yang bikin sebal itu kelakuan yang diulang-ulang orang lain, ambil “wish + would”; simpan “wish + past simple” buat situasi, bukan perilaku."
       }
     },
@@ -8131,7 +8131,7 @@
         "why": "“Would rather” nerimanya kata dasar polos, dan belahan “than”-nya udah nunjukin itu (“than join”), jadi isiannya harus bentuk polos yang serupa: “stay”.",
         "rule": "“Would rather + kata dasar polos (+ than + kata dasar polos)” nyatain pilihan antar tindakan; “prefer” itu pola yang pakai “to + kata kerja” atau -ing.",
         "memory": "“Rather” anti sama “to”: yang benar “would rather stay”, bukan “would rather to stay”.",
-        "avoid": "Dengar “'d rather”? Bikin kata kerjanya polos — dan lirik belahan “than”-nya, di situ kelihatan bentuk polos yang harus dicocokin."
+        "avoid": "Dengar “'d rather”? Bikin kata kerjanya polos, dan lirik belahan “than”-nya, di situ kelihatan bentuk polos yang harus dicocokin."
       }
     },
     {
@@ -8182,9 +8182,9 @@
       ],
       "explain": {
         "why": "Jadwal ngomong satu hal, kenyataan ngomong hal lain, dan ekspektasi yang meleset kayak gitu persis kerjaannya “be supposed to”: “The ferry is supposed to leave in ten minutes”.",
-        "rule": "“Be supposed to + kata dasar” ngelaporin apa yang diharapkan aturan, jadwal, atau kesepakatan — dan itu bisa aja nggak kejadian; kata bantu “be”-nya wajib karena “supposed” itu participle.",
+        "rule": "“Be supposed to + kata dasar” ngelaporin apa yang diharapkan aturan, jadwal, atau kesepakatan, dan itu bisa aja nggak kejadian; kata bantu “be”-nya wajib karena “supposed” itu participle.",
         "memory": "Nggak ada “be”, nggak ada “supposed to”: selalu “is/was supposed to”.",
-        "avoid": "Jangan pernah biarin “supposed to” berdiri sendiri jadi kata kerja kalimat — selalu las bentuk “be” di depannya."
+        "avoid": "Jangan pernah biarin “supposed to” berdiri sendiri jadi kata kerja kalimat; selalu pasang bentuk “be” di depannya."
       }
     },
     {
@@ -8263,10 +8263,10 @@
         }
       ],
       "explain": {
-        "why": "Kalimatnya terang-terangan nyangkal perbandingannya — saldo banknya nunjukin dia bukan jutawan — jadi “as if” pakai past tak nyata: “as if he were a millionaire”.",
+        "why": "Kalimatnya terang-terangan nyangkal perbandingannya (saldo banknya nunjukin dia bukan jutawan), jadi “as if” pakai past tak nyata: “as if he were a millionaire”.",
         "rule": "“As if / as though + past simple” nandain perbandingan yang disodorin sebagai tak nyata; bentuk kini sesudah “as if” jatahnya perbandingan yang mungkin beneran terjadi.",
         "memory": "“As if” yang tak nyata jodohnya “were”: “he talks as if he were the boss”.",
-        "avoid": "Kalau kalimatnya sendiri ngasih tahu perbandingannya bohong, geser kata kerja sesudah “as if” ke bentuk lampau — “were” buat “be”."
+        "avoid": "Kalau kalimatnya sendiri ngasih tahu perbandingannya bohong, geser kata kerja sesudah “as if” ke bentuk lampau: “were” buat “be”."
       }
     },
     {
@@ -8274,7 +8274,7 @@
       "templateId": "MO-013",
       "skill": "neednt_have_vs_didnt_need_to",
       "level": "C1",
-      "sentence": "You ___ printed the whole report — the committee reads everything on screen these days.",
+      "sentence": "You ___ printed the whole report. The committee reads everything on screen these days.",
       "blank": {
         "answer": "needn't have",
         "alternates": [],
@@ -8386,7 +8386,7 @@
       "explain": {
         "why": "Cuma “however” yang bisa berdiri langsung di depan adjektiva atau adverbia buat buka klausa konsesif: “However carefully you word the email” artinya “sehati-hati apa pun”.",
         "rule": "“However + adjektiva/adverbia + subjek + kata kerja” ngakuin bahwa sekuat apa pun kualitasnya, hasilnya nggak berubah; “whatever” jodohnya kata benda, dan “no matter” butuh kata tanya kayak “how” sebelum adjektiva atau adverbianya.",
-        "memory": "“However hard, however carefully” — adverbia itu punyanya “however”.",
+        "memory": "“However hard, however carefully”: adverbia itu punyanya “however”.",
         "avoid": "Kalau kata persis berikutnya adjektiva atau adverbia, pembukanya harus “however”; kasih “whatever” kata benda dan kasih “no matter” si “how”-nya."
       }
     },
@@ -8462,9 +8462,9 @@
         }
       ],
       "explain": {
-        "why": "“But for the surgeon's quick thinking” = “kalau bukan karena kesigapan si dokter bedah” — satu frasa, satu pengandaian utuh, cocok sama “would not have survived”.",
+        "why": "“But for the surgeon's quick thinking” = “kalau bukan karena kesigapan si dokter bedah”; satu frasa, satu pengandaian utuh, cocok sama “would not have survived”.",
         "rule": "“But for” + frasa benda nyatain pengandaian negatif yang nggak kejadian; pasangannya “would/would have” di klausa utama.",
-        "memory": "“But for you” = “kalau bukan karena kamu” — frasa kecil, pengandaian utuh.",
+        "memory": "“But for you” = “kalau bukan karena kamu”: frasa kecil, pengandaian utuh.",
         "avoid": "Kalau setelah titik kosong cuma ada frasa benda dan klausa utamanya pakai “would (not) have”, cek: maksudnya “kalau bukan karena”? Itu jatahnya “but for”."
       }
     },
@@ -8495,7 +8495,7 @@
         {
           "text": "isn't dare",
           "misconception": "treats 'dare' as an adjective and negates it with 'be'",
-          "whyFailsId": "“dare” itu kata kerja, bukan kata sifat; “be” nggak bisa jadi negatornya — yang bener “daren't tell” atau “doesn't dare (to) tell”.",
+          "whyFailsId": "“dare” itu kata kerja, bukan kata sifat; “be” nggak bisa jadi negatornya; yang bener “daren't tell” atau “doesn't dare (to) tell”.",
           "misconceptionId": "“dare” dianggap kata sifat, jadi dinegasi pakai “be” kayak “is not brave”."
         }
       ],
@@ -8503,7 +8503,7 @@
         "why": "“She daren't tell” = dia nggak berani cerita; “daren't” bawa negasi sendiri dan langsung ketemu “tell” bentuk dasar.",
         "rule": "Modal “daren't” kelakuannya kayak “can't”: negasinya udah nempel, diikuti kata kerja dasar tanpa “to”; alternatif sahnya “doesn't dare (to) tell”.",
         "memory": "“daren't” satu keluarga sama “can't”: tanpa “to”, tanpa “do”, negasinya udah nempel.",
-        "avoid": "Pas mau negasi “dare”, pilih satu sistem: modal (“daren't” + kata dasar) atau biasa (“doesn't dare (to)”) — jangan dicampur, jangan dilepas dua-duanya."
+        "avoid": "Pas mau negasi “dare”, pilih satu sistem: modal (“daren't” + kata dasar) atau biasa (“doesn't dare (to)”); jangan dicampur, jangan dilepas dua-duanya."
       }
     },
     {
@@ -8521,7 +8521,7 @@
         {
           "text": "him to release",
           "misconception": "inserts an infinitive after the preposition 'to' of 'object to'",
-          "whyFailsId": "“to” di “object to” itu preposisi, bukan penanda infinitif; setelahnya cuma bentuk -ing yang boleh — “to release” nggak punya slot di situ.",
+          "whyFailsId": "“to” di “object to” itu preposisi, bukan penanda infinitif; setelahnya cuma bentuk -ing yang boleh; “to release” nggak punya slot di situ.",
           "misconceptionId": "setelah “objected to”, malah dipasang infinitif “to release”."
         },
         {
@@ -8540,7 +8540,7 @@
       "explain": {
         "why": "“objected to his releasing the findings” = keberatan atas tindakan dia ngerilis temuan; “his” nandain pelakunya, “releasing” bentuk benda dari kata kerjanya.",
         "rule": "Setelah preposisi (“object to”, “insist on”), pelaku gerund ditulis posesif di register formal: “his releasing”, “their being late”.",
-        "memory": "“They objected to my being late” — posesif + -ing, formalnya begitu.",
+        "memory": "“They objected to my being late”: posesif + -ing, formalnya begitu.",
         "avoid": "Habis “object to / insist on / approve of”, cek dua hal: kata kerjanya udah jadi -ing? pelakunya udah posesif (atau minimal bentuk objek)? “he” nggak pernah boleh."
       }
     },
@@ -8576,9 +8576,9 @@
         }
       ],
       "explain": {
-        "why": "“Barring any further objections” = kalau nggak ada keberatan lagi — nyambung sama lanjutan kalimatnya: kalau ada keberatan, deal-nya mundur ke Maret.",
+        "why": "“Barring any further objections” = kalau nggak ada keberatan lagi; nyambung sama lanjutan kalimatnya: kalau ada keberatan, deal-nya mundur ke Maret.",
         "rule": "“Barring + frasa benda” = “kalau X nggak muncul”; beda sama “despite” (tetap jalan walau X ada) dan “unless” (wajib bawa klausa).",
-        "memory": "“Barring surprises” = asal nggak ada kejutan — kejutannya dipagerin di luar pintu.",
+        "memory": "“Barring surprises” = asal nggak ada kejutan: kejutannya dipagerin di luar pintu.",
         "avoid": "Tanya dulu: kalimatnya bilang “tetap jalan walaupun ada” atau “jalan asal nggak ada”? Yang kedua jatahnya “barring”."
       }
     },
@@ -8616,8 +8616,8 @@
       "explain": {
         "why": "“all the more impressive because she trained without a coach” = makin mengesankan justru karena dia latihan tanpa pelatih; “more” ngasih bentuk komparatif yang diminta bingkainya.",
         "rule": "“All the + komparatif (+ because/for + alasan)” = makin terasa justru karena alasannya; yang boleh masuk cuma bentuk komparatif (“more”, “less”, “better”).",
-        "memory": "“All the more X because Y” — gara-gara Y, X-nya makin nambah.",
-        "avoid": "Ketemu “all the ___” plus alasan? Itu bukan superlatif — isi pakai komparatif: “all the more / all the better”."
+        "memory": "“All the more X because Y”: gara-gara Y, X-nya makin nambah.",
+        "avoid": "Ketemu “all the ___” plus alasan? Itu bukan superlatif; isi pakai komparatif: “all the more / all the better”."
       }
     },
     {
@@ -8654,7 +8654,7 @@
       "explain": {
         "why": "“Not wanting to cause a scene” = karena dia nggak pengin bikin ribut; “not” di depan “wanting” negasiin seluruh klausa partisipnya.",
         "rule": "Klausa non-finit dinegasi dengan “not” tepat sebelum bentuk -ing/-ed: “Not wanting...”, “Not having received...”.",
-        "memory": "“Not wanting to intrude, she left” — “not” selalu duluan, baru bentuk -ing.",
+        "memory": "“Not wanting to intrude, she left”: “not” selalu duluan, baru bentuk -ing.",
         "avoid": "Mau negasi klausa -ing? Rumusnya satu: “not” + bentuk -ing. Jangan ganti jadi “no”, jangan panggil “didn't”."
       }
     },
@@ -8691,15 +8691,15 @@
         {
           "text": "even",
           "misconception": "confuses focus particle 'even' with concessive 'even if' or 'even though'",
-          "whyFailsId": "“even” polos cuma nambahin item paling ekstrem di skala yang sama (“cheap, even free”); dia nggak bisa ngakuin kekurangan, jadi kontras “masih tahap awal”-nya nggak tersampaikan — butuh “even if” + klausa, atau “albeit”.",
+          "whyFailsId": "“even” polos cuma nambahin item paling ekstrem di skala yang sama (“cheap, even free”); dia nggak bisa ngakuin kekurangan, jadi kontras “masih tahap awal”-nya nggak tersampaikan: butuh “even if” + klausa, atau “albeit”.",
           "misconceptionId": "partikel penegas “even” (bahkan) ketuker sama konsesi “even if/though”."
         }
       ],
       "explain": {
-        "why": "“promising, albeit preliminary” = menjanjikan, walau masih tahap awal — “albeit” memang dirancang buat konsesi sependek ini, tanpa kata kerja.",
+        "why": "“promising, albeit preliminary” = menjanjikan, walau masih tahap awal; “albeit” memang dirancang buat konsesi sependek ini, tanpa kata kerja.",
         "rule": "“Albeit + kata sifat/adverbia/frasa preposisi” nyisipin konsesi tanpa klausa finit: “encouraging, albeit preliminary”; “albeit” nggak pernah bawa klausa berkata-kerja.",
-        "memory": "“Albeit” = “although it be” — konsesi dipadetin jadi satu kata, tanpa kata kerja.",
-        "avoid": "Konsesinya cuma satu kata sifat? Pakai “albeit” (atau “though”); jangan “despite” — dia minta kata benda, bukan kata sifat."
+        "memory": "“Albeit” = “although it be”: konsesi dipadetin jadi satu kata, tanpa kata kerja.",
+        "avoid": "Konsesinya cuma satu kata sifat? Pakai “albeit” (atau “though”); jangan “despite”, karena dia minta kata benda, bukan kata sifat."
       }
     },
     {
@@ -9268,7 +9268,7 @@
       "explain": {
         "why": "“Know” ngegambarin keadaan, bukan aksi, jadi walau ada “right now” tetap present simple: don't know.",
         "rule": "Kata kerja keadaan (know, like, want, belong) biasanya tetap present simple, bukan bentuk -ing.",
-        "memory": "Know, like, want — tanpa -ing.",
+        "memory": "Know, like, want: tanpa -ing.",
         "avoid": "“Right now” nggak otomatis berarti -ing. Cek dulu kata kerjanya keadaan atau bukan."
       }
     },
@@ -9420,7 +9420,7 @@
       "explain": {
         "why": "Di pertanyaan yang dilaporin, subjek duluan baru kata kerja, dan bentuk waktunya mundur: what time the shop opened.",
         "rule": "Pertanyaan wh- yang dilaporin: kata tanya + subjek + kata kerja (tanpa do/does/did), bentuk waktunya mundur sesudah kata pelapor lampau.",
-        "memory": "Asked what time the shop opened — tanpa “did”.",
+        "memory": "Asked what time the shop opened: tanpa “did”.",
         "avoid": "Buang do/does/did, taruh subjek duluan, lalu geser kata kerjanya satu langkah ke lampau."
       }
     },
@@ -9505,11 +9505,11 @@
       "templateId": "TA-205",
       "skill": "present_perfect_just_already_yet_placement",
       "level": "B1",
-      "sentence": "You don't need to wash the dishes — I ___ them.",
+      "sentence": "You don't need to wash the dishes. I ___ them.",
       "blank": {
         "answer": "have already washed",
         "alternates": [],
-        "position": 38
+        "position": 37
       },
       "distractors": [
         {
@@ -10216,7 +10216,7 @@
         }
       ],
       "explain": {
-        "why": "“The film” itu benda dan objek dari “watched”, jadi “that” pas — bahkan bisa dibuang.",
+        "why": "“The film” itu benda dan objek dari “watched”, jadi “that” pas, bahkan bisa dibuang.",
         "rule": "Kata ganti relatif objek buat benda: that / which, atau nggak ada sama sekali: the film (that) we watched.",
         "memory": "Kata gantinya bisa hilang: “the film (that) we watched”.",
         "avoid": "Coba hapus kata gantinya. Kalau kalimatnya masih jalan, “that” atau kosong yang bener."
@@ -10255,7 +10255,7 @@
       ],
       "explain": {
         "why": "“Easier” bentuk banding, jadi penguatnya penguat bentuk banding: a lot easier.",
-        "rule": "Di depan bentuk banding pakai much, far, a lot, atau a bit — jangan very.",
+        "rule": "Di depan bentuk banding pakai much, far, a lot, atau a bit; jangan very.",
         "memory": "Very easy, tapi a lot easier.",
         "avoid": "Lihat -er atau “more”? Ambil much / far / a lot."
       }
@@ -10661,7 +10661,7 @@
         {
           "text": "were able to catch",
           "misconception": "Confuses expressing a past possibility with reporting a completed achieved ability.",
-          "whyFailsId": "“were able to” laporin kita beneran ngejar keretanya — padahal nggak.",
+          "whyFailsId": "“were able to” laporin kita beneran ngejar keretanya, padahal nggak.",
           "misconceptionId": "nyatain kemungkinan lampau ketuker sama laporan kemampuan yang kelaksana."
         },
         {
@@ -11093,7 +11093,7 @@
         "why": "Di gaya formal “if” hilang dan “had” pindah ke depan subjek: Had we received the warning.",
         "rule": "Inversi formal: Had + subjek + past participle, … would have + past participle.",
         "memory": "If we had → Had we.",
-        "avoid": "Hapus “if”, lalu tuker posisi subjek sama “had” — yang lain nggak pindah."
+        "avoid": "Hapus “if”, lalu tuker posisi subjek sama “had”; yang lain nggak pindah."
       }
     },
     {
