@@ -6,7 +6,6 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from db import db, ensure_indexes
-import auth
 from auth import router as auth_router, owner_router
 from curriculum import router as curriculum_router
 from questions import router as questions_router
@@ -68,7 +67,6 @@ async def health():
 @app.on_event("startup")
 async def startup():
     await ensure_indexes()
-    await auth.seed_owner()
     if await db.curriculum_nodes.count_documents({}) == 0:
         await seed_curriculum()
         await seed_questions()

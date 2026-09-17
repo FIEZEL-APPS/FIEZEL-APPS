@@ -95,6 +95,11 @@ export const ROLE_CAPABILITIES = Object.freeze({
 export const ROUTE_CAPABILITY = Object.freeze({
   '/api/account/me': CAP.LEARNER_SELF,
   '/api/account/logout': CAP.LEARNER_SELF,
+  /* Tiket kurikulum hanya menyatakan "ini aku, dan ini peranku menurut D1" —
+     kapabilitasnya karena itu LEARNER_SELF, kapabilitas yang dipegang SETIAP peran
+     yang sudah masuk. Guru mendapat tiket berperan guru, murid berperan murid; yang
+     membedakan izin di seberang sana adalah isi tiketnya, bukan hak memintanya. */
+  '/api/account/curriculum-ticket': CAP.LEARNER_SELF,
   '/api/notify/list': CAP.NOTIFY_SELF,
   '/api/notify/read': CAP.NOTIFY_SELF,
   '/api/notify/push/subscribe': CAP.NOTIFY_SELF,

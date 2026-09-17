@@ -14,22 +14,17 @@
   var CONF = [['yakin', 'Yakin'], ['lumayan', 'Lumayan yakin'], ['tidak', 'Tidak yakin']];
   var PHASES = ['warm-up', 'example', 'practice', 'challenge', 'transfer', 'check'];
 
-  // ---------------- boot: tangani callback Google lebih dulu ----------------
+  // ---------------- boot ----------------
   function boot() {
-    var hash = location.hash || '';
-    if (hash.indexOf('session_id=') !== -1) {
-      var sid = decodeURIComponent(hash.split('session_id=')[1].split('&')[0]);
-      app.innerHTML = '<div class="auth-wrap"><div class="card">Menyiapkan akunmu…</div></div>';
-      var code = '';
-      try { code = sessionStorage.getItem('fz-join-code') || ''; } catch (_) {}
-      return E.login.googleSession(sid, code).then(function (u) {
-        history.replaceState(null, '', location.pathname);
-        S.user = u; loadToday();
-      }).catch(function (e) { history.replaceState(null, '', location.pathname); renderAuth(e.message); });
-    }
     E.login.me().then(function (u) { S.user = u; loadToday(); }).catch(function () { renderAuth(); });
   }
 
+  /* Murid tidak mendaftar apa pun di sini.
+
+     Layar ini dulu meminta email+sandi (akun ketiga bagi murid yang sudah punya
+     akun KelasKu) atau Google. Keduanya dicabut: identitas datang dari akun
+     KelasKu yang sama, dan satu-satunya yang perlu diketik murid adalah KODE
+     KELAS dari gurunya — itu pun hanya sekali, saat pertama bergabung. */
   function renderAuth(err) {
     app.innerHTML =
       '<div class="auth-wrap"><div class="card ink rise">' +
@@ -37,27 +32,11 @@
       '<h1>Bukan sekadar mengerjakan soal.</h1>' +
       '<p class="muted">Kamu belajar satu kompetensi sampai benar-benar bisa dipakai — dengan jalur yang disesuaikan untukmu.</p>' +
       (err ? '<div class="issue error">' + esc(err) + '</div>' : '') +
-      '<div class="row" style="margin-bottom:14px"><button class="btn sm" data-a="tab" data-t="login" data-testid="tab-login">Masuk</button>' +
-      '<button class="btn sm ghost" data-a="tab" data-t="register" data-testid="tab-register">Daftar</button></div>' +
-      '<div id="authBox">' + (S.authTab === 'register' ? registerForm() : loginForm()) + '</div>' +
-      '<hr style="border:none;border-top:1px solid var(--line);margin:18px 0">' +
-      '<label class="f">Kode kelas dari guru (opsional)<input id="joinCode" placeholder="FZ-XXXXXX" data-testid="join-code"></label>' +
-      '<button class="btn clay" data-a="google" data-testid="google-btn">Masuk dengan Google</button>' +
-      '<p class="muted" style="margin-top:14px;font-size:13px">Guru masuk di <a href="./kurikulum.html">Ruang Guru</a>.</p>' +
+      '<label class="f">Kode kelas dari guru (isi kalau ini pertama kalinya)<input id="joinCode" placeholder="FZ-XXXXXX" data-testid="join-code" autocomplete="off"></label>' +
+      '<button class="btn primary" data-a="login" data-testid="login-btn">Masuk dengan akun KelasKu</button>' +
+      '<p class="muted" style="margin-top:16px;font-size:13px">Belum masuk? Buka <a href="./index.html" data-testid="link-app">aplikasi FIEZEL</a> dulu, lalu kembali ke halaman ini.</p>' +
+      '<p class="muted" style="font-size:13px">Guru masuk di <a href="./kurikulum.html">Ruang Guru</a>.</p>' +
       '</div></div>';
-  }
-
-  function loginForm() {
-    return '<label class="f">Email<input id="em" type="email" data-testid="login-email"></label>' +
-      '<label class="f">Sandi<input id="pw" type="password" data-testid="login-password"></label>' +
-      '<button class="btn primary" data-a="login" data-testid="login-btn">Masuk FIEZEL</button>';
-  }
-  function registerForm() {
-    return '<label class="f">Nama<input id="nm" data-testid="reg-name"></label>' +
-      '<label class="f">Email<input id="em" type="email" data-testid="reg-email"></label>' +
-      '<label class="f">Sandi (min 6)<input id="pw" type="password" data-testid="reg-password"></label>' +
-      '<label class="f">Kode kelas (opsional)<input id="cc" placeholder="FZ-XXXXXX" data-testid="reg-class-code"></label>' +
-      '<button class="btn primary" data-a="register" data-testid="register-btn">Buat akun</button>';
   }
 
   // ---------------- hari ini ----------------
@@ -254,22 +233,11 @@
     var el = ev.target.closest && ev.target.closest('[data-a]');
     if (!el) return;
     var a = el.getAttribute('data-a');
-    if (a === 'tab') { S.authTab = el.getAttribute('data-t'); return renderAuth(); }
     if (a === 'login') {
-      return E.login.studentLogin(val('em'), val('pw')).then(function (u) { S.user = u; loadToday(); })
+      el.disabled = true;
+      el.textContent = 'Menghubungkan ke KelasKu…';
+      return E.login.kelasku(val('joinCode')).then(function (u) { S.user = u; loadToday(); })
         .catch(function (e) { renderAuth(e.message); });
-    }
-    if (a === 'register') {
-      return E.login.studentRegister({ email: val('em'), password: val('pw'), name: val('nm') || 'Murid',
-                                       class_code: val('cc') || null })
-        .then(function (u) { S.user = u; loadToday(); }).catch(function (e) { S.authTab = 'register'; renderAuth(e.message); });
-    }
-    if (a === 'google') {
-      try { sessionStorage.setItem('fz-join-code', val('joinCode') || ''); } catch (_) {}
-      // REMINDER: DO NOT HARDCODE THE URL, OR ADD ANY FALLBACKS OR REDIRECT URLS, THIS BREAKS THE AUTH
-      var redirectUrl = window.location.origin + '/misi.html';
-      window.location.href = 'https://auth.emergentagent.com/?redirect=' + encodeURIComponent(redirectUrl);
-      return;
     }
     if (a === 'logout') return E.login.logout().then(function () { S.user = null; renderAuth(); });
     if (a === 'go-today') { S.view = 'today'; return loadToday(); }

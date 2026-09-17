@@ -264,19 +264,24 @@ cp .env.example .env
 nano .env
 ```
 
-Ketujuhnya **tidak sama daruratnya**. Lima yang pertama menghalangi pemasangan dan
-diblokir `bootstrap.py`; dua yang terakhir hanya mematikan satu fitur dan cuma
-diperingatkan — jadi kamu bisa memasang **hari ini** walau belum punya semuanya:
+Keempatnya menghalangi pemasangan dan diblokir `bootstrap.py`:
 
 | Env | Kalau kosong |
 |---|---|
 | `MONGO_URL`, `DB_NAME` | server mati saat impor — dibaca di tingkat modul `db.py` |
-| `ADMIN_EMAIL`, `ADMIN_PASSWORD` | `bootstrap.py` tidak bisa membuat akun ownermu |
 | `JWT_SECRET` | nol orang bisa login |
-| `OWNER_MASTER_TOKEN` | hanya rute khusus owner yang menolak |
-| `EMERGENT_AUTH_SESSION_URL` | hanya tombol "Masuk dengan Google" yang mati; login email+sandi tetap penuh |
+| `CURRICULUM_TICKET_KEY` | **nol orang bisa masuk** — ini satu-satunya pintu |
+| `CORS_ORIGINS` (opsional) | tidak ada origin lintas-situs yang diizinkan |
 
-Jadi kalau kamu belum punya alamat penukar sesi Google, **kosongkan saja dan lanjut**.
+**`CURRICULUM_TICKET_KEY` harus sama persis dengan nilai di Worker KelasKu**
+(`wrangler secret put CURRICULUM_TICKET_KEY`). Dua nilai yang berbeda berarti setiap
+tiket ditolak, dan penolakannya sengaja tidak menyebut sebabnya — jadi kalau semua
+orang tiba-tiba tidak bisa masuk, ini tempat pertama yang diperiksa.
+
+Empat env lama sudah **tidak dibaca di mana pun** sejak m025-318: `ADMIN_EMAIL`,
+`ADMIN_PASSWORD`, `OWNER_MASTER_TOKEN`, dan `EMERGENT_AUTH_SESSION_URL`. Mesin
+kurikulum tidak menyimpan kata sandi, tidak punya kunci utama owner, dan tidak menukar
+sesi Google sendiri. Siapa yang guru dan siapa yang owner diputuskan KelasKu.
 
 Bangkitkan dua rahasianya dengan:
 
@@ -313,38 +318,27 @@ body   : {"ok":true,"startup_sudah_jalan":false}
 ```
 
 Perhatikan **200 OK**-nya. Itulah yang membuatnya berbahaya: API-nya tampak sehat
-sementara `users.email` dan `attempts.idempotency_key` tidak punya indeks unik
-(MongoDB lalu dengan patuh menerima email ganda dan jawaban ganda — tanpa galat,
-hanya data yang pelan-pelan rusak), akun ownermu tidak pernah lahir, dan
-databasenya kosong.
+sementara `kelasku_tickets.jti` dan `attempts.idempotency_key` tidak punya indeks unik
+(MongoDB lalu dengan patuh menerima tiket yang dipakai ulang dan jawaban ganda — tanpa
+galat, hanya data yang pelan-pelan rusak) dan databasenya kosong.
 
-`bootstrap.py` **aman dijalankan berulang** — termasuk aman untuk sandimu. Jalankan
-lagi setiap kali menaikkan versi yang menambah indeks.
+`bootstrap.py` **aman dijalankan berulang**. Jalankan lagi setiap kali menaikkan versi
+yang menambah indeks.
 
-**Ia TIDAK akan menimpa sandi owner yang sudah ada.** Kalau sandi di database berbeda
-dari `ADMIN_PASSWORD`, ia melaporkannya dan **membiarkannya**:
+**Tidak ada akun owner yang dibuat di sini, dan tidak ada sandi yang bisa dipulihkan.**
+Sejak m025-318 mesin kurikulum tidak menyimpan satu pun kata sandi: peran guru dan owner
+datang dari tiket identitas KelasKu, jadi pemulihan akses dilakukan di dashboard KelasKu —
+satu tempat — lalu berlaku di sini pada tiket berikutnya. Bendera
+`--reset-owner-password` ikut hilang bersama pintunya.
 
-```
-owner     : kamu@contoh.com sudah ada, sandinya BEDA dari .env — DIBIARKAN.
-            Pakai --reset-owner-password kalau memang mau menimpanya.
-```
-
-Itu perbaikan dari review PR #405. Versi pertama selalu menyelaraskan sandi, sehingga
-menjalankan ulang bootstrap untuk urusan indeks akan diam-diam mengembalikan sandimu
-ke nilai basi di `.env`. Sumbernya bahkan lebih luas dari itu: `server.py` memanggil
-`seed_owner()` di **setiap** start, jadi setiap restart uvicorn ikut menimpanya.
-
-**Memulihkan sandi owner yang lupa** — ubah `ADMIN_PASSWORD` di `.env`, lalu:
-
-```bash
-python bootstrap.py --reset-owner-password
-```
+Yang diperiksa bootstrap sebagai gantinya adalah kunci tiketnya: absen atau lebih pendek
+dari 32 karakter = **gagal keras saat pemasangan**, bukan 401 misterius pada guru pertama.
 
 Keluarannya menyebut angka, bukan "selesai":
 
 ```
 indeks    : terpasang
-owner     : kamu@contoh.com (sandi diselaraskan dengan ADMIN_PASSWORD)
+tiket     : kunci KelasKu terpasang (panjang 64)
 kurikulum : disemai (sebelumnya kosong)
 SIAP. curriculum_nodes=731 questions=21
 ```
@@ -391,7 +385,7 @@ data murid ke server pemasang pertama. Jadi sunting berkas yang sudah terunggah 
 | Mati saat start, `KeyError` | ada env wajib yang kosong. Jalankan `python bootstrap.py` — ia menyebutkan nama yang hilang |
 | `/api/health` hidup tapi `curriculum_nodes: 0` | `bootstrap.py` belum dijalankan (lihat langkah 6) |
 | Login owner ditolak | sama — `seed_owner()` ada di dalam bootstrap |
-| Lupa sandi owner | ubah `ADMIN_PASSWORD` di `.env`, lalu `python bootstrap.py --reset-owner-password` |
+| Guru/owner tidak bisa masuk | cocokkan `CURRICULUM_TICKET_KEY` di `.env` dengan `wrangler secret` di Worker KelasKu — dua nilai berbeda menolak setiap tiket |
 | Timeout ke Atlas | IP server belum masuk Network Access Atlas |
 | Konsol di aplikasi tetap mati | `curriculumApiUrl` belum diisi di `public_html/app/core-config.js` |
 | Galat CORS di Console peramban | `CORS_ORIGINS` belum memuat asal aplikasimu persis (skema + host) |

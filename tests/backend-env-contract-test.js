@@ -10,10 +10,12 @@
 // 1. LIFESPAN TIDAK JALAN DI PASSENGER. Passenger berbicara WSGI, jadi a2wsgi
 //    menjembatani ke ASGI — dan a2wsgi tidak menjalankan protokol lifespan sama
 //    sekali. `@app.on_event("startup")` di server.py karena itu dilewati, padahal di
-//    sanalah ensure_indexes(), seed_owner(), dan penyemaian kurikulum tinggal.
+//    sanalah ensure_indexes() dan penyemaian kurikulum tinggal (seed_owner() ikut di
+//    sana sampai m025-318 mencabutnya bersama pintu kata sandi).
 //    Hasil ukur: status 200 OK, body {"startup_sudah_jalan":false}. Tanpa indeks
-//    unik, MongoDB dengan patuh menerima email ganda dan attempt ganda; tanpa
-//    seed_owner owner tidak bisa masuk. Semuanya tanpa satu pun galat.
+//    unik, MongoDB dengan patuh menerima tiket ganda dan attempt ganda — termasuk
+//    tiket KelasKu yang dipakai ulang, karena yang menutup pemakaian ulang justru
+//    indeks unik pada `jti`. Semuanya tanpa satu pun galat.
 //    Penawarnya: backend/bootstrap.py, dijalankan sekali sebagai proses sendiri.
 //
 // 2. CORS BAWAAN "*" BERSAMA allow_credentials=True. Diukur pada starlette 0.37.2
@@ -77,8 +79,14 @@ berkasPy.forEach((b) => {
   while ((m = re.exec(b.kode)) !== null) envWajib.add(m[1]);
 });
 
+/* Ambang turun 5 -> 3 (m025-318). Empat env hilang sekaligus ketika pintu token `FZG-`,
+   email+sandi, dan Google dicabut: ADMIN_EMAIL, ADMIN_PASSWORD, OWNER_MASTER_TOKEN, dan
+   EMERGENT_AUTH_SESSION_URL tidak dibaca di mana pun lagi; CURRICULUM_TICKET_KEY masuk
+   menggantikan sebagiannya. Ambang ini hanya menjaga PEMINDAINYA tetap hidup — ia bukan
+   pernyataan bahwa backend harus punya banyak rahasia. Justru sebaliknya: makin sedikit
+   rahasia yang disimpan mesin kurikulum, makin sedikit yang bisa bocor darinya. */
 test('backend memang menuntut env wajib (pemindainya hidup)', () => {
-  assert.ok(envWajib.size >= 5,
+  assert.ok(envWajib.size >= 3,
     'hanya ' + envWajib.size + ' env wajib terdeteksi; pemindai kemungkinan rusak');
 });
 
@@ -138,12 +146,18 @@ test('bootstrap sekali-jalan ada', () => {
     'sementara API tetap menjawab 200');
 });
 
-test('bootstrap benar-benar mengerjakan KETIGA tugas startup', () => {
+/* DULU TIGA TUGAS, SEKARANG DUA (m025-318). seed_owner() dicabut bersama pintu kata
+   sandi: mesin kurikulum tidak menyimpan kata sandi lagi, jadi tidak ada akun owner yang
+   perlu dibuat — peran owner datang dari tiket KelasKu. Yang menggantikannya di daftar
+   periksa bukan tugas semai, melainkan SATU pemeriksaan yang gagal-keras: kunci tiket
+   yang absen atau terlalu pendek berarti TIDAK ADA yang bisa masuk, dan itu harus
+   terbaca saat pemasangan, bukan sebagai 401 misterius pada guru pertama. */
+test('bootstrap benar-benar mengerjakan tugas startup yang tersisa', () => {
   const boot = kodeSaja(baca('backend/bootstrap.py'));
   const kurang = [];
   if (!/ensure_indexes\s*\(/.test(boot)) kurang.push('ensure_indexes()');
-  if (!/seed_owner\s*\(/.test(boot)) kurang.push('seed_owner()');
   if (!/seed_curriculum\s*\(/.test(boot)) kurang.push('seed_curriculum()');
+  if (!/CURRICULUM_TICKET_KEY/.test(boot)) kurang.push('pemeriksaan CURRICULUM_TICKET_KEY');
   assert.strictEqual(kurang.length, 0,
     'bootstrap.py tidak memanggil: ' + kurang.join(', ') + '. Yang tidak dipanggil di ' +
     'sini TIDAK akan pernah jalan di Passenger, karena lifespan ASGI dilewati diam-diam');

@@ -13,17 +13,17 @@ versi yang menambah indeks:
     cd ~/fiezel-api && source ~/virtualenv/fiezel-api/3.11/bin/activate
     python bootstrap.py
 
-AMAN DIJALANKAN BERULANG, dan sejak review PR #405 itu berlaku juga untuk sandi:
+AMAN DIJALANKAN BERULANG:
   - `create_index` pada indeks yang sudah ada adalah no-op di MongoDB;
-  - `seed_owner()` membuat owner kalau belum ada, tetapi TIDAK menimpa sandi yang
-    sudah ada kecuali diminta tegas dengan `--reset-owner-password`. Versi pertama
-    selalu menimpanya, sehingga menjalankan ulang berkas ini untuk urusan indeks
-    diam-diam mengembalikan sandi owner ke nilai di .env;
+  - tidak ada owner yang disemai. Sejak m025-318 peran owner datang dari tiket KelasKu
+    dan mesin kurikulum tidak menyimpan satu pun kata sandi, jadi seluruh urusan
+    "sandi owner berbeda dari .env" — beserta bendera --reset-owner-password —
+    hilang bersama pintunya;
   - penyemaian kurikulum hanya berjalan kalau koleksinya benar-benar kosong.
 
-MEMULIHKAN SANDI OWNER YANG LUPA: ubah ADMIN_PASSWORD di .env, lalu
-
-    python bootstrap.py --reset-owner-password
+KEHILANGAN AKSES: tidak ada sandi yang bisa dipulihkan di sini. Akses guru dan owner
+dipulihkan di KelasKu (dashboard owner), satu tempat, lalu berlaku di sini pada tiket
+berikutnya.
 
 Keluarannya sengaja menyebut ANGKA, bukan "selesai": pemasangan yang gagal separuh
 harus terbaca dari layar, bukan dari tebakan.
@@ -45,18 +45,24 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 # /google/session benar-benar dipanggil. Diperiksa satu per satu di kode, bukan diduga:
 #
 #   MONGO_URL, DB_NAME          db.py tingkat MODUL  -> server mati saat impor
-#   ADMIN_EMAIL, ADMIN_PASSWORD di dalam seed_owner()-> bootstrap ini butuh
 #   JWT_SECRET                  saat menandatangani  -> tanpa ini TIDAK ADA yang bisa login
-#   OWNER_MASTER_TOKEN          rute khusus owner    -> rute itu saja yang mati
-#   EMERGENT_AUTH_SESSION_URL   rute /google/session -> login Google saja yang mati
-WAJIB = ("MONGO_URL", "DB_NAME", "ADMIN_EMAIL", "ADMIN_PASSWORD", "JWT_SECRET")
+#   CURRICULUM_TICKET_KEY       pembaca tiket KelasKu-> tanpa ini TIDAK ADA yang bisa masuk
+#
+# CURRICULUM_TICKET_KEY masuk daftar WAJIB sejak m025-318, dan bukan sebagai formalitas:
+# sejak pintu token `FZG-`, email+sandi, dan Google dicabut, tiket KelasKu adalah
+# SATU-SATUNYA cara masuk. Nilainya WAJIB sama persis dengan nilai di Worker KelasKu
+# (wrangler secret CURRICULUM_TICKET_KEY) — dua nilai berbeda berarti setiap tiket
+# ditolak, dan pesan penolakannya sengaja tidak menyebut sebabnya.
+#
+# ADMIN_EMAIL/ADMIN_PASSWORD dan OWNER_MASTER_TOKEN TIDAK lagi disebut di mana pun:
+# mesin kurikulum tidak menyimpan kata sandi, dan peran owner datang dari D1 KelasKu.
+WAJIB = ("MONGO_URL", "DB_NAME", "JWT_SECRET", "CURRICULUM_TICKET_KEY")
 
 # Kurang salah satu ini TIDAK menghalangi pemasangan; ia mematikan satu fitur saja.
 # Diperingatkan keras, bukan diblokir — supaya pemasangan tetap bisa jalan hari ini
 # dan pemasang TAHU persis apa yang belum hidup, bukan menemukannya sebagai 500.
 OPSIONAL = {
-    "OWNER_MASTER_TOKEN": "rute khusus owner akan menolak semua permintaan",
-    "EMERGENT_AUTH_SESSION_URL": "login Google akan gagal (login email/sandi tetap jalan)",
+    "CORS_ORIGINS": "tidak ada origin lintas-situs yang diizinkan (konsol di domain lain akan ditolak)",
 }
 
 
@@ -83,7 +89,6 @@ async def main():
     # Diimpor SESUDAH periksa_env(): db.py membaca os.environ[...] saat diimpor,
     # jadi impor lebih dulu akan meledak sebelum pesan yang berguna sempat tercetak.
     from db import db, ensure_indexes
-    import auth
     from seed import seed_curriculum, seed_questions
     from seed_english import seed_english_curriculum
 
@@ -92,21 +97,16 @@ async def main():
     await ensure_indexes()
     print("indeks    : terpasang")
 
-    reset = "--reset-owner-password" in sys.argv
-    status = await auth.seed_owner(sync_password=reset)
-    email = os.environ["ADMIN_EMAIL"]
-    if status == "dibuat":
-        print(f"owner     : {email} DIBUAT")
-    elif status == "sudah-sesuai":
-        print(f"owner     : {email} sudah ada, sandinya sudah sesuai .env")
-    elif status == "sandi-ditimpa":
-        print(f"owner     : {email} sandinya DITIMPA dengan ADMIN_PASSWORD (diminta tegas)")
-    else:
-        # Dilaporkan, bukan diperbaiki diam-diam. Sandi yang berbeda bisa berarti
-        # ownernya sengaja menggantinya — menimpanya tanpa diminta mengunci dia
-        # dari akunnya sendiri tanpa jejak.
-        print(f"owner     : {email} sudah ada, sandinya BEDA dari .env — DIBIARKAN.")
-        print("            Pakai --reset-owner-password kalau memang mau menimpanya.")
+    # Tidak ada owner yang perlu disemai. Sejak m025-318 peran owner datang dari tiket
+    # KelasKu, dan mesin kurikulum tidak menyimpan satu pun kata sandi — jadi tidak ada
+    # pula sandi owner yang bisa "berbeda dari .env".
+    kunci = os.environ["CURRICULUM_TICKET_KEY"]
+    if len(kunci) < 32:
+        print("GAGAL: CURRICULUM_TICKET_KEY terlalu pendek (minimal 32 karakter).", file=sys.stderr)
+        print("       Kunci pendek bisa ditebak, dan tanda tangan yang tertebak tidak", file=sys.stderr)
+        print("       pernah ketahuan. Pakai nilai acak yang sama dengan Worker KelasKu.", file=sys.stderr)
+        raise SystemExit(2)
+    print("tiket     : kunci KelasKu terpasang (panjang " + str(len(kunci)) + ")")
 
     if await db.curriculum_nodes.count_documents({}) == 0:
         await seed_curriculum()
