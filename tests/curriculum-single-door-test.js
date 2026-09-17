@@ -140,6 +140,30 @@ test('backend punya pintu KelasKu, dan tiket sekali pakai benar-benar dibakar', 
   assert.ok(/verify_ticket/.test(authPy), 'tiket tidak diverifikasi');
 });
 
+/* DUA ASSERT DI BAWAH LAHIR DARI REVIEW gitar-bot di PR #428, dan keduanya menjaga
+   kelas cacat yang sama: pengaman yang TERLIHAT ada tetapi tidak menjaga apa pun. */
+
+test('catatan "tiket sudah dipakai" hidup selama tiketnya MASIH DITERIMA', () => {
+  const i = authPy.indexOf('async def _burn_ticket');
+  const badan = authPy.slice(i, i + 900);
+  assert.ok(/exp \+ TICKET_CLOCK_SKEW_SECONDS/.test(badan),
+    'umur baris dedup diikat ke `exp` saja. verify_ticket menerima tiket sampai ' +
+    '`exp + TICKET_CLOCK_SKEW_SECONDS`, jadi indeks TTL bisa menyapu catatan ' +
+    '"sudah dipakai" sementara tiketnya masih diterima — jendela pemakaian ulang ' +
+    'sampai 60 detik, tepat di pengaman yang ada untuk menutupnya.');
+});
+
+test('hanya tabrakan kunci yang jadi 401; galat Mongo lain tetap 5xx', () => {
+  const i = authPy.indexOf('async def _burn_ticket');
+  const badan = authPy.slice(i, i + 900);
+  assert.ok(/except DuplicateKeyError/.test(badan),
+    'penangkapnya bukan DuplicateKeyError');
+  assert.ok(!/except Exception/.test(badan),
+    '`except Exception` menelan gangguan MongoDB menjadi "tiket tidak berlaku, muat ' +
+    'ulang" — pengguna memuat ulang, mendapat tiket baru, gagal lagi, dan gangguan ' +
+    'infrastruktur menyamar sebagai kesalahan pengguna.');
+});
+
 test('peran murid adalah jatuhan bawaan, bukan guru', () => {
   const kelasku = tanpaKomentarPy(baca('backend/kelasku.py'));
   const m = kelasku.match(/ROLE_MAP\.get\([^,]+,\s*"([a-z]+)"\)/);
