@@ -1,7 +1,7 @@
 {
-  "version": "m025-318",
+  "version": "m025-319",
   "claimedBy": "branch main",
-  "claimedAt": "2026-09-17T18:15:10.904Z",
-  "reason": "m025-318: rilis audit ui/ux flashcards, warna, dan navigasi",
+  "claimedAt": "2026-09-17T18:37:15.760Z",
+  "reason": "m025-319: perbaikan flashcard front actions, hilangkan scroll, dan perbaiki font display",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }
