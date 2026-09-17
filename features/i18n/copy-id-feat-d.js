@@ -64,7 +64,7 @@
     'fsl.score-result': 'Skor {score}% hanya mengukur {metric}; bukan pronunciation.',
     'fsl.sample-response': 'Contoh respons:',
     'fsl.next-btn': 'Lanjut',
-    'fsl.explain-gist': 'Sepanjang audio, {character} terutama membicarakan hal ini — jadi jawaban yang benar: “{answer}”.',
+    'fsl.explain-gist': 'Sepanjang audio, {character} terutama membicarakan hal ini, jadi jawaban yang benar: “{answer}”.',
     'fsl.explain-detail': 'Detail ini disebutkan langsung di audio: “',
     'fsl.explain-inference': 'Jawaban ini tidak diucapkan langsung, tetapi petunjuk dalam audio mengarah ke kesimpulan: “',
     'fsl.explain-attitude': 'Pilihan kata dan nada ',

@@ -6,7 +6,7 @@
   "items": {
     "TA-001-cz0": {
       "explain": {
-        "why": "“Look!” และ “right now — you can smell it” ชี้ถึงเหตุการณ์ที่กำลังดำเนินอยู่ “is preparing” จึงเป็นรูปที่เหมาะสม",
+        "why": "“Look!” และ “right now, you can smell it” ชี้ถึงเหตุการณ์ที่กำลังดำเนินอยู่ “is preparing” จึงเป็นรูปที่เหมาะสม",
         "rule": "เหตุการณ์ที่กำลังดำเนินอยู่ใช้ am, is หรือ are ตามด้วยคำกริยารูป -ing ส่วนความเคยชินที่ทำซ้ำใช้รูปปัจจุบันธรรมดา",
         "memory": "มีคำว่า “Look!” แสดงว่าให้มองหารูป -ing",
         "avoid": "ให้เขียนรูปเต็ม อย่าเขียนเพียงคำกริยารูปพื้นฐาน"
@@ -1409,11 +1409,11 @@
           "misconceptionId": "คิดว่า modal ไม่ต้องเลื่อนรูปใน reported speech"
         },
         "cans": {
-          "whyFailsId": "Modal ไม่เติม -s ท้ายคำเด็ดขาด — รูปนี้ไม่มีอยู่ในภาษาอังกฤษ",
+          "whyFailsId": "Modal ไม่เติม -s ท้ายคำเด็ดขาด เพราะรูปนี้ไม่มีอยู่ในภาษาอังกฤษ",
           "misconceptionId": "มอง modal เป็นกริยาธรรมดาที่เติม -s สำหรับบุรุษที่สาม"
         },
         "will can": {
-          "whyFailsId": "ภาษาอังกฤษไม่อนุญาตให้ modal สองตัวเรียงติดกัน — “will” กับ “can” รวมกันแบบนี้ไม่ได้",
+          "whyFailsId": "ภาษาอังกฤษไม่อนุญาตให้ modal สองตัวเรียงติดกัน ดังนั้น “will” กับ “can” รวมกันแบบนี้ไม่ได้",
           "misconceptionId": "พยายามวาง modal สองตัวซ้อนกัน"
         }
       }
@@ -3158,7 +3158,7 @@
     },
     "QN-006-cz0": {
       "explain": {
-        "why": "A บอกว่า “I met one of your neighbours” B จึงถามถึงคนที่ A เจอ — “who” เป็นกรรม และคำถามกรรมต้องใช้ “did” + ประธาน + กริยา base form: “Who did you meet”",
+        "why": "A บอกว่า “I met one of your neighbours” B จึงถามถึงคนที่ A เจอ โดย “who” เป็นกรรม และคำถามกรรมต้องใช้ “did” + ประธาน + กริยา base form: “Who did you meet”",
         "rule": "คำถามที่ถามหากรรมคือ Who + did + ประธาน + คำกริยารูปพื้นฐาน (“Who did you meet?”) ส่วนคำถามที่ถามหาประธานคือ Who + คำกริยารูปอดีตโดยไม่มี “did” (“Who met you?”)",
         "memory": "เมื่อผู้กระทำชัดเจนอยู่แล้วและสิ่งที่ถามคือผู้รับ ให้ใช้ “did” และคืนคำกริยาสู่รูปพื้นฐาน",
         "avoid": "หาผู้กระทำก่อน ถ้าผู้กระทำชัดเจนอยู่แล้วและสิ่งที่ถามคือผู้รับ ให้เรียก “did” มาใช้และคืนคำกริยาสู่รูปพื้นฐาน"
@@ -4199,7 +4199,7 @@
       },
       "distractors": {
         "so": {
-          "whyFailsId": "หน้าที่ของ “so” คือแนะนำผลลัพธ์ แต่ “she was very tired after work” คือเหตุผลของการนอนเร็ว ไม่ใช่ผลของมัน — การนอนตอนกลางคืนย้อนไปทำให้เหนื่อยตอนเย็นก่อนหน้าไม่ได้",
+          "whyFailsId": "หน้าที่ของ “so” คือแนะนำผลลัพธ์ แต่ “she was very tired after work” คือเหตุผลของการนอนเร็ว ไม่ใช่ผลของมัน เพราะการนอนตอนกลางคืนย้อนไปทำให้เหนื่อยตอนเย็นก่อนหน้าไม่ได้",
           "misconceptionId": "เปิดอนุประโยคบอกเหตุผลด้วย “so” ซึ่งเป็นของอนุประโยคผลลัพธ์"
         },
         "because of": {
@@ -4964,7 +4964,7 @@
       "explain": {
         "why": "'Know' บรรยายสภาวะ ไม่ใช่การกระทำ แม้มี 'right now' ก็ใช้ present simple: don't know",
         "rule": "คำกริยาบอกสภาวะ (know, like, want, belong) ปกติคงอยู่ใน present simple ไม่ใช่ continuous",
-        "memory": "Know, like, want — ไม่มี -ing",
+        "memory": "Know, like, want: ไม่มี -ing",
         "avoid": "'Right now' ไม่ได้แปลว่าต้องใช้ -ing เสมอ ให้เช็กก่อนว่าคำกริยาเป็นสภาวะหรือไม่"
       },
       "distractors": {
@@ -5052,7 +5052,7 @@
       "explain": {
         "why": "ในคำถามที่รายงาน ประธานมาก่อนคำกริยาและกาลเลื่อนถอยหลัง: what time the shop opened",
         "rule": "รายงานคำถาม wh-: คำถาม + ประธาน + คำกริยา (ไม่มี do/does/did) และเลื่อนกาลหลังคำกริยารายงานที่เป็นอดีต",
-        "memory": "Asked what time the shop opened — ไม่มี 'did'",
+        "memory": "Asked what time the shop opened: ไม่มี 'did'",
         "avoid": "ตัด do/does/did วางประธานไว้ก่อน แล้วเลื่อนคำกริยาถอยไปในอดีตหนึ่งขั้น"
       },
       "distractors": {
@@ -5512,7 +5512,7 @@
     },
     "RC-202-cz0": {
       "explain": {
-        "why": "'The film' เป็นสิ่งของและเป็นกรรมของ 'watched' 'that' จึงเหมาะ — และละไว้ก็ยังได้",
+        "why": "'The film' เป็นสิ่งของและเป็นกรรมของ 'watched' 'that' จึงเหมาะ และละไว้ก็ยังได้",
         "rule": "สรรพนามสัมพันธ์กรรมสำหรับสิ่งของ: that / which หรือละไว้เลย: the film (that) we watched",
         "memory": "สรรพนามละได้: 'the film (that) we watched'",
         "avoid": "ลองลบสรรพนามออก ถ้าประโยคยังใช้ได้ 'that' หรือละไว้คือถูก"
@@ -5535,7 +5535,7 @@
     "CM-203-cz0": {
       "explain": {
         "why": "'Easier' เป็นรูปเปรียบเทียบ จึงใช้คำเน้นสำหรับรูปเปรียบเทียบ: a lot easier",
-        "rule": "หน้ารูปเปรียบเทียบใช้ much, far, a lot หรือ a bit — ห้ามใช้ very",
+        "rule": "หน้ารูปเปรียบเทียบใช้ much, far, a lot หรือ a bit (ห้ามใช้ very)",
         "memory": "Very easy แต่ a lot easier",
         "avoid": "เห็น -er หรือ 'more'? หยิบ much / far / a lot"
       },
@@ -5787,7 +5787,7 @@
           "misconceptionId": "สับสนโอกาสที่พลาดไป กับคำแนะนำหรือคำตำหนิหลังเหตุการณ์"
         },
         "were able to catch": {
-          "whyFailsId": "'were able to' รายงานว่าเราขึ้นรถไฟทันจริง ๆ — แต่เราไม่ได้ขึ้น",
+          "whyFailsId": "'were able to' รายงานว่าเราขึ้นรถไฟทันจริง ๆ แต่เราไม่ได้ขึ้น",
           "misconceptionId": "สับสนการบอกความเป็นไปได้ในอดีต กับการรายงานความสามารถที่ทำได้สำเร็จ"
         },
         "can catch": {
@@ -6021,7 +6021,7 @@
         "why": "ในแบบเป็นทางการ 'if' หายไปและ 'had' ย้ายไปหน้าประธาน: Had we received the warning",
         "rule": "การสลับที่แบบเป็นทางการ: Had + ประธาน + past participle, … would have + past participle",
         "memory": "If we had → Had we.",
-        "avoid": "ลบ 'if' แล้วสลับประธานกับ 'had' — ส่วนอื่นไม่ต้องย้าย"
+        "avoid": "ลบ 'if' แล้วสลับประธานกับ 'had' โดยส่วนอื่นไม่ต้องย้าย"
       },
       "distractors": {
         "If we had received": {

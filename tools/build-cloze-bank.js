@@ -215,20 +215,20 @@ function convertTemplate(tpl) {
 
   if (typeof tpl.stem !== 'string' || tpl.stem.indexOf(BLANK) === -1) {
     return { reject: { templateId: tpl.id, reason: 'no_blank_marker',
-      detail: 'stem tidak memuat ___ — jawaban template bukan token/frasa di dalam kalimat target' } };
+      detail: 'stem tidak memuat ___: jawaban template bukan token/frasa di dalam kalimat target' } };
   }
   var markerCount = tpl.stem.split(BLANK).length - 1;
   if (markerCount > 1) {
     return { reject: { templateId: tpl.id, reason: 'multi_blank',
-      detail: 'stem memuat ' + markerCount + ' blank dengan jawaban gabungan "' + answer + '" — pemecahan per posisi tidak mekanis' } };
+      detail: 'stem memuat ' + markerCount + ' blank dengan jawaban gabungan "' + answer + '": pemecahan per posisi tidak mekanis' } };
   }
   if (isPlaceholderAnswer(answer)) {
     return { reject: { templateId: tpl.id, reason: 'answer_not_typable',
-      detail: 'jawaban "' + answer + '" adalah placeholder meta — jawaban sebenarnya "tidak ada kata", mustahil diketik di mode produksi' } };
+      detail: 'jawaban "' + answer + '" adalah placeholder meta: jawaban sebenarnya "tidak ada kata", mustahil diketik di mode produksi' } };
   }
   if (typeof answer !== 'string' || answer.trim().length < MIN_ANSWER_LEN) {
     return { reject: { templateId: tpl.id, reason: 'answer_too_short',
-      detail: 'jawaban "' + answer + '" <' + MIN_ANSWER_LEN + ' karakter — grading edit-distance tidak andal' } };
+      detail: 'jawaban "' + answer + '" <' + MIN_ANSWER_LEN + ' karakter: grading edit-distance tidak andal' } };
   }
 
   /* Kalimat target = stem dengan jawaban benar diisikan. Item cloze valid
