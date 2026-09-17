@@ -1,7 +1,25 @@
-"""Smoke test end-to-end: guru -> kurikulum -> soal -> asesmen -> murid -> braincore -> insight."""
+"""Smoke test end-to-end: guru -> kurikulum -> soal -> asesmen -> murid -> braincore -> insight.
+
+Masuk lewat SATU pintu yang tersisa sejak m025-318: tiket identitas KelasKu.
+Berkas ini menerbitkannya sendiri dengan kunci yang sama seperti Worker
+(CURRICULUM_TICKET_KEY), persis seperti KelasKu di produksi.
+"""
 import json
 import sys
+import time
+
 import httpx
+
+import kelasku
+
+
+def tiket(sub, role, name):
+    now = int(time.time())
+    return kelasku.sign_ticket(kelasku.ticket_key(), {
+        "v": kelasku.TICKET_VERSION, "aud": kelasku.TICKET_AUDIENCE,
+        "sub": sub, "role": role, "name": name,
+        "iat": now, "exp": now + 120, "jti": f"{sub}-{time.time_ns()}",
+    })
 
 BASE = "http://localhost:8001"
 ok, fail = [], []
@@ -14,8 +32,8 @@ def check(name, cond, extra=""):
 
 def main():
     t = httpx.Client(base_url=BASE, timeout=60)
-    r = t.post("/api/auth/teacher/token", json={"token": "FZ-OWNER-2026-MASTER", "name": "Bu Rina"})
-    check("teacher token login", r.status_code == 200, r.text)
+    r = t.post("/api/auth/kelasku", json={"ticket": tiket("sub_guru_smoke", "teacher", "Bu Rina")})
+    check("guru masuk dengan tiket KelasKu", r.status_code == 200, r.text)
     teacher = r.json()
     t.headers["Authorization"] = "Bearer " + teacher["access_token"]
 
@@ -134,10 +152,11 @@ Kunci: A
     # ---------- murid ----------
     s = httpx.Client(base_url=BASE, timeout=60)
     import uuid as _u
-    email = f"murid.{_u.uuid4().hex[:6]}@example.com"
-    r = s.post("/api/auth/register", json={"email": email, "password": "murid123",
-                                           "name": "Murid Uji", "class_code": cls["code"]})
-    check("murid register + join kelas", r.status_code == 200, r.text[:200])
+    # SATU langkah: tiket KelasKu + kode kelas gurunya. Tidak ada pendaftaran.
+    r = s.post("/api/auth/kelasku", json={
+        "ticket": tiket(f"sub_murid_{_u.uuid4().hex[:8]}", "learner", "Murid Uji"),
+        "class_code": cls["code"]})
+    check("murid masuk KelasKu + join kelas lewat kode", r.status_code == 200, r.text[:200])
     student = r.json()
     s.headers["Authorization"] = "Bearer " + student["access_token"]
 

@@ -36,6 +36,9 @@ import { coreDb, roleGate, denied, unauthenticated } from './auth/gate.js';
 import { hashPassword, verifyPassword, needsRehash, checkPasswordPolicy } from './auth/password-core.js';
 import { ROLE, shellForRole, navigationFor } from './auth/role-core.js';
 import { codeWellFormed, hashCode, checkRedeemable, INVITE_PROBLEM } from './auth/invite-core.js';
+import {
+  signCurriculumTicket, TICKET_KEY_ENV, TICKET_KEY_MIN_LENGTH
+} from './auth/curriculum-ticket.js';
 
 /**
  * Hash boneka untuk menyamakan biaya jalur "handle tidak ada". Nilainya adalah
@@ -245,6 +248,55 @@ export async function routeAccountMe(ctx) {
 }
 
 /* ========================================================================== */
+/* POST /api/account/curriculum-ticket                                         */
+/* ========================================================================== */
+
+/**
+ * Tukarkan identitas KelasKu yang SUDAH terverifikasi dengan tiket berumur dua
+ * menit untuk mesin kurikulum (FastAPI+MongoDB di domain lain).
+ *
+ * Kenapa rute ini ada sama sekali: sampai m025-301 konsol kurikulum punya daftar
+ * gurunya sendiri dan menuntut token `FZG-` yang tidak punya satu pun antarmuka
+ * penerbit. Guru yang sudah terverifikasi di KelasKu tetap ditolak di pintu
+ * kedua, dan murid diminta mendaftar ulang dengan email+sandi ketiga. Rute ini
+ * menghapus pintu kedua itu: yang menyeberang bukan kata sandi, melainkan
+ * pernyataan sekali-pakai tentang siapa pemegang cookie ini MENURUT D1.
+ *
+ * Tiga hal yang sengaja TIDAK dilakukan di sini:
+ *  - peran tidak pernah dibaca dari body/query/header (aturan §3 role-security);
+ *    ia datang dari `roleGate` yang membacanya dari D1 pada permintaan ini juga;
+ *  - tidak ada kelas/kuota di dalam tiket (mw-identity §2: klaim bertanda tangan
+ *    menjadi klaim basi);
+ *  - kunci yang lemah atau tidak dipasang MENOLAK menerbitkan, bukan jatuh ke
+ *    nilai cadangan. Fitur yang mati terang-terangan bisa diperbaiki; tanda
+ *    tangan dengan kunci tebakan tidak pernah ketahuan.
+ */
+export async function routeCurriculumTicket(ctx) {
+  const gate = await roleGate(ctx);
+  if (!gate.ok) return gate.response;
+
+  const secret = ctx.env ? ctx.env[TICKET_KEY_ENV] : '';
+  if (typeof secret !== 'string' || secret.length < TICKET_KEY_MIN_LENGTH) {
+    return jsonError(503, ERR.UNAVAILABLE, {}, gate.opt);
+  }
+
+  const name = gate.account && gate.account.login_handle ? String(gate.account.login_handle) : '';
+  let issued = null;
+  try {
+    issued = await signCurriculumTicket(secret, { sub: gate.sub, role: gate.role, name: name }, ctx.now);
+  } catch (_) {
+    return jsonError(503, ERR.UNAVAILABLE, {}, gate.opt);
+  }
+
+  return jsonResponse({
+    ok: true,
+    ticket: issued.ticket,
+    expires_in: issued.expires_in,
+    role: gate.role
+  }, gate.opt);
+}
+
+/* ========================================================================== */
 /* POST /api/account/teacher-activate                                          */
 /* ========================================================================== */
 
@@ -396,5 +448,6 @@ export const ROUTES = [
   ['POST', '/api/account/login', routeAccountLogin],
   ['POST', '/api/account/logout', routeAccountLogout],
   ['GET', '/api/account/me', routeAccountMe],
-  ['POST', '/api/account/teacher-activate', routeTeacherActivate]
+  ['POST', '/api/account/teacher-activate', routeTeacherActivate],
+  ['POST', '/api/account/curriculum-ticket', routeCurriculumTicket]
 ];

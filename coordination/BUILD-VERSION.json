@@ -1,7 +1,7 @@
 {
-  "version": "m025-321",
-  "claimedBy": "branch main",
-  "claimedAt": "2026-09-17T19:21:50.647Z",
-  "reason": "fix(icons): ganti ikon flashcard dan reading bar dengan subset sah lucide.min.js untuk kelulusan gerbang cakupan ikon",
+  "version": "m025-322",
+  "claimedBy": "branch claude/focused-noether-55ocsp",
+  "claimedAt": "2026-09-17T19:39:54.135Z",
+  "reason": "Konsol kurikulum: satu pintu tiket KelasKu m025-322",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }

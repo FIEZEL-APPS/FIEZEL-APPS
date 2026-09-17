@@ -23,17 +23,23 @@
     E.login.me().then(start).catch(function () { renderAuth(); });
   }
 
+  /* SATU tombol, nol kolom isian.
+
+     Layar ini dulu meminta token `FZG-` yang hanya ada di mesin kurikulum dan
+     tidak punya satu pun antarmuka penerbit — guru yang sudah terverifikasi di
+     KelasKu tetap terhenti di sini. Sekarang identitasnya diambil dari akun
+     KelasKu yang sama dengan yang dipakai di aplikasi: kalau gurunya sudah masuk
+     di sana, tidak ada yang perlu diketik sama sekali. */
   function renderAuth(err) {
     app.innerHTML =
       '<div class="auth-wrap"><div class="card ink rise">' +
       '<p class="kicker">FIEZEL · Ruang Guru</p>' +
       '<h1>Kurikulum yang benar-benar dipelajari.</h1>' +
-      '<p class="muted">Masuk dengan token guru yang diberikan owner FIEZEL. Tidak ada pendaftaran mandiri — akses guru dikendalikan owner.</p>' +
+      '<p class="muted">Masuk dengan akun KelasKu-mu. Tidak ada token terpisah: akses guru mengikuti peranmu di KelasKu, dan owner mengaturnya dari satu tempat.</p>' +
       (err ? '<div class="issue error">' + esc(err) + '</div>' : '') +
-      '<label class="f">Token guru<input id="tok" placeholder="FZG-XXXXXXXX" data-testid="teacher-token-input" autocomplete="off"></label>' +
-      '<label class="f">Nama panggilan<input id="tnm" placeholder="Bu Rina" data-testid="teacher-name-input"></label>' +
-      '<button class="btn primary" data-a="login" data-testid="teacher-login-btn">Masuk Ruang Guru</button>' +
-      '<p class="muted" style="margin-top:16px;font-size:13px">Murid masuk di halaman <a href="./misi.html" data-testid="link-student">Misi Belajar</a>.</p>' +
+      '<button class="btn primary" data-a="login" data-testid="teacher-login-btn">Masuk dengan akun KelasKu</button>' +
+      '<p class="muted" style="margin-top:16px;font-size:13px">Belum masuk? Buka <a href="./index.html" data-testid="link-app">aplikasi FIEZEL</a> dulu, lalu kembali ke halaman ini.</p>' +
+      '<p class="muted" style="font-size:13px">Murid masuk di halaman <a href="./misi.html" data-testid="link-student">Misi Belajar</a>.</p>' +
       '</div></div>';
   }
 
@@ -436,10 +442,9 @@
     if (!el) return;
     var a = el.getAttribute('data-a');
     if (a === 'login') {
-      var tok = val('tok');
-      if (!tok) return toast('Masukkan token guru.');
       el.disabled = true;
-      return E.login.teacherToken(tok, val('tnm')).then(start).catch(function (e) { renderAuth(e.message); });
+      el.textContent = 'Menghubungkan ke KelasKu…';
+      return E.login.kelasku().then(start).catch(function (e) { renderAuth(e.message); });
     }
     if (a === 'logout') return E.login.logout().then(function () { S.user = null; renderAuth(); });
     if (a === 'close') { S.drawer = null; S.modal = null; return render(); }

@@ -372,19 +372,15 @@ const HEURISTIC_PATH_ALLOWLIST = [
       + 'pustaka. Kode sumber asli tersedia publik; integritas berkas dijaga oleh commit.'
   },
   {
-    /* Ditambahkan 17 Sep 2026. BUKAN pengecualian baru — ini SALINAN BYTE-IDENTIK dari
-     * entri di atasnya (sha256 c541ef06327885a8…, 19.927 bita, diperiksa dengan
-     * sha256sum atas kedua jalur). Berkasnya disalin ke website/ supaya ikut ter-deploy
-     * lewat cPanel, dan pengecualian jalur lama tertinggal — sejak itu `main` merah di
-     * setiap PR, bukan cuma di PR yang menyentuh sentinel.
-     *
-     * Dibuktikan positif palsu, bukan diasumsikan: string yang tertangkap terdekode
-     * menjadi bita ajaib PNG (b'\x89PNG\r\n\x1a\n') dan duduk di dalam
-     * `d.src="data:image/gif;base64,…"` — placeholder 1x1 bawaan pustaka.
-     *
-     * Kalau salah satu salinan berubah isinya, entri ini TIDAK melindunginya dari
-     * detektor `hard`: blok PEM atau token ghp_ di dalamnya tetap memerahkan gerbang.
-     * Yang dikecualikan hanya heuristik entropi. */
+    /* SALINAN BYTE-IDENTIK dari entri tepat di atas, di rumah barunya.
+       Diukur, bukan diduga: sha256 kedua berkas sama persis
+       (c541ef06327885a8415bca8df6071e14189b4855336def4f36db54bde8484f36, 19.927 bita).
+       Halaman Ghost Sentinel dipindahkan ke website/sentinel/ pada 16 Sep 2026 lewat
+       5e1c4daa, dan pustakanya ikut disalin — pemindai dengan benar menemukannya lagi
+       di jalur baru, karena daftar maaf ini memang dikunci JALUR, bukan isi.
+
+       Entri ini karena itu tidak melonggarkan apa pun yang belum dimaafkan: ia
+       menyatakan ulang keputusan yang sama untuk berkas yang sama. */
     prefix: 'website/sentinel/qrcode.min.js',
     reason: 'Salinan byte-identik (sha256 c541ef06…) dari tools/fiezel-drop/public/qrcode.min.js, '
       + 'dipindahkan ke website/ supaya ter-deploy lewat cPanel. Alasannya sama persis: data URI '

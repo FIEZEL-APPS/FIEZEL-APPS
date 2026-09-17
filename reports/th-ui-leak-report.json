@@ -1,6 +1,6 @@
 {
   "schema": "fiezel-th-ui-leak-v1",
-  "generatedAt": "2026-09-15T18:46:00.433Z",
+  "generatedAt": "2026-09-17T13:35:39.210Z",
   "files": {
     "app.js": {
       "leaks": 3,
@@ -121,28 +121,28 @@
       ]
     },
     "features/curriculum/learning-mission.js": {
-      "leaks": 20,
-      "budget": 20,
+      "leaks": 17,
+      "budget": 17,
       "sample": [
         {
-          "line": 36,
+          "line": 31,
           "text": "FIEZEL · Misi Belajar"
         },
         {
-          "line": 40,
-          "text": "Masuk"
+          "line": 36,
+          "text": "Masuk dengan akun KelasKu"
         },
         {
-          "line": 41,
-          "text": "Daftar"
+          "line": 37,
+          "text": "Belum masuk? Buka"
         },
         {
-          "line": 45,
-          "text": "Masuk dengan Google"
-        },
-        {
-          "line": 46,
+          "line": 38,
           "text": "Guru masuk di"
+        },
+        {
+          "line": 38,
+          "text": "Ruang Guru"
         }
       ]
     },
@@ -163,12 +163,12 @@
           "text": "Murid & Paspor"
         },
         {
-          "line": 29,
+          "line": 36,
           "text": "FIEZEL · Ruang Guru"
         },
         {
-          "line": 34,
-          "text": "Nama panggilan"
+          "line": 40,
+          "text": "Masuk dengan akun KelasKu"
         }
       ]
     },
@@ -468,8 +468,8 @@
     }
   },
   "copyKeys": {
-    "id": 2495,
-    "th": 2497,
+    "id": 2499,
+    "th": 2501,
     "idTanpaTh": 0
   },
   "pass": true
