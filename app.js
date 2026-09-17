@@ -4725,7 +4725,7 @@ function showCoreAnalyzing(then){
   if(hadFeedback)f.classList.add('hidden');
   f.before(panel);
   pawSetState('thinking',{hold:900});
-  setTimeout(()=>{panel.remove();if(hadFeedback)f.classList.remove('hidden');then()},700);
+  setTimeout(()=>{panel.remove();if(hadFeedback)f.classList.remove('hidden');then()},80);
 }
 let appOpened=false,reminderTimer=null,loginMessageCache=null,notificationRetryBound=false;
 function notificationPermission(){return typeof Notification==='undefined'?'unsupported':Notification.permission}
@@ -10780,9 +10780,25 @@ function quizLoop(cfg){
      ke BAWAH #feedback supaya giliran tutor yang basi tidak menumpuk di atas pembahasan.
      Semua id (quizExit/quizNext/quizListen/quizListenNote/quizStem/options/feedback/tutorTurn)
      dan literal quiz-shell/quiz-mascot TETAP — kontrak r2/paw/lesson-experience. */
-  setApp(`<section class="fade quiz-shell${pawSlot?pawSlot.shellClass:''}"><div class="quiz-topbar"><button id="quizExit" class="quiz-exit" aria-label="${FiezelI18n.t('quiz.exit-aria')}"><i data-lucide="x"></i><span class="quiz-exit-label">${FiezelI18n.t('quiz.exit-label')}</span></button><div class="quiz-progress" role="progressbar" aria-valuemin="0" aria-valuemax="${planned}" aria-valuenow="${asked+1}" aria-label="${FiezelI18n.t('quiz.progress-aria',{asked:asked+1,planned})}"><span>${asked+1}</span><em>/ ${planned}</em><i class="quiz-progress-bar" aria-hidden="true" style="--p:${(asked/Math.max(1,planned)).toFixed(3)}"><b></b></i></div><button id="quizNext" class="quiz-next" disabled>${FiezelI18n.t('quiz.next-btn')} <i data-lucide="arrow-right"></i></button></div>${pawSlot?'':`<div class="quiz-mascot" aria-hidden="true">${pawFaceMarkup()}</div>`}${q.passage?card(`<div class="passage passage-reading"><div class="eyebrow">${FiezelI18n.t('quiz.reading-eyebrow')}</div><h3>${esc(q.passage.title)}</h3><p>${esc(q.passage.text)}</p></div>`,'card-reading'):(cfg.context?card(`<div class="passage"><b>${esc(cfg.context.title)}</b><p>${esc(cfg.context.text)}</p></div>`):'')}${card(`${pawSlot?pawSlot.peek:''}${pawSlot&&pawSlot.above?`<div class="quiz-stage">${pawSlot.above}<div class="quiz-bubble"><h2 class="question" id="quizStem">${esc(q.question)}</h2></div></div>`:''}${q.focus?`<div class="vocab-focus"><span class="vocab-focus-word">${esc(q.focus.word)}</span>${q.focus.phonetic?`<span class="phonetic">${esc(q.focus.phonetic)}</span>`:''}</div>`:''}${q.type==='listening'?`<div class="quiz-listen quiz-listen-hero"><button id="quizListen" class="quiz-listen-btn quiz-listen-btn-hero"><i data-lucide="volume-2"></i> ${FiezelI18n.t('quiz.listen-btn')}</button><span id="quizListenNote" class="muted">${FiezelI18n.t('quiz.listen-note')}</span></div>`:''}${pawSlot&&pawSlot.above?'':`<h2 class="question" id="quizStem">${esc(q.question)}</h2>`}<div id="options" class="options"></div><div id="feedback" class="feedback hidden"></div><div id="tutorTurn" class="tutor-turn hidden"></div>`,pawSlot?pawSlot.cardClass:'')}${pawSlot?pawSlot.side:''} </section>`);
+  $('quizFloatingBar')?.remove();
+  setApp(`<section class="fade quiz-shell${pawSlot?pawSlot.shellClass:''}"><div class="quiz-topbar"><button id="quizExit" class="quiz-exit" aria-label="${FiezelI18n.t('quiz.exit-aria')}"><i data-lucide="x"></i><span class="quiz-exit-label">${FiezelI18n.t('quiz.exit-label')}</span></button><div class="quiz-progress" role="progressbar" aria-valuemin="0" aria-valuemax="${planned}" aria-valuenow="${asked+1}" aria-label="${FiezelI18n.t('quiz.progress-aria',{asked:asked+1,planned})}"><span>${asked+1}</span><em>/ ${planned}</em><i class="quiz-progress-bar" aria-hidden="true" style="--p:${(asked/Math.max(1,planned)).toFixed(3)}"><b></b></i></div><button id="quizNext" class="quiz-next" disabled>${FiezelI18n.t('quiz.next-btn')} <i data-lucide="arrow-right"></i></button></div>${pawSlot?'':`<div class="quiz-mascot" aria-hidden="true">${pawFaceMarkup()}</div>`}${q.passage?card(`<div class="passage passage-reading" id="quizPassage"><div class="eyebrow">${FiezelI18n.t('quiz.reading-eyebrow')}</div><h3>${esc(q.passage.title)}</h3><p>${esc(q.passage.text)}</p></div>`,'card-reading'):(cfg.context?card(`<div class="passage" id="quizPassage"><b>${esc(cfg.context.title)}</b><p>${esc(cfg.context.text)}</p></div>`):'')}${card(`${pawSlot?pawSlot.peek:''}${pawSlot&&pawSlot.above?`<div class="quiz-stage">${pawSlot.above}<div class="quiz-bubble"><h2 class="question" id="quizStem">${esc(q.question)}</h2></div></div>`:''}${q.focus?`<div class="vocab-focus"><span class="vocab-focus-word">${esc(q.focus.word)}</span>${q.focus.phonetic?`<span class="phonetic">${esc(q.focus.phonetic)}</span>`:''}</div>`:''}${q.passage?`<div class="reading-jump-bar"><button type="button" id="readingJumpBtn" class="reading-jump-btn"><i data-lucide="book-open"></i> <span>${FiezelI18n.t('quiz.reading-eyebrow')}</span> <i data-lucide="arrow-up"></i></button></div>`:''}${q.type==='listening'?`<div class="quiz-listen quiz-listen-hero"><div class="quiz-listen-controls"><button id="quizListen" class="quiz-listen-btn quiz-listen-btn-hero"><i data-lucide="volume-2"></i> ${FiezelI18n.t('quiz.listen-btn')}</button><button type="button" id="quizListenSpeed" class="quiz-listen-speed-btn" aria-label="Kecepatan Audio"><span id="quizListenSpeedLabel">1.0x</span></button></div><div class="quiz-audio-wave hidden" id="quizAudioWave" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></div><span id="quizListenNote" class="muted">${FiezelI18n.t('quiz.listen-note')}</span></div>`:''}${pawSlot&&pawSlot.above?'':`<h2 class="question" id="quizStem">${esc(q.question)}</h2>`}<div id="options" class="options"></div><div id="feedback" class="feedback hidden"></div><div id="tutorTurn" class="tutor-turn hidden"></div>`,pawSlot?pawSlot.cardClass:'')}${pawSlot?pawSlot.side:''} </section>`);
   $('quizExit').onclick=()=>confirmQuizExit();/* W1 P1-2: keluar lewat konfirmasi, bukan seketika. */
   $('options').append(...opts.map((o,j)=>{const b=document.createElement('button');b.className='option';b.textContent=o;b.onclick=()=>answer(q,j,b);return b}));
+  if(q.passage){
+   const jump=$('readingJumpBtn');
+   if(jump){
+    jump.onclick=()=>{
+     const pass=$('quizPassage'),stem=$('quizStem');
+     if(!pass||!stem)return;
+     const rect=pass.getBoundingClientRect();
+     if(rect.top<0||rect.bottom<120){
+      pass.scrollIntoView({block:'start',behavior:(prefersReducedMotion()||state.preferences?.motion===false)?'auto':'smooth'});
+     }else{
+      stem.scrollIntoView({block:'start',behavior:(prefersReducedMotion()||state.preferences?.motion===false)?'auto':'smooth'});
+     }
+    };
+   }
+  }
   /* m025-246: soal PERTAMA sesi ini benar-benar tercat. Ini titik ukur funnel
      "launch -> soal pertama"; ia diletakkan sesudah opsi terpasang, bukan sesudah
      setApp, karena soal tanpa pilihan jawaban belum bisa dikerjakan siapa pun.
@@ -10812,10 +10828,23 @@ function quizLoop(cfg){
   // sampai audio benar-benar berbunyi, supaya jawaban benar tidak bisa didapat tanpa
   // mendengar; kalau suaranya gagal, kuncinya dilepas agar murid tidak terjebak.
   if(q.type==='listening'){
+   let currentListenSpeed=1.0;
+   const speedBtn=$('quizListenSpeed');
+   if(speedBtn){
+    speedBtn.onclick=(e)=>{
+     e.stopPropagation();
+     currentListenSpeed=currentListenSpeed===1.0?0.8:1.0;
+     const lbl=$('quizListenSpeedLabel');
+     if(lbl)lbl.textContent=currentListenSpeed.toFixed(1)+'x';
+     speedBtn.classList.toggle('is-slow',currentListenSpeed<1.0);
+    };
+   }
    const listen=$('quizListen'),note=$('quizListenNote'),unlock=()=>document.querySelectorAll('.option').forEach(b=>{b.disabled=false});
    document.querySelectorAll('.option').forEach(b=>{b.disabled=true});
    listen.onclick=async()=>{
     listen.disabled=true;note.textContent=FiezelI18n.t('quiz.memutar');
+    const wave=$('quizAudioWave');
+    if(wave)wave.classList.remove('hidden');
     /* 2026-08-29 overhaul I14 (O3 §7 "listening"): Pau ikut menyimak selama audio berbunyi —
        listening-start (P1, tahan lama; tak bisa diinterupsi hover P0) lalu listening-stop di
        finally. Netral, tidak membocorkan verdict → sah dalam MEASURE; pawReact = gerbang
@@ -10830,7 +10859,7 @@ function quizLoop(cfg){
     // tebakan yang murah. Diajukan sesudah audio soal sekarang berangkat, bukan di draw(),
     // supaya tidak pernah bersaing dengan rekaman yang sedang ditunggu murid.
     const nextListening=remaining.find(x=>x&&x.type==='listening'&&x.script&&x.script!==q.script);
-    try{const played=await audio.play(q.script,{contentType:'listening',suppressSubtitles:true,next:nextListening?nextListening.script:''});
+    try{const played=await audio.play(q.script,{speed:currentListenSpeed,contentType:'listening',suppressSubtitles:true,next:nextListening?nextListening.script:''});
      // Fase 2 (B3 butir 6): replay dihitung hanya untuk pemutaran yang BERBUNYI - putaran
      // pertama bukan replay, dan pemutaran gagal bukan bukti apa pun. Nilainya dibaca
      // evidenceKappa (diskon jawaban benar berbekal banyak replay) dan riwayat listening.
@@ -10839,10 +10868,10 @@ function quizLoop(cfg){
      if(!played)showListeningFailureActions(q,cfg);
      unlock()}
     catch(error){note.textContent=FiezelI18n.t('quiz.suara-tidak-berbunyi-pilihan-tetap',{error:String(error?.message||error)});showListeningFailureActions(q,cfg);unlock()}
-    finally{listen.disabled=false;pawReact('listening-stop');enhanceUI()}
+    finally{if(wave)wave.classList.add('hidden');listen.disabled=false;pawReact('listening-stop');enhanceUI()}
    };
   }
-  $('quizNext').onclick=()=>{if(answer.locked){closeConfidencePop();answer.locked=false;audio.stop();asked++;lastConcept=quizConcept(q);start=Date.now();draw()}};
+  $('quizNext').onclick=()=>{if(answer.locked){$('quizFloatingBar')?.remove();closeConfidencePop();answer.locked=false;audio.stop();asked++;lastConcept=quizConcept(q);start=Date.now();draw()}};
  };
 
  /**
@@ -10896,10 +10925,27 @@ function quizLoop(cfg){
   enhanceUI();
  };
 
+  const showQuizFloatingNext=()=>{
+   let bar=$('quizFloatingBar');
+   if(!bar){
+    bar=document.createElement('div');
+    bar.id='quizFloatingBar';
+    bar.className='quiz-floating-bar';
+    bar.innerHTML=`<button type="button" id="quizFloatingNext" class="quiz-floating-next-btn primary luxe"><span>${FiezelI18n.t('quiz.next-btn')}</span> <i data-lucide="arrow-right"></i></button>`;
+    document.body.appendChild(bar);
+    bar.querySelector('#quizFloatingNext').onclick=()=>{
+     bar.remove();
+     $('quizNext')?.click();
+    };
+   }
+   bar.classList.add('is-visible');
+   enhanceUI();
+  };
+
  /** Membuka jawaban dan seluruh penjelasannya. Jalur akhir untuk satu soal. */
  const reveal=(q,j,ok,{forced=false}={})=>{
   document.querySelectorAll('.option').forEach(b=>b.disabled=true);
-  /* W1 P1-1: di mode ukur TIDAK ADA yang dibuka \u2014 tidak ada sorotan kunci, tidak ada
+  /* W1 P1-1: di mode ukur TIDAK ADA yang dibuka — tidak ada sorotan kunci, tidak ada
      vonis, tidak ada pembahasan, tidak ada tombol AI. Hanya tanda terima netral; murid
      lanjut, dan pembahasan lengkap menunggunya di layar hasil (finishQuiz). */
   if(MEASURE){
@@ -10907,6 +10953,7 @@ function quizLoop(cfg){
    f.innerHTML=`<div class="feedback-title"><i data-lucide="check"></i><b>${FiezelI18n.t('quiz.feedback-saved-title')}</b></div><p class="muted">${cfg.placement?FiezelI18n.t('quiz.feedback-saved-body-test'):FiezelI18n.t('quiz.feedback-saved-body-exam')}</p>`;
    answer.locked=true;
    $('quizNext').disabled=false;
+   showQuizFloatingNext();
    try{f.scrollIntoView({block:'nearest',behavior:(prefersReducedMotion()||state.preferences?.motion===false)?'auto':'smooth'})}catch{}
    enhanceUI();
    return;
@@ -10922,6 +10969,7 @@ function quizLoop(cfg){
   speak(turn);
   answer.locked=true;
   $('quizNext').disabled=false;
+  showQuizFloatingNext();
   // R2-5: popup keyakinan TIDAK lagi dibuka di sini - ia sudah selesai SEBELUM panel
   // analyzing berjalan (lihat answer()), jadi pembahasan ini tercat di layar yang bersih.
   $('aiExplainBtn').onclick=()=>explainWithAI(q,j);
@@ -11137,6 +11185,7 @@ function quizLoop(cfg){
    f.innerHTML=`<div class="feedback-title"><i data-lucide="check"></i><b>${FiezelI18n.t('quiz.feedback-saved-title')}</b></div><p class="muted">${cfg.placement?FiezelI18n.t('quiz.feedback-saved-body-test'):FiezelI18n.t('quiz.feedback-saved-body-exam')}</p>`;
    answer.locked=true;
    $('quizNext').disabled=false;
+   showQuizFloatingNext();
    try{f.scrollIntoView({block:'nearest',behavior:(prefersReducedMotion()||state.preferences?.motion===false)?'auto':'smooth'})}catch{}
    enhanceUI();
    return;
@@ -11152,6 +11201,7 @@ function quizLoop(cfg){
   f.innerHTML=`<div class="feedback-title"><i data-lucide="${ok?'circle-check-big':'circle-x'}"></i><b>${ok?FiezelI18n.t('quiz.verdict-correct'):FiezelI18n.t('quiz.verdict-wrong')}</b></div><p>${FiezelI18n.t('quiz.you-menulis')} <strong>${esc(typed)}</strong>. ${detail}</p><p><strong>${FiezelI18n.t('quiz.intinya')}</strong> ${esc(q.explain?.why||FiezelI18n.t('quiz.fallback-tense-check'))} ${q.explain?.rule?esc(q.explain.rule):''}</p><p class="memory-tip"><i data-lucide="lightbulb"></i><span>${esc(q.explain?.memory||FiezelI18n.t('quiz.fallback-tense-read'))}</span></p>`;
   answer.locked=true;
   $('quizNext').disabled=false;
+  showQuizFloatingNext();
   /* W1 P1-4 (11-001 saudara cloze): pembahasan cloze juga harus terlihat, aturan yang sama. */
   try{f.scrollIntoView({block:'nearest',behavior:(prefersReducedMotion()||state.preferences?.motion===false)?'auto':'smooth'})}catch{}
   /* m025-186 (A16-F1): tanpa titipan ini, kedua tombol popup jatuh ke quizNext.click()
@@ -11170,7 +11220,10 @@ function quizLoop(cfg){
  // semuanya melewati stage ini, jadi penutupan sesi ditulis sekali di sini dan bukan sekali
  // per jalan keluar - jalan keluar yang lupa memanggilnya adalah cara sesi menggantung
  // selamanya sebagai "sedang berjalan".
- enterStage('quiz',{draw:()=>draw(),leave:()=>{if(!cfg.__finished)abandonActiveSession('quiz_exit')}});
+ enterStage('quiz',{draw:()=>draw(),leave:()=>{
+  $('quizFloatingBar')?.remove();
+  if(!cfg.__finished)abandonActiveSession('quiz_exit')
+ }});
  draw();
 }
 /* ==========================================================================
