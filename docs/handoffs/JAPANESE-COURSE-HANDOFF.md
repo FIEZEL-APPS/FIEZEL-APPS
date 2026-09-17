@@ -777,3 +777,82 @@ DIPRECACHE `sw.js`; tanpa `SW_REV` baru, murid yang sudah memasang PWA-nya tetap
 lama secara offline — dan offline justru keadaan yang paling sering di lapangan. Bahwa
 `features/neural-voice/fiezel-diag-panel.js` ikut berubah: itu ritual bump menyentuh
 `DIAG_BUILD`; panel diagnostiknya sendiri tidak berubah perilaku.
+
+---
+
+## m025-313+ — utang Thai isi bank Jepang berhenti tak terlihat
+
+Otoritas tetap OWNER. **Nol byte produksi berubah**: yang mendarat hanya satu gerbang baru
+dan pendaftarannya di `quality.yml`, jadi nomor build TIDAK dinaikkan — pola yang sama
+dengan PR #365 dan dengan PR usulan kursus ini sendiri.
+
+### Sebabnya: aturan dua bahasa punya lubang seukuran seluruh isi bank
+
+`CLAUDE.md` mengikat satu aturan — setiap teks yang dilihat pengguna lahir DUA BAHASA.
+`th-coverage-test.js` dan `th-ui-leak-test.js` menegakkannya, tetapi keduanya hanya
+menjangkau naskah **antarmuka**, yang lahir lewat `FiezelI18n.t()`. Isi bank lahir lewat
+jalur lain: dimuat sebagai JSON, dirender apa adanya. Ia lolos keduanya.
+
+Diukur, bukan ditebak:
+
+| Lapisan | Paritas Thai |
+|---|---|
+| Naskah antarmuka | **2.452 / 2.452** kunci |
+| Isi bank Jepang | **0 / 15.364** medan |
+
+Murid Thai yang membuka kursus Jepang mendapat menu dan tombol berbahasa Thai, lalu arti
+kata, penjelasan tata bahasa, soal bacaan, dan petunjuk menulis semuanya Indonesia.
+
+Yang paling perlu dicatat: **sebelum ini tidak ada yang bertanya.** Lima gerbang membaca
+`content/ja/`; tiga tidak menyentuh Thai sama sekali, dua hanya memeriksa
+`copy-th-bahasa.js` — naskah tombol pemilih bahasa, bukan isi bank. Hijaunya bukan bukti
+banknya dua bahasa, melainkan bukti tidak ada yang mengukur.
+
+### Yang gerbang ini TIDAK lakukan
+
+Ia tidak menuntut 15.364 terjemahan hari ini. Menuntut itu sekarang berarti merah permanen,
+dan gerbang yang merah permanen adalah gerbang yang dimatikan orang.
+
+Ia menuntut **sensus yang benar**: tiap bank mendaftarkan berapa medan Indonesia yang
+dilihat murid dan berapa yang sudah ber-Thai, bertanggal.
+
+| Perbuatan | Akibat |
+|---|---|
+| menambah isi Indonesia tanpa Thai | `medan` tidak cocok → **MERAH** sampai angkanya ditulis ulang bertanggal |
+| menulis terjemahan Thai | `berTh` tidak cocok → **MERAH**; utang lunas wajib dicoret |
+| bank Jepang baru lahir | tidak ada di sensus → **MERAH**; ditemukan dari isi direktori, bukan dari daftar |
+
+Sensus cocok = hijau. Itu bukan klaim "sudah dua bahasa"; itu klaim **"kami tahu persis
+seberapa jauh dari dua bahasa, dan angkanya tidak bergerak tanpa ada yang tahu"**.
+
+Terjemahan boleh datang dua cara — medan Thai inline, atau sidecar
+`content/ja/<bank>-th.json` (pola yang sudah dipakai kursus Inggris lewat
+`vocabulary-th.json`). Keduanya dihitung, jadi gerbang ini tidak memaksa satu bentuk.
+
+### Dibuktikan menggigit, bukan diklaim
+
+Lima mutasi dijalankan atas kode sungguhan, masing-masing dipulihkan sesudahnya:
+
+| Mutasi | Hasil |
+|---|---|
+| +1 petunjuk Indonesia (utang bertambah) | MERAH — `UTANG TIDAK BERTAMBAH DIAM-DIAM` |
+| satu petunjuk diterjemahkan ke Thai | MERAH — `UTANG YANG LUNAS WAJIB DICORET` |
+| bank Jepang baru muncul tanpa sensus | MERAH — dua assert sekaligus |
+| `medanMurid()` dipaksa pulang kosong | MERAH — penjaga non-kehampaan |
+| sidecar `-th.json` muncul | MERAH — sensus jadi basi |
+
+Dan tiap pemulihan kembali HIJAU, jadi merahnya memang datang dari mutasinya.
+
+**Satu pesan kuperbaiki sesudah pengujian.** Versi pertama memerahkan bank baru lewat
+penjaga non-kehampaan dengan pesan "pemungutnya patah" — padahal pemungutnya sehat, bank
+itu saja yang belum punya cabang. Pesan yang salah mendiagnosis mengirim pembaca berikutnya
+membongkar kode yang tidak rusak, jadi kedua sebab kini dipisah dan disebut dengan benar.
+
+### Utang yang tetap berdiri
+
+1. **15.364 medan masih Indonesia saja.** Sensus membuatnya terlihat dan terhitung; ia tidak
+   menerjemahkan apa pun. Menulis terjemahannya keputusan terpisah — dan naskah Jepangnya
+   sendiri masih DRAFT AI yang belum ditinjau penutur asli, jadi menerjemahkan sekarang
+   berarti menggandakan naskah yang belum diverifikasi.
+2. Menyimak dan berbicara Jepang masih diblokir pengunci `en-US` di tumpukan audio.
+3. Naskah Jepang masih DRAFT AI; tingkat JLPT masih perkiraan.
