@@ -685,6 +685,88 @@ input[type="checkbox"],input[type="radio"]{min-width:24px;min-height:24px}
 .passage-reading h3{font-family:"Instrument Serif",serif;font-size:1.55rem;line-height:1.25;margin:4px 0 12px;color:var(--ink)}
 .passage-reading p{font-size:1.04rem;line-height:1.85;color:var(--text);max-width:64ch;letter-spacing:0.005em}
 .flash-back .muted{margin-top:12px}
+
+/* Reading Mode: 2-column layout on Desktop & Tablet, comfortable peek on Mobile */
+@media(min-width:860px){
+  .quiz-shell:has(.card-reading){
+    display:grid!important;
+    grid-template-columns:1.2fr 1fr!important;
+    grid-template-areas:"topbar topbar" "reading question"!important;
+    gap:24px!important;
+    align-items:start!important;
+    max-width:1140px!important;
+    margin:0 auto!important;
+  }
+  .quiz-shell:has(.card-reading) .quiz-topbar{grid-area:topbar!important}
+  .quiz-shell:has(.card-reading) .card-reading{
+    grid-area:reading!important;
+    position:sticky!important;
+    top:76px!important;
+    max-height:calc(100vh - 100px)!important;
+    overflow-y:auto!important;
+    scrollbar-width:thin;
+    margin-bottom:0!important;
+  }
+  .quiz-shell:has(.card-reading) > .card:not(.card-reading){grid-area:question!important}
+  .reading-jump-bar{display:none!important}
+}
+.reading-jump-bar{margin-bottom:12px}
+.reading-jump-btn{
+  display:inline-flex;align-items:center;gap:8px;
+  background:var(--surface-cool);border:1px solid var(--line-soft);
+  border-radius:var(--radius-pill, 999px);padding:6px 14px;
+  font-size:.84rem;font-weight:600;color:var(--muted);cursor:pointer;
+  transition:background .15s ease,color .15s ease;
+}
+.reading-jump-btn:hover{background:var(--panel);color:var(--ink)}
+.reading-jump-btn svg{width:14px;height:14px}
+.passage-reading{scroll-margin-top:76px}
+
+/* Listening Mode: Speed controls and animated visualizer wave */
+.quiz-listen-controls{display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:8px}
+.quiz-listen-speed-btn{
+  background:var(--surface-cool);border:1.5px solid var(--line);
+  border-radius:var(--radius-pill, 999px);padding:8px 14px;min-height:44px;
+  font-size:.88rem;font-weight:700;color:var(--ink);cursor:pointer;
+  display:inline-flex;align-items:center;justify-content:center;
+  transition:all .15s ease;
+}
+.quiz-listen-speed-btn:hover{background:var(--panel);border-color:var(--accent)}
+.quiz-listen-speed-btn.is-slow{background:var(--accent-soft);border-color:var(--accent);color:var(--accent)}
+.quiz-audio-wave{display:flex;align-items:center;justify-content:center;gap:4px;height:24px;margin:6px 0 8px}
+.quiz-audio-wave.hidden{display:none}
+.quiz-audio-wave span{
+  display:inline-block;width:4px;background:var(--accent);border-radius:2px;
+  animation:audioWavePulse 1s ease-in-out infinite alternate;
+}
+.quiz-audio-wave span:nth-child(1){animation-delay:.1s;height:35%}
+.quiz-audio-wave span:nth-child(2){animation-delay:.3s;height:75%}
+.quiz-audio-wave span:nth-child(3){animation-delay:.2s;height:100%}
+.quiz-audio-wave span:nth-child(4){animation-delay:.4s;height:60%}
+.quiz-audio-wave span:nth-child(5){animation-delay:.15s;height:40%}
+@keyframes audioWavePulse{0%{transform:scaleY(.3)}100%{transform:scaleY(1)}}
+
+/* Floating Next Action Bar (Thumb-Zone Ergonomics) */
+.quiz-floating-bar{
+  position:fixed;bottom:calc(16px + env(safe-area-inset-bottom, 0px));
+  left:0;right:0;display:flex;justify-content:center;align-items:center;
+  padding:0 16px;z-index:999;pointer-events:none;opacity:0;
+  transform:translateY(16px);
+  transition:opacity .22s cubic-bezier(.16,1,.3,1),transform .22s cubic-bezier(.16,1,.3,1);
+}
+.quiz-floating-bar.is-visible{opacity:1;transform:translateY(0);pointer-events:auto}
+.quiz-floating-next-btn{
+  width:100%;max-width:480px;min-height:52px;
+  display:flex;align-items:center;justify-content:center;gap:12px;
+  border-radius:var(--radius-pill, 999px);font-size:1.05rem;font-weight:700;
+  box-shadow:0 8px 24px -4px rgba(36,26,17,.3),0 2px 8px rgba(234,88,12,.25);
+  cursor:pointer;border:none;
+  background:linear-gradient(135deg,#EA580C,#C2410C);
+  color:#fff;transition:transform .15s ease,box-shadow .15s ease;
+}
+.quiz-floating-next-btn:active{transform:scale(.98)}
+.quiz-floating-next-btn svg{width:20px;height:20px}
+.quiz-shell{padding-bottom:84px!important}
 /* ==========================================================================
    Popup keyakinan (m025-133)
    ==========================================================================
@@ -1203,8 +1285,8 @@ button svg,.creator-link svg{width:17px;height:17px;flex:0 0 auto}
 /* Aksen kiri 4px dipasang lewat box-shadow inset, BUKAN border-left: border akan
    menggeser padding dan membuat teks banner melompat saat state berubah. */
 .feedback.feedback-success{border-color:var(--line);box-shadow:inset 4px 0 0 var(--good)}
-.feedback.feedback-error{border-color:var(--line);box-shadow:inset 4px 0 0 var(--bad)}
-.feedback-title{display:flex;align-items:center;gap:9px;margin-bottom:6px}.feedback-title svg{width:21px;height:21px}.feedback-success .feedback-title{color:var(--good)}.feedback-error .feedback-title{color:var(--bad)}
+.feedback.feedback-error{border-color:#F5C6BC;box-shadow:inset 4px 0 0 #D9534F;background:#FFF5F2}
+.feedback-title{display:flex;align-items:center;gap:9px;margin-bottom:6px}.feedback-title svg{width:21px;height:21px}.feedback-success .feedback-title{color:var(--good)}.feedback-error .feedback-title{color:#B23B2A}
 .grammar-grid .card{display:grid;gap:10px}.lesson-card-foot{display:flex;align-items:center;justify-content:space-between;gap:12px}.lesson-card-foot>span{font-size:var(--fs-caption);color:var(--muted)}
 .lesson-title{font-size:var(--fs-h1);margin:8px 0 10px}.grammar-lesson-card>p{line-height:1.7}
 /* v6.1 (O4 §3): maks DUA dari {border, bayangan, bg tint} — panel inset cukup tint. */
@@ -3446,9 +3528,9 @@ button.hero-stat:active{transform:translateY(1px)}
 /* Strip Coach: satu kalimat, satu tombol besar, satu tautan kecil. */
 .coach-strip{
   display:grid;grid-template-columns:auto 1fr;gap:12px 13px;align-items:center;
-  padding:15px;border-radius:var(--radius-lg);
-  background:rgba(var(--surface-pure-rgb),.94);
-  border:0;box-shadow:var(--shadow-md);
+  padding:16px 18px;border-radius:var(--radius-xl, 22px);
+  background:linear-gradient(145deg, rgba(var(--surface-pure-rgb),.98), rgba(254,248,238,.96));
+  border:1.5px solid rgba(234,88,12,.22);box-shadow:var(--shadow-md),0 6px 20px -4px rgba(234,88,12,.12);
 }
 .coach-strip-face{
   width:42px;height:42px;border-radius:50%;
@@ -3467,7 +3549,14 @@ button.hero-stat:active{transform:translateY(1px)}
 }
 /* Tombolnya melintasi dua kolom: di layar ponsel inilah elemen terbesar di Home, dan
    memang harus begitu - yang paling besar di layar seharusnya yang paling ingin ditekan. */
-.coach-strip-go{grid-column:1/-1;width:100%;min-height:52px;font-size:1rem;font-weight:700}
+.coach-strip-go{
+  grid-column:1/-1;width:100%;min-height:54px;font-size:1.04rem;font-weight:700;
+  border-radius:var(--radius-pill, 999px);
+  background:linear-gradient(135deg,#EA580C,#C2410C);color:#fff;
+  box-shadow:0 8px 24px -4px rgba(234,88,12,.38);
+  transition:transform .15s ease,box-shadow .15s ease;
+}
+.coach-strip-go:active{transform:scale(.98)}
 .coach-strip-more{
   grid-column:1/-1;justify-self:center;
   /* Hit area 101x22 sebelum ini - di bawah 44px minimum DIRECTION #6. Padding-nya
@@ -4864,6 +4953,19 @@ body.fz-stage-grammar-lesson .section-head h1{font-family:var(--fz-heading);font
 :lang(th) .section-head p{line-height:1.5}
 :lang(th) .launch-card b{line-height:1.45;letter-spacing:normal}
 :lang(th) .launch-card small{line-height:1.45}
+:lang(th) .modal-panel,
+:lang(th) .dialog,
+:lang(th) .confidence-card,
+:lang(th) .feedback,
+:lang(th) .passage{line-height:1.62;letter-spacing:normal}
+:lang(th) .feedback p,
+:lang(th) .feedback-title,
+:lang(th) .modal-panel p,
+:lang(th) .modal-panel h2,
+:lang(th) .modal-panel h3,
+:lang(th) .confidence-verdict,
+:lang(th) .reading-jump-btn,
+:lang(th) .quiz-floating-next-btn{line-height:1.6;letter-spacing:normal;padding-top:2px;padding-bottom:2px}
 
 /* Jaring pengaman pembungkusan (AI-04 F01/F02): Thai tanpa spasi antar-kata;
    segmentasi kamus peramban gagal pada nama/serapan panjang dan body punya

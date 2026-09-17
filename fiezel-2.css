@@ -98,7 +98,7 @@ body.fz-lux .option.wrong::before,body .option.wrong::before{background:var(--ba
 body.fz-lux .option:disabled:not(.correct):not(.wrong),body .option:disabled:not(.correct):not(.wrong){opacity:.55;box-shadow:none}
 body.fz-lux .feedback,body .feedback{border-radius:20px;padding:16px 18px;background:var(--surface-tint);border:1px solid var(--line);font-size:.95rem}
 body.fz-lux .feedback.feedback-success,body .feedback.feedback-success,body.fz-lux .feedback.is-correct,body .feedback.is-correct{background:var(--good-soft);border-color:#CDE9DD}
-body.fz-lux .feedback.feedback-error,body .feedback.feedback-error,body.fz-lux .feedback.is-wrong,body .feedback.is-wrong{background:#FFF1EE;border-color:#F6D3C9}
+body.fz-lux .feedback.feedback-error,body .feedback.feedback-error,body.fz-lux .feedback.is-wrong,body .feedback.is-wrong{background:#FFF5F2;border-color:#F5C6BC}
 body.fz-lux .feedback-title,body .feedback-title{font-family:var(--fz-display);font-weight:700;font-size:1.15rem;letter-spacing:-.02em}
 
 /* ---------- form ---------- */

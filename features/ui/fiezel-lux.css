@@ -299,4 +299,5 @@ body.fz-lux [data-fz-student-hide]{display:none !important}
 /* ---------- Thai ---------- */
 body.fz-lux:lang(th),body.fz-lux :lang(th){font-family:'FZ Plus Jakarta Sans','Noto Sans Thai','Sarabun','Tahoma',sans-serif}
 body.fz-lux :lang(th) .section-head h1,body.fz-lux :lang(th) .hero-line,body.fz-lux :lang(th) .home-section-head h2,
-body.fz-lux :lang(th) .modal-panel h2,body.fz-lux :lang(th) .card h3{font-family:'Noto Serif Thai','FZ Instrument Serif','Noto Sans Thai',serif;line-height:1.3}
+body.fz-lux :lang(th) .modal-panel h2,body.fz-lux :lang(th) .card h3{font-family:'Noto Serif Thai','FZ Instrument Serif','Noto Sans Thai',serif;line-height:1.45}
+body.fz-lux :lang(th) .modal-panel p,body.fz-lux :lang(th) .modal-panel,body.fz-lux :lang(th) .feedback,body.fz-lux :lang(th) .passage{line-height:1.62}
