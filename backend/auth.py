@@ -29,7 +29,9 @@ from fastapi import APIRouter, HTTPException, Request, Response, Depends
 from pydantic import BaseModel
 
 from db import db
-from kelasku import TicketError, role_for, verify_ticket
+from pymongo.errors import DuplicateKeyError
+
+from kelasku import TICKET_CLOCK_SKEW_SECONDS, TicketError, role_for, verify_ticket
 
 ALG = "HS256"
 ACCESS_MIN = 720
@@ -142,14 +144,30 @@ class KelasKuIn(BaseModel):
 # jadi daftar ini tidak pernah tumbuh besar; ia dibersihkan indeks TTL Mongo
 # (lihat db.ensure_indexes). Tanpa ini, tiket yang tercuri dari log masih bisa
 # dipakai ulang selama sisa umurnya.
+#
+# BARIS INI HIDUP LEBIH LAMA DARIPADA TIKETNYA, dan selisih itu bukan kelebihan:
+# verify_ticket menerima tiket sampai `exp + TICKET_CLOCK_SKEW_SECONDS` (toleransi jam
+# antar-server). Kalau barisnya mati tepat di `exp`, ada jendela sampai 60 detik di mana
+# tiketnya MASIH diterima sementara catatan "sudah dipakai"-nya sudah disapu TTL — dan
+# di jendela itu tiket yang terpungut dari log bisa dipakai sekali lagi. Umur baris
+# karena itu diikat ke batas PENERIMAAN, bukan ke batas tiket.
+# (Temuan review gitar-bot di PR #428; diukur, bukan didugaan — lihat gerbangnya di
+# tests/curriculum-single-door-test.js.)
 async def _burn_ticket(jti: str, exp: int):
     try:
         await db.kelasku_tickets.insert_one({
             "jti": jti,
-            "expires_at": datetime.fromtimestamp(exp, tz=timezone.utc),
+            "expires_at": datetime.fromtimestamp(exp + TICKET_CLOCK_SKEW_SECONDS, tz=timezone.utc),
         })
-    except Exception:
+    except DuplicateKeyError:
+        # SATU-SATUNYA kegagalan yang berarti "tiket ini sudah dipakai". Kalimatnya sama
+        # dengan penolakan lain (anti-oracle).
         raise HTTPException(401, "Tiket KelasKu tidak berlaku. Muat ulang halaman dan coba lagi.")
+    # Galat Mongo LAIN sengaja tidak ditangkap. Menelannya jadi 401 berarti saat MongoDB
+    # tersendat setiap orang membaca "tiket tidak berlaku, muat ulang" — lalu memuat ulang,
+    # mendapat tiket baru, dan gagal lagi. Gangguan infrastruktur yang menyamar sebagai
+    # kesalahan pengguna adalah gangguan yang tidak akan pernah dicari orang di tempat yang
+    # benar; biarkan ia menjadi 5xx yang jujur.
 
 
 @router.post("/kelasku")
