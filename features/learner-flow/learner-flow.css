@@ -20,7 +20,7 @@
 .lf-stepper li{display:flex;align-items:center;gap:6px;font-size:.74rem;font-weight:600;color:var(--muted);padding:6px 10px;border-radius:var(--radius-pill);white-space:nowrap;background:var(--panel-soft)}
 .lf-stepper li span{width:18px;height:18px;border-radius:50%;display:inline-grid;place-items:center;font-size:.66rem;background:var(--line);color:var(--text)}
 .lf-stepper li.is-done{color:var(--good)}.lf-stepper li.is-done span{background:var(--good);color:#fff}
-.lf-stepper li.is-current{background:var(--ink);color:#fff}.lf-stepper li.is-current span{background:var(--yellow);color:var(--ink)}
+.lf-stepper li.is-current{background:var(--accent);color:#fff}.lf-stepper li.is-current span{background:var(--yellow);color:var(--ink)}
 .lf-goal-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:10px;margin:14px 0 6px}
 .lf-goal{text-align:left;display:flex;flex-direction:column;gap:4px;padding:14px;border:1.5px solid var(--line);border-radius:var(--radius-md);background:var(--panel-soft);font:inherit;cursor:pointer;transition:transform var(--dur-s) var(--ease-spring),border-color var(--dur-s),background-color var(--dur-s)}
 .lf-goal b{font-size:.95rem}.lf-goal small{color:var(--muted);line-height:1.4}
@@ -28,9 +28,9 @@
 .lf-goal.is-selected{border-color:var(--accent);background:var(--accent-soft)}
 .lf-actions,.tac-actions{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-top:16px}
 .lf-actions-end{margin-top:6px;justify-content:flex-end}
-.lf-primary,.tac-primary{border:0;font:inherit;font-weight:700;font-size:.92rem;padding:12px 20px;border-radius:var(--radius-pill);background:var(--ink);color:#fff;cursor:pointer;box-shadow:0 6px 0 rgba(36,26,17,.18);transition:transform var(--dur-s) var(--ease-spring),box-shadow var(--dur-s),opacity var(--dur-s)}
-.lf-primary:hover,.tac-primary:hover{transform:translateY(-2px);box-shadow:0 8px 0 rgba(36,26,17,.18)}
-.lf-primary:active,.tac-primary:active{transform:translateY(2px);box-shadow:0 2px 0 rgba(36,26,17,.18)}
+.lf-primary,.tac-primary{border:0;font:inherit;font-weight:700;font-size:.92rem;padding:12px 20px;border-radius:var(--radius-pill);background:var(--accent);color:#FFFFFF;cursor:pointer;box-shadow:0 6px 0 rgba(155,58,74,.22);transition:transform var(--dur-s) var(--ease-spring),box-shadow var(--dur-s),opacity var(--dur-s)}
+.lf-primary:hover,.tac-primary:hover{transform:translateY(-2px);background:var(--accent-strong);box-shadow:0 8px 0 rgba(155,58,74,.22)}
+.lf-primary:active,.tac-primary:active{transform:translateY(2px);box-shadow:0 2px 0 rgba(155,58,74,.22)}
 .lf-primary:disabled,.tac-primary:disabled{opacity:.4;cursor:not-allowed;transform:none}
 .lf-ghost,.tac-ghost,.lf-mini,.tac-mini{border:1.5px solid var(--line);background:var(--panel);font:inherit;font-weight:600;font-size:.86rem;padding:10px 16px;border-radius:var(--radius-pill);color:var(--text);cursor:pointer;transition:background-color var(--dur-s),border-color var(--dur-s),transform var(--dur-s) var(--ease-spring)}
 .lf-ghost:hover,.tac-ghost:hover,.lf-mini:hover,.tac-mini:hover{background:var(--panel-soft);border-color:var(--muted-soft);transform:translateY(-1px)}

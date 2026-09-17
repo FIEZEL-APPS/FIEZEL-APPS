@@ -380,14 +380,12 @@ const HEURISTIC_PATH_ALLOWLIST = [
        di jalur baru, karena daftar maaf ini memang dikunci JALUR, bukan isi.
 
        Entri ini karena itu tidak melonggarkan apa pun yang belum dimaafkan: ia
-       menyatakan ulang keputusan yang sama untuk berkas yang sama. Kalau suatu hari
-       isinya BERUBAH, sha256 di komentar ini yang menjadi jejak untuk memeriksanya
-       kembali — dan saat salinan lamanya dihapus, entri di atas yang harus ikut pergi. */
+       menyatakan ulang keputusan yang sama untuk berkas yang sama. */
     prefix: 'website/sentinel/qrcode.min.js',
-    reason: 'Salinan byte-identik dari tools/fiezel-drop/public/qrcode.min.js (pustaka QR '
-      + 'pihak ketiga) yang ikut pindah bersama halaman Ghost Sentinel ke website/sentinel/. '
-      + 'Yang tertangkap adalah data URI PNG bawaan pustakanya — aset ikon, bukan kredensial. '
-      + 'Tak satu baris pun ditulis proyek ini.'
+    reason: 'Salinan byte-identik (sha256 c541ef06…) dari tools/fiezel-drop/public/qrcode.min.js, '
+      + 'dipindahkan ke website/ supaya ter-deploy lewat cPanel. Alasannya sama persis: data URI '
+      + 'PNG 1x1 bawaan pustaka, terdekode menjadi bita ajaib PNG. Pengecualian jalur lama '
+      + 'tertinggal saat berkasnya pindah, dan itu membuat main merah di setiap PR.'
   }
 ];
 

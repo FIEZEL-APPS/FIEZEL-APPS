@@ -70,7 +70,7 @@ assert(/passage:\{id:r\.id/.test(app),'reading questions do not carry their pass
 // (soal reading selalu ditemani passage-nya, ber-eyebrow berbahasa Indonesia yang benar),
 // bukan ejaan kunci yang boleh berubah kapan saja. Jadi kuncinya sekarang DIBACA dari
 // renderer, lalu nilainya diverifikasi di copy-map — rename lolos, kartu yang hilang tidak.
-const passageEyebrow=/q\.passage\?card\(`<div class="passage passage-reading"><div class="eyebrow">\$\{([^}]+)\}/.exec(app);
+const passageEyebrow=/q\.passage\?card\(`<div class="passage passage-reading"[^>]*><div class="eyebrow">\$\{([^}]+)\}/.exec(app);
 const eyebrowKey=passageEyebrow&&/FiezelI18n\.t\('([^']+)'\)/.exec(passageEyebrow[1]);
 assert(!!passageEyebrow&&(/TEKS BACAAN/.test(passageEyebrow[1])||(!!eyebrowKey&&new RegExp("'"+eyebrowKey[1].replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+"'\\s*:\\s*'TEKS BACAAN'").test(copyIdUnion))),'quiz renderer does not show passage with reading question');
 assert(/const readiness=diagnosticReadinessMap\(state\)/.test(app)&&/state\.adaptiveReady=!!readiness\[getActiveLevel\(state\)\]/.test(app),'adaptive readiness must be evidence-based, per active level');

@@ -456,17 +456,89 @@ input[type="checkbox"],input[type="radio"]{min-width:24px;min-height:24px}
 .error{margin-top:26px;padding:20px;border:1px solid #f3c3cf;background:var(--red-soft);border-radius:var(--radius-md);color:var(--ink-danger)}
 
 /* ---------- flashcards ---------- */
-.flashcard{width:100%;min-height:340px;cursor:pointer;perspective:1400px;border:1px solid var(--line);border-radius:var(--radius-lg);background:transparent;color:inherit;outline:none;box-shadow:var(--shadow-sm)}
-.flash-inner{position:relative;width:100%;min-height:340px;transition:transform .55s var(--ease-spring);transform-style:preserve-3d}
+.card.card-flashcard{
+  background:transparent;border:none;box-shadow:none;padding:0;
+  max-width:min(520px,100%);margin:0 auto;
+}
+.flashcard{
+  width:100%;height:clamp(220px,32vh,280px);min-height:210px;cursor:pointer;perspective:1400px;
+  border:1.5px solid var(--line);border-radius:24px;background:transparent;
+  color:inherit;outline:none;
+  box-shadow:0 10px 28px -6px rgba(36,26,17,.08),0 2px 8px rgba(36,26,17,.04);
+}
+.flash-inner{
+  position:relative;width:100%;height:100%;
+  transition:transform .55s var(--ease-spring);transform-style:preserve-3d;
+}
 .flashcard.flipped .flash-inner{transform:rotateY(180deg)}
-.flash-face{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;border-radius:var(--radius-lg);padding:30px;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;background:var(--surface-solid)}
-.flash-front{transform:rotateY(0deg)}
-.flash-back{transform:rotateY(180deg);overflow:auto}
-.flash-face .word{margin:.4rem 0}
-.flash-face hr{width:100%;border:0;border-top:1px solid var(--line);margin:16px 0}
-.flash-actions{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:16px}
-.swipe-hint{text-align:center;color:var(--muted-soft);font-size:.74rem;margin:10px 0 2px}
+.flash-face{
+  position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;
+  border-radius:24px;padding:18px 20px;display:flex;flex-direction:column;
+  align-items:center;text-align:center;background:var(--surface-solid);
+  box-sizing:border-box;overflow:hidden;
+}
+@media(min-width:640px){.flash-face{padding:22px 26px}}
+@media(max-width:380px){.flash-face{padding:14px 14px}}
+.flash-front{transform:rotateY(0deg);justify-content:space-between}
+.flash-front-main{margin:auto 0;display:flex;flex-direction:column;align-items:center}
+.flash-front .word{
+  font-family:var(--fz-heading);font-size:clamp(2.1rem,6vw,2.9rem);
+  font-weight:800;letter-spacing:-.025em;line-height:1.15;margin:2px 0;
+  color:var(--text);
+}
+.flash-front .phonetic{font-size:1rem;color:var(--muted);margin-top:2px}
+.flash-back{transform:rotateY(180deg);justify-content:center}
+.flash-kicker{
+  display:block;font-size:.72rem;font-weight:800;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--muted);margin:0 0 4px;
+}
+.flash-meaning{
+  font-family:var(--fz-heading);font-size:clamp(1.5rem,4.8vw,2.1rem);
+  font-weight:800;letter-spacing:-.02em;line-height:1.22;color:var(--text);
+  margin:0 0 10px;word-break:break-word;
+}
+.flash-example-box{
+  width:100%;max-width:440px;background:var(--panel-soft);border:1px solid var(--line);
+  border-radius:14px;padding:8px 14px;margin:0 0 6px;text-align:center;box-sizing:border-box;
+}
+.flash-example-en{font-size:.9rem;line-height:1.38;color:var(--text);font-style:italic;margin:0}
+.flash-example-id{font-size:.82rem;line-height:1.32;color:var(--muted);margin:3px 0 0}
+.flash-flip-hint{
+  display:inline-flex;align-items:center;gap:6px;font-size:.78rem;
+  color:var(--muted-soft);margin:4px 0 0;
+}
+.flash-flip-hint svg{width:13px;height:13px}
 .flashcard:focus-visible{outline:2px solid var(--focus-ring);outline-offset:2px;box-shadow:none}
+
+/* Primary Mastery Bar — ALWAYS visible directly from front & back */
+.flash-mastery-bar{
+  width:100%;max-width:440px;display:grid;grid-template-columns:1fr 1fr;
+  gap:12px;margin:12px auto 0;
+}
+.flash-btn-learning,.flash-btn-mastered{
+  min-height:48px;border-radius:999px;font-size:.95rem;font-weight:700;
+  padding:0 16px;display:inline-flex;align-items:center;justify-content:center;
+  gap:8px;cursor:pointer;transition:transform .15s ease,box-shadow .15s ease;
+}
+.flash-btn-learning{
+  background:var(--panel);border:1.5px solid var(--line);color:var(--text);
+}
+.flash-btn-learning:hover{background:var(--panel-soft);transform:translateY(-1px)}
+.flash-btn-learning:active{transform:translateY(0)}
+.flash-btn-mastered{
+  background:linear-gradient(135deg,#16a34a,#15803d);border:none;color:#ffffff;
+  box-shadow:0 4px 14px rgba(22,163,74,.28);
+}
+.flash-btn-mastered:hover{box-shadow:0 6px 18px rgba(22,163,74,.36);transform:translateY(-1px)}
+.flash-btn-mastered:active{transform:translateY(0)}
+
+/* Utility Actions */
+.card-flashcard .actions{display:flex;justify-content:center;gap:8px;flex-wrap:wrap;margin-top:10px}
+.card-flashcard .actions button{
+  min-height:38px;border-radius:999px;padding:0 14px;font-size:.84rem;font-weight:600;
+  display:inline-flex;align-items:center;gap:6px;background:var(--panel);border:1px solid var(--line);
+}
+.swipe-hint{text-align:center;color:var(--muted-soft);font-size:.74rem;margin:6px 0 2px}
 
 .three{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:14px}
 
@@ -685,6 +757,88 @@ input[type="checkbox"],input[type="radio"]{min-width:24px;min-height:24px}
 .passage-reading h3{font-family:"Instrument Serif",serif;font-size:1.55rem;line-height:1.25;margin:4px 0 12px;color:var(--ink)}
 .passage-reading p{font-size:1.04rem;line-height:1.85;color:var(--text);max-width:64ch;letter-spacing:0.005em}
 .flash-back .muted{margin-top:12px}
+
+/* Reading Mode: 2-column layout on Desktop & Tablet, comfortable peek on Mobile */
+@media(min-width:860px){
+  .quiz-shell:has(.card-reading){
+    display:grid!important;
+    grid-template-columns:1.2fr 1fr!important;
+    grid-template-areas:"topbar topbar" "reading question"!important;
+    gap:24px!important;
+    align-items:start!important;
+    max-width:1140px!important;
+    margin:0 auto!important;
+  }
+  .quiz-shell:has(.card-reading) .quiz-topbar{grid-area:topbar!important}
+  .quiz-shell:has(.card-reading) .card-reading{
+    grid-area:reading!important;
+    position:sticky!important;
+    top:76px!important;
+    max-height:calc(100vh - 100px)!important;
+    overflow-y:auto!important;
+    scrollbar-width:thin;
+    margin-bottom:0!important;
+  }
+  .quiz-shell:has(.card-reading) > .card:not(.card-reading){grid-area:question!important}
+  .reading-jump-bar{display:none!important}
+}
+.reading-jump-bar{margin-bottom:12px}
+.reading-jump-btn{
+  display:inline-flex;align-items:center;gap:8px;
+  background:var(--surface-cool);border:1px solid var(--line-soft);
+  border-radius:var(--radius-pill, 999px);padding:6px 14px;
+  font-size:.84rem;font-weight:600;color:var(--muted);cursor:pointer;
+  transition:background .15s ease,color .15s ease;
+}
+.reading-jump-btn:hover{background:var(--panel);color:var(--ink)}
+.reading-jump-btn svg{width:14px;height:14px}
+.passage-reading{scroll-margin-top:76px}
+
+/* Listening Mode: Speed controls and animated visualizer wave */
+.quiz-listen-controls{display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:8px}
+.quiz-listen-speed-btn{
+  background:var(--surface-cool);border:1.5px solid var(--line);
+  border-radius:var(--radius-pill, 999px);padding:8px 14px;min-height:44px;
+  font-size:.88rem;font-weight:700;color:var(--ink);cursor:pointer;
+  display:inline-flex;align-items:center;justify-content:center;
+  transition:all .15s ease;
+}
+.quiz-listen-speed-btn:hover{background:var(--panel);border-color:var(--accent)}
+.quiz-listen-speed-btn.is-slow{background:var(--accent-soft);border-color:var(--accent);color:var(--accent)}
+.quiz-audio-wave{display:flex;align-items:center;justify-content:center;gap:4px;height:24px;margin:6px 0 8px}
+.quiz-audio-wave.hidden{display:none}
+.quiz-audio-wave span{
+  display:inline-block;width:4px;background:var(--accent);border-radius:2px;
+  animation:audioWavePulse 1s ease-in-out infinite alternate;
+}
+.quiz-audio-wave span:nth-child(1){animation-delay:.1s;height:35%}
+.quiz-audio-wave span:nth-child(2){animation-delay:.3s;height:75%}
+.quiz-audio-wave span:nth-child(3){animation-delay:.2s;height:100%}
+.quiz-audio-wave span:nth-child(4){animation-delay:.4s;height:60%}
+.quiz-audio-wave span:nth-child(5){animation-delay:.15s;height:40%}
+@keyframes audioWavePulse{0%{transform:scaleY(.3)}100%{transform:scaleY(1)}}
+
+/* Floating Next Action Bar (Thumb-Zone Ergonomics) */
+.quiz-floating-bar{
+  position:fixed;bottom:calc(16px + env(safe-area-inset-bottom, 0px));
+  left:0;right:0;display:flex;justify-content:center;align-items:center;
+  padding:0 16px;z-index:999;pointer-events:none;opacity:0;
+  transform:translateY(16px);
+  transition:opacity .22s cubic-bezier(.16,1,.3,1),transform .22s cubic-bezier(.16,1,.3,1);
+}
+.quiz-floating-bar.is-visible{opacity:1;transform:translateY(0);pointer-events:auto}
+.quiz-floating-next-btn{
+  width:100%;max-width:480px;min-height:52px;
+  display:flex;align-items:center;justify-content:center;gap:12px;
+  border-radius:var(--radius-pill, 999px);font-size:1.05rem;font-weight:700;
+  box-shadow:0 8px 24px -4px rgba(36,26,17,.3),0 2px 8px rgba(234,88,12,.25);
+  cursor:pointer;border:none;
+  background:linear-gradient(135deg,#EA580C,#C2410C);
+  color:#fff;transition:transform .15s ease,box-shadow .15s ease;
+}
+.quiz-floating-next-btn:active{transform:scale(.96);transition-duration:.08s}
+.quiz-floating-next-btn svg{width:20px;height:20px}
+.quiz-shell{padding-bottom:84px!important}
 /* ==========================================================================
    Popup keyakinan (m025-133)
    ==========================================================================
@@ -1203,13 +1357,13 @@ button svg,.creator-link svg{width:17px;height:17px;flex:0 0 auto}
 /* Aksen kiri 4px dipasang lewat box-shadow inset, BUKAN border-left: border akan
    menggeser padding dan membuat teks banner melompat saat state berubah. */
 .feedback.feedback-success{border-color:var(--line);box-shadow:inset 4px 0 0 var(--good)}
-.feedback.feedback-error{border-color:var(--line);box-shadow:inset 4px 0 0 var(--bad)}
-.feedback-title{display:flex;align-items:center;gap:9px;margin-bottom:6px}.feedback-title svg{width:21px;height:21px}.feedback-success .feedback-title{color:var(--good)}.feedback-error .feedback-title{color:var(--bad)}
+.feedback.feedback-error{border-color:#F5C6BC;box-shadow:inset 4px 0 0 #D9534F;background:#FFF5F2}
+.feedback-title{display:flex;align-items:center;gap:9px;margin-bottom:6px}.feedback-title svg{width:21px;height:21px}.feedback-success .feedback-title{color:var(--good)}.feedback-error .feedback-title{color:#B23B2A}
 .grammar-grid .card{display:grid;gap:10px}.lesson-card-foot{display:flex;align-items:center;justify-content:space-between;gap:12px}.lesson-card-foot>span{font-size:var(--fs-caption);color:var(--muted)}
 .lesson-title{font-size:var(--fs-h1);margin:8px 0 10px}.grammar-lesson-card>p{line-height:1.7}
 /* v6.1 (O4 §3): maks DUA dari {border, bayangan, bg tint} — panel inset cukup tint. */
 .lesson-example{margin:var(--sp-5) 0;padding:var(--sp-4);border-radius:var(--radius-md);background:var(--surface-warm)}.lesson-example>span{font-size:var(--fs-caption);letter-spacing:.13em;text-transform:uppercase;color:var(--accent-strong);font-weight:700}.lesson-example h3{margin:7px 0 8px;font-size:1rem;line-height:1.5}.lesson-example p{margin:0;color:var(--muted);font-size:.82rem;line-height:1.55}
-.practice-contract{display:flex;align-items:center;justify-content:space-between;gap:var(--sp-6);margin:var(--sp-3) 0;padding:var(--sp-5);border-radius:var(--radius-md);background:rgba(var(--surface-rgb),.9);color:var(--text)}.practice-contract h3{margin:0 0 5px}.practice-contract p{margin:0;max-width:600px;color:var(--muted);font-size:.8rem;line-height:1.55}.practice-contract button{flex:0 0 auto}
+.practice-contract{display:flex;align-items:center;justify-content:space-between;gap:var(--sp-5);margin:var(--sp-3) 0;padding:var(--sp-5);border-radius:var(--radius-lg);background:rgba(var(--surface-rgb),.9);color:var(--text);border:1px solid var(--line)}.practice-contract h3{margin:0 0 5px}.practice-contract p{margin:0;max-width:600px;color:var(--muted);font-size:.84rem;line-height:1.55}.practice-contract button{flex:0 0 auto;min-height:44px;border-radius:999px;padding:0 18px;font-weight:700}@media(max-width:560px){.practice-contract{flex-direction:column;align-items:stretch;gap:14px}.practice-contract button{width:100%;justify-content:center}}
 
 @keyframes signalPulse{0%,100%{opacity:.7;transform:scale(.92)}50%{opacity:1;transform:scale(1.08)}}
 .reduce-motion *{animation-duration:.001ms!important;animation-delay:0s!important;animation-iteration-count:1!important;transition-duration:.001ms!important;scroll-behavior:auto!important}
@@ -2837,15 +2991,23 @@ body.reduce-motion .fz-coach-bubble .fz-coach-pulse,body.reduce-motion .fz-confe
    dan kalau ia ikut tergulir, ia hilang tepat saat murid menggulir daftar pilihan
    jawaban. Terukur di preview: y=-16px setelah gulir kecil, tepiannya terpotong.
    top:6px menyamai --sp yang dipakai topbar v6 di lebar ponsel (tutor-v3.css:94). */
-.skill-page-topbar{display:flex;justify-content:flex-end;margin:0 0 4px;position:sticky;top:6px;z-index:34}
+.skill-page-topbar{display:flex;justify-content:space-between;align-items:center;margin:0 0 10px;position:sticky;top:6px;z-index:34}
 .skill-help-dot{
   width:44px;height:44px;min-height:44px;padding:0;
-  display:grid;place-items:center;
+  display:grid;place-items:center;margin-left:auto;
   border-radius:50%;border:1px solid var(--line);
   background:var(--panel-soft);color:var(--ink);
   font-size:1.05rem;font-weight:800;line-height:1;
   box-shadow:none;
 }
+.skill-back-btn{
+  display:inline-flex;align-items:center;gap:8px;font-size:.88rem;font-weight:700;
+  color:var(--text);background:var(--panel-soft);border:1px solid var(--line);
+  border-radius:999px;padding:6px 14px;min-height:42px;cursor:pointer;
+  transition:background .15s ease,border-color .15s ease;
+}
+.skill-back-btn:hover{background:var(--surface-tint);border-color:var(--line-strong)}
+.skill-back-btn svg{width:16px;height:16px}
 .skill-help-dot:hover{background:var(--sun-soft);transform:none}
 /* DUA aturan menimpa bentuk tombol ini, dan keduanya harus dijawab - preview mencatnya
    dulu 16px, lalu 13px setelah yang pertama diatasi:
@@ -2896,6 +3058,14 @@ html.fiezel-ui-v6 .skill-help-dot{border-radius:50%}
 .skill-help-level{margin:14px 0 0}
 
 /* Isi dialog bantuan: naskah yang dulu berdiri sebagai hero. */
+.skill-help-panel{position:relative}
+.modal-close-corner{
+  position:absolute;top:-8px;right:-8px;width:38px;height:38px;border-radius:999px;
+  border:1px solid var(--line);background:var(--panel-soft);color:var(--muted);
+  display:grid;place-items:center;cursor:pointer;padding:0;transition:all .15s ease;
+}
+.modal-close-corner:hover{color:var(--text);background:var(--surface-tint);border-color:var(--line-strong)}
+.modal-close-corner svg{width:18px;height:18px}
 .skill-help-panel h2{margin:.35rem 0 .5rem;font-size:1.35rem;letter-spacing:-.02em}
 .skill-help-panel p{margin:0 0 .6rem;font-size:.92rem;line-height:1.6}
 .skill-help-panel .skill-level-note{margin-top:12px}
@@ -3240,6 +3410,7 @@ eteach) dan tawaran berhenti (reathe).
     58%{transform:scale(1.12) translateY(-1px)}
     100%{transform:scale(1) translateY(0)}
   }
+}
 /* ==========================================================================
    KelasKu Wordmark — Brand Typography & Contextual Styling
    Signature Plus Jakarta Sans 800 with emerald/sage #1F7A63 identity.
@@ -3446,9 +3617,9 @@ button.hero-stat:active{transform:translateY(1px)}
 /* Strip Coach: satu kalimat, satu tombol besar, satu tautan kecil. */
 .coach-strip{
   display:grid;grid-template-columns:auto 1fr;gap:12px 13px;align-items:center;
-  padding:15px;border-radius:var(--radius-lg);
-  background:rgba(var(--surface-pure-rgb),.94);
-  border:0;box-shadow:var(--shadow-md);
+  padding:16px 18px;border-radius:var(--radius-xl, 22px);
+  background:linear-gradient(145deg, rgba(var(--surface-pure-rgb),.98), rgba(254,248,238,.96));
+  border:1.5px solid rgba(234,88,12,.22);box-shadow:var(--shadow-md),0 6px 20px -4px rgba(234,88,12,.12);
 }
 .coach-strip-face{
   width:42px;height:42px;border-radius:50%;
@@ -3467,7 +3638,14 @@ button.hero-stat:active{transform:translateY(1px)}
 }
 /* Tombolnya melintasi dua kolom: di layar ponsel inilah elemen terbesar di Home, dan
    memang harus begitu - yang paling besar di layar seharusnya yang paling ingin ditekan. */
-.coach-strip-go{grid-column:1/-1;width:100%;min-height:52px;font-size:1rem;font-weight:700}
+.coach-strip-go{
+  grid-column:1/-1;width:100%;min-height:54px;font-size:1.04rem;font-weight:700;
+  border-radius:var(--radius-pill, 999px);
+  background:linear-gradient(135deg,#EA580C,#C2410C);color:#fff;
+  box-shadow:0 8px 24px -4px rgba(234,88,12,.38);
+  transition:transform .15s ease,box-shadow .15s ease;
+}
+.coach-strip-go:active{transform:scale(.98)}
 .coach-strip-more{
   grid-column:1/-1;justify-self:center;
   /* Hit area 101x22 sebelum ini - di bawah 44px minimum DIRECTION #6. Padding-nya
@@ -4093,7 +4271,9 @@ body.fz-lesson-mode .topline{position:sticky;top:0;z-index:30;
 .result-stage .score{font-variant-numeric:tabular-nums}
 .ring-row{display:flex;align-items:center;justify-content:center;gap:14px}
 .ring-row .coach-strip-face{flex:0 0 auto;width:52px;height:52px}
-.result-actions{display:grid;gap:9px;margin-top:4px}
+.result-actions{display:grid;grid-template-columns:1fr;gap:10px;margin-top:14px;width:100%}
+@media(min-width:540px){.result-actions{grid-template-columns:1fr 1fr;max-width:440px;margin-left:auto;margin-right:auto}}
+.result-actions button{min-height:46px;border-radius:999px;font-weight:700;font-size:.94rem;display:inline-flex;align-items:center;justify-content:center;gap:8px}
 /* F1 placement: layar hasil tes penempatan menyebut levelnya secara eksplisit. */
 .result-level{display:grid;gap:2px;justify-items:center;margin:10px 0 4px;padding:12px 14px;border-radius:var(--radius-md);background:var(--panel-soft,rgba(255,255,255,.06));border:1px solid var(--line,rgba(255,255,255,.12))}
 .result-level-mark{font-size:.62rem;letter-spacing:.14em;text-transform:uppercase;opacity:.7}
@@ -4104,7 +4284,7 @@ body.fz-lesson-mode .topline{position:sticky;top:0;z-index:30;
 .result-band-row{display:flex;flex-wrap:wrap;gap:6px;justify-content:center}
 .result-band{font-size:.72rem;padding:3px 9px;border-radius:var(--radius-pill);border:1px solid var(--line,rgba(255,255,255,.14));opacity:.72}
 .result-band-pass{opacity:1;font-weight:700;border-color:var(--accent,#5eead4);color:var(--accent,#5eead4)}
-.result-actions .ghost{min-height:44px;background:transparent;border:1.5px solid var(--line);color:var(--muted)}
+.result-actions .ghost{min-height:46px;background:transparent;border:1.5px solid var(--line);color:var(--muted)}
 
 /* ---------- §7 pengaturan: sakelar + ikon ----------
    CSS-ONLY, nol JS. Sakelarnya digambar DI ATAS checkbox natif, jadi seluruh id
@@ -4864,6 +5044,19 @@ body.fz-stage-grammar-lesson .section-head h1{font-family:var(--fz-heading);font
 :lang(th) .section-head p{line-height:1.5}
 :lang(th) .launch-card b{line-height:1.45;letter-spacing:normal}
 :lang(th) .launch-card small{line-height:1.45}
+:lang(th) .modal-panel,
+:lang(th) .dialog,
+:lang(th) .confidence-card,
+:lang(th) .feedback,
+:lang(th) .passage{line-height:1.62;letter-spacing:normal}
+:lang(th) .feedback p,
+:lang(th) .feedback-title,
+:lang(th) .modal-panel p,
+:lang(th) .modal-panel h2,
+:lang(th) .modal-panel h3,
+:lang(th) .confidence-verdict,
+:lang(th) .reading-jump-btn,
+:lang(th) .quiz-floating-next-btn{line-height:1.6;letter-spacing:normal;padding-top:2px;padding-bottom:2px}
 
 /* Jaring pengaman pembungkusan (AI-04 F01/F02): Thai tanpa spasi antar-kata;
    segmentasi kamus peramban gagal pada nama/serapan panjang dan body punya
