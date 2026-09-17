@@ -1,9 +1,13 @@
 """FIEZEL backend regression pytest — via public REACT_APP_BACKEND_URL ingress.
 
+SEJAK m025-318 mesin kurikulum hanya punya SATU pintu: tiket identitas KelasKu.
+Token `FZG-`, email+sandi, dan sesi Google dicabut beserta rutenya, jadi berkas
+ini menerbitkan tiketnya sendiri dengan kunci yang sama seperti Worker
+(CURRICULUM_TICKET_KEY) — persis yang dilakukan KelasKu di produksi.
+
 Covers edge/negative cases NOT already in /app/backend/smoke_test.py:
- - teacher token wrong -> 401; student token on teacher route -> 403
- - owner mints teacher invite (X-Owner-Token) -> login with FZG-...
- - brute-force lockout after 5 wrong passwords -> 429
+ - tiket palsu/kedaluwarsa/terpakai -> 401; murid di rute guru -> 403
+ - peran datang dari tiket, bukan dari klien
  - curriculum: parent type mismatch 400, duplicate id 400, delete archives,
    self-loop prerequisites rejected
  - questions: unsupported file 400; publish blocked when errors persist
@@ -13,6 +17,8 @@ Covers edge/negative cases NOT already in /app/backend/smoke_test.py:
  - migration: idempotent (2nd run does not duplicate students)
 """
 import os
+import sys
+import time
 import uuid
 import pytest
 import requests
@@ -28,19 +34,42 @@ if not os.environ.get("REACT_APP_BACKEND_URL"):
     except Exception:
         pass
 BASE = os.environ["REACT_APP_BACKEND_URL"].rstrip("/")
-OWNER = "FZ-OWNER-2026-MASTER"
+
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+import kelasku  # noqa: E402
+
+
+def ticket(sub, role, name, ttl=120):
+    """Terbitkan tiket seperti Worker KelasKu.
+
+    `jti` dibuat unik per panggilan: tiket di FIEZEL sekali pakai, jadi fixture
+    yang memakai nilai tetap akan hijau sekali lalu merah selamanya.
+    """
+    now = int(time.time())
+    return kelasku.sign_ticket(kelasku.ticket_key(), {
+        "v": kelasku.TICKET_VERSION, "aud": kelasku.TICKET_AUDIENCE,
+        "sub": sub, "role": role, "name": name,
+        "iat": now, "exp": now + ttl, "jti": f"{sub}-{time.time_ns()}",
+    })
+
+
+def masuk(sub, role, name, class_code=None):
+    body = {"ticket": ticket(sub, role, name)}
+    if class_code:
+        body["class_code"] = class_code
+    r = requests.post(f"{BASE}/api/auth/kelasku", json=body, timeout=30)
+    assert r.status_code == 200, r.text
+    return r.json()
 
 
 # ---------- fixtures ----------
 
 @pytest.fixture(scope="module")
 def teacher():
-    r = requests.post(f"{BASE}/api/auth/teacher/token",
-                      json={"token": OWNER, "name": "Bu Rina"}, timeout=30)
-    assert r.status_code == 200, r.text
-    tok = r.json()["access_token"]
+    data = masuk(f"sub_guru_{uuid.uuid4().hex[:8]}", "teacher", "Bu Rina")
     s = requests.Session()
-    s.headers.update({"Authorization": f"Bearer {tok}", "Content-Type": "application/json"})
+    s.headers.update({"Authorization": f"Bearer {data['access_token']}",
+                      "Content-Type": "application/json"})
     # Ensure demo seed exists
     s.post(f"{BASE}/api/seed/bootstrap", timeout=60)
     return s
@@ -48,25 +77,54 @@ def teacher():
 
 @pytest.fixture(scope="module")
 def student(teacher):
-    email = f"murid.qa+{uuid.uuid4().hex[:6]}@example.com"
-    r = requests.post(f"{BASE}/api/auth/register",
-                      json={"email": email, "password": "murid123",
-                            "name": "Murid QA", "class_code": "FZ-DEMO7A"}, timeout=30)
-    assert r.status_code == 200, r.text
-    data = r.json()
+    sub = f"sub_murid_{uuid.uuid4().hex[:8]}"
+    data = masuk(sub, "learner", "Murid QA", class_code="FZ-DEMO7A")
     s = requests.Session()
     s.headers.update({"Authorization": f"Bearer {data['access_token']}",
                       "Content-Type": "application/json"})
-    return {"session": s, "user_id": data["user_id"], "email": email}
+    return {"session": s, "user_id": data["user_id"], "sub": sub}
 
 
 # ---------- auth ----------
 
 class TestAuth:
-    def test_teacher_wrong_token_401(self):
-        r = requests.post(f"{BASE}/api/auth/teacher/token",
-                          json={"token": "BOGUS-TOKEN-123", "name": "x"}, timeout=30)
+    def test_tiket_palsu_401(self):
+        r = requests.post(f"{BASE}/api/auth/kelasku",
+                          json={"ticket": "bukan.tiket"}, timeout=30)
         assert r.status_code == 401, r.text
+
+    def test_tiket_kunci_lain_401(self):
+        """Tiket berbentuk benar, bertanda tangan kunci penyerang."""
+        now = int(time.time())
+        palsu = kelasku.sign_ticket("kunci-penyerang-yang-cukup-panjang-0123456789", {
+            "v": kelasku.TICKET_VERSION, "aud": kelasku.TICKET_AUDIENCE,
+            "sub": "penyusup", "role": "owner", "name": "X",
+            "iat": now, "exp": now + 120, "jti": f"x{time.time_ns()}",
+        })
+        r = requests.post(f"{BASE}/api/auth/kelasku", json={"ticket": palsu}, timeout=30)
+        assert r.status_code == 401, r.text
+
+    def test_tiket_kedaluwarsa_401(self):
+        r = requests.post(f"{BASE}/api/auth/kelasku",
+                          json={"ticket": ticket("sub_mati", "teacher", "x", ttl=-600)}, timeout=30)
+        assert r.status_code == 401, r.text
+
+    def test_tiket_sekali_pakai(self):
+        """Pemakaian kedua atas tiket yang sama DITOLAK.
+
+        Tanpa ini, tiket yang terpungut dari log atau riwayat peramban masih bisa
+        dipakai ulang selama sisa umurnya.
+        """
+        t = ticket(f"sub_ulang_{uuid.uuid4().hex[:8]}", "teacher", "Bu Ulang")
+        r1 = requests.post(f"{BASE}/api/auth/kelasku", json={"ticket": t}, timeout=30)
+        r2 = requests.post(f"{BASE}/api/auth/kelasku", json={"ticket": t}, timeout=30)
+        assert r1.status_code == 200, r1.text
+        assert r2.status_code == 401, r2.text
+
+    def test_peran_tak_dikenal_jatuh_ke_murid(self):
+        """Kegagalan pemetaan peran harus MENUTUP pintu, bukan membukanya."""
+        data = masuk(f"sub_aneh_{uuid.uuid4().hex[:8]}", "superadmin", "X")
+        assert data["role"] == "student", data
 
     def test_student_token_on_teacher_route_403(self, student):
         # POST /api/curriculum/nodes requires teacher_user
@@ -76,36 +134,18 @@ class TestAuth:
                                           "name": "murid tak boleh"}, timeout=30)
         assert r.status_code in (401, 403), f"{r.status_code} {r.text[:200]}"
 
-    def test_owner_mints_teacher_invite_and_login(self):
-        r = requests.post(f"{BASE}/api/owner/teacher-invites",
-                          headers={"X-Owner-Token": OWNER, "Content-Type": "application/json"},
-                          json={"name": "Bu Test QA"}, timeout=30)
-        assert r.status_code == 200, r.text
-        tok = r.json().get("token") or r.json().get("invite_token")
-        assert tok and tok.startswith("FZG-"), r.json()
-        r2 = requests.post(f"{BASE}/api/auth/teacher/token",
-                           json={"token": tok, "name": "Bu Test QA"}, timeout=30)
-        assert r2.status_code == 200 and r2.json().get("access_token"), r2.text
-
-    def test_login_bruteforce_lockout(self):
-        email = f"lock.qa+{uuid.uuid4().hex[:6]}@example.com"
-        # Register a real user first
-        rr = requests.post(f"{BASE}/api/auth/register",
-                           json={"email": email, "password": "correct123",
-                                 "name": "Lock QA", "class_code": "FZ-DEMO7A"}, timeout=30)
-        assert rr.status_code == 200, rr.text
-        codes = []
-        for _ in range(6):
-            r = requests.post(f"{BASE}/api/auth/login",
-                              json={"email": email, "password": "wrong!!"}, timeout=30)
-            codes.append(r.status_code)
-        assert 429 in codes, codes
-
-    def test_me_after_register(self, student):
+    def test_me_setelah_masuk_kelasku(self, student):
         r = student["session"].get(f"{BASE}/api/auth/me", timeout=30)
         assert r.status_code == 200
         j = r.json()
-        assert j.get("email") == student["email"] or j.get("user", {}).get("email") == student["email"]
+        assert j["provider"] == "kelasku", j
+        assert j["role"] == "student", j
+
+    def test_murid_langsung_masuk_kelas_dari_kode(self, student):
+        """Satu kode kelas, nol pendaftaran: itu seluruh alur murid sekarang."""
+        r = student["session"].get(f"{BASE}/api/auth/me", timeout=30)
+        assert r.status_code == 200
+        assert len(r.json()["class_ids"]) >= 1, r.json()
 
 
 # ---------- curriculum ----------
