@@ -159,6 +159,52 @@ tegaskan(
   'features/curriculum/teacher-console.js: konsol tidak memanggil E.seed.mapel()/mapelStatus().'
 );
 
+/* PENYEMAI KETIGA: BANK SOAL (m025-330).
+
+   Tuntutan pintu yang sama, plus dua tuntutan yang hanya berlaku untuk soal — dan
+   keduanya menutup cara bank soal gagal MENGAJAR meski datanya masuk dengan rapi. */
+const seedSoalPy = baca('backend/seed_soal.py');
+tegaskan(
+  /@router\.post\("\/soal"\)/.test(seedSoalPy) && /@router\.get\("\/soal\/status"\)/.test(seedSoalPy),
+  'backend/seed_soal.py: rute POST /soal atau GET /soal/status hilang — bank soal tidak bisa dipanggil atau diperiksa.'
+);
+tegaskan(
+  /for r in \(([\s\S]*?)\):/.test(serverPy) && /seed_soal_router/.test(RegExp.$1),
+  'backend/server.py: router seed_soal tidak DIDAFTARKAN di daftar include_router.'
+);
+tegaskan(
+  /soal:\s*function[^}]*\/seed\/soal'/.test(api) && /soalStatus:\s*function[^}]*\/seed\/soal\/status'/.test(api),
+  'features/curriculum/fz-api.js: seed.soal()/seed.soalStatus() tidak memanggil rute /seed/soal.'
+);
+tegaskan(
+  /aksi:\s*'seed-soal'/.test(konsol) && /a === 'seed-soal'/.test(konsol),
+  'features/curriculum/teacher-console.js: kendali `seed-soal` tidak ada di layar atau tidak ditangani pengirim aksi.'
+);
+
+/* SOAL YATIM. Butir yang menunjuk kompetensi yang tidak ada akan masuk basis data,
+   tidak pernah terambil sesi mana pun, dan TIDAK ADA satu gerbang pun yang merah
+   karenanya — penyemainya sukses, jumlahnya bertambah, dan murid tidak pernah melihatnya.
+   Karena itu penyemai WAJIB memeriksa keberadaan kompetensinya lebih dulu dan MELAPORKAN
+   yang hilang, bukan menulis diam-diam. */
+tegaskan(
+  /curriculum_nodes\.find_one\(\{"id": komp_id, "type": "competency"\}/.test(seedSoalPy) &&
+  /missing_competencies/.test(seedSoalPy),
+  'backend/seed_soal.py: penyemai tidak memeriksa keberadaan kompetensi sebelum menulis soal, atau tidak ' +
+  'melaporkan yang hilang. Soal yatim masuk basis data tanpa pernah terambil sesi mana pun, dan tidak ada ' +
+  'gerbang yang bisa melihatnya.'
+);
+
+/* TIAP BUTIR WAJIB PUNYA PEMBAHASAN DAN PETUNJUK. Soal tanpa pembahasan hanya memberi
+   tahu murid bahwa ia salah — tepat pada saat ia paling siap belajar. Diperiksa di sini
+   karena validator backend hanya MEMPERINGATKAN (warn), tidak menolak: peringatan yang
+   tidak ada yang membacanya sama dengan tidak ada aturan. */
+{
+  const butir = [...seedSoalPy.matchAll(/\n\s{8}Q\(/g)].length;
+  tegaskan(butir >= 40, 'backend/seed_soal.py: hanya ' + butir + ' butir soal — gelombang pertama terlalu tipis untuk dipakai satu sesi belajar.');
+  const tanpaPembahasan = [...seedSoalPy.matchAll(/Q\("(?:[^"\\]|\\.)*",\s*\n?\s*\[[^\]]*\],\s*"[A-D]",\s*\n\s*""/g)].length;
+  tegaskan(tanpaPembahasan === 0, 'backend/seed_soal.py: ada butir tanpa pembahasan — murid yang salah tidak mendapat apa pun.');
+}
+
 /* SESUDAH MENYEMAI, BANK YANG BARU HARUS TERLIHAT DI TEMPAT GURU MEMAKAINYA.
 
    Temuan gitar-bot pada PR #433, dan ia benar: versi pertama penangan ini mengosongkan

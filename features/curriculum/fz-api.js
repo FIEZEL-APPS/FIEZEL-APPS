@@ -185,7 +185,9 @@
       english: function () { return api('/seed/english', { body: {} }); },
       englishStatus: function () { return api('/seed/english/status'); },
       mapel: function () { return api('/seed/mapel', { body: {} }); },
-      mapelStatus: function () { return api('/seed/mapel/status'); }
+      mapelStatus: function () { return api('/seed/mapel/status'); },
+      soal: function () { return api('/seed/soal', { body: {} }); },
+      soalStatus: function () { return api('/seed/soal/status'); }
     }
   };
 })(window);
