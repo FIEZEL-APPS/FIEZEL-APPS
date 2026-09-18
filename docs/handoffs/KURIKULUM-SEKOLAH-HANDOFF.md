@@ -763,13 +763,21 @@ Lets go  vs  Let's go    beda EJAAN — dan itu yang diuji soal mekanika
 Selama banknya hanya berisi bahasa Inggris, cacat ini tidak pernah terlihat. Gelombang
 Matematika langsung menabraknya sembilan kali. Peringatan yang selalu salah mengajari
 pembacanya mengabaikan peringatan, jadi yang diperbaiki aturannya, bukan soalnya:
-`norm_option()` hanya menyamakan kapital dan spasi — satu-satunya perbedaan yang memang
-tidak terlihat murid.
+`norm_option()` hanya menyamakan SPASI.
 
-Gerbang `curriculum-seed-reachable` (kini **30 penegasan**) menjaga keduanya tetap satu
+Kapital pun tidak disamakan, dan itu aturan yang sama sekali lagi. Rancangan pertama
+`norm_option()` masih menurunkan hurufnya, dan draf gelombang Bahasa Indonesia Kelas 1
+langsung menabraknya: pada "Penulisan nama diri yang benar adalah ...", pilihannya
+memang `Ani`, `ani`, `ANi`, `aNi` — huruf kapital itulah SELURUH isi soalnya. Ditemukan
+sebelum masuk repo karena drafnya diperiksa lebih dulu dengan aturan gerbangnya sendiri.
+Batasnya satu kalimat: **yang disamakan hanya yang tidak terlihat murid.** Spasi tidak
+terlihat; kapital, tanda baca, dan tanda minus terlihat.
+
+Gerbang `curriculum-seed-reachable` (kini **31 penegasan**) menjaga keduanya tetap satu
 aturan: ia menuntut `questions.py` tetap memakai `norm_option` untuk `duplicate_options`,
-DAN menolak `norm_option` yang diam-diam kembali membuang non-alfanumerik. Tanpa penegasan
-kedua, cacatnya bisa kembali lewat pintu lain sementara gerbangnya tetap hijau.
+menolak `norm_option` yang diam-diam kembali membuang non-alfanumerik, dan menolak
+`norm_option` yang kembali menurunkan huruf. Tanpa ketiganya, cacatnya bisa kembali lewat
+pintu lain sementara gerbangnya tetap hijau.
 
 ### Bank demo dan bank isi tidak boleh menulis soal yang sama
 
