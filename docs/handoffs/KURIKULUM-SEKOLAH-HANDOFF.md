@@ -547,3 +547,62 @@ Header cache di server SENGAJA tidak dipakai sebagai jawaban: `.htaccess` ada di
 `rsync --delete` tidak menghapus aturan yang dipasang owner langsung di cPanel. Repo tidak
 bisa menjamin header; ia bisa menjamin bentuk URL. Yang bisa dijamin itulah yang dijadikan
 gerbang.
+
+## m025-327 — kurikulum lengkap yang tidak punya pintu
+
+Owner membuka konsol, melihat dua mata pelajaran dengan satu elemen masing-masing, lalu
+berkata: *"sepertinya mata pelajarannya juga belum lengkap."*
+
+Ia benar tentang yang dilihatnya, dan salah tentang sebabnya — dan salahnya itu bukan
+salahnya. Kurikulum Merdeka Bahasa Inggris UTUH sudah ada di repo sejak lama:
+
+| `backend/seed_english.py` | Jumlah |
+|---|---|
+| Fase | A–F (Kelas 1–12) |
+| Elemen resmi | 3 — Menyimak–Berbicara, Membaca–Memirsa, Menulis–Mempresentasikan |
+| Capaian Pembelajaran | 18 |
+| Tujuan Pembelajaran | 72 |
+| Kompetensi | 144 |
+| Materi ajar | 144 |
+
+Lengkap dengan prasyarat yang dirantai vertikal: kompetensi ke-n pada elemen yang sama di
+kelas sebelumnya menjadi prasyarat kompetensi ke-n di kelas berikutnya. Endpointnya pun
+sudah ada: `POST /api/seed/english`, plus `GET /api/seed/english/status` yang sengaja
+terbuka tanpa kredensial.
+
+**Yang tidak pernah ada adalah pemanggilnya.** Nol antarmuka di seluruh klien menyentuh
+endpoint itu. Satu-satunya kurikulum yang pernah mendarat di MongoDB adalah demo Matematika
+11 kompetensi yang dijalankan otomatis `/seed/bootstrap` saat guru belum punya kelas.
+
+### Kelas cacat yang SUDAH pernah menghantam repo ini
+
+Bentuknya sama persis dengan token `FZG-` yang dicabut di PR #428: konsol menuntut sesuatu
+yang tidak punya antarmuka penerbit. Dua kali, dengan mekanisme berbeda, gejalanya identik —
+**kemampuan lengkap di satu sisi, nol jalan dari sisi yang lain**, dan tidak ada gerbang yang
+bisa melihatnya karena setiap sisinya benar kalau diperiksa sendiri-sendiri.
+
+Pelajaran yang bisa dipakai sesi lain: ketika menambah kemampuan di backend, pertanyaan
+"siapa yang memanggil ini?" adalah bagian dari pekerjaannya, bukan pekerjaan berikutnya.
+Endpoint tanpa pemanggil tidak pernah merah; ia hanya tidak pernah terjadi.
+
+Penjaganya sekarang `tests/curriculum-seed-reachable-test.js` — menuntut ketiga lapisnya
+bersama (endpoint, pengikat klien, kendali di konsol yang penangan aksinya benar-benar ada),
+dan ketiga mode kegagalannya dibuktikan merah lebih dulu, termasuk "tombol mati": kendali
+yang ada di layar tetapi tidak ditangani pengirim aksi.
+
+### Keputusan owner tentang bahasa isi kurikulum
+
+Ditanyakan hari ini dan dijawab tegas: **nama kompetensi dan Tujuan Pembelajaran di dalam
+bank kurikulum tetap berbahasa Indonesia saja** untuk sekarang; murid Thai belum memakai
+bagian ini.
+
+Ini keputusan sadar, bukan utang yang terlupakan, dan batasnya perlu dipegang sesi
+berikutnya: yang dikecualikan adalah ISI BANK (istilah Kurikulum Merdeka — regulasi
+Indonesia yang tidak diajarkan guru Thai). Naskah ANTARMUKA di sekitarnya tetap wajib dua
+bahasa penuh, dan itulah sebabnya `copy-id-kurikulum.js` + `copy-th-kurikulum.js` lahir
+berpasangan pada commit yang sama.
+
+Perlu diketahui kalau keputusan ini kelak ditinjau ulang: `misi.html` MENAMPILKAN nama
+kompetensi dan nama TP langsung ke murid (`learning-mission.js:202,218,220`). Jadi begitu
+murid Thai memakai jalur kurikulum, kekecualian ini berubah dari "tidak relevan" menjadi
+utang yang nyata.
