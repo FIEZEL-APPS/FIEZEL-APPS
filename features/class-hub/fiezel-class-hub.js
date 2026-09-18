@@ -51,6 +51,19 @@
   /* MURID                                                                                  */
   /* ===================================================================================== */
   var sEl = null, sEnv = {}, sUi = null, pendingOpen = null, timerTick = null, WM = '<span class="kelasku-wordmark">KelasKu</span>';
+  var pendingStudentRender = false, lastStudentPaintKey = null, studentDraftCode = '';
+  function isStudentBusy() {
+    try {
+      if (!sEl || typeof document === 'undefined') return false;
+      var a = document.activeElement;
+      if (!a || a === document.body) return false;
+      if (sEl.contains(a)) {
+        if (a.isContentEditable) return true;
+        return /^(INPUT|TEXTAREA|SELECT)$/i.test(a.tagName || '');
+      }
+      return false;
+    } catch (_) { return false; }
+  }
   function ui() { if (!sUi) { sUi = readJson(UI_KEY, {}); sUi.tab = sUi.tab || 'tugas'; sUi.runner = sUi.runner || null; } return sUi; }
   function saveUi() { writeJson(UI_KEY, sUi); }
   function assignments() { var TS = T(); return readJson(TS ? TS.ASSIGN_KEY : 'fiezel-learner-assignments-v1', []); }
@@ -65,7 +78,7 @@
        sesuatu — dan murid yang salah ketik kode mengira dirinya sudah tergabung padahal tidak
        ada siapa pun di ujung sana. */
     try { LF() && LF().announceJoin(); } catch (_) {}
-    try { root.FiezelInbox && root.FiezelInbox.poll(true).then(function () { renderStudent(); }); } catch (_) {}
+    try { root.FiezelInbox && root.FiezelInbox.poll(true).then(function () { renderStudent({ quiet: true }); }); } catch (_) {}
     return true;
   }
   function latestMeta() { var all = assignments().concat(subs()).sort(function (a, b) { return (b.at || 0) - (a.at || 0); }); return all[0] || null; }
@@ -74,12 +87,27 @@
 
   function mountStudent(el, env) {
     sEl = el; sEnv = env || {}; ui();
-    el.addEventListener('click', onStudentClick); el.addEventListener('submit', onStudentSubmit);
+    if (!el.__chStudentBound) {
+      el.__chStudentBound = true;
+      el.addEventListener('click', onStudentClick);
+      el.addEventListener('submit', onStudentSubmit);
+      el.addEventListener('input', function (e) {
+        if (e.target && e.target.name === 'code') studentDraftCode = e.target.value;
+      });
+      el.addEventListener('focusout', function () {
+        setTimeout(function () {
+          if (pendingStudentRender && !isStudentBusy()) {
+            pendingStudentRender = false;
+            renderStudent({ quiet: true });
+          }
+        }, 50);
+      });
+    }
     if (pendingOpen) { var id = pendingOpen; pendingOpen = null; if (openAssignment(id)) return; }
     resumeFocus();
     renderStudent();
   }
-  function unmountStudent() { if (timerTick) clearInterval(timerTick); timerTick = null; unbindFocus(); sEl = null; }
+  function unmountStudent() { if (timerTick) clearInterval(timerTick); timerTick = null; unbindFocus(); sEl = null; pendingStudentRender = false; lastStudentPaintKey = null; }
   /** Dibuka dari notifikasi: satu ketuk = sesi tugas terbuka di dalam Kelas. */
   function openAssignment(id) {
     if (!id) return false;
@@ -240,13 +268,42 @@
   }
   function closeRunner() { var u = ui(); if (u.focus && FG()) { if (u.focus.awaySince) FG().back(u.focus, Date.now()); reportFocus(u.focus); } unbindFocus(); try { if (root.FiezelExamLock) root.FiezelExamLock.end('assignment'); } catch (_) {} if (u.runner && u.runner.finished) u.focus = null; if (u.runner && !u.runner.finished && sEnv.toast) sEnv.toast(t('kelas.toast-disimpan-sedang', 'Tugas disimpan sebagai "sedang mengerjakan". Lanjutkan kapan saja.')); if (u.runner && u.runner.finished) u.runner = null; u.paused = !!u.runner; saveUi(); renderStudent(); }
 
-  function renderStudent() {
-    if (!sEl) return; var u = ui(), pend = assignments(), done = subs();
+  function renderStudent(opts) {
+    if (!sEl) return;
+    if (opts && opts.quiet && isStudentBusy()) {
+      pendingStudentRender = true;
+      return;
+    }
+    pendingStudentRender = false;
+    var u = ui(), pend = assignments(), done = subs();
+    var key = (u.runner && !u.paused ? 'runner|' + u.runner.aid + '|' + u.runner.idx : (u.review ? 'review|' + u.review : u.tab)) + '|' + (classCode() || '') + '|' + (u.editCode ? '1' : '0');
+    var repaint = key === lastStudentPaintKey;
+    lastStudentPaintKey = key;
+    var activeElName = null, selStart = 0, selEnd = 0;
+    try {
+      var act = root.document ? root.document.activeElement : null;
+      if (act && sEl.contains(act) && /^(INPUT|TEXTAREA)$/i.test(act.tagName || '')) {
+        activeElName = act.getAttribute('name');
+        selStart = act.selectionStart;
+        selEnd = act.selectionEnd;
+      }
+    } catch (_) {}
     var body = u.runner && !u.paused ? runnerView() : u.review ? reviewView(u.review) : u.tab === 'kelas' ? kelasView() : u.tab === 'progres' ? progresView() : tugasView(pend, done);
-    sEl.innerHTML = '<section class="ch ch-student" data-testid="class-hub-student">' +
+    sEl.innerHTML = '<section class="ch ch-student' + (repaint ? ' is-repaint' : '') + '" data-testid="class-hub-student">' +
       '<header class="ch-head"><div><h1 data-testid="class-hub-title">' + (className() ? esc(className()) : (classCode() ? WM + ' ' + esc(classCode()) : t('kelas.belum-terhubung', 'Belum terhubung ke ') + WM)) + '</h1><p class="ch-sub">' + (teacherName() ? 'Guru: <b>' + esc(teacherName()) + '</b>' + (classCode() ? ' · ' : '') : '') + (classCode() ? 'Kode ' + esc(classCode()) : '') + '</p></div></header>' +
       (u.runner && !u.paused ? '' : '<nav class="ch-tabs" role="tablist">' + [['tugas', t('umum.tugas', 'Tugas'), pend.length], ['kelas', WM, 0], ['progres', 'Progres', 0]].map(function (t) { return '<button type="button" role="tab" class="ch-tab' + (u.tab === t[0] && !u.review ? ' is-active' : '') + '" data-ch="tab" data-tab="' + t[0] + '" data-testid="class-tab-' + t[0] + '">' + t[1] + (t[2] ? '<span class="ch-badge">' + t[2] + '</span>' : '') + '</button>'; }).join('') + '</nav>') +
       body + '</section>';
+    if (activeElName) {
+      try {
+        var restored = sEl.querySelector('[name="' + activeElName + '"]');
+        if (restored) {
+          restored.focus();
+          if (typeof restored.setSelectionRange === 'function' && selStart != null && selEnd != null) {
+            restored.setSelectionRange(selStart, selEnd);
+          }
+        }
+      } catch (_) {}
+    }
     if (sEnv.afterRender) try { sEnv.afterRender(); } catch (_) {}
   }
   function assignCard(a, pending) {
@@ -268,7 +325,7 @@
     var lf = null; try { lf = LF() ? LF().load() : null; } catch (_) {}
     var rep = lf && lf.classReport;
     return '<div class="ch-body"><section class="ch-card ch-class-card" data-testid="class-my-class">' + (classCode() ? '<p class="ch-kicker">' + WM + ' terhubung</p><h3>' + esc(className() || '') + (className() ? '' : WM + ' ' + esc(classCode())) + '</h3><p class="ch-muted">Kode ' + WM + ' <b class="ch-mono">' + esc(classCode()) + '</b>' + (teacherName() ? ' · Guru <b>' + esc(teacherName()) + '</b>' : '') + '</p>' + (rep ? '<p class="ch-muted ch-small">' + (rep.ok ? icon('check') + ' Laporan terakhir terkirim ke guru ' + esc(fmtDate(rep.at)) : icon('clock') + ' Laporan terakhir belum terkirim (' + esc(rep.error || 'offline') + ') — dikirim ulang otomatis saat online.') + '</p>' : '') + '<div class="ch-actions"><button type="button" class="ch-btn is-ghost" data-ch="change-code">Ganti kode</button></div>' : '<p class="ch-kicker">Gabung ' + WM + '</p><h3><span class="kelasku-wordmark">Masukkan kode dari KelasKu</span></h3><p class="ch-muted">Kode berbentuk FZ-XXXXXX. Setelah tergabung, tugas guru masuk otomatis dan hasilmu kembali ke guru.</p>') +
-      (!classCode() || ui().editCode ? '<form class="ch-form" data-ch-form="join"><input name="code" placeholder="FZ-ABC234" maxlength="9" autocomplete="off" required data-testid="class-code-input"><button type="submit" class="ch-btn is-primary" data-testid="class-code-submit">Gabung</button></form>' : '') + '</section>' +
+      (!classCode() || ui().editCode ? '<form class="ch-form" data-ch-form="join"><input name="code" value="' + esc(studentDraftCode) + '" placeholder="FZ-ABC234" maxlength="9" autocomplete="off" required data-testid="class-code-input"><button type="submit" class="ch-btn is-primary" data-testid="class-code-submit">Gabung</button></form>' : '') + '</section>' +
       '<section class="ch-grid2"><button type="button" class="ch-card ch-link-card" data-ch="tutor" data-testid="class-open-tutor"><span class="ch-link-icon">' + icon('mic') + '</span><div><b>Tutor FIEZEL</b><small>Pelajaran bersuara Inggris + subtitle Indonesia, sesuai levelmu.</small></div>' + icon('arrow-up-right') + '</button>' +
       '<button type="button" class="ch-card ch-link-card" data-ch="learn" data-testid="class-open-learn"><span class="ch-link-icon">' + icon('route') + '</span><div><b>' + t('kelas.belajar-mandiri', 'Belajar mandiri hari ini') + '</b><small>Rencana harian dari peta kemampuanmu — tugas guru ikut masuk ke sana.</small></div>' + icon('arrow-up-right') + '</button></section></div>';
   }
@@ -324,7 +381,7 @@
          Pintunya dibiarkan hidup untuk jalur pemulihan (diagnostik, tes) yang memanggilnya
          langsung; menghapusnya hanya menyisakan satu cabang mati di dua tempat. */
       case 'resend': try { LF() && LF().pushToClass(); } catch (_) {} if (sEnv.toast) sEnv.toast('Laporan dikirim ulang ke guru.'); return;
-      case 'change-code': u.editCode = true; break;
+      case 'change-code': u.editCode = true; studentDraftCode = classCode(); break;
       case 'tutor': if (sEnv.openTutor) { sEnv.openTutor(); } return;
       case 'learn': if (sEnv.go) sEnv.go('learn'); return;
       default: return;
@@ -333,7 +390,7 @@
   }
   function onStudentSubmit(e) {
     var f = e.target.closest ? e.target.closest('[data-ch-form]') : null; if (!f) return; e.preventDefault();
-    if (f.getAttribute('data-ch-form') === 'join') { var ok = setClassCode(new FormData(f).get('code')); if (sEnv.toast) sEnv.toast(ok ? t('kelas.gabung-terkirim', 'Kode tersimpan. Permintaan bergabung sudah dikirim ke gurumu — tugas muncul otomatis setelah kamu ditambahkan.') : t('kelas.gabung-kode-salah', 'Kode tidak valid — bentuknya FZ-XXXXXX.')); ui().editCode = false; saveUi(); renderStudent(); }
+    if (f.getAttribute('data-ch-form') === 'join') { var codeVal = new FormData(f).get('code') || studentDraftCode; var ok = setClassCode(codeVal); if (ok) studentDraftCode = ''; if (sEnv.toast) sEnv.toast(ok ? t('kelas.gabung-terkirim', 'Kode tersimpan. Permintaan bergabung sudah dikirim ke gurumu — tugas muncul otomatis setelah kamu ditambahkan.') : t('kelas.gabung-kode-salah', 'Kode tidak valid — bentuknya FZ-XXXXXX.')); ui().editCode = false; saveUi(); renderStudent(); }
   }
 
   /* ===================================================================================== */
@@ -398,7 +455,7 @@
       }).join('') : '<section class="ch-card ch-empty">' + icon('clipboard-list') + '<p>' + t('kelas.belum-ada-tugas', 'Belum ada tugas. Susun dari bank FIEZEL, tulis sendiri, atau impor — Braincore meninjau sebelum dikirim.') + '</p></section>') + '</div>';
   }
   // ---- Buat tugas: 3 langkah (Sumber → Tinjauan Braincore → Kirim) ----------------------------
-  function draft(c) { if (!tUi.draft) tUi.draft = { step: 1, source: 'bank', title: '', skills: ['past_tense'], count: 10, deadline: T().today(Date.now() + 2 * T().DAY), mode: 'latihan', targets: [], raw: '', items: [], bankIds: [], review: null, finals: [], approved: {}, useSuggest: {} }; return tUi.draft; }
+  function draft(c) { if (!tUi.draft) tUi.draft = { step: 1, source: 'bank', title: '', skills: ['past_tense'], count: 10, deadline: T().today(Date.now() + 2 * T().DAY), mode: 'latihan', targets: [], raw: '', items: [], bankIds: [], review: null, finals: [], approved: {}, useSuggest: {}, q_prompt: '', q_opts: ['', '', '', ''], q_answer: 0 }; return tUi.draft; }
   function bankSkills() { var TS = T(); return TS.SKILL_ORDER.filter(function (k) { return k !== 'speaking' && B() && B().SKILLS[k]; }); }
   function tBuat(c, env) {
     var d = draft(c), TS = T();
@@ -410,7 +467,7 @@
         '<label class="tg-label">Skill' + (d.source === 'bank' ? ' (1–3)' : ' utama') + '</label><div class="tg-chips tg-chips-select">' + bankSkills().concat(d.source === 'bank' ? [] : ['grammar', 'vocabulary', 'reading']).map(function (k) { return '<label class="tg-chip is-check"><input type="' + (d.source === 'bank' ? 'checkbox' : 'radio') + '" name="skills" value="' + k + '"' + (d.skills.indexOf(k) !== -1 ? ' checked' : '') + '><span>' + esc(skillLabel(k)) + '</span></label>'; }).join('') + '</div>' +
         (d.source === 'bank' ? '<label class="tg-label">Jumlah soal<select name="count">' + [5, 8, 10, 12, 15, 20].map(function (n) { return '<option' + (n === Number(d.count) ? ' selected' : '') + '>' + n + '</option>'; }).join('') + '</select></label>' : '') +
         (d.source === 'tulis' ? '<div class="ch-write" data-testid="tclass-write">' + (d.items.length ? '<ol class="ch-item-list">' + d.items.map(function (q, i) { return '<li><b>' + esc(q.prompt) + '</b><ol class="ch-opts-inline">' + q.options.map(function (o, j) { return '<li class="' + (j === q.answer ? 'is-key' : '') + '">' + esc(o) + '</li>'; }).join('') + '</ol><button type="button" class="tg-link" data-ch="drop-item" data-i="' + i + '">hapus</button></li>'; }).join('') + '</ol>' : '') +
-          '<fieldset class="ch-fieldset"><legend>' + t('kelas.soal-baru', 'Soal baru') + '</legend><label class="tg-label">Pertanyaan (gunakan ___ untuk rumpang)<input name="q_prompt" maxlength="400" placeholder="She ___ to school yesterday." data-testid="tclass-q-prompt"></label><div class="ch-form-row">' + [0, 1, 2, 3].map(function (i) { return '<label class="tg-label">' + String.fromCharCode(65 + i) + '<input name="q_opt' + i + '" maxlength="120"' + (i < 2 ? ' placeholder="wajib"' : '') + ' data-testid="tclass-q-opt' + i + '"></label>'; }).join('') + '</div><label class="tg-label">Kunci<select name="q_answer" data-testid="tclass-q-answer">' + [0, 1, 2, 3].map(function (i) { return '<option value="' + i + '">' + String.fromCharCode(65 + i) + '</option>'; }).join('') + '</select></label><button type="button" class="tg-btn is-ghost" data-ch="add-item" data-testid="tclass-add-item">' + icon('plus') + ' ' + t('kelas.tambah-soal', 'Tambah soal') + '</button></fieldset></div>' : '') +
+          '<fieldset class="ch-fieldset"><legend>' + t('kelas.soal-baru', 'Soal baru') + '</legend><label class="tg-label">Pertanyaan (gunakan ___ untuk rumpang)<input name="q_prompt" maxlength="400" value="' + esc(d.q_prompt || '') + '" placeholder="She ___ to school yesterday." data-testid="tclass-q-prompt"></label><div class="ch-form-row">' + [0, 1, 2, 3].map(function (i) { return '<label class="tg-label">' + String.fromCharCode(65 + i) + '<input name="q_opt' + i + '" maxlength="120" value="' + esc((d.q_opts && d.q_opts[i]) || '') + '"' + (i < 2 ? ' placeholder="wajib"' : '') + ' data-testid="tclass-q-opt' + i + '"></label>'; }).join('') + '</div><label class="tg-label">Kunci<select name="q_answer" data-testid="tclass-q-answer">' + [0, 1, 2, 3].map(function (i) { return '<option value="' + i + '"' + (Number(d.q_answer) === i ? ' selected' : '') + '>' + String.fromCharCode(65 + i) + '</option>'; }).join('') + '</select></label><button type="button" class="tg-btn is-ghost" data-ch="add-item" data-testid="tclass-add-item">' + icon('plus') + ' ' + t('kelas.tambah-soal', 'Tambah soal') + '</button></fieldset></div>' : '') +
         (d.source === 'impor' ? '<label class="tg-label">Tempel soal — satu baris per soal: <code>pertanyaan | A | B | C | D | kunci</code> (kunci: huruf, nomor, atau teks). Blok bernomor dengan A./B./C./D. dan “Answer: B” juga dikenali.<textarea name="raw" rows="8" placeholder="She ___ to school yesterday. | go | went | goes | going | B" data-testid="tclass-import-raw">' + esc(d.raw) + '</textarea></label>' + (d.importErrors && d.importErrors.length ? '<p class="tg-error">' + d.importErrors.length + ' baris tidak terbaca: ' + esc(d.importErrors.slice(0, 3).map(function (e) { return 'baris ' + e.line; }).join(', ')) + '</p>' : '') : '') +
         '<div class="ch-form-row"><label class="tg-label">Tenggat<input type="date" name="deadline" value="' + esc(d.deadline) + '" data-testid="tclass-deadline"></label><label class="tg-label">Mode<select name="mode" data-testid="tclass-mode"><option value="latihan"' + (d.mode === 'latihan' ? ' selected' : '') + '>Latihan — umpan balik tiap soal</option><option value="ujian"' + (d.mode === 'ujian' ? ' selected' : '') + '>Ujian mini — acak + timer</option></select></label></div>' +
         '<label class="tg-label">Untuk siapa</label><div class="tg-chips tg-chips-select tg-chips-scroll"><label class="tg-chip is-check"><input type="radio" name="scope" value="all"' + (d.targets.length ? '' : ' checked') + '><span>Seluruh kelas</span></label>' + c.students.map(function (s) { return '<label class="tg-chip is-check"><input type="checkbox" name="targets" value="' + esc(s.id) + '"' + (d.targets.indexOf(s.id) !== -1 ? ' checked' : '') + '><span>' + esc(s.name) + '</span></label>'; }).join('') + '</div>' +
@@ -509,7 +566,7 @@
       case 'expand': tUi.expand = tUi.expand === id ? null : id; break;
       case 'result': tUi.resultId = id; tUi.tab = 'hasil'; break;
       case 'source': d = draft(c); syncDraftForm(b.closest('form'), d); d.source = b.getAttribute('data-source'); if (d.source !== 'bank') d.skills = d.skills.slice(0, 1); break;
-      case 'add-item': { d = draft(c); var f = b.closest('form'); syncDraftForm(f, d); var fd = new FormData(f), opts = [0, 1, 2, 3].map(function (k) { return String(fd.get('q_opt' + k) || '').trim(); }).filter(Boolean), prompt = String(fd.get('q_prompt') || '').trim(); if (!prompt || opts.length < 2) { env.toast('Isi pertanyaan dan minimal 2 pilihan.'); return; } var ans = Number(fd.get('q_answer')); d.items.push({ id: R().uid('tq'), prompt: prompt, options: opts, answer: ans < opts.length ? ans : 0, skill: d.skills[0] }); break; }
+      case 'add-item': { d = draft(c); var f = b.closest('form'); syncDraftForm(f, d); var fd = new FormData(f), opts = [0, 1, 2, 3].map(function (k) { return String(fd.get('q_opt' + k) || (d.q_opts && d.q_opts[k]) || '').trim(); }).filter(Boolean), prompt = String(fd.get('q_prompt') || d.q_prompt || '').trim(); if (!prompt || opts.length < 2) { env.toast('Isi pertanyaan dan minimal 2 pilihan.'); return; } var ans = Number(fd.get('q_answer') != null ? fd.get('q_answer') : d.q_answer); d.items.push({ id: R().uid('tq'), prompt: prompt, options: opts, answer: ans < opts.length ? ans : 0, skill: d.skills[0] }); d.q_prompt = ''; d.q_opts = ['', '', '', '']; d.q_answer = 0; break; }
       case 'drop-item': d = draft(c); syncDraftForm(b.closest('form'), d); d.items.splice(i, 1); break;
       case 'step': d = draft(c); d.step = Number(b.getAttribute('data-step')); break;
       case 'approve': d = draft(c); d.approved[i] = b.checked; break;
@@ -526,6 +583,10 @@
     if (!f) return; var fd = new FormData(f);
     d.title = String(fd.get('title') || '').slice(0, 80); d.count = Number(fd.get('count')) || d.count; d.deadline = String(fd.get('deadline') || ''); d.mode = fd.get('mode') === 'ujian' ? 'ujian' : 'latihan';
     var sk = fd.getAll('skills').slice(0, 3); if (sk.length) d.skills = sk; d.targets = fd.getAll('targets'); d.raw = String(fd.get('raw') || '');
+    if (fd.get('q_prompt') != null) d.q_prompt = String(fd.get('q_prompt') || '');
+    if (!d.q_opts) d.q_opts = ['', '', '', ''];
+    for (var oi = 0; oi < 4; oi++) { if (fd.get('q_opt' + oi) != null) d.q_opts[oi] = String(fd.get('q_opt' + oi) || ''); }
+    if (fd.get('q_answer') != null) d.q_answer = Number(fd.get('q_answer'));
   }
   function onTeacherSubmit(e, env) {
     var f = e.target.closest ? e.target.closest('[data-ch-form]') : null; if (!f) return; e.preventDefault();
@@ -540,8 +601,19 @@
   function onTeacherInput(e, env) {
     var t = e.target, c = env.cls(); if (!t || !t.getAttribute) return;
     if (t.getAttribute('data-ch-select') === 'result') { tUi.resultId = t.value; env.rerender(); return; }
+    var d = draft(c), name = t.name;
+    if (name === 'title') d.title = t.value;
+    else if (name === 'raw') d.raw = t.value;
+    else if (name === 'deadline') d.deadline = t.value;
+    else if (name === 'q_prompt') d.q_prompt = t.value;
+    else if (name && name.indexOf('q_opt') === 0) {
+      var oi = Number(name.replace('q_opt', ''));
+      if (!d.q_opts) d.q_opts = ['', '', '', ''];
+      d.q_opts[oi] = t.value;
+    } else if (name === 'q_answer') d.q_answer = Number(t.value);
+
     var field = t.getAttribute('data-ch-field'); if (!field) return;
-    var d = draft(c), i = Number(t.getAttribute('data-i')), q = d.finals[i]; if (!q) return;
+    var i = Number(t.getAttribute('data-i')), q = d.finals && d.finals[i]; if (!q) return;
     if (field === 'prompt') q.prompt = t.value; else if (field === 'answer') q.answer = Number(t.value); else if (field === 'opt') q.options[Number(t.getAttribute('data-j'))] = t.value;
   }
 
