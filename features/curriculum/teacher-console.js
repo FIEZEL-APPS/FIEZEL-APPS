@@ -308,9 +308,9 @@
       aksi: 'seed-mapel', st: 'mapelStatus', busy: 'mapelBusy',
       ambil: function () { return E.seed.mapelStatus(); },
       jalan: function () { return E.seed.mapel(); },
-      judul: function () { return t('kurikulum.mapel-judul', 'Mata pelajaran lain — Kelas 7–9'); },
-      ajakan: function () { return t('kurikulum.mapel-ajakan', 'Matematika, Bahasa Indonesia, IPA, IPS, dan Pendidikan Pancasila untuk Fase D: 52 tujuan pembelajaran, 104 kompetensi, lengkap materi ajar dan prasyarat antar kelas.'); },
-      selesai: function () { return t('kurikulum.mapel-selesai', 'Mata pelajaran Kelas 7–9 tersemai.'); }
+      judul: function () { return t('kurikulum.mapel-judul', 'Mata pelajaran lain — Kelas 1–9'); },
+      ajakan: function () { return t('kurikulum.mapel-ajakan', 'Matematika, Bahasa Indonesia, Pendidikan Pancasila, IPAS, IPA, dan IPS untuk Fase A–D: 96 tujuan pembelajaran, 192 kompetensi, lengkap materi ajar dan prasyarat antar kelas.'); },
+      selesai: function () { return t('kurikulum.mapel-selesai', 'Mata pelajaran Kelas 1–9 tersemai.'); }
     }
   };
 
