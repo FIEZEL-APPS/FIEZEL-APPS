@@ -1,6 +1,6 @@
 {
   "schema": "fiezel-th-ui-leak-v1",
-  "generatedAt": "2026-09-18T11:11:01.828Z",
+  "generatedAt": "2026-09-18T12:30:48.410Z",
   "files": {
     "app.js": {
       "leaks": 3,
@@ -99,50 +99,50 @@
       "budget": 5,
       "sample": [
         {
-          "line": 269,
+          "line": 275,
           "text": "Tugas disimpan sebagai"
         },
         {
-          "line": 269,
+          "line": 275,
           "text": ". Lanjutkan kapan saja."
         },
         {
-          "line": 314,
+          "line": 320,
           "text": "Latihan ·"
         },
         {
-          "line": 450,
+          "line": 474,
           "text": "Latihan · ±"
         },
         {
-          "line": 472,
+          "line": 496,
           "text": "Latihan — umpan balik tiap soal"
         }
       ]
     },
     "features/curriculum/learning-mission.js": {
-      "leaks": 17,
-      "budget": 17,
+      "leaks": 16,
+      "budget": 16,
       "sample": [
         {
-          "line": 31,
+          "line": 59,
           "text": "FIEZEL · Misi Belajar"
         },
         {
-          "line": 36,
+          "line": 64,
           "text": "Masuk dengan akun KelasKu"
         },
         {
-          "line": 37,
-          "text": "Belum masuk? Buka"
-        },
-        {
-          "line": 38,
+          "line": 66,
           "text": "Guru masuk di"
         },
         {
-          "line": 38,
+          "line": 66,
           "text": "Ruang Guru"
+        },
+        {
+          "line": 91,
+          "text": "Murid"
         }
       ]
     },
@@ -468,8 +468,8 @@
     }
   },
   "copyKeys": {
-    "id": 2510,
-    "th": 2512,
+    "id": 2520,
+    "th": 2522,
     "idTanpaTh": 0
   },
   "pass": true

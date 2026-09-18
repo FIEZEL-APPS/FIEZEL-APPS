@@ -173,3 +173,37 @@ body.reduce-motion .ch-student,body.reduce-motion .ch-body,body.reduce-motion .c
 .ch-card-ink p .kelasku-wordmark {
   color: #FFFFFF !important;
 }
+
+/* ---- Panel Misi Kurikulum Murid ---- */
+.ch-curriculum-panel {
+  background: linear-gradient(135deg, rgba(31, 122, 99, 0.08) 0%, rgba(240, 228, 207, 0.5) 100%), var(--ch-bg);
+  border: 1.5px solid rgba(31, 122, 99, 0.28);
+  border-radius: var(--ch-r-lg, 20px);
+  padding: 18px;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 4px 18px -10px rgba(31, 122, 99, 0.18);
+  text-decoration: none;
+}
+.ch-curriculum-panel .ch-kicker {
+  color: #1F7A63;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 800;
+}
+.ch-curriculum-panel .ch-kicker i,
+.ch-curriculum-panel .ch-kicker svg {
+  width: 14px;
+  height: 14px;
+}
+.ch-curriculum-panel h3 {
+  font-size: 1.15rem;
+  margin: 4px 0 6px;
+  color: var(--ch-ink, #241A11);
+  letter-spacing: -0.01em;
+}
+.ch-curriculum-panel .ch-actions a {
+  text-decoration: none;
+}
+

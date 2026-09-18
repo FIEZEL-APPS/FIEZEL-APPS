@@ -19,6 +19,16 @@
     'kelas.menunggu-penjelasan': 'Mereka memasukkan kode kelas ini. Tambahkan yang kamu kenal; yang tidak ditambahkan tidak menerima tugas apa pun.',
     'kelas.gabung-diterima': '{nama} ditambahkan ke {kelas}. Tugas berikutnya ikut terkirim ke dia.',
     'kelas.tambahkan': 'Tambahkan',
-    'kelas.abaikan': 'Abaikan'
+    'kelas.abaikan': 'Abaikan',
+    'kelas.kurikulum-merdeka': 'Kurikulum Merdeka · Target Belajar',
+    'kelas.misi-adaptif': 'Misi Adaptif',
+    'kelas.misi-belajar-judul': 'Misi Belajar & Paspor Kompetensi',
+    'kelas.misi-belajar-desc': 'Alur belajar adaptif berbasis capaian pembelajaran: tujuan jelas, diagnosis otomatis, dan bukti penguasaan materi.',
+    'kelas.buka-misi': 'Buka Misi Belajar',
+    'kelas.paspor-belajar': 'Paspor Belajar',
+    'kelas.misi-kurikulum-link': 'Misi Belajar Kurikulum',
+    'kelas.misi-kurikulum-sub': 'Target kompetensi SMP/SMA & Paspor Belajar adaptif.',
+    'kelas.kembali-kelasku': '‹ Kembali ke KelasKu',
+    'kelas.kembali-kelasku-app': '‹ Kembali ke KelasKu di aplikasi FIEZEL'
   });
 })();
