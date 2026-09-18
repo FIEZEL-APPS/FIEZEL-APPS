@@ -51,18 +51,25 @@
   /* MURID                                                                                  */
   /* ===================================================================================== */
   var sEl = null, sEnv = {}, sUi = null, pendingOpen = null, timerTick = null, WM = '<span class="kelasku-wordmark">KelasKu</span>';
-  var pendingStudentRender = false, lastStudentPaintKey = null, studentDraftCode = '';
+  var pendingStudentRender = false, lastStudentPaintKey = null, lastStudentDataFp = null, studentDraftCode = '', lastStudentInputAt = 0;
   function isStudentBusy() {
     try {
       if (!sEl || typeof document === 'undefined') return false;
+      if (Date.now() - lastStudentInputAt < 2500) return true;
+      var u = sUi;
+      if (u && u.runner && !u.runner.finished && !u.paused) return true;
       var a = document.activeElement;
       if (!a || a === document.body) return false;
-      if (sEl.contains(a)) {
-        if (a.isContentEditable) return true;
-        return /^(INPUT|TEXTAREA|SELECT)$/i.test(a.tagName || '');
-      }
-      return false;
+      if (a.isContentEditable) return true;
+      return /^(INPUT|TEXTAREA|SELECT)$/i.test(a.tagName || '');
     } catch (_) { return false; }
+  }
+  function studentDataFingerprint() {
+    var u = ui();
+    var p = assignments().map(function (a) { return a.id + ':' + (a.itemIds ? a.itemIds.length : 0) + ':' + (a.deadline || ''); }).join(',');
+    var d = subs().map(function (s) { return s.id + ':' + (s.at || 0) + ':' + (s.c || 0) + '/' + (s.t || 0); }).join(',');
+    var run = u.runner ? (u.runner.aid + ':' + u.runner.idx + ':' + u.runner.finished + ':' + (u.runner.chosen != null ? u.runner.chosen : '')) : '';
+    return (u.tab || '') + '|' + (u.review || '') + '|' + (u.editCode ? '1' : '0') + '|' + (classCode() || '') + '|' + (teacherName() || '') + '|' + p + '|' + d + '|' + run + '|' + studentDraftCode;
   }
   function ui() { if (!sUi) { sUi = readJson(UI_KEY, {}); sUi.tab = sUi.tab || 'tugas'; sUi.runner = sUi.runner || null; } return sUi; }
   function saveUi() { writeJson(UI_KEY, sUi); }
@@ -98,7 +105,11 @@
       el.addEventListener('click', onStudentClick);
       el.addEventListener('submit', onStudentSubmit);
       el.addEventListener('input', function (e) {
+        lastStudentInputAt = Date.now();
         if (e.target && e.target.name === 'code') studentDraftCode = e.target.value;
+      });
+      el.addEventListener('keydown', function () {
+        lastStudentInputAt = Date.now();
       });
       el.addEventListener('focusout', function () {
         setTimeout(function () {
@@ -106,14 +117,14 @@
             pendingStudentRender = false;
             renderStudent({ quiet: true });
           }
-        }, 50);
+        }, 250);
       });
     }
     if (pendingOpen) { var id = pendingOpen; pendingOpen = null; if (openAssignment(id)) return; }
     resumeFocus();
     renderStudent();
   }
-  function unmountStudent() { if (timerTick) clearInterval(timerTick); timerTick = null; unbindFocus(); sEl = null; pendingStudentRender = false; lastStudentPaintKey = null; }
+  function unmountStudent() { if (timerTick) clearInterval(timerTick); timerTick = null; unbindFocus(); sEl = null; pendingStudentRender = false; lastStudentPaintKey = null; lastStudentDataFp = null; }
   /** Dibuka dari notifikasi: satu ketuk = sesi tugas terbuka di dalam Kelas. */
   function openAssignment(id) {
     if (!id) return false;
@@ -280,18 +291,27 @@
       pendingStudentRender = true;
       return;
     }
+    var fp = studentDataFingerprint();
+    if (opts && opts.quiet && fp === lastStudentDataFp) {
+      return;
+    }
+    lastStudentDataFp = fp;
     pendingStudentRender = false;
     var u = ui(), pend = assignments(), done = subs();
     var key = (u.runner && !u.paused ? 'runner|' + u.runner.aid + '|' + u.runner.idx : (u.review ? 'review|' + u.review : u.tab)) + '|' + (classCode() || '') + '|' + (u.editCode ? '1' : '0');
     var repaint = key === lastStudentPaintKey;
     lastStudentPaintKey = key;
-    var activeElName = null, selStart = 0, selEnd = 0;
+    var activeSaved = null;
     try {
       var act = root.document ? root.document.activeElement : null;
       if (act && sEl.contains(act) && /^(INPUT|TEXTAREA)$/i.test(act.tagName || '')) {
-        activeElName = act.getAttribute('name');
-        selStart = act.selectionStart;
-        selEnd = act.selectionEnd;
+        activeSaved = {
+          name: act.getAttribute('name'),
+          testId: act.getAttribute('data-testid'),
+          val: act.value,
+          s: act.selectionStart,
+          e: act.selectionEnd
+        };
       }
     } catch (_) {}
     var body = u.runner && !u.paused ? runnerView() : u.review ? reviewView(u.review) : u.tab === 'kelas' ? kelasView() : u.tab === 'progres' ? progresView() : tugasView(pend, done);
@@ -299,13 +319,15 @@
       '<header class="ch-head"><div><h1 data-testid="class-hub-title">' + (className() ? esc(className()) : (classCode() ? WM + ' ' + esc(classCode()) : t('kelas.belum-terhubung', 'Belum terhubung ke ') + WM)) + '</h1><p class="ch-sub">' + (teacherName() ? 'Guru: <b>' + esc(teacherName()) + '</b>' + (classCode() ? ' · ' : '') : '') + (classCode() ? 'Kode ' + esc(classCode()) : '') + '</p></div></header>' +
       (u.runner && !u.paused ? '' : '<nav class="ch-tabs" role="tablist">' + [['tugas', t('umum.tugas', 'Tugas'), pend.length], ['kelas', WM, 0], ['progres', 'Progres', 0]].map(function (t) { return '<button type="button" role="tab" class="ch-tab' + (u.tab === t[0] && !u.review ? ' is-active' : '') + '" data-ch="tab" data-tab="' + t[0] + '" data-testid="class-tab-' + t[0] + '">' + t[1] + (t[2] ? '<span class="ch-badge">' + t[2] + '</span>' : '') + '</button>'; }).join('') + '</nav>') +
       body + '</section>';
-    if (activeElName) {
+    if (activeSaved) {
       try {
-        var restored = sEl.querySelector('[name="' + activeElName + '"]');
+        var sel = activeSaved.testId ? '[data-testid="' + activeSaved.testId + '"]' : '[name="' + activeSaved.name + '"]';
+        var restored = sEl.querySelector(sel);
         if (restored) {
+          if (activeSaved.val != null && restored.value !== activeSaved.val) restored.value = activeSaved.val;
           restored.focus();
-          if (typeof restored.setSelectionRange === 'function' && selStart != null && selEnd != null) {
-            restored.setSelectionRange(selStart, selEnd);
+          if (typeof restored.setSelectionRange === 'function' && activeSaved.s != null) {
+            restored.setSelectionRange(activeSaved.s, activeSaved.e);
           }
         }
       } catch (_) {}
