@@ -606,3 +606,57 @@ Perlu diketahui kalau keputusan ini kelak ditinjau ulang: `misi.html` MENAMPILKA
 kompetensi dan nama TP langsung ke murid (`learning-mission.js:202,218,220`). Jadi begitu
 murid Thai memakai jalur kurikulum, kekecualian ini berubah dari "tidak relevan" menjadi
 utang yang nyata.
+
+## m025-329 — mapel selain Inggris, dan dua utang yang menyertainya
+
+Owner meminta "lebih lengkap semua pelajaran, dan semua materi". Gelombang pertama masuk
+di `backend/seed_mapel.py` — Fase D (Kelas 7–9):
+
+| Mapel | Elemen | Kompetensi |
+|---|---|---|
+| Matematika | 5 | 32 |
+| Bahasa Indonesia | 4 | 24 |
+| Ilmu Pengetahuan Alam | 2 | 12 |
+| Ilmu Pengetahuan Sosial | 2 | 12 |
+| Pendidikan Pancasila | 4 | 24 |
+| **Total** | **17** | **104** |
+
+Mesinnya generik dan isinya tabel: menambah mapel berikutnya menambah DATA di `MAPEL`,
+bukan kode. Ini disengaja — versi per-mapel akan melahirkan sepuluh salinan logika
+penomoran id, perantaian prasyarat, dan pembuatan topik/materi.
+
+### Utang 1 — teks Capaian Pembelajaran BUKAN salinan resmi
+
+Rumusan CP di `seed_mapel.py` adalah rumusan yang **setia pada isinya**, bukan salinan
+verbatim Kepmendikbudristek. Ia ditulis agar bisa dipakai mengajar dan agar graf
+kompetensinya sah; ia TIDAK bisa dikutip sebagai dokumen resmi.
+
+Syarat pelunasannya jelas: begitu FIEZEL dipakai di luar kelas owner sendiri, teks CP
+wajib diganti salinan resmi dari dokumen Kemendikbud. Utang ini disebut di kepala berkasnya
+juga, supaya pembaca kode menemukannya tanpa harus membaca handoff lebih dulu.
+
+Catatan pembeda yang penting: penyemai Bahasa Inggris (`seed_english.py`) punya batas yang
+sama dan menyebutnya sebagai "ringkas, sesuai rumusan Kurikulum Merdeka". Jadi ini bukan
+kompromi baru — ia kompromi lama yang sekarang ditulis terang-terangan.
+
+### Utang 2 — kompetensi tanpa soal adalah pohon, bukan pelajaran
+
+Ini yang paling penting untuk sesi berikutnya, dan angkanya diukur bukan dikira:
+
+```
+kompetensi demo (seed.py)          :  11  ->  7 punya soal (21 soal)
+kompetensi Inggris (seed_english)  : 144  ->  0 punya soal
+kompetensi mapel  (seed_mapel)     : 104  ->  0 punya soal
+```
+
+Mesin belajar mengambil soal dari `db.questions`. Untuk 248 kompetensi itu banknya KOSONG,
+jadi murid bisa melihat strukturnya dan tidak bisa berlatih satu pun di atasnya.
+
+Dan generatornya tidak menyelamatkan: `POST /api/questions/generate-candidates` membuat
+VARIASI dari soal yang sudah ada. Kalau sebuah kompetensi belum punya soal sama sekali, ia
+jatuh ke cabang `else` dan menghasilkan satu soal esai generik ("Jelaskan dengan kalimatmu
+sendiri: …"). Berguna sebagai benih, bukan sebagai bank.
+
+Kesimpulan yang perlu dipegang sesi berikutnya: **menambah mata pelajaran tanpa menambah
+soal memperbesar pohon yang sama kosongnya.** Urutan yang benar adalah mengisi bank soal
+lebih dulu — itulah yang mengubah kurikulum dari struktur menjadi pelajaran.
