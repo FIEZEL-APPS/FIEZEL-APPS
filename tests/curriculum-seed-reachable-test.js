@@ -206,22 +206,23 @@ tegaskan(
 
   /* DUA OPSI YANG TERBACA SAMA OLEH MURID ADALAH SATU OPSI, DAN TEBAKANNYA JADI 1 DARI 3.
 
-     Yang dijaga di sini bukan "opsi yang berbeda tanda baca". Itu justru yang BOLEH:
-     pada soal mekanika bedanya apostrof, pada soal bilangan bulat bedanya tanda minus,
-     pada soal geometri bedanya satuan cm vs cm². Semua itu terlihat murid, dan justru
-     itulah yang diuji.
+     Yang dijaga di sini bukan "opsi yang berbeda tanda baca atau kapital". Itu justru
+     yang BOLEH: pada soal mekanika bedanya apostrof, pada soal bilangan bulat bedanya
+     tanda minus, pada soal geometri bedanya satuan cm vs cm², dan pada soal penulisan
+     nama diri Kelas 1 bedanya HANYA huruf kapital — "Ani" lawan "ani", yang justru
+     seluruh isi soalnya. Semua itu terlihat murid.
 
-     Yang tidak boleh adalah dua opsi yang benar-benar sama di layar — beda kapital atau
-     beda jumlah spasi saja. Murid melihat empat pilihan, tetapi dua di antaranya satu
-     pilihan yang sama, jadi peluang menebak benar naik tanpa penguasaan naik.
+     Yang tidak boleh adalah dua opsi yang benar-benar sama di layar: beda spasi saja.
+     Murid melihat empat pilihan, tetapi dua di antaranya satu pilihan yang sama, jadi
+     peluang menebak benar naik tanpa penguasaan naik.
 
      Batas ini MENCERMINKAN backend, tidak menebaknya: questions.py memakai norm_option()
      untuk menandai `duplicate_options`, dan norm_option() sengaja hanya menyamakan
-     kapital dan spasi. Pernah dipakai norm_stem() di sana — yang membuang seluruh tanda
-     baca — dan akibatnya setiap pengecoh matematika yang benar (5 vs -5, x - 7 vs x + 7)
-     dilaporkan sebagai opsi identik. Dua pemeriksaan di bawah menjaga keduanya tetap satu
-     aturan: isinya, dan sumber aturannya. */
-  const normOpsi = (x) => x.toLowerCase().replace(/\s+/g, ' ').trim();
+     spasi. Pernah dipakai norm_stem() di sana — yang membuang seluruh tanda baca — dan
+     akibatnya setiap pengecoh matematika yang benar (5 vs -5, x - 7 vs x + 7) dilaporkan
+     sebagai opsi identik. Dua pemeriksaan di bawah menjaga keduanya tetap satu aturan:
+     isinya, dan sumber aturannya. */
+  const normOpsi = (x) => x.replace(/\s+/g, ' ').trim();
   const blokOpsi = [...seedSoalPy.matchAll(/\n\s{10}\[((?:[^\][]|\[[^\]]*\])*)\],\s*"[A-D]"/g)];
   const opsiTabrakan = [];
   for (const m of blokOpsi) {
@@ -231,8 +232,8 @@ tegaskan(
   tegaskan(
     opsiTabrakan.length === 0,
     'backend/seed_soal.py: ' + opsiTabrakan.length + ' butir punya dua opsi yang terbaca SAMA oleh murid ' +
-    '(' + opsiTabrakan.slice(0, 2).join(' | ') + '). Opsi yang hanya berbeda kapital atau jumlah spasi adalah ' +
-    'satu pilihan yang ditulis dua kali: murid melihat empat, sebenarnya memilih dari tiga.'
+    '(' + opsiTabrakan.slice(0, 2).join(' | ') + '). Opsi yang hanya berbeda jumlah spasi adalah satu pilihan ' +
+    'yang ditulis dua kali: murid melihat empat, sebenarnya memilih dari tiga.'
   );
 
   const questionsPy = baca('backend/questions.py');
@@ -248,6 +249,12 @@ tegaskan(
     'backend/questions.py: norm_option() ikut membuang karakter non-alfanumerik. Itu mengembalikan cacat yang ' +
     'sama lewat pintu lain — tanda minus, tanda kurung, dan satuan pangkat adalah ISI jawaban matematika, ' +
     'bukan hiasan yang boleh dinormalisasi.'
+  );
+  tegaskan(
+    badanNormOption !== '' && !/\.lower\(\)/.test(badanNormOption),
+    'backend/questions.py: norm_option() menyamakan besar-kecil huruf. Itu mematikan SELURUH soal kapitalisasi: ' +
+    'pada "Penulisan nama diri yang benar adalah ...", pilihan Ani dan ani adalah dua jawaban yang berbeda dan ' +
+    'perbedaan itulah yang diuji. Murid melihat keduanya berbeda; pembandingnya tidak boleh lebih buta darinya.'
   );
 
   /* STEM KEMBAR ADALAH BUTIR YANG HILANG DIAM-DIAM.

@@ -55,10 +55,16 @@ def norm_option(s: str) -> str:
     paling bernilai di soal bilangan bulat, aljabar, geometri, dan tata tulis sebagai
     cacat. Peringatan yang selalu salah mengajari pembacanya mengabaikan peringatan.
 
+    Besar-kecil huruf juga TIDAK disamakan, dan itu bukan kelonggaran melainkan aturan
+    yang sama sekali lagi: "Ani" dan "ani" adalah dua pilihan yang berbeda di layar, dan
+    pada soal penulisan nama diri, huruf kapital itulah SELURUH isi soalnya. Menyamakannya
+    membuat setiap soal kapitalisasi — pelajaran Kelas 1 dan 2 — dilaporkan cacat.
+
     Yang sebenarnya ditanyakan: apakah dua opsi terbaca SAMA oleh murid. Maka yang
-    disamakan hanya yang memang tidak terlihat olehnya — besar-kecil huruf dan jarak.
+    disamakan hanya yang benar-benar tidak terlihat olehnya: spasi berlebih di tepi dan
+    di antara kata. Selebihnya, yang berbeda di layar adalah pilihan yang berbeda.
     """
-    return re.sub(r"\s+", " ", (s or "").strip().lower())
+    return re.sub(r"\s+", " ", (s or "").strip())
 
 
 class QuestionIn(BaseModel):
