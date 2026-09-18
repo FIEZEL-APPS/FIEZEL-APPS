@@ -20,7 +20,16 @@
 
   // ---------------- boot ----------------
   function boot() {
-    E.login.me().then(start).catch(function () { renderAuth(); });
+    function viaKelasKu() {
+      return E.login.kelasku().then(start).catch(function (e) {
+        renderAuth(e && e.message);
+      });
+    }
+    if (E.token && E.token()) {
+      E.login.me().then(start).catch(viaKelasKu);
+    } else {
+      viaKelasKu();
+    }
   }
 
   /* SATU tombol, nol kolom isian.
