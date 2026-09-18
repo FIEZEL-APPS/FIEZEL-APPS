@@ -1333,6 +1333,257 @@ for _kode, _tambah in MAPEL_SMA.items():
     MAPEL[_kode]["grade"].update(_tambah["grade"])
 MAPEL.update(MAPEL_SMA_BARU)
 
+
+# ==========================================================================
+# GELOMBANG MAPEL LINTAS JENJANG — PJOK, Seni Budaya, Prakarya
+# ==========================================================================
+# PJOK dan Seni Budaya berjalan dari Kelas 1 sampai 12. Prakarya mulai Kelas 7: di SD
+# muatan serupa menyatu dalam Seni Budaya dan IPAS, jadi entri Kelas 1-6 untuknya akan
+# menghitung hal yang sama dua kali di cakupan kurikulum.
+#
+# PENDIDIKAN AGAMA SENGAJA TIDAK ADA DI SINI. Isinya berbeda untuk tiap agama (Islam,
+# Kristen, Katolik, Hindu, Buddha, Khonghucu), dan menulis materi keagamaan tanpa arahan
+# owner bukan keputusan yang boleh diambil penyemai. Ia menunggu keputusan, bukan
+# terlupakan — dicatat di docs/handoffs/KURIKULUM-SEKOLAH-HANDOFF.md.
+MAPEL_LINTAS: dict[str, dict] = {
+    "PJOK": {
+        "nama": "Pendidikan Jasmani, Olahraga, dan Kesehatan", "urutan": 15,
+        "elemen": {"GER": "Keterampilan Gerak", "KEB": "Kebugaran dan Kesehatan"},
+        "cp": {
+            ("A", "GER"): "Pada akhir Fase A, peserta didik menunjukkan gerak dasar lokomotor, nonlokomotor, dan manipulatif sederhana.",
+            ("A", "KEB"): "Pada akhir Fase A, peserta didik mengenal kebiasaan hidup bersih dan sehat serta manfaat bergerak aktif.",
+            ("B", "GER"): "Pada akhir Fase B, peserta didik mengombinasikan gerak dasar dalam permainan sederhana dan aktivitas senam.",
+            ("B", "KEB"): "Pada akhir Fase B, peserta didik memahami unsur kebugaran jasmani dan menjaga kebersihan diri.",
+            ("C", "GER"): "Pada akhir Fase C, peserta didik menerapkan kombinasi gerak dalam permainan bola dan atletik sederhana.",
+            ("C", "KEB"): "Pada akhir Fase C, peserta didik mengukur kebugaran jasmani dan memahami pola makan bergizi.",
+            ("D", "GER"): "Pada akhir Fase D, peserta didik mempraktikkan teknik dasar permainan bola besar, bola kecil, atletik, dan beladiri.",
+            ("D", "KEB"): "Pada akhir Fase D, peserta didik menyusun program kebugaran sederhana dan memahami kesehatan reproduksi serta bahaya zat adiktif.",
+            ("E", "GER"): "Pada akhir Fase E, peserta didik menerapkan keterampilan gerak dalam permainan dan olahraga dengan strategi sederhana.",
+            ("E", "KEB"): "Pada akhir Fase E, peserta didik merancang dan melaksanakan program kebugaran pribadi.",
+            ("F", "GER"): "Pada akhir Fase F, peserta didik menerapkan strategi dan taktik permainan serta memimpin aktivitas jasmani.",
+            ("F", "KEB"): "Pada akhir Fase F, peserta didik mengevaluasi gaya hidup sehat dan menerapkannya secara berkelanjutan.",
+        },
+        "grade": {
+            1: {"GER": [("Mempraktikkan gerak dasar lokomotor", "Bergerak berpindah tempat dengan aman", [
+                    ("Mempraktikkan jalan, lari, dan lompat dengan aman", "Jalan dan lari dengan pandangan ke depan; mendarat dengan lutut menekuk."),
+                    ("Mempraktikkan gerak nonlokomotor sederhana", "Membungkuk, memutar, mengayun di tempat.")])],
+                "KEB": [("Mengenal kebiasaan hidup bersih", "Menjaga kebersihan diri", [
+                    ("Mencuci tangan dengan langkah yang benar", "Enam langkah cuci tangan; kapan harus mencuci tangan."),
+                    ("Menjelaskan manfaat bergerak aktif", "Badan bugar, tidur nyenyak, dan mudah berkonsentrasi.")])]},
+            2: {"GER": [("Mempraktikkan gerak manipulatif", "Melempar, menangkap, dan menendang", [
+                    ("Melempar dan menangkap bola dengan dua tangan", "Posisi tangan menerima bola; pandangan mengikuti bola."),
+                    ("Menendang dan menghentikan bola", "Bagian kaki untuk menendang; menghentikan dengan telapak kaki.")])],
+                "KEB": [("Menjaga kebersihan diri dan lingkungan", "Membiasakan hidup bersih", [
+                    ("Menjaga kebersihan gigi dan tubuh", "Waktu dan cara menyikat gigi; mandi dan mengganti pakaian."),
+                    ("Membuang sampah pada tempatnya", "Memilah sampah kering dan basah di kelas.")])]},
+            3: {"GER": [("Mengombinasikan gerak dalam permainan sederhana", "Menggabungkan dua gerak dasar", [
+                    ("Mengombinasikan lari dan lompat dalam permainan", "Lari lalu melompati rintangan rendah."),
+                    ("Mempraktikkan gerak dasar senam lantai", "Guling depan dengan matras dan pendampingan.")])],
+                "KEB": [("Memahami unsur kebugaran jasmani", "Mengenal unsur kebugaran", [
+                    ("Menjelaskan unsur kekuatan, kelenturan, dan daya tahan", "Contoh latihan untuk tiap unsur."),
+                    ("Melakukan pemanasan dan pendinginan", "Kenapa pemanasan mengurangi risiko cedera.")])]},
+            4: {"GER": [("Mempraktikkan permainan bola sederhana", "Bermain dengan aturan sederhana", [
+                    ("Mempraktikkan permainan bola besar yang dimodifikasi", "Aturan disederhanakan; kerja sama tim lebih dulu daripada skor."),
+                    ("Mempraktikkan gerak ritmik mengikuti irama", "Langkah dan ayunan mengikuti hitungan.")])],
+                "KEB": [("Menjaga kebersihan dan keselamatan diri", "Mencegah cedera dan penyakit", [
+                    ("Menerapkan keselamatan saat beraktivitas jasmani", "Alas kaki, lapangan aman, dan minum cukup."),
+                    ("Menjelaskan pentingnya istirahat dan tidur cukup", "Hubungan tidur dengan kebugaran dan belajar.")])]},
+            5: {"GER": [("Menerapkan kombinasi gerak dalam atletik", "Melakukan gerak atletik dasar", [
+                    ("Mempraktikkan lari jarak pendek dengan teknik dasar", "Start, langkah, dan pengaturan napas."),
+                    ("Mempraktikkan lompat jauh gaya jongkok", "Awalan, tolakan, melayang, mendarat.")])],
+                "KEB": [("Mengukur kebugaran jasmani", "Mengukur dan menafsirkan kebugaran", [
+                    ("Melakukan tes kebugaran sederhana", "Lari 600 m, sit-up, dan push-up dengan pencatatan."),
+                    ("Menjelaskan pola makan bergizi seimbang", "Isi piringku; membedakan lapar dari ingin ngemil.")])]},
+            6: {"GER": [("Menerapkan gerak dalam permainan bola kecil", "Bermain bola kecil dengan teknik dasar", [
+                    ("Mempraktikkan permainan bola kecil yang dimodifikasi", "Kasti atau rounders dengan aturan yang disepakati."),
+                    ("Mempraktikkan rangkaian senam lantai sederhana", "Dua gerakan disambung menjadi rangkaian.")])],
+                "KEB": [("Menerapkan gaya hidup sehat", "Membiasakan perilaku sehat", [
+                    ("Menyusun jadwal aktivitas fisik harian", "Target menit bergerak per hari yang masuk akal."),
+                    ("Menjelaskan bahaya rokok dan minuman berpemanis", "Dampak jangka pendek yang bisa dirasakan sendiri.")])]},
+            7: {"GER": [("Mempraktikkan teknik dasar permainan bola besar", "Melakukan teknik dasar dengan benar", [
+                    ("Mempraktikkan passing dan kontrol dalam sepak bola atau bola voli", "Perkenaan bola dan posisi tubuh."),
+                    ("Mempraktikkan teknik dasar bola basket", "Dribbling, chest pass, dan lay-up sederhana.")])],
+                "KEB": [("Memahami kebugaran dan kesehatan remaja", "Menjaga kebugaran pada masa remaja", [
+                    ("Menyusun latihan kebugaran sederhana", "Frekuensi, intensitas, waktu, dan jenis latihan."),
+                    ("Menjelaskan perubahan tubuh pada masa remaja", "Perubahan fisik sebagai hal wajar; menjaga kebersihan diri.")])]},
+            8: {"GER": [("Mempraktikkan atletik dan beladiri", "Melakukan teknik atletik dan beladiri dasar", [
+                    ("Mempraktikkan tolak peluru atau lempar lembing gaya dasar", "Pegangan, awalan, dan keselamatan area lempar."),
+                    ("Mempraktikkan gerak dasar pencak silat", "Kuda-kuda, pukulan, tangkisan; sikap hormat sebelum dan sesudah.")])],
+                "KEB": [("Memahami kesehatan reproduksi dan zat adiktif", "Menjaga kesehatan dan menolak zat berbahaya", [
+                    ("Menjelaskan kesehatan reproduksi remaja", "Kebersihan, batasan tubuh, dan kepada siapa bertanya."),
+                    ("Menjelaskan bahaya zat adiktif dan cara menolaknya", "Rokok, alkohol, NAPZA; kalimat menolak ajakan teman.")])]},
+            9: {"GER": [("Menerapkan teknik dan taktik permainan", "Bermain dengan taktik sederhana", [
+                    ("Menerapkan taktik menyerang dan bertahan dalam permainan", "Posisi pemain dan pergerakan tanpa bola."),
+                    ("Mempraktikkan aktivitas air atau senam irama", "Keselamatan di air; rangkaian gerak berirama.")])],
+                "KEB": [("Menyusun program kebugaran pribadi", "Merancang latihan sesuai kebutuhan", [
+                    ("Menyusun program latihan kebugaran empat minggu", "Sasaran terukur dan peningkatan bertahap."),
+                    ("Mengevaluasi hasil program kebugaran", "Membandingkan tes awal dan akhir dengan jujur.")])]},
+            10: {"GER": [("Menerapkan keterampilan gerak dalam olahraga", "Bermain dengan strategi", [
+                    ("Menerapkan strategi permainan bola besar", "Formasi dan pembagian peran dalam tim."),
+                    ("Mempraktikkan aktivitas atletik dengan teknik lanjutan", "Efisiensi gerak dan irama langkah.")])],
+                 "KEB": [("Merancang program kebugaran pribadi", "Menyusun dan menjalankan program", [
+                    ("Merancang program kebugaran berdasarkan hasil tes", "Menentukan sasaran dari data, bukan dari keinginan."),
+                    ("Menerapkan prinsip latihan yang aman", "Beban bertahap, pemulihan, dan tanda tubuh kelelahan.")])]},
+            11: {"GER": [("Menerapkan taktik permainan tingkat lanjut", "Menganalisis dan menerapkan taktik", [
+                    ("Menganalisis taktik lawan dalam permainan", "Membaca pola serangan dan menyesuaikan pertahanan."),
+                    ("Memimpin pemanasan dan aktivitas kelompok", "Instruksi jelas dan memperhatikan keselamatan peserta.")])],
+                 "KEB": [("Mengevaluasi gaya hidup sehat", "Menilai dan memperbaiki kebiasaan", [
+                    ("Menganalisis kebiasaan makan dan aktivitas pribadi", "Mencatat asupan dan aktivitas selama sepekan."),
+                    ("Menjelaskan pencegahan penyakit tidak menular", "Diabetes, hipertensi, dan obesitas serta faktor risikonya.")])]},
+            12: {"GER": [("Memimpin aktivitas jasmani", "Merancang dan memimpin kegiatan", [
+                    ("Merancang kegiatan olahraga untuk kelompok", "Jadwal, peran, keselamatan, dan sarana."),
+                    ("Memimpin pelaksanaan kegiatan olahraga", "Mengatur peserta dan menangani keadaan darurat sederhana.")])],
+                 "KEB": [("Menerapkan gaya hidup sehat berkelanjutan", "Mempertahankan kebiasaan sehat", [
+                    ("Menyusun rencana hidup sehat jangka panjang", "Kebiasaan yang bisa dipertahankan sesudah lulus sekolah."),
+                    ("Mengevaluasi informasi kesehatan dari media", "Memeriksa sumber sebelum mempercayai klaim kesehatan.")])]},
+        },
+    },
+    "SEN": {
+        "nama": "Seni Budaya", "urutan": 16,
+        "elemen": {"CIP": "Menciptakan", "APR": "Mengapresiasi"},
+        "cp": {
+            ("A", "CIP"): "Pada akhir Fase A, peserta didik membuat karya seni sederhana dengan media yang tersedia.",
+            ("A", "APR"): "Pada akhir Fase A, peserta didik mengenali dan menanggapi karya seni di sekitarnya.",
+            ("B", "CIP"): "Pada akhir Fase B, peserta didik membuat karya seni rupa, musik, tari, atau teater sederhana sesuai gagasannya.",
+            ("B", "APR"): "Pada akhir Fase B, peserta didik menanggapi karya seni dengan menyebut unsur yang dilihat dan didengar.",
+            ("C", "CIP"): "Pada akhir Fase C, peserta didik menciptakan karya seni dengan teknik dan unsur yang dipilih secara sadar.",
+            ("C", "APR"): "Pada akhir Fase C, peserta didik mengapresiasi karya seni daerah dan menjelaskan maknanya.",
+            ("D", "CIP"): "Pada akhir Fase D, peserta didik menciptakan karya seni dengan mempertimbangkan unsur, teknik, dan pesan.",
+            ("D", "APR"): "Pada akhir Fase D, peserta didik menganalisis karya seni dan hubungannya dengan konteks budaya.",
+            ("E", "CIP"): "Pada akhir Fase E, peserta didik menciptakan karya seni dengan gagasan pribadi yang terarah.",
+            ("E", "APR"): "Pada akhir Fase E, peserta didik mengevaluasi karya seni berdasarkan unsur dan konteksnya.",
+            ("F", "CIP"): "Pada akhir Fase F, peserta didik menciptakan dan mementaskan karya seni untuk publik.",
+            ("F", "APR"): "Pada akhir Fase F, peserta didik mengkritisi karya seni dan menyusun argumen apresiatif.",
+        },
+        "grade": {
+            1: {"CIP": [("Membuat karya seni rupa sederhana", "Berkarya dengan media sederhana", [
+                    ("Menggambar dan mewarnai objek di sekitar", "Garis, bentuk, dan warna; mengamati sebelum menggambar."),
+                    ("Menyanyikan lagu anak dengan nada yang tepat", "Tinggi rendah nada; menyanyi bersama mengikuti ketukan.")])],
+                "APR": [("Menanggapi karya seni di sekitar", "Menyebut apa yang dilihat dan didengar", [
+                    ("Menyebutkan warna dan bentuk pada karya seni", "Menyebut apa yang terlihat, bukan suka atau tidak suka."),
+                    ("Menanggapi lagu yang didengar", "Cepat-lambat dan keras-lembut sebagai kosakata awal.")])]},
+            2: {"CIP": [("Membuat karya dengan bahan alam", "Berkarya dengan bahan di sekitar", [
+                    ("Membuat karya kolase dari bahan alam", "Daun, biji, dan ranting; menempel dengan rapi."),
+                    ("Menirukan gerak tari sederhana", "Gerak mengikuti hitungan dan contoh guru.")])],
+                "APR": [("Mengapresiasi karya teman", "Menanggapi karya dengan santun", [
+                    ("Menyebut bagian yang menarik dari karya teman", "Memuji hal yang spesifik, bukan sekadar bagus."),
+                    ("Menyebut alat musik yang didengar", "Mengenali bunyi alat musik sederhana.")])]},
+            3: {"CIP": [("Membuat karya seni dengan teknik tertentu", "Menerapkan teknik berkarya", [
+                    ("Membuat karya cetak sederhana", "Cetak penampang dan cap dari bahan sekitar."),
+                    ("Memainkan pola irama sederhana", "Tepuk dan alat perkusi mengikuti pola.")])],
+                "APR": [("Menanggapi karya seni daerah", "Mengenal seni daerah setempat", [
+                    ("Mengenali karya seni daerah setempat", "Motif kain, alat musik, dan tarian daerah."),
+                    ("Menceritakan kesan terhadap karya seni", "Menghubungkan karya dengan pengalaman sendiri.")])]},
+            4: {"CIP": [("Menciptakan karya seni rupa dua dimensi", "Berkarya dengan unsur rupa", [
+                    ("Membuat karya dua dimensi dengan komposisi", "Penempatan objek, ruang kosong, dan keseimbangan."),
+                    ("Menyanyikan lagu daerah dengan ekspresi", "Artikulasi dan penghayatan isi lagu.")])],
+                "APR": [("Mengapresiasi keragaman seni Indonesia", "Menghargai seni dari berbagai daerah", [
+                    ("Membandingkan karya seni dari dua daerah", "Persamaan dan perbedaan motif atau irama."),
+                    ("Menjelaskan fungsi seni dalam kehidupan masyarakat", "Seni untuk upacara, hiburan, dan penanda identitas.")])]},
+            5: {"CIP": [("Menciptakan karya seni tiga dimensi", "Berkarya dalam bentuk tiga dimensi", [
+                    ("Membuat karya tiga dimensi dari bahan lunak", "Membentuk, menyusun, dan merakit."),
+                    ("Menampilkan gerak tari kreasi sederhana", "Menyusun gerak sendiri dari pola yang dipelajari.")])],
+                "APR": [("Mengapresiasi karya seni dengan unsurnya", "Menganalisis unsur karya seni", [
+                    ("Menjelaskan unsur rupa dalam sebuah karya", "Garis, bentuk, warna, tekstur, ruang."),
+                    ("Menjelaskan unsur musik dalam lagu", "Melodi, irama, dinamika, dan tempo.")])]},
+            6: {"CIP": [("Menciptakan karya seni pertunjukan", "Menyiapkan dan menampilkan karya", [
+                    ("Menyusun pertunjukan sederhana secara berkelompok", "Pembagian peran, latihan, dan properti."),
+                    ("Menampilkan karya seni di depan penonton", "Kesiapan panggung dan kepercayaan diri.")])],
+                "APR": [("Mengapresiasi karya seni daerah dan maknanya", "Menjelaskan makna karya seni", [
+                    ("Menjelaskan makna simbol dalam karya seni daerah", "Motif dan warna yang membawa arti tertentu."),
+                    ("Menanggapi pertunjukan dengan argumen", "Menyebut alasan di balik tanggapan.")])]},
+            7: {"CIP": [("Menciptakan karya seni dengan gagasan sendiri", "Menuangkan gagasan ke dalam karya", [
+                    ("Menciptakan karya seni rupa dengan tema tertentu", "Sketsa gagasan sebelum berkarya."),
+                    ("Menciptakan aransemen musik sederhana", "Mengubah irama atau menambah suara pengiring.")])],
+                "APR": [("Menganalisis karya seni dan konteksnya", "Menghubungkan karya dengan budayanya", [
+                    ("Menganalisis unsur dan teknik dalam karya seni", "Membaca karya dari cara pembuatannya."),
+                    ("Menjelaskan hubungan karya seni dengan budaya masyarakatnya", "Kenapa bentuk seni berbeda antar daerah.")])]},
+            8: {"CIP": [("Menciptakan karya seni dengan teknik pilihan", "Memilih teknik sesuai gagasan", [
+                    ("Menciptakan karya seni rupa dengan teknik yang dipilih", "Alasan memilih teknik, bukan sekadar mengikuti contoh."),
+                    ("Menampilkan karya tari atau teater berkelompok", "Blocking, ekspresi, dan kerja sama kelompok.")])],
+                "APR": [("Mengapresiasi karya seni modern dan tradisional", "Membandingkan dua jenis karya", [
+                    ("Membandingkan karya seni tradisional dan modern", "Apa yang berubah dan apa yang bertahan."),
+                    ("Menyusun tanggapan tertulis atas sebuah karya", "Deskripsi, analisis, tafsir, penilaian.")])]},
+            9: {"CIP": [("Menciptakan karya seni dengan pesan", "Menyampaikan pesan melalui karya", [
+                    ("Menciptakan karya seni yang menyampaikan pesan sosial", "Pesan yang jelas tanpa menggurui."),
+                    ("Mementaskan karya seni pertunjukan", "Persiapan teknis dan latihan bertahap.")])],
+                "APR": [("Mengkritisi karya seni", "Menyusun kritik yang berdasar", [
+                    ("Menyusun kritik seni sederhana", "Empat tahap kritik; menghindari penilaian tanpa alasan."),
+                    ("Menghargai perbedaan selera dan gaya seni", "Kenapa tidak semua karya harus disukai semua orang.")])]},
+            10: {"CIP": [("Menciptakan karya seni dengan gagasan terarah", "Mengembangkan gagasan menjadi karya", [
+                    ("Mengembangkan gagasan menjadi karya seni utuh", "Riset kecil, sketsa, revisi, karya akhir."),
+                    ("Mendokumentasikan proses berkarya", "Catatan proses sebagai bagian dari karya.")])],
+                 "APR": [("Mengevaluasi karya seni", "Menilai karya dengan kriteria", [
+                    ("Mengevaluasi karya seni berdasarkan unsur dan konteks", "Kriteria penilaian disebut sebelum menilai."),
+                    ("Menjelaskan perkembangan seni di Indonesia", "Garis besar perkembangan dan tokohnya.")])]},
+            11: {"CIP": [("Menciptakan karya seni untuk publik", "Menyiapkan karya untuk penonton", [
+                    ("Menciptakan karya seni untuk dipamerkan atau dipentaskan", "Mempertimbangkan ruang dan penonton."),
+                    ("Menyusun rencana pameran atau pementasan", "Konsep, jadwal, kebutuhan, dan pembagian tugas.")])],
+                 "APR": [("Mengkritisi karya seni secara argumentatif", "Menyusun argumen apresiatif", [
+                    ("Menulis kritik seni dengan argumen dan bukti", "Menunjuk bagian karya sebagai bukti penilaian."),
+                    ("Menganalisis karya seni dari sudut pandang budaya", "Karya sebagai jejak zaman dan masyarakatnya.")])]},
+            12: {"CIP": [("Mementaskan karya seni untuk publik", "Melaksanakan pameran atau pementasan", [
+                    ("Melaksanakan pameran atau pementasan karya", "Pelaksanaan sesuai rencana; menangani kendala di lapangan."),
+                    ("Mengevaluasi hasil pameran atau pementasan", "Umpan balik penonton dan catatan perbaikan.")])],
+                 "APR": [("Menyusun apresiasi seni yang utuh", "Menulis apresiasi mendalam", [
+                    ("Menyusun tulisan apresiasi seni yang utuh", "Konteks, deskripsi, analisis, tafsir, penilaian."),
+                    ("Menghubungkan karya seni dengan isu masa kini", "Seni sebagai tanggapan atas keadaan zamannya.")])]},
+        },
+    },
+    "PRA": {
+        "nama": "Prakarya dan Kewirausahaan", "urutan": 17,
+        "elemen": {"PRD": "Produksi", "WIR": "Kewirausahaan"},
+        "cp": {
+            ("D", "PRD"): "Pada akhir Fase D, peserta didik merancang dan membuat produk kerajinan atau pengolahan sederhana dengan memperhatikan bahan dan keselamatan kerja.",
+            ("D", "WIR"): "Pada akhir Fase D, peserta didik memahami peluang usaha sederhana dan menghitung biaya produksi.",
+            ("E", "PRD"): "Pada akhir Fase E, peserta didik merancang produk berdasarkan kebutuhan pengguna dan menguji hasilnya.",
+            ("E", "WIR"): "Pada akhir Fase E, peserta didik menyusun rencana usaha sederhana berdasarkan analisis pasar.",
+            ("F", "PRD"): "Pada akhir Fase F, peserta didik mengembangkan produk dengan memperhatikan mutu, kemasan, dan keberlanjutan.",
+            ("F", "WIR"): "Pada akhir Fase F, peserta didik menjalankan dan mengevaluasi usaha kecil secara bertanggung jawab.",
+        },
+        "grade": {
+            7: {"PRD": [("Membuat produk kerajinan sederhana", "Merancang dan membuat kerajinan", [
+                    ("Merancang produk kerajinan dari bahan alam", "Memilih bahan sesuai fungsi; sketsa sebelum membuat."),
+                    ("Membuat produk dengan memperhatikan keselamatan kerja", "Penggunaan alat potong dan perekat dengan aman.")])],
+                "WIR": [("Memahami biaya produksi", "Menghitung biaya sebuah produk", [
+                    ("Menghitung biaya bahan dan tenaga sebuah produk", "Biaya tetap dan biaya variabel sederhana."),
+                    ("Menentukan harga jual yang wajar", "Harga pokok, margin, dan harga pesaing.")])]},
+            8: {"PRD": [("Membuat produk pengolahan sederhana", "Mengolah bahan menjadi produk", [
+                    ("Mengolah bahan pangan menjadi produk sederhana", "Kebersihan, takaran, dan daya simpan."),
+                    ("Mengemas produk agar aman dan menarik", "Fungsi kemasan: melindungi, memberi informasi, menarik.")])],
+                "WIR": [("Mengenali peluang usaha", "Menemukan peluang di lingkungan sendiri", [
+                    ("Mengidentifikasi kebutuhan yang belum terpenuhi di sekitar", "Mengamati dan bertanya sebelum membuat produk."),
+                    ("Menyusun ide usaha sederhana", "Ide, sasaran pembeli, dan apa yang membuatnya berbeda.")])]},
+            9: {"PRD": [("Mengembangkan produk berdasarkan umpan balik", "Memperbaiki produk dari masukan", [
+                    ("Menguji produk kepada calon pengguna", "Meminta masukan spesifik, bukan sekadar suka atau tidak."),
+                    ("Memperbaiki produk berdasarkan umpan balik", "Satu perbaikan satu alasan.")])],
+                "WIR": [("Menyusun rencana usaha sederhana", "Merancang usaha kecil", [
+                    ("Menyusun rencana usaha sederhana", "Produk, harga, tempat, promosi."),
+                    ("Menghitung perkiraan untung dan rugi", "Titik impas sederhana.")])]},
+            10: {"PRD": [("Merancang produk berbasis kebutuhan pengguna", "Merancang dari kebutuhan nyata", [
+                    ("Menganalisis kebutuhan pengguna sebelum merancang", "Wawancara singkat dengan calon pengguna."),
+                    ("Membuat purwarupa produk", "Purwarupa murah dulu sebelum produk jadi.")])],
+                 "WIR": [("Menyusun rencana usaha berbasis pasar", "Menganalisis pasar sebelum berusaha", [
+                    ("Menganalisis pasar dan pesaing", "Siapa pesaingnya dan apa yang mereka belum layani."),
+                    ("Menyusun proposal usaha sederhana", "Latar belakang, produk, pasar, keuangan.")])]},
+            11: {"PRD": [("Mengembangkan mutu dan kemasan produk", "Meningkatkan mutu produk", [
+                    ("Meningkatkan mutu produk berdasarkan standar", "Konsistensi ukuran, rasa, atau kekuatan."),
+                    ("Merancang kemasan yang informatif dan berkelanjutan", "Informasi wajib pada label; bahan kemasan ramah lingkungan.")])],
+                 "WIR": [("Menjalankan usaha kecil", "Melaksanakan usaha secara nyata", [
+                    ("Melaksanakan penjualan produk secara nyata", "Mencatat penjualan dan biaya sejak hari pertama."),
+                    ("Mengelola keuangan usaha sederhana", "Memisahkan uang usaha dari uang pribadi.")])]},
+            12: {"PRD": [("Mengembangkan produk berkelanjutan", "Merancang produk yang bertanggung jawab", [
+                    ("Menganalisis dampak lingkungan dari produk", "Bahan, limbah, dan daur hidup produk."),
+                    ("Mengembangkan produk dengan prinsip keberlanjutan", "Mengurangi, memakai ulang, mendaur ulang.")])],
+                 "WIR": [("Mengevaluasi usaha secara bertanggung jawab", "Menilai dan memperbaiki usaha", [
+                    ("Mengevaluasi kinerja usaha dari data penjualan", "Produk mana yang menopang dan mana yang membebani."),
+                    ("Menyusun laporan dan rencana pengembangan usaha", "Laporan jujur termasuk yang gagal, plus rencana berikutnya.")])]},
+        },
+    },
+}
+
+MAPEL.update(MAPEL_LINTAS)
+
 async def _node(node_id, ntype, parent, name, desc="", order=0, meta=None):
     """Idempoten: node yang sudah ada tidak diubah, jadi penyemai aman dijalankan ulang."""
     ada = await db.curriculum_nodes.find_one({"id": node_id}, {"_id": 0, "id": 1})
@@ -1396,7 +1647,7 @@ async def seed_mapel_curriculum():
     after = await db.curriculum_nodes.count_documents({})
     return {"nodes_before": before, "nodes_after": after, "created": after - before,
             "mapel": [m["nama"] for m in MAPEL.values()],
-            "note": "14 mapel non-Inggris, Fase A–F (Kelas 1–12). Rumusan CP adalah rumusan yang setia "
+            "note": "17 mapel non-Inggris, Fase A–F (Kelas 1–12). Rumusan CP adalah rumusan yang setia "
                     "pada isinya, BUKAN salinan verbatim dokumen Kemendikbud. Node lama tidak diubah."}
 
 

@@ -1,6 +1,6 @@
 {
   "schema": "id-golden-baseline/1",
-  "generatedAt": "2026-09-18T12:49:17.280Z",
+  "generatedAt": "2026-09-18T12:53:16.339Z",
   "root": "/home/user/FIEZEL-APPS",
   "files": {
     "grammar-explanations-id.json": "c99dfaa76ec37e33f80cac08712cfc13a98a405ddb9653ac9f853db0905c33f6",
@@ -19,7 +19,7 @@
   },
   "literals": {
     "count": 3300,
-    "sha256": "de3583c3abf0ed100bde048a9ee95bbcf44778c1deefcbdcc6a8f4f85c784968",
+    "sha256": "94015157b465a7c286008c624fef40743d3c6f230d2dfb6a169f6acf5a08693f",
     "list": [
       "\n      SETELAH beat concern ≤1000ms selesai (13 §2.2), bukan menimpanya. Tanpa bunyi:\n      SFX hint sudah dipensiunkan (20 §4); cooldown 8 detiknya dijaga komponen. */\n   setTimeout(()=>{try{pawReact(",
       "\n      case 'silent':                        // L5: kalau mulut sempat mulai (taksiran L3 kandas), tutup SEKARANG\n        degradedLatch = false;\n        closeTurn(false);\n        break;\n      case 'interrupt':                     // stop(): snap tutup\n        degradedLatch = false;\n        closeTurn(true);\n        break;\n      default:\n        break;                              // fase asing dari versi fasad lebih baru: diabaikan tanpa suara\n    }\n  }\n\n  try { doc.addEventListener('fiezel-speech', onSpeech); } catch (_) {}\n\n  /* Suara terdegradasi (audibility-fix): mulut mati SEKETIKA dan tidak boleh\n     hidup lagi untuk sisa giliran — apa pun yang masih dikirim lapisan bawah. */\n  try {\n    root.addEventListener('fiezel-neural-voice-degraded', function () {\n      if (turn) closeTurn(true);\n      degradedLatch = true;                 // dilepas oleh end/silent/interrupt fasad berikutnya\n    });\n  } catch (_) {}\n\n  /* Permukaan kecil untuk Diagnostics/tes — bukan API pemanggil biasa:\n     satu-satunya pintu bicara tetap FiezelVoiceSay.say(). */\n  root.FiezelSpeechBridge = Object.freeze({\n    SCHEMA: SCHEMA,\n    speaking: function () { return !!turn; },\n    degraded: function () { return !!degradedLatch; },\n    motionAllowed: motionAllowed\n  });\n})(typeof self !== 'undefined' ? self : (typeof window !== 'undefined' ? window : this));\n",
@@ -1375,7 +1375,6 @@
       "Duel Belajar FIEZEL",
       "Dugaan yakin yang sudah kejadian: will have + past participle",
       "Email formal ke kampus atau penyelenggara beasiswa",
-      "Empat belas mata pelajaran Fase A–F: Matematika, B.Indonesia, Pancasila, IPAS, IPA, IPS, Sejarah, Informatika, Fisika, Kimia, Biologi, Ekonomi, Sosiologi, Geografi. 150 tujuan pembelajaran, 300 kompetensi, lengkap materi ajar dan prasyarat antar kelas.",
       "Empat botol yang ia beli di jalur pendakian",
       "Empat mahasiswa yang keluar dari rumah itu",
       "Empat puluh pengunjung yang datang hari itu",
@@ -2837,6 +2836,7 @@
       "Tujuan belajar: {label}",
       "Tujuan ini pas nunjukin kemampuan yang lagi diuji di sini.",
       "Tujuanmu yang menentukan materi mana yang kamu dapat dulu.",
+      "Tujuh belas mata pelajaran Fase A–F: Matematika, B.Indonesia, Pancasila, IPAS, IPA, IPS, Sejarah, Informatika, Fisika, Kimia, Biologi, Ekonomi, Sosiologi, Geografi, PJOK, Seni Budaya, Prakarya. 210 tujuan pembelajaran, 420 kompetensi, lengkap materi ajar dan prasyarat antar kelas.",
       "Tulis minimal 15 kata dulu, biar ada yang bisa dibaca FIEZEL.",
       "Tulis nama kamu",
       "Tulis pesan singkat untuk teman yang hari ini tidak masuk sekolah.",
