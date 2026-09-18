@@ -11,7 +11,7 @@
     user: null, classes: [], cls: null, view: 'copilot', tree: null, coverage: null,
     recs: null, questions: [], reviewQueue: [], tps: [], comps: [], assessments: [],
     drawer: null, modal: null, plan: null, groups: null, busy: false, health: null, blueprintCheck: null,
-    engStatus: null, engBusy: false
+    engStatus: null, engBusy: false, mapelStatus: null, mapelBusy: false
   };
 
   /* Pembungkus i18n yang sama dengan fz-api.js, dan alasannya sama pula: halaman konsol
@@ -290,33 +290,60 @@
 
      Statusnya dibaca lebih dulu supaya tombolnya jujur: guru berhak tahu banknya sudah
      terisi atau belum SEBELUM menekan apa pun. */
-  function seedCardHtml() {
-    if (S.engStatus === null && !S.engBusy) {
-      S.engBusy = true;
-      E.seed.englishStatus().then(function (st) {
-        S.engStatus = st; S.engBusy = false; render();
-      }).catch(function () { S.engStatus = false; S.engBusy = false; render(); });
+  /* DUA BANK, SATU BENTUK KARTU. Bahasa Inggris punya penyemainya sendiri (Fase A–F,
+     Kelas 1–12) dan mapel lain punya penyemainya sendiri (Fase D, Kelas 7–9), tetapi
+     kartunya identik: baca status dulu, baru tawarkan tombol. Ditulis sekali dan
+     diparameterkan — dua salinan kartu berarti dua tempat yang bisa menyimpang, dan yang
+     kedua tidak akan pernah dibaca ulang siapa pun. */
+  var SEMAI = {
+    english: {
+      aksi: 'seed-english', st: 'engStatus', busy: 'engBusy',
+      ambil: function () { return E.seed.englishStatus(); },
+      jalan: function () { return E.seed.english(); },
+      judul: function () { return t('kurikulum.semai-judul', 'Kurikulum Bahasa Inggris Kelas 1–12'); },
+      ajakan: function () { return t('kurikulum.semai-ajakan', 'Kurikulum Merdeka Bahasa Inggris lengkap Fase A–F: 72 tujuan pembelajaran, 144 kompetensi, plus materi ajar dan prasyarat antar kelas. Disemai sekali, lalu menjadi milik bank kurikulummu.'); },
+      selesai: function () { return t('kurikulum.semai-selesai', 'Kurikulum Bahasa Inggris Kelas 1–12 tersemai.'); }
+    },
+    mapel: {
+      aksi: 'seed-mapel', st: 'mapelStatus', busy: 'mapelBusy',
+      ambil: function () { return E.seed.mapelStatus(); },
+      jalan: function () { return E.seed.mapel(); },
+      judul: function () { return t('kurikulum.mapel-judul', 'Mata pelajaran lain — Kelas 7–9'); },
+      ajakan: function () { return t('kurikulum.mapel-ajakan', 'Matematika, Bahasa Indonesia, IPA, IPS, dan Pendidikan Pancasila untuk Fase D: 52 tujuan pembelajaran, 104 kompetensi, lengkap materi ajar dan prasyarat antar kelas.'); },
+      selesai: function () { return t('kurikulum.mapel-selesai', 'Mata pelajaran Kelas 7–9 tersemai.'); }
     }
-    var st = S.engStatus;
-    var baris;
+  };
+
+  function kartuSemai(jenis) {
+    var d = SEMAI[jenis];
+    if (S[d.st] === null && !S[d.busy]) {
+      S[d.busy] = true;
+      d.ambil().then(function (st) {
+        S[d.st] = st; S[d.busy] = false; render();
+      }).catch(function () { S[d.st] = false; S[d.busy] = false; render(); });
+    }
+    var st = S[d.st], sibuk = S[d.busy], baris;
     if (st === null) baris = '<p class="muted">' + esc(t('kurikulum.semai-memeriksa', 'Memeriksa isi bank kurikulum…')) + '</p>';
     else if (st && st.seeded) {
-      baris = '<p class="muted" data-testid="seed-english-status">' + esc(
+      baris = '<p class="muted" data-testid="' + d.aksi + '-status">' + esc(
         t('kurikulum.semai-sudah', 'Sudah tersemai: {tp} tujuan pembelajaran, {komp} kompetensi, {materi} materi ajar.')
           .replace('{tp}', st.tp).replace('{komp}', st.competencies).replace('{materi}', st.materials)) + '</p>';
     } else {
-      baris = '<p class="muted" data-testid="seed-english-status">' + esc(t('kurikulum.semai-belum', 'Belum tersemai. Bank kurikulum masih berisi contoh demo saja.')) + '</p>';
+      baris = '<p class="muted" data-testid="' + d.aksi + '-status">' + esc(t('kurikulum.semai-belum', 'Belum tersemai. Bank kurikulum masih berisi contoh demo saja.')) + '</p>';
     }
     var sudah = !!(st && st.seeded);
-    return '<div class="card" data-testid="seed-english-card"><p class="kicker">' + esc(t('kurikulum.semai-kicker', 'Bank kurikulum')) + '</p>' +
-      '<h3>' + esc(t('kurikulum.semai-judul', 'Kurikulum Bahasa Inggris Kelas 1–12')) + '</h3>' +
-      '<p class="muted">' + esc(t('kurikulum.semai-ajakan',
-        'Kurikulum Merdeka Bahasa Inggris lengkap Fase A–F: 72 tujuan pembelajaran, 144 kompetensi, plus materi ajar dan prasyarat antar kelas. Disemai sekali, lalu menjadi milik bank kurikulummu.')) + '</p>' +
+    return '<div class="card" data-testid="' + d.aksi + '-card"><p class="kicker">' + esc(t('kurikulum.semai-kicker', 'Bank kurikulum')) + '</p>' +
+      '<h3>' + esc(d.judul()) + '</h3>' +
+      '<p class="muted">' + esc(d.ajakan()) + '</p>' +
       baris +
-      '<button class="btn ' + (sudah ? 'ghost' : 'primary') + ' sm" data-a="seed-english" data-testid="seed-english-btn"' + (S.engBusy ? ' disabled' : '') + '>' +
-      esc(S.engBusy ? t('kurikulum.semai-jalan', 'Sedang menyemai — butuh beberapa detik.')
+      '<button class="btn ' + (sudah ? 'ghost' : 'primary') + ' sm" data-a="' + d.aksi + '" data-testid="' + d.aksi + '-btn"' + (sibuk ? ' disabled' : '') + '>' +
+      esc(sibuk ? t('kurikulum.semai-jalan', 'Sedang menyemai — butuh beberapa detik.')
         : (sudah ? t('kurikulum.semai-ulang', 'Semai ulang') : t('kurikulum.semai-tombol', 'Semai sekarang'))) +
       '</button></div>';
+  }
+
+  function seedCardHtml() {
+    return kartuSemai('english') + kartuSemai('mapel');
   }
 
   function nodeHtml(n) {
@@ -526,18 +553,19 @@
         S.classes.push(c); S.cls = c; resetCaches(); toast('Kelas dibuat. Kode: ' + c.code); render();
       }).catch(errToast);
     }
-    if (a === 'seed-english') {
-      if (S.engBusy) return;
-      /* Penyemainya idempoten dan non-destruktif (seed_english.py: simpul lama tidak
-         diubah), jadi "semai ulang" aman ditekan dua kali. Yang TIDAK aman adalah
-         menjalankannya dua kali BERSAMAAN — 144 kompetensi berarti ratusan penulisan,
-         dan dua gelombang paralel membuat guru menunggu dua kali lebih lama tanpa
-         alasan. Karena itu tombolnya dikunci selama gelombangnya berjalan. */
-      S.engBusy = true; render();
-      return E.seed.english().then(function () {
-        return E.seed.englishStatus();
+    if (a === 'seed-english' || a === 'seed-mapel') {
+      var d = SEMAI[a === 'seed-english' ? 'english' : 'mapel'];
+      if (S[d.busy]) return;
+      /* Kedua penyemai idempoten dan non-destruktif (simpul lama tidak diubah), jadi
+         `semai ulang` aman ditekan dua kali. Yang TIDAK aman adalah menjalankannya dua
+         kali BERSAMAAN — ratusan kompetensi berarti ratusan penulisan, dan dua gelombang
+         paralel membuat guru menunggu dua kali lebih lama tanpa alasan. Karena itu
+         tombolnya dikunci selama gelombangnya berjalan. */
+      S[d.busy] = true; render();
+      return d.jalan().then(function () {
+        return d.ambil();
       }).then(function (st) {
-        S.engStatus = st; S.engBusy = false;
+        S[d.st] = st; S[d.busy] = false;
         /* `tree` dan `health` punya pemuat malas di vCurriculum — dikosongkan saja sudah
            cukup, mereka mengambil sendiri saat digambar. `tps` dan `comps` TIDAK punya:
            satu-satunya yang mengisinya adalah loadContext() saat boot. Mengosongkannya
@@ -546,10 +574,10 @@
            tidak terlihat di tempat guru justru akan memakainya, yang meniadakan seluruh
            guna tombol ini. Pola yang sama dengan penangan `add-node`. */
         S.tree = null; S.health = null;
-        toast(t('kurikulum.semai-selesai', 'Kurikulum Bahasa Inggris Kelas 1–12 tersemai.'));
+        toast(d.selesai());
         return loadContext().then(render);
       }).catch(function (e) {
-        S.engBusy = false; render();
+        S[d.busy] = false; render();
         toast((e && e.message) || t('kurikulum.semai-gagal', 'Gagal menyemai kurikulum.'));
       });
     }
