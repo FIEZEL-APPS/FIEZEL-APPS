@@ -1,7 +1,7 @@
 {
-  "version": "m025-325",
-  "claimedBy": "branch fix/teacher-demo-r6-sync",
-  "claimedAt": "2026-09-18T09:26:10.757Z",
-  "reason": "fix(teacher): selaraskan jarak render demoBanner untuk loloskan R6 demo preview",
+  "version": "m025-326",
+  "claimedBy": "branch claude/focused-noether-55ocsp",
+  "claimedAt": "2026-09-18T10:09:14.823Z",
+  "reason": "penanda ?v= di halaman kurikulum: rilis tidak boleh tertutup cache peramban",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }
