@@ -203,6 +203,22 @@ tegaskan(
   tegaskan(butir >= 40, 'backend/seed_soal.py: hanya ' + butir + ' butir soal — gelombang pertama terlalu tipis untuk dipakai satu sesi belajar.');
   const tanpaPembahasan = [...seedSoalPy.matchAll(/Q\("(?:[^"\\]|\\.)*",\s*\n?\s*\[[^\]]*\],\s*"[A-D]",\s*\n\s*""/g)].length;
   tegaskan(tanpaPembahasan === 0, 'backend/seed_soal.py: ada butir tanpa pembahasan — murid yang salah tidak mendapat apa pun.');
+
+  /* STEM KEMBAR ADALAH BUTIR YANG HILANG DIAM-DIAM.
+     Penyemai membuang duplikat berdasarkan `stem`, jadi dua kompetensi yang memakai stem
+     yang sama menghasilkan SATU butir saja — dan kompetensi kedua kehilangan soalnya
+     tanpa satu pun galat, tanpa satu pun gerbang merah. Terjadi sungguhan pada gelombang
+     2: "Choose the correct sentence." dipakai di Kelas 7 dan Kelas 8 sekaligus, dan butir
+     Kelas 8 tidak pernah masuk basis data. Ditemukan hanya karena penyemainya dijalankan
+     dan jumlah yang masuk dibandingkan dengan jumlah di tabel. */
+  const stems = [...seedSoalPy.matchAll(/\n\s{8}Q\("((?:[^"\\]|\\.)*)"/g)].map((m) => m[1]);
+  const ganda = stems.filter((x, i) => stems.indexOf(x) !== i);
+  tegaskan(
+    ganda.length === 0,
+    'backend/seed_soal.py: ada stem kembar (' + [...new Set(ganda)].slice(0, 3).join(' | ') + '). Penyemai membuang ' +
+    'duplikat berdasarkan stem, jadi butir kedua TIDAK PERNAH masuk basis data dan kompetensinya kehilangan soal ' +
+    'tanpa satu pun galat. Tulis stem yang khas per butir.'
+  );
 }
 
 /* SESUDAH MENYEMAI, BANK YANG BARU HARUS TERLIHAT DI TEMPAT GURU MEMAKAINYA.
