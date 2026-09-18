@@ -873,6 +873,466 @@ for _kode, _tambah in MAPEL_SD.items():
     MAPEL[_kode]["grade"].update(_tambah["grade"])
 MAPEL.update(MAPEL_BARU)
 
+
+# ==========================================================================
+# GELOMBANG SMA — Fase E (Kelas 10) dan Fase F (Kelas 11–12)
+# ==========================================================================
+# Mapel inti (Matematika, Bahasa Indonesia, Pendidikan Pancasila) bertambah fasenya;
+# mapel peminatan lahir baru. Sejarah dan Informatika ada sejak Fase E; Fisika, Kimia,
+# Biologi, Ekonomi, Sosiologi, dan Geografi berdiri sebagai mapel terpisah di Fase F —
+# di Fase E muatannya masih menyatu sebagai IPA dan IPS terpadu, yang di repo ini sudah
+# diwakili entri IPA/IPS. Itu sebabnya daftar kelasnya berbeda antar mapel, dan bukan
+# karena ada yang terlewat.
+MAPEL_SMA: dict[str, dict] = {
+    "MAT": {
+        "cp": {
+            ("E", "ALJ"): "Pada akhir Fase E, peserta didik menggunakan sistem persamaan dan pertidaksamaan linear, fungsi kuadrat, serta barisan dan deret untuk memodelkan masalah.",
+            ("E", "DAT"): "Pada akhir Fase E, peserta didik merepresentasikan dan menafsirkan data, serta menentukan peluang kejadian majemuk.",
+            ("F", "ALJ"): "Pada akhir Fase F, peserta didik menggunakan fungsi eksponen, logaritma, dan trigonometri serta konsep limit dan turunan untuk menyelesaikan masalah.",
+            ("F", "DAT"): "Pada akhir Fase F, peserta didik menggunakan distribusi peluang dan penalaran statistis untuk menarik simpulan dari data.",
+        },
+        "grade": {
+            10: {"ALJ": [("Memodelkan masalah dengan fungsi kuadrat dan sistem persamaan",
+                          "Menyelesaikan persamaan dan fungsi tingkat dua", [
+                              ("Menentukan sifat dan grafik fungsi kuadrat",
+                               "Titik puncak, sumbu simetri, diskriminan; membaca grafik sebagai model situasi."),
+                              ("Menyelesaikan sistem persamaan linear tiga variabel",
+                               "Eliminasi bertahap dan substitusi; konteks: campuran harga tiga barang.")])],
+                 "DAT": [("Menentukan peluang kejadian majemuk",
+                          "Menghitung peluang gabungan dan bersyarat", [
+                              ("Menghitung peluang kejadian saling lepas dan tidak saling lepas",
+                               "Aturan penjumlahan; diagram Venn sebagai alat hitung."),
+                              ("Menghitung peluang kejadian bersyarat",
+                               "P(A|B); kenapa urutan syarat mengubah hasilnya.")])]},
+            11: {"ALJ": [("Menggunakan fungsi eksponen dan logaritma",
+                          "Memodelkan pertumbuhan dan peluruhan", [
+                              ("Menentukan sifat fungsi eksponen dan grafiknya",
+                               "Pertumbuhan penduduk dan bunga majemuk sebagai model nyata."),
+                              ("Menyelesaikan persamaan logaritma",
+                               "Sifat logaritma; logaritma sebagai kebalikan eksponen.")])],
+                 "DAT": [("Menggunakan penalaran statistis",
+                          "Menafsirkan data dengan ukuran yang tepat", [
+                              ("Menentukan ukuran pemusatan dan penyebaran data berkelompok",
+                               "Rata-rata, median, simpangan baku dari tabel distribusi frekuensi."),
+                              ("Menafsirkan penyajian data yang menyesatkan",
+                               "Sumbu terpotong, skala tidak seragam, dan pemilihan sampel yang bias.")])]},
+            12: {"ALJ": [("Menggunakan konsep limit dan turunan",
+                          "Menentukan limit dan turunan fungsi", [
+                              ("Menentukan limit fungsi aljabar",
+                               "Limit sebagai kecenderungan nilai; bentuk tak tentu 0/0."),
+                              ("Menentukan turunan dan menerapkannya pada masalah maksimum-minimum",
+                               "Turunan sebagai laju perubahan; menentukan nilai optimum.")])],
+                 "DAT": [("Menggunakan distribusi peluang",
+                          "Menghitung peluang dengan distribusi", [
+                              ("Menghitung peluang dengan distribusi binomial",
+                               "Percobaan berulang dua hasil; konteks: uji kualitas produk."),
+                              ("Membaca dan menggunakan distribusi normal",
+                               "Kurva normal, nilai baku z; membaca tabel z.")])]},
+        },
+    },
+    "IND": {
+        "cp": {
+            ("E", "MBC"): "Pada akhir Fase E, peserta didik mengevaluasi informasi dan gagasan dari teks laporan, eksposisi, anekdot, dan hikayat.",
+            ("E", "TUL"): "Pada akhir Fase E, peserta didik menulis teks eksposisi dan laporan hasil observasi dengan data pendukung.",
+            ("F", "MBC"): "Pada akhir Fase F, peserta didik mengevaluasi dan mengkritisi teks kompleks termasuk teks akademik dan multimodal.",
+            ("F", "TUL"): "Pada akhir Fase F, peserta didik menulis karya tulis ilmiah sederhana, esai argumentatif, dan teks kreatif.",
+        },
+        "grade": {
+            10: {"MBC": [("Mengevaluasi teks laporan dan eksposisi",
+                          "Menilai kelengkapan dan ketepatan informasi", [
+                              ("Mengevaluasi isi dan struktur laporan hasil observasi",
+                               "Definisi umum, deskripsi bagian, simpulan; ketepatan data."),
+                              ("Menganalisis kritik sosial dalam anekdot dan hikayat",
+                               "Sindiran halus; nilai budaya dalam karya sastra lama.")])],
+                 "TUL": [("Menulis laporan hasil observasi dan eksposisi",
+                          "Menulis teks berbasis data", [
+                              ("Menulis laporan hasil observasi dengan data faktual",
+                               "Mengumpulkan data sendiri sebelum menulis; memisahkan data dari tafsir."),
+                              ("Menulis teks eksposisi dengan argumen berbukti",
+                               "Klaim, data, penalaran; menyebut sumber data.")])]},
+            11: {"MBC": [("Mengkritisi teks argumentatif dan multimodal",
+                          "Menilai kekuatan argumen dan bukti", [
+                              ("Mengevaluasi kesahihan argumen dalam teks",
+                               "Membedakan bukti dari asumsi; mengenali sesat pikir umum."),
+                              ("Menafsirkan teks multimodal",
+                               "Infografik dan video: bagaimana visual mengarahkan tafsir pembaca.")])],
+                 "TUL": [("Menulis esai argumentatif",
+                          "Menyusun argumen panjang yang runtut", [
+                              ("Menulis esai dengan tesis dan pengembangan yang konsisten",
+                               "Satu tesis, paragraf yang saling menopang, penutup yang menegaskan."),
+                              ("Menggunakan kutipan dan daftar pustaka",
+                               "Mengutip tanpa menjiplak; menulis sumber dengan format konsisten.")])]},
+            12: {"MBC": [("Mengevaluasi teks akademik",
+                          "Membaca kritis teks ilmiah", [
+                              ("Menganalisis struktur karya tulis ilmiah",
+                               "Latar belakang, rumusan masalah, metode, hasil, simpulan."),
+                              ("Mengevaluasi kesesuaian simpulan dengan data yang disajikan",
+                               "Simpulan yang melampaui data adalah simpulan yang cacat.")])],
+                 "TUL": [("Menulis karya tulis ilmiah sederhana",
+                          "Menyusun tulisan ilmiah utuh", [
+                              ("Menyusun karya tulis ilmiah dengan struktur lengkap",
+                               "Dari rumusan masalah sampai simpulan, dengan metode yang disebut."),
+                              ("Menulis teks kreatif berdasarkan pengalaman dan bacaan",
+                               "Cerpen atau puisi; kebebasan bentuk dengan kesadaran pembaca.")])]},
+        },
+    },
+    "PPKN": {
+        "cp": {
+            ("E", "PAN"): "Pada akhir Fase E, peserta didik menganalisis kedudukan Pancasila sebagai ideologi terbuka dan penerapannya dalam kehidupan berbangsa.",
+            ("E", "UUD"): "Pada akhir Fase E, peserta didik menganalisis sistem hukum dan peradilan serta perlindungan hak asasi manusia.",
+            ("F", "PAN"): "Pada akhir Fase F, peserta didik mengevaluasi penerapan Pancasila dalam kebijakan publik dan kehidupan global.",
+            ("F", "NKR"): "Pada akhir Fase F, peserta didik menganalisis ancaman terhadap NKRI dan strategi menghadapinya.",
+        },
+        "grade": {
+            10: {"PAN": [("Menganalisis Pancasila sebagai ideologi terbuka",
+                          "Menjelaskan sifat dan penerapan ideologi Pancasila", [
+                              ("Menjelaskan makna Pancasila sebagai ideologi terbuka",
+                               "Nilai dasar tetap, nilai praksis menyesuaikan zaman."),
+                              ("Menganalisis penerapan nilai Pancasila dalam kehidupan berbangsa",
+                               "Studi kasus kebijakan dan putusan yang mencerminkan sila tertentu.")])],
+                 "UUD": [("Menganalisis sistem hukum dan hak asasi manusia",
+                          "Menjelaskan sistem hukum dan perlindungan HAM", [
+                              ("Menjelaskan sistem hukum dan peradilan di Indonesia",
+                               "Jenis peradilan, asas praduga tak bersalah, peran advokat."),
+                              ("Menganalisis kasus pelanggaran HAM dan upaya penyelesaiannya",
+                               "Instrumen HAM nasional dan internasional; peran Komnas HAM.")])]},
+            11: {"PAN": [("Mengevaluasi penerapan Pancasila dalam kebijakan publik",
+                          "Menilai kebijakan dari sudut nilai Pancasila", [
+                              ("Menganalisis kebijakan publik dari perspektif nilai Pancasila",
+                               "Kebijakan subsidi, pendidikan, dan lingkungan sebagai bahan kajian."),
+                              ("Menyusun argumen tentang kebijakan yang berkeadilan",
+                               "Keadilan distributif; siapa yang diuntungkan dan dirugikan.")])],
+                 "NKR": [("Menganalisis ancaman terhadap NKRI",
+                          "Mengenali bentuk ancaman dan strateginya", [
+                              ("Menganalisis ancaman ideologi, politik, ekonomi, dan sosial budaya",
+                               "Ancaman nonmiliter yang sering tidak terlihat sebagai ancaman."),
+                              ("Menjelaskan strategi menghadapi ancaman terhadap NKRI",
+                               "Sistem pertahanan semesta; peran warga sipil di dalamnya.")])]},
+            12: {"PAN": [("Mengamalkan Pancasila dalam kehidupan global",
+                          "Menerapkan nilai Pancasila di tengah arus global", [
+                              ("Menganalisis peran Indonesia dalam hubungan internasional",
+                               "Politik luar negeri bebas aktif; peran di ASEAN dan PBB."),
+                              ("Mengevaluasi tantangan nilai Pancasila di era digital",
+                               "Polarisasi, disinformasi, dan ruang publik digital.")])],
+                 "NKR": [("Berperan aktif menjaga keutuhan NKRI",
+                          "Menunjukkan peran nyata sebagai warga negara", [
+                              ("Menganalisis peran generasi muda dalam menjaga persatuan",
+                               "Literasi digital dan penolakan ujaran kebencian sebagai bela negara."),
+                              ("Menyusun rencana aksi kewarganegaraan",
+                               "Rencana dengan sasaran, langkah, mitra, dan ukuran keberhasilan.")])]},
+        },
+    },
+}
+
+# Mapel yang baru berdiri di SMA. Sejarah dan Informatika sejak Fase E; sisanya Fase F.
+MAPEL_SMA_BARU: dict[str, dict] = {
+    "SEJ": {
+        "nama": "Sejarah", "urutan": 7,
+        "elemen": {"PEM": "Pemahaman Sejarah", "KET": "Keterampilan Berpikir Sejarah"},
+        "cp": {
+            ("E", "PEM"): "Pada akhir Fase E, peserta didik memahami konsep dasar ilmu sejarah, asal usul nenek moyang, dan kerajaan-kerajaan di Indonesia.",
+            ("E", "KET"): "Pada akhir Fase E, peserta didik menerapkan berpikir kronologis, diakronik, dan sinkronik dalam mengkaji peristiwa.",
+            ("F", "PEM"): "Pada akhir Fase F, peserta didik memahami pergerakan nasional, proklamasi, dan perkembangan Indonesia kontemporer.",
+            ("F", "KET"): "Pada akhir Fase F, peserta didik melakukan penelitian sejarah sederhana berdasarkan sumber yang kredibel.",
+        },
+        "grade": {
+            10: {"PEM": [("Memahami konsep dasar ilmu sejarah",
+                          "Menjelaskan konsep waktu dan sumber sejarah", [
+                              ("Menjelaskan konsep ruang, waktu, dan perubahan dalam sejarah",
+                               "Kronologi, periodisasi, dan kesinambungan."),
+                              ("Membedakan sumber primer dan sekunder",
+                               "Prasasti dan catatan sezaman vs buku yang menulis ulang.")])],
+                 "KET": [("Menerapkan berpikir kronologis dan sinkronik",
+                          "Mengkaji peristiwa dari dua sudut", [
+                              ("Menyusun kronologi peristiwa sejarah",
+                               "Garis waktu; membedakan urutan dari sebab-akibat."),
+                              ("Menganalisis peristiwa secara sinkronik",
+                               "Memotret satu masa dari banyak aspek sekaligus.")])]},
+            11: {"PEM": [("Memahami pergerakan nasional dan proklamasi",
+                          "Menjelaskan jalan menuju kemerdekaan", [
+                              ("Menganalisis lahirnya pergerakan nasional",
+                               "Politik etis, organisasi pergerakan, dan peran pers."),
+                              ("Menganalisis peristiwa sekitar proklamasi",
+                               "Rengasdengklok, perumusan teks, dan makna proklamasi.")])],
+                 "KET": [("Menggunakan sumber sejarah secara kritis",
+                          "Menilai kredibilitas sumber", [
+                              ("Melakukan kritik sumber internal dan eksternal",
+                               "Siapa penulisnya, kapan, dan untuk siapa ditulis."),
+                              ("Membandingkan dua versi peristiwa dari sumber berbeda",
+                               "Kenapa dua saksi bisa menceritakan hal yang sama secara berbeda.")])]},
+            12: {"PEM": [("Memahami Indonesia kontemporer",
+                          "Menjelaskan perkembangan Indonesia pascakemerdekaan", [
+                              ("Menganalisis perubahan politik Indonesia dari masa ke masa",
+                               "Demokrasi liberal, terpimpin, Orde Baru, Reformasi."),
+                              ("Menganalisis peran Indonesia dalam dunia internasional",
+                               "Konferensi Asia Afrika, Gerakan Non-Blok, misi perdamaian.")])],
+                 "KET": [("Melakukan penelitian sejarah sederhana",
+                          "Menyusun tulisan sejarah berbasis sumber", [
+                              ("Menyusun rancangan penelitian sejarah",
+                               "Topik, rumusan masalah, dan sumber yang akan dipakai."),
+                              ("Menulis hasil penelitian sejarah dengan rujukan",
+                               "Historiografi sederhana; menyebut sumber tiap klaim.")])]},
+        },
+    },
+    "INF": {
+        "nama": "Informatika", "urutan": 8,
+        "elemen": {"BK": "Berpikir Komputasional", "TIK": "Teknologi Informasi dan Komunikasi"},
+        "cp": {
+            ("E", "BK"): "Pada akhir Fase E, peserta didik menerapkan berpikir komputasional untuk menyelesaikan persoalan dengan algoritma dan pemrograman dasar.",
+            ("E", "TIK"): "Pada akhir Fase E, peserta didik menggunakan perkakas TIK secara efektif dan memahami keamanan serta etika digital.",
+            ("F", "BK"): "Pada akhir Fase F, peserta didik merancang program dan menganalisis efisiensi solusi komputasional.",
+            ("F", "TIK"): "Pada akhir Fase F, peserta didik mengelola data dan memahami dampak sosial teknologi informasi.",
+        },
+        "grade": {
+            10: {"BK": [("Menerapkan algoritma dan pemrograman dasar",
+                         "Menyusun algoritma dan menerjemahkannya ke program", [
+                             ("Menyusun algoritma penyelesaian masalah",
+                              "Runtutan, percabangan, perulangan; pseudokode sebelum kode."),
+                             ("Menulis program sederhana dengan percabangan dan perulangan",
+                              "Variabel, kondisi, loop; menguji dengan masukan batas.")])],
+                 "TIK": [("Menggunakan perkakas TIK dan menjaga keamanan digital",
+                          "Memakai perkakas dan menjaga data pribadi", [
+                              ("Mengolah data dengan perangkat lunak lembar kerja",
+                               "Rumus, penyaringan, dan grafik; memeriksa hasil rumus."),
+                              ("Menerapkan keamanan dan etika digital",
+                               "Kata sandi kuat, jejak digital, hak cipta, dan privasi orang lain.")])]},
+            11: {"BK": [("Merancang solusi komputasional",
+                         "Memecah masalah dan merancang solusinya", [
+                             ("Memecah masalah besar menjadi submasalah (dekomposisi)",
+                              "Fungsi sebagai wadah submasalah; menamai fungsi dengan jujur."),
+                             ("Menggunakan struktur data sederhana",
+                              "Larik dan kamus; memilih struktur sesuai bentuk datanya.")])],
+                 "TIK": [("Mengelola data terstruktur",
+                          "Menyimpan dan mengambil data secara terstruktur", [
+                              ("Menyusun dan menanyakan basis data sederhana",
+                               "Tabel, kunci, dan kueri dasar."),
+                              ("Menyajikan data hasil olahan secara jujur",
+                               "Visualisasi yang tidak menyesatkan; menyebut sumber data.")])]},
+            12: {"BK": [("Menganalisis efisiensi solusi",
+                         "Membandingkan solusi dari segi efisiensi", [
+                             ("Membandingkan dua algoritma untuk masalah yang sama",
+                              "Banyak langkah terhadap ukuran masukan; kenapa ukuran kecil menipu."),
+                             ("Menguji dan memperbaiki program secara sistematis",
+                              "Kasus uji normal, batas, dan salah; memperbaiki akar bukan gejala.")])],
+                 "TIK": [("Menganalisis dampak sosial teknologi informasi",
+                          "Menilai dampak teknologi bagi masyarakat", [
+                              ("Menganalisis dampak positif dan negatif teknologi informasi",
+                               "Otomasi, pekerjaan, dan kesenjangan digital."),
+                              ("Menganalisis isu privasi dan kecerdasan buatan",
+                               "Data pribadi sebagai bahan bakar model; persetujuan yang bermakna.")])]},
+        },
+    },
+    "FIS": {
+        "nama": "Fisika", "urutan": 9,
+        "elemen": {"PEM": "Pemahaman Fisika", "KET": "Keterampilan Proses"},
+        "cp": {
+            ("F", "PEM"): "Pada akhir Fase F, peserta didik memahami kinematika, dinamika, usaha dan energi, gelombang, listrik, serta fisika modern.",
+            ("F", "KET"): "Pada akhir Fase F, peserta didik merancang dan melaksanakan percobaan fisika serta menganalisis datanya secara kuantitatif.",
+        },
+        "grade": {
+            11: {"PEM": [("Memahami kinematika dan dinamika gerak",
+                          "Menjelaskan gerak dan penyebabnya", [
+                              ("Menganalisis gerak lurus dan gerak parabola",
+                               "Kecepatan, percepatan, dan lintasan; memisahkan komponen x dan y."),
+                              ("Menerapkan hukum Newton pada sistem benda",
+                               "Diagram gaya bebas sebelum menghitung.")])],
+                 "KET": [("Merancang percobaan fisika",
+                          "Menyusun percobaan dengan variabel terkendali", [
+                              ("Merancang percobaan dengan variabel yang terkendali",
+                               "Variabel bebas, terikat, kontrol; pengulangan pengukuran."),
+                              ("Menganalisis ketidakpastian pengukuran",
+                               "Ketelitian alat, angka penting, dan pelaporan hasil.")])]},
+            12: {"PEM": [("Memahami listrik, gelombang, dan fisika modern",
+                          "Menjelaskan fenomena listrik dan gelombang", [
+                              ("Menganalisis rangkaian listrik arus searah dan bolak-balik",
+                               "Hukum Ohm dan Kirchhoff; daya listrik di rumah."),
+                              ("Menjelaskan gejala gelombang dan konsep fisika modern",
+                               "Interferensi dan difraksi; efek fotolistrik sebagai pintu fisika kuantum.")])],
+                 "KET": [("Menganalisis data percobaan secara kuantitatif",
+                          "Menarik simpulan dari data numerik", [
+                              ("Menganalisis data dengan grafik dan gradien",
+                               "Gradien grafik sebagai besaran fisis, bukan sekadar garis."),
+                              ("Menyusun laporan percobaan yang dapat diulang",
+                               "Metode yang cukup rinci agar orang lain memperoleh hasil serupa.")])]},
+        },
+    },
+    "KIM": {
+        "nama": "Kimia", "urutan": 10,
+        "elemen": {"PEM": "Pemahaman Kimia", "KET": "Keterampilan Proses"},
+        "cp": {
+            ("F", "PEM"): "Pada akhir Fase F, peserta didik memahami struktur atom, ikatan kimia, stoikiometri, termokimia, laju reaksi, dan kesetimbangan.",
+            ("F", "KET"): "Pada akhir Fase F, peserta didik melakukan percobaan kimia dengan prosedur keselamatan dan menganalisis hasilnya.",
+        },
+        "grade": {
+            11: {"PEM": [("Memahami struktur atom dan ikatan kimia",
+                          "Menjelaskan struktur atom dan pembentukan ikatan", [
+                              ("Menjelaskan konfigurasi elektron dan letak unsur dalam tabel periodik",
+                               "Kulit, subkulit, dan hubungan dengan sifat periodik."),
+                              ("Menjelaskan pembentukan ikatan ion dan kovalen",
+                               "Serah terima vs pemakaian bersama elektron; sifat senyawanya.")])],
+                 "KET": [("Melakukan percobaan kimia dengan aman",
+                          "Menerapkan prosedur keselamatan laboratorium", [
+                              ("Menerapkan prosedur keselamatan kerja di laboratorium",
+                               "Simbol bahaya, APD, dan penanganan tumpahan."),
+                              ("Melakukan pengukuran dan pencatatan data kimia",
+                               "Massa, volume, dan suhu; mencatat sebelum lupa, bukan sesudah.")])]},
+            12: {"PEM": [("Memahami stoikiometri, laju reaksi, dan kesetimbangan",
+                          "Menghitung dan menjelaskan perubahan kimia", [
+                              ("Menyelesaikan perhitungan stoikiometri",
+                               "Mol sebagai jembatan massa-partikel; persamaan setara lebih dulu."),
+                              ("Menjelaskan faktor yang memengaruhi laju reaksi dan kesetimbangan",
+                               "Suhu, konsentrasi, katalis; asas Le Chatelier.")])],
+                 "KET": [("Menganalisis hasil percobaan kimia",
+                          "Menarik simpulan dari data percobaan", [
+                              ("Menganalisis data percobaan laju reaksi",
+                               "Grafik konsentrasi terhadap waktu; menentukan orde sederhana."),
+                              ("Menyusun laporan percobaan kimia",
+                               "Tujuan, prosedur, data, pembahasan, simpulan.")])]},
+        },
+    },
+    "BIO": {
+        "nama": "Biologi", "urutan": 11,
+        "elemen": {"PEM": "Pemahaman Biologi", "KET": "Keterampilan Proses"},
+        "cp": {
+            ("F", "PEM"): "Pada akhir Fase F, peserta didik memahami sel, metabolisme, genetika, evolusi, dan ekologi.",
+            ("F", "KET"): "Pada akhir Fase F, peserta didik merancang penyelidikan biologi dan mengomunikasikan hasilnya secara ilmiah.",
+        },
+        "grade": {
+            11: {"PEM": [("Memahami sel dan metabolisme",
+                          "Menjelaskan struktur sel dan proses metabolisme", [
+                              ("Menjelaskan struktur dan fungsi organel sel",
+                               "Membran, mitokondria, ribosom; hubungan struktur dan fungsi."),
+                              ("Menjelaskan proses metabolisme sel",
+                               "Respirasi seluler dan fotosintesis sebagai aliran energi.")])],
+                 "KET": [("Merancang penyelidikan biologi",
+                          "Menyusun penyelidikan dengan kontrol yang tepat", [
+                              ("Merancang penyelidikan dengan kelompok kontrol",
+                               "Kenapa tanpa kontrol simpulan tidak boleh ditarik."),
+                              ("Menggunakan mikroskop dan membuat preparat sederhana",
+                               "Perbesaran, fokus, dan pembuatan preparat basah.")])]},
+            12: {"PEM": [("Memahami genetika, evolusi, dan ekologi",
+                          "Menjelaskan pewarisan sifat dan interaksi ekosistem", [
+                              ("Menjelaskan pewarisan sifat dan persilangan",
+                               "Hukum Mendel; papan Punnett dan peluang kemunculan sifat."),
+                              ("Menjelaskan mekanisme evolusi dan interaksi dalam ekosistem",
+                               "Seleksi alam; rantai makanan dan daya dukung lingkungan.")])],
+                 "KET": [("Mengomunikasikan hasil penyelidikan biologi",
+                          "Menyajikan temuan secara ilmiah", [
+                              ("Menganalisis data biologi secara kuantitatif",
+                               "Persentase, rata-rata, dan grafik pertumbuhan."),
+                              ("Menyusun laporan ilmiah hasil penyelidikan",
+                               "Struktur ilmiah lengkap dengan rujukan.")])]},
+        },
+    },
+    "EKO": {
+        "nama": "Ekonomi", "urutan": 12,
+        "elemen": {"PEM": "Pemahaman Ekonomi", "KET": "Keterampilan Proses"},
+        "cp": {
+            ("F", "PEM"): "Pada akhir Fase F, peserta didik memahami konsep kelangkaan, pasar, lembaga keuangan, kebijakan fiskal dan moneter, serta ekonomi internasional.",
+            ("F", "KET"): "Pada akhir Fase F, peserta didik mengolah data ekonomi dan menyusun simpulan berdasarkan bukti.",
+        },
+        "grade": {
+            11: {"PEM": [("Memahami pasar dan lembaga keuangan",
+                          "Menjelaskan mekanisme pasar dan peran lembaga keuangan", [
+                              ("Menjelaskan terbentuknya harga keseimbangan",
+                               "Permintaan, penawaran, dan pergeseran kurvanya."),
+                              ("Menjelaskan peran bank dan lembaga keuangan",
+                               "Fungsi bank, bunga, dan literasi keuangan pribadi.")])],
+                 "KET": [("Mengolah data ekonomi",
+                          "Membaca dan mengolah indikator ekonomi", [
+                              ("Membaca indikator ekonomi dari data resmi",
+                               "Inflasi, pengangguran, pertumbuhan; membaca rilis BPS."),
+                              ("Menyajikan data ekonomi dalam grafik yang jujur",
+                               "Skala dan periode yang tidak dipilih untuk menyesatkan.")])]},
+            12: {"PEM": [("Memahami kebijakan ekonomi dan ekonomi internasional",
+                          "Menjelaskan kebijakan dan perdagangan antarnegara", [
+                              ("Menjelaskan kebijakan fiskal dan moneter",
+                               "APBN, pajak, suku bunga; siapa yang terdampak tiap kebijakan."),
+                              ("Menjelaskan perdagangan internasional dan kurs",
+                               "Ekspor-impor, neraca perdagangan, dan nilai tukar.")])],
+                 "KET": [("Menyusun simpulan ekonomi berbasis bukti",
+                          "Menarik simpulan dari data ekonomi", [
+                              ("Menganalisis hubungan antar indikator ekonomi",
+                               "Korelasi bukan sebab-akibat; contoh kesalahan penafsiran."),
+                              ("Menyusun laporan analisis ekonomi sederhana",
+                               "Masalah, data, analisis, simpulan, dan keterbatasannya.")])]},
+        },
+    },
+    "SOS": {
+        "nama": "Sosiologi", "urutan": 13,
+        "elemen": {"PEM": "Pemahaman Sosiologi", "KET": "Keterampilan Penelitian Sosial"},
+        "cp": {
+            ("F", "PEM"): "Pada akhir Fase F, peserta didik memahami kelompok sosial, konflik, perubahan sosial, dan ketimpangan dalam masyarakat.",
+            ("F", "KET"): "Pada akhir Fase F, peserta didik melakukan penelitian sosial sederhana dengan metode yang sesuai dan etis.",
+        },
+        "grade": {
+            11: {"PEM": [("Memahami kelompok sosial dan konflik",
+                          "Menjelaskan dinamika kelompok dan konflik sosial", [
+                              ("Menjelaskan pembentukan dan dinamika kelompok sosial",
+                               "In-group dan out-group; bagaimana identitas kelompok terbentuk."),
+                              ("Menganalisis sebab dan penyelesaian konflik sosial",
+                               "Akar konflik, eskalasi, mediasi, dan integrasi.")])],
+                 "KET": [("Merancang penelitian sosial",
+                          "Menyusun rancangan penelitian yang etis", [
+                              ("Menyusun rancangan penelitian sosial sederhana",
+                               "Topik, rumusan masalah, metode kualitatif atau kuantitatif."),
+                              ("Menerapkan etika penelitian sosial",
+                               "Persetujuan responden, kerahasiaan, dan tidak merugikan subjek.")])]},
+            12: {"PEM": [("Memahami perubahan sosial dan ketimpangan",
+                          "Menganalisis perubahan dan ketimpangan masyarakat", [
+                              ("Menganalisis faktor dan dampak perubahan sosial",
+                               "Modernisasi, globalisasi, dan pergeseran nilai."),
+                              ("Menganalisis bentuk ketimpangan sosial dan upaya mengatasinya",
+                               "Ketimpangan pendidikan, ekonomi, dan akses layanan.")])],
+                 "KET": [("Melaksanakan dan melaporkan penelitian sosial",
+                          "Mengumpulkan data dan menyusun laporan", [
+                              ("Mengumpulkan data melalui wawancara dan observasi",
+                               "Panduan wawancara; mencatat tanpa menggiring jawaban."),
+                              ("Menyusun laporan penelitian sosial",
+                               "Temuan, pembahasan, simpulan, dan keterbatasan penelitian.")])]},
+        },
+    },
+    "GEO": {
+        "nama": "Geografi", "urutan": 14,
+        "elemen": {"PEM": "Pemahaman Geografi", "KET": "Keterampilan Geografi"},
+        "cp": {
+            ("F", "PEM"): "Pada akhir Fase F, peserta didik memahami dinamika litosfer, atmosfer, hidrosfer, kependudukan, dan mitigasi bencana.",
+            ("F", "KET"): "Pada akhir Fase F, peserta didik menggunakan peta, penginderaan jauh, dan SIG untuk menganalisis fenomena geosfer.",
+        },
+        "grade": {
+            11: {"PEM": [("Memahami dinamika litosfer dan atmosfer",
+                          "Menjelaskan proses pembentuk muka bumi dan cuaca", [
+                              ("Menjelaskan tenaga endogen dan eksogen pembentuk muka bumi",
+                               "Tektonisme, vulkanisme, pelapukan, dan erosi."),
+                              ("Menjelaskan unsur cuaca dan iklim serta pengaruhnya",
+                               "Suhu, kelembapan, angin; pengaruh pada pertanian.")])],
+                 "KET": [("Menggunakan peta dan penginderaan jauh",
+                          "Membaca peta dan citra", [
+                              ("Membaca peta tematik dan menentukan lokasi",
+                               "Skala, legenda, proyeksi, dan koordinat."),
+                              ("Menafsirkan citra penginderaan jauh sederhana",
+                               "Rona, tekstur, dan pola untuk mengenali objek.")])]},
+            12: {"PEM": [("Memahami kependudukan dan mitigasi bencana",
+                          "Menganalisis dinamika penduduk dan risiko bencana", [
+                              ("Menganalisis dinamika kependudukan Indonesia",
+                               "Piramida penduduk, migrasi, dan bonus demografi."),
+                              ("Menjelaskan mitigasi bencana berbasis wilayah",
+                               "Peta rawan bencana; kesiapsiagaan sebelum, saat, sesudah.")])],
+                 "KET": [("Menggunakan SIG untuk analisis wilayah",
+                          "Menganalisis data keruangan", [
+                              ("Menggunakan sistem informasi geografis sederhana",
+                               "Lapisan data, tumpang susun, dan analisis keruangan dasar."),
+                              ("Menyusun laporan analisis keruangan",
+                               "Peta hasil analisis disertai penjelasan dan sumber data.")])]},
+        },
+    },
+}
+
+for _kode, _tambah in MAPEL_SMA.items():
+    MAPEL[_kode]["cp"].update(_tambah["cp"])
+    MAPEL[_kode]["grade"].update(_tambah["grade"])
+MAPEL.update(MAPEL_SMA_BARU)
+
 async def _node(node_id, ntype, parent, name, desc="", order=0, meta=None):
     """Idempoten: node yang sudah ada tidak diubah, jadi penyemai aman dijalankan ulang."""
     ada = await db.curriculum_nodes.find_one({"id": node_id}, {"_id": 0, "id": 1})
@@ -936,7 +1396,7 @@ async def seed_mapel_curriculum():
     after = await db.curriculum_nodes.count_documents({})
     return {"nodes_before": before, "nodes_after": after, "created": after - before,
             "mapel": [m["nama"] for m in MAPEL.values()],
-            "note": "Mapel non-Inggris Fase A–D (Kelas 1–9). Rumusan CP adalah rumusan yang setia "
+            "note": "14 mapel non-Inggris, Fase A–F (Kelas 1–12). Rumusan CP adalah rumusan yang setia "
                     "pada isinya, BUKAN salinan verbatim dokumen Kemendikbud. Node lama tidak diubah."}
 
 
