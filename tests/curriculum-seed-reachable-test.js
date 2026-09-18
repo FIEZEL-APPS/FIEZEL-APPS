@@ -204,6 +204,52 @@ tegaskan(
   const tanpaPembahasan = [...seedSoalPy.matchAll(/Q\("(?:[^"\\]|\\.)*",\s*\n?\s*\[[^\]]*\],\s*"[A-D]",\s*\n\s*""/g)].length;
   tegaskan(tanpaPembahasan === 0, 'backend/seed_soal.py: ada butir tanpa pembahasan — murid yang salah tidak mendapat apa pun.');
 
+  /* DUA OPSI YANG TERBACA SAMA OLEH MURID ADALAH SATU OPSI, DAN TEBAKANNYA JADI 1 DARI 3.
+
+     Yang dijaga di sini bukan "opsi yang berbeda tanda baca". Itu justru yang BOLEH:
+     pada soal mekanika bedanya apostrof, pada soal bilangan bulat bedanya tanda minus,
+     pada soal geometri bedanya satuan cm vs cm². Semua itu terlihat murid, dan justru
+     itulah yang diuji.
+
+     Yang tidak boleh adalah dua opsi yang benar-benar sama di layar — beda kapital atau
+     beda jumlah spasi saja. Murid melihat empat pilihan, tetapi dua di antaranya satu
+     pilihan yang sama, jadi peluang menebak benar naik tanpa penguasaan naik.
+
+     Batas ini MENCERMINKAN backend, tidak menebaknya: questions.py memakai norm_option()
+     untuk menandai `duplicate_options`, dan norm_option() sengaja hanya menyamakan
+     kapital dan spasi. Pernah dipakai norm_stem() di sana — yang membuang seluruh tanda
+     baca — dan akibatnya setiap pengecoh matematika yang benar (5 vs -5, x - 7 vs x + 7)
+     dilaporkan sebagai opsi identik. Dua pemeriksaan di bawah menjaga keduanya tetap satu
+     aturan: isinya, dan sumber aturannya. */
+  const normOpsi = (x) => x.toLowerCase().replace(/\s+/g, ' ').trim();
+  const blokOpsi = [...seedSoalPy.matchAll(/\n\s{10}\[((?:[^\][]|\[[^\]]*\])*)\],\s*"[A-D]"/g)];
+  const opsiTabrakan = [];
+  for (const m of blokOpsi) {
+    const opsi = [...m[1].matchAll(/(['"])((?:\\.|(?!\1)[^\\])*)\1/g)].map((o) => normOpsi(o[2]));
+    if (opsi.length >= 2 && new Set(opsi).size !== opsi.length) opsiTabrakan.push(opsi[0].slice(0, 45));
+  }
+  tegaskan(
+    opsiTabrakan.length === 0,
+    'backend/seed_soal.py: ' + opsiTabrakan.length + ' butir punya dua opsi yang terbaca SAMA oleh murid ' +
+    '(' + opsiTabrakan.slice(0, 2).join(' | ') + '). Opsi yang hanya berbeda kapital atau jumlah spasi adalah ' +
+    'satu pilihan yang ditulis dua kali: murid melihat empat, sebenarnya memilih dari tiga.'
+  );
+
+  const questionsPy = baca('backend/questions.py');
+  tegaskan(
+    /opts\s*=\s*\[norm_option\(/.test(questionsPy),
+    'backend/questions.py: pemeriksaan `duplicate_options` tidak lagi memakai norm_option(). Kalau ia kembali ' +
+    'ke norm_stem(), setiap pengecoh matematika yang benar (5 vs -5, x - 7 vs x + 7) dilaporkan sebagai opsi ' +
+    'identik, dan gerbang ini diam-diam menjaga aturan yang berbeda dari yang dijalankan backend.'
+  );
+  const badanNormOption = (questionsPy.match(/def norm_option[\s\S]*?\n    return ([^\n]+)/) || [])[1] || '';
+  tegaskan(
+    badanNormOption !== '' && !/\[\^a-z0-9/.test(badanNormOption),
+    'backend/questions.py: norm_option() ikut membuang karakter non-alfanumerik. Itu mengembalikan cacat yang ' +
+    'sama lewat pintu lain — tanda minus, tanda kurung, dan satuan pangkat adalah ISI jawaban matematika, ' +
+    'bukan hiasan yang boleh dinormalisasi.'
+  );
+
   /* STEM KEMBAR ADALAH BUTIR YANG HILANG DIAM-DIAM.
      Penyemai membuang duplikat berdasarkan `stem`, jadi dua kompetensi yang memakai stem
      yang sama menghasilkan SATU butir saja — dan kompetensi kedua kehilangan soalnya
@@ -211,33 +257,7 @@ tegaskan(
      2: "Choose the correct sentence." dipakai di Kelas 7 dan Kelas 8 sekaligus, dan butir
      Kelas 8 tidak pernah masuk basis data. Ditemukan hanya karena penyemainya dijalankan
      dan jumlah yang masuk dibandingkan dengan jumlah di tabel. */
-  /* OPSI YANG BERBEDA HANYA PADA KAPITAL ATAU TANDA BACA ADALAH SATU OPSI YANG SAMA.
-
-     `norm_stem()` di backend membuang SEMUA yang bukan huruf/angka/spasi lalu menurunkan
-     hurufnya: re.sub(r"[^a-z0-9 ]", "", s.lower()). Jadi empat kalimat yang hanya berbeda
-     koma, titik, tanda kutip, atau huruf besar menjadi opsi yang sama empat kali — murid
-     melihat empat pilihan, mesin melihat satu.
-
-     Pola ini menghantam TIGA gelombang berturut-turut (direct speech, kapital, tanda
-     baca), selalu pada soal yang menguji MEKANIKA. Itu bukan kebetulan: justru ciri yang
-     diuji soal mekanika adalah ciri yang dihapus normalisasinya. Karena itu ia dijaga di
-     sini, sebelum menyentuh basis data — validator backend hanya memberi `warn`, dan
-     peringatan yang lolos merge adalah peringatan yang tidak ada. */
-  const normStem = (x) => x.toLowerCase().replace(/[^a-z0-9 ]/g, '').replace(/\s+/g, ' ').trim();
-  const blokOpsi = [...seedSoalPy.matchAll(/\n\s{10}\[((?:[^\][]|\[[^\]]*\])*)\],\s*"[A-D]"/g)];
-  const opsiTabrakan = [];
-  for (const m of blokOpsi) {
-    const opsi = [...m[1].matchAll(/(['"])((?:\\.|(?!\1)[^\\])*)\1/g)].map((o) => normStem(o[2]));
-    if (opsi.length >= 2 && new Set(opsi).size !== opsi.length) opsiTabrakan.push(opsi[0].slice(0, 45));
-  }
-  tegaskan(
-    opsiTabrakan.length === 0,
-    'backend/seed_soal.py: ' + opsiTabrakan.length + ' butir punya opsi yang SAMA sesudah normalisasi backend ' +
-    '(' + opsiTabrakan.slice(0, 2).join(' | ') + '). norm_stem() membuang tanda baca dan huruf besar, jadi opsi ' +
-    'yang hanya berbeda pada keduanya menjadi satu opsi yang sama. Soal mekanika harus membedakan pilihannya ' +
-    'lewat KATA, bukan lewat ciri yang justru dihapus normalisasinya.'
-  );
-
+  const normStemSoal = (x) => x.toLowerCase().replace(/[^a-z0-9 ]/g, '').replace(/\s+/g, ' ').trim();
   const stems = [...seedSoalPy.matchAll(/\n\s{8}Q\("((?:[^"\\]|\\.)*)"/g)].map((m) => m[1]);
   const ganda = stems.filter((x, i) => stems.indexOf(x) !== i);
   tegaskan(
@@ -245,6 +265,24 @@ tegaskan(
     'backend/seed_soal.py: ada stem kembar (' + [...new Set(ganda)].slice(0, 3).join(' | ') + '). Penyemai membuang ' +
     'duplikat berdasarkan stem, jadi butir kedua TIDAK PERNAH masuk basis data dan kompetensinya kehilangan soal ' +
     'tanpa satu pun galat. Tulis stem yang khas per butir.'
+  );
+
+  /* BANK CONTOH DAN BANK ISI TIDAK BOLEH MENULIS SOAL YANG SAMA.
+
+     seed.py membawa 21 soal demo di kompetensi demo (KOMP-BIL-*, KOMP-ENG-*). Kalau
+     seed_soal.py menulis soal yang stem-nya sama sesudah norm_stem(), backend menandainya
+     `duplicate_question` — dan benar: satu soal yang sama duduk di dua kompetensi, jadi
+     murid yang sudah mengerjakannya di satu tempat mengerjakannya lagi di tempat lain
+     seolah materi baru. Terjadi sungguhan pada gelombang 9: "Hitunglah: -7 + 12" dan
+     "Hitunglah: 8 - (-5)" sudah ada di bank demo, hanya beda titik dua. */
+  const stemDemo = new Set(
+    [...baca('backend/seed.py').matchAll(/stem="((?:[^"\\]|\\.)*)"/g)].map((m) => normStemSoal(m[1])));
+  const bentrokDemo = [...new Set(stems.map(normStemSoal).filter((x) => stemDemo.has(x)))];
+  tegaskan(
+    bentrokDemo.length === 0,
+    'backend/seed_soal.py: ' + bentrokDemo.length + ' stem sudah ada di bank demo seed.py (' +
+    bentrokDemo.slice(0, 2).join(' | ') + '). Backend menandainya duplicate_question, dan soal yang sama di dua ' +
+    'kompetensi membuat murid mengerjakan ulang hal yang sama seolah materi baru.'
   );
 }
 
