@@ -37,6 +37,30 @@ def stem_hash(s: str) -> str:
     return hashlib.sha1(norm_stem(s).encode()).hexdigest()[:16]
 
 
+def norm_option(s: str) -> str:
+    """Pembanding KESAMAAN OPSI. Sengaja BUKAN norm_stem(), dan itu bukan kelalaian.
+
+    norm_stem() membuang semua yang bukan huruf/angka karena identitas sebuah PERTANYAAN
+    memang tidak berubah oleh tanda baca: "Hitunglah: -7 + 12" dan "Hitunglah -7 + 12"
+    adalah soal yang sama, dan penyemai yang dijalankan dua kali tidak boleh
+    menggandakannya. Untuk OPSI JAWABAN aturan yang sama justru terbalik — persis pada
+    karakter itulah letak jawabannya:
+
+        5        vs  -5          beda TANDA
+        x - 7    vs  x + 7       beda OPERASI
+        40 cm    vs  40 cm2      beda DIMENSI (keliling vs luas)
+        Lets go  vs  Let's go    beda EJAAN — dan itu yang diuji soal mekanika
+
+    Dipakai untuk menandai "opsi identik", norm_stem() melaporkan justru pasangan pengecoh
+    paling bernilai di soal bilangan bulat, aljabar, geometri, dan tata tulis sebagai
+    cacat. Peringatan yang selalu salah mengajari pembacanya mengabaikan peringatan.
+
+    Yang sebenarnya ditanyakan: apakah dua opsi terbaca SAMA oleh murid. Maka yang
+    disamakan hanya yang memang tidak terlihat olehnya — besar-kecil huruf dan jarak.
+    """
+    return re.sub(r"\s+", " ", (s or "").strip().lower())
+
+
 class QuestionIn(BaseModel):
     competency_id: str
     stem: str
@@ -112,7 +136,7 @@ async def validate_doc(doc: dict) -> list[dict]:
         if doc.get("answer_key", "").upper() not in keys:
             add("error", "answer_key_invalid",
                 f"Kunci jawaban “{doc.get('answer_key')}” tidak cocok dengan opsi ({', '.join(keys)}).")
-        opts = [norm_stem(o) for o in doc.get("options") or []]
+        opts = [norm_option(o) for o in doc.get("options") or []]
         if len(set(opts)) != len(opts):
             add("warn", "duplicate_options", "Ada opsi jawaban yang identik.")
     elif not doc.get("answer_key"):
