@@ -660,3 +660,35 @@ sendiri: …"). Berguna sebagai benih, bukan sebagai bank.
 Kesimpulan yang perlu dipegang sesi berikutnya: **menambah mata pelajaran tanpa menambah
 soal memperbesar pohon yang sama kosongnya.** Urutan yang benar adalah mengisi bank soal
 lebih dulu — itulah yang mengubah kurikulum dari struktur menjadi pelajaran.
+
+### m025-329 lanjutan — bank kurikulum lengkap Kelas 1–12, dan satu mapel yang SENGAJA ditahan
+
+Sesudah tiga gelombang, `seed_mapel.py` + `seed_english.py` berisi:
+
+| | Jumlah |
+|---|---|
+| Mata pelajaran | **18** |
+| Jenjang | Kelas 1–12 (Fase A–F) |
+| Tujuan Pembelajaran | 282 |
+| Kompetensi | **564** |
+| Materi ajar | **564** |
+
+Daftar kelas sengaja berbeda antar mapel, dan tiap perbedaannya adalah keputusan:
+
+* **IPAS** hanya Kelas 3–6 — di SMP ia pecah menjadi IPA dan IPS yang sudah ada, dan
+  Fase A tidak punya IPAS sebagai mapel terpisah.
+* **Fisika, Kimia, Biologi, Ekonomi, Sosiologi, Geografi** hanya Kelas 11–12 — di Fase E
+  muatannya masih menyatu sebagai IPA/IPS terpadu. Menambah Fisika Kelas 10 akan membuat
+  dua tempat mengajarkan hal yang sama dan cakupan kurikulum menghitungnya dua kali.
+* **Prakarya** mulai Kelas 7 — di SD muatan serupa menyatu dalam Seni Budaya dan IPAS.
+
+### PENDIDIKAN AGAMA: ditahan, menunggu keputusan owner
+
+Ia TIDAK ada di tabel, dan itu keputusan sadar yang perlu dihormati sesi berikutnya.
+Isinya berbeda untuk tiap agama (Islam, Kristen, Katolik, Hindu, Buddha, Khonghucu), dan
+menulis materi keagamaan tanpa arahan owner bukan keputusan yang boleh diambil penyemai —
+salah menulisnya bukan sekadar cacat data, ia menyinggung keyakinan murid.
+
+Yang dibutuhkan sebelum ia bisa ditambahkan: owner menyebut agama mana yang diajarkan di
+kelasnya, dan sebaiknya memeriksa sendiri rumusan CP-nya. Sampai itu ada, ketiadaannya
+adalah jawaban yang benar, bukan pekerjaan yang terlupakan.

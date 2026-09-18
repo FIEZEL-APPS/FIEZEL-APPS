@@ -309,7 +309,7 @@
       ambil: function () { return E.seed.mapelStatus(); },
       jalan: function () { return E.seed.mapel(); },
       judul: function () { return t('kurikulum.mapel-judul', 'Mata pelajaran lain — Kelas 1–12'); },
-      ajakan: function () { return t('kurikulum.mapel-ajakan', 'Empat belas mata pelajaran Fase A–F: Matematika, B.Indonesia, Pancasila, IPAS, IPA, IPS, Sejarah, Informatika, Fisika, Kimia, Biologi, Ekonomi, Sosiologi, Geografi. 150 tujuan pembelajaran, 300 kompetensi, lengkap materi ajar dan prasyarat antar kelas.'); },
+      ajakan: function () { return t('kurikulum.mapel-ajakan', 'Tujuh belas mata pelajaran Fase A–F: Matematika, B.Indonesia, Pancasila, IPAS, IPA, IPS, Sejarah, Informatika, Fisika, Kimia, Biologi, Ekonomi, Sosiologi, Geografi, PJOK, Seni Budaya, Prakarya. 210 tujuan pembelajaran, 420 kompetensi, lengkap materi ajar dan prasyarat antar kelas.'); },
       selesai: function () { return t('kurikulum.mapel-selesai', 'Mata pelajaran Kelas 1–12 tersemai.'); }
     }
   };
