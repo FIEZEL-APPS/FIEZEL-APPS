@@ -211,6 +211,33 @@ tegaskan(
      2: "Choose the correct sentence." dipakai di Kelas 7 dan Kelas 8 sekaligus, dan butir
      Kelas 8 tidak pernah masuk basis data. Ditemukan hanya karena penyemainya dijalankan
      dan jumlah yang masuk dibandingkan dengan jumlah di tabel. */
+  /* OPSI YANG BERBEDA HANYA PADA KAPITAL ATAU TANDA BACA ADALAH SATU OPSI YANG SAMA.
+
+     `norm_stem()` di backend membuang SEMUA yang bukan huruf/angka/spasi lalu menurunkan
+     hurufnya: re.sub(r"[^a-z0-9 ]", "", s.lower()). Jadi empat kalimat yang hanya berbeda
+     koma, titik, tanda kutip, atau huruf besar menjadi opsi yang sama empat kali — murid
+     melihat empat pilihan, mesin melihat satu.
+
+     Pola ini menghantam TIGA gelombang berturut-turut (direct speech, kapital, tanda
+     baca), selalu pada soal yang menguji MEKANIKA. Itu bukan kebetulan: justru ciri yang
+     diuji soal mekanika adalah ciri yang dihapus normalisasinya. Karena itu ia dijaga di
+     sini, sebelum menyentuh basis data — validator backend hanya memberi `warn`, dan
+     peringatan yang lolos merge adalah peringatan yang tidak ada. */
+  const normStem = (x) => x.toLowerCase().replace(/[^a-z0-9 ]/g, '').replace(/\s+/g, ' ').trim();
+  const blokOpsi = [...seedSoalPy.matchAll(/\n\s{10}\[((?:[^\][]|\[[^\]]*\])*)\],\s*"[A-D]"/g)];
+  const opsiTabrakan = [];
+  for (const m of blokOpsi) {
+    const opsi = [...m[1].matchAll(/(['"])((?:\\.|(?!\1)[^\\])*)\1/g)].map((o) => normStem(o[2]));
+    if (opsi.length >= 2 && new Set(opsi).size !== opsi.length) opsiTabrakan.push(opsi[0].slice(0, 45));
+  }
+  tegaskan(
+    opsiTabrakan.length === 0,
+    'backend/seed_soal.py: ' + opsiTabrakan.length + ' butir punya opsi yang SAMA sesudah normalisasi backend ' +
+    '(' + opsiTabrakan.slice(0, 2).join(' | ') + '). norm_stem() membuang tanda baca dan huruf besar, jadi opsi ' +
+    'yang hanya berbeda pada keduanya menjadi satu opsi yang sama. Soal mekanika harus membedakan pilihannya ' +
+    'lewat KATA, bukan lewat ciri yang justru dihapus normalisasinya.'
+  );
+
   const stems = [...seedSoalPy.matchAll(/\n\s{8}Q\("((?:[^"\\]|\\.)*)"/g)].map((m) => m[1]);
   const ganda = stems.filter((x, i) => stems.indexOf(x) !== i);
   tegaskan(
