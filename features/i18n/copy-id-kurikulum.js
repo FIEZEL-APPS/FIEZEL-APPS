@@ -24,6 +24,9 @@
     'kurikulum.semai-belum': 'Belum tersemai. Bank kurikulum masih berisi contoh demo saja.',
     'kurikulum.semai-selesai': 'Kurikulum Bahasa Inggris Kelas 1–12 tersemai.',
     'kurikulum.semai-gagal': 'Gagal menyemai kurikulum.',
+    'kurikulum.mapel-judul': 'Mata pelajaran lain — Kelas 7–9',
+    'kurikulum.mapel-ajakan': 'Matematika, Bahasa Indonesia, IPA, IPS, dan Pendidikan Pancasila untuk Fase D: 52 tujuan pembelajaran, 104 kompetensi, lengkap materi ajar dan prasyarat antar kelas.',
+    'kurikulum.mapel-selesai': 'Mata pelajaran Kelas 7–9 tersemai.',
     'kurikulum.semai-memeriksa': 'Memeriksa isi bank kurikulum…'
   });
 })();
