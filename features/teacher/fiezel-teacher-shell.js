@@ -237,7 +237,7 @@
     }
     if (ui.syncing || !st.classes.length) return Promise.resolve();
     ui.syncing = true; syncingSince = Date.now();
-    if (quiet) paintSyncChip(); else render();   // sinkron manual = ketukan guru, jangan ditunda
+    paintSyncChip();
     var total = { ingested: 0, graded: 0, names: [], failed: 0, events: [] };
     return st.classes.reduce(function (p, c) { return p.then(function () { return T.syncClass(c).then(function (r) { if (r.ok) { total.ingested += r.ingested; total.graded += r.graded; total.names = total.names.concat(r.names || []); total.events = total.events.concat(r.events || []); } else total.failed++; }); }); }, Promise.resolve())
       .then(function () {
@@ -249,7 +249,7 @@
         /* Render penuh hanya bila ronde ini benar-benar membawa sesuatu. Ronde kosong -
            yang mayoritas pada jeda 3 detik - cukup menyegarkan chipnya. */
         var berubah = total.ingested || total.graded || total.events.length;
-        if (!quiet) render(); else if (berubah) syncRender(); else paintSyncChip();
+        if (!quiet && busy()) { syncRender(); } else if (!quiet) render(); else if (berubah) syncRender(); else paintSyncChip();
         if (total.events.length) { var top = total.events.filter(function (e) { return e.kind === 'focus_exit'; })[0] || total.events.filter(function (e) { return e.kind === 'join_request'; })[0] || total.events.filter(function (e) { return e.kind === 'assignment_done'; })[0] || total.events[0]; toast(T.inboxText(top) + (total.events.length > 1 ? ' · +' + (total.events.length - 1) + ' kabar lain' : '')); }
         else if (total.ingested) toast(total.ingested + ' laporan murid masuk' + (total.graded ? ' · ' + total.graded + ' tugas dinilai otomatis' : '') + '.');
         else if (!quiet) toast(total.failed ? 'Sinkron gagal untuk ' + total.failed + ' kelas.' : 'Tersinkron — belum ada laporan baru.');
@@ -392,9 +392,31 @@
     var key = (st.view || 'briefing') + '|' + (st.activeClassId || '') + '|' + (ui.modal ? ui.modal.kind : '') + '|' + (ui.drawer || '');
     var repaint = key === lastPaintKey;
     lastPaintKey = key;
+    var activeName = null, activeTestId = null, selStart = 0, selEnd = 0;
+    try {
+      var act = root.document ? root.document.activeElement : null;
+      if (act && el.contains(act) && /^(INPUT|TEXTAREA)$/i.test(act.tagName || '')) {
+        activeName = act.getAttribute('name');
+        activeTestId = act.getAttribute('data-testid');
+        selStart = act.selectionStart;
+        selEnd = act.selectionEnd;
+      }
+    } catch (_) {}
     el.innerHTML = '<div class="tg' + (repaint ? ' is-repaint' : '') + (previewOn ? ' is-demo' : '') + (ui.modal && ui.modal.kind === 'board' ? ' tg-board-open' : '') + '" data-testid="teacher-shell">' + demoBanner() + sidebar(c) + '<div class="tg-main">' + topbar(c) + '<div class="tg-content">' + (st.classes.length ? views[st.view || 'briefing'](c) : welcome()) + '</div></div>' + mobileNav() + drawer(c) + modal(c) + '</div>';
     var hubEl = el.querySelector('#tgClassHub');
     if (hubEl && root.FiezelClassHub) root.FiezelClassHub.mountTeacher(hubEl, { st: function () { return st; }, cls: cls, persist: persist, toast: toast, rerender: render });
+    if (activeTestId || activeName) {
+      try {
+        var sel = activeTestId ? '[data-testid="' + activeTestId + '"]' : '[name="' + activeName + '"]';
+        var restored = el.querySelector(sel);
+        if (restored) {
+          restored.focus();
+          if (typeof restored.setSelectionRange === 'function' && selStart != null && selEnd != null) {
+            restored.setSelectionRange(selStart, selEnd);
+          }
+        }
+      } catch (_) {}
+    }
     if (env.afterRender) try { env.afterRender(); } catch (_) {}
     /* Autofokus hanya saat layarnya benar-benar berganti. Pada cat ulang ia akan merebut kursor
        dari tempat guru meletakkannya. */

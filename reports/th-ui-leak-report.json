@@ -1,6 +1,6 @@
 {
   "schema": "fiezel-th-ui-leak-v1",
-  "generatedAt": "2026-09-18T06:10:58.181Z",
+  "generatedAt": "2026-09-18T08:58:39.973Z",
   "files": {
     "app.js": {
       "leaks": 3,
@@ -15,7 +15,7 @@
           "text": "Nama kriteria: n/4 - satu kalimat alasan yang menunjuk bukti di tulisannya"
         },
         {
-          "line": 13951,
+          "line": 13952,
           "text": "Latihan"
         }
       ]
@@ -99,23 +99,23 @@
       "budget": 5,
       "sample": [
         {
-          "line": 241,
+          "line": 269,
           "text": "Tugas disimpan sebagai"
         },
         {
-          "line": 241,
+          "line": 269,
           "text": ". Lanjutkan kapan saja."
         },
         {
-          "line": 257,
+          "line": 314,
           "text": "Latihan ·"
         },
         {
-          "line": 393,
+          "line": 450,
           "text": "Latihan · ±"
         },
         {
-          "line": 415,
+          "line": 472,
           "text": "Latihan — umpan balik tiap soal"
         }
       ]
@@ -163,11 +163,11 @@
           "text": "Murid & Paspor"
         },
         {
-          "line": 36,
+          "line": 45,
           "text": "FIEZEL · Ruang Guru"
         },
         {
-          "line": 40,
+          "line": 49,
           "text": "Masuk dengan akun KelasKu"
         }
       ]
@@ -403,19 +403,19 @@
       "budget": 4,
       "sample": [
         {
-          "line": 492,
+          "line": 514,
           "text": "Akurasi"
         },
         {
-          "line": 504,
+          "line": 526,
           "text": "Latihan ·"
         },
         {
-          "line": 687,
+          "line": 709,
           "text": "📖 Kosakata Kunci:"
         },
         {
-          "line": 704,
+          "line": 726,
           "text": "Latihan"
         }
       ]

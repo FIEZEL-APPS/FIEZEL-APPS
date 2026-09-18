@@ -13943,7 +13943,8 @@ window.socialNotifyPoll=socialNotifyPoll;
  * hasilnya kembali ke guru lewat jalur class-report yang sudah ada. */
 function inboxCore(){try{return self.FiezelInbox||null}catch(_){return null}}
 function notifUnreadTotal(){let n=0;try{n+=inboxCore()?.unread()||0}catch(_){}n+=socialUnreadCount();if(socialPendingInvite())n+=1;return n}
-function refreshNotifBadge(){try{if(state.view==='classroom'&&$('fzClassHub')&&!$('fzClassHub').querySelector('[data-testid="class-runner"]'))self.FiezelClassHub?.renderStudent?.()}catch(_){}const b=$('fzNotifBadge');if(!b)return false;const n=notifUnreadTotal();b.textContent=n>9?'9+':String(n);b.classList.toggle('hidden',n<=0);$('fzNotifBtn')?.classList.toggle('has-new',n>0);return true}
+function isInputActive(){try{const a=document.activeElement;if(!a||a===document.body)return false;if(a.isContentEditable)return true;return /^(INPUT|TEXTAREA|SELECT)$/i.test(a.tagName||'')}catch(_){return false}}
+function refreshNotifBadge(){try{if(state.view==='classroom'&&$('fzClassHub')&&!$('fzClassHub').querySelector('[data-testid="class-runner"]')){if(!isInputActive())self.FiezelClassHub?.renderStudent?.({quiet:true})}}catch(_){}const b=$('fzNotifBadge');if(!b)return false;const n=notifUnreadTotal();b.textContent=n>9?'9+':String(n);b.classList.toggle('hidden',n<=0);$('fzNotifBtn')?.classList.toggle('has-new',n>0);return true}
 function notifTimeLabel(ts){try{const d=new Date(Number(ts)||Date.now()),diff=Date.now()-d.getTime();if(diff<60000)return 'baru saja';if(diff<3600000)return Math.round(diff/60000)+' mnt lalu';if(diff<86400000)return Math.round(diff/3600000)+' jam lalu';return d.toLocaleDateString('id-ID',{day:'numeric',month:'short'})}catch(_){return ''}}
 function notifItemMarkup(e){
   const time=`<small>${esc(notifTimeLabel(e.at))}</small>`;
@@ -13994,7 +13995,7 @@ async function inboxPoll(force){
     const visible=(()=>{try{return document.visibilityState==='visible'}catch(_){return true}})();
     if(visible)showToast(text);else socialNotifySystem(text,{kind:'teacher_assignment'});
     try{uiSfx('open')}catch(_){}
-    try{if(state.view==='learn'||state.view==='home')render()}catch(_){}
+    try{if((state.view==='learn'||state.view==='home')&&!isInputActive())render()}catch(_){}
   }
   refreshNotifBadge();
   return r;
