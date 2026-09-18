@@ -84,6 +84,12 @@
   function latestMeta() { var all = assignments().concat(subs()).sort(function (a, b) { return (b.at || 0) - (a.at || 0); }); return all[0] || null; }
   function teacherName() { var m = latestMeta(); return m && m.teacher ? m.teacher : ''; }
   function className() { var m = latestMeta(); return m && m.from ? m.from : ''; }
+  function konsolKurikulumSiap() {
+    try {
+      var c = root.FIEZEL_CURRICULUM_CONFIG || {};
+      return !!(c.curriculumApiUrl && String(c.curriculumApiUrl).trim());
+    } catch (_) { return false; }
+  }
 
   function mountStudent(el, env) {
     sEl = el; sEnv = env || {}; ui();
@@ -315,10 +321,27 @@
       '<div class="ch-card-foot"><span class="ch-deadline' + (st.late ? ' is-late' : '') + '">' + icon('calendar') + ' ' + (pending ? esc(deadlineText(a)) : 'Selesai ' + esc(fmtDate(a.at))) + '</span>' +
       (pending ? '<button type="button" class="ch-btn is-primary" data-ch="open" data-id="' + esc(a.id) + '" data-testid="class-open-' + esc(a.id) + '">' + (inProgress ? 'Lanjutkan' : 'Kerjakan') + ' ' + icon('arrow-right') + '</button>' : '<button type="button" class="ch-btn is-ghost" data-ch="review" data-id="' + esc(a.id) + '" data-testid="class-review-' + esc(a.id) + '"><b>' + pct(a.t ? a.c / a.t : null) + '</b> · Lihat hasil</button>') + '</div></article>';
   }
+  function curriculumCard() {
+    if (!konsolKurikulumSiap()) return '';
+    return '<section class="ch-card ch-curriculum-panel" data-testid="class-curriculum-panel">' +
+      '<div class="ch-card-top">' +
+        '<span class="ch-kicker">' + icon('compass') + ' ' + esc(t('kelas.kurikulum-merdeka', 'Kurikulum Merdeka · Target Belajar')) + '</span>' +
+        '<span class="ch-status is-sedang">' + esc(t('kelas.misi-adaptif', 'Misi Adaptif')) + '</span>' +
+      '</div>' +
+      '<h3>' + esc(t('kelas.misi-belajar-judul', 'Misi Belajar & Paspor Kompetensi')) + '</h3>' +
+      '<p class="ch-muted">' + esc(t('kelas.misi-belajar-desc', 'Alur belajar adaptif berbasis capaian pembelajaran: tujuan jelas, diagnosis otomatis, dan bukti penguasaan materi.')) + '</p>' +
+      '<div class="ch-actions">' +
+        '<a href="./misi.html" class="ch-btn is-primary" data-testid="class-open-curriculum">' + icon('compass') + ' ' + esc(t('kelas.buka-misi', 'Buka Misi Belajar')) + ' ' + icon('arrow-right') + '</a>' +
+        '<a href="./misi.html#passport" class="ch-btn is-ghost" data-testid="class-open-passport">' + icon('award') + ' ' + esc(t('kelas.paspor-belajar', 'Paspor Belajar')) + '</a>' +
+      '</div>' +
+    '</section>';
+  }
   function tugasView(pend, done) {
     pend = pend.slice().sort(function (a, b) { return String(a.deadline || '9').localeCompare(String(b.deadline || '9')); });
     done = done.slice().sort(function (a, b) { return b.at - a.at; });
-    return '<div class="ch-body"><section><h2 class="ch-h2">Perlu dikerjakan <small>' + pend.length + '</small></h2>' + (pend.length ? pend.map(function (a) { return assignCard(a, true); }).join('') : '<div class="ch-empty" data-testid="class-empty-pending">' + icon('inbox') + (classCode() ? '<p>' + t('kelas.murid-belum-ada-tugas', 'Belum ada tugas baru dari guru. Tugas yang dikirim guru muncul di sini dan di lonceng notifikasi.') + '</p>' : '') + (classCode() ? '' : '<button type="button" class="ch-btn" data-ch="tab" data-tab="kelas"><span class="kelasku-wordmark">Masukkan kode KelasKu</span></button>') + '</div>') + '</section>' +
+    return '<div class="ch-body">' +
+      curriculumCard() +
+      '<section><h2 class="ch-h2">Perlu dikerjakan <small>' + pend.length + '</small></h2>' + (pend.length ? pend.map(function (a) { return assignCard(a, true); }).join('') : '<div class="ch-empty" data-testid="class-empty-pending">' + icon('inbox') + (classCode() ? '<p>' + t('kelas.murid-belum-ada-tugas', 'Belum ada tugas baru dari guru. Tugas yang dikirim guru muncul di sini dan di lonceng notifikasi.') + '</p>' : '') + (classCode() ? '' : '<button type="button" class="ch-btn" data-ch="tab" data-tab="kelas"><span class="kelasku-wordmark">Masukkan kode KelasKu</span></button>') + '</div>') + '</section>' +
       '<section><h2 class="ch-h2">Selesai <small>' + done.length + '</small></h2>' + (done.length ? done.map(function (a) { return assignCard(a, false); }).join('') : '') + '</section></div>';
   }
   function kelasView() {
@@ -327,7 +350,8 @@
     return '<div class="ch-body"><section class="ch-card ch-class-card" data-testid="class-my-class">' + (classCode() ? '<p class="ch-kicker">' + WM + ' terhubung</p><h3>' + esc(className() || '') + (className() ? '' : WM + ' ' + esc(classCode())) + '</h3><p class="ch-muted">Kode ' + WM + ' <b class="ch-mono">' + esc(classCode()) + '</b>' + (teacherName() ? ' · Guru <b>' + esc(teacherName()) + '</b>' : '') + '</p>' + (rep ? '<p class="ch-muted ch-small">' + (rep.ok ? icon('check') + ' Laporan terakhir terkirim ke guru ' + esc(fmtDate(rep.at)) : icon('clock') + ' Laporan terakhir belum terkirim (' + esc(rep.error || 'offline') + ') — dikirim ulang otomatis saat online.') + '</p>' : '') + '<div class="ch-actions"><button type="button" class="ch-btn is-ghost" data-ch="change-code">Ganti kode</button></div>' : '<p class="ch-kicker">Gabung ' + WM + '</p><h3><span class="kelasku-wordmark">Masukkan kode dari KelasKu</span></h3><p class="ch-muted">Kode berbentuk FZ-XXXXXX. Setelah tergabung, tugas guru masuk otomatis dan hasilmu kembali ke guru.</p>') +
       (!classCode() || ui().editCode ? '<form class="ch-form" data-ch-form="join"><input name="code" value="' + esc(studentDraftCode) + '" placeholder="FZ-ABC234" maxlength="9" autocomplete="off" required data-testid="class-code-input"><button type="submit" class="ch-btn is-primary" data-testid="class-code-submit">Gabung</button></form>' : '') + '</section>' +
       '<section class="ch-grid2"><button type="button" class="ch-card ch-link-card" data-ch="tutor" data-testid="class-open-tutor"><span class="ch-link-icon">' + icon('mic') + '</span><div><b>Tutor FIEZEL</b><small>Pelajaran bersuara Inggris + subtitle Indonesia, sesuai levelmu.</small></div>' + icon('arrow-up-right') + '</button>' +
-      '<button type="button" class="ch-card ch-link-card" data-ch="learn" data-testid="class-open-learn"><span class="ch-link-icon">' + icon('route') + '</span><div><b>' + t('kelas.belajar-mandiri', 'Belajar mandiri hari ini') + '</b><small>Rencana harian dari peta kemampuanmu — tugas guru ikut masuk ke sana.</small></div>' + icon('arrow-up-right') + '</button></section></div>';
+      '<button type="button" class="ch-card ch-link-card" data-ch="learn" data-testid="class-open-learn"><span class="ch-link-icon">' + icon('route') + '</span><div><b>' + t('kelas.belajar-mandiri', 'Belajar mandiri hari ini') + '</b><small>Rencana harian dari peta kemampuanmu — tugas guru ikut masuk ke sana.</small></div>' + icon('arrow-up-right') + '</button>' +
+      (konsolKurikulumSiap() ? '<a href="./misi.html" class="ch-card ch-link-card" data-testid="class-curriculum-link"><span class="ch-link-icon">' + icon('compass') + '</span><div><b>' + esc(t('kelas.misi-kurikulum-link', 'Misi Belajar Kurikulum')) + '</b><small>' + esc(t('kelas.misi-kurikulum-sub', 'Target kompetensi SMP/SMA & Paspor Belajar adaptif.')) + '</small></div>' + icon('arrow-up-right') + '</a>' : '') + '</section></div>';
   }
   function progresView() {
     var lf = null; try { lf = LF() ? LF().load() : null; } catch (_) {}

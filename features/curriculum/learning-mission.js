@@ -14,9 +14,37 @@
   var CONF = [['yakin', 'Yakin'], ['lumayan', 'Lumayan yakin'], ['tidak', 'Tidak yakin']];
   var PHASES = ['warm-up', 'example', 'practice', 'challenge', 'transfer', 'check'];
 
+  function t(kunci, cadangan) {
+    var s;
+    try { var I = root.FiezelI18n; s = I && I.t ? I.t(kunci) : undefined; } catch (_) {}
+    return (s === undefined || s === kunci) ? cadangan : s;
+  }
+
   // ---------------- boot ----------------
   function boot() {
-    E.login.me().then(function (u) { S.user = u; loadToday(); }).catch(function () { renderAuth(); });
+    var token = E.token();
+
+    function start(u) {
+      S.user = u;
+      loadToday();
+    }
+
+    function viaKelasKu() {
+      var storedCode = '';
+      try {
+        var ob = JSON.parse(localStorage.getItem('fiezel-onboarding-v1') || '{}');
+        storedCode = ob.classCode || '';
+      } catch (_) {}
+      return E.login.kelasku(storedCode || undefined).then(start).catch(function (e) {
+        renderAuth(e.message);
+      });
+    }
+
+    if (token) {
+      E.login.me().then(start).catch(viaKelasKu);
+    } else {
+      viaKelasKu();
+    }
   }
 
   /* Murid tidak mendaftar apa pun di sini.
@@ -34,13 +62,18 @@
       (err ? '<div class="issue error">' + esc(err) + '</div>' : '') +
       '<label class="f">Kode kelas dari guru (isi kalau ini pertama kalinya)<input id="joinCode" placeholder="FZ-XXXXXX" data-testid="join-code" autocomplete="off"></label>' +
       '<button class="btn primary" data-a="login" data-testid="login-btn">Masuk dengan akun KelasKu</button>' +
-      '<p class="muted" style="margin-top:16px;font-size:13px">Belum masuk? Buka <a href="./index.html" data-testid="link-app">aplikasi FIEZEL</a> dulu, lalu kembali ke halaman ini.</p>' +
+      '<p class="muted" style="margin-top:16px;font-size:13px"><a href="./index.html#classroom" data-testid="link-app">' + t('kelas.kembali-kelasku-app', '‹ Kembali ke KelasKu di aplikasi FIEZEL') + '</a></p>' +
       '<p class="muted" style="font-size:13px">Guru masuk di <a href="./kurikulum.html">Ruang Guru</a>.</p>' +
       '</div></div>';
   }
 
   // ---------------- hari ini ----------------
   function loadToday() {
+    if (window.location.hash === '#passport') {
+      S.view = 'passport';
+      S.passport = null;
+      return render();
+    }
     return api('/learning/today').then(function (t) { S.today = t; S.view = 'today'; render(); }).catch(function (e) {
       toast(e.message); renderAuth(e.message);
     });
@@ -56,7 +89,9 @@
 
   function shellTop(title, sub) {
     return '<div class="row between" style="margin-bottom:8px"><p class="kicker">FIEZEL · ' + esc(S.user.name || 'Murid') + '</p>' +
-      '<div class="row"><button class="btn sm ghost" data-a="go-today" data-testid="go-today">Hari ini</button>' +
+      '<div class="row">' +
+      '<a href="./index.html#classroom" class="btn sm ghost" data-testid="back-to-kelasku" style="text-decoration:none;display:inline-flex;align-items:center;gap:4px">' + t('kelas.kembali-kelasku', '‹ Kembali ke KelasKu') + '</a>' +
+      '<button class="btn sm ghost" data-a="go-today" data-testid="go-today">Hari ini</button>' +
       '<button class="btn sm ghost" data-a="go-passport" data-testid="go-passport">Paspor Belajar</button>' +
       '<button class="btn sm ghost" data-a="logout" data-testid="logout-btn">Keluar</button></div></div>' +
       '<h1>' + esc(title) + '</h1>' + (sub ? '<p class="muted">' + esc(sub) + '</p>' : '');

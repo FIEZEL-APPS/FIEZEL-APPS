@@ -97,7 +97,7 @@ const ALLOWLIST = Object.freeze({
      20 -> 17 (m025-318): formulir daftar/masuk email+sandi dan tombol "Masuk dengan Google"
      dicabut bersama pintu-pintunya, jadi tiga kalimatnya ikut hilang dari layar. Ratchet
      TURUN — angka ini menyatakan utang yang tersisa, bukan jatah yang boleh dipakai. */
-  'features/curriculum/learning-mission.js': 17,
+  'features/curriculum/learning-mission.js': 16,
   'features/curriculum/teacher-console.js': 56,                 // konsol guru Kurikulum Merdeka
   /* KONTEN KURIKULUM NASIONAL INDONESIA, bukan naskah antarmuka. Empat literalnya adalah
      nama Fase resmi Kurikulum Merdeka dan dua saran pedagogis di dalam paket materinya.
