@@ -25,7 +25,7 @@
      i18n yang benar, bukan kebocoran. */
   function t(kunci, cadangan) {
     var s;
-    try { var I = window.FiezelI18n; s = I && I.t ? I.t(kunci) : undefined; } catch (_) {}
+    try { var I = root.FiezelI18n; s = I && I.t ? I.t(kunci) : undefined; } catch (_) {}
     return (s === undefined || s === kunci) ? cadangan : s;
   }
 

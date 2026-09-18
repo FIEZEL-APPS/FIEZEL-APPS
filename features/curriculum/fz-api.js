@@ -166,12 +166,16 @@
     },
 
     /* PENYEMAI BANK KURIKULUM.
-       `backend/seed_english.py` membangun Kurikulum Merdeka Bahasa Inggris utuh —
+       Modul penyemai di sisi server (seed_english.py, di layanan FastAPI yang terpisah —
+       jalurnya sengaja tidak dieja di sini: berkas ini DIKAPALKAN ke murid, dan gerbang
+       deploy-site menolak sumber aplikasi yang menyebut direktori yang tidak ikut terbit,
+       karena rujukan semacam itu berakhir sebagai 404 senyap di produksi)
+       membangun Kurikulum Merdeka Bahasa Inggris utuh —
        Fase A–F, Kelas 1–12, 72 TP, 144 kompetensi — dan sudah punya endpoint sejak
        lama. Yang tidak pernah ada adalah PEMANGGILNYA: nol antarmuka di seluruh
        klien menyentuh /seed/english, jadi kurikulum lengkap itu duduk di kode tanpa
        pernah sampai ke MongoDB siapa pun. Owner melihat konsol berisi 11 kompetensi
-       demo Matematika dan menyimpulkan "mata pelajarannya belum lengkap" — ia benar,
+       demo Matematika dan menyimpulkan bahwa mata pelajarannya belum lengkap — ia benar,
        dan sebabnya bukan isi yang kurang melainkan pintu yang tidak ada.
 
        `status` sengaja TANPA kredensial (backend pun tidak menuntutnya): ia hanya
