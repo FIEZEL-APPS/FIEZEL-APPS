@@ -109,6 +109,24 @@ tegaskan(
   'tidak bisa jujur tentang keadaan sebelum dan sesudah.'
 );
 
+/* SESUDAH MENYEMAI, BANK YANG BARU HARUS TERLIHAT DI TEMPAT GURU MEMAKAINYA.
+
+   Temuan gitar-bot pada PR #433, dan ia benar: versi pertama penangan ini mengosongkan
+   S.tps/S.comps lalu menggambar ulang. Tetapi `tree` dan `health` punya pemuat malas di
+   vCurriculum sementara `tps`/`comps` TIDAK — satu-satunya yang mengisinya adalah
+   loadContext() saat boot. Jadi sesudah menyemai, pilihan TP dan kompetensi di Kopilot
+   dan Asesmen kosong sampai halaman dimuat ulang: 72 TP dan 144 kompetensi yang baru
+   tiba tidak terlihat justru di tempat guru akan memakainya.
+
+   Cacat itu MENIADAKAN guna tombolnya sambil tetap terlihat berhasil (toast hijau, status
+   berubah "sudah tersemai"). Karena itu ia dikunci di sini, bukan sekadar diperbaiki. */
+tegaskan(
+  /S\.engStatus = st[\s\S]{0,900}?loadContext\(\)\.then\(render\)/.test(konsol),
+  'features/curriculum/teacher-console.js: penangan `seed-english` tidak memanggil ulang loadContext() sesudah ' +
+  'menyemai. S.tps/S.comps hanya diisi loadContext() — tanpa itu pilihan TP dan kompetensi di Kopilot dan Asesmen ' +
+  'kosong sampai halaman dimuat ulang, dan kurikulum yang baru disemai tidak terlihat di tempat ia dipakai.'
+);
+
 if (gagal.length) {
   console.error('MERAH curriculum-seed-reachable (' + gagal.length + '):');
   for (const g of gagal) console.error('  - ' + g);

@@ -538,9 +538,16 @@
         return E.seed.englishStatus();
       }).then(function (st) {
         S.engStatus = st; S.engBusy = false;
-        S.tree = null; S.tps = []; S.comps = []; S.health = null;  // banknya berubah; muat ulang tampilannya
+        /* `tree` dan `health` punya pemuat malas di vCurriculum — dikosongkan saja sudah
+           cukup, mereka mengambil sendiri saat digambar. `tps` dan `comps` TIDAK punya:
+           satu-satunya yang mengisinya adalah loadContext() saat boot. Mengosongkannya
+           tanpa memanggil ulang membuat pilihan TP dan kompetensi di Kopilot dan Asesmen
+           kosong sampai halaman dimuat ulang — 72 TP dan 144 kompetensi yang baru disemai
+           tidak terlihat di tempat guru justru akan memakainya, yang meniadakan seluruh
+           guna tombol ini. Pola yang sama dengan penangan `add-node`. */
+        S.tree = null; S.health = null;
         toast(t('kurikulum.semai-selesai', 'Kurikulum Bahasa Inggris Kelas 1–12 tersemai.'));
-        render();
+        return loadContext().then(render);
       }).catch(function (e) {
         S.engBusy = false; render();
         toast((e && e.message) || t('kurikulum.semai-gagal', 'Gagal menyemai kurikulum.'));
