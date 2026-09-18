@@ -11,7 +11,8 @@
     user: null, classes: [], cls: null, view: 'copilot', tree: null, coverage: null,
     recs: null, questions: [], reviewQueue: [], tps: [], comps: [], assessments: [],
     drawer: null, modal: null, plan: null, groups: null, busy: false, health: null, blueprintCheck: null,
-    engStatus: null, engBusy: false, mapelStatus: null, mapelBusy: false
+    engStatus: null, engBusy: false, mapelStatus: null, mapelBusy: false,
+    soalStatus: null, soalBusy: false
   };
 
   /* Pembungkus i18n yang sama dengan fz-api.js, dan alasannya sama pula: halaman konsol
@@ -311,6 +312,14 @@
       judul: function () { return t('kurikulum.mapel-judul', 'Mata pelajaran lain — Kelas 1–12'); },
       ajakan: function () { return t('kurikulum.mapel-ajakan', 'Tujuh belas mata pelajaran Fase A–F: Matematika, B.Indonesia, Pancasila, IPAS, IPA, IPS, Sejarah, Informatika, Fisika, Kimia, Biologi, Ekonomi, Sosiologi, Geografi, PJOK, Seni Budaya, Prakarya. 210 tujuan pembelajaran, 420 kompetensi, lengkap materi ajar dan prasyarat antar kelas.'); },
       selesai: function () { return t('kurikulum.mapel-selesai', 'Mata pelajaran Kelas 1–12 tersemai.'); }
+    },
+    soal: {
+      aksi: 'seed-soal', st: 'soalStatus', busy: 'soalBusy',
+      ambil: function () { return E.seed.soalStatus(); },
+      jalan: function () { return E.seed.soal(); },
+      judul: function () { return t('kurikulum.soal-judul', 'Bank soal'); },
+      ajakan: function () { return t('kurikulum.soal-ajakan', 'Soal pilihan ganda berpembahasan, berpetunjuk, dan berpeta miskonsepsi — inilah yang membuat kompetensi bisa dilatih, bukan sekadar dilihat. Semai kurikulumnya lebih dulu.'); },
+      selesai: function () { return t('kurikulum.soal-selesai', 'Bank soal tersemai.'); }
     }
   };
 
@@ -343,7 +352,7 @@
   }
 
   function seedCardHtml() {
-    return kartuSemai('english') + kartuSemai('mapel');
+    return kartuSemai('english') + kartuSemai('mapel') + kartuSemai('soal');
   }
 
   function nodeHtml(n) {
@@ -553,8 +562,8 @@
         S.classes.push(c); S.cls = c; resetCaches(); toast('Kelas dibuat. Kode: ' + c.code); render();
       }).catch(errToast);
     }
-    if (a === 'seed-english' || a === 'seed-mapel') {
-      var d = SEMAI[a === 'seed-english' ? 'english' : 'mapel'];
+    if (a === 'seed-english' || a === 'seed-mapel' || a === 'seed-soal') {
+      var d = SEMAI[a === 'seed-english' ? 'english' : (a === 'seed-mapel' ? 'mapel' : 'soal')];
       if (S[d.busy]) return;
       /* Kedua penyemai idempoten dan non-destruktif (simpul lama tidak diubah), jadi
          `semai ulang` aman ditekan dua kali. Yang TIDAK aman adalah menjalankannya dua
