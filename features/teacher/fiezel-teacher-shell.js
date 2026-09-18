@@ -385,38 +385,34 @@
    * yang di-restart, bukan tata letak yang bergerak.
    */
   var lastPaintKey = null;
+  function captureActive(container) {
+    try {
+      var act = root.document ? root.document.activeElement : null;
+      if (act && container && container.contains(act) && /^(INPUT|TEXTAREA)$/i.test(act.tagName || '')) {
+        return { name: act.getAttribute('name'), testId: act.getAttribute('data-testid'), s: act.selectionStart, e: act.selectionEnd };
+      }
+    } catch (_) {}
+    return null;
+  }
+  function restoreActive(container, saved) {
+    if (!saved || (!saved.testId && !saved.name) || !container) return;
+    try {
+      var sel = saved.testId ? '[data-testid="' + saved.testId + '"]' : '[name="' + saved.name + '"]';
+      var r = container.querySelector(sel);
+      if (r) { r.focus(); if (r.setSelectionRange && saved.s != null) r.setSelectionRange(saved.s, saved.e); }
+    } catch (_) {}
+  }
   function render() {
     if (!el) return;
     pendingRender = false;
-    var c = cls();
+    var c = cls(), saved = captureActive(el);
     var key = (st.view || 'briefing') + '|' + (st.activeClassId || '') + '|' + (ui.modal ? ui.modal.kind : '') + '|' + (ui.drawer || '');
     var repaint = key === lastPaintKey;
     lastPaintKey = key;
-    var activeName = null, activeTestId = null, selStart = 0, selEnd = 0;
-    try {
-      var act = root.document ? root.document.activeElement : null;
-      if (act && el.contains(act) && /^(INPUT|TEXTAREA)$/i.test(act.tagName || '')) {
-        activeName = act.getAttribute('name');
-        activeTestId = act.getAttribute('data-testid');
-        selStart = act.selectionStart;
-        selEnd = act.selectionEnd;
-      }
-    } catch (_) {}
     el.innerHTML = '<div class="tg' + (repaint ? ' is-repaint' : '') + (previewOn ? ' is-demo' : '') + (ui.modal && ui.modal.kind === 'board' ? ' tg-board-open' : '') + '" data-testid="teacher-shell">' + demoBanner() + sidebar(c) + '<div class="tg-main">' + topbar(c) + '<div class="tg-content">' + (st.classes.length ? views[st.view || 'briefing'](c) : welcome()) + '</div></div>' + mobileNav() + drawer(c) + modal(c) + '</div>';
     var hubEl = el.querySelector('#tgClassHub');
     if (hubEl && root.FiezelClassHub) root.FiezelClassHub.mountTeacher(hubEl, { st: function () { return st; }, cls: cls, persist: persist, toast: toast, rerender: render });
-    if (activeTestId || activeName) {
-      try {
-        var sel = activeTestId ? '[data-testid="' + activeTestId + '"]' : '[name="' + activeName + '"]';
-        var restored = el.querySelector(sel);
-        if (restored) {
-          restored.focus();
-          if (typeof restored.setSelectionRange === 'function' && selStart != null && selEnd != null) {
-            restored.setSelectionRange(selStart, selEnd);
-          }
-        }
-      } catch (_) {}
-    }
+    restoreActive(el, saved);
     if (env.afterRender) try { env.afterRender(); } catch (_) {}
     /* Autofokus hanya saat layarnya benar-benar berganti. Pada cat ulang ia akan merebut kursor
        dari tempat guru meletakkannya. */
