@@ -1079,6 +1079,15 @@ jobs:
         # menuntut tiap rujukan lokal membawa `?v=<build>` yang SAMA dengan FIEZEL_PAGE_BUILD,
         # dan menuntut ritual bump ikut menaikkannya.
         run: node tests/curriculum-cache-version-test.js
+      - name: 'Penyemai kurikulum punya pintu, bukan cuma kemampuan'
+        # backend/seed_english.py membangun Kurikulum Merdeka Bahasa Inggris UTUH (Fase A-F,
+        # Kelas 1-12, 72 TP, 144 kompetensi) dan endpointnya sudah lama ada - tetapi NOL
+        # antarmuka pernah memanggilnya, jadi satu-satunya kurikulum yang mendarat di MongoDB
+        # adalah demo Matematika 11 kompetensi. Owner menyimpulkan "mata pelajarannya belum
+        # lengkap"; yang kurang bukan isinya melainkan pintunya. Bentuk cacat yang sama persis
+        # dengan token FZG- di PR #428. Gerbang menuntut ketiga lapisnya bersama: endpoint,
+        # pengikat klien, dan kendali di konsol yang penangan aksinya benar-benar ada.
+        run: node tests/curriculum-seed-reachable-test.js
       - name: 'Kontrak pemasangan backend: env lengkap, CORS tertutup, lifespan tertutupi'
         # Backend backend/ dipasang permanen di cPanel, dan tiga cacat di jalur itu semuanya
         # GAGAL DALAM DIAM - API menjawab 200 sementara yang penting tidak terjadi. Diukur,
