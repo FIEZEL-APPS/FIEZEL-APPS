@@ -13,6 +13,16 @@
     'kelas.menunggu-penjelasan': 'พวกเขากรอกรหัสของชั้นเรียนนี้ เพิ่มคนที่คุณรู้จัก ส่วนคนที่ไม่ได้เพิ่มจะไม่ได้รับงานใด ๆ',
     'kelas.gabung-diterima': 'เพิ่ม {nama} เข้า {kelas} แล้ว งานครั้งต่อไปจะถูกส่งถึงเขาด้วย',
     'kelas.tambahkan': 'เพิ่ม',
-    'kelas.abaikan': 'ข้าม'
+    'kelas.abaikan': 'ข้าม',
+    'kelas.kurikulum-merdeka': 'หลักสูตรและการเรียนรู้เชิงรุก',
+    'kelas.misi-adaptif': 'ภารกิจปรับตัว',
+    'kelas.misi-belajar-judul': 'ภารกิจการเรียนรู้และพาสปอร์ตทักษะ',
+    'kelas.misi-belajar-desc': 'เส้นทางการเรียนรู้ตามเป้าหมาย: มีเป้าหมายชัดเจน วินิจฉัยข้อผิดพลาดอัตโนมัติ และบันทึกหลักฐานความเชี่ยวชาญ',
+    'kelas.buka-misi': 'เปิดภารกิจการเรียนรู้',
+    'kelas.paspor-belajar': 'พาสปอร์ตการเรียนรู้',
+    'kelas.misi-kurikulum-link': 'ภารกิจหลักสูตรและพาสปอร์ต',
+    'kelas.misi-kurikulum-sub': 'เป้าหมายทักษะระดับมัธยมและพาสปอร์ตการเรียนรู้',
+    'kelas.kembali-kelasku': '‹ กลับไปยัง KelasKu',
+    'kelas.kembali-kelasku-app': '‹ กลับไปยัง KelasKu ในแอป FIEZEL'
   });
 })();
