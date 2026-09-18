@@ -162,3 +162,46 @@ Memaku yang baru saja hanya menjaga satu berkas; melarang yang lama menjaga semu
 - Nomor build **jangan diketik tangan**. Jalankan `node tools/bump-build.mjs "<alasan>"`; ia
   menulis keempat tempat sekaligus, dan `tests/coordination-guard-test.js` akan menangkapmu
   kalau tidak.
+
+---
+
+## m025-323 — satu token hilang menahan seluruh antrean rilis
+
+`b6f5a93a` ("fix(uiux): perbaiki 5 area audit") memakai `var(--line-strong)` di dua keadaan
+hover — `.skill-back-btn:hover` dan `.modal-close-corner:hover` — tetapi tokennya **tidak
+pernah didefinisikan** di blok `:root` mana pun.
+
+### Dua akibat, dan yang kedua tidak terlihat sama sekali
+
+1. **Di layar.** Token yang tidak terdefinisi membuat peramban membuang SELURUH deklarasinya,
+   jadi border kedua kontrol itu tidak pernah berubah saat disentuh. Diukur di Chromium:
+   border dasarnya `rgba(46,39,36,.04)` — nyaris tak terlihat — dan hover-nya tidak menambah
+   apa pun.
+
+2. **Di jalur rilis, dan ini yang mahal.** `tests/search-feedback-test.js` merah karenanya,
+   jadi Quality Gate merah di `main`. `Deploy Site` dipicu `workflow_run` atas Quality Gate
+   yang **sukses**, bukan oleh `push` — sehingga SETIAP build sesudah 16 September berhenti
+   di repo dan tidak pernah terbit ke `fiezel.my.id/app/`. Tiga run Deploy Site berturut-turut
+   berstatus `skipped`, termasuk untuk PR #428 (pintu KelasKu). Tidak ada satu pun pesan yang
+   berbunyi "deploy dilewati"; yang terlihat hanya gerbang CSS yang merah.
+
+   **Pelajaran untuk sesi berikutnya:** di repo ini, gerbang merah di `main` bukan sekadar
+   utang kebersihan — ia menghentikan penerbitan. Periksa `Deploy Site` setiap kali Quality
+   Gate merah lebih dari satu commit.
+
+### Nilainya anak tangga ketiga, bukan warna baru
+
+```
+--line-soft   #F5F0E9   (paling terang)
+--line        #EFE7DE   (dasar)
+--line-strong #E2D6C8   (ditambahkan m025-323)
+```
+
+Arah dan jarak sama dengan tangga sebelumnya, jadi ia tetap di dalam keluarga cream/pastel
+Lembut — bukan warna asing yang kebetulan lolos gerbang kontras.
+
+### Ditulis di KEDUA blok `:root`
+
+`style.css` punya dua, dan komentar di dalamnya sendiri memperingatkan bahwa **blok kedua yang
+menang**. Mengisi yang atas saja meninggalkan cacat yang sama persis sambil terlihat seperti
+sudah diperbaiki — jebakan yang sudah pernah menelan korban di berkas ini (m025-115).
