@@ -46,6 +46,13 @@
   --panel-soft:#F6F1EA;
   --line:#EFE7DE;
   --line-soft:#F5F0E9;
+  /* Anak tangga KETIGA keluarga garis: soft (#F5F0E9) < line (#EFE7DE) < strong.
+     Dipakai HANYA untuk keadaan hover di .skill-back-btn dan .modal-close-corner —
+     keduanya sudah memanggil var(--line-strong) sejak b6f5a93a, tetapi tokennya tidak
+     pernah didefinisikan di mana pun, jadi border-color-nya jatuh ke nilai awal dan
+     hover-nya tidak terlihat sama sekali. Ditambahkan di KEDUA blok :root karena blok
+     kedualah yang menang; mengisi yang atas saja meninggalkan cacat yang sama. */
+  --line-strong:#E2D6C8;
   --text:#2E2724;
   --muted:#6E635C;
   --muted-soft:#786D64;
@@ -944,6 +951,13 @@ input[type="checkbox"],input[type="radio"]{min-width:24px;min-height:24px}
   --panel-soft:#F6F1EA;
   --line:#EFE7DE;
   --line-soft:#F5F0E9;
+  /* Anak tangga KETIGA keluarga garis: soft (#F5F0E9) < line (#EFE7DE) < strong.
+     Dipakai HANYA untuk keadaan hover di .skill-back-btn dan .modal-close-corner —
+     keduanya sudah memanggil var(--line-strong) sejak b6f5a93a, tetapi tokennya tidak
+     pernah didefinisikan di mana pun, jadi border-color-nya jatuh ke nilai awal dan
+     hover-nya tidak terlihat sama sekali. Ditambahkan di KEDUA blok :root karena blok
+     kedualah yang menang; mengisi yang atas saja meninggalkan cacat yang sama. */
+  --line-strong:#E2D6C8;
   --text:#2E2724;
   --muted:#6E635C;
   --muted-soft:#786D64;
