@@ -10,8 +10,24 @@
   var S = {
     user: null, classes: [], cls: null, view: 'copilot', tree: null, coverage: null,
     recs: null, questions: [], reviewQueue: [], tps: [], comps: [], assessments: [],
-    drawer: null, modal: null, plan: null, groups: null, busy: false, health: null, blueprintCheck: null
+    drawer: null, modal: null, plan: null, groups: null, busy: false, health: null, blueprintCheck: null,
+    engStatus: null, engBusy: false
   };
+
+  /* Pembungkus i18n yang sama dengan fz-api.js, dan alasannya sama pula: halaman konsol
+     tidak memuat lapisan i18n hari ini, sehingga FiezelI18n.t() mengembalikan NAMA KUNCI
+     saat naskahnya belum termuat. Guru tidak boleh membaca 'kurikulum.semai-judul' di
+     layarnya, jadi cadangan Indonesia yang dikembalikan.
+
+     Naskah baru di berkas ini WAJIB lewat sini. tests/th-ui-leak-test.js memberi berkas ini
+     anggaran 56 literal Indonesia telanjang — anggaran yang hanya boleh turun — dan
+     argumen kedua t() adalah satu-satunya bentuk yang diakui pemindainya sebagai jalur
+     i18n yang benar, bukan kebocoran. */
+  function t(kunci, cadangan) {
+    var s;
+    try { var I = window.FiezelI18n; s = I && I.t ? I.t(kunci) : undefined; } catch (_) {}
+    return (s === undefined || s === kunci) ? cadangan : s;
+  }
 
   var NAV = [
     ['copilot', 'Kopilot Guru'], ['coverage', 'Cakupan Kurikulum'], ['curriculum', 'Struktur Kurikulum'],
@@ -251,11 +267,56 @@
       '<label class="f">Induk (parent id)<input id="ndParent" placeholder="CP-MAT-D-BIL" data-testid="node-parent"></label>' +
       '<label class="f">Nama<input id="ndName" placeholder="Nama simpul" data-testid="node-name"></label>' +
       '<button class="btn primary sm" data-a="add-node" data-testid="add-node-btn">Tambahkan</button></div>' +
+      seedCardHtml() +
       '<div class="card" data-testid="curriculum-health"><p class="kicker">Peringatan struktur</p>' +
       (S.health ? (S.health.warnings.length ? S.health.warnings.slice(0, 24).map(function (w) {
         return '<div class="issue ' + w.level + '">' + esc(w.message) + '</div>';
       }).join('') : '<p class="muted">Struktur sehat.</p>') : '<p class="muted">Memeriksa…</p>') +
       (S.health ? '<p class="mono muted">' + esc(JSON.stringify(S.health.counts)) + '</p>' : '') + '</div></div></div>';
+  }
+
+  /* KARTU PENYEMAI BANK KURIKULUM.
+
+     Kurikulum Merdeka Bahasa Inggris utuh (Fase A–F, Kelas 1–12, 72 TP, 144 kompetensi,
+     lengkap dengan materi ajar dan prasyarat antar kelas) sudah lama ada di
+     backend/seed_english.py DAN sudah punya endpoint POST /api/seed/english. Yang tidak
+     pernah ada adalah pemanggilnya: nol antarmuka di seluruh klien menyentuhnya, jadi
+     satu-satunya kurikulum yang pernah mendarat di MongoDB adalah demo Matematika 11
+     kompetensi yang dijalankan otomatis /seed/bootstrap saat guru belum punya kelas.
+
+     Akibatnya owner membuka konsol, melihat dua mapel dengan satu elemen masing-masing,
+     dan menyimpulkan "mata pelajarannya belum lengkap". Ia benar — tetapi sebabnya bukan
+     isi yang kurang, melainkan pintu yang tidak pernah dipasang. Kartu ini pintunya.
+
+     Statusnya dibaca lebih dulu supaya tombolnya jujur: guru berhak tahu banknya sudah
+     terisi atau belum SEBELUM menekan apa pun. */
+  function seedCardHtml() {
+    if (S.engStatus === null && !S.engBusy) {
+      S.engBusy = true;
+      E.seed.englishStatus().then(function (st) {
+        S.engStatus = st; S.engBusy = false; render();
+      }).catch(function () { S.engStatus = false; S.engBusy = false; render(); });
+    }
+    var st = S.engStatus;
+    var baris;
+    if (st === null) baris = '<p class="muted">' + esc(t('kurikulum.semai-memeriksa', 'Memeriksa isi bank kurikulum…')) + '</p>';
+    else if (st && st.seeded) {
+      baris = '<p class="muted" data-testid="seed-english-status">' + esc(
+        t('kurikulum.semai-sudah', 'Sudah tersemai: {tp} tujuan pembelajaran, {komp} kompetensi, {materi} materi ajar.')
+          .replace('{tp}', st.tp).replace('{komp}', st.competencies).replace('{materi}', st.materials)) + '</p>';
+    } else {
+      baris = '<p class="muted" data-testid="seed-english-status">' + esc(t('kurikulum.semai-belum', 'Belum tersemai. Bank kurikulum masih berisi contoh demo saja.')) + '</p>';
+    }
+    var sudah = !!(st && st.seeded);
+    return '<div class="card" data-testid="seed-english-card"><p class="kicker">' + esc(t('kurikulum.semai-kicker', 'Bank kurikulum')) + '</p>' +
+      '<h3>' + esc(t('kurikulum.semai-judul', 'Kurikulum Bahasa Inggris Kelas 1–12')) + '</h3>' +
+      '<p class="muted">' + esc(t('kurikulum.semai-ajakan',
+        'Kurikulum Merdeka Bahasa Inggris lengkap Fase A–F: 72 tujuan pembelajaran, 144 kompetensi, plus materi ajar dan prasyarat antar kelas. Disemai sekali, lalu menjadi milik bank kurikulummu.')) + '</p>' +
+      baris +
+      '<button class="btn ' + (sudah ? 'ghost' : 'primary') + ' sm" data-a="seed-english" data-testid="seed-english-btn"' + (S.engBusy ? ' disabled' : '') + '>' +
+      esc(S.engBusy ? t('kurikulum.semai-jalan', 'Sedang menyemai — butuh beberapa detik.')
+        : (sudah ? t('kurikulum.semai-ulang', 'Semai ulang') : t('kurikulum.semai-tombol', 'Semai sekarang'))) +
+      '</button></div>';
   }
 
   function nodeHtml(n) {
@@ -464,6 +525,26 @@
       return api('/classes', { body: { name: name, grade_id: 'KELAS-7', subject_id: 'MAT-7' } }).then(function (c) {
         S.classes.push(c); S.cls = c; resetCaches(); toast('Kelas dibuat. Kode: ' + c.code); render();
       }).catch(errToast);
+    }
+    if (a === 'seed-english') {
+      if (S.engBusy) return;
+      /* Penyemainya idempoten dan non-destruktif (seed_english.py: simpul lama tidak
+         diubah), jadi "semai ulang" aman ditekan dua kali. Yang TIDAK aman adalah
+         menjalankannya dua kali BERSAMAAN — 144 kompetensi berarti ratusan penulisan,
+         dan dua gelombang paralel membuat guru menunggu dua kali lebih lama tanpa
+         alasan. Karena itu tombolnya dikunci selama gelombangnya berjalan. */
+      S.engBusy = true; render();
+      return E.seed.english().then(function () {
+        return E.seed.englishStatus();
+      }).then(function (st) {
+        S.engStatus = st; S.engBusy = false;
+        S.tree = null; S.tps = []; S.comps = []; S.health = null;  // banknya berubah; muat ulang tampilannya
+        toast(t('kurikulum.semai-selesai', 'Kurikulum Bahasa Inggris Kelas 1–12 tersemai.'));
+        render();
+      }).catch(function (e) {
+        S.engBusy = false; render();
+        toast((e && e.message) || t('kurikulum.semai-gagal', 'Gagal menyemai kurikulum.'));
+      });
     }
     if (a === 'tp-detail') return openTpDetail(el.getAttribute('data-tp'));
     if (a === 'passport') return openPassport(el.getAttribute('data-sid'));

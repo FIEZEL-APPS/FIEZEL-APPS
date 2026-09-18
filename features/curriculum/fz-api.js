@@ -163,6 +163,23 @@
       me: function () { return api('/auth/me'); },
       joinClass: function (code) { return api('/auth/join-class', { body: { class_code: code } }); },
       logout: function () { return api('/auth/logout', { method: 'POST', body: {} }).then(function () { setToken(''); }); }
+    },
+
+    /* PENYEMAI BANK KURIKULUM.
+       `backend/seed_english.py` membangun Kurikulum Merdeka Bahasa Inggris utuh —
+       Fase A–F, Kelas 1–12, 72 TP, 144 kompetensi — dan sudah punya endpoint sejak
+       lama. Yang tidak pernah ada adalah PEMANGGILNYA: nol antarmuka di seluruh
+       klien menyentuh /seed/english, jadi kurikulum lengkap itu duduk di kode tanpa
+       pernah sampai ke MongoDB siapa pun. Owner melihat konsol berisi 11 kompetensi
+       demo Matematika dan menyimpulkan "mata pelajarannya belum lengkap" — ia benar,
+       dan sebabnya bukan isi yang kurang melainkan pintu yang tidak ada.
+
+       `status` sengaja TANPA kredensial (backend pun tidak menuntutnya): ia hanya
+       menghitung simpul, dan bisa dibuka langsung di peramban untuk memeriksa bank
+       tanpa harus lolos pintu guru lebih dulu. */
+    seed: {
+      english: function () { return api('/seed/english', { body: {} }); },
+      englishStatus: function () { return api('/seed/english/status'); }
     }
   };
 })(window);

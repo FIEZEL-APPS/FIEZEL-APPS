@@ -1,6 +1,6 @@
 {
   "schema": "fiezel-th-ui-leak-v1",
-  "generatedAt": "2026-09-18T08:58:39.973Z",
+  "generatedAt": "2026-09-18T10:55:50.260Z",
   "files": {
     "app.js": {
       "leaks": 3,
@@ -151,23 +151,23 @@
       "budget": 56,
       "sample": [
         {
-          "line": 17,
+          "line": 33,
           "text": "Kopilot Guru"
         },
         {
-          "line": 18,
+          "line": 34,
           "text": "Bank Soal"
         },
         {
-          "line": 18,
+          "line": 34,
           "text": "Murid & Paspor"
         },
         {
-          "line": 45,
+          "line": 61,
           "text": "FIEZEL · Ruang Guru"
         },
         {
-          "line": 49,
+          "line": 65,
           "text": "Masuk dengan akun KelasKu"
         }
       ]
@@ -403,19 +403,19 @@
       "budget": 4,
       "sample": [
         {
-          "line": 514,
+          "line": 510,
           "text": "Akurasi"
         },
         {
-          "line": 526,
+          "line": 522,
           "text": "Latihan ·"
         },
         {
-          "line": 709,
+          "line": 705,
           "text": "📖 Kosakata Kunci:"
         },
         {
-          "line": 726,
+          "line": 722,
           "text": "Latihan"
         }
       ]
@@ -468,8 +468,8 @@
     }
   },
   "copyKeys": {
-    "id": 2499,
-    "th": 2501,
+    "id": 2510,
+    "th": 2512,
     "idTanpaTh": 0
   },
   "pass": true
