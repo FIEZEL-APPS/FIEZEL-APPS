@@ -35,6 +35,24 @@ const TITIK = [
   { berkas: 'features/neural-voice/fiezel-diag-panel.js', pola: /(var DIAG_BUILD = ')(m025-\d+)(')/, gantiKe: 2 }
 ];
 
+/* HALAMAN DI LUAR CANGKANG, yang karena itu tidak punya penjaga generasi sama sekali.
+   `kurikulum.html` dan `misi.html` TIDAK ada di daftar precache sw.js — nol entri,
+   diperiksa bukan diduga — jadi service worker tidak pernah menyentuhnya dan seluruh
+   kesegarannya diserahkan pada cache HTTP biasa. Rujukan skripnya dulu telanjang
+   (`./features/curriculum/teacher-console.js`), sehingga peramban boleh menyajikan
+   salinan lama di URL yang sama SELAMANYA.
+
+   Itu bukan kekhawatiran teoretis. Pada m025-325 server sudah menyajikan konsol
+   berpintu-KelasKu, tetapi peramban owner masih menggambar layar token `FZG-` yang
+   sudah dicabut tiga rilis sebelumnya — rilisnya terbit, lalu tidak terlihat. Penanda
+   `?v=` di bawah membuat setiap rilis punya URL sendiri, jadi build baru tidak pernah
+   bisa tertutup salinan lama.
+
+   Diganti GLOBAL (semua kemunculan), bukan yang pertama saja: satu halaman memanggil
+   empat berkas, dan satu saja yang tertinggal mengembalikan persis cacat yang sama. */
+const HALAMAN_BERVERSI = ['kurikulum.html', 'misi.html'];
+const POLA_VERSI = /\?v=m025-\d+/g;
+
 const baca = (f) => fs.readFileSync(path.join(ROOT, f), 'utf8');
 const nomor = (v) => Number(String(v).replace(/^m025-/, ''));
 
@@ -230,6 +248,19 @@ for (const t of TITIK) {
   const baru = isi.replace(t.pola, (_all, a, _lama, ...sisa) => a + versiBaru + sisa.slice(0, sisa.length - 2).join(''));
   fs.writeFileSync(p, baru);
   console.log(t.berkas + ': ' + m[t.gantiKe] + ' -> ' + versiBaru);
+}
+
+for (const berkas of HALAMAN_BERVERSI) {
+  const p = path.join(ROOT, berkas);
+  const isi = fs.readFileSync(p, 'utf8');
+  const cocok = isi.match(POLA_VERSI);
+  if (!cocok) {
+    console.error('Penanda ?v= tidak ditemukan di ' + berkas + '. Rujukan skripnya kehilangan penanda versi;');
+    console.error('tanpa itu rilis baru bisa tertutup salinan lama di cache peramban. Perbaiki halamannya, jangan hapus cek ini.');
+    process.exit(1);
+  }
+  fs.writeFileSync(p, isi.replace(POLA_VERSI, '?v=' + versiBaru));
+  console.log(berkas + ': ' + cocok.length + ' rujukan -> ' + versiBaru);
 }
 
 const sumber = JSON.parse(fs.readFileSync(SUMBER, 'utf8'));

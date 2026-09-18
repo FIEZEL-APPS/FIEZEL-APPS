@@ -1070,6 +1070,15 @@ jobs:
         # seluruh *.html di akar: yang memuat fz-api.js WAJIB memuat core-config.js lebih
         # dulu, dan alamat bawaannya WAJIB tetap kosong.
         run: node tests/curriculum-config-wiring-test.js
+      - name: 'Rilis kurikulum tidak boleh tertutup salinan lama di cache peramban'
+        # m025-325 TERBIT lalu tidak TERLIHAT: server menyajikan konsol berpintu-KelasKu,
+        # tetapi peramban owner menggambar layar token FZG- yang sudah dicabut tiga rilis
+        # sebelumnya. Sebabnya struktural - kurikulum.html dan misi.html nol entri di
+        # precache sw.js, jadi penjaga generasi milik cangkang murid tidak berlaku di sana,
+        # sementara rujukan skripnya telanjang (URL sama persis untuk setiap rilis). Gerbang
+        # menuntut tiap rujukan lokal membawa `?v=<build>` yang SAMA dengan FIEZEL_PAGE_BUILD,
+        # dan menuntut ritual bump ikut menaikkannya.
+        run: node tests/curriculum-cache-version-test.js
       - name: 'Kontrak pemasangan backend: env lengkap, CORS tertutup, lifespan tertutupi'
         # Backend backend/ dipasang permanen di cPanel, dan tiga cacat di jalur itu semuanya
         # GAGAL DALAM DIAM - API menjawab 200 sementara yang penting tidak terjadi. Diukur,

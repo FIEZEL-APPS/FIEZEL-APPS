@@ -485,3 +485,65 @@ produksi.
 Satu nilai baru di Worker: `wrangler secret put CURRICULUM_TICKET_KEY` dengan nilai yang
 sama seperti di `.env` backend. Tanpa itu tombol "Masuk dengan akun KelasKu" menjawab
 "jembatan belum dinyalakan" — terang-terangan, bukan diam.
+
+## m025-326 — rilis yang terbit tanpa pernah terlihat
+
+Sesudah seluruh rantai pintu KelasKu selesai dan terbit, owner membuka
+`fiezel.my.id/app/kurikulum.html` dan melihat **layar login token `FZG-`** — layar yang
+dicabut tiga rilis sebelumnya di PR #428. Kesimpulan yang wajar saat itu: "deploy-nya
+gagal". Kesimpulan itu SALAH, dan jarak antara gejala dan sebabnya adalah isi catatan ini.
+
+Pada menit yang sama:
+
+* `deploy-site-verify` membaca produksi: `FIEZEL_PAGE_BUILD` **m025-325**, `SW_REV`
+  **m025-325-paw-kembali-20260913**, keduanya sepadan dengan `main`.
+* Berkasnya sendiri dibaca langsung lewat `?v=999` (melewati cache) — isinya **sudah**
+  kode berpintu-KelasKu, lengkap dengan `data-testid="teacher-login-btn"`.
+
+Servernya benar. Yang salah: peramban tidak pernah memintanya lagi.
+
+### Kenapa halaman-halaman ini tidak terlindungi, padahal cangkang murid terlindungi
+
+Cangkang murid punya penjaga generasi yang ketat — nama cache berkunci `SW_REV`, generasi
+lain dibuang saat `activate`, dokumen pun dilayani dari `SHELL_CACHE` supaya tidak pernah
+ada `index.html` build N+1 berjalan di atas JavaScript build N.
+
+`kurikulum.html` dan `misi.html` **tidak ikut satu pun dari itu**, dan bukan karena
+kelalaian: keduanya memang bukan bagian cangkang murid. Nol entri di `ASSETS` `sw.js` —
+termasuk `fz-api.js`, `teacher-console.js`, `learning-mission.js`:
+
+```
+$ git show origin/main:sw.js | grep -o "'\./[^']*'" \
+    | grep -cE "curriculum/(fz-api|teacher-console|learning-mission)|kurikulum\.html|misi\.html"
+0
+```
+
+Jadi service worker tidak pernah menyentuhnya, dan seluruh kesegarannya diserahkan pada
+cache HTTP biasa. Sementara rujukan skripnya telanjang — `./features/curriculum/teacher-console.js`,
+URL yang sama persis untuk setiap rilis, selamanya. Tidak ada satu pun sinyal di URL itu
+yang memberitahu peramban isinya sudah berubah, jadi peramban menyajikan salinan lama dan
+ia **benar** melakukannya.
+
+### Pelajaran yang berlaku di luar halaman ini
+
+Repo ini punya banyak gerbang yang membuktikan isi berkas benar, dan satu verifier yang
+membuktikan server menyajikan build yang benar. **Tidak ada satu pun** yang bisa melihat
+celah di antaranya: repo hijau, server benar, layar salah. Setiap halaman yang berada di
+LUAR `ASSETS` `sw.js` punya celah ini secara bawaan — kalau kelak lahir halaman ketiga di
+luar cangkang, ia lahir dengan cacat yang sama sampai penandanya dipasang.
+
+### Penjaganya sekarang
+
+`?v=<build>` pada tiap rujukan lokal di kedua halaman, dan nomor itu wajib SAMA dengan
+`FIEZEL_PAGE_BUILD`. `tools/bump-build.mjs` menulis ulang SEMUA kemunculannya pada setiap
+bump (global — satu halaman memanggil empat berkas, dan satu yang tertinggal mengembalikan
+cacat yang sama) dan menolak jalan kalau penandanya hilang.
+`tests/curriculum-cache-version-test.js` menegakkan ketiganya, dan ketiga mode kegagalannya
+dibuktikan merah lebih dulu: rujukan telanjang, penanda tertinggal satu rilis, dan halaman
+yang dicabut dari `HALAMAN_BERVERSI`.
+
+Header cache di server SENGAJA tidak dipakai sebagai jawaban: `.htaccess` ada di
+`deploy/site-exclude.txt` sebagai milik server — repo tidak pernah mengirimkannya supaya
+`rsync --delete` tidak menghapus aturan yang dipasang owner langsung di cPanel. Repo tidak
+bisa menjamin header; ia bisa menjamin bentuk URL. Yang bisa dijamin itulah yang dijadikan
+gerbang.
