@@ -692,3 +692,96 @@ salah menulisnya bukan sekadar cacat data, ia menyinggung keyakinan murid.
 Yang dibutuhkan sebelum ia bisa ditambahkan: owner menyebut agama mana yang diajarkan di
 kelasnya, dan sebaiknya memeriksa sendiri rumusan CP-nya. Sampai itu ada, ketiadaannya
 adalah jawaban yang benar, bukan pekerjaan yang terlupakan.
+
+---
+
+## m025-330 — BANK SOAL: struktur berubah menjadi pelajaran
+
+Sesudah kurikulumnya lengkap, owner masih tidak bisa memakainya, dan sebabnya diukur
+bukan dikira:
+
+```
+kompetensi demo (seed.py)          :  11  ->  7 punya soal (21 soal)
+kompetensi Inggris (seed_english)  : 144  ->  0 punya soal
+kompetensi mapel  (seed_mapel)     : 420  ->  0 punya soal
+```
+
+Mesin belajar mengambil soal dari `db.questions`. Kompetensi tanpa soal adalah simpul yang
+bisa dilihat guru di pohon kurikulum dan TIDAK PERNAH bisa dilatih murid. Struktur lengkap
+tanpa bank soal adalah daftar isi tanpa bukunya.
+
+`POST /api/questions/generate-candidates` tidak menutup celah ini, dan itu bukan
+kekurangannya: ia membuat VARIASI dari soal yang sudah terbit. Kompetensi yang belum punya
+satu soal pun jatuh ke cabang `else` dan menghasilkan satu esai generik. Berguna sebagai
+benih sesudah ada isinya; tidak bisa menciptakan bank dari nol.
+
+Jadi soalnya ditulis. `backend/seed_soal.py`, sepuluh gelombang, **705 butir**:
+
+| Gelombang | Isi | Kompetensi |
+|---|---|---|
+| 1–8 | Bahasa Inggris Kelas 1–12 — TUNTAS | 144 |
+| 9 | Matematika Kelas 7 | 12 |
+| 10 | Matematika Kelas 8–9 | 20 |
+
+**392 kompetensi masih kosong**, seluruhnya mapel non-Inggris. Mesin, gerbang, dan bentuk
+butirnya sudah terbukti; yang tersisa menulis isinya.
+
+### Cara memverifikasi gelombang berikutnya — JANGAN dilewati
+
+Penyemai membuang duplikat berdasarkan `stem`. Artinya butir yang stem-nya kembar TIDAK
+PERNAH masuk basis data, tanpa satu pun galat dan tanpa satu pun gerbang merah. Terjadi
+sungguhan pada gelombang 2: tabel berisi 96 butir, yang masuk 95. Ditemukan HANYA karena
+jumlah di tabel dibandingkan dengan jumlah yang benar-benar masuk.
+
+Maka tiap gelombang diverifikasi terhadap MongoDB sungguhan dengan membandingkan keduanya:
+
+```
+di tabel 705 | masuk 705 | selisih 0 | kompetensi 176 | yatim []
+error: 0 | warn: 0
+```
+
+`selisih` harus nol. `yatim` (kompetensi yang belum ada di graf) harus kosong — penyemai
+menolak menulis soal yatim dan melaporkannya di `missing_competencies`, karena soal yang
+menunjuk kompetensi tak-ada masuk basis data, tidak pernah terambil sesi mana pun, dan
+tidak ada yang merah karenanya.
+
+### `norm_option()` — aturan opsi identik yang selama ini keliru untuk matematika
+
+`duplicate_options` di `questions.py` memakai `norm_stem()`, yang membuang SEMUA karakter
+bukan huruf/angka. Untuk identitas PERTANYAAN itu benar: "Hitunglah: -7 + 12" dan
+"Hitunglah -7 + 12" memang soal yang sama, dan penyemai yang dijalankan dua kali tidak
+boleh menggandakannya. Untuk OPSI JAWABAN aturan itu justru terbalik, karena persis di
+karakter itulah letak jawabannya:
+
+```
+5        vs  -5          beda TANDA
+x - 7    vs  x + 7       beda OPERASI
+40 cm    vs  40 cm²      beda DIMENSI (keliling vs luas)
+Lets go  vs  Let's go    beda EJAAN — dan itu yang diuji soal mekanika
+```
+
+Selama banknya hanya berisi bahasa Inggris, cacat ini tidak pernah terlihat. Gelombang
+Matematika langsung menabraknya sembilan kali. Peringatan yang selalu salah mengajari
+pembacanya mengabaikan peringatan, jadi yang diperbaiki aturannya, bukan soalnya:
+`norm_option()` hanya menyamakan kapital dan spasi — satu-satunya perbedaan yang memang
+tidak terlihat murid.
+
+Gerbang `curriculum-seed-reachable` (kini **30 penegasan**) menjaga keduanya tetap satu
+aturan: ia menuntut `questions.py` tetap memakai `norm_option` untuk `duplicate_options`,
+DAN menolak `norm_option` yang diam-diam kembali membuang non-alfanumerik. Tanpa penegasan
+kedua, cacatnya bisa kembali lewat pintu lain sementara gerbangnya tetap hijau.
+
+### Bank demo dan bank isi tidak boleh menulis soal yang sama
+
+Dua butir gelombang 9 menulis ulang soal yang sudah ada di `seed.py`, hanya beda titik dua.
+Backend menandainya `duplicate_question`, dan benar: satu soal yang sama duduk di dua
+kompetensi, jadi murid yang sudah mengerjakannya di satu tempat mengerjakannya lagi di
+tempat lain seolah materi baru. Angkanya diganti, dan larangannya kini dijaga gerbang.
+
+### Utang yang dibawa gelombang berikutnya
+
+* 392 kompetensi belum bersoal — daftar lengkapnya bisa dibangkitkan ulang dengan
+  membandingkan `db.curriculum_nodes` (type `competency`) dengan
+  `db.questions.distinct("competency_id")`.
+* Pendidikan Agama tetap ditahan sesuai catatan m025-329 di atas; kompetensinya belum ada,
+  jadi soalnya pun belum bisa ditulis.
