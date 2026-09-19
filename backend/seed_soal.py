@@ -4338,10 +4338,23 @@ async def seed_soal_route(u=Depends(teacher_user)):
 
 @router.get("/soal/status")
 async def soal_status():
+    """Keadaan bank soal — dan `seeded` HANYA tentang bank ini.
+
+    Pernah ditulis `seeded: terbit > 0`, yaitu "ada soal terbit di basis data". Itu keliru
+    dan kelirunya berbohong kepada guru: seed.py menerbitkan 21 soal demo, jadi pada basis
+    data yang SAMA SEKALI belum disemai bank ini, kartunya tetap berbunyi "sudah tersemai"
+    dan tombolnya berubah menjadi "Semai ulang". Guru yang percaya kepadanya tidak pernah
+    menekan tombol yang sebenarnya belum pernah dijalankan.
+
+    Yang ditanyakan kartu itu adalah "apakah BANK INI sudah masuk", dan satu-satunya
+    jawaban jujurnya dihitung dari butir yang ditulis penyemai ini sendiri.
+    """
     total = await db.questions.count_documents({"is_current": True})
     terbit = await db.questions.count_documents({"is_current": True, "status": "PUBLISHED"})
+    dari_penyemai = await db.questions.count_documents({"is_current": True, "source": "seed-soal"})
     komp_total = await db.curriculum_nodes.count_documents({"type": "competency"})
     berisi = len(await db.questions.distinct("competency_id", {"is_current": True}))
-    return {"seeded": terbit > 0, "questions": total, "published": terbit,
+    return {"seeded": dari_penyemai > 0, "questions": total, "published": terbit,
+            "from_this_seeder": dari_penyemai,
             "competencies_with_questions": berisi, "competencies_total": komp_total,
             "in_this_wave": sum(len(v) for v in SOAL.values())}

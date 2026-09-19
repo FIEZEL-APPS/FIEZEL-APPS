@@ -28,6 +28,7 @@
     'kurikulum.mapel-ajakan': 'Tujuh belas mata pelajaran Fase A–F: Matematika, B.Indonesia, Pancasila, IPAS, IPA, IPS, Sejarah, Informatika, Fisika, Kimia, Biologi, Ekonomi, Sosiologi, Geografi, PJOK, Seni Budaya, Prakarya. 210 tujuan pembelajaran, 420 kompetensi, lengkap materi ajar dan prasyarat antar kelas.',
     'kurikulum.mapel-selesai': 'Mata pelajaran Kelas 1–12 tersemai.',
     'kurikulum.soal-judul': 'Bank soal',
+    'kurikulum.soal-sudah': 'Sudah tersemai: {n} soal, mencakup {k} dari {total} kompetensi.',
     'kurikulum.soal-ajakan': 'Soal pilihan ganda berpembahasan, berpetunjuk, dan berpeta miskonsepsi — inilah yang membuat kompetensi bisa dilatih, bukan sekadar dilihat. Semai kurikulumnya lebih dulu.',
     'kurikulum.soal-selesai': 'Bank soal tersemai.',
     'kurikulum.semai-memeriksa': 'Memeriksa isi bank kurikulum…'
