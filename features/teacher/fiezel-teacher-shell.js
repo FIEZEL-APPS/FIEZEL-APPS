@@ -79,7 +79,16 @@
   /* Lembar akun hidup di app.js dan sudah dipasang di window. Ruang Guru memanggilnya
      lewat satu pintu ini supaya tidak ada dua salinan alur masuk. */
   function openAccount(mode) {
-    try { if (typeof root.openAccountSheet === 'function') { root.openAccountSheet(mode || 'login'); return true; } } catch (_) {}
+    try {
+      if (typeof root.openFiezelAuthModal === 'function') {
+        root.openFiezelAuthModal(mode || 'login');
+        return true;
+      }
+      if (typeof root.openAccountSheet === 'function') {
+        root.openAccountSheet(mode || 'login');
+        return true;
+      }
+    } catch (_) {}
     toast('Lembar akun belum siap — muat ulang aplikasi lalu coba lagi.');
     return false;
   }
@@ -2482,15 +2491,50 @@
              (root.FiezelAccount && root.FiezelAccount.state && root.FiezelAccount.state() && root.FiezelAccount.state().role === 'teacher');
     } catch (_) { return false; }
   }
+  function performTeacherLogout() {
+    persist();
+    try { localStorage.removeItem('fz_teacher_mode'); } catch(_) {}
+    try { sessionStorage.removeItem('fz-teacher-preview'); } catch(_) {}
+    try { sessionStorage.removeItem('fiezel-teacher-v1-preview'); } catch(_) {}
+    exitPreview();
+    previewOn = false;
+    if (root.state && root.state.preferences) {
+      root.state.preferences.role = 'murid';
+      root.state.view = 'home';
+      try { root.save?.(); } catch(_) {}
+    }
+    unmount();
+
+    var doLogout = (root.FiezelAccount && root.FiezelAccount.logout)
+      ? root.FiezelAccount.logout()
+      : Promise.resolve();
+
+    return doLogout.finally(function () {
+      try { localStorage.removeItem('fz_teacher_mode'); } catch(_) {}
+      if (root.state && root.state.preferences) {
+        root.state.preferences.role = 'murid';
+        root.state.view = 'home';
+        try { root.save?.(); } catch(_) {}
+      }
+      if (typeof root.go === 'function') {
+        root.go('home');
+      } else if (typeof root.render === 'function') {
+        root.render();
+      }
+      setTimeout(function () {
+        try {
+          if (typeof root.openFiezelAuthModal === 'function') {
+            root.openFiezelAuthModal('teacher');
+          } else if (typeof root.openAccountSheet === 'function') {
+            root.openAccountSheet('teacher');
+          }
+        } catch (_) {}
+      }, 150);
+    });
+  }
   function exit(opts) {
     if (isTeacherRole()) {
-      if (confirm('Keluar dari akun guru?')) {
-        if (root.FiezelAccount && root.FiezelAccount.logout) {
-          root.FiezelAccount.logout().then(function () {
-            location.reload();
-          });
-        }
-      }
+      performTeacherLogout();
       return;
     }
     unmount();
@@ -2498,6 +2542,9 @@
       env.exit(opts);
     } else if (opts && opts.target === 'landing') {
       try { location.href = '../#hero'; } catch (_) {}
+    } else {
+      if (typeof root.go === 'function') root.go('home');
+      else if (typeof root.render === 'function') root.render();
     }
   }
 
@@ -3143,22 +3190,7 @@
       case 'demo-exit': exitPreview(); previewOn = false; exit({ target: 'landing' }); return;
       case 'demo-activate': openAccount('teacher'); return;
       case 'logout':
-        persist();
-        if (confirm('Keluar dari akun guru?')) {
-          try { localStorage.removeItem('fz_teacher_mode'); } catch(_) {}
-          if (root.state && root.state.preferences) {
-            root.state.preferences.role = 'murid';
-            root.state.view = 'home';
-            try { root.save?.(); } catch(_) {}
-          }
-          if (root.FiezelAccount && root.FiezelAccount.logout) {
-            root.FiezelAccount.logout().then(function () {
-              location.reload();
-            });
-          } else {
-            exit();
-          }
-        }
+        performTeacherLogout();
         return;
       case 'sync': syncAll(false); return;
       case 'inbox': ui.inbox = !ui.inbox; if (ui.inbox) { T.inboxMarkAllRead(st); } break;
