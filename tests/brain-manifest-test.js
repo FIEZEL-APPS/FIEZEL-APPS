@@ -13,7 +13,7 @@ const __fzRoot = require('path').join(__dirname, '..'); /* m025-254: berkas ini 
  *   - versi bundle & minAppVersion harus bisa diparse semver-ish (kalau tidak,
  *     tidak ada yang bisa membandingkan dua bundle);
  *   - setiap entri otoritas hanya boleh 'active' | 'shadow' | 'off';
- *   - klaim otoritas kunci harus sesuai temuan council (memory aktif, BKT bayangan);
+ *   - klaim otoritas kunci harus sesuai wiring nyata (memory aktif, BKT aktif sejak m025-330);
  *   - seluruh manifest benar-benar beku sampai ke dalam.
  */
 const assert = require('assert');
@@ -68,12 +68,14 @@ test('bundleVersion dan minAppVersion bisa diparse semver-ish', () => {
   assert.ok(SEMVERISH.test(manifest.minAppVersion), 'minAppVersion tidak semver-ish: ' + manifest.minAppVersion);
 });
 
-test('bundleVersion 3.8.0 (pelapor rantai konten masuk bundle, masih off)', () => {
+test('bundleVersion 3.9.0 (bktUnlock shadow -> active, m025-330)', () => {
   // Literal ini sengaja dipatok, bukan dilonggarkan jadi pola semver: gunanya memaksa
   // perubahan versi bundle menjadi keputusan SADAR yang ikut dalam diff, bukan efek
   // samping. 3.0.0 -> 3.1.0 karena peta otoritas bergerak (Langkah 1 roadmap otonomi:
   // stepTutor/productionGrader diakui aktif, retentionProbe/learningMetrics jadi shadow).
-  assert.strictEqual(manifest.bundleVersion, '3.8.0');
+  // 3.8.0 -> 3.9.0: bktUnlock bergerak lagi, shadow -> active (permintaan OWNER "BKT nya
+  // jangan di bekukan" — otoritas dibuka, parameter BKT sendiri tetap beku).
+  assert.strictEqual(manifest.bundleVersion, '3.9.0');
 });
 
 test('minAppVersion sama dengan FIEZEL_VERSION di version.js (dibaca, bukan dikarang)', () => {
@@ -99,9 +101,14 @@ test('setiap modul menunjuk authorityKey yang benar-benar ada di authorityMap', 
   }
 });
 
-test('klaim otoritas kunci sesuai temuan council: memory aktif, bktUnlock bayangan', () => {
+test('klaim otoritas kunci: memory aktif, bktUnlock aktif sejak m025-330', () => {
+  // Sampai m025-330 baris kedua berbunyi 'shadow', sesuai temuan council waktu itu.
+  // OWNER meminta otoritas BKT dibuka (parameter L0/T/slip/guess TETAP beku — itu
+  // keputusan terpisah, BRAIN-EVOLUTION-DECISIONS.md §5); wiring nyatanya diuji gate
+  // "otoritas off DITURUNKAN dari permukaan aplikasi" di bawah, yang mengukur app.js
+  // langsung alih-alih menghafal klaim ini.
   assert.strictEqual(manifest.authorityMap.memory, 'active');
-  assert.strictEqual(manifest.authorityMap.bktUnlock, 'shadow');
+  assert.strictEqual(manifest.authorityMap.bktUnlock, 'active');
 });
 
 test('otoritas off DITURUNKAN dari permukaan aplikasi, bukan dihafal sebagai literal', () => {
