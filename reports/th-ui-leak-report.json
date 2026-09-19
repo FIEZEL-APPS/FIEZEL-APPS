@@ -1,6 +1,6 @@
 {
   "schema": "fiezel-th-ui-leak-v1",
-  "generatedAt": "2026-09-19T17:14:19.880Z",
+  "generatedAt": "2026-09-19T17:52:40.386Z",
   "files": {
     "app.js": {
       "leaks": 3,
@@ -403,15 +403,15 @@
       "budget": 3,
       "sample": [
         {
-          "line": 2576,
+          "line": 2618,
           "text": "Akurasi"
         },
         {
-          "line": 2593,
+          "line": 2635,
           "text": "Latihan ·"
         },
         {
-          "line": 2930,
+          "line": 2972,
           "text": "📖 Kosakata Kunci:"
         }
       ]
@@ -464,8 +464,8 @@
     }
   },
   "copyKeys": {
-    "id": 2843,
-    "th": 2845,
+    "id": 2844,
+    "th": 2846,
     "idTanpaTh": 0
   },
   "pass": true
