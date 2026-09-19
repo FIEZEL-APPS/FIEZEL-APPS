@@ -329,6 +329,29 @@ button{margin-top:10px;padding:11px 16px;font-size:15px;font-weight:700;border:1
             <option value="365">365 Hari (1 Tahun)</option>
           </select>
         </div>
+        <div>
+          <label for="f_subject" style="display:block;font-size:12px;font-weight:bold;margin-bottom:4px;color:var(--ink);">Mata Pelajaran yang Diampu</label>
+          <select id="f_subject" name="subject_id" style="width:100%;box-sizing:border-box;">
+            <option value="MAT" selected>Matematika</option>
+            <option value="ENG">Bahasa Inggris</option>
+            <option value="IPA">Ilmu Pengetahuan Alam (IPA)</option>
+            <option value="IPS">Ilmu Pengetahuan Sosial (IPS)</option>
+            <option value="IND">Bahasa Indonesia</option>
+            <option value="INF">Informatika</option>
+            <option value="PKN">Pendidikan Pancasila</option>
+            <option value="SD-ALL">Guru Kelas SD (Tematik)</option>
+            <option value="ALL">Semua Mapel (Kurikulum/Kepsek)</option>
+          </select>
+        </div>
+        <div>
+          <label for="f_grade" style="display:block;font-size:12px;font-weight:bold;margin-bottom:4px;color:var(--ink);">Jenjang / Fase</label>
+          <select id="f_grade" name="grade_id" style="width:100%;box-sizing:border-box;">
+            <option value="SMP" selected>Fase D · SMP (Kelas 7–9)</option>
+            <option value="SMA">Fase E/F · SMA/SMK (Kelas 10–12)</option>
+            <option value="SD">Fase A–C · SD (Kelas 1–6)</option>
+            <option value="ALL">Semua Jenjang</option>
+          </select>
+        </div>
         <div style="grid-column:1/-1;text-align:right;margin-top:6px;">
           <button type="submit" style="background:var(--ink);color:#fff;padding:10px 20px;border:none;border-radius:6px;font-weight:bold;cursor:pointer;">+ Buat Token Guru</button>
         </div>
@@ -354,6 +377,7 @@ button{margin-top:10px;padding:11px 16px;font-size:15px;font-weight:700;border:1
               <th>Guru</th>
               <th>Sekolah / Instansi</th>
               <th>Jenis</th>
+              <th>Mapel &amp; Jenjang</th>
               <th>Status</th>
               <th>Dibuat (WIB)</th>
               <th>Berlaku Hingga</th>
@@ -365,6 +389,7 @@ button{margin-top:10px;padding:11px 16px;font-size:15px;font-weight:700;border:1
         <td><b>Mardhiana Hamzah</b></td>
         <td>MTsN 5 ACEH BESAR</td>
         <td>school</td>
+        <td><span style="background:#e0f2fe;color:#0369a1;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;">Matematika</span><small style="color:var(--muted);display:block;margin-top:2px;">Fase D (SMP Kelas 7–9)</small></td>
         <td><span style="background:#e8f5e9;color:#2e7d32;padding:2px 8px;border-radius:10px;font-weight:bold;font-size:11px;">AKTIF</span></td>
         <td>2026-09-13</td>
         <td>2026-12-11</td>
@@ -390,6 +415,7 @@ button{margin-top:10px;padding:11px 16px;font-size:15px;font-weight:700;border:1
               <th>Nama Guru</th>
               <th>Sekolah / Instansi</th>
               <th>Jenis</th>
+              <th>Mapel &amp; Jenjang</th>
               <th>Status</th>
               <th>Aktivasi (WIB)</th>
             </tr>
@@ -400,6 +426,7 @@ button{margin-top:10px;padding:11px 16px;font-size:15px;font-weight:700;border:1
         <td><b>Mardhiana Hamzah</b></td>
         <td>MTsN 5 ACEH BESAR</td>
         <td>school</td>
+        <td><span style="background:#e0f2fe;color:#0369a1;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;">Matematika</span><small style="color:var(--muted);display:block;margin-top:2px;">Fase D (SMP Kelas 7–9)</small></td>
         <td><span style="background:#e8f5e9;color:#2e7d32;padding:2px 8px;border-radius:10px;font-weight:bold;font-size:11px;">active</span></td>
         <td>2026-09-13</td>
       </tr>
