@@ -2065,13 +2065,34 @@
   }
 
 
+  function isFzEngineValid(eng) {
+    return !!(
+      eng &&
+      typeof eng === 'object' &&
+      eng.curriculum &&
+      typeof eng.curriculum.tree === 'function' &&
+      eng.seed &&
+      typeof eng.seed.mapel === 'function' &&
+      typeof eng.seed.mapelStatus === 'function'
+    );
+  }
+
   function ensureFzEngine() {
-    if (root.FZEngine) return Promise.resolve(root.FZEngine);
+    if (isFzEngineValid(root.FZEngine)) return Promise.resolve(root.FZEngine);
     return new Promise(function (resolve, reject) {
       var s = document.createElement('script');
-      s.src = './features/curriculum/fz-api.js';
-      s.onload = function () { resolve(root.FZEngine); };
-      s.onerror = function () { reject(new Error(t('guru.err-muat-fz-api', 'Gagal memuat modul mesin kurikulum.'))); };
+      var ver = root.FIEZEL_PAGE_BUILD || ('v' + Date.now());
+      s.src = './features/curriculum/fz-api.js?v=' + encodeURIComponent(ver);
+      s.onload = function () {
+        if (isFzEngineValid(root.FZEngine)) {
+          resolve(root.FZEngine);
+        } else {
+          reject(new Error(t('guru.err-fz-api-stale', 'Modul kurikulum di peramban belum mutakhir. Silakan muat ulang halaman.')));
+        }
+      };
+      s.onerror = function () {
+        reject(new Error(t('guru.err-muat-fz-api', 'Gagal memuat modul mesin kurikulum.')));
+      };
       document.head.appendChild(s);
     });
   }
@@ -2081,6 +2102,9 @@
     ui.curriculumError = null;
     render();
     ensureFzEngine().then(function (FZE) {
+      if (!isFzEngineValid(FZE)) {
+        throw new Error(t('guru.err-fz-api-stale', 'Modul kurikulum di peramban belum mutakhir. Silakan muat ulang halaman.'));
+      }
       var sId = subjectId || ui.curriculumSubject || 'MAT';
       var p = FZE.token() ? Promise.resolve() : FZE.login.kelasku().catch(function () {});
       return p.then(function () {
@@ -2096,7 +2120,7 @@
       render();
     }).catch(function (err) {
       ui.curriculumLoading = false;
-      ui.curriculumError = err.message || t('guru.err-muat-kurikulum', 'Gagal memuat kurikulum');
+      ui.curriculumError = (err && err.message) || t('guru.err-muat-kurikulum', 'Gagal memuat kurikulum');
       render();
     });
   }
@@ -2105,14 +2129,20 @@
     ui.seeding = true;
     render();
     ensureFzEngine().then(function (FZE) {
-      return FZE.seed.mapel();
+      if (!isFzEngineValid(FZE)) {
+        throw new Error(t('guru.err-fz-api-stale', 'Modul kurikulum di peramban belum mutakhir. Silakan muat ulang halaman.'));
+      }
+      var p = FZE.token() ? Promise.resolve() : FZE.login.kelasku();
+      return p.then(function () {
+        return FZE.seed.mapel();
+      });
     }).then(function (res) {
       ui.seeding = false;
       toast(t('guru.semai-mapel-sukses', 'Berhasil menyemai 17 mata pelajaran ke MongoDB!'));
       loadCurriculumTree(ui.curriculumSubject);
     }).catch(function (err) {
       ui.seeding = false;
-      toast(t('guru.err-seeding', 'Gagal seeding: ') + err.message);
+      toast(t('guru.err-seeding', 'Gagal seeding: ') + ((err && err.message) || err));
       render();
     });
   }
@@ -2121,14 +2151,20 @@
     ui.seeding = true;
     render();
     ensureFzEngine().then(function (FZE) {
-      return FZE.seed.english();
+      if (!isFzEngineValid(FZE)) {
+        throw new Error(t('guru.err-fz-api-stale', 'Modul kurikulum di peramban belum mutakhir. Silakan muat ulang halaman.'));
+      }
+      var p = FZE.token() ? Promise.resolve() : FZE.login.kelasku();
+      return p.then(function () {
+        return FZE.seed.english();
+      });
     }).then(function (res) {
       ui.seeding = false;
       toast(t('guru.semai-english-sukses', 'Berhasil menyemai Bahasa Inggris ke MongoDB!'));
       loadCurriculumTree(ui.curriculumSubject);
     }).catch(function (err) {
       ui.seeding = false;
-      toast(t('guru.err-seeding', 'Gagal seeding: ') + err.message);
+      toast(t('guru.err-seeding', 'Gagal seeding: ') + ((err && err.message) || err));
       render();
     });
   }
@@ -2137,14 +2173,20 @@
     ui.seeding = true;
     render();
     ensureFzEngine().then(function (FZE) {
-      return FZE.seed.soal();
+      if (!isFzEngineValid(FZE)) {
+        throw new Error(t('guru.err-fz-api-stale', 'Modul kurikulum di peramban belum mutakhir. Silakan muat ulang halaman.'));
+      }
+      var p = FZE.token() ? Promise.resolve() : FZE.login.kelasku();
+      return p.then(function () {
+        return FZE.seed.soal();
+      });
     }).then(function (res) {
       ui.seeding = false;
       toast(t('guru.semai-soal-sukses', 'Berhasil menyemai Bank Soal ke MongoDB!'));
       loadCurriculumTree(ui.curriculumSubject);
     }).catch(function (err) {
       ui.seeding = false;
-      toast(t('guru.err-seeding', 'Gagal seeding: ') + err.message);
+      toast(t('guru.err-seeding', 'Gagal seeding: ') + ((err && err.message) || err));
       render();
     });
   }
