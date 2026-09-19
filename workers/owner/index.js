@@ -2882,7 +2882,7 @@ function renderTeacherSection(m) {
   }).join('');
 
   const classSection = `
-    <div id="class-panel" style="background:var(--card-bg);border:2px solid var(--card-border-hover);border-radius:14px;padding:20px;margin-bottom:24px;box-shadow:var(--shadow-sm);">
+    <div id="class-panel" style="scroll-margin-top:80px;background:var(--card-bg);border:2px solid var(--card-border-hover);border-radius:14px;padding:20px;margin-bottom:24px;box-shadow:var(--shadow-sm);">
       <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;margin-bottom:16px;border-bottom:1px solid var(--card-border);padding-bottom:12px;">
         <div>
           <h3 style="margin:0;font-size:17px;font-weight:800;color:var(--text-main);display:flex;align-items:center;gap:8px;">
@@ -3212,7 +3212,7 @@ function renderTeacherSection(m) {
 
   return `
     <section>
-      <span class="card-full-inner" id="teachers"></span>
+      <span class="card-full-inner" id="teachers" style="scroll-margin-top:80px;display:block;"></span>
       <h2><span>${ICONS.teacher} Kelola Token &amp; Undangan Guru</span><span class="section-badge">Manajemen Akses</span></h2>
       ${alertBanner}
       ${classSection}
@@ -3367,7 +3367,11 @@ function renderDashboard(m) {
           <span class="sidebar-text">Kualitas Data</span>
         </a>
 
-        <div class="sidebar-heading">ADMINISTRASI</div>
+        <div class="sidebar-heading">ADMINISTRASI &amp; KELAS</div>
+        <a href="#class-panel" class="sidebar-link">
+          <span class="sidebar-icon">🏫</span>
+          <span class="sidebar-text">Panel Kelas (17 Mapel)</span>
+        </a>
         <a href="#teachers" class="sidebar-link">
           <span class="sidebar-icon">${ICONS.teacher}</span>
           <span class="sidebar-text">Token &amp; Guru</span>
