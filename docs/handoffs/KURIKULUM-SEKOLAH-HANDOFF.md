@@ -606,3 +606,190 @@ Perlu diketahui kalau keputusan ini kelak ditinjau ulang: `misi.html` MENAMPILKA
 kompetensi dan nama TP langsung ke murid (`learning-mission.js:202,218,220`). Jadi begitu
 murid Thai memakai jalur kurikulum, kekecualian ini berubah dari "tidak relevan" menjadi
 utang yang nyata.
+
+## m025-329 — mapel selain Inggris, dan dua utang yang menyertainya
+
+Owner meminta "lebih lengkap semua pelajaran, dan semua materi". Gelombang pertama masuk
+di `backend/seed_mapel.py` — Fase D (Kelas 7–9):
+
+| Mapel | Elemen | Kompetensi |
+|---|---|---|
+| Matematika | 5 | 32 |
+| Bahasa Indonesia | 4 | 24 |
+| Ilmu Pengetahuan Alam | 2 | 12 |
+| Ilmu Pengetahuan Sosial | 2 | 12 |
+| Pendidikan Pancasila | 4 | 24 |
+| **Total** | **17** | **104** |
+
+Mesinnya generik dan isinya tabel: menambah mapel berikutnya menambah DATA di `MAPEL`,
+bukan kode. Ini disengaja — versi per-mapel akan melahirkan sepuluh salinan logika
+penomoran id, perantaian prasyarat, dan pembuatan topik/materi.
+
+### Utang 1 — teks Capaian Pembelajaran BUKAN salinan resmi
+
+Rumusan CP di `seed_mapel.py` adalah rumusan yang **setia pada isinya**, bukan salinan
+verbatim Kepmendikbudristek. Ia ditulis agar bisa dipakai mengajar dan agar graf
+kompetensinya sah; ia TIDAK bisa dikutip sebagai dokumen resmi.
+
+Syarat pelunasannya jelas: begitu FIEZEL dipakai di luar kelas owner sendiri, teks CP
+wajib diganti salinan resmi dari dokumen Kemendikbud. Utang ini disebut di kepala berkasnya
+juga, supaya pembaca kode menemukannya tanpa harus membaca handoff lebih dulu.
+
+Catatan pembeda yang penting: penyemai Bahasa Inggris (`seed_english.py`) punya batas yang
+sama dan menyebutnya sebagai "ringkas, sesuai rumusan Kurikulum Merdeka". Jadi ini bukan
+kompromi baru — ia kompromi lama yang sekarang ditulis terang-terangan.
+
+### Utang 2 — kompetensi tanpa soal adalah pohon, bukan pelajaran
+
+Ini yang paling penting untuk sesi berikutnya, dan angkanya diukur bukan dikira:
+
+```
+kompetensi demo (seed.py)          :  11  ->  7 punya soal (21 soal)
+kompetensi Inggris (seed_english)  : 144  ->  0 punya soal
+kompetensi mapel  (seed_mapel)     : 104  ->  0 punya soal
+```
+
+Mesin belajar mengambil soal dari `db.questions`. Untuk 248 kompetensi itu banknya KOSONG,
+jadi murid bisa melihat strukturnya dan tidak bisa berlatih satu pun di atasnya.
+
+Dan generatornya tidak menyelamatkan: `POST /api/questions/generate-candidates` membuat
+VARIASI dari soal yang sudah ada. Kalau sebuah kompetensi belum punya soal sama sekali, ia
+jatuh ke cabang `else` dan menghasilkan satu soal esai generik ("Jelaskan dengan kalimatmu
+sendiri: …"). Berguna sebagai benih, bukan sebagai bank.
+
+Kesimpulan yang perlu dipegang sesi berikutnya: **menambah mata pelajaran tanpa menambah
+soal memperbesar pohon yang sama kosongnya.** Urutan yang benar adalah mengisi bank soal
+lebih dulu — itulah yang mengubah kurikulum dari struktur menjadi pelajaran.
+
+### m025-329 lanjutan — bank kurikulum lengkap Kelas 1–12, dan satu mapel yang SENGAJA ditahan
+
+Sesudah tiga gelombang, `seed_mapel.py` + `seed_english.py` berisi:
+
+| | Jumlah |
+|---|---|
+| Mata pelajaran | **18** |
+| Jenjang | Kelas 1–12 (Fase A–F) |
+| Tujuan Pembelajaran | 282 |
+| Kompetensi | **564** |
+| Materi ajar | **564** |
+
+Daftar kelas sengaja berbeda antar mapel, dan tiap perbedaannya adalah keputusan:
+
+* **IPAS** hanya Kelas 3–6 — di SMP ia pecah menjadi IPA dan IPS yang sudah ada, dan
+  Fase A tidak punya IPAS sebagai mapel terpisah.
+* **Fisika, Kimia, Biologi, Ekonomi, Sosiologi, Geografi** hanya Kelas 11–12 — di Fase E
+  muatannya masih menyatu sebagai IPA/IPS terpadu. Menambah Fisika Kelas 10 akan membuat
+  dua tempat mengajarkan hal yang sama dan cakupan kurikulum menghitungnya dua kali.
+* **Prakarya** mulai Kelas 7 — di SD muatan serupa menyatu dalam Seni Budaya dan IPAS.
+
+### PENDIDIKAN AGAMA: ditahan, menunggu keputusan owner
+
+Ia TIDAK ada di tabel, dan itu keputusan sadar yang perlu dihormati sesi berikutnya.
+Isinya berbeda untuk tiap agama (Islam, Kristen, Katolik, Hindu, Buddha, Khonghucu), dan
+menulis materi keagamaan tanpa arahan owner bukan keputusan yang boleh diambil penyemai —
+salah menulisnya bukan sekadar cacat data, ia menyinggung keyakinan murid.
+
+Yang dibutuhkan sebelum ia bisa ditambahkan: owner menyebut agama mana yang diajarkan di
+kelasnya, dan sebaiknya memeriksa sendiri rumusan CP-nya. Sampai itu ada, ketiadaannya
+adalah jawaban yang benar, bukan pekerjaan yang terlupakan.
+
+---
+
+## m025-330 — BANK SOAL: struktur berubah menjadi pelajaran
+
+Sesudah kurikulumnya lengkap, owner masih tidak bisa memakainya, dan sebabnya diukur
+bukan dikira:
+
+```
+kompetensi demo (seed.py)          :  11  ->  7 punya soal (21 soal)
+kompetensi Inggris (seed_english)  : 144  ->  0 punya soal
+kompetensi mapel  (seed_mapel)     : 420  ->  0 punya soal
+```
+
+Mesin belajar mengambil soal dari `db.questions`. Kompetensi tanpa soal adalah simpul yang
+bisa dilihat guru di pohon kurikulum dan TIDAK PERNAH bisa dilatih murid. Struktur lengkap
+tanpa bank soal adalah daftar isi tanpa bukunya.
+
+`POST /api/questions/generate-candidates` tidak menutup celah ini, dan itu bukan
+kekurangannya: ia membuat VARIASI dari soal yang sudah terbit. Kompetensi yang belum punya
+satu soal pun jatuh ke cabang `else` dan menghasilkan satu esai generik. Berguna sebagai
+benih sesudah ada isinya; tidak bisa menciptakan bank dari nol.
+
+Jadi soalnya ditulis. `backend/seed_soal.py`, sepuluh gelombang, **705 butir**:
+
+| Gelombang | Isi | Kompetensi |
+|---|---|---|
+| 1–8 | Bahasa Inggris Kelas 1–12 — TUNTAS | 144 |
+| 9 | Matematika Kelas 7 | 12 |
+| 10 | Matematika Kelas 8–9 | 20 |
+
+**392 kompetensi masih kosong**, seluruhnya mapel non-Inggris. Mesin, gerbang, dan bentuk
+butirnya sudah terbukti; yang tersisa menulis isinya.
+
+### Cara memverifikasi gelombang berikutnya — JANGAN dilewati
+
+Penyemai membuang duplikat berdasarkan `stem`. Artinya butir yang stem-nya kembar TIDAK
+PERNAH masuk basis data, tanpa satu pun galat dan tanpa satu pun gerbang merah. Terjadi
+sungguhan pada gelombang 2: tabel berisi 96 butir, yang masuk 95. Ditemukan HANYA karena
+jumlah di tabel dibandingkan dengan jumlah yang benar-benar masuk.
+
+Maka tiap gelombang diverifikasi terhadap MongoDB sungguhan dengan membandingkan keduanya:
+
+```
+di tabel 705 | masuk 705 | selisih 0 | kompetensi 176 | yatim []
+error: 0 | warn: 0
+```
+
+`selisih` harus nol. `yatim` (kompetensi yang belum ada di graf) harus kosong — penyemai
+menolak menulis soal yatim dan melaporkannya di `missing_competencies`, karena soal yang
+menunjuk kompetensi tak-ada masuk basis data, tidak pernah terambil sesi mana pun, dan
+tidak ada yang merah karenanya.
+
+### `norm_option()` — aturan opsi identik yang selama ini keliru untuk matematika
+
+`duplicate_options` di `questions.py` memakai `norm_stem()`, yang membuang SEMUA karakter
+bukan huruf/angka. Untuk identitas PERTANYAAN itu benar: "Hitunglah: -7 + 12" dan
+"Hitunglah -7 + 12" memang soal yang sama, dan penyemai yang dijalankan dua kali tidak
+boleh menggandakannya. Untuk OPSI JAWABAN aturan itu justru terbalik, karena persis di
+karakter itulah letak jawabannya:
+
+```
+5        vs  -5          beda TANDA
+x - 7    vs  x + 7       beda OPERASI
+40 cm    vs  40 cm²      beda DIMENSI (keliling vs luas)
+Lets go  vs  Let's go    beda EJAAN — dan itu yang diuji soal mekanika
+```
+
+Selama banknya hanya berisi bahasa Inggris, cacat ini tidak pernah terlihat. Gelombang
+Matematika langsung menabraknya sembilan kali. Peringatan yang selalu salah mengajari
+pembacanya mengabaikan peringatan, jadi yang diperbaiki aturannya, bukan soalnya:
+`norm_option()` hanya menyamakan SPASI.
+
+Kapital pun tidak disamakan, dan itu aturan yang sama sekali lagi. Rancangan pertama
+`norm_option()` masih menurunkan hurufnya, dan draf gelombang Bahasa Indonesia Kelas 1
+langsung menabraknya: pada "Penulisan nama diri yang benar adalah ...", pilihannya
+memang `Ani`, `ani`, `ANi`, `aNi` — huruf kapital itulah SELURUH isi soalnya. Ditemukan
+sebelum masuk repo karena drafnya diperiksa lebih dulu dengan aturan gerbangnya sendiri.
+Batasnya satu kalimat: **yang disamakan hanya yang tidak terlihat murid.** Spasi tidak
+terlihat; kapital, tanda baca, dan tanda minus terlihat.
+
+Gerbang `curriculum-seed-reachable` (kini **31 penegasan**) menjaga keduanya tetap satu
+aturan: ia menuntut `questions.py` tetap memakai `norm_option` untuk `duplicate_options`,
+menolak `norm_option` yang diam-diam kembali membuang non-alfanumerik, dan menolak
+`norm_option` yang kembali menurunkan huruf. Tanpa ketiganya, cacatnya bisa kembali lewat
+pintu lain sementara gerbangnya tetap hijau.
+
+### Bank demo dan bank isi tidak boleh menulis soal yang sama
+
+Dua butir gelombang 9 menulis ulang soal yang sudah ada di `seed.py`, hanya beda titik dua.
+Backend menandainya `duplicate_question`, dan benar: satu soal yang sama duduk di dua
+kompetensi, jadi murid yang sudah mengerjakannya di satu tempat mengerjakannya lagi di
+tempat lain seolah materi baru. Angkanya diganti, dan larangannya kini dijaga gerbang.
+
+### Utang yang dibawa gelombang berikutnya
+
+* 392 kompetensi belum bersoal — daftar lengkapnya bisa dibangkitkan ulang dengan
+  membandingkan `db.curriculum_nodes` (type `competency`) dengan
+  `db.questions.distinct("competency_id")`.
+* Pendidikan Agama tetap ditahan sesuai catatan m025-329 di atas; kompetensinya belum ada,
+  jadi soalnya pun belum bisa ditulis.
