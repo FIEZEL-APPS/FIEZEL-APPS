@@ -3367,6 +3367,33 @@ function bktRecord(q,ok,kappa,boost=1){
   // jadwal; guard di dalamnya membuat perilaku tanpa modul persis seperti sebelum ini.
   retentionProbeSync(Date.now(),lesson);
 }
+/** Lesson pilihan frontier ZPD di antara kandidat yang SUDAH terbuka, atau '' (m025-337).
+ *
+ *  frontier() menyaring dua kali: semua prasyarat lesson harus lolos gerbang mastery BKT,
+ *  DAN peluang benar yang diprediksi model kemampuan harus ada di jendela 0,55-0,90 -
+ *  terlalu mudah tidak mengajarkan apa pun, terlalu sulit hanya mengajarkan rasa gagal.
+ *  Keluarannya sudah terurut menurun pada prediksi, jadi kandidat pertama yang juga ada di
+ *  daftar terbuka adalah yang paling dekat dengan kesiapan penuh.
+ *
+ *  Fungsi ini TIDAK PERNAH memperluas kandidat: ia hanya boleh memilih dari `openIds` yang
+ *  penentu bukanya tetap lessonUnlockState(). Modul absen, model kemampuan belum terbaca,
+ *  atau nol perpotongan = '' = pemanggil memakai urutan kurikulum seperti sebelumnya. */
+function zpdFrontierPick(openIds){
+  const B=self.FiezelMasteryBKT,brain=self.FiezelCoreBrain;
+  const open=Array.isArray(openIds)?openIds.filter(Boolean).map(String):[];
+  if(!open.length||!B||typeof B.frontier!=='function')return '';
+  if(!brain||typeof brain.successProbability!=='function')return '';
+  try{
+    const ability=coreBrainSnapshot()?.ability?.ability;
+    if(!Number.isFinite(ability))return '';
+    // predictFn yang SAMA dengan panel BKT: kesulitan lesson dibaca dari level kurikulumnya
+    // lewat model kemampuan yang juga memilih soal - bukan taksiran kedua yang bisa berbeda.
+    const predict=lesson=>{const li=LEVELS.indexOf(String(grammarCurriculumEntry(lesson)?.level||''));return brain.successProbability(ability,li>=0?li+1:ability)};
+    const openSet=new Set(open);
+    const hit=(B.frontier(bktRead(),GRAMMAR_CURRICULUM,predict)||[]).find(f=>openSet.has(String(f?.lesson)));
+    return hit?String(hit.lesson):'';
+  }catch{return ''}
+}
 /** Skill yang BKT sudah yakin dikuasai (L>=0,95, n>=5 - masteryGate() bawaan modul).
  *  Dipakai lessonUnlockState() sebagai jalur TAMBAHAN menuju unlock (m025-337, otoritas
  *  BKT): hanya perlu menyapu lesson yang punya catatan BKT, karena lesson tak dikenal
@@ -3399,6 +3426,38 @@ function confusionMatrixRecord(q,selectedIndex){
   confusionMatrixWrite(self.FiezelConfusionMatrix.record(confusionMatrixRead(),{
     activeLesson:active,activeFamily:fam(active),sourceLesson:source,sourceFamily:fam(source),picked:true,correct:false
   },Date.now()));
+}
+/** Kebingungan terkuat yang LAYAK ditindaklanjuti, atau null (m025-337: confusionMap naik
+ *  dari bayangan ke aktif). Sampai perubahan ini matriksnya dicatat tiap jawaban salah lalu
+ *  hanya dipajang di panel diagnostik; tidak ada satu keputusan pun yang bergantung padanya.
+ *
+ *  Ambangnya milik modul (min 3 bukti per sel) DITAMBAH syarat share: sel yang cuma
+ *  memegang sebagian kecil kebingungan pada barisnya berarti murid salah ke mana-mana -
+ *  itu "belum paham lesson ini", bukan "menukar dengan lesson itu". Hanya substitusi
+ *  TERARAH yang boleh menyalakan kartu remediasi, karena kartu yang menuduh pasangan yang
+ *  salah lebih buruk daripada kartu yang diam. */
+const CONFUSION_REMEDIATION_MIN_SHARE=.34;
+function confusionRemediationTarget(){
+  const M=self.FiezelConfusionMatrix;
+  if(!M||typeof M.topConfusions!=='function')return null;
+  try{
+    const rows=M.topConfusions(confusionMatrixRead())||[];
+    /* Kartunya MENGETUK ke openGrammarLesson(), dan pintu itu menolak lesson di luar level
+       aktif maupun yang masih terkunci prasyarat. Kartu yang ketukannya cuma memunculkan
+       toast penolakan lebih buruk daripada tidak ada kartu, jadi kandidat yang tidak bisa
+       dibuka murid SAAT INI disaring di sini - bukan diserahkan ke pintunya. */
+    const bisaDibuka=id=>{
+      try{
+        if((GRAMMAR_ITEMS.find(x=>x.skill===id)?.level||'')!==getActiveLevel())return false;
+        return !lessonUnlockState(id,state,bktMasteredSkills()).locked;
+      }catch{return false}
+    };
+    const top=rows.find(r=>Number(r?.share)>=CONFUSION_REMEDIATION_MIN_SHARE&&bisaDibuka(r?.from));
+    if(!top)return null;
+    // Pasangan yang namanya tidak bisa dibaca murid tidak layak jadi kartu.
+    if(!friendlySkillName(top.from)||!friendlySkillName(top.to))return null;
+    return{from:String(top.from),to:String(top.to),count:Number(top.count)||0,share:Number(top.share)||0,persen:Math.round((Number(top.share)||0)*100)};
+  }catch{return null}
 }
 /* ---- Langkah 1 roadmap otonomi: SENSOR JANGKA PANJANG -------------------------------
  *
@@ -7583,6 +7642,24 @@ function aiBoosterTerlemah(){
   return {key:x.key,view:x.view,akurasi:Math.round((x.benar/x.total)*100)};
 }
 function aiBoosterCard(){
+  /* m025-337: kartu ini dulu HANYA melihat akurasi mentah - "skill mana yang paling sering
+     salah". Matriks kebingungan tahu sesuatu yang lebih tajam: BUKAN cuma di mana murid
+     salah, melainkan aturan lesson MANA yang ia pakai menggantikannya. Kalau pasangan itu
+     cukup terarah, kartunya menyebut keduanya, karena "kamu menukar X dengan Y" bisa
+     ditindaklanjuti sedangkan "akurasimu di X 40%" tidak. Tanpa bukti kebingungan yang
+     layak, kartunya PERSIS seperti sebelum perubahan ini. */
+  const bingung=confusionRemediationTarget();
+  if(bingung){
+    const namaFrom=friendlySkillName(bingung.from),namaTo=friendlySkillName(bingung.to);
+    return `<div class="ai-booster-card" onclick="openGrammarLesson('${esc(bingung.from)}')">
+    <div>
+      <span class="ai-booster-tag"><i class="fz-i" data-fz-icon="flame" style="width:12px;height:12px"></i> ${esc(FiezelI18n.t('latihan.booster-tag-tertukar'))}</span>
+      <b style="display:block;font-size:13px;color:var(--text);margin:2px 0">${esc(namaFrom)}</b>
+      <small style="color:var(--muted);font-size:11px">${esc(FiezelI18n.t('latihan.booster-sub-tertukar',{lawan:namaTo,persen:bingung.persen}))}</small>
+    </div>
+    <button type="button" class="text-button" style="font-weight:700;color:var(--accent);font-size:12px">${esc(FiezelI18n.t('latihan.booster-cta'))} <i data-lucide="arrow-right"></i></button>
+  </div>`;
+  }
   const weak=aiBoosterTerlemah();
   if(!weak)return '';
   const nama=friendlySkillName(weak.key);
@@ -9915,9 +9992,18 @@ function grammar(){const level=getActiveLevel(),entries=grammarItemsForLevel(lev
       completed:mastery>=GRAMMAR_UNLOCK_MASTERY,
       examVerified:!touched&&!unlock.locked&&!!examEntry?.passed};
   });
-  // Node aktif = simpul pertama yang terbuka tapi belum menembus ambang unlock — pintu
-  // berikutnya di kurikulum. Jalur ter-scroll otomatis ke sana (lihat setTimeout di bawah).
-  const current=rows.find(r=>!r.unlock.locked&&!r.completed&&!r.examVerified)||null;
+  /* Node aktif = simpul yang terbuka tapi belum menembus ambang unlock — pintu berikutnya
+     di kurikulum. Jalur ter-scroll otomatis ke sana (lihat setTimeout di bawah).
+     m025-337: urutan kurikulum bukan lagi satu-satunya suara. Frontier ZPD milik BKT
+     (prasyarat lolos gerbang DAN peluang benar diprediksi 55-90%) sudah lama dihitung dan
+     hanya dipajang di panel diagnostik; kini ia boleh MEMILIH di antara simpul yang memang
+     sudah terbuka. Batasnya ketat dan disengaja: ia tidak pernah membuka simpul terkunci,
+     tidak pernah menambah kandidat, hanya mengurutkan ulang yang sudah sah. Tanpa BKT,
+     tanpa model kemampuan, atau tanpa perpotongan dengan simpul terbuka, `current` jatuh
+     ke pilihan lama - simpul pertama menurut urutan kurikulum. */
+  const openRows=rows.filter(r=>!r.unlock.locked&&!r.completed&&!r.examVerified);
+  const zpdPick=zpdFrontierPick(openRows.map(r=>r.k));
+  const current=(zpdPick&&openRows.find(r=>r.k===zpdPick))||openRows[0]||null;
   let lockNoteShown=false;
   const pathSteps=rows.map(r=>{
     const stateClass=r.unlock.locked?'is-locked':r.mastered?'is-mastered':r.completed?'is-completed':'is-available';
@@ -11309,6 +11395,26 @@ function dueTomorrowCount(now=Date.now()){
   }
   return n;
 }
+/** Vonis kalibrasi OLM yang LAYAK jadi nasihat, atau null (m025-337: olmInsight naik dari
+ *  bayangan ke aktif). summarize() sudah lama menghitung apakah murid terlalu pede atau
+ *  terlalu ragu dibanding kemampuan aslinya, lengkap dengan kalimatnya sendiri dalam dua
+ *  bahasa - tetapi kalimat itu hanya muncul di panel diagnostik yang jarang dibuka murid.
+ *
+ *  Yang dipakai HANYA nada 'overconfidence'/'underconfidence'. Nada 'netral' berarti
+ *  kalibrasi murid sudah sehat: tidak ada yang perlu dikoreksi, dan memunculkan nasihat
+ *  tanpa masalah membuat murid berhenti mempercayai nasihat berikutnya. Ambang bukti
+ *  (MIN_CALIBRATION_PAIRS) ditegakkan modul sendiri lewat status 'insufficient_data'. */
+function olmCalibrationNudge(now=Date.now()){
+  const O=self.FiezelOLM;
+  if(!O||typeof O.summarize!=='function')return null;
+  try{
+    const c=O.summarize(olmSummarizeInput(),now)?.calibration;
+    if(!c||c.status!=='ok')return null;
+    if(c.tone!=='overconfidence'&&c.tone!=='underconfidence')return null;
+    const pesan=String(c.message||'').trim();
+    return pesan?{tone:String(c.tone),message:pesan}:null;
+  }catch{return null}
+}
 function sessionSummaryMarkup(before,now=Date.now()){
   if(uxOff('sessionSummary'))return '';
   const gains=sessionMasteryGains(before),due=dueTomorrowCount(now);
@@ -11318,10 +11424,16 @@ function sessionSummaryMarkup(before,now=Date.now()){
   const besok=due>0
     ? `<p class="summary-due">${esc(FiezelI18n.t('ringkas.besok-item',{jumlah:due}))}</p>`
     : `<p class="muted">${FiezelI18n.t('ringkas.besok-kosong')}</p>`;
+  /* Kalibrasi hanya muncul kalau OLM benar-benar punya vonis yang bisa ditindaklanjuti;
+     kalimatnya datang dari naskah OLM (sudah dwibahasa), bukan dikarang ulang di sini. */
+  const kalibrasi=olmCalibrationNudge(now);
+  const blokKalibrasi=kalibrasi
+    ? `\n  <div class="summary-block summary-calib" data-tone="${esc(kalibrasi.tone)}"><b>${FiezelI18n.t('ringkas.kalibrasi')}</b><p class="muted">${esc(kalibrasi.message)}</p></div>`
+    : '';
   return `<section class="session-summary" aria-label="${esc(FiezelI18n.t('ringkas.aria'))}">
   <h3>${FiezelI18n.t('ringkas.judul')}</h3>
   <div class="summary-block"><b>${FiezelI18n.t('ringkas.naik')}</b>${naik}</div>
-  <div class="summary-block"><b>${FiezelI18n.t('ringkas.besok')}</b>${besok}</div>
+  <div class="summary-block"><b>${FiezelI18n.t('ringkas.besok')}</b>${besok}</div>${blokKalibrasi}
 </section>`;
 }
 function finishQuiz(cfg,score,total,tutorReport){

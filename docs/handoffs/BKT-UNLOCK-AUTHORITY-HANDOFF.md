@@ -86,6 +86,67 @@ membuat `lessonUnlockState()` berperilaku identik dengan sebelum perubahan ini �
 - Domain lain (Vocabulary, Reading, Listening, Speaking) belum punya BKT per-item/per-skill
   — otoritas yang baru dibuka ini murni jalur Grammar (satu-satunya domain dengan graf
   prasyarat lesson-ke-lesson hari ini).
-- `frontier()` (rekomendasi ZPD) masih tampilan-saja di panel diagnostik; belum dipakai
-  memilih soal di `buildAdaptivePool`. Itu perubahan otoritas terpisah, tidak diminta sesi
-  ini.
+
+---
+
+# Gelombang kedua (m025-337): tiga modul bayangan ikut memutuskan
+
+Permintaan owner sesudah gelombang pertama: *"apakah kamu bisa tingkatkan braincorenya
+lebih powerful lagi?"* — dijawab dengan pilihan tertulis (tiga modul bayangan), owner
+memilih **semuanya**. Bundle manifest naik `3.9.0` → `3.10.0`.
+
+Arah yang TIDAK diambil, dan alasannya tetap berlaku: model AI besar (DKT/transformer/LLM
+tutor), refit parameter dari data lokal, dan belajar lintas-murid semuanya sudah ditolak
+tertulis di `docs/BRAIN-EVOLUTION-DECISIONS.md` dengan argumen kuantitatif (N≈250 pengguna).
+"Lebih powerful" di sini karena itu berarti **menyalakan kecerdasan yang sudah dibayar tapi
+belum pernah dipakai**, bukan menambah mesin baru.
+
+| Modul | Sebelum | Sesudah |
+|---|---|---|
+| `confusionMap` | matriks dicatat tiap jawaban salah, hanya dipajang panel diagnostik | `confusionRemediationTarget()` memilih isi **kartu AI Booster**: pasangan lesson yang tertukar terarah menggantikan kartu akurasi-mentah |
+| `olmInsight` | vonis kalibrasi dihitung lengkap dengan kalimat dwibahasanya, hanya di panel teknis | `olmCalibrationNudge()` memunculkan **blok nasihat di ringkasan akhir sesi** saat nadanya overconfidence/underconfidence |
+| `bktUnlock` (frontier) | `frontier()` ZPD dihitung, hanya dipajang | `zpdFrontierPick()` **memilih simpul aktif jalur Grammar** di antara lesson yang sudah terbuka |
+
+## Tiga pagar yang dipasang sengaja
+
+1. **Tidak ada yang memperluas kandidat.** `zpdFrontierPick()` hanya boleh memilih dari
+   `openRows` yang penentu bukanya tetap `lessonUnlockState()`; ia tidak pernah membuka
+   simpul terkunci. Kartu remediasi hanya menautkan ke lesson yang memang ada namanya.
+2. **Ambang bukti di tiap pintu.** Kebingungan butuh ≥3 bukti per sel (ambang modul)
+   **dan** share ≥ 0,34 — salah yang menyebar rata berarti "belum paham lesson ini",
+   bukan "tertukar dengan lesson itu". Kalibrasi memakai ambang bukti modul sendiri, dan
+   nada `netral` sengaja TIDAK memunculkan nasihat: nasihat tanpa masalah membuat nasihat
+   berikutnya ikut diabaikan.
+3. **Fail-quiet, bukan fail-loud.** Modul absen, bukti tipis, state rusak, atau model
+   kemampuan belum terbaca → layar persis seperti sebelum m025-337. Tiap arah itu punya
+   assert-nya sendiri.
+
+## Bukti
+
+`tests/brain-authority-wave2-test.js` (15 assert, terdaftar di `quality.yml`) menjalankan
+fungsi produksi yang SUNGGUHAN di dalam `vm` di atas modul otak yang sungguhan
+(`require` dari `features/brain/`), bukan mencocokkan regex. Empat mutasi dibuktikan MERAH
+lebih dulu, lalu dipulihkan:
+
+| Mutasi | Assert yang merah |
+|---|---|
+| ambang share dilumpuhkan ke 0 | kebingungan yang menyebar rata tidak boleh menyalakan remediasi |
+| `aiBoosterCard` mengabaikan kebingungan | kartu harus menyebut KEDUA lesson |
+| `olmCalibrationNudge` menerima nada netral | kalibrasi sehat tidak boleh menambah blok |
+| `zpdFrontierPick` memilih kandidat pertama membabi buta | prediksi di luar jendela ZPD + jatuh ke urutan lama |
+
+## Catatan jujur: titik sambung frontier BUKAN yang semula saya sebut
+
+Saat menawarkan pilihan ini saya menulis frontier akan disambungkan ke `buildAdaptivePool`.
+Setelah membaca fungsinya, itu **salah tempat**: `buildAdaptivePool` melewati setiap materi
+yang `!b?.total` — ia kolam ULANGAN untuk yang sudah pernah disentuh, dan tidak pernah
+memperkenalkan lesson baru sama sekali. Yang benar-benar memutuskan "lesson mana
+berikutnya" adalah simpul aktif di hub Grammar, dan di situlah frontier dipasang.
+
+## Satu berkas asing yang ikut didaftarkan
+
+`tests/kelasku-17mapel-assignment-test.js` mendarat lewat merge `main` **tanpa pernah
+didaftarkan** di `quality.yml`, sehingga `gate-registry-test` merah di `main` sendiri dan
+tes itu tertulis tanpa pernah dijalankan CI. Ia didaftarkan di commit ini (23 assert, hijau
+saat didaftarkan) — bukan pelebaran ruang lingkup, melainkan syarat agar PR mana pun bisa
+hijau, dan efek sampingnya tes itu akhirnya benar-benar menjadi bukti.

@@ -68,14 +68,16 @@ test('bundleVersion dan minAppVersion bisa diparse semver-ish', () => {
   assert.ok(SEMVERISH.test(manifest.minAppVersion), 'minAppVersion tidak semver-ish: ' + manifest.minAppVersion);
 });
 
-test('bundleVersion 3.9.0 (bktUnlock shadow -> active, m025-337)', () => {
+test('bundleVersion 3.10.0 (confusionMap + olmInsight shadow -> active, m025-337)', () => {
   // Literal ini sengaja dipatok, bukan dilonggarkan jadi pola semver: gunanya memaksa
   // perubahan versi bundle menjadi keputusan SADAR yang ikut dalam diff, bukan efek
   // samping. 3.0.0 -> 3.1.0 karena peta otoritas bergerak (Langkah 1 roadmap otonomi:
   // stepTutor/productionGrader diakui aktif, retentionProbe/learningMetrics jadi shadow).
   // 3.8.0 -> 3.9.0: bktUnlock bergerak lagi, shadow -> active (permintaan OWNER "BKT nya
   // jangan di bekukan" — otoritas dibuka, parameter BKT sendiri tetap beku).
-  assert.strictEqual(manifest.bundleVersion, '3.9.0');
+  // 3.9.0 -> 3.10.0: gelombang kedua permintaan OWNER ("tingkatkan braincore lebih
+  // powerful") — confusionMap dan olmInsight ikut naik ke active.
+  assert.strictEqual(manifest.bundleVersion, '3.10.0');
 });
 
 test('minAppVersion sama dengan FIEZEL_VERSION di version.js (dibaca, bukan dikarang)', () => {
@@ -109,6 +111,11 @@ test('klaim otoritas kunci: memory aktif, bktUnlock aktif sejak m025-337', () =>
   // langsung alih-alih menghafal klaim ini.
   assert.strictEqual(manifest.authorityMap.memory, 'active');
   assert.strictEqual(manifest.authorityMap.bktUnlock, 'active');
+  // m025-337 gelombang kedua: keduanya dulu 'shadow'. Dipatok literal dengan alasan yang
+  // sama seperti bktUnlock — menurunkannya kembali ke 'shadow' harus jadi keputusan sadar
+  // yang terlihat di diff, bukan efek samping refactor.
+  assert.strictEqual(manifest.authorityMap.confusionMap, 'active');
+  assert.strictEqual(manifest.authorityMap.olmInsight, 'active');
 });
 
 test('otoritas off DITURUNKAN dari permukaan aplikasi, bukan dihafal sebagai literal', () => {
