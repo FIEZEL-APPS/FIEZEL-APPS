@@ -1,4 +1,4 @@
-# BKT: parameter tetap beku, otoritas unlock dibuka (m025-331)
+# BKT: parameter tetap beku, otoritas unlock dibuka (m025-337)
 
 Wewenang: OWNER. Permintaan persis: *"BKT nya jangan di bekukan."* Status: **selesai** —
 `bktUnlock` naik dari `shadow` ke `active` di `FiezelBrainManifest`, dibuktikan gate.
