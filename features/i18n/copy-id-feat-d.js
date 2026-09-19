@@ -348,6 +348,7 @@
     'guru.alasan-kunci-jawaban': 'Pilihan pertama merupakan jawaban yang paling tepat karena menjelaskan esensi capaian pembelajaran materi.',
     'guru.err-koneksi-worker': 'Koneksi Worker belum siap.',
     'guru.err-muat-fz-api': 'Gagal memuat modul mesin kurikulum.',
+    'guru.err-fz-api-stale': 'Modul kurikulum di peramban belum mutakhir. Silakan muat ulang halaman.',
     'guru.err-muat-kurikulum': 'Gagal memuat kurikulum',
     'guru.semai-mapel-sukses': 'Berhasil menyemai 17 mata pelajaran ke MongoDB!',
     'guru.err-seeding': 'Gagal seeding: ',
