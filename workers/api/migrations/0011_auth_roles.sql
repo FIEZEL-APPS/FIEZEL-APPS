@@ -93,7 +93,10 @@ CREATE TABLE IF NOT EXISTS teacher_invite (
   created_by TEXT NOT NULL,
   used_at INTEGER,
   used_by TEXT,
-  revoked_at INTEGER
+  revoked_at INTEGER,
+  subject_id TEXT,
+  grade_id TEXT,
+  raw_code TEXT
 );
 
 CREATE TABLE IF NOT EXISTS teacher_profile (
@@ -102,7 +105,9 @@ CREATE TABLE IF NOT EXISTS teacher_profile (
   institution TEXT NOT NULL,
   institution_type TEXT NOT NULL,
   institution_id TEXT NOT NULL,
-  activated_at INTEGER NOT NULL
+  activated_at INTEGER NOT NULL,
+  subject_id TEXT,
+  grade_id TEXT
 );
 
 CREATE TABLE IF NOT EXISTS friend_request (
