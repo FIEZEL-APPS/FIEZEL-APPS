@@ -151,6 +151,8 @@
     'kurikulum.sub-ips': "Ilmu Pengetahuan Sosial (IPS)",
     'kurikulum.sub-inf': "Informatika",
     'kurikulum.sub-pkn': "Pendidikan Pancasila",
+    'kurikulum.sub-sd-all': "Guru Kelas SD (Tematik)",
+    'kurikulum.sub-all': "Semua Mata Pelajaran",
     'kurikulum.modal-kelas-judul': "Buat Kelas Baru",
     'kurikulum.modal-kelas-sub': "Pilih jenjang kelas dan mata pelajaran yang Anda ampu.",
     'kurikulum.modal-kelas-nama': "Nama Rombel / Kelas",

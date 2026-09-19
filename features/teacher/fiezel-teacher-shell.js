@@ -121,6 +121,321 @@
     return '';
   }
 
+  var MAPEL_CATALOG = {
+    MAT: {
+      name: 'Matematika',
+      grade: 'SD / SMP / SMA',
+      competencies: [
+        { code: 'KOMP-MAT-D-7-BIL-01', name: t('mapel_mat_c1_name', 'Operasi Hitung Bilangan Bulat & Pecahan'), materi: t('mapel_mat_c1_mat', 'Penjumlahan, pengurangan, perkalian, pembagian bilangan rasional dan estimasi') },
+        { code: 'KOMP-MAT-D-8-ALJ-01', name: t('mapel_mat_c2_name', 'Aljabar & Persamaan Linier Dua Variabel'), materi: t('mapel_mat_c2_mat', 'Menyelesaikan SPLDV dengan metode substitusi dan eliminasi kontekstual') },
+        { code: 'KOMP-MAT-D-8-GEO-01', name: t('mapel_mat_c3_name', 'Geometri & Teorema Pythagoras'), materi: t('mapel_mat_c3_mat', 'Membuktikan dan menghitung panjang sisi segitiga siku-siku serta tripel Pythagoras') },
+        { code: 'KOMP-MAT-D-9-STA-01', name: t('mapel_mat_c4_name', 'Statistika & Peluang Empiris'), materi: t('mapel_mat_c4_mat', 'Menghitung pemusatan data rata-rata, median, modus, dan frekuensi relatif') }
+      ],
+      teachingBrief: {
+        summary: t('mapel_mat_tb_sum', 'Penguasaan konsep bilangan rasional, pemodelan aljabar, dan logika spasial geometri.'),
+        hook5Minutes: t('mapel_mat_tb_hook', 'Tunjukkan struk belanja minimarket atau tebak tanggal lahir dengan manipulasi aljabar sederhana.'),
+        boardFormula: t('mapel_mat_tb_board', 'x = (-b ± √(b² - 4ac)) / (2a) · Urutan operasi: Kabataku (Kali Bagi Tambah Kurang)'),
+        commonMisconceptions: [
+          { trap: t('mapel_mat_mc1_trap', 'Aturan tanda negatif'), pattern: t('mapel_mat_mc1_pat', 'Siswa mengira -a - b sama dengan -(a - b)'), fix: t('mapel_mat_mc1_fix', 'Gunakan garis bilangan atau analogi utang-piutang: utang 3 lalu utang 2 = utang 5 (-3 - 2 = -5)') }
+        ]
+      }
+    },
+    IND: {
+      name: 'Bahasa Indonesia',
+      grade: 'SD / SMP / SMA',
+      competencies: [
+        { code: 'KOMP-IND-D-7-TEK-01', name: t('mapel_ind_c1_name', 'Teks Deskripsi & Ide Pokok Paragraf'), materi: t('mapel_ind_c1_mat', 'Menemukan gagasan utama dan mencirikan teks deskriptif objektif') },
+        { code: 'KOMP-IND-D-8-EKS-01', name: t('mapel_ind_c2_name', 'Teks Eksplanasi Fenomena Alam & Sosial'), materi: t('mapel_ind_c2_mat', 'Menganalisis hubungan kausalitas sebab-akibat dan konjungsi kronologis') },
+        { code: 'KOMP-IND-E-10-ARG-01', name: t('mapel_ind_c3_name', 'Teks Argumentasi & Membedakan Fakta vs Opini'), materi: t('mapel_ind_c3_mat', 'Berpikir kritis memilah bukti empiris faktual terhadap klaim opini subjektif') }
+      ],
+      teachingBrief: {
+        summary: t('mapel_ind_tb_sum', 'Kemampuan literasi membaca kritis, penalaran logika argumen, dan sintesis wacana.'),
+        hook5Minutes: t('mapel_ind_tb_hook', 'Tampilkan satu judul berita sensasional: minta murid memisahkan mana fakta dan mana opini penulis.'),
+        boardFormula: t('mapel_ind_tb_board', 'Ide Pokok = Kalimat Utama; Fakta = Data empiris terverifikasi; Opini = Pandangan / kata sifat subjektif'),
+        commonMisconceptions: [
+          { trap: t('mapel_ind_mc1_trap', 'Tertukar fakta dan opini'), pattern: t('mapel_ind_mc1_pat', 'Siswa menganggap pernyataan tokoh penting otomatis selalu fakta'), fix: t('mapel_ind_mc1_fix', 'Uji dengan pertanyaan verifikasi: dapatkah dibuktikan dengan data terukur atau hanya penilaian?') }
+        ]
+      }
+    },
+    ENG: {
+      name: 'Bahasa Inggris',
+      grade: 'SD / SMP / SMA',
+      competencies: [
+        { code: 'KOMP-ENG-D-7-DSC-01', name: t('mapel_eng_c1_name', 'Descriptive Text & Everyday Adjectives'), materi: t('mapel_eng_c1_mat', 'Describing people, objects, animals, and daily environment using Simple Present') },
+        { code: 'KOMP-ENG-D-8-RCT-01', name: t('mapel_eng_c2_name', 'Recount Text & Simple Past Tense'), materi: t('mapel_eng_c2_mat', 'Retelling personal past events with regular and irregular verbs and time connectors') },
+        { code: 'KOMP-ENG-E-10-EXP-01', name: t('mapel_eng_c3_name', 'Analytical Exposition & Opinion Stance'), materi: t('mapel_eng_c3_mat', 'Formulating arguments, thesis statement, and reiteration for critical reasoning') }
+      ],
+      teachingBrief: {
+        summary: t('mapel_eng_tb_sum', 'Pengembangan kompetensi komunikatif lintas genre teks: deskripsi, recount, dan eksposisi analitis.'),
+        hook5Minutes: t('mapel_eng_tb_hook', 'Flash 3 foto situasi misterius di proyektor: minta siswa menduga apa yang terjadi kemarin menggunakan Simple Past.'),
+        boardFormula: t('mapel_eng_tb_board', 'Recount: Orientation ➔ Events ➔ Re-orientation; Simple Past: S + V2 / did not + V1'),
+        commonMisconceptions: [
+          { trap: t('mapel_eng_mc1_trap', 'Double past tense'), pattern: t('mapel_eng_mc1_pat', 'Siswa menulis did you went? atau he did not saw'), fix: t('mapel_eng_mc1_fix', 'Auxiliary did sudah menyerap bentuk lampau; kata kerja utama kembali ke bare infinitive (did you go?)') }
+        ]
+      }
+    },
+    IPA: {
+      name: 'Ilmu Pengetahuan Alam (IPA)',
+      grade: 'SD / SMP',
+      competencies: [
+        { code: 'KOMP-IPA-D-7-MET-01', name: t('mapel_ipa_c1_name', 'Besaran, Satuan & Metode Ilmiah'), materi: t('mapel_ipa_c1_mat', 'Pengukuran besaran pokok dan turunan, konversi satuan SI, dan keselamatan laboratorium') },
+        { code: 'KOMP-IPA-D-8-SEL-01', name: t('mapel_ipa_c2_name', 'Sel, Jaringan & Sistem Organ Manusia'), materi: t('mapel_ipa_c2_mat', 'Struktur sel hewan dan tumbuhan, mikroskop, serta organ respirasi dan ekskresi') },
+        { code: 'KOMP-IPA-D-9-LIS-01', name: t('mapel_ipa_c3_name', 'Listrik Dinamis, Hambatan & Kemagnetan'), materi: t('mapel_ipa_c3_mat', 'Hukum Ohm (V = I·R), rangkaian seri-paralel, dan induksi elektromagnetik') }
+      ],
+      teachingBrief: {
+        summary: t('mapel_ipa_tb_sum', 'Penyelidikan ilmiah empiris fenomena alam, organisasi materi kehidupan, dan konversi energi.'),
+        hook5Minutes: t('mapel_ipa_tb_hook', 'Tunjukkan balon yang digosokkan ke kain wol lalu menempel di dinding atau mengangkat potongan kertas.'),
+        boardFormula: t('mapel_ipa_tb_board', 'V = I · R; Besaran Pokok SI: Panjang (m), Massa (kg), Waktu (s), Suhu (K), Arus (A)'),
+        commonMisconceptions: [
+          { trap: t('mapel_ipa_mc1_trap', 'Massa tertukar dengan berat'), pattern: t('mapel_ipa_mc1_pat', 'Siswa mengira massa dan berat adalah besaran yang persis sama'), fix: t('mapel_ipa_mc1_fix', 'Massa (kg) adalah jumlah materi konstan di mana pun; berat (N) adalah gaya gravitasi yang berubah menurut lokasi') }
+        ]
+      }
+    },
+    IPS: {
+      name: 'Ilmu Pengetahuan Sosial (IPS)',
+      grade: 'SD / SMP',
+      competencies: [
+        { code: 'KOMP-IPS-D-7-RNG-01', name: t('mapel_ips_c1_name', 'Interaksi Antarruang & Letak Geografis'), materi: t('mapel_ips_c1_mat', 'Peta Indonesia, letak astronomis-geologis, dan potensi sumber daya alam maritim') },
+        { code: 'KOMP-IPS-D-8-SOS-01', name: t('mapel_ips_c2_name', 'Interaksi Sosial, Diferensiasi & Integrasi'), materi: t('mapel_ips_c2_mat', 'Bentuk interaksi asosiatif dan disosiatif, lembaga sosial, serta pluralitas budaya nusantara') },
+        { code: 'KOMP-IPS-D-9-GLB-01', name: t('mapel_ips_c3_name', 'Globalisasi & Perkembangan Ekonomi Digital'), materi: t('mapel_ips_c3_mat', 'Dampak perubahan sosial budaya, perdagangan internasional, dan ekonomi kreatif') }
+      ],
+      teachingBrief: {
+        summary: t('mapel_ips_tb_sum', 'Kajian keterhubungan spasial, pranata sosial kemasyarakatan, dan dinamika perekonomian masyarakat.'),
+        hook5Minutes: t('mapel_ips_tb_hook', 'Minta murid memeriksa label asal baju atau sepatu yang mereka kenakan untuk membuktikan perdagangan antarwilayah.'),
+        boardFormula: t('mapel_ips_tb_board', 'Kebutuhan Tak Terbatas + Sumber Daya Terbatas = Kelangkaan (Scarcity) ➔ Menuntut Skala Prioritas'),
+        commonMisconceptions: [
+          { trap: t('mapel_ips_mc1_trap', 'Konsep kelangkaan ekonomi'), pattern: t('mapel_ips_mc1_pat', 'Mengira langka berarti barangnya hampir punah di muka bumi'), fix: t('mapel_ips_mc1_fix', 'Langka dalam ekonomi berarti jumlah yang diinginkan melampaui jumlah yang tersedia cuma-cuma tanpa pengorbanan') }
+        ]
+      }
+    },
+    INF: {
+      name: 'Informatika',
+      grade: 'SMP / SMA',
+      competencies: [
+        { code: 'KOMP-INF-D-7-BK-01', name: t('mapel_inf_c1_name', 'Berpikir Komputasional & 4 Pilar Problem Solving'), materi: t('mapel_inf_c1_mat', 'Dekomposisi, pengenalan pola, abstraksi, dan perancangan algoritma langkah terurut') },
+        { code: 'KOMP-INF-D-8-JKI-01', name: t('mapel_inf_c2_name', 'Jaringan Komputer, Topologi & Keamanan Internet'), materi: t('mapel_inf_c2_mat', 'Perbedaan LAN vs WAN, protokol data, enkripsi sederhana, dan etika privasi siber') },
+        { code: 'KOMP-INF-E-10-AP-01', name: t('mapel_inf_c3_name', 'Algoritma Pemrograman: Percabangan & Perulangan'), materi: t('mapel_inf_c3_mat', 'Penerapan variabel, percabangan if-else, dan loop for/while untuk pemecahan masalah') }
+      ],
+      teachingBrief: {
+        summary: t('mapel_inf_tb_sum', 'Fondasi berpikir komputasional logis, struktur data, dan rekayasa perangkat lunak dasar.'),
+        hook5Minutes: t('mapel_inf_tb_hook', 'Tantang murid memberikan instruksi membuat teh manis ke guru yang berperan sebagai robot yang harfiah.'),
+        boardFormula: t('mapel_inf_tb_board', 'Input ➔ Proses (Kondisi/Branch + Loop) ➔ Output; 4 Pilar: Dekomposisi, Pola, Abstraksi, Algoritma'),
+        commonMisconceptions: [
+          { trap: t('mapel_inf_mc1_trap', 'Sintaks disamakan dengan algoritma'), pattern: t('mapel_inf_mc1_pat', 'Siswa mengira menghafal kode bahasa pemrograman lebih penting daripada logika masalah'), fix: t('mapel_inf_mc1_fix', 'Rancang pseudocode dan diagram alir (flowchart) di kertas sebelum menulis satu baris sintaks apa pun') }
+        ]
+      }
+    },
+    PPK: {
+      name: 'Pendidikan Pancasila',
+      grade: 'SD / SMP / SMA',
+      competencies: [
+        { code: 'KOMP-PPK-D-7-PAN-01', name: t('mapel_ppk_c1_name', 'Penerapan Nilai Pancasila dalam Keseharian'), materi: t('mapel_ppk_c1_mat', 'Pengamalan sila-sila Pancasila di lingkungan keluarga, sekolah, dan masyarakat luas') },
+        { code: 'KOMP-PPK-D-8-UUD-01', name: t('mapel_ppk_c2_name', 'Konstitusi & Hierarki Peraturan Perundang-undangan'), materi: t('mapel_ppk_c2_mat', 'UUD NRI Tahun 1945 sebagai hukum dasar tertinggi dan tata urutan norma perundangan') },
+        { code: 'KOMP-PPK-E-10-NKRI-01', name: t('mapel_ppk_c3_name', 'Bhinneka Tunggal Ika & Penegakan Hak Warga Negara'), materi: t('mapel_ppk_c3_mat', 'Kesadaran bela negara, toleransi keberagaman ras/agama, dan jaminan HAM konstitusional') }
+      ],
+      teachingBrief: {
+        summary: t('mapel_ppk_tb_sum', 'Penghayatan ideologi Pancasila, ketaatan konstitusional, dan kebajikan kewargaan bernegara.'),
+        hook5Minutes: t('mapel_ppk_tb_hook', 'Diskusikan kasus nyata tentang musyawarah mufakat di pemilihan ketua kelas saat ada perbedaan suara yang ketat.'),
+        boardFormula: t('mapel_ppk_tb_board', 'Hierarki Hukum: UUD 1945 ➔ Ketetapan MPR ➔ UU / Perppu ➔ Peraturan Pemerintah ➔ Perpres ➔ Perda'),
+        commonMisconceptions: [
+          { trap: t('mapel_ppk_mc1_trap', 'Hak tanpa kewajiban'), pattern: t('mapel_ppk_mc1_pat', 'Siswa hanya menuntut pemenuhan hak tanpa menyadari kewajiban warga negara'), fix: t('mapel_ppk_mc1_fix', 'Hak asasi seorang warga negara dibatasi secara konstitusional oleh hak asasi orang lain di sekitarnya') }
+        ]
+      }
+    },
+    AGM: {
+      name: 'Pendidikan Agama & Budi Pekerti',
+      grade: 'SD / SMP / SMA',
+      competencies: [
+        { code: 'KOMP-AGM-D-7-AKL-01', name: t('mapel_agm_c1_name', 'Budi Pekerti Mulia & Kejujuran Diri'), materi: t('mapel_agm_c1_mat', 'Menerapkan integritas, amanah, dan rasa hormat kepada orang tua serta pendidik') },
+        { code: 'KOMP-AGM-D-8-KIT-01', name: t('mapel_agm_c2_name', 'Pemahaman Kitab Suci & Nilai Kasih Sayang'), materi: t('mapel_agm_c2_mat', 'Memaknai pesan suci dalam tindakan welas asih dan kepedulian sosial kaum rentan') },
+        { code: 'KOMP-AGM-E-10-TOL-01', name: t('mapel_agm_c3_name', 'Moderasi Beragama & Kerukunan Sesama'), materi: t('mapel_agm_c3_mat', 'Menjaga persaudaraan lintas iman, menolak ekstremisme, dan merawat kedamaian bangsa') }
+      ],
+      teachingBrief: {
+        summary: t('mapel_agm_tb_sum', 'Pembentukan karakter spiritual luhur, keteladanan moral, dan moderasi beragama inklusif.'),
+        hook5Minutes: t('mapel_agm_tb_hook', 'Dilema moral: kamu menemukan dompet berisi sejumlah uang dan obat darurat resep dokter tanpa identitas lain.'),
+        boardFormula: t('mapel_agm_tb_board', 'Integritas Spiritual = Selarasnya niat hati, ucapan lisan, dan amal perbuatan nyata dalam kebaikan'),
+        commonMisconceptions: [
+          { trap: t('mapel_agm_mc1_trap', 'Ritual terpisah dari budi pekerti'), pattern: t('mapel_agm_mc1_pat', 'Mengira kesalehan hanya diukur dari ritual ibadah tanpa memedulikan akhlak sesama'), fix: t('mapel_agm_mc1_fix', 'Budi pekerti luhur terhadap sesama dan lingkungan adalah tolok ukur utama kematangan spiritual') }
+        ]
+      }
+    },
+    FIS: {
+      name: 'Fisika',
+      grade: 'SMA',
+      competencies: [
+        { code: 'KOMP-FIS-E-10-KIN-01', name: t('mapel_fis_c1_name', 'Kinematika Gerak Lurus Beraturan & Berubah'), materi: t('mapel_fis_c1_mat', 'Analisis grafik v-t, s-t, kecepatan sesaat, dan percepatan tetap pada lintasan linier') },
+        { code: 'KOMP-FIS-F-11-DIN-01', name: t('mapel_fis_c2_name', 'Dinamika Gerak & Hukum Newton tentang Gaya'), materi: t('mapel_fis_c2_mat', 'Diagram gaya bebas, gaya gesek statis-kinetis, aksi-reaksi, dan hukum kelembaman') },
+        { code: 'KOMP-FIS-F-12-ELE-01', name: t('mapel_fis_c3_name', 'Medan Listrik, Potensial & Kapasitansi'), materi: t('mapel_fis_c3_mat', 'Hukum Coulomb, kuat medan elektrostatik, energi potensial listrik, dan rangkaian kapasitor') }
+      ],
+      teachingBrief: {
+        summary: t('mapel_fis_tb_sum', 'Model matematis perilaku materi, mekanika gerak alam semesta, dan interaksi gelombang-energi.'),
+        hook5Minutes: t('mapel_fis_tb_hook', 'Jatuhkan selembar kertas datar vs kertas yang diremas menjadi bola padat untuk mengamati efek hambatan udara.'),
+        boardFormula: t('mapel_fis_tb_board', 'vt = v0 + at · s = v0·t + ½at² · vt² = v0² + 2as · ΣF = m · a'),
+        commonMisconceptions: [
+          { trap: t('mapel_fis_mc1_trap', 'Gaya menopang gerak (Aristotelian)'), pattern: t('mapel_fis_mc1_pat', 'Siswa mengira benda membutuhkan dorongan gaya terus-menerus agar tetap bergerak maju'), fix: t('mapel_fis_mc1_fix', 'Hukum Newton I: Jika resultan gaya nol, benda bergerak akan terus bergerak dengan kecepatan tetap') }
+        ]
+      }
+    },
+    KIM: {
+      name: 'Kimia',
+      grade: 'SMA',
+      competencies: [
+        { code: 'KOMP-KIM-E-10-STR-01', name: t('mapel_kim_c1_name', 'Struktur Atom & Sistem Periodik Unsur'), materi: t('mapel_kim_c1_mat', 'Konfigurasi elektron mekanika kuantum, nomor massa, isotop, dan jari-jari periodik atom') },
+        { code: 'KOMP-KIM-F-11-STO-01', name: t('mapel_kim_c2_name', 'Stoikiometri & Konsep Mol Reaksi Kimia'), materi: t('mapel_kim_c2_mat', 'Penyetaraan reaksi, pereaksi pembatas, persen hasil, dan molaritas larutan') },
+        { code: 'KOMP-KIM-F-12-ASB-01', name: t('mapel_kim_c3_name', 'Keseimbangan Larutan Asam-Basa & pH Titrasi'), materi: t('mapel_kim_c3_mat', 'Teori Bronsted-Lowry, derajat disosiasi, larutan penyangga (buffer), dan titik ekivalen') }
+      ],
+      teachingBrief: {
+        summary: t('mapel_kim_tb_sum', 'Kajian komposisi zat submikroskopis, transformasi reaksi materi, dan kesetimbangan energetika.'),
+        hook5Minutes: t('mapel_kim_tb_hook', 'Reaksikan cuka dapur dengan soda kue di botol: gas CO2 yang dihasilkan akan meniup balon sendiri.'),
+        boardFormula: t('mapel_kim_tb_board', 'Mol (n) = massa / Mr · STP: V = n × 22,4 L · pH = -log[H+] · Buffer: [H+] = Ka × (mol asam / mol basa konjugasi)'),
+        commonMisconceptions: [
+          { trap: t('mapel_kim_mc1_trap', 'Mengubah angka indeks senyawa'), pattern: t('mapel_kim_mc1_pat', 'Siswa mengubah angka subskrip senyawa untuk menyetarakan jumlah atom reaksi'), fix: t('mapel_kim_mc1_fix', 'Indeks adalah identitas permanen zat kimia; hanya angka koefisien di depan molekul yang boleh disetel') }
+        ]
+      }
+    },
+    BIO: {
+      name: 'Biologi',
+      grade: 'SMA',
+      competencies: [
+        { code: 'KOMP-BIO-E-10-EKO-01', name: t('mapel_bio_c1_name', 'Keanekaragaman Hayati & Keseimbangan Ekosistem'), materi: t('mapel_bio_c1_mat', 'Jaring makanan, aliran energi piramida trofik, dan konservasi biodiversitas tropis') },
+        { code: 'KOMP-BIO-F-11-FIS-01', name: t('mapel_bio_c2_name', 'Fisiologi Tumbuhan & Sistem Peredaran Darah'), materi: t('mapel_bio_c2_mat', 'Reaksi terang-gelap fotosintesis, transpirasi xilem-floem, dan hemostasis kardiovaskular') },
+        { code: 'KOMP-BIO-F-12-GEN-01', name: t('mapel_bio_c3_name', 'Genetika Mendel, Sintesis Protein & Mutasi DNA'), materi: t('mapel_bio_c3_mat', 'Transkripsi mRNA, translasi kodon asam amino, serta persilangan monohibrid dan dihibrid') }
+      ],
+      teachingBrief: {
+        summary: t('mapel_bio_tb_sum', 'Sistem kehidupan hierarkis dari transkripsi genetika hingga keseimbangan ekologis biosfer.'),
+        hook5Minutes: t('mapel_bio_tb_hook', 'Mengapa daun tampak hijau tua di atas tetapi lebih pucat di sisi bawah? Diskusikan letak kloroplas palisade.'),
+        boardFormula: t('mapel_bio_tb_board', 'Fotosintesis: 6CO2 + 6H2O + Cahaya ➔ C6H12O6 + 6O2 · Monohibrid Mendel F2: Rasio Genotipe 1:2:1, Fenotipe 3:1'),
+        commonMisconceptions: [
+          { trap: t('mapel_bio_mc1_trap', 'Tumbuhan tidak berespirasi'), pattern: t('mapel_bio_mc1_pat', 'Siswa mengira tumbuhan hanya melakukan fotosintesis dan tidak bernapas mengambil oksigen'), fix: t('mapel_bio_mc1_fix', 'Tumbuhan berespirasi seluler terus-menerus selama 24 jam (siang dan malam) untuk menghasilkan ATP di mitokondria') }
+        ]
+      }
+    },
+    EKO: {
+      name: 'Ekonomi',
+      grade: 'SMA',
+      competencies: [
+        { code: 'KOMP-EKO-E-10-PAS-01', name: t('mapel_eko_c1_name', 'Keseimbangan Pasar: Kurva Permintaan & Penawaran'), materi: t('mapel_eko_c1_mat', 'Hukum permintaan-penawaran, elastisitas harga, dan penentuan titik ekuilibrium pasar') },
+        { code: 'KOMP-EKO-F-11-MON-01', name: t('mapel_eko_c2_name', 'Kebijakan Moneter, Fiskal & Pengendalian Inflasi'), materi: t('mapel_eko_c2_mat', 'Operasi pasar terbuka Bank Indonesia, suku bunga acuan, APBN belanja negara, dan daya beli') },
+        { code: 'KOMP-EKO-F-12-AKU-01', name: t('mapel_eko_c3_name', 'Persamaan Dasar Akuntansi & Laporan Keuangan'), materi: t('mapel_eko_c3_mat', 'Pencatatan debit-kredit transaksi, neraca saldo, jurnal penyesuaian, dan laba rugi') }
+      ],
+      teachingBrief: {
+        summary: t('mapel_eko_tb_sum', 'Alokasi sumber daya langka, stabilitas makroekonomi, dan akuntabilitas pelaporan keuangan.'),
+        hook5Minutes: t('mapel_eko_tb_hook', 'Diskusikan mengapa harga payung atau mantel hujan melonjak tinggi saat badai deras melanda terminal bus.'),
+        boardFormula: t('mapel_eko_tb_board', 'Qd = Qs (Titik Ekuilibrium) · Persamaan Akuntansi: Aset = Liabilitas (Kewajiban) + Ekuitas (Modal)'),
+        commonMisconceptions: [
+          { trap: t('mapel_eko_mc1_trap', 'Pergerakan kurva vs pergeseran kurva'), pattern: t('mapel_eko_mc1_pat', 'Menyamakan perubahan harga barang itu sendiri dengan perubahan faktor selera/pendapatan konsumen'), fix: t('mapel_eko_mc1_fix', 'Perubahan harga barang menggeser titik di sepanjang kurva; faktor pendapatan/tren menggeser posisi seluruh kurva') }
+        ]
+      }
+    },
+    GEO: {
+      name: 'Geografi',
+      grade: 'SMA',
+      competencies: [
+        { code: 'KOMP-GEO-E-10-PIG-01', name: t('mapel_geo_c1_name', 'Prinsip & Konsep Dasar Geografi Spasial'), materi: t('mapel_geo_c1_mat', '4 prinsip geografi, 10 konsep esensial geosfer, dan pendekatan spasial keruangan') },
+        { code: 'KOMP-GEO-F-11-LIT-01', name: t('mapel_geo_c2_name', 'Dinamika Litosfer & Mitigasi Gempa Vulkanik'), materi: t('mapel_geo_c2_mat', 'Pergerakan lempeng tektonik, siklus batuan, erosi pelapukan, dan jalur cincin api (Ring of Fire)') },
+        { code: 'KOMP-GEO-F-12-SIG-01', name: t('mapel_geo_c3_name', 'Penginderaan Jauh & Sistem Informasi Geografis'), materi: t('mapel_geo_c3_mat', 'Interpretasi citra satelit rona-tekstur, tumpang susun (overlay) peta tematik peruntukan lahan') }
+      ],
+      teachingBrief: {
+        summary: t('mapel_geo_tb_sum', 'Analisis fenomena geosfer multidimensi, keterkaitan ruang-lingkungan, dan ketahanan mitigasi bencana.'),
+        hook5Minutes: t('mapel_geo_tb_hook', 'Tampilkan citra satelit kota asal siswa di proyektor: amati mengapa permukiman terpusat di sepanjang bantaran sungai.'),
+        boardFormula: t('mapel_geo_tb_board', 'Skala Peta = Jarak pada Peta / Jarak Sebenarnya di Lapangan · 4 Prinsip: Distribusi, Interelasi, Deskripsi, Korologi'),
+        commonMisconceptions: [
+          { trap: t('mapel_geo_mc1_trap', 'Skala peta besar vs kecil'), pattern: t('mapel_geo_mc1_pat', 'Siswa mengira penyebut angka 1:1.000.000 adalah skala peta besar karena nominal angkanya besar'), fix: t('mapel_geo_mc1_fix', '1/1.000.000 adalah pecahan kecil (kurang mendalam); sebaliknya 1/5.000 adalah pecahan besar (tampak rinci)') }
+        ]
+      }
+    },
+    SOS: {
+      name: 'Sosiologi',
+      grade: 'SMA',
+      competencies: [
+        { code: 'KOMP-SOS-E-10-IND-01', name: t('mapel_sos_c1_name', 'Sosialisasi, Identitas Diri & Interaksi Kelompok'), materi: t('mapel_sos_c1_mat', 'Tahapan sosialisasi kepribadian, agen keluarga-sekolah-media, dan konformitas norma') },
+        { code: 'KOMP-SOS-F-11-KON-01', name: t('mapel_sos_c2_name', 'Konflik Sosial, Kekerasan & Resolusi Damai'), materi: t('mapel_sos_c2_mat', 'Sebab terjadinya friksi sosial, mediasi pihak ketiga, konsiliasi, dan transformasi damai') },
+        { code: 'KOMP-SOS-F-12-KET-01', name: t('mapel_sos_c3_name', 'Ketimpangan Sosial Komunitas & Transformasi Digital'), materi: t('mapel_sos_c3_mat', 'Stratifikasi kelas sosial, marginalisasi budaya lokal, dan kearifan masyarakat hadapi modernitas') }
+      ],
+      teachingBrief: {
+        summary: t('mapel_sos_tb_sum', 'Pemahaman sosiologis interaksi relasional, diferensiasi struktural, dan penyelesaian konflik beradab.'),
+        hook5Minutes: t('mapel_sos_tb_hook', 'Diskusikan tren gaya hidup viral di media sosial dan bagaimana tekanan teman sebaya (peer pressure) memengaruhinya.'),
+        boardFormula: t('mapel_sos_tb_board', 'Resolusi Sengketa: Mediasi (Pihak Ke-3 Netral Fasilitator) vs Arbitrasi (Pihak Ke-3 Pengambil Keputusan Mengikat)'),
+        commonMisconceptions: [
+          { trap: t('mapel_sos_mc1_trap', 'Konflik dianggap selalu merusak'), pattern: t('mapel_sos_mc1_pat', 'Menganggap setiap konflik sosial selalu destruktif dan wajib disingkirkan tanpa dikelola'), fix: t('mapel_sos_mc1_fix', 'Konflik sosial terkelola justru dapat memperjelas batas norma yang kabur dan mendorong reformasi konstruktif') }
+        ]
+      }
+    },
+    SEJ: {
+      name: 'Sejarah',
+      grade: 'SMA',
+      competencies: [
+        { code: 'KOMP-SEJ-E-10-MET-01', name: t('mapel_sej_c1_name', 'Metode Penelitian Sejarah & Kritik Sumber'), materi: t('mapel_sej_c1_mat', 'Heuristik jejak primer-sekunder, verifikasi autentisitas arsip, dan sintesis historiografi') },
+        { code: 'KOMP-SEJ-F-11-PER-01', name: t('mapel_sej_c2_name', 'Pergerakan Nasional & Proklamasi Kemerdekaan'), materi: t('mapel_sej_c2_mat', 'Lahirnya Budi Utomo, Sumpah Pemuda 1928, BPUPK-PPKI, dan peristiwa Rengasdengklok 1945') },
+        { code: 'KOMP-SEJ-F-12-DIN-01', name: t('mapel_sej_c3_name', 'Dinamika Demokrasi Parlementer & Terpimpin'), materi: t('mapel_sej_c3_mat', 'Pergantian kabinet, Konferensi Asia Afrika 1955, Dekrit Presiden 5 Juli 1959, dan politik mercusuar') }
+      ],
+      teachingBrief: {
+        summary: t('mapel_sej_tb_sum', 'Penalaran historis sebab-akibat lintas waktu, apresiasi perjuangan bangsa, dan kritik sumber primer.'),
+        hook5Minutes: t('mapel_sej_tb_hook', 'Tunjukkan foto teks proklamasi yang diketik Sayuti Melik: tanyakan bagaimana sejarawan memverifikasi keasliannya.'),
+        boardFormula: t('mapel_sej_tb_board', 'Tahap Metode Sejarah: Heuristik (Pencarian) ➔ Verifikasi (Kritik) ➔ Interpretasi (Penafsiran) ➔ Historiografi (Penulisan)'),
+        commonMisconceptions: [
+          { trap: t('mapel_sej_mc1_trap', 'Sejarah sebatas hafalan tahun'), pattern: t('mapel_sej_mc1_pat', 'Siswa berfokus menghafal tanggal tanpa memahami dialektika sebab-akibat peristiwa masa lalu'), fix: t('mapel_sej_mc1_fix', 'Fokuskan pembelajaran pada: faktor apa yang memicu peristiwa tersebut dan relevansinya bagi kehidupan masa kini') }
+        ]
+      }
+    },
+    PJK: {
+      name: 'PJOK',
+      grade: 'SD / SMP / SMA',
+      competencies: [
+        { code: 'KOMP-PJK-D-7-PER-01', name: t('mapel_pjk_c1_name', 'Keterampilan Gerak Spesifik Permainan Bola'), materi: t('mapel_pjk_c1_mat', 'Teknik passing, dribbling bola basket/voli, serta koordinasi gerak lokomotor dan manipulatif') },
+        { code: 'KOMP-PJK-D-8-KEB-01', name: t('mapel_pjk_c2_name', 'Latihan Kebugaran Jasmani & Daya Tahan Tubuh'), materi: t('mapel_pjk_c2_mat', 'Latihan interval aerobik, kekuatan otot push-up/sit-up, kelenturan sendi, dan indeks masa tubuh') },
+        { code: 'KOMP-PJK-E-10-POL-01', name: t('mapel_pjk_c3_name', 'Pola Hidup Sehat, Gizi Seimbang & P3K Dasar'), materi: t('mapel_pjk_c3_mat', 'Piramida gizi seimbang, bahaya narkoba/rokok, serta penanganan cedera sprain metode RICE') }
+      ],
+      teachingBrief: {
+        summary: t('mapel_pjk_tb_sum', 'Pembiasaan gerak aktif sportif, pemeliharaan kapasitas fisik, dan kebiasaan hidup sehat bugar.'),
+        hook5Minutes: t('mapel_pjk_tb_hook', 'Ajak semua siswa menghitung denyut nadi istirahat di pergelangan tangan mereka selama 15 detik sebelum berdiri.'),
+        boardFormula: t('mapel_pjk_tb_board', 'Denyut Nadi Maksimal (DNM) = 220 - Usia · Zona Latihan Kardio: 60% – 80% DNM · Cedera RICE: Rest, Ice, Compression, Elevation'),
+        commonMisconceptions: [
+          { trap: t('mapel_pjk_mc1_trap', 'Rasa nyeri berlebih tanda berhasil'), pattern: t('mapel_pjk_mc1_pat', 'Mengira latihan kebugaran baru dinilai bagus jika otot mengalami nyeri luar biasa keesokan harinya'), fix: t('mapel_pjk_mc1_fix', 'Kemajuan kebugaran diukur dari adaptasi daya tahan dan pemulihan denyut nadi yang cepat, bukan cedera otot berlebihan') }
+        ]
+      }
+    },
+    SNB: {
+      name: 'Seni Budaya & Prakarya',
+      grade: 'SD / SMP / SMA',
+      competencies: [
+        { code: 'KOMP-SNB-D-7-RUP-01', name: t('mapel_snb_c1_name', 'Unsur, Prinsip & Komposisi Seni Rupa Visual'), materi: t('mapel_snb_c1_mat', 'Eksplorasi garis, bidang, gradasi warna lingkaran primer-sekunder, serta perspektif benda') },
+        { code: 'KOMP-SNB-D-8-MUS-01', name: t('mapel_snb_c2_name', 'Apresiasi Musik Tradisional & Harmoni Melodi'), materi: t('mapel_snb_c2_mat', 'Tangga nada pentatonis nusantara, alat musik gamelan/angklung, dan teknik vokal unisono') },
+        { code: 'KOMP-SNB-E-10-KRA-01', name: t('mapel_snb_c3_name', 'Kriya Nusantara & Eksplorasi Desain Produk'), materi: t('mapel_snb_c3_mat', 'Rancang bangun kerajinan ramah lingkungan, motif batik nusantara, dan kemasan produk bernilai jual') }
+      ],
+      teachingBrief: {
+        summary: t('mapel_snb_tb_sum', 'Kepekaan estetis ragam budaya nusantara, kreativitas visual orisinal, dan apresiasi karya seni.'),
+        hook5Minutes: t('mapel_snb_tb_hook', 'Putar cuplikan nada ritmis instrumen gamelan bali vs jawa: minta murid mendengarkan perbedaan tempo dan suasananya.'),
+        boardFormula: t('mapel_snb_tb_board', 'Unsur Rupa: Titik ➔ Garis ➔ Bidang ➔ Bentuk ➔ Warna ➔ Tekstur ➔ Gelap-Terang ➔ Ruang'),
+        commonMisconceptions: [
+          { trap: t('mapel_snb_mc1_trap', 'Bakat seni mutlak alami'), pattern: t('mapel_snb_mc1_pat', 'Siswa merasa minder dan tidak bisa membuat karya seni karena tidak terlahir dengan bakat bawaan'), fix: t('mapel_snb_mc1_fix', 'Seni visual dan musik adalah keterampilan motorik dan bahasa ekspresi yang dapat dipelajari dengan teknik bertahap') }
+        ]
+      }
+    }
+  };
+
+  /* Acak posisi opsi jawaban agar kunci tidak selalu di index 0.
+     Menerima objek soal { options[], answer, why? } dan mengembalikan salinan
+     dengan urutan options teracak serta answer & why yang sudah diperbarui. */
+  function shuffleOptions(q, seed) {
+    var opts = q.options.slice();
+    var correctText = opts[q.answer];
+    var n = opts.length;
+    var s = seed || 1;
+    function rng() { s = (s * 1103515245 + 12345) & 0x7fffffff; return (s >>> 16) / 32768; }
+    for (var i = n - 1; i > 0; i--) {
+      var j = Math.floor(rng() * (i + 1));
+      var tmp = opts[i]; opts[i] = opts[j]; opts[j] = tmp;
+    }
+    var newAnswer = opts.indexOf(correctText);
+    var newWhy = {};
+    if (q.why) {
+      var oldExpl = q.why[q.answer] || q.why[String(q.answer)] || '';
+      if (oldExpl) newWhy[newAnswer] = oldExpl;
+    }
+    return { options: opts, answer: newAnswer, why: newWhy };
+  }
+
   function synthesizeMapelQuestions(subjectId, compCode, compTitle, count) {
     var num = Math.max(2, Math.min(20, Number(count) || 5));
     var mName = mapelName(subjectId) || subjectId;
@@ -129,31 +444,31 @@
     var templates = {
       MAT: [
         {
-          prompt: 'Hasil dari operasi hitung campuran -15 + (-8) × 3 - (-20) adalah…',
+          prompt: 'Hasil dari operasi hitung campuran -15 + (-8) \u00d7 3 - (-20) adalah\u2026',
           options: ['-19', '-29', '-59', '29'],
           answer: 0,
-          why: { 0: 'Kerjakan perkalian terlebih dahulu: (-8) × 3 = -24. Kemudian -15 + (-24) - (-20) = -39 + 20 = -19.' }
+          why: { 0: 'Kerjakan perkalian terlebih dahulu: (-8) \u00d7 3 = -24. Kemudian -15 + (-24) - (-20) = -39 + 20 = -19.' }
         },
         {
           prompt: 'Sebuah resep membutuhkan perbandingan tepung dan gula 5 : 2. Jika digunakan 250 gram tepung, berapakah gram gula yang dibutuhkan?',
           options: ['100 gram', '125 gram', '50 gram', '150 gram'],
           answer: 0,
-          why: { 0: 'Gula = (2/5) × 250 gram = 100 gram.' }
+          why: { 0: 'Gula = (2/5) \u00d7 250 gram = 100 gram.' }
         },
         {
-          prompt: 'Penyelesaian dari persamaan linear 3x - 7 = 2x + 5 adalah…',
+          prompt: 'Penyelesaian dari persamaan linear 3x - 7 = 2x + 5 adalah\u2026',
           options: ['x = 12', 'x = -2', 'x = 2', 'x = -12'],
           answer: 0,
           why: { 0: 'Pindahkan suku sejenis: 3x - 2x = 5 + 7 sehingga x = 12.' }
         },
         {
-          prompt: 'Sebuah segitiga memiliki panjang alas 14 cm dan tinggi 8 cm. Luas segitiga tersebut adalah…',
-          options: ['56 cm²', '112 cm²', '22 cm²', '48 cm²'],
+          prompt: 'Sebuah segitiga memiliki panjang alas 14 cm dan tinggi 8 cm. Luas segitiga tersebut adalah\u2026',
+          options: ['56 cm\u00b2', '112 cm\u00b2', '22 cm\u00b2', '48 cm\u00b2'],
           answer: 0,
-          why: { 0: 'Luas segitiga = ½ × alas × tinggi = ½ × 14 × 8 = 56 cm².' }
+          why: { 0: 'Luas segitiga = \u00bd \u00d7 alas \u00d7 tinggi = \u00bd \u00d7 14 \u00d7 8 = 56 cm\u00b2.' }
         },
         {
-          prompt: 'Data nilai ulangan matematika: 7, 8, 6, 8, 9, 8, 7. Modus dari data tersebut adalah…',
+          prompt: 'Data nilai ulangan matematika: 7, 8, 6, 8, 9, 8, 7. Modus dari data tersebut adalah\u2026',
           options: ['8', '7', '7.5', '6'],
           answer: 0,
           why: { 0: 'Nilai 8 muncul paling banyak yaitu sebanyak 3 kali.' }
@@ -161,66 +476,514 @@
       ],
       IPA: [
         {
-          prompt: 'Bagian sel yang berfungsi sebagai pusat kendali seluruh aktivitas sel adalah…',
+          prompt: 'Bagian sel yang berfungsi sebagai pusat kendali seluruh aktivitas sel adalah\u2026',
           options: ['Nukleus (inti sel)', 'Mitokondria', 'Ribosom', 'Sitoplasma'],
           answer: 0,
           why: { 0: 'Nukleus mengandung materi genetik yang mengendalikan proses metabolisme dan pembelahan sel.' }
         },
         {
-          prompt: 'Peristiwa perpindahan kalor yang terjadi tanpa memerlukan zat perantara (medium) disebut…',
+          prompt: 'Peristiwa perpindahan kalor yang terjadi tanpa memerlukan zat perantara (medium) disebut\u2026',
           options: ['Radiasi', 'Konduksi', 'Konveksi', 'Evaporasi'],
           answer: 0,
           why: { 0: 'Radiasi adalah pancaran gelombang elektromagnetik seperti sinar matahari ke bumi.' }
         },
         {
-          prompt: 'Perubahan zat yang TIDAK menghasilkan zat baru dan dapat kembali ke wujud semula disebut…',
+          prompt: 'Perubahan zat yang TIDAK menghasilkan zat baru dan dapat kembali ke wujud semula disebut\u2026',
           options: ['Perubahan fisika', 'Perubahan kimia', 'Pembusukan', 'Fermentasi'],
           answer: 0,
           why: { 0: 'Perubahan fisika hanya mengubah wujud atau bentuk (seperti es mencair) tanpa mengubah sifat kimia zat.' }
         },
         {
-          prompt: 'Dalam rantai makanan di sawah: Padi ➔ Belalang ➔ Katak ➔ Ular ➔ Elang. Organisme yang bertindak sebagai konsumen tingkat II adalah…',
+          prompt: 'Dalam rantai makanan di sawah: Padi \u279e Belalang \u279e Katak \u279e Ular \u279e Elang. Organisme yang bertindak sebagai konsumen tingkat II adalah\u2026',
           options: ['Katak', 'Belalang', 'Padi', 'Ular'],
           answer: 0,
           why: { 0: 'Padi (produsen), Belalang (konsumen I), Katak (konsumen II), Ular (konsumen III).' }
         },
         {
-          prompt: 'Sebuah benda bermassa 2 kg ditarik dengan gaya 10 N di lantai licin. Percepatan yang dialami benda adalah…',
-          options: ['5 m/s²', '20 m/s²', '0.2 m/s²', '12 m/s²'],
+          prompt: 'Sebuah benda bermassa 2 kg ditarik dengan gaya 10 N di lantai licin. Percepatan yang dialami benda adalah\u2026',
+          options: ['5 m/s\u00b2', '20 m/s\u00b2', '0.2 m/s\u00b2', '12 m/s\u00b2'],
           answer: 0,
-          why: { 0: 'Berdasarkan Hukum II Newton: a = F / m = 10 N / 2 kg = 5 m/s².' }
+          why: { 0: 'Berdasarkan Hukum II Newton: a = F / m = 10 N / 2 kg = 5 m/s\u00b2.' }
         }
       ],
       IND: [
         {
-          prompt: 'Ciri utama teks deskripsi yang membedakannya dari teks lain adalah…',
+          prompt: 'Ciri utama teks deskripsi yang membedakannya dari teks lain adalah\u2026',
           options: ['Menggambarkan objek secara terperinci dengan melibatkan pancaindra', 'Menceritakan urutan peristiwa berdasarkan konflik tokoh', 'Menjelaskan langkah kerja atau petunjuk praktis', 'Menyampaikan pendapat disertai argumen logis'],
           answer: 0,
           why: { 0: 'Teks deskripsi bertujuan membuat pembaca seolah melihat, mendengar, atau merasakan sendiri objek yang digambarkan.' }
         },
         {
-          prompt: 'Ide pokok suatu paragraf dapat ditemukan dengan cara…',
+          prompt: 'Ide pokok suatu paragraf dapat ditemukan dengan cara\u2026',
           options: ['Menemukan kalimat utama yang memuat inti permasalahan paragraf', 'Membaca hanya kalimat terakhir pada setiap paragraf', 'Menghitung kata yang paling banyak diulang', 'Mencatat seluruh kalimat penjelas'],
           answer: 0,
           why: { 0: 'Ide pokok adalah gagasan inti yang biasanya tertuang dalam kalimat utama paragraf.' }
         },
         {
-          prompt: 'Penulisan kata depan “di” yang tepat terdapat pada kalimat…',
+          prompt: 'Penulisan kata depan "di" yang tepat terdapat pada kalimat\u2026',
           options: ['Siswa berkumpul di halaman sekolah sejak pagi.', 'Buku itu dibaca oleh siswa diperpustakaan.', 'Surat itu ditandatangani diruang kepala sekolah.', 'Mereka berdiskusi dimobil saat perjalanan.'],
           answer: 0,
-          why: { 0: 'Kata depan “di” yang menunjukkan tempat ditulis terpisah: “di halaman”.' }
+          why: { 0: 'Kata depan "di" yang menunjukkan tempat ditulis terpisah: "di halaman".' }
         },
         {
-          prompt: 'Unsur intrinsik cerita yang menjadi penentu watak atau karakter tokoh cerita adalah…',
+          prompt: 'Unsur intrinsik cerita yang menjadi penentu watak atau karakter tokoh cerita adalah\u2026',
           options: ['Penokohan (karakterisasi)', 'Alur (plot)', 'Latar (setting)', 'Amanat'],
           answer: 0,
           why: { 0: 'Penokohan adalah cara pengarang menggambarkan dan mengembangkan karakter tokoh dalam cerita.' }
         },
         {
-          prompt: 'Konjungsi yang menyatakan hubungan urutan waktu dalam teks prosedur adalah…',
+          prompt: 'Konjungsi yang menyatakan hubungan urutan waktu dalam teks prosedur adalah\u2026',
           options: ['Lalu, kemudian, setelah itu', 'Karena, sebab, oleh karena itu', 'Tetapi, melainkan, sedangkan', 'Jika, apabila, jikalau'],
           answer: 0,
           why: { 0: 'Konjungsi kronologis seperti lalu, kemudian, setelah itu menghubungkan tahapan prosedur secara teratur.' }
+        }
+      ],
+      FIS: [
+        {
+          prompt: 'Sebuah mobil melaju dengan kecepatan tetap 72 km/jam. Jarak tempuh dalam waktu 15 menit adalah\u2026',
+          options: ['18 km', '10.8 km', '4.8 km', '36 km'],
+          answer: 0,
+          why: { 0: '72 km/jam = 72 \u00d7 (15/60) = 72 \u00d7 0.25 = 18 km.' }
+        },
+        {
+          prompt: 'Energi kinetik suatu benda bermassa 4 kg yang melaju dengan kelajuan 3 m/s adalah\u2026',
+          options: ['18 J', '12 J', '36 J', '6 J'],
+          answer: 0,
+          why: { 0: 'Ek = \u00bd mv\u00b2 = \u00bd \u00d7 4 \u00d7 9 = 18 Joule.' }
+        },
+        {
+          prompt: 'Kawat penghantar dialiri arus listrik 2 A selama 5 menit. Muatan listrik yang mengalir adalah\u2026',
+          options: ['600 C', '10 C', '150 C', '2.5 C'],
+          answer: 0,
+          why: { 0: 'Q = I \u00d7 t = 2 A \u00d7 300 s = 600 Coulomb.' }
+        },
+        {
+          prompt: 'Gelombang bunyi tidak dapat merambat melalui media\u2026',
+          options: ['Kondisi hampa udara (vakum)', 'Air laut', 'Batang besi', 'Udara bebas'],
+          answer: 0,
+          why: { 0: 'Bunyi memerlukan partikel medium untuk merambat; di ruang hampa tidak ada materi perantara.' }
+        },
+        {
+          prompt: 'Lensa cembung (konveks) digunakan untuk membantu penderita kelainan mata\u2026',
+          options: ['Hipermetropi (rabun dekat)', 'Miopi (rabun jauh)', 'Astigmatisme (silinder)', 'Presbiopi total'],
+          answer: 0,
+          why: { 0: 'Hipermetropi dikoreksi dengan lensa cembung yang mengumpulkan berkas cahaya tepat di retina.' }
+        }
+      ],
+      KIM: [
+        {
+          prompt: 'Atom karbon memiliki nomor atom 6. Jumlah elektron pada kulit terluar atom karbon adalah\u2026',
+          options: ['4', '2', '6', '8'],
+          answer: 0,
+          why: { 0: 'Konfigurasi elektron C: 2, 4. Kulit valensi memiliki 4 elektron.' }
+        },
+        {
+          prompt: 'Larutan dengan nilai pH = 3 tergolong larutan\u2026',
+          options: ['Asam kuat', 'Basa kuat', 'Netral', 'Basa lemah'],
+          answer: 0,
+          why: { 0: 'Nilai pH < 7 menunjukkan sifat asam; pH 3 tergolong asam kuat.' }
+        },
+        {
+          prompt: 'Reaksi antara logam natrium (Na) dengan air (H\u2082O) menghasilkan\u2026',
+          options: ['NaOH dan gas H\u2082', 'Na\u2082O dan gas O\u2082', 'NaCl dan gas H\u2082', 'NaOH dan gas O\u2082'],
+          answer: 0,
+          why: { 0: '2Na + 2H\u2082O \u2192 2NaOH + H\u2082. Reaksi menghasilkan natrium hidroksida dan gas hidrogen.' }
+        },
+        {
+          prompt: 'Ikatan kimia yang terbentuk akibat penggunaan bersama pasangan elektron dinamakan\u2026',
+          options: ['Ikatan kovalen', 'Ikatan ion', 'Ikatan logam', 'Ikatan hidrogen'],
+          answer: 0,
+          why: { 0: 'Ikatan kovalen terjadi ketika dua atom saling berbagi pasangan elektron valensi.' }
+        },
+        {
+          prompt: 'Unsur-unsur yang terletak dalam satu golongan pada tabel periodik memiliki kesamaan pada\u2026',
+          options: ['Jumlah elektron valensi', 'Jumlah kulit atom', 'Massa atom relatif', 'Jumlah neutron inti'],
+          answer: 0,
+          why: { 0: 'Unsur segolongan memiliki jumlah elektron valensi sama sehingga sifat kimianya serupa.' }
+        }
+      ],
+      BIO: [
+        {
+          prompt: 'Proses fotosintesis pada tumbuhan berklorofil berlangsung di dalam organel\u2026',
+          options: ['Kloroplas', 'Mitokondria', 'Ribosom', 'Lisosom'],
+          answer: 0,
+          why: { 0: 'Kloroplas mengandung klorofil penangkap foton cahaya untuk sintesis glukosa.' }
+        },
+        {
+          prompt: 'Hasil akhir hidrolisis protein pada saluran usus halus berupa\u2026',
+          options: ['Asam amino', 'Glukosa', 'Asam lemak dan gliserol', 'Maltosa'],
+          answer: 0,
+          why: { 0: 'Protein dipecah oleh protease hingga menjadi molekul asam amino siap serap.' }
+        },
+        {
+          prompt: 'Penyakit defisiensi imun AIDS disebabkan oleh infeksi virus yang merusak sistem\u2026',
+          options: ['Kekebalan tubuh (imun)', 'Pencernaan makanan', 'Pernapasan internal', 'Saraf pusat'],
+          answer: 0,
+          why: { 0: 'HIV menginfeksi limfosit T helper sehingga daya tahan tubuh inang melemah drastis.' }
+        },
+        {
+          prompt: 'Persilangan monohibrid dominan penuh antara genotipe Aa dengan sesamanya menghasilkan perbandingan fenotipe\u2026',
+          options: ['3 dominan : 1 resesif', '1 dominan : 1 resesif', '2 dominan : 2 resesif', '4 dominan : 0 resesif'],
+          answer: 0,
+          why: { 0: 'Kombinasi Aa \u00d7 Aa menghasilkan AA, 2Aa, aa sehingga rasio fenotipe 3:1.' }
+        },
+        {
+          prompt: 'Kawasan hutan mangrove di garis pantai berperan penting untuk\u2026',
+          options: ['Menahan abrasi gelombang dan habitat biota pesisir', 'Meningkatkan emisi karbon bebas', 'Memicu erosi tanah alluvial', 'Menekan keanekaragaman hayati'],
+          answer: 0,
+          why: { 0: 'Jaringan akar mangrove memecah energi ombak serta menjadi tempat pemijahan ikan.' }
+        }
+      ],
+      EKO: [
+        {
+          prompt: 'Pengorbanan atas pilihan terbaik lain yang harus dilepaskan saat mengambil keputusan ekonomi disebut\u2026',
+          options: ['Opportunity cost (biaya peluang)', 'Sunk cost', 'Biaya marginal', 'Biaya eksplisit'],
+          answer: 0,
+          why: { 0: 'Biaya peluang adalah nilai alternatif terbaik berikutnya yang dikorbankan.' }
+        },
+        {
+          prompt: 'Berdasarkan hukum permintaan, apabila harga suatu komoditas mengalami kenaikan maka kuantitas yang diminta akan\u2026',
+          options: ['Mengalami penurunan (ceteris paribus)', 'Mengalami kenaikan pesat', 'Tetap tanpa fluktuasi', 'Tak terhingga jumlahnya'],
+          answer: 0,
+          why: { 0: 'Hukum permintaan berbanding terbalik: harga naik menyebabkan jumlah permintaan turun.' }
+        },
+        {
+          prompt: 'Kenaikan tingkat harga umum barang secara terus-menerus akibat kenaikan biaya input produksi dinamakan\u2026',
+          options: ['Cost-push inflation', 'Demand-pull inflation', 'Deflasi musiman', 'Depresiasi modal'],
+          answer: 0,
+          why: { 0: 'Cost-push timbul ketika ongkos faktor produksi (upah/bahan mentah) melambung.' }
+        },
+        {
+          prompt: 'Otoritas moneter yang memiliki hak tunggal mencetak dan mengedarkan mata uang rupiah adalah\u2026',
+          options: ['Bank Indonesia (BI)', 'Otoritas Jasa Keuangan (OJK)', 'Kementerian Keuangan RI', 'Lembaga Penjamin Simpanan'],
+          answer: 0,
+          why: { 0: 'Bank sentral (BI) memegang hak oktroi peredaran mata uang negara.' }
+        },
+        {
+          prompt: 'Karakteristik mendasar dari struktur pasar persaingan sempurna adalah\u2026',
+          options: ['Jumlah penjual-pembeli melimpah dengan komoditas homogen', 'Hanya ada satu produsen tunggal pengendali pasar', 'Terdapat diferensiasi produk yang tajam', 'Rintangan masuk pasar sangat tinggi'],
+          answer: 0,
+          why: { 0: 'Pasar sempurna ditandai penjual banyak, produk serupa, dan kebebasan keluar-masuk.' }
+        }
+      ],
+      GEO: [
+        {
+          prompt: 'Lapisan atmosfer terendah tempat berlangsungnya dinamika cuaca seperti hujan dan angin adalah\u2026',
+          options: ['Troposfer', 'Stratosfer', 'Mesosfer', 'Termosfer'],
+          answer: 0,
+          why: { 0: 'Troposfer (0-12 km) menampung mayoritas massa udara dan uap air atmosfer bumi.' }
+        },
+        {
+          prompt: 'Proses pembentukan permukaan bumi yang dipicu oleh tenaga dari dalam kerak bumi disebut tenaga\u2026',
+          options: ['Endogen', 'Eksogen', 'Pelapukan batuan', 'Sedimentasi fluviatil'],
+          answer: 0,
+          why: { 0: 'Tenaga endogen bersumber dari dinamika internal bumi mencakup tektonisme dan vulkanisme.' }
+        },
+        {
+          prompt: 'Secara geografis perairan, posisi kepulauan Indonesia diapit oleh dua samudra luas, yaitu\u2026',
+          options: ['Samudra Hindia dan Samudra Pasifik', 'Samudra Atlantik dan Samudra Hindia', 'Samudra Arktik dan Samudra Pasifik', 'Samudra Atlantik dan Samudra Pasifik'],
+          answer: 0,
+          why: { 0: 'Indonesia berada di antara Samudra Hindia di selatan/barat dan Samudra Pasifik di timur.' }
+        },
+        {
+          prompt: 'Karakteristik tanah vulkanik (andosol) yang menjadikannya sangat produktif bagi bercocok tanam adalah\u2026',
+          options: ['Kandungan mineral hara tinggi dari abu letusan gunung berapi', 'Tingginya kadar garam anorganik', 'Tersusun atas lempung kedap air', 'Kadar keasaman (pH) ekstrem'],
+          answer: 0,
+          why: { 0: 'Lapukan abu vulkanik kaya unsur hara fosfor, kalium, dan kalsium yang menyuburkan tanaman.' }
+        },
+        {
+          prompt: 'Lingkaran khayal khatulistiwa (garis ekuator) membagi bola bumi menjadi dua belahan pada garis lintang\u2026',
+          options: ['0 derajat', '23.5 derajat LU', '90 derajat LS', '180 derajat bujur'],
+          answer: 0,
+          why: { 0: 'Garis ekuator berposisi tepat pada lintang nol derajat.' }
+        }
+      ],
+      SOS: [
+        {
+          prompt: 'Percampuran dua kebudayaan atau lebih yang menghasilkan kultur baru tanpa menghilangkan jati diri budaya asli disebut\u2026',
+          options: ['Akulturasi kebudayaan', 'Asimilasi mutlak', 'Segregasi sosial', 'Ajudikasi norma'],
+          answer: 0,
+          why: { 0: 'Akulturasi memadukan kebudayaan berbeda dengan tetap mempertahankan unsur lama.' }
+        },
+        {
+          prompt: 'Menurut tipologi Max Weber, tindakan sosial yang berorientasi pada pencapaian target secara logis dan terukur disebut\u2026',
+          options: ['Rasionalitas instrumental', 'Tindakan afektif emosional', 'Tindakan tradisionalis', 'Rasionalitas nilai'],
+          answer: 0,
+          why: { 0: 'Tindakan instrumental menimbang sarana dan tujuan secara rasional terhitung.' }
+        },
+        {
+          prompt: 'Sistem pelapisan sosial tertutup yang tidak memungkinkan mobilitas vertikal antarstrata dapat dijumpai pada\u2026',
+          options: ['Sistem kasta tradisional', 'Masyarakat meritokratis modern', 'Struktur kelas industri', 'Komunitas birokrasi'],
+          answer: 0,
+          why: { 0: 'Sistem kasta menentukan status berdasarkan garis keturunan biologis tertutup.' }
+        },
+        {
+          prompt: 'Fungsi primer sosialisasi pertama dan penanaman afeksi bagi seorang individu diemban oleh institusi\u2026',
+          options: ['Lembaga keluarga', 'Lembaga peradilan', 'Lembaga perbankan', 'Lembaga legislatif'],
+          answer: 0,
+          why: { 0: 'Keluarga merupakan wahana sosialisasi primer yang meletakkan fondasi kepribadian anak.' }
+        },
+        {
+          prompt: 'Perilaku warga yang menyimpang dari kaidah kepatutan serta dilakukan bersama-sama oleh suatu kelompok digolongkan sebagai\u2026',
+          options: ['Penyimpangan kolektif', 'Penyimpangan individual', 'Penyimpangan situasional primer', 'Konformitas absolut'],
+          answer: 0,
+          why: { 0: 'Penyimpangan kelompok dilakukan secara kolektif dengan subkultur menyimpang bersama.' }
+        }
+      ],
+      SEJ: [
+        {
+          prompt: 'Kedatuan Sriwijaya yang berkembang di Sumatra termasyhur sebagai kekuatan maritim dan sentra studi keagamaan pada kurun abad ke\u2026',
+          options: ['7 hingga 13 Masehi', '2 hingga 4 Masehi', '15 hingga 17 Masehi', '19 hingga 20 Masehi'],
+          answer: 0,
+          why: { 0: 'Sriwijaya menguasai jalur Selat Malaka sejak abad ke-7 hingga surut sekitar abad ke-13.' }
+        },
+        {
+          prompt: 'Dwi-Tunggal yang membacakan naskah Proklamasi Kemerdekaan Indonesia pada 17 Agustus 1945 adalah\u2026',
+          options: ['Ir. Soekarno dan Drs. Mohammad Hatta', 'Sutan Sjahrir dan Amir Sjarifuddin', 'Ki Hajar Dewantara dan Raden Saleh', 'Tan Malaka dan Chaerul Saleh'],
+          answer: 0,
+          why: { 0: 'Bung Karno dan Bung Hatta memproklamasikan kemerdekaan atas nama bangsa Indonesia.' }
+        },
+        {
+          prompt: 'Konsekuensi diplomatik Perjanjian Renville (1948) yang merugikan kedaulatan wilayah Republik Indonesia adalah\u2026',
+          options: ['Pemberlakuan garis Van Mook yang memangkas wilayah kekuasaan RI', 'Penghapusan seluruh pasukan tentara nasional', 'Kewajiban melunasi biaya perang pihak sekutu', 'Pemberian kemerdekaan langsung tanpa syarat'],
+          answer: 0,
+          why: { 0: 'Garis demarkasi Van Mook mengisolasi wilayah RI menjadi kantong sempit di Jawa dan Sumatra.' }
+        },
+        {
+          prompt: 'Peristiwa bersejarah penjemputan tokoh bangsa ke Rengasdengklok oleh kelompok pemuda berlangsung pada tanggal\u2026',
+          options: ['16 Agustus 1945', '17 Agustus 1945', '18 Agustus 1945', '15 Agustus 1945'],
+          answer: 0,
+          why: { 0: 'Tanggal 16 Agustus 1945 dini hari pemuda mengamankan Dwitunggal guna menjauhkan pengaruh luar.' }
+        },
+        {
+          prompt: 'Kebijakan tanam paksa (cultuurstelsel) di Hindia Belanda pada masa kolonial diprakarsai oleh\u2026',
+          options: ['Johannes van den Bosch', 'Herman Willem Daendels', 'Thomas Stamford Raffles', 'Jan Pieterszoon Coen'],
+          answer: 0,
+          why: { 0: 'Gubernur Jenderal Van den Bosch memberlakukan tanam paksa pada tahun 1830.' }
+        }
+      ],
+      PPK: [
+        {
+          prompt: 'Pancasila sebagai dasar falsafah negara menempatkan Ketuhanan Yang Maha Esa pada sila ke\u2026',
+          options: ['Pertama', 'Kedua', 'Ketiga', 'Kelima'],
+          answer: 0,
+          why: { 0: 'Sila ke-1 menegaskan landasan moral ketuhanan bagi tatanan kenegaraan Indonesia.' }
+        },
+        {
+          prompt: 'Jaminan pemenuhan hak konstitusional warga negara atas pengajaran tercantum dalam UUD 1945 pada\u2026',
+          options: ['Pasal 31 ayat 1', 'Pasal 27 ayat 2', 'Pasal 33 ayat 3', 'Pasal 36'],
+          answer: 0,
+          why: { 0: 'Pasal 31 ayat 1 menyatakan setiap warga negara berhak mendapat pendidikan.' }
+        },
+        {
+          prompt: 'Institusi audit negara yang independen dalam memeriksa pengelolaan keuangan kas negara adalah\u2026',
+          options: ['Badan Pemeriksa Keuangan (BPK)', 'Mahkamah Konstitusi', 'Dewan Perwakilan Daerah', 'Komisi Yudisial'],
+          answer: 0,
+          why: { 0: 'BPK bertugas memeriksa pengelolaan dan tanggung jawab seputar keuangan negara.' }
+        },
+        {
+          prompt: 'Karakter persatuan serta kegotongroyongan dalam kemajemukan bangsa mencerminkan penghayatan sila ke\u2026',
+          options: ['Ketiga (Persatuan Indonesia)', 'Pertama', 'Kedua', 'Keempat'],
+          answer: 0,
+          why: { 0: 'Sila ketiga menekankan integrasi nasional dan persatuan bangsa di atas perbedaan.' }
+        },
+        {
+          prompt: 'Kaidah pergaulan masyarakat yang memiliki sanksi pemaksa nyata berupa hukuman kurungan atau denda adalah\u2026',
+          options: ['Norma hukum positif', 'Norma kesopanan', 'Norma kesusilaan internal', 'Kebiasaan informal'],
+          answer: 0,
+          why: { 0: 'Norma hukum ditegakkan oleh aparatur berwenang dengan sanksi tegas mengikat.' }
+        }
+      ],
+      AGM: [
+        {
+          prompt: 'Pondasi rukun iman dalam doktrin Islam beranggotakan keyakinan sebanyak\u2026',
+          options: ['6 rukun keimanan', '5 rukun kewajiban', '10 rukun ketaatan', '4 rukun amalan'],
+          answer: 0,
+          why: { 0: 'Rukun Iman ada enam: kepada Allah, malaikat, kitab-kitab, rasul, hari kiamat, qada dan qadar.' }
+        },
+        {
+          prompt: 'Sikap moderasi beragama dalam bingkai kebinekaan diwujudkan dengan\u2026',
+          options: ['Menghormati peribadatan sesama tanpa mencampuradukkan akidah', 'Memaksakan keyakinan pribadi kepada pihak lain', 'Menutup dialog antarwarga beriman', 'Mengabaikan nilai-nilai kebaikan universal'],
+          answer: 0,
+          why: { 0: 'Toleransi autentik menjunjung tinggi penghormatan timbal-balik tanpa kompromi teologis.' }
+        },
+        {
+          prompt: 'Sifat amanah, shiddiq, fathanah, dan tabligh merupakan teladan kepribadian yang tergolong\u2026',
+          options: ['Akhlak mulia (mahmudah)', 'Sikap tercela (madzmumah)', 'Tradisi seremonial semata', 'Hukum mubah kasual'],
+          answer: 0,
+          why: { 0: 'Empat sifat kenabian tersebut merepresentasikan puncak integritas etika dan akhlak mulia.' }
+        },
+        {
+          prompt: 'Kitab Zabur menurut keyakinan samawi diwahyukan kepada nabi utusan\u2026',
+          options: ['Nabi Daud a.s.', 'Nabi Musa a.s.', 'Nabi Isa a.s.', 'Nabi Ibrahim a.s.'],
+          answer: 0,
+          why: { 0: 'Zabur diwahyukan kepada Nabi Daud, Taurat kepada Musa, dan Injil kepada Isa.' }
+        },
+        {
+          prompt: 'Dimensi spiritual puasa mengajarkan kepekaan sosial berupa\u2026',
+          options: ['Asah empati terhadap kaum papa serta latihan pengendalian hawa nafsu', 'Kebiasaan mengonsumsi makanan berlebihan saat petang', 'Menghentikan seluruh aktivitas produktivitas harian', 'Menghindari interaksi dengan lingkungan sekitar'],
+          answer: 0,
+          why: { 0: 'Rasa lapar membangkitkan solidaritas kemanusiaan dan kemandirian pengendalian diri.' }
+        }
+      ],
+      INF: [
+        {
+          prompt: 'Unit representasi data digital biner terkecil berharga 0 atau 1 pada komputasi dinamakan\u2026',
+          options: ['Bit', 'Byte', 'Kilobyte', 'Hertz'],
+          answer: 0,
+          why: { 0: 'Bit (binary digit) merepresentasikan kondisi biner atomik pada elektronika digital.' }
+        },
+        {
+          prompt: 'Rangkaian instruksi terstruktur, terurut logis, dan terbatas untuk memecahkan suatu persoalan disebut\u2026',
+          options: ['Algoritma komputasi', 'Bahasa perakitan semata', 'Komponen sirkuit keras', 'Protokol jaringan kabel'],
+          answer: 0,
+          why: { 0: 'Algoritma adalah rancangan langkah sistematis penyelesaian problem secara komputasional.' }
+        },
+        {
+          prompt: 'Konstruksi logika pemilihan alur kendali program berdasar parameter pengujian dinamakan\u2026',
+          options: ['Percabangan kondisional (branching)', 'Pengulangan tanpa henti (loop)', 'Penugasan nilai (assignment)', 'Deklarasi pustaka modul'],
+          answer: 0,
+          why: { 0: 'Percabangan (if-else) mengarahkan cabang eksekusi kode sesuai terpenuhinya syarat.' }
+        },
+        {
+          prompt: 'Rekayasa sosial bermodus pesan umpan tiruan guna memancing data rahasia korban disebut\u2026',
+          options: ['Phishing rekayasa siber', 'Denial of service', 'Enkripsi simetris', 'Kompilasi biner'],
+          answer: 0,
+          why: { 0: 'Phishing mengecoh pengguna melalui identitas palsu agar menyerahkan kredensial akun.' }
+        },
+        {
+          prompt: 'Empat pilar berpikir komputasional mencakup dekomposisi, abstraksi, pengenalan pola, serta\u2026',
+          options: ['Perancangan algoritma terarah', 'Pemasangan sirkuit fisik', 'Penyambungan koneksi kabel', 'Pembelian lisensi sistem'],
+          answer: 0,
+          why: { 0: 'Dekomposisi, pola, abstraksi, dan algoritma membentuk empat pilar fondasi computational thinking.' }
+        }
+      ],
+      IPS: [
+        {
+          prompt: 'Faktor pendorong utama berlangsungnya aktivitas perniagaan lintas negara (ekspor-impor) adalah\u2026',
+          options: ['Disparitas ketersediaan komoditas dan kapabilitas teknologi antarbangsa', 'Keseragaman jenis tanaman bumi', 'Kesamaan bahasa pertuturan internasional', 'Ketidakhadiran pembatas perbatasan wilayah'],
+          answer: 0,
+          why: { 0: 'Perbedaan keunggulan komparatif alam dan teknologi mendorong pertukaran barang antarbangsa.' }
+        },
+        {
+          prompt: 'Organisasi kerja sama regional kawasan Asia Tenggara (ASEAN) diproklamasikan melalui\u2026',
+          options: ['Deklarasi Bangkok 1967', 'Perjanjian Westphalia', 'Konferensi Meja Bundar', 'Perjanjian Linggajati'],
+          answer: 0,
+          why: { 0: 'Lima perwakilan negara menandatangani Deklarasi Bangkok pada 8 Agustus 1967.' }
+        },
+        {
+          prompt: 'Sikap bijak dalam menyongsong arus keterbukaan globalisasi budaya adalah\u2026',
+          options: ['Menyaring budaya luar berlandaskan nilai kearifan lokal bangsa', 'Menolak seluruh kemajuan peradaban teknologi', 'Menghilangkan kesenian tradisional nusantara', 'Mengikuti seluruh tren tanpa pertimbangan adab'],
+          answer: 0,
+          why: { 0: 'Selektivitas berbasis nilai kearifan lokal memperkuat identitas budaya di era keterbukaan.' }
+        },
+        {
+          prompt: 'Lembaga perbankan pembangunan multilateral yang menyokong pendanaan proyek negara berkembang adalah\u2026',
+          options: ['Bank Dunia (World Bank)', 'Palang Merah Internasional', 'Badan Meteorologi Global', 'Organisasi Buruh Sedunia'],
+          answer: 0,
+          why: { 0: 'World Bank mengalokasikan kredit investasi pembangunan infrastruktur dan pengentasan kemiskinan.' }
+        },
+        {
+          prompt: 'Bentuk kontribusi aktif diplomasi perdamaian Indonesia di bawah mandat PBB diwujudkan melalui\u2026',
+          options: ['Penugasan Kontingen Pasukan Garuda ke wilayah konflik', 'Pemutusan hubungan konsuler antarnegara', 'Pemberian sanksi boikot sepihak', 'Penghentian bantuan kemanusiaan'],
+          answer: 0,
+          why: { 0: 'Kontingen Garuda aktif menjaga stabilitas wilayah pascakonflik di bawah panji perdamaian PBB.' }
+        }
+      ],
+      ENG: [
+        {
+          prompt: 'Choose the grammatically correct sentence in the Simple Past Tense:',
+          options: ['She visited the botanical garden yesterday.', 'She visit the botanical garden yesterday.', 'She is visiting the botanical garden yesterday.', 'She has visited the garden yesterday already.'],
+          answer: 0,
+          why: { 0: 'Simple past tense uses past verb form (visited) together with past time signal (yesterday).' }
+        },
+        {
+          prompt: '"The train ___ before we reached the platform." The most appropriate past perfect verb is:',
+          options: ['had departed', 'have departed', 'is departing', 'will depart'],
+          answer: 0,
+          why: { 0: 'Past perfect (had + V3) indicates an event completed prior to another past event.' }
+        },
+        {
+          prompt: 'The contextual synonym for the adjective "vast" is\u2026',
+          options: ['Immense and wide', 'Extremely tiny', 'Rapidly moving', 'Narrow and tight'],
+          answer: 0,
+          why: { 0: '"Vast" describes an immense, expansive area or extent.' }
+        },
+        {
+          prompt: 'Identify the sentence with an accurate type 2 conditional structure:',
+          options: ['If I had a telescope, I would observe the lunar craters.', 'If I have a telescope, I would observe the craters.', 'If I had a telescope, I will observe the craters.', 'If I have a telescope, I observe the craters.'],
+          answer: 0,
+          why: { 0: 'Type 2 conditional uses: If + past simple, would + bare infinitive for hypothetical present.' }
+        },
+        {
+          prompt: 'The communicative purpose of an explanatory text is to\u2026',
+          options: ['Explain the processes involved in the formation of natural phenomena', 'Persuade the audience on a debate proposition', 'Entertain readers with folklore fables', 'Provide step-by-step cooking instructions'],
+          answer: 0,
+          why: { 0: 'Explanation texts account for how or why natural or sociocultural phenomena occur.' }
+        }
+      ],
+      PJK: [
+        {
+          prompt: 'Pukulan mula sebagai tanda dimulainya reli permainan bola voli disebut teknik\u2026',
+          options: ['Servis (service) garis batas', 'Smes menukik tajam', 'Membendung (blocking)', 'Umpan lambung (set-up)'],
+          answer: 0,
+          why: { 0: 'Servis dilakukan dari petak belakang garis lapangan untuk membuka rangkaian reli permainan.' }
+        },
+        {
+          prompt: 'Metode latihan fisik yang paling efektif guna mengoptimalkan kapasitas aerobik jantung-paru adalah\u2026',
+          options: ['Lari kontinu berjarak menengah-panas (jogging)', 'Aktivitas beban berkali-kali tanpa jeda', 'Gerakan kelenturan statis tunggal', 'Gerak ketangkasan reaksi jari'],
+          answer: 0,
+          why: { 0: 'Aktivitas lari aerobik berdurasi melatih efisiensi serapan oksigen dan daya tahan kardiorespirasi.' }
+        },
+        {
+          prompt: 'Benda berbentuk silinder yang diestafetkan antaranggota pelari beregu dinamakan\u2026',
+          options: ['Tongkat estafet (baton)', 'Peluru tolak lempar', 'Cakram putar', 'Lembing serat'],
+          answer: 0,
+          why: { 0: 'Tongkat baton berpindah tangan di zona pergantian antaranggota tim lari bersambung.' }
+        },
+        {
+          prompt: 'Aktivitas pengondisian pemanasan (warm-up) sebelum berolahraga esensial untuk\u2026',
+          options: ['Menaikkan suhu jaringan otot dan meminimalkan cedera', 'Menurunkan curah peredaran darah', 'Membuat persendian kaku', 'Menghabiskan tenaga secara instan'],
+          answer: 0,
+          why: { 0: 'Pemanasan mempersiapkan elastisitas serat otot dan viskositas sendi menghadapi beban gerak.' }
+        },
+        {
+          prompt: 'Penerapan pola hidup aktif dan bugar mencakup keselarasan antara\u2026',
+          options: ['Gerak jasmani teratur, asupan nutrisi proporsional, serta istirahat pemulihan', 'Olahraga intensitas berat tanpa kecukupan rehidrasi', 'Pola makan instan disertai minim gerak fisik', 'Waktu tidur seharian tanpa aktivitas tubuh'],
+          answer: 0,
+          why: { 0: 'Kebugaran holistik bertumpu pada sinergi aktivitas kinetik, gizi seimbang, dan istirahat cukup.' }
+        }
+      ],
+      SNB: [
+        {
+          prompt: 'Kualitas rabaan pada permukaan suatu karya seni (kasar, halus, berbutir) diistilahkan sebagai\u2026',
+          options: ['Tekstur permukaan', 'Gradasi warna', 'Perspektif ruang', 'Proporsi anatomi'],
+          answer: 0,
+          why: { 0: 'Tekstur mendeskripsikan sifat permukaan suatu wujud benda yang dapat diindra visual atau taktil.' }
+        },
+        {
+          prompt: 'Koreografi Tari Saman yang mengutamakan keselarasan gerak tepuk dan dada berakar dari tradisi\u2026',
+          options: ['Masyarakat Gayo, Aceh', 'Sunda, Jawa Barat', 'Minahasa, Sulawesi Utara', 'Dayak Kenyah, Kalimantan'],
+          answer: 0,
+          why: { 0: 'Tari Saman diciptakan oleh Syekh Saman dan dilestarikan oleh masyarakat Gayo, Aceh.' }
+        },
+        {
+          prompt: 'Instrumen ensambel tradisional Nusantara yang didominasi bilahan dan pencon perunggu berpukul adalah\u2026',
+          options: ['Ansambel Gamelan', 'Instrumen Angklung', 'Petikan Sasando', 'Tiupan Saluang'],
+          answer: 0,
+          why: { 0: 'Gamelan menghimpun saron, bonang, kendang, dan gong bermaterial logam perunggu/besi.' }
+        },
+        {
+          prompt: 'Metode pembentukan benda keramik menggunakan bantuan meja putar berputar disebut teknik\u2026',
+          options: ['Teknik putar (throwing method)', 'Teknik pilin melingkar (coiling)', 'Teknik lempengan datar (slab)', 'Teknik cetak tuang beku'],
+          answer: 0,
+          why: { 0: 'Meja putar memungkinkan pembentukan lempung secara sentris simetris menjadi wadah guci/vas.' }
+        },
+        {
+          prompt: 'Wujud karya seni rupa tiga dimensi yang memiliki dimensi panjang, lebar, dan volume kedalaman adalah\u2026',
+          options: ['Karya seni patung dan instalasi', 'Lukisan kanvas cat minyak', 'Karya etsa grafis cetak datar', 'Sketsa pena dua dimensi'],
+          answer: 0,
+          why: { 0: 'Patung menempati ruang nyata tiga dimensi dan dapat dinikmati dari berbagai sudut pandang.' }
         }
       ]
     };
@@ -255,6 +1018,11 @@
           why: { 0: t('guru.alasan-kunci-jawaban', 'Pilihan pertama merupakan jawaban yang paling tepat karena menjelaskan esensi capaian pembelajaran materi.') }
         };
       }
+      /* Acak posisi opsi jawaban agar kunci tidak selalu di index 0 */
+      var shuffled = shuffleOptions(itemObj, (Date.now() % 997) + i * 31 + subjectId.charCodeAt(0));
+      itemObj.options = shuffled.options;
+      itemObj.answer = shuffled.answer;
+      itemObj.why = shuffled.why;
       items.push(itemObj);
     }
     return items;
@@ -763,7 +1531,15 @@
         return '<li><button type="button" class="tg-inbox-item' + warn + (e.read ? '' : ' is-unread') + '" data-tg="inbox-open" data-id="' + esc(e.id) + '" data-testid="tg-inbox-' + esc(e.id) + '">' + icon(ic) + '<div><b>' + esc(T.inboxText(e)) + '</b><small>' + esc(T.fmtDate(e.at)) + ' · ' + esc(new Date(e.at).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })) + '</small></div></button></li>';
       }).join('') + '</ul>' : '<p class="tg-empty">' + t('guru.belum-ada-kabar', 'Belum ada kabar. Saat murid selesai mengerjakan tugas yang kamu kirim, hasilnya muncul di sini otomatis.') + '</p>') + '</section>';
   }
-  function mobileNav() { return '<nav class="tg-mnav">' + NAV.map(function (n) { return '<button type="button" class="' + (st.view === n[0] ? 'is-active' : '') + '" data-tg="view" data-view="' + n[0] + '">' + icon(n[2]) + '<span>' + n[1].split(' ')[0] + '</span></button>'; }).join('') + '</nav>'; }
+  function mobileNav() {
+    return '<nav class="tg-mnav">' + NAV.map(function (n) {
+      return '<button type="button" class="' + (st.view === n[0] ? 'is-active' : '') + '" data-tg="view" data-view="' + n[0] + '">' + icon(n[2]) + '<span>' + n[1].split(' ')[0] + '</span></button>';
+    }).join('') +
+    (konsolKurikulumSiap()
+      ? '<button type="button" class="' + (st.view === 'curriculum' ? 'is-active' : '') + '" data-tg="view" data-view="curriculum">' + icon('library') + '<span>' + esc(t('guru.nav-kurikulum-singkat', 'Kurikulum')) + '</span></button>'
+      : '') +
+    '</nav>';
+  }
 
   function welcome() {
     return '<section class="tg-welcome" data-testid="tg-welcome"><p class="tg-kicker">Selamat datang</p><h2>' + t('guru.ruang-kerja-desc', 'Ruang kerja yang membaca kelasmu, lalu memberi tahu') + ' <em>siapa yang perlu disapa hari ini</em>.</h2>' +
@@ -814,13 +1590,16 @@
 
   // ---- ANALITIK -------------------------------------------------------------------------------
   function insights(c) {
-    var T = S(), heat = T.heatmap(c), map = T.classSkillMap(c), groups = T.studyGroups(c, ui.insightSkill), mis = T.misconceptions(c);
+    var T = S(), heat = T.heatmap(c), map = T.classSkillMap(c), mis = T.misconceptions(c);
+    var activeList = T.activeSkills ? T.activeSkills(c) : T.SKILL_ORDER;
+    if (!ui.insightSkill || activeList.indexOf(ui.insightSkill) === -1) ui.insightSkill = activeList[0] || 'past_tense';
+    var groups = T.studyGroups(c, ui.insightSkill);
     if (!c.students.length) return '<section class="tg-card tg-center"><h3>' + t('guru.belum-data-analisis', 'Belum ada data untuk dianalisis') + '</h3><p class="tg-muted">' + t('guru.tambah-siswa-dulu', 'Tambah siswa atau tempel kode hasil latihan murid dulu.') + '</p></section>';
     return '<div class="tg-grid tg-grid-skill">' + map.map(function (m, i) { return '<button type="button" class="tg-skill' + (ui.insightSkill === m.skill ? ' is-active' : '') + ' tg-rise" style="--d:' + i * 40 + 'ms" data-tg="insight-skill" data-skill="' + m.skill + '" data-testid="tg-skill-' + m.skill + '"><small>' + esc(m.label) + '</small><b>' + pct(m.acc) + '</b>' + bar(m.acc, m.acc != null && m.acc < 0.5 ? 'is-warn' : '') + '<em>' + (m.low ? m.low + ' siswa <50%' : m.acc == null ? 'belum ada data' : 'merata') + '</em></button>'; }).join('') + '</div>' +
       '<section class="tg-card" data-testid="tg-heatmap"><div class="tg-card-head"><div><p class="tg-kicker">Peta panas</p><h3>Siswa × skill — sekali lihat, tahu siapa butuh apa</h3></div><small class="tg-legend"><span class="is-hi">≥75%</span><span class="is-mid">50–74%</span><span class="is-lo">&lt;50%</span></small></div>' +
-      '<div class="tg-table-wrap"><table class="tg-table tg-heat-table"><thead><tr><th>Siswa</th>' + T.SKILL_ORDER.map(function (k) { return '<th>' + esc(T.SKILL_LABEL[k]) + '</th>'; }).join('') + '<th>Risiko</th></tr></thead><tbody>' + heat.map(function (h) { return '<tr data-tg="drawer" data-id="' + h.s.id + '"><td><div class="tg-who">' + avatar(h.s) + '<b>' + esc(h.s.name) + '</b></div></td>' + h.cells.map(function (x) { return cell(x.acc); }).join('') + '<td>' + riskPill(h.risk) + '</td></tr>'; }).join('') + '</tbody></table></div></section>' +
+      '<div class="tg-table-wrap"><table class="tg-table tg-heat-table"><thead><tr><th>Siswa</th>' + activeList.map(function (k) { var lbl = T.SKILL_LABEL[k] || (k.indexOf('KOMP-') === 0 ? k.replace(/^KOMP-/, '') : k); return '<th>' + esc(lbl) + '</th>'; }).join('') + '<th>Risiko</th></tr></thead><tbody>' + heat.map(function (h) { return '<tr data-tg="drawer" data-id="' + h.s.id + '"><td><div class="tg-who">' + avatar(h.s) + '<b>' + esc(h.s.name) + '</b></div></td>' + h.cells.map(function (x) { return cell(x.acc); }).join('') + '<td>' + riskPill(h.risk) + '</td></tr>'; }).join('') + '</tbody></table></div></section>' +
       '<div class="tg-grid tg-grid-2">' +
-      '<section class="tg-card" data-testid="tg-groups"><div class="tg-card-head"><div><p class="tg-kicker">Kelompok belajar otomatis</p><h3>' + esc(T.SKILL_LABEL[ui.insightSkill]) + ' — tiap kelompok punya mentor</h3></div><button type="button" class="tg-btn is-small is-ghost" data-tg="copy-groups">' + icon('copy') + ' Salin</button></div><p class="tg-muted">Siswa yang kuat dipasangkan dengan yang lemah (peer tutoring). Menjelaskan ke teman adalah latihan terbaik untuk si mentor sendiri.</p>' +
+      '<section class="tg-card" data-testid="tg-groups"><div class="tg-card-head"><div><p class="tg-kicker">Kelompok belajar otomatis</p><h3>' + esc(T.SKILL_LABEL[ui.insightSkill] || ui.insightSkill || '') + ' — tiap kelompok punya mentor</h3></div><button type="button" class="tg-btn is-small is-ghost" data-tg="copy-groups">' + icon('copy') + ' Salin</button></div><p class="tg-muted">Siswa yang kuat dipasangkan dengan yang lemah (peer tutoring). Menjelaskan ke teman adalah latihan terbaik untuk si mentor sendiri.</p>' +
       (groups.length ? '<div class="tg-groups">' + groups.map(function (g) { return '<div class="tg-group"><b>Kelompok ' + g.no + '</b>' + g.members.map(function (m, i) { return '<div class="tg-group-row' + (i === 0 ? ' is-mentor' : '') + '">' + avatar(m.s, 'sm') + '<span>' + esc(m.s.name) + '</span><small>' + pct(m.acc) + (i === 0 ? ' · mentor' : '') + '</small></div>'; }).join('') + '</div>'; }).join('') + '</div>' : '<p class="tg-empty">' + t('guru.belum-data-skill', 'Belum ada data skill ini.') + '</p>') + '</section>' +
       '<section class="tg-card tg-card-ink"><p class="tg-kicker">Tiga miskonsepsi teratas</p>' + (mis.length ? '<ol class="tg-mis">' + mis.map(function (m) { return '<li><b>' + esc(m.label) + ' <span>' + pct(m.acc) + '</span></b><small>' + esc(m.pattern) + '</small><em>' + esc(m.objective) + '</em></li>'; }).join('') + '</ol><button type="button" class="tg-btn is-light is-small" data-tg="modal" data-kind="assign" data-skill="' + mis[0].skill + '">' + icon('plus') + ' ' + t('guru.buat-remedial', 'Buat sesi remedial') + ' ' + esc(mis[0].label) + '</button>' : '<p>' + t('umum.belum-ada-data', 'Belum ada data.') + '</p>') + '</section></div>';
   }
@@ -970,7 +1749,7 @@
       '<div class="tg-drawer-head">' + avatar(s, 'lg') + '<div><h3>' + esc(s.name) + '</h3><p class="tg-muted">' + riskPill(r) + ' · ' + (r.inactiveDays == null ? 'belum aktif' : r.inactiveDays === 0 ? 'aktif hari ini' : r.inactiveDays + ' hari tidak belajar') + '</p></div><button type="button" class="tg-icon-btn" data-tg="close" aria-label="' + t('umum.tutup', 'Tutup') + '">' + icon('x') + '</button></div>' +
       '<div class="tg-drawer-body">' +
       '<div class="tg-action-box"><p class="tg-kicker">Tindakan yang disarankan</p><p>' + esc(r.action) + '</p><div class="tg-actions"><button type="button" class="tg-btn is-primary is-small" data-tg="modal" data-kind="greet" data-id="' + s.id + '">' + icon('message-circle-heart') + ' Kartu sapa</button><button type="button" class="tg-btn is-ghost is-small" data-tg="modal" data-kind="parent" data-id="' + s.id + '">' + icon('file-text') + ' Laporan ortu</button><button type="button" class="tg-btn is-ghost is-small" data-tg="modal" data-kind="assign" data-target="' + s.id + '"' + (r.weak ? ' data-skill="' + r.weak.skill + '"' : '') + '>' + icon('plus') + ' ' + t('guru.tugas-khusus', 'Tugas khusus') + '</button></div></div>' +
-      '<h4>Skill</h4><div class="tg-skill-rows">' + T.SKILL_ORDER.map(function (k) { var v = T.skillAcc(s, k); return '<div class="tg-skill-row"><span>' + esc(T.SKILL_LABEL[k]) + '</span>' + bar(v, v != null && v < 0.5 ? 'is-warn' : '') + '<b>' + pct(v) + '</b></div>'; }).join('') + '</div>' +
+      '<h4>Skill</h4><div class="tg-skill-rows">' + (T.activeSkills ? T.activeSkills(c, s) : T.SKILL_ORDER).map(function (k) { var v = T.skillAcc(s, k); var lbl = T.SKILL_LABEL[k] || (k.indexOf('KOMP-') === 0 ? k.replace(/^KOMP-/, '') : k); return '<div class="tg-skill-row"><span>' + esc(lbl) + '</span>' + bar(v, v != null && v < 0.5 ? 'is-warn' : '') + '<b>' + pct(v) + '</b></div>'; }).join('') + '</div>' +
       '<h4>Kehadiran 7 hari</h4><div class="tg-att-strip">' + att.map(function (a) { return '<span class="is-' + (a.v || 'none') + '" title="' + a.date + '">' + (a.v || '·') + '</span>'; }).join('') + '</div>' +
       focusPanel(c, s) +
       '<h4>' + t('umum.tugas', 'Tugas') + '</h4>' + (pend.length ? '<ul class="tg-mini-list">' + pend.map(function (p) { return '<li>' + esc(p.a.title) + (p.late ? ' <strong class="tg-late">lewat</strong>' : '') + ' <button type="button" class="tg-link" data-tg="mark-done" data-id="' + p.a.id + '" data-sid="' + s.id + '">tandai selesai</button></li>'; }).join('') + '</ul>' : '<p class="tg-muted">Semua tugas selesai.</p>') +
@@ -1015,6 +1794,7 @@
         var curSId = m.subjectId || ui.assignSubject || ui.curriculumSubject || 'MAT';
         var mCode = m.compCode || ui.assignCompCode || '';
         var mTitle = m.compTitle || ui.assignCompTitle || '';
+        var catItem = MAPEL_CATALOG[curSId] || MAPEL_CATALOG['MAT'];
 
         var comps = [];
         if (ui.curriculumTree && ui.curriculumTree.length) {
@@ -1029,6 +1809,13 @@
             }
           })(ui.curriculumTree);
         }
+        if (!comps.length && catItem && catItem.competencies) {
+          comps = catItem.competencies.slice();
+        }
+        if (!mCode && comps.length) {
+          mCode = comps[0].code;
+          mTitle = comps[0].name;
+        }
 
         var subjectSelect = '<label class="tg-label">' + t('guru.pilih-mapel-tugas', 'Pilih Mata Pelajaran (17 Mapel)') +
           '<select name="subject_id" data-tg-select="assign-subject" class="tg-select-unit" data-testid="tg-assign-subject-select">' +
@@ -1039,12 +1826,11 @@
 
         var compSelectHtml = '';
         if (comps.length) {
-          compSelectHtml = '<label class="tg-label">' + t('guru.pilih-kompetensi-dropdown', 'Pilih Capaian / Kompetensi dari Pohon Kurikulum') +
-            '<select name="comp_select" data-tg-select="assign-comp-select" class="tg-select-unit">' +
-              '<option value="">' + esc(t('guru.pilih-atau-isi-kustom', '— Pilih dari daftar atau ketik di bawah —')) + '</option>' +
+          compSelectHtml = '<label class="tg-label">' + t('guru.pilih-kompetensi-dropdown', 'Pilih Capaian / Kompetensi Kurikulum') +
+            '<select name="comp_select" data-tg-select="assign-comp-select" class="tg-select-unit" data-testid="tg-assign-comp-select">' +
               comps.map(function (cItem) {
                 var isSel = (cItem.code === mCode || cItem.name === mTitle);
-                return '<option value="' + esc(cItem.code) + '" data-title="' + esc(cItem.name) + '" data-materi="' + esc(cItem.materi) + '"' + (isSel ? ' selected' : '') + '>' +
+                return '<option value="' + esc(cItem.code) + '" data-title="' + esc(cItem.name) + '" data-materi="' + esc(cItem.materi || '') + '"' + (isSel ? ' selected' : '') + '>' +
                   esc(cItem.code + ' · ' + cItem.name) +
                 '</option>';
               }).join('') +
@@ -1060,8 +1846,22 @@
           '</label>' +
         '</div>';
 
+        var briefCard = '';
+        if (catItem && catItem.teachingBrief) {
+          var tb = catItem.teachingBrief;
+          briefCard = '<div class="tg-brief-card" data-testid="tg-mapel-brief">' +
+            '<div class="tg-brief-head"><span class="tg-badge">💡 ' + esc(t('guru.panduan-mengajar', 'Panduan mengajar')) + '</span><h4>' + esc(catItem.name + (mTitle ? ' — ' + mTitle : '')) + '</h4><span class="tg-cefr-pill">' + esc(catItem.grade) + '</span></div>' +
+            '<p class="tg-brief-summary">' + esc(tb.summary) + '</p>' +
+            '<div class="tg-brief-grid">' +
+              '<div class="tg-brief-col"><b>' + esc(t('guru.apersepsi-5-menit', '🎤 Apersepsi 5 Menit (Hook Kelas):')) + '</b><p>' + esc(tb.hook5Minutes) + '</p></div>' +
+              '<div class="tg-brief-col"><b>' + esc(t('guru.papan-tulis-rumus', '📋 Rumus / Konsep Papan Tulis:')) + '</b><code>' + esc(tb.boardFormula) + '</code></div>' +
+            '</div>' +
+            (tb.commonMisconceptions && tb.commonMisconceptions.length ? '<div class="tg-brief-miscons"><b>' + esc(t('guru.top-miskonsepsi', '⚠️ Top Miskonsepsi Siswa:')) + '</b><ul>' + tb.commonMisconceptions.map(function (mc) { return '<li><b>' + esc(mc.trap) + ':</b> ' + esc(mc.pattern) + ' ➔ <em>' + esc(mc.fix) + '</em></li>'; }).join('') + '</ul></div>' : '') +
+            '</div>';
+        }
+
         tabContent = '<input type="hidden" name="assign_source" value="mapel">' +
-          subjectSelect + compSelectHtml + compInputs;
+          subjectSelect + compSelectHtml + compInputs + briefCard;
       } else if (tab === 'curriculum' && C) {
         var phasePills = '<div class="tg-phase-pills">' + phases.map(function (p) {
           return '<button type="button" class="tg-chip' + (curPhase === p.id ? ' is-active' : '') + '" data-tg="assign-phase" data-phase="' + p.id + '"><b>' + esc(p.name) + '</b><small>' + esc(p.cefr) + '</small></button>';
@@ -1430,15 +2230,7 @@
         ui.modal.compCode = optCode;
         ui.modal.compTitle = optTitle;
       }
-      var codeInput = el.querySelector('[name="comp_code"]');
-      var titleInput = el.querySelector('[name="comp_title"]');
-      var mainTitle = el.querySelector('[name="title"]');
-      if (codeInput) codeInput.value = optCode;
-      if (titleInput) titleInput.value = optTitle;
-      if (mainTitle && optTitle) {
-        var curMName = mapelName(ui.assignSubject || ui.curriculumSubject || 'MAT');
-        mainTitle.value = curMName + ' · ' + optTitle;
-      }
+      persist(); render();
     }
     /* Ganti bab = sub-bab lama tidak berlaku lagi. Membiarkannya membuat guru mengira
        sedang memilih "1.2 Simple Present" padahal bab yang dipilih sudah berbeda. */
@@ -1454,5 +2246,5 @@
   }
   function download(name, text, type) { try { var a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([text], { type: type || 'text/plain' })); a.download = name; document.body.appendChild(a); a.click(); setTimeout(function () { URL.revokeObjectURL(a.href); a.remove(); }, 800); } catch (_) { copy(text, 'Unduhan tidak didukung — isi tersalin.'); } }
 
-  root.FiezelTeacherShell = { mount: mount, unmount: unmount, render: render, previewAllowed: previewAllowed, exitPreview: exitPreview, _state: function () { return st; }, _autoSyncPlan: autoSyncPlan, _syncTicks: function () { return { every: SYNC_EVERY_MS, chip: CHIP_TICK_MS, stuck: (root.FiezelSyncPlan && root.FiezelSyncPlan.STUCK_MS) || 45000 }; }, _armed: function () { return !!syncTimer && !!chipTimer; } };
+  root.FiezelTeacherShell = { mount: mount, unmount: unmount, render: render, previewAllowed: previewAllowed, exitPreview: exitPreview, _state: function () { return st; }, _autoSyncPlan: autoSyncPlan, _syncTicks: function () { return { every: SYNC_EVERY_MS, chip: CHIP_TICK_MS, stuck: (root.FiezelSyncPlan && root.FiezelSyncPlan.STUCK_MS) || 45000 }; }, _armed: function () { return !!syncTimer && !!chipTimer; }, _synthesizeMapelQuestions: synthesizeMapelQuestions, _MAPEL_LIST: MAPEL_LIST, _MAPEL_CATALOG: MAPEL_CATALOG };
 })(typeof window !== 'undefined' ? window : null);
