@@ -55,7 +55,7 @@ export const OAUTH_TABLES = Object.freeze([
 /** Tabel konten guru. */
 export const TEACHER_TABLES = Object.freeze([
   'tc_node', 'tc_question', 'tc_assignment', 'tc_assignment_target', 'tc_lesson_evidence',
-  'tc_class', 'tc_class_report', 'tc_class_assignment'
+  'tc_class', 'tc_class_report', 'tc_class_assignment', 'tc_class_teacher', 'tc_school'
 ]);
 
 /**
@@ -97,7 +97,8 @@ export const AUTH_DDL = Object.freeze([
     ' revoked_at INTEGER,' +
     ' subject_id TEXT,' +
     ' grade_id TEXT,' +
-    ' raw_code TEXT' +
+    ' raw_code TEXT,' +
+    ' class_code TEXT' +
     ' )',
   'CREATE TABLE IF NOT EXISTS teacher_profile (' +
     ' sub TEXT PRIMARY KEY,' +
@@ -107,7 +108,8 @@ export const AUTH_DDL = Object.freeze([
     ' institution_id TEXT NOT NULL,' +
     ' activated_at INTEGER NOT NULL,' +
     ' subject_id TEXT,' +
-    ' grade_id TEXT' +
+    ' grade_id TEXT,' +
+    ' class_code TEXT' +
     ' )',
   'CREATE TABLE IF NOT EXISTS friend_request (' +
     ' from_sub TEXT NOT NULL,' +
@@ -249,6 +251,28 @@ export const TEACHER_DDL = Object.freeze([
     ' updated_at INTEGER NOT NULL,' +
     ' PRIMARY KEY (class_code, id)' +
     ' ) WITHOUT ROWID',
+  'CREATE TABLE IF NOT EXISTS tc_class_teacher (' +
+    ' class_code TEXT NOT NULL,' +
+    ' teacher_sub TEXT NOT NULL,' +
+    ' subject_id TEXT NOT NULL,' +
+    ' teacher_name TEXT NOT NULL,' +
+    ' created_at INTEGER NOT NULL,' +
+    ' updated_at INTEGER NOT NULL,' +
+    ' PRIMARY KEY (class_code, subject_id)' +
+    ' ) WITHOUT ROWID',
+  'CREATE TABLE IF NOT EXISTS tc_school (' +
+    ' id TEXT PRIMARY KEY,' +
+    ' name TEXT NOT NULL,' +
+    ' npsn TEXT,' +
+    ' level TEXT NOT NULL DEFAULT \'SMP\',' +
+    ' type TEXT NOT NULL DEFAULT \'school\',' +
+    ' city TEXT,' +
+    ' address TEXT,' +
+    ' principal_name TEXT,' +
+    ' contact TEXT,' +
+    ' created_at INTEGER NOT NULL,' +
+    ' updated_at INTEGER NOT NULL' +
+    ' )',
 ]);
 
 export const OAUTH_DDL = Object.freeze([

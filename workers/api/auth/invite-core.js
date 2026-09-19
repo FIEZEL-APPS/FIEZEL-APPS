@@ -183,7 +183,8 @@ export async function mintInvite(input, nowMs, deps = {}) {
       used_by: null,
       revoked_at: null,
       subject_id: (input.subject_id || input.subjectId || null),
-      grade_id: (input.grade_id || input.gradeId || null)
+      grade_id: (input.grade_id || input.gradeId || null),
+      class_code: (input.class_code || input.classCode || null)
     }
   };
 }
@@ -234,6 +235,7 @@ export function publicInviteView(record, nowMs) {
     institutionType: record.institution_type,
     subjectId: record.subject_id || null,
     gradeId: record.grade_id || null,
+    classCode: record.class_code || null,
     status: inviteStatus(record, nowMs),
     createdAt: Number(record.created_at) || 0,
     expiresAt: Number(record.expires_at) || 0,

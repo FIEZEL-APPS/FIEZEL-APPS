@@ -281,6 +281,12 @@
     return normalizeLocale(record && record.locale);
   }
 
+  /** Kode kelas yang dimasukkan murid, atau '' bila tidak ada. */
+  function storedClassCode(env) {
+    var record = readRecord(env);
+    return String((record && record.classCode) || '');
+  }
+
   /**
    * Simpan segera setelah pilihan diketuk. `done` tidak diubah: memuat ulang sesudah memilih
    * bahasa harus melanjutkan ke nama, bukan mengulang popup dan bukan menandai onboarding selesai.
@@ -1368,6 +1374,7 @@
         commitName();
         if (nameOnly) { finish('name'); return; }
         if (selectedRole === 'guru') { finish('finish'); return; }
+        if (typedClassCode) { finish('finish'); return; }
         goStep(sequenceStep(1));
         return;
       }
@@ -1613,6 +1620,7 @@
     normalizeRole: normalizeRole,
     roleMarkup: roleMarkup,
     storedLocale: storedLocale,
+    storedClassCode: storedClassCode,
     needsName: needsName,
     show: show
   };
