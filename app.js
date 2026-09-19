@@ -3648,9 +3648,21 @@ function retentionProbeDueLessons(now=Date.now()){
   try{
     const st=retentionProbeRead(),probes=st&&st.probes&&typeof st.probes==='object'?st.probes:null;
     if(!probes)return out;
+    /* Probe yang SUDAH dijawab sesudah jatuh temponya = sudah terukur, dan harus berhenti
+       menandai lessonnya. Tanpa saringan ini probe bukan pemeriksaan sekali-jalan melainkan
+       penghuni tetap: schedule() idempoten per lesson (ia melewati lesson yang sudah punya
+       jadwal) dan tidak ada yang mencoret barisnya, jadi dueAt yang lewat tidak pernah
+       bergerak lagi — lesson mastered akan menempati slot kolam review di SETIAP sesi
+       berikutnya, termasuk tepat sesudah murid menjawab benar dan retensinya justru
+       terbukti. Sinyal "dijawab sesudah jatuh tempo" dipinjam apa adanya dari
+       retentionProbeResults() supaya kedua jalur tidak bisa berbeda pendapat. */
+    const rows=(state.history||[]).filter(h=>h&&Number(h.at)>0);
     for(const lesson of Object.keys(probes)){
       const list=Array.isArray(probes[lesson]?.probes)?probes[lesson].probes:[];
-      for(const pr of list){const d=Number(pr?.dueAt);if(Number.isFinite(d)&&d<=now){out.add(String(lesson));break}}
+      for(const pr of list){const d=Number(pr?.dueAt);
+        if(!Number.isFinite(d)||d>now)continue;
+        if(rows.some(h=>String(h.skill||'')===lesson&&Number(h.at)>=d))continue;
+        out.add(String(lesson));break}
     }
   }catch{}
   return out;

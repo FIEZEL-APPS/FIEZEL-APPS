@@ -148,6 +148,35 @@ test('A4 state rusak tidak melempar dan tidak menandai apa pun', () => {
   assert.deepStrictEqual(JSON.parse(out), [], 'state korup harus senyap');
 });
 
+test('A6 probe yang SUDAH DIJAWAB berhenti menandai lessonnya', () => {
+  // Tanpa ini probe bukan pemeriksaan sekali-jalan melainkan penghuni tetap: dueAt yang
+  // sudah lewat tidak pernah bergerak, jadi lesson mastered akan menempati slot kolam
+  // review di SETIAP sesi berikutnya — termasuk tepat sesudah murid menjawabnya dengan
+  // benar dan retensinya justru terbukti.
+  const now = Date.now();
+  const dueAt = now - 2 * DAY;
+  const store = { [KEY]: JSON.stringify(probeState('l1', [-2 * DAY], now)) };
+  const sb = sandboxOf({ store, state: { history: [
+    { at: dueAt + 60000, ok: true, skill: 'l1', target: 'l1', type: 'grammar', predicted: 0.9 },
+  ] } });
+  const out = run(['retentionProbeAvailable', 'retentionProbeRead', 'retentionProbeDueLessons'],
+    sb, 'JSON.stringify([...retentionProbeDueLessons(' + now + ')])');
+  assert.deepStrictEqual(JSON.parse(out), [], 'probe yang sudah terukur tidak boleh disajikan lagi');
+});
+
+test('A7 probe jatuh tempo yang BELUM dijawab tetap disajikan', () => {
+  // Arah kedua A6: jawaban yang mendarat SEBELUM jatuh tempo bukan jawaban probe.
+  const now = Date.now();
+  const dueAt = now - 2 * DAY;
+  const store = { [KEY]: JSON.stringify(probeState('l1', [-2 * DAY], now)) };
+  const sb = sandboxOf({ store, state: { history: [
+    { at: dueAt - 5 * DAY, ok: true, skill: 'l1', target: 'l1', type: 'grammar', predicted: 0.9 },
+  ] } });
+  const out = run(['retentionProbeAvailable', 'retentionProbeRead', 'retentionProbeDueLessons'],
+    sb, 'JSON.stringify([...retentionProbeDueLessons(' + now + ')])');
+  assert.deepStrictEqual(JSON.parse(out), ['l1'], 'jawaban sebelum jatuh tempo tidak mengukur probe');
+});
+
 test('A5 kolam review BENAR-BENAR membaca kedua himpunan (wiring buildAdaptivePool)', () => {
   const src = sourceBlock('buildAdaptivePool');
   assert.ok(src, 'buildAdaptivePool tidak ditemukan');
