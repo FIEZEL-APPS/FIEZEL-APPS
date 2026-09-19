@@ -173,6 +173,9 @@
     'kurikulum.preset-applied-sum': "Template Sumatif (20 soal) diterapkan.",
     'kurikulum.rapor-berhasil-salin': "Narasi e-Rapor berhasil disalin ke papan klip!",
     'kurikulum.rapor-gagal-salin': "Gagal menyalin. Silakan pilih teks manual.",
-    'kurikulum.rapor-manual': "Teks siap disalin secara manual."
+    'kurikulum.rapor-manual': "Teks siap disalin secara manual.",
+    'kurikulum.disclaimer-badge': "Standar Kurikulum Merdeka & Otonomi Pendidik",
+    'kurikulum.disclaimer-text': "FIEZEL beroperasi sebagai platform pendukung pembelajaran mandiri yang mengadopsi struktur Capaian Pembelajaran Kurikulum Merdeka (Keputusan Kepala BSKAP Kemendikbudristek No. 032/H/KR/2024 dan Permendikbudristek No. 12 Tahun 2024). Guru dan satuan pendidikan memiliki otonomi pedagogis penuh untuk menyesuaikan materi, indikator, dan alur tujuan pembelajaran sesuai Kurikulum Operasional Satuan Pendidikan (KOSP) masing-masing.",
+    'kurikulum.disclaimer-auth': "Mengadopsi Standar Capaian Pembelajaran Kurikulum Merdeka (BSKAP No. 032/H/KR/2024). Menghormati penuh otonomi KOSP sekolah dan pendidik."
   });
 })();
