@@ -263,7 +263,7 @@ async function synthesizeGemini(text, voiceName, apiKey) {
     const audioPart = candidate?.content?.parts?.find((p) => p.inlineData && p.inlineData.mimeType?.startsWith('audio/'));
 
     if (!audioPart || !audioPart.inlineData?.data) {
-      lastError = 'no_audio_part_in_response';
+      lastError = `no_audio_part_in_response: ${JSON.stringify(candidate || data).slice(0, 300)}`;
       await new Promise((r) => setTimeout(r, attempt * 1500));
       continue;
     }
