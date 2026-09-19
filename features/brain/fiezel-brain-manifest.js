@@ -211,7 +211,9 @@
     // atau vonis netral = layar persis seperti sebelum m025-337.
     confusionMap: 'active',
     olmInsight: 'active',
-    listeningPolicy: 'shadow',
+    // listeningPolicy (listening-adaptive): AKTIF (P0.1) — rateBand dan replayQuota
+    // langsung mengatur kecepatan pemutar audio dan kuota putar ulang di app.js.
+    listeningPolicy: 'active',
     stepTutor: 'active',
     productionGrader: 'active',
     // Langkah 1 roadmap otonomi: probe retensi kini dimuat halaman dan dipanggil —

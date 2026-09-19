@@ -203,6 +203,17 @@
       tree: function (subjectId) { return api('/curriculum/tree' + (subjectId ? '?subject_id=' + encodeURIComponent(subjectId) : '')); },
       nodes: function (subjectId) { return api('/curriculum/nodes' + (subjectId ? '?subject_id=' + encodeURIComponent(subjectId) : '')); },
       competencies: function (subjectId) { return api('/curriculum/competencies' + (subjectId ? '?subject_id=' + encodeURIComponent(subjectId) : '')); }
+    },
+    questions: {
+      list: function (params) {
+        var q = [];
+        if (params) {
+          Object.keys(params).forEach(function (k) {
+            if (params[k] != null) q.push(encodeURIComponent(k) + '=' + encodeURIComponent(params[k]));
+          });
+        }
+        return api('/questions' + (q.length ? '?' + q.join('&') : ''));
+      }
     }
   };
 })(window);
