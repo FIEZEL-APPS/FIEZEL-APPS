@@ -57,17 +57,14 @@ export async function routeTeacherInviteCreate(ctx) {
   const r = minted.record;
   await db.prepare(
     'INSERT INTO teacher_invite (code_hash, teacher_name, institution, institution_type, ' +
-    'created_at, expires_at, created_by) VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7)'
+    'created_at, expires_at, created_by, subject_id, grade_id, raw_code) VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10)'
   ).bind(r.code_hash, r.teacher_name, r.institution, r.institution_type,
-    r.created_at, r.expires_at, r.created_by).run();
+    r.created_at, r.expires_at, r.created_by, r.subject_id || null, r.grade_id || null, minted.code).run();
 
-  // Teks token muncul DI SINI DAN HANYA DI SINI, dalam satu respons yang owner
-  // lihat sekali. Tidak ada endpoint yang bisa menampilkannya lagi, karena D1
-  // hanya memegang hash-nya. Owner yang kehilangan token mencetak yang baru.
   return jsonResponse({
     code: minted.code,
     invite: publicInviteView(r, ctx.now),
-    notice: 'once_only'
+    notice: 'created'
   }, opt);
 }
 
@@ -139,32 +136,134 @@ export async function routeOwnerTeachers(ctx) {
 
   const invites = await db.prepare(
     'SELECT code_hash, teacher_name, institution, institution_type, created_at, expires_at, ' +
-    'used_at, revoked_at FROM teacher_invite ORDER BY created_at DESC LIMIT 200'
+    'used_at, revoked_at, subject_id, grade_id, raw_code FROM teacher_invite ORDER BY created_at DESC LIMIT 200'
   ).all();
 
   const teachers = await db.prepare(
-    'SELECT p.teacher_name, p.institution, p.institution_type, p.activated_at, a.login_handle, a.status ' +
+    'SELECT p.teacher_name, p.institution, p.institution_type, p.activated_at, p.subject_id, p.grade_id, a.login_handle, a.status ' +
     'FROM teacher_profile p JOIN auth_account a ON a.sub = p.sub ORDER BY p.activated_at DESC LIMIT 200'
   ).all();
 
   return jsonResponse({
     invites: ((invites && invites.results) || []).map((row) => ({
       ...publicInviteView(row, ctx.now),
-      codeHash: row.code_hash
+      subjectId: row.subject_id || null,
+      gradeId: row.grade_id || null,
+      codeHash: row.code_hash,
+      rawCode: row.raw_code || null
     })),
     teachers: ((teachers && teachers.results) || []).map((row) => ({
       handle: row.login_handle,
       teacherName: row.teacher_name,
       institution: row.institution,
       institutionType: row.institution_type,
+      subjectId: row.subject_id || null,
+      gradeId: row.grade_id || null,
       status: row.status,
       activatedAt: Number(row.activated_at) || 0
     }))
   }, opt);
 }
 
+/* ========================================================================== */
+/* POST /api/owner/teacher-invite/update                                       */
+/* ========================================================================== */
+
+export async function routeTeacherInviteUpdate(ctx) {
+  const secretGate = await ownerGate(ctx);
+  let db = coreDb(ctx.env);
+
+  if (secretGate) {
+    const gate = await roleGate(ctx);
+    if (!gate.ok) return gate.response;
+    db = gate.db;
+  }
+
+  if (!db) return jsonError(503, 'internal_error', {}, { headers: ctx.corsHeaders });
+  await ensureAuthSchema(db);
+
+  const opt = { headers: ctx.corsHeaders };
+  const body = await readJsonFromCtx(ctx, opt);
+  if (!body.ok) return body.response;
+
+  const { codeHash, subject_id, grade_id, teacherName, institution } = body.value || {};
+  if (!codeHash || typeof codeHash !== 'string') {
+    return jsonError(400, 'code_hash_required', {}, opt);
+  }
+
+  const existing = await db.prepare('SELECT used_by FROM teacher_invite WHERE code_hash = ?1').bind(codeHash).first();
+  if (!existing) {
+    return jsonError(404, 'invite_not_found', {}, opt);
+  }
+
+  await db.prepare(
+    'UPDATE teacher_invite SET ' +
+    'subject_id = COALESCE(?2, subject_id), ' +
+    'grade_id = COALESCE(?3, grade_id), ' +
+    'teacher_name = COALESCE(?4, teacher_name), ' +
+    'institution = COALESCE(?5, institution) ' +
+    'WHERE code_hash = ?1'
+  ).bind(codeHash, subject_id || null, grade_id || null, teacherName || null, institution || null).run();
+
+  if (existing.used_by) {
+    await db.prepare(
+      'UPDATE teacher_profile SET ' +
+      'subject_id = COALESCE(?2, subject_id), ' +
+      'grade_id = COALESCE(?3, grade_id), ' +
+      'teacher_name = COALESCE(?4, teacher_name), ' +
+      'institution = COALESCE(?5, institution) ' +
+      'WHERE sub = ?1'
+    ).bind(existing.used_by, subject_id || null, grade_id || null, teacherName || null, institution || null).run();
+  }
+
+  return jsonResponse({ ok: true, updated: true }, opt);
+}
+
+/* ========================================================================== */
+/* POST /api/owner/teacher-invite/delete                                       */
+/* ========================================================================== */
+
+export async function routeTeacherInviteDelete(ctx) {
+  const secretGate = await ownerGate(ctx);
+  let db = coreDb(ctx.env);
+
+  if (secretGate) {
+    const gate = await roleGate(ctx);
+    if (!gate.ok) return gate.response;
+    db = gate.db;
+  }
+
+  if (!db) return jsonError(503, 'internal_error', {}, { headers: ctx.corsHeaders });
+  await ensureAuthSchema(db);
+
+  const opt = { headers: ctx.corsHeaders };
+  const body = await readJsonFromCtx(ctx, opt);
+  if (!body.ok) return body.response;
+
+  const { codeHash, mode } = body.value || {};
+
+  if (mode === 'revoked') {
+    const res = await db.prepare('DELETE FROM teacher_invite WHERE revoked_at IS NOT NULL OR expires_at < ?1').bind(ctx.now).run();
+    return jsonResponse({ ok: true, deletedCount: (res && res.meta && res.meta.changes) || 0 }, opt);
+  }
+
+  if (mode === 'all') {
+    const res = await db.prepare('DELETE FROM teacher_invite').run();
+    return jsonResponse({ ok: true, deletedCount: (res && res.meta && res.meta.changes) || 0 }, opt);
+  }
+
+  if (!codeHash || typeof codeHash !== 'string') {
+    return jsonError(400, 'code_hash_or_mode_required', {}, opt);
+  }
+
+  const res = await db.prepare('DELETE FROM teacher_invite WHERE code_hash = ?1').bind(codeHash).run();
+  return jsonResponse({ ok: true, deleted: Boolean(res && res.meta && res.meta.changes === 1) }, opt);
+}
+
 export const ROUTES = [
   ['POST', '/api/owner/teacher-invite', routeTeacherInviteCreate],
   ['POST', '/api/owner/teacher-invite/revoke', routeTeacherInviteRevoke],
+  ['POST', '/api/owner/teacher-invite/update', routeTeacherInviteUpdate],
+  ['POST', '/api/owner/teacher-invite/delete', routeTeacherInviteDelete],
   ['GET', '/api/owner/teachers', routeOwnerTeachers]
 ];

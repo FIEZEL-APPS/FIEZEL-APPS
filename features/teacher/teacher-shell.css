@@ -397,3 +397,17 @@ html.fiezel-ui-v6 body.fz-teacher-mode .tg button.tg-seg-btn:not(.primary):not(.
   .tg-demo-acts{width:100%}
   .tg-demo-btn{flex:1 1 auto;text-align:center}
 }
+
+/* ---------- Kurikulum & Materi Ajar di KelasKu ---------- */
+.tg-curriculum-wrap{display:flex;flex-direction:column;gap:18px}
+.tg-curriculum-toolbar{background:var(--tg-paper-2);border:1px solid var(--tg-line);border-radius:var(--tg-r-lg);padding:14px 18px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px}
+.tg-curriculum-tree{display:flex;flex-direction:column;gap:16px}
+.tg-curriculum-card{background:var(--tg-paper-2);border:1px solid var(--tg-line);border-radius:var(--tg-r-lg);padding:20px;box-shadow:0 2px 8px rgba(0,0,0,.03)}
+.tg-tp-item{background:var(--tg-paper);border:1px solid var(--tg-line);border-radius:var(--tg-r);padding:14px;margin-top:10px}
+.tg-comp-row{display:flex;align-items:center;justify-content:space-between;gap:12px;background:#fff;border:1px solid var(--tg-line);border-radius:8px;padding:10px 14px;margin-top:8px}
+
+/* ---------- Panel Owner & Token di KelasKu ---------- */
+.tg-owner-wrap{display:flex;flex-direction:column;gap:20px}
+.tg-token-pill{display:inline-block;padding:4px 10px;background:rgba(21,76,121,.1);border:1px solid rgba(21,76,121,.25);border-radius:6px;font-family:var(--tg-mono);font-size:.84rem;font-weight:700;color:var(--tg-ink);user-select:all;cursor:pointer}
+.tg-token-pill:hover{background:rgba(21,76,121,.18)}
+

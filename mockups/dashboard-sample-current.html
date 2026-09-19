@@ -329,6 +329,29 @@ button{margin-top:10px;padding:11px 16px;font-size:15px;font-weight:700;border:1
             <option value="365">365 Hari (1 Tahun)</option>
           </select>
         </div>
+        <div>
+          <label for="f_subject" style="display:block;font-size:12px;font-weight:bold;margin-bottom:4px;color:var(--ink);">Mata Pelajaran yang Diampu</label>
+          <select id="f_subject" name="subject_id" style="width:100%;box-sizing:border-box;">
+            <option value="MAT" selected>Matematika</option>
+            <option value="ENG">Bahasa Inggris</option>
+            <option value="IPA">Ilmu Pengetahuan Alam (IPA)</option>
+            <option value="IPS">Ilmu Pengetahuan Sosial (IPS)</option>
+            <option value="IND">Bahasa Indonesia</option>
+            <option value="INF">Informatika</option>
+            <option value="PKN">Pendidikan Pancasila</option>
+            <option value="SD-ALL">Guru Kelas SD (Tematik)</option>
+            <option value="ALL">Semua Mapel (Kurikulum/Kepsek)</option>
+          </select>
+        </div>
+        <div>
+          <label for="f_grade" style="display:block;font-size:12px;font-weight:bold;margin-bottom:4px;color:var(--ink);">Jenjang / Fase</label>
+          <select id="f_grade" name="grade_id" style="width:100%;box-sizing:border-box;">
+            <option value="SMP" selected>Fase D · SMP (Kelas 7–9)</option>
+            <option value="SMA">Fase E/F · SMA/SMK (Kelas 10–12)</option>
+            <option value="SD">Fase A–C · SD (Kelas 1–6)</option>
+            <option value="ALL">Semua Jenjang</option>
+          </select>
+        </div>
         <div style="grid-column:1/-1;text-align:right;margin-top:6px;">
           <button type="submit" style="background:var(--ink);color:#fff;padding:10px 20px;border:none;border-radius:6px;font-weight:bold;cursor:pointer;">+ Buat Token Guru</button>
         </div>
@@ -345,7 +368,25 @@ button{margin-top:10px;padding:11px 16px;font-size:15px;font-weight:700;border:1
       </form>
     </div>
   
-      <h3 style="color:var(--ink);margin-top:20px;margin-bottom:8px;">Riwayat Undangan &amp; Token Guru</h3>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-top:20px;margin-bottom:8px;flex-wrap:wrap;gap:8px;">
+        <h3 style="color:var(--ink);margin:0;">Riwayat Undangan &amp; Token Guru</h3>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          <form method="GET" action="/" style="margin:0;">
+            <input type="hidden" name="action" value="clear_invites">
+            <input type="hidden" name="mode" value="revoked">
+            <button type="submit" style="background:#f1f5f9;color:#334155;border:1px solid #cbd5e1;padding:4px 10px;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;">
+              🧹 Bersihkan Token Dicabut / Kedaluwarsa
+            </button>
+          </form>
+          <form method="GET" action="/" style="margin:0;">
+            <input type="hidden" name="action" value="clear_invites">
+            <input type="hidden" name="mode" value="all">
+            <button type="submit" style="background:#fee2e2;color:#991b1b;border:1px solid #f87171;padding:4px 10px;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;">
+              ⚠️ Hapus Semua Data Token
+            </button>
+          </form>
+        </div>
+      </div>
       
       <div style="overflow-x:auto;margin-bottom:24px;">
         <table>
@@ -353,7 +394,8 @@ button{margin-top:10px;padding:11px 16px;font-size:15px;font-weight:700;border:1
             <tr>
               <th>Guru</th>
               <th>Sekolah / Instansi</th>
-              <th>Jenis</th>
+              <th>Mapel &amp; Jenjang</th>
+              <th>Kode Token</th>
               <th>Status</th>
               <th>Dibuat (WIB)</th>
               <th>Berlaku Hingga</th>
@@ -362,20 +404,62 @@ button{margin-top:10px;padding:11px 16px;font-size:15px;font-weight:700;border:1
           </thead>
           <tbody>
             <tr>
-        <td><b>Mardhiana Hamzah</b></td>
-        <td>MTsN 5 ACEH BESAR</td>
-        <td>school</td>
-        <td><span style="background:#e8f5e9;color:#2e7d32;padding:2px 8px;border-radius:10px;font-weight:bold;font-size:11px;">AKTIF</span></td>
-        <td>2026-09-13</td>
-        <td>2026-12-11</td>
-        <td style="text-align:center;">
-          <form method="GET" action="/" style="display:inline;margin:0;">
-            <input type="hidden" name="action" value="revoke_invite">
-            <input type="hidden" name="codeHash" value="abc">
-            <button type="submit" style="background:#c62828;color:#fff;border:none;padding:4px 10px;border-radius:4px;font-size:11px;font-weight:bold;cursor:pointer;">Cabut</button>
-          </form>
-        </td>
-      </tr>
+              <td><b>Mardhiana Hamzah</b></td>
+              <td>MTsN 5 ACEH BESAR</td>
+              <td><span style="background:#e0f2fe;color:#0369a1;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;">Matematika</span><small style="color:var(--muted);display:block;margin-top:2px;">Fase D (SMP Kelas 7–9)</small></td>
+              <td><code style="background:var(--bg-subtle,#f8fafc);color:var(--brand-gold,#b45309);font-size:12px;font-weight:700;letter-spacing:1px;padding:3px 8px;border-radius:6px;border:1px solid #cbd5e1;user-select:all;" title="Klik/blok untuk menyalin">FZL9-MTH7-2026-OK32-WXYZ-789A</code></td>
+              <td><span style="background:#e8f5e9;color:#2e7d32;padding:2px 8px;border-radius:10px;font-weight:bold;font-size:11px;">AKTIF</span></td>
+              <td>2026-09-13</td>
+              <td>2026-12-11</td>
+              <td style="text-align:center;white-space:nowrap;">
+                <details style="display:inline-block;position:relative;margin:2px;text-align:left;">
+                  <summary style="background:#0284c7;color:#fff;border:none;padding:3px 8px;border-radius:4px;font-size:11px;font-weight:bold;cursor:pointer;list-style:none;display:inline-block;">✏️ Edit</summary>
+                  <div style="position:absolute;right:0;top:100%;z-index:30;background:#ffffff;border:1px solid #cbd5e1;border-radius:8px;padding:12px;box-shadow:0 8px 24px rgba(0,0,0,0.18);width:260px;margin-top:4px;">
+                    <div style="font-weight:700;font-size:12px;margin-bottom:8px;color:var(--ink);">Ganti Mapel / Jenjang</div>
+                    <form method="GET" action="/" style="margin:0;">
+                      <input type="hidden" name="action" value="update_invite">
+                      <input type="hidden" name="codeHash" value="abc">
+                      <div style="margin-bottom:6px;">
+                        <label style="display:block;font-size:11px;font-weight:600;margin-bottom:2px;color:var(--ink);">Mata Pelajaran:</label>
+                        <select name="subject_id" style="width:100%;font-size:11px;padding:4px 6px;border:1px solid #cbd5e1;border-radius:4px;">
+                          <option value="MAT" selected>Matematika</option>
+                          <option value="ENG">Bahasa Inggris</option>
+                          <option value="IPA">IPA</option>
+                          <option value="IPS">IPS</option>
+                          <option value="IND">Bahasa Indonesia</option>
+                          <option value="INF">Informatika</option>
+                          <option value="PKN">Pendidikan Pancasila</option>
+                          <option value="SD-ALL">Guru Kelas SD</option>
+                          <option value="ALL">Semua Mapel</option>
+                        </select>
+                      </div>
+                      <div style="margin-bottom:8px;">
+                        <label style="display:block;font-size:11px;font-weight:600;margin-bottom:2px;color:var(--ink);">Jenjang / Fase:</label>
+                        <select name="grade_id" style="width:100%;font-size:11px;padding:4px 6px;border:1px solid #cbd5e1;border-radius:4px;">
+                          <option value="SMP" selected>Fase D (SMP Kelas 7–9)</option>
+                          <option value="SMA">Fase E/F (SMA Kelas 10–12)</option>
+                          <option value="SD">Fase A–C (SD Kelas 1–6)</option>
+                          <option value="ALL">Semua Jenjang</option>
+                        </select>
+                      </div>
+                      <div style="display:flex;justify-content:flex-end;">
+                        <button type="submit" style="background:#0284c7;color:#fff;border:none;padding:4px 10px;border-radius:4px;font-size:11px;font-weight:bold;cursor:pointer;">Simpan</button>
+                      </div>
+                    </form>
+                  </div>
+                </details>
+                <form method="GET" action="/" style="display:inline;margin:2px;">
+                  <input type="hidden" name="action" value="revoke_invite">
+                  <input type="hidden" name="codeHash" value="abc">
+                  <button type="submit" style="background:#c62828;color:#fff;border:none;padding:3px 8px;border-radius:4px;font-size:11px;font-weight:bold;cursor:pointer;">Cabut</button>
+                </form>
+                <form method="GET" action="/" style="display:inline;margin:2px;">
+                  <input type="hidden" name="action" value="delete_invite">
+                  <input type="hidden" name="codeHash" value="abc">
+                  <button type="submit" style="background:#64748b;color:#fff;border:none;padding:3px 8px;border-radius:4px;font-size:11px;font-weight:bold;cursor:pointer;" title="Hapus permanen">Hapus</button>
+                </form>
+              </td>
+            </tr>
           </tbody>
         </table>
       </div>
@@ -390,6 +474,7 @@ button{margin-top:10px;padding:11px 16px;font-size:15px;font-weight:700;border:1
               <th>Nama Guru</th>
               <th>Sekolah / Instansi</th>
               <th>Jenis</th>
+              <th>Mapel &amp; Jenjang</th>
               <th>Status</th>
               <th>Aktivasi (WIB)</th>
             </tr>
@@ -400,6 +485,7 @@ button{margin-top:10px;padding:11px 16px;font-size:15px;font-weight:700;border:1
         <td><b>Mardhiana Hamzah</b></td>
         <td>MTsN 5 ACEH BESAR</td>
         <td>school</td>
+        <td><span style="background:#e0f2fe;color:#0369a1;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;">Matematika</span><small style="color:var(--muted);display:block;margin-top:2px;">Fase D (SMP Kelas 7–9)</small></td>
         <td><span style="background:#e8f5e9;color:#2e7d32;padding:2px 8px;border-radius:10px;font-weight:bold;font-size:11px;">active</span></td>
         <td>2026-09-13</td>
       </tr>

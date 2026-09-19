@@ -75,6 +75,8 @@ function accountView(account, role) {
   if (account.teacher_name) view.teacherName = account.teacher_name;
   if (account.institution) view.institution = account.institution;
   if (account.institution_type) view.institutionType = account.institution_type;
+  if (account.subject_id || account.subjectId) view.subjectId = account.subject_id || account.subjectId;
+  if (account.grade_id || account.gradeId) view.gradeId = account.grade_id || account.gradeId;
   return view;
 }
 
@@ -199,7 +201,25 @@ export async function routeAccountLogin(ctx) {
 
   // Tujuan sesudah login DITENTUKAN SERVER dari peran (§27). Klien tidak
   // mengirim "mau ke mana", jadi tidak ada yang bisa meminta dasbor guru.
-  return jsonResponse({ ok: true, account: accountView(account, account.role) }, opt);
+  let accountData = account;
+  if (account.role === 'teacher') {
+    const tp = await db
+      .prepare('SELECT teacher_name, institution, institution_type, subject_id, grade_id FROM teacher_profile WHERE sub = ?1')
+      .bind(account.sub)
+      .first()
+      .catch(() => null);
+    if (tp) {
+      accountData = {
+        ...account,
+        teacher_name: tp.teacher_name,
+        institution: tp.institution,
+        institution_type: tp.institution_type,
+        subject_id: tp.subject_id,
+        grade_id: tp.grade_id
+      };
+    }
+  }
+  return jsonResponse({ ok: true, account: accountView(accountData, account.role) }, opt);
 }
 
 /* ========================================================================== */
@@ -231,7 +251,7 @@ export async function routeAccountMe(ctx) {
   let accountData = gate.account;
   if (gate.role === 'teacher') {
     const tp = await gate.db
-      .prepare('SELECT teacher_name, institution, institution_type FROM teacher_profile WHERE sub = ?1')
+      .prepare('SELECT teacher_name, institution, institution_type, subject_id, grade_id FROM teacher_profile WHERE sub = ?1')
       .bind(gate.sub)
       .first()
       .catch(() => null);
@@ -240,7 +260,9 @@ export async function routeAccountMe(ctx) {
         ...gate.account,
         teacher_name: tp.teacher_name,
         institution: tp.institution,
-        institution_type: tp.institution_type
+        institution_type: tp.institution_type,
+        subject_id: tp.subject_id,
+        grade_id: tp.grade_id
       };
     }
   }
@@ -281,9 +303,29 @@ export async function routeCurriculumTicket(ctx) {
   }
 
   const name = gate.account && gate.account.login_handle ? String(gate.account.login_handle) : '';
+  let subjectId = null;
+  let gradeId = null;
+  if (gate.role === 'teacher') {
+    const tp = await gate.db
+      .prepare('SELECT subject_id, grade_id FROM teacher_profile WHERE sub = ?1')
+      .bind(gate.sub)
+      .first()
+      .catch(() => null);
+    if (tp) {
+      subjectId = tp.subject_id || null;
+      gradeId = tp.grade_id || null;
+    }
+  }
+
   let issued = null;
   try {
-    issued = await signCurriculumTicket(secret, { sub: gate.sub, role: gate.role, name: name }, ctx.now);
+    issued = await signCurriculumTicket(secret, {
+      sub: gate.sub,
+      role: gate.role,
+      name: name,
+      subject_id: subjectId,
+      grade_id: gradeId
+    }, ctx.now);
   } catch (_) {
     return jsonError(503, ERR.UNAVAILABLE, {}, gate.opt);
   }
@@ -292,7 +334,9 @@ export async function routeCurriculumTicket(ctx) {
     ok: true,
     ticket: issued.ticket,
     expires_in: issued.expires_in,
-    role: gate.role
+    role: gate.role,
+    subjectId: subjectId,
+    gradeId: gradeId
   }, gate.opt);
 }
 
@@ -328,7 +372,7 @@ export async function routeTeacherActivate(ctx) {
 
   const codeHash = await hashCode(code);
   const invite = await db.prepare(
-    'SELECT code_hash, teacher_name, institution, institution_type, expires_at, used_at, revoked_at ' +
+    'SELECT code_hash, teacher_name, institution, institution_type, expires_at, used_at, revoked_at, subject_id, grade_id ' +
     'FROM teacher_invite WHERE code_hash = ?1'
   ).bind(codeHash).first();
 
@@ -360,9 +404,9 @@ export async function routeTeacherActivate(ctx) {
       db.prepare('UPDATE auth_account SET role = ?2, institution_id = ?3 WHERE sub = ?1 AND role = ?4')
         .bind(ctx.identity.sub, ROLE.TEACHER, institutionId, ROLE.LEARNER),
       db.prepare('INSERT INTO teacher_profile (sub, teacher_name, institution, institution_type, ' +
-        'institution_id, activated_at) VALUES (?1, ?2, ?3, ?4, ?5, ?6)')
+        'institution_id, activated_at, subject_id, grade_id) VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8)')
         .bind(ctx.identity.sub, invite.teacher_name, invite.institution, invite.institution_type,
-          institutionId, ctx.now)
+          institutionId, ctx.now, invite.subject_id || null, invite.grade_id || null)
     ]);
 
     return jsonResponse({
@@ -372,7 +416,9 @@ export async function routeTeacherActivate(ctx) {
         institution_id: institutionId,
         teacher_name: invite.teacher_name,
         institution: invite.institution,
-        institution_type: invite.institution_type
+        institution_type: invite.institution_type,
+        subject_id: invite.subject_id || null,
+        grade_id: invite.grade_id || null
       }, ROLE.TEACHER)
     }, { headers: ctx.corsHeaders });
   }
@@ -426,9 +472,9 @@ export async function routeTeacherActivate(ctx) {
     db.prepare('INSERT INTO auth_credential (sub, pass_hash, updated_at, failed_count) VALUES (?1, ?2, ?3, 0)')
       .bind(ctx.identity.sub, passHash, ctx.now),
     db.prepare('INSERT INTO teacher_profile (sub, teacher_name, institution, institution_type, ' +
-      'institution_id, activated_at) VALUES (?1, ?2, ?3, ?4, ?5, ?6)')
+      'institution_id, activated_at, subject_id, grade_id) VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8)')
       .bind(ctx.identity.sub, invite.teacher_name, invite.institution, invite.institution_type,
-        institutionId, ctx.now)
+        institutionId, ctx.now, invite.subject_id || null, invite.grade_id || null)
   ]);
 
   return jsonResponse({
@@ -438,7 +484,9 @@ export async function routeTeacherActivate(ctx) {
       institution_id: institutionId,
       teacher_name: invite.teacher_name,
       institution: invite.institution,
-      institution_type: invite.institution_type
+      institution_type: invite.institution_type,
+      subject_id: invite.subject_id || null,
+      grade_id: invite.grade_id || null
     }, ROLE.TEACHER)
   }, { headers: ctx.corsHeaders });
 }
