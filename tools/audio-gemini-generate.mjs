@@ -33,7 +33,7 @@ const MAX_RETRIES = 3;
  * Puck: Suara upbeat, youthful, ramah dan santai.
  */
 const DEFAULT_GEMINI_VOICE = 'Aoede';
-const GEMINI_MODEL = 'gemini-2.5-flash';
+const GEMINI_MODEL = 'gemini-3.6-flash';
 
 function r2Url(env, key) {
   return `${R2_API}/${env.accountId}/r2/buckets/${env.bucket}/objects/${encodeURIComponent(key)}`;
