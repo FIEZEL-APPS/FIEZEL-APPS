@@ -26,6 +26,28 @@
   var DAY = 86400000;
   var SKILL_LABEL = { past_tense: 'Past tense', past_questions: 'Past questions', vocab_a2: 'Vocabulary A2', listening_detail: 'Listening detail', reading_inference: 'Reading inference', speaking: 'Speaking' };
   var SKILL_ORDER = ['past_tense', 'past_questions', 'vocab_a2', 'listening_detail', 'reading_inference', 'speaking'];
+  var MAPEL_NAMES = {
+    MAT: 'Matematika',
+    IND: 'Bahasa Indonesia',
+    ENG: 'Bahasa Inggris',
+    IPA: 'Ilmu Pengetahuan Alam',
+    IPS: 'Ilmu Pengetahuan Sosial',
+    INF: 'Informatika',
+    PPK: 'Pendidikan Pancasila',
+    AGM: 'Pendidikan Agama',
+    FIS: 'Fisika',
+    KIM: 'Kimia',
+    BIO: 'Biologi',
+    EKO: 'Ekonomi',
+    GEO: 'Geografi',
+    SOS: 'Sosiologi',
+    SEJ: 'Sejarah',
+    PJK: 'PJOK',
+    SNB: 'Seni Budaya'
+  };
+  Object.keys(MAPEL_NAMES).forEach(function (k) {
+    SKILL_LABEL[k] = MAPEL_NAMES[k];
+  });
   var ATT = { H: 'Hadir', I: 'Izin', S: 'Sakit', A: 'Alpa' };
 
   function bank() { return root.FiezelReviewBank; }
@@ -119,7 +141,16 @@
   }
   function targeted(a, s) { return !a.targets || a.targets.indexOf(s.id) !== -1; }
   function weakestSkill(s) {
-    var best = null; SKILL_ORDER.forEach(function (k) { var v = skillAcc(s, k); if (v != null && (!best || v < best.acc)) best = { skill: k, acc: v }; }); return best;
+    var best = null;
+    var list = SKILL_ORDER.slice();
+    (s.results || []).forEach(function (r) {
+      if (r.skill && list.indexOf(r.skill) === -1) list.push(r.skill);
+    });
+    list.forEach(function (k) {
+      var v = skillAcc(s, k);
+      if (v != null && (!best || v < best.acc)) best = { skill: k, acc: v };
+    });
+    return best;
   }
   /** Skor risiko 0–100 + alasan yang bisa dibaca guru + satu tindakan konkret. */
   function risk(c, s) {
@@ -139,7 +170,7 @@
     var weak = weakestSkill(s), action;
     if (d != null && d >= 7) action = 'Kirim Kartu Sapa hari ini — sapaan personal, bukan tagihan tugas.';
     else if (late.length) action = 'Ingatkan tugas “' + late[0].a.title + '” lewat pesan singkat + tawarkan waktu tambahan.';
-    else if (weak && weak.acc < 0.5) action = 'Beri 5 soal ' + SKILL_LABEL[weak.skill] + ' ' + t('guru.pendamping-teman', 'dengan pendamping teman (lihat Kelompok Belajar).');
+    else if (weak && weak.acc < 0.5) action = 'Beri 5 soal ' + (SKILL_LABEL[weak.skill] || weak.skill) + ' ' + t('guru.pendamping-teman', 'dengan pendamping teman (lihat Kelompok Belajar).');
     else if (level === 'pantau') action = 'Sapa 1 kalimat apresiasi supaya momentumnya tidak putus.';
     else action = 'Pertahankan — beri tantangan kecil satu level di atas.';
     return { score: score, level: level, reasons: reasons, action: action, weak: weak, pending: pend.length, late: late.length, inactiveDays: d };
@@ -153,13 +184,56 @@
     var open = (c.assignments || []).filter(function (a) { return st.some(function (s) { return targeted(a, s) && !(a.done && a.done[s.id]); }); }).length;
     return { total: st.length, active7: active7, avgAcc: avg, atRisk: atRisk, watch: watch, openAssignments: open };
   }
+  function activeSkills(c, s) {
+    var set = {}, order = [];
+    function add(k) {
+      if (k && !set[k]) { set[k] = true; order.push(k); }
+    }
+    if (c) {
+      (c.assignments || []).forEach(function (a) {
+        (a.skills || []).forEach(add);
+      });
+      (c.students || []).forEach(function (st) {
+        (st.results || []).forEach(function (r) { add(r.skill); });
+      });
+    }
+    if (s && s.results) {
+      s.results.forEach(function (r) { add(r.skill); });
+    }
+    if (!order.length) {
+      SKILL_ORDER.forEach(add);
+    } else {
+      SKILL_ORDER.forEach(function (k) {
+        if (!set[k] && (!c || !c.assignments || !c.assignments.length)) add(k);
+      });
+    }
+    return order;
+  }
   function classSkillMap(c) {
-    return SKILL_ORDER.map(function (k) {
-      var cc = 0, nn = 0, low = 0; c.students.forEach(function (s) { (s.results || []).forEach(function (r) { if (r.skill === k) { cc += r.correct; nn += r.total; } }); var v = skillAcc(s, k); if (v != null && v < 0.5) low++; });
-      return { skill: k, label: SKILL_LABEL[k], acc: nn ? cc / nn : null, low: low, n: nn };
+    var list = activeSkills(c);
+    return list.map(function (k) {
+      var cc = 0, nn = 0, low = 0;
+      c.students.forEach(function (s) {
+        (s.results || []).forEach(function (r) {
+          if (r.skill === k) { cc += r.correct; nn += r.total; }
+        });
+        var v = skillAcc(s, k);
+        if (v != null && v < 0.5) low++;
+      });
+      var lbl = SKILL_LABEL[k] || (k.indexOf('KOMP-') === 0 ? k.replace(/^KOMP-/, '') : k);
+      return { skill: k, label: lbl, acc: nn ? cc / nn : null, low: low, n: nn };
     });
   }
-  function heatmap(c) { return c.students.map(function (s) { return { s: s, cells: SKILL_ORDER.map(function (k) { return { skill: k, acc: skillAcc(s, k) }; }), risk: risk(c, s) }; }); }
+  function heatmap(c) {
+    var list = activeSkills(c);
+    return c.students.map(function (s) {
+      return {
+        s: s,
+        cells: list.map(function (k) { return { skill: k, acc: skillAcc(s, k) }; }),
+        risk: risk(c, s)
+      };
+    });
+  }
   /** Kelompok belajar otomatis: pasangkan yang kuat dengan yang lemah pada satu skill (peer tutoring). */
   function studyGroups(c, skill, size) {
     size = size || 4;
@@ -521,9 +595,9 @@
     return { state: 'idle', text: 'Belum tersinkron' };
   }
 
-  return { KEY: KEY, ASSIGN_KEY: ASSIGN_KEY, SKILL_LABEL: SKILL_LABEL, SKILL_ORDER: SKILL_ORDER, ATT: ATT, DAY: DAY,
+  return { KEY: KEY, ASSIGN_KEY: ASSIGN_KEY, SKILL_LABEL: SKILL_LABEL, SKILL_ORDER: SKILL_ORDER, MAPEL_NAMES: MAPEL_NAMES, ATT: ATT, DAY: DAY,
     load: load, save: save, defaults: defaults, setPreview: setPreview, isPreview: isPreview, uid: uid, today: today, firstName: firstName, newClass: newClass, newStudent: newStudent, normalizeClass: normalizeClass, seedDemo: seedDemo, makeClassCode: makeClassCode, normalizeClassCode: normalizeClassCode,
-    skillAcc: skillAcc, overallAcc: overallAcc, daysSince: daysSince, risk: risk, classStats: classStats, classSkillMap: classSkillMap, heatmap: heatmap, studyGroups: studyGroups, misconceptions: misconceptions, needsGreeting: needsGreeting, agenda: agenda, pendingAssignments: pendingAssignments, targeted: targeted, recentAttendance: recentAttendance, attendanceRate: attendanceRate, weakestSkill: weakestSkill,
+    skillAcc: skillAcc, overallAcc: overallAcc, daysSince: daysSince, risk: risk, classStats: classStats, classSkillMap: classSkillMap, heatmap: heatmap, activeSkills: activeSkills, studyGroups: studyGroups, misconceptions: misconceptions, needsGreeting: needsGreeting, agenda: agenda, pendingAssignments: pendingAssignments, targeted: targeted, recentAttendance: recentAttendance, attendanceRate: attendanceRate, weakestSkill: weakestSkill,
     durasi: durasi, examLabel: examLabel, acceptJoin: acceptJoin, rejectJoin: rejectJoin, pendingJoins: pendingJoins, normalizeFocus: normalizeFocus, focusGrew: focusGrew, focusOf: focusOf, focusLabel: focusLabel, focusLevel: focusLevel,
     parseLearnerCode: parseLearnerCode, parseLearnerPayload: parseLearnerPayload, ingest: ingest, assignmentCode: assignmentCode, assignmentPayload: assignmentPayload, parseAssignmentCode: parseAssignmentCode, acceptAssignmentCode: acceptAssignmentCode, acceptAssignmentPayload: acceptAssignmentPayload, buildAssignment: buildAssignment,
     SYNC_PATHS: SYNC_PATHS, syncAvailable: syncAvailable, claimClass: claimClass, pullReports: pullReports, syncClass: syncClass, reportToClass: reportToClass, syncLabel: syncLabel, sendAssignment: sendAssignment, sentTo: sentTo,
