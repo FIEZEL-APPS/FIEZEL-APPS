@@ -1,6 +1,6 @@
 {
   "schema": "fiezel-th-ui-leak-v1",
-  "generatedAt": "2026-09-19T13:03:29.417Z",
+  "generatedAt": "2026-09-19T13:28:47.702Z",
   "files": {
     "app.js": {
       "leaks": 3,
@@ -399,24 +399,20 @@
       ]
     },
     "features/teacher/fiezel-teacher-shell.js": {
-      "leaks": 4,
-      "budget": 4,
+      "leaks": 3,
+      "budget": 3,
       "sample": [
         {
           "line": 1572,
           "text": "Akurasi"
         },
         {
-          "line": 1584,
+          "line": 1589,
           "text": "Latihan ·"
         },
         {
-          "line": 1908,
+          "line": 1926,
           "text": "📖 Kosakata Kunci:"
-        },
-        {
-          "line": 1938,
-          "text": "Latihan"
         }
       ]
     },
@@ -425,15 +421,15 @@
       "budget": 3,
       "sample": [
         {
-          "line": 432,
+          "line": 451,
           "text": ". Aku bangga. Lanjutkan ritmenya — 1 sesi kecil tiap hari lebih ampuh daripada 1 sesi panjang seminggu."
         },
         {
-          "line": 438,
+          "line": 457,
           "text": "• Akurasi keseluruhan:"
         },
         {
-          "line": 457,
+          "line": 476,
           "text": "Akurasi"
         }
       ]
@@ -468,8 +464,8 @@
     }
   },
   "copyKeys": {
-    "id": 2799,
-    "th": 2801,
+    "id": 2820,
+    "th": 2822,
     "idTanpaTh": 0
   },
   "pass": true

@@ -998,7 +998,7 @@
           prompt: src.prompt,
           options: src.options.slice(),
           answer: src.answer,
-          skill: compCode || subjectId,
+          skill: (compCode || subjectId || 'mat').toLowerCase().replace(/[^a-z0-9_]/g, '_').slice(0, 32),
           context: topic,
           why: Object.assign({}, src.why)
         };
@@ -1013,7 +1013,7 @@
             t('guru.opsi-salah-3', 'Pernyataan yang hanya berlaku khusus pada situasi tertentu tanpa dasar yang sah')
           ],
           answer: 0,
-          skill: compCode || subjectId,
+          skill: (compCode || subjectId || 'mat').toLowerCase().replace(/[^a-z0-9_]/g, '_').slice(0, 32),
           context: topic,
           why: { 0: t('guru.alasan-kunci-jawaban', 'Pilihan pertama merupakan jawaban yang paling tepat karena menjelaskan esensi capaian pembelajaran materi.') }
         };
@@ -1581,10 +1581,15 @@
       (list.length ? '<div class="tg-grid tg-grid-cards">' + list.map(function (a) {
         var tgt = c.students.filter(function (s) { return T.targeted(a, s); }), done = tgt.filter(function (s) { return a.done && a.done[s.id]; }), accs = done.map(function (s) { return a.done[s.id].acc; }).filter(function (v) { return v != null; }), avg = accs.length ? accs.reduce(function (x, y) { return x + y; }, 0) / accs.length : null;
         var late = a.deadline && a.deadline < td && done.length < tgt.length;
+        var asgCode = T.assignmentCode(c, a);
+        var waMsgCard = '📢 *TUGAS FIEZEL: ' + a.title + '*\n' +
+          'Dari: ' + (st.teacher.name || 'Guru') + ' · ' + t('umum.kelas', 'Kelas') + ': ' + c.name + ' (' + c.code + ')\n' +
+          '📝 ' + a.itemIds.length + ' ' + t('umum.soal', 'Soal') + ' · ' + a.minutes + ' min' + (a.deadline ? ' · Tenggat: ' + a.deadline : '') + '\n\n' +
+          'Buka FIEZEL → KelasKu / Today Plan → tempel kode tugas ini:\n' + asgCode;
         return '<article class="tg-card tg-assign' + (a.mode === 'ujian' ? ' is-exam' : '') + '" data-testid="tg-assign-' + a.id + '"><div class="tg-card-head"><div><p class="tg-kicker">' + (a.mode === 'ujian' ? icon('shield') + ' Ujian · ' + a.timer + ' mnt · acak' : icon('pencil-ruler') + ' Latihan · ' + a.minutes + ' mnt') + '</p><h3>' + esc(a.title) + '</h3></div><button type="button" class="tg-icon-btn" data-tg="delete-assign" data-id="' + a.id + '" aria-label="Hapus tugas">' + icon('trash-2') + '</button></div>' +
           '<p class="tg-muted">' + a.skills.map(function (k) { return mapelName(k) || T.SKILL_LABEL[k] || k; }).join(' + ') + ' · ' + a.itemIds.length + ' soal · ' + (a.targets ? tgt.length + ' siswa terpilih' : 'seluruh kelas') + '</p>' +
           '<div class="tg-progress"><div class="tg-progress-head"><span>' + done.length + '/' + tgt.length + ' selesai' + (avg != null ? ' · rata-rata ' + pct(avg) : '') + '</span><span class="' + (late ? 'tg-late' : '') + '">' + (a.deadline ? 'Tenggat ' + esc(a.deadline) + (late ? ' (lewat)' : '') : 'Tanpa tenggat') + '</span></div>' + bar(tgt.length ? done.length / tgt.length : 0, avg != null && avg < 0.5 ? 'is-warn' : '') + '</div>' +
-          '<div class="tg-actions"><button type="button" class="tg-btn is-small is-primary" data-tg="send-assign" data-id="' + a.id + '" data-testid="tg-send-all-' + a.id + '"' + (ui.sending === a.id ? ' disabled' : '') + '>' + icon('send') + (a.targets ? (a.sent && a.sent.all ? ' ' + t('guru.kirim-ulang-ke', 'Kirim ulang ke') + ' ' : ' ' + t('guru.kirim-ke', 'Kirim ke') + ' ') + tgt.length + ' murid terpilih' : (a.sent && a.sent.all ? ' ' + t('guru.kirim-ulang-semua', 'Kirim ulang ke semua') : ' ' + t('guru.kirim-semua-murid', 'Kirim ke semua murid'))) + '</button><button type="button" class="tg-btn is-small is-ghost" data-tg="modal" data-kind="share-assign" data-id="' + a.id + '" data-testid="tg-share-assign-' + a.id + '">' + icon('users') + ' ' + t('guru.pilih-murid-kode', 'Pilih murid / kode') + '</button><button type="button" class="tg-btn is-small is-ghost" data-tg="modal" data-kind="assign-detail" data-id="' + a.id + '">' + icon('list-checks') + ' Siapa yang belum</button></div>' + (a.sent && a.sent.all ? '<p class="tg-muted tg-sent-note">' + icon('check') + ' Terkirim ke semua murid ' + esc(T.fmtDate(a.sent.all)) + '</p>' : '') + '</article>';
+          '<div class="tg-actions"><button type="button" class="tg-btn is-small is-primary" data-tg="send-assign" data-id="' + a.id + '" data-testid="tg-send-all-' + a.id + '"' + (ui.sending === a.id ? ' disabled' : '') + '>' + icon('send') + (a.targets ? (a.sent && a.sent.all ? ' ' + t('guru.kirim-ulang-ke', 'Kirim ulang ke') + ' ' : ' ' + t('guru.kirim-ke', 'Kirim ke') + ' ') + tgt.length + ' murid terpilih' : (a.sent && a.sent.all ? ' ' + t('guru.kirim-ulang-semua', 'Kirim ulang ke semua') : ' ' + t('guru.kirim-semua-murid', 'Kirim ke semua murid'))) + '</button><a class="tg-btn is-small is-wa-ghost" target="_blank" rel="noopener" href="' + T.waLink('', waMsgCard) + '" data-testid="tg-card-wa-' + a.id + '">' + icon('message-circle') + ' ' + esc(t('guru.bagikan-wa-singkat', 'WhatsApp')) + '</a><button type="button" class="tg-btn is-small is-ghost" data-tg="copy" data-text="' + esc(asgCode) + '" data-testid="tg-card-copy-' + a.id + '">' + icon('copy') + ' ' + esc(t('guru.salin-kode-singkat', 'Salin Kode')) + '</button><button type="button" class="tg-btn is-small is-ghost" data-tg="modal" data-kind="share-assign" data-id="' + a.id + '" data-testid="tg-share-assign-' + a.id + '">' + icon('users') + ' ' + t('guru.pilih-murid-kode', 'Pilih murid / kode') + '</button><button type="button" class="tg-btn is-small is-ghost" data-tg="modal" data-kind="assign-detail" data-id="' + a.id + '">' + icon('list-checks') + ' Siapa yang belum</button></div>' + (a.sent && a.sent.all ? '<p class="tg-muted tg-sent-note">' + icon('check') + ' Terkirim ke semua murid ' + esc(T.fmtDate(a.sent.all)) + '</p>' : '') + '</article>';
       }).join('') + '</div>' : '<section class="tg-card tg-center"><h3>' + t('guru.belum-ada-tugas', 'Belum ada tugas') + '</h3><p class="tg-muted">Buat tugas dari bank soal FIEZEL: pilih skill, jumlah soal, tenggat. Mode ujian mengacak urutan dan memberi timer.</p></section>');
   }
 
@@ -1860,8 +1865,21 @@
             '</div>';
         }
 
+        var sampleQs = synthesizeMapelQuestions(curSId, mCode, mTitle, 2);
+        var previewCard = '<div class="tg-preview-box" data-testid="tg-mapel-preview">' +
+          '<div class="tg-card-head"><h5>' + icon('eye') + ' ' + esc(t('guru.intip-contoh-soal', 'Pratinjau Contoh Soal yang Diterima Murid')) + '</h5><span class="tg-badge">' + sampleQs.length + ' ' + esc(t('guru.contoh-soal-pill', 'contoh soal')) + '</span></div>' +
+          '<div class="tg-sample-list">' + sampleQs.map(function (sq, sIdx) {
+            return '<div class="tg-sample-item"><strong>' + t('umum.soal', 'Soal') + ' ' + (sIdx + 1) + ': ' + esc(sq.prompt) + '</strong>' +
+              '<div class="tg-sample-opts">' + sq.options.map(function (opt, oIdx) {
+                var isAns = (oIdx === sq.answer);
+                return '<span class="tg-sample-opt' + (isAns ? ' is-answer' : '') + '">' + (isAns ? '✓ ' : '• ') + esc(opt) + '</span>';
+              }).join('') + '</div>' +
+              (sq.why && sq.why[sq.answer] ? '<small class="tg-muted">💡 Pembahasan: ' + esc(sq.why[sq.answer]) + '</small>' : '') +
+            '</div>';
+          }).join('') + '</div></div>';
+
         tabContent = '<input type="hidden" name="assign_source" value="mapel">' +
-          subjectSelect + compSelectHtml + compInputs + briefCard;
+          subjectSelect + compSelectHtml + compInputs + briefCard + previewCard;
       } else if (tab === 'curriculum' && C) {
         var phasePills = '<div class="tg-phase-pills">' + phases.map(function (p) {
           return '<button type="button" class="tg-chip' + (curPhase === p.id ? ' is-active' : '') + '" data-tg="assign-phase" data-phase="' + p.id + '"><b>' + esc(p.name) + '</b><small>' + esc(p.cefr) + '</small></button>';
@@ -1932,10 +1950,16 @@
 
       var curAssignMode = m.mode || ui.assignMode || 'latihan';
 
-      body = '<form data-tg-form="assign" class="tg-form">' + tabHeader + tabContent +
+      var stepGuide = '<div class="tg-steps-guide" data-testid="tg-steps-guide">' +
+        '<div class="tg-step-pill is-active"><span>1</span> <b>' + esc(t('guru.langkah-1-materi', '1. Pilih Materi')) + '</b></div>' +
+        '<div class="tg-step-pill"><span>2</span> <b>' + esc(t('guru.langkah-2-mode', '2. Atur Mode & Waktu')) + '</b></div>' +
+        '<div class="tg-step-pill"><span>3</span> <b>' + esc(t('guru.langkah-3-terbitkan', '3. Terbitkan untuk Murid')) + '</b></div>' +
+      '</div>';
+
+      body = '<form data-tg-form="assign" class="tg-form">' + stepGuide + tabHeader + tabContent +
         '<label class="tg-label">' + t('guru.judul-tugas-bab', 'Judul Tugas / Bab') + '<input name="title" maxlength="80" value="' + esc(defaultTitle) + '" placeholder="' + esc(t('guru.judul-otomatis', 'Kosongkan untuk judul otomatis')) + '" data-testid="tg-assign-title"></label>' +
         '<div class="tg-form-row"><label class="tg-label">' + t('guru.jumlah-soal', 'Jumlah soal') + (tab === 'curriculum' && curUnit ? ' <small class="tg-muted">(tersedia ' + tersedia + ')</small>' : '') + '<select name="count">' + countOptions.map(function (n) { return '<option' + (n === (tab === 'curriculum' && curUnit ? Math.min(tersedia, 8) : 5) ? ' selected' : '') + '>' + n + '</option>'; }).join('') + '</select></label><label class="tg-label">Tenggat<input type="date" name="deadline" value="' + T.today(Date.now() + 2 * T.DAY) + '" data-testid="tg-assign-deadline"></label></div>' +
-        '<label class="tg-label">Mode</label><div class="tg-mode"><label class="tg-mode-opt"><input type="radio" name="mode" value="latihan"' + (curAssignMode !== 'ujian' ? ' checked' : '') + '><div><b>Latihan</b><small>Feedback langsung tiap soal, boleh diulang</small></div></label><label class="tg-mode-opt"><input type="radio" name="mode" value="ujian"' + (curAssignMode === 'ujian' ? ' checked' : '') + ' data-testid="tg-assign-mode-exam"><div><b>Ujian mini</b><small>Urutan diacak per murid + timer — anti saling contek</small></div></label></div>' +
+        '<label class="tg-label">' + esc(t('guru.langkah-2-mode', '2. Atur Mode & Waktu')) + '</label><div class="tg-mode"><label class="tg-mode-opt"><input type="radio" name="mode" value="latihan"' + (curAssignMode !== 'ujian' ? ' checked' : '') + '><div><b>🟢 ' + esc(t('guru.mode-latihan-title', 'Mode Latihan Mandiri')) + '</b><small>' + esc(t('guru.mode-latihan-sub', 'Kunci & pembahasan langsung terbuka setelah murid menjawab tiap soal. Cocok untuk PR & belajar mandiri.')) + '</small></div></label><label class="tg-mode-opt"><input type="radio" name="mode" value="ujian"' + (curAssignMode === 'ujian' ? ' checked' : '') + ' data-testid="tg-assign-mode-exam"><div><b>🛡️ ' + esc(t('guru.mode-ujian-title', 'Mode Ujian / Kuis Terjadwal')) + '</b><small>' + esc(t('guru.mode-ujian-sub', 'Ada timer hitung mundur, urutan soal diacak otomatis (anti-contek), nilai terekam otomatis ke rekap guru.')) + '</small></div></label></div>' +
         '<div class="tg-form-row"><label class="tg-label">' + t('guru.durasi-timer-ujian', 'Durasi Timer (khusus Ujian)') + '<select name="timer"><option value="10">10 Menit</option><option value="15" selected>15 Menit</option><option value="20">20 Menit</option><option value="30">30 Menit</option><option value="45">45 Menit</option><option value="60">60 Menit</option></select></label></div>' +
         '<label class="tg-label">Untuk siapa</label><div class="tg-chips tg-chips-select tg-chips-scroll"><label class="tg-chip is-check"><input type="radio" name="scope" value="all"' + (tgt.length ? '' : ' checked') + '><span>Seluruh kelas</span></label>' + c.students.map(function (s) { return '<label class="tg-chip is-check"><input type="checkbox" name="targets" value="' + s.id + '"' + (tgt.indexOf(s.id) !== -1 ? ' checked' : '') + '><span>' + esc(s.name) + '</span></label>'; }).join('') + '</div>' +
         (tab === 'mapel'
@@ -1946,11 +1970,45 @@
     } else if (m.kind === 'share-assign' || m.kind === 'assign-detail') {
       var a = (c.assignments || []).filter(function (x) { return x.id === m.id; })[0]; if (!a) return '';
       var tg = c.students.filter(function (s) { return T.targeted(a, s); }), notDone = tg.filter(function (s) { return !(a.done && a.done[s.id]); }), code = T.assignmentCode(c, a);
-      var msg = t('guru.wa-halo', 'Halo! Tugas FIEZEL dari') + ' ' + (st.teacher.name || 'gurumu') + ': *' + a.title + '* (' + a.itemIds.length + ' soal, ±' + a.minutes + ' menit' + (a.deadline ? ', tenggat ' + a.deadline : '') + ').\nBuka FIEZEL → Today Plan → "Punya kode tugas dari guru?" → tempel kode ini:\n\n' + code + '\n\nSetelah selesai, kirim balik "Kode hasil untuk tutor" ya.';
+      var teacherName = (st.teacher && st.teacher.name) || 'gurumu';
+      var modeLabel = a.mode === 'ujian' ? t('guru.mode-ujian-title', 'Mode Ujian / Kuis Terjadwal') + ' (' + a.timer + ' min)' : t('guru.mode-latihan-title', 'Mode Latihan Mandiri');
+      var waMsg = '📢 *TUGAS FIEZEL: ' + a.title + '*\n' +
+        'Dari: ' + teacherName + ' · ' + t('umum.kelas', 'Kelas') + ': ' + c.name + ' (' + c.code + ')\n' +
+        '📝 ' + a.itemIds.length + ' ' + t('umum.soal', 'Soal') + ' · ' + a.minutes + ' min' + (a.deadline ? ' · Tenggat: ' + a.deadline : '') + ' · Mode: ' + modeLabel + '\n\n' +
+        '📱 *Cara Mengerjakan di Aplikasi FIEZEL:*\n' +
+        '1. Buka aplikasi FIEZEL\n' +
+        '2. Buka bagian "KelasKu" atau "Today Plan"\n' +
+        '3. Ketuk "Punya kode tugas dari guru?"\n' +
+        '4. Tempel kode tugas di bawah ini:\n\n' +
+        code + '\n\n' +
+        '✨ Nilai dan progres latihanmu akan otomatis terekam ke sistem guru setelah selesai. Semangat belajar! 💪';
       title = m.kind === 'share-assign' ? t('guru.kirim-tugas-murid', 'Kirim tugas ke murid') : t('guru.status-titik', 'Status:') + ' ' + a.title;
       var canSend = T.syncAvailable() === 'ok', busy = ui.sending === a.id;
-      body = (m.kind === 'share-assign' ? '<div class="tg-send-box" data-testid="tg-send-box"><p class="tg-kicker">' + t('guru.kirim-langsung', 'Kirim langsung (notifikasi di aplikasi murid)') + '</p><p class="tg-muted">' + (canSend ? 'Murid yang memakai kode kelas <b class="tg-mono">' + esc(c.code) + '</b> menerima tugas ini di lonceng notifikasi mereka. Sekali ketuk, sesinya langsung terbuka; hasilnya kembali ke sini otomatis.' : t('guru.masuk-untuk-kirim', 'Masuk dengan akun guru dan online untuk mengirim langsung. Sementara itu pakai kode di bawah.')) + '</p><div class="tg-actions"><button type="button" class="tg-btn is-primary" data-tg="send-assign" data-id="' + a.id + '" data-testid="tg-send-all"' + (!canSend || busy ? ' disabled' : '') + '>' + icon('send') + (busy ? ' Mengirim…' : a.targets ? ' Kirim ke ' + tg.length + ' murid terpilih' : ' ' + t('guru.kirim-semua-murid', 'Kirim ke semua murid')) + '</button>' + (a.sent && a.sent.all ? '<span class="tg-ok">' + icon('check') + ' terkirim ' + esc(T.fmtDate(a.sent.all)) + '</span>' : '') + '</div></div>' +
-          '<details class="tg-fold"><summary>Kode tugas (cadangan bila murid offline)</summary><p class="tg-muted">' + t('guru.murid-tempel-kode', 'Murid menempel kode ini di Today Plan → “Punya kode tugas dari guru?”.') + '</p><textarea class="tg-code" readonly rows="3" data-testid="tg-assign-code">' + esc(code) + '</textarea><div class="tg-actions"><button type="button" class="tg-btn is-ghost is-small" data-tg="copy" data-text="' + esc(code) + '" data-testid="tg-copy-assign-code">' + icon('copy') + ' Salin kode</button><button type="button" class="tg-btn is-ghost is-small" data-tg="copy" data-text="' + esc(msg) + '">' + icon('message-square') + ' Salin pesan lengkap</button><a class="tg-btn is-ghost is-small" target="_blank" rel="noopener" href="' + T.waLink('', msg) + '">' + icon('message-circle') + ' WhatsApp</a></div></details><hr class="tg-hr">' : '') +
+      body = (m.kind === 'share-assign' ? '<div class="tg-send-box" data-testid="tg-send-box">' +
+          '<div class="tg-delivery-cards">' +
+            '<div class="tg-delivery-card is-wa" data-testid="tg-delivery-wa">' +
+              '<div class="tg-delivery-head"><h4>' + icon('message-circle') + ' ' + esc(t('guru.opsi-wa-title', 'Bagikan ke WhatsApp Kelas (1-Klik)')) + '</h4><span class="tg-badge" style="background:#16A34A">Paling Praktis</span></div>' +
+              '<p class="tg-muted">' + esc(t('guru.opsi-wa-desc', 'Format pesan rapi berisi nama tugas, jumlah soal, dan panduan 4 langkah cara murid membukanya di FIEZEL.')) + '</p>' +
+              '<div class="tg-actions" style="margin-top:10px">' +
+                '<a class="tg-btn tg-btn-wa" target="_blank" rel="noopener" href="' + T.waLink('', waMsg) + '" data-testid="tg-wa-direct-btn">' + icon('message-circle') + ' ' + esc(t('guru.opsi-wa-title', 'Bagikan ke WhatsApp Kelas (1-Klik)')) + '</a>' +
+                '<button type="button" class="tg-btn is-wa-ghost" data-tg="copy" data-text="' + esc(waMsg) + '" data-testid="tg-copy-wa-btn">' + icon('message-square') + ' ' + esc(t('guru.salin-pesan-wa', 'Salin Pesan WhatsApp')) + '</button>' +
+              '</div>' +
+              '<div class="tg-code-box">' +
+                '<label class="tg-label" style="margin-top:10px"><b>' + esc(t('guru.kode-tugas-label', 'Kode Tugas (Bisa Dicatat di Papan Tulis)')) + ':</b></label>' +
+                '<textarea class="tg-code" readonly rows="2" data-testid="tg-assign-code">' + esc(code) + '</textarea>' +
+                '<div><button type="button" class="tg-btn is-ghost is-small" data-tg="copy" data-text="' + esc(code) + '" data-testid="tg-copy-assign-code">' + icon('copy') + ' ' + esc(t('guru.salin-kode-tugas', 'Salin Kode Tugas')) + '</button></div>' +
+              '</div>' +
+            '</div>' +
+            '<div class="tg-delivery-card is-server" data-testid="tg-delivery-server">' +
+              '<div class="tg-delivery-head"><h4>' + icon('send') + ' ' + esc(t('guru.opsi-server-title', 'Kirim Langsung ke Notifikasi Aplikasi')) + '</h4>' + (canSend ? '<span class="tg-ok">' + icon('check') + ' Terhubung Server</span>' : '<span class="tg-muted">' + t('guru.perlu-akun-guru', 'Perlu Akun Guru') + '</span>') + '</div>' +
+              '<p class="tg-muted">' + (canSend ? 'Murid yang memakai kode kelas <b class="tg-mono">' + esc(c.code) + '</b> menerima tugas ini di lonceng notifikasi mereka. Sekali ketuk, sesinya langsung terbuka; hasilnya kembali ke sini otomatis.' : t('guru.masuk-untuk-kirim', 'Masuk dengan akun guru dan online untuk mengirim langsung. Sementara itu pakai kode di bawah.')) + '</p>' +
+              '<div class="tg-actions" style="margin-top:10px">' +
+                (canSend
+                  ? '<button type="button" class="tg-btn is-primary" data-tg="send-assign" data-id="' + a.id + '" data-testid="tg-send-all"' + (busy ? ' disabled' : '') + '>' + icon('send') + (busy ? ' Mengirim…' : a.targets ? ' Kirim ke ' + tg.length + ' murid terpilih' : ' ' + t('guru.kirim-semua-murid', 'Kirim ke semua murid')) + '</button>' + (a.sent && a.sent.all ? '<span class="tg-ok">' + icon('check') + ' terkirim ' + esc(T.fmtDate(a.sent.all)) + '</span>' : '')
+                  : '<button type="button" class="tg-btn is-ghost" data-tg="modal" data-kind="account-teacher">' + icon('user-check') + ' ' + esc(t('guru.masuk-akun-guru-cta', 'Masuk / Aktivasi Akun Guru')) + '</button>') +
+              '</div>' +
+            '</div>' +
+          '</div></div><hr class="tg-hr">' : '') +
         '<div class="tg-card-head"><h4>' + notDone.length + ' belum selesai · ' + (tg.length - notDone.length) + ' selesai</h4></div><ul class="tg-mini-list tg-send-list">' + tg.map(function (s) { var d = a.done && a.done[s.id], sent = T.sentTo(a, s); return '<li class="' + (d ? 'is-done' : '') + '">' + avatar(s, 'sm') + ' <span class="tg-grow">' + esc(s.name) + (sent && !d ? ' <small class="tg-muted">· terkirim</small>' : '') + '</span>' + (d ? ' <span class="tg-ok">' + pct(d.acc) + '</span>' : (canSend ? '<button type="button" class="tg-btn is-small ' + (sent ? 'is-ghost' : 'is-primary') + '" data-tg="send-assign" data-id="' + a.id + '" data-sid="' + s.id + '" data-testid="tg-send-one-' + s.id + '"' + (busy ? ' disabled' : '') + '>' + icon('send') + (sent ? ' Kirim ulang' : ' Kirim') + '</button>' : '') + ' <button type="button" class="tg-link" data-tg="mark-done" data-id="' + a.id + '" data-sid="' + s.id + '">tandai selesai</button>') + '</li>'; }).join('') + '</ul>' + (notDone.length ? '<div class="tg-actions"><button type="button" class="tg-btn is-ghost is-small" data-tg="copy" data-text="' + esc('Pengingat: tugas *' + a.title + '* belum selesai untuk: ' + notDone.map(function (s) { return s.name; }).join(', ') + (a.deadline ? '. Tenggat ' + a.deadline : '') + '. Semangat! 💪') + '">' + icon('bell') + ' Salin pengingat untuk yang belum</button></div>' : '');
     } else if (m.kind === 'greet' || m.kind === 'parent') {
       var s2 = student(m.id); if (!s2) return '';
@@ -2042,8 +2100,13 @@
       case 'send-assign': {
         if (!c) return;
         var asg = (c.assignments || []).filter(function (x) { return x.id === id; })[0]; if (!asg) return;
+        if (T.syncAvailable() !== 'ok') {
+          ui.modal = { kind: 'share-assign', id: asg.id };
+          toast(T.syncLabel(c).text);
+          render();
+          return;
+        }
         var sid = btn.getAttribute('data-sid'), targets = sid ? [sid] : (asg.targets && asg.targets.length ? asg.targets : null);
-        if (T.syncAvailable() !== 'ok') { toast(T.syncLabel(c).text); return; }
         ui.sending = asg.id; render();
         T.sendAssignment(c, asg, targets).then(function (r) {
           ui.sending = null;

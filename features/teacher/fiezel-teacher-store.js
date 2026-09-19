@@ -47,6 +47,7 @@
   };
   Object.keys(MAPEL_NAMES).forEach(function (k) {
     SKILL_LABEL[k] = MAPEL_NAMES[k];
+    SKILL_LABEL[k.toLowerCase()] = MAPEL_NAMES[k];
   });
   var ATT = { H: 'Hadir', I: 'Izin', S: 'Sakit', A: 'Alpa' };
 
@@ -361,7 +362,25 @@
   }
   function pendingJoins(c) { return (c && Array.isArray(c.pending) ? c.pending : []).slice().sort(function (a, b) { return (b.at || 0) - (a.at || 0); }); }
   /** Bentuk payload tugas yang dikirim ke server = isi kode tugas (tanpa base64). */
-  function assignmentPayload(c, a) { var p = { v: 1, t: 'assign', id: a.id, title: a.title, skills: a.skills, itemIds: a.itemIds, minutes: a.minutes, from: c.name, cls: c.code, deadline: a.deadline || null, mode: a.mode || 'latihan', timer: a.timer || 0, shuffle: !!a.shuffle }; if (a.teacher) p.teacher = String(a.teacher).slice(0, 60); if (Array.isArray(a.items) && a.items.length) p.items = a.items.map(function (q) { var o = { id: q.id, prompt: q.prompt, options: q.options, answer: q.answer, skill: q.skill }; if (q.context) o.context = q.context; if (q.why && Object.keys(q.why).length) o.why = q.why; return o; }); return p; }
+  function assignmentPayload(c, a) {
+    var cleanSkills = (a.skills || []).map(function (k) {
+      return String(k || '').trim().toLowerCase().replace(/[^a-z0-9_]/g, '_').slice(0, 32);
+    }).filter(function (k) { return /^[a-z0-9_]{1,32}$/.test(k); });
+    if (!cleanSkills.length) cleanSkills = ['grammar'];
+    var p = { v: 1, t: 'assign', id: a.id, title: a.title, skills: cleanSkills, itemIds: a.itemIds, minutes: a.minutes, from: c.name, cls: c.code, deadline: a.deadline || null, mode: a.mode || 'latihan', timer: a.timer || 0, shuffle: !!a.shuffle };
+    if (a.teacher) p.teacher = String(a.teacher).slice(0, 60);
+    if (Array.isArray(a.items) && a.items.length) {
+      p.items = a.items.map(function (q) {
+        var rawSk = typeof q.skill === 'string' ? q.skill.trim().toLowerCase().replace(/[^a-z0-9_]/g, '_').slice(0, 32) : '';
+        var sk = /^[a-z0-9_]{1,32}$/.test(rawSk) ? rawSk : cleanSkills[0];
+        var o = { id: q.id, prompt: q.prompt, options: q.options, answer: q.answer, skill: sk };
+        if (q.context) o.context = q.context;
+        if (q.why && Object.keys(q.why).length) o.why = q.why;
+        return o;
+      });
+    }
+    return p;
+  }
   function assignmentCode(c, a) { return b64e(assignmentPayload(c, a)); }
   function parseAssignmentCode(code) { try { var p = b64d(code); if (!p || p.t !== 'assign' || !Array.isArray(p.itemIds)) return null; return p; } catch (_) { return null; } }
   /** Sisi murid: simpan tugas dari kode guru ke antrean Today Plan (dipakai learner-flow). */

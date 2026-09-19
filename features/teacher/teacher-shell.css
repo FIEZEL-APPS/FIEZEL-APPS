@@ -411,3 +411,36 @@ html.fiezel-ui-v6 body.fz-teacher-mode .tg button.tg-seg-btn:not(.primary):not(.
 .tg-token-pill{display:inline-block;padding:4px 10px;background:rgba(21,76,121,.1);border:1px solid rgba(21,76,121,.25);border-radius:6px;font-family:var(--tg-mono);font-size:.84rem;font-weight:700;color:var(--tg-ink);user-select:all;cursor:pointer}
 .tg-token-pill:hover{background:rgba(21,76,121,.18)}
 
+/* ---------- Humanisasi Pembuatan & Pengiriman Tugas Guru ---------- */
+.tg-steps-guide{display:flex;align-items:center;gap:8px;background:var(--tg-paper-2);border:1px solid var(--tg-line);border-radius:var(--tg-r);padding:8px 12px;margin-bottom:14px}
+.tg-step-pill{display:flex;align-items:center;gap:6px;font-size:.82rem;color:var(--tg-muted);flex:1}
+.tg-step-pill span{display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border-radius:50%;background:var(--tg-line);color:var(--tg-ink-2);font-weight:700;font-size:.72rem}
+.tg-step-pill.is-active{color:var(--tg-ink);font-weight:700}
+.tg-step-pill.is-active span{background:var(--tg-sage);color:#fff}
+@media(max-width:640px){.tg-steps-guide{flex-direction:column;align-items:flex-start;gap:6px}}
+
+.tg-preview-box{background:#fff;border:1px solid var(--tg-line);border-radius:var(--tg-r);padding:12px 14px;margin:10px 0 14px}
+.tg-preview-box .tg-card-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.tg-preview-box h5{margin:0;font-size:.88rem;color:var(--tg-ink);display:flex;align-items:center;gap:6px}
+.tg-sample-list{display:flex;flex-direction:column;gap:10px}
+.tg-sample-item{background:var(--tg-paper);border:1px solid rgba(0,0,0,.06);border-radius:6px;padding:10px 12px;font-size:.82rem}
+.tg-sample-item strong{display:block;color:var(--tg-ink-2);margin-bottom:4px}
+.tg-sample-opts{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0}
+.tg-sample-opt{display:inline-block;padding:2px 8px;border-radius:4px;background:#fff;border:1px solid var(--tg-line);font-size:.78rem}
+.tg-sample-opt.is-answer{background:#DCFCE7;border-color:#86EFAC;color:#15803D;font-weight:600}
+
+.tg-delivery-cards{display:flex;flex-direction:column;gap:14px;margin-bottom:14px}
+.tg-delivery-card{background:#fff;border:1px solid var(--tg-line);border-radius:var(--tg-r-lg);padding:16px 18px;box-shadow:0 2px 8px rgba(0,0,0,.03)}
+.tg-delivery-card.is-wa{border-color:#86EFAC;background:linear-gradient(180deg, #F0FDF4 0%, #FFFFFF 100%)}
+.tg-delivery-card.is-server{border-color:#BFDBFE;background:linear-gradient(180deg, #EFF6FF 0%, #FFFFFF 100%)}
+.tg-delivery-card.is-code{border-color:#E5E7EB;background:#F9FAFB}
+.tg-delivery-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px}
+.tg-delivery-head h4{margin:0;font-size:.95rem;color:var(--tg-ink);display:flex;align-items:center;gap:6px}
+.tg-btn-wa{background:#16A34A;color:#fff;border-color:#15803D;font-weight:600}
+.tg-btn-wa:hover{background:#15803D;color:#fff}
+.tg-btn.is-wa-ghost{color:#15803D;border-color:#86EFAC;background:#F0FDF4}
+.tg-btn.is-wa-ghost:hover{background:#DCFCE7}
+.tg-code-box{display:flex;flex-direction:column;gap:8px;margin-top:8px}
+.tg-code-box textarea{font-family:var(--tg-mono);font-size:.8rem;border:1px solid var(--tg-line);border-radius:var(--tg-r);padding:8px;background:#fff;color:var(--tg-ink);resize:vertical}
+
+
