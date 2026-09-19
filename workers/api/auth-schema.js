@@ -96,7 +96,8 @@ export const AUTH_DDL = Object.freeze([
     ' used_by TEXT,' +
     ' revoked_at INTEGER,' +
     ' subject_id TEXT,' +
-    ' grade_id TEXT' +
+    ' grade_id TEXT,' +
+    ' raw_code TEXT' +
     ' )',
   'CREATE TABLE IF NOT EXISTS teacher_profile (' +
     ' sub TEXT PRIMARY KEY,' +
@@ -302,6 +303,7 @@ export async function ensureAuthSchema(db) {
   try { await db.prepare('ALTER TABLE teacher_invite ADD COLUMN grade_id TEXT').run(); } catch (_) {}
   try { await db.prepare('ALTER TABLE teacher_profile ADD COLUMN subject_id TEXT').run(); } catch (_) {}
   try { await db.prepare('ALTER TABLE teacher_profile ADD COLUMN grade_id TEXT').run(); } catch (_) {}
+  try { await db.prepare('ALTER TABLE teacher_invite ADD COLUMN raw_code TEXT').run(); } catch (_) {}
   APPLIED.set(db, true);
 }
 

@@ -1670,15 +1670,25 @@ footer{
       </form>
     </div>
 
-      <h3 style="color:var(--text-main);margin-top:20px;margin-bottom:8px;">Riwayat Undangan &amp; Token Guru</h3>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-top:24px;margin-bottom:12px;flex-wrap:wrap;gap:8px;">
+        <h3 style="color:var(--text-main);margin:0;">Riwayat Undangan &amp; Token Guru</h3>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          <button type="button" id="btn_clear_revoked" style="background:#f1f5f9;color:#334155;border:1px solid #cbd5e1;padding:5px 12px;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;">
+            🧹 Bersihkan Token Dicabut / Kedaluwarsa
+          </button>
+          <button type="button" id="btn_clear_all" style="background:#fee2e2;color:#991b1b;border:1px solid #f87171;padding:5px 12px;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;">
+            ⚠️ Hapus Semua Data Token
+          </button>
+        </div>
+      </div>
       <div class="table-wrap" style="margin-bottom:24px;">
         <table>
           <thead>
             <tr>
               <th>Guru</th>
               <th>Sekolah / Instansi</th>
-              <th>Jenis</th>
               <th>Mapel &amp; Jenjang</th>
+              <th>Kode Token</th>
               <th>Status</th>
               <th>Dibuat (WIB)</th>
               <th>Berlaku Hingga</th>
@@ -1689,22 +1699,92 @@ footer{
             <tr>
               <td><b>Ibu Mardhiana Hamzah</b></td>
               <td>MTsN 5 ACEH BESAR</td>
-              <td>school</td>
-              <td><span style="background:#e0f2fe;color:#0369a1;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;">Matematika</span><small style="color:var(--text-muted);display:block;margin-top:2px;">Fase D (SMP Kelas 7–9)</small></td>
-              <td><span style="background:#e8f5e9;color:#2e7d32;padding:2px 8px;border-radius:10px;font-weight:bold;font-size:11px;">AKTIF</span></td>
+              <td><span class="sub-badge" style="background:#e0f2fe;color:#0369a1;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;">Matematika</span><small class="grd-badge" style="color:var(--text-muted);display:block;margin-top:2px;">Fase D (SMP Kelas 7–9)</small></td>
+              <td><code style="background:var(--bg-subtle,#f8fafc);color:var(--brand-gold,#b45309);font-size:12px;font-weight:700;letter-spacing:1px;padding:3px 8px;border-radius:6px;border:1px solid #cbd5e1;user-select:all;" title="Klik/blok untuk menyalin">FZL9-MTH7-2026-OK32-WXYZ-789A</code></td>
+              <td><span class="status-badge" style="background:#e8f5e9;color:#2e7d32;padding:2px 8px;border-radius:10px;font-weight:bold;font-size:11px;">AKTIF</span></td>
               <td>19 Sep 2026</td>
               <td>18 Des 2026</td>
-              <td style="text-align:center;"><button type="button" style="background:#c62828;color:#fff;border:none;padding:4px 10px;border-radius:4px;font-size:11px;font-weight:bold;cursor:pointer;">Cabut</button></td>
+              <td style="text-align:center;white-space:nowrap;">
+                <details style="display:inline-block;position:relative;margin:2px;text-align:left;">
+                  <summary style="background:#0284c7;color:#fff;border:none;padding:3px 8px;border-radius:4px;font-size:11px;font-weight:bold;cursor:pointer;list-style:none;display:inline-block;">✏️ Edit</summary>
+                  <div style="position:absolute;right:0;top:100%;z-index:30;background:#ffffff;border:1px solid #cbd5e1;border-radius:8px;padding:12px;box-shadow:0 8px 24px rgba(0,0,0,0.18);width:260px;margin-top:4px;">
+                    <div style="font-weight:700;font-size:12px;margin-bottom:8px;color:var(--ink);">Ganti Mapel / Jenjang</div>
+                    <div style="margin-bottom:6px;">
+                      <label style="display:block;font-size:11px;font-weight:600;margin-bottom:2px;">Mapel:</label>
+                      <select class="sel-edit-sub" style="width:100%;font-size:11px;padding:4px 6px;border:1px solid #cbd5e1;border-radius:4px;">
+                        <option value="Matematika" selected>Matematika</option>
+                        <option value="Bahasa Inggris">Bahasa Inggris</option>
+                        <option value="IPA">IPA</option>
+                        <option value="IPS">IPS</option>
+                        <option value="Bahasa Indonesia">Bahasa Indonesia</option>
+                        <option value="Informatika">Informatika</option>
+                        <option value="Pendidikan Pancasila">Pendidikan Pancasila</option>
+                        <option value="Guru Kelas SD">Guru Kelas SD</option>
+                        <option value="Semua Mapel">Semua Mapel</option>
+                      </select>
+                    </div>
+                    <div style="margin-bottom:8px;">
+                      <label style="display:block;font-size:11px;font-weight:600;margin-bottom:2px;">Jenjang:</label>
+                      <select class="sel-edit-grd" style="width:100%;font-size:11px;padding:4px 6px;border:1px solid #cbd5e1;border-radius:4px;">
+                        <option value="Fase D (SMP Kelas 7–9)" selected>Fase D (SMP Kelas 7–9)</option>
+                        <option value="Fase E/F (SMA Kelas 10–12)">Fase E/F (SMA Kelas 10–12)</option>
+                        <option value="Fase A–C (SD Kelas 1–6)">Fase A–C (SD Kelas 1–6)</option>
+                        <option value="Semua Jenjang">Semua Jenjang</option>
+                      </select>
+                    </div>
+                    <div style="display:flex;justify-content:flex-end;">
+                      <button type="button" class="btn-save-edit" style="background:#0284c7;color:#fff;border:none;padding:4px 10px;border-radius:4px;font-size:11px;font-weight:bold;cursor:pointer;">Simpan</button>
+                    </div>
+                  </div>
+                </details>
+                <button type="button" class="btn-revoke-row" style="background:#c62828;color:#fff;border:none;padding:3px 8px;border-radius:4px;font-size:11px;font-weight:bold;cursor:pointer;margin:2px;">Cabut</button>
+                <button type="button" class="btn-del-row" style="background:#64748b;color:#fff;border:none;padding:3px 8px;border-radius:4px;font-size:11px;font-weight:bold;cursor:pointer;margin:2px;" title="Hapus permanen">Hapus</button>
+              </td>
             </tr>
             <tr>
               <td><b>Pak Joko Supriyanto, S.Pd.</b></td>
               <td>SMP Negeri 2 Yogyakarta</td>
-              <td>school</td>
-              <td><span style="background:#e0f2fe;color:#0369a1;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;">Bahasa Inggris</span><small style="color:var(--text-muted);display:block;margin-top:2px;">Fase D (SMP Kelas 7–9)</small></td>
-              <td><span style="background:#e8f5e9;color:#2e7d32;padding:2px 8px;border-radius:10px;font-weight:bold;font-size:11px;">AKTIF</span></td>
+              <td><span class="sub-badge" style="background:#e0f2fe;color:#0369a1;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;">Bahasa Inggris</span><small class="grd-badge" style="color:var(--text-muted);display:block;margin-top:2px;">Fase D (SMP Kelas 7–9)</small></td>
+              <td><code style="background:var(--bg-subtle,#f8fafc);color:var(--brand-gold,#b45309);font-size:12px;font-weight:700;letter-spacing:1px;padding:3px 8px;border-radius:6px;border:1px solid #cbd5e1;user-select:all;" title="Klik/blok untuk menyalin">FZL9-ENG7-2026-JK55-QMNP-345B</code></td>
+              <td><span class="status-badge" style="background:#e8f5e9;color:#2e7d32;padding:2px 8px;border-radius:10px;font-weight:bold;font-size:11px;">AKTIF</span></td>
               <td>19 Sep 2026</td>
               <td>18 Des 2026</td>
-              <td style="text-align:center;"><button type="button" style="background:#c62828;color:#fff;border:none;padding:4px 10px;border-radius:4px;font-size:11px;font-weight:bold;cursor:pointer;">Cabut</button></td>
+              <td style="text-align:center;white-space:nowrap;">
+                <details style="display:inline-block;position:relative;margin:2px;text-align:left;">
+                  <summary style="background:#0284c7;color:#fff;border:none;padding:3px 8px;border-radius:4px;font-size:11px;font-weight:bold;cursor:pointer;list-style:none;display:inline-block;">✏️ Edit</summary>
+                  <div style="position:absolute;right:0;top:100%;z-index:30;background:#ffffff;border:1px solid #cbd5e1;border-radius:8px;padding:12px;box-shadow:0 8px 24px rgba(0,0,0,0.18);width:260px;margin-top:4px;">
+                    <div style="font-weight:700;font-size:12px;margin-bottom:8px;color:var(--ink);">Ganti Mapel / Jenjang</div>
+                    <div style="margin-bottom:6px;">
+                      <label style="display:block;font-size:11px;font-weight:600;margin-bottom:2px;">Mapel:</label>
+                      <select class="sel-edit-sub" style="width:100%;font-size:11px;padding:4px 6px;border:1px solid #cbd5e1;border-radius:4px;">
+                        <option value="Matematika">Matematika</option>
+                        <option value="Bahasa Inggris" selected>Bahasa Inggris</option>
+                        <option value="IPA">IPA</option>
+                        <option value="IPS">IPS</option>
+                        <option value="Bahasa Indonesia">Bahasa Indonesia</option>
+                        <option value="Informatika">Informatika</option>
+                        <option value="Pendidikan Pancasila">Pendidikan Pancasila</option>
+                        <option value="Guru Kelas SD">Guru Kelas SD</option>
+                        <option value="Semua Mapel">Semua Mapel</option>
+                      </select>
+                    </div>
+                    <div style="margin-bottom:8px;">
+                      <label style="display:block;font-size:11px;font-weight:600;margin-bottom:2px;">Jenjang:</label>
+                      <select class="sel-edit-grd" style="width:100%;font-size:11px;padding:4px 6px;border:1px solid #cbd5e1;border-radius:4px;">
+                        <option value="Fase D (SMP Kelas 7–9)" selected>Fase D (SMP Kelas 7–9)</option>
+                        <option value="Fase E/F (SMA Kelas 10–12)">Fase E/F (SMA Kelas 10–12)</option>
+                        <option value="Fase A–C (SD Kelas 1–6)">Fase A–C (SD Kelas 1–6)</option>
+                        <option value="Semua Jenjang">Semua Jenjang</option>
+                      </select>
+                    </div>
+                    <div style="display:flex;justify-content:flex-end;">
+                      <button type="button" class="btn-save-edit" style="background:#0284c7;color:#fff;border:none;padding:4px 10px;border-radius:4px;font-size:11px;font-weight:bold;cursor:pointer;">Simpan</button>
+                    </div>
+                  </div>
+                </details>
+                <button type="button" class="btn-revoke-row" style="background:#c62828;color:#fff;border:none;padding:3px 8px;border-radius:4px;font-size:11px;font-weight:bold;cursor:pointer;margin:2px;">Cabut</button>
+                <button type="button" class="btn-del-row" style="background:#64748b;color:#fff;border:none;padding:3px 8px;border-radius:4px;font-size:11px;font-weight:bold;cursor:pointer;margin:2px;" title="Hapus permanen">Hapus</button>
+              </td>
             </tr>
           </tbody>
         </table>
@@ -1810,15 +1890,114 @@ Kontrak: EXEC-BRIEF-CF.md "KONTRAK ANALYTICS PRIVASI-MAKSIMAL" · bentuk tabel: 
     var tbody = document.getElementById('invite_table_body');
     if (tbody) {
       var tr = document.createElement('tr');
+      var sName = subjMap[subj] || subj;
+      var gName = gradeMap[grade] || grade;
       tr.innerHTML = '<td><b>' + name + '</b></td>' +
         '<td>' + inst + '</td>' +
-        '<td>' + type + '</td>' +
-        '<td><span style="background:#e0f2fe;color:#0369a1;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;">' + (subjMap[subj] || subj) + '</span><small style="color:#6b7280;display:block;margin-top:2px;">' + (gradeMap[grade] || grade) + '</small></td>' +
-        '<td><span style="background:#e8f5e9;color:#2e7d32;padding:2px 8px;border-radius:10px;font-weight:bold;font-size:11px;">AKTIF</span></td>' +
+        '<td><span class="sub-badge" style="background:#e0f2fe;color:#0369a1;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;">' + sName + '</span><small class="grd-badge" style="color:var(--text-muted);display:block;margin-top:2px;">' + gName + '</small></td>' +
+        '<td><code style="background:var(--bg-subtle,#f8fafc);color:var(--brand-gold,#b45309);font-size:12px;font-weight:700;letter-spacing:1px;padding:3px 8px;border-radius:6px;border:1px solid #cbd5e1;user-select:all;" title="Klik/blok untuk menyalin">' + token + '</code></td>' +
+        '<td><span class="status-badge" style="background:#e8f5e9;color:#2e7d32;padding:2px 8px;border-radius:10px;font-weight:bold;font-size:11px;">AKTIF</span></td>' +
         '<td>Hari ini</td>' +
         '<td>' + days + ' Hari</td>' +
-        '<td style="text-align:center;"><button type="button" onclick="this.closest(\'tr\').remove()" style="background:#c62828;color:#fff;border:none;padding:4px 10px;border-radius:4px;font-size:11px;font-weight:bold;cursor:pointer;">Cabut</button></td>';
+        '<td style="text-align:center;white-space:nowrap;">' +
+          '<details style="display:inline-block;position:relative;margin:2px;text-align:left;">' +
+            '<summary style="background:#0284c7;color:#fff;border:none;padding:3px 8px;border-radius:4px;font-size:11px;font-weight:bold;cursor:pointer;list-style:none;display:inline-block;">✏️ Edit</summary>' +
+            '<div style="position:absolute;right:0;top:100%;z-index:30;background:#ffffff;border:1px solid #cbd5e1;border-radius:8px;padding:12px;box-shadow:0 8px 24px rgba(0,0,0,0.18);width:260px;margin-top:4px;">' +
+              '<div style="font-weight:700;font-size:12px;margin-bottom:8px;color:var(--ink);">Ganti Mapel / Jenjang</div>' +
+              '<div style="margin-bottom:6px;">' +
+                '<label style="display:block;font-size:11px;font-weight:600;margin-bottom:2px;">Mapel:</label>' +
+                '<select class="sel-edit-sub" style="width:100%;font-size:11px;padding:4px 6px;border:1px solid #cbd5e1;border-radius:4px;">' +
+                  '<option value="Matematika" ' + (subj==='MAT'?'selected':'') + '>Matematika</option>' +
+                  '<option value="Bahasa Inggris" ' + (subj==='ENG'?'selected':'') + '>Bahasa Inggris</option>' +
+                  '<option value="IPA" ' + (subj==='IPA'?'selected':'') + '>IPA</option>' +
+                  '<option value="IPS" ' + (subj==='IPS'?'selected':'') + '>IPS</option>' +
+                  '<option value="Bahasa Indonesia" ' + (subj==='IND'?'selected':'') + '>Bahasa Indonesia</option>' +
+                  '<option value="Informatika" ' + (subj==='INF'?'selected':'') + '>Informatika</option>' +
+                  '<option value="Pendidikan Pancasila" ' + (subj==='PKN'?'selected':'') + '>Pendidikan Pancasila</option>' +
+                  '<option value="Guru Kelas SD" ' + (subj==='SD-ALL'?'selected':'') + '>Guru Kelas SD</option>' +
+                  '<option value="Semua Mapel" ' + (subj==='ALL'?'selected':'') + '>Semua Mapel</option>' +
+                '</select>' +
+              '</div>' +
+              '<div style="margin-bottom:8px;">' +
+                '<label style="display:block;font-size:11px;font-weight:600;margin-bottom:2px;">Jenjang:</label>' +
+                '<select class="sel-edit-grd" style="width:100%;font-size:11px;padding:4px 6px;border:1px solid #cbd5e1;border-radius:4px;">' +
+                  '<option value="Fase D (SMP Kelas 7–9)" ' + (grade==='SMP'?'selected':'') + '>Fase D (SMP Kelas 7–9)</option>' +
+                  '<option value="Fase E/F (SMA Kelas 10–12)" ' + (grade==='SMA'?'selected':'') + '>Fase E/F (SMA Kelas 10–12)</option>' +
+                  '<option value="Fase A–C (SD Kelas 1–6)" ' + (grade==='SD'?'selected':'') + '>Fase A–C (SD Kelas 1–6)</option>' +
+                  '<option value="Semua Jenjang" ' + (grade==='ALL'?'selected':'') + '>Semua Jenjang</option>' +
+                '</select>' +
+              '</div>' +
+              '<div style="display:flex;justify-content:flex-end;">' +
+                '<button type="button" class="btn-save-edit" style="background:#0284c7;color:#fff;border:none;padding:4px 10px;border-radius:4px;font-size:11px;font-weight:bold;cursor:pointer;">Simpan</button>' +
+              '</div>' +
+            '</div>' +
+          '</details>' +
+          '<button type="button" class="btn-revoke-row" style="background:#c62828;color:#fff;border:none;padding:3px 8px;border-radius:4px;font-size:11px;font-weight:bold;cursor:pointer;margin:2px;">Cabut</button>' +
+          '<button type="button" class="btn-del-row" style="background:#64748b;color:#fff;border:none;padding:3px 8px;border-radius:4px;font-size:11px;font-weight:bold;cursor:pointer;margin:2px;" title="Hapus permanen">Hapus</button>' +
+        '</td>';
       tbody.prepend(tr);
+    }
+  });
+
+  // Event delegation untuk tombol di baris tabel token
+  document.addEventListener('click', function(e) {
+    var saveBtn = e.target.closest('.btn-save-edit');
+    if (saveBtn) {
+      var row = saveBtn.closest('tr');
+      var details = saveBtn.closest('details');
+      if (row && details) {
+        var newSub = details.querySelector('.sel-edit-sub')?.value;
+        var newGrd = details.querySelector('.sel-edit-grd')?.value;
+        if (newSub && row.querySelector('.sub-badge')) row.querySelector('.sub-badge').textContent = newSub;
+        if (newGrd && row.querySelector('.grd-badge')) row.querySelector('.grd-badge').textContent = newGrd;
+        details.removeAttribute('open');
+      }
+      return;
+    }
+
+    var revokeBtn = e.target.closest('.btn-revoke-row');
+    if (revokeBtn) {
+      var row = revokeBtn.closest('tr');
+      if (row) {
+        var badge = row.querySelector('.status-badge');
+        if (badge) {
+          badge.textContent = 'DICABUT';
+          badge.style.background = '#ffebee';
+          badge.style.color = '#c62828';
+          badge.style.textDecoration = 'line-through';
+        }
+        revokeBtn.remove();
+      }
+      return;
+    }
+
+    var delBtn = e.target.closest('.btn-del-row');
+    if (delBtn) {
+      var row = delBtn.closest('tr');
+      if (row) row.remove();
+      return;
+    }
+
+    if (e.target.id === 'btn_clear_revoked') {
+      var rows = document.querySelectorAll('#invite_table_body tr');
+      var removed = 0;
+      rows.forEach(function(r) {
+        var badge = r.querySelector('.status-badge');
+        if (badge && (badge.textContent.includes('CABUT') || badge.textContent.includes('KEDALUWARSA'))) {
+          r.remove();
+          removed++;
+        }
+      });
+      alert('Berhasil membersihkan ' + removed + ' token yang dicabut/kedaluwarsa.');
+      return;
+    }
+
+    if (e.target.id === 'btn_clear_all') {
+      if (confirm('Apakah Anda yakin ingin menghapus seluruh riwayat token guru?')) {
+        var tbody = document.getElementById('invite_table_body');
+        if (tbody) tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;color:var(--text-muted);padding:18px;">Belum ada token undangan yang dicetak.</td></tr>';
+      }
+      return;
     }
   });
 })();

@@ -786,6 +786,29 @@ async function revokeTeacherInvite(env, input, fetchImpl) {
   });
 }
 
+async function updateTeacherInvite(env, input, fetchImpl) {
+  return await ownerApiFetch(env, '/api/owner/teacher-invite/update', fetchImpl, {
+    method: 'POST',
+    body: {
+      codeHash: input.codeHash,
+      subject_id: input.subject_id,
+      grade_id: input.grade_id,
+      teacherName: input.teacherName,
+      institution: input.institution,
+    }
+  });
+}
+
+async function deleteTeacherInvite(env, input, fetchImpl) {
+  return await ownerApiFetch(env, '/api/owner/teacher-invite/delete', fetchImpl, {
+    method: 'POST',
+    body: {
+      codeHash: input.codeHash || undefined,
+      mode: input.mode || undefined,
+    }
+  });
+}
+
 /** `sub` yang sah = UUID. Dipakai DUA arah: sebelum dikirim ke API, dan sebelum dirender. */
 const SUB_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/;
 
@@ -2666,7 +2689,7 @@ function renderTeacherSection(m) {
           <div class="warn" style="margin-top:14px;"><b>${ICONS.alert} PERHATIAN PENTING:</b> Kode token ini <b>HANYA DITAMPILKAN SEKALI INI SAJA</b> demi keamanan kriptografis. Sistem tidak menyimpan token mentah di basis data. Pastikan Anda telah menyalinnya sebelum berpindah halaman.</div>
         </div>
       `;
-    } else if (action.action === 'revoke' && action.ok) {
+    } else if ((action.action === 'revoke' || action.action === 'update' || action.action === 'delete') && action.ok) {
       alertBanner = `
         <div class="note" style="border-left-color:var(--emerald);color:var(--emerald);background:var(--emerald-subtle);padding:12px 16px;margin-bottom:16px;">
           <b>${ICONS.check} Berhasil:</b> ${esc(action.message)}
@@ -2779,15 +2802,82 @@ function renderTeacherSection(m) {
         statusBadge = `<span style="background:#f5f5f5;color:#616161;padding:2px 8px;border-radius:10px;font-size:11px;">${esc(inv.status || '—')}</span>`;
       }
 
+      const curSub = inv.subject_id || inv.subjectId || 'MAT';
+      const curGrd = inv.grade_id || inv.gradeId || 'SMP';
+
+      let tokenCodeCell = '—';
+      if (inv.rawCode) {
+        tokenCodeCell = `<code style="background:var(--bg-subtle,#f8fafc);color:var(--brand-gold,#b45309);font-size:12px;font-weight:700;letter-spacing:1px;padding:3px 8px;border-radius:6px;border:1px solid #cbd5e1;user-select:all;display:inline-block;" title="Klik/blok untuk menyalin token">${esc(inv.rawCode)}</code>`;
+      } else if (inv.codeHash) {
+        tokenCodeCell = `<code style="color:var(--text-muted,#64748b);font-size:11px;" title="Hash token arsip">${esc((inv.codeHash || '').slice(0, 8))}…</code>`;
+      }
+
+      const subjectOptions = [
+        ['MAT', 'Matematika'],
+        ['ENG', 'Bahasa Inggris'],
+        ['IPA', 'Ilmu Pengetahuan Alam (IPA)'],
+        ['IPS', 'Ilmu Pengetahuan Sosial (IPS)'],
+        ['IND', 'Bahasa Indonesia'],
+        ['INF', 'Informatika'],
+        ['PKN', 'Pendidikan Pancasila'],
+        ['SD-ALL', 'Guru Kelas SD (Tematik)'],
+        ['ALL', 'Semua Mapel']
+      ].map(([val, label]) => `<option value="${val}" ${curSub === val ? 'selected' : ''}>${esc(label)}</option>`).join('');
+
+      const gradeOptions = [
+        ['SMP', 'Fase D (SMP Kelas 7–9)'],
+        ['SMA', 'Fase E/F (SMA Kelas 10–12)'],
+        ['SD', 'Fase A–C (SD Kelas 1–6)'],
+        ['ALL', 'Semua Jenjang']
+      ].map(([val, label]) => `<option value="${val}" ${curGrd === val ? 'selected' : ''}>${esc(label)}</option>`).join('');
+
       let actionCell = '—';
-      if (inv.status === 'ACTIVE' && inv.codeHash) {
-        actionCell = `
-          <form method="GET" action="/" style="display:inline;margin:0;">
+      if (inv.codeHash) {
+        const editDetails = `
+          <details style="display:inline-block;position:relative;margin:2px;text-align:left;">
+            <summary style="background:#0284c7;color:#fff;border:none;padding:3px 8px;border-radius:4px;font-size:11px;font-weight:bold;cursor:pointer;list-style:none;display:inline-block;">✏️ Edit</summary>
+            <div style="position:absolute;right:0;top:100%;z-index:30;background:#ffffff;border:1px solid #cbd5e1;border-radius:8px;padding:12px;box-shadow:0 8px 24px rgba(0,0,0,0.18);width:260px;margin-top:4px;">
+              <div style="font-weight:700;font-size:12px;margin-bottom:8px;color:var(--ink);">Ganti Mapel / Jenjang</div>
+              <form method="GET" action="/" style="margin:0;">
+                <input type="hidden" name="action" value="update_invite">
+                <input type="hidden" name="codeHash" value="${esc(inv.codeHash)}">
+                <div style="margin-bottom:6px;">
+                  <label style="display:block;font-size:11px;font-weight:600;margin-bottom:2px;color:var(--ink);">Mata Pelajaran:</label>
+                  <select name="subject_id" style="width:100%;font-size:11px;padding:4px 6px;border:1px solid #cbd5e1;border-radius:4px;">
+                    ${subjectOptions}
+                  </select>
+                </div>
+                <div style="margin-bottom:8px;">
+                  <label style="display:block;font-size:11px;font-weight:600;margin-bottom:2px;color:var(--ink);">Jenjang / Fase:</label>
+                  <select name="grade_id" style="width:100%;font-size:11px;padding:4px 6px;border:1px solid #cbd5e1;border-radius:4px;">
+                    ${gradeOptions}
+                  </select>
+                </div>
+                <div style="display:flex;justify-content:flex-end;">
+                  <button type="submit" style="background:#0284c7;color:#fff;border:none;padding:4px 10px;border-radius:4px;font-size:11px;font-weight:bold;cursor:pointer;">Simpan</button>
+                </div>
+              </form>
+            </div>
+          </details>
+        `;
+
+        const revokeBtn = inv.status === 'ACTIVE' ? `
+          <form method="GET" action="/" style="display:inline;margin:2px;">
             <input type="hidden" name="action" value="revoke_invite">
             <input type="hidden" name="codeHash" value="${esc(inv.codeHash)}">
-            <button type="submit" style="background:#c62828;color:#fff;border:none;padding:4px 10px;border-radius:4px;font-size:11px;font-weight:bold;cursor:pointer;box-shadow:none;">Cabut</button>
+            <button type="submit" style="background:#c62828;color:#fff;border:none;padding:3px 8px;border-radius:4px;font-size:11px;font-weight:bold;cursor:pointer;" title="Cabut token ini">Cabut</button>
+          </form>
+        ` : '';
+
+        const deleteBtn = `
+          <form method="GET" action="/" style="display:inline;margin:2px;">
+            <input type="hidden" name="action" value="delete_invite">
+            <input type="hidden" name="codeHash" value="${esc(inv.codeHash)}">
+            <button type="submit" style="background:#64748b;color:#fff;border:none;padding:3px 8px;border-radius:4px;font-size:11px;font-weight:bold;cursor:pointer;" title="Hapus token ini secara permanen">Hapus</button>
           </form>
         `;
+
+        actionCell = `${editDetails}${revokeBtn}${deleteBtn}`;
       }
 
       const createdStr = inv.createdAt ? wibDay(inv.createdAt) : '—';
@@ -2796,24 +2886,43 @@ function renderTeacherSection(m) {
       return `<tr>
         <td><b>${esc(inv.teacherName || '—')}</b></td>
         <td>${esc(inv.institution || '—')}</td>
-        <td>${esc(inv.institutionType || '—')}</td>
-        <td><span style="background:#e0f2fe;color:#0369a1;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;">${esc(subjectName(inv.subject_id || inv.subjectId))}</span><small style="color:var(--text-muted);display:block;margin-top:2px;">${esc(gradeName(inv.grade_id || inv.gradeId))}</small></td>
+        <td><span style="background:#e0f2fe;color:#0369a1;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;">${esc(subjectName(curSub))}</span><small style="color:var(--text-muted);display:block;margin-top:2px;">${esc(gradeName(curGrd))}</small></td>
+        <td>${tokenCodeCell}</td>
         <td>${statusBadge}</td>
         <td>${esc(createdStr)}</td>
         <td>${esc(expiresStr)}</td>
-        <td style="text-align:center;">${actionCell}</td>
+        <td style="text-align:center;white-space:nowrap;">${actionCell}</td>
       </tr>`;
     }).join('');
 
     inviteTable = `
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;flex-wrap:wrap;gap:8px;">
+        <div style="font-weight:700;font-size:14px;color:var(--ink);">Daftar Token Undangan Guru (${invites.length})</div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          <form method="GET" action="/" style="margin:0;">
+            <input type="hidden" name="action" value="clear_invites">
+            <input type="hidden" name="mode" value="revoked">
+            <button type="submit" style="background:#f1f5f9;color:#334155;border:1px solid #cbd5e1;padding:4px 10px;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;">
+              🧹 Bersihkan Token Dicabut / Kedaluwarsa
+            </button>
+          </form>
+          <form method="GET" action="/" style="margin:0;">
+            <input type="hidden" name="action" value="clear_invites">
+            <input type="hidden" name="mode" value="all">
+            <button type="submit" style="background:#fee2e2;color:#991b1b;border:1px solid #f87171;padding:4px 10px;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;">
+              ⚠️ Hapus Semua Data Token
+            </button>
+          </form>
+        </div>
+      </div>
       <div class="table-wrap" style="margin-bottom:24px;">
         <table>
           <thead>
             <tr>
               <th>Guru</th>
               <th>Sekolah / Instansi</th>
-              <th>Jenis</th>
               <th>Mapel &amp; Jenjang</th>
+              <th>Kode Token</th>
               <th>Status</th>
               <th>Dibuat (WIB)</th>
               <th>Berlaku Hingga</th>
@@ -4010,6 +4119,61 @@ async function handle(request, env, ctx, nowMs) {
           message: 'Gagal mencabut token guru. Periksa format kode token.'
         };
       }
+    } else if (action === 'update_invite') {
+      const codeHash = url.searchParams.get('codeHash') || '';
+      const subject_id = url.searchParams.get('subject_id') || '';
+      const grade_id = url.searchParams.get('grade_id') || '';
+      const teacherName = url.searchParams.get('teacherName') || '';
+      const institution = url.searchParams.get('institution') || '';
+      const updateRes = await updateTeacherInvite(env, { codeHash, subject_id, grade_id, teacherName, institution }, fetchImpl);
+      if (updateRes.state === 'ok' && updateRes.body && updateRes.body.ok) {
+        teacherAction = {
+          ok: true,
+          action: 'update',
+          message: 'Data token guru berhasil diperbarui (Mata pelajaran / Jenjang telah diubah).'
+        };
+      } else {
+        teacherAction = {
+          ok: false,
+          action: 'update',
+          error: (updateRes.body && updateRes.body.error) || updateRes.state,
+          message: 'Gagal memperbarui data token guru.'
+        };
+      }
+    } else if (action === 'delete_invite') {
+      const codeHash = url.searchParams.get('codeHash') || '';
+      const delRes = await deleteTeacherInvite(env, { codeHash }, fetchImpl);
+      if (delRes.state === 'ok' && delRes.body && delRes.body.ok) {
+        teacherAction = {
+          ok: true,
+          action: 'delete',
+          message: 'Token guru berhasil dihapus permanen dari basis data.'
+        };
+      } else {
+        teacherAction = {
+          ok: false,
+          action: 'delete',
+          error: (delRes.body && delRes.body.error) || delRes.state,
+          message: 'Gagal menghapus token guru.'
+        };
+      }
+    } else if (action === 'clear_invites') {
+      const mode = url.searchParams.get('mode') || 'revoked';
+      const delRes = await deleteTeacherInvite(env, { mode }, fetchImpl);
+      if (delRes.state === 'ok' && delRes.body && delRes.body.ok) {
+        teacherAction = {
+          ok: true,
+          action: 'delete',
+          message: `Berhasil menghapus ${delRes.body.deletedCount || 0} token guru (${mode === 'all' ? 'Semua token' : 'Token dicabut / kedaluwarsa'}).`
+        };
+      } else {
+        teacherAction = {
+          ok: false,
+          action: 'delete',
+          error: (delRes.body && delRes.body.error) || delRes.state,
+          message: 'Gagal membersihkan data token guru.'
+        };
+      }
     }
 
     // Murid terpilih adalah PARAMETER KUERI pada rute yang sudah ada, bukan rute baru.
@@ -4203,7 +4367,7 @@ export {
   readEvidence, sanitizeEvidenceSummary, renderEvidenceSection, EVIDENCE_PERIOD_DAYS,
   readLearners, readLearnerDetail, sanitizeLearnerRow, sanitizeLearnerSummary,
   renderLearnerSection, renderLearnerDirectory, renderLearnerDetail, learnerLabel, SUB_RE,
-  readTeachers, mintTeacherInvite, revokeTeacherInvite, renderTeacherSection,
+  readTeachers, mintTeacherInvite, revokeTeacherInvite, updateTeacherInvite, deleteTeacherInvite, renderTeacherSection,
   // Rem penebakan halaman masuk: diekspor supaya gerbang bisa memodelkan ISOLATE BARU per
   // permintaan (cacat yang tidak pernah diuji) dan mengassert angka jendelanya sebagai kontrak.
   LOGIN_MAX, LOGIN_MAX_SHARED, LOGIN_BUCKET_MS, LOGIN_WINDOW_BUCKETS, LOGIN_WINDOW_MS,
