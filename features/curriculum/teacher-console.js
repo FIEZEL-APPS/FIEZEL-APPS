@@ -318,6 +318,16 @@
       ambil: function () { return E.seed.soalStatus(); },
       jalan: function () { return E.seed.soal(); },
       judul: function () { return t('kurikulum.soal-judul', 'Bank soal'); },
+      /* Kartu bank soal memakai kalimat "sudah tersemai"-nya SENDIRI, karena angka yang
+         dipunyainya memang berbeda. english_status dan mapel_status menghitung simpul
+         kurikulum (tp, kompetensi, materi); soal_status menghitung BUTIR. Dipaksa memakai
+         kalimat bersama, kartunya berbunyi "Sudah tersemai: undefined tujuan pembelajaran"
+         — ruas yang tidak pernah ada di jawabannya. */
+      sudah: function (st) {
+        return t('kurikulum.soal-sudah', 'Sudah tersemai: {n} soal, mencakup {k} dari {total} kompetensi.')
+          .replace('{n}', st.from_this_seeder).replace('{k}', st.competencies_with_questions)
+          .replace('{total}', st.competencies_total);
+      },
       ajakan: function () { return t('kurikulum.soal-ajakan', 'Soal pilihan ganda berpembahasan, berpetunjuk, dan berpeta miskonsepsi — inilah yang membuat kompetensi bisa dilatih, bukan sekadar dilihat. Semai kurikulumnya lebih dulu.'); },
       selesai: function () { return t('kurikulum.soal-selesai', 'Bank soal tersemai.'); }
     }
@@ -334,7 +344,7 @@
     var st = S[d.st], sibuk = S[d.busy], baris;
     if (st === null) baris = '<p class="muted">' + esc(t('kurikulum.semai-memeriksa', 'Memeriksa isi bank kurikulum…')) + '</p>';
     else if (st && st.seeded) {
-      baris = '<p class="muted" data-testid="' + d.aksi + '-status">' + esc(
+      baris = '<p class="muted" data-testid="' + d.aksi + '-status">' + esc(d.sudah ? d.sudah(st) :
         t('kurikulum.semai-sudah', 'Sudah tersemai: {tp} tujuan pembelajaran, {komp} kompetensi, {materi} materi ajar.')
           .replace('{tp}', st.tp).replace('{komp}', st.competencies).replace('{materi}', st.materials)) + '</p>';
     } else {

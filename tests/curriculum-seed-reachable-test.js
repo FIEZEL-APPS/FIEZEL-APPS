@@ -265,6 +265,60 @@ tegaskan(
      Kelas 8 tidak pernah masuk basis data. Ditemukan hanya karena penyemainya dijalankan
      dan jumlah yang masuk dibandingkan dengan jumlah di tabel. */
   const normStemSoal = (x) => x.toLowerCase().replace(/[^a-z0-9 ]/g, '').replace(/\s+/g, ' ').trim();
+  /* KARTU SEMAI HANYA BOLEH MENYEBUT RUAS YANG DIJAWAB ENDPOINT-NYA SENDIRI.
+
+     Tiga kartu berbagi satu perender, tetapi TIDAK berbagi satu bentuk jawaban:
+     english_status dan mapel_status menghitung simpul kurikulum ({tp, competencies,
+     materials}), sedangkan soal_status menghitung BUTIR ({from_this_seeder,
+     competencies_with_questions, ...}). Kartu soal sempat memakai kalimat bersama itu dan
+     berbunyi di layar guru: "Sudah tersemai: undefined tujuan pembelajaran, undefined
+     kompetensi, undefined materi ajar." Tidak satu pun gerbang merah karenanya — JavaScript
+     dengan senang hati mencetak undefined.
+
+     Jadi yang dijaga di sini kontraknya: tiap ruas `st.<nama>` yang dipakai kartu harus
+     benar-benar ada di `return` endpoint yang mengisinya. */
+  const konsolKartu = konsol.slice(konsol.indexOf('var SEMAI'), konsol.indexOf('function seedCardHtml'));
+  const ruasSoal = [...(konsolKartu.match(/sudah: function \(st\) \{[\s\S]*?\n      \},/) || [''])[0]
+    .matchAll(/st\.([a-z_]+)/g)].map((m) => m[1]);
+  /* Dipotong sampai definisi berikutnya, supaya "ruas ini ada" tidak dijawab oleh kode lain
+     yang kebetulan menyebut nama yang sama di tempat lain dalam berkas. */
+  const potong = (teks, mulai) => {
+    const i = teks.indexOf(mulai);
+    if (i === -1) return '';
+    const sisa = teks.slice(i + mulai.length);
+    const j = sisa.search(/\n(?:async def |def |@router)/);
+    return j === -1 ? sisa : sisa.slice(0, j);
+  };
+  const balikanSoal = potong(seedSoalPy, 'async def soal_status');
+  const hilangSoal = ruasSoal.filter((r) => balikanSoal.indexOf('"' + r + '"') === -1);
+  tegaskan(
+    ruasSoal.length > 0 && hilangSoal.length === 0,
+    'features/curriculum/teacher-console.js: kartu bank soal menyebut ruas yang TIDAK dikembalikan ' +
+    'soal_status (' + (hilangSoal.join(', ') || 'tidak ada ruas yang dibaca sama sekali') + '). Ruas yang ' +
+    'tidak ada dicetak apa adanya sebagai "undefined" di layar guru, dan tidak ada gerbang yang merah karenanya.'
+  );
+
+  const ruasBersama = [...konsolKartu.matchAll(/\.replace\('\{(?:tp|komp|materi)\}', st\.([a-z_]+)\)/g)].map((m) => m[1]);
+  const balikanEng = potong(baca('backend/seed_english.py'), 'async def english_status');
+  const hilangBersama = ruasBersama.filter((r) => balikanEng.indexOf('"' + r + '"') === -1);
+  tegaskan(
+    ruasBersama.length === 3 && hilangBersama.length === 0,
+    'features/curriculum/teacher-console.js: kalimat bersama kartu semai menyebut ruas yang tidak ada di ' +
+    'english_status (' + (hilangBersama.join(', ') || 'jumlah ruasnya berubah') + ').'
+  );
+
+  /* "SUDAH TERSEMAI" HARUS BERARTI BANK INI, BUKAN "ADA SOAL DI BASIS DATA".
+     seed.py menerbitkan 21 soal demo. Selama `seeded` dihitung dari SEMUA soal terbit,
+     kartunya berbunyi "sudah tersemai" pada basis data yang belum pernah menyentuh bank ini,
+     dan tombolnya berubah jadi "Semai ulang" — guru tidak pernah menekan tombol yang
+     sebenarnya belum pernah dijalankan. */
+  tegaskan(
+    /"seeded":\s*dari_penyemai\s*>\s*0/.test(seedSoalPy) && !/"seeded":\s*terbit\s*>\s*0/.test(seedSoalPy),
+    'backend/seed_soal.py: soal_status menghitung `seeded` dari seluruh soal terbit, bukan dari butir yang ' +
+    'ditulis penyemai ini. Bank demo seed.py sudah menerbitkan soal, jadi kartunya mengaku "sudah tersemai" ' +
+    'pada basis data yang belum pernah disemai.'
+  );
+
   const stems = [...seedSoalPy.matchAll(/\n\s{8}Q\("((?:[^"\\]|\\.)*)"/g)].map((m) => m[1]);
   const ganda = stems.filter((x, i) => stems.indexOf(x) !== i);
   tegaskan(
