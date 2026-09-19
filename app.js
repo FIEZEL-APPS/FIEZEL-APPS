@@ -1233,7 +1233,7 @@ function grammarMastery(skill,sourceState=state){return Math.max(0,Math.min(100,
 // tidak menyentuh DOM, tidak menyimpan apa pun, jadi hub, openGrammarLesson(), dan practiceSkill()
 // bisa memakai jawaban yang SAMA. Prasyarat yang hanya ditampilkan tapi tidak ditegakkan membuat
 // urutan kurikulum jadi saran belaka - itu yang ditutup di sini.
-/* Braincore v3 (otoritas BKT, m025-330 — permintaan OWNER "BKT nya jangan di bekukan"):
+/* Braincore v3 (otoritas BKT, m025-331 — permintaan OWNER "BKT nya jangan di bekukan"):
    parameter BKT (L0/T/slip/guess) TETAP beku - itu keputusan terpisah, lihat
    docs/BRAIN-EVOLUTION-DECISIONS.md §5, dan tidak disentuh di sini. Yang berubah adalah
    OTORITASNYA: bktMastered adalah Set opsional berisi skill yang sudah lolos
@@ -3368,7 +3368,7 @@ function bktRecord(q,ok,kappa,boost=1){
   retentionProbeSync(Date.now(),lesson);
 }
 /** Skill yang BKT sudah yakin dikuasai (L>=0,95, n>=5 - masteryGate() bawaan modul).
- *  Dipakai lessonUnlockState() sebagai jalur TAMBAHAN menuju unlock (m025-330, otoritas
+ *  Dipakai lessonUnlockState() sebagai jalur TAMBAHAN menuju unlock (m025-331, otoritas
  *  BKT): hanya perlu menyapu lesson yang punya catatan BKT, karena lesson tak dikenal
  *  jatuh ke prior L0=0,2 yang pasti gagal gerbang. Modul absen/tanpa bukti = Set kosong. */
 function bktMasteredSkills(bktState=bktRead()){
@@ -11542,9 +11542,9 @@ function confidenceCalibration(){const c=(state.confidenceHistory||[]).filter(x=
  * Saat buktinya masih tipis, kartu ini mengatakannya apa adanya. Itu lebih jujur daripada
  * menampilkan angka yang terlihat pasti padahal berdiri di atas sepuluh jawaban.
  */
-/* Fase 2 (B3 butir 3), diperluas m025-330: panel diagnostik BKT. Frontier dan rootCause di
+/* Fase 2 (B3 butir 3), diperluas m025-331: panel diagnostik BKT. Frontier dan rootCause di
  * sini TETAP tampilan saja (tidak ada baris di bawah yang menulis apa pun). Yang TIDAK lagi
- * benar sejak m025-330 adalah "tanpa otoritas unlock" pada judulnya - masteryGate() modul
+ * benar sejak m025-331 adalah "tanpa otoritas unlock" pada judulnya - masteryGate() modul
  * yang sama kini ikut membuka prasyarat lesson berikutnya lewat bktMasteredSkills() +
  * lessonUnlockState() (satu arah: hanya membuka, tidak pernah mengunci ulang; lihat komentar
  * di lessonUnlockState). Nama fungsi ini dipertahankan apa adanya - ia masih panel bacaan
@@ -11776,7 +11776,7 @@ function learningMetricsMarkup(){
 
    brainManifestMarkup menyatakan sendiri bahwa ia tidak punya wewenang - "panel
    ini hanya membaca", "ia sendiri tidak ikut memutuskan apa pun" - dan itu tetap
-   benar. bktShadowMarkup TIDAK LAGI begitu sejak m025-330: masteryGate() yang
+   benar. bktShadowMarkup TIDAK LAGI begitu sejak m025-331: masteryGate() yang
    dibacanya di sini adalah PERSIS fungsi yang sama yang kini ikut membuka
    prasyarat lesson berikutnya (lihat lessonUnlockState/bktMasteredSkills).
    Panel ini SENDIRI tetap tampilan-saja - tidak ada baris di dalamnya yang

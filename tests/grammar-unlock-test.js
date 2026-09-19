@@ -1,6 +1,6 @@
 const __fzRoot = require('path').join(__dirname, '..'); /* m025-254: berkas ini pindah dari root ke tests/. __dirname dulu BERARTI root repo, dan puluhan gerbang memakainya untuk menunjuk berkas produksi - alias ini menjaga makna itu tetap benar tanpa menyunting setiap pemakaian. */
 // m025-137 — gate untuk B-05: prasyarat Grammar harus MENGUNCI, bukan sekadar tampil.
-// m025-330 — diperluas untuk otoritas BKT: lessonUnlockState() menerima Set opsional
+// m025-331 — diperluas untuk otoritas BKT: lessonUnlockState() menerima Set opsional
 // ketiga (skill yang lolos FiezelMasteryBKT.masteryGate()) sebagai jalur TAMBAHAN menuju
 // unlock. Semua check DI ATAS bagian "Otoritas BKT" di bawah memanggil unlockFor() tanpa
 // argumen ke-3 dan karena itu MEMBUKTIKAN regresi: kalau otoritas BKT diam-diam mengubah
@@ -124,7 +124,7 @@ if (sample.prerequisites.length > 1) {
   );
 }
 
-// --- Otoritas BKT (m025-330): masteryGate() sebagai jalur TAMBAHAN menuju unlock --------
+// --- Otoritas BKT (m025-331): masteryGate() sebagai jalur TAMBAHAN menuju unlock --------
 // "BKT nya jangan di bekukan" (permintaan OWNER) = otoritas dibuka, bukan parameternya.
 // Kontraknya: BKT hanya boleh MEMBUKA, tidak pernah MENGUNCI ulang yang sudah terbuka.
 check(

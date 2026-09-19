@@ -33,7 +33,7 @@
  *   estimateAbility (coreBrainAttempts) dan bobot bukti BKT.
  * - affectTargetSuccess: AKTIF — menggeser targetSuccess pemilih soal
  *   (frustrated 0.90 / bored 0.75 / default 0.80).
- * - bktUnlock (mastery-bkt): AKTIF sejak m025-330 (permintaan OWNER: "BKT nya jangan
+ * - bktUnlock (mastery-bkt): AKTIF sejak m025-331 (permintaan OWNER: "BKT nya jangan
  *   di bekukan" — parameter L0/T/slip/guess TETAP beku, lihat BRAIN-EVOLUTION-DECISIONS.md
  *   §5; yang dibuka adalah OTORITASNYA). bktMasteredSkills() menyapu lessons BKT yang
  *   lolos masteryGate() (L>=0,95, n>=5) jadi Set; lessonUnlockState() memakainya sebagai
@@ -81,7 +81,7 @@
 
   // Versi BUNDLE kebijakan belajar — terpisah dari versi produk. 3.0.0 menandai
   // gelombang Braincore v3 pertama yang punya identitas bundle eksplisit.
-  // 3.8.0 -> 3.9.0 (m025-330): bktUnlock shadow -> active, lihat authorityMap di bawah.
+  // 3.8.0 -> 3.9.0 (m025-331): bktUnlock shadow -> active, lihat authorityMap di bawah.
   var BUNDLE_VERSION = '3.9.0';
 
   // Disalin apa adanya dari version.js (self.FIEZEL_VERSION). Bundle ini mengandalkan
@@ -186,12 +186,12 @@
     itemCalibration: 'active',
     srlCoach: 'active',
     speakingPolicy: 'shadow',
-    // m025-330 (permintaan OWNER: "BKT nya jangan di bekukan"): shadow -> active.
+    // m025-331 (permintaan OWNER: "BKT nya jangan di bekukan"): shadow -> active.
     // masteryGate() (L>=0,95 DAN n>=5 — bukti tinggi, bukan cuma posterior tinggi) kini
     // dibaca lessonUnlockState() lewat bktMasteredSkills(): sebuah prasyarat yang lolos
     // gerbang ini membuka lesson berikutnya SEKALIPUN akurasi mentah v2 belum sampai
     // ambang. Klaim ini bukan "BKT menggantikan v2" — ia cuma bisa MEMBUKA, tidak pernah
-    // MENGUNCI (bktMastered kosong/absen = perilaku identik sebelum m025-330). Parameter
+    // MENGUNCI (bktMastered kosong/absen = perilaku identik sebelum m025-331). Parameter
     // BKT sendiri (L0/T/slip/guess) TETAP beku; itu keputusan terpisah yang tidak berubah
     // (BRAIN-EVOLUTION-DECISIONS.md §5).
     bktUnlock: 'active',
