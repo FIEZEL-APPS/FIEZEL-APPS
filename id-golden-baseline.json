@@ -1,6 +1,6 @@
 {
   "schema": "id-golden-baseline/1",
-  "generatedAt": "2026-09-19T08:01:07.234Z",
+  "generatedAt": "2026-09-19T09:02:40.040Z",
   "root": "C:\\Users\\hp\\fiezel-apps",
   "files": {
     "grammar-explanations-id.json": "c99dfaa76ec37e33f80cac08712cfc13a98a405ddb9653ac9f853db0905c33f6",
@@ -18,8 +18,8 @@
     "features/audio-assets/fiezel-audio-key.js": "11624e303917fe0df881ac3f410911587766fd6f4d2491ca6687ec42de8d457d"
   },
   "literals": {
-    "count": 3331,
-    "sha256": "abf258df59fd3de90bd7b5ab6cfdb5a3533bce120c7e0510fbc711ff4d1ae5cc",
+    "count": 3332,
+    "sha256": "5efc8dc27e9b32fa61414073d9f0c1443f6a89a5c341514e605136e8a2f2dd8c",
     "list": [
       "\n      SETELAH beat concern ≤1000ms selesai (13 §2.2), bukan menimpanya. Tanpa bunyi:\n      SFX hint sudah dipensiunkan (20 §4); cooldown 8 detiknya dijaga komponen. */\n   setTimeout(()=>{try{pawReact(",
       "\n      case 'silent':                        // L5: kalau mulut sempat mulai (taksiran L3 kandas), tutup SEKARANG\n        degradedLatch = false;\n        closeTurn(false);\n        break;\n      case 'interrupt':                     // stop(): snap tutup\n        degradedLatch = false;\n        closeTurn(true);\n        break;\n      default:\n        break;                              // fase asing dari versi fasad lebih baru: diabaikan tanpa suara\n    }\n  }\n\n  try { doc.addEventListener('fiezel-speech', onSpeech); } catch (_) {}\n\n  /* Suara terdegradasi (audibility-fix): mulut mati SEKETIKA dan tidak boleh\n     hidup lagi untuk sisa giliran — apa pun yang masih dikirim lapisan bawah. */\n  try {\n    root.addEventListener('fiezel-neural-voice-degraded', function () {\n      if (turn) closeTurn(true);\n      degradedLatch = true;                 // dilepas oleh end/silent/interrupt fasad berikutnya\n    });\n  } catch (_) {}\n\n  /* Permukaan kecil untuk Diagnostics/tes — bukan API pemanggil biasa:\n     satu-satunya pintu bicara tetap FiezelVoiceSay.say(). */\n  root.FiezelSpeechBridge = Object.freeze({\n    SCHEMA: SCHEMA,\n    speaking: function () { return !!turn; },\n    degraded: function () { return !!degradedLatch; },\n    motionAllowed: motionAllowed\n  });\n})(typeof self !== 'undefined' ? self : (typeof window !== 'undefined' ? window : this));\n",
@@ -1388,6 +1388,7 @@
       "FIEZEL baca kamu udah capek",
       "FIEZEL belum punya cukup bukti untuk membuat laporan diagnostik. Mulai tes diagnostik terlebih dahulu.",
       "FIEZEL belum tahu levelmu. Delapan sampai dua belas soal singkat sudah cukup.",
+      "FIEZEL beroperasi sebagai platform pendukung pembelajaran mandiri yang mengadopsi struktur Capaian Pembelajaran Kurikulum Merdeka (Keputusan Kepala BSKAP Kemendikbudristek No. 032/H/KR/2024 dan Permendikbudristek No. 12 Tahun 2024). Guru dan satuan pendidikan memiliki otonomi pedagogis penuh untuk menyesuaikan materi, indikator, dan alur tujuan pembelajaran sesuai Kurikulum Operasional Satuan Pendidikan (KOSP) masing-masing.",
       "FIEZEL bisa mengetuk pelan saat target harian belum selesai, atau saat ada kata dan pola yang menurut jadwal pengulangan sudah waktunya diulang sebelum sempat lupa.",
       "FIEZEL bukan lembaga asesmen terakreditasi. Sertifikat ini melaporkan hasil asesmen adaptif di aplikasi FIEZEL yang dipetakan ke skala CEFR, dan TIDAK setara dengan TOEFL, IELTS, atau ujian terakreditasi lainnya. Penerima sertifikat dipersilakan menilai sendiri kecukupannya.",
       "FIEZEL lihat kamu lagi mandek",

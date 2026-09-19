@@ -66,6 +66,9 @@
       '<button class="btn primary" data-a="login" data-testid="teacher-login-btn">Masuk dengan akun KelasKu</button>' +
       '<p class="muted" style="margin-top:16px;font-size:13px">Belum masuk? Buka <a href="./index.html" data-testid="link-app">aplikasi FIEZEL</a> dulu, lalu kembali ke halaman ini.</p>' +
       '<p class="muted" style="font-size:13px">Murid masuk di halaman <a href="./misi.html" data-testid="link-student">Misi Belajar</a>.</p>' +
+      '<p class="muted" style="margin-top:20px;font-size:11px;line-height:1.5;border-top:1px solid rgba(255,255,255,0.08);padding-top:12px">' +
+      esc(t('kurikulum.disclaimer-auth', 'Mengadopsi Standar Capaian Pembelajaran Kurikulum Merdeka (BSKAP No. 032/H/KR/2024). Menghormati penuh otonomi KOSP sekolah dan pendidik.')) +
+      '</p>' +
       '</div></div>';
   }
 
@@ -90,6 +93,16 @@
     ]).then(function (r) { S.tps = r[0]; S.comps = r[1]; });
   }
 
+  function renderDisclaimer() {
+    return '<footer class="compliance-footer" data-testid="compliance-disclaimer" style="margin-top:40px;padding:16px 20px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:12px;font-size:12px;line-height:1.6;color:var(--text-muted, #8e9bb0)">' +
+      '<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;font-weight:600;color:var(--text-normal, #cad5e2)">' +
+      '<span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#10b981"></span>' +
+      '<span>' + esc(t('kurikulum.disclaimer-badge', 'Standar Kurikulum Merdeka & Otonomi Pendidik')) + '</span>' +
+      '</div>' +
+      '<p style="margin:0">' + esc(t('kurikulum.disclaimer-text', 'FIEZEL beroperasi sebagai platform pendukung pembelajaran mandiri yang mengadopsi struktur Capaian Pembelajaran Kurikulum Merdeka (Keputusan Kepala BSKAP Kemendikbudristek No. 032/H/KR/2024 dan Permendikbudristek No. 12 Tahun 2024). Guru dan satuan pendidikan memiliki otonomi pedagogis penuh untuk menyesuaikan materi, indikator, dan alur tujuan pembelajaran sesuai Kurikulum Operasional Satuan Pendidikan (KOSP) masing-masing.')) + '</p>' +
+      '</footer>';
+  }
+
   // ---------------- kerangka ----------------
   function render() {
     if (!S.user) return renderAuth();
@@ -107,7 +120,7 @@
       '<a class="btn sm ghost" href="./index.html">← Aplikasi FIEZEL</a>' +
       '<button class="btn sm ghost" data-a="logout" data-testid="logout-btn">Keluar</button></div>' +
       '<p class="muted mono" style="margin-top:22px">' + esc(S.user.name || '') + ' · ' + esc(S.user.role) + '</p>' +
-      '</aside><main class="main" data-testid="teacher-console">' + view() + '</main></div>' +
+      '</aside><main class="main" data-testid="teacher-console">' + view() + renderDisclaimer() + '</main></div>' +
       (S.drawer ? '<div class="scrim" data-a="close"></div><aside class="drawer" data-testid="drawer">' + S.drawer + '</aside>' : '') +
       (S.modal ? '<div class="scrim" data-a="close"></div><div class="modal" data-testid="modal">' + S.modal + '</div>' : '');
   }
