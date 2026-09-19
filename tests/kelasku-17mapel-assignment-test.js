@@ -176,6 +176,8 @@ assert(payload.mode === 'ujian', 'Payload membawa mode ujian');
 assert(payload.timer === 15, 'Payload membawa timer 15 menit');
 assert(Array.isArray(payload.items) && payload.items.length === 3, 'Payload membawa 3 butir soal lengkap ke murid');
 assert(payload.items[0].prompt.includes('Pusat kendali'), 'Prompt soal murid terbaca sempurna');
+assert(Array.isArray(payload.skills) && payload.skills[0] === 'ipa', 'Skills dinormalisasi ke lowercase (ipa) agar lolos validasi server');
+assert(payload.items.every(function(it) { return it.skill === 'ipa'; }), 'Setiap butir soal kustom dinormalisasi skill-nya ke lowercase');
 
 // 6. Uji runner murid (resolveItem)
 function resolveItem(a, id) {

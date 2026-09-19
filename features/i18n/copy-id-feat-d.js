@@ -381,6 +381,27 @@
     'guru.top-miskonsepsi': '⚠️ Top Miskonsepsi Siswa:',
     'guru.durasi-timer-ujian': 'Durasi Timer (khusus Ujian)',
     'guru.terbitkan-tugas-mapel': 'Terbitkan Tugas / Ujian Mapel',
-    'guru.tugas-mapel-tersusun': 'Tugas Kurikulum Nasional tersusun:'
+    'guru.tugas-mapel-tersusun': 'Tugas Kurikulum Nasional tersusun:',
+    'guru.langkah-1-materi': '1. Pilih Materi',
+    'guru.langkah-2-mode': '2. Atur Mode & Waktu',
+    'guru.langkah-3-terbitkan': '3. Terbitkan untuk Murid',
+    'guru.intip-contoh-soal': 'Pratinjau Contoh Soal yang Diterima Murid',
+    'guru.contoh-soal-pill': 'contoh soal',
+    'guru.mode-latihan-title': 'Mode Latihan Mandiri',
+    'guru.mode-latihan-sub': 'Kunci & pembahasan langsung terbuka setelah murid menjawab tiap soal. Cocok untuk PR & belajar mandiri.',
+    'guru.mode-ujian-title': 'Mode Ujian / Kuis Terjadwal',
+    'guru.mode-ujian-sub': 'Ada timer hitung mundur, urutan soal diacak otomatis (anti-contek), nilai terekam otomatis ke rekap guru.',
+    'guru.cara-kirim-murid': 'Pilih Cara Pengiriman ke Murid',
+    'guru.opsi-wa-title': 'Bagikan ke WhatsApp Kelas (1-Klik)',
+    'guru.opsi-wa-desc': 'Format pesan rapi berisi nama tugas, jumlah soal, dan panduan 4 langkah cara murid membukanya di FIEZEL.',
+    'guru.salin-pesan-wa': 'Salin Pesan WhatsApp',
+    'guru.opsi-server-title': 'Kirim Langsung ke Notifikasi Aplikasi',
+    'guru.opsi-server-desc': 'Tugas langsung muncul di lonceng notifikasi aplikasi murid. Sekali ketuk, langsung mulai.',
+    'guru.kode-tugas-label': 'Kode Tugas (Bisa Dicatat di Papan Tulis)',
+    'guru.salin-kode-tugas': 'Salin Kode Tugas',
+    'guru.masuk-akun-guru-cta': 'Masuk / Aktivasi Akun Guru',
+    'guru.perlu-akun-guru': 'Perlu Akun Guru',
+    'guru.bagikan-wa-singkat': 'WhatsApp',
+    'guru.salin-kode-singkat': 'Salin Kode'
   });
 }());

@@ -376,6 +376,27 @@
     'guru.top-miskonsepsi': '⚠️ ความเข้าใจผิดยอดนิยมของนักเรียน:',
     'guru.durasi-timer-ujian': 'การจับเวลา (เฉพาะการสอบ)',
     'guru.terbitkan-tugas-mapel': 'เผยแพร่การบ้าน / ข้อสอบประจำวิชา',
-    'guru.tugas-mapel-tersusun': 'การบ้านตามหลักสูตรระดับชาติจัดทำเรียบร้อย:'
+    'guru.tugas-mapel-tersusun': 'การบ้านตามหลักสูตรระดับชาติจัดทำเรียบร้อย:',
+    'guru.langkah-1-materi': '1. เลือกเนื้อหา',
+    'guru.langkah-2-mode': '2. ตั้งค่าโหมดและเวลา',
+    'guru.langkah-3-terbitkan': '3. เผยแพร่ให้นักเรียน',
+    'guru.intip-contoh-soal': 'ตัวอย่างโจทย์ที่นักเรียนจะได้รับ',
+    'guru.contoh-soal-pill': 'ตัวอย่างโจทย์',
+    'guru.mode-latihan-title': 'โหมดฝึกฝนด้วยตนเอง',
+    'guru.mode-latihan-sub': 'เฉลยและคำอธิบายเปิดทันทีหลังตอบแต่ละข้อ เหมาะกับการบ้านและการเรียนรู้ตามสบาย',
+    'guru.mode-ujian-title': 'โหมดสอบ / ควิซตามกำหนดเวลา',
+    'guru.mode-ujian-sub': 'มีตัวจับเวลานับถอยหลัง สลับลำดับคำถามอัตโนมัติ (ป้องกันการลอก) บันทึกคะแนนอัตโนมัติ',
+    'guru.cara-kirim-murid': 'เลือกวิธีส่งให้นักเรียน',
+    'guru.opsi-wa-title': 'แชร์ไปยัง WhatsApp ประจำชั้น (1 คลิก)',
+    'guru.opsi-wa-desc': 'ข้อความรูปแบบเรียบร้อยระบุชื่องาน จำนวนข้อ และขั้นตอน 4 ขั้นตอนในการเปิดบน FIEZEL',
+    'guru.salin-pesan-wa': 'คัดลอกข้อความ WhatsApp',
+    'guru.opsi-server-title': 'ส่งตรงไปยังการแจ้งเตือนแอป',
+    'guru.opsi-server-desc': 'งานจะปรากฏในการแจ้งเตือนของนักเรียนทันที แตะครั้งเดียวเริ่มทำได้เลย',
+    'guru.kode-tugas-label': 'รหัสงาน (จดบนกระดานดำได้)',
+    'guru.salin-kode-tugas': 'คัดลอกรหัสงาน',
+    'guru.masuk-akun-guru-cta': 'เข้าสู่ระบบ / เปิดใช้งานบัญชีครู',
+    'guru.perlu-akun-guru': 'ต้องใช้บัญชีครู',
+    'guru.bagikan-wa-singkat': 'WhatsApp',
+    'guru.salin-kode-singkat': 'คัดลอกรหัส'
   });
 }());
