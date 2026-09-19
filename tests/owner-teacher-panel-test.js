@@ -13,6 +13,7 @@ const assert = require('assert');
   assert(typeof ownerMod.revokeTeacherInvite === 'function', 'revokeTeacherInvite diekspor');
   assert(typeof ownerMod.updateTeacherInvite === 'function', 'updateTeacherInvite diekspor');
   assert(typeof ownerMod.deleteTeacherInvite === 'function', 'deleteTeacherInvite diekspor');
+  assert(typeof ownerMod.deleteTeacherAccount === 'function', 'deleteTeacherAccount diekspor');
   assert(typeof ownerMod.renderTeacherSection === 'function', 'renderTeacherSection diekspor');
   assert(typeof ownerMod.readSchools === 'function', 'readSchools diekspor');
   assert(typeof ownerMod.createSchool === 'function', 'createSchool diekspor');
@@ -122,6 +123,27 @@ const assert = require('assert');
     assert(bodyBulk.mode === 'revoked', 'bulk mode terkirim');
   }
 
+  // 5b. deleteTeacherAccount mengirim sub/handle atau mode all
+  {
+    let captured = null;
+    const mockFetch = async (url, opt) => {
+      captured = { url, opt };
+      return { ok: true, status: 200, json: async () => ({ ok: true, deleted: true }) };
+    };
+
+    const env = { EVIDENCE_API_BASE: 'https://api.fiezel.my.id', EVIDENCE_API_TOKEN: 'secret-owner-token' };
+    const res = await ownerMod.deleteTeacherAccount(env, { sub: 'usr-123', handle: 'pakbudi' }, mockFetch);
+    assert(res.state === 'ok', 'deleteTeacherAccount state ok');
+    assert(captured.url === 'https://api.fiezel.my.id/api/owner/teacher/delete', 'deleteTeacherAccount url benar');
+    const body = JSON.parse(captured.opt.body);
+    assert(body.sub === 'usr-123' && body.handle === 'pakbudi', 'sub dan handle terkirim');
+
+    // bulk mode
+    await ownerMod.deleteTeacherAccount(env, { mode: 'all' }, mockFetch);
+    const bodyBulk = JSON.parse(captured.opt.body);
+    assert(bodyBulk.mode === 'all', 'bulk mode all terkirim');
+  }
+
   // 6. createSchool, updateSchool, deleteSchool mengirim endpoint dan body yang sesuai
   {
     let captured = null;
@@ -170,6 +192,20 @@ const assert = require('assert');
 
     await ownerMod.readClasses(env, mockFetch);
     assert(captured.url === 'https://api.fiezel.my.id/api/owner/classes', 'url readClasses benar');
+
+    // Test deleteClass (single)
+    const delSingle = await ownerMod.deleteClass(env, { code: 'FZ-7A9X2K' }, mockFetch);
+    assert(delSingle.state === 'ok', 'deleteClass single ok');
+    assert(captured.url === 'https://api.fiezel.my.id/api/owner/class/delete', 'url deleteClass benar');
+    const bDel = JSON.parse(captured.opt.body);
+    assert(bDel.code === 'FZ-7A9X2K', 'code terkirim ke deleteClass');
+
+    // Test deleteClass (all)
+    const delAll = await ownerMod.deleteClass(env, { mode: 'all' }, mockFetch);
+    assert(delAll.state === 'ok', 'deleteClass all ok');
+    assert(captured.url === 'https://api.fiezel.my.id/api/owner/class/delete', 'url deleteClass all benar');
+    const bDelAll = JSON.parse(captured.opt.body);
+    assert(bDelAll.mode === 'all', 'mode all terkirim ke deleteClass');
   }
 
   // 8. regenerateTeacherInvite mengirim codeHash dan endpoint regenerasi
@@ -303,6 +339,12 @@ const assert = require('assert');
     assert(rendered.includes('value="regenerate_invite"'), 'Aksi regenerasi token guru tersedia');
     assert(rendered.includes('extend_days'), 'Pilihan perpanjang masa aktif token tersedia di edit');
     assert(rendered.includes('FZ-7A9X2K'), 'Kode kelas persisten dari database tertampil');
+    assert(rendered.includes('value="delete_teacher"'), 'Form delete_teacher tersedia');
+    assert(rendered.includes('Bersihkan Semua Akun Guru'), 'Tombol bersihkan semua guru aktif tersedia');
+    assert(rendered.includes('value="delete_class"'), 'Form delete_class tersedia');
+    assert(rendered.includes('value="clear_classes"'), 'Form clear_classes tersedia');
+    assert(rendered.includes('Bersihkan Semua Kelas'), 'Tombol bersihkan semua kelas tersedia');
+    assert(rendered.includes('Hapus Kelas'), 'Tombol hapus kelas tersedia');
   }
 
   console.log('owner-teacher-panel-test: SEMUA ASERSI LULUS (100% PASS)');

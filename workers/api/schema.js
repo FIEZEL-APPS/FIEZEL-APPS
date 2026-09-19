@@ -68,6 +68,7 @@ export const BYTE_LIMITS = Object.freeze({
   '/api/owner/teacher-invite/update': 1024,
   '/api/owner/teacher-invite/delete': 512,
   '/api/owner/teachers': 512,              // GET, tanpa body
+  '/api/owner/teacher/delete': 512,
   '/api/teacher/tree': 512,                // GET
   '/api/teacher/node/save': 16384,         // deskripsi + tujuan + daftar kosakata
   '/api/teacher/node/publish': 512,

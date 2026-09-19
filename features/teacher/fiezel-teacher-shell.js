@@ -2459,7 +2459,7 @@
             var matched = st.classes.filter(function (c) { return S().normalizeClassCode(c.code) === normCode; })[0];
             if (matched) {
               st.activeClassId = matched.id;
-            } else {
+            } else if (!st.deletedClassCodes || !st.deletedClassCodes[normCode]) {
               var clsTitle = (acc.institution ? acc.institution + ' — ' : '') + (acc.subjectId || 'Kelas ' + normCode);
               var autoCls = S().newClass(clsTitle, 'A2', acc.subjectId || 'English');
               autoCls.code = normCode;
@@ -2849,7 +2849,7 @@
   function settings() {
     return accountCard() +
       '<section class="tg-card tg-narrow" data-testid="tg-settings"><p class="tg-kicker">Profil guru</p><h3>' + t('guru.nama-sekolah-ttd', 'Nama & sekolah dipakai di tanda tangan laporan') + '</h3><form data-tg-form="teacher" class="tg-form"><label class="tg-label">' + t('guru.nama-panggilan', 'Nama panggilan') + '<input name="name" value="' + esc(st.teacher.name) + '" placeholder="Bu Rina / Pak Dimas" maxlength="40" data-testid="tg-teacher-name"></label><label class="tg-label">Sekolah / lembaga<input name="school" value="' + esc(st.teacher.school) + '" placeholder="SMA Negeri 3 Bandung" maxlength="60" data-testid="tg-teacher-school"></label><div class="tg-actions"><button type="submit" class="tg-btn is-primary is-small" data-testid="tg-teacher-save">' + t('umum.simpan', 'Simpan') + '</button></div></form>' +
-      '<hr class="tg-hr"><p class="tg-kicker">Data</p><p class="tg-muted">' + t('guru.data-lokal-warn', 'Semua data KelasKu untuk Guru tersimpan di perangkat ini. Ekspor cadangan sebelum ganti perangkat.') + '</p><div class="tg-actions"><button type="button" class="tg-btn is-ghost is-small" data-tg="export-json">' + icon('download') + ' Ekspor cadangan</button><label class="tg-btn is-ghost is-small">' + icon('upload') + ' Pulihkan cadangan<input type="file" accept="application/json" hidden data-tg-file="import-json"></label><button type="button" class="tg-btn is-danger is-small" data-tg="reset-all" data-testid="tg-reset">' + icon('trash-2') + ' ' + t('guru.hapus-semua-data', 'Hapus semua data guru') + '</button></div></section>';
+      '<hr class="tg-hr"><p class="tg-kicker">Data</p><p class="tg-muted">' + t('guru.data-lokal-warn', 'Semua data KelasKu untuk Guru tersimpan di perangkat ini. Ekspor cadangan sebelum ganti perangkat.') + '</p><div class="tg-actions"><button type="button" class="tg-btn is-ghost is-small" data-tg="export-json">' + icon('download') + ' Ekspor cadangan</button><label class="tg-btn is-ghost is-small">' + icon('upload') + ' Pulihkan cadangan<input type="file" accept="application/json" hidden data-tg-file="import-json"></label><button type="button" class="tg-btn is-ghost is-small" data-tg="clear-all-classes" data-testid="tg-clear-classes">' + icon('trash-2') + ' Bersihkan semua kelas</button><button type="button" class="tg-btn is-danger is-small" data-tg="reset-all" data-testid="tg-reset">' + icon('trash-2') + ' ' + t('guru.hapus-semua-data', 'Hapus semua data guru') + '</button></div></section>';
   }
   var views = { hub: function () { return '<div id="tgClassHub" class="tg-hub-host"></div>'; }, briefing: briefing, classes: classes, assignments: assignments, insights: insights, comms: comms, journal: journal, settings: settings, curriculum: curriculumView };
 
@@ -2889,7 +2889,7 @@
     var m = ui.modal, T = S(), body = '', title = '', wide = false;
     if (m.kind === 'new-class' || m.kind === 'edit-class') {
       var e = m.kind === 'edit-class' ? c : null; title = e ? t('guru.ubah-kelas', 'Ubah kelas') : t('guru.kelas-baru', 'Kelas baru');
-      body = '<form data-tg-form="' + m.kind + '" class="tg-form"><label class="tg-label">' + t('guru.nama-kelas', 'Nama kelas') + '<input name="name" required maxlength="60" value="' + esc(e ? e.name : '') + '" placeholder="English A2 — Kelas 10A" data-autofocus data-testid="tg-class-name"></label><div class="tg-form-row"><label class="tg-label">Level<select name="level" data-testid="tg-class-level">' + ['A1', 'A2', 'B1', 'B2', 'C1'].map(function (l) { return '<option' + ((e ? e.level : 'A2') === l ? ' selected' : '') + '>' + l + '</option>'; }).join('') + '</select></label><label class="tg-label">Mata pelajaran<input name="subject" value="' + esc(e ? e.subject : 'English') + '" maxlength="40"></label></div><div class="tg-actions"><button type="submit" class="tg-btn is-primary" data-testid="tg-class-submit">' + (e ? t('umum.simpan', 'Simpan') : t('guru.buat-kelas', 'Buat kelas')) + '</button>' + (e ? '' : '<button type="button" class="tg-btn is-ghost" data-tg="seed-demo">Atau muat kelas contoh</button>') + '</div></form>';
+      body = '<form data-tg-form="' + m.kind + '" class="tg-form"><label class="tg-label">' + t('guru.nama-kelas', 'Nama kelas') + '<input name="name" required maxlength="60" value="' + esc(e ? e.name : '') + '" placeholder="English A2 — Kelas 10A" data-autofocus data-testid="tg-class-name"></label><div class="tg-form-row"><label class="tg-label">Level<select name="level" data-testid="tg-class-level">' + ['A1', 'A2', 'B1', 'B2', 'C1'].map(function (l) { return '<option' + ((e ? e.level : 'A2') === l ? ' selected' : '') + '>' + l + '</option>'; }).join('') + '</select></label><label class="tg-label">Mata pelajaran<input name="subject" value="' + esc(e ? e.subject : 'English') + '" maxlength="40"></label></div><label class="tg-label">Kode kelas (mis. FZ-QVQDHM)<input name="code" value="' + esc(e ? e.code : '') + '" placeholder="FZ-XXXXXX (otomatis atau gunakan kode sekolah)" maxlength="16"></label><div class="tg-actions"><button type="submit" class="tg-btn is-primary" data-testid="tg-class-submit">' + (e ? t('umum.simpan', 'Simpan') : t('guru.buat-kelas', 'Buat kelas')) + '</button>' + (e ? '' : '<button type="button" class="tg-btn is-ghost" data-tg="seed-demo">Atau muat kelas contoh</button>') + '</div></form>';
     } else if (m.kind === 'add-students') {
       title = t('guru.tambah-siswa', 'Tambah siswa');
       body = '<form data-tg-form="add-students" class="tg-form"><label class="tg-label">' + t('guru.nama-siswa-baris', 'Nama siswa — satu per baris, atau tempel daftar absen') + '<textarea name="names" rows="6" required placeholder="1. Rina Kartika\n2. Dimas Prasetyo\nSari, Bagas, Nadia" data-autofocus data-testid="tg-add-names"></textarea></label><p class="tg-muted">Nomor urut dan nama belakang dibuang otomatis — FIEZEL hanya menyimpan nama depan.</p><div class="tg-actions"><button type="submit" class="tg-btn is-primary" data-testid="tg-add-submit">Tambahkan</button><button type="button" class="tg-btn is-ghost" data-tg="modal" data-kind="import-code">Punya kode hasil murid?</button></div></form>';
@@ -3228,8 +3228,44 @@
       case 'copy': copy(btn.getAttribute('data-text'), 'Tersalin.'); return;
       case 'copy-draft': { var ta = el.querySelector('[data-tg-input="draft"]'); copy(ta ? ta.value : '', 'Pesan tersalin.'); saveMinutes(ui.modal && ui.modal.kind === 'parent' ? 8 : 3); persist(); return; }
       case 'mark-sent': { var s = student(id); if (s) { s.notes.push({ at: Date.now(), text: (btn.getAttribute('data-kind') === 'parent' ? 'Laporan orang tua dikirim.' : 'Kartu sapa dikirim.') }); saveMinutes(btn.getAttribute('data-kind') === 'parent' ? 8 : 3); } ui.modal = null; toast('Dicatat di riwayat ' + (s ? s.name : '') + '.'); break; }
-      case 'seed-demo': { var d = T.seedDemo(); st.classes.push(d); st.activeClassId = d.id; st.onboarded = true; ui.modal = null; st.view = 'briefing'; toast(t('guru.kelas-contoh', 'Kelas contoh dimuat — 18 siswa, 2 tugas, data 14 hari.')); break; }
-      case 'delete-class': if (!c || !confirm('Hapus kelas "' + c.name + '" beserta ' + c.students.length + ' siswa? Tidak bisa dibatalkan.')) return; st.classes = st.classes.filter(function (k) { return k.id !== c.id; }); st.activeClassId = st.classes.length ? st.classes[0].id : null; break;
+      case 'delete-class': {
+        if (!c || !confirm('Hapus kelas "' + c.name + '" beserta ' + c.students.length + ' siswa? Tidak bisa dibatalkan.')) return;
+        var delCode = c.code ? S().normalizeClassCode(c.code) : '';
+        if (delCode) {
+          st.deletedClassCodes = st.deletedClassCodes || {};
+          st.deletedClassCodes[delCode] = true;
+          try {
+            var A = S().account ? S().account() : root.FiezelAccount;
+            if (A && typeof A.api === 'function') {
+              A.api('/api/teacher/class/delete', { code: delCode }).catch(function () {});
+            }
+          } catch (_) {}
+        }
+        st.classes = st.classes.filter(function (k) { return k.id !== c.id; });
+        st.activeClassId = st.classes.length ? st.classes[0].id : null;
+        toast('Kelas "' + c.name + '" berhasil dihapus.');
+        break;
+      }
+      case 'clear-all-classes': {
+        if (!confirm('Bersihkan dan hapus SEMUA kelas di KelasKu?')) return;
+        st.classes.forEach(function (k) {
+          if (k.code) {
+            var dc = S().normalizeClassCode(k.code);
+            st.deletedClassCodes = st.deletedClassCodes || {};
+            st.deletedClassCodes[dc] = true;
+            try {
+              var A = S().account ? S().account() : root.FiezelAccount;
+              if (A && typeof A.api === 'function') {
+                A.api('/api/teacher/class/delete', { code: dc }).catch(function () {});
+              }
+            } catch (_) {}
+          }
+        });
+        st.classes = [];
+        st.activeClassId = null;
+        toast('Semua kelas berhasil dibersihkan.');
+        break;
+      }
       case 'delete-student': if (!c) return; c.students = c.students.filter(function (s) { return s.id !== id; }); ui.drawer = null; toast('Siswa dihapus dari kelas.'); break;
       case 'delete-assign': if (!c || !confirm(t('guru.konfirm-hapus-tugas', 'Hapus tugas ini?'))) return; c.assignments = c.assignments.filter(function (a) { return a.id !== id; }); break;
       case 'mark-done': { var a = c.assignments.filter(function (x) { return x.id === id; })[0], sid = btn.getAttribute('data-sid'); if (a) { a.done = a.done || {}; a.done[sid] = { at: Date.now(), acc: T.skillAcc(student(sid) || {}, a.skills[0]) }; } saveMinutes(1); break; }
@@ -3276,8 +3312,23 @@
     var form = e.target.closest ? e.target.closest('[data-tg-form]') : null; if (!form) return;
     e.preventDefault();
     var kind = form.getAttribute('data-tg-form'), fd = new FormData(form), c = cls(), T = S(), viaWa = e.submitter && e.submitter.name === 'wa';
-    if (kind === 'new-class') { var k = T.newClass(fd.get('name'), fd.get('level'), fd.get('subject')); st.classes.push(k); st.activeClassId = k.id; st.onboarded = true; ui.modal = null; st.view = 'classes'; toast('Kelas ' + k.name + ' dibuat. Kode: ' + k.code); if (S().syncAvailable() === 'ok') setTimeout(function () { syncAll(true); }, 400); }
-    else if (kind === 'edit-class' && c) { c.name = String(fd.get('name')).slice(0, 60); c.level = fd.get('level'); c.subject = fd.get('subject'); if (c.sync) c.sync.claimed = false; ui.modal = null; }
+    if (kind === 'new-class') {
+      var k = T.newClass(fd.get('name'), fd.get('level'), fd.get('subject'));
+      var customCode = T.normalizeClassCode(fd.get('code'));
+      if (customCode) k.code = customCode;
+      st.classes.push(k); st.activeClassId = k.id; st.onboarded = true; ui.modal = null; st.view = 'classes';
+      toast('Kelas ' + k.name + ' dibuat. Kode: ' + k.code);
+      if (S().syncAvailable() === 'ok') setTimeout(function () { syncAll(true); }, 400);
+    }
+    else if (kind === 'edit-class' && c) {
+      c.name = String(fd.get('name')).slice(0, 60);
+      c.level = fd.get('level');
+      c.subject = fd.get('subject');
+      var editCode = T.normalizeClassCode(fd.get('code'));
+      if (editCode && editCode !== c.code) { c.code = editCode; if (c.sync) c.sync.claimed = false; }
+      else if (c.sync) c.sync.claimed = false;
+      ui.modal = null;
+    }
     else if (kind === 'add-students' && c) { var names = T.parseNames(fd.get('names')), added = 0; names.forEach(function (n) { var fn = T.firstName(n); if (!c.students.some(function (s) { return s.name.toLowerCase() === fn.toLowerCase(); })) { c.students.push(T.newStudent(fn)); added++; } }); ui.modal = null; st.view = 'classes'; saveMinutes(added * 0.5); toast(added + ' siswa ditambahkan.'); }
     else if (kind === 'import-code' && c) { var p = T.parseLearnerCode(fd.get('code')); if (!p) { ui.modal = { kind: 'import-code', error: 'Kode tidak dikenali. Pastikan menyalin utuh "Kode hasil untuk tutor" dari murid.' }; render(); return; } var res = T.ingest(c, p); ui.modal = null; ui.drawer = res.student.id; saveMinutes(4 + res.graded.length * 5); toast('Hasil ' + res.student.name + ' masuk' + (res.graded.length ? ' · ' + res.graded.length + ' tugas dinilai otomatis' : '') + '.'); }
     else if (kind === 'assign' && c) {
