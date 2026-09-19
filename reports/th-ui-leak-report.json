@@ -1,6 +1,6 @@
 {
   "schema": "fiezel-th-ui-leak-v1",
-  "generatedAt": "2026-09-19T08:10:27.844Z",
+  "generatedAt": "2026-09-19T08:37:21.058Z",
   "files": {
     "app.js": {
       "leaks": 3,
@@ -147,16 +147,12 @@
       ]
     },
     "features/curriculum/teacher-console.js": {
-      "leaks": 56,
-      "budget": 56,
+      "leaks": 43,
+      "budget": 43,
       "sample": [
         {
           "line": 34,
           "text": "Kopilot Guru"
-        },
-        {
-          "line": 35,
-          "text": "Bank Soal"
         },
         {
           "line": 35,
@@ -169,6 +165,10 @@
         {
           "line": 66,
           "text": "Masuk dengan akun KelasKu"
+        },
+        {
+          "line": 67,
+          "text": "Belum masuk? Buka"
         }
       ]
     },
@@ -468,8 +468,8 @@
     }
   },
   "copyKeys": {
-    "id": 2527,
-    "th": 2529,
+    "id": 2669,
+    "th": 2671,
     "idTanpaTh": 0
   },
   "pass": true
