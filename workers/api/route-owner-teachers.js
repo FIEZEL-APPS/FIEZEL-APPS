@@ -57,9 +57,9 @@ export async function routeTeacherInviteCreate(ctx) {
   const r = minted.record;
   await db.prepare(
     'INSERT INTO teacher_invite (code_hash, teacher_name, institution, institution_type, ' +
-    'created_at, expires_at, created_by, subject_id, grade_id, raw_code) VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10)'
+    'created_at, expires_at, created_by, subject_id, grade_id, raw_code, class_code) VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11)'
   ).bind(r.code_hash, r.teacher_name, r.institution, r.institution_type,
-    r.created_at, r.expires_at, r.created_by, r.subject_id || null, r.grade_id || null, minted.code).run();
+    r.created_at, r.expires_at, r.created_by, r.subject_id || null, r.grade_id || null, minted.code, r.class_code || null).run();
 
   return jsonResponse({
     code: minted.code,
@@ -136,11 +136,11 @@ export async function routeOwnerTeachers(ctx) {
 
   const invites = await db.prepare(
     'SELECT code_hash, teacher_name, institution, institution_type, created_at, expires_at, ' +
-    'used_at, revoked_at, subject_id, grade_id, raw_code FROM teacher_invite ORDER BY created_at DESC LIMIT 200'
+    'used_at, revoked_at, subject_id, grade_id, raw_code, class_code FROM teacher_invite ORDER BY created_at DESC LIMIT 200'
   ).all();
 
   const teachers = await db.prepare(
-    'SELECT p.teacher_name, p.institution, p.institution_type, p.activated_at, p.subject_id, p.grade_id, a.login_handle, a.status ' +
+    'SELECT p.teacher_name, p.institution, p.institution_type, p.activated_at, p.subject_id, p.grade_id, p.class_code, a.login_handle, a.status ' +
     'FROM teacher_profile p JOIN auth_account a ON a.sub = p.sub ORDER BY p.activated_at DESC LIMIT 200'
   ).all();
 
@@ -149,6 +149,7 @@ export async function routeOwnerTeachers(ctx) {
       ...publicInviteView(row, ctx.now),
       subjectId: row.subject_id || null,
       gradeId: row.grade_id || null,
+      classCode: row.class_code || null,
       codeHash: row.code_hash,
       rawCode: row.raw_code || null
     })),
@@ -159,6 +160,7 @@ export async function routeOwnerTeachers(ctx) {
       institutionType: row.institution_type,
       subjectId: row.subject_id || null,
       gradeId: row.grade_id || null,
+      classCode: row.class_code || null,
       status: row.status,
       activatedAt: Number(row.activated_at) || 0
     }))
@@ -186,7 +188,7 @@ export async function routeTeacherInviteUpdate(ctx) {
   const body = await readJsonFromCtx(ctx, opt);
   if (!body.ok) return body.response;
 
-  const { codeHash, subject_id, grade_id, teacherName, institution } = body.value || {};
+  const { codeHash, subject_id, grade_id, teacherName, institution, class_code } = body.value || {};
   if (!codeHash || typeof codeHash !== 'string') {
     return jsonError(400, 'code_hash_required', {}, opt);
   }
@@ -201,9 +203,10 @@ export async function routeTeacherInviteUpdate(ctx) {
     'subject_id = COALESCE(?2, subject_id), ' +
     'grade_id = COALESCE(?3, grade_id), ' +
     'teacher_name = COALESCE(?4, teacher_name), ' +
-    'institution = COALESCE(?5, institution) ' +
+    'institution = COALESCE(?5, institution), ' +
+    'class_code = COALESCE(?6, class_code) ' +
     'WHERE code_hash = ?1'
-  ).bind(codeHash, subject_id || null, grade_id || null, teacherName || null, institution || null).run();
+  ).bind(codeHash, subject_id || null, grade_id || null, teacherName || null, institution || null, class_code || null).run();
 
   if (existing.used_by) {
     await db.prepare(
@@ -211,9 +214,10 @@ export async function routeTeacherInviteUpdate(ctx) {
       'subject_id = COALESCE(?2, subject_id), ' +
       'grade_id = COALESCE(?3, grade_id), ' +
       'teacher_name = COALESCE(?4, teacher_name), ' +
-      'institution = COALESCE(?5, institution) ' +
+      'institution = COALESCE(?5, institution), ' +
+      'class_code = COALESCE(?6, class_code) ' +
       'WHERE sub = ?1'
-    ).bind(existing.used_by, subject_id || null, grade_id || null, teacherName || null, institution || null).run();
+    ).bind(existing.used_by, subject_id || null, grade_id || null, teacherName || null, institution || null, class_code || null).run();
   }
 
   return jsonResponse({ ok: true, updated: true }, opt);

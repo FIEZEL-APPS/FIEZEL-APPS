@@ -998,11 +998,18 @@ test('alur ringkas: stepper menghitung tiga, bukan enam', () => {
   });
 });
 
-test('alur lengkap tetap utuh saat bendera ringkas dimatikan', () => {
+test('murid dengan kode kelas langsung menyelesaikan perkenalan dan menyimpan kode', () => {
   const env = fakeEnv();
-  const run = onboarding.show(env, { now: NOW, onName() {}, onGoal() {}, onPlacement() {}, onFinish() {} });
-  advanceTo(run, 2);
-  assert.strictEqual(run.stepIndex(), 2, 'karosel harus tetap tercat di alur lengkap');
+  let finished = false;
+  const run = onboarding.show(env, { now: NOW, force: true, onFinish() { finished = true; } });
+  typeName(run, 'Budi');
+  const codeInput = run.element.querySelector('[data-ob-classcode]');
+  assert.ok(codeInput, 'kolom kode kelas harus ada');
+  codeInput.value = 'FZ-ABC234';
+  codeInput.listeners.input[0]();
+  run.element.querySelector('[data-ob-advance]').listeners.click[0]();
+  assert.strictEqual(finished, true, 'onboarding harus selesai langsung tanpa tes penempatan');
+  assert.strictEqual(onboarding.storedClassCode(env), 'FZ-ABC234', 'kode kelas harus tersimpan');
 });
 
 test('gate onboarding sudah terdaftar di CI', () => {
