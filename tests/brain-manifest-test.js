@@ -68,7 +68,7 @@ test('bundleVersion dan minAppVersion bisa diparse semver-ish', () => {
   assert.ok(SEMVERISH.test(manifest.minAppVersion), 'minAppVersion tidak semver-ish: ' + manifest.minAppVersion);
 });
 
-test('bundleVersion 3.10.0 (confusionMap + olmInsight shadow -> active, m025-337)', () => {
+test('bundleVersion 3.11.0 (retentionProbe + learningMetrics shadow -> active, m025-341)', () => {
   // Literal ini sengaja dipatok, bukan dilonggarkan jadi pola semver: gunanya memaksa
   // perubahan versi bundle menjadi keputusan SADAR yang ikut dalam diff, bukan efek
   // samping. 3.0.0 -> 3.1.0 karena peta otoritas bergerak (Langkah 1 roadmap otonomi:
@@ -77,7 +77,7 @@ test('bundleVersion 3.10.0 (confusionMap + olmInsight shadow -> active, m025-337
   // jangan di bekukan" — otoritas dibuka, parameter BKT sendiri tetap beku).
   // 3.9.0 -> 3.10.0: gelombang kedua permintaan OWNER ("tingkatkan braincore lebih
   // powerful") — confusionMap dan olmInsight ikut naik ke active.
-  assert.strictEqual(manifest.bundleVersion, '3.10.0');
+  assert.strictEqual(manifest.bundleVersion, '3.11.0');
 });
 
 test('minAppVersion sama dengan FIEZEL_VERSION di version.js (dibaca, bukan dikarang)', () => {
@@ -116,6 +116,16 @@ test('klaim otoritas kunci: memory aktif, bktUnlock aktif sejak m025-337', () =>
   // yang terlihat di diff, bukan efek samping refactor.
   assert.strictEqual(manifest.authorityMap.confusionMap, 'active');
   assert.strictEqual(manifest.authorityMap.olmInsight, 'active');
+  // m025-341 (lapisan ukur): keduanya dulu 'shadow'. retentionProbe kini menyajikan probe
+  // jatuh tempo ke kolam review dan mencabut klaim penguasaan lesson rapuh; learningMetrics
+  // kini menaikkan ambang bukti lewat brierEvidenceBump(). Dipatok literal supaya
+  // menurunkannya kembali harus jadi keputusan sadar yang terlihat di diff.
+  assert.strictEqual(manifest.authorityMap.retentionProbe, 'active');
+  assert.strictEqual(manifest.authorityMap.learningMetrics, 'active');
+  // Sengaja TETAP 'shadow' dan ikut dipatok: attemptRecord diperiksa ulang pada gelombang
+  // yang sama dan memang bukan pengambil keputusan belajar. Menaikkannya supaya "genap
+  // tiga" akan lolos hitungan pemanggil tanpa ada perilaku yang berubah.
+  assert.strictEqual(manifest.authorityMap.attemptRecord, 'shadow');
 });
 
 test('otoritas off DITURUNKAN dari permukaan aplikasi, bukan dihafal sebagai literal', () => {
