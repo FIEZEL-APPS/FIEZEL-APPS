@@ -639,6 +639,57 @@ export async function routeOwnerClassCreate(ctx) {
 }
 
 /* ========================================================================== */
+/* POST /api/owner/class/delete                                                */
+/* ========================================================================== */
+
+export async function routeOwnerClassDelete(ctx) {
+  const secretGate = await ownerGate(ctx);
+  let db = coreDb(ctx.env);
+  if (secretGate) {
+    const gate = await roleGate(ctx);
+    if (!gate.ok) return gate.response;
+    db = gate.db;
+  }
+  if (!db) return jsonError(503, 'internal_error', {}, { headers: ctx.corsHeaders });
+  await ensureAuthSchema(db);
+  await ensureTeacherInviteColumns(db);
+  const opt = { headers: ctx.corsHeaders };
+
+  const body = await readJsonFromCtx(ctx, opt);
+  if (!body.ok) return body.response;
+  const { code, mode } = body.value || {};
+
+  if (mode === 'all') {
+    let deletedCount = 0;
+    try {
+      const cRes = await db.prepare('SELECT COUNT(*) AS cnt FROM tc_class').first();
+      deletedCount = (cRes && cRes.cnt) || 0;
+    } catch (_) {}
+    await db.prepare('DELETE FROM tc_class').run().catch(() => null);
+    await db.prepare('DELETE FROM tc_class_teacher').run().catch(() => null);
+    await db.prepare('DELETE FROM tc_class_report').run().catch(() => null);
+    await db.prepare('DELETE FROM tc_class_assignment').run().catch(() => null);
+    await db.prepare('UPDATE teacher_profile SET class_code = NULL').run().catch(() => null);
+    await db.prepare('UPDATE teacher_invite SET class_code = NULL').run().catch(() => null);
+    return jsonResponse({ ok: true, deletedCount, mode: 'all' }, opt);
+  }
+
+  const cleanCode = String(code || '').trim().toUpperCase();
+  if (!cleanCode) {
+    return jsonError(400, 'bad_request', { reason: 'class_code_required' }, opt);
+  }
+
+  await db.prepare('DELETE FROM tc_class WHERE code = ?1').bind(cleanCode).run().catch(() => null);
+  await db.prepare('DELETE FROM tc_class_teacher WHERE class_code = ?1').bind(cleanCode).run().catch(() => null);
+  await db.prepare('DELETE FROM tc_class_report WHERE class_code = ?1').bind(cleanCode).run().catch(() => null);
+  await db.prepare('DELETE FROM tc_class_assignment WHERE class_code = ?1').bind(cleanCode).run().catch(() => null);
+  await db.prepare('UPDATE teacher_profile SET class_code = NULL WHERE class_code = ?1').bind(cleanCode).run().catch(() => null);
+  await db.prepare('UPDATE teacher_invite SET class_code = NULL WHERE class_code = ?1').bind(cleanCode).run().catch(() => null);
+
+  return jsonResponse({ ok: true, code: cleanCode, deleted: true }, opt);
+}
+
+/* ========================================================================== */
 /* POST /api/owner/teacher/delete                                              */
 /* ========================================================================== */
 
@@ -743,5 +794,6 @@ export const ROUTES = [
   ['POST', '/api/owner/school/update', routeOwnerSchoolUpdate],
   ['POST', '/api/owner/school/delete', routeOwnerSchoolDelete],
   ['GET', '/api/owner/classes', routeOwnerClasses],
-  ['POST', '/api/owner/class', routeOwnerClassCreate]
+  ['POST', '/api/owner/class', routeOwnerClassCreate],
+  ['POST', '/api/owner/class/delete', routeOwnerClassDelete]
 ];

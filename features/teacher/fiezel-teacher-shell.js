@@ -2459,7 +2459,7 @@
             var matched = st.classes.filter(function (c) { return S().normalizeClassCode(c.code) === normCode; })[0];
             if (matched) {
               st.activeClassId = matched.id;
-            } else {
+            } else if (!st.deletedClassCodes || !st.deletedClassCodes[normCode]) {
               var clsTitle = (acc.institution ? acc.institution + ' — ' : '') + (acc.subjectId || 'Kelas ' + normCode);
               var autoCls = S().newClass(clsTitle, 'A2', acc.subjectId || 'English');
               autoCls.code = normCode;
@@ -2849,7 +2849,7 @@
   function settings() {
     return accountCard() +
       '<section class="tg-card tg-narrow" data-testid="tg-settings"><p class="tg-kicker">Profil guru</p><h3>' + t('guru.nama-sekolah-ttd', 'Nama & sekolah dipakai di tanda tangan laporan') + '</h3><form data-tg-form="teacher" class="tg-form"><label class="tg-label">' + t('guru.nama-panggilan', 'Nama panggilan') + '<input name="name" value="' + esc(st.teacher.name) + '" placeholder="Bu Rina / Pak Dimas" maxlength="40" data-testid="tg-teacher-name"></label><label class="tg-label">Sekolah / lembaga<input name="school" value="' + esc(st.teacher.school) + '" placeholder="SMA Negeri 3 Bandung" maxlength="60" data-testid="tg-teacher-school"></label><div class="tg-actions"><button type="submit" class="tg-btn is-primary is-small" data-testid="tg-teacher-save">' + t('umum.simpan', 'Simpan') + '</button></div></form>' +
-      '<hr class="tg-hr"><p class="tg-kicker">Data</p><p class="tg-muted">' + t('guru.data-lokal-warn', 'Semua data KelasKu untuk Guru tersimpan di perangkat ini. Ekspor cadangan sebelum ganti perangkat.') + '</p><div class="tg-actions"><button type="button" class="tg-btn is-ghost is-small" data-tg="export-json">' + icon('download') + ' Ekspor cadangan</button><label class="tg-btn is-ghost is-small">' + icon('upload') + ' Pulihkan cadangan<input type="file" accept="application/json" hidden data-tg-file="import-json"></label><button type="button" class="tg-btn is-danger is-small" data-tg="reset-all" data-testid="tg-reset">' + icon('trash-2') + ' ' + t('guru.hapus-semua-data', 'Hapus semua data guru') + '</button></div></section>';
+      '<hr class="tg-hr"><p class="tg-kicker">Data</p><p class="tg-muted">' + t('guru.data-lokal-warn', 'Semua data KelasKu untuk Guru tersimpan di perangkat ini. Ekspor cadangan sebelum ganti perangkat.') + '</p><div class="tg-actions"><button type="button" class="tg-btn is-ghost is-small" data-tg="export-json">' + icon('download') + ' Ekspor cadangan</button><label class="tg-btn is-ghost is-small">' + icon('upload') + ' Pulihkan cadangan<input type="file" accept="application/json" hidden data-tg-file="import-json"></label><button type="button" class="tg-btn is-ghost is-small" data-tg="clear-all-classes" data-testid="tg-clear-classes">' + icon('trash-2') + ' Bersihkan semua kelas</button><button type="button" class="tg-btn is-danger is-small" data-tg="reset-all" data-testid="tg-reset">' + icon('trash-2') + ' ' + t('guru.hapus-semua-data', 'Hapus semua data guru') + '</button></div></section>';
   }
   var views = { hub: function () { return '<div id="tgClassHub" class="tg-hub-host"></div>'; }, briefing: briefing, classes: classes, assignments: assignments, insights: insights, comms: comms, journal: journal, settings: settings, curriculum: curriculumView };
 
@@ -3228,8 +3228,44 @@
       case 'copy': copy(btn.getAttribute('data-text'), 'Tersalin.'); return;
       case 'copy-draft': { var ta = el.querySelector('[data-tg-input="draft"]'); copy(ta ? ta.value : '', 'Pesan tersalin.'); saveMinutes(ui.modal && ui.modal.kind === 'parent' ? 8 : 3); persist(); return; }
       case 'mark-sent': { var s = student(id); if (s) { s.notes.push({ at: Date.now(), text: (btn.getAttribute('data-kind') === 'parent' ? 'Laporan orang tua dikirim.' : 'Kartu sapa dikirim.') }); saveMinutes(btn.getAttribute('data-kind') === 'parent' ? 8 : 3); } ui.modal = null; toast('Dicatat di riwayat ' + (s ? s.name : '') + '.'); break; }
-      case 'seed-demo': { var d = T.seedDemo(); st.classes.push(d); st.activeClassId = d.id; st.onboarded = true; ui.modal = null; st.view = 'briefing'; toast(t('guru.kelas-contoh', 'Kelas contoh dimuat — 18 siswa, 2 tugas, data 14 hari.')); break; }
-      case 'delete-class': if (!c || !confirm('Hapus kelas "' + c.name + '" beserta ' + c.students.length + ' siswa? Tidak bisa dibatalkan.')) return; st.classes = st.classes.filter(function (k) { return k.id !== c.id; }); st.activeClassId = st.classes.length ? st.classes[0].id : null; break;
+      case 'delete-class': {
+        if (!c || !confirm('Hapus kelas "' + c.name + '" beserta ' + c.students.length + ' siswa? Tidak bisa dibatalkan.')) return;
+        var delCode = c.code ? S().normalizeClassCode(c.code) : '';
+        if (delCode) {
+          st.deletedClassCodes = st.deletedClassCodes || {};
+          st.deletedClassCodes[delCode] = true;
+          try {
+            var A = S().account ? S().account() : root.FiezelAccount;
+            if (A && typeof A.api === 'function') {
+              A.api('/api/teacher/class/delete', { code: delCode }).catch(function () {});
+            }
+          } catch (_) {}
+        }
+        st.classes = st.classes.filter(function (k) { return k.id !== c.id; });
+        st.activeClassId = st.classes.length ? st.classes[0].id : null;
+        toast('Kelas "' + c.name + '" berhasil dihapus.');
+        break;
+      }
+      case 'clear-all-classes': {
+        if (!confirm('Bersihkan dan hapus SEMUA kelas di KelasKu?')) return;
+        st.classes.forEach(function (k) {
+          if (k.code) {
+            var dc = S().normalizeClassCode(k.code);
+            st.deletedClassCodes = st.deletedClassCodes || {};
+            st.deletedClassCodes[dc] = true;
+            try {
+              var A = S().account ? S().account() : root.FiezelAccount;
+              if (A && typeof A.api === 'function') {
+                A.api('/api/teacher/class/delete', { code: dc }).catch(function () {});
+              }
+            } catch (_) {}
+          }
+        });
+        st.classes = [];
+        st.activeClassId = null;
+        toast('Semua kelas berhasil dibersihkan.');
+        break;
+      }
       case 'delete-student': if (!c) return; c.students = c.students.filter(function (s) { return s.id !== id; }); ui.drawer = null; toast('Siswa dihapus dari kelas.'); break;
       case 'delete-assign': if (!c || !confirm(t('guru.konfirm-hapus-tugas', 'Hapus tugas ini?'))) return; c.assignments = c.assignments.filter(function (a) { return a.id !== id; }); break;
       case 'mark-done': { var a = c.assignments.filter(function (x) { return x.id === id; })[0], sid = btn.getAttribute('data-sid'); if (a) { a.done = a.done || {}; a.done[sid] = { at: Date.now(), acc: T.skillAcc(student(sid) || {}, a.skills[0]) }; } saveMinutes(1); break; }
