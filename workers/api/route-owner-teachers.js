@@ -207,12 +207,12 @@ export async function routeOwnerTeachers(ctx) {
   let teachers;
   try {
     teachers = await db.prepare(
-      'SELECT p.teacher_name, p.institution, p.institution_type, p.activated_at, p.subject_id, p.grade_id, p.class_code, a.login_handle, a.status ' +
+      'SELECT p.sub, p.teacher_name, p.institution, p.institution_type, p.activated_at, p.subject_id, p.grade_id, p.class_code, a.login_handle, a.status ' +
       'FROM teacher_profile p JOIN auth_account a ON a.sub = p.sub ORDER BY p.activated_at DESC LIMIT 200'
     ).all();
   } catch (_) {
     teachers = await db.prepare(
-      'SELECT p.teacher_name, p.institution, p.institution_type, p.activated_at, p.subject_id, p.grade_id, a.login_handle, a.status ' +
+      'SELECT p.sub, p.teacher_name, p.institution, p.institution_type, p.activated_at, p.subject_id, p.grade_id, a.login_handle, a.status ' +
       'FROM teacher_profile p JOIN auth_account a ON a.sub = p.sub ORDER BY p.activated_at DESC LIMIT 200'
     ).all();
   }
@@ -227,6 +227,7 @@ export async function routeOwnerTeachers(ctx) {
       rawCode: row.raw_code || null
     })),
     teachers: ((teachers && teachers.results) || []).map((row) => ({
+      sub: row.sub,
       handle: row.login_handle,
       teacherName: row.teacher_name,
       institution: row.institution,
@@ -637,6 +638,98 @@ export async function routeOwnerClassCreate(ctx) {
   return jsonResponse({ ok: true, code: classCode, title: cleanTitle, level: cleanLevel, schoolId: cleanSchoolId }, opt);
 }
 
+/* ========================================================================== */
+/* POST /api/owner/teacher/delete                                              */
+/* ========================================================================== */
+
+export async function routeOwnerTeacherDelete(ctx) {
+  const secretGate = await ownerGate(ctx);
+  let db = coreDb(ctx.env);
+
+  if (secretGate) {
+    const gate = await roleGate(ctx);
+    if (!gate.ok) return gate.response;
+    db = gate.db;
+  }
+
+  if (!db) return jsonError(503, 'internal_error', {}, { headers: ctx.corsHeaders });
+  await ensureAuthSchema(db);
+  await ensureTeacherInviteColumns(db);
+
+  const opt = { headers: ctx.corsHeaders };
+  const body = await readJsonFromCtx(ctx, opt);
+  if (!body.ok) return body.response;
+
+  const { sub, handle, mode } = body.value || {};
+
+  if (mode === 'all') {
+    // Bersihkan semua akun guru terdaftar (role = 'teacher')
+    const tRows = await db.prepare("SELECT sub, login_handle FROM auth_account WHERE role = 'teacher'").all();
+    const list = (tRows && tRows.results) || [];
+    let deletedCount = 0;
+    for (const tc of list) {
+      const tcSub = tc.sub;
+      const tcHandle = tc.login_handle;
+      await db.prepare('DELETE FROM auth_credential WHERE sub = ?1').bind(tcSub).run().catch(() => null);
+      if (tcHandle) {
+        await db.prepare('DELETE FROM auth_login_handle WHERE sub = ?1 OR handle = ?2').bind(tcSub, tcHandle).run().catch(() => null);
+      } else {
+        await db.prepare('DELETE FROM auth_login_handle WHERE sub = ?1').bind(tcSub).run().catch(() => null);
+      }
+      await db.prepare('DELETE FROM teacher_profile WHERE sub = ?1').bind(tcSub).run().catch(() => null);
+      await db.prepare('DELETE FROM tc_class_teacher WHERE teacher_sub = ?1').bind(tcSub).run().catch(() => null);
+      await db.prepare('DELETE FROM teacher_invite WHERE used_by = ?1').bind(tcSub).run().catch(() => null);
+      await db.prepare("UPDATE tc_class SET teacher_sub = 'owner' WHERE teacher_sub = ?1").bind(tcSub).run().catch(() => null);
+      await db.prepare('DELETE FROM auth_account WHERE sub = ?1').bind(tcSub).run().catch(() => null);
+      deletedCount++;
+    }
+    return jsonResponse({ ok: true, deletedCount }, opt);
+  }
+
+  if (!sub && !handle) {
+    return jsonError(400, 'sub_or_handle_required', {}, opt);
+  }
+
+  let targetSub = sub || '';
+  let targetHandle = handle || '';
+
+  if (!targetSub && targetHandle) {
+    const acc = await db.prepare('SELECT sub FROM auth_login_handle WHERE handle = ?1').bind(targetHandle).first();
+    if (acc) targetSub = acc.sub;
+  }
+  if (!targetSub && targetHandle) {
+    const acc2 = await db.prepare('SELECT sub FROM auth_account WHERE login_handle = ?1').bind(targetHandle).first();
+    if (acc2) targetSub = acc2.sub;
+  }
+  if (targetSub && !targetHandle) {
+    const acc3 = await db.prepare('SELECT login_handle FROM auth_account WHERE sub = ?1').bind(targetSub).first();
+    if (acc3) targetHandle = acc3.login_handle;
+  }
+
+  if (!targetSub) {
+    const pRow = await db.prepare('SELECT sub FROM teacher_profile WHERE sub = ?1').bind(sub).first();
+    if (pRow) targetSub = pRow.sub;
+  }
+
+  if (!targetSub) {
+    return jsonError(404, 'teacher_not_found', {}, opt);
+  }
+
+  await db.prepare('DELETE FROM auth_credential WHERE sub = ?1').bind(targetSub).run().catch(() => null);
+  if (targetHandle) {
+    await db.prepare('DELETE FROM auth_login_handle WHERE sub = ?1 OR handle = ?2').bind(targetSub, targetHandle).run().catch(() => null);
+  } else {
+    await db.prepare('DELETE FROM auth_login_handle WHERE sub = ?1').bind(targetSub).run().catch(() => null);
+  }
+  await db.prepare('DELETE FROM teacher_profile WHERE sub = ?1').bind(targetSub).run().catch(() => null);
+  await db.prepare('DELETE FROM tc_class_teacher WHERE teacher_sub = ?1').bind(targetSub).run().catch(() => null);
+  await db.prepare('DELETE FROM teacher_invite WHERE used_by = ?1').bind(targetSub).run().catch(() => null);
+  await db.prepare("UPDATE tc_class SET teacher_sub = 'owner' WHERE teacher_sub = ?1").bind(targetSub).run().catch(() => null);
+  await db.prepare('DELETE FROM auth_account WHERE sub = ?1').bind(targetSub).run().catch(() => null);
+
+  return jsonResponse({ ok: true, deleted: true, sub: targetSub, handle: targetHandle }, opt);
+}
+
 export const ROUTES = [
   ['POST', '/api/owner/teacher-invite', routeTeacherInviteCreate],
   ['POST', '/api/owner/teacher-invite/revoke', routeTeacherInviteRevoke],
@@ -644,6 +737,7 @@ export const ROUTES = [
   ['POST', '/api/owner/teacher-invite/regenerate', routeTeacherInviteRegenerate],
   ['POST', '/api/owner/teacher-invite/delete', routeTeacherInviteDelete],
   ['GET', '/api/owner/teachers', routeOwnerTeachers],
+  ['POST', '/api/owner/teacher/delete', routeOwnerTeacherDelete],
   ['GET', '/api/owner/schools', routeOwnerSchools],
   ['POST', '/api/owner/school', routeOwnerSchoolCreate],
   ['POST', '/api/owner/school/update', routeOwnerSchoolUpdate],

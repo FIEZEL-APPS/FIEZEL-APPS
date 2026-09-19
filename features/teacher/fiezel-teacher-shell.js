@@ -2889,7 +2889,7 @@
     var m = ui.modal, T = S(), body = '', title = '', wide = false;
     if (m.kind === 'new-class' || m.kind === 'edit-class') {
       var e = m.kind === 'edit-class' ? c : null; title = e ? t('guru.ubah-kelas', 'Ubah kelas') : t('guru.kelas-baru', 'Kelas baru');
-      body = '<form data-tg-form="' + m.kind + '" class="tg-form"><label class="tg-label">' + t('guru.nama-kelas', 'Nama kelas') + '<input name="name" required maxlength="60" value="' + esc(e ? e.name : '') + '" placeholder="English A2 — Kelas 10A" data-autofocus data-testid="tg-class-name"></label><div class="tg-form-row"><label class="tg-label">Level<select name="level" data-testid="tg-class-level">' + ['A1', 'A2', 'B1', 'B2', 'C1'].map(function (l) { return '<option' + ((e ? e.level : 'A2') === l ? ' selected' : '') + '>' + l + '</option>'; }).join('') + '</select></label><label class="tg-label">Mata pelajaran<input name="subject" value="' + esc(e ? e.subject : 'English') + '" maxlength="40"></label></div><div class="tg-actions"><button type="submit" class="tg-btn is-primary" data-testid="tg-class-submit">' + (e ? t('umum.simpan', 'Simpan') : t('guru.buat-kelas', 'Buat kelas')) + '</button>' + (e ? '' : '<button type="button" class="tg-btn is-ghost" data-tg="seed-demo">Atau muat kelas contoh</button>') + '</div></form>';
+      body = '<form data-tg-form="' + m.kind + '" class="tg-form"><label class="tg-label">' + t('guru.nama-kelas', 'Nama kelas') + '<input name="name" required maxlength="60" value="' + esc(e ? e.name : '') + '" placeholder="English A2 — Kelas 10A" data-autofocus data-testid="tg-class-name"></label><div class="tg-form-row"><label class="tg-label">Level<select name="level" data-testid="tg-class-level">' + ['A1', 'A2', 'B1', 'B2', 'C1'].map(function (l) { return '<option' + ((e ? e.level : 'A2') === l ? ' selected' : '') + '>' + l + '</option>'; }).join('') + '</select></label><label class="tg-label">Mata pelajaran<input name="subject" value="' + esc(e ? e.subject : 'English') + '" maxlength="40"></label></div><label class="tg-label">Kode kelas (mis. FZ-QVQDHM)<input name="code" value="' + esc(e ? e.code : '') + '" placeholder="FZ-XXXXXX (otomatis atau gunakan kode sekolah)" maxlength="16"></label><div class="tg-actions"><button type="submit" class="tg-btn is-primary" data-testid="tg-class-submit">' + (e ? t('umum.simpan', 'Simpan') : t('guru.buat-kelas', 'Buat kelas')) + '</button>' + (e ? '' : '<button type="button" class="tg-btn is-ghost" data-tg="seed-demo">Atau muat kelas contoh</button>') + '</div></form>';
     } else if (m.kind === 'add-students') {
       title = t('guru.tambah-siswa', 'Tambah siswa');
       body = '<form data-tg-form="add-students" class="tg-form"><label class="tg-label">' + t('guru.nama-siswa-baris', 'Nama siswa — satu per baris, atau tempel daftar absen') + '<textarea name="names" rows="6" required placeholder="1. Rina Kartika\n2. Dimas Prasetyo\nSari, Bagas, Nadia" data-autofocus data-testid="tg-add-names"></textarea></label><p class="tg-muted">Nomor urut dan nama belakang dibuang otomatis — FIEZEL hanya menyimpan nama depan.</p><div class="tg-actions"><button type="submit" class="tg-btn is-primary" data-testid="tg-add-submit">Tambahkan</button><button type="button" class="tg-btn is-ghost" data-tg="modal" data-kind="import-code">Punya kode hasil murid?</button></div></form>';
@@ -3276,8 +3276,23 @@
     var form = e.target.closest ? e.target.closest('[data-tg-form]') : null; if (!form) return;
     e.preventDefault();
     var kind = form.getAttribute('data-tg-form'), fd = new FormData(form), c = cls(), T = S(), viaWa = e.submitter && e.submitter.name === 'wa';
-    if (kind === 'new-class') { var k = T.newClass(fd.get('name'), fd.get('level'), fd.get('subject')); st.classes.push(k); st.activeClassId = k.id; st.onboarded = true; ui.modal = null; st.view = 'classes'; toast('Kelas ' + k.name + ' dibuat. Kode: ' + k.code); if (S().syncAvailable() === 'ok') setTimeout(function () { syncAll(true); }, 400); }
-    else if (kind === 'edit-class' && c) { c.name = String(fd.get('name')).slice(0, 60); c.level = fd.get('level'); c.subject = fd.get('subject'); if (c.sync) c.sync.claimed = false; ui.modal = null; }
+    if (kind === 'new-class') {
+      var k = T.newClass(fd.get('name'), fd.get('level'), fd.get('subject'));
+      var customCode = T.normalizeClassCode(fd.get('code'));
+      if (customCode) k.code = customCode;
+      st.classes.push(k); st.activeClassId = k.id; st.onboarded = true; ui.modal = null; st.view = 'classes';
+      toast('Kelas ' + k.name + ' dibuat. Kode: ' + k.code);
+      if (S().syncAvailable() === 'ok') setTimeout(function () { syncAll(true); }, 400);
+    }
+    else if (kind === 'edit-class' && c) {
+      c.name = String(fd.get('name')).slice(0, 60);
+      c.level = fd.get('level');
+      c.subject = fd.get('subject');
+      var editCode = T.normalizeClassCode(fd.get('code'));
+      if (editCode && editCode !== c.code) { c.code = editCode; if (c.sync) c.sync.claimed = false; }
+      else if (c.sync) c.sync.claimed = false;
+      ui.modal = null;
+    }
     else if (kind === 'add-students' && c) { var names = T.parseNames(fd.get('names')), added = 0; names.forEach(function (n) { var fn = T.firstName(n); if (!c.students.some(function (s) { return s.name.toLowerCase() === fn.toLowerCase(); })) { c.students.push(T.newStudent(fn)); added++; } }); ui.modal = null; st.view = 'classes'; saveMinutes(added * 0.5); toast(added + ' siswa ditambahkan.'); }
     else if (kind === 'import-code' && c) { var p = T.parseLearnerCode(fd.get('code')); if (!p) { ui.modal = { kind: 'import-code', error: 'Kode tidak dikenali. Pastikan menyalin utuh "Kode hasil untuk tutor" dari murid.' }; render(); return; } var res = T.ingest(c, p); ui.modal = null; ui.drawer = res.student.id; saveMinutes(4 + res.graded.length * 5); toast('Hasil ' + res.student.name + ' masuk' + (res.graded.length ? ' · ' + res.graded.length + ' tugas dinilai otomatis' : '') + '.'); }
     else if (kind === 'assign' && c) {
