@@ -229,8 +229,62 @@ const apiPath = path.join(__dirname, '..', 'features/curriculum/fz-api.js');
 const apiCode = fs.readFileSync(apiPath, 'utf8');
 assert(apiCode.includes("api('/questions'"), 'FZEngine menyediakan pemanggil endpoint API questions list');
 
+// 10. Uji Katalog Materi Ajar (Teaching Briefs & Kompetensi) untuk Seluruh 17 Mapel
+assert(!!TShell._MAPEL_CATALOG, '_MAPEL_CATALOG tersedia di FiezelTeacherShell');
+const catalogKeys = Object.keys(TShell._MAPEL_CATALOG);
+assert(catalogKeys.length === 17, 'Katalog materi memuat tepat 17 mata pelajaran');
+
+let verifiedBriefs = 0;
+let verifiedComps = 0;
+allMapelIds.forEach(function (mId) {
+  const cat = TShell._MAPEL_CATALOG[mId];
+  assert(!!cat, `Katalog mapel ${mId} terdefinisi`);
+  if (cat && Array.isArray(cat.competencies) && cat.competencies.length >= 3) {
+    verifiedComps++;
+  }
+  if (cat && cat.teachingBrief && cat.teachingBrief.summary && cat.teachingBrief.hook5Minutes && cat.teachingBrief.boardFormula && Array.isArray(cat.teachingBrief.commonMisconceptions) && cat.teachingBrief.commonMisconceptions.length > 0) {
+    verifiedBriefs++;
+  }
+});
+assert(verifiedComps === 17, 'Seluruh 17 mapel memiliki daftar capaian kompetensi bawaan (minimal 3 per mapel)');
+assert(verifiedBriefs === 17, 'Seluruh 17 mapel memiliki teaching briefs lengkap (Ringkasan, Apersepsi 5 Menit, Rumus/Konsep Papan Tulis, Top Miskonsepsi)');
+
+// 11. Uji Multi-Subject Analytics di FiezelTeacherStore (activeSkills & weakestSkill)
+assert(typeof TS.activeSkills === 'function', 'TS.activeSkills tersedia');
+const multiSubjClass = {
+  id: 'c-multi',
+  name: 'Kelas Multimapel',
+  assignments: [{ id: 'a-1', skills: ['MAT', 'FIS'] }],
+  students: [
+    {
+      id: 's-1',
+      name: 'Budi',
+      results: [
+        { skill: 'MAT', correct: 8, total: 10 },
+        { skill: 'FIS', correct: 3, total: 10 },
+        { skill: 'KIM', correct: 9, total: 10 }
+      ]
+    }
+  ]
+};
+const discoveredSkills = TS.activeSkills(multiSubjClass, multiSubjClass.students[0]);
+assert(discoveredSkills.includes('MAT'), 'activeSkills mendeteksi skill MAT');
+assert(discoveredSkills.includes('FIS'), 'activeSkills mendeteksi skill FIS');
+assert(discoveredSkills.includes('KIM'), 'activeSkills mendeteksi skill KIM');
+
+const weakest = TS.weakestSkill(multiSubjClass.students[0]);
+assert(weakest && weakest.skill === 'FIS', 'weakestSkill mengidentifikasi FIS (30%) sebagai kelemahan murid di antara mapel');
+
+// 12. Uji Integrasi UI: Brief Card & Competency Select di Modal
+assert(shellCode.includes('data-testid="tg-mapel-brief"'), 'Kartu panduan mengajar tg-mapel-brief terpasang di modal');
+assert(shellCode.includes('data-testid="tg-assign-comp-select"'), 'Dropdown pilihan kompetensi terpasang di modal mapel');
+
+// 13. Uji Integrasi Mobile Navigation untuk Kurikulum
+assert(shellCode.includes("data-view=\"curriculum\">' + icon('library') + '<span>' + esc(t('guru.nav-kurikulum-singkat', 'Kurikulum'))"), 'Navigasi mobile menyertakan tombol kurikulum yang dijaga gerbang');
+
 console.log(`\nHasil: ${pass} assert PASS, ${fail} assert FAIL`);
 if (fail > 0) {
   process.exit(1);
 }
+
 
