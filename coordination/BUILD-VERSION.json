@@ -1,7 +1,7 @@
 {
-  "version": "m025-337",
+  "version": "m025-338",
   "claimedBy": "branch claude/kind-albattani-5ztglj",
-  "claimedAt": "2026-09-19T12:12:47.574Z",
-  "reason": "otoritas unlock BKT: masteryGate() ikut membuka prasyarat Grammar",
+  "claimedAt": "2026-09-19T17:30:38.675Z",
+  "reason": "paket playbook pilot sekolah SMP + dua kunci kurikulum",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }
