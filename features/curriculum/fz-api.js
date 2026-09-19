@@ -198,6 +198,11 @@
       mapelStatus: function () { return api('/seed/mapel/status'); },
       soal: function () { return api('/seed/soal', { body: {} }); },
       soalStatus: function () { return api('/seed/soal/status'); }
+    },
+    curriculum: {
+      tree: function (subjectId) { return api('/curriculum/tree' + (subjectId ? '?subject_id=' + encodeURIComponent(subjectId) : '')); },
+      nodes: function (subjectId) { return api('/curriculum/nodes' + (subjectId ? '?subject_id=' + encodeURIComponent(subjectId) : '')); },
+      competencies: function (subjectId) { return api('/curriculum/competencies' + (subjectId ? '?subject_id=' + encodeURIComponent(subjectId) : '')); }
     }
   };
 })(window);
