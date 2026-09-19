@@ -44,6 +44,7 @@
     'progress.belum-terukur': 'belum terukur',
     'quiz.tombol-dengar': 'Dengarkan',
     'quiz.listen-note': 'Pilihan terbuka setelah rekaman diputar.',
+    'quiz.kuota-putar-habis': 'Batas putar ulang tercapai — silakan pilih jawabanmu.',
     'quiz.feedback-saved-title': 'Tersimpan.',
     'quiz.feedback-saved-body-test': 'Jawabanmu kecatat. Pembahasan lengkap muncul di layar hasil setelah tes ini selesai.',
     'quiz.feedback-saved-body-exam': 'Jawabanmu kecatat. Pembahasan lengkap muncul di layar hasil setelah ujian ini selesai.',

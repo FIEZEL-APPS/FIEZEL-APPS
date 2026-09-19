@@ -26,6 +26,29 @@
   var DAY = 86400000;
   var SKILL_LABEL = { past_tense: 'Past tense', past_questions: 'Past questions', vocab_a2: 'Vocabulary A2', listening_detail: 'Listening detail', reading_inference: 'Reading inference', speaking: 'Speaking' };
   var SKILL_ORDER = ['past_tense', 'past_questions', 'vocab_a2', 'listening_detail', 'reading_inference', 'speaking'];
+  var MAPEL_NAMES = {
+    MAT: 'Matematika',
+    IND: 'Bahasa Indonesia',
+    ENG: 'Bahasa Inggris',
+    IPA: 'Ilmu Pengetahuan Alam',
+    IPS: 'Ilmu Pengetahuan Sosial',
+    INF: 'Informatika',
+    PPK: 'Pendidikan Pancasila',
+    AGM: 'Pendidikan Agama',
+    FIS: 'Fisika',
+    KIM: 'Kimia',
+    BIO: 'Biologi',
+    EKO: 'Ekonomi',
+    GEO: 'Geografi',
+    SOS: 'Sosiologi',
+    SEJ: 'Sejarah',
+    PJK: 'PJOK',
+    SNB: 'Seni Budaya'
+  };
+  Object.keys(MAPEL_NAMES).forEach(function (k) {
+    SKILL_LABEL[k] = MAPEL_NAMES[k];
+    SKILL_LABEL[k.toLowerCase()] = MAPEL_NAMES[k];
+  });
   var ATT = { H: 'Hadir', I: 'Izin', S: 'Sakit', A: 'Alpa' };
 
   function bank() { return root.FiezelReviewBank; }
@@ -75,6 +98,7 @@
     c.students = (c.students || []).map(normalizeStudent);
     c.assignments = c.assignments || [];
     c.announcements = c.announcements || [];
+    c.latestAnnouncement = c.latestAnnouncement || (c.announcements.length ? c.announcements[c.announcements.length - 1] : null);
     c.journal = c.journal || [];
     c.sentItemIds = c.sentItemIds || [];
     c.pending = Array.isArray(c.pending) ? c.pending : [];
@@ -119,7 +143,16 @@
   }
   function targeted(a, s) { return !a.targets || a.targets.indexOf(s.id) !== -1; }
   function weakestSkill(s) {
-    var best = null; SKILL_ORDER.forEach(function (k) { var v = skillAcc(s, k); if (v != null && (!best || v < best.acc)) best = { skill: k, acc: v }; }); return best;
+    var best = null;
+    var list = SKILL_ORDER.slice();
+    (s.results || []).forEach(function (r) {
+      if (r.skill && list.indexOf(r.skill) === -1) list.push(r.skill);
+    });
+    list.forEach(function (k) {
+      var v = skillAcc(s, k);
+      if (v != null && (!best || v < best.acc)) best = { skill: k, acc: v };
+    });
+    return best;
   }
   /** Skor risiko 0–100 + alasan yang bisa dibaca guru + satu tindakan konkret. */
   function risk(c, s) {
@@ -139,7 +172,7 @@
     var weak = weakestSkill(s), action;
     if (d != null && d >= 7) action = 'Kirim Kartu Sapa hari ini — sapaan personal, bukan tagihan tugas.';
     else if (late.length) action = 'Ingatkan tugas “' + late[0].a.title + '” lewat pesan singkat + tawarkan waktu tambahan.';
-    else if (weak && weak.acc < 0.5) action = 'Beri 5 soal ' + SKILL_LABEL[weak.skill] + ' ' + t('guru.pendamping-teman', 'dengan pendamping teman (lihat Kelompok Belajar).');
+    else if (weak && weak.acc < 0.5) action = 'Beri 5 soal ' + (SKILL_LABEL[weak.skill] || weak.skill) + ' ' + t('guru.pendamping-teman', 'dengan pendamping teman (lihat Kelompok Belajar).');
     else if (level === 'pantau') action = 'Sapa 1 kalimat apresiasi supaya momentumnya tidak putus.';
     else action = 'Pertahankan — beri tantangan kecil satu level di atas.';
     return { score: score, level: level, reasons: reasons, action: action, weak: weak, pending: pend.length, late: late.length, inactiveDays: d };
@@ -153,13 +186,56 @@
     var open = (c.assignments || []).filter(function (a) { return st.some(function (s) { return targeted(a, s) && !(a.done && a.done[s.id]); }); }).length;
     return { total: st.length, active7: active7, avgAcc: avg, atRisk: atRisk, watch: watch, openAssignments: open };
   }
+  function activeSkills(c, s) {
+    var set = {}, order = [];
+    function add(k) {
+      if (k && !set[k]) { set[k] = true; order.push(k); }
+    }
+    if (c) {
+      (c.assignments || []).forEach(function (a) {
+        (a.skills || []).forEach(add);
+      });
+      (c.students || []).forEach(function (st) {
+        (st.results || []).forEach(function (r) { add(r.skill); });
+      });
+    }
+    if (s && s.results) {
+      s.results.forEach(function (r) { add(r.skill); });
+    }
+    if (!order.length) {
+      SKILL_ORDER.forEach(add);
+    } else {
+      SKILL_ORDER.forEach(function (k) {
+        if (!set[k] && (!c || !c.assignments || !c.assignments.length)) add(k);
+      });
+    }
+    return order;
+  }
   function classSkillMap(c) {
-    return SKILL_ORDER.map(function (k) {
-      var cc = 0, nn = 0, low = 0; c.students.forEach(function (s) { (s.results || []).forEach(function (r) { if (r.skill === k) { cc += r.correct; nn += r.total; } }); var v = skillAcc(s, k); if (v != null && v < 0.5) low++; });
-      return { skill: k, label: SKILL_LABEL[k], acc: nn ? cc / nn : null, low: low, n: nn };
+    var list = activeSkills(c);
+    return list.map(function (k) {
+      var cc = 0, nn = 0, low = 0;
+      c.students.forEach(function (s) {
+        (s.results || []).forEach(function (r) {
+          if (r.skill === k) { cc += r.correct; nn += r.total; }
+        });
+        var v = skillAcc(s, k);
+        if (v != null && v < 0.5) low++;
+      });
+      var lbl = SKILL_LABEL[k] || (k.indexOf('KOMP-') === 0 ? k.replace(/^KOMP-/, '') : k);
+      return { skill: k, label: lbl, acc: nn ? cc / nn : null, low: low, n: nn };
     });
   }
-  function heatmap(c) { return c.students.map(function (s) { return { s: s, cells: SKILL_ORDER.map(function (k) { return { skill: k, acc: skillAcc(s, k) }; }), risk: risk(c, s) }; }); }
+  function heatmap(c) {
+    var list = activeSkills(c);
+    return c.students.map(function (s) {
+      return {
+        s: s,
+        cells: list.map(function (k) { return { skill: k, acc: skillAcc(s, k) }; }),
+        risk: risk(c, s)
+      };
+    });
+  }
   /** Kelompok belajar otomatis: pasangkan yang kuat dengan yang lemah pada satu skill (peer tutoring). */
   function studyGroups(c, skill, size) {
     size = size || 4;
@@ -287,7 +363,26 @@
   }
   function pendingJoins(c) { return (c && Array.isArray(c.pending) ? c.pending : []).slice().sort(function (a, b) { return (b.at || 0) - (a.at || 0); }); }
   /** Bentuk payload tugas yang dikirim ke server = isi kode tugas (tanpa base64). */
-  function assignmentPayload(c, a) { var p = { v: 1, t: 'assign', id: a.id, title: a.title, skills: a.skills, itemIds: a.itemIds, minutes: a.minutes, from: c.name, cls: c.code, deadline: a.deadline || null, mode: a.mode || 'latihan', timer: a.timer || 0, shuffle: !!a.shuffle }; if (a.teacher) p.teacher = String(a.teacher).slice(0, 60); if (Array.isArray(a.items) && a.items.length) p.items = a.items.map(function (q) { var o = { id: q.id, prompt: q.prompt, options: q.options, answer: q.answer, skill: q.skill }; if (q.context) o.context = q.context; if (q.why && Object.keys(q.why).length) o.why = q.why; return o; }); return p; }
+  function assignmentPayload(c, a) {
+    var cleanSkills = (a.skills || []).map(function (k) {
+      return String(k || '').trim().toLowerCase().replace(/[^a-z0-9_]/g, '_').slice(0, 32);
+    }).filter(function (k) { return /^[a-z0-9_]{1,32}$/.test(k); });
+    if (!cleanSkills.length) cleanSkills = ['grammar'];
+    var p = { v: 1, t: 'assign', id: a.id, title: a.title, skills: cleanSkills, itemIds: a.itemIds, minutes: a.minutes, from: c.name, cls: c.code, deadline: a.deadline || null, mode: a.mode || 'latihan', timer: a.timer || 0, shuffle: !!a.shuffle };
+    p.teacher = a.teacher || (c && c.teacher) || 'Guru';
+    if (a.teacher) p.teacher = String(a.teacher);
+    if (Array.isArray(a.items) && a.items.length) {
+      p.items = a.items.map(function (q) {
+        var rawSk = typeof q.skill === 'string' ? q.skill.trim().toLowerCase().replace(/[^a-z0-9_]/g, '_').slice(0, 32) : '';
+        var sk = /^[a-z0-9_]{1,32}$/.test(rawSk) ? rawSk : cleanSkills[0];
+        var o = { id: q.id, prompt: q.prompt, options: q.options, answer: q.answer, skill: sk };
+        if (q.context) o.context = q.context;
+        if (q.why && Object.keys(q.why).length) o.why = q.why;
+        return o;
+      });
+    }
+    return p;
+  }
   function assignmentCode(c, a) { return b64e(assignmentPayload(c, a)); }
   function parseAssignmentCode(code) { try { var p = b64d(code); if (!p || p.t !== 'assign' || !Array.isArray(p.itemIds)) return null; return p; } catch (_) { return null; } }
   /** Sisi murid: simpan tugas dari kode guru ke antrean Today Plan (dipakai learner-flow). */
@@ -340,7 +435,8 @@
     var minutes = Math.max(3, Math.round(ids.length * 0.9));
     var a = { id: uid('as'), title: String(opts.title || ('Latihan ' + skills.map(function (k) { return SKILL_LABEL[k] || k; }).join(' + '))).slice(0, 80), skills: skills, itemIds: ids, minutes: minutes, mode: opts.mode || 'latihan', timer: opts.mode === 'ujian' ? (Number(opts.timer) || minutes) : 0, shuffle: opts.mode === 'ujian', deadline: opts.deadline || null, createdAt: Date.now(), targets: opts.targets && opts.targets.length ? opts.targets : null, done: {}, progress: {} };
     if (custom.length) a.items = custom;
-    if (opts.teacher) a.teacher = String(opts.teacher).slice(0, 60);
+    var st; try { st = load(); } catch (_) {}
+    a.teacher = opts.teacher || (st && st.teacher && st.teacher.name) || '';
     if (opts.source) a.source = opts.source;
     if (opts.review) a.review = opts.review;
     return a;
@@ -376,6 +472,10 @@
     map.forEach(function (m) { if (m.acc != null) lines.push('  - ' + m.label + ': ' + pct(m.acc) + (m.low ? ' (' + m.low + ' siswa <50%)' : '')); });
     if (mis.length) { lines.push('', 'Miskonsepsi utama: ' + mis[0].label + ' — ' + mis[0].pattern + '. Rencana: ' + mis[0].lesson + '.'); }
     if (greet.length) { lines.push('', 'Siswa yang perlu disapa: ' + greet.slice(0, 6).map(function (x) { return x.s.name + ' (' + x.r.reasons[0] + ')'; }).join('; ')); }
+    var la = c.latestAnnouncement || (c.announcements && c.announcements.length ? c.announcements[c.announcements.length - 1] : null);
+    if (la && la.text) {
+      lines.push('', 'Pengumuman kelas (' + (la.teacher || (teacher && teacher.name) || 'Wali kelas') + (la.at ? ' · ' + fmtDate(la.at) : '') + '): ' + la.text);
+    }
     lines.push('', (teacher && teacher.name) || 'Guru', (teacher && teacher.school) || '');
     return lines.join('\n').trim();
   }
@@ -521,9 +621,9 @@
     return { state: 'idle', text: 'Belum tersinkron' };
   }
 
-  return { KEY: KEY, ASSIGN_KEY: ASSIGN_KEY, SKILL_LABEL: SKILL_LABEL, SKILL_ORDER: SKILL_ORDER, ATT: ATT, DAY: DAY,
+  return { KEY: KEY, ASSIGN_KEY: ASSIGN_KEY, SKILL_LABEL: SKILL_LABEL, SKILL_ORDER: SKILL_ORDER, MAPEL_NAMES: MAPEL_NAMES, ATT: ATT, DAY: DAY,
     load: load, save: save, defaults: defaults, setPreview: setPreview, isPreview: isPreview, uid: uid, today: today, firstName: firstName, newClass: newClass, newStudent: newStudent, normalizeClass: normalizeClass, seedDemo: seedDemo, makeClassCode: makeClassCode, normalizeClassCode: normalizeClassCode,
-    skillAcc: skillAcc, overallAcc: overallAcc, daysSince: daysSince, risk: risk, classStats: classStats, classSkillMap: classSkillMap, heatmap: heatmap, studyGroups: studyGroups, misconceptions: misconceptions, needsGreeting: needsGreeting, agenda: agenda, pendingAssignments: pendingAssignments, targeted: targeted, recentAttendance: recentAttendance, attendanceRate: attendanceRate, weakestSkill: weakestSkill,
+    skillAcc: skillAcc, overallAcc: overallAcc, daysSince: daysSince, risk: risk, classStats: classStats, classSkillMap: classSkillMap, heatmap: heatmap, activeSkills: activeSkills, studyGroups: studyGroups, misconceptions: misconceptions, needsGreeting: needsGreeting, agenda: agenda, pendingAssignments: pendingAssignments, targeted: targeted, recentAttendance: recentAttendance, attendanceRate: attendanceRate, weakestSkill: weakestSkill,
     durasi: durasi, examLabel: examLabel, acceptJoin: acceptJoin, rejectJoin: rejectJoin, pendingJoins: pendingJoins, normalizeFocus: normalizeFocus, focusGrew: focusGrew, focusOf: focusOf, focusLabel: focusLabel, focusLevel: focusLevel,
     parseLearnerCode: parseLearnerCode, parseLearnerPayload: parseLearnerPayload, ingest: ingest, assignmentCode: assignmentCode, assignmentPayload: assignmentPayload, parseAssignmentCode: parseAssignmentCode, acceptAssignmentCode: acceptAssignmentCode, acceptAssignmentPayload: acceptAssignmentPayload, buildAssignment: buildAssignment,
     SYNC_PATHS: SYNC_PATHS, syncAvailable: syncAvailable, claimClass: claimClass, pullReports: pullReports, syncClass: syncClass, reportToClass: reportToClass, syncLabel: syncLabel, sendAssignment: sendAssignment, sentTo: sentTo,

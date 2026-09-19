@@ -44,6 +44,7 @@
     'progress.belum-terukur': 'ยังไม่ได้วัด',
     'quiz.tombol-dengar': 'ฟัง',
     'quiz.listen-note': 'ตัวเลือกจะเปิดหลังจากเสียงเล่นจบ',
+    'quiz.kuota-putar-habis': 'ถึงขีดจำกัดการเล่นซ้ำแล้ว — โปรดเลือกคำตอบของคุณ',
     'quiz.feedback-saved-title': 'บันทึกแล้ว',
     'quiz.feedback-saved-body-test': 'คำตอบของคุณถูกบันทึก คำอธิบายจะแสดงในหน้าผลลัพธ์หลังทำข้อสอบเสร็จ',
     'quiz.feedback-saved-body-exam': 'คำตอบของคุณถูกบันทึก คำอธิบายจะแสดงในหน้าผลลัพธ์หลังสอบเสร็จ',

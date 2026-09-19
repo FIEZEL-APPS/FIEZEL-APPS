@@ -336,3 +336,79 @@ export function syncStatusOf(node, indexResult) {
   const items = (indexResult && indexResult.items) || [];
   return items.length ? 'SYNCED' : 'PENDING';
 }
+
+/* ========================================================================== */
+/* EMPIRICAL BAYES ITEM CALIBRATION POOLING (§17 / Braincore v3 Parity)       */
+/* ========================================================================== */
+
+export const EB_CALIBRATION = Object.freeze({
+  PRIOR_SAMPLE_SIZE: 15,
+  MAX_SHRINKAGE_CLAMP: 0.6,
+  MIN_N_APPLY: 8
+});
+
+/**
+ * poolItemDeltas(observations, options) -> { byItem: { [itemId]: {...} } }
+ *
+ * Menggabungkan delta kalibrasi kesulitan item dari banyak murid/gawai
+ * menggunakan Empirical Bayes shrinkage:
+ *   hat{delta}_i = (N_i / (N_i + N_0)) * bar{delta}_i
+ * dengan clamp keras [-0.6, +0.6] (paritas dengan fiezel-item-calibration.js).
+ */
+export function poolItemDeltas(observations, options) {
+  const opts = options || {};
+  const n0 = Number(opts.priorSampleSize) > 0 ? Number(opts.priorSampleSize) : EB_CALIBRATION.PRIOR_SAMPLE_SIZE;
+  const clampLimit = Number(opts.maxShrinkage) > 0 ? Number(opts.maxShrinkage) : EB_CALIBRATION.MAX_SHRINKAGE_CLAMP;
+  const minN = Number(opts.minN) > 0 ? Number(opts.minN) : EB_CALIBRATION.MIN_N_APPLY;
+
+  const grouped = {};
+  for (const obs of (Array.isArray(observations) ? observations : [])) {
+    if (!obs || typeof obs !== 'object') continue;
+    const itemId = String(obs.itemId || '');
+    if (!itemId) continue;
+    const delta = Number(obs.delta);
+    if (!Number.isFinite(delta)) continue;
+    const n = Number(obs.n);
+    const weight = Number.isFinite(n) && n > 0 ? n : 1;
+    const kappa = Number.isFinite(obs.kappa) ? Math.max(0, Math.min(1, Number(obs.kappa))) : 1;
+    const effectiveWeight = weight * kappa;
+
+    if (!grouped[itemId]) {
+      grouped[itemId] = { sumWeightedDelta: 0, totalWeight: 0, obsCount: 0 };
+    }
+    grouped[itemId].sumWeightedDelta += delta * effectiveWeight;
+    grouped[itemId].totalWeight += effectiveWeight;
+    grouped[itemId].obsCount += 1;
+  }
+
+  const byItem = {};
+  for (const [itemId, stat] of Object.entries(grouped)) {
+    const rawMean = stat.totalWeight > 0 ? stat.sumWeightedDelta / stat.totalWeight : 0;
+    const shrinkage = stat.totalWeight / (stat.totalWeight + n0);
+    const shrunkDelta = shrinkage * rawMean;
+    const clampedDelta = Math.max(-clampLimit, Math.min(clampLimit, shrunkDelta));
+
+    byItem[itemId] = {
+      itemId,
+      pooledDelta: Math.round(clampedDelta * 1000) / 1000,
+      rawMeanDelta: Math.round(rawMean * 1000) / 1000,
+      totalWeight: Math.round(stat.totalWeight * 100) / 100,
+      observationsCount: stat.obsCount,
+      shrinkageFactor: Math.round(shrinkage * 1000) / 1000,
+      applied: stat.totalWeight >= minN
+    };
+  }
+
+  return { byItem };
+}
+
+/**
+ * calibratedDifficulty(priorDifficulty, pooledDelta) -> kesulitan terkalibrasi.
+ */
+export function calibratedDifficulty(priorDifficulty, pooledDelta) {
+  const prior = Number.isFinite(Number(priorDifficulty)) ? Number(priorDifficulty) : 3.0;
+  const delta = Number.isFinite(Number(pooledDelta)) ? Number(pooledDelta) : 0.0;
+  const clamped = Math.max(-EB_CALIBRATION.MAX_SHRINKAGE_CLAMP,
+    Math.min(EB_CALIBRATION.MAX_SHRINKAGE_CLAMP, delta));
+  return Math.round((prior + clamped) * 1000) / 1000;
+}

@@ -3,13 +3,51 @@ import asyncio
 import sys
 from datetime import datetime, timezone, timedelta
 
+import os
+_here = os.path.dirname(os.path.abspath(__file__))
+sys.path.insert(0, _here)
 sys.path.insert(0, "/app/backend")
 from dotenv import load_dotenv
+load_dotenv(os.path.join(_here, ".env"))
 load_dotenv("/app/backend/.env")
 
 import braincore as bc
 from questions import parse_paste, validate_doc, stem_hash
 from assessment import check_blueprint, assemble
+import db as db_module
+
+# Mock DB untuk unit test murni tanpa server live
+class _MockCollection:
+    def __init__(self, name=""):
+        self.name = name
+    async def find_one(self, *args, **kwargs):
+        if self.name == "curriculum_nodes":
+            return {"id": "TP-MAT-D-7-BIL-01", "code": "BIL-01", "name": "Bilangan"}
+        return None
+    async def count_documents(self, *args, **kwargs):
+        return 10
+    async def update_one(self, *args, **kwargs):
+        return None
+    def find(self, *args, **kwargs):
+        return self
+    def sort(self, *args, **kwargs):
+        return self
+    async def to_list(self, limit=100):
+        return [{"question_id": f"Q-BIL-{i}", "version": 1, "tp_id": "TP-MAT-D-7-BIL-01",
+                 "competency_id": "COMP-1", "difficulty": 2, "cognitive_level": "C2",
+                 "question_type": "mcq", "is_transfer": False, "status": "PUBLISHED",
+                 "is_current": True} for i in range(10)]
+
+class _MockDB:
+    def __getattr__(self, name):
+        return _MockCollection(name)
+
+db_module.db = _MockDB()
+import questions
+questions.db = db_module.db
+import assessment
+assessment.db = db_module.db
+bc.db = db_module.db
 
 ok, fail = 0, 0
 
@@ -37,6 +75,30 @@ def test_bkt():
     check("benar-tapi-tidak-yakin naik lebih sedikit dari benar-yakin", lucky < sure, (lucky, sure))
     hinted = bc.bkt_update(0.5, True, hints=2)
     check("benar dengan hint = evidence lebih lemah", hinted < sure, (hinted, sure))
+
+
+# ---------- IRT 3PL & Decay Parity ----------
+def test_irt_3pl():
+    p_equal = bc.success_probability(3.0, 3.0)
+    check("3PL P(theta=b) == 0.625 saat c=0.25", abs(p_equal - 0.625) < 1e-4, p_equal)
+    p_harder = bc.success_probability(2.0, 3.0)
+    p_easier = bc.success_probability(4.0, 3.0)
+    check("kemampuan lebih tinggi menghasilkan P lebih tinggi", p_easier > p_equal > p_harder, (p_harder, p_equal, p_easier))
+
+    # Inversi optimal difficulty
+    b_opt = bc.optimal_difficulty(3.5, target_success=0.80)
+    p_check = bc.success_probability(3.5, b_opt)
+    check("optimal_difficulty menghasilkan P mendekati target 0.80", abs(p_check - 0.80) < 0.02, (b_opt, p_check))
+    check("kemampuan lebih tinggi menargetkan soal lebih sulit", bc.optimal_difficulty(4.5) > bc.optimal_difficulty(2.5))
+
+
+def test_bkt_decay():
+    check("decay 0 hari tidak mengubah posterior", bc.bkt_decay(0.85, 0) == 0.85)
+    d30 = bc.bkt_decay(0.85, 30.0, half_life_days=30.0)
+    check("decay 30 hari meluruh separuh jarak ke P_INIT (0.55)", abs(d30 - 0.55) < 0.01, d30)
+    d90 = bc.bkt_decay(0.85, 90.0, half_life_days=30.0)
+    check("decay 90 hari semakin mendekati P_INIT (0.25)", d90 < d30 and d90 > 0.25, d90)
+    check("di bawah P_INIT tidak meluruh lagi", bc.bkt_decay(0.20, 30.0) == 0.20)
 
 
 # ---------- state machine ----------
@@ -145,13 +207,45 @@ async def test_blueprint():
     check("perakitan tidak duplikat", len(set(asm["question_ids"])) == len(asm["question_ids"]))
 
 
+import learning
+learning.db = db_module.db
+from learning import CompetencySyncIn, StateSyncIn, sync_state
+
+
+# ---------- state sync ----------
+async def test_state_sync():
+    user = {"user_id": "STUDENT-1", "role": "student"}
+    payload = StateSyncIn(
+        theta=3.2,
+        sd=0.45,
+        competencies=[
+            CompetencySyncIn(
+                competency_id="COMP-BIL-01",
+                p_mastery=0.82,
+                attempts=5,
+                correct=4,
+                streak=3,
+                stability_days=3.0
+            )
+        ],
+        misconceptions=[{"competency_id": "COMP-BIL-01", "misconception_id": "MIS-SIGN", "frequency": 1}]
+    )
+    res = await sync_state(payload, u=user)
+    check("sync_state berhasil tersinkron", res["synced"] is True)
+    check("sync_state merekonsiliasi kompetensi klien", res["client_competencies_received"] == 1)
+    check("sync_state mencatat pembaruan server", res["server_updated_count"] >= 1)
+
+
 async def main():
     test_bkt()
+    test_irt_3pl()
+    test_bkt_decay()
     test_states()
     test_diagnosis()
     test_parser()
     await test_validation()
     await test_blueprint()
+    await test_state_sync()
     print(f"\n=== {ok} PASS / {fail} FAIL ===")
     if fail:
         sys.exit(1)

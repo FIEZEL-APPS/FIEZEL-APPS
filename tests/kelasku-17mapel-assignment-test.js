@@ -176,6 +176,8 @@ assert(payload.mode === 'ujian', 'Payload membawa mode ujian');
 assert(payload.timer === 15, 'Payload membawa timer 15 menit');
 assert(Array.isArray(payload.items) && payload.items.length === 3, 'Payload membawa 3 butir soal lengkap ke murid');
 assert(payload.items[0].prompt.includes('Pusat kendali'), 'Prompt soal murid terbaca sempurna');
+assert(Array.isArray(payload.skills) && payload.skills[0] === 'ipa', 'Skills dinormalisasi ke lowercase (ipa) agar lolos validasi server');
+assert(payload.items.every(function(it) { return it.skill === 'ipa'; }), 'Setiap butir soal kustom dinormalisasi skill-nya ke lowercase');
 
 // 6. Uji runner murid (resolveItem)
 function resolveItem(a, id) {
@@ -187,7 +189,137 @@ const resolvedQ1 = resolveItem(examIpa, 'q-ipa-1');
 assert(!!resolvedQ1, 'Murid berhasil me-resolve soal q-ipa-1 dari paket tugas');
 assert(resolvedQ1.options[resolvedQ1.answer] === 'Nukleus', 'Kunci jawaban soal terverifikasi akurat');
 
+// 7. Evaluasi FiezelTeacherShell di sandbox untuk menguji seluruh 17 mata pelajaran
+sandbox.document = {
+  createElement: function () { return { setAttribute: function () {}, style: {} }; },
+  head: { appendChild: function () {} }
+};
+vm.runInContext(shellCode, sandbox);
+const TShell = sandbox.FiezelTeacherShell;
+assert(!!TShell, 'FiezelTeacherShell berhasil dimuat di sandbox');
+assert(typeof TShell._synthesizeMapelQuestions === 'function', 'Generator soal _synthesizeMapelQuestions tersedia');
+assert(Array.isArray(TShell._MAPEL_LIST) && TShell._MAPEL_LIST.length === 17, 'Tepat 17 mata pelajaran terdaftar di cangkang KelasKu');
+
+// 8. Uji pembuatan 5 soal nyata untuk SETIAP 17 mata pelajaran Kurikulum Merdeka
+const allMapelIds = ['MAT', 'IND', 'ENG', 'IPA', 'IPS', 'INF', 'PPK', 'AGM', 'FIS', 'KIM', 'BIO', 'EKO', 'GEO', 'SOS', 'SEJ', 'PJK', 'SNB'];
+let nonZeroAnswersCount = 0;
+let totalVerifiedQuestions = 0;
+
+allMapelIds.forEach(function (mId) {
+  const compCode = 'KOMP-' + mId + '-D-01';
+  const questions = TShell._synthesizeMapelQuestions(mId, compCode, 'Materi Uji ' + mId, 5);
+  assert(questions.length === 5, `Mapel ${mId}: Menghasilkan tepat 5 butir soal`);
+  
+  questions.forEach(function (q, qIdx) {
+    const hasValidOptions = Array.isArray(q.options) && q.options.length >= 4;
+    const hasValidAnswer = typeof q.answer === 'number' && q.answer >= 0 && q.answer < q.options.length;
+    const hasValidPrompt = typeof q.prompt === 'string' && q.prompt.length > 10;
+    const hasValidWhy = q.why && typeof q.why[q.answer] === 'string' && q.why[q.answer].length > 5;
+    
+    if (q.answer > 0) nonZeroAnswersCount++;
+    if (hasValidOptions && hasValidAnswer && hasValidPrompt && hasValidWhy) {
+      totalVerifiedQuestions++;
+    }
+  });
+});
+
+assert(totalVerifiedQuestions === 17 * 5, `Semua 85 butir soal dari 17 mata pelajaran memiliki prompt, 4 opsi, indeks kunci valid, dan penjelasan pembahasan`);
+assert(nonZeroAnswersCount > 10, `Pengacakan opsi (shuffleOptions) terbukti aktif: kunci jawaban tersebar di opsi B/C/D (${nonZeroAnswersCount} dari 85 soal tidak di index 0)`);
+
+// 8b. Verifikasi Permintaan 10, 15, dan 20 Soal: 100% Bebas dari Dummy Template Tiruan
+const dummyPhrases = [
+  'Dalam pembelajaran',
+  'manakah pernyataan yang paling tepat secara konsep',
+  'Pernyataan yang menerapkan konsep',
+  'Pernyataan yang keliru karena mengabaikan syarat',
+  'esensi capaian pembelajaran materi'
+];
+
+[10, 15, 20].forEach(function (reqCount) {
+  allMapelIds.forEach(function (mId) {
+    const qs = TShell._synthesizeMapelQuestions(mId, 'KOMP-' + mId + '-TEST', 'Uji Skala ' + mId, reqCount);
+    assert(qs.length === reqCount, `Mapel ${mId} (req=${reqCount}): menghasilkan tepat ${reqCount} butir soal`);
+
+    // Pastikan tidak ada satupun soal dummy template generik
+    qs.forEach(function (q, idx) {
+      dummyPhrases.forEach(function (phrase) {
+        assert(!q.prompt.includes(phrase), `Mapel ${mId} butir #${idx+1} tidak boleh mengandung template dummy '${phrase}'`);
+        q.options.forEach(function (opt) {
+          assert(!opt.includes(phrase), `Mapel ${mId} butir #${idx+1} opsi tidak boleh mengandung template dummy '${phrase}'`);
+        });
+        if (q.why && q.why[q.answer]) {
+          assert(!q.why[q.answer].includes(phrase), `Mapel ${mId} butir #${idx+1} pembahasan tidak boleh mengandung template dummy '${phrase}'`);
+        }
+      });
+      assert(Array.isArray(q.options) && q.options.length === 4, `Mapel ${mId} butir #${idx+1} memiliki 4 opsi`);
+      assert(typeof q.answer === 'number' && q.answer >= 0 && q.answer < 4, `Mapel ${mId} butir #${idx+1} memiliki indeks kunci valid`);
+      assert(q.why && typeof q.why[q.answer] === 'string' && q.why[q.answer].length > 0, `Mapel ${mId} butir #${idx+1} memiliki pembahasan kunci`);
+    });
+  });
+});
+console.log('  OK: Permintaan 10, 15, dan 20 soal untuk seluruh 17 mapel 100% memuat soal kurikulum autentik (0 dummy template)');
+
+// 9. Uji fz-api endpoint questions
+const apiPath = path.join(__dirname, '..', 'features/curriculum/fz-api.js');
+const apiCode = fs.readFileSync(apiPath, 'utf8');
+assert(apiCode.includes("api('/questions'"), 'FZEngine menyediakan pemanggil endpoint API questions list');
+
+// 10. Uji Katalog Materi Ajar (Teaching Briefs & Kompetensi) untuk Seluruh 17 Mapel
+assert(!!TShell._MAPEL_CATALOG, '_MAPEL_CATALOG tersedia di FiezelTeacherShell');
+const catalogKeys = Object.keys(TShell._MAPEL_CATALOG);
+assert(catalogKeys.length === 17, 'Katalog materi memuat tepat 17 mata pelajaran');
+
+let verifiedBriefs = 0;
+let verifiedComps = 0;
+allMapelIds.forEach(function (mId) {
+  const cat = TShell._MAPEL_CATALOG[mId];
+  assert(!!cat, `Katalog mapel ${mId} terdefinisi`);
+  if (cat && Array.isArray(cat.competencies) && cat.competencies.length >= 3) {
+    verifiedComps++;
+  }
+  if (cat && cat.teachingBrief && cat.teachingBrief.summary && cat.teachingBrief.hook5Minutes && cat.teachingBrief.boardFormula && Array.isArray(cat.teachingBrief.commonMisconceptions) && cat.teachingBrief.commonMisconceptions.length > 0) {
+    verifiedBriefs++;
+  }
+});
+assert(verifiedComps === 17, 'Seluruh 17 mapel memiliki daftar capaian kompetensi bawaan (minimal 3 per mapel)');
+assert(verifiedBriefs === 17, 'Seluruh 17 mapel memiliki teaching briefs lengkap (Ringkasan, Apersepsi 5 Menit, Rumus/Konsep Papan Tulis, Top Miskonsepsi)');
+
+// 11. Uji Multi-Subject Analytics di FiezelTeacherStore (activeSkills & weakestSkill)
+assert(typeof TS.activeSkills === 'function', 'TS.activeSkills tersedia');
+const multiSubjClass = {
+  id: 'c-multi',
+  name: 'Kelas Multimapel',
+  assignments: [{ id: 'a-1', skills: ['MAT', 'FIS'] }],
+  students: [
+    {
+      id: 's-1',
+      name: 'Budi',
+      results: [
+        { skill: 'MAT', correct: 8, total: 10 },
+        { skill: 'FIS', correct: 3, total: 10 },
+        { skill: 'KIM', correct: 9, total: 10 }
+      ]
+    }
+  ]
+};
+const discoveredSkills = TS.activeSkills(multiSubjClass, multiSubjClass.students[0]);
+assert(discoveredSkills.includes('MAT'), 'activeSkills mendeteksi skill MAT');
+assert(discoveredSkills.includes('FIS'), 'activeSkills mendeteksi skill FIS');
+assert(discoveredSkills.includes('KIM'), 'activeSkills mendeteksi skill KIM');
+
+const weakest = TS.weakestSkill(multiSubjClass.students[0]);
+assert(weakest && weakest.skill === 'FIS', 'weakestSkill mengidentifikasi FIS (30%) sebagai kelemahan murid di antara mapel');
+
+// 12. Uji Integrasi UI: Brief Card & Competency Select di Modal
+assert(shellCode.includes('data-testid="tg-mapel-brief"'), 'Kartu panduan mengajar tg-mapel-brief terpasang di modal');
+assert(shellCode.includes('data-testid="tg-assign-comp-select"'), 'Dropdown pilihan kompetensi terpasang di modal mapel');
+
+// 13. Uji Integrasi Mobile Navigation untuk Kurikulum
+assert(shellCode.includes("data-view=\"curriculum\">' + icon('library') + '<span>' + esc(t('guru.nav-kurikulum-singkat', 'Kurikulum'))"), 'Navigasi mobile menyertakan tombol kurikulum yang dijaga gerbang');
+
 console.log(`\nHasil: ${pass} assert PASS, ${fail} assert FAIL`);
 if (fail > 0) {
   process.exit(1);
 }
+
+
