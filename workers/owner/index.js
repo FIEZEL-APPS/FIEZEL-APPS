@@ -771,6 +771,7 @@ async function mintTeacherInvite(env, input, fetchImpl) {
   if (input.subject_id || input.subjectId) body.subject_id = input.subject_id || input.subjectId;
   if (input.grade_id || input.gradeId) body.grade_id = input.grade_id || input.gradeId;
   if (input.class_code || input.classCode) body.class_code = input.class_code || input.classCode;
+  if (input.school_id || input.schoolId) body.school_id = input.school_id || input.schoolId;
   return await ownerApiFetch(env, '/api/owner/teacher-invite', fetchImpl, {
     method: 'POST',
     body
@@ -796,6 +797,19 @@ async function updateTeacherInvite(env, input, fetchImpl) {
       grade_id: input.grade_id,
       teacherName: input.teacherName,
       institution: input.institution,
+      institutionType: input.institutionType,
+      class_code: input.class_code,
+      school_id: input.school_id,
+      extend_days: input.extend_days,
+    }
+  });
+}
+
+async function regenerateTeacherInvite(env, input, fetchImpl) {
+  return await ownerApiFetch(env, '/api/owner/teacher-invite/regenerate', fetchImpl, {
+    method: 'POST',
+    body: {
+      codeHash: input.codeHash,
     }
   });
 }
@@ -809,6 +823,79 @@ async function deleteTeacherInvite(env, input, fetchImpl) {
     }
   });
 }
+
+async function readSchools(env, fetchImpl) {
+  const res = await ownerApiFetch(env, '/api/owner/schools', fetchImpl);
+  if (res.state !== 'ok') return { state: res.state, status: res.status, schools: [] };
+  const body = res.body || {};
+  return {
+    state: 'ok',
+    schools: Array.isArray(body.schools) ? body.schools : [],
+  };
+}
+
+async function createSchool(env, input, fetchImpl) {
+  return await ownerApiFetch(env, '/api/owner/school', fetchImpl, {
+    method: 'POST',
+    body: {
+      name: input.name,
+      npsn: input.npsn,
+      level: input.level,
+      type: input.type,
+      city: input.city,
+      address: input.address,
+      principal_name: input.principal_name || input.principalName,
+      contact: input.contact,
+    }
+  });
+}
+
+async function updateSchool(env, input, fetchImpl) {
+  return await ownerApiFetch(env, '/api/owner/school/update', fetchImpl, {
+    method: 'POST',
+    body: {
+      id: input.id,
+      name: input.name,
+      npsn: input.npsn,
+      level: input.level,
+      type: input.type,
+      city: input.city,
+      address: input.address,
+      principal_name: input.principal_name || input.principalName,
+      contact: input.contact,
+    }
+  });
+}
+
+async function deleteSchool(env, input, fetchImpl) {
+  return await ownerApiFetch(env, '/api/owner/school/delete', fetchImpl, {
+    method: 'POST',
+    body: { id: input.id }
+  });
+}
+
+async function readClasses(env, fetchImpl) {
+  const res = await ownerApiFetch(env, '/api/owner/classes', fetchImpl);
+  if (res.state !== 'ok') return { state: res.state, status: res.status, classes: [] };
+  const body = res.body || {};
+  return {
+    state: 'ok',
+    classes: Array.isArray(body.classes) ? body.classes : [],
+  };
+}
+
+async function createClass(env, input, fetchImpl) {
+  return await ownerApiFetch(env, '/api/owner/class', fetchImpl, {
+    method: 'POST',
+    body: {
+      title: input.title,
+      level: input.level,
+      school_id: input.school_id || input.schoolId,
+      code: input.code,
+    }
+  });
+}
+
 
 /** `sub` yang sah = UUID. Dipakai DUA arah: sebelum dikirim ke API, dan sebelum dirender. */
 const SUB_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/;
@@ -1134,6 +1221,8 @@ async function readModel(env, period, nowMs, learnerSub, fetchImpl) {
     learnerDetail: SUB_RE.test(String(learnerSub || '')) ? await readLearnerDetail(env, period, learnerSub, fetchImpl) : null,
     // Undangan & token guru. Satu subrequest owner-gated ke Worker api, fail-soft.
     teachers: await readTeachers(env, fetchImpl),
+    schools: await readSchools(env, fetchImpl),
+    classes: await readClasses(env, fetchImpl),
     // Batas pengukuran ikut ke model — jadi HTML dan JSON menceritakan batas yang SAMA.
     unmeasurable: UNMEASURABLE,
     generatedAtIso: new Date(Number(nowMs)).toISOString(),
@@ -2697,19 +2786,35 @@ function gradeName(id) {
 
 function renderTeacherSection(m) {
   const tData = m.teachers || { state: 'ok', invites: [], teachers: [] };
+  const sData = m.schools || { state: 'ok', schools: [] };
+  const cData = m.classes || { state: 'ok', classes: [] };
   const action = m.teacherAction;
   const invites = tData.invites || [];
   const teachers = tData.teachers || [];
+  const schools = sData.schools || [];
+  const classes = cData.classes || [];
 
-  // Daftar kelas unik yang sudah ada
-  const knownClasses = new Set();
-  invites.forEach((inv) => { if (inv.classCode) knownClasses.add(inv.classCode); });
-  teachers.forEach((tc) => { if (tc.classCode) knownClasses.add(tc.classCode); });
-  const classList = Array.from(knownClasses);
+  // Daftar kelas unik dari tc_class (D1), invites, dan teachers
+  const knownClassMap = new Map();
+  classes.forEach((c) => {
+    if (c.code) knownClassMap.set(c.code, c);
+  });
+  invites.forEach((inv) => {
+    if (inv.classCode && !knownClassMap.has(inv.classCode)) {
+      knownClassMap.set(inv.classCode, { code: inv.classCode, title: 'Kelas ' + inv.classCode });
+    }
+  });
+  teachers.forEach((tc) => {
+    if (tc.classCode && !knownClassMap.has(tc.classCode)) {
+      knownClassMap.set(tc.classCode, { code: tc.classCode, title: 'Kelas ' + tc.classCode });
+    }
+  });
+  const classList = Array.from(knownClassMap.values());
 
+  // Pastikan currentClass STABIL dan TIDAK PERNAH ACAK SAAT DI-REFRESH
   let currentClass = m.selectedClass;
-  if (!currentClass || m.isNewClass) {
-    currentClass = m.isNewClass ? generateClassCode() : (classList[0] || generateClassCode());
+  if (!currentClass || (classList.length > 0 && !knownClassMap.has(currentClass))) {
+    currentClass = classList.length > 0 ? classList[0].code : (m.selectedClass || 'FZ-MERDEKA1');
   }
 
   let alertBanner = '';
@@ -2736,7 +2841,31 @@ function renderTeacherSection(m) {
           <div class="warn" style="margin-top:14px;"><b>${ICONS.alert} PERHATIAN PENTING:</b> Kode token ini <b>HANYA DITAMPILKAN SEKALI INI SAJA</b> demi keamanan kriptografis. Sistem tidak menyimpan token mentah di basis data. Pastikan Anda telah menyalinnya sebelum berpindah halaman.</div>
         </div>
       `;
-    } else if ((action.action === 'revoke' || action.action === 'update' || action.action === 'delete') && action.ok) {
+    } else if (action.action === 'regenerate' && action.ok) {
+      alertBanner = `
+        <div style="background:var(--card-bg);border:1px solid var(--blue-border);border-left:4px solid var(--blue);border-radius:var(--radius-lg);padding:20px;margin-bottom:20px;box-shadow:var(--shadow-sm);">
+          <div style="font-size:16px;font-weight:700;color:var(--text-main);margin-bottom:8px;display:flex;align-items:center;gap:8px;">🔄 Token Guru Berhasil Diregenerasi</div>
+          <div style="font-size:13px;color:var(--text-muted);margin-bottom:12px;">Token lama telah dicabut permanen. Salin kode token baru di bawah ini dan serahkan kepada guru:</div>
+          <div style="margin:12px 0;text-align:center;">
+            <code style="font-size:1.5rem;font-weight:700;letter-spacing:2px;color:var(--brand-gold);background:var(--bg-subtle);padding:10px 20px;border-radius:var(--radius-md);border:1px dashed var(--card-border-hover);user-select:all;display:inline-block;font-family:ui-monospace,monospace;">${esc(action.code)}</code>
+            <div style="font-size:11.5px;color:var(--text-subtle);margin-top:6px;">(Klik/blok teks token di atas untuk menyalin langsung)</div>
+          </div>
+          <div class="warn" style="margin-top:14px;"><b>${ICONS.alert} PERHATIAN PENTING:</b> Kode token ini <b>HANYA DITAMPILKAN SEKALI INI SAJA</b> demi keamanan kriptografis. Pastikan Anda telah menyalinnya sebelum berpindah halaman.</div>
+        </div>
+      `;
+    } else if (action.action === 'class' && action.ok) {
+      alertBanner = `
+        <div class="note" style="border-left-color:var(--emerald);color:var(--emerald);background:var(--emerald-subtle);padding:14px 18px;margin-bottom:16px;">
+          <b>${ICONS.check} Kelas Baru Berhasil Dibuat:</b> ${esc(action.message)}
+        </div>
+      `;
+    } else if (action.action === 'school' && action.ok) {
+      alertBanner = `
+        <div class="note" style="border-left-color:var(--emerald);color:var(--emerald);background:var(--emerald-subtle);padding:14px 18px;margin-bottom:16px;">
+          <b>${ICONS.check} Sekolah Mitra:</b> ${esc(action.message)}
+        </div>
+      `;
+    } else if (action.ok) {
       alertBanner = `
         <div class="note" style="border-left-color:var(--emerald);color:var(--emerald);background:var(--emerald-subtle);padding:12px 16px;margin-bottom:16px;">
           <b>${ICONS.check} Berhasil:</b> ${esc(action.message)}
@@ -2751,18 +2880,192 @@ function renderTeacherSection(m) {
     }
   }
 
-  // --- REKONSTRUKSI: PANEL KELAS & 17 PANEL MAPEL ---
+  // --- 1. PANEL SEKOLAH MITRA ---
+  let schoolRows = '';
+  if (schools.length === 0) {
+    schoolRows = `<tr><td colspan="9" style="text-align:center;padding:20px;color:var(--text-muted);">Belum ada sekolah mitra yang terdaftar. Gunakan formulir di atas untuk mendaftarkan sekolah mitra pertama.</td></tr>`;
+  } else {
+    schoolRows = schools.map((s) => {
+      const createdStr = s.created_at ? wibDay(s.created_at) : '—';
+      const levelBadge = `<span style="background:#e0f2fe;color:#0369a1;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:700;">${esc(s.level || 'SMP')}</span>`;
+      return `<tr>
+        <td><code style="font-weight:700;color:var(--brand-gold);">${esc(s.id)}</code></td>
+        <td><b>${esc(s.name)}</b>${s.address ? `<small style="display:block;color:var(--text-muted);margin-top:2px;">${esc(s.address)}</small>` : ''}</td>
+        <td><code>${esc(s.npsn || '—')}</code></td>
+        <td>${levelBadge}</td>
+        <td>${esc(s.city || '—')}</td>
+        <td>${esc(s.principal_name || '—')}</td>
+        <td><small>${esc(s.contact || '—')}</small></td>
+        <td>${esc(createdStr)}</td>
+        <td style="text-align:center;white-space:nowrap;">
+          <details style="display:inline-block;position:relative;margin:2px;text-align:left;">
+            <summary style="background:#0284c7;color:#fff;border:none;padding:3px 8px;border-radius:4px;font-size:11px;font-weight:bold;cursor:pointer;list-style:none;display:inline-block;">✏️ Edit</summary>
+            <div style="position:absolute;right:0;top:100%;z-index:50;background:#ffffff;border:1px solid #cbd5e1;border-radius:8px;padding:14px;box-shadow:0 8px 24px rgba(0,0,0,0.18);width:300px;margin-top:4px;">
+              <div style="font-weight:700;font-size:12px;margin-bottom:8px;color:var(--ink);">Edit Data Sekolah Mitra</div>
+              <form method="GET" action="/" style="margin:0;display:flex;flex-direction:column;gap:6px;">
+                <input type="hidden" name="action" value="update_school">
+                <input type="hidden" name="id" value="${esc(s.id)}">
+                <input type="hidden" name="cls" value="${esc(currentClass)}">
+                <div>
+                  <label style="display:block;font-size:10.5px;font-weight:700;color:#334155;">Nama Sekolah:</label>
+                  <input name="name" type="text" value="${esc(s.name)}" maxlength="100" required style="width:100%;box-sizing:border-box;font-size:11px;padding:4px 6px;border:1px solid #cbd5e1;border-radius:4px;">
+                </div>
+                <div>
+                  <label style="display:block;font-size:10.5px;font-weight:700;color:#334155;">NPSN:</label>
+                  <input name="npsn" type="text" value="${esc(s.npsn || '')}" maxlength="20" style="width:100%;box-sizing:border-box;font-size:11px;padding:4px 6px;border:1px solid #cbd5e1;border-radius:4px;">
+                </div>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px;">
+                  <div>
+                    <label style="display:block;font-size:10.5px;font-weight:700;color:#334155;">Jenjang:</label>
+                    <select name="level" style="width:100%;font-size:10.5px;padding:3px;border:1px solid #cbd5e1;border-radius:4px;">
+                      <option value="SD" ${s.level === 'SD' ? 'selected' : ''}>SD</option>
+                      <option value="SMP" ${s.level === 'SMP' ? 'selected' : ''}>SMP</option>
+                      <option value="SMA" ${s.level === 'SMA' ? 'selected' : ''}>SMA/SMK</option>
+                      <option value="ALL" ${s.level === 'ALL' ? 'selected' : ''}>Semua</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label style="display:block;font-size:10.5px;font-weight:700;color:#334155;">Jenis:</label>
+                    <select name="type" style="width:100%;font-size:10.5px;padding:3px;border:1px solid #cbd5e1;border-radius:4px;">
+                      <option value="school" ${s.type === 'school' ? 'selected' : ''}>Sekolah</option>
+                      <option value="madrasah" ${s.type === 'madrasah' ? 'selected' : ''}>Madrasah</option>
+                      <option value="tutoring" ${s.type === 'tutoring' ? 'selected' : ''}>Bimbel</option>
+                      <option value="other" ${s.type === 'other' ? 'selected' : ''}>Lainnya</option>
+                    </select>
+                  </div>
+                </div>
+                <div>
+                  <label style="display:block;font-size:10.5px;font-weight:700;color:#334155;">Kota / Kab:</label>
+                  <input name="city" type="text" value="${esc(s.city || '')}" maxlength="50" style="width:100%;box-sizing:border-box;font-size:11px;padding:4px 6px;border:1px solid #cbd5e1;border-radius:4px;">
+                </div>
+                <div>
+                  <label style="display:block;font-size:10.5px;font-weight:700;color:#334155;">Kepala Sekolah / PIC:</label>
+                  <input name="principal_name" type="text" value="${esc(s.principal_name || '')}" maxlength="80" style="width:100%;box-sizing:border-box;font-size:11px;padding:4px 6px;border:1px solid #cbd5e1;border-radius:4px;">
+                </div>
+                <div>
+                  <label style="display:block;font-size:10.5px;font-weight:700;color:#334155;">Kontak Narahubung:</label>
+                  <input name="contact" type="text" value="${esc(s.contact || '')}" maxlength="50" style="width:100%;box-sizing:border-box;font-size:11px;padding:4px 6px;border:1px solid #cbd5e1;border-radius:4px;">
+                </div>
+                <div style="display:flex;justify-content:flex-end;margin-top:4px;">
+                  <button type="submit" style="background:#0284c7;color:#fff;border:none;padding:4px 10px;border-radius:4px;font-size:11px;font-weight:bold;cursor:pointer;">Simpan Perubahan</button>
+                </div>
+              </form>
+            </div>
+          </details>
+          <form method="GET" action="/" style="display:inline;margin:2px;">
+            <input type="hidden" name="action" value="delete_school">
+            <input type="hidden" name="id" value="${esc(s.id)}">
+            <input type="hidden" name="cls" value="${esc(currentClass)}">
+            <button type="submit" style="background:#ef4444;color:#fff;border:none;padding:3px 8px;border-radius:4px;font-size:11px;font-weight:bold;cursor:pointer;">Hapus</button>
+          </form>
+        </td>
+      </tr>`;
+    }).join('');
+  }
+
+  const schoolSection = `
+    <div id="school-panel" style="scroll-margin-top:80px;background:var(--card-bg);border:2px solid var(--card-border-hover);border-radius:14px;padding:20px;margin-bottom:24px;box-shadow:var(--shadow-sm);">
+      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;margin-bottom:16px;border-bottom:1px solid var(--card-border);padding-bottom:12px;">
+        <div>
+          <h3 style="margin:0;font-size:17px;font-weight:800;color:var(--text-main);display:flex;align-items:center;gap:8px;">
+            🏢 Panel Direktori &amp; Pendaftaran Sekolah Mitra
+          </h3>
+          <div style="font-size:12.5px;color:var(--text-muted);margin-top:3px;">
+            Kelola instansi atau sekolah yang bermitra dengan FIEZEL. Data sekolah ini menjadi induk bagi pembuatan kelas dan otorisasi token guru.
+          </div>
+        </div>
+      </div>
+
+      <div style="background:#f8fafc;border:1px solid #cbd5e1;border-radius:10px;padding:16px;margin-bottom:20px;">
+        <h4 style="margin:0 0 10px 0;font-size:13px;font-weight:700;color:var(--text-main);">+ Daftarkan Sekolah / Instansi Mitra Baru</h4>
+        <form method="GET" action="/" style="display:grid;grid-template-columns:repeat(auto-fit, minmax(200px, 1fr));gap:10px;align-items:end;">
+          <input type="hidden" name="action" value="create_school">
+          <input type="hidden" name="cls" value="${esc(currentClass)}">
+          <div>
+            <label style="display:block;font-size:11px;font-weight:700;color:#334155;margin-bottom:2px;">Nama Sekolah / Instansi *</label>
+            <input name="name" type="text" placeholder="Contoh: MTsN 5 ACEH BESAR" maxlength="100" required style="width:100%;box-sizing:border-box;font-size:11px;padding:5px 8px;border:1px solid #cbd5e1;border-radius:6px;">
+          </div>
+          <div>
+            <label style="display:block;font-size:11px;font-weight:700;color:#334155;margin-bottom:2px;">NPSN (Nomor Pokok)</label>
+            <input name="npsn" type="text" placeholder="Contoh: 10101234" maxlength="20" style="width:100%;box-sizing:border-box;font-size:11px;padding:5px 8px;border:1px solid #cbd5e1;border-radius:6px;">
+          </div>
+          <div>
+            <label style="display:block;font-size:11px;font-weight:700;color:#334155;margin-bottom:2px;">Jenjang Satuan</label>
+            <select name="level" style="width:100%;font-size:11px;padding:5px 8px;border:1px solid #cbd5e1;border-radius:6px;">
+              <option value="SMP" selected>SMP / MTs (Fase D)</option>
+              <option value="SMA">SMA / MA / SMK (Fase E/F)</option>
+              <option value="SD">SD / MI (Fase A-C)</option>
+              <option value="ALL">Semua Jenjang</option>
+            </select>
+          </div>
+          <div>
+            <label style="display:block;font-size:11px;font-weight:700;color:#334155;margin-bottom:2px;">Jenis Lembaga</label>
+            <select name="type" style="width:100%;font-size:11px;padding:5px 8px;border:1px solid #cbd5e1;border-radius:6px;">
+              <option value="school" selected>Sekolah Formal</option>
+              <option value="madrasah">Madrasah (Kemenag)</option>
+              <option value="tutoring">Bimbel</option>
+              <option value="course">Kursus</option>
+              <option value="other">Lainnya</option>
+            </select>
+          </div>
+          <div>
+            <label style="display:block;font-size:11px;font-weight:700;color:#334155;margin-bottom:2px;">Kabupaten / Kota</label>
+            <input name="city" type="text" placeholder="Contoh: Aceh Besar" maxlength="50" style="width:100%;box-sizing:border-box;font-size:11px;padding:5px 8px;border:1px solid #cbd5e1;border-radius:6px;">
+          </div>
+          <div>
+            <label style="display:block;font-size:11px;font-weight:700;color:#334155;margin-bottom:2px;">Kepala Sekolah / PIC</label>
+            <input name="principal_name" type="text" placeholder="Nama Kepala Sekolah / PIC" maxlength="80" style="width:100%;box-sizing:border-box;font-size:11px;padding:5px 8px;border:1px solid #cbd5e1;border-radius:6px;">
+          </div>
+          <div>
+            <label style="display:block;font-size:11px;font-weight:700;color:#334155;margin-bottom:2px;">Kontak Narahubung</label>
+            <input name="contact" type="text" placeholder="Email / Kontak resmi" maxlength="50" style="width:100%;box-sizing:border-box;font-size:11px;padding:5px 8px;border:1px solid #cbd5e1;border-radius:6px;">
+          </div>
+          <div>
+            <button type="submit" style="background:#059669;color:#ffffff;font-size:11.5px;font-weight:700;padding:6px 14px;border-radius:6px;border:none;cursor:pointer;width:100%;height:32px;">
+              + Daftarkan Sekolah Mitra
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <div style="font-size:13px;font-weight:700;color:var(--text-main);margin-bottom:8px;">
+        Direktori Sekolah Mitra Terdaftar (${schools.length})
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>ID Sekolah</th>
+              <th>Nama Sekolah</th>
+              <th>NPSN</th>
+              <th>Jenjang</th>
+              <th>Kota / Kab</th>
+              <th>Kepala Sekolah / PIC</th>
+              <th>Kontak</th>
+              <th>Terdaftar (WIB)</th>
+              <th style="text-align:center;">Aksi</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${schoolRows}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  `;
+
+  // --- 2. PANEL KELAS PERSISTEN & 17 MAPEL ---
   const classPills = classList.map((c) => {
-    const isCur = c === currentClass;
-    return `<a href="/?cls=${esc(c)}#class-panel" style="padding:6px 14px;border-radius:20px;font-size:12px;font-weight:700;text-decoration:none;border:1px solid ${isCur ? 'var(--brand-gold)' : '#cbd5e1'};background:${isCur ? 'var(--brand-gold)' : '#ffffff'};color:${isCur ? '#ffffff' : '#334155'};display:inline-flex;align-items:center;gap:6px;">
-      🏫 ${esc(c)}
+    const isCur = c.code === currentClass;
+    const titleSnippet = c.title ? ` · ${c.title}` : '';
+    return `<a href="/?cls=${esc(c.code)}#class-panel" style="padding:6px 14px;border-radius:20px;font-size:12px;font-weight:700;text-decoration:none;border:1px solid ${isCur ? 'var(--brand-gold)' : '#cbd5e1'};background:${isCur ? 'var(--brand-gold)' : '#ffffff'};color:${isCur ? '#ffffff' : '#334155'};display:inline-flex;align-items:center;gap:6px;">
+      🏫 ${esc(c.code)}${esc(titleSnippet)}
     </a>`;
   }).join('');
 
-  // Hitung jumlah mapel terisi di kelas ini
+  // Hitung jumlah mapel terisi di kelas aktif ini
   let filledCount = 0;
   const mapelCards = SUBJECTS_17.map((s) => {
-    // Cari apakah sudah ada invite aktif atau guru terdaftar di mapel ini untuk kelas currentClass
     const assignedInv = invites.find((i) => (i.classCode === currentClass || !i.classCode && classList.length === 0) && (i.subjectId === s.id || i.subject_id === s.id) && i.status === 'ACTIVE');
     const assignedTeacher = teachers.find((tc) => (tc.classCode === currentClass || !tc.classCode && classList.length === 0) && (tc.subjectId === s.id || tc.subject_id === s.id));
     const isAssigned = Boolean(assignedInv || assignedTeacher);
@@ -2793,6 +3096,7 @@ function renderTeacherSection(m) {
             <form method="GET" action="/" style="margin:0;">
               <input type="hidden" name="action" value="revoke_invite">
               <input type="hidden" name="codeHash" value="${esc(assignedInv.codeHash)}">
+              <input type="hidden" name="cls" value="${esc(currentClass)}">
               <button type="submit" style="background:#ef4444;color:#fff;border:none;padding:2px 8px;border-radius:4px;font-size:10.5px;font-weight:700;cursor:pointer;">Cabut</button>
             </form>
           </div>
@@ -2820,17 +3124,21 @@ function renderTeacherSection(m) {
                 <input type="hidden" name="cls" value="${esc(currentClass)}">
                 <div>
                   <label style="display:block;font-size:10.5px;font-weight:700;color:#334155;">Nama Guru</label>
-                  <input name="teacherName" type="text" placeholder="Nama Guru Lengkap" maxlength="60" required style="width:100%;box-sizing:border-box;font-size:11px;padding:4px 6px;">
+                  <input name="teacherName" type="text" placeholder="Nama Guru Lengkap" maxlength="60" required style="width:100%;box-sizing:border-box;font-size:11px;padding:4px 6px;border:1px solid #cbd5e1;border-radius:4px;">
                 </div>
                 <div>
                   <label style="display:block;font-size:10.5px;font-weight:700;color:#334155;">Sekolah / Instansi</label>
-                  <input name="institution" type="text" placeholder="Nama Sekolah" maxlength="80" required style="width:100%;box-sizing:border-box;font-size:11px;padding:4px 6px;">
+                  <input name="institution" list="schools_datalist" type="text" placeholder="Pilih / ketik nama sekolah" maxlength="80" required style="width:100%;box-sizing:border-box;font-size:11px;padding:4px 6px;border:1px solid #cbd5e1;border-radius:4px;">
+                  <datalist id="schools_datalist">
+                    ${schools.map(sch => `<option value="${esc(sch.name)}">${esc(sch.name)} (${esc(sch.city || sch.level || '')})</option>`).join('')}
+                  </datalist>
                 </div>
                 <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px;">
                   <div>
                     <label style="display:block;font-size:10.5px;font-weight:700;color:#334155;">Jenis</label>
-                    <select name="institutionType" style="width:100%;font-size:10.5px;padding:3px;">
+                    <select name="institutionType" style="width:100%;font-size:10.5px;padding:3px;border:1px solid #cbd5e1;border-radius:4px;">
                       <option value="school" selected>Sekolah</option>
+                      <option value="madrasah">Madrasah</option>
                       <option value="tutoring">Bimbel</option>
                       <option value="course">Kursus</option>
                       <option value="other">Lainnya</option>
@@ -2838,7 +3146,7 @@ function renderTeacherSection(m) {
                   </div>
                   <div>
                     <label style="display:block;font-size:10.5px;font-weight:700;color:#334155;">Jenjang</label>
-                    <select name="grade_id" style="width:100%;font-size:10.5px;padding:3px;">
+                    <select name="grade_id" style="width:100%;font-size:10.5px;padding:3px;border:1px solid #cbd5e1;border-radius:4px;">
                       <option value="SMP" selected>SMP</option>
                       <option value="SMA">SMA</option>
                       <option value="SD">SD</option>
@@ -2848,7 +3156,7 @@ function renderTeacherSection(m) {
                 </div>
                 <div>
                   <label style="display:block;font-size:10.5px;font-weight:700;color:#334155;">Masa Aktif</label>
-                  <select name="days" style="width:100%;font-size:10.5px;padding:3px;">
+                  <select name="days" style="width:100%;font-size:10.5px;padding:3px;border:1px solid #cbd5e1;border-radius:4px;">
                     <option value="14">14 Hari</option>
                     <option value="30">30 Hari</option>
                     <option value="90" selected>90 Hari (3 Bulan)</option>
@@ -2889,13 +3197,57 @@ function renderTeacherSection(m) {
             🏫 Panel Kelas &amp; Token Guru (17 Mata Pelajaran)
           </h3>
           <div style="font-size:12.5px;color:var(--text-muted);margin-top:3px;">
-            Sistem otomatis menghasilkan kode unik kelas. Klik mapel yang ingin diajarkan lalu tambahkan guru untuk mencetak token terikat.
+            Pilih kelas persisten atau buat kelas baru yang tersimpan permanen di D1. Klik mapel untuk mencetak token guru terikat.
           </div>
         </div>
         <div style="display:flex;gap:8px;align-items:center;">
-          <a href="/?new_class=1#class-panel" style="background:#0284c7;color:#ffffff;font-size:12px;font-weight:700;padding:8px 14px;border-radius:8px;text-decoration:none;box-shadow:0 2px 0 #0369a1;display:inline-flex;align-items:center;gap:6px;">
-            + Buat Kelas Baru (Auto-Code)
-          </a>
+          <details style="position:relative;">
+            <summary style="background:#0284c7;color:#ffffff;font-size:12px;font-weight:700;padding:8px 14px;border-radius:8px;cursor:pointer;list-style:none;display:inline-flex;align-items:center;gap:6px;box-shadow:0 2px 0 #0369a1;">
+              + Buat Kelas Baru (Persisten D1)
+            </summary>
+            <div style="position:absolute;right:0;top:100%;z-index:40;background:#ffffff;border:2px solid #cbd5e1;border-radius:10px;padding:16px;box-shadow:0 10px 30px rgba(0,0,0,0.25);margin-top:6px;width:320px;">
+              <div style="font-weight:800;font-size:13px;color:#1e293b;margin-bottom:4px;">
+                🏫 Terbitkan Kelas Baru (Permanen D1)
+              </div>
+              <div style="font-size:11.5px;color:#64748b;margin-bottom:12px;">
+                Kelas akan disimpan permanen di tabel <code>tc_class</code> dan tidak akan berubah saat reload/refresh.
+              </div>
+              <form method="GET" action="/" style="display:flex;flex-direction:column;gap:8px;">
+                <input type="hidden" name="action" value="create_class">
+                <input type="hidden" name="cls" value="${esc(currentClass)}">
+                <div>
+                  <label style="display:block;font-size:11px;font-weight:700;color:#334155;">Pilih Sekolah Mitra:</label>
+                  <select name="school_id" style="width:100%;font-size:11px;padding:4px 6px;border:1px solid #cbd5e1;border-radius:4px;">
+                    <option value="">-- Tanpa Sekolah / Mandiri --</option>
+                    ${schools.map(s => `<option value="${esc(s.id)}">${esc(s.name)} (${esc(s.level || 'SMP')})</option>`).join('')}
+                  </select>
+                </div>
+                <div>
+                  <label style="display:block;font-size:11px;font-weight:700;color:#334155;">Nama / Judul Kelas:</label>
+                  <input name="title" type="text" placeholder="Contoh: Kelas 7-A (Merdeka)" maxlength="80" required style="width:100%;box-sizing:border-box;font-size:11px;padding:4px 6px;border:1px solid #cbd5e1;border-radius:4px;">
+                </div>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;">
+                  <div>
+                    <label style="display:block;font-size:11px;font-weight:700;color:#334155;">Jenjang:</label>
+                    <select name="level" style="width:100%;font-size:11px;padding:4px 6px;border:1px solid #cbd5e1;border-radius:4px;">
+                      <option value="SMP" selected>SMP</option>
+                      <option value="SMA">SMA</option>
+                      <option value="SD">SD</option>
+                      <option value="ALL">Semua</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label style="display:block;font-size:11px;font-weight:700;color:#334155;">Kode Unik (Opsional):</label>
+                    <input name="code" type="text" placeholder="Auto (FZ-XXXXXX)" maxlength="16" style="width:100%;box-sizing:border-box;font-size:11px;padding:4px 6px;border:1px solid #cbd5e1;border-radius:4px;font-weight:700;text-transform:uppercase;">
+                  </div>
+                </div>
+                <div style="font-size:10.5px;color:#64748b;">Biarkan kode unik kosong untuk auto-generate kode Crockford 6-karakter resmi.</div>
+                <button type="submit" style="background:#059669;color:#ffffff;font-size:11.5px;font-weight:700;padding:6px;border-radius:4px;border:none;cursor:pointer;margin-top:4px;">
+                  + Simpan &amp; Terbitkan Kelas
+                </button>
+              </form>
+            </div>
+          </details>
         </div>
       </div>
 
@@ -2908,13 +3260,16 @@ function renderTeacherSection(m) {
 
       <div style="background:var(--bg-subtle,#f8fafc);border:1px solid var(--card-border);border-radius:10px;padding:16px;margin-bottom:20px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;">
         <div>
-          <div style="font-size:11.5px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:var(--text-muted);margin-bottom:4px;">KODE KELAS AKTIF (UNIK OTOMATIS)</div>
-          <div style="display:flex;align-items:center;gap:12px;">
+          <div style="font-size:11.5px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:var(--text-muted);margin-bottom:4px;">
+            KODE KELAS AKTIF (PERMANEN DI BASIS DATA D1)
+          </div>
+          <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
             <code style="font-size:1.6rem;font-weight:800;letter-spacing:3px;color:var(--brand-gold);background:#ffffff;padding:6px 16px;border-radius:8px;border:1px dashed var(--card-border-hover);user-select:all;display:inline-block;">${esc(currentClass)}</code>
             <span style="font-size:12.5px;font-weight:700;color:#059669;background:#dcfce7;padding:4px 10px;border-radius:20px;">${filledCount} / 17 Mapel Terisi</span>
+            <span style="font-size:11.5px;font-weight:700;color:#0284c7;background:#e0f2fe;padding:4px 10px;border-radius:20px;">TERSIMPAN PERMANEN</span>
           </div>
           <div style="font-size:12px;color:var(--text-muted);margin-top:6px;">
-            Berikan 1 kode kelas di atas kepada murid. Di tab <b>KelasKu</b> murid, sistem otomatis menampilkan panel-panel mata pelajaran guru yang terdaftar.
+            Berikan 1 kode kelas di atas kepada murid. Di tab <b>KelasKu</b> murid, sistem otomatis menampilkan panel-panel mata pelajaran guru yang terdaftar. Kode kelas ini permanen dan tersimpan aman di basis data D1. Memuat ulang atau me-refresh halaman tidak akan mengubah kode unik kelas ini.
           </div>
         </div>
       </div>
@@ -2928,7 +3283,7 @@ function renderTeacherSection(m) {
     </div>
   `;
 
-  // Formulir pembuatan token mandiri / manual (Kompatibilitas 100% dengan owner-teacher-panel-test)
+  // --- 3. FORMULIR PEMBUATAN TOKEN MANDIRI / MANUAL ---
   const formMint = `
     <div style="background:#fff;border:1px solid var(--line);border-radius:12px;padding:18px;margin-bottom:20px;">
       <h3 style="margin-top:0;margin-bottom:6px;color:var(--ink);">+ Buat Undangan &amp; Token Guru Baru (Form Mandiri)</h3>
@@ -2937,18 +3292,23 @@ function renderTeacherSection(m) {
       </div>
       <form method="GET" action="/" style="display:grid;grid-template-columns:repeat(auto-fit, minmax(200px, 1fr));gap:12px;align-items:end;">
         <input type="hidden" name="action" value="mint_teacher">
+        <input type="hidden" name="cls" value="${esc(currentClass)}">
         <div>
           <label for="f_teacherName" style="display:block;font-size:12px;font-weight:bold;margin-bottom:4px;color:var(--ink);">Nama Guru</label>
           <input id="f_teacherName" name="teacherName" type="text" placeholder="Contoh: Mardhiana Hamzah" maxlength="60" required>
         </div>
         <div>
           <label for="f_institution" style="display:block;font-size:12px;font-weight:bold;margin-bottom:4px;color:var(--ink);">Nama Sekolah / Instansi</label>
-          <input id="f_institution" name="institution" type="text" placeholder="Contoh: MTsN 5 ACEH BESAR" maxlength="80" required>
+          <input id="f_institution" name="institution" list="schools_list_mint" type="text" placeholder="Contoh: MTsN 5 ACEH BESAR" maxlength="80" required>
+          <datalist id="schools_list_mint">
+            ${schools.map(sch => `<option value="${esc(sch.name)}">${esc(sch.name)}</option>`).join('')}
+          </datalist>
         </div>
         <div>
           <label for="f_institutionType" style="display:block;font-size:12px;font-weight:bold;margin-bottom:4px;color:var(--ink);">Jenis Instansi</label>
           <select id="f_institutionType" name="institutionType">
             <option value="school" selected>Sekolah (school)</option>
+            <option value="madrasah">Madrasah (madrasah)</option>
             <option value="tutoring">Bimbel (tutoring)</option>
             <option value="course">Kursus (course)</option>
             <option value="other">Lainnya (other)</option>
@@ -2967,15 +3327,7 @@ function renderTeacherSection(m) {
         <div>
           <label for="f_subject" style="display:block;font-size:12px;font-weight:bold;margin-bottom:4px;color:var(--ink);">Mata Pelajaran yang Diampu</label>
           <select id="f_subject" name="subject_id">
-            <option value="MAT" selected>Matematika</option>
-            <option value="ENG">Bahasa Inggris</option>
-            <option value="IPA">Ilmu Pengetahuan Alam (IPA)</option>
-            <option value="IPS">Ilmu Pengetahuan Sosial (IPS)</option>
-            <option value="IND">Bahasa Indonesia</option>
-            <option value="INF">Informatika</option>
-            <option value="PKN">Pendidikan Pancasila</option>
-            <option value="SD-ALL">Guru Kelas SD (Tematik)</option>
-            <option value="ALL">Semua Mapel (Kurikulum/Kepsek)</option>
+            ${SUBJECTS_17.map(s => `<option value="${s.id}" ${s.id === 'MAT' ? 'selected' : ''}>${s.icon} ${esc(s.name)}</option>`).join('')}
           </select>
         </div>
         <div>
@@ -2998,11 +3350,12 @@ function renderTeacherSection(m) {
     </div>
   `;
 
-  // Formulir cabut manual
+  // --- 4. FORMULIR CABUT MANUAL ---
   const formRevokeManual = `
     <div style="background:#fff;border:1px dashed var(--line);border-radius:12px;padding:14px 16px;margin-bottom:20px;">
       <form method="GET" action="/" style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
         <input type="hidden" name="action" value="revoke_invite">
+        <input type="hidden" name="cls" value="${esc(currentClass)}">
         <label for="f_revoke_code" style="font-size:12px;font-weight:bold;color:var(--muted);white-space:nowrap;">Cabut Token Manual:</label>
         <input id="f_revoke_code" name="code" type="text" placeholder="Ketik atau tempel 32 karakter kode token Crockford" maxlength="32" required style="flex:1;min-width:240px;">
         <button type="submit" style="background:#c62828;color:#fff;box-shadow:0 2px 0 #8e1c1c;">Cabut Token</button>
@@ -3010,7 +3363,7 @@ function renderTeacherSection(m) {
     </div>
   `;
 
-  // Tabel daftar token
+  // --- 5. TABEL DAFTAR TOKEN GURU DENGAN EDIT LUAS ---
   let inviteTable = '';
   if (!invites.length) {
     inviteTable = `<div class="note">Belum ada token undangan yang dicetak.</div>`;
@@ -3039,17 +3392,9 @@ function renderTeacherSection(m) {
         tokenCodeCell = `<code style="color:var(--text-muted,#64748b);font-size:11px;" title="Hash token arsip">${esc((inv.codeHash || '').slice(0, 8))}…</code>`;
       }
 
-      const subjectOptions = [
-        ['MAT', 'Matematika'],
-        ['ENG', 'Bahasa Inggris'],
-        ['IPA', 'Ilmu Pengetahuan Alam (IPA)'],
-        ['IPS', 'Ilmu Pengetahuan Sosial (IPS)'],
-        ['IND', 'Bahasa Indonesia'],
-        ['INF', 'Informatika'],
-        ['PKN', 'Pendidikan Pancasila'],
-        ['SD-ALL', 'Guru Kelas SD (Tematik)'],
-        ['ALL', 'Semua Mapel']
-      ].map(([val, label]) => `<option value="${val}" ${curSub === val ? 'selected' : ''}>${esc(label)}</option>`).join('');
+      const subjectOptions = SUBJECTS_17.map((s) =>
+        `<option value="${s.id}" ${curSub === s.id ? 'selected' : ''}>${s.icon} ${esc(s.name)}</option>`
+      ).join('');
 
       const gradeOptions = [
         ['SMP', 'Fase D (SMP Kelas 7–9)'],
@@ -3063,35 +3408,84 @@ function renderTeacherSection(m) {
         const editDetails = `
           <details style="display:inline-block;position:relative;margin:2px;text-align:left;">
             <summary style="background:#0284c7;color:#fff;border:none;padding:3px 8px;border-radius:4px;font-size:11px;font-weight:bold;cursor:pointer;list-style:none;display:inline-block;">✏️ Edit</summary>
-            <div style="position:absolute;right:0;top:100%;z-index:30;background:#ffffff;border:1px solid #cbd5e1;border-radius:8px;padding:12px;box-shadow:0 8px 24px rgba(0,0,0,0.18);width:260px;margin-top:4px;">
-              <div style="font-weight:700;font-size:12px;margin-bottom:8px;color:var(--ink);">Ganti Mapel / Jenjang</div>
-              <form method="GET" action="/" style="margin:0;">
+            <div style="position:absolute;right:0;top:100%;z-index:50;background:#ffffff;border:2px solid #cbd5e1;border-radius:10px;padding:16px;box-shadow:0 12px 32px rgba(0,0,0,0.22);width:320px;margin-top:4px;">
+              <div style="font-weight:800;font-size:13px;margin-bottom:10px;color:var(--ink);border-bottom:1px solid #e2e8f0;padding-bottom:6px;">
+                ✏️ Edit Luas Data Guru &amp; Token
+              </div>
+              <form method="GET" action="/" style="margin:0;display:flex;flex-direction:column;gap:8px;">
                 <input type="hidden" name="action" value="update_invite">
                 <input type="hidden" name="codeHash" value="${esc(inv.codeHash)}">
-                <div style="margin-bottom:6px;">
-                  <label style="display:block;font-size:11px;font-weight:600;margin-bottom:2px;color:var(--ink);">Mata Pelajaran:</label>
+                <input type="hidden" name="cls" value="${esc(currentClass)}">
+                <div>
+                  <label style="display:block;font-size:11px;font-weight:700;margin-bottom:2px;color:#334155;">Nama Guru:</label>
+                  <input name="teacherName" type="text" value="${esc(inv.teacherName || '')}" maxlength="60" required style="width:100%;box-sizing:border-box;font-size:11px;padding:4px 6px;border:1px solid #cbd5e1;border-radius:4px;">
+                </div>
+                <div>
+                  <label style="display:block;font-size:11px;font-weight:700;margin-bottom:2px;color:#334155;">Sekolah / Instansi:</label>
+                  <input name="institution" type="text" value="${esc(inv.institution || '')}" maxlength="80" required style="width:100%;box-sizing:border-box;font-size:11px;padding:4px 6px;border:1px solid #cbd5e1;border-radius:4px;">
+                </div>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px;">
+                  <div>
+                    <label style="display:block;font-size:11px;font-weight:700;margin-bottom:2px;color:#334155;">Jenis Instansi:</label>
+                    <select name="institutionType" style="width:100%;font-size:10.5px;padding:3px;border:1px solid #cbd5e1;border-radius:4px;">
+                      <option value="school" ${inv.institutionType === 'school' ? 'selected' : ''}>Sekolah</option>
+                      <option value="madrasah" ${inv.institutionType === 'madrasah' ? 'selected' : ''}>Madrasah</option>
+                      <option value="tutoring" ${inv.institutionType === 'tutoring' ? 'selected' : ''}>Bimbel</option>
+                      <option value="course" ${inv.institutionType === 'course' ? 'selected' : ''}>Kursus</option>
+                      <option value="other" ${inv.institutionType === 'other' ? 'selected' : ''}>Lainnya</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label style="display:block;font-size:11px;font-weight:700;margin-bottom:2px;color:#334155;">Pindah Kode Kelas:</label>
+                    <input name="class_code" type="text" value="${esc(inv.classCode || currentClass)}" maxlength="16" style="width:100%;box-sizing:border-box;font-size:10.5px;padding:3px 5px;border:1px solid #cbd5e1;border-radius:4px;font-weight:700;color:var(--brand-gold);">
+                  </div>
+                </div>
+                <div>
+                  <label style="display:block;font-size:11px;font-weight:700;margin-bottom:2px;color:#334155;">Mata Pelajaran (17 Mapel):</label>
                   <select name="subject_id" style="width:100%;font-size:11px;padding:4px 6px;border:1px solid #cbd5e1;border-radius:4px;">
                     ${subjectOptions}
                   </select>
                 </div>
-                <div style="margin-bottom:8px;">
-                  <label style="display:block;font-size:11px;font-weight:600;margin-bottom:2px;color:var(--ink);">Jenjang / Fase:</label>
+                <div>
+                  <label style="display:block;font-size:11px;font-weight:700;margin-bottom:2px;color:#334155;">Jenjang / Fase:</label>
                   <select name="grade_id" style="width:100%;font-size:11px;padding:4px 6px;border:1px solid #cbd5e1;border-radius:4px;">
                     ${gradeOptions}
                   </select>
                 </div>
-                <div style="display:flex;justify-content:flex-end;">
-                  <button type="submit" style="background:#0284c7;color:#fff;border:none;padding:4px 10px;border-radius:4px;font-size:11px;font-weight:bold;cursor:pointer;">Simpan</button>
+                <div>
+                  <label style="display:block;font-size:11px;font-weight:700;margin-bottom:2px;color:#334155;">Perpanjang Masa Aktif Token:</label>
+                  <select name="extend_days" style="width:100%;font-size:11px;padding:4px 6px;border:1px solid #cbd5e1;border-radius:4px;">
+                    <option value="0" selected>Tidak diperpanjang (tetap)</option>
+                    <option value="30">+30 Hari (1 Bulan)</option>
+                    <option value="90">+90 Hari (3 Bulan)</option>
+                    <option value="180">+180 Hari (6 Bulan)</option>
+                    <option value="365">+365 Hari (1 Tahun)</option>
+                  </select>
+                </div>
+                <div style="display:flex;justify-content:flex-end;margin-top:6px;">
+                  <button type="submit" style="background:#0284c7;color:#fff;border:none;padding:6px 14px;border-radius:6px;font-size:11.5px;font-weight:bold;cursor:pointer;">
+                    💾 Simpan Perubahan Guru
+                  </button>
                 </div>
               </form>
             </div>
           </details>
         `;
 
+        const regenBtn = `
+          <form method="GET" action="/" style="display:inline;margin:2px;">
+            <input type="hidden" name="action" value="regenerate_invite">
+            <input type="hidden" name="codeHash" value="${esc(inv.codeHash)}">
+            <input type="hidden" name="cls" value="${esc(currentClass)}">
+            <button type="submit" style="background:#d97706;color:#fff;border:none;padding:3px 8px;border-radius:4px;font-size:11px;font-weight:bold;cursor:pointer;" title="Terbitkan token baru untuk guru ini dan cabut token lama">🔄 Regenerasi</button>
+          </form>
+        `;
+
         const revokeBtn = inv.status === 'ACTIVE' ? `
           <form method="GET" action="/" style="display:inline;margin:2px;">
             <input type="hidden" name="action" value="revoke_invite">
             <input type="hidden" name="codeHash" value="${esc(inv.codeHash)}">
+            <input type="hidden" name="cls" value="${esc(currentClass)}">
             <button type="submit" style="background:#c62828;color:#fff;border:none;padding:3px 8px;border-radius:4px;font-size:11px;font-weight:bold;cursor:pointer;" title="Cabut token ini">Cabut</button>
           </form>
         ` : '';
@@ -3100,11 +3494,12 @@ function renderTeacherSection(m) {
           <form method="GET" action="/" style="display:inline;margin:2px;">
             <input type="hidden" name="action" value="delete_invite">
             <input type="hidden" name="codeHash" value="${esc(inv.codeHash)}">
+            <input type="hidden" name="cls" value="${esc(currentClass)}">
             <button type="submit" style="background:#64748b;color:#fff;border:none;padding:3px 8px;border-radius:4px;font-size:11px;font-weight:bold;cursor:pointer;" title="Hapus token ini secara permanen">Hapus</button>
           </form>
         `;
 
-        actionCell = `${editDetails}${revokeBtn}${deleteBtn}`;
+        actionCell = `${editDetails}${regenBtn}${revokeBtn}${deleteBtn}`;
       }
 
       const createdStr = inv.createdAt ? wibDay(inv.createdAt) : '—';
@@ -3131,6 +3526,7 @@ function renderTeacherSection(m) {
           <form method="GET" action="/" style="margin:0;">
             <input type="hidden" name="action" value="clear_invites">
             <input type="hidden" name="mode" value="revoked">
+            <input type="hidden" name="cls" value="${esc(currentClass)}">
             <button type="submit" style="background:#f1f5f9;color:#334155;border:1px solid #cbd5e1;padding:4px 10px;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;">
               🧹 Bersihkan Token Dicabut / Kedaluwarsa
             </button>
@@ -3138,6 +3534,7 @@ function renderTeacherSection(m) {
           <form method="GET" action="/" style="margin:0;">
             <input type="hidden" name="action" value="clear_invites">
             <input type="hidden" name="mode" value="all">
+            <input type="hidden" name="cls" value="${esc(currentClass)}">
             <button type="submit" style="background:#fee2e2;color:#991b1b;border:1px solid #f87171;padding:4px 10px;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;">
               ⚠️ Hapus Semua Data Token
             </button>
@@ -3167,7 +3564,7 @@ function renderTeacherSection(m) {
     `;
   }
 
-  // Tabel daftar guru aktif
+  // --- 6. TABEL DAFTAR GURU TERDAFTAR & AKTIF DENGAN EDIT LUAS ---
   let teacherTable = '';
   if (!teachers.length) {
     teacherTable = `<div class="note">Belum ada akun guru yang menyelesaikan aktivasi token.</div>`;
@@ -3175,12 +3572,15 @@ function renderTeacherSection(m) {
     const tRows = teachers.map((tc) => {
       const actDate = tc.activatedAt ? wibDay(tc.activatedAt) : '—';
       const cCode = tc.classCode || '—';
+      const curSub = tc.subject_id || tc.subjectId || 'MAT';
+      const curGrd = tc.grade_id || tc.gradeId || 'SMP';
+
       return `<tr>
         <td><code>${esc(tc.handle || '—')}</code></td>
         <td><b>${esc(tc.teacherName || '—')}</b></td>
         <td>${esc(tc.institution || '—')}</td>
         <td>${esc(tc.institutionType || '—')}</td>
-        <td><span style="background:#e0f2fe;color:#0369a1;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;">${esc(subjectName(tc.subject_id || tc.subjectId))}</span><small style="color:var(--text-muted);display:block;margin-top:2px;">${esc(gradeName(tc.grade_id || tc.gradeId))}</small></td>
+        <td><span style="background:#e0f2fe;color:#0369a1;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;">${esc(subjectName(curSub))}</span><small style="color:var(--text-muted);display:block;margin-top:2px;">${esc(gradeName(curGrd))}</small></td>
         <td><code style="font-weight:700;color:var(--brand-gold);">${esc(cCode)}</code></td>
         <td><span style="background:#e8f5e9;color:#2e7d32;padding:2px 8px;border-radius:10px;font-weight:bold;font-size:11px;">${esc(tc.status || 'active')}</span></td>
         <td>${esc(actDate)}</td>
@@ -3211,6 +3611,10 @@ function renderTeacherSection(m) {
   }
 
   return `
+    <section>
+      <span class="card-full-inner" id="school-panel" style="scroll-margin-top:80px;display:block;"></span>
+      ${schoolSection}
+    </section>
     <section>
       <span class="card-full-inner" id="teachers" style="scroll-margin-top:80px;display:block;"></span>
       <h2><span>${ICONS.teacher} Kelola Token &amp; Undangan Guru</span><span class="section-badge">Manajemen Akses</span></h2>
@@ -3368,6 +3772,10 @@ function renderDashboard(m) {
         </a>
 
         <div class="sidebar-heading">ADMINISTRASI &amp; KELAS</div>
+        <a href="#school-panel" class="sidebar-link">
+          <span class="sidebar-icon">🏢</span>
+          <span class="sidebar-text">Panel Sekolah (Mitra)</span>
+        </a>
         <a href="#class-panel" class="sidebar-link">
           <span class="sidebar-icon">🏫</span>
           <span class="sidebar-text">Panel Kelas (17 Mapel)</span>
@@ -3744,17 +4152,27 @@ function renderLogin(message) {
 }
 
 function html(body, status, extraHeaders) {
+  const headers = new Headers({
+    'content-type': 'text/html; charset=utf-8',
+    'cache-control': 'no-store',
+    'x-robots-tag': 'noindex, nofollow',
+    'referrer-policy': 'no-referrer',
+    'x-content-type-options': 'nosniff',
+    // Tanpa CDN dan tanpa framework, jadi CSP bisa seketat ini.
+    'content-security-policy': "default-src 'none'; style-src 'unsafe-inline'; img-src data:; form-action 'self'; base-uri 'none'; frame-ancestors 'none'",
+  });
+  if (extraHeaders) {
+    for (const [k, v] of Object.entries(extraHeaders)) {
+      if (Array.isArray(v)) {
+        for (const item of v) headers.append(k, item);
+      } else if (v != null) {
+        headers.set(k, String(v));
+      }
+    }
+  }
   return new Response(body, {
     status: status || 200,
-    headers: Object.assign({
-      'content-type': 'text/html; charset=utf-8',
-      'cache-control': 'no-store',
-      'x-robots-tag': 'noindex, nofollow',
-      'referrer-policy': 'no-referrer',
-      'x-content-type-options': 'nosniff',
-      // Tanpa CDN dan tanpa framework, jadi CSP bisa seketat ini.
-      'content-security-policy': "default-src 'none'; style-src 'unsafe-inline'; img-src data:; form-action 'self'; base-uri 'none'; frame-ancestors 'none'",
-    }, extraHeaders || {}),
+    headers,
   });
 }
 
@@ -4331,11 +4749,14 @@ async function handle(request, env, ctx, nowMs) {
           message: 'Token guru berhasil dibuat! Simpan/salin sekarang karena token hanya ditampilkan satu kali.'
         };
       } else {
+        const errDetail = (mintRes.body && (mintRes.body.reason || mintRes.body.error)) || mintRes.state;
         teacherAction = {
           ok: false,
           action: 'mint',
-          error: (mintRes.body && mintRes.body.error) || mintRes.state,
-          message: 'Gagal membuat token guru. Periksa kembali nama guru, instansi, dan jenis instansi.'
+          error: errDetail,
+          message: mintRes.body && mintRes.body.reason
+            ? `Gagal membuat token guru: ${mintRes.body.reason}`
+            : 'Gagal membuat token guru. Periksa kembali nama guru, instansi, dan jenis instansi.'
         };
       }
     } else if (action === 'revoke_invite') {
@@ -4357,18 +4778,24 @@ async function handle(request, env, ctx, nowMs) {
           message: 'Gagal mencabut token guru. Periksa format kode token.'
         };
       }
-    } else if (action === 'update_invite') {
+    } else if (action === 'update_invite' || action === 'update_teacher_full') {
       const codeHash = url.searchParams.get('codeHash') || '';
       const subject_id = url.searchParams.get('subject_id') || '';
       const grade_id = url.searchParams.get('grade_id') || '';
       const teacherName = url.searchParams.get('teacherName') || '';
       const institution = url.searchParams.get('institution') || '';
-      const updateRes = await updateTeacherInvite(env, { codeHash, subject_id, grade_id, teacherName, institution }, fetchImpl);
+      const institutionType = url.searchParams.get('institutionType') || '';
+      const class_code = url.searchParams.get('class_code') || '';
+      const school_id = url.searchParams.get('school_id') || '';
+      const extend_days = url.searchParams.get('extend_days') || '';
+      const updateRes = await updateTeacherInvite(env, {
+        codeHash, subject_id, grade_id, teacherName, institution, institutionType, class_code, school_id, extend_days
+      }, fetchImpl);
       if (updateRes.state === 'ok' && updateRes.body && updateRes.body.ok) {
         teacherAction = {
           ok: true,
           action: 'update',
-          message: 'Data token guru berhasil diperbarui (Mata pelajaran / Jenjang telah diubah).'
+          message: 'Data profil guru, mapel, jenjang, sekolah, dan masa aktif token berhasil diperbarui.'
         };
       } else {
         teacherAction = {
@@ -4376,6 +4803,112 @@ async function handle(request, env, ctx, nowMs) {
           action: 'update',
           error: (updateRes.body && updateRes.body.error) || updateRes.state,
           message: 'Gagal memperbarui data token guru.'
+        };
+      }
+    } else if (action === 'regenerate_invite') {
+      const codeHash = url.searchParams.get('codeHash') || '';
+      const regenRes = await regenerateTeacherInvite(env, { codeHash }, fetchImpl);
+      if (regenRes.state === 'ok' && regenRes.body && regenRes.body.code) {
+        teacherAction = {
+          ok: true,
+          action: 'regenerate',
+          code: regenRes.body.code,
+          invite: regenRes.body.invite,
+          message: 'Token baru berhasil diregenerasi! Token lama telah dicabut. Salin kode token baru sekarang.'
+        };
+      } else {
+        teacherAction = {
+          ok: false,
+          action: 'regenerate',
+          error: (regenRes.body && regenRes.body.error) || regenRes.state,
+          message: 'Gagal meregenerasi token guru.'
+        };
+      }
+    } else if (action === 'create_school') {
+      const name = url.searchParams.get('name') || '';
+      const npsn = url.searchParams.get('npsn') || '';
+      const level = url.searchParams.get('level') || 'SMP';
+      const type = url.searchParams.get('type') || 'school';
+      const city = url.searchParams.get('city') || '';
+      const address = url.searchParams.get('address') || '';
+      const principal_name = url.searchParams.get('principal_name') || '';
+      const contact = url.searchParams.get('contact') || '';
+      const schRes = await createSchool(env, { name, npsn, level, type, city, address, principal_name, contact }, fetchImpl);
+      if (schRes.state === 'ok' && schRes.body && schRes.body.ok) {
+        teacherAction = {
+          ok: true,
+          action: 'school',
+          message: `Sekolah mitra "${name}" berhasil didaftarkan (ID: ${schRes.body.id}).`
+        };
+      } else {
+        teacherAction = {
+          ok: false,
+          action: 'school',
+          error: (schRes.body && schRes.body.error) || schRes.state,
+          message: 'Gagal mendaftarkan sekolah mitra. Pastikan nama sekolah terisi.'
+        };
+      }
+    } else if (action === 'update_school') {
+      const id = url.searchParams.get('id') || '';
+      const name = url.searchParams.get('name') || '';
+      const npsn = url.searchParams.get('npsn') || '';
+      const level = url.searchParams.get('level') || 'SMP';
+      const type = url.searchParams.get('type') || 'school';
+      const city = url.searchParams.get('city') || '';
+      const address = url.searchParams.get('address') || '';
+      const principal_name = url.searchParams.get('principal_name') || '';
+      const contact = url.searchParams.get('contact') || '';
+      const schRes = await updateSchool(env, { id, name, npsn, level, type, city, address, principal_name, contact }, fetchImpl);
+      if (schRes.state === 'ok' && schRes.body && schRes.body.ok) {
+        teacherAction = {
+          ok: true,
+          action: 'school',
+          message: 'Data sekolah mitra berhasil diperbarui.'
+        };
+      } else {
+        teacherAction = {
+          ok: false,
+          action: 'school',
+          error: (schRes.body && schRes.body.error) || schRes.state,
+          message: 'Gagal memperbarui data sekolah mitra.'
+        };
+      }
+    } else if (action === 'delete_school') {
+      const id = url.searchParams.get('id') || '';
+      const schRes = await deleteSchool(env, { id }, fetchImpl);
+      if (schRes.state === 'ok' && schRes.body && schRes.body.ok) {
+        teacherAction = {
+          ok: true,
+          action: 'school',
+          message: 'Sekolah mitra berhasil dihapus.'
+        };
+      } else {
+        teacherAction = {
+          ok: false,
+          action: 'school',
+          error: (schRes.body && schRes.body.error) || schRes.state,
+          message: 'Gagal menghapus sekolah mitra.'
+        };
+      }
+    } else if (action === 'create_class') {
+      const title = url.searchParams.get('title') || 'Kelas';
+      const level = url.searchParams.get('level') || 'SMP';
+      const school_id = url.searchParams.get('school_id') || '';
+      const code = url.searchParams.get('code') || '';
+      const clsRes = await createClass(env, { title, level, school_id, code }, fetchImpl);
+      if (clsRes.state === 'ok' && clsRes.body && clsRes.body.ok) {
+        teacherAction = {
+          ok: true,
+          action: 'class',
+          code: clsRes.body.code,
+          message: `Kelas baru "${clsRes.body.title}" (${clsRes.body.code}) berhasil dibuat dan disimpan permanen di basis data D1.`
+        };
+      } else {
+        teacherAction = {
+          ok: false,
+          action: 'class',
+          error: (clsRes.body && clsRes.body.error) || clsRes.state,
+          message: 'Gagal membuat kelas baru.'
         };
       }
     } else if (action === 'delete_invite') {
@@ -4422,9 +4955,58 @@ async function handle(request, env, ctx, nowMs) {
     if (teacherAction) {
       model.teacherAction = teacherAction;
     }
-    model.selectedClass = url.searchParams.get('cls') || '';
+
+    // Resolusi daftar kelas yang persisten dari tc_class, invites, dan teachers
+    const dbClasses = (model.classes && model.classes.classes) || [];
+    const knownClassSet = new Set();
+    dbClasses.forEach((c) => { if (c.code) knownClassSet.add(c.code); });
+    (model.teachers && model.teachers.invites || []).forEach((i) => { if (i.classCode) knownClassSet.add(i.classCode); });
+    (model.teachers && model.teachers.teachers || []).forEach((t) => { if (t.classCode) knownClassSet.add(t.classCode); });
+
+    // Jika database tc_class benar-benar kosong, otomatis terbitkan kelas awal di D1 agar tersimpan permanen
+    if (dbClasses.length === 0 && knownClassSet.size === 0) {
+      try {
+        const autoInit = await createClass(env, {
+          title: 'Kelas 7-A (Utama)',
+          level: 'SMP',
+          code: 'FZ-MERDEKA1'
+        }, fetchImpl);
+        if (autoInit && autoInit.body && autoInit.body.code) {
+          knownClassSet.add(autoInit.body.code);
+          dbClasses.push({
+            code: autoInit.body.code,
+            title: 'Kelas 7-A (Utama)',
+            level: 'SMP'
+          });
+        }
+      } catch (_) {}
+    }
+
+    const classArray = Array.from(knownClassSet);
+    const cookieCls = cookieValue(request, 'fz_cls');
+    const paramCls = url.searchParams.get('cls');
+
+    // Tentukan kelas aktif secara stabil (TIDAK PERNAH ACAK SAAT REFRESH!)
+    let activeClass = '';
+    if (teacherAction && teacherAction.action === 'class' && teacherAction.code) {
+      activeClass = teacherAction.code;
+    } else if (paramCls && knownClassSet.has(paramCls)) {
+      activeClass = paramCls;
+    } else if (paramCls && /^FZ-[A-Z0-9]{4,10}$/.test(paramCls)) {
+      activeClass = paramCls;
+    } else if (cookieCls && knownClassSet.has(cookieCls)) {
+      activeClass = cookieCls;
+    } else if (classArray.length > 0) {
+      activeClass = classArray[0];
+    } else {
+      activeClass = 'FZ-MERDEKA1';
+    }
+
+    model.selectedClass = activeClass;
     model.isNewClass = url.searchParams.get('new_class') === '1';
-    return html(renderDashboard(model), 200, { 'set-cookie': refreshed });
+
+    const classCookie = `fz_cls=${encodeURIComponent(activeClass)}; Path=/; Max-Age=31536000; SameSite=Lax; HttpOnly`;
+    return html(renderDashboard(model), 200, { 'set-cookie': [refreshed, classCookie] });
   }
   if (path === '/api/summary') {
     const model = await readModel(env, period, now);
@@ -4608,6 +5190,7 @@ export {
   readLearners, readLearnerDetail, sanitizeLearnerRow, sanitizeLearnerSummary,
   renderLearnerSection, renderLearnerDirectory, renderLearnerDetail, learnerLabel, SUB_RE,
   readTeachers, mintTeacherInvite, revokeTeacherInvite, updateTeacherInvite, deleteTeacherInvite, renderTeacherSection,
+  readSchools, createSchool, updateSchool, deleteSchool, readClasses, createClass, regenerateTeacherInvite,
   // Rem penebakan halaman masuk: diekspor supaya gerbang bisa memodelkan ISOLATE BARU per
   // permintaan (cacat yang tidak pernah diuji) dan mengassert angka jendelanya sebagai kontrak.
   LOGIN_MAX, LOGIN_MAX_SHARED, LOGIN_BUCKET_MS, LOGIN_WINDOW_BUCKETS, LOGIN_WINDOW_MS,

@@ -39,6 +39,7 @@ import { codeWellFormed, hashCode, checkRedeemable, INVITE_PROBLEM } from './aut
 import {
   signCurriculumTicket, TICKET_KEY_ENV, TICKET_KEY_MIN_LENGTH
 } from './auth/curriculum-ticket.js';
+import { ensureTeacherInviteColumns } from './route-owner-teachers.js';
 
 /**
  * Hash boneka untuk menyamakan biaya jalur "handle tidak ada". Nilainya adalah
@@ -363,6 +364,7 @@ export async function routeTeacherActivate(ctx) {
   const db = coreDb(ctx.env);
   if (!db) return jsonError(503, ERR.INTERNAL, {}, { headers: ctx.corsHeaders });
   await ensureAuthSchema(db);
+  await ensureTeacherInviteColumns(db);
 
   const opt = { headers: ctx.corsHeaders };
   const body = await readJsonFromCtx(ctx, opt);
