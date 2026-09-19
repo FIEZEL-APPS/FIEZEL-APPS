@@ -1,7 +1,7 @@
 {
-  "version": "m025-332",
+  "version": "m025-334",
   "claimedBy": "branch main",
-  "claimedAt": "2026-09-19T09:02:51.127Z",
-  "reason": "tambah penafian resmi kepatuhan BSKAP 032/H/KR/2024 dan otonomi KOSP pendidik",
+  "claimedAt": "2026-09-19T09:11:10.569Z",
+  "reason": "humanize bank soal UI/UX & teacher guidance",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }

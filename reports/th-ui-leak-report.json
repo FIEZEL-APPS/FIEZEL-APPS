@@ -1,6 +1,6 @@
 {
   "schema": "fiezel-th-ui-leak-v1",
-  "generatedAt": "2026-09-19T09:02:58.508Z",
+  "generatedAt": "2026-09-19T09:11:14.035Z",
   "files": {
     "app.js": {
       "leaks": 3,
@@ -147,8 +147,8 @@
       ]
     },
     "features/curriculum/teacher-console.js": {
-      "leaks": 43,
-      "budget": 43,
+      "leaks": 41,
+      "budget": 41,
       "sample": [
         {
           "line": 34,
@@ -468,8 +468,8 @@
     }
   },
   "copyKeys": {
-    "id": 2672,
-    "th": 2674,
+    "id": 2709,
+    "th": 2711,
     "idTanpaTh": 0
   },
   "pass": true

@@ -429,10 +429,19 @@
 
   // ---------------- 4. Bank soal ----------------
   function vBank() {
-    if (!S.questions.length && !S.bankLoaded) { loadBank(); return head('Bank Soal', 'Memuat…'); }
-    return head('Bank Soal', 'Setiap soal punya DNA kurikulum', 'Soal adalah alat ukur; objek kanoniknya adalah KOMPETENSI.') +
+    if (!S.questions.length && !S.bankLoaded) { loadBank(); return head(t('kurikulum.bank-head-kicker', 'Bank Soal'), t('kurikulum.bank-head-memuat', 'Memuat…')); }
+    return head(t('kurikulum.bank-head-kicker', 'Bank Soal'), t('kurikulum.bank-head-title', 'Gudang Soal & Kurasi Mandiri'), t('kurikulum.bank-head-sub', 'Kelola bank soal kurikulum, buat soal baru secara manual, atau impor dari file naskah.')) +
+      '<div class="card ink" style="margin-bottom:18px;border-left:4px solid #38bdf8" data-testid="bank-guide-card">' +
+      '<p class="kicker" style="color:#38bdf8">' + esc(t('kurikulum.bank-guide-kicker', '💡 Petunjuk Guru')) + '</p>' +
+      '<h3 style="margin:4px 0 8px">' + esc(t('kurikulum.bank-guide-title', 'Pusat Kurasi & Bank Soal')) + '</h3>' +
+      '<p class="muted" style="margin:0 0 10px;font-size:13px;line-height:1.5">' +
+      esc(t('kurikulum.bank-guide-desc', 'Seluruh kompetensi kurikulum sudah dilengkapi bank soal siap pakai. Jika Anda hanya ingin membuat kuis atau asesmen untuk kelas, Anda TIDAK PERLU menyusun soal manual di sini — cukup buka tab Asesmen dan gunakan Template Cepat 1-Klik.')) +
+      '</p>' +
+      '<button class="btn sm primary" data-a="view" data-v="assessment" data-testid="bank-to-as-btn">' + esc(t('kurikulum.bank-to-assessment', '⚡ Buka Tab Asesmen (Buat Kuis 1-Klik)')) + '</button>' +
+      '</div>' +
+
       '<div class="grid g3">' +
-      '<div class="card" data-testid="manual-card"><p class="kicker">A · Manual</p><h3>Buat soal</h3>' +
+      '<div class="card" data-testid="manual-card"><p class="kicker">' + esc(t('kurikulum.bank-kicker-manual', 'Tulis Manual')) + '</p><h3>' + esc(t('kurikulum.bank-title-manual', 'Buat 1 Soal Baru')) + '</h3>' +
       compSelect('mqComp') +
       '<label class="f">Pertanyaan<textarea id="mqStem" data-testid="q-stem"></textarea></label>' +
       '<label class="f">Opsi A<input id="mqA" data-testid="q-a"></label>' +
@@ -448,30 +457,30 @@
       '<button class="btn primary sm" data-a="create-q" data-testid="create-q-btn">Simpan sebagai draf</button></div>' +
       '<div id="qIssues"></div></div>' +
 
-      '<div class="card" data-testid="paste-card"><p class="kicker">C · Copy/Paste</p><h3>Tempel banyak soal</h3>' +
+      '<div class="card" data-testid="paste-card"><p class="kicker">' + esc(t('kurikulum.bank-kicker-paste', 'Salin & Tempel')) + '</p><h3>' + esc(t('kurikulum.bank-title-paste', 'Tempel Banyak Soal Sekaligus')) + '</h3>' +
       '<p class="muted" style="font-size:13px">Format: nomor, pertanyaan, opsi A–D, lalu <span class="mono">Jawaban: B</span> dan <span class="mono">Penjelasan: …</span></p>' +
       compSelect('pasteComp') +
       '<label class="f">Tempelan<textarea id="pasteText" style="min-height:160px" data-testid="paste-text"></textarea></label>' +
       '<button class="btn primary sm" data-a="import-paste" data-testid="import-paste-btn">Parse ke antrean tinjau</button></div>' +
 
-      '<div class="card" data-testid="import-card"><p class="kicker">B & D · Import</p><h3>Excel / CSV / PDF / TXT</h3>' +
+      '<div class="card" data-testid="import-card"><p class="kicker">' + esc(t('kurikulum.bank-kicker-import', 'Impor Dokumen')) + '</p><h3>' + esc(t('kurikulum.bank-title-import', 'Unggah Excel / CSV / PDF / TXT')) + '</h3>' +
       compSelect('fileComp') +
       '<label class="f">Berkas<input type="file" id="impFile" accept=".csv,.xlsx,.pdf,.txt,.md" data-testid="import-file"></label>' +
       '<button class="btn primary sm" data-a="import-file" data-testid="import-file-btn">Unggah & parse</button>' +
       '<p class="muted" style="font-size:13px;margin-top:8px">Hasil parsing WAJIB ditinjau guru sebelum aktif.</p>' +
       '<button class="btn ghost sm" data-a="csv-template" data-testid="csv-template-btn">Lihat template kolom CSV</button>' +
       '<hr style="border:none;border-top:1px solid var(--line);margin:16px 0">' +
-      '<p class="kicker">E · Kandidat dari Braincore</p>' +
+      '<p class="kicker">' + esc(t('kurikulum.bank-kicker-ai', 'Bantuan AI')) + '</p>' +
       compSelect('genComp') +
       '<button class="btn clay sm" data-a="generate" data-testid="generate-btn">Buat kandidat soal</button>' +
       '<p class="muted" style="font-size:13px;margin-top:8px">Kandidat tidak pernah langsung terbit — hanya guru yang menerbitkan.</p></div>' +
       '</div>' +
 
-      '<div class="card" data-testid="review-queue"><div class="row between"><div><p class="kicker">Antrean tinjau</p><h3>Menunggu keputusan guru</h3></div>' +
+      '<div class="card" data-testid="review-queue"><div class="row between"><div><p class="kicker">' + esc(t('kurikulum.bank-kicker-queue', 'Antrean Kurasi')) + '</p><h3>' + esc(t('kurikulum.bank-title-queue', 'Menunggu Keputusan Guru')) + '</h3></div>' +
       '<button class="btn ghost sm" data-a="reload-bank">Muat ulang</button></div>' +
       (S.reviewQueue.length ? S.reviewQueue.map(qCard).join('') : '<p class="muted">Antrean bersih.</p>') + '</div>' +
 
-      '<div class="card" data-testid="question-list"><div class="row between"><div><p class="kicker">Bank soal terbit</p><h3>' + S.questions.length + ' soal</h3></div>' +
+      '<div class="card" data-testid="question-list"><div class="row between"><div><p class="kicker">' + esc(t('kurikulum.bank-kicker-published', 'Koleksi Siap Pakai')) + '</p><h3>' + S.questions.length + ' ' + esc(t('kurikulum.bank-soal-satuan', 'soal aktif')) + '</h3></div>' +
       '<label class="f" style="width:280px;margin:0">Filter TP<select data-a="filter-tp" data-testid="filter-tp"><option value="">Semua TP</option>' + tpOptions(S.filterTp) + '</select></label></div>' +
       (S.questions.length ? S.questions.map(qCard).join('') : '<p class="muted">Belum ada soal.</p>') + '</div>';
   }
@@ -488,20 +497,55 @@
     var issues = q.issues || [];
     var st = q.status;
     var cls = st === 'PUBLISHED' ? 'good' : st === 'APPROVED' ? 'info' : st === 'ARCHIVED' ? 'mute' : 'warn';
+    var diffMap = {
+      1: t('kurikulum.diff-1', 'Sangat Mudah'),
+      2: t('kurikulum.diff-2', 'Mudah'),
+      3: t('kurikulum.diff-3', 'Sedang'),
+      4: t('kurikulum.diff-4', 'Sulit / HOTS'),
+      5: t('kurikulum.diff-5', 'Sangat Sulit / Olimpiade')
+    };
+    var diffLabel = diffMap[q.difficulty] || ('D' + q.difficulty);
+    var cogMap = {
+      C1: t('kurikulum.cog-c1-short', 'Mengingat (C1)'),
+      C2: t('kurikulum.cog-c2-short', 'Memahami (C2)'),
+      C3: t('kurikulum.cog-c3-short', 'Menerapkan (C3)'),
+      C4: t('kurikulum.cog-c4-short', 'Menganalisis (C4)'),
+      C5: t('kurikulum.cog-c5-short', 'Mengevaluasi (C5)'),
+      C6: t('kurikulum.cog-c6-short', 'Mencipta (C6)')
+    };
+    var cogLabel = cogMap[q.cognitive_level] || esc(q.cognitive_level);
+    var stMap = {
+      PUBLISHED: t('kurikulum.st-published', 'Siap Pakai'),
+      APPROVED: t('kurikulum.st-approved', 'Disetujui'),
+      REVIEW: t('kurikulum.st-review', 'Menunggu Tinjauan'),
+      DRAFT: t('kurikulum.st-draft', 'Draf'),
+      ARCHIVED: t('kurikulum.st-archived', 'Diarsipkan')
+    };
+    var stLabel = stMap[st] || st;
+
     return '<div class="card tight" style="margin-top:10px" data-testid="q-' + esc(q.question_id) + '">' +
-      '<div class="row between"><span class="pill ' + cls + '">' + esc(st) + ' v' + q.version + '</span>' +
-      '<span class="mono muted">' + esc(q.question_id) + ' · ' + esc(q.tp_id || '-') + ' · D' + q.difficulty + ' · ' + esc(q.cognitive_level) + (q.is_transfer ? ' · TRANSFER' : '') + '</span></div>' +
+      '<div class="row between" style="align-items:flex-start;gap:8px">' +
+      '<div><span class="pill ' + cls + '">' + esc(stLabel) + ' · v' + q.version + '</span>' +
+      (q.is_transfer ? ' <span class="pill info">' + esc(t('kurikulum.pill-transfer', 'Soal Kontekstual')) + '</span>' : '') + '</div>' +
+      '<div style="text-align:right;font-size:12px;color:var(--text-muted)">' +
+      '<span>' + esc(diffLabel) + ' · ' + esc(cogLabel) + '</span><br>' +
+      '<span class="mono" style="font-size:11px;opacity:0.75">ID: ' + esc(q.question_id) + (q.tp_id ? ' · ' + esc(q.tp_id) : '') + '</span>' +
+      '</div></div>' +
       '<p style="margin:8px 0 4px"><b>' + esc(q.stem) + '</b></p>' +
-      (q.options && q.options.length ? '<p class="muted mono">' + q.options.map(function (o, i) { return String.fromCharCode(65 + i) + '. ' + esc(o); }).join(' · ') + ' → kunci ' + esc(q.answer_key) + '</p>' : '') +
+      (q.options && q.options.length ? '<p class="muted mono" style="font-size:13px;line-height:1.6">' + q.options.map(function (o, i) { return String.fromCharCode(65 + i) + '. ' + esc(o); }).join('  ·  ') + ' <span style="color:var(--good, #10b981);font-weight:bold">→ Kunci: ' + esc(q.answer_key) + '</span></p>' : '') +
       '<p class="muted" style="font-size:13px">' + esc(q.competency_name || '') + (q.explanation ? ' · ' + esc(q.explanation.slice(0, 110)) : '') + '</p>' +
-      issues.map(function (i) { return '<div class="issue ' + i.level + '">' + esc(i.message) + '</div>'; }).join('') +
-      '<div class="row">' +
+      issues.map(function (i) { return '<div class="issue ' + i.level + '" style="font-size:12px;margin:6px 0;display:flex;align-items:center;gap:6px"><span>💡</span><span>' + esc(i.message) + '</span></div>'; }).join('') +
+      '<div class="row" style="margin-top:8px">' +
       (st !== 'PUBLISHED' ? '<button class="btn primary sm" data-a="q-review" data-q="' + esc(q.question_id) + '" data-act="publish" data-testid="publish-' + esc(q.question_id) + '">Terbitkan</button>' : '') +
       (st === 'DRAFT' || st === 'REVIEW' ? '<button class="btn sm" data-a="q-review" data-q="' + esc(q.question_id) + '" data-act="approve">Setujui</button>' : '') +
+      '<details class="curation-tools" style="display:inline-block;margin-left:auto">' +
+      '<summary style="cursor:pointer;font-size:12px;color:var(--text-muted);user-select:none;padding:4px 8px">' + esc(t('kurikulum.btn-curation-options', 'Opsi kurasi & varian soal…')) + '</summary>' +
+      '<div class="row" style="margin-top:6px;gap:6px">' +
       '<button class="btn ghost sm" data-a="q-variants" data-q="' + esc(q.question_id) + '" data-testid="variants-' + esc(q.question_id) + '">Buat varian</button>' +
       '<button class="btn ghost sm" data-a="q-transfer" data-q="' + esc(q.question_id) + '">Buat varian transfer</button>' +
       '<button class="btn ghost sm" data-a="q-history" data-q="' + esc(q.question_id) + '">Riwayat versi</button>' +
       (st !== 'ARCHIVED' ? '<button class="btn ghost sm" data-a="q-review" data-q="' + esc(q.question_id) + '" data-act="archive">Arsipkan</button>' : '') +
+      '</div></details>' +
       '</div></div>';
   }
 
