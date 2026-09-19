@@ -499,3 +499,176 @@ body.reduce-motion .ch-student,body.reduce-motion .ch-body,body.reduce-motion .c
   color: var(--ch-muted);
 }
 
+/* ==========================================================================
+   Panel Mata Pelajaran KelasKu (17 Mapel / Subject Panels)
+   ========================================================================== */
+.ch-subject-panels-wrap {
+  margin: 6px 0 14px;
+}
+.ch-subject-panels-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 10px;
+  margin-bottom: 10px;
+  flex-wrap: wrap;
+}
+.ch-subject-panels-head .ch-h3 {
+  font-size: 1.05rem;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.ch-subject-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 10px;
+}
+.ch-subject-card {
+  background: var(--ch-bg);
+  border: 1.5px solid var(--ch-line);
+  border-radius: 16px;
+  padding: 14px;
+  text-align: left;
+  cursor: pointer;
+  transition: transform .18s, border-color .18s, box-shadow .18s;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  position: relative;
+  overflow: hidden;
+}
+.ch-subject-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: var(--mapel-color, var(--ch-accent));
+}
+.ch-subject-card:hover {
+  transform: translateY(-2px);
+  border-color: var(--mapel-color, var(--ch-accent));
+  box-shadow: 0 10px 24px -14px rgba(0, 0, 0, 0.25);
+}
+.ch-subject-card.is-active {
+  border-color: var(--mapel-color, var(--ch-accent));
+  background: linear-gradient(180deg, rgba(255, 243, 220, 0.45) 0%, var(--ch-bg) 100%);
+  box-shadow: 0 0 0 1px var(--mapel-color, var(--ch-accent)), 0 8px 20px -10px rgba(0, 0, 0, 0.2);
+}
+.ch-subject-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+}
+.ch-subject-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 10px;
+  background: var(--ch-soft);
+  display: grid;
+  place-items: center;
+  color: var(--mapel-color, var(--ch-accent));
+  flex: none;
+}
+.ch-subject-icon i, .ch-subject-icon svg {
+  width: 18px;
+  height: 18px;
+}
+.ch-badge.is-warn {
+  background: #C2410C;
+  color: #fff;
+}
+.ch-badge.is-ok {
+  background: var(--ch-ok-soft);
+  color: var(--ch-ok);
+  font-weight: 700;
+}
+.ch-subject-name {
+  margin: 0;
+  font-size: .95rem;
+  font-weight: 700;
+  line-height: 1.25;
+  color: var(--ch-text);
+}
+.ch-subject-teacher {
+  margin: 0;
+  font-size: .78rem;
+  color: var(--ch-muted);
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+.ch-subject-teacher i, .ch-subject-teacher svg {
+  width: 14px;
+  height: 14px;
+  color: var(--ch-ok);
+}
+.ch-no-teacher {
+  color: var(--ch-muted);
+  font-style: italic;
+}
+
+/* Compact list di tab Kelas */
+.ch-subjects-compact-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 8px;
+  margin-top: 12px;
+}
+.ch-subject-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: var(--ch-soft);
+  border: 1px solid var(--ch-line);
+}
+.ch-subject-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: .84rem;
+}
+.ch-subject-bullet {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex: none;
+}
+.ch-teacher-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: .72rem;
+  font-weight: 700;
+  color: var(--ch-ok);
+  background: var(--ch-ok-soft);
+  padding: 3px 8px;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+.ch-empty-pill {
+  font-size: .72rem;
+  color: var(--ch-muted);
+  font-style: italic;
+}
+.ch-subject-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: .72rem;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 6px;
+  background: var(--ch-soft);
+  color: var(--ch-text);
+  margin-right: 4px;
+}
+
+

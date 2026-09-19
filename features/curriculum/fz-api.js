@@ -31,6 +31,28 @@
   function token() { try { return localStorage.getItem(TOKEN_KEY) || ''; } catch (_) { return ''; } }
   function setToken(t) { try { t ? localStorage.setItem(TOKEN_KEY, t) : localStorage.removeItem(TOKEN_KEY); } catch (_) {} }
 
+  var slowNoticeTimer = null;
+  var slowNoticeEl = null;
+
+  function showWakeNotice() {
+    if (slowNoticeEl || typeof document === 'undefined' || !document.body) return;
+    slowNoticeEl = document.createElement('div');
+    slowNoticeEl.className = 'toast fz-wake-notice';
+    slowNoticeEl.setAttribute('data-testid', 'server-wake-notice');
+    slowNoticeEl.style.cssText = 'position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1A2332;color:#E6F4FE;padding:12px 20px;border-radius:12px;box-shadow:0 8px 24px rgba(0,0,0,0.35);font-size:13px;z-index:99999;display:flex;align-items:center;gap:10px;border:1px solid #2B4568;max-width:90vw;text-align:left;';
+    slowNoticeEl.innerHTML = '<span style="display:inline-block;width:14px;height:14px;border:2px solid #5795E2;border-top-color:transparent;border-radius:50%;animation:spin 1s linear infinite;flex-shrink:0"></span>' +
+      '<span>' + esc(t('kurikulum.server-wakeup', 'Menghubungkan ke server kurikulum... (proses wake-up butuh beberapa detik)')) + '</span>';
+    try { document.body.appendChild(slowNoticeEl); } catch (_) {}
+  }
+
+  function hideWakeNotice() {
+    if (slowNoticeTimer) { clearTimeout(slowNoticeTimer); slowNoticeTimer = null; }
+    if (slowNoticeEl) {
+      try { slowNoticeEl.remove(); } catch (_) {}
+      slowNoticeEl = null;
+    }
+  }
+
   function api(path, opts) {
     opts = opts || {};
     var headers = { 'Accept': 'application/json' };
@@ -43,12 +65,16 @@
       return Promise.reject(new Error(
         'Konsol kurikulum belum dikonfigurasi: alamat backend (curriculumApiUrl) masih kosong di core-config.js.'));
     }
+    if (typeof setTimeout === 'function' && !slowNoticeTimer) {
+      slowNoticeTimer = setTimeout(showWakeNotice, 2200);
+    }
     return fetch(akar + '/api' + path, {
       method: opts.method || (opts.body ? 'POST' : 'GET'),
       credentials: 'include',
       headers: headers,
       body: opts.body instanceof FormData ? opts.body : (opts.body ? JSON.stringify(opts.body) : undefined)
     }).then(function (r) {
+      hideWakeNotice();
       var ct = r.headers.get('content-type') || '';
       var p = ct.indexOf('json') !== -1 ? r.json() : r.text();
       return p.then(function (data) {
@@ -61,6 +87,9 @@
         }
         return data;
       });
+    }).catch(function (err) {
+      hideWakeNotice();
+      throw err;
     });
   }
 

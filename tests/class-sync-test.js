@@ -13,7 +13,7 @@ function assert(c, m) { results.push({ ok: !!c, message: m }); if (!c) failures 
 
 /** D1 palsu: cukup untuk kueri yang dipakai lane ini. */
 function fakeD1() {
-  const cls = new Map(), rep = new Map(), accounts = new Map(), asg = new Map();
+  const cls = new Map(), rep = new Map(), accounts = new Map(), asg = new Map(), clsTeachers = new Map();
   function stmt(sql) {
     let args = [];
     const s = sql.replace(/\s+/g, ' ');
@@ -23,6 +23,7 @@ function fakeD1() {
         if (/CREATE /.test(s)) return { success: true };
         if (/INSERT INTO tc_class \(/.test(s)) { cls.set(args[0], { code: args[0], teacher_sub: args[1], title: args[2], level: args[3], created_at: args[4], updated_at: args[4] }); return { meta: { changes: 1 } }; }
         if (/UPDATE tc_class SET/.test(s)) { const c = cls.get(args[0]); if (c && c.teacher_sub === args[4]) { c.title = args[1]; c.level = args[2]; c.updated_at = args[3]; } return { meta: { changes: 1 } }; }
+        if (/INSERT (?:OR REPLACE )?INTO tc_class_teacher/.test(s)) { clsTeachers.set(args[0] + '|' + args[2], { class_code: args[0], teacher_sub: args[1], subject_id: args[2], teacher_name: args[3], created_at: args[4], updated_at: args[5] }); return { meta: { changes: 1 } }; }
         if (/INSERT INTO tc_class_assignment/.test(s)) { asg.set(args[0] + '|' + args[1], { class_code: args[0], id: args[1], teacher_sub: args[2], payload_json: args[3], targets_json: args[4], created_at: args[5], updated_at: args[5] }); return { meta: { changes: 1 } }; }
         if (/INSERT INTO tc_class_report/.test(s)) { rep.set(args[0] + '|' + args[1], { class_code: args[0], learner_key: args[1], display_name: args[2], learner_sub: args[3], reported_at: args[4], report_json: args[5], updated_at: args[6] }); return { meta: { changes: 1 } }; }
         throw new Error('run tak dikenal: ' + s);
@@ -30,20 +31,48 @@ function fakeD1() {
       async first() {
         if (/FROM auth_account WHERE sub/.test(s)) return accounts.get(args[0]) || null;
         if (/SELECT code FROM tc_class WHERE code = \?1 AND teacher_sub = \?2/.test(s)) { const c = cls.get(args[0]); return c && c.teacher_sub === args[1] ? { code: c.code } : null; }
+        if (/SELECT class_code AS code FROM tc_class_teacher WHERE class_code = \?1 AND teacher_sub = \?2/.test(s)) {
+          const match = [...clsTeachers.values()].find((ct) => ct.class_code === args[0] && ct.teacher_sub === args[1]);
+          return match ? { code: match.class_code } : null;
+        }
+        if (/SELECT teacher_sub FROM tc_class_teacher WHERE class_code = \?1 AND subject_id = \?2/.test(s)) {
+          const match = clsTeachers.get(args[0] + '|' + args[1]);
+          return match ? { teacher_sub: match.teacher_sub } : null;
+        }
+        if (/SELECT code, title, level FROM tc_class WHERE code = \?1/.test(s)) { const c = cls.get(args[0]); return c ? { code: c.code, title: c.title, level: c.level } : null; }
         if (/SELECT code, teacher_sub FROM tc_class WHERE code/.test(s)) { const c = cls.get(args[0]); return c ? { code: c.code, teacher_sub: c.teacher_sub } : null; }
         if (/SELECT code FROM tc_class WHERE code = \?1/.test(s)) { const c = cls.get(args[0]); return c ? { code: c.code } : null; }
         throw new Error('first tak dikenal: ' + s);
       },
       async all() {
-        if (/FROM tc_class c WHERE c.teacher_sub/.test(s)) return { results: [...cls.values()].filter((c) => c.teacher_sub === args[0]).map((c) => ({ ...c, reports: [...rep.values()].filter((r) => r.class_code === c.code).length })) };
+        if (/FROM tc_class c WHERE c.teacher_sub/.test(s) || /UNION/.test(s)) {
+          const sub = args[0];
+          const direct = [...cls.values()].filter((c) => c.teacher_sub === sub);
+          const viaTeacher = [...clsTeachers.values()].filter((ct) => ct.teacher_sub === sub).map((ct) => cls.get(ct.class_code)).filter(Boolean);
+          const set = new Map();
+          for (const c of [...direct, ...viaTeacher]) {
+            if (!set.has(c.code)) {
+              set.set(c.code, { ...c, reports: [...rep.values()].filter((r) => r.class_code === c.code).length });
+            }
+          }
+          return { results: [...set.values()] };
+        }
         if (/FROM tc_class_assignment WHERE class_code/.test(s)) return { results: [...asg.values()].filter((a) => a.class_code === args[0] && a.updated_at > args[1]).sort((a, b) => a.updated_at - b.updated_at).slice(0, args[2]) };
-        if (/FROM tc_class_report r/.test(s)) { const c = cls.get(args[0]); if (!c || c.teacher_sub !== args[1]) return { results: [] }; return { results: [...rep.values()].filter((r) => r.class_code === args[0] && r.updated_at > args[2]).sort((a, b) => a.updated_at - b.updated_at).slice(0, args[3]) }; }
+        if (/FROM tc_class_report r/.test(s)) {
+          const c = cls.get(args[0]);
+          const inTeacherTable = [...clsTeachers.values()].some((ct) => ct.class_code === args[0] && ct.teacher_sub === args[1]);
+          if (!c || (c.teacher_sub !== args[1] && !inTeacherTable)) return { results: [] };
+          return { results: [...rep.values()].filter((r) => r.class_code === args[0] && r.updated_at > args[2]).sort((a, b) => a.updated_at - b.updated_at).slice(0, args[3]) };
+        }
+        if (/FROM tc_class_teacher WHERE class_code = \?1/.test(s)) {
+          return { results: [...clsTeachers.values()].filter((ct) => ct.class_code === args[0]) };
+        }
         throw new Error('all tak dikenal: ' + s);
       }
     };
     return api;
   }
-  return { prepare: stmt, batch: async (xs) => Promise.all(xs.map((x) => x.run())), _accounts: accounts, _cls: cls, _rep: rep, _asg: asg };
+  return { prepare: stmt, batch: async (xs) => Promise.all(xs.map((x) => x.run())), _accounts: accounts, _cls: cls, _rep: rep, _asg: asg, _clsTeachers: clsTeachers };
 }
 
 function ctxOf(db, { sub, method, pathname, body, query, now }) {
@@ -143,6 +172,19 @@ async function json(res) { return { status: res.status, body: JSON.parse(await r
   assert(r.status === 200 && r.body.assignments.length === 0, 'kursor since menyaring tugas yang sudah ditarik');
   r = await json(await routes.routeLearnerClassAssignments(ctxOf(db, { sub: 'anon-3', method: 'GET', pathname: '/api/learner/class-assignments', query: { cls: 'FZ-ZZZ234', name: 'X' }, now: 1_700_000_061_000 })));
   assert(r.status === 404, 'kode kelas tak dikenal -> 404');
+
+  /* ---------- 2c. multi-guru berbagi kode kelas (17 mapel) ----------------------- */
+  // Guru t2 mengklaim kelas yang sama untuk mapel MAT
+  let rMg = await json(await routes.routeClassClaim(ctxOf(db, { sub: 't2', method: 'POST', pathname: '/api/teacher/class/claim', body: { code: 'FZ-AB2C3D', title: 'Kelas 10A', subjectId: 'MAT', teacherName: 'Pak Budi' } })));
+  assert(rMg.status === 200 && rMg.body.claimed === true, 'guru t2 berhasil mengklaim kelas FZ-AB2C3D untuk mapel MAT');
+
+  // Murid memeriksa daftar guru di kelas FZ-AB2C3D
+  let rGt = await json(await routes.routeLearnerClassTeachers(ctxOf(db, { sub: 'anon-1', method: 'GET', pathname: '/api/learner/class-teachers', query: { cls: 'FZ-AB2C3D' } })));
+  assert(rGt.status === 200 && Array.isArray(rGt.body.teachers) && rGt.body.teachers.length >= 1, 'murid dapat menarik daftar guru & kartu mapel di kelasnya');
+
+  // Guru t2 sekarang BISA mengirim tugas ke kelas FZ-AB2C3D karena sudah terdaftar di tc_class_teacher
+  let rAsg2 = await json(await routes.routeClassAssign(ctxOf(db, { sub: 't2', method: 'POST', pathname: '/api/teacher/class/assign', body: { code: 'FZ-AB2C3D', assignment: { ...asgBody, id: 'as-mat-101', title: 'Aljabar Dasar' } }, now: 1_700_000_070_000 })));
+  assert(rAsg2.status === 200 && rAsg2.body.ok, 'guru t2 berhasil mengirim tugas matematika ke kelas FZ-AB2C3D');
 
   /* ---------- 3. kontrak statis -------------------------------------------------- */
   const fs = require('fs');
