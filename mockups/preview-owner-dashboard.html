@@ -1630,12 +1630,36 @@ footer{
             <option value="365">365 Hari (1 Tahun)</option>
           </select>
         </div>
+        <div>
+          <label for="f_subject" style="display:block;font-size:12px;font-weight:bold;margin-bottom:4px;color:var(--ink);">Mata Pelajaran yang Diampu</label>
+          <select id="f_subject" name="subject_id">
+            <option value="MAT" selected>Matematika</option>
+            <option value="ENG">Bahasa Inggris</option>
+            <option value="IPA">Ilmu Pengetahuan Alam (IPA)</option>
+            <option value="IPS">Ilmu Pengetahuan Sosial (IPS)</option>
+            <option value="IND">Bahasa Indonesia</option>
+            <option value="INF">Informatika</option>
+            <option value="PKN">Pendidikan Pancasila</option>
+            <option value="SD-ALL">Guru Kelas SD (Tematik)</option>
+            <option value="ALL">Semua Mapel (Kurikulum/Kepsek)</option>
+          </select>
+        </div>
+        <div>
+          <label for="f_grade" style="display:block;font-size:12px;font-weight:bold;margin-bottom:4px;color:var(--ink);">Jenjang / Fase</label>
+          <select id="f_grade" name="grade_id">
+            <option value="SMP" selected>Fase D · SMP (Kelas 7–9)</option>
+            <option value="SMA">Fase E/F · SMA/SMK (Kelas 10–12)</option>
+            <option value="SD">Fase A–C · SD (Kelas 1–6)</option>
+            <option value="ALL">Semua Jenjang</option>
+          </select>
+        </div>
         <div style="grid-column:1/-1;text-align:right;margin-top:6px;">
-          <button type="submit">+ Buat Token Guru</button>
+          <button type="submit" id="btn_mint_teacher">+ Buat Token Guru</button>
         </div>
       </form>
     </div>
 
+    <div id="mint_success_slot"></div>
 
     <div style="background:#fff;border:1px dashed var(--line);border-radius:12px;padding:14px 16px;margin-bottom:20px;">
       <form method="GET" action="/" style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
@@ -1647,11 +1671,74 @@ footer{
     </div>
 
       <h3 style="color:var(--text-main);margin-top:20px;margin-bottom:8px;">Riwayat Undangan &amp; Token Guru</h3>
-      <div class="note">Belum ada token undangan yang dicetak.</div>
+      <div class="table-wrap" style="margin-bottom:24px;">
+        <table>
+          <thead>
+            <tr>
+              <th>Guru</th>
+              <th>Sekolah / Instansi</th>
+              <th>Jenis</th>
+              <th>Mapel &amp; Jenjang</th>
+              <th>Status</th>
+              <th>Dibuat (WIB)</th>
+              <th>Berlaku Hingga</th>
+              <th style="text-align:center;">Aksi</th>
+            </tr>
+          </thead>
+          <tbody id="invite_table_body">
+            <tr>
+              <td><b>Ibu Mardhiana Hamzah</b></td>
+              <td>MTsN 5 ACEH BESAR</td>
+              <td>school</td>
+              <td><span style="background:#e0f2fe;color:#0369a1;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;">Matematika</span><small style="color:var(--text-muted);display:block;margin-top:2px;">Fase D (SMP Kelas 7–9)</small></td>
+              <td><span style="background:#e8f5e9;color:#2e7d32;padding:2px 8px;border-radius:10px;font-weight:bold;font-size:11px;">AKTIF</span></td>
+              <td>19 Sep 2026</td>
+              <td>18 Des 2026</td>
+              <td style="text-align:center;"><button type="button" style="background:#c62828;color:#fff;border:none;padding:4px 10px;border-radius:4px;font-size:11px;font-weight:bold;cursor:pointer;">Cabut</button></td>
+            </tr>
+            <tr>
+              <td><b>Pak Joko Supriyanto, S.Pd.</b></td>
+              <td>SMP Negeri 2 Yogyakarta</td>
+              <td>school</td>
+              <td><span style="background:#e0f2fe;color:#0369a1;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;">Bahasa Inggris</span><small style="color:var(--text-muted);display:block;margin-top:2px;">Fase D (SMP Kelas 7–9)</small></td>
+              <td><span style="background:#e8f5e9;color:#2e7d32;padding:2px 8px;border-radius:10px;font-weight:bold;font-size:11px;">AKTIF</span></td>
+              <td>19 Sep 2026</td>
+              <td>18 Des 2026</td>
+              <td style="text-align:center;"><button type="button" style="background:#c62828;color:#fff;border:none;padding:4px 10px;border-radius:4px;font-size:11px;font-weight:bold;cursor:pointer;">Cabut</button></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
       <h3 style="color:var(--text-main);margin-top:20px;margin-bottom:8px;">Daftar Guru Terdaftar &amp; Aktif</h3>
-      <div class="note">Belum ada akun guru yang menyelesaikan aktivasi token.</div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Handle Akun</th>
+              <th>Nama Guru</th>
+              <th>Sekolah / Instansi</th>
+              <th>Jenis</th>
+              <th>Mapel &amp; Jenjang</th>
+              <th>Status</th>
+              <th>Aktivasi (WIB)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>guru_endang</code></td>
+              <td><b>Endang Wulandari</b></td>
+              <td>SMP Negeri 1 Surabaya</td>
+              <td>school</td>
+              <td><span style="background:#e0f2fe;color:#0369a1;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;">IPA</span><small style="color:var(--text-muted);display:block;margin-top:2px;">Fase D (SMP Kelas 7–9)</small></td>
+              <td><span style="background:#e8f5e9;color:#2e7d32;padding:2px 8px;border-radius:10px;font-weight:bold;font-size:11px;">active</span></td>
+              <td>18 Sep 2026</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
       <div class="note" style="margin-top:16px;">
-        Undangan guru bersifat sekali pakai. Masa aktif default adalah 90 hari. Begitu guru mengaktifkan token di aplikasi, peran akunnya langsung dipromosikan ke <code>teacher</code> dan profil sekolahnya tersimpan aman di basis data server.
+        Undangan guru bersifat sekali pakai. Masa aktif default adalah 90 hari. Begitu guru mengaktifkan token di aplikasi, peran akunnya langsung dipromosikan ke <code>teacher</code>, mata pelajaran yang diampu dikunci di profil, dan ruang belajar kurikulumnya langsung siap digunakan.
       </div>
     </section>
 
@@ -1680,4 +1767,60 @@ Kontrak: EXEC-BRIEF-CF.md "KONTRAK ANALYTICS PRIVASI-MAKSIMAL" · bentuk tabel: 
     </div>
   </div>
 </div>
+<script>
+(function() {
+  var form = document.querySelector('form input[value="mint_teacher"]')?.closest('form');
+  if (!form) return;
+  form.addEventListener('submit', function(e) {
+    e.preventDefault();
+    var name = document.getElementById('f_teacherName').value.trim();
+    var inst = document.getElementById('f_institution').value.trim();
+    var type = document.getElementById('f_institutionType').value;
+    var days = document.getElementById('f_days').value;
+    var subj = document.getElementById('f_subject').value;
+    var grade = document.getElementById('f_grade').value;
+    
+    var subjMap = { MAT: 'Matematika', ENG: 'Bahasa Inggris', IPA: 'IPA', IPS: 'IPS', IND: 'Bahasa Indonesia', INF: 'Informatika', PKN: 'Pendidikan Pancasila', 'SD-ALL': 'Guru Kelas SD', ALL: 'Semua Mapel' };
+    var gradeMap = { SMP: 'Fase D (SMP Kelas 7–9)', SMA: 'Fase E/F (SMA Kelas 10–12)', SD: 'Fase A–C (SD Kelas 1–6)', ALL: 'Semua Jenjang' };
+    
+    var chars = '23456789ABCDEFGHJKMNPQRSTVWXYZ';
+    var token = '';
+    for (var i = 0; i < 32; i++) token += chars.charAt(Math.floor(Math.random() * chars.length));
+    
+    var slot = document.getElementById('mint_success_slot');
+    if (slot) {
+      slot.innerHTML = '<div style="background:var(--card-bg,#fff);border:1px solid var(--emerald-border,#a7f3d0);border-left:4px solid var(--emerald,#10b981);border-radius:12px;padding:20px;margin-bottom:20px;box-shadow:0 2px 8px rgba(0,0,0,0.06);">' +
+        '<div style="font-size:16px;font-weight:700;color:var(--text-main,#111);margin-bottom:8px;">✅ Token Guru Berhasil Dibuat</div>' +
+        '<div style="font-size:13px;color:var(--text-muted,#666);margin-bottom:12px;">Salin token ini sekarang dan berikan kepada guru untuk aktivasi di aplikasi.</div>' +
+        '<div style="margin:12px 0;text-align:center;">' +
+        '<code id="token_val" style="font-size:1.35rem;font-weight:700;letter-spacing:2px;color:#d97706;background:#fef3c7;padding:10px 18px;border-radius:8px;border:1px dashed #f59e0b;user-select:all;display:inline-block;font-family:ui-monospace,monospace;">' + token + '</code>' +
+        '<div style="margin-top:8px"><button type="button" onclick="navigator.clipboard.writeText(\'' + token + '\');alert(\'Token disalin!\');" style="background:#0284c7;color:#fff;border:none;padding:6px 14px;border-radius:6px;font-weight:bold;cursor:pointer;">📋 Salin Token</button></div>' +
+        '</div>' +
+        '<div style="font-size:13px;line-height:1.6;margin-top:12px;border-top:1px solid #e5e7eb;padding-top:10px;">' +
+        '<div>Nama Guru: <b>' + name + '</b></div>' +
+        '<div>Sekolah/Instansi: <b>' + inst + ' (' + type + ')</b></div>' +
+        '<div>Mata Pelajaran: <b>' + (subjMap[subj] || subj) + '</b> · Jenjang: <b>' + (gradeMap[grade] || grade) + '</b></div>' +
+        '<div>Masa Berlaku: <b>' + days + ' Hari</b></div>' +
+        '</div>' +
+        '<div style="margin-top:14px;background:#fffbeb;border:1px solid #fef3c7;padding:10px;border-radius:6px;font-size:12px;color:#92400e;"><b>⚠️ PERHATIAN:</b> Token ini hanya ditampilkan satu kali demi keamanan kriptografis.</div>' +
+        '</div>';
+      slot.scrollIntoView({ behavior: 'smooth' });
+    }
+    
+    var tbody = document.getElementById('invite_table_body');
+    if (tbody) {
+      var tr = document.createElement('tr');
+      tr.innerHTML = '<td><b>' + name + '</b></td>' +
+        '<td>' + inst + '</td>' +
+        '<td>' + type + '</td>' +
+        '<td><span style="background:#e0f2fe;color:#0369a1;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;">' + (subjMap[subj] || subj) + '</span><small style="color:#6b7280;display:block;margin-top:2px;">' + (gradeMap[grade] || grade) + '</small></td>' +
+        '<td><span style="background:#e8f5e9;color:#2e7d32;padding:2px 8px;border-radius:10px;font-weight:bold;font-size:11px;">AKTIF</span></td>' +
+        '<td>Hari ini</td>' +
+        '<td>' + days + ' Hari</td>' +
+        '<td style="text-align:center;"><button type="button" onclick="this.closest(\'tr\').remove()" style="background:#c62828;color:#fff;border:none;padding:4px 10px;border-radius:4px;font-size:11px;font-weight:bold;cursor:pointer;">Cabut</button></td>';
+      tbody.prepend(tr);
+    }
+  });
+})();
+</script>
 </body></html>

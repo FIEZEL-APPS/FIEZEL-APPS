@@ -2615,6 +2615,31 @@ function renderLearnerSection(m) {
   </section>`;
 }
 
+function subjectName(id) {
+  const map = {
+    MAT: 'Matematika',
+    ENG: 'Bahasa Inggris',
+    IPA: 'IPA',
+    IPS: 'IPS',
+    IND: 'Bahasa Indonesia',
+    INF: 'Informatika',
+    PKN: 'Pendidikan Pancasila',
+    'SD-ALL': 'Guru Kelas SD (Tematik)',
+    ALL: 'Semua Mapel'
+  };
+  return map[id] || id || '—';
+}
+
+function gradeName(id) {
+  const map = {
+    SMP: 'Fase D (SMP Kelas 7–9)',
+    SMA: 'Fase E/F (SMA Kelas 10–12)',
+    SD: 'Fase A–C (SD Kelas 1–6)',
+    ALL: 'Semua Jenjang'
+  };
+  return map[id] || id || '—';
+}
+
 function renderTeacherSection(m) {
   const tData = m.teachers || { state: 'ok', invites: [], teachers: [] };
   const action = m.teacherAction;
@@ -2635,6 +2660,7 @@ function renderTeacherSection(m) {
           <div style="font-size:13px;line-height:1.6;margin-top:12px;border-top:1px solid var(--card-border);padding-top:10px;color:var(--text-main);">
             <div>Nama Guru: <b>${esc(inv.teacherName || '—')}</b></div>
             <div>Sekolah/Instansi: <b>${esc(inv.institution || '—')}</b> (${esc(inv.institutionType || '—')})</div>
+            <div>Mata Pelajaran: <b>${esc(subjectName(inv.subject_id || inv.subjectId))}</b> · Jenjang: <b>${esc(gradeName(inv.grade_id || inv.gradeId))}</b></div>
             <div>Masa Berlaku: <b>s.d. ${esc(expDate)} (WIB)</b></div>
           </div>
           <div class="warn" style="margin-top:14px;"><b>${ICONS.alert} PERHATIAN PENTING:</b> Kode token ini <b>HANYA DITAMPILKAN SEKALI INI SAJA</b> demi keamanan kriptografis. Sistem tidak menyimpan token mentah di basis data. Pastikan Anda telah menyalinnya sebelum berpindah halaman.</div>
@@ -2771,6 +2797,7 @@ function renderTeacherSection(m) {
         <td><b>${esc(inv.teacherName || '—')}</b></td>
         <td>${esc(inv.institution || '—')}</td>
         <td>${esc(inv.institutionType || '—')}</td>
+        <td><span style="background:#e0f2fe;color:#0369a1;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;">${esc(subjectName(inv.subject_id || inv.subjectId))}</span><small style="color:var(--text-muted);display:block;margin-top:2px;">${esc(gradeName(inv.grade_id || inv.gradeId))}</small></td>
         <td>${statusBadge}</td>
         <td>${esc(createdStr)}</td>
         <td>${esc(expiresStr)}</td>
@@ -2786,6 +2813,7 @@ function renderTeacherSection(m) {
               <th>Guru</th>
               <th>Sekolah / Instansi</th>
               <th>Jenis</th>
+              <th>Mapel &amp; Jenjang</th>
               <th>Status</th>
               <th>Dibuat (WIB)</th>
               <th>Berlaku Hingga</th>
@@ -2813,6 +2841,7 @@ function renderTeacherSection(m) {
         <td><b>${esc(tc.teacherName || '—')}</b></td>
         <td>${esc(tc.institution || '—')}</td>
         <td>${esc(tc.institutionType || '—')}</td>
+        <td><span style="background:#e0f2fe;color:#0369a1;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;">${esc(subjectName(tc.subject_id || tc.subjectId))}</span><small style="color:var(--text-muted);display:block;margin-top:2px;">${esc(gradeName(tc.grade_id || tc.gradeId))}</small></td>
         <td><span style="background:#e8f5e9;color:#2e7d32;padding:2px 8px;border-radius:10px;font-weight:bold;font-size:11px;">${esc(tc.status || 'active')}</span></td>
         <td>${esc(actDate)}</td>
       </tr>`;
@@ -2827,6 +2856,7 @@ function renderTeacherSection(m) {
               <th>Nama Guru</th>
               <th>Sekolah / Instansi</th>
               <th>Jenis</th>
+              <th>Mapel &amp; Jenjang</th>
               <th>Status</th>
               <th>Aktivasi (WIB)</th>
             </tr>
