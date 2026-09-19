@@ -65,6 +65,8 @@ export const BYTE_LIMITS = Object.freeze({
   '/api/account/teacher-activate': 1536,   // kode 32 char + handle + kata sandi
   '/api/owner/teacher-invite': 1024,
   '/api/owner/teacher-invite/revoke': 512,
+  '/api/owner/teacher-invite/update': 1024,
+  '/api/owner/teacher-invite/delete': 512,
   '/api/owner/teachers': 512,              // GET, tanpa body
   '/api/teacher/tree': 512,                // GET
   '/api/teacher/node/save': 16384,         // deskripsi + tujuan + daftar kosakata
