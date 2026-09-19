@@ -824,6 +824,17 @@ async function deleteTeacherInvite(env, input, fetchImpl) {
   });
 }
 
+async function deleteTeacherAccount(env, input, fetchImpl) {
+  return await ownerApiFetch(env, '/api/owner/teacher/delete', fetchImpl, {
+    method: 'POST',
+    body: {
+      sub: input.sub || undefined,
+      handle: input.handle || undefined,
+      mode: input.mode || undefined,
+    }
+  });
+}
+
 async function readSchools(env, fetchImpl) {
   const res = await ownerApiFetch(env, '/api/owner/schools', fetchImpl);
   if (res.state !== 'ok') return { state: res.state, status: res.status, schools: [] };
@@ -3584,10 +3595,32 @@ function renderTeacherSection(m) {
         <td><code style="font-weight:700;color:var(--brand-gold);">${esc(cCode)}</code></td>
         <td><span style="background:#e8f5e9;color:#2e7d32;padding:2px 8px;border-radius:10px;font-weight:bold;font-size:11px;">${esc(tc.status || 'active')}</span></td>
         <td>${esc(actDate)}</td>
+        <td style="text-align:center;white-space:nowrap;">
+          <form method="GET" action="/" style="display:inline;margin:2px;">
+            <input type="hidden" name="action" value="delete_teacher">
+            <input type="hidden" name="sub" value="${esc(tc.sub || '')}">
+            <input type="hidden" name="handle" value="${esc(tc.handle || '')}">
+            <input type="hidden" name="cls" value="${esc(currentClass)}">
+            <button type="submit" style="background:#fee2e2;color:#b91c1c;border:1px solid #fca5a5;padding:3px 8px;border-radius:4px;font-size:11px;font-weight:bold;cursor:pointer;" title="Hapus akun guru ini dan bersihkan tokennya">Hapus</button>
+          </form>
+        </td>
       </tr>`;
     }).join('');
 
     teacherTable = `
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;flex-wrap:wrap;gap:8px;">
+        <div style="font-weight:700;font-size:14px;color:var(--ink);">Daftar Guru Terdaftar &amp; Aktif (${teachers.length})</div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          <form method="GET" action="/" style="margin:0;">
+            <input type="hidden" name="action" value="delete_teacher">
+            <input type="hidden" name="mode" value="all">
+            <input type="hidden" name="cls" value="${esc(currentClass)}">
+            <button type="submit" style="background:#fef2f2;color:#dc2626;border:1px solid #fecaca;padding:4px 10px;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;" title="Bersihkan semua akun guru aktif">
+              Bersihkan Semua Akun Guru
+            </button>
+          </form>
+        </div>
+      </div>
       <div class="table-wrap">
         <table>
           <thead>
@@ -3600,6 +3633,7 @@ function renderTeacherSection(m) {
               <th>Kode Kelas</th>
               <th>Status</th>
               <th>Aktivasi (WIB)</th>
+              <th style="text-align:center;">Aksi</th>
             </tr>
           </thead>
           <tbody>
@@ -4945,6 +4979,27 @@ async function handle(request, env, ctx, nowMs) {
           message: 'Gagal membersihkan data token guru.'
         };
       }
+    } else if (action === 'delete_teacher') {
+      const sub = url.searchParams.get('sub') || '';
+      const handle = url.searchParams.get('handle') || '';
+      const mode = url.searchParams.get('mode') || '';
+      const delRes = await deleteTeacherAccount(env, { sub, handle, mode }, fetchImpl);
+      if (delRes.state === 'ok' && delRes.body && delRes.body.ok) {
+        teacherAction = {
+          ok: true,
+          action: 'delete_teacher',
+          message: mode === 'all'
+            ? `Berhasil membersihkan ${delRes.body.deletedCount || 0} akun guru aktif.`
+            : `Akun guru (${handle || sub}) berhasil dihapus dan dibersihkan dari basis data.`
+        };
+      } else {
+        teacherAction = {
+          ok: false,
+          action: 'delete_teacher',
+          error: (delRes.body && delRes.body.error) || delRes.state,
+          message: 'Gagal menghapus akun guru aktif.'
+        };
+      }
     }
 
     // Murid terpilih adalah PARAMETER KUERI pada rute yang sudah ada, bukan rute baru.
@@ -5189,7 +5244,7 @@ export {
   readEvidence, sanitizeEvidenceSummary, renderEvidenceSection, EVIDENCE_PERIOD_DAYS,
   readLearners, readLearnerDetail, sanitizeLearnerRow, sanitizeLearnerSummary,
   renderLearnerSection, renderLearnerDirectory, renderLearnerDetail, learnerLabel, SUB_RE,
-  readTeachers, mintTeacherInvite, revokeTeacherInvite, updateTeacherInvite, deleteTeacherInvite, renderTeacherSection,
+  readTeachers, mintTeacherInvite, revokeTeacherInvite, updateTeacherInvite, deleteTeacherInvite, deleteTeacherAccount, renderTeacherSection,
   readSchools, createSchool, updateSchool, deleteSchool, readClasses, createClass, regenerateTeacherInvite,
   // Rem penebakan halaman masuk: diekspor supaya gerbang bisa memodelkan ISOLATE BARU per
   // permintaan (cacat yang tidak pernah diuji) dan mengassert angka jendelanya sebagai kontrak.

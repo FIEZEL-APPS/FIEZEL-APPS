@@ -70,18 +70,24 @@ export async function routeClassClaim(ctx) {
   if (!c.ok) return jsonError(400, ERR.SCHEMA_INVALID, { reason: c.reason }, gate.opt);
 
   await ensureAuthSchema(gate.db);
+  let teacherProfile = null;
+  try {
+    teacherProfile = await gate.db.prepare(
+      'SELECT teacher_name, subject_id, class_code, school_id FROM teacher_profile WHERE sub = ?1'
+    ).bind(gate.sub).first();
+  } catch (_) {}
+
+  if (!c.subjectId && teacherProfile && teacherProfile.subject_id) {
+    c.subjectId = teacherProfile.subject_id;
+  }
+  if (!c.teacherName && teacherProfile && teacherProfile.teacher_name) {
+    c.teacherName = teacherProfile.teacher_name;
+  }
+
   const existing = await gate.db.prepare('SELECT code, teacher_sub FROM tc_class WHERE code = ?1').bind(c.code).first();
 
   if (c.subjectId) {
-    // Mode multi-guru: satu kelas bisa diajar banyak guru dengan mapel berbeda
-    const existingSubject = await gate.db.prepare(
-      'SELECT teacher_sub FROM tc_class_teacher WHERE class_code = ?1 AND subject_id = ?2'
-    ).bind(c.code, c.subjectId).first();
-
-    if (existingSubject && existingSubject.teacher_sub !== gate.sub) {
-      return jsonError(409, 'subject_teacher_assigned', { subject: c.subjectId }, gate.opt);
-    }
-
+    // Mode multi-guru: satu kelas bisa diajar banyak guru dengan mapel berbeda atau bersama
     if (!existing) {
       await gate.db.prepare('INSERT INTO tc_class (code, teacher_sub, title, level, created_at, updated_at) VALUES (?1,?2,?3,?4,?5,?5)')
         .bind(c.code, gate.sub, c.title, c.level, ctx.now).run();
@@ -91,16 +97,20 @@ export async function routeClassClaim(ctx) {
     }
 
     const tName = c.teacherName || 'Guru';
-    if (existingSubject) {
-      await gate.db.prepare(
-        'UPDATE tc_class_teacher SET teacher_name = ?3, updated_at = ?4 WHERE class_code = ?1 AND subject_id = ?2 AND teacher_sub = ?5'
-      ).bind(c.code, c.subjectId, tName, ctx.now, gate.sub).run();
-    } else {
-      await gate.db.prepare(
-        'INSERT INTO tc_class_teacher (class_code, teacher_sub, subject_id, teacher_name, created_at, updated_at) VALUES (?1,?2,?3,?4,?5,?5)'
-      ).bind(c.code, gate.sub, c.subjectId, tName, ctx.now).run();
-    }
+    await gate.db.prepare(
+      'INSERT OR REPLACE INTO tc_class_teacher (class_code, teacher_sub, subject_id, teacher_name, created_at, updated_at) VALUES (?1,?2,?3,?4,?5,?5)'
+    ).bind(c.code, gate.sub, c.subjectId, tName, ctx.now).run();
     return jsonResponse({ ok: true, code: c.code, title: c.title, level: c.level, subjectId: c.subjectId, claimed: true }, gate.opt);
+  }
+
+  // Jika guru sudah ditugaskan ke kode kelas ini oleh Owner di teacher_profile
+  if (teacherProfile && teacherProfile.class_code === c.code) {
+    const assignedSub = teacherProfile.subject_id || 'ALL';
+    const tName = c.teacherName || teacherProfile.teacher_name || 'Guru';
+    await gate.db.prepare(
+      'INSERT OR REPLACE INTO tc_class_teacher (class_code, teacher_sub, subject_id, teacher_name, created_at, updated_at) VALUES (?1,?2,?3,?4,?5,?5)'
+    ).bind(c.code, gate.sub, assignedSub, tName, ctx.now).run();
+    return jsonResponse({ ok: true, code: c.code, title: c.title, level: c.level, subjectId: assignedSub, claimed: true }, gate.opt);
   }
 
   // Mode kompatibilitas tanpa subjectId: terikat ke satu guru utama
