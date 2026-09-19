@@ -150,6 +150,8 @@
     'kurikulum.sub-ips': "สังคมศึกษา (IPS)",
     'kurikulum.sub-inf': "วิทยาการคอมพิวเตอร์",
     'kurikulum.sub-pkn': "วิชาปัญจศีลและหน้าที่พลเมือง",
+    'kurikulum.sub-sd-all': "ครูประจำชั้นประถม (สาระบูรณาการ)",
+    'kurikulum.sub-all': "ทุกรายวิชา",
     'kurikulum.modal-kelas-judul': "สร้างชั้นเรียนใหม่",
     'kurikulum.modal-kelas-sub': "เลือกระดับชั้นและวิชาที่คุณสอน",
     'kurikulum.modal-kelas-nama': "ชื่อห้องเรียน / ชั้นเรียน",

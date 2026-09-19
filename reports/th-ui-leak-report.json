@@ -1,21 +1,21 @@
 {
   "schema": "fiezel-th-ui-leak-v1",
-  "generatedAt": "2026-09-19T11:01:50.772Z",
+  "generatedAt": "2026-09-19T13:03:29.417Z",
   "files": {
     "app.js": {
       "leaks": 3,
       "budget": 3,
       "sample": [
         {
-          "line": 7856,
+          "line": 7954,
           "text": "Selesaikan ritme hari ini"
         },
         {
-          "line": 9274,
+          "line": 9372,
           "text": "Nama kriteria: n/4 - satu kalimat alasan yang menunjuk bukti di tulisannya"
         },
         {
-          "line": 13974,
+          "line": 14120,
           "text": "Latihan"
         }
       ]
@@ -403,19 +403,19 @@
       "budget": 4,
       "sample": [
         {
-          "line": 796,
+          "line": 1572,
           "text": "Akurasi"
         },
         {
-          "line": 808,
+          "line": 1584,
           "text": "Latihan ·"
         },
         {
-          "line": 1108,
+          "line": 1908,
           "text": "📖 Kosakata Kunci:"
         },
         {
-          "line": 1138,
+          "line": 1938,
           "text": "Latihan"
         }
       ]
@@ -425,15 +425,15 @@
       "budget": 3,
       "sample": [
         {
-          "line": 358,
+          "line": 432,
           "text": ". Aku bangga. Lanjutkan ritmenya — 1 sesi kecil tiap hari lebih ampuh daripada 1 sesi panjang seminggu."
         },
         {
-          "line": 364,
+          "line": 438,
           "text": "• Akurasi keseluruhan:"
         },
         {
-          "line": 383,
+          "line": 457,
           "text": "Akurasi"
         }
       ]
@@ -468,8 +468,8 @@
     }
   },
   "copyKeys": {
-    "id": 2754,
-    "th": 2756,
+    "id": 2799,
+    "th": 2801,
     "idTanpaTh": 0
   },
   "pass": true
