@@ -1,7 +1,7 @@
 {
-  "version": "m025-340",
+  "version": "m025-343",
   "claimedBy": "branch claude/kind-albattani-5ztglj",
-  "claimedAt": "2026-09-19T22:12:49.345Z",
-  "reason": "selesaikan tabrakan nomor build setelah merge main (paket pilot SMP)",
+  "claimedAt": "2026-09-19T23:31:06.064Z",
+  "reason": "lapisan ukur Braincore: probe retensi sampai ke murid, kalibrasi menaikkan ambang bukti",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }

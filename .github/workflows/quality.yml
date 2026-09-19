@@ -216,6 +216,7 @@ jobs:
           # m025-337: gelombang kedua otoritas Braincore (confusionMap + olmInsight jadi
           # active, frontier ZPD memilih simpul aktif). Menjalankan fungsi produksi di vm.
           node tests/brain-authority-wave2-test.js
+          node tests/brain-measurement-layer-test.js
           # Mendarat lewat merge main tanpa pernah didaftarkan, jadi ia tertulis tetapi tidak
           # pernah dijalankan CI - dan gate-registry-test merah di main karenanya. Didaftarkan
           # di sini (23 assert, hijau saat didaftarkan) supaya benar-benar menjadi bukti.
