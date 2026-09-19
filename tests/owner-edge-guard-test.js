@@ -471,7 +471,22 @@ function proxyForward(workerHeaders, list) {
     assert(/no-store/.test(forwarded.headers.get('cache-control') || ''),
       '(c) Cache-Control: no-store bertahan (hosting bersama tidak boleh menyimpan halaman owner)');
     // Sesi diperbarui tiap akses -> Set-Cookie harus sampai ke browser.
-    assert(forwarded.cookies.length === 1 && /fz_owner=/.test(forwarded.cookies[0]),
+    //
+    // DULU baris ini berbunyi `forwarded.cookies.length === 1 && /fz_owner=/.test(cookies[0])`,
+    // dan itu MENUDUH JEMBATAN ATAS DOSA YANG TIDAK ADA. Dashboard kini memasang DUA cookie
+    // (`fz_owner` sesi + `fz_cls` kelas terpilih, workers/owner/index.js), jadi hitungan "tepat
+    // satu" merah bukan karena ada cookie yang hilang, melainkan karena ada cookie yang LAHIR.
+    // Assert di bawahnya sendiri sudah menuntut proxy memakai `replace=false` supaya Set-Cookie
+    // "boleh lebih dari satu" — dua baris bertetangga yang saling membantah.
+    //
+    // Yang menggantikannya lebih ketat, bukan lebih longgar: dulu cookie kedua yang HILANG di
+    // jembatan tetap hijau selama yang pertama `fz_owner`; sekarang setiap Set-Cookie yang
+    // dipasang Worker wajib sampai, berapa pun jumlahnya.
+    const workerCookies = [...page.headers].filter(([n]) => String(n).toLowerCase() === 'set-cookie');
+    assert(forwarded.cookies.length === workerCookies.length,
+      '(c) SEMUA Set-Cookie Worker lolos proxy — nol hilang di jembatan (worker ' +
+      workerCookies.length + ', lolos ' + forwarded.cookies.length + ')');
+    assert(forwarded.cookies.some((c) => /fz_owner=/.test(c)),
       '(c) Set-Cookie sesi owner diteruskan proxy (tanpa ini sesi mati di setiap muat halaman)');
     assert(/if \(\$name === 'set-cookie'\) \{ header\('Set-Cookie: ' \. \$val, false\);/.test(phpSource),
       '(c) proxy meneruskan Set-Cookie dengan replace=false (boleh lebih dari satu)');
