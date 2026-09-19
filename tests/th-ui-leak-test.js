@@ -145,7 +145,7 @@ const ALLOWLIST = Object.freeze({
   'features/class-hub/fiezel-braincore-review.js': 2,           // nama dua latihan di kartu ulasan
   'features/learner-flow/fiezel-learner-flow.js': 1,            // satu kalimat transisi sesi
   'features/learner-flow/fiezel-review-bank.js': 1,             // satu ajakan buka kartu
-  'features/teacher/fiezel-teacher-shell.js': 4,                // layar guru, naskah lama; baru terlihat sejak ID_WORDS diperlebar
+  'features/teacher/fiezel-teacher-shell.js': 3,                // layar guru, naskah lama (turun ke 3 setelah humanisasi modal assign)
   'features/teacher/fiezel-teacher-store.js': 3,                // idem
   'features/tutor-action-center/fiezel-tutor-action-center.js': 3, // idem
   'features/tutor-classroom/fiezel-tutor-v3.js': 1              // NASKAH AJAR MURID — lihat §C3 laporan audit

@@ -117,6 +117,18 @@ async function json(res) { return { status: res.status, body: JSON.parse(await r
   assert(na.ok && na.payload.cls === 'FZ-AB2C3D' && na.payload.t === 'assign' && na.targets.join(',') === 'rina,dimas', 'tugas dinormalisasi; target = learner_key unik');
   assert(!core.normalizeAssignment({ code: 'FZ-AB2C3D', assignment: { ...asgBody, itemIds: [] } }).ok, 'tugas tanpa soal ditolak');
   assert(!core.normalizeAssignment({ code: 'FZ-AB2C3D', assignment: { ...asgBody, id: 'bad id!' } }).ok, 'id tugas liar ditolak');
+  const naMapel = core.normalizeAssignment({
+    code: 'FZ-AB2C3D',
+    assignment: {
+      id: 'as-mat-1',
+      title: 'Tugas Matematika',
+      skills: ['MAT', 'KOMP-MAT-D-7-BIL-01'],
+      itemIds: ['q-mat-1'],
+      items: [{ id: 'q-mat-1', prompt: '2+2', options: ['4', '5'], answer: 0, skill: 'MAT' }],
+      mode: 'latihan'
+    }
+  });
+  assert(naMapel.ok && naMapel.payload.skills.includes('mat') && naMapel.payload.items[0].skill === 'mat', 'tugas mapel (MAT & KOMP) dinormalisasi dan diterima server');
   r = await json(await routes.routeClassAssign(ctxOf(db, { sub: 't2', method: 'POST', pathname: '/api/teacher/class/assign', body: { code: 'FZ-AB2C3D', assignment: asgBody }, now: 1_700_000_040_000 })));
   assert(r.status === 404, 'guru t2 tidak bisa mengirim tugas ke kelas guru t1');
   r = await json(await routes.routeClassAssign(ctxOf(db, { sub: 't1', method: 'POST', pathname: '/api/teacher/class/assign', body: { code: 'FZ-AB2C3D', assignment: asgBody, targets: ['Rina'] }, now: 1_700_000_040_000 })));

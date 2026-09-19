@@ -226,6 +226,39 @@ test('frontier bekerja pada grammar-curriculum-v1.json asli (≥139 lesson, id u
   }
 });
 
+// ---------------------------------------------------------------------------------
+// (h) Peluruhan waktu (BKT decay): L meluruh menuju L0 bila lama tidak berlatih
+// ---------------------------------------------------------------------------------
+test('peluruhan waktu BKT: kompatibel mundur tanpa nowMs, meluruh eksponensial dengan nowMs', () => {
+  const st = run([true, true, true, true, true], 'decay_test');
+  const mFresh = bkt.mastery(st, 'decay_test');
+  assert.ok(mFresh.L >= 0.95, 'harus mencapai mastery awal');
+  assert.ok(bkt.masteryGate(st, 'decay_test'), 'lolos gate tanpa argumen waktu');
+
+  // Tanpa nowMs -> L tetap tidak berubah sama sekali (kompatibel mundur)
+  const mNoTime = bkt.mastery(st, 'decay_test');
+  assert.strictEqual(mNoTime.L, mFresh.L, 'L tanpa nowMs wajib identik dengan nilai tersimpan');
+
+  // Setelah 30 hari (1 half-life) -> L meluruh separuh jarak ke L0 (0.2)
+  const after30Days = NOW + 30 * 86400000;
+  const m30 = bkt.mastery(st, 'decay_test', after30Days);
+  const expectedL30 = 0.2 + (mFresh.L - 0.2) * 0.5;
+  assert.ok(Math.abs(m30.L - expectedL30) < 1e-4, 'L setelah 30 hari harus meluruh separuh jarak menuju L0');
+  assert.ok(m30.L < mFresh.L, 'L harus turun setelah 30 hari');
+
+  // Setelah 60 hari (2 half-lives) -> L turun di bawah 0.95 sehingga gerbang mastery terkunci
+  const after60Days = NOW + 60 * 86400000;
+  const m60 = bkt.mastery(st, 'decay_test', after60Days);
+  assert.ok(m60.L < 0.95, 'L setelah 60 hari harus di bawah ambang mastery 0.95');
+  assert.strictEqual(bkt.masteryGate(st, 'decay_test', after60Days), false,
+    'masteryGate dengan nowMs harus false bila materi sudah lama tidak dilatih');
+
+  // decay() murni menghasilkan state baru
+  const decayedSt = bkt.decay(st, after30Days);
+  assert.ok(decayedSt.lessons.decay_test.L < st.lessons.decay_test.L, 'state hasil decay harus lebih rendah');
+  assert.strictEqual(st.lessons.decay_test.L, mFresh.L, 'state lama tidak boleh termutasi');
+});
+
 test('modul murni: tanpa DOM, tanpa jaringan, tanpa penyimpanan, tanpa jam internal', () => {
   const source = fs.readFileSync('./features/brain/fiezel-mastery-bkt.js', 'utf8')
     .replace(/\/\*[\s\S]*?\*\//g, '').replace(/^\s*\/\/.*$/gm, '');

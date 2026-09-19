@@ -72,6 +72,7 @@
     'ringkas.naik': 'Yang naik hari ini',
     'ringkas.naik-kosong': 'Belum ada yang naik cukup jauh untuk dicatat. Itu wajar untuk satu sesi.',
     'ringkas.besok': 'Jatuh tempo besok',
+    'ringkas.kalibrasi': 'Seberapa pas rasa yakinmu',
     'ringkas.besok-kosong': 'Tidak ada yang jatuh tempo besok.',
     'ringkas.besok-item': '{jumlah} materi menunggu diulang',
     'ringkas.baris-naik': '{skill} naik {delta} poin',
@@ -161,6 +162,8 @@
     'latihan.lanjut-sub': 'Selesaikan materi untuk memperkuat bukti kemahiran',
     'latihan.booster-tag': 'AI Booster',
     'latihan.booster-sub': 'Akurasi {akurasi}% · Disarankan latihan {menit} menit',
+    'latihan.booster-tag-tertukar': 'Sering Tertukar',
+    'latihan.booster-sub-tertukar': '{persen}% kekeliruanmu di sini memakai aturan {lawan}. Latih bedanya.',
     'latihan.booster-cta': 'Latih',
 
     /* Flashcard: tombol dengar disembunyikan saat kursusnya belum punya suara sendiri,
