@@ -403,6 +403,14 @@
     'guru.masuk-akun-guru-cta': 'Masuk / Aktivasi Akun Guru',
     'guru.perlu-akun-guru': 'Perlu Akun Guru',
     'guru.bagikan-wa-singkat': 'WhatsApp',
-    'guru.salin-kode-singkat': 'Salin Kode'
+    'guru.salin-kode-singkat': 'Salin Kode',
+    'kelas.panel-mapel-judul': 'Mata Pelajaran Kelas',
+    'kelas.panel-mapel-sub': 'Pilih kartu mapel untuk menyaring tugas & materi dari guru',
+    'kelas.semua-mapel': 'Tampilkan Semua Mapel',
+    'kelas.panel-kelas-terpadu': 'Kelas Terpadu',
+    'kelas.panel-semua-judul': 'Panel Mata Pelajaran {kelas}',
+    'kelas.panel-semua-kelas-fallback': 'Kelas {kode}',
+    'kelas.filter-mapel-kosong': 'Belum ada tugas untuk mapel ini.',
+    'kelas.filter-tampilkan-semua': 'Tampilkan Semua'
   });
 }());

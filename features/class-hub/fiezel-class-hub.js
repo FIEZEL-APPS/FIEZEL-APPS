@@ -570,9 +570,9 @@
     return '<section class="ch-card ch-all-subjects" data-testid="class-all-subjects-panel">' +
       '<div class="ch-card-top">' +
         '<span class="ch-kicker">' + icon('book-open') + ' Kurikulum Merdeka (17 Mapel)</span>' +
-        '<span class="ch-badge">' + (teachers.length ? teachers.length + ' Guru Terdaftar' : 'Kelas Terpadu') + '</span>' +
+        '<span class="ch-badge">' + (teachers.length ? teachers.length + ' Guru Terdaftar' : esc(t('kelas.panel-kelas-terpadu', 'Kelas Terpadu'))) + '</span>' +
       '</div>' +
-      '<h3>Panel Mata Pelajaran ' + esc(className() || ('Kelas ' + code)) + '</h3>' +
+      '<h3>' + esc(t('kelas.panel-semua-judul', 'Panel Mata Pelajaran {kelas}', { kelas: className() || t('kelas.panel-semua-kelas-fallback', 'Kelas {kode}', { kode: code }) })) + '</h3>' +
       '<p class="ch-muted">Satu kode kelas menghubungkan seluruh guru mata pelajaran. Tugas dari masing-masing guru otomatis teralokasi ke kartu panel mapel bersangkutan.</p>' +
       '<div class="ch-subjects-compact-list">' +
         SUBJECTS_17.map(function (s) {
@@ -612,7 +612,7 @@
       teacherGreetingCard() +
       subjectPanelsSection(allPend, allDone) +
       curriculumCard() +
-      '<section><h2 class="ch-h2">' + esc(t('kelas.perlu-dikerjakan', 'Perlu dikerjakan')) + ' <small>' + filteredPend.length + (curFilter ? ' (filter aktif)' : '') + '</small></h2>' + (filteredPend.length ? filteredPend.map(function (a) { return assignCard(a, true); }).join('') : '<div class="ch-empty" data-testid="class-empty-pending">' + icon('inbox') + (curFilter ? '<p>Belum ada tugas untuk mapel ini. <button type="button" class="ch-btn is-small is-ghost" data-ch="clear-subject-filter">Tampilkan Semua</button></p>' : (classCode() ? '<p>' + t('kelas.murid-belum-ada-tugas', 'Belum ada tugas baru dari guru. Tugas yang dikirim guru muncul di sini dan di lonceng notifikasi.') + '</p>' : '') + (classCode() ? '' : '<button type="button" class="ch-btn" data-ch="tab" data-tab="kelas"><span class="kelasku-wordmark">Masukkan kode KelasKu</span></button>')) + '</div>') + '</section>' +
+      '<section><h2 class="ch-h2">' + esc(t('kelas.perlu-dikerjakan', 'Perlu dikerjakan')) + ' <small>' + filteredPend.length + (curFilter ? ' (filter aktif)' : '') + '</small></h2>' + (filteredPend.length ? filteredPend.map(function (a) { return assignCard(a, true); }).join('') : '<div class="ch-empty" data-testid="class-empty-pending">' + icon('inbox') + (curFilter ? '<p>' + esc(t('kelas.filter-mapel-kosong', 'Belum ada tugas untuk mapel ini.')) + ' <button type="button" class="ch-btn is-small is-ghost" data-ch="clear-subject-filter">' + esc(t('kelas.filter-tampilkan-semua', 'Tampilkan Semua')) + '</button></p>' : (classCode() ? '<p>' + t('kelas.murid-belum-ada-tugas', 'Belum ada tugas baru dari guru. Tugas yang dikirim guru muncul di sini dan di lonceng notifikasi.') + '</p>' : '') + (classCode() ? '' : '<button type="button" class="ch-btn" data-ch="tab" data-tab="kelas"><span class="kelasku-wordmark">Masukkan kode KelasKu</span></button>')) + '</div>') + '</section>' +
       '<section><h2 class="ch-h2">' + esc(t('umum.selesai', 'Selesai')) + ' <small>' + filteredDone.length + '</small></h2>' + (filteredDone.length ? filteredDone.map(function (a) { return assignCard(a, false); }).join('') : '') + '</section></div>';
   }
   function kelasView() {

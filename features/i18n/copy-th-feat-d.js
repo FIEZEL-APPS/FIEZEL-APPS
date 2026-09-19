@@ -398,6 +398,14 @@
     'guru.masuk-akun-guru-cta': 'เข้าสู่ระบบ / เปิดใช้งานบัญชีครู',
     'guru.perlu-akun-guru': 'ต้องใช้บัญชีครู',
     'guru.bagikan-wa-singkat': 'WhatsApp',
-    'guru.salin-kode-singkat': 'คัดลอกรหัส'
+    'guru.salin-kode-singkat': 'คัดลอกรหัส',
+    'kelas.panel-mapel-judul': 'วิชาเรียนของชั้นเรียน',
+    'kelas.panel-mapel-sub': 'เลือกการ์ดวิชาเพื่อกรองงานและสื่อการสอนจากครู',
+    'kelas.semua-mapel': 'แสดงทุกวิชา',
+    'kelas.panel-kelas-terpadu': 'ชั้นเรียนแบบบูรณาการ',
+    'kelas.panel-semua-judul': 'แผงวิชาเรียน {kelas}',
+    'kelas.panel-semua-kelas-fallback': 'ชั้นเรียน {kode}',
+    'kelas.filter-mapel-kosong': 'ยังไม่มีงานสำหรับวิชานี้',
+    'kelas.filter-tampilkan-semua': 'แสดงทั้งหมด'
   });
 }());
