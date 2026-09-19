@@ -87,6 +87,26 @@
   function logit(p) { var q = clamp(p, EPS, 1 - EPS); return Math.log(q / (1 - q)); }
   function sigmoid(z) { return 1 / (1 + Math.exp(-z)); }
 
+  var DEFAULT_DECAY_HALF_LIFE_DAYS = 30;
+  var DAY_MS = 86400000;
+
+  /**
+   * Hitung peluruhan L menuju L0 setelah jeda waktu berlalu:
+   * L(t) = L0 + (L_prev - L0) * exp(- elapsed / tau)
+   * dengan tau = (halfLifeDays * DAY_MS) / ln(2).
+   * Murni: bila nowMs tidak diberikan atau <= lastAt, L tidak berubah.
+   */
+  function calculateDecay(L, lastAt, nowMs, halfLifeDays) {
+    var now = num(nowMs, 0);
+    var last = num(lastAt, 0);
+    if (!now || !last || now <= last) return L;
+    var hlDays = Math.max(1, num(halfLifeDays, DEFAULT_DECAY_HALF_LIFE_DAYS));
+    var elapsedDays = (now - last) / DAY_MS;
+    var factor = Math.exp(-elapsedDays * Math.LN2 / hlDays);
+    var decayed = PARAMS.L0 + (L - PARAMS.L0) * factor;
+    return clamp(decayed, EPS, 1 - EPS);
+  }
+
   /**
    * Bentuk kanonik state. State boleh null/korup — pemanggil (localStorage bisa berisi
    * apa saja setelah update aplikasi) tidak boleh bisa membuat modul ini melempar.
@@ -150,16 +170,43 @@
     return next;
   }
 
-  /** mastery(st, lesson) -> {L, n}. Lesson tak dikenal = prior jujur {L0, 0}. */
-  function mastery(st, lesson) {
+  /**
+   * decay(st, nowMs, halfLifeDays) -> st'
+   * Menghasilkan state baru di mana seluruh lesson ter-decay ke waktu nowMs.
+   */
+  function decay(st, nowMs, halfLifeDays) {
+    var base = normalizeState(st);
+    var next = { schema: SCHEMA, lessons: {} };
+    for (var k in base.lessons) {
+      var row = base.lessons[k];
+      if (!row || typeof row !== 'object') continue;
+      next.lessons[k] = {
+        L: calculateDecay(row.L, row.lastAt, nowMs, halfLifeDays),
+        n: row.n,
+        lastAt: row.lastAt
+      };
+    }
+    return next;
+  }
+
+  /**
+   * mastery(st, lesson, nowMs, halfLifeDays) -> {L, n, lastAt}.
+   * Lesson tak dikenal = prior jujur {L0, 0, 0}.
+   * Kompatibel mundur: jika nowMs tidak disertakan, L tidak meluruh (nilai aktual tersimpan).
+   */
+  function mastery(st, lesson, nowMs, halfLifeDays) {
     var base = normalizeState(st);
     var row = readLesson(base.lessons, str(lesson));
-    return { L: row.L, n: row.n };
+    var L = row.L;
+    if (nowMs !== undefined && nowMs !== null) {
+      L = calculateDecay(L, row.lastAt, nowMs, halfLifeDays);
+    }
+    return { L: L, n: row.n, lastAt: row.lastAt };
   }
 
   /** Gerbang mastery: posterior tinggi SAJA tidak cukup — buktinya juga harus cukup. */
-  function masteryGate(st, lesson) {
-    var m = mastery(st, lesson);
+  function masteryGate(st, lesson, nowMs, halfLifeDays) {
+    var m = mastery(st, lesson, nowMs, halfLifeDays);
     return m.L >= GATE.L && m.n >= GATE.minN;
   }
 
@@ -287,6 +334,8 @@
     mastery: mastery,
     masteryGate: masteryGate,
     frontier: frontier,
-    rootCause: rootCause
+    rootCause: rootCause,
+    decay: decay,
+    calculateDecay: calculateDecay
   };
 });

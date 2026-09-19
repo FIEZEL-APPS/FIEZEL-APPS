@@ -484,3 +484,89 @@ async def get_session(session_id: str, u=Depends(current_user)):
 @router.get("/passport")
 async def my_passport(u=Depends(current_user)):
     return await bc.learning_passport(u["user_id"])
+
+
+# ------------------------- two-way state sync -------------------------
+class CompetencySyncIn(BaseModel):
+    competency_id: str
+    p_mastery: float
+    state: str | None = None
+    attempts: int = 0
+    correct: int = 0
+    streak: int = 0
+    hints_used: int = 0
+    retries: int = 0
+    stability_days: float = 1.0
+    due_at: datetime | None = None
+    last_at: datetime | None = None
+    tp_id: str | None = None
+
+
+class StateSyncIn(BaseModel):
+    theta: float | None = None
+    sd: float | None = None
+    competencies: list[CompetencySyncIn] = Field(default_factory=list)
+    misconceptions: list[dict[str, Any]] = Field(default_factory=list)
+    client_timestamp: datetime | None = None
+
+
+@router.post("/sync-state")
+async def sync_state(body: StateSyncIn, u=Depends(current_user)):
+    """Rekonsiliasi state dua arah (klien offline <-> database server).
+
+    Menerapkan pembaruan non-destruktif:
+    1. Jika klien memiliki jumlah percobaan lebih tinggi, catat riwayat offline ke server.
+    2. Jika server memiliki data lebih baru, pertahankan kemajuan server.
+    3. Kembalikan state gabungan yang otoritatif ke klien.
+    """
+    sid = u["user_id"]
+    updated_cids = []
+
+    for item in body.competencies:
+        st = await bc.get_state(sid, item.competency_id)
+        if item.attempts > st.get("attempts", 0):
+            st["attempts"] = item.attempts
+            st["correct"] = max(st.get("correct", 0), item.correct)
+            st["streak"] = item.streak
+            st["hints_used"] = max(st.get("hints_used", 0), item.hints_used)
+            st["retries"] = max(st.get("retries", 0), item.retries)
+            st["p_mastery"] = round(max(0.01, min(0.99, item.p_mastery)), 4)
+            st["stability_days"] = max(0.5, item.stability_days)
+            if item.due_at:
+                st["due_at"] = item.due_at
+            if item.last_at:
+                st["last_at"] = item.last_at
+            if item.tp_id:
+                st["tp_id"] = item.tp_id
+            st["state"] = bc.derive_state(st)
+            await db.learner_competency.update_one(
+                {"student_id": sid, "competency_id": item.competency_id},
+                {"$set": st}, upsert=True
+            )
+            updated_cids.append(item.competency_id)
+
+    for mis in body.misconceptions:
+        cid = mis.get("competency_id")
+        mid = mis.get("misconception_id")
+        if cid and mid and not mis.get("resolved"):
+            await db.misconception_ledger.update_one(
+                {"student_id": sid, "competency_id": cid, "misconception_id": mid},
+                {"$inc": {"frequency": mis.get("frequency", 1)},
+                 "$set": {"last_at": bc.now(), "resolved": False, "tp_id": mis.get("tp_id")},
+                 "$setOnInsert": {"first_at": bc.now()}},
+                upsert=True
+            )
+
+    server_recs = await db.learner_competency.find({"student_id": sid}, {"_id": 0}).to_list(1000)
+    open_mis = await db.misconception_ledger.find({"student_id": sid, "resolved": False}, {"_id": 0}).to_list(200)
+
+    return {
+        "synced": True,
+        "student_id": sid,
+        "client_competencies_received": len(body.competencies),
+        "server_updated_count": len(updated_cids),
+        "total_server_competencies": len(server_recs),
+        "competencies": server_recs,
+        "open_misconceptions": open_mis,
+        "server_time": bc.now()
+    }

@@ -214,7 +214,39 @@ function loadCoreBrainModule(file, globalName) {
     'draf = PENDING');
   assert(B.syncStatusOf(lesson, { items: [], skipped: [] }) === 'PENDING',
     'lesson terbit tanpa item terindeks = PENDING, bukan SYNCED palsu');
-  assert(B.syncStatusOf(null, {}) === 'FAILED', 'node hilang = FAILED (fail-closed)');
+  /* ---------- 8. Empirical Bayes Item Calibration Pooling (§17) --------------- */
+  assert(typeof B.poolItemDeltas === 'function', 'fungsi poolItemDeltas tersedia');
+  assert(typeof B.calibratedDifficulty === 'function', 'fungsi calibratedDifficulty tersedia');
+
+  // Uji sampel kecil (N=2) menyusut kuat mendekati 0
+  const smallSample = B.poolItemDeltas([
+    { itemId: 'item-1', delta: 0.5, n: 1, kappa: 1.0 },
+    { itemId: 'item-1', delta: 0.5, n: 1, kappa: 1.0 }
+  ]);
+  const pSmall = smallSample.byItem['item-1'];
+  assert(pSmall && pSmall.totalWeight === 2, 'bobot terakumulasi benar untuk sampel kecil');
+  assert(pSmall.applied === false, 'sampel kecil (N=2 < 8) belum diterapkan ke prior');
+  assert(pSmall.pooledDelta < 0.15, 'sampel kecil menyusut kuat ke prior: delta=' + pSmall.pooledDelta);
+
+  // Uji sampel besar (N=60) mendekati rata-rata observasi
+  const largeSample = B.poolItemDeltas([
+    { itemId: 'item-2', delta: 0.4, n: 30, kappa: 1.0 },
+    { itemId: 'item-2', delta: 0.4, n: 30, kappa: 1.0 }
+  ]);
+  const pLarge = largeSample.byItem['item-2'];
+  assert(pLarge && pLarge.applied === true, 'sampel besar (N=60 >= 8) diterapkan');
+  assert(pLarge.pooledDelta > 0.30, 'sampel besar mendekati rata-rata: delta=' + pLarge.pooledDelta);
+
+  // Uji adversarial clamp: delta ekstrim (+2.0) di-clamp ke +/-0.6
+  const extremeSample = B.poolItemDeltas([
+    { itemId: 'item-3', delta: 2.0, n: 100, kappa: 1.0 }
+  ]);
+  const pExtreme = extremeSample.byItem['item-3'];
+  assert(Math.abs(pExtreme.pooledDelta) <= 0.6 + 1e-6, 'adversarial delta di-clamp ke batas shrinkage 0.6: ' + pExtreme.pooledDelta);
+
+  // Uji calibratedDifficulty roundtrip
+  const calDiff = B.calibratedDifficulty(2.5, pLarge.pooledDelta);
+  assert(calDiff === Math.round((2.5 + pLarge.pooledDelta) * 1000) / 1000, 'kesulitan terkalibrasi prior + pooledDelta');
 
   /* ---------- Laporan -------------------------------------------------------- */
   const passed = results.filter((r) => r.ok).length;

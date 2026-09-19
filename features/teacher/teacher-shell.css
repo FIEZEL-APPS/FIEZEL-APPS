@@ -442,5 +442,3 @@ html.fiezel-ui-v6 body.fz-teacher-mode .tg button.tg-seg-btn:not(.primary):not(.
 .tg-btn.is-wa-ghost:hover{background:#DCFCE7}
 .tg-code-box{display:flex;flex-direction:column;gap:8px;margin-top:8px}
 .tg-code-box textarea{font-family:var(--tg-mono);font-size:.8rem;border:1px solid var(--tg-line);border-radius:var(--tg-r);padding:8px;background:#fff;color:var(--tg-ink);resize:vertical}
-
-

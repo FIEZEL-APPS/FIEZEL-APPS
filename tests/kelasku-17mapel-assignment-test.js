@@ -239,7 +239,7 @@ const dummyPhrases = [
   allMapelIds.forEach(function (mId) {
     const qs = TShell._synthesizeMapelQuestions(mId, 'KOMP-' + mId + '-TEST', 'Uji Skala ' + mId, reqCount);
     assert(qs.length === reqCount, `Mapel ${mId} (req=${reqCount}): menghasilkan tepat ${reqCount} butir soal`);
-    
+
     // Pastikan tidak ada satupun soal dummy template generik
     qs.forEach(function (q, idx) {
       dummyPhrases.forEach(function (phrase) {
