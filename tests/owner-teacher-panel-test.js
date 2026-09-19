@@ -1,4 +1,4 @@
-﻿// tests/owner-teacher-panel-test.js — Pengujian panel kelola token guru di Dashboard Owner.
+// tests/owner-teacher-panel-test.js — Pengujian panel kelola token guru di Dashboard Owner.
 'use strict';
 
 const assert = require('assert');
@@ -11,6 +11,8 @@ const assert = require('assert');
   assert(typeof ownerMod.readTeachers === 'function', 'readTeachers diekspor');
   assert(typeof ownerMod.mintTeacherInvite === 'function', 'mintTeacherInvite diekspor');
   assert(typeof ownerMod.revokeTeacherInvite === 'function', 'revokeTeacherInvite diekspor');
+  assert(typeof ownerMod.updateTeacherInvite === 'function', 'updateTeacherInvite diekspor');
+  assert(typeof ownerMod.deleteTeacherInvite === 'function', 'deleteTeacherInvite diekspor');
   assert(typeof ownerMod.renderTeacherSection === 'function', 'renderTeacherSection diekspor');
 
   // 2. mintTeacherInvite mengirim method POST dan body JSON yang tepat
@@ -68,7 +70,50 @@ const assert = require('assert');
     assert(body.codeHash === 'a'.repeat(64), 'codeHash terkirim');
   }
 
-  // 4. renderTeacherSection mematuhi CSP (Zero inline script & inline on* handlers)
+  // 4. updateTeacherInvite mengirim codeHash, subject_id, grade_id
+  {
+    let captured = null;
+    const mockFetch = async (url, opt) => {
+      captured = { url, opt };
+      return { ok: true, status: 200, json: async () => ({ ok: true, updated: true }) };
+    };
+
+    const env = { EVIDENCE_API_BASE: 'https://api.fiezel.my.id', EVIDENCE_API_TOKEN: 'secret-owner-token' };
+    const res = await ownerMod.updateTeacherInvite(env, {
+      codeHash: 'a'.repeat(64),
+      subject_id: 'IND',
+      grade_id: 'SMA'
+    }, mockFetch);
+    assert(res.state === 'ok', 'update state ok');
+    assert(captured.url === 'https://api.fiezel.my.id/api/owner/teacher-invite/update', 'update url benar');
+    const body = JSON.parse(captured.opt.body);
+    assert(body.codeHash === 'a'.repeat(64), 'codeHash terkirim');
+    assert(body.subject_id === 'IND', 'subject_id terkirim');
+    assert(body.grade_id === 'SMA', 'grade_id terkirim');
+  }
+
+  // 5. deleteTeacherInvite mengirim codeHash atau mode bulk
+  {
+    let captured = null;
+    const mockFetch = async (url, opt) => {
+      captured = { url, opt };
+      return { ok: true, status: 200, json: async () => ({ ok: true, deleted: true }) };
+    };
+
+    const env = { EVIDENCE_API_BASE: 'https://api.fiezel.my.id', EVIDENCE_API_TOKEN: 'secret-owner-token' };
+    const res = await ownerMod.deleteTeacherInvite(env, { codeHash: 'b'.repeat(64) }, mockFetch);
+    assert(res.state === 'ok', 'delete state ok');
+    assert(captured.url === 'https://api.fiezel.my.id/api/owner/teacher-invite/delete', 'delete url benar');
+    const body = JSON.parse(captured.opt.body);
+    assert(body.codeHash === 'b'.repeat(64), 'codeHash terkirim');
+
+    // bulk mode
+    await ownerMod.deleteTeacherInvite(env, { mode: 'revoked' }, mockFetch);
+    const bodyBulk = JSON.parse(captured.opt.body);
+    assert(bodyBulk.mode === 'revoked', 'bulk mode terkirim');
+  }
+
+  // 6. renderTeacherSection mematuhi CSP (Zero inline script & inline on* handlers)
   {
     const model = {
       teachers: {
@@ -80,6 +125,9 @@ const assert = require('assert');
             institutionType: 'school',
             status: 'ACTIVE',
             codeHash: 'b'.repeat(64),
+            rawCode: '23456789ABCDEFGHJKMNPQRSTVWXYZ12',
+            subject_id: 'MAT',
+            grade_id: 'SMP',
             createdAt: Date.now() - 3600000,
             expiresAt: Date.now() + 89 * 86400000
           },
@@ -88,6 +136,7 @@ const assert = require('assert');
             institution: 'SMA 1',
             institutionType: 'school',
             status: 'REVOKED',
+            codeHash: 'c'.repeat(64),
             createdAt: Date.now() - 86400000,
             expiresAt: Date.now() + 10 * 86400000
           }
@@ -124,12 +173,17 @@ const assert = require('assert');
 
     // Assert komponen esensial
     assert(rendered.includes('TESTTOKEN123456789ABCDEFGHJKMNPQ'), 'Kode token baru tertampil di banner');
+    assert(rendered.includes('23456789ABCDEFGHJKMNPQRSTVWXYZ12'), 'Kode token terlihat di kolom Kode Token');
     assert(rendered.includes('user-select:all'), 'Kode token punya styling user-select:all untuk mudah disalin');
     assert(rendered.includes('HANYA DITAMPILKAN SEKALI'), 'Peringatan one-time view tertampil');
     assert(rendered.includes('Mardhiana Hamzah'), 'Nama guru tertampil');
     assert(rendered.includes('MTsN 5 ACEH BESAR'), 'Nama instansi tertampil');
     assert(rendered.includes('90 Hari'), 'Opsi 90 hari tersedia');
     assert(rendered.includes('Cabut'), 'Tombol cabut tersedia');
+    assert(rendered.includes('Edit'), 'Tombol/opsi edit tersedia');
+    assert(rendered.includes('value="update_invite"'), 'Form update invite tersedia');
+    assert(rendered.includes('value="delete_invite"'), 'Form delete invite tersedia');
+    assert(rendered.includes('value="clear_invites"'), 'Toolbar bersihkan token tersedia');
     assert(rendered.includes('AKTIF'), 'Badge status AKTIF tertampil');
     assert(rendered.includes('DICABUT'), 'Badge status DICABUT tertampil');
     assert(rendered.includes('mardhiana'), 'Handle akun guru aktif tertampil');

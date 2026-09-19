@@ -8,7 +8,7 @@
   var E = root.FZEngine, esc = E.esc, api = E.api, toast = E.toast;
   var app = document.getElementById('app');
   var S = {
-    user: null, classes: [], cls: null, view: 'copilot', tree: null, coverage: null,
+    user: null, classes: [], cls: null, activeSubject: null, view: 'copilot', tree: null, coverage: null,
     recs: null, questions: [], reviewQueue: [], tps: [], comps: [], assessments: [],
     drawer: null, modal: null, plan: null, groups: null, busy: false, health: null, blueprintCheck: null,
     engStatus: null, engBusy: false, mapelStatus: null, mapelBusy: false,
@@ -30,9 +30,69 @@
     return (s === undefined || s === kunci) ? cadangan : s;
   }
 
+  var GRADES = [
+    ['KELAS-7', t('kurikulum.opt-k7', 'Kelas 7 (Fase D · SMP)')],
+    ['KELAS-8', t('kurikulum.opt-k8', 'Kelas 8 (Fase D · SMP)')],
+    ['KELAS-9', t('kurikulum.opt-k9', 'Kelas 9 (Fase D · SMP)')],
+    ['KELAS-10', t('kurikulum.opt-k10', 'Kelas 10 (Fase E · SMA/SMK)')],
+    ['KELAS-11', t('kurikulum.opt-k11', 'Kelas 11 (Fase F · SMA/SMK)')],
+    ['KELAS-12', t('kurikulum.opt-k12', 'Kelas 12 (Fase F · SMA/SMK)')],
+    ['KELAS-1', t('kurikulum.opt-k1', 'Kelas 1 (Fase A · SD)')],
+    ['KELAS-2', t('kurikulum.opt-k2', 'Kelas 2 (Fase A · SD)')],
+    ['KELAS-3', t('kurikulum.opt-k3', 'Kelas 3 (Fase B · SD)')],
+    ['KELAS-4', t('kurikulum.opt-k4', 'Kelas 4 (Fase B · SD)')],
+    ['KELAS-5', t('kurikulum.opt-k5', 'Kelas 5 (Fase C · SD)')],
+    ['KELAS-6', t('kurikulum.opt-k6', 'Kelas 6 (Fase C · SD)')]
+  ];
+
+  var SUBJECT_CHOICES = [
+    ['MAT-7', t('kurikulum.sub-mat7', 'Matematika (Kelas 7 · SMP)')],
+    ['MAT-8', t('kurikulum.sub-mat8', 'Matematika (Kelas 8 · SMP)')],
+    ['MAT-9', t('kurikulum.sub-mat9', 'Matematika (Kelas 9 · SMP)')],
+    ['ENG-7', t('kurikulum.sub-eng7', 'Bahasa Inggris (Kelas 7 · SMP)')],
+    ['ENG-8', t('kurikulum.sub-eng8', 'Bahasa Inggris (Kelas 8 · SMP)')],
+    ['ENG-9', t('kurikulum.sub-eng9', 'Bahasa Inggris (Kelas 9 · SMP)')],
+    ['IPA-7', t('kurikulum.sub-ipa7', 'IPA (Kelas 7 · SMP)')],
+    ['IPA-8', t('kurikulum.sub-ipa8', 'IPA (Kelas 8 · SMP)')],
+    ['IPA-9', t('kurikulum.sub-ipa9', 'IPA (Kelas 9 · SMP)')],
+    ['IPS-7', t('kurikulum.sub-ips7', 'IPS (Kelas 7 · SMP)')],
+    ['IND-7', t('kurikulum.sub-ind7', 'Bahasa Indonesia (Kelas 7 · SMP)')],
+    ['INF-7', t('kurikulum.sub-inf7', 'Informatika (Kelas 7 · SMP)')],
+    ['PKN-7', t('kurikulum.sub-pkn7', 'Pendidikan Pancasila (Kelas 7 · SMP)')],
+    ['MAT', t('kurikulum.sub-mat', 'Matematika (Semua Kelas)')],
+    ['ENG', t('kurikulum.sub-eng', 'Bahasa Inggris (Semua Kelas)')],
+    ['IPA', t('kurikulum.sub-ipa', 'Ilmu Pengetahuan Alam (IPA)')],
+    ['IPS', t('kurikulum.sub-ips', 'Ilmu Pengetahuan Sosial (IPS)')],
+    ['IND', t('kurikulum.sub-ind', 'Bahasa Indonesia')],
+    ['INF', t('kurikulum.sub-inf', 'Informatika')],
+    ['PKN', t('kurikulum.sub-pkn', 'Pendidikan Pancasila')],
+    ['SD-ALL', t('kurikulum.sub-sd-all', 'Guru Kelas SD (Tematik)')],
+    ['ALL', t('kurikulum.sub-all', 'Semua Mata Pelajaran')]
+  ];
+
+  function activeSubj() {
+    return (S.cls && S.cls.subject_id) || S.activeSubject || 'MAT-7';
+  }
+
+  function subjName(sid) {
+    if (!sid) return t('kurikulum.sub-umum', 'Semua Mata Pelajaran');
+    for (var i = 0; i < SUBJECT_CHOICES.length; i++) {
+      if (SUBJECT_CHOICES[i][0] === sid) return SUBJECT_CHOICES[i][1];
+    }
+    var base = sid.split('-')[0];
+    for (var j = 0; j < SUBJECT_CHOICES.length; j++) {
+      if (SUBJECT_CHOICES[j][0] === base) return SUBJECT_CHOICES[j][1];
+    }
+    return sid;
+  }
+
   var NAV = [
-    ['copilot', 'Kopilot Guru'], ['coverage', 'Cakupan Kurikulum'], ['curriculum', 'Struktur Kurikulum'],
-    ['bank', 'Bank Soal'], ['assessment', 'Asesmen'], ['students', 'Murid & Paspor']
+    ['copilot', t('kurikulum.nav-copilot', 'Beranda Guru')],
+    ['coverage', t('kurikulum.nav-coverage', 'Kemajuan Belajar')],
+    ['curriculum', t('kurikulum.nav-curriculum', 'Standar Kurikulum')],
+    ['bank', t('kurikulum.nav-bank', 'Bank Soal')],
+    ['assessment', t('kurikulum.nav-assessment', 'Kuis & Ulangan')],
+    ['students', t('kurikulum.nav-students', 'Nilai & Rapor')]
   ];
 
   // ---------------- boot ----------------
@@ -66,28 +126,102 @@
       '<button class="btn primary" data-a="login" data-testid="teacher-login-btn">Masuk dengan akun KelasKu</button>' +
       '<p class="muted" style="margin-top:16px;font-size:13px">Belum masuk? Buka <a href="./index.html" data-testid="link-app">aplikasi FIEZEL</a> dulu, lalu kembali ke halaman ini.</p>' +
       '<p class="muted" style="font-size:13px">Murid masuk di halaman <a href="./misi.html" data-testid="link-student">Misi Belajar</a>.</p>' +
+      '<p class="muted" style="margin-top:20px;font-size:11px;line-height:1.5;border-top:1px solid rgba(255,255,255,0.08);padding-top:12px">' +
+      esc(t('kurikulum.disclaimer-auth', 'Mengadopsi Standar Capaian Pembelajaran Kurikulum Merdeka (BSKAP No. 032/H/KR/2024). Menghormati penuh otonomi KOSP sekolah dan pendidik.')) +
+      '</p>' +
       '</div></div>';
   }
 
   function start(user) {
     S.user = user;
+    if (user && (user.subjectId || user.subject_id)) {
+      S.activeSubject = user.subjectId || user.subject_id;
+    }
+    if (E && E.seed && E.seed.mapelStatus) {
+      E.seed.mapelStatus().then(function (st) {
+        if (st && !st.seeded && E.seed.mapel) {
+          return E.seed.mapel().catch(function () {});
+        }
+      }).catch(function () {});
+    }
     api('/classes').then(function (list) {
       S.classes = list;
       if (!list.length) {
-        return api('/seed/bootstrap', { body: {} }).then(function (r) {
-          S.classes = [r.class]; S.cls = r.class;
-          toast('Kurikulum Merdeka & bank soal contoh disiapkan.');
-        });
+        openWelcomeModal();
+        return;
       }
       S.cls = list[0];
-    }).then(loadContext).then(render).catch(function (e) { renderAuth(e.message); });
+      if (S.cls && S.cls.subject_id) {
+        S.activeSubject = S.cls.subject_id;
+      }
+      return loadContext().then(render);
+    }).catch(function (e) { renderAuth(e.message); });
+  }
+
+  function openWelcomeModal() {
+    var rawSub = S.activeSubject || '';
+    var defSubject = 'MAT-7';
+    for (var sIdx = 0; sIdx < SUBJECT_CHOICES.length; sIdx++) {
+      var sCode = SUBJECT_CHOICES[sIdx][0];
+      if (sCode === rawSub || (rawSub && (sCode.indexOf(rawSub + '-') === 0 || sCode === rawSub))) {
+        defSubject = sCode;
+        break;
+      }
+    }
+
+    var rawGrd = (S.user && (S.user.gradeId || S.user.grade_id)) || '';
+    var defGrade = 'KELAS-7';
+    if (rawGrd === 'SMP' || rawGrd === 'fase_d') defGrade = 'KELAS-7';
+    else if (rawGrd === 'SMA' || rawGrd === 'fase_e' || rawGrd === 'fase_f') defGrade = 'KELAS-10';
+    else if (rawGrd === 'SD' || rawGrd === 'fase_a' || rawGrd === 'fase_b' || rawGrd === 'fase_c') defGrade = 'KELAS-1';
+
+    S.modal =
+      '<div class="card tight ink" style="margin-bottom:0;max-width:520px" data-testid="welcome-onboarding-modal">' +
+      '<div class="row between" style="margin-bottom:12px">' +
+        '<h3 style="margin:0">' + esc(t('kurikulum.welcome-title', 'Selamat Datang di Ruang Guru!')) + '</h3>' +
+      '</div>' +
+      '<p class="muted" style="margin-bottom:16px;line-height:1.5">' +
+        esc(t('kurikulum.welcome-sub', 'Pilih mata pelajaran dan kelas yang Anda ampu agar ruang belajar Anda siap digunakan.')) +
+      '</p>' +
+      '<label class="f">' + esc(t('kurikulum.modal-kelas-nama', 'Nama Rombel / Kelas')) +
+        '<input id="welcomeClsName" value="' + esc(t('kurikulum.default-class-name', 'Kelas 7A')) + '" autofocus data-testid="welcome-class-name">' +
+      '</label>' +
+      '<div class="grid g2">' +
+        '<label class="f">' + esc(t('kurikulum.modal-kelas-jenjang', 'Tingkat / Fase')) +
+          '<select id="welcomeClsGrade" data-testid="welcome-class-grade">' +
+            GRADES.map(function (g) { return '<option value="' + g[0] + '"' + (g[0] === defGrade ? ' selected' : '') + '>' + esc(g[1]) + '</option>'; }).join('') +
+          '</select>' +
+        '</label>' +
+        '<label class="f">' + esc(t('kurikulum.modal-kelas-mapel', 'Mata Pelajaran')) +
+          '<select id="welcomeClsSubject" data-testid="welcome-class-subject">' +
+            SUBJECT_CHOICES.map(function (s) { return '<option value="' + s[0] + '"' + (s[0] === defSubject ? ' selected' : '') + '>' + esc(s[1]) + '</option>'; }).join('') +
+          '</select>' +
+        '</label>' +
+      '</div>' +
+      '<div style="margin-top:20px;display:flex;flex-direction:column;gap:10px">' +
+        '<button class="btn primary" data-a="submit-welcome-class" data-testid="submit-welcome-btn">' + esc(t('kurikulum.welcome-submit', '🚀 Mulai Mengajar di Ruang Ini')) + '</button>' +
+        '<button class="btn ghost sm" data-a="bootstrap-demo-class" data-testid="bootstrap-demo-btn">' + esc(t('kurikulum.welcome-demo-btn', 'Atau Gunakan Kelas Contoh (Demo)')) + '</button>' +
+      '</div>' +
+      '</div>';
+    render();
   }
 
   function loadContext() {
+    var sub = activeSubj();
     return Promise.all([
-      api('/curriculum/nodes?type=tp'),
-      api('/curriculum/competencies')
+      api('/curriculum/nodes?type=tp' + (sub ? '&subject_id=' + encodeURIComponent(sub) : '')),
+      api('/curriculum/competencies' + (sub ? '?subject_id=' + encodeURIComponent(sub) : ''))
     ]).then(function (r) { S.tps = r[0]; S.comps = r[1]; });
+  }
+
+  function renderDisclaimer() {
+    return '<footer class="compliance-footer" data-testid="compliance-disclaimer" style="margin-top:40px;padding:16px 20px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:12px;font-size:12px;line-height:1.6;color:var(--text-muted, #8e9bb0)">' +
+      '<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;font-weight:600;color:var(--text-normal, #cad5e2)">' +
+      '<span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#10b981"></span>' +
+      '<span>' + esc(t('kurikulum.disclaimer-badge', 'Standar Kurikulum Merdeka & Otonomi Pendidik')) + '</span>' +
+      '</div>' +
+      '<p style="margin:0">' + esc(t('kurikulum.disclaimer-text', 'FIEZEL beroperasi sebagai platform pendukung pembelajaran mandiri yang mengadopsi struktur Capaian Pembelajaran Kurikulum Merdeka (Keputusan Kepala BSKAP Kemendikbudristek No. 032/H/KR/2024 dan Permendikbudristek No. 12 Tahun 2024). Guru dan satuan pendidikan memiliki otonomi pedagogis penuh untuk menyesuaikan materi, indikator, dan alur tujuan pembelajaran sesuai Kurikulum Operasional Satuan Pendidikan (KOSP) masing-masing.')) + '</p>' +
+      '</footer>';
   }
 
   // ---------------- kerangka ----------------
@@ -96,6 +230,10 @@
     app.innerHTML =
       '<div class="shell"><aside class="side">' +
       '<div class="brand"><span class="brand-mark">F</span><div><b>FIEZEL</b><small>Kurikulum & Kompetensi</small></div></div>' +
+      '<div class="card tight ink" style="margin-bottom:12px;padding:8px 10px;background:rgba(56,189,248,0.08);border:1px solid rgba(56,189,248,0.2);border-radius:8px" data-testid="active-subject-badge">' +
+      '<small class="kicker" style="font-size:10px;color:#38bdf8;margin:0;display:block">' + esc(t('kurikulum.ruang-guru-label', 'RUANG MATA PELAJARAN')) + '</small>' +
+      '<b style="font-size:12px;color:var(--text-normal, #cad5e2);display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">' + esc(subjName(activeSubj())) + '</b>' +
+      '</div>' +
       (S.classes.length ? '<label class="f">Kelas aktif<select data-a="pick-class" data-testid="class-select">' +
         S.classes.map(function (c) { return '<option value="' + c.id + '"' + (S.cls && c.id === S.cls.id ? ' selected' : '') + '>' + esc(c.name) + '</option>'; }).join('') +
         '</select></label>' : '') +
@@ -107,13 +245,13 @@
       '<a class="btn sm ghost" href="./index.html">← Aplikasi FIEZEL</a>' +
       '<button class="btn sm ghost" data-a="logout" data-testid="logout-btn">Keluar</button></div>' +
       '<p class="muted mono" style="margin-top:22px">' + esc(S.user.name || '') + ' · ' + esc(S.user.role) + '</p>' +
-      '</aside><main class="main" data-testid="teacher-console">' + view() + '</main></div>' +
+      '</aside><main class="main" data-testid="teacher-console">' + view() + renderDisclaimer() + '</main></div>' +
       (S.drawer ? '<div class="scrim" data-a="close"></div><aside class="drawer" data-testid="drawer">' + S.drawer + '</aside>' : '') +
       (S.modal ? '<div class="scrim" data-a="close"></div><div class="modal" data-testid="modal">' + S.modal + '</div>' : '');
   }
 
   function view() {
-    if (!S.cls) return '<div class="card">Belum ada kelas. Buat kelas baru untuk mulai.</div>';
+    if (!S.cls) return '<div class="card"><h3>' + esc(t('kurikulum.welcome-title', 'Selamat Datang di Ruang Guru!')) + '</h3><p class="muted">' + esc(t('kurikulum.welcome-sub', 'Pilih mata pelajaran dan kelas yang Anda ampu agar ruang belajar Anda siap digunakan.')) + '</p><button class="btn primary sm" data-a="new-class" style="margin-top:10px">+ ' + esc(t('kurikulum.modal-kelas-submit', 'Simpan & Buat Kelas')) + '</button></div>';
     return ({ copilot: vCopilot, coverage: vCoverage, curriculum: vCurriculum, bank: vBank,
               assessment: vAssessment, students: vStudents }[S.view] || vCopilot)();
   }
@@ -125,7 +263,7 @@
 
   // ---------------- 1. Kopilot ----------------
   function vCopilot() {
-    if (!S.coverage) { loadCoverage(); return head('Kopilot', 'Menyiapkan intelijen kelas…') + '<div class="card">Memuat evidence…</div>'; }
+    if (!S.coverage) { loadCoverage(); return head(t('kurikulum.nav-copilot', 'Beranda Guru'), t('kurikulum.copilot-loading', 'Menyiapkan panduan mengajar kelas…')) + '<div class="card">' + t('kurikulum.copilot-memuat', 'Memuat data belajar kelas…') + '</div>'; }
     if (!S.recs) { loadRecs(); }
     var rows = S.coverage.rows, total = rows.length;
     var missing = rows.filter(function (r) { return r.status === 'MISSING' || r.status === 'NOT_TAUGHT'; }).length;
@@ -133,14 +271,14 @@
     var good = rows.filter(function (r) { return r.status === 'GOOD'; }).length;
     var avg = rows.filter(function (r) { return r.mastery_pct != null; });
     var mastery = avg.length ? Math.round(avg.reduce(function (a, b) { return a + b.mastery_pct; }, 0) / avg.length) : null;
-    return head('Kopilot Guru', 'Apa yang harus saya lakukan sekarang?',
-      'Rekomendasi dibangun dari evidence nyata kelas ' + S.cls.name + ' — bukan template.') +
+    return head(t('kurikulum.nav-copilot', 'Beranda Guru'), t('kurikulum.copilot-title', 'Panduan & Rekomendasi Mengajar Hari Ini'),
+      t('kurikulum.copilot-sub', 'Saran otomatis berdasarkan materi yang perlu diperkuat di kelas ') + S.cls.name + '.') +
       '<div class="grid g4">' +
-      kpi('TP dipantau', total, 0) + kpi('Belum diajarkan / tanpa soal', missing, 60) +
-      kpi('Sudah diajarkan, belum dikuasai', gap, 120) + kpi('Rata-rata penguasaan', mastery == null ? '—' : mastery + '%', 180) +
+      kpi(t('kurikulum.kpi-tp-pantau', 'Materi Dipantau'), total, 0) + kpi(t('kurikulum.kpi-belum-ajar', 'Belum Diajarkan'), missing, 60) +
+      kpi(t('kurikulum.kpi-perlu-remedial', 'Perlu Remedial / Bimbingan'), gap, 120) + kpi(t('kurikulum.kpi-rata-nilai', 'Rata-rata Nilai Kelas'), mastery == null ? '—' : mastery + '%', 180) +
       '</div>' +
       '<div class="card accent rise" style="--d:220ms" data-testid="recommendations">' +
-      '<p class="kicker">3 tindakan paling disarankan hari ini</p>' +
+      '<p class="kicker">' + esc(t('kurikulum.recs-kicker', '💡 Rekomendasi Guru Hari Ini')) + '</p>' +
       (S.recs ? (S.recs.length ? S.recs.map(function (r, i) {
         return '<div class="card tight" style="margin-top:12px" data-testid="rec-' + i + '">' +
           '<div class="row between"><b>' + esc(r.title) + '</b><span class="pill ' +
@@ -151,18 +289,18 @@
           '<div class="row">' + (r.actions || []).map(function (a, j) {
             return '<button class="btn ' + (j === 0 ? 'primary' : 'ghost') + ' sm" data-a="exec-rec" data-i="' + i + '" data-j="' + j + '" data-testid="rec-' + i + '-action-' + j + '">' + esc(a.label) + '</button>';
           }).join('') + '</div></div>';
-      }).join('') : '<p class="muted">Belum ada evidence yang cukup untuk merekomendasikan tindakan.</p>')
-        : '<p class="muted">Menghitung rekomendasi…</p>') + '</div>' +
+      }).join('') : '<p class="muted">' + t('kurikulum.recs-empty', 'Belum ada data nilai yang cukup untuk merekomendasikan tindakan.') + '</p>')
+        : '<p class="muted">' + t('kurikulum.recs-calc', 'Menghitung rekomendasi mengajar…') + '</p>') + '</div>' +
       '<div class="grid g2">' +
-      '<div class="card rise" style="--d:280ms" data-testid="lesson-plan-card"><p class="kicker">Rencana mengajar pintar</p>' +
-      '<h3>Susun jam pelajaran dari evidence kelas</h3>' +
-      '<div class="row"><label class="f" style="flex:1 1 200px">Target TP<select id="planTp" data-testid="plan-tp">' + tpOptions() + '</select></label>' +
+      '<div class="card rise" style="--d:280ms" data-testid="lesson-plan-card"><p class="kicker">' + t('kurikulum.plan-kicker', 'Rencana Jam Pelajaran (45 Menit)') + '</p>' +
+      '<h3>' + t('kurikulum.plan-title', 'Susun kegiatan belajar sesuai kebutuhan murid') + '</h3>' +
+      '<div class="row"><label class="f" style="flex:1 1 200px">' + t('kurikulum.kompetensi-goal-label', 'Kompetensi (goal)') + '<select id="planTp" data-testid="plan-tp">' + tpOptions() + '</select></label>' +
       '<label class="f" style="width:120px">Durasi (menit)<input id="planMin" type="number" value="45" data-testid="plan-minutes"></label></div>' +
       '<button class="btn primary sm" data-a="make-plan" data-testid="make-plan-btn">Buat rencana</button>' +
       (S.plan ? planHtml(S.plan) : '') + '</div>' +
-      '<div class="card rise" style="--d:340ms" data-testid="groups-card"><p class="kicker">Kelompok dinamis</p>' +
-      '<h3>Kelompok berbasis bukti, bukan tebakan</h3>' +
-      '<label class="f">TP<select id="grpTp" data-testid="group-tp">' + tpOptions() + '</select></label>' +
+      '<div class="card rise" style="--d:340ms" data-testid="groups-card"><p class="kicker">' + t('kurikulum.grp-kicker', 'Kelompok Belajar Murid') + '</p>' +
+      '<h3>' + t('kurikulum.grp-title', 'Bentuk kelompok otomatis berdasarkan penguasaan materi') + '</h3>' +
+      '<label class="f">' + t('kurikulum.kompetensi-goal-label', 'Kompetensi (goal)') + '<select id="grpTp" data-testid="group-tp">' + tpOptions() + '</select></label>' +
       '<button class="btn primary sm" data-a="make-groups" data-testid="make-groups-btn">Bentuk kelompok</button>' +
       (S.groups ? S.groups.groups.map(function (g, i) {
         return '<div class="card tight" style="margin-top:10px" data-testid="group-' + i + '"><div class="row between"><b>' + esc(g.name) + '</b><span class="pill mute">' + g.members.length + ' murid</span></div>' +
@@ -186,8 +324,9 @@
   }
 
   function tpOptions(sel) {
+    var sub = activeSubj();
     var list = S.tps.filter(function (t) {
-      return !S.cls || !S.cls.subject_id || t.subject_id === S.cls.subject_id;
+      return !sub || t.subject_id === sub;
     });
     if (!list.length) list = S.tps;
     return list.map(function (t) {
@@ -196,7 +335,8 @@
   }
 
   function loadCoverage() {
-    api('/coverage?class_id=' + S.cls.id).then(function (c) { S.coverage = c; render(); });
+    var sub = activeSubj();
+    api('/coverage?class_id=' + S.cls.id + (sub ? '&subject_id=' + encodeURIComponent(sub) : '')).then(function (c) { S.coverage = c; render(); });
   }
   function loadRecs() {
     api('/braincore/recommendations?class_id=' + S.cls.id).then(function (r) { S.recs = r.recommendations; render(); });
@@ -204,20 +344,35 @@
 
   // ---------------- 2. Cakupan ----------------
   function vCoverage() {
-    if (!S.coverage) { loadCoverage(); return head('Cakupan', 'Memuat matriks cakupan…'); }
-    return head('Cakupan Kurikulum', 'Bagian mana yang belum diajarkan, dan mana yang sudah tapi belum dikuasai',
-      'MISSING = belum ada soal · NOT_TAUGHT = belum ada evidence belajar · GAP = sudah dipelajari tapi mastery rendah') +
-      '<div class="card" data-testid="coverage-table"><table><thead><tr><th>TP</th><th>Soal</th><th>Exposure</th><th>Mastery</th><th>Perlu bantuan</th><th>Status</th></tr></thead><tbody>' +
+    if (!S.coverage) { loadCoverage(); return head(t('kurikulum.cakupan-head', 'Cakupan'), t('kurikulum.cakupan-memuat', 'Memuat matriks cakupan…')); }
+    var STATUS_LABELS = {
+      GOOD: t('kurikulum.st-good', 'Tuntas / Mahir'),
+      DEVELOPING: t('kurikulum.st-dev', 'Sedang Berkembang'),
+      GAP: t('kurikulum.st-gap', 'Perlu Pendampingan'),
+      NOT_TAUGHT: t('kurikulum.st-not-taught', 'Belum Diajarkan'),
+      MISSING: t('kurikulum.st-missing', 'Belum Ada Soal')
+    };
+    return head(t('kurikulum.cakupan-judul', 'Cakupan Kurikulum'), t('kurikulum.cakupan-subjudul', 'Bagian mana yang belum diajarkan, dan mana yang sudah tapi belum dikuasai'),
+      t('kurikulum.cakupan-ket', 'Keterangan: Tuntas / Mahir = penguasaan tinggi · Perlu Pendampingan = perlu remedial · Belum Diajarkan = belum ada aktivitas belajar')) +
+      '<div class="card" data-testid="coverage-table"><table><thead><tr>' +
+      '<th>' + t('kurikulum.th-tp', 'Tujuan Pembelajaran (TP)') + '</th>' +
+      '<th>' + t('kurikulum.th-soal', 'Bank Soal') + '</th>' +
+      '<th>' + t('kurikulum.th-exposure', 'Keterlibatan') + '</th>' +
+      '<th>' + t('kurikulum.th-mastery', 'Kemahiran') + '</th>' +
+      '<th>' + t('kurikulum.th-help', 'Perlu Pendampingan') + '</th>' +
+      '<th>' + t('kurikulum.th-status', 'Status Ketuntasan') + '</th></tr></thead><tbody>' +
       S.coverage.rows.map(function (r) {
         var cls = r.status === 'GOOD' ? 'good' : r.status === 'GAP' ? 'bad' : r.status === 'DEVELOPING' ? 'warn' : 'mute';
+        var stText = STATUS_LABELS[r.status] || r.status;
         return '<tr class="click" data-a="tp-detail" data-tp="' + r.tp_id + '" data-testid="coverage-row-' + r.tp_id + '">' +
           '<td><b>' + esc(r.tp_code) + '</b><br><span class="muted">' + esc(r.tp_name.slice(0, 70)) + '</span></td>' +
           '<td>' + r.questions_published + (r.questions_pending ? ' <span class="muted">(+' + r.questions_pending + ' tinjau)</span>' : '') + '</td>' +
-          '<td>' + r.students_exposed + '/' + r.students_total + '</td>' +
+          '<td>' + r.students_exposed + '/' + r.students_total + ' ' + t('kurikulum.unit-murid', 'murid') + '</td>' +
           '<td><span class="bar ' + (r.mastery_pct != null && r.mastery_pct < 60 ? 'bad' : r.mastery_pct != null && r.mastery_pct < 80 ? 'warn' : '') + '"><i style="width:' + (r.mastery_pct || 0) + '%"></i></span> ' + (r.mastery_pct == null ? '—' : r.mastery_pct + '%') + '</td>' +
           '<td>' + r.students_needs_help + '</td>' +
-          '<td><span class="pill ' + cls + '">' + esc(r.status) + '</span><br><span class="muted" style="font-size:12px">' + esc(r.note) + '</span></td></tr>';
-      }).join('') + '</tbody></table></div>';
+          '<td><span class="pill ' + cls + '">' + esc(stText) + '</span><br><span class="muted" style="font-size:12px">' + esc(r.note) + '</span></td></tr>';
+      }).join('') + '</tbody></table>' +
+      '<p class="muted" style="margin-top:12px;font-size:12.5px">💡 ' + t('kurikulum.petunjuk-klik-tp', 'Klik baris mana saja untuk melihat murid, detail miskonsepsi, dan langsung membuat rencana intervensi.') + '</p></div>';
   }
 
   function openTpDetail(tpId) {
@@ -252,28 +407,57 @@
     });
   }
 
+  function flattenTree(nodes, acc) {
+    acc = acc || [];
+    (nodes || []).forEach(function (n) {
+      acc.push({ id: n.id, code: n.code, name: n.name, type: n.type });
+      if (n.children && n.children.length) flattenTree(n.children, acc);
+    });
+    return acc;
+  }
+
   // ---------------- 3. Struktur kurikulum ----------------
   function vCurriculum() {
-    if (!S.tree) { api('/curriculum/tree?curriculum_id=KURMER&depth=material').then(function (t) { S.tree = t; render(); }); return head('Kurikulum', 'Memuat learning graph…'); }
-    if (!S.health) { api('/curriculum/health-check').then(function (h) { S.health = h; render(); }); }
-    return head('Struktur Kurikulum', 'Kurikulum sebagai learning graph, bukan daftar nama materi',
+    var sub = activeSubj();
+    if (!S.tree) { api('/curriculum/tree?curriculum_id=KURMER&depth=material' + (sub ? '&subject_id=' + encodeURIComponent(sub) : '')).then(function (t) { S.tree = t; render(); }); return head(t('kurikulum.kurikulum-head', 'Kurikulum'), t('kurikulum.kurikulum-memuat', 'Memuat learning graph…')); }
+    if (!S.health) { api('/curriculum/health-check' + (sub ? '?subject_id=' + encodeURIComponent(sub) : '')).then(function (h) { S.health = h; render(); }); }
+    var flatNodes = flattenTree(S.tree);
+    var parentOptions = flatNodes.map(function (n) {
+      return '<option value="' + esc(n.id) + '">' + esc(n.type.toUpperCase() + ': ' + n.code + ' — ' + (n.name || '').slice(0, 50)) + '</option>';
+    }).join('');
+    var NODE_TYPES = [
+      ['tp', t('kurikulum.type.tp', 'Tujuan Pembelajaran (TP)')],
+      ['competency', t('kurikulum.type.comp', 'Kompetensi Dasar')],
+      ['indicator', t('kurikulum.type.ind', 'Indikator Keberhasilan')],
+      ['topic', t('kurikulum.type.topic', 'Topik Bahasan')],
+      ['material', t('kurikulum.type.mat', 'Materi Ajar')],
+      ['element', t('kurikulum.type.elem', 'Elemen Pembelajaran')],
+      ['cp', t('kurikulum.type.cp', 'Capaian Pembelajaran (CP)')],
+      ['subject', t('kurikulum.type.sub', 'Mata Pelajaran')],
+      ['grade', t('kurikulum.type.grd', 'Jenjang Kelas')],
+      ['phase', t('kurikulum.type.phs', 'Fase Kurikulum')]
+    ];
+    return head(t('kurikulum.struktur-judul', 'Struktur Kurikulum') + ' — ' + subjName(sub), t('kurikulum.struktur-subjudul', 'Kurikulum sebagai learning graph, bukan daftar nama materi'),
       'Kurikulum → Fase → Kelas → Mapel → Elemen → CP → TP → Indikator → Kompetensi → Topik → Materi → Soal') +
-      '<div class="grid g2"><div class="card" data-testid="curriculum-tree"><p class="kicker">Learning graph</p><div class="tree">' +
+      '<div class="grid g2"><div class="card" data-testid="curriculum-tree"><p class="kicker">' + t('kurikulum.learning-graph-kicker', 'Learning graph') + '</p><div class="tree">' +
       S.tree.map(nodeHtml).join('') + '</div></div>' +
       '<div class="stack">' +
-      '<div class="card" data-testid="add-node-card"><p class="kicker">Tambah simpul</p><h3>Lengkapi kurikulum</h3>' +
-      '<label class="f">Jenis<select id="ndType" data-testid="node-type">' +
-      ['tp', 'indicator', 'competency', 'topic', 'material', 'element', 'cp', 'subject', 'grade', 'phase'].map(function (t) { return '<option>' + t + '</option>'; }).join('') +
+      '<details class="card" data-testid="add-node-card"><summary style="cursor:pointer;font-weight:600"><span class="kicker" style="display:inline;margin:0 8px 0 0">' + t('kurikulum.tambah-simpul-kicker', 'Tambah simpul') + '</span> ' + t('kurikulum.lengkapi-kurikulum', 'Lengkapi kurikulum') + ' …</summary>' +
+      '<div style="margin-top:14px">' +
+      '<label class="f">' + t('kurikulum.jenis-label', 'Jenis Simpul') + '<select id="ndType" data-testid="node-type">' +
+      NODE_TYPES.map(function (nt) { return '<option value="' + nt[0] + '">' + esc(nt[1]) + '</option>'; }).join('') +
       '</select></label>' +
-      '<label class="f">Induk (parent id)<input id="ndParent" placeholder="CP-MAT-D-BIL" data-testid="node-parent"></label>' +
-      '<label class="f">Nama<input id="ndName" placeholder="Nama simpul" data-testid="node-name"></label>' +
-      '<button class="btn primary sm" data-a="add-node" data-testid="add-node-btn">Tambahkan</button></div>' +
+      '<label class="f">' + t('kurikulum.induk-label', 'Induk (pilih dari bank atau ketik ID)') +
+      '<datalist id="parent-tree-list">' + parentOptions + '</datalist>' +
+      '<input id="ndParent" list="parent-tree-list" placeholder="' + t('kurikulum.induk-ph', 'Pilih dari daftar atau ketik ID induk (mis. CP-MAT-D-BIL)') + '" data-testid="node-parent"></label>' +
+      '<label class="f">' + t('kurikulum.nama-simpul-label', 'Nama Simpul / Deskripsi') + '<input id="ndName" placeholder="' + t('kurikulum.nama-simpul-ph', 'Nama simpul atau rumusan kompetensi') + '" data-testid="node-name"></label>' +
+      '<button class="btn primary sm" data-a="add-node" data-testid="add-node-btn">' + t('kurikulum.tombol-tambah-simpul', 'Tambahkan') + '</button></div></details>' +
       seedCardHtml() +
-      '<div class="card" data-testid="curriculum-health"><p class="kicker">Peringatan struktur</p>' +
+      '<div class="card" data-testid="curriculum-health"><p class="kicker">' + t('kurikulum.peringatan-kicker', 'Peringatan struktur') + '</p>' +
       (S.health ? (S.health.warnings.length ? S.health.warnings.slice(0, 24).map(function (w) {
         return '<div class="issue ' + w.level + '">' + esc(w.message) + '</div>';
-      }).join('') : '<p class="muted">Struktur sehat.</p>') : '<p class="muted">Memeriksa…</p>') +
-      (S.health ? '<p class="mono muted">' + esc(JSON.stringify(S.health.counts)) + '</p>' : '') + '</div></div></div>';
+      }).join('') : '<p class="muted">' + t('kurikulum.struktur-sehat', 'Struktur sehat.') + '</p>') : '<p class="muted">' + t('kurikulum.memeriksa-struktur', 'Memeriksa…') + '</p>') +
+      (S.health && S.health.counts ? '<div class="row" style="gap:8px;flex-wrap:wrap;margin-top:10px"><span class="pill good">' + (S.health.counts.tp || 0) + ' ' + esc(t('kurikulum.type.tp', 'Tujuan Pembelajaran')) + '</span><span class="pill info">' + (S.health.counts.competency || 0) + ' ' + esc(t('kurikulum.type.comp', 'Kompetensi')) + '</span><span class="pill mute">' + (S.health.counts.material || 0) + ' ' + esc(t('kurikulum.type.mat', 'Materi Ajar')) + '</span></div>' : '') + '</div></div></div>';
   }
 
   /* KARTU PENYEMAI BANK KURIKULUM.
@@ -374,10 +558,19 @@
 
   // ---------------- 4. Bank soal ----------------
   function vBank() {
-    if (!S.questions.length && !S.bankLoaded) { loadBank(); return head('Bank Soal', 'Memuat…'); }
-    return head('Bank Soal', 'Setiap soal punya DNA kurikulum', 'Soal adalah alat ukur; objek kanoniknya adalah KOMPETENSI.') +
+    if (!S.questions.length && !S.bankLoaded) { loadBank(); return head(t('kurikulum.bank-head-kicker', 'Bank Soal'), t('kurikulum.bank-head-memuat', 'Memuat…')); }
+    return head(t('kurikulum.bank-head-kicker', 'Bank Soal'), t('kurikulum.bank-head-title', 'Gudang Soal & Kurasi Mandiri'), t('kurikulum.bank-head-sub', 'Kelola bank soal kurikulum, buat soal baru secara manual, atau impor dari file naskah.')) +
+      '<div class="card ink" style="margin-bottom:18px;border-left:4px solid #38bdf8" data-testid="bank-guide-card">' +
+      '<p class="kicker" style="color:#38bdf8">' + esc(t('kurikulum.bank-guide-kicker', '💡 Petunjuk Guru')) + '</p>' +
+      '<h3 style="margin:4px 0 8px">' + esc(t('kurikulum.bank-guide-title', 'Pusat Kurasi & Bank Soal')) + '</h3>' +
+      '<p class="muted" style="margin:0 0 10px;font-size:13px;line-height:1.5">' +
+      esc(t('kurikulum.bank-guide-desc', 'Seluruh kompetensi kurikulum sudah dilengkapi bank soal siap pakai. Jika Anda hanya ingin membuat kuis atau asesmen untuk kelas, Anda TIDAK PERLU menyusun soal manual di sini — cukup buka tab Asesmen dan gunakan Template Cepat 1-Klik.')) +
+      '</p>' +
+      '<button class="btn sm primary" data-a="view" data-v="assessment" data-testid="bank-to-as-btn">' + esc(t('kurikulum.bank-to-assessment', '⚡ Buka Tab Asesmen (Buat Kuis 1-Klik)')) + '</button>' +
+      '</div>' +
+
       '<div class="grid g3">' +
-      '<div class="card" data-testid="manual-card"><p class="kicker">A · Manual</p><h3>Buat soal</h3>' +
+      '<div class="card" data-testid="manual-card"><p class="kicker">' + esc(t('kurikulum.bank-kicker-manual', 'Tulis Manual')) + '</p><h3>' + esc(t('kurikulum.bank-title-manual', 'Buat 1 Soal Baru')) + '</h3>' +
       compSelect('mqComp') +
       '<label class="f">Pertanyaan<textarea id="mqStem" data-testid="q-stem"></textarea></label>' +
       '<label class="f">Opsi A<input id="mqA" data-testid="q-a"></label>' +
@@ -393,38 +586,39 @@
       '<button class="btn primary sm" data-a="create-q" data-testid="create-q-btn">Simpan sebagai draf</button></div>' +
       '<div id="qIssues"></div></div>' +
 
-      '<div class="card" data-testid="paste-card"><p class="kicker">C · Copy/Paste</p><h3>Tempel banyak soal</h3>' +
+      '<div class="card" data-testid="paste-card"><p class="kicker">' + esc(t('kurikulum.bank-kicker-paste', 'Salin & Tempel')) + '</p><h3>' + esc(t('kurikulum.bank-title-paste', 'Tempel Banyak Soal Sekaligus')) + '</h3>' +
       '<p class="muted" style="font-size:13px">Format: nomor, pertanyaan, opsi A–D, lalu <span class="mono">Jawaban: B</span> dan <span class="mono">Penjelasan: …</span></p>' +
       compSelect('pasteComp') +
       '<label class="f">Tempelan<textarea id="pasteText" style="min-height:160px" data-testid="paste-text"></textarea></label>' +
       '<button class="btn primary sm" data-a="import-paste" data-testid="import-paste-btn">Parse ke antrean tinjau</button></div>' +
 
-      '<div class="card" data-testid="import-card"><p class="kicker">B & D · Import</p><h3>Excel / CSV / PDF / TXT</h3>' +
+      '<div class="card" data-testid="import-card"><p class="kicker">' + esc(t('kurikulum.bank-kicker-import', 'Impor Dokumen')) + '</p><h3>' + esc(t('kurikulum.bank-title-import', 'Unggah Excel / CSV / PDF / TXT')) + '</h3>' +
       compSelect('fileComp') +
       '<label class="f">Berkas<input type="file" id="impFile" accept=".csv,.xlsx,.pdf,.txt,.md" data-testid="import-file"></label>' +
       '<button class="btn primary sm" data-a="import-file" data-testid="import-file-btn">Unggah & parse</button>' +
       '<p class="muted" style="font-size:13px;margin-top:8px">Hasil parsing WAJIB ditinjau guru sebelum aktif.</p>' +
       '<button class="btn ghost sm" data-a="csv-template" data-testid="csv-template-btn">Lihat template kolom CSV</button>' +
       '<hr style="border:none;border-top:1px solid var(--line);margin:16px 0">' +
-      '<p class="kicker">E · Kandidat dari Braincore</p>' +
+      '<p class="kicker">' + esc(t('kurikulum.bank-kicker-ai', 'Bantuan AI')) + '</p>' +
       compSelect('genComp') +
       '<button class="btn clay sm" data-a="generate" data-testid="generate-btn">Buat kandidat soal</button>' +
       '<p class="muted" style="font-size:13px;margin-top:8px">Kandidat tidak pernah langsung terbit — hanya guru yang menerbitkan.</p></div>' +
       '</div>' +
 
-      '<div class="card" data-testid="review-queue"><div class="row between"><div><p class="kicker">Antrean tinjau</p><h3>Menunggu keputusan guru</h3></div>' +
+      '<div class="card" data-testid="review-queue"><div class="row between"><div><p class="kicker">' + esc(t('kurikulum.bank-kicker-queue', 'Antrean Kurasi')) + '</p><h3>' + esc(t('kurikulum.bank-title-queue', 'Menunggu Keputusan Guru')) + '</h3></div>' +
       '<button class="btn ghost sm" data-a="reload-bank">Muat ulang</button></div>' +
       (S.reviewQueue.length ? S.reviewQueue.map(qCard).join('') : '<p class="muted">Antrean bersih.</p>') + '</div>' +
 
-      '<div class="card" data-testid="question-list"><div class="row between"><div><p class="kicker">Bank soal terbit</p><h3>' + S.questions.length + ' soal</h3></div>' +
+      '<div class="card" data-testid="question-list"><div class="row between"><div><p class="kicker">' + esc(t('kurikulum.bank-kicker-published', 'Koleksi Siap Pakai')) + '</p><h3>' + S.questions.length + ' ' + esc(t('kurikulum.bank-soal-satuan', 'soal aktif')) + '</h3></div>' +
       '<label class="f" style="width:280px;margin:0">Filter TP<select data-a="filter-tp" data-testid="filter-tp"><option value="">Semua TP</option>' + tpOptions(S.filterTp) + '</select></label></div>' +
       (S.questions.length ? S.questions.map(qCard).join('') : '<p class="muted">Belum ada soal.</p>') + '</div>';
   }
 
   function compSelect(id) {
-    var list = S.comps.filter(function (c) { return !S.cls || !S.cls.subject_id || c.subject_id === S.cls.subject_id; });
+    var sub = activeSubj();
+    var list = S.comps.filter(function (c) { return !sub || c.subject_id === sub; });
     if (!list.length) list = S.comps;
-    return '<label class="f">Kompetensi (goal)<select id="' + id + '" data-testid="' + id + '">' +
+    return '<label class="f">' + esc(t('kurikulum.kompetensi-goal-label', 'Kompetensi (goal)')) + '<select id="' + id + '" data-testid="' + id + '">' +
       list.map(function (c) { return '<option value="' + c.id + '">' + esc(c.code) + ' — ' + esc(c.name.slice(0, 52)) + '</option>'; }).join('') +
       '</select></label>';
   }
@@ -433,59 +627,125 @@
     var issues = q.issues || [];
     var st = q.status;
     var cls = st === 'PUBLISHED' ? 'good' : st === 'APPROVED' ? 'info' : st === 'ARCHIVED' ? 'mute' : 'warn';
+    var diffMap = {
+      1: t('kurikulum.diff-1', 'Sangat Mudah'),
+      2: t('kurikulum.diff-2', 'Mudah'),
+      3: t('kurikulum.diff-3', 'Sedang'),
+      4: t('kurikulum.diff-4', 'Sulit / HOTS'),
+      5: t('kurikulum.diff-5', 'Sangat Sulit / Olimpiade')
+    };
+    var diffLabel = diffMap[q.difficulty] || ('D' + q.difficulty);
+    var cogMap = {
+      C1: t('kurikulum.cog-c1-short', 'Mengingat (C1)'),
+      C2: t('kurikulum.cog-c2-short', 'Memahami (C2)'),
+      C3: t('kurikulum.cog-c3-short', 'Menerapkan (C3)'),
+      C4: t('kurikulum.cog-c4-short', 'Menganalisis (C4)'),
+      C5: t('kurikulum.cog-c5-short', 'Mengevaluasi (C5)'),
+      C6: t('kurikulum.cog-c6-short', 'Mencipta (C6)')
+    };
+    var cogLabel = cogMap[q.cognitive_level] || esc(q.cognitive_level);
+    var stMap = {
+      PUBLISHED: t('kurikulum.st-published', 'Siap Pakai'),
+      APPROVED: t('kurikulum.st-approved', 'Disetujui'),
+      REVIEW: t('kurikulum.st-review', 'Menunggu Tinjauan'),
+      DRAFT: t('kurikulum.st-draft', 'Draf'),
+      ARCHIVED: t('kurikulum.st-archived', 'Diarsipkan')
+    };
+    var stLabel = stMap[st] || st;
+
     return '<div class="card tight" style="margin-top:10px" data-testid="q-' + esc(q.question_id) + '">' +
-      '<div class="row between"><span class="pill ' + cls + '">' + esc(st) + ' v' + q.version + '</span>' +
-      '<span class="mono muted">' + esc(q.question_id) + ' · ' + esc(q.tp_id || '-') + ' · D' + q.difficulty + ' · ' + esc(q.cognitive_level) + (q.is_transfer ? ' · TRANSFER' : '') + '</span></div>' +
+      '<div class="row between" style="align-items:flex-start;gap:8px">' +
+      '<div><span class="pill ' + cls + '">' + esc(stLabel) + ' · v' + q.version + '</span>' +
+      (q.is_transfer ? ' <span class="pill info">' + esc(t('kurikulum.pill-transfer', 'Soal Kontekstual')) + '</span>' : '') + '</div>' +
+      '<div style="text-align:right;font-size:12px;color:var(--text-muted)">' +
+      '<span>' + esc(diffLabel) + ' · ' + esc(cogLabel) + '</span><br>' +
+      '<span class="mono" style="font-size:11px;opacity:0.75">ID: ' + esc(q.question_id) + (q.tp_id ? ' · ' + esc(q.tp_id) : '') + '</span>' +
+      '</div></div>' +
       '<p style="margin:8px 0 4px"><b>' + esc(q.stem) + '</b></p>' +
-      (q.options && q.options.length ? '<p class="muted mono">' + q.options.map(function (o, i) { return String.fromCharCode(65 + i) + '. ' + esc(o); }).join(' · ') + ' → kunci ' + esc(q.answer_key) + '</p>' : '') +
+      (q.options && q.options.length ? '<p class="muted mono" style="font-size:13px;line-height:1.6">' + q.options.map(function (o, i) { return String.fromCharCode(65 + i) + '. ' + esc(o); }).join('  ·  ') + ' <span style="color:var(--good, #10b981);font-weight:bold">→ Kunci: ' + esc(q.answer_key) + '</span></p>' : '') +
       '<p class="muted" style="font-size:13px">' + esc(q.competency_name || '') + (q.explanation ? ' · ' + esc(q.explanation.slice(0, 110)) : '') + '</p>' +
-      issues.map(function (i) { return '<div class="issue ' + i.level + '">' + esc(i.message) + '</div>'; }).join('') +
-      '<div class="row">' +
+      issues.map(function (i) { return '<div class="issue ' + i.level + '" style="font-size:12px;margin:6px 0;display:flex;align-items:center;gap:6px"><span>💡</span><span>' + esc(i.message) + '</span></div>'; }).join('') +
+      '<div class="row" style="margin-top:8px">' +
       (st !== 'PUBLISHED' ? '<button class="btn primary sm" data-a="q-review" data-q="' + esc(q.question_id) + '" data-act="publish" data-testid="publish-' + esc(q.question_id) + '">Terbitkan</button>' : '') +
       (st === 'DRAFT' || st === 'REVIEW' ? '<button class="btn sm" data-a="q-review" data-q="' + esc(q.question_id) + '" data-act="approve">Setujui</button>' : '') +
+      '<details class="curation-tools" style="display:inline-block;margin-left:auto">' +
+      '<summary style="cursor:pointer;font-size:12px;color:var(--text-muted);user-select:none;padding:4px 8px">' + esc(t('kurikulum.btn-curation-options', 'Opsi kurasi & varian soal…')) + '</summary>' +
+      '<div class="row" style="margin-top:6px;gap:6px">' +
       '<button class="btn ghost sm" data-a="q-variants" data-q="' + esc(q.question_id) + '" data-testid="variants-' + esc(q.question_id) + '">Buat varian</button>' +
       '<button class="btn ghost sm" data-a="q-transfer" data-q="' + esc(q.question_id) + '">Buat varian transfer</button>' +
       '<button class="btn ghost sm" data-a="q-history" data-q="' + esc(q.question_id) + '">Riwayat versi</button>' +
       (st !== 'ARCHIVED' ? '<button class="btn ghost sm" data-a="q-review" data-q="' + esc(q.question_id) + '" data-act="archive">Arsipkan</button>' : '') +
+      '</div></details>' +
       '</div></div>';
   }
 
   function loadBank() {
     S.bankLoaded = true;
-    var qq = '/questions?limit=60' + (S.filterTp ? '&tp_id=' + S.filterTp : '');
-    Promise.all([api(qq + '&status=PUBLISHED'), api('/questions/review/queue')]).then(function (r) {
+    var sub = activeSubj();
+    var qq = '/questions?limit=60' + (sub ? '&subject_id=' + encodeURIComponent(sub) : '') + (S.filterTp ? '&tp_id=' + encodeURIComponent(S.filterTp) : '');
+    Promise.all([
+      api(qq + '&status=PUBLISHED'),
+      api('/questions/review/queue' + (sub ? '?subject_id=' + encodeURIComponent(sub) : ''))
+    ]).then(function (r) {
       S.questions = r[0]; S.reviewQueue = r[1].items; render();
     });
   }
 
   // ---------------- 5. Asesmen ----------------
   function vAssessment() {
-    if (!S.assessments.length && !S.asLoaded) { loadAssessments(); return head('Asesmen', 'Memuat…'); }
-    var subjectTps = S.tps.filter(function (t) { return !S.cls.subject_id || t.subject_id === S.cls.subject_id; });
+    var sub = activeSubj();
+    var subjectTps = S.tps.filter(function (t) { return !sub || t.subject_id === sub; });
     if (!subjectTps.length) subjectTps = S.tps;
     var bpRows = S.bpRows || [{ tp: subjectTps[0] && subjectTps[0].id, count: 5 }];
     S.bpRows = bpRows;
-    return head('Assessment Engine', 'Blueprint dulu, soal kemudian',
-      'Delapan jenis asesmen dengan tujuan berbeda: diagnostic, practice, formative, summative, remedial, enrichment, review, transfer.') +
-      '<div class="grid g2"><div class="card" data-testid="blueprint-card"><p class="kicker">Blueprint</p><h3>Rancang komposisi asesmen</h3>' +
-      '<label class="f">Judul<input id="bpTitle" value="Formatif Bilangan" data-testid="bp-title"></label>' +
-      '<label class="f">Jenis<select id="bpType" data-testid="bp-type">' +
-      ['diagnostic', 'practice', 'formative', 'summative', 'remedial', 'enrichment', 'review', 'transfer'].map(function (t) { return '<option' + (t === 'formative' ? ' selected' : '') + '>' + t + '</option>'; }).join('') + '</select></label>' +
-      '<p class="kicker">Target TP & jumlah soal</p>' +
+    var AS_TYPES = [
+      ['formative', t('kurikulum.as-opt-formative', 'Formatif (Penilaian Proses Belajar)')],
+      ['summative', t('kurikulum.as-opt-summative', 'Sumatif (Penilaian Akhir Bab / Semester)')],
+      ['diagnostic', t('kurikulum.as-opt-diagnostic', 'Diagnostik (Asesmen Awal)')],
+      ['practice', t('kurikulum.as-opt-practice', 'Latihan Mandiri')],
+      ['remedial', t('kurikulum.as-opt-remedial', 'Remedial (Perbaikan Khusus)')],
+      ['enrichment', t('kurikulum.as-opt-enrichment', 'Pengayaan (Tantangan Mahir)')],
+      ['review', t('kurikulum.as-opt-review', 'Ulasan Berkala (Spaced Review)')],
+      ['transfer', t('kurikulum.as-opt-transfer', 'Transfer Kemahiran (Konteks Baru)')]
+    ];
+    var COG_ITEMS = [
+      ['C1', t('kurikulum.cog-c1-label', 'C1 (Mengingat)')],
+      ['C2', t('kurikulum.cog-c2-label', 'C2 (Memahami)')],
+      ['C3', t('kurikulum.cog-c3-label', 'C3 (Menerapkan)')],
+      ['C4', t('kurikulum.cog-c4-label', 'C4 (Menganalisis)')]
+    ];
+    return head(t('kurikulum.as-title', 'Assessment Engine'), t('kurikulum.as-sub', 'Blueprint dulu, soal kemudian'),
+      t('kurikulum.as-desc', 'Delapan jenis asesmen dengan tujuan berbeda: diagnostic, practice, formative, summative, remedial, enrichment, review, transfer.')) +
+      '<div class="grid g2"><div class="card" data-testid="blueprint-card"><p class="kicker">' + t('kurikulum.as-bp-kicker', 'Blueprint') + '</p><h3>' + t('kurikulum.as-bp-title', 'Rancang komposisi asesmen') + '</h3>' +
+      '<div class="card tight ink" style="margin-bottom:14px" data-testid="blueprint-presets">' +
+      '<p class="kicker">' + t('kurikulum.bp-preset-kicker', 'Template Blueprint Cepat') + '</p>' +
+      '<div class="row">' +
+      '<button class="btn sm ghost" data-a="apply-bp-preset" data-preset="quiz" data-testid="preset-quiz">⚡ ' + t('kurikulum.preset-quiz-btn', 'Kuis Harian (5 Soal)') + '</button>' +
+      '<button class="btn sm ghost" data-a="apply-bp-preset" data-preset="weekly" data-testid="preset-weekly">📝 ' + t('kurikulum.preset-weekly-btn', 'Formatif Mingguan (10 Soal)') + '</button>' +
+      '<button class="btn sm ghost" data-a="apply-bp-preset" data-preset="summative" data-testid="preset-sum-btn">🏆 ' + t('kurikulum.preset-sum-btn', 'Sumatif Bab (20 Soal)') + '</button>' +
+      '</div></div>' +
+      '<label class="f">' + t('kurikulum.bp-title-label', 'Judul Asesmen') + '<input id="bpTitle" value="' + t('kurikulum.bp-default-title', 'Formatif Bilangan') + '" data-testid="bp-title"></label>' +
+      '<label class="f">' + t('kurikulum.bp-type-label', 'Jenis Asesmen') + '<select id="bpType" data-testid="bp-type">' +
+      AS_TYPES.map(function (at) { return '<option value="' + at[0] + '"' + (at[0] === 'formative' ? ' selected' : '') + '>' + esc(at[1]) + '</option>'; }).join('') +
+      '</select></label>' +
+      '<p class="kicker">' + t('kurikulum.bp-target-kicker', 'Target TP & jumlah soal') + '</p>' +
       bpRows.map(function (r, i) {
         return '<div class="row" data-testid="bp-row-' + i + '"><select data-a="bp-tp" data-i="' + i + '" style="flex:1">' + tpOptions(r.tp) + '</select>' +
           '<input type="number" value="' + r.count + '" data-a="bp-count" data-i="' + i + '" style="width:80px"></div>';
       }).join('') +
       '<button class="btn ghost sm" data-a="bp-add" data-testid="bp-add">+ Target TP</button>' +
-      '<p class="kicker" style="margin-top:14px">Distribusi kognitif (%)</p><div class="row">' +
-      ['C1', 'C2', 'C3', 'C4'].map(function (c) {
-        return '<label class="f" style="width:78px">' + c + '<input type="number" id="cog' + c + '" value="' + ({ C1: 20, C2: 30, C3: 30, C4: 20 })[c] + '" data-testid="cog-' + c + '"></label>';
+      '<details style="margin:16px 0;padding:12px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:8px"><summary style="cursor:pointer;font-size:12.5px;color:var(--text-muted);font-weight:600">⚙️ ' + t('kurikulum.bp-adv-toggle', 'Pengaturan Kesulitan & Soal Cerita (Opsional)') + '</summary>' +
+      '<div style="margin-top:10px">' +
+      '<p class="kicker">' + t('kurikulum.bp-cog-kicker', 'Distribusi kognitif (%)') + '</p><div class="row">' +
+      COG_ITEMS.map(function (c) {
+        return '<label class="f" style="flex:1;min-width:70px">' + c[1] + '<input type="number" id="cog' + c[0] + '" value="' + ({ C1: 20, C2: 30, C3: 30, C4: 20 })[c[0]] + '" data-testid="cog-' + c[0] + '"></label>';
       }).join('') + '</div>' +
-      '<label class="f">Porsi soal transfer (0–1)<input id="bpTransfer" type="number" step="0.05" value="0.2" data-testid="bp-transfer"></label>' +
-      '<div class="row"><button class="btn ghost sm" data-a="bp-check" data-testid="bp-check">Cek keseimbangan</button>' +
-      '<button class="btn primary sm" data-a="bp-create" data-testid="bp-create">Simpan blueprint & buat asesmen</button></div>' +
+      '<label class="f">' + t('kurikulum.bp-transfer-label', 'Porsi Soal Transfer / Kontekstual (0.0 – 1.0, misal 0.2 = 20% soal situasi nyata)') + '<input id="bpTransfer" type="number" step="0.05" value="0.2" data-testid="bp-transfer"></label>' +
+      '</div></details>' +
+      '<div class="row"><button class="btn ghost sm" data-a="bp-check" data-testid="bp-check">' + t('kurikulum.bp-check-btn', 'Cek keseimbangan') + '</button>' +
+      '<button class="btn primary sm" data-a="bp-create" data-testid="bp-create">' + t('kurikulum.bp-create-btn', '🚀 Terbitkan Kuis untuk Murid') + '</button></div>' +
       (S.blueprintCheck ? '<div style="margin-top:12px" data-testid="bp-warnings">' +
-        (S.blueprintCheck.warnings.length ? S.blueprintCheck.warnings.map(function (w) { return '<div class="issue ' + w.level + '">' + esc(w.message) + '</div>'; }).join('') : '<div class="issue info">Blueprint seimbang.</div>') +
+        (S.blueprintCheck.warnings.length ? S.blueprintCheck.warnings.map(function (w) { return '<div class="issue ' + w.level + '">' + esc(w.message) + '</div>'; }).join('') : '<div class="issue info">' + t('kurikulum.bp-seimbang', 'Blueprint seimbang.') + '</div>') +
         '<p class="mono muted">' + esc(JSON.stringify(S.blueprintCheck.availability)) + '</p></div>' : '') +
       '</div>' +
       '<div class="card" data-testid="assessment-list"><p class="kicker">Asesmen kelas ini</p><h3>' + S.assessments.length + ' asesmen</h3>' +
@@ -508,9 +768,9 @@
   function vStudents() {
     if (!S.students) {
       api('/classes/' + S.cls.id).then(function (c) { S.students = c.students || []; render(); });
-      return head('Murid', 'Memuat…');
+      return head(t('kurikulum.nav-students', 'Nilai & Rapor'), 'Memuat…');
     }
-    return head('Murid & Learning Passport', S.cls.name, 'Kode kelas: ' + S.cls.code + ' — murid memakainya saat masuk.') +
+    return head(t('kurikulum.nav-students', 'Nilai & Rapor'), S.cls.name, t('kurikulum.kode-kelas-label', 'Kode kelas: ') + S.cls.code + ' — ' + t('kurikulum.kode-kelas-sub', 'berikan kode ini saat murid bergabung.')) +
       '<div class="grid g2"><div class="card" data-testid="roster-card"><p class="kicker">Tambah murid</p>' +
       '<label class="f">Nama (satu per baris)<textarea id="roster" data-testid="roster-input"></textarea></label>' +
       '<button class="btn primary sm" data-a="add-roster" data-testid="add-roster-btn">Tambahkan</button></div>' +
@@ -520,17 +780,45 @@
       '<button class="btn sm" data-a="import-legacy" data-testid="import-legacy-btn">Impor dari perangkat ini</button></div>' +
       '<div class="card" data-testid="student-list"><p class="kicker">Daftar murid</p><h3>' + S.students.length + ' murid</h3>' +
       '<table><tbody>' + S.students.map(function (s) {
-        return '<tr class="click" data-a="passport" data-sid="' + esc(s.user_id) + '" data-testid="student-' + esc(s.user_id) + '"><td><b>' + esc(s.name) + '</b></td><td class="muted mono">' + esc(s.email || 'roster') + '</td><td>Lihat paspor →</td></tr>';
+        return '<tr class="click" data-a="passport" data-sid="' + esc(s.user_id) + '" data-testid="student-' + esc(s.user_id) + '"><td><b>' + esc(s.name) + '</b></td><td class="muted mono">' + esc(s.email || 'roster') + '</td><td>Lihat rapor →</td></tr>';
       }).join('') + '</tbody></table></div></div>';
+  }
+
+  function makeRaporNarrative(studentName, rows, misconceptions) {
+    var sName = studentName || t('kurikulum.rapor-anon', 'Murid');
+    var mastered = (rows || []).filter(function (r) { return r.mastery_pct >= 70; });
+    var developing = (rows || []).filter(function (r) { return r.mastery_pct < 70; });
+    var parts = [];
+    if (mastered.length) {
+      var topM = mastered.slice(0, 2).map(function (m) { return m.tp_name || m.tp_code; }).join(' ' + t('kurikulum.rapor-dan', 'dan') + ' ');
+      parts.push(t('kurikulum.rapor-mastered-pre', 'Ananda ') + sName + t('kurikulum.rapor-mastered-post', ' menunjukkan penguasaan yang sangat baik dalam ') + topM + '.');
+    } else {
+      parts.push(t('kurikulum.rapor-aktif-pre', 'Ananda ') + sName + t('kurikulum.rapor-aktif-post', ' telah aktif mengikuti seluruh proses pembelajaran materi ini.'));
+    }
+    if (developing.length) {
+      var topD = developing.slice(0, 2).map(function (d) { return d.tp_name || d.tp_code; }).join(' ' + t('kurikulum.rapor-serta', 'serta') + ' ');
+      parts.push(t('kurikulum.rapor-dev-text', 'Perlu bimbingan lebih lanjut dan latihan teratur dalam ') + topD + '.');
+    } else {
+      parts.push(t('kurikulum.rapor-pertahankan', 'Diharapkan dapat mempertahankan ritme belajar dan mengeksplorasi materi pengayaan lebih lanjut.'));
+    }
+    if (misconceptions && misconceptions.length) {
+      parts.push(t('kurikulum.rapor-mis-pre', 'Catatan guru: perhatikan penguatan konsep pada ') + misconceptions[0].misconception_id + '.');
+    }
+    return parts.join(' ');
   }
 
   function openPassport(sid) {
     api('/braincore/passport/' + sid).then(function (p) {
-      S.drawer = '<div class="row between"><p class="kicker">Learning Passport</p><button class="btn sm ghost" data-a="close">Tutup</button></div>' +
+      var raporNarrative = makeRaporNarrative(p.name, p.rows, p.open_misconceptions);
+      S.drawer = '<div class="row between"><p class="kicker">' + t('kurikulum.paspor-kicker', 'Learning Passport') + '</p><button class="btn sm ghost" data-a="close">' + t('kurikulum.tutup', 'Tutup') + '</button></div>' +
         '<h2>' + esc(p.name || sid) + '</h2>' +
-        '<div class="row">' + [['Kompetensi', p.totals.competencies], ['Dikuasai', p.totals.mastered], ['Bertahan', p.totals.retained], ['Transfer', p.totals.transferred]].map(function (t) {
-          return '<div class="card tight kpi" style="flex:1"><small>' + t[0] + '</small><b>' + t[1] + '</b></div>';
+        '<div class="row">' + [[t('kurikulum.kpi-komp', 'Kompetensi'), p.totals.competencies], [t('kurikulum.kpi-kuasai', 'Dikuasai'), p.totals.mastered], [t('kurikulum.kpi-tahan', 'Bertahan'), p.totals.retained], [t('kurikulum.kpi-trans', 'Transfer'), p.totals.transferred]].map(function (tRow) {
+          return '<div class="card tight kpi" style="flex:1"><small>' + tRow[0] + '</small><b>' + tRow[1] + '</b></div>';
         }).join('') + '</div>' +
+        '<div class="card tight accent" style="margin-top:14px" data-testid="rapor-card">' +
+        '<div class="row between"><div><p class="kicker">' + t('kurikulum.rapor-card-kicker', 'Catatan Capaian Kompetensi') + '</p><b>' + t('kurikulum.rapor-card-title', 'Draf Narasi e-Rapor Kemendikbud') + '</b></div>' +
+        '<button class="btn primary sm" data-a="copy-rapor" data-text="' + esc(raporNarrative) + '" data-testid="copy-rapor-btn">📋 ' + t('kurikulum.rapor-copy-btn', 'Salin Narasi') + '</button></div>' +
+        '<p class="muted" style="margin-top:8px;font-size:13.5px;line-height:1.5">' + esc(raporNarrative) + '</p></div>' +
         (p.rows.length ? p.rows.map(function (r) {
           return '<div class="card tight" style="margin-top:10px"><div class="row between"><b>' + esc(r.tp_code || '-') + '</b><span class="pill mute">' + r.mastery_pct + '%</span></div>' +
             '<p class="muted">' + esc((r.tp_name || '').slice(0, 90)) + '</p>' +
@@ -538,12 +826,12 @@
               return '<div class="row between" style="border-top:1px solid rgba(42,63,53,.5);padding:6px 0"><span>' + esc(c.name) + '</span>' +
                 '<span class="pill ' + (['MASTERED', 'RETAINED', 'TRANSFERRED'].indexOf(c.state) !== -1 ? 'good' : c.state === 'DEVELOPING' ? 'warn' : 'mute') + '">' + esc(c.state_label) + '</span></div>';
             }).join('') +
-            (r.next_target ? '<p class="mono" style="color:var(--clay)">Target berikutnya: ' + esc(r.next_target) + '</p>' : '') + '</div>';
-        }).join('') : '<p class="muted">Belum ada evidence.</p>') +
-        (p.due_reviews.length ? '<h3>Perlu review</h3>' + p.due_reviews.map(function (d) {
-          return '<div class="issue info">' + esc(d.name || d.competency_id) + ' — retensi ' + (d.retrievability == null ? '?' : Math.round(d.retrievability * 100) + '%') + '</div>';
+            (r.next_target ? '<p class="mono" style="color:var(--clay)">' + t('kurikulum.target-berikutnya', 'Target berikutnya: ') + esc(r.next_target) + '</p>' : '') + '</div>';
+        }).join('') : '<p class="muted">' + t('kurikulum.paspor-tanpa-evidence', 'Belum ada evidence.') + '</p>') +
+        (p.due_reviews.length ? '<h3>' + t('kurikulum.paspor-perlu-review', 'Perlu review') + '</h3>' + p.due_reviews.map(function (d) {
+          return '<div class="issue info">' + esc(d.name || d.competency_id) + ' — ' + t('kurikulum.paspor-retensi', 'retensi ') + (d.retrievability == null ? '?' : Math.round(d.retrievability * 100) + '%') + '</div>';
         }).join('') : '') +
-        (p.open_misconceptions.length ? '<h3>Miskonsepsi terbuka</h3>' + p.open_misconceptions.map(function (m) {
+        (p.open_misconceptions.length ? '<h3>' + t('kurikulum.paspor-miskonsepsi', 'Miskonsepsi terbuka') + '</h3>' + p.open_misconceptions.map(function (m) {
           return '<div class="issue warn">' + esc(m.misconception_id) + ' (' + m.frequency + 'x)</div>';
         }).join('') : '');
       render();
@@ -566,11 +854,77 @@
     if (a === 'close') { S.drawer = null; S.modal = null; return render(); }
     if (a === 'view') { S.view = el.getAttribute('data-v'); S.drawer = null; S.modal = null; return render(); }
     if (a === 'new-class') {
-      var name = prompt('Nama kelas baru?');
-      if (!name) return;
-      return api('/classes', { body: { name: name, grade_id: 'KELAS-7', subject_id: 'MAT-7' } }).then(function (c) {
-        S.classes.push(c); S.cls = c; resetCaches(); toast('Kelas dibuat. Kode: ' + c.code); render();
+      var defSub = activeSubj();
+      S.modal =
+        '<div class="card tight" style="margin-bottom:0">' +
+        '<div class="row between" style="margin-bottom:12px"><h3>' + t('kurikulum.modal-kelas-judul', 'Buat Kelas Baru') + '</h3><button class="btn sm ghost" data-a="close">' + t('kurikulum.tutup', 'Tutup') + '</button></div>' +
+        '<p class="muted">' + t('kurikulum.modal-kelas-sub', 'Pilih jenjang kelas dan mata pelajaran yang Anda ampu.') + '</p>' +
+        '<label class="f">' + t('kurikulum.modal-kelas-nama', 'Nama Rombel / Kelas') +
+          '<input id="newClsName" placeholder="' + t('kurikulum.modal-kelas-ph', 'mis. 7A, 8B, atau X-Bahasa 1') + '" autofocus data-testid="new-class-name">' +
+        '</label>' +
+        '<div class="grid g2">' +
+          '<label class="f">' + t('kurikulum.modal-kelas-jenjang', 'Tingkat / Fase') +
+            '<select id="newClsGrade" data-testid="new-class-grade">' +
+              GRADES.map(function (g) { return '<option value="' + g[0] + '"' + (g[0] === 'KELAS-7' ? ' selected' : '') + '>' + esc(g[1]) + '</option>'; }).join('') +
+            '</select>' +
+          '</label>' +
+          '<label class="f">' + t('kurikulum.modal-kelas-mapel', 'Mata Pelajaran') +
+            '<select id="newClsSubject" data-testid="new-class-subject">' +
+              SUBJECT_CHOICES.map(function (s) { return '<option value="' + s[0] + '"' + (s[0] === defSub ? ' selected' : '') + '>' + esc(s[1]) + '</option>'; }).join('') +
+            '</select>' +
+          '</label>' +
+        '</div>' +
+        '<div class="row" style="margin-top:18px;justify-content:flex-end">' +
+          '<button class="btn ghost sm" data-a="close">' + t('kurikulum.batal', 'Batal') + '</button>' +
+          '<button class="btn primary sm" data-a="submit-new-class" data-testid="submit-new-class-btn">' + t('kurikulum.modal-kelas-submit', 'Simpan & Buat Kelas') + '</button>' +
+        '</div>' +
+        '</div>';
+      return render();
+    }
+    if (a === 'submit-new-class') {
+      var name = val('newClsName');
+      var grade = val('newClsGrade') || 'KELAS-7';
+      var subject = val('newClsSubject') || 'MAT-7';
+      if (!name) { toast(t('kurikulum.nama-kelas-kosong', 'Nama kelas wajib diisi.')); return; }
+      el.disabled = true;
+      return api('/classes', { body: { name: name, grade_id: grade, subject_id: subject } }).then(function (c) {
+        S.classes.push(c); S.cls = c; S.activeSubject = c.subject_id; S.modal = null; resetCaches();
+        toast(t('kurikulum.kelas-berhasil-dibuat', 'Kelas dibuat. Kode: ') + c.code);
+        return loadContext().then(render);
       }).catch(errToast);
+    }
+    if (a === 'submit-welcome-class') {
+      var wName = val('welcomeClsName') || t('kurikulum.default-class-name', 'Kelas 7A');
+      var wGrade = val('welcomeClsGrade') || 'KELAS-7';
+      var wSub = val('welcomeClsSubject') || 'MAT-7';
+      el.disabled = true;
+      return api('/classes', { body: { name: wName, grade_id: wGrade, subject_id: wSub } }).then(function (c) {
+        S.classes = [c];
+        S.cls = c;
+        S.activeSubject = c.subject_id;
+        S.modal = null;
+        resetCaches();
+        toast(t('kurikulum.kelas-berhasil-dibuat', 'Kelas dibuat. Kode: ') + c.code);
+        return loadContext().then(render);
+      }).catch(function (e) {
+        el.disabled = false;
+        errToast(e);
+      });
+    }
+    if (a === 'bootstrap-demo-class') {
+      el.disabled = true;
+      return api('/seed/bootstrap', { body: {} }).then(function (r) {
+        S.classes = [r.class];
+        S.cls = r.class;
+        S.activeSubject = r.class.subject_id || 'MAT-7';
+        S.modal = null;
+        resetCaches();
+        toast(t('kurikulum.kelas-berhasil-dibuat', 'Kelas dibuat. Kode: ') + r.class.code);
+        return loadContext().then(render);
+      }).catch(function (e) {
+        el.disabled = false;
+        errToast(e);
+      });
     }
     if (a === 'seed-english' || a === 'seed-mapel' || a === 'seed-soal') {
       var d = SEMAI[a === 'seed-english' ? 'english' : (a === 'seed-mapel' ? 'mapel' : 'soal')];
@@ -638,8 +992,13 @@
     }
 
     if (a === 'add-node') {
-      return api('/curriculum/nodes', { body: { type: val('ndType'), parent_id: val('ndParent'), name: val('ndName') } })
-        .then(function (n) { toast('Simpul ' + n.code + ' dibuat.'); S.tree = null; S.health = null; loadContext().then(render); })
+      var nType = val('ndType');
+      var nParent = val('ndParent');
+      var nName = val('ndName');
+      if (!nName) return toast(t('kurikulum.node-nama-wajib', 'Nama simpul wajib diisi.'));
+      if (!nParent && nType !== 'curriculum') return toast(t('kurikulum.node-induk-wajib', 'Pilih atau ketik ID induk simpul.'));
+      return api('/curriculum/nodes', { body: { type: nType, parent_id: nParent, name: nName } })
+        .then(function (n) { toast(t('kurikulum.simpul-dibuat', 'Simpul ') + n.code + t('kurikulum.simpul-berhasil', ' dibuat.')); S.tree = null; S.health = null; loadContext().then(render); })
         .catch(errToast);
     }
 
@@ -706,8 +1065,58 @@
       });
     }
     if (a === 'reload-bank') { S.bankLoaded = false; return loadBank(); }
+    if (a === 'apply-bp-preset') {
+      var preset = el.getAttribute('data-preset');
+      var clsName = (S.cls && S.cls.name) ? ' — ' + S.cls.name : '';
+      if (preset === 'quiz') {
+        if (document.getElementById('bpTitle')) document.getElementById('bpTitle').value = t('kurikulum.preset-quiz-title', 'Kuis Harian') + clsName;
+        if (document.getElementById('bpType')) document.getElementById('bpType').value = 'formative';
+        if (document.getElementById('cogC1')) document.getElementById('cogC1').value = '30';
+        if (document.getElementById('cogC2')) document.getElementById('cogC2').value = '40';
+        if (document.getElementById('cogC3')) document.getElementById('cogC3').value = '30';
+        if (document.getElementById('cogC4')) document.getElementById('cogC4').value = '0';
+        if (document.getElementById('bpTransfer')) document.getElementById('bpTransfer').value = '0.1';
+        if (S.bpRows && S.bpRows[0]) S.bpRows[0].count = 5;
+        toast(t('kurikulum.preset-applied-quiz', 'Template Kuis Harian (5 soal) diterapkan.'));
+      } else if (preset === 'weekly') {
+        if (document.getElementById('bpTitle')) document.getElementById('bpTitle').value = t('kurikulum.preset-weekly-title', 'Formatif Mingguan') + clsName;
+        if (document.getElementById('bpType')) document.getElementById('bpType').value = 'formative';
+        if (document.getElementById('cogC1')) document.getElementById('cogC1').value = '20';
+        if (document.getElementById('cogC2')) document.getElementById('cogC2').value = '30';
+        if (document.getElementById('cogC3')) document.getElementById('cogC3').value = '30';
+        if (document.getElementById('cogC4')) document.getElementById('cogC4').value = '20';
+        if (document.getElementById('bpTransfer')) document.getElementById('bpTransfer').value = '0.2';
+        if (S.bpRows && S.bpRows[0]) S.bpRows[0].count = 10;
+        toast(t('kurikulum.preset-applied-weekly', 'Template Formatif Mingguan (10 soal) diterapkan.'));
+      } else if (preset === 'summative') {
+        if (document.getElementById('bpTitle')) document.getElementById('bpTitle').value = t('kurikulum.preset-sum-title', 'Sumatif Lingkup Materi') + clsName;
+        if (document.getElementById('bpType')) document.getElementById('bpType').value = 'summative';
+        if (document.getElementById('cogC1')) document.getElementById('cogC1').value = '15';
+        if (document.getElementById('cogC2')) document.getElementById('cogC2').value = '25';
+        if (document.getElementById('cogC3')) document.getElementById('cogC3').value = '35';
+        if (document.getElementById('cogC4')) document.getElementById('cogC4').value = '25';
+        if (document.getElementById('bpTransfer')) document.getElementById('bpTransfer').value = '0.3';
+        if (S.bpRows && S.bpRows[0]) S.bpRows[0].count = 20;
+        toast(t('kurikulum.preset-applied-sum', 'Template Sumatif (20 soal) diterapkan.'));
+      }
+      return render();
+    }
+    if (a === 'copy-rapor') {
+      var txt = el.getAttribute('data-text') || '';
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(txt).then(function () {
+          toast(t('kurikulum.rapor-berhasil-salin', 'Narasi e-Rapor berhasil disalin ke papan klip!'));
+        }).catch(function () {
+          toast(t('kurikulum.rapor-gagal-salin', 'Gagal menyalin. Silakan pilih teks manual.'));
+        });
+      } else {
+        toast(t('kurikulum.rapor-manual', 'Teks siap disalin secara manual.'));
+      }
+      return;
+    }
     if (a === 'bp-add') {
-      var pool = S.tps.filter(function (t) { return !S.cls.subject_id || t.subject_id === S.cls.subject_id; });
+      var sub = activeSubj();
+      var pool = S.tps.filter(function (t) { return !sub || t.subject_id === sub; });
       if (!pool.length) pool = S.tps;
       S.bpRows.push({ tp: pool[0] && pool[0].id, count: 5 });
       return render();
@@ -761,7 +1170,11 @@
     var a = el.getAttribute('data-a');
     if (a === 'pick-class') {
       S.cls = S.classes.filter(function (c) { return c.id === el.value; })[0];
-      resetCaches(); render();
+      if (S.cls && S.cls.subject_id) {
+        S.activeSubject = S.cls.subject_id;
+      }
+      resetCaches();
+      loadContext().then(render);
     }
     if (a === 'filter-tp') { S.filterTp = el.value; S.bankLoaded = false; loadBank(); }
     if (a === 'bp-tp') { S.bpRows[+el.getAttribute('data-i')].tp = el.value; }
@@ -791,6 +1204,7 @@
     S.coverage = null; S.recs = null; S.assessments = []; S.asLoaded = false;
     S.students = null; S.bankLoaded = false; S.questions = []; S.reviewQueue = [];
     S.plan = null; S.groups = null; S.bpRows = null; S.blueprintCheck = null;
+    S.tree = null; S.health = null;
   }
 
   function errToast(e) { toast(e.message || 'Gagal.'); render(); }

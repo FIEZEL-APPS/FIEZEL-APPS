@@ -181,7 +181,9 @@ export async function mintInvite(input, nowMs, deps = {}) {
       created_by: typeof input.ownerSub === 'string' ? input.ownerSub : 'owner',
       used_at: null,
       used_by: null,
-      revoked_at: null
+      revoked_at: null,
+      subject_id: (input.subject_id || input.subjectId || null),
+      grade_id: (input.grade_id || input.gradeId || null)
     }
   };
 }
@@ -230,6 +232,8 @@ export function publicInviteView(record, nowMs) {
     teacherName: record.teacher_name,
     institution: record.institution,
     institutionType: record.institution_type,
+    subjectId: record.subject_id || null,
+    gradeId: record.grade_id || null,
     status: inviteStatus(record, nowMs),
     createdAt: Number(record.created_at) || 0,
     expiresAt: Number(record.expires_at) || 0,

@@ -119,7 +119,36 @@ const KEY = 'kunci-uji-paritas-yang-cukup-panjang-0123456789';
   });
 
   // ------------------------------------------------------------------ penolakan
-  const rusak = terbit.ticket.slice(0, -1) + (terbit.ticket.slice(-1) === 'A' ? 'B' : 'A');
+
+  /* PERUSAKAN HARUS BENAR-BENAR MERUSAK, DAN DULU TIDAK SELALU.
+
+     Versi sebelumnya membalik karakter TERAKHIR tiket: `...slice(0,-1) + (akhir === 'A' ? 'B' : 'A')`.
+     Tanda tangan HMAC-SHA256 panjangnya 32 bita, dan 32 bita menjadi 43 karakter base64url —
+     berarti karakter terakhir hanya membawa 4 bit yang berarti; 2 bit sisanya dibuang saat
+     didekode. Akibatnya 'A', 'B', 'C', dan 'D' semuanya menghasilkan 32 bita YANG SAMA PERSIS.
+
+     Jadi setiap kali tanda tangan sebuah tiket kebetulan berakhir pada salah satu dari empat
+     huruf itu — diukur 6,25% dari percobaan — tiket "rusak" itu sebenarnya tiket yang sama,
+     kedua sisi menerimanya dengan benar, dan gerbang ini merah tanpa satu pun cacat produk.
+     Gerbang yang merah satu kali dari enam belas mengajari pembacanya menekan jalankan-ulang
+     alih-alih membaca pesannya, dan itu justru membunuh gerbang yang menjaga tanda tangan.
+
+     Yang dirusak sekarang karakter di TENGAH tanda tangan, tempat seluruh 6 bitnya berarti,
+     dan hasilnya diperiksa memang berbeda sebelum dipakai. */
+  const pisah = terbit.ticket.lastIndexOf('.');
+  const tandaTangan = terbit.ticket.slice(pisah + 1);
+  const titik = Math.floor(tandaTangan.length / 2);
+  const gantiDengan = tandaTangan[titik] === 'A' ? 'B' : 'A';
+  const rusak = terbit.ticket.slice(0, pisah + 1) +
+    tandaTangan.slice(0, titik) + gantiDengan + tandaTangan.slice(titik + 1);
+
+  const baca = (b64) => Buffer.from(b64.replace(/-/g, '+').replace(/_/g, '/'), 'base64');
+  test('vektor perusakan benar-benar mengubah bita tanda tangan', () => {
+    assert.notStrictEqual(rusak, terbit.ticket, 'tiket rusak identik dengan tiket asli');
+    assert.ok(!baca(tandaTangan).equals(baca(rusak.slice(pisah + 1))),
+      'karakter yang diganti jatuh pada bit yang dibuang saat dekode base64url — ' +
+      'perusakan ini tidak merusak apa pun, dan pengujian di bawahnya menguji tiket yang sah');
+  });
 
   const tolakJs = await mod.verifyCurriculumTicket(KEY, rusak, Date.now());
   const tolakPy = py(
