@@ -33,7 +33,7 @@ const MAX_RETRIES = 5;
  * Puck: Suara upbeat, youthful, ramah dan santai.
  */
 const DEFAULT_GEMINI_VOICE = 'Aoede';
-const GEMINI_MODEL = 'gemini-3.6-flash';
+const GEMINI_MODEL = 'gemini-2.5-flash-preview-tts';
 
 function r2Url(env, key) {
   return `${R2_API}/${env.accountId}/r2/buckets/${env.bucket}/objects/${encodeURIComponent(key)}`;
@@ -207,7 +207,7 @@ async function synthesizeGemini(text, voiceName, apiKey) {
         role: 'user',
         parts: [
           {
-            text: `Read the following English text aloud clearly, naturally, and with vibrant energy, suitable for language learners:\n\n${text}`
+            text: text
           }
         ]
       }
