@@ -40,6 +40,7 @@ import {
   signCurriculumTicket, TICKET_KEY_ENV, TICKET_KEY_MIN_LENGTH
 } from './auth/curriculum-ticket.js';
 import { ensureTeacherInviteColumns } from './route-owner-teachers.js';
+import { attachIdentityCookie, issueAnonIdentity, ensureIdentityRow } from './mw-identity.js';
 
 /**
  * Hash boneka untuk menyamakan biaya jalur "handle tidak ada". Nilainya adalah
@@ -222,6 +223,10 @@ export async function routeAccountLogin(ctx) {
       };
     }
   }
+  try {
+    await ensureIdentityRow(ctx.env, account.sub, ctx.now);
+    await attachIdentityCookie(ctx, account.sub);
+  } catch (_) {}
   return jsonResponse({ ok: true, account: accountView(accountData, account.role) }, opt);
 }
 
@@ -241,6 +246,9 @@ export async function routeAccountLogout(ctx) {
   await gate.db.prepare('UPDATE session SET revoked_at = ?2 WHERE sub = ?1 AND revoked_at IS NULL')
     .bind(gate.sub, ctx.now).run()
     .catch(() => null); // tabel session milik paket identitas; ketiadaannya bukan galat logout
+  try {
+    await issueAnonIdentity(ctx);
+  } catch (_) {}
   return jsonResponse({ ok: true }, gate.opt);
 }
 
@@ -421,6 +429,11 @@ export async function routeTeacherActivate(ctx) {
         .bind(invite.class_code, ctx.identity.sub, invite.subject_id || 'ALL', invite.teacher_name, ctx.now, ctx.now).run().catch(() => null);
     }
 
+    try {
+      await ensureIdentityRow(ctx.env, ctx.identity.sub, ctx.now);
+      await attachIdentityCookie(ctx, ctx.identity.sub);
+    } catch (_) {}
+
     return jsonResponse({
       ok: true,
       account: accountView({
@@ -496,6 +509,11 @@ export async function routeTeacherActivate(ctx) {
     await db.prepare('INSERT OR REPLACE INTO tc_class_teacher (class_code, teacher_sub, subject_id, teacher_name, created_at, updated_at) VALUES (?1, ?2, ?3, ?4, ?5, ?6)')
       .bind(invite.class_code, ctx.identity.sub, invite.subject_id || 'ALL', invite.teacher_name, ctx.now, ctx.now).run().catch(() => null);
   }
+
+  try {
+    await ensureIdentityRow(ctx.env, ctx.identity.sub, ctx.now);
+    await attachIdentityCookie(ctx, ctx.identity.sub);
+  } catch (_) {}
 
   return jsonResponse({
     ok: true,

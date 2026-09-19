@@ -359,6 +359,7 @@
   }
 
   async function logout() {
+    session = null;
     var res = await call(API_PATHS.logout, {});
     // Sesi lokal dibuang APA PUN jawaban server: kalau server tidak bisa dihubungi,
     // murid yang menekan "keluar" tetap harus melihat dirinya keluar. Cookie fz_id
