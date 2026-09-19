@@ -558,7 +558,16 @@
   /** Klaim kode kelas di server (idempoten untuk pemilik yang sama). */
   function claimClass(c) {
     var A = account();
-    return A.api(SYNC_PATHS.claim, { code: c.code, title: c.name, level: c.level }).then(function (r) {
+    var acc = (A && A.state && A.state()) || {};
+    var sId = (c && (c.subjectId || c.subject)) || acc.subjectId || null;
+    var tName = (c && c.teacherName) || acc.teacherName || null;
+    return A.api(SYNC_PATHS.claim, {
+      code: c.code,
+      title: c.name,
+      level: c.level,
+      subjectId: sId,
+      teacherName: tName
+    }).then(function (r) {
       if (r.ok) { c.sync = Object.assign(c.sync || {}, { claimed: true, claimedAt: Date.now(), error: '' }); return { ok: true }; }
       c.sync = Object.assign(c.sync || {}, { claimed: false, error: r.error || 'unknown' });
       return { ok: false, error: r.error || 'unknown' };

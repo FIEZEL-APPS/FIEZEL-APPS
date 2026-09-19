@@ -824,6 +824,17 @@ async function deleteTeacherInvite(env, input, fetchImpl) {
   });
 }
 
+async function deleteTeacherAccount(env, input, fetchImpl) {
+  return await ownerApiFetch(env, '/api/owner/teacher/delete', fetchImpl, {
+    method: 'POST',
+    body: {
+      sub: input.sub || undefined,
+      handle: input.handle || undefined,
+      mode: input.mode || undefined,
+    }
+  });
+}
+
 async function readSchools(env, fetchImpl) {
   const res = await ownerApiFetch(env, '/api/owner/schools', fetchImpl);
   if (res.state !== 'ok') return { state: res.state, status: res.status, schools: [] };
@@ -892,6 +903,16 @@ async function createClass(env, input, fetchImpl) {
       level: input.level,
       school_id: input.school_id || input.schoolId,
       code: input.code,
+    }
+  });
+}
+
+async function deleteClass(env, input, fetchImpl) {
+  return await ownerApiFetch(env, '/api/owner/class/delete', fetchImpl, {
+    method: 'POST',
+    body: {
+      code: input.code,
+      mode: input.mode
     }
   });
 }
@@ -3063,6 +3084,36 @@ function renderTeacherSection(m) {
     </a>`;
   }).join('');
 
+  let classTableRows = '';
+  if (classList.length === 0) {
+    classTableRows = '<tr><td colspan="6" style="text-align:center;padding:16px;color:var(--text-muted);">Belum ada kelas yang terdaftar di basis data.</td></tr>';
+  } else {
+    classTableRows = classList.map((clsItem) => {
+      const isCur = clsItem.code === currentClass;
+      const sch = schools.find(s => s.id === clsItem.school_id);
+      const schName = (sch && sch.name) || clsItem.school_name || '—';
+      const mapelCount = SUBJECTS_17.filter(s => {
+        return (invites.some(i => i.classCode === clsItem.code && (i.subjectId === s.id || i.subject_id === s.id) && i.status === 'ACTIVE')) ||
+               (teachers.some(t => t.classCode === clsItem.code && (t.subjectId === s.id || t.subject_id === s.id)));
+      }).length;
+      return `<tr>
+        <td><code style="font-weight:800;color:var(--brand-gold);">${esc(clsItem.code)}</code></td>
+        <td><b>${esc(clsItem.title || 'Kelas ' + clsItem.code)}</b></td>
+        <td><span style="background:#e0f2fe;color:#0369a1;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:700;">${esc(clsItem.level || 'SMP')}</span></td>
+        <td>${esc(schName)}</td>
+        <td><span style="font-size:11px;font-weight:700;color:${mapelCount > 0 ? '#166534' : '#64748b'};">${mapelCount} / 17 Mapel</span></td>
+        <td style="text-align:center;white-space:nowrap;">
+          ${!isCur ? `<a href="/?cls=${esc(clsItem.code)}#class-panel" style="background:#0284c7;color:#fff;border:none;padding:3px 8px;border-radius:4px;font-size:11px;font-weight:bold;text-decoration:none;display:inline-block;margin-right:4px;">Pilih</a>` : '<span style="color:#059669;font-weight:700;font-size:11px;margin-right:6px;">Aktif</span>'}
+          <form method="GET" action="/" style="display:inline;margin:0;">
+            <input type="hidden" name="action" value="delete_class">
+            <input type="hidden" name="code" value="${esc(clsItem.code)}">
+            <button type="submit" style="background:#ef4444;color:#fff;border:none;padding:3px 8px;border-radius:4px;font-size:11px;font-weight:bold;cursor:pointer;">Hapus</button>
+          </form>
+        </td>
+      </tr>`;
+    }).join('');
+  }
+
   // Hitung jumlah mapel terisi di kelas aktif ini
   let filledCount = 0;
   const mapelCards = SUBJECTS_17.map((s) => {
@@ -3200,7 +3251,13 @@ function renderTeacherSection(m) {
             Pilih kelas persisten atau buat kelas baru yang tersimpan permanen di D1. Klik mapel untuk mencetak token guru terikat.
           </div>
         </div>
-        <div style="display:flex;gap:8px;align-items:center;">
+        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+          <form method="GET" action="/" style="margin:0;">
+            <input type="hidden" name="action" value="clear_classes">
+            <button type="submit" style="background:#fee2e2;color:#991b1b;border:1px solid #f87171;padding:7px 12px;border-radius:8px;font-size:11.5px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:6px;">
+              🧹 Bersihkan Semua Kelas
+            </button>
+          </form>
           <details style="position:relative;">
             <summary style="background:#0284c7;color:#ffffff;font-size:12px;font-weight:700;padding:8px 14px;border-radius:8px;cursor:pointer;list-style:none;display:inline-flex;align-items:center;gap:6px;box-shadow:0 2px 0 #0369a1;">
               + Buat Kelas Baru (Persisten D1)
@@ -3259,7 +3316,7 @@ function renderTeacherSection(m) {
       ` : ''}
 
       <div style="background:var(--bg-subtle,#f8fafc);border:1px solid var(--card-border);border-radius:10px;padding:16px;margin-bottom:20px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;">
-        <div>
+        <div style="max-width:750px;">
           <div style="font-size:11.5px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:var(--text-muted);margin-bottom:4px;">
             KODE KELAS AKTIF (PERMANEN DI BASIS DATA D1)
           </div>
@@ -3272,7 +3329,40 @@ function renderTeacherSection(m) {
             Berikan 1 kode kelas di atas kepada murid. Di tab <b>KelasKu</b> murid, sistem otomatis menampilkan panel-panel mata pelajaran guru yang terdaftar. Kode kelas ini permanen dan tersimpan aman di basis data D1. Memuat ulang atau me-refresh halaman tidak akan mengubah kode unik kelas ini.
           </div>
         </div>
+        <div>
+          <form method="GET" action="/" style="margin:0;">
+            <input type="hidden" name="action" value="delete_class">
+            <input type="hidden" name="code" value="${esc(currentClass)}">
+            <button type="submit" style="background:#ef4444;color:#ffffff;border:none;padding:8px 14px;border-radius:8px;font-size:11.5px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:6px;box-shadow:0 2px 0 #b91c1c;">
+              🗑️ Hapus Kelas ${esc(currentClass)}
+            </button>
+          </form>
+        </div>
       </div>
+
+      <details style="margin-bottom:20px;background:#ffffff;border:1px solid var(--card-border);border-radius:10px;padding:12px 16px;">
+        <summary style="font-weight:700;font-size:13px;color:var(--text-main);cursor:pointer;list-style:none;display:flex;align-items:center;justify-content:space-between;">
+          <span>📋 Daftar &amp; Kelola Semua Kelas Terdaftar (${classList.length})</span>
+          <span style="font-size:11px;color:var(--text-muted);font-weight:400;">(Buka tabel untuk melihat / menghapus kelas lain)</span>
+        </summary>
+        <div class="table-wrap" style="margin-top:12px;">
+          <table>
+            <thead>
+              <tr>
+                <th>Kode Kelas</th>
+                <th>Nama / Judul Kelas</th>
+                <th>Jenjang</th>
+                <th>Sekolah Mitra</th>
+                <th>Mapel Terisi</th>
+                <th style="text-align:center;">Aksi</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${classTableRows}
+            </tbody>
+          </table>
+        </div>
+      </details>
 
       <div style="font-size:13px;font-weight:700;color:var(--text-main);margin-bottom:10px;">
         Panel 17 Mata Pelajaran Kurikulum Merdeka di Kelas <code>${esc(currentClass)}</code>:
@@ -3584,10 +3674,32 @@ function renderTeacherSection(m) {
         <td><code style="font-weight:700;color:var(--brand-gold);">${esc(cCode)}</code></td>
         <td><span style="background:#e8f5e9;color:#2e7d32;padding:2px 8px;border-radius:10px;font-weight:bold;font-size:11px;">${esc(tc.status || 'active')}</span></td>
         <td>${esc(actDate)}</td>
+        <td style="text-align:center;white-space:nowrap;">
+          <form method="GET" action="/" style="display:inline;margin:2px;">
+            <input type="hidden" name="action" value="delete_teacher">
+            <input type="hidden" name="sub" value="${esc(tc.sub || '')}">
+            <input type="hidden" name="handle" value="${esc(tc.handle || '')}">
+            <input type="hidden" name="cls" value="${esc(currentClass)}">
+            <button type="submit" style="background:#fee2e2;color:#b91c1c;border:1px solid #fca5a5;padding:3px 8px;border-radius:4px;font-size:11px;font-weight:bold;cursor:pointer;" title="Hapus akun guru ini dan bersihkan tokennya">Hapus</button>
+          </form>
+        </td>
       </tr>`;
     }).join('');
 
     teacherTable = `
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;flex-wrap:wrap;gap:8px;">
+        <div style="font-weight:700;font-size:14px;color:var(--ink);">Daftar Guru Terdaftar &amp; Aktif (${teachers.length})</div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          <form method="GET" action="/" style="margin:0;">
+            <input type="hidden" name="action" value="delete_teacher">
+            <input type="hidden" name="mode" value="all">
+            <input type="hidden" name="cls" value="${esc(currentClass)}">
+            <button type="submit" style="background:#fef2f2;color:#dc2626;border:1px solid #fecaca;padding:4px 10px;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;" title="Bersihkan semua akun guru aktif">
+              Bersihkan Semua Akun Guru
+            </button>
+          </form>
+        </div>
+      </div>
       <div class="table-wrap">
         <table>
           <thead>
@@ -3600,6 +3712,7 @@ function renderTeacherSection(m) {
               <th>Kode Kelas</th>
               <th>Status</th>
               <th>Aktivasi (WIB)</th>
+              <th style="text-align:center;">Aksi</th>
             </tr>
           </thead>
           <tbody>
@@ -4911,6 +5024,41 @@ async function handle(request, env, ctx, nowMs) {
           message: 'Gagal membuat kelas baru.'
         };
       }
+    } else if (action === 'delete_class') {
+      const code = url.searchParams.get('code') || '';
+      const delRes = await deleteClass(env, { code }, fetchImpl);
+      if (delRes.state === 'ok' && delRes.body && delRes.body.ok) {
+        teacherAction = {
+          ok: true,
+          action: 'class',
+          deletedCode: code,
+          message: `Kelas "${code}" berhasil dihapus permanen dari basis data D1.`
+        };
+      } else {
+        teacherAction = {
+          ok: false,
+          action: 'class',
+          error: (delRes.body && delRes.body.error) || delRes.state,
+          message: `Gagal menghapus kelas "${code}".`
+        };
+      }
+    } else if (action === 'clear_classes') {
+      const delRes = await deleteClass(env, { mode: 'all' }, fetchImpl);
+      if (delRes.state === 'ok' && delRes.body && delRes.body.ok) {
+        teacherAction = {
+          ok: true,
+          action: 'class',
+          clearedAll: true,
+          message: `Semua data kelas (${delRes.body.deletedCount || 0} kelas) berhasil dibersihkan dari basis data D1.`
+        };
+      } else {
+        teacherAction = {
+          ok: false,
+          action: 'class',
+          error: (delRes.body && delRes.body.error) || delRes.state,
+          message: 'Gagal membersihkan data kelas.'
+        };
+      }
     } else if (action === 'delete_invite') {
       const codeHash = url.searchParams.get('codeHash') || '';
       const delRes = await deleteTeacherInvite(env, { codeHash }, fetchImpl);
@@ -4943,6 +5091,27 @@ async function handle(request, env, ctx, nowMs) {
           action: 'delete',
           error: (delRes.body && delRes.body.error) || delRes.state,
           message: 'Gagal membersihkan data token guru.'
+        };
+      }
+    } else if (action === 'delete_teacher') {
+      const sub = url.searchParams.get('sub') || '';
+      const handle = url.searchParams.get('handle') || '';
+      const mode = url.searchParams.get('mode') || '';
+      const delRes = await deleteTeacherAccount(env, { sub, handle, mode }, fetchImpl);
+      if (delRes.state === 'ok' && delRes.body && delRes.body.ok) {
+        teacherAction = {
+          ok: true,
+          action: 'delete_teacher',
+          message: mode === 'all'
+            ? `Berhasil membersihkan ${delRes.body.deletedCount || 0} akun guru aktif.`
+            : `Akun guru (${handle || sub}) berhasil dihapus dan dibersihkan dari basis data.`
+        };
+      } else {
+        teacherAction = {
+          ok: false,
+          action: 'delete_teacher',
+          error: (delRes.body && delRes.body.error) || delRes.state,
+          message: 'Gagal menghapus akun guru aktif.'
         };
       }
     }
@@ -4988,16 +5157,17 @@ async function handle(request, env, ctx, nowMs) {
 
     // Tentukan kelas aktif secara stabil (TIDAK PERNAH ACAK SAAT REFRESH!)
     let activeClass = '';
+    const isDeleted = (code) => teacherAction && teacherAction.deletedCode === code;
     if (teacherAction && teacherAction.action === 'class' && teacherAction.code) {
       activeClass = teacherAction.code;
-    } else if (paramCls && knownClassSet.has(paramCls)) {
+    } else if (paramCls && knownClassSet.has(paramCls) && !isDeleted(paramCls)) {
       activeClass = paramCls;
-    } else if (paramCls && /^FZ-[A-Z0-9]{4,10}$/.test(paramCls)) {
+    } else if (paramCls && /^FZ-[A-Z0-9]{4,10}$/.test(paramCls) && !isDeleted(paramCls)) {
       activeClass = paramCls;
-    } else if (cookieCls && knownClassSet.has(cookieCls)) {
+    } else if (cookieCls && knownClassSet.has(cookieCls) && !isDeleted(cookieCls)) {
       activeClass = cookieCls;
-    } else if (classArray.length > 0) {
-      activeClass = classArray[0];
+    } else if (classArray.filter(c => !isDeleted(c)).length > 0) {
+      activeClass = classArray.filter(c => !isDeleted(c))[0];
     } else {
       activeClass = 'FZ-MERDEKA1';
     }
@@ -5189,8 +5359,8 @@ export {
   readEvidence, sanitizeEvidenceSummary, renderEvidenceSection, EVIDENCE_PERIOD_DAYS,
   readLearners, readLearnerDetail, sanitizeLearnerRow, sanitizeLearnerSummary,
   renderLearnerSection, renderLearnerDirectory, renderLearnerDetail, learnerLabel, SUB_RE,
-  readTeachers, mintTeacherInvite, revokeTeacherInvite, updateTeacherInvite, deleteTeacherInvite, renderTeacherSection,
-  readSchools, createSchool, updateSchool, deleteSchool, readClasses, createClass, regenerateTeacherInvite,
+  readTeachers, mintTeacherInvite, revokeTeacherInvite, updateTeacherInvite, deleteTeacherInvite, deleteTeacherAccount, renderTeacherSection,
+  readSchools, createSchool, updateSchool, deleteSchool, readClasses, createClass, deleteClass, regenerateTeacherInvite,
   // Rem penebakan halaman masuk: diekspor supaya gerbang bisa memodelkan ISOLATE BARU per
   // permintaan (cacat yang tidak pernah diuji) dan mengassert angka jendelanya sebagai kontrak.
   LOGIN_MAX, LOGIN_MAX_SHARED, LOGIN_BUCKET_MS, LOGIN_WINDOW_BUCKETS, LOGIN_WINDOW_MS,
