@@ -1233,7 +1233,17 @@ function grammarMastery(skill,sourceState=state){return Math.max(0,Math.min(100,
 // tidak menyentuh DOM, tidak menyimpan apa pun, jadi hub, openGrammarLesson(), dan practiceSkill()
 // bisa memakai jawaban yang SAMA. Prasyarat yang hanya ditampilkan tapi tidak ditegakkan membuat
 // urutan kurikulum jadi saran belaka - itu yang ditutup di sini.
-function lessonUnlockState(skill,sourceState=state){
+/* Braincore v3 (otoritas BKT, m025-330 — permintaan OWNER "BKT nya jangan di bekukan"):
+   parameter BKT (L0/T/slip/guess) TETAP beku - itu keputusan terpisah, lihat
+   docs/BRAIN-EVOLUTION-DECISIONS.md §5, dan tidak disentuh di sini. Yang berubah adalah
+   OTORITASNYA: bktMastered adalah Set opsional berisi skill yang sudah lolos
+   FiezelMasteryBKT.masteryGate() (L>=0,95 DAN n>=5 - gerbang kepercayaan bukti, bukan
+   sekadar posterior tinggi). Bila sebuah prasyarat ada di Set ini, ia dianggap terpenuhi
+   SEKALIPUN akurasi mentah v2 belum sampai ambang.
+   SATU ARAH SAJA: BKT hanya bisa MEMBUKA, tidak pernah MENGUNCI. bktMastered yang
+   null/undefined/kosong membuat fungsi ini berperilaku identik dengan sebelum otoritas
+   ini ada (modul absen = perilaku identik hari ini) - dijaga tests/grammar-unlock-test.js. */
+function lessonUnlockState(skill,sourceState=state,bktMastered=null){
   const key=String(skill||''),meta=grammarCurriculumEntry(key)||GRAMMAR_ITEMS.find(x=>x.skill===key)||null;
   const prerequisites=Array.isArray(meta?.prerequisites)?meta.prerequisites.map(x=>String(x||'')).filter(Boolean):[];
   const threshold=GRAMMAR_UNLOCK_MASTERY;
@@ -1246,7 +1256,8 @@ function lessonUnlockState(skill,sourceState=state){
      "lesson berikutnya terbuka". Prasyarat kini juga terpenuhi oleh skippedAt (gerbang
      sudah lulus); angka mastery yang tampil tetap jujur mengikuti bukti terbaru. */
   const skipVerified=x=>!!sourceState?.grammar?.[String(x||'')]?.skippedAt;
-  const missing=prerequisites.filter(x=>grammarMastery(x,sourceState)<threshold&&!skipVerified(x)).map(x=>({skill:x,mastery:grammarMastery(x,sourceState)}));
+  const bktVerified=x=>!!(bktMastered&&typeof bktMastered.has==='function'&&bktMastered.has(String(x||'')));
+  const missing=prerequisites.filter(x=>grammarMastery(x,sourceState)<threshold&&!skipVerified(x)&&!bktVerified(x)).map(x=>({skill:x,mastery:grammarMastery(x,sourceState)}));
   return{skill:key,locked:missing.length>0,threshold,missing,reason:missing.length?'prerequisite_not_mastered':'prerequisite_mastered'}
 }
 function lessonLockMessage(unlock){if(!unlock?.locked)return'';const names=unlock.missing.map(x=>friendlySkillName(x.skill)).join(', ');return FiezelI18n.t('grammar.lesson-terkunci',{daftarLesson:names,ambang:unlock.threshold})}
@@ -3355,6 +3366,16 @@ function bktRecord(q,ok,kappa,boost=1){
   // retensi. Modul idempoten per lesson, jadi memanggilnya tiap jawaban tidak menumpuk
   // jadwal; guard di dalamnya membuat perilaku tanpa modul persis seperti sebelum ini.
   retentionProbeSync(Date.now(),lesson);
+}
+/** Skill yang BKT sudah yakin dikuasai (L>=0,95, n>=5 - masteryGate() bawaan modul).
+ *  Dipakai lessonUnlockState() sebagai jalur TAMBAHAN menuju unlock (m025-330, otoritas
+ *  BKT): hanya perlu menyapu lesson yang punya catatan BKT, karena lesson tak dikenal
+ *  jatuh ke prior L0=0,2 yang pasti gagal gerbang. Modul absen/tanpa bukti = Set kosong. */
+function bktMasteredSkills(bktState=bktRead()){
+  const B=self.FiezelMasteryBKT,out=new Set();
+  if(!B||typeof B.masteryGate!=='function'||!bktState?.lessons)return out;
+  for(const skill in bktState.lessons){try{if(B.masteryGate(bktState,skill))out.add(skill)}catch{}}
+  return out;
 }
 /* ---- Butir 4: confusion matrix lesson-x-lesson dari opsi pinjaman ---- */
 const CONFUSION_MATRIX_KEY='fiezel-confusion-matrix-v1';
@@ -9885,9 +9906,10 @@ function toggleGrammarHubView(){grammarHubListView=!grammarHubListView;grammar()
 window.toggleGrammarHubView=toggleGrammarHubView;
 function grammar(){const level=getActiveLevel(),entries=grammarItemsForLevel(level).slice().sort((a,b)=>Number(a.sequence||Number.MAX_SAFE_INTEGER)-Number(b.sequence||Number.MAX_SAFE_INTEGER)),skills=entries.map(x=>x.skill).filter((x,i,a)=>a.indexOf(x)===i);
   const examEntry=levelTrustState(state).exams[level]||null;
+  const bktMastered=bktMasteredSkills();
   const rows=skills.map((k,index)=>{
     const entry=entries.find(x=>x.skill===k)||{},item=entry.item||G[k]?.[0]||[],family=grammarFamilyLabel(item),meta=grammarCurriculumEntry(k)||entry,title=friendlySkillName(k),prerequisites=Array.isArray(meta?.prerequisites)&&meta.prerequisites.length?FiezelI18n.t('grammar.prasyarat',{join:meta.prerequisites.map(friendlySkillName).join(', ')}):FiezelI18n.t('grammar.fondasi-awal');
-    const unlock=lessonUnlockState(k),mastery=state.grammar[k]?.mastery||0,touched=!!state.grammar[k]?.total;
+    const unlock=lessonUnlockState(k,state,bktMastered),mastery=state.grammar[k]?.mastery||0,touched=!!state.grammar[k]?.total;
     return{k,index,title,family,prerequisites,unlock,mastery,
       mastered:mastery>=MASTERY_THRESHOLD,
       completed:mastery>=GRAMMAR_UNLOCK_MASTERY,
@@ -9934,7 +9956,7 @@ function grammar(){const level=getActiveLevel(),entries=grammarItemsForLevel(lev
   if(pawPathWatch&&pawPathWatch.level===level&&pawPathDone>pawPathWatch.done&&!grammarHubListView)setTimeout(()=>{pawStageState('.path-mascot fiezel-mascot','celebrating',{hold:1400})},260);
   pawPathWatch={level,done:pawPathDone};
 }
-function openGrammarLesson(skill){const meta=GRAMMAR_ITEMS.find(x=>x.skill===skill);if(!meta||meta.level!==getActiveLevel())return showToast(FiezelI18n.t('grammar.lesson-hanya-tersedia-pada-level',{level:getActiveLevel()}));const unlock=lessonUnlockState(skill);if(unlock.locked)return showToast(lessonLockMessage(unlock));if(!(G[skill]||[]).length)return showToast(FiezelI18n.t('grammar.lesson-belum-memiliki-materi'));enterStage('grammar-lesson',()=>renderGrammarLesson(skill));renderGrammarLesson(skill)}
+function openGrammarLesson(skill){const meta=GRAMMAR_ITEMS.find(x=>x.skill===skill);if(!meta||meta.level!==getActiveLevel())return showToast(FiezelI18n.t('grammar.lesson-hanya-tersedia-pada-level',{level:getActiveLevel()}));const unlock=lessonUnlockState(skill,state,bktMasteredSkills());if(unlock.locked)return showToast(lessonLockMessage(unlock));if(!(G[skill]||[]).length)return showToast(FiezelI18n.t('grammar.lesson-belum-memiliki-materi'));enterStage('grammar-lesson',()=>renderGrammarLesson(skill));renderGrammarLesson(skill)}
 /* Panel "?" layar materi Grammar. Pola yang sama dengan openSkillHelp() di Skills Lab,
    dengan satu perbedaan yang penting: ia MEMBAWA SERTA levelControlMarkup(). Keterangan
    boleh dilipat, tetapi KONTROL tidak boleh hilang - "Level belajar / Ganti" adalah satu-
@@ -9956,7 +9978,7 @@ function grammarLessonHelpMarkup(skill){
 }
 function openGrammarLessonHelp(skill){const html=grammarLessonHelpMarkup(skill);if(html)openModal(html);return !!html}
 window.openGrammarLessonHelp=openGrammarLessonHelp;
-function renderGrammarLesson(skill){const meta=GRAMMAR_ITEMS.find(x=>x.skill===skill);if(!meta||meta.level!==getActiveLevel())return showToast(FiezelI18n.t('grammar.lesson-hanya-tersedia-pada-level',{level:getActiveLevel()}));const lessonUnlock=lessonUnlockState(skill);if(lessonUnlock.locked)return showToast(lessonLockMessage(lessonUnlock));const arr=G[skill]||[];if(!arr.length)return showToast(FiezelI18n.t('grammar.lesson-belum-memiliki-materi'));const item=arr[0],base=item[0],opts=item[1]||[],correct=opts[item[2]],rule=grammarRuleIndonesian(item),clue=grammarClue(base),curriculum=grammarCurriculumEntry(skill)||meta;const prereq=Array.isArray(curriculum.prerequisites)&&curriculum.prerequisites.length?FiezelI18n.t('grammar.prasyarat-2',{join:curriculum.prerequisites.map(friendlySkillName).join(', ')}):FiezelI18n.t('grammar.lesson-fondasi-pertama');/* 2026-08-31 (permintaan OWNER: "design ulang bagian grammar seperti listening"):
+function renderGrammarLesson(skill){const meta=GRAMMAR_ITEMS.find(x=>x.skill===skill);if(!meta||meta.level!==getActiveLevel())return showToast(FiezelI18n.t('grammar.lesson-hanya-tersedia-pada-level',{level:getActiveLevel()}));const lessonUnlock=lessonUnlockState(skill,state,bktMasteredSkills());if(lessonUnlock.locked)return showToast(lessonLockMessage(lessonUnlock));const arr=G[skill]||[];if(!arr.length)return showToast(FiezelI18n.t('grammar.lesson-belum-memiliki-materi'));const item=arr[0],base=item[0],opts=item[1]||[],correct=opts[item[2]],rule=grammarRuleIndonesian(item),clue=grammarClue(base),curriculum=grammarCurriculumEntry(skill)||meta;const prereq=Array.isArray(curriculum.prerequisites)&&curriculum.prerequisites.length?FiezelI18n.t('grammar.prasyarat-2',{join:curriculum.prerequisites.map(friendlySkillName).join(', ')}):FiezelI18n.t('grammar.lesson-fondasi-pertama');/* 2026-08-31 (permintaan OWNER: "design ulang bagian grammar seperti listening"):
      layar materi memakai resep yang sama dengan sesi Listening, dan alasannya sama.
      Yang berdiri di sini dulu adalah shell(judul, subjudul) - dan judulnya DICETAK DUA
      KALI: sekali sebagai hero halaman, sekali lagi sebagai <h2 class="lesson-title"> di
@@ -9986,7 +10008,7 @@ function buildGrammarLessonQuestions(skill,count=GRAMMAR_SESSION_SIZE){const met
   for(let variant=0;variant<GRAMMAR_PRACTICE_MODES.length&&unique.length<count;variant++)for(let i=0;i<own.length;i++)if(take(makeGrammarQuestion(skill,own[(variant+i)%own.length],variant,skill)))break;
   for(let variant=0;variant<GRAMMAR_PRACTICE_MODES.length&&unique.length<count;variant++)for(const item of own){if(unique.length>=count)break;take(makeGrammarQuestion(skill,item,variant,skill))}
   return unique}
-function practiceSkill(skill){if((GRAMMAR_ITEMS.find(x=>x.skill===skill)?.level||'')!==getActiveLevel())return showToast(FiezelI18n.t('grammar.pilih-lesson-terlebih-dahulu',{level:getActiveLevel()}));const unlock=lessonUnlockState(skill);if(unlock.locked)return showToast(lessonLockMessage(unlock));const questions=buildGrammarLessonQuestions(skill,GRAMMAR_SESSION_SIZE);if(questions.length<GRAMMAR_SESSION_SIZE)return showToast(FiezelI18n.t('grammar.lesson-new-memiliki-item-valid',{jumlahSoal:questions.length}));quizLoop({type:'grammar',count:GRAMMAR_SESSION_SIZE,pool:questions,factory:item=>item,preserveOrder:true})}
+function practiceSkill(skill){if((GRAMMAR_ITEMS.find(x=>x.skill===skill)?.level||'')!==getActiveLevel())return showToast(FiezelI18n.t('grammar.pilih-lesson-terlebih-dahulu',{level:getActiveLevel()}));const unlock=lessonUnlockState(skill,state,bktMasteredSkills());if(unlock.locked)return showToast(lessonLockMessage(unlock));const questions=buildGrammarLessonQuestions(skill,GRAMMAR_SESSION_SIZE);if(questions.length<GRAMMAR_SESSION_SIZE)return showToast(FiezelI18n.t('grammar.lesson-new-memiliki-item-valid',{jumlahSoal:questions.length}));quizLoop({type:'grammar',count:GRAMMAR_SESSION_SIZE,pool:questions,factory:item=>item,preserveOrder:true})}
 /* ---- Sesi Kilat: 10 soal grammar campuran lintas lesson satu level ----------------------
  * Latihan singkat harian. Hanya lesson yang sudah terbuka di level aktif; soal dirotasi antar
  * lesson (satu per lesson per putaran) dan dibatasi ke mode BENTUK (apply/complete/repair)
@@ -9995,7 +10017,8 @@ function practiceSkill(skill){if((GRAMMAR_ITEMS.find(x=>x.skill===skill)?.level|
 const GRAMMAR_QUICK_SIZE=10;
 const GRAMMAR_QUICK_MODES=new Set(['apply_form','complete_sentence','repair_distractor_1','repair_distractor_2','repair_distractor_3']);
 function buildGrammarQuickQuestions(level=getActiveLevel(),count=GRAMMAR_QUICK_SIZE){
-  const skills=shuffle(grammarItemsForLevel(level).map(x=>x.skill).filter((x,i,a)=>a.indexOf(x)===i).filter(skill=>!lessonUnlockState(skill).locked));
+  const bktMastered=bktMasteredSkills();
+  const skills=shuffle(grammarItemsForLevel(level).map(x=>x.skill).filter((x,i,a)=>a.indexOf(x)===i).filter(skill=>!lessonUnlockState(skill,state,bktMastered).locked));
   if(!skills.length)return[];
   const pools=new Map(skills.map(skill=>[skill,shuffle(buildGrammarLessonQuestions(skill,GRAMMAR_SESSION_SIZE).filter(q=>GRAMMAR_QUICK_MODES.has(q.practiceMode)))]));
   const out=[],seen=new Set();
@@ -11519,10 +11542,13 @@ function confidenceCalibration(){const c=(state.confidenceHistory||[]).filter(x=
  * Saat buktinya masih tipis, kartu ini mengatakannya apa adanya. Itu lebih jujur daripada
  * menampilkan angka yang terlihat pasti padahal berdiri di atas sepuluh jawaban.
  */
-/* Fase 2 (B3 butir 3): bayangan (shadow) BKT di panel diagnostik - TAMPILAN SAJA, tanpa
- * otoritas unlock/gating. Fase membaca sebelum fase memutuskan: frontier dan rootCause BKT
- * dipajang berdampingan dengan keputusan mesin lama supaya perbedaannya terlihat oleh mata
- * manusia dulu, baru (di fase berikutnya) dipertimbangkan memegang kendali. */
+/* Fase 2 (B3 butir 3), diperluas m025-330: panel diagnostik BKT. Frontier dan rootCause di
+ * sini TETAP tampilan saja (tidak ada baris di bawah yang menulis apa pun). Yang TIDAK lagi
+ * benar sejak m025-330 adalah "tanpa otoritas unlock" pada judulnya - masteryGate() modul
+ * yang sama kini ikut membuka prasyarat lesson berikutnya lewat bktMasteredSkills() +
+ * lessonUnlockState() (satu arah: hanya membuka, tidak pernah mengunci ulang; lihat komentar
+ * di lessonUnlockState). Nama fungsi ini dipertahankan apa adanya - ia masih panel bacaan
+ * BKT, otoritasnya yang berubah, bukan tugas panel ini. */
 function bktShadowMarkup(){
   const B=self.FiezelMasteryBKT;
   if(!B||typeof B.frontier!=='function')return '';
@@ -11748,10 +11774,18 @@ function learningMetricsMarkup(){
    modul internal (memory, tutorSelection, itemDifficultyPrior, ...), nomor
    bundel, dan versi app minimum.
 
-   Keduanya menyatakan sendiri bahwa mereka tidak punya wewenang - "bayangan,
-   tanpa otoritas unlock", "panel ini hanya membaca", "ia sendiri tidak ikut
-   memutuskan apa pun". Jadi tidak ada yang hilang dari murid kalau keduanya
-   dilipat: yang dilipat memang keterangan mesin, bukan umpan balik belajar.
+   brainManifestMarkup menyatakan sendiri bahwa ia tidak punya wewenang - "panel
+   ini hanya membaca", "ia sendiri tidak ikut memutuskan apa pun" - dan itu tetap
+   benar. bktShadowMarkup TIDAK LAGI begitu sejak m025-330: masteryGate() yang
+   dibacanya di sini adalah PERSIS fungsi yang sama yang kini ikut membuka
+   prasyarat lesson berikutnya (lihat lessonUnlockState/bktMasteredSkills).
+   Panel ini SENDIRI tetap tampilan-saja - tidak ada baris di dalamnya yang
+   menulis apa pun - tapi keputusannya sudah terasa di UI biasa (hub Grammar,
+   lessonLockMessage), bukan cuma di sini. Jadi tidak ada yang hilang dari
+   murid kalau keduanya dilipat: umpan balik unlock yang sebenarnya sudah
+   tampil di tempat murid melihatnya, dan yang dilipat di sini memang
+   keterangan mesin (nama kunci penyimpanan, nama modul internal), bukan
+   satu-satunya tempat keputusan itu terlihat.
    Dilipat, BUKAN dihapus - yang penasaran (dan OWNER sendiri saat memeriksa)
    tetap bisa membukanya satu ketukan. <details> dipakai karena ia bawaan
    browser: bisa dibuka keyboard, terbaca screen reader, dan tidak butuh JS. */
