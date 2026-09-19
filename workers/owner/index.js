@@ -4331,11 +4331,14 @@ async function handle(request, env, ctx, nowMs) {
           message: 'Token guru berhasil dibuat! Simpan/salin sekarang karena token hanya ditampilkan satu kali.'
         };
       } else {
+        const errDetail = (mintRes.body && (mintRes.body.reason || mintRes.body.error)) || mintRes.state;
         teacherAction = {
           ok: false,
           action: 'mint',
-          error: (mintRes.body && mintRes.body.error) || mintRes.state,
-          message: 'Gagal membuat token guru. Periksa kembali nama guru, instansi, dan jenis instansi.'
+          error: errDetail,
+          message: mintRes.body && mintRes.body.reason
+            ? `Gagal membuat token guru: ${mintRes.body.reason}`
+            : 'Gagal membuat token guru. Periksa kembali nama guru, instansi, dan jenis instansi.'
         };
       }
     } else if (action === 'revoke_invite') {
