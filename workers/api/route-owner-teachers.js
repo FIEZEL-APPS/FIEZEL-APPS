@@ -57,9 +57,9 @@ export async function routeTeacherInviteCreate(ctx) {
   const r = minted.record;
   await db.prepare(
     'INSERT INTO teacher_invite (code_hash, teacher_name, institution, institution_type, ' +
-    'created_at, expires_at, created_by) VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7)'
+    'created_at, expires_at, created_by, subject_id, grade_id) VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9)'
   ).bind(r.code_hash, r.teacher_name, r.institution, r.institution_type,
-    r.created_at, r.expires_at, r.created_by).run();
+    r.created_at, r.expires_at, r.created_by, r.subject_id || null, r.grade_id || null).run();
 
   // Teks token muncul DI SINI DAN HANYA DI SINI, dalam satu respons yang owner
   // lihat sekali. Tidak ada endpoint yang bisa menampilkannya lagi, karena D1
@@ -139,17 +139,19 @@ export async function routeOwnerTeachers(ctx) {
 
   const invites = await db.prepare(
     'SELECT code_hash, teacher_name, institution, institution_type, created_at, expires_at, ' +
-    'used_at, revoked_at FROM teacher_invite ORDER BY created_at DESC LIMIT 200'
+    'used_at, revoked_at, subject_id, grade_id FROM teacher_invite ORDER BY created_at DESC LIMIT 200'
   ).all();
 
   const teachers = await db.prepare(
-    'SELECT p.teacher_name, p.institution, p.institution_type, p.activated_at, a.login_handle, a.status ' +
+    'SELECT p.teacher_name, p.institution, p.institution_type, p.activated_at, p.subject_id, p.grade_id, a.login_handle, a.status ' +
     'FROM teacher_profile p JOIN auth_account a ON a.sub = p.sub ORDER BY p.activated_at DESC LIMIT 200'
   ).all();
 
   return jsonResponse({
     invites: ((invites && invites.results) || []).map((row) => ({
       ...publicInviteView(row, ctx.now),
+      subjectId: row.subject_id || null,
+      gradeId: row.grade_id || null,
       codeHash: row.code_hash
     })),
     teachers: ((teachers && teachers.results) || []).map((row) => ({
@@ -157,6 +159,8 @@ export async function routeOwnerTeachers(ctx) {
       teacherName: row.teacher_name,
       institution: row.institution,
       institutionType: row.institution_type,
+      subjectId: row.subject_id || null,
+      gradeId: row.grade_id || null,
       status: row.status,
       activatedAt: Number(row.activated_at) || 0
     }))

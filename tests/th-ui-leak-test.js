@@ -98,7 +98,7 @@ const ALLOWLIST = Object.freeze({
      dicabut bersama pintu-pintunya, jadi tiga kalimatnya ikut hilang dari layar. Ratchet
      TURUN — angka ini menyatakan utang yang tersisa, bukan jatah yang boleh dipakai. */
   'features/curriculum/learning-mission.js': 16,
-  'features/curriculum/teacher-console.js': 41,                 // konsol guru Kurikulum Merdeka (turun ke 41 setelah humanisasi bank soal m025-333)
+  'features/curriculum/teacher-console.js': 40,                 // konsol guru Kurikulum Merdeka (turun ke 40 setelah spesialisasi mapel & pembersihan literal m025-335)
   /* KONTEN KURIKULUM NASIONAL INDONESIA, bukan naskah antarmuka. Empat literalnya adalah
      nama Fase resmi Kurikulum Merdeka dan dua saran pedagogis di dalam paket materinya.
      Menerjemahkannya ke Thai bukan sia-sia melainkan menyesatkan: guru Thai tidak mengajar

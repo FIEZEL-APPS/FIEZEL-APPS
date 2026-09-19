@@ -212,6 +212,27 @@
     'kurikulum.st-draft': "ฉบับร่าง",
     'kurikulum.st-archived': "เก็บถาวร",
     'kurikulum.pill-transfer': "ข้อสอบเชิงบริบท",
-    'kurikulum.btn-curation-options': "ตัวเลือกการดูแลและรูปแบบข้อสอบ…"
+    'kurikulum.btn-curation-options': "ตัวเลือกการดูแลและรูปแบบข้อสอบ…",
+    'kurikulum.sub-mat7': "คณิตศาสตร์ (มัธยมศึกษาปีที่ 1)",
+    'kurikulum.sub-mat8': "คณิตศาสตร์ (มัธยมศึกษาปีที่ 2)",
+    'kurikulum.sub-mat9': "คณิตศาสตร์ (มัธยมศึกษาปีที่ 3)",
+    'kurikulum.sub-eng7': "ภาษาอังกฤษ (มัธยมศึกษาปีที่ 1)",
+    'kurikulum.sub-eng8': "ภาษาอังกฤษ (มัธยมศึกษาปีที่ 2)",
+    'kurikulum.sub-eng9': "ภาษาอังกฤษ (มัธยมศึกษาปีที่ 3)",
+    'kurikulum.sub-ipa7': "วิทยาศาสตร์ (มัธยมศึกษาปีที่ 1)",
+    'kurikulum.sub-ipa8': "วิทยาศาสตร์ (มัธยมศึกษาปีที่ 2)",
+    'kurikulum.sub-ipa9': "วิทยาศาสตร์ (มัธยมศึกษาปีที่ 3)",
+    'kurikulum.sub-ips7': "สังคมศึกษา (มัธยมศึกษาปีที่ 1)",
+    'kurikulum.sub-ind7': "ภาษาอินโดนีเซีย (มัธยมศึกษาปีที่ 1)",
+    'kurikulum.sub-inf7': "วิทยาการคำนวณ (มัธยมศึกษาปีที่ 1)",
+    'kurikulum.sub-pkn7': "หน้าที่พลเมืองปัญจศีล (มัธยมศึกษาปีที่ 1)",
+    'kurikulum.sub-umum': "ทุกรายวิชา",
+    'kurikulum.ruang-guru-label': "ห้องเรียนรายวิชา",
+    'kurikulum.welcome-title': "ยินดีต้อนรับสู่ห้องทำงานครู!",
+    'kurikulum.welcome-sub': "เลือกวิชาและชั้นเรียนที่คุณสอนเพื่อให้ห้องเรียนพร้อมใช้งานทันที",
+    'kurikulum.default-class-name': "ชั้น ม.1/1",
+    'kurikulum.welcome-submit': "🚀 เริ่มสอนในห้องเรียนนี้",
+    'kurikulum.welcome-demo-btn': "หรือใช้ชั้นเรียนตัวอย่าง (เดโม)",
+    'kurikulum.kompetensi-goal-label': "สมรรถนะเป้าหมาย"
   });
 })();
