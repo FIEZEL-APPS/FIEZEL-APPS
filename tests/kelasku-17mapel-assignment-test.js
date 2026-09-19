@@ -187,7 +187,50 @@ const resolvedQ1 = resolveItem(examIpa, 'q-ipa-1');
 assert(!!resolvedQ1, 'Murid berhasil me-resolve soal q-ipa-1 dari paket tugas');
 assert(resolvedQ1.options[resolvedQ1.answer] === 'Nukleus', 'Kunci jawaban soal terverifikasi akurat');
 
+// 7. Evaluasi FiezelTeacherShell di sandbox untuk menguji seluruh 17 mata pelajaran
+sandbox.document = {
+  createElement: function () { return { setAttribute: function () {}, style: {} }; },
+  head: { appendChild: function () {} }
+};
+vm.runInContext(shellCode, sandbox);
+const TShell = sandbox.FiezelTeacherShell;
+assert(!!TShell, 'FiezelTeacherShell berhasil dimuat di sandbox');
+assert(typeof TShell._synthesizeMapelQuestions === 'function', 'Generator soal _synthesizeMapelQuestions tersedia');
+assert(Array.isArray(TShell._MAPEL_LIST) && TShell._MAPEL_LIST.length === 17, 'Tepat 17 mata pelajaran terdaftar di cangkang KelasKu');
+
+// 8. Uji pembuatan 5 soal nyata untuk SETIAP 17 mata pelajaran Kurikulum Merdeka
+const allMapelIds = ['MAT', 'IND', 'ENG', 'IPA', 'IPS', 'INF', 'PPK', 'AGM', 'FIS', 'KIM', 'BIO', 'EKO', 'GEO', 'SOS', 'SEJ', 'PJK', 'SNB'];
+let nonZeroAnswersCount = 0;
+let totalVerifiedQuestions = 0;
+
+allMapelIds.forEach(function (mId) {
+  const compCode = 'KOMP-' + mId + '-D-01';
+  const questions = TShell._synthesizeMapelQuestions(mId, compCode, 'Materi Uji ' + mId, 5);
+  assert(questions.length === 5, `Mapel ${mId}: Menghasilkan tepat 5 butir soal`);
+  
+  questions.forEach(function (q, qIdx) {
+    const hasValidOptions = Array.isArray(q.options) && q.options.length >= 4;
+    const hasValidAnswer = typeof q.answer === 'number' && q.answer >= 0 && q.answer < q.options.length;
+    const hasValidPrompt = typeof q.prompt === 'string' && q.prompt.length > 10;
+    const hasValidWhy = q.why && typeof q.why[q.answer] === 'string' && q.why[q.answer].length > 5;
+    
+    if (q.answer > 0) nonZeroAnswersCount++;
+    if (hasValidOptions && hasValidAnswer && hasValidPrompt && hasValidWhy) {
+      totalVerifiedQuestions++;
+    }
+  });
+});
+
+assert(totalVerifiedQuestions === 17 * 5, `Semua 85 butir soal dari 17 mata pelajaran memiliki prompt, 4 opsi, indeks kunci valid, dan penjelasan pembahasan`);
+assert(nonZeroAnswersCount > 10, `Pengacakan opsi (shuffleOptions) terbukti aktif: kunci jawaban tersebar di opsi B/C/D (${nonZeroAnswersCount} dari 85 soal tidak di index 0)`);
+
+// 9. Uji fz-api endpoint questions
+const apiPath = path.join(__dirname, '..', 'features/curriculum/fz-api.js');
+const apiCode = fs.readFileSync(apiPath, 'utf8');
+assert(apiCode.includes("api('/questions'"), 'FZEngine menyediakan pemanggil endpoint API questions list');
+
 console.log(`\nHasil: ${pass} assert PASS, ${fail} assert FAIL`);
 if (fail > 0) {
   process.exit(1);
 }
+
