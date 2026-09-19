@@ -260,9 +260,6 @@
     'kurikulum.grp-title': "Bentuk kelompok otomatis berdasarkan penguasaan materi",
     'kurikulum.bp-adv-toggle': "Pengaturan Kesulitan & Soal Cerita (Opsional)",
     'kurikulum.kode-kelas-label': "Kode kelas: ",
-    'kurikulum.kode-kelas-sub': "berikan kode ini saat murid bergabung.",
-    // m025-337: 43 kunci yang dipanggil gelombang kurikulum/KelasKu tetapi tidak pernah didaftarkan.
-    'kurikulum.sub-sd-all': 'Guru Kelas SD (Tematik)',
-    'kurikulum.sub-all': 'Semua Mata Pelajaran'
+    'kurikulum.kode-kelas-sub': "berikan kode ini saat murid bergabung."
   });
 })();

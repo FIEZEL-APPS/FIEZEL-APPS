@@ -259,9 +259,6 @@
     'kurikulum.grp-title': "จัดกลุ่มอัตโนมัติตามความเข้าใจในเนื้อหา",
     'kurikulum.bp-adv-toggle': "การตั้งค่าระดับความยากและโจทย์ประยุกต์เพิ่มเติม",
     'kurikulum.kode-kelas-label': "รหัสชั้นเรียน: ",
-    'kurikulum.kode-kelas-sub': "ให้นักเรียนใช้รหัสนี้เมื่อเข้าร่วม",
-    // m025-337: 43 kunci yang dipanggil gelombang kurikulum/KelasKu tetapi tidak pernah didaftarkan.
-    'kurikulum.sub-sd-all': 'ครูประจำชั้นประถม (บูรณาการ)',
-    'kurikulum.sub-all': 'ทุกวิชา'
+    'kurikulum.kode-kelas-sub': "ให้นักเรียนใช้รหัสนี้เมื่อเข้าร่วม"
   });
 })();
