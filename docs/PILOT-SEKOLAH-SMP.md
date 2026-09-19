@@ -36,6 +36,74 @@ untuk menyambungkannya ke RPP-nya. Ini yang benar, dan ini yang harus kamu ucapk
 
 ---
 
+## 0b. Mata pelajaran lain — JANGAN dipakai di pilot ini
+
+FIEZEL punya tab **KelasKu** dengan **17 mata pelajaran** (Matematika, IPA, IPS,
+Informatika, Pancasila, Agama, Fisika, Kimia, Biologi, Ekonomi, Geografi, Sosiologi,
+Sejarah, PJOK, Seni Budaya, Bahasa Indonesia, Bahasa Inggris). Kelihatannya produk ini
+sudah melayani seluruh sekolah. **Belum.**
+
+### Angka sebenarnya
+
+| | Bahasa Inggris | 16 mapel lainnya |
+|---|---|---|
+| Soal | **≈1.150** (adaptif A1–A2) + **62** kurikulum Fase D | **15 soal per mapel**, 255 total |
+| Menyesuaikan kemampuan murid? | Ya | Tidak |
+| Berubah menurut kelas? | Ya (kelas 7/8/9 beda bab) | **Tidak** |
+| Berubah menurut kompetensi yang dipilih guru? | Ya (bab → sub-bab → fitur bahasa) | **Tidak** |
+
+### Cacat yang membuatnya tidak layak dipamerkan
+
+Kode kompetensi dan tingkat kelas yang dipilih guru **diabaikan sepenuhnya** oleh penyedia
+soal 17-mapel. Kolam soalnya sama persis untuk kelas 1 SD sampai kelas 12 SMA.
+
+Diuji langsung pada `synthesizeMapelQuestions()`:
+
+```
+kolam "Matematika · kelas 7 · Bilangan Bulat"      -> 15 soal
+kolam "Matematika · kelas 11 · Kalkulus Turunan"   -> 15 soal
+irisan keduanya: 15 dari 15  -> IDENTIK
+```
+
+Guru Matematika kelas 11 yang menerbitkan tugas "Kalkulus Turunan" mengirimkan ini ke
+muridnya:
+
+> *"Hasil dari operasi hitung campuran −15 + (−8) × 3 − (−20) adalah…"*
+> *"Sebuah resep membutuhkan perbandingan tepung dan gula 5 : 2…"*
+
+Itu materi kelas 7. Ini penyakit yang **sama persis** dengan cacat nomor satu yang sudah
+ditutup untuk Bahasa Inggris di `handoffs/KURIKULUM-SEKOLAH-HANDOFF.md` ("soal tugas
+kurikulum sebagian besar BUKAN dari kurikulum") — hanya saja di jalur 17-mapel belum
+ditutup.
+
+Jalur ini **bisa dijangkau guru di produksi**, bukan demo: tab Kurikulum → sumber
+`mapel` → Terbitkan.
+
+### Aturan untuk pilot
+
+1. **Pilot dijalankan sebagai pilot Bahasa Inggris.** Satu guru bahasa Inggris, satu kelas.
+2. **Jangan tunjukkan tab 17 mapel di rapat kepala sekolah.** Kalau kepala sekolah
+   melihatnya, ia akan menanyakan Matematika — dan jawaban jujurnya akan merusak rapat.
+3. **Kalau ditanya "mapel lain ada?"**, jawab apa adanya:
+   > "Ada rangkanya, tapi isinya belum layak dipakai — baru 15 soal per mapel dan belum
+   > menyesuaikan tingkat kelas. Yang sudah matang dan saya tawarkan hari ini hanya Bahasa
+   > Inggris."
+   Kalimat itu menyelamatkan kredibilitasmu; menyembunyikannya menghancurkannya di minggu
+   kedua ketika ada guru yang mencoba.
+4. **Minta guru pilot tidak membuka tab mapel** selama 6 minggu. Satu tugas Matematika
+   salah tingkat sudah cukup membuat seluruh ruang guru menyimpulkan "aplikasinya
+   ngawur".
+
+### Kalau mau mapel lain benar-benar siap
+
+Itu **proyek konten, bukan perbaikan kode**. Perkiraan kasar: 17 mapel × 6 tingkat ×
+3 kompetensi × 8 soal ≈ **2.400 soal** yang harus ditulis dan diperiksa guru bidang studi.
+Jangan dimulai sebelum pilot Bahasa Inggris memberi bukti bahwa produknya memang dipakai —
+menulis 2.400 soal untuk produk yang ditinggalkan di minggu 3 adalah kerugian terbesar
+yang bisa kamu buat sekarang.
+
+---
+
 ## 1. Kenapa pilot sekolah gagal (baca ini sebelum apa pun)
 
 Enam sebab, hampir selalu. Semuanya bisa dicegah sebelum hari pertama:
