@@ -299,11 +299,6 @@ export async function ensureAuthSchema(db) {
     /* eslint-disable no-await-in-loop */
     await db.prepare(statement).run();
   }
-  try { await db.prepare('ALTER TABLE teacher_invite ADD COLUMN subject_id TEXT').run(); } catch (_) {}
-  try { await db.prepare('ALTER TABLE teacher_invite ADD COLUMN grade_id TEXT').run(); } catch (_) {}
-  try { await db.prepare('ALTER TABLE teacher_profile ADD COLUMN subject_id TEXT').run(); } catch (_) {}
-  try { await db.prepare('ALTER TABLE teacher_profile ADD COLUMN grade_id TEXT').run(); } catch (_) {}
-  try { await db.prepare('ALTER TABLE teacher_invite ADD COLUMN raw_code TEXT').run(); } catch (_) {}
   APPLIED.set(db, true);
 }
 

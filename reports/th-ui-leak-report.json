@@ -1,6 +1,6 @@
 {
   "schema": "fiezel-th-ui-leak-v1",
-  "generatedAt": "2026-09-19T09:51:55.852Z",
+  "generatedAt": "2026-09-19T10:28:57.393Z",
   "files": {
     "app.js": {
       "leaks": 3,
@@ -151,23 +151,23 @@
       "budget": 33,
       "sample": [
         {
-          "line": 108,
+          "line": 122,
           "text": "FIEZEL · Ruang Guru"
         },
         {
-          "line": 112,
+          "line": 126,
           "text": "Masuk dengan akun KelasKu"
         },
         {
-          "line": 113,
+          "line": 127,
           "text": "Belum masuk? Buka"
         },
         {
-          "line": 114,
+          "line": 128,
           "text": "Murid masuk di halaman"
         },
         {
-          "line": 114,
+          "line": 128,
           "text": "Misi Belajar"
         }
       ]
