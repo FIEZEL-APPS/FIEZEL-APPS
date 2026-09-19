@@ -25,7 +25,7 @@ const AudioKey = require(path.join(ROOT, 'features/audio-assets/fiezel-audio-key
 
 const MANIFEST_PATH = path.join(ROOT, 'audio/manifest.json');
 const R2_API = 'https://api.cloudflare.com/client/v4/accounts';
-const MAX_RETRIES = 3;
+const MAX_RETRIES = 5;
 
 /**
  * Gemini Voice Profiles:
@@ -239,11 +239,11 @@ async function synthesizeGemini(text, voiceName, apiKey) {
       continue;
     }
 
-    if (response.status === 429) {
+    if (response.status === 429 || response.status === 503) {
       let detail = '';
       try { detail = await response.text(); } catch (_) {}
-      console.warn(`[Gemini Rate Limit 429] Percobaan ${attempt}, menunggu 10 detik...`);
-      await new Promise((r) => setTimeout(r, 10000));
+      console.warn(`[Gemini HTTP ${response.status}] Percobaan ${attempt}/${MAX_RETRIES}, menunggu 6 detik...`);
+      await new Promise((r) => setTimeout(r, 6000));
       continue;
     }
 
