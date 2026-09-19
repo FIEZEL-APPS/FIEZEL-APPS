@@ -16,12 +16,42 @@ MASTERY_T, DEVELOPING_T = 0.80, 0.60
 MIN_CORRECT_FOR_MASTERY = 3
 RETENTION_DAYS = 3
 
+# --- parameter IRT 3PL & Psikometri (paritas kanonik dengan client brain v3) ---
+DISCRIMINATION = 1.5
+GUESS_FLOOR = 0.25
+TARGET_SUCCESS = 0.80
+BKT_HALF_LIFE_DAYS = 30.0
+
 STATES = ["NOT_EXPOSED", "EXPOSED", "PRACTICING", "DEVELOPING", "MASTERED", "RETAINED", "TRANSFERRED"]
 STATE_LABEL = {
     "NOT_EXPOSED": "Belum dipelajari", "EXPOSED": "Baru dikenalkan", "PRACTICING": "Perlu latihan",
     "DEVELOPING": "Sedang berkembang", "MASTERED": "Sudah dikuasai", "RETAINED": "Dikuasai & bertahan",
     "TRANSFERRED": "Bisa diterapkan di situasi baru",
 }
+
+
+def success_probability(ability: float, difficulty: float, discrimination: float = DISCRIMINATION) -> float:
+    """Model IRT 3PL: P = c + (1 - c) / (1 + exp(-a * (theta - b)))."""
+    a = float(discrimination or DISCRIMINATION)
+    latent = 1.0 / (1.0 + math.exp(-a * (float(ability) - float(difficulty))))
+    return GUESS_FLOOR + (1.0 - GUESS_FLOOR) * latent
+
+
+def optimal_difficulty(ability: float, target_success: float = TARGET_SUCCESS, discrimination: float = DISCRIMINATION) -> float:
+    """Inversi model 3PL: b = theta - logit((p - c) / (1 - c)) / a."""
+    p = max(GUESS_FLOOR + 0.05, min(0.97, float(target_success or TARGET_SUCCESS)))
+    a = float(discrimination or DISCRIMINATION)
+    latent = max(0.01, min(0.99, (p - GUESS_FLOOR) / (1.0 - GUESS_FLOOR)))
+    return round(float(ability) - math.log(latent / (1.0 - latent)) / a, 3)
+
+
+def bkt_decay(p: float, elapsed_days: float, half_life_days: float = BKT_HALF_LIFE_DAYS) -> float:
+    """Model lupa eksponensial BKT-FSRS: L(t) = L_0 + (L_last - L_0) * exp(-dt / tau)."""
+    if elapsed_days <= 0 or p <= P_INIT:
+        return p
+    tau = max(1.0, float(half_life_days)) / math.log(2.0)
+    decayed = P_INIT + (p - P_INIT) * math.exp(-float(elapsed_days) / tau)
+    return round(max(0.01, min(0.99, decayed)), 4)
 
 
 def now():
@@ -45,7 +75,14 @@ def blank_state(student_id: str, competency_id: str) -> dict:
 async def get_state(student_id: str, competency_id: str) -> dict:
     doc = await db.learner_competency.find_one(
         {"student_id": student_id, "competency_id": competency_id}, {"_id": 0})
-    return doc or blank_state(student_id, competency_id)
+    st = doc or blank_state(student_id, competency_id)
+    last = aware(st.get("last_at"))
+    if last:
+        elapsed = max(0.0, (now() - last).total_seconds() / 86400)
+        st["p_mastery_decayed"] = bkt_decay(st["p_mastery"], elapsed)
+    else:
+        st["p_mastery_decayed"] = st["p_mastery"]
+    return st
 
 
 def bkt_update(p: float, correct: bool, hints: int = 0, confidence: float | None = None) -> float:
@@ -225,14 +262,15 @@ async def next_best_item(student_id: str, competency_ids: list[str], served_ids:
                     "reason": "Kamu sudah cukup kuat di konsep dasarnya. Sekarang kita coba situasi yang sedikit berbeda untuk memastikan kamu benar-benar bisa memakainya.",
                     "competency_id": target, "phase": "transfer"}
 
-    # 3) tangga kesulitan sesuai posterior
-    want = 1 if p < 0.35 else 2 if p < 0.55 else 3 if p < 0.72 else 4
+    # 3) pencocokan kesulitan kontinu IRT 3PL desirable difficulty (target success ~0.80)
+    theta = 1.0 + 4.0 * max(0.0, min(1.0, p))
+    target_difficulty = optimal_difficulty(theta, target_success=TARGET_SUCCESS)
     pool = [q for q in await _pool([target], transfer=False) if q["question_id"] not in served_ids]
     if not pool:
         pool = [q for q in await _pool([target]) if q["question_id"] not in served_ids]
     if not pool:
         return None
-    pool.sort(key=lambda q: (abs(q["difficulty"] - want), q["difficulty"]))
+    pool.sort(key=lambda q: (abs(q["difficulty"] - target_difficulty), q["difficulty"]))
     chosen = pool[0]
     if p < 0.35:
         reason = "Kita mulai dari soal yang lebih ringan supaya kamu dapat pijakan yang jelas."

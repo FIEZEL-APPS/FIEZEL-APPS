@@ -1456,6 +1456,13 @@ function sanitizeState(raw){
   if(!Number.isFinite(next.totalAnswered)||next.totalAnswered<0)next.totalAnswered=0;
   if(!Number.isFinite(next.totalCorrect)||next.totalCorrect<0)next.totalCorrect=0;
   if(!Number.isFinite(next.totalTimeMs)||next.totalTimeMs<0)next.totalTimeMs=0;
+  /* P0.3 State hygiene: pangkas riwayat pengerjaan yang lebih tua dari 90 hari bila tumpukan
+     melebihi 500 butir, dengan jaminan minimal 200 butir terbaru tetap dipertahankan. */
+  if(Array.isArray(next.history)&&next.history.length>500){
+    const cutoff=Date.now()-90*86400000;
+    const fresh=next.history.filter(h=>!h?.at||Number(h.at)>cutoff);
+    next.history=fresh.length>=200?fresh:next.history.slice(-200);
+  }
   if(!next.totalAnswered){next.vocab={};next.grammar={};next.reading={};next.history=[];next.wrongAnswers=[];next.confidenceHistory=[];next.sessionHistory=[];next.learningDays=[];next.activeSession=null;next.policyOutcomeMeta={last:null,history:[],queue:[]};next.daily={date:'',count:0,attempts:0,meaningful:false};next.adaptiveReady=false;next.placementDone=false;next.level=1}
   if(next.totalAnswered&&next.activeSession?.startedAt){const a=next.activeSession,now=Date.now(),started=Math.max(0,Number(a.startedAt||now));next.sessionHistory=[...(next.sessionHistory||[]),{id:String(a.id||`session-${started}`),at:new Date(now).toISOString(),startedAt:new Date(started||now).toISOString(),level:LEVELS.includes(String(a.level||''))?String(a.level):'',type:String(a.type||'practice'),planned:Math.max(0,Number(a.planned||0)),answered:Math.max(0,Number(a.answered||0)),score:null,total:Math.max(0,Number(a.planned||0)),accuracy:null,completed:false,abandoned:true,abandonReason:'interrupted',durationMs:Math.max(0,now-started),policyId:String(a.policyId||'').slice(0,120),policyMode:String(a.policyMode||'').slice(0,30),targetSkill:String(a.targetSkill||'').slice(0,80),primaryDomain:String(a.primaryDomain||'').slice(0,20),policySource:String(a.policySource||'').slice(0,40),baselineTargetMastery:a.baselineTargetMastery??null,baselineTargetAccuracy:a.baselineTargetAccuracy??null}].slice(-100);next.activeSession=null}
   /* W1 P1-2 (10-002, 09-003): SETTLE penanda percobaan-berjalan. Reload/kill PWA di tengah
@@ -10943,13 +10950,18 @@ function quizLoop(cfg){
   // sampai audio benar-benar berbunyi, supaya jawaban benar tidak bisa didapat tanpa
   // mendengar; kalau suaranya gagal, kuncinya dilepas agar murid tidak terjebak.
   if(q.type==='listening'){
-   let currentListenSpeed=1.0;
+   const lPolicy=listeningAdaptivePolicy();
+   try{q.__listeningPolicy=lPolicy}catch{}
+   let currentListenSpeed=lPolicy?.rateBand==='slow'?0.8:(lPolicy?.rateBand==='fast'?1.1:1.0);
+   const maxReplays=typeof lPolicy?.replayQuota==='number'?lPolicy.replayQuota:3;
    const speedBtn=$('quizListenSpeed');
    if(speedBtn){
+    const lbl=$('quizListenSpeedLabel');
+    if(lbl)lbl.textContent=currentListenSpeed.toFixed(1)+'x';
+    speedBtn.classList.toggle('is-slow',currentListenSpeed<1.0);
     speedBtn.onclick=(e)=>{
      e.stopPropagation();
      currentListenSpeed=currentListenSpeed===1.0?0.8:1.0;
-     const lbl=$('quizListenSpeedLabel');
      if(lbl)lbl.textContent=currentListenSpeed.toFixed(1)+'x';
      speedBtn.classList.toggle('is-slow',currentListenSpeed<1.0);
     };
@@ -10957,6 +10969,10 @@ function quizLoop(cfg){
    const listen=$('quizListen'),note=$('quizListenNote'),unlock=()=>document.querySelectorAll('.option').forEach(b=>{b.disabled=false});
    document.querySelectorAll('.option').forEach(b=>{b.disabled=true});
    listen.onclick=async()=>{
+    if((q.__replayCount||0)>=maxReplays){
+     note.textContent=FiezelI18n.t('quiz.kuota-putar-habis','Batas putar ulang tercapai — silakan pilih jawabanmu.');
+     return;
+    }
     listen.disabled=true;note.textContent=FiezelI18n.t('quiz.memutar');
     const wave=$('quizAudioWave');
     if(wave)wave.classList.remove('hidden');
@@ -10996,13 +11012,15 @@ function quizLoop(cfg){
  const speak=(turn,{retry=false}={})=>{
   const host=$('tutorTurn');if(!host||!turn||(!turn.say&&!turn.ask))return;
   host.classList.remove('hidden');
+  let isFrustrated=false;try{isFrustrated=affectSessionSync().state==='frustrated'}catch{}
   host.innerHTML=`<div class="tutor-turn-head"><span class="tutor-turn-face"><i data-lucide="graduation-cap"></i></span><b>FIEZEL</b></div>`
    +(turn.say?`<p class="tutor-turn-say">${esc(personalize(turn.say))}</p>`:'')
    +(turn.ask?`<p class="tutor-turn-ask">${esc(personalize(turn.ask))}</p>`:'')
-   /* Fase 3 (C5 butir 6): di anak tangga 'worked', soal ber-langkah (reasoningOperation di
-      bank) dipecah FiezelStepTutor.decompose menjadi tuntunan 2-3 langkah yang tampil
-      SEBELUM murid memilih lagi. Guarded: tanpa modul/template, string kosong = markup lama. */
-   +(retry&&answer.scaffold==='worked'?stepTutorGuidanceMarkup(q):'')
+   /* Fase 3 (C5 butir 6) + Gelombang 2 (P1.3): di anak tangga 'worked' ATAU saat afek
+      terdeteksi 'frustrated', soal ber-langkah (reasoningOperation di bank) dipecah
+      FiezelStepTutor.decompose menjadi tuntunan 2-3 langkah yang tampil SEBELUM murid
+      memilih lagi. Guarded: tanpa modul/template, string kosong = markup lama. */
+   +(retry&&(answer.scaffold==='worked'||isFrustrated)?stepTutorGuidanceMarkup(q):'')
    +(retry?FiezelI18n.t('quiz.div-class-tutor-turn-actions'):'');
   if(retry)$('tutorStuck').onclick=()=>{
    // Murid yang bilang belum paham TIDAK diberi soal lagi - ia dinaikkan satu anak tangga
@@ -12404,6 +12422,33 @@ window.targetLangVoiceBlocked=targetLangVoiceBlocked;
    bahasa yang baru. Membalik dua langkah pertama akan MENYALIN progres bahasa lama ke kunci
    bahasa baru - murid membuka kursus Jepang dan menemukan penguasaan Inggrisnya di sana,
    yang persis kebalikan dari yang dijanjikan pemilih bahasa. */
+const JAPANESE_FAMILY_GRAPH=Object.freeze({
+  particles:[],demonstratives:[],noun_modification:['particles'],adjectives:['particles'],
+  existence_location:['particles'],verb_groups:['particles'],polite_forms:['verb_groups'],
+  negation_past:['polite_forms','adjectives'],question_words:['particles','demonstratives'],
+  counters:['existence_location'],time_expressions:['particles'],te_form:['verb_groups','polite_forms'],
+  plain_forms:['polite_forms','te_form','verb_groups'],
+  transitivity_pairs:['existence_location','particles','te_form','verb_groups'],
+  keigo:['plain_forms','polite_forms'],te_form_extensions:['te_form'],
+  potential:['verb_groups','plain_forms'],volitional_intent:['polite_forms','verb_groups'],
+  passive_causative:['verb_groups','plain_forms'],conditionals:['plain_forms'],
+  giving_receiving:['particles','te_form'],quotation_thought:['plain_forms'],
+  relative_clauses:['noun_modification','plain_forms'],comparison:['adjectives'],
+  obligation_permission:['negation_past','te_form_extensions'],reason_concession:['plain_forms'],
+  experience_frequency:['plain_forms']
+});
+function syncTargetLangFamilyGraph(lang){
+  try{
+    if(typeof self!=='undefined'&&self.FiezelCoreBrain){
+      if(lang==='ja'){
+        self.FiezelCoreBrain.setFamilyGraph(JAPANESE_FAMILY_GRAPH);
+      }else{
+        self.FiezelCoreBrain.resetFamilyGraph();
+      }
+    }
+  }catch(_){}
+}
+window.syncTargetLangFamilyGraph=syncTargetLangFamilyGraph;
 function switchTargetLangStorage(value){
   saveFlushWrite();                       // progres bahasa LAMA aman di kuncinya sendiri
   let dasar=null;
@@ -12411,6 +12456,7 @@ function switchTargetLangStorage(value){
   const global=(dasar&&typeof dasar==='object')?dasar:{};
   global.preferences={...(global.preferences||{}),targetLang:value};
   try{localStorage.setItem(activeStateStorageKey,JSON.stringify(global))}catch(_){}
+  syncTargetLangFamilyGraph(value);
   state=loadState();                      // progres bahasa BARU (atau nol kalau belum ada)
 }
 window.switchTargetLangStorage=switchTargetLangStorage;
