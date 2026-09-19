@@ -172,3 +172,13 @@ CREATE TABLE IF NOT EXISTS tc_class_assignment (
   updated_at INTEGER NOT NULL,
   PRIMARY KEY (class_code, id)
 ) WITHOUT ROWID;
+
+CREATE TABLE IF NOT EXISTS tc_class_teacher (
+  class_code TEXT NOT NULL,
+  teacher_sub TEXT NOT NULL,
+  subject_id TEXT NOT NULL,
+  teacher_name TEXT NOT NULL,
+  created_at INTEGER NOT NULL,
+  updated_at INTEGER NOT NULL,
+  PRIMARY KEY (class_code, subject_id)
+) WITHOUT ROWID;

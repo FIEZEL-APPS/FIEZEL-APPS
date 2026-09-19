@@ -2437,6 +2437,32 @@
       } catch (_) { /* bank soal belum termuat: papan tetap terbuka, sekadar kosong */ }
     }
     st.classes = st.classes.map(S().normalizeClass);
+    try {
+      var acc = (root.FiezelAccount && root.FiezelAccount.state && root.FiezelAccount.state()) || null;
+      if (acc && acc.role === 'teacher') {
+        if (acc.subjectId) {
+          ui.curriculumSubject = acc.subjectId;
+          ui.assignSubject = acc.subjectId;
+        }
+        if (acc.classCode) {
+          var normCode = S().normalizeClassCode(acc.classCode);
+          if (normCode) {
+            var matched = st.classes.filter(function (c) { return S().normalizeClassCode(c.code) === normCode; })[0];
+            if (matched) {
+              st.activeClassId = matched.id;
+            } else {
+              var clsTitle = (acc.institution ? acc.institution + ' — ' : '') + (acc.subjectId || 'Kelas ' + normCode);
+              var autoCls = S().newClass(clsTitle, 'A2', acc.subjectId || 'English');
+              autoCls.code = normCode;
+              st.classes.unshift(autoCls);
+              st.activeClassId = autoCls.id;
+              st.onboarded = true;
+              persist();
+            }
+          }
+        }
+      }
+    } catch (_) {}
     if (!cls() && st.classes.length) st.activeClassId = st.classes[0].id;
     if (!st.classes.length && !st.onboarded) { st.view = 'briefing'; }
     // Kelas (class-hub) = landing default Ruang Guru: guru, murid, tugas, hasil, Braincore satu tempat.

@@ -264,7 +264,9 @@
       institutionId: acc.institutionId || null,
       teacherName: acc.teacherName ? String(acc.teacherName) : '',
       institution: acc.institution ? String(acc.institution) : '',
-      institutionType: acc.institutionType ? String(acc.institutionType) : ''
+      institutionType: acc.institutionType ? String(acc.institutionType) : '',
+      classCode: acc.classCode ? String(acc.classCode) : null,
+      subjectId: acc.subjectId ? String(acc.subjectId) : null
     });
     if (typeof FiezelTeacherStore !== 'undefined' && session.role === 'teacher') {
       try {

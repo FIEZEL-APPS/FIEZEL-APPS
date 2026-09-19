@@ -770,6 +770,7 @@ async function mintTeacherInvite(env, input, fetchImpl) {
   };
   if (input.subject_id || input.subjectId) body.subject_id = input.subject_id || input.subjectId;
   if (input.grade_id || input.gradeId) body.grade_id = input.grade_id || input.gradeId;
+  if (input.class_code || input.classCode) body.class_code = input.class_code || input.classCode;
   return await ownerApiFetch(env, '/api/owner/teacher-invite', fetchImpl, {
     method: 'POST',
     body
@@ -2638,7 +2639,38 @@ function renderLearnerSection(m) {
   </section>`;
 }
 
+const CLASS_CODE_ALPHABET = '23456789ABCDEFGHJKMNPQRSTVWXYZ';
+function generateClassCode() {
+  let s = 'FZ-';
+  for (let i = 0; i < 6; i++) {
+    s += CLASS_CODE_ALPHABET[Math.floor(Math.random() * CLASS_CODE_ALPHABET.length)];
+  }
+  return s;
+}
+
+const SUBJECTS_17 = [
+  { id: 'MAT', name: 'Matematika', icon: '📐', desc: 'Bilangan, Aljabar, Geometri, Data & Peluang' },
+  { id: 'ENG', name: 'Bahasa Inggris', icon: '🇬🇧', desc: 'Listening, Speaking, Reading, Writing' },
+  { id: 'IPA', name: 'Ilmu Pengetahuan Alam (IPA)', icon: '🔬', desc: 'Fisika, Biologi, Kimia, Ekologi' },
+  { id: 'IPS', name: 'Ilmu Pengetahuan Sosial (IPS)', icon: '🌍', desc: 'Geografi, Sejarah, Ekonomi, Sosiologi' },
+  { id: 'IND', name: 'Bahasa Indonesia', icon: '📚', desc: 'Literasi, Menulis, Tata Bahasa, Sastra' },
+  { id: 'INF', name: 'Informatika', icon: '💻', desc: 'Berpikir Komputasional, Algoritma, TIK' },
+  { id: 'PKN', name: 'Pendidikan Pancasila', icon: '🇮🇩', desc: 'Pancasila, UUD 1945, NKRI, Bhinneka' },
+  { id: 'PAI', name: 'Pend. Agama Islam & Budi Pekerti', icon: '🕌', desc: 'Al-Qur\'an Hadits, Akidah, Akhlak, Fikih' },
+  { id: 'PJOK', name: 'PJOK (Pendidikan Jasmani)', icon: '🏃', desc: 'Kebugaran, Atletik, Permainan Bola, Senam' },
+  { id: 'SB-RUPA', name: 'Seni Rupa', icon: '🎨', desc: 'Menggambar, Desain, Kriya Seni' },
+  { id: 'SB-MUSIK', name: 'Seni Musik', icon: '🎵', desc: 'Solmisasi, Instrumen, Harmoni Lagu' },
+  { id: 'SB-TARI', name: 'Seni Tari', icon: '🩰', desc: 'Koreografi, Wiraga, Wirama, Wirasa' },
+  { id: 'SB-TEATER', name: 'Seni Teater', icon: '🎭', desc: 'Tata Panggung, Pantomim, Lakon' },
+  { id: 'PRA-KARYA', name: 'Prakarya & Kewirausahaan', icon: '🧶', desc: 'Kerajinan, Rekayasa, Budi Daya, Pengolahan' },
+  { id: 'BK', name: 'Bimbingan Konseling (BK)', icon: '🤝', desc: 'Pengembangan Diri, Karir, Sosial, Belajar' },
+  { id: 'SD-ALL', name: 'Guru Kelas SD (Tematik)', icon: '🎒', desc: 'Tematik Terpadu Fase A–C SD' },
+  { id: 'ALL', name: 'Semua Mapel (Kurikulum/Kepsek)', icon: '🏫', desc: 'Manajemen Kurikulum & Supervisi Kelas' }
+];
+
 function subjectName(id) {
+  const match = SUBJECTS_17.find((s) => s.id === id);
+  if (match) return match.name;
   const map = {
     MAT: 'Matematika',
     ENG: 'Bahasa Inggris',
@@ -2666,12 +2698,26 @@ function gradeName(id) {
 function renderTeacherSection(m) {
   const tData = m.teachers || { state: 'ok', invites: [], teachers: [] };
   const action = m.teacherAction;
+  const invites = tData.invites || [];
+  const teachers = tData.teachers || [];
+
+  // Daftar kelas unik yang sudah ada
+  const knownClasses = new Set();
+  invites.forEach((inv) => { if (inv.classCode) knownClasses.add(inv.classCode); });
+  teachers.forEach((tc) => { if (tc.classCode) knownClasses.add(tc.classCode); });
+  const classList = Array.from(knownClasses);
+
+  let currentClass = m.selectedClass;
+  if (!currentClass || m.isNewClass) {
+    currentClass = m.isNewClass ? generateClassCode() : (classList[0] || generateClassCode());
+  }
 
   let alertBanner = '';
   if (action) {
     if (action.action === 'mint' && action.ok) {
       const inv = action.invite || {};
       const expDate = inv.expiresAt ? wibDay(inv.expiresAt) : '—';
+      const boundClass = inv.classCode || inv.class_code || action.classCode || currentClass;
       alertBanner = `
         <div style="background:var(--card-bg);border:1px solid var(--emerald-border);border-left:4px solid var(--emerald);border-radius:var(--radius-lg);padding:20px;margin-bottom:20px;box-shadow:var(--shadow-sm);">
           <div style="font-size:16px;font-weight:700;color:var(--text-main);margin-bottom:8px;display:flex;align-items:center;gap:8px;">${ICONS.check} Token Guru Berhasil Dibuat</div>
@@ -2680,7 +2726,8 @@ function renderTeacherSection(m) {
             <code style="font-size:1.5rem;font-weight:700;letter-spacing:2px;color:var(--brand-gold);background:var(--bg-subtle);padding:10px 20px;border-radius:var(--radius-md);border:1px dashed var(--card-border-hover);user-select:all;display:inline-block;font-family:ui-monospace,monospace;">${esc(action.code)}</code>
             <div style="font-size:11.5px;color:var(--text-subtle);margin-top:6px;">(Klik/blok teks token di atas untuk menyalin langsung)</div>
           </div>
-          <div style="font-size:13px;line-height:1.6;margin-top:12px;border-top:1px solid var(--card-border);padding-top:10px;color:var(--text-main);">
+          <div style="font-size:13px;line-height:1.6;margin-top:12px;border-top:1px solid var(--card-border);padding-top:10px;color:var(--text-main);display:grid;grid-template-columns:repeat(auto-fit, minmax(200px, 1fr));gap:8px;">
+            <div>Kode Kelas Terikat: <b style="color:var(--brand-gold);letter-spacing:1px;">${esc(boundClass)}</b></div>
             <div>Nama Guru: <b>${esc(inv.teacherName || '—')}</b></div>
             <div>Sekolah/Instansi: <b>${esc(inv.institution || '—')}</b> (${esc(inv.institutionType || '—')})</div>
             <div>Mata Pelajaran: <b>${esc(subjectName(inv.subject_id || inv.subjectId))}</b> · Jenjang: <b>${esc(gradeName(inv.grade_id || inv.gradeId))}</b></div>
@@ -2704,10 +2751,187 @@ function renderTeacherSection(m) {
     }
   }
 
-  // Formulir pembuatan token
+  // --- REKONSTRUKSI: PANEL KELAS & 17 PANEL MAPEL ---
+  const classPills = classList.map((c) => {
+    const isCur = c === currentClass;
+    return `<a href="/?cls=${esc(c)}#class-panel" style="padding:6px 14px;border-radius:20px;font-size:12px;font-weight:700;text-decoration:none;border:1px solid ${isCur ? 'var(--brand-gold)' : '#cbd5e1'};background:${isCur ? 'var(--brand-gold)' : '#ffffff'};color:${isCur ? '#ffffff' : '#334155'};display:inline-flex;align-items:center;gap:6px;">
+      🏫 ${esc(c)}
+    </a>`;
+  }).join('');
+
+  // Hitung jumlah mapel terisi di kelas ini
+  let filledCount = 0;
+  const mapelCards = SUBJECTS_17.map((s) => {
+    // Cari apakah sudah ada invite aktif atau guru terdaftar di mapel ini untuk kelas currentClass
+    const assignedInv = invites.find((i) => (i.classCode === currentClass || !i.classCode && classList.length === 0) && (i.subjectId === s.id || i.subject_id === s.id) && i.status === 'ACTIVE');
+    const assignedTeacher = teachers.find((tc) => (tc.classCode === currentClass || !tc.classCode && classList.length === 0) && (tc.subjectId === s.id || tc.subject_id === s.id));
+    const isAssigned = Boolean(assignedInv || assignedTeacher);
+    if (isAssigned) filledCount += 1;
+
+    let bodyContent = '';
+    if (assignedTeacher) {
+      bodyContent = `
+        <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;padding:10px;margin-top:8px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
+            <span style="font-size:11px;font-weight:700;color:#166534;background:#dcfce7;padding:2px 8px;border-radius:10px;">GURU AKTIF</span>
+            <code style="font-size:11px;color:#475569;">@${esc(assignedTeacher.handle || '—')}</code>
+          </div>
+          <div style="font-weight:700;font-size:13px;color:#1e293b;">${esc(assignedTeacher.teacherName || '—')}</div>
+          <div style="font-size:11.5px;color:#64748b;">${esc(assignedTeacher.institution || '—')}</div>
+        </div>
+      `;
+    } else if (assignedInv) {
+      bodyContent = `
+        <div style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:8px;padding:10px;margin-top:8px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
+            <span style="font-size:11px;font-weight:700;color:#1e40af;background:#dbeafe;padding:2px 8px;border-radius:10px;">TOKEN DICETAK (BELUM AKTIVASI)</span>
+          </div>
+          <div style="font-weight:700;font-size:13px;color:#1e293b;">${esc(assignedInv.teacherName || '—')}</div>
+          <div style="font-size:11.5px;color:#64748b;margin-bottom:6px;">${esc(assignedInv.institution || '—')}</div>
+          ${assignedInv.rawCode ? `<div style="margin:4px 0;"><code style="font-size:11.5px;font-weight:700;color:var(--brand-gold);background:#fff;padding:2px 6px;border-radius:4px;border:1px solid #cbd5e1;user-select:all;display:inline-block;">${esc(assignedInv.rawCode)}</code></div>` : ''}
+          <div style="display:flex;gap:4px;margin-top:6px;">
+            <form method="GET" action="/" style="margin:0;">
+              <input type="hidden" name="action" value="revoke_invite">
+              <input type="hidden" name="codeHash" value="${esc(assignedInv.codeHash)}">
+              <button type="submit" style="background:#ef4444;color:#fff;border:none;padding:2px 8px;border-radius:4px;font-size:10.5px;font-weight:700;cursor:pointer;">Cabut</button>
+            </form>
+          </div>
+        </div>
+      `;
+    } else {
+      bodyContent = `
+        <div style="margin-top:8px;">
+          <div style="font-size:11.5px;color:var(--text-muted);margin-bottom:8px;">Belum ada guru pengampu di kelas ini.</div>
+          <details style="position:relative;">
+            <summary style="background:var(--brand-gold);color:#ffffff;font-size:11.5px;font-weight:700;padding:6px 12px;border-radius:6px;cursor:pointer;list-style:none;text-align:center;display:block;">
+              + Tambahkan Guru
+            </summary>
+            <div style="position:absolute;left:0;right:0;top:100%;z-index:40;background:#ffffff;border:2px solid #cbd5e1;border-radius:10px;padding:14px;box-shadow:0 10px 30px rgba(0,0,0,0.25);margin-top:6px;width:280px;">
+              <div style="font-weight:800;font-size:12.5px;color:#1e293b;margin-bottom:4px;">
+                ${s.icon} Guru ${esc(s.name)}
+              </div>
+              <div style="font-size:11px;color:#64748b;margin-bottom:10px;">
+                Token otomatis terikat ke Kelas <b>${esc(currentClass)}</b>.
+              </div>
+              <form method="GET" action="/" style="display:flex;flex-direction:column;gap:6px;">
+                <input type="hidden" name="action" value="mint_teacher">
+                <input type="hidden" name="class_code" value="${esc(currentClass)}">
+                <input type="hidden" name="subject_id" value="${esc(s.id)}">
+                <input type="hidden" name="cls" value="${esc(currentClass)}">
+                <div>
+                  <label style="display:block;font-size:10.5px;font-weight:700;color:#334155;">Nama Guru</label>
+                  <input name="teacherName" type="text" placeholder="Nama Guru Lengkap" maxlength="60" required style="width:100%;box-sizing:border-box;font-size:11px;padding:4px 6px;">
+                </div>
+                <div>
+                  <label style="display:block;font-size:10.5px;font-weight:700;color:#334155;">Sekolah / Instansi</label>
+                  <input name="institution" type="text" placeholder="Nama Sekolah" maxlength="80" required style="width:100%;box-sizing:border-box;font-size:11px;padding:4px 6px;">
+                </div>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px;">
+                  <div>
+                    <label style="display:block;font-size:10.5px;font-weight:700;color:#334155;">Jenis</label>
+                    <select name="institutionType" style="width:100%;font-size:10.5px;padding:3px;">
+                      <option value="school" selected>Sekolah</option>
+                      <option value="tutoring">Bimbel</option>
+                      <option value="course">Kursus</option>
+                      <option value="other">Lainnya</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label style="display:block;font-size:10.5px;font-weight:700;color:#334155;">Jenjang</label>
+                    <select name="grade_id" style="width:100%;font-size:10.5px;padding:3px;">
+                      <option value="SMP" selected>SMP</option>
+                      <option value="SMA">SMA</option>
+                      <option value="SD">SD</option>
+                      <option value="ALL">Semua</option>
+                    </select>
+                  </div>
+                </div>
+                <div>
+                  <label style="display:block;font-size:10.5px;font-weight:700;color:#334155;">Masa Aktif</label>
+                  <select name="days" style="width:100%;font-size:10.5px;padding:3px;">
+                    <option value="14">14 Hari</option>
+                    <option value="30">30 Hari</option>
+                    <option value="90" selected>90 Hari (3 Bulan)</option>
+                    <option value="180">180 Hari</option>
+                    <option value="365">365 Hari</option>
+                  </select>
+                </div>
+                <button type="submit" style="background:#059669;color:#ffffff;font-size:11px;font-weight:700;padding:6px;border-radius:4px;border:none;cursor:pointer;margin-top:4px;">
+                  + Cetak Token Guru
+                </button>
+              </form>
+            </div>
+          </details>
+        </div>
+      `;
+    }
+
+    return `
+      <div style="background:var(--card-bg);border:1px solid ${isAssigned ? '#86efac' : 'var(--card-border)'};border-radius:10px;padding:14px;box-shadow:var(--shadow-xs);display:flex;flex-direction:column;justify-content:space-between;">
+        <div>
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
+            <span style="font-size:20px;">${s.icon}</span>
+            <span style="font-size:10px;font-weight:800;letter-spacing:0.5px;background:${isAssigned ? '#dcfce7' : '#f1f5f9'};color:${isAssigned ? '#166534' : '#64748b'};padding:2px 6px;border-radius:6px;">${esc(s.id)}</span>
+          </div>
+          <div style="font-weight:700;font-size:13.5px;color:var(--text-main);">${esc(s.name)}</div>
+          <div style="font-size:11px;color:var(--text-muted);margin-top:2px;">${esc(s.desc)}</div>
+        </div>
+        ${bodyContent}
+      </div>
+    `;
+  }).join('');
+
+  const classSection = `
+    <div id="class-panel" style="background:var(--card-bg);border:2px solid var(--card-border-hover);border-radius:14px;padding:20px;margin-bottom:24px;box-shadow:var(--shadow-sm);">
+      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;margin-bottom:16px;border-bottom:1px solid var(--card-border);padding-bottom:12px;">
+        <div>
+          <h3 style="margin:0;font-size:17px;font-weight:800;color:var(--text-main);display:flex;align-items:center;gap:8px;">
+            🏫 Panel Kelas &amp; Token Guru (17 Mata Pelajaran)
+          </h3>
+          <div style="font-size:12.5px;color:var(--text-muted);margin-top:3px;">
+            Sistem otomatis menghasilkan kode unik kelas. Klik mapel yang ingin diajarkan lalu tambahkan guru untuk mencetak token terikat.
+          </div>
+        </div>
+        <div style="display:flex;gap:8px;align-items:center;">
+          <a href="/?new_class=1#class-panel" style="background:#0284c7;color:#ffffff;font-size:12px;font-weight:700;padding:8px 14px;border-radius:8px;text-decoration:none;box-shadow:0 2px 0 #0369a1;display:inline-flex;align-items:center;gap:6px;">
+            + Buat Kelas Baru (Auto-Code)
+          </a>
+        </div>
+      </div>
+
+      ${classList.length > 0 ? `
+        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:16px;">
+          <span style="font-size:12px;font-weight:700;color:var(--text-muted);">Pilih Kelas:</span>
+          ${classPills}
+        </div>
+      ` : ''}
+
+      <div style="background:var(--bg-subtle,#f8fafc);border:1px solid var(--card-border);border-radius:10px;padding:16px;margin-bottom:20px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;">
+        <div>
+          <div style="font-size:11.5px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:var(--text-muted);margin-bottom:4px;">KODE KELAS AKTIF (UNIK OTOMATIS)</div>
+          <div style="display:flex;align-items:center;gap:12px;">
+            <code style="font-size:1.6rem;font-weight:800;letter-spacing:3px;color:var(--brand-gold);background:#ffffff;padding:6px 16px;border-radius:8px;border:1px dashed var(--card-border-hover);user-select:all;display:inline-block;">${esc(currentClass)}</code>
+            <span style="font-size:12.5px;font-weight:700;color:#059669;background:#dcfce7;padding:4px 10px;border-radius:20px;">${filledCount} / 17 Mapel Terisi</span>
+          </div>
+          <div style="font-size:12px;color:var(--text-muted);margin-top:6px;">
+            Berikan 1 kode kelas di atas kepada murid. Di tab <b>KelasKu</b> murid, sistem otomatis menampilkan panel-panel mata pelajaran guru yang terdaftar.
+          </div>
+        </div>
+      </div>
+
+      <div style="font-size:13px;font-weight:700;color:var(--text-main);margin-bottom:10px;">
+        Panel 17 Mata Pelajaran Kurikulum Merdeka di Kelas <code>${esc(currentClass)}</code>:
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(240px, 1fr));gap:12px;">
+        ${mapelCards}
+      </div>
+    </div>
+  `;
+
+  // Formulir pembuatan token mandiri / manual (Kompatibilitas 100% dengan owner-teacher-panel-test)
   const formMint = `
     <div style="background:#fff;border:1px solid var(--line);border-radius:12px;padding:18px;margin-bottom:20px;">
-      <h3 style="margin-top:0;margin-bottom:6px;color:var(--ink);">+ Buat Undangan &amp; Token Guru Baru</h3>
+      <h3 style="margin-top:0;margin-bottom:6px;color:var(--ink);">+ Buat Undangan &amp; Token Guru Baru (Form Mandiri)</h3>
       <div style="font-size:13px;color:var(--muted);margin-bottom:16px;">
         Owner dapat mencetak token untuk guru. Guru kemudian memasukkan kode token ini di aplikasi FIEZEL untuk membuka portal guru dan mengelola materi kelas.
       </div>
@@ -2763,6 +2987,10 @@ function renderTeacherSection(m) {
             <option value="ALL">Semua Jenjang</option>
           </select>
         </div>
+        <div>
+          <label for="f_class_code" style="display:block;font-size:12px;font-weight:bold;margin-bottom:4px;color:var(--ink);">Kode Kelas (Opsional)</label>
+          <input id="f_class_code" name="class_code" type="text" placeholder="Contoh: FZ-AB2C3D" value="${esc(currentClass)}" maxlength="16">
+        </div>
         <div style="grid-column:1/-1;text-align:right;margin-top:6px;">
           <button type="submit">+ Buat Token Guru</button>
         </div>
@@ -2783,7 +3011,6 @@ function renderTeacherSection(m) {
   `;
 
   // Tabel daftar token
-  const invites = tData.invites || [];
   let inviteTable = '';
   if (!invites.length) {
     inviteTable = `<div class="note">Belum ada token undangan yang dicetak.</div>`;
@@ -2882,11 +3109,13 @@ function renderTeacherSection(m) {
 
       const createdStr = inv.createdAt ? wibDay(inv.createdAt) : '—';
       const expiresStr = inv.expiresAt ? wibDay(inv.expiresAt) : '—';
+      const cCode = inv.classCode || '—';
 
       return `<tr>
         <td><b>${esc(inv.teacherName || '—')}</b></td>
         <td>${esc(inv.institution || '—')}</td>
         <td><span style="background:#e0f2fe;color:#0369a1;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;">${esc(subjectName(curSub))}</span><small style="color:var(--text-muted);display:block;margin-top:2px;">${esc(gradeName(curGrd))}</small></td>
+        <td><code style="font-weight:700;color:var(--brand-gold);">${esc(cCode)}</code></td>
         <td>${tokenCodeCell}</td>
         <td>${statusBadge}</td>
         <td>${esc(createdStr)}</td>
@@ -2922,6 +3151,7 @@ function renderTeacherSection(m) {
               <th>Guru</th>
               <th>Sekolah / Instansi</th>
               <th>Mapel &amp; Jenjang</th>
+              <th>Kode Kelas</th>
               <th>Kode Token</th>
               <th>Status</th>
               <th>Dibuat (WIB)</th>
@@ -2938,19 +3168,20 @@ function renderTeacherSection(m) {
   }
 
   // Tabel daftar guru aktif
-  const teachers = tData.teachers || [];
   let teacherTable = '';
   if (!teachers.length) {
     teacherTable = `<div class="note">Belum ada akun guru yang menyelesaikan aktivasi token.</div>`;
   } else {
     const tRows = teachers.map((tc) => {
       const actDate = tc.activatedAt ? wibDay(tc.activatedAt) : '—';
+      const cCode = tc.classCode || '—';
       return `<tr>
         <td><code>${esc(tc.handle || '—')}</code></td>
         <td><b>${esc(tc.teacherName || '—')}</b></td>
         <td>${esc(tc.institution || '—')}</td>
         <td>${esc(tc.institutionType || '—')}</td>
         <td><span style="background:#e0f2fe;color:#0369a1;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;">${esc(subjectName(tc.subject_id || tc.subjectId))}</span><small style="color:var(--text-muted);display:block;margin-top:2px;">${esc(gradeName(tc.grade_id || tc.gradeId))}</small></td>
+        <td><code style="font-weight:700;color:var(--brand-gold);">${esc(cCode)}</code></td>
         <td><span style="background:#e8f5e9;color:#2e7d32;padding:2px 8px;border-radius:10px;font-weight:bold;font-size:11px;">${esc(tc.status || 'active')}</span></td>
         <td>${esc(actDate)}</td>
       </tr>`;
@@ -2966,6 +3197,7 @@ function renderTeacherSection(m) {
               <th>Sekolah / Instansi</th>
               <th>Jenis</th>
               <th>Mapel &amp; Jenjang</th>
+              <th>Kode Kelas</th>
               <th>Status</th>
               <th>Aktivasi (WIB)</th>
             </tr>
@@ -2983,6 +3215,7 @@ function renderTeacherSection(m) {
       <span class="card-full-inner" id="teachers"></span>
       <h2><span>${ICONS.teacher} Kelola Token &amp; Undangan Guru</span><span class="section-badge">Manajemen Akses</span></h2>
       ${alertBanner}
+      ${classSection}
       ${formMint}
       ${formRevokeManual}
       <h3 style="color:var(--text-main);margin-top:20px;margin-bottom:8px;">Riwayat Undangan &amp; Token Guru</h3>
@@ -4083,7 +4316,8 @@ async function handle(request, env, ctx, nowMs) {
       const days = url.searchParams.get('days') || '90';
       const subject_id = url.searchParams.get('subject_id') || 'MAT';
       const grade_id = url.searchParams.get('grade_id') || 'SMP';
-      const mintRes = await mintTeacherInvite(env, { teacherName, institution, institutionType, days, subject_id, grade_id }, fetchImpl);
+      const class_code = url.searchParams.get('class_code') || '';
+      const mintRes = await mintTeacherInvite(env, { teacherName, institution, institutionType, days, subject_id, grade_id, class_code }, fetchImpl);
       if (mintRes.state === 'ok' && mintRes.body && mintRes.body.code) {
         teacherAction = {
           ok: true,
@@ -4184,6 +4418,8 @@ async function handle(request, env, ctx, nowMs) {
     if (teacherAction) {
       model.teacherAction = teacherAction;
     }
+    model.selectedClass = url.searchParams.get('cls') || '';
+    model.isNewClass = url.searchParams.get('new_class') === '1';
     return html(renderDashboard(model), 200, { 'set-cookie': refreshed });
   }
   if (path === '/api/summary') {

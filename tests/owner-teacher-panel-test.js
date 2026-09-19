@@ -41,7 +41,8 @@ const assert = require('assert');
       teacherName: 'Mardhiana Hamzah',
       institution: 'MTsN 5 ACEH BESAR',
       institutionType: 'school',
-      days: 90
+      days: 90,
+      class_code: 'FZ-7A9X2K'
     }, mockFetch);
 
     assert(res.state === 'ok', 'state ok');
@@ -52,6 +53,7 @@ const assert = require('assert');
     assert(parsedBody.institution === 'MTsN 5 ACEH BESAR', 'institution sesuai');
     assert(parsedBody.institutionType === 'school', 'institutionType sesuai');
     assert(parsedBody.days === 90, 'days 90 hari');
+    assert(parsedBody.class_code === 'FZ-7A9X2K', 'class_code terkirim');
   }
 
   // 3. revokeTeacherInvite mengirim code atau codeHash
@@ -187,6 +189,10 @@ const assert = require('assert');
     assert(rendered.includes('AKTIF'), 'Badge status AKTIF tertampil');
     assert(rendered.includes('DICABUT'), 'Badge status DICABUT tertampil');
     assert(rendered.includes('mardhiana'), 'Handle akun guru aktif tertampil');
+    assert(rendered.includes('Panel Kelas &amp; Token Guru (17 Mata Pelajaran)'), 'Panel Kelas 17 Mapel tertampil');
+    assert(rendered.includes('Bahasa Inggris'), 'Mapel Bahasa Inggris tertampil di grid mapel');
+    assert(rendered.includes('Matematika'), 'Mapel Matematika tertampil di grid mapel');
+    assert(rendered.includes('Kode Kelas'), 'Kolom/info Kode Kelas tertampil');
   }
 
   console.log('owner-teacher-panel-test: SEMUA ASERSI LULUS (100% PASS)');

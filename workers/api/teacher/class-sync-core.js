@@ -196,6 +196,14 @@ export function normalizeAssignment(body) {
   const payload = { v: 1, t: 'assign', id, title, skills: cleanSkills, itemIds: a.itemIds.slice(), minutes, from, cls: code, deadline, mode, timer, shuffle: !!a.shuffle };
   const teacher = String(a.teacher || '').trim().slice(0, ASSIGN_LIMITS.TEACHER_MAX);
   if (teacher) payload.teacher = teacher;
+  const rawSubject = a.subjectId || a.subject_id;
+  if (typeof rawSubject === 'string' && rawSubject.trim()) {
+    payload.subjectId = rawSubject.trim().toUpperCase().slice(0, 16);
+  }
+  const rawSubjectName = a.subjectName || a.subject_name;
+  if (typeof rawSubjectName === 'string' && rawSubjectName.trim()) {
+    payload.subjectName = rawSubjectName.trim().slice(0, 60);
+  }
   if (a.items !== undefined) {
     const ci = normalizeCustomItems(a.items);
     if (!ci.ok) return { ok: false, reason: ci.reason };
@@ -221,14 +229,22 @@ export function rowToAssignment(row, key) {
   return { id: row.id, at: Number(row.updated_at) || 0, assignment: payload };
 }
 
-/** normalizeClaim(body) -> { ok, code, title, level } | { ok:false, reason } */
+/** normalizeClaim(body) -> { ok, code, title, level, subjectId?, teacherName? } | { ok:false, reason } */
 export function normalizeClaim(body) {
   if (!body || typeof body !== 'object') return { ok: false, reason: 'not_object' };
   const code = normalizeClassCode(body.code);
   if (!code) return { ok: false, reason: 'bad_class_code' };
   const title = String(body.title || '').trim().slice(0, LIMITS.TITLE_MAX) || 'Kelas';
   const level = typeof body.level === 'string' && /^[ABC][12]$/.test(body.level) ? body.level : null;
-  return { ok: true, code, title, level };
+  const rawSubject = body.subject_id || body.subjectId;
+  const subjectId = typeof rawSubject === 'string' && rawSubject.trim()
+    ? rawSubject.trim().toUpperCase().slice(0, 16)
+    : null;
+  const rawTeacher = body.teacher_name || body.teacherName;
+  const teacherName = typeof rawTeacher === 'string' && rawTeacher.trim()
+    ? rawTeacher.trim().slice(0, 60)
+    : null;
+  return { ok: true, code, title, level, subjectId, teacherName };
 }
 
 /** Pembatas laju per kunci dalam memori isolate: cukup untuk menahan banjir satu perangkat. */
