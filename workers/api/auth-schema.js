@@ -55,7 +55,7 @@ export const OAUTH_TABLES = Object.freeze([
 /** Tabel konten guru. */
 export const TEACHER_TABLES = Object.freeze([
   'tc_node', 'tc_question', 'tc_assignment', 'tc_assignment_target', 'tc_lesson_evidence',
-  'tc_class', 'tc_class_report', 'tc_class_assignment', 'tc_class_teacher'
+  'tc_class', 'tc_class_report', 'tc_class_assignment', 'tc_class_teacher', 'tc_school'
 ]);
 
 /**
@@ -260,6 +260,19 @@ export const TEACHER_DDL = Object.freeze([
     ' updated_at INTEGER NOT NULL,' +
     ' PRIMARY KEY (class_code, subject_id)' +
     ' ) WITHOUT ROWID',
+  'CREATE TABLE IF NOT EXISTS tc_school (' +
+    ' id TEXT PRIMARY KEY,' +
+    ' name TEXT NOT NULL,' +
+    ' npsn TEXT,' +
+    ' level TEXT NOT NULL DEFAULT \'SMP\',' +
+    ' type TEXT NOT NULL DEFAULT \'school\',' +
+    ' city TEXT,' +
+    ' address TEXT,' +
+    ' principal_name TEXT,' +
+    ' contact TEXT,' +
+    ' created_at INTEGER NOT NULL,' +
+    ' updated_at INTEGER NOT NULL' +
+    ' )',
 ]);
 
 export const OAUTH_DDL = Object.freeze([

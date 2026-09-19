@@ -124,9 +124,16 @@ export const ROUTE_CAPABILITY = Object.freeze({
   '/api/teacher/class/assign': CAP.TEACHER_CLASS,
   '/api/owner/teacher-invite': CAP.OWNER_INVITE,
   '/api/owner/teacher-invite/update': CAP.OWNER_INVITE,
+  '/api/owner/teacher-invite/regenerate': CAP.OWNER_INVITE,
   '/api/owner/teacher-invite/revoke': CAP.OWNER_INVITE,
   '/api/owner/teacher-invite/delete': CAP.OWNER_INVITE,
-  '/api/owner/teachers': CAP.OWNER_TEACHERS
+  '/api/owner/teachers': CAP.OWNER_TEACHERS,
+  '/api/owner/schools': CAP.OWNER_TEACHERS,
+  '/api/owner/school': CAP.OWNER_INVITE,
+  '/api/owner/school/update': CAP.OWNER_INVITE,
+  '/api/owner/school/delete': CAP.OWNER_INVITE,
+  '/api/owner/classes': CAP.OWNER_TEACHERS,
+  '/api/owner/class': CAP.OWNER_INVITE
 });
 
 /**

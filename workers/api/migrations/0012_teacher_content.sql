@@ -182,3 +182,17 @@ CREATE TABLE IF NOT EXISTS tc_class_teacher (
   updated_at INTEGER NOT NULL,
   PRIMARY KEY (class_code, subject_id)
 ) WITHOUT ROWID;
+
+CREATE TABLE IF NOT EXISTS tc_school (
+  id TEXT PRIMARY KEY,
+  name TEXT NOT NULL,
+  npsn TEXT,
+  level TEXT NOT NULL DEFAULT 'SMP',
+  type TEXT NOT NULL DEFAULT 'school',
+  city TEXT,
+  address TEXT,
+  principal_name TEXT,
+  contact TEXT,
+  created_at INTEGER NOT NULL,
+  updated_at INTEGER NOT NULL
+);
