@@ -264,7 +264,9 @@
       institutionId: acc.institutionId || null,
       teacherName: acc.teacherName ? String(acc.teacherName) : '',
       institution: acc.institution ? String(acc.institution) : '',
-      institutionType: acc.institutionType ? String(acc.institutionType) : ''
+      institutionType: acc.institutionType ? String(acc.institutionType) : '',
+      classCode: acc.classCode ? String(acc.classCode) : null,
+      subjectId: acc.subjectId ? String(acc.subjectId) : null
     });
     if (typeof FiezelTeacherStore !== 'undefined' && session.role === 'teacher') {
       try {
@@ -357,6 +359,7 @@
   }
 
   async function logout() {
+    session = null;
     var res = await call(API_PATHS.logout, {});
     // Sesi lokal dibuang APA PUN jawaban server: kalau server tidak bisa dihubungi,
     // murid yang menekan "keluar" tetap harus melihat dirinya keluar. Cookie fz_id

@@ -6456,6 +6456,8 @@ function afterOnboardingExit(action){
     if(state.view!=='tutor')go('tutor');
     return;
   }
+  const cCode=String((self.FiezelOnboarding?.storedClassCode?.(self))||'');
+  if(cCode&&action==='home')action='classroom';
   if(action==='placement')pendingAfterGate='placement';
   /* m025-262 PENDAFTARAN SEKALI: begitu perkenalan selesai, nama yang baru saja diketik
      LANGSUNG menjadi ID online murid. Tidak ada formulir kedua di Pengaturan, di Online &
@@ -6464,7 +6466,8 @@ function afterOnboardingExit(action){
   // Peran dari perkenalan: hanya guru terverifikasi yang mendarat di Tutor Action Center.
   // Pengguna tanpa kode undangan diarahkan ke modal aktivasi guru.
   if(action==='home'){try{const role=self.FiezelOnboarding?.storedRole?.(self)||'murid';const verified=isVerifiedTeacher();if(role==='guru'&&!verified){showToast('Akses Guru memerlukan kode undangan resmi.');setTimeout(()=>{try{openFiezelAuthModal('teacher')}catch{}},420)}else{if(state.preferences?.role!==role){state.preferences={...state.preferences,role:verified?role:'murid'};save()}if(role==='guru'&&verified)setTimeout(()=>{try{go('tutor')}catch{}},420)}}catch{}}
-  if(appOpened){if(action==='placement'){/* q19-P2a 2026-08-29: kalau gerbang akun sedang menutup layar, penempatan menunggu lewat pendingAfterGate (jalur 'placement' setelah gate selesai) \u2014 memulai kuis di balik gerbang membuat pushLayer ditolak dan mode lesson tidak pernah menyala. */if(document.body?.classList?.contains?.('auth-locked')){pendingAfterGateFn=()=>startPlacement();/* v38 2026-08-29: cabang defensif ini dulu memarkir niat di pendingAfterGate yang tak pernah dikonsumsi setelah gerbang turun — sekarang lewat jalur generik runPendingAfterGateFn. */return}pendingAfterGate=null;startPlacement()}else go('home');return}
+  if(appOpened){if(action==='placement'){/* q19-P2a 2026-08-29: kalau gerbang akun sedang menutup layar, penempatan menunggu lewat pendingAfterGate (jalur 'placement' setelah gate selesai) — memulai kuis di balik gerbang membuat pushLayer ditolak dan mode lesson tidak pernah menyala. */if(document.body?.classList?.contains?.('auth-locked')){pendingAfterGateFn=()=>startPlacement();/* v38 2026-08-29: cabang defensif ini dulu memarkir niat di pendingAfterGate yang tak pernah dikonsumsi setelah gerbang turun — sekarang lewat jalur generik runPendingAfterGateFn. */return}pendingAfterGate=null;startPlacement()}else if(action==='classroom')go('classroom');else go('home');return}
+  if(action==='classroom')state.view='classroom';
   startNotificationInvitation()
 }
 // m025-80 AUDIT (Bagian 1 + Bagian 6): kesan pertama harus identitas brand, bukan dialog
@@ -8700,6 +8703,9 @@ function bindFiezelAccountControls(){
     const btn=$('btnFiezelLogout');
     if(btn)btn.disabled=true;
     try{localStorage.removeItem('fz_teacher_mode')}catch(_){}
+    try{sessionStorage.removeItem('fz-teacher-preview');sessionStorage.removeItem('fiezel-teacher-v1-preview')}catch(_){}
+    try{self.FiezelTeacherShell?.unmount?.()}catch(_){}
+    const wasTeacher=(state.preferences?.role==='guru')||(self.FiezelAccount?.role?.()==='teacher');
     if(state.preferences?.role==='guru'){
       state.preferences={...state.preferences,role:'murid'};
       state.view='home';
@@ -8716,7 +8722,14 @@ function bindFiezelAccountControls(){
       showToast('Keluar dari sesi.');
     }
     closeModal();
-    setTimeout(openSettings,100);
+    if(wasTeacher){
+      try{go('home')}catch(_){try{render()}catch(_){}}
+      setTimeout(()=>{
+        try{openFiezelAuthModal('teacher')}catch(_){}
+      },150);
+    }else{
+      setTimeout(openSettings,100);
+    }
   });
 
   $('btnSubmitTeacherCodeInline')?.addEventListener('click',async()=>{
@@ -8897,7 +8910,9 @@ function openFiezelAuthModal(initialTab){
 
     $('btnAuthCancel').onclick=()=>{
       closeModal();
-      setTimeout(openSettings,100);
+      if(state.view==='profile'||state.view==='settings'){
+        setTimeout(openSettings,100);
+      }
     };
 
     document.querySelectorAll('.auth-tab').forEach(tabBtn=>{
@@ -8983,6 +8998,7 @@ function openFiezelAuthModal(initialTab){
 
   renderAuthModalContent();
 }
+window.openFiezelAuthModal = openFiezelAuthModal;
 function neuralVoiceStatusMarkup(){const say=self.FiezelPuterVoice,online=say?.status?.()||{ready:false,sdkPresent:false,error:''};const runtime=self.FiezelVoiceRuntime,status=runtime?.status?.()||{prepared:false,ready:false,phase:'unavailable',totalBytes:0};const offline=self.FiezelVoiceOfflineAutoload?.status?.()||{done:false,armed:false};const label=online.ready?FiezelI18n.t('suara.siap'):FiezelI18n.t('suara.menyiapkan');
   // m025-121: kartu ini TIDAK menjual unduhan apa pun, dan itu keputusan yang sama dengan
   // m025-100. Cadangan perangkat menyiapkan dirinya sendiri di latar; yang ditampilkan di
@@ -14396,12 +14412,20 @@ async function accountSubmit(){
 async function fiezelAccountLogout(){
   const core=accountCore();if(!core)return false;
   try{localStorage.removeItem('fz_teacher_mode')}catch(_){}
+  try{sessionStorage.removeItem('fz-teacher-preview');sessionStorage.removeItem('fiezel-teacher-v1-preview')}catch(_){}
+  try{self.FiezelTeacherShell?.unmount?.()}catch(_){}
+  const wasTeacher=(state.preferences?.role==='guru')||(core.role?.()==='teacher');
   state.preferences={...state.preferences,role:'murid'};
   state.view='home';
   try{save()}catch(_){}
   await core.logout();
   showToast(FiezelI18n.t('account.logout-done'));
-  try{render()}catch(_){}
+  try{go('home')}catch(_){try{render()}catch(_){}}
+  if(wasTeacher){
+    setTimeout(()=>{
+      try{openFiezelAuthModal('teacher')}catch(_){}
+    },150);
+  }
   return true;
 }
 /** Baris status untuk Pengaturan. Kosong = anonim, dan itu keadaan yang sah. */

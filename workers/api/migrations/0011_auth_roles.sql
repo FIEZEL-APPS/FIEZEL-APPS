@@ -96,7 +96,8 @@ CREATE TABLE IF NOT EXISTS teacher_invite (
   revoked_at INTEGER,
   subject_id TEXT,
   grade_id TEXT,
-  raw_code TEXT
+  raw_code TEXT,
+  class_code TEXT
 );
 
 CREATE TABLE IF NOT EXISTS teacher_profile (
@@ -107,7 +108,8 @@ CREATE TABLE IF NOT EXISTS teacher_profile (
   institution_id TEXT NOT NULL,
   activated_at INTEGER NOT NULL,
   subject_id TEXT,
-  grade_id TEXT
+  grade_id TEXT,
+  class_code TEXT
 );
 
 CREATE TABLE IF NOT EXISTS friend_request (

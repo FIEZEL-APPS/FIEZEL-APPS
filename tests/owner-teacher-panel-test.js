@@ -14,6 +14,13 @@ const assert = require('assert');
   assert(typeof ownerMod.updateTeacherInvite === 'function', 'updateTeacherInvite diekspor');
   assert(typeof ownerMod.deleteTeacherInvite === 'function', 'deleteTeacherInvite diekspor');
   assert(typeof ownerMod.renderTeacherSection === 'function', 'renderTeacherSection diekspor');
+  assert(typeof ownerMod.readSchools === 'function', 'readSchools diekspor');
+  assert(typeof ownerMod.createSchool === 'function', 'createSchool diekspor');
+  assert(typeof ownerMod.updateSchool === 'function', 'updateSchool diekspor');
+  assert(typeof ownerMod.deleteSchool === 'function', 'deleteSchool diekspor');
+  assert(typeof ownerMod.readClasses === 'function', 'readClasses diekspor');
+  assert(typeof ownerMod.createClass === 'function', 'createClass diekspor');
+  assert(typeof ownerMod.regenerateTeacherInvite === 'function', 'regenerateTeacherInvite diekspor');
 
   // 2. mintTeacherInvite mengirim method POST dan body JSON yang tepat
   {
@@ -41,7 +48,8 @@ const assert = require('assert');
       teacherName: 'Mardhiana Hamzah',
       institution: 'MTsN 5 ACEH BESAR',
       institutionType: 'school',
-      days: 90
+      days: 90,
+      class_code: 'FZ-7A9X2K'
     }, mockFetch);
 
     assert(res.state === 'ok', 'state ok');
@@ -52,6 +60,7 @@ const assert = require('assert');
     assert(parsedBody.institution === 'MTsN 5 ACEH BESAR', 'institution sesuai');
     assert(parsedBody.institutionType === 'school', 'institutionType sesuai');
     assert(parsedBody.days === 90, 'days 90 hari');
+    assert(parsedBody.class_code === 'FZ-7A9X2K', 'class_code terkirim');
   }
 
   // 3. revokeTeacherInvite mengirim code atau codeHash
@@ -113,9 +122,102 @@ const assert = require('assert');
     assert(bodyBulk.mode === 'revoked', 'bulk mode terkirim');
   }
 
-  // 6. renderTeacherSection mematuhi CSP (Zero inline script & inline on* handlers)
+  // 6. createSchool, updateSchool, deleteSchool mengirim endpoint dan body yang sesuai
+  {
+    let captured = null;
+    const mockFetch = async (url, opt) => {
+      captured = { url, opt };
+      return { ok: true, status: 200, json: async () => ({ ok: true, id: 'SCH-TEST1234', name: 'MTsN 5 ACEH BESAR' }) };
+    };
+    const env = { EVIDENCE_API_BASE: 'https://api.fiezel.my.id', EVIDENCE_API_TOKEN: 'secret-owner-token' };
+
+    const res = await ownerMod.createSchool(env, {
+      name: 'MTsN 5 ACEH BESAR',
+      npsn: '10101234',
+      level: 'SMP',
+      type: 'school',
+      city: 'Aceh Besar'
+    }, mockFetch);
+    assert(res.state === 'ok', 'createSchool state ok');
+    assert(captured.url === 'https://api.fiezel.my.id/api/owner/school', 'url createSchool benar');
+    assert(captured.opt.method === 'POST', 'method POST');
+    const b = JSON.parse(captured.opt.body);
+    assert(b.name === 'MTsN 5 ACEH BESAR', 'name terkirim');
+    assert(b.npsn === '10101234', 'npsn terkirim');
+
+    await ownerMod.updateSchool(env, { id: 'SCH-TEST1234', city: 'Banda Aceh' }, mockFetch);
+    assert(captured.url === 'https://api.fiezel.my.id/api/owner/school/update', 'url updateSchool benar');
+
+    await ownerMod.deleteSchool(env, { id: 'SCH-TEST1234' }, mockFetch);
+    assert(captured.url === 'https://api.fiezel.my.id/api/owner/school/delete', 'url deleteSchool benar');
+  }
+
+  // 7. createClass dan readClasses bekerja presisi
+  {
+    let captured = null;
+    const mockFetch = async (url, opt) => {
+      captured = { url, opt };
+      return { ok: true, status: 200, json: async () => ({ ok: true, code: 'FZ-7A9X2K', title: 'Kelas 7-A' }) };
+    };
+    const env = { EVIDENCE_API_BASE: 'https://api.fiezel.my.id', EVIDENCE_API_TOKEN: 'secret-owner-token' };
+
+    const res = await ownerMod.createClass(env, { title: 'Kelas 7-A', level: 'SMP', code: 'FZ-7A9X2K' }, mockFetch);
+    assert(res.state === 'ok', 'createClass state ok');
+    assert(captured.url === 'https://api.fiezel.my.id/api/owner/class', 'url createClass benar');
+    const b = JSON.parse(captured.opt.body);
+    assert(b.code === 'FZ-7A9X2K', 'code terkirim');
+    assert(b.title === 'Kelas 7-A', 'title terkirim');
+
+    await ownerMod.readClasses(env, mockFetch);
+    assert(captured.url === 'https://api.fiezel.my.id/api/owner/classes', 'url readClasses benar');
+  }
+
+  // 8. regenerateTeacherInvite mengirim codeHash dan endpoint regenerasi
+  {
+    let captured = null;
+    const mockFetch = async (url, opt) => {
+      captured = { url, opt };
+      return { ok: true, status: 200, json: async () => ({ ok: true, code: 'REGENCODE123456789ABCDEFGHJKMNPQ' }) };
+    };
+    const env = { EVIDENCE_API_BASE: 'https://api.fiezel.my.id', EVIDENCE_API_TOKEN: 'secret-owner-token' };
+
+    const res = await ownerMod.regenerateTeacherInvite(env, { codeHash: 'c'.repeat(64) }, mockFetch);
+    assert(res.state === 'ok', 'regenerate state ok');
+    assert(captured.url === 'https://api.fiezel.my.id/api/owner/teacher-invite/regenerate', 'url regenerate benar');
+    const b = JSON.parse(captured.opt.body);
+    assert(b.codeHash === 'c'.repeat(64), 'codeHash terkirim');
+  }
+
+  // 9. renderTeacherSection mematuhi CSP (Zero inline script & inline on* handlers)
   {
     const model = {
+      schools: {
+        state: 'ok',
+        schools: [
+          {
+            id: 'SCH-TEST1234',
+            name: 'MTsN 5 ACEH BESAR',
+            npsn: '10101234',
+            level: 'SMP',
+            type: 'school',
+            city: 'Aceh Besar',
+            created_at: Date.now() - 86400000
+          }
+        ]
+      },
+      classes: {
+        state: 'ok',
+        classes: [
+          {
+            code: 'FZ-7A9X2K',
+            title: 'Kelas 7-A Unggulan',
+            level: 'SMP',
+            school_id: 'SCH-TEST1234',
+            created_at: Date.now() - 86400000
+          }
+        ]
+      },
+      selectedClass: 'FZ-7A9X2K',
       teachers: {
         state: 'ok',
         invites: [
@@ -128,6 +230,7 @@ const assert = require('assert');
             rawCode: '23456789ABCDEFGHJKMNPQRSTVWXYZ12',
             subject_id: 'MAT',
             grade_id: 'SMP',
+            classCode: 'FZ-7A9X2K',
             createdAt: Date.now() - 3600000,
             expiresAt: Date.now() + 89 * 86400000
           },
@@ -187,6 +290,19 @@ const assert = require('assert');
     assert(rendered.includes('AKTIF'), 'Badge status AKTIF tertampil');
     assert(rendered.includes('DICABUT'), 'Badge status DICABUT tertampil');
     assert(rendered.includes('mardhiana'), 'Handle akun guru aktif tertampil');
+    assert(rendered.includes('Panel Kelas &amp; Token Guru (17 Mata Pelajaran)'), 'Panel Kelas 17 Mapel tertampil');
+    assert(rendered.includes('Bahasa Inggris'), 'Mapel Bahasa Inggris tertampil di grid mapel');
+    assert(rendered.includes('Matematika'), 'Mapel Matematika tertampil di grid mapel');
+    assert(rendered.includes('Kode Kelas'), 'Kolom/info Kode Kelas tertampil');
+
+    // Asersi Fitur Baru Rekonstruksi:
+    assert(rendered.includes('id="school-panel"'), 'Panel khusus sekolah mitra tertampil');
+    assert(rendered.includes('value="create_school"'), 'Form registrasi sekolah mitra tersedia');
+    assert(rendered.includes('value="create_class"'), 'Form pembuatan kelas persisten D1 tersedia');
+    assert(rendered.includes('TERSIMPAN PERMANEN'), 'Badge kelas persisten D1 tertampil');
+    assert(rendered.includes('value="regenerate_invite"'), 'Aksi regenerasi token guru tersedia');
+    assert(rendered.includes('extend_days'), 'Pilihan perpanjang masa aktif token tersedia di edit');
+    assert(rendered.includes('FZ-7A9X2K'), 'Kode kelas persisten dari database tertampil');
   }
 
   console.log('owner-teacher-panel-test: SEMUA ASERSI LULUS (100% PASS)');

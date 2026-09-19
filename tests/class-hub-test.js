@@ -313,6 +313,53 @@ test('soal bergambar: runner kelas BENAR-BENAR mencetak gambarnya', () => {
   assert.ok(/aria-label="Gambar: /.test(sEl.innerHTML), 'gambar punya nama aksesibel');
 });
 
+test('student subject panels: kartu panel mapel dan filter tugas per mapel', () => {
+  const store = {};
+  globalThis.localStorage = { getItem: (k) => (k in store ? store[k] : null), setItem: (k, v) => { store[k] = String(v); }, removeItem: (k) => { delete store[k]; } };
+  store['fiezel-onboarding-v1'] = JSON.stringify({ name: 'Rani', classCode: 'FZ-998877' });
+  store['fiezel-class-hub-v1'] = JSON.stringify({
+    tab: 'tugas',
+    classTeachers: [
+      { subjectId: 'ENG', teacherName: 'Bu Mardhiana' },
+      { subjectId: 'MAT', teacherName: 'Pak Budi' }
+    ]
+  });
+
+  const TS = globalThis.FiezelTeacherStore;
+  TS.acceptAssignmentPayload({
+    v: 1, t: 'assign', id: 'as-eng-1', title: 'Daily Routine', skills: ['ENG'],
+    itemIds: ['q1'], minutes: 5, from: 'Bu Mardhiana', teacher: 'Bu Mardhiana', cls: 'FZ-998877',
+    source: { subjectId: 'ENG', subjectName: 'Bahasa Inggris' }
+  });
+  TS.acceptAssignmentPayload({
+    v: 1, t: 'assign', id: 'as-mat-1', title: 'Aljabar Dasar', skills: ['MAT'],
+    itemIds: ['q2'], minutes: 5, from: 'Pak Budi', teacher: 'Pak Budi', cls: 'FZ-998877',
+    source: { subjectId: 'MAT', subjectName: 'Matematika' }
+  });
+
+  const Hub = globalThis.FiezelClassHub;
+  const mkEl = () => { const el = { innerHTML: '', _h: {}, addEventListener(t, fn) { (el._h[t] = el._h[t] || []).push(fn); }, querySelector: () => null, fire(t, target) { (el._h[t] || []).forEach((fn) => fn({ target, preventDefault() {} })); } }; return el; };
+  const btn = (attrs) => { const b = { _attrs: attrs, getAttribute: (k) => (k in attrs ? attrs[k] : null), value: attrs.value }; b.closest = (sel) => (sel === '[data-ch]' ? b : null); return b; };
+
+  const sEl = mkEl();
+  Hub.mountStudent(sEl, { toast() {}, go() {}, openTutor() {}, afterRender() {} });
+
+  assert.ok(sEl.innerHTML.includes('class-subject-panels'), 'panel mata pelajaran muncul di murid');
+  assert.ok(sEl.innerHTML.includes('Bu Mardhiana'), 'nama Bu Mardhiana muncul di kartu mapel');
+  assert.ok(sEl.innerHTML.includes('Pak Budi'), 'nama Pak Budi muncul di kartu mapel');
+  assert.ok(sEl.innerHTML.includes('as-eng-1') && sEl.innerHTML.includes('as-mat-1'), 'kedua tugas tampil sebelum filter');
+
+  // Klik filter Bahasa Inggris
+  sEl.fire('click', btn({ 'data-ch': 'filter-subject', 'data-subject': 'ENG' }));
+  assert.ok(sEl.innerHTML.includes('as-eng-1'), 'tugas B. Inggris tampil saat filter ENG');
+  assert.ok(!sEl.innerHTML.includes('as-mat-1'), 'tugas Matematika terfilter keluar');
+
+  // Buka tab KelasKu
+  sEl.fire('click', btn({ 'data-ch': 'tab', 'data-tab': 'kelas' }));
+  assert.ok(sEl.innerHTML.includes('class-all-subjects-panel'), 'panel 17 mapel lengkap muncul di tab KelasKu');
+  assert.ok(sEl.innerHTML.includes('Kurikulum Merdeka (17 Mapel)'), 'kicker 17 mapel muncul');
+});
+
 test('sintaks: app.js & modul class-hub dapat di-parse', () => {
   const vm = require('vm');
   ['app.js', 'features/class-hub/fiezel-class-hub.js', 'features/class-hub/fiezel-braincore-review.js', 'features/teacher/fiezel-teacher-shell.js', 'features/teacher/fiezel-teacher-store.js', 'features/learner-flow/fiezel-learner-flow.js'].forEach((f) => { new vm.Script(read(f), { filename: f }); });
