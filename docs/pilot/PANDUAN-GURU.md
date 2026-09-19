@@ -77,6 +77,19 @@ Murid yang memasukkan kode **belum otomatis masuk** — dia menunggu di antrean.
 
 ---
 
+## Satu tab yang jangan dibuka dulu
+
+Di tab Kurikulum ada pilihan sumber **mata pelajaran lain** (Matematika, IPA, IPS, dan
+seterusnya). **Jangan dipakai selama uji coba.**
+
+Alasannya jujur saja: bank soal untuk mapel selain Bahasa Inggris baru berisi 15 soal per
+mapel, dan **belum menyesuaikan tingkat kelas maupun kompetensi** yang Bapak/Ibu pilih —
+memilih "Kalkulus kelas 11" tetap mengeluarkan soal setingkat kelas 7. Itu sedang
+dikerjakan, tetapi belum siap dipakai mengajar.
+
+Untuk uji coba ini, pakai **Bahasa Inggris** saja: jalur adaptif harian + tugas Kurikulum
+Fase D. Keduanya sudah matang.
+
 ## Kalau ada masalah
 
 | Kejadian | Yang dilakukan |
