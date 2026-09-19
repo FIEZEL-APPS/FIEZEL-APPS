@@ -73,8 +73,12 @@
   }
 
   var NAV = [
-    ['copilot', 'Kopilot Guru'], ['coverage', 'Cakupan Kurikulum'], ['curriculum', 'Struktur Kurikulum'],
-    ['bank', 'Bank Soal'], ['assessment', 'Asesmen'], ['students', 'Murid & Paspor']
+    ['copilot', t('kurikulum.nav-copilot', 'Beranda Guru')],
+    ['coverage', t('kurikulum.nav-coverage', 'Kemajuan Belajar')],
+    ['curriculum', t('kurikulum.nav-curriculum', 'Standar Kurikulum')],
+    ['bank', t('kurikulum.nav-bank', 'Bank Soal')],
+    ['assessment', t('kurikulum.nav-assessment', 'Kuis & Ulangan')],
+    ['students', t('kurikulum.nav-students', 'Nilai & Rapor')]
   ];
 
   // ---------------- boot ----------------
@@ -224,7 +228,7 @@
 
   // ---------------- 1. Kopilot ----------------
   function vCopilot() {
-    if (!S.coverage) { loadCoverage(); return head('Kopilot', 'Menyiapkan intelijen kelas…') + '<div class="card">Memuat evidence…</div>'; }
+    if (!S.coverage) { loadCoverage(); return head(t('kurikulum.nav-copilot', 'Beranda Guru'), t('kurikulum.copilot-loading', 'Menyiapkan panduan mengajar kelas…')) + '<div class="card">' + t('kurikulum.copilot-memuat', 'Memuat data belajar kelas…') + '</div>'; }
     if (!S.recs) { loadRecs(); }
     var rows = S.coverage.rows, total = rows.length;
     var missing = rows.filter(function (r) { return r.status === 'MISSING' || r.status === 'NOT_TAUGHT'; }).length;
@@ -232,14 +236,14 @@
     var good = rows.filter(function (r) { return r.status === 'GOOD'; }).length;
     var avg = rows.filter(function (r) { return r.mastery_pct != null; });
     var mastery = avg.length ? Math.round(avg.reduce(function (a, b) { return a + b.mastery_pct; }, 0) / avg.length) : null;
-    return head('Kopilot Guru', 'Apa yang harus saya lakukan sekarang?',
-      'Rekomendasi dibangun dari evidence nyata kelas ' + S.cls.name + ' — bukan template.') +
+    return head(t('kurikulum.nav-copilot', 'Beranda Guru'), t('kurikulum.copilot-title', 'Panduan & Rekomendasi Mengajar Hari Ini'),
+      t('kurikulum.copilot-sub', 'Saran otomatis berdasarkan materi yang perlu diperkuat di kelas ') + S.cls.name + '.') +
       '<div class="grid g4">' +
-      kpi('TP dipantau', total, 0) + kpi('Belum diajarkan / tanpa soal', missing, 60) +
-      kpi('Sudah diajarkan, belum dikuasai', gap, 120) + kpi('Rata-rata penguasaan', mastery == null ? '—' : mastery + '%', 180) +
+      kpi(t('kurikulum.kpi-tp-pantau', 'Materi Dipantau'), total, 0) + kpi(t('kurikulum.kpi-belum-ajar', 'Belum Diajarkan'), missing, 60) +
+      kpi(t('kurikulum.kpi-perlu-remedial', 'Perlu Remedial / Bimbingan'), gap, 120) + kpi(t('kurikulum.kpi-rata-nilai', 'Rata-rata Nilai Kelas'), mastery == null ? '—' : mastery + '%', 180) +
       '</div>' +
       '<div class="card accent rise" style="--d:220ms" data-testid="recommendations">' +
-      '<p class="kicker">3 tindakan paling disarankan hari ini</p>' +
+      '<p class="kicker">' + esc(t('kurikulum.recs-kicker', '💡 Rekomendasi Guru Hari Ini')) + '</p>' +
       (S.recs ? (S.recs.length ? S.recs.map(function (r, i) {
         return '<div class="card tight" style="margin-top:12px" data-testid="rec-' + i + '">' +
           '<div class="row between"><b>' + esc(r.title) + '</b><span class="pill ' +
@@ -250,18 +254,18 @@
           '<div class="row">' + (r.actions || []).map(function (a, j) {
             return '<button class="btn ' + (j === 0 ? 'primary' : 'ghost') + ' sm" data-a="exec-rec" data-i="' + i + '" data-j="' + j + '" data-testid="rec-' + i + '-action-' + j + '">' + esc(a.label) + '</button>';
           }).join('') + '</div></div>';
-      }).join('') : '<p class="muted">Belum ada evidence yang cukup untuk merekomendasikan tindakan.</p>')
-        : '<p class="muted">Menghitung rekomendasi…</p>') + '</div>' +
+      }).join('') : '<p class="muted">' + t('kurikulum.recs-empty', 'Belum ada data nilai yang cukup untuk merekomendasikan tindakan.') + '</p>')
+        : '<p class="muted">' + t('kurikulum.recs-calc', 'Menghitung rekomendasi mengajar…') + '</p>') + '</div>' +
       '<div class="grid g2">' +
-      '<div class="card rise" style="--d:280ms" data-testid="lesson-plan-card"><p class="kicker">Rencana mengajar pintar</p>' +
-      '<h3>Susun jam pelajaran dari evidence kelas</h3>' +
-      '<div class="row"><label class="f" style="flex:1 1 200px">Target TP<select id="planTp" data-testid="plan-tp">' + tpOptions() + '</select></label>' +
+      '<div class="card rise" style="--d:280ms" data-testid="lesson-plan-card"><p class="kicker">' + t('kurikulum.plan-kicker', 'Rencana Jam Pelajaran (45 Menit)') + '</p>' +
+      '<h3>' + t('kurikulum.plan-title', 'Susun kegiatan belajar sesuai kebutuhan murid') + '</h3>' +
+      '<div class="row"><label class="f" style="flex:1 1 200px">' + t('kurikulum.kompetensi-goal-label', 'Kompetensi (goal)') + '<select id="planTp" data-testid="plan-tp">' + tpOptions() + '</select></label>' +
       '<label class="f" style="width:120px">Durasi (menit)<input id="planMin" type="number" value="45" data-testid="plan-minutes"></label></div>' +
       '<button class="btn primary sm" data-a="make-plan" data-testid="make-plan-btn">Buat rencana</button>' +
       (S.plan ? planHtml(S.plan) : '') + '</div>' +
-      '<div class="card rise" style="--d:340ms" data-testid="groups-card"><p class="kicker">Kelompok dinamis</p>' +
-      '<h3>Kelompok berbasis bukti, bukan tebakan</h3>' +
-      '<label class="f">TP<select id="grpTp" data-testid="group-tp">' + tpOptions() + '</select></label>' +
+      '<div class="card rise" style="--d:340ms" data-testid="groups-card"><p class="kicker">' + t('kurikulum.grp-kicker', 'Kelompok Belajar Murid') + '</p>' +
+      '<h3>' + t('kurikulum.grp-title', 'Bentuk kelompok otomatis berdasarkan penguasaan materi') + '</h3>' +
+      '<label class="f">' + t('kurikulum.kompetensi-goal-label', 'Kompetensi (goal)') + '<select id="grpTp" data-testid="group-tp">' + tpOptions() + '</select></label>' +
       '<button class="btn primary sm" data-a="make-groups" data-testid="make-groups-btn">Bentuk kelompok</button>' +
       (S.groups ? S.groups.groups.map(function (g, i) {
         return '<div class="card tight" style="margin-top:10px" data-testid="group-' + i + '"><div class="row between"><b>' + esc(g.name) + '</b><span class="pill mute">' + g.members.length + ' murid</span></div>' +
@@ -403,7 +407,8 @@
       '<div class="grid g2"><div class="card" data-testid="curriculum-tree"><p class="kicker">' + t('kurikulum.learning-graph-kicker', 'Learning graph') + '</p><div class="tree">' +
       S.tree.map(nodeHtml).join('') + '</div></div>' +
       '<div class="stack">' +
-      '<div class="card" data-testid="add-node-card"><p class="kicker">' + t('kurikulum.tambah-simpul-kicker', 'Tambah simpul') + '</p><h3>' + t('kurikulum.lengkapi-kurikulum', 'Lengkapi kurikulum') + '</h3>' +
+      '<details class="card" data-testid="add-node-card"><summary style="cursor:pointer;font-weight:600"><span class="kicker" style="display:inline;margin:0 8px 0 0">' + t('kurikulum.tambah-simpul-kicker', 'Tambah simpul') + '</span> ' + t('kurikulum.lengkapi-kurikulum', 'Lengkapi kurikulum') + ' …</summary>' +
+      '<div style="margin-top:14px">' +
       '<label class="f">' + t('kurikulum.jenis-label', 'Jenis Simpul') + '<select id="ndType" data-testid="node-type">' +
       NODE_TYPES.map(function (nt) { return '<option value="' + nt[0] + '">' + esc(nt[1]) + '</option>'; }).join('') +
       '</select></label>' +
@@ -411,13 +416,13 @@
       '<datalist id="parent-tree-list">' + parentOptions + '</datalist>' +
       '<input id="ndParent" list="parent-tree-list" placeholder="' + t('kurikulum.induk-ph', 'Pilih dari daftar atau ketik ID induk (mis. CP-MAT-D-BIL)') + '" data-testid="node-parent"></label>' +
       '<label class="f">' + t('kurikulum.nama-simpul-label', 'Nama Simpul / Deskripsi') + '<input id="ndName" placeholder="' + t('kurikulum.nama-simpul-ph', 'Nama simpul atau rumusan kompetensi') + '" data-testid="node-name"></label>' +
-      '<button class="btn primary sm" data-a="add-node" data-testid="add-node-btn">' + t('kurikulum.tombol-tambah-simpul', 'Tambahkan') + '</button></div>' +
+      '<button class="btn primary sm" data-a="add-node" data-testid="add-node-btn">' + t('kurikulum.tombol-tambah-simpul', 'Tambahkan') + '</button></div></details>' +
       seedCardHtml() +
       '<div class="card" data-testid="curriculum-health"><p class="kicker">' + t('kurikulum.peringatan-kicker', 'Peringatan struktur') + '</p>' +
       (S.health ? (S.health.warnings.length ? S.health.warnings.slice(0, 24).map(function (w) {
         return '<div class="issue ' + w.level + '">' + esc(w.message) + '</div>';
       }).join('') : '<p class="muted">' + t('kurikulum.struktur-sehat', 'Struktur sehat.') + '</p>') : '<p class="muted">' + t('kurikulum.memeriksa-struktur', 'Memeriksa…') + '</p>') +
-      (S.health ? '<p class="mono muted">' + esc(JSON.stringify(S.health.counts)) + '</p>' : '') + '</div></div></div>';
+      (S.health && S.health.counts ? '<div class="row" style="gap:8px;flex-wrap:wrap;margin-top:10px"><span class="pill good">' + (S.health.counts.tp || 0) + ' ' + esc(t('kurikulum.type.tp', 'Tujuan Pembelajaran')) + '</span><span class="pill info">' + (S.health.counts.competency || 0) + ' ' + esc(t('kurikulum.type.comp', 'Kompetensi')) + '</span><span class="pill mute">' + (S.health.counts.material || 0) + ' ' + esc(t('kurikulum.type.mat', 'Materi Ajar')) + '</span></div>' : '') + '</div></div></div>';
   }
 
   /* KARTU PENYEMAI BANK KURIKULUM.
@@ -694,13 +699,16 @@
           '<input type="number" value="' + r.count + '" data-a="bp-count" data-i="' + i + '" style="width:80px"></div>';
       }).join('') +
       '<button class="btn ghost sm" data-a="bp-add" data-testid="bp-add">+ Target TP</button>' +
-      '<p class="kicker" style="margin-top:14px">' + t('kurikulum.bp-cog-kicker', 'Distribusi kognitif (%)') + '</p><div class="row">' +
+      '<details style="margin:16px 0;padding:12px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:8px"><summary style="cursor:pointer;font-size:12.5px;color:var(--text-muted);font-weight:600">⚙️ ' + t('kurikulum.bp-adv-toggle', 'Pengaturan Kesulitan & Soal Cerita (Opsional)') + '</summary>' +
+      '<div style="margin-top:10px">' +
+      '<p class="kicker">' + t('kurikulum.bp-cog-kicker', 'Distribusi kognitif (%)') + '</p><div class="row">' +
       COG_ITEMS.map(function (c) {
         return '<label class="f" style="flex:1;min-width:70px">' + c[1] + '<input type="number" id="cog' + c[0] + '" value="' + ({ C1: 20, C2: 30, C3: 30, C4: 20 })[c[0]] + '" data-testid="cog-' + c[0] + '"></label>';
       }).join('') + '</div>' +
       '<label class="f">' + t('kurikulum.bp-transfer-label', 'Porsi Soal Transfer / Kontekstual (0.0 – 1.0, misal 0.2 = 20% soal situasi nyata)') + '<input id="bpTransfer" type="number" step="0.05" value="0.2" data-testid="bp-transfer"></label>' +
+      '</div></details>' +
       '<div class="row"><button class="btn ghost sm" data-a="bp-check" data-testid="bp-check">' + t('kurikulum.bp-check-btn', 'Cek keseimbangan') + '</button>' +
-      '<button class="btn primary sm" data-a="bp-create" data-testid="bp-create">' + t('kurikulum.bp-create-btn', 'Simpan blueprint & buat asesmen') + '</button></div>' +
+      '<button class="btn primary sm" data-a="bp-create" data-testid="bp-create">' + t('kurikulum.bp-create-btn', '🚀 Terbitkan Kuis untuk Murid') + '</button></div>' +
       (S.blueprintCheck ? '<div style="margin-top:12px" data-testid="bp-warnings">' +
         (S.blueprintCheck.warnings.length ? S.blueprintCheck.warnings.map(function (w) { return '<div class="issue ' + w.level + '">' + esc(w.message) + '</div>'; }).join('') : '<div class="issue info">' + t('kurikulum.bp-seimbang', 'Blueprint seimbang.') + '</div>') +
         '<p class="mono muted">' + esc(JSON.stringify(S.blueprintCheck.availability)) + '</p></div>' : '') +
@@ -725,9 +733,9 @@
   function vStudents() {
     if (!S.students) {
       api('/classes/' + S.cls.id).then(function (c) { S.students = c.students || []; render(); });
-      return head('Murid', 'Memuat…');
+      return head(t('kurikulum.nav-students', 'Nilai & Rapor'), 'Memuat…');
     }
-    return head('Murid & Learning Passport', S.cls.name, 'Kode kelas: ' + S.cls.code + ' — murid memakainya saat masuk.') +
+    return head(t('kurikulum.nav-students', 'Nilai & Rapor'), S.cls.name, t('kurikulum.kode-kelas-label', 'Kode kelas: ') + S.cls.code + ' — ' + t('kurikulum.kode-kelas-sub', 'berikan kode ini saat murid bergabung.')) +
       '<div class="grid g2"><div class="card" data-testid="roster-card"><p class="kicker">Tambah murid</p>' +
       '<label class="f">Nama (satu per baris)<textarea id="roster" data-testid="roster-input"></textarea></label>' +
       '<button class="btn primary sm" data-a="add-roster" data-testid="add-roster-btn">Tambahkan</button></div>' +
@@ -737,7 +745,7 @@
       '<button class="btn sm" data-a="import-legacy" data-testid="import-legacy-btn">Impor dari perangkat ini</button></div>' +
       '<div class="card" data-testid="student-list"><p class="kicker">Daftar murid</p><h3>' + S.students.length + ' murid</h3>' +
       '<table><tbody>' + S.students.map(function (s) {
-        return '<tr class="click" data-a="passport" data-sid="' + esc(s.user_id) + '" data-testid="student-' + esc(s.user_id) + '"><td><b>' + esc(s.name) + '</b></td><td class="muted mono">' + esc(s.email || 'roster') + '</td><td>Lihat paspor →</td></tr>';
+        return '<tr class="click" data-a="passport" data-sid="' + esc(s.user_id) + '" data-testid="student-' + esc(s.user_id) + '"><td><b>' + esc(s.name) + '</b></td><td class="muted mono">' + esc(s.email || 'roster') + '</td><td>Lihat rapor →</td></tr>';
       }).join('') + '</tbody></table></div></div>';
   }
 

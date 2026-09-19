@@ -1,6 +1,6 @@
 {
   "schema": "fiezel-th-ui-leak-v1",
-  "generatedAt": "2026-09-19T09:25:25.161Z",
+  "generatedAt": "2026-09-19T09:45:51.762Z",
   "files": {
     "app.js": {
       "leaks": 3,
@@ -147,28 +147,28 @@
       ]
     },
     "features/curriculum/teacher-console.js": {
-      "leaks": 40,
-      "budget": 40,
+      "leaks": 33,
+      "budget": 33,
       "sample": [
         {
-          "line": 76,
-          "text": "Kopilot Guru"
-        },
-        {
-          "line": 77,
-          "text": "Murid & Paspor"
-        },
-        {
-          "line": 104,
+          "line": 108,
           "text": "FIEZEL · Ruang Guru"
         },
         {
-          "line": 108,
+          "line": 112,
           "text": "Masuk dengan akun KelasKu"
         },
         {
-          "line": 109,
+          "line": 113,
           "text": "Belum masuk? Buka"
+        },
+        {
+          "line": 114,
+          "text": "Murid masuk di halaman"
+        },
+        {
+          "line": 114,
+          "text": "Misi Belajar"
         }
       ]
     },
@@ -468,8 +468,8 @@
     }
   },
   "copyKeys": {
-    "id": 2730,
-    "th": 2732,
+    "id": 2754,
+    "th": 2756,
     "idTanpaTh": 0
   },
   "pass": true
