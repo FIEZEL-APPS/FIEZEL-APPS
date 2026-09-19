@@ -141,15 +141,25 @@
         if (!r.ok || !data || !data.ticket) {
           throw new Error(t('kelasku.tiket-gagal', 'Gagal mengambil tiket KelasKu.'));
         }
-        return data.ticket;
+        return { ticket: data.ticket, subjectId: data.subjectId || null, gradeId: data.gradeId || null };
       });
     });
   }
 
   function masukKelasKu(classCode) {
-    return ambilTiket().then(function (tiket) {
-      return api('/auth/kelasku', { body: { ticket: tiket, class_code: classCode || null } });
-    }).then(function (u) { setToken(u.access_token); return u; });
+    return ambilTiket().then(function (ticketData) {
+      var tStr = typeof ticketData === 'string' ? ticketData : (ticketData && ticketData.ticket);
+      return api('/auth/kelasku', { body: { ticket: tStr, class_code: classCode || null } }).then(function (u) {
+        if (ticketData && ticketData.subjectId && !u.subjectId && !u.subject_id) {
+          u.subjectId = ticketData.subjectId;
+        }
+        if (ticketData && ticketData.gradeId && !u.gradeId && !u.grade_id) {
+          u.gradeId = ticketData.gradeId;
+        }
+        setToken(u.access_token);
+        return u;
+      });
+    });
   }
 
   root.FZEngine = {

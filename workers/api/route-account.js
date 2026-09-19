@@ -201,7 +201,25 @@ export async function routeAccountLogin(ctx) {
 
   // Tujuan sesudah login DITENTUKAN SERVER dari peran (§27). Klien tidak
   // mengirim "mau ke mana", jadi tidak ada yang bisa meminta dasbor guru.
-  return jsonResponse({ ok: true, account: accountView(account, account.role) }, opt);
+  let accountData = account;
+  if (account.role === 'teacher') {
+    const tp = await db
+      .prepare('SELECT teacher_name, institution, institution_type, subject_id, grade_id FROM teacher_profile WHERE sub = ?1')
+      .bind(account.sub)
+      .first()
+      .catch(() => null);
+    if (tp) {
+      accountData = {
+        ...account,
+        teacher_name: tp.teacher_name,
+        institution: tp.institution,
+        institution_type: tp.institution_type,
+        subject_id: tp.subject_id,
+        grade_id: tp.grade_id
+      };
+    }
+  }
+  return jsonResponse({ ok: true, account: accountView(accountData, account.role) }, opt);
 }
 
 /* ========================================================================== */
@@ -233,7 +251,7 @@ export async function routeAccountMe(ctx) {
   let accountData = gate.account;
   if (gate.role === 'teacher') {
     const tp = await gate.db
-      .prepare('SELECT teacher_name, institution, institution_type FROM teacher_profile WHERE sub = ?1')
+      .prepare('SELECT teacher_name, institution, institution_type, subject_id, grade_id FROM teacher_profile WHERE sub = ?1')
       .bind(gate.sub)
       .first()
       .catch(() => null);
@@ -242,7 +260,9 @@ export async function routeAccountMe(ctx) {
         ...gate.account,
         teacher_name: tp.teacher_name,
         institution: tp.institution,
-        institution_type: tp.institution_type
+        institution_type: tp.institution_type,
+        subject_id: tp.subject_id,
+        grade_id: tp.grade_id
       };
     }
   }
@@ -283,9 +303,29 @@ export async function routeCurriculumTicket(ctx) {
   }
 
   const name = gate.account && gate.account.login_handle ? String(gate.account.login_handle) : '';
+  let subjectId = null;
+  let gradeId = null;
+  if (gate.role === 'teacher') {
+    const tp = await gate.db
+      .prepare('SELECT subject_id, grade_id FROM teacher_profile WHERE sub = ?1')
+      .bind(gate.sub)
+      .first()
+      .catch(() => null);
+    if (tp) {
+      subjectId = tp.subject_id || null;
+      gradeId = tp.grade_id || null;
+    }
+  }
+
   let issued = null;
   try {
-    issued = await signCurriculumTicket(secret, { sub: gate.sub, role: gate.role, name: name }, ctx.now);
+    issued = await signCurriculumTicket(secret, {
+      sub: gate.sub,
+      role: gate.role,
+      name: name,
+      subject_id: subjectId,
+      grade_id: gradeId
+    }, ctx.now);
   } catch (_) {
     return jsonError(503, ERR.UNAVAILABLE, {}, gate.opt);
   }
@@ -294,7 +334,9 @@ export async function routeCurriculumTicket(ctx) {
     ok: true,
     ticket: issued.ticket,
     expires_in: issued.expires_in,
-    role: gate.role
+    role: gate.role,
+    subjectId: subjectId,
+    gradeId: gradeId
   }, gate.opt);
 }
 

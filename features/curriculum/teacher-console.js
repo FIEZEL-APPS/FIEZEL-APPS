@@ -58,7 +58,16 @@
     ['IPS-7', t('kurikulum.sub-ips7', 'IPS (Kelas 7 · SMP)')],
     ['IND-7', t('kurikulum.sub-ind7', 'Bahasa Indonesia (Kelas 7 · SMP)')],
     ['INF-7', t('kurikulum.sub-inf7', 'Informatika (Kelas 7 · SMP)')],
-    ['PKN-7', t('kurikulum.sub-pkn7', 'Pendidikan Pancasila (Kelas 7 · SMP)')]
+    ['PKN-7', t('kurikulum.sub-pkn7', 'Pendidikan Pancasila (Kelas 7 · SMP)')],
+    ['MAT', t('kurikulum.sub-mat', 'Matematika (Semua Kelas)')],
+    ['ENG', t('kurikulum.sub-eng', 'Bahasa Inggris (Semua Kelas)')],
+    ['IPA', t('kurikulum.sub-ipa', 'Ilmu Pengetahuan Alam (IPA)')],
+    ['IPS', t('kurikulum.sub-ips', 'Ilmu Pengetahuan Sosial (IPS)')],
+    ['IND', t('kurikulum.sub-ind', 'Bahasa Indonesia')],
+    ['INF', t('kurikulum.sub-inf', 'Informatika')],
+    ['PKN', t('kurikulum.sub-pkn', 'Pendidikan Pancasila')],
+    ['SD-ALL', t('kurikulum.sub-sd-all', 'Guru Kelas SD (Tematik)')],
+    ['ALL', t('kurikulum.sub-all', 'Semua Mata Pelajaran')]
   ];
 
   function activeSubj() {
@@ -66,10 +75,15 @@
   }
 
   function subjName(sid) {
+    if (!sid) return t('kurikulum.sub-umum', 'Semua Mata Pelajaran');
     for (var i = 0; i < SUBJECT_CHOICES.length; i++) {
       if (SUBJECT_CHOICES[i][0] === sid) return SUBJECT_CHOICES[i][1];
     }
-    return sid || t('kurikulum.sub-umum', 'Semua Mata Pelajaran');
+    var base = sid.split('-')[0];
+    for (var j = 0; j < SUBJECT_CHOICES.length; j++) {
+      if (SUBJECT_CHOICES[j][0] === base) return SUBJECT_CHOICES[j][1];
+    }
+    return sid;
   }
 
   var NAV = [
@@ -123,6 +137,13 @@
     if (user && (user.subjectId || user.subject_id)) {
       S.activeSubject = user.subjectId || user.subject_id;
     }
+    if (E && E.seed && E.seed.mapelStatus) {
+      E.seed.mapelStatus().then(function (st) {
+        if (st && !st.seeded && E.seed.mapel) {
+          return E.seed.mapel().catch(function () {});
+        }
+      }).catch(function () {});
+    }
     api('/classes').then(function (list) {
       S.classes = list;
       if (!list.length) {
@@ -138,8 +159,22 @@
   }
 
   function openWelcomeModal() {
-    var defSubject = S.activeSubject || 'MAT-7';
-    var defGrade = (S.user && (S.user.gradeId || S.user.grade_id)) || 'KELAS-7';
+    var rawSub = S.activeSubject || '';
+    var defSubject = 'MAT-7';
+    for (var sIdx = 0; sIdx < SUBJECT_CHOICES.length; sIdx++) {
+      var sCode = SUBJECT_CHOICES[sIdx][0];
+      if (sCode === rawSub || (rawSub && (sCode.indexOf(rawSub + '-') === 0 || sCode === rawSub))) {
+        defSubject = sCode;
+        break;
+      }
+    }
+
+    var rawGrd = (S.user && (S.user.gradeId || S.user.grade_id)) || '';
+    var defGrade = 'KELAS-7';
+    if (rawGrd === 'SMP' || rawGrd === 'fase_d') defGrade = 'KELAS-7';
+    else if (rawGrd === 'SMA' || rawGrd === 'fase_e' || rawGrd === 'fase_f') defGrade = 'KELAS-10';
+    else if (rawGrd === 'SD' || rawGrd === 'fase_a' || rawGrd === 'fase_b' || rawGrd === 'fase_c') defGrade = 'KELAS-1';
+
     S.modal =
       '<div class="card tight ink" style="margin-bottom:0;max-width:520px" data-testid="welcome-onboarding-modal">' +
       '<div class="row between" style="margin-bottom:12px">' +
