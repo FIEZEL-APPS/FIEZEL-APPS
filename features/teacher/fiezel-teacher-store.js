@@ -98,6 +98,7 @@
     c.students = (c.students || []).map(normalizeStudent);
     c.assignments = c.assignments || [];
     c.announcements = c.announcements || [];
+    c.latestAnnouncement = c.latestAnnouncement || (c.announcements.length ? c.announcements[c.announcements.length - 1] : null);
     c.journal = c.journal || [];
     c.sentItemIds = c.sentItemIds || [];
     c.pending = Array.isArray(c.pending) ? c.pending : [];
@@ -368,7 +369,8 @@
     }).filter(function (k) { return /^[a-z0-9_]{1,32}$/.test(k); });
     if (!cleanSkills.length) cleanSkills = ['grammar'];
     var p = { v: 1, t: 'assign', id: a.id, title: a.title, skills: cleanSkills, itemIds: a.itemIds, minutes: a.minutes, from: c.name, cls: c.code, deadline: a.deadline || null, mode: a.mode || 'latihan', timer: a.timer || 0, shuffle: !!a.shuffle };
-    if (a.teacher) p.teacher = String(a.teacher).slice(0, 60);
+    p.teacher = a.teacher || (c && c.teacher) || 'Guru';
+    if (a.teacher) p.teacher = String(a.teacher);
     if (Array.isArray(a.items) && a.items.length) {
       p.items = a.items.map(function (q) {
         var rawSk = typeof q.skill === 'string' ? q.skill.trim().toLowerCase().replace(/[^a-z0-9_]/g, '_').slice(0, 32) : '';
@@ -433,7 +435,8 @@
     var minutes = Math.max(3, Math.round(ids.length * 0.9));
     var a = { id: uid('as'), title: String(opts.title || ('Latihan ' + skills.map(function (k) { return SKILL_LABEL[k] || k; }).join(' + '))).slice(0, 80), skills: skills, itemIds: ids, minutes: minutes, mode: opts.mode || 'latihan', timer: opts.mode === 'ujian' ? (Number(opts.timer) || minutes) : 0, shuffle: opts.mode === 'ujian', deadline: opts.deadline || null, createdAt: Date.now(), targets: opts.targets && opts.targets.length ? opts.targets : null, done: {}, progress: {} };
     if (custom.length) a.items = custom;
-    if (opts.teacher) a.teacher = String(opts.teacher).slice(0, 60);
+    var st; try { st = load(); } catch (_) {}
+    a.teacher = opts.teacher || (st && st.teacher && st.teacher.name) || '';
     if (opts.source) a.source = opts.source;
     if (opts.review) a.review = opts.review;
     return a;
@@ -469,6 +472,10 @@
     map.forEach(function (m) { if (m.acc != null) lines.push('  - ' + m.label + ': ' + pct(m.acc) + (m.low ? ' (' + m.low + ' siswa <50%)' : '')); });
     if (mis.length) { lines.push('', 'Miskonsepsi utama: ' + mis[0].label + ' — ' + mis[0].pattern + '. Rencana: ' + mis[0].lesson + '.'); }
     if (greet.length) { lines.push('', 'Siswa yang perlu disapa: ' + greet.slice(0, 6).map(function (x) { return x.s.name + ' (' + x.r.reasons[0] + ')'; }).join('; ')); }
+    var la = c.latestAnnouncement || (c.announcements && c.announcements.length ? c.announcements[c.announcements.length - 1] : null);
+    if (la && la.text) {
+      lines.push('', 'Pengumuman kelas (' + (la.teacher || (teacher && teacher.name) || 'Wali kelas') + (la.at ? ' · ' + fmtDate(la.at) : '') + '): ' + la.text);
+    }
     lines.push('', (teacher && teacher.name) || 'Guru', (teacher && teacher.school) || '');
     return lines.join('\n').trim();
   }
