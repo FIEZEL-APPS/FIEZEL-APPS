@@ -75,6 +75,8 @@ function accountView(account, role) {
   if (account.teacher_name) view.teacherName = account.teacher_name;
   if (account.institution) view.institution = account.institution;
   if (account.institution_type) view.institutionType = account.institution_type;
+  if (account.subject_id || account.subjectId) view.subjectId = account.subject_id || account.subjectId;
+  if (account.grade_id || account.gradeId) view.gradeId = account.grade_id || account.gradeId;
   return view;
 }
 
@@ -328,7 +330,7 @@ export async function routeTeacherActivate(ctx) {
 
   const codeHash = await hashCode(code);
   const invite = await db.prepare(
-    'SELECT code_hash, teacher_name, institution, institution_type, expires_at, used_at, revoked_at ' +
+    'SELECT code_hash, teacher_name, institution, institution_type, expires_at, used_at, revoked_at, subject_id, grade_id ' +
     'FROM teacher_invite WHERE code_hash = ?1'
   ).bind(codeHash).first();
 
@@ -360,9 +362,9 @@ export async function routeTeacherActivate(ctx) {
       db.prepare('UPDATE auth_account SET role = ?2, institution_id = ?3 WHERE sub = ?1 AND role = ?4')
         .bind(ctx.identity.sub, ROLE.TEACHER, institutionId, ROLE.LEARNER),
       db.prepare('INSERT INTO teacher_profile (sub, teacher_name, institution, institution_type, ' +
-        'institution_id, activated_at) VALUES (?1, ?2, ?3, ?4, ?5, ?6)')
+        'institution_id, activated_at, subject_id, grade_id) VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8)')
         .bind(ctx.identity.sub, invite.teacher_name, invite.institution, invite.institution_type,
-          institutionId, ctx.now)
+          institutionId, ctx.now, invite.subject_id || null, invite.grade_id || null)
     ]);
 
     return jsonResponse({
@@ -372,7 +374,9 @@ export async function routeTeacherActivate(ctx) {
         institution_id: institutionId,
         teacher_name: invite.teacher_name,
         institution: invite.institution,
-        institution_type: invite.institution_type
+        institution_type: invite.institution_type,
+        subject_id: invite.subject_id || null,
+        grade_id: invite.grade_id || null
       }, ROLE.TEACHER)
     }, { headers: ctx.corsHeaders });
   }
@@ -426,9 +430,9 @@ export async function routeTeacherActivate(ctx) {
     db.prepare('INSERT INTO auth_credential (sub, pass_hash, updated_at, failed_count) VALUES (?1, ?2, ?3, 0)')
       .bind(ctx.identity.sub, passHash, ctx.now),
     db.prepare('INSERT INTO teacher_profile (sub, teacher_name, institution, institution_type, ' +
-      'institution_id, activated_at) VALUES (?1, ?2, ?3, ?4, ?5, ?6)')
+      'institution_id, activated_at, subject_id, grade_id) VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8)')
       .bind(ctx.identity.sub, invite.teacher_name, invite.institution, invite.institution_type,
-        institutionId, ctx.now)
+        institutionId, ctx.now, invite.subject_id || null, invite.grade_id || null)
   ]);
 
   return jsonResponse({
@@ -438,7 +442,9 @@ export async function routeTeacherActivate(ctx) {
       institution_id: institutionId,
       teacher_name: invite.teacher_name,
       institution: invite.institution,
-      institution_type: invite.institution_type
+      institution_type: invite.institution_type,
+      subject_id: invite.subject_id || null,
+      grade_id: invite.grade_id || null
     }, ROLE.TEACHER)
   }, { headers: ctx.corsHeaders });
 }

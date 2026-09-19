@@ -762,14 +762,17 @@ async function readTeachers(env, fetchImpl) {
 }
 
 async function mintTeacherInvite(env, input, fetchImpl) {
+  const body = {
+    teacherName: input.teacherName,
+    institution: input.institution,
+    institutionType: input.institutionType,
+    days: input.days,
+  };
+  if (input.subject_id || input.subjectId) body.subject_id = input.subject_id || input.subjectId;
+  if (input.grade_id || input.gradeId) body.grade_id = input.grade_id || input.gradeId;
   return await ownerApiFetch(env, '/api/owner/teacher-invite', fetchImpl, {
     method: 'POST',
-    body: {
-      teacherName: input.teacherName,
-      institution: input.institution,
-      institutionType: input.institutionType,
-      days: input.days,
-    }
+    body
   });
 }
 
@@ -2688,6 +2691,29 @@ function renderTeacherSection(m) {
             <option value="365">365 Hari (1 Tahun)</option>
           </select>
         </div>
+        <div>
+          <label for="f_subject" style="display:block;font-size:12px;font-weight:bold;margin-bottom:4px;color:var(--ink);">Mata Pelajaran yang Diampu</label>
+          <select id="f_subject" name="subject_id">
+            <option value="MAT" selected>Matematika</option>
+            <option value="ENG">Bahasa Inggris</option>
+            <option value="IPA">Ilmu Pengetahuan Alam (IPA)</option>
+            <option value="IPS">Ilmu Pengetahuan Sosial (IPS)</option>
+            <option value="IND">Bahasa Indonesia</option>
+            <option value="INF">Informatika</option>
+            <option value="PKN">Pendidikan Pancasila</option>
+            <option value="SD-ALL">Guru Kelas SD (Tematik)</option>
+            <option value="ALL">Semua Mapel (Kurikulum/Kepsek)</option>
+          </select>
+        </div>
+        <div>
+          <label for="f_grade" style="display:block;font-size:12px;font-weight:bold;margin-bottom:4px;color:var(--ink);">Jenjang / Fase</label>
+          <select id="f_grade" name="grade_id">
+            <option value="SMP" selected>Fase D · SMP (Kelas 7–9)</option>
+            <option value="SMA">Fase E/F · SMA/SMK (Kelas 10–12)</option>
+            <option value="SD">Fase A–C · SD (Kelas 1–6)</option>
+            <option value="ALL">Semua Jenjang</option>
+          </select>
+        </div>
         <div style="grid-column:1/-1;text-align:right;margin-top:6px;">
           <button type="submit">+ Buat Token Guru</button>
         </div>
@@ -3916,7 +3942,9 @@ async function handle(request, env, ctx, nowMs) {
       const institution = url.searchParams.get('institution') || '';
       const institutionType = url.searchParams.get('institutionType') || 'school';
       const days = url.searchParams.get('days') || '90';
-      const mintRes = await mintTeacherInvite(env, { teacherName, institution, institutionType, days }, fetchImpl);
+      const subject_id = url.searchParams.get('subject_id') || 'MAT';
+      const grade_id = url.searchParams.get('grade_id') || 'SMP';
+      const mintRes = await mintTeacherInvite(env, { teacherName, institution, institutionType, days, subject_id, grade_id }, fetchImpl);
       if (mintRes.state === 'ok' && mintRes.body && mintRes.body.code) {
         teacherAction = {
           ok: true,

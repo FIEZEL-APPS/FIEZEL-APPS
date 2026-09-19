@@ -1,6 +1,6 @@
 {
   "schema": "id-golden-baseline/1",
-  "generatedAt": "2026-09-19T09:10:48.787Z",
+  "generatedAt": "2026-09-19T09:24:52.323Z",
   "root": "C:\\Users\\hp\\fiezel-apps",
   "files": {
     "grammar-explanations-id.json": "c99dfaa76ec37e33f80cac08712cfc13a98a405ddb9653ac9f853db0905c33f6",
@@ -18,8 +18,8 @@
     "features/audio-assets/fiezel-audio-key.js": "11624e303917fe0df881ac3f410911587766fd6f4d2491ca6687ec42de8d457d"
   },
   "literals": {
-    "count": 3336,
-    "sha256": "014483a825c90bb4d0a19791fe6f1c2a420a2ef87f716a82e29021fe521392f2",
+    "count": 3342,
+    "sha256": "bd8943304ee0d128a60d21e9280b1693fe75113a0cfa5631f563ec4ff2723578",
     "list": [
       "\n      SETELAH beat concern ≤1000ms selesai (13 §2.2), bukan menimpanya. Tanpa bunyi:\n      SFX hint sudah dipensiunkan (20 §4); cooldown 8 detiknya dijaga komponen. */\n   setTimeout(()=>{try{pawReact(",
       "\n      case 'silent':                        // L5: kalau mulut sempat mulai (taksiran L3 kandas), tutup SEKARANG\n        degradedLatch = false;\n        closeTurn(false);\n        break;\n      case 'interrupt':                     // stop(): snap tutup\n        degradedLatch = false;\n        closeTurn(true);\n        break;\n      default:\n        break;                              // fase asing dari versi fasad lebih baru: diabaikan tanpa suara\n    }\n  }\n\n  try { doc.addEventListener('fiezel-speech', onSpeech); } catch (_) {}\n\n  /* Suara terdegradasi (audibility-fix): mulut mati SEKETIKA dan tidak boleh\n     hidup lagi untuk sisa giliran — apa pun yang masih dikirim lapisan bawah. */\n  try {\n    root.addEventListener('fiezel-neural-voice-degraded', function () {\n      if (turn) closeTurn(true);\n      degradedLatch = true;                 // dilepas oleh end/silent/interrupt fasad berikutnya\n    });\n  } catch (_) {}\n\n  /* Permukaan kecil untuk Diagnostics/tes — bukan API pemanggil biasa:\n     satu-satunya pintu bicara tetap FiezelVoiceSay.say(). */\n  root.FiezelSpeechBridge = Object.freeze({\n    SCHEMA: SCHEMA,\n    speaking: function () { return !!turn; },\n    degraded: function () { return !!degradedLatch; },\n    motionAllowed: motionAllowed\n  });\n})(typeof self !== 'undefined' ? self : (typeof window !== 'undefined' ? window : this));\n",
@@ -528,7 +528,6 @@
       "<div class=\"card\"><p class=\"kicker\">Kompetensi yang kamu sentuh hari ini</p>",
       "<div class=\"card\"><p class=\"muted\">Belum ada evidence. Mulai satu misi dan paspormu akan terisi.</p></div>",
       "<div class=\"card\"><p>Belum ada misi. Minta gurumu mengirim latihan, atau masukkan kode kelas di Paspor Belajar.</p>",
-      "<div class=\"card\">Belum ada kelas. Buat kelas baru untuk mulai.</div>",
       "<div class=\"confidence-card\">\n    <div class=\"confidence-verdict ${ok?'is-ok':'is-no'}\"><i data-lucide=\"${ok?'circle-check-big':'circle-x'}\"></i><b>${ok?FiezelI18n.t('quiz.vonis-benar'):FiezelI18n.t('quiz.vonis-salah')}</b></div>\n    <div id=\"confidenceAsk\">\n      <button type=\"button\" class=\"primary luxe confidence-go\" onclick=\"confidencePopNext()\">${FiezelI18n.t('quiz.keyakinan-lihat-pembahasan')} <i data-lucide=\"arrow-right\"></i></button>\n    </div>\n  </div>",
       "<div class=\"continue-learning-card\" onclick=\"go('${esc(last.view)}')\">\n    <div class=\"continue-card-body\">\n      <small style=\"color:var(--info);font-weight:700;text-transform:uppercase;letter-spacing:.06em\">${esc(FiezelI18n.t('latihan.lanjut-eyebrow',{level:getActiveLevel()}))}</small>\n      <b>${esc(nama)}</b>\n      <small>${esc(FiezelI18n.t('latihan.lanjut-sub'))}</small>\n    </div>\n    <div class=\"continue-card-btn\">${FiezelI18n.t('home.continue-btn')} <i data-lucide=\"play\" style=\"width:14px;height:14px\"></i></div>\n  </div>",
       "<div class=\"fsl-exam-result\"><b>{correct} dari {total} benar.</b><p class=\"fsl-privacy\">Ini skor latihan, bukan band IELTS atau skor TOEFL - konversinya berbeda tiap sesi ujian dan menirunya di sini akan mengarang angka.</p></div>",
@@ -1049,7 +1048,11 @@
       "Bagian yang paling mendukung jawaban ini adalah: “{evidence}”",
       "Bahan yang salah bisa membahayakannya",
       "Bahasa Indonesia",
+      "Bahasa Indonesia (Kelas 7 · SMP)",
       "Bahasa Inggris",
+      "Bahasa Inggris (Kelas 7 · SMP)",
+      "Bahasa Inggris (Kelas 8 · SMP)",
+      "Bahasa Inggris (Kelas 9 · SMP)",
       "Bahasa Inggris harian",
       "Bahasa Jepang",
       "Bahasa Jepang aktif",
@@ -1918,7 +1921,6 @@
       "Kunjungannya ke teman yang patah kaki",
       "Kurikulum Bahasa Inggris Kelas 1–12",
       "Kurikulum Bahasa Inggris Kelas 1–12 tersemai.",
-      "Kurikulum Merdeka & bank soal contoh disiapkan.",
       "Kurikulum Merdeka Bahasa Inggris lengkap Fase A–F: 72 tujuan pembelajaran, 144 kompetensi, plus materi ajar dan prasyarat antar kelas. Disemai sekali, lalu menjadi milik bank kurikulummu.",
       "Kurikulum Merdeka · Target Belajar",
       "Kurikulum → Fase → Kelas → Mapel → Elemen → CP → TP → Indikator → Kompetensi → Topik → Materi → Soal",
@@ -2431,6 +2433,7 @@
       "Pilih jenjang kelas dan mata pelajaran yang Anda ampu.",
       "Pilih level belajar",
       "Pilih level kamu",
+      "Pilih mata pelajaran dan kelas yang Anda ampu agar ruang belajar Anda siap digunakan.",
       "Pilih materi dulu, lalu Fiezel menerangkan di level {level}.",
       "Pilih murid / kode",
       "Pilih peran: murid atau guru",
@@ -2487,6 +2490,7 @@
       "Putar audionya dan pasang telinga baik-baik. Kalau belum nangkep, ulang — ada jatah replay di tiap soal.",
       "Putar sekali penuh sebelum melihat pilihan. Menebak dari satu kata yang tertangkap adalah cara paling cepat salah.",
       "RENCANA HARI INI",
+      "RUANG MATA PELAJARAN",
       "Rak baru yang dipasang pustakawan di ruangan",
       "Rapor bagus itu bonus. Yang lu kejar skill yang kepakai.",
       "Reading cepat itu yang nyelametin lu pas kuliah nanti.",
@@ -2577,6 +2581,7 @@
       "Selesaikan 1 latihan grammar",
       "Selisih menunjukkan jarak antara rasa yakin dan hasil nyata. Semakin kecil, semakin akurat kamu menilai kemampuanmu sendiri.",
       "Seluruh kompetensi kurikulum sudah dilengkapi bank soal siap pakai. Jika Anda hanya ingin membuat kuis atau asesmen untuk kelas, Anda TIDAK PERLU menyusun soal manual di sini — cukup buka tab Asesmen dan gunakan Template Cepat 1-Klik.",
+      "Semua Mata Pelajaran",
       "Semua anak di ruangan itu",
       "Semua barang akan selesai dikemas",
       "Semua bisa melihat siapa yang perlu printer",
@@ -3356,7 +3361,8 @@
       "‹ Kembali ke KelasKu",
       "‹ Kembali ke KelasKu di aplikasi FIEZEL",
       "↑ Sebelumnya",
-      "↓ Berikutnya"
+      "↓ Berikutnya",
+      "🚀 Mulai Mengajar di Ruang Ini"
     ]
   },
   "anchors": {

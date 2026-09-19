@@ -213,6 +213,27 @@
     'kurikulum.st-draft': "Draf",
     'kurikulum.st-archived': "Diarsipkan",
     'kurikulum.pill-transfer': "Soal Kontekstual",
-    'kurikulum.btn-curation-options': "Opsi kurasi & varian soal…"
+    'kurikulum.btn-curation-options': "Opsi kurasi & varian soal…",
+    'kurikulum.sub-mat7': "Matematika (Kelas 7 · SMP)",
+    'kurikulum.sub-mat8': "Matematika (Kelas 8 · SMP)",
+    'kurikulum.sub-mat9': "Matematika (Kelas 9 · SMP)",
+    'kurikulum.sub-eng7': "Bahasa Inggris (Kelas 7 · SMP)",
+    'kurikulum.sub-eng8': "Bahasa Inggris (Kelas 8 · SMP)",
+    'kurikulum.sub-eng9': "Bahasa Inggris (Kelas 9 · SMP)",
+    'kurikulum.sub-ipa7': "IPA (Kelas 7 · SMP)",
+    'kurikulum.sub-ipa8': "IPA (Kelas 8 · SMP)",
+    'kurikulum.sub-ipa9': "IPA (Kelas 9 · SMP)",
+    'kurikulum.sub-ips7': "IPS (Kelas 7 · SMP)",
+    'kurikulum.sub-ind7': "Bahasa Indonesia (Kelas 7 · SMP)",
+    'kurikulum.sub-inf7': "Informatika (Kelas 7 · SMP)",
+    'kurikulum.sub-pkn7': "Pendidikan Pancasila (Kelas 7 · SMP)",
+    'kurikulum.sub-umum': "Semua Mata Pelajaran",
+    'kurikulum.ruang-guru-label': "RUANG MATA PELAJARAN",
+    'kurikulum.welcome-title': "Selamat Datang di Ruang Guru!",
+    'kurikulum.welcome-sub': "Pilih mata pelajaran dan kelas yang Anda ampu agar ruang belajar Anda siap digunakan.",
+    'kurikulum.default-class-name': "Kelas 7A",
+    'kurikulum.welcome-submit': "🚀 Mulai Mengajar di Ruang Ini",
+    'kurikulum.welcome-demo-btn': "Atau Gunakan Kelas Contoh (Demo)",
+    'kurikulum.kompetensi-goal-label': "Kompetensi (goal)"
   });
 })();

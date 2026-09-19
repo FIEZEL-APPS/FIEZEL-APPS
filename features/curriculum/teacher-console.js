@@ -8,7 +8,7 @@
   var E = root.FZEngine, esc = E.esc, api = E.api, toast = E.toast;
   var app = document.getElementById('app');
   var S = {
-    user: null, classes: [], cls: null, view: 'copilot', tree: null, coverage: null,
+    user: null, classes: [], cls: null, activeSubject: null, view: 'copilot', tree: null, coverage: null,
     recs: null, questions: [], reviewQueue: [], tps: [], comps: [], assessments: [],
     drawer: null, modal: null, plan: null, groups: null, busy: false, health: null, blueprintCheck: null,
     engStatus: null, engBusy: false, mapelStatus: null, mapelBusy: false,
@@ -28,6 +28,48 @@
     var s;
     try { var I = root.FiezelI18n; s = I && I.t ? I.t(kunci) : undefined; } catch (_) {}
     return (s === undefined || s === kunci) ? cadangan : s;
+  }
+
+  var GRADES = [
+    ['KELAS-7', t('kurikulum.opt-k7', 'Kelas 7 (Fase D · SMP)')],
+    ['KELAS-8', t('kurikulum.opt-k8', 'Kelas 8 (Fase D · SMP)')],
+    ['KELAS-9', t('kurikulum.opt-k9', 'Kelas 9 (Fase D · SMP)')],
+    ['KELAS-10', t('kurikulum.opt-k10', 'Kelas 10 (Fase E · SMA/SMK)')],
+    ['KELAS-11', t('kurikulum.opt-k11', 'Kelas 11 (Fase F · SMA/SMK)')],
+    ['KELAS-12', t('kurikulum.opt-k12', 'Kelas 12 (Fase F · SMA/SMK)')],
+    ['KELAS-1', t('kurikulum.opt-k1', 'Kelas 1 (Fase A · SD)')],
+    ['KELAS-2', t('kurikulum.opt-k2', 'Kelas 2 (Fase A · SD)')],
+    ['KELAS-3', t('kurikulum.opt-k3', 'Kelas 3 (Fase B · SD)')],
+    ['KELAS-4', t('kurikulum.opt-k4', 'Kelas 4 (Fase B · SD)')],
+    ['KELAS-5', t('kurikulum.opt-k5', 'Kelas 5 (Fase C · SD)')],
+    ['KELAS-6', t('kurikulum.opt-k6', 'Kelas 6 (Fase C · SD)')]
+  ];
+
+  var SUBJECT_CHOICES = [
+    ['MAT-7', t('kurikulum.sub-mat7', 'Matematika (Kelas 7 · SMP)')],
+    ['MAT-8', t('kurikulum.sub-mat8', 'Matematika (Kelas 8 · SMP)')],
+    ['MAT-9', t('kurikulum.sub-mat9', 'Matematika (Kelas 9 · SMP)')],
+    ['ENG-7', t('kurikulum.sub-eng7', 'Bahasa Inggris (Kelas 7 · SMP)')],
+    ['ENG-8', t('kurikulum.sub-eng8', 'Bahasa Inggris (Kelas 8 · SMP)')],
+    ['ENG-9', t('kurikulum.sub-eng9', 'Bahasa Inggris (Kelas 9 · SMP)')],
+    ['IPA-7', t('kurikulum.sub-ipa7', 'IPA (Kelas 7 · SMP)')],
+    ['IPA-8', t('kurikulum.sub-ipa8', 'IPA (Kelas 8 · SMP)')],
+    ['IPA-9', t('kurikulum.sub-ipa9', 'IPA (Kelas 9 · SMP)')],
+    ['IPS-7', t('kurikulum.sub-ips7', 'IPS (Kelas 7 · SMP)')],
+    ['IND-7', t('kurikulum.sub-ind7', 'Bahasa Indonesia (Kelas 7 · SMP)')],
+    ['INF-7', t('kurikulum.sub-inf7', 'Informatika (Kelas 7 · SMP)')],
+    ['PKN-7', t('kurikulum.sub-pkn7', 'Pendidikan Pancasila (Kelas 7 · SMP)')]
+  ];
+
+  function activeSubj() {
+    return (S.cls && S.cls.subject_id) || S.activeSubject || 'MAT-7';
+  }
+
+  function subjName(sid) {
+    for (var i = 0; i < SUBJECT_CHOICES.length; i++) {
+      if (SUBJECT_CHOICES[i][0] === sid) return SUBJECT_CHOICES[i][1];
+    }
+    return sid || t('kurikulum.sub-umum', 'Semua Mata Pelajaran');
   }
 
   var NAV = [
@@ -74,22 +116,62 @@
 
   function start(user) {
     S.user = user;
+    if (user && (user.subjectId || user.subject_id)) {
+      S.activeSubject = user.subjectId || user.subject_id;
+    }
     api('/classes').then(function (list) {
       S.classes = list;
       if (!list.length) {
-        return api('/seed/bootstrap', { body: {} }).then(function (r) {
-          S.classes = [r.class]; S.cls = r.class;
-          toast('Kurikulum Merdeka & bank soal contoh disiapkan.');
-        });
+        openWelcomeModal();
+        return;
       }
       S.cls = list[0];
-    }).then(loadContext).then(render).catch(function (e) { renderAuth(e.message); });
+      if (S.cls && S.cls.subject_id) {
+        S.activeSubject = S.cls.subject_id;
+      }
+      return loadContext().then(render);
+    }).catch(function (e) { renderAuth(e.message); });
+  }
+
+  function openWelcomeModal() {
+    var defSubject = S.activeSubject || 'MAT-7';
+    var defGrade = (S.user && (S.user.gradeId || S.user.grade_id)) || 'KELAS-7';
+    S.modal =
+      '<div class="card tight ink" style="margin-bottom:0;max-width:520px" data-testid="welcome-onboarding-modal">' +
+      '<div class="row between" style="margin-bottom:12px">' +
+        '<h3 style="margin:0">' + esc(t('kurikulum.welcome-title', 'Selamat Datang di Ruang Guru!')) + '</h3>' +
+      '</div>' +
+      '<p class="muted" style="margin-bottom:16px;line-height:1.5">' +
+        esc(t('kurikulum.welcome-sub', 'Pilih mata pelajaran dan kelas yang Anda ampu agar ruang belajar Anda siap digunakan.')) +
+      '</p>' +
+      '<label class="f">' + esc(t('kurikulum.modal-kelas-nama', 'Nama Rombel / Kelas')) +
+        '<input id="welcomeClsName" value="' + esc(t('kurikulum.default-class-name', 'Kelas 7A')) + '" autofocus data-testid="welcome-class-name">' +
+      '</label>' +
+      '<div class="grid g2">' +
+        '<label class="f">' + esc(t('kurikulum.modal-kelas-jenjang', 'Tingkat / Fase')) +
+          '<select id="welcomeClsGrade" data-testid="welcome-class-grade">' +
+            GRADES.map(function (g) { return '<option value="' + g[0] + '"' + (g[0] === defGrade ? ' selected' : '') + '>' + esc(g[1]) + '</option>'; }).join('') +
+          '</select>' +
+        '</label>' +
+        '<label class="f">' + esc(t('kurikulum.modal-kelas-mapel', 'Mata Pelajaran')) +
+          '<select id="welcomeClsSubject" data-testid="welcome-class-subject">' +
+            SUBJECT_CHOICES.map(function (s) { return '<option value="' + s[0] + '"' + (s[0] === defSubject ? ' selected' : '') + '>' + esc(s[1]) + '</option>'; }).join('') +
+          '</select>' +
+        '</label>' +
+      '</div>' +
+      '<div style="margin-top:20px;display:flex;flex-direction:column;gap:10px">' +
+        '<button class="btn primary" data-a="submit-welcome-class" data-testid="submit-welcome-btn">' + esc(t('kurikulum.welcome-submit', '🚀 Mulai Mengajar di Ruang Ini')) + '</button>' +
+        '<button class="btn ghost sm" data-a="bootstrap-demo-class" data-testid="bootstrap-demo-btn">' + esc(t('kurikulum.welcome-demo-btn', 'Atau Gunakan Kelas Contoh (Demo)')) + '</button>' +
+      '</div>' +
+      '</div>';
+    render();
   }
 
   function loadContext() {
+    var sub = activeSubj();
     return Promise.all([
-      api('/curriculum/nodes?type=tp'),
-      api('/curriculum/competencies')
+      api('/curriculum/nodes?type=tp' + (sub ? '&subject_id=' + encodeURIComponent(sub) : '')),
+      api('/curriculum/competencies' + (sub ? '?subject_id=' + encodeURIComponent(sub) : ''))
     ]).then(function (r) { S.tps = r[0]; S.comps = r[1]; });
   }
 
@@ -109,6 +191,10 @@
     app.innerHTML =
       '<div class="shell"><aside class="side">' +
       '<div class="brand"><span class="brand-mark">F</span><div><b>FIEZEL</b><small>Kurikulum & Kompetensi</small></div></div>' +
+      '<div class="card tight ink" style="margin-bottom:12px;padding:8px 10px;background:rgba(56,189,248,0.08);border:1px solid rgba(56,189,248,0.2);border-radius:8px" data-testid="active-subject-badge">' +
+      '<small class="kicker" style="font-size:10px;color:#38bdf8;margin:0;display:block">' + esc(t('kurikulum.ruang-guru-label', 'RUANG MATA PELAJARAN')) + '</small>' +
+      '<b style="font-size:12px;color:var(--text-normal, #cad5e2);display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">' + esc(subjName(activeSubj())) + '</b>' +
+      '</div>' +
       (S.classes.length ? '<label class="f">Kelas aktif<select data-a="pick-class" data-testid="class-select">' +
         S.classes.map(function (c) { return '<option value="' + c.id + '"' + (S.cls && c.id === S.cls.id ? ' selected' : '') + '>' + esc(c.name) + '</option>'; }).join('') +
         '</select></label>' : '') +
@@ -126,7 +212,7 @@
   }
 
   function view() {
-    if (!S.cls) return '<div class="card">Belum ada kelas. Buat kelas baru untuk mulai.</div>';
+    if (!S.cls) return '<div class="card"><h3>' + esc(t('kurikulum.welcome-title', 'Selamat Datang di Ruang Guru!')) + '</h3><p class="muted">' + esc(t('kurikulum.welcome-sub', 'Pilih mata pelajaran dan kelas yang Anda ampu agar ruang belajar Anda siap digunakan.')) + '</p><button class="btn primary sm" data-a="new-class" style="margin-top:10px">+ ' + esc(t('kurikulum.modal-kelas-submit', 'Simpan & Buat Kelas')) + '</button></div>';
     return ({ copilot: vCopilot, coverage: vCoverage, curriculum: vCurriculum, bank: vBank,
               assessment: vAssessment, students: vStudents }[S.view] || vCopilot)();
   }
@@ -199,8 +285,9 @@
   }
 
   function tpOptions(sel) {
+    var sub = activeSubj();
     var list = S.tps.filter(function (t) {
-      return !S.cls || !S.cls.subject_id || t.subject_id === S.cls.subject_id;
+      return !sub || t.subject_id === sub;
     });
     if (!list.length) list = S.tps;
     return list.map(function (t) {
@@ -209,7 +296,8 @@
   }
 
   function loadCoverage() {
-    api('/coverage?class_id=' + S.cls.id).then(function (c) { S.coverage = c; render(); });
+    var sub = activeSubj();
+    api('/coverage?class_id=' + S.cls.id + (sub ? '&subject_id=' + encodeURIComponent(sub) : '')).then(function (c) { S.coverage = c; render(); });
   }
   function loadRecs() {
     api('/braincore/recommendations?class_id=' + S.cls.id).then(function (r) { S.recs = r.recommendations; render(); });
@@ -291,8 +379,9 @@
 
   // ---------------- 3. Struktur kurikulum ----------------
   function vCurriculum() {
-    if (!S.tree) { api('/curriculum/tree?curriculum_id=KURMER&depth=material').then(function (t) { S.tree = t; render(); }); return head(t('kurikulum.kurikulum-head', 'Kurikulum'), t('kurikulum.kurikulum-memuat', 'Memuat learning graph…')); }
-    if (!S.health) { api('/curriculum/health-check').then(function (h) { S.health = h; render(); }); }
+    var sub = activeSubj();
+    if (!S.tree) { api('/curriculum/tree?curriculum_id=KURMER&depth=material' + (sub ? '&subject_id=' + encodeURIComponent(sub) : '')).then(function (t) { S.tree = t; render(); }); return head(t('kurikulum.kurikulum-head', 'Kurikulum'), t('kurikulum.kurikulum-memuat', 'Memuat learning graph…')); }
+    if (!S.health) { api('/curriculum/health-check' + (sub ? '?subject_id=' + encodeURIComponent(sub) : '')).then(function (h) { S.health = h; render(); }); }
     var flatNodes = flattenTree(S.tree);
     var parentOptions = flatNodes.map(function (n) {
       return '<option value="' + esc(n.id) + '">' + esc(n.type.toUpperCase() + ': ' + n.code + ' — ' + (n.name || '').slice(0, 50)) + '</option>';
@@ -309,7 +398,7 @@
       ['grade', t('kurikulum.type.grd', 'Jenjang Kelas')],
       ['phase', t('kurikulum.type.phs', 'Fase Kurikulum')]
     ];
-    return head(t('kurikulum.struktur-judul', 'Struktur Kurikulum'), t('kurikulum.struktur-subjudul', 'Kurikulum sebagai learning graph, bukan daftar nama materi'),
+    return head(t('kurikulum.struktur-judul', 'Struktur Kurikulum') + ' — ' + subjName(sub), t('kurikulum.struktur-subjudul', 'Kurikulum sebagai learning graph, bukan daftar nama materi'),
       'Kurikulum → Fase → Kelas → Mapel → Elemen → CP → TP → Indikator → Kompetensi → Topik → Materi → Soal') +
       '<div class="grid g2"><div class="card" data-testid="curriculum-tree"><p class="kicker">' + t('kurikulum.learning-graph-kicker', 'Learning graph') + '</p><div class="tree">' +
       S.tree.map(nodeHtml).join('') + '</div></div>' +
@@ -486,9 +575,10 @@
   }
 
   function compSelect(id) {
-    var list = S.comps.filter(function (c) { return !S.cls || !S.cls.subject_id || c.subject_id === S.cls.subject_id; });
+    var sub = activeSubj();
+    var list = S.comps.filter(function (c) { return !sub || c.subject_id === sub; });
     if (!list.length) list = S.comps;
-    return '<label class="f">Kompetensi (goal)<select id="' + id + '" data-testid="' + id + '">' +
+    return '<label class="f">' + esc(t('kurikulum.kompetensi-goal-label', 'Kompetensi (goal)')) + '<select id="' + id + '" data-testid="' + id + '">' +
       list.map(function (c) { return '<option value="' + c.id + '">' + esc(c.code) + ' — ' + esc(c.name.slice(0, 52)) + '</option>'; }).join('') +
       '</select></label>';
   }
@@ -551,16 +641,20 @@
 
   function loadBank() {
     S.bankLoaded = true;
-    var qq = '/questions?limit=60' + (S.filterTp ? '&tp_id=' + S.filterTp : '');
-    Promise.all([api(qq + '&status=PUBLISHED'), api('/questions/review/queue')]).then(function (r) {
+    var sub = activeSubj();
+    var qq = '/questions?limit=60' + (sub ? '&subject_id=' + encodeURIComponent(sub) : '') + (S.filterTp ? '&tp_id=' + encodeURIComponent(S.filterTp) : '');
+    Promise.all([
+      api(qq + '&status=PUBLISHED'),
+      api('/questions/review/queue' + (sub ? '?subject_id=' + encodeURIComponent(sub) : ''))
+    ]).then(function (r) {
       S.questions = r[0]; S.reviewQueue = r[1].items; render();
     });
   }
 
   // ---------------- 5. Asesmen ----------------
   function vAssessment() {
-    if (!S.assessments.length && !S.asLoaded) { loadAssessments(); return head(t('kurikulum.as-head', 'Asesmen'), t('kurikulum.as-memuat', 'Memuat…')); }
-    var subjectTps = S.tps.filter(function (t) { return !S.cls.subject_id || t.subject_id === S.cls.subject_id; });
+    var sub = activeSubj();
+    var subjectTps = S.tps.filter(function (t) { return !sub || t.subject_id === sub; });
     if (!subjectTps.length) subjectTps = S.tps;
     var bpRows = S.bpRows || [{ tp: subjectTps[0] && subjectTps[0].id, count: 5 }];
     S.bpRows = bpRows;
@@ -717,29 +811,7 @@
     if (a === 'close') { S.drawer = null; S.modal = null; return render(); }
     if (a === 'view') { S.view = el.getAttribute('data-v'); S.drawer = null; S.modal = null; return render(); }
     if (a === 'new-class') {
-      var GRADES = [
-        ['KELAS-7', t('kurikulum.opt-k7', 'Kelas 7 (Fase D · SMP)')],
-        ['KELAS-8', t('kurikulum.opt-k8', 'Kelas 8 (Fase D · SMP)')],
-        ['KELAS-9', t('kurikulum.opt-k9', 'Kelas 9 (Fase D · SMP)')],
-        ['KELAS-10', t('kurikulum.opt-k10', 'Kelas 10 (Fase E · SMA/SMK)')],
-        ['KELAS-11', t('kurikulum.opt-k11', 'Kelas 11 (Fase F · SMA/SMK)')],
-        ['KELAS-12', t('kurikulum.opt-k12', 'Kelas 12 (Fase F · SMA/SMK)')],
-        ['KELAS-1', t('kurikulum.opt-k1', 'Kelas 1 (Fase A · SD)')],
-        ['KELAS-2', t('kurikulum.opt-k2', 'Kelas 2 (Fase A · SD)')],
-        ['KELAS-3', t('kurikulum.opt-k3', 'Kelas 3 (Fase B · SD)')],
-        ['KELAS-4', t('kurikulum.opt-k4', 'Kelas 4 (Fase B · SD)')],
-        ['KELAS-5', t('kurikulum.opt-k5', 'Kelas 5 (Fase C · SD)')],
-        ['KELAS-6', t('kurikulum.opt-k6', 'Kelas 6 (Fase C · SD)')]
-      ];
-      var SUBJECTS = [
-        ['ENG-7', t('kurikulum.sub-eng', 'Bahasa Inggris')],
-        ['MAT-7', t('kurikulum.sub-mat', 'Matematika')],
-        ['IND-7', t('kurikulum.sub-ind', 'Bahasa Indonesia')],
-        ['IPA-7', t('kurikulum.sub-ipa', 'Ilmu Pengetahuan Alam (IPA)')],
-        ['IPS-7', t('kurikulum.sub-ips', 'Ilmu Pengetahuan Sosial (IPS)')],
-        ['INF-7', t('kurikulum.sub-inf', 'Informatika')],
-        ['PKN-7', t('kurikulum.sub-pkn', 'Pendidikan Pancasila')]
-      ];
+      var defSub = activeSubj();
       S.modal =
         '<div class="card tight" style="margin-bottom:0">' +
         '<div class="row between" style="margin-bottom:12px"><h3>' + t('kurikulum.modal-kelas-judul', 'Buat Kelas Baru') + '</h3><button class="btn sm ghost" data-a="close">' + t('kurikulum.tutup', 'Tutup') + '</button></div>' +
@@ -755,7 +827,7 @@
           '</label>' +
           '<label class="f">' + t('kurikulum.modal-kelas-mapel', 'Mata Pelajaran') +
             '<select id="newClsSubject" data-testid="new-class-subject">' +
-              SUBJECTS.map(function (s) { return '<option value="' + s[0] + '"' + (s[0] === 'ENG-7' ? ' selected' : '') + '>' + esc(s[1]) + '</option>'; }).join('') +
+              SUBJECT_CHOICES.map(function (s) { return '<option value="' + s[0] + '"' + (s[0] === defSub ? ' selected' : '') + '>' + esc(s[1]) + '</option>'; }).join('') +
             '</select>' +
           '</label>' +
         '</div>' +
@@ -769,14 +841,47 @@
     if (a === 'submit-new-class') {
       var name = val('newClsName');
       var grade = val('newClsGrade') || 'KELAS-7';
-      var subject = val('newClsSubject') || 'ENG-7';
+      var subject = val('newClsSubject') || 'MAT-7';
       if (!name) { toast(t('kurikulum.nama-kelas-kosong', 'Nama kelas wajib diisi.')); return; }
       el.disabled = true;
       return api('/classes', { body: { name: name, grade_id: grade, subject_id: subject } }).then(function (c) {
-        S.classes.push(c); S.cls = c; S.modal = null; resetCaches();
+        S.classes.push(c); S.cls = c; S.activeSubject = c.subject_id; S.modal = null; resetCaches();
         toast(t('kurikulum.kelas-berhasil-dibuat', 'Kelas dibuat. Kode: ') + c.code);
-        render();
+        return loadContext().then(render);
       }).catch(errToast);
+    }
+    if (a === 'submit-welcome-class') {
+      var wName = val('welcomeClsName') || t('kurikulum.default-class-name', 'Kelas 7A');
+      var wGrade = val('welcomeClsGrade') || 'KELAS-7';
+      var wSub = val('welcomeClsSubject') || 'MAT-7';
+      el.disabled = true;
+      return api('/classes', { body: { name: wName, grade_id: wGrade, subject_id: wSub } }).then(function (c) {
+        S.classes = [c];
+        S.cls = c;
+        S.activeSubject = c.subject_id;
+        S.modal = null;
+        resetCaches();
+        toast(t('kurikulum.kelas-berhasil-dibuat', 'Kelas dibuat. Kode: ') + c.code);
+        return loadContext().then(render);
+      }).catch(function (e) {
+        el.disabled = false;
+        errToast(e);
+      });
+    }
+    if (a === 'bootstrap-demo-class') {
+      el.disabled = true;
+      return api('/seed/bootstrap', { body: {} }).then(function (r) {
+        S.classes = [r.class];
+        S.cls = r.class;
+        S.activeSubject = r.class.subject_id || 'MAT-7';
+        S.modal = null;
+        resetCaches();
+        toast(t('kurikulum.kelas-berhasil-dibuat', 'Kelas dibuat. Kode: ') + r.class.code);
+        return loadContext().then(render);
+      }).catch(function (e) {
+        el.disabled = false;
+        errToast(e);
+      });
     }
     if (a === 'seed-english' || a === 'seed-mapel' || a === 'seed-soal') {
       var d = SEMAI[a === 'seed-english' ? 'english' : (a === 'seed-mapel' ? 'mapel' : 'soal')];
@@ -967,7 +1072,8 @@
       return;
     }
     if (a === 'bp-add') {
-      var pool = S.tps.filter(function (t) { return !S.cls.subject_id || t.subject_id === S.cls.subject_id; });
+      var sub = activeSubj();
+      var pool = S.tps.filter(function (t) { return !sub || t.subject_id === sub; });
       if (!pool.length) pool = S.tps;
       S.bpRows.push({ tp: pool[0] && pool[0].id, count: 5 });
       return render();
@@ -1021,7 +1127,11 @@
     var a = el.getAttribute('data-a');
     if (a === 'pick-class') {
       S.cls = S.classes.filter(function (c) { return c.id === el.value; })[0];
-      resetCaches(); render();
+      if (S.cls && S.cls.subject_id) {
+        S.activeSubject = S.cls.subject_id;
+      }
+      resetCaches();
+      loadContext().then(render);
     }
     if (a === 'filter-tp') { S.filterTp = el.value; S.bankLoaded = false; loadBank(); }
     if (a === 'bp-tp') { S.bpRows[+el.getAttribute('data-i')].tp = el.value; }
@@ -1051,6 +1161,7 @@
     S.coverage = null; S.recs = null; S.assessments = []; S.asLoaded = false;
     S.students = null; S.bankLoaded = false; S.questions = []; S.reviewQueue = [];
     S.plan = null; S.groups = null; S.bpRows = null; S.blueprintCheck = null;
+    S.tree = null; S.health = null;
   }
 
   function errToast(e) { toast(e.message || 'Gagal.'); render(); }
