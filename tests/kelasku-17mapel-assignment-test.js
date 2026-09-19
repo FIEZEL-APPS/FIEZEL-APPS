@@ -176,6 +176,8 @@ assert(payload.mode === 'ujian', 'Payload membawa mode ujian');
 assert(payload.timer === 15, 'Payload membawa timer 15 menit');
 assert(Array.isArray(payload.items) && payload.items.length === 3, 'Payload membawa 3 butir soal lengkap ke murid');
 assert(payload.items[0].prompt.includes('Pusat kendali'), 'Prompt soal murid terbaca sempurna');
+assert(Array.isArray(payload.skills) && payload.skills[0] === 'ipa', 'Skills dinormalisasi ke lowercase (ipa) agar lolos validasi server');
+assert(payload.items.every(function(it) { return it.skill === 'ipa'; }), 'Setiap butir soal kustom dinormalisasi skill-nya ke lowercase');
 
 // 6. Uji runner murid (resolveItem)
 function resolveItem(a, id) {
@@ -223,6 +225,39 @@ allMapelIds.forEach(function (mId) {
 
 assert(totalVerifiedQuestions === 17 * 5, `Semua 85 butir soal dari 17 mata pelajaran memiliki prompt, 4 opsi, indeks kunci valid, dan penjelasan pembahasan`);
 assert(nonZeroAnswersCount > 10, `Pengacakan opsi (shuffleOptions) terbukti aktif: kunci jawaban tersebar di opsi B/C/D (${nonZeroAnswersCount} dari 85 soal tidak di index 0)`);
+
+// 8b. Verifikasi Permintaan 10, 15, dan 20 Soal: 100% Bebas dari Dummy Template Tiruan
+const dummyPhrases = [
+  'Dalam pembelajaran',
+  'manakah pernyataan yang paling tepat secara konsep',
+  'Pernyataan yang menerapkan konsep',
+  'Pernyataan yang keliru karena mengabaikan syarat',
+  'esensi capaian pembelajaran materi'
+];
+
+[10, 15, 20].forEach(function (reqCount) {
+  allMapelIds.forEach(function (mId) {
+    const qs = TShell._synthesizeMapelQuestions(mId, 'KOMP-' + mId + '-TEST', 'Uji Skala ' + mId, reqCount);
+    assert(qs.length === reqCount, `Mapel ${mId} (req=${reqCount}): menghasilkan tepat ${reqCount} butir soal`);
+
+    // Pastikan tidak ada satupun soal dummy template generik
+    qs.forEach(function (q, idx) {
+      dummyPhrases.forEach(function (phrase) {
+        assert(!q.prompt.includes(phrase), `Mapel ${mId} butir #${idx+1} tidak boleh mengandung template dummy '${phrase}'`);
+        q.options.forEach(function (opt) {
+          assert(!opt.includes(phrase), `Mapel ${mId} butir #${idx+1} opsi tidak boleh mengandung template dummy '${phrase}'`);
+        });
+        if (q.why && q.why[q.answer]) {
+          assert(!q.why[q.answer].includes(phrase), `Mapel ${mId} butir #${idx+1} pembahasan tidak boleh mengandung template dummy '${phrase}'`);
+        }
+      });
+      assert(Array.isArray(q.options) && q.options.length === 4, `Mapel ${mId} butir #${idx+1} memiliki 4 opsi`);
+      assert(typeof q.answer === 'number' && q.answer >= 0 && q.answer < 4, `Mapel ${mId} butir #${idx+1} memiliki indeks kunci valid`);
+      assert(q.why && typeof q.why[q.answer] === 'string' && q.why[q.answer].length > 0, `Mapel ${mId} butir #${idx+1} memiliki pembahasan kunci`);
+    });
+  });
+});
+console.log('  OK: Permintaan 10, 15, dan 20 soal untuk seluruh 17 mapel 100% memuat soal kurikulum autentik (0 dummy template)');
 
 // 9. Uji fz-api endpoint questions
 const apiPath = path.join(__dirname, '..', 'features/curriculum/fz-api.js');

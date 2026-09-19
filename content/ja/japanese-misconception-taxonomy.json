@@ -1,0 +1,52 @@
+{
+  "schema": "fiezel-japanese-misconception-taxonomy-v1",
+  "target": "ja",
+  "catatan": "Taksonomi miskonsepsi distraktor kanonik untuk kurikulum tata bahasa Jepang (JLPT N5-N4). Menyatukan diagnosis kesalahan partikel, bentuk kata kerja, dan kata sifat ke kode bernilai diagnostik.",
+  "codes": {
+    "particles.wa_for_new_info": {
+      "label": "Partikel は dipakai untuk informasi yang baru",
+      "familyHint": "particles",
+      "description_id": "Murid memakai は untuk kata benda yang justru baru diketahui atau menjawab kata tanya, seharusnya memakai が."
+    },
+    "particles.o_for_subject": {
+      "label": "Partikel を dipakai untuk pelaku/subjek",
+      "familyHint": "particles",
+      "description_id": "Murid menempelkan を pada pelaku aksi, bukan pada objek penderita pengerjaan."
+    },
+    "particles.mo_without_antecedent": {
+      "label": "Partikel も dipakai tanpa anteseden",
+      "familyHint": "particles",
+      "description_id": "Murid memakai も (juga) padahal belum ada rujukan pembanding sebelumnya di konteks percakapan."
+    },
+    "particles.ni_de_location": {
+      "label": "Tertukar lokasi keberadaan (に) dengan lokasi aksi (で)",
+      "familyHint": "particles",
+      "description_id": "Murid memakai に untuk tempat dilakukannya kegiatan dinamis, atau で untuk letak keberadaan statis (いる/ある)."
+    },
+    "particles.to_de_instrument": {
+      "label": "Tertukar penyerta (と) dengan sarana/alat (で)",
+      "familyHint": "particles",
+      "description_id": "Murid memakai と untuk alat/kendaraan atau で untuk orang yang menemani."
+    },
+    "particles.e_ni_direction": {
+      "label": "Tertukar arah tujuan (へ) dengan titik waktu/tujuan pasti (に)",
+      "familyHint": "particles",
+      "description_id": "Murid keliru membedakan penanda arah pergerakan dengan penanda waktu pasti atau kontak langsung."
+    },
+    "verb_forms.te_form_conjugation": {
+      "label": "Kekeliruan konjugasi bentuk te",
+      "familyHint": "te_form",
+      "description_id": "Aturan sambungan bentuk te (u/tsu/ru -> tte, bu/mu/nu -> nde, ku -> ite, gu -> ide) tertukar antar golongan kata kerja."
+    },
+    "verb_forms.polite_plain_mismatch": {
+      "label": "Bercampur bentuk sopan (desu/masu) dengan bentuk biasa (plain)",
+      "familyHint": "polite_forms",
+      "description_id": "Bentuk masu/desu diselipkan di dalam anak kalimat atau klausul modifikasi yang mewajibkan bentuk biasa."
+    },
+    "adjectives.i_na_inflection": {
+      "label": "Infleksi kata sifat i dan na tertukar",
+      "familyHint": "adjectives",
+      "description_id": "Menempelkan na pada i-adjective atau membuang i dari i-adjective sebelum kata benda, atau negasi ku-nai vs dewa-arimasen tertukar."
+    }
+  }
+}

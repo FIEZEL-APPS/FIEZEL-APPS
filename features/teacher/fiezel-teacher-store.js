@@ -47,6 +47,7 @@
   };
   Object.keys(MAPEL_NAMES).forEach(function (k) {
     SKILL_LABEL[k] = MAPEL_NAMES[k];
+    SKILL_LABEL[k.toLowerCase()] = MAPEL_NAMES[k];
   });
   var ATT = { H: 'Hadir', I: 'Izin', S: 'Sakit', A: 'Alpa' };
 
@@ -97,6 +98,7 @@
     c.students = (c.students || []).map(normalizeStudent);
     c.assignments = c.assignments || [];
     c.announcements = c.announcements || [];
+    c.latestAnnouncement = c.latestAnnouncement || (c.announcements.length ? c.announcements[c.announcements.length - 1] : null);
     c.journal = c.journal || [];
     c.sentItemIds = c.sentItemIds || [];
     c.pending = Array.isArray(c.pending) ? c.pending : [];
@@ -361,7 +363,26 @@
   }
   function pendingJoins(c) { return (c && Array.isArray(c.pending) ? c.pending : []).slice().sort(function (a, b) { return (b.at || 0) - (a.at || 0); }); }
   /** Bentuk payload tugas yang dikirim ke server = isi kode tugas (tanpa base64). */
-  function assignmentPayload(c, a) { var p = { v: 1, t: 'assign', id: a.id, title: a.title, skills: a.skills, itemIds: a.itemIds, minutes: a.minutes, from: c.name, cls: c.code, deadline: a.deadline || null, mode: a.mode || 'latihan', timer: a.timer || 0, shuffle: !!a.shuffle }; if (a.teacher) p.teacher = String(a.teacher).slice(0, 60); if (Array.isArray(a.items) && a.items.length) p.items = a.items.map(function (q) { var o = { id: q.id, prompt: q.prompt, options: q.options, answer: q.answer, skill: q.skill }; if (q.context) o.context = q.context; if (q.why && Object.keys(q.why).length) o.why = q.why; return o; }); return p; }
+  function assignmentPayload(c, a) {
+    var cleanSkills = (a.skills || []).map(function (k) {
+      return String(k || '').trim().toLowerCase().replace(/[^a-z0-9_]/g, '_').slice(0, 32);
+    }).filter(function (k) { return /^[a-z0-9_]{1,32}$/.test(k); });
+    if (!cleanSkills.length) cleanSkills = ['grammar'];
+    var p = { v: 1, t: 'assign', id: a.id, title: a.title, skills: cleanSkills, itemIds: a.itemIds, minutes: a.minutes, from: c.name, cls: c.code, deadline: a.deadline || null, mode: a.mode || 'latihan', timer: a.timer || 0, shuffle: !!a.shuffle };
+    p.teacher = a.teacher || (c && c.teacher) || 'Guru';
+    if (a.teacher) p.teacher = String(a.teacher);
+    if (Array.isArray(a.items) && a.items.length) {
+      p.items = a.items.map(function (q) {
+        var rawSk = typeof q.skill === 'string' ? q.skill.trim().toLowerCase().replace(/[^a-z0-9_]/g, '_').slice(0, 32) : '';
+        var sk = /^[a-z0-9_]{1,32}$/.test(rawSk) ? rawSk : cleanSkills[0];
+        var o = { id: q.id, prompt: q.prompt, options: q.options, answer: q.answer, skill: sk };
+        if (q.context) o.context = q.context;
+        if (q.why && Object.keys(q.why).length) o.why = q.why;
+        return o;
+      });
+    }
+    return p;
+  }
   function assignmentCode(c, a) { return b64e(assignmentPayload(c, a)); }
   function parseAssignmentCode(code) { try { var p = b64d(code); if (!p || p.t !== 'assign' || !Array.isArray(p.itemIds)) return null; return p; } catch (_) { return null; } }
   /** Sisi murid: simpan tugas dari kode guru ke antrean Today Plan (dipakai learner-flow). */
@@ -414,7 +435,8 @@
     var minutes = Math.max(3, Math.round(ids.length * 0.9));
     var a = { id: uid('as'), title: String(opts.title || ('Latihan ' + skills.map(function (k) { return SKILL_LABEL[k] || k; }).join(' + '))).slice(0, 80), skills: skills, itemIds: ids, minutes: minutes, mode: opts.mode || 'latihan', timer: opts.mode === 'ujian' ? (Number(opts.timer) || minutes) : 0, shuffle: opts.mode === 'ujian', deadline: opts.deadline || null, createdAt: Date.now(), targets: opts.targets && opts.targets.length ? opts.targets : null, done: {}, progress: {} };
     if (custom.length) a.items = custom;
-    if (opts.teacher) a.teacher = String(opts.teacher).slice(0, 60);
+    var st; try { st = load(); } catch (_) {}
+    a.teacher = opts.teacher || (st && st.teacher && st.teacher.name) || '';
     if (opts.source) a.source = opts.source;
     if (opts.review) a.review = opts.review;
     return a;
@@ -450,6 +472,10 @@
     map.forEach(function (m) { if (m.acc != null) lines.push('  - ' + m.label + ': ' + pct(m.acc) + (m.low ? ' (' + m.low + ' siswa <50%)' : '')); });
     if (mis.length) { lines.push('', 'Miskonsepsi utama: ' + mis[0].label + ' — ' + mis[0].pattern + '. Rencana: ' + mis[0].lesson + '.'); }
     if (greet.length) { lines.push('', 'Siswa yang perlu disapa: ' + greet.slice(0, 6).map(function (x) { return x.s.name + ' (' + x.r.reasons[0] + ')'; }).join('; ')); }
+    var la = c.latestAnnouncement || (c.announcements && c.announcements.length ? c.announcements[c.announcements.length - 1] : null);
+    if (la && la.text) {
+      lines.push('', 'Pengumuman kelas (' + (la.teacher || (teacher && teacher.name) || 'Wali kelas') + (la.at ? ' · ' + fmtDate(la.at) : '') + '): ' + la.text);
+    }
     lines.push('', (teacher && teacher.name) || 'Guru', (teacher && teacher.school) || '');
     return lines.join('\n').trim();
   }

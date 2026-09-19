@@ -88,6 +88,7 @@
     'ringkas.naik': 'สิ่งที่ดีขึ้นวันนี้',
     'ringkas.naik-kosong': 'ยังไม่มีอะไรขึ้นมากพอจะบันทึก เป็นเรื่องปกติของรอบเดียว',
     'ringkas.besok': 'ครบกำหนดพรุ่งนี้',
+    'ringkas.kalibrasi': 'ความมั่นใจของเธอแม่นแค่ไหน',
     'ringkas.besok-kosong': 'พรุ่งนี้ไม่มีอะไรครบกำหนด',
     'ringkas.besok-item': 'มี {jumlah} เรื่องรอทบทวน',
     'ringkas.baris-naik': '{skill} เพิ่มขึ้น {delta} คะแนน',
@@ -159,6 +160,8 @@
     'latihan.lanjut-sub': 'เรียนบทนี้ให้จบเพื่อยืนยันความเข้าใจของคุณ',
     'latihan.booster-tag': 'AI Booster',
     'latihan.booster-sub': 'ความแม่นยำ {akurasi}% · แนะนำให้ฝึก {menit} นาที',
+    'latihan.booster-tag-tertukar': 'มักสับสนกัน',
+    'latihan.booster-sub-tertukar': '{persen}% ของข้อผิดพลาดตรงนี้ใช้กฎของ {lawan} มาฝึกแยกความต่างกัน',
     'latihan.booster-cta': 'ฝึก',
 
     'flash.suara-belum-ada': 'ยังไม่มีเสียงสำหรับ{bahasa} เราจึงซ่อนปุ่มฟังไว้ก่อน เพื่อไม่ให้คุณจำคำอ่านที่ผิดไป'

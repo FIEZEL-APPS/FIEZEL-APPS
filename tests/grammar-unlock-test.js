@@ -1,5 +1,10 @@
 const __fzRoot = require('path').join(__dirname, '..'); /* m025-254: berkas ini pindah dari root ke tests/. __dirname dulu BERARTI root repo, dan puluhan gerbang memakainya untuk menunjuk berkas produksi - alias ini menjaga makna itu tetap benar tanpa menyunting setiap pemakaian. */
 // m025-137 — gate untuk B-05: prasyarat Grammar harus MENGUNCI, bukan sekadar tampil.
+// m025-337 — diperluas untuk otoritas BKT: lessonUnlockState() menerima Set opsional
+// ketiga (skill yang lolos FiezelMasteryBKT.masteryGate()) sebagai jalur TAMBAHAN menuju
+// unlock. Semua check DI ATAS bagian "Otoritas BKT" di bawah memanggil unlockFor() tanpa
+// argumen ke-3 dan karena itu MEMBUKTIKAN regresi: kalau otoritas BKT diam-diam mengubah
+// perilaku default, check lama itu sendiri yang merah lebih dulu.
 //
 // Gate ini sengaja menjalankan lessonUnlockState() yang asli di dalam vm, bukan mencocokkan
 // regex. Alasannya: temuan B-05 muncul justru karena kode yang MENYEBUT prasyarat sudah ada
@@ -56,11 +61,17 @@ function makeSandbox(grammarProgress) {
   };
 }
 
-function unlockFor(skill, grammarProgress) {
+function unlockFor(skill, grammarProgress, bktMasteredList) {
   const sandbox = makeSandbox(grammarProgress);
   vm.createContext(sandbox);
   vm.runInContext(blocks.join('\n'), sandbox, { timeout: 2000 });
-  return vm.runInContext(`lessonUnlockState(${JSON.stringify(skill)})`, sandbox, { timeout: 2000 });
+  // bktMasteredList absen/undefined -> panggilan 1-argumen yang PERSIS sama dengan sebelum
+  // otoritas BKT ada. Hanya check yang sengaja meminta Set (termasuk Set kosong lewat []) yang
+  // menyentuh jalur baru sama sekali.
+  const call = bktMasteredList !== undefined
+    ? `lessonUnlockState(${JSON.stringify(skill)}, state, new Set(${JSON.stringify(bktMasteredList)}))`
+    : `lessonUnlockState(${JSON.stringify(skill)})`;
+  return vm.runInContext(call, sandbox, { timeout: 2000 });
 }
 
 const roots = lessons.filter(lesson => !lesson.prerequisites.length);
@@ -112,6 +123,33 @@ if (sample.prerequisites.length > 1) {
     `${sample.lessonId} needs all of ${sample.prerequisites.join(', ')}`
   );
 }
+
+// --- Otoritas BKT (m025-337): masteryGate() sebagai jalur TAMBAHAN menuju unlock --------
+// "BKT nya jangan di bekukan" (permintaan OWNER) = otoritas dibuka, bukan parameternya.
+// Kontraknya: BKT hanya boleh MEMBUKA, tidak pernah MENGUNCI ulang yang sudah terbuka.
+check(
+  'BKT masteryGate membuka prasyarat walau akurasi mentah masih 0',
+  unlockFor(sample.lessonId, {}, sample.prerequisites).locked === false,
+  `${sample.lessonId} dengan bktMastered=${JSON.stringify(sample.prerequisites)}, akurasi mentah 0`
+);
+if (sample.prerequisites.length > 1) {
+  check(
+    'BKT parsial (belum semua prasyarat lolos gate) tetap mengunci',
+    unlockFor(sample.lessonId, {}, [sample.prerequisites[0]]).locked === true,
+    `${sample.lessonId}: hanya ${sample.prerequisites[0]} yang lolos masteryGate`
+  );
+}
+check(
+  'Set BKT kosong berperilaku identik dengan argumen absen (nol regresi otoritas)',
+  unlockFor(sample.lessonId, {}, []).locked === true &&
+    unlockFor(sample.lessonId, {}, []).locked === unlockFor(sample.lessonId, {}).locked,
+  'Set kosong tidak boleh membuka apa pun yang argumen absen juga tidak buka'
+);
+check(
+  'BKT tidak bisa membuka lesson yang prasyaratnya tidak ia sebut sama sekali',
+  unlockFor(sample.lessonId, {}, ['skill-asing-yang-bukan-prasyarat']).locked === true,
+  'mastery pada skill di luar daftar prasyarat tidak relevan bagi lesson ini'
+);
 
 // Jalur penuh: kerjakan kurikulum berurutan, setiap lesson harus terbuka tepat pada gilirannya.
 const progress = {};

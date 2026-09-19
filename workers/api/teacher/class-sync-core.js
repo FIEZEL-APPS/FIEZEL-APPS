@@ -150,7 +150,8 @@ export function normalizeCustomItems(items) {
     if (options.some((o) => !o)) return { ok: false, reason: 'bad_custom_options' };
     const answer = intIn(q.answer, options.length - 1);
     if (answer == null) return { ok: false, reason: 'bad_custom_answer' };
-    const skill = typeof q.skill === 'string' && /^[a-z0-9_]{1,32}$/.test(q.skill) ? q.skill : 'grammar';
+    const rawSkill = typeof q.skill === 'string' ? q.skill.trim().toLowerCase().replace(/[^a-z0-9_]/g, '_').slice(0, 32) : '';
+    const skill = /^[a-z0-9_]{1,32}$/.test(rawSkill) ? rawSkill : 'grammar';
     const item = { id, prompt, options, answer, skill };
     if (typeof q.context === 'string' && q.context.trim()) item.context = q.context.trim().slice(0, ASSIGN_LIMITS.CONTEXT_MAX);
     if (q.why && typeof q.why === 'object' && !Array.isArray(q.why)) {
@@ -178,7 +179,13 @@ export function normalizeAssignment(body) {
   if (!id) return { ok: false, reason: 'bad_assign_id' };
   const title = String(a.title || '').trim().slice(0, ASSIGN_LIMITS.TITLE_MAX) || 'Tugas';
   if (!Array.isArray(a.skills) || !a.skills.length || a.skills.length > ASSIGN_LIMITS.SKILLS_MAX) return { ok: false, reason: 'bad_skills' };
-  for (const k of a.skills) if (!/^[a-z0-9_]{1,32}$/.test(String(k))) return { ok: false, reason: 'bad_skill_key' };
+  const cleanSkills = [];
+  for (const raw of a.skills) {
+    const k = String(raw || '').trim().toLowerCase().replace(/[^a-z0-9_]/g, '_').slice(0, 32);
+    if (!/^[a-z0-9_]{1,32}$/.test(k)) return { ok: false, reason: 'bad_skill_key' };
+    if (cleanSkills.indexOf(k) === -1) cleanSkills.push(k);
+  }
+  if (!cleanSkills.length) return { ok: false, reason: 'bad_skills' };
   if (!Array.isArray(a.itemIds) || !a.itemIds.length || a.itemIds.length > ASSIGN_LIMITS.ITEMS_MAX) return { ok: false, reason: 'bad_items' };
   for (const it of a.itemIds) if (typeof it !== 'string' || !it || it.length > ASSIGN_LIMITS.ITEM_ID_MAX) return { ok: false, reason: 'bad_item_id' };
   const minutes = intIn(a.minutes, 240) || 5;
@@ -186,7 +193,7 @@ export function normalizeAssignment(body) {
   const timer = intIn(a.timer, 240) || 0;
   const deadline = typeof a.deadline === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(a.deadline) ? a.deadline : null;
   const from = String(a.from || '').trim().slice(0, ASSIGN_LIMITS.FROM_MAX);
-  const payload = { v: 1, t: 'assign', id, title, skills: a.skills.map(String), itemIds: a.itemIds.slice(), minutes, from, cls: code, deadline, mode, timer, shuffle: !!a.shuffle };
+  const payload = { v: 1, t: 'assign', id, title, skills: cleanSkills, itemIds: a.itemIds.slice(), minutes, from, cls: code, deadline, mode, timer, shuffle: !!a.shuffle };
   const teacher = String(a.teacher || '').trim().slice(0, ASSIGN_LIMITS.TEACHER_MAX);
   if (teacher) payload.teacher = teacher;
   if (a.items !== undefined) {

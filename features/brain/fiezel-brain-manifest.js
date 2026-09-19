@@ -33,14 +33,24 @@
  *   estimateAbility (coreBrainAttempts) dan bobot bukti BKT.
  * - affectTargetSuccess: AKTIF — menggeser targetSuccess pemilih soal
  *   (frustrated 0.90 / bored 0.75 / default 0.80).
- * - bktUnlock (mastery-bkt): BAYANGAN — bukti dicatat, tetapi panel diagnostik
- *   sendiri memberi label "bayangan - tanpa otoritas unlock"; keputusan buka-kunci
- *   masih di mesin lama (app.js bktShadowMarkup).
- * - confusionMap (confusion-matrix): BAYANGAN — sel kebingungan dicatat ke
- *   penyimpanan lokal oleh app.js tetapi TIDAK pernah dibaca untuk keputusan
- *   maupun UI (hanya terekspos lewat __fiezelAudit).
- * - olmInsight (olm): BAYANGAN — hanya dirender di panel diagnostik
- *   (olmPanelMarkup), tidak memutuskan apa pun.
+ * - bktUnlock (mastery-bkt): AKTIF sejak m025-337 (permintaan OWNER: "BKT nya jangan
+ *   di bekukan" — parameter L0/T/slip/guess TETAP beku, lihat BRAIN-EVOLUTION-DECISIONS.md
+ *   §5; yang dibuka adalah OTORITASNYA). bktMasteredSkills() menyapu lessons BKT yang
+ *   lolos masteryGate() (L>=0,95, n>=5) jadi Set; lessonUnlockState() memakainya sebagai
+ *   jalur TAMBAHAN menuju unlock — satu arah, hanya membuka, tidak pernah mengunci ulang
+ *   yang sudah terbuka heuristik lama. Lima pemanggil: grammar() hub, openGrammarLesson(),
+ *   renderGrammarLesson(), practiceSkill(), buildGrammarQuickQuestions(). Sejak m025-337
+ *   frontier()-nya juga MEMILIH simpul aktif jalur Grammar di antara lesson yang sudah
+ *   terbuka (zpdFrontierPick), tanpa pernah menambah kandidat.
+ * - confusionMap (confusion-matrix): AKTIF sejak m025-337 — topConfusions() dibaca
+ *   confusionRemediationTarget() dan MENENTUKAN isi kartu AI Booster: pasangan yang
+ *   tertukar terarah (share >= 0,34) menggantikan kartu akurasi-mentah dan menautkan
+ *   murid ke lesson yang aturannya sedang tergeser. Sebelum itu ia cuma dipajang
+ *   confusionInsightMarkup dan tidak memutuskan apa pun.
+ * - olmInsight (olm): AKTIF sejak m025-337 — vonis kalibrasi summarize() dibaca
+ *   olmCalibrationNudge() dan memunculkan blok nasihat di ringkasan akhir sesi saat
+ *   nadanya overconfidence/underconfidence. Sebelum itu kalimat yang sama hanya ada di
+ *   panel diagnostik (olmPanelMarkup) yang jarang dibuka murid.
  * - listeningPolicy (listening-adaptive): BAYANGAN — policy() dihitung dan
  *   ditempel sebagai metadata q.__listeningPolicy, tetapi tidak ada satu baris
  *   pun yang membacanya kembali untuk mengubah playback.
@@ -77,7 +87,10 @@
 
   // Versi BUNDLE kebijakan belajar — terpisah dari versi produk. 3.0.0 menandai
   // gelombang Braincore v3 pertama yang punya identitas bundle eksplisit.
-  var BUNDLE_VERSION = '3.8.0';
+  // 3.8.0 -> 3.9.0 (m025-337): bktUnlock shadow -> active, lihat authorityMap di bawah.
+  // 3.9.0 -> 3.10.0 (m025-337, gelombang kedua): confusionMap dan olmInsight ikut aktif,
+  // dan frontier() BKT mulai memilih simpul aktif jalur Grammar.
+  var BUNDLE_VERSION = '3.10.0';
 
   // Disalin apa adanya dari version.js (self.FIEZEL_VERSION). Bundle ini mengandalkan
   // wiring app.js 5.19.0 (guard modul-absen, sidecar stabilityDays, dsb.) — versi
@@ -181,10 +194,26 @@
     itemCalibration: 'active',
     srlCoach: 'active',
     speakingPolicy: 'shadow',
-    bktUnlock: 'shadow',
-    confusionMap: 'shadow',
-    olmInsight: 'shadow',
-    listeningPolicy: 'shadow',
+    // m025-337 (permintaan OWNER: "BKT nya jangan di bekukan"): shadow -> active.
+    // masteryGate() (L>=0,95 DAN n>=5 — bukti tinggi, bukan cuma posterior tinggi) kini
+    // dibaca lessonUnlockState() lewat bktMasteredSkills(): sebuah prasyarat yang lolos
+    // gerbang ini membuka lesson berikutnya SEKALIPUN akurasi mentah v2 belum sampai
+    // ambang. Klaim ini bukan "BKT menggantikan v2" — ia cuma bisa MEMBUKA, tidak pernah
+    // MENGUNCI (bktMastered kosong/absen = perilaku identik sebelum m025-337). Parameter
+    // BKT sendiri (L0/T/slip/guess) TETAP beku; itu keputusan terpisah yang tidak berubah
+    // (BRAIN-EVOLUTION-DECISIONS.md §5).
+    bktUnlock: 'active',
+    // m025-337: shadow -> active, dua modul sekaligus, keduanya lewat pola yang sama dengan
+    // bktUnlock — modulnya sudah lengkap dan teruji sejak lahir, yang absen cuma pemanggil.
+    // confusionMap: topConfusions() memilih isi kartu AI Booster (pasangan tertukar
+    // menggantikan kartu akurasi-mentah). olmInsight: vonis kalibrasi summarize() menyalakan
+    // blok nasihat di ringkasan akhir sesi. Keduanya fail-quiet: modul absen, bukti tipis,
+    // atau vonis netral = layar persis seperti sebelum m025-337.
+    confusionMap: 'active',
+    olmInsight: 'active',
+    // listeningPolicy (listening-adaptive): AKTIF (P0.1) — rateBand dan replayQuota
+    // langsung mengatur kecepatan pemutar audio dan kuota putar ulang di app.js.
+    listeningPolicy: 'active',
     stepTutor: 'active',
     productionGrader: 'active',
     // Langkah 1 roadmap otonomi: probe retensi kini dimuat halaman dan dipanggil —

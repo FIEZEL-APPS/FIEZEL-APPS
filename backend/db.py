@@ -2,8 +2,10 @@
 import os
 from motor.motor_asyncio import AsyncIOMotorClient
 
-_client = AsyncIOMotorClient(os.environ["MONGO_URL"])
-db = _client[os.environ["DB_NAME"]]
+_mongo_url = os.environ.get("MONGO_URL", "mongodb://localhost:27017")
+_db_name = os.environ.get("DB_NAME", "fiezel")
+_client = AsyncIOMotorClient(_mongo_url)
+db = _client[_db_name]
 
 
 async def ensure_indexes():
