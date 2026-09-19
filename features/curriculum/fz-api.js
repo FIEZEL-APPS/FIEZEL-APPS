@@ -183,7 +183,11 @@
        tanpa harus lolos pintu guru lebih dulu. */
     seed: {
       english: function () { return api('/seed/english', { body: {} }); },
-      englishStatus: function () { return api('/seed/english/status'); }
+      englishStatus: function () { return api('/seed/english/status'); },
+      mapel: function () { return api('/seed/mapel', { body: {} }); },
+      mapelStatus: function () { return api('/seed/mapel/status'); },
+      soal: function () { return api('/seed/soal', { body: {} }); },
+      soalStatus: function () { return api('/seed/soal/status'); }
     }
   };
 })(window);

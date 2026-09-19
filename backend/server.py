@@ -13,6 +13,8 @@ from assessment import router as assessment_router
 from learning import router as learning_router
 from seed import router as seed_router, seed_curriculum, seed_questions
 from seed_english import router as seed_english_router, seed_english_curriculum
+from seed_mapel import router as seed_mapel_router
+from seed_soal import router as seed_soal_router
 
 app = FastAPI(title="FIEZEL Learning System API", version="1.0.0")
 
@@ -52,7 +54,8 @@ app.add_middleware(
 )
 
 for r in (auth_router, owner_router, curriculum_router, questions_router,
-          assessment_router, learning_router, seed_router, seed_english_router):
+          assessment_router, learning_router, seed_router, seed_english_router,
+          seed_mapel_router, seed_soal_router):
     app.include_router(r)
 
 
