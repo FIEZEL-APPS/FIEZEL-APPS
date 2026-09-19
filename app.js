@@ -8703,6 +8703,9 @@ function bindFiezelAccountControls(){
     const btn=$('btnFiezelLogout');
     if(btn)btn.disabled=true;
     try{localStorage.removeItem('fz_teacher_mode')}catch(_){}
+    try{sessionStorage.removeItem('fz-teacher-preview');sessionStorage.removeItem('fiezel-teacher-v1-preview')}catch(_){}
+    try{self.FiezelTeacherShell?.unmount?.()}catch(_){}
+    const wasTeacher=(state.preferences?.role==='guru')||(self.FiezelAccount?.role?.()==='teacher');
     if(state.preferences?.role==='guru'){
       state.preferences={...state.preferences,role:'murid'};
       state.view='home';
@@ -8719,7 +8722,14 @@ function bindFiezelAccountControls(){
       showToast('Keluar dari sesi.');
     }
     closeModal();
-    setTimeout(openSettings,100);
+    if(wasTeacher){
+      try{go('home')}catch(_){try{render()}catch(_){}}
+      setTimeout(()=>{
+        try{openFiezelAuthModal('teacher')}catch(_){}
+      },150);
+    }else{
+      setTimeout(openSettings,100);
+    }
   });
 
   $('btnSubmitTeacherCodeInline')?.addEventListener('click',async()=>{
@@ -8900,7 +8910,9 @@ function openFiezelAuthModal(initialTab){
 
     $('btnAuthCancel').onclick=()=>{
       closeModal();
-      setTimeout(openSettings,100);
+      if(state.view==='profile'||state.view==='settings'){
+        setTimeout(openSettings,100);
+      }
     };
 
     document.querySelectorAll('.auth-tab').forEach(tabBtn=>{
@@ -8986,6 +8998,7 @@ function openFiezelAuthModal(initialTab){
 
   renderAuthModalContent();
 }
+window.openFiezelAuthModal = openFiezelAuthModal;
 function neuralVoiceStatusMarkup(){const say=self.FiezelPuterVoice,online=say?.status?.()||{ready:false,sdkPresent:false,error:''};const runtime=self.FiezelVoiceRuntime,status=runtime?.status?.()||{prepared:false,ready:false,phase:'unavailable',totalBytes:0};const offline=self.FiezelVoiceOfflineAutoload?.status?.()||{done:false,armed:false};const label=online.ready?FiezelI18n.t('suara.siap'):FiezelI18n.t('suara.menyiapkan');
   // m025-121: kartu ini TIDAK menjual unduhan apa pun, dan itu keputusan yang sama dengan
   // m025-100. Cadangan perangkat menyiapkan dirinya sendiri di latar; yang ditampilkan di
@@ -14399,12 +14412,20 @@ async function accountSubmit(){
 async function fiezelAccountLogout(){
   const core=accountCore();if(!core)return false;
   try{localStorage.removeItem('fz_teacher_mode')}catch(_){}
+  try{sessionStorage.removeItem('fz-teacher-preview');sessionStorage.removeItem('fiezel-teacher-v1-preview')}catch(_){}
+  try{self.FiezelTeacherShell?.unmount?.()}catch(_){}
+  const wasTeacher=(state.preferences?.role==='guru')||(core.role?.()==='teacher');
   state.preferences={...state.preferences,role:'murid'};
   state.view='home';
   try{save()}catch(_){}
   await core.logout();
   showToast(FiezelI18n.t('account.logout-done'));
-  try{render()}catch(_){}
+  try{go('home')}catch(_){try{render()}catch(_){}}
+  if(wasTeacher){
+    setTimeout(()=>{
+      try{openFiezelAuthModal('teacher')}catch(_){}
+    },150);
+  }
   return true;
 }
 /** Baris status untuk Pengaturan. Kosong = anonim, dan itu keadaan yang sah. */
