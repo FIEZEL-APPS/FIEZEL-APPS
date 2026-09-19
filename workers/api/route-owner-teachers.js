@@ -24,6 +24,30 @@ import { ownerGate } from './cron-status.js';
 import { ensureAuthSchema } from './auth-schema.js';
 import { mintInvite, publicInviteView, checkInviteInput, hashCode, codeWellFormed } from './auth/invite-core.js';
 
+const MIGRATED_TEACHER_DBS = new WeakSet();
+
+export async function ensureTeacherInviteColumns(db) {
+  if (!db || typeof db.prepare !== 'function' || MIGRATED_TEACHER_DBS.has(db)) return;
+  const cols = [
+    ['teacher_invite', 'class_code', 'TEXT'],
+    ['teacher_invite', 'raw_code', 'TEXT'],
+    ['teacher_invite', 'subject_id', 'TEXT'],
+    ['teacher_invite', 'grade_id', 'TEXT'],
+    ['teacher_profile', 'class_code', 'TEXT'],
+    ['teacher_profile', 'subject_id', 'TEXT'],
+    ['teacher_profile', 'grade_id', 'TEXT'],
+    ['tc_assignment', 'class_code', 'TEXT']
+  ];
+  for (const [tbl, col, typ] of cols) {
+    try {
+      await db.prepare(`ALTER TABLE ${tbl} ADD COLUMN ${col} ${typ}`).run();
+    } catch (_) {
+      // Kolom sudah ada
+    }
+  }
+  MIGRATED_TEACHER_DBS.add(db);
+}
+
 /* ========================================================================== */
 /* POST /api/owner/teacher-invite                                              */
 /* ========================================================================== */
@@ -45,6 +69,7 @@ export async function routeTeacherInviteCreate(ctx) {
 
   if (!db) return jsonError(503, 'internal_error', {}, { headers: ctx.corsHeaders });
   await ensureAuthSchema(db);
+  await ensureTeacherInviteColumns(db);
 
   const opt = { headers: ctx.corsHeaders };
   const body = await readJsonFromCtx(ctx, opt);
@@ -55,11 +80,23 @@ export async function routeTeacherInviteCreate(ctx) {
 
   const minted = await mintInvite({ ...body.value, ownerSub }, ctx.now);
   const r = minted.record;
-  await db.prepare(
-    'INSERT INTO teacher_invite (code_hash, teacher_name, institution, institution_type, ' +
-    'created_at, expires_at, created_by, subject_id, grade_id, raw_code, class_code) VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11)'
-  ).bind(r.code_hash, r.teacher_name, r.institution, r.institution_type,
-    r.created_at, r.expires_at, r.created_by, r.subject_id || null, r.grade_id || null, minted.code, r.class_code || null).run();
+  try {
+    await db.prepare(
+      'INSERT INTO teacher_invite (code_hash, teacher_name, institution, institution_type, ' +
+      'created_at, expires_at, created_by, subject_id, grade_id, raw_code, class_code) VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11)'
+    ).bind(r.code_hash, r.teacher_name, r.institution, r.institution_type,
+      r.created_at, r.expires_at, r.created_by, r.subject_id || null, r.grade_id || null, minted.code, r.class_code || null).run();
+  } catch (err) {
+    try {
+      await db.prepare(
+        'INSERT INTO teacher_invite (code_hash, teacher_name, institution, institution_type, ' +
+        'created_at, expires_at, created_by, subject_id, grade_id) VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9)'
+      ).bind(r.code_hash, r.teacher_name, r.institution, r.institution_type,
+        r.created_at, r.expires_at, r.created_by, r.subject_id || null, r.grade_id || null).run();
+    } catch (fallbackErr) {
+      return jsonError(500, 'internal_error', { reason: fallbackErr && fallbackErr.message }, opt);
+    }
+  }
 
   return jsonResponse({
     code: minted.code,
@@ -84,6 +121,7 @@ export async function routeTeacherInviteRevoke(ctx) {
 
   if (!db) return jsonError(503, 'internal_error', {}, { headers: ctx.corsHeaders });
   await ensureAuthSchema(db);
+  await ensureTeacherInviteColumns(db);
 
   const opt = { headers: ctx.corsHeaders };
   const body = await readJsonFromCtx(ctx, opt);
@@ -132,17 +170,34 @@ export async function routeOwnerTeachers(ctx) {
 
   if (!db) return jsonError(503, 'internal_error', {}, { headers: ctx.corsHeaders });
   await ensureAuthSchema(db);
+  await ensureTeacherInviteColumns(db);
   const opt = { headers: ctx.corsHeaders };
 
-  const invites = await db.prepare(
-    'SELECT code_hash, teacher_name, institution, institution_type, created_at, expires_at, ' +
-    'used_at, revoked_at, subject_id, grade_id, raw_code, class_code FROM teacher_invite ORDER BY created_at DESC LIMIT 200'
-  ).all();
+  let invites;
+  try {
+    invites = await db.prepare(
+      'SELECT code_hash, teacher_name, institution, institution_type, created_at, expires_at, ' +
+      'used_at, revoked_at, subject_id, grade_id, raw_code, class_code FROM teacher_invite ORDER BY created_at DESC LIMIT 200'
+    ).all();
+  } catch (_) {
+    invites = await db.prepare(
+      'SELECT code_hash, teacher_name, institution, institution_type, created_at, expires_at, ' +
+      'used_at, revoked_at, subject_id, grade_id FROM teacher_invite ORDER BY created_at DESC LIMIT 200'
+    ).all();
+  }
 
-  const teachers = await db.prepare(
-    'SELECT p.teacher_name, p.institution, p.institution_type, p.activated_at, p.subject_id, p.grade_id, p.class_code, a.login_handle, a.status ' +
-    'FROM teacher_profile p JOIN auth_account a ON a.sub = p.sub ORDER BY p.activated_at DESC LIMIT 200'
-  ).all();
+  let teachers;
+  try {
+    teachers = await db.prepare(
+      'SELECT p.teacher_name, p.institution, p.institution_type, p.activated_at, p.subject_id, p.grade_id, p.class_code, a.login_handle, a.status ' +
+      'FROM teacher_profile p JOIN auth_account a ON a.sub = p.sub ORDER BY p.activated_at DESC LIMIT 200'
+    ).all();
+  } catch (_) {
+    teachers = await db.prepare(
+      'SELECT p.teacher_name, p.institution, p.institution_type, p.activated_at, p.subject_id, p.grade_id, a.login_handle, a.status ' +
+      'FROM teacher_profile p JOIN auth_account a ON a.sub = p.sub ORDER BY p.activated_at DESC LIMIT 200'
+    ).all();
+  }
 
   return jsonResponse({
     invites: ((invites && invites.results) || []).map((row) => ({
@@ -183,6 +238,7 @@ export async function routeTeacherInviteUpdate(ctx) {
 
   if (!db) return jsonError(503, 'internal_error', {}, { headers: ctx.corsHeaders });
   await ensureAuthSchema(db);
+  await ensureTeacherInviteColumns(db);
 
   const opt = { headers: ctx.corsHeaders };
   const body = await readJsonFromCtx(ctx, opt);
@@ -239,6 +295,7 @@ export async function routeTeacherInviteDelete(ctx) {
 
   if (!db) return jsonError(503, 'internal_error', {}, { headers: ctx.corsHeaders });
   await ensureAuthSchema(db);
+  await ensureTeacherInviteColumns(db);
 
   const opt = { headers: ctx.corsHeaders };
   const body = await readJsonFromCtx(ctx, opt);
