@@ -1,0 +1,2259 @@
+{
+  "schema": "fiezel-mapel-bank-v1",
+  "subjectId": "MAT",
+  "subjectName": "Matematika",
+  "phase": "fase_d",
+  "catatan": "Bank soal Fase D (SMP kelas 7-9) untuk jalur Kurikulum Nasional 17 Mapel di Ruang Guru. Kunci jawaban selalu di indeks 0 pada berkas sumber; pengacakan opsi terjadi saat tugas diterbitkan (shuffleOptions di features/teacher/fiezel-teacher-shell.js), jadi tidak ada penjelasan yang boleh menyebut posisi pilihan. distractorWhy adalah peta miskonsepsi yang dibaca Braincore untuk diagnosis.",
+  "competencies": [
+    {
+      "code": "KOMP-MAT-D-7-BIL-01",
+      "grade": 7,
+      "semester": 1,
+      "name": "Operasi Hitung Bilangan Bulat & Pecahan",
+      "materi": "Penjumlahan, pengurangan, perkalian, pembagian bilangan rasional dan estimasi",
+      "cpRef": "Kepmendikbudristek/BSKAP No. 032/H/KR/2024 — CP Matematika Fase D, Elemen Bilangan",
+      "items": [
+        {
+          "id": "mat-d7-bil-001",
+          "prompt": "Suhu di puncak Gunung Rinjani pada pukul 05.00 tercatat -3 °C. Menjelang siang suhunya naik 8 °C. Berapa suhu di puncak Gunung Rinjani menjelang siang?",
+          "options": [
+            "5 °C",
+            "11 °C",
+            "-5 °C",
+            "-11 °C"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Kata naik berarti ditambah, sehingga -3 + 8 = 5. Pada garis bilangan kita mulai dari -3 lalu melangkah 8 satuan ke kanan dan berhenti di 5, jadi suhunya 5 °C."
+          },
+          "distractorWhy": {
+            "1": "Murid mengabaikan tanda negatif pada -3 dan menghitung 3 + 8 = 11, seolah-olah suhu awal berada di atas titik nol.",
+            "2": "Murid membalik urutan pengurangan menjadi 3 - 8 = -5 karena memperlakukan tanda negatif sebagai perintah mengurangi angka yang lebih besar dari angka yang lebih kecil.",
+            "3": "Murid menganggap kata naik tetap mempertahankan tanda negatif, lalu menjumlahkan nilai mutlaknya menjadi -(3 + 8) = -11."
+          },
+          "difficulty": "dasar"
+        },
+        {
+          "id": "mat-d7-bil-002",
+          "prompt": "Bagas mengerjakan soal perkalian bilangan bulat -8 × 3. Hasil yang benar adalah ...",
+          "options": [
+            "-24",
+            "24",
+            "-5",
+            "-11"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Hasil kali bilangan negatif dengan bilangan positif selalu negatif: 8 × 3 = 24, lalu diberi tanda negatif sehingga -8 × 3 = -24."
+          },
+          "distractorWhy": {
+            "1": "Murid menghitung 8 × 3 = 24 lebih dahulu, lalu lupa mengembalikan tanda negatifnya karena mengira satu tanda negatif saja tidak mengubah hasil.",
+            "2": "Murid menjumlahkan kedua bilangan (-8 + 3 = -5) karena membaca lambang × sebagai operasi penjumlahan.",
+            "3": "Murid mengurangkan 3 dari -8 sehingga memperoleh -11; ia memperlakukan bilangan negatif sebagai perintah mengurangi."
+          },
+          "difficulty": "dasar"
+        },
+        {
+          "id": "mat-d7-bil-003",
+          "prompt": "Rina menuangkan 2/5 liter sirup ke dalam teko, lalu menambahkan 1/3 liter lagi. Berapa liter sirup di dalam teko sekarang?",
+          "options": [
+            "11/15 liter",
+            "3/8 liter",
+            "3/15 liter",
+            "2/15 liter"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Samakan penyebut dengan KPK dari 5 dan 3, yaitu 15: 2/5 = 6/15 dan 1/3 = 5/15. Jadi 6/15 + 5/15 = 11/15 liter."
+          },
+          "distractorWhy": {
+            "1": "Murid menjumlahkan pembilang dengan pembilang dan penyebut dengan penyebut menjadi (2+1)/(5+3) = 3/8, cara yang tidak berlaku untuk penjumlahan pecahan.",
+            "2": "Murid sudah benar menyamakan penyebut menjadi 15, tetapi menjumlahkan pembilang aslinya (2 + 1) tanpa mengubahnya lebih dahulu menjadi 6 dan 5.",
+            "3": "Murid mengalikan kedua pecahan (2/5 × 1/3 = 2/15) karena kata menambahkan terlewat saat membaca soal."
+          },
+          "difficulty": "dasar"
+        },
+        {
+          "id": "mat-d7-bil-004",
+          "prompt": "Bu Nadia mempunyai 3/4 kg gula yang ditakar memakai gelas takar berukuran 1/2 kg. Hasil dari 3/4 : 1/2 adalah ...",
+          "options": [
+            "1 1/2",
+            "3/8",
+            "2/3",
+            "1/4"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Membagi pecahan berarti mengalikan dengan kebalikan pembaginya: 3/4 : 1/2 = 3/4 × 2/1 = 6/4 = 3/2 = 1 1/2."
+          },
+          "distractorWhy": {
+            "1": "Murid langsung mengalikan kedua pecahan (3/4 × 1/2 = 3/8) tanpa membalik pembaginya terlebih dahulu.",
+            "2": "Murid membalik pecahan yang salah, yaitu pecahan yang dibagi: 4/3 × 1/2 = 4/6 = 2/3.",
+            "3": "Murid mengurangkan kedua pecahan (3/4 - 1/2 = 1/4) karena menganggap pembagian sama dengan satu langkah pengurangan."
+          },
+          "difficulty": "dasar"
+        },
+        {
+          "id": "mat-d7-bil-005",
+          "prompt": "Hitunglah hasil dari -12 + 6 × (-3).",
+          "options": [
+            "-30",
+            "18",
+            "6",
+            "-6"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Perkalian dikerjakan lebih dahulu daripada penjumlahan: 6 × (-3) = -18, kemudian -12 + (-18) = -30."
+          },
+          "distractorWhy": {
+            "1": "Murid mengerjakan penjumlahan lebih dahulu menjadi (-12 + 6) × (-3) = -6 × (-3) = 18, sehingga urutan operasi dilanggar.",
+            "2": "Murid menghitung 6 × (-3) sebagai +18 karena mengira hasil kali yang memuat bilangan positif selalu positif, lalu -12 + 18 = 6.",
+            "3": "Murid mengabaikan tanda negatif pada -12 sehingga menghitung 12 + (-18) = -6."
+          },
+          "difficulty": "sedang"
+        },
+        {
+          "id": "mat-d7-bil-006",
+          "prompt": "Rina mempunyai uang Rp60.000. Sebanyak 1/3 bagian dibelanjakan untuk buku tulis dan 1/4 bagian untuk pulpen. Berapa sisa uang Rina?",
+          "options": [
+            "Rp25.000",
+            "Rp40.000",
+            "Rp45.000",
+            "Rp35.000"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "1/3 × 60.000 = 20.000 dan 1/4 × 60.000 = 15.000, sehingga seluruh belanjanya 35.000. Sisa uang Rina 60.000 - 35.000 = Rp25.000."
+          },
+          "distractorWhy": {
+            "1": "Murid hanya mengurangkan belanja buku tulis (60.000 - 20.000) dan lupa memperhitungkan pembelian pulpen.",
+            "2": "Murid hanya mengurangkan belanja pulpen (60.000 - 15.000) sehingga pembelian buku tulis terlewat.",
+            "3": "Murid berhenti pada jumlah uang yang dibelanjakan (20.000 + 15.000) padahal yang ditanyakan adalah sisa uangnya."
+          },
+          "difficulty": "sedang"
+        },
+        {
+          "id": "mat-d7-bil-007",
+          "prompt": "Pak Slamet membeli 3 karung pupuk seharga Rp98.700 per karung. Dengan membulatkan harga ke ribuan terdekat, taksiran uang yang harus dibayar Pak Slamet adalah ...",
+          "options": [
+            "Rp297.000",
+            "Rp270.000",
+            "Rp300.000",
+            "Rp294.000"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Pembulatan ke ribuan terdekat mengubah 98.700 menjadi 99.000 karena ratusannya 7 (tidak kurang dari 5). Taksirannya 99.000 × 3 = Rp297.000."
+          },
+          "distractorWhy": {
+            "1": "Murid membulatkan ke puluhan ribu dan turun ke 90.000, padahal 98.700 jauh lebih dekat ke 100.000, lalu menghitung 90.000 × 3.",
+            "2": "Murid membulatkan sampai ratusan ribu terdekat menjadi 100.000, bukan ke ribuan terdekat seperti yang diminta soal.",
+            "3": "Murid memotong angka di belakang ribuan menjadi 98.000, yaitu selalu membulatkan ke bawah tanpa melihat bahwa ratusannya 7."
+          },
+          "difficulty": "sedang"
+        },
+        {
+          "id": "mat-d7-bil-008",
+          "prompt": "Nadia memiliki pita sepanjang 5 1/4 m. Sepanjang 2 2/3 m digunakan untuk menghias kotak kado. Berapa meter sisa pita Nadia?",
+          "options": [
+            "2 7/12 m",
+            "3 5/12 m",
+            "2 5/12 m",
+            "7 11/12 m"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Ubah ke pecahan biasa: 5 1/4 = 21/4 dan 2 2/3 = 8/3. Dengan penyebut 12 diperoleh 63/12 - 32/12 = 31/12 = 2 7/12 m."
+          },
+          "distractorWhy": {
+            "1": "Murid mengurangkan bagian bulatnya (5 - 2 = 3) lalu mengambil selisih pecahan tanpa memperhatikan urutannya (2/3 - 1/4 = 5/12) karena 1/4 lebih kecil daripada 2/3.",
+            "2": "Murid meminjam 1 dari bilangan bulat tetapi menambahkannya sebagai 10/12 mengikuti kebiasaan meminjam puluhan pada desimal, bukan 12/12, sehingga 13/12 - 8/12 = 5/12.",
+            "3": "Murid menjumlahkan kedua panjang (5 1/4 + 2 2/3) karena kata digunakan dibaca sebagai penambahan pita."
+          },
+          "difficulty": "sedang"
+        },
+        {
+          "id": "mat-d7-bil-009",
+          "prompt": "Urutkan bilangan -0,6 ; -2/3 ; -0,25 ; dan 1/2 dari yang terkecil ke yang terbesar.",
+          "options": [
+            "-2/3, -0,6, -0,25, 1/2",
+            "-0,25, -0,6, -2/3, 1/2",
+            "-0,6, -2/3, -0,25, 1/2",
+            "-0,25, 1/2, -0,6, -2/3"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Ubah semuanya ke desimal: -2/3 ≈ -0,67 ; -0,6 ; -0,25 ; dan 1/2 = 0,5. Pada garis bilangan semakin ke kiri semakin kecil, sehingga urutannya -2/3, -0,6, -0,25, 1/2."
+          },
+          "distractorWhy": {
+            "1": "Murid mengurutkan bilangan negatif seperti bilangan positif sehingga -0,25 dianggap paling kecil karena angkanya paling kecil, padahal pada bilangan negatif semakin besar angkanya semakin kecil nilainya.",
+            "2": "Murid tidak mengubah 2/3 menjadi desimal dan mengira -0,6 lebih kecil daripada -2/3, padahal -2/3 ≈ -0,67 letaknya lebih ke kiri pada garis bilangan.",
+            "3": "Murid mengurutkan berdasarkan nilai mutlaknya (0,25 ; 0,5 ; 0,6 ; 0,67) tanpa memperhatikan tanda, sehingga bilangan positif 1/2 terselip di antara bilangan negatif."
+          },
+          "difficulty": "sedang"
+        },
+        {
+          "id": "mat-d7-bil-010",
+          "prompt": "Suhu di dalam lemari pendingin warung Bu Rina mula-mula -18 °C. Karena pintunya dibiarkan terbuka, suhunya naik 3 °C setiap 5 menit. Berapa suhu di dalam lemari pendingin setelah 20 menit?",
+          "options": [
+            "-6 °C",
+            "6 °C",
+            "-30 °C",
+            "-3 °C"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Dalam 20 menit terjadi 20 : 5 = 4 kali kenaikan, sehingga suhu naik 4 × 3 = 12 °C. Suhu akhirnya -18 + 12 = -6 °C."
+          },
+          "distractorWhy": {
+            "1": "Murid menghitung kenaikan 12 °C dengan benar, tetapi mengabaikan tanda negatif suhu awal sehingga menghitung 18 - 12 = 6.",
+            "2": "Murid mengurangkan kenaikan suhu (-18 - 12) karena menganggap semua perhitungan yang memuat bilangan negatif berarti pengurangan.",
+            "3": "Murid menghitung banyaknya selang waktu dengan mendaftar menit ke-0, 5, 10, 15, dan 20 sehingga memperoleh 5 kali kenaikan, yaitu -18 + 15."
+          },
+          "difficulty": "tinggi"
+        },
+        {
+          "id": "mat-d7-bil-011",
+          "prompt": "Pak Slamet memanen 2/5 bagian sawahnya pada hari Senin. Pada hari Selasa ia memanen 1/3 dari bagian sawah yang tersisa. Berapa bagian sawah yang belum dipanen?",
+          "options": [
+            "2/5 bagian",
+            "4/15 bagian",
+            "3/5 bagian",
+            "1/5 bagian"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Sisa setelah Senin adalah 1 - 2/5 = 3/5. Panen Selasa 1/3 × 3/5 = 1/5. Seluruh panen 2/5 + 1/5 = 3/5, sehingga yang belum dipanen 1 - 3/5 = 2/5 bagian."
+          },
+          "distractorWhy": {
+            "1": "Murid mengira 1/3 dihitung dari seluruh sawah, bukan dari sisanya, lalu menghitung 1 - 2/5 - 1/3 = 4/15.",
+            "2": "Murid menjawab bagian yang sudah dipanen (2/5 + 1/5), padahal yang ditanya adalah bagian yang belum dipanen.",
+            "3": "Murid berhenti pada hasil panen hari Selasa saja (1/3 × 3/5) dan menganggapnya sebagai bagian yang belum dipanen."
+          },
+          "difficulty": "tinggi"
+        },
+        {
+          "id": "mat-d7-bil-012",
+          "prompt": "Harga mangga di pasar Rp18.000 per kilogram. Bu Nadia membeli 2 1/2 kg mangga dan membayar dengan selembar uang Rp50.000. Berapa uang kembalian yang diterima Bu Nadia?",
+          "options": [
+            "Rp5.000",
+            "Rp14.000",
+            "Rp45.000",
+            "Rp10.400"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "2 1/2 kg sama dengan 2,5 kg, sehingga harga mangga 2,5 × 18.000 = Rp45.000. Kembaliannya 50.000 - 45.000 = Rp5.000."
+          },
+          "distractorWhy": {
+            "1": "Murid hanya menghitung 2 kg (2 × 18.000 = 36.000) dan mengabaikan setengah kilogram sisanya.",
+            "2": "Murid berhenti pada harga belanja (2,5 × 18.000) dan menuliskannya sebagai uang kembalian.",
+            "3": "Murid menulis pecahan campuran 2 1/2 sebagai desimal 2,2 dengan menyalin pembilangnya, sehingga menghitung 2,2 × 18.000 = 39.600 dan kembaliannya 10.400."
+          },
+          "difficulty": "tinggi"
+        }
+      ]
+    },
+    {
+      "code": "KOMP-MAT-D-7-RAS-01",
+      "grade": 7,
+      "semester": 1,
+      "name": "Rasio, Proporsi & Perbandingan Senilai/Berbalik Nilai",
+      "materi": "Menyelesaikan masalah rasio, skala peta, dan perbandingan senilai maupun berbalik nilai dalam konteks sehari-hari",
+      "cpRef": "Kepmendikbudristek/BSKAP No. 032/H/KR/2024 — CP Matematika Fase D, Elemen Bilangan",
+      "items": [
+        {
+          "id": "mat-d7-ras-001",
+          "prompt": "Banyak kelereng Bagas dan Rina berbanding 3 : 5. Jika Bagas mempunyai 12 kelereng, berapa banyak kelereng Rina?",
+          "options": [
+            "20 kelereng",
+            "14 kelereng",
+            "4 kelereng",
+            "60 kelereng"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Nilai satu bagian diperoleh dari 12 : 3 = 4 kelereng. Bagian Rina sebanyak 5 bagian, sehingga 5 × 4 = 20 kelereng."
+          },
+          "distractorWhy": {
+            "1": "Murid berpikir secara penjumlahan: karena selisih perbandingan 5 - 3 = 2, ia menambahkan 2 pada 12 sehingga memperoleh 14.",
+            "2": "Murid berhenti pada nilai satu bagian (12 : 3 = 4) dan menuliskannya sebagai banyak kelereng Rina.",
+            "3": "Murid langsung mengalikan 12 dengan 5 tanpa lebih dahulu mencari nilai satu bagian dengan membagi 12 oleh 3."
+          },
+          "difficulty": "dasar"
+        },
+        {
+          "id": "mat-d7-ras-002",
+          "prompt": "Pada peta berskala 1 : 500.000, jarak Kota A dan Kota B adalah 4 cm. Berapa jarak sebenarnya kedua kota itu?",
+          "options": [
+            "20 km",
+            "200 km",
+            "2 km",
+            "2.000 km"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Jarak sebenarnya = 4 × 500.000 = 2.000.000 cm. Karena 1 km = 100.000 cm, maka 2.000.000 : 100.000 = 20 km."
+          },
+          "distractorWhy": {
+            "1": "Murid mengira 1 km = 10.000 cm sehingga 2.000.000 cm dibaginya menjadi 200 km.",
+            "2": "Murid mengira 1 km = 1.000.000 cm sehingga hasilnya menyusut menjadi 2 km.",
+            "3": "Murid hanya mengubah sentimeter ke meter dengan membagi 1.000, lalu menuliskan satuannya sebagai kilometer."
+          },
+          "difficulty": "dasar"
+        },
+        {
+          "id": "mat-d7-ras-003",
+          "prompt": "Harga 4 buku tulis di koperasi sekolah Rp24.000. Berapa harga 6 buku tulis yang sama?",
+          "options": [
+            "Rp36.000",
+            "Rp144.000",
+            "Rp12.000",
+            "Rp26.000"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Harga satu buku adalah 24.000 : 4 = 6.000. Harga 6 buku = 6 × 6.000 = Rp36.000."
+          },
+          "distractorWhy": {
+            "1": "Murid mengalikan harga 4 buku dengan 6 (24.000 × 6) tanpa lebih dahulu mencari harga satu buku.",
+            "2": "Murid hanya menghitung harga 2 buku tambahan (2 × 6.000) dan lupa menambahkannya pada harga 4 buku.",
+            "3": "Murid berpikir secara penjumlahan: bertambah 2 buku dianggap bertambah Rp2.000 saja, seolah-olah satu buku berharga Rp1.000."
+          },
+          "difficulty": "dasar"
+        },
+        {
+          "id": "mat-d7-ras-004",
+          "prompt": "Sebuah pekerjaan dapat diselesaikan oleh 6 pekerja dalam 12 hari. Jika pekerjanya menjadi 8 orang dengan kecepatan kerja yang sama, pekerjaan itu selesai dalam berapa hari?",
+          "options": [
+            "9 hari",
+            "16 hari",
+            "10 hari",
+            "6 hari"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Banyak pekerja dan lama waktu berbalik nilai. Beban kerjanya tetap 6 × 12 = 72 hari-orang, sehingga 72 : 8 = 9 hari."
+          },
+          "distractorWhy": {
+            "1": "Murid memperlakukan masalah ini sebagai perbandingan senilai dan menghitung 12 × 8/6 = 16, seolah-olah menambah pekerja membuat pekerjaan lebih lama.",
+            "2": "Murid berpikir secara penjumlahan: pekerja bertambah 2 orang dianggap memperpendek waktu tepat 2 hari.",
+            "3": "Murid mengira setiap penambahan pekerja selalu memotong waktu menjadi setengahnya, sehingga menghitung 12 : 2."
+          },
+          "difficulty": "dasar"
+        },
+        {
+          "id": "mat-d7-ras-005",
+          "prompt": "Jarak sebenarnya antara Pasar Legi dan terminal adalah 60 km. Pada sebuah denah, jarak kedua tempat itu digambar 4 cm. Skala denah tersebut adalah ...",
+          "options": [
+            "1 : 1.500.000",
+            "1 : 15.000.000",
+            "1 : 150.000",
+            "1 : 24.000.000"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Ubah 60 km menjadi 6.000.000 cm. Skala = jarak pada denah : jarak sebenarnya = 4 : 6.000.000 = 1 : 1.500.000."
+          },
+          "distractorWhy": {
+            "1": "Murid mengira 1 km = 1.000.000 cm sehingga 60 km menjadi 60.000.000 cm dan hasil baginya sepuluh kali terlalu besar.",
+            "2": "Murid mengira 1 km = 10.000 cm sehingga 60 km hanya menjadi 600.000 cm.",
+            "3": "Murid mengalikan jarak sebenarnya dengan jarak pada denah (6.000.000 × 4), padahal skala diperoleh dengan membagi."
+          },
+          "difficulty": "sedang"
+        },
+        {
+          "id": "mat-d7-ras-006",
+          "prompt": "Uang Rina dan uang Nadia berbanding 4 : 7. Jika jumlah uang mereka Rp88.000, berapa uang Nadia?",
+          "options": [
+            "Rp56.000",
+            "Rp32.000",
+            "Rp22.000",
+            "Rp24.000"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Jumlah bagian 4 + 7 = 11, sehingga satu bagian bernilai 88.000 : 11 = 8.000. Uang Nadia 7 × 8.000 = Rp56.000."
+          },
+          "distractorWhy": {
+            "1": "Murid menjawab bagian Rina (4 × 8.000) karena tertukar suku perbandingan yang ditanyakan.",
+            "2": "Murid membagi jumlah uang dengan salah satu suku perbandingan saja (88.000 : 4) tanpa menjumlahkan seluruh bagian lebih dahulu.",
+            "3": "Murid menghitung selisih uang mereka (3 × 8.000), bukan besar uang Nadia."
+          },
+          "difficulty": "sedang"
+        },
+        {
+          "id": "mat-d7-ras-007",
+          "prompt": "Sepeda motor Pak Slamet menempuh 45 km dengan 3 liter bensin. Berapa liter bensin yang diperlukan untuk menempuh 120 km?",
+          "options": [
+            "8 liter",
+            "40 liter",
+            "6 liter",
+            "2,7 liter"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Satu liter bensin menempuh 45 : 3 = 15 km. Untuk 120 km diperlukan 120 : 15 = 8 liter."
+          },
+          "distractorWhy": {
+            "1": "Murid membagi jarak dengan banyaknya liter (120 : 3), seolah-olah angka 3 menyatakan jarak untuk setiap liter.",
+            "2": "Murid membagi 120 : 45 lalu membulatkan ke bawah menjadi 2 dan mengalikannya dengan 3 liter, sehingga sisa jarak 30 km tidak diperhitungkan.",
+            "3": "Murid berhenti pada hasil bagi 120 : 45 ≈ 2,7 dan menuliskannya sebagai banyak liter, padahal itu baru perbandingan jaraknya."
+          },
+          "difficulty": "sedang"
+        },
+        {
+          "id": "mat-d7-ras-008",
+          "prompt": "Persediaan pakan di kandang Pak Slamet cukup untuk 20 ekor sapi selama 18 hari. Jika 5 ekor sapi dijual, persediaan yang sama akan habis dalam berapa hari?",
+          "options": [
+            "24 hari",
+            "13,5 hari",
+            "23 hari",
+            "36 hari"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Banyak sapi dan lama persediaan berbalik nilai. Jumlah jatah pakan tetap 20 × 18 = 360 dan sapi tersisa 15 ekor, sehingga 360 : 15 = 24 hari."
+          },
+          "distractorWhy": {
+            "1": "Murid memperlakukan masalah ini sebagai perbandingan senilai (18 × 15/20), seolah-olah sapi yang berkurang membuat pakan lebih cepat habis.",
+            "2": "Murid berpikir secara penjumlahan: sapi berkurang 5 ekor dianggap menambah lama persediaan tepat 5 hari.",
+            "3": "Murid mengira jumlah sapi berkurang menjadi setengahnya sehingga waktunya dikalikan dua (18 × 2), padahal sapi yang tersisa 15 ekor, bukan 10 ekor."
+          },
+          "difficulty": "sedang"
+        },
+        {
+          "id": "mat-d7-ras-009",
+          "prompt": "Resep kue Bu Rina memakai tepung dan gula dengan perbandingan 5 : 2. Jika Bu Rina memakai 750 gram tepung, berapa gram gula yang diperlukan?",
+          "options": [
+            "300 gram",
+            "1.875 gram",
+            "150 gram",
+            "450 gram"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Nilai satu bagian adalah 750 : 5 = 150 gram. Gula sebanyak 2 bagian, sehingga 2 × 150 = 300 gram."
+          },
+          "distractorWhy": {
+            "1": "Murid membalik perbandingannya dan mengalikan 750 dengan 5/2, seolah-olah gula lebih banyak daripada tepung.",
+            "2": "Murid berhenti pada nilai satu bagian (750 : 5) dan menuliskannya sebagai banyak gula.",
+            "3": "Murid memakai selisih suku perbandingan (5 - 2 = 3) sebagai bagian gula, lalu menghitung 750 × 3/5."
+          },
+          "difficulty": "sedang"
+        },
+        {
+          "id": "mat-d7-ras-010",
+          "prompt": "Pada denah berskala 1 : 200, sebuah kolam ikan berbentuk persegi panjang digambar dengan panjang 6 cm dan lebar 4 cm. Berapa luas kolam yang sebenarnya?",
+          "options": [
+            "96 m²",
+            "0,48 m²",
+            "9.600 m²",
+            "24 m²"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Panjang sebenarnya 6 × 200 = 1.200 cm = 12 m dan lebar sebenarnya 4 × 200 = 800 cm = 8 m. Luasnya 12 × 8 = 96 m²."
+          },
+          "distractorWhy": {
+            "1": "Murid mengalikan luas pada denah (24 cm²) dengan skala 200 satu kali saja sehingga memperoleh 4.800 cm² = 0,48 m², padahal panjang dan lebar masing-masing harus dikalikan skala.",
+            "2": "Murid mengira 1 m = 10 cm sehingga 1.200 cm dibacanya 120 m dan 800 cm dibacanya 80 m.",
+            "3": "Murid menghitung luas pada denah (6 × 4) lalu langsung menuliskan satuannya sebagai meter persegi tanpa memakai skala."
+          },
+          "difficulty": "tinggi"
+        },
+        {
+          "id": "mat-d7-ras-011",
+          "prompt": "Sebuah proyek irigasi dirancang selesai oleh 12 pekerja dalam 30 hari. Setelah 6 hari bekerja, 4 pekerja berhenti. Jika kecepatan kerja setiap orang sama, berapa hari lagi sisa pekerjaan itu selesai?",
+          "options": [
+            "36 hari",
+            "45 hari",
+            "24 hari",
+            "16 hari"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Menurut rencana masih tersisa 30 - 6 = 24 hari, sehingga sisa pekerjaan setara 12 × 24 = 288 hari-orang. Pekerja tinggal 8 orang, maka 288 : 8 = 36 hari lagi."
+          },
+          "distractorWhy": {
+            "1": "Murid memakai seluruh waktu rencana 30 hari (12 × 30 : 8) dan lupa bahwa 6 hari pertama sudah dikerjakan oleh 12 pekerja.",
+            "2": "Murid menjawab sisa hari menurut rencana semula (30 - 6) karena mengira jumlah pekerja tidak mempengaruhi lama pekerjaan.",
+            "3": "Murid memakai perbandingan senilai (24 × 8/12), seolah-olah berkurangnya pekerja membuat pekerjaan lebih cepat selesai."
+          },
+          "difficulty": "tinggi"
+        },
+        {
+          "id": "mat-d7-ras-012",
+          "prompt": "Perbandingan uang tabungan Bagas dan Nadia adalah 5 : 3. Selisih tabungan mereka Rp60.000. Berapa tabungan Bagas?",
+          "options": [
+            "Rp150.000",
+            "Rp90.000",
+            "Rp37.500",
+            "Rp300.000"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Selisih perbandingan 5 - 3 = 2 bagian senilai Rp60.000, sehingga satu bagian 60.000 : 2 = 30.000. Tabungan Bagas 5 × 30.000 = Rp150.000."
+          },
+          "distractorWhy": {
+            "1": "Murid menghitung tabungan Nadia (3 × 30.000) padahal yang ditanyakan tabungan Bagas.",
+            "2": "Murid memperlakukan Rp60.000 sebagai jumlah tabungan, bukan selisihnya, sehingga membagi 60.000 dengan 8 bagian lalu mengalikannya dengan 5.",
+            "3": "Murid langsung mengalikan selisih Rp60.000 dengan 5 tanpa lebih dahulu mencari nilai satu bagian."
+          },
+          "difficulty": "tinggi"
+        }
+      ]
+    },
+    {
+      "code": "KOMP-MAT-D-7-GEO-01",
+      "grade": 7,
+      "semester": 2,
+      "name": "Keliling & Luas Bangun Datar",
+      "materi": "Menghitung keliling dan luas segiempat, segitiga, dan lingkaran serta bangun gabungan sederhana",
+      "cpRef": "Kepmendikbudristek/BSKAP No. 032/H/KR/2024 — CP Matematika Fase D, Elemen Geometri",
+      "items": [
+        {
+          "id": "mat-d7-geo-001",
+          "prompt": "Sebuah segitiga memiliki panjang alas 14 cm dan tinggi 8 cm. Berapa luas segitiga tersebut?",
+          "options": [
+            "56 cm²",
+            "112 cm²",
+            "44 cm²",
+            "22 cm²"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Luas segitiga = ½ × alas × tinggi = ½ × 14 × 8 = 56 cm²."
+          },
+          "distractorWhy": {
+            "1": "Murid mengalikan alas dengan tinggi (14 × 8) tetapi lupa mengalikannya dengan ½, sehingga yang dihitungnya adalah luas persegi panjang.",
+            "2": "Murid memakai rumus keliling persegi panjang 2 × (14 + 8), padahal yang diminta luas segitiga.",
+            "3": "Murid hanya menjumlahkan alas dan tinggi (14 + 8) karena mengira luas selalu diperoleh dengan menjumlahkan ukuran yang diketahui."
+          },
+          "difficulty": "dasar"
+        },
+        {
+          "id": "mat-d7-geo-002",
+          "prompt": "Taman sekolah berbentuk persegi panjang dengan panjang 15 m dan lebar 9 m. Berapa keliling taman itu?",
+          "options": [
+            "48 m",
+            "135 m",
+            "24 m",
+            "30 m"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Keliling persegi panjang = 2 × (panjang + lebar) = 2 × (15 + 9) = 2 × 24 = 48 m."
+          },
+          "distractorWhy": {
+            "1": "Murid memakai rumus luas (15 × 9) padahal yang ditanyakan keliling, yaitu panjang lintasan mengelilingi taman.",
+            "2": "Murid menjumlahkan panjang dan lebar (15 + 9) tetapi lupa mengalikan hasilnya dengan 2, sehingga baru menghitung separuh keliling.",
+            "3": "Murid hanya mengalikan panjang dengan 2 (2 × 15) dan tidak memasukkan kedua sisi lebarnya."
+          },
+          "difficulty": "dasar"
+        },
+        {
+          "id": "mat-d7-geo-003",
+          "prompt": "Lantai kelas dipasangi ubin berbentuk persegi dengan panjang sisi 30 cm. Berapa luas satu ubin?",
+          "options": [
+            "900 cm²",
+            "450 cm²",
+            "120 cm²",
+            "60 cm²"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Luas persegi = sisi × sisi = 30 × 30 = 900 cm²."
+          },
+          "distractorWhy": {
+            "1": "Murid memakai rumus luas segitiga ½ × 30 × 30, padahal ubin itu berbentuk persegi sehingga tidak ada pembagian dua.",
+            "2": "Murid menghitung keliling persegi (4 × 30) lalu menuliskan hasilnya sebagai luas.",
+            "3": "Murid mengartikan sisi pangkat dua sebagai sisi dikalikan 2, sehingga menghitung 30 × 2."
+          },
+          "difficulty": "dasar"
+        },
+        {
+          "id": "mat-d7-geo-004",
+          "prompt": "Sebuah taplak meja berbentuk lingkaran dengan jari-jari 14 cm. Dengan π = 22/7, berapa keliling taplak itu?",
+          "options": [
+            "88 cm",
+            "44 cm",
+            "616 cm",
+            "176 cm"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Keliling lingkaran = 2 × π × r = 2 × 22/7 × 14 = 88 cm."
+          },
+          "distractorWhy": {
+            "1": "Murid memperlakukan 14 cm sebagai diameter sehingga menghitung π × d = 22/7 × 14 dan kehilangan faktor 2.",
+            "2": "Murid memakai rumus luas lingkaran π × r² = 22/7 × 14 × 14, padahal yang diminta keliling.",
+            "3": "Murid lebih dahulu mengubah jari-jari menjadi diameter 28 cm tetapi tetap memakai rumus 2 × π × d, sehingga mengalikan dengan 2 sebanyak dua kali."
+          },
+          "difficulty": "dasar"
+        },
+        {
+          "id": "mat-d7-geo-005",
+          "prompt": "Tutup sumur di rumah Nadia berbentuk lingkaran dengan diameter 28 cm. Dengan π = 22/7, berapa luas tutup sumur itu?",
+          "options": [
+            "616 cm²",
+            "2.464 cm²",
+            "88 cm²",
+            "308 cm²"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Jari-jari = 28 : 2 = 14 cm. Luas lingkaran = π × r² = 22/7 × 14 × 14 = 616 cm²."
+          },
+          "distractorWhy": {
+            "1": "Murid memasukkan diameter 28 cm langsung ke rumus π × r² tanpa lebih dahulu membaginya dua menjadi jari-jari.",
+            "2": "Murid menghitung keliling lingkaran 2 × 22/7 × 14, padahal yang diminta luas daerah tutup sumur.",
+            "3": "Murid memakai rumus luas setengah lingkaran ½ × π × r², padahal tutup sumur itu berbentuk lingkaran penuh."
+          },
+          "difficulty": "sedang"
+        },
+        {
+          "id": "mat-d7-geo-006",
+          "prompt": "Papan nama kelas berbentuk trapesium dengan panjang sisi sejajar 12 cm dan 20 cm serta tinggi 9 cm. Berapa luas papan nama itu?",
+          "options": [
+            "144 cm²",
+            "288 cm²",
+            "1.080 cm²",
+            "41 cm²"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Luas trapesium = ½ × jumlah sisi sejajar × tinggi = ½ × (12 + 20) × 9 = ½ × 32 × 9 = 144 cm²."
+          },
+          "distractorWhy": {
+            "1": "Murid menjumlahkan sisi sejajar lalu mengalikannya dengan tinggi (32 × 9) tetapi lupa mengalikannya dengan ½.",
+            "2": "Murid mengalikan kedua sisi sejajar (12 × 20) padahal keduanya harus dijumlahkan lebih dahulu, sehingga memperoleh ½ × 12 × 20 × 9.",
+            "3": "Murid menjumlahkan semua ukuran yang diketahui (12 + 20 + 9) karena mengira luas dihitung seperti keliling."
+          },
+          "difficulty": "sedang"
+        },
+        {
+          "id": "mat-d7-geo-007",
+          "prompt": "Layang-layang mainan Bagas memiliki panjang diagonal 24 cm dan 10 cm. Berapa luas layang-layang itu?",
+          "options": [
+            "120 cm²",
+            "240 cm²",
+            "60 cm²",
+            "34 cm²"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Luas layang-layang = ½ × diagonal pertama × diagonal kedua = ½ × 24 × 10 = 120 cm²."
+          },
+          "distractorWhy": {
+            "1": "Murid mengalikan kedua diagonal (24 × 10) tetapi lupa mengalikan hasilnya dengan ½.",
+            "2": "Murid membagi dua setiap diagonal lebih dahulu lalu mengalikannya (12 × 5), sehingga luasnya terbagi dua sebanyak dua kali.",
+            "3": "Murid menjumlahkan kedua diagonal (24 + 10) karena mengira luas diperoleh dengan menjumlahkan ukuran yang diketahui."
+          },
+          "difficulty": "sedang"
+        },
+        {
+          "id": "mat-d7-geo-008",
+          "prompt": "Taman sekolah berbentuk persegi panjang berukuran 12 m × 8 m. Di sepanjang kelilingnya akan ditanam pohon dengan jarak 2 m antarpohon. Berapa banyak pohon yang diperlukan?",
+          "options": [
+            "20 pohon",
+            "21 pohon",
+            "48 pohon",
+            "10 pohon"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Keliling taman = 2 × (12 + 8) = 40 m. Karena jalur tanamnya tertutup, banyak pohon = 40 : 2 = 20 pohon."
+          },
+          "distractorWhy": {
+            "1": "Murid menambahkan satu pohon seperti pada penanaman di sepanjang garis lurus, padahal pada jalur tertutup pohon pertama dan pohon terakhir berimpit.",
+            "2": "Murid memakai luas taman (12 × 8 = 96 m²) lalu membaginya dengan 2, padahal pohon ditanam di sepanjang keliling, bukan menutupi seluruh permukaan.",
+            "3": "Murid hanya menjumlahkan panjang dan lebar (12 + 8 = 20) lalu membaginya dengan 2, sehingga baru memperhitungkan separuh keliling."
+          },
+          "difficulty": "sedang"
+        },
+        {
+          "id": "mat-d7-geo-009",
+          "prompt": "Pak Slamet memagari kebun berbentuk persegi dengan panjang sisi 15 m. Biaya pemasangan pagar Rp45.000 tiap meter. Berapa biaya seluruhnya?",
+          "options": [
+            "Rp2.700.000",
+            "Rp10.125.000",
+            "Rp675.000",
+            "Rp1.350.000"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Panjang pagar sama dengan keliling kebun = 4 × 15 = 60 m. Biaya = 60 × 45.000 = Rp2.700.000."
+          },
+          "distractorWhy": {
+            "1": "Murid memakai luas kebun (15 × 15 = 225 m²) sebagai panjang pagar, padahal pagar dipasang di sepanjang keliling.",
+            "2": "Murid hanya menghitung biaya untuk satu sisi (15 × 45.000) dan lupa bahwa persegi memiliki empat sisi yang sama panjang.",
+            "3": "Murid hanya memperhitungkan dua sisi (30 m) karena mengira keliling persegi adalah dua kali panjang sisinya."
+          },
+          "difficulty": "sedang"
+        },
+        {
+          "id": "mat-d7-geo-010",
+          "prompt": "Lapangan mini sekolah berbentuk persegi panjang dengan panjang 20 m dan lebar 14 m. Pada salah satu sisi lebarnya ditambahkan bagian berbentuk setengah lingkaran dengan diameter 14 m. Dengan π = 22/7, berapa luas seluruh lapangan itu?",
+          "options": [
+            "357 m²",
+            "434 m²",
+            "280 m²",
+            "588 m²"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Luas persegi panjang = 20 × 14 = 280 m². Jari-jari setengah lingkaran = 14 : 2 = 7 m, sehingga luasnya ½ × 22/7 × 7 × 7 = 77 m². Luas seluruhnya = 280 + 77 = 357 m²."
+          },
+          "distractorWhy": {
+            "1": "Murid menghitung luas lingkaran penuh (22/7 × 7 × 7 = 154 m²) lalu menambahkannya, padahal yang menempel pada lapangan hanya setengah lingkaran.",
+            "2": "Murid hanya menghitung bagian persegi panjangnya dan mengabaikan setengah lingkaran yang ditambahkan.",
+            "3": "Murid memakai 14 m sebagai jari-jari setengah lingkaran, padahal 14 m adalah diameternya sehingga jari-jarinya 7 m."
+          },
+          "difficulty": "tinggi"
+        },
+        {
+          "id": "mat-d7-geo-011",
+          "prompt": "Taman berbentuk persegi panjang berukuran 18 m × 10 m. Di dalamnya terdapat kolam ikan berbentuk persegi dengan sisi 4 m, sedangkan bagian sisanya ditanami rumput. Berapa luas bagian yang ditanami rumput?",
+          "options": [
+            "164 m²",
+            "196 m²",
+            "180 m²",
+            "40 m²"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Luas taman = 18 × 10 = 180 m² dan luas kolam = 4 × 4 = 16 m². Luas rumput = 180 - 16 = 164 m²."
+          },
+          "distractorWhy": {
+            "1": "Murid menjumlahkan luas taman dan luas kolam (180 + 16), padahal kolam menempati sebagian taman sehingga luasnya harus dikurangkan.",
+            "2": "Murid menghitung luas taman saja dan lupa mengurangi bagian yang sudah dipakai kolam ikan.",
+            "3": "Murid mengurangkan keliling kolam (16 m) dari keliling taman (56 m), padahal yang ditanyakan luas daerah rumput, bukan keliling."
+          },
+          "difficulty": "tinggi"
+        },
+        {
+          "id": "mat-d7-geo-012",
+          "prompt": "Sebuah persegi panjang memiliki luas 108 cm² dan panjang 12 cm. Berapa keliling persegi panjang itu?",
+          "options": [
+            "42 cm",
+            "216 cm",
+            "21 cm",
+            "18 cm"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Lebar = luas : panjang = 108 : 12 = 9 cm. Keliling = 2 × (12 + 9) = 2 × 21 = 42 cm."
+          },
+          "distractorWhy": {
+            "1": "Murid mencari lebar dengan mengurangkan (108 - 12 = 96), padahal luas diperoleh dari perkalian sehingga lebar harus dicari dengan membagi.",
+            "2": "Murid berhenti pada jumlah panjang dan lebar (12 + 9) tanpa mengalikannya dengan 2.",
+            "3": "Murid sudah menemukan lebar 9 cm tetapi hanya mengalikan lebar itu dengan 2 dan tidak memasukkan kedua sisi panjangnya."
+          },
+          "difficulty": "tinggi"
+        }
+      ]
+    },
+    {
+      "code": "KOMP-MAT-D-8-ALJ-01",
+      "grade": 8,
+      "semester": 1,
+      "name": "Aljabar & Persamaan Linier Dua Variabel",
+      "materi": "Menyelesaikan SPLDV dengan metode substitusi dan eliminasi kontekstual",
+      "cpRef": "Kepmendikbudristek/BSKAP No. 032/H/KR/2024 — CP Matematika Fase D, Elemen Aljabar",
+      "items": [
+        {
+          "id": "mat-d8-alj-001",
+          "prompt": "Di koperasi sekolah, Rina membayar Rp 17.000 untuk 2 buku tulis dan 1 pensil. Bagas membayar Rp 10.000 untuk 1 buku tulis dan 1 pensil. Berapa harga satu buku tulis?",
+          "options": [
+            "Rp 7.000",
+            "Rp 3.000",
+            "Rp 10.000",
+            "Rp 8.500"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Misalkan b harga buku dan p harga pensil: 2b + p = 17.000 dan b + p = 10.000. Kurangkan persamaan kedua dari persamaan pertama sehingga p hilang: (2b + p) − (b + p) = 17.000 − 10.000, jadi b = 7.000. Harga satu buku tulis Rp 7.000."
+          },
+          "distractorWhy": {
+            "1": "Murid menyelesaikan sistemnya dengan benar tetapi melaporkan harga pensil (p = 10.000 − 7.000 = 3.000); kesalahan klasik salah membaca variabel mana yang ditanyakan.",
+            "2": "Murid menganggap seluruh belanjaan Bagas adalah harga buku dan mengabaikan pensil yang ikut dibeli, sehingga menyamakan Rp 10.000 dengan harga satu buku.",
+            "3": "Murid membagi 17.000 dengan 2 seolah Rina hanya membeli dua buku, mengabaikan suku pensil dalam persamaan pertama."
+          },
+          "difficulty": "dasar"
+        },
+        {
+          "id": "mat-d8-alj-002",
+          "prompt": "Diketahui sistem persamaan x + y = 12 dan x − y = 4. Berapakah nilai x?",
+          "options": [
+            "8",
+            "4",
+            "16",
+            "6"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Jumlahkan kedua persamaan supaya y saling meniadakan: (x + y) + (x − y) = 12 + 4, sehingga 2x = 16 dan x = 8. Substitusi balik memberi y = 4, dan pasangan (8, 4) memenuhi kedua persamaan."
+          },
+          "distractorWhy": {
+            "1": "Murid menghitung y = 4 lalu menuliskannya sebagai x; tertukar variabel karena tidak memeriksa kembali apa yang ditanyakan.",
+            "2": "Murid berhenti pada langkah 2x = 16 dan menuliskan 16 sebagai jawaban, lupa membagi kedua ruas dengan koefisien 2.",
+            "3": "Murid membagi 12 dengan 2 karena menganggap x dan y pasti sama besar, mengabaikan informasi selisih pada persamaan kedua."
+          },
+          "difficulty": "dasar"
+        },
+        {
+          "id": "mat-d8-alj-003",
+          "prompt": "Umur Nadia dua kali umur adiknya. Jumlah umur mereka 18 tahun. Berapa umur Nadia sekarang?",
+          "options": [
+            "12 tahun",
+            "6 tahun",
+            "9 tahun",
+            "36 tahun"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Misalkan umur adik a, maka umur Nadia 2a. Model SPLDV-nya n = 2a dan n + a = 18. Substitusikan n: 2a + a = 18, jadi 3a = 18 dan a = 6. Umur Nadia n = 2 × 6 = 12 tahun, dan 12 + 6 = 18 tahun sesuai syarat."
+          },
+          "distractorWhy": {
+            "1": "Murid menemukan a = 6 lalu berhenti, menuliskan umur adik sebagai umur Nadia karena tidak mengembalikan hasil ke variabel yang ditanya.",
+            "2": "Murid membagi 18 menjadi dua bagian sama besar, mengabaikan syarat bahwa umur Nadia dua kali lipat umur adiknya.",
+            "3": "Murid membaca 'dua kali' sebagai perintah mengalikan jumlah umur, sehingga menghitung 18 × 2 dan bukan menyusun sistem persamaannya."
+          },
+          "difficulty": "dasar"
+        },
+        {
+          "id": "mat-d8-alj-004",
+          "prompt": "Pasangan nilai manakah yang merupakan penyelesaian dari sistem 3x + y = 11 dan x + y = 5?",
+          "options": [
+            "x = 3 dan y = 2",
+            "x = 2 dan y = 3",
+            "x = 5 dan y = 0",
+            "x = 4 dan y = 1"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Kurangkan persamaan kedua dari persamaan pertama: (3x + y) − (x + y) = 11 − 5, sehingga 2x = 6 dan x = 3. Substitusikan ke x + y = 5 sehingga y = 2. Uji kembali: 3(3) + 2 = 11 dan 3 + 2 = 5, keduanya benar."
+          },
+          "distractorWhy": {
+            "1": "Murid memperoleh angka 3 dan 2 tetapi memasangkannya terbalik; ketika diuji, 3(2) + 3 = 9 dan bukan 11, tanda khas lupa menguji kembali penyelesaian.",
+            "2": "Murid langsung mengambil x = 5 dari persamaan x + y = 5 seolah y pasti nol, kebiasaan menyelesaikan satu persamaan saja tanpa mengaitkannya dengan persamaan lain.",
+            "3": "Murid menebak angka yang memenuhi persamaan kedua saja (4 + 1 = 5) tanpa menguji persamaan pertama, sehingga 3(4) + 1 = 13 terlewat."
+          },
+          "difficulty": "dasar"
+        },
+        {
+          "id": "mat-d8-alj-005",
+          "prompt": "Di warung Pak Slamet, 3 gelas es teh dan 2 porsi bakso dihargai Rp 46.000, sedangkan 1 gelas es teh dan 1 porsi bakso dihargai Rp 20.000. Berapa harga satu porsi bakso?",
+          "options": [
+            "Rp 14.000",
+            "Rp 6.000",
+            "Rp 10.000",
+            "Rp 23.000"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Misalkan t harga es teh dan b harga bakso: 3t + 2b = 46.000 dan t + b = 20.000. Dari persamaan kedua t = 20.000 − b. Substitusikan: 3(20.000 − b) + 2b = 46.000, menjadi 60.000 − b = 46.000, jadi b = 14.000. Harga es teh t = 6.000, dan 3(6.000) + 2(14.000) = 46.000 sesuai."
+          },
+          "distractorWhy": {
+            "1": "Murid menemukan kedua harga dengan benar tetapi melaporkan harga es teh; kesalahan menukar variabel yang ditanyakan.",
+            "2": "Murid membagi Rp 20.000 menjadi dua bagian sama besar, menganggap es teh dan bakso pasti berharga sama padahal persamaan pertama menunjukkan sebaliknya.",
+            "3": "Murid membagi 46.000 dengan 2 seolah belanjaan pertama hanya terdiri atas dua barang, mengabaikan koefisien 3 pada es teh."
+          },
+          "difficulty": "sedang"
+        },
+        {
+          "id": "mat-d8-alj-006",
+          "prompt": "Tentukan nilai y dari sistem persamaan 2x + 3y = 16 dan 3x − y = 2.",
+          "options": [
+            "4",
+            "2",
+            "-4",
+            "9"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Kalikan persamaan kedua dengan 3 sehingga menjadi 9x − 3y = 6, lalu jumlahkan dengan 2x + 3y = 16 agar y hilang: 11x = 22, jadi x = 2. Substitusikan ke 3x − y = 2 sehingga y = 3(2) − 2 = 4. Uji: 2(2) + 3(4) = 16 benar."
+          },
+          "distractorWhy": {
+            "1": "Murid berhenti setelah memperoleh x = 2 dan menuliskannya sebagai jawaban, kebiasaan tidak mensubstitusikan balik untuk mencari variabel kedua.",
+            "2": "Murid salah memindahkan ruas pada 3x − y = 2 dan menulis y = 2 − 3x, bukan y = 3x − 2, sehingga tandanya terbalik dan diperoleh 2 − 3(2) = −4.",
+            "3": "Murid mengira eliminasi berarti menjumlahkan kedua persamaan apa adanya menjadi 5x + 2y = 18, lalu menganggap x = 0 sehingga 2y = 18 dan y = 9."
+          },
+          "difficulty": "sedang"
+        },
+        {
+          "id": "mat-d8-alj-007",
+          "prompt": "Panitia pentas seni di lapangan desa menjual 120 tiket. Tiket dewasa Rp 14.000 dan tiket anak Rp 7.000, dengan hasil penjualan Rp 1.330.000. Berapa banyak tiket dewasa yang terjual?",
+          "options": [
+            "70 tiket",
+            "50 tiket",
+            "60 tiket",
+            "35 tiket"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Misalkan d tiket dewasa dan a tiket anak: d + a = 120 dan 14.000d + 7.000a = 1.330.000. Substitusikan a = 120 − d: 14.000d + 7.000(120 − d) = 1.330.000, menjadi 7.000d + 840.000 = 1.330.000, sehingga 7.000d = 490.000 dan d = 70. Periksa: 70(14.000) + 50(7.000) = 1.330.000."
+          },
+          "distractorWhy": {
+            "1": "Murid menghitung sistemnya dengan benar tetapi melaporkan banyak tiket anak, tertukar variabel yang diminta soal.",
+            "2": "Murid membagi 120 tiket sama rata untuk kedua jenis tiket, mengabaikan informasi hasil penjualan yang membuat jumlahnya tidak seimbang.",
+            "3": "Murid membagi sisa uang 490.000 dengan harga tiket dewasa Rp 14.000, padahal pembaginya harus selisih harga kedua tiket (Rp 7.000); kesalahan khas memakai harga satuan alih-alih selisih harga."
+          },
+          "difficulty": "sedang"
+        },
+        {
+          "id": "mat-d8-alj-008",
+          "prompt": "Selisih uang saku Rina dan Bagas Rp 24.000. Uang saku Rina dua kali uang saku Bagas. Berapa uang saku Rina?",
+          "options": [
+            "Rp 48.000",
+            "Rp 24.000",
+            "Rp 12.000",
+            "Rp 16.000"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Misalkan uang Rina R dan uang Bagas B: R − B = 24.000 dan R = 2B. Substitusikan: 2B − B = 24.000, jadi B = 24.000 dan R = 2(24.000) = 48.000. Periksa: 48.000 − 24.000 = 24.000 dan 48.000 memang dua kali 24.000."
+          },
+          "distractorWhy": {
+            "1": "Murid menuliskan uang Bagas atau langsung menganggap angka selisih Rp 24.000 sebagai uang Rina, tanda tidak membedakan nilai selisih dari nilai salah satu variabel.",
+            "2": "Murid membaca 'dua kali' sebagai perintah membagi selisih dengan 2, sehingga menghitung 24.000 : 2 alih-alih menyusun persamaan.",
+            "3": "Murid membaca 'selisih' sebagai 'jumlah' sehingga menyelesaikan R + B = 24.000 dengan R = 2B dan memperoleh B = 8.000 serta R = 16.000."
+          },
+          "difficulty": "sedang"
+        },
+        {
+          "id": "mat-d8-alj-009",
+          "prompt": "Di pasar, Nadia membeli 4 kg mangga dan 3 kg salak seharga Rp 34.000. Pak Slamet membeli 3 kg mangga dan 2 kg salak seharga Rp 24.000. Berapa harga 1 kg mangga?",
+          "options": [
+            "Rp 4.000",
+            "Rp 6.000",
+            "Rp 8.500",
+            "Rp 10.000"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Misalkan m harga mangga dan s harga salak: 4m + 3s = 34.000 dan 3m + 2s = 24.000. Samakan koefisien s dengan mengalikan persamaan pertama dengan 2 (8m + 6s = 68.000) dan persamaan kedua dengan 3 (9m + 6s = 72.000), lalu kurangkan sehingga m = 4.000. Substitusi memberi s = 6.000, dan 4(4.000) + 3(6.000) = 34.000."
+          },
+          "distractorWhy": {
+            "1": "Murid menemukan kedua harga tetapi melaporkan harga salak; tertukar variabel yang ditanya.",
+            "2": "Murid membagi 34.000 dengan 4 seolah Nadia hanya membeli mangga, mengabaikan 3 kg salak dalam persamaan yang sama.",
+            "3": "Murid mengurangkan kedua persamaan apa adanya tanpa menyamakan koefisien, memperoleh m + s = 10.000, lalu menuliskan 10.000 sebagai harga satu kilogram mangga padahal itu harga gabungan."
+          },
+          "difficulty": "sedang"
+        },
+        {
+          "id": "mat-d8-alj-010",
+          "prompt": "Sebuah perahu menyusuri Sungai Musi. Searah arus, perahu menempuh 36 km dalam 2 jam. Melawan arus, perahu menempuh 36 km dalam 3 jam. Berapa kecepatan arus sungai?",
+          "options": [
+            "3 km/jam",
+            "15 km/jam",
+            "6 km/jam",
+            "12 km/jam"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Misalkan p kecepatan perahu di air tenang dan a kecepatan arus. Searah arus: p + a = 36 : 2 = 18. Melawan arus: p − a = 36 : 3 = 12. Kurangkan kedua persamaan: 2a = 18 − 12 = 6, jadi a = 3 km/jam dan p = 15 km/jam."
+          },
+          "distractorWhy": {
+            "1": "Murid mengambil setengah dari jumlah kedua kecepatan, (18 + 12) : 2 = 15, padahal setengah jumlah memberi kecepatan perahu di air tenang, sedangkan kecepatan arus adalah setengah selisihnya.",
+            "2": "Murid berhenti pada selisih 18 − 12 = 6 dan lupa membaginya dengan 2, padahal selisih itu bernilai 2a bukan a.",
+            "3": "Murid menganggap kecepatan saat melawan arus (36 : 3 = 12 km/jam) sebagai kecepatan arus, tidak memisahkan kecepatan perahu dari pengaruh arus."
+          },
+          "difficulty": "tinggi"
+        },
+        {
+          "id": "mat-d8-alj-011",
+          "prompt": "Keliling lapangan bulu tangkis berbentuk persegi panjang di kampung Bagas adalah 84 m. Panjangnya 6 m lebih dari lebarnya. Berapa luas lapangan itu?",
+          "options": [
+            "432 m²",
+            "1.755 m²",
+            "441 m²",
+            "42 m²"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Keliling 2(p + l) = 84 sehingga p + l = 42, dan p = l + 6. Substitusikan: (l + 6) + l = 42, jadi 2l = 36 dan l = 18 m serta p = 24 m. Luasnya 24 × 18 = 432 m²."
+          },
+          "distractorWhy": {
+            "1": "Murid memakai 84 langsung sebagai p + l tanpa membagi keliling dengan 2, sehingga memperoleh l = 39 m dan p = 45 m dengan luas 1.755 m².",
+            "2": "Murid mengabaikan selisih 6 m dan menganggap lapangan berbentuk persegi dengan sisi 42 : 2 = 21 m, sehingga luasnya 21 × 21 = 441 m².",
+            "3": "Murid menemukan p + l = 42 lalu menuliskan 42 sebagai luas, yaitu menjumlahkan panjang dan lebar alih-alih mengalikannya."
+          },
+          "difficulty": "tinggi"
+        },
+        {
+          "id": "mat-d8-alj-012",
+          "prompt": "Umur Bagas sekarang 4 kali umur adiknya. Enam tahun lagi, umur Bagas menjadi 2 kali umur adiknya. Berapa umur adik Bagas sekarang?",
+          "options": [
+            "3 tahun",
+            "12 tahun",
+            "9 tahun",
+            "6 tahun"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Misalkan umur adik a dan umur Bagas 4a. Enam tahun lagi keduanya sama-sama bertambah 6: 4a + 6 = 2(a + 6). Ruas kanan menjadi 2a + 12, sehingga 2a = 6 dan a = 3. Periksa: sekarang 3 dan 12 tahun, enam tahun lagi 9 dan 18 tahun, dan 18 memang dua kali 9."
+          },
+          "distractorWhy": {
+            "1": "Murid menuliskan umur Bagas sekarang (4a = 12) padahal yang ditanya umur adiknya; kesalahan melaporkan variabel yang salah.",
+            "2": "Murid berhenti pada umur adik enam tahun lagi (3 + 6 = 9) dan lupa mengembalikan jawabannya ke keadaan sekarang.",
+            "3": "Murid hanya menambahkan 6 tahun pada umur adik dan lupa bahwa umur Bagas juga bertambah, sehingga menyelesaikan 4a = 2(a + 6) dan memperoleh a = 6."
+          },
+          "difficulty": "tinggi"
+        }
+      ]
+    },
+    {
+      "code": "KOMP-MAT-D-8-GEO-01",
+      "grade": 8,
+      "semester": 1,
+      "name": "Geometri & Teorema Pythagoras",
+      "materi": "Membuktikan dan menghitung panjang sisi segitiga siku-siku serta tripel Pythagoras",
+      "cpRef": "Kepmendikbudristek/BSKAP No. 032/H/KR/2024 — CP Matematika Fase D, Elemen Geometri",
+      "items": [
+        {
+          "id": "mat-d8-geo-001",
+          "prompt": "Sebuah segitiga siku-siku memiliki panjang sisi tegak 9 cm dan 12 cm. Berapa panjang sisi miringnya?",
+          "options": [
+            "15 cm",
+            "21 cm",
+            "3 cm",
+            "225 cm"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Gunakan teorema Pythagoras: c = √(9² + 12²) = √(81 + 144) = √225 = 15 cm. Sisi miring selalu diperoleh dari akar jumlah kuadrat kedua sisi tegak."
+          },
+          "distractorWhy": {
+            "1": "Murid menjumlahkan 9 + 12 tanpa mengkuadratkan, khas kesalahan membaca teorema Pythagoras sebagai penjumlahan panjang sisi.",
+            "2": "Murid mengurangkan 12 − 9 karena menghafal Pythagoras sebagai operasi pengurangan, tanpa memperhatikan bahwa yang dicari justru sisi terpanjang.",
+            "3": "Murid berhenti pada 81 + 144 = 225 dan menuliskannya sebagai panjang sisi, lupa menarik akar kuadrat pada langkah terakhir."
+          },
+          "difficulty": "dasar"
+        },
+        {
+          "id": "mat-d8-geo-002",
+          "prompt": "Pada segitiga siku-siku, panjang sisi miring 13 cm dan salah satu sisi tegaknya 5 cm. Berapa panjang sisi tegak yang lain?",
+          "options": [
+            "12 cm",
+            "8 cm",
+            "144 cm",
+            "sekitar 13,9 cm"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Karena yang diketahui adalah sisi miring, kuadratnya dikurangi: b = √(13² − 5²) = √(169 − 25) = √144 = 12 cm. Tripel 5-12-13 memang tripel Pythagoras."
+          },
+          "distractorWhy": {
+            "1": "Murid mengurangkan panjang sisi secara langsung, 13 − 5 = 8, tanpa mengkuadratkan lebih dahulu.",
+            "2": "Murid menghitung 169 − 25 = 144 dengan benar tetapi lupa menarik akar kuadratnya sebelum menuliskan jawaban.",
+            "3": "Murid menjumlahkan kuadrat kedua panjang yang diketahui, √(169 + 25) = √194 ≈ 13,9 cm, karena tidak menyadari bahwa 13 cm adalah sisi miring sehingga harus dikurangi, bukan ditambah."
+          },
+          "difficulty": "dasar"
+        },
+        {
+          "id": "mat-d8-geo-003",
+          "prompt": "Kelompok tiga bilangan berikut manakah yang merupakan tripel Pythagoras?",
+          "options": [
+            "6, 8, 10",
+            "3, 4, 6",
+            "5, 12, 14",
+            "7, 8, 9"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Tripel Pythagoras memenuhi a² + b² = c² dengan c bilangan terbesar. Untuk 6, 8, 10 berlaku 6² + 8² = 36 + 64 = 100 = 10². Kelompok ini adalah kelipatan dua dari tripel 3-4-5."
+          },
+          "distractorWhy": {
+            "1": "Murid mengira menambahkan bilangan pada tripel 3-4-5 tetap menghasilkan tripel, padahal 3² + 4² = 25 sedangkan 6² = 36, sehingga syaratnya tidak terpenuhi.",
+            "2": "Murid mengenali dua bilangan awal tripel 5-12-13 lalu menerima bilangan terbesar apa pun tanpa memeriksanya: 5² + 12² = 169, sedangkan 14² = 196.",
+            "3": "Murid mengira tiga bilangan asli berurutan selalu membentuk segitiga siku-siku, padahal 7² + 8² = 113 dan tidak sama dengan 9² = 81."
+          },
+          "difficulty": "dasar"
+        },
+        {
+          "id": "mat-d8-geo-004",
+          "prompt": "Sebuah tangga sepanjang 10 m disandarkan pada dinding gudang. Kaki tangga berjarak 6 m dari dinding. Berapa tinggi dinding yang dicapai ujung atas tangga?",
+          "options": [
+            "8 m",
+            "4 m",
+            "sekitar 11,7 m",
+            "64 m"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Tangga berperan sebagai sisi miring, jarak ke dinding sebagai sisi mendatar. Tingginya t = √(10² − 6²) = √(100 − 36) = √64 = 8 m."
+          },
+          "distractorWhy": {
+            "1": "Murid mengurangkan 10 − 6 tanpa mengkuadratkan, kesalahan yang muncul ketika teorema Pythagoras diingat sebagai pengurangan panjang sisi.",
+            "2": "Murid menjumlahkan kuadrat, √(100 + 36) = √136 ≈ 11,7 m, karena tidak menyadari bahwa tangga adalah sisi terpanjang sehingga hasilnya tidak mungkin melebihi 10 m.",
+            "3": "Murid berhenti pada 100 − 36 = 64 dan menuliskannya sebagai tinggi, lupa menarik akar kuadrat."
+          },
+          "difficulty": "dasar"
+        },
+        {
+          "id": "mat-d8-geo-005",
+          "prompt": "Sebuah segitiga memiliki panjang sisi 9 cm, 12 cm, dan 16 cm. Termasuk jenis apakah segitiga tersebut?",
+          "options": [
+            "Segitiga tumpul",
+            "Segitiga siku-siku",
+            "Segitiga lancip",
+            "Segitiga sama kaki"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Bandingkan kuadrat sisi terpanjang dengan jumlah kuadrat dua sisi lain: 9² + 12² = 81 + 144 = 225, sedangkan 16² = 256. Karena 256 > 225, sudut di hadapan sisi 16 cm lebih besar dari 90°, sehingga segitiganya tumpul."
+          },
+          "distractorWhy": {
+            "1": "Murid melihat angka 9 dan 12 lalu teringat tripel 9-12-15 dan menyimpulkan siku-siku tanpa memeriksa bahwa sisi terpanjangnya 16 cm, bukan 15 cm.",
+            "2": "Murid membalik aturan perbandingan dan mengira c² yang lebih besar dari a² + b² menandakan segitiga lancip, padahal justru sebaliknya.",
+            "3": "Murid menentukan jenis segitiga dari kesamaan panjang sisi saja, bukan dari hubungan kuadrat sisinya, padahal ketiga sisinya berbeda."
+          },
+          "difficulty": "sedang"
+        },
+        {
+          "id": "mat-d8-geo-006",
+          "prompt": "Lapangan voli di sekolah Rina berbentuk persegi panjang berukuran 24 m × 10 m. Berapa panjang diagonal lapangan tersebut?",
+          "options": [
+            "26 m",
+            "34 m",
+            "14 m",
+            "13 m"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Diagonal persegi panjang membagi lapangan menjadi dua segitiga siku-siku dengan sisi tegak 24 m dan 10 m. Jadi d = √(24² + 10²) = √(576 + 100) = √676 = 26 m."
+          },
+          "distractorWhy": {
+            "1": "Murid menjumlahkan panjang dan lebar (24 + 10) seolah diagonal sama dengan berjalan menyusuri dua sisi, padahal jalur lurus selalu lebih pendek.",
+            "2": "Murid mengurangkan 24 − 10 karena mengira selisih sisi memberi panjang diagonal, tanpa mengkuadratkan sisi-sisinya lebih dahulu.",
+            "3": "Murid menghitung 26 m dengan benar lalu membaginya dua karena mengira yang ditanya adalah jarak titik potong diagonal ke salah satu sudut."
+          },
+          "difficulty": "sedang"
+        },
+        {
+          "id": "mat-d8-geo-007",
+          "prompt": "Perbandingan panjang sisi sebuah segitiga siku-siku adalah 3 : 4 : 5. Jika sisi terpendeknya 21 cm, berapa panjang sisi miringnya?",
+          "options": [
+            "35 cm",
+            "28 cm",
+            "23 cm",
+            "105 cm"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Sisi terpendek bersesuaian dengan angka 3, sehingga faktor pengalinya k = 21 : 3 = 7. Sisi miring bersesuaian dengan angka 5, jadi panjangnya 5 × 7 = 35 cm. Periksa: 21² + 28² = 441 + 784 = 1.225 = 35²."
+          },
+          "distractorWhy": {
+            "1": "Murid menghitung faktor pengali dengan benar tetapi mengalikannya dengan 4, sehingga memperoleh sisi tegak yang lain dan bukan sisi miring yang ditanyakan.",
+            "2": "Murid mengira perbandingan 3 : 4 : 5 berarti ketiga sisi berselisih 1 cm, lalu menjawab 21, 22, 23 sehingga sisi miringnya 23 cm.",
+            "3": "Murid mengalikan 21 dengan 5 karena menganggap angka 5 pada perbandingan berarti sisi miring selalu lima kali sisi terpendek, bukan lima kali faktor pengali."
+          },
+          "difficulty": "sedang"
+        },
+        {
+          "id": "mat-d8-geo-008",
+          "prompt": "Bagas berjalan 15 m ke arah utara, lalu berbelok dan berjalan 20 m ke arah timur. Berapa jarak terpendek dari titik awal ke posisi Bagas sekarang?",
+          "options": [
+            "25 m",
+            "35 m",
+            "5 m",
+            "17,5 m"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Arah utara dan timur saling tegak lurus, sehingga lintasannya membentuk segitiga siku-siku. Jarak terpendek adalah sisi miring: √(15² + 20²) = √(225 + 400) = √625 = 25 m."
+          },
+          "distractorWhy": {
+            "1": "Murid menjumlahkan seluruh lintasan yang ditempuh (15 + 20), yaitu mencampuradukkan panjang lintasan dengan jarak lurus antara dua titik.",
+            "2": "Murid mengurangkan 20 − 15 karena mengira jarak terpendek diperoleh dengan mencari selisih kedua perpindahan.",
+            "3": "Murid merata-ratakan kedua jarak, (15 + 20) : 2 = 17,5, sebuah jalan pintas yang tidak berdasar pada hubungan kuadrat sisi segitiga siku-siku."
+          },
+          "difficulty": "sedang"
+        },
+        {
+          "id": "mat-d8-geo-009",
+          "prompt": "Sebuah segitiga sama kaki memiliki panjang alas 16 cm dan panjang kaki 17 cm. Berapa tinggi segitiga itu?",
+          "options": [
+            "15 cm",
+            "sekitar 5,7 cm",
+            "9 cm",
+            "1 cm"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Garis tinggi pada segitiga sama kaki membagi alas menjadi dua bagian sama panjang, masing-masing 8 cm. Terbentuk segitiga siku-siku dengan sisi miring 17 cm, sehingga t = √(17² − 8²) = √(289 − 64) = √225 = 15 cm."
+          },
+          "distractorWhy": {
+            "1": "Murid memakai panjang alas penuh 16 cm sebagai sisi segitiga siku-siku, menghitung √(289 − 256) = √33 ≈ 5,7 cm, lupa bahwa garis tinggi membagi alas menjadi dua.",
+            "2": "Murid membagi alas dengan benar menjadi 8 cm tetapi langsung mengurangkan 17 − 8 tanpa mengkuadratkan kedua panjang itu.",
+            "3": "Murid mengurangkan kaki dengan alas secara langsung, 17 − 16, tanpa membentuk segitiga siku-siku maupun menggunakan kuadrat sisi."
+          },
+          "difficulty": "sedang"
+        },
+        {
+          "id": "mat-d8-geo-010",
+          "prompt": "Tiang bendera setinggi 12 m ditopang empat utas kawat. Setiap kawat diikat di puncak tiang dan dipatok di tanah sejauh 5 m dari kaki tiang. Tiap utas kawat dilebihkan 0,5 m untuk simpul. Berapa total panjang kawat yang dibutuhkan?",
+          "options": [
+            "54 m",
+            "52 m",
+            "68 m",
+            "13,5 m"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Satu utas kawat menjadi sisi miring segitiga siku-siku dengan sisi tegak 12 m dan 5 m: √(144 + 25) = √169 = 13 m. Ditambah 0,5 m untuk simpul menjadi 13,5 m per utas. Untuk empat utas, totalnya 4 × 13,5 = 54 m."
+          },
+          "distractorWhy": {
+            "1": "Murid menghitung sisi miring dan jumlah kawat dengan benar (4 × 13 = 52) tetapi melewatkan tambahan 0,5 m untuk simpul pada setiap utas, kesalahan khas mengabaikan satu syarat dalam soal berlapis.",
+            "2": "Murid menjumlahkan 12 + 5 = 17 tanpa mengkuadratkan lalu mengalikannya dengan 4, sehingga teorema Pythagoras tidak terpakai sama sekali.",
+            "3": "Murid menghitung panjang satu utas kawat lengkap dengan simpulnya tetapi lupa bahwa kawat yang dibutuhkan ada empat utas."
+          },
+          "difficulty": "tinggi"
+        },
+        {
+          "id": "mat-d8-geo-011",
+          "prompt": "Sebuah segitiga memiliki panjang sisi 20 cm, 21 cm, dan 29 cm. Pernyataan manakah yang benar tentang segitiga tersebut?",
+          "options": [
+            "Segitiga itu siku-siku karena 20² + 21² = 400 + 441 = 841 = 29², sehingga sisi 29 cm adalah sisi miringnya.",
+            "Segitiga itu bukan siku-siku karena 20, 21, dan 29 bukan kelipatan dari tripel 3-4-5 maupun 5-12-13.",
+            "Segitiga itu siku-siku dengan sisi miring 21 cm karena sisi miring adalah sisi yang berada di tengah urutan panjang.",
+            "Segitiga itu tumpul karena 20 + 21 = 41 lebih besar daripada 29."
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Kebalikan teorema Pythagoras menyatakan jika kuadrat sisi terpanjang sama dengan jumlah kuadrat dua sisi lainnya, maka segitiganya siku-siku. Di sini 400 + 441 = 841 dan 29² = 841, sehingga sudut siku-sikunya berada di hadapan sisi 29 cm."
+          },
+          "distractorWhy": {
+            "1": "Murid mengira hanya tripel yang sudah dihafal yang dapat membentuk segitiga siku-siku, padahal syarat sebenarnya adalah kesamaan a² + b² = c² yang di sini terpenuhi.",
+            "2": "Murid salah menetapkan sisi miring: sisi miring selalu sisi terpanjang, yaitu 29 cm, bukan sisi yang berada di tengah urutan panjang.",
+            "3": "Murid membandingkan jumlah panjang dua sisi dengan sisi ketiga, yang merupakan syarat terbentuknya segitiga, bukan syarat untuk menentukan jenis sudutnya; penentuan jenis sudut memakai perbandingan kuadrat sisi."
+          },
+          "difficulty": "tinggi"
+        },
+        {
+          "id": "mat-d8-geo-012",
+          "prompt": "Nadia membuat bendera berbentuk segitiga siku-siku dengan panjang sisi tegak 24 cm dan 32 cm. Seluruh tepi bendera akan diberi pita. Berapa panjang pita yang dibutuhkan?",
+          "options": [
+            "96 cm",
+            "56 cm",
+            "112 cm",
+            "384 cm"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Cari sisi miringnya lebih dahulu: √(24² + 32²) = √(576 + 1.024) = √1.600 = 40 cm. Pita mengelilingi seluruh tepi, jadi panjangnya 24 + 32 + 40 = 96 cm."
+          },
+          "distractorWhy": {
+            "1": "Murid hanya menjumlahkan kedua sisi tegak dan lupa bahwa tepi bendera juga mencakup sisi miring.",
+            "2": "Murid menghitung sisi miring dengan menjumlahkan 24 + 32 = 56 tanpa mengkuadratkan, lalu menjumlahkan ketiga sisi menjadi 24 + 32 + 56 = 112 cm.",
+            "3": "Murid menghitung luas bendera, ½ × 24 × 32 = 384, dan menuliskannya sebagai panjang pita, yaitu tertukar antara luas daerah dan keliling."
+          },
+          "difficulty": "tinggi"
+        }
+      ]
+    },
+    {
+      "code": "KOMP-MAT-D-8-FUN-01",
+      "grade": 8,
+      "semester": 2,
+      "name": "Relasi, Fungsi & Persamaan Garis Lurus",
+      "materi": "Menyatakan relasi dan fungsi, menentukan gradien, serta menyusun persamaan garis lurus",
+      "cpRef": "Kepmendikbudristek/BSKAP No. 032/H/KR/2024 — CP Matematika Fase D, Elemen Aljabar",
+      "items": [
+        {
+          "id": "mat-d8-fun-001",
+          "prompt": "Diketahui fungsi f(x) = 3x - 4. Berapakah nilai f(5)?",
+          "options": [
+            "11",
+            "15",
+            "19",
+            "3"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Substitusikan x = 5 ke aturan fungsinya: f(5) = 3(5) - 4 = 15 - 4 = 11. Perkalian dikerjakan lebih dahulu, baru pengurangan."
+          },
+          "distractorWhy": {
+            "1": "Murid hanya mengalikan 3 x 5 dan berhenti, melupakan suku konstanta -4 pada aturan fungsi.",
+            "2": "Murid membaca tanda minus sebagai plus sehingga menghitung 15 + 4; kesalahan tanda yang sering muncul saat menyalin aturan fungsi.",
+            "3": "Murid mengerjakan pengurangan lebih dahulu, 3(5 - 4) = 3, sehingga urutan operasi pada bentuk aljabar terbalik."
+          },
+          "difficulty": "dasar"
+        },
+        {
+          "id": "mat-d8-fun-002",
+          "prompt": "Berapakah gradien garis yang melalui titik (1, 3) dan (4, 12)?",
+          "options": [
+            "3",
+            "1/3",
+            "-3",
+            "9"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Gradien adalah perbandingan perubahan y terhadap perubahan x: m = (12 - 3) / (4 - 1) = 9 / 3 = 3. Artinya setiap x bertambah 1, nilai y bertambah 3."
+          },
+          "distractorWhy": {
+            "1": "Murid membalik rumus gradien menjadi selisih absis dibagi selisih ordinat, 3 / 9, sehingga memperoleh kebalikan dari nilai yang benar.",
+            "2": "Murid mengurangkan ordinat dengan urutan terbalik, (3 - 12) / (4 - 1) = -3, tetapi tidak membalik urutan absisnya sehingga tandanya salah.",
+            "3": "Murid berhenti pada selisih ordinat 12 - 3 = 9 dan lupa membaginya dengan selisih absis."
+          },
+          "difficulty": "dasar"
+        },
+        {
+          "id": "mat-d8-fun-003",
+          "prompt": "Himpunan A = {1, 2, 3} dipasangkan ke himpunan B = {a, b, c}. Himpunan pasangan berurutan manakah yang merupakan fungsi dari A ke B?",
+          "options": [
+            "{(1, a), (2, a), (3, b)}",
+            "{(1, a), (1, b), (2, c)}",
+            "{(1, a), (2, b)}",
+            "{(a, 1), (b, 2), (c, 3)}"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Suatu relasi disebut fungsi jika setiap anggota daerah asal dipasangkan dengan tepat satu anggota daerah kawan. Pada himpunan ini, 1, 2, dan 3 masing-masing muncul tepat sekali. Anggota daerah kawan boleh dipakai berulang (a dipakai dua kali) atau tidak dipakai sama sekali (c)."
+          },
+          "distractorWhy": {
+            "1": "Murid mengira syarat fungsi adalah semua anggota daerah kawan terpakai, padahal di sini anggota 1 memiliki dua pasangan sehingga aturannya tidak tunggal.",
+            "2": "Murid menganggap relasi tetap menjadi fungsi meskipun ada anggota daerah asal yang tidak memiliki pasangan; angka 3 di sini tidak dipasangkan sama sekali.",
+            "3": "Murid membalik arah pemetaan dan menyusun pasangan dari B ke A, padahal soal meminta fungsi dengan daerah asal A."
+          },
+          "difficulty": "dasar"
+        },
+        {
+          "id": "mat-d8-fun-004",
+          "prompt": "Tentukan persamaan garis yang bergradien 2 dan memotong sumbu-y di titik (0, -3).",
+          "options": [
+            "y = 2x - 3",
+            "y = 2x + 3",
+            "y = -3x + 2",
+            "y = 2x"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Bentuk umum garis adalah y = mx + c dengan m gradien dan c ordinat titik potong sumbu-y. Karena m = 2 dan c = -3, persamaannya y = 2x - 3. Diuji dengan x = 0 memang diperoleh y = -3."
+          },
+          "distractorWhy": {
+            "1": "Murid mengabaikan tanda negatif pada ordinat titik potong dan menuliskan c = 3, sehingga garisnya memotong sumbu-y di tempat yang keliru.",
+            "2": "Murid tertukar menempatkan gradien dan konstanta, memakai -3 sebagai koefisien x dan 2 sebagai konstanta.",
+            "3": "Murid mengira setiap garis melalui titik asal sehingga menghilangkan konstanta, padahal garis ini memotong sumbu-y di (0, -3)."
+          },
+          "difficulty": "dasar"
+        },
+        {
+          "id": "mat-d8-fun-005",
+          "prompt": "Fungsi linear f(x) = ax + b memenuhi f(2) = 7 dan f(4) = 13. Tentukan rumus fungsinya.",
+          "options": [
+            "f(x) = 3x + 1",
+            "f(x) = 3x - 1",
+            "f(x) = 2x + 3",
+            "f(x) = 6x - 5"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Nilai a diperoleh dari perbandingan perubahan nilai fungsi terhadap perubahan x: a = (13 - 7) / (4 - 2) = 6 / 2 = 3. Substitusikan ke f(2) = 7: 3(2) + b = 7 sehingga b = 1. Jadi f(x) = 3x + 1, dan f(4) = 13 terpenuhi."
+          },
+          "distractorWhy": {
+            "1": "Murid menemukan a = 3 lalu menghitung b terbalik, 6 - 7 = -1, padahal yang benar b = 7 - 6; kesalahan arah pengurangan saat memindahkan ruas.",
+            "2": "Murid tertukar peran a dan b, menempatkan konstanta 3 sebagai koefisien x dan sebaliknya, sehingga f(2) = 7 tidak terpenuhi.",
+            "3": "Murid memakai selisih nilai fungsi 13 - 7 = 6 sebagai a tanpa membaginya dengan selisih x, lalu menghitung b = 7 - 12 = -5."
+          },
+          "difficulty": "sedang"
+        },
+        {
+          "id": "mat-d8-fun-006",
+          "prompt": "Tentukan persamaan garis yang melalui titik (2, 3) dan (6, 11).",
+          "options": [
+            "y = 2x - 1",
+            "y = 2x + 1",
+            "y = 1/2 x + 2",
+            "y = 8x - 13"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Gradiennya m = (11 - 3) / (6 - 2) = 8 / 4 = 2. Gunakan bentuk y - y1 = m(x - x1) dengan titik (2, 3): y - 3 = 2(x - 2) = 2x - 4, sehingga y = 2x - 1. Titik (6, 11) juga memenuhi karena 2(6) - 1 = 11."
+          },
+          "distractorWhy": {
+            "1": "Murid salah tanda saat memindahkan ruas: dari y - 3 = 2x - 4 ditulis y = 2x - 4 + 3 menjadi y = 2x + 1 karena -4 dan +3 dijumlahkan dengan tanda terbalik.",
+            "2": "Murid membalik rumus gradien menjadi selisih absis dibagi selisih ordinat, 4 / 8 = 1/2, lalu menghitung konstanta dari titik (2, 3).",
+            "3": "Murid memakai selisih ordinat 8 sebagai gradien tanpa membaginya dengan selisih absis, sehingga diperoleh konstanta -13."
+          },
+          "difficulty": "sedang"
+        },
+        {
+          "id": "mat-d8-fun-007",
+          "prompt": "Garis k sejajar dengan garis 3x + y = 6 dan melalui titik (3, 2). Tentukan persamaan garis k.",
+          "options": [
+            "y = -3x + 11",
+            "y = 3x - 7",
+            "y = 1/3 x + 1",
+            "y = -3x + 6"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Ubah garis yang diketahui ke bentuk y = mx + c: dari 3x + y = 6 diperoleh y = -3x + 6, sehingga gradiennya -3. Garis sejajar memiliki gradien sama, jadi y - 2 = -3(x - 3) = -3x + 9 dan y = -3x + 11. Uji titik (3, 2): -9 + 11 = 2."
+          },
+          "distractorWhy": {
+            "1": "Murid membaca koefisien x pada bentuk 3x + y = 6 sebagai gradien, lupa bahwa y harus diisolasi lebih dahulu sehingga gradien sebenarnya -3.",
+            "2": "Murid memakai gradien garis tegak lurus, yaitu kebalikan berlawanan dari -3, padahal yang diminta garis sejajar yang gradiennya sama persis.",
+            "3": "Murid menyalin konstanta 6 dari garis yang diketahui karena mengira garis sejajar memiliki konstanta yang sama; padahal garis itu tidak melalui titik (3, 2)."
+          },
+          "difficulty": "sedang"
+        },
+        {
+          "id": "mat-d8-fun-008",
+          "prompt": "Tarif ojek pangkalan Pak Slamet adalah Rp 5.000 untuk kilometer pertama, ditambah Rp 3.000 untuk setiap kilometer berikutnya. Berapa biaya perjalanan sejauh 7 km?",
+          "options": [
+            "Rp 23.000",
+            "Rp 26.000",
+            "Rp 21.000",
+            "Rp 8.000"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Model fungsinya f(x) = 5.000 + 3.000(x - 1) karena kilometer pertama sudah dihitung pada tarif awal. Untuk x = 7: f(7) = 5.000 + 3.000(6) = 5.000 + 18.000 = 23.000 rupiah."
+          },
+          "distractorWhy": {
+            "1": "Murid mengalikan Rp 3.000 dengan seluruh 7 km lalu menambahkan tarif awal, sehingga kilometer pertama terhitung dua kali.",
+            "2": "Murid hanya mengalikan Rp 3.000 dengan 7 km dan melupakan tarif awal Rp 5.000 untuk kilometer pertama.",
+            "3": "Murid menjumlahkan kedua angka tarif satu kali saja, menganggap biaya tidak bergantung pada jarak yang ditempuh."
+          },
+          "difficulty": "sedang"
+        },
+        {
+          "id": "mat-d8-fun-009",
+          "prompt": "Garis dengan persamaan 2x - 3y = 12 memotong sumbu-x di titik manakah?",
+          "options": [
+            "(6, 0)",
+            "(0, 6)",
+            "(0, -4)",
+            "(-6, 0)"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Titik potong dengan sumbu-x selalu memiliki ordinat nol. Substitusikan y = 0: 2x - 3(0) = 12 sehingga 2x = 12 dan x = 6. Titik potongnya (6, 0)."
+          },
+          "distractorWhy": {
+            "1": "Murid menemukan angka 6 dengan benar tetapi menuliskannya pada posisi ordinat, tertukar antara absis dan ordinat dalam penulisan koordinat.",
+            "2": "Murid mensubstitusikan x = 0 sehingga memperoleh -3y = 12 dan y = -4; itu adalah titik potong dengan sumbu-y, bukan sumbu-x.",
+            "3": "Murid terbawa tanda minus pada suku -3y dan memberi tanda negatif pada hasil pembagian 12 : 2, padahal suku itu bernilai nol ketika y = 0."
+          },
+          "difficulty": "sedang"
+        },
+        {
+          "id": "mat-d8-fun-010",
+          "prompt": "Tentukan persamaan garis yang melalui titik A(-2, 5) dan B(4, -7).",
+          "options": [
+            "y = -2x + 1",
+            "y = -2x - 9",
+            "y = -2x + 8",
+            "y = -1/2 x + 4"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Gradiennya m = (-7 - 5) / (4 - (-2)) = -12 / 6 = -2. Gunakan titik A: y - 5 = -2(x - (-2)) = -2(x + 2) = -2x - 4, sehingga y = -2x + 1. Uji titik B: -2(4) + 1 = -7, benar."
+          },
+          "distractorWhy": {
+            "1": "Murid memperoleh y - 5 = -2x - 4 lalu menjumlahkan -4 dengan -5, padahal +5 harus berpindah ruas menjadi penjumlahan; kesalahan tanda saat memindahkan ruas.",
+            "2": "Murid menukar absis dan ordinat titik A saat memasukkannya ke bentuk y - y1 = m(x - x1), sehingga menghitung y + 2 = -2(x - 5).",
+            "3": "Murid membalik rumus gradien menjadi selisih absis dibagi selisih ordinat, 6 / (-12) = -1/2, lalu menyusun persamaan dari gradien yang keliru itu."
+          },
+          "difficulty": "tinggi"
+        },
+        {
+          "id": "mat-d8-fun-011",
+          "prompt": "Nadia menabung dengan tambahan tetap setiap bulan. Setelah 3 bulan tabungannya Rp 260.000 dan setelah 7 bulan menjadi Rp 500.000. Berapa uang yang Nadia tabung pada awal sebelum bulan pertama?",
+          "options": [
+            "Rp 80.000",
+            "Rp 60.000",
+            "Rp 200.000",
+            "Rp 440.000"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Tabungan Nadia mengikuti fungsi linear T(b) = mb + T0. Tambahan per bulan m = (500.000 - 260.000) / (7 - 3) = 240.000 / 4 = 60.000. Substitusikan bulan ke-3: 260.000 = 60.000(3) + T0 sehingga T0 = 260.000 - 180.000 = 80.000 rupiah."
+          },
+          "distractorWhy": {
+            "1": "Murid menghitung tambahan per bulan dengan benar lalu menuliskannya sebagai tabungan awal, yaitu tertukar antara gradien dan nilai awal pada fungsi linear.",
+            "2": "Murid hanya mengurangkan satu kali tambahan bulanan (260.000 - 60.000), padahal harus mundur tiga bulan penuh untuk sampai ke keadaan awal.",
+            "3": "Murid menambahkan 3 x 60.000 alih-alih mengurangkannya, sehingga bergerak maju menjauhi keadaan awal, bukan mundur ke titik nol bulan."
+          },
+          "difficulty": "tinggi"
+        },
+        {
+          "id": "mat-d8-fun-012",
+          "prompt": "Fungsi linear f(x) = ax + b memenuhi f(-1) = 1 dan f(3) = 9. Berapakah nilai f(5)?",
+          "options": [
+            "13",
+            "11",
+            "25",
+            "17"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Hitung a = (9 - 1) / (3 - (-1)) = 8 / 4 = 2. Dari f(-1) = 1 diperoleh 2(-1) + b = 1 sehingga b = 3, jadi f(x) = 2x + 3. Maka f(5) = 2(5) + 3 = 13."
+          },
+          "distractorWhy": {
+            "1": "Murid menemukan a = 2 tetapi menganggap b sama dengan nilai f(-1) = 1, sehingga memakai rumus f(x) = 2x + 1 dan memperoleh 11.",
+            "2": "Murid menghitung selisih absis sebagai 3 - 1 = 2 karena mengabaikan tanda negatif pada -1, sehingga memperoleh a = 4 dan b = 5.",
+            "3": "Murid menganggap nilai fungsi selalu bertambah 8 setiap satu langkah x, lalu menghitung 9 + 8, padahal 8 adalah pertambahan untuk 4 satuan x."
+          },
+          "difficulty": "tinggi"
+        }
+      ]
+    },
+    {
+      "code": "KOMP-MAT-D-9-STA-01",
+      "grade": 9,
+      "semester": 1,
+      "name": "Statistika & Peluang Empiris",
+      "materi": "Menghitung pemusatan data rata-rata, median, modus, dan frekuensi relatif",
+      "cpRef": "Kepmendikbudristek/BSKAP No. 032/H/KR/2024 — CP Matematika Fase D, Elemen Analisis Data dan Peluang",
+      "items": [
+        {
+          "id": "mat-d9-sta-001",
+          "prompt": "Nilai ulangan Matematika Rina dalam lima kali ulangan adalah 70, 80, 75, 85, dan 90. Rata-rata nilai ulangan Rina adalah …",
+          "options": [
+            "80",
+            "400",
+            "100",
+            "75"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Rata-rata = jumlah seluruh nilai dibagi banyaknya data. Jumlahnya 70 + 80 + 75 + 85 + 90 = 400, lalu 400 : 5 = 80."
+          },
+          "distractorWhy": {
+            "1": "Murid berhenti pada jumlah seluruh nilai dan lupa membaginya dengan banyaknya data; miskonsepsi bahwa rata-rata sama dengan total.",
+            "2": "Murid membagi 400 dengan 4 karena menghitung banyak jarak antardata (n − 1), bukan banyaknya data yang sebenarnya, yaitu 5.",
+            "3": "Murid tertukar antara rata-rata dan median, lalu mengambil nilai yang kebetulan berada di tengah daftar yang belum diurutkan."
+          },
+          "difficulty": "dasar"
+        },
+        {
+          "id": "mat-d9-sta-002",
+          "prompt": "Berat badan enam siswa kelas 9A (dalam kg) tercatat 42, 38, 45, 40, 47, dan 44. Median data tersebut adalah …",
+          "options": [
+            "43 kg",
+            "42,5 kg",
+            "42 kg",
+            "42,67 kg"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Median dicari setelah data diurutkan: 38, 40, 42, 44, 45, 47. Karena banyak datanya genap, median adalah rata-rata dua data tengah, yaitu (42 + 44) : 2 = 43 kg."
+          },
+          "distractorWhy": {
+            "1": "Murid langsung mengambil dua angka yang tampak di tengah daftar asli (45 dan 40) tanpa mengurutkan data lebih dahulu.",
+            "2": "Murid hanya mengambil satu data tengah (data ke-3 setelah diurutkan); pada data berjumlah genap median adalah rata-rata dua data tengah.",
+            "3": "Murid menghitung rata-rata (256 : 6 ≈ 42,67) padahal yang diminta median; keduanya ukuran pemusatan, tetapi cara menghitungnya berbeda."
+          },
+          "difficulty": "dasar"
+        },
+        {
+          "id": "mat-d9-sta-003",
+          "prompt": "Ukuran sepatu sepuluh siswa kelas 9B adalah 38, 39, 40, 39, 41, 39, 40, 38, 39, dan 42. Modus data tersebut adalah …",
+          "options": [
+            "39",
+            "4",
+            "42",
+            "39,5"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Modus adalah nilai yang paling sering muncul. Ukuran 38 muncul 2 kali, 39 muncul 4 kali, 40 muncul 2 kali, sedangkan 41 dan 42 masing-masing 1 kali, sehingga modusnya 39."
+          },
+          "distractorWhy": {
+            "1": "Murid menyebutkan frekuensi terbanyaknya (4 kali), bukan nilai datanya; modus adalah datanya sendiri, bukan berapa kali data itu muncul.",
+            "2": "Murid mengira modus berarti nilai terbesar dalam kumpulan data.",
+            "3": "Murid menghitung rata-rata (395 : 10 = 39,5) padahal yang ditanyakan modus."
+          },
+          "difficulty": "dasar"
+        },
+        {
+          "id": "mat-d9-sta-004",
+          "prompt": "Bagas melempar sebuah dadu sebanyak 40 kali dan mata dadu 6 muncul 8 kali. Frekuensi relatif munculnya mata dadu 6 pada percobaan itu adalah …",
+          "options": [
+            "0,2",
+            "1/6 ≈ 0,17",
+            "5",
+            "8"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Frekuensi relatif = frekuensi kejadian dibagi banyaknya percobaan, yaitu 8 : 40 = 0,2 atau 20%."
+          },
+          "distractorWhy": {
+            "1": "Murid memakai peluang teoretis 1/6, padahal yang diminta frekuensi relatif yang dihitung dari hasil percobaan nyata.",
+            "2": "Murid membalik perbandingan dan membagi banyaknya percobaan dengan frekuensi kejadian (40 : 8).",
+            "3": "Murid melaporkan frekuensi mutlak kejadian tanpa membaginya dengan banyaknya percobaan, sehingga hasilnya bukan bilangan antara 0 dan 1."
+          },
+          "difficulty": "dasar"
+        },
+        {
+          "id": "mat-d9-sta-005",
+          "prompt": "Nilai empat kali ulangan IPA Nadia adalah 78, 82, 85, dan 75. Agar rata-rata lima kali ulangannya menjadi 82, nilai ulangan kelima Nadia harus …",
+          "options": [
+            "90",
+            "82",
+            "80",
+            "8"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Jumlah nilai yang dibutuhkan untuk lima ulangan adalah 5 × 82 = 410. Jumlah empat nilai yang sudah ada 78 + 82 + 85 + 75 = 320, sehingga nilai kelima = 410 − 320 = 90."
+          },
+          "distractorWhy": {
+            "1": "Murid mengira nilai ulangan terakhir harus sama dengan rata-rata yang ditargetkan, padahal rata-rata dipengaruhi seluruh data.",
+            "2": "Murid hanya menghitung rata-rata empat nilai yang sudah ada (320 : 4 = 80) dan tidak memakai target rata-rata yang baru.",
+            "3": "Murid mengalikan target rata-rata dengan 4, yaitu banyaknya data lama, bukan dengan 5, sehingga memperoleh 328 − 320 = 8."
+          },
+          "difficulty": "sedang"
+        },
+        {
+          "id": "mat-d9-sta-006",
+          "prompt": "Tabel nilai ulangan Matematika kelas 9C: nilai 6 diperoleh 4 siswa, nilai 7 oleh 8 siswa, nilai 8 oleh 10 siswa, nilai 9 oleh 5 siswa, dan nilai 10 oleh 3 siswa. Median nilai kelas tersebut adalah …",
+          "options": [
+            "8",
+            "10",
+            "7",
+            "7,83"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Banyak siswa seluruhnya 30, sehingga median adalah rata-rata data ke-15 dan ke-16. Frekuensi kumulatifnya 4, lalu 12, lalu 22, jadi data ke-15 dan ke-16 sama-sama bernilai 8 dan mediannya 8."
+          },
+          "distractorWhy": {
+            "1": "Murid mengambil frekuensi terbesar (10 siswa) sebagai jawaban, tertukar antara nilai data dan banyaknya siswa yang memperoleh nilai itu.",
+            "2": "Murid berhenti pada baris yang frekuensi kumulatifnya baru mencapai 12 siswa, padahal data ke-15 belum tercakup di baris tersebut.",
+            "3": "Murid menghitung rata-rata (235 : 30 ≈ 7,83) padahal yang ditanyakan median."
+          },
+          "difficulty": "sedang"
+        },
+        {
+          "id": "mat-d9-sta-007",
+          "prompt": "Pak Slamet mendata banyak buku yang dipinjam 20 siswa di perpustakaan: 3 siswa tidak meminjam, 6 siswa meminjam 1 buku, 7 siswa meminjam 2 buku, dan 4 siswa meminjam 3 buku. Rata-rata banyak buku yang dipinjam tiap siswa adalah …",
+          "options": [
+            "1,6 buku",
+            "1,5 buku",
+            "8 buku",
+            "32 buku"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Jumlah seluruh buku = (0 × 3) + (1 × 6) + (2 × 7) + (3 × 4) = 32 buku, lalu dibagi banyaknya siswa: 32 : 20 = 1,6 buku."
+          },
+          "distractorWhy": {
+            "1": "Murid merata-ratakan angka pada kolom banyak buku saja, (0 + 1 + 2 + 3) : 4 = 1,5, dan mengabaikan frekuensi tiap nilai.",
+            "2": "Murid membagi jumlah buku dengan banyaknya baris tabel (32 : 4), bukan dengan banyaknya siswa.",
+            "3": "Murid berhenti pada jumlah seluruh buku dan lupa membaginya dengan banyaknya siswa."
+          },
+          "difficulty": "sedang"
+        },
+        {
+          "id": "mat-d9-sta-008",
+          "prompt": "Kelompok Rina melempar sekeping uang logam 200 kali dan sisi angka muncul 116 kali. Jika pelemparan dilanjutkan sampai 500 kali dengan frekuensi relatif yang tetap, perkiraan banyak munculnya sisi angka adalah …",
+          "options": [
+            "290 kali",
+            "250 kali",
+            "116 kali",
+            "416 kali"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Frekuensi relatif sisi angka = 116 : 200 = 0,58. Perkiraan banyak kemunculan pada 500 pelemparan = 0,58 × 500 = 290 kali."
+          },
+          "distractorWhy": {
+            "1": "Murid memakai peluang teoretis 1/2 (0,5 × 500) dan mengabaikan data percobaan yang sudah dikumpulkan.",
+            "2": "Murid menganggap frekuensi kejadian tidak ikut bertambah walaupun banyaknya percobaan bertambah.",
+            "3": "Murid menambahkan seluruh 300 pelemparan tambahan sebagai sisi angka (116 + 300), seolah sisa percobaan pasti menghasilkan angka."
+          },
+          "difficulty": "sedang"
+        },
+        {
+          "id": "mat-d9-sta-009",
+          "prompt": "Rata-rata tinggi badan 9 siswa putra kelas 9A adalah 158 cm. Setelah Bagas yang tingginya 168 cm bergabung, rata-rata tinggi badan sepuluh siswa itu menjadi …",
+          "options": [
+            "159 cm",
+            "163 cm",
+            "158 cm",
+            "176,67 cm"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Jumlah tinggi 9 siswa = 9 × 158 = 1422 cm. Setelah Bagas bergabung jumlahnya 1422 + 168 = 1590 cm untuk 10 siswa, sehingga rata-ratanya 1590 : 10 = 159 cm."
+          },
+          "distractorWhy": {
+            "1": "Murid merata-ratakan rata-rata lama dengan data baru, (158 + 168) : 2, seolah satu orang berbobot sama dengan sembilan orang.",
+            "2": "Murid mengira menambah satu data tidak mengubah rata-rata.",
+            "3": "Murid menambahkan tinggi Bagas dengan benar tetapi tetap membagi dengan 9, lupa bahwa banyaknya data menjadi 10."
+          },
+          "difficulty": "sedang"
+        },
+        {
+          "id": "mat-d9-sta-010",
+          "prompt": "Rata-rata nilai ujian 18 siswa putri kelas 9B adalah 82, sedangkan rata-rata nilai 12 siswa putranya 77. Rata-rata nilai seluruh siswa kelas itu adalah …",
+          "options": [
+            "80",
+            "79,5",
+            "79",
+            "1200"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Jumlah nilai seluruh siswa = (18 × 82) + (12 × 77) = 1476 + 924 = 2400, lalu dibagi 30 siswa: 2400 : 30 = 80."
+          },
+          "distractorWhy": {
+            "1": "Murid merata-ratakan kedua rata-rata, (82 + 77) : 2, tanpa memperhatikan bahwa banyaknya siswa tiap kelompok berbeda.",
+            "2": "Murid tertukar memasangkan banyaknya siswa dengan rata-rata kelompok lain, yaitu menghitung (18 × 77) + (12 × 82) lalu dibagi 30.",
+            "3": "Murid membagi jumlah seluruh nilai dengan banyaknya kelompok (2), bukan dengan banyaknya siswa (30)."
+          },
+          "difficulty": "tinggi"
+        },
+        {
+          "id": "mat-d9-sta-011",
+          "prompt": "Nilai lima siswa adalah 6, 8, x, 9, dan 7 dengan x bilangan bulat. Jika rata-rata kelima nilai itu 7,8 dan mediannya 8, nilai x adalah …",
+          "options": [
+            "9",
+            "8",
+            "7,8",
+            "10"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Jumlah kelima nilai = 5 × 7,8 = 39. Empat nilai yang diketahui berjumlah 6 + 8 + 9 + 7 = 30, sehingga x = 39 − 30 = 9. Setelah diurutkan menjadi 6, 7, 8, 9, 9, mediannya memang 8."
+          },
+          "distractorWhy": {
+            "1": "Murid mengira data yang belum diketahui pasti sama dengan mediannya, padahal median hanya menunjukkan posisi tengah setelah data diurutkan.",
+            "2": "Murid menuliskan rata-rata sebagai nilai x; rata-rata adalah hasil perhitungan seluruh data, bukan salah satu datanya, dan x diketahui bilangan bulat.",
+            "3": "Murid memakai median 8 sebagai rata-rata sehingga menghitung jumlah seluruh data 5 × 8 = 40 dan memperoleh x = 10."
+          },
+          "difficulty": "tinggi"
+        },
+        {
+          "id": "mat-d9-sta-012",
+          "prompt": "Nadia mengambil satu kelereng dari sebuah kantong lalu mengembalikannya, sebanyak 250 kali. Kelereng merah terambil 90 kali, hijau 60 kali, dan sisanya biru. Jika kantong itu berisi 40 kelereng, frekuensi relatif kelereng biru dan perkiraan banyak kelereng biru di dalam kantong berturut-turut adalah …",
+          "options": [
+            "0,4 dan sekitar 16 kelereng",
+            "0,4 dan sekitar 100 kelereng",
+            "0,6 dan sekitar 24 kelereng",
+            "1/3 dan sekitar 13 kelereng"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Kelereng biru terambil 250 − 90 − 60 = 100 kali, sehingga frekuensi relatifnya 100 : 250 = 0,4. Perkiraan banyak kelereng biru = 0,4 × 40 = 16 kelereng."
+          },
+          "distractorWhy": {
+            "1": "Murid menghitung frekuensi relatifnya dengan benar tetapi memakai frekuensi mutlak 100 sebagai banyaknya kelereng, padahal kantong hanya berisi 40 kelereng.",
+            "2": "Murid menjumlahkan frekuensi merah dan hijau (150) dan mengira itulah frekuensi biru, sehingga memperoleh 150 : 250 = 0,6 lalu 0,6 × 40 = 24.",
+            "3": "Murid memakai peluang teoretis 1/3 karena menganggap tiga warna pasti sama banyak, tanpa membaca data percobaan."
+          },
+          "difficulty": "tinggi"
+        }
+      ]
+    },
+    {
+      "code": "KOMP-MAT-D-9-BAK-01",
+      "grade": 9,
+      "semester": 1,
+      "name": "Bilangan Berpangkat & Bentuk Akar",
+      "materi": "Operasi bilangan berpangkat bulat, bentuk akar, dan notasi ilmiah",
+      "cpRef": "Kepmendikbudristek/BSKAP No. 032/H/KR/2024 — CP Matematika Fase D, Elemen Bilangan",
+      "items": [
+        {
+          "id": "mat-d9-bak-001",
+          "prompt": "Hasil dari 2³ × 2⁴ : 2² adalah …",
+          "options": [
+            "2⁵ = 32",
+            "2⁶ = 64",
+            "2⁹ = 512",
+            "2¹⁰ = 1024"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Gunakan sifat eksponen berbasis sama: pada perkalian pangkatnya dijumlahkan dan pada pembagian dikurangkan, sehingga 2^(3 + 4 − 2) = 2⁵ = 32."
+          },
+          "distractorWhy": {
+            "1": "Murid menyalin operasi hitung bilangannya ke pangkatnya (3 × 4 : 2 = 6), padahal operasi pada pangkat berbasis sama justru berupa penjumlahan dan pengurangan.",
+            "2": "Murid menjumlahkan ketiga pangkat (3 + 4 + 2), lupa bahwa pembagian bilangan berpangkat berbasis sama berarti pangkatnya dikurangkan.",
+            "3": "Murid mengalikan pangkat pada operasi perkalian (3 × 4 = 12) lalu baru mengurangi 2, miskonsepsi klasik pada perkalian bilangan berpangkat berbasis sama."
+          },
+          "difficulty": "dasar"
+        },
+        {
+          "id": "mat-d9-bak-002",
+          "prompt": "Nilai dari (−4)⁰ + 2⁻² adalah …",
+          "options": [
+            "5/4 atau 1,25",
+            "1/4 atau 0,25",
+            "−3",
+            "−3/4 atau −0,75"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Setiap bilangan bukan nol yang dipangkatkan 0 bernilai 1, jadi (−4)⁰ = 1. Pangkat negatif berarti kebalikan, jadi 2⁻² = 1/2² = 1/4. Jumlahnya 1 + 1/4 = 5/4 = 1,25."
+          },
+          "distractorWhy": {
+            "1": "Murid mengira bilangan berpangkat nol bernilai 0, sehingga yang dihitung hanya 0 + 1/4.",
+            "2": "Murid mengira pangkat negatif membuat hasilnya menjadi bilangan negatif, sehingga menulis 2⁻² = −4 lalu 1 + (−4) = −3.",
+            "3": "Murid mengira tanda negatif pada basis tetap terbawa meski pangkatnya nol, sehingga menulis (−4)⁰ = −1 lalu −1 + 1/4 = −3/4."
+          },
+          "difficulty": "dasar"
+        },
+        {
+          "id": "mat-d9-bak-003",
+          "prompt": "Nilai dari √225 + √64 adalah …",
+          "options": [
+            "23",
+            "17",
+            "120",
+            "144,5"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Akar ditarik lebih dahulu pada tiap suku: √225 = 15 karena 15² = 225, dan √64 = 8 karena 8² = 64, sehingga hasilnya 15 + 8 = 23."
+          },
+          "distractorWhy": {
+            "1": "Murid menjumlahkan bilangan di dalam akar lebih dahulu, √(225 + 64) = √289 = 17; akar dari sebuah jumlah tidak sama dengan jumlah akar-akarnya.",
+            "2": "Murid mengalikan hasil kedua akar (15 × 8) padahal tanda operasi pada soal adalah penjumlahan.",
+            "3": "Murid mengira menarik akar kuadrat sama dengan membagi dua, sehingga menghitung 112,5 + 32."
+          },
+          "difficulty": "dasar"
+        },
+        {
+          "id": "mat-d9-bak-004",
+          "prompt": "Bentuk notasi ilmiah dari 0,00045 adalah …",
+          "options": [
+            "4,5 × 10⁻⁴",
+            "4,5 × 10⁴",
+            "45 × 10⁻⁵",
+            "4,5 × 10⁻³"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Koma digeser ke kanan sampai tersisa satu angka bukan nol di depan koma: 0,00045 menjadi 4,5 setelah empat kali pergeseran. Karena bilangan asalnya lebih kecil dari 1, pangkatnya negatif, yaitu 4,5 × 10⁻⁴."
+          },
+          "distractorWhy": {
+            "1": "Murid menggeser koma dengan benar tetapi memberi pangkat positif; bilangan yang lebih kecil dari 1 selalu berpangkat negatif.",
+            "2": "Murid tidak memenuhi syarat baku notasi ilmiah yang mengharuskan bilangan di depan pangkat bernilai antara 1 dan 10.",
+            "3": "Murid hanya menghitung banyaknya angka nol setelah koma (tiga nol) dan melewatkan satu langkah pergeseran koma."
+          },
+          "difficulty": "dasar"
+        },
+        {
+          "id": "mat-d9-bak-005",
+          "prompt": "Bentuk sederhana dari 6/√3 setelah penyebutnya dirasionalkan adalah …",
+          "options": [
+            "2√3",
+            "6√3",
+            "2",
+            "2√3/3"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Pembilang dan penyebut dikalikan √3 agar penyebutnya menjadi bilangan rasional: (6 × √3)/(√3 × √3) = 6√3/3 = 2√3."
+          },
+          "distractorWhy": {
+            "1": "Murid mengalikan pembilang dengan √3 tetapi lupa bahwa penyebutnya berubah menjadi 3, sehingga 6 tidak dibagi 3.",
+            "2": "Murid mencoret √3 pada pembilang dengan angka 3 pada penyebut seolah keduanya saling menghapus, padahal √3 dan 3 bukan bilangan yang sama.",
+            "3": "Murid membagi dengan 3 sebanyak dua kali, yaitu sekali pada 6 dan sekali lagi pada hasil akhirnya."
+          },
+          "difficulty": "sedang"
+        },
+        {
+          "id": "mat-d9-bak-006",
+          "prompt": "Hasil dari 3√5 + 2√5 − √20 adalah …",
+          "options": [
+            "3√5",
+            "5√5",
+            "√5",
+            "5√10"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Sederhanakan √20 lebih dahulu: √20 = √(4 × 5) = 2√5. Pada suku sejenis yang dijumlahkan atau dikurangkan hanyalah koefisiennya, sehingga 3√5 + 2√5 − 2√5 = 3√5."
+          },
+          "distractorWhy": {
+            "1": "Murid menjumlahkan dua suku pertama lalu menganggap √20 tidak sejenis dengan √5 sehingga tidak ikut dikurangkan, padahal √20 dapat disederhanakan menjadi 2√5.",
+            "2": "Murid menyederhanakan √20 menjadi 4√5 karena membagi 20 dengan 5, padahal yang keluar dari tanda akar adalah akar faktor kuadratnya, yaitu √4 = 2.",
+            "3": "Murid ikut menjumlahkan bilangan di dalam akar ketika menjumlahkan suku sejenis, seolah √5 + √5 menjadi √10."
+          },
+          "difficulty": "sedang"
+        },
+        {
+          "id": "mat-d9-bak-007",
+          "prompt": "Massa satu butir beras kira-kira 2,5 × 10⁻² gram. Massa 4 × 10³ butir beras, ditulis dalam notasi ilmiah, adalah …",
+          "options": [
+            "1 × 10² gram",
+            "1 × 10⁻⁵ gram",
+            "1 × 10⁶ gram",
+            "1 × 10⁻⁴ gram"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Bilangan depannya dikalikan dan pangkat 10 dijumlahkan: (2,5 × 4) × 10^(−2 + 3) = 10 × 10¹ = 10², sehingga massanya 1 × 10² gram atau 100 gram."
+          },
+          "distractorWhy": {
+            "1": "Murid mengalikan pangkatnya, (−2) × 3 = −6, alih-alih menjumlahkannya, sehingga memperoleh 10 × 10⁻⁶.",
+            "2": "Murid mengabaikan tanda negatif pada pangkat lalu menjumlahkan 2 + 3 = 5, sehingga memperoleh 10 × 10⁵.",
+            "3": "Murid mengurangkan pangkat, −2 − 3 = −5, karena terbawa aturan pembagian, padahal operasi pada soal adalah perkalian."
+          },
+          "difficulty": "sedang"
+        },
+        {
+          "id": "mat-d9-bak-008",
+          "prompt": "Bentuk sederhana dari (2⁻³ × 2⁵) : 2⁴ adalah …",
+          "options": [
+            "1/4",
+            "16",
+            "−4",
+            "4"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Pangkat dijumlahkan pada perkalian dan dikurangkan pada pembagian: 2^(−3 + 5 − 4) = 2⁻² = 1/2² = 1/4."
+          },
+          "distractorWhy": {
+            "1": "Murid mengabaikan tanda negatif pada pangkat −3 dan menghitung 3 + 5 − 4 = 4, sehingga memperoleh 2⁴.",
+            "2": "Murid mengira pangkat negatif menghasilkan bilangan negatif sehingga menulis 2⁻² sebagai −4; pangkat negatif berarti kebalikan, bukan tanda minus.",
+            "3": "Murid membalik urutan pengurangan pangkat dengan mengurangi pangkat pembilang dari pangkat penyebut (4 − 2 = 2), sehingga memperoleh 2²."
+          },
+          "difficulty": "sedang"
+        },
+        {
+          "id": "mat-d9-bak-009",
+          "prompt": "Lapangan sekolah berbentuk persegi dengan luas 1296 m². Pak Slamet ingin memasang pagar mengelilingi lapangan itu. Panjang pagar yang diperlukan adalah …",
+          "options": [
+            "144 m",
+            "36 m",
+            "5184 m",
+            "2592 m"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Panjang sisi persegi = √1296 = 36 m karena 36² = 1296. Panjang pagar sama dengan keliling persegi, yaitu 4 × 36 = 144 m."
+          },
+          "distractorWhy": {
+            "1": "Murid berhenti pada panjang sisi lapangan, padahal pagar mengelilingi lapangan sehingga yang dicari adalah kelilingnya, yaitu 4 × sisi.",
+            "2": "Murid mengalikan luas dengan 4 tanpa menarik akar lebih dahulu, sehingga yang dihitung masih berupa besaran luas.",
+            "3": "Murid mengira √1296 sama dengan 1296 : 2 = 648, lalu mengalikan hasil itu dengan 4."
+          },
+          "difficulty": "sedang"
+        },
+        {
+          "id": "mat-d9-bak-010",
+          "prompt": "Jumlah penduduk sebuah kabupaten 1,2 × 10⁶ jiwa dengan luas wilayah 4 × 10³ km². Kepadatan penduduk kabupaten itu adalah …",
+          "options": [
+            "300 jiwa/km²",
+            "3000 jiwa/km²",
+            "4,8 × 10⁹ jiwa/km²",
+            "3 × 10⁸ jiwa/km²"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Kepadatan penduduk = banyak penduduk dibagi luas wilayah = (1,2 : 4) × 10^(6 − 3) = 0,3 × 10³ = 3 × 10² = 300 jiwa/km²."
+          },
+          "distractorWhy": {
+            "1": "Murid menggeser koma ke arah yang keliru saat menghitung 1,2 : 4 sehingga memperoleh 3, padahal hasilnya 0,3.",
+            "2": "Murid mengalikan kedua bilangan, padahal kepadatan penduduk diperoleh dengan membagi banyak penduduk dengan luas wilayah.",
+            "3": "Murid membagi bilangan depannya dengan benar tetapi menjumlahkan pangkat 10, padahal pada pembagian pangkatnya harus dikurangkan."
+          },
+          "difficulty": "tinggi"
+        },
+        {
+          "id": "mat-d9-bak-011",
+          "prompt": "Bentuk sederhana dari 4/(√5 − 1) setelah penyebutnya dirasionalkan adalah …",
+          "options": [
+            "√5 + 1",
+            "4√5 + 4",
+            "(√5 + 1)/4",
+            "√5 − 1"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Pembilang dan penyebut dikalikan bentuk sekawan (√5 + 1). Penyebutnya menjadi (√5)² − 1² = 5 − 1 = 4, sehingga hasilnya 4(√5 + 1)/4 = √5 + 1."
+          },
+          "distractorWhy": {
+            "1": "Murid mengalikan dengan bentuk sekawan secara benar tetapi lupa membagi pembilangnya dengan penyebut baru yang bernilai 4.",
+            "2": "Murid membagi dengan 4 sekali lagi setelah pembilang 4(√5 + 1) dibagi 4, sehingga pembagian dilakukan dua kali.",
+            "3": "Murid mengalikan pembilang dan penyebut dengan bentuk yang sama, (√5 − 1), padahal (√5 − 1)(√5 − 1) = 6 − 2√5 masih memuat akar; yang melenyapkan akar adalah bentuk sekawannya."
+          },
+          "difficulty": "tinggi"
+        },
+        {
+          "id": "mat-d9-bak-012",
+          "prompt": "Nilai x yang memenuhi persamaan 3^(x + 1) = 81 adalah …",
+          "options": [
+            "3",
+            "4",
+            "27",
+            "80"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Ubah 81 menjadi bilangan berbasis 3, yaitu 81 = 3⁴. Karena basis kedua ruas sama, pangkatnya dapat disamakan: x + 1 = 4, sehingga x = 3."
+          },
+          "distractorWhy": {
+            "1": "Murid menyamakan pangkat menjadi x + 1 = 4 tetapi berhenti di situ dan lupa mengurangkan 1 untuk memperoleh nilai x.",
+            "2": "Murid membagi 81 dengan 3 dan mengira hasil bagi itulah nilai x; pada persamaan eksponen yang dicari adalah pangkatnya, bukan hasil bagi bilangannya.",
+            "3": "Murid memperlakukan pangkat seperti operasi penjumlahan biasa lalu menghitung 81 − 1 = 80."
+          },
+          "difficulty": "tinggi"
+        }
+      ]
+    },
+    {
+      "code": "KOMP-MAT-D-9-KUA-01",
+      "grade": 9,
+      "semester": 2,
+      "name": "Persamaan & Fungsi Kuadrat",
+      "materi": "Menyelesaikan persamaan kuadrat dengan pemfaktoran dan menganalisis grafik fungsi kuadrat sederhana",
+      "cpRef": "Kepmendikbudristek/BSKAP No. 032/H/KR/2024 — CP Matematika Fase D, Elemen Aljabar",
+      "items": [
+        {
+          "id": "mat-d9-kua-001",
+          "prompt": "Akar-akar persamaan x² - 7x + 12 = 0 adalah ...",
+          "options": [
+            "x = 3 atau x = 4",
+            "x = -3 atau x = -4",
+            "x = -3 atau x = 4",
+            "x = 7 atau x = 12"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Dicari dua bilangan yang hasil kalinya 12 dan jumlahnya -7, yaitu -3 dan -4. Pemfaktorannya (x - 3)(x - 4) = 0, sehingga x = 3 atau x = 4."
+          },
+          "distractorWhy": {
+            "1": "Murid menyalin bilangan pada faktor apa adanya tanpa membalik tandanya, padahal dari (x - 3)(x - 4) = 0 setiap faktor bernilai nol ketika x = 3 dan x = 4.",
+            "2": "Murid hanya memperhatikan syarat hasil kali dan memilih pasangan tanda yang keliru, yaitu (x + 3)(x - 4), sehingga jumlah bilangannya menjadi -1 dan hasil kalinya -12, bukan 12.",
+            "3": "Murid mengira akar persamaan adalah bilangan yang tertulis pada persamaan itu sendiri, sehingga langsung menyebut 7 dan 12 tanpa memfaktorkan."
+          },
+          "difficulty": "dasar"
+        },
+        {
+          "id": "mat-d9-kua-002",
+          "prompt": "Nilai x yang memenuhi persamaan x² - 9 = 0 adalah ...",
+          "options": [
+            "x = 3 atau x = -3",
+            "x = 3",
+            "x = 9 atau x = -9",
+            "x = 4,5 atau x = -4,5"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Persamaan dapat ditulis x² = 9. Dengan pemfaktoran selisih dua kuadrat diperoleh (x - 3)(x + 3) = 0, sehingga x = 3 atau x = -3. Keduanya memenuhi sebab 3² = 9 dan (-3)² = 9."
+          },
+          "distractorWhy": {
+            "1": "Murid hanya mengambil akar positif dan lupa bahwa kuadrat bilangan negatif juga bernilai positif, sehingga -3 ikut memenuhi persamaan.",
+            "2": "Murid memindahkan 9 ke ruas kanan lalu menuliskannya langsung sebagai nilai x, tanpa menarik akar kuadrat dari kedua ruas.",
+            "3": "Murid mengartikan pangkat dua sebagai dikalikan 2, sehingga menyelesaikan 2x = 9 dan memperoleh 4,5."
+          },
+          "difficulty": "dasar"
+        },
+        {
+          "id": "mat-d9-kua-003",
+          "prompt": "Akar-akar persamaan x² + 5x = 0 adalah ...",
+          "options": [
+            "x = 0 atau x = -5",
+            "x = -5",
+            "x = 0 atau x = 5",
+            "x = 5"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Karena tidak ada suku tetap, x difaktorkan sebagai faktor bersama: x(x + 5) = 0. Perkalian bernilai nol bila salah satu faktornya nol, sehingga x = 0 atau x + 5 = 0 yang berarti x = -5."
+          },
+          "distractorWhy": {
+            "1": "Murid membagi kedua ruas dengan x untuk menyederhanakan persamaan sehingga akar x = 0 ikut terbuang. Pembagian dengan x hanya boleh dilakukan bila x dipastikan bukan nol.",
+            "2": "Murid sudah memfaktorkan menjadi x(x + 5) = 0 tetapi membaca faktor (x + 5) sebagai x = 5, tanpa memindahkan 5 ke ruas kanan lebih dahulu.",
+            "3": "Murid melakukan dua kesalahan sekaligus: membagi kedua ruas dengan x sehingga kehilangan akar nol, lalu membaca tanda pada faktor yang tersisa secara terbalik."
+          },
+          "difficulty": "dasar"
+        },
+        {
+          "id": "mat-d9-kua-004",
+          "prompt": "Diketahui fungsi f(x) = x² - 4x + 3. Nilai f(5) adalah ...",
+          "options": [
+            "8",
+            "24",
+            "48",
+            "-7"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Substitusikan x = 5 ke setiap suku: f(5) = 5² - 4(5) + 3 = 25 - 20 + 3 = 8."
+          },
+          "distractorWhy": {
+            "1": "Murid menghitung 25 - 4 + 3 karena lupa mengalikan koefisien 4 dengan nilai x yang disubstitusikan.",
+            "2": "Murid mengabaikan tanda negatif pada suku -4x sehingga menjumlahkan semua suku menjadi 25 + 20 + 3.",
+            "3": "Murid mengartikan 5² sebagai 5 × 2 = 10, sehingga perhitungannya menjadi 10 - 20 + 3."
+          },
+          "difficulty": "dasar"
+        },
+        {
+          "id": "mat-d9-kua-005",
+          "prompt": "Akar-akar persamaan 2x² - 5x - 3 = 0 adalah ...",
+          "options": [
+            "x = -1/2 atau x = 3",
+            "x = 1/2 atau x = -3",
+            "x = -1 atau x = 3",
+            "x = -1/2 atau x = -3"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Persamaan difaktorkan menjadi (2x + 1)(x - 3) = 0. Dari 2x + 1 = 0 diperoleh x = -1/2, dan dari x - 3 = 0 diperoleh x = 3."
+          },
+          "distractorWhy": {
+            "1": "Murid membalik tanda kedua akarnya sekaligus, seolah-olah akar diperoleh dengan menyalin bilangan pada faktor apa adanya.",
+            "2": "Murid mengabaikan koefisien 2 pada faktor (2x + 1) dan membacanya sebagai x = -1, padahal 2x + 1 = 0 memberi x = -1/2.",
+            "3": "Murid salah tanda pada faktor kedua dengan membaca (x - 3) sebagai x = -3, padahal x - 3 = 0 memberi x = 3."
+          },
+          "difficulty": "sedang"
+        },
+        {
+          "id": "mat-d9-kua-006",
+          "prompt": "Persamaan kuadrat yang akar-akarnya 2 dan -5 adalah ...",
+          "options": [
+            "x² + 3x - 10 = 0",
+            "x² - 3x - 10 = 0",
+            "x² + 3x + 10 = 0",
+            "x² - 7x + 10 = 0"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Persamaan disusun dari (x - 2)(x - (-5)) = (x - 2)(x + 5) = x² + 5x - 2x - 10 = x² + 3x - 10 = 0."
+          },
+          "distractorWhy": {
+            "1": "Murid memakai jumlah akar 2 + (-5) = -3 langsung sebagai koefisien x, padahal koefisien x adalah negatif dari jumlah akar sehingga tandanya tertukar.",
+            "2": "Murid menghitung hasil kali akar 2 × (-5) sebagai +10 karena mengabaikan tanda negatif pada salah satu akarnya.",
+            "3": "Murid membuang tanda negatif dan bekerja dengan akar 2 dan 5, sehingga memperoleh jumlah 7 serta hasil kali 10."
+          },
+          "difficulty": "sedang"
+        },
+        {
+          "id": "mat-d9-kua-007",
+          "prompt": "Koordinat titik puncak grafik fungsi f(x) = x² - 6x + 5 adalah ...",
+          "options": [
+            "(3, -4)",
+            "(-3, 32)",
+            "(3, 14)",
+            "(6, 5)"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Absis titik puncak x = -b/(2a) = -(-6)/(2 × 1) = 3. Ordinatnya f(3) = 3² - 6(3) + 5 = 9 - 18 + 5 = -4, sehingga titik puncaknya (3, -4)."
+          },
+          "distractorWhy": {
+            "1": "Murid memakai rumus x = b/(2a) tanpa tanda negatif sehingga memperoleh x = -3, lalu menghitung f(-3) = 9 + 18 + 5 = 32.",
+            "2": "Murid sudah benar menemukan x = 3 tetapi saat menghitung nilai fungsinya ia melewatkan suku -6x dan hanya menjumlahkan 9 + 5.",
+            "3": "Murid membaca koefisien b dan konstanta c pada persamaan sebagai koordinat titik puncak, tanpa memakai rumus x = -b/(2a)."
+          },
+          "difficulty": "sedang"
+        },
+        {
+          "id": "mat-d9-kua-008",
+          "prompt": "Grafik fungsi f(x) = x² - 4x + 4 berpotongan dengan sumbu X di ...",
+          "options": [
+            "satu titik, yaitu (2, 0)",
+            "dua titik, yaitu (2, 0) dan (-2, 0)",
+            "dua titik, yaitu (1, 0) dan (4, 0)",
+            "tidak satu titik pun karena grafiknya melayang di atas sumbu X"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Titik potong dengan sumbu X dicari dari f(x) = 0. Karena x² - 4x + 4 = (x - 2)², persamaan (x - 2)² = 0 hanya memberi satu akar kembar x = 2, sehingga grafiknya menyinggung sumbu X tepat di titik (2, 0)."
+          },
+          "distractorWhy": {
+            "1": "Murid mengabaikan suku -4x dan hanya menyelesaikan x² = 4, sehingga mengira ada dua akar yang berlawanan tanda.",
+            "2": "Murid mencari dua bilangan yang hasil kalinya 4 lalu memilih 1 dan 4, tanpa memeriksa syarat bahwa jumlah kedua bilangan itu harus -4.",
+            "3": "Murid menghitung diskriminan D = (-4)² - 4(1)(4) = 0 lalu mengira D = 0 berarti tidak ada akar real, padahal D = 0 justru menandakan adanya satu akar kembar."
+          },
+          "difficulty": "sedang"
+        },
+        {
+          "id": "mat-d9-kua-009",
+          "prompt": "Kebun Pak Slamet berbentuk persegi panjang. Panjangnya 3 m lebih dari lebarnya dan luasnya 40 m². Berapa lebar kebun itu?",
+          "options": [
+            "5 m",
+            "8 m",
+            "8,5 m",
+            "37 m"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Misalkan lebar = l meter, maka panjang = (l + 3) meter dan l(l + 3) = 40, yaitu l² + 3l - 40 = 0. Pemfaktorannya (l + 8)(l - 5) = 0 sehingga l = -8 atau l = 5. Panjang sisi tidak mungkin negatif, jadi lebarnya 5 m."
+          },
+          "distractorWhy": {
+            "1": "Murid mengambil akar negatif l = -8 lalu menuliskan nilai mutlaknya sebagai lebar, padahal akar itu harus ditolak karena panjang sisi tidak mungkin negatif.",
+            "2": "Murid memperlakukan 40 m² sebagai keliling, sehingga menyelesaikan 2(l + l + 3) = 40 dan memperoleh l = 8,5.",
+            "3": "Murid langsung mengurangkan 40 - 3 karena mengira selisih 3 m dapat dikurangkan dari luas, bukan dipakai untuk menyusun persamaan kuadrat."
+          },
+          "difficulty": "sedang"
+        },
+        {
+          "id": "mat-d9-kua-010",
+          "prompt": "Bagas melempar bola ke atas. Tinggi bola setelah t detik dinyatakan oleh h(t) = 20t - 5t² dengan h dalam meter. Berapa tinggi maksimum yang dicapai bola itu?",
+          "options": [
+            "20 m",
+            "40 m",
+            "4 m",
+            "2 m"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Karena koefisien t² negatif, grafiknya parabola terbuka ke bawah dan tinggi maksimum tercapai di titik puncak, yaitu t = -b/(2a) = -20/(2 × (-5)) = 2 detik. Tingginya h(2) = 20(2) - 5(2)² = 40 - 20 = 20 m."
+          },
+          "distractorWhy": {
+            "1": "Murid memasukkan t = 2 hanya ke suku 20t dan mengabaikan suku -5t² yang menahan laju naiknya bola.",
+            "2": "Murid menyelesaikan 20t - 5t² = 0 dan memperoleh t = 4, yaitu saat bola kembali menyentuh tanah, lalu menuliskan bilangan itu sebagai tinggi.",
+            "3": "Murid menjawab nilai t pada titik puncak, padahal 2 detik baru menyatakan waktu tercapainya tinggi maksimum, bukan tingginya."
+          },
+          "difficulty": "tinggi"
+        },
+        {
+          "id": "mat-d9-kua-011",
+          "prompt": "Akar-akar persamaan x² - 8x + 15 = 0 adalah p dan q. Nilai p² + q² adalah ...",
+          "options": [
+            "34",
+            "64",
+            "94",
+            "8"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Dari persamaan diperoleh p + q = 8 dan p × q = 15. Karena (p + q)² = p² + 2pq + q², maka p² + q² = (p + q)² - 2pq = 8² - 2(15) = 64 - 30 = 34. Hasil ini cocok dengan akarnya, yaitu 3 dan 5, sebab 9 + 25 = 34."
+          },
+          "distractorWhy": {
+            "1": "Murid menghitung (p + q)² = 64 lalu berhenti, mengira p² + q² sama saja dengan kuadrat jumlah akarnya, padahal masih tersisa suku 2pq yang harus dikurangkan.",
+            "2": "Murid memakai bentuk yang benar tetapi menjumlahkan 2pq alih-alih mengurangkannya, sehingga memperoleh 64 + 30.",
+            "3": "Murid menjawab jumlah akar p + q = 8 karena mengira pangkat dua pada p² + q² dapat langsung dihilangkan."
+          },
+          "difficulty": "tinggi"
+        },
+        {
+          "id": "mat-d9-kua-012",
+          "prompt": "Rina membuat kandang kelinci berbentuk persegi panjang memakai kawat sepanjang 24 m untuk seluruh kelilingnya. Berapa luas terbesar yang dapat diperoleh Rina?",
+          "options": [
+            "36 m²",
+            "144 m²",
+            "72 m²",
+            "6 m²"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Keliling 24 m berarti panjang + lebar = 12 m. Bila lebarnya x, luasnya L(x) = x(12 - x) = 12x - x². Grafiknya parabola terbuka ke bawah dengan puncak di x = -12/(2 × (-1)) = 6, sehingga luas terbesarnya L(6) = 6 × 6 = 36 m²."
+          },
+          "distractorWhy": {
+            "1": "Murid membagi 24 dengan 2 lalu memakai 12 m sekaligus sebagai panjang dan lebar, padahal 12 m adalah jumlah panjang dan lebar, bukan ukuran setiap sisi.",
+            "2": "Murid mengira kandang terluas terbentuk bila panjangnya dua kali lebar, lalu memakai panjang 12 m dan lebar 6 m tanpa memeriksa bahwa keliling ukuran itu 36 m, bukan 24 m.",
+            "3": "Murid menjawab nilai x pada titik puncak, padahal 6 baru menyatakan panjang sisi yang menghasilkan luas terbesar, bukan luasnya."
+          },
+          "difficulty": "tinggi"
+        }
+      ]
+    }
+  ]
+}

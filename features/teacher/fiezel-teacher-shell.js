@@ -423,9 +423,110 @@
     }
   };
 
+  /* ---------------------------------------------------------------------------
+   * BANK SOAL FASE D (MAT / IPA / ENG) — isinya JSON, bukan literal di modul ini.
+   *
+   * Ketiga mapel ini punya bank berjenjang di content/mapel/: satu berkas Indonesia
+   * plus sidecar Thai dengan kunci yang sama persis. Naskah yang DILIHAT MURID lahir
+   * di sana, bukan di sini. Itu syarat dua-bahasa CLAUDE.md, dan juga satu-satunya
+   * cara gerbang bahasa bisa melihat naskahnya sama sekali — literal di dalam .js
+   * tidak pernah terbaca oleh satu pun sensus bahasa yang dimiliki repo ini.
+   *
+   * Pemuatannya punya dua jalur, dan KEDUANYA gagal lunak:
+   *   - Node (gerbang, perkakas): fs sinkron, deterministik, tanpa jaringan.
+   *   - Peramban: fetch sekali saat mount; hasilnya disimpan, lalu render diminta
+   *     ulang. Selama bank belum mendarat jawabannya adalah bank tidak ada, dan itu
+   *     berarti perilaku lama (templates di bawah) — bukan lemparan, bukan layar
+   *     kosong.
+   * 14 mapel lain tidak punya bank JSON; bagi mereka jalur ini selalu menjawab null
+   * dan tidak satu pun perilakunya berubah.
+   */
+  var MAPEL_BANK_SUBJECTS = ['MAT', 'IPA', 'ENG'];
+  var mapelBankCache = {};
+  var mapelBankFetching = {};
+
+  function mapelBankFile(subjectId) { return 'mapel-' + String(subjectId).toLowerCase() + '-d.json'; }
+
+  /* Katalog kompetensi ikut bank begitu bank mendarat: satu sumber kebenaran, jadi
+     dropdown guru tidak bisa menawarkan kompetensi yang banknya tidak punya soalnya
+     — dan nama kompetensi yang sampai ke murid lewat judul tugas ikut punya kembaran
+     Thai, karena ia lahir di bank, bukan di sini. */
+  function adoptBankCompetencies(subjectId, bank) {
+    try {
+      var cat = MAPEL_CATALOG[subjectId];
+      if (!cat || !bank || !Array.isArray(bank.competencies) || !bank.competencies.length) return;
+      cat.competencies = bank.competencies.map(function (c) {
+        return { code: c.code, name: c.name, materi: c.materi, grade: c.grade, cpRef: c.cpRef };
+      });
+    } catch (_) {}
+  }
+
+  function mapelBank(subjectId) {
+    if (Object.prototype.hasOwnProperty.call(mapelBankCache, subjectId)) return mapelBankCache[subjectId];
+    if (MAPEL_BANK_SUBJECTS.indexOf(subjectId) < 0) { mapelBankCache[subjectId] = null; return null; }
+    var diNode = (typeof require === 'function' && typeof __dirname === 'string');
+    if (diNode) {
+      try {
+        var full = require('path').join(__dirname, '..', '..', 'content', 'mapel', mapelBankFile(subjectId));
+        var bank = JSON.parse(require('fs').readFileSync(full, 'utf8'));
+        mapelBankCache[subjectId] = bank;
+        adoptBankCompetencies(subjectId, bank);
+        return bank;
+      } catch (_) {
+        /* Di Node, berkas yang tidak terbaca berarti bank memang tidak ada. Jangan lanjut ke
+           fetch: alamat relatif tidak punya arti tanpa halaman, dan satu-satunya hasilnya
+           adalah lemparan yang harus ditangkap lagi. */
+        mapelBankCache[subjectId] = null;
+        return null;
+      }
+    }
+    if (!mapelBankFetching[subjectId] && typeof fetch === 'function') {
+      mapelBankFetching[subjectId] = true;
+      try {
+        fetch('content/mapel/' + mapelBankFile(subjectId), { credentials: 'same-origin' })
+          .then(function (r) { return r && r.ok ? r.json() : null; })
+          .then(function (bank) {
+            mapelBankCache[subjectId] = bank || null;
+            if (bank) { adoptBankCompetencies(subjectId, bank); try { render(); } catch (_) {} }
+          })
+          .catch(function () { mapelBankCache[subjectId] = null; });
+      } catch (_) { mapelBankCache[subjectId] = null; }
+    }
+    mapelBankCache[subjectId] = null;
+    return null;
+  }
+
+  /* Kolam soal disaring berjenjang: mapel -> kelas -> kompetensi. Kode kompetensi
+     sudah memuat kelasnya (KOMP-MAT-D-9-STA-01), jadi cocok-persis pada kode berarti
+     kelas ikut tersaring: dua kompetensi berbeda tidak pernah berbagi satu soal pun.
+
+     Yang paling penting ada di cabang `exact`. Kalau kompetensinya cocok tetapi
+     isinya lebih sedikit daripada yang diminta, sisanya dibiarkan KOSONG. Menambalnya
+     dari kolam mapel akan mengirim bab yang salah ke murid tanpa guru pernah tahu —
+     3 soal yang jujur lebih berguna daripada 8 soal yang separuhnya salah bab. */
+  function mapelPool(subjectId, compCode) {
+    var bank = mapelBank(subjectId);
+    if (!bank || !Array.isArray(bank.competencies)) return null;
+    var code = String(compCode == null ? '' : compCode);
+    for (var i = 0; i < bank.competencies.length; i++) {
+      if (bank.competencies[i].code === code) {
+        return { items: bank.competencies[i].items || [], exact: true };
+      }
+    }
+    /* Kode yang tidak dikenal — kosong, salah bentuk, atau milik fase lain — bukan
+       saringan, melainkan ketiadaan saringan. Kolamnya seluruh mapel, seperti dulu. */
+    var all = [];
+    for (var j = 0; j < bank.competencies.length; j++) {
+      var list = bank.competencies[j].items || [];
+      for (var k = 0; k < list.length; k++) all.push(list[k]);
+    }
+    return { items: all, exact: false };
+  }
+
   /* Acak posisi opsi jawaban agar kunci tidak selalu di index 0.
-     Menerima objek soal { options[], answer, why? } dan mengembalikan salinan
-     dengan urutan options teracak serta answer & why yang sudah diperbarui. */
+     Menerima objek soal { options[], answer, why?, distractorWhy? } dan mengembalikan
+     salinan dengan urutan options teracak serta answer, why & distractorWhy yang sudah
+     dipetakan ulang ke posisi barunya. */
   function shuffleOptions(q, seed) {
     var opts = q.options.slice();
     var correctText = opts[q.answer];
@@ -442,7 +543,21 @@
       var oldExpl = q.why[q.answer] || q.why[String(q.answer)] || '';
       if (oldExpl) newWhy[newAnswer] = oldExpl;
     }
-    return { options: opts, answer: newAnswer, why: newWhy };
+    /* Peta miskonsepsi ikut berpindah. Kalau tidak, penjelasan pengecoh menempel pada
+       posisi yang isinya sudah berganti — diagnosis yang menunjuk jawaban yang salah
+       lebih buruk daripada tidak ada diagnosis sama sekali. */
+    var newDistractorWhy = null;
+    if (q.distractorWhy) {
+      newDistractorWhy = {};
+      for (var oi = 0; oi < q.options.length; oi++) {
+        if (oi === q.answer) continue;
+        var expl = q.distractorWhy[oi] || q.distractorWhy[String(oi)];
+        if (expl == null) continue;
+        var moved = opts.indexOf(q.options[oi]);
+        if (moved >= 0) newDistractorWhy[moved] = expl;
+      }
+    }
+    return { options: opts, answer: newAnswer, why: newWhy, distractorWhy: newDistractorWhy };
   }
 
   function synthesizeMapelQuestions(subjectId, compCode, compTitle, count) {
@@ -2017,9 +2132,19 @@
   ]
   };
 
-    var baseList = templates[subjectId] || templates.MAT || [];
-    for (var i = 0; i < num; i++) {
-      var src = baseList[i % baseList.length];
+    /* Bank Fase D kalau ada; kalau tidak, kolam literal lama — apa adanya, termasuk
+       untuk 14 mapel yang memang tidak punya bank. */
+    var pool = mapelPool(subjectId, compCode);
+    var baseList = pool ? pool.items : (templates[subjectId] || templates.MAT || []);
+    if (!baseList.length) return items;
+    /* Kolam kompetensi dipotong jujur ketika permintaan melampaui isinya; kolam mapel
+       dan jalur lama tetap berputar persis seperti sebelumnya. */
+    var take = (pool && pool.exact) ? Math.min(num, baseList.length) : num;
+    /* Rotasi hanya pada kolam kompetensi: dua tugas untuk kompetensi yang sama tidak
+       lagi mengirim urutan soal yang persis sama. Jalur lama sengaja tidak disentuh. */
+    var start = (pool && pool.exact) ? Math.floor(Date.now() / 1000) % baseList.length : 0;
+    for (var i = 0; i < take; i++) {
+      var src = baseList[(start + i) % baseList.length];
       var itemObj = {
         id: 'q-' + subjectId.toLowerCase() + '-' + (i + 1) + '-' + Math.random().toString(36).slice(2, 6),
         prompt: src.prompt,
@@ -2029,11 +2154,13 @@
         context: topic,
         why: Object.assign({}, src.why)
       };
+      if (src.distractorWhy) itemObj.distractorWhy = Object.assign({}, src.distractorWhy);
       /* Acak posisi opsi jawaban agar kunci tidak selalu di index 0 */
       var shuffled = shuffleOptions(itemObj, (Date.now() % 997) + i * 31 + subjectId.charCodeAt(0));
       itemObj.options = shuffled.options;
       itemObj.answer = shuffled.answer;
       itemObj.why = shuffled.why;
+      if (shuffled.distractorWhy) itemObj.distractorWhy = shuffled.distractorWhy;
       items.push(itemObj);
     }
     return items;
@@ -2547,6 +2674,11 @@
   // ---- mount ------------------------------------------------------------------------------
   function mount(target, options) {
     el = target; env = options || {};
+    /* Bank Fase D dipanggil sedini mungkin dan TIDAK ditunggu: guru butuh beberapa
+       ketukan untuk sampai ke pembuat tugas, dan dalam rentang itu banknya sudah
+       mendarat. Kalau belum, pratinjau pertama memakai kolam lama lalu mengecat ulang
+       sendiri begitu bank tiba — tidak ada yang menunggu layar kosong. */
+    try { for (var bi = 0; bi < MAPEL_BANK_SUBJECTS.length; bi++) mapelBank(MAPEL_BANK_SUBJECTS[bi]); } catch (_) {}
     /* Urutannya penting: penyimpanan dialihkan SEBELUM load(), kalau tidak papan demo
        terisi dari data guru asli dan tulisan pertamanya mendarat di sana juga. */
     previewOn = previewAllowed();
