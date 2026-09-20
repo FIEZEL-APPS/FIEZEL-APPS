@@ -1,7 +1,7 @@
 {
   "schema": "fiezel-audio-manifest-v1",
-  "version": 50,
-  "generatedAt": "2026-09-20T08:47:17.903Z",
+  "version": 51,
+  "generatedAt": "2026-09-20T10:41:21.526Z",
   "assetBaseUrl": "https://fiezel-audio.fitrajft.workers.dev",
   "voiceProfile": {
     "voiceId": "4KH3q7xDXbPdY3S5yw0Y",
@@ -14356,6 +14356,18 @@
       "checksum": "aeab073b9568188ea39ec84f7e3a5bbc6e313d10f9bac1c899150298f41dfb80",
       "sourceRef": "listen_sc_b2_gist_039",
       "createdAt": "2026-09-20T08:47:06.156Z",
+      "status": "ready"
+    },
+    "fcda54d2e034c11ec97d32b32bf4f25fe9995cc83c1c328a4218c3cde75380ac": {
+      "url": "a/fcda54d2e034c11ec97d32b32bf4f25fe9995cc83c1c328a4218c3cde75380ac.mp3",
+      "contentType": "listening",
+      "locale": "en-US",
+      "voiceId": "Aoede",
+      "modelId": "gemini-tts-gemini-2.5-flash-preview-tts",
+      "bytes": 223290,
+      "checksum": "1da0f8ed42dad200460a8ac294dd571f897d7a6420c3c299a3445439d6899095",
+      "sourceRef": "listen_sc_b2_dictation_032",
+      "createdAt": "2026-09-20T10:41:09.700Z",
       "status": "ready"
     }
   },
