@@ -247,6 +247,11 @@ jobs:
           # Termasuk: jembatannya gagal-diam, dan TIDAK menulis asesmen server ke kunci
           # tugas lokal. Temuan X4/X5 audit KelasKu 2026-09-20.
           node tests/kurikulum-satu-buku-test.js
+          # Paspor sebagai ALAT: stempel yang memudar berjadwal (7/21/60 hari), hasil per
+          # sub-bab dari percobaan terakhir, misi yang bisa disaring ke sub-bab goyah,
+          # urutan soal yang diacak, kunci skill mesin alih-alih nama genre Inggris, dan
+          # target mingguan yang selalu menyebut alasannya. Temuan K3/K5/K6/K11 + F3/F4/F6.
+          node tests/kelasku-paspor-alat-test.js
           node tests/question-allocator-test.js
           node tests/bankor-latihan-test.js
           node tests/fiezel-stat-gate-test.js

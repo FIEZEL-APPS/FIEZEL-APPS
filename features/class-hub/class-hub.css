@@ -597,6 +597,31 @@ body.reduce-motion .ch-student,body.reduce-motion .ch-body,body.reduce-motion .c
   color: var(--ch-muted);
   font-weight: 600;
 }
+/* Kartu "Target Minggu Ini" (m025-349, fitur F6). Ia menyebut SATU langkah berikutnya,
+   jadi ia berhak berdiri paling atas dan berhak terlihat berbeda dari katalog di bawahnya. */
+.ch-target-card {
+  background: linear-gradient(150deg, var(--ch-soft), var(--ch-bg));
+  border-color: var(--ch-accent);
+}
+.ch-target-card h3 { margin: 4px 0 2px; }
+
+/* Paspor per sub-bab (fitur F3). Baris-baris ini yang mengubah paspor dari rapor menjadi
+   alat: murid melihat BAGIAN MANA yang goyah, bukan satu angka untuk satu bab. */
+.ch-passport-subs { list-style: none; margin: 8px 0 10px; padding: 0; display: flex; flex-direction: column; gap: 3px; }
+.ch-passport-subs li {
+  display: flex; align-items: baseline; justify-content: space-between; gap: 8px;
+  font-size: .78rem; padding: 3px 7px; border-radius: 7px; background: var(--ch-line);
+}
+.ch-passport-subs li span { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ch-passport-subs li b { flex: none; font-variant-numeric: tabular-nums; }
+.ch-passport-subs li.is-ok { background: var(--ch-ok-soft); color: var(--ch-ok); }
+.ch-passport-subs li.is-weak { background: var(--ch-bad-soft); color: var(--ch-bad); }
+.ch-passport-subs li.is-untested { opacity: .62; }
+.ch-passport-actions { display: flex; flex-direction: column; gap: 6px; }
+
+/* Stempel yang memudar: bukan hijau (masih bisa), bukan merah (gagal). */
+.ch-passport-stamp.is-due { background: var(--ch-info-soft); color: var(--ch-info); }
+
 /* Tugas dari Kurikulum (m025-349, temuan X4). Kartunya MENINGGALKAN halaman ini menuju
    misi.html, jadi ia memakai aksen kiri yang sama dengan pintu adaptif di bawah — bukan
    supaya menonjol, melainkan supaya murid tahu ketukan ini berpindah layar. Bentuknya
