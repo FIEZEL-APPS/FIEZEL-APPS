@@ -266,3 +266,58 @@ Seluruh butir latihan bernomor di Bab IV ("Gerak dan Gaya") dari Buku Siswa IPA 
   - Bab 3 (`KOMP-IPA-D-7-BAB3-01`): 21 butir (6 dasar, 11 sedang, 4 tinggi)
   - Bab 4 (`KOMP-IPA-D-7-BAB4-01`): 20 butir (6 dasar, 11 sedang, 3 tinggi)
   - Total bank soal IPA Fase D aktif: **101 butir soal asli terverifikasi**.
+
+## 14. Ekstraksi Tahap 5: Penuntasan 100% Seluruh 7 Bab Buku Siswa IPA Kelas VII (149 Butir Soal Asli)
+
+Seluruh 7 Bab dari Buku Siswa IPA Kelas VII Edisi Revisi (`IPA_BS_KLS_VII_Rev (1).pdf`, ISBN 978-623-118-457-3) kini **100% tuntas terbit di bank soal kurikulum resmi**:
+
+1. **Bab 5: Karakteristik dan Klasifikasi Makhluk Hidup (`KOMP-IPA-D-7-BAB5-01`, 16 Butir Soal)**:
+   - Ciri makhluk hidup vs robot mati (seluler, metabolisme, reproduksi).
+   - Iritabilitas pada gerak mengatup daun putri malu (*Mimosa pudica*).
+   - Hierarki takson dari tertinggi ke terendah (Kingdom s.d. Spesies).
+   - Hubungan tingkatan takson dengan kesamaan ciri dan jumlah anggota.
+   - Pembeda utama kingdom Plantae (autotrof berselulosa) vs Animalia (heterotrof).
+   - Identifikasi tumbuhan monokotil (tulang daun sejajar, akar serabut, biji berkeping satu).
+   - Filum Mollusca (tubuh lunak bercangkang), Arthropoda (kaki beruas kitin), Echinodermata (kulit berduri laut).
+   - Karakteristik kingdom Monera (prokariotik), Fungi (dinding sel kitin tanpa klorofil), Protista (eukariotik uniseluler).
+   - Aturan tatanama ganda binomial nomenclature Linnaeus (*Oryza sativa*).
+   - Kunci dikotomi bertahap dan karakteristik kelas vertebrata (Amfibi poikilotermik dan Aves berbulu).
+
+2. **Bab 6: Ekologi dan Pelestarian Lingkungan (`KOMP-IPA-D-7-BAB6-01`, 16 Butir Soal)**:
+   - Komponen biotik vs abiotik (cahaya, suhu, kelembapan, tanah).
+   - Peran produsen autotrof pada tingkatan trofik pertama rantai makanan.
+   - Dampak kepunahan predator puncak (burung hantu/elang) terhadap ledakan hama tikus.
+   - Perbandingan stabilitas ekosistem area 10 rantai makanan vs 50 rantai makanan (kompleksitas resiliensi).
+   - Aksi nyata pengurangan jejak karbon (transportasi bersih, hemat energi, reboisasi).
+   - Analisis kasus sains kematian paus di Wakatobi akibat 5,9 kg sampah plastik (bahaya mikroplastik).
+   - Pola simbiosis mutualisme (Lichenes), komensalisme (anggrek epifit), dan parasitisme (kutu rambut).
+   - Aliran energi piramida makanan dan efisiensi 10% trofik Lindeman.
+   - Dampak eutrofikasi perairan akibat limpasan pupuk pertanian (blooming alga & anoksia ikan).
+   - Konservasi in-situ (Taman Nasional habitat asli) vs ex-situ (Kebun Raya/Taman Safari).
+   - Peran dekomposer dalam siklus biogeokimia dan fenomena pemekatan hayati biomagnifikasi racun pestisida.
+   - Perlindungan satwa endemik Komodo (*Varanus komodoensis*) di NTT.
+
+3. **Bab 7: Bumi dan Tata Surya (`KOMP-IPA-D-7-BAB7-01`, 16 Butir Soal)**:
+   - Pengaruh jarak Matahari terhadap zona laik huni (*habitable/Goldilocks zone*) air cair.
+   - Perhitungan waktu tempuh rambat cahaya Matahari ke Bumi ($150.000.000 / 300.000 = 500\text{ detik} \approx 8,3\text{ menit}$).
+   - Fase Bulan dalam Kalender Hijriah (tanggal 1 hilal bulan baru, tanggal 14–15 bulan purnama).
+   - Prediksi fenomena alam jika gravitasi Bulan 2 kali lebih kuat (pasang surut laut dua kali lebih ekstrem).
+   - Analisis grafik anomali suhu bumi vs radiasi matahari (bukti pemanasan global akibat gas rumah kaca antropogenik).
+   - Akibat rotasi Bumi (siang-malam, gerak semu harian) vs revolusi Bumi 23,5° (pergantian musim, perbedaan waktu siang-malam).
+   - Konfigurasi gerhana bulan (Matahari - Bumi - Bulan) dan gerhana matahari (Matahari - Bulan - Bumi).
+   - Pengelompokan planet dalam batuan (Merkurius, Venus, Bumi, Mars) vs planet luar gas raksasa (Yupiter, Saturnus, Uranus, Neptunus).
+   - Efek rumah kaca tak terkendali di atmosfer gas CO2 planet Venus (suhu permukaan mencapai 460°C).
+   - Lapisan troposfer tempat fenomena cuaca dan lapisan ozon stratosfer penyerap radiasi ultraviolet berbahaya.
+   - Posisi geologis cincin api Indonesia di pertemuan tiga lempeng tektonik aktif (Eurasia, Indo-Australia, Pasifik).
+   - Prosedur mitigasi keselamatan saat terjadi gempa bumi (*Drop, Cover, Hold on*).
+
+**Verifikasi Mutu Penuh 7 Bab IPA Kelas VII (149 Butir Soal Autentik)**:
+- `tests/mapel-fase-d-content-test.js`: **37/37 PASS**
+  - Bab 1 (`KOMP-IPA-D-7-BAB1-01`): 38 butir (10 dasar, 18 sedang, 10 tinggi)
+  - Bab 2 (`KOMP-IPA-D-7-BAB2-01`): 22 butir (6 dasar, 10 sedang, 6 tinggi)
+  - Bab 3 (`KOMP-IPA-D-7-BAB3-01`): 21 butir (6 dasar, 11 sedang, 4 tinggi)
+  - Bab 4 (`KOMP-IPA-D-7-BAB4-01`): 20 butir (6 dasar, 11 sedang, 3 tinggi)
+  - Bab 5 (`KOMP-IPA-D-7-BAB5-01`): 16 butir (5 dasar, 8 sedang, 3 tinggi)
+  - Bab 6 (`KOMP-IPA-D-7-BAB6-01`): 16 butir (5 dasar, 8 sedang, 3 tinggi)
+  - Bab 7 (`KOMP-IPA-D-7-BAB7-01`): 16 butir (4 dasar, 9 sedang, 3 tinggi)
+  - Total bank soal IPA Kelas VII aktif: **149 butir soal asli terverifikasi 100% lengkap satu buku penuh**.
