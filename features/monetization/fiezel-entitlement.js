@@ -66,6 +66,23 @@
  *                              transfer telat tiga hari menghancurkan kepercayaan yang
  *                              harganya jauh di atas 14 hari akses. Tenggang ini MURAH.
  *
+ * BATAS KEAMANAN YANG HARUS DIKATAKAN TERUS TERANG
+ * ------------------------------------------------
+ * FIEZEL local-first: catatan hak akses tinggal di perangkat murid. Artinya murid yang
+ * mau dan tahu caranya BISA memberi dirinya sendiri rencana Pro dengan menyunting
+ * penyimpanan peramban, dan tidak ada satu baris pun di berkas ini yang bisa
+ * mencegahnya. Itu bukan kelalaian yang menunggu ditambal — itu konsekuensi arsitektur,
+ * dan menyembunyikannya di balik obfuscation hanya akan menipu kita sendiri.
+ *
+ * Yang dijaga berkas ini adalah kecurangan MURAH: jam yang diputar mundur, kode kelas
+ * yang ditebak, state yang rusak. Ketiganya tidak butuh pengetahuan khusus dan karena
+ * itu akan terjadi dalam skala besar kalau dibiarkan.
+ *
+ * Penegakan yang benar-benar mengikat menuntut server: `verifiedAt` untuk sekolah sudah
+ * ditulis dengan bentuk itu sejak awal, dan Pro kelak membutuhkan padanannya (tanda
+ * tangan berbatas waktu yang diperiksa saat sinkronisasi). Sampai itu ada, gerbang ini
+ * jujur tentang apa yang ia jaga: ia menutup pintu, bukan membangun brankas.
+ *
  * Referensi harga (§5 spesifikasi produk): Pro Rp 29.000/bulan · Rp 199.000/tahun;
  * lisensi sekolah Rp 500.000 per kelas per semester.
  */
