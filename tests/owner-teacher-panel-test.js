@@ -23,6 +23,7 @@ const assert = require('assert');
   assert(typeof ownerMod.createClass === 'function', 'createClass diekspor');
   assert(typeof ownerMod.regenerateTeacherInvite === 'function', 'regenerateTeacherInvite diekspor');
   assert(typeof ownerMod.triggerMasterSeed === 'function', 'triggerMasterSeed diekspor');
+  assert(typeof ownerMod.readCurriculumStatus === 'function', 'readCurriculumStatus diekspor');
   assert(typeof ownerMod.renderCurriculumSyncSection === 'function', 'renderCurriculumSyncSection diekspor');
 
   // 2. mintTeacherInvite mengirim method POST dan body JSON yang tepat
@@ -226,21 +227,73 @@ const assert = require('assert');
     assert(b.codeHash === 'c'.repeat(64), 'codeHash terkirim');
   }
 
-  // 8b. triggerMasterSeed memicu penyemaian 3 modul kurikulum (mapel, english, soal)
+  // 8b. triggerMasterSeed: status-dulu, lewati-bila-penuh, tolak-anonim-dengan-jujur.
+  // 8b-i. Backend belum tersemai → 3 GET status + 3 POST seed, hasil ok.
   {
     const captured = [];
     const mockFetch = async (url, opt) => {
       captured.push({ url, opt });
-      return { ok: true, status: 200, json: async () => ({ ok: true, seeded: true }) };
+      if ((opt && opt.method) === 'POST') {
+        return { ok: true, status: 200, json: async () => ({ ok: true, seeded: true }) };
+      }
+      return { ok: true, status: 200, json: async () => ({ ok: true, seeded: false, in_this_wave: 1137, from_this_seeder: 0 }) };
     };
     const env = { CURRICULUM_API_URL: 'https://fiezel-apps.onrender.com' };
     const res = await ownerMod.triggerMasterSeed(env, mockFetch);
     assert(res.state === 'ok', 'triggerMasterSeed state ok');
     assert(res.ok === true, 'triggerMasterSeed ok true');
-    assert(captured.length === 3, 'memanggil 3 endpoint penyemai');
-    assert(captured.some(c => c.url.includes('/api/seed/mapel')), 'memanggil seed mapel');
-    assert(captured.some(c => c.url.includes('/api/seed/english')), 'memanggil seed english');
-    assert(captured.some(c => c.url.includes('/api/seed/soal')), 'memanggil seed soal');
+    const posts = captured.filter((c) => c.opt && c.opt.method === 'POST');
+    const gets = captured.filter((c) => !c.opt || c.opt.method !== 'POST');
+    assert(gets.length === 3, 'membaca 3 status dulu, dapat ' + gets.length);
+    assert(posts.length === 3, 'memicu 3 endpoint yang kurang, dapat ' + posts.length);
+    assert(posts.some(c => c.url.includes('/api/seed/mapel')), 'memanggil seed mapel');
+    assert(posts.some(c => c.url.includes('/api/seed/english')), 'memanggil seed english');
+    assert(posts.some(c => c.url.includes('/api/seed/soal')), 'memanggil seed soal');
+  }
+
+  // 8b-ii. Backend sudah penuh → NOL POST (POST anonim pasti 401, tak perlu ditembakkan).
+  {
+    const captured = [];
+    const mockFetch = async (url, opt) => {
+      captured.push({ url, opt });
+      return {
+        ok: true, status: 200,
+        json: async () => ({ ok: true, seeded: true, in_this_wave: 1137, from_this_seeder: 1137, competencies_with_questions: 291 })
+      };
+    };
+    const env = { CURRICULUM_API_URL: 'https://fiezel-apps.onrender.com' };
+    const res = await ownerMod.triggerMasterSeed(env, mockFetch);
+    assert(res.state === 'ok' && res.ok === true, 'sudah-penuh tetap hijau jujur');
+    assert(res.skipped === true, 'menandai skipped');
+    assert(!captured.some((c) => c.opt && c.opt.method === 'POST'), 'nol POST saat sudah penuh');
+    assert(res.message.includes('1137'), 'pesan menyebut hitungan riil');
+  }
+
+  // 8b-iii. POST ditolak 401 → state auth (bukan sukses palsu, bukan pending abadi).
+  {
+    const mockFetch = async (url, opt) => {
+      if (opt && opt.method === 'POST') return { ok: false, status: 401, json: async () => ({ detail: 'Not authenticated' }) };
+      return { ok: true, status: 200, json: async () => ({ ok: true, seeded: false, in_this_wave: 1137, from_this_seeder: 0 }) };
+    };
+    const env = { CURRICULUM_API_URL: 'https://fiezel-apps.onrender.com' };
+    const res = await ownerMod.triggerMasterSeed(env, mockFetch);
+    assert(res.state === 'auth', 'penolakan 401 menjadi state auth, dapat ' + res.state);
+    assert(res.ok === false, 'auth tidak berpura-pura ok');
+    assert(res.error === 'seed_auth_required', 'kode galat jujur');
+    assert(/tetap aktif/i.test(res.message), 'pesan menegaskan data lama tetap aktif');
+  }
+
+  // 8b-iv. Banner auth merender penjelasan, bukan banner hijau 100%.
+  {
+    const modelAuth = {
+      teachers: { state: 'ok', invites: [], teachers: [] },
+      schools: { state: 'ok', schools: [] },
+      classes: { state: 'ok', classes: [] },
+      teacherAction: { ok: false, action: 'master_seed', state: 'auth', error: 'seed_auth_required', message: 'Backend menolak pemicu anonim. Data lama tetap aktif.' }
+    };
+    const renderedAuth = ownerMod.renderTeacherSection(modelAuth);
+    assert(renderedAuth.includes('tetap aktif'), 'banner auth menegaskan data aktif');
+    assert(!renderedAuth.includes('Berhasil 100%!'), 'banner auth tidak memakai label 100%');
   }
 
   // 8c. renderCurriculumSyncSection merender kartu dan panduan sinkronisasi
