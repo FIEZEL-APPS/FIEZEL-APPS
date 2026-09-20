@@ -195,3 +195,39 @@ Seluruh butir latihan bernomor di Bab II ("Zat dan Perubahannya") dari Buku Sisw
   - Bab 1 (`KOMP-IPA-D-7-BAB1-01`): 38 butir (10 dasar, 18 sedang, 10 tinggi)
   - Bab 2 (`KOMP-IPA-D-7-BAB2-01`): 22 butir (6 dasar, 10 sedang, 6 tinggi)
   - Total bank soal IPA Fase D aktif: **60 butir soal asli terverifikasi**.
+
+## 12. Ekstraksi Tahap 3: Bab 3 Suhu, Kalor, dan Pemuaian (21 Butir Asli, Akumulasi 81 Soal)
+
+Seluruh butir latihan bernomor di Bab III ("Suhu, Kalor, dan Pemuaian") dari Buku Siswa IPA Kelas VII Edisi Revisi (`IPA_BS_KLS_VII_Rev (1).pdf` hal. 84–109) telah diekstraksi ke dalam `KOMP-IPA-D-7-BAB3-01`:
+1. **Hal. 84–92 (Konsep Suhu & Skala Termometer)**:
+   - Alasan indra peraba tangan tidak dapat dijadikan alat ukur suhu yang pasti (subjektif & kualitatif).
+   - Konversi suhu ruangan $30^\circ\text{C}$ ke skala Fahrenheit: $T_F = (\frac{9}{5} \times 30) + 32 = 86^\circ\text{F}$.
+   - Penetapan titik acuan dan perbandingan rasio skala suhu Celcius : Reamur : Fahrenheit = $5 : 4 : 9$.
+   - Definisi fisis suhu nol mutlak ($0\text{ K} = -273^\circ\text{C}$) pada skala Satuan Internasional (SI).
+   - Konversi suhu air hangat $45^\circ\text{C}$ ke skala Kelvin: $T_K = 45 + 273 = 318\text{ K}$.
+2. **Hal. 92–100 (Kalor & Perpindahannya)**:
+   - Perbedaan konsep mendasar antara suhu (derajat panas) vs kalor (energi panas yang berpindah).
+   - Alasan air mendidih lebih cepat dalam panci tertutup (menahan uap & kalor terperangkap).
+   - Alasan larutan garam mendidih lebih lama (fenomena kenaikan titik didih di atas $100^\circ\text{C}$).
+   - Karakteristik fisis kalor jenis air yang tinggi ($4.184\text{ J/kg}\cdot\text{K}$).
+   - Perhitungan kalor pelepasan pendinginan daging sapi $Q = m \cdot c \cdot \Delta T = 2 \times 3.500 \times 20 = 140.000\text{ J}$ ($140\text{ kJ}$).
+   - Mekanisme radiasi sinar matahari dan kehangatan api unggun tanpa zat perantara.
+   - Mekanisme konveksi sirkulasi cairan saat memasak air dalam panci.
+3. **Hal. 101–106 (Pemuaian & Bimetal)**:
+   - Alasan celah longgar bingkai jendela kaca untuk ruang pemuaian saat siang terik.
+   - Pemasangan celah ekspansi pada sambungan rel kereta api baja dan jembatan logam.
+   - Arah kelengkungan keping bimetal tembaga-kuningan saat dipanaskan (melengkung ke arah tembaga).
+   - Aplikasi keping bimetal sebagai termostat sakelar otomatis setrika dan penanak nasi.
+   - Urutan pemuaian panjang logam berdasarkan koefisien muai Tabel 3.3 (Aluminium > Tembaga > Baja).
+   - Pemanfaatan pemuaian udara untuk gaya apung penerbangan balon udara dan lampion.
+4. **Hal. 106–109 (Pemanfaatan Energi Kalor)**:
+   - Urutan perpindahan kalor saat menggoreng ayam (konduksi wajan $\to$ konveksi minyak $\to$ konduksi daging).
+   - Pemanfaatan kalor pada PLTU untuk memutar turbin generator listrik bertenaga uap air bertekanan.
+   - Desain dinding cermin mengilap dan ruang hampa pada termos air panas untuk mencegah radiasi termal.
+
+**Verifikasi Mutu Bab 1, Bab 2 & Bab 3 (81 Butir Soal Autentik)**:
+- `tests/mapel-fase-d-content-test.js`: **29/29 PASS**
+  - Bab 1 (`KOMP-IPA-D-7-BAB1-01`): 38 butir (10 dasar, 18 sedang, 10 tinggi)
+  - Bab 2 (`KOMP-IPA-D-7-BAB2-01`): 22 butir (6 dasar, 10 sedang, 6 tinggi)
+  - Bab 3 (`KOMP-IPA-D-7-BAB3-01`): 21 butir (6 dasar, 11 sedang, 4 tinggi)
+  - Total bank soal IPA Fase D aktif: **81 butir soal asli terverifikasi**.
