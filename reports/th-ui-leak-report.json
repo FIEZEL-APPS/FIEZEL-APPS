@@ -1,6 +1,6 @@
 {
   "schema": "fiezel-th-ui-leak-v1",
-  "generatedAt": "2026-09-20T06:10:09.307Z",
+  "generatedAt": "2026-09-20T08:48:29.484Z",
   "files": {
     "app.js": {
       "leaks": 3,
@@ -11,11 +11,11 @@
           "text": "Selesaikan ritme hari ini"
         },
         {
-          "line": 9517,
+          "line": 9518,
           "text": "Nama kriteria: n/4 - satu kalimat alasan yang menunjuk bukti di tulisannya"
         },
         {
-          "line": 14310,
+          "line": 14311,
           "text": "Latihan"
         }
       ]
@@ -403,15 +403,15 @@
       "budget": 3,
       "sample": [
         {
-          "line": 2691,
+          "line": 2804,
           "text": "Akurasi"
         },
         {
-          "line": 2708,
+          "line": 2821,
           "text": "Latihan ·"
         },
         {
-          "line": 3045,
+          "line": 3158,
           "text": "📖 Kosakata Kunci:"
         }
       ]
@@ -421,15 +421,15 @@
       "budget": 3,
       "sample": [
         {
-          "line": 454,
+          "line": 459,
           "text": ". Aku bangga. Lanjutkan ritmenya — 1 sesi kecil tiap hari lebih ampuh daripada 1 sesi panjang seminggu."
         },
         {
-          "line": 460,
+          "line": 465,
           "text": "• Akurasi keseluruhan:"
         },
         {
-          "line": 483,
+          "line": 488,
           "text": "Akurasi"
         }
       ]
