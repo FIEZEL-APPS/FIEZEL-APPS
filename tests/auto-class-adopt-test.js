@@ -406,6 +406,48 @@ ok(typeof FA.state === 'function', 'FiezelAccount.state tersedia');
   ok(after.onboarded === true, 'S8: onboarded = true');
 }
 
+// Skenario 9: Sinkronisasi subjectId dari dashboard (mis. Farza diubah ke Bahasa Inggris / ENG)
+{
+  const TS = ctx.FiezelTeacherStore;
+  let profile = TS.load();
+
+  // Sebelum: Farza masih punya kelas Matematika dari S8
+  ok(profile.classes.length === 1, 'S9: awal ada 1 kelas');
+  ok(profile.classes[0].subject === 'MAT', 'S9: awal mapel MAT');
+
+  // Simulasikan session baru dari server (/api/account/me) dengan subjectId: 'ENG'
+  const updatedSession = {
+    role: 'teacher',
+    teacherName: 'FARZA',
+    institution: 'MAN 1 BANDA ACEH',
+    classCode: profile.classes[0].code,
+    subjectId: 'ENG',
+    gradeId: 'SMA'
+  };
+
+  const mapelNames = TS.MAPEL_NAMES || {};
+  const officialSub = updatedSession.subjectId || 'ENG';
+  const officialSubName = mapelNames[officialSub] || officialSub;
+
+  let modified = false;
+  if (updatedSession.subjectId && profile.classes.length) {
+    profile.classes.forEach(function (c) {
+      const prefix = updatedSession.institution ? updatedSession.institution + ' — ' : '';
+      if (c.subject !== updatedSession.subjectId || (c.name && c.name.indexOf('Matematika') !== -1 && updatedSession.subjectId !== 'MAT')) {
+        c.subject = updatedSession.subjectId;
+        c.name = prefix + officialSubName;
+        modified = true;
+      }
+    });
+  }
+  if (modified) TS.save(profile);
+
+  const synced = TS.load();
+  ok(synced.classes.length === 1, 'S9: tetap 1 kelas tanpa duplikasi');
+  ok(synced.classes[0].subject === 'ENG', 'S9: mapel tersinkronkan ke ENG (Bahasa Inggris)');
+  ok(synced.classes[0].name === 'MAN 1 BANDA ACEH — Bahasa Inggris', 'S9: nama kelas tersinkronkan menjadi MAN 1 BANDA ACEH — Bahasa Inggris');
+}
+
 // --- Ringkasan ---
 console.log(`\nauto-class-adopt-test: ${passed.length} PASS, ${failed.length} FAIL`);
 if (failed.length) {
