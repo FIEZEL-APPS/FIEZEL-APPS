@@ -149,3 +149,62 @@ assets/motion/
 character-preview.html
 remotion/
 test_reports/
+
+# --- ALAT PRIBADI OWNER YANG IKUT TER-COMMIT ---
+# Bukan bagian FIEZEL sama sekali: satu ekstensi peramban penahan popup, dua skrip .bat
+# Windows, dan satu .exe 6 KB. Nol rujukan dari index.html maupun ASSETS sw.js.
+#
+# ALASANNYA BUKAN KERAPIAN, dan itu yang penting: `fiezel.my.id/app/test_key.exe` adalah
+# berkas .exe yang bisa diunduh siapa pun dari situs yang akan dipakai sekolah. Penyaring
+# jaringan sekolah dan antivirus tidak menilai berkas itu satu per satu — mereka menandai
+# DOMAIN yang menyajikan .exe dan .bat. Yang hilang karena itu bukan satu unduhan, melainkan
+# akses seluruh murid ke FIEZEL, di tengah pilot, tanpa pesan galat yang menjelaskan sebabnya.
+#
+# `pressed_keys.txt` dan `wmi_events.txt` DIPERIKSA ISINYA sebelum diputuskan, bukan dihakimi
+# dari namanya: keduanya hanya memuat baris pembuka ("Listening for keys...", 22 bita;
+# "Starting WMI listener...", 51 bita). NOL data tertangkap. Mereka tetap dikecualikan justru
+# karena namanya — berkas bernama `pressed_keys.txt` di URL publik adalah tuduhan yang harus
+# dibantah, dan lebih murah tidak menyajikannya daripada menjelaskannya kepada wali murid.
+#
+# DIKECUALIKAN, BUKAN DIHAPUS. Berkasnya tetap di repo karena itu milik owner dan mungkin
+# masih dipakai di luar FIEZEL. Menghapusnya keputusan terpisah; yang diselesaikan di sini
+# hanya penyajiannya ke publik.
+*.exe
+*.bat
+stealthpop-guard/
+pressed_keys.txt
+wmi_events.txt
+
+# --- GERBANG, DOKUMEN, DAN MEMORI KERJA ---
+# `tests/` adalah ratusan berkas gerbang yang dijalankan CI dan TIDAK PERNAH dimuat peramban.
+# Sebelum ini hanya pola akhiran (`*-test.js`) yang membuangnya satu per satu — artinya berkas
+# di dalamnya yang tidak berakhiran itu (fixture, README, data uji) tetap terkirim.
+# Mengecualikan direktorinya menutup keduanya sekaligus.
+#
+# `memory/` memuat `test_credentials.md`. Kredensial di dalamnya SUDAH dicabut — dan
+# `backend/auth.py:122` mencatat pencabutan itu dengan sebab yang persis: nilainya pernah
+# terpublikasi di repo. Berkas yang menamai prosedur masuk tetap tidak punya alasan berada
+# di URL publik, hidup atau mati tokennya.
+#
+# `frontend/`, `mockups/`, `preview-redesign.html`: nol rujukan dari berkas runtime.
+# `design/` tetap TIDAK dikecualikan — ia benar-benar dimuat splash dan SFX, dan blok maskot
+# di atas sudah pernah salah pada titik yang persis sama.
+#
+# `tests/` dan `docs/` SENGAJA TIDAK dikecualikan sebagai direktori, dan itu keputusan yang
+# diambil SESUDAH gerbang memerahkannya — bukan sebelum. Cek (F) menandai keduanya karena
+# `index.html`, `style.css`, `core-config.js` menulis `tests/...-test.js` di dalam komentar
+# dengan tanda petik balik, dan `content/ja/vocabulary-master-ja.json` menyebut
+# `docs/japanese/kosakata-jlpt.json` sebagai catatan asal-usul data. Ketiganya prosa, bukan
+# pemuatan — tetapi cek (F) sengaja dibuat sederhana dan tidak membedakan komentar dari kode.
+#
+# Melonggarkan gerbang itu agar dua kecualian ini lolos adalah pertukaran yang buruk, dan
+# angkanya yang memutuskan: dari `tests/` hanya SATU berkas yang benar-benar terkirim hari
+# ini (sisanya sudah tertangkap `*-test.js`, `*-selftest.js`, `*.md`), dan dari `docs/` hanya
+# tiga JSON Jepang yang tidak bisa dipastikan bukan dimuat. Satu berkas itu dikecualikan
+# langsung di bawah; tiga JSON itu dibiarkan, karena menebak di sini berarti 404 senyap di
+# produksi — persis yang dijaga cek (F).
+*-regression.js
+memory/
+frontend/
+mockups/
+preview-redesign.html
