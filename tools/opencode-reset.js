@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /**
  * OpenCode Reset & Fresh-User Auto-Healing System
- * 
+ *
  * Fungsi:
  * 1. Menghapus sesi stuck/errored di OpenCode tanpa menyentuh 1 byte pun file proyek Anda.
  * 2. Mode --fresh-user: Menghapus SELURUH rekam jejak, database SQLite, token sesi lama,
@@ -9,7 +9,7 @@
  *    sebagai USER BARU yang baru pertama kali menginstal aplikasi.
  * 3. Me-restart background daemon OpenCode dengan identitas fresh.
  * 4. Memasang proteksi anti-subagent (sequential-only) di AGENTS.md.
- * 
+ *
  * JAMINAN KEAMANAN:
  * - 100% TIDAK MENGHAPUS file source code, git repository, atau aset proyek Anda.
  * - HANYA mengelola memori/history/identitas client di dalam runtime OpenCode.
@@ -226,7 +226,7 @@ function executeFreshUserReset() {
   if (fs.existsSync(DESKTOP_DIR)) {
     // Tulis updaterId baru
     fs.writeFileSync(path.join(DESKTOP_DIR, '.updaterId'), newMachineId, 'utf-8');
-    
+
     // Reset settings ke fresh onboarding
     const freshSettings = {
       firstLaunchOnboardingComplete: true,
@@ -306,7 +306,7 @@ async function main() {
     console.log('ℹ️  Tidak ada sesi yang tersimpan di OpenCode.');
   } else {
     console.log(`📋 Ditemukan ${sessions.length} sesi.`);
-    
+
     // Find sessions to remove
     let targets = [];
     if (isAll) {
