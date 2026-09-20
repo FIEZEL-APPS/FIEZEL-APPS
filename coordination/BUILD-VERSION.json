@@ -1,7 +1,7 @@
 {
-  "version": "m025-349",
+  "version": "m025-350",
   "claimedBy": "branch claude/charming-bohr-lb8dbt",
-  "claimedAt": "2026-09-20T19:19:17.881Z",
-  "reason": "--help",
+  "claimedAt": "2026-09-20T19:24:21.719Z",
+  "reason": "KunciHantu hijau: 32 kunci hantu Ruang Guru didaftarkan dwibahasa",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }
