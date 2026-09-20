@@ -110,6 +110,11 @@ input[type=file] { padding: 8px; }
 .pill.mute { background: rgba(255,255,255,.07); color: var(--muted); }
 
 table { width: 100%; border-collapse: collapse; font-size: 14px; }
+/* G2 (m025-351): matriks cakupan punya 6 kolom — di ponsel tabelnya digeser di dalam
+   pembungkus, tidak dipadatkan sampai selnya tak terbaca. Lebar minimum dengan sengaja:
+   di layar sempit gulir horizontal adalah jawaban yang jujur. */
+.tbl-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+.tbl-scroll table { min-width: 680px; }
 th { text-align: left; font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); padding: 9px 10px; border-bottom: 1px solid var(--line); font-weight: 700; }
 td { padding: 11px 10px; border-bottom: 1px solid rgba(42,63,53,.55); vertical-align: middle; }
 tr.click { cursor: pointer; transition: background-color .15s ease; }
@@ -126,9 +131,13 @@ tr.click:hover { background: rgba(201,242,78,.06); }
 .issue.info { border-left-color: var(--sky); }
 
 /* ---------- drawer & modal ---------- */
-.scrim { position: fixed; inset: 0; background: rgba(4,8,6,.66); backdrop-filter: blur(4px); z-index: 40; animation: fade .2s ease; }
+/* G3 (m025-351): scrim dipasang sebagai <button> supaya terjangkau keyboard; penampilan
+   tetap scrim (posisi tetap, tanpa chrome tombol). */
+.scrim { position: fixed; inset: 0; background: rgba(4,8,6,.66); backdrop-filter: blur(4px); z-index: 40; animation: fade .2s ease; border: 0; padding: 0; cursor: pointer; }
+.scrim:focus-visible { outline: 2px solid var(--citrus); outline-offset: -2px; }
 .drawer { position: fixed; top: 0; right: 0; bottom: 0; width: min(560px, 96vw); background: var(--ink-2); border-left: 1px solid var(--line); z-index: 41; padding: 26px; overflow: auto; box-shadow: var(--shadow); animation: slide .26s cubic-bezier(.2,.8,.2,1); }
 .modal { position: fixed; left: 50%; top: 50%; transform: translate(-50%, -50%); width: min(760px, 94vw); max-height: 88vh; overflow: auto; background: var(--ink-2); border: 1px solid var(--line); border-radius: 18px; z-index: 41; padding: 26px; box-shadow: var(--shadow); animation: pop .22s cubic-bezier(.2,.8,.2,1); }
+.drawer:focus-visible, .modal:focus-visible { outline: 2px solid var(--citrus); outline-offset: -2px; }
 @keyframes fade { from { opacity: 0; } }
 @keyframes slide { from { transform: translateX(28px); opacity: .4; } }
 @keyframes pop { from { transform: translate(-50%, -46%) scale(.97); opacity: 0; } }
@@ -170,4 +179,19 @@ tr.click:hover { background: rgba(201,242,78,.06); }
   .shell { grid-template-columns: 1fr; }
   .side { position: static; height: auto; border-right: none; border-bottom: 1px solid var(--line); }
   .nav { flex-direction: row; overflow: auto; }
+  .main { padding: 24px 14px 80px; }
+  .card { padding: 14px 15px; }
+  th, td { padding: 8px 7px; }
+}
+
+/* G4 (m025-351): konsol guru tidak memuat style.css, jadi gerbang kurangi-gerak harus
+   berdiri sendiri di sini — pola yang sama dengan style.css (rise, slide, pop, fade dan
+   seluruh transisi kartu KPI dimatikan untuk pengguna yang memintanya secara sistem). */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .01ms !important;
+    scroll-behavior: auto !important;
+  }
 }

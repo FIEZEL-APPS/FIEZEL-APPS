@@ -53,14 +53,20 @@ const ALLOWLIST = Object.freeze({
   /* 1 -> 3 (m025-314). Bukan naskah baru: ketiganya sudah ada di main, dan dua di antaranya
      baru terlihat setelah ID_WORDS diperlebar di commit ini. Yang dihitung: potongan prompt
      AI (rubrik penilaian, bukan naskah UI), judul 'Selesaikan ritme hari ini', dan label
-     'Latihan'. Dua yang terakhir adalah utang nyata dan tercatat di §C3 laporan audit. */
-  'app.js': 3,
+     'Latihan'. Dua yang terakhir adalah utang nyata dan tercatat di §C3 laporan audit.
+     3 -> 4 (m025-351): baris '— Penugasan latihan dan pemantauan capaian murid.' di modal
+     "KelasKu untuk Guru" ikut terlihat setelah 'Penugasan' masuk daftar kata. Naskah lama
+     di permukaan guru; utang tetap tercatat di sini. */
+  'app.js': 4,
   'features/brain/fiezel-olm.js': 1,                            // tabel copy id, padanan th di naskah-th-brain.js
   /* 3 -> 4 (m025-314): satu kalimat umpan balik tutor ('Belum ada jawaban di sesi ini.')
      ikut terlihat setelah daftar kata diperlebar. Naskahnya lama, matanya yang baru. */
   'features/brain/fiezel-tutor-brain.js': 4,
-  /* 1 -> 5 (m025-314): empat label Tugas/Latihan di kartu kelas, semuanya naskah lama. */
-  'features/class-hub/fiezel-class-hub.js': 5,
+  /* 1 -> 5 (m025-314): empat label Tugas/Latihan di kartu kelas, semuanya naskah lama.
+     5 -> 6 (m025-351): literal 'Tenggat ' di kartu tugas ZONE GURU (Ruang Guru) ikut
+     terlihat setelah 'Tenggat' masuk daftar kata. Zona murid KelasKu sudah dwibahasa
+     penuh lewat t() — yang tersisa ini permukaan guru, dan permukaan guru memang ID. */
+  'features/class-hub/fiezel-class-hub.js': 6,
   'features/neural-voice/fiezel-cf-voice-notice.js': 3,         // cermin naskah kanon quota
   /* Naik 1 -> 3 (m025-271). Blok "sudah punya akun?" ikut berdiri di pemilih bahasa,
      dan alasannya sama persis dengan literal yang sudah ada di sana: pada cat PERTAMA
@@ -84,9 +90,9 @@ const ALLOWLIST = Object.freeze({
 
      YANG PERLU DIKETAHUI TERUS TERANG, dan sengaja ditulis di sini supaya tidak hilang:
      learning-mission.js adalah LAYAR MURID (misi.html), bukan layar guru. Kalau kelak ada
-     murid Thai yang dibukakan konsol ini, 16 kalimat itu sampai kepadanya dalam bahasa
-     Indonesia. Selama kursusnya memang Kurikulum Merdeka, itu konsekuensi yang diterima
-     sadar - bukan kebocoran yang terlewat.
+     murid Thai yang dibukakan konsol ini, kalimat-kalimat konsol ini sampai kepadanya
+     dalam bahasa Indonesia. Selama kursusnya memang Kurikulum Merdeka, itu konsekuensi
+     yang diterima sadar - bukan kebocoran yang terlewat.
 
      Angka ini menyatakan utang, bukan izin bertambah: naik satu = merah, sama seperti
      berkas lain. Jalan keluarnya, kalau FIEZEL kelak membawa kurikulum negara lain, adalah
@@ -96,9 +102,13 @@ const ALLOWLIST = Object.freeze({
 
      20 -> 17 (m025-318): formulir daftar/masuk email+sandi dan tombol "Masuk dengan Google"
      dicabut bersama pintu-pintunya, jadi tiga kalimatnya ikut hilang dari layar. Ratchet
-     TURUN — angka ini menyatakan utang yang tersisa, bukan jatah yang boleh dipakai. */
-  'features/curriculum/learning-mission.js': 16,
-  'features/curriculum/teacher-console.js': 33,                 // konsol guru Kurikulum Merdeka (turun ke 33 setelah humanisasi Beranda, Kurikulum, Asesmen & Rapor m025-336)
+     TURUN — angka ini menyatakan utang yang tersisa, bukan jatah yang boleh dipakai.
+
+     17 -> 19 (m025-351): 'FIEZEL · Misi Belajar', 'Belum ada misi. Minta gurumu...', dan
+     'Misi:' ikut terlihat setelah 'Misi' masuk daftar kata. Konten Merdeka yang sama,
+     mata gerbang yang baru — alasannya tidak berubah. */
+  'features/curriculum/learning-mission.js': 19,
+  'features/curriculum/teacher-console.js': 35,                 // konsol guru Kurikulum Merdeka (+2 m025-351: 'Kurikulum yang benar-benar dipelajari.' dan 'Kurikulum & Kompetensi' ikut terlihat setelah 'Kurikulum'/'Kompetensi' masuk daftar kata; alasannya tidak berubah)
   /* KONTEN KURIKULUM NASIONAL INDONESIA, bukan naskah antarmuka. Empat literalnya adalah
      nama Fase resmi Kurikulum Merdeka dan dua saran pedagogis di dalam paket materinya.
      Menerjemahkannya ke Thai bukan sia-sia melainkan menyesatkan: guru Thai tidak mengajar
@@ -119,10 +129,15 @@ const ALLOWLIST = Object.freeze({
      di dalam butir-butir baru itu. Alasannya sama persis dengan alasan entri ini ada:
      pembahasan soal Kurikulum Merdeka ditulis untuk guru Indonesia yang mengajar di bawah
      kurikulum Indonesia. Angka ini akan naik lagi setiap kali banknya diperdalam — itu
-     bukan utang yang menumpuk, melainkan ukuran isi berkas konten nasional. */
-  'features/teacher/fiezel-teacher-curriculum.js': 10,
-  'features/speaking-listening/listening-scenarios-a1.js': 11,  // konten belajar, jalur th lewat sidecar
-  'features/speaking-listening/listening-scenarios-a2.js': 12,  // idem
+     bukan utang yang menumpuk, melainkan ukuran isi berkas konten nasional.
+
+     10 -> 11 (m025-351): 'Fase D (SMP / MTs)' — nama Fase REGULASI yang selama ini lolos
+     karena daftar kata tidak memuat 'Fase'. Dua nama Fase lain sudah terhitung sejak lama
+     lewat kata 'Kelas'. Istilah regulasi tidak diterjemahkan — alasannya yang panjang ada
+     di atas. */
+  'features/teacher/fiezel-teacher-curriculum.js': 11,
+  'features/speaking-listening/listening-scenarios-a1.js': 15,  // +4 judul 'Menunggu...' setelah 'Menunggu' masuk daftar kata (m025-351) — konten belajar, jalur th lewat sidecar
+  'features/speaking-listening/listening-scenarios-a2.js': 14,  // +2 idem
   /* UTANG BARU TERLIHAT — m025-314, 14 September 2026. Empat entri di bawah TIDAK lahir di
      gelombang ini: kalimatnya sudah ada di main sejak lama. Yang berubah adalah MATA
      gerbangnya. Audit reports/AUDIT-UI-UX-BAHASA-2026-09-14.md §C1 menunjukkan daftar
@@ -145,10 +160,10 @@ const ALLOWLIST = Object.freeze({
   'features/class-hub/fiezel-braincore-review.js': 2,           // nama dua latihan di kartu ulasan
   'features/learner-flow/fiezel-learner-flow.js': 1,            // satu kalimat transisi sesi
   'features/learner-flow/fiezel-review-bank.js': 1,             // satu ajakan buka kartu
-  'features/teacher/fiezel-teacher-shell.js': 3,                // layar guru, naskah lama (turun ke 3 setelah humanisasi modal assign)
+  'features/teacher/fiezel-teacher-shell.js': 7,                // layar guru, naskah lama (+4 m025-351: label 'Tenggat & tugas', 'Mapel', 'Penugasan nilai (assignment)', dan contoh soal 'Penugasan Kontingen...' ikut terlihat setelah kosakata baru masuk daftar)
   'features/teacher/fiezel-teacher-store.js': 3,                // idem
   'features/tutor-action-center/fiezel-tutor-action-center.js': 3, // idem
-  'features/tutor-classroom/fiezel-tutor-v3.js': 1              // NASKAH AJAR MURID — lihat §C3 laporan audit
+  'features/tutor-classroom/fiezel-tutor-v3.js': 2              // NASKAH AJAR MURID — lihat §C3 laporan audit (+1 m025-351: kalimat 'Kurikulum A1 lengkap dulu...' ikut terlihat setelah 'Kurikulum'/'Lengkap' masuk daftar; utang yang sama, matanya yang baru)
 });
 
 /* DAFTAR INI ADALAH HEURISTIK, DAN ANGKA ANGGARAN DI ATAS HARUS DIBACA BEGITU.
@@ -162,8 +177,17 @@ const ALLOWLIST = Object.freeze({
    'Lanjutkan', jadi bentuk berimbuhan perlu disebut sendiri.
 
    Kata di baris kedua ditambahkan dari temuan audit itu. Menambah kata di sini MEMPERSEMPIT
-   blind spot; ia tidak pernah menutupnya. */
-const ID_WORDS = /\b(Akun|Masuk|Daftar|Pengaturan|Simpan|Batal|Lanjut|Kembali|Selesai|Silakan|Memuat|Jawaban|Pilih|Kirim|Aktifkan|Aktivasi|Nama|Kelas|Guru|Murid|Suara|Notifikasi|Riwayat|Belajar|Undangan|Coba lagi|Status|Belum|Sudah|Hapus|Tambah|Ubah|Buat|Tutup|Cari|Ruang|Tugas|Soal|Materi|Metrik|Lanjutkan|Selesaikan|Kosakata|Latihan|Akurasi|Ritme|Dengar|Runtun|Tingkat|Sekarang|Kemahiran|Disarankan|Direkomendasikan)\b/;
+   blind spot; ia tidak pernah menutupnya.
+
+   Kata di baris ketiga (m025-351, Gelombang 5 audit) ditambahkan dari finding A1 audit
+   UI/UX KelasKu & Kurikulum sampai Kompetensi: titik buta konsol KelasKu — zona yang
+   dwibahasanya nyata (id/th) — tidak diawasi satu kosakata kurikulum pun ('Tenggat',
+   'Fase', 'Misi', 'Paspor', dst). Kosa kata itu disuntikkan ke sini supaya titik butanya
+   hilang. Pukulan sampingan di zona Merdeka yang memang di-SK-kan owner 7 September 2026
+   (konsol guru, misi.html, bank konten) dijelaskan per berkas di ALLOWLIST di atas.
+   Catatan: 'Fase' juga meleset ke teks ajaran kelas tutor dan 'Menunggu' ke judul skenario
+   menyimak — keduanya konten, bukan naskah UI; keduanya dicatat di ALLOWLIST. */
+const ID_WORDS = /\b(Akun|Masuk|Daftar|Pengaturan|Simpan|Batal|Lanjut|Kembali|Selesai|Silakan|Memuat|Jawaban|Pilih|Kirim|Aktifkan|Aktivasi|Nama|Kelas|Guru|Murid|Suara|Notifikasi|Riwayat|Belajar|Undangan|Coba lagi|Status|Belum|Sudah|Hapus|Tambah|Ubah|Buat|Tutup|Cari|Ruang|Tugas|Soal|Materi|Metrik|Lanjutkan|Selesaikan|Kosakata|Latihan|Akurasi|Ritme|Dengar|Runtun|Tingkat|Sekarang|Kemahiran|Disarankan|Direkomendasikan|Menunggu|Tenggat|Mapel|Fase|Kurikulum|Merdeka|Tuntas|Misi|Paspor|Kompetensi|Lengkap|Terdaftar|Penugasan)\b/;
 
 /* Buang komentar tanpa menggeser nomor baris — komentar Indonesia ada di mana-mana di repo
    ini dan bukan naskah murid. */

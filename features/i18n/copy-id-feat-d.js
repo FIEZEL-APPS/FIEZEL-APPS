@@ -481,6 +481,23 @@
     'kelas.target-alasan-lemah': '{n} sub-bab masih goyah di percobaan terakhirmu.',
     'kelas.target-alasan-belum-tuntas': 'Bab ini belum tuntas di percobaan terakhirmu.',
     'kelas.target-alasan-baru': 'Bab berikutnya yang belum pernah kamu buka.',
-    'guru.kelas-mapel-tanpa-nama': 'Kelas'
+    'guru.kelas-mapel-tanpa-nama': 'Kelas',
+    /* m025-351 (Gelombang 5) — naskah zona kurikulum KarlasKu lahir dwibahasa. */
+    'kelas.status-terlambat': ' (terlambat)',
+    'kelas.tanpa-tenggat': 'Tanpa tenggat',
+    'kelas.lewat-n-hari': 'Lewat {n} hari',
+    'kelas.tenggat-hari-ini': 'Tenggat hari ini',
+    'kelas.tenggat-besok': 'Tenggat besok',
+    'kelas.tenggat-n-hari': 'Tenggat {n} hari lagi · {tanggal}',
+    'kelas.fase-d': 'Fase D (SMP)',
+    'kelas.fase-e': 'Fase E (SMA 10)',
+    'kelas.fase-f': 'Fase F (SMA 11-12)',
+    'kelas.nav-aria': 'Bagian KelasKu',
+    'kelas.panel-aria': 'Isi KelasKu',
+    'kelas.nav-guru-aria': 'Bagian Ruang Kelas Guru',
+    'kelas.panel-guru-aria': 'Isi Ruang Kelas Guru',
+    /* m025-351 (Gelombang 5, G10) — penanda asal data pohon kurikulum di Ruang Guru. */
+    'guru.kurikulum-sumber-lokal': 'Sumber: katalog cadangan perangkat — server belum menyemai kurikulum mapel ini. Tekan kartu penyemai agar papan ini terisi dari server KelasKu.',
+    'guru.kurikulum-sumber-server': 'Sumber: kurikulum dari server KelasKu.'
   });
 }());

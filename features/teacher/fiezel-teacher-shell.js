@@ -3084,7 +3084,9 @@
 
     var tree = ui.curriculumTree || [];
     /* Fallback mulus ke katalog materi lokal jika pohon server belum dimuat */
+    var sumberLokal = false;
     if (!tree.length && cat && cat.competencies && cat.competencies.length) {
+      sumberLokal = true;
       tree = cat.competencies.map(function (cp) {
         return {
           type: 'competency',
@@ -3138,7 +3140,15 @@
       '</div>';
     }
 
-    return '<div class="tg-curriculum-wrap">' + toolbar + pintuKonsol + '<div class="tg-curriculum-tree">' + tree.map(renderNode).join('') + '</div></div>';
+    var pinSumber = sumberLokal
+      ? '<div class="tg-curriculum-source is-local" data-testid="tg-curriculum-source-local">' + icon('hard-drive') + ' <span>' +
+        esc(t('guru.kurikulum-sumber-lokal', 'Sumber: katalog cadangan perangkat — server belum menyemai kurikulum mapel ini. Tekan kartu penyemai agar papan ini terisi dari server KelasKu.')) +
+        '</span></div>'
+      : '<div class="tg-curriculum-source is-server" data-testid="tg-curriculum-source-server">' + icon('cloud') + ' <span>' +
+        esc(t('guru.kurikulum-sumber-server', 'Sumber: kurikulum dari server KelasKu.')) +
+        '</span></div>';
+
+    return '<div class="tg-curriculum-wrap">' + toolbar + pintuKonsol + pinSumber + '<div class="tg-curriculum-tree">' + tree.map(renderNode).join('') + '</div></div>';
   }
 
   function settings() {

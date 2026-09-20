@@ -492,6 +492,10 @@ html.fiezel-ui-v6 body.fz-teacher-mode .tg button.tg-seg-btn:not(.primary):not(.
 .tg-curriculum-wrap{display:flex;flex-direction:column;gap:18px}
 .tg-curriculum-toolbar{background:var(--tg-paper-2);border:1px solid var(--tg-line);border-radius:var(--tg-r-lg);padding:14px 18px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px}
 .tg-curriculum-tree{display:flex;flex-direction:column;gap:16px}
+.tg-curriculum-source{display:flex;align-items:flex-start;gap:8px;font-size:.84rem;line-height:1.5;padding:10px 14px;border-radius:10px;border:1px solid var(--tg-line)}
+.tg-curriculum-source svg{flex:none;margin-top:2px}
+.tg-curriculum-source.is-server{background:rgba(21,120,94,.08);border-color:rgba(21,120,94,.25);color:var(--tg-ink)}
+.tg-curriculum-source.is-local{background:rgba(212,139,42,.1);border-color:rgba(212,139,42,.35);color:var(--tg-ink)}
 .tg-curriculum-card{background:var(--tg-paper-2);border:1px solid var(--tg-line);border-radius:var(--tg-r-lg);padding:20px;box-shadow:0 2px 8px rgba(0,0,0,.03)}
 .tg-tp-item{background:var(--tg-paper);border:1px solid var(--tg-line);border-radius:var(--tg-r);padding:14px;margin-top:10px}
 .tg-comp-row{display:flex;align-items:center;justify-content:space-between;gap:12px;background:#fff;border:1px solid var(--tg-line);border-radius:8px;padding:10px 14px;margin-top:8px}

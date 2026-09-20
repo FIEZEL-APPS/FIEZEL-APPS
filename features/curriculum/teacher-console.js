@@ -20,10 +20,10 @@
      saat naskahnya belum termuat. Guru tidak boleh membaca 'kurikulum.semai-judul' di
      layarnya, jadi cadangan Indonesia yang dikembalikan.
 
-     Naskah baru di berkas ini WAJIB lewat sini. tests/th-ui-leak-test.js memberi berkas ini
-     anggaran 56 literal Indonesia telanjang — anggaran yang hanya boleh turun — dan
-     argumen kedua t() adalah satu-satunya bentuk yang diakui pemindainya sebagai jalur
-     i18n yang benar, bukan kebocoran. */
+     Naskah baru di berkas ini WAJIB lewat sini. tests/th-ui-leak-test.js melacak anggaran
+     literal Indonesia telanjang berkas ini di ALLOWLIST (sedang 35; angka yang hanya boleh
+     turun dan harus pas dengan kenyataan) — dan argumen kedua t() adalah satu-satunya
+     bentuk yang diakui pemindainya sebagai jalur i18n yang benar, bukan kebocoran. */
   function t(kunci, cadangan) {
     var s;
     try { var I = root.FiezelI18n; s = I && I.t ? I.t(kunci) : undefined; } catch (_) {}
@@ -84,6 +84,44 @@
       if (SUBJECT_CHOICES[j][0] === base) return SUBJECT_CHOICES[j][1];
     }
     return sid;
+  }
+
+  /* G6 (m025-351): judul asesmen bawaan dulu satu string mengambang — muncul apa adanya
+     di ruang mapel mana pun. Sekarang judulnya mengikuti mapel yang sedang aktif; urutan
+     kata Indonesia tidak dipaksa ke naskah Thai karena pola {mapel} menyatu di dalam
+     t()/copy-map. */
+  function defaultAssessTitle() {
+    var mapel = subjName(activeSubj());
+    return String(t('kurikulum.bp-default-title', 'Formatif {mapel}')).replace('{mapel}', mapel);
+  }
+
+  /* G7 (m025-351): ketersediaan blueprint dari backend berbentuk array {tp_id, tp_code,
+     needed, available} — dulu dicetak mentah dengan JSON.stringify. Yang dibaca guru cukup
+     satu baris per TP: cukup atau kurang, dan berapa. */
+  function fmtAvailability(list) {
+    if (!list || !list.length) return t('kurikulum.bp-av-kosong', 'Pemeriksaan ketersediaan soal belum menghasilkan data.');
+    var ganti = function (s, p) { return String(s).replace('{tp}', p.tp).replace('{avail}', p.avail).replace('{need}', p.need).replace('{selisih}', p.selisih); };
+    return list.map(function (x) {
+      var tp = x.tp_code || String(x.tp_id || 'TP');
+      var avail = x.available || 0, need = x.needed || 0;
+      var s = avail < need
+        ? t('kurikulum.bp-av-kurang', 'TP {tp}: hanya {avail}/{need} soal — kurang {selisih}.')
+        : t('kurikulum.bp-av-cukup', 'TP {tp}: {avail}/{need} soal tersedia.');
+      return ganti(s, { tp: tp, avail: avail, need: need, selisih: need - avail });
+    }).join(' · ');
+  }
+
+  /* G7 (m025-351): sinyal kepercayaan diri per butir (lucky guess, false confidence,
+     careless, misconception) dicetak sebagai baris ringkas, bukan JSON mentah. */
+  function fmtConfidence(s) {
+    if (!s) return '—';
+    var baris = [
+      [t('kurikulum.an-sinyal-lucky', 'Tebakan beruntung'), s.lucky_guess],
+      [t('kurikulum.an-sinyal-over', 'Yakin tapi salah'), s.false_confidence],
+      [t('kurikulum.an-sinyal-careless', 'Ceroboh'), s.careless],
+      [t('kurikulum.an-sinyal-miskon', 'Miskonsepsi'), s.misconception]
+    ];
+    return baris.map(function (b) { return b[0] + ': ' + (b[1] || 0); }).join(' · ');
   }
 
   var NAV = [
@@ -315,9 +353,12 @@
       '<button class="btn sm ghost" data-a="logout" data-testid="logout-btn">Keluar</button></div>' +
       '<p class="muted mono" style="margin-top:22px">' + esc(S.user.name || '') + ' · ' + esc(S.user.role) + '</p>' +
       '</aside><main class="main" data-testid="teacher-console">' + view() + renderDisclaimer() + '</main></div>' +
-      (S.drawer ? '<div class="scrim" data-a="close"></div><aside class="drawer" data-testid="drawer">' + S.drawer + '</aside>' : '') +
-      (S.modal ? '<div class="scrim" data-a="close"></div><div class="modal" data-testid="modal">' + S.modal + '</div>' : '');
+      (S.drawer ? '<button type="button" class="scrim" data-a="close" aria-label="' + esc(t('kurikulum.scrim-tutup', 'Tutup')) + '"></button><aside class="drawer" data-testid="drawer">' + S.drawer + '</aside>' : '') +
+      (S.modal ? '<button type="button" class="scrim" data-a="close" aria-label="' + esc(t('kurikulum.scrim-tutup', 'Tutup')) + '"></button><div class="modal" data-testid="modal">' + S.modal + '</div>' : '');
     pulihkanIsian(potret);
+    /* G3 (m025-351): ingat elemen pemicu supaya Tutup/Escape bisa memulangkan fokus. */
+    if (!S.drawer && !S.modal && document.activeElement && app.contains(document.activeElement)) lastFocused = document.activeElement;
+    if (S.drawer || S.modal) focusOverlay();
   }
 
   function view() {
@@ -424,7 +465,7 @@
     };
     return head(t('kurikulum.cakupan-judul', 'Cakupan Kurikulum'), t('kurikulum.cakupan-subjudul', 'Bagian mana yang belum diajarkan, dan mana yang sudah tapi belum dikuasai'),
       t('kurikulum.cakupan-ket', 'Keterangan: Tuntas / Mahir = penguasaan tinggi · Perlu Pendampingan = perlu remedial · Belum Diajarkan = belum ada aktivitas belajar')) +
-      '<div class="card" data-testid="coverage-table"><table><thead><tr>' +
+      '<div class="card" data-testid="coverage-table"><div class="tbl-scroll"><table><thead><tr>' +
       '<th>' + t('kurikulum.th-tp', 'Tujuan Pembelajaran (TP)') + '</th>' +
       '<th>' + t('kurikulum.th-soal', 'Bank Soal') + '</th>' +
       '<th>' + t('kurikulum.th-exposure', 'Keterlibatan') + '</th>' +
@@ -446,7 +487,7 @@
           '<td><span class="bar ' + (r.mastery_pct != null && r.mastery_pct < 60 ? 'bad' : r.mastery_pct != null && r.mastery_pct < 80 ? 'warn' : '') + '"><i style="width:' + (r.mastery_pct || 0) + '%"></i></span> ' + (r.mastery_pct == null ? '—' : r.mastery_pct + '%') + '</td>' +
           '<td>' + r.students_needs_help + '</td>' +
           '<td><span class="pill ' + cls + '">' + esc(stText) + '</span><br><span class="muted" style="font-size:12px">' + esc(r.note) + '</span></td></tr>';
-      }).join('') + '</tbody></table>' +
+      }).join('') + '</tbody></table></div>' +
       '<p class="muted" style="margin-top:12px;font-size:12.5px">💡 ' + t('kurikulum.petunjuk-klik-tp', 'Klik baris mana saja untuk melihat murid, detail miskonsepsi, dan langsung membuat rencana intervensi.') + '</p></div>';
   }
 
@@ -684,7 +725,8 @@
       '<button class="btn ghost sm" data-a="reload-bank">Muat ulang</button></div>' +
       (S.reviewQueue.length ? S.reviewQueue.map(qCard).join('') : '<p class="muted">Antrean bersih.</p>') + '</div>' +
 
-      '<div class="card" data-testid="question-list"><div class="row between"><div><p class="kicker">' + esc(t('kurikulum.bank-kicker-published', 'Koleksi Siap Pakai')) + '</p><h3>' + S.questions.length + ' ' + esc(t('kurikulum.bank-soal-satuan', 'soal aktif')) + '</h3></div>' +
+      '<div class="card" data-testid="question-list"><div class="row between"><div><p class="kicker">' + esc(t('kurikulum.bank-kicker-published', 'Koleksi Siap Pakai')) + '</p><h3>' + S.questions.length + ' ' + esc(t('kurikulum.bank-soal-satuan', 'soal aktif')) + '</h3>' +
+      (S.questions.length === 60 ? '<p class="muted" style="font-size:12.5px;margin:4px 0 0">⚠️ ' + esc(t('kurikulum.bank-capped-note', 'Menampilkan 60 soal pertama dari bank — batas halaman, bukan jumlah seluruh bank.')) + '</p>' : '') + '</div>' +
       '<label class="f" style="width:280px;margin:0">Filter TP<select data-a="filter-tp" data-testid="filter-tp"><option value="">Semua TP</option>' + tpOptions(S.filterTp) + '</select></label></div>' +
       (S.questions.length ? S.questions.map(qCard).join('') : '<p class="muted">Belum ada soal.</p>') + '</div>';
   }
@@ -787,7 +829,9 @@
       ['C1', t('kurikulum.cog-c1-label', 'C1 (Mengingat)')],
       ['C2', t('kurikulum.cog-c2-label', 'C2 (Memahami)')],
       ['C3', t('kurikulum.cog-c3-label', 'C3 (Menerapkan)')],
-      ['C4', t('kurikulum.cog-c4-label', 'C4 (Menganalisis)')]
+      ['C4', t('kurikulum.cog-c4-label', 'C4 (Menganalisis)')],
+      ['C5', t('kurikulum.cog-c5-label', 'C5 (Mengevaluasi)')],
+      ['C6', t('kurikulum.cog-c6-label', 'C6 (Mencipta)')]
     ];
     return head(t('kurikulum.as-title', 'Assessment Engine'), t('kurikulum.as-sub', 'Blueprint dulu, soal kemudian'),
       t('kurikulum.as-desc', 'Delapan jenis asesmen dengan tujuan berbeda: diagnostic, practice, formative, summative, remedial, enrichment, review, transfer.')) +
@@ -799,7 +843,7 @@
       '<button class="btn sm ghost" data-a="apply-bp-preset" data-preset="weekly" data-testid="preset-weekly">📝 ' + t('kurikulum.preset-weekly-btn', 'Formatif Mingguan (10 Soal)') + '</button>' +
       '<button class="btn sm ghost" data-a="apply-bp-preset" data-preset="summative" data-testid="preset-sum-btn">🏆 ' + t('kurikulum.preset-sum-btn', 'Sumatif Bab (20 Soal)') + '</button>' +
       '</div></div>' +
-      '<label class="f">' + t('kurikulum.bp-title-label', 'Judul Asesmen') + '<input id="bpTitle" value="' + t('kurikulum.bp-default-title', 'Formatif Bilangan') + '" data-testid="bp-title"></label>' +
+      '<label class="f">' + t('kurikulum.bp-title-label', 'Judul Asesmen') + '<input id="bpTitle" value="' + esc(defaultAssessTitle()) + '" data-testid="bp-title"></label>' +
       '<label class="f">' + t('kurikulum.bp-type-label', 'Jenis Asesmen') + '<select id="bpType" data-testid="bp-type">' +
       AS_TYPES.map(function (at) { return '<option value="' + at[0] + '"' + (at[0] === 'formative' ? ' selected' : '') + '>' + esc(at[1]) + '</option>'; }).join('') +
       '</select></label>' +
@@ -813,7 +857,7 @@
       '<div style="margin-top:10px">' +
       '<p class="kicker">' + t('kurikulum.bp-cog-kicker', 'Distribusi kognitif (%)') + '</p><div class="row">' +
       COG_ITEMS.map(function (c) {
-        return '<label class="f" style="flex:1;min-width:70px">' + c[1] + '<input type="number" id="cog' + c[0] + '" value="' + ({ C1: 20, C2: 30, C3: 30, C4: 20 })[c[0]] + '" data-testid="cog-' + c[0] + '"></label>';
+        return '<label class="f" style="flex:1;min-width:70px">' + c[1] + '<input type="number" id="cog' + c[0] + '" value="' + ({ C1: 20, C2: 30, C3: 30, C4: 20, C5: 0, C6: 0 })[c[0]] + '" data-testid="cog-' + c[0] + '"></label>';
       }).join('') + '</div>' +
       '<label class="f">' + t('kurikulum.bp-transfer-label', 'Porsi Soal Transfer / Kontekstual (0.0 – 1.0, misal 0.2 = 20% soal situasi nyata)') + '<input id="bpTransfer" type="number" step="0.05" value="0.2" data-testid="bp-transfer"></label>' +
       '</div></details>' +
@@ -821,7 +865,7 @@
       '<button class="btn primary sm" data-a="bp-create" data-testid="bp-create">' + t('kurikulum.bp-create-btn', '🚀 Terbitkan Kuis untuk Murid') + '</button></div>' +
       (S.blueprintCheck ? '<div style="margin-top:12px" data-testid="bp-warnings">' +
         (S.blueprintCheck.warnings.length ? S.blueprintCheck.warnings.map(function (w) { return '<div class="issue ' + w.level + '">' + esc(w.message) + '</div>'; }).join('') : '<div class="issue info">' + t('kurikulum.bp-seimbang', 'Blueprint seimbang.') + '</div>') +
-        '<p class="mono muted">' + esc(JSON.stringify(S.blueprintCheck.availability)) + '</p></div>' : '') +
+        '<p class="mono muted">' + esc(fmtAvailability(S.blueprintCheck.availability)) + '</p></div>' : '') +
       '</div>' +
       '<div class="card" data-testid="assessment-list"><p class="kicker">Asesmen kelas ini</p><h3>' + S.assessments.length + ' asesmen</h3>' +
       (S.assessments.length ? S.assessments.map(function (a) {
@@ -919,6 +963,44 @@
   // ---------------- events ----------------
   function val(id) { var e = document.getElementById(id); return e ? e.value.trim() : ''; }
 
+  /* G3 (m025-351): overlay (drawer/modal) dulu tidak terjangkau keyboard — tidak ada
+     Escape, tidak ada focus trap, dan scrim-nya <div> biasa. Sekarang: Escape menutup,
+     Tab dikurung di dalam overlay, fokus pindah masuk saat terbuka, dan kembali ke elemen
+     pemicu saat tertutup. lastFocused diisi render() ketika tidak ada overlay yang terbuka. */
+  var lastFocused = null;
+
+  function fokusFirst(box) {
+    var f = box.querySelectorAll('button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), a[href], [tabindex]:not([tabindex="-1"])');
+    return f && f.length ? f[0] : null;
+  }
+
+  function focusOverlay() {
+    var box = document.querySelector('.drawer, .modal');
+    if (!box) return;
+    var f = fokusFirst(box);
+    if (f && f.focus) { try { f.focus(); } catch (_) {} }
+  }
+
+  function tutupOverlay() {
+    var tutup = !!(S.drawer || S.modal);
+    S.drawer = null; S.modal = null; render();
+    if (tutup && lastFocused && lastFocused.focus) { try { lastFocused.focus(); } catch (_) {} }
+    return tutup;
+  }
+
+  document.addEventListener('keydown', function (ev) {
+    if (ev.key === 'Escape' && (S.drawer || S.modal)) { ev.preventDefault(); tutupOverlay(); return; }
+    if (ev.key === 'Tab' && (S.drawer || S.modal)) {
+      var box = document.querySelector('.drawer, .modal');
+      if (!box) return;
+      var f = box.querySelectorAll('button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), a[href], [tabindex]:not([tabindex="-1"])');
+      if (!f.length) return;
+      var first = f[0], last = f[f.length - 1], aktif = document.activeElement;
+      if (!box.contains(aktif) || (ev.shiftKey && aktif === first)) { ev.preventDefault(); last.focus(); }
+      else if (!ev.shiftKey && aktif === last) { ev.preventDefault(); first.focus(); }
+    }
+  });
+
   document.addEventListener('click', function (ev) {
     var el = ev.target.closest && ev.target.closest('[data-a]');
     if (!el) return;
@@ -929,7 +1011,7 @@
       return E.login.kelasku().then(start).catch(function (e) { renderAuth(e.message); });
     }
     if (a === 'logout') return E.login.logout().then(function () { S.user = null; renderAuth(); });
-    if (a === 'close') { S.drawer = null; S.modal = null; return render(); }
+    if (a === 'close') { tutupOverlay(); return; }
     if (a === 'view') { S.view = el.getAttribute('data-v'); S.drawer = null; S.modal = null; return render(); }
     if (a === 'new-class') {
       var defSub = activeSubj();
@@ -1216,7 +1298,7 @@
         S.drawer = '<div class="row between"><p class="kicker">Analitik butir</p><button class="btn sm ghost" data-a="close">Tutup</button></div>' +
           '<h2>' + esc(an.assessment.title) + '</h2>' +
           '<p class="muted">' + an.sessions + ' sesi · ' + an.finished + ' selesai · rata-rata ' + (an.avg_score == null ? '—' : Math.round(an.avg_score * 100) + '%') + '</p>' +
-          '<div class="card tight"><p class="kicker">Sinyal kepercayaan diri</p><p class="mono">' + esc(JSON.stringify(an.confidence_signals)) + '</p></div>' +
+          '<div class="card tight"><p class="kicker">Sinyal kepercayaan diri</p><p class="mono">' + esc(fmtConfidence(an.confidence_signals)) + '</p></div>' +
           (an.items.length ? an.items.map(function (i) {
             return '<div class="card tight" style="margin-top:8px"><div class="row between"><span class="pill ' + (i.flag === 'sehat' ? 'good' : 'warn') + '">' + esc(i.flag) + '</span><span class="mono muted">p=' + (i.p_value == null ? '—' : i.p_value) + ' · n=' + i.n + '</span></div><p>' + esc((i.stem || '').slice(0, 120)) + '</p></div>';
           }).join('') : '<p class="muted">Belum ada attempt.</p>');
@@ -1273,7 +1355,7 @@
     return {
       title: val('bpTitle') || 'Asesmen', assessment_type: val('bpType') || 'formative',
       tp_targets: S.bpRows.map(function (r) { return { tp_id: r.tp, count: r.count }; }),
-      cognitive_distribution: { C1: +val('cogC1') || 0, C2: +val('cogC2') || 0, C3: +val('cogC3') || 0, C4: +val('cogC4') || 0 },
+      cognitive_distribution: { C1: +val('cogC1') || 0, C2: +val('cogC2') || 0, C3: +val('cogC3') || 0, C4: +val('cogC4') || 0, C5: +val('cogC5') || 0, C6: +val('cogC6') || 0 },
       transfer_ratio: parseFloat(val('bpTransfer')) || 0, question_types: ['mcq']
     };
   }

@@ -476,6 +476,23 @@
     'kelas.target-alasan-lemah': 'ยังมีบทย่อยที่ไม่แน่น {n} บท จากการทำครั้งล่าสุดของคุณ',
     'kelas.target-alasan-belum-tuntas': 'บทนี้ยังไม่ผ่านในการทำครั้งล่าสุดของคุณ',
     'kelas.target-alasan-baru': 'บทถัดไปที่คุณยังไม่เคยเปิด',
-    'guru.kelas-mapel-tanpa-nama': 'ชั้นเรียน'
+    'guru.kelas-mapel-tanpa-nama': 'ชั้นเรียน',
+    /* m025-351 (Gelombang 5) — นสคร Kurikulum KelasKu ถือกำเนิดขึ้นแบบสองภาษา */
+    'kelas.status-terlambat': ' (ล่าช้า)',
+    'kelas.tanpa-tenggat': 'ไม่มีกำหนดส่ง',
+    'kelas.lewat-n-hari': 'เกินกำหนด {n} วัน',
+    'kelas.tenggat-hari-ini': 'กำหนดส่งวันนี้',
+    'kelas.tenggat-besok': 'กำหนดส่งพรุ่งนี้',
+    'kelas.tenggat-n-hari': 'กำหนดส่งอีก {n} วัน · {tanggal}',
+    'kelas.fase-d': 'ช่วงชั้น D (ม.ต้น)',
+    'kelas.fase-e': 'ช่วงชั้น E (ม.ปลาย ปี 10)',
+    'kelas.fase-f': 'ช่วงชั้น F (ม.ปลาย ปี 11-12)',
+    'kelas.nav-aria': 'ส่วนของ KelasKu',
+    'kelas.panel-aria': 'เนื้อหา KelasKu',
+    'kelas.nav-guru-aria': 'ส่วนห้องเรียนครู',
+    'kelas.panel-guru-aria': 'เนื้อหาห้องเรียนครู',
+    /* m025-351 (Gelombang 5, G10) — ป้ายแหล่งที่มาของแผนผังหลักสูตรในห้องครู */
+    'guru.kurikulum-sumber-lokal': 'ที่มา: แคตตาล็อกสำรองในเครื่อง — เซิร์ฟเวอร์ยังไม่ได้เพาะหลักสูตรวิชานี้ กดการ์ดเพาะเมล็ดเพื่อให้กระดานนี้เติมจากเซิร์ฟเวอร์ KelasKu',
+    'guru.kurikulum-sumber-server': 'ที่มา: หลักสูตรจากเซิร์ฟเวอร์ KelasKu'
   });
 }());
