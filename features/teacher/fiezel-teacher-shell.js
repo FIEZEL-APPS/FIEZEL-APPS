@@ -2461,6 +2461,42 @@
       code = S().makeClassCode();
     }
 
+    var modified = false;
+
+    // Sinkronkan data guru jika akun membawa profil baru
+    if (acc) {
+      if (acc.teacherName && (!st.teacher || st.teacher.name !== acc.teacherName)) {
+        if (!st.teacher) st.teacher = { name: '', school: '' };
+        st.teacher.name = acc.teacherName;
+        modified = true;
+      }
+      if (acc.institution && (!st.teacher || st.teacher.school !== acc.institution)) {
+        if (!st.teacher) st.teacher = { name: '', school: '' };
+        st.teacher.school = acc.institution;
+        modified = true;
+      }
+    }
+
+    // SELALU SINKRONKAN MAPEL PADA SEMUA KELAS GURU INI JIKA ADA SUBJECTID RESMI
+    if (acc && acc.subjectId && st.classes.length) {
+      var officialSub = acc.subjectId;
+      var officialSubName = mapelNames[officialSub] || officialSub;
+      st.classes.forEach(function (c) {
+        var prefix = inst ? inst + ' — ' : (st.teacher && st.teacher.school ? st.teacher.school + ' — ' : '');
+        if (c.subject !== officialSub || (c.name && c.name.indexOf('Matematika') !== -1 && officialSub !== 'MAT')) {
+          c.subject = officialSub;
+          c.name = prefix + officialSubName;
+          modified = true;
+        }
+      });
+      if (ui.curriculumSubject !== officialSub) {
+        ui.curriculumSubject = officialSub;
+      }
+      if (ui.assignSubject !== officialSub) {
+        ui.assignSubject = officialSub;
+      }
+    }
+
     var existing = st.classes.filter(function (c) {
       return S().normalizeClassCode(c.code) === code;
     })[0];
@@ -2469,7 +2505,21 @@
       st.activeClassId = existing.id;
       st.onboarded = true;
       if (!st.view || st.view === 'briefing') st.view = 'hub';
+      if (modified) persist();
       return existing;
+    }
+
+    // Jika kelas tunggal sebelumnya belum punya murid dan merupakan kelas otomatis
+    if (st.classes.length === 1 && (!st.classes[0].students || !st.classes[0].students.length) && code) {
+      st.classes[0].code = code;
+      st.classes[0].subject = sId;
+      var pfx = inst ? inst + ' — ' : (st.teacher && st.teacher.school ? st.teacher.school + ' — ' : '');
+      st.classes[0].name = pfx + subName;
+      st.activeClassId = st.classes[0].id;
+      st.onboarded = true;
+      if (!st.view || st.view === 'briefing') st.view = 'hub';
+      persist();
+      return st.classes[0];
     }
 
     // Jika guru belum punya kelas sama sekali, buat kelas otomatis
@@ -2490,6 +2540,7 @@
       return newCls;
     }
 
+    if (modified) persist();
     return null;
   }
 
@@ -2626,7 +2677,15 @@
   function render() {
     if (!el) return;
     pendingRender = false;
-    if (!previewOn && isTeacherRole() && (!st.classes || !st.classes.length)) {
+    if (!previewOn && isTeacherRole()) {
+      try {
+        var fresh = S().load();
+        if (fresh && Array.isArray(fresh.classes) && fresh.classes.length) {
+          st.classes = fresh.classes;
+          if (fresh.activeClassId) st.activeClassId = fresh.activeClassId;
+          if (fresh.teacher && fresh.teacher.name) st.teacher = fresh.teacher;
+        }
+      } catch (_) {}
       try { ensureTeacherClass(); } catch (_) {}
     }
     var c = cls(), saved = captureActive(el);
@@ -2736,9 +2795,10 @@
   // ---- KELAS & SISWA -------------------------------------------------------------------------
   function classes(c) {
     var T = S(), q = ui.filter.toLowerCase(), list = c.students.filter(function (s) { return !q || s.name.toLowerCase().indexOf(q) !== -1; }).map(function (s) { return { s: s, r: T.risk(c, s) }; }).sort(function (a, b) { return b.r.score - a.r.score; });
+    var mapelNames = (T && T.MAPEL_NAMES) || {};
     return '<div class="tg-toolbar"><div class="tg-tabs">' + st.classes.map(function (k) { return '<button type="button" class="tg-tab' + (k.id === c.id ? ' is-active' : '') + '" data-tg="pick-class" data-id="' + k.id + '">' + esc(k.name) + '<small>' + k.students.length + '</small></button>'; }).join('') + '<button type="button" class="tg-tab is-add" data-tg="modal" data-kind="new-class" data-testid="tg-new-class">' + t('guru.kelas-tambah-btn', '+ Kelas') + '</button></div>' +
       '<div class="tg-toolbar-actions"><label class="tg-search">' + icon('search') + '<input type="search" placeholder="' + t('guru.cari-siswa', 'Cari siswa…') + '" value="' + esc(ui.filter) + '" data-tg-input="filter" data-testid="tg-student-search"></label><button type="button" class="tg-btn is-ghost" data-tg="modal" data-kind="attendance" data-testid="tg-attendance">' + icon('check-square') + '<span>Absensi</span></button><button type="button" class="tg-btn is-ghost" data-tg="export-csv" data-testid="tg-export-csv">' + icon('download') + '<span>CSV</span></button><button type="button" class="tg-btn is-primary" data-tg="modal" data-kind="add-students" data-testid="tg-add-students">' + icon('user-plus') + '<span>' + t('guru.tambah-siswa', 'Tambah siswa') + '</span></button></div></div>' +
-      '<section class="tg-card tg-class-meta"><div><p class="tg-kicker">' + esc(c.subject || 'English') + ' · Level ' + esc(c.level) + (c.demo ? ' · <span class="tg-demo">data contoh</span>' : '') + '</p><h3>' + esc(c.name) + '</h3>' +
+      '<section class="tg-card tg-class-meta"><div><p class="tg-kicker">' + esc(mapelNames[c.subject] || c.subject || 'English') + ' · Level ' + esc(c.level) + (c.demo ? ' · <span class="tg-demo">data contoh</span>' : '') + '</p><h3>' + esc(c.name) + '</h3>' +
       (c.latestAnnouncement && c.latestAnnouncement.text ? '<p class="tg-latest-ann" style="margin:4px 0 8px;font-size:13px;color:var(--tg-text)">📢 <b>Pengumuman:</b> ' + esc(c.latestAnnouncement.text) + ' <small class="tg-muted">(' + esc(c.latestAnnouncement.teacher || 'Wali kelas') + (c.latestAnnouncement.at ? ' · ' + T.fmtDate(c.latestAnnouncement.at) : '') + ')</small></p>' : '') +
       '<small>Kode kelas <b class="tg-mono">' + esc(c.code) + '</b> — murid mengetiknya saat onboarding; setiap selesai sesi, hasilnya dikirim ke server dan masuk ke sini otomatis. ' + (c.sync && c.sync.claimed ? '<span class="tg-ok">Kode terdaftar di server.</span>' : S().syncAvailable() === 'ok' ? '<span class="tg-muted">Kode belum terdaftar — tekan Sinkron.</span>' : '<span class="tg-muted">Tanpa akun guru, tempel kode hasil murid secara manual.</span>') + '</small></div><div class="tg-actions"><button type="button" class="tg-btn is-ghost is-small" data-tg="modal" data-kind="edit-class">' + icon('pencil') + ' ' + t('umum.ubah', 'Ubah') + '</button><button type="button" class="tg-btn is-danger is-small" data-tg="delete-class" data-testid="tg-delete-class">' + icon('trash-2') + ' ' + t('guru.hapus-kelas', 'Hapus kelas') + '</button></div></section>' +
       (list.length ? '<div class="tg-table-wrap"><table class="tg-table" data-testid="tg-student-table"><thead><tr><th>Siswa</th><th>' + t('umum.status', 'Status') + '</th><th>Akurasi</th><th>Terakhir aktif</th><th>Kehadiran</th><th>' + t('umum.tugas', 'Tugas') + '</th><th></th></tr></thead><tbody>' +
