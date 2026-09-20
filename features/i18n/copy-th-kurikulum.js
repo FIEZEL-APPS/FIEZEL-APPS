@@ -316,6 +316,28 @@
     'kurikulum.papan-sel-belum': 'ยังไม่เริ่ม',
     'kurikulum.papan-cap-note': 'แสดง {n} TP แรก — จำกัดเพื่อให้กระดานยังอ่านได้',
     'kurikulum.papan-tanpa-murid': 'ยังไม่มีนักเรียนในชั้นนี้ — ไม่มีแกนนอนให้วาด',
-    'kurikulum.papan-tanpa-tp': 'ยังไม่มี TP ของวิชานี้ในชั้นนี้'
+    'kurikulum.papan-tanpa-tp': 'ยังไม่มี TP ของวิชานี้ในชั้นนี้',
+    /* m025-354 (F9 ระยะ 1, ภารกิจออฟไลน์) — นสครใหม่ถือกำเนิดแบบสองภาษา */
+    'kurikulum.luring-kicker': 'โหมดออฟไลน์',
+    'kurikulum.luring-masuk': 'ทำต่อแบบออฟไลน์ในชื่อ {nama}',
+    'kurikulum.luring-masuk-sub': 'ไม่มีสัญญาณ — ฝึกจากคลังในเครื่อง ตรวจในเครื่อง',
+    'kurikulum.luring-pilih-judul': 'เลือกหน่วยฝึกออฟไลน์',
+    'kurikulum.luring-pilih-sub': 'จากคลังออฟไลน์ในเครื่องนี้ — {n} หน่วย',
+    'kurikulum.luring-butir': 'ข้อ',
+    'kurikulum.luring-soal-ke': 'ข้อที่ {i} จาก {n}',
+    'kurikulum.luring-benar': 'ถูกต้อง',
+    'kurikulum.luring-salah': 'ยังไม่ถูก',
+    'kurikulum.luring-berikutnya': 'ข้อต่อไป',
+    'kurikulum.luring-hasil': 'ดูผล',
+    'kurikulum.luring-selesai-judul': 'ฝึกออฟไลน์เสร็จแล้ว',
+    'kurikulum.luring-skor': 'ได้ {benar} จาก {total}',
+    'kurikulum.luring-lagi': 'ทำหน่วยนี้ซ้ำ',
+    'kurikulum.luring-ganti': 'เปลี่ยนหน่วย',
+    'kurikulum.luring-tanpa-modul': 'คลังหน่วยยังไม่โหลดในหน้านี้',
+    'kurikulum.antre-judul': 'หลักฐานรอสัญญาณ',
+    'kurikulum.antre-isi': '{n} คำตอบรอให้เซิร์ฟเวอร์นับ — ยังไม่เข้าหลักฐานความชำนาญ',
+    'kurikulum.antre-kirim': 'ส่งคิว',
+    'kurikulum.antre-terkirim': 'ส่งคิวแล้ว',
+    'kurikulum.antre-sisa': 'เหลือ {n} — ลองอีกครั้งเมื่อสัญญาณดีกว่า'
   });
 })();

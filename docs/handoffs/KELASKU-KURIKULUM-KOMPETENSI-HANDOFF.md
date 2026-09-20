@@ -17,7 +17,7 @@ mengikuti lima gelombang di laporan audit.
 | **2 — pintu** | X2, X3, K10, G1 | **SELESAI** · `m025-349` |
 | **3 — satu buku kompetensi** | X4, X5, F1 (sebagian) | **SELESAI** · `m025-349` |
 | **4 — alat, bukan rapor** | F3, F4, F6, K3, K5, K6, K11, K13 | **SELESAI** · `m025-349` |
-| **5 — jangkauan** | A1–A5, G2–G4, G6–G10, K12, F7, F8, F10 · F9 | **SEBAGIAN** · build `m025-352` (butir teknis + F7 + F8 + F10 selesai; 3 gerbang baru terdaftar di CI; F9 menunggu) |
+| **5 — jangkauan** | A1–A5, G2–G4, G6–G10, K12, F7, F8, F10, F9 | **SELESAI** · build `m025-354` (seluruh butir gelombang + 4 gerbang baru terdaftar di CI) |
 
 Di luar gelombang, sudah mendarat di program yang sama:
 `tests/modal-assign-teacher-ux-test.js` didaftarkan di `quality.yml`, dan 32 kunci hantu
@@ -141,14 +141,23 @@ Gelombang 5 — **jangkauan**. Butir teknisnya sudah selesai dan terkunci gerban
   bukan modal kertas.
 - ✅ **F8+F10** — tab Wali Kelas (agregat `/coverage` per mapel, spanduk tertinggal) dan
   tab Papan Kelas (grid TP × murid dari `/tp-detail`, sel tombol ber-aria-label).
-- ⏳ **F9** — misi luring (pilot schools: butuh keputusan arsitektur offline).
+- ✅ **F9 fase 1** — misi luring sesuai keputusan owner (penuh-luring bertahap, sesi
+  terakhir + konfirmasi, seluruh bank teks otomatis).
 
 Status build `m025-351`: **F7 selesai** — modul bersama `features/curriculum/rapor-share.js`
 merender dokumen yang sama untuk guru (drawer paspor konsol) dan murid (kartu rapor di
 paspor Belajar); format PNG via Canvas + Cetak/PDF via `window.print`, render sisi klien
 sesuai keputusan owner; 17 kunci `kurikulum.rapor-*` baru lahir dwibahasa (id+th);
 gerbang `tests/kurikulum-rapor-ortu-test.js` (10 asersi) terdaftar di `quality.yml`.
-Yang masih terbuka dari Gelombang 5 tinggal F9.
+
+Status build `m025-354`: **F9 fase 1 selesai** — precache shell misi (misi.html, console.css,
+learning-mission.js, rapor-share.js; bank unit sudah di-cache), pintu luring di layar masuk
+(hanya bila ada sesi terakhir bernama), sesi dibekukan saat masuk + dilupakan saat keluar,
+runner lokal 6 butir acak dari 23 unit dengan umpan balik kunci, antrean `question_answered`
+idempoten (event_id stabil, payload bertanda offline:true) yang terkirim otomatis saat
+online/kembali-sinyal/tombol; layar menyatakan antrean belum masuk bukti penguasaan
+(penguasaan tetap dihitung server — fase 2). 21 kunci `luring-*`/`antre-*` dwibahasa;
+gerbang `tests/kurikulum-luring-test.js` (8 asersi) terdaftar di `quality.yml`.
 
 Status build `m025-352`: **F8+F10 selesai sepaket** — tab Wali Kelas (`vWali`: agregat
 `/coverage` per subject_id untuk 21 pilihan mapel nyata, antrean berbatas 4 dengan
@@ -164,6 +173,6 @@ Status `m025-351`: butir A1–A5, G2–G4, G6–G10, K12, dan F7 **selesai** (li
 prinsip yang sama dengan gelombang m025-314/m025-290: kosakata zona kurikulum masuk
 `ID_WORDS` penjaga `th-ui-leak-test`, dan pukulan sampingan di zona Merdeka yang di-SK-kan
 owner 7 September 2026 (konsol guru, misi Belajar, bank konten, layar guru) naik
-anggarannya di `ALLOWLIST` dengan alasan tertulis, bukan pelonggaran diam-diam. Yang
-masih terbuka dari Gelombang 5 tinggal F9 (misi luring) — butuh keputusan arsitektur
-offline sebelum di-scope ke butir kerja.
+anggarannya di `ALLOWLIST` dengan alasan tertulis, bukan pelonggaran diam-diam.
+Gelombang 5 kini **SELESAI seluruhnya** (F9 fase 1 = butir terakhir); fase 2 F9 (pipa
+penilaian bukti luring di backend) adalah pekerjaan backend di luar pintu klien ini.

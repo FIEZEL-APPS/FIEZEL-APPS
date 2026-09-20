@@ -9,7 +9,9 @@
   var app = document.getElementById('app');
   var S = { user: null, today: null, session: null, q: null, reason: null, phase: null,
             progress: null, picked: null, conf: null, feedback: null, summary: null,
-            hint: null, view: 'today', passport: null, busy: false, retryOf: null, t0: 0 };
+            hint: null, view: 'today', passport: null, busy: false, retryOf: null, t0: 0,
+            offline: false, offUnit: null, offItems: [], offIdx: 0, offBenar: 0, offJawab: null,
+            flushing: false };
 
   var CONF = [['yakin', 'Yakin'], ['lumayan', 'Lumayan yakin'], ['tidak', 'Tidak yakin']];
   var PHASES = ['warm-up', 'example', 'practice', 'challenge', 'transfer', 'check'];
@@ -20,12 +22,45 @@
     return (s === undefined || s === kunci) ? cadangan : s;
   }
 
+  /* F9 fase 1 (m025-354): MISI LURING. Keputusan owner: penuh-luring bertahap, identitas
+     = sesi terakhir + konfirmasi (anti-bukti-nyasar di HP bersama), paket = seluruh bank
+     teks otomatis (23 unit, nol gambar — tidak ada kuota yang dimakan diam-diam).
+     Batas jujur fase 1: latihan dinilai di perangkat; antrean bukti dikirim sebagai
+     question_answered idempoten (event_id stabil) — penguasaan/paspor tetap dihitung
+     server (fase 2 = pipa penilaian backend, di luar pintu klien ini). */
+  var SES_KEY = 'fiezel-mission-session-v1', PAS_KEY = 'fiezel-mission-passport-v1',
+      QUEUE_KEY = 'fiezel-mission-queue-v1';
+
+  function muatJSON(kunci) {
+    try { return JSON.parse(localStorage.getItem(kunci) || 'null'); } catch (_) { return null; }
+  }
+  function simpanJSON(kunci, v) {
+    try {
+      if (v === null) localStorage.removeItem(kunci);
+      else localStorage.setItem(kunci, JSON.stringify(v));
+    } catch (_) {}
+  }
+  function uidOf(u) {
+    if (!u) return null;
+    return u.user_id || u.sub || u.id || u.name || null;
+  }
+  function muatAntre() {
+    var q = muatJSON(QUEUE_KEY);
+    return Array.isArray(q) ? q : [];
+  }
+  function kickLuring() {
+    try { return root.FiezelCurriculum || null; } catch (_) { return null; }
+  }
+
   // ---------------- boot ----------------
   function boot() {
     var token = E.token();
 
     function start(u) {
       S.user = u;
+      S.offline = false;
+      /* F9: bekukan sesi terakhir supaya mode luring tahu siapa yang memegang perangkat. */
+      simpanJSON(SES_KEY, { u: u, at: new Date().toISOString() });
       loadToday();
     }
 
@@ -62,6 +97,18 @@
       (err ? '<div class="issue error">' + esc(err) + '</div>' : '') +
       '<label class="f">Kode kelas dari guru (isi kalau ini pertama kalinya)<input id="joinCode" placeholder="FZ-XXXXXX" data-testid="join-code" autocomplete="off"></label>' +
       '<button class="btn primary" data-a="login" data-testid="login-btn">Masuk dengan akun KelasKu</button>' +
+      /* F9: pintu luring hanya muncul bila ada sesi terakhir yang bisa dikonfirmasi —
+         tanpa itu tidak ada identitas untuk mengikat bukti antre. */
+      (function () {
+        var snap = muatJSON(SES_KEY);
+        var nm = snap && snap.u && (snap.u.name || snap.u.handle);
+        if (!nm) return '';
+        return '<div class="card" style="margin-top:12px" data-testid="offline-door"><p class="kicker">' +
+          esc(t('kurikulum.luring-kicker', 'Mode luring')) + '</p><p class="muted">' +
+          esc(t('kurikulum.luring-masuk-sub', 'Tanpa sinyal — latihan dari bank perangkat, dinilai di perangkat.')) + '</p>' +
+          '<button class="btn ghost sm" data-a="offline" data-testid="offline-btn">' +
+          esc(t('kurikulum.luring-masuk', 'Lanjut luring sebagai {nama}').replace('{nama}', nm)) + '</button></div>';
+      })() +
       '<p class="muted" style="margin-top:16px;font-size:13px"><a href="./index.html#classroom" data-testid="link-app">' + t('kelas.kembali-kelasku-app', '‹ Kembali ke KelasKu di aplikasi FIEZEL') + '</a></p>' +
       '<p class="muted" style="font-size:13px">Guru masuk di <a href="./kurikulum.html">Ruang Guru</a>.</p>' +
       '</div></div>';
@@ -74,7 +121,11 @@
       S.passport = null;
       return render();
     }
-    return api('/learning/today').then(function (t) { S.today = t; S.view = 'today'; render(); }).catch(function (e) {
+    return api('/learning/today').then(function (t) {
+      S.today = t; S.view = 'today'; S.offline = false; render();
+      /* F9: bukti online = sinyal ada — kirim antrean luring yang menunggu. */
+      kirimAntre(false);
+    }).catch(function (e) {
       toast(e.message); renderAuth(e.message);
     });
   }
@@ -84,6 +135,9 @@
     if (S.view === 'session') return renderSession();
     if (S.view === 'summary') return renderSummary();
     if (S.view === 'passport') return renderPassport();
+    if (S.view === 'offline-units') return renderOffUnits();
+    if (S.view === 'offline-run') return renderOffRun();
+    if (S.view === 'offline-done') return renderOffDone();
     return renderToday();
   }
 
@@ -101,6 +155,7 @@
     var t = S.today || { missions: [], due_reviews: [] };
     app.innerHTML = '<div class="mission" data-testid="today-view">' + shellTop('Misi belajarmu hari ini',
       t.missions.length ? 'Setiap misi punya tujuan, bukan sekadar tumpukan soal.' : 'Belum ada misi dari gurumu.') +
+      antreBanner() +
       (t.missions.length ? t.missions.map(function (m, i) {
         return '<div class="card rise" style="--d:' + (i * 70) + 'ms" data-testid="mission-' + esc(m.assessment_id) + '">' +
           '<div class="row between"><span class="pill info">' + esc(m.type_label || m.type) + '</span>' +
@@ -244,7 +299,15 @@
 
   function renderPassport() {
     var p = S.passport;
-    if (!p) { api('/learning/passport').then(function (r) { S.passport = r; render(); }); app.innerHTML = '<div class="mission"><div class="card">Memuat paspor…</div></div>'; return; }
+    if (!p) {
+      api('/learning/passport').then(function (r) {
+        S.passport = r;
+        /* F9: bekukan paspor terakhir untuk dibaca luring (dengan stempel waktu). */
+        simpanJSON(PAS_KEY, { data: r, at: new Date().toISOString() });
+        render();
+      });
+      app.innerHTML = '<div class="mission"><div class="card">Memuat paspor…</div></div>'; return;
+    }
     app.innerHTML = '<div class="mission" data-testid="passport-view">' + shellTop('Paspor Belajarmu', 'Bukti perkembangan, bukan sekadar nilai.') +
       '<div class="row">' + [['Kompetensi', p.totals.competencies], ['Dikuasai', p.totals.mastered], ['Masih ingat', p.totals.retained], ['Bisa diterapkan', p.totals.transferred]].map(function (t) {
         return '<div class="card tight kpi" style="flex:1 1 140px"><small>' + t[0] + '</small><b>' + t[1] + '</b></div>';
@@ -269,8 +332,126 @@
       '<button class="btn primary sm" data-a="join" data-testid="join-btn-3">Gabung</button></div></div>';
   }
 
+  /* ---------------- F9: unit, runner, dan antrean luring ---------------- */
+
+  function antreBanner() {
+    var n = muatAntre().length;
+    if (!n) return '';
+    return '<div class="card tight" data-testid="antre-banner"><p class="kicker">' +
+      esc(t('kurikulum.antre-judul', 'Bukti menunggu sinyal')) + '</p><p class="muted">' +
+      esc(t('kurikulum.antre-isi', '{n} jawaban antre untuk dihitung server — belum masuk bukti penguasaan.').replace('{n}', n)) +
+      '</p><button class="btn sm ghost" data-a="queue-flush" data-testid="queue-flush-btn">' +
+      esc(t('kurikulum.antre-kirim', 'Kirim antrean')) + '</button></div>';
+  }
+
+  function acakSalin(arr) {
+    var a = arr.slice(), i, j, tmp;
+    for (i = a.length - 1; i > 0; i--) {
+      j = Math.floor(Math.random() * (i + 1));
+      tmp = a[i]; a[i] = a[j]; a[j] = tmp;
+    }
+    return a;
+  }
+
+  function renderOffUnits() {
+    var CUR = kickLuring();
+    var units = CUR ? CUR.allUnits().filter(function (u) { return u.items && u.items.length; }) : [];
+    app.innerHTML = '<div class="mission" data-testid="offline-units-view">' +
+      shellTop(t('kurikulum.luring-pilih-judul', 'Pilih unit latihan luring'),
+        t('kurikulum.luring-pilih-sub', 'Dari bank offline di perangkat ini — {n} unit.').replace('{n}', units.length)) +
+      '<div class="card tight"><p class="kicker">' + esc(t('kurikulum.luring-kicker', 'Mode luring')) + '</p><p class="muted">' +
+      esc(t('kurikulum.luring-masuk-sub', 'Tanpa sinyal — latihan dari bank perangkat, dinilai di perangkat.')) + '</p></div>' +
+      antreBanner() +
+      (CUR ? units.map(function (u) {
+        return '<div class="card" data-testid="off-unit-' + esc(u.id) + '"><div class="row between"><div><b>' +
+          esc(u.title || u.id) + '</b><p class="muted">' + esc([u.genre, u.grade ? 'Kelas ' + u.grade : null].filter(Boolean).join(' · ') +
+          ' · ' + u.items.length + ' ' + t('kurikulum.luring-butir', 'butir')) + '</p></div>' +
+          '<button class="btn primary sm" data-a="off-unit" data-id="' + esc(u.id) + '">▶</button></div></div>';
+      }).join('') : '<div class="card"><p class="muted">' +
+        esc(t('kurikulum.luring-tanpa-modul', 'Bank unit belum termuat di halaman ini.')) + '</p></div>') + '</div>';
+  }
+
+  function renderOffRun() {
+    var u = S.offUnit, items = S.offItems, i = S.offIdx, q = items[i];
+    if (!u || !q) { S.view = 'offline-units'; return render(); }
+    var jawab = S.offJawab;
+    var benar = jawab !== null && jawab !== undefined && jawab === q.answer;
+    app.innerHTML = '<div class="mission" data-testid="offline-run-view">' +
+      shellTop(u.title || u.id, t('kurikulum.luring-soal-ke', 'Butir {i} dari {n}').replace('{i}', i + 1).replace('{n}', items.length)) +
+      '<div class="card"><p style="font-size:17px;line-height:1.6">' + esc(q.prompt) + '</p>' +
+      '<div class="opts">' + q.options.map(function (o, k) {
+        var cls = jawab === null || jawab === undefined ? '' : (k === q.answer ? ' is-benar' : (k === jawab ? ' is-salah' : ' is-redup'));
+        return '<button class="btn ghost' + cls + '" data-a="off-pick" data-l="' + k + '"' + (jawab !== null && jawab !== undefined ? ' disabled' : '') +
+          '>' + esc(o) + '</button>';
+      }).join('') + '</div>' +
+      (jawab !== null && jawab !== undefined
+        ? '<div class="card tight" style="margin-top:10px"><b>' + esc(benar ? t('kurikulum.luring-benar', 'Benar') : t('kurikulum.luring-salah', 'Kurang tepat')) + '</b>' +
+          (q.marker ? '<p class="mono">' + esc(q.marker) + '</p>' : '') +
+          '<p class="muted">' + esc((q.why && (q.why[String(q.answer)] || q.why[q.answer])) || q.note || '') + '</p>' +
+          '<button class="btn primary sm" data-a="off-next" data-testid="off-next-btn">' +
+          esc(i + 1 >= items.length ? t('kurikulum.luring-hasil', 'Lihat hasil') : t('kurikulum.luring-berikutnya', 'Berikutnya')) + '</button></div>'
+        : '') + '</div></div>';
+  }
+
+  function renderOffDone() {
+    var total = S.offItems.length, benar = S.offBenar, n = muatAntre().length;
+    app.innerHTML = '<div class="mission" data-testid="offline-done-view">' +
+      shellTop(t('kurikulum.luring-selesai-judul', 'Latihan luring selesai'),
+        t('kurikulum.luring-skor', 'Skor {benar} dari {total}').replace('{benar}', benar).replace('{total}', total)) +
+      antreBanner() +
+      '<div class="card"><div class="row" style="gap:8px;flex-wrap:wrap">' +
+      '<button class="btn primary sm" data-a="off-again" data-testid="off-again-btn">' + esc(t('kurikulum.luring-lagi', 'Ulangi unit ini')) + '</button>' +
+      '<button class="btn ghost sm" data-a="off-units" data-testid="off-units-btn">' + esc(t('kurikulum.luring-ganti', 'Ganti unit')) + '</button>' +
+      '<button class="btn ghost sm" data-a="queue-flush" data-testid="queue-flush-btn2">' + esc(t('kurikulum.antre-kirim', 'Kirim antrean')) + ' (' + n + ')</button>' +
+      '</div></div></div>';
+  }
+
+  function dorongAntre(entri) {
+    var q = muatAntre();
+    q.push(entri);
+    simpanJSON(QUEUE_KEY, q.slice(-500));
+  }
+
+  /* Mengirim antrean sebagai question_answered idempoten. event_id stabil dari
+     (pengguna, butir, waktu jawab) — kirim ulang tidak pernah double-count. */
+  function kirimAntre(manual) {
+    if (S.flushing) return Promise.resolve(false);
+    var q = muatAntre();
+    if (!q.length || !S.user) return Promise.resolve(true);
+    S.flushing = true;
+    var sisa = [];
+    var rantai = Promise.resolve();
+    q.forEach(function (e) {
+      rantai = rantai.then(function () {
+        return api('/learning/events', { body: {
+          type: 'question_answered',
+          event_id: e.eid,
+          payload: {
+            question_id: e.itemId, unit_id: e.unitId, subchapter_id: e.sub || null,
+            correct: e.correct ? 1 : 0, offline: true, at: e.at
+          }
+        } }).then(function (r) {
+          if (!(r && (r.stored || r.reason === 'duplicate'))) sisa.push(e);
+        }, function () { sisa.push(e); });
+      });
+    });
+    return rantai.then(function () {
+      simpanJSON(QUEUE_KEY, sisa);
+      S.flushing = false;
+      if (manual) {
+        toast(sisa.length
+          ? t('kurikulum.antre-sisa', '{n} masih antre — coba lagi saat sinyal lebih baik.').replace('{n}', sisa.length)
+          : t('kurikulum.antre-terkirim', 'Antrean terkirim.'));
+      }
+      if (S.user) render();
+      return !sisa.length;
+    });
+  }
+
   // ---------------- events ----------------
   function val(id) { var e = document.getElementById(id); return e ? e.value.trim() : ''; }
+
+  document.addEventListener('online', function () { kirimAntre(false); });
 
   document.addEventListener('click', function (ev) {
     var el = ev.target.closest && ev.target.closest('[data-a]');
@@ -282,9 +463,73 @@
       return E.login.kelasku(val('joinCode')).then(function (u) { S.user = u; loadToday(); })
         .catch(function (e) { renderAuth(e.message); });
     }
-    if (a === 'logout') return E.login.logout().then(function () { S.user = null; renderAuth(); });
-    if (a === 'go-today') { S.view = 'today'; return loadToday(); }
+    if (a === 'logout') {
+      /* F9: keluar = lupakan sesi & paspor perangkat (HP bersama). Antrean milik userId
+         tetap — ia terkirim saat pemiliknya masuk lagi, bukan oleh pemegang berikutnya. */
+      simpanJSON(SES_KEY, null); simpanJSON(PAS_KEY, null);
+      return E.login.logout().then(function () { S.user = null; S.offline = false; renderAuth(); });
+    }
+    if (a === 'go-today') {
+      if (S.offline) { S.view = 'offline-units'; return render(); }
+      S.view = 'today'; return loadToday();
+    }
     if (a === 'go-passport') { S.view = 'passport'; S.passport = null; return render(); }
+    if (a === 'offline') {
+      var snap = muatJSON(SES_KEY);
+      if (!snap || !snap.u || !uidOf(snap.u)) return renderAuth('Sesi tidak ditemukan.');
+      /* F9: konfirmasi implisit — tombolnya menyebut nama pemilik sesi, jadi bukti antre
+         terikat pada identitas yang ditampilkan, bukan pada siapa pun yang memegang HP. */
+      S.user = snap.u; S.offline = true; S.view = 'offline-units';
+      return render();
+    }
+    if (a === 'off-units' || a === 'off-again') {
+      if (a === 'off-again' && S.offUnit) {
+        S.offItems = acakSalin(S.offUnit.items).slice(0, 6);
+        S.offIdx = 0; S.offBenar = 0; S.offJawab = null; S.view = 'offline-run';
+      } else S.view = 'offline-units';
+      return render();
+    }
+    if (a === 'off-unit') {
+      var CUR = kickLuring();
+      var unit = null;
+      if (CUR) {
+        var semua = CUR.allUnits();
+        for (var ui = 0; ui < semua.length; ui++) {
+          if (String(semua[ui].id) === String(el.getAttribute('data-id'))) { unit = semua[ui]; break; }
+        }
+      }
+      if (!unit || !unit.items || !unit.items.length) return;
+      S.offUnit = unit;
+      S.offItems = acakSalin(unit.items).slice(0, 6);
+      S.offIdx = 0; S.offBenar = 0; S.offJawab = null; S.view = 'offline-run';
+      return render();
+    }
+    if (a === 'off-pick') {
+      if (S.offJawab !== null && S.offJawab !== undefined) return;
+      var pilih = parseInt(el.getAttribute('data-l'), 10);
+      var soal = S.offItems[S.offIdx];
+      if (!soal || isNaN(pilih)) return;
+      S.offJawab = pilih;
+      var ok = pilih === soal.answer;
+      if (ok) S.offBenar++;
+      var uid = uidOf(S.user);
+      var saat = new Date().toISOString();
+      if (uid) {
+        dorongAntre({
+          v: 1, userId: uid, unitId: (S.offUnit && S.offUnit.id) || null, itemId: soal.id,
+          sub: soal.subChapterId || null, correct: ok ? 1 : 0, at: saat,
+          eid: 'offline:' + uid + ':' + soal.id + ':' + Date.parse(saat)
+        });
+      }
+      return render();
+    }
+    if (a === 'off-next') {
+      S.offJawab = null;
+      if (S.offIdx + 1 >= S.offItems.length) S.view = 'offline-done';
+      else S.offIdx++;
+      return render();
+    }
+    if (a === 'queue-flush') { kirimAntre(true); return; }
     if (a === 'rapor-png' || a === 'rapor-print') {
       /* F7 (m025-351): ekspor sisi klien dari payload paspor murid sendiri. Tanpa payload
          tidak ada dokumen — gagal diam lebih buruk daripada tombol yang jujur. */

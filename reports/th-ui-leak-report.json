@@ -1,6 +1,6 @@
 {
   "schema": "fiezel-th-ui-leak-v1",
-  "generatedAt": "2026-09-20T21:11:00.171Z",
+  "generatedAt": "2026-09-20T21:49:26.404Z",
   "files": {
     "app.js": {
       "leaks": 4,
@@ -129,23 +129,23 @@
       "budget": 19,
       "sample": [
         {
-          "line": 59,
+          "line": 94,
           "text": "FIEZEL · Misi Belajar"
         },
         {
-          "line": 64,
+          "line": 99,
           "text": "Masuk dengan akun KelasKu"
         },
         {
-          "line": 66,
+          "line": 113,
           "text": "Guru masuk di"
         },
         {
-          "line": 66,
+          "line": 113,
           "text": "Ruang Guru"
         },
         {
-          "line": 91,
+          "line": 145,
           "text": "Murid"
         }
       ]
@@ -377,8 +377,8 @@
       ]
     },
     "features/teacher/fiezel-teacher-curriculum.js": {
-      "leaks": 19,
-      "budget": 19,
+      "leaks": 25,
+      "budget": 25,
       "sample": [
         {
           "line": 20,
@@ -480,8 +480,8 @@
     }
   },
   "copyKeys": {
-    "id": 2992,
-    "th": 2994,
+    "id": 3013,
+    "th": 3015,
     "idTanpaTh": 0
   },
   "pass": true
