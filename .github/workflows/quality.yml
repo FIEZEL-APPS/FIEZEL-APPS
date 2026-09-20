@@ -252,6 +252,9 @@ jobs:
           # urutan soal yang diacak, kunci skill mesin alih-alih nama genre Inggris, dan
           # target mingguan yang selalu menyebut alasannya. Temuan K3/K5/K6/K11 + F3/F4/F6.
           node tests/kelasku-paspor-alat-test.js
+          # Jangkauan Gelombang 5: zona murid KelasKu dwibahasa (ID_WORDS + t()),
+          # label BackNav kurikulum, konsol guru ramah ponsel/keyboard/kurangi-gerak.
+          node tests/kurikulum-jangkauan-test.js
           node tests/question-allocator-test.js
           node tests/bankor-latihan-test.js
           node tests/fiezel-stat-gate-test.js

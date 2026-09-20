@@ -742,4 +742,8 @@ body.reduce-motion .ch-student,body.reduce-motion .ch-body,body.reduce-motion .c
   margin-right: 4px;
 }
 
+/* K12/A5 (m025-351): panel tab adalah pembungkus transparan — id/role dibawa untuk
+   aria-controls, tetapi tata letak tetap milik isinya (apa pun display induknya). */
+.ch-tabpanel { display: contents; }
+
 

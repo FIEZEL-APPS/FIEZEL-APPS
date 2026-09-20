@@ -17,7 +17,7 @@ mengikuti lima gelombang di laporan audit.
 | **2 — pintu** | X2, X3, K10, G1 | **SELESAI** · `m025-349` |
 | **3 — satu buku kompetensi** | X4, X5, F1 (sebagian) | **SELESAI** · `m025-349` |
 | **4 — alat, bukan rapor** | F3, F4, F6, K3, K5, K6, K11, K13 | **SELESAI** · `m025-349` |
-| **5 — jangkauan** | A1–A5, G2–G4, G6–G10, K12, F7–F10 | belum |
+| **5 — jangkauan** | A1–A5, G2–G4, G6–G10, K12 · F7–F10 | **SEBAGIAN** · `m025-351` (butir teknis selesai + gerbang `kurikulum-jangkauan-test.js` terdaftar di CI; F7–F10 menunggu) |
 
 Di luar gelombang, sudah mendarat di program yang sama:
 `tests/modal-assign-teacher-ux-test.js` didaftarkan di `quality.yml`, dan 32 kunci hantu
@@ -126,19 +126,26 @@ server — pekerjaan konten, bukan pekerjaan kode.
 
 ## Langkah berikutnya (roadmap)
 
-Gelombang 5 — **jangkauan**, dan bisa dikerjakan paralel karena tiap butirnya berdiri
-sendiri:
+Gelombang 5 — **jangkauan**. Butir teknisnya sudah selesai dan terkunci gerbang
+`tests/kurikulum-jangkauan-test.js` (terdaftar di `quality.yml` sejak `m025-351`):
 
-- **A1–A5** — kebocoran naskah Indonesia di zona kurikulum (daftar `ID_WORDS` di
-  `tests/th-ui-leak-test.js` tidak memuat satu pun kosakata zona ini), tanggal yang dipaksa
-  `id-ID` untuk semua murid, naskah tenggat, label fase, dan `role="tablist"` tanpa
-  `aria-selected`.
-- **G2–G4** — matriks cakupan 6 kolom tanpa pembungkus gulir di ponsel, drawer/modal tanpa
-  Escape dan tanpa focus trap, nol `prefers-reduced-motion` di `console.css`.
-- **G6–G10** — judul asesmen bawaan "Formatif Bilangan" di ruang mapel apa pun, JSON mentah
-  di layar guru, blueprint C1–C4 vs form soal C1–C6, bank soal dipotong 60 tanpa penanda,
-  cadangan katalog lokal tanpa penanda asal data.
-- **K12** — layar kurikulum menyebut dirinya "modal" tetapi mengganti seluruh halaman dan
-  tidak mendukung tombol Back perangkat.
-- **F7–F10** — rapor yang bisa dibagikan ke orang tua, cakupan per mapel untuk wali kelas,
+- ✅ **A1–A5** — kebocoran naskah Indonesia di zona kurikulum (kosakata zona masuk
+  `ID_WORDS` di `tests/th-ui-leak-test.js`), tanggal mengikuti locale, naskah tenggat
+  dan label fase lewat `t()`, `role="tablist"` ber-`aria-selected` + tabpanel.
+- ✅ **G2–G4** — matriks cakupan dibungkus gulir di ponsel, drawer/modal bisa Escape +
+  focus trap + scrim tombol, `prefers-reduced-motion` sendiri di `console.css`.
+- ✅ **G6–G10** — judul asesmen mengikuti mapel aktif, JSON mentah pensiun dari layar
+  guru, blueprint C1–C6 sejajar form soal, batas 60 bank berpenanda, cadangan katalog
+  lokal berpenanda asal data.
+- ✅ **K12** — layar kurikulum adalah lapisan `FiezelBackNav` (pushLayer + dismiss),
+  bukan modal kertas.
+- ⏳ **F7–F10** — rapor yang bisa dibagikan ke orang tua, cakupan per mapel untuk wali kelas,
   misi luring, papan "kelas saya vs kurikulum".
+
+Status `m025-351`: butir A1–A5, G2–G4, G6–G10, dan K12 **selesai** (lihat tabel Status dan
+`tests/kurikulum-jangkauan-test.js`). A1 memakai prinsip yang sama dengan gelombang
+m025-314/m025-290: kosakata zona kurikulum masuk `ID_WORDS` penjaga `th-ui-leak-test`, dan
+pukulan sampingan di zona Merdeka yang di-SK-kan owner 7 September 2026 (konsol guru,
+misi Belajar, bank konten, layar guru) naik anggarannya di `ALLOWLIST` dengan alasan
+tertulis, bukan pelonggaran diam-diam. Yang masih terbuka dari Gelombang 5 tinggal
+F7–F10, dan itu sengaja: empat fitur besar yang belum di-scope ke butir kerja.

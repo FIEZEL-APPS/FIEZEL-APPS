@@ -264,6 +264,21 @@
     'kurikulum.server-wakeup': "Menghubungkan ke server kurikulum... (proses wake-up butuh beberapa detik)",
     'kurikulum.cakupan-kosong': "Belum ada data belajar di kelas ini. Matriks terisi sendiri setelah murid mengerjakan kuis pertamanya \u2014 terbitkan satu dari tab Kuis & Ulangan.",
     'kurikulum.murid-kosong': "Belum ada murid di kelas ini. Bagikan kode kelas di atas, atau tambahkan namanya lewat kotak \"Tambah murid\".",
-    'kurikulum.asesmen-kosong': "Belum ada asesmen di kelas ini. Pakai Template Blueprint Cepat di sebelah kiri untuk menerbitkan kuis pertama dalam satu klik."
+    'kurikulum.asesmen-kosong': "Belum ada asesmen di kelas ini. Pakai Template Blueprint Cepat di sebelah kiri untuk menerbitkan kuis pertama dalam satu klik.",
+    /* m025-351 (Gelombang 5) — G6: judul asesmen bawaan mengikuti mapel yang aktif;
+       G7: ringkasan ketersediaan blueprint & sinyal analitik butir; G8: distribusi
+       kognitif lengkap C1–C6; G9: penanda batas 60 soal pertama; G3: label scrim. */
+    'kurikulum.bp-default-title': 'Formatif {mapel}',
+    'kurikulum.cog-c5-label': 'C5 (Mengevaluasi)',
+    'kurikulum.cog-c6-label': 'C6 (Mencipta)',
+    'kurikulum.bank-capped-note': 'Menampilkan 60 soal pertama dari bank — batas halaman, bukan jumlah seluruh bank.',
+    'kurikulum.bp-av-kosong': 'Pemeriksaan ketersediaan soal belum menghasilkan data.',
+    'kurikulum.bp-av-cukup': 'TP {tp}: {avail}/{need} soal tersedia.',
+    'kurikulum.bp-av-kurang': 'TP {tp}: hanya {avail}/{need} soal — kurang {selisih}.',
+    'kurikulum.an-sinyal-lucky': 'Tebakan beruntung',
+    'kurikulum.an-sinyal-over': 'Yakin tapi salah',
+    'kurikulum.an-sinyal-careless': 'Ceroboh',
+    'kurikulum.an-sinyal-miskon': 'Miskonsepsi',
+    'kurikulum.scrim-tutup': 'Tutup'
   });
 })();

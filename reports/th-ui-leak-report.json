@@ -1,14 +1,18 @@
 {
   "schema": "fiezel-th-ui-leak-v1",
-  "generatedAt": "2026-09-20T19:40:40.812Z",
+  "generatedAt": "2026-09-20T20:31:06.641Z",
   "files": {
     "app.js": {
-      "leaks": 3,
-      "budget": 3,
+      "leaks": 4,
+      "budget": 4,
       "sample": [
         {
           "line": 8086,
           "text": "Selesaikan ritme hari ini"
+        },
+        {
+          "line": 8905,
+          "text": "— Penugasan latihan dan pemantauan capaian murid."
         },
         {
           "line": 9518,
@@ -95,34 +99,34 @@
       ]
     },
     "features/class-hub/fiezel-class-hub.js": {
-      "leaks": 5,
-      "budget": 5,
+      "leaks": 6,
+      "budget": 6,
       "sample": [
         {
-          "line": 590,
+          "line": 591,
           "text": "Tugas disimpan sebagai"
         },
         {
-          "line": 590,
+          "line": 591,
           "text": ". Lanjutkan kapan saja."
         },
         {
-          "line": 657,
+          "line": 658,
           "text": "Latihan ·"
         },
         {
-          "line": 1409,
+          "line": 1432,
           "text": "Latihan · ±"
         },
         {
-          "line": 1431,
-          "text": "Latihan — umpan balik tiap soal"
+          "line": 1454,
+          "text": "Tenggat"
         }
       ]
     },
     "features/curriculum/learning-mission.js": {
-      "leaks": 16,
-      "budget": 16,
+      "leaks": 19,
+      "budget": 19,
       "sample": [
         {
           "line": 59,
@@ -147,28 +151,28 @@
       ]
     },
     "features/curriculum/teacher-console.js": {
-      "leaks": 33,
-      "budget": 33,
+      "leaks": 35,
+      "budget": 35,
       "sample": [
         {
-          "line": 122,
+          "line": 160,
           "text": "FIEZEL · Ruang Guru"
         },
         {
-          "line": 126,
+          "line": 161,
+          "text": "Kurikulum yang benar-benar dipelajari."
+        },
+        {
+          "line": 164,
           "text": "Masuk dengan akun KelasKu"
         },
         {
-          "line": 127,
+          "line": 165,
           "text": "Belum masuk? Buka"
         },
         {
-          "line": 128,
+          "line": 166,
           "text": "Murid masuk di halaman"
-        },
-        {
-          "line": 128,
-          "text": "Misi Belajar"
         }
       ]
     },
@@ -321,12 +325,20 @@
       ]
     },
     "features/speaking-listening/listening-scenarios-a1.js": {
-      "leaks": 11,
-      "budget": 11,
+      "leaks": 15,
+      "budget": 15,
       "sample": [
+        {
+          "line": 23,
+          "text": "Menunggu teman karena hujan"
+        },
         {
           "line": 31,
           "text": "Kelas malam yang diikuti ibunya setiap minggu"
+        },
+        {
+          "line": 41,
+          "text": "Menunggu satu jam lagi"
         },
         {
           "line": 41,
@@ -335,20 +347,12 @@
         {
           "line": 79,
           "text": "Guru baru di kelasnya"
-        },
-        {
-          "line": 151,
-          "text": "Guru yang melukis laut untuk kelasnya"
-        },
-        {
-          "line": 183,
-          "text": "Guru yang mencetakkan laporan untuknya"
         }
       ]
     },
     "features/speaking-listening/listening-scenarios-a2.js": {
-      "leaks": 12,
-      "budget": 12,
+      "leaks": 14,
+      "budget": 14,
       "sample": [
         {
           "line": 26,
@@ -359,23 +363,27 @@
           "text": "Kembali lagi keesokan harinya"
         },
         {
+          "line": 91,
+          "text": "Menunggu di jalannya sendiri"
+        },
+        {
           "line": 106,
           "text": "Daftar nama dan hari untuk kebun sekolah"
         },
         {
           "line": 106,
           "text": "Daftar murid yang bergabung ke kelasnya"
-        },
-        {
-          "line": 109,
-          "text": "Daftar sebenarnya tidak berguna"
         }
       ]
     },
     "features/teacher/fiezel-teacher-curriculum.js": {
-      "leaks": 10,
-      "budget": 10,
+      "leaks": 11,
+      "budget": 11,
       "sample": [
+        {
+          "line": 18,
+          "text": "Fase D (SMP / MTs)"
+        },
         {
           "line": 25,
           "text": "Fase E (SMA / SMK Kelas 10)"
@@ -391,17 +399,25 @@
         {
           "line": 791,
           "text": "Nama spesies tunggal + pasif"
-        },
-        {
-          "line": 795,
-          "text": "Nama satu spesies diperlakukan tunggal, jadi \\"
         }
       ]
     },
     "features/teacher/fiezel-teacher-shell.js": {
-      "leaks": 3,
-      "budget": 3,
+      "leaks": 7,
+      "budget": 7,
       "sample": [
+        {
+          "line": 959,
+          "text": "Penugasan Kontingen Pasukan Garuda ke wilayah konflik"
+        },
+        {
+          "line": 1039,
+          "text": "Penugasan nilai (assignment)"
+        },
+        {
+          "line": 2939,
+          "text": "Tenggat & tugas"
+        },
         {
           "line": 2954,
           "text": "Akurasi"
@@ -409,10 +425,6 @@
         {
           "line": 2971,
           "text": "Latihan ·"
-        },
-        {
-          "line": 3548,
-          "text": "📖 Kosakata Kunci:"
         }
       ]
     },
@@ -453,19 +465,23 @@
       ]
     },
     "features/tutor-classroom/fiezel-tutor-v3.js": {
-      "leaks": 1,
-      "budget": 1,
+      "leaks": 2,
+      "budget": 2,
       "sample": [
         {
           "line": 175,
           "text": "Sekarang polanya lebih masuk akal: subjek, have atau has, lalu bentuk ketiga kata kerja."
+        },
+        {
+          "line": 748,
+          "text": "Kurikulum A1 lengkap dulu, lalu naik ke jalur TOEFL / IELTS. Fiezel mengingat checkpoint, bukan audio mentah."
         }
       ]
     }
   },
   "copyKeys": {
-    "id": 2929,
-    "th": 2931,
+    "id": 2954,
+    "th": 2956,
     "idTanpaTh": 0
   },
   "pass": true
