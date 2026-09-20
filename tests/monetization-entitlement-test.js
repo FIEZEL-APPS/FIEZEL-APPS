@@ -572,5 +572,73 @@ test('MENGHITUNG tetap jalan walau bendera mati — supaya angkanya teruji sebel
     'yang belum pernah dipakai siapa pun');
 });
 
+// ======================================================================================
+// L. JAM YANG TIDAK SAH — lubang yang lolos dari bagian A-K
+// ======================================================================================
+//
+// Bagian A-K menguji serangan yang SUDAH TERPIKIRKAN. Yang lolos justru masukan paling
+// hambar: `now` yang tidak ada. Tanpa penjaga, num() menjatuhkannya ke 0, dan setiap
+// pemeriksaan `now <= until` dengan until epoch positif menjadi BENAR — jam yang hilang
+// tidak menutup pintu, ia membukanya lebar-lebar dan menghidupkan kembali setiap catatan
+// langganan yang pernah ada. Header fungsinya bahkan sempat menjanjikan kebalikannya.
+//
+// Ditemukan review otomatis di PR #451, bukan oleh gerbang ini. Karena itu ia ditulis di
+// sini: pelajarannya bukan "tambal satu baris", melainkan bahwa masukan degenerat layak
+// diuji sekeras serangan yang dikarang.
+
+const JAM_TIDAK_SAH = [
+  ['hilang', undefined],
+  ['nol', 0],
+  ['negatif', -5],
+  ['bukan angka', NaN],
+  ['string sampah', 'besok']
+];
+
+test('jam yang tidak sah TIDAK PERNAH membuka lisensi sekolah', () => {
+  const depan = Date.UTC(2027, 0, 1);
+  for (const [nama, now] of JAM_TIDAK_SAH) {
+    const r = E.resolve({ now: now, school: { classCode: '8A-ENG', verifiedAt: 1, licenseUntil: depan } });
+    assert.strictEqual(r.plan, E.PLANS.FREE, 'jam ' + nama + ' membuka rencana sekolah');
+    assert.ok(r.reasons.includes('no_valid_clock'), 'jam ' + nama + ' harus menyebut sebabnya');
+  }
+});
+
+test('jam yang tidak sah TIDAK PERNAH menghidupkan langganan pro', () => {
+  const depan = Date.UTC(2027, 0, 1);
+  for (const [nama, now] of JAM_TIDAK_SAH) {
+    assert.strictEqual(E.resolve({ now: now, pro: { until: depan } }).plan, E.PLANS.FREE,
+      'jam ' + nama + ' menghidupkan rencana pro');
+  }
+});
+
+test('snapshot ikut tertutup saat jamnya tidak sah (bukan hanya resolve)', () => {
+  const s = E.snapshot({ pro: { until: Date.UTC(2027, 0, 1) } }); // now sengaja hilang
+  assert.strictEqual(s.plan, E.PLANS.FREE);
+  assert.strictEqual(s.levels.B1, false, 'isi berbayar tidak boleh bocor lewat snapshot');
+  assert.strictEqual(s.neuralVoice, false);
+  assert.strictEqual(s.certificate, false);
+});
+
+test('jam tidak sah tetap jujur soal kode kelas yang sedang diperiksa', () => {
+  const r = E.resolve({ now: 0, classCode: '8A-ENG' });
+  assert.strictEqual(r.schoolPending, true,
+    'mengatakan "kelasmu sedang diperiksa" tidak membuka apa pun dan tetap benar walau jamnya rusak');
+});
+
+test('jam yang SAH tetap bekerja seperti biasa (penjaga tidak boleh kebablasan)', () => {
+  const depan = NOW + 5 * DAY;
+  assert.strictEqual(E.resolve({ now: NOW, pro: { until: depan } }).plan, E.PLANS.PRO);
+  assert.strictEqual(E.resolve({ now: 1, pro: { until: depan } }).plan, E.PLANS.PRO,
+    'epoch 1 ms adalah jam yang sah, sekecil apa pun');
+});
+
+test('header resolve() tidak lagi menjanjikan yang sebaliknya', () => {
+  const src = fs.readFileSync(path.join(__fzRoot, 'features', 'monetization', 'fiezel-entitlement.js'), 'utf8');
+  assert.ok(!/0\/undefined dibaca sebagai 0/.test(src),
+    'janji lama ("semua masa lewat") harus hilang: janji yang salah lebih berbahaya ' +
+    'daripada perilaku yang salah, karena pemanggil berikutnya memercayainya tanpa memeriksa');
+  assert.ok(/if \(!\(now > 0\)\)/.test(src), 'penjaga jam harus benar-benar ada di sumbernya');
+});
+
 console.log(failures === 0 ? '\nSEMUA GERBANG HIJAU' : '\n' + failures + ' GERBANG MERAH');
 process.exit(failures === 0 ? 0 : 1);

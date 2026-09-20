@@ -238,7 +238,8 @@
    * Tentukan rencana aktif dari fakta yang disuplai pemanggil.
    *
    * input = {
-   *   now        ms epoch (wajib bermakna; 0/undefined dibaca sebagai 0 → semua masa lewat)
+   *   now        ms epoch. WAJIB > 0. Jam yang tidak sah (hilang, 0, negatif, NaN) tidak
+   *              menghasilkan keputusan masa berlaku apa pun — lihat penjaga di bawah.
    *   pro        { until } langganan pribadi; until = ms epoch akhir masa
    *   school     { classCode, verifiedAt, licenseUntil, teacherId } lisensi sekolah;
    *              verifiedAt WAJIB ADA — tanpa itu tidak pernah membuka apa pun
@@ -260,6 +261,31 @@
     var localCode = String(arg.classCode || (school && school.classCode) || '');
     var schoolVerified = !!(school && num(school.verifiedAt) > 0);
     var schoolPending = !!localCode && !schoolVerified;
+
+    /* JAM YANG TIDAK SAH = TIDAK ADA KEPUTUSAN MASA BERLAKU.
+     *
+     * Ini penjaga yang paling gampang lupa dipasang, dan paling mahal kalau lupa. Tanpa
+     * dia, `now` yang hilang jatuh ke 0 lewat num(), dan SETIAP pemeriksaan di bawah
+     * berbentuk `now <= until` dengan until epoch positif — jadi 0 <= licenseUntil dan
+     * 0 <= proGrace keduanya BENAR. Artinya jam yang hilang tidak menutup pintu seperti
+     * yang orang kira; ia membukanya lebar-lebar, dan setiap catatan langganan yang
+     * pernah ada hidup kembali.
+     *
+     * Ditemukan review otomatis di PR #451 — dan header fungsi ini sempat MENJANJIKAN
+     * kebalikannya ("semua masa lewat"). Janji yang salah lebih berbahaya daripada
+     * perilaku yang salah: pemanggil berikutnya akan memercayainya tanpa memeriksa.
+     *
+     * Arahnya fail-CLOSED, berbeda dengan adapter di app.js yang fail-OPEN saat MODULNYA
+     * absen. Bedanya disengaja: modul yang tidak mendarat adalah kesalahan KITA dan tidak
+     * boleh mengunci pelanggan; jam yang tidak masuk akal adalah masukan yang TIDAK BISA
+     * DIPERCAYA, dan hak akses tidak pernah boleh diberikan atas dasar itu.
+     *
+     * schoolPending tetap dilaporkan apa adanya: mengatakan "kelasmu sedang diperiksa"
+     * tidak membuka apa pun, dan tetap benar walau jamnya rusak. */
+    if (!(now > 0)) {
+      reasons.push('no_valid_clock');
+      return plan(PLANS.FREE, 'default', 0, 0, false, schoolPending, reasons);
+    }
 
     // --- 1. Sekolah menang lebih dulu (lihat header: murid sekolah tidak membayar dua kali)
     if (school) {
