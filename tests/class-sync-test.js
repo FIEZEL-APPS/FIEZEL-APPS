@@ -186,6 +186,11 @@ async function json(res) { return { status: res.status, body: JSON.parse(await r
   let rAsg2 = await json(await routes.routeClassAssign(ctxOf(db, { sub: 't2', method: 'POST', pathname: '/api/teacher/class/assign', body: { code: 'FZ-AB2C3D', assignment: { ...asgBody, id: 'as-mat-101', title: 'Aljabar Dasar' } }, now: 1_700_000_070_000 })));
   assert(rAsg2.status === 200 && rAsg2.body.ok, 'guru t2 berhasil mengirim tugas matematika ke kelas FZ-AB2C3D');
 
+  // Guru t3 (IPA) juga mengklaim kelas yang sama FZ-AB2C3D tanpa konflik
+  db._accounts.set('t3', { sub: 't3', role: 'teacher', status: 'active' });
+  let rMg3 = await json(await routes.routeClassClaim(ctxOf(db, { sub: 't3', method: 'POST', pathname: '/api/teacher/class/claim', body: { code: 'FZ-AB2C3D', title: 'Kelas 10A', subjectId: 'IPA', teacherName: 'Bu Eka' } })));
+  assert(rMg3.status === 200 && rMg3.body.claimed === true, 'guru t3 (IPA) berhasil berbagi kode kelas FZ-AB2C3D bersama guru t1 dan t2');
+
   /* ---------- 3. kontrak statis -------------------------------------------------- */
   const fs = require('fs');
   const src = fs.readFileSync(path.join(API, 'route-class-sync.js'), 'utf8');

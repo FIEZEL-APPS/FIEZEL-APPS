@@ -266,7 +266,8 @@
       institution: acc.institution ? String(acc.institution) : '',
       institutionType: acc.institutionType ? String(acc.institutionType) : '',
       classCode: acc.classCode ? String(acc.classCode) : null,
-      subjectId: acc.subjectId ? String(acc.subjectId) : null
+      subjectId: acc.subjectId ? String(acc.subjectId) : null,
+      gradeId: acc.gradeId ? String(acc.gradeId) : null
     });
     if (typeof FiezelTeacherStore !== 'undefined' && session.role === 'teacher') {
       try {
@@ -281,8 +282,82 @@
           profile.teacher.school = session.institution;
           modified = true;
         }
+        /* ----------------------------------------------------------------
+         * AUTO-BUAT KELAS dari classCode + subjectId yang dibawa token guru.
+         *
+         * Saat owner mencetak token, ia memilih kode kelas dan mata pelajaran.
+         * Data itu dikembalikan server di respons aktivasi/refresh/login dan
+         * sudah tersimpan di `session` di atas. Tugas blok ini: pastikan kelas
+         * dengan kode itu SUDAH ADA di penyimpanan lokal guru SEBELUM
+         * FiezelTeacherShell.mount() dipanggil, sehingga guru TIDAK PERNAH
+         * melihat layar kosong "Buat kelas pertamamu".
+         *
+         * Idempoten: kalau kelas sudah ada (guru reload, login ulang), blok
+         * ini tidak menambah duplikat.
+         * ---------------------------------------------------------------- */
+        if (!Array.isArray(profile.classes)) profile.classes = [];
+        var normCode = session.classCode && FiezelTeacherStore.normalizeClassCode
+          ? FiezelTeacherStore.normalizeClassCode(session.classCode)
+          : '';
+        if (!normCode && !profile.classes.length) {
+          try {
+            var m = (typeof document !== 'undefined' && document.cookie) ? document.cookie.match(/(?:^|;\s*)fz_cls=([^;]+)/) : null;
+            if (m && m[1] && FiezelTeacherStore.normalizeClassCode) {
+              normCode = FiezelTeacherStore.normalizeClassCode(decodeURIComponent(m[1]));
+            }
+          } catch (_) {}
+          if (!normCode && FiezelTeacherStore.makeClassCode) {
+            normCode = FiezelTeacherStore.makeClassCode();
+          }
+        }
+
+        var mapelNames = FiezelTeacherStore.MAPEL_NAMES || {};
+        var officialSub = session.subjectId || 'ENG';
+        var officialSubName = mapelNames[officialSub] || officialSub;
+
+        // SELALU SINKRONKAN MAPEL PADA SEMUA KELAS GURU INI
+        if (session.subjectId && profile.classes.length) {
+          profile.classes.forEach(function (c) {
+            var prefix = session.institution ? session.institution + ' — ' : (profile.teacher && profile.teacher.school ? profile.teacher.school + ' — ' : '');
+            if (c.subject !== session.subjectId || (c.name && c.name.indexOf('Matematika') !== -1 && session.subjectId !== 'MAT')) {
+              c.subject = session.subjectId;
+              c.name = prefix + officialSubName;
+              modified = true;
+            }
+          });
+        }
+
+        if (normCode) {
+          var matchedCls = profile.classes.filter(function (c) {
+            return FiezelTeacherStore.normalizeClassCode(c.code) === normCode;
+          })[0];
+          if (!matchedCls) {
+            // Bersihkan tanda "dihapus" untuk kode ini — token baru sengaja
+            // menghubungkan kembali, jadi penanda hapus lama harus dibuang.
+            if (profile.deletedClassCodes && profile.deletedClassCodes[normCode]) {
+              delete profile.deletedClassCodes[normCode];
+            }
+            var clsTitle = (session.institution ? session.institution + ' — ' : '') + officialSubName;
+            var autoCls = FiezelTeacherStore.newClass(clsTitle, session.gradeId || 'SMP', officialSub);
+            autoCls.code = normCode;
+            profile.classes.unshift(autoCls);
+            profile.activeClassId = autoCls.id;
+            profile.onboarded = true;
+            modified = true;
+          }
+        }
+        if (profile.classes.length && !profile.activeClassId) {
+          profile.activeClassId = profile.classes[0].id;
+          profile.onboarded = true;
+          modified = true;
+        }
         if (modified) {
           FiezelTeacherStore.save(profile);
+          try {
+            if (root.FiezelTeacherShell && typeof root.FiezelTeacherShell.render === 'function') {
+              root.FiezelTeacherShell.render();
+            }
+          } catch (_) {}
         }
       } catch (_) {}
     }

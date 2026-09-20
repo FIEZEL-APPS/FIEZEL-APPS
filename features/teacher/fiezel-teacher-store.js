@@ -57,7 +57,12 @@
   function b64e(obj) { return btoa(unescape(encodeURIComponent(JSON.stringify(obj)))); }
   function b64d(str) { return JSON.parse(decodeURIComponent(escape(atob(String(str || '').trim())))); }
   function makeClassCode() { var A = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789', out = ''; for (var i = 0; i < 6; i++) out += A[Math.floor(Math.random() * A.length)]; return 'FZ-' + out; }
-  function normalizeClassCode(v) { v = String(v || '').toUpperCase().replace(/[^A-Z0-9]/g, ''); if (v.indexOf('FZ') === 0) v = v.slice(2); return v.length === 6 ? 'FZ-' + v : ''; }
+  function normalizeClassCode(v) {
+    v = String(v || '').toUpperCase().replace(/[^A-Z0-9]/g, '');
+    if (v.indexOf('FZ') === 0) v = v.slice(2);
+    if (!v) return '';
+    return (v.length >= 3 && v.length <= 16) ? 'FZ-' + v : '';
+  }
   function firstName(n) { return String(n || t('umum.murid', 'Murid')).trim().split(/\s+/)[0].slice(0, 24); }
 
   // ---- persist -------------------------------------------------------------------------
@@ -558,7 +563,16 @@
   /** Klaim kode kelas di server (idempoten untuk pemilik yang sama). */
   function claimClass(c) {
     var A = account();
-    return A.api(SYNC_PATHS.claim, { code: c.code, title: c.name, level: c.level }).then(function (r) {
+    var acc = (A && A.state && A.state()) || {};
+    var sId = (c && (c.subjectId || c.subject)) || acc.subjectId || null;
+    var tName = (c && c.teacherName) || acc.teacherName || null;
+    return A.api(SYNC_PATHS.claim, {
+      code: c.code,
+      title: c.name,
+      level: c.level,
+      subjectId: sId,
+      teacherName: tName
+    }).then(function (r) {
       if (r.ok) { c.sync = Object.assign(c.sync || {}, { claimed: true, claimedAt: Date.now(), error: '' }); return { ok: true }; }
       c.sync = Object.assign(c.sync || {}, { claimed: false, error: r.error || 'unknown' });
       return { ok: false, error: r.error || 'unknown' };
@@ -621,12 +635,57 @@
     return { state: 'idle', text: 'Belum tersinkron' };
   }
 
+  /** Tarik daftar kelas guru dari server (/api/teacher/class/list) */
+  function syncClassList(st) {
+    var avail = syncAvailable();
+    if (avail !== 'ok') return Promise.resolve({ ok: false, error: avail, classes: [] });
+    var A = account();
+    return A.api(SYNC_PATHS.list).then(function (r) {
+      if (!r.ok) return { ok: false, error: r.error || 'unknown', classes: [] };
+      var serverClasses = (r.data && r.data.classes) || r.classes || [];
+      if (!Array.isArray(serverClasses) || !serverClasses.length) {
+        return { ok: true, added: 0, classes: st ? st.classes : [] };
+      }
+      var target = st || load();
+      if (!Array.isArray(target.classes)) target.classes = [];
+      var added = 0;
+      var acc = (A.state && A.state()) || {};
+      serverClasses.forEach(function (sc) {
+        var nCode = normalizeClassCode(sc.code);
+        if (!nCode) return;
+        var exists = target.classes.some(function (c) {
+          return normalizeClassCode(c.code) === nCode;
+        });
+        if (!exists) {
+          var sub = sc.subjectId || acc.subjectId || 'MAT';
+          var lvl = sc.level || acc.gradeId || 'SMP';
+          var sTitle = sc.title || (acc.institution ? acc.institution + ' — ' : '') + (MAPEL_NAMES[sub] || sub || 'Kelas');
+          var newC = newClass(sTitle, lvl, sub);
+          newC.code = nCode;
+          newC.sync = { claimed: true, claimedAt: Date.now() };
+          target.classes.push(newC);
+          added++;
+        }
+      });
+      if (added > 0) {
+        if (!target.activeClassId && target.classes.length) {
+          target.activeClassId = target.classes[0].id;
+        }
+        target.onboarded = true;
+        save(target);
+      }
+      return { ok: true, added: added, classes: target.classes };
+    }).catch(function (err) {
+      return { ok: false, error: (err && err.message) || 'unavailable', classes: [] };
+    });
+  }
+
   return { KEY: KEY, ASSIGN_KEY: ASSIGN_KEY, SKILL_LABEL: SKILL_LABEL, SKILL_ORDER: SKILL_ORDER, MAPEL_NAMES: MAPEL_NAMES, ATT: ATT, DAY: DAY,
     load: load, save: save, defaults: defaults, setPreview: setPreview, isPreview: isPreview, uid: uid, today: today, firstName: firstName, newClass: newClass, newStudent: newStudent, normalizeClass: normalizeClass, seedDemo: seedDemo, makeClassCode: makeClassCode, normalizeClassCode: normalizeClassCode,
     skillAcc: skillAcc, overallAcc: overallAcc, daysSince: daysSince, risk: risk, classStats: classStats, classSkillMap: classSkillMap, heatmap: heatmap, activeSkills: activeSkills, studyGroups: studyGroups, misconceptions: misconceptions, needsGreeting: needsGreeting, agenda: agenda, pendingAssignments: pendingAssignments, targeted: targeted, recentAttendance: recentAttendance, attendanceRate: attendanceRate, weakestSkill: weakestSkill,
     durasi: durasi, examLabel: examLabel, acceptJoin: acceptJoin, rejectJoin: rejectJoin, pendingJoins: pendingJoins, normalizeFocus: normalizeFocus, focusGrew: focusGrew, focusOf: focusOf, focusLabel: focusLabel, focusLevel: focusLevel,
     parseLearnerCode: parseLearnerCode, parseLearnerPayload: parseLearnerPayload, ingest: ingest, assignmentCode: assignmentCode, assignmentPayload: assignmentPayload, parseAssignmentCode: parseAssignmentCode, acceptAssignmentCode: acceptAssignmentCode, acceptAssignmentPayload: acceptAssignmentPayload, buildAssignment: buildAssignment,
-    SYNC_PATHS: SYNC_PATHS, syncAvailable: syncAvailable, claimClass: claimClass, pullReports: pullReports, syncClass: syncClass, reportToClass: reportToClass, syncLabel: syncLabel, sendAssignment: sendAssignment, sentTo: sentTo,
+    SYNC_PATHS: SYNC_PATHS, syncAvailable: syncAvailable, claimClass: claimClass, pullReports: pullReports, syncClass: syncClass, syncClassList: syncClassList, reportToClass: reportToClass, syncLabel: syncLabel, sendAssignment: sendAssignment, sentTo: sentTo,
     notify: notify, inboxUnread: inboxUnread, inboxMarkAllRead: inboxMarkAllRead, inboxText: inboxText,
     greetingCard: greetingCard, parentReport: parentReport, weeklyClassReport: weeklyClassReport, csvStudents: csvStudents, parseNames: parseNames, waLink: waLink, fmtDate: fmtDate, pct: pct };
 });
