@@ -2575,13 +2575,16 @@
     var gId = (acc && acc.gradeId) || 'SMP';
     var inst = (acc && acc.institution) || (st.teacher && st.teacher.school) || '';
     var mapelNames = (S() && S().MAPEL_NAMES) || {};
-    var subName = mapelNames[sId] || sId || 'Matematika';
-    var code = (acc && acc.classCode) ? S().normalizeClassCode(acc.classCode) : '';
+    var code = (acc && acc.classCode && acc.classCode !== 'FZ-MERDEKA1') ? S().normalizeClassCode(acc.classCode) : '';
+    if (code === 'FZ-MERDEKA1' || (code && !/^FZ-[A-HJ-NP-Z2-9]{6}$/.test(code))) code = '';
 
     if (!code) {
       try {
         var m = (typeof document !== 'undefined' && document.cookie) ? document.cookie.match(/(?:^|;\s*)fz_cls=([^;]+)/) : null;
-        if (m && m[1]) code = S().normalizeClassCode(decodeURIComponent(m[1]));
+        if (m && m[1]) {
+          var cand = S().normalizeClassCode(decodeURIComponent(m[1]));
+          if (cand && cand !== 'FZ-MERDEKA1' && /^FZ-[A-HJ-NP-Z2-9]{6}$/.test(cand)) code = cand;
+        }
       } catch (_) {}
     }
     if (!code) {
@@ -2589,6 +2592,15 @@
     }
 
     var modified = false;
+
+    // Bersihkan kelas yang tersimpan dengan kode FZ-MERDEKA1 atau kode bukan 6-char
+    st.classes.forEach(function (c) {
+      if (c.code === 'FZ-MERDEKA1' || (c.code && !/^FZ-[A-HJ-NP-Z2-9]{6}$/.test(c.code))) {
+        c.code = code || S().makeClassCode();
+        if (c.sync) c.sync.claimed = false;
+        modified = true;
+      }
+    });
 
     // Sinkronkan data guru jika akun membawa profil baru
     if (acc) {

@@ -296,20 +296,35 @@
          * ini tidak menambah duplikat.
          * ---------------------------------------------------------------- */
         if (!Array.isArray(profile.classes)) profile.classes = [];
-        var normCode = session.classCode && FiezelTeacherStore.normalizeClassCode
+        var normCode = session.classCode && session.classCode !== 'FZ-MERDEKA1' && FiezelTeacherStore.normalizeClassCode
           ? FiezelTeacherStore.normalizeClassCode(session.classCode)
           : '';
+        if (normCode === 'FZ-MERDEKA1' || (normCode && !/^FZ-[A-HJ-NP-Z2-9]{6}$/.test(normCode))) {
+          normCode = '';
+        }
         if (!normCode && !profile.classes.length) {
           try {
             var m = (typeof document !== 'undefined' && document.cookie) ? document.cookie.match(/(?:^|;\s*)fz_cls=([^;]+)/) : null;
             if (m && m[1] && FiezelTeacherStore.normalizeClassCode) {
-              normCode = FiezelTeacherStore.normalizeClassCode(decodeURIComponent(m[1]));
+              var cand = FiezelTeacherStore.normalizeClassCode(decodeURIComponent(m[1]));
+              if (cand && cand !== 'FZ-MERDEKA1' && /^FZ-[A-HJ-NP-Z2-9]{6}$/.test(cand)) {
+                normCode = cand;
+              }
             }
           } catch (_) {}
           if (!normCode && FiezelTeacherStore.makeClassCode) {
             normCode = FiezelTeacherStore.makeClassCode();
           }
         }
+
+        // Bersihkan kode basi FZ-MERDEKA1 di kelas yang sudah ada
+        profile.classes.forEach(function (c) {
+          if (c.code === 'FZ-MERDEKA1' || (c.code && !/^FZ-[A-HJ-NP-Z2-9]{6}$/.test(c.code))) {
+            c.code = normCode || (FiezelTeacherStore.makeClassCode ? FiezelTeacherStore.makeClassCode() : 'FZ-A2B3C4');
+            if (c.sync) c.sync.claimed = false;
+            modified = true;
+          }
+        });
 
         var mapelNames = FiezelTeacherStore.MAPEL_NAMES || {};
         var officialSub = session.subjectId || 'ENG';
