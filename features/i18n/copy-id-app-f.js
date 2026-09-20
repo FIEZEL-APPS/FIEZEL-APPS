@@ -234,6 +234,7 @@
     'umum.cari': 'Cari',
     'umum.riwayat': 'Riwayat',
     'umum.notifikasi': 'Notifikasi',
-    'umum.belum-ada-data': 'Belum ada data.'
+    'umum.belum-ada-data': 'Belum ada data.',
+    'umum.muat-ulang': 'Muat Ulang'
   });
 }());
