@@ -344,9 +344,66 @@ html.fiezel-ui-v6 body.fz-teacher-mode .tg button.tg-seg-btn:not(.primary):not(.
 .tg-muted.tg-small{font-size:.78rem;line-height:1.45}
 
 /* ---- Kurikulum Sekolah SMP & SMA di Modal Assign ---- */
-.tg-assign-tabs{display:flex;gap:8px;margin-bottom:14px;border-bottom:1px solid var(--tg-line);padding-bottom:10px}
-.tg-assign-tabs .tg-tab-btn{background:transparent;border:0;padding:8px 16px;border-radius:var(--tg-r);font:inherit;font-weight:600;font-size:.9rem;color:var(--tg-muted);cursor:pointer;transition:all .15s}
-.tg-assign-tabs .tg-tab-btn.is-active{background:var(--tg-sage);color:#fff}
+.tg-assign-tabs{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px;border-bottom:1px solid var(--tg-line);padding-bottom:10px}
+.tg-assign-tabs .tg-tab-btn{display:inline-flex;align-items:center;gap:6px;background:var(--tg-paper-2);border:1px solid var(--tg-line);padding:7px 14px;border-radius:999px;font:inherit;font-weight:600;font-size:.84rem;color:var(--tg-muted);cursor:pointer;transition:all .15s;white-space:nowrap}
+.tg-assign-tabs .tg-tab-btn:hover{background:var(--tg-paper);color:var(--tg-ink)}
+.tg-assign-tabs .tg-tab-btn.is-active{background:var(--tg-sage);border-color:var(--tg-sage);color:#fff}
+
+/* Ringkasan Bab & Capaian Kurikulum Guru */
+.tg-topic-summary-card{background:linear-gradient(135deg, #F0FDF4 0%, #ECFDF5 100%);border:1px solid #A7F3D0;border-radius:var(--tg-r-lg);padding:14px 16px;margin:10px 0 14px;box-shadow:0 2px 6px rgba(16,185,129,.05)}
+.tg-topic-badge-row{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin-bottom:8px}
+.tg-topic-badge-row .tg-badge{font-size:.72rem;font-weight:700;padding:3px 9px;border-radius:999px}
+.tg-topic-badge-row .tg-badge.is-subject{background:#047857;color:#fff}
+.tg-topic-badge-row .tg-badge.is-grade{background:rgba(4,120,87,.12);color:#065F46;border:1px solid rgba(4,120,87,.2)}
+.tg-topic-badge-row .tg-badge.is-count{background:#FEF3C7;color:#92400E;border:1px solid #FCD34D}
+.tg-topic-title{margin:0 0 6px;font-size:1.02rem;font-weight:700;color:#064E3B;line-height:1.35}
+.tg-topic-materi{margin:0;font-size:.82rem;color:#065F46;line-height:1.4}
+
+/* Panduan Mengajar Collapsible Accordion */
+.tg-brief-accordion{background:linear-gradient(180deg, #FBF8EE 0%, #F5EEDB 100%);border:1px solid #E6D9BC;border-radius:var(--tg-r-lg);margin:10px 0 14px;overflow:hidden;box-shadow:0 2px 8px rgba(44,34,22,.03)}
+.tg-brief-accordion > summary{padding:10px 14px;font-size:.86rem;font-weight:700;color:#78350F;cursor:pointer;display:flex;align-items:center;justify-content:space-between;user-select:none;background:rgba(245,238,219,.5);transition:background .15s}
+.tg-brief-accordion > summary:hover{background:#F5EEDB}
+.tg-brief-accordion[open] > summary{border-bottom:1px solid #E6D9BC}
+.tg-brief-accordion .tg-brief-card{border:0;box-shadow:none;margin:0;border-radius:0;background:transparent;padding:12px 16px}
+
+/* Bank Soal Interaktif & Viewer Guru */
+.tg-qbank-section{background:#fff;border:1px solid var(--tg-line);border-radius:var(--tg-r-lg);padding:14px;margin:12px 0 16px;box-shadow:0 2px 10px rgba(0,0,0,.03)}
+.tg-qbank-header{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px;padding-bottom:10px;border-bottom:1px solid var(--tg-line)}
+.tg-qbank-title-group h5{margin:0 0 3px;font-size:.92rem;font-weight:700;color:var(--tg-ink);display:flex;align-items:center;gap:6px}
+.tg-count-pill{display:inline-block;padding:2px 8px;border-radius:999px;background:var(--tg-sage-soft);color:var(--tg-sage);font-size:.74rem;font-weight:700}
+.tg-qbank-quick-btns{display:flex;flex-wrap:wrap;align-items:center;gap:6px}
+.tg-q-quick-btn{background:var(--tg-paper-2);border:1px solid var(--tg-line);padding:5px 11px;border-radius:999px;font:inherit;font-size:.78rem;font-weight:600;color:var(--tg-ink-2);cursor:pointer;transition:all .15s}
+.tg-q-quick-btn:hover{background:var(--tg-sage-soft);border-color:var(--tg-sage);color:var(--tg-ink)}
+.tg-qbank-list{display:flex;flex-direction:column;gap:10px;max-height:380px;overflow-y:auto;padding-right:4px}
+.tg-qbank-list::-webkit-scrollbar{width:6px}
+.tg-qbank-list::-webkit-scrollbar-thumb{background:#CBD5E1;border-radius:3px}
+.tg-qcard{background:var(--tg-paper);border:1px solid rgba(0,0,0,.08);border-radius:var(--tg-r);padding:12px;transition:border-color .15s}
+.tg-qcard:hover{border-color:#CBD5E1}
+.tg-qcard-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px}
+.tg-qcard-label{display:flex;align-items:center;gap:6px;cursor:pointer}
+.tg-q-checkbox{width:16px;height:16px;accent-color:var(--tg-sage);cursor:pointer}
+.tg-q-num{font-weight:700;font-size:.82rem;color:var(--tg-ink)}
+.tg-diff-badge{font-size:.7rem;font-weight:700;padding:2px 7px;border-radius:4px}
+.tg-diff-badge.is-dasar{background:#DCFCE7;color:#166534}
+.tg-diff-badge.is-sedang{background:#FEF3C7;color:#92400E}
+.tg-diff-badge.is-tinggi{background:#FEE2E2;color:#991B1B}
+.tg-qcard-prompt{font-size:.85rem;font-weight:600;color:var(--tg-ink);line-height:1.4;margin-bottom:8px}
+.tg-qcard-options{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:8px}
+@media(max-width:640px){.tg-qcard-options{grid-template-columns:1fr}}
+.tg-q-opt{display:flex;align-items:flex-start;gap:6px;padding:6px 9px;border-radius:6px;background:#fff;border:1px solid var(--tg-line);font-size:.78rem;line-height:1.35;color:var(--tg-ink-2)}
+.tg-opt-letter{font-weight:700;color:var(--tg-muted);flex-shrink:0}
+.tg-opt-text{flex:1}
+.tg-q-opt.is-correct{background:#F0FDF4;border-color:#86EFAC;color:#166534}
+.tg-q-opt.is-correct .tg-opt-letter{color:#166534}
+.tg-correct-pill{display:inline-flex;align-items:center;padding:1px 5px;border-radius:3px;background:#22C55E;color:#fff;font-size:.65rem;font-weight:700;margin-left:4px;flex-shrink:0}
+.tg-q-explanation{margin-top:6px;border-top:1px dashed var(--tg-line);padding-top:6px}
+.tg-q-exp-toggle{font-size:.76rem;font-weight:600;color:#0D9488;cursor:pointer;user-select:none}
+.tg-q-exp-toggle:hover{text-decoration:underline}
+.tg-q-exp-body{padding:6px 8px;background:rgba(255,255,255,.8);border-radius:4px;margin-top:4px;font-size:.76rem;line-height:1.4;color:var(--tg-ink-2)}
+.tg-q-exp-body p{margin:2px 0}
+.tg-q-exp-body b{color:var(--tg-ink)}
+.tg-q-exp-body .tg-trap-note{color:#B91C1C;margin-top:4px}
+
 .tg-phase-pills{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px}
 .tg-phase-pills .tg-chip{display:flex;flex-direction:column;align-items:flex-start;padding:8px 14px;border-radius:var(--tg-r);border:1px solid var(--tg-line);background:var(--tg-paper);cursor:pointer;text-align:left;font:inherit;transition:all .15s}
 .tg-phase-pills .tg-chip.is-active{border-color:var(--tg-sage);background:var(--tg-sage-soft);color:var(--tg-ink)}
