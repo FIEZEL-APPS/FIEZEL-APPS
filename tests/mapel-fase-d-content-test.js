@@ -381,6 +381,13 @@ if (bankLengkap) {
     for (const s of SUBJECTS) {
       const comps = banks[s.id].competencies || [];
 
+      /* Bank yang berkasnya ada tetapi belum berisi kompetensi: sensus di atas SUDAH
+         mencatatnya sebagai gagal. Lanjut ke pemeriksaan runtime di bawah hanya akan
+         melempar pada comps[0] yang undefined, dan lemparan itu membunuh proses sebelum
+         laporan check() sempat tercetak — pengembang melihat stack trace, bukan daftar
+         gerbang yang merah. Merah yang terbaca lebih berguna daripada merah yang meledak. */
+      if (comps.length === 0) continue;
+
       /* 3 · kompetensi berbeda -> kolam berbeda. Diperiksa untuk SEMUA pasangan dalam satu
          mapel, bukan sampel: satu pasang yang bocor sudah cukup untuk mengirim bab yang
          salah ke satu kelas. */
