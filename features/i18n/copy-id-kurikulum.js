@@ -320,6 +320,28 @@
     'kurikulum.papan-sel-belum': 'Belum mulai',
     'kurikulum.papan-cap-note': 'Menampilkan {n} TP pertama — batasi agar papan tetap terbaca.',
     'kurikulum.papan-tanpa-murid': 'Belum ada murid di kelas ini — tidak ada sumbu datar yang bisa digambar.',
-    'kurikulum.papan-tanpa-tp': 'Belum ada TP untuk mapel ini di kelas ini.'
+    'kurikulum.papan-tanpa-tp': 'Belum ada TP untuk mapel ini di kelas ini.',
+    /* m025-354 (F9 fase 1, misi luring) — naskah lahir dwibahasa. */
+    'kurikulum.luring-kicker': 'Mode luring',
+    'kurikulum.luring-masuk': 'Lanjut luring sebagai {nama}',
+    'kurikulum.luring-masuk-sub': 'Tanpa sinyal — latihan dari bank perangkat, dinilai di perangkat.',
+    'kurikulum.luring-pilih-judul': 'Pilih unit latihan luring',
+    'kurikulum.luring-pilih-sub': 'Dari bank offline di perangkat ini — {n} unit.',
+    'kurikulum.luring-butir': 'butir',
+    'kurikulum.luring-soal-ke': 'Butir {i} dari {n}',
+    'kurikulum.luring-benar': 'Benar',
+    'kurikulum.luring-salah': 'Kurang tepat',
+    'kurikulum.luring-berikutnya': 'Berikutnya',
+    'kurikulum.luring-hasil': 'Lihat hasil',
+    'kurikulum.luring-selesai-judul': 'Latihan luring selesai',
+    'kurikulum.luring-skor': 'Skor {benar} dari {total}',
+    'kurikulum.luring-lagi': 'Ulangi unit ini',
+    'kurikulum.luring-ganti': 'Ganti unit',
+    'kurikulum.luring-tanpa-modul': 'Bank unit belum termuat di halaman ini.',
+    'kurikulum.antre-judul': 'Bukti menunggu sinyal',
+    'kurikulum.antre-isi': '{n} jawaban antre untuk dihitung server — belum masuk bukti penguasaan.',
+    'kurikulum.antre-kirim': 'Kirim antrean',
+    'kurikulum.antre-terkirim': 'Antrean terkirim.',
+    'kurikulum.antre-sisa': '{n} masih antre — coba lagi saat sinyal lebih baik.'
   });
 })();

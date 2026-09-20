@@ -261,6 +261,9 @@ jobs:
           # Wali Kelas F8 + Papan Kelas F10: agregat /coverage per mapel dan grid
           # TP × murid dari endpoint yang ada, antrean berbatas, sel ber-aria.
           node tests/kurikulum-wali-papan-test.js
+          # Misi luring F9 fase 1: precache shell, sesi terakhir + konfirmasi,
+          # runner lokal 6 butir, antrean question_answered idempoten.
+          node tests/kurikulum-luring-test.js
           node tests/question-allocator-test.js
           node tests/bankor-latihan-test.js
           node tests/fiezel-stat-gate-test.js
