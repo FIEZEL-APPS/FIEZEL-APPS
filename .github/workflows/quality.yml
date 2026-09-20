@@ -237,6 +237,11 @@ jobs:
           # dipotong, dan mengulang misi tidak pernah menurunkan stempel. Temuan K1/K2/K4
           # reports/AUDIT-UIUX-KELASKU-KURIKULUM-KOMPETENSI-2026-09-20.md.
           node tests/kelasku-paspor-kompetensi-test.js
+          # Pintu permukaan kurikulum: kurikulum.html tertaut dari Ruang Guru, misi.html
+          # tertaut dari KelasKu, tab Progres murid benar-benar memanggil progresView(),
+          # dan konsol guru memotret-lalu-memulihkan isian saat mengecat ulang. Temuan
+          # X2/X3/K10/G1 reports/AUDIT-UIUX-KELASKU-KURIKULUM-KOMPETENSI-2026-09-20.md.
+          node tests/kurikulum-pintu-test.js
           node tests/question-allocator-test.js
           node tests/bankor-latihan-test.js
           node tests/fiezel-stat-gate-test.js

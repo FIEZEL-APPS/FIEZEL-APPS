@@ -532,3 +532,41 @@ html.fiezel-ui-v6 body.fz-teacher-mode .tg button.tg-seg-btn:not(.primary):not(.
 .tg-btn.is-wa-ghost:hover{background:#DCFCE7}
 .tg-code-box{display:flex;flex-direction:column;gap:8px;margin-top:8px}
 .tg-code-box textarea{font-family:var(--tg-mono);font-size:.8rem;border:1px solid var(--tg-line);border-radius:var(--tg-r);padding:8px;background:#fff;color:var(--tg-ink);resize:vertical}
+
+/* PINTU KE KONSOL KURIKULUM & KOMPETENSI (m025-349, temuan X2).
+   Ia membuka HALAMAN LAIN (kurikulum.html), jadi bentuknya sengaja tidak sama dengan
+   kartu materi di bawahnya: satu baris lebar dengan panah keluar, supaya guru tahu ia
+   sedang berpindah ruangan, bukan membuka lipatan. */
+.tg-console-door {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 16px 18px;
+  margin-bottom: 14px;
+  text-decoration: none;
+  color: inherit;
+  border-left: 3px solid var(--tg-sage);
+  transition: transform .18s ease, box-shadow .18s ease;
+}
+.tg-console-door:hover,
+.tg-console-door:focus-visible {
+  transform: translateY(-1px);
+  box-shadow: 0 10px 26px rgba(0, 0, 0, .10);
+}
+.tg-console-door-icon {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 12px;
+  background: var(--tg-sage-soft);
+  color: var(--tg-sage);
+}
+.tg-console-door-icon i,
+.tg-console-door-icon svg { width: 19px; height: 19px; }
+.tg-console-door-body { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+.tg-console-door-body b { font-size: .95rem; }
+.tg-console-door-body small { color: var(--tg-muted); line-height: 1.45; }
+.tg-console-door > i:last-child,
+.tg-console-door > svg:last-child { flex: none; width: 17px; height: 17px; color: var(--tg-muted); margin-left: auto; }
