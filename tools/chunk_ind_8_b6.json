@@ -1,0 +1,389 @@
+{
+  "code": "KOMP-IND-D-8-BAB6-01",
+  "grade": 8,
+  "name": "Bab VI: Menulis Teks Pidato",
+  "materi": "Memahami Teks Pidato Persuasif, Struktur Teks Pidato (Salam Pembuka, Pendahuluan, Isi, Penutup), Kebahasaan Pidato (Kata Sapaan, Kalimat Persuasif, Kata Kerja Mental)",
+  "cpRef": "Bahasa Indonesia untuk SMP/MTs Kelas VIII (Edisi Revisi)",
+  "items": [
+    {
+      "id": "ind-d-8-b6-q01",
+      "difficulty": "dasar",
+      "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VIII (Bab VI Menulis Teks Pidato), pengertian pidato secara umum adalah…",
+      "options": [
+        "Kegiatan mengungkapkan pikiran atau ide/gagasan dalam bentuk kata-kata yang ditujukan kepada orang banyak dengan bahasa formal",
+        "Uraian cerita rekaan tentang tokoh dan konflik sosial yang diperankan oleh para pemain di atas panggung pertunjukan",
+        "Catatan harian pribadi yang berisi luapan emosi dan pengalaman batin penulis tanpa ditujukan kepada audiens",
+        "Ringkasan berita fakta ilmiah yang dipublikasikan secara tertulis melalui media cetak atau elektronik"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Pidato merupakan kegiatan menyampaikan pikiran, ide, atau gagasan secara lisan dalam bentuk kata-kata yang ditujukan kepada khalayak ramai menggunakan bahasa formal."
+      },
+      "distractorWhy": {
+        "1": "Pernyataan tersebut merupakan definisi dari naskah drama atau pertunjukan drama.",
+        "2": "Pernyataan tersebut merupakan definisi dari buku harian (diari).",
+        "3": "Pernyataan tersebut merupakan karakter teks berita atau artikel jurnalistik."
+      }
+    },
+    {
+      "id": "ind-d-8-b6-q02",
+      "difficulty": "dasar",
+      "prompt": "Dalam Buku Siswa Bahasa Indonesia Kelas VIII (Bab VI), sebutan bagi orang yang ahli atau pandai berpidato di hadapan umum dinamakan…",
+      "options": [
+        "Orator",
+        "Moderator",
+        "Notulis",
+        "Narator"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Orator adalah sebutan khusus bagi orang yang mempunyai keahlian dan kepandaian dalam menyampaikan pidato di depan umum, seperti Ir. Sukarno dan Buya Hamka."
+      },
+      "distractorWhy": {
+        "1": "Moderator adalah orang yang memimpin dan memandu jalannya diskusi atau seminar.",
+        "2": "Notulis adalah orang yang bertugas mencatat hasil rapat atau diskusi.",
+        "3": "Narator adalah orang yang membacakan narasi atau menceritakan alur cerita."
+      }
+    },
+    {
+      "id": "ind-d-8-b6-q03",
+      "difficulty": "dasar",
+      "prompt": "Menurut Buku Siswa Bahasa Indonesia Kelas VIII (Bab VI Tabel 6.1), struktur umum penulisan teks pidato secara runtut terdiri atas…",
+      "options": [
+        "Pembukaan, isi, dan penutup",
+        "Tesis, argumentasi, dan penegasan ulang",
+        "Orientasi, komplikasi, dan resolusi",
+        "Pernyataan umum, urutan sebab-akibat, dan interpretasi"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Struktur teks pidato terdiri atas bagian pembukaan (salam dan sapaan), bagian isi (gagasan utama/argumen), serta bagian penutup (kesimpulan dan salam penutup)."
+      },
+      "distractorWhy": {
+        "1": "Struktur tersebut milik teks eksposisi.",
+        "2": "Struktur tersebut milik teks cerpen atau narasi naskah drama.",
+        "3": "Struktur tersebut milik teks eksplanasi."
+      }
+    },
+    {
+      "id": "ind-d-8-b6-q04",
+      "difficulty": "dasar",
+      "prompt": "Berdasarkan pembahasan salam keagamaan di Indonesia pada Bab VI Buku Siswa Bahasa Indonesia Kelas VIII, ucapan salam 'Om swastiastu' berasal dari agama Hindu yang memiliki arti…",
+      "options": [
+        "Semoga dalam keadaan selamat atas karunia Sang Hyang Widhi",
+        "Semoga keselamatan dan rahmat Allah serta keberkahan-Nya terlimpah kepada kalian",
+        "Salam sejahtera bagi kita semua",
+        "Terpujilah Buddha"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Om swastiastu merupakan salam pembuka keagamaan Hindu yang bermakna memohon keselamatan atas karunia Tuhan (Sang Hyang Widhi)."
+      },
+      "distractorWhy": {
+        "1": "Merupakan makna dari salam Assalamualaikum dalam agama Islam.",
+        "2": "Merupakan makna dari Salam Sejahtera dalam agama Kristen dan Katolik.",
+        "3": "Merupakan makna dari salam Namo Buddhaya dalam agama Buddha."
+      }
+    },
+    {
+      "id": "ind-d-8-b6-q05",
+      "difficulty": "dasar",
+      "prompt": "Berdasarkan bagian istilah-istilah dalam pidato pada Buku Siswa Bahasa Indonesia Kelas VIII (Bab VI), ilmu tentang pidato atau seni berbicara didefinisikan sebagai…",
+      "options": [
+        "Retorika",
+        "Estetika",
+        "Semiotika",
+        "Fonetika"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Retorika adalah istilah ilmiah yang merujuk pada ilmu tentang pidato atau seni berbicara secara efektif di depan publik."
+      },
+      "distractorWhy": {
+        "1": "Estetika adalah ilmu tentang keindahan dan keharmonisan seni.",
+        "2": "Semiotika adalah ilmu tentang tanda dan simbol dalam bahasa.",
+        "3": "Fonetika adalah ilmu linguistik yang mempelajari bunyi bahasa."
+      }
+    },
+    {
+      "id": "ind-d-8-b6-q06",
+      "difficulty": "dasar",
+      "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VIII (Bab VI), metode berpidato yang dilakukan secara spontan dan tiba-tiba tanpa persiapan naskah sebelumnya disebut…",
+      "options": [
+        "Pidato impromptu",
+        "Pidato manuskrip",
+        "Pidato memoriter",
+        "Pidato ekstempore"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Pidato impromptu adalah metode penyampaian pidato secara serta-merta/spontan tanpa membawa naskah atau persiapan khusus sebelumnya."
+      },
+      "distractorWhy": {
+        "1": "Pidato manuskrip menggunakan naskah lengkap tulisan.",
+        "2": "Pidato memoriter menyampaikan pidato dengan cara menghafalkan naskah kata demi kata.",
+        "3": "Pidato ekstempore menyampaikan pidato dengan menyiapkan garis besar atau catatan poin penting."
+      }
+    },
+    {
+      "id": "ind-d-8-b6-q07",
+      "difficulty": "sedang",
+      "prompt": "Cermatilah penggalan pidato berikut:\n\"Pada saat penyampaian visi dan misi, saya mengungkapkan keinginan untuk mengaktifkan kembali beberapa kegiatan, antara lain pembuatan majalah dinding OSIS, kegiatan lomba pidato, dan kegiatan ekstrakurikuler debat bahasa Inggris. Saya berharap nantinya kita dapat bekerja sama untuk mewujudkan ide tersebut.\"\nBerdasarkan Buku Siswa Bahasa Indonesia Kelas VIII (Bab VI), penggalan teks pidato Ketua OSIS tersebut termasuk ke dalam bagian struktur…",
+      "options": [
+        "Isi pidato, karena memuat gagasan utama dan program kerja yang ingin disampaikan oleh orator",
+        "Pembukaan pidato, karena memuat salam keagamaan dan ungkapan sapaan penghormatan",
+        "Penutup pidato, karena berisi kalimat permohonan maaf dan salam perpisahan",
+        "Salam pembuka pidato, karena berisi penghormatan formal kepada kepala sekolah dan dewan guru"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Bagian isi pidato memuat gagasan pokok, ide, gagasan program, serta pandangan yang ingin disampaikan pembawa pidato kepada audiens."
+      },
+      "distractorWhy": {
+        "1": "Bagian pembukaan terletak di awal pidato dan berisi salam serta sapaan penghormatan.",
+        "2": "Bagian penutup berada di akhir pidato dan memuat simpulan serta pesan/harapan akhir.",
+        "3": "Salam pembuka merupakan ucapan sapaan awal seperti selamat pagi atau Assalamualaikum."
+      }
+    },
+    {
+      "id": "ind-d-8-b6-q08",
+      "difficulty": "sedang",
+      "prompt": "Dalam Jelajah Kata Bab VI Buku Siswa Bahasa Indonesia Kelas VIII, gerakan anggota tubuh saat berpidato yang berfungsi meyakinkan pendengar dinamakan…",
+      "options": [
+        "Gestur",
+        "Intonasi",
+        "Artikulasi",
+        "Khalayak"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Gestur adalah gerakan anggota tubuh (seperti tangan, bahu, dan mimik) saat berpidato yang berfungsi memperkuat pesan dan meyakinkan khalayak."
+      },
+      "distractorWhy": {
+        "1": "Intonasi adalah ketepatan irama kalimat dalam berbicara saat berpidato.",
+        "2": "Artikulasi adalah kejelasan pengucapan lafal kata.",
+        "3": "Khalayak adalah sebutan bagi orang banyak atau pendengar pidato."
+      }
+    },
+    {
+      "id": "ind-d-8-b6-q09",
+      "difficulty": "sedang",
+      "prompt": "Cermatilah kutipan pidato dari teks \"Masalah Sampah\" berikut:\n\"Kementerian Lingkungan Hidup dan Kehutanan (KLHK) merilis bahwa jumlah timbunan sampah nasional sebesar 175.000 ton per hari atau setara 64 juta ton per tahun dengan asumsi sampah yang dihasilkan setiap orang 0,7 kg per hari.\"\nBerdasarkan Buku Siswa Bahasa Indonesia Kelas VIII (Bab VI), fungsi penyampaian data kuantitatif tersebut dalam pidato adalah…",
+      "options": [
+        "Memperkuat argumen pidato dengan fakta resmi agar pendengar percaya akan keseriusan masalah sampah",
+        "Menghibur pendengar agar suasana pembacaan pidato menjadi santai dan lucu",
+        "Memenuhi kaidah tata bahasa yang mewajibkan angka matematis dalam pidato",
+        "Mengubah teks pidato persuasif menjadi naskah laporan keuangan instansi"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Penyampaian fakta dan data resmi (seperti rilis KLHK) berfungsi memperkuat argumen dan dasar pemikiran pidato sehingga audiens terpengaruh dan meyakini pesan pidato."
+      },
+      "distractorWhy": {
+        "1": "Data statistik sampah disajikan untuk memberikan bukti faktual objektif, bukan sarana hiburan.",
+        "2": "Kaidah bahasa pidato tidak mewajibkan menyertakan perhitungan matematika.",
+        "3": "Penyajian data KLHK tidak mengubah genre pidato menjadi laporan akuntansi."
+      }
+    },
+    {
+      "id": "ind-d-8-b6-q10",
+      "difficulty": "sedang",
+      "prompt": "Dalam Bab VI Buku Siswa Bahasa Indonesia Kelas VIII, dijelaskan bahwa teks pidato sering memuat kata ilmiah. Pasangan kata ilmiah dan bidang ilmu terkait yang sesuai menurut buku siswa adalah…",
+      "options": [
+        "Ekosistem merupakan kata ilmiah dari bidang ilmu biologi",
+        "Atom merupakan kata ilmiah dari bidang ilmu sejarah",
+        "Khatulistiwa merupakan kata ilmiah dari bidang ilmu bahasa dan sastra",
+        "Bait merupakan kata ilmiah dari bidang ilmu kimia"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Ekosistem merujuk pada keilmuan biologi tentang lingkungan tempat tinggal komunitas organik."
+      },
+      "distractorWhy": {
+        "1": "Atom merupakan kata ilmiah dari bidang ilmu kimia.",
+        "2": "Khatulistiwa merupakan kata ilmiah dari bidang ilmu geografi.",
+        "3": "Bait merupakan kata ilmiah dari bidang ilmu bahasa dan sastra."
+      }
+    },
+    {
+      "id": "ind-d-8-b6-q11",
+      "difficulty": "sedang",
+      "prompt": "Cermatilah kalimat-kalimat berikut:\n(1) Marilah kita melatih diri untuk disiplin dalam membuang sampah pada tempatnya.\n(2) Hari ini hujan deras menyebabkan beberapa jalan di kawasan sekolah tergenang air.\n(3) Buanglah sampah organik ke dalam wadah pengomposan agar bermanfaat.\n(4) Halaman sekolah kami dikelilingi oleh berbagai jenis pepohonan yang rindang.\nBerdasarkan materi penulisan kalimat persuasif pada Bab VI Buku Siswa Bahasa Indonesia Kelas VIII, kalimat yang termasuk contoh kalimat persuasif ditunjukkan oleh nomor…",
+      "options": [
+        "(1) dan (3)",
+        "(2) dan (4)",
+        "(1) dan (2)",
+        "(3) dan (4)"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Kalimat (1) dan (3) mengandung ajakan dan bujukan yang ditandai oleh kata 'marilah' dan kata imperatif 'buanglah'."
+      },
+      "distractorWhy": {
+        "1": "Kalimat (2) dan (4) merupakan kalimat berita/deskriptif informatif, bukan kalimat persuasif.",
+        "2": "Kalimat (2) merupakan kalimat berita fenomena alam.",
+        "3": "Kalimat (4) merupakan kalimat deskripsi lingkungan."
+      }
+    },
+    {
+      "id": "ind-d-8-b6-q12",
+      "difficulty": "sedang",
+      "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VIII (Bab VI), manakah di antara kalimat berikut yang merupakan contoh ungkapan rasa peduli atau simpati dalam teks pidato?",
+      "options": [
+        "\"Saya berharap pada masa yang akan datang kita lebih peduli dan memperhatikan masalah sampah.\"",
+        "\"Data menunjukkan produksi sampah nasional mencapai 175.000 ton per hari.\"",
+        "\"Selamat pagi Bapak Kepala Sekolah dan Bapak/Ibu Guru yang saya hormati.\"",
+        "\"Pidato impromptu dilakukan secara spontan tanpa bantuan naskah tertulis.\""
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Kalimat tersebut mengekspresikan perhatian, rasa empati, dan kepedulian terhadap kelestarian lingkungan dan penanganan sampah."
+      },
+      "distractorWhy": {
+        "1": "Kalimat tersebut memuat pernyataan fakta data kuantitatif.",
+        "2": "Kalimat tersebut memuat sapaan pembuka pidato.",
+        "3": "Kalimat tersebut memuat definisi metode berpidato."
+      }
+    },
+    {
+      "id": "ind-d-8-b6-q13",
+      "difficulty": "sedang",
+      "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VIII (Bab VI), urutan langkah awal yang tepat dalam menyusun teks pidato sebelum mengumpulkan fakta dan data adalah…",
+      "options": [
+        "Memilih dan menentukan topik, lalu menentukan tujuan pidato dan menyusun kerangka pidato",
+        "Berpidato di depan umum terlebih dahulu baru menentukan topik dan kerangka naskah",
+        "Menghafal naskah pidato secara keseluruhan lalu menyusun ucapan salam pembuka",
+        "Menyunting tata bahasa naskah pidato sebelum menentukan masalah yang akan dibahas"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Langkah penulisan pidato dimulai dengan menentukan topik yang dikuasai/disukai, menetapkan tujuan pidato, lalu membuat kerangka bagian pidato sebelum mencari data pendukung."
+      },
+      "distractorWhy": {
+        "1": "Praktik berpidato dilakukan setelah naskah pidato selesai disusun dan disunting.",
+        "2": "Menghafal naskah adalah salah satu metode berpidato, bukan langkah awal penyusunan.",
+        "3": "Menyunting merupakan tahap akhir perbaikan teks setelah naskah lengkap selesai ditulis."
+      }
+    },
+    {
+      "id": "ind-d-8-b6-q14",
+      "difficulty": "tinggi",
+      "prompt": "Cermatilah penggalan teks pidato berikut:\n\"Bapak dan Ibu Guru serta teman-teman semua. Kita telah mengetahui akibat buruk yang ditimbulkan oleh sampah. Marilah kita melatih diri untuk disiplin membuang sampah pada tempatnya. Jika perlu, kita harus mencari cara untuk mengolah sampah menjadi sesuatu yang bermanfaat...\"\nBerdasarkan analisis struktur dan kebahasaan pidato pada Bab VI Buku Siswa Bahasa Indonesia Kelas VIII, penggalan paragraf tersebut menggabungkan unsur kebahasaan…",
+      "options": [
+        "Kata sapaan khalayak, simpulan dampak masalah, dan kalimat persuasif dengan kata penanda 'marilah'",
+        "Salam keagamaan lima agama, permohonan maaf penutup, dan kata ilmiah astronomi",
+        "Pengenalan identitas orator, pembacaan rima puisi, dan larangan hukum perundang-undangan",
+        "Biodata pengurus OSIS, paparan anggaran biaya sekolah, dan salam perpisahan alumni"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Paragraf tersebut memuat sapaan khalayak ('Bapak dan Ibu Guru serta teman-teman'), penegasan pemahaman dampak sampah, serta ajakan persuasif yang ditandai kata 'marilah'."
+      },
+      "distractorWhy": {
+        "1": "Teks tidak mengandung ucapan salam keagamaan lima agama maupun istilah astronomi.",
+        "2": "Teks tidak memuat unsur naskah puisi atau perundang-undangan.",
+        "3": "Teks tidak membahas rincian anggaran biaya atau biodata pengurus."
+      }
+    },
+    {
+      "id": "ind-d-8-b6-q15",
+      "difficulty": "tinggi",
+      "prompt": "Seorang orator menyampaikan pidato pada acara sekolah. Ia tidak membaca naskah secara utuh kata demi kata, melainkan hanya membawa lembaran catatan kecil yang memuat garis-garis besar topik dan poin penting yang hendak disampaikan.\nBerdasarkan penjelasannya pada Bab VI Buku Siswa Bahasa Indonesia Kelas VIII, metode berpidato yang diterapkan oleh orator tersebut dinamakan…",
+      "options": [
+        "Ekstempore, karena menyampaikan pidato dengan bantuan kerangka/garis besar topik",
+        "Manuskrip, karena membaca seluruh teks naskah pidato kata demi kata sampai selesai",
+        "Memoriter, karena menghafal seluruh isi teks naskah pidato tanpa membawa catatan",
+        "Impromptu, karena berpidato secara mendadak tanpa ada persiapan naskah atau catatan sama sekali"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Metode ekstempore dilakukan dengan menyiapkan catatan garis besar atau poin-poin penting isi pidato sebagai panduan alur berbicara."
+      },
+      "distractorWhy": {
+        "1": "Metode manuskrip mewajibkan pembacaan naskah lengkap secara verbatim.",
+        "2": "Metode memoriter mengandalkan hafalan total tanpa lembaran catatan di tangan.",
+        "3": "Metode impromptu dilakukan mendadak tanpa ada waktu menyiapkan catatan garis besar."
+      }
+    },
+    {
+      "id": "ind-d-8-b6-q16",
+      "difficulty": "tinggi",
+      "prompt": "Cermatilah kutipan kalimat pidato berikut:\n\"KLHK merilis bahwa jumlah timbunan sampah nasional sebesar 175.000 ton per hari dengan asumsi sampah per orang 0,7 kg. Produksi sampah yang sangat besar ini akan berakibat fatal jika diikuti oleh perilaku tidak terpuji masyarakat.\"\nBerdasarkan kotak Jelajah Kata Bab VI Buku Siswa Bahasa Indonesia Kelas VIII, arti kata 'asumsi' dan 'fatal' secara berurutan adalah…",
+      "options": [
+        "Dugaan atau landasan berpikir yang dianggap benar; serta kesalahan/perilaku yang berakibat buruk",
+        "Kenyataan objektif yang teruji di laboratorium; serta keuntungan finansial yang sangat melimpah",
+        "Keputusan hukum perundang-undangan; serta hasil musyawarah kesepakatan bersama",
+        "Rekomendasi tertulis dari tokoh; serta imbauan resmi dari lembaga daerah"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Menurut kotak Jelajah Kata halaman 205, asumsi berarti dugaan atau landasan berpikir yang dianggap benar, sedangkan fatal berarti perilaku atau kesalahan yang berakibat buruk."
+      },
+      "distractorWhy": {
+        "1": "Arti tersebut bertolak belakang dengan makna asumsi dan fatal.",
+        "2": "Merupakan definisi istilah perundang-undangan atau musyawarah.",
+        "3": "Merupakan definisi dari anjuran atau surat imbauan resmi."
+      }
+    },
+    {
+      "id": "ind-d-8-b6-q17",
+      "difficulty": "tinggi",
+      "prompt": "Menurut penjelasan pada Bab VI Buku Siswa Bahasa Indonesia Kelas VIII (halaman 206), pendengar atau pembaca dapat menyimpulkan pesan-pesan yang terkandung dalam naskah pidato melalui tiga langkah mendasar, yaitu…",
+      "options": [
+        "Menemukan topik/gagasan pidato, memahami isi teks pidato, dan mencermati kata-kata yang sering muncul",
+        "Menghafal seluruh naskah pidato, mengukur durasi waktu berbicara, dan menilai intonasi orator",
+        "Mengubah teks pidato menjadi naskah drama, mencatat kata ilmiah, dan menghitung jumlah paragraf",
+        "Menuliskan salam pembuka lima agama, membuat spanduk promosi, dan mengamati gestur audiens"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Buku siswa menjelaskan 3 cara mengidentifikasi pesan pidato: (1) menemukan topik/gagasan pidato, (2) memahami isi teks pidato, dan (3) mencermati kata-kata yang sering muncul dalam teks."
+      },
+      "distractorWhy": {
+        "1": "Tiga hal tersebut merupakan aspek teknik penyampaian pidato, bukan cara menemukan pesan pidato.",
+        "2": "Mengubah bentuk teks menjadi drama dan menghitung paragraf tidak menjamin pemahaman pesan.",
+        "3": "Salam lima agama dan spanduk adalah unsur pelengkap pembuka dan media visual."
+      }
+    },
+    {
+      "id": "ind-d-8-b6-q18",
+      "difficulty": "tinggi",
+      "prompt": "Dalam Bab VI Buku Siswa Bahasa Indonesia Kelas VIII (halaman 215), salah satu langkah penting sebelum menyusun teks pidato adalah memperhitungkan durasi atau lamanya pidato jika dipraktikkan. Alasan utama menentukan alokasi waktu tersebut adalah…",
+      "options": [
+        "Agar pidato dapat disampaikan dalam waktu yang pas serta sesuai dengan situasi dan alokasi susunan acara",
+        "Supaya pembawa pidato dapat menghabiskan waktu acara meskipun materi keluar dari topik utama",
+        "Agar pendengar merasa jenuh sehingga tidak memberikan pertanyaan kritis kepada orator",
+        "Untuk memastikan teks pidato memiliki jumlah paragraf yang sangat tebal"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Menentukan lamanya pidato bertujuan agar teks yang disusun pas dengan alokasi waktu yang diberikan panitia acara serta efisien bagi pendengar."
+      },
+      "distractorWhy": {
+        "1": "Pidato tidak boleh melebar ke luar topik hanya demi menghabiskan alokasi waktu.",
+        "2": "Pidato hendaknya membuat pendengar antusias, bukan membuat jenuh.",
+        "3": "Kualitas pidato diukur dari ketepatan pesan dan struktur, bukan ketebalan halaman naskah."
+      }
+    },
+    {
+      "id": "ind-d-8-b6-q19",
+      "difficulty": "tinggi",
+      "prompt": "Dalam penyusunan teks pidato di lingkungan majemuk, pembawa pidato sering menggunakan salam keagamaan resmi. Berdasarkan Bab VI Buku Siswa Bahasa Indonesia Kelas VIII, pasangan ucapan salam keagamaan beserta makna/asal agama yang tepat adalah…",
+      "options": [
+        "'Namo Buddhaya' dari agama Buddha yang bermakna terpujilah Buddha, serta 'Salam Kebajikan' dari agama Konghucu",
+        "'Om Swastiastu' dari agama Kristen Katolik yang bermakna ucapan selamat pagi bagi seluruh jemaat",
+        "'Salam Sejahtera' dari agama Hindu yang bermakna permohonan maaf kepada para dewa",
+        "'Assalamualaikum' dari agama Konghucu yang bermakna kedamaian bagi seluruh umat manusia"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Namo Buddhaya merupakan ucapan salam agama Buddha (terpujilah Buddha) dan Salam Kebajikan merupakan salam agama Konghucu."
+      },
+      "distractorWhy": {
+        "1": "Om Swastiastu merupakan ucapan salam dari agama Hindu.",
+        "2": "Salam Sejahtera merupakan ucapan salam dari agama Kristen dan Katolik.",
+        "3": "Assalamualaikum merupakan ucapan salam dari agama Islam."
+      }
+    }
+  ]
+}

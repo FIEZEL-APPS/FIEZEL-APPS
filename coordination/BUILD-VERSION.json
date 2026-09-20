@@ -1,7 +1,7 @@
 {
-  "version": "m025-352",
+  "version": "m025-353",
   "claimedBy": "branch main",
-  "claimedAt": "2026-09-20T21:03:01.260Z",
-  "reason": "F8 wali kelas + F10 papan kelas: agregat coverage per mapel dan grid TP x murid + gerbang baru",
+  "claimedAt": "2026-09-20T21:26:36.188Z",
+  "reason": "bank 5 mapel inti + 3 chunk buku offline-first + status seed jujur Owner",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }

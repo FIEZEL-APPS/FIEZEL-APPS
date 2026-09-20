@@ -106,6 +106,22 @@
       ],
       "mulai": "2026-09-07T02:14:39Z",
       "catatan": "m025-291 memperbaiki bank Jepang yang ditimpa di load(); m025-292 menambah bank kosakata Jepang 1.370 entri. Menyentuh juga app.js, sw.js, quality.yml."
+    },
+    {
+      "sesi": "ses_f3f6b8fc5ffek1kzJxphTr2HPB",
+      "peran": "opencode / bank 5 mapel inti + 3 chunk buku offline-first + status seed jujur Owner",
+      "paths": [
+        "backend/seed_soal.py",
+        "features/teacher/fiezel-teacher-curriculum.js",
+        "workers/owner/index.js",
+        "tools/convert_chunk_to_seed.js",
+        "tools/chunk_ind_8_b6.json",
+        "tools/chunk_ips_7_t4.json",
+        "tools/chunk_ips_8_t1.json",
+        "tests/th-ui-leak-test.js"
+      ],
+      "mulai": "2026-09-21T00:00:00+07:00",
+      "catatan": "Lanjutan sesi sebelah: 5 unit mapel inti + 3 unit chunk buku (IND-8-BAB6, IPS-7-T4, IPS-8-T1) offline-first; triggerMasterSeed jujur 25 dtk + readCurriculumStatus; per_mapel di soal_status. TIDAK menyentuh seed_mapel.py (BAB/TEMA bukan elemen CP), sw.js, atau jalur Thai runtime (keputusan owner)."
     }
   ],
   "finished": [

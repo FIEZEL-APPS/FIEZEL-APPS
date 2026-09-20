@@ -139,8 +139,13 @@ const ALLOWLIST = Object.freeze({
       11 -> 19 (2026-09-21, 5 Mapel Inti SMP): bank diperdalam 15 bab/115 soal menjadi
       20 bab/155 soal (MAT, IND, IPA, IPS, PPKN offline-first, sumber backend/seed_soal.py SOAL_*).
       Pemindai menghitung 8 penanda/catatan pembahasan Indonesia baru. Alasan sama: pembahasan
-      Kurikulum Merdeka untuk guru Indonesia; bukan naskah UI. Ukuran isi, bukan utang. */
-  'features/teacher/fiezel-teacher-curriculum.js': 19,
+      Kurikulum Merdeka untuk guru Indonesia; bukan naskah UI. Ukuran isi, bukan utang.
+
+      19 -> 25 (2026-09-21, 3 chunk buku teks): bank diperdalam 20 bab/155 soal menjadi
+      23 bab/214 soal (IND-8 Bab VI Pidato 19 butir, IPS-7 Tema IV 20 butir, IPS-8 Tema 01
+      20 butir; sumber tools/chunk_*.json dari skrip ekstraksi sesi sebelah, ter auditing
+      59/59 valid + nol sebut-posisi). Alasan sama. */
+  'features/teacher/fiezel-teacher-curriculum.js': 25,
   'features/speaking-listening/listening-scenarios-a1.js': 15,  // +4 judul 'Menunggu...' setelah 'Menunggu' masuk daftar kata (m025-351) — konten belajar, jalur th lewat sidecar
   'features/speaking-listening/listening-scenarios-a2.js': 14,  // +2 idem
   /* UTANG BARU TERLIHAT — m025-314, 14 September 2026. Empat entri di bawah TIDAK lahir di
