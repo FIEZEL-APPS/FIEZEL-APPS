@@ -33,9 +33,132 @@
   function today() { var d = new Date(); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); }
   function icon(n) { return '<i data-lucide="' + n + '" aria-hidden="true"></i>'; }
   function fmtDate(v) { try { var d = typeof v === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(v) ? new Date(v + 'T00:00:00') : new Date(v); return d.toLocaleDateString('id-ID', { weekday: 'short', day: 'numeric', month: 'short' }); } catch (_) { return String(v || ''); } }
-  function skillLabel(k) { var TS = T(), RV = R(); return (TS && TS.SKILL_LABEL[k]) || (RV && RV.SKILL_LABEL[k]) || k; }
+  /* 'curriculum' adalah kunci mesin milik misi kurikulum dan tidak ada di tabel skill mana
+     pun; tanpa baris ini ia tercetak mentah di peta skill murid (temuan K11). */
+  function skillLabel(k) {
+    if (k === 'curriculum') return t('kelas.skill-kurikulum', 'Misi Kurikulum');
+    var TS = T(), RV = R();
+    return (TS && TS.SKILL_LABEL[k]) || (RV && RV.SKILL_LABEL[k]) || k;
+  }
   function readJson(k, fb) { try { var v = JSON.parse(localStorage.getItem(k)); return v == null ? fb : v; } catch (_) { return fb; } }
   function writeJson(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (_) {} }
+
+  /* ===== PASPOR KOMPETENSI — buku yang tidak boleh bocor dan tidak boleh lupa (m025-349) ==
+     Dulu stempel paspor dihitung ulang dari SUB_KEY, daftar kiriman yang dipotong
+     `slice(-30)` demi menjaga ukuran localStorage. Dua akibatnya nyata, dan dua-duanya
+     menghukum murid yang paling rajin lebih dulu:
+
+       1. LUPA. Kiriman ke-31 mendorong keluar kiriman pertama, dan stempel "Tuntas" untuk
+          bab itu ikut keluar bersamanya — tanpa pemberitahuan, tanpa jejak.
+       2. BOCOR. Pencocokannya memakai `u.genre`, dan genre BUKAN kunci unik: "Procedure
+          Text" dipakai unit Kelas 7 DAN Kelas 9, "Narrative Text" Kelas 8 DAN Kelas 10,
+          "Descriptive Text" dua unit sekaligus. Menuntaskan yang satu mencap yang lain,
+          termasuk bab dua tingkat di atasnya yang belum pernah dibuka murid.
+
+     Buku ini memisahkan BUKTI dari RIWAYAT. Riwayat kiriman tetap dipotong — ia memang
+     hanya memberi makan daftar "Selesai" di layar Tugas. Bukti penguasaan pindah ke sini,
+     dikunci pada ID UNIT, dan tidak pernah dipotong: lima belas unit adalah lima belas
+     baris, beberapa ratus byte seumur hidup akun.
+
+     Terbaik DAN terakhir disimpan, bukan salah satu. Kode lama mengklaim "ambil yang
+     terbaik" saat membaca sementara penulisannya menimpa dengan percobaan terakhir — dua
+     aturan yang bertentangan di satu layar, sehingga tombol "Ulangi Misi" diam-diam bisa
+     mencabut stempel yang sudah diperoleh. Sekarang stempelnya memakai yang TERBAIK
+     (mengulang tidak pernah merugikan) dan layarnya menyebut yang terakhir bila berbeda. */
+  var PASS_KEY = 'fiezel-class-passport-v1';
+  function passport() {
+    var p = readJson(PASS_KEY, null);
+    if (p && p.units) return p;
+    /* Migrasi sekali jalan: akun yang sudah punya stempel sebelum buku ini ada tetap
+       membawanya. Yang dibaca HANYA kiriman misi (`misi_<unitId>`) — tugas guru tidak
+       pernah menjadi bukti unit kurikulum, dan justru itulah kebocoran yang ditutup. */
+    p = { v: 1, units: {} };
+    try {
+      subs().forEach(function (s) {
+        if (!s || String(s.id || '').indexOf('misi_') !== 0 || !s.t) return;
+        var uid = s.unitId || String(s.id).slice(5);
+        if (!uid) return;
+        p.units[uid] = { n: 1, bc: s.c, bt: s.t, lc: s.c, lt: s.t, firstAt: s.at || 0, at: s.at || 0 };
+      });
+    } catch (_) {}
+    writeJson(PASS_KEY, p);
+    return p;
+  }
+  var TUNTAS = 0.7;
+  var HARI = 24 * 60 * 60 * 1000;
+  /* JADWAL PENGULANGAN (m025-349, temuan K3 + fitur F4).
+     "Tuntas" dari satu percobaan delapan soal, berlaku selamanya, bukan bukti penguasaan —
+     ia potret akurasi. Kartu induknya menjanjikan "bukti penguasaan materi"; janji itu baru
+     ditepati kalau stempelnya bisa memudar.
+
+     Jaraknya melebar setiap kali bab itu tuntas lagi: seminggu, tiga minggu, dua bulan.
+     Angka-angka ini bukan hasil kalibrasi FIEZEL dan tidak berpura-pura begitu — ia jarak
+     yang lazim dipakai pengulangan berjarak, cukup untuk membuat stempel berarti "masih
+     bisa" alih-alih "pernah bisa". Bab yang belum tuntas ditawarkan lagi dua hari lagi. */
+  var JARAK_ULANG = [7, 21, 60];
+  function jadwalBerikutnya(row, lulus, at) {
+    if (!lulus) return at + 2 * HARI;
+    /* `streak` SUDAH dinaikkan saat fungsi ini dipanggil, jadi tuntas pertama bernilai 1.
+       Tanpa -1 di sini, tuntas pertama langsung melompat ke 21 hari — jarak yang pantas
+       untuk bab yang sudah dua kali tuntas, bukan untuk yang baru sekali. */
+    var tingkat = Math.min(Math.max((row.streak || 1) - 1, 0), JARAK_ULANG.length - 1);
+    return at + JARAK_ULANG[tingkat] * HARI;
+  }
+
+  /**
+   * @param {string} unitId
+   * @param {number} c benar
+   * @param {number} total soal
+   * @param {number} at waktu selesai
+   * @param {Object} [perSub] { <subChapterId>: { c, t } } — hasil per sub-bab percobaan ini
+   */
+  function passportRecord(unitId, c, total, at, perSub) {
+    if (!unitId || !total) return;
+    var p = passport(), row = p.units[unitId];
+    if (!row) row = p.units[unitId] = { n: 0, bc: 0, bt: 0, lc: 0, lt: 0, firstAt: at, at: at };
+    var lulus = (c / total) >= TUNTAS;
+    row.n = (row.n || 0) + 1;
+    row.lc = c; row.lt = total; row.at = at;
+    if (!row.firstAt) row.firstAt = at;
+    if (!row.bt || (c / total) > (row.bc / row.bt)) { row.bc = c; row.bt = total; }
+    row.streak = lulus ? (row.streak || 0) + 1 : 0;
+    row.due = jadwalBerikutnya(row, lulus, at);
+    /* Per sub-bab disimpan dari percobaan TERAKHIR, bukan terbaik: yang ingin dijawab
+       layar "latih yang belum kuat" adalah "apa yang masih goyah SEKARANG", dan sub-bab
+       yang dulu benar lalu kini salah justru yang paling perlu diulang. */
+    if (perSub) {
+      row.sub = row.sub || {};
+      Object.keys(perSub).forEach(function (k) {
+        if (perSub[k] && perSub[k].t) row.sub[k] = { c: perSub[k].c, t: perSub[k].t };
+      });
+    }
+    writeJson(PASS_KEY, p);
+  }
+  function passportOf(unitId) {
+    var row = passport().units[unitId];
+    if (!row || !row.bt) return null;
+    var acc = row.bc / row.bt;
+    var due = row.due || 0;
+    return {
+      acc: acc, c: row.bc, t: row.bt,
+      lastAcc: row.lt ? row.lc / row.lt : null, lastC: row.lc, lastT: row.lt,
+      n: row.n || 1, at: row.at || 0,
+      sub: row.sub || {},
+      due: due,
+      /* Tuntas TAPI sudah lewat jadwal ulang: bukan gagal, bukan pula "masih bisa". */
+      perluUlang: acc >= TUNTAS && !!due && Date.now() >= due,
+      tuntas: acc >= TUNTAS
+    };
+  }
+  /** Sub-bab yang masih goyah pada percobaan terakhir — bahan tombol "latih yang belum kuat". */
+  function subLemah(unitId) {
+    var m = passportOf(unitId);
+    if (!m) return [];
+    return Object.keys(m.sub).filter(function (k) {
+      var r = m.sub[k];
+      return r && r.t && (r.c / r.t) < TUNTAS;
+    });
+  }
   function statusOf(a, rec) { return R().assignmentStatus(a, rec, today()); }
   function statusChip(s) { return '<span class="ch-status is-' + s.id + (s.late && s.id === 'selesai' ? ' is-late-done' : '') + '">' + esc(s.label) + (s.id === 'selesai' && s.late ? ' (terlambat)' : '') + '</span>'; }
   function deadlineText(a) { if (!a.deadline) return 'Tanpa tenggat'; var d = R().daysLeft(a.deadline, today()); return d < 0 ? 'Lewat ' + (-d) + ' hari' : d === 0 ? 'Tenggat hari ini' : d === 1 ? 'Tenggat besok' : 'Tenggat ' + d + ' hari lagi · ' + fmtDate(a.deadline); }
@@ -69,7 +192,8 @@
     var p = assignments().map(function (a) { return a.id + ':' + (a.itemIds ? a.itemIds.length : 0) + ':' + (a.deadline || ''); }).join(',');
     var d = subs().map(function (s) { return s.id + ':' + (s.at || 0) + ':' + (s.c || 0) + '/' + (s.t || 0); }).join(',');
     var run = u.runner ? (u.runner.aid + ':' + u.runner.idx + ':' + u.runner.finished + ':' + (u.runner.chosen != null ? u.runner.chosen : '')) : '';
-    return (u.tab || '') + '|' + (u.curriculumView || '') + '|' + (u.review || '') + '|' + (u.editCode ? '1' : '0') + '|' + (u.filterSubject || '') + '|' + (Array.isArray(u.classTeachers) ? u.classTeachers.length : 0) + '|' + (classCode() || '') + '|' + (teacherName() || '') + '|' + p + '|' + d + '|' + run + '|' + studentDraftCode;
+    var ci = ''; try { var Mi = CI(); if (Mi) { var sn = Mi.snapshot(); ci = (sn.missions || []).map(function (m) { return m.id + ':' + (m.started ? 1 : 0) + ':' + (m.finished ? 1 : 0); }).join(','); } } catch (_) {}
+    return ci + '|' + (u.tab || '') + '|' + (u.curriculumView || '') + '|' + (u.review || '') + '|' + (u.editCode ? '1' : '0') + '|' + (u.filterSubject || '') + '|' + (Array.isArray(u.classTeachers) ? u.classTeachers.length : 0) + '|' + (classCode() || '') + '|' + (teacherName() || '') + '|' + p + '|' + d + '|' + run + '|' + studentDraftCode;
   }
   function ui() { if (!sUi) { sUi = readJson(UI_KEY, {}); sUi.tab = sUi.tab || 'tugas'; sUi.runner = sUi.runner || null; } return sUi; }
   function saveUi() { writeJson(UI_KEY, sUi); }
@@ -224,6 +348,21 @@
     return !!getCurriculum() || konsolKurikulumSiap();
   }
 
+  /* PINTU KE MISI BELAJAR ADAPTIF (m025-349, temuan X3).
+     ==========================================================================
+     misi.html menjalankan mesin misi yang sesungguhnya: goal → alasan → pemanasan →
+     contoh → latihan → tantangan → transfer → cek, dengan penilaian keyakinan, petunjuk
+     bertingkat, diagnosis miskonsepsi, dan jadwal ulang berbasis retensi. Sampai baris
+     ini ditulis, satu-satunya tautan menujunya di seluruh repo ada di teacher-console.js
+     — yaitu di layar GURU. Murid tidak punya jalan ke sana dari dalam aplikasi, dan yang
+     mereka temui di jalan utama justru versi yang jauh lebih lemah: 15 unit statis.
+
+     Syaratnya BUKAN kurikulumTersedia(). Yang itu juga benar ketika hanya modul lokal
+     yang ada, dan misi.html tanpa backend adalah pintu ke ruangan kosong — persis yang
+     ditutup m025-296 untuk konsol guru. Pintu ini hanya berdiri kalau alamat backendnya
+     benar-benar terisi. */
+  function misiAdaptifSiap() { return konsolKurikulumSiap(); }
+
   function mountStudent(el, env) {
     sEl = el; sEnv = env || {}; ui();
     if (!el.__chStudentBound) {
@@ -249,6 +388,13 @@
     if (pendingOpen) { var id = pendingOpen; pendingOpen = null; if (openAssignment(id)) return; }
     resumeFocus();
     try { fetchClassTeachers(); } catch (_) {}
+    /* Kabar kurikulum diambil paling banyak sekali per lima menit (lihat perluRefresh),
+       dan kegagalannya berakhir sebagai daftar kosong — tab Tugas tidak boleh bergantung
+       pada layanan lain yang hidup. */
+    try {
+      var M = CI();
+      if (M && M.perluRefresh()) M.refresh().then(function () { renderStudent({ quiet: true }); }).catch(function () {});
+    } catch (_) {}
     renderStudent();
   }
   function unmountStudent() { if (timerTick) clearInterval(timerTick); timerTick = null; unbindFocus(); sEl = null; pendingStudentRender = false; lastStudentPaintKey = null; lastStudentDataFp = null; }
@@ -408,10 +554,28 @@
     try { if (root.FiezelExamLock) root.FiezelExamLock.end('assignment'); } catch (_) {}
     if (ui().focus && FG()) { var fst = ui().focus; if (fst.awaySince) FG().back(fst, Date.now()); focus = FG().payload(fst, Date.now()); }
     unbindFocus();
-    var res = null; try { res = LF() ? LF().recordAssignmentResult({ id: a.id, title: a.title, skill: a.skills[0], mode: a.mode, minutes: Math.round((Date.now() - r.startedAt) / 60000), results: r.answers, focus: focus }) : null; } catch (_) {}
+    var res = null; try { res = LF() ? LF().recordAssignmentResult({ id: a.id, title: a.title, skill: a.skills[0], mode: a.mode, minutes: Math.round((Date.now() - r.startedAt) / 60000), results: r.answers, focus: focus, selfDirected: !!a.isMission }) : null; } catch (_) {}
     var correct = r.answers.filter(function (x) { return x.correct; }).length;
-    var sub = { id: a.id, title: a.title, from: a.from, teacher: a.teacher || '', cls: a.cls || classCode(), skills: a.skills, mode: a.mode, deadline: a.deadline || null, at: Date.now(), c: correct, t: r.answers.length, results: r.answers, itemIds: a.itemIds, items: a.items || undefined, sent: !!res };
+    var sub = { id: a.id, title: a.title, from: a.from, teacher: a.teacher || '', cls: a.cls || classCode(), skills: a.skills, mode: a.mode, deadline: a.deadline || null, at: Date.now(), c: correct, t: r.answers.length, results: r.answers, itemIds: a.itemIds, items: a.items || undefined, unitId: a.unitId || undefined, sent: !!res };
     var list = subs().filter(function (x) { return x.id !== a.id; }); list.push(sub); writeJson(SUB_KEY, list.slice(-30));
+    /* Bukti unit kurikulum ditulis ke buku yang TIDAK dipotong. Baris di atas sengaja
+       dibiarkan memotong: ia riwayat layar Tugas, bukan bukti penguasaan. */
+    if (a.isMission && a.unitId) {
+      /* Hasil per sub-bab dihitung di sini, bukan disimpan di runner: `itemId` sudah ada
+         di setiap jawaban, dan padanan sub-babnya ada di butir soalnya. */
+      var perSub = {};
+      try {
+        r.answers.forEach(function (jw) {
+          var it = resolveItem(a, jw.itemId);
+          var sc = it && it.subChapterId;
+          if (!sc) return;
+          if (!perSub[sc]) perSub[sc] = { c: 0, t: 0 };
+          perSub[sc].t += 1;
+          if (jw.correct) perSub[sc].c += 1;
+        });
+      } catch (_) {}
+      passportRecord(a.unitId, correct, r.answers.length, sub.at, perSub);
+    }
     if (!res) { try { var TS = T(); writeJson(TS.ASSIGN_KEY, assignments().filter(function (x) { return x.id !== a.id; })); } catch (_) {} }
     r.finished = true; r.result = { c: correct, t: r.answers.length, title: a.title, teacher: a.teacher || a.from }; saveUi();
     try { root.refreshNotifBadge && root.refreshNotifBadge(); } catch (_) {}
@@ -462,7 +626,7 @@
     var body = u.runner && !u.paused ? runnerView() : u.review ? reviewView(u.review) : u.curriculumView ? curriculumModalView(u.curriculumView) : u.tab === 'papan' ? papanView() : u.tab === 'kelas' ? kelasView() : u.tab === 'progres' ? progresView() : tugasView(pend, done);
     sEl.innerHTML = '<section class="ch ch-student' + (repaint ? ' is-repaint' : '') + '" data-testid="class-hub-student">' +
       '<header class="ch-head"><div><h1 data-testid="class-hub-title">' + (className() ? esc(className()) : (classCode() ? WM + ' ' + esc(classCode()) : t('kelas.belum-terhubung', 'Belum terhubung ke ') + WM)) + '</h1><p class="ch-sub">' + (teacherName() ? 'Guru: <b>' + esc(teacherName()) + '</b>' + (classCode() ? ' · ' : '') : '') + (classCode() ? 'Kode ' + esc(classCode()) : '') + '</p></div></header>' +
-      (u.runner && !u.paused || u.curriculumView ? '' : '<nav class="ch-tabs" role="tablist">' + [['tugas', t('umum.tugas', 'Tugas'), pend.length], ['papan', t('kelas.papan-kelas', 'Papan'), 0], ['kelas', WM, 0]].map(function (t) { return '<button type="button" role="tab" class="ch-tab' + (u.tab === t[0] && !u.review ? ' is-active' : '') + '" data-ch="tab" data-tab="' + t[0] + '" data-testid="class-tab-' + t[0] + '">' + t[1] + (t[2] ? '<span class="ch-badge">' + t[2] + '</span>' : '') + '</button>'; }).join('') + '</nav>') +
+      (u.runner && !u.paused || u.curriculumView ? '' : '<nav class="ch-tabs" role="tablist">' + [['tugas', t('umum.tugas', 'Tugas'), pend.length], ['papan', t('kelas.papan-kelas', 'Papan'), 0], ['progres', t('kelas.tab-progres', 'Progres'), 0], ['kelas', WM, 0]].map(function (t) { return '<button type="button" role="tab" class="ch-tab' + (u.tab === t[0] && !u.review ? ' is-active' : '') + '" data-ch="tab" data-tab="' + t[0] + '" data-testid="class-tab-' + t[0] + '">' + t[1] + (t[2] ? '<span class="ch-badge">' + t[2] + '</span>' : '') + '</button>'; }).join('') + '</nav>') +
       body + '</section>';
     if (activeSaved) {
       try {
@@ -494,6 +658,70 @@
       '<div class="ch-card-foot"><span class="ch-deadline' + (st.late ? ' is-late' : '') + '">' + icon('calendar') + ' ' + (pending ? esc(deadlineText(a)) : 'Selesai ' + esc(fmtDate(a.at))) + '</span>' +
       (pending ? '<button type="button" class="ch-btn is-primary" data-ch="open" data-id="' + esc(a.id) + '" data-testid="class-open-' + esc(a.id) + '">' + (inProgress ? 'Lanjutkan' : 'Kerjakan') + ' ' + icon('arrow-right') + '</button>' : '<button type="button" class="ch-btn is-ghost" data-ch="review" data-id="' + esc(a.id) + '" data-testid="class-review-' + esc(a.id) + '"><b>' + pct(a.t ? a.c / a.t : null) + '</b> · Lihat hasil</button>') + '</div></article>';
   }
+  /* ===== TARGET MINGGU INI (m025-349, fitur F6) ========================================
+     Lima belas kartu misi sejajar adalah KATALOG, bukan jalur. Murid yang membukanya
+     menghadapi lima belas pilihan yang tampak setara dan memilih berdasarkan judul yang
+     paling ramah — padahal datanya sudah cukup untuk menyebut satu langkah berikutnya
+     beserta alasannya.
+
+     Urutan pemilihannya sengaja menaruh PENGULANGAN di atas MATERI BARU: bab yang sudah
+     lewat jadwal ulang sedang meluruh, dan meluruhnya tidak terlihat sampai ia benar-benar
+     hilang. Sesudahnya sub-bab yang goyah, baru bab yang belum pernah dibuka.
+
+     Selalu menyebut ALASAN. Kartu yang berkata "kerjakan ini" tanpa mengatakan kenapa
+     hanya memindahkan pilihan, tidak menghapusnya. */
+  function targetMingguIni() {
+    var FC = getCurriculum();
+    if (!FC) return null;
+    var units = FC.allUnits();
+    if (!units.length) return null;
+    var perluUlang = null, goyah = null, baru = null;
+    for (var i = 0; i < units.length; i++) {
+      var u = units[i], m = passportOf(u.id);
+      if (!m) { if (!baru) baru = u; continue; }
+      if (m.perluUlang && !perluUlang) perluUlang = { unit: u, m: m };
+      if (!m.tuntas && !goyah) goyah = { unit: u, m: m };
+    }
+    if (perluUlang) {
+      return {
+        unit: perluUlang.unit, aksi: 'start-mission', sub: null,
+        alasan: t('kelas.target-alasan-ulang', 'Sudah lewat jadwal ulang. Diulang sekarang selagi masih mudah diingat.')
+      };
+    }
+    if (goyah) {
+      var lemah = subLemah(goyah.unit.id);
+      return {
+        unit: goyah.unit, aksi: lemah.length ? 'start-weak' : 'start-mission', sub: lemah,
+        alasan: lemah.length
+          ? t('kelas.target-alasan-lemah', '{n} sub-bab masih goyah di percobaan terakhirmu.', { n: lemah.length })
+          : t('kelas.target-alasan-belum-tuntas', 'Bab ini belum tuntas di percobaan terakhirmu.')
+      };
+    }
+    if (baru) {
+      return {
+        unit: baru, aksi: 'start-mission', sub: null,
+        alasan: t('kelas.target-alasan-baru', 'Bab berikutnya yang belum pernah kamu buka.')
+      };
+    }
+    return null;
+  }
+
+  function targetCard() {
+    if (!kurikulumTersedia()) return '';
+    var g = targetMingguIni();
+    if (!g) return '';
+    return '<section class="ch-card ch-target-card" data-testid="class-target-card">' +
+      '<span class="ch-kicker">' + icon('target') + ' ' + esc(t('kelas.target-kicker', 'Target Minggu Ini')) + '</span>' +
+      '<h3>' + esc(g.unit.title) + '</h3>' +
+      '<p class="ch-muted ch-small">' + esc(g.alasan) + '</p>' +
+      '<div class="ch-actions">' +
+        '<button type="button" class="ch-btn is-primary" data-ch="' + g.aksi + '" data-unit="' + esc(g.unit.id) + '" data-testid="class-target-start">' +
+          icon('play') + ' ' + esc(t('kelas.target-mulai', 'Mulai sekarang')) + '</button>' +
+        '<button type="button" class="ch-btn is-ghost" data-ch="open-passport">' + icon('award') + ' ' + esc(t('kelas.paspor-belajar', 'Paspor Belajar')) + '</button>' +
+      '</div>' +
+    '</section>';
+  }
+
   function curriculumCard() {
     if (!kurikulumTersedia()) return '';
     return '<section class="ch-card ch-curriculum-panel" data-testid="class-curriculum-panel">' +
@@ -503,10 +731,53 @@
       '</div>' +
       '<h3>' + esc(t('kelas.misi-belajar-judul', 'Misi Belajar & Paspor Kompetensi')) + '</h3>' +
       '<p class="ch-muted">' + esc(t('kelas.misi-belajar-desc', 'Alur belajar adaptif berbasis capaian pembelajaran: tujuan jelas, diagnosis otomatis, dan bukti penguasaan materi.')) + '</p>' +
+      /* RUANG LINGKUP DISEBUT, BUKAN DISEMBUNYIKAN. Kartu ini duduk tepat di sebelah panel
+         "Kurikulum Merdeka (17 Mapel)", sementara isinya hari ini hanya Bahasa Inggris
+         Fase D-F. Murid yang membukanya untuk mencari Matematika berhak tahu sebelum
+         mengetuk, bukan sesudah. Baris ini turun sendiri begitu mapel lain menyusul. */
+      '<p class="ch-muted ch-small ch-curriculum-scope" data-testid="class-curriculum-scope">' + icon('info') + ' ' +
+        esc(t('kelas.misi-ruang-lingkup', 'Tersedia untuk Bahasa Inggris, Kelas 7-12 (Fase D-F). Mata pelajaran lain menyusul.')) + '</p>' +
       '<div class="ch-actions">' +
         '<button type="button" class="ch-btn is-primary" data-ch="open-curriculum" data-testid="class-open-curriculum">' + icon('compass') + ' ' + esc(t('kelas.buka-misi', 'Buka Misi Belajar')) + ' ' + icon('arrow-right') + '</button>' +
         '<button type="button" class="ch-btn is-ghost" data-ch="open-passport" data-testid="class-open-passport">' + icon('award') + ' ' + esc(t('kelas.paspor-belajar', 'Paspor Belajar')) + '</button>' +
       '</div>' +
+    '</section>';
+  }
+
+  /* ===== TUGAS DARI KURIKULUM (m025-349, temuan X4) =====================================
+     Kuis yang guru terbitkan dari konsol Kurikulum & Kompetensi hidup di backend
+     kurikulum, dan sampai gelombang ini tidak ada satu pun layar murid yang melihatnya.
+     Bagian ini membawa KABARNYA ke tempat murid benar-benar mencari tugas, lalu
+     menyerahkan pengerjaannya ke misi.html — mesin yang memang bisa menjalankannya.
+     Alasan lengkap kenapa isinya tidak disalin menjadi tugas lokal ada di
+     features/curriculum/fiezel-curriculum-inbox.js. */
+  function CI() { return root.FiezelCurriculumInbox; }
+  function curriculumInboxSection() {
+    var M = CI();
+    if (!M || !M.siap()) return '';
+    var snap = M.snapshot();
+    var list = (snap.missions || []).filter(function (m) { return !m.finished; });
+    if (!list.length) return '';
+    return '<section class="ch-curriculum-inbox" data-testid="class-curriculum-inbox">' +
+      '<h2 class="ch-h2">' + esc(t('kelas.tugas-kurikulum-judul', 'Tugas dari Kurikulum')) + ' <small>' + list.length + '</small></h2>' +
+      '<p class="ch-muted ch-small">' + esc(t('kelas.tugas-kurikulum-sub', 'Dikirim gurumu lewat konsol kurikulum. Dikerjakan di layar Misi Belajar Adaptif.')) + '</p>' +
+      list.map(function (m) {
+        return '<a class="ch-card ch-assign ch-curriculum-task" href="./misi.html" data-testid="class-curriculum-task-' + esc(m.id) + '">' +
+          '<div class="ch-card-top">' +
+            '<span class="ch-from">' + icon('compass') + ' ' + esc(m.typeLabel || t('kelas.tugas-kurikulum-kicker', 'Kurikulum')) + '</span>' +
+            (m.started
+              ? '<span class="ch-status is-sedang">' + esc(t('kelas.tugas-kurikulum-sedang', 'Sedang dikerjakan')) + '</span>'
+              : '<span class="ch-status is-belum">' + esc(t('kelas.tugas-kurikulum-baru', 'Belum dimulai')) + '</span>') +
+          '</div>' +
+          '<h3>' + esc(m.title) + '</h3>' +
+          (m.goals.length ? '<p class="ch-muted ch-small">' + esc(t('kelas.tugas-kurikulum-target', 'Target: {target}', { target: m.goals.join(' · ') })) + '</p>' : '') +
+          '<div class="ch-card-foot">' +
+            '<span class="ch-deadline">' + icon('calendar') + ' ' +
+              (m.deadline ? esc(deadlineText({ deadline: m.deadline })) : esc(t('kelas.tanpa-tenggat', 'Tanpa tenggat'))) + '</span>' +
+            '<span class="ch-btn is-primary">' + esc(m.started ? t('umum.lanjutkan', 'Lanjutkan') : t('kelas.kerjakan', 'Kerjakan')) + ' ' + icon('arrow-up-right') + '</span>' +
+          '</div>' +
+        '</a>';
+      }).join('') +
     '</section>';
   }
 
@@ -525,8 +796,19 @@
       return hasPend || hasDone;
     });
 
+    /* Kelas yang belum punya guru mapel dan belum punya tugas TIDAK dikarang isinya.
+       Kode lama memajang lima mapel pertama dari daftar — lengkap dengan lonceng hijau
+       "Lengkap" dari badge di bawah — sehingga kelas kosong tampak seperti kelas yang
+       sudah berjalan, dan murid tidak punya cara tahu bedanya. */
     if (!activeSubjects.length) {
-      activeSubjects = SUBJECTS_17.slice(0, 5);
+      return '<section class="ch-subject-panels-wrap" data-testid="class-subject-panels">' +
+        '<div class="ch-subject-panels-head"><div>' +
+          '<h3 class="ch-h3">' + icon('layers') + ' ' + esc(t('kelas.panel-mapel-judul', 'Mata Pelajaran Kelas')) + '</h3>' +
+        '</div></div>' +
+        '<div class="ch-card ch-empty" data-testid="class-subject-panels-empty">' + icon('user-plus') +
+          '<p>' + esc(t('kelas.panel-mapel-kosong', 'Belum ada guru mapel yang terdaftar di kelas ini. Kartu mata pelajaran muncul sendiri begitu gurumu mengirim tugas pertamanya.')) + '</p>' +
+        '</div>' +
+      '</section>';
     }
 
     var curFilter = u.filterSubject || null;
@@ -549,10 +831,14 @@
           return '<button type="button" class="ch-subject-card' + (isSelected ? ' is-active' : '') + '" data-ch="filter-subject" data-subject="' + esc(s.id) + '" data-testid="subject-card-' + esc(s.id) + '" style="--mapel-color:' + s.color + '">' +
             '<div class="ch-subject-top">' +
               '<span class="ch-subject-icon">' + icon(s.icon) + '</span>' +
-              (taskCount ? '<span class="ch-badge is-warn">' + taskCount + ' tugas</span>' : '<span class="ch-badge is-ok">Lengkap</span>') +
+              /* Nol tugas BUKAN "Lengkap". Badge hijau lama membuat mapel yang gurunya
+                 belum mengirim apa pun terbaca sebagai mapel yang sudah tuntas. */
+              (taskCount
+                ? '<span class="ch-badge is-warn">' + esc(t('kelas.mapel-tugas-menunggu', '{n} tugas', { n: taskCount })) + '</span>'
+                : '<span class="ch-badge is-mute">' + esc(t('kelas.mapel-tanpa-tugas', 'Belum ada tugas')) + '</span>') +
             '</div>' +
             '<h4 class="ch-subject-name">' + esc(s.name) + '</h4>' +
-            '<p class="ch-subject-teacher">' + (tName ? icon('user-check') + ' ' + esc(tName) : '<span class="ch-no-teacher">Menunggu guru</span>') + '</p>' +
+            '<p class="ch-subject-teacher">' + (tName ? icon('user-check') + ' ' + esc(tName) : '<span class="ch-no-teacher">' + esc(t('kelas.mapel-menunggu-guru', 'Menunggu guru')) + '</span>') + '</p>' +
           '</button>';
         }).join('') +
       '</div>' +
@@ -569,11 +855,11 @@
 
     return '<section class="ch-card ch-all-subjects" data-testid="class-all-subjects-panel">' +
       '<div class="ch-card-top">' +
-        '<span class="ch-kicker">' + icon('book-open') + ' Kurikulum Merdeka (17 Mapel)</span>' +
-        '<span class="ch-badge">' + (teachers.length ? teachers.length + ' Guru Terdaftar' : esc(t('kelas.panel-kelas-terpadu', 'Kelas Terpadu'))) + '</span>' +
+        '<span class="ch-kicker">' + icon('book-open') + ' ' + esc(t('kelas.panel-17-mapel', 'Kurikulum Merdeka (17 Mapel)')) + '</span>' +
+        '<span class="ch-badge">' + (teachers.length ? esc(t('kelas.panel-guru-terdaftar', '{n} Guru Terdaftar', { n: teachers.length })) : esc(t('kelas.panel-kelas-terpadu', 'Kelas Terpadu'))) + '</span>' +
       '</div>' +
       '<h3>' + esc(t('kelas.panel-semua-judul', 'Panel Mata Pelajaran {kelas}', { kelas: className() || t('kelas.panel-semua-kelas-fallback', 'Kelas {kode}', { kode: code }) })) + '</h3>' +
-      '<p class="ch-muted">Satu kode kelas menghubungkan seluruh guru mata pelajaran. Tugas dari masing-masing guru otomatis teralokasi ke kartu panel mapel bersangkutan.</p>' +
+      '<p class="ch-muted">' + esc(t('kelas.panel-17-mapel-desc', 'Satu kode kelas menghubungkan seluruh guru mata pelajaran. Tugas dari masing-masing guru otomatis teralokasi ke kartu panel mapel bersangkutan.')) + '</p>' +
       '<div class="ch-subjects-compact-list">' +
         SUBJECTS_17.map(function (s) {
           var tName = tMap[s.id] || (s.id === 'ENG' && teacherName() ? teacherName() : null);
@@ -583,7 +869,7 @@
               '<strong>' + esc(s.name) + '</strong>' +
             '</div>' +
             '<div class="ch-subject-status">' +
-              (tName ? '<span class="ch-teacher-pill">' + icon('user') + ' ' + esc(tName) + '</span>' : '<span class="ch-empty-pill">Menunggu penugasan</span>') +
+              (tName ? '<span class="ch-teacher-pill">' + icon('user') + ' ' + esc(tName) + '</span>' : '<span class="ch-empty-pill">' + esc(t('kelas.mapel-menunggu-penugasan', 'Menunggu penugasan')) + '</span>') +
             '</div>' +
           '</div>';
         }).join('') +
@@ -611,6 +897,8 @@
     return '<div class="ch-body">' +
       teacherGreetingCard() +
       subjectPanelsSection(allPend, allDone) +
+      targetCard() +
+      curriculumInboxSection() +
       curriculumCard() +
       '<section><h2 class="ch-h2">' + esc(t('kelas.perlu-dikerjakan', 'Perlu dikerjakan')) + ' <small>' + filteredPend.length + (curFilter ? ' (filter aktif)' : '') + '</small></h2>' + (filteredPend.length ? filteredPend.map(function (a) { return assignCard(a, true); }).join('') : '<div class="ch-empty" data-testid="class-empty-pending">' + icon('inbox') + (curFilter ? '<p>' + esc(t('kelas.filter-mapel-kosong', 'Belum ada tugas untuk mapel ini.')) + ' <button type="button" class="ch-btn is-small is-ghost" data-ch="clear-subject-filter">' + esc(t('kelas.filter-tampilkan-semua', 'Tampilkan Semua')) + '</button></p>' : (classCode() ? '<p>' + t('kelas.murid-belum-ada-tugas', 'Belum ada tugas baru dari guru. Tugas yang dikirim guru muncul di sini dan di lonceng notifikasi.') + '</p>' : '') + (classCode() ? '' : '<button type="button" class="ch-btn" data-ch="tab" data-tab="kelas"><span class="kelasku-wordmark">Masukkan kode KelasKu</span></button>')) + '</div>') + '</section>' +
       '<section><h2 class="ch-h2">' + esc(t('umum.selesai', 'Selesai')) + ' <small>' + filteredDone.length + '</small></h2>' + (filteredDone.length ? filteredDone.map(function (a) { return assignCard(a, false); }).join('') : '') + '</section></div>';
@@ -733,13 +1021,24 @@
   }
 
   /* In-App Misi Belajar Kurikulum & Paspor */
-  function startMissionAssignment(unitId) {
+  /**
+   * @param {string} unitId
+   * @param {string[]} [hanyaSub] id sub-bab yang ingin dilatih saja (fitur F3/K6). Kosong = seluruh bab.
+   */
+  function startMissionAssignment(unitId, hanyaSub) {
     var FC = getCurriculum();
     if (!FC) return;
     var u = FC.getUnit(unitId);
     if (!u || !u.items || !u.items.length) return;
     var assignId = 'misi_' + u.id;
-    var items = u.items.map(function (it) {
+    var sumber = u.items;
+    if (hanyaSub && hanyaSub.length) {
+      var saring = sumber.filter(function (it) { return hanyaSub.indexOf(it.subChapterId) !== -1; });
+      /* Kalau penyaringan menyisakan nol soal, bab penuh yang dikerjakan — lebih baik
+         melatih terlalu banyak daripada membuka sesi kosong. */
+      if (saring.length) sumber = saring;
+    }
+    var items = sumber.map(function (it) {
       return {
         id: it.id,
         prompt: it.prompt,
@@ -756,16 +1055,35 @@
       id: assignId,
       unitId: u.id,
       title: u.title,
-      from: 'Kurikulum Merdeka',
-      teacher: 'Kurikulum Merdeka · ' + (u.genre || 'English'),
-      skills: [u.genre || 'curriculum'],
+      /* BUKAN GURU (m025-349, temuan X5). Kode lama memasang 'Kurikulum Merdeka · English'
+         sebagai nama guru, sehingga layar hasil berbunyi "Hasil ini dikirim ke Kurikulum
+         Merdeka · English" — seorang guru yang tidak ada — dan jurnal murid mencatat
+         inisiatif belajar mandirinya sebagai tugas yang diberikan guru. `teacher` kini
+         dikosongkan dan `isMission` yang menentukan naskahnya. */
+      from: t('kelas.misi-sumber', 'Misi Kurikulum'),
+      teacher: '',
+      /* KUNCI SKILL MESIN, BUKAN NAMA GENRE (m025-349, temuan K11). Kode lama memakai
+         `u.genre` ("Descriptive Text"), yang lalu mendarat mentah di peta skill murid
+         lewat skillLabel() — mencampur label Indonesia dengan istilah Inggris, dan bagi
+         murid Thai keduanya sama-sama asing. Rincian per bab tetap utuh di paspor. */
+      skills: ['curriculum'],
+      genre: u.genre || '',
       mode: 'latihan',
       deadline: null,
+      /* DIACAK (m025-349, temuan K5). Misi dulu mode 'latihan' tanpa `shuffle`, jadi
+         mengulang berarti menghadapi soal yang sama dalam urutan yang sama — yang dilatih
+         ingatan urutan, bukan kompetensinya. Padahal "Ulangi Misi" adalah satu-satunya
+         tombol yang ditawarkan pada bab yang sudah tuntas. */
+      shuffle: true,
       itemIds: items.map(function (it) { return it.id; }),
       items: items,
       isMission: true,
       at: Date.now()
     };
+    /* K13: yang disimpan hanya misi yang SEDANG berjalan, dan ia memang perlu membawa
+       butirnya — runner menyelesaikan soal dari sini, bukan dari bank lokal. Yang dulu
+       salah adalah membiarkannya tinggal setelah sesi selesai; closeRunner/finishRunner
+       kini membersihkannya (lihat u.activeMission = null). */
     ui().activeMission = missionAssign;
     ui().curriculumView = null;
     startRunner(missionAssign);
@@ -775,26 +1093,34 @@
     subTab = subTab || 'misi';
     var FC = getCurriculum();
     var units = FC ? FC.allUnits() : [];
-    var allSubs = subs();
 
-    function unitMastery(u) {
-      var found = allSubs.filter(function (s) {
-        return s.id === 'misi_' + u.id || (s.skills && s.skills.indexOf(u.genre) !== -1);
-      });
-      if (!found.length) return null;
-      return found.reduce(function (max, s) {
-        var acc = s.t ? s.c / s.t : 0;
-        return acc > max.acc ? { acc: acc, c: s.c, t: s.t } : max;
-      }, { acc: 0, c: 0, t: 0 });
-    }
+    /* Dikunci pada ID UNIT, bukan genre. Genre dipakai bersama antar tingkat kelas, jadi
+       mencocokkannya berarti mencap bab yang belum pernah dibuka murid. Lihat PASS_KEY. */
+    function unitMastery(u) { return passportOf(u.id); }
 
     var navSwitch = '<div class="ch-curriculum-switch">' +
       '<button type="button" class="' + (subTab === 'misi' ? 'is-active' : '') + '" data-ch="curriculum-tab" data-tab="misi">' + icon('compass') + ' ' + esc(t('kelas.misi-belajar-tab', 'Misi Belajar')) + '</button>' +
       '<button type="button" class="' + (subTab === 'passport' ? 'is-active' : '') + '" data-ch="curriculum-tab" data-tab="passport">' + icon('award') + ' ' + esc(t('kelas.paspor-kompetensi-tab', 'Paspor Kompetensi')) + '</button>' +
     '</div>';
 
+    /* Daftar unit kosong berarti modul kurikulumnya belum termuat — bukan berarti murid
+       belum mengerjakan apa pun. Dulu kedua tab mengecat kisi kosong tanpa satu kalimat
+       pun, dan paspor bahkan memasang penyebut karangan ("0/15") di atasnya. Layar yang
+       diam saat rusak membuat murid menyalahkan dirinya sendiri. */
+    if (!units.length) {
+      return '<div class="ch-body ch-curriculum-modal" data-testid="class-curriculum-empty">' +
+        '<div class="ch-curriculum-header"><div class="ch-curriculum-nav">' +
+          '<button type="button" class="ch-btn is-ghost is-small" data-ch="close-curriculum">' + icon('chevron-left') + ' ' + t('kelas.kembali-kelasku', '‹ Kembali ke KelasKu') + '</button>' +
+          navSwitch +
+        '</div></div>' +
+        '<section class="ch-card ch-empty">' + icon('cloud-off') +
+          '<p>' + esc(t('kelas.kurikulum-belum-termuat', 'Daftar misi kurikulum belum bisa dimuat di perangkat ini. Tutup lalu buka kembali aplikasi; kalau masih kosong, sambungkan internet sebentar supaya materinya ikut terunduh.')) + '</p>' +
+        '</section>' +
+      '</div>';
+    }
+
     if (subTab === 'passport') {
-      var totalUnits = units.length || 15;
+      var totalUnits = units.length;
       var masteredCount = 0;
       var totalQuestionsDone = 0;
       var totalAccSum = 0;
@@ -814,15 +1140,33 @@
 
       var passportCardsHtml = units.map(function (u) {
         var m = unitMastery(u);
-        var isMastered = m && m.acc >= 0.7;
-        var isPractice = m && m.acc < 0.7;
+        var isMastered = m && m.tuntas && !m.perluUlang;
+        var isPractice = m && !m.tuntas;
         var phaseLabel = u.phaseId === 'fase_d' ? 'Fase D (SMP)' : u.phaseId === 'fase_e' ? 'Fase E (SMA 10)' : 'Fase F (SMA 11-12)';
 
-        var stampHtml = isMastered
+        var stampHtml = m && m.perluUlang
+          /* Stempel yang memudar (K3/F4): bukan gagal, bukan pula "masih bisa". */
+          ? '<span class="ch-passport-stamp is-due">' + icon('history') + ' ' + esc(t('kelas.perlu-diulang', 'Perlu Diulang')) + '</span>'
+          : isMastered
           ? '<span class="ch-passport-stamp is-mastered">' + icon('award') + ' ' + esc(t('kelas.tuntas', 'Tuntas')) + ' (' + Math.round(m.acc * 100) + '%)</span>'
           : isPractice
           ? '<span class="ch-passport-stamp is-practice">' + icon('clock') + ' ' + esc(t('kelas.perlu-latihan', 'Perlu Latihan')) + ' (' + Math.round(m.acc * 100) + '%)</span>'
           : '<span class="ch-passport-stamp is-unstarted">' + icon('circle-dashed') + ' ' + esc(t('kelas.belum-mulai', 'Belum Dimulai')) + '</span>';
+
+        /* PER SUB-BAB (fitur F3 / temuan K6). Sub-bab sudah lama dipajang di kartu misi
+           dan setiap butir soal sudah lama membawa `subChapterId` — yang tidak pernah ada
+           adalah layar yang memakainya. Baris-baris ini mengubah paspor dari rapor menjadi
+           alat: murid melihat BAGIAN MANA yang goyah, bukan hanya angka satu bab. */
+        var subChs = Array.isArray(u.subChapters) ? u.subChapters : [];
+        var lemah = m ? subLemah(u.id) : [];
+        var subHtml = (m && subChs.length && Object.keys(m.sub).length)
+          ? '<ul class="ch-passport-subs">' + subChs.map(function (sc) {
+              var r = m.sub[sc.id];
+              if (!r || !r.t) return '<li class="is-untested"><span>' + esc(sc.no) + ' ' + esc(sc.title) + '</span><b>—</b></li>';
+              var a = r.c / r.t;
+              return '<li class="' + (a >= 0.7 ? 'is-ok' : 'is-weak') + '"><span>' + esc(sc.no) + ' ' + esc(sc.title) + '</span><b>' + r.c + '/' + r.t + '</b></li>';
+            }).join('') + '</ul>'
+          : '';
 
         return '<article class="ch-passport-card' + (isMastered ? ' is-mastered' : '') + '" data-testid="class-passport-unit-' + esc(u.id) + '">' +
           '<div class="ch-card-top">' +
@@ -831,9 +1175,25 @@
           '</div>' +
           '<h4 style="font-size:15px;margin:2px 0 4px;font-weight:700;">' + esc(u.genre) + '</h4>' +
           '<p class="ch-muted ch-small" style="margin:0 0 8px;">' + esc(u.title) + '</p>' +
-          '<div style="margin-top:auto;"><button type="button" class="ch-btn is-ghost is-small" data-ch="start-mission" data-unit="' + esc(u.id) + '">' +
-            icon('play') + ' ' + (isMastered ? esc(t('kelas.ulangi-misi', 'Ulangi Misi')) : esc(t('kelas.mulai-misi', 'Mulai Misi'))) +
-          '</button></div>' +
+          /* Stempelnya memakai percobaan TERBAIK; kalau yang terakhir berbeda, baris ini
+             mengatakannya. Murid berhak tahu bahwa mengulang tidak mencabut apa pun — dan
+             berhak tahu pula bahwa percobaan terakhirnya turun. */
+          (m ? '<p class="ch-muted ch-small ch-passport-trace" style="margin:0 0 8px;">' +
+            esc(t('kelas.paspor-jejak', 'Terbaik {terbaik} dari {n}× dikerjakan', { terbaik: Math.round(m.acc * 100) + '%', n: m.n })) +
+            (m.lastAcc != null && Math.round(m.lastAcc * 100) !== Math.round(m.acc * 100)
+              ? ' · ' + esc(t('kelas.paspor-terakhir', 'terakhir {terakhir}', { terakhir: Math.round(m.lastAcc * 100) + '%' }))
+              : '') + '</p>' : '') +
+          subHtml +
+          '<div class="ch-passport-actions" style="margin-top:auto;">' +
+            (lemah.length
+              ? '<button type="button" class="ch-btn is-primary is-small" data-ch="start-weak" data-unit="' + esc(u.id) + '" data-testid="class-practice-weak-' + esc(u.id) + '">' +
+                  icon('target') + ' ' + esc(t('kelas.latih-yang-lemah', 'Latih {n} sub-bab yang belum kuat', { n: lemah.length })) +
+                '</button>'
+              : '') +
+            '<button type="button" class="ch-btn is-ghost is-small" data-ch="start-mission" data-unit="' + esc(u.id) + '">' +
+              icon('play') + ' ' + (m && m.perluUlang ? esc(t('kelas.ulangi-sekarang', 'Ulangi Sekarang')) : isMastered ? esc(t('kelas.ulangi-misi', 'Ulangi Misi')) : esc(t('kelas.mulai-misi', 'Mulai Misi'))) +
+            '</button>' +
+          '</div>' +
         '</article>';
       }).join('');
 
@@ -899,6 +1259,14 @@
           '<p class="ch-muted ch-small">' + esc(t('kelas.misi-belajar-desc', 'Alur belajar adaptif berbasis capaian pembelajaran: tujuan jelas, diagnosis otomatis, dan bukti penguasaan materi.')) + '</p>' +
         '</div>' +
       '</div>' +
+      (misiAdaptifSiap()
+        ? '<a class="ch-card ch-link-card ch-adaptive-door" href="./misi.html" data-testid="class-adaptive-mission-door">' +
+            '<span class="ch-link-icon">' + icon('sparkles') + '</span>' +
+            '<div><b>' + esc(t('kelas.misi-adaptif-judul', 'Misi Belajar Adaptif')) + '</b>' +
+            '<small>' + esc(t('kelas.misi-adaptif-sub', 'Jalur yang menyesuaikan diri: pemanasan, contoh, latihan, lalu tantangan — dengan petunjuk saat kamu tersendat dan pengulangan terjadwal supaya tidak cepat lupa.')) + '</small></div>' +
+            icon('arrow-up-right') +
+          '</a>'
+        : '') +
       '<div class="ch-missions-list" data-testid="class-missions-list">' +
         missionsHtml +
       '</div>' +
@@ -909,7 +1277,7 @@
   }
   function runnerView() {
     var r = ui().runner;
-    if (r.finished) { var res = r.result; return '<div class="ch-body"><section class="ch-card ch-result" data-testid="class-result"><p class="ch-kicker">' + t('umum.selesai', 'Selesai') + '</p><h2>' + esc(res.title) + '</h2><p class="ch-score">' + res.c + '<small>/' + res.t + '</small></p><p class="ch-muted">' + icon('send') + ' Hasil ini dikirim ke <b>' + esc(res.teacher || 'guru') + '</b> — termasuk soal yang perlu diulang.</p><div class="ch-actions"><button type="button" class="ch-btn is-primary" data-ch="review" data-id="' + esc(r.aid) + '">Lihat pembahasan</button><button type="button" class="ch-btn is-ghost" data-ch="close-runner">' + t('kelas.kembali-ke-tugas', 'Kembali ke Tugas') + '</button></div></section></div>'; }
+    if (r.finished) { var res = r.result; return '<div class="ch-body"><section class="ch-card ch-result" data-testid="class-result"><p class="ch-kicker">' + t('umum.selesai', 'Selesai') + '</p><h2>' + esc(res.title) + '</h2><p class="ch-score">' + res.c + '<small>/' + res.t + '</small></p><p class="ch-muted">' + (res.teacher ? icon('send') + ' ' + esc(t('kelas.hasil-dikirim-guru', 'Hasil ini dikirim ke {guru} — termasuk soal yang perlu diulang.', { guru: res.teacher })) : icon('award') + ' ' + esc(t('kelas.hasil-misi-mandiri', 'Tersimpan di Paspor Kompetensimu. Ini misi yang kamu pilih sendiri, jadi ia tidak dilaporkan sebagai tugas dari guru.'))) + '</p><div class="ch-actions"><button type="button" class="ch-btn is-primary" data-ch="review" data-id="' + esc(r.aid) + '">Lihat pembahasan</button><button type="button" class="ch-btn is-ghost" data-ch="close-runner">' + t('kelas.kembali-ke-tugas', 'Kembali ke Tugas') + '</button></div></section></div>'; }
     var a = currentAssignment();
     if (!a) { ui().runner = null; saveUi(); return tugasView(assignments(), subs()); }
     while (r.idx < r.order.length && !resolveItem(a, a.itemIds[r.order[r.idx]])) r.idx += 1;
@@ -945,6 +1313,11 @@
       case 'back': u.review = null; break;
       case 'open-curriculum': u.curriculumView = 'misi'; u.review = null; break;
       case 'open-passport': u.curriculumView = 'passport'; u.review = null; break;
+      case 'start-weak': {
+        var wu = b.getAttribute('data-unit');
+        startMissionAssignment(wu, subLemah(wu));
+        return;
+      }
       case 'close-curriculum': u.curriculumView = null; break;
       case 'curriculum-tab': u.curriculumView = b.getAttribute('data-tab') || 'misi'; break;
       case 'start-mission': {
@@ -1203,5 +1576,5 @@
     if (field === 'prompt') q.prompt = t.value; else if (field === 'answer') q.answer = Number(t.value); else if (field === 'opt') q.options[Number(t.getAttribute('data-j'))] = t.value;
   }
 
-  root.FiezelClassHub = { mountStudent: mountStudent, unmountStudent: unmountStudent, renderStudent: renderStudent, openAssignment: openAssignment, mountTeacher: mountTeacher, SUB_KEY: SUB_KEY, _teacherUi: function () { return tUi; }, _studentUi: ui, _focusEvents: function () { return focusBound; } };
+  root.FiezelClassHub = { mountStudent: mountStudent, unmountStudent: unmountStudent, renderStudent: renderStudent, openAssignment: openAssignment, mountTeacher: mountTeacher, SUB_KEY: SUB_KEY, _teacherUi: function () { return tUi; }, _studentUi: ui, _focusEvents: function () { return focusBound; }, PASS_KEY: PASS_KEY, _passport: { record: passportRecord, of: passportOf, all: passport } };
 })(typeof window !== 'undefined' ? window : null);
