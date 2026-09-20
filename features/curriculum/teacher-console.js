@@ -361,6 +361,11 @@
       '<th>' + t('kurikulum.th-mastery', 'Kemahiran') + '</th>' +
       '<th>' + t('kurikulum.th-help', 'Perlu Pendampingan') + '</th>' +
       '<th>' + t('kurikulum.th-status', 'Status Ketuntasan') + '</th></tr></thead><tbody>' +
+      /* Kelas baru dulu menerima tabel berkepala tanpa satu baris pun dan tanpa satu
+         kalimat pun tentang langkah berikutnya. Guru tidak bisa membedakan "belum ada
+         data" dari "gagal memuat" — dua keadaan yang tindakannya berlawanan. */
+      (S.coverage.rows.length ? '' : '<tr data-testid="coverage-empty"><td colspan="6" class="muted" style="padding:22px 10px;text-align:center">' +
+        esc(t('kurikulum.cakupan-kosong', 'Belum ada data belajar di kelas ini. Matriks terisi sendiri setelah murid mengerjakan kuis pertamanya — terbitkan satu dari tab Kuis & Ulangan.')) + '</td></tr>') +
       S.coverage.rows.map(function (r) {
         var cls = r.status === 'GOOD' ? 'good' : r.status === 'GAP' ? 'bad' : r.status === 'DEVELOPING' ? 'warn' : 'mute';
         var stText = STATUS_LABELS[r.status] || r.status;
@@ -756,7 +761,8 @@
           a.progress.finished + ' selesai / ' + a.progress.started + ' mulai</p>' +
           (a.assembly_notes && a.assembly_notes.length ? '<div class="issue warn">' + esc(a.assembly_notes.join(' ')) + '</div>' : '') +
           '<div class="row"><button class="btn ghost sm" data-a="as-analytics" data-id="' + esc(a.id) + '" data-testid="analytics-' + esc(a.id) + '">Analitik butir</button></div></div>';
-      }).join('') : '<p class="muted">Belum ada asesmen.</p>') + '</div></div>';
+      }).join('') : '<p class="muted" data-testid="assessment-list-empty">' +
+        esc(t('kurikulum.asesmen-kosong', 'Belum ada asesmen di kelas ini. Pakai Template Blueprint Cepat di sebelah kiri untuk menerbitkan kuis pertama dalam satu klik.')) + '</p>') + '</div></div>';
   }
 
   function loadAssessments() {
@@ -779,6 +785,8 @@
       'agregat skill lama sebagai evidence kompetensi kurikulum — tidak ada yang dihapus.</p>' +
       '<button class="btn sm" data-a="import-legacy" data-testid="import-legacy-btn">Impor dari perangkat ini</button></div>' +
       '<div class="card" data-testid="student-list"><p class="kicker">Daftar murid</p><h3>' + S.students.length + ' murid</h3>' +
+      (S.students.length ? '' : '<p class="muted" data-testid="student-list-empty">' +
+        esc(t('kurikulum.murid-kosong', 'Belum ada murid di kelas ini. Bagikan kode kelas di atas, atau tambahkan namanya lewat kotak "Tambah murid".')) + '</p>') +
       '<table><tbody>' + S.students.map(function (s) {
         return '<tr class="click" data-a="passport" data-sid="' + esc(s.user_id) + '" data-testid="student-' + esc(s.user_id) + '"><td><b>' + esc(s.name) + '</b></td><td class="muted mono">' + esc(s.email || 'roster') + '</td><td>Lihat rapor →</td></tr>';
       }).join('') + '</tbody></table></div></div>';

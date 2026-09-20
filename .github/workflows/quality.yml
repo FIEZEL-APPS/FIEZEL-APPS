@@ -232,6 +232,11 @@ jobs:
           # jadi gate-registry-test merah sejak commit itu. Didaftarkan di sini (27 assert,
           # hijau saat didaftarkan) supaya ia benar-benar menjadi bukti, bukan berkas yang ada.
           node tests/modal-assign-teacher-ux-test.js
+          # Paspor Kompetensi murid: stempel dikunci pada ID unit (bukan genre, yang dipakai
+          # bersama lintas tingkat kelas), buku bukti terpisah dari riwayat kiriman yang
+          # dipotong, dan mengulang misi tidak pernah menurunkan stempel. Temuan K1/K2/K4
+          # reports/AUDIT-UIUX-KELASKU-KURIKULUM-KOMPETENSI-2026-09-20.md.
+          node tests/kelasku-paspor-kompetensi-test.js
           node tests/question-allocator-test.js
           node tests/bankor-latihan-test.js
           node tests/fiezel-stat-gate-test.js
