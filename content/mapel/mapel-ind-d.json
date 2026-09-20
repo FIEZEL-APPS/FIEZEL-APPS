@@ -1328,6 +1328,764 @@
       ]
     },
     {
+      "code": "KOMP-IND-D-7-BAB5-01",
+      "grade": 7,
+      "name": "Bab V: Membuka Gerbang Dunia",
+      "materi": "Membedah Buku Bergambar, Bagian-Bagian Buku (Cover, Daftar Isi, Ilustrasi), Merangkum Buku & Peta Pikiran, Menyajikan Teks Tanggapan dan Ragam Kalimat Tanggapan",
+      "cpRef": "Bahasa Indonesia untuk SMP/MTs Kelas VII (Edisi Revisi) — Bab 5",
+      "items": [
+        {
+          "id": "ind-d-7-b5-q01",
+          "difficulty": "dasar",
+          "prompt": "Berdasarkan buku Bahasa Indonesia Kelas VII Edisi Revisi Bab V (halaman 172-175), bagian sampul depan buku fiksi maupun nonfiksi umumnya memuat elemen-elemen penting berikut, KECUALI ...",
+          "options": [
+            "Daftar rujukan atau bibliografi lengkap",
+            "Judul buku yang menarik",
+            "Nama pembuat (penulis dan ilustrator)",
+            "Logo dan nama penerbit"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Daftar rujukan atau bibliografi merupakan bagian penutup buku di halaman belakang, bukan elemen yang terdapat pada sampul depan buku."
+          },
+          "distractorWhy": {
+            "1": "Judul buku merupakan salah satu elemen utama yang wajib ada di bagian sampul depan.",
+            "2": "Nama pembuat buku (penulis dan/atau ilustrator) tercantum di sampul depan untuk menunjukkan kredibilitas karya.",
+            "3": "Logo penerbit biasa diletakkan di bagian sampul depan buku (misalnya di bagian atas atau bawah)."
+          }
+        },
+        {
+          "id": "ind-d-7-b5-q02",
+          "difficulty": "dasar",
+          "prompt": "Dalam cerita buku bergambar \"Itam dan U\" (halaman 168), terdapat kata khas Aceh yaitu \"Smong\". Berdasarkan glosarium Jelajah Kata pada buku tersebut, apakah arti dari kata \"Smong\"?",
+          "options": [
+            "Gelombang laut besar (tsunami)",
+            "Pos komando penanggulangan bencana",
+            "Sebutan untuk bapak dalam bahasa Gayo",
+            "Wilayah pemukiman setingkat kelurahan"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Pada Jelajah Kata halaman 168, kata \"Smong\" diartikan sebagai gelombang laut besar dalam bahasa Aceh."
+          },
+          "distractorWhy": {
+            "1": "Pos komando penanggulangan bencana merupakan arti dari kata kependekan \"Posko\".",
+            "2": "Sebutan untuk bapak dalam bahasa Gayo merupakan arti dari kata sapaan \"Cik\".",
+            "3": "Wilayah pemukiman setingkat kelurahan di Aceh merupakan pengertian dari kata \"Gampong\"."
+          }
+        },
+        {
+          "id": "ind-d-7-b5-q03",
+          "difficulty": "sedang",
+          "prompt": "Pada analisis sajian visual buku bergambar \"Itam dan U\" (halaman 169-171), konsep nada (tone) pada ilustrasi gambar berfungsi untuk ...",
+          "options": [
+            "Mewakili emosi dan suasana (seperti sedih, mencekam, atau ceria) yang ingin disampaikan penulis/ilustrator",
+            "Mengarahkan perhatian pembaca hanya pada objek yang ukurannya paling besar",
+            "Menampilkan biodata singkat penulis dan ilustrator di bagian bawah halaman",
+            "Menggantikan keseluruhan teks bacaan agar pembaca tidak perlu membaca tulisan"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Berdasarkan Kupas Teori halaman 169, nada (tone) dihasilkan dari pencampuran warna yang mewakili emosi (senang, sedih, muram, optimis) yang ingin disampaikan."
+          },
+          "distractorWhy": {
+            "1": "Mengarahkan perhatian pada objek terbesar adalah fungsi dari elemen fokus pada gambar, bukan nada (tone).",
+            "2": "Biodata penulis dan ilustrator terdapat pada halaman penutup buku, bukan fungsi nada gambar.",
+            "3": "Nada visual melengkapi dan memperkuat teks cerita, bukan menggantikan seluruh teks bacaan."
+          }
+        },
+        {
+          "id": "ind-d-7-b5-q04",
+          "difficulty": "sedang",
+          "prompt": "Di Bab 1 buku \"Itam dan U\" (halaman 160-161), ilustrator menggunakan warna latar yang dominan gelap/hitam dengan fokus wajah Itam yang panik. Hal ini bertujuan untuk menggambarkan ...",
+          "options": [
+            "Ketakutan dan suasana mencekam saat bencana tsunami terjadi",
+            "Kegembiraan Itam saat bermain gasing di lapangan bersama Micel",
+            "Ketenangan Itam saat melaut dan memancing ikan bersama Cik Lam",
+            "Kehangatan suasana di posko pengungsian bersama warga gampong"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Latar gelap dan raut wajah panik pada Bab 1 secara visual menyampaikan emosi takut, panik, dan suasana mencekam ketika gelombang tsunami menerjang."
+          },
+          "distractorWhy": {
+            "1": "Suasana bermain gasing digambarkan dengan warna yang lebih bervariasi sebelum bencana terjadi.",
+            "2": "Suasana melaut bersama Cik Lam pada akhir cerita digambarkan dengan nada warna yang mulai terang dan optimis.",
+            "3": "Kehangatan posko pengungsian ditunjukkan pada bab-bab selanjutnya saat Itam membagikan gasing."
+          }
+        },
+        {
+          "id": "ind-d-7-b5-q05",
+          "difficulty": "sedang",
+          "prompt": "Perhatikan kalimat tanggapan berikut (halaman 189): \"Di buku ini ada beberapa istilah dalam bahasa Aceh, seperti gampong, Cik, dan Smong. Saya bisa mengira-ngira artinya. Namun, akan lebih baik kalau di bagian akhir penulis memberi daftar glosarium.\" Jenis kalimat tanggapan tersebut adalah ...",
+          "options": [
+            "Tanggapan yang memberikan saran kepada penulis",
+            "Tanggapan yang sepenuhnya menyetujui pendapat penulis",
+            "Tanggapan yang menolak secara tegas tanpa solusi",
+            "Tanggapan berupa pertanyaan klarifikasi identitas buku"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Kalimat tersebut mengoreksi/menunjukkan kekurangan lalu memberikan masukan perbaikan (\"akan lebih baik kalau...\"), sehingga tergolong kalimat tanggapan yang memberikan saran."
+          },
+          "distractorWhy": {
+            "1": "Kalimat persetujuan berisi pernyataan menguatkan dan sependapat dengan penulis tanpa usulan perubahan.",
+            "2": "Kalimat penolakan berisi pertentangan murni, sedangkan kalimat ini menyertakan perbaikan konstruktif (saran).",
+            "3": "Kalimat ini bukan pertanyaan, melainkan ulasan perbaikan untuk kelengkapan buku."
+          }
+        },
+        {
+          "id": "ind-d-7-b5-q06",
+          "difficulty": "sedang",
+          "prompt": "Perhatikan pernyataan tanggapan berikut (halaman 189): \"Proses perubahan perasaan Itam digambarkan dengan baik sekali melalui ilustrasi yang berubah warnanya dari gelap ke cerah. Saya suka sekali buku ini.\" Kalimat ini merupakan contoh dari ...",
+          "options": [
+            "Tanggapan yang menguatkan atau menyetujui (memuji) kelebihan karya",
+            "Tanggapan penolakan dengan penanda konjungsi tetapi",
+            "Tanggapan perbaikan yang meminta ilustrator mengubah gambar",
+            "Pernyataan deskripsi alur cerita yang tidak memuat penilaian"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Kalimat tersebut menyatakan persetujuan dan apresiasi positif (\"digambarkan dengan baik sekali\", \"Saya suka sekali\") terhadap teknik penyampaian penulis dan ilustrator."
+          },
+          "distractorWhy": {
+            "1": "Tidak ada konjungsi pertentangan atau rasa tidak setuju dalam kalimat tersebut.",
+            "2": "Kalimat ini memuji karya yang ada, bukan meminta perubahan atau memberikan saran perbaikan.",
+            "3": "Kalimat ini memuat ulasan apresiatif yang jelas merupakan bagian dari tanggapan persetujuan/pujian."
+          }
+        },
+        {
+          "id": "ind-d-7-b5-q07",
+          "difficulty": "sedang",
+          "prompt": "Struktur teks tanggapan buku terdiri atas tiga bagian utama (halaman 189-190). Bagian yang berisi pengenalan awal mengenai buku yang akan ditanggapi (seperti judul, penulis, dan tema umum) disebut ...",
+          "options": [
+            "Konteks",
+            "Deskripsi",
+            "Penilaian",
+            "Rekomendasi ulang"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Berdasarkan Kupas Teori halaman 189, bagian Konteks berisi pengenalan umum tentang buku yang akan ditanggapi."
+          },
+          "distractorWhy": {
+            "1": "Deskripsi berisi penjelasan lebih detail mengenai isi cerita, alur, dan tokoh-tokoh dalam buku.",
+            "2": "Penilaian berisi ulasan pribadi pembaca mengenai kelebihan, kekurangan, dan saran untuk buku.",
+            "3": "Rekomendasi ulang bukan nama istilah bagian struktur standar dalam teks tanggapan buku."
+          }
+        },
+        {
+          "id": "ind-d-7-b5-q08",
+          "difficulty": "sedang",
+          "prompt": "Pada struktur teks tanggapan buku (halaman 190), bagian yang memuat uraian lebih rinci mengenai ide cerita, alur peristiwa, serta karakter tokoh-tokoh dinamakan ...",
+          "options": [
+            "Deskripsi",
+            "Konteks",
+            "Penilaian",
+            "Glosarium"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Berdasarkan Kupas Teori halaman 190, bagian Deskripsi menjelaskan gambaran detail sinopsis, alur, dan tokoh cerita."
+          },
+          "distractorWhy": {
+            "1": "Konteks hanya berisi pengenalan judul dan gambaran umum buku.",
+            "2": "Penilaian berfokus pada pandangan kritis pembaca mengenai kelebihan dan kelemahan karya.",
+            "3": "Glosarium adalah bagian daftar kata sulit pada halaman penutup buku, bukan bagian struktur teks tanggapan."
+          }
+        },
+        {
+          "id": "ind-d-7-b5-q09",
+          "difficulty": "sedang",
+          "prompt": "Di bagian Penilaian dalam sebuah teks tanggapan (halaman 190), fokus utama yang disampaikan oleh penanggap adalah ...",
+          "options": [
+            "Pandangan dan pendapat pribadi mengenai keunggulan, kelemahan, serta saran perbaikan karya",
+            "Salinan lengkap seluruh isi bab dari halaman pertama hingga halaman terakhir",
+            "Biodata pribadi penulis beserta alamat rumah dan tempat tanggal lahirnya",
+            "Daftar kata-kata sulit beserta arti kamusnya yang diambil dari isi buku"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Penilaian memuat pendapat kritis pembaca mengenai sisi menarik, kelemahan, dan masukan untuk buku yang diulas."
+          },
+          "distractorWhy": {
+            "1": "Salinan lengkap seluruh bab bukanlah teks tanggapan, melainkan pencetakan ulang karya.",
+            "2": "Biodata singkat penulis berada di bagian identitas/hak cipta buku, bukan inti dari bagian Penilaian.",
+            "3": "Daftar kata sulit merupakan glosarium buku."
+          }
+        },
+        {
+          "id": "ind-d-7-b5-q10",
+          "difficulty": "tinggi",
+          "prompt": "Dalam cerita biografi B.J. Habibie pada buku siswa (halaman 186-188), B.J. Habibie mendapat julukan \"Mr. Crack\" karena prestasinya dalam bidang teknik penerbangan, yaitu ...",
+          "options": [
+            "Menemukan rumus perhitungan keretakan (crack propagation on random) pesawat hingga skala atom",
+            "Menjadi presiden ketiga Republik Indonesia yang memimpin di masa reformasi",
+            "Merancang kapal penangkap ikan modern bersama nelayan tradisional di Jerman",
+            "Membuat peta pikiran pertama untuk merangkum buku-buku sains di ITB"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Pada halaman 187 dijelaskan bahwa rumus hitung keretakan pesawat dinamai Faktor Habibie dan membuatnya dijuluki Mr. Crack."
+          },
+          "distractorWhy": {
+            "1": "Jabatan presiden merupakan riwayat hidup beliau, namun alasan julukan Mr. Crack spesifik pada temuan rumus fisikanya.",
+            "2": "Habibie ahli di bidang teknik penerbangan (pesawat terbang), bukan merancang kapal nelayan.",
+            "3": "Peta pikiran adalah materi teknik membaca di Bab V, bukan penemuan ilmiah B.J. Habibie."
+          }
+        },
+        {
+          "id": "ind-d-7-b5-q11",
+          "difficulty": "dasar",
+          "prompt": "Bagian halaman penutup pada buku nonfiksi maupun fiksi yang memuat daftar istilah-istilah sulit beserta artinya disusun secara alfabetis dinamakan ...",
+          "options": [
+            "Glosarium",
+            "Sinopsis",
+            "Daftar isi",
+            "Hak cipta"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Berdasarkan materi bagian buku (halaman 175 & 181), glosarium berisi daftar kata sulit atau khusus beserta artinya di halaman penutup."
+          },
+          "distractorWhy": {
+            "1": "Sinopsis adalah ringkasan gambaran umum cerita yang terdapat di sampul belakang.",
+            "2": "Daftar isi memuat daftar judul bab dan nomor halaman di bagian awal buku.",
+            "3": "Halaman hak cipta memuat informasi penerbitan, ISBN, dan pembuat buku."
+          }
+        },
+        {
+          "id": "ind-d-7-b5-q12",
+          "difficulty": "sedang",
+          "prompt": "Menurut penjelasan di halaman 177, langkah utama untuk merangkum sebuah buku nonfiksi adalah dengan cara ...",
+          "options": [
+            "Menentukan ide pokok atau gagasan utama pada setiap paragraf/subbab lalu menyusunnya menjadi karangan padu",
+            "Menyalin ulang seluruh kalimat dari paragraf pertama sampai paragraf terakhir tanpa ada yang dikurangi",
+            "Menggambar ulang semua ilustrasi yang ada di dalam buku ke dalam lembar kertas baru",
+            "Mengubah nama seluruh tokoh utama cerita menjadi nama kawan sekelas"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Berdasarkan halaman 177, rangkuman nonfiksi diperoleh dengan menyarikan gagasan pokok setiap paragraf/subbab dan merangkainya."
+          },
+          "distractorWhy": {
+            "1": "Menyalin seluruh teks bukan merangkum, melainkan menyalin (mengutip utuh).",
+            "2": "Menggambar ilustrasi merupakan kegiatan seni visual, bukan teknik merangkum teks.",
+            "3": "Mengubah nama tokoh bukan teknik merangkum, melainkan mengganti unsur cerita."
+          }
+        },
+        {
+          "id": "ind-d-7-b5-q13",
+          "difficulty": "dasar",
+          "prompt": "Manfaat utama membuat peta pikiran (mind map) sebelum menyusun rangkuman buku (halaman 180) adalah ...",
+          "options": [
+            "Mengatur dan memvisualisasikan gagasan pokok serta keterkaitannya secara jelas dan terstruktur",
+            "Menghilangkan bagian penilaian agar pembaca tidak dapat memberi kritik pada buku",
+            "Menentukan harga jual buku di toko buku atau perpustakaan",
+            "Menggantikan fungsi nama penulis di sampul depan buku"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Peta pikiran membantu mengatur pikiran secara visual sehingga hubungan antaride pokok terlihat jelas sebelum dituliskan menjadi rangkuman."
+          },
+          "distractorWhy": {
+            "1": "Peta pikiran bertujuan memudahkan pemahaman isi buku, bukan menghilangkan penilaian kritik.",
+            "2": "Peta pikiran adalah alat bantu belajar membaca/menulis, tidak berhubungan dengan harga jual buku.",
+            "3": "Peta pikiran tidak menggantikan identitas penulis pada buku."
+          }
+        },
+        {
+          "id": "ind-d-7-b5-q14",
+          "difficulty": "sedang",
+          "prompt": "Perhatikan cuplikan rangkuman buku \"Aku Terbatas tapi Tanpa Batas\" (halaman 178-179). Tokoh Yulia berhasil memenangkan Lomba Penelitian Siswa Nasional di Jakarta melalui karya ilmiahnya tentang ...",
+          "options": [
+            "Pembuatan kacamata Abaca (Alat Bantu Membaca)",
+            "Pembuatan gasing kayu dari serpihan hutan Gampong",
+            "Perancangan mesin pesawat terbang cepat",
+            "Penulisan buku komik bergambar tentang bencana tsunami"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Pada teks halaman 179 dijelaskan Yulia meneliti karya ilmiah penulisan proposal KIR tentang pembuatan kacamata Abaca."
+          },
+          "distractorWhy": {
+            "1": "Gasing kayu merupakan karya buatan Itam pada cerita fiksi \"Itam dan U\".",
+            "2": "Mesin pesawat terbang berkaitan dengan biografi B.J. Habibie.",
+            "3": "Yulia meneliti alat bantu membaca (Abaca), bukan membuat komik tsunami."
+          }
+        },
+        {
+          "id": "ind-d-7-b5-q15",
+          "difficulty": "tinggi",
+          "prompt": "Dalam ulasan teks tanggapan buku \"Mau Masak Apa, Lintang?\" (halaman 193-194), keunikan pemilihan tokoh utama yang diapresiasi oleh penanggap (Rakhma Subarna) adalah ...",
+          "options": [
+            "Penulis memilih anak laki-laki sebagai tokoh utama dalam cerita bertema lomba memasak",
+            "Tokoh utama digambarkan sebagai seorang anak yang tidak pernah mengalami kegagalan",
+            "Cerita disajikan tanpa adanya dukungan dari orang tua maupun tetangga sekitar",
+            "Buku tersebut memuat cerita fiksi sains modern di luar angkasa"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Penanggap menyebutkan: \"Saya menyukai tokoh utama anak laki-laki yang dipilih penulis, meski untuk cerita dengan tema lomba memasak.\""
+          },
+          "distractorWhy": {
+            "1": "Lintang mengalami perjuangan dan latihan yang tidak mudah (proses belajar dari kegagalan).",
+            "2": "Tokoh Ibu digambarkan sangat mendukung perjuangan Lintang.",
+            "3": "Buku tersebut bertema lomba memasak tradisional (tiwul & kue), bukan fiksi sains."
+          }
+        },
+        {
+          "id": "ind-d-7-b5-q16",
+          "difficulty": "dasar",
+          "prompt": "Perbedaan mendasar antara buku fiksi dan buku nonfiksi (halaman 176) terletak pada ...",
+          "options": [
+            "Buku fiksi memuat cerita rekaan/khayalan, sedangkan buku nonfiksi berdasarkan fakta atau kenyataan",
+            "Buku fiksi tidak memiliki judul, sedangkan buku nonfiksi wajib memiliki judul",
+            "Buku fiksi hanya ditulis oleh anak-anak, sedangkan buku nonfiksi ditulis oleh pakar dewasa",
+            "Buku fiksi tidak boleh memiliki ilustrasi gambar sama sekali"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Berdasarkan Kupas Teori halaman 176, buku fiksi bersumber dari imajinasi/rekaan, sedangkan nonfiksi berdasarkan fakta/kenyataan ilmiah."
+          },
+          "distractorWhy": {
+            "1": "Baik buku fiksi maupun nonfiksi sama-sama memiliki judul buku.",
+            "2": "Penulis buku fiksi maupun nonfiksi bisa berasal dari berbagai usia dan latar belakang.",
+            "3": "Buku fiksi bergambar (picture book) sangat kaya akan ilustrasi visual."
+          }
+        },
+        {
+          "id": "ind-d-7-b5-q17",
+          "difficulty": "sedang",
+          "prompt": "Pada saat menyampaikan tanggapan buku secara lisan kepada teman atau membuat rekaman video (halaman 186 & 192), sikap dan bahasa yang seharus ditunjukkan adalah ...",
+          "options": [
+            "Menggunakan sapaan santun dan akrab, ekspresi ramah, serta volume suara yang cukup terdengar",
+            "Berbicara sangat cepat tanpa memandang penonton atau arah kamera",
+            "Menggunakan kata-kata kasar untuk menunjukkan kelemahan buku secara emosional",
+            "Membaca teks secara kaku dengan menutupi muka di balik buku"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Pada petunjuk penyampaian lisan (halaman 186), penanggap hendaknya santun, komunikatif, memperlihatkan ekspresi ramah, dan bersuara jelas."
+          },
+          "distractorWhy": {
+            "1": "Berbicara terlalu cepat dan tidak menatap lawan bicara mengurangi efektivitas komunikasi.",
+            "2": "Tanggapan harus bersifat kritis konstruktif dengan bahasa santun, bukan menghina atau menggunakan kata kasar.",
+            "3": "Menutupi wajah menghambat kontak mata dan ekspresi visual yang baik."
+          }
+        },
+        {
+          "id": "ind-d-7-b5-q18",
+          "difficulty": "tinggi",
+          "prompt": "Dalam cerita \"Itam dan U\" (halaman 165-167), perubahan emosi Itam dari rasa duka yang mendalam menjadi kembali bangkit dan tersenyum diawali oleh kegiatan ...",
+          "options": [
+            "Membuat seribu gasing kejutan bersama Cik Lam untuk dibagikan kepada anak-anak di pos pengungsian",
+            "Memutus pohon kelapa U agar tidak ada lagi kenangan tentang tsunami",
+            "Pindah tinggal ke kota besar dan melupakan kawan lamanya Micel",
+            "Menjual seluruh perahu milik Cik Lam kepada warga gampong lain"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Itam mengumpulkan kayu dan membuat gasing kejutan bersama Cik Lam, lalu membagikannya sehingga melihat senyum anak-anak pengungsi dan mulai bangkit kembali."
+          },
+          "distractorWhy": {
+            "1": "Itam tidak memutus pohon U, melainkan memeluk dan berterima kasih kepada U di akhir cerita.",
+            "2": "Itam tetap tinggal dan melaut bersama Cik Lam.",
+            "3": "Itam dan Cik Lam justru menggunakan perahu bersama untuk kembali melaut."
+          }
+        }
+      ]
+    },
+    {
+      "code": "KOMP-IND-D-7-BAB6-01",
+      "grade": 7,
+      "name": "Bab VI: Sampaikan Melalui Surat",
+      "materi": "Mengenal Surat Pribadi dan Surat Resmi, Unsur-Unsur dan Struktur Surat, Berkomunikasi Santun via Surat, Etika Komunikasi Digital di Ruang Bincang / Email",
+      "cpRef": "Bahasa Indonesia untuk SMP/MTs Kelas VII (Edisi Revisi) — Bab 6",
+      "items": [
+        {
+          "id": "ind-d-7-b6-q01",
+          "difficulty": "dasar",
+          "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VII (hal. 202-203), surat pribadi digolongkan sebagai surat yang dikirim oleh individu untuk kepentingan pribadi. Salah satu tujuan utama penulisan surat pribadi sebagaimana ditunjukkan dalam surat Florencia kepada Alga adalah…",
+          "options": [
+            "Bertukar kabar dan menceritakan pengalaman pribadi",
+            "Memberikan instruksi dinas dan keputusan rapat instansi",
+            "Mengundang seluruh warga sekolah dalam acara resmi",
+            "Menagih sisa pembayaran transaksi jual beli organisasi"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Surat pribadi berfungsi untuk hubungan personal seperti bertukar kabar, menceritakan pengalaman, atau menyampaikan perasaan."
+          },
+          "distractorWhy": {
+            "1": "Instruksi dinas merupakan fungsi surat resmi.",
+            "2": "Undangan warga sekolah adalah fungsi surat resmi.",
+            "3": "Penagihan transaksi organisasi merupakan fungsi surat resmi."
+          }
+        },
+        {
+          "id": "ind-d-7-b6-q02",
+          "difficulty": "sedang",
+          "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VII (hal. 204), pada kop surat resmi Organisasi Siswa Intra Sekolah (OSIS) SMP Pelita Bangsa terdapat informasi utama yang memuat…",
+          "options": [
+            "Nama organisasi/lembaga, nama sekolah, alamat lengkap, dan nomor telepon",
+            "Nama pengirim surat, sapaan akrab, dan tempat pembuatan surat",
+            "Salam pembuka, tanggal rapat, dan susunan acara",
+            "Nama penerima surat, lampiran, dan perihal rapat"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Kop surat (kepala surat) memuat identitas resmi lembaga/sekolah seperti nama organisasi, alamat, serta nomor kontak."
+          },
+          "distractorWhy": {
+            "1": "Informasi ini merupakan bagian surat pribadi.",
+            "2": "Informasi ini adalah bagian pembuka dan isi surat.",
+            "3": "Informasi ini adalah bagian kepala isi surat (nomor, hal, lampiran, alamat tujuan)."
+          }
+        },
+        {
+          "id": "ind-d-7-b6-q03",
+          "difficulty": "sedang",
+          "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VII (hal. 206-207), bentuk terikat 'pra-' bermakna 'sebelum'. Apabila kata 'prakegiatan' digunakan dalam kalimat 'OSIS mengadakan rapat prakegiatan Bazar dan Malam Gembira', makna kata 'prakegiatan' adalah…",
+          "options": [
+            "Tahap persiapan atau perencanaan yang dilakukan sebelum kegiatan utama dilaksanakan",
+            "Evaluasi menyeluruh yang dilakukan setelah seluruh rangkaian acara selesai",
+            "Pelaksanaan inti kegiatan saat acara sedang berlangsung di lokasi",
+            "Pembatalan suatu agenda kegiatan karena adanya kendala tak terduga"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Bentuk terikat 'pra-' berarti sebelum, sehingga 'prakegiatan' berarti tahap sebelum kegiatan utama."
+          },
+          "distractorWhy": {
+            "1": "Evaluasi setelah kegiatan dinamakan pascakegiatan.",
+            "2": "Pelaksanaan inti terjadi saat kegiatan berlangsung.",
+            "3": "Pembatalan bukan makna bentuk terikat 'pra-'."
+          }
+        },
+        {
+          "id": "ind-d-7-b6-q04",
+          "difficulty": "tinggi",
+          "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VII (hal. 207), kalimat rumpang: \"Penggunaan sistem pembayaran _____ saat ini lazim digunakan orang dalam menggunakan paket internet, telepon genggam, hingga listrik.\" Kata berimbuhan 'pra-' yang paling tepat untuk melengkapi kalimat tersebut adalah…",
+          "options": [
+            "prabayar",
+            "prasyarat",
+            "praduga",
+            "prasejarah"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Sistem pembayaran yang dilakukan sebelum menggunakan jasa/layanan disebut prabayar."
+          },
+          "distractorWhy": {
+            "1": "Prasyarat berarti syarat yang harus dipenuhi sebelum melangkah ke tahap berikutnya.",
+            "2": "Praduga berarti persangkaan sebelum ada bukti sah.",
+            "3": "Prasejarah merujuk pada masa sebelum ditemukannya tulisan."
+          }
+        },
+        {
+          "id": "ind-d-7-b6-q05",
+          "difficulty": "dasar",
+          "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VII (hal. 208-209 Tabel 6.3), salah satu unsur pembeda yang hanya terdapat pada surat resmi dan tidak ada pada surat pribadi adalah…",
+          "options": [
+            "Kepala surat (kop surat), nomor surat, dan perihal",
+            "Salam pembuka dan salam penutup",
+            "Tanggal pembuatan surat dan nama pengirim",
+            "Isi surat dan pesan yang disampaikan"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Kop surat, nomor surat, dan perihal merupakan unsur khas yang hanya dimiliki surat resmi instansi/lembaga."
+          },
+          "distractorWhy": {
+            "1": "Salam pembuka dan penutup ada pada surat resmi maupun surat pribadi.",
+            "2": "Tanggal dan nama pengirim terdapat pada kedua jenis surat.",
+            "3": "Isi surat terdapat pada semua jenis surat."
+          }
+        },
+        {
+          "id": "ind-d-7-b6-q06",
+          "difficulty": "sedang",
+          "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VII (hal. 210-211), surat pembaca yang dikirimkan oleh Bapak Andito ke harian Kompas mengenai \"Lamanya Proses Perubahan Kartu Keluarga di Kelurahan Bakti Sari\" tergolong sebagai surat pribadi karena…",
+          "options": [
+            "Ditulis oleh warga secara individu untuk menyampaikan keluhan atau aspirasi pribadinya kepada publik",
+            "Dibuat oleh pejabat kelurahan untuk memberikan instruksi kerja resmi",
+            "Menggunakan kop surat resmi kelurahan lengkap dengan stempel lembaga",
+            "Bersifat rahasia dan hanya boleh dibaca oleh pihak kepolisian"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Surat pembaca merupakan bentuk surat pribadi yang dikirimkan warga ke media massa untuk menyampaikan aspirasi atau permasalahan publik."
+          },
+          "distractorWhy": {
+            "1": "Bapak Andito adalah warga penerima layanan, bukan pejabat publik.",
+            "2": "Surat pembaca tidak menggunakan kop surat resmi instansi.",
+            "3": "Surat pembaca dimuat di surat kabar harian sehingga dapat dibaca khalayak umum."
+          }
+        },
+        {
+          "id": "ind-d-7-b6-q07",
+          "difficulty": "tinggi",
+          "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VII (hal. 211-212 Kupas Teori), cermatilah pembuka surat berikut: \"Bapak Presiden yang terhormat, saya Ganis, siswa kelas tujuh SMP Bintang Indonesia. Saya tinggal di Kota Sumedang. Akhir-akhir ini saya merasa khawatir melihat makin maraknya iklan rokok di televisi.\" Jenis pembuka surat tersebut adalah…",
+          "options": [
+            "Memperkenalkan diri",
+            "Menanyakan kabar",
+            "Menyatakan tujuan kegiatan",
+            "Ucapan terima kasih"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Kalimat awal memuat identitas penulis berupa nama, jenjang sekolah, dan kota tempat tinggal (memperkenalkan diri)."
+          },
+          "distractorWhy": {
+            "1": "Tidak ada struktur kalimat yang menanyakan kabar penerima.",
+            "2": "Pernyataan tujuan kegiatan sekolah tidak terdapat pada penggalan tersebut.",
+            "3": "Tidak ada ungkapan apresiasi atau terima kasih pada awal surat."
+          }
+        },
+        {
+          "id": "ind-d-7-b6-q08",
+          "difficulty": "dasar",
+          "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VII (hal. 214 Gambar 6.3 Ragam Sapaan), kata sapaan seperti \"Kakek, Nenek, Paman, Bibi, Ibu, dan Mas\" dikategorikan sebagai kata sapaan yang…",
+          "options": [
+            "Menunjukkan hubungan kerabat atau keluarga",
+            "Berbentuk kata sapaan nominal dengan penambahan akhiran -ku",
+            "Menunjukkan rasa hormat kepada pejabat pemerintah",
+            "Digunakan khusus untuk percakapan dalam ruang bincang daring"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Kata sapaan kakek, paman, dan mas merujuk pada ikatan kekerabatan atau hubungan keluarga."
+          },
+          "distractorWhy": {
+            "1": "Sapaan nominal+ku contohnya Tuhanku atau Ibuku.",
+            "2": "Sapaan rasa hormat contohnya Yang Terhormat.",
+            "3": "Sapaan kerabat berlaku umum baik secara lisan maupun tertulis."
+          }
+        },
+        {
+          "id": "ind-d-7-b6-q09",
+          "difficulty": "sedang",
+          "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VII (hal. 215-216 Gambar 6.4 Pronomina), kata ganti \"kami\" dan \"kita\" termasuk ke dalam jenis pronomina persona yang mengacu pada…",
+          "options": [
+            "Diri sendiri jamak (orang pertama jamak)",
+            "Orang yang diajak bicara tunggal (orang kedua tunggal)",
+            "Orang yang dibicarakan jamak (orang ketiga jamak)",
+            "Penunjuk tempat dan ihwal"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Kata 'kami' dan 'kita' menduduki fungsi pronomina persona orang pertama jamak (mengacu pada pihak pembicara)."
+          },
+          "distractorWhy": {
+            "1": "Orang kedua tunggal contohnya engkau, kamu, atau Anda.",
+            "2": "Orang ketiga jamak contohnya mereka.",
+            "3": "Penunjuk tempat contohnya sini, situ, atau sana."
+          }
+        },
+        {
+          "id": "ind-d-7-b6-q10",
+          "difficulty": "tinggi",
+          "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VII (hal. 216), cermatilah kalimat berikut: \"Lain kali, jangan berbuat begitu lagi!\" Kata \"begitu\" pada kalimat tersebut berfungsi sebagai…",
+          "options": [
+            "Pronomina penunjuk ihwal",
+            "Pronomina persona orang ketiga",
+            "Pronomina penanya jumlah",
+            "Kata sapaan penghormatan"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Kata 'begini' dan 'begitu' termasuk kelompok pronomina penunjuk ihwal (mengacu pada keadaan atau perbuatan)."
+          },
+          "distractorWhy": {
+            "1": "Pronomina persona mengacu pada orang (dia, mereka).",
+            "2": "Pronomina penanya mengacu pada pertanyaan (siapa, apa).",
+            "3": "Kata sapaan merujuk pada sapaan mitra tutur."
+          }
+        },
+        {
+          "id": "ind-d-7-b6-q11",
+          "difficulty": "dasar",
+          "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VII (hal. 217 Tabel 6.5), ragam bahasa baku digunakan dalam komunikasi resmi. Pasangan kata baku dan tidak baku yang tepat menurut tabel tersebut adalah…",
+          "options": [
+            "Baku: 'mengubah' | Tidak Baku: 'merubah'",
+            "Baku: 'enggak' | Tidak Baku: 'tidak'",
+            "Baku: 'belom' | Tidak Baku: 'belum'",
+            "Baku: 'dikerjain' | Tidak Baku: 'dikerjakan'"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Kata 'mengubah' adalah bentuk baku yang tepat sesuai kaidah tata bahasa, sedangkan 'merubah' adalah bentuk tidak baku."
+          },
+          "distractorWhy": {
+            "1": "Kata 'tidak' adalah bentuk baku, sedangkan 'enggak' tidak baku.",
+            "2": "Kata 'belum' adalah bentuk baku, sedangkan 'belom' tidak baku.",
+            "3": "Kata 'dikerjakan' adalah bentuk baku, sedangkan 'dikerjain' tidak baku."
+          }
+        },
+        {
+          "id": "ind-d-7-b6-q12",
+          "difficulty": "sedang",
+          "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VII (hal. 218), perhatikan ungkapan percakapan tidak baku kepada guru berikut: \"Pak guru, tugasnya udah dinilai belom?\" Perbaikan kalimat tersebut agar menjadi baku dan santun adalah…",
+          "options": [
+            "\"Selamat pagi, Pak. Mohon maaf, apakah tugas kami sudah selesai dinilai?\"",
+            "\"Pak, tugas saya buruan dinilai dong sekarang!\"",
+            "\"Halo Pak, tugasnya udah dikurangin belom nilainya?\"",
+            "\"Sorry Pak guru, tugas kemarin udah beres dinilai kan?\""
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Kalimat diawali sapaan sopan dan permohonan maaf, serta mengganti kata percakapan dengan kosakata baku (sudah, selesai, dinilai)."
+          },
+          "distractorWhy": {
+            "1": "Menggunakan kata tidak baku 'buruan' dan nada mendesak yang kurang santun.",
+            "2": "Masih memuat kata tidak baku 'udah' dan 'belom'.",
+            "3": "Menggunakan kata tidak baku ragam percakapan santai ('sorry' dan 'udah beres')."
+          }
+        },
+        {
+          "id": "ind-d-7-b6-q13",
+          "difficulty": "sedang",
+          "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VII (hal. 218 Tabel 6.6), struktur penyusunan pesan media sosial yang santun dan jelas kepada guru secara berurutan terdiri atas…",
+          "options": [
+            "Pembuka, perkenalan diri, maksud dan tujuan, serta penutup",
+            "Kepala surat, nomor surat, alamat tujuan, dan lampiran",
+            "Judul artikel, riwayat hidup, kutipan opini, dan perihal",
+            "Salam perpisahan, ucapan maaf, alasan keterlambatan, dan ucapan terima kasih"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Pesan media sosial yang santun dan efektif disusun dengan urutan pembuka, perkenalan diri, maksud/tujuan yang jelas, lalu ditutup dengan ucapan terima kasih."
+          },
+          "distractorWhy": {
+            "1": "Struktur ini merupakan komponen surat resmi cetak.",
+            "2": "Struktur ini bukan penyusun pesan singkat.",
+            "3": "Urutan ini tidak sistematis dan tidak memuat perkenalan identitas pengirim."
+          }
+        },
+        {
+          "id": "ind-d-7-b6-q14",
+          "difficulty": "tinggi",
+          "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VII (hal. 220-221 Kegiatan 9), dalam tanggapan ruang bincang mengenai permasalahan kucing Mabel milik Tira, pendapat drh. Puspa Restiningtyas dianggap paling tepercaya karena…",
+          "options": [
+            "Disampaikan berdasarkan latar belakang keahlian (kepakaran) dokter hewan dengan penjelasan ilmiah serta solusi konkret",
+            "Menggunakan nama akun yang unik dan lucu tanpa disertai argumentasi medis",
+            "Menyarankan Tira untuk membiarkan kucingnya keluar rumah tanpa memperhatikan kondisi kesehatannya",
+            "Memaksa Tira membeli pakan impor yang dijual oleh penanggap secara pribadi"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Tanggapan tepercaya diukur dari kepakaran penulis (seorang dokter hewan) yang memberikan solusi medis rasional dan empati."
+          },
+          "distractorWhy": {
+            "1": "Keunikan nama akun bukan indikator kebenaran dan kepakaran informasi.",
+            "2": "Saran pembiaran tanpa analisis medis dapat memperburuk kondisi kesehatan hewan.",
+            "3": "Tanggapan dokter hewan dalam teks berfokus pada saran medis, bukan penjualan pakan."
+          }
+        },
+        {
+          "id": "ind-d-7-b6-q15",
+          "difficulty": "sedang",
+          "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VII (hal. 221), suatu kalimat tanggapan di ruang bincang daring dikatakan penuh empati apabila memenuhi kriteria berikut, kecuali…",
+          "options": [
+            "Menyalahkan dan mengejek tindakan atau keputusan yang telah dilakukan oleh penanya",
+            "Ditulis dengan pilihan kata dan bahasa yang santun",
+            "Menyampaikan simpati terhadap masalah yang sedang dihadapi penanya",
+            "Memberikan apresiasi dan dorongan semangat kepada penanya"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Empati diwujudkan melalui dukungan dan penghargaan, bukan tindakan menyalahkan atau mengejek."
+          },
+          "distractorWhy": {
+            "1": "Bahasa yang santun merupakan salah satu ciri utama tanggapan berempati.",
+            "2": "Menyampaikan rasa simpati merupakan wujud empati.",
+            "3": "Memberikan apresiasi dan dorongan semangat merupakan kriteria tanggapan berempati."
+          }
+        },
+        {
+          "id": "ind-d-7-b6-q16",
+          "difficulty": "tinggi",
+          "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VII (hal. 222-224), pada platform \"Situs Masalah\", penanggap EinsteinKuadrat menuliskan: \"Panggung sekolah merupakan tradisi sekolah sejak 20 tahun yang lalu dan tidak pernah ada yang mati karena tampil di atasnya.\" Pernyataan \"Panggung sekolah merupakan tradisi sekolah sejak 20 tahun yang lalu\" dikategorikan sebagai…",
+          "options": [
+            "Fakta, karena memuat kenyataan sejarah yang dapat diverifikasi kebenarannya",
+            "Opini, karena merupakan dugaan pribadi yang bersifat subjektif",
+            "Mitos, karena merupakan cerita rekaan yang belum pasti ada",
+            "Slogan, karena berisi kalimat ajakan untuk berhias"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Pernyataan mengenai tradisi sekolah selama 20 tahun berisi fakta kenyataan sejarah yang dapat dibuktikan kebenarannya."
+          },
+          "distractorWhy": {
+            "1": "Data rentang waktu 20 tahun dapat dibuktikan kebenarannya sehingga bukan sekadar opini.",
+            "2": "Bukan mitos karena merujuk pada kegiatan nyata sekolah.",
+            "3": "Bukan slogan."
+          }
+        },
+        {
+          "id": "ind-d-7-b6-q17",
+          "difficulty": "sedang",
+          "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VII (hal. 225-226 Gambar 6.5), percakapan di ruang bincang Tim Duta Adiwiyata SMP Negeri 13 berfokus pada pembahasan mengenai…",
+          "options": [
+            "Upaya mengatasi penumpukan sampah di selokan depan sekolah akibat kurangnya fasilitas tempat sampah pedagang",
+            "Rencana kenaikan harga makanan jajanan di kantin sekolah",
+            "Jadwal ujian tengah semester untuk mata pelajaran IPA",
+            "Persiapan lomba debat antarsekolah tingkat kabupaten"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Tim Adiwiyata mendiskusikan masalah sampah selokan di luar pagar sekolah dan mencari cara efektif mengedukasi pedagang serta warga."
+          },
+          "distractorWhy": {
+            "1": "Masalah harga makanan kantin tidak menjadi bahasan percakapan.",
+            "2": "Percakapan tidak membahas jadwal ujian sekolah.",
+            "3": "Percakapan berfokus pada kebersihan lingkungan sekolah, bukan lomba debat."
+          }
+        },
+        {
+          "id": "ind-d-7-b6-q18",
+          "difficulty": "tinggi",
+          "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VII (hal. 229 Kegiatan 11), perhatikan rumpang kalimat surat resmi berikut: \"Sehubungan dengan kegiatan studi banding tersebut, kami berharap Bapak/Ibu Kepala Sekolah berkenan memberikan izin...\" Penggunaan ungkapan \"berkenan memberikan izin\" berfungsi untuk…",
+          "options": [
+            "Menyampaikan permohonan resmi kepada pihak atasan dengan pilihan kata baku yang santun",
+            "Menyatakan teguran kepada pihak sekolah mengenai kegiatan siswa",
+            "Menggunakan bahasa pergaulan sehari-hari antaranggota OSIS",
+            "Menutup pembicaraan dalam surat pribadi kepada teman sekelas"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Frasa 'berkenan memberikan izin' merupakan ragam bahasa baku dan santun dalam surat resmi untuk memohon bantuan/izin kepada penerima berwenang."
+          },
+          "distractorWhy": {
+            "1": "Ungkapan ini bukan teguran, melainkan permohonan santun.",
+            "2": "Bukan ragam percakapan santai sehari-hari.",
+            "3": "Bukan penutup surat pribadi."
+          }
+        },
+        {
+          "id": "ind-d-7-b6-q19",
+          "difficulty": "sedang",
+          "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VII (hal. 231 Kegiatan 12b), ketika siswa melakukan kegiatan tantangan berbalas surat virtual melalui email, norma utama yang harus tetap dipelihara adalah…",
+          "options": [
+            "Menggunakan kata sapaan yang tepat serta bahasa Indonesia yang baik dan santun",
+            "Menuliskan seluruh pesan dengan kata-kata tidak baku dan kata singkatan gaul",
+            "Mengosongkan judul subjek email agar penerima merasa penasaran",
+            "Menulis teks menggunakan huruf kapital secara keseluruhan agar berkesan tegas"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Meskipun berbentuk surat elektronik pribadi, penggunaan kata sapaan yang tepat dan bahasa Indonesia yang santun tetap wajib diterapkan."
+          },
+          "distractorWhy": {
+            "1": "Surat pribadi digital tetap disarankan menggunakan bahasa yang baik dan santun.",
+            "2": "Subjek email perlu diisi agar penerima memahami perihal surat.",
+            "3": "Penggunaan kapital seluruhnya dalam media digital dianggap kurang santun (berteriak)."
+          }
+        }
+      ]
+    },
+    {
       "code": "KOMP-IND-D-8-BAB1-01",
       "grade": 8,
       "name": "Bab 1: Laporan Hasil Observasi",
@@ -3368,6 +4126,395 @@
             "1": "Penampilan kaku mengurangi kualitas akting.",
             "2": "Lampu padam menghalangi pengamatan penonton.",
             "3": "Intonasi terburu-buru merusak penyampaian pesan."
+          }
+        }
+      ]
+    },
+    {
+      "code": "KOMP-IND-D-8-BAB6-01",
+      "grade": 8,
+      "name": "Bab VI: Menulis Teks Pidato",
+      "materi": "Memahami Teks Pidato Persuasif, Struktur Teks Pidato (Salam Pembuka, Pendahuluan, Isi, Penutup), Kebahasaan Pidato (Kata Sapaan, Kalimat Persuasif, Kata Kerja Mental)",
+      "cpRef": "Bahasa Indonesia untuk SMP/MTs Kelas VII (Edisi Revisi) — Bab 6 (Kelas VIII)",
+      "items": [
+        {
+          "id": "ind-d-8-b6-q01",
+          "difficulty": "dasar",
+          "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VIII (Bab VI Menulis Teks Pidato), pengertian pidato secara umum adalah…",
+          "options": [
+            "Kegiatan mengungkapkan pikiran atau ide/gagasan dalam bentuk kata-kata yang ditujukan kepada orang banyak dengan bahasa formal",
+            "Uraian cerita rekaan tentang tokoh dan konflik sosial yang diperankan oleh para pemain di atas panggung pertunjukan",
+            "Catatan harian pribadi yang berisi luapan emosi dan pengalaman batin penulis tanpa ditujukan kepada audiens",
+            "Ringkasan berita fakta ilmiah yang dipublikasikan secara tertulis melalui media cetak atau elektronik"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Pidato merupakan kegiatan menyampaikan pikiran, ide, atau gagasan secara lisan dalam bentuk kata-kata yang ditujukan kepada khalayak ramai menggunakan bahasa formal."
+          },
+          "distractorWhy": {
+            "1": "Pernyataan tersebut merupakan definisi dari naskah drama atau pertunjukan drama.",
+            "2": "Pernyataan tersebut merupakan definisi dari buku harian (diari).",
+            "3": "Pernyataan tersebut merupakan karakter teks berita atau artikel jurnalistik."
+          }
+        },
+        {
+          "id": "ind-d-8-b6-q02",
+          "difficulty": "dasar",
+          "prompt": "Dalam Buku Siswa Bahasa Indonesia Kelas VIII (Bab VI), sebutan bagi orang yang ahli atau pandai berpidato di hadapan umum dinamakan…",
+          "options": [
+            "Orator",
+            "Moderator",
+            "Notulis",
+            "Narator"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Orator adalah sebutan khusus bagi orang yang mempunyai keahlian dan kepandaian dalam menyampaikan pidato di depan umum, seperti Ir. Sukarno dan Buya Hamka."
+          },
+          "distractorWhy": {
+            "1": "Moderator adalah orang yang memimpin dan memandu jalannya diskusi atau seminar.",
+            "2": "Notulis adalah orang yang bertugas mencatat hasil rapat atau diskusi.",
+            "3": "Narator adalah orang yang membacakan narasi atau menceritakan alur cerita."
+          }
+        },
+        {
+          "id": "ind-d-8-b6-q03",
+          "difficulty": "dasar",
+          "prompt": "Menurut Buku Siswa Bahasa Indonesia Kelas VIII (Bab VI Tabel 6.1), struktur umum penulisan teks pidato secara runtut terdiri atas…",
+          "options": [
+            "Pembukaan, isi, dan penutup",
+            "Tesis, argumentasi, dan penegasan ulang",
+            "Orientasi, komplikasi, dan resolusi",
+            "Pernyataan umum, urutan sebab-akibat, dan interpretasi"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Struktur teks pidato terdiri atas bagian pembukaan (salam dan sapaan), bagian isi (gagasan utama/argumen), serta bagian penutup (kesimpulan dan salam penutup)."
+          },
+          "distractorWhy": {
+            "1": "Struktur tersebut milik teks eksposisi.",
+            "2": "Struktur tersebut milik teks cerpen atau narasi naskah drama.",
+            "3": "Struktur tersebut milik teks eksplanasi."
+          }
+        },
+        {
+          "id": "ind-d-8-b6-q04",
+          "difficulty": "dasar",
+          "prompt": "Berdasarkan pembahasan salam keagamaan di Indonesia pada Bab VI Buku Siswa Bahasa Indonesia Kelas VIII, ucapan salam 'Om swastiastu' berasal dari agama Hindu yang memiliki arti…",
+          "options": [
+            "Semoga dalam keadaan selamat atas karunia Sang Hyang Widhi",
+            "Semoga keselamatan dan rahmat Allah serta keberkahan-Nya terlimpah kepada kalian",
+            "Salam sejahtera bagi kita semua",
+            "Terpujilah Buddha"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Om swastiastu merupakan salam pembuka keagamaan Hindu yang bermakna memohon keselamatan atas karunia Tuhan (Sang Hyang Widhi)."
+          },
+          "distractorWhy": {
+            "1": "Merupakan makna dari salam Assalamualaikum dalam agama Islam.",
+            "2": "Merupakan makna dari Salam Sejahtera dalam agama Kristen dan Katolik.",
+            "3": "Merupakan makna dari salam Namo Buddhaya dalam agama Buddha."
+          }
+        },
+        {
+          "id": "ind-d-8-b6-q05",
+          "difficulty": "dasar",
+          "prompt": "Berdasarkan bagian istilah-istilah dalam pidato pada Buku Siswa Bahasa Indonesia Kelas VIII (Bab VI), ilmu tentang pidato atau seni berbicara didefinisikan sebagai…",
+          "options": [
+            "Retorika",
+            "Estetika",
+            "Semiotika",
+            "Fonetika"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Retorika adalah istilah ilmiah yang merujuk pada ilmu tentang pidato atau seni berbicara secara efektif di depan publik."
+          },
+          "distractorWhy": {
+            "1": "Estetika adalah ilmu tentang keindahan dan keharmonisan seni.",
+            "2": "Semiotika adalah ilmu tentang tanda dan simbol dalam bahasa.",
+            "3": "Fonetika adalah ilmu linguistik yang mempelajari bunyi bahasa."
+          }
+        },
+        {
+          "id": "ind-d-8-b6-q06",
+          "difficulty": "dasar",
+          "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VIII (Bab VI), metode berpidato yang dilakukan secara spontan dan tiba-tiba tanpa persiapan naskah sebelumnya disebut…",
+          "options": [
+            "Pidato impromptu",
+            "Pidato manuskrip",
+            "Pidato memoriter",
+            "Pidato ekstempore"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Pidato impromptu adalah metode penyampaian pidato secara serta-merta/spontan tanpa membawa naskah atau persiapan khusus sebelumnya."
+          },
+          "distractorWhy": {
+            "1": "Pidato manuskrip menggunakan naskah lengkap tulisan.",
+            "2": "Pidato memoriter menyampaikan pidato dengan cara menghafalkan naskah kata demi kata.",
+            "3": "Pidato ekstempore menyampaikan pidato dengan menyiapkan garis besar atau catatan poin penting."
+          }
+        },
+        {
+          "id": "ind-d-8-b6-q07",
+          "difficulty": "sedang",
+          "prompt": "Cermatilah penggalan pidato berikut:\n\"Pada saat penyampaian visi dan misi, saya mengungkapkan keinginan untuk mengaktifkan kembali beberapa kegiatan, antara lain pembuatan majalah dinding OSIS, kegiatan lomba pidato, dan kegiatan ekstrakurikuler debat bahasa Inggris. Saya berharap nantinya kita dapat bekerja sama untuk mewujudkan ide tersebut.\"\nBerdasarkan Buku Siswa Bahasa Indonesia Kelas VIII (Bab VI), penggalan teks pidato Ketua OSIS tersebut termasuk ke dalam bagian struktur…",
+          "options": [
+            "Isi pidato, karena memuat gagasan utama dan program kerja yang ingin disampaikan oleh orator",
+            "Pembukaan pidato, karena memuat salam keagamaan dan ungkapan sapaan penghormatan",
+            "Penutup pidato, karena berisi kalimat permohonan maaf dan salam perpisahan",
+            "Salam pembuka pidato, karena berisi penghormatan formal kepada kepala sekolah dan dewan guru"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Bagian isi pidato memuat gagasan pokok, ide, gagasan program, serta pandangan yang ingin disampaikan pembawa pidato kepada audiens."
+          },
+          "distractorWhy": {
+            "1": "Bagian pembukaan terletak di awal pidato dan berisi salam serta sapaan penghormatan.",
+            "2": "Bagian penutup berada di akhir pidato dan memuat simpulan serta pesan/harapan akhir.",
+            "3": "Salam pembuka merupakan ucapan sapaan awal seperti selamat pagi atau Assalamualaikum."
+          }
+        },
+        {
+          "id": "ind-d-8-b6-q08",
+          "difficulty": "sedang",
+          "prompt": "Dalam Jelajah Kata Bab VI Buku Siswa Bahasa Indonesia Kelas VIII, gerakan anggota tubuh saat berpidato yang berfungsi meyakinkan pendengar dinamakan…",
+          "options": [
+            "Gestur",
+            "Intonasi",
+            "Artikulasi",
+            "Khalayak"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Gestur adalah gerakan anggota tubuh (seperti tangan, bahu, dan mimik) saat berpidato yang berfungsi memperkuat pesan dan meyakinkan khalayak."
+          },
+          "distractorWhy": {
+            "1": "Intonasi adalah ketepatan irama kalimat dalam berbicara saat berpidato.",
+            "2": "Artikulasi adalah kejelasan pengucapan lafal kata.",
+            "3": "Khalayak adalah sebutan bagi orang banyak atau pendengar pidato."
+          }
+        },
+        {
+          "id": "ind-d-8-b6-q09",
+          "difficulty": "sedang",
+          "prompt": "Cermatilah kutipan pidato dari teks \"Masalah Sampah\" berikut:\n\"Kementerian Lingkungan Hidup dan Kehutanan (KLHK) merilis bahwa jumlah timbunan sampah nasional sebesar 175.000 ton per hari atau setara 64 juta ton per tahun dengan asumsi sampah yang dihasilkan setiap orang 0,7 kg per hari.\"\nBerdasarkan Buku Siswa Bahasa Indonesia Kelas VIII (Bab VI), fungsi penyampaian data kuantitatif tersebut dalam pidato adalah…",
+          "options": [
+            "Memperkuat argumen pidato dengan fakta resmi agar pendengar percaya akan keseriusan masalah sampah",
+            "Menghibur pendengar agar suasana pembacaan pidato menjadi santai dan lucu",
+            "Memenuhi kaidah tata bahasa yang mewajibkan angka matematis dalam pidato",
+            "Mengubah teks pidato persuasif menjadi naskah laporan keuangan instansi"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Penyampaian fakta dan data resmi (seperti rilis KLHK) berfungsi memperkuat argumen dan dasar pemikiran pidato sehingga audiens terpengaruh dan meyakini pesan pidato."
+          },
+          "distractorWhy": {
+            "1": "Data statistik sampah disajikan untuk memberikan bukti faktual objektif, bukan sarana hiburan.",
+            "2": "Kaidah bahasa pidato tidak mewajibkan menyertakan perhitungan matematika.",
+            "3": "Penyajian data KLHK tidak mengubah genre pidato menjadi laporan akuntansi."
+          }
+        },
+        {
+          "id": "ind-d-8-b6-q10",
+          "difficulty": "sedang",
+          "prompt": "Dalam Bab VI Buku Siswa Bahasa Indonesia Kelas VIII, dijelaskan bahwa teks pidato sering memuat kata ilmiah. Pasangan kata ilmiah dan bidang ilmu terkait yang sesuai menurut buku siswa adalah…",
+          "options": [
+            "Ekosistem merupakan kata ilmiah dari bidang ilmu biologi",
+            "Atom merupakan kata ilmiah dari bidang ilmu sejarah",
+            "Khatulistiwa merupakan kata ilmiah dari bidang ilmu bahasa dan sastra",
+            "Bait merupakan kata ilmiah dari bidang ilmu kimia"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Ekosistem merujuk pada keilmuan biologi tentang lingkungan tempat tinggal komunitas organik."
+          },
+          "distractorWhy": {
+            "1": "Atom merupakan kata ilmiah dari bidang ilmu kimia.",
+            "2": "Khatulistiwa merupakan kata ilmiah dari bidang ilmu geografi.",
+            "3": "Bait merupakan kata ilmiah dari bidang ilmu bahasa dan sastra."
+          }
+        },
+        {
+          "id": "ind-d-8-b6-q11",
+          "difficulty": "sedang",
+          "prompt": "Cermatilah kalimat-kalimat berikut:\n(1) Marilah kita melatih diri untuk disiplin dalam membuang sampah pada tempatnya.\n(2) Hari ini hujan deras menyebabkan beberapa jalan di kawasan sekolah tergenang air.\n(3) Buanglah sampah organik ke dalam wadah pengomposan agar bermanfaat.\n(4) Halaman sekolah kami dikelilingi oleh berbagai jenis pepohonan yang rindang.\nBerdasarkan materi penulisan kalimat persuasif pada Bab VI Buku Siswa Bahasa Indonesia Kelas VIII, kalimat yang termasuk contoh kalimat persuasif ditunjukkan oleh nomor…",
+          "options": [
+            "(1) dan (3)",
+            "(2) dan (4)",
+            "(1) dan (2)",
+            "(3) dan (4)"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Kalimat (1) dan (3) mengandung ajakan dan bujukan yang ditandai oleh kata 'marilah' dan kata imperatif 'buanglah'."
+          },
+          "distractorWhy": {
+            "1": "Kalimat (2) dan (4) merupakan kalimat berita/deskriptif informatif, bukan kalimat persuasif.",
+            "2": "Kalimat (2) merupakan kalimat berita fenomena alam.",
+            "3": "Kalimat (4) merupakan kalimat deskripsi lingkungan."
+          }
+        },
+        {
+          "id": "ind-d-8-b6-q12",
+          "difficulty": "sedang",
+          "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VIII (Bab VI), manakah di antara kalimat berikut yang merupakan contoh ungkapan rasa peduli atau simpati dalam teks pidato?",
+          "options": [
+            "\"Saya berharap pada masa yang akan datang kita lebih peduli dan memperhatikan masalah sampah.\"",
+            "\"Data menunjukkan produksi sampah nasional mencapai 175.000 ton per hari.\"",
+            "\"Selamat pagi Bapak Kepala Sekolah dan Bapak/Ibu Guru yang saya hormati.\"",
+            "\"Pidato impromptu dilakukan secara spontan tanpa bantuan naskah tertulis.\""
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Kalimat tersebut mengekspresikan perhatian, rasa empati, dan kepedulian terhadap kelestarian lingkungan dan penanganan sampah."
+          },
+          "distractorWhy": {
+            "1": "Kalimat tersebut memuat pernyataan fakta data kuantitatif.",
+            "2": "Kalimat tersebut memuat sapaan pembuka pidato.",
+            "3": "Kalimat tersebut memuat definisi metode berpidato."
+          }
+        },
+        {
+          "id": "ind-d-8-b6-q13",
+          "difficulty": "sedang",
+          "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VIII (Bab VI), urutan langkah awal yang tepat dalam menyusun teks pidato sebelum mengumpulkan fakta dan data adalah…",
+          "options": [
+            "Memilih dan menentukan topik, lalu menentukan tujuan pidato dan menyusun kerangka pidato",
+            "Berpidato di depan umum terlebih dahulu baru menentukan topik dan kerangka naskah",
+            "Menghafal naskah pidato secara keseluruhan lalu menyusun ucapan salam pembuka",
+            "Menyunting tata bahasa naskah pidato sebelum menentukan masalah yang akan dibahas"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Langkah penulisan pidato dimulai dengan menentukan topik yang dikuasai/disukai, menetapkan tujuan pidato, lalu membuat kerangka bagian pidato sebelum mencari data pendukung."
+          },
+          "distractorWhy": {
+            "1": "Praktik berpidato dilakukan setelah naskah pidato selesai disusun dan disunting.",
+            "2": "Menghafal naskah adalah salah satu metode berpidato, bukan langkah awal penyusunan.",
+            "3": "Menyunting merupakan tahap akhir perbaikan teks setelah naskah lengkap selesai ditulis."
+          }
+        },
+        {
+          "id": "ind-d-8-b6-q14",
+          "difficulty": "tinggi",
+          "prompt": "Cermatilah penggalan teks pidato berikut:\n\"Bapak dan Ibu Guru serta teman-teman semua. Kita telah mengetahui akibat buruk yang ditimbulkan oleh sampah. Marilah kita melatih diri untuk disiplin membuang sampah pada tempatnya. Jika perlu, kita harus mencari cara untuk mengolah sampah menjadi sesuatu yang bermanfaat...\"\nBerdasarkan analisis struktur dan kebahasaan pidato pada Bab VI Buku Siswa Bahasa Indonesia Kelas VIII, penggalan paragraf tersebut menggabungkan unsur kebahasaan…",
+          "options": [
+            "Kata sapaan khalayak, simpulan dampak masalah, dan kalimat persuasif dengan kata penanda 'marilah'",
+            "Salam keagamaan lima agama, permohonan maaf penutup, dan kata ilmiah astronomi",
+            "Pengenalan identitas orator, pembacaan rima puisi, dan larangan hukum perundang-undangan",
+            "Biodata pengurus OSIS, paparan anggaran biaya sekolah, dan salam perpisahan alumni"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Paragraf tersebut memuat sapaan khalayak ('Bapak dan Ibu Guru serta teman-teman'), penegasan pemahaman dampak sampah, serta ajakan persuasif yang ditandai kata 'marilah'."
+          },
+          "distractorWhy": {
+            "1": "Teks tidak mengandung ucapan salam keagamaan lima agama maupun istilah astronomi.",
+            "2": "Teks tidak memuat unsur naskah puisi atau perundang-undangan.",
+            "3": "Teks tidak membahas rincian anggaran biaya atau biodata pengurus."
+          }
+        },
+        {
+          "id": "ind-d-8-b6-q15",
+          "difficulty": "tinggi",
+          "prompt": "Seorang orator menyampaikan pidato pada acara sekolah. Ia tidak membaca naskah secara utuh kata demi kata, melainkan hanya membawa lembaran catatan kecil yang memuat garis-garis besar topik dan poin penting yang hendak disampaikan.\nBerdasarkan penjelasannya pada Bab VI Buku Siswa Bahasa Indonesia Kelas VIII, metode berpidato yang diterapkan oleh orator tersebut dinamakan…",
+          "options": [
+            "Ekstempore, karena menyampaikan pidato dengan bantuan kerangka/garis besar topik",
+            "Manuskrip, karena membaca seluruh teks naskah pidato kata demi kata sampai selesai",
+            "Memoriter, karena menghafal seluruh isi teks naskah pidato tanpa membawa catatan",
+            "Impromptu, karena berpidato secara mendadak tanpa ada persiapan naskah atau catatan sama sekali"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Metode ekstempore dilakukan dengan menyiapkan catatan garis besar atau poin-poin penting isi pidato sebagai panduan alur berbicara."
+          },
+          "distractorWhy": {
+            "1": "Metode manuskrip mewajibkan pembacaan naskah lengkap secara verbatim.",
+            "2": "Metode memoriter mengandalkan hafalan total tanpa lembaran catatan di tangan.",
+            "3": "Metode impromptu dilakukan mendadak tanpa ada waktu menyiapkan catatan garis besar."
+          }
+        },
+        {
+          "id": "ind-d-8-b6-q16",
+          "difficulty": "tinggi",
+          "prompt": "Cermatilah kutipan kalimat pidato berikut:\n\"KLHK merilis bahwa jumlah timbunan sampah nasional sebesar 175.000 ton per hari dengan asumsi sampah per orang 0,7 kg. Produksi sampah yang sangat besar ini akan berakibat fatal jika diikuti oleh perilaku tidak terpuji masyarakat.\"\nBerdasarkan kotak Jelajah Kata Bab VI Buku Siswa Bahasa Indonesia Kelas VIII, arti kata 'asumsi' dan 'fatal' secara berurutan adalah…",
+          "options": [
+            "Dugaan atau landasan berpikir yang dianggap benar; serta kesalahan/perilaku yang berakibat buruk",
+            "Kenyataan objektif yang teruji di laboratorium; serta keuntungan finansial yang sangat melimpah",
+            "Keputusan hukum perundang-undangan; serta hasil musyawarah kesepakatan bersama",
+            "Rekomendasi tertulis dari tokoh; serta imbauan resmi dari lembaga daerah"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Menurut kotak Jelajah Kata halaman 205, asumsi berarti dugaan atau landasan berpikir yang dianggap benar, sedangkan fatal berarti perilaku atau kesalahan yang berakibat buruk."
+          },
+          "distractorWhy": {
+            "1": "Arti tersebut bertolak belakang dengan makna asumsi dan fatal.",
+            "2": "Merupakan definisi istilah perundang-undangan atau musyawarah.",
+            "3": "Merupakan definisi dari anjuran atau surat imbauan resmi."
+          }
+        },
+        {
+          "id": "ind-d-8-b6-q17",
+          "difficulty": "tinggi",
+          "prompt": "Menurut penjelasan pada Bab VI Buku Siswa Bahasa Indonesia Kelas VIII (halaman 206), pendengar atau pembaca dapat menyimpulkan pesan-pesan yang terkandung dalam naskah pidato melalui tiga langkah mendasar, yaitu…",
+          "options": [
+            "Menemukan topik/gagasan pidato, memahami isi teks pidato, dan mencermati kata-kata yang sering muncul",
+            "Menghafal seluruh naskah pidato, mengukur durasi waktu berbicara, dan menilai intonasi orator",
+            "Mengubah teks pidato menjadi naskah drama, mencatat kata ilmiah, dan menghitung jumlah paragraf",
+            "Menuliskan salam pembuka lima agama, membuat spanduk promosi, dan mengamati gestur audiens"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Buku siswa menjelaskan 3 cara mengidentifikasi pesan pidato: (1) menemukan topik/gagasan pidato, (2) memahami isi teks pidato, dan (3) mencermati kata-kata yang sering muncul dalam teks."
+          },
+          "distractorWhy": {
+            "1": "Tiga hal tersebut merupakan aspek teknik penyampaian pidato, bukan cara menemukan pesan pidato.",
+            "2": "Mengubah bentuk teks menjadi drama dan menghitung paragraf tidak menjamin pemahaman pesan.",
+            "3": "Salam lima agama dan spanduk adalah unsur pelengkap pembuka dan media visual."
+          }
+        },
+        {
+          "id": "ind-d-8-b6-q18",
+          "difficulty": "tinggi",
+          "prompt": "Dalam Bab VI Buku Siswa Bahasa Indonesia Kelas VIII (halaman 215), salah satu langkah penting sebelum menyusun teks pidato adalah memperhitungkan durasi atau lamanya pidato jika dipraktikkan. Alasan utama menentukan alokasi waktu tersebut adalah…",
+          "options": [
+            "Agar pidato dapat disampaikan dalam waktu yang pas serta sesuai dengan situasi dan alokasi susunan acara",
+            "Supaya pembawa pidato dapat menghabiskan waktu acara meskipun materi keluar dari topik utama",
+            "Agar pendengar merasa jenuh sehingga tidak memberikan pertanyaan kritis kepada orator",
+            "Untuk memastikan teks pidato memiliki jumlah paragraf yang sangat tebal"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Menentukan lamanya pidato bertujuan agar teks yang disusun pas dengan alokasi waktu yang diberikan panitia acara serta efisien bagi pendengar."
+          },
+          "distractorWhy": {
+            "1": "Pidato tidak boleh melebar ke luar topik hanya demi menghabiskan alokasi waktu.",
+            "2": "Pidato hendaknya membuat pendengar antusias, bukan membuat jenuh.",
+            "3": "Kualitas pidato diukur dari ketepatan pesan dan struktur, bukan ketebalan halaman naskah."
+          }
+        },
+        {
+          "id": "ind-d-8-b6-q19",
+          "difficulty": "tinggi",
+          "prompt": "Dalam penyusunan teks pidato di lingkungan majemuk, pembawa pidato sering menggunakan salam keagamaan resmi. Berdasarkan Bab VI Buku Siswa Bahasa Indonesia Kelas VIII, pasangan ucapan salam keagamaan beserta makna/asal agama yang tepat adalah…",
+          "options": [
+            "'Namo Buddhaya' dari agama Buddha yang bermakna terpujilah Buddha, serta 'Salam Kebajikan' dari agama Konghucu",
+            "'Om Swastiastu' dari agama Kristen Katolik yang bermakna ucapan selamat pagi bagi seluruh jemaat",
+            "'Salam Sejahtera' dari agama Hindu yang bermakna permohonan maaf kepada para dewa",
+            "'Assalamualaikum' dari agama Konghucu yang bermakna kedamaian bagi seluruh umat manusia"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Namo Buddhaya merupakan ucapan salam agama Buddha (terpujilah Buddha) dan Salam Kebajikan merupakan salam agama Konghucu."
+          },
+          "distractorWhy": {
+            "1": "Om Swastiastu merupakan ucapan salam dari agama Hindu.",
+            "2": "Salam Sejahtera merupakan ucapan salam dari agama Kristen dan Katolik.",
+            "3": "Assalamualaikum merupakan ucapan salam dari agama Islam."
           }
         }
       ]

@@ -30,7 +30,7 @@ def fix_difficulty(comp):
                     item["distractorWhy"][k] = val.strip() + " yang merupakan analisis kekeliruan jawaban."
     return comp
 
-# 1. MATEMATIKA (Grade 7 Bab 1-4 + Grade 8 Bab 1)
+# 1. MATEMATIKA (Grade 7 Bab 1-6 + Grade 8 Bab 1)
 mat_doc = "Matematika untuk SMP/MTs Kelas VII"
 mat_data = {
     "schema": "fiezel-mapel-bank-v1",
@@ -46,7 +46,7 @@ mat_data = {
     },
     "competencies": []
 }
-for b in [1, 2, 3, 4]:
+for b in [1, 2, 3, 4, 5, 6]:
     c = load_json(os.path.join(tools_dir, f"chunk_mat_7_b{b}.json"))
     if c:
         c["cpRef"] = f"{mat_doc} — Bab {b}"
@@ -61,7 +61,7 @@ for b in [1]:
 save_json(os.path.join(content_dir, "mapel-mat-d.json"), mat_data)
 
 
-# 2. BAHASA INDONESIA (Grade 7 Bab 1-4 + Grade 8 Bab 1-5)
+# 2. BAHASA INDONESIA (Grade 7 Bab 1-6 + Grade 8 Bab 1-6)
 ind_doc = "Bahasa Indonesia untuk SMP/MTs Kelas VII (Edisi Revisi)"
 ind_data = {
     "schema": "fiezel-mapel-bank-v1",
@@ -77,13 +77,13 @@ ind_data = {
     },
     "competencies": []
 }
-for b in [1, 2, 3, 4]:
+for b in [1, 2, 3, 4, 5, 6]:
     c = load_json(os.path.join(tools_dir, f"chunk_ind_7_b{b}.json"))
     if c:
         c["cpRef"] = f"{ind_doc} — Bab {b}"
         ind_data["competencies"].append(fix_difficulty(c))
 
-for b in [1, 2, 3, 4, 5]:
+for b in [1, 2, 3, 4, 5, 6]:
     c = load_json(os.path.join(tools_dir, f"chunk_ind_8_b{b}.json"))
     if c:
         c["cpRef"] = f"{ind_doc} — Bab {b} (Kelas VIII)"
@@ -92,7 +92,7 @@ for b in [1, 2, 3, 4, 5]:
 save_json(os.path.join(content_dir, "mapel-ind-d.json"), ind_data)
 
 
-# 3. BAHASA INGGRIS (Grade 7 Chapter 1-3 + Grade 8 Chapter 1-5 + Grade 9 Chapter 1, 4, 5)
+# 3. BAHASA INGGRIS (Grade 7 Chapter 1-3 + Grade 8 Chapter 1-5 + Grade 9 Chapter 1-5)
 eng_doc = "English for Nusantara untuk SMP/MTs Kelas VII"
 eng_data = {
     "schema": "fiezel-mapel-bank-v1",
@@ -129,7 +129,7 @@ for c_num in [1, 2, 3, 4, 5]:
 save_json(os.path.join(content_dir, "mapel-eng-d.json"), eng_data)
 
 
-# 4. IPS (Grade 7 Tema 1-3 + Grade 8 Tema 1)
+# 4. IPS (Grade 7 Tema 1-4 + Grade 8 Tema 1)
 ips_doc = "Ilmu Pengetahuan Sosial untuk SMP/MTs Kelas VII (Edisi Revisi)"
 ips_data = {
     "schema": "fiezel-mapel-bank-v1",
@@ -145,7 +145,7 @@ ips_data = {
     },
     "competencies": []
 }
-for t_num in [1, 2, 3]:
+for t_num in [1, 2, 3, 4]:
     c = load_json(os.path.join(tools_dir, f"chunk_ips_7_t{t_num}.json"))
     if c:
         c["cpRef"] = f"{ips_doc} — Tema {t_num:02d}"

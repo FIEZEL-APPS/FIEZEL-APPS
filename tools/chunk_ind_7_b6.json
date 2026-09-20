@@ -1,0 +1,389 @@
+{
+  "code": "KOMP-IND-D-7-BAB6-01",
+  "grade": 7,
+  "name": "Bab VI: Sampaikan Melalui Surat",
+  "materi": "Mengenal Surat Pribadi dan Surat Resmi, Unsur-Unsur dan Struktur Surat, Berkomunikasi Santun via Surat, Etika Komunikasi Digital di Ruang Bincang / Email",
+  "cpRef": "Bahasa Indonesia untuk SMP/MTs Kelas VII (Edisi Revisi)",
+  "items": [
+    {
+      "id": "ind-d-7-b6-q01",
+      "difficulty": "dasar",
+      "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VII (hal. 202-203), surat pribadi digolongkan sebagai surat yang dikirim oleh individu untuk kepentingan pribadi. Salah satu tujuan utama penulisan surat pribadi sebagaimana ditunjukkan dalam surat Florencia kepada Alga adalah…",
+      "options": [
+        "Bertukar kabar dan menceritakan pengalaman pribadi",
+        "Memberikan instruksi dinas dan keputusan rapat instansi",
+        "Mengundang seluruh warga sekolah dalam acara resmi",
+        "Menagih sisa pembayaran transaksi jual beli organisasi"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Surat pribadi berfungsi untuk hubungan personal seperti bertukar kabar, menceritakan pengalaman, atau menyampaikan perasaan."
+      },
+      "distractorWhy": {
+        "1": "Instruksi dinas merupakan fungsi surat resmi.",
+        "2": "Undangan warga sekolah adalah fungsi surat resmi.",
+        "3": "Penagihan transaksi organisasi merupakan fungsi surat resmi."
+      }
+    },
+    {
+      "id": "ind-d-7-b6-q02",
+      "difficulty": "sedang",
+      "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VII (hal. 204), pada kop surat resmi Organisasi Siswa Intra Sekolah (OSIS) SMP Pelita Bangsa terdapat informasi utama yang memuat…",
+      "options": [
+        "Nama organisasi/lembaga, nama sekolah, alamat lengkap, dan nomor telepon",
+        "Nama pengirim surat, sapaan akrab, dan tempat pembuatan surat",
+        "Salam pembuka, tanggal rapat, dan susunan acara",
+        "Nama penerima surat, lampiran, dan perihal rapat"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Kop surat (kepala surat) memuat identitas resmi lembaga/sekolah seperti nama organisasi, alamat, serta nomor kontak."
+      },
+      "distractorWhy": {
+        "1": "Informasi ini merupakan bagian surat pribadi.",
+        "2": "Informasi ini adalah bagian pembuka dan isi surat.",
+        "3": "Informasi ini adalah bagian kepala isi surat (nomor, hal, lampiran, alamat tujuan)."
+      }
+    },
+    {
+      "id": "ind-d-7-b6-q03",
+      "difficulty": "sedang",
+      "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VII (hal. 206-207), bentuk terikat 'pra-' bermakna 'sebelum'. Apabila kata 'prakegiatan' digunakan dalam kalimat 'OSIS mengadakan rapat prakegiatan Bazar dan Malam Gembira', makna kata 'prakegiatan' adalah…",
+      "options": [
+        "Tahap persiapan atau perencanaan yang dilakukan sebelum kegiatan utama dilaksanakan",
+        "Evaluasi menyeluruh yang dilakukan setelah seluruh rangkaian acara selesai",
+        "Pelaksanaan inti kegiatan saat acara sedang berlangsung di lokasi",
+        "Pembatalan suatu agenda kegiatan karena adanya kendala tak terduga"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Bentuk terikat 'pra-' berarti sebelum, sehingga 'prakegiatan' berarti tahap sebelum kegiatan utama."
+      },
+      "distractorWhy": {
+        "1": "Evaluasi setelah kegiatan dinamakan pascakegiatan.",
+        "2": "Pelaksanaan inti terjadi saat kegiatan berlangsung.",
+        "3": "Pembatalan bukan makna bentuk terikat 'pra-'."
+      }
+    },
+    {
+      "id": "ind-d-7-b6-q04",
+      "difficulty": "tinggi",
+      "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VII (hal. 207), kalimat rumpang: \"Penggunaan sistem pembayaran _____ saat ini lazim digunakan orang dalam menggunakan paket internet, telepon genggam, hingga listrik.\" Kata berimbuhan 'pra-' yang paling tepat untuk melengkapi kalimat tersebut adalah…",
+      "options": [
+        "prabayar",
+        "prasyarat",
+        "praduga",
+        "prasejarah"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Sistem pembayaran yang dilakukan sebelum menggunakan jasa/layanan disebut prabayar."
+      },
+      "distractorWhy": {
+        "1": "Prasyarat berarti syarat yang harus dipenuhi sebelum melangkah ke tahap berikutnya.",
+        "2": "Praduga berarti persangkaan sebelum ada bukti sah.",
+        "3": "Prasejarah merujuk pada masa sebelum ditemukannya tulisan."
+      }
+    },
+    {
+      "id": "ind-d-7-b6-q05",
+      "difficulty": "dasar",
+      "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VII (hal. 208-209 Tabel 6.3), salah satu unsur pembeda yang hanya terdapat pada surat resmi dan tidak ada pada surat pribadi adalah…",
+      "options": [
+        "Kepala surat (kop surat), nomor surat, dan perihal",
+        "Salam pembuka dan salam penutup",
+        "Tanggal pembuatan surat dan nama pengirim",
+        "Isi surat dan pesan yang disampaikan"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Kop surat, nomor surat, dan perihal merupakan unsur khas yang hanya dimiliki surat resmi instansi/lembaga."
+      },
+      "distractorWhy": {
+        "1": "Salam pembuka dan penutup ada pada surat resmi maupun surat pribadi.",
+        "2": "Tanggal dan nama pengirim terdapat pada kedua jenis surat.",
+        "3": "Isi surat terdapat pada semua jenis surat."
+      }
+    },
+    {
+      "id": "ind-d-7-b6-q06",
+      "difficulty": "sedang",
+      "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VII (hal. 210-211), surat pembaca yang dikirimkan oleh Bapak Andito ke harian Kompas mengenai \"Lamanya Proses Perubahan Kartu Keluarga di Kelurahan Bakti Sari\" tergolong sebagai surat pribadi karena…",
+      "options": [
+        "Ditulis oleh warga secara individu untuk menyampaikan keluhan atau aspirasi pribadinya kepada publik",
+        "Dibuat oleh pejabat kelurahan untuk memberikan instruksi kerja resmi",
+        "Menggunakan kop surat resmi kelurahan lengkap dengan stempel lembaga",
+        "Bersifat rahasia dan hanya boleh dibaca oleh pihak kepolisian"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Surat pembaca merupakan bentuk surat pribadi yang dikirimkan warga ke media massa untuk menyampaikan aspirasi atau permasalahan publik."
+      },
+      "distractorWhy": {
+        "1": "Bapak Andito adalah warga penerima layanan, bukan pejabat publik.",
+        "2": "Surat pembaca tidak menggunakan kop surat resmi instansi.",
+        "3": "Surat pembaca dimuat di surat kabar harian sehingga dapat dibaca khalayak umum."
+      }
+    },
+    {
+      "id": "ind-d-7-b6-q07",
+      "difficulty": "tinggi",
+      "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VII (hal. 211-212 Kupas Teori), cermatilah pembuka surat berikut: \"Bapak Presiden yang terhormat, saya Ganis, siswa kelas tujuh SMP Bintang Indonesia. Saya tinggal di Kota Sumedang. Akhir-akhir ini saya merasa khawatir melihat makin maraknya iklan rokok di televisi.\" Jenis pembuka surat tersebut adalah…",
+      "options": [
+        "Memperkenalkan diri",
+        "Menanyakan kabar",
+        "Menyatakan tujuan kegiatan",
+        "Ucapan terima kasih"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Kalimat awal memuat identitas penulis berupa nama, jenjang sekolah, dan kota tempat tinggal (memperkenalkan diri)."
+      },
+      "distractorWhy": {
+        "1": "Tidak ada struktur kalimat yang menanyakan kabar penerima.",
+        "2": "Pernyataan tujuan kegiatan sekolah tidak terdapat pada penggalan tersebut.",
+        "3": "Tidak ada ungkapan apresiasi atau terima kasih pada awal surat."
+      }
+    },
+    {
+      "id": "ind-d-7-b6-q08",
+      "difficulty": "dasar",
+      "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VII (hal. 214 Gambar 6.3 Ragam Sapaan), kata sapaan seperti \"Kakek, Nenek, Paman, Bibi, Ibu, dan Mas\" dikategorikan sebagai kata sapaan yang…",
+      "options": [
+        "Menunjukkan hubungan kerabat atau keluarga",
+        "Berbentuk kata sapaan nominal dengan penambahan akhiran -ku",
+        "Menunjukkan rasa hormat kepada pejabat pemerintah",
+        "Digunakan khusus untuk percakapan dalam ruang bincang daring"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Kata sapaan kakek, paman, dan mas merujuk pada ikatan kekerabatan atau hubungan keluarga."
+      },
+      "distractorWhy": {
+        "1": "Sapaan nominal+ku contohnya Tuhanku atau Ibuku.",
+        "2": "Sapaan rasa hormat contohnya Yang Terhormat.",
+        "3": "Sapaan kerabat berlaku umum baik secara lisan maupun tertulis."
+      }
+    },
+    {
+      "id": "ind-d-7-b6-q09",
+      "difficulty": "sedang",
+      "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VII (hal. 215-216 Gambar 6.4 Pronomina), kata ganti \"kami\" dan \"kita\" termasuk ke dalam jenis pronomina persona yang mengacu pada…",
+      "options": [
+        "Diri sendiri jamak (orang pertama jamak)",
+        "Orang yang diajak bicara tunggal (orang kedua tunggal)",
+        "Orang yang dibicarakan jamak (orang ketiga jamak)",
+        "Penunjuk tempat dan ihwal"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Kata 'kami' dan 'kita' menduduki fungsi pronomina persona orang pertama jamak (mengacu pada pihak pembicara)."
+      },
+      "distractorWhy": {
+        "1": "Orang kedua tunggal contohnya engkau, kamu, atau Anda.",
+        "2": "Orang ketiga jamak contohnya mereka.",
+        "3": "Penunjuk tempat contohnya sini, situ, atau sana."
+      }
+    },
+    {
+      "id": "ind-d-7-b6-q10",
+      "difficulty": "tinggi",
+      "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VII (hal. 216), cermatilah kalimat berikut: \"Lain kali, jangan berbuat begitu lagi!\" Kata \"begitu\" pada kalimat tersebut berfungsi sebagai…",
+      "options": [
+        "Pronomina penunjuk ihwal",
+        "Pronomina persona orang ketiga",
+        "Pronomina penanya jumlah",
+        "Kata sapaan penghormatan"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Kata 'begini' dan 'begitu' termasuk kelompok pronomina penunjuk ihwal (mengacu pada keadaan atau perbuatan)."
+      },
+      "distractorWhy": {
+        "1": "Pronomina persona mengacu pada orang (dia, mereka).",
+        "2": "Pronomina penanya mengacu pada pertanyaan (siapa, apa).",
+        "3": "Kata sapaan merujuk pada sapaan mitra tutur."
+      }
+    },
+    {
+      "id": "ind-d-7-b6-q11",
+      "difficulty": "dasar",
+      "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VII (hal. 217 Tabel 6.5), ragam bahasa baku digunakan dalam komunikasi resmi. Pasangan kata baku dan tidak baku yang tepat menurut tabel tersebut adalah…",
+      "options": [
+        "Baku: 'mengubah' | Tidak Baku: 'merubah'",
+        "Baku: 'enggak' | Tidak Baku: 'tidak'",
+        "Baku: 'belom' | Tidak Baku: 'belum'",
+        "Baku: 'dikerjain' | Tidak Baku: 'dikerjakan'"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Kata 'mengubah' adalah bentuk baku yang tepat sesuai kaidah tata bahasa, sedangkan 'merubah' adalah bentuk tidak baku."
+      },
+      "distractorWhy": {
+        "1": "Kata 'tidak' adalah bentuk baku, sedangkan 'enggak' tidak baku.",
+        "2": "Kata 'belum' adalah bentuk baku, sedangkan 'belom' tidak baku.",
+        "3": "Kata 'dikerjakan' adalah bentuk baku, sedangkan 'dikerjain' tidak baku."
+      }
+    },
+    {
+      "id": "ind-d-7-b6-q12",
+      "difficulty": "sedang",
+      "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VII (hal. 218), perhatikan ungkapan percakapan tidak baku kepada guru berikut: \"Pak guru, tugasnya udah dinilai belom?\" Perbaikan kalimat tersebut agar menjadi baku dan santun adalah…",
+      "options": [
+        "\"Selamat pagi, Pak. Mohon maaf, apakah tugas kami sudah selesai dinilai?\"",
+        "\"Pak, tugas saya buruan dinilai dong sekarang!\"",
+        "\"Halo Pak, tugasnya udah dikurangin belom nilainya?\"",
+        "\"Sorry Pak guru, tugas kemarin udah beres dinilai kan?\""
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Kalimat diawali sapaan sopan dan permohonan maaf, serta mengganti kata percakapan dengan kosakata baku (sudah, selesai, dinilai)."
+      },
+      "distractorWhy": {
+        "1": "Menggunakan kata tidak baku 'buruan' dan nada mendesak yang kurang santun.",
+        "2": "Masih memuat kata tidak baku 'udah' dan 'belom'.",
+        "3": "Menggunakan kata tidak baku ragam percakapan santai ('sorry' dan 'udah beres')."
+      }
+    },
+    {
+      "id": "ind-d-7-b6-q13",
+      "difficulty": "sedang",
+      "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VII (hal. 218 Tabel 6.6), struktur penyusunan pesan media sosial yang santun dan jelas kepada guru secara berurutan terdiri atas…",
+      "options": [
+        "Pembuka, perkenalan diri, maksud dan tujuan, serta penutup",
+        "Kepala surat, nomor surat, alamat tujuan, dan lampiran",
+        "Judul artikel, riwayat hidup, kutipan opini, dan perihal",
+        "Salam perpisahan, ucapan maaf, alasan keterlambatan, dan ucapan terima kasih"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Pesan media sosial yang santun dan efektif disusun dengan urutan pembuka, perkenalan diri, maksud/tujuan yang jelas, lalu ditutup dengan ucapan terima kasih."
+      },
+      "distractorWhy": {
+        "1": "Struktur ini merupakan komponen surat resmi cetak.",
+        "2": "Struktur ini bukan penyusun pesan singkat.",
+        "3": "Urutan ini tidak sistematis dan tidak memuat perkenalan identitas pengirim."
+      }
+    },
+    {
+      "id": "ind-d-7-b6-q14",
+      "difficulty": "tinggi",
+      "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VII (hal. 220-221 Kegiatan 9), dalam tanggapan ruang bincang mengenai permasalahan kucing Mabel milik Tira, pendapat drh. Puspa Restiningtyas dianggap paling tepercaya karena…",
+      "options": [
+        "Disampaikan berdasarkan latar belakang keahlian (kepakaran) dokter hewan dengan penjelasan ilmiah serta solusi konkret",
+        "Menggunakan nama akun yang unik dan lucu tanpa disertai argumentasi medis",
+        "Menyarankan Tira untuk membiarkan kucingnya keluar rumah tanpa memperhatikan kondisi kesehatannya",
+        "Memaksa Tira membeli pakan impor yang dijual oleh penanggap secara pribadi"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Tanggapan tepercaya diukur dari kepakaran penulis (seorang dokter hewan) yang memberikan solusi medis rasional dan empati."
+      },
+      "distractorWhy": {
+        "1": "Keunikan nama akun bukan indikator kebenaran dan kepakaran informasi.",
+        "2": "Saran pembiaran tanpa analisis medis dapat memperburuk kondisi kesehatan hewan.",
+        "3": "Tanggapan dokter hewan dalam teks berfokus pada saran medis, bukan penjualan pakan."
+      }
+    },
+    {
+      "id": "ind-d-7-b6-q15",
+      "difficulty": "sedang",
+      "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VII (hal. 221), suatu kalimat tanggapan di ruang bincang daring dikatakan penuh empati apabila memenuhi kriteria berikut, kecuali…",
+      "options": [
+        "Menyalahkan dan mengejek tindakan atau keputusan yang telah dilakukan oleh penanya",
+        "Ditulis dengan pilihan kata dan bahasa yang santun",
+        "Menyampaikan simpati terhadap masalah yang sedang dihadapi penanya",
+        "Memberikan apresiasi dan dorongan semangat kepada penanya"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Empati diwujudkan melalui dukungan dan penghargaan, bukan tindakan menyalahkan atau mengejek."
+      },
+      "distractorWhy": {
+        "1": "Bahasa yang santun merupakan salah satu ciri utama tanggapan berempati.",
+        "2": "Menyampaikan rasa simpati merupakan wujud empati.",
+        "3": "Memberikan apresiasi dan dorongan semangat merupakan kriteria tanggapan berempati."
+      }
+    },
+    {
+      "id": "ind-d-7-b6-q16",
+      "difficulty": "tinggi",
+      "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VII (hal. 222-224), pada platform \"Situs Masalah\", penanggap EinsteinKuadrat menuliskan: \"Panggung sekolah merupakan tradisi sekolah sejak 20 tahun yang lalu dan tidak pernah ada yang mati karena tampil di atasnya.\" Pernyataan \"Panggung sekolah merupakan tradisi sekolah sejak 20 tahun yang lalu\" dikategorikan sebagai…",
+      "options": [
+        "Fakta, karena memuat kenyataan sejarah yang dapat diverifikasi kebenarannya",
+        "Opini, karena merupakan dugaan pribadi yang bersifat subjektif",
+        "Mitos, karena merupakan cerita rekaan yang belum pasti ada",
+        "Slogan, karena berisi kalimat ajakan untuk berhias"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Pernyataan mengenai tradisi sekolah selama 20 tahun berisi fakta kenyataan sejarah yang dapat dibuktikan kebenarannya."
+      },
+      "distractorWhy": {
+        "1": "Data rentang waktu 20 tahun dapat dibuktikan kebenarannya sehingga bukan sekadar opini.",
+        "2": "Bukan mitos karena merujuk pada kegiatan nyata sekolah.",
+        "3": "Bukan slogan."
+      }
+    },
+    {
+      "id": "ind-d-7-b6-q17",
+      "difficulty": "sedang",
+      "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VII (hal. 225-226 Gambar 6.5), percakapan di ruang bincang Tim Duta Adiwiyata SMP Negeri 13 berfokus pada pembahasan mengenai…",
+      "options": [
+        "Upaya mengatasi penumpukan sampah di selokan depan sekolah akibat kurangnya fasilitas tempat sampah pedagang",
+        "Rencana kenaikan harga makanan jajanan di kantin sekolah",
+        "Jadwal ujian tengah semester untuk mata pelajaran IPA",
+        "Persiapan lomba debat antarsekolah tingkat kabupaten"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Tim Adiwiyata mendiskusikan masalah sampah selokan di luar pagar sekolah dan mencari cara efektif mengedukasi pedagang serta warga."
+      },
+      "distractorWhy": {
+        "1": "Masalah harga makanan kantin tidak menjadi bahasan percakapan.",
+        "2": "Percakapan tidak membahas jadwal ujian sekolah.",
+        "3": "Percakapan berfokus pada kebersihan lingkungan sekolah, bukan lomba debat."
+      }
+    },
+    {
+      "id": "ind-d-7-b6-q18",
+      "difficulty": "tinggi",
+      "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VII (hal. 229 Kegiatan 11), perhatikan rumpang kalimat surat resmi berikut: \"Sehubungan dengan kegiatan studi banding tersebut, kami berharap Bapak/Ibu Kepala Sekolah berkenan memberikan izin...\" Penggunaan ungkapan \"berkenan memberikan izin\" berfungsi untuk…",
+      "options": [
+        "Menyampaikan permohonan resmi kepada pihak atasan dengan pilihan kata baku yang santun",
+        "Menyatakan teguran kepada pihak sekolah mengenai kegiatan siswa",
+        "Menggunakan bahasa pergaulan sehari-hari antaranggota OSIS",
+        "Menutup pembicaraan dalam surat pribadi kepada teman sekelas"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Frasa 'berkenan memberikan izin' merupakan ragam bahasa baku dan santun dalam surat resmi untuk memohon bantuan/izin kepada penerima berwenang."
+      },
+      "distractorWhy": {
+        "1": "Ungkapan ini bukan teguran, melainkan permohonan santun.",
+        "2": "Bukan ragam percakapan santai sehari-hari.",
+        "3": "Bukan penutup surat pribadi."
+      }
+    },
+    {
+      "id": "ind-d-7-b6-q19",
+      "difficulty": "sedang",
+      "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VII (hal. 231 Kegiatan 12b), ketika siswa melakukan kegiatan tantangan berbalas surat virtual melalui email, norma utama yang harus tetap dipelihara adalah…",
+      "options": [
+        "Menggunakan kata sapaan yang tepat serta bahasa Indonesia yang baik dan santun",
+        "Menuliskan seluruh pesan dengan kata-kata tidak baku dan kata singkatan gaul",
+        "Mengosongkan judul subjek email agar penerima merasa penasaran",
+        "Menulis teks menggunakan huruf kapital secara keseluruhan agar berkesan tegas"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Meskipun berbentuk surat elektronik pribadi, penggunaan kata sapaan yang tepat dan bahasa Indonesia yang santun tetap wajib diterapkan."
+      },
+      "distractorWhy": {
+        "1": "Surat pribadi digital tetap disarankan menggunakan bahasa yang baik dan santun.",
+        "2": "Subjek email perlu diisi agar penerima memahami perihal surat.",
+        "3": "Penggunaan kapital seluruhnya dalam media digital dianggap kurang santun (berteriak)."
+      }
+    }
+  ]
+}

@@ -1,0 +1,409 @@
+{
+  "code": "KOMP-MAT-D-7-BAB5-01",
+  "grade": 7,
+  "name": "Bab 5: Kesebangunan dan Hubungan Antar Garis",
+  "materi": "Hubungan Antar Garis & Sudut, Sudut Sejajar & Berpotongan, Konsep Kesebangunan & Kekongruenan Bangun Datar",
+  "cpRef": "Matematika untuk SMP/MTs Kelas VII",
+  "items": [
+    {
+      "id": "mat-d-7-b5-q01",
+      "difficulty": "dasar",
+      "prompt": "Dalam Buku Siswa Matematika Kelas VII Bab 5 Subbab A (halaman 166), dua sudut dikatakan saling berpenyiku jika jumlah ukurannya sama dengan 90°. Jika sudut α dan 50° adalah dua sudut yang saling berpenyiku, berapakah besar sudut α?",
+      "options": [
+        "40°",
+        "50°",
+        "130°",
+        "310°"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Dua sudut saling berpenyiku jika jumlah keduanya 90°. Maka α = 90° - 50° = 40°."
+      },
+      "distractorWhy": {
+        "1": "Nilai 50° adalah besar sudut pasangannya, bukan nilai penyikunya.",
+        "2": "Nilai 130° adalah pelurus dari 50° (180° - 50°), bukan penyikunya.",
+        "3": "Nilai 310° diperoleh jika mengurangi 360° dengan 50°, yang bukan merupakan penyiku."
+      }
+    },
+    {
+      "id": "mat-d-7-b5-q02",
+      "difficulty": "dasar",
+      "prompt": "Berdasarkan penjelasan hubungan antar sudut pada Bab 5 Subbab A (halaman 166), dua sudut yang berpelurus membentuk garis lurus sehingga jumlah keduanya 180°. Jika besar suatu sudut adalah 65°, berapakah besar sudut pelurusnya?",
+      "options": [
+        "115°",
+        "25°",
+        "125°",
+        "295°"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Sudut berpelurus jika dijumlahkan menghasilkan 180°. Jadi, sudut pelurus dari 65° adalah 180° - 65° = 115°."
+      },
+      "distractorWhy": {
+        "1": "Nilai 25° adalah hasil pengurangan 90° - 65° (penyiku), bukan pelurus.",
+        "2": "Nilai 125° terjadi akibat kesalahan perhitungan pengurangan 180° - 65°.",
+        "3": "Nilai 295° adalah hasil 360° - 65°, yang merupakan sudut refleks."
+      }
+    },
+    {
+      "id": "mat-d-7-b5-q03",
+      "difficulty": "sedang",
+      "prompt": "Pada Bab 5 Subbab A (Tabel 5.2 halaman 167), dua garis berpotongan membentuk pasangan sudut yang bertolak belakang. Pasangan sudut bertolak belakang α dan γ terbentuk pada persimpangan garis. Jika besar sudut α = 72°, maka besar sudut γ adalah ...",
+      "options": [
+        "72°",
+        "18°",
+        "108°",
+        "288°"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Sudut-sudut yang bertolak belakang memiliki besar sudut yang sama, sehingga besar sudut γ = α = 72°."
+      },
+      "distractorWhy": {
+        "1": "Nilai 18° adalah hasil pengurangan 90° - 72° (penyiku).",
+        "2": "Nilai 108° adalah besar sudut pelurusnya (180° - 72°).",
+        "3": "Nilai 288° adalah hasil pengurangan 360° - 72°."
+      }
+    },
+    {
+      "id": "mat-d-7-b5-q04",
+      "difficulty": "sedang",
+      "prompt": "Dalam Eksplorasi 5.1 perancangan jalan Asep (halaman 167), dua garis sejajar dipotong oleh garis ketiga (transversal) membentuk pasangan sudut sehadap. Jika salah satu sudut sehadap besarnya 110°, maka besar sudut sehadap pasangannya adalah ...",
+      "options": [
+        "110°",
+        "70°",
+        "20°",
+        "250°"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Pasangan sudut sehadap pada dua garis sejajar yang dipotong garis transversal memiliki besar sudut yang sama, yaitu 110°."
+      },
+      "distractorWhy": {
+        "1": "Nilai 70° adalah besar sudut pelurus dari 110° (180° - 110°).",
+        "2": "Nilai 20° adalah hasil pengurangan 90° dari 110° yang salah penalarannya.",
+        "3": "Nilai 250° adalah hasil pengurangan 360° - 110°."
+      }
+    },
+    {
+      "id": "mat-d-7-b5-q05",
+      "difficulty": "sedang",
+      "prompt": "Berdasarkan Tabel 5.2 Bab 5 (halaman 167), sudut dalam berseberangan terletak di bagian dalam antara dua garis sejajar pada sisi berseberangan dari garis transversal. Jika besar sudut dalam berseberangan δ = 65°, berapa besar sudut dalam berseberangan pasangannya ζ?",
+      "options": [
+        "65°",
+        "115°",
+        "25°",
+        "130°"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Sudut-sudut dalam berseberangan pada dua garis sejajar selalu sama besar, sehingga ζ = 65°."
+      },
+      "distractorWhy": {
+        "1": "Nilai 115° merupakan besar sudut dalam sepihak atau pelurusnya (180° - 65°).",
+        "2": "Nilai 25° adalah penyiku (90° - 65°).",
+        "3": "Nilai 130° adalah 2 x 65°."
+      }
+    },
+    {
+      "id": "mat-d-7-b5-q06",
+      "difficulty": "sedang",
+      "prompt": "Pada Gambar 5.7 dan Tabel 5.2 (halaman 167), dua sudut dalam sepihak terbentuk oleh dua garis sejajar yang dipotong garis transversal. Jika besar salah satu sudut dalam sepihak δ = 82°, maka besar sudut dalam sepihak pasangannya ε adalah ...",
+      "options": [
+        "98°",
+        "82°",
+        "8°",
+        "278°"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Pasangan sudut dalam sepihak saling berpelurus (jumlahnya 180°). Maka ε = 180° - 82° = 98°."
+      },
+      "distractorWhy": {
+        "1": "Nilai 82° terjadi jika dikira sama besar, padahal itu sifat sudut berseberangan/sehadap.",
+        "2": "Nilai 8° adalah hasil pengurangan 90° - 82°.",
+        "3": "Nilai 278° adalah hasil 360° - 82°."
+      }
+    },
+    {
+      "id": "mat-d-7-b5-q07",
+      "difficulty": "tinggi",
+      "prompt": "Pada Latihan 5.1 Soal 2 (halaman 169 Buku Siswa), diketahui bahwa jumlah seluruh sudut dalam segitiga adalah 180°. Pada ΔDEF, diketahui dua sudutnya masing-masing besarnya 55° dan 50°. Besar sudut ketiga pada ΔDEF adalah ...",
+      "options": [
+        "75°",
+        "105°",
+        "85°",
+        "65°"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Jumlah sudut dalam segitiga adalah 180°. Sudut ketiga = 180° - (55° + 50°) = 180° - 105° = 75°."
+      },
+      "distractorWhy": {
+        "1": "Nilai 105° adalah hasil penjumlahan dua sudut yang diketahui (55° + 50°), belum dikurangi dari 180°.",
+        "2": "Nilai 85° terjadi jika mengira jumlah sudut segitiga adalah 190° atau salah hitung.",
+        "3": "Nilai 65° terjadi jika pengurangan 180° - 105° salah hitung menjadi 65°."
+      }
+    },
+    {
+      "id": "mat-d-7-b5-q08",
+      "difficulty": "tinggi",
+      "prompt": "Pada Latihan 5.1 Soal 3 (halaman 169-170), segi empat ABCD dibentuk oleh dua pasang garis sejajar (jajar genjang). Jika diketahui besar ∠A = 130°, berapakah besar ∠B yang terletak berdampingan dengan ∠A pada garis sejajar yang sama?",
+      "options": [
+        "50°",
+        "130°",
+        "40°",
+        "230°"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Sudut ∠A dan ∠B merupakan pasangan sudut dalam sepihak pada dua garis sejajar, sehingga saling berpelurus: ∠B = 180° - 130° = 50°."
+      },
+      "distractorWhy": {
+        "1": "Nilai 130° adalah besar sudut ∠C yang berhadapan dengan ∠A, bukan ∠B.",
+        "2": "Nilai 40° adalah penyiku (90° - 50°).",
+        "3": "Nilai 230° adalah hasil 360° - 130°."
+      }
+    },
+    {
+      "id": "mat-d-7-b5-q09",
+      "difficulty": "dasar",
+      "prompt": "Dalam Subbab B \"Arti Kesebangunan\" (halaman 170-171), ditunjukkan contoh pas foto berukuran 2 cm × 3 cm. Pas foto berukuran manakah yang SEBANGUN dengan pas foto 2 cm × 3 cm tersebut?",
+      "options": [
+        "4 cm × 6 cm",
+        "3 cm × 4 cm",
+        "4 cm × 5 cm",
+        "5 cm × 6 cm"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Foto 2 cm × 3 cm memiliki perbandingan lebar dan panjang 2 : 3. Foto 4 cm × 6 cm memiliki perbandingan 4 : 6 = 2 : 3, sehingga kedua foto sebangun."
+      },
+      "distractorWhy": {
+        "1": "Perbandingan 3 cm × 4 cm adalah 3 : 4, tidak senilai dengan 2 : 3.",
+        "2": "Perbandingan 4 cm × 5 cm adalah 4 : 5, tidak senilai dengan 2 : 3.",
+        "3": "Perbandingan 5 cm × 6 cm adalah 5 : 6, tidak senilai dengan 2 : 3."
+      }
+    },
+    {
+      "id": "mat-d-7-b5-q10",
+      "difficulty": "sedang",
+      "prompt": "Berdasarkan Eksplorasi 5.2 tentang memperbesar dan memperkecil gambar (halaman 171-172), ketika suatu bangun datar diperbesar sehingga menghasilkan bangun yang sebangun, besaran apakah yang ukurannya TETAP SAMA (tidak berubah)?",
+      "options": [
+        "Besar sudut-sudutnya",
+        "Panjang sisi-sisinya",
+        "Keliling bangun",
+        "Luas bangun"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Pada dua bangun datar yang sebangun, bentuk dan besar sudut-sudut yang berpadanan selalu sama besar (tetap), sedangkan panjang sisi, keliling, dan luas berubah secara proporsional."
+      },
+      "distractorWhy": {
+        "1": "Panjang sisi-sisi berubah sebanding dengan faktor skala perbesaran.",
+        "2": "Keliling bangun berubah sebanding dengan faktor skala perbesaran.",
+        "3": "Luas bangun berubah sebanding dengan kuadrat dari faktor skala perbesaran."
+      }
+    },
+    {
+      "id": "mat-d-7-b5-q11",
+      "difficulty": "sedang",
+      "prompt": "Pada Latihan 5.2 Soal 2 (halaman 173-174), Kinan mengubah ukuran gambar pada layar komputer menggunakan skala lebar dan skala tinggi. Agar gambar hasil pengubahan tetap sebangun dengan gambar asli, syarat skala yang harus diterapkan adalah ...",
+      "options": [
+        "Skala lebar dan skala tinggi harus bernilai sama (misalnya keduanya 200%)",
+        "Skala lebar harus dua kali lipat skala tinggi",
+        "Skala tinggi harus lebih besar daripada skala lebar",
+        "Skala lebar ditambah skala tinggi harus bernilai 100%"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Agar dua gambar sebangun, rasio perbesaran pada dimensi lebar dan tinggi harus sama (proporsional), seperti skala lebar 200% dan skala tinggi 200%."
+      },
+      "distractorWhy": {
+        "1": "Skala lebar dua kali lipat skala tinggi menyebabkan gambar terdistorsi secara horizontal (gepeng atau mulur).",
+        "2": "Skala tinggi lebih besar membuat gambar tertarik secara vertikal sehingga bentuknya berubah.",
+        "3": "Penjumlahan skala bernilai 100% tidak menjamin perbandingan rasio dimensi yang sama."
+      }
+    },
+    {
+      "id": "mat-d-7-b5-q12",
+      "difficulty": "tinggi",
+      "prompt": "Berdasarkan konsep kesebangunan pada Bab 5 Subbab C (halaman 177), sebuah foto persegi panjang diperbesar dengan skala 200% (faktor skala k = 2). Berapakah perbandingan luas foto setelah diperbesar terhadap luas foto awal?",
+      "options": [
+        "4 : 1",
+        "2 : 1",
+        "8 : 1",
+        "1 : 2"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Faktor skala panjang dan lebar k = 2. Luas foto baru = (2 × panjang) × (2 × lebar) = 4 × (panjang × lebar) = 4 × luas awal. Jadi perbandingannya 4 : 1."
+      },
+      "distractorWhy": {
+        "1": "Perbandingan 2 : 1 adalah perbandingan panjang sisinya, bukan perbandingan luasnya.",
+        "2": "Perbandingan 8 : 1 adalah perbandingan volume untuk bangun 3 dimensi dengan faktor skala k = 2.",
+        "3": "Perbandingan 1 : 2 adalah kebalikan dari faktor skala panjang sisi."
+      }
+    },
+    {
+      "id": "mat-d-7-b5-q13",
+      "difficulty": "dasar",
+      "prompt": "Dalam Bab 5 Subbab C (halaman 178), penulisan ΔABC ~ ΔDEF menunjukkan bahwa ΔABC sebangun dengan ΔDEF. Manakah pernyataan yang BENAR mengenai sudut-sudut yang berpadanan?",
+      "options": [
+        "∠A = ∠D, ∠B = ∠E, dan ∠C = ∠F",
+        "∠A = ∠E, ∠B = ∠F, dan ∠C = ∠D",
+        "∠A + ∠B + ∠C = 360°",
+        "∠A = ∠B = ∠C = 90°"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Penulisan ΔABC ~ ΔDEF menandakan urutan huruf titik sudut berpadanan sama besar, yaitu ∠A = ∠D, ∠B = ∠E, dan ∠C = ∠F."
+      },
+      "distractorWhy": {
+        "1": "Urutan sudut tidak sesuai dengan padanan huruf ΔABC ~ ΔDEF.",
+        "2": "Jumlah sudut dalam segitiga selalu 180°, bukan 360°.",
+        "3": "Tidak semua segitiga sebangun harus memiliki sudut siku-siku 90°."
+      }
+    },
+    {
+      "id": "mat-d-7-b5-q14",
+      "difficulty": "sedang",
+      "prompt": "Berdasarkan konsep perbandingan sisi pada segitiga sebangun (halaman 178), diketahui ΔABC ~ ΔDEF. Jika panjang AB = 6 cm, BC = 8 cm, dan DE = 9 cm, berapakah panjang sisi EF?",
+      "options": [
+        "12 cm",
+        "10 cm",
+        "11 cm",
+        "15 cm"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Perbandingan sisi berpadanan sama: AB / DE = BC / EF. Sehingga 6 / 9 = 8 / EF => EF = (9 × 8) / 6 = 72 / 6 = 12 cm."
+      },
+      "distractorWhy": {
+        "1": "Nilai 10 cm diperoleh jika salah mengira penjumlahan 8 + 2.",
+        "2": "Nilai 11 cm adalah hasil dari 9 + 8 - 6.",
+        "3": "Nilai 15 cm diperoleh jika perbandingan dikalikan tidak proporsional."
+      }
+    },
+    {
+      "id": "mat-d-7-b5-q15",
+      "difficulty": "tinggi",
+      "prompt": "Pada Latihan 5.3 Soal 1 (halaman 179 Buku Siswa), segmen DE dibuat sejajar dengan sisi BC pada ΔABC sehingga terbentuk ΔADE ~ ΔABC. Jika AB = 10 cm, AC = 15 cm, dan AD = 4 cm, berapakah panjang segmen AE?",
+      "options": [
+        "6 cm",
+        "5 cm",
+        "9 cm",
+        "8 cm"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Karena DE // BC, maka ΔADE ~ ΔABC. Perbandingan sisi berpadanan: AD / AB = AE / AC => 4 / 10 = AE / 15 => AE = (4 × 15) / 10 = 6 cm."
+      },
+      "distractorWhy": {
+        "1": "Nilai 5 cm adalah selisih antara panjang AC dan AB (15 - 10).",
+        "2": "Nilai 9 cm adalah panjang sisa segmen EC (15 - 6 = 9 cm), bukan panjang AE.",
+        "3": "Nilai 8 cm diperoleh jika perbandingan dikalikan salah."
+      }
+    },
+    {
+      "id": "mat-d-7-b5-q16",
+      "difficulty": "tinggi",
+      "prompt": "Pada Uji Kompetensi Soal 3 (halaman 181 Buku Siswa), seorang siswa dengan tinggi badan 150 cm memiliki panjang bayangan 100 cm. Pada saat yang sama, panjang bayangan sebuah gedung di dekatnya adalah 300 cm. Berapakah tinggi gedung tersebut?",
+      "options": [
+        "450 cm",
+        "200 cm",
+        "400 cm",
+        "600 cm"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Segitiga yang dibentuk oleh objek dan bayangannya sebangun: Tinggi Gedung / Bayangan Gedung = Tinggi Siswa / Bayangan Siswa => Tinggi Gedung / 300 = 150 / 100 => Tinggi Gedung = (150 / 100) × 300 = 450 cm (4,5 m)."
+      },
+      "distractorWhy": {
+        "1": "Nilai 200 cm adalah selisih 300 cm - 100 cm.",
+        "2": "Nilai 400 cm diperoleh dari penjumlahan 100 cm + 300 cm.",
+        "3": "Nilai 600 cm diperoleh dari 2 × 300 cm."
+      }
+    },
+    {
+      "id": "mat-d-7-b5-q17",
+      "difficulty": "tinggi",
+      "prompt": "Pada Latihan 5.3 Soal 4 (halaman 180 Buku Siswa), ΔABC siku-siku di B dengan panjang AB = 4 cm, BC = 3 cm, dan hipotenusa AC = 5 cm. Garis BD adalah garis tinggi dari titik B tegak lurus AC. Berapakah panjang garis tinggi BD?",
+      "options": [
+        "2,4 cm",
+        "2,0 cm",
+        "3,5 cm",
+        "1,2 cm"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Luas ΔABC = 1/2 × AB × BC = 1/2 × 4 × 3 = 6 cm². Menggunakan alas AC dan tinggi BD: Luas = 1/2 × AC × BD => 6 = 1/2 × 5 × BD => BD = 12 / 5 = 2,4 cm."
+      },
+      "distractorWhy": {
+        "1": "Nilai 2,0 cm diperoleh dari perkiraan kasar tanpa menggunakan kesamaan luas segitiga.",
+        "2": "Nilai 3,5 cm adalah rata-rata dari panjang sisi siku-siku (3 + 4) / 2.",
+        "3": "Nilai 1,2 cm adalah setengah dari panjang BD yang sebenarnya."
+      }
+    },
+    {
+      "id": "mat-d-7-b5-q18",
+      "difficulty": "sedang",
+      "prompt": "Pada Latihan 5.2 Soal 3 (halaman 174 Buku Siswa), dibahas mengenai jenis cermin dan bayangan yang dihasilkan. Cermin manakah yang selalu menghasilkan bayangan yang SEBANGUN dengan benda asalnya?",
+      "options": [
+        "Cermin datar",
+        "Cermin cembung yang melengkung tidak proporsional",
+        "Cermin cekung yang membesarkan hanya salah satu dimensi",
+        "Cermin kembung komedi yang merenggangkan gambar secara horizontal"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Cermin datar menghasilkan bayangan dengan bentuk dan ukuran yang identik (kongruen), yang merupakan kasus khusus kesebangunan dengan skala 1 : 1."
+      },
+      "distractorWhy": {
+        "1": "Cermin cembung tidak proporsional membiaskan gambar sehingga terdistorsi dan tidak sebangun.",
+        "2": "Cermin cekung yang membesarkan satu dimensi saja mengubah rasio bentuk sehingga tidak sebangun.",
+        "3": "Cermin kembung merenggangkan satu sisi sehingga perbandingan tinggi dan lebar berubah."
+      }
+    },
+    {
+      "id": "mat-d-7-b5-q19",
+      "difficulty": "sedang",
+      "prompt": "Pada Pengantar Bab 5 Gambar 5.3 (halaman 161), peta merupakan model dua dimensi yang sebangun dengan wilayah sebenarnya. Sebuah peta pulau Jawa dibuat dengan skala 1 : 200.000. Jika jarak dua kota pada peta adalah 4 cm, berapakah jarak sebenarnya antara kedua kota tersebut?",
+      "options": [
+        "8 km",
+        "80 km",
+        "0,8 km",
+        "800 km"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Skala 1 : 200.000 artinya 1 cm pada peta mewakili 200.000 cm sebenarnya. Jarak sebenarnya = 4 cm × 200.000 = 800.000 cm = 8.000 m = 8 km."
+      },
+      "distractorWhy": {
+        "1": "Nilai 80 km terjadi karena kesalahan konversi 800.000 cm menjadi 80 km.",
+        "2": "Nilai 0,8 km terjadi karena kesalahan pembagian 100.000.",
+        "3": "Nilai 800 km terjadi karena kelebihan nol saat mengubah cm ke km."
+      }
+    },
+    {
+      "id": "mat-d-7-b5-q20",
+      "difficulty": "tinggi",
+      "prompt": "Berdasarkan konsep kesebangunan dan kekongruenan pada Bab 5 (halaman 161 & 178), manakah hubungan yang BENAR antara dua bangun yang kongruen dan dua bangun yang sebangun?",
+      "options": [
+        "Dua bangun yang kongruen pasti sebangun dengan faktor skala 1 : 1, tetapi dua bangun yang sebangun belum tentu kongruen",
+        "Dua bangun yang sebangun pasti selalu kongruen",
+        "Bangun yang sebangun tidak memiliki sudut-sudut yang sama besar",
+        "Bangun yang kongruen memiliki bentuk yang berbeda"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Kekongruenan adalah bentuk khusus dari kesebangunan di mana perbandingan sisi-sisi berpadanan bernilai tepat 1 : 1, sehingga semua bangun kongruen pasti sebangun."
+      },
+      "distractorWhy": {
+        "1": "Bangun yang sebangun dapat memiliki ukuran berbeda (faktor skala k ≠ 1), sehingga belum tentu kongruen.",
+        "2": "Bangun yang sebangun wajib memiliki sudut-sudut berpadanan yang sama besar.",
+        "3": "Bangun yang kongruen memiliki bentuk dan ukuran yang persis sama (identik)."
+      }
+    }
+  ]
+}

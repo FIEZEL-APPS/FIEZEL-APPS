@@ -1,0 +1,369 @@
+{
+  "code": "KOMP-IND-D-7-BAB5-01",
+  "grade": 7,
+  "name": "Bab V: Membuka Gerbang Dunia",
+  "materi": "Membedah Buku Bergambar, Bagian-Bagian Buku (Cover, Daftar Isi, Ilustrasi), Merangkum Buku & Peta Pikiran, Menyajikan Teks Tanggapan dan Ragam Kalimat Tanggapan",
+  "cpRef": "Bahasa Indonesia untuk SMP/MTs Kelas VII (Edisi Revisi)",
+  "items": [
+    {
+      "id": "ind-d-7-b5-q01",
+      "difficulty": "dasar",
+      "prompt": "Berdasarkan buku Bahasa Indonesia Kelas VII Edisi Revisi Bab V (halaman 172-175), bagian sampul depan buku fiksi maupun nonfiksi umumnya memuat elemen-elemen penting berikut, KECUALI ...",
+      "options": [
+        "Daftar rujukan atau bibliografi lengkap",
+        "Judul buku yang menarik",
+        "Nama pembuat (penulis dan ilustrator)",
+        "Logo dan nama penerbit"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Daftar rujukan atau bibliografi merupakan bagian penutup buku di halaman belakang, bukan elemen yang terdapat pada sampul depan buku."
+      },
+      "distractorWhy": {
+        "1": "Judul buku merupakan salah satu elemen utama yang wajib ada di bagian sampul depan.",
+        "2": "Nama pembuat buku (penulis dan/atau ilustrator) tercantum di sampul depan untuk menunjukkan kredibilitas karya.",
+        "3": "Logo penerbit biasa diletakkan di bagian sampul depan buku (misalnya di bagian atas atau bawah)."
+      }
+    },
+    {
+      "id": "ind-d-7-b5-q02",
+      "difficulty": "dasar",
+      "prompt": "Dalam cerita buku bergambar \"Itam dan U\" (halaman 168), terdapat kata khas Aceh yaitu \"Smong\". Berdasarkan glosarium Jelajah Kata pada buku tersebut, apakah arti dari kata \"Smong\"?",
+      "options": [
+        "Gelombang laut besar (tsunami)",
+        "Pos komando penanggulangan bencana",
+        "Sebutan untuk bapak dalam bahasa Gayo",
+        "Wilayah pemukiman setingkat kelurahan"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Pada Jelajah Kata halaman 168, kata \"Smong\" diartikan sebagai gelombang laut besar dalam bahasa Aceh."
+      },
+      "distractorWhy": {
+        "1": "Pos komando penanggulangan bencana merupakan arti dari kata kependekan \"Posko\".",
+        "2": "Sebutan untuk bapak dalam bahasa Gayo merupakan arti dari kata sapaan \"Cik\".",
+        "3": "Wilayah pemukiman setingkat kelurahan di Aceh merupakan pengertian dari kata \"Gampong\"."
+      }
+    },
+    {
+      "id": "ind-d-7-b5-q03",
+      "difficulty": "sedang",
+      "prompt": "Pada analisis sajian visual buku bergambar \"Itam dan U\" (halaman 169-171), konsep nada (tone) pada ilustrasi gambar berfungsi untuk ...",
+      "options": [
+        "Mewakili emosi dan suasana (seperti sedih, mencekam, atau ceria) yang ingin disampaikan penulis/ilustrator",
+        "Mengarahkan perhatian pembaca hanya pada objek yang ukurannya paling besar",
+        "Menampilkan biodata singkat penulis dan ilustrator di bagian bawah halaman",
+        "Menggantikan keseluruhan teks bacaan agar pembaca tidak perlu membaca tulisan"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Berdasarkan Kupas Teori halaman 169, nada (tone) dihasilkan dari pencampuran warna yang mewakili emosi (senang, sedih, muram, optimis) yang ingin disampaikan."
+      },
+      "distractorWhy": {
+        "1": "Mengarahkan perhatian pada objek terbesar adalah fungsi dari elemen fokus pada gambar, bukan nada (tone).",
+        "2": "Biodata penulis dan ilustrator terdapat pada halaman penutup buku, bukan fungsi nada gambar.",
+        "3": "Nada visual melengkapi dan memperkuat teks cerita, bukan menggantikan seluruh teks bacaan."
+      }
+    },
+    {
+      "id": "ind-d-7-b5-q04",
+      "difficulty": "sedang",
+      "prompt": "Di Bab 1 buku \"Itam dan U\" (halaman 160-161), ilustrator menggunakan warna latar yang dominan gelap/hitam dengan fokus wajah Itam yang panik. Hal ini bertujuan untuk menggambarkan ...",
+      "options": [
+        "Ketakutan dan suasana mencekam saat bencana tsunami terjadi",
+        "Kegembiraan Itam saat bermain gasing di lapangan bersama Micel",
+        "Ketenangan Itam saat melaut dan memancing ikan bersama Cik Lam",
+        "Kehangatan suasana di posko pengungsian bersama warga gampong"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Latar gelap dan raut wajah panik pada Bab 1 secara visual menyampaikan emosi takut, panik, dan suasana mencekam ketika gelombang tsunami menerjang."
+      },
+      "distractorWhy": {
+        "1": "Suasana bermain gasing digambarkan dengan warna yang lebih bervariasi sebelum bencana terjadi.",
+        "2": "Suasana melaut bersama Cik Lam pada akhir cerita digambarkan dengan nada warna yang mulai terang dan optimis.",
+        "3": "Kehangatan posko pengungsian ditunjukkan pada bab-bab selanjutnya saat Itam membagikan gasing."
+      }
+    },
+    {
+      "id": "ind-d-7-b5-q05",
+      "difficulty": "sedang",
+      "prompt": "Perhatikan kalimat tanggapan berikut (halaman 189): \"Di buku ini ada beberapa istilah dalam bahasa Aceh, seperti gampong, Cik, dan Smong. Saya bisa mengira-ngira artinya. Namun, akan lebih baik kalau di bagian akhir penulis memberi daftar glosarium.\" Jenis kalimat tanggapan tersebut adalah ...",
+      "options": [
+        "Tanggapan yang memberikan saran kepada penulis",
+        "Tanggapan yang sepenuhnya menyetujui pendapat penulis",
+        "Tanggapan yang menolak secara tegas tanpa solusi",
+        "Tanggapan berupa pertanyaan klarifikasi identitas buku"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Kalimat tersebut mengoreksi/menunjukkan kekurangan lalu memberikan masukan perbaikan (\"akan lebih baik kalau...\"), sehingga tergolong kalimat tanggapan yang memberikan saran."
+      },
+      "distractorWhy": {
+        "1": "Kalimat persetujuan berisi pernyataan menguatkan dan sependapat dengan penulis tanpa usulan perubahan.",
+        "2": "Kalimat penolakan berisi pertentangan murni, sedangkan kalimat ini menyertakan perbaikan konstruktif (saran).",
+        "3": "Kalimat ini bukan pertanyaan, melainkan ulasan perbaikan untuk kelengkapan buku."
+      }
+    },
+    {
+      "id": "ind-d-7-b5-q06",
+      "difficulty": "sedang",
+      "prompt": "Perhatikan pernyataan tanggapan berikut (halaman 189): \"Proses perubahan perasaan Itam digambarkan dengan baik sekali melalui ilustrasi yang berubah warnanya dari gelap ke cerah. Saya suka sekali buku ini.\" Kalimat ini merupakan contoh dari ...",
+      "options": [
+        "Tanggapan yang menguatkan atau menyetujui (memuji) kelebihan karya",
+        "Tanggapan penolakan dengan penanda konjungsi tetapi",
+        "Tanggapan perbaikan yang meminta ilustrator mengubah gambar",
+        "Pernyataan deskripsi alur cerita yang tidak memuat penilaian"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Kalimat tersebut menyatakan persetujuan dan apresiasi positif (\"digambarkan dengan baik sekali\", \"Saya suka sekali\") terhadap teknik penyampaian penulis dan ilustrator."
+      },
+      "distractorWhy": {
+        "1": "Tidak ada konjungsi pertentangan atau rasa tidak setuju dalam kalimat tersebut.",
+        "2": "Kalimat ini memuji karya yang ada, bukan meminta perubahan atau memberikan saran perbaikan.",
+        "3": "Kalimat ini memuat ulasan apresiatif yang jelas merupakan bagian dari tanggapan persetujuan/pujian."
+      }
+    },
+    {
+      "id": "ind-d-7-b5-q07",
+      "difficulty": "sedang",
+      "prompt": "Struktur teks tanggapan buku terdiri atas tiga bagian utama (halaman 189-190). Bagian yang berisi pengenalan awal mengenai buku yang akan ditanggapi (seperti judul, penulis, dan tema umum) disebut ...",
+      "options": [
+        "Konteks",
+        "Deskripsi",
+        "Penilaian",
+        "Rekomendasi ulang"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Berdasarkan Kupas Teori halaman 189, bagian Konteks berisi pengenalan umum tentang buku yang akan ditanggapi."
+      },
+      "distractorWhy": {
+        "1": "Deskripsi berisi penjelasan lebih detail mengenai isi cerita, alur, dan tokoh-tokoh dalam buku.",
+        "2": "Penilaian berisi ulasan pribadi pembaca mengenai kelebihan, kekurangan, dan saran untuk buku.",
+        "3": "Rekomendasi ulang bukan nama istilah bagian struktur standar dalam teks tanggapan buku."
+      }
+    },
+    {
+      "id": "ind-d-7-b5-q08",
+      "difficulty": "sedang",
+      "prompt": "Pada struktur teks tanggapan buku (halaman 190), bagian yang memuat uraian lebih rinci mengenai ide cerita, alur peristiwa, serta karakter tokoh-tokoh dinamakan ...",
+      "options": [
+        "Deskripsi",
+        "Konteks",
+        "Penilaian",
+        "Glosarium"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Berdasarkan Kupas Teori halaman 190, bagian Deskripsi menjelaskan gambaran detail sinopsis, alur, dan tokoh cerita."
+      },
+      "distractorWhy": {
+        "1": "Konteks hanya berisi pengenalan judul dan gambaran umum buku.",
+        "2": "Penilaian berfokus pada pandangan kritis pembaca mengenai kelebihan dan kelemahan karya.",
+        "3": "Glosarium adalah bagian daftar kata sulit pada halaman penutup buku, bukan bagian struktur teks tanggapan."
+      }
+    },
+    {
+      "id": "ind-d-7-b5-q09",
+      "difficulty": "sedang",
+      "prompt": "Di bagian Penilaian dalam sebuah teks tanggapan (halaman 190), fokus utama yang disampaikan oleh penanggap adalah ...",
+      "options": [
+        "Pandangan dan pendapat pribadi mengenai keunggulan, kelemahan, serta saran perbaikan karya",
+        "Salinan lengkap seluruh isi bab dari halaman pertama hingga halaman terakhir",
+        "Biodata pribadi penulis beserta alamat rumah dan tempat tanggal lahirnya",
+        "Daftar kata-kata sulit beserta arti kamusnya yang diambil dari isi buku"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Penilaian memuat pendapat kritis pembaca mengenai sisi menarik, kelemahan, dan masukan untuk buku yang diulas."
+      },
+      "distractorWhy": {
+        "1": "Salinan lengkap seluruh bab bukanlah teks tanggapan, melainkan pencetakan ulang karya.",
+        "2": "Biodata singkat penulis berada di bagian identitas/hak cipta buku, bukan inti dari bagian Penilaian.",
+        "3": "Daftar kata sulit merupakan glosarium buku."
+      }
+    },
+    {
+      "id": "ind-d-7-b5-q10",
+      "difficulty": "tinggi",
+      "prompt": "Dalam cerita biografi B.J. Habibie pada buku siswa (halaman 186-188), B.J. Habibie mendapat julukan \"Mr. Crack\" karena prestasinya dalam bidang teknik penerbangan, yaitu ...",
+      "options": [
+        "Menemukan rumus perhitungan keretakan (crack propagation on random) pesawat hingga skala atom",
+        "Menjadi presiden ketiga Republik Indonesia yang memimpin di masa reformasi",
+        "Merancang kapal penangkap ikan modern bersama nelayan tradisional di Jerman",
+        "Membuat peta pikiran pertama untuk merangkum buku-buku sains di ITB"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Pada halaman 187 dijelaskan bahwa rumus hitung keretakan pesawat dinamai Faktor Habibie dan membuatnya dijuluki Mr. Crack."
+      },
+      "distractorWhy": {
+        "1": "Jabatan presiden merupakan riwayat hidup beliau, namun alasan julukan Mr. Crack spesifik pada temuan rumus fisikanya.",
+        "2": "Habibie ahli di bidang teknik penerbangan (pesawat terbang), bukan merancang kapal nelayan.",
+        "3": "Peta pikiran adalah materi teknik membaca di Bab V, bukan penemuan ilmiah B.J. Habibie."
+      }
+    },
+    {
+      "id": "ind-d-7-b5-q11",
+      "difficulty": "dasar",
+      "prompt": "Bagian halaman penutup pada buku nonfiksi maupun fiksi yang memuat daftar istilah-istilah sulit beserta artinya disusun secara alfabetis dinamakan ...",
+      "options": [
+        "Glosarium",
+        "Sinopsis",
+        "Daftar isi",
+        "Hak cipta"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Berdasarkan materi bagian buku (halaman 175 & 181), glosarium berisi daftar kata sulit atau khusus beserta artinya di halaman penutup."
+      },
+      "distractorWhy": {
+        "1": "Sinopsis adalah ringkasan gambaran umum cerita yang terdapat di sampul belakang.",
+        "2": "Daftar isi memuat daftar judul bab dan nomor halaman di bagian awal buku.",
+        "3": "Halaman hak cipta memuat informasi penerbitan, ISBN, dan pembuat buku."
+      }
+    },
+    {
+      "id": "ind-d-7-b5-q12",
+      "difficulty": "sedang",
+      "prompt": "Menurut penjelasan di halaman 177, langkah utama untuk merangkum sebuah buku nonfiksi adalah dengan cara ...",
+      "options": [
+        "Menentukan ide pokok atau gagasan utama pada setiap paragraf/subbab lalu menyusunnya menjadi karangan padu",
+        "Menyalin ulang seluruh kalimat dari paragraf pertama sampai paragraf terakhir tanpa ada yang dikurangi",
+        "Menggambar ulang semua ilustrasi yang ada di dalam buku ke dalam lembar kertas baru",
+        "Mengubah nama seluruh tokoh utama cerita menjadi nama kawan sekelas"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Berdasarkan halaman 177, rangkuman nonfiksi diperoleh dengan menyarikan gagasan pokok setiap paragraf/subbab dan merangkainya."
+      },
+      "distractorWhy": {
+        "1": "Menyalin seluruh teks bukan merangkum, melainkan menyalin (mengutip utuh).",
+        "2": "Menggambar ilustrasi merupakan kegiatan seni visual, bukan teknik merangkum teks.",
+        "3": "Mengubah nama tokoh bukan teknik merangkum, melainkan mengganti unsur cerita."
+      }
+    },
+    {
+      "id": "ind-d-7-b5-q13",
+      "difficulty": "dasar",
+      "prompt": "Manfaat utama membuat peta pikiran (mind map) sebelum menyusun rangkuman buku (halaman 180) adalah ...",
+      "options": [
+        "Mengatur dan memvisualisasikan gagasan pokok serta keterkaitannya secara jelas dan terstruktur",
+        "Menghilangkan bagian penilaian agar pembaca tidak dapat memberi kritik pada buku",
+        "Menentukan harga jual buku di toko buku atau perpustakaan",
+        "Menggantikan fungsi nama penulis di sampul depan buku"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Peta pikiran membantu mengatur pikiran secara visual sehingga hubungan antaride pokok terlihat jelas sebelum dituliskan menjadi rangkuman."
+      },
+      "distractorWhy": {
+        "1": "Peta pikiran bertujuan memudahkan pemahaman isi buku, bukan menghilangkan penilaian kritik.",
+        "2": "Peta pikiran adalah alat bantu belajar membaca/menulis, tidak berhubungan dengan harga jual buku.",
+        "3": "Peta pikiran tidak menggantikan identitas penulis pada buku."
+      }
+    },
+    {
+      "id": "ind-d-7-b5-q14",
+      "difficulty": "sedang",
+      "prompt": "Perhatikan cuplikan rangkuman buku \"Aku Terbatas tapi Tanpa Batas\" (halaman 178-179). Tokoh Yulia berhasil memenangkan Lomba Penelitian Siswa Nasional di Jakarta melalui karya ilmiahnya tentang ...",
+      "options": [
+        "Pembuatan kacamata Abaca (Alat Bantu Membaca)",
+        "Pembuatan gasing kayu dari serpihan hutan Gampong",
+        "Perancangan mesin pesawat terbang cepat",
+        "Penulisan buku komik bergambar tentang bencana tsunami"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Pada teks halaman 179 dijelaskan Yulia meneliti karya ilmiah penulisan proposal KIR tentang pembuatan kacamata Abaca."
+      },
+      "distractorWhy": {
+        "1": "Gasing kayu merupakan karya buatan Itam pada cerita fiksi \"Itam dan U\".",
+        "2": "Mesin pesawat terbang berkaitan dengan biografi B.J. Habibie.",
+        "3": "Yulia meneliti alat bantu membaca (Abaca), bukan membuat komik tsunami."
+      }
+    },
+    {
+      "id": "ind-d-7-b5-q15",
+      "difficulty": "tinggi",
+      "prompt": "Dalam ulasan teks tanggapan buku \"Mau Masak Apa, Lintang?\" (halaman 193-194), keunikan pemilihan tokoh utama yang diapresiasi oleh penanggap (Rakhma Subarna) adalah ...",
+      "options": [
+        "Penulis memilih anak laki-laki sebagai tokoh utama dalam cerita bertema lomba memasak",
+        "Tokoh utama digambarkan sebagai seorang anak yang tidak pernah mengalami kegagalan",
+        "Cerita disajikan tanpa adanya dukungan dari orang tua maupun tetangga sekitar",
+        "Buku tersebut memuat cerita fiksi sains modern di luar angkasa"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Penanggap menyebutkan: \"Saya menyukai tokoh utama anak laki-laki yang dipilih penulis, meski untuk cerita dengan tema lomba memasak.\""
+      },
+      "distractorWhy": {
+        "1": "Lintang mengalami perjuangan dan latihan yang tidak mudah (proses belajar dari kegagalan).",
+        "2": "Tokoh Ibu digambarkan sangat mendukung perjuangan Lintang.",
+        "3": "Buku tersebut bertema lomba memasak tradisional (tiwul & kue), bukan fiksi sains."
+      }
+    },
+    {
+      "id": "ind-d-7-b5-q16",
+      "difficulty": "dasar",
+      "prompt": "Perbedaan mendasar antara buku fiksi dan buku nonfiksi (halaman 176) terletak pada ...",
+      "options": [
+        "Buku fiksi memuat cerita rekaan/khayalan, sedangkan buku nonfiksi berdasarkan fakta atau kenyataan",
+        "Buku fiksi tidak memiliki judul, sedangkan buku nonfiksi wajib memiliki judul",
+        "Buku fiksi hanya ditulis oleh anak-anak, sedangkan buku nonfiksi ditulis oleh pakar dewasa",
+        "Buku fiksi tidak boleh memiliki ilustrasi gambar sama sekali"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Berdasarkan Kupas Teori halaman 176, buku fiksi bersumber dari imajinasi/rekaan, sedangkan nonfiksi berdasarkan fakta/kenyataan ilmiah."
+      },
+      "distractorWhy": {
+        "1": "Baik buku fiksi maupun nonfiksi sama-sama memiliki judul buku.",
+        "2": "Penulis buku fiksi maupun nonfiksi bisa berasal dari berbagai usia dan latar belakang.",
+        "3": "Buku fiksi bergambar (picture book) sangat kaya akan ilustrasi visual."
+      }
+    },
+    {
+      "id": "ind-d-7-b5-q17",
+      "difficulty": "sedang",
+      "prompt": "Pada saat menyampaikan tanggapan buku secara lisan kepada teman atau membuat rekaman video (halaman 186 & 192), sikap dan bahasa yang seharus ditunjukkan adalah ...",
+      "options": [
+        "Menggunakan sapaan santun dan akrab, ekspresi ramah, serta volume suara yang cukup terdengar",
+        "Berbicara sangat cepat tanpa memandang penonton atau arah kamera",
+        "Menggunakan kata-kata kasar untuk menunjukkan kelemahan buku secara emosional",
+        "Membaca teks secara kaku dengan menutupi muka di balik buku"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Pada petunjuk penyampaian lisan (halaman 186), penanggap hendaknya santun, komunikatif, memperlihatkan ekspresi ramah, dan bersuara jelas."
+      },
+      "distractorWhy": {
+        "1": "Berbicara terlalu cepat dan tidak menatap lawan bicara mengurangi efektivitas komunikasi.",
+        "2": "Tanggapan harus bersifat kritis konstruktif dengan bahasa santun, bukan menghina atau menggunakan kata kasar.",
+        "3": "Menutupi wajah menghambat kontak mata dan ekspresi visual yang baik."
+      }
+    },
+    {
+      "id": "ind-d-7-b5-q18",
+      "difficulty": "tinggi",
+      "prompt": "Dalam cerita \"Itam dan U\" (halaman 165-167), perubahan emosi Itam dari rasa duka yang mendalam menjadi kembali bangkit dan tersenyum diawali oleh kegiatan ...",
+      "options": [
+        "Membuat seribu gasing kejutan bersama Cik Lam untuk dibagikan kepada anak-anak di pos pengungsian",
+        "Memutus pohon kelapa U agar tidak ada lagi kenangan tentang tsunami",
+        "Pindah tinggal ke kota besar dan melupakan kawan lamanya Micel",
+        "Menjual seluruh perahu milik Cik Lam kepada warga gampong lain"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Itam mengumpulkan kayu dan membuat gasing kejutan bersama Cik Lam, lalu membagikannya sehingga melihat senyum anak-anak pengungsi dan mulai bangkit kembali."
+      },
+      "distractorWhy": {
+        "1": "Itam tidak memutus pohon U, melainkan memeluk dan berterima kasih kepada U di akhir cerita.",
+        "2": "Itam tetap tinggal dan melaut bersama Cik Lam.",
+        "3": "Itam dan Cik Lam justru menggunakan perahu bersama untuk kembali melaut."
+      }
+    }
+  ]
+}

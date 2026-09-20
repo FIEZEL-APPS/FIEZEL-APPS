@@ -1,0 +1,409 @@
+{
+  "code": "KOMP-IPS-D-7-BAB4-01",
+  "grade": 7,
+  "name": "Tema IV: Pemberdayaan Masyarakat",
+  "materi": "Keanekaragaman Keragaman Etnis & Budaya Indonesia, Pemberdayaan Ekonomi Masyarakat, Literasi & Pengelolaan Keuangan Keluarga, Peran Komunitas Lokal",
+  "cpRef": "Ilmu Pengetahuan Sosial untuk SMP/MTs Kelas VII (Edisi Revisi)",
+  "items": [
+    {
+      "id": "ips-d-7-t4-q01",
+      "difficulty": "dasar",
+      "prompt": "Berdasarkan materi IPS Kelas VII Edisi Revisi Tema IV (halaman 169/222), faktor geografis yang memengaruhi perbedaan bentuk dan model pakaian adat antara masyarakat di wilayah pesisir (suhu tinggi, pakaian tanpa lengan) dan wilayah pegunungan (suhu rendah, pakaian berlengan panjang) dipengaruhi oleh ....",
+      "options": [
+        "suhu dan kelembapan udara",
+        "posisi strategis wilayah",
+        "luas wilayah daratan",
+        "isolasi kepulauan oleh lautan"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Faktor geografis berupa suhu dan kelembapan udara menentukan kondisi iklim setempat yang memengaruhi adaptasi busana/pakaian adat masyarakat setempat."
+      },
+      "distractorWhy": {
+        "1": "Posisi strategis berkaitan dengan posisi geografis dalam jalur perdagangan internasional, bukan faktor perbedaan suhu lokal.",
+        "2": "Luas wilayah daratan mempengaruhi bentang alam, bukan secara langsung membentuk penyesuaian jenis pakaian adat.",
+        "3": "Isolasi kepulauan oleh lautan membatasi komunikasi antar pulau, bukan pembeda suhu pesisir dan pegunungan."
+      }
+    },
+    {
+      "id": "ips-d-7-t4-q02",
+      "difficulty": "dasar",
+      "prompt": "Perhatikan unsur-unsur berikut: (1) Warisan, (2) Bahasa, (3) Sistem politik, (4) Sistem mata pencaharian, (5) Sistem pengetahuan. Berdasarkan pembahasan keragaman budaya (halaman 222-223), yang termasuk unsur-unsur budaya universal menurut C. Kluckhohn adalah ....",
+      "options": [
+        "(2), (4), dan (5)",
+        "(1), (2), dan (3)",
+        "(1), (2), dan (4)",
+        "(1), (3), dan (5)"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Bahasa, sistem mata pencaharian, dan sistem pengetahuan termasuk dalam 7 unsur budaya universal (cultural universals) yang ditemukan di seluruh kebudayaan dunia."
+      },
+      "distractorWhy": {
+        "1": "Pernyataan ini salah karena Warisan bukan bagian dari 7 unsur budaya universal Kluckhohn.",
+        "2": "Pernyataan ini keliru karena memasukkan Warisan sebagai unsur universal.",
+        "3": "Pernyataan ini kurang tepat karena Warisan dan sistem politik bukan bagian utama dari 7 unsur universal Kluckhohn."
+      }
+    },
+    {
+      "id": "ips-d-7-t4-q03",
+      "difficulty": "dasar",
+      "prompt": "Dalam catatan sejarah maritim lokal dan perlawanan terhadap kolonialisme di Nusantara (halaman 184/223), pahlawan wanita Ratu Kalinyamat dari Jepara merupakan putri ketiga dari tokoh Kesultanan Demak yaitu ....",
+      "options": [
+        "Sultan Trenggana",
+        "Raden Toyib",
+        "Sunan Prawata",
+        "Arya Penangsang"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Ratu Kalinyamat adalah putri ketiga dari Sultan Trenggana, raja Kesultanan Demak yang memimpin ekspansi kekuasaan di pesisir utara Jawa."
+      },
+      "distractorWhy": {
+        "1": "Raden Toyib (Sultan Hadlirin) adalah suami dari Ratu Kalinyamat, bukan ayahnya.",
+        "2": "Sunan Prawata adalah kakak kandung Ratu Kalinyamat (putra tertua Sultan Trenggana).",
+        "3": "Arya Penangsang adalah bupati Jipang Panolan yang berkonflik dengan Ratu Kalinyamat."
+      }
+    },
+    {
+      "id": "ips-d-7-t4-q04",
+      "difficulty": "sedang",
+      "prompt": "Perhatikan pernyataan berikut: (1) Mengoordinasikan sejumlah pasukan laut, (2) Mengawasi pelabuhan di bawah syahbandar, (3) Mengawasi kapal-kapal jenis galley milik Kerajaan Aceh, (4) Bekerja sama dengan Belanda dalam perdagangan lada, (5) Melakukan balas dendam pribadi. Berdasarkan teks sejarah lokal (halaman 185/223), tugas resmi Laksamana Keumalahayati ditunjukkan oleh nomor ....",
+      "options": [
+        "(1), (2), dan (3)",
+        "(1), (2), dan (4)",
+        "(1), (3), dan (5)",
+        "(2), (4), dan (5)"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Keumalahayati menjabat Laksamana Kesultanan Aceh yang bertugas mengoordinasikan armada laut, mengawasi pelabuhan syahbandar, serta memimpin kapal perang (galley)."
+      },
+      "distractorWhy": {
+        "1": "Nomor (4) salah karena Keumalahayati bertempur melawan ancaman asing termasuk armada Belanda pimpinan Cornelis de Houtman.",
+        "2": "Nomor (5) bukan merupakan tugas resmi ketatanegaraan militer Laksamana Kerajaan Aceh.",
+        "3": "Kombinasi ini keliru karena melibatkan pernyataan (4) dan (5) yang tidak sesuai fakta tugas militer."
+      }
+    },
+    {
+      "id": "ips-d-7-t4-q05",
+      "difficulty": "tinggi",
+      "prompt": "Berdasarkan data Forest Watch Indonesia dalam Buku Siswa IPS Kelas VII (halaman 189/224), region di Indonesia yang tercatat memiliki persentase tutupan hutan alam tertinggi terhadap luas daratannya (mencapai 81%) adalah ....",
+      "options": [
+        "Papua",
+        "Kalimantan",
+        "Maluku",
+        "Sumatra"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Papua memiliki luas hutan alam 33.119.514 Ha dari luas daratan 40.640.520 Ha, sehingga persentase tutupan hutan alamnya tertinggi yaitu 81%."
+      },
+      "distractorWhy": {
+        "1": "Kalimantan memiliki persentase tutupan hutan alam 47% terhadap luas daratannya.",
+        "2": "Maluku memiliki persentase tutupan hutan alam 57% terhadap luas daratannya.",
+        "3": "Sumatra memiliki persentase tutupan hutan alam 22% terhadap luas daratannya."
+      }
+    },
+    {
+      "id": "ips-d-7-t4-q06",
+      "difficulty": "sedang",
+      "prompt": "Perjuangan para pahlawan wanita Indonesia seperti R.A. Kartini, Dewi Sartika, Cut Nyak Dien, dan Laksamana Keumalahayati (halaman 224-225) memberikan teladan relevan untuk mengatasi isu permasalahan sosial budaya masa kini, yaitu ....",
+      "options": [
+        "kesetaraan gender",
+        "kesenjangan sosial dan kemiskinan",
+        "penyalahgunaan narkotika",
+        "tawuran antarpelajar"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Perjuangan para pahlawan wanita tersebut membuktikan peran strategis perempuan di bidang pendidikan, sosial, dan militer untuk memperjuangkan kesetaraan gender."
+      },
+      "distractorWhy": {
+        "1": "Kesenjangan sosial dan kemiskinan merupakan isu perbedaan tingkat pendapatan dan ekonomi.",
+        "2": "Penyalahgunaan narkotika merupakan masalah patologi sosial zat adiktif.",
+        "3": "Tawuran antarpelajar adalah bentuk kenakalan remaja dan gangguan ketertiban sekolah."
+      }
+    },
+    {
+      "id": "ips-d-7-t4-q07",
+      "difficulty": "dasar",
+      "prompt": "Menabung merupakan salah satu aspek penting dalam pengelolaan keuangan keluarga (halaman 200/225). Di antara hal berikut, yang bukan merupakan manfaat dari kebiasaan menabung adalah ....",
+      "options": [
+        "menambah beban utang",
+        "melatih gaya hidup hemat",
+        "tersedianya dana untuk kebutuhan mendesak",
+        "membantu mencapai tujuan keuangan masa depan"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Menabung menyisihkan bagian pendapatan untuk disimpan, sehingga memperkuat cadangan finansial dan tidak menambah beban utang."
+      },
+      "distractorWhy": {
+        "1": "Melatih gaya hidup hemat merupakan salah satu fungsi dan manfaat utama kegiatan menabung.",
+        "2": "Tersedianya uang darurat untuk hal mendesak adalah manfaat langsung dari tabungan.",
+        "3": "Menabung mempermudah pencapaian target keuangan jangka panjang di masa depan."
+      }
+    },
+    {
+      "id": "ips-d-7-t4-q08",
+      "difficulty": "sedang",
+      "prompt": "Dalam tahapan pengelolaan keuangan keluarga (halaman 204/225), langkah membedakan antara kebutuhan primer yang mendesak dengan keinginan pribadi dilakukan dalam rangka ....",
+      "options": [
+        "memilih prioritas pengeluaran",
+        "menyusun rencana pendapatan",
+        "menyusun rencana pengeluaran",
+        "melakukan reviu perencanaan"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Membedakan kebutuhan dan keinginan merupakan inti dari memilih prioritas pengeluaran agar alokasi dana mendahulukan hal-hal vital."
+      },
+      "distractorWhy": {
+        "1": "Menyusun rencana pendapatan adalah kegiatan mencatat estimasi total penghasilan yang akan diterima.",
+        "2": "Menyusun rencana pengeluaran adalah membuat rincian alokasi biaya untuk tiap kategori.",
+        "3": "Melakukan reviu perencanaan adalah kegiatan evaluasi atas pelaksanaan pencatatan kas di akhir periode."
+      }
+    },
+    {
+      "id": "ips-d-7-t4-q09",
+      "difficulty": "tinggi",
+      "prompt": "Seorang warga yang paham mengenai produk keuangan (seperti memilih reksa dana yang relatif aman dibanding saham) serta terampil membuat keputusan finansial yang tepat tergolong ke dalam tingkat literasi keuangan (halaman 203/226) yaitu ....",
+      "options": [
+        "well literate",
+        "sufficient literate",
+        "less literate",
+        "not literate"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Kategori well literate ditandai dengan tingginya pemahaman, keterampilan, dan kepercayaan diri dalam memilih serta memanfaatkan produk jasa keuangan."
+      },
+      "distractorWhy": {
+        "1": "Sufficient literate hanya memiliki pengetahuan dan kepercayaan tentang produk keuangan, namun kurang terampil memilih instrumen.",
+        "2": "Less literate hanya mengetahui lembaga dan produk keuangan tanpa pemahaman cara memanfaatkannya.",
+        "3": "Not literate adalah kondisi tidak memiliki pemahaman maupun kepercayaan terhadap institusi keuangan."
+      }
+    },
+    {
+      "id": "ips-d-7-t4-q10",
+      "difficulty": "tinggi",
+      "prompt": "Perhatikan kegiatan berikut: (1) Pelatihan kewirausahaan pekarangan rumah di Desa Paremono, (2) Pelatihan pembuatan tas daur ulang sampah plastik untuk PKK, (3) Sosialisasi Desa Tangguh Bencana, (4) Sosialisasi safety riding komunitas sepeda, (5) Pelatihan desain grafis postcrossing. Kegiatan yang merupakan bentuk pemberdayaan masyarakat berbasis ekonomi dan lingkungan desa (halaman 219/226) ditunjukkan oleh nomor ....",
+      "options": [
+        "(1), (2), dan (3)",
+        "(1), (2), dan (4)",
+        "(1), (3), dan (5)",
+        "(2), (4), dan (5)"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Wirausaha pekarangan, daur ulang sampah plastik PKK, dan Desa Tangguh Bencana secara konkrit mencerminkan kegiatan pemberdayaan masyarakat desa."
+      },
+      "distractorWhy": {
+        "1": "Nomor (4) safety riding merupakan edukasi tertib lalu lintas, bukan fokus pemberdayaan ekonomi/lingkungan lokal.",
+        "2": "Nomor (5) pelatihan desain grafis komunitas hobi tidak berorientasi langsung pada pemberdayaan masyarakat desa.",
+        "3": "Pernyataan (4) dan (5) kurang tepat dimasukkan sebagai wujud utama pemberdayaan ekonomi dan resiliensi lingkungan masyarakat desa."
+      }
+    },
+    {
+      "id": "ips-d-7-t4-q11",
+      "difficulty": "sedang",
+      "prompt": "Sultan Nuku dari Tidore dan raja-raja Papua membentuk persekutuan erat dalam perjuangan sejarah lokal Tema IV (halaman 181). Faktor utama yang menyatukan mereka adalah ....",
+      "options": [
+        "tekad yang kuat untuk mengusir penjajah Belanda dan menciptakan kedamaian di Maluku-Papua",
+        "keinginan menguasai monopoli perdagangan rempah-rempah di kawasan Eropa",
+        "upaya mendirikan pelabuhan khusus untuk kapal persekutuan Inggris",
+        "rencana merebut jalur pelayaran niaga di sepanjang pesisir utara Jawa"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Persatuan Sultan Nuku dan raja-raja Papua dilandasi tekad gigih tanpa lelah untuk mengusir penjajah Belanda yang mengganggu kedamaian rakyat."
+      },
+      "distractorWhy": {
+        "1": "Perjuangan Nuku bertujuan membebaskan rakyat dari cengkeraman monopoli penjajah, bukan mencari monopoli sendiri.",
+        "2": "Diplomasi dengan Inggris hanya taktik perjuangan, bukan tujuan utama persekutuan dengan raja-raja Papua.",
+        "3": "Jalur pesisir utara Jawa merupakan fokus wilayah maritim Kesultanan Demak/Jepara."
+      }
+    },
+    {
+      "id": "ips-d-7-t4-q12",
+      "difficulty": "dasar",
+      "prompt": "Sikap atau kecenderungan suatu kelompok masyarakat yang memandang kebudayaan sendiri paling baik dan menganggap rendah kebudayaan kelompok lain (halaman 169) disebut ....",
+      "options": [
+        "etnosentrisme",
+        "akulturasi",
+        "asimilasi",
+        "pluralisme"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Etnosentrisme adalah pandangan yang menilai budaya lain berdasarkan ukuran kebudayaannya sendiri dan merasa budayanya paling unggul."
+      },
+      "distractorWhy": {
+        "1": "Akulturasi adalah proses bercampurnya dua budaya tanpa menghilangkan kepribadian kebudayaan asli.",
+        "2": "Asimilasi adalah pembauran dua kebudayaan menjadi satu budaya baru dengan menghilangkan ciri asli.",
+        "3": "Pluralisme adalah sikap menerima dan menganggap positif adanya keberagaman dalam masyarakat."
+      }
+    },
+    {
+      "id": "ips-d-7-t4-q13",
+      "difficulty": "dasar",
+      "prompt": "Metode pencatatan keuangan sederhana dengan membukukan setiap transaksi pemasukan dan pengeluaran secara rutin saban hari selama satu bulan (halaman 210) dinamakan ....",
+      "options": [
+        "sistem buku kas harian",
+        "sistem amplop keuangan",
+        "sistem kas keluarga",
+        "sistem investasi reksa dana"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Sistem buku kas harian dilakukan dengan mencatat arus pemasukan dan pengeluaran setiap hari guna mengontrol belanja bulanan."
+      },
+      "distractorWhy": {
+        "1": "Sistem amplop memisahkan uang tunai fisik ke kantong/amplop alokasi belanja tertentu.",
+        "2": "Sistem kas keluarga membagi pos pengeluaran menjadi pengeluaran tetap, harian, dan berkala.",
+        "3": "Reksa dana adalah wahana investasi modal, bukan metode pencatatan kas harian."
+      }
+    },
+    {
+      "id": "ips-d-7-t4-q14",
+      "difficulty": "sedang",
+      "prompt": "Berdasarkan data Survei Nasional Literasi dan Inklusi Keuangan (SNLIK) OJK tahun 2022 (halaman 203), selisih atau kesenjangan (gap) antara indeks inklusi keuangan (85,10%) dan indeks literasi keuangan (49,68%) adalah sebesar ....",
+      "options": [
+        "35,42%",
+        "25,12%",
+        "45,30%",
+        "15,20%"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Selisih ketimpangan literasi dan inklusi finansial diperoleh dari 85,10% dikurangi 49,68% yang menghasilkan nilai 35,42%."
+      },
+      "distractorWhy": {
+        "1": "Nilai 25,12% bukan merupakan hasil kalkulasi gap data SNLIK 2022.",
+        "2": "Nilai 45,30% keliru dan tidak sesuai dengan perbandingan dua indeks OJK.",
+        "3": "Nilai 15,20% jauh dari fakta besarnya perbedaan akses dan pemahaman finansial."
+      }
+    },
+    {
+      "id": "ips-d-7-t4-q15",
+      "difficulty": "tinggi",
+      "prompt": "Pakar hukum asal Belanda yang dikenal sebagai Bapak Hukum Adat Indonesia (halaman 227-231) karena gigih mempertahankan eksistensi 19 lingkungan hukum adat serta mengusulkan konsep dualisme progresif adalah ....",
+      "options": [
+        "Cornelis van Vollenhoven",
+        "Snouck Hurgronje",
+        "R. Soepomo",
+        "Djokosutono"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Cornelis van Vollenhoven menyusun karya Het adatrecht van Nederlandsch-Indie dan berjuang agar hukum adat bumiputra diakui serta diteliti secara sistematis."
+      },
+      "distractorWhy": {
+        "1": "Snouck Hurgronje adalah ahli ketimuran yang pertama menggunakan istilah adatrecht dalam De Atjehers (1893).",
+        "2": "R. Soepomo adalah pakar hukum adat Indonesia yang banyak mengutip konsep perjuangan Van Vollenhoven.",
+        "3": "Djokosutono adalah ahli hukum Indonesia yang bersama Soepomo mengulas sejarah hukum adat."
+      }
+    },
+    {
+      "id": "ips-d-7-t4-q16",
+      "difficulty": "sedang",
+      "prompt": "Salah satu wujud partisipasi aktif komunitas dalam mendorong pembangunan berkelanjutan (SDGs) di bidang lingkungan dan ekonomi masyarakat (halaman 220) adalah ....",
+      "options": [
+        "membentuk komunitas peduli sampah yang mengelola bank sampah untuk kegiatan daur ulang",
+        "meningkatkan konsumsi produk impor secara berlebihan",
+        "menggunakan kantong plastik sekali pakai dalam setiap kegiatan warga",
+        "membatasi masyarakat desa dalam mengakses sarana internet"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Bank sampah yang dikelola komunitas mendidik masyarakat memilah limbah untuk didaur ulang, mencerminkan prinsip pembangunan berkelanjutan."
+      },
+      "distractorWhy": {
+        "1": "Konsumsi barang impor berlebihan tidak mendukung kemandirian ekonomi lokal.",
+        "2": "Penggunaan plastik sekali pakai mencemari lingkungan dan merusak ekosistem.",
+        "3": "Membatasi akses internet justru menghambat kemajuan literasi dan ekonomi digital."
+      }
+    },
+    {
+      "id": "ips-d-7-t4-q17",
+      "difficulty": "tinggi",
+      "prompt": "Kapasitas, pemahaman, dan keterampilan seseorang dalam mengelola instrumen keuangan pribadi serta menggunakan lembaga keuangan formal secara bijak (halaman 204) dinamakan ....",
+      "options": [
+        "literasi keuangan",
+        "inklusif sosial",
+        "skala prioritas",
+        "diferensiasi sosial"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Literasi keuangan (literasi finansial) mencakup pengetahuan dan kemampuan membuat keputusan keuangan yang sehat serta terhindar dari kerugian."
+      },
+      "distractorWhy": {
+        "1": "Inklusif sosial merujuk pada keterlibatan seluruh elemen masyarakat dalam pembangunan.",
+        "2": "Skala prioritas adalah penentuan urutan pemenuhan kebutuhan berdasarkan tingkat kepentingannya.",
+        "3": "Diferensiasi sosial adalah pengelompokan masyarakat secara vertikal/horizontal berdasarkan karakteristik sosial."
+      }
+    },
+    {
+      "id": "ips-d-7-t4-q18",
+      "difficulty": "sedang",
+      "prompt": "Upaya pemberdayaan masyarakat desa dapat dilakukan dengan mengembangkan wirausaha di pekarangan rumah, seperti budi daya tanaman hias anggrek (halaman 219). Manfaat utama kegiatan tersebut adalah ....",
+      "options": [
+        "meningkatkan potensi ekonomi keluarga sekaligus memberikan sarana rekreasi bagi pembudi daya",
+        "mengubah seluruh fungsi lahan pertanian utama menjadi kebun bunga non-pangan",
+        "mengharuskan warga desa meninggalkan pekerjaan utama mereka",
+        "menyebabkan kelangkaan bahan makanan pokok di wilayah pedesaan"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Budi daya anggrek di pekarangan rumah memberikan cadangan pendapatan tambahan serta efek hiburan/rekreasi saat mekar."
+      },
+      "distractorWhy": {
+        "1": "Kegiatan ini memanfaatkan pekarangan rumah, bukan menggantikan lahan pertanian pangan desa.",
+        "2": "Budi daya pekarangan bersifat usaha sampingan yang fleksibel di waktu senggang.",
+        "3": "Pemanfaatan pekarangan rumah untuk tanaman hias tidak mengganggu pasokan pangan pokok."
+      }
+    },
+    {
+      "id": "ips-d-7-t4-q19",
+      "difficulty": "sedang",
+      "prompt": "Kondisi ketidakmampuan seorang individu atau keluarga dalam memenuhi kebutuhan dasar minimal seperti sandang, pangan, dan papan (halaman 193/209) dinamakan ....",
+      "options": [
+        "kemiskinan",
+        "etnosentrisme",
+        "akulturasi",
+        "deforestasi"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Kemiskinan adalah situasi di mana individu tidak mampu memenuhi standar kebutuhan dasar hidupnya."
+      },
+      "distractorWhy": {
+        "1": "Etnosentrisme adalah pandangan mengagungkan kebudayaan sendiri secara berlebihan.",
+        "2": "Akulturasi adalah proses percampuran dua kebudayaan.",
+        "3": "Deforestasi adalah penebangan hutan secara luas."
+      }
+    },
+    {
+      "id": "ips-d-7-t4-q20",
+      "difficulty": "tinggi",
+      "prompt": "Kegiatan penebangan hutan alam secara masif dalam skala besar untuk kepentingan komersial yang dapat memicu kerusakan lingkungan hidup (halaman 224/234) disebut ....",
+      "options": [
+        "deforestasi",
+        "eutrofikasi",
+        "eksplorasi",
+        "akomodasi"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Deforestasi adalah aktivitas penebangan hutan komersial skala besar yang mengurangi tutupan lahan hutan."
+      },
+      "distractorWhy": {
+        "1": "Eutrofikasi adalah pengayaan nutrisi air yang memicu pesatnya pertumbuhan eceng gondok/alga.",
+        "2": "Eksplorasi adalah kegiatan penyelidikan awal untuk menemukan cadangan tambang.",
+        "3": "Akomodasi adalah upaya penyelesaian konflik sosial."
+      }
+    }
+  ]
+}
