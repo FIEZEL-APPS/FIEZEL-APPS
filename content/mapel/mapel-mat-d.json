@@ -1326,6 +1326,255 @@
           }
         }
       ]
+    },
+    {
+      "code": "KOMP-MAT-D-8-BAB1-01",
+      "grade": 8,
+      "name": "Teorema Pythagoras dan Lingkaran",
+      "materi": "Teorema Pythagoras & Tripel Pythagoras, Penerapan Pythagoras, Keliling & Luas Lingkaran, Panjang Busur & Luas Juring",
+      "cpRef": "Matematika untuk SMP/MTs Kelas VII — Bab 1 (Kelas VIII)",
+      "items": [
+        {
+          "id": "mat-d-8-b1-q01",
+          "difficulty": "dasar",
+          "prompt": "Berdasarkan Buku Siswa Matematika Kelas VIII (hal. 10-14), rumus Teorema Pythagoras untuk segitiga siku-siku dengan sisi penyiku a dan b serta hipotenusa c adalah…",
+          "options": [
+            "c² = a² + b²",
+            "c = a + b",
+            "c² = a² - b²",
+            "c² = a × b"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Teorema Pythagoras menyatakan kuadrat hipotenusa sama dengan jumlah kuadrat sisi penyikunya: c² = a² + b²."
+          },
+          "distractorWhy": {
+            "1": "c = a+b mengabaikan kuadrat.",
+            "2": "c² = a²-b² rumus mencari sisi penyiku.",
+            "3": "c² = a×b keliru."
+          }
+        },
+        {
+          "id": "mat-d-8-b1-q02",
+          "difficulty": "sedang",
+          "prompt": "Berdasarkan Buku Siswa Matematika Kelas VIII (hal. 18), sebuah segitiga siku-siku memiliki panjang sisi penyiku 6 cm dan 8 cm. Panjang sisi miring (hipotenusa) segitiga tersebut adalah…",
+          "options": [
+            "10 cm",
+            "14 cm",
+            "100 cm",
+            "12 cm"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "c² = 6² + 8² = 36 + 64 = 100 => c = sqrt(100) = 10 cm."
+          },
+          "distractorWhy": {
+            "1": "6 + 8 = 14 cm.",
+            "2": "100 cm lupa diakar.",
+            "3": "12 cm keliru."
+          }
+        },
+        {
+          "id": "mat-d-8-b1-q03",
+          "difficulty": "sedang",
+          "prompt": "Berdasarkan Buku Siswa Matematika Kelas VIII (hal. 25 Tripel Pythagoras), kelompok tiga bilangan berikut yang merupakan Tripel Pythagoras adalah…",
+          "options": [
+            "5, 12, 13",
+            "3, 4, 6",
+            "6, 8, 11",
+            "7, 10, 15"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "5² + 12² = 25 + 144 = 169 = 13² (Tripel Pythagoras sempurna)."
+          },
+          "distractorWhy": {
+            "1": "3² + 4² = 25 != 36.",
+            "2": "6² + 8² = 100 != 121.",
+            "3": "7² + 10² = 149 != 225."
+          }
+        },
+        {
+          "id": "mat-d-8-b1-q04",
+          "difficulty": "tinggi",
+          "prompt": "Berdasarkan Buku Siswa Matematika Kelas VIII (hal. 45 Luas Lingkaran), luas lingkaran yang memiliki jari-jari r = 7 cm (dengan pi = 22/7) adalah…",
+          "options": [
+            "154 cm²",
+            "44 cm²",
+            "308 cm²",
+            "49 cm²"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Luas L = pi × r² = (22/7) × 7 × 7 = 22 × 7 = 154 cm²."
+          },
+          "distractorWhy": {
+            "1": "44 cm adalah Keliling (2×pi×r).",
+            "2": "308 cm² keliru.",
+            "3": "49 cm² hanya r²."
+          }
+        },
+        {
+          "id": "mat-d-8-b1-q05",
+          "difficulty": "dasar",
+          "prompt": "Berdasarkan Buku Siswa Matematika Kelas VIII (hal. 40), keliling lingkaran dengan diameter d = 14 cm (pi = 22/7) adalah…",
+          "options": [
+            "44 cm",
+            "88 cm",
+            "154 cm",
+            "28 cm"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Keliling K = pi × d = (22/7) × 14 = 22 × 2 = 44 cm."
+          },
+          "distractorWhy": {
+            "1": "88 cm keliru 2×pi×d.",
+            "2": "154 cm adalah Luas.",
+            "3": "28 cm 2d. yang merupakan analisis kekeliruan jawaban."
+          }
+        },
+        {
+          "id": "mat-d-8-b1-q06",
+          "difficulty": "tinggi",
+          "prompt": "Berdasarkan Buku Siswa Matematika Kelas VIII (hal. 55 Luas Juring), sudut pusat sebuah juring lingkaran adalah 90°. Jika luas total lingkaran tersebut adalah 200 cm², maka luas juring tersebut adalah…",
+          "options": [
+            "50 cm²",
+            "100 cm²",
+            "25 cm²",
+            "75 cm²"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Luas Juring = (Sudut Pusat / 360°) × Luas Lingkaran = (90/360) × 200 = 1/4 × 200 = 50 cm²."
+          },
+          "distractorWhy": {
+            "1": "100 cm² setengah lingkaran.",
+            "2": "25 cm² seperdelapan.",
+            "3": "75 cm² keliru."
+          }
+        },
+        {
+          "id": "mat-d-8-b1-q07",
+          "difficulty": "dasar",
+          "prompt": "Berdasarkan Buku Siswa Matematika Kelas VIII (hal. 12), jika c adalah hipotenusa, rumus untuk mencari panjang sisi penyiku a adalah…",
+          "options": [
+            "a = sqrt(c² - b²)",
+            "a = sqrt(c² + b²)",
+            "a = c - b",
+            "a = c² / b²"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Dari a² + b² = c² => a² = c² - b² => a = sqrt(c² - b²)."
+          },
+          "distractorWhy": {
+            "1": "Penjumlahan untuk hipotenusa.",
+            "2": "Pengurangan tanpa kuadrat.",
+            "3": "Pembagian keliru."
+          }
+        },
+        {
+          "id": "mat-d-8-b1-q08",
+          "difficulty": "sedang",
+          "prompt": "Berdasarkan Buku Siswa Matematika Kelas VIII (hal. 30), tangga sepanjang 5 meter disandarkan pada dinding tembok. Jika jarak ujung bawah tangga ke tembok adalah 3 meter, tinggi dinding yang dicapai tangga adalah…",
+          "options": [
+            "4 meter",
+            "2 meter",
+            "8 meter",
+            "16 meter"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "t² = 5² - 3² = 25 - 9 = 16 => t = sqrt(16) = 4 meter."
+          },
+          "distractorWhy": {
+            "1": "5 - 3 = 2 m.",
+            "2": "5 + 3 = 8 m.",
+            "3": "16 m lupa diakar."
+          }
+        },
+        {
+          "id": "mat-d-8-b1-q09",
+          "difficulty": "tinggi",
+          "prompt": "Berdasarkan Buku Siswa Matematika Kelas VIII (hal. 60 Panjang Busur), sudut pusat busur AB adalah 60°. Jika keliling total lingkaran adalah 120 cm, panjang busur AB adalah…",
+          "options": [
+            "20 cm",
+            "60 cm",
+            "30 cm",
+            "10 cm"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Panjang Busur = (60 / 360) × 120 = 1/6 × 120 = 20 cm."
+          },
+          "distractorWhy": {
+            "1": "60 cm setengah keliling.",
+            "2": "30 cm seperempat.",
+            "3": "10 cm keliru."
+          }
+        },
+        {
+          "id": "mat-d-8-b1-q10",
+          "difficulty": "dasar",
+          "prompt": "Berdasarkan Buku Siswa Matematika Kelas VIII (hal. 38), garis lurus yang menghubungkan titik pusat lingkaran dengan titik pada lengkungan lingkaran dinamakan…",
+          "options": [
+            "Jari-jari (r)",
+            "Diameter (d)",
+            "Tali busur",
+            "Apotema"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Jari-jari adalah jarak titik pusat ke tepi lengkungan lingkaran."
+          },
+          "distractorWhy": {
+            "1": "Diameter garis tengah membelah lingkaran.",
+            "2": "Tali busur menghubungkan 2 titik tepi.",
+            "3": "Apotema tegak lurus tali busur."
+          }
+        },
+        {
+          "id": "mat-d-8-b1-q11",
+          "difficulty": "sedang",
+          "prompt": "Berdasarkan Buku Siswa Matematika Kelas VIII (hal. 22), kapal berlayar ke arah utara sejauh 9 km, kemudian berbelok ke arah timur sejauh 12 km. Jarak terpendek kapal dari titik awal keberangkatan adalah…",
+          "options": [
+            "15 km",
+            "21 km",
+            "3 km",
+            "225 km"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "s² = 9² + 12² = 81 + 144 = 225 => s = sqrt(225) = 15 km."
+          },
+          "distractorWhy": {
+            "1": "9 + 12 = 21 km.",
+            "2": "12 - 9 = 3 km.",
+            "3": "225 km lupa diakar."
+          }
+        },
+        {
+          "id": "mat-d-8-b1-q12",
+          "difficulty": "tinggi",
+          "prompt": "Berdasarkan Buku Siswa Matematika Kelas VIII (hal. 65), sebuah roda sepeda memiliki jari-jari r = 35 cm. Jika roda berputar sebanyak 100 kali putaran, jarak yang ditempuh sepeda adalah…",
+          "options": [
+            "220 meter (22.000 cm)",
+            "110 meter",
+            "440 meter",
+            "70 meter"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Keliling K = 2 × (22/7) × 35 = 220 cm. Jarak = 100 × 220 cm = 22.000 cm = 220 meter."
+          },
+          "distractorWhy": {
+            "1": "110 m keliru pi×r.",
+            "2": "440 m keliru 2K.",
+            "3": "70 m keliru 2r."
+          }
+        }
+      ]
     }
   ]
 }

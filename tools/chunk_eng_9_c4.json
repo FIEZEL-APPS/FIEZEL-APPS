@@ -1,0 +1,409 @@
+{
+  "code": "KOMP-ENG-D-9-BAB4-01",
+  "grade": 9,
+  "name": "Chapter 4: Upcycling Used Materials",
+  "materi": "Upcycling & Recycling Crafts Procedural Texts, Imperative Action Verbs, DIY Project Instructions, Environmental Sustainability",
+  "cpRef": "English for Nusantara untuk SMP/MTs Kelas IX",
+  "items": [
+    {
+      "id": "eng-d-9-c4-q01",
+      "difficulty": "easy",
+      "prompt": "In Unit 1 (Look at My Creation, Section 2), Galang, Monita, and Andre are discussing ideas for their school bazaar project. What items do they decide to make from used plastic water bottles and bottle caps?",
+      "options": [
+        "Wall decorations and pencil holders",
+        "Plastic keychains and shopping bags",
+        "Water bottles and flower pots",
+        "Storage boxes and decorative lamps"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Galang, Monita, dan Andre sepakat memanfaatkan botol plastik bekas untuk membuat hiasan dinding (wall decoration) dan botolnya menjadi tempat pensil (pencil holder)."
+      },
+      "distractorWhy": {
+        "1": "Gantungan kunci dan tas belanja plastik bukan merupakan produk daur ulang botol yang disepakati oleh mereka dalam percakapan.",
+        "2": "Botol air baru dan pot bunga tidak sesuai dengan produk utama yang mereka rencanakan dalam diskusi kelompok.",
+        "3": "Kotak penyimpanan dan lampu hias bukan kreasi yang dirancang oleh Monita dan teman-teman dari botol air bekas."
+      }
+    },
+    {
+      "id": "eng-d-9-c4-q02",
+      "difficulty": "easy",
+      "prompt": "Based on Unit 1 Section 2 (Audio 4.2), what is the main purpose of Monita using green craft paper for their plastic bottle wall decoration project?",
+      "options": [
+        "To cover the cardboard base to make it look neat and attractive",
+        "To stick the bottle caps directly onto the plastic bottle surface",
+        "To wrap the entire plastic bottle before cutting it into pieces",
+        "To replace the plastic bottle caps with paper cutouts"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Dalam petunjuk pembuatan kreasi hiasan dinding, kertas kerajinan hijau digunakan untuk melapisi alas karton agar tampak rapi dan menarik."
+      },
+      "distractorWhy": {
+        "1": "Kertas hijau tidak ditempelkan langsung pada permukaan botol plastik melainkan pada karton dasar.",
+        "2": "Botol plastik tidak dibungkus seluruhnya dengan kertas sebelum dipotong dalam langkah pembuatan.",
+        "3": "Kertas hijau digunakan sebagai alas latar, bukan untuk menggantikan tutup botol plastik."
+      }
+    },
+    {
+      "id": "eng-d-9-c4-q03",
+      "difficulty": "medium",
+      "prompt": "Read the following imperative step from a DIY procedural text in Unit 1: \"______ the plastic bottle into two halves using a pair of scissors carefully.\" Which action verb correctly completes this imperative instruction?",
+      "options": [
+        "Cut",
+        "Glue",
+        "Paint",
+        "Decorate"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Kata kerja imperatif Cut (potong) paling tepat untuk mengawali instruksi membagi botol plastik menjadi dua bagian menggunakan gunting."
+      },
+      "distractorWhy": {
+        "1": "Glue (rekatkan/lem) tidak cocok digunakan untuk memisahkan botol menjadi dua bagian menggunakan gunting.",
+        "2": "Paint (cat/mewarnai) digunakan untuk memberi warna, bukan untuk membagi botol menjadi dua bagian.",
+        "3": "Decorate (menghias) adalah proses mempercantik benda, bukan tindakan memotong botol."
+      }
+    },
+    {
+      "id": "eng-d-9-c4-q04",
+      "difficulty": "medium",
+      "prompt": "In Unit 1 Section 3 (Language Focus), how are adjectives ordered when describing upcycled craft materials (e.g., size, shape, color, material)? Which phrase follows the correct adjective order rules?",
+      "options": [
+        "A small round green plastic cap",
+        "A plastic green round small cap",
+        "A green small plastic round cap",
+        "A round plastic small green cap"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Urutan kata sifat (Adjective Order) yang benar mengikuti pola: Size (small) + Shape (round) + Color (green) + Material (plastic) + Noun (cap)."
+      },
+      "distractorWhy": {
+        "1": "Bahan (plastic) diletakkan di depan warna dan bentuk, memutarbalikkan aturan baku urutan kata sifat.",
+        "2": "Warna (green) ditempatkan sebelum ukuran (small) dan bahan sebelum bentuk, yang melanggar urutan standar.",
+        "3": "Bentuk (round) diletakkan di depan bahan dan ukuran, tidak sesuai urutan Size-Shape-Color-Material."
+      }
+    },
+    {
+      "id": "eng-d-9-c4-q05",
+      "difficulty": "medium",
+      "prompt": "In Unit 1 Section 4, Andre describes his upcycled craft creation: \"I made a pencil holder using a large cylindrical blue plastic bottle.\" What material and physical traits are highlighted in this description?",
+      "options": [
+        "Size (large), shape (cylindrical), color (blue), material (plastic)",
+        "Price (cheap), weight (heavy), age (old), origin (local)",
+        "Texture (rough), quality (bad), color (blue), shape (square)",
+        "Size (small), pattern (striped), material (glass), color (red)"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Deskripsi memuat ukuran (large), bentuk (cylindrical), warna (blue), dan bahan asal daur ulang (plastic)."
+      },
+      "distractorWhy": {
+        "1": "Harga, berat, dan usia barang tidak disebutkan dalam gabungan frasa kata sifat deskriptif tersebut.",
+        "2": "Tekstur kasar dan bentuk persegi tidak sesuai dengan deskripsi botol plastik silinder biru.",
+        "3": "Ukuran kecil, pola garis, dan bahan kaca bertentangan dengan deskripsi botol plastik besar."
+      }
+    },
+    {
+      "id": "eng-d-9-c4-q06",
+      "difficulty": "hard",
+      "prompt": "Consider the procedural text instructions for making an upcycled wall hanging from bottle caps in Unit 1: \"First, collect 20 plastic bottle caps. Next, arrange them in a flower pattern. Then, glue each cap onto the cardboard backing.\" What is the main purpose of using sequence adverbs like \"First\", \"Next\", and \"Then\" in this text?",
+      "options": [
+        "To guide the reader step-by-step through the logical order of the DIY process",
+        "To express the author's personal feelings about upcycling waste",
+        "To compare the quality of plastic bottles with glass bottles",
+        "To persuade readers to buy wall decorations at a high price"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Kata keterangan urutan (sequence adverbs) bertindak sebagai penanda urutan kronologis langkah-langkah kerja dalam teks prosedur DIY."
+      },
+      "distractorWhy": {
+        "1": "Kata penanda urutan tidak digunakan untuk menyuarakan perasaan pribadi atau opini penulis.",
+        "2": "Teks prosedur urutan tidak bertujuan membandingkan kualitas bahan bekas dengan bahan kaca.",
+        "3": "Urutan langkah bukan bertujuan membujuk pembeli dari segi harga barang."
+      }
+    },
+    {
+      "id": "eng-d-9-c4-q07",
+      "difficulty": "easy",
+      "prompt": "In Unit 2 (They're on Sale!, Section 1), students present preloved and upcycled items at the school marketplace. What does the term \"preloved items\" mean in the context of eco-friendly practices?",
+      "options": [
+        "Secondhand goods that are still in good condition and can be reused",
+        "Brand-new products bought straight from a factory",
+        "Broken items that cannot be repaired or used again",
+        "Waste materials that must be burned or buried immediately"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Istilah preloved items mengacu pada barang bekas pakai yang masih berkualitas layak dan bagus untuk dimanfaatkan kembali."
+      },
+      "distractorWhy": {
+        "1": "Barang preloved bukan merupakan produk yang baru dibeli langsung dari pabrik pabrikan.",
+        "2": "Barang rusak yang tidak dapat diperbaiki tergolong sampah/sampah rusaknya bukan preloved.",
+        "3": "Barang preloved disukai untuk diguna-ulang, bukan limbah yang harus dibakar atau ditimbun."
+      }
+    },
+    {
+      "id": "eng-d-9-c4-q08",
+      "difficulty": "medium",
+      "prompt": "In Unit 2 Section 2, Galang sells handmade upcycled pencil cases made from old denim jeans. What key information should be included in a promotional text or advertisement poster for such products?",
+      "options": [
+        "Product name, material description, price, and eco-friendly benefits",
+        "Step-by-step recipes, cooking duration, and nutritional values",
+        "Historical origin of denim fabric and garment manufacturing history",
+        "List of school rules regarding classroom cleanliness"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Iklan promosi produk daur ulang memerlukan nama produk, rincian bahan bekas yang dipakai, harga, dan keunggulan ramah lingkungan."
+      },
+      "distractorWhy": {
+        "1": "Resep makanan dan nilai gizi relevan untuk produk kuliner, bukan kerajinan tempat pensil berbahan denim.",
+        "2": "Sejarah pabrik garmen terlalu luas dan tidak berfokus pada informasi penjualan produk daur ulang.",
+        "3": "Tata tertib kebersihan kelas bukan isi informasi promosi penjualan barang daur ulang."
+      }
+    },
+    {
+      "id": "eng-d-9-c4-q09",
+      "difficulty": "easy",
+      "prompt": "Read the promo line from Unit 2: \"Buy two upcycled denim pouches and get a free handmade keychain! Offer valid during the School Charity Bazaar.\" What is the primary objective of this promotional message?",
+      "options": [
+        "To attract buyers and encourage sales of upcycled products during the bazaar",
+        "To instruct students on how to sew denim pouches from scratch",
+        "To inform students about the school schedule for upcoming exams",
+        "To warn visitors about the danger of plastic pollution"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Pesan promosi dengan penawaran khusus bertujuan menarik pembeli dan meningkatkan penjualan barang daur ulang."
+      },
+      "distractorWhy": {
+        "1": "Pesan ini adalah iklan penawaran beli, bukan panduan teks prosedur tentang cara menjahit kantong denim.",
+        "2": "Iklan bazaar tidak bertujuan menyampaikan jadwal ujian sekolah kepada siswa.",
+        "3": "Pesan ini berfokus pada penjualan produk, bukan surat peringatan bahaya pencemaran limbah."
+      }
+    },
+    {
+      "id": "eng-d-9-c4-q10",
+      "difficulty": "medium",
+      "prompt": "In Unit 2 Section 4 (Language Focus), expressions for asking and giving price are practiced for buying upcycled crafts. Which question appropriately asks for the price of an upcycled handbag?",
+      "options": [
+        "How much does this upcycled handbag cost?",
+        "Where did you find this upcycled handbag?",
+        "What color is this upcycled handbag?",
+        "Why did you create this upcycled handbag?"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Kalimat \"How much does this upcycled handbag cost?\" adalah ungkapan yang tepat untuk menanyakan harga barang."
+      },
+      "distractorWhy": {
+        "1": "Menanyakan tempat menemukan barang mengarah pada lokasi asal, bukan menanyakan nominal harga.",
+        "2": "Menanyakan warna barang berfokus pada penampilan visual, bukan harga jual produk.",
+        "3": "Menanyakan alasan pembuatan berfokus pada tujuan proyek, bukan harga barang yang ditawarkan."
+      }
+    },
+    {
+      "id": "eng-d-9-c4-q11",
+      "difficulty": "medium",
+      "prompt": "During a school charity sale (Unit 2), a customer asks: \"Can I get a discount if I buy three plastic bottle pots?\" Which response by the student seller offers a polite negotiation response?",
+      "options": [
+        "Sure! You can have all three for twenty thousand rupiahs.",
+        "No, you cannot buy any items from our store today.",
+        "I don't care how many pots you want to buy.",
+        "Please throw your trash into the designated recycling bin."
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Jawaban memberikan harga potongan (diskon) secara sopan dan menyetujui penawaran pembeli."
+      },
+      "distractorWhy": {
+        "1": "Penolakan mentah-mentah untuk menjual barang terkesan tidak sopan dan merugikan transaksi penjualan.",
+        "2": "Pernyataan acuh tak acuh melanggar tata cara berkomunikasi sopan dalam kegiatan jual beli.",
+        "3": "Himbauan membuang sampah tidak relevan dengan pertanyaan penawaran diskon harga produk."
+      }
+    },
+    {
+      "id": "eng-d-9-c4-q12",
+      "difficulty": "hard",
+      "prompt": "In Unit 2 Section 6 (Reading Poster), a student crafts poster states: \"Turn Waste into Treasure: Eco-Friendly Crafts on Sale! Support our green initiative this Friday.\" What underlying message is conveyed by the slogan \"Turn Waste into Treasure\"?",
+      "options": [
+        "Discarded materials can be creatively converted into valuable and useful products",
+        "Real treasure chests filled with gold can be found in plastic waste bins",
+        "All school trash should be sold immediately without cleaning or processing",
+        "Buying recycled products is more expensive than buying gold"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Slogan \"Turn Waste into Treasure\" bermakna mengubah sampah/barang bekas menjadi barang berguna yang memiliki nilai kreasi dan manfaat tinggi."
+      },
+      "distractorWhy": {
+        "1": "Slogan ini bernilai kiasan daur ulang, bukan arti harfiah menemukan peti harta karun emas di tempat sampah.",
+        "2": "Sampah harus diolah dan dibersihkan menjadi kerajinan terlebih dahulu, bukan dijual mentah dalam keadaan kotor.",
+        "3": "Slogan tersebut tidak menyatakan bahwa produk daur ulang lebih mahal daripada harga emas."
+      }
+    },
+    {
+      "id": "eng-d-9-c4-q13",
+      "difficulty": "easy",
+      "prompt": "In Unit 3 (Let's Donate, Section 1), students learn about community action for environmental sustainability. What is the main goal of organizing a student-run charity shop at school?",
+      "options": [
+        "To collect preloved items, sell them, and donate the profits to social causes",
+        "To store unused furniture permanently inside classroom corners",
+        "To force students to buy new plastic toys every week",
+        "To compete with commercial shopping malls in the city center"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Tujuan utama toko amal siswa (charity shop) adalah mengumpulkan barang layak pakai, menjualnya, lalu mendonasikan keuntungannya untuk aksi sosial."
+      },
+      "distractorWhy": {
+        "1": "Toko amal bertujuan mendaur/menjual barang, bukan menumpuk perabotan bekas secara permanen di sudut kelas.",
+        "2": "Toko amal berfokus pada pemanfaatan barang bekas (preloved), bukan memaksa membeli mainan plastik baru.",
+        "3": "Kegiatan sekolah ini bersifat sosial dan edukatif, bukan untuk bersaing secara komersial dengan mal besar."
+      }
+    },
+    {
+      "id": "eng-d-9-c4-q14",
+      "difficulty": "medium",
+      "prompt": "Read the excerpt from a school website post in Unit 3 Section 2: \"At Merdeka Friday Shop, we accept clean preloved clothes, books, and handmade crafts. All profits go to helping local shelters.\" What type of text structure is used to describe the shop's operations?",
+      "options": [
+        "Descriptive text highlighting features, items accepted, and donation goals",
+        "Narrative text about a fictional hero fighting plastic monsters",
+        "Recount text detailing a vacation trip to a recycling factory",
+        "Exposition text discussing global weather patterns"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Teks tersebut merupakan teks deskriptif yang memaparkan fitur toko, barang yang diterima, serta tujuan donasi."
+      },
+      "distractorWhy": {
+        "1": "Teks bukan dongeng naratif fiktif tentang pahlawan melawan monster sampah plastik.",
+        "2": "Teks memuat informasi profil toko saat ini, bukan catatan pengalamannya berlibur ke pabrik daur ulang.",
+        "3": "Topik bahasan berfokus pada toko amal sekolah, bukan eksposisi perubahan cuaca global."
+      }
+    },
+    {
+      "id": "eng-d-9-c4-q15",
+      "difficulty": "hard",
+      "prompt": "In Unit 3 Section 3 (Language Focus), passive voice is introduced to emphasize actions in DIY and donation contexts, such as: \"Used plastic bottles ARE COLLECTED by students every Wednesday.\" Why is passive voice used in this sentence?",
+      "options": [
+        "To place primary focus on the action performed and the object (plastic bottles) rather than the agent",
+        "To express future plans that will never take place",
+        "To ask a direct question to the school principal",
+        "To command someone to clean the classroom immediately"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Kalimat pasif menekankan objek (used plastic bottles) dan tindakan pengumpulan yang dilakukan ketimbang subjek pelakunya."
+      },
+      "distractorWhy": {
+        "1": "Bentuk pasif menyatakan fakta kegiatan rutin yang berlangsung, bukan pengada-adaan rencana yang takkan terjadi.",
+        "2": "Kalimat tersebut berbentuk berita/pernyataan, bukan kalimat tanya langsung kepada kepala sekolah.",
+        "3": "Struktur kalimat ini adalah pernyataan pasif deskriptif, bukan kalimat perintah imperatif."
+      }
+    },
+    {
+      "id": "eng-d-9-c4-q16",
+      "difficulty": "medium",
+      "prompt": "Convert the active DIY procedure sentence into correct passive voice: \"Students turn old newspapers into decorative paper baskets.\" Which sentence presents the correct passive form?",
+      "options": [
+        "Old newspapers are turned into decorative paper baskets by students.",
+        "Old newspapers were turning decorative paper baskets for students.",
+        "Students are turned by old newspapers into decorative paper baskets.",
+        "Decorative paper baskets turn old newspapers by students."
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Bentuk pasif dari kalimat Simple Present tersebut adalah \"Old newspapers (object) + are turned (V3) + into decorative paper baskets + by students (agent)\"."
+      },
+      "distractorWhy": {
+        "1": "Penggunaan tensis \"were turning\" salah karena kalimat asal menggunakan Simple Present tense.",
+        "2": "Makna kalimat tertukar secara tidak logis, seolah-olah siswa yang diubah oleh surat kabar tua.",
+        "3": "Keranjang kertas diletakkan sebagai subjek aktif yang mengubah koran, mengacaukan struktur pasif."
+      }
+    },
+    {
+      "id": "eng-d-9-c4-q17",
+      "difficulty": "hard",
+      "prompt": "In Unit 3 Section 4, students write a description for their charity project. Which section structure correctly organizes a descriptive report about an eco-friendly project?",
+      "options": [
+        "Identification (introducing the shop/project) followed by Description (details of items, pricing, and donation recipient)",
+        "Orientation (setting time/place), Complication (problem encountered), and Resolution (ending)",
+        "Goal (title), Materials needed, and Step-by-step instructions",
+        "Thesis statement, Arguments in support, and Reiteration conclusion"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Struktur generik teks deskriptif proyek adalah Identification (pengenalan toko/proyek) dilanjutkan Description (rincian barang, harga, dan penyaluran donasi)."
+      },
+      "distractorWhy": {
+        "1": "Orientation-Complication-Resolution adalah struktur generik teks naratif (cerita dongeng/pengalaman).",
+        "2": "Goal-Materials-Steps merupakan struktur generik teks prosedur pembuatan/panduan DIY.",
+        "3": "Thesis-Arguments-Reiteration merupakan struktur generik teks eksposisi analitis."
+      }
+    },
+    {
+      "id": "eng-d-9-c4-q18",
+      "difficulty": "medium",
+      "prompt": "Read the DIY project step: \"______ the glued plastic caps with acrylic paint to give them a vibrant appearance before attaching them to the wall frame.\" Which imperative action verb fits best?",
+      "options": [
+        "Coat",
+        "Wash",
+        "Melt",
+        "Burn"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Kata kerja Coat (melapisi/mewarnai dengan lapisan cat) paling pas untuk memberi warna akrilik pada tutup botol."
+      },
+      "distractorWhy": {
+        "1": "Wash (mencuci) dilakukan dengan air di awal pembersihan, bukan saat melapisi dengan cat akrilik.",
+        "2": "Melt (mencairkan) akan merusak tutup botol plastik dan berbahaya dalam proyek hiasan dinding sederhana.",
+        "3": "Burn (membakar) merusak bahan daur ulang serta merilis gas beracun yang bertentangan dengan prinsip ramah lingkungan."
+      }
+    },
+    {
+      "id": "eng-d-9-c4-q19",
+      "difficulty": "medium",
+      "prompt": "In a DIY instruction guide for making a plant pot from a plastic bottle, what is the importance of adding the step: \"Puncture small holes in the bottom of the plastic bottle\"?",
+      "options": [
+        "To allow excess water to drain out so the plant roots do not rot",
+        "To make the plastic bottle lighter so it can float in the air",
+        "To prevent sunlight from reaching the soil inside the pot",
+        "To store extra fertilizer at the base of the bottle container"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Lubang kecil di dasar botol berfungsi sebagai saluran drainase air agar akar tanaman tidak membusuk."
+      },
+      "distractorWhy": {
+        "1": "Memberi lubang pada pot plastik tidak membuat pot tersebut melayang di udara.",
+        "2": "Lubang bawah tidak bertujuan menahan sinar matahari mengenai tanah tanaman.",
+        "3": "Lubang di bagian bawah justru membuat cairan mengalir keluar, bukan untuk menyimpan pupuk."
+      }
+    },
+    {
+      "id": "eng-d-9-c4-q20",
+      "difficulty": "hard",
+      "prompt": "Reflecting on Chapter 4 (\"Upcycling Used Materials\"), how do upcycling projects contribute to environmental sustainability in school communities?",
+      "options": [
+        "By reducing plastic waste in landfills, reusing existing resources creatively, and fostering social responsibility through donation",
+        "By encouraging people to produce more single-use plastic bottles every day",
+        "By replacing natural plants with artificial plastic flowers across all gardens",
+        "By increasing the amount of trash thrown into local rivers"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Daur ulang (upcycling) mengurangi volume sampah, memanfaatkan kembali sumber daya secara kreatif, dan memupuk kepedulian sosial melalui kegiatan donasi."
+      },
+      "distractorWhy": {
+        "1": "Upcycling bertujuan mengurangi limbah, bukan mendorong produksi botol plastik sekali pakai lebih banyak.",
+        "2": "Daur ulang tidak bertujuan mengganti semua tanaman alami dengan bunga plastik di taman.",
+        "3": "Daur ulang mencegah dan mengurangi pembuangan sampah ke sungai, bukan menambah jumlah pencemaran."
+      }
+    }
+  ]
+}

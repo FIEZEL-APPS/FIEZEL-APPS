@@ -30,7 +30,7 @@ def fix_difficulty(comp):
                     item["distractorWhy"][k] = val.strip() + " yang merupakan analisis kekeliruan jawaban."
     return comp
 
-# 1. MATEMATIKA (Grade 7 Bab 1-4)
+# 1. MATEMATIKA (Grade 7 Bab 1-4 + Grade 8 Bab 1)
 mat_doc = "Matematika untuk SMP/MTs Kelas VII"
 mat_data = {
     "schema": "fiezel-mapel-bank-v1",
@@ -51,6 +51,13 @@ for b in [1, 2, 3, 4]:
     if c:
         c["cpRef"] = f"{mat_doc} — Bab {b}"
         mat_data["competencies"].append(fix_difficulty(c))
+
+for b in [1]:
+    c = load_json(os.path.join(tools_dir, f"chunk_mat_8_b{b}.json"))
+    if c:
+        c["cpRef"] = f"{mat_doc} — Bab {b} (Kelas VIII)"
+        mat_data["competencies"].append(fix_difficulty(c))
+
 save_json(os.path.join(content_dir, "mapel-mat-d.json"), mat_data)
 
 
@@ -85,7 +92,7 @@ for b in [1, 2, 3, 4, 5]:
 save_json(os.path.join(content_dir, "mapel-ind-d.json"), ind_data)
 
 
-# 3. BAHASA INGGRIS (Grade 7 Chapter 1-3 + Grade 8 Chapter 1-5)
+# 3. BAHASA INGGRIS (Grade 7 Chapter 1-3 + Grade 8 Chapter 1-5 + Grade 9 Chapter 1, 4, 5)
 eng_doc = "English for Nusantara untuk SMP/MTs Kelas VII"
 eng_data = {
     "schema": "fiezel-mapel-bank-v1",
@@ -113,10 +120,16 @@ for c_num in [1, 2, 3, 4, 5]:
         c["cpRef"] = f"{eng_doc} — Chapter {c_num} (Kelas VIII)"
         eng_data["competencies"].append(fix_difficulty(c))
 
+for c_num in [1, 4, 5]:
+    c = load_json(os.path.join(tools_dir, f"chunk_eng_9_c{c_num}.json"))
+    if c:
+        c["cpRef"] = f"{eng_doc} — Chapter {c_num} (Kelas IX)"
+        eng_data["competencies"].append(fix_difficulty(c))
+
 save_json(os.path.join(content_dir, "mapel-eng-d.json"), eng_data)
 
 
-# 4. IPS (Grade 7 Tema 1-3)
+# 4. IPS (Grade 7 Tema 1-3 + Grade 8 Tema 1)
 ips_doc = "Ilmu Pengetahuan Sosial untuk SMP/MTs Kelas VII (Edisi Revisi)"
 ips_data = {
     "schema": "fiezel-mapel-bank-v1",
@@ -137,6 +150,13 @@ for t_num in [1, 2, 3]:
     if c:
         c["cpRef"] = f"{ips_doc} — Tema {t_num:02d}"
         ips_data["competencies"].append(fix_difficulty(c))
+
+for t_num in [1]:
+    c = load_json(os.path.join(tools_dir, f"chunk_ips_8_t{t_num}.json"))
+    if c:
+        c["cpRef"] = f"{ips_doc} — Tema {t_num:02d} (Kelas VIII)"
+        ips_data["competencies"].append(fix_difficulty(c))
+
 save_json(os.path.join(content_dir, "mapel-ips-d.json"), ips_data)
 
 
@@ -155,3 +175,4 @@ ipa_data["competencies"] = list(existing_ipa.values())
 save_json(os.path.join(content_dir, "mapel-ipa-d.json"), ipa_data)
 
 print(f"Assembled: MAT={len(mat_data['competencies'])}, IND={len(ind_data['competencies'])}, ENG={len(eng_data['competencies'])}, IPS={len(ips_data['competencies'])}, IPA={len(ipa_data['competencies'])}")
+

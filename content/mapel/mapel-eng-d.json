@@ -2962,6 +2962,1233 @@
           }
         }
       ]
+    },
+    {
+      "code": "KOMP-ENG-D-9-BAB1-01",
+      "grade": 9,
+      "name": "Chapter 1: Exploring Fauna of Indonesia",
+      "materi": "Reading Report Texts on Indonesian Wildlife (Bekantan, Orangutan, Birds), Passive Voice in Science Context, Describing Animals Physical & Behavior",
+      "cpRef": "English for Nusantara untuk SMP/MTs Kelas VII — Chapter 1 (Kelas IX)",
+      "items": [
+        {
+          "id": "eng-d-9-c1-q01",
+          "difficulty": "dasar",
+          "prompt": "Read the dialogue snippet from Comic Strip 1.1:\n\"Monita: Bekantan is a Proboscis monkey. Its scientific name is Nasalis larvatus.\"\nBased on the conversation in Unit 1, what does the common name 'Proboscis monkey' mean?",
+          "options": [
+            "A long-nosed monkey",
+            "A reddish-brown ape",
+            "A tailless primate",
+            "A short-tailed lemur"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Proboscis monkey secara harfiah merujuk pada monyet berhidung panjang (long-nosed monkey), sebagaimana dijelaskan Monita dalam percakapan di Unit 1."
+          },
+          "distractorWhy": {
+            "1": "Monyet bekantan memang berbulu cokelat kemerahan, tetapi kata proboscis secara khusus merujuk pada bentuk hidungnya yang panjang, bukan warna bulunya.",
+            "2": "Bekantan memiliki ekor yang hampir sama panjang dengan tubuhnya, sehingga bukan primata tanpa ekor.",
+            "3": "Bekantan tergolong primata jenis monyet berhidung panjang, bukan lemur berbuntut pendek."
+          }
+        },
+        {
+          "id": "eng-d-9-c1-q02",
+          "difficulty": "dasar",
+          "prompt": "In Comic Strip 1.2, Andre says: \"Bekantans are grouped as arboreal animals.\" What is meant by arboreal animals based on the text explanation?",
+          "options": [
+            "Animals that eat, sleep, and play mostly in trees",
+            "Animals that spend most of their time swimming in deep oceans",
+            "Animals that live exclusively inside dark underground caves",
+            "Animals that migrate across long distances during winter"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Istilah arboreal dalam buku teks didefinisikan secara eksplisit sebagai hewan yang menghabiskan sebagian besar waktunya untuk makan, tidur, dan bermain di atas pohon."
+          },
+          "distractorWhy": {
+            "1": "Hewan laut yang hidup di samudera tergolong akuatik, bukan arboreal.",
+            "2": "Hewan yang tinggal di dalam goa bawah tanah disebut hewan gua (troglobit), bukan arboreal.",
+            "3": "Hewan yang melakukan migrasi musiman tidak didefinisikan sebagai hewan arboreal atas dasar perilaku migrasinya."
+          }
+        },
+        {
+          "id": "eng-d-9-c1-q03",
+          "difficulty": "sedang",
+          "prompt": "Read the dialogue snippet from Comic Strip 1.3:\n\"Monita: The book says that Bekantans can swim well because they have a skin membrane on their feet and hands like frogs.\"\nWhy do Bekantans need to swim according to the text in Unit 1?",
+          "options": [
+            "To escape predators like crocodiles and cross rivers to find food",
+            "To clean their reddish-brown fur from dirt and parasites",
+            "To catch small marine fish in deep seawater habitats",
+            "To attract female mates by performing water dance routines"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Bekantan berenang melintasi sungai untuk menyelamatkan diri dari pemangsa seperti buaya serta untuk mencari sumber makanan di seberang sungai."
+          },
+          "distractorWhy": {
+            "1": "Tujuan utama bekantan berenang yang disebutkan dalam teks adalah menghindari pemangsa dan mencari makan, bukan untuk membersihkan bulu.",
+            "2": "Bekantan memakan dedaunan muda dan buah-buahan di hutan bakau, bukan berburu ikan laut di laut dalam.",
+            "3": "Bekantan menarik perhatian betina menggunakan hidungnya yang besar dan panjang, bukan dengan tarian air."
+          }
+        },
+        {
+          "id": "eng-d-9-c1-q04",
+          "difficulty": "sedang",
+          "prompt": "Section 4 of Unit 1 explains Noun Groups: \"A noun group is a group of words around a headword noun. Adjectives give more information before the noun.\"\nWhich sentence correctly uses a noun group to describe an animal's physical feature according to the pattern in Chapter 1?",
+          "options": [
+            "The female Helmeted Hornbill has a bluish white featherless patch on its neck.",
+            "The female Helmeted Hornbill has a patch bluish white featherless on its neck.",
+            "The female Helmeted Hornbill featherless has patch a bluish white on its neck.",
+            "The female Helmeted Hornbill on its neck patch a bluish white featherless has."
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Urutan frasa nomina (noun group) yang benar menempatkan kata sifat (bluish white, featherless) sebelum kata benda inti (patch), membentuk frasa a bluish white featherless patch."
+          },
+          "distractorWhy": {
+            "1": "Kata sifat ditempatkan setelah kata benda sehingga struktur frasa nomina menjadi tidak tepat.",
+            "2": "Susunan kata sifat dan kata benda terpecah secara keliru di sekitar kata kerja.",
+            "3": "Tata kata acak ini merusak struktur frasa nomina dan tata bahasa kalimat."
+          }
+        },
+        {
+          "id": "eng-d-9-c1-q05",
+          "difficulty": "sedang",
+          "prompt": "In Comic Strip 1.4, Monita explains the main danger facing Bekantans:\n\"The major threat is habitat destruction. It means they lose their home—their mangrove trees.\"\nWhat is the main conclusion regarding how to save Bekantans?",
+          "options": [
+            "People must save and protect the mangrove forests where Bekantans live",
+            "People should catch all Bekantans and move them to city zoos",
+            "People ought to feed Bekantans with commercial processed monkey food",
+            "People must eliminate all natural bird species in Borneo rainforests"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Karena ancaman terbesar bagi bekantan adalah kerusakan habitat pohon bakau, cara utama menyelamatkannya adalah dengan menjaga dan melestarikan hutan bakau tersebut."
+          },
+          "distractorWhy": {
+            "1": "Memindahkan seluruh populasi liar ke kebun binatang kota bukan solusi pelestarian habitat alami yang dimaksudkan dalam konteks teks.",
+            "2": "Memberi pakan buatan tidak mengatasi masalah hilangnya tempat tinggal alami mereka di hutan bakau.",
+            "3": "Membasmi spesies burung alami tidak relevan dan justru merusak ekosistem hutan Borneo."
+          }
+        },
+        {
+          "id": "eng-d-9-c1-q06",
+          "difficulty": "dasar",
+          "prompt": "Read the informational text from 'Did you know?' in Unit 2:\n\"Apes and monkeys are two different animals. The first and easiest way to know the difference is by observing the absence or presence of their tails. Monkeys have tails while apes don't.\"\nBased on this rule, which animal is categorized as an ape because it has no tail?",
+          "options": [
+            "Orangutan",
+            "Proboscis monkey",
+            "Long-tailed macaque",
+            "Baboon"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Orangutan tergolong kera (ape) karena tidak memiliki ekor dan bertubuh besar, sesuai penjelasan perbedaan kera dan monyet di Unit 2."
+          },
+          "distractorWhy": {
+            "1": "Bekantan (Proboscis monkey) tergolong monyet karena memiliki ekor yang panjang.",
+            "2": "Macaca berkeor panjang merupakan jenis monyet karena jelas memiliki ekor.",
+            "3": "Babun merupakan spesies monyet yang memiliki ekor."
+          }
+        },
+        {
+          "id": "eng-d-9-c1-q07",
+          "difficulty": "tinggi",
+          "prompt": "According to the reading text 'Orangutan' in Unit 2:\n\"The scientific name of Orangutan from Northern Sumatra is Pongo abelii and the scientific name of Orangutan from Borneo is Pongo pygmaeus.\"\nWhich statement accurately reflects the facts provided in the report text?",
+          "options": [
+            "Male orangutans can reach a height of up to 150 cm, whereas mature females average around 120 cm.",
+            "Female orangutans are heavier than male orangutans, weighing over 150 kg on average.",
+            "Orangutans live strictly in solitary desert areas without tree canopies.",
+            "Pongo pygmaeus is the scientific designation exclusive to Sumatran orangutans."
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Teks menjelaskan bahwa orangutan jantan dapat mencapai tinggi 150 cm, sementara betina dewasa berukuran lebih kecil dengan tinggi sekitar 120 cm."
+          },
+          "distractorWhy": {
+            "1": "Teks menyatakan orangutan jantan (bisa lebih dari 100 kg) jauh lebih berat daripada betina (sekitar 40 kg).",
+            "2": "Orangutan hidup di hutan hujan dan rawa di Sumatra dan Borneo di atas pepohonan, bukan di gurun pasir.",
+            "3": "Pongo pygmaeus adalah nama ilmiah untuk orangutan Borneo, sedangkan orangutan Sumatra bernama Pongo abelii."
+          }
+        },
+        {
+          "id": "eng-d-9-c1-q08",
+          "difficulty": "dasar",
+          "prompt": "Study the rule in Unit 2 Language Focus:\n\"We use 'have' following a plural subject and 'has' following a singular subject to describe animal features.\"\nChoose the correct pair of verbs to complete these sentences:\n1) Gorillas ___ long arms.\n2) Bekantan ___ a unique shape of nose.",
+          "options": [
+            "have ; has",
+            "has ; have",
+            "have ; have",
+            "has ; has"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Subjek jamak (Gorillas) menggunakan kata kerja have, sedangkan subjek tunggal (Bekantan) menggunakan kata kerja has."
+          },
+          "distractorWhy": {
+            "1": "Penggunaan kata kerja terbalik untuk subjek jamak dan tunggal.",
+            "2": "Kata kerja have tidak tepat digunakan untuk subjek tunggal Bekantan.",
+            "3": "Kata kerja has tidak tepat digunakan untuk subjek jamak Gorillas."
+          }
+        },
+        {
+          "id": "eng-d-9-c1-q09",
+          "difficulty": "sedang",
+          "prompt": "Examine the possessive adjective rules in Unit 2 Section 3:\n\"If the subject is singular, we add apostrophe+s ('s). If the subject is plural and ends with an 's', the possessive is formed by adding an apostrophe after the 's'.\"\nWhich sentence correctly applies this rule?",
+          "options": [
+            "Orangutans and gorillas' legs are long, but a gorilla's fur is black.",
+            "Orangutans and gorillas's legs are long, but a gorillas' fur is black.",
+            "Orangutans's and gorilla's legs are long, but a gorilla' fur is black.",
+            "Orangutan and gorilla legs's are long, but a gorilla's fur is black."
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Bentuk kepemilikan subjek jamak berakhiran s adalah gorillas', sedangkan subjek tunggal adalah gorilla's."
+          },
+          "distractorWhy": {
+            "1": "Penambahan apostrof s setelah s jamak (gorillas's) dan penggunaan apostrof saja untuk kata tunggal (gorillas') melanggar aturan tata bahasa buku.",
+            "2": "Kata Orangutans's dan gorilla' tidak sesuai dengan aturan penulisan kepemilikan tunggal dan jamak.",
+            "3": "Penempatan tanda apostrof dan huruf s pada kata benda yang salah merusak struktur kepemilikan."
+          }
+        },
+        {
+          "id": "eng-d-9-c1-q10",
+          "difficulty": "tinggi",
+          "prompt": "Read the excerpt from Worksheet 1.15 ('Gorillas'):\n\"Gorillas are our closest cousins because they share 98.3% of their genetic code with humans... The group is led by a group leader called a silverback.\"\nWhy is the leader of a gorilla family group called a silverback?",
+          "options": [
+            "The mature male leader develops silver-gray hair on his back as he ages",
+            "The leader carries a piece of silver metal found in African rain forests",
+            "The leader's skin reflects silver light during night time",
+            "The leader exclusively eats plants with silver-colored leaves"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Pemimpin kelompok gorila jantan dewasa dinamakan silverback karena tumbuh bulu berwarna abu-abu keperakan di bagian punggungnya seiring bertambahnya usia."
+          },
+          "distractorWhy": {
+            "1": "Istilah tersebut berkaitan dengan karakteristik fisik bulu gorila, bukan karena membawa benda logam.",
+            "2": "Kulit gorila berwarna hitam dan tidak memancarkan cahaya keperakan di malam hari.",
+            "3": "Gorila memakan dedaunan, tunas, dan batang tumbuhan biasa, bukan tumbuhan khusus berdaun perak."
+          }
+        },
+        {
+          "id": "eng-d-9-c1-q11",
+          "difficulty": "dasar",
+          "prompt": "In Comic Strip 1.5, Galang and Andre discuss the Helmeted Hornbill:\n\"Andre: It is the only hornbill with a casque made of keratin.\nMonita: What is a casque?\nAndre: The bird's helmet.\"\nWhat is the unique feature of the Helmeted Hornbill's casque mentioned in the text?",
+          "options": [
+            "It is a solid helmet-like structure on its beak made of keratin",
+            "It is a soft leather pouch under its throat used to hold water",
+            "It is a pair of long tail streamers used for steering in flight",
+            "It is a colorful crest feather located on its wing tips"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Casque adalah struktur mirip helm keras di atas paruh burung enggang gading yang terbuat dari zat tanduk (keratin)."
+          },
+          "distractorWhy": {
+            "1": "Casque berada di atas paruh dan bertekstur keras, bukan kantong kulit lunak di bawah tenggorokan.",
+            "2": "Bulu ekor yang panjang adalah fitur lain pada ekornya, bukan casque (helm).",
+            "3": "Casque berada di bagian kepala/paruh, bukan bulu jambul pada ujung sayap."
+          }
+        },
+        {
+          "id": "eng-d-9-c1-q12",
+          "difficulty": "sedang",
+          "prompt": "According to Audio Transcript 2 in Unit 3:\n\"Males have a red featherless patch on the neck, while females have a bluish-white patch.\"\nIf a birder observes a Helmeted Hornbill in the forest with a bluish-white neck patch, what can be inferred?",
+          "options": [
+            "The observed bird is a female Helmeted Hornbill",
+            "The observed bird is a male Helmeted Hornbill",
+            "The observed bird is a young chick that has not grown feathers",
+            "The observed bird belongs to the Cendrawasih family"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Bercak kulit tanpa bulu berwarna putih kebiruan di bagian leher merupakan ciri khas burung enggang gading betina."
+          },
+          "distractorWhy": {
+            "1": "Burung jantan memiliki bercak kulit berwarna merah di bagian lehernya.",
+            "2": "Warna kulit leher putih kebiruan membedakan jenis kelamin betina dewasa, bukan indikator anak burung.",
+            "3": "Ciri fisik leher ini milik spesies Helmeted Hornbill (Rhinoplax vigil), bukan burung Cendrawasih."
+          }
+        },
+        {
+          "id": "eng-d-9-c1-q13",
+          "difficulty": "sedang",
+          "prompt": "Read the report text on Cendrawasih from Unit 3 Section 3:\n\"Cendrawasihs or the birds of paradise are from the family of Paradisaeidae... The natural devastation and illegal hunting make Cenderawasih an endangered species. Their reproduction cycle also makes the preservation difficult as they only produce one until two eggs.\"\nWhat factors cause Cendrawasih to become endangered according to the text?",
+          "options": [
+            "Natural devastation, illegal hunting, and a low reproduction rate of 1-2 eggs",
+            "High consumption of toxic ocean fish and cold polar climate changes",
+            "Attacks from silverback gorillas and overpopulation of predators",
+            "Rapid growth of commercial tree plantations in Western Australia"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Kelangkaan Cendrawasih disebabkan oleh kerusakan alam, perburuan liar, serta siklus reproduksi yang lambat karena hanya bertelur 1 hingga 2 butir."
+          },
+          "distractorWhy": {
+            "1": "Cendrawasih hidup di hutan Indonesia Timur dan memakan buah serta artropoda, bukan ikan laut beracun.",
+            "2": "Gorila hidup di Afrika dan tidak berinteraksi dengan burung Cendrawasih di Indonesia Timur.",
+            "3": "Perkebunan Australia Barat bukan faktor utama ancaman kelangkaan yang dijelaskan dalam teks."
+          }
+        },
+        {
+          "id": "eng-d-9-c1-q14",
+          "difficulty": "dasar",
+          "prompt": "Section 4 of Unit 3 explains Passive Voice:\n\"When we talk about facts or events, we sometimes want to emphasize the action rather than who is doing the action. We use passive voice to show interest in the person or object that experiences an action.\"\nWhy do scientific report texts frequently use passive voice?",
+          "options": [
+            "To focus on the animal or object experiencing the action rather than the doer",
+            "To make sentences longer and more difficult for readers to understand",
+            "To express personal emotional feelings and informal daily gossip",
+            "To hide factual information from scientific researchers"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Kalimat pasif digunakan dalam teks laporan ilmiah untuk memberikan penekanan pada objek atau hewan yang dikenai tindakan, bukan pada pelakunya."
+          },
+          "distractorWhy": {
+            "1": "Tujuan kalimat pasif bukan untuk memperrumit bacaan, melainkan menyampaikan fokus informasi ilmiah secara tepat.",
+            "2": "Teks laporan ilmiah bersifat objektif dan faktual, bukan untuk mengungkapkan perasaan emosional pribadi.",
+            "3": "Kalimat pasif digunakan untuk kejelasan fokus ilmiah, bukan untuk menyembunyikan fakta."
+          }
+        },
+        {
+          "id": "eng-d-9-c1-q15",
+          "difficulty": "sedang",
+          "prompt": "Consider the grammar example from Unit 3 Section 4:\nActive: \"Galang brings binoculars to the forest.\" -> Passive: \"Binoculars are brought by Galang to the forest.\"\nNow, transform the active sentence below into passive voice following the rules in Chapter 1:\nActive: \"Monita reads a book about bekantan.\"",
+          "options": [
+            "A book about bekantan is read by Monita.",
+            "A book about bekantan was reading by Monita.",
+            "Monita is read a book about bekantan.",
+            "A book about bekantan is reading Monita."
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Objek A book about bekantan (tunggal) menjadi subjek pasif diikuti to be 'is' dan kata kerja bentuk ketiga 'read' (is read by Monita)."
+          },
+          "distractorWhy": {
+            "1": "Penggunaan bentuk was reading berubah menjadi kalimat lampau berlangsung (past continuous), bukan pasif sederhana.",
+            "2": "Menjadikan Monita sebagai pihak yang dibaca merusak makna kalimat secara logis.",
+            "3": "Penggunaan kata kerja aktif is reading membuat buku seolah-olah membaca Monita."
+          }
+        },
+        {
+          "id": "eng-d-9-c1-q16",
+          "difficulty": "tinggi",
+          "prompt": "Choose the correct passive verb forms to complete the sentences below based on Worksheet 1.21 in Unit 3:\n1) Bekantan is ___ (find/found) in Kalimantan.\n2) The leaves are ___ (eat/eaten) by Bekantans.\n3) Water is ___ (drink/drunk) from holes between tree branches by orangutans.",
+          "options": [
+            "found ; eaten ; drunk",
+            "find ; eat ; drink",
+            "finding ; eating ; drinking",
+            "founded ; eated ; dranked"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Kalimat pasif dalam bahasa Inggris menggunakan kata kerja bentuk ketiga (past participle): found, eaten, dan drunk."
+          },
+          "distractorWhy": {
+            "1": "Bentuk kata kerja dasar (infinitive) tidak dapat digunakan setelah kata kerja bantu to be dalam struktur pasif.",
+            "2": "Bentuk present participle (-ing) membentuk kalimat aktif continuous, bukan kalimat pasif.",
+            "3": "Bentuk kata kerja tidak beraturan yang salah tata bahasanya (founded, eated, dranked)."
+          }
+        },
+        {
+          "id": "eng-d-9-c1-q17",
+          "difficulty": "dasar",
+          "prompt": "Read the informational excerpt from Unit 3 Section 4 ('Did you know?'):\n\"What is bird watching exactly? It is an activity where birds are observed for the purpose of recreation or science. People who like birdwatching are called birders.\"\nWhat activities do birders do during bird watching according to the text?",
+          "options": [
+            "Observe birds' appearance and behavior, take notes, identify species, and share findings",
+            "Catch wild birds with nets and sell them at traditional animal markets",
+            "Shoot birds using slingshots for recreational outdoor sport competition",
+            "Train wild birds to perform acrobatic tricks in public entertainment shows"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Para pengamat burung (birders) melakukan pengamatan penampilan dan perilaku burung, mencatat, mengidentifikasi spesies, serta membagikan temuan mereka."
+          },
+          "distractorWhy": {
+            "1": "Kegiatan pengamatan burung bersifat rekreasi dan ilmiah, bukan penangkapan untuk dijual di pasar.",
+            "2": "Birdwatching tidak melibatkan perburuan atau penembakan burung.",
+            "3": "Pengamatan burung tidak bertujuan melatih burung liar untuk pertunjukan sirkus."
+          }
+        },
+        {
+          "id": "eng-d-9-c1-q18",
+          "difficulty": "sedang",
+          "prompt": "Study the five steps of writing a report text outlined in Unit 3 Section 5:\n1. Gathering Information\n2. Organizing Information\n3. Writing the draft\n4. Revising and Editing the draft\n5. Publishing your work\nWhich step involves 'collecting information by reading references and making observations'?",
+          "options": [
+            "Gathering Information",
+            "Revising and Editing the draft",
+            "Publishing your work",
+            "Organizing Information"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Tahap Gathering Information (Pengumpulan Informasi) adalah langkah awal di mana penulis mengumpulkan data melalui membaca referensi dan pengamatan langsung."
+          },
+          "distractorWhy": {
+            "1": "Tahap revisi dan penyuntingan dilakukan setelah draf awal selesai ditulis untuk memperbaiki tata bahasa dan isi.",
+            "2": "Tahap publikasi adalah langkah akhir membagikan hasil laporan kepada guru atau media.",
+            "3": "Pengorganisasian informasi adalah tahap mengelompokkan data yang telah dikumpulkan ke dalam kategori yang sesuai."
+          }
+        },
+        {
+          "id": "eng-d-9-c1-q19",
+          "difficulty": "tinggi",
+          "prompt": "Section 6 presents a fact sheet about the Bali Starling (Jalak Bali):\n- Threats: Poaching for illegal songbird trade, habitat loss\n- Lifespan: 5 years in the wild, up to 15 years in captivity\n- Interesting fact: The national bird of Bali, saved by breeding and reintroduction programmes.\nWhich passive sentence best represents the fact about saving the Bali Starling from extinction?",
+          "options": [
+            "Bali starlings were saved from extinction by breeding and reintroduction programmes.",
+            "Illegal songbird traders saved Bali starlings from habitat loss.",
+            "Bali starlings are being hunted to increase their population in captivity.",
+            "Programmers saved Bali starlings by building digital computer games."
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Kalimat pasif ini secara akurat menyampaikan fakta bahwa jalak bali diselamatkan dari kepunahan melalui program penangkaran dan pelepasliaran kembali."
+          },
+          "distractorWhy": {
+            "1": "Pedagang burung berkicau ilegal adalah ancaman kelangsungan hidup jalak bali, bukan pihak yang menyelamatkannya.",
+            "2": "Perburuan liar mengurangi populasi jalak bali, bukan meningkatkan populasinya.",
+            "3": "Program yang dimaksud adalah penangkaran biologi (breeding), bukan pemrograman komputer digital."
+          }
+        },
+        {
+          "id": "eng-d-9-c1-q20",
+          "difficulty": "tinggi",
+          "prompt": "Across Chapter 1, students learn to read and write Report Texts on Indonesian fauna (Bekantan, Orangutan, Birds).\nWhat is the main social function and generic structure of a Report Text based on Chapter 1?",
+          "options": [
+            "To present factual information about natural phenomena or animals in general, typically structured with General Classification followed by Descriptions",
+            "To entertain readers with a fictional fairy tale about talking animals, structured with Orientation, Complication, and Resolution",
+            "To persuade readers to buy exotic pets, structured with Thesis, Arguments, and Recommendation",
+            "To instruct readers on how to cook traditional Indonesian dishes, structured with Goal, Materials, and Steps"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Teks laporan (Report Text) berfungsi menyajikan informasi faktual umum tentang hewan atau fenomena alam, dengan struktur Umum (General Classification) dan Deskripsi (Descriptions)."
+          },
+          "distractorWhy": {
+            "1": "Struktur Orientation, Complication, Resolution milik Teks Naratif (Narrative Text) yang bertujuan menghibur dengan cerita fiktif.",
+            "2": "Struktur Thesis, Arguments, Recommendation milik Teks Eksposisi yang bertujuan membujuk pembaca.",
+            "3": "Struktur Goal, Materials, Steps milik Teks Prosedur (Procedure Text) yang memberikan petunjuk langkah demi langkah."
+          }
+        }
+      ]
+    },
+    {
+      "code": "KOMP-ENG-D-9-BAB4-01",
+      "grade": 9,
+      "name": "Chapter 4: Upcycling Used Materials",
+      "materi": "Upcycling & Recycling Crafts Procedural Texts, Imperative Action Verbs, DIY Project Instructions, Environmental Sustainability",
+      "cpRef": "English for Nusantara untuk SMP/MTs Kelas VII — Chapter 4 (Kelas IX)",
+      "items": [
+        {
+          "id": "eng-d-9-c4-q01",
+          "difficulty": "dasar",
+          "prompt": "In Unit 1 (Look at My Creation, Section 2), Galang, Monita, and Andre are discussing ideas for their school bazaar project. What items do they decide to make from used plastic water bottles and bottle caps?",
+          "options": [
+            "Wall decorations and pencil holders",
+            "Plastic keychains and shopping bags",
+            "Water bottles and flower pots",
+            "Storage boxes and decorative lamps"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Galang, Monita, dan Andre sepakat memanfaatkan botol plastik bekas untuk membuat hiasan dinding (wall decoration) dan botolnya menjadi tempat pensil (pencil holder)."
+          },
+          "distractorWhy": {
+            "1": "Gantungan kunci dan tas belanja plastik bukan merupakan produk daur ulang botol yang disepakati oleh mereka dalam percakapan.",
+            "2": "Botol air baru dan pot bunga tidak sesuai dengan produk utama yang mereka rencanakan dalam diskusi kelompok.",
+            "3": "Kotak penyimpanan dan lampu hias bukan kreasi yang dirancang oleh Monita dan teman-teman dari botol air bekas."
+          }
+        },
+        {
+          "id": "eng-d-9-c4-q02",
+          "difficulty": "dasar",
+          "prompt": "Based on Unit 1 Section 2 (Audio 4.2), what is the main purpose of Monita using green craft paper for their plastic bottle wall decoration project?",
+          "options": [
+            "To cover the cardboard base to make it look neat and attractive",
+            "To stick the bottle caps directly onto the plastic bottle surface",
+            "To wrap the entire plastic bottle before cutting it into pieces",
+            "To replace the plastic bottle caps with paper cutouts"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Dalam petunjuk pembuatan kreasi hiasan dinding, kertas kerajinan hijau digunakan untuk melapisi alas karton agar tampak rapi dan menarik."
+          },
+          "distractorWhy": {
+            "1": "Kertas hijau tidak ditempelkan langsung pada permukaan botol plastik melainkan pada karton dasar.",
+            "2": "Botol plastik tidak dibungkus seluruhnya dengan kertas sebelum dipotong dalam langkah pembuatan.",
+            "3": "Kertas hijau digunakan sebagai alas latar, bukan untuk menggantikan tutup botol plastik."
+          }
+        },
+        {
+          "id": "eng-d-9-c4-q03",
+          "difficulty": "sedang",
+          "prompt": "Read the following imperative step from a DIY procedural text in Unit 1: \"______ the plastic bottle into two halves using a pair of scissors carefully.\" Which action verb correctly completes this imperative instruction?",
+          "options": [
+            "Cut",
+            "Glue",
+            "Paint",
+            "Decorate"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Kata kerja imperatif Cut (potong) paling tepat untuk mengawali instruksi membagi botol plastik menjadi dua bagian menggunakan gunting."
+          },
+          "distractorWhy": {
+            "1": "Glue (rekatkan/lem) tidak cocok digunakan untuk memisahkan botol menjadi dua bagian menggunakan gunting.",
+            "2": "Paint (cat/mewarnai) digunakan untuk memberi warna, bukan untuk membagi botol menjadi dua bagian.",
+            "3": "Decorate (menghias) adalah proses mempercantik benda, bukan tindakan memotong botol."
+          }
+        },
+        {
+          "id": "eng-d-9-c4-q04",
+          "difficulty": "sedang",
+          "prompt": "In Unit 1 Section 3 (Language Focus), how are adjectives ordered when describing upcycled craft materials (e.g., size, shape, color, material)? Which phrase follows the correct adjective order rules?",
+          "options": [
+            "A small round green plastic cap",
+            "A plastic green round small cap",
+            "A green small plastic round cap",
+            "A round plastic small green cap"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Urutan kata sifat (Adjective Order) yang benar mengikuti pola: Size (small) + Shape (round) + Color (green) + Material (plastic) + Noun (cap)."
+          },
+          "distractorWhy": {
+            "1": "Bahan (plastic) diletakkan di depan warna dan bentuk, memutarbalikkan aturan baku urutan kata sifat.",
+            "2": "Warna (green) ditempatkan sebelum ukuran (small) dan bahan sebelum bentuk, yang melanggar urutan standar.",
+            "3": "Bentuk (round) diletakkan di depan bahan dan ukuran, tidak sesuai urutan Size-Shape-Color-Material."
+          }
+        },
+        {
+          "id": "eng-d-9-c4-q05",
+          "difficulty": "sedang",
+          "prompt": "In Unit 1 Section 4, Andre describes his upcycled craft creation: \"I made a pencil holder using a large cylindrical blue plastic bottle.\" What material and physical traits are highlighted in this description?",
+          "options": [
+            "Size (large), shape (cylindrical), color (blue), material (plastic)",
+            "Price (cheap), weight (heavy), age (old), origin (local)",
+            "Texture (rough), quality (bad), color (blue), shape (square)",
+            "Size (small), pattern (striped), material (glass), color (red)"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Deskripsi memuat ukuran (large), bentuk (cylindrical), warna (blue), dan bahan asal daur ulang (plastic)."
+          },
+          "distractorWhy": {
+            "1": "Harga, berat, dan usia barang tidak disebutkan dalam gabungan frasa kata sifat deskriptif tersebut.",
+            "2": "Tekstur kasar dan bentuk persegi tidak sesuai dengan deskripsi botol plastik silinder biru.",
+            "3": "Ukuran kecil, pola garis, dan bahan kaca bertentangan dengan deskripsi botol plastik besar."
+          }
+        },
+        {
+          "id": "eng-d-9-c4-q06",
+          "difficulty": "tinggi",
+          "prompt": "Consider the procedural text instructions for making an upcycled wall hanging from bottle caps in Unit 1: \"First, collect 20 plastic bottle caps. Next, arrange them in a flower pattern. Then, glue each cap onto the cardboard backing.\" What is the main purpose of using sequence adverbs like \"First\", \"Next\", and \"Then\" in this text?",
+          "options": [
+            "To guide the reader step-by-step through the logical order of the DIY process",
+            "To express the author's personal feelings about upcycling waste",
+            "To compare the quality of plastic bottles with glass bottles",
+            "To persuade readers to buy wall decorations at a high price"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Kata keterangan urutan (sequence adverbs) bertindak sebagai penanda urutan kronologis langkah-langkah kerja dalam teks prosedur DIY."
+          },
+          "distractorWhy": {
+            "1": "Kata penanda urutan tidak digunakan untuk menyuarakan perasaan pribadi atau opini penulis.",
+            "2": "Teks prosedur urutan tidak bertujuan membandingkan kualitas bahan bekas dengan bahan kaca.",
+            "3": "Urutan langkah bukan bertujuan membujuk pembeli dari segi harga barang."
+          }
+        },
+        {
+          "id": "eng-d-9-c4-q07",
+          "difficulty": "dasar",
+          "prompt": "In Unit 2 (They're on Sale!, Section 1), students present preloved and upcycled items at the school marketplace. What does the term \"preloved items\" mean in the context of eco-friendly practices?",
+          "options": [
+            "Secondhand goods that are still in good condition and can be reused",
+            "Brand-new products bought straight from a factory",
+            "Broken items that cannot be repaired or used again",
+            "Waste materials that must be burned or buried immediately"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Istilah preloved items mengacu pada barang bekas pakai yang masih berkualitas layak dan bagus untuk dimanfaatkan kembali."
+          },
+          "distractorWhy": {
+            "1": "Barang preloved bukan merupakan produk yang baru dibeli langsung dari pabrik pabrikan.",
+            "2": "Barang rusak yang tidak dapat diperbaiki tergolong sampah/sampah rusaknya bukan preloved.",
+            "3": "Barang preloved disukai untuk diguna-ulang, bukan limbah yang harus dibakar atau ditimbun."
+          }
+        },
+        {
+          "id": "eng-d-9-c4-q08",
+          "difficulty": "sedang",
+          "prompt": "In Unit 2 Section 2, Galang sells handmade upcycled pencil cases made from old denim jeans. What key information should be included in a promotional text or advertisement poster for such products?",
+          "options": [
+            "Product name, material description, price, and eco-friendly benefits",
+            "Step-by-step recipes, cooking duration, and nutritional values",
+            "Historical origin of denim fabric and garment manufacturing history",
+            "List of school rules regarding classroom cleanliness"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Iklan promosi produk daur ulang memerlukan nama produk, rincian bahan bekas yang dipakai, harga, dan keunggulan ramah lingkungan."
+          },
+          "distractorWhy": {
+            "1": "Resep makanan dan nilai gizi relevan untuk produk kuliner, bukan kerajinan tempat pensil berbahan denim.",
+            "2": "Sejarah pabrik garmen terlalu luas dan tidak berfokus pada informasi penjualan produk daur ulang.",
+            "3": "Tata tertib kebersihan kelas bukan isi informasi promosi penjualan barang daur ulang."
+          }
+        },
+        {
+          "id": "eng-d-9-c4-q09",
+          "difficulty": "dasar",
+          "prompt": "Read the promo line from Unit 2: \"Buy two upcycled denim pouches and get a free handmade keychain! Offer valid during the School Charity Bazaar.\" What is the primary objective of this promotional message?",
+          "options": [
+            "To attract buyers and encourage sales of upcycled products during the bazaar",
+            "To instruct students on how to sew denim pouches from scratch",
+            "To inform students about the school schedule for upcoming exams",
+            "To warn visitors about the danger of plastic pollution"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Pesan promosi dengan penawaran khusus bertujuan menarik pembeli dan meningkatkan penjualan barang daur ulang."
+          },
+          "distractorWhy": {
+            "1": "Pesan ini adalah iklan penawaran beli, bukan panduan teks prosedur tentang cara menjahit kantong denim.",
+            "2": "Iklan bazaar tidak bertujuan menyampaikan jadwal ujian sekolah kepada siswa.",
+            "3": "Pesan ini berfokus pada penjualan produk, bukan surat peringatan bahaya pencemaran limbah."
+          }
+        },
+        {
+          "id": "eng-d-9-c4-q10",
+          "difficulty": "sedang",
+          "prompt": "In Unit 2 Section 4 (Language Focus), expressions for asking and giving price are practiced for buying upcycled crafts. Which question appropriately asks for the price of an upcycled handbag?",
+          "options": [
+            "How much does this upcycled handbag cost?",
+            "Where did you find this upcycled handbag?",
+            "What color is this upcycled handbag?",
+            "Why did you create this upcycled handbag?"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Kalimat \"How much does this upcycled handbag cost?\" adalah ungkapan yang tepat untuk menanyakan harga barang."
+          },
+          "distractorWhy": {
+            "1": "Menanyakan tempat menemukan barang mengarah pada lokasi asal, bukan menanyakan nominal harga.",
+            "2": "Menanyakan warna barang berfokus pada penampilan visual, bukan harga jual produk.",
+            "3": "Menanyakan alasan pembuatan berfokus pada tujuan proyek, bukan harga barang yang ditawarkan."
+          }
+        },
+        {
+          "id": "eng-d-9-c4-q11",
+          "difficulty": "sedang",
+          "prompt": "During a school charity sale (Unit 2), a customer asks: \"Can I get a discount if I buy three plastic bottle pots?\" Which response by the student seller offers a polite negotiation response?",
+          "options": [
+            "Sure! You can have all three for twenty thousand rupiahs.",
+            "No, you cannot buy any items from our store today.",
+            "I don't care how many pots you want to buy.",
+            "Please throw your trash into the designated recycling bin."
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Jawaban memberikan harga potongan (diskon) secara sopan dan menyetujui penawaran pembeli."
+          },
+          "distractorWhy": {
+            "1": "Penolakan mentah-mentah untuk menjual barang terkesan tidak sopan dan merugikan transaksi penjualan.",
+            "2": "Pernyataan acuh tak acuh melanggar tata cara berkomunikasi sopan dalam kegiatan jual beli.",
+            "3": "Himbauan membuang sampah tidak relevan dengan pertanyaan penawaran diskon harga produk."
+          }
+        },
+        {
+          "id": "eng-d-9-c4-q12",
+          "difficulty": "tinggi",
+          "prompt": "In Unit 2 Section 6 (Reading Poster), a student crafts poster states: \"Turn Waste into Treasure: Eco-Friendly Crafts on Sale! Support our green initiative this Friday.\" What underlying message is conveyed by the slogan \"Turn Waste into Treasure\"?",
+          "options": [
+            "Discarded materials can be creatively converted into valuable and useful products",
+            "Real treasure chests filled with gold can be found in plastic waste bins",
+            "All school trash should be sold immediately without cleaning or processing",
+            "Buying recycled products is more expensive than buying gold"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Slogan \"Turn Waste into Treasure\" bermakna mengubah sampah/barang bekas menjadi barang berguna yang memiliki nilai kreasi dan manfaat tinggi."
+          },
+          "distractorWhy": {
+            "1": "Slogan ini bernilai kiasan daur ulang, bukan arti harfiah menemukan peti harta karun emas di tempat sampah.",
+            "2": "Sampah harus diolah dan dibersihkan menjadi kerajinan terlebih dahulu, bukan dijual mentah dalam keadaan kotor.",
+            "3": "Slogan tersebut tidak menyatakan bahwa produk daur ulang lebih mahal daripada harga emas."
+          }
+        },
+        {
+          "id": "eng-d-9-c4-q13",
+          "difficulty": "dasar",
+          "prompt": "In Unit 3 (Let's Donate, Section 1), students learn about community action for environmental sustainability. What is the main goal of organizing a student-run charity shop at school?",
+          "options": [
+            "To collect preloved items, sell them, and donate the profits to social causes",
+            "To store unused furniture permanently inside classroom corners",
+            "To force students to buy new plastic toys every week",
+            "To compete with commercial shopping malls in the city center"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Tujuan utama toko amal siswa (charity shop) adalah mengumpulkan barang layak pakai, menjualnya, lalu mendonasikan keuntungannya untuk aksi sosial."
+          },
+          "distractorWhy": {
+            "1": "Toko amal bertujuan mendaur/menjual barang, bukan menumpuk perabotan bekas secara permanen di sudut kelas.",
+            "2": "Toko amal berfokus pada pemanfaatan barang bekas (preloved), bukan memaksa membeli mainan plastik baru.",
+            "3": "Kegiatan sekolah ini bersifat sosial dan edukatif, bukan untuk bersaing secara komersial dengan mal besar."
+          }
+        },
+        {
+          "id": "eng-d-9-c4-q14",
+          "difficulty": "sedang",
+          "prompt": "Read the excerpt from a school website post in Unit 3 Section 2: \"At Merdeka Friday Shop, we accept clean preloved clothes, books, and handmade crafts. All profits go to helping local shelters.\" What type of text structure is used to describe the shop's operations?",
+          "options": [
+            "Descriptive text highlighting features, items accepted, and donation goals",
+            "Narrative text about a fictional hero fighting plastic monsters",
+            "Recount text detailing a vacation trip to a recycling factory",
+            "Exposition text discussing global weather patterns"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Teks tersebut merupakan teks deskriptif yang memaparkan fitur toko, barang yang diterima, serta tujuan donasi."
+          },
+          "distractorWhy": {
+            "1": "Teks bukan dongeng naratif fiktif tentang pahlawan melawan monster sampah plastik.",
+            "2": "Teks memuat informasi profil toko saat ini, bukan catatan pengalamannya berlibur ke pabrik daur ulang.",
+            "3": "Topik bahasan berfokus pada toko amal sekolah, bukan eksposisi perubahan cuaca global."
+          }
+        },
+        {
+          "id": "eng-d-9-c4-q15",
+          "difficulty": "tinggi",
+          "prompt": "In Unit 3 Section 3 (Language Focus), passive voice is introduced to emphasize actions in DIY and donation contexts, such as: \"Used plastic bottles ARE COLLECTED by students every Wednesday.\" Why is passive voice used in this sentence?",
+          "options": [
+            "To place primary focus on the action performed and the object (plastic bottles) rather than the agent",
+            "To express future plans that will never take place",
+            "To ask a direct question to the school principal",
+            "To command someone to clean the classroom immediately"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Kalimat pasif menekankan objek (used plastic bottles) dan tindakan pengumpulan yang dilakukan ketimbang subjek pelakunya."
+          },
+          "distractorWhy": {
+            "1": "Bentuk pasif menyatakan fakta kegiatan rutin yang berlangsung, bukan pengada-adaan rencana yang takkan terjadi.",
+            "2": "Kalimat tersebut berbentuk berita/pernyataan, bukan kalimat tanya langsung kepada kepala sekolah.",
+            "3": "Struktur kalimat ini adalah pernyataan pasif deskriptif, bukan kalimat perintah imperatif."
+          }
+        },
+        {
+          "id": "eng-d-9-c4-q16",
+          "difficulty": "sedang",
+          "prompt": "Convert the active DIY procedure sentence into correct passive voice: \"Students turn old newspapers into decorative paper baskets.\" Which sentence presents the correct passive form?",
+          "options": [
+            "Old newspapers are turned into decorative paper baskets by students.",
+            "Old newspapers were turning decorative paper baskets for students.",
+            "Students are turned by old newspapers into decorative paper baskets.",
+            "Decorative paper baskets turn old newspapers by students."
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Bentuk pasif dari kalimat Simple Present tersebut adalah \"Old newspapers (object) + are turned (V3) + into decorative paper baskets + by students (agent)\"."
+          },
+          "distractorWhy": {
+            "1": "Penggunaan tensis \"were turning\" salah karena kalimat asal menggunakan Simple Present tense.",
+            "2": "Makna kalimat tertukar secara tidak logis, seolah-olah siswa yang diubah oleh surat kabar tua.",
+            "3": "Keranjang kertas diletakkan sebagai subjek aktif yang mengubah koran, mengacaukan struktur pasif."
+          }
+        },
+        {
+          "id": "eng-d-9-c4-q17",
+          "difficulty": "tinggi",
+          "prompt": "In Unit 3 Section 4, students write a description for their charity project. Which section structure correctly organizes a descriptive report about an eco-friendly project?",
+          "options": [
+            "Identification (introducing the shop/project) followed by Description (details of items, pricing, and donation recipient)",
+            "Orientation (setting time/place), Complication (problem encountered), and Resolution (ending)",
+            "Goal (title), Materials needed, and Step-by-step instructions",
+            "Thesis statement, Arguments in support, and Reiteration conclusion"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Struktur generik teks deskriptif proyek adalah Identification (pengenalan toko/proyek) dilanjutkan Description (rincian barang, harga, dan penyaluran donasi)."
+          },
+          "distractorWhy": {
+            "1": "Orientation-Complication-Resolution adalah struktur generik teks naratif (cerita dongeng/pengalaman).",
+            "2": "Goal-Materials-Steps merupakan struktur generik teks prosedur pembuatan/panduan DIY.",
+            "3": "Thesis-Arguments-Reiteration merupakan struktur generik teks eksposisi analitis."
+          }
+        },
+        {
+          "id": "eng-d-9-c4-q18",
+          "difficulty": "sedang",
+          "prompt": "Read the DIY project step: \"______ the glued plastic caps with acrylic paint to give them a vibrant appearance before attaching them to the wall frame.\" Which imperative action verb fits best?",
+          "options": [
+            "Coat",
+            "Wash",
+            "Melt",
+            "Burn"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Kata kerja Coat (melapisi/mewarnai dengan lapisan cat) paling pas untuk memberi warna akrilik pada tutup botol."
+          },
+          "distractorWhy": {
+            "1": "Wash (mencuci) dilakukan dengan air di awal pembersihan, bukan saat melapisi dengan cat akrilik.",
+            "2": "Melt (mencairkan) akan merusak tutup botol plastik dan berbahaya dalam proyek hiasan dinding sederhana.",
+            "3": "Burn (membakar) merusak bahan daur ulang serta merilis gas beracun yang bertentangan dengan prinsip ramah lingkungan."
+          }
+        },
+        {
+          "id": "eng-d-9-c4-q19",
+          "difficulty": "sedang",
+          "prompt": "In a DIY instruction guide for making a plant pot from a plastic bottle, what is the importance of adding the step: \"Puncture small holes in the bottom of the plastic bottle\"?",
+          "options": [
+            "To allow excess water to drain out so the plant roots do not rot",
+            "To make the plastic bottle lighter so it can float in the air",
+            "To prevent sunlight from reaching the soil inside the pot",
+            "To store extra fertilizer at the base of the bottle container"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Lubang kecil di dasar botol berfungsi sebagai saluran drainase air agar akar tanaman tidak membusuk."
+          },
+          "distractorWhy": {
+            "1": "Memberi lubang pada pot plastik tidak membuat pot tersebut melayang di udara.",
+            "2": "Lubang bawah tidak bertujuan menahan sinar matahari mengenai tanah tanaman.",
+            "3": "Lubang di bagian bawah justru membuat cairan mengalir keluar, bukan untuk menyimpan pupuk."
+          }
+        },
+        {
+          "id": "eng-d-9-c4-q20",
+          "difficulty": "tinggi",
+          "prompt": "Reflecting on Chapter 4 (\"Upcycling Used Materials\"), how do upcycling projects contribute to environmental sustainability in school communities?",
+          "options": [
+            "By reducing plastic waste in landfills, reusing existing resources creatively, and fostering social responsibility through donation",
+            "By encouraging people to produce more single-use plastic bottles every day",
+            "By replacing natural plants with artificial plastic flowers across all gardens",
+            "By increasing the amount of trash thrown into local rivers"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Daur ulang (upcycling) mengurangi volume sampah, memanfaatkan kembali sumber daya secara kreatif, dan memupuk kepedulian sosial melalui kegiatan donasi."
+          },
+          "distractorWhy": {
+            "1": "Upcycling bertujuan mengurangi limbah, bukan mendorong produksi botol plastik sekali pakai lebih banyak.",
+            "2": "Daur ulang tidak bertujuan mengganti semua tanaman alami dengan bunga plastik di taman.",
+            "3": "Daur ulang mencegah dan mengurangi pembuangan sampah ke sungai, bukan menambah jumlah pencemaran."
+          }
+        }
+      ]
+    },
+    {
+      "code": "KOMP-ENG-D-9-BAB5-01",
+      "grade": 9,
+      "name": "Chapter 5: Digital Life",
+      "materi": "Digital Literacy & Online Safety, Analytical Exposition Texts, Expressing Arguments & Opinions, Cyber Etiquette",
+      "cpRef": "English for Nusantara untuk SMP/MTs Kelas VII — Chapter 5 (Kelas IX)",
+      "items": [
+        {
+          "id": "eng-d-9-c5-q01",
+          "difficulty": "dasar",
+          "prompt": "In Section 2 of Unit 1 (Let's Check the Facts!), Galang asks Monita how to search for information on the internet. According to Monita, what is the very first step to do before typing keywords?",
+          "options": [
+            "Open a web browser on a laptop or smartphone",
+            "Click on the first advertisement link in search results",
+            "Type a complete paragraph into the address bar",
+            "Turn off the internet connection and restart the computer"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Berdasarkan dialog Galang dan Monita di Unit 1, langkah paling awal saat ingin mencari informasi adalah membuka peramban web (web browser) di perangkat komputer atau ponsel pintar."
+          },
+          "distractorWhy": {
+            "1": "Mengklik iklan secara langsung berisiko mengarahkan ke situs yang tidak aman atau tidak relevan.",
+            "2": "Ketiklah kata kunci utama (keywords) di kolom pencarian, bukan mengetik seluruh paragraf panjang.",
+            "3": "Mematikan koneksi internet justru membuat peramban web tidak dapat mengakses mesin pencari."
+          }
+        },
+        {
+          "id": "eng-d-9-c5-q02",
+          "difficulty": "dasar",
+          "prompt": "Based on Monita's advice to Galang in Unit 1, why is it essential to check the source of information found on the internet?",
+          "options": [
+            "In order to avoid using false or misleading information",
+            "To increase the internet connection speed",
+            "To automatically download pocket book templates",
+            "To change the browser's default background color"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Monita menjelaskan bahwa memeriksa sumber informasi (source of information) sangat penting agar kita terhindar dari penggunaan data atau informasi palsu (false information)."
+          },
+          "distractorWhy": {
+            "1": "Memeriksa sumber data adalah tindakan verifikasi keabsahan isi, bukan untuk mempercepat koneksi internet.",
+            "2": "Memeriksa kredibilitas sumber tidak mengunduh templat secara otomatis.",
+            "3": "Sumber informasi berkaitan dengan isi materi, bukan pengaturan warna tampilan peramban."
+          }
+        },
+        {
+          "id": "eng-d-9-c5-q03",
+          "difficulty": "sedang",
+          "prompt": "Read the passage from Unit 1 Section 7:\n'Facts about search engines: Internet users must be familiar with search engines. It only takes a few seconds for search engines to find desired information. Search engines put relevant sites at the top of the search results... Everyday there are more than 500 million searches completed.'\n\nHow do search engines organize search results to help users find information quickly?",
+          "options": [
+            "By placing the most relevant websites at the top of the results list",
+            "By sorting websites strictly in alphabetical order of their full URLs",
+            "By hiding secure websites and displaying unverified blogs first",
+            "By randomly changing the order of search results every few seconds"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Teks 'Facts about search engines' menyebutkan bahwa mesin pencari menempatkan situs-situs yang paling relevan di urutan paling atas (top of the search results) agar pengguna dapat menemukan informasi dengan cepat."
+          },
+          "distractorWhy": {
+            "1": "Mesin pencari mengurutkan hasil berdasarkan relevansi dan peringkat algoritma, bukan urutan abjad URL.",
+            "2": "Mesin pencari memprioritaskan situs terverifikasi dan relevan, bukan menyembunyikannya.",
+            "3": "Urutan pencarian disusun secara terstruktur sesuai relevansi pencarian, bukan diacak secara acak setiap detik."
+          }
+        },
+        {
+          "id": "eng-d-9-c5-q04",
+          "difficulty": "dasar",
+          "prompt": "According to Ibu Ida Ayu's instructions in Unit 1 on making a biography pocket book, which action verb correctly completes the step: '______ the key words in the search box'?",
+          "options": [
+            "Type",
+            "Erase",
+            "Fold",
+            "Glue"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Kata kerja imperatif yang tepat untuk menggunakan kolom pencarian (search box) di peramban web adalah 'Type' (ketiklah kata kunci)."
+          },
+          "distractorWhy": {
+            "1": "'Erase' berarti menghapus, bukan tindakan memasukkan kata kunci pencarian.",
+            "2": "'Fold' adalah instruksi melipat kertas saat membuat buku saku, bukan perintah di peramban.",
+            "3": "'Glue' adalah tindakan menempelkan bahan kertas."
+          }
+        },
+        {
+          "id": "eng-d-9-c5-q05",
+          "difficulty": "dasar",
+          "prompt": "In Unit 2 (Staying safe in the digital world), students learn digital security terms. What is the definition of 'privacy settings' on digital devices and social media?",
+          "options": [
+            "Controls that allow users to manage who can see their personal information and posts",
+            "A public list of passwords shared with all online friends",
+            "Hardware tools used to increase the display brightness of a screen",
+            "An automatic notification sent to unknown internet users"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "'Privacy settings' (pengaturan privasi) adalah fitur keamanan yang memungkinkan pengguna mengatur siapa saja yang berhak melihat data pribadi maupun unggahan mereka."
+          },
+          "distractorWhy": {
+            "1": "Kata sandi tidak boleh dibuat menjadi daftar publik yang dibagikan kepada teman online.",
+            "2": "Pengaturan privasi adalah fitur perangkat lunak keamanan digital, bukan pengatur kecerahan layar.",
+            "3": "Pengaturan privasi bertujuan membatasi akses orang tidak dikenal, bukan mengirim notifikasi otomatis kepada mereka."
+          }
+        },
+        {
+          "id": "eng-d-9-c5-q06",
+          "difficulty": "sedang",
+          "prompt": "Read the rule from 'Internet Safety Rules' in Unit 2 Section 2:\n'Verify a link is safe... Know about hovering. Hovering is when you place your mouse cursor over a link (without clicking it) to see the link embedded in the text.'\n\nWhat should an internet user do if the embedded web address shown during hovering differs from the visible text link?",
+          "options": [
+            "Never click the link because it may be suspicious or fraudulent",
+            "Immediately forward the link to all contacts in your address book",
+            "Click the link twice to force the browser to fix the web address",
+            "Enter your personal banking password on the displayed page"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Aturan keselamatan internet di Unit 2 menegaskan bahwa jika alamat tautan yang tersembunyi berbeda dari teks yang terlihat saat dilayangkan kursor (hovering), tautan tersebut tidak boleh diklik (never click it) karena berpotensi jebakan/scam."
+          },
+          "distractorWhy": {
+            "1": "Meneruskan tautan mencurigakan ke orang lain dapat menyebarkan ancaman siber.",
+            "2": "Mengklik tautan berbeda dua kali tetap dapat mengarahkan ke situs peretas atau malware.",
+            "3": "Memasukkan kata sandi rahasia pada situs mencurigakan sangat berbahaya dan memicu pencurian identitas."
+          }
+        },
+        {
+          "id": "eng-d-9-c5-q07",
+          "difficulty": "sedang",
+          "prompt": "In Unit 2 Section 5 ('10 Ways to Protect Yourself Against Cybercrimes'), what is recommended regarding passwords to protect your digital accounts against unauthorized access?",
+          "options": [
+            "Keep passwords secret from peers and change them regularly",
+            "Share passwords with online gaming acquaintances to gain bonus points",
+            "Use your full name and date of birth as a simple password for all websites",
+            "Post your passwords on social media profiles so you never forget them"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Poin ke-6 dari 10 cara perlindungan diri di Unit 2 menyarankan agar kata sandi dijaga kerahasiaannya dan diubah secara berkala (change it regularly)."
+          },
+          "distractorWhy": {
+            "1": "Membagikan kata sandi kepada kenalan online dapat menyebabkan akun diretas.",
+            "2": "Menggunakan nama lengkap dan tanggal lahir membuat kata sandi sangat mudah ditebak peretas.",
+            "3": "Mengunggah kata sandi di profil media sosial akan menghilangkan perlindungan akun."
+          }
+        },
+        {
+          "id": "eng-d-9-c5-q08",
+          "difficulty": "sedang",
+          "prompt": "According to the UNICEF survey text presented in Unit 2 ('Online bullying in Indonesia'), what percentage of the 2,777 young Indonesians surveyed had experienced cyberbullying?",
+          "options": [
+            "45%",
+            "10%",
+            "75%",
+            "90%"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Teks hasil survei UNICEF 2019 di Unit 2 menyebutkan bahwa dari 2.777 remaja Indonesia berusia 14-24 tahun, sebanyak 45% pernah mengalami perundungan siber (cyberbullying)."
+          },
+          "distractorWhy": {
+            "1": "Angka 10% terlalu rendah dan tidak sesuai dengan data resmi survei di buku teks.",
+            "2": "Angka 75% bukan merupakan data persentase total korban perundungan siber dalam teks tersebut.",
+            "3": "Angka 90% tidak menggambarkan data statistik yang tercantum pada materi Unit 2."
+          }
+        },
+        {
+          "id": "eng-d-9-c5-q09",
+          "difficulty": "sedang",
+          "prompt": "In Unit 2 Section 6, what safe action should a student take if they receive an abusive or nasty message from an unknown user on a messaging application?",
+          "options": [
+            "Block the sender, screenshot the evidence, and tell a trusted adult",
+            "Reply with angry insults to retaliate against the sender",
+            "Delete your entire computer operating system immediately",
+            "Blame yourself and keep the abusive messages secret from everyone"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Panduan penanganan cyberbullying di Unit 2 menyarankan untuk memblokir akun pengirim, menyimpan bukti berupa tangkapan layar (screenshot), dan melaporkannya kepada orang dewasa yang dipercaya."
+          },
+          "distractorWhy": {
+            "1": "Membalas dengan hinaan akan memperkeruh konflik dan memicu perundungan balasan.",
+            "2": "Menghapus seluruh sistem operasi komputer adalah tindakan berlebihan yang tidak menyelesaikan masalah akun.",
+            "3": "Menyalahkan diri sendiri dan merahasikannya dapat mengganggu kesehatan mental korban perundungan."
+          }
+        },
+        {
+          "id": "eng-d-9-c5-q10",
+          "difficulty": "dasar",
+          "prompt": "Unit 2 focuses on imperative sentences for digital safety rules using adverbs of frequency 'always' or 'never'. Which of the following sentences correctly states an online safety rule?",
+          "options": [
+            "Never give out personal information to strangers online.",
+            "Always share your home address on public forums.",
+            "Never check if a web address begins with HTTPS.",
+            "Always open email attachments from unknown senders."
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Kalimat imperatif aturan keselamatan online yang benar adalah larangan memberikan informasi pribadi kepada orang asing ('Never give out personal information to strangers online')."
+          },
+          "distractorWhy": {
+            "1": "Membagikan alamat rumah di forum publik melanggar prinsip privasi dan keselamatan digital.",
+            "2": "Kita justru harus selalu memeriksa indikator HTTPS pada alamat situs web.",
+            "3": "Membuka lampiran email dari pengirim tak dikenal berisiko terkena virus atau malware."
+          }
+        },
+        {
+          "id": "eng-d-9-c5-q11",
+          "difficulty": "sedang",
+          "prompt": "In Unit 3 (Turn back hoax!), students learn how to check the source of internet news. Which top-level domain ending is typically associated with official educational institutions?",
+          "options": [
+            ".edu",
+            ".com",
+            ".xyz",
+            ".temp"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Unit 3 menjelaskan identifikasi alamat URL, di mana ekstensi domain '.edu' khusus digunakan oleh lembaga pendidikan resmi (educational institutions)."
+          },
+          "distractorWhy": {
+            "1": "Domain '.com' umumnya digunakan oleh organisasi komersial atau umum.",
+            "2": "Domain '.xyz' adalah domain tingkat atas umum yang sering dipakai situs komersial atau blog bebas.",
+            "3": "Domain '.temp' bukan merupakan ekstensi domain resmi lembaga pendidikan."
+          }
+        },
+        {
+          "id": "eng-d-9-c5-q12",
+          "difficulty": "sedang",
+          "prompt": "Unit 3 provides steps to identify fake news or hoaxes online. What should you do when encountering a sensational headline before sharing it on social media?",
+          "options": [
+            "Cross-check the facts with reliable news sources and official websites",
+            "Immediately share the news to gain views and likes",
+            "Assume the news is true if it includes an dramatic photo",
+            "Rewrite the news with extra exaggerated details"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Langkah utama menangkal hoaks di Unit 3 adalah memverifikasi dan mencocokkan fakta (cross-check facts) dengan sumber berita tepercaya sebelum menyebarkannya."
+          },
+          "distractorWhy": {
+            "1": "Langsung menyebarkan berita demi jumlah suka (likes) memicu penyebaran informasi palsu.",
+            "2": "Foto dramatis sering diubah atau dipakai di luar konteks asli oleh pembuat hoaks.",
+            "3": "Menambah rincian berlebihan justru memperburuk kualitas dan kebenaran informasi."
+          }
+        },
+        {
+          "id": "eng-d-9-c5-q13",
+          "difficulty": "tinggi",
+          "prompt": "In Chapter 5 Unit 3, analytical exposition texts are introduced to state arguments regarding digital issues. What is the standard generic structure of an analytical exposition text?",
+          "options": [
+            "Thesis - Arguments - Reiteration / Conclusion",
+            "Goal - Materials - Steps",
+            "Orientation - Complication - Resolution",
+            "Identification - Description"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Struktur generik teks eksposisi analitis (analytical exposition text) terdiri dari Tesis (penyataan pendapat utama), Argumen-argumen pendukung, dan Reinterasi/Kesimpulan (penegasan ulang tesis)."
+          },
+          "distractorWhy": {
+            "1": "Struktur 'Goal - Materials - Steps' merupakan struktur generik dari Teks Prosedur (Procedure Text).",
+            "2": "Struktur 'Orientation - Complication - Resolution' merupakan struktur generik dari Teks Naratif (Narrative Text).",
+            "3": "Struktur 'Identification - Description' merupakan struktur generik dari Teks Deskriptif (Descriptive Text)."
+          }
+        },
+        {
+          "id": "eng-d-9-c5-q14",
+          "difficulty": "tinggi",
+          "prompt": "What is the primary communicative purpose of an analytical exposition text discussed in digital literacy topics?",
+          "options": [
+            "To persuade readers that a particular topic or issue is important by presenting logical arguments",
+            "To entertain readers with a fictional story about internet superheroes",
+            "To provide step-by-step instructions on how to assemble a computer desktop",
+            "To describe the physical appearance of a digital device in detail"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Tujuan komunikatif teks eksposisi analitis adalah meyakinkan pembaca bahwa topik atau isu yang dibahas itu penting melalui argumen-argumen yang logis."
+          },
+          "distractorWhy": {
+            "1": "Menghibur pembaca dengan cerita rekaan adalah tujuan dari teks naratif.",
+            "2": "Memberikan petunjuk langkah demi langkah melakukan sesuatu adalah tujuan teks prosedur.",
+            "3": "Mendeskripsikan penampilan fisik suatu benda secara detail adalah tujuan teks deskriptif."
+          }
+        },
+        {
+          "id": "eng-d-9-c5-q15",
+          "difficulty": "sedang",
+          "prompt": "Which expression is commonly used to introduce a personal opinion or argument when discussing online etiquette in Unit 3?",
+          "options": [
+            "In my opinion, we should always verify information before posting it.",
+            "Once upon a time, there lived a wise king in a digital kingdom.",
+            "First, cut the paper into two equal rectangular parts.",
+            "Congratulations on winning the internet safety competition!"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Ungkapan 'In my opinion,...' adalah ungkapan standar untuk menyampaikan pendapat atau argumen pribadi dalam materi teks eksposisi dan etika digital."
+          },
+          "distractorWhy": {
+            "1": "'Once upon a time,...' adalah frasa pembuka dongeng/teks naratif.",
+            "2": "'First, cut the paper...' merupakan instruksi dalam teks prosedur.",
+            "3": "'Congratulations...' adalah ungkapan selamat (congratulating)."
+          }
+        },
+        {
+          "id": "eng-d-9-c5-q16",
+          "difficulty": "tinggi",
+          "prompt": "Analytical exposition texts rely heavily on the Simple Present Tense to state general truths and facts. Which sentence correctly uses the Simple Present Tense with proper subject-verb agreement?",
+          "options": [
+            "A responsible internet user checks the credibility of news sources.",
+            "A responsible internet user checking the credibility of news sources yesterday.",
+            "A responsible internet user check the credibility of news sources tomorrow.",
+            "A responsible internet user were check the credibility of news sources."
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Subjek tunggal 'A responsible internet user' membutuhkan kata kerja bentuk Simple Present Tense dengan akhiran -s, yaitu 'checks'."
+          },
+          "distractorWhy": {
+            "1": "Penggunaan bentuk 'checking' dengan kata keterangan 'yesterday' melanggar kaidah Simple Present Tense.",
+            "2": "Subjek orang ketiga tunggal memerlukan kata kerja 'checks', bukan 'check' tanpa -s.",
+            "3": "Bentuk 'were check' secara tata bahasa tidak baku dan salah."
+          }
+        },
+        {
+          "id": "eng-d-9-c5-q17",
+          "difficulty": "tinggi",
+          "prompt": "In Chapter 5, formal vocabulary related to digital ethics is introduced. Which word pair consists of synonyms relevant to online safety and verifying facts?",
+          "options": [
+            "Verify - Confirm",
+            "Hoax - Truth",
+            "Scam - Protection",
+            "Suspicious - Trusted"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Pasangan kata 'Verify' (memverifikasi) dan 'Confirm' (mengonfirmasi) adalah sinonim (persamaan kata) yang sesuai dalam konteks verifikasi kebenaran informasi digital."
+          },
+          "distractorWhy": {
+            "1": "'Hoax' (berita bohong) dan 'Truth' (kebenaran) adalah antonim (lawan kata).",
+            "2": "'Scam' (penipuan) dan 'Protection' (perlindungan) adalah dua konsep yang berlawanan.",
+            "3": "'Suspicious' (mencurigakan) dan 'Trusted' (dapat dipercaya) merupakan kata yang berlawanan arti."
+          }
+        },
+        {
+          "id": "eng-d-9-c5-q18",
+          "difficulty": "tinggi",
+          "prompt": "Consider the following online situation: A news post headline claims 'Drinking salt water cures all viral infections instantly' without citing any medical research or doctor's name. Applying the steps from Unit 3 (Turn Back Hoax!), how should a digitally literate student evaluate this post?",
+          "options": [
+            "Classify it as potential hoax/misinformation because it lacks credible scientific evidence and source verification",
+            "Accept it as real news because the headline contains strong exclamation marks",
+            "Share it immediately to all family chat groups to prevent illness",
+            "Assume it is authentic because it was posted on an unverified personal blog"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Berdasarkan langkah-langkah penangkalan hoaks di Unit 3, klaim medis tanpa bukti ilmiah dan tanpa rujukan pihak berwenang wajib dikategorikan sebagai potensi hoaks/disinformasi."
+          },
+          "distractorWhy": {
+            "1": "Tanda seru pada judul berita sering digunakan oleh pembuat berita sensasional/palsu untuk memancing emosi pembaca.",
+            "2": "Menyebarkan informasi medis yang belum terbukti kebenaran ilmiahnya dapat membahayakan kesehatan orang lain.",
+            "3": "Unggahan di blog pribadi tanpa verifikasi bukan merupakan sumber warta resmi yang tepercaya."
+          }
+        },
+        {
+          "id": "eng-d-9-c5-q19",
+          "difficulty": "tinggi",
+          "prompt": "What is the key takeaway regarding cyber etiquette when interacting on social media platforms as outlined in Chapter 5?",
+          "options": [
+            "Think critically before sharing information and respect others' privacy online",
+            "Post every personal detail of your daily life to maintain online popularity",
+            "Comment harsh critiques on strangers' photos to express freedom of speech",
+            "Use other people's account passwords whenever you need internet access"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Inti dari etika digital (cyber etiquette) di Chapter 5 adalah berpikir kritis sebelum membagikan informasi (think before sharing) serta menghormati hak privasi orang lain."
+          },
+          "distractorWhy": {
+            "1": "Mengunggah seluruh detail pribadi mengabaikan prinsip keamanan dan privasi data.",
+            "2": "Komentar kasar dan menghina melanggar etika digital dan tergolong perundungan siber.",
+            "3": "Menggunakan akun milik orang lain tanpa izin merupakan pelanggaran keamanan digital."
+          }
+        },
+        {
+          "id": "eng-d-9-c5-q20",
+          "difficulty": "dasar",
+          "prompt": "In Chapter 5 (Digital Life), which combination of actions best demonstrates a student who practices good digital literacy and online safety?",
+          "options": [
+            "Using strong passwords, verifying news sources, and reporting cyberbullying",
+            "Sharing account passwords with friends, clicking unknown web links, and spreading unverified news",
+            "Ignoring browser security warnings, downloading illegal attachments, and insulting online users",
+            "Using fake identities to scam others, disabling firewall protections, and hiding passwords under keyboards"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Kombinasi penggunaan kata sandi kuat, memverifikasi berita, dan melaporkan perundungan siber adalah bentuk nyata dari literasi digital dan keselamatan online yang baik."
+          },
+          "distractorWhy": {
+            "1": "Membagikan kata sandi dan mengklik tautan tidak dikenal adalah tindakan berisiko tinggi terhadap kejahatan siber.",
+            "2": "Abaikan peringatan keamanan dan mengunduh lampiran ilegal dapat merusak sistem komputer.",
+            "3": "Penipuan identitas dan mematikan benteng keamanan (firewall) melanggar etika serta hukum digital."
+          }
+        }
+      ]
     }
   ]
 }
