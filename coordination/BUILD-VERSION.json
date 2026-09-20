@@ -1,7 +1,7 @@
 {
-  "version": "m025-339",
-  "claimedBy": "branch main",
-  "claimedAt": "2026-09-19T22:00:37.369Z",
-  "reason": "fix(teacher-shell): instan logout dan popup auth token",
+  "version": "m025-343",
+  "claimedBy": "branch claude/upbeat-pasteur-oizcey",
+  "claimedAt": "2026-09-20T03:41:34.943Z",
+  "reason": "bank mapel Fase D masuk precache: MAT/IPA/ENG dibaca runtime dari content/mapel",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }
