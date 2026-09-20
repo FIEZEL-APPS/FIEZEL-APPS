@@ -295,33 +295,54 @@
          * Idempoten: kalau kelas sudah ada (guru reload, login ulang), blok
          * ini tidak menambah duplikat.
          * ---------------------------------------------------------------- */
-        if (session.classCode && FiezelTeacherStore.normalizeClassCode) {
-          var normCode = FiezelTeacherStore.normalizeClassCode(session.classCode);
-          if (normCode) {
-            if (!Array.isArray(profile.classes)) profile.classes = [];
-            var exists = profile.classes.some(function (c) {
-              return FiezelTeacherStore.normalizeClassCode(c.code) === normCode;
-            });
-            if (!exists) {
-              // Bersihkan tanda "dihapus" untuk kode ini — token baru sengaja
-              // menghubungkan kembali, jadi penanda hapus lama harus dibuang.
-              if (profile.deletedClassCodes && profile.deletedClassCodes[normCode]) {
-                delete profile.deletedClassCodes[normCode];
-              }
-              var mapelNames = FiezelTeacherStore.MAPEL_NAMES || {};
-              var subName = mapelNames[session.subjectId] || session.subjectId || t('guru.kelas-mapel-tanpa-nama', 'Kelas');
-              var clsTitle = (session.institution ? session.institution + ' — ' : '') + subName;
-              var autoCls = FiezelTeacherStore.newClass(clsTitle, session.gradeId || 'SMP', session.subjectId || 'MAT');
-              autoCls.code = normCode;
-              profile.classes.unshift(autoCls);
-              profile.activeClassId = autoCls.id;
-              profile.onboarded = true;
-              modified = true;
+        if (!Array.isArray(profile.classes)) profile.classes = [];
+        var normCode = session.classCode && FiezelTeacherStore.normalizeClassCode
+          ? FiezelTeacherStore.normalizeClassCode(session.classCode)
+          : '';
+        if (!normCode && !profile.classes.length) {
+          try {
+            var m = (typeof document !== 'undefined' && document.cookie) ? document.cookie.match(/(?:^|;\s*)fz_cls=([^;]+)/) : null;
+            if (m && m[1] && FiezelTeacherStore.normalizeClassCode) {
+              normCode = FiezelTeacherStore.normalizeClassCode(decodeURIComponent(m[1]));
             }
+          } catch (_) {}
+          if (!normCode && FiezelTeacherStore.makeClassCode) {
+            normCode = FiezelTeacherStore.makeClassCode();
           }
+        }
+        if (normCode) {
+          var exists = profile.classes.some(function (c) {
+            return FiezelTeacherStore.normalizeClassCode(c.code) === normCode;
+          });
+          if (!exists) {
+            // Bersihkan tanda "dihapus" untuk kode ini — token baru sengaja
+            // menghubungkan kembali, jadi penanda hapus lama harus dibuang.
+            if (profile.deletedClassCodes && profile.deletedClassCodes[normCode]) {
+              delete profile.deletedClassCodes[normCode];
+            }
+            var mapelNames = FiezelTeacherStore.MAPEL_NAMES || {};
+            var subName = mapelNames[session.subjectId] || session.subjectId || t('guru.kelas-mapel-tanpa-nama', 'Matematika');
+            var clsTitle = (session.institution ? session.institution + ' — ' : '') + subName;
+            var autoCls = FiezelTeacherStore.newClass(clsTitle, session.gradeId || 'SMP', session.subjectId || 'MAT');
+            autoCls.code = normCode;
+            profile.classes.unshift(autoCls);
+            profile.activeClassId = autoCls.id;
+            profile.onboarded = true;
+            modified = true;
+          }
+        }
+        if (profile.classes.length && !profile.activeClassId) {
+          profile.activeClassId = profile.classes[0].id;
+          profile.onboarded = true;
+          modified = true;
         }
         if (modified) {
           FiezelTeacherStore.save(profile);
+          try {
+            if (root.FiezelTeacherShell && typeof root.FiezelTeacherShell.render === 'function') {
+              root.FiezelTeacherShell.render();
+            }
+          } catch (_) {}
         }
       } catch (_) {}
     }

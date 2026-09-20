@@ -9096,6 +9096,7 @@ function openFiezelAuthModal(initialTab){
                 }
               }catch(_){}
               state.preferences={...state.preferences,role:'guru'};
+              try{localStorage.setItem('fz_teacher_mode','1')}catch(_){}
               try{save()}catch(_){}
               closeModal();
               go('tutor');
@@ -14746,7 +14747,20 @@ function maybeAutoDetectLocale(){
     if(cc==='TH'){try{self.FiezelI18n?.setLocale?.('th')}catch(_){}}
   }).catch(function(){});
 }
-function bootFiezel(){try{self.FiezelAccount?.getMe?.();}catch(_){}return maybeAutoDetectLocale().then(function(){return load()}).catch(e=>{dismissBootSplash();
+function bootFiezel(){
+  try{
+    if(self.FiezelAccount && self.FiezelAccount.getMe){
+      self.FiezelAccount.getMe().then(function(res){
+        if(res && res.ok && res.account && res.account.role === 'teacher'){
+          try{localStorage.setItem('fz_teacher_mode','1')}catch(_){}
+          if(self.FiezelTeacherShell && typeof self.FiezelTeacherShell.render === 'function'){
+            self.FiezelTeacherShell.render();
+          }
+        }
+      }).catch(function(){});
+    }
+  }catch(_){}
+  return maybeAutoDetectLocale().then(function(){return load()}).catch(e=>{dismissBootSplash();
   try{console.debug('FIEZEL boot error:',e)}catch(_){}
   const offline=typeof navigator!=='undefined'&&navigator.onLine===false,fileProto=typeof location!=='undefined'&&location.protocol==='file:';
   const msg=offline?FiezelI18n.t('boot.offline-msg')
