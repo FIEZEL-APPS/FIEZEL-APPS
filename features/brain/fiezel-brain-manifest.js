@@ -90,7 +90,7 @@
   // 3.8.0 -> 3.9.0 (m025-337): bktUnlock shadow -> active, lihat authorityMap di bawah.
   // 3.9.0 -> 3.10.0 (m025-337, gelombang kedua): confusionMap dan olmInsight ikut aktif,
   // dan frontier() BKT mulai memilih simpul aktif jalur Grammar.
-  var BUNDLE_VERSION = '3.10.0';
+  var BUNDLE_VERSION = '3.11.0';
 
   // Disalin apa adanya dari version.js (self.FIEZEL_VERSION). Bundle ini mengandalkan
   // wiring app.js 5.19.0 (guard modul-absen, sidecar stabilityDays, dsb.) — versi
@@ -216,22 +216,29 @@
     listeningPolicy: 'active',
     stepTutor: 'active',
     productionGrader: 'active',
-    // Langkah 1 roadmap otonomi: probe retensi kini dimuat halaman dan dipanggil —
-    // schedule() saat mastery BKT tembus, evaluate() atas jawaban nyata sesudah jatuh
-    // tempo. Ia MENGUKUR dan tidak memutuskan (rekomendasi half-life tetap advisory,
-    // penulis nextReview tetap tunggal), maka jujurnya 'shadow', bukan 'active'.
-    retentionProbe: 'shadow',
+    // m025-341: penjadwalnya memang sudah jalan sejak lama, tetapi jadwalnya tidak pernah
+    // dibaca siapa pun — tidak ada satu pun lesson yang benar-benar diuji ulang. Sekarang
+    // ada dua jalur yang MEMUTUSKAN: probe jatuh tempo mengembalikan lesson mastered ke
+    // kolam review (buildAdaptivePool), dan vonis 'rapuh' mencabut klaim penguasaannya di
+    // hub Grammar. Rekomendasi half-life TETAP advisory dan penulis nextReview tetap
+    // tunggal; yang berubah adalah probe kini sampai ke murid. Jujurnya 'active'.
+    retentionProbe: 'active',
     // Registry konfigurasi (fiezel-brain-config.js) menyatakan sendiri bahwa ia TIDAK
     // dibaca modul lain saat runtime dan tidak dimuat index.html — sumber kebenaran
     // untuk manusia/tooling, bukan jalur keputusan: jujurnya 'off'.
     brainConfig: 'off',
-    // Langkah 1 roadmap otonomi: learningMetricsSnapshot() di app.js menghitung lima
-    // metrik longitudinal dari riwayat lokal dan merendernya di panel diagnostik.
-    // Tampilan saja — nol keputusan sesi yang bergantung padanya: 'shadow'.
-    learningMetrics: 'shadow',
+    // m025-341: bukan tampilan lagi. brierCalibration() sekarang memutuskan lewat
+    // brierEvidenceBump(): Brier Skill Score <= 0 (model kalah dari tebakan base-rate)
+    // menaikkan ambang bukti n yang dituntut sebelum mastery BKT boleh ikut membuka
+    // prasyarat. Satu arah — hanya bisa memperketat, tidak pernah melonggarkan. 'active'.
+    learningMetrics: 'active',
     // Proyeksi bukti sinkron (S5b). Dipanggil app.js lewat brainSyncQueue, tetapi ia
     // MEMBATASI apa yang boleh keluar — ia tidak memutuskan apa pun tentang belajar murid,
     // dan sinkronnya sendiri mati secara default. Jujurnya 'shadow', bukan 'active'.
+    // m025-341: DIPERIKSA ULANG pada gelombang lapisan ukur dan sengaja DIBIARKAN 'shadow'.
+    // Alasan di atas masih benar kata per kata sesudah retentionProbe/learningMetrics naik:
+    // modul ini tetap pembatas jalur keluar, bukan pengambil keputusan belajar. Menaikkannya
+    // hanya supaya "genap tiga" adalah klaim yang lolos gerbang tanpa ada yang berubah.
     attemptRecord: 'shadow',
     // Langkah 2 roadmap otonomi: pemutus nasib kebijakan belajar. Ia BENAR-BENAR
     // memutuskan — hasilnya menentukan status outcome yang membentuk kebijakan sesi
