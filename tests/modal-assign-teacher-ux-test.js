@@ -29,6 +29,11 @@ assert(shellCode.includes('class="tg-qbank-section" data-testid="tg-mapel-previe
 assert(shellCode.includes('data-tg="quick-count" data-count="5"'), 'Tombol pilih 5 soal cepat terpasang');
 assert(shellCode.includes('data-tg="quick-count" data-count="10"'), 'Tombol pilih 10 soal ulangan terpasang');
 assert(shellCode.includes('data-tg-check="q-select"'), 'Checkbox kurasi butir soal per kartu terpasang');
+assert(shellCode.includes('class="tg-chapter-cards-grid"'), 'Kisi kartu bab interaktif tg-chapter-cards-grid terpasang di modal');
+assert(shellCode.includes('data-tg="select-bab"'), 'Tombol interaktif pilih bab (data-tg="select-bab") terpasang');
+assert(shellCode.includes('data-testid="tg-assign-bab-card-'), 'Setiap kartu bab memiliki data-testid untuk pengujian');
+assert(shellCode.includes('data-tg="filter-grade"'), 'Filter jenjang kelas (data-tg="filter-grade") terpasang');
+assert(shellCode.includes('class="tg-subbab-box"'), 'Rincian sub-bab dan indikator materi terpasang di ringkasan bab');
 assert(shellCode.includes('class="tg-correct-pill"'), 'Badge hijau kunci jawaban terpasang');
 assert(shellCode.includes('class="tg-q-explanation"'), 'Akordeon pembahasan & miskonsepsi siswa terpasang');
 

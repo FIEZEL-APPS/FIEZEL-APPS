@@ -355,9 +355,42 @@ html.fiezel-ui-v6 body.fz-teacher-mode .tg button.tg-seg-btn:not(.primary):not(.
 .tg-topic-badge-row .tg-badge{font-size:.72rem;font-weight:700;padding:3px 9px;border-radius:999px}
 .tg-topic-badge-row .tg-badge.is-subject{background:#047857;color:#fff}
 .tg-topic-badge-row .tg-badge.is-grade{background:rgba(4,120,87,.12);color:#065F46;border:1px solid rgba(4,120,87,.2)}
+.tg-topic-badge-row .tg-badge.is-bab{background:#0D9488;color:#fff}
 .tg-topic-badge-row .tg-badge.is-count{background:#FEF3C7;color:#92400E;border:1px solid #FCD34D}
 .tg-topic-title{margin:0 0 6px;font-size:1.02rem;font-weight:700;color:#064E3B;line-height:1.35}
 .tg-topic-materi{margin:0;font-size:.82rem;color:#065F46;line-height:1.4}
+
+/* Bab Buku Ajar & Chapter Cards */
+.tg-bab-section{margin-bottom:12px}
+.tg-bab-header-row{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px}
+.tg-grade-filter-row{display:flex;flex-wrap:wrap;align-items:center;gap:6px}
+.tg-filter-label{font-size:.78rem;font-weight:700;color:var(--tg-muted)}
+.tg-grade-pill{background:var(--tg-paper-2);border:1px solid var(--tg-line);padding:4px 10px;border-radius:999px;font:inherit;font-size:.76rem;font-weight:600;color:var(--tg-muted);cursor:pointer;transition:all .15s}
+.tg-grade-pill:hover{background:var(--tg-paper);color:var(--tg-ink)}
+.tg-grade-pill.is-active{background:var(--tg-ink);border-color:var(--tg-ink);color:#fff}
+
+.tg-chapter-cards-grid{display:grid;grid-template-columns:repeat(auto-fill, minmax(210px, 1fr));gap:10px;margin:8px 0 10px}
+@media(max-width:640px){.tg-chapter-cards-grid{grid-template-columns:1fr}}
+.tg-chapter-card{display:flex;flex-direction:column;align-items:flex-start;text-align:left;background:var(--tg-paper);border:1.5px solid var(--tg-line);border-radius:var(--tg-r);padding:10px 12px;cursor:pointer;font:inherit;transition:all .18s;box-shadow:0 1px 3px rgba(0,0,0,.02)}
+.tg-chapter-card:hover{border-color:var(--tg-sage);transform:translateY(-1px);box-shadow:0 4px 10px rgba(0,0,0,.06)}
+.tg-chapter-card.is-active{background:#F0FDF4;border-color:#16A34A;box-shadow:0 2px 8px rgba(22,163,74,.18)}
+.tg-chap-top{display:flex;align-items:center;justify-content:space-between;width:100%;margin-bottom:4px}
+.tg-chap-pill{background:var(--tg-sage);color:#fff;font-size:.68rem;font-weight:700;padding:2px 7px;border-radius:999px}
+.tg-chapter-card.is-active .tg-chap-pill{background:#15803D}
+.tg-chap-grade{font-size:.72rem;color:var(--tg-muted);font-weight:600}
+.tg-chap-title{margin:0 0 6px;font-size:.85rem;font-weight:700;color:var(--tg-ink);line-height:1.35;flex:1}
+.tg-chap-meta{display:flex;align-items:center;justify-content:space-between;width:100%;font-size:.74rem;color:var(--tg-muted)}
+.tg-chap-selected-pill{color:#15803D;font-weight:700;font-size:.72rem;background:#DCFCE7;padding:1px 6px;border-radius:4px}
+
+.tg-bab-select{margin-top:6px;font-size:.84rem}
+
+/* Rincian Sub-bab di Ringkasan */
+.tg-subbab-box{margin-top:10px;padding-top:10px;border-top:1px dashed #A7F3D0}
+.tg-subbab-head{font-size:.8rem;color:#065F46;margin-bottom:6px}
+.tg-subbab-list{display:flex;flex-direction:column;gap:5px}
+.tg-subbab-item{display:flex;align-items:baseline;gap:6px;background:rgba(255,255,255,.7);border-left:3px solid #059669;padding:5px 8px;border-radius:0 5px 5px 0;font-size:.78rem;line-height:1.35;color:#064E3B}
+.tg-subbab-badge{font-weight:700;color:#047857;flex-shrink:0}
+.tg-subbab-title{color:#065F46}
 
 /* Panduan Mengajar Collapsible Accordion */
 .tg-brief-accordion{background:linear-gradient(180deg, #FBF8EE 0%, #F5EEDB 100%);border:1px solid #E6D9BC;border-radius:var(--tg-r-lg);margin:10px 0 14px;overflow:hidden;box-shadow:0 2px 8px rgba(44,34,22,.03)}

@@ -3191,18 +3191,67 @@
             for (var i = 0; i < arr.length; i++) {
               var nd = arr[i];
               if (nd.type === 'competency') {
-                comps.push({ code: nd.code || nd.id, name: nd.name || nd.title || '', materi: nd.description || nd.materi || '' });
+                var cGrade = nd.grade;
+                if (!cGrade && nd.code) {
+                  var gm = nd.code.match(/-(\d+)-/);
+                  if (gm) cGrade = parseInt(gm[1], 10);
+                }
+                comps.push({
+                  code: nd.code || nd.id,
+                  name: nd.name || nd.title || '',
+                  materi: nd.description || nd.materi || '',
+                  grade: cGrade || 7,
+                  cpRef: nd.cpRef || ''
+                });
               }
               if (nd.children) walkTree(nd.children);
             }
           })(ui.curriculumTree);
         }
         if (!comps.length && catItem && catItem.competencies) {
-          comps = catItem.competencies.slice();
+          comps = catItem.competencies.map(function (c) {
+            var cGrade = c.grade;
+            if (!cGrade && c.code) {
+              var gm = c.code.match(/-(\d+)-/);
+              if (gm) cGrade = parseInt(gm[1], 10);
+            }
+            return {
+              code: c.code,
+              name: c.name,
+              materi: c.materi || '',
+              grade: cGrade || 7,
+              cpRef: c.cpRef || ''
+            };
+          });
         }
-        if (!mCode && comps.length) {
-          mCode = comps[0].code;
-          mTitle = comps[0].name;
+
+        /* Hitung nomor Bab (babNum) berurutan per jenjang kelas agar persis buku siswa */
+        var gradeBabCounts = {};
+        for (var cIdx = 0; cIdx < comps.length; cIdx++) {
+          var cg = comps[cIdx].grade || 7;
+          if (!gradeBabCounts[cg]) gradeBabCounts[cg] = 0;
+          gradeBabCounts[cg]++;
+          comps[cIdx].babNum = gradeBabCounts[cg];
+        }
+
+        var curGradeFilter = ui.assignGradeFilter || 'all';
+        var availableGrades = [];
+        for (var gi = 0; gi < comps.length; gi++) {
+          var gr = comps[gi].grade || 7;
+          if (availableGrades.indexOf(gr) === -1) availableGrades.push(gr);
+        }
+        availableGrades.sort(function (a, b) { return a - b; });
+
+        var displayedComps = comps;
+        if (curGradeFilter !== 'all') {
+          var targetGrade = parseInt(curGradeFilter, 10);
+          displayedComps = comps.filter(function (c) { return c.grade === targetGrade; });
+          if (!displayedComps.length) displayedComps = comps;
+        }
+
+        if (!mCode && displayedComps.length) {
+          mCode = displayedComps[0].code;
+          mTitle = displayedComps[0].name;
         }
 
         var curCompObj = null;
@@ -3212,8 +3261,14 @@
             break;
           }
         }
-        if (!curCompObj && comps.length) curCompObj = comps[0];
+        if (!curCompObj && displayedComps.length) {
+          curCompObj = displayedComps[0];
+          mCode = curCompObj.code;
+          mTitle = curCompObj.name;
+        }
         var curMateri = (curCompObj && curCompObj.materi) || '';
+        var curGrade = curCompObj ? (curCompObj.grade || 7) : 7;
+        var curBabNum = curCompObj ? (curCompObj.babNum || 1) : 1;
 
         var qData = getMapelQuestionsForCompetency(curSId, mCode);
         var allQItems = qData.items || [];
@@ -3227,30 +3282,105 @@
             }).join('') +
           '</select></label>';
 
+        var chapterCardsHtml = '';
+        if (displayedComps.length) {
+          chapterCardsHtml = '<div class="tg-chapter-cards-grid">' +
+            displayedComps.map(function (cItem) {
+              var isSel = (cItem.code === mCode || cItem.name === mTitle);
+              var qCount = (getMapelQuestionsForCompetency(curSId, cItem.code).items || []).length;
+              return '<button type="button" class="tg-chapter-card' + (isSel ? ' is-active' : '') + '" data-tg="select-bab" data-code="' + esc(cItem.code) + '" data-title="' + esc(cItem.name) + '" data-testid="tg-assign-bab-card-' + cItem.babNum + '">' +
+                '<div class="tg-chap-top">' +
+                  '<span class="tg-chap-pill">📖 ' + esc(t('guru.bab-label', 'Bab')) + ' ' + cItem.babNum + '</span>' +
+                  '<span class="tg-chap-grade">' + esc(t('guru.kelas-label', 'Kelas')) + ' ' + cItem.grade + '</span>' +
+                '</div>' +
+                '<h5 class="tg-chap-title">' + esc(cItem.name) + '</h5>' +
+                '<div class="tg-chap-meta">' +
+                  '<span class="tg-chap-count">📚 ' + qCount + ' ' + esc(t('guru.soal-count', 'soal')) + '</span>' +
+                  (isSel ? '<span class="tg-chap-selected-pill">✓ ' + esc(t('guru.terpilih', 'Aktif')) + '</span>' : '') +
+                '</div>' +
+              '</button>';
+            }).join('') +
+          '</div>';
+        }
+
+        var gradeFilterHtml = '';
+        if (availableGrades.length > 1) {
+          gradeFilterHtml = '<div class="tg-grade-filter-row">' +
+            '<span class="tg-filter-label">' + esc(t('guru.jenjang-kelas-label', '🎯 Jenjang Kelas:')) + '</span>' +
+            '<button type="button" class="tg-grade-pill' + (curGradeFilter === 'all' ? ' is-active' : '') + '" data-tg="filter-grade" data-grade="all">' + esc(t('guru.semua-kelas', 'Semua Kelas')) + '</button>' +
+            availableGrades.map(function (gr) {
+              return '<button type="button" class="tg-grade-pill' + (curGradeFilter === String(gr) ? ' is-active' : '') + '" data-tg="filter-grade" data-grade="' + gr + '">' + esc(t('guru.kelas-label', 'Kelas')) + ' ' + gr + '</button>';
+            }).join('') +
+          '</div>';
+        }
+
         var compSelectHtml = '';
         if (comps.length) {
-          compSelectHtml = '<label class="tg-label">' + t('guru.pilih-kompetensi-dropdown', 'Pilih Capaian / Kompetensi Kurikulum') +
-            '<select name="comp_select" data-tg-select="assign-comp-select" class="tg-select-unit" data-testid="tg-assign-comp-select">' +
-              comps.map(function (cItem) {
-                var isSel = (cItem.code === mCode || cItem.name === mTitle);
-                return '<option value="' + esc(cItem.code) + '" data-title="' + esc(cItem.name) + '" data-materi="' + esc(cItem.materi || '') + '"' + (isSel ? ' selected' : '') + '>' +
-                  esc(cItem.code + ' · ' + cItem.name) +
-                '</option>';
-              }).join('') +
-            '</select></label>';
+          var groupedByGrade = {};
+          comps.forEach(function (c) {
+            var gKey = c.grade || 7;
+            if (!groupedByGrade[gKey]) groupedByGrade[gKey] = [];
+            groupedByGrade[gKey].push(c);
+          });
+
+          var optGroupsHtml = Object.keys(groupedByGrade).sort(function (a, b) { return Number(a) - Number(b); }).map(function (gKey) {
+            var groupItems = groupedByGrade[gKey];
+            var opts = groupItems.map(function (cItem) {
+              var isSel = (cItem.code === mCode || cItem.name === mTitle);
+              var qCount = (getMapelQuestionsForCompetency(curSId, cItem.code).items || []).length;
+              var label = '📖 ' + t('guru.bab-label', 'Bab') + ' ' + cItem.babNum + ': ' + cItem.name + ' (' + qCount + ' ' + t('guru.soal-count', 'soal') + ')';
+              return '<option value="' + esc(cItem.code) + '" data-title="' + esc(cItem.name) + '" data-materi="' + esc(cItem.materi || '') + '"' + (isSel ? ' selected' : '') + '>' +
+                esc(label) +
+              '</option>';
+            }).join('');
+            return '<optgroup label="📚 ' + esc(t('guru.kelas-label', 'Kelas')) + ' ' + gKey + ' SMP / Fase D">' + opts + '</optgroup>';
+          }).join('');
+
+          compSelectHtml = '<div class="tg-bab-section">' +
+            '<div class="tg-bab-header-row">' +
+              '<label class="tg-label">📖 <b>' + esc(t('guru.pilih-bab-buku-ajar', 'Pilih Bab Buku Ajar (Kurikulum Merdeka)')) + '</b></label>' +
+              gradeFilterHtml +
+            '</div>' +
+            chapterCardsHtml +
+            '<select name="comp_select" data-tg-select="assign-comp-select" class="tg-select-unit tg-bab-select" data-testid="tg-assign-comp-select">' +
+              optGroupsHtml +
+            '</select>' +
+          '</div>';
         }
 
         var compInputs = '<input type="hidden" name="comp_code" value="' + esc(mCode) + '" data-testid="tg-assign-comp-code">' +
           '<input type="hidden" name="comp_title" value="' + esc(mTitle) + '" data-testid="tg-assign-comp-title">';
 
+        var subTopicsHtml = '';
+        if (curMateri) {
+          var rawSubs = curMateri.split(/,|;/).map(function (s) {
+            return s.trim().replace(/^(dan|serta)\s+/i, '');
+          }).filter(Boolean);
+
+          if (rawSubs.length) {
+            subTopicsHtml = '<div class="tg-subbab-box">' +
+              '<div class="tg-subbab-head">🎯 <b>' + esc(t('guru.subbab-topik-bab', 'Sub-bab & Indikator Materi di Bab Ini:')) + '</b></div>' +
+              '<div class="tg-subbab-list">' +
+                rawSubs.map(function (st, sIdx) {
+                  return '<div class="tg-subbab-item">' +
+                    '<span class="tg-subbab-badge">📌 ' + esc(t('guru.subbab-label', 'Sub-bab')) + ' ' + curBabNum + '.' + (sIdx + 1) + '</span>' +
+                    '<span class="tg-subbab-title">' + esc(st) + '</span>' +
+                  '</div>';
+                }).join('') +
+              '</div>' +
+            '</div>';
+          }
+        }
+
         var topicSummaryCard = '<div class="tg-topic-summary-card">' +
           '<div class="tg-topic-badge-row">' +
             '<span class="tg-badge is-subject">' + esc(catItem ? catItem.name : curSId) + '</span>' +
-            '<span class="tg-badge is-grade">' + esc(catItem ? catItem.grade : 'Fase D') + '</span>' +
+            '<span class="tg-badge is-grade">' + esc(t('guru.kelas-label', 'Kelas')) + ' ' + curGrade + '</span>' +
+            '<span class="tg-badge is-bab">📖 ' + esc(t('guru.bab-label', 'Bab')) + ' ' + curBabNum + '</span>' +
             '<span class="tg-badge is-count">📚 ' + totalAvailable + ' ' + esc(t('guru.soal-tersedia-bab', 'Soal Siap Pakai di Bab Ini')) + '</span>' +
           '</div>' +
-          '<h4 class="tg-topic-title">' + esc(mTitle || (catItem ? catItem.name : curSId)) + '</h4>' +
-          (curMateri ? '<p class="tg-topic-materi">🎯 <b>' + esc(t('guru.indikator-tp', 'Indikator & Materi:')) + '</b> ' + esc(curMateri) + '</p>' : '') +
+          '<h4 class="tg-topic-title">📖 ' + esc(t('guru.bab-label', 'Bab')) + ' ' + curBabNum + ': ' + esc(mTitle || (catItem ? catItem.name : curSId)) + '</h4>' +
+          subTopicsHtml +
         '</div>';
 
         var briefCard = '';
@@ -3647,6 +3777,22 @@
       case 'assign-tab': { ui.assignTab = btn.getAttribute('data-tab'); persist(); render(); return; }
       case 'assign-phase': { ui.curriculumPhase = btn.getAttribute('data-phase'); ui.curriculumUnitId = null; persist(); render(); return; }
       case 'assign-unit': { ui.curriculumUnitId = btn.getAttribute('data-unit'); persist(); render(); return; }
+      case 'select-bab': {
+        var bCode = btn.getAttribute('data-code');
+        var bTitle = btn.getAttribute('data-title') || '';
+        ui.assignCompCode = bCode;
+        ui.assignCompTitle = bTitle;
+        if (ui.modal && ui.modal.kind === 'assign') {
+          ui.modal.compCode = bCode;
+          ui.modal.compTitle = bTitle;
+        }
+        persist(); render(); return;
+      }
+      case 'filter-grade': {
+        var fGrade = btn.getAttribute('data-grade') || 'all';
+        ui.assignGradeFilter = fGrade;
+        persist(); render(); return;
+      }
       case 'quick-count': {
         var countReq = parseInt(btn.getAttribute('data-count'), 10) || 5;
         var modalForm = el.querySelector('[data-tg-form="assign"]');
@@ -3879,6 +4025,7 @@
       ui.assignSubject = sel.value;
       ui.assignCompCode = '';
       ui.assignCompTitle = '';
+      ui.assignGradeFilter = 'all';
       if (ui.modal && ui.modal.kind === 'assign') {
         ui.modal.subjectId = sel.value;
         ui.modal.compCode = '';
