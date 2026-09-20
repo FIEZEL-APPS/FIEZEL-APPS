@@ -3052,6 +3052,36 @@
       '<div class="tg-seed-badge">' + icon('book-open') + ' <span><b>' + esc(mItem.name) + '</b> (' + esc(mItem.grade) + ') · ' + esc(t('guru.kurikulum-nasional', 'Kurikulum Nasional')) + '</span></div>' +
     '</div>';
 
+    /* PINTU KE KONSOL KURIKULUM & KOMPETENSI (m025-349, temuan X2).
+       ==========================================================================
+       kurikulum.html adalah permukaan kurikulum paling lengkap di repo ini: rekomendasi
+       mengajar harian, matriks cakupan per TP, learning graph, bank soal, blueprint
+       delapan jenis asesmen, dan draf narasi e-Rapor. Sampai baris ini ditulis, SATU-
+       SATUNYA tautan menujunya di seluruh repo ada di features/curriculum/learning-mission.js
+       — yaitu di layar MURID. Guru hanya bisa sampai ke sana dengan mengetik alamatnya.
+
+       Pintunya memang pernah sengaja ditutup: 7 September 2026 backend-nya menjawab 404,
+       dan pintu yang terbuka ke ruangan kosong lebih merugikan daripada fitur yang belum
+       ada (alasan lengkapnya di fiezel-ux-flags.js). Tapi yang menutup pintu itu adalah
+       ALAMAT BACKEND YANG KOSONG, dan alamat itu kini terisi — konsolKurikulumSiap() di
+       kepala berkas ini sudah menjadi syaratnya, dan syarat itulah yang memutuskan view
+       ini boleh tampil sama sekali. Jadi menautkannya di sini tidak melonggarkan pagar
+       apa pun: ia memakai pagar yang sama.
+
+       Ditaruh DI DALAM view kurikulum, bukan sebagai butir nav baru: di sinilah guru
+       sudah sedang memikirkan kurikulum, dan di sinilah batas kemampuan layar ini
+       (pohon + penyemaian) bertemu dengan yang hanya bisa dilakukan konsol penuh. */
+    var pintuKonsol = konsolKurikulumSiap()
+      ? '<a class="tg-card tg-console-door" href="./kurikulum.html" data-testid="tg-curriculum-console-door">' +
+          '<span class="tg-console-door-icon">' + icon('compass') + '</span>' +
+          '<span class="tg-console-door-body">' +
+            '<b>' + esc(t('guru.konsol-kurikulum-judul', 'Buka Konsol Kurikulum & Kompetensi')) + '</b>' +
+            '<small>' + esc(t('guru.konsol-kurikulum-sub', 'Rekomendasi mengajar harian, matriks ketuntasan per tujuan pembelajaran, bank soal, kuis 1-klik, dan draf narasi e-Rapor.')) + '</small>' +
+          '</span>' +
+          icon('arrow-up-right') +
+        '</a>'
+      : '';
+
     var tree = ui.curriculumTree || [];
     /* Fallback mulus ke katalog materi lokal jika pohon server belum dimuat */
     if (!tree.length && cat && cat.competencies && cat.competencies.length) {
@@ -3067,7 +3097,7 @@
     }
 
     if (ui.curriculumLoading && !tree.length) {
-      return '<div class="tg-curriculum-wrap">' + toolbar + '<div class="tg-card tg-center"><p class="tg-muted">' + icon('hourglass') + ' ' + t('guru.memuat-kurikulum-silabus', 'Memuat kurikulum & capaian pembelajaran…') + '</p></div></div>';
+      return '<div class="tg-curriculum-wrap">' + toolbar + pintuKonsol + '<div class="tg-card tg-center"><p class="tg-muted">' + icon('hourglass') + ' ' + t('guru.memuat-kurikulum-silabus', 'Memuat kurikulum & capaian pembelajaran…') + '</p></div></div>';
     }
 
     function renderNode(node) {
@@ -3108,7 +3138,7 @@
       '</div>';
     }
 
-    return '<div class="tg-curriculum-wrap">' + toolbar + '<div class="tg-curriculum-tree">' + tree.map(renderNode).join('') + '</div></div>';
+    return '<div class="tg-curriculum-wrap">' + toolbar + pintuKonsol + '<div class="tg-curriculum-tree">' + tree.map(renderNode).join('') + '</div></div>';
   }
 
   function settings() {

@@ -285,6 +285,21 @@
     return !!getCurriculum() || konsolKurikulumSiap();
   }
 
+  /* PINTU KE MISI BELAJAR ADAPTIF (m025-349, temuan X3).
+     ==========================================================================
+     misi.html menjalankan mesin misi yang sesungguhnya: goal → alasan → pemanasan →
+     contoh → latihan → tantangan → transfer → cek, dengan penilaian keyakinan, petunjuk
+     bertingkat, diagnosis miskonsepsi, dan jadwal ulang berbasis retensi. Sampai baris
+     ini ditulis, satu-satunya tautan menujunya di seluruh repo ada di teacher-console.js
+     — yaitu di layar GURU. Murid tidak punya jalan ke sana dari dalam aplikasi, dan yang
+     mereka temui di jalan utama justru versi yang jauh lebih lemah: 15 unit statis.
+
+     Syaratnya BUKAN kurikulumTersedia(). Yang itu juga benar ketika hanya modul lokal
+     yang ada, dan misi.html tanpa backend adalah pintu ke ruangan kosong — persis yang
+     ditutup m025-296 untuk konsol guru. Pintu ini hanya berdiri kalau alamat backendnya
+     benar-benar terisi. */
+  function misiAdaptifSiap() { return konsolKurikulumSiap(); }
+
   function mountStudent(el, env) {
     sEl = el; sEnv = env || {}; ui();
     if (!el.__chStudentBound) {
@@ -526,7 +541,7 @@
     var body = u.runner && !u.paused ? runnerView() : u.review ? reviewView(u.review) : u.curriculumView ? curriculumModalView(u.curriculumView) : u.tab === 'papan' ? papanView() : u.tab === 'kelas' ? kelasView() : u.tab === 'progres' ? progresView() : tugasView(pend, done);
     sEl.innerHTML = '<section class="ch ch-student' + (repaint ? ' is-repaint' : '') + '" data-testid="class-hub-student">' +
       '<header class="ch-head"><div><h1 data-testid="class-hub-title">' + (className() ? esc(className()) : (classCode() ? WM + ' ' + esc(classCode()) : t('kelas.belum-terhubung', 'Belum terhubung ke ') + WM)) + '</h1><p class="ch-sub">' + (teacherName() ? 'Guru: <b>' + esc(teacherName()) + '</b>' + (classCode() ? ' · ' : '') : '') + (classCode() ? 'Kode ' + esc(classCode()) : '') + '</p></div></header>' +
-      (u.runner && !u.paused || u.curriculumView ? '' : '<nav class="ch-tabs" role="tablist">' + [['tugas', t('umum.tugas', 'Tugas'), pend.length], ['papan', t('kelas.papan-kelas', 'Papan'), 0], ['kelas', WM, 0]].map(function (t) { return '<button type="button" role="tab" class="ch-tab' + (u.tab === t[0] && !u.review ? ' is-active' : '') + '" data-ch="tab" data-tab="' + t[0] + '" data-testid="class-tab-' + t[0] + '">' + t[1] + (t[2] ? '<span class="ch-badge">' + t[2] + '</span>' : '') + '</button>'; }).join('') + '</nav>') +
+      (u.runner && !u.paused || u.curriculumView ? '' : '<nav class="ch-tabs" role="tablist">' + [['tugas', t('umum.tugas', 'Tugas'), pend.length], ['papan', t('kelas.papan-kelas', 'Papan'), 0], ['progres', t('kelas.tab-progres', 'Progres'), 0], ['kelas', WM, 0]].map(function (t) { return '<button type="button" role="tab" class="ch-tab' + (u.tab === t[0] && !u.review ? ' is-active' : '') + '" data-ch="tab" data-tab="' + t[0] + '" data-testid="class-tab-' + t[0] + '">' + t[1] + (t[2] ? '<span class="ch-badge">' + t[2] + '</span>' : '') + '</button>'; }).join('') + '</nav>') +
       body + '</section>';
     if (activeSaved) {
       try {
@@ -1000,6 +1015,14 @@
           '<p class="ch-muted ch-small">' + esc(t('kelas.misi-belajar-desc', 'Alur belajar adaptif berbasis capaian pembelajaran: tujuan jelas, diagnosis otomatis, dan bukti penguasaan materi.')) + '</p>' +
         '</div>' +
       '</div>' +
+      (misiAdaptifSiap()
+        ? '<a class="ch-card ch-link-card ch-adaptive-door" href="./misi.html" data-testid="class-adaptive-mission-door">' +
+            '<span class="ch-link-icon">' + icon('sparkles') + '</span>' +
+            '<div><b>' + esc(t('kelas.misi-adaptif-judul', 'Misi Belajar Adaptif')) + '</b>' +
+            '<small>' + esc(t('kelas.misi-adaptif-sub', 'Jalur yang menyesuaikan diri: pemanasan, contoh, latihan, lalu tantangan — dengan petunjuk saat kamu tersendat dan pengulangan terjadwal supaya tidak cepat lupa.')) + '</small></div>' +
+            icon('arrow-up-right') +
+          '</a>'
+        : '') +
       '<div class="ch-missions-list" data-testid="class-missions-list">' +
         missionsHtml +
       '</div>' +

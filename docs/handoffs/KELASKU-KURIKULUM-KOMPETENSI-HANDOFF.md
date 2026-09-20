@@ -14,7 +14,7 @@ mengikuti lima gelombang di laporan audit.
 | Gelombang | Isi | Keadaan |
 |---|---|---|
 | **1 — kejujuran layar** | K1, K2, K4, K8, K9, K14, G5, F5 (jalan cepat) | **SELESAI** · `m025-349` |
-| **2 — pintu** | X2, X3, K10, G1 | belum |
+| **2 — pintu** | X2, X3, K10, G1 | **SELESAI** · `m025-349` |
 | **3 — satu buku kompetensi** | X4, X5, F1 | belum |
 | **4 — alat, bukan rapor** | F3, F4, F6, K3, K5, K6, K11, K13 | belum |
 | **5 — jangkauan** | A1–A5, G2–G4, G6–G10, K12, F7–F10 | belum |
@@ -57,19 +57,29 @@ program ini dimulai.
 7. **Setiap naskah lahir dwibahasa.** Berlaku penuh di program ini; lihat CLAUDE.md dan
    `docs/handoffs/I18N-TH-PARITY-HANDOFF.md`.
 
+8. **Pintu digantung pada ALAMAT BACKEND, bukan pada bendera atau pada
+   `kurikulumTersedia()`.** `kurikulum.html` dan `misi.html` dua-duanya mati tanpa backend;
+   `kurikulumTersedia()` juga benar ketika hanya modul lokal yang ada, jadi memakainya
+   sebagai syarat mengembalikan bug m025-296 — guru menekan tautan lalu menemukan halaman
+   mati. Syarat yang benar: `konsolKurikulumSiap()` / `misiAdaptifSiap()`.
+
+9. **Konsol guru memotret-lalu-memulihkan isian saat mengecat ulang.** `render()` menulis
+   ulang `app.innerHTML` seutuhnya dan dipanggil dari setiap permintaan latar yang selesai.
+   `potretIsian()`/`pulihkanIsian()` adalah yang membuat kotak "Tempel Banyak Soal" aman.
+   Menghapusnya mengembalikan G1.
+
 ## Langkah berikutnya (roadmap)
 
-Gelombang 2 — **pintu**, dan alasannya: fitur yang sudah selesai tetapi tidak bisa dibuka
-adalah nilai yang sudah dibayar dan belum diambil.
+Gelombang 3 — **satu buku kompetensi**. Terberat, dan prasyarat semua yang bermakna di
+Gelombang 4.
 
-- **X2** — `kurikulum.html` (konsol Kurikulum & Kompetensi) tidak punya satu pun tautan dari
-  produk; satu-satunya yang ada menunjuk dari layar **murid**. Pintunya pernah sengaja
-  ditutup saat backend 404 (7 Sep 2026, `fiezel-ux-flags.js`), tetapi alamatnya kini terisi.
-- **X3** — `misi.html` (mesin misi adaptif) hanya ditautkan dari konsol **guru**.
-- **K10** — `progresView()` di `fiezel-class-hub.js` tidak punya tab yang membukanya.
-- **G1** — `render()` di `teacher-console.js` mengecat ulang seluruh `app.innerHTML`, jadi
-  isian guru hilang saat permintaan latar selesai. Membuka pintu ke konsol yang menghapus
-  ketikan gurunya adalah urutan yang salah; G1 dikerjakan bersama X2.
+- **X4** — paspor murid hidup di localStorage, cakupan guru hidup di server, dan keduanya
+  tidak pernah bertemu. Kuis yang guru terbitkan dari konsol tidak pernah mendarat di tab
+  Tugas KelasKu: penulis `fiezel-learner-assignments-v1` di seluruh repo hanya
+  `fiezel-teacher-store.js` dan `fiezel-tutor-action-center.js`, tak satu pun dari jalur
+  kurikulum.
+- **X5** — misi mandiri murid dilaporkan ke guru sebagai "Tugas dari guru", dengan "guru"
+  bernama *Kurikulum Merdeka · English* yang tidak ada.
+- **F1** — satu sumber kebenaran penguasaan yang dibaca keempat permukaan.
 
-Sesudahnya Gelombang 3 (satu buku kompetensi) adalah pekerjaan terberat dan prasyarat semua
-yang bermakna di Gelombang 4.
+Sesudahnya Gelombang 4 (alat, bukan rapor) dan Gelombang 5 (jangkauan).

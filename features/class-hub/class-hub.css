@@ -597,6 +597,14 @@ body.reduce-motion .ch-student,body.reduce-motion .ch-body,body.reduce-motion .c
   color: var(--ch-muted);
   font-weight: 600;
 }
+/* Pintu ke misi adaptif (misi.html). Ia MENINGGALKAN halaman ini, jadi ia tidak boleh
+   menyamar sebagai tab: diberi aksen kiri supaya terbaca sebagai jalan keluar, bukan
+   sebagai salah satu kartu misi di bawahnya. (m025-349, temuan X3.) */
+.ch-adaptive-door {
+  border-left: 3px solid var(--ch-accent);
+  margin-bottom: 14px;
+}
+
 /* Ruang lingkup kartu kurikulum: ikon sebaris dengan teksnya, tanpa menaikkan tinggi baris. */
 .ch-curriculum-scope {
   display: flex;
