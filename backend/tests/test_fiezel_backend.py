@@ -294,6 +294,54 @@ class TestLearningEvents:
         assert r.status_code == 400, r.text
 
 
+# ---------- offline batch (F9 fase 2: paparan, bukan penguasaan) ----------
+
+class TestOfflineBatch:
+    def _batch(self, student, attempts):
+        return student["session"].post(f"{BASE}/api/learning/offline-batch",
+                                       json={"attempts": attempts}, timeout=60)
+
+    def _one(self, **kw):
+        import offline_static_map as m
+        samb = next(iter(m.STATIC_COMPETENCY))
+        d = {"event_id": "qa-off-" + uuid.uuid4().hex[:12],
+             "static_item_id": samb, "unit_id": "qa-unit",
+             "client_correct": True, "at": "2026-09-20T10:00:00Z"}
+        d.update(kw)
+        return d
+
+    def test_teacher_forbidden_403(self, teacher):
+        r = teacher.post(f"{BASE}/api/learning/offline-batch",
+                         json={"attempts": []}, timeout=30)
+        assert r.status_code == 403, r.text
+
+    def test_malformed_rejected_400(self, student):
+        r = self._batch(student, [self._one(event_id="x")])
+        assert r.status_code == 400, r.text
+        r = self._batch(student, [self._one(at="2999-01-01T00:00:00Z")])
+        assert r.status_code == 400, r.text
+
+    def test_stored_idempotent_and_no_mastery(self, student):
+        a = self._one()
+        r = self._batch(student, [a])
+        assert r.status_code == 200, r.text
+        j = r.json()
+        assert j["stored"] == 1 and j["exposed"] == 1, j
+        r2 = self._batch(student, [a])
+        assert r2.json()["duplicates"] == 1 and r2.json()["stored"] == 0, r2.text
+        # klaim benar 100% dari klien TIDAK boleh menggerakkan penguasaan
+        p = student["session"].get(f"{BASE}/api/braincore/passport/{student['user_id']}",
+                                   timeout=30)
+        assert p.status_code == 200, p.text
+        assert p.json()["totals"]["mastered"] == 0, p.text
+
+    def test_unmapped_recorded_without_competency(self, student):
+        r = self._batch(student, [self._one(static_item_id="qa-tidak-ada-di-peta")])
+        assert r.status_code == 200, r.text
+        j = r.json()
+        assert j["stored"] == 1 and j["unmapped"] == 1 and j["exposed"] == 0, j
+
+
 # ---------- migration idempotency ----------
 
 class TestMigration:

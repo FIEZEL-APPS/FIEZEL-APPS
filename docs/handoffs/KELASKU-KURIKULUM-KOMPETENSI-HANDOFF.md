@@ -17,7 +17,7 @@ mengikuti lima gelombang di laporan audit.
 | **2 — pintu** | X2, X3, K10, G1 | **SELESAI** · `m025-349` |
 | **3 — satu buku kompetensi** | X4, X5, F1 (sebagian) | **SELESAI** · `m025-349` |
 | **4 — alat, bukan rapor** | F3, F4, F6, K3, K5, K6, K11, K13 | **SELESAI** · `m025-349` |
-| **5 — jangkauan** | A1–A5, G2–G4, G6–G10, K12, F7, F8, F10, F9 | **SELESAI** · build `m025-354` (seluruh butir gelombang + 4 gerbang baru terdaftar di CI) |
+| **5 — jangkauan** | A1–A5, G2–G4, G6–G10, K12, F7, F8, F10, F9 | **SELESAI** · build `m025-355` (seluruh butir gelombang + 5 gerbang baru terdaftar di CI) |
 
 Di luar gelombang, sudah mendarat di program yang sama:
 `tests/modal-assign-teacher-ux-test.js` didaftarkan di `quality.yml`, dan 32 kunci hantu
@@ -158,6 +158,15 @@ idempoten (event_id stabil, payload bertanda offline:true) yang terkirim otomati
 online/kembali-sinyal/tombol; layar menyatakan antrean belum masuk bukti penguasaan
 (penguasaan tetap dihitung server — fase 2). 21 kunci `luring-*`/`antre-*` dwibahasa;
 gerbang `tests/kurikulum-luring-test.js` (8 asersi) terdaftar di `quality.yml`.
+
+Status `m025-355`: **F9 fase 2 selesai** — `POST /api/learning/offline-batch`: validasi ketat
+(200/batch, event_id + cap waktu waras), hanya murid pemilik tiket (guru 403), kompetensi
+dipetakan server via `backend/offline_static_map.py` (31/214 kecocokan prompt EKSak,
+generator `tools/build-offline-map.mjs`), `bc.mark_exposure` untuk yang terpetakan,
+skor klien disimpan berlabel `client_correct` dan TIDAK PERNAH menyentuh
+grade/diagnose/apply_attempt (dikunci gerbang + 4 pytest backend: 403, 400, idempoten,
+tanpa-gerakan-mastery, unmapped-terekam). Klien mengirim batch dulu, jatuh ke `/events`
+warisan bila backend tua (404). 4 gerbang luring terdaftar di `quality.yml`.
 
 Status build `m025-352`: **F8+F10 selesai sepaket** — tab Wali Kelas (`vWali`: agregat
 `/coverage` per subject_id untuk 21 pilihan mapel nyata, antrean berbatas 4 dengan

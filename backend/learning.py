@@ -4,7 +4,7 @@ hint, retry, evidence, mastery, retensi, transfer. Termasuk telemetry idempoten.
 import re
 import uuid
 import hashlib
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 from typing import Any
 
 from fastapi import APIRouter, Depends, HTTPException
@@ -64,6 +64,98 @@ class EventIn(BaseModel):
 @router.post("/events")
 async def post_event(body: EventIn, u=Depends(current_user)):
     return await record_event(body.type, u["user_id"], body.payload, body.event_id)
+
+
+try:
+    from offline_static_map import STATIC_COMPETENCY
+except ImportError:  # dijalankan sebagai paket backend.*
+    try:
+        from backend.offline_static_map import STATIC_COMPETENCY
+    except ImportError:
+        STATIC_COMPETENCY = {}
+
+
+class OfflineAttemptIn(BaseModel):
+    event_id: str
+    static_item_id: str
+    unit_id: str | None = None
+    subchapter_id: str | None = None
+    client_correct: bool = False
+    at: str = ""
+
+
+class OfflineBatchIn(BaseModel):
+    attempts: list[OfflineAttemptIn] = Field(default_factory=list)
+
+
+def _parse_at(v: str):
+    try:
+        d = datetime.fromisoformat(str(v).replace("Z", "+00:00"))
+        if d.tzinfo is None:
+            d = d.replace(tzinfo=timezone.utc)
+        return d
+    except (ValueError, TypeError):
+        return None
+
+
+@router.post("/offline-batch")
+async def offline_batch(body: OfflineBatchIn, u=Depends(current_user)):
+    """F9 fase 2: bukti luring = PAPARAN + AKTIVITAS, bukan penguasaan.
+
+    Kontrak yang dikunci di sini (dan diuji):
+    - skor klien TIDAK PERNAH dinilai/diagnois/diterapkan ke mastery; ia disimpan
+      apa adanya berlabel client_correct supaya guru bisa membacanya sebagai klaim,
+      bukan fakta. Kunci jawaban ikut terkirim dalam bundle offline, jadi bukti
+      luring pada dasarnya bisa di-game — menggerakkannya ke mastery berarti
+      memberi nilai pada contekan.
+    - bukti yang terpetakan ke kompetensi (peta eksak) menandai exposure lewat
+      bc.mark_exposure — fungsi yang SAMA dipakai sesi online saat mulai; yang
+      tak terpetakan tetap terrekam sebagai aktivitas tanpa kompetensi.
+    - idempoten per event_id: kirim ulang tidak double-count.
+    - hanya murid pemilik tiket yang boleh mengirim untuk dirinya sendiri.
+    """
+    if u["role"] != "student":
+        raise HTTPException(403, "Batch luring hanya untuk murid pemilik tiket")
+    sid = u["user_id"]
+    items = body.attempts or []
+    if len(items) > 200:
+        raise HTTPException(400, "Maksimal 200 butir per batch")
+    sekarang = now()
+    for n, a in enumerate(items):
+        if not (isinstance(a.event_id, str) and 8 <= len(a.event_id) <= 120):
+            raise HTTPException(400, f"Butir {n}: event_id tidak sah")
+        if not (isinstance(a.static_item_id, str) and 1 <= len(a.static_item_id) <= 80):
+            raise HTTPException(400, f"Butir {n}: static_item_id tidak sah")
+        d = _parse_at(a.at)
+        if not d:
+            raise HTTPException(400, f"Butir {n}: cap waktu tidak sah")
+        if d > sekarang + timedelta(minutes=5):
+            raise HTTPException(400, f"Butir {n}: cap waktu di masa depan")
+        if (sekarang - d).days > 60:
+            raise HTTPException(400, f"Butir {n}: bukti lebih tua dari 60 hari")
+    hasil, terpapar, tanpa_peta = [], 0, 0
+    for a in items:
+        cid = STATIC_COMPETENCY.get(a.static_item_id)
+        tp = None
+        if cid:
+            comp = await db.curriculum_nodes.find_one({"id": cid}, {"_id": 0, "tp_id": 1})
+            tp = (comp or {}).get("tp_id")
+        ev = await record_event("question_answered", sid, {
+            "question_id": a.static_item_id, "unit_id": a.unit_id,
+            "subchapter_id": a.subchapter_id, "competency_id": cid,
+            "client_correct": bool(a.client_correct), "offline": True, "at": a.at,
+        }, a.event_id)
+        status = "stored" if ev.get("stored") else "duplicate"
+        if ev.get("stored") and cid:
+            await bc.mark_exposure(sid, cid, tp)
+            terpapar += 1
+        if not cid:
+            tanpa_peta += 1
+        hasil.append({"event_id": a.event_id, "status": status,
+                      "competency_id": cid})
+    disimpan = sum(1 for r in hasil if r["status"] == "stored")
+    return {"stored": disimpan, "duplicates": len(hasil) - disimpan,
+            "exposed": terpapar, "unmapped": tanpa_peta, "results": hasil}
 
 
 @router.get("/events")
