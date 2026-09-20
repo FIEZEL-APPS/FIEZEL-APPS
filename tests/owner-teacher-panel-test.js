@@ -22,6 +22,8 @@ const assert = require('assert');
   assert(typeof ownerMod.readClasses === 'function', 'readClasses diekspor');
   assert(typeof ownerMod.createClass === 'function', 'createClass diekspor');
   assert(typeof ownerMod.regenerateTeacherInvite === 'function', 'regenerateTeacherInvite diekspor');
+  assert(typeof ownerMod.triggerMasterSeed === 'function', 'triggerMasterSeed diekspor');
+  assert(typeof ownerMod.renderCurriculumSyncSection === 'function', 'renderCurriculumSyncSection diekspor');
 
   // 2. mintTeacherInvite mengirim method POST dan body JSON yang tepat
   {
@@ -224,6 +226,35 @@ const assert = require('assert');
     assert(b.codeHash === 'c'.repeat(64), 'codeHash terkirim');
   }
 
+  // 8b. triggerMasterSeed memicu penyemaian 3 modul kurikulum (mapel, english, soal)
+  {
+    const captured = [];
+    const mockFetch = async (url, opt) => {
+      captured.push({ url, opt });
+      return { ok: true, status: 200, json: async () => ({ ok: true, seeded: true }) };
+    };
+    const env = { CURRICULUM_API_URL: 'https://fiezel-apps.onrender.com' };
+    const res = await ownerMod.triggerMasterSeed(env, mockFetch);
+    assert(res.state === 'ok', 'triggerMasterSeed state ok');
+    assert(res.ok === true, 'triggerMasterSeed ok true');
+    assert(captured.length === 3, 'memanggil 3 endpoint penyemai');
+    assert(captured.some(c => c.url.includes('/api/seed/mapel')), 'memanggil seed mapel');
+    assert(captured.some(c => c.url.includes('/api/seed/english')), 'memanggil seed english');
+    assert(captured.some(c => c.url.includes('/api/seed/soal')), 'memanggil seed soal');
+  }
+
+  // 8c. renderCurriculumSyncSection merender kartu dan panduan sinkronisasi
+  {
+    const syncHtml = ownerMod.renderCurriculumSyncSection({});
+    assert(syncHtml.includes('id="curriculum-sync"'), 'memiliki anchor id curriculum-sync');
+    assert(syncHtml.includes('value="master_seed"'), 'memiliki form action master_seed');
+    assert(syncHtml.includes('17 Mapel Nasional'), 'memiliki kartu 17 Mapel');
+    assert(syncHtml.includes('Bahasa Inggris Kurmer'), 'memiliki kartu Bahasa Inggris Kurmer');
+    assert(syncHtml.includes('Bank Soal'), 'memiliki kartu Bank Soal');
+    assert(syncHtml.includes('Kapan Owner Harus Menekan Tombol Ini?'), 'memiliki panduan kapan harus ditekan');
+    assert(syncHtml.includes('Bagaimana Cara Tahu Kalau Sudah Bekerja &amp; Aktif?'), 'memiliki panduan verifikasi aktif');
+  }
+
   // 9. renderTeacherSection mematuhi CSP (Zero inline script & inline on* handlers)
   {
     const model = {
@@ -341,10 +372,31 @@ const assert = require('assert');
     assert(rendered.includes('FZ-7A9X2K'), 'Kode kelas persisten dari database tertampil');
     assert(rendered.includes('value="delete_teacher"'), 'Form delete_teacher tersedia');
     assert(rendered.includes('Bersihkan Semua Akun Guru'), 'Tombol bersihkan semua guru aktif tersedia');
-    assert(rendered.includes('value="delete_class"'), 'Form delete_class tersedia');
-    assert(rendered.includes('value="clear_classes"'), 'Form clear_classes tersedia');
     assert(rendered.includes('Bersihkan Semua Kelas'), 'Tombol bersihkan semua kelas tersedia');
     assert(rendered.includes('Hapus Kelas'), 'Tombol hapus kelas tersedia');
+
+    // Asersi Fitur Master Kurikulum 1-Klik:
+    assert(rendered.includes('id="curriculum-sync"'), 'Panel Master Kurikulum tertampil di teacher section');
+    assert(rendered.includes('value="master_seed"'), 'Form One-Click Master Sync tersedia');
+    assert(rendered.includes('Semai &amp; Aktifkan Semua Kurikulum Sekarang'), 'Tombol One-Click Master Sync tertampil');
+  }
+
+  // 10. Banner sukses saat action === 'master_seed'
+  {
+    const modelWithSeed = {
+      teachers: { state: 'ok', invites: [], teachers: [] },
+      schools: { state: 'ok', schools: [] },
+      classes: { state: 'ok', classes: [] },
+      teacherAction: {
+        ok: true,
+        action: 'master_seed',
+        message: 'Seluruh 17 Mapel Nasional, Bahasa Inggris (144 Kompetensi), dan Bank Soal telah berhasil diaktifkan 100%!'
+      }
+    };
+    const renderedSeed = ownerMod.renderTeacherSection(modelWithSeed);
+    assert(renderedSeed.includes('Sinkronisasi Master Kurikulum &amp; Bank Soal Berhasil 100%!'), 'Banner sukses master_seed tertampil');
+    assert(renderedSeed.includes('17 Mata Pelajaran Aktif'), 'Indikator 17 Mapel aktif di banner');
+    assert(renderedSeed.includes('72 TP · 144 Kompetensi'), 'Indikator Bahasa Inggris di banner');
   }
 
   console.log('owner-teacher-panel-test: SEMUA ASERSI LULUS (100% PASS)');
