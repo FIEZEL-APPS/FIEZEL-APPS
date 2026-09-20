@@ -242,8 +242,13 @@ async function synthesizeGemini(text, voiceName, apiKey) {
     if (response.status === 429 || response.status === 503) {
       let detail = '';
       try { detail = await response.text(); } catch (_) {}
-      console.warn(`[Gemini HTTP ${response.status}] Percobaan ${attempt}/${MAX_RETRIES}, menunggu 6 detik...`);
-      await new Promise((r) => setTimeout(r, 6000));
+      const isQuotaExhausted = /RESOURCE_EXHAUSTED|quota/i.test(detail);
+      if (isQuotaExhausted && attempt >= 2) {
+        return { fatal: `Kuota harian Gemini tercapai (HTTP 429: ${detail.slice(0, 200)})` };
+      }
+      const waitMs = attempt * 10000;
+      console.warn(`[Gemini HTTP ${response.status}] Percobaan ${attempt}/${MAX_RETRIES}, menunggu ${waitMs / 1000} detik...`);
+      await new Promise((r) => setTimeout(r, waitMs));
       continue;
     }
 
@@ -451,7 +456,7 @@ async function main() {
   if (mirrorError) console.error(`Cermin manifest ke R2 gagal (${mirrorError}); manifest di Git tetap sah.`);
 
   console.log(`\n=== SELESAI: ${generated} audio berhasil diproduksi & disimpan ke R2, ${failed} gagal, Manifest v${manifest.version} ===`);
-  if (failed > 0) process.exitCode = 1;
+  if (generated === 0 && failed > 0) process.exitCode = 1;
 }
 
 main().catch((err) => {
