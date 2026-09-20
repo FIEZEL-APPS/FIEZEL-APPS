@@ -260,6 +260,7 @@
     'kurikulum.grp-title': "Bentuk kelompok otomatis berdasarkan penguasaan materi",
     'kurikulum.bp-adv-toggle': "Pengaturan Kesulitan & Soal Cerita (Opsional)",
     'kurikulum.kode-kelas-label': "Kode kelas: ",
-    'kurikulum.kode-kelas-sub': "berikan kode ini saat murid bergabung."
+    'kurikulum.kode-kelas-sub': "berikan kode ini saat murid bergabung.",
+    'kurikulum.server-wakeup': "Menghubungkan ke server kurikulum... (proses wake-up butuh beberapa detik)"
   });
 })();
