@@ -937,9 +937,53 @@ async function triggerMasterSeed(env, fetchImpl) {
     };
   }
 
+  const num = (v) => {
+    const n = Number(v);
+    return Number.isFinite(n) ? n : -1;
+  };
+  const countsText = (soalBody) => {
+    if (!soalBody) return 'hitungan backend belum terbaca';
+    const dari = num(soalBody.from_this_seeder);
+    const berisi = num(soalBody.competencies_with_questions);
+    return (dari >= 0 ? dari + ' soal dari penyemai' : 'jumlah soal belum terbaca') +
+      (berisi >= 0 ? ' (' + berisi + ' kompetensi berisi)' : '');
+  };
+
+  // 1. Baca status dulu — backend MENOLAK POST anonim (401), jadi keputusan jujur
+  //    diambil dari data, bukan dari asumsi. Timeout status 6 dtk + POST 20 dtk menjaga
+  //    total di bawah batas wall-clock Worker.
+  const status = await readCurriculumStatus(env, doFetch, 6000);
+  const soalBody = status.soal && status.soal.ok ? status.soal.body : null;
+  const mapelBody = status.mapel && status.mapel.ok ? status.mapel.body : null;
+  const englishBody = status.english && status.english.ok ? status.english.body : null;
+
+  const waveTotal = num(soalBody && soalBody.in_this_wave);
+  const waveSeeded = num(soalBody && soalBody.from_this_seeder);
+  const soalNeeds = !(soalBody && waveTotal > 0 && waveSeeded >= waveTotal);
+  const mapelNeeds = !(mapelBody && mapelBody.seeded === true);
+  const englishNeeds = !(englishBody && englishBody.seeded === true);
+
+  // 2. Sudah penuh → hijau jujur TANPA POST (POST anonim pasti 401; menembakkannya
+  //    hanya menghasilkan kegaduhan jujur tanpa gunanya).
+  if (!soalNeeds && !mapelNeeds && !englishNeeds) {
+    return {
+      state: 'ok',
+      ok: true,
+      skipped: true,
+      message: 'Bank kurikulum sudah tersemai penuh dan aktif — ' + countsText(soalBody) + '. Tidak ada penyemaian ulang yang diperlukan; data kelas dan akun guru tidak diubah.',
+      details: {
+        mapel: { ok: true, skipped: true },
+        english: { ok: true, skipped: true },
+        soal: { ok: true, skipped: true }
+      },
+      status
+    };
+  }
+
+  // 3. Ada yang kurang → coba semai endpoint yang kurang saja (25 dtk → 20 dtk).
   const controller = typeof AbortController !== 'undefined' ? new AbortController() : null;
-  // Render spin-down/cold-start butuh >6 detik; Worker Cloudflare maks 30 detik jadi 25 detik aman.
-  const timeoutId = controller ? setTimeout(() => controller.abort(), 25000) : null;
+  // Render spin-down/cold-start butuh >6 detik; 6 dtk status + 20 dtk POST aman di wall-clock Worker.
+  const timeoutId = controller ? setTimeout(() => controller.abort(), 20000) : null;
   const opt = {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -947,14 +991,15 @@ async function triggerMasterSeed(env, fetchImpl) {
     signal: controller ? controller.signal : undefined
   };
 
+  const targets = [];
+  if (mapelNeeds) targets.push(['mapel', base + '/api/seed/mapel']);
+  if (englishNeeds) targets.push(['english', base + '/api/seed/english']);
+  if (soalNeeds) targets.push(['soal', base + '/api/seed/soal']);
+
   let settled;
   try {
-    // Kirim sinyal penyemaian ke endpoint kurikulum (17 mapel, bahasa inggris, dan bank soal)
-    settled = await Promise.allSettled([
-      doFetch(base + '/api/seed/mapel', opt),
-      doFetch(base + '/api/seed/english', opt),
-      doFetch(base + '/api/seed/soal', opt)
-    ]);
+    // Kirim sinyal penyemaian hanya ke endpoint yang statusnya kurang.
+    settled = await Promise.allSettled(targets.map(([, url]) => doFetch(url, opt)));
   } catch (e) {
     if (timeoutId) clearTimeout(timeoutId);
     const aborted = e && (e.name === 'AbortError' || /abort/i.test(String((e && e.message) || '')));
@@ -963,31 +1008,35 @@ async function triggerMasterSeed(env, fetchImpl) {
       ok: true,
       pending: true,
       message: aborted
-        ? 'Sinyal sinkronisasi terkirim ke backend, sedang proses penyemaian di background (timeout 25 detik, Render cold-start). Muat ulang 1-2 menit untuk melihat hitungan riil.'
+        ? 'Sinyal sinkronisasi terkirim ke backend, sedang proses penyemaian di background (timeout 20 detik, Render cold-start). Muat ulang 1-2 menit untuk melihat hitungan riil.'
         : 'Sinyal sinkronisasi terkirim ke backend, sedang proses penyemaian di background. Gagal baca respons cepat: ' + String((e && e.message) || e),
-      error: String((e && e.message) || e)
+      error: String((e && e.message) || e),
+      status
     };
   }
   if (timeoutId) clearTimeout(timeoutId);
 
-  const names = ['mapel', 'english', 'soal'];
   const details = {};
   let okCount = 0;
   let abortCount = 0;
+  let authCount = 0;
   for (let i = 0; i < settled.length; i++) {
     const r = settled[i];
-    const key = names[i] || ('endpoint_' + i);
+    const key = (targets[i] && targets[i][0]) || ('endpoint_' + i);
     if (r.status === 'fulfilled') {
       const resp = r.value || {};
-      const ok = resp.ok !== false && Number(resp.status || 200) < 500;
+      const st = Number(resp.status || 200);
+      const locked = st === 401 || st === 403;
+      const ok = resp.ok !== false && st < 500 && !locked;
       // Coba baca body JSON tanpa menggagalkan bila backend masih streaming/cold-start.
       let body = null;
       try {
         if (resp && typeof resp.json === 'function') body = await resp.json();
         else if (typeof resp === 'object') body = resp;
       } catch (_) { body = null; }
-      details[key] = { ok, status: Number(resp.status || (ok ? 200 : 500)), body };
+      details[key] = { ok, status: st, locked, body };
       if (ok) okCount++;
+      if (locked) authCount++;
     } else {
       const reason = r.reason || {};
       const aborted = reason && (reason.name === 'AbortError' || /abort/i.test(String(reason.message || reason)));
@@ -1001,7 +1050,20 @@ async function triggerMasterSeed(env, fetchImpl) {
       state: 'ok',
       ok: true,
       message: 'Seluruh 17 Mapel Nasional (Fase A–F), Kurikulum Bahasa Inggris (144 Kompetensi), dan Bank Soal telah berhasil disinkronkan dan diaktifkan 100%! Seluruh akun guru di KelasKu kini dapat langsung mengakses Bab Buku Ajar dan Bank Soal.',
-      details
+      details,
+      status
+    };
+  }
+  // Backend menolak pemicu anonim (401/403): ini PENGAMAN yang benar, bukan kerusakan.
+  // Data yang sudah tersemai tetap aktif — pesannya wajib berkata begitu.
+  if (authCount > 0 && okCount === 0) {
+    return {
+      state: 'auth',
+      ok: false,
+      message: 'Backend menolak pemicu penyemaian anonim (HTTP 401/403) — ini pengaman yang benar, bukan kerusakan. Data yang sudah tersemai tetap aktif (' + countsText(soalBody) + '). Untuk menyemai yang kurang: login sebagai guru/owner di backend lalu panggil POST /api/seed/mapel, /english, /soal; atau minta pengembang memasang kunci pemicu server-ke-server.',
+      details,
+      error: 'seed_auth_required',
+      status
     };
   }
   if (abortCount > 0 || okCount > 0) {
@@ -1010,7 +1072,8 @@ async function triggerMasterSeed(env, fetchImpl) {
       ok: true,
       pending: true,
       message: 'Sinyal sinkronisasi terkirim ke backend, sedang proses penyemaian di background (' + okCount + '/' + settled.length + ' endpoint menjawab cepat, Render mungkin cold-start). Muat ulang 1-2 menit untuk hitungan riil jumlah soal dan kompetensi.',
-      details
+      details,
+      status
     };
   }
   return {
@@ -1018,7 +1081,8 @@ async function triggerMasterSeed(env, fetchImpl) {
     ok: false,
     message: 'Gagal menghubungi backend penyemaian (0/' + settled.length + ' endpoint menjawab). Periksa CURRICULUM_API_URL dan status Render, lalu coba lagi.',
     details,
-    error: 'all_endpoints_failed'
+    error: 'all_endpoints_failed',
+    status
   };
 }
 
@@ -1027,14 +1091,15 @@ async function triggerMasterSeed(env, fetchImpl) {
  * Dipakai panel ringkasan Owner agar tidak menampilkan angka statis.
  * Selalu resolve (tidak pernah throw); tiap endpoint 8 detik, allSettled.
  */
-async function readCurriculumStatus(env, fetchImpl) {
+async function readCurriculumStatus(env, fetchImpl, timeoutMs) {
   const base = (env && typeof env.CURRICULUM_API_URL === 'string' && env.CURRICULUM_API_URL.trim().replace(/\/+$/, '')) || 'https://fiezel-apps.onrender.com';
   const doFetch = typeof fetchImpl === 'function' ? fetchImpl : (typeof fetch === 'function' ? fetch : (typeof globalThis !== 'undefined' && globalThis.fetch ? globalThis.fetch : null));
   const empty = { state: 'unknown', mapel: null, english: null, soal: null };
   if (!doFetch) return empty;
+  const budget = Number(timeoutMs) > 0 ? Number(timeoutMs) : 8000;
   const getOne = async (path) => {
     const controller = typeof AbortController !== 'undefined' ? new AbortController() : null;
-    const timeoutId = controller ? setTimeout(() => controller.abort(), 8000) : null;
+    const timeoutId = controller ? setTimeout(() => controller.abort(), budget) : null;
     try {
       const resp = await doFetch(base + path, { method: 'GET', signal: controller ? controller.signal : undefined });
       if (timeoutId) clearTimeout(timeoutId);
@@ -3148,6 +3213,14 @@ function renderTeacherSection(m) {
           <div style="font-size:16px;font-weight:700;color:var(--text-main);margin-bottom:8px;display:flex;align-items:center;gap:8px;">⏳ Sinyal sinkronisasi terkirim ke backend, sedang proses penyemaian di background${esc(det)}</div>
           <div style="font-size:13.5px;color:var(--text-muted);margin-bottom:12px;line-height:1.6;">${esc(action.message)}</div>
           <div style="font-size:12.5px;color:var(--text-muted);">Render cold-start 30-60 detik. Muat ulang 1-2 menit untuk melihat hitungan riil jumlah soal dan kompetensi per mapel. Bank offline KelasKu (20 bab, 155 soal) tetap bisa dipakai guru tanpa menunggu backend.</div>
+        </div>
+      `;
+    } else if (action.action === 'master_seed' && action.state === 'auth') {
+      alertBanner = `
+        <div style="background:var(--card-bg);border:1px solid var(--brand-gold);border-left:4px solid var(--brand-gold);border-radius:var(--radius-lg);padding:20px;margin-bottom:20px;box-shadow:var(--shadow-sm);">
+          <div style="font-size:16px;font-weight:700;color:var(--text-main);margin-bottom:8px;display:flex;align-items:center;gap:8px;">🔒 Pemicu anonim ditolak backend — data yang sudah ada tetap aktif</div>
+          <div style="font-size:13.5px;color:var(--text-muted);margin-bottom:12px;line-height:1.6;">${esc(action.message)}</div>
+          <div style="font-size:12.5px;color:var(--text-muted);">Penolakan 401/403 adalah pengaman yang benar, bukan kerusakan. Bank offline KelasKu (23 bab, 214 soal) tetap bisa dipakai guru tanpa menunggu backend.</div>
         </div>
       `;
     } else if (action.action === 'master_seed' && action.ok) {
