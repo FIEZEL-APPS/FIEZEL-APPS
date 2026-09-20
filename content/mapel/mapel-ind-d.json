@@ -4,5 +4,756 @@
   "subjectName": "Bahasa Indonesia",
   "phase": "fase_d",
   "catatan": "Bank soal Fase D (SMP kelas 7-9) untuk jalur Kurikulum Nasional 17 Mapel di Ruang Guru. Satu kompetensi = satu BAB Buku Siswa Kemendikbudristek. Kunci jawaban selalu di indeks 0 pada berkas sumber; pengacakan opsi terjadi saat tugas diterbitkan.",
-  "competencies": []
+  "competencies": [
+    {
+      "code": "KOMP-IND-D-7-BAB1-01",
+      "grade": 7,
+      "semester": 1,
+      "name": "Jelajah Nusantara",
+      "materi": "Teks Deskripsi, Ciri Objek yang Dideskripsikan, Pengindraan dengan Pancaindra, Kata Konkret dan Kalimat Perincian, Majas Personifikasi",
+      "cpRef": "Kepmendikbudristek/BSKAP No. 032/H/KR/2024 — Buku Siswa Bahasa Indonesia Kelas 7 Bab 1",
+      "items": [
+        {
+          "id": "ind-d7-bab1-001",
+          "prompt": "Tujuan utama penulis menyusun teks deskripsi adalah…",
+          "options": [
+            "membuat pembaca seolah-olah melihat sendiri objek yang digambarkan",
+            "meyakinkan pembaca agar menerima pendapat penulis tentang suatu masalah",
+            "menjelaskan urutan langkah yang harus dikerjakan pembaca",
+            "melaporkan hasil pengamatan ilmiah dalam bentuk klasifikasi"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Teks deskripsi menggambarkan objek secara terperinci lewat pancaindra sehingga pembaca seakan-akan mengalami sendiri apa yang dilihat, didengar, atau dirasakan penulis."
+          },
+          "distractorWhy": {
+            "1": "Murid tertukar dengan teks persuasi atau argumentasi, yang memang bertujuan memengaruhi pendapat pembaca, bukan menggambarkan objek.",
+            "2": "Murid tertukar dengan teks prosedur, yang menyusun langkah berurutan agar pembaca dapat melakukan sesuatu.",
+            "3": "Murid tertukar dengan teks laporan hasil observasi, yang menyajikan objek secara umum dan diklasifikasikan, bukan secara sensoris dan personal."
+          },
+          "difficulty": "dasar"
+        },
+        {
+          "id": "ind-d7-bab1-002",
+          "prompt": "Kalimat berikut yang paling jelas memanfaatkan indra pendengaran adalah…",
+          "options": [
+            "Debur ombak Pantai Parangtritis terdengar bersahutan sepanjang sore.",
+            "Pasir Pantai Parangtritis terasa hangat ketika diinjak telapak kaki.",
+            "Langit di atas Pantai Parangtritis berwarna jingga kemerahan.",
+            "Udara Pantai Parangtritis berbau asin dan sedikit amis."
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Kata debur dan terdengar menunjuk pada bunyi, sehingga kalimat itu menggambarkan objek melalui indra pendengaran."
+          },
+          "distractorWhy": {
+            "1": "Kata terasa hangat berkaitan dengan indra peraba pada kulit, bukan dengan bunyi yang ditangkap telinga.",
+            "2": "Kata berwarna jingga kemerahan berkaitan dengan indra penglihatan, sehingga murid yang memilihnya menyamakan semua pencitraan dengan melihat.",
+            "3": "Kata berbau asin berkaitan dengan indra penciuman, bukan dengan suara."
+          },
+          "difficulty": "dasar"
+        },
+        {
+          "id": "ind-d7-bab1-003",
+          "prompt": "Struktur teks deskripsi secara berurutan terdiri atas…",
+          "options": [
+            "identifikasi, deskripsi bagian, lalu simpulan atau kesan",
+            "orientasi, komplikasi, lalu resolusi",
+            "tesis, rangkaian argumen, lalu penegasan ulang",
+            "tujuan, alat dan bahan, lalu langkah-langkah"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Teks deskripsi dibuka dengan identifikasi yang mengenalkan objek, dilanjutkan deskripsi bagian yang memerinci tiap sisi objek, lalu ditutup simpulan berisi kesan penulis."
+          },
+          "distractorWhy": {
+            "1": "Murid menyebut struktur teks narasi; komplikasi dan resolusi hanya muncul pada cerita yang punya konflik.",
+            "2": "Murid menyebut struktur teks eksposisi atau argumentasi yang berisi pendapat dan alasan, bukan gambaran objek.",
+            "3": "Murid menyebut struktur teks prosedur yang menuntun pembaca melakukan sesuatu."
+          },
+          "difficulty": "dasar"
+        },
+        {
+          "id": "ind-d7-bab1-004",
+          "prompt": "Kalimat \"Angin sore berbisik lembut di sela daun kelapa\" menggunakan majas…",
+          "options": [
+            "personifikasi, karena angin diberi sifat manusia yang dapat berbisik",
+            "hiperbola, karena angin digambarkan jauh lebih kuat daripada aslinya",
+            "metafora, karena angin dibandingkan langsung dengan benda lain",
+            "litotes, karena penulis merendahkan keadaan yang sebenarnya"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Personifikasi adalah majas yang memberikan sifat atau perbuatan manusia kepada benda bukan manusia; berbisik adalah perbuatan manusia yang di sini dikenakan pada angin."
+          },
+          "distractorWhy": {
+            "1": "Hiperbola melebih-lebihkan keadaan, sedangkan kalimat itu justru menggambarkan angin yang lembut, bukan yang berlebihan.",
+            "2": "Metafora menyamakan dua hal secara langsung tanpa kata pembanding; di kalimat itu tidak ada hal lain yang disamakan dengan angin.",
+            "3": "Litotes merendahkan diri atau keadaan demi kesopanan, sedangkan kalimat itu tidak merendahkan apa pun."
+          },
+          "difficulty": "dasar"
+        },
+        {
+          "id": "ind-d7-bab1-005",
+          "prompt": "Kalimat perincian yang paling tepat untuk memperjelas pernyataan \"Kamar Sinta rapi\" adalah…",
+          "options": [
+            "Buku tersusun menurut tinggi di rak, seprai terbentang tanpa kerut, dan lantai bebas dari sehelai pun kertas.",
+            "Kamar Sinta sangat rapi sekali sehingga siapa pun akan mengakuinya.",
+            "Sinta adalah anak yang rajin dan patut dicontoh teman-temannya.",
+            "Kamar Sinta berukuran tiga kali empat meter dan menghadap ke timur."
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Kalimat perincian membuktikan pernyataan umum dengan detail yang dapat diindra, dan susunan buku, seprai, serta lantai yang bersih adalah bukti konkret dari kata rapi."
+          },
+          "distractorWhy": {
+            "1": "Murid menambah kata penguat seperti sangat dan sekali dan mengira itu memerinci, padahal kata itu hanya mengulang penilaian tanpa menunjukkan bukti apa pun.",
+            "2": "Murid berpindah memerinci sifat orangnya, bukan keadaan kamarnya, sehingga pernyataan semula tetap tidak terbukti.",
+            "3": "Murid menyebut ukuran dan arah hadap kamar; data itu benar tetapi tidak berkaitan dengan rapi atau tidaknya kamar."
+          },
+          "difficulty": "sedang"
+        },
+        {
+          "id": "ind-d7-bab1-006",
+          "prompt": "Bagian identifikasi pada teks deskripsi tentang Danau Toba paling tepat berisi…",
+          "options": [
+            "pengenalan nama, letak, dan gambaran umum Danau Toba sebagai objek yang akan digambarkan",
+            "rincian warna air, suhu udara, dan suara perahu di tengah danau",
+            "ajakan kepada pembaca agar ikut menjaga kebersihan kawasan danau",
+            "urutan perjalanan naik bus dari Medan menuju Parapat"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Identifikasi berfungsi memperkenalkan objek secara umum, yaitu apa objeknya, di mana letaknya, dan gambaran menyeluruhnya, sebelum penulis masuk ke rincian tiap bagian."
+          },
+          "distractorWhy": {
+            "1": "Rincian warna, suhu, dan suara justru termasuk bagian deskripsi bagian yang muncul setelah objek diperkenalkan.",
+            "2": "Ajakan menjaga kebersihan adalah ciri teks persuasi dan tidak menjadi tugas bagian identifikasi.",
+            "3": "Urutan perjalanan termasuk teks narasi perjalanan, bukan pengenalan objek yang dideskripsikan."
+          },
+          "difficulty": "sedang"
+        },
+        {
+          "id": "ind-d7-bab1-007",
+          "prompt": "Kata yang paling konkret untuk menggantikan kata bercetak miring pada kalimat \"Pasar Beringharjo terasa ramai\" adalah…",
+          "options": [
+            "berdesakan, karena menunjukkan keadaan yang dapat dilihat langsung",
+            "menyenangkan, karena menggambarkan perasaan pengunjung pasar",
+            "istimewa, karena menegaskan bahwa pasar itu tidak biasa",
+            "terkenal, karena banyak orang mengetahui nama pasar itu"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Kata konkret menunjuk keadaan yang dapat ditangkap pancaindra, dan berdesakan memperlihatkan tubuh orang yang rapat sehingga pembaca dapat membayangkannya."
+          },
+          "distractorWhy": {
+            "1": "Murid memilih kata yang justru abstrak karena menyatakan perasaan, padahal perasaan tidak dapat dilihat atau didengar pembaca.",
+            "2": "Murid memilih kata penilaian; penilaian bergantung pada pendapat dan tidak memberi gambaran indrawi.",
+            "3": "Murid memilih kata yang berbicara tentang reputasi pasar, bukan tentang keadaan pasar saat digambarkan."
+          },
+          "difficulty": "sedang"
+        },
+        {
+          "id": "ind-d7-bab1-008",
+          "prompt": "Penulisan kata depan yang tepat terdapat pada kalimat…",
+          "options": [
+            "Wisatawan itu menginap di rumah warga selama dua malam.",
+            "Wisatawan itu menginap dirumah warga selama dua malam.",
+            "Wisatawan itu men ginap di rumah warga selama dua malam.",
+            "Wisatawan itu menginap di-rumah warga selama dua malam."
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Kata depan di yang menunjukkan tempat ditulis terpisah dari kata yang mengikutinya, sehingga penulisan di rumah sudah benar."
+          },
+          "distractorWhy": {
+            "1": "Murid menyamakan kata depan di dengan awalan di- yang memang ditulis serangkai, padahal awalan di- melekat pada kata kerja, bukan pada kata tempat.",
+            "2": "Murid memenggal awalan men- dari kata kerjanya; awalan selalu ditulis serangkai dengan kata dasarnya.",
+            "3": "Murid menambahkan tanda hubung pada kata depan, padahal tanda hubung hanya dipakai antara lain pada kata ulang dan pemenggalan suku kata."
+          },
+          "difficulty": "sedang"
+        },
+        {
+          "id": "ind-d7-bab1-009",
+          "prompt": "Perbedaan pokok antara teks deskripsi dan teks laporan hasil observasi adalah…",
+          "options": [
+            "deskripsi menggambarkan satu objek khusus disertai kesan penulis, sedangkan laporan observasi menyajikan objek secara umum dan objektif",
+            "deskripsi selalu lebih panjang daripada laporan observasi",
+            "deskripsi memakai bahasa baku, sedangkan laporan observasi memakai bahasa sehari-hari",
+            "deskripsi memuat langkah kerja, sedangkan laporan observasi memuat kesimpulan"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Teks deskripsi memusatkan perhatian pada satu objek tertentu dan boleh memuat kesan pribadi penulis, sedangkan laporan hasil observasi memaparkan objek secara umum berdasarkan fakta tanpa melibatkan perasaan penulis."
+          },
+          "distractorWhy": {
+            "1": "Murid membedakan berdasarkan panjang tulisan, padahal panjang teks tidak menentukan jenisnya.",
+            "2": "Murid membalik keadaannya; laporan hasil observasi justru menuntut bahasa baku dan istilah yang tepat.",
+            "3": "Murid memasukkan ciri teks prosedur, yaitu langkah kerja, ke dalam teks deskripsi."
+          },
+          "difficulty": "sedang"
+        },
+        {
+          "id": "ind-d7-bab1-010",
+          "prompt": "Bacalah kutipan berikut. \"Matahari baru saja terbit ketika kami tiba. Kabut tipis masih menggantung di punggung Bukit Menoreh, dan embun di ujung daun teh berkilau seperti butiran kaca.\" Fungsi kalimat kedua dalam kutipan tersebut adalah…",
+          "options": [
+            "memerinci keadaan tempat melalui gambaran yang dapat dilihat sehingga suasana pagi terasa nyata bagi pembaca",
+            "memulai konflik yang akan diselesaikan pada bagian akhir tulisan",
+            "menyatakan pendapat penulis tentang keindahan perkebunan teh",
+            "menyimpulkan seluruh hasil pengamatan penulis selama perjalanan"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Kalimat kedua berisi rincian visual berupa kabut dan embun yang berkilau; rincian semacam itu bertugas menghidupkan gambaran tempat pada bagian deskripsi bagian."
+          },
+          "distractorWhy": {
+            "1": "Murid membaca kutipan itu sebagai cerita; deskripsi tidak memerlukan konflik dan kutipan itu tidak memuat masalah apa pun.",
+            "2": "Murid menganggap setiap kalimat indah pasti pendapat, padahal kabut dan embun adalah hal yang dapat diamati siapa pun, bukan penilaian.",
+            "3": "Murid menempatkan kalimat itu sebagai simpulan, padahal simpulan berisi kesan menyeluruh dan biasanya menutup teks."
+          },
+          "difficulty": "tinggi"
+        },
+        {
+          "id": "ind-d7-bab1-011",
+          "prompt": "Kalimat deskripsi berikut yang paling lemah karena tidak memberi gambaran indrawi adalah…",
+          "options": [
+            "Candi Borobudur sangat indah dan luar biasa menakjubkan.",
+            "Relief Candi Borobudur terpahat berbaris mengelilingi setiap lorong.",
+            "Batu andesit candi terasa kasar dan dingin ketika disentuh pagi hari.",
+            "Aroma dupa tercium samar dari arah pelataran sebelah timur."
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Kalimat itu hanya menumpuk kata penilaian tanpa satu pun detail yang dapat dilihat, diraba, atau dicium, sehingga pembaca tidak memperoleh gambaran apa pun tentang candi."
+          },
+          "distractorWhy": {
+            "1": "Kalimat tentang relief yang berbaris memberi gambaran visual yang jelas, sehingga justru termasuk deskripsi yang kuat.",
+            "2": "Kalimat tentang batu yang kasar dan dingin memanfaatkan indra peraba, sehingga sudah memenuhi syarat deskripsi.",
+            "3": "Kalimat tentang aroma dupa memanfaatkan indra penciuman, sehingga pembaca tetap memperoleh kesan indrawi."
+          },
+          "difficulty": "tinggi"
+        },
+        {
+          "id": "ind-d7-bab1-012",
+          "prompt": "Sebuah teks deskripsi tentang Pasar Terapung Lok Baintan ditutup dengan kalimat \"Sampan-sampan itu mengajari saya bahwa pasar dapat hidup tanpa gedung.\" Kalimat penutup itu tergolong tepat karena…",
+          "options": [
+            "berisi kesan penulis yang lahir dari rincian yang sudah digambarkan sebelumnya",
+            "berisi ajakan agar pembaca membeli dagangan di pasar terapung",
+            "berisi data jumlah sampan yang berdagang setiap pagi di sungai",
+            "berisi langkah-langkah menuju lokasi pasar terapung dari kota"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Bagian penutup teks deskripsi berisi simpulan atau kesan penulis atas objek, dan kalimat itu merumuskan kesan yang tumbuh dari gambaran sampan yang telah diperinci."
+          },
+          "distractorWhy": {
+            "1": "Murid menyamakan penutup deskripsi dengan penutup teks persuasi yang berisi ajakan bertindak.",
+            "2": "Murid mengira penutup harus memuat data angka, padahal data justru lebih cocok pada bagian rincian atau pada laporan observasi.",
+            "3": "Murid memasukkan petunjuk arah yang merupakan ciri teks prosedur ke dalam penutup deskripsi."
+          },
+          "difficulty": "tinggi"
+        }
+      ]
+    },
+    {
+      "code": "KOMP-IND-D-7-BAB2-01",
+      "grade": 7,
+      "semester": 1,
+      "name": "Berkelana di Dunia Imajinasi",
+      "materi": "Teks Narasi, Cerita Fantasi, Unsur Intrinsik Cerita, Alur dan Latar, Penokohan, Kalimat Langsung dan Tidak Langsung",
+      "cpRef": "Kepmendikbudristek/BSKAP No. 032/H/KR/2024 — Buku Siswa Bahasa Indonesia Kelas 7 Bab 2",
+      "items": [
+        {
+          "id": "ind-d7-bab2-001",
+          "prompt": "Ciri yang membedakan cerita fantasi dari cerita realistis adalah…",
+          "options": [
+            "adanya keajaiban atau dunia yang tidak mungkin terjadi di kehidupan nyata",
+            "adanya tokoh utama yang mengalami masalah dalam hidupnya",
+            "adanya urutan peristiwa dari awal sampai akhir cerita",
+            "adanya latar tempat dan waktu yang disebutkan penulis"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Cerita fantasi menghadirkan unsur keajaiban, seperti sihir, makhluk ajaib, atau dunia lain, yang tidak mungkin ditemui dalam kehidupan nyata."
+          },
+          "distractorWhy": {
+            "1": "Tokoh yang menghadapi masalah ada di hampir semua cerita, termasuk cerita realistis, sehingga bukan ciri pembeda.",
+            "2": "Urutan peristiwa adalah unsur alur yang dimiliki setiap teks narasi, bukan penanda fantasi.",
+            "3": "Latar tempat dan waktu juga disebutkan dalam cerita realistis, jadi keberadaannya tidak membuat cerita menjadi fantasi."
+          },
+          "difficulty": "dasar"
+        },
+        {
+          "id": "ind-d7-bab2-002",
+          "prompt": "Bagian alur cerita yang memuat munculnya masalah tokoh disebut…",
+          "options": [
+            "komplikasi",
+            "orientasi",
+            "resolusi",
+            "koda"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Komplikasi adalah bagian alur ketika konflik mulai muncul dan berkembang sehingga tokoh menghadapi masalah."
+          },
+          "distractorWhy": {
+            "1": "Orientasi adalah pengenalan tokoh, latar, dan keadaan awal, jadi masalah belum muncul di bagian itu.",
+            "2": "Resolusi adalah bagian penyelesaian masalah, yaitu setelah konflik memuncak, bukan saat masalah mulai ada.",
+            "3": "Koda adalah penutup berisi pesan atau amanat, yang muncul setelah cerita selesai."
+          },
+          "difficulty": "dasar"
+        },
+        {
+          "id": "ind-d7-bab2-003",
+          "prompt": "Kalimat berikut yang merupakan kalimat langsung adalah…",
+          "options": [
+            "\"Jangan sentuh cermin itu, Rio!\" seru Kakek dengan suara bergetar.",
+            "Kakek berseru agar Rio tidak menyentuh cermin itu.",
+            "Rio diminta kakeknya supaya menjauhi cermin tua tersebut.",
+            "Kakek mengatakan bahwa cermin itu berbahaya bagi Rio."
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Kalimat langsung mengutip ucapan tokoh apa adanya, ditandai tanda petik dan dapat disertai kata seru serta panggilan kepada lawan bicara."
+          },
+          "distractorWhy": {
+            "1": "Kalimat itu sudah diubah menjadi laporan pembicaraan dan tidak lagi memakai tanda petik, sehingga termasuk kalimat tidak langsung.",
+            "2": "Kalimat itu memakai bentuk pasif untuk melaporkan permintaan, jadi ucapan tokoh tidak dikutip apa adanya.",
+            "3": "Kalimat itu memakai kata bahwa yang merupakan penanda khas kalimat tidak langsung."
+          },
+          "difficulty": "dasar"
+        },
+        {
+          "id": "ind-d7-bab2-004",
+          "prompt": "Latar suasana dalam sebuah cerita berfungsi untuk…",
+          "options": [
+            "membangun perasaan yang menyelimuti peristiwa, misalnya mencekam atau gembira",
+            "menyebutkan nama kota tempat peristiwa berlangsung",
+            "menunjukkan jam dan tanggal terjadinya peristiwa",
+            "menjelaskan watak tokoh utama secara terperinci"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Latar suasana menggambarkan perasaan atau keadaan batin yang meliputi peristiwa, sehingga pembaca ikut merasakan ketegangan atau kegembiraan cerita."
+          },
+          "distractorWhy": {
+            "1": "Nama kota termasuk latar tempat, yang menunjuk lokasi, bukan perasaan yang menyelimuti peristiwa.",
+            "2": "Jam dan tanggal termasuk latar waktu, yang menunjuk kapan peristiwa terjadi.",
+            "3": "Penjelasan watak tokoh termasuk penokohan, yang merupakan unsur berbeda dari latar."
+          },
+          "difficulty": "dasar"
+        },
+        {
+          "id": "ind-d7-bab2-005",
+          "prompt": "Bacalah kutipan berikut. \"Begitu Nadia menekan tombol merah di jam kayu itu, ruang kelas lenyap. Ia berdiri di tengah pasar yang orang-orangnya berpakaian seperti seratus tahun lalu.\" Peristiwa tersebut menandai bahwa cerita itu memakai latar waktu…",
+          "options": [
+            "lintas waktu, karena tokoh berpindah ke masa yang berbeda dari masa asalnya",
+            "pagi hari, karena pasar biasanya ramai pada pagi hari",
+            "masa depan, karena tokoh memakai alat berteknologi tinggi",
+            "sezaman, karena tokoh tetap berada di dunia yang sama"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Perpindahan Nadia dari ruang kelas ke pasar dengan pakaian seabad lalu menunjukkan cerita memakai latar waktu lintas waktu, ciri khas cerita fantasi."
+          },
+          "distractorWhy": {
+            "1": "Murid menebak waktu dari kebiasaan pasar, padahal kutipan tidak menyebut pagi dan yang ditanyakan adalah jenis latar waktunya.",
+            "2": "Murid melihat jam kayu sebagai teknologi canggih lalu menyimpulkan masa depan, padahal pakaian orang di pasar justru menunjuk masa lampau.",
+            "3": "Murid mengabaikan lenyapnya ruang kelas; jika tokoh sezaman, ia tidak akan menemukan orang berpakaian seratus tahun lalu."
+          },
+          "difficulty": "sedang"
+        },
+        {
+          "id": "ind-d7-bab2-006",
+          "prompt": "Penokohan tokoh Bima digambarkan lewat kalimat \"Tanpa banyak bicara, Bima menyerahkan bekalnya kepada anak yang duduk sendirian di pojok kantin.\" Cara penulis menggambarkan watak tokoh tersebut disebut…",
+          "options": [
+            "tidak langsung, karena watak disimpulkan pembaca dari tindakan tokoh",
+            "langsung, karena penulis menyebutkan sifat tokoh dengan kata sifat",
+            "campuran, karena penulis menyebut nama sekaligus sifat tokoh",
+            "dramatik dialog, karena watak tokoh muncul lewat percakapan panjang"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Penulis tidak menyebut kata dermawan atau peduli, melainkan menunjukkan perbuatan Bima, sehingga pembaca menyimpulkan sendiri wataknya; cara ini disebut penggambaran tidak langsung."
+          },
+          "distractorWhy": {
+            "1": "Penggambaran langsung terjadi bila penulis menuliskan sifat tokoh secara terang, misalnya menulis Bima anak yang dermawan, dan itu tidak dilakukan di sini.",
+            "2": "Murid mengira penyebutan nama tokoh sudah termasuk penggambaran watak, padahal nama bukan sifat.",
+            "3": "Kutipan itu tidak memuat percakapan sama sekali, bahkan tokohnya justru digambarkan tanpa banyak bicara."
+          },
+          "difficulty": "sedang"
+        },
+        {
+          "id": "ind-d7-bab2-007",
+          "prompt": "Perubahan kalimat langsung \"Ibu berkata, \\\"Kunci pintu gerbang sebelum malam.\\\"\" menjadi kalimat tidak langsung yang benar adalah…",
+          "options": [
+            "Ibu berkata bahwa pintu gerbang harus dikunci sebelum malam.",
+            "Ibu berkata bahwa \"kunci pintu gerbang sebelum malam\".",
+            "Ibu berkata, kunci pintu gerbang sebelum malam!",
+            "Ibu berkata bahwa saya kunci pintu gerbang sebelum malam."
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Pada kalimat tidak langsung, tanda petik dihilangkan, kalimat perintah diubah menjadi pernyataan, dan kata ganti disesuaikan dengan sudut pandang pelapor."
+          },
+          "distractorWhy": {
+            "1": "Murid mempertahankan tanda petik padahal kalimat tidak langsung tidak mengutip ucapan apa adanya.",
+            "2": "Murid hanya menghapus tanda petik tetapi membiarkan bentuk perintah beserta tanda serunya, sehingga kalimat itu belum menjadi laporan.",
+            "3": "Murid salah menyesuaikan kata ganti sehingga pelaku perintahnya berubah dan makna kalimatnya menjadi rancu."
+          },
+          "difficulty": "sedang"
+        },
+        {
+          "id": "ind-d7-bab2-008",
+          "prompt": "Amanat sebuah cerita fantasi paling tepat ditemukan dengan cara…",
+          "options": [
+            "menyimpulkan pesan hidup dari sikap tokoh dan akibat yang dialaminya sepanjang cerita",
+            "mencatat semua nama tokoh yang muncul dalam cerita",
+            "menghitung jumlah peristiwa ajaib yang terjadi dalam cerita",
+            "menyalin kalimat pertama pada bagian orientasi cerita"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Amanat adalah pesan yang ingin disampaikan penulis dan biasanya tersirat, sehingga pembaca menyimpulkannya dari pilihan sikap tokoh serta akibat yang menyertainya."
+          },
+          "distractorWhy": {
+            "1": "Mencatat nama tokoh hanya mendata unsur cerita dan tidak mengungkap pesan yang ingin disampaikan penulis.",
+            "2": "Menghitung peristiwa ajaib mengukur kadar fantasi cerita, bukan pesan moralnya.",
+            "3": "Kalimat pembuka berisi pengenalan keadaan, sedangkan pesan cerita baru tampak setelah konflik diselesaikan."
+          },
+          "difficulty": "sedang"
+        },
+        {
+          "id": "ind-d7-bab2-009",
+          "prompt": "Kata yang paling tepat melengkapi kalimat \"Suara langkah itu ____ mendekat, membuat bulu kuduk Farel berdiri\" agar suasana menjadi mencekam adalah…",
+          "options": [
+            "perlahan",
+            "riang",
+            "santai",
+            "ceria"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Kata perlahan memperpanjang ketegangan karena ancaman terasa mendekat sedikit demi sedikit, sehingga cocok dengan suasana mencekam."
+          },
+          "distractorWhy": {
+            "1": "Kata riang menimbulkan suasana gembira yang berlawanan dengan bulu kuduk yang berdiri.",
+            "2": "Kata santai melemahkan ketegangan karena menyiratkan keadaan tenang tanpa ancaman.",
+            "3": "Kata ceria membangun suasana menyenangkan sehingga bertolak belakang dengan rasa takut yang digambarkan."
+          },
+          "difficulty": "sedang"
+        },
+        {
+          "id": "ind-d7-bab2-010",
+          "prompt": "Sebuah cerita fantasi berakhir dengan tokoh yang memilih mengembalikan batu ajaib meskipun batu itu dapat mengabulkan keinginannya. Penyelesaian seperti itu paling kuat karena…",
+          "options": [
+            "mengaitkan pilihan tokoh dengan amanat cerita, sehingga akhir cerita terasa berasal dari watak tokoh",
+            "membuat cerita menjadi lebih panjang daripada cerita fantasi pada umumnya",
+            "menunjukkan bahwa penulis menguasai banyak istilah tentang benda ajaib",
+            "menghindarkan cerita dari kewajiban menampilkan konflik apa pun"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Resolusi yang kuat tumbuh dari watak dan keputusan tokoh, bukan dari kebetulan, sehingga pesan cerita ikut terasa meyakinkan bagi pembaca."
+          },
+          "distractorWhy": {
+            "1": "Murid menilai mutu penyelesaian dari panjang cerita, padahal panjang tidak menjamin akhir yang meyakinkan.",
+            "2": "Murid menilai dari kekayaan istilah, padahal istilah ajaib adalah hiasan, bukan penentu kekuatan penyelesaian.",
+            "3": "Murid mengira cerita baik justru menghindari konflik, padahal penyelesaian hanya bermakna bila ada konflik yang diselesaikan."
+          },
+          "difficulty": "tinggi"
+        },
+        {
+          "id": "ind-d7-bab2-011",
+          "prompt": "Kalimat \"Rumah tua itu menelan cahaya senja hingga halamannya menjadi gelap seketika\" dipakai penulis terutama untuk…",
+          "options": [
+            "membangun latar suasana yang mencekam melalui majas personifikasi",
+            "menjelaskan letak rumah tua tersebut di dalam peta desa",
+            "memperkenalkan tokoh baru yang tinggal di rumah tua itu",
+            "menyampaikan amanat cerita secara terang kepada pembaca"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Kata menelan memberi perbuatan manusia kepada rumah, dan gambaran halaman yang seketika gelap menumbuhkan rasa takut, sehingga kalimat itu membangun latar suasana."
+          },
+          "distractorWhy": {
+            "1": "Kalimat itu tidak menyebut arah, jarak, atau batas wilayah, sehingga tidak berfungsi menunjuk letak.",
+            "2": "Tidak ada nama atau sifat manusia yang diperkenalkan dalam kalimat itu, jadi tidak ada tokoh baru yang muncul.",
+            "3": "Amanat bersifat pesan hidup dan tidak dinyatakan dalam kalimat itu; yang ada hanyalah gambaran keadaan."
+          },
+          "difficulty": "tinggi"
+        },
+        {
+          "id": "ind-d7-bab2-012",
+          "prompt": "Seorang murid menulis cerita fantasi yang tokohnya dapat menghilang, tetapi kemampuan itu tidak pernah berpengaruh pada penyelesaian masalah. Saran perbaikan yang paling tepat adalah…",
+          "options": [
+            "menghubungkan kemampuan menghilang dengan cara tokoh mengatasi konflik agar unsur fantasi menjadi bermakna",
+            "menghapus seluruh unsur fantasi supaya cerita berubah menjadi cerita realistis",
+            "menambah tokoh baru sebanyak mungkin agar cerita terasa lebih ramai",
+            "memindahkan bagian orientasi ke akhir cerita agar pembaca penasaran"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Unsur fantasi seharusnya menggerakkan alur; bila kemampuan tokoh dikaitkan dengan cara ia mengatasi konflik, keajaiban itu menjadi bagian penting cerita, bukan hiasan."
+          },
+          "distractorWhy": {
+            "1": "Menghapus unsur fantasi mengubah jenis cerita dan tidak menjawab masalah yang sebenarnya, yaitu unsur ajaib yang belum berfungsi.",
+            "2": "Menambah tokoh tanpa keperluan justru memecah perhatian pembaca dan tidak membuat kemampuan tokoh menjadi berguna.",
+            "3": "Memindahkan pengenalan ke akhir merusak keruntutan alur dan tetap tidak menjadikan kemampuan tokoh berperan."
+          },
+          "difficulty": "tinggi"
+        }
+      ]
+    },
+    {
+      "code": "KOMP-IND-D-7-BAB3-01",
+      "grade": 7,
+      "semester": 1,
+      "name": "Hal yang Baik bagi Tubuh",
+      "materi": "Teks Prosedur, Tujuan dan Alat Bahan, Langkah-Langkah Berurutan, Kalimat Perintah, Kata Keterangan Cara dan Alat, Konjungsi Urutan",
+      "cpRef": "Kepmendikbudristek/BSKAP No. 032/H/KR/2024 — Buku Siswa Bahasa Indonesia Kelas 7 Bab 3",
+      "items": [
+        {
+          "id": "ind-d7-bab3-001",
+          "prompt": "Teks prosedur ditulis dengan tujuan…",
+          "options": [
+            "memberi petunjuk agar pembaca dapat melakukan sesuatu dengan benar dan berurutan",
+            "menggambarkan keindahan suatu tempat secara terperinci",
+            "menceritakan pengalaman pribadi penulis pada masa lalu",
+            "membandingkan dua pendapat yang berbeda tentang suatu masalah"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Teks prosedur berisi petunjuk kerja yang disusun berurutan agar pembaca berhasil melakukan atau membuat sesuatu."
+          },
+          "distractorWhy": {
+            "1": "Menggambarkan keindahan tempat adalah tugas teks deskripsi, bukan teks prosedur.",
+            "2": "Menceritakan pengalaman masa lalu adalah ciri teks rekon atau narasi pribadi.",
+            "3": "Membandingkan dua pendapat adalah ciri teks diskusi yang menyajikan sisi mendukung dan menentang."
+          },
+          "difficulty": "dasar"
+        },
+        {
+          "id": "ind-d7-bab3-002",
+          "prompt": "Kalimat yang berupa kalimat perintah dalam teks prosedur adalah…",
+          "options": [
+            "Cucilah tangan dengan sabun selama dua puluh detik.",
+            "Mencuci tangan adalah kebiasaan yang sangat bermanfaat.",
+            "Banyak orang lupa mencuci tangan sebelum makan.",
+            "Sabun cair itu dibeli ibu di koperasi sekolah kemarin."
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Kalimat perintah dalam prosedur biasanya memakai kata kerja dasar yang dapat diberi partikel lah dan meminta pembaca melakukan tindakan, seperti cucilah."
+          },
+          "distractorWhy": {
+            "1": "Kalimat itu menyatakan pendapat tentang manfaat kebiasaan, bukan menyuruh pembaca melakukan sesuatu.",
+            "2": "Kalimat itu melaporkan keadaan banyak orang, jadi berfungsi memberi informasi, bukan perintah.",
+            "3": "Kalimat itu menceritakan peristiwa pembelian sabun, sehingga hanya berupa pernyataan biasa."
+          },
+          "difficulty": "dasar"
+        },
+        {
+          "id": "ind-d7-bab3-003",
+          "prompt": "Konjungsi yang menandai urutan langkah dalam teks prosedur adalah…",
+          "options": [
+            "kemudian",
+            "meskipun",
+            "karena",
+            "atau"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Konjungsi kemudian menghubungkan langkah yang satu dengan langkah berikutnya sehingga urutan kerja menjadi jelas."
+          },
+          "distractorWhy": {
+            "1": "Kata meskipun menyatakan hubungan pertentangan, bukan urutan kerja.",
+            "2": "Kata karena menyatakan hubungan sebab akibat antara dua peristiwa.",
+            "3": "Kata atau menyatakan pilihan di antara dua hal, sehingga tidak menunjukkan langkah berikutnya."
+          },
+          "difficulty": "dasar"
+        },
+        {
+          "id": "ind-d7-bab3-004",
+          "prompt": "Bagian teks prosedur yang menyebutkan apa saja yang harus disiapkan sebelum bekerja disebut…",
+          "options": [
+            "alat dan bahan",
+            "pernyataan umum",
+            "simpulan",
+            "komplikasi"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Bagian alat dan bahan memuat daftar perlengkapan serta bahan yang diperlukan agar langkah kerja dapat dijalankan tanpa terhenti."
+          },
+          "distractorWhy": {
+            "1": "Pernyataan umum adalah bagian pembuka teks laporan hasil observasi yang mengenalkan objek secara menyeluruh.",
+            "2": "Simpulan berisi penegasan di akhir teks, sedangkan daftar perlengkapan justru diperlukan sebelum langkah dimulai.",
+            "3": "Komplikasi adalah bagian alur cerita ketika konflik muncul, sehingga tidak ada dalam teks prosedur."
+          },
+          "difficulty": "dasar"
+        },
+        {
+          "id": "ind-d7-bab3-005",
+          "prompt": "Perhatikan langkah acak berikut. (1) Tuang air hangat ke dalam gelas. (2) Siapkan gelas bersih dan sendok. (3) Aduk hingga madu larut merata. (4) Masukkan satu sendok madu ke dalam gelas. Urutan yang benar adalah…",
+          "options": [
+            "(2), (1), (4), (3)",
+            "(1), (2), (3), (4)",
+            "(2), (4), (3), (1)",
+            "(4), (1), (2), (3)"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Langkah kerja dimulai dengan menyiapkan peralatan, lalu menuang air, memasukkan madu, dan terakhir mengaduk hingga larut."
+          },
+          "distractorWhy": {
+            "1": "Urutan itu menuang air sebelum gelas disiapkan, padahal air tidak dapat dituang tanpa wadah yang tersedia lebih dahulu.",
+            "2": "Urutan itu mengaduk madu sebelum air dituang, sehingga tidak ada cairan yang dapat melarutkan madu.",
+            "3": "Urutan itu memasukkan madu ketika gelas belum disiapkan, sehingga langkah persiapan justru diletakkan di tengah pekerjaan."
+          },
+          "difficulty": "sedang"
+        },
+        {
+          "id": "ind-d7-bab3-006",
+          "prompt": "Kalimat \"Potong wortel tipis-tipis dengan pisau agar cepat empuk\" memuat keterangan alat dan keterangan…",
+          "options": [
+            "tujuan, yang ditandai kata agar",
+            "waktu, yang ditandai kata tipis-tipis",
+            "tempat, yang ditandai kata dengan",
+            "syarat, yang ditandai kata cepat"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Frasa dengan pisau menyatakan alat, sedangkan bagian agar cepat empuk menyatakan tujuan dilakukannya langkah tersebut."
+          },
+          "distractorWhy": {
+            "1": "Kata tipis-tipis menyatakan cara memotong, bukan waktu, sebab tidak menunjuk kapan pekerjaan dilakukan.",
+            "2": "Kata dengan di kalimat itu memperkenalkan alat, bukan tempat; keterangan tempat memerlukan kata seperti di atau ke.",
+            "3": "Kata cepat memberi keterangan pada keadaan empuk dan tidak memuat prasyarat apa pun."
+          },
+          "difficulty": "sedang"
+        },
+        {
+          "id": "ind-d7-bab3-007",
+          "prompt": "Teks prosedur tentang cara mencuci tangan sebaiknya menyebutkan lama menggosok tangan karena…",
+          "options": [
+            "ukuran waktu membuat langkah dapat dikerjakan secara seragam dan hasilnya terjamin",
+            "ukuran waktu membuat teks prosedur terlihat lebih panjang",
+            "ukuran waktu diperlukan agar teks memiliki latar waktu seperti cerita",
+            "ukuran waktu menunjukkan bahwa penulis pernah belajar ilmu kesehatan"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Prosedur yang baik memuat ukuran yang jelas, seperti lama waktu, sehingga setiap pembaca mengerjakannya dengan takaran sama dan hasilnya dapat diandalkan."
+          },
+          "distractorWhy": {
+            "1": "Murid menilai keterangan waktu dari panjangnya tulisan, padahal tujuannya adalah ketepatan kerja.",
+            "2": "Murid menyamakan prosedur dengan cerita yang membutuhkan latar waktu, padahal ukuran waktu di prosedur berfungsi sebagai takaran kerja.",
+            "3": "Murid mengaitkan ukuran waktu dengan kredibilitas penulis, padahal fungsinya adalah menjadikan langkah dapat diulang dengan hasil sama."
+          },
+          "difficulty": "sedang"
+        },
+        {
+          "id": "ind-d7-bab3-008",
+          "prompt": "Kalimat berikut yang perlu diperbaiki karena tidak jelas sebagai langkah prosedur adalah…",
+          "options": [
+            "Masak sayur itu secukupnya sampai kelihatan bagus.",
+            "Rebus air sebanyak lima ratus mililiter hingga mendidih.",
+            "Masukkan bayam, lalu tunggu selama dua menit.",
+            "Angkat panci dari kompor menggunakan sarung tangan kain."
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Kalimat itu memakai ukuran yang kabur, yaitu secukupnya dan kelihatan bagus, sehingga setiap orang dapat menafsirkannya berbeda dan hasil masakan tidak seragam."
+          },
+          "distractorWhy": {
+            "1": "Kalimat tentang merebus air sudah menyebut takaran dan tanda selesai yang pasti, sehingga tidak perlu diperbaiki.",
+            "2": "Kalimat tentang memasukkan bayam sudah menyebut lama menunggu yang terukur.",
+            "3": "Kalimat tentang mengangkat panci sudah menyebut alat pelindung yang jelas."
+          },
+          "difficulty": "sedang"
+        },
+        {
+          "id": "ind-d7-bab3-009",
+          "prompt": "Penggunaan kata keterangan cara yang tepat terdapat pada kalimat…",
+          "options": [
+            "Aduk adonan secara perlahan agar tidak berceceran.",
+            "Aduk adonan di dapur agar tidak berceceran.",
+            "Aduk adonan besok pagi agar tidak berceceran.",
+            "Aduk adonan bersama adik agar tidak berceceran."
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Keterangan cara menjelaskan bagaimana suatu tindakan dilakukan, dan frasa secara perlahan menerangkan cara mengaduk."
+          },
+          "distractorWhy": {
+            "1": "Frasa di dapur menyatakan tempat berlangsungnya pekerjaan, bukan cara mengerjakannya.",
+            "2": "Frasa besok pagi menyatakan waktu pekerjaan dilakukan.",
+            "3": "Frasa bersama adik menyatakan penyerta pekerjaan, yakni dengan siapa tindakan dilakukan."
+          },
+          "difficulty": "sedang"
+        },
+        {
+          "id": "ind-d7-bab3-010",
+          "prompt": "Sebuah teks prosedur senam ringan mencantumkan peringatan \"Hentikan gerakan bila dada terasa nyeri.\" Peringatan seperti itu penting karena…",
+          "options": [
+            "melindungi keselamatan pembaca ketika langkah dijalankan pada tubuh yang berbeda-beda keadaannya",
+            "menambah jumlah kalimat perintah agar teks memenuhi syarat panjang",
+            "menggantikan kedudukan bagian alat dan bahan yang tidak diperlukan",
+            "membuktikan bahwa penulis teks adalah seorang pelatih olahraga"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Prosedur yang menyangkut tubuh perlu memuat peringatan karena keadaan fisik pembaca berbeda-beda, sehingga batas berhenti menjaga pembaca dari cedera."
+          },
+          "distractorWhy": {
+            "1": "Murid menilai peringatan dari segi jumlah kalimat, padahal fungsinya adalah keselamatan.",
+            "2": "Murid mengira peringatan menggantikan daftar alat dan bahan, padahal keduanya bagian berbeda dengan fungsi berbeda.",
+            "3": "Murid menghubungkan peringatan dengan jati diri penulis, padahal peringatan dibutuhkan siapa pun penulisnya."
+          },
+          "difficulty": "tinggi"
+        },
+        {
+          "id": "ind-d7-bab3-011",
+          "prompt": "Dua teks prosedur membahas cara membuat jus jambu. Teks pertama menulis \"tambahkan air\", teks kedua menulis \"tambahkan dua ratus mililiter air matang\". Teks kedua lebih baik karena…",
+          "options": [
+            "memuat takaran yang pasti sehingga hasil kerja pembaca dapat diulang dengan sama",
+            "memuat kata serapan yang membuat bahasanya terdengar ilmiah",
+            "memuat kalimat yang lebih panjang sehingga terlihat lebih lengkap",
+            "memuat angka yang membuat teks terlihat seperti laporan penelitian"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Ciri utama prosedur yang baik adalah ukuran yang jelas; takaran dua ratus mililiter membuat pembaca berbeda memperoleh hasil yang sama."
+          },
+          "distractorWhy": {
+            "1": "Murid menilai dari kesan ilmiah kata, padahal yang menentukan adalah kepastian takaran, bukan pilihan kosakata.",
+            "2": "Murid menyamakan kalimat panjang dengan kalimat lengkap, padahal kalimat panjang tanpa ukuran tetap kabur.",
+            "3": "Murid mengira angka dipakai untuk meniru gaya laporan, padahal angka di prosedur berfungsi sebagai takaran kerja."
+          },
+          "difficulty": "tinggi"
+        },
+        {
+          "id": "ind-d7-bab3-012",
+          "prompt": "Seorang murid menyusun prosedur membuat masker bengkuang, tetapi ia menempatkan langkah \"cuci bengkuang hingga bersih\" setelah langkah \"parut bengkuang\". Akibat kesalahan penempatan itu adalah…",
+          "options": [
+            "tanah yang menempel ikut terparut sehingga hasil masker menjadi tidak higienis",
+            "bengkuang menjadi lebih sulit dikupas ketika sudah dicuci lebih dahulu",
+            "urutan kerja tetap benar karena semua langkah tercantum lengkap",
+            "parutan bengkuang tidak mungkin dicuci sehingga langkah mencuci boleh dihapus"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Urutan langkah dalam prosedur bersifat menentukan; mencuci setelah memarut membuat kotoran yang masih melekat tercampur ke dalam parutan dan hasilnya tidak layak dipakai di kulit."
+          },
+          "distractorWhy": {
+            "1": "Murid membalik hubungannya; mencuci lebih dahulu tidak mempersulit pengupasan, justru membuat bahan lebih bersih saat diolah.",
+            "2": "Murid mengira kelengkapan langkah sudah cukup, padahal prosedur menuntut urutan yang benar, bukan sekadar daftar yang lengkap.",
+            "3": "Murid menyimpulkan langkah mencuci boleh dihapus, padahal yang keliru hanyalah letaknya, sedangkan kebersihan bahan tetap wajib."
+          },
+          "difficulty": "tinggi"
+        }
+      ]
+    }
+  ]
 }

@@ -1006,6 +1006,256 @@
       ]
     },
     {
+      "code": "KOMP-IPA-D-7-BAB5-01",
+      "grade": 7,
+      "semester": 2,
+      "name": "Klasifikasi Makhluk Hidup",
+      "materi": "Ciri-Ciri Makhluk Hidup, Dasar Klasifikasi, Takson dan Tata Nama Ganda, Kunci Determinasi, Kelompok Hewan dan Tumbuhan",
+      "cpRef": "Kepmendikbudristek/BSKAP No. 032/H/KR/2024 — Buku Siswa IPA Kelas 7 Bab 5",
+      "items": [
+        {
+          "id": "ipa-d7-bab5-001",
+          "prompt": "Ilmu yang mempelajari pengelompokan makhluk hidup berdasarkan persamaan dan perbedaan cirinya disebut…",
+          "options": [
+            "taksonomi",
+            "ekologi",
+            "morfologi",
+            "genetika"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Taksonomi adalah cabang biologi yang menyusun makhluk hidup ke dalam kelompok bertingkat berdasarkan persamaan dan perbedaan ciri."
+          },
+          "distractorWhy": {
+            "1": "Murid teringat ekologi karena sama-sama mempelajari makhluk hidup, padahal ekologi mengkaji hubungan makhluk hidup dengan lingkungannya, bukan cara mengelompokkannya.",
+            "2": "Murid memilih morfologi karena klasifikasi memang memakai bentuk tubuh, padahal morfologi hanya mempelajari bentuk luar dan belum sampai menyusun kelompok.",
+            "3": "Murid mengira pengelompokan selalu berdasar keturunan, padahal genetika mempelajari pewarisan sifat, bukan penyusunan kelompok makhluk hidup."
+          },
+          "difficulty": "dasar"
+        },
+        {
+          "id": "ipa-d7-bab5-002",
+          "prompt": "Urutan takson tumbuhan dari kelompok yang paling besar ke paling kecil adalah…",
+          "options": [
+            "divisi – kelas – ordo – famili – genus – spesies",
+            "spesies – genus – famili – ordo – kelas – divisi",
+            "kelas – divisi – famili – ordo – genus – spesies",
+            "genus – spesies – famili – kelas – ordo – divisi"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Takson disusun bertingkat dari yang paling luas ke paling sempit: divisi, kelas, ordo, famili, genus, lalu spesies sebagai kelompok terkecil."
+          },
+          "distractorWhy": {
+            "1": "Murid membaca urutannya terbalik, sehingga spesies yang merupakan kelompok terkecil justru ditempatkan sebagai yang terbesar.",
+            "2": "Murid menukar kedudukan divisi dan kelas; divisi menaungi banyak kelas, jadi divisi lebih luas daripada kelas.",
+            "3": "Murid mengira genus lebih luas daripada famili, padahal satu famili berisi banyak genus dan satu genus berisi beberapa spesies."
+          },
+          "difficulty": "dasar"
+        },
+        {
+          "id": "ipa-d7-bab5-003",
+          "prompt": "Penulisan nama ilmiah padi yang benar menurut aturan binomial nomenklatur adalah…",
+          "options": [
+            "Oryza sativa",
+            "oryza Sativa",
+            "ORYZA SATIVA",
+            "Sativa oryza"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Aturan tata nama ganda menetapkan kata pertama sebagai nama genus yang diawali huruf kapital dan kata kedua sebagai penunjuk spesies dengan huruf kecil."
+          },
+          "distractorWhy": {
+            "1": "Murid membalik aturan kapitalnya; huruf kapital dipakai pada nama genus, sedangkan penunjuk spesies selalu huruf kecil.",
+            "2": "Murid menulis seluruhnya dengan huruf kapital karena mengira nama ilmiah harus ditegaskan, padahal aturannya hanya mengapitalkan huruf awal genus.",
+            "3": "Murid menukar urutan kata; genus harus mendahului penunjuk spesies, bukan sebaliknya."
+          },
+          "difficulty": "sedang"
+        },
+        {
+          "id": "ipa-d7-bab5-004",
+          "prompt": "Ciri makhluk hidup yang ditunjukkan oleh tanaman putri malu yang mengatupkan daunnya saat disentuh adalah…",
+          "options": [
+            "peka terhadap rangsang",
+            "berkembang biak",
+            "memerlukan makanan",
+            "mengeluarkan zat sisa"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Mengatupkan daun ketika disentuh adalah tanggapan terhadap rangsang sentuhan, yaitu ciri iritabilitas atau kepekaan terhadap rangsang."
+          },
+          "distractorWhy": {
+            "1": "Murid mengira setiap gerakan tumbuhan berhubungan dengan perbanyakan diri, padahal berkembang biak berarti menghasilkan individu baru.",
+            "2": "Murid menghubungkan gerak daun dengan kebutuhan makan, padahal pembuatan makanan terjadi melalui fotosintesis, bukan melalui gerak mengatup.",
+            "3": "Murid mengira daun mengatup untuk membuang zat sisa, padahal pengeluaran zat sisa pada tumbuhan berlangsung lewat stomata dan lentisel."
+          },
+          "difficulty": "dasar"
+        },
+        {
+          "id": "ipa-d7-bab5-005",
+          "prompt": "Kucing (Felis catus) dan harimau (Panthera tigris) berada dalam satu famili Felidae tetapi berbeda genus. Kesimpulan yang tepat adalah…",
+          "options": [
+            "keduanya memiliki banyak ciri famili yang sama tetapi berbeda pada ciri tingkat genus",
+            "keduanya sama sekali tidak memiliki ciri yang sama karena genusnya berbeda",
+            "keduanya dapat dikawinkan dan menghasilkan keturunan karena satu famili",
+            "keduanya termasuk satu spesies karena sama-sama hewan berkaki empat"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Makhluk hidup yang satu famili berbagi ciri umum famili itu, sedangkan perbedaan genus menunjukkan ada ciri khusus yang membedakannya pada tingkat yang lebih sempit."
+          },
+          "distractorWhy": {
+            "1": "Murid mengira perbedaan pada takson sempit meniadakan semua persamaan, padahal berada di satu famili justru berarti banyak ciri yang sama.",
+            "2": "Murid mengira satu famili sudah cukup untuk saling kawin dan beranak, padahal keturunan subur umumnya hanya terjadi pada makhluk satu spesies.",
+            "3": "Murid memakai ciri sangat umum seperti berkaki empat untuk menyimpulkan satu spesies, padahal spesies adalah takson paling sempit dengan ciri yang jauh lebih khusus."
+          },
+          "difficulty": "sedang"
+        },
+        {
+          "id": "ipa-d7-bab5-006",
+          "prompt": "Perhatikan kunci determinasi berikut. 1a. tubuh berbulu → ke nomor 2; 1b. tubuh bersisik → ke nomor 3; 2a. sayap untuk terbang → Aves; 2b. berambut dan menyusui → Mammalia. Merpati akan berhenti pada…",
+          "options": [
+            "1a lalu 2a",
+            "1b lalu 3",
+            "1a lalu 2b",
+            "1b lalu 2a"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Merpati bertubuh berbulu sehingga mengikuti pernyataan tentang bulu menuju nomor 2, lalu memiliki sayap untuk terbang sehingga berakhir pada kelompok Aves."
+          },
+          "distractorWhy": {
+            "1": "Murid mengira bulu merpati adalah sisik karena kaki merpati bersisik, padahal penutup tubuh utamanya adalah bulu.",
+            "2": "Murid sudah benar sampai nomor 2 tetapi memilih cabang menyusui, padahal merpati bertelur dan tidak memiliki kelenjar susu.",
+            "3": "Murid mencampur cabang yang tidak saling terhubung; setelah memilih pernyataan tentang sisik, penelusuran harus berlanjut ke nomor 3, bukan ke nomor 2."
+          },
+          "difficulty": "tinggi"
+        },
+        {
+          "id": "ipa-d7-bab5-007",
+          "prompt": "Ciri utama yang membedakan tumbuhan dikotil dari monokotil adalah…",
+          "options": [
+            "berkeping biji dua, akar tunggang, dan tulang daun menjari atau menyirip",
+            "berkeping biji satu, akar serabut, dan tulang daun sejajar",
+            "tidak berbiji dan berkembang biak dengan spora",
+            "batangnya selalu lebih tinggi daripada tumbuhan monokotil"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Dikotil dikenali dari biji berkeping dua, sistem akar tunggang, serta tulang daun menjari atau menyirip; monokotil memiliki ciri sebaliknya."
+          },
+          "distractorWhy": {
+            "1": "Murid menukar ciri kedua kelompok; biji berkeping satu, akar serabut, dan tulang daun sejajar adalah ciri monokotil.",
+            "2": "Murid tertukar dengan tumbuhan paku dan lumut yang berkembang biak memakai spora, padahal dikotil dan monokotil sama-sama berbiji.",
+            "3": "Murid memakai tinggi batang sebagai pembeda, padahal tinggi tumbuhan tergantung jenisnya, bukan penentu kelompok dikotil atau monokotil."
+          },
+          "difficulty": "sedang"
+        },
+        {
+          "id": "ipa-d7-bab5-008",
+          "prompt": "Kelompok hewan yang tidak memiliki tulang belakang disebut…",
+          "options": [
+            "invertebrata",
+            "vertebrata",
+            "mamalia",
+            "amfibi"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Invertebrata adalah kelompok hewan tanpa tulang belakang, misalnya serangga, cacing, dan ubur-ubur."
+          },
+          "distractorWhy": {
+            "1": "Murid tertukar istilah; vertebrata justru kelompok hewan yang memiliki tulang belakang.",
+            "2": "Murid memilih mamalia karena istilahnya terdengar umum, padahal mamalia adalah kelas hewan bertulang belakang yang menyusui.",
+            "3": "Murid mengira amfibi bertubuh lunak berarti tak bertulang belakang, padahal katak dan salamander memiliki rangka dalam bertulang belakang."
+          },
+          "difficulty": "dasar"
+        },
+        {
+          "id": "ipa-d7-bab5-009",
+          "prompt": "Seorang murid menemukan hewan bertubuh lunak, bercangkang keras satu buah, dan bergerak dengan kaki perut. Hewan itu paling tepat digolongkan ke dalam…",
+          "options": [
+            "Mollusca",
+            "Arthropoda",
+            "Annelida",
+            "Echinodermata"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Tubuh lunak, cangkang berkapur, dan kaki perut untuk bergerak adalah ciri khas Mollusca seperti siput."
+          },
+          "distractorWhy": {
+            "1": "Murid mengira setiap cangkang keras berarti rangka luar Arthropoda, padahal Arthropoda bertubuh beruas dengan kaki berbuku-buku, bukan bertubuh lunak.",
+            "2": "Murid melihat tubuh lunaknya saja lalu menebak cacing, padahal Annelida bertubuh beruas-ruas dan tidak bercangkang.",
+            "3": "Murid menganggap permukaan keras itu sebagai duri Echinodermata, padahal Echinodermata bertubuh simetri radial dan bergerak dengan kaki tabung."
+          },
+          "difficulty": "tinggi"
+        },
+        {
+          "id": "ipa-d7-bab5-010",
+          "prompt": "Bayu menyusun kelompok berdasarkan ciri \"hewan yang hidup di air\". Cara pengelompokan ini dianggap kurang ilmiah karena…",
+          "options": [
+            "ciri tempat hidup menyatukan hewan yang susunan tubuhnya sangat berbeda seperti ikan, paus, dan ubur-ubur",
+            "jumlah hewan air terlalu banyak untuk dihitung seluruhnya",
+            "hewan air tidak dapat diamati secara langsung oleh murid",
+            "ciri tempat hidup tidak pernah boleh dipakai dalam pengamatan apa pun"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Klasifikasi ilmiah berdasar persamaan ciri tubuh dan kekerabatan; tempat hidup bisa sama meski susunan tubuhnya sangat berbeda, sehingga kelompoknya menjadi tidak bermakna secara biologis."
+          },
+          "distractorWhy": {
+            "1": "Murid mengira masalahnya pada banyaknya anggota, padahal takson besar seperti Mammalia juga beranggota banyak dan tetap sah.",
+            "2": "Murid mengira kesulitan pengamatan yang menjadi soal, padahal hewan air dapat diamati dan masalahnya terletak pada dasar pengelompokannya.",
+            "3": "Murid menyimpulkan tempat hidup terlarang sama sekali, padahal tempat hidup tetap berguna sebagai catatan ekologi, hanya tidak dipakai sebagai dasar takson."
+          },
+          "difficulty": "tinggi"
+        },
+        {
+          "id": "ipa-d7-bab5-011",
+          "prompt": "Makhluk hidup bersel satu yang memiliki membran inti dan sering hidup di air kolam, seperti Amoeba dan Paramecium, termasuk dalam kingdom…",
+          "options": [
+            "Protista",
+            "Monera",
+            "Fungi",
+            "Plantae"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Protista mencakup makhluk hidup eukariotik sederhana, umumnya bersel satu, yang belum tergolong hewan, tumbuhan, maupun jamur."
+          },
+          "distractorWhy": {
+            "1": "Murid mengira semua makhluk bersel satu adalah Monera, padahal Monera meliputi bakteri yang selnya tidak memiliki membran inti.",
+            "2": "Murid memilih Fungi karena sama-sama bukan hewan dan bukan tumbuhan, padahal jamur memiliki dinding sel kitin dan umumnya bersel banyak dengan hifa.",
+            "3": "Murid mengira kemampuan hidup di air sama dengan tumbuhan air, padahal Plantae bersel banyak dan memiliki jaringan yang jelas."
+          },
+          "difficulty": "sedang"
+        },
+        {
+          "id": "ipa-d7-bab5-012",
+          "prompt": "Tujuan utama para ilmuwan memakai nama ilmiah dalam bahasa Latin untuk setiap makhluk hidup adalah…",
+          "options": [
+            "agar satu jenis makhluk hidup dikenali dengan nama yang sama di seluruh dunia",
+            "agar nama makhluk hidup terdengar lebih indah saat diucapkan",
+            "agar hanya ilmuwan yang dapat membaca nama makhluk hidup",
+            "agar nama daerah untuk makhluk hidup segera dilupakan masyarakat"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Nama ilmiah bersifat internasional sehingga satu jenis makhluk hidup tidak tertukar meskipun nama lokalnya berbeda-beda di tiap daerah."
+          },
+          "distractorWhy": {
+            "1": "Murid menilai dari sisi keindahan bunyi, padahal alasan penamaan adalah ketepatan dan keseragaman, bukan estetika.",
+            "2": "Murid mengira nama ilmiah sengaja dirahasiakan, padahal justru dibuat agar siapa pun dapat merujuk jenis yang sama tanpa salah paham.",
+            "3": "Murid mengira nama daerah harus dihapus, padahal nama daerah tetap dipakai sehari-hari dan nama ilmiah hanya melengkapi untuk keperluan ilmiah."
+          },
+          "difficulty": "sedang"
+        }
+      ]
+    },
+    {
       "code": "KOMP-IPA-D-7-BAB6-01",
       "grade": 7,
       "semester": 2,
@@ -1252,6 +1502,256 @@
             "3": "Murid bergantung pada satu ciri luar saja, padahal yang menentukan adalah keseluruhan ciri berupa alat pernapasan, rangka tubuh, dan cara berkembang biak."
           },
           "difficulty": "tinggi"
+        }
+      ]
+    },
+    {
+      "code": "KOMP-IPA-D-7-BAB7-01",
+      "grade": 7,
+      "semester": 2,
+      "name": "Bumi dan Tata Surya",
+      "materi": "Sistem Tata Surya, Rotasi dan Revolusi Bumi, Bulan dan Fasenya, Gerhana, Pasang Surut Air Laut",
+      "cpRef": "Kepmendikbudristek/BSKAP No. 032/H/KR/2024 — Buku Siswa IPA Kelas 7 Bab 7",
+      "items": [
+        {
+          "id": "ipa-d7-bab7-001",
+          "prompt": "Pergantian siang dan malam di Bumi terjadi karena…",
+          "options": [
+            "Bumi berputar pada porosnya sehingga sisi yang menghadap Matahari bergantian",
+            "Bumi mengelilingi Matahari selama satu tahun penuh",
+            "Matahari bergerak mengelilingi Bumi setiap hari",
+            "Bulan menutupi cahaya Matahari secara bergantian"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Rotasi Bumi pada porosnya selama sekitar 24 jam membuat setiap sisi Bumi bergantian menghadap dan membelakangi Matahari."
+          },
+          "distractorWhy": {
+            "1": "Murid tertukar antara rotasi dan revolusi; revolusi selama satu tahun menyebabkan pergantian musim, bukan pergantian siang dan malam.",
+            "2": "Murid memakai pengamatan sehari-hari bahwa Matahari tampak bergerak, padahal gerak semu itu justru akibat Bumi yang berputar.",
+            "3": "Murid menyamakan siang malam dengan gerhana, padahal gerhana hanya terjadi sesekali dan hanya di sebagian wilayah."
+          },
+          "difficulty": "dasar"
+        },
+        {
+          "id": "ipa-d7-bab7-002",
+          "prompt": "Waktu yang diperlukan Bumi untuk satu kali revolusi mengelilingi Matahari adalah…",
+          "options": [
+            "365,25 hari",
+            "24 jam",
+            "30 hari",
+            "29,5 hari"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Satu kali revolusi Bumi mengelilingi Matahari memakan waktu sekitar 365,25 hari, dan kelebihan seperempat hari itulah yang dikumpulkan menjadi tahun kabisat."
+          },
+          "distractorWhy": {
+            "1": "Murid menyebut lama rotasi Bumi; 24 jam adalah waktu satu kali putaran pada porosnya, bukan mengelilingi Matahari.",
+            "2": "Murid memakai panjang satu bulan kalender, padahal itu pembagian penanggalan, bukan waktu edar Bumi.",
+            "3": "Murid memakai periode fase Bulan; 29,5 hari adalah waktu Bulan menyelesaikan satu siklus fasenya."
+          },
+          "difficulty": "dasar"
+        },
+        {
+          "id": "ipa-d7-bab7-003",
+          "prompt": "Gerhana matahari terjadi ketika…",
+          "options": [
+            "Bulan berada di antara Matahari dan Bumi sehingga bayangan Bulan jatuh ke permukaan Bumi",
+            "Bumi berada di antara Matahari dan Bulan sehingga Bulan masuk bayangan Bumi",
+            "Matahari berada di antara Bumi dan Bulan sehingga cahayanya terhalang",
+            "Bumi berhenti berputar sehingga satu sisinya gelap sepanjang hari"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Pada gerhana matahari, Bulan tepat berada di antara Matahari dan Bumi sehingga bayangan Bulan menutupi sebagian permukaan Bumi."
+          },
+          "distractorWhy": {
+            "1": "Murid menukar susunannya dengan gerhana bulan; susunan Matahari–Bumi–Bulan justru menghasilkan gerhana bulan.",
+            "2": "Murid menempatkan Matahari di tengah susunan, padahal Bumi dan Bulan sama-sama mengorbit Matahari sehingga Matahari tidak pernah berada di antara keduanya.",
+            "3": "Murid mengira gerhana berhubungan dengan berhentinya rotasi, padahal Bumi terus berputar dan gerhana ditentukan oleh kesejajaran ketiga benda langit."
+          },
+          "difficulty": "sedang"
+        },
+        {
+          "id": "ipa-d7-bab7-004",
+          "prompt": "Planet-planet dalam tata surya tetap berada pada orbitnya mengelilingi Matahari karena…",
+          "options": [
+            "gaya gravitasi Matahari yang sangat besar menarik planet-planet tersebut",
+            "planet-planet saling mendorong satu sama lain agar tidak bertabrakan",
+            "ruang angkasa berisi udara yang menahan gerak planet",
+            "Matahari memancarkan cahaya yang mengikat planet pada tempatnya"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Matahari bermassa jauh lebih besar daripada planet mana pun, sehingga gaya gravitasinya menahan planet-planet tetap beredar pada orbitnya."
+          },
+          "distractorWhy": {
+            "1": "Murid mengira planet saling mendorong, padahal gaya antarplanet justru tarik-menarik dan jauh lebih lemah daripada tarikan Matahari.",
+            "2": "Murid mengira ruang angkasa berisi udara, padahal ruang antarplanet hampa sehingga tidak ada udara yang menahan gerak.",
+            "3": "Murid mengira cahaya yang mengikat planet, padahal yang menahan orbit adalah gravitasi, bukan pancaran cahaya."
+          },
+          "difficulty": "sedang"
+        },
+        {
+          "id": "ipa-d7-bab7-005",
+          "prompt": "Kelompok planet dalam yang letaknya lebih dekat ke Matahari daripada sabuk asteroid adalah…",
+          "options": [
+            "Merkurius, Venus, Bumi, dan Mars",
+            "Jupiter, Saturnus, Uranus, dan Neptunus",
+            "Bumi, Mars, Jupiter, dan Saturnus",
+            "Venus, Bumi, Saturnus, dan Neptunus"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Planet dalam adalah empat planet berbatu yang mengorbit di sebelah dalam sabuk asteroid, yaitu Merkurius, Venus, Bumi, dan Mars."
+          },
+          "distractorWhy": {
+            "1": "Murid menyebut planet luar; keempat planet raksasa gas itu justru berada di luar sabuk asteroid.",
+            "2": "Murid memasukkan Jupiter dan Saturnus sebagai planet dalam, padahal keduanya berada di seberang sabuk asteroid.",
+            "3": "Murid mencampur planet dalam dan luar dalam satu daftar, sehingga batas sabuk asteroid sebagai pemisah menjadi terabaikan."
+          },
+          "difficulty": "dasar"
+        },
+        {
+          "id": "ipa-d7-bab7-006",
+          "prompt": "Bulan selalu menampakkan sisi permukaan yang sama kepada pengamat di Bumi karena…",
+          "options": [
+            "waktu rotasi Bulan sama dengan waktu revolusinya mengelilingi Bumi",
+            "Bulan sama sekali tidak berputar pada porosnya",
+            "sisi lain Bulan selamanya gelap dan tidak pernah terkena cahaya Matahari",
+            "Bumi berputar sangat cepat sehingga mata tidak sempat melihat sisi lain Bulan"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Rotasi Bulan berlangsung sekitar 27,3 hari, sama dengan waktu revolusinya mengelilingi Bumi, sehingga sisi yang menghadap Bumi selalu sama."
+          },
+          "distractorWhy": {
+            "1": "Murid menyimpulkan Bulan diam karena wajahnya tetap, padahal Bulan tetap berputar; kebetulan periodenya sama dengan revolusinya.",
+            "2": "Murid menyamakan sisi jauh dengan sisi gelap abadi, padahal sisi jauh Bulan juga mendapat cahaya Matahari secara bergantian.",
+            "3": "Murid melibatkan rotasi Bumi, padahal yang menentukan sisi Bulan yang tampak adalah gerak Bulan sendiri, bukan kecepatan putaran Bumi."
+          },
+          "difficulty": "sedang"
+        },
+        {
+          "id": "ipa-d7-bab7-007",
+          "prompt": "Pasang naik air laut yang paling tinggi terjadi saat Matahari, Bumi, dan Bulan berada pada satu garis lurus. Peristiwa ini disebut pasang…",
+          "options": [
+            "purnama dan pasang mati bulan baru yang sama-sama disebut pasang perbani hanya bila posisinya tegak lurus",
+            "yang tidak berkaitan dengan kedudukan Bulan sama sekali",
+            "yang terjadi hanya pada siang hari ketika Matahari tepat di atas kepala",
+            "yang besarnya selalu sama sepanjang bulan tanpa perubahan"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Ketika Matahari, Bumi, dan Bulan segaris, tarikan gravitasi keduanya saling menguatkan sehingga terjadi pasang tertinggi; bila kedudukannya tegak lurus, tarikan saling melemahkan dan terjadi pasang perbani."
+          },
+          "distractorWhy": {
+            "1": "Murid mengira kedudukan Bulan tidak berpengaruh, padahal tarikan gravitasi Bulan adalah penyebab utama pasang surut.",
+            "2": "Murid menghubungkan pasang dengan posisi Matahari di siang hari saja, padahal pasang juga terjadi pada malam hari mengikuti kedudukan Bulan.",
+            "3": "Murid mengira tinggi pasang tetap, padahal tingginya berubah mengikuti kedudukan Bulan sepanjang bulan."
+          },
+          "difficulty": "tinggi"
+        },
+        {
+          "id": "ipa-d7-bab7-008",
+          "prompt": "Benda langit yang memancarkan cahayanya sendiri di tata surya kita adalah…",
+          "options": [
+            "Matahari",
+            "Bulan",
+            "Mars",
+            "Venus"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Matahari adalah bintang yang menghasilkan cahaya sendiri dari reaksi fusi di intinya, sedangkan benda langit lain di tata surya hanya memantulkan cahaya Matahari."
+          },
+          "distractorWhy": {
+            "1": "Murid mengira Bulan bercahaya sendiri karena tampak terang di malam hari, padahal cahaya itu adalah pantulan cahaya Matahari.",
+            "2": "Murid mengira planet bercahaya sendiri karena tampak berkilau, padahal planet hanya memantulkan cahaya Matahari.",
+            "3": "Murid memilih benda langit yang paling terang setelah Bulan, padahal terangnya Venus berasal dari pantulan cahaya Matahari pada awan tebalnya."
+          },
+          "difficulty": "dasar"
+        },
+        {
+          "id": "ipa-d7-bab7-009",
+          "prompt": "Sari mengamati Bulan pada tanggal 1 sebagai sabit tipis, lalu pada tanggal 8 tampak setengah lingkaran, dan pada tanggal 15 tampak bulat penuh. Perubahan ini terjadi karena…",
+          "options": [
+            "kedudukan Bulan terhadap Bumi dan Matahari berubah sehingga bagian yang tersinari dan terlihat dari Bumi berbeda-beda",
+            "Bulan benar-benar berubah bentuk dari sabit menjadi bulat setiap bulan",
+            "awan menutupi sebagian Bulan sehingga bentuknya tampak berubah-ubah",
+            "bayangan Bumi menutupi Bulan sedikit demi sedikit lalu menghilang"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Setengah bagian Bulan selalu tersinari Matahari; yang berubah adalah sudut pandang dari Bumi seiring Bulan beredar, sehingga bagian tersinari yang terlihat berbeda-beda."
+          },
+          "distractorWhy": {
+            "1": "Murid mengira bentuk fisik Bulan sendiri berubah, padahal Bulan tetap bulat dan hanya bagian tampak yang berubah.",
+            "2": "Murid menjelaskan dengan awan, padahal fase Bulan terjadi teratur setiap bulan dan tetap terlihat sama polanya meski langit cerah.",
+            "3": "Murid tertukar dengan gerhana bulan; bayangan Bumi hanya menutupi Bulan pada gerhana yang terjadi sesekali, bukan setiap malam."
+          },
+          "difficulty": "tinggi"
+        },
+        {
+          "id": "ipa-d7-bab7-010",
+          "prompt": "Indonesia berada di daerah tropis sehingga panjang siang dan malamnya hampir sama sepanjang tahun, berbeda dengan negara di lintang tinggi. Penyebabnya adalah…",
+          "options": [
+            "daerah khatulistiwa menerima penyinaran Matahari yang hampir merata sepanjang tahun meskipun sumbu Bumi miring",
+            "Indonesia tidak ikut berputar bersama Bumi sehingga siangnya tetap",
+            "sumbu Bumi tidak miring sama sekali di daerah khatulistiwa",
+            "Matahari selalu tepat berada di atas Indonesia setiap hari sepanjang tahun"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Kemiringan sumbu Bumi membuat lama penyinaran sangat berubah di lintang tinggi, sedangkan di dekat khatulistiwa perubahannya kecil sehingga siang dan malam hampir sama panjang."
+          },
+          "distractorWhy": {
+            "1": "Murid mengira ada wilayah yang tidak ikut berputar, padahal seluruh permukaan Bumi berotasi bersama.",
+            "2": "Murid mengira kemiringan sumbu berbeda-beda menurut wilayah, padahal sumbu Bumi satu dan kemiringannya berlaku untuk seluruh planet.",
+            "3": "Murid mengira Matahari tepat di atas kepala setiap hari, padahal kedudukan itu hanya terjadi pada hari-hari tertentu saja di daerah tropis."
+          },
+          "difficulty": "tinggi"
+        },
+        {
+          "id": "ipa-d7-bab7-011",
+          "prompt": "Perbedaan waktu antara Waktu Indonesia Barat dan Waktu Indonesia Timur adalah dua jam. Hal ini merupakan akibat dari…",
+          "options": [
+            "rotasi Bumi yang membuat setiap 15 derajat bujur berbeda satu jam",
+            "revolusi Bumi yang membuat setiap daerah mengalami musim berbeda",
+            "jarak Indonesia bagian timur yang lebih dekat ke Matahari",
+            "perbedaan luas wilayah antara Indonesia bagian barat dan timur"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Bumi berotasi 360 derajat dalam 24 jam sehingga setiap 15 derajat bujur setara satu jam; selisih bujur antara wilayah barat dan timur Indonesia menghasilkan beda dua jam."
+          },
+          "distractorWhy": {
+            "1": "Murid menghubungkan pembagian waktu dengan revolusi, padahal revolusi berkaitan dengan musim, bukan perbedaan jam dalam satu hari.",
+            "2": "Murid mengira wilayah timur lebih dekat ke Matahari, padahal selisih jarak itu tidak berarti dan waktu ditentukan oleh bujur.",
+            "3": "Murid memakai luas wilayah sebagai dasar, padahal pembagian waktu ditentukan garis bujur, bukan luas daratan."
+          },
+          "difficulty": "sedang"
+        },
+        {
+          "id": "ipa-d7-bab7-012",
+          "prompt": "Benda langit kecil yang memasuki atmosfer Bumi dan terbakar sehingga tampak seperti garis cahaya di langit malam disebut…",
+          "options": [
+            "meteor",
+            "komet",
+            "asteroid",
+            "satelit"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Meteor adalah pijaran cahaya yang muncul ketika serpihan benda langit memasuki atmosfer Bumi dan terbakar akibat gesekan dengan udara."
+          },
+          "distractorWhy": {
+            "1": "Murid tertukar dengan komet karena sama-sama berekor cahaya, padahal komet adalah benda langit beres berukuran besar yang mengorbit Matahari, bukan pijaran di atmosfer.",
+            "2": "Murid menyebut asteroid karena sama-sama batuan angkasa, padahal asteroid beredar di sabuk antara Mars dan Jupiter dan belum memasuki atmosfer.",
+            "3": "Murid memilih satelit karena benda itu bergerak di langit, padahal satelit mengorbit planet dan tidak terbakar saat melintas."
+          },
+          "difficulty": "sedang"
         }
       ]
     },
