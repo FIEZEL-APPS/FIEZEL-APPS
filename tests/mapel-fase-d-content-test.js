@@ -141,6 +141,14 @@ check('asal-usul: bank yang ADA selalu berpasangan dengan sidecar Thai-nya',
   adaBank.every((s) => !!banksTh[s.id]),
   adaBank.map((s) => s.id + (banksTh[s.id] ? '' : ' [sidecar hilang]')).join(', ') || 'nol bank');
 
+/* Bank yang berkas Indonesia-nya ada tetapi sidecar Thai-nya belum — berkas id ter-commit,
+   kembarannya lupa — SUDAH dilaporkan gagal tepat di atas. Pemeriksaan keutuhan di bawah
+   membaca `banksTh[s.id].competencies`, jadi melanjutkannya untuk mapel itu berarti
+   menyentuh null dan melempar TypeError: proses mati sebelum satu baris check() pun
+   tercetak. Itu persis "merah yang meledak" yang penulisan ulang gerbang ini ada untuk
+   melenyapkannya — dan ia sempat lolos ke dalam gerbangnya sendiri. */
+const adaBankUtuh = adaBank.filter((s) => !!banksTh[s.id]);
+
 /* Berkas precache service worker tidak boleh menyebut bank yang berkasnya tidak ada:
    addAll() menolak SELURUH precache bila satu alamat gagal, dan service worker gagal
    pasang. Ini pernah nyaris terjadi saat bank dicabut. */
@@ -187,7 +195,7 @@ for (const s of adaBank) {
 /* ========================= C · BANK YANG ADA WAJIB UTUH ============================== */
 
 const idButirGlobal = new Set();
-for (const s of adaBank) {
+for (const s of adaBankUtuh) {
   const comps = banks[s.id].competencies || [];
   const promptSubjek = new Set();
   let butirCacat = [], posisiHit = [], promptKembar = [];
