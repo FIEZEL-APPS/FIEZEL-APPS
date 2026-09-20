@@ -1,0 +1,409 @@
+{
+  "code": "KOMP-IPS-D-7-BAB4-01",
+  "grade": 7,
+  "name": "Tema IV: Pemberdayaan Masyarakat",
+  "materi": "Keanekaragaman Keragaman Etnis & Budaya Indonesia, Pemberdayaan Ekonomi Masyarakat, Literasi & Pengelolaan Keuangan Keluarga, Peran Komunitas Lokal",
+  "cpRef": "Ilmu Pengetahuan Sosial untuk SMP/MTs Kelas VII (Edisi Revisi)",
+  "items": [
+    {
+      "id": "ips-d-7-t4-q01",
+      "difficulty": "sedang",
+      "prompt": "Perhatikan perbandingan dua wilayah berikut!\n- Wilayah X: Terletak di pesisir, suhu tinggi, pakaian adat tidak memiliki lengan.\n- Wilayah Z: Terletak di pegunungan, suhu rendah, pakaian adat berlengan panjang.\nFaktor geografis yang memengaruhi keragaman budaya berpakaian pada kedua wilayah tersebut dipengaruhi oleh....",
+      "options": [
+        "suhu dan kelembapan udara",
+        "posisi strategis",
+        "luas wilayah",
+        "isolasi kepulauan oleh lautan"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Perbedaan kondisi suhu dan kelembapan udara antara daerah pesisir (panas) dan pegunungan (dingin) secara langsung memengaruhi jenis pakaian adat yang dirancang oleh masyarakat setempat untuk menyesuaikan dengan kenyamanan tubuh."
+      },
+      "distractorWhy": {
+        "1": "Posisi strategis lebih berpengaruh terhadap jalur perdagangan dan akulturasi budaya, bukan perbedaan jenis bahan pakaian karena suhu lingkungan.",
+        "2": "Luas wilayah mempengaruhi sebaran populasi dan variasi bentang alam, tetapi bukan faktor utama penyusunan desain pakaian adat tahan dingin atau panas.",
+        "3": "Isolasi kepulauan oleh lautan membentuk perbedaan bahasa dan tradisi lokal secara terpisah, bukan penyesuaian pakaian terhadap iklim atau cuaca."
+      }
+    },
+    {
+      "id": "ips-d-7-t4-q02",
+      "difficulty": "dasar",
+      "prompt": "Perhatikan setiap unsur budaya berikut!\n(1) Warisan\n(2) Bahasa\n(3) Sistem politik\n(4) Sistem mata pencaharian\n(5) Sistem pengetahuan\nUnsur-unsur budaya universal dalam masyarakat ditunjukkan oleh nomor....",
+      "options": [
+        "(2), (4), dan (5)",
+        "(1), (2), dan (3)",
+        "(1), (2), dan (4)",
+        "(1), (3), dan (5)"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Unsur budaya universal merupakan unsur kebudayaan yang dapat ditemukan di seluruh kelompok masyarakat di dunia, mencakup bahasa, sistem mata pencaharian, dan sistem pengetahuan (serta sistem religi, organisasi sosial, teknologi, dan kesenian)."
+      },
+      "distractorWhy": {
+        "1": "Pernyataan (1) warisan dan (3) sistem politik bukan merupakan kategori baku 7 unsur kebudayaan universal menurut teori antropologi.",
+        "2": "Pernyataan (1) warisan tidak termasuk dalam tujuh unsur budaya universal.",
+        "3": "Pernyataan (1) warisan dan (3) sistem politik bukan unsur budaya universal utama."
+      }
+    },
+    {
+      "id": "ips-d-7-t4-q03",
+      "difficulty": "dasar",
+      "prompt": "Dalam sejarah lokal perkembangan Kesultanan Demak, Ratu Kalinyamat yang terkenal dengan kepemimpinan dan kekuatan armadanya di Jepara merupakan putri ketiga dari....",
+      "options": [
+        "Sultan Trenggana",
+        "Raden Toyib",
+        "Sunan Prawata",
+        "Arya Penangsang"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Ratu Kalinyamat adalah putri ketiga dari Sultan Trenggana (raja ketiga Kesultanan Demak) yang memerintah wilayah Jepara dan memiliki peranan besar dalam sejarah maritim Nusantara."
+      },
+      "distractorWhy": {
+        "1": "Raden Toyib adalah nama lain dari Sultan Hadlirin (suami Ratu Kalinyamat), bukan ayah kandungnya.",
+        "2": "Sunan Prawata adalah saudara laki-laki dari Ratu Kalinyamat, bukan ayahnya.",
+        "3": "Arya Penangsang adalah adipati Jipang yang menjadi rival politik keluarga Demak, bukan ayah Ratu Kalinyamat."
+      }
+    },
+    {
+      "id": "ips-d-7-t4-q04",
+      "difficulty": "sedang",
+      "prompt": "Perhatikan setiap pernyataan tugas berikut!\n(1) Mengoordinasikan sejumlah pasukan laut.\n(2) Mengawasi pelabuhan yang berada di bawah syahbandar.\n(3) Mengawasi kapal-kapal jenis galley (perang) milik Kerajaan Aceh.\n(4) Bekerja sama dengan pihak Belanda dalam perdagangan lada.\n(5) Melakukan balas dendam bersama para wanita yang ditinggal wafat oleh suaminya di medan perang.\nTugas resmi Laksamana Keumalahayati dalam struktur Kerajaan Aceh ditunjukkan oleh nomor....",
+      "options": [
+        "(1), (2), dan (3)",
+        "(1), (2), dan (4)",
+        "(1), (3), dan (5)",
+        "(2), (4), dan (5)"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Laksamana Keumalahayati bertugas mengoordinasikan armada laut, mengawasi pelabuhan di bawah syahbandar, serta mengawasi kapal-kapal perang jenis galley milik Kerajaan Aceh."
+      },
+      "distractorWhy": {
+        "1": "Pernyataan (4) tidak tepat karena Keumalahayati gigih melawan perompak dan pengacau Eropa seperti Cornelis de Houtman dari Belanda.",
+        "2": "Pernyataan (5) bukan tugas resmi kedinasan laksamana Kerajaan Aceh.",
+        "3": "Pernyataan (4) bertentangan dengan perlawanan Keumalahayati terhadap bangsa Belanda."
+      }
+    },
+    {
+      "id": "ips-d-7-t4-q05",
+      "difficulty": "tinggi",
+      "prompt": "Berdasarkan data statistik kawasan hutan Indonesia tahun 2009–2013, region Sumatra memiliki persentase tutupan hutan alam sebesar 22% dari total luas daratan. Wilayah ini mengalami ancaman deforestasi tinggi yang disebabkan oleh....",
+      "options": [
+        "alih fungsi lahan hutan secara masif untuk perkebunan dan industri",
+        "tingginya intensitas erupsi gunung berapi di sepanjang pesisir",
+        "luas daratan yang terlalu kecil dibandingkan kawasan perairan",
+        "rendahnya tingkat curah hujan tahunan di wilayah khatulistiwa"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Penurunan persentase hutan alam di Sumatra terutama disebabkan oleh pembukaan lahan masif untuk industri perkebunan, pembalakan liar, dan alih fungsi lahan."
+      },
+      "distractorWhy": {
+        "1": "Erupsi gunung berapi memengaruhi lingkungan sekitar letusan, namun bukan penyebab utama hilangnya puluhan juta hektar tutupan hutan alam.",
+        "2": "Sumatra memiliki luas daratan sangat besar (47 juta hektar), sehingga persentase kecil menunjukkan deforestasi yang intensif.",
+        "3": "Sumatra berada di lintang khatulistiwa dengan curah hujan tropis yang sangat tinggi, bukan curah hujan rendah."
+      }
+    },
+    {
+      "id": "ips-d-7-t4-q06",
+      "difficulty": "dasar",
+      "prompt": "Perjuangan pahlawan nasional wanita seperti R.A. Kartini, Dewi Sartika, Christina Martha Tiahahu, Keumalahayati, dan Cut Nyak Dien memberikan keteladanan yang sangat relevan dengan upaya penyelesaian masalah sosial saat ini, yaitu terkait....",
+      "options": [
+        "kesetaraan gender",
+        "kesenjangan sosial dan kemiskinan",
+        "penyalahgunaan narkotika",
+        "tawuran antarpelajar"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Perjuangan para pahlawan wanita Nusantara membuktikan bahwa perempuan memiliki kemampuan, kepemimpinan, dan hak yang sama dengan laki-laki dalam pendidikan, pemerintahan, dan perjuangan bangsa (kesetaraan gender)."
+      },
+      "distractorWhy": {
+        "1": "Kesenjangan sosial dan kemiskinan berkaitan dengan masalah ekonomi, bukan inti perjuangan emansipasi pahlawan wanita tersebut.",
+        "2": "Penyalahgunaan narkotika merupakan masalah kejahatan narkoba masa modern.",
+        "3": "Tawuran antarpelajar merupakan kenakalan remaja yang bertentangan dengan semangat pendidikan pahlawan nasional."
+      }
+    },
+    {
+      "id": "ips-d-7-t4-q07",
+      "difficulty": "dasar",
+      "prompt": "Sebagian dari pendapatan yang tidak habis digunakan untuk konsumsi dapat disisihkan sebagai tabungan. Di antara pilihan berikut, yang BUKAN merupakan manfaat menabung adalah....",
+      "options": [
+        "menambah utang",
+        "melatih gaya hidup hemat",
+        "tersedianya uang untuk kebutuhan mendesak",
+        "mencapai tujuan keuangan pada masa mendatang"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Menabung justru mencegah seseorang dari ketergantungan pada pinjaman atau utang, sehingga menambah utang bukanlah manfaat menabung."
+      },
+      "distractorWhy": {
+        "1": "Melatih gaya hidup hemat adalah salah satu manfaat utama dari kebiasaan menabung secara teratur.",
+        "2": "Menyediakan dana darurat untuk kebutuhan mendesak merupakan fungsi penting dari tabungan.",
+        "3": "Tabungan membantu mengumpulkan dana untuk mencapai tujuan keuangan jangka panjang."
+      }
+    },
+    {
+      "id": "ips-d-7-t4-q08",
+      "difficulty": "sedang",
+      "prompt": "Dalam pengelolaan keuangan keluarga, seseorang harus dapat membedakan antara Kebutuhan (hal yang wajib dipenuhi) dan Keinginan (hal yang tidak mendesak). Tindakan membedakan kedua hal tersebut merupakan bagian dari langkah perencanaan keuangan yaitu....",
+      "options": [
+        "memilih prioritas pengeluaran",
+        "menyusun rencana pendapatan",
+        "menyusun rencana pengeluaran",
+        "melakukan reviu perencanaan"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Membedakan kebutuhan dan keinginan membantu menentukan skala prioritas sehingga pengeluaran dialokasikan untuk hal yang paling mendesak dan penting terlebih dahulu."
+      },
+      "distractorWhy": {
+        "1": "Menyusun rencana pendapatan berfokus pada sumber-sumber penerimaan uang, bukan memilah daftar pengeluaran.",
+        "2": "Menyusun rencana pengeluaran mencatat seluruh perkiraan biaya tanpa memisahkan tingkat urgensinya.",
+        "3": "Melakukan reviu perencanaan adalah evaluasi setelah rencana dijalankan."
+      }
+    },
+    {
+      "id": "ips-d-7-t4-q09",
+      "difficulty": "tinggi",
+      "prompt": "Ismi memiliki modal sebesar Rp10.000.000,00 dan memutuskan berinvestasi pada instrumen reksa dana karena memahami tingkat risiko dan potensi imbal hasilnya dibanding saham. Keputusan Ismi yang memahami produk dan risiko keuangan ini menunjukkan tingkat literasi keuangan....",
+      "options": [
+        "well literate",
+        "sufficient literate",
+        "less literate",
+        "not literate"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Well literate adalah tingkatan di mana seseorang mempunyai pengetahuan dan keyakinan tentang lembaga jasa keuangan serta produk keuangan, termasuk fitur, manfaat, risiko, dan hak-kewajiban."
+      },
+      "distractorWhy": {
+        "1": "Sufficient literate hanya memiliki pengetahuan dan keyakinan tentang lembaga serta produk keuangan, tetapi belum mahir mengelola atau memilih risiko investasi secara tepat.",
+        "2": "Less literate hanya memiliki pengetahuan minimal tentang lembaga jasa keuangan dan produknya.",
+        "3": "Not literate adalah kondisi seseorang yang tidak memiliki pengetahuan dan keyakinan terhadap lembaga serta produk keuangan."
+      }
+    },
+    {
+      "id": "ips-d-7-t4-q10",
+      "difficulty": "tinggi",
+      "prompt": "Perhatikan setiap kegiatan berikut!\n(1) Pelatihan kewirausahaan dari halaman rumah di Desa Paremono.\n(2) Pelatihan keterampilan membuat tas daur ulang dari sampah plastik untuk ibu-ibu PKK.\n(3) Sosialisasi Desa Tangguh Bencana.\n(4) Sosialisasi safety riding pada komunitas sepeda.\n(5) Pelatihan desain grafis bagi anggota komunitas postcrossing.\nKegiatan yang merupakan bentuk wujud pemberdayaan masyarakat berbasis komunitas lokal ditunjukkan oleh nomor....",
+      "options": [
+        "(1), (2), dan (3)",
+        "(1), (2), dan (4)",
+        "(1), (3), dan (5)",
+        "(2), (4), dan (5)"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Pemberdayaan masyarakat berfokus pada peningkatan kapasitas kemandirian ekonomi, pengelolaan lingkungan (daur ulang), dan ketangguhan bencana warga lokal."
+      },
+      "distractorWhy": {
+        "1": "Sosialisasi keselamatan berkendara (4) lebih bersifat edukasi umum lalu lintas, bukan program peningkatan kemandirian ekonomi/sosial masyarakat.",
+        "2": "Pelatihan desain grafis komunitas hobi (5) tidak secara langsung memberdayakan kapasitas ekonomi atau kemasyarakatan desa.",
+        "3": "Kombinasi (2), (4), dan (5) memuat sosialisasi hobi dan lalu lintas yang bukan inti pemberdayaan desa."
+      }
+    },
+    {
+      "id": "ips-d-7-t4-q11",
+      "difficulty": "sedang",
+      "prompt": "Pada abad ke-18, Sultan Nuku dari Tidore berhasil menyatukan wilayah Maluku dan Papua dalam perjuangan melawan penjajahan kolonial Belanda. Nilai utama yang dapat diteladani dari perjuangan Sultan Nuku adalah....",
+      "options": [
+        "persatuan, keberanian, dan kesetiaan pada kedaulatan wilayah",
+        "persaingan antarkerajaan lokal untuk memperluas wilayah kekuasaan",
+        "kerja sama dengan kongsi dagang asing untuk meraih keuntungan pribadi",
+        "sikap menyerah kepada kolonial demi keamanan daerah"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Sultan Nuku menunjukkan kepemimpinan yang menyatukan berbagai suku dan wilayah (Maluku dan Papua) serta gigih mempertahankan kedaulatan dari penjajahan asing."
+      },
+      "distractorWhy": {
+        "1": "Sultan Nuku justru menghentikan konflik internal antarkerajaan untuk bersatu melawan Belanda.",
+        "2": "Sultan Nuku memanfaatkan diplomasi secara cerdik tanpa mengorbankan kedaulatan rakyat demi keuntungan pribadi.",
+        "3": "Sultan Nuku pantang menyerah dan terus berjuang hingga berhasil membebaskan Tidore."
+      }
+    },
+    {
+      "id": "ips-d-7-t4-q12",
+      "difficulty": "dasar",
+      "prompt": "Keberagaman sosial budaya di Indonesia dapat memicu konflik antarkebudayaan apabila terdapat kelompok masyarakat yang merasa kebudayaannya paling unggul (etnosentrisme). Sikap yang harus dikembangkan untuk mencegah konflik tersebut adalah....",
+      "options": [
+        "toleransi dan menghargai keragaman budaya bangsa",
+        "etnosentrisme dan mengagungkan budaya sendiri",
+        "asimilasi paksa seluruh budaya daerah menjadi satu",
+        "mengisolasi diri dari interaksi dengan kelompok budaya lain"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Sikap toleransi dan saling menghargai keragaman budaya merupakan kunci utama menjaga persatuan dan mencegah perpecahan di masyarakat majemuk."
+      },
+      "distractorWhy": {
+        "1": "Etnosentrisme memicu rasa superioritas yang justru menjadi penyebab utama konflik antarbudaya.",
+        "2": "Pemaksaan budaya melanggar hak asasi dan merusak kekayaan budaya lokal.",
+        "3": "Mengisolasi diri menghambat komunikasi dan memperluas prasangka buruk antarwarga."
+      }
+    },
+    {
+      "id": "ips-d-7-t4-q13",
+      "difficulty": "tinggi",
+      "prompt": "Berdasarkan Hasil Survei Nasional Literasi dan Inklusi Keuangan (SNLIK) tahun 2022, indeks inklusi finansial Indonesia mencapai 85,10% sedangkan literasi finansial sebesar 49,68%. Hal ini menunjukkan kondisi bahwa....",
+      "options": [
+        "banyak masyarakat sudah mengakses produk keuangan tetapi pemahamannya belum sebanding",
+        "tingkat pemahaman keuangan masyarakat jauh lebih tinggi daripada akses produk keuangan",
+        "masyarakat Indonesia sama sekali belum memanfaatkan layanan perbankan dan jasa keuangan",
+        "indeks literasi dan inklusi keuangan Indonesia telah mencapai angka sempurna 100%"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Tingginya angka inklusi (85,10%) dibanding literasi (49,68%) berarti sebagian besar masyarakat telah menggunakan produk/layanan keuangan tetapi belum memahami risiko dan manfaatnya secara mendalam."
+      },
+      "distractorWhy": {
+        "1": "Kenyataannya angka literasi (49,68%) lebih rendah dari angka inklusi (85,10%).",
+        "2": "Angka inklusi 85,10% membuktikan mayoritas masyarakat telah memiliki akses dan menggunakan jasa keuangan.",
+        "3": "Kedua indeks masih di bawah 100% dan memerlukan peningkatan pemahaman literasi."
+      }
+    },
+    {
+      "id": "ips-d-7-t4-q14",
+      "difficulty": "sedang",
+      "prompt": "Masyarakat sering kali menganggap tabungan dan investasi adalah hal yang sama. Perbedaan mendasar antara tabungan dan investasi terletak pada....",
+      "options": [
+        "tabungan bertujuan menyimpan uang dengan risiko rendah, sedangkan investasi bertujuan meningkatkan nilai aset di masa depan",
+        "tabungan selalu menghasilkan keuntungan sangat tinggi, sedangkan investasi tidak memiliki potensi imbal hasil",
+        "tabungan hanya dapat dilakukan di bank swasta, sedangkan investasi wajib dilakukan di lembaga pemerintah",
+        "tabungan membutuhkan modal sangat besar, sedangkan investasi dapat dilakukan tanpa modal sama sekali"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Tabungan berfungsi mengamankan uang simpanan untuk jangka pendek dengan risiko minimal, sedangkan investasi menempatkan dana pada instrumen tertentu guna memperoleh pertumbuhan nilai aset dalam jangka panjang."
+      },
+      "distractorWhy": {
+        "1": "Investasi justru memiliki potensi imbal hasil lebih tinggi dibanding tabungan biasa.",
+        "2": "Baik tabungan maupun investasi dapat diakses melalui berbagai lembaga keuangan resmi swasta maupun pemerintah.",
+        "3": "Investasi dan tabungan saat ini dapat dimulai dari jumlah nominal yang relatif terjangkau."
+      }
+    },
+    {
+      "id": "ips-d-7-t4-q15",
+      "difficulty": "tinggi",
+      "prompt": "Cornelis van Vollenhoven dijuluki sebagai 'Bapak Hukum Adat Indonesia' karena kontribusi ilmiah besarnya dalam....",
+      "options": [
+        "mengidentifikasi dan mempertahankan 19 lingkungan hukum adat dari upaya penghapusan kolonial Belanda",
+        "menghapuskan seluruh sistem hukum adat dan menggantikannya dengan Hukum Perdata Barat",
+        "menerapkan hukum tunggal Kerajaan Belanda untuk seluruh pribumi tanpa terkecuali",
+        "mendirikan kongsi perdagangan baru di wilayah kepulauan Hindia Belanda"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Melalui karyanya Het Adatrecht van Nederlandsch-Indië, Van Vollenhoven meneliti 19 lingkungan hukum adat dan gigih membela eksistensi hukum adat pribumi dari upaya unifikasi hukum Barat oleh pemerintah kolonial."
+      },
+      "distractorWhy": {
+        "1": "Van Vollenhoven justru menentang pemaksaan Hukum Perdata Barat terhadap masyarakat adat pribumi.",
+        "2": "Ia membantah proyek unifikasi hukum tunggal dan memperjuangkan konsepsi dualisme hukum.",
+        "3": "Van Vollenhoven adalah guru besar akademisi hukum di Universitas Leiden, bukan pendiri kongsi dagang."
+      }
+    },
+    {
+      "id": "ips-d-7-t4-q16",
+      "difficulty": "sedang",
+      "prompt": "Kondisi iklim dan cuaca memengaruhi bentuk arsitektur rumah tradisional di Indonesia. Sebagai contoh, rumah adat Baduy di Kanekes dibangun menghadap ke utara dan selatan dengan tujuan....",
+      "options": [
+        "mengatur sirkulasi udara dan intensitas sinar matahari yang masuk ke dalam rumah",
+        "mempermudah perluasan permukiman ke arah timur dan barat",
+        "menyesuaikan dengan arah angin laut di kawasan pesisir pantai",
+        "menghindari bencana tanah longsor di kawasan lereng gunung"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Rumah adat Baduy dibangun menghadap utara-selatan agar mendapat pencahayaan sinar matahari yang cukup tanpa terlalu panas serta menjaga sirkulasi udara yang baik."
+      },
+      "distractorWhy": {
+        "1": "Arah bangunan didasarkan pada kenyamanan suhu dan iklim mikro, bukan sekadar ruang perluasan.",
+        "2": "Kanekes terletak di pedalaman perbukitan Banten, bukan kawasan pesisir pantai.",
+        "3": "Orientasi rumah utara-selatan berfokus pada pencahayaan dan penghawaan alami."
+      }
+    },
+    {
+      "id": "ips-d-7-t4-q17",
+      "difficulty": "sedang",
+      "prompt": "Kepemimpinan Ratu Kalinyamat dari Kesultanan Demak/Jepara yang mampu mengorganisasi puluhan kapal perang dan ribuan prajurit untuk membantu Malaka melawan Portugis menunjukkan keunggulan daerah Nusantara dalam hal....",
+      "options": [
+        "kekuatan armada maritim dan keberanian melawan dominasi asing di perairan Nusantara",
+        "penerapan sistem pertanian irigasi sawah di kawasan pegunungan pedalaman",
+        "penerapan monopoli perdagangan eksklusif di wilayah daratan",
+        "pembentukan pasukan militer khusus berkuda untuk pertempuran darat"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Kekuatan Jepara di bawah Ratu Kalinyamat membuktikan ketangguhan maritim dan armada laut Nusantara yang disegani di kawasan Asia Tenggara."
+      },
+      "distractorWhy": {
+        "1": "Jepara dikenal sebagai pusat maritim dan perdagangan laut, bukan sektor pertanian pegunungan.",
+        "2": "Ekspedisi Ratu Kalinyamat adalah pengiriman armada militer laut untuk menolong Malaka dari Portugis.",
+        "3": "Kekuatan utama Jepara terletak pada armada kapal perang (maritim), bukan pasukan darat berkuda."
+      }
+    },
+    {
+      "id": "ips-d-7-t4-q18",
+      "difficulty": "dasar",
+      "prompt": "Dalam menyusun skala prioritas pengelolaan keuangan keluarga, alokasi dana utama dari pendapatan harus didahulukan untuk....",
+      "options": [
+        "pemenuhan kebutuhan pokok seperti pangan, kesehatan, dan pendidikan",
+        "pembelian barang-barang mewah untuk mengikuti tren gaya hidup",
+        "pengeluaran rekreasi dan hiburan setiap akhir pekan",
+        "pembelian barang-barang yang sifatnya hanya dorongan keinginan"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Kebutuhan pokok (pangan, papan, kesehatan, dan pendidikan) wajib dipenuhi terlebih dahulu sebelum mengalokasikan dana untuk keinginan atau hiburan."
+      },
+      "distractorWhy": {
+        "1": "Barang mewah merupakan bentuk keinginan yang berada pada prioritas rendah.",
+        "2": "Rekreasi dan hiburan adalah kebutuhan sekunder/tersier yang disesuaikan setelah kebutuhan utama terpenuhi.",
+        "3": "Keinginan tidak mendesak dapat ditunda demi menjaga kestabilan keuangan keluarga."
+      }
+    },
+    {
+      "id": "ips-d-7-t4-q19",
+      "difficulty": "dasar",
+      "prompt": "Tindakan merusak atau mencorat-coret fasilitas umum dan menandai dinding publik dengan inisial kelompok atau sekolah merupakan bentuk permasalahan sosial budaya yang disebut....",
+      "options": [
+        "vandalisme",
+        "akumulasi modal",
+        "diferensiasi sosial",
+        "akulturasi budaya"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Vandalisme adalah perbuatan merusak atau menghancurkan barang/fasilitas umum atau milik orang lain secara sembarangan dan tanpa izin."
+      },
+      "distractorWhy": {
+        "1": "Akumulasi modal adalah istilah ekonomi dalam pengumpulan dana atau aset.",
+        "2": "Diferensiasi sosial adalah pembedaan anggota masyarakat secara horizontal tanpa tingkatan.",
+        "3": "Akulturasi budaya adalah perpaduan dua kebudayaan yang melahirkan kebudayaan baru tanpa menghilangkan unsur asli."
+      }
+    },
+    {
+      "id": "ips-d-7-t4-q20",
+      "difficulty": "tinggi",
+      "prompt": "Kehadiran komunitas lokal seperti kelompok pengelola sampah daur ulang dan desa tangguh bencana memiliki peranan penting dalam pemberdayaan masyarakat, yaitu....",
+      "options": [
+        "meningkatkan kemandirian dan kepedulian masyarakat terhadap permasalahan lingkungan dan sosial",
+        "mengambil alih seluruh kewenangan dan tugas dari pemerintah pusat",
+        "membatasi warga masyarakat agar tidak berinteraksi dengan pihak luar",
+        "menggantikan peran lembaga perbankan dalam menyalurkan pinjaman modal"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Komunitas lokal berperan membangun kesadaran bersama, keterampilan warga, dan kemandirian dalam mengatasi permasalahan di lingkungan tempat tinggal."
+      },
+      "distractorWhy": {
+        "1": "Komunitas lokal bersifat bermitra dan melengkapi, bukan menggantikan kewenangan pemerintah.",
+        "2": "Pemberdayaan komunitas justru memperluas jaringan dan kerja sama dengan berbagai pihak luar.",
+        "3": "Komunitas berfokus pada gerakan sosial dan lingkungan, bukan bertindak sebagai bank pinjaman modal."
+      }
+    }
+  ]
+}

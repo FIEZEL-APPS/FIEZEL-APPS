@@ -1,0 +1,409 @@
+{
+  "code": "KOMP-IPS-D-8-BAB1-01",
+  "grade": 8,
+  "name": "Tema 01: Kondisi Geografis dan Pelestarian Sumber Daya Alam",
+  "materi": "Kondisi Geografis & Iklim Indonesia, Keragaman Flora & Fauna (Garis Wallace & Weber), Pelestarian Sumber Daya Alam, Potensi Maritim",
+  "cpRef": "Ilmu Pengetahuan Sosial untuk SMP/MTs Kelas VIII (Edisi Revisi)",
+  "items": [
+    {
+      "id": "ips-d-8-t1-q01",
+      "difficulty": "dasar",
+      "prompt": "Berdasarkan Buku Siswa IPS Kelas VIII Edisi Revisi Tema 01, letak astronomis Indonesia berada pada 6°LU – 11°LS dan 95°BT – 141°BT. Pengaruh letak astronomis tersebut terhadap kondisi iklim di sebagian besar wilayah Indonesia adalah ....",
+      "options": [
+        "memiliki iklim tropis dengan suhu udara tinggi dan curah hujan rata-rata melimpah sepanjang tahun",
+        "memiliki empat musim yang berganti secara teratur setiap tiga bulan sekali",
+        "didominasi iklim subtropis kering dengan gurun pasir yang luas di wilayah pesisir",
+        "mengalami penurunan suhu ekstrem hingga di bawah titik beku pada pertengahan tahun"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Letak astronomis Indonesia di wilayah khatulistiwa (6°LU – 11°LS) menyebabkan Indonesia beriklim tropis dengan intensitas penyinaran matahari tinggi dan kelembapan serta curah hujan yang melimpah sepanjang tahun."
+      },
+      "distractorWhy": {
+        "1": "Empat musim teratur adalah ciri daerah beriklim sedang atau sedang-subtropis, bukan wilayah tropis khatulistiwa.",
+        "2": "Iklim subtropis kering terdapat di kawasan lintang menengah seperti Afrika Utara dan Australia Tengah, bukan di Indonesia.",
+        "3": "Suhu ekstrem di bawah titik beku merupakan karakteristik iklim kutub atau iklim sedang pada musim dingin."
+      }
+    },
+    {
+      "id": "ips-d-8-t1-q02",
+      "difficulty": "sedang",
+      "prompt": "Berdasarkan Buku Siswa IPS Kelas VIII Edisi Revisi Tema 01, posisi geografis Indonesia diapit oleh Benua Asia dan Benua Australia serta Samudra Hindia dan Samudra Pasifik. Keuntungan strategis dari posisi silang tersebut bagi Indonesia adalah ....",
+      "options": [
+        "menjadi jalur persimpangan lalu lintas perdagangan internasional dan interaksi budaya dunia",
+        "terbebas sepenuhnya dari ancaman bencana alam geologis seperti gempa bumi dan tsunami",
+        "memiliki garis pantai terkecil sehingga kawasan daratan lebih mudah diolah",
+        "menjadi wilayah yang tidak terpengaruh oleh dinamika iklim global maupun pola angin muson"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Posisi silang di antara dua benua dan dua samudra menempatkan Indonesia pada jalur pelayaran komersial utama dunia yang mendorong jalur perdagangan internasional dan pertukaran budaya."
+      },
+      "distractorWhy": {
+        "1": "Posisi geografis tidak menghilangkan risiko bencana geologis karena Indonesia berada di jalur cincin api pasifik dan pertemuan lempeng tektonik.",
+        "2": "Indonesia justru memiliki garis pantai terpanjang kedua di dunia sebagai negara kepulauan.",
+        "3": "Posisi di antara dua benua dan samudra sangat memengaruhi pola pergerakan angin muson barat dan muson timur."
+      }
+    },
+    {
+      "id": "ips-d-8-t1-q03",
+      "difficulty": "dasar",
+      "prompt": "Berdasarkan Buku Siswa IPS Kelas VIII Edisi Revisi Tema 01, wilayah Indonesia terbagi menjadi tiga daerah waktu karena perentangan garis bujur sebesar 46° (95°BT – 141°BT). Daerah di bawah ini yang termasuk dalam zona Waktu Indonesia Tengah (WITA) adalah ....",
+      "options": [
+        "Sulawesi, Bali, Nusa Tenggara, dan Kalimantan Selatan",
+        "Jawa, Sumatra, Kalimantan Barat, dan Madura",
+        "Maluku, Maluku Utara, Papua, dan Papua Barat",
+        "Aceh, Sumatra Utara, Riau, dan Kepulauan Riau"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Waktu Indonesia Tengah (WITA, UTC+8) mencakup wilayah Sulawesi, Bali, Nusa Tenggara Barat, Nusa Tenggara Timur, Kalimantan Selatan, dan Kalimantan Timur."
+      },
+      "distractorWhy": {
+        "1": "Jawa, Sumatra, Kalimantan Barat, dan Madura masuk dalam zona Waktu Indonesia Barat (WIB, UTC+7).",
+        "2": "Maluku, Maluku Utara, Papua, dan Papua Barat masuk dalam zona Waktu Indonesia Timur (WIT, UTC+9).",
+        "3": "Aceh, Sumatra Utara, Riau, dan Kepulauan Riau berlokasi di Sumatra yang masuk zona Waktu Indonesia Barat (WIB)."
+      }
+    },
+    {
+      "id": "ips-d-8-t1-q04",
+      "difficulty": "sedang",
+      "prompt": "Berdasarkan Buku Siswa IPS Kelas VIII Edisi Revisi Tema 01, pergantian musim di Indonesia dipengaruhi oleh pergerakan angin muson. Pola pergerakan Angin Muson Barat yang bertiup dari Benua Asia menuju Benua Australia pada periode Oktober hingga April berdampak pada ....",
+      "options": [
+        "terjadinya musim hujan di sebagian besar wilayah Indonesia karena angin membawa uap air melimpah dari Samudra Pasifik dan Laut Cina Selatan",
+        "terjadinya musim kemarau panjang karena angin melewati gurun pasir yang kering di Benua Australia",
+        "terjadinya gelombang panas ekstrem di pulau Jawa dan Bali karena udara kering yang bertiup cepat",
+        "menurunnya tingkat kelembapan udara secara drastis di kawasan pesisir utara Sumatra"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Angin Muson Barat bertiup dari Asia melewati Samudra Pasifik dan lautan luas, membawa banyak uap air sehingga menyebabkan musim hujan di Indonesia."
+      },
+      "distractorWhy": {
+        "1": "Angin bertiup dari Benua Australia yang bersifat kering adalah Angin Muson Timur yang memicu musim kemarau (April–Oktober).",
+        "2": "Muson Barat membawa kelembapan tinggi dan curah hujan, bukan gelombang panas atau udara kering.",
+        "3": "Kelembapan udara saat musim hujan relatif tinggi, bukan menurun drastis."
+      }
+    },
+    {
+      "id": "ips-d-8-t1-q05",
+      "difficulty": "dasar",
+      "prompt": "Berdasarkan Buku Siswa IPS Kelas VIII Edisi Revisi Tema 01, Indonesia berada pada titik pertemuan tiga lempeng tektonik utama dunia, yaitu Lempeng Indo-Australia, Lempeng Eurasia, dan Lempeng Pasifik. Kondisi geologis tersebut mengakibatkan wilayah Indonesia ....",
+      "options": [
+        "memiliki banyak gunung api aktif serta sering mengalami gempa bumi tektonik dan vulkanik",
+        "menjadi kawasan yang bebas dari aktivitas tektonik dan lipatan kerak bumi",
+        "memiliki lapisan tanah yang tandus dan tidak dapat dimanfaatkan untuk pertanian",
+        "terdiri atas daratan tua yang stabil dan tidak pernah mengalami pergeseran kerak bumi"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Pertemuan tiga lempeng tektonik memicu pembentukan jalur gunung api (cincin api) serta aktivitas seismik berupa gempa bumi tektonik dan vulkanik."
+      },
+      "distractorWhy": {
+        "1": "Kawasan pertemuan lempeng tektonik justru sangat aktif dalam aktivitas tektonik dan pembentukan pegunungan lipatan.",
+        "2": "Aktivitas vulkanisme dari gunung api di Indonesia justru menghasilkan tanah vulkanis yang sangat subur.",
+        "3": "Kerak bumi di Indonesia bersifat dinamis akibat pergerakan dan tumbukan lempeng yang terus berlangsung."
+      }
+    },
+    {
+      "id": "ips-d-8-t1-q06",
+      "difficulty": "sedang",
+      "prompt": "Berdasarkan Buku Siswa IPS Kelas VIII Edisi Revisi Tema 01, keragaman flora dan fauna di Indonesia dibagi menjadi tiga wilayah utama yang dipisahkan oleh Garis Wallace dan Garis Weber. Karakteristik utama dari kelompok fauna Asiatis (Barat) adalah ....",
+      "options": [
+        "didominasi oleh mamalia berukuran besar dan berbagai jenis kera, serta tidak terdapat mamalia berkantong",
+        "didominasi oleh mamalia berkantong kecil dan burung-burung berbulu indah dan berwarna-warni",
+        "terdiri atas hewan-hewan purba endemis yang tidak ditemukan di benua mana pun",
+        "hanya diisi oleh jenis unggas air dan mamalia laut tanpa adanya reptil darat"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Fauna Asiatis di bagian barat Indonesia (Sumatra, Jawa, Kalimantan, Bali) memiliki kemiripan dengan fauna Asia, ditandai oleh mamalia besar (gajah, harimau, badak) dan primates/kera tanpa mamalia berkantong."
+      },
+      "distractorWhy": {
+        "1": "Mamalia berkantong dan burung berbulu indah berwarna-warni merupakan ciri khas fauna Australis di Indonesia bagian timur.",
+        "2": "Hewan purba endemis unik merupakan ciri fauna Peralihan/Wallacea seperti komodo dan anoa.",
+        "3": "Fauna Asiatis mencakup ekosistem darat yang luas termasuk berbagai jenis reptil, mamalia, dan burung."
+      }
+    },
+    {
+      "id": "ips-d-8-t1-q07",
+      "difficulty": "sedang",
+      "prompt": "Berdasarkan Buku Siswa IPS Kelas VIII Edisi Revisi Tema 01, Garis Wallace membatasi persebaran fauna bagian barat dengan kawasan peralihan, sedangkan Garis Weber membatasi kawasan peralihan dengan bagian timur. Hewan di bawah ini yang termasuk dalam kelompok fauna kawasan Peralihan (Wallacea) adalah ....",
+      "options": [
+        "komodo, anoa, babirusa, dan burung maleo",
+        "gajah surowiti, harimau sumatra, orangutan, dan badak bercula satu",
+        "kanguru pohon, burung cendrawasih, kasuari, dan walabi",
+        "banteng jawa, beruang madu, pesut mahakam, dan macan tutul"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Kawasan Peralihan (Sulawesi, Nusa Tenggara, Maluku) memiliki hewan khas/endemis Indonesia seperti komodo, anoa, babirusa, dan burung maleo."
+      },
+      "distractorWhy": {
+        "1": "Gajah, harimau sumatra, orangutan, dan badak merupakan contoh fauna tipe Asiatis (bagian barat).",
+        "2": "Kanguru pohon, cendrawasih, kasuari, dan walabi merupakan contoh fauna tipe Australis (bagian timur/Papua).",
+        "3": "Banteng jawa, beruang madu, pesut mahakam, dan macan tutul tergolong dalam kelompok fauna tipe Asiatis."
+      }
+    },
+    {
+      "id": "ips-d-8-t1-q08",
+      "difficulty": "dasar",
+      "prompt": "Berdasarkan Buku Siswa IPS Kelas VIII Edisi Revisi Tema 01, fauna bagian timur Indonesia memilik kemiripan dengan fauna di Benua Australia (tipe Australis). Salah satu contoh hewan khas yang terdapat di kawasan Papua dan sekitarnya adalah ....",
+      "options": [
+        "burung cendrawasih dan kanguru pohon",
+        "orangutan dan harimau sumatra",
+        "babirusa dan anoa darat",
+        "badak bercula satu dan gajah sumatra"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Burung cendrawasih dan kanguru pohon adalah hewan khas tipe Australis yang hidup di Papua dan pulau-pulau sekitarnya."
+      },
+      "distractorWhy": {
+        "1": "Orangutan dan harimau sumatra hidup di Sumatra dan Kalimantan (tipe Asiatis).",
+        "2": "Babirusa dan anoa hidup di Sulawesi (tipe Peralihan/Wallacea).",
+        "3": "Badak bercula satu dan gajah sumatra hidup di Jawa dan Sumatra (tipe Asiatis)."
+      }
+    },
+    {
+      "id": "ips-d-8-t1-q09",
+      "difficulty": "sedang",
+      "prompt": "Berdasarkan Buku Siswa IPS Kelas VIII Edisi Revisi Tema 01, Hutan Hujan Tropis di Indonesia kaya akan keberagaman flora heterogen. Ciri-ciri vegetasi yang tumbuh pada kawasan hutan hujan tropis adalah ....",
+      "options": [
+        "pohon-pohon berdaun lebat dan rapat membentuk kanopi dengan ketinggian bervariasi serta kelembapan tinggi",
+        "pohon-pohon menggugurkan daunnya pada musim kemarau untuk mengurangi penguapan air",
+        "didominasi oleh tumbuhan jenis konifer yang tahan terhadap suhu di bawah titik beku",
+        "terdiri atas padang rumput yang luas tanpa dijumpai adanya pepohonan berkayu"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Hutan hujan tropis ditandai oleh keanekaragaman vegetasi heterogen yang tumbuh rapat, berdaun lebat membentuk kanopi, dan kelembapan di dalam hutan sangat tinggi."
+      },
+      "distractorWhy": {
+        "1": "Menggugurkan daun pada musim kemarau adalah ciri hutan musim (hutan meranggas) seperti hutan jati.",
+        "2": "Tumbuhan konifer merupakan vegetasi hutan taiga di daerah beriklim dingin/subtropis.",
+        "3": "Padang rumput tanpa pohon merupakan ciri vegetasi sabana atau padang rumput stepa."
+      }
+    },
+    {
+      "id": "ips-d-8-t1-q10",
+      "difficulty": "dasar",
+      "prompt": "Berdasarkan Buku Siswa IPS Kelas VIII Edisi Revisi Tema 01, di kawasan Nusa Tenggara dengan curah hujan yang relatif sedikit, jenis vegetasi alami yang dominan dijumpai adalah ....",
+      "options": [
+        "sabana dan padang rumput",
+        "hutan hujan tropis heterogen",
+        "hutan lumut dan tundra",
+        "hutan bakau pedalaman"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Wilayah Nusa Tenggara memiliki iklim yang cenderung lebih kering dengan masa kemarau panjang sehingga ditumbuhi vegetasi sabana dan padang rumput."
+      },
+      "distractorWhy": {
+        "1": "Hutan hujan tropis heterogen tumbuh di daerah bersuhu basah dengan curah hujan tinggi seperti Sumatra, Kalimantan, dan Papua.",
+        "2": "Hutan lumut dan tundra terdapat di kawasan pegunungan tinggi atau daerah kutub.",
+        "3": "Hutan bakau tumbuh di daerah pesisir pantai berlumpur yang dipengaruhi pasang surut air laut."
+      }
+    },
+    {
+      "id": "ips-d-8-t1-q11",
+      "difficulty": "sedang",
+      "prompt": "Berdasarkan Buku Siswa IPS Kelas VIII Edisi Revisi Tema 01, hutan memiliki fungsi ekologis dan ekonomis bagi kehidupan. Salah satu fungsi ekologis hutan sebagai pengatur tata air (fungsi hidrologis) adalah ....",
+      "options": [
+        "menampung air hujan dan menyerapnya ke dalam tanah sehingga mencegah banjir serta menjaga ketersediaan air tanah",
+        "menghasilkan kayu pertukangan dan bahan baku kertas untuk diekspor ke luar negeri",
+        "menjadi tempat objek wisata alam yang mendatangkan pendapatan bagi daerah",
+        "menyediakan lahan permukiman baru bagi penduduk yang direlokasi dari perkotaan"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Fungsi hidrologis hutan adalah menyerap dan menyimpan air hujan dalam tanah sehingga menjaga keseimbangan tata air tanah dan mencegah banjir."
+      },
+      "distractorWhy": {
+        "1": "Menghasilkan kayu pertukangan merupakan fungsi produksi atau ekonomis hutan.",
+        "2": "Tempat objek wisata merupakan fungsi pariwisata/ekonomis jasa lingkungan.",
+        "3": "Penyediaan lahan permukiman bukan fungsi ekologis hutan, melainkan alih fungsi lahan."
+      }
+    },
+    {
+      "id": "ips-d-8-t1-q12",
+      "difficulty": "mahir",
+      "prompt": "Berdasarkan Buku Siswa IPS Kelas VIII Edisi Revisi Tema 01, pelestarian sumber daya alam hayati dapat dilakukan melalui bentuk konservasi *in-situ* dan *ex-situ*. Pernyataan yang menggambarkan konservasi *in-situ* secara tepat adalah ....",
+      "options": [
+        "perlindungan flora dan fauna yang dilakukan di dalam habitat aslinya seperti di Taman Nasional Ujung Kulon",
+        "pemeliharaan dan pembiakan hewan langka di dalam kebun binatang atau taman safari di luar habitat asli",
+        "penyimpanan benih tanaman langka dalam bank genetik berteknologi tinggi di laboratorium kota",
+        "penangkaran tumbuhan langka di dalam kebun raya buatan di pusat perkotaan"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Konservasi *in-situ* adalah perlindungan flora dan fauna yang dilakukan di dalam kawasan habitat aslinya (misalnya Taman Nasional, Cagar Alam, Suaka Margasatwa)."
+      },
+      "distractorWhy": {
+        "1": "Pemeliharaan di kebun binatang atau taman safari merupakan contoh konservasi *ex-situ* (di luar habitat asli).",
+        "2": "Bank genetik laboratorium adalah bentuk pelestarian *ex-situ* berbasis teknologi.",
+        "3": "Kebun raya di kota juga merupakan bentuk pelestarian *ex-situ* karena berada di luar habitat alami tanaman."
+      }
+    },
+    {
+      "id": "ips-d-8-t1-q13",
+      "difficulty": "dasar",
+      "prompt": "Berdasarkan Buku Siswa IPS Kelas VIII Edisi Revisi Tema 01, Indonesia memiliki potensi sumber daya maritim yang melimpah. Kawasan pesisir pantai yang ditumbuhi oleh hutan mangrove bermanfaat secara fisik untuk ....",
+      "options": [
+        "mencegah terjadinya erosi dan abrasi pantai akibat terjangan gelombang laut",
+        "meningkatkan kadar garam air laut sehingga memudahkan pembuatan garam industri",
+        "mempercepat pendangkalan pelabuhan kapal komersial di muara sungai",
+        "menaikkan suhu permukaan air laut agar biota laut berkembang biak lebih cepat"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Akar hutan mangrove berfungsi menahan gempuran gelombang laut sehingga mencegah erosi dan abrasi di garis pantai."
+      },
+      "distractorWhy": {
+        "1": "Mangrove tidak ditujukan untuk meningkatkan kadar garam air laut.",
+        "2": "Pendangkalan pelabuhan justru merupakan dampak negatif sedimentasi yang merugikan navigasi kapal.",
+        "3": "Mangrove tidak berfungsi menaikkan suhu air laut, melainkan menjaga keseimbangan ekosistem pesisir."
+      }
+    },
+    {
+      "id": "ips-d-8-t1-q14",
+      "difficulty": "mahir",
+      "prompt": "Berdasarkan Buku Siswa IPS Kelas VIII Edisi Revisi Tema 01, terumbu karang merupakan salah satu potensi maritim utama Indonesia. Syarat lingkungan yang diperlukan agar ekosistem terumbu karang dapat tumbuh dengan baik dan sehat adalah ....",
+      "options": [
+        "air laut yang jernih, bersuhu hangat antara 20°C–29°C, dan mendapat sinar matahari yang cukup di perairan dangkal",
+        "perairan laut dalam yang gelap dan bersuhu sangat dingin di dasar samudra",
+        "air yang keruh dan kaya kandungan lumpur dari muara sungai berarus deras",
+        "perairan dengan kadar pencemaran minyak tinggi agar zat hara lebih pekat"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Terumbu karang membutuhkan air laut yang jernih agar sinar matahari dapat menembus untuk fotosintesis alga simbion (zooxanthellae), serta suhu hangat berkisar 20°C–29°C di perairan dangkal."
+      },
+      "distractorWhy": {
+        "1": "Dasar samudra yang gelap dan dingin tidak memungkinkan fotosintesis alga simbion terumbu karang.",
+        "2": "Air laut yang keruh dan berlumpur menutup permukaan karang sehingga menahan masuknya sinar matahari.",
+        "3": "Pencemaran minyak sangat merusak dan mematikan polip karang."
+      }
+    },
+    {
+      "id": "ips-d-8-t1-q15",
+      "difficulty": "dasar",
+      "prompt": "Berdasarkan Buku Siswa IPS Kelas VIII Edisi Revisi Tema 01, hutan mangrove juga memiliki fungsi biologis yang penting bagi keberlangsungan hewan air. Fungsi biologis tersebut diantaranya adalah ....",
+      "options": [
+        "sebagai tempat pemijahan (*spawning ground*) serta tempat mencari makan bagi ikan dan udang kecil",
+        "sebagai bahan baku pembuat kayu arang dan bahan kayu pertukangan industri",
+        "sebagai benteng pertahanan militer di pulau-pulau terluar Indonesia",
+        "sebagai sarana pembatas wilayah laut teritorial antarnegara tetangga"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Fungsi biologis hutan mangrove mencakup penyediaan habitat tempat bertelur, memijah, membesar, dan mencari makan bagi beragam biota laut."
+      },
+      "distractorWhy": {
+        "1": "Bahan baku kayu arang merupakan fungsi ekonomis/eksploitasi kayu, bukan fungsi biologis ekosistem.",
+        "2": "Benteng pertahanan militer bukan merupakan fungsi biologis alami ekosistem mangrove.",
+        "3": "Pembatas wilayah teritorial ditentukan oleh koordinat hukum internasional, bukan oleh hutan mangrove."
+      }
+    },
+    {
+      "id": "ips-d-8-t1-q16",
+      "difficulty": "sedang",
+      "prompt": "Berdasarkan Buku Siswa IPS Kelas VIII Edisi Revisi Tema 01, maraknya praktik *Illegal, Unreported, and Unregulated Fishing* (IUU Fishing) serta penggunaan alat tangkap pukat harimau (*trawl*) di perairan Indonesia dapat mengakibatkan ....",
+      "options": [
+        "kerusakan ekosistem dasar laut dan penurunan populasi ikan secara drastis karena terumbu karang hancur dan anak ikan ikut tertangkap",
+        "meningkatnya kelestarian populasi ikan besar karena anak ikan terlindungi di dasar laut",
+        "bertambahnya produktivitas terumbu karang akibat pembajakan dasar laut oleh jaring",
+        "meningkatnya kesejahteraan nelayan tradisional dalam jangka panjang tanpa batas waktu"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Pukat harimau merusak ekosistem terumbu karang di dasar laut dan menangkap seluruh ukuran ikan (termasuk bibit/anak ikan), pemicu krisis sumber daya perikanan."
+      },
+      "distractorWhy": {
+        "1": "Penggunaan alat tangkap tidak ramah lingkungan tidak melindungi anak ikan, melainkan pemicu kepunahan populasi ikan.",
+        "2": "Jaring yang menyapu dasar laut menghancurkan struktur terumbu karang, bukan meningkatkan produktivitas.",
+        "3": "Eksploitasi berlebihan merusak mata pencaharian nelayan tradisional dalam jangka panjang."
+      }
+    },
+    {
+      "id": "ips-d-8-t1-q17",
+      "difficulty": "sedang",
+      "prompt": "Berdasarkan Buku Siswa IPS Kelas VIII Edisi Revisi Tema 01, alih fungsi lahan hutan menjadi perkebunan kelapa sawit secara massif tanpa memperhatikan daya dukung lingkungan dapat memicu terjadinya ancaman ....",
+      "options": [
+        "hilangnya habitat flora-fauna endemik, erosi tanah, dan peningkatkan risiko bencana banjir serta kekeringan",
+        "meningkatnya keberagaman jenis fauna liar di sekitar wilayah pemukiman warga",
+        "bertambahnya volume air tanah yang jernih dan bebas dari bahan kimia industri",
+        "penurunan suhu udara global karena bertambahnya luasan tanaman monokultur"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Deforestasi dan alih fungsi lahan hutan mengurangi kemampuan tanah menyerap air, menghilangkan habitat satwa liar, serta memicu erupsi erosi tanah dan banjir."
+      },
+      "distractorWhy": {
+        "1": "Pembukaan hutan justru menghancurkan habitat alami satwa liar dan menurunkan keanekaragaman hayati.",
+        "2": "Pembukaan hutan mengganggu siklus hidrologi sehingga pasokan air tanah justru berkurang.",
+        "3": "Pengurangan luas hutan hujan menurunkan penyerapan karbon yang dapat memperparah pemanasan global."
+      }
+    },
+    {
+      "id": "ips-d-8-t1-q18",
+      "difficulty": "mahir",
+      "prompt": "Berdasarkan Buku Siswa IPS Kelas VIII Edisi Revisi Tema 01, pemanfaatan sumber daya maritim di Indonesia dapat dikembangkan melalui sektor pariwisata bahari. Upaya pemanfaatan yang paling sesuai dengan prinsip pembangunan berkelanjutan adalah ....",
+      "options": [
+        "mengembangkan ekowisata berbasis pemberdayaan masyarakat lokal dengan menjaga keaslian ekosistem terumbu karang",
+        "membangun resor mewah di atas terumbu karang dengan mengeruk dasar laut agar kapal pesiar besar dapat bersandar",
+        "memperbolehkan wisatawan mengambil suvenir berupa terumbu karang dan kerang langka untuk dijual kembali",
+        "membuka kawasan konservasi maritim secara bebas tanpa batasan jumlah pengunjung harian"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Ekowisata bahari berkelanjutan memadukan pemanfaatan ekonomi melalui wisata dengan perlindungan kelestarian ekosistem laut serta pelibatan masyarakat lokal."
+      },
+      "distractorWhy": {
+        "1": "Pengerukan dasar laut merusak ekosistem terumbu karang dan biota laut di sekitarnya.",
+        "2": "Mengambil terumbu karang dan kerang langka melanggar hukum konservasi dan merusak rantai makanan laut.",
+        "3": "Wisata tanpa pembatasan daya dukung lingkungan (*overtourism*) akan mempercepat kerusakan kawasan konservasi."
+      }
+    },
+    {
+      "id": "ips-d-8-t1-q19",
+      "difficulty": "mahir",
+      "prompt": "Berdasarkan Buku Siswa IPS Kelas VIII Edisi Revisi Tema 01, tanah vulkanis di Indonesia sangat subur dan bernilai ekonomis tinggi untuk sektor pertanian. Pembentukan jenis tanah vulkanis tersebut terjadi akibat ....",
+      "options": [
+        "pelapukan material letusan gunung api seperti abu vulkanis yang kaya akan unsur hara mineral",
+        "pengendapan sisa-sisa cangkang kerang dan hewan laut di perairan pantai dangkal",
+        "pelapukan dedaunan yang membusuk di dasar rawa-rawa berair tenang",
+        "pengikisan batuan kapur oleh air hujan di wilayah pegunungan karst"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Tanah vulkanis terbentuk dari material endapan abu dan tefra erupsi gunung api yang mengalami pelapukan sehingga kaya mineral pendukung kesuburan tanaman."
+      },
+      "distractorWhy": {
+        "1": "Pengendapan kerang di laut membentuk batuan kapur/gamping, bukan tanah vulkanis.",
+        "2": "Pelapukan tumbuhan rawa membentuk tanah gambut atau tanah organosol.",
+        "3": "Pengikisan batuan kapur menghasilkan tanah mediteran atau tanah kapur yang cenderung kurang subur."
+      }
+    },
+    {
+      "id": "ips-d-8-t1-q20",
+      "difficulty": "mahir",
+      "prompt": "Berdasarkan Buku Siswa IPS Kelas VIII Edisi Revisi Tema 01, pengelolaan sumber daya alam harus menerapkan prinsip efisiensi dan pembangunan berkelanjutan (*sustainable development*). Penerapan prinsip tersebut dalam kegiatan pemanfaatan sumber daya alam tercermin pada tindakan ....",
+      "options": [
+        "melakukan reboisasi pada lahan bekas tambang dan menerapkan sistem tebang pilih dalam pemanfaatan kayu hutan",
+        "menguras habis seluruh cadangan bahan tambang fosil demi mengejar target pertumbuhan ekonomi setinggi-tingginya",
+        "membuang limbah industri secara langsung ke aliran sungai untuk menekan biaya operasional pabrik",
+        "mengubah seluruh kawasan cagar alam menjadi kawasan industri dan permukiman modern"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Pembangunan berkelanjutan menjamin pemanfaatan SDA secara efisien dengan memperhatikan kelestarian lingkungan bagi generasi mendatang (seperti tebang pilih dan reklamasi/reboisasi bekas tambang)."
+      },
+      "distractorWhy": {
+        "1": "Menguras habis cadangan SDA tanpa pemikiran masa depan melanggar prinsip keadilan antargenerasi dalam pembangunan berkelanjutan.",
+        "2": "Membuang limbah tanpa pengolahan merusak lingkungan dan mencemari sumber air bersih.",
+        "3": "Mengubah cagar alam menjadi kawasan industri merusak kawasan perlindungan ekosistem alami."
+      }
+    }
+  ]
+}
