@@ -258,6 +258,9 @@ jobs:
           # Rapor ortu F7: satu modul bersama merender dokumen guru & murid (PNG
           # Canvas + window.print, sisi klien), keadaan kosong tidak dikarang.
           node tests/kurikulum-rapor-ortu-test.js
+          # Wali Kelas F8 + Papan Kelas F10: agregat /coverage per mapel dan grid
+          # TP × murid dari endpoint yang ada, antrean berbatas, sel ber-aria.
+          node tests/kurikulum-wali-papan-test.js
           node tests/question-allocator-test.js
           node tests/bankor-latihan-test.js
           node tests/fiezel-stat-gate-test.js

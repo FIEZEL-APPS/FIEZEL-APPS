@@ -294,6 +294,28 @@
     'kurikulum.rapor-ortu-card-sub': 'เอกสารชุดเดียวกับที่ครูอ่าน — ดาวน์โหลดรูปเพื่อแชร์ หรือพิมพ์',
     'kurikulum.rapor-gagal-unduh': 'สร้างรูปไม่สำเร็จ ลองกดปุ่มพิมพ์',
     'kurikulum.rapor-gagal-cetak': 'เปิดหน้าต่างพิมพ์ไม่สำเร็จ',
-    'kurikulum.rapor-modul-hilang': 'โมดูลแชร์รายงานยังไม่โหลด โปรดโหลดหน้าซ้ำ'
+    'kurikulum.rapor-modul-hilang': 'โมดูลแชร์รายงานยังไม่โหลด โปรดโหลดหน้าซ้ำ',
+    /* m025-352 (F8+F10) — นสครใหม่ถือกำเนิดแบบสองภาษา */
+    'kurikulum.nav-wali': 'ครูประจำชั้น',
+    'kurikulum.nav-papan': 'กระดานชั้นเรียน',
+    'kurikulum.wali-title': 'ความครอบคลุมรายวิชา',
+    'kurikulum.wali-sub': 'หน้าเดียวสำหรับครูประจำชั้น: วิชาไหนล้าหลังในชั้นนี้',
+    'kurikulum.wali-loading': 'กำลังโหลดความครอบคลุม {done}/{total} วิชา…',
+    'kurikulum.wali-tp': 'TP',
+    'kurikulum.wali-rata': 'เฉลี่ย',
+    'kurikulum.wali-terlemah': 'อ่อนที่สุด',
+    'kurikulum.wali-tanpa-data': 'ยังไม่มีข้อมูล',
+    'kurikulum.wali-gagal': 'โหลดไม่สำเร็จ',
+    'kurikulum.wali-tertinggal': 'ล้าหลัง',
+    'kurikulum.papan-title': 'กระดานชั้นเรียนกับหลักสูตร',
+    'kurikulum.papan-sub': 'TP ทั้งหมดในแนวตั้ง นักเรียนทั้งหมดในแนวนอน — ใครล้าหลัง TP ไหน เห็นในแวบเดียว กดช่องเพื่อแทรกแซง',
+    'kurikulum.papan-loading': 'กำลังโหลด TP {done}/{total}…',
+    'kurikulum.papan-legend': 'คำอธิบาย',
+    'kurikulum.papan-sel-remedial': 'ต้องซ่อมเสริม',
+    'kurikulum.papan-sel-pengayaan': 'พร้อมเสริม',
+    'kurikulum.papan-sel-belum': 'ยังไม่เริ่ม',
+    'kurikulum.papan-cap-note': 'แสดง {n} TP แรก — จำกัดเพื่อให้กระดานยังอ่านได้',
+    'kurikulum.papan-tanpa-murid': 'ยังไม่มีนักเรียนในชั้นนี้ — ไม่มีแกนนอนให้วาด',
+    'kurikulum.papan-tanpa-tp': 'ยังไม่มี TP ของวิชานี้ในชั้นนี้'
   });
 })();
