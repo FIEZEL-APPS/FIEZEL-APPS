@@ -466,6 +466,16 @@
     'kelas.misi-sumber': 'ภารกิจหลักสูตร',
     'kelas.hasil-dikirim-guru': 'ผลนี้ถูกส่งไปยัง {guru} แล้ว รวมถึงข้อที่ต้องทบทวนซ้ำ',
     'kelas.hasil-misi-mandiri': 'บันทึกไว้ในพาสปอร์ตสมรรถนะของคุณแล้ว นี่คือภารกิจที่คุณเลือกเอง จึงไม่ถูกรายงานเป็นงานจากครู',
+    'kelas.perlu-diulang': 'ต้องทบทวน',
+    'kelas.ulangi-sekarang': 'ทบทวนเลย',
+    'kelas.latih-yang-lemah': 'ฝึกบทย่อยที่ยังไม่แน่น {n} บท',
+    'kelas.skill-kurikulum': 'ภารกิจหลักสูตร',
+    'kelas.target-kicker': 'เป้าหมายสัปดาห์นี้',
+    'kelas.target-mulai': 'เริ่มเลย',
+    'kelas.target-alasan-ulang': 'เลยกำหนดทบทวนแล้ว ทบทวนตอนนี้ขณะที่ยังจำได้ง่าย',
+    'kelas.target-alasan-lemah': 'ยังมีบทย่อยที่ไม่แน่น {n} บท จากการทำครั้งล่าสุดของคุณ',
+    'kelas.target-alasan-belum-tuntas': 'บทนี้ยังไม่ผ่านในการทำครั้งล่าสุดของคุณ',
+    'kelas.target-alasan-baru': 'บทถัดไปที่คุณยังไม่เคยเปิด',
     'guru.kelas-mapel-tanpa-nama': 'ชั้นเรียน'
   });
 }());

@@ -471,6 +471,16 @@
     'kelas.misi-sumber': 'Misi Kurikulum',
     'kelas.hasil-dikirim-guru': 'Hasil ini dikirim ke {guru} — termasuk soal yang perlu diulang.',
     'kelas.hasil-misi-mandiri': 'Tersimpan di Paspor Kompetensimu. Ini misi yang kamu pilih sendiri, jadi ia tidak dilaporkan sebagai tugas dari guru.',
+    'kelas.perlu-diulang': 'Perlu Diulang',
+    'kelas.ulangi-sekarang': 'Ulangi Sekarang',
+    'kelas.latih-yang-lemah': 'Latih {n} sub-bab yang belum kuat',
+    'kelas.skill-kurikulum': 'Misi Kurikulum',
+    'kelas.target-kicker': 'Target Minggu Ini',
+    'kelas.target-mulai': 'Mulai sekarang',
+    'kelas.target-alasan-ulang': 'Sudah lewat jadwal ulang. Diulang sekarang selagi masih mudah diingat.',
+    'kelas.target-alasan-lemah': '{n} sub-bab masih goyah di percobaan terakhirmu.',
+    'kelas.target-alasan-belum-tuntas': 'Bab ini belum tuntas di percobaan terakhirmu.',
+    'kelas.target-alasan-baru': 'Bab berikutnya yang belum pernah kamu buka.',
     'guru.kelas-mapel-tanpa-nama': 'Kelas'
   });
 }());
