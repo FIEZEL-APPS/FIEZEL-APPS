@@ -63,6 +63,27 @@ function badanFungsi(src, tanda) {
   return src.slice(mulai);
 }
 
+/* Pernyataan cat render(): dari `el.innerHTML` sampai `;` yang menutupnya.
+ * Tanda kutip dilewati utuh supaya `;` di dalam string HTML (`'...;'`) tidak dikira
+ * akhir pernyataan. Dipakai R6 untuk menuntut pita demo benar-benar IKUT TERCETAK,
+ * bukan sekadar disebut di suatu tempat dalam render(). */
+function pernyataanCat(badan) {
+  const mulai = badan.indexOf('el.innerHTML');
+  if (mulai < 0) return '';
+  let kutip = null;
+  for (let i = mulai; i < badan.length; i++) {
+    const c = badan[i];
+    if (kutip) {
+      if (c === '\\') { i++; continue; }
+      if (c === kutip) kutip = null;
+      continue;
+    }
+    if (c === '"' || c === "'" || c === '`') { kutip = c; continue; }
+    if (c === ';') return badan.slice(mulai, i + 1);
+  }
+  return badan.slice(mulai);
+}
+
 /* ------------------------------------------------------------------ R1 · tautan --- */
 
 test('R1 · landing page menautkan Demo Guru ke ?teacher=preview', () => {
@@ -161,8 +182,20 @@ test('R6 · pita demo tampil dengan jalan keluar dan jalan naik ke akun guru', (
   assert.ok(/function demoBanner\(/.test(shellCode), 'pita demo tidak ada');
   assert.ok(/previewOn\s*\?\s*' is-demo'/.test(shellCode) || /is-demo/.test(shellCode),
     'kelas penanda demo tidak dipasang di kerangka');
-  assert.ok(/demoBanner\(\)/.test(badanFungsi(shellCode, 'function render(')),
-    'pita demo tidak dirender');
+  /* DUA tuntutan, dan keduanya perlu:
+   *   1. demoBanner() ada di dalam badan render() — dipotong dengan mencocokkan kurung
+   *      kurawal, BUKAN dengan menghitung karakter. Penyisipan kode di awal render()
+   *      (seperti blok penjaga m025-345) tidak lagi memerahkan gerbang.
+   *   2. demoBanner() ikut di dalam PERNYATAAN CATNYA. Tanpa ini, gerbang tetap hijau
+   *      walau hasil demoBanner() dibuang dan pitanya tidak pernah sampai ke layar.
+   * Jendela 900 karakter sengaja tidak dipakai di mana pun: menambatkannya ulang hanya
+   * memindahkan ranjaunya, tidak menjinakkannya. */
+  const badanRender = badanFungsi(shellCode, 'function render(');
+  assert.ok(/demoBanner\(\)/.test(badanRender), 'pita demo tidak dirender');
+  const catRender = pernyataanCat(badanRender);
+  assert.ok(catRender, 'pernyataan cat render() tidak ditemukan — tambatan R6 perlu ditinjau');
+  assert.ok(/demoBanner\(\)/.test(catRender),
+    'demoBanner() dipanggil di render() tetapi tidak ikut tercetak ke kerangka');
   assert.ok(/case 'demo-exit':[\s\S]{0,120}exitPreview\(\)/.test(shellCode), 'tombol keluar demo tidak menghapus penanda');
   assert.ok(/case 'demo-activate':[\s\S]{0,80}openAccount\('teacher'\)/.test(shellCode),
     'pita demo tidak menawarkan jalan naik ke akun guru sungguhan');
