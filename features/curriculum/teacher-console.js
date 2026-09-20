@@ -225,8 +225,77 @@
   }
 
   // ---------------- kerangka ----------------
+
+  /* ISIAN GURU TIDAK BOLEH HILANG SAAT LAYAR DICAT ULANG (m025-349, temuan G1).
+     ==========================================================================
+     render() menulis ulang app.innerHTML seutuhnya, dan ia dipanggil dari SETIAP
+     penyelesaian permintaan latar: loadCoverage, loadRecs, health-check, tiga kartu
+     penyemai, loadBank, loadAssessments, dan errToast. Seluruh isian di konsol ini adalah
+     elemen DOM polos tanpa cadangan di S — jadi setiap permintaan yang selesai menghapus
+     apa pun yang sedang diketik guru.
+
+     Jalur yang paling mudah dipicu, dan yang membuat temuan ini P0: guru membuka Standar
+     Kurikulum, mulai mengetik rumusan kompetensi di "Tambah simpul", lalu salah satu dari
+     tiga permintaan status penyemai di kartu sebelahnya selesai — dan kalimatnya lenyap.
+     Yang paling mahal: kotak "Tempel Banyak Soal Sekaligus", tempat guru menempelkan
+     puluhan soal sekaligus.
+
+     Perbaikannya sengaja TIDAK menyentuh alur render. Mengubah konsol menjadi render
+     inkremental adalah penulisan ulang yang risikonya jauh lebih besar daripada cacatnya.
+     Yang dilakukan di sini persis pola yang sudah dipakai fiezel-class-hub.js: potret
+     nilai sebelum dicat, pulihkan sesudahnya, berikut fokus dan posisi kursor. */
+  function potretIsian() {
+    var potret = { nilai: {}, fokus: null };
+    if (!app) return potret;
+    try {
+      var medan = app.querySelectorAll('input[id], textarea[id], select[id]');
+      for (var i = 0; i < medan.length; i++) {
+        var el = medan[i];
+        /* Berkas tidak bisa — dan tidak boleh — dipulihkan dari JavaScript. */
+        if (el.type === 'file') continue;
+        potret.nilai[el.id] = el.type === 'checkbox' || el.type === 'radio' ? el.checked : el.value;
+      }
+      var aktif = document.activeElement;
+      if (aktif && aktif.id && app.contains(aktif)) {
+        potret.fokus = { id: aktif.id, mulai: null, akhir: null };
+        try { potret.fokus.mulai = aktif.selectionStart; potret.fokus.akhir = aktif.selectionEnd; } catch (_) {}
+      }
+    } catch (_) {}
+    return potret;
+  }
+
+  function pulihkanIsian(potret) {
+    if (!potret || !app) return;
+    try {
+      Object.keys(potret.nilai).forEach(function (id) {
+        var el = document.getElementById(id);
+        if (!el || !app.contains(el)) return;
+        var v = potret.nilai[id];
+        if (el.type === 'checkbox' || el.type === 'radio') { el.checked = !!v; return; }
+        /* Untuk <select>, nilai yang opsinya sudah tidak ada dibiarkan apa adanya supaya
+           pilihan bawaan yang baru tetap sah — memaksakan nilai hantu diam-diam mengubah
+           arti tombol di sebelahnya. */
+        if (el.tagName === 'SELECT') {
+          for (var i = 0; i < el.options.length; i++) if (el.options[i].value === v) { el.value = v; break; }
+          return;
+        }
+        el.value = v;
+      });
+      if (potret.fokus) {
+        var f = document.getElementById(potret.fokus.id);
+        if (f && app.contains(f)) {
+          f.focus();
+          if (typeof f.setSelectionRange === 'function' && potret.fokus.mulai != null) {
+            try { f.setSelectionRange(potret.fokus.mulai, potret.fokus.akhir); } catch (_) {}
+          }
+        }
+      }
+    } catch (_) {}
+  }
+
   function render() {
     if (!S.user) return renderAuth();
+    var potret = potretIsian();
     app.innerHTML =
       '<div class="shell"><aside class="side">' +
       '<div class="brand"><span class="brand-mark">F</span><div><b>FIEZEL</b><small>Kurikulum & Kompetensi</small></div></div>' +
@@ -248,6 +317,7 @@
       '</aside><main class="main" data-testid="teacher-console">' + view() + renderDisclaimer() + '</main></div>' +
       (S.drawer ? '<div class="scrim" data-a="close"></div><aside class="drawer" data-testid="drawer">' + S.drawer + '</aside>' : '') +
       (S.modal ? '<div class="scrim" data-a="close"></div><div class="modal" data-testid="modal">' + S.modal + '</div>' : '');
+    pulihkanIsian(potret);
   }
 
   function view() {
@@ -361,6 +431,11 @@
       '<th>' + t('kurikulum.th-mastery', 'Kemahiran') + '</th>' +
       '<th>' + t('kurikulum.th-help', 'Perlu Pendampingan') + '</th>' +
       '<th>' + t('kurikulum.th-status', 'Status Ketuntasan') + '</th></tr></thead><tbody>' +
+      /* Kelas baru dulu menerima tabel berkepala tanpa satu baris pun dan tanpa satu
+         kalimat pun tentang langkah berikutnya. Guru tidak bisa membedakan "belum ada
+         data" dari "gagal memuat" — dua keadaan yang tindakannya berlawanan. */
+      (S.coverage.rows.length ? '' : '<tr data-testid="coverage-empty"><td colspan="6" class="muted" style="padding:22px 10px;text-align:center">' +
+        esc(t('kurikulum.cakupan-kosong', 'Belum ada data belajar di kelas ini. Matriks terisi sendiri setelah murid mengerjakan kuis pertamanya — terbitkan satu dari tab Kuis & Ulangan.')) + '</td></tr>') +
       S.coverage.rows.map(function (r) {
         var cls = r.status === 'GOOD' ? 'good' : r.status === 'GAP' ? 'bad' : r.status === 'DEVELOPING' ? 'warn' : 'mute';
         var stText = STATUS_LABELS[r.status] || r.status;
@@ -756,7 +831,8 @@
           a.progress.finished + ' selesai / ' + a.progress.started + ' mulai</p>' +
           (a.assembly_notes && a.assembly_notes.length ? '<div class="issue warn">' + esc(a.assembly_notes.join(' ')) + '</div>' : '') +
           '<div class="row"><button class="btn ghost sm" data-a="as-analytics" data-id="' + esc(a.id) + '" data-testid="analytics-' + esc(a.id) + '">Analitik butir</button></div></div>';
-      }).join('') : '<p class="muted">Belum ada asesmen.</p>') + '</div></div>';
+      }).join('') : '<p class="muted" data-testid="assessment-list-empty">' +
+        esc(t('kurikulum.asesmen-kosong', 'Belum ada asesmen di kelas ini. Pakai Template Blueprint Cepat di sebelah kiri untuk menerbitkan kuis pertama dalam satu klik.')) + '</p>') + '</div></div>';
   }
 
   function loadAssessments() {
@@ -779,6 +855,8 @@
       'agregat skill lama sebagai evidence kompetensi kurikulum — tidak ada yang dihapus.</p>' +
       '<button class="btn sm" data-a="import-legacy" data-testid="import-legacy-btn">Impor dari perangkat ini</button></div>' +
       '<div class="card" data-testid="student-list"><p class="kicker">Daftar murid</p><h3>' + S.students.length + ' murid</h3>' +
+      (S.students.length ? '' : '<p class="muted" data-testid="student-list-empty">' +
+        esc(t('kurikulum.murid-kosong', 'Belum ada murid di kelas ini. Bagikan kode kelas di atas, atau tambahkan namanya lewat kotak "Tambah murid".')) + '</p>') +
       '<table><tbody>' + S.students.map(function (s) {
         return '<tr class="click" data-a="passport" data-sid="' + esc(s.user_id) + '" data-testid="student-' + esc(s.user_id) + '"><td><b>' + esc(s.name) + '</b></td><td class="muted mono">' + esc(s.email || 'roster') + '</td><td>Lihat rapor →</td></tr>';
       }).join('') + '</tbody></table></div></div>';
