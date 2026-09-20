@@ -67,6 +67,29 @@ test('SETIAP berkas yang dimuat index.html ada di ASSETS sw.js', () => {
     'atau offline ia tidak pernah sampai, dan kunci di dalamnya tampil sebagai nama kunci');
 });
 
+/* Arah SEBALIKNYA, dan ia menutup kelas cacat yang berbeda. Gerbang di atas menanyakan
+   "apakah berkas yang dimuat sudah diprecache"; yang ini menanyakan "apakah berkas yang
+   diprecache benar-benar ADA". Keduanya perlu, karena install handler memakai
+   `cache.addAll`, dan addAll ATOMIK: satu saja 404 menolak SELURUH batch, jadi service
+   worker baru gagal dipasang untuk SEMUA klien dan pembaruan cangkang ditahan diam-diam —
+   bukan cuma berkas yang hilang itu. sw.js sudah memperingatkan bahaya ini di empat
+   komentar terpisah; yang belum ada adalah sesuatu yang MENGUKURNYA.
+
+   Ditemukan dengan cara yang mahal: entri bank mapel didaftarkan di ASSETS satu commit
+   lebih awal daripada berkasnya, dan tidak satu pun gerbang bersuara. */
+test('SETIAP entri ASSETS sw.js benar-benar ada di repo (cache.addAll atomik)', () => {
+  /* Dipungut dengan awalan './' yang WAJIB, bukan dari `diprecache` di atas: himpunan itu
+     memungut setiap string berkutip di dalam blok, termasuk token yang bukan jalur berkas
+     ('th', 'voice'). Untuk pemeriksaan keanggotaan token liar itu tidak berbahaya; untuk
+     pemeriksaan keberadaan berkas ia akan melaporkan berkas hilang yang tidak pernah ada. */
+  const jalur = [...new Set([...blokAssets.matchAll(/'\.\/([^']+)'/g)].map((m) => m[1]))];
+  assert.ok(jalur.length >= 200, 'hanya ' + jalur.length + ' jalur aset terbaca — pemindainya kemungkinan rusak');
+  const hilang = jalur.filter((p) => !fs.existsSync(path.join(__fzRoot, p)));
+  assert.deepStrictEqual(hilang.slice(0, 12), [],
+    hilang.length + ' entri ASSETS tidak ada berkasnya. cache.addAll menolak seluruh batch ' +
+    'begitu satu entri 404, jadi service worker baru tidak akan terpasang sama sekali');
+});
+
 test('naskah Ruang Guru khususnya, karena itu yang pernah patah', () => {
   // Penjaga yang menyebut kejadiannya dengan nama. Kalau kelak copy-map dipecah ulang,
   // yang penting bukan nama berkasnya melainkan bahwa kunci guru.* punya rumah yang

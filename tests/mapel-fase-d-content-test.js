@@ -333,6 +333,33 @@ if (bankLengkap) {
       thTanpaAksara.length === 0, thTanpaAksara.slice(0, 6).join(' | '));
     check('paritas ' + s.id + ': himpunan {placeholder} id vs th sama persis',
       placeholderBeda.length === 0, placeholderBeda.slice(0, 8).join(', '));
+
+    /* Aksara Thai saja tidak membuktikan opsinya masih soal yang sama: "25 cm³" yang
+       diterjemahkan menjadi "52 cm³" tetap lolos aturan aksara, dan murid Thai mengerjakan
+       soal dengan kunci yang berbeda dari murid Indonesia. Karena itu ANGKA di dalam opsi
+       dibandingkan sebagai himpunan.
+
+       Sengaja hanya OPSI, bukan prosa: penjelasan yang di Indonesia menulis "lima siswa"
+       dan di Thai menulis "5 คน" berbeda angkanya karena bahasanya, bukan karena salah —
+       diukur, bukan ditebak: 31 selisih semacam itu di prosa, NOL di 1.296 opsi. */
+    const angkaBeda = [];
+    const angkaDi = (v) => (samakanDesimal(v).match(/\d+(?:\.\d+)?/g) || []).sort().join(',');
+    for (const c of kompId) {
+      const ct = petaTh[c.code];
+      if (!ct) continue;
+      const itemsTh = {};
+      for (const it of (ct.items || [])) itemsTh[it.id] = it;
+      for (const it of (c.items || [])) {
+        const itTh = itemsTh[it.id];
+        if (!itTh) continue;
+        (it.options || []).forEach((opt, i) => {
+          const optTh = (itTh.options || [])[i];
+          if (angkaDi(opt) !== angkaDi(optTh)) angkaBeda.push(it.id + '.options[' + i + '] id="' + opt + '" th="' + optTh + '"');
+        });
+      }
+    }
+    check('paritas ' + s.id + ': angka di dalam opsi id vs th sama persis',
+      angkaBeda.length === 0, angkaBeda.slice(0, 5).join(' | '));
   }
 
   /* ============== 3,4,5 · PENYARIPAN SAAT RUNTIME (mapel -> kelas -> kompetensi) ======= */
