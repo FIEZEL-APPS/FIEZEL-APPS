@@ -1,7 +1,9 @@
 /**
- * FIEZEL Ruang Guru — Kurikulum Bahasa Inggris SMP (Fase D) & SMA (Fase E/F).
+ * FIEZEL Ruang Guru — Kurikulum SMP (Fase D) & SMA (Fase E/F) + 5 Mapel Inti SMP.
  * Berbasis Kurikulum Merdeka (BSKAP 032/H/KR/2024 & English for Nusantara),
  * dilengkapi referensi silang K13 Revisi dan UTBK SNBT.
+ * Tambahan 2026-09: 5 unit offline-first Matematika, Bahasa Indonesia, IPA, IPS,
+ * Pendidikan Pancasila SMP (sumber: backend/seed_soal.py SOAL_* + tools chunk buku).
  *
  * Murni data + utilitas tanpa dependensi DOM, offline-first, UMD.
  */
@@ -2298,7 +2300,599 @@
           note: "ON untuk hari dan tanggal, IN untuk bulan/tahun, AT untuk jam. Caption berita memakainya secara ketat."
         }
       ]
-    }
+    },
+    // -------------------------------------------------------------------------------------
+    // FASE D — 5 MAPEL INTI SMP (OFFLINE-FIRST, SUMBER: backend/seed_soal.py + tools chunk buku)
+    // -------------------------------------------------------------------------------------
+    // Cakupan: Matematika (KOMP-MAT-7-BIL), B.Indonesia (KOMP-IND-7-MBC),
+    // IPA (KOMP-IPA-7-KET/PEM), IPS (KOMP-IPS-7-KET/PEM), PPKn (KOMP-PPKN-7-PAN/UUD).
+    // Tiap butir: prompt=stem, options=4, answer=index kunci, note=explanation,
+    // marker=hint, why=penjelasan pengecoh (dm). Lolos K4/K6 kurikulum-integritas-test.
+    {
+      id: 'd_g7_mat_bilangan',
+      phaseId: 'fase_d',
+      grade: 7,
+      semester: 1,
+      genre: 'Matematika',
+      title: 'Matematika — Bilangan Bulat, Pecahan & Perbandingan (Buku Resmi Kelas 7)',
+      targetCefr: 'Numerasi',
+      socialFunction: 'Menghitung operasi bilangan bulat, pecahan, persen, dan perbandingan skala.',
+      genericStructure: ['Memahami soal cerita', 'Memilih operasi yang tepat', 'Menghitung dan memeriksa kewajaran hasil'],
+      languageFeatures: ['Operasi Bilangan Bulat', 'Pecahan & Persen'],
+      subChapters: [
+        { id: 'd_g7_mat_bilangan_1_1', no: '1.1', title: 'Operasi Bilangan Bulat', feature: 'Operasi Bilangan Bulat' },
+        { id: 'd_g7_mat_bilangan_1_2', no: '1.2', title: 'Pecahan, Persen & Perbandingan', feature: 'Pecahan & Persen' },
+      ],
+      teachingBrief: {
+        summary: 'Unit offline Matematika kelas 7. Sumber backend/seed_soal.py SOAL_MAT7 (KOMP-MAT-7-BIL-011/012).',
+        hook5Minutes: 'Tantang siswa menebak suhu -9 tambah 14 tanpa kalkulator, lalu cek di garis bilangan.',
+        boardFormula: '-a + b = b - a | a - (-b) = a + b | persen = desimal x 100',
+        commonMisconceptions: [
+          { trap: 'Tanda hasil mengikuti bilangan pertama', pattern: '-9 + 14 = -5', fix: 'Hasil mengikuti arah gerak di garis bilangan, bukan tanda bilangan pertama.' },
+          { trap: 'Dikerjakan berurutan dari kiri', pattern: '12 - 4 x 2 = 16', fix: 'Kali/bagi dikerjakan lebih dulu daripada tambah/kurang.' }
+        ],
+        differentiation: {
+          struggling: 'Beri garis bilangan kosong dan tabel persen-desimal.',
+          advanced: 'Minta siswa membuat soal cerita diskon dan skala peta sendiri.'
+        },
+        keyVocabulary: [
+          { word: 'bilangan bulat', meaning: 'integer' },
+          { word: 'pecahan', meaning: 'fraction' },
+          { word: 'diskon', meaning: 'potongan harga' },
+          { word: 'skala', meaning: 'perbandingan peta' }
+        ]
+      },
+      items: [
+        {
+          id: 'cur_d7_mat_01',
+          subChapterId: 'd_g7_mat_bilangan_1_1', feature: 'Operasi Bilangan Bulat',
+          prompt: 'Hitunglah: -9 + 14',
+          options: ['5', '-5', '23', '-23'],
+          answer: 0,
+          marker: 'Garis bilangan: mulai -9 maju 14',
+          why: { 1: '-5 salah karena tanda hasil dianggap mengikuti bilangan pertama.', 2: '23 salah karena nilai mutlak dijumlahkan tanpa memperhatikan tanda.', 3: '-23 salah karena nilai mutlak dijumlahkan lalu diberi tanda negatif.' },
+          note: 'Dari -9 bergerak 14 langkah ke kanan pada garis bilangan: -9 + 14 = 5.'
+        },
+        {
+          id: 'cur_d7_mat_02',
+          subChapterId: 'd_g7_mat_bilangan_1_1', feature: 'Operasi Bilangan Bulat',
+          prompt: 'Hitunglah: 9 - (-6)',
+          options: ['15', '3', '-15', '-3'],
+          answer: 0,
+          marker: 'Dua tanda negatif berdampingan jadi positif',
+          why: { 1: '3 salah karena tanda negatif ganda diabaikan.', 2: '-15 salah karena hasil diberi tanda negatif tanpa alasan.', 3: '-3 salah karena pengurangan dianggap tetap negatif.' },
+          note: 'Mengurangi bilangan negatif sama dengan menambah: 9 - (-6) = 9 + 6 = 15.'
+        },
+        {
+          id: 'cur_d7_mat_03',
+          subChapterId: 'd_g7_mat_bilangan_1_1', feature: 'Operasi Bilangan Bulat',
+          prompt: 'Suhu di puncak gunung -3 derajat C. Suhu turun lagi 5 derajat C. Berapa suhunya sekarang?',
+          options: ['-8 derajat C', '2 derajat C', '8 derajat C', '-2 derajat C'],
+          answer: 0,
+          marker: 'Turun berarti bergerak ke KIRI',
+          why: { 1: '2 derajat salah karena turun dihitung sebagai penjumlahan.', 2: '8 derajat salah karena tanda negatif diabaikan.', 3: '-2 derajat salah karena selisih dihitung bukan pengurangan.' },
+          note: 'Turun berarti berkurang: -3 - 5 = -8.'
+        },
+        {
+          id: 'cur_d7_mat_04',
+          subChapterId: 'd_g7_mat_bilangan_1_1', feature: 'Operasi Bilangan Bulat',
+          prompt: 'Hitunglah: 12 - 4 x 2',
+          options: ['4', '16', '8', '20'],
+          answer: 0,
+          marker: 'Kali dan bagi sebelum tambah kurang',
+          why: { 1: '16 salah karena dikerjakan berurutan dari kiri.', 2: '8 salah karena perkalian diabaikan sebagian.', 3: '20 salah karena semua operasi dijumlahkan.' },
+          note: 'Perkalian dikerjakan lebih dulu: 12 - 8 = 4.'
+        },
+        {
+          id: 'cur_d7_mat_05',
+          subChapterId: 'd_g7_mat_bilangan_1_2', feature: 'Pecahan & Persen',
+          prompt: 'Ubahlah 3/4 menjadi persen.',
+          options: ['75%', '34%', '0,75%', '43%'],
+          answer: 0,
+          marker: 'Bagi 3 dengan 4 dulu lalu kali 100',
+          why: { 1: '34% salah karena pembilang dan penyebut dibaca sebagai angka 34.', 2: '0,75% salah karena desimal langsung diberi tanda persen.', 3: '43% salah karena pembilang-penyebut dibalik.' },
+          note: '3/4 = 0,75 = 75%. Mengubah desimal ke persen dikalikan 100.'
+        },
+        {
+          id: 'cur_d7_mat_06',
+          subChapterId: 'd_g7_mat_bilangan_1_2', feature: 'Pecahan & Persen',
+          prompt: 'Sebuah baju berharga Rp200.000 didiskon 25%. Berapa harga yang dibayar?',
+          options: ['Rp150.000', 'Rp50.000', 'Rp175.000', 'Rp160.000'],
+          answer: 0,
+          marker: 'Hitung potongan dulu lalu kurangkan',
+          why: { 1: 'Rp50.000 salah karena besar diskon dijawab sebagai harga bayar.', 2: 'Rp175.000 salah karena persen dihitung keliru.', 3: 'Rp160.000 salah karena diskon dihitung 20%.' },
+          note: 'Diskon 25% = Rp50.000, jadi yang DIBAYAR Rp200.000 - Rp50.000 = Rp150.000.'
+        },
+        {
+          id: 'cur_d7_mat_07',
+          subChapterId: 'd_g7_mat_bilangan_1_2', feature: 'Pecahan & Persen',
+          prompt: 'Hitunglah: 1/2 + 1/3',
+          options: ['5/6', '2/5', '1/5', '2/6'],
+          answer: 0,
+          marker: 'Penyebut harus disamakan dulu',
+          why: { 1: '2/5 salah karena pembilang dan penyebut dijumlahkan terpisah.', 2: '1/5 salah karena pembilang dijumlahkan penyebut dikalikan.', 3: '2/6 salah karena penyebut tidak disamakan.' },
+          note: 'Samakan penyebut: 3/6 + 2/6 = 5/6.'
+        },
+        {
+          id: 'cur_d7_mat_08',
+          subChapterId: 'd_g7_mat_bilangan_1_2', feature: 'Pecahan & Persen',
+          prompt: 'Manakah yang TERBESAR: 0,7 ; 2/3 ; 65% ?',
+          options: ['0,7', '2/3', '65%', 'Ketiganya sama'],
+          answer: 0,
+          marker: 'Ubah ketiganya ke bentuk sama',
+          why: { 1: '2/3 salah karena pecahan dianggap selalu lebih besar.', 2: '65% salah karena persen dibandingkan tanpa konversi.', 3: 'Ketiganya sama salah karena bentuk berbeda dianggap tidak bisa dibandingkan.' },
+          note: 'Samakan bentuknya: 0,7 = 70%; 2/3 sekitar 66,7%; 65%. Jadi 0,7 paling besar.'
+        }
+      ]
+    },
+    {
+      id: 'd_g7_ind_deskripsi',
+      phaseId: 'fase_d',
+      grade: 7,
+      semester: 2,
+      genre: 'Bahasa Indonesia',
+      title: 'Bahasa Indonesia — Teks Deskripsi & Makna Kata (Buku Resmi Kelas 7)',
+      targetCefr: 'Literasi',
+      socialFunction: 'Mengidentifikasi struktur teks deskripsi dan menentukan makna kata dari konteks.',
+      genericStructure: ['Identifikasi (gambaran umum)', 'Deskripsi bagian (rincian indra)', 'Simpulan'],
+      languageFeatures: ['Kata Indra & Rincian', 'Makna Kata Kontekstual'],
+      subChapters: [
+        { id: 'd_g7_ind_deskripsi_2_1', no: '2.1', title: 'Struktur Teks Deskripsi', feature: 'Struktur Teks Deskripsi' },
+        { id: 'd_g7_ind_deskripsi_2_2', no: '2.2', title: 'Makna Kata Kontekstual', feature: 'Makna Kata Kontekstual' },
+      ],
+      teachingBrief: {
+        summary: 'Unit offline B.Indonesia kelas 7. Sumber backend/seed_soal.py SOAL_IND_SMP (KOMP-IND-7-MBC-011/012) + tools/create_chunk_ind_8_b6.py (Bab VI Pidato).',
+        hook5Minutes: 'Bacakan deskripsi Pantai Ora tanpa menyebut namanya, minta siswa menebak objeknya dari rinciannya.',
+        boardFormula: 'Identifikasi = apa + di mana | Deskripsi bagian = bagaimana (indra)',
+        commonMisconceptions: [
+          { trap: 'Rincian dianggap identifikasi', pattern: 'Airnya bening = identifikasi', fix: 'Identifikasi memperkenalkan objeknya; rincian menyusul sesudahnya.' },
+          { trap: 'Ungkapan dibaca harfiah', pattern: 'Tangan kanan = anggota tubuh', fix: 'Periksa konteks jabatan: ungkapan bukan makna harfiah.' }
+        ],
+        differentiation: {
+          struggling: 'Beri tabel identifikasi vs rincian dan daftar kata indra.',
+          advanced: 'Minta siswa menulis paragraf deskripsi pasar tradisional 5 kalimat.'
+        },
+        keyVocabulary: [
+          { word: 'identifikasi', meaning: 'gambaran umum objek' },
+          { word: 'deskripsi bagian', meaning: 'rincian ciri objek' },
+          { word: 'ungkapan', meaning: 'makna kiasan' },
+          { word: 'konteks', meaning: 'kalimat sekitar kata' }
+        ]
+      },
+      items: [
+        {
+          id: 'cur_d7_ind_01',
+          subChapterId: 'd_g7_ind_deskripsi_2_1', feature: 'Struktur Teks Deskripsi',
+          prompt: 'Bagian teks deskripsi yang berisi gambaran umum tentang objek disebut ...',
+          options: ['identifikasi', 'deskripsi bagian', 'simpulan', 'orientasi'],
+          answer: 0,
+          marker: 'Bagian yang membuat pembaca tahu benda apa',
+          why: { 1: 'Deskripsi bagian salah karena ia berisi rincian, bukan gambaran umum.', 2: 'Simpulan salah karena ia bagian penutup, bukan pembuka.', 3: 'Orientasi salah karena istilah teks naratif dibawa ke deskripsi.' },
+          note: 'Identifikasi memperkenalkan objeknya lebih dulu; rincian baru menyusul pada deskripsi bagian.'
+        },
+        {
+          id: 'cur_d7_ind_02',
+          subChapterId: 'd_g7_ind_deskripsi_2_1', feature: 'Struktur Teks Deskripsi',
+          prompt: 'Pantai Ora terletak di Maluku Tengah. Airnya bening sampai dasar. Pasirnya putih dan halus. Kalimat yang merupakan IDENTIFIKASI adalah ...',
+          options: ['Kalimat pertama', 'Kalimat kedua', 'Kalimat ketiga', 'Kalimat keempat'],
+          answer: 0,
+          marker: 'Mana yang memperkenalkan, mana yang merinci',
+          why: { 1: 'Kalimat kedua salah karena ia merinci kejernihan air.', 2: 'Kalimat ketiga salah karena ia merinci pasir.', 3: 'Kalimat keempat salah karena ia merinci karang.' },
+          note: 'Kalimat pertama menyebut objek dan letaknya; kalimat berikutnya merinci cirinya.'
+        },
+        {
+          id: 'cur_d7_ind_03',
+          subChapterId: 'd_g7_ind_deskripsi_2_1', feature: 'Struktur Teks Deskripsi',
+          prompt: 'Ciri kebahasaan yang paling menonjol dalam teks deskripsi adalah ...',
+          options: ['penggunaan kata yang menggugah pancaindra', 'penggunaan kata perintah', 'penggunaan konjungsi sebab-akibat', 'penggunaan angka dan data statistik'],
+          answer: 0,
+          marker: 'Apa yang membuat pembaca membayangkan objek',
+          why: { 1: 'Kata perintah salah karena itu ciri teks prosedur.', 2: 'Konjungsi sebab-akibat salah karena itu ciri eksposisi.', 3: 'Angka dan statistik salah karena itu ciri laporan.' },
+          note: 'Teks deskripsi bekerja dengan membuat pembaca seolah melihat, mendengar, dan mencium objeknya.'
+        },
+        {
+          id: 'cur_d7_ind_04',
+          subChapterId: 'd_g7_ind_deskripsi_2_1', feature: 'Struktur Teks Deskripsi',
+          prompt: 'Dari puncaknya, kota tampak seperti hamparan lampu kuning yang bergetar. Kalimat itu menggambarkan objek melalui indra ...',
+          options: ['penglihatan', 'pendengaran', 'penciuman', 'perabaan'],
+          answer: 0,
+          marker: 'Indra mana untuk kata tampak',
+          why: { 1: 'Pendengaran salah karena tidak ada bunyi yang digambarkan.', 2: 'Penciuman salah karena tidak ada bau yang digambarkan.', 3: 'Perabaan salah karena tidak ada sentuhan yang digambarkan.' },
+          note: 'Tampak, hamparan lampu, dan warna kuning semuanya ditangkap mata.'
+        },
+        {
+          id: 'cur_d7_ind_05',
+          subChapterId: 'd_g7_ind_deskripsi_2_2', feature: 'Makna Kata Kontekstual',
+          prompt: 'Setelah gagal tiga kali, semangat Rudi mulai kendur. Makna kata KENDUR dalam kalimat itu adalah ...',
+          options: ['melemah', 'mengencang', 'menghilang sama sekali', 'berubah arah'],
+          answer: 0,
+          marker: 'Habis atau berkurang',
+          why: { 1: 'Mengencang salah karena maknanya dibalik.', 2: 'Menghilang sama sekali salah karena maknanya dilebihkan.', 3: 'Berubah arah salah karena makna dikarang di luar konteks.' },
+          note: 'Kendur berarti tidak tegang; dalam konteks semangat, ia berarti melemah, belum hilang.'
+        },
+        {
+          id: 'cur_d7_ind_06',
+          subChapterId: 'd_g7_ind_deskripsi_2_2', feature: 'Makna Kata Kontekstual',
+          prompt: 'Ia menjadi tangan kanan kepala sekolah sejak tahun lalu. Makna TANGAN KANAN dalam kalimat itu adalah ...',
+          options: ['orang kepercayaan', 'anggota tubuh sebelah kanan', 'orang yang menulis dengan tangan kanan', 'orang yang duduk di sebelah kanan'],
+          answer: 0,
+          marker: 'Masuk akalkah makna harfiahnya',
+          why: { 1: 'Anggota tubuh salah karena ungkapan dibaca harfiah.', 2: 'Menulis dengan tangan kanan salah karena konteksnya jabatan.', 3: 'Duduk di sebelah kanan salah karena konteksnya kepercayaan.' },
+          note: 'Tangan kanan di sini ungkapan, bukan makna harfiah. Konteksnya jabatan, bukan anggota tubuh.'
+        },
+        {
+          id: 'cur_d7_ind_07',
+          subChapterId: 'd_g7_ind_deskripsi_2_2', feature: 'Makna Kata Kontekstual',
+          prompt: 'Cara paling tepat menentukan makna kata yang belum dikenal saat membaca adalah ...',
+          options: ['memeriksa kalimat di sekitarnya lebih dulu', 'menebak dari bunyi katanya', 'melewatinya begitu saja', 'mengganti dengan kata yang mirip bentuknya'],
+          answer: 0,
+          marker: 'Dari mana petunjuk makna paling dipercaya',
+          why: { 1: 'Menebak dari bunyi salah karena bunyi sering menyesatkan.', 2: 'Melewatinya salah karena kata sulit tidak boleh dilewati.', 3: 'Mengganti dengan kata mirip salah karena kemiripan bentuk menyesatkan.' },
+          note: 'Konteks memberi petunjuk makna; kemiripan bunyi atau bentuk sering menyesatkan.'
+        },
+        {
+          id: 'cur_d7_ind_08',
+          subChapterId: 'd_g7_ind_deskripsi_2_2', feature: 'Makna Kata Kontekstual',
+          prompt: 'Harga kebutuhan pokok merangkak naik sejak awal tahun. Kata MERANGKAK menggambarkan kenaikan yang ...',
+          options: ['berlangsung perlahan tetapi terus-menerus', 'terjadi sekali dan besar', 'berhenti di tengah jalan', 'turun kembali'],
+          answer: 0,
+          marker: 'Bagaimana gerak merangkak',
+          why: { 1: 'Terjadi sekali dan besar salah karena maknanya dilebihkan.', 2: 'Berhenti di tengah jalan salah karena maknanya dibalik.', 3: 'Turun kembali salah karena arahnya dibalik.' },
+          note: 'Merangkak dipinjam dari gerak lambat, jadi ia menyatakan kenaikan yang pelan namun tidak berhenti.'
+        }
+      ]
+    },
+    {
+      id: 'd_g7_ipa_pengukuran',
+      phaseId: 'fase_d',
+      grade: 7,
+      semester: 1,
+      genre: 'Ilmu Pengetahuan Alam',
+      title: 'IPA — Pengukuran & Perubahan Zat (Buku Resmi Kelas 7)',
+      targetCefr: 'Sains',
+      socialFunction: 'Mengukur besaran dengan alat tepat dan membedakan perubahan fisika dan kimia.',
+      genericStructure: ['Mengamati besaran', 'Mengukur dengan satuan baku', 'Menyimpulkan jenis perubahan'],
+      languageFeatures: ['Besaran & Satuan', 'Perubahan Fisika-Kimia'],
+      subChapters: [
+        { id: 'd_g7_ipa_pengukuran_1_1', no: '1.1', title: 'Besaran, Satuan & Pengukuran', feature: 'Besaran & Satuan' },
+        { id: 'd_g7_ipa_pengukuran_1_2', no: '1.2', title: 'Perubahan Fisika dan Kimia', feature: 'Perubahan Fisika-Kimia' },
+      ],
+      teachingBrief: {
+        summary: 'Unit offline IPA kelas 7. Sumber backend/seed_soal.py SOAL_IPA_SMP (KOMP-IPA-7-KET-011/012, PEM-011).',
+        hook5Minutes: 'Tantang siswa mengukur ketebalan sehelai kertas dengan penggaris, lalu tanyakan alat apa yang kurang.',
+        boardFormula: 'Satuan pokok massa = kilogram | Kalor perubahan wujud tidak menaikkan suhu',
+        commonMisconceptions: [
+          { trap: 'Alat kasar untuk ukuran kecil', pattern: 'Kertas diukur dengan penggaris', fix: 'Bandingkan ketelitian alat dengan ukuran yang diukur.' },
+          { trap: 'Perubahan wujud dianggap kimia', pattern: 'Es mencair = kimia', fix: 'Tanyakan: adakah zat baru yang terbentuk?' }
+        ],
+        differentiation: {
+          struggling: 'Beri kartu alat-ukur vs ketelitiannya.',
+          advanced: 'Minta siswa merancang tabel pengamatan perubahan wujud.'
+        },
+        keyVocabulary: [
+          { word: 'mikrometer sekrup', meaning: 'alat ukur 0,01 mm' },
+          { word: 'satuan baku', meaning: 'standard unit' },
+          { word: 'menyublim', meaning: 'padat langsung ke gas' },
+          { word: 'konduksi', meaning: 'perpindahan kalor tanpa perpindahan zat' }
+        ]
+      },
+      items: [
+        {
+          id: 'cur_d7_ipa_01',
+          subChapterId: 'd_g7_ipa_pengukuran_1_1', feature: 'Besaran & Satuan',
+          prompt: 'Alat yang paling tepat untuk mengukur ketebalan sehelai kertas adalah ...',
+          options: ['mikrometer sekrup', 'penggaris', 'meteran gulung', 'jangka sorong'],
+          answer: 0,
+          marker: 'Bandingkan ketelitian tiap alat',
+          why: { 1: 'Penggaris salah karena terlalu kasar untuk ukuran setipis itu.', 2: 'Meteran gulung salah karena untuk ukuran besar.', 3: 'Jangka sorong salah karena ketelitiannya belum cukup.' },
+          note: 'Mikrometer sekrup punya ketelitian 0,01 mm, satu-satunya yang cukup teliti untuk ukuran setipis itu.'
+        },
+        {
+          id: 'cur_d7_ipa_02',
+          subChapterId: 'd_g7_ipa_pengukuran_1_1', feature: 'Besaran & Satuan',
+          prompt: 'Satuan baku untuk besaran massa dalam Sistem Internasional adalah ...',
+          options: ['kilogram', 'gram', 'newton', 'liter'],
+          answer: 0,
+          marker: 'Bedakan satuan pokok dan turunan',
+          why: { 1: 'Gram salah karena ia turunan dari kilogram.', 2: 'Newton salah karena ia satuan gaya.', 3: 'Liter salah karena ia satuan volume.' },
+          note: 'Kilogram adalah satuan pokok massa; gram turunan darinya, newton satuan gaya, liter satuan volume.'
+        },
+        {
+          id: 'cur_d7_ipa_03',
+          subChapterId: 'd_g7_ipa_pengukuran_1_1', feature: 'Besaran & Satuan',
+          prompt: 'Hasil pengukuran panjang sebuah pensil ditulis 12,4 cm. Angka 4 pada hasil itu merupakan ...',
+          options: ['angka taksiran', 'angka pasti', 'angka nol tak berarti', 'kesalahan pengukuran'],
+          answer: 0,
+          marker: 'Digit mana dibaca, mana ditaksir',
+          why: { 1: 'Angka pasti salah karena digit terakhir selalu taksiran.', 2: 'Angka nol tak berarti salah karena ia tetap bermakna.', 3: 'Kesalahan pengukuran salah karena taksiran bukan kesalahan.' },
+          note: 'Digit terakhir pada hasil pengukuran selalu merupakan taksiran di antara dua goresan skala terkecil.'
+        },
+        {
+          id: 'cur_d7_ipa_04',
+          subChapterId: 'd_g7_ipa_pengukuran_1_1', feature: 'Besaran & Satuan',
+          prompt: 'Mengukur satu benda beberapa kali lalu mengambil rata-ratanya bertujuan untuk ...',
+          options: ['mengurangi pengaruh kesalahan acak', 'mengubah nilai sebenarnya benda itu', 'mempercepat pengukuran', 'menghilangkan seluruh kesalahan alat'],
+          answer: 0,
+          marker: 'Kesalahan mana yang bisa ditekan dengan mengulang',
+          why: { 1: 'Mengubah nilai salah karena pengukuran tidak mengubah benda.', 2: 'Mempercepat salah karena tujuannya ketelitian bukan kecepatan.', 3: 'Menghilangkan seluruh kesalahan salah karena kesalahan alat yang tetap tidak hilang.' },
+          note: 'Kesalahan acak menyimpang ke dua arah, jadi rata-rata menekannya; kesalahan alat yang tetap tidak hilang oleh pengulangan.'
+        },
+        {
+          id: 'cur_d7_ipa_05',
+          subChapterId: 'd_g7_ipa_pengukuran_1_2', feature: 'Perubahan Fisika-Kimia',
+          prompt: 'Peristiwa yang merupakan perubahan KIMIA adalah ...',
+          options: ['besi berkarat', 'es mencair', 'gula larut dalam air', 'kertas disobek'],
+          answer: 0,
+          marker: 'Adakah zat baru yang terbentuk',
+          why: { 1: 'Es mencair salah karena hanya perubahan wujud.', 2: 'Gula larut salah karena tidak mengubah jenis zat.', 3: 'Kertas disobek salah karena hanya perubahan bentuk.' },
+          note: 'Berkarat menghasilkan zat baru dengan sifat berbeda; tiga peristiwa lain tidak mengubah jenis zatnya.'
+        },
+        {
+          id: 'cur_d7_ipa_06',
+          subChapterId: 'd_g7_ipa_pengukuran_1_2', feature: 'Perubahan Fisika-Kimia',
+          prompt: 'Sifat berikut yang termasuk sifat FISIKA suatu zat adalah ...',
+          options: ['titik leleh', 'mudah terbakar', 'mudah berkarat', 'dapat membusuk'],
+          answer: 0,
+          marker: 'Apakah zatnya harus berubah untuk mengetahuinya',
+          why: { 1: 'Mudah terbakar salah karena itu sifat kimia.', 2: 'Mudah berkarat salah karena itu sifat kimia.', 3: 'Dapat membusuk salah karena itu sifat kimia.' },
+          note: 'Titik leleh dapat diukur tanpa mengubah jenis zatnya; tiga sifat lain baru tampak ketika zatnya berubah.'
+        },
+        {
+          id: 'cur_d7_ipa_07',
+          subChapterId: 'd_g7_ipa_pengukuran_1_2', feature: 'Perubahan Fisika-Kimia',
+          prompt: 'Tanda yang paling dapat dipercaya bahwa telah terjadi perubahan kimia adalah ...',
+          options: ['terbentuknya zat baru dengan sifat yang berbeda', 'berubahnya bentuk benda', 'berubahnya suhu benda', 'berubahnya ukuran benda'],
+          answer: 0,
+          marker: 'Tanda mana yang tidak mungkin pada fisika',
+          why: { 1: 'Berubahnya bentuk salah karena bisa terjadi pada fisika.', 2: 'Berubahnya suhu salah karena bisa terjadi pada fisika.', 3: 'Berubahnya ukuran salah karena bisa terjadi pada fisika.' },
+          note: 'Perubahan suhu dan bentuk bisa terjadi pada perubahan fisika juga; yang menentukan adalah adanya zat baru.'
+        },
+        {
+          id: 'cur_d7_ipa_08',
+          subChapterId: 'd_g7_ipa_pengukuran_1_2', feature: 'Perubahan Fisika-Kimia',
+          prompt: 'Air dipanaskan sampai mendidih lalu uapnya diembunkan kembali menjadi air. Peristiwa itu menunjukkan bahwa ...',
+          options: ['perubahan wujud tidak mengubah jenis zatnya', 'air berubah menjadi zat baru saat mendidih', 'uap air adalah zat yang berbeda dari air', 'pendidihan adalah perubahan kimia'],
+          answer: 0,
+          marker: 'Mungkinkah kembali seperti semula',
+          why: { 1: 'Berubah jadi zat baru salah karena ia kembali menjadi air.', 2: 'Uap berbeda zat salah karena wujud berbeda bukan zat berbeda.', 3: 'Pendidihan kimia salah karena tidak ada zat baru.' },
+          note: 'Zat yang kembali menjadi air semula membuktikan jenis zatnya tidak pernah berubah.'
+        }
+      ]
+    },
+    {
+      id: 'd_g7_ips_sumber',
+      phaseId: 'fase_d',
+      grade: 7,
+      semester: 2,
+      genre: 'Ilmu Pengetahuan Sosial',
+      title: 'IPS — Sumber Data & Letak Geografis Indonesia (Buku Resmi Kelas 7)',
+      targetCefr: 'Literasi Sosial',
+      socialFunction: 'Menilai kredibilitas sumber data dan menjelaskan letak geografis Indonesia.',
+      genericStructure: ['Mengumpulkan data dari sumber', 'Memeriksa kredibilitasnya', 'Mengaitkan dengan kondisi geografis'],
+      languageFeatures: ['Kredibilitas Sumber Data', 'Letak Geografis Indonesia'],
+      subChapters: [
+        { id: 'd_g7_ips_sumber_2_1', no: '2.1', title: 'Sumber dan Kredibilitas Data', feature: 'Kredibilitas Sumber Data' },
+        { id: 'd_g7_ips_sumber_2_2', no: '2.2', title: 'Letak Geografis Indonesia', feature: 'Letak Geografis Indonesia' },
+      ],
+      teachingBrief: {
+        summary: 'Unit offline IPS kelas 7. Sumber backend/seed_soal.py SOAL_IPS_SMP (KOMP-IPS-7-KET-011, PEM-011) + tools/create_chunk_ips_7_t4.py dan generate_ips8_t1.py.',
+        hook5Minutes: 'Tampilkan grafik tanpa sumber dan tahun, tanyakan apakah grafik itu boleh dipakai.',
+        boardFormula: 'Kredibel = asal data jelas + bisa ditelusuri | Astronomis = lintang + bujur',
+        commonMisconceptions: [
+          { trap: 'Popularitas dianggap bukti', pattern: 'Banyak dibagikan berarti benar', fix: 'Yang bisa diperiksa orang lain hanyalah asal data dan tahunnya.' },
+          { trap: 'Letak geografis tertukar astronomis', pattern: 'Benua = astronomis', fix: 'Astronomis memakai koordinat; geografis memakai kenyataan sekitar.' }
+        ],
+        differentiation: {
+          struggling: 'Beri daftar periksa sumber: penerbit, tanggal, cara hitung.',
+          advanced: 'Minta siswa membandingkan dua sumber pengangguran yang angkanya berbeda.'
+        },
+        keyVocabulary: [
+          { word: 'data primer', meaning: 'dikumpulkan sendiri' },
+          { word: 'data sekunder', meaning: 'dari kumpulan yang sudah ada' },
+          { word: 'letak astronomis', meaning: 'lintang dan bujur' },
+          { word: 'letak geografis', meaning: 'benua dan samudra sekitar' }
+        ]
+      },
+      items: [
+        {
+          id: 'cur_d7_ips_01',
+          subChapterId: 'd_g7_ips_sumber_2_1', feature: 'Kredibilitas Sumber Data',
+          prompt: 'Untuk mengetahui jumlah penduduk Indonesia tahun lalu, sumber yang paling tepat dipakai adalah ...',
+          options: ['publikasi Badan Pusat Statistik', 'unggahan seseorang di media sosial', 'ingatan beberapa tetangga', 'buku pelajaran terbitan sepuluh tahun lalu'],
+          answer: 0,
+          marker: 'Sumber mana yang bisa diperiksa caranya',
+          why: { 1: 'Media sosial salah karena tanpa prosedur yang bisa diperiksa.', 2: 'Ingatan tetangga salah karena ingatan bukan data.', 3: 'Buku lama salah karena kedaluwarsa.' },
+          note: 'Lembaga statistik resmi mengumpulkan dan menerbitkan data kependudukan dengan cara yang dapat ditelusuri.'
+        },
+        {
+          id: 'cur_d7_ips_02',
+          subChapterId: 'd_g7_ips_sumber_2_1', feature: 'Kredibilitas Sumber Data',
+          prompt: 'Data yang dikumpulkan langsung oleh peneliti sendiri melalui wawancara atau pengamatan disebut data ...',
+          options: ['primer', 'sekunder', 'tersier', 'sementara'],
+          answer: 0,
+          marker: 'Siapa yang mengumpulkan datanya',
+          why: { 1: 'Sekunder salah karena ia dari pihak lain lebih dulu.', 2: 'Tersier salah karena istilah itu karangan.', 3: 'Sementara salah karena istilah itu karangan.' },
+          note: 'Data primer dikumpulkan sendiri; data sekunder diambil dari kumpulan yang sudah ada.'
+        },
+        {
+          id: 'cur_d7_ips_03',
+          subChapterId: 'd_g7_ips_sumber_2_1', feature: 'Kredibilitas Sumber Data',
+          prompt: 'Mengutip data dari internet sebaiknya selalu disertai ...',
+          options: ['nama penerbit dan tanggal pengambilannya', 'jumlah tampilan halaman itu', 'warna tampilan situsnya', 'nama peramban yang dipakai'],
+          answer: 0,
+          marker: 'Apa yang memungkinkan orang lain menemukan sumber sama',
+          why: { 1: 'Jumlah tampilan salah karena popularitas bukan keterangan sumber.', 2: 'Warna tampilan salah karena tampilan bukan keterangan sumber.', 3: 'Nama peramban salah karena alat bukan keterangan sumber.' },
+          note: 'Isi laman dapat berubah; penerbit dan tanggal memungkinkan pembaca menelusuri versi yang dipakai.'
+        },
+        {
+          id: 'cur_d7_ips_04',
+          subChapterId: 'd_g7_ips_sumber_2_1', feature: 'Kredibilitas Sumber Data',
+          prompt: 'Mengumpulkan data dari beberapa sumber yang berbeda berguna terutama untuk ...',
+          options: ['memeriksa apakah keterangannya saling menguatkan', 'memperpanjang daftar pustaka', 'menghabiskan waktu penelitian', 'membuat laporan terlihat tebal'],
+          answer: 0,
+          marker: 'Bagaimana tahu keterangan tidak keliru',
+          why: { 1: 'Memperpanjang daftar salah karena tujuannya dialihkan.', 2: 'Menghabiskan waktu salah karena tujuannya dialihkan.', 3: 'Terlihat tebal salah karena tujuannya dialihkan.' },
+          note: 'Satu sumber bisa keliru tanpa disadari; kecocokan beberapa sumber menaikkan kepercayaan.'
+        },
+        {
+          id: 'cur_d7_ips_05',
+          subChapterId: 'd_g7_ips_sumber_2_2', feature: 'Letak Geografis Indonesia',
+          prompt: 'Secara geografis, Indonesia terletak di antara dua benua, yaitu ...',
+          options: ['Asia dan Australia', 'Asia dan Afrika', 'Australia dan Amerika', 'Asia dan Eropa'],
+          answer: 0,
+          marker: 'Benua mana di utara dan selatan',
+          why: { 1: 'Asia-Afrika salah karena benua tertukar.', 2: 'Australia-Amerika salah karena benua tertukar.', 3: 'Asia-Eropa salah karena benua tertukar.' },
+          note: 'Letak geografis Indonesia berada di antara Benua Asia dan Benua Australia, serta dua samudra.'
+        },
+        {
+          id: 'cur_d7_ips_06',
+          subChapterId: 'd_g7_ips_sumber_2_2', feature: 'Letak Geografis Indonesia',
+          prompt: 'Indonesia terletak di antara dua samudra, yaitu ...',
+          options: ['Samudra Hindia dan Samudra Pasifik', 'Samudra Atlantik dan Samudra Pasifik', 'Samudra Hindia dan Samudra Atlantik', 'Samudra Arktik dan Samudra Pasifik'],
+          answer: 0,
+          marker: 'Samudra mana yang mengapit Indonesia',
+          why: { 1: 'Atlantik-Pasifik salah karena samudra tertukar.', 2: 'Hindia-Atlantik salah karena samudra tertukar.', 3: 'Arktik-Pasifik salah karena samudra tertukar.' },
+          note: 'Samudra Hindia di barat dan selatan, Samudra Pasifik di timur laut.'
+        },
+        {
+          id: 'cur_d7_ips_07',
+          subChapterId: 'd_g7_ips_sumber_2_2', feature: 'Letak Geografis Indonesia',
+          prompt: 'Pada peta berskala 1 : 500.000, jarak dua kota yang terukur 4 cm berarti jarak sebenarnya ...',
+          options: ['20 km', '2 km', '200 km', '125 km'],
+          answer: 0,
+          marker: 'Kalikan dulu baru ubah ke km',
+          why: { 1: '2 km salah karena satuan salah diubah.', 2: '200 km salah karena satuan salah diubah.', 3: '125 km salah karena jarak dibagi bukan dikali.' },
+          note: '4 cm x 500.000 = 2.000.000 cm, dan 2.000.000 cm sama dengan 20 km.'
+        },
+        {
+          id: 'cur_d7_ips_08',
+          subChapterId: 'd_g7_ips_sumber_2_2', feature: 'Letak Geografis Indonesia',
+          prompt: 'Letak ASTRONOMIS sebuah wilayah dinyatakan berdasarkan ...',
+          options: ['garis lintang dan garis bujurnya', 'benua dan samudra di sekitarnya', 'jenis tanah dan iklimnya', 'jumlah penduduk dan luasnya'],
+          answer: 0,
+          marker: 'Bedakan astronomis dari geografis',
+          why: { 1: 'Benua-samudra salah karena itu letak geografis.', 2: 'Tanah-iklim salah karena itu ciri alam.', 3: 'Penduduk-luas salah karena itu ciri penduduk.' },
+          note: 'Letak astronomis memakai koordinat lintang dan bujur; letak geografis memakai kenyataan di sekitarnya.'
+        }
+      ]
+    },
+    {
+      id: 'd_g7_ppkn_pancasila',
+      phaseId: 'fase_d',
+      grade: 7,
+      semester: 1,
+      genre: 'Pendidikan Pancasila',
+      title: 'Pendidikan Pancasila — Sejarah Pancasila & Norma (Buku Resmi Kelas 7)',
+      targetCefr: 'Kewargaan',
+      socialFunction: 'Menjelaskan sejarah perumusan Pancasila dan menerapkan norma dalam kehidupan.',
+      genericStructure: ['Mengetahui sejarahnya', 'Memahami nilainya', 'Menerapkannya sehari-hari'],
+      languageFeatures: ['Sejarah Pancasila', 'Norma dan Aturan'],
+      subChapters: [
+        { id: 'd_g7_ppkn_pancasila_1_1', no: '1.1', title: 'Sejarah Perumusan Pancasila', feature: 'Sejarah Pancasila' },
+        { id: 'd_g7_ppkn_pancasila_1_2', no: '1.2', title: 'Norma dan Tata Tertib', feature: 'Norma dan Aturan' },
+      ],
+      teachingBrief: {
+        summary: 'Unit offline PPKn kelas 7. Sumber backend/seed_soal.py SOAL_PPKN_SMP (KOMP-PPKN-7-PAN-011, UUD-011).',
+        hook5Minutes: 'Urutkan kartu peristiwa: sidang BPUPKI, Piagam Jakarta, penetapan PPKI. Mana yang lebih dulu?',
+        boardFormula: 'BPUPKI merumuskan | PPKI menetapkan | Norma hukum sanksinya oleh negara',
+        commonMisconceptions: [
+          { trap: 'Perumus dianggap penetap', pattern: 'BPUPKI menetapkan', fix: 'Bedakan merumuskan dengan menetapkan.' },
+          { trap: 'Hafalan dianggap penerapan', pattern: 'Hafal = mengamalkan', fix: 'Nilai diterapkan dalam perbuatan, bukan hanya dihafal.' }
+        ],
+        differentiation: {
+          struggling: 'Beri garis waktu 1 Juni, 22 Juni, 18 Agustus 1945.',
+          advanced: 'Minta siswa menganalisis kasus menyontek dari sudut sila keempat.'
+        },
+        keyVocabulary: [
+          { word: 'BPUPKI', meaning: 'badan perumus' },
+          { word: 'PPKI', meaning: 'badan penetap' },
+          { word: 'norma hukum', meaning: 'sanksi oleh negara' },
+          { word: 'musyawarah', meaning: 'memutuskan bersama' }
+        ]
+      },
+      items: [
+        {
+          id: 'cur_d7_ppkn_01',
+          subChapterId: 'd_g7_ppkn_pancasila_1_1', feature: 'Sejarah Pancasila',
+          prompt: 'Lembaga yang menetapkan Pancasila sebagai dasar negara pada 18 Agustus 1945 adalah ...',
+          options: ['PPKI', 'BPUPKI', 'MPR', 'KNIP'],
+          answer: 0,
+          marker: 'Bedakan merumuskan dengan menetapkan',
+          why: { 1: 'BPUPKI salah karena ia merumuskan dan membahas.', 2: 'MPR salah karena lembaga kemudian dibawa ke 1945.', 3: 'KNIP salah karena lembaga kemudian dibawa ke 1945.' },
+          note: 'BPUPKI merumuskan dan membahas; PPKI-lah yang menetapkan UUD 1945 beserta Pancasila pada 18 Agustus 1945.'
+        },
+        {
+          id: 'cur_d7_ppkn_02',
+          subChapterId: 'd_g7_ppkn_pancasila_1_1', feature: 'Sejarah Pancasila',
+          prompt: 'Pidato Soekarno pada 1 Juni 1945 dalam sidang BPUPKI dikenal sebagai ...',
+          options: ['lahirnya Pancasila', 'penetapan Pancasila', 'pembacaan Piagam Jakarta', 'pengesahan UUD 1945'],
+          answer: 0,
+          marker: 'Diusulkan atau sudah ditetapkan',
+          why: { 1: 'Penetapan salah karena usulan dianggap penetapan.', 2: 'Piagam Jakarta salah karena peristiwa 22 Juni dibawa ke 1 Juni.', 3: 'Pengesahan UUD salah karena peristiwa 18 Agustus dibawa ke 1 Juni.' },
+          note: 'Pada hari itu istilah Pancasila diusulkan; penetapannya baru terjadi kemudian melalui PPKI.'
+        },
+        {
+          id: 'cur_d7_ppkn_03',
+          subChapterId: 'd_g7_ppkn_pancasila_1_1', feature: 'Sejarah Pancasila',
+          prompt: 'Rumusan sila pertama dalam Piagam Jakarta diubah menjadi Ketuhanan Yang Maha Esa terutama karena ...',
+          options: ['menjaga persatuan seluruh warga yang berbeda agama', 'kalimatnya dianggap terlalu panjang', 'usulan itu datang dari pemerintah pendudukan', 'rumusan sebelumnya tidak dapat diterjemahkan'],
+          answer: 0,
+          marker: 'Apa yang paling terancam kalau dipertahankan',
+          why: { 1: 'Terlalu panjang salah karena alasan dialihkan.', 2: 'Pihak luar salah karena alasan dialihkan.', 3: 'Tidak bisa diterjemahkan salah karena alasan bahasa.' },
+          note: 'Perubahan itu diambil agar dasar negara dapat menaungi seluruh warga dari berbagai agama.'
+        },
+        {
+          id: 'cur_d7_ppkn_04',
+          subChapterId: 'd_g7_ppkn_pancasila_1_1', feature: 'Sejarah Pancasila',
+          prompt: 'Urutan peristiwa yang benar dalam sejarah perumusan Pancasila adalah ...',
+          options: ['sidang BPUPKI, Piagam Jakarta, penetapan oleh PPKI', 'penetapan oleh PPKI, sidang BPUPKI, Piagam Jakarta', 'Piagam Jakarta, penetapan oleh PPKI, sidang BPUPKI', 'sidang BPUPKI, penetapan oleh PPKI, Piagam Jakarta'],
+          answer: 0,
+          marker: 'Mana yang lebih dulu: membahas atau menetapkan',
+          why: { 1: 'Urutan dibalik salah.', 2: 'Urutan diacak salah.', 3: 'Piagam sesudah penetapan salah.' },
+          note: 'Pembahasan mendahului rumusan bersama, dan rumusan bersama mendahului penetapannya.'
+        },
+        {
+          id: 'cur_d7_ppkn_05',
+          subChapterId: 'd_g7_ppkn_pancasila_1_2', feature: 'Norma dan Aturan',
+          prompt: 'Norma yang pelanggarannya dikenai sanksi tegas oleh negara adalah norma ...',
+          options: ['hukum', 'kesopanan', 'kesusilaan', 'agama'],
+          answer: 0,
+          marker: 'Siapa yang menjatuhkan sanksinya',
+          why: { 1: 'Kesopanan salah karena sanksinya sosial bukan negara.', 2: 'Kesusilaan salah karena sanksinya batin bukan negara.', 3: 'Agama salah karena sanksinya keagamaan bukan negara.' },
+          note: 'Hanya norma hukum yang sanksinya ditegakkan oleh alat negara dan bersifat memaksa.'
+        },
+        {
+          id: 'cur_d7_ppkn_06',
+          subChapterId: 'd_g7_ppkn_pancasila_1_2', feature: 'Norma dan Aturan',
+          prompt: 'Rasa bersalah yang muncul dari dalam diri ketika berbohong adalah sanksi dari norma ...',
+          options: ['kesusilaan', 'hukum', 'kesopanan', 'adat tertulis'],
+          answer: 0,
+          marker: 'Dari mana rasa bersalah itu datang',
+          why: { 1: 'Hukum salah karena sanksi batin dianggap hukum.', 2: 'Kesopanan salah karena sanksi batin dianggap sosial.', 3: 'Adat tertulis salah karena sanksi batin dianggap adat.' },
+          note: 'Norma kesusilaan bersumber dari hati nurani, dan sanksinya berupa penyesalan batin.'
+        },
+        {
+          id: 'cur_d7_ppkn_07',
+          subChapterId: 'd_g7_ppkn_pancasila_1_2', feature: 'Norma dan Aturan',
+          prompt: 'Mengucapkan salam ketika bertamu termasuk norma ...',
+          options: ['kesopanan', 'hukum', 'kesusilaan', 'perundang-undangan'],
+          answer: 0,
+          marker: 'Dihukum negara atau dinilai kurang santun',
+          why: { 1: 'Hukum salah karena kebiasaan dianggap hukum.', 2: 'Kesusilaan salah karena kebiasaan dianggap kesusilaan.', 3: 'Perundang-undangan salah karena kebiasaan dianggap aturan tertulis.' },
+          note: 'Aturan itu tumbuh dari kebiasaan masyarakat dan sanksinya berupa penilaian sosial.'
+        },
+        {
+          id: 'cur_d7_ppkn_08',
+          subChapterId: 'd_g7_ppkn_pancasila_1_2', feature: 'Norma dan Aturan',
+          prompt: 'Satu perbuatan dapat melanggar lebih dari satu norma sekaligus. Contoh yang paling tepat adalah ...',
+          options: ['mencuri, yang melanggar norma hukum, agama, dan kesusilaan', 'terlambat tidur, yang melanggar norma hukum', 'lupa mengucap terima kasih, yang melanggar norma hukum', 'memakai baju warna tertentu, yang melanggar norma kesusilaan'],
+          answer: 0,
+          marker: 'Perbuatan mana yang ditolak banyak aturan',
+          why: { 1: 'Terlambat tidur salah karena kebiasaan pribadi dianggap hukum.', 2: 'Lupa terima kasih salah karena kesopanan dianggap hukum.', 3: 'Baju warna tertentu salah karena selera dianggap norma.' },
+          note: 'Mencuri dilarang undang-undang, ditolak ajaran agama, dan ditentang hati nurani sekaligus.'
+        }
+      ]
+    },
   ];
 
   // Lookup peta cepat

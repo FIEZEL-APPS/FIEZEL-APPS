@@ -8599,7 +8599,25 @@ async def soal_status():
     dari_penyemai = await db.questions.count_documents({"is_current": True, "source": "seed-soal"})
     komp_total = await db.curriculum_nodes.count_documents({"type": "competency"})
     berisi = len(await db.questions.distinct("competency_id", {"is_current": True}))
+    # Rincian per mapel inti (dihitung dari tabel SOAL, bukan tebakan) agar panel Owner
+    # menampilkan hitungan riil, bukan angka statis. Kunci: MAT, IND, IPA, IPS, PPKN.
+    def _n(*tables):
+        s = 0
+        for t in tables:
+            for v in t.values():
+                s += len(v)
+        return s
+    def _c(*tables):
+        return sum(len(t) for t in tables)
+    per_mapel = {
+        "MAT": {"questions": _n(SOAL_MAT7, SOAL_MAT89), "competencies": _c(SOAL_MAT7, SOAL_MAT89)},
+        "IND": {"questions": _n(SOAL_IND_SMP), "competencies": _c(SOAL_IND_SMP)},
+        "IPA": {"questions": _n(SOAL_IPA_SMP), "competencies": _c(SOAL_IPA_SMP)},
+        "IPS": {"questions": _n(SOAL_IPS_SMP), "competencies": _c(SOAL_IPS_SMP)},
+        "PPKN": {"questions": _n(SOAL_PPKN_SMP), "competencies": _c(SOAL_PPKN_SMP)},
+    }
     return {"seeded": dari_penyemai > 0, "questions": total, "published": terbit,
             "from_this_seeder": dari_penyemai,
             "competencies_with_questions": berisi, "competencies_total": komp_total,
-            "in_this_wave": sum(len(v) for v in SOAL.values())}
+            "in_this_wave": sum(len(v) for v in SOAL.values()),
+            "per_mapel": per_mapel}
