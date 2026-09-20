@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * tests/mapel-fase-d-content-test.js — GERBANG: ISI MAPEL FASE D (MAT / IPA / ENG)
+ * tests/mapel-fase-d-content-test.js — GERBANG: ISI MAPEL FASE D (5 MAPEL INTI)
  *
  * KENAPA GERBANG INI ADA
  * ----------------------
@@ -39,8 +39,11 @@
  *     (atau identik dengan padanan id-nya untuk isi yang memang netral bahasa — angka,
  *     notasi matematika, dan batang soal Bahasa Inggris yang memang materinya), dan
  *     himpunan {placeholder} sama persis.
- *  9. Fail-quiet: bank absen => perilaku lama, nol lemparan. 14 mapel lain hidup di jalur
+ *  9. Fail-quiet: bank absen => perilaku lama, nol lemparan. 12 mapel lain hidup di jalur
  *     itu setiap hari dan tidak boleh ikut berubah.
+ * 10. Satu kompetensi = satu BAB Buku Siswa Kemendikbudristek. Kodenya menyebut babnya
+ *     (KOMP-IPA-D-7-BAB1-01), bukan singkatan topik buatan sendiri: guru mencari "Bab 1",
+ *     dan istilah yang tidak tercetak di buku muridnya memaksa ia menerjemahkan sendiri.
  *
  * Print-only: tidak menulis berkas apa pun; exit 1 bila ada FAIL.
  * ENV: FIEZEL_ROOT -> root repo (default __fzRoot). Dipakai uji mutasi merah-dulu supaya
@@ -491,19 +494,23 @@ if (bankLengkap) {
     check('fail-quiet: 17 mapel tetap utuh tanpa bank', quietShell._MAPEL_LIST.length === 17, quietShell._MAPEL_LIST.length + ' mapel');
     let lainErr = '';
     let lainOk = true;
+    /* IND & IPS kini PUNYA bank, tetapi cangkang ini sengaja dimuat TANPA akses berkas.
+       Keduanya ikut diuji di sini justru karena itu: bila banknya tak terjangkau (peramban
+       luring, fetch gagal), keduanya wajib jatuh ke perilaku lama seperti 12 mapel sisanya
+       — bukan layar kosong. */
     for (const mid of ['IND', 'IPS', 'INF', 'PPK', 'AGM', 'FIS', 'KIM', 'BIO', 'EKO', 'GEO', 'SOS', 'SEJ', 'PJK', 'SNB']) {
       try {
         const q = quietShell._synthesizeMapelQuestions(mid, 'KOMP-' + mid + '-D-01', 'uji', 5);
         if (!q || q.length !== 5) { lainOk = false; lainErr += mid + '=' + (q ? q.length : 'null') + ' '; }
       } catch (e) { lainOk = false; lainErr += mid + '=throw '; }
     }
-    check('fail-quiet: 14 mapel tanpa bank tetap melayani 5 butir seperti sebelumnya', lainOk, lainErr);
+    check('fail-quiet: 14 mapel tanpa akses bank tetap melayani 5 butir seperti sebelumnya', lainOk, lainErr);
   }
 }
 
 /* =============================== LAPORAN ============================================= */
 
-console.log('tests/mapel-fase-d-content-test.js — gerbang isi mapel Fase D (MAT/IPA/ENG)');
+console.log('tests/mapel-fase-d-content-test.js — gerbang isi mapel Fase D (MAT/IPA/ENG/IND/IPS)');
 console.log('ROOT: ' + ROOT);
 for (const c of checks) {
   console.log((c.ok ? '  OK  : ' : '  FAIL: ') + c.name + (c.details ? '  — ' + c.details : ''));
