@@ -135,10 +135,26 @@
       name: 'Matematika',
       grade: 'SD / SMP / SMA',
       competencies: [
-        { code: 'KOMP-MAT-D-7-BIL-01', name: t('mapel_mat_c1_name', 'Operasi Hitung Bilangan Bulat & Pecahan'), materi: t('mapel_mat_c1_mat', 'Penjumlahan, pengurangan, perkalian, pembagian bilangan rasional dan estimasi') },
-        { code: 'KOMP-MAT-D-8-ALJ-01', name: t('mapel_mat_c2_name', 'Aljabar & Persamaan Linier Dua Variabel'), materi: t('mapel_mat_c2_mat', 'Menyelesaikan SPLDV dengan metode substitusi dan eliminasi kontekstual') },
-        { code: 'KOMP-MAT-D-8-GEO-01', name: t('mapel_mat_c3_name', 'Geometri & Teorema Pythagoras'), materi: t('mapel_mat_c3_mat', 'Membuktikan dan menghitung panjang sisi segitiga siku-siku serta tripel Pythagoras') },
-        { code: 'KOMP-MAT-D-9-STA-01', name: t('mapel_mat_c4_name', 'Statistika & Peluang Empiris'), materi: t('mapel_mat_c4_mat', 'Menghitung pemusatan data rata-rata, median, modus, dan frekuensi relatif') }
+        /* Kelas 7 — Buku Siswa Matematika Kelas VII (Kemendikbudristek) */
+        { code: 'KOMP-MAT-D-7-BAB1-01', grade: 7, name: t('mapel_mat_d7_b1_name', 'Bilangan Bulat'), materi: t('mapel_mat_d7_b1_mat', 'Memahami Bilangan Bulat, Operasi Hitung Bilangan Bulat, Faktor Bilangan Bulat'), cpRef: 'Matematika untuk SMP/MTs Kelas VII — Bab 1' },
+        { code: 'KOMP-MAT-D-7-BAB2-01', grade: 7, name: t('mapel_mat_d7_b2_name', 'Bilangan Rasional'), materi: t('mapel_mat_d7_b2_mat', 'Di Antara Dua Bilangan Bulat, Membandingkan Bilangan Rasional, Operasi Hitung Bilangan Rasional'), cpRef: 'Matematika untuk SMP/MTs Kelas VII — Bab 2' },
+        { code: 'KOMP-MAT-D-7-BAB3-01', grade: 7, name: t('mapel_mat_d7_b3_name', 'Rasio'), materi: t('mapel_mat_d7_b3_mat', 'Konsep Rasio, Skala, Laju Perubahan Satuan'), cpRef: 'Matematika untuk SMP/MTs Kelas VII — Bab 3' },
+        { code: 'KOMP-MAT-D-7-BAB4-01', grade: 7, name: t('mapel_mat_d7_b4_name', 'Bentuk Aljabar'), materi: t('mapel_mat_d7_b4_mat', 'Unsur-Unsur Bentuk Aljabar, Sifat-Sifat dan Operasi Aljabar, Pemodelan dengan Bentuk Aljabar'), cpRef: 'Matematika untuk SMP/MTs Kelas VII — Bab 4' },
+        { code: 'KOMP-MAT-D-7-BAB5-01', grade: 7, name: t('mapel_mat_d7_b5_name', 'Kesebangunan'), materi: t('mapel_mat_d7_b5_mat', 'Hubungan Antar Sudut, Arti Kesebangunan, Kesebangunan pada Segitiga'), cpRef: 'Matematika untuk SMP/MTs Kelas VII — Bab 5' },
+        { code: 'KOMP-MAT-D-7-BAB6-01', grade: 7, name: t('mapel_mat_d7_b6_name', 'Data dan Diagram'), materi: t('mapel_mat_d7_b6_mat', 'Investigasi Statistika, Macam-Macam Data, Diagram Batang, Diagram Lingkaran, Memilih Diagram yang Tepat'), cpRef: 'Matematika untuk SMP/MTs Kelas VII — Bab 6' },
+        /* Kelas 8 — Buku Siswa Matematika Kelas VIII (Kemendikbudristek) */
+        { code: 'KOMP-MAT-D-8-BAB1-01', grade: 8, name: t('mapel_mat_d8_b1_name', 'Bilangan Berpangkat dan Bentuk Akar'), materi: t('mapel_mat_d8_b1_mat', 'Sifat-Sifat Eksponen, Operasi Bentuk Akar, Penulisan Notasi Ilmiah'), cpRef: 'Matematika untuk SMP/MTs Kelas VIII — Bab 1' },
+        { code: 'KOMP-MAT-D-8-BAB2-01', grade: 8, name: t('mapel_mat_d8_b2_name', 'Teorema Pythagoras'), materi: t('mapel_mat_d8_b2_mat', 'Membuktikan Teorema Pythagoras, Menemukan Tripel Pythagoras, Penerapan dalam Konteks Nyata'), cpRef: 'Matematika untuk SMP/MTs Kelas VIII — Bab 2' },
+        { code: 'KOMP-MAT-D-8-BAB3-01', grade: 8, name: t('mapel_mat_d8_b3_name', 'Sistem Persamaan Linear Dua Variabel (SPLDV)'), materi: t('mapel_mat_d8_b3_mat', 'Metode Grafik, Metode Substitusi, Metode Eliminasi, Pemodelan Kontekstual SPLDV'), cpRef: 'Matematika untuk SMP/MTs Kelas VIII — Bab 3' },
+        { code: 'KOMP-MAT-D-8-BAB4-01', grade: 8, name: t('mapel_mat_d8_b4_name', 'Relasi dan Fungsi'), materi: t('mapel_mat_d8_b4_mat', 'Memahami Relasi, Notasi dan Nilai Fungsi, Domain, Kodomain, Range, Korespondensi Satu-Satu'), cpRef: 'Matematika untuk SMP/MTs Kelas VIII — Bab 4' },
+        { code: 'KOMP-MAT-D-8-BAB5-01', grade: 8, name: t('mapel_mat_d8_b5_name', 'Persamaan Garis Lurus'), materi: t('mapel_mat_d8_b5_mat', 'Gradien Kemiringan Garis Lurus, Bentuk Persamaan Garis, Hubungan Garis Sejajar & Tegak Lurus'), cpRef: 'Matematika untuk SMP/MTs Kelas VIII — Bab 5' },
+        { code: 'KOMP-MAT-D-8-BAB6-01', grade: 8, name: t('mapel_mat_d8_b6_name', 'Statistika dan Peluang'), materi: t('mapel_mat_d8_b6_mat', 'Ukuran Pemusatan Data: Mean, Median, Modus; Peluang Teoretik dan Empirik'), cpRef: 'Matematika untuk SMP/MTs Kelas VIII — Bab 6' },
+        /* Kelas 9 — Buku Siswa Matematika Kelas IX (Kemendikbudristek) */
+        { code: 'KOMP-MAT-D-9-BAB1-01', grade: 9, name: t('mapel_mat_d9_b1_name', 'Pola Bilangan dan Barisan'), materi: t('mapel_mat_d9_b1_mat', 'Pola Bilangan Konfigurasi Objek, Barisan dan Deret Aritmetika, Barisan Geometri'), cpRef: 'Matematika untuk SMP/MTs Kelas IX — Bab 1' },
+        { code: 'KOMP-MAT-D-9-BAB2-01', grade: 9, name: t('mapel_mat_d9_b2_name', 'Persamaan dan Fungsi Kuadrat'), materi: t('mapel_mat_d9_b2_mat', 'Akar Persamaan Kuadrat, Diskriminan, Karakteristik Grafik Fungsi Kuadrat, Titik Puncak'), cpRef: 'Matematika untuk SMP/MTs Kelas IX — Bab 2' },
+        { code: 'KOMP-MAT-D-9-BAB3-01', grade: 9, name: t('mapel_mat_d9_b3_name', 'Transformasi Geometri'), materi: t('mapel_mat_d9_b3_mat', 'Translasi (Pergeseran), Refleksi (Pencerminan), Rotasi (Perputaran), Dilatasi (Perkalian Skala)'), cpRef: 'Matematika untuk SMP/MTs Kelas IX — Bab 3' },
+        { code: 'KOMP-MAT-D-9-BAB4-01', grade: 9, name: t('mapel_mat_d9_b4_name', 'Kesebangunan dan Kekongruenan'), materi: t('mapel_mat_d9_b4_mat', 'Syarat Bangun Datar Kongruen, Segitiga Kongruen, Syarat Kesebangunan Bangun Datar'), cpRef: 'Matematika untuk SMP/MTs Kelas IX — Bab 4' },
+        { code: 'KOMP-MAT-D-9-BAB5-01', grade: 9, name: t('mapel_mat_d9_b5_name', 'Bangun Ruang Sisi Lengkung'), materi: t('mapel_mat_d9_b5_mat', 'Luas Permukaan dan Volume Tabung, Kerucut, dan Bola serta Penerapan Nyata'), cpRef: 'Matematika untuk SMP/MTs Kelas IX — Bab 5' }
       ],
       teachingBrief: {
         summary: t('mapel_mat_tb_sum', 'Penguasaan konsep bilangan rasional, pemodelan aljabar, dan logika spasial geometri.'),
@@ -153,9 +169,26 @@
       name: 'Bahasa Indonesia',
       grade: 'SD / SMP / SMA',
       competencies: [
-        { code: 'KOMP-IND-D-7-TEK-01', name: t('mapel_ind_c1_name', 'Teks Deskripsi & Ide Pokok Paragraf'), materi: t('mapel_ind_c1_mat', 'Menemukan gagasan utama dan mencirikan teks deskriptif objektif') },
-        { code: 'KOMP-IND-D-8-EKS-01', name: t('mapel_ind_c2_name', 'Teks Eksplanasi Fenomena Alam & Sosial'), materi: t('mapel_ind_c2_mat', 'Menganalisis hubungan kausalitas sebab-akibat dan konjungsi kronologis') },
-        { code: 'KOMP-IND-E-10-ARG-01', name: t('mapel_ind_c3_name', 'Teks Argumentasi & Membedakan Fakta vs Opini'), materi: t('mapel_ind_c3_mat', 'Berpikir kritis memilah bukti empiris faktual terhadap klaim opini subjektif') }
+        /* Kelas 7 — Buku Siswa Bahasa Indonesia Kelas VII Edisi Revisi (Kemendikbudristek) */
+        { code: 'KOMP-IND-D-7-BAB1-01', grade: 7, name: t('mapel_ind_d7_b1_name', 'Jelajah Nusantara'), materi: t('mapel_ind_d7_b1_mat', 'Memahami Isi Teks Deskripsi, Ciri Objek yang Diamati, Unsur Kebahasaan Teks Deskripsi, Menyajikan Teks Deskripsi'), cpRef: 'Bahasa Indonesia untuk SMP/MTs Kelas VII (Edisi Revisi) — Bab 1' },
+        { code: 'KOMP-IND-D-7-BAB2-01', grade: 7, name: t('mapel_ind_d7_b2_name', 'Berkelana di Dunia Imajinasi'), materi: t('mapel_ind_d7_b2_mat', 'Mengenal Unsur Puisi Rakyat: Pantun, Syair, Gurindam; Elemen Teks Cerita Fantasi, Berkreasi Cerita Fantasi'), cpRef: 'Bahasa Indonesia untuk SMP/MTs Kelas VII (Edisi Revisi) — Bab 2' },
+        { code: 'KOMP-IND-D-7-BAB3-01', grade: 7, name: t('mapel_ind_d7_b3_name', 'Hal yang Baik bagi Tubuh'), materi: t('mapel_ind_d7_b3_mat', 'Karakteristik Teks Prosedur, Unsur Kebahasaan: Kalimat Perintah, Pelesapan, Kata Keterangan; Merancang Teks Prosedur'), cpRef: 'Bahasa Indonesia untuk SMP/MTs Kelas VII (Edisi Revisi) — Bab 3' },
+        { code: 'KOMP-IND-D-7-BAB4-01', grade: 7, name: t('mapel_ind_d7_b4_name', 'Aksi Nyata Para Pelindung Bumi'), materi: t('mapel_ind_d7_b4_mat', 'Menganalisis Teks Berita Cetak & Daring, Unsur ADIKSIMBA (5W1H), Membedakan Fakta dan Opini, Menelisik Berita Palsu'), cpRef: 'Bahasa Indonesia untuk SMP/MTs Kelas VII (Edisi Revisi) — Bab 4' },
+        { code: 'KOMP-IND-D-7-BAB5-01', grade: 7, name: t('mapel_ind_d7_b5_name', 'Membuka Gerbang Dunia'), materi: t('mapel_ind_d7_b5_mat', 'Membedah Buku Bergambar, Menganalisis Nada & Suasana Teks Puisi, Bagian Buku Fiksi & Nonfiksi, Merangkum Buku'), cpRef: 'Bahasa Indonesia untuk SMP/MTs Kelas VII (Edisi Revisi) — Bab 5' },
+        { code: 'KOMP-IND-D-7-BAB6-01', grade: 7, name: t('mapel_ind_d7_b6_name', 'Sampaikan Melalui Surat'), materi: t('mapel_ind_d7_b6_mat', 'Mengenal Surat Pribadi dan Surat Resmi, Unsur dan Struktur Surat, Berkomunikasi Santun di Ruang Bincang Digital'), cpRef: 'Bahasa Indonesia untuk SMP/MTs Kelas VII (Edisi Revisi) — Bab 6' },
+        /* Kelas 8 — Buku Siswa Bahasa Indonesia Kelas VIII Edisi Revisi (Kemendikbudristek) */
+        { code: 'KOMP-IND-D-8-BAB1-01', grade: 8, name: t('mapel_ind_d8_b1_name', 'Menulis Teks Laporan Hasil Observasi'), materi: t('mapel_ind_d8_b1_mat', 'Mengenal Teks LHO, Topik & Gagasan Utama Objektif, Struktur LHO, Paragraf Deskripsi & Eksposisi, Tanda Baca & Kata Asing'), cpRef: 'Bahasa Indonesia untuk SMP/MTs Kelas VIII (Edisi Revisi) — Bab 1' },
+        { code: 'KOMP-IND-D-8-BAB2-01', grade: 8, name: t('mapel_ind_d8_b2_name', 'Menulis Iklan dan Slogan'), materi: t('mapel_ind_d8_b2_mat', 'Mengenal Iklan Komersial & Layanan Masyarakat, Pesan Slogan dan Poster, Menulis Iklan Menarik dengan Bahasa Persuasif'), cpRef: 'Bahasa Indonesia untuk SMP/MTs Kelas VIII (Edisi Revisi) — Bab 2' },
+        { code: 'KOMP-IND-D-8-BAB3-01', grade: 8, name: t('mapel_ind_d8_b3_name', 'Menulis Artikel Ilmiah Populer'), materi: t('mapel_ind_d8_b3_mat', 'Ciri-Ciri Artikel Ilmiah Populer, Membedakan Fakta dan Opini, Pengumpulan Data Ilmiah, Kalimat Perbandingan & Analogi'), cpRef: 'Bahasa Indonesia untuk SMP/MTs Kelas VIII (Edisi Revisi) — Bab 3' },
+        { code: 'KOMP-IND-D-8-BAB4-01', grade: 8, name: t('mapel_ind_d8_b4_name', 'Mengulas Karya Fiksi'), materi: t('mapel_ind_d8_b4_mat', 'Mengenal Karya Fiksi: Cerpen & Novel, Unsur Intrinsik & Ekstrinsik, Kata Denotasi & Konotasi, Menulis Resensi Fiksi'), cpRef: 'Bahasa Indonesia untuk SMP/MTs Kelas VIII (Edisi Revisi) — Bab 4' },
+        { code: 'KOMP-IND-D-8-BAB5-01', grade: 8, name: t('mapel_ind_d8_b5_name', 'Menciptakan Puisi'), materi: t('mapel_ind_d8_b5_mat', 'Mengenal Puisi Diafan & Prismatis, Menemukan Pesan dalam Puisi, Majas Metafora, Simile, Repetisi, Mendeklamasikan Puisi'), cpRef: 'Bahasa Indonesia untuk SMP/MTs Kelas VIII (Edisi Revisi) — Bab 5' },
+        { code: 'KOMP-IND-D-8-BAB6-01', grade: 8, name: t('mapel_ind_d8_b6_name', 'Menulis Teks Pidato'), materi: t('mapel_ind_d8_b6_mat', 'Pengertian & Struktur Teks Pidato, Kalimat Persuasif & Ungkapan Empati, Menulis Teks Pidato, Metode Berpidato'), cpRef: 'Bahasa Indonesia untuk SMP/MTs Kelas VIII (Edisi Revisi) — Bab 6' },
+        /* Kelas 9 — Buku Siswa Bahasa Indonesia Kelas IX (Kemendikbudristek) */
+        { code: 'KOMP-IND-D-9-BAB1-01', grade: 9, name: t('mapel_ind_d9_b1_name', 'Demi Keluarga'), materi: t('mapel_ind_d9_b1_mat', 'Memahami Teks Deskripsi Lanjutan, Sudut Pandang Penceritaan, Konjungsi Lintas Kalimat'), cpRef: 'Bahasa Indonesia untuk SMP/MTs Kelas IX — Bab 1' },
+        { code: 'KOMP-IND-D-9-BAB2-01', grade: 9, name: t('mapel_ind_d9_b2_name', 'Buku-Buku Berbicara'), materi: t('mapel_ind_d9_b2_mat', 'Menganalisis Teks Tanggapan Kritis, Struktur Evaluasi & Deskripsi Kritis, Kaidah Bahasa Tanggapan'), cpRef: 'Bahasa Indonesia untuk SMP/MTs Kelas IX — Bab 2' },
+        { code: 'KOMP-IND-D-9-BAB3-01', grade: 9, name: t('mapel_ind_d9_b3_name', 'Komunikasi Ujung Jari'), materi: t('mapel_ind_d9_b3_mat', 'Menganalisis Teks Diskusi, Argumen Mendukung (Pro) dan Menentang (Kontra), Kesimpulan Solutif'), cpRef: 'Bahasa Indonesia untuk SMP/MTs Kelas IX — Bab 3' },
+        { code: 'KOMP-IND-D-9-BAB4-01', grade: 9, name: t('mapel_ind_d9_b4_name', 'Dari Hobi Menjadi Pundi'), materi: t('mapel_ind_d9_b4_mat', 'Teks Prosedur Wirausaha, Membaca Informasi Grafis & Infografik Usaha, Menyusun Rencana Usaha'), cpRef: 'Bahasa Indonesia untuk SMP/MTs Kelas IX — Bab 4' },
+        { code: 'KOMP-IND-D-9-BAB5-01', grade: 9, name: t('mapel_ind_d9_b5_name', 'Menuju Laut'), materi: t('mapel_ind_d9_b5_mat', 'Teks Rekon Pribadi & Faktual Sejarah Bahari, Urutan Peristiwa Kronologis, Refleksi Pengalaman'), cpRef: 'Bahasa Indonesia untuk SMP/MTs Kelas IX — Bab 5' }
       ],
       teachingBrief: {
         summary: t('mapel_ind_tb_sum', 'Kemampuan literasi membaca kritis, penalaran logika argumen, dan sintesis wacana.'),
@@ -170,12 +203,27 @@
       name: 'Bahasa Inggris',
       grade: 'SD / SMP / SMA',
       competencies: [
-        { code: 'KOMP-ENG-D-7-DSC-01', name: t('mapel_eng_c1_name', 'Descriptive Text & Everyday Adjectives'), materi: t('mapel_eng_c1_mat', 'Describing people, objects, animals, and daily environment using Simple Present') },
-        { code: 'KOMP-ENG-D-8-RCT-01', name: t('mapel_eng_c2_name', 'Recount Text & Simple Past Tense'), materi: t('mapel_eng_c2_mat', 'Retelling personal past events with regular and irregular verbs and time connectors') },
-        { code: 'KOMP-ENG-E-10-EXP-01', name: t('mapel_eng_c3_name', 'Analytical Exposition & Opinion Stance'), materi: t('mapel_eng_c3_mat', 'Formulating arguments, thesis statement, and reiteration for critical reasoning') }
+        /* Kelas 7 — English for Nusantara Class VII (Kemendikbudristek) */
+        { code: 'KOMP-ENG-D-7-BAB1-01', grade: 7, name: t('mapel_eng_d7_b1_name', 'Chapter 1: About Me'), materi: t('mapel_eng_d7_b1_mat', 'Unit 1: Galang from Kalimantan, Unit 2: I Love Fishing, Unit 3: My Friends and I (Pronouns & Simple Present)'), cpRef: 'English for Nusantara untuk SMP/MTs Kelas VII — Chapter 1' },
+        { code: 'KOMP-ENG-D-7-BAB2-01', grade: 7, name: t('mapel_eng_d7_b2_name', 'Chapter 2: Culinary and Me'), materi: t('mapel_eng_d7_b2_mat', 'Unit 1: My Favorite Food, Unit 2: My Favorite Snack, Unit 3: A Secret Recipe (Describing Foods & Recipes)'), cpRef: 'English for Nusantara untuk SMP/MTs Kelas VII — Chapter 2' },
+        { code: 'KOMP-ENG-D-7-BAB3-01', grade: 7, name: t('mapel_eng_d7_b3_name', 'Chapter 3: Home Sweet Home'), materi: t('mapel_eng_d7_b3_mat', "Unit 1: My House, Unit 2: My House Chores, Unit 3: Let's Clean Up! (House Rooms & Imperatives)"), cpRef: 'English for Nusantara untuk SMP/MTs Kelas VII — Chapter 3' },
+        { code: 'KOMP-ENG-D-7-BAB4-01', grade: 7, name: t('mapel_eng_d7_b4_name', 'Chapter 4: My School Activities'), materi: t('mapel_eng_d7_b4_mat', 'Unit 1: My Class Schedule, Unit 2: My Online Class, Unit 3: My Study Habits (School Subjects & Habits)'), cpRef: 'English for Nusantara untuk SMP/MTs Kelas VII — Chapter 4' },
+        { code: 'KOMP-ENG-D-7-BAB5-01', grade: 7, name: t('mapel_eng_d7_b5_name', 'Chapter 5: This is My School'), materi: t('mapel_eng_d7_b5_mat', 'Unit 1: School Buildings, Unit 2: Extracurricular Activities, Unit 3: School Festival (School Facilities & Clubs)'), cpRef: 'English for Nusantara untuk SMP/MTs Kelas VII — Chapter 5' },
+        /* Kelas 8 — English for Nusantara Class VIII (Kemendikbudristek) */
+        { code: 'KOMP-ENG-D-8-BAB1-01', grade: 8, name: t('mapel_eng_d8_b1_name', 'Chapter 1: Celebrating Independence Day'), materi: t('mapel_eng_d8_b1_mat', 'Unit 1: The Champion of Panjat Pinang, Unit 2: Going to a Parade, Unit 3: Independence Day at SMP Merdeka (Recount & Past Tense)'), cpRef: 'English for Nusantara untuk SMP/MTs Kelas VIII — Chapter 1' },
+        { code: 'KOMP-ENG-D-8-BAB2-01', grade: 8, name: t('mapel_eng_d8_b2_name', 'Chapter 2: Kindness Begins with Me'), materi: t('mapel_eng_d8_b2_mat', 'Unit 1: Kindness towards Differences, Unit 2: Kindness and Happiness, Unit 3: Kindness and Friendship (Empathy & Stories)'), cpRef: 'English for Nusantara untuk SMP/MTs Kelas VIII — Chapter 2' },
+        { code: 'KOMP-ENG-D-8-BAB3-01', grade: 8, name: t('mapel_eng_d8_b3_name', 'Chapter 3: Love Our World'), materi: t('mapel_eng_d8_b3_mat', 'Unit 1: Look Around You, Unit 2: This is the Way, Unit 3: Act Now (Environmental Posters & Saving Energy)'), cpRef: 'English for Nusantara untuk SMP/MTs Kelas VIII — Chapter 3' },
+        { code: 'KOMP-ENG-D-8-BAB4-01', grade: 8, name: t('mapel_eng_d8_b4_name', 'Chapter 4: No Littering'), materi: t('mapel_eng_d8_b4_mat', 'Unit 1: Did It Rain Last Night?, Unit 2: What Happened to the Sea Animals?, Unit 3: You Can Help (Past Continuous & Clean-up)'), cpRef: 'English for Nusantara untuk SMP/MTs Kelas VIII — Chapter 4' },
+        { code: 'KOMP-ENG-D-8-BAB5-01', grade: 8, name: t('mapel_eng_d8_b5_name', 'Chapter 5: Embrace Yourself'), materi: t('mapel_eng_d8_b5_mat', 'Unit 1: Be Yourself, Unit 2: I Know I Can Do It, Unit 3: Practice Makes Perfect (Mindset & Compliments)'), cpRef: 'English for Nusantara untuk SMP/MTs Kelas VIII — Chapter 5' },
+        /* Kelas 9 — English for Nusantara Class IX (Kemendikbudristek) */
+        { code: 'KOMP-ENG-D-9-BAB1-01', grade: 9, name: t('mapel_eng_d9_b1_name', 'Chapter 1: Exploring Fauna of Indonesia'), materi: t('mapel_eng_d9_b1_mat', 'Unit 1: Bekantan, Unit 2: Orangutan and Gorilla, Unit 3: Indonesian Birds (Report Text on Wildlife)'), cpRef: 'English for Nusantara untuk SMP/MTs Kelas IX — Chapter 1' },
+        { code: 'KOMP-ENG-D-9-BAB2-01', grade: 9, name: t('mapel_eng_d9_b2_name', 'Chapter 2: Taking Trips'), materi: t('mapel_eng_d9_b2_mat', 'Unit 1: Going to a National Park, Unit 2: What Did You Do There?, Unit 3: My Underwater Adventure (Travel Recount)'), cpRef: 'English for Nusantara untuk SMP/MTs Kelas IX — Chapter 2' },
+        { code: 'KOMP-ENG-D-9-BAB3-01', grade: 9, name: t('mapel_eng_d9_b3_name', 'Chapter 3: Journey to Fantasy Worlds'), materi: t('mapel_eng_d9_b3_mat', 'Unit 1: Andre and Princess Suripit, Unit 2: Back to the 90s, Unit 3: The Multiverse Story of Timun Mas (Fantasy Narrative)'), cpRef: 'English for Nusantara untuk SMP/MTs Kelas IX — Chapter 3' },
+        { code: 'KOMP-ENG-D-9-BAB4-01', grade: 9, name: t('mapel_eng_d9_b4_name', 'Chapter 4: Upcycling Used Materials'), materi: t('mapel_eng_d9_b4_mat', "Unit 1: Look At My New Creation, Unit 2: They're On Sale, Unit 3: Let's Donate (DIY Upcycling & Procedures)"), cpRef: 'English for Nusantara untuk SMP/MTs Kelas IX — Chapter 4' },
+        { code: 'KOMP-ENG-D-9-BAB5-01', grade: 9, name: t('mapel_eng_d9_b5_name', 'Chapter 5: Digital Life'), materi: t('mapel_eng_d9_b5_mat', "Unit 1: Let's Check the Facts!, Unit 2: Stay Safe in the Digital World, Unit 3: Turn Back Hoax! (Digital Literacy)"), cpRef: 'English for Nusantara untuk SMP/MTs Kelas IX — Chapter 5' }
       ],
       teachingBrief: {
-        summary: t('mapel_eng_tb_sum', 'Pengembangan kompetensi komunikatif lintas genre teks: deskripsi, recount, dan eksposisi analitis.'),
+        summary: t('mapel_eng_tb_sum', 'Pengembangan kompetensi komunikatif lintas genre teks: deskripsi, recount, naratif, dan literasi digital.'),
         hook5Minutes: t('mapel_eng_tb_hook', 'Flash 3 foto situasi misterius di proyektor: minta siswa menduga apa yang terjadi kemarin menggunakan Simple Past.'),
         boardFormula: t('mapel_eng_tb_board', 'Recount: Orientation ➔ Events ➔ Re-orientation; Simple Past: S + V2 / did not + V1'),
         commonMisconceptions: [
@@ -187,9 +235,29 @@
       name: 'Ilmu Pengetahuan Alam (IPA)',
       grade: 'SD / SMP',
       competencies: [
-        { code: 'KOMP-IPA-D-7-MET-01', name: t('mapel_ipa_c1_name', 'Besaran, Satuan & Metode Ilmiah'), materi: t('mapel_ipa_c1_mat', 'Pengukuran besaran pokok dan turunan, konversi satuan SI, dan keselamatan laboratorium') },
-        { code: 'KOMP-IPA-D-8-SEL-01', name: t('mapel_ipa_c2_name', 'Sel, Jaringan & Sistem Organ Manusia'), materi: t('mapel_ipa_c2_mat', 'Struktur sel hewan dan tumbuhan, mikroskop, serta organ respirasi dan ekskresi') },
-        { code: 'KOMP-IPA-D-9-LIS-01', name: t('mapel_ipa_c3_name', 'Listrik Dinamis, Hambatan & Kemagnetan'), materi: t('mapel_ipa_c3_mat', 'Hukum Ohm (V = I·R), rangkaian seri-paralel, dan induksi elektromagnetik') }
+        /* Kelas 7 — Buku Siswa IPA Kelas VII Edisi Revisi (Kemendikbudristek) */
+        { code: 'KOMP-IPA-D-7-BAB1-01', grade: 7, name: t('mapel_ipa_d7_b1_name', 'Hakikat Ilmu Sains dan Metode Ilmiah'), materi: t('mapel_ipa_d7_b1_mat', 'Apa Itu Sains?, Laboratorium IPA & Keselamatan Kerja, Merancang Percobaan, Pengukuran Besaran & Satuan SI, Pelaporan Hasil Percobaan'), cpRef: 'Ilmu Pengetahuan Alam untuk SMP/MTs Kelas VII (Edisi Revisi) — Bab 1' },
+        { code: 'KOMP-IPA-D-7-BAB2-01', grade: 7, name: t('mapel_ipa_d7_b2_name', 'Zat dan Perubahannya'), materi: t('mapel_ipa_d7_b2_mat', 'Wujud Zat dan Model Partikel, Perubahan Wujud Zat, Perubahan Fisika dan Kimia, Kerapatan Zat / Massa Jenis'), cpRef: 'Ilmu Pengetahuan Alam untuk SMP/MTs Kelas VII (Edisi Revisi) — Bab 2' },
+        { code: 'KOMP-IPA-D-7-BAB3-01', grade: 7, name: t('mapel_ipa_d7_b3_name', 'Suhu, Kalor, dan Pemuaian'), materi: t('mapel_ipa_d7_b3_mat', 'Konsep Suhu & Skala Termometer, Kalor & Perubahan Suhu/Wujud, Pemuaian Zat Padat Cair Gas, Pemanfaatan Energi Kalor'), cpRef: 'Ilmu Pengetahuan Alam untuk SMP/MTs Kelas VII (Edisi Revisi) — Bab 3' },
+        { code: 'KOMP-IPA-D-7-BAB4-01', grade: 7, name: t('mapel_ipa_d7_b4_name', 'Gerak dan Gaya'), materi: t('mapel_ipa_d7_b4_mat', 'Gerak Benda: Jarak, Perpindahan, Kelajuan, Kecepatan; Konsep Gaya & Hukum Newton'), cpRef: 'Ilmu Pengetahuan Alam untuk SMP/MTs Kelas VII (Edisi Revisi) — Bab 4' },
+        { code: 'KOMP-IPA-D-7-BAB5-01', grade: 7, name: t('mapel_ipa_d7_b5_name', 'Karakteristik dan Klasifikasi Makhluk Hidup'), materi: t('mapel_ipa_d7_b5_mat', 'Makhluk Hidup atau Benda Mati?, Mengapa Makhluk Hidup Dikelompokkan?, Kunci Dikotomi & Klasifikasi 5 Kingdom'), cpRef: 'Ilmu Pengetahuan Alam untuk SMP/MTs Kelas VII (Edisi Revisi) — Bab 5' },
+        { code: 'KOMP-IPA-D-7-BAB6-01', grade: 7, name: t('mapel_ipa_d7_b6_name', 'Ekologi dan Pelestarian Lingkungan'), materi: t('mapel_ipa_d7_b6_mat', 'Pengaruh Lingkungan terhadap Organisme, Interaksi Antarkomponen Ekosistem, Pengaruh Manusia terhadap Ekosistem, Konservasi Keanekaragaman Hayati'), cpRef: 'Ilmu Pengetahuan Alam untuk SMP/MTs Kelas VII (Edisi Revisi) — Bab 6' },
+        { code: 'KOMP-IPA-D-7-BAB7-01', grade: 7, name: t('mapel_ipa_d7_b7_name', 'Bumi dan Tata Surya'), materi: t('mapel_ipa_d7_b7_mat', 'Sistem Tata Surya & Karakteristik Planet, Pengaruh Pergerakan Bumi & Benda Langit dalam Kehidupan, Perubahan Iklim Bumi'), cpRef: 'Ilmu Pengetahuan Alam untuk SMP/MTs Kelas VII (Edisi Revisi) — Bab 7' },
+        /* Kelas 8 — Buku Siswa IPA Kelas VIII Edisi Revisi (Kemendikbudristek) */
+        { code: 'KOMP-IPA-D-8-BAB1-01', grade: 8, name: t('mapel_ipa_d8_b1_name', 'Struktur dan Fungsi Tubuh Makhluk Hidup I'), materi: t('mapel_ipa_d8_b1_mat', 'Makanan dan Nutrisi Seimbang, Sistem Pencernaan Manusia & Gangguannya, Sistem Peredaran Darah & Kesehatan Jantung'), cpRef: 'Ilmu Pengetahuan Alam untuk SMP/MTs Kelas VIII (Edisi Revisi) — Bab 1' },
+        { code: 'KOMP-IPA-D-8-BAB2-01', grade: 8, name: t('mapel_ipa_d8_b2_name', 'Struktur dan Fungsi Tubuh Makhluk Hidup II'), materi: t('mapel_ipa_d8_b2_mat', 'Sistem Pernapasan & Mekanisme Pertukaran Gas, Sistem Ekskresi: Ginjal, Kulit, Paru-paru, Hati'), cpRef: 'Ilmu Pengetahuan Alam untuk SMP/MTs Kelas VIII (Edisi Revisi) — Bab 2' },
+        { code: 'KOMP-IPA-D-8-BAB3-01', grade: 8, name: t('mapel_ipa_d8_b3_name', 'Memanfaatkan Usaha, Energi, dan Pesawat Sederhana'), materi: t('mapel_ipa_d8_b3_mat', 'Konsep Usaha dan Daya, Energi Kinetik & Potensial, Pesawat Sederhana: Tuas, Katrol, Bidang Miring, Roda Berporos'), cpRef: 'Ilmu Pengetahuan Alam untuk SMP/MTs Kelas VIII (Edisi Revisi) — Bab 3' },
+        { code: 'KOMP-IPA-D-8-BAB4-01', grade: 8, name: t('mapel_ipa_d8_b4_name', 'Teknologi Penerapan Tekanan pada Zat'), materi: t('mapel_ipa_d8_b4_mat', 'Tekanan pada Zat Padat, Tekanan Zat Cair (Hidrostatis), Hukum Pascal, Hukum Archimedes, Tekanan Gas'), cpRef: 'Ilmu Pengetahuan Alam untuk SMP/MTs Kelas VIII (Edisi Revisi) — Bab 4' },
+        { code: 'KOMP-IPA-D-8-BAB5-01', grade: 8, name: t('mapel_ipa_d8_b5_name', 'Manfaat Gelombang dan Cahaya bagi Manusia'), materi: t('mapel_ipa_d8_b5_mat', 'Konsep Getaran & Gelombang Bunyi, Sifat-Sifat Cahaya, Pembentukan Bayangan Cermin & Lensa, Alat Optik'), cpRef: 'Ilmu Pengetahuan Alam untuk SMP/MTs Kelas VIII (Edisi Revisi) — Bab 5' },
+        { code: 'KOMP-IPA-D-8-BAB6-01', grade: 8, name: t('mapel_ipa_d8_b6_name', 'Pemisahan Campuran di Sekitar Kita'), materi: t('mapel_ipa_d8_b6_mat', 'Zat Tunggal dan Campuran Homogen/Heterogen, Metode Pemisahan: Filtrasi, Sentrifugasi, Destilasi, Kromatografi, Sublimasi'), cpRef: 'Ilmu Pengetahuan Alam untuk SMP/MTs Kelas VIII (Edisi Revisi) — Bab 6' },
+        { code: 'KOMP-IPA-D-8-BAB7-01', grade: 8, name: t('mapel_ipa_d8_b7_name', 'Tanah bagi Kehidupan Berkelanjutan'), materi: t('mapel_ipa_d8_b7_mat', 'Peran Tanah bagi Organisme, Komponen & Profil Tanah, Sifat Kimia & Fisika Tanah, Konservasi Tanah'), cpRef: 'Ilmu Pengetahuan Alam untuk SMP/MTs Kelas VIII (Edisi Revisi) — Bab 7' },
+        /* Kelas 9 — Buku Siswa IPA Kelas IX (Kemendikbudristek) */
+        { code: 'KOMP-IPA-D-9-BAB1-01', grade: 9, name: t('mapel_ipa_d9_b1_name', 'Pertumbuhan dan Perkembangan'), materi: t('mapel_ipa_d9_b1_mat', 'Pertumbuhan dan Perkembangan Tumbuhan, Hewan, dan Manusia; Faktor Internal dan Eksternal'), cpRef: 'Ilmu Pengetahuan Alam untuk SMP/MTs Kelas IX — Bab 1' },
+        { code: 'KOMP-IPA-D-9-BAB2-01', grade: 9, name: t('mapel_ipa_d9_b2_name', 'Sistem Koordinasi, Reproduksi, dan Homeostasis'), materi: t('mapel_ipa_d9_b2_mat', 'Sistem Saraf & Alat Indra, Sistem Endokrin (Hormon), Sistem Reproduksi Manusia, Mekanisme Homeostasis Tubuh'), cpRef: 'Ilmu Pengetahuan Alam untuk SMP/MTs Kelas IX — Bab 2' },
+        { code: 'KOMP-IPA-D-9-BAB3-01', grade: 9, name: t('mapel_ipa_d9_b3_name', 'Tekanan Zat dan Penerapannya'), materi: t('mapel_ipa_d9_b3_mat', 'Tekanan Darah pada Manusia, Pengangkutan Air & Nutrisi pada Tumbuhan, Mekanisme Difusi dan Osmosis'), cpRef: 'Ilmu Pengetahuan Alam untuk SMP/MTs Kelas IX — Bab 3' },
+        { code: 'KOMP-IPA-D-9-BAB4-01', grade: 9, name: t('mapel_ipa_d9_b4_name', 'Listrik, Magnet, dan Sumber Energi Alternatif'), materi: t('mapel_ipa_d9_b4_mat', 'Listrik Statis & Dinamis, Hukum Ohm & Rangkaian Listrik, Medan Magnet & Induksi Elektromagnetik, Pemanfaatan Energi Terbarukan'), cpRef: 'Ilmu Pengetahuan Alam untuk SMP/MTs Kelas IX — Bab 4' },
+        { code: 'KOMP-IPA-D-9-BAB5-01', grade: 9, name: t('mapel_ipa_d9_b5_name', 'Reaksi-Reaksi Kimia dan Dinamika Partikel'), materi: t('mapel_ipa_d9_b5_mat', 'Struktur Partikel Atom, Ion, Molekul; Sifat Zat dan Perubahan Kimia, Reaksi Asam Basa dan Indikator Alami/Sintetis'), cpRef: 'Ilmu Pengetahuan Alam untuk SMP/MTs Kelas IX — Bab 5' },
+        { code: 'KOMP-IPA-D-9-BAB6-01', grade: 9, name: t('mapel_ipa_d9_b6_name', 'Pewarisan Sifat dan Bioteknologi'), materi: t('mapel_ipa_d9_b6_mat', 'Materi Genetik Kromosom, DNA & RNA, Hukum Pewarisan Sifat Mendel, Perkembangan Bioteknologi Pangan Konvensional & Modern'), cpRef: 'Ilmu Pengetahuan Alam untuk SMP/MTs Kelas IX — Bab 6' }
       ],
       teachingBrief: {
         summary: t('mapel_ipa_tb_sum', 'Penyelidikan ilmiah empiris fenomena alam, organisasi materi kehidupan, dan konversi energi.'),
@@ -204,9 +272,21 @@
       name: 'Ilmu Pengetahuan Sosial (IPS)',
       grade: 'SD / SMP',
       competencies: [
-        { code: 'KOMP-IPS-D-7-RNG-01', name: t('mapel_ips_c1_name', 'Interaksi Antarruang & Letak Geografis'), materi: t('mapel_ips_c1_mat', 'Peta Indonesia, letak astronomis-geologis, dan potensi sumber daya alam maritim') },
-        { code: 'KOMP-IPS-D-8-SOS-01', name: t('mapel_ips_c2_name', 'Interaksi Sosial, Diferensiasi & Integrasi'), materi: t('mapel_ips_c2_mat', 'Bentuk interaksi asosiatif dan disosiatif, lembaga sosial, serta pluralitas budaya nusantara') },
-        { code: 'KOMP-IPS-D-9-GLB-01', name: t('mapel_ips_c3_name', 'Globalisasi & Perkembangan Ekonomi Digital'), materi: t('mapel_ips_c3_mat', 'Dampak perubahan sosial budaya, perdagangan internasional, dan ekonomi kreatif') }
+        /* Kelas 7 — Buku Siswa IPS Kelas VII Edisi Revisi (Kemendikbudristek) */
+        { code: 'KOMP-IPS-D-7-BAB1-01', grade: 7, name: t('mapel_ips_d7_b1_name', 'Tema 1: Kehidupan Sosial dan Kondisi Lingkungan Sekitar'), materi: t('mapel_ips_d7_b1_mat', 'Mengenal Lokasi Tempat Tinggal & Peta, Konektivitas Antarruang, Perubahan Iklim & Potensi Bencana Alam di Indonesia, Kegiatan Ekonomi, Interaksi Sosial, Konsep Dasar Ilmu Sejarah'), cpRef: 'Ilmu Pengetahuan Sosial untuk SMP/MTs Kelas VII (Edisi Revisi) — Tema 1' },
+        { code: 'KOMP-IPS-D-7-BAB2-01', grade: 7, name: t('mapel_ips_d7_b2_name', 'Tema 2: Keberagaman Lingkungan Sekitar'), materi: t('mapel_ips_d7_b2_mat', 'Berkenalan dengan Lingkungan Sekitar & Masa Praaksara, Pembiasaan Diri untuk Melestarikan Lingkungan, Pembiasaan Diri dalam Memenuhi Kebutuhan & Kelangkaan'), cpRef: 'Ilmu Pengetahuan Sosial untuk SMP/MTs Kelas VII (Edisi Revisi) — Tema 2' },
+        { code: 'KOMP-IPS-D-7-BAB3-01', grade: 7, name: t('mapel_ips_d7_b3_name', 'Tema 3: Potensi Ekonomi Lingkungan'), materi: t('mapel_ips_d7_b3_mat', 'Pemanfaatan dan Pelestarian Potensi Sumber Daya Alam, Potensi Indonesia Menjadi Negara Maju, Toponimi Wilayah, Dinamika Ekonomi di Lingkungan Sekitar'), cpRef: 'Ilmu Pengetahuan Sosial untuk SMP/MTs Kelas VII (Edisi Revisi) — Tema 3' },
+        { code: 'KOMP-IPS-D-7-BAB4-01', grade: 7, name: t('mapel_ips_d7_b4_name', 'Tema 4: Pemberdayaan Masyarakat'), materi: t('mapel_ips_d7_b4_mat', 'Keragaman Sosial Budaya di Masyarakat, Permasalahan Kehidupan Sosial Budaya, Pemberdayaan Masyarakat Lokal, Peranan Komunitas dalam Kehidupan Sosial'), cpRef: 'Ilmu Pengetahuan Sosial untuk SMP/MTs Kelas VII (Edisi Revisi) — Tema 4' },
+        /* Kelas 8 — Buku Siswa IPS Kelas VIII (Kemendikbudristek) */
+        { code: 'KOMP-IPS-D-8-BAB1-01', grade: 8, name: t('mapel_ips_d8_b1_name', 'Tema 1: Kondisi Geografis dan Pelestarian Sumber Daya Alam'), materi: t('mapel_ips_d8_b1_mat', 'Keragaman Alam Indonesia & Letak Geologis, Pemanfaatan Sumber Daya Alam Hutan Tambang Maritim, Kualitas Sumber Daya Manusia'), cpRef: 'Ilmu Pengetahuan Sosial untuk SMP/MTs Kelas VIII — Tema 1' },
+        { code: 'KOMP-IPS-D-8-BAB2-01', grade: 8, name: t('mapel_ips_d8_b2_name', 'Tema 2: Kemajemukan Masyarakat Indonesia'), materi: t('mapel_ips_d8_b2_mat', 'Keragaman Suku Agama Ras Antargolongan, Mobilitas Sosial Vertikal & Horizontal, Pluralitas dan Integrasi Sosial'), cpRef: 'Ilmu Pengetahuan Sosial untuk SMP/MTs Kelas VIII — Tema 2' },
+        { code: 'KOMP-IPS-D-8-BAB3-01', grade: 8, name: t('mapel_ips_d8_b3_name', 'Tema 3: Nasionalisme dan Jati Diri Bangsa'), materi: t('mapel_ips_d8_b3_mat', 'Penjelajahan Samudra & Kolonialisme di Indonesia, Pergerakan Nasional & Sumpah Pemuda, Proklamasi Kemerdekaan Indonesia'), cpRef: 'Ilmu Pengetahuan Sosial untuk SMP/MTs Kelas VIII — Tema 3' },
+        { code: 'KOMP-IPS-D-8-BAB4-01', grade: 8, name: t('mapel_ips_d8_b4_name', 'Tema 4: Pembangunan Perekonomian Indonesia'), materi: t('mapel_ips_d8_b4_mat', 'Kondisi Perekonomian pada Masa Awal Kemerdekaan, Perdagangan Antardaerah dan Internasional, Pengembangan Ekonomi Maritim & Agrikultur'), cpRef: 'Ilmu Pengetahuan Sosial untuk SMP/MTs Kelas VIII — Tema 4' },
+        /* Kelas 9 — Buku Siswa IPS Kelas IX (Kemendikbudristek) */
+        { code: 'KOMP-IPS-D-9-BAB1-01', grade: 9, name: t('mapel_ips_d9_b1_name', 'Tema 1: Perubahan Sosial Budaya dan Globalisasi'), materi: t('mapel_ips_d9_b1_mat', 'Bentuk Perubahan Sosial Budaya, Modernisasi, Dampak Globalisasi dalam Bidang IPTEK, Ekonomi, Komunikasi, dan Budaya'), cpRef: 'Ilmu Pengetahuan Sosial untuk SMP/MTs Kelas IX — Tema 1' },
+        { code: 'KOMP-IPS-D-9-BAB2-01', grade: 9, name: t('mapel_ips_d9_b2_name', 'Tema 2: Perkembangan Ekonomi Digital'), materi: t('mapel_ips_d9_b2_mat', 'Transformasi Ekonomi Digital, Uang Elektronik, Fintech, E-Commerce, dan Literasi Finansial Digital'), cpRef: 'Ilmu Pengetahuan Sosial untuk SMP/MTs Kelas IX — Tema 2' },
+        { code: 'KOMP-IPS-D-9-BAB3-01', grade: 9, name: t('mapel_ips_d9_b3_name', 'Tema 3: Tantangan Pembangunan Indonesia'), materi: t('mapel_ips_d9_b3_mat', 'Pembangunan Berkelanjutan (SDGs), Bonus Demografi, Kualitas Pendidikan dan Tenaga Kerja, Pengentasan Kemiskinan'), cpRef: 'Ilmu Pengetahuan Sosial untuk SMP/MTs Kelas IX — Tema 3' },
+        { code: 'KOMP-IPS-D-9-BAB4-01', grade: 9, name: t('mapel_ips_d9_b4_name', 'Tema 4: Kerja Sama Dunia'), materi: t('mapel_ips_d9_b4_mat', 'Kerja Sama Bilateral, Regional, Multilateral; Peran Indonesia di ASEAN, PBB, dan G20; Diplomasi Internasional'), cpRef: 'Ilmu Pengetahuan Sosial untuk SMP/MTs Kelas IX — Tema 4' }
       ],
       teachingBrief: {
         summary: t('mapel_ips_tb_sum', 'Kajian keterhubungan spasial, pranata sosial kemasyarakatan, dan dinamika perekonomian masyarakat.'),
@@ -3291,12 +3371,19 @@
             displayedComps.map(function (cItem) {
               var isSel = (cItem.code === mCode || cItem.name === mTitle);
               var qCount = (getMapelQuestionsForCompetency(curSId, cItem.code).items || []).length;
+              var isPrefixed = /^(Bab|Chapter|Tema)\s+\d+/i.test(cItem.name);
+              var pillText = /^(Chapter|Tema)\s+\d+/i.test(cItem.name)
+                ? cItem.name.match(/^(Chapter|Tema)\s+\d+/i)[0]
+                : (t('guru.bab-label', 'Bab') + ' ' + cItem.babNum);
+              var titleText = isPrefixed
+                ? cItem.name.replace(/^(Bab|Chapter|Tema)\s+\d+[:\s]*/i, '')
+                : cItem.name;
               return '<button type="button" class="tg-chapter-card' + (isSel ? ' is-active' : '') + '" data-tg="select-bab" data-code="' + esc(cItem.code) + '" data-title="' + esc(cItem.name) + '" data-testid="tg-assign-bab-card-' + cItem.babNum + '">' +
                 '<div class="tg-chap-top">' +
-                  '<span class="tg-chap-pill">📖 ' + esc(t('guru.bab-label', 'Bab')) + ' ' + cItem.babNum + '</span>' +
+                  '<span class="tg-chap-pill">📖 ' + esc(pillText) + '</span>' +
                   '<span class="tg-chap-grade">' + esc(t('guru.kelas-label', 'Kelas')) + ' ' + cItem.grade + '</span>' +
                 '</div>' +
-                '<h5 class="tg-chap-title">' + esc(cItem.name) + '</h5>' +
+                '<h5 class="tg-chap-title">' + esc(titleText || cItem.name) + '</h5>' +
                 '<div class="tg-chap-meta">' +
                   '<span class="tg-chap-count">📚 ' + qCount + ' ' + esc(t('guru.soal-count', 'soal')) + '</span>' +
                   (isSel ? '<span class="tg-chap-selected-pill">✓ ' + esc(t('guru.terpilih', 'Aktif')) + '</span>' : '') +
@@ -3331,7 +3418,8 @@
             var opts = groupItems.map(function (cItem) {
               var isSel = (cItem.code === mCode || cItem.name === mTitle);
               var qCount = (getMapelQuestionsForCompetency(curSId, cItem.code).items || []).length;
-              var label = '📖 ' + t('guru.bab-label', 'Bab') + ' ' + cItem.babNum + ': ' + cItem.name + ' (' + qCount + ' ' + t('guru.soal-count', 'soal') + ')';
+              var isPref = /^(Bab|Chapter|Tema)\s+\d+/i.test(cItem.name);
+              var label = '📖 ' + (isPref ? '' : (t('guru.bab-label', 'Bab') + ' ' + cItem.babNum + ': ')) + cItem.name + ' (' + qCount + ' ' + t('guru.soal-count', 'soal') + ')';
               return '<option value="' + esc(cItem.code) + '" data-title="' + esc(cItem.name) + '" data-materi="' + esc(cItem.materi || '') + '"' + (isSel ? ' selected' : '') + '>' +
                 esc(label) +
               '</option>';
@@ -3375,14 +3463,22 @@
           }
         }
 
+        var isTitlePrefixed = /^(Bab|Chapter|Tema)\s+\d+/i.test(mTitle);
+        var curChapBadge = /^(Chapter|Tema)\s+\d+/i.test(mTitle)
+          ? mTitle.match(/^(Chapter|Tema)\s+\d+/i)[0]
+          : (t('guru.bab-label', 'Bab') + ' ' + curBabNum);
+        var curHeading = isTitlePrefixed
+          ? (mTitle || (catItem ? catItem.name : curSId))
+          : (t('guru.bab-label', 'Bab') + ' ' + curBabNum + ': ' + (mTitle || (catItem ? catItem.name : curSId)));
+
         var topicSummaryCard = '<div class="tg-topic-summary-card">' +
           '<div class="tg-topic-badge-row">' +
             '<span class="tg-badge is-subject">' + esc(catItem ? catItem.name : curSId) + '</span>' +
             '<span class="tg-badge is-grade">' + esc(t('guru.kelas-label', 'Kelas')) + ' ' + curGrade + '</span>' +
-            '<span class="tg-badge is-bab">📖 ' + esc(t('guru.bab-label', 'Bab')) + ' ' + curBabNum + '</span>' +
+            '<span class="tg-badge is-bab">📖 ' + esc(curChapBadge) + '</span>' +
             '<span class="tg-badge is-count">📚 ' + totalAvailable + ' ' + esc(t('guru.soal-tersedia-bab', 'Soal Siap Pakai di Bab Ini')) + '</span>' +
           '</div>' +
-          '<h4 class="tg-topic-title">📖 ' + esc(t('guru.bab-label', 'Bab')) + ' ' + curBabNum + ': ' + esc(mTitle || (catItem ? catItem.name : curSId)) + '</h4>' +
+          '<h4 class="tg-topic-title">📖 ' + esc(curHeading) + '</h4>' +
           subTopicsHtml +
         '</div>';
 

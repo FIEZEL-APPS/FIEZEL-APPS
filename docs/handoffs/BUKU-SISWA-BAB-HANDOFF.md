@@ -120,3 +120,20 @@ Daftar isi lengkap, metadata hak cipta, penerbit, tahun terbit, dan nomor ISBN r
 
 Gerbang `tests/mapel-fase-d-content-test.js` kini secara otomatis memvalidasi keberadaan kontrak `MANIFEST.tsv` dan keutuhan kesembilan berkas sumber tersebut (12/12 PASS).
 
+## 8. Penyelarasan Penuh 81 Bab & Sub-bab 5 Mapel Inti di Cangkang Guru
+
+Struktur kurikulum pada `features/teacher/fiezel-teacher-shell.js` (`MAPEL_CATALOG`) untuk 5 Mapel Inti Fase D SMP (Kelas 7, 8, dan 9) telah 100% diselaraskan dengan Buku Siswa resmi Kemendikbudristek:
+- **Matematika (17 Bab)**: Kelas 7 (6 Bab), Kelas 8 (6 Bab), Kelas 9 (5 Bab).
+- **Bahasa Indonesia (17 Bab)**: Kelas 7 Edisi Revisi (6 Bab), Kelas 8 Edisi Revisi (6 Bab), Kelas 9 (5 Bab).
+- **Bahasa Inggris (15 Chapters)**: English for Nusantara Kelas 7 (5 Chapters), Kelas 8 (5 Chapters), Kelas 9 (5 Chapters).
+- **IPA (20 Bab)**: Kelas 7 Edisi Revisi (7 Bab), Kelas 8 Edisi Revisi (7 Bab), Kelas 9 (6 Bab).
+- **IPS (12 Tema)**: Kelas 7 Edisi Revisi (4 Tema), Kelas 8 (4 Tema), Kelas 9 (4 Tema).
+
+Setiap bab memuat:
+1. `code`: Kode formal terstandarisasi (`KOMP-<MAPEL>-D-<KELAS>-BAB<N>-01`).
+2. `grade`: Jenjang kelas spesifik (7, 8, atau 9) terhubung ke tombol filter kelas di antarmuka guru.
+3. `name`: Judul bab resmi Buku Siswa (tanpa kode teknis birokrasi di UI guru).
+4. `materi`: Rincian sub-bab/unit resmi dari Buku Siswa.
+5. `cpRef`: Rujukan judul buku resmi Kemendikbudristek.
+
+
