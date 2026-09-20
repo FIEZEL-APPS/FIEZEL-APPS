@@ -298,6 +298,28 @@
     'kurikulum.rapor-ortu-card-sub': 'Dokumen yang sama dibaca guru — unduh gambar untuk dibagikan, atau cetak.',
     'kurikulum.rapor-gagal-unduh': 'Gagal membuat gambar. Coba tombol Cetak.',
     'kurikulum.rapor-gagal-cetak': 'Gagal membuka dialog cetak.',
-    'kurikulum.rapor-modul-hilang': 'Modul berbagi rapor belum termuat. Muat ulang halaman.'
+    'kurikulum.rapor-modul-hilang': 'Modul berbagi rapor belum termuat. Muat ulang halaman.',
+    /* m025-352 (F8+F10) — Wali Kelas dan Papan Kelas; naskah lahir dwibahasa. */
+    'kurikulum.nav-wali': 'Wali Kelas',
+    'kurikulum.nav-papan': 'Papan Kelas',
+    'kurikulum.wali-title': 'Cakupan per Mapel',
+    'kurikulum.wali-sub': 'Satu halaman untuk wali kelas: mapel mana yang tertinggal di kelas ini.',
+    'kurikulum.wali-loading': 'Memuat cakupan {done}/{total} mapel…',
+    'kurikulum.wali-tp': 'TP',
+    'kurikulum.wali-rata': 'Rata-rata',
+    'kurikulum.wali-terlemah': 'Terlemah',
+    'kurikulum.wali-tanpa-data': 'Belum ada data',
+    'kurikulum.wali-gagal': 'Gagal memuat',
+    'kurikulum.wali-tertinggal': 'Tertinggal',
+    'kurikulum.papan-title': 'Papan Kelas vs Kurikulum',
+    'kurikulum.papan-sub': 'Seluruh TP di sumbu tegak, seluruh murid di sumbu datar — siapa tertinggal di TP mana, sekali pandang. Klik sel untuk intervensi.',
+    'kurikulum.papan-loading': 'Memuat TP {done}/{total}…',
+    'kurikulum.papan-legend': 'Keterangan',
+    'kurikulum.papan-sel-remedial': 'Butuh remedial',
+    'kurikulum.papan-sel-pengayaan': 'Siap pengayaan',
+    'kurikulum.papan-sel-belum': 'Belum mulai',
+    'kurikulum.papan-cap-note': 'Menampilkan {n} TP pertama — batasi agar papan tetap terbaca.',
+    'kurikulum.papan-tanpa-murid': 'Belum ada murid di kelas ini — tidak ada sumbu datar yang bisa digambar.',
+    'kurikulum.papan-tanpa-tp': 'Belum ada TP untuk mapel ini di kelas ini.'
   });
 })();

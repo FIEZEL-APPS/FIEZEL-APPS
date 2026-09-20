@@ -12,7 +12,7 @@
     recs: null, questions: [], reviewQueue: [], tps: [], comps: [], assessments: [],
     drawer: null, modal: null, plan: null, groups: null, busy: false, health: null, blueprintCheck: null,
     engStatus: null, engBusy: false, mapelStatus: null, mapelBusy: false,
-    soalStatus: null, soalBusy: false
+    soalStatus: null, soalBusy: false, wali: null, papan: null
   };
 
   /* Pembungkus i18n yang sama dengan fz-api.js, dan alasannya sama pula: halaman konsol
@@ -130,7 +130,9 @@
     ['curriculum', t('kurikulum.nav-curriculum', 'Standar Kurikulum')],
     ['bank', t('kurikulum.nav-bank', 'Bank Soal')],
     ['assessment', t('kurikulum.nav-assessment', 'Kuis & Ulangan')],
-    ['students', t('kurikulum.nav-students', 'Nilai & Rapor')]
+    ['students', t('kurikulum.nav-students', 'Nilai & Rapor')],
+    ['wali', t('kurikulum.nav-wali', 'Wali Kelas')],
+    ['papan', t('kurikulum.nav-papan', 'Papan Kelas')]
   ];
 
   // ---------------- boot ----------------
@@ -364,7 +366,7 @@
   function view() {
     if (!S.cls) return '<div class="card"><h3>' + esc(t('kurikulum.welcome-title', 'Selamat Datang di Ruang Guru!')) + '</h3><p class="muted">' + esc(t('kurikulum.welcome-sub', 'Pilih mata pelajaran dan kelas yang Anda ampu agar ruang belajar Anda siap digunakan.')) + '</p><button class="btn primary sm" data-a="new-class" style="margin-top:10px">+ ' + esc(t('kurikulum.modal-kelas-submit', 'Simpan & Buat Kelas')) + '</button></div>';
     return ({ copilot: vCopilot, coverage: vCoverage, curriculum: vCurriculum, bank: vBank,
-              assessment: vAssessment, students: vStudents }[S.view] || vCopilot)();
+              assessment: vAssessment, students: vStudents, wali: vWali, papan: vPapan }[S.view] || vCopilot)();
   }
 
   function head(kicker, title, sub) {
@@ -521,6 +523,197 @@
         '<button class="btn ghost sm" data-a="groups-from-drawer" data-tp="' + tpId + '">Bentuk kelompok</button></div>';
       render();
     });
+  }
+
+  /* F8+F10 (m025-352): Wali Kelas dan Papan Kelas berbagi satu pola muat —
+     antrean janji berbatas (4 jalur) dengan hitungan kemajuan yang jujur, supaya
+     21 panggilan /coverage dan puluhan /tp-detail tidak menembak server sekaligus
+     dan guru selalu tahu pekerjaannya sampai di mana. */
+  function lariBatch(items, batas, kerja, kemajuan) {
+    var kirim = 0, jalan = 0, selesaiHitung = 0;
+    return new Promise(function (selesai) {
+      function berikutnya() {
+        if (selesaiHitung >= items.length) return selesai();
+        while (jalan < batas && kirim < items.length) {
+          (function (item) {
+            jalan++;
+            kerja(item).then(tandai, tandai);
+            function tandai() {
+              jalan--; selesaiHitung++;
+              try { if (kemajuan) kemajuan(selesaiHitung, items.length); } catch (_) {}
+              berikutnya();
+            }
+          })(items[kirim]);
+          kirim++;
+        }
+      }
+      berikutnya();
+    });
+  }
+
+  function gantiPola(s, peta) {
+    var out = String(s);
+    Object.keys(peta).forEach(function (k) { out = out.split(k).join(peta[k]); });
+    return out;
+  }
+
+  // ---------------- F8. Wali Kelas: 17 mapel × status ----------------
+  function mapelWali() {
+    return SUBJECT_CHOICES.filter(function (c) { return c[0] !== 'ALL'; });
+  }
+
+  function muatWali() {
+    var daftar = mapelWali();
+    S.wali = { clsId: S.cls.id, items: [], done: 0, total: daftar.length };
+    render();
+    lariBatch(daftar, 4, function (c) {
+      return api('/coverage?class_id=' + S.cls.id + '&subject_id=' + encodeURIComponent(c[0])).then(function (r) {
+        S.wali.items.push({ sid: c[0], nama: c[1], rows: (r && r.rows) || [], gagal: false });
+      }, function () {
+        S.wali.items.push({ sid: c[0], nama: c[1], rows: [], gagal: true });
+      });
+    }, function (done) {
+      if (S.wali) { S.wali.done = done; render(); }
+    });
+  }
+
+  function ringkasMapel(item) {
+    var ada = item.rows.filter(function (r) { return r.mastery_pct !== undefined && r.mastery_pct !== null; });
+    var rata = ada.length ? Math.round(ada.reduce(function (a, b) { return a + b.mastery_pct; }, 0) / ada.length) : null;
+    var hitung = { GOOD: 0, DEVELOPING: 0, GAP: 0, MISSING: 0, NOT_TAUGHT: 0 };
+    item.rows.forEach(function (r) { if (hitung[r.status] !== undefined) hitung[r.status]++; });
+    var lemah = ada.slice().sort(function (a, b) { return a.mastery_pct - b.mastery_pct; })[0] || null;
+    return { rata: rata, hitung: hitung, lemah: lemah };
+  }
+
+  function vWali() {
+    if (!S.wali || S.wali.clsId !== S.cls.id) { muatWali(); }
+    var w = S.wali || { items: [], done: 0, total: mapelWali().length };
+    var keluar = head(t('kurikulum.wali-title', 'Cakupan per Mapel'),
+      t('kurikulum.wali-sub', 'Satu halaman untuk wali kelas: mapel mana yang tertinggal di kelas ini.'));
+    if (w.done < w.total) {
+      keluar += '<div class="card" data-testid="wali-progress"><p class="muted">' +
+        esc(gantiPola(t('kurikulum.wali-loading', 'Memuat cakupan {done}/{total} mapel…'), { '{done}': w.done, '{total}': w.total })) + '</p></div>';
+    }
+    var urut = w.items.slice().map(function (it) { return { it: it, r: ringkasMapel(it) }; });
+    urut.sort(function (a, b) {
+      if (a.it.gagal !== b.it.gagal) return a.it.gagal ? 1 : -1;
+      if ((a.r.rata === null) !== (b.r.rata === null)) return a.r.rata === null ? 1 : -1;
+      return (a.r.rata || 0) - (b.r.rata || 0);
+    });
+    var pertama = urut.filter(function (u) { return !u.it.gagal && u.r.rata !== null; })[0];
+    if (pertama && w.done >= w.total) {
+      keluar += '<div class="card tight accent" data-testid="wali-tertinggal"><p class="kicker">' +
+        esc(t('kurikulum.wali-tertinggal', 'Tertinggal')) + '</p><b>' + esc(pertama.it.nama) + ' — ' + pertama.r.rata + '%</b>' +
+        (pertama.r.lemah ? '<p class="muted">' + esc(t('kurikulum.wali-terlemah', 'Terlemah') + ': ' + (pertama.r.lemah.tp_code || '') + ' ' + (pertama.r.lemah.tp_name || '').slice(0, 80)) + '</p>' : '') + '</div>';
+    }
+    keluar += '<div class="grid g2">' + urut.map(function (u) {
+      var r = u.r;
+      var badan = u.it.gagal
+        ? '<p class="muted">' + esc(t('kurikulum.wali-gagal', 'Gagal memuat')) + '</p>'
+        : (u.it.rows.length
+          ? '<div class="row between"><span>' + u.it.rows.length + ' ' + esc(t('kurikulum.wali-tp', 'TP')) + '</span><b>' +
+            (r.rata === null ? '–' : r.rata + '% ' + esc(t('kurikulum.wali-rata', 'Rata-rata'))) + '</b></div>' +
+            '<p class="mono muted">GOOD ' + r.hitung.GOOD + ' · DEV ' + r.hitung.DEVELOPING + ' · GAP ' + r.hitung.GAP +
+            ' · MISS ' + r.hitung.MISSING + ' · UNTAUGHT ' + r.hitung.NOT_TAUGHT + '</p>' +
+            (r.lemah ? '<p class="muted">' + esc(t('kurikulum.wali-terlemah', 'Terlemah') + ': ' + (r.lemah.tp_code || '')) + '</p>' : '')
+          : '<p class="muted">' + esc(t('kurikulum.wali-tanpa-data', 'Belum ada data')) + '</p>');
+      return '<div class="card tight" data-testid="wali-card-' + esc(u.it.sid) + '"><p class="kicker">' + esc(u.it.nama) + '</p>' + badan + '</div>';
+    }).join('') + '</div>';
+    return keluar;
+  }
+
+  // ---------------- F10. Papan Kelas vs Kurikulum: TP × murid ----------------
+  var PAPAN_MAKS_TP = 40;
+
+  function hurufSel(grup) {
+    return grup === 'mastered' ? ['M', 'good', t('kurikulum.rapor-kuat', 'Kuat')]
+      : grup === 'developing' ? ['B', 'warn', t('kurikulum.rapor-berkembang', 'Berkembang')]
+      : grup === 'needs_remediation' ? ['R', 'bad', t('kurikulum.papan-sel-remedial', 'Butuh remedial')]
+      : grup === 'ready_enrichment' ? ['E', 'info', t('kurikulum.papan-sel-pengayaan', 'Siap pengayaan')]
+      : ['·', 'mute', t('kurikulum.papan-sel-belum', 'Belum mulai')];
+  }
+
+  function muatPapan() {
+    var sub = activeSubj();
+    var kunci = S.cls.id + '|' + sub;
+    S.papan = { kunci: kunci, mapel: subjName(sub), tps: [], murid: [], done: 0, total: 0, siap: false, ceramah: 0 };
+    render();
+    Promise.all([
+      api('/coverage?class_id=' + S.cls.id + '&subject_id=' + encodeURIComponent(sub)),
+      api('/classes/' + S.cls.id)
+    ]).then(function (r) {
+      var rows = (r[0] && r[0].rows) || [];
+      var murid = ((r[1] && r[1].students) || []).map(function (s) { return { id: s.user_id, nama: s.name || s.user_id }; });
+      var daftar = rows.slice(0, PAPAN_MAKS_TP);
+      S.papan.murid = murid;
+      S.papan.total = daftar.length;
+      S.papan.ceramah = rows.length - daftar.length;
+      S.papan.tps = daftar.map(function (tp) { return { id: tp.tp_id, kode: tp.tp_code, nama: tp.tp_name, sel: {} }; });
+      if (!daftar.length) { S.papan.siap = true; render(); return; }
+      render();
+      lariBatch(daftar, 4, function (tp) {
+        return api('/braincore/tp-detail?class_id=' + S.cls.id + '&tp_id=' + tp.tp_id).then(function (d) {
+          var ring = (d && d.summary) || {};
+          var baris = null;
+          for (var i = 0; i < S.papan.tps.length; i++) if (S.papan.tps[i].id === tp.tp_id) baris = S.papan.tps[i];
+          if (baris) {
+            ['mastered', 'developing', 'needs_remediation', 'ready_enrichment', 'not_started'].forEach(function (g) {
+              (ring[g] || []).forEach(function (m) { if (m && m.student_id) baris.sel[m.student_id] = g; });
+            });
+          }
+        }, function () {});
+      }, function (done) {
+        if (S.papan) { S.papan.done = done; render(); }
+      }).then(function () {
+        if (S.papan) { S.papan.siap = true; render(); }
+      });
+    }, function () {
+      if (S.papan) { S.papan.siap = true; S.papan.gagal = true; render(); }
+    });
+  }
+
+  function vPapan() {
+    var sub = activeSubj();
+    if (!S.papan || S.papan.kunci !== S.cls.id + '|' + sub) { muatPapan(); }
+    var p = S.papan || { tps: [], murid: [], done: 0, total: 0, siap: false };
+    var keluar = head(t('kurikulum.papan-title', 'Papan Kelas vs Kurikulum') + ' — ' + (p.mapel || subjName(sub)),
+      t('kurikulum.papan-sub', 'Seluruh TP di sumbu tegak, seluruh murid di sumbu datar — siapa tertinggal di TP mana, sekali pandang. Klik sel untuk intervensi.'));
+    if (p.gagal) return keluar + '<div class="card"><p class="muted">' + esc(t('kurikulum.wali-gagal', 'Gagal memuat')) + '</p></div>';
+    if (!p.siap || p.done < p.total) {
+      keluar += '<div class="card" data-testid="papan-progress"><p class="muted">' +
+        esc(gantiPola(t('kurikulum.papan-loading', 'Memuat TP {done}/{total}…'), { '{done}': p.done, '{total}': p.total })) + '</p></div>';
+    }
+    if (p.siap && !p.murid.length) {
+      return keluar + '<div class="card"><p class="muted">' + esc(t('kurikulum.papan-tanpa-murid', 'Belum ada murid di kelas ini — tidak ada sumbu datar yang bisa digambar.')) + '</p></div>';
+    }
+    if (p.siap && !p.tps.length) {
+      return keluar + '<div class="card"><p class="muted">' + esc(t('kurikulum.papan-tanpa-tp', 'Belum ada TP untuk mapel ini di kelas ini.')) + '</p></div>';
+    }
+    if (!p.murid.length || !p.tps.length) return keluar;
+    var legenda = [['M', 'good', t('kurikulum.rapor-kuat', 'Kuat')], ['B', 'warn', t('kurikulum.rapor-berkembang', 'Berkembang')],
+      ['R', 'bad', t('kurikulum.papan-sel-remedial', 'Butuh remedial')], ['E', 'info', t('kurikulum.papan-sel-pengayaan', 'Siap pengayaan')],
+      ['·', 'mute', t('kurikulum.papan-sel-belum', 'Belum mulai')]];
+    keluar += '<div class="card" data-testid="papan-legend"><p class="kicker">' + esc(t('kurikulum.papan-legend', 'Keterangan')) + '</p><p>' +
+      legenda.map(function (l) { return '<span class="pill ' + l[1] + '">' + l[0] + ' = ' + esc(l[2]) + '</span>'; }).join(' ') + '</p></div>';
+    if (p.ceramah > 0) {
+      keluar += '<div class="card tight" data-testid="papan-cap"><p class="muted">' +
+        esc(gantiPola(t('kurikulum.papan-cap-note', 'Menampilkan {n} TP pertama — batasi agar papan tetap terbaca.'), { '{n}': p.tps.length })) + '</p></div>';
+    }
+    keluar += '<div class="card" data-testid="papan-grid"><div class="tbl-scroll"><table><thead><tr><th>' +
+      esc(t('kurikulum.th-tp', 'Tujuan Pembelajaran (TP)')) + '</th>' +
+      p.murid.map(function (m) { return '<th>' + esc(m.nama) + '</th>'; }).join('') + '</tr></thead><tbody>' +
+      p.tps.map(function (baris) {
+        return '<tr data-testid="papan-row-' + esc(baris.id) + '"><td><b>' + esc(baris.kode || '-') + '</b><br><small class="muted">' +
+          esc((baris.nama || '').slice(0, 60)) + '</small></td>' +
+          p.murid.map(function (m) {
+            var hs = hurufSel(baris.sel[m.id] || 'not_started');
+            var label = (baris.kode || '') + ' · ' + m.nama + ' · ' + hs[2];
+            return '<td style="text-align:center"><button class="pill ' + hs[1] + '" data-a="tp-detail" data-tp="' + esc(baris.id) +
+              '" aria-label="' + esc(label) + '" title="' + esc(label) + '" data-testid="papan-sel-' + esc(baris.id) + '-' + esc(m.id) + '">' + hs[0] + '</button></td>';
+          }).join('') + '</tr>';
+      }).join('') + '</tbody></table></div></div>';
+    return keluar;
   }
 
   function flattenTree(nodes, acc) {
@@ -1387,6 +1580,7 @@
     S.students = null; S.bankLoaded = false; S.questions = []; S.reviewQueue = [];
     S.plan = null; S.groups = null; S.bpRows = null; S.blueprintCheck = null;
     S.tree = null; S.health = null;
+    S.wali = null; S.papan = null;
   }
 
   function errToast(e) { toast(e.message || 'Gagal.'); render(); }
