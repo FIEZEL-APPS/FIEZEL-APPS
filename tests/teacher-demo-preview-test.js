@@ -39,6 +39,30 @@ const strip = (s) => s.replace(/\/\*[\s\S]*?\*\//g, ' ').replace(/(^|[^:])\/\/[^
 const shellCode = strip(shellSrc);
 const storeCode = strip(storeSrc);
 
+/* Badan sebuah fungsi, dipotong dengan mencocokkan kurung kurawal.
+ *
+ * Dipakai R6, dan ia ada karena versi sebelumnya memakai jendela 900 karakter dari
+ * `function render(` sebagai proksi untuk "di dalam render()". Proksi itu bukan menguji
+ * perilaku melainkan JARAK, jadi ia patah bukan ketika pitanya hilang, melainkan ketika
+ * `render()` tumbuh — dan itulah yang terjadi di m025-344/345, saat jaminan welcome()
+ * untuk guru terverifikasi mendorong `demoBanner()` ke karakter 960. Pitanya tetap
+ * dirender; yang patah adalah pengukurnya, dan ia menyumbat SELURUH quality.yml
+ * (langkahnya berhenti pada gerbang merah pertama).
+ */
+function badanFungsi(src, tanda) {
+  const mulai = src.indexOf(tanda);
+  if (mulai < 0) return '';
+  const buka = src.indexOf('{', mulai);
+  if (buka < 0) return '';
+  let dalam = 0;
+  for (let i = buka; i < src.length; i++) {
+    const c = src[i];
+    if (c === '{') dalam++;
+    else if (c === '}') { dalam--; if (dalam === 0) return src.slice(buka, i + 1); }
+  }
+  return src.slice(mulai);
+}
+
 /* ------------------------------------------------------------------ R1 · tautan --- */
 
 test('R1 · landing page menautkan Demo Guru ke ?teacher=preview', () => {
@@ -137,7 +161,7 @@ test('R6 · pita demo tampil dengan jalan keluar dan jalan naik ke akun guru', (
   assert.ok(/function demoBanner\(/.test(shellCode), 'pita demo tidak ada');
   assert.ok(/previewOn\s*\?\s*' is-demo'/.test(shellCode) || /is-demo/.test(shellCode),
     'kelas penanda demo tidak dipasang di kerangka');
-  assert.ok(/demoBanner\(\)/.test(shellCode.slice(shellCode.indexOf('function render('), shellCode.indexOf('function render(') + 900)),
+  assert.ok(/demoBanner\(\)/.test(badanFungsi(shellCode, 'function render(')),
     'pita demo tidak dirender');
   assert.ok(/case 'demo-exit':[\s\S]{0,120}exitPreview\(\)/.test(shellCode), 'tombol keluar demo tidak menghapus penanda');
   assert.ok(/case 'demo-activate':[\s\S]{0,80}openAccount\('teacher'\)/.test(shellCode),
