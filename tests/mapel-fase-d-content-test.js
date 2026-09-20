@@ -58,7 +58,9 @@ const ROOT = process.env.FIEZEL_ROOT || __fzRoot;
 const SUBJECTS = [
   { id: 'MAT', file: 'mapel-mat-d.json' },
   { id: 'IPA', file: 'mapel-ipa-d.json' },
-  { id: 'ENG', file: 'mapel-eng-d.json' }
+  { id: 'ENG', file: 'mapel-eng-d.json' },
+  { id: 'IND', file: 'mapel-ind-d.json' },
+  { id: 'IPS', file: 'mapel-ips-d.json' }
 ];
 const GRADES = [7, 8, 9];
 const MIN_KOMP_PER_KELAS = 3;
@@ -67,7 +69,9 @@ const BIDANG_TERJEMAH = ['name', 'materi'];
 
 const RE_THAI = /[฀-๿]/;
 const RE_PLACEHOLDER = /\{[a-zA-Z0-9_]+\}/g;
-const RE_KODE = /^KOMP-(MAT|IPA|ENG)-D-([789])-[A-Z]{3}-\d{2}$/;
+/* Kode kompetensi mengikat pada BAB Buku Siswa, bukan pada singkatan topik buatan sendiri:
+   guru mencari "Bab 3", bukan "TEK". Bentuknya KOMP-<MAPEL>-D-<kelas>-BAB<n>-<NN>. */
+const RE_KODE = /^KOMP-(MAT|IPA|ENG|IND|IPS)-D-([789])-BAB(\d{1,2})-\d{2}$/;
 
 /* Pembahasan yang menyebut letak, bukan konsep. Sengaja SEMPIT: "data di atas" di dalam
    pembahasan merujuk tabel di batang soal dan itu sah, jadi ia tidak masuk daftar. Yang
@@ -162,7 +166,7 @@ if (bankLengkap) {
       luarFaseD.length === 0, luarFaseD.map((c) => c.code + '=kelas' + c.grade).join(', '));
 
     const kodeSalahBentuk = comps.filter((c) => !RE_KODE.test(String(c.code)));
-    check('kompetensi ' + s.id + ': semua kode berbentuk KOMP-' + s.id + '-D-<kelas>-<TOPIK>-<NN>',
+    check('kompetensi ' + s.id + ': semua kode berbentuk KOMP-' + s.id + '-D-<kelas>-BAB<n>-<NN>',
       kodeSalahBentuk.length === 0, kodeSalahBentuk.map((c) => c.code).join(', '));
 
     const kodeBedaKelas = comps.filter((c) => {
@@ -189,8 +193,11 @@ if (bankLengkap) {
         items.length >= MIN_BUTIR, items.length + ' butir');
     }
   }
-  check('sensus: 27 kompetensi Fase D (3 mapel x 3 kelas x 3)', totalKomp >= 27, totalKomp + ' kompetensi');
-  check('sensus: >= 324 butir soal Indonesia', totalButir >= 324, totalButir + ' butir');
+  /* 81 bab Buku Siswa: IPA 19, MAT 18, IND 17, ENG 15, IPS 12. Angka ini bukan target
+     bulat buatan gerbang — ia jumlah bab yang benar-benar tercetak di Daftar Isi kelima
+     Buku Siswa Kemendikbudristek untuk Fase D. */
+  check('sensus: 81 kompetensi Fase D (satu per bab Buku Siswa, 5 mapel)', totalKomp >= 81, totalKomp + ' kompetensi');
+  check('sensus: >= 972 butir soal Indonesia', totalButir >= 972, totalButir + ' butir');
 
   /* ===================== 6 · BENTUK TIAP BUTIR + 7 · NOL RUJUKAN POSISI ================ */
 

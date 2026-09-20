@@ -7,515 +7,15 @@
   "catatan": "Sidecar Thai untuk bank soal Fase D. Kunci (code, id, answer, difficulty) identik dengan berkas Indonesia; hanya name, materi, prompt, options, why, dan distractorWhy yang diterjemahkan. Batang soal Bahasa Inggris dan notasi matematika sengaja dipertahankan apa adanya karena itu materinya, bukan naskah yang diterjemahkan.",
   "competencies": [
     {
-      "code": "KOMP-ENG-D-7-DSC-01",
+      "code": "KOMP-ENG-D-7-BAB1-01",
       "grade": 7,
       "semester": 1,
-      "name": "ข้อความบรรยายและคำคุณศัพท์ในชีวิตประจำวัน",
-      "materi": "การบรรยายบุคคล สิ่งของ สัตว์ และสภาพแวดล้อมประจำวันโดยใช้ Simple Present และ verb to be",
-      "cpRef": "Kepmendikbudristek/BSKAP No. 032/H/KR/2024 — CP Bahasa Inggris Fase D, Elemen Membaca–Memirsa",
+      "name": "บทที่ 1: About Me (เกี่ยวกับฉัน)",
+      "materi": "การทักทาย การแนะนำตัว สรรพนามบุรุษ และงานอดิเรก",
+      "cpRef": "Kepmendikbudristek/BSKAP No. 032/H/KR/2024 — Buku Siswa English for Nusantara Kelas 7 Chapter 1",
       "items": [
         {
-          "id": "eng-d7-dsc-001",
-          "prompt": "Rina wants to describe her classmate Bagas. Which sentence is correct?",
-          "options": [
-            "Bagas is tall and friendly.",
-            "Bagas tall and friendly.",
-            "Bagas are tall and friendly.",
-            "Bagas is tall and friend."
-          ],
-          "answer": 0,
-          "why": {
-            "0": "ประธานบุรุษที่สามเอกพจน์ใน Simple Present ต้องใช้ verb to be รูป is และคำที่ตามมาต้องเป็นคำคุณศัพท์เพื่อบอกลักษณะของบุคคล"
-          },
-          "distractorWhy": {
-            "1": "นักเรียนละ verb to be เพราะในภาษาอินโดนีเซียประโยคที่บอกลักษณะของคนสมบูรณ์ได้โดยไม่ต้องมีคำกริยา แต่ภาษาอังกฤษยังต้องมี is",
-            "2": "นักเรียนใช้ are กับ verb to be ทุกกรณีเหมือนกันหมด ทั้งที่ are ใช้กับประธานพหูพจน์และกับ you ส่วนชื่อคนหนึ่งคนใช้ is",
-            "3": "นักเรียนใช้คำนาม friend ในตำแหน่งที่ต้องใช้คำคุณศัพท์ ทั้งที่คำที่บอกนิสัยของคนหลัง is คือคำคุณศัพท์ friendly"
-          },
-          "difficulty": "dasar"
-        },
-        {
-          "id": "eng-d7-dsc-002",
-          "prompt": "Nadia describes her classroom to a new friend. Which sentence uses the adjective correctly?",
-          "options": [
-            "We have a big classroom.",
-            "We have a classroom big.",
-            "We have a big classrooms.",
-            "We has a big classroom."
-          ],
-          "answer": 0,
-          "why": {
-            "0": "ในภาษาอังกฤษคำคุณศัพท์วางอยู่หน้าคำนามที่ถูกขยาย ลำดับจึงเป็นคำนำหน้านาม คำคุณศัพท์ แล้วจึงเป็นคำนาม"
-          },
-          "distractorWhy": {
-            "1": "นักเรียนย้ายลำดับแบบภาษาอินโดนีเซียที่วางคำคุณศัพท์ไว้หลังคำนาม ทั้งที่ภาษาอังกฤษสลับลำดับนั้น",
-            "2": "นักเรียนเติม -s ให้คำนาม ทั้งที่คำนำหน้านาม a บ่งบอกว่ามีเพียงสิ่งเดียว a กับรูปพหูพจน์จึงอยู่ด้วยกันไม่ได้",
-            "3": "นักเรียนใช้ has กับประธาน we ทั้งที่ has ใช้กับประธานบุรุษที่สามเอกพจน์เท่านั้น ส่วน we ใช้ have"
-          },
-          "difficulty": "dasar"
-        },
-        {
-          "id": "eng-d7-dsc-003",
-          "prompt": "Complete the description: 'Rina ___ long black hair and a round face.'",
-          "options": [
-            "has",
-            "have",
-            "is",
-            "haves"
-          ],
-          "answer": 0,
-          "why": {
-            "0": "ประธานบุรุษที่สามเอกพจน์ใน Simple Present ใช้รูป has เพื่อบอกลักษณะทางกายภาพที่บุคคลนั้นมี"
-          },
-          "distractorWhy": {
-            "1": "นักเรียนใช้รูปพื้นฐาน have กับประธานทุกตัว เพราะคำกริยาภาษาอินโดนีเซียไม่เคยเปลี่ยนรูปตามผู้กระทำ",
-            "2": "นักเรียนเลือก is เพราะคิดว่าประโยคบรรยายทุกประโยคใช้คำเชื่อม ทั้งที่ลักษณะที่บุคคลมีอยู่บอกด้วย has ไม่ใช่ verb to be",
-            "3": "นักเรียนใช้กฎเติม -s กับ have อย่างเป็นกลไก ทั้งที่รูปบุรุษที่สามเอกพจน์ของคำกริยานี้เป็นรูปพิเศษคือ has"
-          },
-          "difficulty": "dasar"
-        },
-        {
-          "id": "eng-d7-dsc-004",
-          "prompt": "Bagas describes the school canteen in his writing task. Which sentence is correct?",
-          "options": [
-            "There are three tables in our canteen.",
-            "There are three table in our canteen.",
-            "There is three tables in our canteen.",
-            "There have three tables in our canteen."
-          ],
-          "answer": 0,
-          "why": {
-            "0": "คำนามนับได้ที่มีมากกว่าหนึ่งต้องลงท้ายด้วย -s และการบอกว่ามีสิ่งของพหูพจน์อยู่ใช้ there are"
-          },
-          "distractorWhy": {
-            "1": "นักเรียนไม่ใส่รูปพหูพจน์ให้คำนาม เพราะในภาษาอินโดนีเซียคำบอกจำนวนถือว่าเพียงพอที่จะบอกปริมาณแล้ว แต่ภาษาอังกฤษยังต้องเติม -s",
-            "2": "นักเรียนใช้ there is กับสิ่งของพหูพจน์ ทั้งที่รูป is ใช้กับสิ่งเดียว ส่วนโต๊ะสามตัวต้องใช้ are",
-            "3": "นักเรียนแปลคำว่า 'ada' เป็น have ทั้งที่การบอกว่ามีสิ่งของอยู่ในที่ใดที่หนึ่งใช้ there is หรือ there are"
-          },
-          "difficulty": "dasar"
-        },
-        {
-          "id": "eng-d7-dsc-005",
-          "prompt": "Bagas writes about his pet for the English class. Which sentence is correct?",
-          "options": [
-            "My cat is an animal with soft grey fur.",
-            "My cat is a animal with soft grey fur.",
-            "My cat is an animal with soft grey furs.",
-            "My cat is animal with soft grey fur."
-          ],
-          "answer": 0,
-          "why": {
-            "0": "คำนามเอกพจน์ที่ขึ้นต้นด้วยเสียงสระใช้คำนำหน้านาม an ส่วนคำนามนับไม่ได้ที่หมายถึงขนสัตว์ไม่เติมรูปพหูพจน์"
-          },
-          "distractorWhy": {
-            "1": "นักเรียนจำว่า a เป็นคำนำหน้านามของคำนามทุกคำ ทั้งที่การเลือก a หรือ an ขึ้นอยู่กับเสียงแรกของคำที่ตามมา",
-            "2": "นักเรียนเติม -s ให้คำที่หมายถึงขนสัตว์ เพราะนึกภาพว่ามีจำนวนมาก ทั้งที่คำนามนับไม่ได้ยังคงรูปเอกพจน์",
-            "3": "นักเรียนละคำนำหน้านาม เพราะภาษาอินโดนีเซียไม่มี a หรือ an ทั้งที่คำนามเอกพจน์ที่นับได้ต้องมีคำนำหน้านามเสมอ"
-          },
-          "difficulty": "sedang"
-        },
-        {
-          "id": "eng-d7-dsc-006",
-          "prompt": "Which sentence describes the new seventh graders correctly?",
-          "options": [
-            "The new students are diligent and polite.",
-            "The new students is diligent and polite.",
-            "The new students are diligents and polites.",
-            "The students new are diligent and polite."
-          ],
-          "answer": 0,
-          "why": {
-            "0": "ประธานพหูพจน์ใช้ are และคำคุณศัพท์ในภาษาอังกฤษไม่เปลี่ยนรูปตามจำนวนของคำนาม"
-          },
-          "distractorWhy": {
-            "1": "นักเรียนคิดว่ากลุ่มนักเรียนนับเป็นหน่วยเดียวจึงเลือก is ทั้งที่รูปของ verb to be ต้องตามรูปพหูพจน์ของคำนาม",
-            "2": "นักเรียนย้ายตัวบ่งชี้พหูพจน์ไปไว้ที่คำคุณศัพท์ เพราะคิดว่าทุกคำต้องสอดคล้องกันเรื่องจำนวน ทั้งที่มีเพียงคำนามเท่านั้นที่รับ -s",
-            "3": "นักเรียนวางคำคุณศัพท์ไว้หลังคำนามตามลำดับแบบภาษาอินโดนีเซีย ทั้งที่ในภาษาอังกฤษคำคุณศัพท์อยู่หน้าคำนาม"
-          },
-          "difficulty": "sedang"
-        },
-        {
-          "id": "eng-d7-dsc-007",
-          "prompt": "Rina describes the bag that belongs to Nadia. Which sentence is correct?",
-          "options": [
-            "Nadia's bag is red and small.",
-            "Nadia bag is red and small.",
-            "Nadias bag is red and small.",
-            "Nadia's bag are red and small."
-          ],
-          "answer": 0,
-          "why": {
-            "0": "ความเป็นเจ้าของของคนคนเดียวแสดงด้วยเครื่องหมายอะพอสทรอฟีและ -s ที่ชื่อของเจ้าของ และเพราะสิ่งของเป็นเอกพจน์ verb to be จึงเป็น is"
-          },
-          "distractorWhy": {
-            "1": "นักเรียนวางชื่อกับสิ่งของไว้ติดกันเฉย ๆ ตามรูปแบบการแสดงความเป็นเจ้าของของภาษาอินโดนีเซีย ทั้งที่ภาษาอังกฤษต้องมีตัวแสดงความเป็นเจ้าของที่ชื่อ",
-            "2": "นักเรียนเขียน -s โดยไม่มีอะพอสทรอฟี สิ่งที่อ่านได้จึงเป็นรูปพหูพจน์ของชื่อ ไม่ใช่การแสดงความเป็นเจ้าของ",
-            "3": "นักเรียนจับคู่ verb to be กับคำคุณศัพท์สองคำที่รู้สึกว่ามีจำนวนมาก ทั้งที่สิ่งที่กำหนดรูปของ verb to be คือประธาน ซึ่งคือกระเป๋าเพียงใบเดียว"
-          },
-          "difficulty": "sedang"
-        },
-        {
-          "id": "eng-d7-dsc-008",
-          "prompt": "Rina wants to say that her brother is not tall. Which sentence is correct?",
-          "options": [
-            "My brother is not tall.",
-            "My brother does not tall.",
-            "My brother not tall.",
-            "My brother is no tall."
-          ],
-          "answer": 0,
-          "why": {
-            "0": "ประโยคปฏิเสธที่มีคำคุณศัพท์เป็นภาคแสดงสร้างด้วย verb to be เติม not โดยไม่ต้องมีกริยาช่วยตัวอื่น"
-          },
-          "distractorWhy": {
-            "1": "นักเรียนใช้ does not เพราะคิดว่าการปฏิเสธใน Simple Present ทุกแบบต้องมี do ทั้งที่กริยาช่วยนั้นใช้เมื่อภาคแสดงเป็นคำกริยาแท้เท่านั้น",
-            "2": "นักเรียนวางคำปฏิเสธไว้หน้าคำคุณศัพท์ทันทีตามรูปแบบภาษาอินโดนีเซีย ทั้งที่ภาษาอังกฤษยังต้องมี is ก่อน not",
-            "3": "นักเรียนสลับ no กับ not ทั้งที่ no ใช้ขยายคำนาม ส่วนคำที่ปฏิเสธคำคุณศัพท์หลัง verb to be คือ not"
-          },
-          "difficulty": "sedang"
-        },
-        {
-          "id": "eng-d7-dsc-009",
-          "prompt": "Nadia describes the gate of her school. Which phrase is correct?",
-          "options": [
-            "a tall black gate",
-            "a black tall gate",
-            "a gate tall black",
-            "a tall blacks gate"
-          ],
-          "answer": 0,
-          "why": {
-            "0": "เมื่อคำคุณศัพท์สองคำขยายสิ่งของเดียวกัน ลำดับปกติคือคำบอกขนาดมาก่อน แล้วจึงเป็นคำบอกสี"
-          },
-          "distractorWhy": {
-            "1": "นักเรียนเรียงคำคุณศัพท์ตามคำที่นึกออกก่อน ทั้งที่ภาษาอังกฤษวางคำบอกขนาดไว้หน้าคำบอกสี",
-            "2": "นักเรียนใช้รูปแบบภาษาอินโดนีเซียที่วางคำคุณศัพท์ทั้งหมดไว้หลังคำนาม",
-            "3": "นักเรียนเติม -s ให้คำคุณศัพท์บอกสี เพราะคิดว่าคำคุณศัพท์เปลี่ยนรูปตามไปด้วย ทั้งที่คำคุณศัพท์ภาษาอังกฤษคงรูปเดิมเสมอ"
-          },
-          "difficulty": "sedang"
-        },
-        {
-          "id": "eng-d7-dsc-010",
-          "prompt": "Which sentence about the girl in the school library is correct?",
-          "options": [
-            "The girl with two big books is my sister.",
-            "The girl with two big books are my sister.",
-            "The girl with two big book is my sister.",
-            "The girl with two big books she is my sister."
-          ],
-          "answer": 0,
-          "why": {
-            "0": "แกนของประธานในประโยคนี้คือคำนามเอกพจน์ที่หมายถึงเด็กผู้หญิง verb to be จึงเป็น is แม้จะมีคำพหูพจน์อยู่ในส่วนขยายก็ตาม"
-          },
-          "distractorWhy": {
-            "1": "นักเรียนจับคู่ verb to be กับคำนามพหูพจน์ที่อยู่ใกล้ที่สุด ทั้งที่สิ่งที่กำหนดรูปของ verb to be คือแกนของประธาน ไม่ใช่คำในส่วนขยาย",
-            "2": "นักเรียนลืมตัวบ่งชี้พหูพจน์หลังคำบอกจำนวน ทั้งที่คำนามนับได้ที่มีมากกว่าหนึ่งต้องลงท้ายด้วย -s",
-            "3": "นักเรียนพูดซ้ำประธานด้วยคำสรรพนามตามความเคยชินในการพูดภาษาอินโดนีเซีย ทั้งที่ภาษาอังกฤษกล่าวถึงประธานเพียงครั้งเดียว"
-          },
-          "difficulty": "tinggi"
-        },
-        {
-          "id": "eng-d7-dsc-011",
-          "prompt": "Bagas describes his habit at school. Which sentence is correct?",
-          "options": [
-            "He always wears a neat uniform on Monday.",
-            "He wears always a neat uniform on Monday.",
-            "He always wear a neat uniform on Monday.",
-            "He is always wears a neat uniform on Monday."
-          ],
-          "answer": 0,
-          "why": {
-            "0": "คำวิเศษณ์บอกความถี่อย่าง always วางอยู่หน้าคำกริยาแท้ และประธานบุรุษที่สามเอกพจน์ต้องเติม -s ที่คำกริยา"
-          },
-          "distractorWhy": {
-            "1": "นักเรียนวางคำวิเศษณ์บอกความถี่ไว้หลังคำกริยาตามตำแหน่งของคำขยายในภาษาพูด ทั้งที่ตำแหน่งของมันอยู่หน้าคำกริยาแท้",
-            "2": "นักเรียนลืมเติม -s เพราะคำกริยาภาษาอินโดนีเซียไม่เคยเปลี่ยนรูปตามประธาน",
-            "3": "นักเรียนใส่ทั้ง verb to be และคำกริยาแท้พร้อมกันเพราะแปลคำว่า 'adalah' ทั้งที่ประโยค Simple Present หนึ่งประโยคมีตัวบ่งชี้ภาคแสดงได้เพียงอย่างเดียว"
-          },
-          "difficulty": "tinggi"
-        },
-        {
-          "id": "eng-d7-dsc-012",
-          "prompt": "Rina finishes her descriptive text about her cat. Which sentence is correct?",
-          "options": [
-            "My cat is small, and its fur is very soft.",
-            "My cat is small, and it's fur is very soft.",
-            "My cat is small, and its fur are very soft.",
-            "My cat is small, and its fur very soft."
-          ],
-          "answer": 0,
-          "why": {
-            "0": "รูป its ที่ไม่มีอะพอสทรอฟีเป็นคำสรรพนามแสดงความเป็นเจ้าของ และคำนามนับไม่ได้ที่หมายถึงขนสัตว์ใช้ is"
-          },
-          "distractorWhy": {
-            "1": "นักเรียนเขียนรูปย่อของ it is เพราะออกเสียงเหมือนกัน ทั้งที่รูปที่มีอะพอสทรอฟีแปลว่า 'สิ่งนั้นคือ' ไม่ใช่ตัวแสดงความเป็นเจ้าของ",
-            "2": "นักเรียนใช้ are เพราะนึกภาพว่าขนมีจำนวนมาก ทั้งที่คำนามนับไม่ได้ถือเป็นหน่วยเดียวและใช้ is",
-            "3": "นักเรียนละ verb to be ในประโยคส่วนที่สอง เพราะประโยคบอกลักษณะในภาษาอินโดนีเซียไม่ต้องมี"
-          },
-          "difficulty": "tinggi"
-        }
-      ]
-    },
-    {
-      "code": "KOMP-ENG-D-7-PRO-01",
-      "grade": 7,
-      "semester": 1,
-      "name": "ข้อความแนะนำวิธีทำ: ประโยคคำสั่งและคำเชื่อมบอกลำดับ",
-      "materi": "การเขียนและการทำความเข้าใจขั้นตอนของวิธีทำด้วยประโยคคำสั่งและคำเชื่อมบอกลำดับ",
-      "cpRef": "Kepmendikbudristek/BSKAP No. 032/H/KR/2024 — CP Bahasa Inggris Fase D, Elemen Menulis–Mempresentasikan",
-      "items": [
-        {
-          "id": "eng-d7-pro-001",
-          "prompt": "This is the opening step of a nasi goreng recipe. Which sentence is a correct imperative?",
-          "options": [
-            "Heat two spoons of oil in a pan.",
-            "To heat two spoons of oil in a pan.",
-            "Heats two spoons of oil in a pan.",
-            "Heating two spoons of oil in a pan."
-          ],
-          "answer": 0,
-          "why": {
-            "0": "ขั้นตอนในข้อความแนะนำวิธีทำเขียนเป็นประโยคคำสั่งที่ขึ้นต้นด้วยคำกริยารูปพื้นฐานโดยไม่ระบุประธาน"
-          },
-          "distractorWhy": {
-            "1": "นักเรียนใช้รูป to กับคำกริยาเพราะแปลคำว่า 'untuk' ทั้งที่รูปนั้นยังไม่เป็นประโยคคำสั่งที่สมบูรณ์",
-            "2": "นักเรียนเติม -s ราวกับว่ามีประธานบุรุษที่สามเอกพจน์ ทั้งที่ประโยคคำสั่งไม่มีประธาน คำกริยาจึงคงรูปพื้นฐาน",
-            "3": "นักเรียนเลือกรูป -ing เพราะคำกริยาที่มีหน่วยคำเติมในภาษาอินโดนีเซียให้ความรู้สึกใกล้เคียงกัน ทั้งที่รูป -ing ไม่ใช่ประโยคคำสั่ง"
-          },
-          "difficulty": "dasar"
-        },
-        {
-          "id": "eng-d7-pro-002",
-          "prompt": "Rina warns her friend about the salt while they cook. Which sentence is correct?",
-          "options": [
-            "Do not add too much salt.",
-            "Not add too much salt.",
-            "Do not adds too much salt.",
-            "No add too much salt."
-          ],
-          "answer": 0,
-          "why": {
-            "0": "ข้อห้ามในข้อความแนะนำวิธีทำสร้างด้วย do not ตามด้วยคำกริยารูปพื้นฐาน"
-          },
-          "distractorWhy": {
-            "1": "นักเรียนวางคำปฏิเสธไว้หน้าคำกริยาทันทีตามรูปแบบข้อห้ามของภาษาอินโดนีเซีย ทั้งที่ภาษาอังกฤษต้องเติม do ก่อน not",
-            "2": "นักเรียนเติม -s ที่คำกริยาหลัง do not ทั้งที่คำกริยาที่ตามหลังกริยาช่วยอยู่ในรูปพื้นฐานเสมอ",
-            "3": "นักเรียนใช้ no ซึ่งมีหน้าที่ขยายคำนาม ทั้งที่การห้ามไม่ให้ทำสิ่งใดใช้ not คู่กับ do"
-          },
-          "difficulty": "dasar"
-        },
-        {
-          "id": "eng-d7-pro-003",
-          "prompt": "Complete the recipe for es teh: '___, boil two glasses of water.'",
-          "options": [
-            "First",
-            "At first",
-            "Finally",
-            "After"
-          ],
-          "answer": 0,
-          "why": {
-            "0": "ขั้นตอนเปิดของข้อความแนะนำวิธีทำใช้คำเชื่อมบอกลำดับ First ซึ่งบอกว่าเป็นการกระทำแรกสุด"
-          },
-          "distractorWhy": {
-            "1": "นักเรียนคิดว่าสำนวนที่มีคำบุพบทนั้นมีความหมายเหมือนกัน ทั้งที่สำนวนดังกล่าวบอกสภาพในตอนแรกที่ภายหลังเปลี่ยนไป ไม่ใช่ขั้นตอนเปิดของวิธีทำ",
-            "2": "นักเรียนใช้คำบอกขั้นตอนปิดมาเปิดวิธีทำ ลำดับของขั้นตอนจึงกลับด้าน",
-            "3": "นักเรียนตัดสำนวนบอกลำดับให้สั้นลง ทั้งที่คำนั้นยังต้องมีคำนามหรืออนุประโยคตามมา จึงยังยืนเป็นคำบอกลำดับด้วยตัวเองไม่ได้"
-          },
-          "difficulty": "dasar"
-        },
-        {
-          "id": "eng-d7-pro-004",
-          "prompt": "Rina writes the second step of frying rice. Which sentence is correct?",
-          "options": [
-            "Then, put the cold rice into the pan.",
-            "Then, putting the cold rice into the pan.",
-            "Then, please you put the cold rice into the pan.",
-            "Than, put the cold rice into the pan."
-          ],
-          "answer": 0,
-          "why": {
-            "0": "คำเชื่อมบอกลำดับ Then ตามด้วยประโยคคำสั่งที่มีคำกริยารูปพื้นฐานและไม่มีประธาน"
-          },
-          "distractorWhy": {
-            "1": "นักเรียนใช้รูป -ing เป็นหัวข้อของขั้นตอน ทั้งที่ขั้นตอนของวิธีทำยังต้องเป็นคำสั่งที่มีคำกริยารูปพื้นฐาน",
-            "2": "นักเรียนใส่ประธาน you เข้าไปในประโยคคำสั่ง ทั้งที่ประโยคคำสั่งภาษาอังกฤษไม่ระบุผู้กระทำ",
-            "3": "นักเรียนสลับคำสองคำที่ออกเสียงคล้ายกัน คำที่นักเรียนใช้นั้นทำหน้าที่เปรียบเทียบ ไม่ใช่บอกลำดับขั้นตอน"
-          },
-          "difficulty": "dasar"
-        },
-        {
-          "id": "eng-d7-pro-005",
-          "prompt": "Step two says 'Fry the garlic until it is fragrant.' Which connective opens step three: '___, add the cold rice and stir it well.'",
-          "options": [
-            "After that",
-            "First of all",
-            "Finally",
-            "After"
-          ],
-          "answer": 0,
-          "why": {
-            "0": "ขั้นตอนถัดไปที่อยู่กลางวิธีทำใช้ After that ซึ่งชี้ไปยังขั้นตอนที่เพิ่งกล่าวถึง"
-          },
-          "distractorWhy": {
-            "1": "นักเรียนใช้คำบอกขั้นตอนเปิดกับขั้นตอนที่สาม ลำดับของเรื่องจึงหายไป",
-            "2": "นักเรียนเลือกคำบอกขั้นตอนปิด ทั้งที่ยังมีขั้นตอนอื่นตามมาอีก",
-            "3": "นักเรียนตัดสำนวนบอกลำดับให้สั้นลง รูปที่เหลือยังต้องมีคำนามหรืออนุประโยคตามมา"
-          },
-          "difficulty": "sedang"
-        },
-        {
-          "id": "eng-d7-pro-006",
-          "prompt": "Nadia writes a step for making es teh in the school kitchen. Which sentence is correct?",
-          "options": [
-            "Stir the tea until the sugar dissolves.",
-            "Stir the tea until the sugar dissolve.",
-            "Stir the tea until the sugar is dissolves.",
-            "Stir the tea until the sugar dissolved."
-          ],
-          "answer": 0,
-          "why": {
-            "0": "อนุประโยคบอกเวลาหลัง until ใช้ Simple Present และประธานเป็นบุรุษที่สามเอกพจน์ คำกริยาจึงลงท้ายด้วย -s"
-          },
-          "distractorWhy": {
-            "1": "นักเรียนลืมเติม -s ในอนุประโยค เพราะสนใจเฉพาะประโยคคำสั่งเท่านั้น",
-            "2": "นักเรียนใส่ทั้ง verb to be และคำกริยาแท้ ภาคแสดงจึงถูกทำเครื่องหมายซ้ำสองครั้ง",
-            "3": "นักเรียนใช้รูปอดีตเพราะนึกภาพขั้นตอนที่ทำเสร็จไปแล้ว ทั้งที่ข้อความแนะนำวิธีทำใช้ Simple Present เสมอ"
-          },
-          "difficulty": "sedang"
-        },
-        {
-          "id": "eng-d7-pro-007",
-          "prompt": "Which sentence lists the ingredients of nasi goreng correctly?",
-          "options": [
-            "You need two eggs, a little salt, and some cooking oil.",
-            "You need two egg, a little salt, and some cooking oil.",
-            "You need two eggs, a few salt, and some cooking oil.",
-            "You need two eggs, a little salt, and some cooking oils."
-          ],
-          "answer": 0,
-          "why": {
-            "0": "คำนามนับได้ที่มีมากกว่าหนึ่งใช้ -s ส่วนคำนามนับไม่ได้ใช้ a little หรือ some โดยไม่เติมหน่วยคำท้ายคำ"
-          },
-          "distractorWhy": {
-            "1": "นักเรียนไม่ใส่รูปพหูพจน์เพราะคิดว่าคำบอกจำนวนเพียงพอที่จะบอกปริมาณแล้วตามความเคยชินของภาษาอินโดนีเซีย",
-            "2": "นักเรียนใช้ a few กับวัตถุดิบที่นับเป็นหน่วยไม่ได้ ทั้งที่รูปนั้นใช้กับคำนามนับได้พหูพจน์เท่านั้น",
-            "3": "นักเรียนเติมรูปพหูพจน์ให้คำนามนับไม่ได้ ทั้งที่ชื่อวัตถุดิบที่เป็นของเหลวนั้นไม่เติมท้ายแม้จะมีปริมาณมาก"
-          },
-          "difficulty": "sedang"
-        },
-        {
-          "id": "eng-d7-pro-008",
-          "prompt": "Bagas writes the closing step of the nasi goreng recipe. Which sentence is correct?",
-          "options": [
-            "Finally, serve the fried rice on a plate while it is hot.",
-            "Finally, serving the fried rice on a plate while it is hot.",
-            "Finally, you must to serve the fried rice on a plate while it is hot.",
-            "Finally, serve the fried rice on a plate while it hot."
-          ],
-          "answer": 0,
-          "why": {
-            "0": "ขั้นตอนปิดใช้คำเชื่อม Finally ตามด้วยประโยคคำสั่ง และอนุประโยคบอกเวลาของมันยังต้องมี verb to be ก่อนคำคุณศัพท์"
-          },
-          "distractorWhy": {
-            "1": "นักเรียนใช้รูป -ing หลังคำเชื่อมบอกลำดับ ทั้งที่ขั้นตอนของวิธีทำยังต้องเป็นคำสั่งที่มีคำกริยารูปพื้นฐาน",
-            "2": "นักเรียนแทรก to หลังกริยาช่วย must ทั้งที่คำกริยาหลังกริยาช่วยอยู่ในรูปพื้นฐานเสมอ อีกทั้งขั้นตอนของวิธีทำเขียนเป็นคำสั่งก็เพียงพอแล้ว",
-            "3": "นักเรียนละ verb to be หน้าคำคุณศัพท์ เพราะประโยคบอกลักษณะในภาษาอินโดนีเซียไม่ต้องมี"
-          },
-          "difficulty": "sedang"
-        },
-        {
-          "id": "eng-d7-pro-009",
-          "prompt": "Which safety step for the cooking practice at school is correct?",
-          "options": [
-            "Before you turn on the stove, check the gas hose.",
-            "Before you turn on the stove, checking the gas hose.",
-            "Before you turns on the stove, check the gas hose.",
-            "Before turn on the stove, check the gas hose."
-          ],
-          "answer": 0,
-          "why": {
-            "0": "อนุประโยคบอกเวลาที่ขึ้นต้นด้วย before มีประธานและคำกริยาครบถ้วน ส่วนตัวขั้นตอนเองเป็นคำสั่งที่มีคำกริยารูปพื้นฐาน"
-          },
-          "distractorWhy": {
-            "1": "นักเรียนเขียนขั้นตอนหลักด้วยรูป -ing ประโยคนั้นจึงสูญเสียความเป็นคำสั่ง",
-            "2": "นักเรียนเติม -s ที่คำกริยาซึ่งมีประธานเป็น you ทั้งที่หน่วยคำนั้นใช้กับประธานบุรุษที่สามเอกพจน์เท่านั้น",
-            "3": "นักเรียนตัดประธานออกจากอนุประโยค เพราะประโยคภาษาอินโดนีเซียยืนอยู่ได้โดยไม่ต้องเอ่ยถึงผู้กระทำ ทั้งที่หลัง before ต้องมีประธานและคำกริยา"
-          },
-          "difficulty": "sedang"
-        },
-        {
-          "id": "eng-d7-pro-010",
-          "prompt": "Bagas arranges four steps for making es teh. Which arrangement uses the sequencing connectives correctly?",
-          "options": [
-            "First, boil the water. Next, put a tea bag into a glass. After that, add two spoons of sugar. Finally, put in some ice cubes.",
-            "Finally, boil the water. Next, put a tea bag into a glass. After that, add two spoons of sugar. First, put in some ice cubes.",
-            "First, boil the water. First, put a tea bag into a glass. First, add two spoons of sugar. First, put in some ice cubes.",
-            "First, boiling the water. Next, putting a tea bag into a glass. After that, adding two spoons of sugar. Finally, putting in some ice cubes."
-          ],
-          "answer": 0,
-          "why": {
-            "0": "คำเชื่อมบอกลำดับเคลื่อนจาก First ไป Next แล้ว After that และปิดท้ายด้วย Finally ขณะที่ทุกขั้นตอนเขียนเป็นประโยคคำสั่ง"
-          },
-          "distractorWhy": {
-            "1": "นักเรียนสลับคำบอกขั้นตอนเปิดกับคำบอกขั้นตอนปิด เพราะคิดว่าคำเชื่อมบอกลำดับเป็นเพียงเครื่องประดับ ทั้งที่คำเหล่านั้นเองเป็นตัวบอกว่าขั้นตอนใดมาก่อน",
-            "2": "นักเรียนใช้คำบอกลำดับคำเดียวซ้ำกับทุกขั้นตอน ผู้อ่านจึงไม่รู้ว่าขั้นตอนใดตามมา",
-            "3": "นักเรียนเขียนทุกขั้นตอนด้วยรูป -ing ทั้งที่ข้อความแนะนำวิธีทำต้องใช้คำกริยาคำสั่งรูปพื้นฐาน"
-          },
-          "difficulty": "tinggi"
-        },
-        {
-          "id": "eng-d7-pro-011",
-          "prompt": "Rina joins the two closing steps of the recipe in one sentence. Which sentence is correct?",
-          "options": [
-            "Turn off the stove, and then move the fried rice to a plate.",
-            "Turn off the stove, and then moving the fried rice to a plate.",
-            "Turn off the stove, and then you moves the fried rice to a plate.",
-            "Turn off the stove, and then the fried rice move to a plate."
-          ],
-          "answer": 0,
-          "why": {
-            "0": "คำสั่งสองประโยคที่เชื่อมด้วย and then ต่างก็ยังใช้คำกริยารูปพื้นฐานและไม่มีประธาน"
-          },
-          "distractorWhy": {
-            "1": "นักเรียนเปลี่ยนคำสั่งประโยคที่สองเป็นรูป -ing ส่วนนั้นจึงไม่ขนานกับคำสั่งก่อนหน้า",
-            "2": "นักเรียนใส่ประธานพร้อมกับเติม -s ทั้งที่ประโยคคำสั่งไม่มีประธานและคำกริยาคงรูปพื้นฐาน",
-            "3": "นักเรียนวางสิ่งที่ถูกกระทำไว้หน้าคำกริยาตามความเคยชินที่เน้นสิ่งของไว้ต้นประโยคในภาษาอินโดนีเซีย ทั้งที่คำสั่งภาษาอังกฤษขึ้นต้นด้วยคำกริยาเสมอ"
-          },
-          "difficulty": "tinggi"
-        },
-        {
-          "id": "eng-d7-pro-012",
-          "prompt": "Nadia writes the ingredient list for es teh on the whiteboard. Which line is correct?",
-          "options": [
-            "Ingredients: two glasses of water, three spoons of sugar, and one tea bag.",
-            "Ingredients: two glass of water, three spoon of sugar, and one tea bag.",
-            "Ingredients: two glasses of waters, three spoons of sugars, and one tea bag.",
-            "Ingredients: two glasses water, three spoons sugar, and one tea bag."
-          ],
-          "answer": 0,
-          "why": {
-            "0": "การบอกปริมาณเขียนด้วยคำเรียกภาชนะในรูปพหูพจน์ ตามด้วยคำว่า of แล้วจึงเป็นคำนามนับไม่ได้ซึ่งคงรูปเดิม"
-          },
-          "distractorWhy": {
-            "1": "นักเรียนไม่เติมรูปพหูพจน์ให้คำเรียกภาชนะแม้จะมีมากกว่าหนึ่ง ทั้งที่สิ่งที่นับคือแก้วและช้อน คำเหล่านั้นจึงต้องลงท้ายด้วย -s",
-            "2": "นักเรียนเติมรูปพหูพจน์ให้วัตถุดิบที่นับไม่ได้ ทั้งที่ชื่อวัตถุดิบอย่างน้ำและน้ำตาลไม่เคยรับหน่วยคำ -s",
-            "3": "นักเรียนละคำว่า of เพราะการบอกปริมาณในภาษาอินโดนีเซียวางภาชนะติดกับวัตถุดิบได้เลย ทั้งที่ภาษาอังกฤษต้องมี of คั่นกลาง"
-          },
-          "difficulty": "tinggi"
-        }
-      ]
-    },
-    {
-      "code": "KOMP-ENG-D-7-GRT-01",
-      "grade": 7,
-      "semester": 2,
-      "name": "คำทักทาย การแนะนำตัว และประโยคคำถาม WH",
-      "materi": "คำทักทาย การแนะนำตัวเอง และประโยคคำถาม WH-question พื้นฐานในบทสนทนาประจำวัน",
-      "cpRef": "Kepmendikbudristek/BSKAP No. 032/H/KR/2024 — CP Bahasa Inggris Fase D, Elemen Menyimak–Berbicara",
-      "items": [
-        {
-          "id": "eng-d7-grt-001",
+          "id": "eng-d7-bab1-001",
           "prompt": "Rina meets her English teacher in the school corridor at seven o'clock in the morning. Which greeting is correct?",
           "options": [
             "Good morning, Mrs. Dewi.",
@@ -535,7 +35,7 @@
           "difficulty": "dasar"
         },
         {
-          "id": "eng-d7-grt-002",
+          "id": "eng-d7-bab1-002",
           "prompt": "Bagas introduces himself in front of his new class on the first day of school. Which sentence is correct?",
           "options": [
             "Good morning, friends. My name is Bagas, and I am twelve years old.",
@@ -555,7 +55,7 @@
           "difficulty": "dasar"
         },
         {
-          "id": "eng-d7-grt-003",
+          "id": "eng-d7-bab1-003",
           "prompt": "Nadia wants to know the place where Bagas lives. Which question is correct?",
           "options": [
             "Where do you live?",
@@ -575,7 +75,7 @@
           "difficulty": "dasar"
         },
         {
-          "id": "eng-d7-grt-004",
+          "id": "eng-d7-bab1-004",
           "prompt": "Bagas points at a teacher on the school field and wants to know who she is. Which question is correct?",
           "options": [
             "Who is that teacher?",
@@ -595,7 +95,7 @@
           "difficulty": "dasar"
         },
         {
-          "id": "eng-d7-grt-005",
+          "id": "eng-d7-bab1-005",
           "prompt": "Nadia wants to know the starting time of the flag ceremony on Monday. Which question is correct?",
           "options": [
             "What time does the flag ceremony start?",
@@ -615,7 +115,7 @@
           "difficulty": "sedang"
         },
         {
-          "id": "eng-d7-grt-006",
+          "id": "eng-d7-bab1-006",
           "prompt": "Rina introduces her friend Nadia to the new English teacher. Which sentence is correct?",
           "options": [
             "This is my friend. Her name is Nadia.",
@@ -635,7 +135,7 @@
           "difficulty": "sedang"
         },
         {
-          "id": "eng-d7-grt-007",
+          "id": "eng-d7-bab1-007",
           "prompt": "The teacher asks Bagas, 'What does your sister do every morning?' Which answer is correct?",
           "options": [
             "She goes to school at half past six.",
@@ -655,7 +155,7 @@
           "difficulty": "sedang"
         },
         {
-          "id": "eng-d7-grt-008",
+          "id": "eng-d7-bab1-008",
           "prompt": "Nadia wants to know the number of students in Bagas's class. Which question is correct?",
           "options": [
             "How many students are there in your class?",
@@ -675,7 +175,7 @@
           "difficulty": "sedang"
         },
         {
-          "id": "eng-d7-grt-009",
+          "id": "eng-d7-bab1-009",
           "prompt": "Rina asks a new student about his hometown. Which question is correct?",
           "options": [
             "Where are you from?",
@@ -695,7 +195,7 @@
           "difficulty": "sedang"
         },
         {
-          "id": "eng-d7-grt-010",
+          "id": "eng-d7-bab1-010",
           "prompt": "Nadia wants to know the school subject that Bagas likes most. Which question is correct?",
           "options": [
             "What subject does Bagas like best?",
@@ -715,7 +215,7 @@
           "difficulty": "tinggi"
         },
         {
-          "id": "eng-d7-grt-011",
+          "id": "eng-d7-bab1-011",
           "prompt": "Read the dialogue in front of the classroom. Nadia: '___' Bagas: 'Because my house is far from school.' Which question completes the dialogue?",
           "options": [
             "Why do you come to school by bus?",
@@ -735,7 +235,7 @@
           "difficulty": "tinggi"
         },
         {
-          "id": "eng-d7-grt-012",
+          "id": "eng-d7-bab1-012",
           "prompt": "Rina finds a blue bag on the classroom floor and wants to know its owner. Which question is correct?",
           "options": [
             "Whose bag is this?",
@@ -757,15 +257,515 @@
       ]
     },
     {
-      "code": "KOMP-ENG-D-8-RCT-01",
-      "grade": 8,
-      "semester": 1,
-      "name": "บทเล่าประสบการณ์ (Recount Text) และอดีตกาลธรรมดา",
-      "materi": "การเล่าเหตุการณ์ในอดีตของตนเอง ด้วยคำกริยาที่ผันตามกฎและผันไม่ตามกฎ พร้อมคำเชื่อมบอกลำดับเวลา",
-      "cpRef": "Kepmendikbudristek/BSKAP No. 032/H/KR/2024 — CP Bahasa Inggris Fase D, Elemen Menulis–Mempresentasikan",
+      "code": "KOMP-ENG-D-7-BAB3-01",
+      "grade": 7,
+      "semester": 2,
+      "name": "บทที่ 3: Home Sweet Home (บ้านแสนสุข)",
+      "materi": "ห้องต่าง ๆ ในบ้าน กิจกรรมทำความสะอาด ประโยคคำสั่ง และคำเชื่อมบอกลำดับ",
+      "cpRef": "Kepmendikbudristek/BSKAP No. 032/H/KR/2024 — Buku Siswa English for Nusantara Kelas 7 Chapter 3",
       "items": [
         {
-          "id": "eng-d8-rct-001",
+          "id": "eng-d7-bab3-001",
+          "prompt": "This is the opening step of a nasi goreng recipe. Which sentence is a correct imperative?",
+          "options": [
+            "Heat two spoons of oil in a pan.",
+            "To heat two spoons of oil in a pan.",
+            "Heats two spoons of oil in a pan.",
+            "Heating two spoons of oil in a pan."
+          ],
+          "answer": 0,
+          "why": {
+            "0": "ขั้นตอนในข้อความแนะนำวิธีทำเขียนเป็นประโยคคำสั่งที่ขึ้นต้นด้วยคำกริยารูปพื้นฐานโดยไม่ระบุประธาน"
+          },
+          "distractorWhy": {
+            "1": "นักเรียนใช้รูป to กับคำกริยาเพราะแปลคำว่า 'untuk' ทั้งที่รูปนั้นยังไม่เป็นประโยคคำสั่งที่สมบูรณ์",
+            "2": "นักเรียนเติม -s ราวกับว่ามีประธานบุรุษที่สามเอกพจน์ ทั้งที่ประโยคคำสั่งไม่มีประธาน คำกริยาจึงคงรูปพื้นฐาน",
+            "3": "นักเรียนเลือกรูป -ing เพราะคำกริยาที่มีหน่วยคำเติมในภาษาอินโดนีเซียให้ความรู้สึกใกล้เคียงกัน ทั้งที่รูป -ing ไม่ใช่ประโยคคำสั่ง"
+          },
+          "difficulty": "dasar"
+        },
+        {
+          "id": "eng-d7-bab3-002",
+          "prompt": "Rina warns her friend about the salt while they cook. Which sentence is correct?",
+          "options": [
+            "Do not add too much salt.",
+            "Not add too much salt.",
+            "Do not adds too much salt.",
+            "No add too much salt."
+          ],
+          "answer": 0,
+          "why": {
+            "0": "ข้อห้ามในข้อความแนะนำวิธีทำสร้างด้วย do not ตามด้วยคำกริยารูปพื้นฐาน"
+          },
+          "distractorWhy": {
+            "1": "นักเรียนวางคำปฏิเสธไว้หน้าคำกริยาทันทีตามรูปแบบข้อห้ามของภาษาอินโดนีเซีย ทั้งที่ภาษาอังกฤษต้องเติม do ก่อน not",
+            "2": "นักเรียนเติม -s ที่คำกริยาหลัง do not ทั้งที่คำกริยาที่ตามหลังกริยาช่วยอยู่ในรูปพื้นฐานเสมอ",
+            "3": "นักเรียนใช้ no ซึ่งมีหน้าที่ขยายคำนาม ทั้งที่การห้ามไม่ให้ทำสิ่งใดใช้ not คู่กับ do"
+          },
+          "difficulty": "dasar"
+        },
+        {
+          "id": "eng-d7-bab3-003",
+          "prompt": "Complete the recipe for es teh: '___, boil two glasses of water.'",
+          "options": [
+            "First",
+            "At first",
+            "Finally",
+            "After"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "ขั้นตอนเปิดของข้อความแนะนำวิธีทำใช้คำเชื่อมบอกลำดับ First ซึ่งบอกว่าเป็นการกระทำแรกสุด"
+          },
+          "distractorWhy": {
+            "1": "นักเรียนคิดว่าสำนวนที่มีคำบุพบทนั้นมีความหมายเหมือนกัน ทั้งที่สำนวนดังกล่าวบอกสภาพในตอนแรกที่ภายหลังเปลี่ยนไป ไม่ใช่ขั้นตอนเปิดของวิธีทำ",
+            "2": "นักเรียนใช้คำบอกขั้นตอนปิดมาเปิดวิธีทำ ลำดับของขั้นตอนจึงกลับด้าน",
+            "3": "นักเรียนตัดสำนวนบอกลำดับให้สั้นลง ทั้งที่คำนั้นยังต้องมีคำนามหรืออนุประโยคตามมา จึงยังยืนเป็นคำบอกลำดับด้วยตัวเองไม่ได้"
+          },
+          "difficulty": "dasar"
+        },
+        {
+          "id": "eng-d7-bab3-004",
+          "prompt": "Rina writes the second step of frying rice. Which sentence is correct?",
+          "options": [
+            "Then, put the cold rice into the pan.",
+            "Then, putting the cold rice into the pan.",
+            "Then, please you put the cold rice into the pan.",
+            "Than, put the cold rice into the pan."
+          ],
+          "answer": 0,
+          "why": {
+            "0": "คำเชื่อมบอกลำดับ Then ตามด้วยประโยคคำสั่งที่มีคำกริยารูปพื้นฐานและไม่มีประธาน"
+          },
+          "distractorWhy": {
+            "1": "นักเรียนใช้รูป -ing เป็นหัวข้อของขั้นตอน ทั้งที่ขั้นตอนของวิธีทำยังต้องเป็นคำสั่งที่มีคำกริยารูปพื้นฐาน",
+            "2": "นักเรียนใส่ประธาน you เข้าไปในประโยคคำสั่ง ทั้งที่ประโยคคำสั่งภาษาอังกฤษไม่ระบุผู้กระทำ",
+            "3": "นักเรียนสลับคำสองคำที่ออกเสียงคล้ายกัน คำที่นักเรียนใช้นั้นทำหน้าที่เปรียบเทียบ ไม่ใช่บอกลำดับขั้นตอน"
+          },
+          "difficulty": "dasar"
+        },
+        {
+          "id": "eng-d7-bab3-005",
+          "prompt": "Step two says 'Fry the garlic until it is fragrant.' Which connective opens step three: '___, add the cold rice and stir it well.'",
+          "options": [
+            "After that",
+            "First of all",
+            "Finally",
+            "After"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "ขั้นตอนถัดไปที่อยู่กลางวิธีทำใช้ After that ซึ่งชี้ไปยังขั้นตอนที่เพิ่งกล่าวถึง"
+          },
+          "distractorWhy": {
+            "1": "นักเรียนใช้คำบอกขั้นตอนเปิดกับขั้นตอนที่สาม ลำดับของเรื่องจึงหายไป",
+            "2": "นักเรียนเลือกคำบอกขั้นตอนปิด ทั้งที่ยังมีขั้นตอนอื่นตามมาอีก",
+            "3": "นักเรียนตัดสำนวนบอกลำดับให้สั้นลง รูปที่เหลือยังต้องมีคำนามหรืออนุประโยคตามมา"
+          },
+          "difficulty": "sedang"
+        },
+        {
+          "id": "eng-d7-bab3-006",
+          "prompt": "Nadia writes a step for making es teh in the school kitchen. Which sentence is correct?",
+          "options": [
+            "Stir the tea until the sugar dissolves.",
+            "Stir the tea until the sugar dissolve.",
+            "Stir the tea until the sugar is dissolves.",
+            "Stir the tea until the sugar dissolved."
+          ],
+          "answer": 0,
+          "why": {
+            "0": "อนุประโยคบอกเวลาหลัง until ใช้ Simple Present และประธานเป็นบุรุษที่สามเอกพจน์ คำกริยาจึงลงท้ายด้วย -s"
+          },
+          "distractorWhy": {
+            "1": "นักเรียนลืมเติม -s ในอนุประโยค เพราะสนใจเฉพาะประโยคคำสั่งเท่านั้น",
+            "2": "นักเรียนใส่ทั้ง verb to be และคำกริยาแท้ ภาคแสดงจึงถูกทำเครื่องหมายซ้ำสองครั้ง",
+            "3": "นักเรียนใช้รูปอดีตเพราะนึกภาพขั้นตอนที่ทำเสร็จไปแล้ว ทั้งที่ข้อความแนะนำวิธีทำใช้ Simple Present เสมอ"
+          },
+          "difficulty": "sedang"
+        },
+        {
+          "id": "eng-d7-bab3-007",
+          "prompt": "Which sentence lists the ingredients of nasi goreng correctly?",
+          "options": [
+            "You need two eggs, a little salt, and some cooking oil.",
+            "You need two egg, a little salt, and some cooking oil.",
+            "You need two eggs, a few salt, and some cooking oil.",
+            "You need two eggs, a little salt, and some cooking oils."
+          ],
+          "answer": 0,
+          "why": {
+            "0": "คำนามนับได้ที่มีมากกว่าหนึ่งใช้ -s ส่วนคำนามนับไม่ได้ใช้ a little หรือ some โดยไม่เติมหน่วยคำท้ายคำ"
+          },
+          "distractorWhy": {
+            "1": "นักเรียนไม่ใส่รูปพหูพจน์เพราะคิดว่าคำบอกจำนวนเพียงพอที่จะบอกปริมาณแล้วตามความเคยชินของภาษาอินโดนีเซีย",
+            "2": "นักเรียนใช้ a few กับวัตถุดิบที่นับเป็นหน่วยไม่ได้ ทั้งที่รูปนั้นใช้กับคำนามนับได้พหูพจน์เท่านั้น",
+            "3": "นักเรียนเติมรูปพหูพจน์ให้คำนามนับไม่ได้ ทั้งที่ชื่อวัตถุดิบที่เป็นของเหลวนั้นไม่เติมท้ายแม้จะมีปริมาณมาก"
+          },
+          "difficulty": "sedang"
+        },
+        {
+          "id": "eng-d7-bab3-008",
+          "prompt": "Bagas writes the closing step of the nasi goreng recipe. Which sentence is correct?",
+          "options": [
+            "Finally, serve the fried rice on a plate while it is hot.",
+            "Finally, serving the fried rice on a plate while it is hot.",
+            "Finally, you must to serve the fried rice on a plate while it is hot.",
+            "Finally, serve the fried rice on a plate while it hot."
+          ],
+          "answer": 0,
+          "why": {
+            "0": "ขั้นตอนปิดใช้คำเชื่อม Finally ตามด้วยประโยคคำสั่ง และอนุประโยคบอกเวลาของมันยังต้องมี verb to be ก่อนคำคุณศัพท์"
+          },
+          "distractorWhy": {
+            "1": "นักเรียนใช้รูป -ing หลังคำเชื่อมบอกลำดับ ทั้งที่ขั้นตอนของวิธีทำยังต้องเป็นคำสั่งที่มีคำกริยารูปพื้นฐาน",
+            "2": "นักเรียนแทรก to หลังกริยาช่วย must ทั้งที่คำกริยาหลังกริยาช่วยอยู่ในรูปพื้นฐานเสมอ อีกทั้งขั้นตอนของวิธีทำเขียนเป็นคำสั่งก็เพียงพอแล้ว",
+            "3": "นักเรียนละ verb to be หน้าคำคุณศัพท์ เพราะประโยคบอกลักษณะในภาษาอินโดนีเซียไม่ต้องมี"
+          },
+          "difficulty": "sedang"
+        },
+        {
+          "id": "eng-d7-bab3-009",
+          "prompt": "Which safety step for the cooking practice at school is correct?",
+          "options": [
+            "Before you turn on the stove, check the gas hose.",
+            "Before you turn on the stove, checking the gas hose.",
+            "Before you turns on the stove, check the gas hose.",
+            "Before turn on the stove, check the gas hose."
+          ],
+          "answer": 0,
+          "why": {
+            "0": "อนุประโยคบอกเวลาที่ขึ้นต้นด้วย before มีประธานและคำกริยาครบถ้วน ส่วนตัวขั้นตอนเองเป็นคำสั่งที่มีคำกริยารูปพื้นฐาน"
+          },
+          "distractorWhy": {
+            "1": "นักเรียนเขียนขั้นตอนหลักด้วยรูป -ing ประโยคนั้นจึงสูญเสียความเป็นคำสั่ง",
+            "2": "นักเรียนเติม -s ที่คำกริยาซึ่งมีประธานเป็น you ทั้งที่หน่วยคำนั้นใช้กับประธานบุรุษที่สามเอกพจน์เท่านั้น",
+            "3": "นักเรียนตัดประธานออกจากอนุประโยค เพราะประโยคภาษาอินโดนีเซียยืนอยู่ได้โดยไม่ต้องเอ่ยถึงผู้กระทำ ทั้งที่หลัง before ต้องมีประธานและคำกริยา"
+          },
+          "difficulty": "sedang"
+        },
+        {
+          "id": "eng-d7-bab3-010",
+          "prompt": "Bagas arranges four steps for making es teh. Which arrangement uses the sequencing connectives correctly?",
+          "options": [
+            "First, boil the water. Next, put a tea bag into a glass. After that, add two spoons of sugar. Finally, put in some ice cubes.",
+            "Finally, boil the water. Next, put a tea bag into a glass. After that, add two spoons of sugar. First, put in some ice cubes.",
+            "First, boil the water. First, put a tea bag into a glass. First, add two spoons of sugar. First, put in some ice cubes.",
+            "First, boiling the water. Next, putting a tea bag into a glass. After that, adding two spoons of sugar. Finally, putting in some ice cubes."
+          ],
+          "answer": 0,
+          "why": {
+            "0": "คำเชื่อมบอกลำดับเคลื่อนจาก First ไป Next แล้ว After that และปิดท้ายด้วย Finally ขณะที่ทุกขั้นตอนเขียนเป็นประโยคคำสั่ง"
+          },
+          "distractorWhy": {
+            "1": "นักเรียนสลับคำบอกขั้นตอนเปิดกับคำบอกขั้นตอนปิด เพราะคิดว่าคำเชื่อมบอกลำดับเป็นเพียงเครื่องประดับ ทั้งที่คำเหล่านั้นเองเป็นตัวบอกว่าขั้นตอนใดมาก่อน",
+            "2": "นักเรียนใช้คำบอกลำดับคำเดียวซ้ำกับทุกขั้นตอน ผู้อ่านจึงไม่รู้ว่าขั้นตอนใดตามมา",
+            "3": "นักเรียนเขียนทุกขั้นตอนด้วยรูป -ing ทั้งที่ข้อความแนะนำวิธีทำต้องใช้คำกริยาคำสั่งรูปพื้นฐาน"
+          },
+          "difficulty": "tinggi"
+        },
+        {
+          "id": "eng-d7-bab3-011",
+          "prompt": "Rina joins the two closing steps of the recipe in one sentence. Which sentence is correct?",
+          "options": [
+            "Turn off the stove, and then move the fried rice to a plate.",
+            "Turn off the stove, and then moving the fried rice to a plate.",
+            "Turn off the stove, and then you moves the fried rice to a plate.",
+            "Turn off the stove, and then the fried rice move to a plate."
+          ],
+          "answer": 0,
+          "why": {
+            "0": "คำสั่งสองประโยคที่เชื่อมด้วย and then ต่างก็ยังใช้คำกริยารูปพื้นฐานและไม่มีประธาน"
+          },
+          "distractorWhy": {
+            "1": "นักเรียนเปลี่ยนคำสั่งประโยคที่สองเป็นรูป -ing ส่วนนั้นจึงไม่ขนานกับคำสั่งก่อนหน้า",
+            "2": "นักเรียนใส่ประธานพร้อมกับเติม -s ทั้งที่ประโยคคำสั่งไม่มีประธานและคำกริยาคงรูปพื้นฐาน",
+            "3": "นักเรียนวางสิ่งที่ถูกกระทำไว้หน้าคำกริยาตามความเคยชินที่เน้นสิ่งของไว้ต้นประโยคในภาษาอินโดนีเซีย ทั้งที่คำสั่งภาษาอังกฤษขึ้นต้นด้วยคำกริยาเสมอ"
+          },
+          "difficulty": "tinggi"
+        },
+        {
+          "id": "eng-d7-bab3-012",
+          "prompt": "Nadia writes the ingredient list for es teh on the whiteboard. Which line is correct?",
+          "options": [
+            "Ingredients: two glasses of water, three spoons of sugar, and one tea bag.",
+            "Ingredients: two glass of water, three spoon of sugar, and one tea bag.",
+            "Ingredients: two glasses of waters, three spoons of sugars, and one tea bag.",
+            "Ingredients: two glasses water, three spoons sugar, and one tea bag."
+          ],
+          "answer": 0,
+          "why": {
+            "0": "การบอกปริมาณเขียนด้วยคำเรียกภาชนะในรูปพหูพจน์ ตามด้วยคำว่า of แล้วจึงเป็นคำนามนับไม่ได้ซึ่งคงรูปเดิม"
+          },
+          "distractorWhy": {
+            "1": "นักเรียนไม่เติมรูปพหูพจน์ให้คำเรียกภาชนะแม้จะมีมากกว่าหนึ่ง ทั้งที่สิ่งที่นับคือแก้วและช้อน คำเหล่านั้นจึงต้องลงท้ายด้วย -s",
+            "2": "นักเรียนเติมรูปพหูพจน์ให้วัตถุดิบที่นับไม่ได้ ทั้งที่ชื่อวัตถุดิบอย่างน้ำและน้ำตาลไม่เคยรับหน่วยคำ -s",
+            "3": "นักเรียนละคำว่า of เพราะการบอกปริมาณในภาษาอินโดนีเซียวางภาชนะติดกับวัตถุดิบได้เลย ทั้งที่ภาษาอังกฤษต้องมี of คั่นกลาง"
+          },
+          "difficulty": "tinggi"
+        }
+      ]
+    },
+    {
+      "code": "KOMP-ENG-D-7-BAB5-01",
+      "grade": 7,
+      "semester": 2,
+      "name": "บทที่ 5: This is My School (นี่คือโรงเรียนของฉัน)",
+      "materi": "อาคารเรียน กิจกรรมชุมนุม การบอกทาง และคำคุณศัพท์เชิงบรรยาย",
+      "cpRef": "Kepmendikbudristek/BSKAP No. 032/H/KR/2024 — Buku Siswa English for Nusantara Kelas 7 Chapter 5",
+      "items": [
+        {
+          "id": "eng-d7-bab5-001",
+          "prompt": "Rina wants to describe her classmate Bagas. Which sentence is correct?",
+          "options": [
+            "Bagas is tall and friendly.",
+            "Bagas tall and friendly.",
+            "Bagas are tall and friendly.",
+            "Bagas is tall and friend."
+          ],
+          "answer": 0,
+          "why": {
+            "0": "ประธานบุรุษที่สามเอกพจน์ใน Simple Present ต้องใช้ verb to be รูป is และคำที่ตามมาต้องเป็นคำคุณศัพท์เพื่อบอกลักษณะของบุคคล"
+          },
+          "distractorWhy": {
+            "1": "นักเรียนละ verb to be เพราะในภาษาอินโดนีเซียประโยคที่บอกลักษณะของคนสมบูรณ์ได้โดยไม่ต้องมีคำกริยา แต่ภาษาอังกฤษยังต้องมี is",
+            "2": "นักเรียนใช้ are กับ verb to be ทุกกรณีเหมือนกันหมด ทั้งที่ are ใช้กับประธานพหูพจน์และกับ you ส่วนชื่อคนหนึ่งคนใช้ is",
+            "3": "นักเรียนใช้คำนาม friend ในตำแหน่งที่ต้องใช้คำคุณศัพท์ ทั้งที่คำที่บอกนิสัยของคนหลัง is คือคำคุณศัพท์ friendly"
+          },
+          "difficulty": "dasar"
+        },
+        {
+          "id": "eng-d7-bab5-002",
+          "prompt": "Nadia describes her classroom to a new friend. Which sentence uses the adjective correctly?",
+          "options": [
+            "We have a big classroom.",
+            "We have a classroom big.",
+            "We have a big classrooms.",
+            "We has a big classroom."
+          ],
+          "answer": 0,
+          "why": {
+            "0": "ในภาษาอังกฤษคำคุณศัพท์วางอยู่หน้าคำนามที่ถูกขยาย ลำดับจึงเป็นคำนำหน้านาม คำคุณศัพท์ แล้วจึงเป็นคำนาม"
+          },
+          "distractorWhy": {
+            "1": "นักเรียนย้ายลำดับแบบภาษาอินโดนีเซียที่วางคำคุณศัพท์ไว้หลังคำนาม ทั้งที่ภาษาอังกฤษสลับลำดับนั้น",
+            "2": "นักเรียนเติม -s ให้คำนาม ทั้งที่คำนำหน้านาม a บ่งบอกว่ามีเพียงสิ่งเดียว a กับรูปพหูพจน์จึงอยู่ด้วยกันไม่ได้",
+            "3": "นักเรียนใช้ has กับประธาน we ทั้งที่ has ใช้กับประธานบุรุษที่สามเอกพจน์เท่านั้น ส่วน we ใช้ have"
+          },
+          "difficulty": "dasar"
+        },
+        {
+          "id": "eng-d7-bab5-003",
+          "prompt": "Complete the description: 'Rina ___ long black hair and a round face.'",
+          "options": [
+            "has",
+            "have",
+            "is",
+            "haves"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "ประธานบุรุษที่สามเอกพจน์ใน Simple Present ใช้รูป has เพื่อบอกลักษณะทางกายภาพที่บุคคลนั้นมี"
+          },
+          "distractorWhy": {
+            "1": "นักเรียนใช้รูปพื้นฐาน have กับประธานทุกตัว เพราะคำกริยาภาษาอินโดนีเซียไม่เคยเปลี่ยนรูปตามผู้กระทำ",
+            "2": "นักเรียนเลือก is เพราะคิดว่าประโยคบรรยายทุกประโยคใช้คำเชื่อม ทั้งที่ลักษณะที่บุคคลมีอยู่บอกด้วย has ไม่ใช่ verb to be",
+            "3": "นักเรียนใช้กฎเติม -s กับ have อย่างเป็นกลไก ทั้งที่รูปบุรุษที่สามเอกพจน์ของคำกริยานี้เป็นรูปพิเศษคือ has"
+          },
+          "difficulty": "dasar"
+        },
+        {
+          "id": "eng-d7-bab5-004",
+          "prompt": "Bagas describes the school canteen in his writing task. Which sentence is correct?",
+          "options": [
+            "There are three tables in our canteen.",
+            "There are three table in our canteen.",
+            "There is three tables in our canteen.",
+            "There have three tables in our canteen."
+          ],
+          "answer": 0,
+          "why": {
+            "0": "คำนามนับได้ที่มีมากกว่าหนึ่งต้องลงท้ายด้วย -s และการบอกว่ามีสิ่งของพหูพจน์อยู่ใช้ there are"
+          },
+          "distractorWhy": {
+            "1": "นักเรียนไม่ใส่รูปพหูพจน์ให้คำนาม เพราะในภาษาอินโดนีเซียคำบอกจำนวนถือว่าเพียงพอที่จะบอกปริมาณแล้ว แต่ภาษาอังกฤษยังต้องเติม -s",
+            "2": "นักเรียนใช้ there is กับสิ่งของพหูพจน์ ทั้งที่รูป is ใช้กับสิ่งเดียว ส่วนโต๊ะสามตัวต้องใช้ are",
+            "3": "นักเรียนแปลคำว่า 'ada' เป็น have ทั้งที่การบอกว่ามีสิ่งของอยู่ในที่ใดที่หนึ่งใช้ there is หรือ there are"
+          },
+          "difficulty": "dasar"
+        },
+        {
+          "id": "eng-d7-bab5-005",
+          "prompt": "Bagas writes about his pet for the English class. Which sentence is correct?",
+          "options": [
+            "My cat is an animal with soft grey fur.",
+            "My cat is a animal with soft grey fur.",
+            "My cat is an animal with soft grey furs.",
+            "My cat is animal with soft grey fur."
+          ],
+          "answer": 0,
+          "why": {
+            "0": "คำนามเอกพจน์ที่ขึ้นต้นด้วยเสียงสระใช้คำนำหน้านาม an ส่วนคำนามนับไม่ได้ที่หมายถึงขนสัตว์ไม่เติมรูปพหูพจน์"
+          },
+          "distractorWhy": {
+            "1": "นักเรียนจำว่า a เป็นคำนำหน้านามของคำนามทุกคำ ทั้งที่การเลือก a หรือ an ขึ้นอยู่กับเสียงแรกของคำที่ตามมา",
+            "2": "นักเรียนเติม -s ให้คำที่หมายถึงขนสัตว์ เพราะนึกภาพว่ามีจำนวนมาก ทั้งที่คำนามนับไม่ได้ยังคงรูปเอกพจน์",
+            "3": "นักเรียนละคำนำหน้านาม เพราะภาษาอินโดนีเซียไม่มี a หรือ an ทั้งที่คำนามเอกพจน์ที่นับได้ต้องมีคำนำหน้านามเสมอ"
+          },
+          "difficulty": "sedang"
+        },
+        {
+          "id": "eng-d7-bab5-006",
+          "prompt": "Which sentence describes the new seventh graders correctly?",
+          "options": [
+            "The new students are diligent and polite.",
+            "The new students is diligent and polite.",
+            "The new students are diligents and polites.",
+            "The students new are diligent and polite."
+          ],
+          "answer": 0,
+          "why": {
+            "0": "ประธานพหูพจน์ใช้ are และคำคุณศัพท์ในภาษาอังกฤษไม่เปลี่ยนรูปตามจำนวนของคำนาม"
+          },
+          "distractorWhy": {
+            "1": "นักเรียนคิดว่ากลุ่มนักเรียนนับเป็นหน่วยเดียวจึงเลือก is ทั้งที่รูปของ verb to be ต้องตามรูปพหูพจน์ของคำนาม",
+            "2": "นักเรียนย้ายตัวบ่งชี้พหูพจน์ไปไว้ที่คำคุณศัพท์ เพราะคิดว่าทุกคำต้องสอดคล้องกันเรื่องจำนวน ทั้งที่มีเพียงคำนามเท่านั้นที่รับ -s",
+            "3": "นักเรียนวางคำคุณศัพท์ไว้หลังคำนามตามลำดับแบบภาษาอินโดนีเซีย ทั้งที่ในภาษาอังกฤษคำคุณศัพท์อยู่หน้าคำนาม"
+          },
+          "difficulty": "sedang"
+        },
+        {
+          "id": "eng-d7-bab5-007",
+          "prompt": "Rina describes the bag that belongs to Nadia. Which sentence is correct?",
+          "options": [
+            "Nadia's bag is red and small.",
+            "Nadia bag is red and small.",
+            "Nadias bag is red and small.",
+            "Nadia's bag are red and small."
+          ],
+          "answer": 0,
+          "why": {
+            "0": "ความเป็นเจ้าของของคนคนเดียวแสดงด้วยเครื่องหมายอะพอสทรอฟีและ -s ที่ชื่อของเจ้าของ และเพราะสิ่งของเป็นเอกพจน์ verb to be จึงเป็น is"
+          },
+          "distractorWhy": {
+            "1": "นักเรียนวางชื่อกับสิ่งของไว้ติดกันเฉย ๆ ตามรูปแบบการแสดงความเป็นเจ้าของของภาษาอินโดนีเซีย ทั้งที่ภาษาอังกฤษต้องมีตัวแสดงความเป็นเจ้าของที่ชื่อ",
+            "2": "นักเรียนเขียน -s โดยไม่มีอะพอสทรอฟี สิ่งที่อ่านได้จึงเป็นรูปพหูพจน์ของชื่อ ไม่ใช่การแสดงความเป็นเจ้าของ",
+            "3": "นักเรียนจับคู่ verb to be กับคำคุณศัพท์สองคำที่รู้สึกว่ามีจำนวนมาก ทั้งที่สิ่งที่กำหนดรูปของ verb to be คือประธาน ซึ่งคือกระเป๋าเพียงใบเดียว"
+          },
+          "difficulty": "sedang"
+        },
+        {
+          "id": "eng-d7-bab5-008",
+          "prompt": "Rina wants to say that her brother is not tall. Which sentence is correct?",
+          "options": [
+            "My brother is not tall.",
+            "My brother does not tall.",
+            "My brother not tall.",
+            "My brother is no tall."
+          ],
+          "answer": 0,
+          "why": {
+            "0": "ประโยคปฏิเสธที่มีคำคุณศัพท์เป็นภาคแสดงสร้างด้วย verb to be เติม not โดยไม่ต้องมีกริยาช่วยตัวอื่น"
+          },
+          "distractorWhy": {
+            "1": "นักเรียนใช้ does not เพราะคิดว่าการปฏิเสธใน Simple Present ทุกแบบต้องมี do ทั้งที่กริยาช่วยนั้นใช้เมื่อภาคแสดงเป็นคำกริยาแท้เท่านั้น",
+            "2": "นักเรียนวางคำปฏิเสธไว้หน้าคำคุณศัพท์ทันทีตามรูปแบบภาษาอินโดนีเซีย ทั้งที่ภาษาอังกฤษยังต้องมี is ก่อน not",
+            "3": "นักเรียนสลับ no กับ not ทั้งที่ no ใช้ขยายคำนาม ส่วนคำที่ปฏิเสธคำคุณศัพท์หลัง verb to be คือ not"
+          },
+          "difficulty": "sedang"
+        },
+        {
+          "id": "eng-d7-bab5-009",
+          "prompt": "Nadia describes the gate of her school. Which phrase is correct?",
+          "options": [
+            "a tall black gate",
+            "a black tall gate",
+            "a gate tall black",
+            "a tall blacks gate"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "เมื่อคำคุณศัพท์สองคำขยายสิ่งของเดียวกัน ลำดับปกติคือคำบอกขนาดมาก่อน แล้วจึงเป็นคำบอกสี"
+          },
+          "distractorWhy": {
+            "1": "นักเรียนเรียงคำคุณศัพท์ตามคำที่นึกออกก่อน ทั้งที่ภาษาอังกฤษวางคำบอกขนาดไว้หน้าคำบอกสี",
+            "2": "นักเรียนใช้รูปแบบภาษาอินโดนีเซียที่วางคำคุณศัพท์ทั้งหมดไว้หลังคำนาม",
+            "3": "นักเรียนเติม -s ให้คำคุณศัพท์บอกสี เพราะคิดว่าคำคุณศัพท์เปลี่ยนรูปตามไปด้วย ทั้งที่คำคุณศัพท์ภาษาอังกฤษคงรูปเดิมเสมอ"
+          },
+          "difficulty": "sedang"
+        },
+        {
+          "id": "eng-d7-bab5-010",
+          "prompt": "Which sentence about the girl in the school library is correct?",
+          "options": [
+            "The girl with two big books is my sister.",
+            "The girl with two big books are my sister.",
+            "The girl with two big book is my sister.",
+            "The girl with two big books she is my sister."
+          ],
+          "answer": 0,
+          "why": {
+            "0": "แกนของประธานในประโยคนี้คือคำนามเอกพจน์ที่หมายถึงเด็กผู้หญิง verb to be จึงเป็น is แม้จะมีคำพหูพจน์อยู่ในส่วนขยายก็ตาม"
+          },
+          "distractorWhy": {
+            "1": "นักเรียนจับคู่ verb to be กับคำนามพหูพจน์ที่อยู่ใกล้ที่สุด ทั้งที่สิ่งที่กำหนดรูปของ verb to be คือแกนของประธาน ไม่ใช่คำในส่วนขยาย",
+            "2": "นักเรียนลืมตัวบ่งชี้พหูพจน์หลังคำบอกจำนวน ทั้งที่คำนามนับได้ที่มีมากกว่าหนึ่งต้องลงท้ายด้วย -s",
+            "3": "นักเรียนพูดซ้ำประธานด้วยคำสรรพนามตามความเคยชินในการพูดภาษาอินโดนีเซีย ทั้งที่ภาษาอังกฤษกล่าวถึงประธานเพียงครั้งเดียว"
+          },
+          "difficulty": "tinggi"
+        },
+        {
+          "id": "eng-d7-bab5-011",
+          "prompt": "Bagas describes his habit at school. Which sentence is correct?",
+          "options": [
+            "He always wears a neat uniform on Monday.",
+            "He wears always a neat uniform on Monday.",
+            "He always wear a neat uniform on Monday.",
+            "He is always wears a neat uniform on Monday."
+          ],
+          "answer": 0,
+          "why": {
+            "0": "คำวิเศษณ์บอกความถี่อย่าง always วางอยู่หน้าคำกริยาแท้ และประธานบุรุษที่สามเอกพจน์ต้องเติม -s ที่คำกริยา"
+          },
+          "distractorWhy": {
+            "1": "นักเรียนวางคำวิเศษณ์บอกความถี่ไว้หลังคำกริยาตามตำแหน่งของคำขยายในภาษาพูด ทั้งที่ตำแหน่งของมันอยู่หน้าคำกริยาแท้",
+            "2": "นักเรียนลืมเติม -s เพราะคำกริยาภาษาอินโดนีเซียไม่เคยเปลี่ยนรูปตามประธาน",
+            "3": "นักเรียนใส่ทั้ง verb to be และคำกริยาแท้พร้อมกันเพราะแปลคำว่า 'adalah' ทั้งที่ประโยค Simple Present หนึ่งประโยคมีตัวบ่งชี้ภาคแสดงได้เพียงอย่างเดียว"
+          },
+          "difficulty": "tinggi"
+        },
+        {
+          "id": "eng-d7-bab5-012",
+          "prompt": "Rina finishes her descriptive text about her cat. Which sentence is correct?",
+          "options": [
+            "My cat is small, and its fur is very soft.",
+            "My cat is small, and it's fur is very soft.",
+            "My cat is small, and its fur are very soft.",
+            "My cat is small, and its fur very soft."
+          ],
+          "answer": 0,
+          "why": {
+            "0": "รูป its ที่ไม่มีอะพอสทรอฟีเป็นคำสรรพนามแสดงความเป็นเจ้าของ และคำนามนับไม่ได้ที่หมายถึงขนสัตว์ใช้ is"
+          },
+          "distractorWhy": {
+            "1": "นักเรียนเขียนรูปย่อของ it is เพราะออกเสียงเหมือนกัน ทั้งที่รูปที่มีอะพอสทรอฟีแปลว่า 'สิ่งนั้นคือ' ไม่ใช่ตัวแสดงความเป็นเจ้าของ",
+            "2": "นักเรียนใช้ are เพราะนึกภาพว่าขนมีจำนวนมาก ทั้งที่คำนามนับไม่ได้ถือเป็นหน่วยเดียวและใช้ is",
+            "3": "นักเรียนละ verb to be ในประโยคส่วนที่สอง เพราะประโยคบอกลักษณะในภาษาอินโดนีเซียไม่ต้องมี"
+          },
+          "difficulty": "tinggi"
+        }
+      ]
+    },
+    {
+      "code": "KOMP-ENG-D-8-BAB1-01",
+      "grade": 8,
+      "semester": 1,
+      "name": "บทที่ 1: Celebrating Independence Day (ฉลองวันประกาศเอกราช)",
+      "materi": "การเล่าเหตุการณ์ส่วนตัว อดีตกาลธรรมดา และลำดับเหตุการณ์",
+      "cpRef": "Kepmendikbudristek/BSKAP No. 032/H/KR/2024 — Buku Siswa English for Nusantara Kelas 8 Chapter 1",
+      "items": [
+        {
+          "id": "eng-d8-bab1-001",
           "prompt": "Last Saturday, our class ____ the school yard before the flag ceremony.",
           "options": [
             "cleaned",
@@ -785,7 +785,7 @@
           "difficulty": "dasar"
         },
         {
-          "id": "eng-d8-rct-002",
+          "id": "eng-d8-bab1-002",
           "prompt": "Bagas ____ to Yogyakarta with his family during the last school holiday.",
           "options": [
             "went",
@@ -805,7 +805,7 @@
           "difficulty": "dasar"
         },
         {
-          "id": "eng-d8-rct-003",
+          "id": "eng-d8-bab1-003",
           "prompt": "Nadia wrote about her study tour: 'First, we visited Candi Prambanan. ____, we had lunch near the temple. Finally, we went back to the bus.'",
           "options": [
             "After that",
@@ -825,7 +825,7 @@
           "difficulty": "dasar"
         },
         {
-          "id": "eng-d8-rct-004",
+          "id": "eng-d8-bab1-004",
           "prompt": "The weather ____ very hot when our class arrived at the campsite in Sukabumi.",
           "options": [
             "was",
@@ -845,7 +845,7 @@
           "difficulty": "dasar"
         },
         {
-          "id": "eng-d8-rct-005",
+          "id": "eng-d8-bab1-005",
           "prompt": "Did Rina ____ a speech at the Independence Day ceremony last Monday?",
           "options": [
             "give",
@@ -865,7 +865,7 @@
           "difficulty": "sedang"
         },
         {
-          "id": "eng-d8-rct-006",
+          "id": "eng-d8-bab1-006",
           "prompt": "Nadia ____ the drawing contest last year because she was ill.",
           "options": [
             "did not join",
@@ -885,7 +885,7 @@
           "difficulty": "sedang"
         },
         {
-          "id": "eng-d8-rct-007",
+          "id": "eng-d8-bab1-007",
           "prompt": "Our futsal team ____ the final match and then ____ a trophy from the headmaster.",
           "options": [
             "won ... received",
@@ -905,7 +905,7 @@
           "difficulty": "sedang"
         },
         {
-          "id": "eng-d8-rct-008",
+          "id": "eng-d8-bab1-008",
           "prompt": "Which sentence is the orientation of a recount text about a study tour?",
           "options": [
             "Last Thursday, my class and I went to Museum Fatahillah in Jakarta.",
@@ -925,7 +925,7 @@
           "difficulty": "sedang"
         },
         {
-          "id": "eng-d8-rct-009",
+          "id": "eng-d8-bab1-009",
           "prompt": "Our study tour bus left school at six o'clock and arrived at Candi Borobudur at nine o'clock. Which sentence retells this correctly?",
           "options": [
             "The bus left school three hours before it arrived at Candi Borobudur.",
@@ -945,7 +945,7 @@
           "difficulty": "sedang"
         },
         {
-          "id": "eng-d8-rct-010",
+          "id": "eng-d8-bab1-010",
           "prompt": "Read Bagas's recount: 'Last Friday, our scout club camped at Bumi Perkemahan Cibubur. We arrived at three o'clock and put up our tents. After dinner, we sat around a campfire and sang together. It started to rain at midnight, so we went into our tents and slept.' According to the text, which sentence is true?",
           "options": [
             "The students put up their tents before they had dinner.",
@@ -965,7 +965,7 @@
           "difficulty": "tinggi"
         },
         {
-          "id": "eng-d8-rct-011",
+          "id": "eng-d8-bab1-011",
           "prompt": "Bagas wrote: 'After the competition finished, we goed home and we was very tired.' Which version of the sentence is completely correct?",
           "options": [
             "After the competition finished, we went home and we were very tired.",
@@ -985,7 +985,7 @@
           "difficulty": "tinggi"
         },
         {
-          "id": "eng-d8-rct-012",
+          "id": "eng-d8-bab1-012",
           "prompt": "Which sentence from Nadia's recount about the 17 Agustus competitions is completely correct?",
           "options": [
             "Before the sack race began, Rina tied her shoes and drank a glass of water.",
@@ -1007,15 +1007,15 @@
       ]
     },
     {
-      "code": "KOMP-ENG-D-8-NAR-01",
+      "code": "KOMP-ENG-D-8-BAB2-01",
       "grade": 8,
       "semester": 1,
-      "name": "บทเล่าเรื่อง (Narrative Text): นิทานสัตว์และอดีตกาลต่อเนื่อง",
-      "materi": "การเข้าใจโครงสร้างของนิทานสัตว์ ฉากหลังที่ใช้อดีตกาลต่อเนื่อง และข้อคิดของเรื่อง",
-      "cpRef": "Kepmendikbudristek/BSKAP No. 032/H/KR/2024 — CP Bahasa Inggris Fase D, Elemen Membaca–Memirsa",
+      "name": "บทที่ 2: Kindness and Happiness (ความเมตตาและความสุข)",
+      "materi": "เรื่องเล่า นิทานสอนใจและเรื่องลูกเป็ดขี้เหร่ อดีตกาลต่อเนื่อง และข้อคิด",
+      "cpRef": "Kepmendikbudristek/BSKAP No. 032/H/KR/2024 — Buku Siswa English for Nusantara Kelas 8 Chapter 2",
       "items": [
         {
-          "id": "eng-d8-nar-001",
+          "id": "eng-d8-bab2-001",
           "prompt": "While Kancil ____ along the riverbank, he saw a hungry crocodile in the water.",
           "options": [
             "was walking",
@@ -1035,7 +1035,7 @@
           "difficulty": "dasar"
         },
         {
-          "id": "eng-d8-nar-002",
+          "id": "eng-d8-bab2-002",
           "prompt": "Which sentence is the orientation of a fable about Kancil?",
           "options": [
             "Once upon a time, a clever mouse deer lived near a wide river in Java.",
@@ -1055,7 +1055,7 @@
           "difficulty": "dasar"
         },
         {
-          "id": "eng-d8-nar-003",
+          "id": "eng-d8-bab2-003",
           "prompt": "Kancil was sleeping under a big tree ____ a hunter came quietly into the forest.",
           "options": [
             "when",
@@ -1075,7 +1075,7 @@
           "difficulty": "dasar"
         },
         {
-          "id": "eng-d8-nar-004",
+          "id": "eng-d8-bab2-004",
           "prompt": "The monkeys ____ near the river when the heavy rain started.",
           "options": [
             "were not playing",
@@ -1095,7 +1095,7 @@
           "difficulty": "dasar"
         },
         {
-          "id": "eng-d8-nar-005",
+          "id": "eng-d8-bab2-005",
           "prompt": "Read the text: 'One quiet morning, Kancil was walking beside the river. He wanted to visit his friend on the other side. Suddenly, a big crocodile came out of the water and said, \"I will eat you today.\"' Which sentence states the complication of the story?",
           "options": [
             "A big crocodile came out of the water and threatened to eat Kancil.",
@@ -1115,7 +1115,7 @@
           "difficulty": "sedang"
         },
         {
-          "id": "eng-d8-nar-006",
+          "id": "eng-d8-bab2-006",
           "prompt": "Which question about the fable is grammatically correct?",
           "options": [
             "What was Kancil doing when the crocodile appeared?",
@@ -1135,7 +1135,7 @@
           "difficulty": "sedang"
         },
         {
-          "id": "eng-d8-nar-007",
+          "id": "eng-d8-bab2-007",
           "prompt": "Read the ending: 'The crocodiles were angry, but Kancil was already standing safely on the other side. He was small, yet he used his clever mind.' What is the moral of the story?",
           "options": [
             "Clever thinking can help us solve a problem that strength cannot.",
@@ -1155,7 +1155,7 @@
           "difficulty": "sedang"
         },
         {
-          "id": "eng-d8-nar-008",
+          "id": "eng-d8-bab2-008",
           "prompt": "The clever mouse deer ____ across the crocodiles' backs and ____ the other side safely.",
           "options": [
             "ran ... reached",
@@ -1175,7 +1175,7 @@
           "difficulty": "sedang"
         },
         {
-          "id": "eng-d8-nar-009",
+          "id": "eng-d8-bab2-009",
           "prompt": "Nadia is retelling a fable. Which word best opens the sentence that introduces the problem: '____, a big storm broke the little bird's nest.'?",
           "options": [
             "Suddenly",
@@ -1195,7 +1195,7 @@
           "difficulty": "sedang"
         },
         {
-          "id": "eng-d8-nar-010",
+          "id": "eng-d8-bab2-010",
           "prompt": "Read: 'The mouse deer was drinking at the river when a tiger jumped out of the bushes. The tiger wanted to eat him, so Kancil told the tiger about a magic drum. While the tiger was hitting the drum, Kancil ran away and hid in a cave.' Which sentence states the complication?",
           "options": [
             "A tiger jumped out of the bushes and wanted to eat the mouse deer.",
@@ -1215,7 +1215,7 @@
           "difficulty": "tinggi"
         },
         {
-          "id": "eng-d8-nar-011",
+          "id": "eng-d8-bab2-011",
           "prompt": "Rina wrote: 'While the farmer was work in his rice field, his buffalo was eating young grass.' Which form corrects her mistake?",
           "options": [
             "was working",
@@ -1235,7 +1235,7 @@
           "difficulty": "tinggi"
         },
         {
-          "id": "eng-d8-nar-012",
+          "id": "eng-d8-bab2-012",
           "prompt": "Which sentence about the fable of the rabbits and the turtle is completely correct?",
           "options": [
             "While the rabbits were sleeping under the tree, the turtle passed them slowly.",
@@ -1257,15 +1257,15 @@
       ]
     },
     {
-      "code": "KOMP-ENG-D-8-DEG-01",
+      "code": "KOMP-ENG-D-8-BAB5-01",
       "grade": 8,
       "semester": 2,
-      "name": "การเปรียบเทียบขั้นของคำคุณศัพท์ (Degrees of Comparison)",
-      "materi": "การเปรียบเทียบคำคุณศัพท์: ขั้นปกติ ขั้นกว่า และขั้นสูงสุด",
-      "cpRef": "Kepmendikbudristek/BSKAP No. 032/H/KR/2024 — CP Bahasa Inggris Fase D, Elemen Menyimak–Berbicara",
+      "name": "บทที่ 5: Embrace Yourself (ยอมรับตัวเอง)",
+      "materi": "ข้อความเชิงบรรยาย การกล่าวชม และการเปรียบเทียบขั้นกว่าและขั้นสูงสุด",
+      "cpRef": "Kepmendikbudristek/BSKAP No. 032/H/KR/2024 — Buku Siswa English for Nusantara Kelas 8 Chapter 5",
       "items": [
         {
-          "id": "eng-d8-deg-001",
+          "id": "eng-d8-bab5-001",
           "prompt": "Mount Semeru is ____ than Mount Merapi.",
           "options": [
             "higher",
@@ -1285,7 +1285,7 @@
           "difficulty": "dasar"
         },
         {
-          "id": "eng-d8-deg-002",
+          "id": "eng-d8-bab5-002",
           "prompt": "Lake Toba is ____ lake in Southeast Asia.",
           "options": [
             "the largest",
@@ -1305,7 +1305,7 @@
           "difficulty": "dasar"
         },
         {
-          "id": "eng-d8-deg-003",
+          "id": "eng-d8-bab5-003",
           "prompt": "Bagas got 85 and Rina got 85 too. Bagas's score is ____ Rina's score.",
           "options": [
             "as high as",
@@ -1325,7 +1325,7 @@
           "difficulty": "dasar"
         },
         {
-          "id": "eng-d8-deg-004",
+          "id": "eng-d8-bab5-004",
           "prompt": "My English score this semester is ____ than my score last semester.",
           "options": [
             "better",
@@ -1345,7 +1345,7 @@
           "difficulty": "dasar"
         },
         {
-          "id": "eng-d8-deg-005",
+          "id": "eng-d8-bab5-005",
           "prompt": "This exercise is ____ than the one we did yesterday.",
           "options": [
             "easier",
@@ -1365,7 +1365,7 @@
           "difficulty": "sedang"
         },
         {
-          "id": "eng-d8-deg-006",
+          "id": "eng-d8-bab5-006",
           "prompt": "Candi Borobudur is ____ than the small temple near my house.",
           "options": [
             "more famous",
@@ -1385,7 +1385,7 @@
           "difficulty": "sedang"
         },
         {
-          "id": "eng-d8-deg-007",
+          "id": "eng-d8-bab5-007",
           "prompt": "Pantai Kuta is more crowded ____ Pantai Parangtritis in July.",
           "options": [
             "than",
@@ -1405,7 +1405,7 @@
           "difficulty": "sedang"
         },
         {
-          "id": "eng-d8-deg-008",
+          "id": "eng-d8-bab5-008",
           "prompt": "Rina is 150 cm tall, Nadia is 155 cm tall, and Bagas is 160 cm tall. Which sentence is true?",
           "options": [
             "Bagas is the tallest of the three students.",
@@ -1425,7 +1425,7 @@
           "difficulty": "sedang"
         },
         {
-          "id": "eng-d8-deg-009",
+          "id": "eng-d8-bab5-009",
           "prompt": "Of all the mountains our club climbed last year, Mount Rinjani was ____.",
           "options": [
             "the most difficult",
@@ -1445,7 +1445,7 @@
           "difficulty": "sedang"
         },
         {
-          "id": "eng-d8-deg-010",
+          "id": "eng-d8-bab5-010",
           "prompt": "Nadia wrote: 'Gunung Bromo is more higher than Gunung Merapi.' Which sentence corrects her mistake?",
           "options": [
             "Gunung Bromo is higher than Gunung Merapi.",
@@ -1465,7 +1465,7 @@
           "difficulty": "tinggi"
         },
         {
-          "id": "eng-d8-deg-011",
+          "id": "eng-d8-bab5-011",
           "prompt": "The school library is quieter than the canteen. Which sentence has the same meaning?",
           "options": [
             "The canteen is noisier than the library.",
@@ -1485,7 +1485,7 @@
           "difficulty": "tinggi"
         },
         {
-          "id": "eng-d8-deg-012",
+          "id": "eng-d8-bab5-012",
           "prompt": "Which sentence about Indonesian cities is completely correct?",
           "options": [
             "Jakarta is the most crowded city in Indonesia, and it is busier than Bandung.",
@@ -1507,15 +1507,15 @@
       ]
     },
     {
-      "code": "KOMP-ENG-D-9-RPT-01",
+      "code": "KOMP-ENG-D-9-BAB1-01",
       "grade": 9,
       "semester": 1,
-      "name": "ข้อความรายงาน (Report Text) และประโยคกรรม (Passive Voice)",
-      "materi": "คำอธิบายเชิงวิทยาศาสตร์ตามข้อเท็จจริงเกี่ยวกับสปีชีส์หรือปรากฏการณ์ โดยใช้ประโยคกรรม (passive voice) และปัจจุบันกาลธรรมดา (simple present)",
-      "cpRef": "Kepmendikbudristek/BSKAP No. 032/H/KR/2024 — CP Bahasa Inggris Fase D, Elemen Membaca–Memirsa",
+      "name": "บทที่ 1: Exploring Fauna of Indonesia (สำรวจสัตว์ป่าอินโดนีเซีย)",
+      "materi": "ข้อความรายงาน ลิงจมูกยาวและอุรังอุตัง ประโยคกรรมวาจก และการจำแนกทางวิทยาศาสตร์",
+      "cpRef": "Kepmendikbudristek/BSKAP No. 032/H/KR/2024 — Buku Siswa English for Nusantara Kelas 9 Chapter 1",
       "items": [
         {
-          "id": "eng-d9-rpt-001",
+          "id": "eng-d9-bab1-001",
           "prompt": "Komodo dragons ___ only on a few small islands in East Nusa Tenggara.",
           "options": [
             "are found",
@@ -1535,7 +1535,7 @@
           "difficulty": "dasar"
         },
         {
-          "id": "eng-d9-rpt-002",
+          "id": "eng-d9-bab1-002",
           "prompt": "Rafflesia arnoldii ___ the corpse flower because of its very strong smell.",
           "options": [
             "is called",
@@ -1555,7 +1555,7 @@
           "difficulty": "dasar"
         },
         {
-          "id": "eng-d9-rpt-003",
+          "id": "eng-d9-bab1-003",
           "prompt": "A report text about the orangutan usually ___ with a general classification of the animal.",
           "options": [
             "begins",
@@ -1575,7 +1575,7 @@
           "difficulty": "dasar"
         },
         {
-          "id": "eng-d9-rpt-004",
+          "id": "eng-d9-bab1-004",
           "prompt": "Which sentence best opens the general classification of a report text about the proboscis monkey?",
           "options": [
             "The proboscis monkey is a long-nosed monkey that lives in the mangrove forests of Kalimantan.",
@@ -1595,7 +1595,7 @@
           "difficulty": "dasar"
         },
         {
-          "id": "eng-d9-rpt-005",
+          "id": "eng-d9-bab1-005",
           "prompt": "Komodo dragons must ___ from poachers, so the park rangers patrol the island every day.",
           "options": [
             "be protected",
@@ -1615,7 +1615,7 @@
           "difficulty": "sedang"
         },
         {
-          "id": "eng-d9-rpt-006",
+          "id": "eng-d9-bab1-006",
           "prompt": "The Rafflesia flower ___ by Joseph Arnold and Thomas Stamford Raffles in Bengkulu in 1818.",
           "options": [
             "was discovered",
@@ -1635,7 +1635,7 @@
           "difficulty": "sedang"
         },
         {
-          "id": "eng-d9-rpt-007",
+          "id": "eng-d9-bab1-007",
           "prompt": "Active sentence: \"Rangers feed the young orangutans twice a day.\" Which sentence has the same meaning in the passive voice?",
           "options": [
             "The young orangutans are fed twice a day by the rangers.",
@@ -1655,7 +1655,7 @@
           "difficulty": "sedang"
         },
         {
-          "id": "eng-d9-rpt-008",
+          "id": "eng-d9-bab1-008",
           "prompt": "Read the paragraph. \"The bekantan, or proboscis monkey, is endemic to Borneo. It is easily recognised by its long nose and reddish-brown fur. Its food is mostly made up of young leaves and unripe fruit.\" What does the paragraph say about the food of the bekantan?",
           "options": [
             "It consists mainly of young leaves and unripe fruit.",
@@ -1675,7 +1675,7 @@
           "difficulty": "sedang"
         },
         {
-          "id": "eng-d9-rpt-009",
+          "id": "eng-d9-bab1-009",
           "prompt": "Why do writers of report texts often use the passive voice, as in \"Komodo dragons are protected by law\"?",
           "options": [
             "Because the focus is on the animal that is described, not on who does the action.",
@@ -1695,7 +1695,7 @@
           "difficulty": "sedang"
         },
         {
-          "id": "eng-d9-rpt-010",
+          "id": "eng-d9-bab1-010",
           "prompt": "Which sentence is grammatically correct for a report text about the Javan rhino?",
           "options": [
             "The Javan rhino, which is hunted for its horn, is now found only in Ujung Kulon National Park.",
@@ -1715,7 +1715,7 @@
           "difficulty": "tinggi"
         },
         {
-          "id": "eng-d9-rpt-011",
+          "id": "eng-d9-bab1-011",
           "prompt": "Since 1980, the number of Javan rhinos ___ carefully by the park rangers every year.",
           "options": [
             "has been counted",
@@ -1735,7 +1735,7 @@
           "difficulty": "tinggi"
         },
         {
-          "id": "eng-d9-rpt-012",
+          "id": "eng-d9-bab1-012",
           "prompt": "Read the paragraph. \"Rafflesia arnoldii has no leaves, stems or roots of its own. It lives on the Tetrastigma vine, from which water and nutrients are taken. The flower can only be seen for about five to seven days before it rots.\" What can be concluded about Rafflesia arnoldii?",
           "options": [
             "It depends on another plant in order to stay alive.",
@@ -1757,265 +1757,15 @@
       ]
     },
     {
-      "code": "KOMP-ENG-D-9-CND-01",
+      "code": "KOMP-ENG-D-9-BAB2-01",
       "grade": 9,
       "semester": 1,
-      "name": "ประโยคเงื่อนไขและกริยาช่วยแสดงทัศนภาวะ (Modals)",
-      "materi": "ประโยคเงื่อนไขแบบที่ 1 และแบบที่ 2 พร้อมทั้งการใช้กริยาช่วยแสดงทัศนภาวะ (modal auxiliary verbs)",
-      "cpRef": "Kepmendikbudristek/BSKAP No. 032/H/KR/2024 — CP Bahasa Inggris Fase D, Elemen Menulis–Mempresentasikan",
+      "name": "บทที่ 2: Taking Trips (การเดินทางท่องเที่ยว)",
+      "materi": "ข้อความเล่าเหตุการณ์ ประสบการณ์วันหยุดและการเดินทาง ข้อความสั้นเชิงปฏิบัติ และกลวิธีการอ่าน",
+      "cpRef": "Kepmendikbudristek/BSKAP No. 032/H/KR/2024 — Buku Siswa English for Nusantara Kelas 9 Chapter 2",
       "items": [
         {
-          "id": "eng-d9-cnd-001",
-          "prompt": "If it ___ tomorrow morning, the flag ceremony will be held in the school hall.",
-          "options": [
-            "rains",
-            "will rain",
-            "rained",
-            "rain"
-          ],
-          "answer": 0,
-          "why": {
-            "0": "ประโยคเงื่อนไขแบบที่ 1 ใช้โครงสร้าง If + ปัจจุบันกาลธรรมดา, ... will + กริยาช่องที่ 1 ประธาน it ทำให้กริยาต้องเติม -s จึงเป็น rains"
-          },
-          "distractorWhy": {
-            "1": "นักเรียนใส่ will ในอนุประโยค if เพราะรู้สึกว่าทั้งประโยคพูดถึงอนาคต",
-            "2": "นักเรียนใช้รูปอดีตเพราะคิดว่าประโยคที่ขึ้นต้นด้วย \"ถ้า\" เป็นการสมมติที่ไม่เป็นจริงเสมอ",
-            "3": "นักเรียนลืมเติม -s หลังประธาน it เพราะในภาษาอินโดนีเซียกริยาไม่เปลี่ยนรูป"
-          },
-          "difficulty": "dasar"
-        },
-        {
-          "id": "eng-d9-cnd-002",
-          "prompt": "If Rina finishes her homework early, she ___ her mother in the kitchen.",
-          "options": [
-            "will help",
-            "helps",
-            "would help",
-            "will helps"
-          ],
-          "answer": 0,
-          "why": {
-            "0": "ประโยคหลักของเงื่อนไขแบบที่ 1 ใช้ will + กริยาช่องที่ 1 โดยกริยาไม่เปลี่ยนรูป คำตอบจึงเป็น will help"
-          },
-          "distractorWhy": {
-            "1": "นักเรียนใช้ปัจจุบันกาลธรรมดาทั้งสองอนุประโยค เพราะคิดว่ารูปกริยาต้องเหมือนกันทั้งประโยค",
-            "2": "นักเรียนใช้ would ซึ่งเป็นเครื่องหมายของเงื่อนไขแบบที่ 2 ทั้งที่เงื่อนไขนี้ยังเป็นไปได้จริง",
-            "3": "นักเรียนเติม -s หลัง will เพราะติดกฎของประธานเอกพจน์ she"
-          },
-          "difficulty": "dasar"
-        },
-        {
-          "id": "eng-d9-cnd-003",
-          "prompt": "Bagas has a high fever. The school nurse gives him advice: \"You ___ stay at home and rest today.\"",
-          "options": [
-            "should",
-            "can",
-            "may",
-            "would"
-          ],
-          "answer": 0,
-          "why": {
-            "0": "การให้คำแนะนำใช้กริยาช่วย should ซึ่งมีความหมายว่าควรจะทำสิ่งนั้น"
-          },
-          "distractorWhy": {
-            "1": "นักเรียนเลือก can เพราะเข้าใจว่าการแนะนำเท่ากับการบอกความสามารถหรือโอกาส",
-            "2": "นักเรียนเลือก may เพราะคิดว่าประโยคสุภาพจากผู้ใหญ่ต้องใช้กริยาช่วยที่แสดงการอนุญาต",
-            "3": "นักเรียนเลือก would เพราะแปลคำว่า \"ควรจะ\" กับ \"จะ\" เป็นกริยาช่วยตัวเดียวกัน"
-          },
-          "difficulty": "dasar"
-        },
-        {
-          "id": "eng-d9-cnd-004",
-          "prompt": "Nadia asks her teacher politely, \"Excuse me, Ma'am. ___ I borrow the English dictionary for a moment?\"",
-          "options": [
-            "May",
-            "Must",
-            "Will",
-            "Should"
-          ],
-          "answer": 0,
-          "why": {
-            "0": "การขออนุญาตอย่างสุภาพต่อคุณครูใช้กริยาช่วย may"
-          },
-          "distractorWhy": {
-            "1": "นักเรียนเลือก must เพราะคิดว่ากริยาช่วยที่ฟังดูหนักแน่นย่อมฟังดูสุภาพไปด้วย",
-            "2": "นักเรียนเลือก will เพราะรู้สึกว่าการยืมยังไม่เกิดขึ้นจึงต้องใช้รูปอนาคต",
-            "3": "นักเรียนเลือก should เพราะเข้าใจว่ากริยาช่วยที่ใช้แนะนำนำมาขออนุญาตได้ด้วย"
-          },
-          "difficulty": "dasar"
-        },
-        {
-          "id": "eng-d9-cnd-005",
-          "prompt": "If Rina ___ in Labuan Bajo, she would visit the komodo national park every holiday.",
-          "options": [
-            "lived",
-            "lives",
-            "will live",
-            "would live"
-          ],
-          "answer": 0,
-          "why": {
-            "0": "ประโยคเงื่อนไขแบบที่ 2 บรรยายสภาพที่ไม่เป็นจริงในปัจจุบัน และใช้โครงสร้าง If + อดีตกาลธรรมดา, ... would + กริยาช่องที่ 1"
-          },
-          "distractorWhy": {
-            "1": "นักเรียนใช้ปัจจุบันกาลธรรมดาเพราะอ่านประโยคนี้เป็นความเป็นไปได้จริงแบบเงื่อนไขที่ 1",
-            "2": "นักเรียนใส่ will ในอนุประโยค if เพราะคิดว่าเงื่อนไขที่ยังไม่เกิดต้องใช้รูปอนาคตเสมอ",
-            "3": "นักเรียนคัดลอก would มาไว้ในอนุประโยค if เพราะเห็นว่ามี would อยู่ในอีกส่วนของประโยคแล้ว"
-          },
-          "difficulty": "sedang"
-        },
-        {
-          "id": "eng-d9-cnd-006",
-          "prompt": "If I ___ the chairperson of the OSIS, I would start an English club for every class.",
-          "options": [
-            "were",
-            "am",
-            "will be",
-            "would be"
-          ],
-          "answer": 0,
-          "why": {
-            "0": "ในประโยคเงื่อนไขแบบที่ 2 กริยา to be ที่ใช้คือ were กับประธานทุกตัว รวมถึงประธาน I ด้วย"
-          },
-          "distractorWhy": {
-            "1": "นักเรียนใช้ am ตามกฎ to be ของประโยคทั่วไป ทั้งที่ประโยคนี้เป็นสถานการณ์สมมติที่ไม่เป็นจริง",
-            "2": "นักเรียนใช้ will be เพราะคิดว่าการได้เป็นประธานนักเรียนเป็นแผนในอนาคตที่เกิดขึ้นได้",
-            "3": "นักเรียนใช้ would be ในอนุประโยค if ทั้งที่ would ใช้ได้เฉพาะในประโยคหลัก"
-          },
-          "difficulty": "sedang"
-        },
-        {
-          "id": "eng-d9-cnd-007",
-          "prompt": "If our school had a bigger library, more students ___ books during the long break.",
-          "options": [
-            "would borrow",
-            "will borrow",
-            "would borrowed",
-            "borrowed"
-          ],
-          "answer": 0,
-          "why": {
-            "0": "ประโยคหลักของเงื่อนไขแบบที่ 2 ใช้ would + กริยาช่องที่ 1 รูปที่ถูกต้องจึงเป็น would borrow"
-          },
-          "distractorWhy": {
-            "1": "นักเรียนใช้ will เพราะนำประโยคหลักของเงื่อนไขที่ 1 มาปนกับอนุประโยค if ของเงื่อนไขที่ 2",
-            "2": "นักเรียนเติมกริยาช่องที่ 2 หลัง would เพราะคิดว่าเครื่องหมายของอดีตต้องปรากฏในทั้งสองอนุประโยค",
-            "3": "นักเรียนใช้อดีตกาลธรรมดาในประโยคหลักเพราะเลียนแบบรูปกริยาในอนุประโยค if"
-          },
-          "difficulty": "sedang"
-        },
-        {
-          "id": "eng-d9-cnd-008",
-          "prompt": "Bagas says, \"If I had a bicycle, I would ride it to school every day.\" What does his sentence mean?",
-          "options": [
-            "Bagas does not have a bicycle at the moment.",
-            "Bagas had a bicycle when he was in primary school.",
-            "Bagas is going to buy a bicycle tomorrow morning.",
-            "Bagas rides his own bicycle to school every day."
-          ],
-          "answer": 0,
-          "why": {
-            "0": "ประโยคเงื่อนไขแบบที่ 2 บอกสภาพที่ตรงข้ามกับความจริงในปัจจุบัน ความจริงคือบากัสไม่มีจักรยาน"
-          },
-          "distractorWhy": {
-            "1": "นักเรียนอ่านคำว่า had เป็นเหตุการณ์ในอดีตที่เกิดขึ้นจริง ไม่ใช่เครื่องหมายของการสมมติ",
-            "2": "นักเรียนเข้าใจว่า would หมายถึงแผนที่จะทำในเวลาอันใกล้เสมอ",
-            "3": "นักเรียนเข้าใจว่าประโยคสมมติเล่าถึงกิจวัตรประจำวันที่เป็นจริง"
-          },
-          "difficulty": "sedang"
-        },
-        {
-          "id": "eng-d9-cnd-009",
-          "prompt": "The school rule says, \"Students ___ bring mobile phones into the examination room.\"",
-          "options": [
-            "must not",
-            "do not have to",
-            "would not",
-            "must not to"
-          ],
-          "answer": 0,
-          "why": {
-            "0": "ข้อห้ามในระเบียบโรงเรียนใช้ must not + กริยาช่องที่ 1 โดยไม่มีคำว่า to"
-          },
-          "distractorWhy": {
-            "1": "นักเรียนเข้าใจว่า \"ห้าม\" กับ \"ไม่จำเป็นต้อง\" เหมือนกัน ทั้งที่วลีนี้แปลว่าไม่ได้บังคับเท่านั้น",
-            "2": "นักเรียนใช้ would not เพราะคิดว่ารูปสุภาพย่อมเหมาะกับประโยคห้ามโดยอัตโนมัติ",
-            "3": "นักเรียนเติมคำว่า to หลังกริยาช่วย เพราะเลียนแบบโครงสร้าง have to ที่มี to อยู่จริง"
-          },
-          "difficulty": "sedang"
-        },
-        {
-          "id": "eng-d9-cnd-010",
-          "prompt": "Which sentence is a correct type 1 conditional about the futsal match?",
-          "options": [
-            "If the rain stops before three o'clock, we will continue the futsal match.",
-            "If the rain will stop before three o'clock, we will continue the futsal match.",
-            "If the rain stops before three o'clock, we would continue the futsal match.",
-            "If the rain stopped before three o'clock, we will continue the futsal match."
-          ],
-          "answer": 0,
-          "why": {
-            "0": "ประโยคเงื่อนไขแบบที่ 1 ใช้กับความเป็นไปได้ที่ยังเป็นจริงได้ และมีโครงสร้าง If + ปัจจุบันกาลธรรมดา, ... will + กริยาช่องที่ 1"
-          },
-          "distractorWhy": {
-            "1": "นักเรียนใส่ will ในอนุประโยค if เพราะคิดว่าเงื่อนไขที่พูดถึงอนาคตต้องมี will ด้วย",
-            "2": "นักเรียนจับคู่อนุประโยค if แบบที่ 1 กับประโยคหลักแบบที่ 2 ทำให้สองโครงสร้างปะปนกัน",
-            "3": "นักเรียนใช้รูปอดีตในอนุประโยค if แต่ยังใช้ will ในประโยคหลัก ทำให้กาลไม่สอดคล้องกัน"
-          },
-          "difficulty": "tinggi"
-        },
-        {
-          "id": "eng-d9-cnd-011",
-          "prompt": "Fact: Nadia is not good at swimming, so she does not join the swimming club. Which type 2 conditional expresses the same idea?",
-          "options": [
-            "If Nadia were good at swimming, she would join the swimming club.",
-            "If Nadia is good at swimming, she will join the swimming club.",
-            "If Nadia were not good at swimming, she would not join the swimming club.",
-            "If Nadia were good at swimming, she will join the swimming club."
-          ],
-          "answer": 0,
-          "why": {
-            "0": "ประโยคเงื่อนไขแบบที่ 2 กลับข้อเท็จจริง ดังนั้นข้อเท็จจริงที่เป็นปฏิเสธจึงเปลี่ยนเป็นรูปบอกเล่า ตามโครงสร้าง If + were, ... would + กริยาช่องที่ 1"
-          },
-          "distractorWhy": {
-            "1": "นักเรียนเปลี่ยนข้อเท็จจริงให้เป็นเงื่อนไขแบบที่ 1 เพราะคิดว่าเงื่อนไขนั้นยังเกิดขึ้นได้",
-            "2": "นักเรียนคัดลอกคำว่า not มาจากประโยคข้อเท็จจริง ทั้งที่เงื่อนไขแบบที่ 2 ต้องกลับข้อเท็จจริงนั้น",
-            "3": "นักเรียนใช้ were ในอนุประโยค if แต่ยังใช้ will ในประโยคหลัก ทำให้โครงสร้างไม่สอดคล้องกัน"
-          },
-          "difficulty": "tinggi"
-        },
-        {
-          "id": "eng-d9-cnd-012",
-          "prompt": "The sentence \"If I would have more free time, I would join the traditional dance club\" is incorrect. Which sentence is the correct form?",
-          "options": [
-            "If I had more free time, I would join the traditional dance club.",
-            "If I have more free time, I would join the traditional dance club.",
-            "If I would have more free time, I joined the traditional dance club.",
-            "If I had more free time, I will join the traditional dance club."
-          ],
-          "answer": 0,
-          "why": {
-            "0": "ในประโยคเงื่อนไขแบบที่ 2 คำว่า would ปรากฏได้เฉพาะในประโยคหลัก ส่วนอนุประโยค if ใช้อดีตกาลธรรมดา"
-          },
-          "distractorWhy": {
-            "1": "นักเรียนเพียงตัด would ออกจากอนุประโยค if แล้วใช้ปัจจุบันกาลธรรมดา ทำให้ชนิดของประโยคไม่สอดคล้องกัน",
-            "2": "นักเรียนเปลี่ยนประโยคหลักให้เป็นรูปอดีต ทั้งที่ส่วนที่ผิดคืออนุประโยค if ข้อผิดพลาดเดิมจึงยังคงอยู่",
-            "3": "นักเรียนแก้อนุประโยค if ถูกแล้ว แต่เปลี่ยน would ในประโยคหลักเป็น will ทำให้โครงสร้างปนกันอีกครั้ง"
-          },
-          "difficulty": "tinggi"
-        }
-      ]
-    },
-    {
-      "code": "KOMP-ENG-D-9-TXT-01",
-      "grade": 9,
-      "semester": 2,
-      "name": "ข้อความสั้นเชิงหน้าที่และกลวิธีการอ่าน",
-      "materi": "การทำความเข้าใจข้อความสั้นเชิงหน้าที่ (ประกาศ บัตรเชิญ ฉลาก ข้อความสั้น) และกลวิธีค้นหาข้อมูล",
-      "cpRef": "Kepmendikbudristek/BSKAP No. 032/H/KR/2024 — CP Bahasa Inggris Fase D, Elemen Membaca–Memirsa",
-      "items": [
-        {
-          "id": "eng-d9-txt-001",
+          "id": "eng-d9-bab2-001",
           "prompt": "Read the announcement. \"ANNOUNCEMENT. All Grade 9 students must collect their graduation photos at the administration office on Friday, 20 June, from 09.00 to 12.00. Please bring your student card.\" What is the purpose of the text?",
           "options": [
             "To tell Grade 9 students when and where to collect their graduation photos.",
@@ -2035,7 +1785,7 @@
           "difficulty": "dasar"
         },
         {
-          "id": "eng-d9-txt-002",
+          "id": "eng-d9-bab2-002",
           "prompt": "Read the notice. \"LIBRARY NOTICE. The school library will be closed on Monday, 5 May, for book stock-taking. It will reopen on Tuesday at 07.30.\" When can students use the library again?",
           "options": [
             "On Tuesday at 07.30.",
@@ -2055,7 +1805,7 @@
           "difficulty": "dasar"
         },
         {
-          "id": "eng-d9-txt-003",
+          "id": "eng-d9-bab2-003",
           "prompt": "Read the invitation. \"Dear Nadia, you are invited to the OSIS English Night. Day: Saturday, 12 October. Time: 18.30. Place: School Hall. Dress code: batik. Rina, Chairperson of OSIS.\" Who sends the invitation?",
           "options": [
             "Rina, the chairperson of the OSIS.",
@@ -2075,7 +1825,7 @@
           "difficulty": "dasar"
         },
         {
-          "id": "eng-d9-txt-004",
+          "id": "eng-d9-bab2-004",
           "prompt": "Read the label. \"MILK CHOCOLATE BAR. Keep in a cool and dry place. Best before: 12/2026. Not suitable for people with a milk allergy.\" Who should not eat this chocolate?",
           "options": [
             "People who are allergic to milk.",
@@ -2095,7 +1845,7 @@
           "difficulty": "dasar"
         },
         {
-          "id": "eng-d9-txt-005",
+          "id": "eng-d9-bab2-005",
           "prompt": "Rina only wants to know the exact starting time of the OSIS English Night on a long invitation card. Which reading strategy should she use?",
           "options": [
             "Scanning, because she is looking for one specific piece of information.",
@@ -2115,7 +1865,7 @@
           "difficulty": "sedang"
         },
         {
-          "id": "eng-d9-txt-006",
+          "id": "eng-d9-bab2-006",
           "prompt": "Read the short message. \"Hi Bagas, our group has to present the science report at 08.00 tomorrow. Please come to the lab at 07.30 so that we can check the slides first. Nadia.\" Why does Nadia ask Bagas to come at 07.30?",
           "options": [
             "So that the group has time to check the slides before the presentation.",
@@ -2135,7 +1885,7 @@
           "difficulty": "sedang"
         },
         {
-          "id": "eng-d9-txt-007",
+          "id": "eng-d9-bab2-007",
           "prompt": "Read the announcement. \"The English speech contest has been postponed to Friday, 8 September, because the school hall is being repaired.\" The word \"postponed\" is closest in meaning to ___.",
           "options": [
             "moved to a later time",
@@ -2155,7 +1905,7 @@
           "difficulty": "sedang"
         },
         {
-          "id": "eng-d9-txt-008",
+          "id": "eng-d9-bab2-008",
           "prompt": "Read the notice. \"Students who join the study tour must submit the permission letter to Mr Hadi before Wednesday. He will not accept any letter after that day.\" The word \"He\" in the second sentence refers to ___.",
           "options": [
             "Mr Hadi",
@@ -2175,7 +1925,7 @@
           "difficulty": "sedang"
         },
         {
-          "id": "eng-d9-txt-009",
+          "id": "eng-d9-bab2-009",
           "prompt": "Which information is usually NOT written in a school announcement about a coming event?",
           "options": [
             "The personal feelings of the writer about the event.",
@@ -2195,7 +1945,7 @@
           "difficulty": "sedang"
         },
         {
-          "id": "eng-d9-txt-010",
+          "id": "eng-d9-bab2-010",
           "prompt": "Read the announcement. \"CLASS MEETING 2026. The futsal final will be held on Saturday, 14 June, at 14.00 on the school field. If it rains, the match will be moved to the indoor court. Supporters may enter from 13.30.\" Which statement is true according to the text?",
           "options": [
             "Supporters may come in half an hour before the match starts.",
@@ -2215,7 +1965,7 @@
           "difficulty": "tinggi"
         },
         {
-          "id": "eng-d9-txt-011",
+          "id": "eng-d9-bab2-011",
           "prompt": "Read the invitation. \"GRADUATION DINNER for Grade 9 students and their parents. Friday, 19 June, 18.00, School Hall. Please confirm your attendance to Nadia before 15 June.\" What must a student do before 15 June?",
           "options": [
             "Tell Nadia whether he or she is coming or not.",
@@ -2235,7 +1985,7 @@
           "difficulty": "tinggi"
         },
         {
-          "id": "eng-d9-txt-012",
+          "id": "eng-d9-bab2-012",
           "prompt": "Read the notice. \"To all members of the English Club: our meeting on Thursday will start one hour earlier than usual, because the room is used for a teachers' meeting at 16.00. Our club meeting is normally from 15.00 to 16.30.\" What time will the club meeting start on Thursday?",
           "options": [
             "At 14.00.",
@@ -2251,6 +2001,256 @@
             "1": "นักเรียนใช้เวลาประชุมของครูเป็นเวลาเริ่มชมรม ทั้งที่ตัวเลขนั้นเพียงอธิบายเหตุผลของการเปลี่ยนแปลง",
             "2": "นักเรียนมองข้ามวลี one hour earlier จึงยังใช้เวลานัดหมายตามปกติ",
             "3": "นักเรียนนำเวลาเลิกประชุมมาใช้เป็นเวลาเริ่มประชุม"
+          },
+          "difficulty": "tinggi"
+        }
+      ]
+    },
+    {
+      "code": "KOMP-ENG-D-9-BAB5-01",
+      "grade": 9,
+      "semester": 2,
+      "name": "บทที่ 5: Digital Literacy and Well-being (การรู้เท่าทันดิจิทัลและสุขภาวะ)",
+      "materi": "ข้อความอภิปราย ความปลอดภัยบนสื่อสังคมออนไลน์ กริยาช่วยแสดงทัศนภาวะ และประโยคเงื่อนไข",
+      "cpRef": "Kepmendikbudristek/BSKAP No. 032/H/KR/2024 — Buku Siswa English for Nusantara Kelas 9 Chapter 5",
+      "items": [
+        {
+          "id": "eng-d9-bab5-001",
+          "prompt": "If it ___ tomorrow morning, the flag ceremony will be held in the school hall.",
+          "options": [
+            "rains",
+            "will rain",
+            "rained",
+            "rain"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "ประโยคเงื่อนไขแบบที่ 1 ใช้โครงสร้าง If + ปัจจุบันกาลธรรมดา, ... will + กริยาช่องที่ 1 ประธาน it ทำให้กริยาต้องเติม -s จึงเป็น rains"
+          },
+          "distractorWhy": {
+            "1": "นักเรียนใส่ will ในอนุประโยค if เพราะรู้สึกว่าทั้งประโยคพูดถึงอนาคต",
+            "2": "นักเรียนใช้รูปอดีตเพราะคิดว่าประโยคที่ขึ้นต้นด้วย \"ถ้า\" เป็นการสมมติที่ไม่เป็นจริงเสมอ",
+            "3": "นักเรียนลืมเติม -s หลังประธาน it เพราะในภาษาอินโดนีเซียกริยาไม่เปลี่ยนรูป"
+          },
+          "difficulty": "dasar"
+        },
+        {
+          "id": "eng-d9-bab5-002",
+          "prompt": "If Rina finishes her homework early, she ___ her mother in the kitchen.",
+          "options": [
+            "will help",
+            "helps",
+            "would help",
+            "will helps"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "ประโยคหลักของเงื่อนไขแบบที่ 1 ใช้ will + กริยาช่องที่ 1 โดยกริยาไม่เปลี่ยนรูป คำตอบจึงเป็น will help"
+          },
+          "distractorWhy": {
+            "1": "นักเรียนใช้ปัจจุบันกาลธรรมดาทั้งสองอนุประโยค เพราะคิดว่ารูปกริยาต้องเหมือนกันทั้งประโยค",
+            "2": "นักเรียนใช้ would ซึ่งเป็นเครื่องหมายของเงื่อนไขแบบที่ 2 ทั้งที่เงื่อนไขนี้ยังเป็นไปได้จริง",
+            "3": "นักเรียนเติม -s หลัง will เพราะติดกฎของประธานเอกพจน์ she"
+          },
+          "difficulty": "dasar"
+        },
+        {
+          "id": "eng-d9-bab5-003",
+          "prompt": "Bagas has a high fever. The school nurse gives him advice: \"You ___ stay at home and rest today.\"",
+          "options": [
+            "should",
+            "can",
+            "may",
+            "would"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "การให้คำแนะนำใช้กริยาช่วย should ซึ่งมีความหมายว่าควรจะทำสิ่งนั้น"
+          },
+          "distractorWhy": {
+            "1": "นักเรียนเลือก can เพราะเข้าใจว่าการแนะนำเท่ากับการบอกความสามารถหรือโอกาส",
+            "2": "นักเรียนเลือก may เพราะคิดว่าประโยคสุภาพจากผู้ใหญ่ต้องใช้กริยาช่วยที่แสดงการอนุญาต",
+            "3": "นักเรียนเลือก would เพราะแปลคำว่า \"ควรจะ\" กับ \"จะ\" เป็นกริยาช่วยตัวเดียวกัน"
+          },
+          "difficulty": "dasar"
+        },
+        {
+          "id": "eng-d9-bab5-004",
+          "prompt": "Nadia asks her teacher politely, \"Excuse me, Ma'am. ___ I borrow the English dictionary for a moment?\"",
+          "options": [
+            "May",
+            "Must",
+            "Will",
+            "Should"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "การขออนุญาตอย่างสุภาพต่อคุณครูใช้กริยาช่วย may"
+          },
+          "distractorWhy": {
+            "1": "นักเรียนเลือก must เพราะคิดว่ากริยาช่วยที่ฟังดูหนักแน่นย่อมฟังดูสุภาพไปด้วย",
+            "2": "นักเรียนเลือก will เพราะรู้สึกว่าการยืมยังไม่เกิดขึ้นจึงต้องใช้รูปอนาคต",
+            "3": "นักเรียนเลือก should เพราะเข้าใจว่ากริยาช่วยที่ใช้แนะนำนำมาขออนุญาตได้ด้วย"
+          },
+          "difficulty": "dasar"
+        },
+        {
+          "id": "eng-d9-bab5-005",
+          "prompt": "If Rina ___ in Labuan Bajo, she would visit the komodo national park every holiday.",
+          "options": [
+            "lived",
+            "lives",
+            "will live",
+            "would live"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "ประโยคเงื่อนไขแบบที่ 2 บรรยายสภาพที่ไม่เป็นจริงในปัจจุบัน และใช้โครงสร้าง If + อดีตกาลธรรมดา, ... would + กริยาช่องที่ 1"
+          },
+          "distractorWhy": {
+            "1": "นักเรียนใช้ปัจจุบันกาลธรรมดาเพราะอ่านประโยคนี้เป็นความเป็นไปได้จริงแบบเงื่อนไขที่ 1",
+            "2": "นักเรียนใส่ will ในอนุประโยค if เพราะคิดว่าเงื่อนไขที่ยังไม่เกิดต้องใช้รูปอนาคตเสมอ",
+            "3": "นักเรียนคัดลอก would มาไว้ในอนุประโยค if เพราะเห็นว่ามี would อยู่ในอีกส่วนของประโยคแล้ว"
+          },
+          "difficulty": "sedang"
+        },
+        {
+          "id": "eng-d9-bab5-006",
+          "prompt": "If I ___ the chairperson of the OSIS, I would start an English club for every class.",
+          "options": [
+            "were",
+            "am",
+            "will be",
+            "would be"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "ในประโยคเงื่อนไขแบบที่ 2 กริยา to be ที่ใช้คือ were กับประธานทุกตัว รวมถึงประธาน I ด้วย"
+          },
+          "distractorWhy": {
+            "1": "นักเรียนใช้ am ตามกฎ to be ของประโยคทั่วไป ทั้งที่ประโยคนี้เป็นสถานการณ์สมมติที่ไม่เป็นจริง",
+            "2": "นักเรียนใช้ will be เพราะคิดว่าการได้เป็นประธานนักเรียนเป็นแผนในอนาคตที่เกิดขึ้นได้",
+            "3": "นักเรียนใช้ would be ในอนุประโยค if ทั้งที่ would ใช้ได้เฉพาะในประโยคหลัก"
+          },
+          "difficulty": "sedang"
+        },
+        {
+          "id": "eng-d9-bab5-007",
+          "prompt": "If our school had a bigger library, more students ___ books during the long break.",
+          "options": [
+            "would borrow",
+            "will borrow",
+            "would borrowed",
+            "borrowed"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "ประโยคหลักของเงื่อนไขแบบที่ 2 ใช้ would + กริยาช่องที่ 1 รูปที่ถูกต้องจึงเป็น would borrow"
+          },
+          "distractorWhy": {
+            "1": "นักเรียนใช้ will เพราะนำประโยคหลักของเงื่อนไขที่ 1 มาปนกับอนุประโยค if ของเงื่อนไขที่ 2",
+            "2": "นักเรียนเติมกริยาช่องที่ 2 หลัง would เพราะคิดว่าเครื่องหมายของอดีตต้องปรากฏในทั้งสองอนุประโยค",
+            "3": "นักเรียนใช้อดีตกาลธรรมดาในประโยคหลักเพราะเลียนแบบรูปกริยาในอนุประโยค if"
+          },
+          "difficulty": "sedang"
+        },
+        {
+          "id": "eng-d9-bab5-008",
+          "prompt": "Bagas says, \"If I had a bicycle, I would ride it to school every day.\" What does his sentence mean?",
+          "options": [
+            "Bagas does not have a bicycle at the moment.",
+            "Bagas had a bicycle when he was in primary school.",
+            "Bagas is going to buy a bicycle tomorrow morning.",
+            "Bagas rides his own bicycle to school every day."
+          ],
+          "answer": 0,
+          "why": {
+            "0": "ประโยคเงื่อนไขแบบที่ 2 บอกสภาพที่ตรงข้ามกับความจริงในปัจจุบัน ความจริงคือบากัสไม่มีจักรยาน"
+          },
+          "distractorWhy": {
+            "1": "นักเรียนอ่านคำว่า had เป็นเหตุการณ์ในอดีตที่เกิดขึ้นจริง ไม่ใช่เครื่องหมายของการสมมติ",
+            "2": "นักเรียนเข้าใจว่า would หมายถึงแผนที่จะทำในเวลาอันใกล้เสมอ",
+            "3": "นักเรียนเข้าใจว่าประโยคสมมติเล่าถึงกิจวัตรประจำวันที่เป็นจริง"
+          },
+          "difficulty": "sedang"
+        },
+        {
+          "id": "eng-d9-bab5-009",
+          "prompt": "The school rule says, \"Students ___ bring mobile phones into the examination room.\"",
+          "options": [
+            "must not",
+            "do not have to",
+            "would not",
+            "must not to"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "ข้อห้ามในระเบียบโรงเรียนใช้ must not + กริยาช่องที่ 1 โดยไม่มีคำว่า to"
+          },
+          "distractorWhy": {
+            "1": "นักเรียนเข้าใจว่า \"ห้าม\" กับ \"ไม่จำเป็นต้อง\" เหมือนกัน ทั้งที่วลีนี้แปลว่าไม่ได้บังคับเท่านั้น",
+            "2": "นักเรียนใช้ would not เพราะคิดว่ารูปสุภาพย่อมเหมาะกับประโยคห้ามโดยอัตโนมัติ",
+            "3": "นักเรียนเติมคำว่า to หลังกริยาช่วย เพราะเลียนแบบโครงสร้าง have to ที่มี to อยู่จริง"
+          },
+          "difficulty": "sedang"
+        },
+        {
+          "id": "eng-d9-bab5-010",
+          "prompt": "Which sentence is a correct type 1 conditional about the futsal match?",
+          "options": [
+            "If the rain stops before three o'clock, we will continue the futsal match.",
+            "If the rain will stop before three o'clock, we will continue the futsal match.",
+            "If the rain stops before three o'clock, we would continue the futsal match.",
+            "If the rain stopped before three o'clock, we will continue the futsal match."
+          ],
+          "answer": 0,
+          "why": {
+            "0": "ประโยคเงื่อนไขแบบที่ 1 ใช้กับความเป็นไปได้ที่ยังเป็นจริงได้ และมีโครงสร้าง If + ปัจจุบันกาลธรรมดา, ... will + กริยาช่องที่ 1"
+          },
+          "distractorWhy": {
+            "1": "นักเรียนใส่ will ในอนุประโยค if เพราะคิดว่าเงื่อนไขที่พูดถึงอนาคตต้องมี will ด้วย",
+            "2": "นักเรียนจับคู่อนุประโยค if แบบที่ 1 กับประโยคหลักแบบที่ 2 ทำให้สองโครงสร้างปะปนกัน",
+            "3": "นักเรียนใช้รูปอดีตในอนุประโยค if แต่ยังใช้ will ในประโยคหลัก ทำให้กาลไม่สอดคล้องกัน"
+          },
+          "difficulty": "tinggi"
+        },
+        {
+          "id": "eng-d9-bab5-011",
+          "prompt": "Fact: Nadia is not good at swimming, so she does not join the swimming club. Which type 2 conditional expresses the same idea?",
+          "options": [
+            "If Nadia were good at swimming, she would join the swimming club.",
+            "If Nadia is good at swimming, she will join the swimming club.",
+            "If Nadia were not good at swimming, she would not join the swimming club.",
+            "If Nadia were good at swimming, she will join the swimming club."
+          ],
+          "answer": 0,
+          "why": {
+            "0": "ประโยคเงื่อนไขแบบที่ 2 กลับข้อเท็จจริง ดังนั้นข้อเท็จจริงที่เป็นปฏิเสธจึงเปลี่ยนเป็นรูปบอกเล่า ตามโครงสร้าง If + were, ... would + กริยาช่องที่ 1"
+          },
+          "distractorWhy": {
+            "1": "นักเรียนเปลี่ยนข้อเท็จจริงให้เป็นเงื่อนไขแบบที่ 1 เพราะคิดว่าเงื่อนไขนั้นยังเกิดขึ้นได้",
+            "2": "นักเรียนคัดลอกคำว่า not มาจากประโยคข้อเท็จจริง ทั้งที่เงื่อนไขแบบที่ 2 ต้องกลับข้อเท็จจริงนั้น",
+            "3": "นักเรียนใช้ were ในอนุประโยค if แต่ยังใช้ will ในประโยคหลัก ทำให้โครงสร้างไม่สอดคล้องกัน"
+          },
+          "difficulty": "tinggi"
+        },
+        {
+          "id": "eng-d9-bab5-012",
+          "prompt": "The sentence \"If I would have more free time, I would join the traditional dance club\" is incorrect. Which sentence is the correct form?",
+          "options": [
+            "If I had more free time, I would join the traditional dance club.",
+            "If I have more free time, I would join the traditional dance club.",
+            "If I would have more free time, I joined the traditional dance club.",
+            "If I had more free time, I will join the traditional dance club."
+          ],
+          "answer": 0,
+          "why": {
+            "0": "ในประโยคเงื่อนไขแบบที่ 2 คำว่า would ปรากฏได้เฉพาะในประโยคหลัก ส่วนอนุประโยค if ใช้อดีตกาลธรรมดา"
+          },
+          "distractorWhy": {
+            "1": "นักเรียนเพียงตัด would ออกจากอนุประโยค if แล้วใช้ปัจจุบันกาลธรรมดา ทำให้ชนิดของประโยคไม่สอดคล้องกัน",
+            "2": "นักเรียนเปลี่ยนประโยคหลักให้เป็นรูปอดีต ทั้งที่ส่วนที่ผิดคืออนุประโยค if ข้อผิดพลาดเดิมจึงยังคงอยู่",
+            "3": "นักเรียนแก้อนุประโยค if ถูกแล้ว แต่เปลี่ยน would ในประโยคหลักเป็น will ทำให้โครงสร้างปนกันอีกครั้ง"
           },
           "difficulty": "tinggi"
         }

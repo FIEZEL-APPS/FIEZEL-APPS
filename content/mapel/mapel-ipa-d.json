@@ -6,15 +6,15 @@
   "catatan": "Bank soal Fase D (SMP kelas 7-9) untuk jalur Kurikulum Nasional 17 Mapel di Ruang Guru. Kunci jawaban selalu di indeks 0 pada berkas sumber; pengacakan opsi terjadi saat tugas diterbitkan (shuffleOptions di features/teacher/fiezel-teacher-shell.js), jadi tidak ada penjelasan yang boleh menyebut posisi pilihan. distractorWhy adalah peta miskonsepsi yang dibaca Braincore untuk diagnosis.",
   "competencies": [
     {
-      "code": "KOMP-IPA-D-7-MET-01",
+      "code": "KOMP-IPA-D-7-BAB1-01",
       "grade": 7,
       "semester": 1,
-      "name": "Besaran, Satuan & Metode Ilmiah",
-      "materi": "Pengukuran besaran pokok dan turunan, konversi satuan SI, dan keselamatan laboratorium",
-      "cpRef": "Kepmendikbudristek/BSKAP No. 032/H/KR/2024 — CP IPA Fase D, Elemen Pemahaman IPA (Pengukuran dan Metode Ilmiah)",
+      "name": "Hakikat Ilmu Sains dan Metode Ilmiah",
+      "materi": "Laboratorium IPA & Keselamatan Kerja, Alat Ukur serta Besaran dan Satuan SI, Merancang Percobaan Ilmiah",
+      "cpRef": "Kepmendikbudristek/BSKAP No. 032/H/KR/2024 — Buku Siswa IPA Kelas 7 Bab 1",
       "items": [
         {
-          "id": "ipa-d7-met-001",
+          "id": "ipa-d7-bab1-001",
           "prompt": "Siti mengukur panjang meja praktikum di laboratorium sekolah dengan mistar dan mencatat hasilnya 120 cm. Pernyataan yang tepat tentang besaran dan satuan SI hasil pengukuran itu adalah…",
           "options": [
             "panjang termasuk besaran pokok, dan satuan SI-nya adalah meter (m)",
@@ -34,7 +34,7 @@
           "difficulty": "dasar"
         },
         {
-          "id": "ipa-d7-met-002",
+          "id": "ipa-d7-bab1-002",
           "prompt": "Seorang pedagang di pasar menimbang sekarung beras dan membaca angka 25 kg pada neracanya. Pernyataan yang benar tentang hasil pengukuran itu adalah…",
           "options": [
             "angka 25 kg menunjukkan massa beras, dan nilainya tetap meskipun beras dibawa ke puncak Gunung Rinjani",
@@ -54,7 +54,7 @@
           "difficulty": "dasar"
         },
         {
-          "id": "ipa-d7-met-003",
+          "id": "ipa-d7-bab1-003",
           "prompt": "Dodi mencatat panjang lintasan lari di lapangan sekolah 1,2 km dan lebar pita pengukur 45 mm. Bila keduanya dinyatakan dalam satuan SI, hasilnya berturut-turut adalah…",
           "options": [
             "1200 m dan 0,045 m",
@@ -74,7 +74,7 @@
           "difficulty": "dasar"
         },
         {
-          "id": "ipa-d7-met-004",
+          "id": "ipa-d7-bab1-004",
           "prompt": "Kelompok Ayu memanaskan air di dalam tabung reaksi memakai pembakar spiritus. Tindakan keselamatan kerja yang tepat saat melakukannya adalah…",
           "options": [
             "mengarahkan mulut tabung menjauhi wajah sendiri dan wajah teman sekelompok",
@@ -94,7 +94,7 @@
           "difficulty": "dasar"
         },
         {
-          "id": "ipa-d7-met-005",
+          "id": "ipa-d7-bab1-005",
           "prompt": "Sebuah batu kecil dimasukkan ke gelas ukur yang berisi 40 mL air. Permukaan air naik hingga menunjuk angka 65 mL. Volume batu itu adalah…",
           "options": [
             "25 cm³",
@@ -114,7 +114,7 @@
           "difficulty": "sedang"
         },
         {
-          "id": "ipa-d7-met-006",
+          "id": "ipa-d7-bab1-006",
           "prompt": "Sebuah balok kayu bermassa 120 g memiliki volume 150 cm³. Jika massa jenis air 1 g/cm³, massa jenis balok dan nasibnya ketika dimasukkan ke dalam air adalah…",
           "options": [
             "0,8 g/cm³ sehingga balok terapung",
@@ -134,7 +134,7 @@
           "difficulty": "sedang"
         },
         {
-          "id": "ipa-d7-met-007",
+          "id": "ipa-d7-bab1-007",
           "prompt": "Bayu menanam bibit cabai pada empat pot. Setiap pot diberi dosis pupuk yang berbeda, sedangkan jenis tanah, ukuran pot, jumlah air, dan lama penyinaran dibuat sama. Ia mengukur tinggi tanaman tiap minggu. Variabel bebas percobaan Bayu adalah…",
           "options": [
             "dosis pupuk yang diberikan pada setiap pot",
@@ -154,7 +154,7 @@
           "difficulty": "sedang"
         },
         {
-          "id": "ipa-d7-met-008",
+          "id": "ipa-d7-bab1-008",
           "prompt": "Guru meminta murid mengukur diameter bagian dalam sebuah potongan pipa PVC dengan ketelitian sampai 0,1 mm. Alat ukur yang paling tepat dipilih adalah…",
           "options": [
             "jangka sorong, karena memiliki rahang atas yang memang dirancang untuk mengukur diameter dalam",
@@ -174,7 +174,7 @@
           "difficulty": "sedang"
         },
         {
-          "id": "ipa-d7-met-009",
+          "id": "ipa-d7-bab1-009",
           "prompt": "Sebuah angkot menempuh jarak 1,8 km dalam waktu 120 sekon. Pernyataan yang benar tentang kelajuan angkot itu adalah…",
           "options": [
             "15 m/s, dan kelajuan termasuk besaran turunan dari besaran panjang dan waktu",
@@ -194,7 +194,7 @@
           "difficulty": "sedang"
         },
         {
-          "id": "ipa-d7-met-010",
+          "id": "ipa-d7-bab1-010",
           "prompt": "Rina ingin menguji pengaruh suhu air terhadap kecepatan larutnya gula. Ia menyiapkan gelas A berisi air dingin dengan satu sendok gula yang diaduk, gelas B berisi air hangat dengan dua sendok gula tanpa diaduk, dan gelas C berisi air panas dengan satu sendok gula yang diaduk. Kelemahan terbesar rancangan percobaan Rina adalah…",
           "options": [
             "pada gelas B jumlah gula dan perlakuan pengadukan ikut diubah sehingga pengaruh suhu tidak dapat disimpulkan",
@@ -214,7 +214,7 @@
           "difficulty": "tinggi"
         },
         {
-          "id": "ipa-d7-met-011",
+          "id": "ipa-d7-bab1-011",
           "prompt": "Sebuah kubus besi bersisi 2 cm memiliki massa 62,4 g, sedangkan sebuah kubus aluminium bersisi 3 cm memiliki massa 72,9 g. Benda yang massa jenisnya lebih besar adalah…",
           "options": [
             "kubus besi, karena massa jenisnya 7,8 g/cm³ sedangkan kubus aluminium 2,7 g/cm³",
@@ -234,7 +234,7 @@
           "difficulty": "tinggi"
         },
         {
-          "id": "ipa-d7-met-012",
+          "id": "ipa-d7-bab1-012",
           "prompt": "Sebuah tandon air berbentuk balok berukuran panjang 80 cm, lebar 50 cm, dan tinggi 40 cm diisi penuh air. Volume air di dalam tandon itu sama dengan…",
           "options": [
             "160 liter",
@@ -256,15 +256,15 @@
       ]
     },
     {
-      "code": "KOMP-IPA-D-7-ZAT-01",
+      "code": "KOMP-IPA-D-7-BAB2-01",
       "grade": 7,
       "semester": 1,
-      "name": "Wujud Zat, Perubahan Fisika & Kimia",
-      "materi": "Klasifikasi zat, perubahan wujud, pemisahan campuran, serta ciri perubahan fisika dan kimia",
-      "cpRef": "Kepmendikbudristek/BSKAP No. 032/H/KR/2024 — CP IPA Fase D, Elemen Pemahaman IPA (Zat dan Perubahannya)",
+      "name": "Zat dan Perubahannya",
+      "materi": "Wujud Zat, Model Partikel, Perubahan Fisika & Kimia, Kerapatan (Massa Jenis)",
+      "cpRef": "Kepmendikbudristek/BSKAP No. 032/H/KR/2024 — Buku Siswa IPA Kelas 7 Bab 2",
       "items": [
         {
-          "id": "ipa-d7-zat-001",
+          "id": "ipa-d7-bab2-001",
           "prompt": "Sebongkah es batu di dalam termos tetap berbentuk bongkahan dan volumenya tidak berubah. Susunan serta gerak partikel penyusun es batu itu adalah…",
           "options": [
             "berdekatan dan tersusun teratur, hanya bergetar di tempatnya",
@@ -284,7 +284,7 @@
           "difficulty": "dasar"
         },
         {
-          "id": "ipa-d7-zat-002",
+          "id": "ipa-d7-bab2-002",
           "prompt": "Kapur barus yang diletakkan di lemari pakaian lama-kelamaan habis dan tidak meninggalkan bekas cairan sedikit pun. Perubahan wujud yang dialami kapur barus itu adalah…",
           "options": [
             "menyublim, yaitu perubahan dari wujud padat langsung menjadi gas",
@@ -304,7 +304,7 @@
           "difficulty": "dasar"
         },
         {
-          "id": "ipa-d7-zat-003",
+          "id": "ipa-d7-bab2-003",
           "prompt": "Peristiwa yang tergolong perubahan kimia adalah…",
           "options": [
             "besi pagar sekolah berkarat setelah berkali-kali terkena air hujan",
@@ -324,7 +324,7 @@
           "difficulty": "dasar"
         },
         {
-          "id": "ipa-d7-zat-004",
+          "id": "ipa-d7-bab2-004",
           "prompt": "Warga desa menjernihkan air sungai yang keruh dengan mengalirkannya melalui lapisan kain, pasir, dan kerikil. Pernyataan yang tepat tentang cara pemisahan itu adalah…",
           "options": [
             "filtrasi, karena butiran lumpur berukuran lebih besar daripada pori penyaring sehingga tertahan",
@@ -344,7 +344,7 @@
           "difficulty": "dasar"
         },
         {
-          "id": "ipa-d7-zat-005",
+          "id": "ipa-d7-bab2-005",
           "prompt": "Ketika es dipanaskan terus-menerus, termometer menunjukkan suhu tetap 0 °C selama es masih bercampur dengan air lelehannya. Penjelasan yang benar tentang keadaan itu adalah…",
           "options": [
             "kalor yang masuk dipakai untuk memutuskan ikatan antarpartikel es, bukan untuk menaikkan suhunya",
@@ -364,7 +364,7 @@
           "difficulty": "sedang"
         },
         {
-          "id": "ipa-d7-zat-006",
+          "id": "ipa-d7-bab2-006",
           "prompt": "Petani garam di pantai memperoleh garam dengan menguapkan air laut di petak-petak tambak. Seorang murid ingin memperoleh air tawar dari air laut yang sama. Cara yang tepat adalah…",
           "options": [
             "destilasi, karena uap airnya ditampung lalu diembunkan kembali menjadi air tawar",
@@ -384,7 +384,7 @@
           "difficulty": "sedang"
         },
         {
-          "id": "ipa-d7-zat-007",
+          "id": "ipa-d7-bab2-007",
           "prompt": "Rani meneteskan cuka ke dalam gelas berisi soda kue. Muncul buih gas yang banyak dan dinding gelas terasa lebih dingin daripada sebelumnya. Kesimpulan yang tepat adalah…",
           "options": [
             "terjadi perubahan kimia, karena terbentuk zat baru berupa gas karbon dioksida",
@@ -404,7 +404,7 @@
           "difficulty": "sedang"
         },
         {
-          "id": "ipa-d7-zat-008",
+          "id": "ipa-d7-bab2-008",
           "prompt": "Kelompok zat yang seluruh anggotanya merupakan senyawa adalah…",
           "options": [
             "air (H₂O), garam dapur (NaCl), dan gula pasir (C₁₂H₂₂O₁₁)",
@@ -424,7 +424,7 @@
           "difficulty": "sedang"
         },
         {
-          "id": "ipa-d7-zat-009",
+          "id": "ipa-d7-bab2-009",
           "prompt": "Setitik tinta spidol hitam ditotolkan pada kertas saring, lalu ujung bawah kertas dicelupkan ke dalam air. Beberapa menit kemudian muncul beberapa pita warna yang berbeda pada kertas. Kesimpulan yang tepat adalah…",
           "options": [
             "tinta hitam merupakan campuran beberapa zat warna yang berbeda kelarutan dan daya rambatnya pada kertas",
@@ -444,7 +444,7 @@
           "difficulty": "sedang"
         },
         {
-          "id": "ipa-d7-zat-010",
+          "id": "ipa-d7-bab2-010",
           "prompt": "Sebuah tabel mencatat titik leleh dan titik didih empat zat pada tekanan 1 atm: zat A (−39 °C dan 357 °C), zat B (801 °C dan 1465 °C), zat C (−219 °C dan −183 °C), serta zat D (0 °C dan 100 °C). Pada suhu ruang 27 °C, zat yang berwujud gas adalah…",
           "options": [
             "zat C, karena suhu ruang sudah berada di atas titik didihnya yang −183 °C",
@@ -464,7 +464,7 @@
           "difficulty": "tinggi"
         },
         {
-          "id": "ipa-d7-zat-011",
+          "id": "ipa-d7-bab2-011",
           "prompt": "Sebatang kayu bermassa 500 g dibakar sampai habis dan abu yang tersisa hanya 20 g. Penjelasan yang benar tentang peristiwa itu adalah…",
           "options": [
             "massa seluruhnya tetap, karena sebagian besar massa kayu berubah menjadi gas karbon dioksida dan uap air yang lepas ke udara",
@@ -484,7 +484,7 @@
           "difficulty": "tinggi"
         },
         {
-          "id": "ipa-d7-zat-012",
+          "id": "ipa-d7-bab2-012",
           "prompt": "Sebuah wadah berisi campuran pasir, garam dapur, dan serbuk besi. Urutan langkah yang tepat untuk memperoleh ketiga zat itu kembali dalam keadaan terpisah adalah…",
           "options": [
             "tarik serbuk besi dengan magnet, larutkan sisanya ke dalam air lalu saring untuk memisahkan pasir, kemudian uapkan air saringannya untuk memperoleh garam",
@@ -506,15 +506,265 @@
       ]
     },
     {
-      "code": "KOMP-IPA-D-7-EKO-01",
+      "code": "KOMP-IPA-D-7-BAB3-01",
       "grade": 7,
       "semester": 2,
-      "name": "Klasifikasi Makhluk Hidup, Ekosistem & Interaksinya",
-      "materi": "Ciri dan klasifikasi makhluk hidup, rantai makanan, serta interaksi dalam ekosistem",
-      "cpRef": "Kepmendikbudristek/BSKAP No. 032/H/KR/2024 — CP IPA Fase D, Elemen Pemahaman IPA (Makhluk Hidup dan Lingkungannya)",
+      "name": "Suhu, Kalor dan Pemuaian",
+      "materi": "Suhu & Termometer, Konversi Skala Suhu, Kalor dan Perubahan Wujud, Perpindahan Kalor, Pemuaian Zat",
+      "cpRef": "Kepmendikbudristek/BSKAP No. 032/H/KR/2024 — Buku Siswa IPA Kelas 7 Bab 3",
       "items": [
         {
-          "id": "ipa-d7-eko-001",
+          "id": "ipa-d7-bab3-001",
+          "prompt": "Dinda menyentuh gagang panci logam dan air di dalamnya yang sama-sama sudah dipanaskan 10 menit. Gagang logam terasa jauh lebih panas. Penjelasan yang tepat adalah…",
+          "options": [
+            "suhu keduanya sama, tetapi logam menghantarkan kalor ke tangan jauh lebih cepat daripada air",
+            "suhu logam memang lebih tinggi karena logam menyimpan kalor lebih banyak daripada air",
+            "air tidak menerima kalor dari api karena air bukan penghantar kalor",
+            "logam memuai sehingga suhunya ikut naik melebihi suhu air"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Setelah dipanaskan bersama cukup lama, keduanya mencapai suhu yang sama. Yang berbeda adalah daya hantar: logam konduktor baik sehingga kalor mengalir cepat ke tangan, sedangkan air jauh lebih lambat menghantarkannya."
+          },
+          "distractorWhy": {
+            "1": "Murid menyamakan \"terasa panas\" dengan \"suhunya lebih tinggi\"; rasa panas pada kulit ditentukan oleh laju aliran kalor ke tangan, bukan oleh suhu benda semata.",
+            "2": "Murid mengira air tidak menerima kalor sama sekali; air jelas menerima kalor — suhunya naik — hanya saja air menghantarkan kalor jauh lebih lambat.",
+            "3": "Murid membalik hubungan sebab-akibat: pemuaian adalah akibat naiknya suhu, bukan penyebab suhu naik."
+          },
+          "difficulty": "dasar"
+        },
+        {
+          "id": "ipa-d7-bab3-002",
+          "prompt": "Suhu air panas terukur 60 °C. Berapa nilai suhu itu bila dinyatakan dalam skala Fahrenheit?",
+          "options": [
+            "140 °F",
+            "108 °F",
+            "92 °F",
+            "333 °F"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Rumusnya °F = (9/5 × °C) + 32. Maka (9/5 × 60) + 32 = 108 + 32 = 140 °F."
+          },
+          "distractorWhy": {
+            "1": "Murid mengalikan 9/5 tetapi lupa menambahkan 32, padahal titik beku air pada skala Fahrenheit adalah 32, bukan 0.",
+            "2": "Murid menambahkan 32 lebih dulu lalu keliru membagi, sehingga faktor perbandingan 9/5 tidak pernah diterapkan pada 60 °C secara utuh.",
+            "3": "Murid memakai rumus konversi ke Kelvin (60 + 273 = 333) lalu menuliskan satuannya sebagai Fahrenheit."
+          },
+          "difficulty": "dasar"
+        },
+        {
+          "id": "ipa-d7-bab3-003",
+          "prompt": "Es batu 0 °C dipanaskan terus sampai seluruhnya menjadi air. Selama proses mencair berlangsung, termometer menunjukkan angka yang tetap 0 °C. Alasannya adalah…",
+          "options": [
+            "kalor yang diberikan dipakai untuk memutus ikatan antarpartikel es, bukan untuk menaikkan suhu",
+            "es tidak menerima kalor selama mencair karena suhunya sudah berada di titik lebur",
+            "termometer tidak dapat membaca perubahan suhu pada zat yang sedang berubah wujud",
+            "kalor yang masuk langsung dilepaskan kembali ke udara dalam jumlah yang sama persis"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Kalor yang masuk saat perubahan wujud disebut kalor laten. Energinya habis dipakai untuk melepaskan susunan partikel padat menjadi cair, sehingga energi kinetik rata-rata partikel — yang terbaca sebagai suhu — belum bertambah."
+          },
+          "distractorWhy": {
+            "1": "Murid menyimpulkan dari suhu yang tetap bahwa tidak ada kalor yang masuk; kalor tetap masuk, hanya saja pekerjaannya mengubah wujud.",
+            "2": "Murid menyalahkan alat ukurnya; termometer bekerja normal dan justru sedang menunjukkan fakta yang benar.",
+            "3": "Murid membayangkan kesetimbangan dengan udara; kalau kalor masuk dan keluar sama persis, es tidak akan pernah mencair sama sekali."
+          },
+          "difficulty": "sedang"
+        },
+        {
+          "id": "ipa-d7-bab3-004",
+          "prompt": "Kaca jendela yang dipasang terlalu rapat pada bingkainya sering retak saat siang hari yang sangat panas. Peristiwa ini paling tepat dijelaskan oleh konsep…",
+          "options": [
+            "pemuaian, karena kaca bertambah ukuran saat suhunya naik tetapi tidak punya ruang untuk memuai",
+            "kalor jenis, karena kaca menyerap kalor lebih banyak daripada bingkainya",
+            "konveksi, karena udara panas di dalam ruangan mendorong permukaan kaca",
+            "perubahan wujud, karena permukaan kaca mulai melunak pada suhu siang hari"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Zat padat memuai ketika suhunya naik. Pemasangan yang terlalu rapat tidak menyediakan celah muai, sehingga kaca yang memuai tertahan bingkai dan tegangan di dalamnya memecahkan kaca."
+          },
+          "distractorWhy": {
+            "1": "Murid memakai kalor jenis untuk menjelaskan perubahan ukuran; kalor jenis menentukan seberapa cepat suhu naik, bukan seberapa besar benda memuai.",
+            "2": "Murid memindahkan perpindahan kalor pada fluida ke benda padat; konveksi tidak menghasilkan gaya sebesar itu pada kaca.",
+            "3": "Murid mengira kaca melunak; titik lebur kaca ribuan derajat di atas suhu siang hari, jadi wujudnya sama sekali tidak berubah."
+          },
+          "difficulty": "sedang"
+        },
+        {
+          "id": "ipa-d7-bab3-005",
+          "prompt": "Air sebanyak 2 kg dipanaskan dari 25 °C menjadi 75 °C. Bila kalor jenis air 4.200 J/kg°C, kalor yang diperlukan adalah…",
+          "options": [
+            "420.000 J",
+            "210.000 J",
+            "630.000 J",
+            "8.400 J"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Q = m × c × ΔT, dengan ΔT = 75 − 25 = 50 °C. Maka Q = 2 × 4.200 × 50 = 420.000 J."
+          },
+          "distractorWhy": {
+            "1": "Murid lupa mengalikan massanya, sehingga hanya menghitung 4.200 × 50 untuk 1 kg air.",
+            "2": "Murid memakai suhu akhir 75 °C sebagai ΔT alih-alih selisih suhunya, sehingga hasilnya terlalu besar.",
+            "3": "Murid hanya mengalikan massa dengan kalor jenis dan mengabaikan kenaikan suhunya sama sekali."
+          },
+          "difficulty": "sedang"
+        },
+        {
+          "id": "ipa-d7-bab3-006",
+          "prompt": "Saat memasak air, bagian air di dasar panci naik ke atas dan yang di atas turun ke bawah sehingga seluruh air ikut panas. Perpindahan kalor seperti ini disebut…",
+          "options": [
+            "konveksi, karena kalor berpindah bersama aliran zat airnya sendiri",
+            "konduksi, karena kalor merambat melalui partikel air yang tetap di tempatnya",
+            "radiasi, karena kalor dari api memancar langsung menembus air",
+            "induksi, karena panas dasar panci menular ke air tanpa sentuhan"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Pada konveksi, kalor terbawa oleh perpindahan massa zatnya. Air panas di dasar memuai, massa jenisnya turun, lalu naik; air yang lebih dingin turun menggantikannya sehingga terbentuk arus konveksi."
+          },
+          "distractorWhy": {
+            "1": "Murid tertukar dengan konduksi; pada konduksi partikel hanya bergetar di tempat dan tidak ikut berpindah, padahal soal jelas menyebut airnya naik dan turun.",
+            "2": "Murid memilih radiasi karena ada api; radiasi memang ada, tetapi yang ditanyakan adalah pemanasan merata akibat aliran air.",
+            "3": "Murid memakai istilah induksi yang bukan merupakan salah satu cara perpindahan kalor pada bahasan ini."
+          },
+          "difficulty": "sedang"
+        },
+        {
+          "id": "ipa-d7-bab3-007",
+          "prompt": "Gagang panci dan sendok sayur banyak dibuat dari kayu atau plastik tebal. Pilihan bahan itu didasarkan pada pertimbangan bahwa kayu dan plastik…",
+          "options": [
+            "merupakan isolator, sehingga menghambat aliran kalor dari panci ke tangan",
+            "memiliki suhu yang selalu lebih rendah daripada suhu ruangan di sekitarnya",
+            "tidak dapat menerima kalor sama sekali dari benda yang bersentuhan dengannya",
+            "memuai lebih besar daripada logam sehingga pegangannya terasa longgar dan aman"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Kayu dan plastik adalah isolator: daya hantar kalornya rendah, sehingga kalor dari panci merambat sangat lambat ke tangan dan pegangan tetap aman dipegang."
+          },
+          "distractorWhy": {
+            "1": "Murid mengira isolator punya suhu sendiri yang lebih rendah; suhunya akan menyesuaikan lingkungan, yang berbeda adalah laju perambatan kalornya.",
+            "2": "Murid menyamakan \"menghambat\" dengan \"tidak menerima sama sekali\"; isolator tetap menerima kalor, hanya sangat lambat.",
+            "3": "Murid mengaitkan keamanan pegangan dengan pemuaian, padahal yang menentukan aman tidaknya adalah daya hantar kalor."
+          },
+          "difficulty": "dasar"
+        },
+        {
+          "id": "ipa-d7-bab3-008",
+          "prompt": "Sebuah termometer zat cair dapat menunjukkan suhu karena raksa atau alkohol di dalamnya…",
+          "options": [
+            "memuai dan menyusut secara teratur mengikuti naik turunnya suhu",
+            "berubah warna sesuai dengan tingkat panas yang diterimanya",
+            "berpindah tempat karena didorong oleh udara panas dari luar tabung",
+            "berubah wujud menjadi gas setiap kali suhu lingkungan naik"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Prinsip kerja termometer zat cair adalah pemuaian. Volume zat cair bertambah teratur saat suhu naik dan menyusut saat suhu turun, sehingga tinggi kolomnya dapat diberi skala suhu."
+          },
+          "distractorWhy": {
+            "1": "Murid mengira termometer bekerja dengan indikator warna seperti kertas lakmus; zat cair di dalamnya tidak berubah warna sama sekali.",
+            "2": "Murid mengira ada dorongan udara luar; tabung termometer justru dibuat hampa di atas kolom agar pemuaian zat cairnya tidak terhalang.",
+            "3": "Murid mengira terjadi penguapan; kalau zat cairnya menguap, kolomnya tidak akan kembali turun saat suhu turun."
+          },
+          "difficulty": "dasar"
+        },
+        {
+          "id": "ipa-d7-bab3-009",
+          "prompt": "Rel kereta api dipasang dengan celah kecil di antara sambungannya. Bila celah itu dihilangkan, yang paling mungkin terjadi pada siang hari yang terik adalah…",
+          "options": [
+            "rel saling mendesak lalu melengkung karena pemuaian tidak punya ruang",
+            "rel menyusut sehingga sambungannya terlepas dan renggang",
+            "rel menjadi lebih dingin karena kalor tertahan di sambungan",
+            "rel tidak mengalami perubahan apa pun karena baja tidak memuai"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Baja memuai saat suhu naik. Tanpa celah muai, pertambahan panjang tiap batang rel saling mendesak dan tegangan itu dilepaskan dengan cara melengkung ke samping — persis alasan celah itu dirancang."
+          },
+          "distractorWhy": {
+            "1": "Murid membalik arah perubahan; siang hari yang terik menaikkan suhu sehingga rel memuai, bukan menyusut.",
+            "2": "Murid mengira kalor yang tertahan justru mendinginkan; kalor yang tertahan menaikkan suhu, tidak menurunkannya.",
+            "3": "Murid mengira baja tidak memuai; semua zat padat memuai, hanya besar koefisien muainya yang berbeda-beda."
+          },
+          "difficulty": "tinggi"
+        },
+        {
+          "id": "ipa-d7-bab3-010",
+          "prompt": "Dua benda bersuhu berbeda disentuhkan dan dibiarkan cukup lama. Pernyataan yang benar tentang keadaan akhirnya adalah…",
+          "options": [
+            "kalor mengalir dari benda bersuhu tinggi ke benda bersuhu rendah sampai suhu keduanya sama",
+            "kalor mengalir dari benda yang massanya lebih besar ke benda yang massanya lebih kecil",
+            "kedua benda menahan kalornya masing-masing sehingga suhunya tidak pernah berubah",
+            "benda bersuhu rendah mengalirkan dingin ke benda bersuhu tinggi sampai keduanya dingin"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Kalor selalu mengalir dari suhu tinggi ke suhu rendah. Aliran itu berhenti ketika kedua benda mencapai suhu yang sama, yaitu keadaan setimbang termal."
+          },
+          "distractorWhy": {
+            "1": "Murid mengira arah aliran kalor ditentukan massa; yang menentukan arah adalah selisih suhu, sedangkan massa hanya memengaruhi suhu akhirnya.",
+            "2": "Murid mengabaikan perpindahan kalor yang pasti terjadi saat dua benda bersuhu berbeda bersentuhan.",
+            "3": "Murid membayangkan \"dingin\" sebagai sesuatu yang mengalir; yang berpindah hanyalah kalor, dan dingin adalah keadaan ketika kalornya berkurang."
+          },
+          "difficulty": "sedang"
+        },
+        {
+          "id": "ipa-d7-bab3-011",
+          "prompt": "Pakaian basah lebih cepat kering bila dijemur di tempat berangin daripada di tempat teduh tak berangin. Penjelasan ilmiahnya adalah…",
+          "options": [
+            "angin menyingkirkan uap air di dekat kain sehingga penguapan berlangsung lebih cepat",
+            "angin menurunkan suhu kain sehingga air di dalamnya membeku lalu hilang",
+            "angin menambah massa jenis air sehingga air lebih mudah jatuh dari kain",
+            "angin menekan kain sehingga air terperas keluar seperti diperas tangan"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Penguapan melambat bila udara di sekitar kain sudah jenuh uap air. Angin terus mengganti udara jenuh itu dengan udara yang lebih kering, sehingga molekul air terus dapat meninggalkan kain."
+          },
+          "distractorWhy": {
+            "1": "Murid mengaitkan pengeringan dengan pembekuan; membeku justru membuat air tetap tinggal di kain sebagai es.",
+            "2": "Murid memakai massa jenis untuk menjelaskan penguapan, padahal air tidak jatuh menetes melainkan berubah menjadi uap.",
+            "3": "Murid membayangkan angin sebagai tekanan mekanis; tekanan angin biasa jauh terlalu kecil untuk memeras air dari serat kain."
+          },
+          "difficulty": "tinggi"
+        },
+        {
+          "id": "ipa-d7-bab3-012",
+          "prompt": "Termos air panas dibuat berdinding rangkap dengan ruang hampa di antaranya dan permukaan dalam yang mengilap. Rancangan itu bertujuan menghambat…",
+          "options": [
+            "konduksi dan konveksi oleh ruang hampa, serta radiasi oleh permukaan mengilap",
+            "radiasi oleh ruang hampa, serta konduksi oleh permukaan mengilap",
+            "pemuaian air panas agar volumenya tidak bertambah di dalam termos",
+            "perubahan wujud air panas menjadi es saat suhu udara luar turun"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Ruang hampa hampir tidak punya partikel, sehingga konduksi dan konveksi — yang keduanya butuh medium — nyaris terhenti. Permukaan mengilap memantulkan kembali radiasi kalor sehingga jalur ketiga pun ikut ditutup."
+          },
+          "distractorWhy": {
+            "1": "Murid menukar peran kedua bagian; radiasi justru tetap dapat menyeberangi ruang hampa dan yang menahannya adalah lapisan mengilap.",
+            "2": "Murid mengira termos mengurus pemuaian; tujuan termos adalah mempertahankan suhu, bukan mengatur volume air.",
+            "3": "Murid membalik fungsinya menjadi pencegah pembekuan; termos menghambat perpindahan kalor ke dua arah, dan soal ini menanyakan mekanismenya."
+          },
+          "difficulty": "tinggi"
+        }
+      ]
+    },
+    {
+      "code": "KOMP-IPA-D-7-BAB6-01",
+      "grade": 7,
+      "semester": 2,
+      "name": "Ekologi dan Keanekaragaman Hayati Indonesia",
+      "materi": "Komponen Ekosistem, Rantai & Jaring Makanan, Interaksi Antarmakhluk Hidup, Keanekaragaman Hayati Indonesia",
+      "cpRef": "Kepmendikbudristek/BSKAP No. 032/H/KR/2024 — Buku Siswa IPA Kelas 7 Bab 6",
+      "items": [
+        {
+          "id": "ipa-d7-bab6-001",
           "prompt": "Daun putri malu (Mimosa pudica) di halaman sekolah segera mengatup ketika disentuh ujung jari. Ciri makhluk hidup yang ditunjukkan peristiwa itu adalah…",
           "options": [
             "peka terhadap rangsang dari lingkungannya",
@@ -534,7 +784,7 @@
           "difficulty": "dasar"
         },
         {
-          "id": "ipa-d7-eko-002",
+          "id": "ipa-d7-bab6-002",
           "prompt": "Nama ilmiah komodo dituliskan Varanus komodoensis. Pernyataan yang benar tentang penulisan nama itu adalah…",
           "options": [
             "Varanus adalah nama genus dan komodoensis adalah penunjuk jenisnya, keduanya ditulis miring atau digarisbawahi secara terpisah",
@@ -554,7 +804,7 @@
           "difficulty": "dasar"
         },
         {
-          "id": "ipa-d7-eko-003",
+          "id": "ipa-d7-bab6-003",
           "prompt": "Pada rantai makanan di sawah, padi dimakan belalang, belalang dimangsa katak, dan katak dimangsa ular sawah. Kedudukan katak dalam rantai makanan itu adalah…",
           "options": [
             "konsumen tingkat II, karena memangsa belalang yang merupakan pemakan tumbuhan",
@@ -574,7 +824,7 @@
           "difficulty": "dasar"
         },
         {
-          "id": "ipa-d7-eko-004",
+          "id": "ipa-d7-bab6-004",
           "prompt": "Di ekosistem sawah terdapat padi, belalang, cacing tanah, air irigasi, lumpur, dan sinar matahari. Kelompok yang seluruh anggotanya merupakan komponen abiotik adalah…",
           "options": [
             "air irigasi, lumpur, dan sinar matahari",
@@ -594,7 +844,7 @@
           "difficulty": "dasar"
         },
         {
-          "id": "ipa-d7-eko-005",
+          "id": "ipa-d7-bab6-005",
           "prompt": "Rafflesia arnoldii tumbuh menempel pada akar tumbuhan inang Tetrastigma dan menyerap air serta zat makanan dari tubuh inangnya. Interaksi antara keduanya tergolong…",
           "options": [
             "parasitisme, karena rafflesia diuntungkan sedangkan tumbuhan inangnya dirugikan",
@@ -614,7 +864,7 @@
           "difficulty": "sedang"
         },
         {
-          "id": "ipa-d7-eko-006",
+          "id": "ipa-d7-bab6-006",
           "prompt": "Petani di sebuah desa memburu habis ular sawah karena takut digigit. Beberapa bulan kemudian, dampak yang paling mungkin terjadi pada sawah mereka adalah…",
           "options": [
             "populasi tikus melonjak sehingga hasil panen padi menurun",
@@ -634,7 +884,7 @@
           "difficulty": "sedang"
         },
         {
-          "id": "ipa-d7-eko-007",
+          "id": "ipa-d7-bab6-007",
           "prompt": "Bekantan, lumba-lumba, dan kelelawar ditempatkan dalam satu kelas yang sama meskipun tempat hidupnya sangat berbeda. Ciri yang menjadi dasar pengelompokan itu adalah…",
           "options": [
             "ketiganya melahirkan anak dan menyusuinya dengan kelenjar susu",
@@ -654,7 +904,7 @@
           "difficulty": "sedang"
         },
         {
-          "id": "ipa-d7-eko-008",
+          "id": "ipa-d7-bab6-008",
           "prompt": "Perhatikan kunci determinasi berikut. 1a. Tubuh ditutupi bulu, lanjut ke nomor 2; 1b. Tubuh tidak ditutupi bulu, lanjut ke nomor 3; 2a. Jari kaki berselaput, yaitu itik; 2b. Jari kaki tidak berselaput, yaitu ayam; 3a. Tubuh ditutupi rambut, yaitu kucing; 3b. Tubuh ditutupi sisik kering, yaitu cicak. Urutan kunci yang menuntun pada cicak adalah…",
           "options": [
             "1b – 3b",
@@ -674,7 +924,7 @@
           "difficulty": "sedang"
         },
         {
-          "id": "ipa-d7-eko-009",
+          "id": "ipa-d7-bab6-009",
           "prompt": "Di ekosistem sawah, jumlah elang jauh lebih sedikit daripada jumlah belalang. Penjelasan ekologis yang tepat untuk keadaan itu adalah…",
           "options": [
             "energi menyusut pada setiap tingkat trofik sehingga hanya sedikit energi yang tersisa untuk menghidupi pemangsa di tingkat atas",
@@ -694,7 +944,7 @@
           "difficulty": "sedang"
         },
         {
-          "id": "ipa-d7-eko-010",
+          "id": "ipa-d7-bab6-010",
           "prompt": "Pestisida disemprotkan bertahun-tahun di sebuah kawasan persawahan. Pemeriksaan kemudian menunjukkan kadar residu pestisida tertinggi justru terdapat pada tubuh elang, jauh melampaui kadarnya pada padi. Penjelasan yang tepat adalah…",
           "options": [
             "residu pestisida semakin pekat pada setiap tingkat trofik, karena seekor elang memakan banyak mangsa yang tubuhnya sudah tercemar",
@@ -714,7 +964,7 @@
           "difficulty": "tinggi"
         },
         {
-          "id": "ipa-d7-eko-011",
+          "id": "ipa-d7-bab6-011",
           "prompt": "Permukaan sebuah danau tertutup rapat oleh hamparan eceng gondok. Beberapa minggu kemudian banyak ikan ditemukan mati. Rangkaian sebab akibat yang paling tepat adalah…",
           "options": [
             "cahaya matahari terhalang sehingga tumbuhan air di bawah permukaan berkurang, kadar oksigen terlarut menurun, lalu ikan kekurangan oksigen",
@@ -734,7 +984,7 @@
           "difficulty": "tinggi"
         },
         {
-          "id": "ipa-d7-eko-012",
+          "id": "ipa-d7-bab6-012",
           "prompt": "Paus biru dan hiu sama-sama hidup di laut dan bertubuh menyerupai torpedo, tetapi keduanya digolongkan ke dalam kelas yang berbeda. Alasan ilmiah yang tepat adalah…",
           "options": [
             "paus bernapas dengan paru-paru dan menyusui anaknya sedangkan hiu bernapas dengan insang, sebab penggolongan bersandar pada ciri tubuh dan bukan pada tempat hidup",
@@ -756,15 +1006,15 @@
       ]
     },
     {
-      "code": "KOMP-IPA-D-8-SEL-01",
+      "code": "KOMP-IPA-D-8-BAB1-01",
       "grade": 8,
       "semester": 1,
-      "name": "Sel, Jaringan & Sistem Organ Manusia",
-      "materi": "Struktur sel hewan dan tumbuhan, mikroskop, serta organ pencernaan, respirasi, dan ekskresi",
-      "cpRef": "Kepmendikbudristek/BSKAP No. 032/H/KR/2024 — CP IPA Fase D, Elemen Pemahaman IPA (Makhluk Hidup dan Lingkungannya)",
+      "name": "Pengenalan Sel, Jaringan, dan Organ",
+      "materi": "Struktur Sel Hewan & Tumbuhan, Mikroskop, Jaringan, Organ, dan Sistem Organ",
+      "cpRef": "Kepmendikbudristek/BSKAP No. 032/H/KR/2024 — Buku Siswa IPA Kelas 8 Bab 1",
       "items": [
         {
-          "id": "ipa-d8-sel-001",
+          "id": "ipa-d8-bab1-001",
           "prompt": "Doni mengamati sayatan daun Rhoeo discolor dan olesan sel epitel pipinya sendiri di laboratorium sekolah. Ia menemukan satu bagian kaku yang hanya dimiliki sel daun. Bagian yang dimaksud adalah…",
           "options": [
             "dinding sel yang tersusun dari selulosa",
@@ -784,7 +1034,7 @@
           "difficulty": "dasar"
         },
         {
-          "id": "ipa-d8-sel-002",
+          "id": "ipa-d8-bab1-002",
           "prompt": "Sinta memasang lensa okuler berperbesaran 10 kali dan lensa objektif berperbesaran 40 kali pada mikroskop cahaya sekolah. Perbesaran bayangan preparat yang ia amati adalah…",
           "options": [
             "400 kali",
@@ -804,7 +1054,7 @@
           "difficulty": "dasar"
         },
         {
-          "id": "ipa-d8-sel-003",
+          "id": "ipa-d8-bab1-003",
           "prompt": "Getah lambung manusia mengandung asam klorida dan enzim pepsin. Peran enzim pepsin dalam proses pencernaan adalah…",
           "options": [
             "memecah protein menjadi molekul yang lebih kecil berupa pepton",
@@ -824,7 +1074,7 @@
           "difficulty": "dasar"
         },
         {
-          "id": "ipa-d8-sel-004",
+          "id": "ipa-d8-bab1-004",
           "prompt": "Rani berolahraga di lapangan sekolah pada siang hari dan tubuhnya banyak mengeluarkan keringat. Organ ekskresi yang bekerja beserta zat sisa yang dikeluarkannya adalah…",
           "options": [
             "kulit, mengeluarkan keringat yang berisi air, garam mineral, dan sedikit urea",
@@ -844,7 +1094,7 @@
           "difficulty": "dasar"
         },
         {
-          "id": "ipa-d8-sel-005",
+          "id": "ipa-d8-bab1-005",
           "prompt": "Bagas menaruh potongan kertas bertuliskan huruf 'd' sebagai preparat di bawah mikroskop cahaya, lalu menggeser preparat itu ke kanan. Bentuk bayangan dan arah geraknya di medan pandang adalah…",
           "options": [
             "berbentuk 'p' dan bergerak ke kiri",
@@ -864,7 +1114,7 @@
           "difficulty": "sedang"
         },
         {
-          "id": "ipa-d8-sel-006",
+          "id": "ipa-d8-bab1-006",
           "prompt": "Dinding usus halus manusia berlipat-lipat dan permukaannya dipenuhi jonjot usus (vili). Keuntungan susunan itu bagi tubuh adalah…",
           "options": [
             "memperluas bidang penyerapan sehingga lebih banyak sari makanan masuk ke pembuluh darah dan pembuluh getah bening",
@@ -884,7 +1134,7 @@
           "difficulty": "sedang"
         },
         {
-          "id": "ipa-d8-sel-007",
+          "id": "ipa-d8-bab1-007",
           "prompt": "Pada pernapasan dada, otot antartulang rusuk bagian luar berkontraksi ketika seseorang menarik napas. Urutan perubahan yang terjadi sesudahnya adalah…",
           "options": [
             "tulang rusuk terangkat, rongga dada membesar, tekanan udara dalam paru-paru mengecil, udara luar masuk",
@@ -904,7 +1154,7 @@
           "difficulty": "sedang"
         },
         {
-          "id": "ipa-d8-sel-008",
+          "id": "ipa-d8-bab1-008",
           "prompt": "Hasil pemeriksaan urin seorang pasien di puskesmas menunjukkan adanya glukosa. Bagian nefron yang paling mungkin mengalami gangguan adalah…",
           "options": [
             "tubulus kontortus proksimal, tempat glukosa seharusnya diserap kembali ke pembuluh darah",
@@ -924,7 +1174,7 @@
           "difficulty": "sedang"
         },
         {
-          "id": "ipa-d8-sel-009",
+          "id": "ipa-d8-bab1-009",
           "prompt": "Sayatan daun Rhoeo discolor yang sedang diamati di bawah mikroskop ditetesi larutan garam pekat. Sitoplasmanya tampak mengerut menjauhi dinding sel. Peristiwa itu terjadi karena…",
           "options": [
             "air keluar dari sel menuju larutan yang lebih pekat melalui membran sel yang bersifat selektif permeabel",
@@ -944,7 +1194,7 @@
           "difficulty": "sedang"
         },
         {
-          "id": "ipa-d8-sel-010",
+          "id": "ipa-d8-bab1-010",
           "prompt": "Sekelompok murid menguji satu bahan makanan di laboratorium. Ditetesi lugol bahan itu berubah menjadi biru kehitaman, ditetesi biuret warnanya tidak menjadi ungu, dan ketika digosokkan pada kertas buram tidak meninggalkan noda transparan. Kesimpulan yang tepat adalah…",
           "options": [
             "bahan itu mengandung amilum, tetapi tidak mengandung protein maupun lemak",
@@ -964,7 +1214,7 @@
           "difficulty": "tinggi"
         },
         {
-          "id": "ipa-d8-sel-011",
+          "id": "ipa-d8-bab1-011",
           "prompt": "Dari percobaan sederhana di kelas diketahui volume tidal seorang murid 500 mL, volume cadangan inspirasi 1.500 mL, volume cadangan ekspirasi 1.500 mL, dan volume residu 1.200 mL. Kapasitas vital paru-paru murid tersebut adalah…",
           "options": [
             "3.500 mL",
@@ -984,7 +1234,7 @@
           "difficulty": "tinggi"
         },
         {
-          "id": "ipa-d8-sel-012",
+          "id": "ipa-d8-bab1-012",
           "prompt": "Seorang pasien mengalami penyumbatan saluran empedu. Fesesnya menjadi pucat dan pencernaan lemaknya terganggu. Penjelasan yang tepat mengenai peran hati pada kasus itu adalah…",
           "options": [
             "hati menghasilkan empedu yang mengemulsikan lemak sekaligus membuang zat sisa perombakan sel darah merah yang memberi warna pada feses",
@@ -1006,15 +1256,15 @@
       ]
     },
     {
-      "code": "KOMP-IPA-D-8-GET-01",
+      "code": "KOMP-IPA-D-8-BAB4-01",
       "grade": 8,
-      "semester": 1,
-      "name": "Getaran, Gelombang, Bunyi & Cahaya",
-      "materi": "Karakteristik getaran dan gelombang, sifat bunyi, pemantulan dan pembiasan cahaya, serta alat optik sederhana",
-      "cpRef": "Kepmendikbudristek/BSKAP No. 032/H/KR/2024 — CP IPA Fase D, Elemen Pemahaman IPA (Energi dan Perubahannya)",
+      "semester": 2,
+      "name": "Getaran, Gelombang, dan Cahaya",
+      "materi": "Getaran & Periode, Gelombang Transversal-Longitudinal, Bunyi, Pemantulan & Pembiasan Cahaya",
+      "cpRef": "Kepmendikbudristek/BSKAP No. 032/H/KR/2024 — Buku Siswa IPA Kelas 8 Bab 4",
       "items": [
         {
-          "id": "ipa-d8-get-001",
+          "id": "ipa-d8-bab4-001",
           "prompt": "Sebuah bandul sederhana di laboratorium sekolah melakukan 50 getaran penuh selama 10 sekon. Frekuensi getaran bandul itu adalah…",
           "options": [
             "5 Hz",
@@ -1034,7 +1284,7 @@
           "difficulty": "dasar"
         },
         {
-          "id": "ipa-d8-get-002",
+          "id": "ipa-d8-bab4-002",
           "prompt": "Sebuah senar gitar dipetik dan bergetar dengan frekuensi 250 Hz. Periode getaran senar tersebut adalah…",
           "options": [
             "0,004 sekon",
@@ -1054,7 +1304,7 @@
           "difficulty": "dasar"
         },
         {
-          "id": "ipa-d8-get-003",
+          "id": "ipa-d8-bab4-003",
           "prompt": "Dua astronaut yang berdampingan di luar pesawat antariksa tidak dapat saling mendengar suara meskipun berteriak, sehingga harus memakai radio. Alasan ilmiahnya adalah…",
           "options": [
             "bunyi adalah gelombang mekanik yang memerlukan medium perantara, sedangkan ruang hampa tidak memiliki partikel untuk merambatkan getaran",
@@ -1074,7 +1324,7 @@
           "difficulty": "dasar"
         },
         {
-          "id": "ipa-d8-get-004",
+          "id": "ipa-d8-bab4-004",
           "prompt": "Nina berdiri tepat 60 cm di depan sebuah cermin datar di kamarnya. Sifat bayangan Nina beserta letaknya adalah…",
           "options": [
             "maya, tegak, sama besar, dan berada 60 cm di belakang cermin",
@@ -1094,7 +1344,7 @@
           "difficulty": "dasar"
         },
         {
-          "id": "ipa-d8-get-005",
+          "id": "ipa-d8-bab4-005",
           "prompt": "Riak gelombang di permukaan kolam sekolah memiliki panjang gelombang 0,5 m dan frekuensi 4 Hz. Cepat rambat gelombang di permukaan kolam itu adalah…",
           "options": [
             "2 m/s",
@@ -1114,7 +1364,7 @@
           "difficulty": "sedang"
         },
         {
-          "id": "ipa-d8-get-006",
+          "id": "ipa-d8-bab4-006",
           "prompt": "Pada seutas tali yang digetarkan terbentuk 4 bukit dan 4 lembah gelombang selama 2 sekon, sedangkan jarak antara dua puncak berurutan terukur 40 cm. Cepat rambat gelombang pada tali itu adalah…",
           "options": [
             "0,8 m/s",
@@ -1134,7 +1384,7 @@
           "difficulty": "sedang"
         },
         {
-          "id": "ipa-d8-get-007",
+          "id": "ipa-d8-bab4-007",
           "prompt": "Sebuah kapal survei memancarkan bunyi ke dasar laut dan menerima bunyi pantulnya 0,4 sekon kemudian. Bila cepat rambat bunyi di air laut 1.500 m/s, kedalaman laut di titik itu adalah…",
           "options": [
             "300 m",
@@ -1154,7 +1404,7 @@
           "difficulty": "sedang"
         },
         {
-          "id": "ipa-d8-get-008",
+          "id": "ipa-d8-bab4-008",
           "prompt": "Di sanggar karawitan, satu bilah gender dipukul dan bilah lain di dekatnya ikut bergetar serta berbunyi meskipun tidak ikut dipukul. Syarat utama agar peristiwa itu terjadi adalah…",
           "options": [
             "frekuensi alami bilah yang ikut bergetar sama dengan frekuensi bilah yang dipukul",
@@ -1174,7 +1424,7 @@
           "difficulty": "sedang"
         },
         {
-          "id": "ipa-d8-get-009",
+          "id": "ipa-d8-bab4-009",
           "prompt": "Sebatang pensil yang dimasukkan miring ke dalam gelas berisi air tampak patah tepat di permukaan air. Penjelasan yang benar mengenai peristiwa itu adalah…",
           "options": [
             "cahaya dari pensil dibelokkan ketika melewati batas antara air dan udara yang berbeda kerapatan optiknya",
@@ -1194,7 +1444,7 @@
           "difficulty": "sedang"
         },
         {
-          "id": "ipa-d8-get-010",
+          "id": "ipa-d8-bab4-010",
           "prompt": "Sebuah benda diletakkan 15 cm di depan cermin cekung yang jarak fokusnya 10 cm. Jarak bayangan yang terbentuk dari cermin adalah…",
           "options": [
             "30 cm",
@@ -1214,7 +1464,7 @@
           "difficulty": "tinggi"
         },
         {
-          "id": "ipa-d8-get-011",
+          "id": "ipa-d8-bab4-011",
           "prompt": "Seorang murid tidak dapat membaca tulisan di papan tulis dengan jelas. Pemeriksaan menunjukkan titik jauh matanya hanya 50 cm. Kuat dan jenis lensa kacamata yang ia perlukan adalah…",
           "options": [
             "−2 dioptri berupa lensa cekung",
@@ -1234,7 +1484,7 @@
           "difficulty": "tinggi"
         },
         {
-          "id": "ipa-d8-get-012",
+          "id": "ipa-d8-bab4-012",
           "prompt": "Andi memetik senar gitarnya lebih keras daripada biasanya, kemudian ia menekan senar itu pada fret yang lebih tinggi sehingga bagian senar yang bergetar menjadi lebih pendek. Perubahan bunyi yang benar-benar terjadi adalah…",
           "options": [
             "petikan yang lebih keras memperbesar amplitudo sehingga bunyi terdengar lebih kuat, sedangkan senar yang lebih pendek menaikkan frekuensi sehingga nadanya lebih tinggi",
@@ -1256,515 +1506,15 @@
       ]
     },
     {
-      "code": "KOMP-IPA-D-8-TEK-01",
-      "grade": 8,
-      "semester": 2,
-      "name": "Tekanan Zat & Fotosintesis pada Tumbuhan",
-      "materi": "Tekanan zat padat, cair, dan gas, hukum Archimedes-Pascal, serta struktur tumbuhan dan proses fotosintesis",
-      "cpRef": "Kepmendikbudristek/BSKAP No. 032/H/KR/2024 — CP IPA Fase D, Elemen Pemahaman IPA (Zat dan Perubahannya)",
-      "items": [
-        {
-          "id": "ipa-d8-tek-001",
-          "prompt": "Sebuah balok kayu dengan berat 30 N diletakkan di atas meja sehingga luas bidang sentuhnya 0,05 m². Tekanan yang diberikan balok kepada permukaan meja adalah…",
-          "options": [
-            "600 N/m²",
-            "1,5 N/m²",
-            "0,0017 N/m²",
-            "30 N/m²"
-          ],
-          "answer": 0,
-          "why": {
-            "0": "Tekanan zat padat adalah gaya tekan dibagi luas bidang sentuh, yaitu 30 : 0,05 = 600 N/m². Makin sempit bidang sentuhnya, makin besar tekanan yang dihasilkan gaya yang sama."
-          },
-          "distractorWhy": {
-            "1": "Murid mengalikan gaya dengan luas bidang sentuh karena mengira tekanan bertambah besar bila bidang sentuhnya makin luas.",
-            "2": "Murid membalik susunan rumus menjadi luas dibagi gaya, sehingga hasilnya justru mengecil ketika gaya bertambah.",
-            "3": "Murid menyamakan besar tekanan dengan besar berat benda dan mengabaikan luas bidang sentuh sama sekali."
-          },
-          "difficulty": "dasar"
-        },
-        {
-          "id": "ipa-d8-tek-002",
-          "prompt": "Seorang penyelam berada pada kedalaman 5 m di bawah permukaan air sebuah danau. Jika massa jenis air 1.000 kg/m³ dan percepatan gravitasi 10 m/s², tekanan hidrostatis yang dialami penyelam itu adalah…",
-          "options": [
-            "50.000 Pa",
-            "5.000 Pa",
-            "10.000 Pa",
-            "2.000 Pa"
-          ],
-          "answer": 0,
-          "why": {
-            "0": "Tekanan hidrostatis dihitung dengan mengalikan massa jenis zat cair, percepatan gravitasi, dan kedalaman: 1.000 × 10 × 5 = 50.000 Pa. Tekanan ini berasal dari berat kolom air di atas penyelam."
-          },
-          "distractorWhy": {
-            "1": "Murid melewatkan percepatan gravitasi dan hanya mengalikan massa jenis dengan kedalaman, seolah berat kolom air tidak bergantung pada gravitasi.",
-            "2": "Murid mengabaikan kedalaman karena mengira tekanan air sama besar di seluruh bagian danau, padahal tekanan bertambah seiring bertambahnya kedalaman.",
-            "3": "Murid membagi hasil perkalian massa jenis dan gravitasi dengan kedalaman karena mengira makin dalam posisi benda, makin kecil tekanan yang dialaminya."
-          },
-          "difficulty": "dasar"
-        },
-        {
-          "id": "ipa-d8-tek-003",
-          "prompt": "Daun padi di sawah menyusun zat makanannya sendiri melalui fotosintesis. Pasangan bahan baku dan hasil fotosintesis yang benar adalah…",
-          "options": [
-            "bahan bakunya karbon dioksida dan air, hasilnya glukosa dan oksigen",
-            "bahan bakunya oksigen dan air, hasilnya karbon dioksida dan glukosa",
-            "bahan bakunya karbon dioksida dan klorofil, hasilnya glukosa dan uap air",
-            "bahan bakunya pupuk dari dalam tanah dan sinar matahari, hasilnya oksigen dan zat hijau daun"
-          ],
-          "answer": 0,
-          "why": {
-            "0": "Fotosintesis menggunakan karbon dioksida yang masuk lewat stomata dan air yang diangkut dari akar; dengan bantuan energi cahaya yang diserap klorofil, keduanya diubah menjadi glukosa sebagai simpanan energi dan oksigen yang dilepaskan ke udara."
-          },
-          "distractorWhy": {
-            "1": "Murid menukar fotosintesis dengan respirasi karena kedua proses melibatkan gas yang sama, hanya arah pemakaiannya berlawanan.",
-            "2": "Murid mengira klorofil ikut habis sebagai bahan baku, padahal klorofil hanya menyerap energi cahaya dan jumlahnya tidak berkurang oleh reaksi.",
-            "3": "Murid mengira makanan tumbuhan adalah pupuk yang diserap dari tanah, padahal pupuk hanya menyediakan unsur hara, sedangkan makanan berupa glukosa dibuat sendiri di daun."
-          },
-          "difficulty": "dasar"
-        },
-        {
-          "id": "ipa-d8-tek-004",
-          "prompt": "Sebutir telur tenggelam ketika dimasukkan ke dalam gelas berisi air tawar, tetapi terapung setelah air itu dibubuhi banyak garam dan diaduk. Alasan yang benar adalah…",
-          "options": [
-            "massa jenis air garam menjadi lebih besar daripada massa jenis telur sehingga gaya apung yang diterima telur melebihi beratnya",
-            "berat telur berkurang setelah airnya dibubuhi garam",
-            "butiran garam menutup pori-pori cangkang telur sehingga air tidak dapat masuk ke dalamnya",
-            "air garam lebih kental sehingga menahan telur seperti lem"
-          ],
-          "answer": 0,
-          "why": {
-            "0": "Melarutkan garam menambah massa zat terlarut tanpa menambah volume secara berarti, sehingga massa jenis larutan naik melampaui massa jenis telur. Menurut hukum Archimedes, gaya apung sebanding dengan massa jenis zat cair, sehingga gaya apung kini melebihi berat telur dan telur terangkat sampai terapung."
-          },
-          "distractorWhy": {
-            "1": "Murid mengira garam membuat benda di dalamnya menjadi lebih ringan, padahal massa dan berat telur tidak berubah sama sekali.",
-            "2": "Murid menjelaskan peristiwa terapung dengan masuk atau tidaknya air ke dalam benda, bukan dengan perbandingan massa jenis benda dan zat cair.",
-            "3": "Murid menyamakan kekentalan zat cair dengan gaya angkat ke atas, padahal yang menentukan terapung atau tenggelam adalah massa jenisnya."
-          },
-          "difficulty": "dasar"
-        },
-        {
-          "id": "ipa-d8-tek-005",
-          "prompt": "Pada sebuah dongkrak hidrolik di bengkel, penampang kecilnya berluas 10 cm² dan penampang besarnya 200 cm². Bila pada penampang kecil diberikan gaya 50 N, gaya angkat yang timbul pada penampang besar adalah…",
-          "options": [
-            "1.000 N",
-            "2,5 N",
-            "50 N",
-            "10.000 N"
-          ],
-          "answer": 0,
-          "why": {
-            "0": "Hukum Pascal menyatakan tekanan diteruskan sama besar ke segala arah, sehingga F₁/A₁ = F₂/A₂. Luas penampang besar 20 kali luas penampang kecil, maka gaya angkatnya juga 20 kali lipat: 50 × 20 = 1.000 N."
-          },
-          "distractorWhy": {
-            "1": "Murid membagi gaya dengan perbandingan luas penampang karena mengira penampang yang lebih luas justru memperkecil gaya yang dihasilkan.",
-            "2": "Murid mengira yang diteruskan sama besar oleh zat cair adalah gayanya, padahal yang sama besar adalah tekanannya, sehingga gaya menjadi berlipat pada penampang yang lebih luas.",
-            "3": "Murid mengalikan gaya dengan luas penampang besar tanpa membandingkannya dengan luas penampang kecil, sehingga perbandingan luas tidak terpakai."
-          },
-          "difficulty": "sedang"
-        },
-        {
-          "id": "ipa-d8-tek-006",
-          "prompt": "Sebuah batu bervolume 500 cm³ tercelup seluruhnya ke dalam air. Bila massa jenis air 1.000 kg/m³ dan percepatan gravitasi 10 m/s², besar gaya apung yang bekerja pada batu adalah…",
-          "options": [
-            "5 N",
-            "5.000.000 N",
-            "0,5 N",
-            "50 N"
-          ],
-          "answer": 0,
-          "why": {
-            "0": "Gaya apung sama dengan berat zat cair yang dipindahkan, yaitu massa jenis air × gravitasi × volume benda yang tercelup. Volume 500 cm³ sama dengan 0,0005 m³, sehingga F = 1.000 × 10 × 0,0005 = 5 N."
-          },
-          "distractorWhy": {
-            "1": "Murid memasukkan volume dalam satuan cm³ langsung ke dalam rumus tanpa mengubahnya menjadi m³, sehingga hasilnya sejuta kali lebih besar daripada seharusnya.",
-            "2": "Murid melewatkan percepatan gravitasi dan hanya mengalikan massa jenis dengan volume, sehingga yang diperolehnya adalah massa air yang dipindahkan, bukan beratnya.",
-            "3": "Murid salah menggeser tanda koma saat mengubah 500 cm³ menjadi m³ dan memakai 0,005 m³, sehingga hasilnya sepuluh kali lebih besar."
-          },
-          "difficulty": "sedang"
-        },
-        {
-          "id": "ipa-d8-tek-007",
-          "prompt": "Seorang pendaki membawa bungkus makanan ringan yang tertutup rapat saat mendaki Gunung Rinjani. Makin tinggi ia mendaki, bungkus itu tampak makin menggembung. Penyebabnya adalah…",
-          "options": [
-            "tekanan udara di luar bungkus makin kecil pada tempat yang tinggi, sedangkan tekanan gas di dalam bungkus tetap sehingga mendorong bungkus mengembang",
-            "udara di dalam bungkus bertambah banyak karena bungkus menyerap udara pegunungan",
-            "suhu di puncak gunung lebih panas sehingga gas di dalam bungkus memuai",
-            "tekanan udara di pegunungan lebih besar sehingga menekan bungkus dari segala arah"
-          ],
-          "answer": 0,
-          "why": {
-            "0": "Makin tinggi suatu tempat, makin sedikit lapisan udara yang menekannya sehingga tekanan udara luar mengecil. Gas di dalam kemasan tertutup jumlahnya tetap, sehingga tekanan dalam yang kini lebih besar daripada tekanan luar mendorong dinding kemasan sampai menggembung."
-          },
-          "distractorWhy": {
-            "1": "Murid mengira jumlah gas di dalam kemasan tertutup dapat bertambah, padahal kemasan yang rapat tidak dapat dimasuki udara dari luar.",
-            "2": "Murid menjelaskan menggembungnya bungkus dengan pemuaian akibat panas, padahal udara di puncak gunung justru lebih dingin daripada di kaki gunung.",
-            "3": "Murid mengira tekanan udara bertambah seiring bertambahnya ketinggian karena membayangkan makin tinggi berarti makin banyak udara di atasnya; kenyataannya justru sebaliknya."
-          },
-          "difficulty": "sedang"
-        },
-        {
-          "id": "ipa-d8-tek-008",
-          "prompt": "Air dari akar dapat naik sampai ke pucuk pohon mangga yang tinggi di halaman sekolah. Faktor yang paling berperan dalam peristiwa pengangkutan itu adalah…",
-          "options": [
-            "daya kapilaritas pembuluh xilem yang bergaris tengah sangat kecil bersama daya isap daun akibat penguapan air lewat stomata",
-            "tekanan yang diberikan pembuluh floem untuk mendorong air dari akar menuju daun",
-            "dorongan angin yang menekan batang sehingga air terangkat ke atas",
-            "pemompaan air oleh organ semacam jantung yang terletak di pangkal batang"
-          ],
-          "answer": 0,
-          "why": {
-            "0": "Xilem berupa pipa-pipa sangat halus, sehingga air naik karena daya kapilaritas; sementara itu penguapan air lewat stomata daun menimbulkan daya isap yang menarik kolom air di dalam xilem dari akar sampai ke pucuk."
-          },
-          "distractorWhy": {
-            "1": "Murid menukar tugas kedua berkas pengangkut; floem mengangkut hasil fotosintesis dari daun ke seluruh bagian tumbuhan, bukan mengangkut air dari akar.",
-            "2": "Murid mencari penyebab dari luar tubuh tumbuhan, padahal pengangkutan air tetap berlangsung meskipun udara di sekitar pohon tenang.",
-            "3": "Murid menyamakan pengangkutan pada tumbuhan dengan peredaran darah manusia yang digerakkan jantung, padahal tumbuhan tidak memiliki organ pemompa."
-          },
-          "difficulty": "sedang"
-        },
-        {
-          "id": "ipa-d8-tek-009",
-          "prompt": "Pada percobaan Ingenhousz, tanaman Hydrilla di dalam corong terbalik yang terendam air menghasilkan gelembung ketika terkena cahaya matahari. Gelembung tersebut menunjukkan bahwa…",
-          "options": [
-            "fotosintesis menghasilkan gas oksigen dan berlangsung makin cepat ketika cahaya yang diterima makin banyak",
-            "fotosintesis menghasilkan gas karbon dioksida yang dilepaskan ke dalam air",
-            "air di sekitar tanaman mendidih karena panas matahari sehingga muncul gelembung uap air",
-            "Hydrilla menyerap oksigen dari air sehingga air berkurang dan meninggalkan rongga udara"
-          ],
-          "answer": 0,
-          "why": {
-            "0": "Gas yang terkumpul di ujung tabung pada percobaan Ingenhousz dapat menyalakan kembali bara lidi, yang menandakan gas itu oksigen. Jumlah gelembung bertambah bila cahaya lebih terang, sehingga cahaya terbukti memengaruhi laju fotosintesis."
-          },
-          "distractorWhy": {
-            "1": "Murid mengira gas yang keluar dari makhluk hidup selalu karbon dioksida seperti pada pernapasan manusia, padahal karbon dioksida justru merupakan bahan baku fotosintesis.",
-            "2": "Murid menjelaskan gelembung sebagai akibat pemanasan air, padahal air dalam percobaan tidak sampai mendidih dan gelembung tetap muncul pada air yang sejuk asalkan ada cahaya.",
-            "3": "Murid membalik arah pertukaran gas dan mengira gelembung berasal dari ruang kosong yang ditinggalkan air yang menyusut."
-          },
-          "difficulty": "sedang"
-        },
-        {
-          "id": "ipa-d8-tek-010",
-          "prompt": "Sebuah balok kayu terapung di permukaan air dengan tiga perempat bagian volumenya tercelup. Bila massa jenis air 1.000 kg/m³, massa jenis kayu itu adalah…",
-          "options": [
-            "750 kg/m³",
-            "1.333 kg/m³",
-            "250 kg/m³",
-            "1.000 kg/m³"
-          ],
-          "answer": 0,
-          "why": {
-            "0": "Pada benda terapung, berat benda sama dengan gaya apung, sehingga massa jenis benda sama dengan massa jenis zat cair dikalikan bagian volume yang tercelup: 3/4 × 1.000 = 750 kg/m³."
-          },
-          "distractorWhy": {
-            "1": "Murid membagi massa jenis air dengan bagian yang tercelup sehingga memperoleh nilai yang justru lebih besar daripada massa jenis air; benda dengan massa jenis seperti itu pasti tenggelam, bukan terapung.",
-            "2": "Murid memakai bagian yang muncul di atas permukaan air alih-alih bagian yang tercelup sebagai pembanding massa jenis.",
-            "3": "Murid mengira setiap benda yang terapung memiliki massa jenis sama dengan zat cairnya, padahal keadaan itu berlaku untuk benda yang melayang."
-          },
-          "difficulty": "tinggi"
-        },
-        {
-          "id": "ipa-d8-tek-011",
-          "prompt": "Sebuah batu bata bermassa 3 kg berukuran 20 cm × 10 cm × 5 cm diletakkan di atas pasir halus (g = 10 m/s²). Perbandingan tekanan ketika batu bata itu berdiri pada sisi terluas dengan ketika berdiri pada sisi tersempit adalah…",
-          "options": [
-            "1 : 4, karena tekanan berbanding terbalik dengan luas bidang sentuh",
-            "4 : 1, karena bidang sentuh yang lebih luas menahan berat lebih besar sehingga tekanannya lebih besar",
-            "1 : 1, karena berat batu bata tidak berubah meskipun kedudukannya diubah",
-            "1 : 2, karena sisi tersempit panjangnya hanya setengah dari sisi terluas"
-          ],
-          "answer": 0,
-          "why": {
-            "0": "Berat batu bata tetap 30 N. Sisi terluas berukuran 20 cm × 10 cm = 0,02 m² sehingga tekanannya 1.500 Pa, sedangkan sisi tersempit berukuran 10 cm × 5 cm = 0,005 m² sehingga tekanannya 6.000 Pa. Perbandingannya 1.500 : 6.000 = 1 : 4, sesuai sifat tekanan yang berbanding terbalik dengan luas bidang sentuh."
-          },
-          "distractorWhy": {
-            "1": "Murid mengira makin luas bidang sentuh makin besar tekanannya karena menyamakan tekanan dengan besarnya gaya berat yang ditanggung bidang itu.",
-            "2": "Murid mengira tekanan hanya ditentukan oleh berat benda, sehingga perubahan kedudukan batu bata dianggap tidak berpengaruh.",
-            "3": "Murid membandingkan panjang rusuk batu bata, bukan luas kedua bidang sentuhnya, sehingga perbandingannya berhenti pada satu ukuran saja."
-          },
-          "difficulty": "tinggi"
-        },
-        {
-          "id": "ipa-d8-tek-012",
-          "prompt": "Dalam percobaan Sachs, sehelai daun yang masih menempel pada tumbuhan ditutup sebagian memakai kertas timah selama dua hari. Daun itu lalu dipetik, direbus dalam air, dimasukkan ke alkohol panas, dan ditetesi lugol. Hasil yang seharusnya tampak beserta alasannya adalah…",
-          "options": [
-            "bagian daun yang tidak tertutup berwarna biru kehitaman karena di bagian itu terbentuk amilum hasil fotosintesis yang memerlukan cahaya",
-            "seluruh permukaan daun berwarna biru kehitaman karena daun tetap berfotosintesis memakai cahaya yang sudah tersimpan sebelumnya",
-            "bagian daun yang tertutup berwarna biru kehitaman karena kertas timah melindungi amilum agar tidak terurai",
-            "seluruh daun tetap pucat karena perebusan dalam alkohol panas melarutkan semua amilum di dalam daun"
-          ],
-          "answer": 0,
-          "why": {
-            "0": "Lugol memberi warna biru kehitaman bila ada amilum. Bagian daun yang tertutup kertas timah tidak menerima cahaya sehingga tidak berfotosintesis dan tidak membentuk amilum, sedangkan bagian yang terbuka membentuk amilum; inilah bukti bahwa fotosintesis memerlukan cahaya."
-          },
-          "distractorWhy": {
-            "1": "Murid mengira tumbuhan dapat menyimpan cahaya sebagai cadangan dan tetap berfotosintesis dalam keadaan gelap, padahal yang tersimpan adalah hasil fotosintesis berupa amilum.",
-            "2": "Murid membalik peran perlakuan dan menganggap penutup menjaga hasil fotosintesis, padahal penutup justru menghalangi cahaya sehingga amilum tidak terbentuk.",
-            "3": "Murid mengira alkohol panas melarutkan amilum, padahal yang larut adalah klorofil sehingga daun menjadi pucat dan perubahan warna oleh lugol mudah diamati."
-          },
-          "difficulty": "tinggi"
-        }
-      ]
-    },
-    {
-      "code": "KOMP-IPA-D-9-LIS-01",
+      "code": "KOMP-IPA-D-9-BAB2-01",
       "grade": 9,
       "semester": 1,
-      "name": "Listrik Dinamis, Hambatan & Kemagnetan",
-      "materi": "Hukum Ohm (V = I·R), rangkaian seri-paralel, energi listrik, dan induksi elektromagnetik",
-      "cpRef": "Kepmendikbudristek/BSKAP No. 032/H/KR/2024 — CP IPA Fase D, Elemen Pemahaman IPA (Energi dan Perubahannya)",
+      "name": "Sistem Koordinasi, Reproduksi, dan Homeostasis Manusia",
+      "materi": "Sistem Saraf & Hormon, Sistem Reproduksi Manusia, Menjaga Kesehatan Reproduksi, Homeostasis Tubuh",
+      "cpRef": "Kepmendikbudristek/BSKAP No. 032/H/KR/2024 — Buku Siswa IPA Kelas 9 Bab 2",
       "items": [
         {
-          "id": "ipa-d9-lis-001",
-          "prompt": "Sebuah lampu senter berhambatan 4 Ω dihubungkan ke baterai bertegangan 12 V. Berapa kuat arus yang mengalir pada lampu itu?",
-          "options": [
-            "3 A",
-            "48 A",
-            "0,33 A",
-            "8 A"
-          ],
-          "answer": 0,
-          "why": {
-            "0": "Hukum Ohm menyatakan I = V / R. Dengan V = 12 V dan R = 4 Ω, maka I = 12 V / 4 Ω = 3 A. Makin besar hambatan, makin kecil arus pada tegangan yang sama."
-          },
-          "distractorWhy": {
-            "1": "Angka 48 A muncul ketika murid mengalikan tegangan dengan hambatan (12 × 4) alih-alih membaginya. Ini kekeliruan arah rumus Hukum Ohm yang paling sering terjadi.",
-            "2": "Nilai 0,33 A lahir dari membalik pembagian menjadi R / V = 4 / 12. Murid ingat bahwa ada pembagian, tetapi tertukar mana yang menjadi pembilang.",
-            "3": "Hasil 8 A didapat dengan mengurangkan 12 − 4. Murid memperlakukan volt dan ohm sebagai besaran sejenis yang boleh dijumlah atau dikurangkan."
-          },
-          "difficulty": "dasar"
-        },
-        {
-          "id": "ipa-d9-lis-002",
-          "prompt": "Tiga hambatan masing-masing 2 Ω, 3 Ω, dan 5 Ω dirangkai seri pada sebuah papan percobaan. Berapa hambatan penggantinya?",
-          "options": [
-            "10 Ω",
-            "0,97 Ω",
-            "3,33 Ω",
-            "30 Ω"
-          ],
-          "answer": 0,
-          "why": {
-            "0": "Pada rangkaian seri arus melewati satu jalur yang sama, sehingga hambatan tinggal dijumlahkan: Rs = 2 Ω + 3 Ω + 5 Ω = 10 Ω. Hambatan pengganti seri selalu lebih besar daripada hambatan terbesar penyusunnya."
-          },
-          "distractorWhy": {
-            "1": "Nilai 0,97 Ω keluar dari rumus paralel 1/R = 1/2 + 1/3 + 1/5. Murid tertukar menerapkan rumus paralel pada susunan seri karena hanya menghafal rumus tanpa mengenali bentuk rangkaiannya.",
-            "2": "Angka 3,33 Ω adalah rata-rata dari 2, 3, dan 5. Murid mengira hambatan pengganti merupakan nilai tengah dari hambatan-hambatan yang dipasang.",
-            "3": "Hasil 30 Ω diperoleh dari mengalikan 2 × 3 × 5. Murid mencampur aturan seri dengan pola perkalian yang dipakai pada rumus dua hambatan paralel."
-          },
-          "difficulty": "dasar"
-        },
-        {
-          "id": "ipa-d9-lis-003",
-          "prompt": "Sebuah setrika listrik berdaya 300 W dipakai rata-rata 2 jam setiap hari selama 30 hari. Berapa energi listrik yang terpakai dalam sebulan?",
-          "options": [
-            "18 kWh",
-            "18.000 kWh",
-            "0,6 kWh",
-            "9 kWh"
-          ],
-          "answer": 0,
-          "why": {
-            "0": "Energi listrik W = P × t. Daya 300 W harus diubah dulu menjadi 0,3 kW agar satuannya cocok dengan kWh. Maka W = 0,3 kW × 2 jam × 30 hari = 18 kWh."
-          },
-          "distractorWhy": {
-            "1": "Nilai 18.000 kWh terjadi ketika daya tetap ditulis 300 W lalu langsung dikalikan jam dan hari, tanpa mengubah watt menjadi kilowatt. Kesalahan konversi satuan 1 kW = 1.000 W ini membuat hasilnya seribu kali terlalu besar.",
-            "2": "Angka 0,6 kWh hanya menghitung pemakaian satu hari (0,3 kW × 2 jam). Murid berhenti sebelum mengalikan dengan 30 hari karena membaca soal sebagai pemakaian harian.",
-            "3": "Hasil 9 kWh muncul dari 0,3 kW × 30 hari tanpa memperhitungkan lamanya pemakaian tiap hari. Murid menganggap daya kali jumlah hari sudah cukup, padahal satuan kWh menuntut waktu dalam jam."
-          },
-          "difficulty": "dasar"
-        },
-        {
-          "id": "ipa-d9-lis-004",
-          "prompt": "Seorang murid ingin mengubah sebuah paku baja menjadi magnet di dalam kelas. Tindakan yang tepat untuk mencapainya adalah …",
-          "options": [
-            "Melilitkan kawat berisolasi pada paku, lalu mengalirkan arus searah dari baterai melalui lilitan itu",
-            "Memukul-mukul paku dengan palu berkali-kali sampai terasa hangat",
-            "Membakar paku di atas nyala api sampai membara lalu mendinginkannya",
-            "Menggosokkan paku itu ke paku baja lain yang belum bermagnet, berulang-ulang ke satu arah"
-          ],
-          "answer": 0,
-          "why": {
-            "0": "Arus searah yang mengalir pada lilitan menimbulkan medan magnet di dalam kumparan. Medan ini menata magnet-magnet elementer di dalam baja agar menghadap satu arah, sehingga paku menjadi elektromagnet. Cara membuat magnet ada tiga: menggosok dengan magnet, induksi, dan mengaliri arus searah."
-          },
-          "distractorWhy": {
-            "1": "Murid mengira pukulan menata magnet elementer seperti mengetuk serbuk agar rapi. Kenyataannya pukulan justru mengacak susunan magnet elementer, sehingga memukul termasuk cara MENGHILANGKAN sifat kemagnetan.",
-            "2": "Murid menyamakan panas dengan energi yang bisa 'memasukkan' kemagnetan. Pemanasan sampai membara membuat getaran partikel begitu hebat sehingga susunan magnet elementer berantakan; ini juga cara menghilangkan kemagnetan.",
-            "3": "Murid benar mengingat kata 'menggosok', tetapi melewatkan syaratnya: penggosoknya harus benda yang sudah bermagnet. Menggosokkan dua baja yang sama-sama belum bermagnet tidak menata magnet elementer apa pun."
-          },
-          "difficulty": "dasar"
-        },
-        {
-          "id": "ipa-d9-lis-005",
-          "prompt": "Hambatan 6 Ω dan 3 Ω disusun paralel, lalu dihubungkan ke sumber tegangan 12 V. Berapa kuat arus total yang keluar dari sumber?",
-          "options": [
-            "6 A",
-            "1,33 A",
-            "4 A",
-            "2 A"
-          ],
-          "answer": 0,
-          "why": {
-            "0": "Hambatan pengganti paralel: Rp = (6 × 3) / (6 + 3) = 18 / 9 = 2 Ω. Kuat arus total I = V / Rp = 12 V / 2 Ω = 6 A. Dapat dicek lewat cabang: 12/6 = 2 A dan 12/3 = 4 A, jumlahnya 6 A."
-          },
-          "distractorWhy": {
-            "1": "Nilai 1,33 A muncul karena hambatan dijumlahkan seperti rangkaian seri (6 + 3 = 9 Ω), lalu 12 / 9. Murid belum membedakan bahwa pada susunan paralel hambatan pengganti justru mengecil.",
-            "2": "Angka 4 A adalah arus pada satu cabang saja, yaitu 12 / 3. Murid berhenti setelah menghitung cabang berhambatan kecil dan melupakan bahwa arus dari sumber terbagi ke dua cabang.",
-            "3": "Angka 2 A adalah arus cabang 12 / 6. Murid memilih hambatan terbesar dengan anggapan hambatan terbesarlah yang menentukan arus total, padahal pada paralel kedua cabang sama-sama mendapat 12 V."
-          },
-          "difficulty": "sedang"
-        },
-        {
-          "id": "ipa-d9-lis-006",
-          "prompt": "Instalasi lampu di rumah pelanggan PLN dipasang paralel terhadap jala-jala 220 V, bukan seri. Alasan teknis yang benar untuk pilihan itu adalah …",
-          "options": [
-            "Setiap lampu menerima tegangan penuh 220 V dan tetap menyala meskipun lampu lain dimatikan atau putus",
-            "Susunan paralel memperbesar hambatan total rumah sehingga arus yang mengalir menjadi lebih aman",
-            "Pada susunan paralel tegangan terbagi rata ke setiap lampu sehingga lampu menjadi lebih awet",
-            "Arus yang mengalir pada setiap lampu selalu sama besar sehingga nyala semua lampu seragam"
-          ],
-          "answer": 0,
-          "why": {
-            "0": "Ciri rangkaian paralel adalah tegangan pada tiap cabang sama dengan tegangan sumber, sedangkan arus terbagi. Maka tiap lampu mendapat 220 V penuh, dan jika satu lampu putus cabang lain tetap tersambung ke sumber sehingga lampu lain tidak ikut padam."
-          },
-          "distractorWhy": {
-            "1": "Ini miskonsepsi arah perubahan hambatan: murid mengira menambah cabang paralel berarti menambah hambatan. Kenyataannya tiap cabang baru membuka jalan arus tambahan sehingga hambatan total justru MENGECIL dan arus dari PLN bertambah — itulah sebabnya rumah memakai MCB pembatas.",
-            "2": "Murid memindahkan sifat rangkaian seri (tegangan terbagi) ke rangkaian paralel. Pada paralel yang terbagi adalah arus, bukan tegangan; kalau tegangan tiap lampu terbagi, lampu justru akan menyala redup.",
-            "3": "Arus yang selalu sama di setiap komponen adalah ciri rangkaian SERI. Murid menukar ciri seri dan paralel; pada paralel arus tiap cabang bergantung pada hambatan lampu masing-masing."
-          },
-          "difficulty": "sedang"
-        },
-        {
-          "id": "ipa-d9-lis-007",
-          "prompt": "Sebuah rumah menyalakan 5 lampu LED masing-masing 10 W selama 6 jam setiap hari. Jika tarif PLN Rp1.500,00 per kWh, berapa biaya listrik untuk lampu itu selama 30 hari?",
-          "options": [
-            "Rp13.500,00",
-            "Rp2.700,00",
-            "Rp13.500.000,00",
-            "Rp450,00"
-          ],
-          "answer": 0,
-          "why": {
-            "0": "Daya total = 5 × 10 W = 50 W = 0,05 kW. Energi sebulan = 0,05 kW × 6 jam × 30 hari = 9 kWh. Biaya = 9 kWh × Rp1.500,00 = Rp13.500,00."
-          },
-          "distractorWhy": {
-            "1": "Nilai Rp2.700,00 adalah biaya untuk satu lampu saja (0,01 kW × 6 × 30 × 1.500). Murid melewatkan kata 'lima lampu' dan tidak mengalikan daya dengan jumlah lampu.",
-            "2": "Hasil Rp13.500.000,00 muncul karena 50 W tidak diubah menjadi 0,05 kW sebelum dikalikan. Kesalahan konversi 1 kW = 1.000 W membuat biayanya melambung seribu kali lipat — sekaligus petunjuk bahwa jawabannya tidak masuk akal.",
-            "3": "Angka Rp450,00 hanya menghitung pemakaian satu hari. Murid berhenti pada energi harian 0,3 kWh dan lupa mengalikannya dengan 30 hari seperti yang diminta soal."
-          },
-          "difficulty": "sedang"
-        },
-        {
-          "id": "ipa-d9-lis-008",
-          "prompt": "Sebuah magnet batang digerakkan keluar-masuk kumparan yang ujung-ujungnya dihubungkan ke galvanometer. Agar simpangan jarum galvanometer bertambah besar, yang harus dilakukan adalah …",
-          "options": [
-            "Menggerakkan magnet lebih cepat dan menambah jumlah lilitan kumparan",
-            "Menahan magnet diam tepat di tengah kumparan agar medan magnet yang dirasakan kumparan paling kuat",
-            "Mengganti galvanometer dengan galvanometer yang hambatan dalamnya jauh lebih besar",
-            "Mengurangi jumlah lilitan agar arus tidak terhambat oleh kawat yang panjang"
-          ],
-          "answer": 0,
-          "why": {
-            "0": "GGL induksi bergantung pada laju perubahan fluks magnetik dan jumlah lilitan. Gerakan yang lebih cepat membuat fluks berubah dalam waktu lebih singkat, dan lilitan yang lebih banyak melipatgandakan GGL, sehingga arus induksi — dan simpangan jarum — bertambah besar."
-          },
-          "distractorWhy": {
-            "1": "Ini miskonsepsi klasik 'medan kuat = listrik besar'. Yang membangkitkan GGL bukan besarnya medan magnet, melainkan PERUBAHAN fluks. Magnet yang diam di tengah kumparan memberi fluks besar tetapi tetap, sehingga GGL induksinya nol dan jarum sama sekali tidak menyimpang.",
-            "2": "Murid mengira alat ukurnya yang menentukan besar simpangan. Memperbesar hambatan dalam galvanometer justru memperkecil arus induksi yang mengalir, sehingga simpangan berkurang; sumber gejalanya tetap ada pada perubahan fluks.",
-            "3": "Murid menukar peran lilitan: dianggap hanya menambah panjang kawat dan hambatan. Padahal setiap lilitan menyumbang GGL, dan pengaruh penambahan GGL jauh lebih menentukan daripada tambahan hambatan kawatnya."
-          },
-          "difficulty": "sedang"
-        },
-        {
-          "id": "ipa-d9-lis-009",
-          "prompt": "Sebuah transformator ideal memiliki 1.000 lilitan primer dan 100 lilitan sekunder. Kumparan primernya dihubungkan ke tegangan 220 V. Berapa tegangan pada kumparan sekundernya?",
-          "options": [
-            "22 V",
-            "2.200 V",
-            "220 V",
-            "110 V"
-          ],
-          "answer": 0,
-          "why": {
-            "0": "Pada transformator ideal berlaku Vp / Vs = Np / Ns. Maka Vs = Vp × (Ns / Np) = 220 V × (100 / 1.000) = 22 V. Karena lilitan sekunder lebih sedikit, alat ini adalah transformator step-down."
-          },
-          "distractorWhy": {
-            "1": "Nilai 2.200 V lahir dari membalik perbandingan menjadi Vs = Vp × (Np / Ns). Murid menerapkan perbandingan tanpa memeriksa arah: lilitan sekunder yang lebih SEDIKIT mustahil menghasilkan tegangan yang lebih besar.",
-            "2": "Angka 220 V muncul dari anggapan bahwa transformator hanya mengubah kuat arus dan membiarkan tegangan tetap. Padahal justru tegangan yang diubah, sedangkan daya yang tetap (pada trafo ideal) membuat arus berubah berlawanan arah.",
-            "3": "Hasil 110 V berasal dari anggapan bahwa 'step-down' selalu berarti membagi dua. Murid tidak memakai perbandingan lilitan 1.000 : 100 yang sebenarnya menurunkan tegangan menjadi sepersepuluh."
-          },
-          "difficulty": "sedang"
-        },
-        {
-          "id": "ipa-d9-lis-010",
-          "prompt": "Hambatan R1 = 4 Ω dipasang seri dengan gabungan paralel R2 = 6 Ω dan R3 = 12 Ω. Ujung-ujung rangkaian dihubungkan ke sumber 12 V. Berapa kuat arus yang keluar dari sumber?",
-          "options": [
-            "1,5 A",
-            "0,55 A",
-            "6 A",
-            "3 A"
-          ],
-          "answer": 0,
-          "why": {
-            "0": "Selesaikan bagian paralel lebih dulu: Rp = (6 × 12) / (6 + 12) = 72 / 18 = 4 Ω. Hambatan total = R1 + Rp = 4 Ω + 4 Ω = 8 Ω. Arus dari sumber I = 12 V / 8 Ω = 1,5 A."
-          },
-          "distractorWhy": {
-            "1": "Nilai 0,55 A didapat dengan menjumlahkan ketiga hambatan seolah semuanya seri (4 + 6 + 12 = 22 Ω). Murid tidak mengenali bahwa R2 dan R3 berbagi dua titik sambung yang sama sehingga tersusun paralel.",
-            "2": "Angka 6 A berasal dari menganggap ketiga hambatan paralel semua: 1/R = 1/4 + 1/6 + 1/12 = 1/2 sehingga R = 2 Ω. Murid menyeragamkan seluruh rangkaian menjadi satu jenis susunan tanpa membaca titik percabangannya.",
-            "3": "Hasil 3 A diperoleh dari 12 / 4, yaitu hanya memakai R1. Murid mengabaikan cabang paralel dengan anggapan hambatan yang bercabang 'tidak dilewati arus utama', padahal seluruh arus sumber tetap melalui gabungan paralel itu."
-          },
-          "difficulty": "tinggi"
-        },
-        {
-          "id": "ipa-d9-lis-011",
-          "prompt": "Sebuah lampu pijar bertuliskan \"40 W; 220 V\". Lampu itu dipasang pada sumber tegangan 110 V. Jika hambatan filamennya dianggap tetap, berapa daya yang dihasilkan lampu?",
-          "options": [
-            "10 W",
-            "20 W",
-            "40 W",
-            "80 W"
-          ],
-          "answer": 0,
-          "why": {
-            "0": "Hambatan filamen dihitung dari data tertulis: R = V² / P = (220 V)² / 40 W = 1.210 Ω. Pada 110 V, daya menjadi P = V² / R = (110 V)² / 1.210 Ω = 10 W. Karena P sebanding dengan kuadrat tegangan, tegangan yang menjadi setengah membuat daya tinggal seperempat."
-          },
-          "distractorWhy": {
-            "1": "Nilai 20 W lahir dari anggapan daya sebanding lurus dengan tegangan, sehingga tegangan setengah dianggap memberi daya setengah. Murid melewatkan bahwa pada hambatan tetap, arus ikut turun menjadi setengah, jadi daya turun dua kali lipat penurunan itu.",
-            "2": "Angka 40 W muncul dari anggapan bahwa tulisan pada lampu adalah daya yang selalu dihasilkan berapa pun tegangannya. Padahal angka itu hanya berlaku tepat pada tegangan yang tertera, yaitu 220 V.",
-            "3": "Hasil 80 W berasal dari mengira lampu menarik arus lebih besar ketika tegangan turun agar dayanya tetap terpenuhi. Murid menyamakan lampu pijar dengan peralatan berdaya tetap, padahal filamen adalah hambatan biasa yang tunduk pada Hukum Ohm."
-          },
-          "difficulty": "tinggi"
-        },
-        {
-          "id": "ipa-d9-lis-012",
-          "prompt": "Lampu pada dinamo sepeda menyala makin terang ketika sepeda dikayuh makin cepat. Penjelasan fisika yang paling tepat untuk peristiwa itu adalah …",
-          "options": [
-            "Putaran yang lebih cepat mempersingkat waktu perubahan fluks magnetik pada kumparan, sehingga GGL induksi yang dihasilkan lebih besar",
-            "Kayuhan yang cepat membuat magnet di dalam dinamo menjadi lebih kuat, sehingga tegangan keluarannya naik",
-            "Gesekan antara roda dan kepala dinamo menghasilkan panas yang langsung diubah menjadi energi listrik",
-            "Kayuhan yang cepat mendorong keluar lebih banyak muatan listrik yang sudah tersimpan di dalam dinamo"
-          ],
-          "answer": 0,
-          "why": {
-            "0": "Dinamo sepeda adalah generator kecil: magnet berputar di dekat kumparan sehingga fluks magnetik yang menembus kumparan berubah-ubah. Besar GGL induksi bergantung pada laju perubahan fluks itu, jadi putaran yang lebih cepat menghasilkan GGL dan arus yang lebih besar, dan lampu menyala lebih terang."
-          },
-          "distractorWhy": {
-            "1": "Murid mengira kecepatan gerak menambah kekuatan magnet permanennya. Kekuatan magnet di dalam dinamo tetap; yang berubah hanyalah seberapa cepat fluksnya berubah terhadap waktu.",
-            "2": "Murid menganggap gesekan menghasilkan listrik secara langsung, mencampuradukkan listrik statis akibat gesekan dengan induksi elektromagnetik. Gesekan roda pada dinamo hanya berperan memutar poros magnetnya, bukan membangkitkan muatan.",
-            "3": "Murid memperlakukan dinamo seperti baterai yang menyimpan listrik dan tinggal dikeluarkan. Dinamo tidak menyimpan energi listrik; ia mengubah energi gerak kayuhan menjadi energi listrik saat itu juga, sehingga berhenti mengayuh berarti lampu padam."
-          },
-          "difficulty": "tinggi"
-        }
-      ]
-    },
-    {
-      "code": "KOMP-IPA-D-9-GEN-01",
-      "grade": 9,
-      "semester": 1,
-      "name": "Sistem Reproduksi & Pewarisan Sifat",
-      "materi": "Sistem reproduksi manusia dan tumbuhan, hukum Mendel, serta persilangan monohibrid sederhana",
-      "cpRef": "Kepmendikbudristek/BSKAP No. 032/H/KR/2024 — CP IPA Fase D, Elemen Pemahaman IPA (Makhluk Hidup dan Lingkungannya)",
-      "items": [
-        {
-          "id": "ipa-d9-gen-001",
+          "id": "ipa-d9-bab2-001",
           "prompt": "Pada sistem reproduksi laki-laki, organ yang menghasilkan sel sperma sekaligus hormon testosteron adalah …",
           "options": [
             "Testis",
@@ -1784,7 +1534,7 @@
           "difficulty": "dasar"
         },
         {
-          "id": "ipa-d9-gen-002",
+          "id": "ipa-d9-bab2-002",
           "prompt": "Pada manusia, pertemuan sel sperma dengan sel telur (fertilisasi) secara normal berlangsung di …",
           "options": [
             "Tuba fallopi (oviduk)",
@@ -1804,7 +1554,7 @@
           "difficulty": "dasar"
         },
         {
-          "id": "ipa-d9-gen-003",
+          "id": "ipa-d9-bab2-003",
           "prompt": "Petani memperbanyak tanaman singkong dengan memotong batangnya sepanjang sekitar 20 cm lalu menanamnya di bedengan. Cara perkembangbiakan itu disebut …",
           "options": [
             "Vegetatif buatan dengan cara stek batang",
@@ -1824,7 +1574,7 @@
           "difficulty": "dasar"
         },
         {
-          "id": "ipa-d9-gen-004",
+          "id": "ipa-d9-bab2-004",
           "prompt": "Tanaman ercis bergenotipe Bb tumbuh berbatang tinggi, sedangkan yang bergenotipe bb berbatang pendek. Sifat \"berbatang tinggi\" yang tampak pada tanaman Bb itu disebut …",
           "options": [
             "Fenotipe, yaitu sifat yang dapat diamati dari luar",
@@ -1844,7 +1594,7 @@
           "difficulty": "dasar"
         },
         {
-          "id": "ipa-d9-gen-005",
+          "id": "ipa-d9-bab2-005",
           "prompt": "Ercis berbiji bulat homozigot dominan (BB) disilangkan dengan ercis berbiji keriput (bb). Seluruh F1 kemudian disilangkan sesamanya. Bagaimana perbandingan fenotipe pada F2?",
           "options": [
             "3 berbiji bulat : 1 berbiji keriput",
@@ -1864,7 +1614,7 @@
           "difficulty": "sedang"
         },
         {
-          "id": "ipa-d9-gen-006",
+          "id": "ipa-d9-bab2-006",
           "prompt": "Mawar berbunga merah heterozigot (Mm) disilangkan dengan mawar berbunga putih (mm). Bagaimana perbandingan GENOTIPE keturunannya?",
           "options": [
             "1 Mm : 1 mm",
@@ -1884,7 +1634,7 @@
           "difficulty": "sedang"
         },
         {
-          "id": "ipa-d9-gen-007",
+          "id": "ipa-d9-bab2-007",
           "prompt": "Sepasang suami istri sama-sama bergolongan darah A dengan genotipe IᴬIᴼ. Berapa persen kemungkinan anak mereka bergolongan darah O?",
           "options": [
             "25%",
@@ -1904,7 +1654,7 @@
           "difficulty": "sedang"
         },
         {
-          "id": "ipa-d9-gen-008",
+          "id": "ipa-d9-bab2-008",
           "prompt": "Sebuah keluarga mengharapkan anak laki-laki. Ditinjau dari genetika, pernyataan yang benar tentang penentuan jenis kelamin anak adalah …",
           "options": [
             "Sel telur selalu membawa kromosom X, sehingga jenis kelamin anak ditentukan oleh kromosom X atau Y yang dibawa sel sperma",
@@ -1924,7 +1674,7 @@
           "difficulty": "sedang"
         },
         {
-          "id": "ipa-d9-gen-009",
+          "id": "ipa-d9-bab2-009",
           "prompt": "Bunga padi di sawah berukuran kecil, tidak berwarna mencolok, tidak berbau harum, serbuk sarinya ringan dan banyak, sedangkan kepala putiknya berbulu dan menjulur keluar. Penyerbukan bunga padi paling mungkin dibantu oleh …",
           "options": [
             "Angin, sehingga disebut penyerbukan anemogami",
@@ -1944,7 +1694,7 @@
           "difficulty": "sedang"
         },
         {
-          "id": "ipa-d9-gen-010",
+          "id": "ipa-d9-bab2-010",
           "prompt": "Seekor kucing berbulu hitam (hitam bersifat dominan, gen H) dikawinkan dengan kucing berbulu putih (hh). Dari 8 ekor anak yang lahir, 4 ekor berbulu hitam dan 4 ekor berbulu putih. Apa genotipe induk yang berbulu hitam?",
           "options": [
             "Hh, karena perkawinan dengan hh menghasilkan perbandingan 1 hitam : 1 putih",
@@ -1964,7 +1714,7 @@
           "difficulty": "tinggi"
         },
         {
-          "id": "ipa-d9-gen-011",
+          "id": "ipa-d9-bab2-011",
           "prompt": "Bunga pukul empat (Mirabilis jalapa) berwarna merah (MM) disilangkan dengan yang berwarna putih (mm). Seluruh F1 ternyata berbunga merah muda. Jika F1 disilangkan sesamanya, bagaimana perbandingan fenotipe F2?",
           "options": [
             "1 merah : 2 merah muda : 1 putih",
@@ -1984,7 +1734,7 @@
           "difficulty": "tinggi"
         },
         {
-          "id": "ipa-d9-gen-012",
+          "id": "ipa-d9-bab2-012",
           "prompt": "Seorang petani memiliki tanaman padi yang tahan wereng (sifat tahan dikendalikan alel dominan T) tetapi belum tahu apakah tanaman itu bergenotipe TT atau Tt. Langkah yang paling tepat untuk memastikannya adalah …",
           "options": [
             "Menyilangkannya dengan padi yang peka wereng (tt); bila seluruh keturunannya tahan wereng berarti TT, dan bila kira-kira separuhnya peka berarti Tt",
@@ -2006,15 +1756,515 @@
       ]
     },
     {
-      "code": "KOMP-IPA-D-9-BIO-01",
+      "code": "KOMP-IPA-D-9-BAB3-01",
       "grade": 9,
-      "semester": 2,
-      "name": "Bioteknologi & Kelestarian Lingkungan",
-      "materi": "Prinsip bioteknologi konvensional dan modern, pencemaran lingkungan, serta teknologi ramah lingkungan",
-      "cpRef": "Kepmendikbudristek/BSKAP No. 032/H/KR/2024 — CP IPA Fase D, Elemen Pemahaman IPA (Makhluk Hidup dan Lingkungannya)",
+      "semester": 1,
+      "name": "Tekanan Zat dan Penerapannya",
+      "materi": "Tekanan Zat Padat, Tekanan Hidrostatis & Hukum Pascal, Tekanan Gas, Penerapan pada Makhluk Hidup",
+      "cpRef": "Kepmendikbudristek/BSKAP No. 032/H/KR/2024 — Buku Siswa IPA Kelas 9 Bab 3",
       "items": [
         {
-          "id": "ipa-d9-bio-001",
+          "id": "ipa-d9-bab3-001",
+          "prompt": "Sebuah balok kayu dengan berat 30 N diletakkan di atas meja sehingga luas bidang sentuhnya 0,05 m². Tekanan yang diberikan balok kepada permukaan meja adalah…",
+          "options": [
+            "600 N/m²",
+            "1,5 N/m²",
+            "0,0017 N/m²",
+            "30 N/m²"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Tekanan zat padat adalah gaya tekan dibagi luas bidang sentuh, yaitu 30 : 0,05 = 600 N/m². Makin sempit bidang sentuhnya, makin besar tekanan yang dihasilkan gaya yang sama."
+          },
+          "distractorWhy": {
+            "1": "Murid mengalikan gaya dengan luas bidang sentuh karena mengira tekanan bertambah besar bila bidang sentuhnya makin luas.",
+            "2": "Murid membalik susunan rumus menjadi luas dibagi gaya, sehingga hasilnya justru mengecil ketika gaya bertambah.",
+            "3": "Murid menyamakan besar tekanan dengan besar berat benda dan mengabaikan luas bidang sentuh sama sekali."
+          },
+          "difficulty": "dasar"
+        },
+        {
+          "id": "ipa-d9-bab3-002",
+          "prompt": "Seorang penyelam berada pada kedalaman 5 m di bawah permukaan air sebuah danau. Jika massa jenis air 1.000 kg/m³ dan percepatan gravitasi 10 m/s², tekanan hidrostatis yang dialami penyelam itu adalah…",
+          "options": [
+            "50.000 Pa",
+            "5.000 Pa",
+            "10.000 Pa",
+            "2.000 Pa"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Tekanan hidrostatis dihitung dengan mengalikan massa jenis zat cair, percepatan gravitasi, dan kedalaman: 1.000 × 10 × 5 = 50.000 Pa. Tekanan ini berasal dari berat kolom air di atas penyelam."
+          },
+          "distractorWhy": {
+            "1": "Murid melewatkan percepatan gravitasi dan hanya mengalikan massa jenis dengan kedalaman, seolah berat kolom air tidak bergantung pada gravitasi.",
+            "2": "Murid mengabaikan kedalaman karena mengira tekanan air sama besar di seluruh bagian danau, padahal tekanan bertambah seiring bertambahnya kedalaman.",
+            "3": "Murid membagi hasil perkalian massa jenis dan gravitasi dengan kedalaman karena mengira makin dalam posisi benda, makin kecil tekanan yang dialaminya."
+          },
+          "difficulty": "dasar"
+        },
+        {
+          "id": "ipa-d9-bab3-003",
+          "prompt": "Daun padi di sawah menyusun zat makanannya sendiri melalui fotosintesis. Pasangan bahan baku dan hasil fotosintesis yang benar adalah…",
+          "options": [
+            "bahan bakunya karbon dioksida dan air, hasilnya glukosa dan oksigen",
+            "bahan bakunya oksigen dan air, hasilnya karbon dioksida dan glukosa",
+            "bahan bakunya karbon dioksida dan klorofil, hasilnya glukosa dan uap air",
+            "bahan bakunya pupuk dari dalam tanah dan sinar matahari, hasilnya oksigen dan zat hijau daun"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Fotosintesis menggunakan karbon dioksida yang masuk lewat stomata dan air yang diangkut dari akar; dengan bantuan energi cahaya yang diserap klorofil, keduanya diubah menjadi glukosa sebagai simpanan energi dan oksigen yang dilepaskan ke udara."
+          },
+          "distractorWhy": {
+            "1": "Murid menukar fotosintesis dengan respirasi karena kedua proses melibatkan gas yang sama, hanya arah pemakaiannya berlawanan.",
+            "2": "Murid mengira klorofil ikut habis sebagai bahan baku, padahal klorofil hanya menyerap energi cahaya dan jumlahnya tidak berkurang oleh reaksi.",
+            "3": "Murid mengira makanan tumbuhan adalah pupuk yang diserap dari tanah, padahal pupuk hanya menyediakan unsur hara, sedangkan makanan berupa glukosa dibuat sendiri di daun."
+          },
+          "difficulty": "dasar"
+        },
+        {
+          "id": "ipa-d9-bab3-004",
+          "prompt": "Sebutir telur tenggelam ketika dimasukkan ke dalam gelas berisi air tawar, tetapi terapung setelah air itu dibubuhi banyak garam dan diaduk. Alasan yang benar adalah…",
+          "options": [
+            "massa jenis air garam menjadi lebih besar daripada massa jenis telur sehingga gaya apung yang diterima telur melebihi beratnya",
+            "berat telur berkurang setelah airnya dibubuhi garam",
+            "butiran garam menutup pori-pori cangkang telur sehingga air tidak dapat masuk ke dalamnya",
+            "air garam lebih kental sehingga menahan telur seperti lem"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Melarutkan garam menambah massa zat terlarut tanpa menambah volume secara berarti, sehingga massa jenis larutan naik melampaui massa jenis telur. Menurut hukum Archimedes, gaya apung sebanding dengan massa jenis zat cair, sehingga gaya apung kini melebihi berat telur dan telur terangkat sampai terapung."
+          },
+          "distractorWhy": {
+            "1": "Murid mengira garam membuat benda di dalamnya menjadi lebih ringan, padahal massa dan berat telur tidak berubah sama sekali.",
+            "2": "Murid menjelaskan peristiwa terapung dengan masuk atau tidaknya air ke dalam benda, bukan dengan perbandingan massa jenis benda dan zat cair.",
+            "3": "Murid menyamakan kekentalan zat cair dengan gaya angkat ke atas, padahal yang menentukan terapung atau tenggelam adalah massa jenisnya."
+          },
+          "difficulty": "dasar"
+        },
+        {
+          "id": "ipa-d9-bab3-005",
+          "prompt": "Pada sebuah dongkrak hidrolik di bengkel, penampang kecilnya berluas 10 cm² dan penampang besarnya 200 cm². Bila pada penampang kecil diberikan gaya 50 N, gaya angkat yang timbul pada penampang besar adalah…",
+          "options": [
+            "1.000 N",
+            "2,5 N",
+            "50 N",
+            "10.000 N"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Hukum Pascal menyatakan tekanan diteruskan sama besar ke segala arah, sehingga F₁/A₁ = F₂/A₂. Luas penampang besar 20 kali luas penampang kecil, maka gaya angkatnya juga 20 kali lipat: 50 × 20 = 1.000 N."
+          },
+          "distractorWhy": {
+            "1": "Murid membagi gaya dengan perbandingan luas penampang karena mengira penampang yang lebih luas justru memperkecil gaya yang dihasilkan.",
+            "2": "Murid mengira yang diteruskan sama besar oleh zat cair adalah gayanya, padahal yang sama besar adalah tekanannya, sehingga gaya menjadi berlipat pada penampang yang lebih luas.",
+            "3": "Murid mengalikan gaya dengan luas penampang besar tanpa membandingkannya dengan luas penampang kecil, sehingga perbandingan luas tidak terpakai."
+          },
+          "difficulty": "sedang"
+        },
+        {
+          "id": "ipa-d9-bab3-006",
+          "prompt": "Sebuah batu bervolume 500 cm³ tercelup seluruhnya ke dalam air. Bila massa jenis air 1.000 kg/m³ dan percepatan gravitasi 10 m/s², besar gaya apung yang bekerja pada batu adalah…",
+          "options": [
+            "5 N",
+            "5.000.000 N",
+            "0,5 N",
+            "50 N"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Gaya apung sama dengan berat zat cair yang dipindahkan, yaitu massa jenis air × gravitasi × volume benda yang tercelup. Volume 500 cm³ sama dengan 0,0005 m³, sehingga F = 1.000 × 10 × 0,0005 = 5 N."
+          },
+          "distractorWhy": {
+            "1": "Murid memasukkan volume dalam satuan cm³ langsung ke dalam rumus tanpa mengubahnya menjadi m³, sehingga hasilnya sejuta kali lebih besar daripada seharusnya.",
+            "2": "Murid melewatkan percepatan gravitasi dan hanya mengalikan massa jenis dengan volume, sehingga yang diperolehnya adalah massa air yang dipindahkan, bukan beratnya.",
+            "3": "Murid salah menggeser tanda koma saat mengubah 500 cm³ menjadi m³ dan memakai 0,005 m³, sehingga hasilnya sepuluh kali lebih besar."
+          },
+          "difficulty": "sedang"
+        },
+        {
+          "id": "ipa-d9-bab3-007",
+          "prompt": "Seorang pendaki membawa bungkus makanan ringan yang tertutup rapat saat mendaki Gunung Rinjani. Makin tinggi ia mendaki, bungkus itu tampak makin menggembung. Penyebabnya adalah…",
+          "options": [
+            "tekanan udara di luar bungkus makin kecil pada tempat yang tinggi, sedangkan tekanan gas di dalam bungkus tetap sehingga mendorong bungkus mengembang",
+            "udara di dalam bungkus bertambah banyak karena bungkus menyerap udara pegunungan",
+            "suhu di puncak gunung lebih panas sehingga gas di dalam bungkus memuai",
+            "tekanan udara di pegunungan lebih besar sehingga menekan bungkus dari segala arah"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Makin tinggi suatu tempat, makin sedikit lapisan udara yang menekannya sehingga tekanan udara luar mengecil. Gas di dalam kemasan tertutup jumlahnya tetap, sehingga tekanan dalam yang kini lebih besar daripada tekanan luar mendorong dinding kemasan sampai menggembung."
+          },
+          "distractorWhy": {
+            "1": "Murid mengira jumlah gas di dalam kemasan tertutup dapat bertambah, padahal kemasan yang rapat tidak dapat dimasuki udara dari luar.",
+            "2": "Murid menjelaskan menggembungnya bungkus dengan pemuaian akibat panas, padahal udara di puncak gunung justru lebih dingin daripada di kaki gunung.",
+            "3": "Murid mengira tekanan udara bertambah seiring bertambahnya ketinggian karena membayangkan makin tinggi berarti makin banyak udara di atasnya; kenyataannya justru sebaliknya."
+          },
+          "difficulty": "sedang"
+        },
+        {
+          "id": "ipa-d9-bab3-008",
+          "prompt": "Air dari akar dapat naik sampai ke pucuk pohon mangga yang tinggi di halaman sekolah. Faktor yang paling berperan dalam peristiwa pengangkutan itu adalah…",
+          "options": [
+            "daya kapilaritas pembuluh xilem yang bergaris tengah sangat kecil bersama daya isap daun akibat penguapan air lewat stomata",
+            "tekanan yang diberikan pembuluh floem untuk mendorong air dari akar menuju daun",
+            "dorongan angin yang menekan batang sehingga air terangkat ke atas",
+            "pemompaan air oleh organ semacam jantung yang terletak di pangkal batang"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Xilem berupa pipa-pipa sangat halus, sehingga air naik karena daya kapilaritas; sementara itu penguapan air lewat stomata daun menimbulkan daya isap yang menarik kolom air di dalam xilem dari akar sampai ke pucuk."
+          },
+          "distractorWhy": {
+            "1": "Murid menukar tugas kedua berkas pengangkut; floem mengangkut hasil fotosintesis dari daun ke seluruh bagian tumbuhan, bukan mengangkut air dari akar.",
+            "2": "Murid mencari penyebab dari luar tubuh tumbuhan, padahal pengangkutan air tetap berlangsung meskipun udara di sekitar pohon tenang.",
+            "3": "Murid menyamakan pengangkutan pada tumbuhan dengan peredaran darah manusia yang digerakkan jantung, padahal tumbuhan tidak memiliki organ pemompa."
+          },
+          "difficulty": "sedang"
+        },
+        {
+          "id": "ipa-d9-bab3-009",
+          "prompt": "Pada percobaan Ingenhousz, tanaman Hydrilla di dalam corong terbalik yang terendam air menghasilkan gelembung ketika terkena cahaya matahari. Gelembung tersebut menunjukkan bahwa…",
+          "options": [
+            "fotosintesis menghasilkan gas oksigen dan berlangsung makin cepat ketika cahaya yang diterima makin banyak",
+            "fotosintesis menghasilkan gas karbon dioksida yang dilepaskan ke dalam air",
+            "air di sekitar tanaman mendidih karena panas matahari sehingga muncul gelembung uap air",
+            "Hydrilla menyerap oksigen dari air sehingga air berkurang dan meninggalkan rongga udara"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Gas yang terkumpul di ujung tabung pada percobaan Ingenhousz dapat menyalakan kembali bara lidi, yang menandakan gas itu oksigen. Jumlah gelembung bertambah bila cahaya lebih terang, sehingga cahaya terbukti memengaruhi laju fotosintesis."
+          },
+          "distractorWhy": {
+            "1": "Murid mengira gas yang keluar dari makhluk hidup selalu karbon dioksida seperti pada pernapasan manusia, padahal karbon dioksida justru merupakan bahan baku fotosintesis.",
+            "2": "Murid menjelaskan gelembung sebagai akibat pemanasan air, padahal air dalam percobaan tidak sampai mendidih dan gelembung tetap muncul pada air yang sejuk asalkan ada cahaya.",
+            "3": "Murid membalik arah pertukaran gas dan mengira gelembung berasal dari ruang kosong yang ditinggalkan air yang menyusut."
+          },
+          "difficulty": "sedang"
+        },
+        {
+          "id": "ipa-d9-bab3-010",
+          "prompt": "Sebuah balok kayu terapung di permukaan air dengan tiga perempat bagian volumenya tercelup. Bila massa jenis air 1.000 kg/m³, massa jenis kayu itu adalah…",
+          "options": [
+            "750 kg/m³",
+            "1.333 kg/m³",
+            "250 kg/m³",
+            "1.000 kg/m³"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Pada benda terapung, berat benda sama dengan gaya apung, sehingga massa jenis benda sama dengan massa jenis zat cair dikalikan bagian volume yang tercelup: 3/4 × 1.000 = 750 kg/m³."
+          },
+          "distractorWhy": {
+            "1": "Murid membagi massa jenis air dengan bagian yang tercelup sehingga memperoleh nilai yang justru lebih besar daripada massa jenis air; benda dengan massa jenis seperti itu pasti tenggelam, bukan terapung.",
+            "2": "Murid memakai bagian yang muncul di atas permukaan air alih-alih bagian yang tercelup sebagai pembanding massa jenis.",
+            "3": "Murid mengira setiap benda yang terapung memiliki massa jenis sama dengan zat cairnya, padahal keadaan itu berlaku untuk benda yang melayang."
+          },
+          "difficulty": "tinggi"
+        },
+        {
+          "id": "ipa-d9-bab3-011",
+          "prompt": "Sebuah batu bata bermassa 3 kg berukuran 20 cm × 10 cm × 5 cm diletakkan di atas pasir halus (g = 10 m/s²). Perbandingan tekanan ketika batu bata itu berdiri pada sisi terluas dengan ketika berdiri pada sisi tersempit adalah…",
+          "options": [
+            "1 : 4, karena tekanan berbanding terbalik dengan luas bidang sentuh",
+            "4 : 1, karena bidang sentuh yang lebih luas menahan berat lebih besar sehingga tekanannya lebih besar",
+            "1 : 1, karena berat batu bata tidak berubah meskipun kedudukannya diubah",
+            "1 : 2, karena sisi tersempit panjangnya hanya setengah dari sisi terluas"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Berat batu bata tetap 30 N. Sisi terluas berukuran 20 cm × 10 cm = 0,02 m² sehingga tekanannya 1.500 Pa, sedangkan sisi tersempit berukuran 10 cm × 5 cm = 0,005 m² sehingga tekanannya 6.000 Pa. Perbandingannya 1.500 : 6.000 = 1 : 4, sesuai sifat tekanan yang berbanding terbalik dengan luas bidang sentuh."
+          },
+          "distractorWhy": {
+            "1": "Murid mengira makin luas bidang sentuh makin besar tekanannya karena menyamakan tekanan dengan besarnya gaya berat yang ditanggung bidang itu.",
+            "2": "Murid mengira tekanan hanya ditentukan oleh berat benda, sehingga perubahan kedudukan batu bata dianggap tidak berpengaruh.",
+            "3": "Murid membandingkan panjang rusuk batu bata, bukan luas kedua bidang sentuhnya, sehingga perbandingannya berhenti pada satu ukuran saja."
+          },
+          "difficulty": "tinggi"
+        },
+        {
+          "id": "ipa-d9-bab3-012",
+          "prompt": "Dalam percobaan Sachs, sehelai daun yang masih menempel pada tumbuhan ditutup sebagian memakai kertas timah selama dua hari. Daun itu lalu dipetik, direbus dalam air, dimasukkan ke alkohol panas, dan ditetesi lugol. Hasil yang seharusnya tampak beserta alasannya adalah…",
+          "options": [
+            "bagian daun yang tidak tertutup berwarna biru kehitaman karena di bagian itu terbentuk amilum hasil fotosintesis yang memerlukan cahaya",
+            "seluruh permukaan daun berwarna biru kehitaman karena daun tetap berfotosintesis memakai cahaya yang sudah tersimpan sebelumnya",
+            "bagian daun yang tertutup berwarna biru kehitaman karena kertas timah melindungi amilum agar tidak terurai",
+            "seluruh daun tetap pucat karena perebusan dalam alkohol panas melarutkan semua amilum di dalam daun"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Lugol memberi warna biru kehitaman bila ada amilum. Bagian daun yang tertutup kertas timah tidak menerima cahaya sehingga tidak berfotosintesis dan tidak membentuk amilum, sedangkan bagian yang terbuka membentuk amilum; inilah bukti bahwa fotosintesis memerlukan cahaya."
+          },
+          "distractorWhy": {
+            "1": "Murid mengira tumbuhan dapat menyimpan cahaya sebagai cadangan dan tetap berfotosintesis dalam keadaan gelap, padahal yang tersimpan adalah hasil fotosintesis berupa amilum.",
+            "2": "Murid membalik peran perlakuan dan menganggap penutup menjaga hasil fotosintesis, padahal penutup justru menghalangi cahaya sehingga amilum tidak terbentuk.",
+            "3": "Murid mengira alkohol panas melarutkan amilum, padahal yang larut adalah klorofil sehingga daun menjadi pucat dan perubahan warna oleh lugol mudah diamati."
+          },
+          "difficulty": "tinggi"
+        }
+      ]
+    },
+    {
+      "code": "KOMP-IPA-D-9-BAB4-01",
+      "grade": 9,
+      "semester": 2,
+      "name": "Listrik, Magnet, dan Sumber Energi Alternatif",
+      "materi": "Listrik Statis & Dinamis, Hukum Ohm, Rangkaian Seri-Paralel, Kemagnetan, Induksi Elektromagnetik, Energi Alternatif",
+      "cpRef": "Kepmendikbudristek/BSKAP No. 032/H/KR/2024 — Buku Siswa IPA Kelas 9 Bab 4",
+      "items": [
+        {
+          "id": "ipa-d9-bab4-001",
+          "prompt": "Sebuah lampu senter berhambatan 4 Ω dihubungkan ke baterai bertegangan 12 V. Berapa kuat arus yang mengalir pada lampu itu?",
+          "options": [
+            "3 A",
+            "48 A",
+            "0,33 A",
+            "8 A"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Hukum Ohm menyatakan I = V / R. Dengan V = 12 V dan R = 4 Ω, maka I = 12 V / 4 Ω = 3 A. Makin besar hambatan, makin kecil arus pada tegangan yang sama."
+          },
+          "distractorWhy": {
+            "1": "Angka 48 A muncul ketika murid mengalikan tegangan dengan hambatan (12 × 4) alih-alih membaginya. Ini kekeliruan arah rumus Hukum Ohm yang paling sering terjadi.",
+            "2": "Nilai 0,33 A lahir dari membalik pembagian menjadi R / V = 4 / 12. Murid ingat bahwa ada pembagian, tetapi tertukar mana yang menjadi pembilang.",
+            "3": "Hasil 8 A didapat dengan mengurangkan 12 − 4. Murid memperlakukan volt dan ohm sebagai besaran sejenis yang boleh dijumlah atau dikurangkan."
+          },
+          "difficulty": "dasar"
+        },
+        {
+          "id": "ipa-d9-bab4-002",
+          "prompt": "Tiga hambatan masing-masing 2 Ω, 3 Ω, dan 5 Ω dirangkai seri pada sebuah papan percobaan. Berapa hambatan penggantinya?",
+          "options": [
+            "10 Ω",
+            "0,97 Ω",
+            "3,33 Ω",
+            "30 Ω"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Pada rangkaian seri arus melewati satu jalur yang sama, sehingga hambatan tinggal dijumlahkan: Rs = 2 Ω + 3 Ω + 5 Ω = 10 Ω. Hambatan pengganti seri selalu lebih besar daripada hambatan terbesar penyusunnya."
+          },
+          "distractorWhy": {
+            "1": "Nilai 0,97 Ω keluar dari rumus paralel 1/R = 1/2 + 1/3 + 1/5. Murid tertukar menerapkan rumus paralel pada susunan seri karena hanya menghafal rumus tanpa mengenali bentuk rangkaiannya.",
+            "2": "Angka 3,33 Ω adalah rata-rata dari 2, 3, dan 5. Murid mengira hambatan pengganti merupakan nilai tengah dari hambatan-hambatan yang dipasang.",
+            "3": "Hasil 30 Ω diperoleh dari mengalikan 2 × 3 × 5. Murid mencampur aturan seri dengan pola perkalian yang dipakai pada rumus dua hambatan paralel."
+          },
+          "difficulty": "dasar"
+        },
+        {
+          "id": "ipa-d9-bab4-003",
+          "prompt": "Sebuah setrika listrik berdaya 300 W dipakai rata-rata 2 jam setiap hari selama 30 hari. Berapa energi listrik yang terpakai dalam sebulan?",
+          "options": [
+            "18 kWh",
+            "18.000 kWh",
+            "0,6 kWh",
+            "9 kWh"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Energi listrik W = P × t. Daya 300 W harus diubah dulu menjadi 0,3 kW agar satuannya cocok dengan kWh. Maka W = 0,3 kW × 2 jam × 30 hari = 18 kWh."
+          },
+          "distractorWhy": {
+            "1": "Nilai 18.000 kWh terjadi ketika daya tetap ditulis 300 W lalu langsung dikalikan jam dan hari, tanpa mengubah watt menjadi kilowatt. Kesalahan konversi satuan 1 kW = 1.000 W ini membuat hasilnya seribu kali terlalu besar.",
+            "2": "Angka 0,6 kWh hanya menghitung pemakaian satu hari (0,3 kW × 2 jam). Murid berhenti sebelum mengalikan dengan 30 hari karena membaca soal sebagai pemakaian harian.",
+            "3": "Hasil 9 kWh muncul dari 0,3 kW × 30 hari tanpa memperhitungkan lamanya pemakaian tiap hari. Murid menganggap daya kali jumlah hari sudah cukup, padahal satuan kWh menuntut waktu dalam jam."
+          },
+          "difficulty": "dasar"
+        },
+        {
+          "id": "ipa-d9-bab4-004",
+          "prompt": "Seorang murid ingin mengubah sebuah paku baja menjadi magnet di dalam kelas. Tindakan yang tepat untuk mencapainya adalah …",
+          "options": [
+            "Melilitkan kawat berisolasi pada paku, lalu mengalirkan arus searah dari baterai melalui lilitan itu",
+            "Memukul-mukul paku dengan palu berkali-kali sampai terasa hangat",
+            "Membakar paku di atas nyala api sampai membara lalu mendinginkannya",
+            "Menggosokkan paku itu ke paku baja lain yang belum bermagnet, berulang-ulang ke satu arah"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Arus searah yang mengalir pada lilitan menimbulkan medan magnet di dalam kumparan. Medan ini menata magnet-magnet elementer di dalam baja agar menghadap satu arah, sehingga paku menjadi elektromagnet. Cara membuat magnet ada tiga: menggosok dengan magnet, induksi, dan mengaliri arus searah."
+          },
+          "distractorWhy": {
+            "1": "Murid mengira pukulan menata magnet elementer seperti mengetuk serbuk agar rapi. Kenyataannya pukulan justru mengacak susunan magnet elementer, sehingga memukul termasuk cara MENGHILANGKAN sifat kemagnetan.",
+            "2": "Murid menyamakan panas dengan energi yang bisa 'memasukkan' kemagnetan. Pemanasan sampai membara membuat getaran partikel begitu hebat sehingga susunan magnet elementer berantakan; ini juga cara menghilangkan kemagnetan.",
+            "3": "Murid benar mengingat kata 'menggosok', tetapi melewatkan syaratnya: penggosoknya harus benda yang sudah bermagnet. Menggosokkan dua baja yang sama-sama belum bermagnet tidak menata magnet elementer apa pun."
+          },
+          "difficulty": "dasar"
+        },
+        {
+          "id": "ipa-d9-bab4-005",
+          "prompt": "Hambatan 6 Ω dan 3 Ω disusun paralel, lalu dihubungkan ke sumber tegangan 12 V. Berapa kuat arus total yang keluar dari sumber?",
+          "options": [
+            "6 A",
+            "1,33 A",
+            "4 A",
+            "2 A"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Hambatan pengganti paralel: Rp = (6 × 3) / (6 + 3) = 18 / 9 = 2 Ω. Kuat arus total I = V / Rp = 12 V / 2 Ω = 6 A. Dapat dicek lewat cabang: 12/6 = 2 A dan 12/3 = 4 A, jumlahnya 6 A."
+          },
+          "distractorWhy": {
+            "1": "Nilai 1,33 A muncul karena hambatan dijumlahkan seperti rangkaian seri (6 + 3 = 9 Ω), lalu 12 / 9. Murid belum membedakan bahwa pada susunan paralel hambatan pengganti justru mengecil.",
+            "2": "Angka 4 A adalah arus pada satu cabang saja, yaitu 12 / 3. Murid berhenti setelah menghitung cabang berhambatan kecil dan melupakan bahwa arus dari sumber terbagi ke dua cabang.",
+            "3": "Angka 2 A adalah arus cabang 12 / 6. Murid memilih hambatan terbesar dengan anggapan hambatan terbesarlah yang menentukan arus total, padahal pada paralel kedua cabang sama-sama mendapat 12 V."
+          },
+          "difficulty": "sedang"
+        },
+        {
+          "id": "ipa-d9-bab4-006",
+          "prompt": "Instalasi lampu di rumah pelanggan PLN dipasang paralel terhadap jala-jala 220 V, bukan seri. Alasan teknis yang benar untuk pilihan itu adalah …",
+          "options": [
+            "Setiap lampu menerima tegangan penuh 220 V dan tetap menyala meskipun lampu lain dimatikan atau putus",
+            "Susunan paralel memperbesar hambatan total rumah sehingga arus yang mengalir menjadi lebih aman",
+            "Pada susunan paralel tegangan terbagi rata ke setiap lampu sehingga lampu menjadi lebih awet",
+            "Arus yang mengalir pada setiap lampu selalu sama besar sehingga nyala semua lampu seragam"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Ciri rangkaian paralel adalah tegangan pada tiap cabang sama dengan tegangan sumber, sedangkan arus terbagi. Maka tiap lampu mendapat 220 V penuh, dan jika satu lampu putus cabang lain tetap tersambung ke sumber sehingga lampu lain tidak ikut padam."
+          },
+          "distractorWhy": {
+            "1": "Ini miskonsepsi arah perubahan hambatan: murid mengira menambah cabang paralel berarti menambah hambatan. Kenyataannya tiap cabang baru membuka jalan arus tambahan sehingga hambatan total justru MENGECIL dan arus dari PLN bertambah — itulah sebabnya rumah memakai MCB pembatas.",
+            "2": "Murid memindahkan sifat rangkaian seri (tegangan terbagi) ke rangkaian paralel. Pada paralel yang terbagi adalah arus, bukan tegangan; kalau tegangan tiap lampu terbagi, lampu justru akan menyala redup.",
+            "3": "Arus yang selalu sama di setiap komponen adalah ciri rangkaian SERI. Murid menukar ciri seri dan paralel; pada paralel arus tiap cabang bergantung pada hambatan lampu masing-masing."
+          },
+          "difficulty": "sedang"
+        },
+        {
+          "id": "ipa-d9-bab4-007",
+          "prompt": "Sebuah rumah menyalakan 5 lampu LED masing-masing 10 W selama 6 jam setiap hari. Jika tarif PLN Rp1.500,00 per kWh, berapa biaya listrik untuk lampu itu selama 30 hari?",
+          "options": [
+            "Rp13.500,00",
+            "Rp2.700,00",
+            "Rp13.500.000,00",
+            "Rp450,00"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Daya total = 5 × 10 W = 50 W = 0,05 kW. Energi sebulan = 0,05 kW × 6 jam × 30 hari = 9 kWh. Biaya = 9 kWh × Rp1.500,00 = Rp13.500,00."
+          },
+          "distractorWhy": {
+            "1": "Nilai Rp2.700,00 adalah biaya untuk satu lampu saja (0,01 kW × 6 × 30 × 1.500). Murid melewatkan kata 'lima lampu' dan tidak mengalikan daya dengan jumlah lampu.",
+            "2": "Hasil Rp13.500.000,00 muncul karena 50 W tidak diubah menjadi 0,05 kW sebelum dikalikan. Kesalahan konversi 1 kW = 1.000 W membuat biayanya melambung seribu kali lipat — sekaligus petunjuk bahwa jawabannya tidak masuk akal.",
+            "3": "Angka Rp450,00 hanya menghitung pemakaian satu hari. Murid berhenti pada energi harian 0,3 kWh dan lupa mengalikannya dengan 30 hari seperti yang diminta soal."
+          },
+          "difficulty": "sedang"
+        },
+        {
+          "id": "ipa-d9-bab4-008",
+          "prompt": "Sebuah magnet batang digerakkan keluar-masuk kumparan yang ujung-ujungnya dihubungkan ke galvanometer. Agar simpangan jarum galvanometer bertambah besar, yang harus dilakukan adalah …",
+          "options": [
+            "Menggerakkan magnet lebih cepat dan menambah jumlah lilitan kumparan",
+            "Menahan magnet diam tepat di tengah kumparan agar medan magnet yang dirasakan kumparan paling kuat",
+            "Mengganti galvanometer dengan galvanometer yang hambatan dalamnya jauh lebih besar",
+            "Mengurangi jumlah lilitan agar arus tidak terhambat oleh kawat yang panjang"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "GGL induksi bergantung pada laju perubahan fluks magnetik dan jumlah lilitan. Gerakan yang lebih cepat membuat fluks berubah dalam waktu lebih singkat, dan lilitan yang lebih banyak melipatgandakan GGL, sehingga arus induksi — dan simpangan jarum — bertambah besar."
+          },
+          "distractorWhy": {
+            "1": "Ini miskonsepsi klasik 'medan kuat = listrik besar'. Yang membangkitkan GGL bukan besarnya medan magnet, melainkan PERUBAHAN fluks. Magnet yang diam di tengah kumparan memberi fluks besar tetapi tetap, sehingga GGL induksinya nol dan jarum sama sekali tidak menyimpang.",
+            "2": "Murid mengira alat ukurnya yang menentukan besar simpangan. Memperbesar hambatan dalam galvanometer justru memperkecil arus induksi yang mengalir, sehingga simpangan berkurang; sumber gejalanya tetap ada pada perubahan fluks.",
+            "3": "Murid menukar peran lilitan: dianggap hanya menambah panjang kawat dan hambatan. Padahal setiap lilitan menyumbang GGL, dan pengaruh penambahan GGL jauh lebih menentukan daripada tambahan hambatan kawatnya."
+          },
+          "difficulty": "sedang"
+        },
+        {
+          "id": "ipa-d9-bab4-009",
+          "prompt": "Sebuah transformator ideal memiliki 1.000 lilitan primer dan 100 lilitan sekunder. Kumparan primernya dihubungkan ke tegangan 220 V. Berapa tegangan pada kumparan sekundernya?",
+          "options": [
+            "22 V",
+            "2.200 V",
+            "220 V",
+            "110 V"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Pada transformator ideal berlaku Vp / Vs = Np / Ns. Maka Vs = Vp × (Ns / Np) = 220 V × (100 / 1.000) = 22 V. Karena lilitan sekunder lebih sedikit, alat ini adalah transformator step-down."
+          },
+          "distractorWhy": {
+            "1": "Nilai 2.200 V lahir dari membalik perbandingan menjadi Vs = Vp × (Np / Ns). Murid menerapkan perbandingan tanpa memeriksa arah: lilitan sekunder yang lebih SEDIKIT mustahil menghasilkan tegangan yang lebih besar.",
+            "2": "Angka 220 V muncul dari anggapan bahwa transformator hanya mengubah kuat arus dan membiarkan tegangan tetap. Padahal justru tegangan yang diubah, sedangkan daya yang tetap (pada trafo ideal) membuat arus berubah berlawanan arah.",
+            "3": "Hasil 110 V berasal dari anggapan bahwa 'step-down' selalu berarti membagi dua. Murid tidak memakai perbandingan lilitan 1.000 : 100 yang sebenarnya menurunkan tegangan menjadi sepersepuluh."
+          },
+          "difficulty": "sedang"
+        },
+        {
+          "id": "ipa-d9-bab4-010",
+          "prompt": "Hambatan R1 = 4 Ω dipasang seri dengan gabungan paralel R2 = 6 Ω dan R3 = 12 Ω. Ujung-ujung rangkaian dihubungkan ke sumber 12 V. Berapa kuat arus yang keluar dari sumber?",
+          "options": [
+            "1,5 A",
+            "0,55 A",
+            "6 A",
+            "3 A"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Selesaikan bagian paralel lebih dulu: Rp = (6 × 12) / (6 + 12) = 72 / 18 = 4 Ω. Hambatan total = R1 + Rp = 4 Ω + 4 Ω = 8 Ω. Arus dari sumber I = 12 V / 8 Ω = 1,5 A."
+          },
+          "distractorWhy": {
+            "1": "Nilai 0,55 A didapat dengan menjumlahkan ketiga hambatan seolah semuanya seri (4 + 6 + 12 = 22 Ω). Murid tidak mengenali bahwa R2 dan R3 berbagi dua titik sambung yang sama sehingga tersusun paralel.",
+            "2": "Angka 6 A berasal dari menganggap ketiga hambatan paralel semua: 1/R = 1/4 + 1/6 + 1/12 = 1/2 sehingga R = 2 Ω. Murid menyeragamkan seluruh rangkaian menjadi satu jenis susunan tanpa membaca titik percabangannya.",
+            "3": "Hasil 3 A diperoleh dari 12 / 4, yaitu hanya memakai R1. Murid mengabaikan cabang paralel dengan anggapan hambatan yang bercabang 'tidak dilewati arus utama', padahal seluruh arus sumber tetap melalui gabungan paralel itu."
+          },
+          "difficulty": "tinggi"
+        },
+        {
+          "id": "ipa-d9-bab4-011",
+          "prompt": "Sebuah lampu pijar bertuliskan \"40 W; 220 V\". Lampu itu dipasang pada sumber tegangan 110 V. Jika hambatan filamennya dianggap tetap, berapa daya yang dihasilkan lampu?",
+          "options": [
+            "10 W",
+            "20 W",
+            "40 W",
+            "80 W"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Hambatan filamen dihitung dari data tertulis: R = V² / P = (220 V)² / 40 W = 1.210 Ω. Pada 110 V, daya menjadi P = V² / R = (110 V)² / 1.210 Ω = 10 W. Karena P sebanding dengan kuadrat tegangan, tegangan yang menjadi setengah membuat daya tinggal seperempat."
+          },
+          "distractorWhy": {
+            "1": "Nilai 20 W lahir dari anggapan daya sebanding lurus dengan tegangan, sehingga tegangan setengah dianggap memberi daya setengah. Murid melewatkan bahwa pada hambatan tetap, arus ikut turun menjadi setengah, jadi daya turun dua kali lipat penurunan itu.",
+            "2": "Angka 40 W muncul dari anggapan bahwa tulisan pada lampu adalah daya yang selalu dihasilkan berapa pun tegangannya. Padahal angka itu hanya berlaku tepat pada tegangan yang tertera, yaitu 220 V.",
+            "3": "Hasil 80 W berasal dari mengira lampu menarik arus lebih besar ketika tegangan turun agar dayanya tetap terpenuhi. Murid menyamakan lampu pijar dengan peralatan berdaya tetap, padahal filamen adalah hambatan biasa yang tunduk pada Hukum Ohm."
+          },
+          "difficulty": "tinggi"
+        },
+        {
+          "id": "ipa-d9-bab4-012",
+          "prompt": "Lampu pada dinamo sepeda menyala makin terang ketika sepeda dikayuh makin cepat. Penjelasan fisika yang paling tepat untuk peristiwa itu adalah …",
+          "options": [
+            "Putaran yang lebih cepat mempersingkat waktu perubahan fluks magnetik pada kumparan, sehingga GGL induksi yang dihasilkan lebih besar",
+            "Kayuhan yang cepat membuat magnet di dalam dinamo menjadi lebih kuat, sehingga tegangan keluarannya naik",
+            "Gesekan antara roda dan kepala dinamo menghasilkan panas yang langsung diubah menjadi energi listrik",
+            "Kayuhan yang cepat mendorong keluar lebih banyak muatan listrik yang sudah tersimpan di dalam dinamo"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Dinamo sepeda adalah generator kecil: magnet berputar di dekat kumparan sehingga fluks magnetik yang menembus kumparan berubah-ubah. Besar GGL induksi bergantung pada laju perubahan fluks itu, jadi putaran yang lebih cepat menghasilkan GGL dan arus yang lebih besar, dan lampu menyala lebih terang."
+          },
+          "distractorWhy": {
+            "1": "Murid mengira kecepatan gerak menambah kekuatan magnet permanennya. Kekuatan magnet di dalam dinamo tetap; yang berubah hanyalah seberapa cepat fluksnya berubah terhadap waktu.",
+            "2": "Murid menganggap gesekan menghasilkan listrik secara langsung, mencampuradukkan listrik statis akibat gesekan dengan induksi elektromagnetik. Gesekan roda pada dinamo hanya berperan memutar poros magnetnya, bukan membangkitkan muatan.",
+            "3": "Murid memperlakukan dinamo seperti baterai yang menyimpan listrik dan tinggal dikeluarkan. Dinamo tidak menyimpan energi listrik; ia mengubah energi gerak kayuhan menjadi energi listrik saat itu juga, sehingga berhenti mengayuh berarti lampu padam."
+          },
+          "difficulty": "tinggi"
+        }
+      ]
+    },
+    {
+      "code": "KOMP-IPA-D-9-BAB6-01",
+      "grade": 9,
+      "semester": 2,
+      "name": "Pewarisan Sifat dan Bioteknologi",
+      "materi": "Materi Genetik & Persilangan Monohibrid, Penerapan Pewarisan Sifat, Bioteknologi Konvensional & Modern",
+      "cpRef": "Kepmendikbudristek/BSKAP No. 032/H/KR/2024 — Buku Siswa IPA Kelas 9 Bab 6",
+      "items": [
+        {
+          "id": "ipa-d9-bab6-001",
           "prompt": "Kedelai rebus yang diberi ragi tempe berubah menjadi tempe yang padat dan diselimuti benang-benang putih. Mikroorganisme yang berperan dalam pembuatan tempe adalah …",
           "options": [
             "Jamur Rhizopus oryzae",
@@ -2034,7 +2284,7 @@
           "difficulty": "dasar"
         },
         {
-          "id": "ipa-d9-bio-002",
+          "id": "ipa-d9-bab6-002",
           "prompt": "Singkong kukus yang ditaburi ragi lalu ditutup rapat selama tiga hari berubah menjadi tape yang terasa manis dan beraroma alkohol. Proses yang sesungguhnya terjadi adalah …",
           "options": [
             "Fermentasi oleh Saccharomyces cerevisiae yang memecah amilum menjadi gula, lalu sebagian gula diubah menjadi alkohol dan karbon dioksida",
@@ -2054,7 +2304,7 @@
           "difficulty": "dasar"
         },
         {
-          "id": "ipa-d9-bio-003",
+          "id": "ipa-d9-bab6-003",
           "prompt": "Di antara produk berikut, yang tergolong hasil bioteknologi MODERN adalah …",
           "options": [
             "Insulin untuk penderita diabetes yang diproduksi bakteri Escherichia coli hasil rekayasa genetika",
@@ -2074,7 +2324,7 @@
           "difficulty": "dasar"
         },
         {
-          "id": "ipa-d9-bio-004",
+          "id": "ipa-d9-bab6-004",
           "prompt": "Gas buang kendaraan bermotor di jalan raya kota besar mengandung karbon monoksida yang berbahaya bagi pernapasan. Pencemaran yang terjadi tergolong …",
           "options": [
             "Pencemaran udara, karena zat pencemarnya bercampur ke dalam udara dan terhirup makhluk hidup",
@@ -2094,7 +2344,7 @@
           "difficulty": "dasar"
         },
         {
-          "id": "ipa-d9-bio-005",
+          "id": "ipa-d9-bab6-005",
           "prompt": "Air sungai di belakang sebuah pabrik tampak keruh, berbusa, berbau, dan banyak ikan mati. Hasil uji laboratorium yang paling menunjukkan bahwa air itu tercemar berat oleh limbah organik adalah …",
           "options": [
             "Kadar oksigen terlarut (DO) rendah disertai nilai BOD yang tinggi",
@@ -2114,7 +2364,7 @@
           "difficulty": "sedang"
         },
         {
-          "id": "ipa-d9-bio-006",
+          "id": "ipa-d9-bab6-006",
           "prompt": "Seorang petani menaburkan pupuk urea jauh melebihi takaran. Air sawah yang meluap masuk ke kolam di sebelahnya. Beberapa minggu kemudian permukaan kolam tertutup rapat oleh eceng gondok dan ikan-ikan di kolam mati. Urutan sebab-akibat yang benar adalah …",
           "options": [
             "Kelebihan unsur hara memicu ledakan pertumbuhan tumbuhan air; permukaan yang tertutup menghalangi cahaya dan pertukaran udara, lalu penguraian tumbuhan yang mati menghabiskan oksigen terlarut sehingga ikan mati lemas",
@@ -2134,7 +2384,7 @@
           "difficulty": "sedang"
         },
         {
-          "id": "ipa-d9-bio-007",
+          "id": "ipa-d9-bab6-007",
           "prompt": "Sebuah kelompok peternak sapi mengolah kotoran ternak di dalam tabung pencerna (digester) tertutup, lalu gas yang terkumpul dialirkan ke kompor dapur warga. Teknologi ini bekerja dengan cara …",
           "options": [
             "Biogas; bakteri metanogen menguraikan kotoran tanpa oksigen sehingga terbentuk gas metana yang dapat dibakar",
@@ -2154,7 +2404,7 @@
           "difficulty": "sedang"
         },
         {
-          "id": "ipa-d9-bio-008",
+          "id": "ipa-d9-bab6-008",
           "prompt": "Tanah bekas tumpahan minyak di sekitar depo bahan bakar dipulihkan dengan menaburkan biakan bakteri pengurai hidrokarbon. Upaya pemulihan lingkungan semacam ini disebut …",
           "options": [
             "Bioremediasi, yaitu pemanfaatan makhluk hidup untuk menguraikan zat pencemar menjadi zat yang tidak berbahaya",
@@ -2174,7 +2424,7 @@
           "difficulty": "sedang"
         },
         {
-          "id": "ipa-d9-bio-009",
+          "id": "ipa-d9-bab6-009",
           "prompt": "Petani anggrek memperbanyak bibit unggul dalam jumlah sangat banyak dan seragam dengan menanam potongan kecil jaringan tanaman pada media steril di dalam botol. Dasar ilmiah keberhasilan cara ini adalah …",
           "options": [
             "Sifat totipotensi sel tumbuhan, yaitu kemampuan satu sel tumbuh menjadi individu lengkap",
@@ -2194,7 +2444,7 @@
           "difficulty": "sedang"
         },
         {
-          "id": "ipa-d9-bio-010",
+          "id": "ipa-d9-bab6-010",
           "prompt": "Jagung Bt adalah jagung transgenik yang disisipi gen dari bakteri Bacillus thuringiensis sehingga tanamannya menghasilkan protein yang mematikan ulat hama. Keberatan yang paling dapat dipertanggungjawabkan secara ilmiah terhadap penanamannya di lahan yang sangat luas adalah …",
           "options": [
             "Hama ulat dapat mengalami seleksi sehingga lama-kelamaan muncul populasi yang kebal terhadap protein Bt, dan serangga bukan sasaran ikut terpengaruh",
@@ -2214,7 +2464,7 @@
           "difficulty": "tinggi"
         },
         {
-          "id": "ipa-d9-bio-011",
+          "id": "ipa-d9-bab6-011",
           "prompt": "Sebuah sekolah ingin menekan timbunan sampah plastiknya. Di antara rencana berikut, yang menempati tingkat TERTINGGI dalam hierarki pengelolaan sampah (reduce–reuse–recycle) adalah …",
           "options": [
             "Mewajibkan seluruh warga sekolah membawa botol minum isi ulang sehingga botol plastik sekali pakai tidak lagi dibeli di kantin",
@@ -2234,7 +2484,7 @@
           "difficulty": "tinggi"
         },
         {
-          "id": "ipa-d9-bio-012",
+          "id": "ipa-d9-bab6-012",
           "prompt": "Dua titik pada satu sungai diperiksa biotanya. Titik A di hulu pabrik: ditemukan larva capung, larva lalat sehari, dan ikan-ikan kecil. Titik B di hilir saluran pembuangan pabrik: hampir hanya ditemukan cacing Tubifex dalam jumlah sangat melimpah. Kesimpulan yang tepat dari data itu adalah …",
           "options": [
             "Titik B lebih tercemar, karena Tubifex mampu hidup pada air ber-oksigen rendah yang kaya bahan organik, sedangkan larva capung hanya bertahan di air yang bersih",
