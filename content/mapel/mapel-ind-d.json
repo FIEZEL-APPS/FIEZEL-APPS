@@ -21,241 +21,401 @@
         {
           "id": "ind-d-7-b1-q01",
           "difficulty": "dasar",
-          "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VII (hal. 6-9 Teks 'Pantan Terong yang Instagramable'), objek utama yang dideskripsikan oleh penulis dalam teks tersebut adalah…",
+          "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VII hal. 4, dalam teks 'Pantan Terong yang Instagramable', objek wisata Pantan Terong terletak di kota...",
           "options": [
-            "Keindahan pemandangan alam dari bukit Pantan Terong di Kota Takengon, Aceh",
-            "Sejarah pembangunan dermaga penyeberangan di Danau Toba",
-            "Fasilitas penginapan mewah dan arena bermain di Kota Banda Aceh",
-            "Rute penerbangan komersial menuju Bandara Sultan Iskandar Muda"
+            "Takengon",
+            "Banda Aceh",
+            "Lampung",
+            "Pangandaran"
           ],
           "answer": 0,
           "why": {
-            "0": "Teks deskripsi 'Pantan Terong yang Instagramable' memaparkan lanskap keindahan bukit Pantan Terong yang menyuguhkan pemandangan Danau Laut Tawar di Takengon, Aceh."
+            "0": "Teks deskripsi 'Pantan Terong yang Instagramable' secara eksplisit menyebutkan bahwa Pantan Terong merupakan nama tempat wisata populer yang berada di Kota Takengon, Aceh."
           },
           "distractorWhy": {
-            "1": "Danau Toba terletak di Sumatera Utara, bukan fokus teks Pantan Terong Aceh.",
-            "2": "Teks tidak membahas arena bermain atau penginapan mewah.",
-            "3": "Rute penerbangan bukan merupakan isi fisik teks deskripsi wisata alam ini."
+            "1": "Banda Aceh merupakan kota asal keberangkatan rombongan Rafa pada pukul 01.00 siang, bukan lokasi dari objek wisata Pantan Terong.",
+            "2": "Lampung merupakan lokasi objek wisata kuliner Gang PU yang dibahas dalam teks deskripsi lain berjudul 'Jelajah Rasa di Lampung'.",
+            "3": "Pangandaran merupakan lokasi destinasi wisata Green Canyon dan Sungai Santirah yang dibahas pada bab mengenai pamflet wisata."
           }
         },
         {
           "id": "ind-d-7-b1-q02",
-          "difficulty": "sedang",
-          "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VII (hal. 12), kalimat berikut yang menggunakan majas personifikasi secara tepat adalah…",
+          "difficulty": "dasar",
+          "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VII hal. 5, berapakah ketinggian bukit Pantan Terong di atas permukaan laut?",
           "options": [
-            "Angin laut berbisik menyampaikan salam hangat pada dedaunan nyiur di pantai",
-            "Pemandangan Gunung Leuser sangat indah bagaikan lukisan surga",
-            "Suara ombak Samudra Hindia menggelegar memecah kesunyian malam",
-            "Air laut di Teluk Kiluan jernih sekali seperti kaca bening"
+            "1.830 meter dpl",
+            "2.662 meter dpl",
+            "1.500 meter dpl",
+            "3.000 meter dpl"
           ],
           "answer": 0,
           "why": {
-            "0": "Majas personifikasi memberikan sifat atau perilaku manusia (berbisik menyampaikan salam) kepada benda mati/alam (angin laut)."
+            "0": "Pada teks halaman 5 disebutkan secara rinci bahwa pemandangan cantik di Pantan Terong dinikmati dari ketinggian 1.830 meter di atas permukaan laut."
           },
           "distractorWhy": {
-            "1": "Kalimat ini menggunakan majas asosiasi/simile (menggunakan kata pembanding 'bagaikan').",
-            "2": "Kalimat ini menggunakan ungkapan deskriptif pendengaran (bukan perilaku manusia).",
-            "3": "Kalimat ini menggunakan pembanding 'seperti' (simile)."
+            "1": "Ketinggian 2.662 mdpl merupakan ketinggian Gunung Papandayan sebagaimana tercantum dalam pamflet wisata Papandayan di halaman 16.",
+            "2": "Ketinggian 1.500 meter dpl bukan angka ketinggian yang tercantum dalam teks deskripsi Pantan Terong maupun Gunung Papandayan.",
+            "3": "Angka 3.000 merupakan rata-rata curah hujan (mm/tahun) Gunung Papandayan, bukan ukuran ketinggian Pantan Terong di atas permukaan laut."
           }
         },
         {
           "id": "ind-d-7-b1-q03",
           "difficulty": "sedang",
-          "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VII (hal. 15 Kebahasaan), penulisan kata berimbuhan meN- yang luluh secara benar sesuai kaidah EYD adalah…",
+          "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VII hal. 5-6, manakah yang merupakan kalimat perincian untuk menggambarkan keindahan pemandangan alam dari atas Pantan Terong?",
           "options": [
-            "Memesona (meN- + pesona)",
-            "Mempesona (meN- + pesona)",
-            "Mengkristal (meN- + kristal)",
-            "Mensapu (meN- + sapu)"
+            "Dari ketinggian, terlihat warna langit yang jingga terkena semburat sinar matahari di balik deretan gunung-gunung yang kokoh.",
+            "Sebelum pulang, ibuku membeli suvenir yang berbentuk kopi gayo untuk membantu perajin lokal.",
+            "Kami berangkat dari Banda Aceh pukul 01.00 siang dan tiba pukul 08.00 malam di rumah Paman.",
+            "Jalanan kecil menuju puncak sangat menanjak dan curam dengan tikungan-tikungan yang tajam."
           ],
           "answer": 0,
           "why": {
-            "0": "Kaidah fonologi: Kata dasar berawalan huruf K, T, S, P yang diikuti huruf vokal akan luluh jika diberi imbuhan meN-. P pada 'pesona' luluh menjadi 'memesona'."
+            "0": "Kalimat tersebut merinci secara spesifik gambaran visual pemandangan alam (warna langit jingga, semburat matahari, deretan gunung kokoh) yang melibatkan pancaindra penglihatan."
           },
           "distractorWhy": {
-            "1": "Bentuk 'mempesona' tidak luluh dan melanggar kaidah KTSP.",
-            "2": "Huruf K pada 'kristal' diikuti konsonan 'r', sehingga tidak luluh (mengkristal benar tapi contoh tidak luluh).",
-            "3": "Bentuk 'mensapu' salah karena huruf S harus luluh menjadi 'menyapu'."
+            "1": "Kalimat tentang membeli suvenir merupakan bagian dari ajakan mempromosikan produk/kerajinan lokal, bukan perincian keindahan alam.",
+            "2": "Kalimat tersebut menguraikan alur perjalanan waktu dan tempat dari Banda Aceh ke Takengon, bukan kalimat perincian gambaran alam.",
+            "3": "Kalimat tentang jalanan menanjak dan curam menggambarkan kondisi medan perjalanan menuju puncak bukit, bukan perincian keindahan pemandangan dari atas."
           }
         },
         {
           "id": "ind-d-7-b1-q04",
-          "difficulty": "tinggi",
-          "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VII (hal. 20-22 'Menjelajah Keindahan Riau'), tujuan utama penulisan teks deskripsi adalah…",
+          "difficulty": "dasar",
+          "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VII hal. 6, jenis makanan atau minuman khas yang dapat dicicipi wisatawan saat berkunjung ke Pantan Terong di Tanah Gayo adalah...",
           "options": [
-            "Menggambarkan objek secara terperinci sehingga pembaca seolah-olah dapat melihat, mendengar, atau merasakan sendiri objek tersebut",
-            "Mempengaruhi pembaca agar membeli produk wisata daerah",
-            "Menjelaskan langkah-langkah prosedural menuju tempat wisata",
-            "Menceritakan kisah rukun kehidupan tokoh fiktif di daerah wisata"
+            "Kopi gayo",
+            "Keripik pisang",
+            "Bandrek hangat",
+            "Kue balok lumer"
           ],
           "answer": 0,
           "why": {
-            "0": "Tujuan utama teks deskripsi adalah melukiskan pancaindra objek secara mendalam agar pembaca seakan mengalami langsung objek yang dideskripsikan."
+            "0": "Teks menyebutkan bahwa pengunjung dapat mencicipi aneka varian sajian kopi asli Tanah Gayo seperti espresso, cappuccino, mochacino, hingga latte."
           },
           "distractorWhy": {
-            "1": "Mempengaruhi membeli produk adalah tujuan teks persuasi/iklan.",
-            "2": "Menjelaskan langkah prosedural adalah fungsi teks prosedur.",
-            "3": "Menceritakan kisah tokoh fiktif adalah fungsi teks cerpen/fantasi."
+            "1": "Keripik pisang merupakan makanan khas yang diulas dalam teks deskripsi lisan 'Jelajah Rasa di Lampung' di Gang PU Bandar Lampung.",
+            "2": "Bandrek merupakan sajian minuman hangat yang dijadikan contoh objek latihan deskripsi gambar pada Kegiatan 5a halaman 14.",
+            "3": "Kue balok merupakan contoh objek wacana pembanding kalimat perincian rasa dan tekstur makanan pada halaman 12."
           }
         },
         {
           "id": "ind-d-7-b1-q05",
-          "difficulty": "dasar",
-          "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VII (hal. 18), kata konkret yang digunakan untuk menggambarkan indra penglihatan dalam deskripsi pantai adalah…",
+          "difficulty": "sedang",
+          "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VII hal. 7, kata 'instagramable' yang digunakan dalam teks deskripsi merupakan istilah yang memiliki makna...",
           "options": [
-            "Pasir putih bersih, kebiruan air laut, dan jajaran pohon kelapa",
-            "Deru ombak menggelegar dan hisikan angin",
-            "Aroma khas garam laut dan wangi ikan bakar",
-            "Tekstur pasir yang halus dan dinginnya tetesan air laut"
+            "Layak atau indah untuk diunggah dan dijadikan latar berswafoto di media sosial Instagram",
+            "Dapat dibeli dengan harga murah sebagai suvenir khas daerah",
+            "Memiliki nilai sejarah yang tinggi dan dilindungi pemerintah",
+            "Dapat diakses dengan mudah menggunakan kendaraan umum"
           ],
           "answer": 0,
           "why": {
-            "0": "Kata konkret penglihatan melibatkan ciri visual seperti warna (putih, kebiruan) dan bentuk fisik (jajaran pohon)."
+            "0": "Dalam penjelasan buku hal. 9, instagramable adalah kata serapan bahasa Inggris yang disematkan pada tempat yang indah untuk latar swafoto di Instagram."
           },
           "distractorWhy": {
-            "1": "Deru dan hisikan melibatkan indra pendengaran.",
-            "2": "Aroma melibatkan indra penciuman.",
-            "3": "Tekstur halus dan dingin melibatkan indra perabaan."
+            "1": "Makna barang murah yang dijadikan oleh-oleh merujuk pada pengertian suvenir atau cendera mata lokal.",
+            "2": "Nilai sejarah dan perlindungan pemerintah merujuk pada objek cagar budaya atau cagar alam, bukan makna istilah instagramable.",
+            "3": "Keterjangkauan akses kendaraan umum merupakan aspek aksesibilitas tempat wisata seperti yang dibahas pada analisis pamflet Papandayan."
           }
         },
         {
           "id": "ind-d-7-b1-q06",
           "difficulty": "sedang",
-          "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VII (hal. 24), penggunaan tanda koma (,) yang tepat dalam rincian unsur teks deskripsi adalah…",
+          "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VII hal. 8-9 (Kegiatan 3), perhatikan pencarian makna kata dalam KBBI cetak. Jika kita mencari makna kata dasar 'meredup' dalam KBBI cetak, kata dasar yang harus dicari pada abjad 'R' adalah...",
           "options": [
-            "Ibu membeli buah jeruk, apel, dan mangga di pasar tradisional.",
-            "Ibu membeli buah jeruk apel dan mangga, di pasar tradisional.",
-            "Ibu membeli buah, jeruk, apel dan mangga di pasar tradisional.",
-            "Ibu membeli, buah jeruk, apel, dan mangga di pasar tradisional."
+            "redup",
+            "meredup",
+            "edup",
+            "redupkan"
           ],
           "answer": 0,
           "why": {
-            "0": "Tanda koma digunakan di antara unsur-unsur dalam suatu pemerincian atau pembilangan, termasuk sebelum kata hubung 'dan' di akhir rincian."
+            "0": "Kaidah pencarian kata dalam KBBI cetak mengharuskan pengguna menemukan kata dasarnya terlebih dahulu. Kata dasar dari kata berimbuhan 'meredup' adalah 'redup'."
           },
           "distractorWhy": {
-            "1": "Kurang tanda koma sebelum kata hubung 'dan'.",
-            "2": "Penggunaan tanda koma sebelum keterangan tempat salah.",
-            "3": "Penggunaan koma setelah kata kerja transitif 'membeli' tidak tepat."
+            "1": "Pencarian langsung menggunakan kata berimbuhan 'meredup' kurang tepat dalam KBBI cetak karena entri disusun berdasarkan kata dasar.",
+            "2": "Bentuk 'edup' bukanlah kata dasar bahasa Indonesia yang valid dari verba meredup.",
+            "3": "Bentuk 'redupkan' adalah bentuk kata dasar yang sudah mendapat akhiran -kan, bukan kata dasar murni."
           }
         },
         {
           "id": "ind-d-7-b1-q07",
-          "difficulty": "tinggi",
-          "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VII (hal. 28 Uji Kemampuan), kutipan teks: 'Dari kejauhan, perbukitan hijau berdiri kokoh memagari lembah. Kabut tipis menyelimuti puncaknya bagaikan selendang sutra putih.' Struktur bagian teks deskripsi di atas merupakan bagian…",
+          "difficulty": "dasar",
+          "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VII hal. 10-11 (Kupas Teori), manakah yang BUKAN merupakan ciri atau tujuan utama dari teks deskripsi?",
           "options": [
-            "Deskripsi bagian",
-            "Identifikasi / Gambaran umum",
-            "Simpulan / Kesan umum",
-            "Judul utama"
+            "Menceritakan urutan peristiwa rekaan dengan plot konflik yang rumit",
+            "Menggambarkan atau melukiskan suatu benda, tempat, atau suasana tertentu",
+            "Melibatkan pancaindra agar pembaca seolah-olah melihat atau merasakan sendiri",
+            "Menjelaskan ciri-ciri objek seperti warna, ukuran, dan bentuk secara terperinci"
           ],
           "answer": 0,
           "why": {
-            "0": "Bagian ini merinci kondisi rupa fisik perbukitan dan kabut secara mendalam (rincian pancaindra), yang merupakan ciri struktur 'Deskripsi bagian'."
+            "0": "Menceritakan urutan peristiwa rekaan dengan konflik rumit merupakan ciri dari teks narasi/fantasi, bukan teks deskripsi yang berfokus melukiskan objek konkret."
           },
           "distractorWhy": {
-            "1": "Identifikasi memuat penetapan nama objek, lokasi, dan pernyataan umum awal.",
-            "2": "Simpulan berisi ringkasan atau kesan pribadi penulis di akhir teks.",
-            "3": "Judul utama berada di kepala teks."
+            "1": "Pernyataan ini tepat merupakan salah satu poin utama tujuan teks deskripsi pada halaman 9.",
+            "2": "Pernyataan ini tepat merupakan ciri teks deskripsi yang melibatkan penglihatan, pendengaran, penciuman, dan perabaan pada halaman 10.",
+            "3": "Pernyataan ini tepat merupakan ciri teks deskripsi yang menguraikan rupa dan bentuk objek secara mendetail pada halaman 10."
           }
         },
         {
           "id": "ind-d-7-b1-q08",
           "difficulty": "sedang",
-          "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VII (hal. 14), imbuhan meN- yang bergabung dengan kata dasar 'tulis' membentuk kata…",
+          "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VII hal. 12 (Tabel 1.2), perhatikan kalimat umum: 'Kue balok itu enak sekali.' Manakah kalimat perincian yang tepat untuk mendukung kalimat umum tersebut?",
           "options": [
-            "Menulis",
-            "Mentulis",
-            "Memtulis",
-            "Mengtulis"
+            "Teksturnya lembut saat digigit dan isian cokelatnya akan lumer di mulutmu.",
+            "Kue balok dibeli oleh Paman di toko roti terkenal kemarin sore.",
+            "Harganya sangat murah sehingga terjangkau oleh semua kalangan.",
+            "Kue tersebut dikemas dalam kotak karton berwarna cokelat tua."
           ],
           "answer": 0,
           "why": {
-            "0": "Kata dasar berawalan huruf 't' (tulis) akan luluh menjadi 'n' saat diberi imbuhan meN-, menghasilkan kata 'menulis'."
+            "0": "Teks buku halaman 12 memberikan contoh kalimat perinci untuk rasa kue balok yang enak: 'Teksturnya lembut saat digigit dan isian cokelatnya akan lumer di mulutmu.'"
           },
           "distractorWhy": {
-            "1": "Bentuk 'mentulis' tidak mengalami peluluhan huruf 't'.",
-            "2": "Bentuk 'memtulis' salah penggabungan alomor.",
-            "3": "Bentuk 'mengtulis' salah alomor."
+            "1": "Kalimat ini menjelaskan alur transaksi pembelian kue, bukan perincian citra rasa atau tekstur yang membuktikan kue itu enak.",
+            "2": "Kalimat ini menguraikan aspek ekonomis atau harga kue, bukan perincian kelezatan rasa kue balok.",
+            "3": "Kalimat ini menggambarkan aspek kemasan luar (wadah), bukan perincian rasa atau kualitas makanan saat dikonsumsi."
           }
         },
         {
           "id": "ind-d-7-b1-q09",
           "difficulty": "dasar",
-          "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VII (hal. 10), kalimat deskripsi yang melibatkan citraan indra pendengaran adalah…",
+          "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VII hal. 13 (Kupas Teori), gaya bahasa yang mengumpamakan benda mati seolah-olah hidup dan dapat berperilaku seperti manusia disebut...",
           "options": [
-            "Gemericik air sungai terdengar jernih menenangkan jiwa di pagi hari",
-            "Warna merah menyala bunga mawar menghiasi sudut taman",
-            "Bau harum aroma kopi menyengat di sepanjang lorong pasar",
-            "Permukaan daun keladi itu sangat licin dan halus saat diusap"
+            "Majas personifikasi",
+            "Majas metafora",
+            "Majas hiperbola",
+            "Majas asosiasi"
           ],
           "answer": 0,
           "why": {
-            "0": "Kata 'gemericik' dan 'terdengar' menstimulasi indra pendengaran (auditori)."
+            "0": "Kupas Teori halaman 13 mendefinisikan majas personifikasi sebagai gaya bahasa yang mengumpamakan benda mati seolah-olah hidup seperti manusia."
           },
           "distractorWhy": {
-            "1": "Warna merah menyala menstimulasi penglihatan.",
-            "2": "Bau harum menyengat menstimulasi penciuman.",
-            "3": "Licin dan halus menstimulasi perabaan."
+            "1": "Majas metafora adalah pemakaian kata yang bukan arti sebenarnya sebagai pembanding langsung tanpa kata pembanding, bukan penginsanan benda mati.",
+            "2": "Majas hiperbola adalah gaya bahasa pengungkapan yang berlebih-lebihan untuk menekankan kesan.",
+            "3": "Majas asosiasi adalah perbandingan dua hal yang sifatnya berbeda tetapi dianggap sama dengan kata pembanding seperti bagai, ibarat, bak."
           }
         },
         {
           "id": "ind-d-7-b1-q10",
-          "difficulty": "tinggi",
-          "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VII (hal. 32), kata emotif yang digunakan untuk memperkuat kesan keindahan dalam deskripsi pantai adalah…",
+          "difficulty": "sedang",
+          "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VII hal. 13, perhatikan kalimat berikut: 'Angin yang bertiup memainkan rambut dan berputar di sekeliling tubuh.' Kata kerja yang menandai pengumpamaan benda mati seolah-olah hidup pada kalimat tersebut adalah...",
           "options": [
-            "Memukau, menakjubkan, dan memesona",
-            "Besar, tinggi, dan panjang",
-            "Berjalan, berlari, dan melompat",
-            "Satu, dua, dan tiga"
+            "memainkan dan berputar",
+            "bertiup dan sekeliling",
+            "angin dan rambut",
+            "tubuh dan bertiup"
           ],
           "answer": 0,
           "why": {
-            "0": "Kata emotif adalah kata-kata yang memicu emosi atau rasa kagum pembaca, seperti 'memukau', 'menakjubkan', dan 'memesona'."
+            "0": "Kata 'memainkan' dan 'berputar' adalah tindakan manusiawi yang disematkan kepada angin (benda mati) sehingga menciptakan majas personifikasi."
           },
           "distractorWhy": {
-            "1": "Kata besar, tinggi, dan panjang adalah kata ukuran objektif.",
-            "2": "Kata berjalan, berlari, melompat adalah kata kerja aksi.",
-            "3": "Kata satu, dua, tiga adalah kata bilangan."
+            "1": "Kata 'bertiup' adalah pergerakan alami angin, sedangkan 'sekeliling' adalah kata penunjuk ruang/posisi.",
+            "2": "Kata 'angin' dan 'rambut' keduanya merupakan kata benda (nomina), bukan kata kerja penggerak majas.",
+            "3": "Kata 'tubuh' adalah nomina dan 'bertiup' adalah verba alami angin, tidak mengandung tindakan personifikasi khas manusia."
           }
         },
         {
           "id": "ind-d-7-b1-q11",
-          "difficulty": "dasar",
-          "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VII (hal. 16), kata sinonim dari kata 'elok' dalam kalimat 'Pemandangan laut di sore hari sangat elok' adalah…",
+          "difficulty": "tinggi",
+          "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VII hal. 13-14, bacalah kutipan novel 'Misteri Terowongan Kereta' karya Tere Liye: '...Meski si ular besi ini sudah menjadi bagian kehidupan kampung, dengan suara klaksonnya yang tidak pernah alpa, melenguh nyaring setiap subuh buta dan tengah malam...' Ungkapan majas personifikasi dalam kutipan tersebut ditunjukkan oleh ungkapan...",
           "options": [
-            "Indah / Cantik",
-            "Buruk / Jelek",
-            "Gelap / Suram",
-            "Biasa / Standar"
+            "suara klaksonnya yang tidak pernah alpa, melenguh nyaring",
+            "perjalanan pertama kalinya aku dan Burlian dengan kereta api",
+            "hutan pedalaman Sumatra yang selalu berkabut di pagi hari",
+            "bapak tersenyum sambil takzim menatap langit-langit gerbong"
           ],
           "answer": 0,
           "why": {
-            "0": "Kata 'elok' bermakna indah, cantik, atau bagus dipandang."
+            "0": "Klakson kereta api (benda mati) digambarkan memiliki sifat 'tidak pernah alpa' dan dapat 'melenguh nyaring' seperti lembu/hewan bernyawa, yang merupakan majas personifikasi."
           },
           "distractorWhy": {
-            "1": "Buruk/jelek adalah antonim (lawan kata).",
-            "2": "Gelap/suram tidak sesuai makna.",
-            "3": "Biasa/standar tidak memiliki kadar estetika kata elok."
+            "1": "Kalimat ini menceritakan pengalaman tokoh aku dan Burlian menaiki kereta api, merupakan fakta peristiwa naratif tanpa majas.",
+            "2": "Kalimat ini menggambarkan keadaan alam hutan Sumatra yang berkabut, merupakan kenyataan fenomena alamik biasa.",
+            "3": "Kalimat ini menceritakan ekspresi dan tindakan manusia (Bapak) yang menatap langit gerbong, bukan personifikasi benda mati."
           }
         },
         {
           "id": "ind-d-7-b1-q12",
           "difficulty": "sedang",
-          "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VII (hal. 30), penggunaan kata depan 'di' yang benar sebagai penunjuk lokasi/tempat adalah…",
+          "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VII hal. 16-17, pamflet wisata 'Taklukkan Puncak Papandayan' memuat informasi detail berupa kelembapan udara 70—80% dan temperatur 10—25°C yang didasarkan pada klasifikasi iklim menurut...",
           "options": [
-            "di Takengon",
-            "ditakengon",
-            "di makan",
-            "di baca"
+            "Schmidt dan Ferguson",
+            "Junghuhn",
+            "Koppen",
+            "Oldeman"
           ],
           "answer": 0,
           "why": {
-            "0": "Kata depan 'di' yang menunjukkan tempat ditulis terpisah dari kata yang mengikutinya (di Takengon)."
+            "0": "Dalam teks pamflet wisata Papandayan halaman 16 tertulis eksplisit: 'Menurut klasifikasi Schmidt dan Ferguson, gunung ini memiliki curah hujan rata-rata 3.000 mm/tahun, kelembapan udara 70—80% dan temperatur 10—25° C.'"
           },
           "distractorWhy": {
-            "1": "Bentuk 'ditakengon' salah karena disambung.",
-            "2": "Bentuk 'di makan' salah karena di- pada kata kerja harus disambung (dimakan).",
-            "3": "Bentuk 'di baca' salah karena di- awalan pasif harus disambung (dibaca)."
+            "1": "Klasifikasi Junghuhn didasarkan pada ketinggian tempat dan jenis vegetasi tanaman budidaya, bukan rujukan yang tertulis dalam teks pamflet.",
+            "2": "Klasifikasi Koppen didasarkan pada suhu dan curah hujan global, tidak disebutkan dalam teks pamflet Papandayan.",
+            "3": "Klasifikasi Oldeman didasarkan pada bulan basah dan bulan kering untuk pertanian tanaman pangan, tidak dirujuk pada pamflet tersebut."
+          }
+        },
+        {
+          "id": "ind-d-7-b1-q13",
+          "difficulty": "tinggi",
+          "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VII hal. 16, jika seorang wisatawan dari Jakarta ingin mengunjungi Taman Wisata Alam Gunung Papandayan menggunakan bus jurusan Jakarta—Garut, rute angkutan umum lanjutan yang benar dari Terminal Guntur Garut adalah...",
+          "options": [
+            "Naik angkutan elf jurusan Garut—Cikajang dengan tarif Rp15.000,00",
+            "Naik angkutan elf dari Terminal Cicaheum jurusan Bandung—Cikajang",
+            "Naik bus Primajasa langsung menuju lokasi tempat perkemahan Pondok Saladah",
+            "Naik taksi online langsung menuju gerbang pos 2 Poco Roko"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Pamflet wisata Papandayan di hal. 16 menyebutkan rute secara presisi: turun di Terminal Guntur—Garut, lalu lanjutkan dengan angkutan elf jurusan Garut—Cikajang dengan tarif Rp15.000,00."
+          },
+          "distractorWhy": {
+            "1": "Rute Terminal Cicaheum (Bandung) merupakan rute alternatif jika wisatawan berangkat dari Bandung, bukan sambungan dari Terminal Guntur Garut.",
+            "2": "Bus Primajasa hanya beroperasi antar kota (Jakarta—Garut) hingga terminal, tidak masuk ke lokasi perkemahan gunung.",
+            "3": "Pos 2 Poco Roko merupakan pos pendakian di Desa Wae Rebo NTT (halaman 32-33), bukan lokasi di Gunung Papandayan Garut."
+          }
+        },
+        {
+          "id": "ind-d-7-b1-q14",
+          "difficulty": "sedang",
+          "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VII hal. 21 (Gambar 1.6 dan 1.7), tempat wisata Sungai Santirah yang menyajikan kegiatan River Tubing secara geografis terletak di...",
+          "options": [
+            "Dusun Giriharja, Desa Selasari, Kecamatan Parigi, Kabupaten Pangandaran",
+            "Desa Sirna Jaya dan Desa Kramat Wangi, Kabupaten Garut",
+            "Kecamatan Takengon, Kabupaten Aceh Tengah, Provinsi Aceh",
+            "Desa Denge, Kecamatan Satarmese Barat, Kabupaten Manggarai"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Keterangan lokasi pada pamflet Wisata Green Canyon (Gambar 1.7) menyebutkan lokasi Sungai Santirah berada di dusun Giriharja, Desa Selasari, Kecamatan Parigi, Kabupaten Pangandaran, Jawa Barat."
+          },
+          "distractorWhy": {
+            "1": "Lokasi tersebut merupakan letak kawasan Taman Wisata Alam Gunung Papandayan di Kabupaten Garut.",
+            "2": "Kecamatan Takengon Aceh Tengah merupakan lokasi objek wisata Bukit Pantan Terong dan Danau Laut Tawar.",
+            "3": "Desa Denge Kabupaten Manggarai NTT merupakan lokasi gerbang awal pendakian menuju Desa Wae Rebo."
+          }
+        },
+        {
+          "id": "ind-d-7-b1-q15",
+          "difficulty": "tinggi",
+          "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VII hal. 23 (Kupas Teori Awalan meN-), manakah aturan yang BENAR mengenai peluluhan fonem k, p, t, s saat mendapat awalan meN-?",
+          "options": [
+            "Fonem k, p, t, s luluh jika diikuti kata dasar yang berawalan huruf k, p, t, s tunggal (bukan kluster)",
+            "Fonem k, p, t, s tetap luluh meskipun diikuti oleh kata dasar yang berawalan konsonan rangkap (kluster)",
+            "Fonem k, p, t, s luluh ketika bergabung dengan kata berimbuhan berawalan k, p, t, s seperti memperluas",
+            "Fonem k, p, t, s tidak pernah luluh dalam kondisi penambahan awalan meN- bentuk apa pun"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Teori bahasa hal. 23 menjelaskan fonem k, p, t, s luluh jika diawali kata dasar berawalan huruf k, p, t, s tunggal (contoh: meN- + pesona -> memesona, meN- + pengaruh -> memengaruhi)."
+          },
+          "distractorWhy": {
+            "1": "Jika diikuti konsonan rangkap (kluster) seperti pr, kr, kl, fonem k, p, t, s TIDAK luluh (contoh: memprakarsai, mengkriminalkan).",
+            "2": "Pada kata berimbuhan yang diawali k, p, t, s seperti memperluas / mempertaruhkan, fonem p atau t TIDAK luluh.",
+            "3": "Pernyataan ini salah karena dalam kaidah tata bahasa Indonesia standar fonem k, p, t, s mengalami peluluhan jika memenuhi syarat tertentu."
+          }
+        },
+        {
+          "id": "ind-d-7-b1-q16",
+          "difficulty": "sedang",
+          "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VII hal. 23 (Tantangan), manakah kalimat yang menggunakan kata berimbuhan meN- dengan peluluhan kata dasar yang BENAR?",
+          "options": [
+            "Kilau sinar matahari yang menerpa permukaan danau itu sangat mengagumkan.",
+            "Perajin memroduksi suvenir dalam kegiatan industri rumah tangga skala kecil.",
+            "Pemandu wisata itu secara tangkas menterjemahkan paparannya ke bahasa Jerman.",
+            "Pendaki gunung tidak memersoalkan kenaikan tarif fasilitas di jalur pendakian."
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Kata 'menerpa' berasal dari awalan meN- + terpa (huruf t luluh menjadi n). Ini merupakan pembentukan kata berimbuhan meN- yang baku dan tepat."
+          },
+          "distractorWhy": {
+            "1": "Bentuk 'memroduksi' salah; kata dasar 'produksi' berawalan kluster pr- sehingga p TIDAK luluh (seharusnya memproduksi).",
+            "2": "Bentuk 'menterjemahkan' salah; kata dasar 'terjemah' berawalan t tunggal sehingga t LULUH menjadi n (seharusnya menerjemahkan).",
+            "3": "Bentuk 'memersoalkan' salah; kata asal 'persoal' mendapat imbuhan me-kan pada bentuk dasar soal/persoal (seharusnya mempersoalkan)."
+          }
+        },
+        {
+          "id": "ind-d-7-b1-q17",
+          "difficulty": "sedang",
+          "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VII hal. 25-27 (Menganalisis Informasi Lisan 'Jelajah Wae Rebo'), apakah nama rumah adat tradisional khas Manggarai yang berbentuk kerucut dan memiliki lima tingkat?",
+          "options": [
+            "Mbaru Niang",
+            "Tongkonan",
+            "Rumah Gadang",
+            "Honai"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Teks lisan 'Jelajah Wae Rebo' karya Eugenia Rakhma Subarna menyebutkan bahwa rumah tradisional khas Manggarai yang memiliki 5 tingkat berbentuk kerucut dinamakan Mbaru Niang."
+          },
+          "distractorWhy": {
+            "1": "Tongkonan merupakan rumah adat tradisional masyarakat suku Toraja di Sulawesi Selatan.",
+            "2": "Rumah Gadang merupakan rumah adat tradisional Minangkabau di Sumatera Barat.",
+            "3": "Honai merupakan rumah adat tradisional suku-suku di wilayah pegunungan Papua."
+          }
+        },
+        {
+          "id": "ind-d-7-b1-q18",
+          "difficulty": "tinggi",
+          "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VII hal. 26-27, pada bangunan rumah Mbaru Niang di Desa Wae Rebo, bagian tingkat ketiga yang berfungsi khusus untuk menyimpan benih jagung dan tanaman bercocok tanam dinamakan...",
+          "options": [
+            "lentar",
+            "lutur",
+            "lobo",
+            "hempang"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Dalam penuturan pandu wisata teks Jelajah Wae Rebo di hal. 27 dijelaskan: '...inilah tingkat ketiga atau yang biasa disebut lentar, berfungsi menyimpan benih jagung dan tanaman untuk bercocok tanam...'"
+          },
+          "distractorWhy": {
+            "1": "Lutur atau tenda adalah tingkat pertama Mbaru Niang yang berfungsi sebagai tempat tinggal dan berkumpul keluarga.",
+            "2": "Lobo (tingkat keempat) dan tempat lainnya memiliki fungsi penyimpanan bahan makanan cadangan saat paceklik.",
+            "3": "Hempang adalah istilah lain dari susunan konstruksi kayu/perabot, bukan nama struktur tingkat ketiga Mbaru Niang."
+          }
+        },
+        {
+          "id": "ind-d-7-b1-q19",
+          "difficulty": "sedang",
+          "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VII hal. 28-29 ('Jelajah Rasa di Lampung'), apakah nama kawasan yang terkenal sebagai pusat sentra keripik pisang di Jalan Pagar Alam, Kota Bandar Lampung?",
+          "options": [
+            "Gang PU",
+            "Gang Malioboro",
+            "Pasar Beringharjo",
+            "Pantan Terong"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Teks 'Jelajah Rasa di Lampung' menyebutkan bahwa pusat sentra keripik pisang lampung terletak di Jalan Pagar Alam, Kota Bandar Lampung, yang terkenal dengan sebutan Gang PU."
+          },
+          "distractorWhy": {
+            "1": "Gang Malioboro merupakan kawasan sentra wisata belanja terkenal di Kota Yogyakarta.",
+            "2": "Pasar Beringharjo adalah pasar tradisional di Yogyakarta yang dipakai sebagai contoh teks deskripsi lokasi di hal. 10.",
+            "3": "Pantan Terong adalah bukit tempat wisata pemandangan alam di Kota Takengon Aceh Tengah."
+          }
+        },
+        {
+          "id": "ind-d-7-b1-q20",
+          "difficulty": "tinggi",
+          "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VII hal. 31-32 (Kegiatan 9: Kupas Teori Tanda Baca), manakah kalimat yang menggunakan tanda koma (,) dengan BENAR sesuai kaidah kebahasaan?",
+          "options": [
+            "Wah, indah sekali pemandangan di Pantan Terong!",
+            "Gunung Papandayan telah meletus beberapa kali, Meskipun demikian kawahnya tetap indah.",
+            "Ia membeli kopi kain dan tas sebagai oleh-oleh.",
+            "Lili mengambil foto sementara Fajar memilih menikmati kopi."
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Halaman 32 menjelaskan bahwa tanda koma dipakai sebelum dan/atau sesudah kata seru (seperti wah, o, ya, aduh) sehingga pemisahan 'Wah, indah sekali...' adalah tepat."
+          },
+          "distractorWhy": {
+            "1": "Setelah ungkapan penghubung antarkalimat 'Meskipun demikian', WAJIB diikuti tanda koma: 'Meskipun demikian, kawahnya...'.",
+            "2": "Pada rincian lebih dari dua unsur (pemerincian), wajib menggunakan tanda koma sebelum kata 'dan': 'kopi, kain, dan tas'.",
+            "3": "Pada kalimat majemuk setara dengan pertentangan/penghubung 'sementara', wajib didahului tanda koma sebelum kata 'sementara'."
           }
         }
       ]
@@ -665,6 +825,504 @@
             "1": "Bola kristal tidak terdapat dalam teks cerita Rendra.",
             "2": "Media perantara waktu dalam cerita adalah pintu jati dan kunci es, bukan cermin.",
             "3": "Meskipun menceritakan kisah ibu, medianya adalah penjelajahan pintu ajaib jati."
+          }
+        }
+      ]
+    },
+    {
+      "code": "KOMP-IND-D-7-BAB3-01",
+      "grade": 7,
+      "name": "Bab 3: Hal yang Baik bagi Tubuh",
+      "materi": "Memahami Teks Prosedur Kesehatan & Olahraga, Struktur Teks Prosedur (Tujuan, Bahan, Langkah), Unsur Kebahasaan: Kalimat Imperatif & Kata Keterangan",
+      "cpRef": "Bahasa Indonesia untuk SMP/MTs Kelas VII (Edisi Revisi) — Bab 3",
+      "items": [
+        {
+          "id": "ind-d-7-b3-q01",
+          "difficulty": "dasar",
+          "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VII (hal. 75-80), tujuan utama penulisan teks prosedur adalah…",
+          "options": [
+            "Petunjuk atau panduan langkah-langkah dalam membuat atau melakukan sesuatu secara runtut",
+            "Menceritakan kisah fiktif tokoh pahlawan",
+            "Menggambarkan keindahan alam secara detail",
+            "Menyampaikan pendapat pro dan kontra terhadap isu sosial"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Teks prosedur memberikan petunjuk operasional sistematis membuat/melakukan sesuatu."
+          },
+          "distractorWhy": {
+            "1": "Teks narasi.",
+            "2": "Teks deskripsi.",
+            "3": "Teks diskusi."
+          }
+        },
+        {
+          "id": "ind-d-7-b3-q02",
+          "difficulty": "sedang",
+          "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VII (hal. 84 Struktur Prosedur), urutan struktur teks prosedur yang tepat adalah…",
+          "options": [
+            "Tujuan -> Alat/Bahan -> Langkah-langkah -> Penutup/Penegasan",
+            "Langkah-langkah -> Tujuan -> Alat/Bahan",
+            "Judul -> Kesimpulan -> Langkah-langkah",
+            "Orientasi -> Komplikasi -> Resolusi"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Struktur baku teks prosedur diawali Tujuan, Bahan/Alat, Urutan Langkah, dan Penutup."
+          },
+          "distractorWhy": {
+            "1": "Urutan acak.",
+            "2": "Struktur tidak baku.",
+            "3": "Struktur cerita fantasi."
+          }
+        },
+        {
+          "id": "ind-d-7-b3-q03",
+          "difficulty": "sedang",
+          "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VII (hal. 88 Kebahasaan), kalimat imperatif (perintah) yang tepat dalam prosedur pembuatan minuman sehat adalah…",
+          "options": [
+            "Aduk campuran jahe dan madu tersebut hingga larut sempurna!",
+            "Apakah jahe tersebut sudah diiris tipis?",
+            "Saya sangat menyukai aroma jahe segar.",
+            "Jahe adalah tanaman rimpang obat keluarga."
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Kalimat imperatif ditandai kata kerja aksi di awal (aduk) dan akhiran perintah (!)."
+          },
+          "distractorWhy": {
+            "1": "Kalimat interogatif (tanya).",
+            "2": "Kalimat deklaratif opini.",
+            "3": "Kalimat deklaratif fakta."
+          }
+        },
+        {
+          "id": "ind-d-7-b3-q04",
+          "difficulty": "tinggi",
+          "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VII (hal. 92), penggunaan kata keterangan cara yang tepat dalam teks prosedur olahraga adalah…",
+          "options": [
+            "Tarik napas secara perlahan-lahan dan hembuskan lewat mulut",
+            "Olahraga dilakukan pada pagi hari pukul 06.00 WIB",
+            "Gunakan sepatu olahraga ukuran 40",
+            "Lakukan gerakan ini sebanyak 10 kali"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "'Secara perlahan-lahan' adalah keterangan cara (adverbia cara) pelaksanaan aksi."
+          },
+          "distractorWhy": {
+            "1": "Keterangan waktu.",
+            "2": "Keterangan alat/ukuran.",
+            "3": "Keterangan kuantitas/jumlah."
+          }
+        },
+        {
+          "id": "ind-d-7-b3-q05",
+          "difficulty": "dasar",
+          "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VII (hal. 82), contoh kata penghubung (konjungsi) urutan dalam teks prosedur adalah…",
+          "options": [
+            "Pertama, kemudian, selanjutnya, dan akhirnya",
+            "Sebab, karena, dan akibatnya",
+            "Tetapi, namun, dan melainkan",
+            "Jika, seandainya, dan jikalau"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Konjungsi urutan (kronologis) menyusun langkah bertahap."
+          },
+          "distractorWhy": {
+            "1": "Konjungsi kausalitas.",
+            "2": "Konjungsi pertentangan.",
+            "3": "Konjungsi pengandaian."
+          }
+        },
+        {
+          "id": "ind-d-7-b3-q06",
+          "difficulty": "sedang",
+          "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VII (hal. 96 Uji Kemampuan), bagian penutup dalam teks prosedur berfungsi untuk…",
+          "options": [
+            "Memberikan penegasan ulang ucapan selamat mencoba atau manfaat dari kegiatan yang dipraktikkan",
+            "Merinci daftar harga bahan-bahan yang dibeli",
+            "Menjelaskan kegagalan yang mungkin terjadi",
+            "Menuliskan nama-nama penulis buku"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Penutup berisi apresiasi 'Selamat mencoba' atau ringkasan manfaat hasil."
+          },
+          "distractorWhy": {
+            "1": "Bukan fungsi penutup.",
+            "2": "Bukan fokus penutup.",
+            "3": "Biografi penulis."
+          }
+        },
+        {
+          "id": "ind-d-7-b3-q07",
+          "difficulty": "dasar",
+          "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VII (hal. 86), contoh kata kerja aksi dalam teks prosedur mencuci tangan yang benar adalah…",
+          "options": [
+            "Basahi, tuangkan, gosok, dan bilas",
+            "Melihat, mendengar, dan meraba",
+            "Indah, cantik, dan elok",
+            "Satu, dua, dan tiga"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Basahi, tuangkan, gosok, dan bilas merupakan bentuk kata kerja imperatif (aksi) dalam prosedur."
+          },
+          "distractorWhy": {
+            "1": "Kata kerja persepsi indra.",
+            "2": "Kata sifat estetika.",
+            "3": "Kata bilangan numerik."
+          }
+        },
+        {
+          "id": "ind-d-7-b3-q08",
+          "difficulty": "sedang",
+          "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VII (hal. 90), ciri bahasa teks prosedur yang menggunakan batasan ukuran secara akurat adalah…",
+          "options": [
+            "Rebus air sebanyak 500 ml selama 10 menit",
+            "Rebus air secukupnya sebentar saja",
+            "Gunakan air yang sangat banyak",
+            "Masakkan air sampai hangat"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Penggunaan angka '500 ml' dan '10 menit' memberikan batasan kuantitatif yang presisi."
+          },
+          "distractorWhy": {
+            "1": "Kata 'secukupnya' bersifat kualitatif umum.",
+            "2": "Kata 'sangat banyak' tidak presisi.",
+            "3": "Kata 'hangat' tanpa batas derajat."
+          }
+        },
+        {
+          "id": "ind-d-7-b3-q09",
+          "difficulty": "sedang",
+          "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VII (hal. 94), penulisan kalimat saran dalam teks prosedur kesehatan yang tepat adalah…",
+          "options": [
+            "Sebaiknya konsumsi buah segar setiap hari agar imun tubuh tetap terjaga",
+            "Jangan pernah makan buah apel!",
+            "Buah apel rasanya sangat manis sekali",
+            "Mengapa Anda tidak membeli buah apel?"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Penggunaan kata 'sebaiknya' menandakan bentuk kalimat saran (persuasif halus) dalam prosedur."
+          },
+          "distractorWhy": {
+            "1": "Kalimat larangan keras.",
+            "2": "Kalimat opini subjektif.",
+            "3": "Kalimat pertanyaan."
+          }
+        },
+        {
+          "id": "ind-d-7-b3-q10",
+          "difficulty": "tinggi",
+          "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VII (hal. 98), bagian rincian bahan dan alat dalam prosedur pembuatan jus alpukat berfungsi untuk…",
+          "options": [
+            "Memudahkan pembaca menyiapkan seluruh perlengkapan dan takaran bahan sebelum memulai proses pembuatan",
+            "Menjelaskan sejarah penemuan buah alpukat",
+            "Menceritakan pengalaman minum jus alpukat",
+            "Menampilkan iklan merek blender"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Rincian bahan dan alat memastikan persiapan (persiapan material) memadai sebelum merangkai langkah."
+          },
+          "distractorWhy": {
+            "1": "Bukan sejarah tanaman.",
+            "2": "Bukan narasi pengalaman.",
+            "3": "Bukan materi promosi iklan."
+          }
+        },
+        {
+          "id": "ind-d-7-b3-q11",
+          "difficulty": "dasar",
+          "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VII (hal. 80), teks prosedur dapat disajikan dalam bentuk visual infografis dengan tujuan…",
+          "options": [
+            "Memperjelas urutan langkah melalui panduan gambar ilustrasi yang menarik dan mudah dipahami",
+            "Mengurangi isi tulisan menjadi teka-teki",
+            "Menghilangkan kata kerja perintah",
+            "Membuat pembaca bingung"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Infografis mengombinasikan elemen visual dan teks singkat agar tahapan prosedur lebih komunikatif."
+          },
+          "distractorWhy": {
+            "1": "Bukan teka-teki.",
+            "2": "Kata kerja tetap ada.",
+            "3": "Infografis mempermudah pemahaman."
+          }
+        },
+        {
+          "id": "ind-d-7-b3-q12",
+          "difficulty": "tinggi",
+          "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VII (hal. 100 Uji Kemampuan), peletakan urutan langkah yang tidak logis dalam teks prosedur dapat berakibat…",
+          "options": [
+            "Kegagalan dalam mencapai hasil akhir yang diinginkan serta berpotensi membahayakan pengguna",
+            "Hasil pembuatan menjadi lebih sempurna",
+            "Waktu pembuatan menjadi lebih cepat",
+            "Teks prosedur menjadi lebih panjang"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Urutan langkah acak/salah merusak urutan proses dan menggagalkan hasil."
+          },
+          "distractorWhy": {
+            "1": "Langkah acak tidak menyempurnakan hasil.",
+            "2": "Langkah salah tidak mempercepat.",
+            "3": "Panjang teks tidak ditentukan urutan."
+          }
+        }
+      ]
+    },
+    {
+      "code": "KOMP-IND-D-7-BAB4-01",
+      "grade": 7,
+      "name": "Bab 4: Aksi Nyata Pelindung Bumi",
+      "materi": "Memahami Teks Berita Lingkungan, Unsur Berita 5W+1H (ADIKSIMBA), Struktur Berita (Kepala, Tubuh, Ekor), Membandingkan Media Cetak & Digital",
+      "cpRef": "Bahasa Indonesia untuk SMP/MTs Kelas VII (Edisi Revisi) — Bab 4",
+      "items": [
+        {
+          "id": "ind-d-7-b4-q01",
+          "difficulty": "dasar",
+          "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VII (hal. 105-110 Teks Berita), unsur-unsur utama berita ADIKSIMBA (5W+1H) terdiri atas…",
+          "options": [
+            "Apa, Di mana, Kapan, Siapa, Mengapa, dan Bagaimana",
+            "Awal, Depan, Isi, Kesimpulan, dan Simpulan",
+            "Aku, Dia, Kita, Mereka, dan Kami",
+            "Alasan, Dampak, Informasi, Karakter, dan Bukti"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "ADIKSIMBA merupakan akronim Apa, Di mana, Kapan, Siapa, Mengapa, Bagaimana."
+          },
+          "distractorWhy": {
+            "1": "Bukan unsur berita.",
+            "2": "Kata ganti orang.",
+            "3": "Istilah buatan."
+          }
+        },
+        {
+          "id": "ind-d-7-b4-q02",
+          "difficulty": "sedang",
+          "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VII (hal. 115 Struktur Berita), bagian terpenting berita yang memuat inti informasi paling menarik di paragraf pertama dinamakan…",
+          "options": [
+            "Kepala berita (Lead)",
+            "Tubuh berita (Body)",
+            "Ekor berita (Tail)",
+            "Judul berita (Headline)"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Kepala berita (lead) berada di paling awal berisi ringkasan jawaban unsur utama 5W+1H."
+          },
+          "distractorWhy": {
+            "1": "Tubuh berita berisi uraian rincian.",
+            "2": "Ekor berita informasi tambahan kurang penting.",
+            "3": "Judul adalah nama berita."
+          }
+        },
+        {
+          "id": "ind-d-7-b4-q03",
+          "difficulty": "sedang",
+          "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VII (hal. 120), kutipan kalimat: 'Bencana banjir bandang menerjang wilayah Garut pada Selasa (15/10) malam akibat luapan sungai.' Unsur berita yang terdapat pada kata yang dicetak tebal 'Selasa malam' adalah…",
+          "options": [
+            "Kapan (When)",
+            "Di mana (Where)",
+            "Siapa (Who)",
+            "Mengapa (Why)"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "'Selasa malam' menunjukkan keterangan waktu terjadinya peristiwa (Kapan)."
+          },
+          "distractorWhy": {
+            "1": "Di mana menunjukkan lokasi.",
+            "2": "Siapa menunjukkan subjek.",
+            "3": "Mengapa menunjukkan alasan."
+          }
+        },
+        {
+          "id": "ind-d-7-b4-q04",
+          "difficulty": "tinggi",
+          "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VII (hal. 125 Kebahasaan), kalimat langsung yang menyalin wawancara wartawan dengan narasumber secara tepat adalah…",
+          "options": [
+            "\"Masyarakat diimbau tetap waspada terhadap potensi tanah longsor,\" kata Kepala BPBD.",
+            "Kepala BPBD mengatakan bahwa masyarakat diimbau tetap waspada.",
+            "Apakah masyarakat diimbau tetap waspada kata Kepala BPBD.",
+            "Masyarakat diimbau tetap waspada kata Kepala BPBD tanpa tanda petik."
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Kalimat langsung menggunakan tanda petik ganda (\"\") mengapit tuturan lisan narasumber."
+          },
+          "distractorWhy": {
+            "1": "Kalimat tidak langsung (menggunakan bahwa).",
+            "2": "Tanda baca salah.",
+            "3": "Tanpa tanda petik salah."
+          }
+        },
+        {
+          "id": "ind-d-7-b4-q05",
+          "difficulty": "dasar",
+          "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VII (hal. 112), perbedaan utama antara berita media cetak (koran) dengan berita media digital (daring/online) adalah…",
+          "options": [
+            "Berita digital dapat diperbarui secara waktu nyata (real-time) dan memuat pranala (hyperlink), sedangkan cetak terbit berkala pada kertas",
+            "Berita cetak tidak memiliki judul",
+            "Berita digital hanya berisi gambar tanpa teks",
+            "Berita cetak selalu bohong"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Media digital bersifat dinamis, cepat diperbarui, serta terintegrasi dengan tautan multimedia."
+          },
+          "distractorWhy": {
+            "1": "Cetak punya judul.",
+            "2": "Digital ada teksnya.",
+            "3": "Pernyataan keliru."
+          }
+        },
+        {
+          "id": "ind-d-7-b4-q06",
+          "difficulty": "sedang",
+          "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VII (hal. 128 Uji Kemampuan), bagian ekor berita memuat rincian yang bersifat…",
+          "options": [
+            "Informasi tambahan pendukung yang jika dihilangkan tidak merusak inti berita",
+            "Inti sari utama berita",
+            "Alamat kontak redaksi penerbit",
+            "Daftar riwayat hidup wartawan"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Ekor berita menggunakan piramida terbalik, memuat suplemen yang dapat dipotong tanpa mengganggu pemahaman."
+          },
+          "distractorWhy": {
+            "1": "Inti di kepala berita.",
+            "2": "Kontak redaksi di footer media.",
+            "3": "Riwayat wartawan irrelevan."
+          }
+        },
+        {
+          "id": "ind-d-7-b4-q07",
+          "difficulty": "dasar",
+          "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VII (hal. 110), judul berita yang baik harus memiliki sifat…",
+          "options": [
+            "Singkat, padat, menarik perhatian, dan mencerminkan isi berita secara jujur",
+            "Sangat panjang hingga 50 kata",
+            "Menggunakan bahasa gaul informal",
+            "Memuat teka-teki tanpa makna"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Judul berita (headline) bertugas memikat pembaca sekaligus merangkum topik berita secara akurat."
+          },
+          "distractorWhy": {
+            "1": "Judul panjang tidak efektif.",
+            "2": "Judul menggunakan bahasa baku lugas.",
+            "3": "Judul harus informatif jelas."
+          }
+        },
+        {
+          "id": "ind-d-7-b4-q08",
+          "difficulty": "sedang",
+          "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VII (hal. 118), unsur berita 'Mengapa' (Why) menjelaskan tentang…",
+          "options": [
+            "Latar belakang penyebab atau alasan terjadinya peristiwa dalam berita",
+            "Waktu detik terjadinya peristiwa",
+            "Nama lokasi geografis tempat kejadian",
+            "Jumlah korban dalam angka"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Unsur Mengapa menguraikan faktor kausalitas atau alasan utama pemicu peristiwa."
+          },
+          "distractorWhy": {
+            "1": "Kapan (When).",
+            "2": "Di mana (Where).",
+            "3": "Berapa/Siapa."
+          }
+        },
+        {
+          "id": "ind-d-7-b4-q09",
+          "difficulty": "sedang",
+          "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VII (hal. 122), kata kerja mental yang sering digunakan dalam teks berita adalah…",
+          "options": [
+            "Memperkirakan, menduga, dan mengkhawatirkan",
+            "Berlari, melompat, dan menendang",
+            "Makan, minum, dan tidur",
+            "Menulis, membaca, dan menggambar"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Kata kerja mental menyatakan persepsi atau respon pikiran (memperkirakan, menduga)."
+          },
+          "distractorWhy": {
+            "1": "Kata kerja fisik/olahraga.",
+            "2": "Kata kerja konsumsi.",
+            "3": "Kata kerja aktivitas."
+          }
+        },
+        {
+          "id": "ind-d-7-b4-q10",
+          "difficulty": "tinggi",
+          "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VII (hal. 126), syarat berita fakta yang objektif adalah…",
+          "options": [
+            "Berdasarkan kejadian nyata tanpa disertai opini atau prasangka pribadi penulis berita",
+            "Berdasarkan karangan imajinasi penulis",
+            "Menambahkan gosip dari media sosial",
+            "Memihak pada salah satu kelompok"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Objektivitas berita mewajibkan kesesuaian dengan fakta di lapangan tanpa distorsi opini wartawan."
+          },
+          "distractorWhy": {
+            "1": "Karangan adalah fiksi.",
+            "2": "Gosip bukan fakta terverifikasi.",
+            "3": "Berita harus netral dan berimbang."
+          }
+        },
+        {
+          "id": "ind-d-7-b4-q11",
+          "difficulty": "dasar",
+          "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VII (hal. 114), kalimat tunggal yang digunakan dalam teks berita adalah…",
+          "options": [
+            "Tim relawan membersihkan sampah plastik di sepanjang pantai.",
+            "Tim relawan membersihkan sampah karena hari hujan dan mereka lelah.",
+            "Jika hari hujan maka tim relawan akan pulang tetapi mereka tetap bertahan.",
+            "Meskipun banjir surut tetapi sampah bertumpuk sehingga warga mengeluh."
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Kalimat tunggal hanya memiliki satu klausa (Subjek + Predikat + Objek)."
+          },
+          "distractorWhy": {
+            "1": "Kalimat majemuk bertingkat.",
+            "2": "Kalimat majemuk kompleks.",
+            "3": "Kalimat majemuk bertingkat."
+          }
+        },
+        {
+          "id": "ind-d-7-b4-q12",
+          "difficulty": "tinggi",
+          "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VII (hal. 130 Uji Kemampuan), tujuan utama memilah dan memverifikasi sumber berita (fact-checking) adalah…",
+          "options": [
+            "Mencegah penyebaran berita palsu (hoaks) dan memastikan kebenaran informasi publik",
+            "Membuat berita menjadi viral tanpa peduli isi",
+            "Menghapus nama penerbit berita",
+            "Menambah durasi membaca"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Cek fakta memastikan publik menerima informasi yang sah dan terpercaya."
+          },
+          "distractorWhy": {
+            "1": "Viral tanpa peduli isi berbahaya.",
+            "2": "Nama penerbit tetap dicantumkan.",
+            "3": "Durasi bukan tujuan verifikasi."
           }
         }
       ]

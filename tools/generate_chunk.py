@@ -1,420 +1,413 @@
 import json
-import os
-
 data = {
-  "code": "KOMP-IPS-D-7-BAB2-01",
+  "code": "KOMP-IND-D-7-BAB1-01",
   "grade": 7,
-  "name": "Tema 02: Keberagaman Lingkungan Sekitar",
-  "materi": "Proses Pembentukan Bumi & Masa Praaksara, Keberagaman Bentang Alam & Lingkungan, Interaksi Manusia & Konservasi SDA, Peran Lembaga Sosial & Ekonomi",
-  "cpRef": "Ilmu Pengetahuan Sosial untuk SMP/MTs Kelas VII (Edisi Revisi) — Tema 02",
+  "name": "Bab 1: Jelajah Nusantara",
+  "materi": "Mengakses Informasi & Menjelajah Keindahan Alam, Memahami Gaya & Isi Teks Deskripsi, Unsur Kebahasaan: Kata Berimbuhan meN- & Majas Personifikasi",
+  "cpRef": "Bahasa Indonesia untuk SMP/MTs Kelas VII (Edisi Revisi) — Bab 1",
   "items": [
     {
-      "id": "ips-d-7-t2-q01",
+      "id": "ind-d-7-b1-q01",
       "difficulty": "dasar",
-      "prompt": "Berdasarkan Buku Siswa IPS Kelas VII hal. 97 (Evaluasi Tema 02), kemunculan makhluk hidup di permukaan bumi yang menandakan kondisi bumi sudah mulai stabil terjadi sekitar 140 juta tahun lalu pada zaman...",
+      "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VII hal. 4, dalam teks 'Pantan Terong yang Instagramable', objek wisata Pantan Terong terletak di kota...",
       "options": [
-        "Mesozoikum",
-        "Arkaekum",
-        "Paleozoikum",
-        "Neozoikum"
+        "Takengon",
+        "Banda Aceh",
+        "Lampung",
+        "Pangandaran"
       ],
       "answer": 0,
       "why": {
-        "0": "Zaman Mesozoikum (sekitar 140–65 juta tahun lalu) merupakan masa sekunder saat kondisi bumi mulai stabil dan ditandai oleh munculnya reptil raksasa serta mamalia purba."
+        "0": "Teks deskripsi 'Pantan Terong yang Instagramable' secara eksplisit menyebutkan bahwa Pantan Terong merupakan nama tempat wisata populer yang berada di Kota Takengon, Aceh."
       },
       "distractorWhy": {
-        "1": "Masa Arkaekum terjadi sekitar 2,5 miliar tahun lalu ketika bumi masih sangat panas dan belum ada tanda-tanda kehidupan.",
-        "2": "Masa Paleozoikum terjadi sekitar 340 juta tahun lalu saat organisme bersel satu dan bertulang belakang awal mulai muncul.",
-        "3": "Masa Neozoikum terjadi sekitar 60 juta tahun lalu hingga sekarang dan terbagi menjadi zaman tersier serta kuarter."
+        "1": "Banda Aceh merupakan kota asal keberangkatan rombongan Rafa pada pukul 01.00 siang, bukan lokasi dari objek wisata Pantan Terong.",
+        "2": "Lampung merupakan lokasi objek wisata kuliner Gang PU yang dibahas dalam teks deskripsi lain berjudul 'Jelajah Rasa di Lampung'.",
+        "3": "Pangandaran merupakan lokasi destinasi wisata Green Canyon dan Sungai Santirah yang dibahas pada bab mengenai pamflet wisata."
       }
     },
     {
-      "id": "ips-d-7-t2-q02",
+      "id": "ind-d-7-b1-q02",
+      "difficulty": "dasar",
+      "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VII hal. 5, berapakah ketinggian bukit Pantan Terong di atas permukaan laut?",
+      "options": [
+        "1.830 meter dpl",
+        "2.662 meter dpl",
+        "1.500 meter dpl",
+        "3.000 meter dpl"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Pada teks halaman 5 disebutkan secara rinci bahwa pemandangan cantik di Pantan Terong dinikmati dari ketinggian 1.830 meter di atas permukaan laut."
+      },
+      "distractorWhy": {
+        "1": "Ketinggian 2.662 mdpl merupakan ketinggian Gunung Papandayan sebagaimana tercantum dalam pamflet wisata Papandayan di halaman 16.",
+        "2": "Ketinggian 1.500 meter dpl bukan angka ketinggian yang tercantum dalam teks deskripsi Pantan Terong maupun Gunung Papandayan.",
+        "3": "Angka 3.000 merupakan rata-rata curah hujan (mm/tahun) Gunung Papandayan, bukan ukuran ketinggian Pantan Terong di atas permukaan laut."
+      }
+    },
+    {
+      "id": "ind-d-7-b1-q03",
       "difficulty": "sedang",
-      "prompt": "Berdasarkan Buku Siswa IPS Kelas VII hal. 97 (Evaluasi Tema 02), kota-kota metropolitan seperti Jakarta, Surabaya, dan Bandung memiliki tingkat pencemaran udara PM 2.5 berkisar 30–42 mikrogram akibat tingginya penggunaan kendaraan bermotor, sedangkan kota dengan mobilitas kendaraan rendah memiliki tingkat cemaran udara rendah. Hal ini menunjukkan bahwa...",
+      "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VII hal. 5-6, manakah yang merupakan kalimat perincian untuk menggambarkan keindahan pemandangan alam dari atas Pantan Terong?",
       "options": [
-        "Kota-kota metropolitan memberikan sumbangan yang besar terhadap pencemaran udara dibandingkan dengan kota-kota kecil",
-        "Kota-kota metropolitan memberikan sumbangan yang kecil terhadap pencemaran udara dibandingkan dengan kota-kota kecil",
-        "Kota-kota metropolitan memiliki tingkat pencemaran udara yang sama persis dengan kota-kota kecil",
-        "Penggunaan kendaraan bermotor di kota metropolitan tidak memengaruhi kualitas udara secara signifikan"
+        "Dari ketinggian, terlihat warna langit yang jingga terkena semburat sinar matahari di balik deretan gunung-gunung yang kokoh.",
+        "Sebelum pulang, ibuku membeli suvenir yang berbentuk kopi gayo untuk membantu perajin lokal.",
+        "Kami berangkat dari Banda Aceh pukul 01.00 siang dan tiba pukul 08.00 malam di rumah Paman.",
+        "Jalanan kecil menuju puncak sangat menanjak dan curam dengan tikungan-tikungan yang tajam."
       ],
       "answer": 0,
       "why": {
-        "0": "Tingginya volume kendaraan bermotor di kawasan metropolitan berbanding lurus dengan jumlah emisi gas buang dan partikel PM 2.5 yang mencemari udara."
+        "0": "Kalimat tersebut merinci secara spesifik gambaran visual pemandangan alam (warna langit jingga, semburat matahari, deretan gunung kokoh) yang melibatkan pancaindra penglihatan."
       },
       "distractorWhy": {
-        "1": "Pernyataan ini berlawanan dengan fakta empiris bahwa emisi kendaraan padat di kota besar menyumbang polusi udara terbesar.",
-        "2": "Tingkat polusi udara di kota metropolitan jauh lebih tinggi daripada kota kecil karena perbedaan densitas kendaraan bermotor.",
-        "3": "Emisi gas buang dari kendaraan bermotor merupakan penyebab utama penurunan kualitas udara di wilayah perkotaan."
+        "1": "Kalimat tentang membeli suvenir merupakan bagian dari ajakan mempromosikan produk/kerajinan lokal, bukan perincian keindahan alam.",
+        "2": "Kalimat tersebut menguraikan alur perjalanan waktu dan tempat dari Banda Aceh ke Takengon, bukan kalimat perincian gambaran alam.",
+        "3": "Kalimat tentang jalanan menanjak dan curam menggambarkan kondisi medan perjalanan menuju puncak bukit, bukan perincian keindahan pemandangan dari atas."
       }
     },
     {
-      "id": "ips-d-7-t2-q03",
+      "id": "ind-d-7-b1-q04",
+      "difficulty": "dasar",
+      "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VII hal. 6, jenis makanan atau minuman khas yang dapat dicicipi wisatawan saat berkunjung ke Pantan Terong di Tanah Gayo adalah...",
+      "options": [
+        "Kopi gayo",
+        "Keripik pisang",
+        "Bandrek hangat",
+        "Kue balok lumer"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Teks menyebutkan bahwa pengunjung dapat mencicipi aneka varian sajian kopi asli Tanah Gayo seperti espresso, cappuccino, mochacino, hingga latte."
+      },
+      "distractorWhy": {
+        "1": "Keripik pisang merupakan makanan khas yang diulas dalam teks deskripsi lisan 'Jelajah Rasa di Lampung' di Gang PU Bandar Lampung.",
+        "2": "Bandrek merupakan sajian minuman hangat yang dijadikan contoh objek latihan deskripsi gambar pada Kegiatan 5a halaman 14.",
+        "3": "Kue balok merupakan contoh objek wacana pembanding kalimat perincian rasa dan tekstur makanan pada halaman 12."
+      }
+    },
+    {
+      "id": "ind-d-7-b1-q05",
       "difficulty": "sedang",
-      "prompt": "Berdasarkan Buku Siswa IPS Kelas VII hal. 98, perhatikan empat aktivitas berikut:\n(1) Menggunakan sarana transportasi umum\n(2) Mengembangkan kendaraan bertenaga listrik\n(3) Menanam pohon-pohon di hutan\n(4) Memakai masker ketika beraktivitas\n\nSolusi yang paling tepat untuk menanggulangi dan memitigasi sumber pencemaran udara dari sektor transportasi adalah...",
+      "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VII hal. 7, kata 'instagramable' yang digunakan dalam teks deskripsi merupakan istilah yang memiliki makna...",
       "options": [
-        "(1) dan (2)",
-        "(2) dan (3)",
-        "(3) dan (4)",
-        "(1) dan (4)"
+        "Layak atau indah untuk diunggah dan dijadikan latar berswafoto di media sosial Instagram",
+        "Dapat dibeli dengan harga murah sebagai suvenir khas daerah",
+        "Memiliki nilai sejarah yang tinggi dan dilindungi pemerintah",
+        "Dapat diakses dengan mudah menggunakan kendaraan umum"
       ],
       "answer": 0,
       "why": {
-        "0": "Menggunakan transportasi umum menekan jumlah emisi per kapita, sedangkan mengembangkan kendaraan listrik mengurangi ketergantungan pada bahan bakar fosil penyebab polusi."
-      },
-      'distractorWhy': {
-        "1": "Penanaman pohon di hutan menanggulangi deforestasi, tetapi kurang spesifik mengatasi emisi transportasi perkotaan secara langsung.",
-        "2": "Memakai masker hanya langkah proteksi diri individu dari paparan polusi, bukan solusi menurunkan sumber polusi udara.",
-        "3": "Memakai masker tidak mengurangi jumlah gas buang yang dihasilkan oleh kendaraan bermotor di jalan raya."
-      }
-    },
-    {
-      "id": "ips-d-7-t2-q04",
-      "difficulty": "dasar",
-      "prompt": "Berdasarkan Buku Siswa IPS Kelas VII hal. 98 (Evaluasi Tema 02), faktor internal yang mendukung terjadinya dinamika sosial di dalam masyarakat mencakup hal-hal berikut, KECUALI...",
-      "options": [
-        "Bencana alam",
-        "Dinamika jumlah penduduk",
-        "Konflik sosial antar kelompok",
-        "Revolusi atau pemberontakan internal"
-      ],
-      "answer": 0,
-      "why": {
-        "0": "Bencana alam merupakan faktor eksternal yang berasal dari lingkungan fisik di luar struktur internal masyarakat."
+        "0": "Dalam penjelasan buku hal. 9, instagramable adalah kata serapan bahasa Inggris yang disematkan pada tempat yang indah untuk latar swafoto di Instagram."
       },
       "distractorWhy": {
-        "1": "Perubahan atau dinamika jumlah penduduk merupakan faktor internal yang memicu perubahan struktur sosial.",
-        "2": "Konflik sosial di dalam masyarakat merupakan faktor internal penyebab pergeseran dan dinamika sosial.",
-        "3": "Revolusi internal merupakan dorongan perubahan sosial yang berasal dari dalam masyarakat itu sendiri."
+        "1": "Makna barang murah yang dijadikan oleh-oleh merujuk pada pengertian suvenir atau cendera mata lokal.",
+        "2": "Nilai sejarah dan perlindungan pemerintah merujuk pada objek cagar budaya atau cagar alam, bukan makna istilah instagramable.",
+        "3": "Keterjangkauan akses kendaraan umum merupakan aspek aksesibilitas tempat wisata seperti yang dibahas pada analisis pamflet Papandayan."
       }
     },
     {
-      "id": "ips-d-7-t2-q05",
-      "difficulty": "dasar",
-      "prompt": "Berdasarkan Buku Siswa IPS Kelas VII hal. 98, pada era 2000-an penggunaan telepon genggam belum meluas, namun saat ini ketergantungan individu terhadap smartphone sangat tinggi hingga mengubah pola komunikasi dan perilaku masyarakat. Fenomena ini dikategorikan sebagai...",
+      "id": "ind-d-7-b1-q06",
+      "difficulty": "sedang",
+      "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VII hal. 8-9 (Kegiatan 3), perhatikan pencarian makna kata dalam KBBI cetak. Jika kita mencari makna kata dasar 'meredup' dalam KBBI cetak, kata dasar yang harus dicari pada abjad 'R' adalah...",
       "options": [
-        "Perubahan sosial",
-        "Interaksi sosial",
-        "Dinamika sosial",
-        "Mobilitas sosial"
+        "redup",
+        "meredup",
+        "edup",
+        "redupkan"
       ],
       "answer": 0,
       "why": {
-        "0": "Perubahan sosial merujuk pada peralihan pola perilaku, norma, dan peradaban masyarakat akibat perkembangan teknologi informasi."
+        "0": "Kaidah pencarian kata dalam KBBI cetak mengharuskan pengguna menemukan kata dasarnya terlebih dahulu. Kata dasar dari kata berimbuhan 'meredup' adalah 'redup'."
       },
       "distractorWhy": {
-        "1": "Interaksi sosial merujuk pada hubungan timbal balik antarindividu atau kelompok, bukan fenomena peralihan pola budaya akibat teknologi.",
-        "2": "Dinamika sosial adalah proses pergerakan internal kelompok, bukan istilah umum untuk perubahan pola hidup masyarakat.",
-        "3": "Mobilitas sosial merujuk pada perpindahan status sosial seseorang dalam hierarki masyarakat."
+        "1": "Pencarian langsung menggunakan kata berimbuhan 'meredup' kurang tepat dalam KBBI cetak karena entri disusun berdasarkan kata dasar.",
+        "2": "Bentuk 'edup' bukanlah kata dasar bahasa Indonesia yang valid dari verba meredup.",
+        "3": "Bentuk 'redupkan' adalah bentuk kata dasar yang sudah mendapat akhiran -kan, bukan kata dasar murni."
       }
     },
     {
-      "id": "ips-d-7-t2-q06",
+      "id": "ind-d-7-b1-q07",
+      "difficulty": "dasar",
+      "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VII hal. 10-11 (Kupas Teori), manakah yang BUKAN merupakan ciri atau tujuan utama dari teks deskripsi?",
+      "options": [
+        "Menceritakan urutan peristiwa rekaan dengan plot konflik yang rumit",
+        "Menggambarkan atau melukiskan suatu benda, tempat, atau suasana tertentu",
+        "Melibatkan pancaindra agar pembaca seolah-olah melihat atau merasakan sendiri",
+        "Menjelaskan ciri-ciri objek seperti warna, ukuran, dan bentuk secara terperinci"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Menceritakan urutan peristiwa rekaan dengan konflik rumit merupakan ciri dari teks narasi/fantasi, bukan teks deskripsi yang berfokus melukiskan objek konkret."
+      },
+      "distractorWhy": {
+        "1": "Pernyataan ini tepat merupakan salah satu poin utama tujuan teks deskripsi pada halaman 9.",
+        "2": "Pernyataan ini tepat merupakan ciri teks deskripsi yang melibatkan penglihatan, pendengaran, penciuman, dan perabaan pada halaman 10.",
+        "3": "Pernyataan ini tepat merupakan ciri teks deskripsi yang menguraikan rupa dan bentuk objek secara mendetail pada halaman 10."
+      }
+    },
+    {
+      "id": "ind-d-7-b1-q08",
+      "difficulty": "sedang",
+      "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VII hal. 12 (Tabel 1.2), perhatikan kalimat umum: 'Kue balok itu enak sekali.' Manakah kalimat perincian yang tepat untuk mendukung kalimat umum tersebut?",
+      "options": [
+        "Teksturnya lembut saat digigit dan isian cokelatnya akan lumer di mulutmu.",
+        "Kue balok dibeli oleh Paman di toko roti terkenal kemarin sore.",
+        "Harganya sangat murah sehingga terjangkau oleh semua kalangan.",
+        "Kue tersebut dikemas dalam kotak karton berwarna cokelat tua."
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Teks buku halaman 12 memberikan contoh kalimat perinci untuk rasa kue balok yang enak: 'Teksturnya lembut saat digigit dan isian cokelatnya akan lumer di mulutmu.'"
+      },
+      "distractorWhy": {
+        "1": "Kalimat ini menjelaskan alur transaksi pembelian kue, bukan perincian citra rasa atau tekstur yang membuktikan kue itu enak.",
+        "2": "Kalimat ini menguraikan aspek ekonomis atau harga kue, bukan perincian kelezatan rasa kue balok.",
+        "3": "Kalimat ini menggambarkan aspek kemasan luar (wadah), bukan perincian rasa atau kualitas makanan saat dikonsumsi."
+      }
+    },
+    {
+      "id": "ind-d-7-b1-q09",
+      "difficulty": "dasar",
+      "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VII hal. 13 (Kupas Teori), gaya bahasa yang mengumpamakan benda mati seolah-olah hidup dan dapat berperilaku seperti manusia disebut...",
+      "options": [
+        "Majas personifikasi",
+        "Majas metafora",
+        "Majas hiperbola",
+        "Majas asosiasi"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Kupas Teori halaman 13 mendefinisikan majas personifikasi sebagai gaya bahasa yang mengumpamakan benda mati seolah-olah hidup seperti manusia."
+      },
+      "distractorWhy": {
+        "1": "Majas metafora adalah pemakaian kata yang bukan arti sebenarnya sebagai pembanding langsung tanpa kata pembanding, bukan penginsanan benda mati.",
+        "2": "Majas hiperbola adalah gaya bahasa pengungkapan yang berlebih-lebihan untuk menekankan kesan.",
+        "3": "Majas asosiasi adalah perbandingan dua hal yang sifatnya berbeda tetapi dianggap sama dengan kata pembanding seperti bagai, ibarat, bak."
+      }
+    },
+    {
+      "id": "ind-d-7-b1-q10",
+      "difficulty": "sedang",
+      "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VII hal. 13, perhatikan kalimat berikut: 'Angin yang bertiup memainkan rambut dan berputar di sekeliling tubuh.' Kata kerja yang menandai pengumpamaan benda mati seolah-olah hidup pada kalimat tersebut adalah...",
+      "options": [
+        "memainkan dan berputar",
+        "bertiup dan sekeliling",
+        "angin dan rambut",
+        "tubuh dan bertiup"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Kata 'memainkan' dan 'berputar' adalah tindakan manusiawi yang disematkan kepada angin (benda mati) sehingga menciptakan majas personifikasi."
+      },
+      "distractorWhy": {
+        "1": "Kata 'bertiup' adalah pergerakan alami angin, sedangkan 'sekeliling' adalah kata penunjuk ruang/posisi.",
+        "2": "Kata 'angin' dan 'rambut' keduanya merupakan kata benda (nomina), bukan kata kerja penggerak majas.",
+        "3": "Kata 'tubuh' adalah nomina dan 'bertiup' adalah verba alami angin, tidak mengandung tindakan personifikasi khas manusia."
+      }
+    },
+    {
+      "id": "ind-d-7-b1-q11",
       "difficulty": "tinggi",
-      "prompt": "Berdasarkan Buku Siswa IPS Kelas VII hal. 99, penggunaan bahan kimia seperti pestisida dan pupuk anorganik sejak Revolusi Hijau dapat meningkatkan produksi pertanian, namun dampak jangka panjangnya menyebabkan pencemaran tanah sehingga tanah menjadi tidak subur. Solusi yang tepat untuk memulihkan tanah tercemar tersebut adalah...",
+      "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VII hal. 13-14, bacalah kutipan novel 'Misteri Terowongan Kereta' karya Tere Liye: '...Meski si ular besi ini sudah menjadi bagian kehidupan kampung, dengan suara klaksonnya yang tidak pernah alpa, melenguh nyaring setiap subuh buta dan tengah malam...' Ungkapan majas personifikasi dalam kutipan tersebut ditunjukkan oleh ungkapan...",
       "options": [
-        "Mendegradasi zat pencemar dan racun dalam tanah melalui pemulihan lingkungan",
-        "Menambah dosis pupuk kimia sintetis agar unsur hara bertambah cepat",
-        "Membiarkan tanah tanpa pengolahan agar zat racun menguap sendiri secara alami",
-        "Mengubah seluruh lahan pertanian tercemar menjadi kawasan pemukiman industri"
+        "suara klaksonnya yang tidak pernah alpa, melenguh nyaring",
+        "perjalanan pertama kalinya aku dan Burlian dengan kereta api",
+        "hutan pedalaman Sumatra yang selalu berkabut di pagi hari",
+        "bapak tersenyum sambil takzim menatap langit-langit gerbong"
       ],
       "answer": 0,
       "why": {
-        "0": "Degradasi zat pencemar (remediasi/bioremediasi) menguraikan racun kimia sintetis dalam tanah menjadi senyawa tidak berbahaya sehingga kesuburan tanah pulih."
+        "0": "Klakson kereta api (benda mati) digambarkan memiliki sifat 'tidak pernah alpa' dan dapat 'melenguh nyaring' seperti lembu/hewan bernyawa, yang merupakan majas personifikasi."
       },
       "distractorWhy": {
-        "1": "Menambah pupuk kimia sintetis justru akan memperparah akumulasi racun dan merusak struktur tanah.",
-        "2": "Zat cemaran pestisida kimia bersifat persisten di dalam tanah dan tidak mudah hilang tanpa upaya pemulihan aktif.",
-        "3": "Mengubah fungsi lahan pertanian mengurangi ketersediaan lahan pangan nasional dan tidak menyelesaikan pencemaran tanah."
+        "1": "Kalimat ini menceritakan pengalaman tokoh aku dan Burlian menaiki kereta api, merupakan fakta peristiwa naratif tanpa majas.",
+        "2": "Kalimat ini menggambarkan keadaan alam hutan Sumatra yang berkabut, merupakan kenyataan fenomena alamik biasa.",
+        "3": "Kalimat ini menceritakan ekspresi dan tindakan manusia (Bapak) yang menatap langit gerbong, bukan personifikasi benda mati."
       }
     },
     {
-      "id": "ips-d-7-t2-q07",
+      "id": "ind-d-7-b1-q12",
       "difficulty": "sedang",
-      "prompt": "Berdasarkan Buku Siswa IPS Kelas VII hal. 99, pada masa berburu dan mengumpulkan makanan tingkat sederhana (50.000–10.000 SM), manusia praaksara telah mengenal pembagian kerja berdasarkan jenis kelamin. Peran utama kaum perempuan pada masa tersebut adalah...",
+      "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VII hal. 16-17, pamflet wisata 'Taklukkan Puncak Papandayan' memuat informasi detail berupa kelembapan udara 70—80% dan temperatur 10—25°C yang didasarkan pada klasifikasi iklim menurut...",
       "options": [
-        "Mengumpulkan makanan di sekitar tempat tinggal dan mengasuh anak",
-        "Berburu binatang buas berukuran besar di hutan rimba",
-        "Membuat alat-alat dari logam dan perunggu untuk bertani",
-        "Membuka lahan pertanian skala besar dengan teknik tebang bakar"
+        "Schmidt dan Ferguson",
+        "Junghuhn",
+        "Koppen",
+        "Oldeman"
       ],
       "answer": 0,
       "why": {
-        "0": "Pada masa berburu tingkat sederhana, perempuan bertugas mengumpulkan tumbuh-tumbuhan, buah, dan mengasuh anak di dekat perkemahan sementara kaum laki-laki berburu hewan."
+        "0": "Dalam teks pamflet wisata Papandayan halaman 16 tertulis eksplisit: 'Menurut klasifikasi Schmidt dan Ferguson, gunung ini memiliki curah hujan rata-rata 3.000 mm/tahun, kelembapan udara 70—80% dan temperatur 10—25° C.'"
       },
       "distractorWhy": {
-        "1": "Berburu binatang buas jarak jauh memerlukan fisik kuat dan merupakan tugas utama kelompok laki-laki.",
-        "2": "Teknologi perunggu dan logam baru berkembang pada masa Perundagian ribuan tahun kemudian.",
-        "3": "Pembukaan lahan pertanian tebang bakar baru dikenal pada masa bercocok tanam (Neolitikum)."
+        "1": "Klasifikasi Junghuhn didasarkan pada ketinggian tempat dan jenis vegetasi tanaman budidaya, bukan rujukan yang tertulis dalam teks pamflet.",
+        "2": "Klasifikasi Koppen didasarkan pada suhu dan curah hujan global, tidak disebutkan dalam teks pamflet Papandayan.",
+        "3": "Klasifikasi Oldeman didasarkan pada bulan basah dan bulan kering untuk pertanian tanaman pangan, tidak dirujuk pada pamflet tersebut."
       }
     },
     {
-      "id": "ips-d-7-t2-q08",
-      "difficulty": "sedang",
-      "prompt": "Berdasarkan Buku Siswa IPS Kelas VII hal. 99, jumlah penduduk Indonesia terus meningkat dari 272,6 juta jiwa (2020) menjadi 278,6 juta jiwa (2023). Untuk menjamin kesejahteraan penduduk melalui pemenuhan layanan dasar pendidikan dan kesehatan, program pembangunan diselaraskan dengan SDGs pada pilar...",
-      "options": [
-        "Pembangunan sosial",
-        "Pembangunan ekonomi",
-        "Pembangunan lingkungan",
-        "Pembangunan tata kelola"
-      ],
-      "answer": 0,
-      "why": {
-        "0": "Pilar pembangunan sosial SDGs berfokus pada pemenuhan hak dasar manusia mencakup pengentasan kemiskinan, kesehatan, pendidikan berkualitas, dan kesetaraan."
-      },
-      "distractorWhy": {
-        "1": "Pilar pembangunan ekonomi berfokus pada pertumbuhan ekonomi berkualitas, pekerjaan layak, dan inovasi industri.",
-        "2": "Pilar pembangunan lingkungan berfokus pada konservasi ekosistem darat, lautan, serta penanganan perubahan iklim.",
-        "3": "Pilar pembangunan tata kelola berfokus pada perdamaian, keadilan, dan kelembagaan yang tangguh."
-      }
-    },
-    {
-      "id": "ips-d-7-t2-q09",
+      "id": "ind-d-7-b1-q13",
       "difficulty": "tinggi",
-      "prompt": "Berdasarkan Buku Siswa IPS Kelas VII hal. 100, lonjakan minat dan penggunaan mobil listrik di Indonesia dari 3.205 unit menjadi 20.681 unit direspon pemerintah dan produsen melalui pengembangan teknologi ramah lingkungan. Fenomena ini merupakan bentuk respons terhadap sumber daya minyak bumi yang...",
+      "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VII hal. 16, jika seorang wisatawan dari Jakarta ingin mengunjungi Taman Wisata Alam Gunung Papandayan menggunakan bus jurusan Jakarta—Garut, rute angkutan umum lanjutan yang benar dari Terminal Guntur Garut adalah...",
       "options": [
-        "Terbatas dan tidak dapat diperbarui",
-        "Jumlahnya tidak terbatas di alam",
-        "Sangat mudah didaur ulang secara alami",
-        "Tidak memiliki dampak emisi karbon"
+        "Naik angkutan elf jurusan Garut—Cikajang dengan tarif Rp15.000,00",
+        "Naik angkutan elf dari Terminal Cicaheum jurusan Bandung—Cikajang",
+        "Naik bus Primajasa langsung menuju lokasi tempat perkemahan Pondok Saladah",
+        "Naik taksi online langsung menuju gerbang pos 2 Poco Roko"
       ],
       "answer": 0,
       "why": {
-        "0": "Minyak bumi merupakan bahan bakar fosil yang jumlahnya terbatas di alam dan depositnya akan habis sehingga mendorong transisi ke energi listrik."
+        "0": "Pamflet wisata Papandayan di hal. 16 menyebutkan rute secara presisi: turun di Terminal Guntur—Garut, lalu lanjutkan dengan angkutan elf jurusan Garut—Cikajang dengan tarif Rp15.000,00."
       },
       "distractorWhy": {
-        "1": "Minyak bumi terbentuk dari fosil yang memerlukan waktu jutaan tahun sehingga persediaannya terbatas.",
-        "2": "Minyak bumi tidak bisa didaur ulang setelah dibakar menjadi energi emisi.",
-        "3": "Pembakaran minyak bumi menghasilkan emisi gas rumah kaca yang memicu pemanasan global."
+        "1": "Rute Terminal Cicaheum (Bandung) merupakan rute alternatif jika wisatawan berangkat dari Bandung, bukan sambungan dari Terminal Guntur Garut.",
+        "2": "Bus Primajasa hanya beroperasi antar kota (Jakarta—Garut) hingga terminal, tidak masuk ke lokasi perkemahan gunung.",
+        "3": "Pos 2 Poco Roko merupakan pos pendakian di Desa Wae Rebo NTT (halaman 32-33), bukan lokasi di Gunung Papandayan Garut."
       }
     },
     {
-      "id": "ips-d-7-t2-q10",
+      "id": "ind-d-7-b1-q14",
       "difficulty": "sedang",
-      "prompt": "Berdasarkan Buku Siswa IPS Kelas VII hal. 100, produsen UMKM kuliner moci mengalami peningkatan permintaan dua kali lipat sehingga membeli mesin modern untuk menambah kapasitas dan variasi rasa. Hal ini menunjukkan bahwa perkembangan IPTEK dalam kegiatan ekonomi bertujuan untuk...",
+      "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VII hal. 21 (Gambar 1.6 & 1.7), tempat wisata Sungai Santirah yang menyajikan kegiatan River Tubing secara geografis terletak di...",
       "options": [
-        "Memaksimalkan proses produksi serta meningkatkan kualitas dan kuantitas produk",
-        "Mengurangi ketergantungan pada konsumen luar daerah",
-        "Menghilangkan kebutuhan akan tenaga kerja manusia secara total",
-        "Membatasi jumlah barang yang beredar di pasar"
+        "Dusun Giriharja, Desa Selasari, Kecamatan Parigi, Kabupaten Pangandaran",
+        "Desa Sirna Jaya dan Desa Kramat Wangi, Kabupaten Garut",
+        "Kecamatan Takengon, Kabupaten Aceh Tengah, Provinsi Aceh",
+        "Desa Denge, Kecamatan Satarmese Barat, Kabupaten Manggarai"
       ],
       "answer": 0,
       "why": {
-        "0": "Penerapan IPTEK dan mesin modern mempermudah produsen menghasilkan produk berkualitas lebih baik dalam jumlah yang sesuai kebutuhan pasar."
+        "0": "Keterangan lokasi pada pamflet Wisata Green Canyon (Gambar 1.7) menyebutkan lokasi Sungai Santirah berada di dusun Giriharja, Desa Selasari, Kecamatan Parigi, Kabupaten Pangandaran, Jawa Barat."
       },
       "distractorWhy": {
-        "1": "Penggunaan teknologi justru membantu UMKM menjangkau pasar konsumen luar daerah yang lebih luas.",
-        "2": "Penerapan mesin pada UMKM bertujuan mendukung efisiensi kerja, bukan menghapus seluruh tenaga kerja.",
-        "3": "Mesin baru digunakan untuk meningkatkan volume produksi, bukan membatasi barang beredar."
+        "1": "Lokasi tersebut merupakan letak kawasan Taman Wisata Alam Gunung Papandayan di Kabupaten Garut.",
+        "2": "Kecamatan Takengon Aceh Tengah merupakan lokasi objek wisata Bukit Pantan Terong dan Danau Laut Tawar.",
+        "3": "Desa Denge Kabupaten Manggarai NTT merupakan lokasi gerbang awal pendakian menuju Desa Wae Rebo."
       }
     },
     {
-      "id": "ips-d-7-t2-q11",
-      "difficulty": "dasar",
-      "prompt": "Berdasarkan Buku Siswa IPS Kelas VII hal. 74 (Aktivitas 2), proses perpaduan dua kebudayaan atau lebih yang saling memengaruhi sehingga menghasilkan unsur kebudayaan baru tanpa menghilangkan ciri khas kebudayaan aslinya disebut...",
-      "options": [
-        "Akulturasi",
-        "Asimilasi",
-        "Difusi",
-        "Internalisasi"
-      ],
-      "answer": 0,
-      "why": {
-        "0": "Akulturasi terjadi ketika budaya asing diterima dan diolah ke dalam kebudayaan sendiri tanpa menyebabkan hilangnya kepribadian kebudayaan asli."
-      },
-      "distractorWhy": {
-        "1": "Asimilasi merupakan pembauran dua kebudayaan yang disertai dengan hilangnya ciri khas kebudayaan asli membentuk budaya baru.",
-        "2": "Difusi adalah proses penyebaran unsur-unsur kebudayaan dari satu individu/masyarakat ke individu/masyarakat lain.",
-        "3": "Internalisasi adalah proses penanaman nilai dan norma ke dalam kepribadian individu sejak kecil."
-      }
-    },
-    {
-      "id": "ips-d-7-t2-q12",
-      "difficulty": "dasar",
-      "prompt": "Berdasarkan Buku Siswa IPS Kelas VII hal. 81 (Aktivitas 4), pembabakan masa praaksara secara arkeologis yang ditandai dengan penggunaan alat batu yang masih kasar dan belum diasah seperti kapak genggam adalah...",
-      "options": [
-        "Paleolitikum",
-        "Mesolitikum",
-        "Neolitikum",
-        "Perundagian"
-      ],
-      "answer": 0,
-      "why": {
-        "0": "Zaman Paleolitikum (zaman batu tua) ditandai oleh alat-alat batu yang dikerjakan secara kasar dan belum dihaluskan untuk berburu."
-      },
-      "distractorWhy": {
-        "1": "Zaman Mesolitikum (zaman batu tengah) ditandai oleh pembuat kapak genggam Sumatra dan mulai menetap di gua-gua.",
-        "2": "Zaman Neolitikum (zaman batu baru) ditandai oleh perkakas batu yang sudah diasah halus seperti beliung persegi.",
-        "3": "Zaman Perundagian merupakan masa pertukangan logam (perunggu dan besi)."
-      }
-    },
-    {
-      "id": "ips-d-7-t2-q13",
+      "id": "ind-d-7-b1-q15",
       "difficulty": "tinggi",
-      "prompt": "Berdasarkan Buku Siswa IPS Kelas VII hal. 86 (Aktivitas 6), manusia praaksara pada masa berburu dan mengumpulkan makanan tingkat lanjut mulai membuat lukisan dinding gua berupa cap-cap tangan dan gambar binatang. Makna utama seni lukis gua tersebut adalah...",
+      "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VII hal. 23 (Kupas Teori Awalan meN-), manakah aturan yang BENAR mengenai peluluhan fonem k, p, t, s saat mendapat awalan meN-?",
       "options": [
-        "Sebagai bagian dari ritual kepercayaan, permohonan perlindungan, dan rekaman pengalaman berburu",
-        "Sebagai barang dagangan bernilai ekonomi tinggi untuk ditukarkan dengan suku lain",
-        "Sebagai hiasan estetis komersial untuk menarik perhatian kelompok luar",
-        "Sebagai alat komunikasi berbasis sistem tulisan alfabet formal"
+        "Fonem k, p, t, s luluh jika diikuti kata dasar yang berawalan huruf k, p, t, s tunggal (bukan kluster)",
+        "Fonem k, p, t, s tetap luluh meskipun diikuti oleh kata dasar yang berawalan konsonan rangkap (kluster)",
+        "Fonem k, p, t, s luluh ketika bergabung dengan kata berimbuhan berawalan k, p, t, s seperti memperluas",
+        "Fonem k, p, t, s tidak pernah luluh dalam kondisi penambahan awalan meN- bentuk apa pun"
       ],
       "answer": 0,
       "why": {
-        "0": "Lukisan dinding gua pada masa praaksara bernilai magis-religius yang berkaitan dengan simbol permohonan keberhasilan berburu dan penghormatan roh."
+        "0": "Teori bahasa hal. 23 menjelaskan fonem k, p, t, s luluh jika diawali kata dasar berawalan huruf k, p, t, s tunggal (contoh: meN- + pesona -> memesona, meN- + pengaruh -> memengaruhi)."
       },
       "distractorWhy": {
-        "1": "Pada masa batu pertengahan belum terdapat aktivitas perdagangan lukisan komersial.",
-        "2": "Lukisan gua dibuat bukan untuk tujuan dekorasi komersial melainkan kebutuhan spritual dan ekspresi pengalaman.",
-        "3": "Masa tersebut merupakan masa praaksara sehingga masyarakat belum mengenal sistem aksara tulisan alfabet."
+        "1": "Jika diikuti konsonan rangkap (kluster) seperti pr, kr, kl, fonem k, p, t, s TIDAK luluh (contoh: memprakarsai, mengkriminalkan).",
+        "2": "Pada kata berimbuhan yang diawali k, p, t, s seperti memperluas / mempertaruhkan, fonem p atau t TIDAK luluh.",
+        "3": "Pernyataan ini salah karena dalam kaidah tata bahasa Indonesia standar fonem k, p, t, s mengalami peluluhan jika memenuhi syarat tertentu."
       }
     },
     {
-      "id": "ips-d-7-t2-q14",
+      "id": "ind-d-7-b1-q16",
       "difficulty": "sedang",
-      "prompt": "Berdasarkan Buku Siswa IPS Kelas VII hal. 87 (Aktivitas 7), pada masa bercocok tanam (Neolitikum), masyarakat membangun berbagai bangunan batu besar seperti dolmen, menhir, dan sarkofagus. Keberadaan bangunan megalitikum ini mencerminkan sistem kepercayaan...",
+      "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VII hal. 23 (Tantangan), manakah kalimat yang menggunakan kata berimbuhan meN- dengan peluluhan kata dasar yang BENAR?",
       "options": [
-        "Penghormatan terhadap roh nenek moyang dan pemujaan kekuatan alam",
-        "Kepercayaan monoteisme modern berbasis kitab tertulis",
-        "Penolakan terhadap semua bentuk bangunan ritual keagamaan",
-        "Penyembahan berhala berbasis teknologi manufaktur mesin"
+        "Kilau sinar matahari yang menerpa permukaan danau itu sangat mengagumkan.",
+        "Perajin memroduksi suvenir dalam kegiatan industri rumah tangga skala kecil.",
+        "Pemandu wisata itu secara tangkas menterjemahkan paparannya ke bahasa Jerman.",
+        "Pendaki gunung tidak memersoalkan kenaikan tarif fasilitas di jalur pendakian."
       ],
       "answer": 0,
       "why": {
-        "0": "Tradisi megalitikum berkembang karena adanya keyakinan bahwa roh nenek moyang tetap mengawasi dan memengaruhi kehidupan keturunannya."
+        "0": "Kata 'menerpa' berasal dari awalan meN- + terpa (huruf t luluh menjadi n). Ini merupakan pembentukan kata berimbuhan meN- yang baku dan tepat."
       },
       "distractorWhy": {
-        "1": "Masyarakat praaksara belum mengenal agama monoteisme modern dengan kitab suci.",
-        "2": "Bangunan dolmen dan menhir justru membuktikan keberadaan ritual keagamaan yang sangat kuat.",
-        "3": "Masyarakat Neolitikum belum menggunakan teknologi mesin manufaktur."
+        "1": "Bentuk 'memroduksi' salah; kata dasar 'produksi' berawalan kluster pr- sehingga p TIDAK luluh (seharusnya memproduksi).",
+        "2": "Bentuk 'menterjemahkan' salah; kata dasar 'terjemah' berawalan t tunggal sehingga t LULUH menjadi n (seharusnya menerjemahkan).",
+        "3": "Bentuk 'memersoalkan' salah; kata asal 'persoal' mendapat imbuhan me-kan pada bentuk dasar soal/persoal (seharusnya mempersoalkan)."
       }
     },
     {
-      "id": "ips-d-7-t2-q15",
+      "id": "ind-d-7-b1-q17",
+      "difficulty": "sedang",
+      "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VII hal. 25-27 (Menganalisis Informasi Lisan 'Jelajah Wae Rebo'), apakah nama rumah adat tradisional khas Manggarai yang berbentuk kerucut dan memiliki lima tingkat?",
+      "options": [
+        "Mbaru Niang",
+        "Tongkonan",
+        "Rumah Gadang",
+        "Honai"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Teks lisan 'Jelajah Wae Rebo' karya Eugenia Rakhma Subarna menyebutkan bahwa rumah tradisional khas Manggarai yang memiliki 5 tingkat berbentuk kerucut dinamakan Mbaru Niang."
+      },
+      "distractorWhy": {
+        "1": "Tongkonan merupakan rumah adat tradisional masyarakat suku Toraja di Sulawesi Selatan.",
+        "2": "Rumah Gadang merupakan rumah adat tradisional Minangkabau di Sumatera Barat.",
+        "3": "Honai merupakan rumah adat tradisional suku-suku di wilayah pegunungan Papua."
+      }
+    },
+    {
+      "id": "ind-d-7-b1-q18",
       "difficulty": "tinggi",
-      "prompt": "Berdasarkan Buku Siswa IPS Kelas VII hal. 89 (Aktivitas 8), pada masa Perundagian perdagangan antarpulau semakin ramai dengan memanfaatkan sarana perahu bercadik. Mekanisme transaksi ekonomi yang berlaku pada era tersebut adalah...",
+      "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VII hal. 26-27, pada bangunan rumah Mbaru Niang di Desa Wae Rebo, bagian tingkat ketiga yang berfungsi khusus untuk menyimpan benih jagung dan tanaman bercocok tanam dinamakan...",
       "options": [
-        "Barter atau tukar-menukar barang berupa nekara perunggu, perhiasan, dan hasil bumi",
-        "Penggunaan mata uang kertas resmi terbitan bank sentral",
-        "Pembayaran menggunakan koin emas berstempel standar internasional",
-        "Sistem transfer kredit digital berbasis perbankan"
+        "lentar",
+        "lutur",
+        "lobo",
+        "hempang"
       ],
       "answer": 0,
       "why": {
-        "0": "Meskipun teknologi perunggu sudah maju, alat pembayaran uang resmi belum ada sehingga perdagangan dilakukan secara barter dengan barang bernilai tinggi seperti nekara dan perhiasan."
+        "0": "Dalam penuturan pandu wisata teks Jelajah Wae Rebo di hal. 27 dijelaskan: '...inilah tingkat ketiga atau yang biasa disebut lentar, berfungsi menyimpan benih jagung dan tanaman untuk bercocok tanam...'"
       },
       "distractorWhy": {
-        "1": "Mata uang kertas belum dikenal pada masa praaksara.",
-        "2": "Koin emas berskala internasional baru hadir pada era kerajaan Hindu-Buddha dan Islam.",
-        "3": "Sistem transfer digital merupakan inovasi teknologi keuangan masa modern."
+        "1": "Lutur atau tenda adalah tingkat pertama Mbaru Niang yang berfungsi sebagai tempat tinggal dan berkumpul keluarga.",
+        "2": "Lobo (tingkat keempat) dan tempat lainnya memiliki fungsi penyimpanan bahan makanan cadangan saat paceklik.",
+        "3": "Hempang adalah istilah lain dari susunan konstruksi kayu/perabot, bukan nama struktur tingkat ketiga Mbaru Niang."
       }
     },
     {
-      "id": "ips-d-7-t2-q16",
+      "id": "ind-d-7-b1-q19",
       "difficulty": "sedang",
-      "prompt": "Berdasarkan Buku Siswa IPS Kelas VII hal. 93 (Aktivitas 9), fenomena pemanasan suhu permukaan laut di Samudra Pasifik bagian tengah dan timur yang berakibat pada menurunnya curah hujan drastis dan kekeringan panjang di Indonesia dinamakan...",
+      "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VII hal. 28-29 ('Jelajah Rasa di Lampung'), apakah nama kawasan yang terkenal sebagai pusat sentra keripik pisang di Jalan Pagar Alam, Kota Bandar Lampung?",
       "options": [
-        "El Nino",
-        "La Nina",
-        "Efek rumah kaca",
-        "Gelombang tsunami"
+        "Gang PU",
+        "Gang Malioboro",
+        "Pasar Beringharjo",
+        "Pantan Terong"
       ],
       "answer": 0,
       "why": {
-        "0": "El Nino memicu pergeseran awan hujan menjauhi wilayah Indonesia sehingga menyebabkan kemarau panjang dan kekeringan."
+        "0": "Teks 'Jelajah Rasa di Lampung' menyebutkan bahwa pusat sentra keripik pisang lampung terletak di Jalan Pagar Alam, Kota Bandar Lampung, yang terkenal dengan sebutan Gang PU."
       },
       "distractorWhy": {
-        "1": "La Nina merupakan fenomena pendinginan suhu muka laut Pasifik yang menyebabkan curah hujan tinggi dan banjir di Indonesia.",
-        "2": "Efek rumah kaca adalah proses terperangkapnya panas matahari oleh gas atmosfer secara global.",
-        "3": "Tsunami adalah gelombang laut raksasa yang dipicu oleh gempa bumi atau letusan gunung api bawah laut."
+        "1": "Gang Malioboro merupakan kawasan sentra wisata belanja terkenal di Kota Yogyakarta.",
+        "2": "Pasar Beringharjo adalah pasar tradisional di Yogyakarta yang dipakai sebagai contoh teks deskripsi lokasi di hal. 10.",
+        "3": "Pantan Terong adalah bukit tempat wisata pemandangan alam di Kota Takengon Aceh Tengah."
       }
     },
     {
-      "id": "ips-d-7-t2-q17",
+      "id": "ind-d-7-b1-q20",
       "difficulty": "tinggi",
-      "prompt": "Berdasarkan Buku Siswa IPS Kelas VII hal. 101 (Evaluasi Essay No. 5), perburuan hiu secara masif untuk diambil siripnya memberikan nilai ekonomi tinggi bagi nelayan, namun mengancam kepunahan predator puncak laut. Berdasarkan prinsip pembangunan berkelanjutan, langkah pengelolaan yang tepat adalah...",
+      "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VII hal. 31-32 (Kegiatan 9: Kupas Teori Tanda Baca), manakah kalimat yang menggunakan tanda koma (,) dengan BENAR sesuai kaidah kebahasaan?",
       "options": [
-        "Menghentikan perburuan hiu liar dan mengembangkan mata pencaharian alternatif berkelanjutan demi menjaga ekosistem laut",
-        "Meningkatkan kapasitas kuota penangkapan hiu agar pendapatan nelayan melonjak pesat",
-        "Membiarkan perburuan sirip hiu tanpa batasan karena memberikan harga jual tinggi bagi pasar",
-        "Memusnahkan seluruh habitat laut agar tidak ada persaingan ekosistem"
+        "Wah, indah sekali pemandangan di Pantan Terong!",
+        "Gunung Papandayan telah meletus beberapa kali, Meskipun demikian kawahnya tetap indah.",
+        "Ia membeli kopi kain dan tas sebagai oleh-oleh.",
+        "Lili mengambil foto sementara Fajar memilih menikmati kopi."
       ],
       "answer": 0,
       "why": {
-        "0": "Pembangunan berkelanjutan menjamin pemanfaatan sumber daya tanpa mengorbankan kelestarian ekosistem dan keanekaragaman hayati laut bagi generasi mendatang."
+        "0": "Halaman 32 menjelaskan bahwa tanda koma dipakai sebelum dan/atau sesudah kata seru (seperti wah, o, ya, aduh) sehingga pemisahan 'Wah, indah sekali...' adalah tepat."
       },
       "distractorWhy": {
-        "1": "Meningkatkan kuota penangkapan akan mempercepat kepunahan hiu dan merusak keseimbangan ekosistem laut.",
-        "2": "Pembiaran perburuan liar bertentangan dengan pilar pembangunan lingkungan SDGs.",
-        "3": "Memusnahkan habitat laut akan menghancurkan sumber kehidupan manusia dan biota lingkungan."
-      }
-    },
-    {
-      "id": "ips-d-7-t2-q18",
-      "difficulty": "dasar",
-      "prompt": "Berdasarkan Buku Siswa IPS Kelas VII hal. 65, pada pembabakan sejarah bumi secara geologis, masa Arkaekum yang berlangsung sekitar 2,5 miliar tahun lalu memiliki karakteristik utama yaitu...",
-      "options": [
-        "Kulit bumi masih sangat panas dan dalam proses pembentukan sehingga belum ada tanda kehidupan",
-        "Suhu bumi sudah stabil dan ditumbuhi hutan hujan tropis lebat",
-        "Bumi didominasi oleh reptil raksasa dinosaurus",
-        "Manusia praaksara mulai hidup menetap di sekitar sungai"
-      ],
-      "answer": 0,
-      "why": {
-        "0": "Masa Arkaekum merupakan masa tertua ketika bumi dalam keadaan sangat panas dan belum memungkinkan adanya kehidupan."
-      },
-      "distractorWhy": {
-        "1": "Kondisi bumi yang stabil dengan tumbuhan lebat terjadi pada masa Paleozoikum dan Mesozoikum.",
-        "2": "Reptil raksasa hidup pada masa Mesozoikum.",
-        "3": "Kehadiran manusia praaksara baru terjadi pada zaman Kuarter di masa Neozoikum."
-      }
-    },
-    {
-      "id": "ips-d-7-t2-q19",
-      "difficulty": "sedang",
-      "prompt": "Berdasarkan Buku Siswa IPS Kelas VII hal. 70, pencemaran tanah sering terjadi akibat penumpukan limbah padat non-biodegradable seperti sampah plastik dan limbah B3. Dampak ekologis paling serius dari pencemaran tanah ini adalah...",
-      "options": [
-        "Menurunnya kesuburan tanah serta rusaknya populasi mikroorganisme pengurai",
-        "Meningkatnya kandungan oksigen murni di dalam pori-pori tanah",
-        "Mempercepat pematangan tanaman pertanian tanpa perlu penyiraman",
-        "Mencegah erosi dan tanah longsor saat musim hujan"
-      ],
-      "answer": 0,
-      "why": {
-        "0": "Bahan pencemar mematikan cacing dan mikroorganisme tanah sehingga proses pembentukan humus terganggu dan kesuburan tanah merosot."
-      },
-      "distractorWhy": {
-        "1": "Pencemaran tanah justru menurunkan kualitas aerasi dan mematikan biota tanah.",
-        "2": "Limbah beracun merusak akar tanaman dan menurunkan produktivitas pertanian.",
-        "3": "Pencemaran tanah merusak struktur tanah sehingga tanah menjadi rawan erosi."
-      }
-    },
-    {
-      "id": "ips-d-7-t2-q20",
-      "difficulty": "sedang",
-      "prompt": "Berdasarkan Buku Siswa IPS Kelas VII hal. 90-91, kerangka Pembangunan Berkelanjutan (SDGs) ditopang oleh empat pilar utama. Pilar yang secara khusus mengatur konservasi ekosistem daratan dan perairan serta penanganan iklim adalah...",
-      "options": [
-        "Pilar pembangunan lingkungan",
-        "Pilar pembangunan ekonomi",
-        "Pilar pembangunan sosial",
-        "Pilar pembangunan tata kelola"
-      ],
-      "answer": 0,
-      "why": {
-        "0": "Pilar pembangunan lingkungan mencakup keberlanjutan sumber daya alam, keanekaragaman hayati darat dan air, serta aksi iklim."
-      },
-      "distractorWhy": {
-        "1": "Pilar pembangunan ekonomi berfokus pada pekerjaan layak, energi bersih, dan inovasi industri.",
-        "2": "Pilar pembangunan sosial mencakup bidang pendidikan, kesehatan, dan pengentasan kemiskinan.",
-        "3": "Pilar pembangunan tata kelola mencakup penegakan hukum, keadilan, dan perdamaian."
+        "1": "Setelah ungkapan penghubung antarkalimat 'Meskipun demikian', WAJIB diikuti tanda koma: 'Meskipun demikian, kawahnya...'.",
+        "2": "Pada rincian lebih dari dua unsur (pemerincian), wajib menggunakan tanda koma sebelum kata 'dan': 'kopi, kain, dan tas'.",
+        "3": "Pada kalimat majemuk setara dengan pertentangan/penghubung 'sementara', wajib didahului tanda koma sebelum kata 'sementara'."
       }
     }
   ]
 }
-
-target_file = r"c:\Users\hp\fiezel-apps\tools\chunk_ips_7_t2.json"
-os.makedirs(os.path.dirname(target_file), exist_ok=True)
-
-with open(target_file, "w", encoding="utf-8") as f:
-    json.dump(data, f, ensure_ascii=False, indent=2)
-
-print("Generated:", target_file)
+with open(r"c:\Users\hp\fiezel-apps\tools\chunk_ind_7_b1.json", "w", encoding="utf-8") as out:
+    json.dump(data, out, ensure_ascii=False, indent=2)
+print("Done generating JSON")

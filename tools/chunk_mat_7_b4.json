@@ -1,0 +1,249 @@
+{
+  "code": "KOMP-MAT-D-7-BAB4-01",
+  "grade": 7,
+  "name": "Bentuk Geometri dan Bangun Datar",
+  "materi": "Sifat Garis & Sudut, Hubungan Antarsudut, Keliling & Luas Segitiga & Segi Empat (Persegi, Persegi Panjang, Jajar Genjang, Trapesium)",
+  "cpRef": "Matematika untuk SMP/MTs Kelas VII",
+  "items": [
+    {
+      "id": "mat-d-7-b4-q01",
+      "difficulty": "dasar",
+      "prompt": "Berdasarkan Buku Siswa Matematika Kelas VII (hal. 140-144), sudut berpelurus (suplemen) memiliki jumlah besar sudut sebesar…",
+      "options": [
+        "180°",
+        "90°",
+        "360°",
+        "45°"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Dua sudut dikatakan berpelurus jika jumlah kedua sudutnya membentuk garis lurus 180°."
+      },
+      "distractorWhy": {
+        "1": "90° adalah sudut berpenyiku (komplemen).",
+        "2": "360° adalah sudut satu putaran penuh.",
+        "3": "45° sudut lancip."
+      }
+    },
+    {
+      "id": "mat-d-7-b4-q02",
+      "difficulty": "sedang",
+      "prompt": "Berdasarkan Buku Siswa Matematika Kelas VII (hal. 150), luas sebuah persegi panjang dengan panjang 12 cm dan lebar 8 cm adalah…",
+      "options": [
+        "96 cm²",
+        "40 cm²",
+        "48 cm²",
+        "80 cm²"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Luas persegi panjang L = p × l = 12 cm × 8 cm = 96 cm²."
+      },
+      "distractorWhy": {
+        "1": "40 cm keliling (2(12+8)).",
+        "2": "48 cm² setengahnya.",
+        "3": "80 cm² keliru."
+      }
+    },
+    {
+      "id": "mat-d-7-b4-q03",
+      "difficulty": "sedang",
+      "prompt": "Berdasarkan Buku Siswa Matematika Kelas VII (hal. 158 Luas Segitiga), sebuah segitiga memiliki alas 10 cm dan tinggi 14 cm. Luas segitiga tersebut adalah…",
+      "options": [
+        "70 cm²",
+        "140 cm²",
+        "35 cm²",
+        "48 cm²"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Luas segitiga L = 1/2 × a × t = 1/2 × 10 cm × 14 cm = 70 cm²."
+      },
+      "distractorWhy": {
+        "1": "140 cm² lupa dibagi 2.",
+        "2": "35 cm² keliru.",
+        "3": "48 cm² keliru."
+      }
+    },
+    {
+      "id": "mat-d-7-b4-q04",
+      "difficulty": "tinggi",
+      "prompt": "Berdasarkan Buku Siswa Matematika Kelas VII (hal. 165 Jajar Genjang), jajar genjang memiliki alas a = 15 cm dan tinggi t = 8 cm. Luas jajar genjang tersebut adalah…",
+      "options": [
+        "120 cm²",
+        "60 cm²",
+        "46 cm²",
+        "90 cm²"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Luas jajar genjang L = a × t = 15 cm × 8 cm = 120 cm²."
+      },
+      "distractorWhy": {
+        "1": "60 cm² keliru dibagi 2 seperti segitiga.",
+        "2": "46 cm² keliling.",
+        "3": "90 cm² keliru."
+      }
+    },
+    {
+      "id": "mat-d-7-b4-q05",
+      "difficulty": "tinggi",
+      "prompt": "Berdasarkan Buku Siswa Matematika Kelas VII (hal. 172 Trapesium), sebuah trapesium memiliki panjang sisi sejajar a = 12 cm dan b = 18 cm, serta tinggi t = 10 cm. Luas trapesium adalah…",
+      "options": [
+        "150 cm²",
+        "300 cm²",
+        "108 cm²",
+        "216 cm²"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Luas trapesium L = 1/2 × (a + b) × t = 1/2 × (12 + 18) × 10 = 1/2 × 30 × 10 = 150 cm²."
+      },
+      "distractorWhy": {
+        "1": "300 cm² lupa dibagi 2.",
+        "2": "108 cm² keliru.",
+        "3": "216 cm² keliru."
+      }
+    },
+    {
+      "id": "mat-d-7-b4-q06",
+      "difficulty": "dasar",
+      "prompt": "Berdasarkan Buku Siswa Matematika Kelas VII (hal. 148), keliling persegi dengan panjang sisi s = 15 cm adalah…",
+      "options": [
+        "60 cm",
+        "225 cm²",
+        "30 cm",
+        "45 cm"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Keliling persegi K = 4 × s = 4 × 15 cm = 60 cm."
+      },
+      "distractorWhy": {
+        "1": "225 cm² adalah Luas (s²).",
+        "2": "30 cm keliru 2s.",
+        "3": "45 cm keliru 3s."
+      }
+    },
+    {
+      "id": "mat-d-7-b4-q07",
+      "difficulty": "sedang",
+      "prompt": "Berdasarkan Buku Siswa Matematika Kelas VII (hal. 178 Layang-layang), panjang diagonal-diagonal layang-layang adalah d1 = 16 cm dan d2 = 24 cm. Luas layang-layang adalah…",
+      "options": [
+        "192 cm²",
+        "384 cm²",
+        "96 cm²",
+        "80 cm²"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Luas layang-layang L = 1/2 × d1 × d2 = 1/2 × 16 × 24 = 192 cm²."
+      },
+      "distractorWhy": {
+        "1": "384 cm² lupa dibagi 2.",
+        "2": "96 cm² keliru.",
+        "3": "80 cm² keliru."
+      }
+    },
+    {
+      "id": "mat-d-7-b4-q08",
+      "difficulty": "tinggi",
+      "prompt": "Berdasarkan Buku Siswa Matematika Kelas VII (hal. 142), dua sudut saling berpenyiku (komplemen). Jika sudut pertama besarnya 35°, besar sudut kedua adalah…",
+      "options": [
+        "55°",
+        "145°",
+        "65°",
+        "45°"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Sudut berpenyiku jumlahnya 90°. Sudut kedua = 90° - 35° = 55°."
+      },
+      "distractorWhy": {
+        "1": "145° berpelurus (180 - 35).",
+        "2": "65° keliru.",
+        "3": "45° keliru."
+      }
+    },
+    {
+      "id": "mat-d-7-b4-q09",
+      "difficulty": "dasar",
+      "prompt": "Berdasarkan Buku Siswa Matematika Kelas VII (hal. 152), bangun datar segi empat yang memiliki dua pasang sisi sama panjang dan kedua diagonalnya saling tegak lurus tetapi tidak sama panjang adalah…",
+      "options": [
+        "Layang-layang",
+        "Persegi panjang",
+        "Trapesium sama kaki",
+        "Jajar genjang"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Layang-layang memiliki sifat 2 pasang sisi berdampingan sama panjang dan diagonal tegak lurus."
+      },
+      "distractorWhy": {
+        "1": "Persegi panjang diagonal tidak tegak lurus.",
+        "2": "Trapesium diagonal tidak tegak lurus.",
+        "3": "Jajar genjang tidak tegak lurus."
+      }
+    },
+    {
+      "id": "mat-d-7-b4-q10",
+      "difficulty": "sedang",
+      "prompt": "Berdasarkan Buku Siswa Matematika Kelas VII (hal. 160), jumlah seluruh sudut dalam pada bangun datar segitiga selalu sama dengan…",
+      "options": [
+        "180°",
+        "360°",
+        "90°",
+        "270°"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Jumlah ketiga sudut dalam segitiga apa saja selalu 180°."
+      },
+      "distractorWhy": {
+        "1": "360° sudut dalam segi empat.",
+        "2": "90° sudut siku-siku.",
+        "3": "270° keliru."
+      }
+    },
+    {
+      "id": "mat-d-7-b4-q11",
+      "difficulty": "tinggi",
+      "prompt": "Berdasarkan Buku Siswa Matematika Kelas VII (hal. 182 Uji Kompetensi), sebuah lapangan berbentuk persegi panjang berukuran 30 m × 20 m. Di sekeliling lapangan ditanami pohon dengan jarak antar pohon 5 m. Banyak pohon yang dibutuhkan adalah…",
+      "options": [
+        "20 pohon",
+        "100 pohon",
+        "10 pohon",
+        "25 pohon"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Keliling = 2 × (30 + 20) = 100 m. Banyak pohon = 100 m / 5 m = 20 pohon."
+      },
+      "distractorWhy": {
+        "1": "100 pohon keliru.",
+        "2": "10 pohon keliru.",
+        "3": "25 pohon keliru."
+      }
+    },
+    {
+      "id": "mat-d-7-b4-q12",
+      "difficulty": "dasar",
+      "prompt": "Berdasarkan Buku Siswa Matematika Kelas VII (hal. 168), belah ketupat adalah bangun segi empat yang memiliki sifat khusus yaitu…",
+      "options": [
+        "Keempat sisinya sama panjang",
+        "Keempat sudutnya siku-siku 90°",
+        "Memiliki satu pasang sisi sejajar",
+        "Hanya memiliki satu simetri lipat"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Belah ketupat adalah jajar genjang yang keempat sisinya sama panjang."
+      },
+      "distractorWhy": {
+        "1": "Sifat persegi.",
+        "2": "Sifat trapesium.",
+        "3": "Layang-layang."
+      }
+    }
+  ]
+}

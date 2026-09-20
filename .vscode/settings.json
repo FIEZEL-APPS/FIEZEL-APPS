@@ -1,0 +1,46 @@
+{
+  "files.watcherExclude": {
+    "**/.git/objects/**": true,
+    "**/.git/subtree-cache/**": true,
+    "**/node_modules/**": true,
+    "**/remotion/node_modules/**": true,
+    "**/remotion/.remotion/**": true,
+    "**/.audit-tmp/**": true,
+    "**/.reading-new/**": true,
+    "**/.claude/**": true,
+    "**/.emergent/**": true,
+    "**/scratch/**": true,
+    "**/audio/**": true,
+    "**/assets/**": true,
+    "**/vendor/**": true,
+    "**/test_reports/**": true,
+    "**/reports/**": true,
+    "**/*.mp4": true,
+    "**/*.webm": true
+  },
+  "search.exclude": {
+    "**/node_modules": true,
+    "**/remotion/node_modules": true,
+    "**/remotion/.remotion": true,
+    "**/.git": true,
+    "**/.audit-tmp": true,
+    "**/.reading-new": true,
+    "**/audio": true,
+    "**/assets": true,
+    "**/scratch": true,
+    "**/test_reports": true,
+    "**/reports": true
+  },
+  "files.exclude": {
+    "**/.git": true,
+    "**/.audit-tmp": true,
+    "**/.reading-new": true,
+    "**/remotion/.remotion": true
+  },
+  "python.analysis.diagnosticMode": "openFilesOnly",
+  "python.analysis.indexing": false,
+  "typescript.tsserver.maxTsServerMemory": 2048,
+  "editor.largeFileOptimizations": true,
+  "git.autofetch": false,
+  "git.autorefresh": true
+}

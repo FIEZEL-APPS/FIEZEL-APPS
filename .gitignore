@@ -27,6 +27,7 @@ STAGE8-PRODUCT-AUDIT.json
 AUDIT-REPORT.json
 visual-checks/
 .audit-tmp/
+scratch/
 CONTENT-QA-REPORT.json
 CONTENT-CANARY-PROOF.json
 CONTENT-PROMOTION-PROOF.json

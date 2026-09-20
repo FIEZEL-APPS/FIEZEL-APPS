@@ -1,0 +1,249 @@
+{
+  "code": "KOMP-IND-D-7-BAB4-01",
+  "grade": 7,
+  "name": "Bab 4: Aksi Nyata Pelindung Bumi",
+  "materi": "Memahami Teks Berita Lingkungan, Unsur Berita 5W+1H (ADIKSIMBA), Struktur Berita (Kepala, Tubuh, Ekor), Membandingkan Media Cetak & Digital",
+  "cpRef": "Bahasa Indonesia untuk SMP/MTs Kelas VII (Edisi Revisi)",
+  "items": [
+    {
+      "id": "ind-d-7-b4-q01",
+      "difficulty": "dasar",
+      "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VII (hal. 105-110 Teks Berita), unsur-unsur utama berita ADIKSIMBA (5W+1H) terdiri atas…",
+      "options": [
+        "Apa, Di mana, Kapan, Siapa, Mengapa, dan Bagaimana",
+        "Awal, Depan, Isi, Kesimpulan, dan Simpulan",
+        "Aku, Dia, Kita, Mereka, dan Kami",
+        "Alasan, Dampak, Informasi, Karakter, dan Bukti"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "ADIKSIMBA merupakan akronim Apa, Di mana, Kapan, Siapa, Mengapa, Bagaimana."
+      },
+      "distractorWhy": {
+        "1": "Bukan unsur berita.",
+        "2": "Kata ganti orang.",
+        "3": "Istilah buatan."
+      }
+    },
+    {
+      "id": "ind-d-7-b4-q02",
+      "difficulty": "sedang",
+      "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VII (hal. 115 Struktur Berita), bagian terpenting berita yang memuat inti informasi paling menarik di paragraf pertama dinamakan…",
+      "options": [
+        "Kepala berita (Lead)",
+        "Tubuh berita (Body)",
+        "Ekor berita (Tail)",
+        "Judul berita (Headline)"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Kepala berita (lead) berada di paling awal berisi ringkasan jawaban unsur utama 5W+1H."
+      },
+      "distractorWhy": {
+        "1": "Tubuh berita berisi uraian rincian.",
+        "2": "Ekor berita informasi tambahan kurang penting.",
+        "3": "Judul adalah nama berita."
+      }
+    },
+    {
+      "id": "ind-d-7-b4-q03",
+      "difficulty": "sedang",
+      "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VII (hal. 120), kutipan kalimat: 'Bencana banjir bandang menerjang wilayah Garut pada Selasa (15/10) malam akibat luapan sungai.' Unsur berita yang terdapat pada kata yang dicetak tebal 'Selasa malam' adalah…",
+      "options": [
+        "Kapan (When)",
+        "Di mana (Where)",
+        "Siapa (Who)",
+        "Mengapa (Why)"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "'Selasa malam' menunjukkan keterangan waktu terjadinya peristiwa (Kapan)."
+      },
+      "distractorWhy": {
+        "1": "Di mana menunjukkan lokasi.",
+        "2": "Siapa menunjukkan subjek.",
+        "3": "Mengapa menunjukkan alasan."
+      }
+    },
+    {
+      "id": "ind-d-7-b4-q04",
+      "difficulty": "tinggi",
+      "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VII (hal. 125 Kebahasaan), kalimat langsung yang menyalin wawancara wartawan dengan narasumber secara tepat adalah…",
+      "options": [
+        "\"Masyarakat diimbau tetap waspada terhadap potensi tanah longsor,\" kata Kepala BPBD.",
+        "Kepala BPBD mengatakan bahwa masyarakat diimbau tetap waspada.",
+        "Apakah masyarakat diimbau tetap waspada kata Kepala BPBD.",
+        "Masyarakat diimbau tetap waspada kata Kepala BPBD tanpa tanda petik."
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Kalimat langsung menggunakan tanda petik ganda (\"\") mengapit tuturan lisan narasumber."
+      },
+      "distractorWhy": {
+        "1": "Kalimat tidak langsung (menggunakan bahwa).",
+        "2": "Tanda baca salah.",
+        "3": "Tanpa tanda petik salah."
+      }
+    },
+    {
+      "id": "ind-d-7-b4-q05",
+      "difficulty": "dasar",
+      "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VII (hal. 112), perbedaan utama antara berita media cetak (koran) dengan berita media digital (daring/online) adalah…",
+      "options": [
+        "Berita digital dapat diperbarui secara waktu nyata (real-time) dan memuat pranala (hyperlink), sedangkan cetak terbit berkala pada kertas",
+        "Berita cetak tidak memiliki judul",
+        "Berita digital hanya berisi gambar tanpa teks",
+        "Berita cetak selalu bohong"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Media digital bersifat dinamis, cepat diperbarui, serta terintegrasi dengan tautan multimedia."
+      },
+      "distractorWhy": {
+        "1": "Cetak punya judul.",
+        "2": "Digital ada teksnya.",
+        "3": "Pernyataan keliru."
+      }
+    },
+    {
+      "id": "ind-d-7-b4-q06",
+      "difficulty": "sedang",
+      "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VII (hal. 128 Uji Kemampuan), bagian ekor berita memuat rincian yang bersifat…",
+      "options": [
+        "Informasi tambahan pendukung yang jika dihilangkan tidak merusak inti berita",
+        "Inti sari utama berita",
+        "Alamat kontak redaksi penerbit",
+        "Daftar riwayat hidup wartawan"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Ekor berita menggunakan piramida terbalik, memuat suplemen yang dapat dipotong tanpa mengganggu pemahaman."
+      },
+      "distractorWhy": {
+        "1": "Inti di kepala berita.",
+        "2": "Kontak redaksi di footer media.",
+        "3": "Riwayat wartawan irrelevan."
+      }
+    },
+    {
+      "id": "ind-d-7-b4-q07",
+      "difficulty": "dasar",
+      "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VII (hal. 110), judul berita yang baik harus memiliki sifat…",
+      "options": [
+        "Singkat, padat, menarik perhatian, dan mencerminkan isi berita secara jujur",
+        "Sangat panjang hingga 50 kata",
+        "Menggunakan bahasa gaul informal",
+        "Memuat teka-teki tanpa makna"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Judul berita (headline) bertugas memikat pembaca sekaligus merangkum topik berita secara akurat."
+      },
+      "distractorWhy": {
+        "1": "Judul panjang tidak efektif.",
+        "2": "Judul menggunakan bahasa baku lugas.",
+        "3": "Judul harus informatif jelas."
+      }
+    },
+    {
+      "id": "ind-d-7-b4-q08",
+      "difficulty": "sedang",
+      "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VII (hal. 118), unsur berita 'Mengapa' (Why) menjelaskan tentang…",
+      "options": [
+        "Latar belakang penyebab atau alasan terjadinya peristiwa dalam berita",
+        "Waktu detik terjadinya peristiwa",
+        "Nama lokasi geografis tempat kejadian",
+        "Jumlah korban dalam angka"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Unsur Mengapa menguraikan faktor kausalitas atau alasan utama pemicu peristiwa."
+      },
+      "distractorWhy": {
+        "1": "Kapan (When).",
+        "2": "Di mana (Where).",
+        "3": "Berapa/Siapa."
+      }
+    },
+    {
+      "id": "ind-d-7-b4-q09",
+      "difficulty": "sedang",
+      "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VII (hal. 122), kata kerja mental yang sering digunakan dalam teks berita adalah…",
+      "options": [
+        "Memperkirakan, menduga, dan mengkhawatirkan",
+        "Berlari, melompat, dan menendang",
+        "Makan, minum, dan tidur",
+        "Menulis, membaca, dan menggambar"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Kata kerja mental menyatakan persepsi atau respon pikiran (memperkirakan, menduga)."
+      },
+      "distractorWhy": {
+        "1": "Kata kerja fisik/olahraga.",
+        "2": "Kata kerja konsumsi.",
+        "3": "Kata kerja aktivitas."
+      }
+    },
+    {
+      "id": "ind-d-7-b4-q10",
+      "difficulty": "tinggi",
+      "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VII (hal. 126), syarat berita fakta yang objektif adalah…",
+      "options": [
+        "Berdasarkan kejadian nyata tanpa disertai opini atau prasangka pribadi penulis berita",
+        "Berdasarkan karangan imajinasi penulis",
+        "Menambahkan gosip dari media sosial",
+        "Memihak pada salah satu kelompok"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Objektivitas berita mewajibkan kesesuaian dengan fakta di lapangan tanpa distorsi opini wartawan."
+      },
+      "distractorWhy": {
+        "1": "Karangan adalah fiksi.",
+        "2": "Gosip bukan fakta terverifikasi.",
+        "3": "Berita harus netral dan berimbang."
+      }
+    },
+    {
+      "id": "ind-d-7-b4-q11",
+      "difficulty": "dasar",
+      "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VII (hal. 114), kalimat tunggal yang digunakan dalam teks berita adalah…",
+      "options": [
+        "Tim relawan membersihkan sampah plastik di sepanjang pantai.",
+        "Tim relawan membersihkan sampah karena hari hujan dan mereka lelah.",
+        "Jika hari hujan maka tim relawan akan pulang tetapi mereka tetap bertahan.",
+        "Meskipun banjir surut tetapi sampah bertumpuk sehingga warga mengeluh."
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Kalimat tunggal hanya memiliki satu klausa (Subjek + Predikat + Objek)."
+      },
+      "distractorWhy": {
+        "1": "Kalimat majemuk bertingkat.",
+        "2": "Kalimat majemuk kompleks.",
+        "3": "Kalimat majemuk bertingkat."
+      }
+    },
+    {
+      "id": "ind-d-7-b4-q12",
+      "difficulty": "tinggi",
+      "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VII (hal. 130 Uji Kemampuan), tujuan utama memilah dan memverifikasi sumber berita (fact-checking) adalah…",
+      "options": [
+        "Mencegah penyebaran berita palsu (hoaks) dan memastikan kebenaran informasi publik",
+        "Membuat berita menjadi viral tanpa peduli isi",
+        "Menghapus nama penerbit berita",
+        "Menambah durasi membaca"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Cek fakta memastikan publik menerima informasi yang sah dan terpercaya."
+      },
+      "distractorWhy": {
+        "1": "Viral tanpa peduli isi berbahaya.",
+        "2": "Nama penerbit tetap dicantumkan.",
+        "3": "Durasi bukan tujuan verifikasi."
+      }
+    }
+  ]
+}

@@ -1,0 +1,369 @@
+{
+  "code": "KOMP-IPA-D-8-BAB3-01",
+  "grade": 8,
+  "name": "Usaha, Energi, dan Pesawat Sederhana",
+  "materi": "Konsep Usaha & Energi, Energi Kinetik & Potensial, Keuntungan Mekanis Pesawat Sederhana (Tuas, Katrol, Bidang Miring)",
+  "cpRef": "Ilmu Pengetahuan Alam untuk SMP/MTs Kelas VII (Edisi Revisi)",
+  "items": [
+    {
+      "id": "ipa-d-8-b3-q01",
+      "difficulty": "dasar",
+      "prompt": "Berdasarkan Buku Siswa IPA Kelas VIII hal. 79, usaha (W) dirumuskan sebagai W = F x s, di mana F adalah gaya (N) dan s adalah perpindahan (m). Jika seseorang mencoba mendorong gerobak berisi muatan penuh dengan gaya dorong tertentu namun gerobak tersebut tidak berpindah posisi sama sekali, berapakah usaha yang dilakukan orang tersebut?",
+      "options": [
+        "0 joule",
+        "10 joule",
+        "100 joule",
+        "Sama dengan besar gaya dorong yang diberikan"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Karena gerobak tidak berpindah posisi (s = 0 m), maka usaha W = F x 0 = 0 joule."
+      },
+      "distractorWhy": {
+        "1": "Angka 10 joule tidak sesuai dengan hasil perhitungan usaha saat perpindahan nol.",
+        "2": "Angka 100 joule mengabaikan kenyataan bahwa s = 0 m sehingga usaha tetap 0 joule.",
+        "3": "Usaha tidak hanya bergantung pada besar gaya dorong F, tetapi juga dikalikan dengan perpindahan s."
+      }
+    },
+    {
+      "id": "ipa-d-8-b3-q02",
+      "difficulty": "sedang",
+      "prompt": "Berdasarkan Buku Siswa IPA Kelas VIII hal. 80-81, daya (P) dirumuskan sebagai P = W / t. Pada suatu lomba ski lantai, seorang siswa mendorong papan dengan gaya F = 100 N sejauh s = 10 m dalam waktu t = 5 detik. Berapakah daya yang dikeluarkan siswa tersebut?",
+      "options": [
+        "200 watt",
+        "100 watt",
+        "500 watt",
+        "50 watt"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Usaha W = F x s = 100 N x 10 m = 1000 joule. Daya P = W / t = 1000 J / 5 s = 200 watt."
+      },
+      "distractorWhy": {
+        "1": "Hasil 100 watt terjadi jika salah membagi usaha 1000 J dengan waktu 10 s.",
+        "2": "Hasil 500 watt terjadi jika langsung mengalikan gaya 100 N dengan waktu 5 s.",
+        "3": "Hasil 50 watt terjadi jika membagi gaya 100 N dengan waktu 5 s tanpa menghitung usaha terlebih dahulu."
+      }
+    },
+    {
+      "id": "ipa-d-8-b3-q03",
+      "difficulty": "sedang",
+      "prompt": "Berdasarkan Gambar 3.5 Buku Siswa IPA Kelas VIII hal. 82 (Ayo Uji Kemampuan), seseorang mendorong tembok yang kokoh sehingga tembok tetap diam di tempatnya. Pernyataan yang benar mengenai aktivitas tersebut menurut konsep fisika adalah ...",
+      "options": [
+        "Tidak termasuk usaha karena tidak terjadi perpindahan posisi benda",
+        "Termasuk usaha maksimum karena gaya yang diberikan sangat besar",
+        "Termasuk usaha negatif karena arah gaya berlawanan dengan reaksi tembok",
+        "Termasuk usaha bernilai positif sebesar gaya dikali waktu"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Dalam fisika, usaha didefinisikan sebagai W = F x s. Apabila tembok tidak mengalami perpindahan (s = 0), maka nilai usaha yang dilakukan bernilai nol (tidak termasuk usaha)."
+      },
+      "distractorWhy": {
+        "1": "Gaya yang besar tidak menghasilkan usaha jika perpindahan benda bernilai nol.",
+        "2": "Usaha negatif terjadi jika gaya berlawanan arah dengan arah perpindahan, bukan karena benda diam.",
+        "3": "Perkalian gaya dengan waktu menghasilkan impuls, bukan usaha fisika."
+      }
+    },
+    {
+      "id": "ipa-d-8-b3-q04",
+      "difficulty": "sedang",
+      "prompt": "Berdasarkan Buku Siswa IPA Kelas VIII hal. 84, energi kinetik dirumuskan sebagai Ek = 1/2 x m x v^2. Sebuah benda bermassa m = 4 kg bergerak dengan kecepatan v = 5 m/s. Berapakah energi kinetik yang dimiliki benda tersebut?",
+      "options": [
+        "50 joule",
+        "20 joule",
+        "100 joule",
+        "10 joule"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Perhitungan energi kinetik: Ek = 1/2 x m x v^2 = 1/2 x 4 kg x (5 m/s)^2 = 2 x 25 = 50 joule."
+      },
+      "distractorWhy": {
+        "1": "Hasil 20 joule terjadi jika tidak menguadratkan kecepatan (hanya 1/2 x 4 x 5).",
+        "2": "Hasil 100 joule terjadi jika lupa membagi dengan 2 (m x v^2 = 4 x 25).",
+        "3": "Hasil 10 joule terjadi jika hanya mengalikan m x v lalu dibagi 2."
+      }
+    },
+    {
+      "id": "ipa-d-8-b3-q05",
+      "difficulty": "sedang",
+      "prompt": "Berdasarkan Buku Siswa IPA Kelas VIII hal. 85, energi potensial gravitasi dirumuskan sebagai Ep = m x g x h. Sebuah benda bermassa m = 2 kg berada pada ketinggian h = 5 meter di atas tanah. Jika percepatan gravitasi g = 9,8 m/s^2, berapakah energi potensial benda tersebut?",
+      "options": [
+        "98 joule",
+        "19,6 joule",
+        "49 joule",
+        "10 joule"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Perhitungan energi potensial: Ep = m x g x h = 2 kg x 9,8 m/s^2 x 5 m = 98 joule."
+      },
+      "distractorWhy": {
+        "1": "Hasil 19,6 joule terjadi jika hanya mengalikan m x g tanpa dikali ketinggian h.",
+        "2": "Hasil 49 joule terjadi jika membagi hasil 98 joule dengan 2.",
+        "3": "Hasil 10 joule terjadi jika hanya mengalikan massa m dengan ketinggian h."
+      }
+    },
+    {
+      "id": "ipa-d-8-b3-q06",
+      "difficulty": "tinggi",
+      "prompt": "Berdasarkan Hukum Kekekalan Energi pada Buku Siswa IPA Kelas VIII hal. 86, ketika sebuah kelereng dilepaskan dari titik tertinggi suatu lintasan melengkung tanpa gesekan, perubahan energi yang terjadi saat kelereng bergerak turun menuju titik terendah adalah ...",
+      "options": [
+        "Energi potensial berkurang dan energi kinetik bertambah, tetapi energi mekanik total tetap",
+        "Energi potensial dan energi kinetik sama-sama bertambah seiring bertambahnya kecepatan",
+        "Energi potensial berubah menjadi energi mekanik sehingga energi kinetik menjadi nol",
+        "Energi kinetik berubah menjadi energi potensial sehingga total energi berkurang"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Saat kelereng bergerak turun, ketinggiannya h berkurang (Ep berkurang) dan kecepatannya v bertambah (Ek bertambah). Sesuai Hukum Kekekalan Energi Mekanika, jumlah total Em = Ep + Ek selalu konstan."
+      },
+      "distractorWhy": {
+        "1": "Kedua energi tidak bisa sama-sama bertambah tanpa adanya tambahan energi dari luar sistem.",
+        "2": "Energi mekanik adalah penjumlahan Ep dan Ek, bukan bentuk energi tersendiri yang menghilangkan energi kinetik.",
+        "3": "Saat bergerak turun, energi potensiallah yang berubah menjadi energi kinetik, bukan sebaliknya, dan total energi tetap konstan."
+      }
+    },
+    {
+      "id": "ipa-d-8-b3-q07",
+      "difficulty": "tinggi",
+      "prompt": "Berdasarkan Buku Siswa IPA Kelas VIII hal. 90 (Ayo Uji Kemampuan), sebuah rumah tangga menyalakan 1 unit AC berkekuatan 1.000 watt selama 12 jam per hari dan 1 unit kulkas berkekuatan 100 watt selama 24 jam per hari. Berapakah total konsumsi daya listrik kedua alat tersebut dalam satu hari?",
+      "options": [
+        "14.400 Wh (14,4 kWh)",
+        "12.000 Wh (12,0 kWh)",
+        "2.400 Wh (2,4 kWh)",
+        "26.400 Wh (26,4 kWh)"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Konsumsi AC = 1.000 W x 12 h = 12.000 Wh. Konsumsi Kulkas = 100 W x 24 h = 2.400 Wh. Total konsumsi harian = 12.000 + 2.400 = 14.400 Wh atau 14,4 kWh."
+      },
+      "distractorWhy": {
+        "1": "Nilai 12.000 Wh hanya menghitung konsumsi listrik dari AC saja.",
+        "2": "Nilai 2.400 Wh hanya menghitung konsumsi listrik dari kulkas saja.",
+        "3": "Nilai 26.400 Wh terjadi jika mengalikan total daya 1.100 watt dengan 24 jam penuh untuk kedua alat."
+      }
+    },
+    {
+      "id": "ipa-d-8-b3-q08",
+      "difficulty": "sedang",
+      "prompt": "Berdasarkan Buku Siswa IPA Kelas VIII hal. 91-92, jika seseorang berhasil menghemat energi listrik sebesar 220 Wh dengan mematikan alat elektronik selama 1 jam, berapa lama sebuah lampu LED berdaya 10 watt dapat menyala menggunakan energi yang berhasil dihemat tersebut?",
+      "options": [
+        "22 jam",
+        "10 jam",
+        "220 jam",
+        "2,2 jam"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Lama waktu menyala t = Energi / Daya = 220 Wh / 10 watt = 22 jam."
+      },
+      "distractorWhy": {
+        "1": "Nilai 10 jam tidak sesuai dengan pembagian 220 Wh dengan 10 watt.",
+        "2": "Nilai 220 jam terjadi jika membagi energi 220 Wh dengan daya 1 watt.",
+        "3": "Nilai 2,2 jam terjadi jika salah membagi daya 10 watt dengan energi 220 Wh."
+      }
+    },
+    {
+      "id": "ipa-d-8-b3-q09",
+      "difficulty": "dasar",
+      "prompt": "Berdasarkan Buku Siswa IPA Kelas VIII hal. 93-94, manakah dari pernyataan berikut yang menggambarkan prinsip utama cara pesawat sederhana membantu memudahkan pekerjaan manusia?",
+      "options": [
+        "Meningkatkan gaya kuasa, mengubah arah gaya, atau memperbesar jarak perpindahan",
+        "Menciptakan energi baru sehingga usaha yang diperlukan menjadi nol",
+        "Menghilangkan gaya gesekan secara total pada setiap peralatan",
+        "Mengurangi massa benda yang diangkat menjadi lebih ringan secara permanen"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Buku Siswa hal. 93 menjelaskan pesawat sederhana membantu pekerjaan manusia dengan 3 cara: menggandakan/meningkatkan gaya, mengubah arah gaya, atau meningkatkan jarak perpindahan."
+      },
+      "distractorWhy": {
+        "1": "Pesawat sederhana tidak dapat menciptakan energi baru sesuai Hukum Kekekalan Energi.",
+        "2": "Pesawat sederhana tidak menghilangkan gaya gesekan secara total.",
+        "3": "Massa benda tetap sama; pesawat sederhana hanya memperkecil gaya kuasa yang diperlukan."
+      }
+    },
+    {
+      "id": "ipa-d-8-b3-q10",
+      "difficulty": "dasar",
+      "prompt": "Berdasarkan Buku Siswa IPA Kelas VIII hal. 95, katrol tetap yang digunakan pada tiang bendera atau sumur timba memiliki keuntungan mekanis (KM) sebesar 1. Keuntungan utama dari penggunaan katrol tetap adalah ...",
+      "options": [
+        "Mengubah arah gaya dari menarik ke bawah menjadi mengangkat ke atas",
+        "Melipatgandakan gaya kuasa menjadi 2 kali lipat dari berat beban",
+        "Mengurangi berat beban menjadi separuh dari berat aslinya",
+        "Mempercepat waktu pengangkatan beban menjadi 10 kali lebih cepat"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Buku Siswa hal. 95 menyebutkan bahwa katrol tetap memiliki KM = 1, sehingga tidak menggandakan gaya, melainkan memudahkan pekerjaan dengan mengubah arah gaya kuasa."
+      },
+      "distractorWhy": {
+        "1": "Melipatgandakan gaya kuasa menjadi 2 kali lipat adalah ciri katrol bebas (KM = 2).",
+        "2": "Katrol tetap tidak mengurangi berat beban yang diangkat.",
+        "3": "Katrol tetap tidak mengubah besar kecepatan pengangkatan secara otomatis."
+      }
+    },
+    {
+      "id": "ipa-d-8-b3-q11",
+      "difficulty": "sedang",
+      "prompt": "Berdasarkan Buku Siswa IPA Kelas VIII hal. 95-96, sebuah katrol bebas (bebas bergerak) memiliki keuntungan mekanis KM = 2. Jika beban yang akan diangkat memiliki berat W = 120 N, berapakah gaya kuasa minimum (F) yang diperlukan untuk mengangkat beban tersebut?",
+      "options": [
+        "60 N",
+        "120 N",
+        "240 N",
+        "30 N"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Keuntungan mekanis KM = W / F. Maka F = W / KM = 120 N / 2 = 60 N."
+      },
+      "distractorWhy": {
+        "1": "Nilai 120 N adalah gaya kuasa jika menggunakan katrol tetap (KM = 1).",
+        "2": "Nilai 240 N terjadi jika mengalikan beban dengan 2.",
+        "3": "Nilai 30 N terjadi jika membagi beban dengan 4."
+      }
+    },
+    {
+      "id": "ipa-d-8-b3-q12",
+      "difficulty": "sedang",
+      "prompt": "Berdasarkan Buku Siswa IPA Kelas VIII hal. 96-97, keuntungan mekanis pada bidang miring dirumuskan sebagai KM = s / h, di mana s adalah panjang lintasan miring dan h adalah tinggi bidang miring. Jika sebuah papan miring memiliki panjang s = 3 meter dan tinggi h = 1 meter, berapakah keuntungan mekanis papan miring tersebut?",
+      "options": [
+        "3",
+        "0,33",
+        "4",
+        "2"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Keuntungan mekanis bidang miring KM = s / h = 3 m / 1 m = 3."
+      },
+      "distractorWhy": {
+        "1": "Nilai 0,33 terjadi jika terbalik membagi tinggi h dengan panjang s (1/3).",
+        "2": "Nilai 4 terjadi jika menjumlahkan panjang lintasan dan tinggi (3 + 1).",
+        "3": "Nilai 2 terjadi jika mengurangkan panjang lintasan dengan tinggi (3 - 1)."
+      }
+    },
+    {
+      "id": "ipa-d-8-b3-q13",
+      "difficulty": "sedang",
+      "prompt": "Berdasarkan Buku Siswa IPA Kelas VIII hal. 97-98, keuntungan mekanis roda berporos dirumuskan sebagai KM = r_roda / r_poros. Sebuah roda berporos memiliki jari-jari roda sebesar 20 cm dan jari-jari poros sebesar 4 cm. Berapakah keuntungan mekanis alat tersebut?",
+      "options": [
+        "5",
+        "80",
+        "0,2",
+        "16"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Keuntungan mekanis KM = r_roda / r_poros = 20 cm / 4 cm = 5."
+      },
+      "distractorWhy": {
+        "1": "Nilai 80 terjadi jika mengalikan jari-jari roda dengan jari-jari poros (20 x 4).",
+        "2": "Nilai 0,2 terjadi jika terbalik membagi jari-jari poros dengan jari-jari roda (4 / 20).",
+        "3": "Nilai 16 terjadi jika mengurangkan jari-jari roda dengan jari-jari poros (20 - 4)."
+      }
+    },
+    {
+      "id": "ipa-d-8-b3-q14",
+      "difficulty": "sedang",
+      "prompt": "Berdasarkan Buku Siswa IPA Kelas VIII hal. 99-100, pada pengungkit jenis pertama, posisi titik tumpu (TT) berada di antara beban (TB) dan gaya kuasa (TK). Manakah dari alat-alat berikut yang memanfaatkan prinsip pengungkit jenis pertama?",
+      "options": [
+        "Gunting dan jungkat-jungkit",
+        "Pembuka botol dan gerobak roda satu",
+        "Pemotong kuku dan pinset",
+        "Sekop dan penjepit roti"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Buku Siswa hal. 100 menyebutkan gunting dan jungkat-jungkit sebagai contoh pengungkit jenis pertama karena titik tumpunya terletak di antara titik beban dan titik kuasa."
+      },
+      "distractorWhy": {
+        "1": "Pembuka botol dan gerobak roda satu merupakan contoh pengungkit jenis kedua (beban di tengah).",
+        "2": "Pemotong kuku dan pinset merupakan contoh pengungkit jenis ketiga (kuasa di tengah).",
+        "3": "Sekop dan penjepit roti merupakan contoh pengungkit jenis ketiga."
+      }
+    },
+    {
+      "id": "ipa-d-8-b3-q15",
+      "difficulty": "sedang",
+      "prompt": "Berdasarkan Buku Siswa IPA Kelas VIII hal. 100, pengungkit jenis kedua memiliki posisi titik beban (TB) di antara titik tumpu (TT) dan titik kuasa (TK). Contoh alat sehari-hari yang menggunakan prinsip pengungkit jenis kedua adalah ...",
+      "options": [
+        "Pembuka botol minum",
+        "Gunting kertas",
+        "Pinset laboratorium",
+        "Sumpit makanan"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Buku Siswa hal. 100 (Gambar 3.23) memperlihatkan pembuka botol sebagai contoh pengungkit jenis kedua karena beban berada di tengah antara titik tumpu dan kuasa."
+      },
+      "distractorWhy": {
+        "1": "Gunting kertas adalah pengungkit jenis pertama (titik tumpu di tengah).",
+        "2": "Pinset laboratorium adalah pengungkit jenis ketiga (titik kuasa di tengah).",
+        "3": "Sumpit makanan adalah pengungkit jenis ketiga."
+      }
+    },
+    {
+      "id": "ipa-d-8-b3-q16",
+      "difficulty": "tinggi",
+      "prompt": "Berdasarkan Buku Siswa IPA Kelas VIII hal. 101-102 (Gambar 3.26: Konsep Pesawat Sederhana pada Sistem Gerak Manusia), saat seseorang mendongakkan kepala, tulang tengkorak bertindak sebagai titik tumpu (TT) di antara rahang/wajah sebagai beban (TB) dan otot leher sebagai kuasa (TK). Gerakan ini menerapkan prinsip ...",
+      "options": [
+        "Pengungkit jenis pertama",
+        "Pengungkit jenis kedua",
+        "Pengungkit jenis ketiga",
+        "Katrol majemuk"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Buku Siswa hal. 101 menjelaskan bahwa sistem gerak kepala/tengkorak menerapkan tuas jenis pertama karena titik tumpu (tulang tengkorak) terletak di antara beban (rahang/kepala depan) dan titik kuasa (otot leher)."
+      },
+      "distractorWhy": {
+        "1": "Pengungkit jenis kedua diterapkan pada sistem gerak tumit/jinjit telapak kaki (beban di tengah).",
+        "2": "Pengungkit jenis ketiga diterapkan pada sistem gerak lengan saat mengangkat beban dengan siku sebagai tumpuan (kuasa di tengah).",
+        "3": "Katrol majemuk bukan bagian dari sistem pengungkit gerak kepala manusia."
+      }
+    },
+    {
+      "id": "ipa-d-8-b3-q17",
+      "difficulty": "tinggi",
+      "prompt": "Berdasarkan Gambar pada Buku Siswa IPA Kelas VIII hal. 103 (Ayo Uji Kemampuan No. 1), sebuah tangga kayu disandarkan pada dinding dengan panjang lintasan tangga s = 100 cm dan ketinggian vertikal h = 80 cm. Berapakah keuntungan mekanis (KM) tangga kayu tersebut?",
+      "options": [
+        "1,25",
+        "0,80",
+        "1,80",
+        "0,20"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Keuntungan mekanis tangga (bidang miring) KM = s / h = 100 cm / 80 cm = 1,25."
+      },
+      "distractorWhy": {
+        "1": "Nilai 0,80 terjadi jika terbalik membagi tinggi h dengan panjang s (80 / 100).",
+        "2": "Nilai 1,80 terjadi jika mengoperasikan penjumlahan (100 + 80) / 100.",
+        "3": "Nilai 0,20 terjadi jika mengurangkan (100 - 80) / 100."
+      }
+    },
+    {
+      "id": "ipa-d-8-b3-q18",
+      "difficulty": "tinggi",
+      "prompt": "Berdasarkan Gambar pada Buku Siswa IPA Kelas VIII hal. 103 (Ayo Uji Kemampuan No. 2), sistem katrol digunakan untuk menarik beban dengan gaya kuasa F = 8 N. Jika sistem katrol memiliki keuntungan mekanis KM = 2, berapakah beban total (W) yang dapat ditarik?",
+      "options": [
+        "16 N",
+        "4 N",
+        "8 N",
+        "32 N"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Keuntungan mekanis KM = W / F. Maka besar beban total W = KM x F = 2 x 8 N = 16 N."
+      },
+      "distractorWhy": {
+        "1": "Nilai 4 N terjadi jika terbalik membagi gaya kuasa dengan keuntungan mekanis (8 / 2).",
+        "2": "Nilai 8 N terjadi jika menyamakan beban dengan gaya kuasa seperti pada katrol tetap (KM = 1).",
+        "3": "Nilai 32 N terjadi jika mengalikan gaya kuasa dengan KM kuadrat (8 x 4)."
+      }
+    }
+  ]
+}

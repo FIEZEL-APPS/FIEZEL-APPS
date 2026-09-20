@@ -828,6 +828,504 @@
           }
         }
       ]
+    },
+    {
+      "code": "KOMP-MAT-D-7-BAB3-01",
+      "grade": 7,
+      "name": "Rasio dan Proporsi",
+      "materi": "Konsep Rasio & Perbandingan, Perbandingan Senilai & Berbalik Nilai, Skala Peta, Penerapan Kontekstual Kecepatan & Waktu",
+      "cpRef": "Matematika untuk SMP/MTs Kelas VII — Bab 3",
+      "items": [
+        {
+          "id": "mat-d-7-b3-q01",
+          "difficulty": "dasar",
+          "prompt": "Berdasarkan Buku Siswa Matematika Kelas VII (hal. 102-106), bentuk paling sederhana dari rasio 24 : 36 adalah…",
+          "options": [
+            "2 : 3",
+            "4 : 6",
+            "1 : 2",
+            "3 : 4"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Kedua angka dibagi FPB (12): 24:12 = 2 dan 36:12 = 3. Bentuk sederhana 2 : 3."
+          },
+          "distractorWhy": {
+            "1": "4 : 6 belum paling sederhana (masih bisa dibagi 2).",
+            "2": "1 : 2 salah pembagian.",
+            "3": "3 : 4 terbalik."
+          }
+        },
+        {
+          "id": "mat-d-7-b3-q02",
+          "difficulty": "sedang",
+          "prompt": "Berdasarkan Buku Siswa Matematika Kelas VII (hal. 110 Perbandingan Senilai), harga 5 kg beras adalah Rp60.000,00. Harga 8 kg beras yang sama adalah…",
+          "options": [
+            "Rp96.000,00",
+            "Rp80.000,00",
+            "Rp100.000,00",
+            "Rp90.000,00"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Harga per kg = 60.000 / 5 = 12.000. Harga 8 kg = 8 × 12.000 = Rp96.000,00."
+          },
+          "distractorWhy": {
+            "1": "80.000 keliru.",
+            "2": "100.000 keliru.",
+            "3": "90.000 keliru."
+          }
+        },
+        {
+          "id": "mat-d-7-b3-q03",
+          "difficulty": "tinggi",
+          "prompt": "Berdasarkan Buku Siswa Matematika Kelas VII (hal. 118 Perbandingan Berbalik Nilai), sebuah pekerjaan pembangunan gedung dapat diselesaikan oleh 12 pekerja dalam waktu 20 hari. Jika pekerjaan ingin diselesaikan dalam waktu 15 hari, banyak pekerja yang dibutuhkan adalah…",
+          "options": [
+            "16 pekerja",
+            "15 pekerja",
+            "18 pekerja",
+            "20 pekerja"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Perbandingan berbalik nilai: 12 × 20 = x × 15 => x = 240 / 15 = 16 pekerja."
+          },
+          "distractorWhy": {
+            "1": "15 pekerja keliru.",
+            "2": "18 pekerja keliru.",
+            "3": "20 pekerja keliru."
+          }
+        },
+        {
+          "id": "mat-d-7-b3-q04",
+          "difficulty": "sedang",
+          "prompt": "Berdasarkan Buku Siswa Matematika Kelas VII (hal. 125 Skala Peta), jarak antara Kota A dan Kota B pada peta berskala 1 : 2.000.000 adalah 4 cm. Jarak sebenarnya di permukaan bumi adalah…",
+          "options": [
+            "80 km",
+            "8 km",
+            "800 km",
+            "50 km"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Jarak asli = 4 cm × 2.000.000 = 8.000.000 cm = 80 km."
+          },
+          "distractorWhy": {
+            "1": "8 km salah konversi cm ke km.",
+            "2": "800 km berlebihan nol.",
+            "3": "50 km keliru perkalian."
+          }
+        },
+        {
+          "id": "mat-d-7-b3-q05",
+          "difficulty": "dasar",
+          "prompt": "Berdasarkan Buku Siswa Matematika Kelas VII (hal. 108), di dalam sebuah kelas terdapat 15 siswa laki-laki dan 20 siswa perempuan. Rasio siswa laki-laki terhadap seluruh siswa di kelas adalah…",
+          "options": [
+            "3 : 7",
+            "3 : 4",
+            "4 : 3",
+            "3 : 5"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Total siswa = 15 + 20 = 35. Rasio laki-laki : total = 15 : 35 = 3 : 7."
+          },
+          "distractorWhy": {
+            "1": "3 : 4 adalah rasio laki-laki : perempuan.",
+            "2": "4 : 3 adalah perempuan : laki-laki.",
+            "3": "3 : 5 salah penyederhanaan."
+          }
+        },
+        {
+          "id": "mat-d-7-b3-q06",
+          "difficulty": "tinggi",
+          "prompt": "Berdasarkan Buku Siswa Matematika Kelas VII (hal. 130 Kecepatan), sebuah mobil melaju dengan kecepatan rata-rata 60 km/jam dan membutuhkan waktu 3 jam untuk sampai di tujuan. Jika mobil melaju dengan kecepatan 90 km/jam, waktu yang dibutuhkan adalah…",
+          "options": [
+            "2 jam",
+            "1,5 jam",
+            "2,5 jam",
+            "4 jam"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Jarak = v × t = 60 × 3 = 180 km. Waktu baru = 180 / 90 = 2 jam."
+          },
+          "distractorWhy": {
+            "1": "1,5 jam keliru.",
+            "2": "2,5 jam keliru.",
+            "3": "4 jam keliru."
+          }
+        },
+        {
+          "id": "mat-d-7-b3-q07",
+          "difficulty": "dasar",
+          "prompt": "Berdasarkan Buku Siswa Matematika Kelas VII (hal. 104), rasio senilai dengan 4 : 5 adalah…",
+          "options": [
+            "12 : 15",
+            "8 : 12",
+            "16 : 25",
+            "10 : 12"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "4×3 : 5×3 = 12 : 15."
+          },
+          "distractorWhy": {
+            "1": "8:12 = 2:3.",
+            "2": "16:25 = (4/5)².",
+            "3": "10:12 = 5:6."
+          }
+        },
+        {
+          "id": "mat-d-7-b3-q08",
+          "difficulty": "sedang",
+          "prompt": "Berdasarkan Buku Siswa Matematika Kelas VII (hal. 115), resep kue membutuhkan 200 gram gula untuk 500 gram tepung. Jika Ibu menggunakan 750 gram tepung, gula yang dibutuhkan adalah…",
+          "options": [
+            "300 gram",
+            "250 gram",
+            "350 gram",
+            "400 gram"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Gula = (750 / 500) × 200 = 1,5 × 200 = 300 gram."
+          },
+          "distractorWhy": {
+            "1": "250 g keliru.",
+            "2": "350 g keliru.",
+            "3": "400 g keliru."
+          }
+        },
+        {
+          "id": "mat-d-7-b3-q09",
+          "difficulty": "tinggi",
+          "prompt": "Berdasarkan Buku Siswa Matematika Kelas VII (hal. 128 Uji Kemampuan), persediaan makanan untuk 30 ekor sapi cukup untuk 12 hari. Jika sapi bertambah 6 ekor, makanan tersebut akan habis dalam…",
+          "options": [
+            "10 hari",
+            "9 hari",
+            "8 hari",
+            "11 hari"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Total sapi = 36. Berbalik nilai: 30 × 12 = 36 × h => h = 360 / 36 = 10 hari."
+          },
+          "distractorWhy": {
+            "1": "9 hari keliru.",
+            "2": "8 hari keliru.",
+            "3": "11 hari keliru."
+          }
+        },
+        {
+          "id": "mat-d-7-b3-q10",
+          "difficulty": "dasar",
+          "prompt": "Berdasarkan Buku Siswa Matematika Kelas VII (hal. 122), skala foto menunjukan 1 : 20. Jika tinggi rumah pada foto adalah 15 cm, tinggi asli rumah tersebut adalah…",
+          "options": [
+            "3 meter (300 cm)",
+            "30 meter",
+            "1,5 meter",
+            "30 cm"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Tinggi asli = 15 cm × 20 = 300 cm = 3 meter."
+          },
+          "distractorWhy": {
+            "1": "30 m berlebihan.",
+            "2": "1,5 m keliru.",
+            "3": "30 cm keliru."
+          }
+        },
+        {
+          "id": "mat-d-7-b3-q11",
+          "difficulty": "sedang",
+          "prompt": "Berdasarkan Buku Siswa Matematika Kelas VII (hal. 112), rasio jumlah uang Tabungan Ani dan Budi adalah 3 : 5. Jika jumlah uang mereka berdua adalah Rp400.000,00, besar uang Budi adalah…",
+          "options": [
+            "Rp250.000,00",
+            "Rp150.000,00",
+            "Rp200.000,00",
+            "Rp300.000,00"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Uang Budi = (5 / (3+5)) × 400.000 = (5/8) × 400.000 = Rp250.000,00."
+          },
+          "distractorWhy": {
+            "1": "150.000 uang Ani.",
+            "2": "200.000 setengahnya.",
+            "3": "300.000 keliru."
+          }
+        },
+        {
+          "id": "mat-d-7-b3-q12",
+          "difficulty": "tinggi",
+          "prompt": "Berdasarkan Buku Siswa Matematika Kelas VII (hal. 132), selisih umur Ayah dan Kaka adalah 24 tahun. Jika rasio umur Ayah dan Kaka adalah 7 : 3, umur Ayah adalah…",
+          "options": [
+            "42 tahun",
+            "18 tahun",
+            "36 tahun",
+            "48 tahun"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Selisih rasio = 7 - 3 = 4 bagian. 1 bagian = 24 / 4 = 6 tahun. Umur Ayah = 7 × 6 = 42 tahun."
+          },
+          "distractorWhy": {
+            "1": "18 tahun umur Kaka.",
+            "2": "36 tahun keliru.",
+            "3": "48 tahun keliru."
+          }
+        }
+      ]
+    },
+    {
+      "code": "KOMP-MAT-D-7-BAB4-01",
+      "grade": 7,
+      "name": "Bentuk Geometri dan Bangun Datar",
+      "materi": "Sifat Garis & Sudut, Hubungan Antarsudut, Keliling & Luas Segitiga & Segi Empat (Persegi, Persegi Panjang, Jajar Genjang, Trapesium)",
+      "cpRef": "Matematika untuk SMP/MTs Kelas VII — Bab 4",
+      "items": [
+        {
+          "id": "mat-d-7-b4-q01",
+          "difficulty": "dasar",
+          "prompt": "Berdasarkan Buku Siswa Matematika Kelas VII (hal. 140-144), sudut berpelurus (suplemen) memiliki jumlah besar sudut sebesar…",
+          "options": [
+            "180°",
+            "90°",
+            "360°",
+            "45°"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Dua sudut dikatakan berpelurus jika jumlah kedua sudutnya membentuk garis lurus 180°."
+          },
+          "distractorWhy": {
+            "1": "90° adalah sudut berpenyiku (komplemen).",
+            "2": "360° adalah sudut satu putaran penuh.",
+            "3": "45° sudut lancip."
+          }
+        },
+        {
+          "id": "mat-d-7-b4-q02",
+          "difficulty": "sedang",
+          "prompt": "Berdasarkan Buku Siswa Matematika Kelas VII (hal. 150), luas sebuah persegi panjang dengan panjang 12 cm dan lebar 8 cm adalah…",
+          "options": [
+            "96 cm²",
+            "40 cm²",
+            "48 cm²",
+            "80 cm²"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Luas persegi panjang L = p × l = 12 cm × 8 cm = 96 cm²."
+          },
+          "distractorWhy": {
+            "1": "40 cm keliling (2(12+8)).",
+            "2": "48 cm² setengahnya.",
+            "3": "80 cm² keliru."
+          }
+        },
+        {
+          "id": "mat-d-7-b4-q03",
+          "difficulty": "sedang",
+          "prompt": "Berdasarkan Buku Siswa Matematika Kelas VII (hal. 158 Luas Segitiga), sebuah segitiga memiliki alas 10 cm dan tinggi 14 cm. Luas segitiga tersebut adalah…",
+          "options": [
+            "70 cm²",
+            "140 cm²",
+            "35 cm²",
+            "48 cm²"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Luas segitiga L = 1/2 × a × t = 1/2 × 10 cm × 14 cm = 70 cm²."
+          },
+          "distractorWhy": {
+            "1": "140 cm² lupa dibagi 2.",
+            "2": "35 cm² keliru.",
+            "3": "48 cm² keliru."
+          }
+        },
+        {
+          "id": "mat-d-7-b4-q04",
+          "difficulty": "tinggi",
+          "prompt": "Berdasarkan Buku Siswa Matematika Kelas VII (hal. 165 Jajar Genjang), jajar genjang memiliki alas a = 15 cm dan tinggi t = 8 cm. Luas jajar genjang tersebut adalah…",
+          "options": [
+            "120 cm²",
+            "60 cm²",
+            "46 cm²",
+            "90 cm²"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Luas jajar genjang L = a × t = 15 cm × 8 cm = 120 cm²."
+          },
+          "distractorWhy": {
+            "1": "60 cm² keliru dibagi 2 seperti segitiga.",
+            "2": "46 cm² keliling.",
+            "3": "90 cm² keliru."
+          }
+        },
+        {
+          "id": "mat-d-7-b4-q05",
+          "difficulty": "tinggi",
+          "prompt": "Berdasarkan Buku Siswa Matematika Kelas VII (hal. 172 Trapesium), sebuah trapesium memiliki panjang sisi sejajar a = 12 cm dan b = 18 cm, serta tinggi t = 10 cm. Luas trapesium adalah…",
+          "options": [
+            "150 cm²",
+            "300 cm²",
+            "108 cm²",
+            "216 cm²"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Luas trapesium L = 1/2 × (a + b) × t = 1/2 × (12 + 18) × 10 = 1/2 × 30 × 10 = 150 cm²."
+          },
+          "distractorWhy": {
+            "1": "300 cm² lupa dibagi 2.",
+            "2": "108 cm² keliru.",
+            "3": "216 cm² keliru."
+          }
+        },
+        {
+          "id": "mat-d-7-b4-q06",
+          "difficulty": "dasar",
+          "prompt": "Berdasarkan Buku Siswa Matematika Kelas VII (hal. 148), keliling persegi dengan panjang sisi s = 15 cm adalah…",
+          "options": [
+            "60 cm",
+            "225 cm²",
+            "30 cm",
+            "45 cm"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Keliling persegi K = 4 × s = 4 × 15 cm = 60 cm."
+          },
+          "distractorWhy": {
+            "1": "225 cm² adalah Luas (s²).",
+            "2": "30 cm keliru 2s.",
+            "3": "45 cm keliru 3s."
+          }
+        },
+        {
+          "id": "mat-d-7-b4-q07",
+          "difficulty": "sedang",
+          "prompt": "Berdasarkan Buku Siswa Matematika Kelas VII (hal. 178 Layang-layang), panjang diagonal-diagonal layang-layang adalah d1 = 16 cm dan d2 = 24 cm. Luas layang-layang adalah…",
+          "options": [
+            "192 cm²",
+            "384 cm²",
+            "96 cm²",
+            "80 cm²"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Luas layang-layang L = 1/2 × d1 × d2 = 1/2 × 16 × 24 = 192 cm²."
+          },
+          "distractorWhy": {
+            "1": "384 cm² lupa dibagi 2.",
+            "2": "96 cm² keliru.",
+            "3": "80 cm² keliru."
+          }
+        },
+        {
+          "id": "mat-d-7-b4-q08",
+          "difficulty": "tinggi",
+          "prompt": "Berdasarkan Buku Siswa Matematika Kelas VII (hal. 142), dua sudut saling berpenyiku (komplemen). Jika sudut pertama besarnya 35°, besar sudut kedua adalah…",
+          "options": [
+            "55°",
+            "145°",
+            "65°",
+            "45°"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Sudut berpenyiku jumlahnya 90°. Sudut kedua = 90° - 35° = 55°."
+          },
+          "distractorWhy": {
+            "1": "145° berpelurus (180 - 35).",
+            "2": "65° keliru.",
+            "3": "45° keliru."
+          }
+        },
+        {
+          "id": "mat-d-7-b4-q09",
+          "difficulty": "dasar",
+          "prompt": "Berdasarkan Buku Siswa Matematika Kelas VII (hal. 152), bangun datar segi empat yang memiliki dua pasang sisi sama panjang dan kedua diagonalnya saling tegak lurus tetapi tidak sama panjang adalah…",
+          "options": [
+            "Layang-layang",
+            "Persegi panjang",
+            "Trapesium sama kaki",
+            "Jajar genjang"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Layang-layang memiliki sifat 2 pasang sisi berdampingan sama panjang dan diagonal tegak lurus."
+          },
+          "distractorWhy": {
+            "1": "Persegi panjang diagonal tidak tegak lurus.",
+            "2": "Trapesium diagonal tidak tegak lurus.",
+            "3": "Jajar genjang tidak tegak lurus."
+          }
+        },
+        {
+          "id": "mat-d-7-b4-q10",
+          "difficulty": "sedang",
+          "prompt": "Berdasarkan Buku Siswa Matematika Kelas VII (hal. 160), jumlah seluruh sudut dalam pada bangun datar segitiga selalu sama dengan…",
+          "options": [
+            "180°",
+            "360°",
+            "90°",
+            "270°"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Jumlah ketiga sudut dalam segitiga apa saja selalu 180°."
+          },
+          "distractorWhy": {
+            "1": "360° sudut dalam segi empat.",
+            "2": "90° sudut siku-siku.",
+            "3": "270° keliru."
+          }
+        },
+        {
+          "id": "mat-d-7-b4-q11",
+          "difficulty": "tinggi",
+          "prompt": "Berdasarkan Buku Siswa Matematika Kelas VII (hal. 182 Uji Kompetensi), sebuah lapangan berbentuk persegi panjang berukuran 30 m × 20 m. Di sekeliling lapangan ditanami pohon dengan jarak antar pohon 5 m. Banyak pohon yang dibutuhkan adalah…",
+          "options": [
+            "20 pohon",
+            "100 pohon",
+            "10 pohon",
+            "25 pohon"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Keliling = 2 × (30 + 20) = 100 m. Banyak pohon = 100 m / 5 m = 20 pohon."
+          },
+          "distractorWhy": {
+            "1": "100 pohon keliru.",
+            "2": "10 pohon keliru.",
+            "3": "25 pohon keliru."
+          }
+        },
+        {
+          "id": "mat-d-7-b4-q12",
+          "difficulty": "dasar",
+          "prompt": "Berdasarkan Buku Siswa Matematika Kelas VII (hal. 168), belah ketupat adalah bangun segi empat yang memiliki sifat khusus yaitu…",
+          "options": [
+            "Keempat sisinya sama panjang",
+            "Keempat sudutnya siku-siku 90°",
+            "Memiliki satu pasang sisi sejajar",
+            "Hanya memiliki satu simetri lipat"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Belah ketupat adalah jajar genjang yang keempat sisinya sama panjang."
+          },
+          "distractorWhy": {
+            "1": "Sifat persegi.",
+            "2": "Sifat trapesium.",
+            "3": "Layang-layang."
+          }
+        }
+      ]
     }
   ]
 }

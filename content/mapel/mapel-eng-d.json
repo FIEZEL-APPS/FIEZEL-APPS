@@ -270,241 +270,650 @@
         {
           "id": "eng-d-7-c2-q01",
           "difficulty": "dasar",
-          "prompt": "Based on English for Nusantara Grade VII (page 55-60 Unit 1 'Favorite Foods'), how does Monita describe the taste of fried rice with chili?",
+          "prompt": "Based on English for Nusantara Grade VII page 63 (Unit 1 Section 2, Worksheet 2.4), what does Monita love to eat for snacks?",
           "options": [
-            "'It is spicy and savory.'",
-            "'It is sweet and sour.'",
-            "'It is bitter and salty.'",
-            "'It is cold and creamy.'"
+            "Banana fritters",
+            "Fried rice",
+            "Fried fish",
+            "Cassava chips"
           ],
           "answer": 0,
           "why": {
-            "0": "Fried rice with chili is described as spicy (pedas) and savory (gurih)."
+            "0": "Monita explicitly states in the dialogue that she loves banana fritters for snacks."
           },
           "distractorWhy": {
-            "1": "Sweet and sour is for certain fruit dishes or tamarind soup.",
-            "2": "Bitter is for coffee or herbal medicine.",
-            "3": "Cold and creamy is for ice cream."
+            "1": "Fried rice is Galang's favorite main meal for breakfast, not Monita's snack preference.",
+            "2": "Fried fish is mentioned as a main dish option during family meals, not Monita's chosen snack in the text.",
+            "3": "Cassava chips are mentioned in Unit 2 language focus exercises, not Monita's favorite snack in Unit 1."
           }
         },
         {
           "id": "eng-d-7-c2-q02",
-          "difficulty": "sedang",
-          "prompt": "Based on English for Nusantara Grade VII (page 65 Unit 2 'Secret Recipe'), what imperative verb is used to instructionally separate liquid from solid ingredients when making iced tea?",
+          "difficulty": "dasar",
+          "prompt": "Based on English for Nusantara Grade VII page 67 (Unit 1 Section 3, Worksheet 2.6), which food or drink item matches the taste descriptor \"sour\"?",
           "options": [
-            "Pour the tea into the glass",
-            "Bake the tea in an oven",
-            "Chop the tea with a knife",
-            "Grill the tea on charcoal"
+            "Lime juice",
+            "Honey",
+            "Fried chicken",
+            "Black coffee"
           ],
           "answer": 0,
           "why": {
-            "0": "'Pour' (tuangkan) is the action verb used for liquids into a container."
+            "0": "Lime juice has a characteristic citrus taste described as sour in the sensory vocabulary lesson."
           },
           "distractorWhy": {
-            "1": "'Bake' is for baking bread/cake in an oven.",
-            "2": "'Chop' is for cutting solid food into small pieces.",
-            "3": "'Grill' is for cooking on direct heat."
+            "1": "Honey tastes sweet, which represents a sugary flavor profile rather than sour.",
+            "2": "Fried chicken tastes savory or salty, describing a seasoned savory dish.",
+            "3": "Black coffee tastes bitter due to roasted beans, not sour."
           }
         },
         {
           "id": "eng-d-7-c2-q03",
           "difficulty": "sedang",
-          "prompt": "Based on English for Nusantara Grade VII (page 72 Procedural Text Structure), what are the three main parts of a cooking recipe procedural text?",
+          "prompt": "Based on English for Nusantara Grade VII page 68 (Unit 1 Section 4, Picture 2.2), how is the texture of crackers (kerupuk) described?",
           "options": [
-            "Goal/Title, Ingredients/Materials, and Steps/Instructions",
-            "Orientation, Complication, and Resolution",
-            "General Statement, Description, and Conclusion",
-            "Thesis, Argument, and Reiteration"
+            "Crunchy",
+            "Soft",
+            "Chewy",
+            "Greasy"
           ],
           "answer": 0,
           "why": {
-            "0": "A procedural recipe text consists of Goal (what to make), Ingredients (materials needed), and Steps (method/instructions)."
+            "0": "Crackers (kerupuk) have a crisp and hard texture that makes a crisp noise when bitten, described as crunchy."
           },
           "distractorWhy": {
-            "1": "Structure of narrative text.",
-            "2": "Structure of descriptive text.",
-            "3": "Structure of analytical exposition text."
+            "1": "Soft describes foods like sponge cake or steamed bread that yield easily to pressure.",
+            "2": "Chewy describes elastic textures like boba or rubbery meat that require repeated mastication.",
+            "3": "Greasy describes oily cooked foods like deep-fried chicken rather than dry crackers."
           }
         },
         {
           "id": "eng-d-7-c2-q04",
-          "difficulty": "tinggi",
-          "prompt": "Based on English for Nusantara Grade VII (page 78 Language Focus), choose the sentence that correctly uses sequential action connectors for a recipe:",
+          "difficulty": "sedang",
+          "prompt": "Based on English for Nusantara Grade VII page 70 (Unit 1 Section 5), which expression is used to ask about the taste of a food item?",
           "options": [
-            "First, wash the bananas. Next, peel them. Then, slice them into round pieces. Finally, fry them until golden brown.",
-            "Finally, fry the bananas. First, peel them. Next, buy bananas.",
-            "Because wash bananas, but fry them.",
-            "Although bananas are sweet, wash them."
+            "What does it taste like?",
+            "Where do you cook it?",
+            "How much is the food?",
+            "When do you eat it?"
           ],
           "answer": 0,
           "why": {
-            "0": "The sequence connectors 'First', 'Next', 'Then', and 'Finally' logically structure procedural steps chronological order."
+            "0": "\"What does it taste like?\" is the standard target expression given in Section 5 to inquire about flavor profiles."
           },
           "distractorWhy": {
-            "1": "Illogical order (starts with Finally before buying).",
-            "2": "Incorrect causal connector usage.",
-            "3": "Incorrect concession connector usage."
+            "1": "\"Where do you cook it?\" asks for location rather than sensory flavor details.",
+            "2": "\"How much is the food?\" asks for price rather than taste qualities.",
+            "3": "\"When do you eat it?\" asks for temporal schedule rather than food flavor."
           }
         },
         {
           "id": "eng-d-7-c2-q05",
-          "difficulty": "dasar",
-          "prompt": "Based on English for Nusantara Grade VII (page 62), what action verb means to cut vegetables into thin small pieces using a knife?",
+          "difficulty": "tinggi",
+          "prompt": "Based on English for Nusantara Grade VII pages 61-62 (Comic strip 2.1), what can be inferred about Galang's breakfast habit?",
           "options": [
-            "Slice",
-            "Boil",
-            "Stir",
-            "Freeze"
+            "He eats fried rice and drinks sweet tea at home.",
+            "He buys donuts and orange juice at school.",
+            "He eats banana fritters and drinks plain water for lunch.",
+            "He skips breakfast and only eats snacks at noon."
           ],
           "answer": 0,
           "why": {
-            "0": "'Slice' (iris) means cutting ingredients into thin pieces with a knife."
+            "0": "In Comic strip 2.1, Galang eats fried rice and drinks sweet tea for breakfast before going to school."
           },
           "distractorWhy": {
-            "1": "'Boil' means cooking in boiling water.",
-            "2": "'Stir' means mixing ingredients with a spoon.",
-            "3": "'Freeze' means turning liquid into ice."
+            "1": "Donuts and orange juice are not Galang's breakfast meal depicted in Comic strip 2.1.",
+            "2": "Banana fritters are snack items, and Galang's morning drink is sweet tea rather than plain water for lunch.",
+            "3": "Galang does not skip breakfast; he explicitly discusses his home breakfast meal with Monita."
           }
         },
         {
           "id": "eng-d-7-c2-q06",
-          "difficulty": "sedang",
-          "prompt": "Based on English for Nusantara Grade VII (page 80 Unit 3), read the step: 'Add two spoonfuls of sugar into the cup of warm coffee and stir it well.' What is the purpose of adding sugar?",
+          "difficulty": "dasar",
+          "prompt": "Based on English for Nusantara Grade VII page 60 (Unit 1 Section 1.b), which of the following is categorized as a main meal?",
           "options": [
-            "To make the coffee taste sweet",
-            "To change the color to green",
-            "To cool down the temperature",
-            "To make it spicy"
+            "Nasi goreng",
+            "Cassava chips",
+            "Iced tea",
+            "Banana fritters"
           ],
           "answer": 0,
           "why": {
-            "0": "Adding sugar to coffee increases sweetness and balances bitter taste."
+            "0": "Nasi goreng (fried rice) is categorized as a main meal because it serves as a staple substantial dish for breakfast, lunch, or dinner."
           },
           "distractorWhy": {
-            "1": "Sugar does not turn coffee green.",
-            "2": "Sugar does not cool down temperature.",
-            "3": "Sugar does not add spice."
+            "1": "Cassava chips are categorized under snacks rather than a main meal.",
+            "2": "Iced tea is categorized under beverages/drinks.",
+            "3": "Banana fritters are categorized under light afternoon snacks."
           }
         },
         {
           "id": "eng-d-7-c2-q07",
-          "difficulty": "dasar",
-          "prompt": "Based on English for Nusantara Grade VII (page 68 Unit 2), what tool is used to mix salad ingredients together thoroughly in a bowl?",
+          "difficulty": "sedang",
+          "prompt": "Based on English for Nusantara Grade VII page 74 (Unit 1 Section 7, Picture 2.4), how does the speaker describe Nasi Goreng?",
           "options": [
-            "A large mixing spoon",
-            "A sharp knife",
-            "A drinking straw",
-            "A napkin"
+            "It is savory and a bit greasy.",
+            "It is sweet and very crunchy.",
+            "It is bitter and dry.",
+            "It is sour and sticky."
           ],
           "answer": 0,
           "why": {
-            "0": "A large mixing spoon is used to toss and combine salad ingredients evenly."
+            "0": "The text on page 74 explicitly quotes: \"My favorite meal is Nasi Goreng. It's savory. It's a bit greasy.\""
           },
           "distractorWhy": {
-            "1": "A knife is for cutting.",
-            "2": "A straw is for drinking liquids.",
-            "3": "A napkin is for wiping hands."
+            "1": "Sweet and crunchy describes desserts like sugar-coated snacks or crackers, not fried rice.",
+            "2": "Bitter and dry contradicts the savory taste and moist/oily texture of fried rice.",
+            "3": "Sour and sticky describes fermented or acidic dishes, not standard savory fried rice."
           }
         },
         {
           "id": "eng-d-7-c2-q08",
-          "difficulty": "sedang",
-          "prompt": "Based on English for Nusantara Grade VII (page 74 Unit 3), choose the correct sentence to describe a crispy banana fritter:",
+          "difficulty": "dasar",
+          "prompt": "Based on English for Nusantara Grade VII page 75 (Unit 2 Section 2.b), what is Galang's favorite snack?",
           "options": [
-            "'The fried banana fritter is warm, sweet, and crunchy on the outside.'",
-            "'The banana fritter is cold and sour like lemon.'",
-            "'The fritter tastes bitter like dark coffee.'",
-            "'The banana fritter is salty like sea water.'"
+            "Banana fritters",
+            "Chocolate cake",
+            "Pecel",
+            "Rujak"
           ],
           "answer": 0,
           "why": {
-            "0": "Banana fritters (pisang goreng) are described as warm, sweet, and crunchy."
+            "0": "The text titled \"Galang's Favorite Snack\" begins with the sentence: \"My favorite snack is banana fritters.\""
           },
           "distractorWhy": {
-            "1": "Banana fritters are not cold or sour.",
-            "2": "Banana fritters are sweet, not bitter.",
-            "3": "Banana fritters are sweet, not salty."
+            "1": "Chocolate cake is Monita's baking project text on page 77.",
+            "2": "Pecel is a traditional vegetable dish featured in Section 4 (page 79).",
+            "3": "Rujak is a fruit dish loved by Monita's mother in Section 4 (page 80)."
           }
         },
         {
           "id": "eng-d-7-c2-q09",
           "difficulty": "sedang",
-          "prompt": "Based on English for Nusantara Grade VII (page 79), what imperative verb completes the recipe step: '___ the boiling soup into four bowls before serving.'",
+          "prompt": "Based on the passage \"Galang's Favorite Snack\" on page 75, how are the textures of banana fritters described?",
           "options": [
-            "Ladle",
-            "Bake",
-            "Freeze",
-            "Grill"
+            "Crispy and crunchy outside, sweet and soft inside.",
+            "Soft and wet outside, salty and hard inside.",
+            "Hard and tough outside, sour and cold inside.",
+            "Chewy and greasy outside, bitter and dry inside."
           ],
           "answer": 0,
           "why": {
-            "0": "'Ladle' (sendokkan) is the specific cooking verb for serving soup from a pot into bowls."
+            "0": "The text states: \"I like them because they are crispy and crunchy outside, but sweet and soft inside.\""
           },
           "distractorWhy": {
-            "1": "Bake is for ovens.",
-            "2": "Freeze turns liquids to ice.",
-            "3": "Grill is direct flame."
+            "1": "Soft and wet outside contradicts the fried crispness specified in the passage.",
+            "2": "Hard and tough outside mischaracterizes fried batter and warm bananas.",
+            "3": "Chewy and bitter contradicts the crisp outer batter and sweet interior."
           }
         },
         {
           "id": "eng-d-7-c2-q10",
-          "difficulty": "tinggi",
-          "prompt": "Based on English for Nusantara Grade VII (page 82 Language Focus), choose the correct adverb of sequence to start the first cooking step:",
+          "difficulty": "sedang",
+          "prompt": "Based on English for Nusantara Grade VII page 77 (Unit 2 Section 3.b, Picture 2.6), what toppings are used on Monita's Black Forest cake?",
           "options": [
-            "First",
-            "Finally",
-            "After that",
-            "Lastly"
+            "Whipped cream and cherries",
+            "Palm sugar and grated coconut",
+            "Peanut sauce and chili powder",
+            "Sprinkles and fried shallots"
           ],
           "answer": 0,
           "why": {
-            "0": "'First' is the initial sequence marker used at the start of procedural instructions."
+            "0": "Monita's Black Forest cake post highlights whipped cream frosting topped with cherries."
           },
           "distractorWhy": {
-            "1": "'Finally' is used at the end.",
-            "2": "'After that' is used in middle steps.",
-            "3": "'Lastly' is used at the end."
+            "1": "Palm sugar and grated coconut are traditional toppings for Indonesian traditional sweets like klepon or lupis.",
+            "2": "Peanut sauce and chili powder are savory dressings for dishes like Pecel or Rujak.",
+            "3": "Fried shallots are savory garnishes used for fried rice or soups."
           }
         },
         {
           "id": "eng-d-7-c2-q11",
-          "difficulty": "dasar",
-          "prompt": "Based on English for Nusantara Grade VII (page 58), what taste word describes honey and sugar?",
+          "difficulty": "tinggi",
+          "prompt": "Based on English for Nusantara Grade VII pages 79-80 (Unit 2 Section 4), what key difference distinguishes Pecel from Rujak in their dressing and main ingredients?",
           "options": [
-            "Sweet",
-            "Sour",
-            "Salty",
-            "Spicy"
+            "Pecel uses peanut sauce over boiled vegetables, while Rujak uses spicy palm sugar over sliced fruits.",
+            "Pecel uses palm sugar over raw meat, while Rujak uses coconut milk over cooked rice.",
+            "Pecel is an iced sweet dessert, while Rujak is a warm bakery product.",
+            "Pecel uses mayonnaise over seafood, while Rujak uses soy sauce over noodles."
           ],
           "answer": 0,
           "why": {
-            "0": "Honey and sugar are sweet (manis)."
+            "0": "The reading mind maps specify Pecel as boiled vegetables with peanut sauce, and Rujak as sliced fruits with spicy palm sugar dressing."
           },
           "distractorWhy": {
-            "1": "Sour describes lemons.",
-            "2": "Salty describes salt.",
-            "3": "Spicy describes chili."
+            "1": "Neither dish contains raw meat or coconut milk base for cooked rice.",
+            "2": "Pecel and Rujak are traditional Indonesian fresh/boiled salad dishes, not bakery products or ice cream.",
+            "3": "Mayonnaise seafood and soy sauce noodles misrepresent these traditional fruit and vegetable dishes."
           }
         },
         {
           "id": "eng-d-7-c2-q12",
-          "difficulty": "tinggi",
-          "prompt": "Based on English for Nusantara Grade VII (page 85 Unit 3 Review), why do recipes use exact measurements like 'two teaspoons' or '500 ml'?",
+          "difficulty": "dasar",
+          "prompt": "Based on English for Nusantara Grade VII page 81 (Unit 2 Section 5 Language Focus), complete the sentence: \"Monita needs ___ oven to bake the cake.\"",
           "options": [
-            "To ensure the dish turns out with the correct balance of taste and consistency",
-            "To make the cooking process longer",
-            "To confuse the reader",
-            "To increase the price of the ingredients"
+            "an",
+            "a",
+            "some",
+            "many"
           ],
           "answer": 0,
           "why": {
-            "0": "Exact measurements ensure consistent flavor balance and proper cooking results."
+            "0": "The word \"oven\" begins with a vowel sound /ɒ/, requiring the indefinite article \"an\"."
           },
           "distractorWhy": {
-            "1": "Measurements do not aim to lengthen time needlessly.",
-            "2": "Recipes aim to clarify, not confuse.",
-            "3": "Measurements do not alter ingredient prices."
+            "1": "The article \"a\" is used before singular countable nouns beginning with consonant sounds.",
+            "2": "\"Some\" is used with plural or uncountable nouns, whereas \"oven\" is a singular countable noun.",
+            "3": "\"Many\" is a quantifier used with plural countable nouns, not singular nouns."
+          }
+        },
+        {
+          "id": "eng-d-7-c2-q13",
+          "difficulty": "sedang",
+          "prompt": "Based on English for Nusantara Grade VII page 81 (Unit 2 Section 5, Worksheet 2.17), which article correctly completes sentence 7: \"Monita's father makes ___ plate of fried rice for breakfast.\"",
+          "options": [
+            "a",
+            "an",
+            "some",
+            "these"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "The word \"plate\" starts with the consonant sound /p/, so it takes the indefinite article \"a\"."
+          },
+          "distractorWhy": {
+            "1": "\"an\" is only used before words starting with vowel sounds.",
+            "2": "\"some\" is inappropriate here because \"plate\" is a singular countable noun preceded by a quantity marker.",
+            "3": "\"these\" is a plural demonstrative determiner, which cannot modify the singular noun \"plate\"."
+          }
+        },
+        {
+          "id": "eng-d-7-c2-q14",
+          "difficulty": "dasar",
+          "prompt": "Based on English for Nusantara Grade VII pages 83-84 (Unit 3 Section 2), which utensil is used to stir or flip food in a frying pan/wok?",
+          "options": [
+            "spatula",
+            "napkin",
+            "chopstick",
+            "glass"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "A spatula is the flat cooking tool designed for stirring, lifting, and flipping ingredients in a pan or wok."
+          },
+          "distractorWhy": {
+            "1": "A napkin is a piece of cloth or paper used for wiping mouth and hands during eating.",
+            "2": "Chopsticks are handheld eating utensils used primarily for picking up food pieces.",
+            "3": "A glass is a drink container, not a cooking utensil used in a wok."
+          }
+        },
+        {
+          "id": "eng-d-7-c2-q15",
+          "difficulty": "sedang",
+          "prompt": "Based on English for Nusantara Grade VII page 84 (Unit 3 Section 2.c, Worksheet 2.19), which action verb correctly completes the phrase: \"I ___ the vegetable into small pieces\"?",
+          "options": [
+            "cut",
+            "heat",
+            "pour",
+            "turn on"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "The action verb \"cut\" means dividing food into smaller parts using a knife."
+          },
+          "distractorWhy": {
+            "1": "\"heat\" applies to liquids or oil in a cooking vessel.",
+            "2": "\"pour\" applies to liquids like water or oil transferred into containers.",
+            "3": "\"turn on\" applies to appliances like the stove."
+          }
+        },
+        {
+          "id": "eng-d-7-c2-q16",
+          "difficulty": "sedang",
+          "prompt": "Based on English for Nusantara Grade VII page 87 (Unit 3 Section 4.a, Recipe for Traditional Fried Rice), what should you do right after heating cooking oil in the pan?",
+          "options": [
+            "Put the eggs into the pan and stir/scramble them.",
+            "Add a pinch of salt to the cold pan.",
+            "Serve the fried rice on a plate immediately.",
+            "Chop the raw rice into pieces."
+          ],
+          "answer": 0,
+          "why": {
+            "0": "According to the recipe steps on page 87, Step 3 is heating oil, followed by Step 4: \"Put the eggs into the pan\" and Step 5: \"Stir the egg and scramble it.\""
+          },
+          "distractorWhy": {
+            "1": "Salt is added later as step 8 for seasoning after cooked rice is added.",
+            "2": "Serving the dish is the final step after all cooking is complete.",
+            "3": "Cooked rice is added whole in step 7, not chopped raw."
+          }
+        },
+        {
+          "id": "eng-d-7-c2-q17",
+          "difficulty": "tinggi",
+          "prompt": "Based on English for Nusantara Grade VII pages 88-89 (Unit 3 Section 4.c-d, Table 2.3 & 2.4), what are the main structural components of a procedural recipe text?",
+          "options": [
+            "Goal, Materials (utensils & ingredients), and Steps",
+            "Orientation, Complication, and Resolution",
+            "Thesis, Arguments, and Reiteration",
+            "Identification and Description"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Table 2.3 defines procedural recipe text structure as: Goal (aim), Materials (ingredients and utensils), and Steps (ordered instructions)."
+          },
+          "distractorWhy": {
+            "1": "Orientation, Complication, and Resolution form the structure of narrative texts.",
+            "2": "Thesis, Arguments, and Reiteration form the structure of analytical exposition texts.",
+            "3": "Identification and Description form the structure of descriptive texts."
+          }
+        },
+        {
+          "id": "eng-d-7-c2-q18",
+          "difficulty": "dasar",
+          "prompt": "Based on English for Nusantara Grade VII page 90 (Unit 3 Section 5 Language Focus), how is a positive imperative sentence formed in English cooking instructions?",
+          "options": [
+            "By using the base verb without a subject at the beginning of the sentence.",
+            "By starting with \"You must to\" followed by a past tense verb.",
+            "By placing an auxiliary verb \"Did\" before a subject.",
+            "By using an -ing verb with a subject pronoun."
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Section 5 explicitly states that imperative sentences use the base verb with no subject (e.g., \"Heat the oil in the pan\")."
+          },
+          "distractorWhy": {
+            "1": "\"You must to\" is grammatically incorrect and does not follow imperative command structure.",
+            "2": "\"Did\" creates past tense questions, not direct imperative instructions.",
+            "3": "Subject pronouns with -ing verbs form continuous tenses, not imperative commands."
+          }
+        },
+        {
+          "id": "eng-d-7-c2-q19",
+          "difficulty": "sedang",
+          "prompt": "Based on English for Nusantara Grade VII page 90 (Unit 3 Section 5 Language Focus), which sentence is a correct example of a negative imperative command?",
+          "options": [
+            "Don't put chili in the fried rice.",
+            "Not putting chili in the fried rice.",
+            "You don't putting chili in fried rice.",
+            "No put chili in fried rice."
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Negative imperative sentences follow the structure \"Don't\" + base verb, as shown in the textbook example \"Don't put chili in the fried rice.\""
+          },
+          "distractorWhy": {
+            "1": "\"Not putting\" lacks the mandatory auxiliary verb \"Do\" in negative imperative construction.",
+            "2": "\"You don't putting\" contains redundant subject inclusion and ungrammatical verb form.",
+            "3": "\"No put\" is non-standard broken English that violates English imperative rules."
+          }
+        },
+        {
+          "id": "eng-d-7-c2-q20",
+          "difficulty": "tinggi",
+          "prompt": "Based on English for Nusantara Grade VII pages 88 and 92 (Unit 3 Section 4.c & Section 6.b), which set of temporal conjunctions is used to indicate the chronological order of cooking steps?",
+          "options": [
+            "First, second, then, next, finally",
+            "Because, although, unless, since",
+            "However, nevertheless, on the other hand",
+            "Whereas, despite, in addition to"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "The text highlights sequence markers (conjunctions) such as first, second, then, next, and finally to order procedural steps."
+          },
+          "distractorWhy": {
+            "1": "Because, although, unless, and since are causal and conditional conjunctions, not sequential markers.",
+            "2": "However, nevertheless, and on the other hand are contrastive transition words.",
+            "3": "Whereas, despite, and in addition to are contrastive and additive connectors, not order indicators."
+          }
+        }
+      ]
+    },
+    {
+      "code": "KOMP-ENG-D-7-BAB3-01",
+      "grade": 7,
+      "name": "Chapter 3: Home Sweet Home",
+      "materi": "Rooms & Furniture in a House, Describing House Chores & Cleaning Activities, Prepositions of Place (in, on, under, next to), Rules and Abilities (can/can't)",
+      "cpRef": "English for Nusantara untuk SMP/MTs Kelas VII — Chapter 3",
+      "items": [
+        {
+          "id": "eng-d-7-c3-q01",
+          "difficulty": "dasar",
+          "prompt": "Based on English for Nusantara Grade VII (pages 105-110 Unit 1 'My House'), which room is primarily used for cooking meals and preparing drinks?",
+          "options": [
+            "Kitchen",
+            "Bedroom",
+            "Bathroom",
+            "Living room"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "The kitchen is the room in a house dedicated to cooking and food preparation."
+          },
+          "distractorWhy": {
+            "1": "Bedroom is for sleeping.",
+            "2": "Bathroom is for bathing.",
+            "3": "Living room is for family gathering."
+          }
+        },
+        {
+          "id": "eng-d-7-c3-q02",
+          "difficulty": "sedang",
+          "prompt": "Based on English for Nusantara Grade VII (page 115 Prepositions of Place), look at the sentence: 'Galang puts his school bag ___ the desk in his bedroom.' What is the correct preposition?",
+          "options": [
+            "on",
+            "under",
+            "behind",
+            "in"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "'on' is used when an object is supported by a flat horizontal surface (on the desk)."
+          },
+          "distractorWhy": {
+            "1": "under means beneath.",
+            "2": "behind means at the back.",
+            "3": "in means inside an enclosed space."
+          }
+        },
+        {
+          "id": "eng-d-7-c3-q03",
+          "difficulty": "sedang",
+          "prompt": "Based on English for Nusantara Grade VII (page 120 Unit 2 'House Chores'), what expression describes Monita's daily cleaning activity of using a broom on the floor?",
+          "options": [
+            "'She sweeps the floor.'",
+            "'She washes the dishes.'",
+            "'She waters the plants.'",
+            "'She irons the clothes.'"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "'sweeps the floor' (menyapu lantai) is the chore associated with a broom."
+          },
+          "distractorWhy": {
+            "1": "Washing dishes is for plates/cups.",
+            "2": "Watering plants is for garden.",
+            "3": "Ironing clothes is for garments."
+          }
+        },
+        {
+          "id": "eng-d-7-c3-q04",
+          "difficulty": "tinggi",
+          "prompt": "Based on English for Nusantara Grade VII (page 128 Language Focus - Modals for Rules), choose the correct sentence to state a household rule about cleanliness:",
+          "options": [
+            "'We must keep our bedroom clean and tidy.'",
+            "'We can throw trash on the floor.'",
+            "'We cannot sleep at night.'",
+            "'We must break the window.'"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "'must keep our bedroom clean' states a positive house rule requirement."
+          },
+          "distractorWhy": {
+            "1": "Contradicts cleanliness rules.",
+            "2": "Illogical rule.",
+            "3": "Destructive behavior."
+          }
+        },
+        {
+          "id": "eng-d-7-c3-q05",
+          "difficulty": "dasar",
+          "prompt": "Based on English for Nusantara Grade VII (page 112), what piece of furniture is typically found in the living room for people to sit comfortably?",
+          "options": [
+            "Sofa",
+            "Stove",
+            "Refrigerator",
+            "Wardrobe"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "A sofa is comfortable seating furniture in a living room."
+          },
+          "distractorWhy": {
+            "1": "Stove is in the kitchen.",
+            "2": "Refrigerator is for food cold storage.",
+            "3": "Wardrobe is in bedroom for clothes."
+          }
+        },
+        {
+          "id": "eng-d-7-c3-q06",
+          "difficulty": "sedang",
+          "prompt": "Based on English for Nusantara Grade VII (page 132 Unit 3 Review), complete the sentence with 'can' or 'can't': 'Sinta ___ cook fried rice because her mother taught her last week.'",
+          "options": [
+            "can",
+            "can't",
+            "must not",
+            "should not"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "'can' expresses learned ability/capability in the present."
+          },
+          "distractorWhy": {
+            "1": "can't expresses inability.",
+            "2": "must not expresses prohibition.",
+            "3": "should not expresses negative advice."
+          }
+        },
+        {
+          "id": "eng-d-7-c3-q07",
+          "difficulty": "dasar",
+          "prompt": "Based on English for Nusantara Grade VII (page 114), which preposition completes the sentence: 'The cat is sleeping ___ the bed.'",
+          "options": [
+            "under",
+            "between",
+            "inside of",
+            "through"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "'under' (di bawah) is the correct preposition showing the cat's sleeping spot beneath the bed frame."
+          },
+          "distractorWhy": {
+            "1": "between requires two objects.",
+            "2": "inside of is inside mattress.",
+            "3": "through implies motion."
+          }
+        },
+        {
+          "id": "eng-d-7-c3-q08",
+          "difficulty": "sedang",
+          "prompt": "Based on English for Nusantara Grade VII (page 122), what is the household chore expression for washing dirty dishes and spoons in the sink?",
+          "options": [
+            "'Wash the dishes'",
+            "'Make the bed'",
+            "'Clean the window'",
+            "'Mop the floor'"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "'Wash the dishes' (mencuci piring) is the chore for cleaning eating utensils."
+          },
+          "distractorWhy": {
+            "1": "Make the bed is tidying blankets.",
+            "2": "Clean the window is glass cleaning.",
+            "3": "Mop the floor is floor cleaning."
+          }
+        },
+        {
+          "id": "eng-d-7-c3-q09",
+          "difficulty": "sedang",
+          "prompt": "Based on English for Nusantara Grade VII (page 126), complete the sentence: 'Galang ___ play video games after finishing his homework.'",
+          "options": [
+            "can",
+            "can't",
+            "must not",
+            "should not"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "'can' expresses permission granted after completing duties."
+          },
+          "distractorWhy": {
+            "1": "can't expresses refusal.",
+            "2": "must not is prohibition.",
+            "3": "should not is advice."
+          }
+        },
+        {
+          "id": "eng-d-7-c3-q10",
+          "difficulty": "tinggi",
+          "prompt": "Based on English for Nusantara Grade VII (page 130), what room is used for taking a shower and brushing teeth?",
+          "options": [
+            "Bathroom",
+            "Dining room",
+            "Garage",
+            "Terrace"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "The bathroom is the designated room for personal hygiene and bathing."
+          },
+          "distractorWhy": {
+            "1": "Dining room is for eating.",
+            "2": "Garage is for vehicles.",
+            "3": "Terrace is outdoor porch."
+          }
+        },
+        {
+          "id": "eng-d-7-c3-q11",
+          "difficulty": "dasar",
+          "prompt": "Based on English for Nusantara Grade VII (page 118), where do people park their cars and motorcycles at home?",
+          "options": [
+            "Garage",
+            "Living room",
+            "Attic",
+            "Balcony"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "The garage is the enclosed room/area used for parking vehicles."
+          },
+          "distractorWhy": {
+            "1": "Living room is indoor seating.",
+            "2": "Attic is under roof storage.",
+            "3": "Balcony is upper level floor."
+          }
+        },
+        {
+          "id": "eng-d-7-c3-q12",
+          "difficulty": "tinggi",
+          "prompt": "Based on English for Nusantara Grade VII (page 134 Review), why is it important for family members to share house chores?",
+          "options": [
+            "To make the house clean faster and foster cooperation among family members",
+            "To make one person do all the hard work alone",
+            "To ruin the house furniture",
+            "To increase electricity bills"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Sharing chores teaches teamwork and keeps the living environment clean efficiently."
+          },
+          "distractorWhy": {
+            "1": "Unfair single workload.",
+            "2": "Not intended to ruin furniture.",
+            "3": "Chores do not aim to raise bills."
           }
         }
       ]

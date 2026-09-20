@@ -788,6 +788,415 @@
           }
         }
       ]
+    },
+    {
+      "code": "KOMP-IPS-D-7-BAB3-01",
+      "grade": 7,
+      "name": "Tema 03: Potensi Ekonomi Lingkungan",
+      "materi": "Potensi Sumber Daya Alam (Hutan, Tambang, Laut), Kegiatan Ekonomi (Produksi, Distribusi, Konsumsi), Hukum Permintaan & Penawaran, Pasar & Peran Teknologi",
+      "cpRef": "Ilmu Pengetahuan Sosial untuk SMP/MTs Kelas VII (Edisi Revisi) — Tema 03",
+      "items": [
+        {
+          "id": "ips-d-7-t3-q01",
+          "difficulty": "dasar",
+          "prompt": "Berdasarkan Buku Siswa IPS Kelas VII hal. 150, hutan merupakan salah satu potensi sumber daya alam Indonesia yang berfungsi sebagai sumber bahan baku untuk menghasilkan barang dan jasa. Hutan dapat berfungsi sebagai hutan produksi, hutan lindung, dan hutan konservasi. Jenis hutan yang dimanfaatkan secara khusus untuk diambil hasil kayunya maupun non-kayu dalam kegiatan produksi adalah...",
+          "options": [
+            "Hutan produksi",
+            "Hutan lindung",
+            "Hutan konservasi",
+            "Hutan suaka alam"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Hutan produksi adalah kawasan hutan yang memiliki fungsi pokok menghasilkan hasil hutan, baik kayu maupun non-kayu, untuk memenuhi kebutuhan industri dan kegiatan ekonomi masyarakat."
+          },
+          "distractorWhy": {
+            "1": "Hutan lindung berfungsi utama untuk melindungi sistem penyangga kehidupan seperti mengatur tata air, mencegah banjir, dan mengendalikan erosi, bukan diproduksi hasil kayunya.",
+            "2": "Hutan konservasi difokuskan untuk pengawetan keanekaragaman tumbuhan dan satwa serta ekosistemnya.",
+            "3": "Hutan suaka alam merupakan bagian dari hutan konservasi yang ditujukan khusus untuk perlindungan cagar alam dan suaka margasatwa."
+          }
+        },
+        {
+          "id": "ips-d-7-t3-q02",
+          "difficulty": "sedang",
+          "prompt": "Berdasarkan Buku Siswa IPS Kelas VII hal. 150, Pak Bambang melakukan penelusuran jejak serpihan mineral dengan cara mengambil sampel endapan sungai, kemudian mendulangnya untuk mengetahui keberadaan kandungan mineral berharga. Tahapan awal kegiatan pertambangan yang dilakukan Pak Bambang tersebut dinamakan...",
+          "options": [
+            "Prospeksi",
+            "Eksplorasi",
+            "Eksploitasi",
+            "Pengolahan"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Prospeksi merupakan kegiatan penyelidikan dan pencarian awal untuk menemukan keberadaan serpihan endapan atau keterdapatan mineral berharga di suatu wilayah."
+          },
+          "distractorWhy": {
+            "1": "Eksplorasi adalah tahap lanjutan untuk mengetahui ukuran, bentuk, posisi, kadar rata-rata, dan besarnya cadangan dari endapan bahan galian.",
+            "2": "Eksploitasi adalah kegiatan penambangan yang meliputi aktivitas pengambilan dan pengangkutan bahan tambang.",
+            "3": "Pengolahan adalah kegiatan untuk memurnikan dan meningkatkan mutu bahan tambang yang telah ditambang."
+          }
+        },
+        {
+          "id": "ips-d-7-t3-q03",
+          "difficulty": "sedang",
+          "prompt": "Berdasarkan Buku Siswa IPS Kelas VII hal. 150-151, pada tahun 2045 Indonesia diproyeksikan mendapat bonus demografi. Sebagai peserta didik, langkah yang paling tepat dilakukan untuk mempersiapkan diri menghadapi bonus demografi tersebut adalah...",
+          "options": [
+            "Meningkatkan kemampuan literasi keuangan dan literasi digital serta rajin belajar",
+            "Mengambil alih proyek pembangunan fisik infrastruktur nasional secara langsung",
+            "Fokus mencari pekerjaan kasar tanpa memperhitungkan tingkat pendidikan",
+            "Menyerahkan seluruh pengelolaan sumber daya alam kepada pihak asing"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Peserta didik sebagai generasi muda perlu menyiapkan kapasitas diri melalui rajin belajar, serta menguasai literasi digital dan literasi keuangan untuk menjadi sumber daya manusia yang berkualitas tinggi."
+          },
+          "distractorWhy": {
+            "1": "Pembangunan fisik infrastruktur nasional merupakan kewajiban pemerintah dan pihak penyedia konstruksi profesional, bukan tugas primer peserta didik.",
+            "2": "Bekerja tanpa memperhatikan tingkat pendidikan dan keterampilan akan menempatkan tenaga kerja pada daya saing rendah.",
+            "3": "Menyerahkan pengawasan sumber daya alam sepenuhnya kepada pihak luar akan mengancam kedaulatan ekonomi bangsa."
+          }
+        },
+        {
+          "id": "ips-d-7-t3-q04",
+          "difficulty": "dasar",
+          "prompt": "Berdasarkan Buku Siswa IPS Kelas VII hal. 151, seseorang memiliki kehormatan dan pengaruh tertentu di tengah masyarakat karena kedudukan yang dimilikinya. Hal ini menunjukkan pengaruh dari...",
+          "options": [
+            "Status sosial",
+            "Peran sosial",
+            "Pola sosial",
+            "Konflik sosial"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Status sosial merupakan posisi atau kedudukan seseorang dalam kelompok masyarakat yang menentukan tingkat penghormatan dan hak istimewa yang diterimanya."
+          },
+          "distractorWhy": {
+            "1": "Peran sosial adalah aspek dinamis dari status, yaitu pelaksanaan hak dan kewajiban sesuai dengan status yang disandang.",
+            "2": "Pola sosial merujuk pada bentuk pengulangan perilaku interaksi sosial dalam jangka waktu tertentu.",
+            "3": "Konflik sosial adalah proses perselisihan atau pertentangan antara dua pihak atau lebih."
+          }
+        },
+        {
+          "id": "ips-d-7-t3-q05",
+          "difficulty": "sedang",
+          "prompt": "Berdasarkan Buku Siswa IPS Kelas VII hal. 151, toponimi merupakan kajian kebudayaan secara historis dan simbolis untuk mengetahui asal-usul penamaan suatu tempat yang disepakati dari generasi ke generasi. Di bawah ini yang bukan merupakan contoh penamaan toponimi adalah...",
+          "options": [
+            "Gunung Vulkanik",
+            "Taman Nasional Gunung Leuser",
+            "Gunung Rinjani",
+            "Sungai Musi"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Gunung Vulkanik merupakan istilah umum dalam ilmu geologi untuk menyebut jenis gunung api, bukan nama geografis spesifik (toponimi) suatu wilayah."
+          },
+          "distractorWhy": {
+            "1": "Taman Nasional Gunung Leuser merupakan nama geografis spesifik kawasan konservasi di Sumatra.",
+            "2": "Gunung Rinjani merupakan nama rupa bumi spesifik gunung yang terletak di Pulau Lombok.",
+            "3": "Sungai Musi adalah nama rupa bumi spesifik sungai yang mengalir di Sumatra Selatan."
+          }
+        },
+        {
+          "id": "ips-d-7-t3-q06",
+          "difficulty": "tinggi",
+          "prompt": "Berdasarkan Buku Siswa IPS Kelas VII hal. 151-152, masyarakat memiliki keberagaman horizontal yang tidak berjenjang (diferensiasi sosial). Faktor-faktor yang mencerminkan konsep diferensiasi sosial ditunjukkan oleh keanekaragaman...",
+          "options": [
+            "Warna kulit, pekerjaan/profesi yang beraneka ragam, dan agama yang dianut",
+            "Sistem kasta, perbedaan warna kulit, dan jenjang pendidikan formal",
+            "Sistem kasta, jenjang pendidikan formal, dan agama yang dianut",
+            "Tingkat pendidikan formal, pekerjaan yang beraneka ragam, dan kasta sosial"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Diferensiasi sosial membagi masyarakat secara horizontal berdasarkan ciri fisik (warna kulit), profesi, dan agama tanpa ada tingkatan tinggi atau rendah."
+          },
+          "distractorWhy": {
+            "1": "Kasta dan tingkat pendidikan merupakan bentuk stratifikasi sosial bertingkat (vertikal).",
+            "2": "Kasta dan pendidikan membuat struktur masyarakat berjenjang secara vertikal.",
+            "3": "Kasta sosial membagi masyarakat secara hierarkis (vertikal), bukan horizontal."
+          }
+        },
+        {
+          "id": "ips-d-7-t3-q07",
+          "difficulty": "sedang",
+          "prompt": "Berdasarkan Buku Siswa IPS Kelas VII hal. 152, sistem stratifikasi sosial tertutup tidak memungkinkan individu untuk berpindah kedudukan sosial secara bebas. Sistem stratifikasi tertutup ini dikenal juga sebagai sistem...",
+          "options": [
+            "Kasta, yang mengakibatkan masyarakat tidak dapat berpindah kelas sosial",
+            "Kelas, yang mengakibatkan masyarakat tidak dapat berpindah kelas sosial",
+            "Meritokrasi, yang mengakibatkan masyarakat tidak dapat berpindah kelas sosial",
+            "Kasta, yang mengakibatkan masyarakat sangat mudah berpindah kelas sosial"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Sistem kasta merupakan contoh stratifikasi sosial tertutup di mana status seseorang ditentukan sejak lahir sehingga tidak memungkinkan perpindahan kelas sosial."
+          },
+          "distractorWhy": {
+            "1": "Sistem kelas bersifat terbuka sehingga masyarakat masih memiliki kesempatan untuk berpindah kedudukan.",
+            "2": "Meritokrasi adalah sistem pemberian kedudukan berdasarkan prestasi dan keahlian, yang bersifat terbuka.",
+            "3": "Sistem kasta justru menutup mobilitas sosial sehingga individu tidak mudah berpindah status."
+          }
+        },
+        {
+          "id": "ips-d-7-t3-q08",
+          "difficulty": "tinggi",
+          "prompt": "Berdasarkan Buku Siswa IPS Kelas VII hal. 153, perhatikan kegiatan berikut:\n(1) Perusahaan mengirimkan barang ke minimarket.\n(2) Mega membeli seragam sekolah untuk dipakai.\n(3) Arif membeli pertalite untuk bahan bakar sepeda motornya.\n(4) Perusahaan SR memproduksi roti dalam jumlah besar.\n(5) Ibu Tanti membeli tepung lalu mengolahnya menjadi makanan untuk dikonsumsi sendiri.\nKegiatan yang tergolong ke dalam aktivitas konsumsi ditunjukkan oleh nomor...",
+          "options": [
+            "(2), (3), dan (5)",
+            "(1), (2), dan (5)",
+            "(3), (4), dan (5)",
+            "(2), (3), dan (4)"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Kegiatan (2), (3), dan (5) merupakan tindakan menghabiskan atau mengurangi nilai guna barang untuk memenuhi kebutuhan hidup langsung."
+          },
+          "distractorWhy": {
+            "1": "Kegiatan nomor (1) merupakan aktivitas distribusi yaitu penyaluran barang dari produsen ke retail.",
+            "2": "Kegiatan nomor (4) merupakan kegiatan produksi yaitu pembuatan roti.",
+            "3": "Kegiatan nomor (4) adalah produksi barang, bukan kegiatan konsumsi."
+          }
+        },
+        {
+          "id": "ips-d-7-t3-q09",
+          "difficulty": "dasar",
+          "prompt": "Berdasarkan Buku Siswa IPS Kelas VII hal. 153, saat merasa lapar, Dimas memilih membeli bakso, Erry memilih satai, Ismi memilih ayam goreng, sedangkan Lili memilih mi. Keberagaman pilihan dalam memenuhi kebutuhan makanan tersebut menunjukkan bahwa permintaan dipengaruhi oleh faktor...",
+          "options": [
+            "Selera",
+            "Harga barang",
+            "Tingkat pendapatan",
+            "Kualitas barang"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Selera perseorangan yang berbeda-beda memengaruhi jenis barang atau jasa yang diminta meskipun kebutuhan dasarnya sama (memenuhi rasa lapar)."
+          },
+          "distractorWhy": {
+            "1": "Faktor harga berkaitan dengan tinggi rendahnya nominal uang yang harus dibayar untuk suatu produk.",
+            "2": "Faktor pendapatan berkaitan dengan daya beli konsumen berdasarkan penghasilan yang diperoleh.",
+            "3": "Faktor kualitas barang berkaitan dengan keunggulan mutu produk yang ditawarkan."
+          }
+        },
+        {
+          "id": "ips-d-7-t3-q10",
+          "difficulty": "dasar",
+          "prompt": "Berdasarkan Buku Siswa IPS Kelas VII hal. 154, pasar memegang peranan penting dalam kegiatan ekonomi masyarakat. Fungsi pasar dalam menyalurkan produk hasil barang dan jasa dari pihak produsen sampai ke tangan konsumen disebut...",
+          "options": [
+            "Fungsi distribusi",
+            "Fungsi pembentuk harga",
+            "Fungsi promosi",
+            "Fungsi produksi"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Fungsi distribusi pasar bertugas menjembatani penyampaian barang dan jasa dari produsen kepada konsumen yang membutuhkan."
+          },
+          "distractorWhy": {
+            "1": "Fungsi pembentuk harga adalah menetapkan harga kesepakatan antara penjual dan pembeli melalui proses tawar-menawar.",
+            "2": "Fungsi promosi adalah memperkenalkan barang atau jasa kepada masyarakat pembeli.",
+            "3": "Fungsi produksi terjadi di unit pembuatan barang, bukan fungsi utama keberadaan pasar."
+          }
+        },
+        {
+          "id": "ips-d-7-t3-q11",
+          "difficulty": "sedang",
+          "prompt": "Berdasarkan Buku Siswa IPS Kelas VII hal. 110-111, Indonesia memiliki kawasan hutan yang sangat luas. Kawasan hutan suaka alam yang memiliki ciri khas berupa keanekaragaman dan keunikan tumbuhan serta ekosistemnya yang perkembangannya diserahkan pada alam tanpa campur tangan manusia dinamakan...",
+          "options": [
+            "Cagar alam",
+            "Suaka margasatwa",
+            "Taman hutan raya",
+            "Hutan produksi terbatas"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Cagar alam adalah kawasan suaka alam yang melindungi keunikan tumbuhan beserta ekosistem aslinya agar berkembang secara alami."
+          },
+          "distractorWhy": {
+            "1": "Suaka margasatwa difokuskan pada perlindungan dan kelestarian keanekaragaman jenis satwa liar.",
+            "2": "Taman hutan raya difungsikan untuk koleksi tumbuhan dan satwa alami atau buatan bagi kepentingan penelitian dan rekreasi.",
+            "3": "Hutan produksi terbatas diperuntukkan bagi eksploitasi kayu dengan kuota tebang tertentu."
+          }
+        },
+        {
+          "id": "ips-d-7-t3-q12",
+          "difficulty": "tinggi",
+          "prompt": "Berdasarkan Buku Siswa IPS Kelas VII hal. 113-114, pemanfaatan sumber daya alam tambang dilakukan melalui empat tahapan secara berurutan. Urutan tahapan kegiatan pertambangan yang benar adalah...",
+          "options": [
+            "Prospeksi, eksplorasi, eksploitasi, dan pengolahan",
+            "Eksplorasi, prospeksi, pengolahan, dan eksploitasi",
+            "Prospeksi, eksploitasi, eksplorasi, dan pengolahan",
+            "Eksploitasi, prospeksi, eksplorasi, dan pengolahan"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Tahapan pertambangan dimulai dari pencarian awal (prospeksi), pengukuran cadangan (eksplorasi), penambangan/penambangan nyata (eksploitasi), hingga pemurnian (pengolahan)."
+          },
+          "distractorWhy": {
+            "1": "Tahap eksplorasi tidak dapat mendahului prospeksi karena eksplorasi membutuhkan data titik keberadaan awal dari prospeksi.",
+            "2": "Eksploitasi (penambangan) tidak boleh dilakukan sebelum tahap pengukuran besarnya cadangan (eksplorasi) selesai.",
+            "3": "Eksploitasi merupakan langkah ketiga setelah prospeksi dan eksplorasi dilakukan."
+          }
+        },
+        {
+          "id": "ips-d-7-t3-q13",
+          "difficulty": "sedang",
+          "prompt": "Berdasarkan Buku Siswa IPS Kelas VII hal. 118-120, wilayah laut Indonesia menyimpan potensi kemaritiman yang besar. Selain ikan tangkap dan terumbu karang, ekosistem pesisir yang berfungsi mencegah erosi pantai (abrasi) serta menjadi tempat pembiakan satwa laut adalah...",
+          "options": [
+            "Hutan bakau (mangrove)",
+            "Padang lamun",
+            "Palung laut",
+            "Taman laut dangkal"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Hutan bakau (mangrove) berperan penting sebagai benteng alami pemecah gelombang pencegah abrasi pantai serta habitat pembiakan biota laut."
+          },
+          "distractorWhy": {
+            "1": "Padang lamun adalah tumbuhan berbunga yang hidup di perairan dangkal sebagai penstabil dasar laut dan pakan mamalia laut.",
+            "2": "Palung laut merupakan jurang di dasar laut yang sangat dalam dan tidak berfungsi menahan abrasi garis pantai.",
+            "3": "Taman laut dangkal merupakan ekosistem terumbu karang untuk keanekaragaman hayati dan wisata."
+          }
+        },
+        {
+          "id": "ips-d-7-t3-q14",
+          "difficulty": "sedang",
+          "prompt": "Berdasarkan Buku Siswa IPS Kelas VII hal. 125-128, perbedaan potensi sumber daya alam antarwilayah memicu terjadinya hubungan perdagangan antardaerah maupun internasional. Alasan utama terjadinya perdagangan antarwilayah tersebut adalah...",
+          "options": [
+            "Setiap wilayah memiliki keterbatasan sumber daya alam sehingga perlu saling menutupi kebutuhan",
+            "Keinginan setiap wilayah untuk menguasai perekonomian daerah lain secara sepihak",
+            "Adanya kesamaan iklim dan kondisi geografis di seluruh pelosok Indonesia",
+            "Pemerintah melarang setiap daerah memproduksi barang kebutuhan sendiri"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Perbedaan kondisi geografis menyebabkan persebaran sumber daya alam tidak merata sehingga perdagangan dilakukan untuk memenuhi kebutuhan antarwilayah."
+          },
+          "distractorWhy": {
+            "1": "Perdagangan bertujuan memenuhi kebutuhan bersama dan kerja sama ekonomi, bukan untuk ekspansi penguasaan sepihak.",
+            "2": "Kondisi geografis dan iklim di Indonesia beranekaragam, bukan sama persis.",
+            "3": "Pemerintah tidak melarang daerah memproduksi barang, tetapi mendorong pemenuhan kebutuhan secara efisien."
+          }
+        },
+        {
+          "id": "ips-d-7-t3-q15",
+          "difficulty": "dasar",
+          "prompt": "Berdasarkan Buku Siswa IPS Kelas VII hal. 129-130, fenomena bonus demografi yang dialami suatu negara ditandai oleh...",
+          "options": [
+            "Jumlah penduduk usia produktif (15-64 tahun) lebih besar dibandingkan usia non-produktif",
+            "Jumlah penduduk usia lanjut (di atas 65 tahun) mendominasi seluruh populasi negara",
+            "Tingginya angka kelahiran bayi yang menyebabkan ledakan usia anak-anak",
+            "Penurunan tingkat pendidikan dan keterampilan pada angkatan kerja produktif"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Bonus demografi terjadi ketika proporsi penduduk usia produktif (15-64 tahun) mencapai lebih dari 60% dari total populasi penduduk."
+          },
+          "distractorWhy": {
+            "1": "Dominasi usia lanjut menciptakan fenomena ageing population yang meningkatkan beban ketergantungan.",
+            "2": "Tingginya kelahiran anak-anak memperbesar angka ketergantungan usia muda.",
+            "3": "Penurunan keterampilan angkatan kerja akan mengagalkan peluang pemanfaatan bonus demografi."
+          }
+        },
+        {
+          "id": "ips-d-7-t3-q16",
+          "difficulty": "sedang",
+          "prompt": "Berdasarkan Buku Siswa IPS Kelas VII hal. 136-138, dalam arus kegiatan ekonomi, Rumah Tangga Konsumen (RTK) berperan menyediakan faktor-faktor produksi. Imbalan yang diterima RTK atas penyerahan faktor produksi berupa tenaga kerja adalah...",
+          "options": [
+            "Upah atau gaji (wage)",
+            "Sewa (rent)",
+            "Bunga modal (interest)",
+            "Laba usaha (profit)"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Rumah tangga konsumen yang menyerahkan jasa tenaga kerja kepada rumah tangga produsen mendapatkan balas jasa dalam bentuk upah atau gaji."
+          },
+          "distractorWhy": {
+            "1": "Sewa (rent) merupakan imbalan atas penyerahan faktor produksi berupa tanah atau lahan.",
+            "2": "Bunga modal (interest) adalah imbalan atas penyerahan faktor produksi modal.",
+            "3": "Laba usaha (profit) merupakan balasan atas kemampuan kewirausahaan (entrepreneurship)."
+          }
+        },
+        {
+          "id": "ips-d-7-t3-q17",
+          "difficulty": "tinggi",
+          "prompt": "Berdasarkan Buku Siswa IPS Kelas VII hal. 141-143, hukum permintaan menyatakan hubungan antara harga dengan jumlah barang yang diminta. Pernyataan yang sesuai dengan hukum permintaan adalah...",
+          "options": [
+            "Jika harga suatu barang naik, maka jumlah barang yang diminta akan berkurang",
+            "Jika harga suatu barang naik, maka jumlah barang yang diminta akan bertambah",
+            "Harga barang tidak memiliki pengaruh apapun terhadap jumlah barang yang diminta",
+            "Jika harga barang turun, maka penjual akan menambah jumlah barang yang ditawarkan"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Hukum permintaan berbunyi jika harga suatu barang naik (ceteris paribus), maka jumlah barang yang diminta konsumen akan berkurang, dan sebaliknya."
+          },
+          "distractorWhy": {
+            "1": "Pernyataan tersebut berlawanan dengan hukum permintaan di mana kenaikan harga justru menurunkan minat beli.",
+            "2": "Harga merupakan faktor utama yang memengaruhi tingkat permintaan konsumen.",
+            "3": "Pernyataan tersebut menguraikan hukum penawaran dari sudut pandang produsen, bukan hukum permintaan."
+          }
+        },
+        {
+          "id": "ips-d-7-t3-q18",
+          "difficulty": "sedang",
+          "prompt": "Berdasarkan Buku Siswa IPS Kelas VII hal. 144-145, pasar dapat dibedakan menjadi pasar konkret dan pasar abstrak. Contoh aktivitas transaksi pada pasar abstrak adalah...",
+          "options": [
+            "Membeli barang kebutuhan harian secara daring (online marketplace) tanpa bertemu penjual langsung",
+            "Membeli sayur-mayur dan bumbu dapur langsung di pasar tradisional setempat",
+            "Melakukan tawar-menawar harga ikan basah di tempat pelelangan ikan pantai",
+            "Membeli pakaian dengan memilih dan mencoba pakaian secara langsung di toko fisik"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Pasar abstrak adalah pasar di mana penjual dan pembeli tidak bertemu langsung secara fisik dan barang yang diperjualbelikan tidak dibawa secara langsung (seperti e-commerce)."
+          },
+          "distractorWhy": {
+            "1": "Membeli di pasar tradisional merupakan transaksi di pasar konkret karena ada pertemuan fisik dan barang langsung diserahterimakan.",
+            "2": "Pelelangan ikan di lokasi pantai adalah contoh transaksi pasar konkret.",
+            "3": "Mencoba pakaian di toko fisik adalah bentuk transaksi pasar konkret."
+          }
+        },
+        {
+          "id": "ips-d-7-t3-q19",
+          "difficulty": "tinggi",
+          "prompt": "Berdasarkan Buku Siswa IPS Kelas VII hal. 146-147, kedudukan atau status sosial dapat diperoleh dengan berbagai cara. Status sosial yang diperoleh seseorang melalui usaha, kerja keras, dan prestasi yang disengaja dinamakan...",
+          "options": [
+            "Achieved status",
+            "Ascribed status",
+            "Assigned status",
+            "Inherited status"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Achieved status adalah kedudukan yang dicapai seseorang melalui usaha sengaja, pendidikan, dan prestasi (seperti menjadi dokter atau sarjana)."
+          },
+          "distractorWhy": {
+            "1": "Ascribed status adalah kedudukan yang diperoleh secara otomatis sejak lahir tanpa usaha (seperti keturunan bangsawan).",
+            "2": "Assigned status adalah kedudukan yang diberikan oleh masyarakat atas jasa-jasa seseorang (seperti gelar pahlawan).",
+            "3": "Inherited status bukan istilah baku dalam sosiologi untuk kategori status sosial."
+          }
+        },
+        {
+          "id": "ips-d-7-t3-q20",
+          "difficulty": "sedang",
+          "prompt": "Berdasarkan Buku Siswa IPS Kelas VII hal. 145-146, perkembangan teknologi informasi memberikan pengaruh besar bagi kegiatan ekonomi. Salah satu dampak positif kemajuan teknologi terhadap kegiatan distribusi barang adalah...",
+          "options": [
+            "Mempercepat proses pemesanan dan pengiriman barang dari produsen ke konsumen",
+            "Meningkatkan biaya operasional pemasaran produk secara signifikan",
+            "Membatasi jangkauan pasar barang hanya di sekitar daerah tempat produksi",
+            "Menghilangkan peran produsen dalam pembuatan barang dan jasa"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Teknologi logistik dan e-commerce mempermudah pelacakan, pemesanan, dan pengiriman barang sehingga saluran distribusi menjadi lebih cepat dan efisien."
+          },
+          "distractorWhy": {
+            "1": "Teknologi digital justru memangkas biaya pemasaran dan iklan konvensional.",
+            "2": "Kemajuan teknologi memperluas jangkauan pasar hingga ke tingkat antarnegara.",
+            "3": "Produsen tetap dibutuhkan untuk memproduksi barang; teknologi hanya membantu proses pembuatan dan distribusinya."
+          }
+        }
+      ]
     }
   ]
 }
