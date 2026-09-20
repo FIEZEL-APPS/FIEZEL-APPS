@@ -136,13 +136,26 @@ Setiap bab memuat:
 4. `materi`: Rincian sub-bab/unit resmi dari Buku Siswa.
 5. `cpRef`: Rujukan judul buku resmi Kemendikbudristek.
 
-## 9. Ekstraksi Tahap 1: Bank Soal Resmi IPA Kelas VII Bab 1 Mendarat (30/30 PASS)
+## 9. Ekstraksi Awal: Bank Soal IPA Kelas VII Bab 1 (Fase D)
 
-Sebanyak 12 butir soal latihan autentik diekstrak langsung dari lembar latihan dan aktivitas eksperimen Buku Siswa IPA Kelas VII (`IPA_BS_KLS_VII_Rev (1).pdf` hal. 8, 12, 13, 24, 31-35, dan 42):
-- `content/mapel/mapel-ipa-d.json`: Berisi 12 butir soal terverifikasi (4 dasar, 5 sedang, 3 tinggi) dengan `provenance` buku resmi SIBI dan `penyusunButir: "resmi-terverifikasi"`. Kunci jawaban di indeks 0 sebelum diacak di runtime, lengkap dengan pembahasan `why` dan peta miskonsepsi `distractorWhy`.
-- `content/mapel/mapel-ipa-d-th.json`: Sidecar bahasa Thai berparitas 100% dengan kecocokan angka numerik pada opsi yang identik.
-- `features/teacher/fiezel-teacher-shell.js`: Fungsi `adoptBankCompetencies` diperkaya dengan mekanisme merge, menjaga keutuhan 20 bab IPA dan seluruh mapel lainnya.
-- Gerbang `tests/mapel-fase-d-content-test.js` kini menguji bank IPA yang ada dan lulus sempurna: **30/30 PASS**.
+Sebanyak 12 butir soal latihan mula-mula diekstrak sebagai bukti konsep integrasi bank soal terverifikasi terhadap Buku Siswa IPA Kelas VII (`IPA_BS_KLS_VII_Rev (1).pdf`).
 
+## 10. Ekstraksi Penuh Seluruh 38 Butir Soal Asli Buku Siswa & Kebijakan Kurikulum Nasional
 
+Sesuai instruksi OWNER ("JANGAN HANYA 12, TAPI HARUS PERSIS SAMA DENGAN JUMLAH SOAL DI BUKU, THAI TIDAK PERLU KARENA HANYA UNTUK USER INDONESIA"):
+1. **Pelepasan Batasan Arbitrer 12 Soal**:
+   Seluruh 38 butir latihan bernomor di dalam bab 1 resmi dipindai dan dikonversi ke format `fiezel-mapel-bank-v1`:
+   - **Hal. 8–9 (Apa itu Sains? / Ayo Uji Kemampuan)**: 8 butir (No. 1a–1e cabang sains ilmuwan Dewi, Yosua, Farhan, Bagas, Vania; No. 2a–2c biokimia, geofisika, oseanografi).
+   - **Hal. 12–13 (Laboratorium IPA & Keselamatan Kerja)**: 11 butir (No. 1a–1f alat lab volume, pemanasan, suhu, mereaksikan, sendok spatula, batang pengaduk; No. 2a–2d perbandingan batang pengaduk vs spatula, beaker vs erlenmeyer, kawat kasa vs segitiga porselen, tabung reaksi vs cawan penguap; No. 3 prosedur keselamatan tabung reaksi).
+   - **Hal. 24–25 (Merancang Percobaan & Metode Ilmiah)**: 11 butir (No. 1a–1e pengujian klaim ilmiah vs subjektif warna mobil, kelelawar, musik dangdut vs rock, ketebalan senar dawai, fosil tinggi manusia purba; No. 2a–2d variabel bebas, variabel terikat, variabel kontrol, dan hipotesis percobaan pupuk tanaman; tabel pengamatan sampah organik & kecepatan tumbuh cabe).
+   - **Hal. 35 (Pengukuran Besaran & Satuan SI)**: 4 butir (No. 1 estimasi vs pengukuran alat ukur standar; No. 2 esensi pengukuran kuantitatif data empiris; No. 3 pengukuran berulang dan reduksi galat acak; eksperimen volume batu tidak beraturan $78 - 50 = 28\text{ mL}$).
+   - **Hal. 42 (Pelaporan Hasil Percobaan Suhu Air Dian)**: 4 butir (No. 1 konvensi tabel data berkolom; No. 2a laju kenaikan suhu rata-rata $7^\circ\text{C}$/menit; No. 2b pemilihan jenis grafik garis kontinu; kesimpulan ilmiah percobaan).
 
+2. **Kebijakan Sidecar Bahasa**:
+   - Kurikulum Nasional Indonesia (Fase D SMP) ditujukan untuk siswa dan guru di Indonesia, sehingga sidecar Thai (`-th.json`) **tidak diperlukan** dan dihapus untuk mapel IPA.
+   - Gerbang `tests/mapel-fase-d-content-test.js` telah disesuaikan agar pengujian paritas bahasa asing bersifat opsional (hanya dieksekusi bila berkas `-th.json` ada), sementara bank bahasa Indonesia diuji penuh.
+
+3. **Hasil Gerbang Mutu**:
+   - `tests/mapel-fase-d-content-test.js`: **25/25 PASS** (38 butir valid, 10 dasar, 18 sedang, 10 tinggi, 0 duplikasi, 0 rujukan posisi opsi).
+   - `tests/kelasku-17mapel-assignment-test.js`: **25.373/25.373 PASS**.
+   - `tests/modal-assign-teacher-ux-test.js`: **27/27 PASS**.

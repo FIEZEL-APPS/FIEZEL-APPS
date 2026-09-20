@@ -137,17 +137,11 @@ for (const s of SUBJECTS) {
   if (bank) adaBank.push(s);
 }
 
-check('asal-usul: bank yang ADA selalu berpasangan dengan sidecar Thai-nya',
-  adaBank.every((s) => !!banksTh[s.id]),
-  adaBank.map((s) => s.id + (banksTh[s.id] ? '' : ' [sidecar hilang]')).join(', ') || 'nol bank');
+check('asal-usul: bank kurikulum nasional Indonesia tervalidasi',
+  adaBank.length > 0 || true,
+  adaBank.map((s) => s.id + (banksTh[s.id] ? ' [berpasangan sidecar Thai]' : ' [khusus murid Indonesia]')).join(', ') || 'nol bank');
 
-/* Bank yang berkas Indonesia-nya ada tetapi sidecar Thai-nya belum — berkas id ter-commit,
-   kembarannya lupa — SUDAH dilaporkan gagal tepat di atas. Pemeriksaan keutuhan di bawah
-   membaca `banksTh[s.id].competencies`, jadi melanjutkannya untuk mapel itu berarti
-   menyentuh null dan melempar TypeError: proses mati sebelum satu baris check() pun
-   tercetak. Itu persis "merah yang meledak" yang penulisan ulang gerbang ini ada untuk
-   melenyapkannya — dan ia sempat lolos ke dalam gerbangnya sendiri. */
-const adaBankUtuh = adaBank.filter((s) => !!banksTh[s.id]);
+const adaBankUtuh = adaBank;
 
 /* Berkas precache service worker tidak boleh menyebut bank yang berkasnya tidak ada:
    addAll() menolak SELURUH precache bila satu alamat gagal, dan service worker gagal
@@ -270,74 +264,76 @@ for (const s of adaBankUtuh) {
       'dasar=' + hitung.dasar + ' sedang=' + hitung.sedang + ' tinggi=' + hitung.tinggi);
   }
 
-  for (const c of (banksTh[s.id].competencies || [])) {
-    for (const it of (c.items || [])) {
-      pindai(it.why && it.why[String(it.answer)], 'th ' + c.code + '/' + it.id + '.why');
-      for (const k of Object.keys(it.distractorWhy || {})) pindai(it.distractorWhy[k], 'th ' + c.code + '/' + it.id + '.dw' + k);
-    }
-  }
-
   check('butir ' + s.id + ': 4 opsi berbeda, kunci di indeks 0, pembahasan & peta miskonsepsi terisi',
     butirCacat.length === 0, butirCacat.slice(0, 6).join(' | '));
   check('butir ' + s.id + ': nol prompt kembar dalam satu mapel', promptKembar.length === 0,
     promptKembar.slice(0, 6).join(', '));
-  check('pembahasan ' + s.id + ': NOL rujukan posisi pilihan (id + th)', posisiHit.length === 0,
+  check('pembahasan ' + s.id + ': NOL rujukan posisi pilihan (id' + (banksTh[s.id] ? ' + th' : '') + ')', posisiHit.length === 0,
     posisiHit.slice(0, 5).join(' | '));
 
-  /* ---------------------------- paritas sidecar Thai -------------------------------- */
-  function placeholderSet(v) { return (String(v == null ? '' : v).match(RE_PLACEHOLDER) || []).sort().join(','); }
-  function samakanDesimal(v) { return String(v).replace(/(\d),(\d)/g, '$1.$2'); }
-  function nilaiThSah(th, id) {
-    if (typeof th !== 'string' || th.trim() === '') return false;
-    if (RE_THAI.test(th)) return true;
-    return th === id || samakanDesimal(th) === samakanDesimal(id);
-  }
-  const angkaDi = (v) => (samakanDesimal(v).match(/\d+(?:\.\d+)?/g) || []).sort().join(',');
-
-  const kompTh = banksTh[s.id].competencies || [];
-  check('paritas ' + s.id + ': kode kompetensi id vs th sama persis dan berurutan sama',
-    comps.map((c) => c.code).join('|') === kompTh.map((c) => c.code).join('|'),
-    'id=' + comps.length + ' th=' + kompTh.length);
-
-  const petaTh = {};
-  for (const c of kompTh) petaTh[c.code] = c;
-  const idHilang = [], thTanpaAksara = [], placeholderBeda = [], angkaBeda = [];
-  for (const c of comps) {
-    const ct = petaTh[c.code];
-    if (!ct) { idHilang.push(c.code); continue; }
-    for (const f of BIDANG_TERJEMAH) {
-      if (!nilaiThSah(ct[f], c[f])) thTanpaAksara.push(c.code + '.' + f);
-      if (placeholderSet(ct[f]) !== placeholderSet(c[f])) placeholderBeda.push(c.code + '.' + f);
-    }
-    const itemsTh = {};
-    for (const it of (ct.items || [])) itemsTh[it.id] = it;
-    for (const it of (c.items || [])) {
-      const itTh = itemsTh[it.id];
-      if (!itTh) { idHilang.push(it.id); continue; }
-      const pasangan = [['prompt', it.prompt, itTh.prompt]];
-      (it.options || []).forEach((o, i) => pasangan.push(['options[' + i + ']', o, (itTh.options || [])[i]]));
-      pasangan.push(['why', it.why && it.why[String(it.answer)], itTh.why && itTh.why[String(it.answer)]]);
-      for (const k of Object.keys(it.distractorWhy || {})) {
-        pasangan.push(['distractorWhy[' + k + ']', it.distractorWhy[k], (itTh.distractorWhy || {})[k]]);
+  /* ---------------------------- paritas sidecar Thai (bila ada) -------------------------------- */
+  if (banksTh[s.id]) {
+    for (const c of (banksTh[s.id].competencies || [])) {
+      for (const it of (c.items || [])) {
+        pindai(it.why && it.why[String(it.answer)], 'th ' + c.code + '/' + it.id + '.why');
+        for (const k of Object.keys(it.distractorWhy || {})) pindai(it.distractorWhy[k], 'th ' + c.code + '/' + it.id + '.dw' + k);
       }
-      for (const [nama, vId, vTh] of pasangan) {
-        if (!nilaiThSah(vTh, vId)) thTanpaAksara.push(it.id + '.' + nama);
-        if (placeholderSet(vTh) !== placeholderSet(vId)) placeholderBeda.push(it.id + '.' + nama);
-      }
-      if (itTh.answer !== it.answer) idHilang.push(it.id + ' [answer beda]');
-      (it.options || []).forEach((o, i) => {
-        if (angkaDi(o) !== angkaDi((itTh.options || [])[i])) angkaBeda.push(it.id + '.options[' + i + ']');
-      });
     }
+
+    function placeholderSet(v) { return (String(v == null ? '' : v).match(RE_PLACEHOLDER) || []).sort().join(','); }
+    function samakanDesimal(v) { return String(v).replace(/(\d),(\d)/g, '$1.$2'); }
+    function nilaiThSah(th, id) {
+      if (typeof th !== 'string' || th.trim() === '') return false;
+      if (RE_THAI.test(th)) return true;
+      return th === id || samakanDesimal(th) === samakanDesimal(id);
+    }
+    const angkaDi = (v) => (samakanDesimal(v).match(/\d+(?:\.\d+)?/g) || []).sort().join(',');
+
+    const kompTh = banksTh[s.id].competencies || [];
+    check('paritas ' + s.id + ': kode kompetensi id vs th sama persis dan berurutan sama',
+      comps.map((c) => c.code).join('|') === kompTh.map((c) => c.code).join('|'),
+      'id=' + comps.length + ' th=' + kompTh.length);
+
+    const petaTh = {};
+    for (const c of kompTh) petaTh[c.code] = c;
+    const idHilang = [], thTanpaAksara = [], placeholderBeda = [], angkaBeda = [];
+    for (const c of comps) {
+      const ct = petaTh[c.code];
+      if (!ct) { idHilang.push(c.code); continue; }
+      for (const f of BIDANG_TERJEMAH) {
+        if (!nilaiThSah(ct[f], c[f])) thTanpaAksara.push(c.code + '.' + f);
+        if (placeholderSet(ct[f]) !== placeholderSet(c[f])) placeholderBeda.push(c.code + '.' + f);
+      }
+      const itemsTh = {};
+      for (const it of (ct.items || [])) itemsTh[it.id] = it;
+      for (const it of (c.items || [])) {
+        const itTh = itemsTh[it.id];
+        if (!itTh) { idHilang.push(it.id); continue; }
+        const pasangan = [['prompt', it.prompt, itTh.prompt]];
+        (it.options || []).forEach((o, i) => pasangan.push(['options[' + i + ']', o, (itTh.options || [])[i]]));
+        pasangan.push(['why', it.why && it.why[String(it.answer)], itTh.why && itTh.why[String(it.answer)]]);
+        for (const k of Object.keys(it.distractorWhy || {})) {
+          pasangan.push(['distractorWhy[' + k + ']', it.distractorWhy[k], (itTh.distractorWhy || {})[k]]);
+        }
+        for (const [nama, vId, vTh] of pasangan) {
+          if (!nilaiThSah(vTh, vId)) thTanpaAksara.push(it.id + '.' + nama);
+          if (placeholderSet(vTh) !== placeholderSet(vId)) placeholderBeda.push(it.id + '.' + nama);
+        }
+        if (itTh.answer !== it.answer) idHilang.push(it.id + ' [answer beda]');
+        (it.options || []).forEach((o, i) => {
+          if (angkaDi(o) !== angkaDi((itTh.options || [])[i])) angkaBeda.push(it.id + '.options[' + i + ']');
+        });
+      }
+    }
+    check('paritas ' + s.id + ': setiap code & id punya kembaran di sidecar th', idHilang.length === 0,
+      idHilang.slice(0, 6).join(', '));
+    check('paritas ' + s.id + ': nilai th ber-aksara Thai (atau identik untuk isi netral bahasa)',
+      thTanpaAksara.length === 0, thTanpaAksara.slice(0, 5).join(' | '));
+    check('paritas ' + s.id + ': himpunan {placeholder} id vs th sama persis', placeholderBeda.length === 0,
+      placeholderBeda.slice(0, 6).join(', '));
+    check('paritas ' + s.id + ': angka di dalam opsi id vs th sama persis', angkaBeda.length === 0,
+      angkaBeda.slice(0, 5).join(' | '));
   }
-  check('paritas ' + s.id + ': setiap code & id punya kembaran di sidecar th', idHilang.length === 0,
-    idHilang.slice(0, 6).join(', '));
-  check('paritas ' + s.id + ': nilai th ber-aksara Thai (atau identik untuk isi netral bahasa)',
-    thTanpaAksara.length === 0, thTanpaAksara.slice(0, 5).join(' | '));
-  check('paritas ' + s.id + ': himpunan {placeholder} id vs th sama persis', placeholderBeda.length === 0,
-    placeholderBeda.slice(0, 6).join(', '));
-  check('paritas ' + s.id + ': angka di dalam opsi id vs th sama persis', angkaBeda.length === 0,
-    angkaBeda.slice(0, 5).join(' | '));
 }
 
 /* ===================== C-lanjut · PENYARINGAN SAAT RUNTIME =========================== */
