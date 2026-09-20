@@ -310,20 +310,35 @@
             normCode = FiezelTeacherStore.makeClassCode();
           }
         }
-        if (normCode) {
-          var exists = profile.classes.some(function (c) {
-            return FiezelTeacherStore.normalizeClassCode(c.code) === normCode;
+
+        var mapelNames = FiezelTeacherStore.MAPEL_NAMES || {};
+        var officialSub = session.subjectId || 'ENG';
+        var officialSubName = mapelNames[officialSub] || officialSub;
+
+        // SELALU SINKRONKAN MAPEL PADA SEMUA KELAS GURU INI
+        if (session.subjectId && profile.classes.length) {
+          profile.classes.forEach(function (c) {
+            var prefix = session.institution ? session.institution + ' — ' : (profile.teacher && profile.teacher.school ? profile.teacher.school + ' — ' : '');
+            if (c.subject !== session.subjectId || (c.name && c.name.indexOf('Matematika') !== -1 && session.subjectId !== 'MAT')) {
+              c.subject = session.subjectId;
+              c.name = prefix + officialSubName;
+              modified = true;
+            }
           });
-          if (!exists) {
+        }
+
+        if (normCode) {
+          var matchedCls = profile.classes.filter(function (c) {
+            return FiezelTeacherStore.normalizeClassCode(c.code) === normCode;
+          })[0];
+          if (!matchedCls) {
             // Bersihkan tanda "dihapus" untuk kode ini — token baru sengaja
             // menghubungkan kembali, jadi penanda hapus lama harus dibuang.
             if (profile.deletedClassCodes && profile.deletedClassCodes[normCode]) {
               delete profile.deletedClassCodes[normCode];
             }
-            var mapelNames = FiezelTeacherStore.MAPEL_NAMES || {};
-            var subName = mapelNames[session.subjectId] || session.subjectId || t('guru.kelas-mapel-tanpa-nama', 'Matematika');
-            var clsTitle = (session.institution ? session.institution + ' — ' : '') + subName;
-            var autoCls = FiezelTeacherStore.newClass(clsTitle, session.gradeId || 'SMP', session.subjectId || 'MAT');
+            var clsTitle = (session.institution ? session.institution + ' — ' : '') + officialSubName;
+            var autoCls = FiezelTeacherStore.newClass(clsTitle, session.gradeId || 'SMP', officialSub);
             autoCls.code = normCode;
             profile.classes.unshift(autoCls);
             profile.activeClassId = autoCls.id;
