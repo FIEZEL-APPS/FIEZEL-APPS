@@ -460,6 +460,17 @@
     'kelas.misi-adaptif-sub': 'Jalur yang menyesuaikan diri: pemanasan, contoh, latihan, lalu tantangan — dengan petunjuk saat kamu tersendat dan pengulangan terjadwal supaya tidak cepat lupa.',
     'guru.konsol-kurikulum-judul': 'Buka Konsol Kurikulum & Kompetensi',
     'guru.konsol-kurikulum-sub': 'Rekomendasi mengajar harian, matriks ketuntasan per tujuan pembelajaran, bank soal, kuis 1-klik, dan draf narasi e-Rapor.',
+    'kelas.tugas-kurikulum-judul': 'Tugas dari Kurikulum',
+    'kelas.tugas-kurikulum-sub': 'Dikirim gurumu lewat konsol kurikulum. Dikerjakan di layar Misi Belajar Adaptif.',
+    'kelas.tugas-kurikulum-kicker': 'Kurikulum',
+    'kelas.tugas-kurikulum-sedang': 'Sedang dikerjakan',
+    'kelas.tugas-kurikulum-baru': 'Belum dimulai',
+    'kelas.tugas-kurikulum-target': 'Target: {target}',
+    'kelas.tanpa-tenggat': 'Tanpa tenggat',
+    'kelas.kerjakan': 'Kerjakan',
+    'kelas.misi-sumber': 'Misi Kurikulum',
+    'kelas.hasil-dikirim-guru': 'Hasil ini dikirim ke {guru} — termasuk soal yang perlu diulang.',
+    'kelas.hasil-misi-mandiri': 'Tersimpan di Paspor Kompetensimu. Ini misi yang kamu pilih sendiri, jadi ia tidak dilaporkan sebagai tugas dari guru.',
     'guru.kelas-mapel-tanpa-nama': 'Kelas'
   });
 }());

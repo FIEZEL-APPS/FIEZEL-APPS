@@ -130,7 +130,8 @@
     var p = assignments().map(function (a) { return a.id + ':' + (a.itemIds ? a.itemIds.length : 0) + ':' + (a.deadline || ''); }).join(',');
     var d = subs().map(function (s) { return s.id + ':' + (s.at || 0) + ':' + (s.c || 0) + '/' + (s.t || 0); }).join(',');
     var run = u.runner ? (u.runner.aid + ':' + u.runner.idx + ':' + u.runner.finished + ':' + (u.runner.chosen != null ? u.runner.chosen : '')) : '';
-    return (u.tab || '') + '|' + (u.curriculumView || '') + '|' + (u.review || '') + '|' + (u.editCode ? '1' : '0') + '|' + (u.filterSubject || '') + '|' + (Array.isArray(u.classTeachers) ? u.classTeachers.length : 0) + '|' + (classCode() || '') + '|' + (teacherName() || '') + '|' + p + '|' + d + '|' + run + '|' + studentDraftCode;
+    var ci = ''; try { var Mi = CI(); if (Mi) { var sn = Mi.snapshot(); ci = (sn.missions || []).map(function (m) { return m.id + ':' + (m.started ? 1 : 0) + ':' + (m.finished ? 1 : 0); }).join(','); } } catch (_) {}
+    return ci + '|' + (u.tab || '') + '|' + (u.curriculumView || '') + '|' + (u.review || '') + '|' + (u.editCode ? '1' : '0') + '|' + (u.filterSubject || '') + '|' + (Array.isArray(u.classTeachers) ? u.classTeachers.length : 0) + '|' + (classCode() || '') + '|' + (teacherName() || '') + '|' + p + '|' + d + '|' + run + '|' + studentDraftCode;
   }
   function ui() { if (!sUi) { sUi = readJson(UI_KEY, {}); sUi.tab = sUi.tab || 'tugas'; sUi.runner = sUi.runner || null; } return sUi; }
   function saveUi() { writeJson(UI_KEY, sUi); }
@@ -325,6 +326,13 @@
     if (pendingOpen) { var id = pendingOpen; pendingOpen = null; if (openAssignment(id)) return; }
     resumeFocus();
     try { fetchClassTeachers(); } catch (_) {}
+    /* Kabar kurikulum diambil paling banyak sekali per lima menit (lihat perluRefresh),
+       dan kegagalannya berakhir sebagai daftar kosong — tab Tugas tidak boleh bergantung
+       pada layanan lain yang hidup. */
+    try {
+      var M = CI();
+      if (M && M.perluRefresh()) M.refresh().then(function () { renderStudent({ quiet: true }); }).catch(function () {});
+    } catch (_) {}
     renderStudent();
   }
   function unmountStudent() { if (timerTick) clearInterval(timerTick); timerTick = null; unbindFocus(); sEl = null; pendingStudentRender = false; lastStudentPaintKey = null; lastStudentDataFp = null; }
@@ -484,7 +492,7 @@
     try { if (root.FiezelExamLock) root.FiezelExamLock.end('assignment'); } catch (_) {}
     if (ui().focus && FG()) { var fst = ui().focus; if (fst.awaySince) FG().back(fst, Date.now()); focus = FG().payload(fst, Date.now()); }
     unbindFocus();
-    var res = null; try { res = LF() ? LF().recordAssignmentResult({ id: a.id, title: a.title, skill: a.skills[0], mode: a.mode, minutes: Math.round((Date.now() - r.startedAt) / 60000), results: r.answers, focus: focus }) : null; } catch (_) {}
+    var res = null; try { res = LF() ? LF().recordAssignmentResult({ id: a.id, title: a.title, skill: a.skills[0], mode: a.mode, minutes: Math.round((Date.now() - r.startedAt) / 60000), results: r.answers, focus: focus, selfDirected: !!a.isMission }) : null; } catch (_) {}
     var correct = r.answers.filter(function (x) { return x.correct; }).length;
     var sub = { id: a.id, title: a.title, from: a.from, teacher: a.teacher || '', cls: a.cls || classCode(), skills: a.skills, mode: a.mode, deadline: a.deadline || null, at: Date.now(), c: correct, t: r.answers.length, results: r.answers, itemIds: a.itemIds, items: a.items || undefined, unitId: a.unitId || undefined, sent: !!res };
     var list = subs().filter(function (x) { return x.id !== a.id; }); list.push(sub); writeJson(SUB_KEY, list.slice(-30));
@@ -592,6 +600,43 @@
         '<button type="button" class="ch-btn is-primary" data-ch="open-curriculum" data-testid="class-open-curriculum">' + icon('compass') + ' ' + esc(t('kelas.buka-misi', 'Buka Misi Belajar')) + ' ' + icon('arrow-right') + '</button>' +
         '<button type="button" class="ch-btn is-ghost" data-ch="open-passport" data-testid="class-open-passport">' + icon('award') + ' ' + esc(t('kelas.paspor-belajar', 'Paspor Belajar')) + '</button>' +
       '</div>' +
+    '</section>';
+  }
+
+  /* ===== TUGAS DARI KURIKULUM (m025-349, temuan X4) =====================================
+     Kuis yang guru terbitkan dari konsol Kurikulum & Kompetensi hidup di backend
+     kurikulum, dan sampai gelombang ini tidak ada satu pun layar murid yang melihatnya.
+     Bagian ini membawa KABARNYA ke tempat murid benar-benar mencari tugas, lalu
+     menyerahkan pengerjaannya ke misi.html — mesin yang memang bisa menjalankannya.
+     Alasan lengkap kenapa isinya tidak disalin menjadi tugas lokal ada di
+     features/curriculum/fiezel-curriculum-inbox.js. */
+  function CI() { return root.FiezelCurriculumInbox; }
+  function curriculumInboxSection() {
+    var M = CI();
+    if (!M || !M.siap()) return '';
+    var snap = M.snapshot();
+    var list = (snap.missions || []).filter(function (m) { return !m.finished; });
+    if (!list.length) return '';
+    return '<section class="ch-curriculum-inbox" data-testid="class-curriculum-inbox">' +
+      '<h2 class="ch-h2">' + esc(t('kelas.tugas-kurikulum-judul', 'Tugas dari Kurikulum')) + ' <small>' + list.length + '</small></h2>' +
+      '<p class="ch-muted ch-small">' + esc(t('kelas.tugas-kurikulum-sub', 'Dikirim gurumu lewat konsol kurikulum. Dikerjakan di layar Misi Belajar Adaptif.')) + '</p>' +
+      list.map(function (m) {
+        return '<a class="ch-card ch-assign ch-curriculum-task" href="./misi.html" data-testid="class-curriculum-task-' + esc(m.id) + '">' +
+          '<div class="ch-card-top">' +
+            '<span class="ch-from">' + icon('compass') + ' ' + esc(m.typeLabel || t('kelas.tugas-kurikulum-kicker', 'Kurikulum')) + '</span>' +
+            (m.started
+              ? '<span class="ch-status is-sedang">' + esc(t('kelas.tugas-kurikulum-sedang', 'Sedang dikerjakan')) + '</span>'
+              : '<span class="ch-status is-belum">' + esc(t('kelas.tugas-kurikulum-baru', 'Belum dimulai')) + '</span>') +
+          '</div>' +
+          '<h3>' + esc(m.title) + '</h3>' +
+          (m.goals.length ? '<p class="ch-muted ch-small">' + esc(t('kelas.tugas-kurikulum-target', 'Target: {target}', { target: m.goals.join(' · ') })) + '</p>' : '') +
+          '<div class="ch-card-foot">' +
+            '<span class="ch-deadline">' + icon('calendar') + ' ' +
+              (m.deadline ? esc(deadlineText({ deadline: m.deadline })) : esc(t('kelas.tanpa-tenggat', 'Tanpa tenggat'))) + '</span>' +
+            '<span class="ch-btn is-primary">' + esc(m.started ? t('umum.lanjutkan', 'Lanjutkan') : t('kelas.kerjakan', 'Kerjakan')) + ' ' + icon('arrow-up-right') + '</span>' +
+          '</div>' +
+        '</a>';
+      }).join('') +
     '</section>';
   }
 
@@ -711,6 +756,7 @@
     return '<div class="ch-body">' +
       teacherGreetingCard() +
       subjectPanelsSection(allPend, allDone) +
+      curriculumInboxSection() +
       curriculumCard() +
       '<section><h2 class="ch-h2">' + esc(t('kelas.perlu-dikerjakan', 'Perlu dikerjakan')) + ' <small>' + filteredPend.length + (curFilter ? ' (filter aktif)' : '') + '</small></h2>' + (filteredPend.length ? filteredPend.map(function (a) { return assignCard(a, true); }).join('') : '<div class="ch-empty" data-testid="class-empty-pending">' + icon('inbox') + (curFilter ? '<p>' + esc(t('kelas.filter-mapel-kosong', 'Belum ada tugas untuk mapel ini.')) + ' <button type="button" class="ch-btn is-small is-ghost" data-ch="clear-subject-filter">' + esc(t('kelas.filter-tampilkan-semua', 'Tampilkan Semua')) + '</button></p>' : (classCode() ? '<p>' + t('kelas.murid-belum-ada-tugas', 'Belum ada tugas baru dari guru. Tugas yang dikirim guru muncul di sini dan di lonceng notifikasi.') + '</p>' : '') + (classCode() ? '' : '<button type="button" class="ch-btn" data-ch="tab" data-tab="kelas"><span class="kelasku-wordmark">Masukkan kode KelasKu</span></button>')) + '</div>') + '</section>' +
       '<section><h2 class="ch-h2">' + esc(t('umum.selesai', 'Selesai')) + ' <small>' + filteredDone.length + '</small></h2>' + (filteredDone.length ? filteredDone.map(function (a) { return assignCard(a, false); }).join('') : '') + '</section></div>';
@@ -856,8 +902,13 @@
       id: assignId,
       unitId: u.id,
       title: u.title,
-      from: 'Kurikulum Merdeka',
-      teacher: 'Kurikulum Merdeka · ' + (u.genre || 'English'),
+      /* BUKAN GURU (m025-349, temuan X5). Kode lama memasang 'Kurikulum Merdeka · English'
+         sebagai nama guru, sehingga layar hasil berbunyi "Hasil ini dikirim ke Kurikulum
+         Merdeka · English" — seorang guru yang tidak ada — dan jurnal murid mencatat
+         inisiatif belajar mandirinya sebagai tugas yang diberikan guru. `teacher` kini
+         dikosongkan dan `isMission` yang menentukan naskahnya. */
+      from: t('kelas.misi-sumber', 'Misi Kurikulum'),
+      teacher: '',
       skills: [u.genre || 'curriculum'],
       mode: 'latihan',
       deadline: null,
@@ -1033,7 +1084,7 @@
   }
   function runnerView() {
     var r = ui().runner;
-    if (r.finished) { var res = r.result; return '<div class="ch-body"><section class="ch-card ch-result" data-testid="class-result"><p class="ch-kicker">' + t('umum.selesai', 'Selesai') + '</p><h2>' + esc(res.title) + '</h2><p class="ch-score">' + res.c + '<small>/' + res.t + '</small></p><p class="ch-muted">' + icon('send') + ' Hasil ini dikirim ke <b>' + esc(res.teacher || 'guru') + '</b> — termasuk soal yang perlu diulang.</p><div class="ch-actions"><button type="button" class="ch-btn is-primary" data-ch="review" data-id="' + esc(r.aid) + '">Lihat pembahasan</button><button type="button" class="ch-btn is-ghost" data-ch="close-runner">' + t('kelas.kembali-ke-tugas', 'Kembali ke Tugas') + '</button></div></section></div>'; }
+    if (r.finished) { var res = r.result; return '<div class="ch-body"><section class="ch-card ch-result" data-testid="class-result"><p class="ch-kicker">' + t('umum.selesai', 'Selesai') + '</p><h2>' + esc(res.title) + '</h2><p class="ch-score">' + res.c + '<small>/' + res.t + '</small></p><p class="ch-muted">' + (res.teacher ? icon('send') + ' ' + esc(t('kelas.hasil-dikirim-guru', 'Hasil ini dikirim ke {guru} — termasuk soal yang perlu diulang.', { guru: res.teacher })) : icon('award') + ' ' + esc(t('kelas.hasil-misi-mandiri', 'Tersimpan di Paspor Kompetensimu. Ini misi yang kamu pilih sendiri, jadi ia tidak dilaporkan sebagai tugas dari guru.'))) + '</p><div class="ch-actions"><button type="button" class="ch-btn is-primary" data-ch="review" data-id="' + esc(r.aid) + '">Lihat pembahasan</button><button type="button" class="ch-btn is-ghost" data-ch="close-runner">' + t('kelas.kembali-ke-tugas', 'Kembali ke Tugas') + '</button></div></section></div>'; }
     var a = currentAssignment();
     if (!a) { ui().runner = null; saveUi(); return tugasView(assignments(), subs()); }
     while (r.idx < r.order.length && !resolveItem(a, a.itemIds[r.order[r.idx]])) r.idx += 1;

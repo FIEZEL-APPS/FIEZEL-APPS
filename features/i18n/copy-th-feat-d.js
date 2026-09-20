@@ -455,6 +455,17 @@
     'kelas.misi-adaptif-sub': 'เส้นทางที่ปรับตามตัวคุณ: อุ่นเครื่อง ตัวอย่าง แบบฝึกหัด แล้วจึงถึงโจทย์ท้าทาย พร้อมคำใบ้เมื่อคุณติดขัด และการทบทวนตามกำหนดเพื่อไม่ให้ลืมเร็ว',
     'guru.konsol-kurikulum-judul': 'เปิดคอนโซลหลักสูตรและสมรรถนะ',
     'guru.konsol-kurikulum-sub': 'คำแนะนำการสอนประจำวัน ตารางความสำเร็จรายจุดประสงค์การเรียนรู้ คลังข้อสอบ แบบทดสอบคลิกเดียว และร่างคำบรรยาย e-Rapor',
+    'kelas.tugas-kurikulum-judul': 'งานจากหลักสูตร',
+    'kelas.tugas-kurikulum-sub': 'ครูของคุณส่งมาผ่านคอนโซลหลักสูตร ทำได้ที่หน้าภารกิจการเรียนรู้แบบปรับตัว',
+    'kelas.tugas-kurikulum-kicker': 'หลักสูตร',
+    'kelas.tugas-kurikulum-sedang': 'กำลังทำอยู่',
+    'kelas.tugas-kurikulum-baru': 'ยังไม่เริ่ม',
+    'kelas.tugas-kurikulum-target': 'เป้าหมาย: {target}',
+    'kelas.tanpa-tenggat': 'ไม่มีกำหนดส่ง',
+    'kelas.kerjakan': 'ทำเลย',
+    'kelas.misi-sumber': 'ภารกิจหลักสูตร',
+    'kelas.hasil-dikirim-guru': 'ผลนี้ถูกส่งไปยัง {guru} แล้ว รวมถึงข้อที่ต้องทบทวนซ้ำ',
+    'kelas.hasil-misi-mandiri': 'บันทึกไว้ในพาสปอร์ตสมรรถนะของคุณแล้ว นี่คือภารกิจที่คุณเลือกเอง จึงไม่ถูกรายงานเป็นงานจากครู',
     'guru.kelas-mapel-tanpa-nama': 'ชั้นเรียน'
   });
 }());

@@ -597,6 +597,21 @@ body.reduce-motion .ch-student,body.reduce-motion .ch-body,body.reduce-motion .c
   color: var(--ch-muted);
   font-weight: 600;
 }
+/* Tugas dari Kurikulum (m025-349, temuan X4). Kartunya MENINGGALKAN halaman ini menuju
+   misi.html, jadi ia memakai aksen kiri yang sama dengan pintu adaptif di bawah — bukan
+   supaya menonjol, melainkan supaya murid tahu ketukan ini berpindah layar. Bentuknya
+   tetap kartu tugas biasa: ia memang tugas, dan tempatnya memang di sini. */
+.ch-curriculum-inbox { display: flex; flex-direction: column; gap: 10px; }
+.ch-curriculum-inbox > .ch-h2 { margin-bottom: 0; }
+.ch-curriculum-inbox > .ch-small { margin: -4px 0 4px; }
+.ch-curriculum-task {
+  display: block;
+  text-decoration: none;
+  border-left: 3px solid var(--ch-accent);
+}
+.ch-curriculum-task:hover,
+.ch-curriculum-task:focus-visible { transform: translateY(-1px); }
+
 /* Pintu ke misi adaptif (misi.html). Ia MENINGGALKAN halaman ini, jadi ia tidak boleh
    menyamar sebagai tab: diberi aksen kiri supaya terbaca sebagai jalan keluar, bukan
    sebagai salah satu kartu misi di bawahnya. (m025-349, temuan X3.) */

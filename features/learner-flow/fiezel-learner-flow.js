@@ -389,7 +389,12 @@
     if (!res || !res.id || !Array.isArray(res.results)) return null; var s = ensureState(), B = bank();
     var correct = res.results.filter(function (r) { return r.correct; }).length;
     res.results.forEach(function (r) { record(s, r.skill || res.skill || 'grammar', !!r.correct); });
-    var meta = B && B.SKILLS[res.skill]; s.lessons.push({ at: Date.now(), skill: res.skill, area: meta ? meta.area : (res.skill || 'grammar'), kind: res.mode === 'ujian' ? 'Ujian dari guru' : t('flow.tugas-guru', 'Tugas dari guru'), title: res.title, correct: correct, total: res.results.length, minutes: res.minutes || 0 });
+    /* `selfDirected` (m025-349, temuan X5): misi kurikulum yang DIPILIH SENDIRI murid
+       bukan tugas dari guru, dan tidak boleh dicatat sebagai tugas dari guru — tidak di
+       jurnal murid, dan terutama tidak di laporan yang dibaca gurunya. Pemanggil lama
+       yang tidak mengirim ruas ini tidak berubah artinya. */
+    var mandiri = !!res.selfDirected;
+    var meta = B && B.SKILLS[res.skill]; s.lessons.push({ at: Date.now(), skill: res.skill, area: meta ? meta.area : (res.skill || 'grammar'), kind: mandiri ? t('flow.misi-mandiri', 'Misi kurikulum (pilihan sendiri)') : (res.mode === 'ujian' ? 'Ujian dari guru' : t('flow.tugas-guru', 'Tugas dari guru')), title: res.title, correct: correct, total: res.results.length, minutes: res.minutes || 0 });
     var wrong = res.results.filter(function (r) { return !r.correct; }).slice(0, 40).map(function (r) { return { i: String(r.itemId).slice(0, 40), o: Number(r.chosen) >= 0 ? Number(r.chosen) : 0 }; });
     var entry = { id: res.id, at: Date.now(), c: correct, t: res.results.length }; if (wrong.length) entry.w = wrong;
     // Catatan keluar layar milik sesi ini ikut ke hasil akhir; tanpa penggabungan ini,
@@ -398,9 +403,15 @@
     var prevFocus = (s.doneAssign || []).filter(function (x) { return x.id === res.id; })[0];
     if (res.focus && Number(res.focus.n) > 0) entry.f = { n: Math.round(Number(res.focus.n) || 0), s: Math.round(Number(res.focus.s) || 0), x: Math.round(Number(res.focus.x) || 0) };
     else if (prevFocus && prevFocus.f) entry.f = prevFocus.f;
-    s.doneAssign = (s.doneAssign || []).filter(function (x) { return x.id !== res.id; }).concat([entry]).slice(-8);
-    if (s.plan && s.plan.done.indexOf('assign-' + res.id) === -1) s.plan.done.push('assign-' + res.id);
-    try { localStorage.setItem(ASSIGN_KEY, JSON.stringify(loadAssignments().filter(function (a) { return a.id !== res.id; }))); } catch (_) {}
+    /* `doneAssign` adalah persis yang dikirim ke guru (lihat tutorCode: `assign`). Misi
+       mandiri tidak masuk ke sana: guru yang membaca laporan berhak yakin bahwa setiap
+       baris di situ adalah tugas yang IA kirim. Peta skill dan jurnal tetap terisi —
+       yang tidak terjadi hanyalah pengakuan palsu atas penugasan. */
+    if (!mandiri) {
+      s.doneAssign = (s.doneAssign || []).filter(function (x) { return x.id !== res.id; }).concat([entry]).slice(-8);
+      if (s.plan && s.plan.done.indexOf('assign-' + res.id) === -1) s.plan.done.push('assign-' + res.id);
+      try { localStorage.setItem(ASSIGN_KEY, JSON.stringify(loadAssignments().filter(function (a) { return a.id !== res.id; }))); } catch (_) {}
+    }
     save(s); pushToClass();
     return { correct: correct, total: res.results.length, entry: entry };
   }
