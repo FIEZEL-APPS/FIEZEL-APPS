@@ -1,7 +1,7 @@
 {
-  "version": "m025-347",
+  "version": "m025-348",
   "claimedBy": "branch main",
-  "claimedAt": "2026-09-20T11:35:09.011Z",
-  "reason": "fix(sync): 6-char unique class code and bulletproof class claim sync",
+  "claimedAt": "2026-09-20T12:01:17.592Z",
+  "reason": "feat(teacher): humanize assign modal with question bank viewer and quick picks",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }
