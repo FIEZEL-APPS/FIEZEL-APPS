@@ -235,6 +235,8 @@
     'umum.riwayat': 'Riwayat',
     'umum.notifikasi': 'Notifikasi',
     'umum.belum-ada-data': 'Belum ada data.',
-    'umum.muat-ulang': 'Muat Ulang'
+    'umum.muat-ulang': 'Muat Ulang',
+    'umum.lanjutkan': 'Lanjutkan',
+    'flow.misi-mandiri': 'Misi kurikulum (pilihan sendiri)'
   });
 }());

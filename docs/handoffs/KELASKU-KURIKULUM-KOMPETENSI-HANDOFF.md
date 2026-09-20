@@ -15,7 +15,7 @@ mengikuti lima gelombang di laporan audit.
 |---|---|---|
 | **1 — kejujuran layar** | K1, K2, K4, K8, K9, K14, G5, F5 (jalan cepat) | **SELESAI** · `m025-349` |
 | **2 — pintu** | X2, X3, K10, G1 | **SELESAI** · `m025-349` |
-| **3 — satu buku kompetensi** | X4, X5, F1 | belum |
+| **3 — satu buku kompetensi** | X4, X5, F1 (sebagian) | **SELESAI** · `m025-349` |
 | **4 — alat, bukan rapor** | F3, F4, F6, K3, K5, K6, K11, K13 | belum |
 | **5 — jangkauan** | A1–A5, G2–G4, G6–G10, K12, F7–F10 | belum |
 
@@ -68,18 +68,41 @@ program ini dimulai.
    `potretIsian()`/`pulihkanIsian()` adalah yang membuat kotak "Tempel Banyak Soal" aman.
    Menghapusnya mengembalikan G1.
 
+10. **Kotak masuk kurikulum membawa KABAR, bukan ISI.** `fiezel-curriculum-inbox.js`
+    sengaja TIDAK menulis ke `fiezel-learner-assignments-v1`. Soal asesmen kurikulum hidup
+    di server dan dipilih adaptif per murid saat sesi berjalan; menyalinnya menjadi tugas
+    lokal membuat kartu yang, begitu diketuk, membuka runner yang tidak menemukan satu soal
+    pun. Kartunya menyerahkan pengerjaan ke `misi.html`.
+
+11. **Kotak masuk itu gagal dengan diam.** Backend kurikulum adalah layanan terpisah yang
+    bisa mati. Tab Tugas berisi tugas dari jalur KelasKu dan tidak boleh pecah karenanya:
+    setiap kegagalan berakhir sebagai daftar kosong, dan daftar kosong berarti bagiannya
+    tidak dicetak sama sekali.
+
+12. **`doneAssign` hanya untuk tugas yang benar-benar dikirim guru.** Ia adalah persis yang
+    terkirim ke guru (lihat `tutorCode`: ruas `assign`). Misi mandiri memakai
+    `selfDirected: true` dan tidak masuk ke sana — peta skill dan jurnal tetap terisi; yang
+    tidak terjadi hanyalah pengakuan palsu atas penugasan.
+
+## Yang BELUM selesai dari X4, dan kenapa
+
+Separuh X4 yang lain — **bukti murid dari misi in-app mengalir ke cakupan guru** — sengaja
+TIDAK dikerjakan, dan bukan karena kehabisan waktu.
+
+Misi in-app berjalan di atas 15 unit statis `fiezel-teacher-curriculum.js`. Unit-unit itu
+tidak punya `tp_id` maupun `competency_id` server; matriks cakupan guru dikunci pada TP dan
+pada butir soal yang hidup di bank server. Tidak ada pemetaan jujur di antara keduanya, dan
+mengarang pemetaan berarti mengirim bukti palsu ke layar yang dipakai guru untuk memutuskan
+siapa yang perlu remedial. Bukti palsu lebih buruk daripada tidak ada bukti.
+
+Jalan keluarnya bukan jembatan, melainkan arah: pekerjaan kurikulum yang BERBUKTI dikerjakan
+lewat `misi.html`, yang memang menulis ke buku server; paspor lokal tetap jadi catatan
+latihan mandiri. Pintu di Gelombang 2 (X3) dan kotak masuk di Gelombang 3 (X4) dua-duanya
+mendorong ke arah itu. F1 penuh baru bisa ditutup kalau unit statis itu diberi padanan TP
+server — pekerjaan konten, bukan pekerjaan kode.
+
 ## Langkah berikutnya (roadmap)
 
-Gelombang 3 — **satu buku kompetensi**. Terberat, dan prasyarat semua yang bermakna di
-Gelombang 4.
-
-- **X4** — paspor murid hidup di localStorage, cakupan guru hidup di server, dan keduanya
-  tidak pernah bertemu. Kuis yang guru terbitkan dari konsol tidak pernah mendarat di tab
-  Tugas KelasKu: penulis `fiezel-learner-assignments-v1` di seluruh repo hanya
-  `fiezel-teacher-store.js` dan `fiezel-tutor-action-center.js`, tak satu pun dari jalur
-  kurikulum.
-- **X5** — misi mandiri murid dilaporkan ke guru sebagai "Tugas dari guru", dengan "guru"
-  bernama *Kurikulum Merdeka · English* yang tidak ada.
-- **F1** — satu sumber kebenaran penguasaan yang dibaca keempat permukaan.
-
-Sesudahnya Gelombang 4 (alat, bukan rapor) dan Gelombang 5 (jangkauan).
+Gelombang 4 — **alat, bukan rapor**: F3 (paspor per sub-bab + "latih yang merah saja"),
+F4 (retensi & jadwal ulang), F6 (kartu "Target minggu ini"), K3, K5, K6, K11, K13.
+Sesudahnya Gelombang 5 (jangkauan): A1–A5, G2–G4, G6–G10, K12, F7–F10.

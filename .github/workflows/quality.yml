@@ -242,6 +242,11 @@ jobs:
           # dan konsol guru memotret-lalu-memulihkan isian saat mengecat ulang. Temuan
           # X2/X3/K10/G1 reports/AUDIT-UIUX-KELASKU-KURIKULUM-KOMPETENSI-2026-09-20.md.
           node tests/kurikulum-pintu-test.js
+          # Kuis yang guru terbitkan dari konsol kurikulum sampai ke tab Tugas KelasKu, dan
+          # misi mandiri murid tidak menyamar jadi tugas guru di laporan yang dibaca guru.
+          # Termasuk: jembatannya gagal-diam, dan TIDAK menulis asesmen server ke kunci
+          # tugas lokal. Temuan X4/X5 audit KelasKu 2026-09-20.
+          node tests/kurikulum-satu-buku-test.js
           node tests/question-allocator-test.js
           node tests/bankor-latihan-test.js
           node tests/fiezel-stat-gate-test.js

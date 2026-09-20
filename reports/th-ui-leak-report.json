@@ -1,6 +1,6 @@
 {
   "schema": "fiezel-th-ui-leak-v1",
-  "generatedAt": "2026-09-20T19:30:18.177Z",
+  "generatedAt": "2026-09-20T19:35:31.932Z",
   "files": {
     "app.js": {
       "leaks": 3,
@@ -99,23 +99,23 @@
       "budget": 5,
       "sample": [
         {
-          "line": 505,
+          "line": 513,
           "text": "Tugas disimpan sebagai"
         },
         {
-          "line": 505,
+          "line": 513,
           "text": ". Lanjutkan kapan saja."
         },
         {
-          "line": 572,
+          "line": 580,
           "text": "Latihan ·"
         },
         {
-          "line": 1160,
+          "line": 1211,
           "text": "Latihan · ±"
         },
         {
-          "line": 1182,
+          "line": 1233,
           "text": "Latihan — umpan balik tiap soal"
         }
       ]
@@ -464,8 +464,8 @@
     }
   },
   "copyKeys": {
-    "id": 2906,
-    "th": 2908,
+    "id": 2919,
+    "th": 2921,
     "idTanpaTh": 0
   },
   "pass": true
