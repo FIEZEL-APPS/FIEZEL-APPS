@@ -55,6 +55,10 @@
     './features/i18n/copy-th-classjoin.js',
     './features/i18n/copy-th-google.js',
     './features/i18n/copy-th-pawarena.js',
+    // m025-349: kembaran th naskah hak akses (free/pro/sekolah). Layar yang meminta
+    // uang adalah layar paling mahal untuk salah bahasa - murid th harus membacanya
+    // dalam bahasanya sendiri, bukan jatuh ke Indonesia.
+    './features/i18n/copy-th-monetization.js',
     './features/i18n/naskah-th-brain.js'
   ];
   var GRAMMAR_TH = './grammar-explanations-th.json';

@@ -106,7 +106,23 @@
     /* "Peran tutor (minimal): kode kelas + progres murid read-only (Fase 4,
        KONDISIONAL)." Kondisional = belum dinyalakan. Lapisannya sudah ada di
        features/tutor-action-center; benderanya menunggu Fase 4. */
-    tutorRole: false
+    tutorRole: false,
+    /* m025-349: PENEGAKAN hak akses (batas 3 sesi/hari, kunci B1-C2, suara neural,
+       sertifikat). Mesinnya utuh dan diuji di tests/monetization-entitlement-test.js;
+       yang mati di sini adalah PINTUNYA.
+
+       KENAPA MATI SAAT MENDARAT. Alur pembayaran belum ada. Menyalakan bendera ini hari
+       ini berarti memagari B1-C2 untuk SELURUH murid yang sudah memakai FIEZEL, tanpa
+       satu pun jalan untuk membayar - itu bukan monetisasi, itu pemadaman. Murid yang
+       kemarin belajar B2 akan membuka aplikasi dan menemukan pintunya hilang, dan satu-
+       satunya tombol yang kita tawarkan tidak menuju ke mana-mana.
+
+       SYARAT MENYALAKAN, ketiganya sekaligus: (1) alur pembayaran Pro benar-benar bisa
+       menerima uang, (2) rute verifikasi kode kelas ada sehingga murid sekolah tidak
+       ikut terkunci (lihat header fiezel-entitlement.js), (3) naskah Thai sudah direview
+       penutur asli. Sebelum ketiganya ada, mesin tetap MENGHITUNG dan MENCATAT dalam
+       diam - jadi saat bendera dinaikkan, angkanya sudah teruji di lapangan. */
+    monetizationEnforce: false
   };
 
   /* HIDUP = permukaan baru yang diminta owner di bagian TAMBAH/PERBAIKI. Bendera

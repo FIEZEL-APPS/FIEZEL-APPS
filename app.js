@@ -17,7 +17,7 @@ const APP_VERSION=self.FIEZEL_VERSION||'5.19.0';
    FIEZEL_UX_FLAGS milik berkas benderanya, kunci demi kunci, dan MERAH kalau
    keduanya menyimpang satu nilai pun. Jadi ini duplikasi berpagar, bukan dua
    sumber kebenaran yang saling bersaing. */
-const UX_FALLBACK_FLAGS={curriculumConsole:true,scenePhases:false,skillExams:false,skillsLabDestination:false,personalJourneyTab:false,voicePackGate:false,tutorRole:false,todayHome:true,fourTabNav:true,leanIntro:true,placementLite:true,sessionSummary:true,funnelTelemetry:true};
+const UX_FALLBACK_FLAGS={curriculumConsole:true,scenePhases:false,skillExams:false,skillsLabDestination:false,personalJourneyTab:false,voicePackGate:false,tutorRole:false,todayHome:true,fourTabNav:true,leanIntro:true,placementLite:true,sessionSummary:true,funnelTelemetry:true,monetizationEnforce:false};
 /* Nama tak dikenal -> false di KEDUA jalur: salah ketik mematikan fitur (aman),
    bukan menyalakannya diam-diam. */
 function uxOn(flag){
@@ -981,7 +981,9 @@ function gemsCore(){try{return self.FiezelGems||null}catch(_){return null}}
 function defaultGems(){const g=gemsCore();return g?g.freshGems():{schema:'fiezel-gems-v1',balance:0,earnedTotal:0,spentTotal:0,ledger:[]}}
 function sanitizeGemsState(raw){const g=gemsCore();return g?g.sanitizeGems(raw):defaultGems()}
 function gemsBalance(){return Math.max(0,Math.floor(Number(state?.gems?.balance)||0))}
-const defaultState={version:APP_VERSION,stateRevision:0,ownerUuid:'',userName:DEFAULT_USER_NAME,view:'home',level:1,placementDone:false,placementBandLevel:1,placementBands:null,totalAnswered:0,totalCorrect:0,totalTimeMs:0,history:[],wrongAnswers:[],vocab:{},grammar:{},reading:{},daily:{date:'',count:0,attempts:0,meaningful:false},streak:0,adaptiveReady:false,adaptiveReadyByLevel:{},confidenceHistory:[],learningDays:[],sessionHistory:[],activeSession:null,inflightAttempt:null,pendingInterruptNotice:'',preferences:defaultPreferences,levelTrust:{schema:'fiezel-level-trust-v1',verified:'A1',locked:false,probation:{level:'',mistakesByLevel:{},startedAt:0,lastMistakeAt:0},exams:{},demotions:[],pendingNotice:null},reportMeta:defaultReportMeta,reminderMeta:{lastNotificationAt:0,lastNotificationDay:'',lastNotificationKind:'',lastMessageIndex:-1,lastPositiveDay:'',evidenceLog:[]},adaptivePolicyMeta:{lastPolicy:null,lastSource:'',lastAt:0,history:[]},policyOutcomeMeta:{last:null,history:[],queue:[]},contentCanaryMeta:{schema:'fiezel-content-canary-evidence-v1',canaryId:'',exposureSessions:0,targetAttempts:0,targetCorrect:0,targetIncorrect:0,controlAttempts:0,controlCorrect:0,controlIncorrect:0,canaryAttempts:0,canaryCorrect:0,canaryIncorrect:0,promotedAttempts:0,promotedCorrect:0,promotedIncorrect:0,promotionLedger:[],lastExposureAt:'',lastOutcomeAt:'',rollbackCount:0,lastRollbackReason:'',privacy:{rawAnswersIncluded:false,rawHistoryIncluded:false}},coachCache:null,gems:defaultGems(),prasasti:{schema:'fiezel-prasasti-v1',earned:{}},ritualMeta:{lastDay:''},
+const defaultState={version:APP_VERSION,stateRevision:0,ownerUuid:'',userName:DEFAULT_USER_NAME,view:'home',level:1,placementDone:false,placementBandLevel:1,placementBands:null,totalAnswered:0,totalCorrect:0,totalTimeMs:0,history:[],wrongAnswers:[],vocab:{},grammar:{},reading:{},daily:{date:'',count:0,attempts:0,meaningful:false},streak:0,adaptiveReady:false,adaptiveReadyByLevel:{},confidenceHistory:[],learningDays:[],sessionHistory:[],activeSession:null,inflightAttempt:null,pendingInterruptNotice:'',preferences:defaultPreferences,levelTrust:{schema:'fiezel-level-trust-v1',verified:'A1',locked:false,probation:{level:'',mistakesByLevel:{},startedAt:0,lastMistakeAt:0},exams:{},demotions:[],pendingNotice:null},reportMeta:defaultReportMeta,reminderMeta:{lastNotificationAt:0,lastNotificationDay:'',lastNotificationKind:'',lastMessageIndex:-1,lastPositiveDay:'',evidenceLog:[]},adaptivePolicyMeta:{lastPolicy:null,lastSource:'',lastAt:0,history:[]},policyOutcomeMeta:{last:null,history:[],queue:[]},contentCanaryMeta:{schema:'fiezel-content-canary-evidence-v1',canaryId:'',exposureSessions:0,targetAttempts:0,targetCorrect:0,targetIncorrect:0,controlAttempts:0,controlCorrect:0,controlIncorrect:0,canaryAttempts:0,canaryCorrect:0,canaryIncorrect:0,promotedAttempts:0,promotedCorrect:0,promotedIncorrect:0,promotionLedger:[],lastExposureAt:'',lastOutcomeAt:'',rollbackCount:0,lastRollbackReason:'',privacy:{rawAnswersIncluded:false,rawHistoryIncluded:false}},coachCache:null,gems:defaultGems(),prasasti:{schema:'fiezel-prasasti-v1',earned:{}},ritualMeta:{lastDay:''},/* m025-349: catatan hak akses. pro/school diisi jalur
+  verifikasi (belum mendarat), ledger dihitung lokal. Kosong = murid gratis. */
+  entitlement:{schema:'fiezel-entitlement-v1',pro:null,school:null,ledger:{day:'',used:0,maxDay:''}},
 // m026-03: bendera tur BERSESI. Sebelumnya keputusan "sudah pernah lihat tur" tinggal di
 // localStorage['fiezel-tour-v1'] - satu kunci untuk seluruh aplikasi, di luar state, jadi ia
 // tidak ikut backup/restore DAN dibagi antar akun Puter di perangkat yang sama. Sekarang tiap
@@ -1436,9 +1438,26 @@ function sanitizeToursSeen(raw){
   if(src.menu===undefined&&legacyTourSeen())next.menu=true;
   return next;
 }
+/* m025-349: catatan hak akses disanitasi FAIL-CLOSED ke arah yang benar. Dua sisi punya
+   aturan berbeda, dan bedanya disengaja:
+     pro/school  hanya diterima sebagai objek; apa pun yang lain jadi null. State korup
+                 tidak boleh bisa MENCIPTAKAN langganan - itu arah yang mahal.
+     ledger      justru harus bertahan sekuat mungkin, karena membuangnya berarti
+                 mengisi ulang jatah 3 sesi. State korup tidak boleh jadi jalan reroll. */
+function sanitizeEntitlement(raw){
+  const E=(()=>{try{return self.FiezelEntitlement||null}catch(_){return null}})();
+  const src=raw&&typeof raw==='object'?raw:{};
+  const ledger=E?E.sanitizeLedger(src.ledger):(src.ledger&&typeof src.ledger==='object'?src.ledger:{day:'',used:0,maxDay:''});
+  return{
+    schema:E?E.SCHEMA:'fiezel-entitlement-v1',
+    pro:src.pro&&typeof src.pro==='object'?src.pro:null,
+    school:src.school&&typeof src.school==='object'?src.school:null,
+    ledger
+  };
+}
 function sanitizeState(raw){
   const rawPreferences=raw?.preferences||{},activeLevel=LEVELS.includes(String(rawPreferences.activeLevel||''))?String(rawPreferences.activeLevel):'';
-  const next={...defaultState,...raw,view:'home',ownerUuid:String(raw?.ownerUuid||'').replace(/[^A-Za-z0-9_-]/g,'').slice(0,128),vocab:raw?.vocab||{},grammar:raw?.grammar||{},reading:raw?.reading||{},history:Array.isArray(raw?.history)?raw.history.filter(h=>h&&typeof h==='object'):[],wrongAnswers:pruneCorruptedReviewEntries(raw?.wrongAnswers),confidenceHistory:Array.isArray(raw?.confidenceHistory)?raw.confidenceHistory:[],sessionHistory:Array.isArray(raw?.sessionHistory)?raw.sessionHistory:[],learningDays:Array.isArray(raw?.learningDays)?raw.learningDays:[],daily:raw?.daily&&typeof raw.daily==='object'?raw.daily:{date:'',count:0,attempts:0,meaningful:false},preferences:{...defaultPreferences,...rawPreferences,activeLevel,levelMode:activeLevel?'manual':'placement',selfAssessedLevel:LEVELS.includes(String(rawPreferences.selfAssessedLevel||''))?String(rawPreferences.selfAssessedLevel):'',timeZone:validTimeZone(rawPreferences.timeZone||defaultPreferences.timeZone),goalProfile:String(rawPreferences.goalProfile||defaultPreferences.goalProfile).slice(0,30),reportEndpoint:String(rawPreferences.reportEndpoint||DEFAULT_REPORT_ENDPOINT).trim(),/* m025-182 W2-STATE: enum tertutup — nilai korup/asing jatuh ke default 'id', bukan lolos mentah */learnerLocale:(self.FiezelI18n?.SUPPORTED||['id','th']).includes(rawPreferences.learnerLocale)?rawPreferences.learnerLocale:defaultPreferences.learnerLocale,/* fail-closed: apa pun selain true persis -> false. State korup tidak boleh bisa menyalakan pengiriman data. */brainSync:rawPreferences.brainSync===true},reportMeta:{...defaultReportMeta,...(raw?.reportMeta||{}),queue:Array.isArray(raw?.reportMeta?.queue)?raw.reportMeta.queue.slice(-8):[]},reminderMeta:{lastNotificationAt:0,lastNotificationDay:'',lastNotificationKind:'',lastMessageIndex:-1,lastPositiveDay:'',evidenceLog:[],...(raw?.reminderMeta||{}),evidenceLog:Array.isArray(raw?.reminderMeta?.evidenceLog)?raw.reminderMeta.evidenceLog.slice(-ALRS_EVIDENCE_LOG_LIMIT):[]},activeSession:raw?.activeSession&&typeof raw.activeSession==='object'?raw.activeSession:null,adaptivePolicyMeta:{lastPolicy:null,lastSource:'',lastAt:0,history:[],...(raw?.adaptivePolicyMeta||{}),history:Array.isArray(raw?.adaptivePolicyMeta?.history)?raw.adaptivePolicyMeta.history.slice(-30):[]},policyOutcomeMeta:{last:null,history:[],queue:[],...(raw?.policyOutcomeMeta||{}),history:Array.isArray(raw?.policyOutcomeMeta?.history)?raw.policyOutcomeMeta.history.slice(-POLICY_OUTCOME_LOG_LIMIT):[],queue:Array.isArray(raw?.policyOutcomeMeta?.queue)?raw.policyOutcomeMeta.queue.slice(-10):[]},contentCanaryMeta:CONTENT_CANARY?CONTENT_CANARY.sanitizeEvidence(raw?.contentCanaryMeta,CONTENT_CANARY_CONFIG?.canaryId||raw?.contentCanaryMeta?.canaryId||''):{...defaultState.contentCanaryMeta},coachCache:raw?.coachCache&&typeof raw.coachCache==='object'?raw.coachCache:null,levelTrust:sanitizeLevelTrust(raw?.levelTrust),gems:sanitizeGemsState(raw?.gems),toursSeen:sanitizeToursSeen(raw?.toursSeen)};
+  const next={...defaultState,...raw,view:'home',ownerUuid:String(raw?.ownerUuid||'').replace(/[^A-Za-z0-9_-]/g,'').slice(0,128),vocab:raw?.vocab||{},grammar:raw?.grammar||{},reading:raw?.reading||{},history:Array.isArray(raw?.history)?raw.history.filter(h=>h&&typeof h==='object'):[],wrongAnswers:pruneCorruptedReviewEntries(raw?.wrongAnswers),confidenceHistory:Array.isArray(raw?.confidenceHistory)?raw.confidenceHistory:[],sessionHistory:Array.isArray(raw?.sessionHistory)?raw.sessionHistory:[],learningDays:Array.isArray(raw?.learningDays)?raw.learningDays:[],daily:raw?.daily&&typeof raw.daily==='object'?raw.daily:{date:'',count:0,attempts:0,meaningful:false},preferences:{...defaultPreferences,...rawPreferences,activeLevel,levelMode:activeLevel?'manual':'placement',selfAssessedLevel:LEVELS.includes(String(rawPreferences.selfAssessedLevel||''))?String(rawPreferences.selfAssessedLevel):'',timeZone:validTimeZone(rawPreferences.timeZone||defaultPreferences.timeZone),goalProfile:String(rawPreferences.goalProfile||defaultPreferences.goalProfile).slice(0,30),reportEndpoint:String(rawPreferences.reportEndpoint||DEFAULT_REPORT_ENDPOINT).trim(),/* m025-182 W2-STATE: enum tertutup — nilai korup/asing jatuh ke default 'id', bukan lolos mentah */learnerLocale:(self.FiezelI18n?.SUPPORTED||['id','th']).includes(rawPreferences.learnerLocale)?rawPreferences.learnerLocale:defaultPreferences.learnerLocale,/* fail-closed: apa pun selain true persis -> false. State korup tidak boleh bisa menyalakan pengiriman data. */brainSync:rawPreferences.brainSync===true},reportMeta:{...defaultReportMeta,...(raw?.reportMeta||{}),queue:Array.isArray(raw?.reportMeta?.queue)?raw.reportMeta.queue.slice(-8):[]},reminderMeta:{lastNotificationAt:0,lastNotificationDay:'',lastNotificationKind:'',lastMessageIndex:-1,lastPositiveDay:'',evidenceLog:[],...(raw?.reminderMeta||{}),evidenceLog:Array.isArray(raw?.reminderMeta?.evidenceLog)?raw.reminderMeta.evidenceLog.slice(-ALRS_EVIDENCE_LOG_LIMIT):[]},activeSession:raw?.activeSession&&typeof raw.activeSession==='object'?raw.activeSession:null,adaptivePolicyMeta:{lastPolicy:null,lastSource:'',lastAt:0,history:[],...(raw?.adaptivePolicyMeta||{}),history:Array.isArray(raw?.adaptivePolicyMeta?.history)?raw.adaptivePolicyMeta.history.slice(-30):[]},policyOutcomeMeta:{last:null,history:[],queue:[],...(raw?.policyOutcomeMeta||{}),history:Array.isArray(raw?.policyOutcomeMeta?.history)?raw.policyOutcomeMeta.history.slice(-POLICY_OUTCOME_LOG_LIMIT):[],queue:Array.isArray(raw?.policyOutcomeMeta?.queue)?raw.policyOutcomeMeta.queue.slice(-10):[]},contentCanaryMeta:CONTENT_CANARY?CONTENT_CANARY.sanitizeEvidence(raw?.contentCanaryMeta,CONTENT_CANARY_CONFIG?.canaryId||raw?.contentCanaryMeta?.canaryId||''):{...defaultState.contentCanaryMeta},coachCache:raw?.coachCache&&typeof raw.coachCache==='object'?raw.coachCache:null,levelTrust:sanitizeLevelTrust(raw?.levelTrust),gems:sanitizeGemsState(raw?.gems),toursSeen:sanitizeToursSeen(raw?.toursSeen),entitlement:sanitizeEntitlement(raw?.entitlement)};
   /* R6 perbaikan-15/16: penghitung yang rusak TIDAK boleh menghapus bukti belajar.
      (1) Baris history yang korup (null/bukan objek) dibuang SATU-SATU di atas - dulu satu
      baris null membuat hs.map(h=>h.skill) melempar, loadState menangkapnya, dan SELURUH
@@ -7248,7 +7267,12 @@ function levelControlMarkup(){const level=getActiveLevel();return `<button type=
 function setActiveLevel(level){const next=String(level||'').toUpperCase();if(!LEVELS.includes(next))return false;/* m028-06: DEFAULT-ALLOW. Guard hanya menolak level yang benar-benar TERKUNCI akibat
      demosi; state lama tanpa levelTrust, atau murid yang belum pernah didemosi, tetap bebas
      pindah ke atas (mode percobaan). Dibungkus typeof+try supaya fixture kontrak level yang
-     hanya menyuplai state/LEVELS/save/render tetap lolos. */try{if(typeof isLevelLocked==='function'&&isLevelLocked(state,next)){showToast(FiezelI18n.t('level.toast-terkunci',{level:next,ujian:nextVerifiableLevel(state)}));openActiveLevelExamPanel(nextVerifiableLevel(state));return false}}catch(_){}if(next===getActiveLevel()&&activeLevelIsManual())return true;try{if(state.activeSession)abandonActiveSession('level_change')}catch{}try{leaveAllStages()}catch{}if(typeof classroomSession!=='undefined')classroomSession=null;if(typeof classroomSessionLevel!=='undefined')classroomSessionLevel='';if(typeof speakingListeningController!=='undefined')speakingListeningController?.setActiveLevel?.(next);state.preferences={...state.preferences,activeLevel:next,levelMode:'manual'};state.adaptivePolicyMeta={...state.adaptivePolicyMeta,lastPolicy:null,lastSource:'',lastAt:0};coreBrainCache=null;save();closeModal();render();showToast(FiezelI18n.t('level.toast-aktif',{level:next}));return true}
+     hanya menyuplai state/LEVELS/save/render tetap lolos. */try{if(typeof isLevelLocked==='function'&&isLevelLocked(state,next)){showToast(FiezelI18n.t('level.toast-terkunci',{level:next,ujian:nextVerifiableLevel(state)}));openActiveLevelExamPanel(nextVerifiableLevel(state));return false}}catch(_){}/* m025-349: gerbang KOMERSIAL, sesudah gerbang pedagogis di atas dan sebelum
+     perpindahan benar-benar terjadi. Urutan ini disengaja: murid yang levelnya terkunci
+     karena demosi harus membaca alasan pedagogisnya dulu - menawarkan Pro kepada murid
+     yang sebenarnya perlu mengulang ujian adalah menjual di saat yang salah. */
+  if(!entitlementAllowLevel(next))return false;
+  if(next===getActiveLevel()&&activeLevelIsManual())return true;try{if(state.activeSession)abandonActiveSession('level_change')}catch{}try{leaveAllStages()}catch{}if(typeof classroomSession!=='undefined')classroomSession=null;if(typeof classroomSessionLevel!=='undefined')classroomSessionLevel='';if(typeof speakingListeningController!=='undefined')speakingListeningController?.setActiveLevel?.(next);state.preferences={...state.preferences,activeLevel:next,levelMode:'manual'};state.adaptivePolicyMeta={...state.adaptivePolicyMeta,lastPolicy:null,lastSource:'',lastAt:0};coreBrainCache=null;save();closeModal();render();showToast(FiezelI18n.t('level.toast-aktif',{level:next}));return true}
 function usePlacementLevel(){try{if(state.activeSession)abandonActiveSession('level_mode_change')}catch{}try{leaveAllStages()}catch{}if(typeof classroomSession!=='undefined')classroomSession=null;if(typeof classroomSessionLevel!=='undefined')classroomSessionLevel='';if(typeof speakingListeningController!=='undefined')speakingListeningController?.setActiveLevel?.(placementLevel());state.preferences={...state.preferences,activeLevel:'',levelMode:'placement'};coreBrainCache=null;save();closeModal();render();showToast(FiezelI18n.t('level.toast-ikut-tes',{level:getActiveLevel()}));return true}
 /* m028-06: panel level sekarang JUJUR - tiap kartu membawa statusnya (terverifikasi, mode
    percobaan dengan hitungan salah, atau terkunci setelah demosi) dan level terkunci benar-
@@ -10897,6 +10921,131 @@ function startLevelPractice(level){
  *    menghitungnya sebagai benar akan membuat penguasaan yang dilaporkan lebih tinggi
  *    daripada yang sebenarnya, dan seluruh model kemampuan di atasnya ikut keliru.
  */
+/* ---- m025-349 HAK AKSES: free / pro / sekolah ------------------------------------------
+ * Jembatan tipis antara state aplikasi dan features/monetization/fiezel-entitlement.js.
+ * Mesinnya MURNI (tidak membaca penyimpanan/jaringan/jam); seluruh pembacaan dunia terjadi
+ * di sini, di satu tempat, supaya gerbangnya tetap bisa diuji tanpa peramban.
+ *
+ * KENAPA FAIL-OPEN, BUKAN FAIL-CLOSED. Kalau fiezel-entitlement.js gagal mendarat (jaringan
+ * buruk, cache shell setengah jalan), pilihannya dua: anggap semua murid gratis, atau
+ * lepaskan gerbangnya. Yang pertama MENGUNCI PELANGGAN YANG SUDAH MEMBAYAR karena kesalahan
+ * kita sendiri - kerusakan kepercayaan yang tidak sebanding dengan pendapatan satu hari.
+ * Maka: modul absen = gerbangnya absen, murid tetap belajar. Kebocorannya berumur sependek
+ * satu muat ulang; kemarahan pelanggan tidak.
+ */
+function entitlementEngine(){try{return self.FiezelEntitlement||null}catch(_){return null}}
+
+/**
+ * Apakah hak akses BENAR-BENAR ditegakkan? Bendera `monetizationEnforce` (mati saat
+ * mendarat, lihat fiezel-ux-flags.js) memisahkan DUA hal yang gampang tertukar:
+ *
+ *   MENGHITUNG  selalu jalan. Buku hari tetap dicatat walau bendera mati, supaya saat
+ *               owner menaikkannya nanti angkanya sudah teruji di lapangan - bukan
+ *               dinyalakan bersamaan dengan kode yang belum pernah dipakai siapa pun.
+ *   MENGHALANGI hanya saat bendera hidup. Alur pembayaran belum ada; memagari B1-C2
+ *               hari ini berarti murid yang kemarin belajar B2 membuka aplikasi dan
+ *               menemukan pintunya hilang, dengan satu-satunya tombol yang kita
+ *               tawarkan tidak menuju ke mana-mana.
+ *
+ * Fail-closed ke MATI: bendera yang tidak terbaca berarti tidak menghalangi apa pun.
+ */
+function entitlementEnforced(){try{return self.FiezelUX?.on('monetizationEnforce')===true}catch(_){return false}}
+
+/** Buku hari jatah sesi, selalu lewat sanitizer mesin supaya state korup tidak pernah masuk. */
+function entitlementLedger(s=state){
+  const E=entitlementEngine();const raw=s?.entitlement?.ledger;
+  return E?E.sanitizeLedger(raw):(raw&&typeof raw==='object'?raw:{day:'',used:0,maxDay:''});
+}
+
+/** Fakta yang dibutuhkan mesin, dikumpulkan dari state + penyimpanan onboarding. */
+function entitlementFacts(s=state,cfg=null){
+  const e=s?.entitlement||{};
+  const now=Date.now();
+  return{
+    now,
+    pro:e.pro&&typeof e.pro==='object'?e.pro:null,
+    school:e.school&&typeof e.school==='object'?e.school:null,
+    /* Kode kelas MENTAH dari perangkat. Ia sengaja dikirim terpisah dari `school`: mesin
+       memakainya HANYA untuk menjelaskan keadaan "sedang diperiksa", tidak pernah untuk
+       membuka pintu. Lihat header fiezel-entitlement.js - joinClassWithCode() tidak pernah
+       bertanya ke server, jadi kode ini bukan bukti apa pun. */
+    classCode:(()=>{try{return learnerClassCode()}catch(_){return ''}})(),
+    ledger:entitlementLedger(s),
+    dayKey:studyDayKey(now,s),
+    session:cfg||null
+  };
+}
+
+/** Rencana aktif ('free'|'pro'|'school'). Fail-open ke 'school' bila mesin absen. */
+function entitlementPlan(s=state){
+  const E=entitlementEngine();if(!E)return 'school';
+  try{return E.resolve(entitlementFacts(s)).plan}catch(_){return 'school'}
+}
+
+/** Ringkasan lengkap untuk layar; null bila mesin absen (pemanggil memilih jalur terbuka). */
+function entitlementSnapshot(s=state,cfg=null){
+  const E=entitlementEngine();if(!E)return null;
+  try{return E.snapshot(entitlementFacts(s,cfg))}catch(_){return null}
+}
+
+/** Tampilkan pemberitahuan hak akses. copyKey = basis; naskahnya .judul + .pesan. */
+function presentEntitlementNotice(copyKey,params,options){
+  const key=String(copyKey||'');if(!key)return;
+  const opt=options||{};
+  const judul=FiezelI18n.t(key+'.judul',params);
+  const pesan=FiezelI18n.t(key+'.pesan',params);
+  /* Ajakan hanya ditawarkan kalau benar-benar ada tujuannya. Tombol "Lihat Pro" yang tidak
+     membuka apa-apa lebih merusak daripada tidak ada tombol sama sekali - layar pertama yang
+     meminta uang adalah layar yang paling diingat murid. Alur pembayaran belum mendarat,
+     jadi satu-satunya ajakan yang JUJUR hari ini adalah kode kelas: pintunya memang ada. */
+  const ajakan=opt.offerClassCode?`<button type="button" class="primary" id="aksesKodeKelas">${esc(FiezelI18n.t('akses.cta.sekolah'))}</button>`:'';
+  openModal(`<h2>${esc(judul)}</h2><p>${esc(pesan)}</p><div class="modal-actions"><button type="button" id="aksesNanti">${esc(FiezelI18n.t('akses.cta.nanti'))}</button>${ajakan}</div>`);
+  $('aksesNanti')?.addEventListener('click',closeModal);
+  $('aksesKodeKelas')?.addEventListener('click',()=>{try{closeModal();openJoinClassModal()}catch(_){}});
+}
+
+/** Gerbang mulai sesi. Mengembalikan true bila sesi boleh berjalan. */
+function entitlementAllowSession(cfg){
+  const E=entitlementEngine();if(!E)return true; // modul absen -> gerbang absen (fail-open)
+  if(!entitlementEnforced())return true;         // bendera mati -> hitung saja, jangan halangi
+  let gate=null;
+  try{gate=E.sessionGate({plan:entitlementPlan(),ledger:entitlementLedger(),dayKey:studyDayKey(Date.now(),state),session:cfg||null})}catch(_){return true}
+  if(!gate)return true;
+  if(!gate.allowed){presentEntitlementNotice(gate.copyKey,{limit:gate.limit},{offerClassCode:true});return false}
+  /* Peringatan sesi terakhir sengaja TOAST, bukan modal: ia tidak menghalangi apa pun, dan
+     modal di sini akan terasa seperti tagihan di tengah niat belajar. */
+  if(gate.copyKey)try{showToast(FiezelI18n.t(gate.copyKey+'.judul'))}catch(_){}
+  return true;
+}
+
+/** Catat satu sesi terukur ke buku hari. Dipanggil SESUDAH sesi benar-benar dimulai. */
+function noteEntitlementSession(cfg){
+  const E=entitlementEngine();if(!E)return;
+  try{
+    if(!E.countsAsAdaptive(cfg||null))return;
+    const next=E.recordSession(entitlementLedger(),studyDayKey(Date.now(),state));
+    state.entitlement={...(state.entitlement||{}),schema:E.SCHEMA,ledger:next};
+    save();
+  }catch(_){}
+}
+
+/**
+ * Gerbang level KOMERSIAL. Sengaja terpisah dari gerbang PEDAGOGIS yang sudah ada
+ * (isLevelLocked/levelEntryDecision - "buktikan dulu lewat ujian"). Keduanya harus lulus,
+ * tetapi tidak boleh bicara dengan kalimat yang sama: murid yang sudah lulus ujian B1
+ * tetapi belum berlangganan harus membaca "buka dengan Pro", bukan "ikuti ujian dulu".
+ * Mencampur keduanya menghasilkan layar yang menyalahkan murid atas keputusan harga kita.
+ */
+function entitlementAllowLevel(level){
+  const E=entitlementEngine();if(!E)return true;
+  if(!entitlementEnforced())return true;
+  let gate=null;
+  try{gate=E.levelGate(level,{plan:entitlementPlan()})}catch(_){return true}
+  if(!gate||gate.allowed)return true;
+  presentEntitlementNotice(gate.copyKey,{level:String(level||'').toUpperCase()},{offerClassCode:true});
+  return false;
+}
+
 function quizLoop(cfg){
  if(document.body?.classList?.contains?.('auth-locked')){pendingAfterGateFn=()=>quizLoop(cfg);return}
  /* m025-246: potret mastery SEBELUM satu jawaban pun masuk. Diambil di sini dan bukan di
@@ -10939,7 +11088,13 @@ function quizLoop(cfg){
  if(!questions.length){showToast(FiezelI18n.t('quiz.pending-ada-item-valid-for'));return}
  questions.forEach(x=>{x.concept=quizConcept(x)});
  const planned=Math.min(Math.max(1,Number(cfg.count)||questions.length),questions.length);
+ /* m025-349: gerbang jatah harian. Ditaruh DI SINI, sesudah soal terkumpul dan sesaat
+    sebelum sesi resmi dibuka, supaya murid yang jatahnya habis tidak pernah melihat
+    layar kuis berkedip lalu hilang. Ujian, penempatan, tugas guru, dan ulangan tidak
+    pernah terhitung - aturannya ada di mesin, bukan di sini. */
+ if(!entitlementAllowSession(cfg))return;
  beginLearningSession(cfg,planned);
+ noteEntitlementSession(cfg);
  // P0-1: jatah konfeti Major direset per sesi. P0-3: runtun gem lintas domain hidup di
  // closure sesi ini — placement dan Ujian Skip Level dikecualikan karena keduanya alat
  // UKUR, bukan sesi latihan; hadiah di tengah pengukuran mengubah perilaku yang diukur.

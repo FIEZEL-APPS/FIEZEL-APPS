@@ -58,7 +58,12 @@ const REQUIRED = {
      Konsol kurikulum dilayani '/api/...' relatif origin, dan repo tidak punya
      passenger_wsgi.py / Procfile / requirements.txt di akar - backend-nya memang belum
      pernah dipasang. Pintunya ditutup sampai ia benar-benar berjalan; mesinnya utuh. */
-  curriculumConsole: [true, 'Fitur diizinkan; yang menentukan pintu terbuka adalah curriculumApiUrl yang bawaannya kosong (m025-298)']
+  curriculumConsole: [true, 'Fitur diizinkan; yang menentukan pintu terbuka adalah curriculumApiUrl yang bawaannya kosong (m025-298)'],
+  /* m025-349: mesin hak akses mendarat UTUH tapi GELAP. Alur pembayaran belum ada, jadi
+     menyalakannya hari ini memagari B1-C2 untuk seluruh murid yang sudah ada tanpa satu
+     pun jalan membayar - pemadaman, bukan monetisasi. Nilai false di sini adalah bagian
+     dari keputusan itu, dan menaikkannya harus terlihat sebagai perubahan tes. */
+  monetizationEnforce: [false, 'Penegakan hak akses - menunggu alur pembayaran, verifikasi kode kelas, dan review naskah Thai']
 };
 
 /* -- T1: setiap bendera punya nilai yang diminta owner -------------------------------- */
