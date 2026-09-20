@@ -242,12 +242,13 @@ async function synthesizeGemini(text, voiceName, apiKey) {
     if (response.status === 429 || response.status === 503) {
       let detail = '';
       try { detail = await response.text(); } catch (_) {}
-      const isQuotaExhausted = /RESOURCE_EXHAUSTED|quota/i.test(detail);
-      if (isQuotaExhausted && attempt >= 2) {
+      const isDailyExhausted = /GenerateContentRequestsPerDayPerProject/i.test(detail);
+      if (isDailyExhausted && attempt >= 2) {
         return { fatal: `Kuota harian Gemini tercapai (HTTP 429: ${detail.slice(0, 200)})` };
       }
-      const waitMs = attempt * 10000;
-      console.warn(`[Gemini HTTP ${response.status}] Percobaan ${attempt}/${MAX_RETRIES}, menunggu ${waitMs / 1000} detik...`);
+      // Sebagian besar 429 di free tier adalah batas RPM (Requests Per Minute). Tunggu 60 detik agar jendela menit ter-reset.
+      const waitMs = 60000;
+      console.warn(`[Gemini HTTP ${response.status}] Terkena batas per-menit. Percobaan ${attempt}/${MAX_RETRIES}, menunggu 60 detik...`);
       await new Promise((r) => setTimeout(r, waitMs));
       continue;
     }
@@ -439,8 +440,8 @@ async function main() {
     manifest.assets[identity.audioKey] = manifestEntry(identity, objectKey, result.bytes, sourceRef);
     generated++;
 
-    // Jeda kecil agar aman dari rate limits
-    await new Promise((r) => setTimeout(r, 1200));
+    // Jeda 4.5 detik antar request agar stabil di bawah batas 15 RPM Gemini Free Tier
+    await new Promise((r) => setTimeout(r, 4500));
 
     // Simpan progres manifest setiap 20 item agar aman jika terhenti
     if (generated % 20 === 0) {
