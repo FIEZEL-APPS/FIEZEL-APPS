@@ -756,6 +756,256 @@
       ]
     },
     {
+      "code": "KOMP-IPA-D-7-BAB4-01",
+      "grade": 7,
+      "semester": 2,
+      "name": "Gerak dan Gaya",
+      "materi": "Gerak Lurus, Kelajuan & Kecepatan, Percepatan, Jenis-Jenis Gaya, Hukum Newton I-II-III",
+      "cpRef": "Kepmendikbudristek/BSKAP No. 032/H/KR/2024 — Buku Siswa IPA Kelas 7 Bab 4",
+      "items": [
+        {
+          "id": "ipa-d7-bab4-001",
+          "prompt": "Rani berlari menempuh jarak 200 m dalam waktu 50 sekon. Kelajuan rata-rata Rani adalah…",
+          "options": [
+            "4 m/s",
+            "0,25 m/s",
+            "10.000 m/s",
+            "250 m/s"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Kelajuan rata-rata adalah jarak dibagi waktu: 200 m ÷ 50 s = 4 m/s."
+          },
+          "distractorWhy": {
+            "1": "Murid membalik pembagiannya menjadi waktu dibagi jarak, sehingga satuan hasilnya pun menjadi sekon per meter, bukan meter per sekon.",
+            "2": "Murid mengalikan jarak dengan waktu; perkalian menghasilkan besaran yang tidak punya makna fisis di sini.",
+            "3": "Murid menjumlahkan jarak dan waktu, padahal keduanya besaran berbeda dan tidak boleh dijumlahkan."
+          },
+          "difficulty": "dasar"
+        },
+        {
+          "id": "ipa-d7-bab4-002",
+          "prompt": "Doni berjalan 6 m ke timur lalu 8 m ke barat. Jarak dan perpindahan Doni berturut-turut adalah…",
+          "options": [
+            "14 m dan 2 m ke barat",
+            "14 m dan 14 m ke barat",
+            "2 m dan 2 m ke timur",
+            "2 m dan 14 m ke barat"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Jarak adalah panjang seluruh lintasan: 6 + 8 = 14 m. Perpindahan adalah perubahan posisi dari titik awal ke akhir: 8 m ke barat dikurangi 6 m ke timur menyisakan 2 m ke arah barat."
+          },
+          "distractorWhy": {
+            "1": "Murid menyamakan perpindahan dengan jarak; perpindahan memperhitungkan arah sehingga dua gerak berlawanan saling mengurangi.",
+            "2": "Murid menukar definisi keduanya dan juga salah menentukan arah akhirnya, padahal langkah ke barat lebih panjang daripada ke timur.",
+            "3": "Murid menukar nilai jarak dengan nilai perpindahan, sehingga lintasan total yang jelas 14 m dilaporkan hanya 2 m."
+          },
+          "difficulty": "sedang"
+        },
+        {
+          "id": "ipa-d7-bab4-003",
+          "prompt": "Sebuah mobil melaju dengan kecepatan tetap 20 m/s di jalan tol yang lurus. Jenis gerak mobil itu disebut…",
+          "options": [
+            "gerak lurus beraturan, karena kecepatannya tidak berubah",
+            "gerak lurus berubah beraturan, karena mobilnya terus berpindah",
+            "gerak melingkar, karena roda mobil berputar saat mobil melaju",
+            "gerak jatuh bebas, karena mobil bergerak tanpa didorong tangan"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Gerak lurus beraturan adalah gerak pada lintasan lurus dengan kecepatan tetap. Karena kecepatannya tidak berubah, percepatan mobil bernilai nol."
+          },
+          "distractorWhy": {
+            "1": "Murid mengira setiap gerak yang berlanjut berarti berubah beraturan; yang menentukan adalah berubah tidaknya kecepatan, bukan berlanjutnya gerak.",
+            "2": "Murid melihat roda yang berputar; yang ditanyakan adalah gerak mobil sebagai satu benda terhadap jalan, dan lintasannya lurus.",
+            "3": "Murid memakai istilah jatuh bebas untuk gerak mendatar, padahal jatuh bebas adalah gerak vertikal hanya karena tarikan gravitasi."
+          },
+          "difficulty": "dasar"
+        },
+        {
+          "id": "ipa-d7-bab4-004",
+          "prompt": "Sepeda motor bergerak dari keadaan diam hingga kecepatannya 12 m/s dalam waktu 4 sekon. Percepatan sepeda motor itu adalah…",
+          "options": [
+            "3 m/s²",
+            "48 m/s²",
+            "0,33 m/s²",
+            "8 m/s²"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Percepatan adalah perubahan kecepatan dibagi waktu: (12 − 0) ÷ 4 = 3 m/s²."
+          },
+          "distractorWhy": {
+            "1": "Murid mengalikan kecepatan dengan waktu alih-alih membaginya, sehingga yang dihitung bukan lagi laju perubahan kecepatan.",
+            "2": "Murid membalik pembagiannya menjadi waktu dibagi perubahan kecepatan.",
+            "3": "Murid mengurangkan waktu dari kecepatan, padahal kecepatan dan waktu adalah besaran berbeda yang tidak dapat dikurangkan."
+          },
+          "difficulty": "sedang"
+        },
+        {
+          "id": "ipa-d7-bab4-005",
+          "prompt": "Buku yang diletakkan diam di atas meja tidak bergerak meskipun berat buku menariknya ke bawah. Penjelasannya adalah…",
+          "options": [
+            "meja memberikan gaya normal ke atas yang besarnya sama dengan berat buku",
+            "berat buku hilang begitu buku menyentuh permukaan meja",
+            "gaya gravitasi tidak bekerja pada benda yang sedang diam",
+            "gaya gesek meja mendorong buku ke atas melawan gravitasi"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Dua gaya bekerja pada buku: berat ke bawah dan gaya normal meja ke atas. Keduanya sama besar dan berlawanan arah sehingga resultan gayanya nol dan buku tetap diam."
+          },
+          "distractorWhy": {
+            "1": "Murid mengira berat lenyap saat bersentuhan; berat tetap ada, hanya saja diimbangi gaya normal.",
+            "2": "Murid mengira gravitasi berhenti bekerja pada benda diam; gravitasi bekerja terus-menerus, terbukti dari buku yang jatuh bila meja disingkirkan.",
+            "3": "Murid memakai gaya gesek untuk arah tegak lurus permukaan; gaya gesek bekerja sejajar permukaan, sedangkan yang menahan buku adalah gaya normal."
+          },
+          "difficulty": "sedang"
+        },
+        {
+          "id": "ipa-d7-bab4-006",
+          "prompt": "Penumpang yang berdiri di dalam bus terdorong ke depan ketika bus direm mendadak. Peristiwa itu paling tepat dijelaskan oleh…",
+          "options": [
+            "Hukum I Newton, karena tubuh penumpang cenderung mempertahankan geraknya",
+            "Hukum II Newton, karena percepatan bus sebanding dengan gaya rem",
+            "Hukum III Newton, karena bus memberi gaya reaksi kepada penumpang",
+            "hukum gravitasi, karena tubuh penumpang ditarik ke arah depan bus"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Hukum I Newton menyatakan benda mempertahankan keadaan geraknya bila tidak ada gaya luar. Lantai bus melambat karena rem, tetapi tubuh penumpang belum mendapat gaya penahan sehingga tetap melaju ke depan."
+          },
+          "distractorWhy": {
+            "1": "Murid memakai Hukum II yang menghubungkan gaya dengan percepatan benda yang dikenainya; yang ditanya adalah kecenderungan tubuh penumpang, bukan perhitungan gaya rem.",
+            "2": "Murid memakai pasangan aksi-reaksi; gaya reaksi bekerja pada benda yang berbeda dan bukan penyebab tubuh terdorong ke depan.",
+            "3": "Murid mengira gravitasi punya arah mendatar; gravitasi selalu menarik ke pusat bumi, yaitu ke bawah."
+          },
+          "difficulty": "sedang"
+        },
+        {
+          "id": "ipa-d7-bab4-007",
+          "prompt": "Sebuah benda bermassa 5 kg didorong dengan gaya total 15 N. Percepatan yang dialami benda itu adalah…",
+          "options": [
+            "3 m/s²",
+            "75 m/s²",
+            "0,33 m/s²",
+            "20 m/s²"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Menurut Hukum II Newton, a = F ÷ m = 15 N ÷ 5 kg = 3 m/s²."
+          },
+          "distractorWhy": {
+            "1": "Murid mengalikan gaya dengan massa alih-alih membaginya, sehingga rumus a = F/m terbalik menjadi perkalian.",
+            "2": "Murid membalik pembagiannya menjadi massa dibagi gaya.",
+            "3": "Murid menjumlahkan gaya dan massa, padahal keduanya besaran yang berbeda jenis."
+          },
+          "difficulty": "sedang"
+        },
+        {
+          "id": "ipa-d7-bab4-008",
+          "prompt": "Permukaan ban kendaraan dibuat beralur dan tidak licin. Tujuan utama rancangan itu adalah…",
+          "options": [
+            "memperbesar gaya gesek agar ban tidak selip di jalan",
+            "memperkecil gaya gesek agar kendaraan dapat melaju lebih cepat",
+            "menghilangkan gaya gravitasi yang bekerja pada kendaraan",
+            "menambah berat kendaraan agar lebih stabil saat berbelok"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Alur pada ban memperbesar gaya gesek antara ban dan jalan. Gesekan itulah yang membuat ban mencengkeram jalan sehingga kendaraan dapat dikendalikan dan direm."
+          },
+          "distractorWhy": {
+            "1": "Murid mengira gesekan selalu merugikan; pada ban, gesekan justru dibutuhkan dan sengaja diperbesar.",
+            "2": "Murid mengira bentuk ban dapat menghilangkan gravitasi; tidak ada rancangan benda yang bisa meniadakan gaya gravitasi.",
+            "3": "Murid mengira alur menambah berat; alur justru mengurangi bahan, dan kestabilan berbelok bergantung pada cengkeraman, bukan berat."
+          },
+          "difficulty": "dasar"
+        },
+        {
+          "id": "ipa-d7-bab4-009",
+          "prompt": "Saat seseorang berjalan, telapak kakinya mendorong tanah ke belakang dan tubuhnya bergerak maju. Pasangan gaya aksi-reaksi yang benar pada peristiwa itu adalah…",
+          "options": [
+            "kaki mendorong tanah ke belakang, tanah mendorong kaki ke depan",
+            "kaki mendorong tanah ke belakang, tanah menarik kaki ke bawah",
+            "berat tubuh menekan tanah, tanah menahan tubuh dengan gaya gesek",
+            "otot kaki mendorong tubuh ke depan, udara menahan tubuh ke belakang"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Pasangan aksi-reaksi selalu bekerja pada dua benda berbeda, sama besar, dan berlawanan arah. Kaki mengerjakan gaya ke belakang pada tanah, dan tanah membalas dengan gaya ke depan pada kaki — gaya inilah yang mendorong orang maju."
+          },
+          "distractorWhy": {
+            "1": "Murid memasangkan gaya mendatar dengan gaya tegak; pasangan aksi-reaksi harus segaris dan berlawanan arah, bukan saling tegak lurus.",
+            "2": "Murid memasangkan berat dengan gaya gesek; keduanya bukan pasangan aksi-reaksi karena arah dan jenis gayanya berbeda.",
+            "3": "Murid memasangkan dua gaya yang keduanya bekerja pada tubuh yang sama, padahal pasangan aksi-reaksi tidak pernah bekerja pada satu benda yang sama."
+          },
+          "difficulty": "tinggi"
+        },
+        {
+          "id": "ipa-d7-bab4-010",
+          "prompt": "Grafik kecepatan terhadap waktu sebuah benda berbentuk garis lurus mendatar pada nilai 8 m/s selama 10 sekon. Kesimpulan yang benar adalah…",
+          "options": [
+            "benda bergerak dengan kecepatan tetap dan menempuh jarak 80 m",
+            "benda berhenti karena grafiknya mendatar dan tidak naik",
+            "benda mengalami percepatan tetap sebesar 8 m/s²",
+            "benda menempuh jarak 8 m karena nilai grafiknya 8"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Garis mendatar pada grafik kecepatan berarti kecepatan tidak berubah, jadi percepatannya nol. Jaraknya sama dengan luas daerah di bawah grafik: 8 m/s × 10 s = 80 m."
+          },
+          "distractorWhy": {
+            "1": "Murid membaca grafik kecepatan seperti grafik posisi; pada grafik kecepatan, garis mendatar berarti kecepatan tetap, bukan benda diam.",
+            "2": "Murid membaca nilai kecepatan sebagai nilai percepatan; percepatan dibaca dari kemiringan grafik, dan kemiringan garis mendatar adalah nol.",
+            "3": "Murid menyalin angka pada sumbu tegak sebagai jarak tanpa mengalikannya dengan selang waktu."
+          },
+          "difficulty": "tinggi"
+        },
+        {
+          "id": "ipa-d7-bab4-011",
+          "prompt": "Dua anak menarik sebuah gerobak dari arah berlawanan. Anak pertama menarik dengan gaya 40 N ke kanan dan anak kedua 25 N ke kiri. Keadaan gerobak adalah…",
+          "options": [
+            "bergerak ke kanan karena resultan gayanya 15 N ke kanan",
+            "diam karena kedua gaya saling meniadakan",
+            "bergerak ke kiri karena gaya 25 N lebih dekat ke pusat gerobak",
+            "bergerak ke kanan dengan resultan gaya 65 N ke kanan"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Gaya yang berlawanan arah dikurangkan: 40 N − 25 N = 15 N, dengan arah mengikuti gaya yang lebih besar, yaitu ke kanan."
+          },
+          "distractorWhy": {
+            "1": "Murid mengira setiap gaya berlawanan pasti saling meniadakan; peniadaan hanya terjadi bila besarnya sama persis.",
+            "2": "Murid memakai jarak ke pusat benda untuk menentukan pemenangnya; yang menentukan arah gerak adalah besar gaya, bukan letak pegangannya.",
+            "3": "Murid menjumlahkan kedua gaya; penjumlahan hanya berlaku untuk gaya yang searah."
+          },
+          "difficulty": "tinggi"
+        },
+        {
+          "id": "ipa-d7-bab4-012",
+          "prompt": "Besaran yang menyatakan seberapa cepat kedudukan sebuah benda berubah beserta arahnya disebut…",
+          "options": [
+            "kecepatan",
+            "kelajuan",
+            "percepatan",
+            "perpindahan"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Kecepatan adalah perpindahan tiap satuan waktu dan memiliki arah, sehingga ia besaran vektor yang menyatakan perubahan kedudukan beserta arahnya."
+          },
+          "distractorWhy": {
+            "1": "Kelajuan hanya menyatakan seberapa cepat tanpa arah, sehingga belum memenuhi bagian \"beserta arahnya\" pada pertanyaan.",
+            "2": "Percepatan menyatakan seberapa cepat kecepatan berubah, bukan seberapa cepat kedudukan berubah.",
+            "3": "Perpindahan menyatakan perubahan kedudukannya sendiri, belum dibagi waktu, sehingga bukan ukuran seberapa cepat."
+          },
+          "difficulty": "dasar"
+        }
+      ]
+    },
+    {
       "code": "KOMP-IPA-D-7-BAB6-01",
       "grade": 7,
       "semester": 2,

@@ -1,0 +1,8 @@
+{
+  "schema": "fiezel-mapel-bank-v1",
+  "subjectId": "IPS",
+  "subjectName": "Ilmu Pengetahuan Sosial",
+  "phase": "fase_d",
+  "catatan": "Bank soal Fase D (SMP kelas 7-9) untuk jalur Kurikulum Nasional 17 Mapel di Ruang Guru. Satu kompetensi = satu BAB Buku Siswa Kemendikbudristek. Kunci jawaban selalu di indeks 0 pada berkas sumber; pengacakan opsi terjadi saat tugas diterbitkan.",
+  "competencies": []
+}
