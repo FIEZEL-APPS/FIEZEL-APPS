@@ -931,42 +931,128 @@ async function triggerMasterSeed(env, fetchImpl) {
   const doFetch = typeof fetchImpl === 'function' ? fetchImpl : (typeof fetch === 'function' ? fetch : (typeof globalThis !== 'undefined' && globalThis.fetch ? globalThis.fetch : null));
   if (!doFetch) {
     return {
-      state: 'ok',
+      state: 'pending',
       ok: true,
-      message: 'Seluruh 17 Mapel Nasional (Fase A–F), Kurikulum Bahasa Inggris (144 Kompetensi), dan Bank Soal telah berhasil diaktifkan 100%! Seluruh akun guru di KelasKu dapat langsung mengakses Bab Buku Ajar dan Bank Soal.'
+      message: 'Sinyal sinkronisasi terkirim ke backend, sedang proses penyemaian di background. Render cold-start 30-60 detik; muat ulang 1-2 menit untuk hitungan riil.'
     };
   }
 
-  try {
-    const controller = typeof AbortController !== 'undefined' ? new AbortController() : null;
-    const timeoutId = controller ? setTimeout(() => controller.abort(), 6000) : null;
-    const opt = {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({}),
-      signal: controller ? controller.signal : undefined
-    };
+  const controller = typeof AbortController !== 'undefined' ? new AbortController() : null;
+  // Render spin-down/cold-start butuh >6 detik; Worker Cloudflare maks 30 detik jadi 25 detik aman.
+  const timeoutId = controller ? setTimeout(() => controller.abort(), 25000) : null;
+  const opt = {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({}),
+    signal: controller ? controller.signal : undefined
+  };
 
+  let settled;
+  try {
     // Kirim sinyal penyemaian ke endpoint kurikulum (17 mapel, bahasa inggris, dan bank soal)
-    await Promise.allSettled([
+    settled = await Promise.allSettled([
       doFetch(base + '/api/seed/mapel', opt),
       doFetch(base + '/api/seed/english', opt),
       doFetch(base + '/api/seed/soal', opt)
     ]);
+  } catch (e) {
     if (timeoutId) clearTimeout(timeoutId);
-
+    const aborted = e && (e.name === 'AbortError' || /abort/i.test(String((e && e.message) || '')));
     return {
-      state: 'ok',
+      state: 'pending',
       ok: true,
-      message: 'Seluruh 17 Mapel Nasional (Fase A–F), Kurikulum Bahasa Inggris (144 Kompetensi), dan Bank Soal telah berhasil disinkronkan dan diaktifkan 100%! Seluruh akun guru di KelasKu kini dapat langsung mengakses Bab Buku Ajar dan Bank Soal.'
-    };
-  } catch (_) {
-    return {
-      state: 'ok',
-      ok: true,
-      message: 'Sinyal sinkronisasi master kurikulum telah diproses. Seluruh 17 Mapel Nasional, Bahasa Inggris (144 Kompetensi), dan Bank Soal aktif untuk seluruh guru di KelasKu.'
+      pending: true,
+      message: aborted
+        ? 'Sinyal sinkronisasi terkirim ke backend, sedang proses penyemaian di background (timeout 25 detik, Render cold-start). Muat ulang 1-2 menit untuk melihat hitungan riil.'
+        : 'Sinyal sinkronisasi terkirim ke backend, sedang proses penyemaian di background. Gagal baca respons cepat: ' + String((e && e.message) || e),
+      error: String((e && e.message) || e)
     };
   }
+  if (timeoutId) clearTimeout(timeoutId);
+
+  const names = ['mapel', 'english', 'soal'];
+  const details = {};
+  let okCount = 0;
+  let abortCount = 0;
+  for (let i = 0; i < settled.length; i++) {
+    const r = settled[i];
+    const key = names[i] || ('endpoint_' + i);
+    if (r.status === 'fulfilled') {
+      const resp = r.value || {};
+      const ok = resp.ok !== false && Number(resp.status || 200) < 500;
+      // Coba baca body JSON tanpa menggagalkan bila backend masih streaming/cold-start.
+      let body = null;
+      try {
+        if (resp && typeof resp.json === 'function') body = await resp.json();
+        else if (typeof resp === 'object') body = resp;
+      } catch (_) { body = null; }
+      details[key] = { ok, status: Number(resp.status || (ok ? 200 : 500)), body };
+      if (ok) okCount++;
+    } else {
+      const reason = r.reason || {};
+      const aborted = reason && (reason.name === 'AbortError' || /abort/i.test(String(reason.message || reason)));
+      if (aborted) abortCount++;
+      details[key] = { ok: false, aborted, error: String((reason && reason.message) || reason) };
+    }
+  }
+
+  if (okCount === settled.length) {
+    return {
+      state: 'ok',
+      ok: true,
+      message: 'Seluruh 17 Mapel Nasional (Fase A–F), Kurikulum Bahasa Inggris (144 Kompetensi), dan Bank Soal telah berhasil disinkronkan dan diaktifkan 100%! Seluruh akun guru di KelasKu kini dapat langsung mengakses Bab Buku Ajar dan Bank Soal.',
+      details
+    };
+  }
+  if (abortCount > 0 || okCount > 0) {
+    return {
+      state: 'pending',
+      ok: true,
+      pending: true,
+      message: 'Sinyal sinkronisasi terkirim ke backend, sedang proses penyemaian di background (' + okCount + '/' + settled.length + ' endpoint menjawab cepat, Render mungkin cold-start). Muat ulang 1-2 menit untuk hitungan riil jumlah soal dan kompetensi.',
+      details
+    };
+  }
+  return {
+    state: 'error',
+    ok: false,
+    message: 'Gagal menghubungi backend penyemaian (0/' + settled.length + ' endpoint menjawab). Periksa CURRICULUM_API_URL dan status Render, lalu coba lagi.',
+    details,
+    error: 'all_endpoints_failed'
+  };
+}
+
+/**
+ * Baca hitungan riil kurikulum dari backend (GET status seed mapel, english, soal, best-effort).
+ * Dipakai panel ringkasan Owner agar tidak menampilkan angka statis.
+ * Selalu resolve (tidak pernah throw); tiap endpoint 8 detik, allSettled.
+ */
+async function readCurriculumStatus(env, fetchImpl) {
+  const base = (env && typeof env.CURRICULUM_API_URL === 'string' && env.CURRICULUM_API_URL.trim().replace(/\/+$/, '')) || 'https://fiezel-apps.onrender.com';
+  const doFetch = typeof fetchImpl === 'function' ? fetchImpl : (typeof fetch === 'function' ? fetch : (typeof globalThis !== 'undefined' && globalThis.fetch ? globalThis.fetch : null));
+  const empty = { state: 'unknown', mapel: null, english: null, soal: null };
+  if (!doFetch) return empty;
+  const getOne = async (path) => {
+    const controller = typeof AbortController !== 'undefined' ? new AbortController() : null;
+    const timeoutId = controller ? setTimeout(() => controller.abort(), 8000) : null;
+    try {
+      const resp = await doFetch(base + path, { method: 'GET', signal: controller ? controller.signal : undefined });
+      if (timeoutId) clearTimeout(timeoutId);
+      if (!resp || resp.ok === false) return { ok: false, status: Number((resp && resp.status) || 500) };
+      const body = typeof resp.json === 'function' ? await resp.json() : resp;
+      return { ok: true, status: 200, body };
+    } catch (e) {
+      if (timeoutId) clearTimeout(timeoutId);
+      return { ok: false, error: String((e && e.message) || e) };
+    }
+  };
+  const [mapel, english, soal] = await Promise.all([
+    getOne('/api/seed/mapel/status'),
+    getOne('/api/seed/english/status'),
+    getOne('/api/seed/soal/status')
+  ]);
+  const anyOk = (mapel && mapel.ok) || (english && english.ok) || (soal && soal.ok);
+  return { state: anyOk ? 'measured' : 'unavailable', mapel, english, soal };
 }
 
 
@@ -2857,13 +2943,34 @@ function gradeName(id) {
   return map[id] || id || '—';
 }
 
-function renderCurriculumSyncSection(m, masterAlert) {
+function renderCurriculumSyncSection(m, masterAlert, curriculumStatus) {
+  const cs = curriculumStatus || (m && m.curriculumStatus) || null;
+  let realCountsHtml = '';
+  if (cs && (cs.mapel || cs.english || cs.soal)) {
+    const fmtBody = (entry, pick) => {
+      if (!entry || !entry.ok || !entry.body) return '—';
+      try { return pick(entry.body); } catch (_) { return '—'; }
+    };
+    const mapelComp = fmtBody(cs.mapel, (b) => String(b.competencies ?? b.comp ?? '—'));
+    const engComp = fmtBody(cs.english, (b) => String(b.competencies ?? '—'));
+    const soalFrom = fmtBody(cs.soal, (b) => String(b.from_this_seeder ?? b.questions ?? '—'));
+    const soalKomp = fmtBody(cs.soal, (b) => String(b.competencies_with_questions ?? '—'));
+    const stateLabel = cs.state === 'measured' ? 'TERUKUR' : 'BELUM TERUKUR / TIDAK TERSEDIA';
+    realCountsHtml = `
+      <div class="note" style="margin-bottom:16px;border-left:4px solid var(--blue);padding:12px 16px;background:var(--card-bg);font-size:12.5px;line-height:1.6;">
+        <b style="color:var(--text-main);">Hitungan riil backend (${stateLabel}):</b>
+        Mapel kompetensi ${mapelComp} · Inggris kompetensi ${engComp} · Soal dari penyemai ${soalFrom} (kompetensi berisi ${soalKomp}).
+        Angka diambil dari GET /api/seed/mapel/status, /english/status, /soal/status. Render cold-start 30-60 detik; bila strip ini, backend belum menjawab.
+      </div>`;
+  }
   return `
     <section>
       <span class="card-full-inner" id="curriculum-sync" style="scroll-margin-top:80px;display:block;"></span>
       <h2><span>📚 Sinkronisasi Master Kurikulum &amp; Bank Soal</span><span class="section-badge">Master Control</span></h2>
       
       ${masterAlert || ''}
+
+      ${realCountsHtml}
 
       <div class="note" style="margin-bottom:16px;line-height:1.6;">
         Pusat kendali aktivasi satu-klik untuk <b>17 Mata Pelajaran Nasional</b>, <b>Bahasa Inggris Kurikulum Merdeka (Fase A–F)</b>, dan <b>Bank Soal</b>. 
@@ -3032,6 +3139,15 @@ function renderTeacherSection(m) {
             <div style="font-size:11.5px;color:var(--text-subtle);margin-top:6px;">(Klik/blok teks token di atas untuk menyalin langsung)</div>
           </div>
           <div class="warn" style="margin-top:14px;"><b>${ICONS.alert} PERHATIAN PENTING:</b> Kode token ini <b>HANYA DITAMPILKAN SEKALI INI SAJA</b> demi keamanan kriptografis. Pastikan Anda telah menyalinnya sebelum berpindah halaman.</div>
+        </div>
+      `;
+    } else if (action.action === 'master_seed' && action.ok && (action.state === 'pending' || action.pending)) {
+      const det = action.details ? ' (' + Object.keys(action.details).map((k) => k + ':' + (action.details[k] && action.details[k].ok ? 'OK' : 'tunda')).join(', ') + ')' : '';
+      alertBanner = `
+        <div style="background:var(--card-bg);border:1px solid var(--brand-gold);border-left:4px solid var(--brand-gold);border-radius:var(--radius-lg);padding:20px;margin-bottom:20px;box-shadow:var(--shadow-sm);">
+          <div style="font-size:16px;font-weight:700;color:var(--text-main);margin-bottom:8px;display:flex;align-items:center;gap:8px;">⏳ Sinyal sinkronisasi terkirim ke backend, sedang proses penyemaian di background${esc(det)}</div>
+          <div style="font-size:13.5px;color:var(--text-muted);margin-bottom:12px;line-height:1.6;">${esc(action.message)}</div>
+          <div style="font-size:12.5px;color:var(--text-muted);">Render cold-start 30-60 detik. Muat ulang 1-2 menit untuk melihat hitungan riil jumlah soal dan kompetensi per mapel. Bank offline KelasKu (20 bab, 155 soal) tetap bisa dipakai guru tanpa menunggu backend.</div>
         </div>
       `;
     } else if (action.action === 'master_seed' && action.ok) {
@@ -5300,6 +5416,10 @@ async function handle(request, env, ctx, nowMs) {
       teacherAction = {
         ok: seedRes.ok !== false,
         action: 'master_seed',
+        state: seedRes.state || (seedRes.ok === false ? 'error' : 'ok'),
+        pending: seedRes.pending === true || seedRes.state === 'pending',
+        details: seedRes.details || null,
+        error: seedRes.error || null,
         message: seedRes.message || 'Seluruh 17 Mapel Nasional (Fase A–F), Kurikulum Bahasa Inggris (144 Kompetensi), dan Bank Soal telah berhasil diaktifkan dan disinkronkan 100%! Seluruh akun guru di KelasKu dapat langsung mengakses Bab Buku Ajar dan Bank Soal.'
       };
     }
@@ -5362,6 +5482,16 @@ async function handle(request, env, ctx, nowMs) {
 
     model.selectedClass = activeClass;
     model.isNewClass = url.searchParams.get('new_class') === '1';
+
+    /* Hitungan riil kurikulum untuk strip panel Owner: best-effort, tidak pernah
+       menggagalkan render dashboard. readCurriculumStatus tidak pernah throw menurut
+       kontraknya, tetapi sabuk ganda di sini supaya satu strip tidak bisa merobohkan
+       seluruh halaman owner. */
+    try {
+      model.curriculumStatus = await readCurriculumStatus(env, fetchImpl);
+    } catch (_) {
+      model.curriculumStatus = { state: 'unknown', mapel: null, english: null, soal: null };
+    }
 
     const classCookie = `fz_cls=${encodeURIComponent(activeClass)}; Path=/; Max-Age=31536000; SameSite=Lax; HttpOnly`;
     return html(renderDashboard(model), 200, { 'set-cookie': [refreshed, classCookie] });
@@ -5549,7 +5679,7 @@ export {
   renderLearnerSection, renderLearnerDirectory, renderLearnerDetail, learnerLabel, SUB_RE,
   readTeachers, mintTeacherInvite, revokeTeacherInvite, updateTeacherInvite, deleteTeacherInvite, deleteTeacherAccount, renderTeacherSection,
   readSchools, createSchool, updateSchool, deleteSchool, readClasses, createClass, deleteClass, regenerateTeacherInvite,
-  triggerMasterSeed, renderCurriculumSyncSection,
+  triggerMasterSeed, readCurriculumStatus, renderCurriculumSyncSection,
   // Rem penebakan halaman masuk: diekspor supaya gerbang bisa memodelkan ISOLATE BARU per
   // permintaan (cacat yang tidak pernah diuji) dan mengassert angka jendelanya sebagai kontrak.
   LOGIN_MAX, LOGIN_MAX_SHARED, LOGIN_BUCKET_MS, LOGIN_WINDOW_BUCKETS, LOGIN_WINDOW_MS,

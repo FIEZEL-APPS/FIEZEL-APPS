@@ -399,6 +399,58 @@ const assert = require('assert');
     assert(renderedSeed.includes('72 TP · 144 Kompetensi'), 'Indikator Bahasa Inggris di banner');
   }
 
+  // 10b. Status seed jujur: pending saat sebagian gagal, error saat semua gagal
+  {
+    const abortErr = new Error('aborted');
+    abortErr.name = 'AbortError';
+    const partialFetch = async (url) => {
+      if (String(url).includes('/api/seed/soal')) throw abortErr;
+      return { ok: true, status: 200, json: async () => ({ ok: true }) };
+    };
+    const env = { CURRICULUM_API_URL: 'https://fiezel-apps.onrender.com' };
+    const partial = await ownerMod.triggerMasterSeed(env, partialFetch);
+    assert(partial.state === 'pending', 'seed sebagian gagal harus pending, bukan ok palsu');
+    assert(partial.ok === true, 'pending tetap ok true (sinyal terkirim, proses di background)');
+    assert(partial.details && partial.details.soal && partial.details.soal.aborted === true, 'detail mencatat endpoint yang abort');
+
+    const deadFetch = async () => { throw new Error('connect refused'); };
+    const total = await ownerMod.triggerMasterSeed(env, deadFetch);
+    assert(total.state === 'error', 'seed total gagal harus error');
+    assert(total.ok === false, 'error harus ok false');
+  }
+
+  // 10c. readCurriculumStatus: terukur saat backend menjawab, unavailable saat mati
+  {
+    assert(typeof ownerMod.readCurriculumStatus === 'function', 'readCurriculumStatus diekspor');
+    const env = { CURRICULUM_API_URL: 'https://fiezel-apps.onrender.com' };
+    const goodFetch = async (url) => ({
+      ok: true, status: 200,
+      json: async () => (String(url).includes('/soal/') ? { from_this_seeder: 10, competencies_with_questions: 5 } : { competencies: 144 })
+    });
+    const measured = await ownerMod.readCurriculumStatus(env, goodFetch);
+    assert(measured.state === 'measured', 'backend menjawab harus measured');
+    assert(measured.soal.body.from_this_seeder === 10, 'body soal diteruskan apa adanya');
+
+    const deadFetch = async () => { throw new Error('down'); };
+    const unavailable = await ownerMod.readCurriculumStatus(env, deadFetch);
+    assert(unavailable.state === 'unavailable', 'backend mati harus unavailable, bukan throw');
+  }
+
+  // 10d. Strip hitungan riil muncul bila status diukur, hilang bila tidak ada
+  {
+    const cs = {
+      state: 'measured',
+      mapel: { ok: true, body: { competencies: 210 } },
+      english: { ok: true, body: { competencies: 144 } },
+      soal: { ok: true, body: { from_this_seeder: 40, competencies_with_questions: 30 } }
+    };
+    const withStrip = ownerMod.renderCurriculumSyncSection({ curriculumStatus: cs });
+    assert(withStrip.includes('Hitungan riil backend'), 'strip hitungan riil tidak tampil saat terukur');
+    assert(withStrip.includes('TERUKUR'), 'label TERUKUR tidak tampil');
+    const withoutStrip = ownerMod.renderCurriculumSyncSection({});
+    assert(!withoutStrip.includes('Hitungan riil backend'), 'strip hitungan riil tampil padahal tidak ada status — angka dari udara');
+  }
+
   console.log('owner-teacher-panel-test: SEMUA ASERSI LULUS (100% PASS)');
 })().catch((err) => {
   console.error('owner-teacher-panel-test GAGAL:', err);
