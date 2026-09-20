@@ -175,7 +175,20 @@ jobs:
           DEST: ${{ secrets.FIEZEL_DEPLOY_PATH }}
         run: |
           set -euo pipefail
-          ROOT_DEST="${DEST%/app}"
+          # NILAI BAWAAN YANG SAMA dengan dua langkah unggah di atas, dan itu bukan kerapian
+          # melainkan pagar. Dulu baris ini berbunyi `ROOT_DEST="${DEST%/app}"` — memotong
+          # akhiran `/app` dari DEST MENTAH, tanpa pernah menyentuh bawaan `~/public_html/app`
+          # yang dipakai langkah aset dan langkah sw.js. Akibatnya kalau `FIEZEL_DEPLOY_PATH`
+          # tidak dipasang: dua langkah di atas tetap menerbitkan ke `~/public_html/app` dengan
+          # benar, sedangkan baris ini menghasilkan ROOT_DEST KOSONG dan menyalin seluruh
+          # `website/` ke `$USER@$HOST:/` — akar filesystem server, bukan rumah pengguna.
+          #
+          # Jadi satu secret yang lupa dipasang tidak membuat deploy gagal bersuara; ia membuat
+          # SATU dari tiga langkah menembak tempat yang sama sekali lain. Menurunkan ROOT_DEST
+          # dari TARGET yang sudah ber-bawaan menutup jalan itu: keduanya kini tidak bisa
+          # berbeda asal-usul. `tests/deploy-site-gate-test.js` cek (E2) mengunci kesamaan ini.
+          TARGET="${DEST:-~/public_html/app}"
+          ROOT_DEST="${TARGET%/app}"
           if [ -d "website" ]; then
             rsync -az \
               -e "ssh -i ~/.ssh/id_deploy -p ${PORT:-22} -o StrictHostKeyChecking=yes" \
