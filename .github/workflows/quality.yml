@@ -227,6 +227,11 @@ jobs:
           # Gerbang di atas hanya mengukur BENTUK soal untuk 17 mapel; ia hijau sekalipun
           # ketiga mapel ini mengirim bab yang salah - itulah celah yang ditutup di sini.
           node tests/mapel-fase-d-content-test.js
+          # Modal 'Buat Tugas' guru: pemilihan Bab & Sub-bab Buku Siswa, kolam soal per
+          # sub-bab, dan bentuk soal 17 mapel. Mendarat di m025-349 tanpa pernah didaftarkan,
+          # jadi gate-registry-test merah sejak commit itu. Didaftarkan di sini (27 assert,
+          # hijau saat didaftarkan) supaya ia benar-benar menjadi bukti, bukan berkas yang ada.
+          node tests/modal-assign-teacher-ux-test.js
           node tests/question-allocator-test.js
           node tests/bankor-latihan-test.js
           node tests/fiezel-stat-gate-test.js
