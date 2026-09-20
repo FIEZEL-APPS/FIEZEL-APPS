@@ -233,6 +233,7 @@
     'umum.cari': 'ค้นหา',
     'umum.riwayat': 'ประวัติ',
     'umum.notifikasi': 'การแจ้งเตือน',
-    'umum.belum-ada-data': 'ยังไม่มีข้อมูล'
+    'umum.belum-ada-data': 'ยังไม่มีข้อมูล',
+    'umum.muat-ulang': 'โหลดใหม่'
   });
 }());
