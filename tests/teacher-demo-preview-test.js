@@ -137,8 +137,27 @@ test('R6 · pita demo tampil dengan jalan keluar dan jalan naik ke akun guru', (
   assert.ok(/function demoBanner\(/.test(shellCode), 'pita demo tidak ada');
   assert.ok(/previewOn\s*\?\s*' is-demo'/.test(shellCode) || /is-demo/.test(shellCode),
     'kelas penanda demo tidak dipasang di kerangka');
-  assert.ok(/demoBanner\(\)/.test(shellCode.slice(shellCode.indexOf('function render('), shellCode.indexOf('function render(') + 900)),
-    'pita demo tidak dirender');
+  // Yang dijaga: render() BENAR-BENAR memanggil demoBanner(). Dulu baris ini mengiris 900
+  // karakter pertama sesudah `function render(` dan mencari panggilannya di sana — jendela
+  // byte, bukan kontrak. Setiap sisipan sah di awal render() menggeser panggilannya keluar
+  // jendela dan memerahkan gerbang tanpa ada yang rusak; itu persis yang terjadi ketika
+  // m025-344/345 menambahkan ensureTeacherClass() + syncClassList() di kepala render()
+  // (panggilannya pindah ke offset 960, 60 karakter di luar jendela).
+  //
+  // Penggantinya membaca BADAN render() yang sesungguhnya, dihitung lewat pasangan kurung
+  // kurawal. Ini lebih ketat, bukan lebih longgar: kalau demoBanner() dicabut dari render()
+  // ia tetap merah di posisi mana pun, sekaligus berhenti merah karena kode tak terkait.
+  const renderStart = shellCode.indexOf('function render(');
+  assert.ok(renderStart >= 0, 'function render( tidak ditemukan di shell guru');
+  const bodyStart = shellCode.indexOf('{', renderStart);
+  let depth = 0, bodyEnd = -1;
+  for (let i = bodyStart; i < shellCode.length; i++) {
+    if (shellCode[i] === '{') depth++;
+    else if (shellCode[i] === '}' && --depth === 0) { bodyEnd = i; break; }
+  }
+  assert.ok(bodyEnd > bodyStart, 'badan render() tidak bisa ditentukan — kurung kurawalnya tidak seimbang');
+  assert.ok(/demoBanner\(\)/.test(shellCode.slice(bodyStart, bodyEnd)),
+    'pita demo tidak dirender — render() tidak memanggil demoBanner()');
   assert.ok(/case 'demo-exit':[\s\S]{0,120}exitPreview\(\)/.test(shellCode), 'tombol keluar demo tidak menghapus penanda');
   assert.ok(/case 'demo-activate':[\s\S]{0,80}openAccount\('teacher'\)/.test(shellCode),
     'pita demo tidak menawarkan jalan naik ke akun guru sungguhan');
