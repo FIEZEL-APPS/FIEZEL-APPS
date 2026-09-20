@@ -1,0 +1,409 @@
+{
+  "code": "KOMP-ENG-D-8-BAB5-01",
+  "grade": 8,
+  "name": "Chapter 5: Embrace Yourself",
+  "materi": "Describing Feelings and Personality Traits, Personal Recount Text, Self-Acceptance & Empathy, Encouraging Expressions",
+  "cpRef": "English for Nusantara untuk SMP/MTs Kelas VIII",
+  "items": [
+    {
+      "id": "eng-d-8-c5-q01",
+      "difficulty": "easy",
+      "prompt": "Read the conversation from Unit 1 (p. 239):\nMonita: \"Pipit, look at these models!\"\nPipit: \"They are white and tall. They have no flaws at all. They are so beautiful. Should we put on makeup?\"\nMonita: \"I think so. That's what makes them beautiful.\"\n\nWhat is the main topic of Monita and Pipit's discussion?",
+      "options": [
+        "Beauty standards and advertisements",
+        "Types of physical exercise",
+        "School sports competition",
+        "Cooking healthy meals"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Monita dan Pipit sedang mendiskusikan iklan perawatan kecantikan dan standar kecantikan model yang sempurna tanpa cela."
+      },
+      "distractorWhy": {
+        "1": "Pilihan ini membahas olahraga fisik yang tidak disebutkan dalam percakapan.",
+        "2": "Pilihan ini membahas kompetisi olahraga sekolah yang tidak relevan dengan dialog.",
+        "3": "Pilihan ini mengenai memasak makanan sehat yang tidak sesuai dengan isi dialog."
+      }
+    },
+    {
+      "id": "eng-d-8-c5-q02",
+      "difficulty": "easy",
+      "prompt": "Read Kak Shinta's response in Unit 1 (p. 240):\nKak Shinta: \"You know, we are beautiful just the way we are, with or without makeup.\"\n\nWhat message is Kak Shinta conveying to Monita and Pipit?",
+      "options": [
+        "Self-acceptance and loving oneself naturally",
+        "The mandatory requirement to wear cosmetics daily",
+        "The importance of saving money to buy expensive makeup",
+        "Becoming professional fashion models in the future"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Kak Shinta menekankan penerimaan diri (self-acceptance) bahwa setiap individu cantik apa adanya tanpa perlu bergantung pada tata rias."
+      },
+      "distractorWhy": {
+        "1": "Pilihan ini bertolak belakang karena Kak Shinta tidak mewajibkan kosmetik.",
+        "2": "Pilihan ini membahas tabungan kosmetik mahal yang tidak disampaikan Kak Shinta.",
+        "3": "Pilihan ini mengenai cita-cita menjadi model yang tidak relevan dengan pesan Kak Shinta."
+      }
+    },
+    {
+      "id": "eng-d-8-c5-q03",
+      "difficulty": "easy",
+      "prompt": "In Unit 1 (p. 241), match the word 'intently' with its correct meaning provided in Section 3:",
+      "options": [
+        "With earnest and eager attention",
+        "A quick look or glance",
+        "A slight hollow in a hard surface",
+        "Cosmetics applied to the face"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Sesuai dengan padanan kosakata di Section 3 (p. 241), 'intently' bermakna menatap dengan penuh perhatian dan sungguh-sungguh."
+      },
+      "distractorWhy": {
+        "1": "Pilihan ini merupakan definisi dari 'a glance'.",
+        "2": "Pilihan ini merupakan definisi dari 'dent'.",
+        "3": "Pilihan ini merupakan definisi dari 'makeup'."
+      }
+    },
+    {
+      "id": "eng-d-8-c5-q04",
+      "difficulty": "medium",
+      "prompt": "Read the story text from Unit 1 (p. 242):\n\"'You'd look prettier with makeup on.' She looked at me intently; her eyes were scanning every inch of my face. Every dent, every scratch, every line. Every flaw. Suddenly, all the words I had made friends with throughout my life vanished. I didn't say anything to her for a solid minute...\"\n\nHow did the main character ('I') feel when her classmate made that comment?",
+      "options": [
+        "Hurt and speechless",
+        "Cheered and excited",
+        "Amused and cheerful",
+        "Proud and confident"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Karakter 'I' merasa tersakiti perasaannya dan tidak mampu berkata-kata (speechless) selama satu menit penuh akibat komentar tersebut."
+      },
+      "distractorWhy": {
+        "1": "Pilihan ini menggambarkan perasaan gembira yang berlawanan dengan konteks narasi.",
+        "2": "Pilihan ini menggambarkan rasa terhibur yang tidak sesuai dengan dampak emosional cerita.",
+        "3": "Pilihan ini menggambarkan rasa bangga dan percaya diri yang bertentangan dengan isi teks."
+      }
+    },
+    {
+      "id": "eng-d-8-c5-q05",
+      "difficulty": "medium",
+      "prompt": "Read the ending of the narrative in Unit 1 (p. 242):\n\"Maybe someday I'll carefully conceal my dents, my scratches, my lines. Maybe someday I'll 'prettify' my face. Maybe someday, but for now, I'll learn how to embrace every imperfection, flaw, and part of me...\"\n\nWhat resolution does the narrator reach at the end of the story?",
+      "options": [
+        "Learning to embrace every flaw and imperfection",
+        "Buying whitening skin products immediately",
+        "Avoiding going to school forever",
+        "Confronting her classmate aggressively"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Narator memutuskan untuk belajar merangkul dan menerima setiap kekurangan serta ketidaksempurnaan dirinya (embracing imperfection)."
+      },
+      "distractorWhy": {
+        "1": "Pilihan ini mengenai membeli produk pemutih yang tidak menjadi keputusan narator.",
+        "2": "Pilihan ini mengenai membolos sekolah yang tidak disebutkan dalam teks.",
+        "3": "Pilihan ini mengenai konfrontasi agresif yang tidak dilakukan oleh narator."
+      }
+    },
+    {
+      "id": "eng-d-8-c5-q06",
+      "difficulty": "easy",
+      "prompt": "Based on Table 5.1 Language Focus (p. 244), which of the following expressions is used to express personal opinion with 'I'?",
+      "options": [
+        "I think (that) ...",
+        "Once upon a time ...",
+        "The next morning ...",
+        "Suddenly ..."
+      ],
+      "answer": 0,
+      "why": {
+        "0": "'I think (that)...' adalah salah satu ungkapan standar untuk menyampaikan pendapat pribadi (expressing opinion)."
+      },
+      "distractorWhy": {
+        "1": "Pilihan ini merupakan kosa kata pembuka cerita naratif/dongeng.",
+        "2": "Pilihan ini merupakan penanda urutan waktu (adverbial of time).",
+        "3": "Pilihan ini merupakan kata keterangan urutan peristiwa mendadak."
+      }
+    },
+    {
+      "id": "eng-d-8-c5-q07",
+      "difficulty": "medium",
+      "prompt": "Complete the opinion sentence based on Table 5.2 & 5.3 (p. 245):\n\"________, swimming helps you to stay healthy.\"\nWhich expression correctly completes the opinion statement?",
+      "options": [
+        "In my opinion",
+        "Look at me",
+        "Long ago",
+        "Behind the door"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "'In my opinion' merupakan frasa resmi yang digunakan untuk menyatakan pandangan/pendapat."
+      },
+      "distractorWhy": {
+        "1": "Pilihan ini merupakan kalimat perintah untuk melihat.",
+        "2": "Pilihan ini merupakan keterangan waktu lampau.",
+        "3": "Pilihan ini merupakan keterangan tempat."
+      }
+    },
+    {
+      "id": "eng-d-8-c5-q08",
+      "difficulty": "medium",
+      "prompt": "Read the dialogue in Unit 2 (p. 255):\nGalang: \"I was in the same situation once. I thought I was not good at anything.\"\nMonita: \"But, I found out that I was good at playing basketball.\"\nMade: \"In my case, I thought I was not good at fishing but Galang proved me wrong. He taught me how to fish well. Thanks, Galang.\"\n\nWhat role did Galang play in helping Made build self-confidence?",
+      "options": [
+        "He patiently taught Made how to fish well",
+        "He bought new fishing gear for Made",
+        "He teased Made for lacking sports skills",
+        "He forced Made to join the basketball team"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Galang membantu Made membuktikan bahwa anggapan dirinya buruk dalam memancing adalah keliru dengan mengajarinya teknik memancing yang baik."
+      },
+      "distractorWhy": {
+        "1": "Pilihan ini membahas membelikan alat pancing baru yang tidak ada dalam dialog.",
+        "2": "Pilihan ini membahas mengejek Made yang bertolak belakang dengan sikap suportif Galang.",
+        "3": "Pilihan ini mengenai memaksa masuk tim basket yang tidak sesuai dengan dialog."
+      }
+    },
+    {
+      "id": "eng-d-8-c5-q09",
+      "difficulty": "medium",
+      "prompt": "Read Part 1 of Mirza's story in Unit 2 (p. 257):\n\"While everyone was so eager to defend and score, Mirza was not sure about his role as a keeper. He ran left, then to the right, clumsily leaving the goal area empty. The next thing he knew, the other team already scored.\"\n\nWhy did the opposing team manage to score easily?",
+      "options": [
+        "Mirza moved clumsily and left the goal area empty",
+        "The soccer ball broke in the middle of the game",
+        "Siti played as the goalkeeper for Mirza's team",
+        "The referee stopped the match unexpectedly"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Tim lawan berhasil mencetak gol karena Mirza merasa canggung dan meninggalkan area gawang dalam keadaan kosong."
+      },
+      "distractorWhy": {
+        "1": "Pilihan ini mengenai bola plastik yang rusak yang tidak disebutkan saat pertandingan.",
+        "2": "Pilihan ini keliru karena Siti bermain di pos penyerang/pemain depan.",
+        "3": "Pilihan ini mengenai wasit menghentikan pertandingan yang tidak ada dalam teks."
+      }
+    },
+    {
+      "id": "eng-d-8-c5-q10",
+      "difficulty": "hard",
+      "prompt": "Read the conversation after the street soccer match in Unit 2 (p. 257):\nSiti: \"You were no use, Mirza. You can't play football.\"\nBayu: \"I think he guarded the goal area well.\"\nSiti: \"But he didn't know what to do in the game. He was just running here and there.\"\n\nHow did Mirza react to Siti's discouraging harsh words?",
+      "options": [
+        "He kept silent and remained calm without arguing",
+        "He shouted angrily at Siti and Bayu",
+        "He cried out loud and ran away immediately",
+        "He quit school soccer activities on the spot"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Mirza memilih diam (kept silent) dan tidak membalas ucapan tajam Siti tersebut."
+      },
+      "distractorWhy": {
+        "1": "Pilihan ini berlawanan dengan fakta bahwa Mirza memilih untuk diam.",
+        "2": "Pilihan ini menyatakan Mirza menangis keras yang tidak tercantum dalam narasi.",
+        "3": "Pilihan ini mengenai keluar sekolah yang tidak sesuai dengan alur cerita."
+      }
+    },
+    {
+      "id": "eng-d-8-c5-q11",
+      "difficulty": "hard",
+      "prompt": "Read Part 2 of Mirza's story in Unit 2 (p. 259):\nMirza asked his mother if he could join Winners Football Club, but his mother whispered, \"But you know our financial condition.\" Then she suggested, \"There's a community football club here. I heard Pak RT was looking for children to join the club.\"\n\nWhy could Mirza not join Winners Football Club?",
+      "options": [
+        "His family had financial constraints to pay for the club",
+        "Pak RT banned Mirza from joining soccer clubs",
+        "Winners Football Club moved to another country",
+        "Mirza did not like soccer training at all"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Mirza tidak dapat bergabung dengan Winners Football Club karena keterbatasan biaya keluarga (financial condition)."
+      },
+      "distractorWhy": {
+        "1": "Pilihan ini menyalahkan Pak RT padahal Pak RT justru memfasilitasi klub komunitas gratis.",
+        "2": "Pilihan ini mengenai klub pindah negara yang tidak ada dalam konteks.",
+        "3": "Pilihan ini menyatakan Mirza tidak suka sepak bola padahal ia sangat ingin berlatih."
+      }
+    },
+    {
+      "id": "eng-d-8-c5-q12",
+      "difficulty": "hard",
+      "prompt": "Read Part 3 of Mirza's story in Unit 2 (p. 261):\n\"Pak RT came to him and suggested that he should try other positions. After trying some positions, he found that being a midfielder was the best position for him. A month later... He helped his team to win as a midfielder.\"\n\nWhat key change led to Mirza's success in football?",
+      "options": [
+        "Switching his position from goalkeeper to midfielder based on advice",
+        "Quitting the community soccer club to join a commercial academy",
+        "Refusing to pass the soccer ball to any of his teammates",
+        "Playing without a coach or any formal practice"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Kunci keberhasilan Mirza adalah berpindah posisi dari penjaga gawang menjadi gelandang (midfielder) atas saran Pak RT."
+      },
+      "distractorWhy": {
+        "1": "Pilihan ini bertolak belakang dengan fakta bahwa Mirza berlatih di klub komunitas Pak RT.",
+        "2": "Pilihan ini menyatakan tidak mau mengoper bola padahal umpan presisi Mirza membantu Siti mencetak gol.",
+        "3": "Pilihan ini menyatakan bermain tanpa pelatih yang tidak sesuai cerita."
+      }
+    },
+    {
+      "id": "eng-d-8-c5-q13",
+      "difficulty": "medium",
+      "prompt": "Read Siti's words at the end of Unit 2 (p. 261):\nSiti: \"I'm sorry for underestimating you, Mirza. I should not have pushed you to be a goalkeeper. You are such a great midfielder!\"\nMirza: \"That's okay. Let's practice together to become a better team.\"\n\nWhat personal quality does Mirza show when responding to Siti's apology?",
+      "options": [
+        "Forgiveness and a supportive team spirit",
+        "Arrogance and holding long-term grudges",
+        "Indifference and lack of respect",
+        "Selfishness and boasting about his talent"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Mirza menunjukkan kebesaran hati untuk memaafkan (forgiveness) dan semangat kerja sama tim (team spirit) tanpa menyimpan dendam."
+      },
+      "distractorWhy": {
+        "1": "Pilihan ini menggambarkan kesombongan dan dendam yang bertentangan dengan respon Mirza.",
+        "2": "Pilihan ini menggambarkan sikap acuh tak acuh yang tidak sesuai dengan ajakan Mirza.",
+        "3": "Pilihan ini menggambarkan rasa egois dan pamer yang bertolak belakang dengan karakter Mirza."
+      }
+    },
+    {
+      "id": "eng-d-8-c5-q14",
+      "difficulty": "medium",
+      "prompt": "Based on Language Focus in Unit 2 (p. 265), identify the sentence that contains an adverb of manner ending in '-ly':",
+      "options": [
+        "He ran left, then to the right, clumsily leaving the goal area empty.",
+        "Galang is always friendly to all of his classmates.",
+        "Andre sometimes feels lonely at home.",
+        "We have to respect elderly people in our neighborhood."
+      ],
+      "answer": 0,
+      "why": {
+        "0": "'clumsily' adalah adverb of manner yang menerangkan bagaimana Mirza meninggalkan area gawang. Kata seperti friendly, lonely, dan elderly adalah adjective."
+      },
+      "distractorWhy": {
+        "1": "Pilihan ini menggunakan kata 'friendly' yang berkategori kata sifat (adjective).",
+        "2": "Pilihan ini menggunakan kata 'lonely' yang berkategori kata sifat (adjective).",
+        "3": "Pilihan ini menggunakan kata 'elderly' yang berkategori kata sifat (adjective)."
+      }
+    },
+    {
+      "id": "eng-d-8-c5-q15",
+      "difficulty": "medium",
+      "prompt": "Based on Language Focus in Unit 2 (p. 265), which of the following words is an adverb of manner that DOES NOT end in '-ly'?",
+      "options": [
+        "well",
+        "clumsily",
+        "sternly",
+        "hesitantly"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Kata 'well' merupakan contoh adverb of manner bentuk tidak berakhiran '-ly' (berasal dari kata sifat 'good')."
+      },
+      "distractorWhy": {
+        "1": "Pilihan ini adalah adverb of manner yang berakhiran '-ly'.",
+        "2": "Pilihan ini adalah adverb of manner yang berakhiran '-ly'.",
+        "3": "Pilihan ini adalah adverb of manner yang berakhiran '-ly'."
+      }
+    },
+    {
+      "id": "eng-d-8-c5-q16",
+      "difficulty": "hard",
+      "prompt": "Complete the sentence in Worksheet 5.12 (p. 267) using the correct adjective and adverb of manner:\n\"Mirza is a ________ soccer player. He plays soccer very ________.\"",
+      "options": [
+        "good ; well",
+        "well ; good",
+        "good ; goodly",
+        "well ; well"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "'good' digunakan sebagai kata sifat (adjective) menerangkan kata benda 'soccer player', sedangkan 'well' digunakan sebagai kata keterangan (adverb of manner) menerangkan kata kerja 'plays'."
+      },
+      "distractorWhy": {
+        "1": "Pilihan ini terbalik dalam penempatan kata sifat dan kata keterangan.",
+        "2": "Pilihan ini salah karena bentuk 'goodly' tidak tepat digunakan sebagai keterangan cara bermain.",
+        "3": "Pilihan ini menggunakan kata keterangan di posisi kata sifat."
+      }
+    },
+    {
+      "id": "eng-d-8-c5-q17",
+      "difficulty": "medium",
+      "prompt": "Read the story 'Getting into the Band' in Unit 3 (p. 274):\n\"I did a few auditions. The first time was a disaster. I couldn't get my breath and I started to cry. I just wanted to run home but the leader was very understanding. He fixed an appointment for the following week. He explained how to relax and do breathing techniques.\"\n\nHow did the band leader show empathy toward Peter during his failed first audition?",
+      "options": [
+        "By giving breathing techniques and offering a re-audition",
+        "By disqualifying Peter from music activities permanently",
+        "By laughing at Peter's nervousness in front of everyone",
+        "By ordering Peter to leave the town hall immediately"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Pemimpin grup musik menunjukkan empati dengan memahami kondisi Peter, mengajarkan teknik pernapasan/relaksasi, serta memberikan kesempatan audisi ulang."
+      },
+      "distractorWhy": {
+        "1": "Pilihan ini mengenai diskualifikasi permanen yang bertentangan dengan sikap suportif sang pemimpin.",
+        "2": "Pilihan ini mengenai mengetawai kegugupan yang berlawanan dengan empati sang pemimpin.",
+        "3": "Pilihan ini mengenai mengusir Peter yang tidak sesuai dengan isi narasi."
+      }
+    },
+    {
+      "id": "eng-d-8-c5-q18",
+      "difficulty": "hard",
+      "prompt": "Read the progression of Peter's auditions in Unit 3 (p. 274):\n\"The next time I had prepared everything. But, I did not play well enough because I was still nervous... The third time was a completely different story. I enjoyed it.\"\n\nWhat key takeaway does Peter's story demonstrate regarding skill development?",
+      "options": [
+        "Continuous practice and perseverance overcome initial anxiety",
+        "Relying on luck without preparation is sufficient for success",
+        "Giving up immediately after the first failure avoids stress",
+        "Natural talent requires no practice or breathing guidance"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Pengalaman Peter membuktikan bahwa latihan tekun (practice) dan pantang menyerah (perseverance) mampu mengatasi kecemasan hingga meraih keberhasilan."
+      },
+      "distractorWhy": {
+        "1": "Pilihan ini mengandalkan keberuntungan semata yang bertolak belakang dengan usaha Peter.",
+        "2": "Pilihan ini menyarankan menyerah pada kegagalan pertama yang bertentangan dengan semangat Peter.",
+        "3": "Pilihan ini mengklaim bakat tidak butuh latihan yang berlawanan dengan judul bab 'Practice Makes Perfect'."
+      }
+    },
+    {
+      "id": "eng-d-8-c5-q19",
+      "difficulty": "hard",
+      "prompt": "Read Section 4 Language Focus on Narrative Text Structure in Unit 3 (p. 276):\nWhich generic structure of a personal recount narrative text functions to introduce the time, location, and characters of the story?",
+      "options": [
+        "Orientation",
+        "Complication",
+        "Resolution",
+        "Re-orientation"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "'Orientation' adalah bagian struktur naratif yang berfungsi mengenalkan tokoh, waktu, dan tempat terjadinya peristiwa."
+      },
+      "distractorWhy": {
+        "1": "Pilihan ini merupakan bagian yang menyajikan konflik atau permasalahan dalam cerita.",
+        "2": "Pilihan ini merupakan bagian penyelesaian masalah.",
+        "3": "Pilihan ini merupakan bagian penutup atau penyimpulan cerita."
+      }
+    },
+    {
+      "id": "eng-d-8-c5-q20",
+      "difficulty": "hard",
+      "prompt": "Based on the text elements in Unit 3 (p. 276), what section of the narrative presents the solution to the conflict experienced by the characters?",
+      "options": [
+        "Resolution",
+        "Complication",
+        "Orientation",
+        "Identification"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "'Resolution' memuat solusi atau penyelesaian dari konflik (complication) yang dialami para tokoh."
+      },
+      "distractorWhy": {
+        "1": "Pilihan ini adalah bagian munculnya konflik/masalah.",
+        "2": "Pilihan ini adalah bagian pengenalan latar dan tokoh.",
+        "3": "Pilihan ini adalah struktur umum teks deskriptif, bukan naratif."
+      }
+    }
+  ]
+}

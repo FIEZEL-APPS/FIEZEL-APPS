@@ -1,0 +1,417 @@
+import json
+
+data = {
+  "code": "KOMP-ENG-D-8-BAB4-01",
+  "grade": 8,
+  "name": "Chapter 4: No Littering",
+  "materi": "Recounting Waste Clean-Up Events, Waste Sorting & Management, Past Continuous Tense (was/were + v-ing), Environmental Action",
+  "cpRef": "English for Nusantara untuk SMP/MTs Kelas VIII",
+  "items": [
+    {
+      "id": "eng-d-8-c4-q01",
+      "difficulty": "easy",
+      "prompt": "Read the dialogue snippet from Unit 1 Section 2:\nGalang: \"Was the river this dirty back then? Did you swim in the river?\"\nPak Rahmansyah: \"I did! The river was quite clean back then. A lot of kids swam and played in the river.\"\n\nWhat condition was Sungai Lestari in when Pak Rahmansyah was a child?",
+      "options": [
+        "It was clean and local children often swam and played in it.",
+        "It was already filled with plastic trash and polluted.",
+        "It was deep and dangerous so children were forbidden to go near.",
+        "It was dried up because of a severe drought in the nearby town."
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Teks percakapan menyebutkan bahwa dahulu Sungai Lestari cukup bersih (\"quite clean back then\") dan banyak anak-anak berenang serta bermain di sana."
+      },
+      "distractorWhy": {
+        "1": "Pernyataan ini bertentangan dengan penjelasan Pak Rahmansyah yang menyatakan bahwa sungai tersebut dahulu masih bersih.",
+        "2": "Dialog tidak menyebutkan sungai itu berbahaya atau melarang anak-anak mendekat, melainkan menceritakan bahwa banyak anak bermain di sungai.",
+        "3": "Teks tidak menyebutkan terjadinya kekeringan atau sungai kering."
+      }
+    },
+    {
+      "id": "eng-d-8-c4-q02",
+      "difficulty": "easy",
+      "prompt": "Based on Bu Posma's explanation in Unit 1 Section 2, why does plastic trash cause long-term pollution in rivers like Sungai Lestari?",
+      "options": [
+        "Because plastic does not decay easily and accumulates in many places.",
+        "Because plastic dissolves instantly in water and poisons river fish.",
+        "Because plastic turns into organic fertilizer that attracts algae.",
+        "Because plastic sinks to the bottom and burns underwater."
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Bu Posma menjelaskan bahwa sampah plastik menjadi masalah utama karena tidak mudah terurai (\"plastic does not decay easily\") sehingga mengotori berbagai tempat."
+      },
+      "distractorWhy": {
+        "1": "Plastik tidak larut secara instan dalam air, melainkan justru sangat sulit terurai.",
+        "2": "Plastik adalah bahan anorganik dan tidak berubah menjadi pupuk organik.",
+        "3": "Plastik yang berada di dalam air sungai tidak terbakar di bawah air."
+      }
+    },
+    {
+      "id": "eng-d-8-c4-q03",
+      "difficulty": "medium",
+      "prompt": "Choose the grammatically correct interrogative sentence in Simple Past tense based on Language Focus Unit 1:",
+      "options": [
+        "Did people throw their trash into the river?",
+        "Did people threw their trash into the river?",
+        "Was people throw their trash into the river?",
+        "Were people threw their trash into the river?"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Dalam kalimat tanya Simple Past Tense menggunakan kata bantu \"Did\", kata kerja utama kembali ke bentuk dasar (infinitive/Verb 1), yaitu \"throw\"."
+      },
+      "distractorWhy": {
+        "1": "Kata kerja setelah kata bantu \"Did\" harus berupa Verb 1 (\"throw\"), bukan kata kerja bentuk lampau (\"threw\").",
+        "2": "Kata bantu \"Was\" tidak digunakan bersama kata kerja aksi (\"throw\") dalam struktur kalimat tanya sederhana ini.",
+        "3": "Kata bantu \"Were\" tidak dipadukan dengan Verb 2 (\"threw\") dalam pembentukan kalimat tanya Simple Past."
+      }
+    },
+    {
+      "id": "eng-d-8-c4-q04",
+      "difficulty": "medium",
+      "prompt": "In Audio 4.2 (Unit 1), what main obstacle caused the rainwater to back up and flood the area after the heavy rain?",
+      "options": [
+        "Almost all gutters were clogged and full of plastic trash.",
+        "The river dam broke due to an earthquake.",
+        "The local residents blocked the water pipes intentionally.",
+        "The sea level rose suddenly and flooded the town."
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Petugas penyelamat melaporkan bahwa saluran air (gutters) tersumbat dan penuh dengan sampah plastik sehingga air hujan meluap."
+      },
+      "distractorWhy": {
+        "1": "Teks tidak menyebutkan adanya bendungan yang jebol akibat gempa bumi.",
+        "2": "Tidak ada informasi mengenai warga yang sengaja menyumbat pipa air.",
+        "3": "Banjir disebabkan oleh hujan lebat dan saluran air yang tersumbat sampah plastik, bukan oleh kenaikan permukaan laut."
+      }
+    },
+    {
+      "id": "eng-d-8-c4-q05",
+      "difficulty": "easy",
+      "prompt": "Complete the sentence with the correct past form of 'be' based on Language Focus Unit 1:\n\"In some areas of the town, many houses _____ almost underwater during the flood.\"",
+      "options": [
+        "were",
+        "was",
+        "is",
+        "are"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Subjek kalimat adalah \"many houses\" (jamak/plural), sehingga kata bantu 'be' dalam bentuk lampau yang tepat adalah \"were\"."
+      },
+      "distractorWhy": {
+        "1": "Bentuk \"was\" digunakan untuk subjek tunggal (singular), sedangkan subjek kalimat ini jamak.",
+        "2": "Bentuk \"is\" merupakan to be present tense untuk subjek tunggal, tidak cocok untuk konteks kejadian masa lalu.",
+        "3": "Bentuk \"are\" merupakan to be present tense, padahal kalimat menceritakan peristiwa di masa lalu (past tense)."
+      }
+    },
+    {
+      "id": "eng-d-8-c4-q06",
+      "difficulty": "medium",
+      "prompt": "Which of the following questions correctly asks about the state of the gutters in the past using Was/Were?",
+      "options": [
+        "Were the gutters full of plastic trash after the storm?",
+        "Did the gutters was full of plastic trash after the storm?",
+        "Was the gutters full of plastic trash after the storm?",
+        "Were the gutters filled trash do after the storm?"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Subjek \"the gutters\" berbentuk jamak, sehingga kalimat tanya nominal di masa lalu diawali dengan \"Were\" diikuti subjek dan kata sifat/frasa preposisi."
+      },
+      "distractorWhy": {
+        "1": "Penggabungan kata bantu \"Did\" dan \"was\" secara bersamaan dalam satu klausa tidak sesuai tata bahasa.",
+        "2": "Bentuk \"Was\" seharusnya digunakan untuk subjek tunggal, sedangkan \"the gutters\" adalah kata benda jamak.",
+        "3": "Susunan kata dan penggunaan \"filled trash do\" tidak memenuhi struktur tata bahasa yang valid."
+      }
+    },
+    {
+      "id": "eng-d-8-c4-q07",
+      "difficulty": "easy",
+      "prompt": "Read the excerpt from Unit 2 Section 3:\n\"A team of scientists from Texas University helped an injured sea turtle when they sailed in the ocean near Costa Rica. The scientists were collecting data on sea turtles when they saw the injured turtle.\"\n\nWhere were the scientists when they spotted the injured sea turtle?",
+      "options": [
+        "In the ocean near Costa Rica.",
+        "At a turtle breeding center in Texas.",
+        "On a public beach in Kuta, Bali.",
+        "In a laboratory at Texas University."
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Teks bacaan menyebutkan bahwa para ilmuwan sedang berlayar di samudra dekat Costa Rica ketika mereka melihat penyu yang terluka."
+      },
+      "distractorWhy": {
+        "1": "Meskipun para ilmuwan berasal dari Texas University, lokasi penemuan penyu berada di laut dekat Costa Rica.",
+        "2": "Pantai Kuta Bali merupakan latar lokasi untuk cerita di Unit 3 (gerakan Bye Bye Plastic Bags), bukan cerita penyu di Unit 2.",
+        "3": "Para ilmuwan melihat penyu saat berlayar di laut, bukan di dalam laboratorium."
+      }
+    },
+    {
+      "id": "eng-d-8-c4-q08",
+      "difficulty": "easy",
+      "prompt": "Based on the story in Unit 2 Section 3, what object did the scientists pull out of the injured sea turtle's nostril?",
+      "options": [
+        "A plastic straw.",
+        "A sharp fish hook.",
+        "A piece of fishing net.",
+        "A dangerous natural parasite."
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Hasil pemeriksaan menunjukkan bahwa benda yang tersumbat di lubang hidung penyu adalah sedotan plastik (\"plastic straw\")."
+      },
+      "distractorWhy": {
+        "1": "Teks tidak menyebutkan adanya kail pancing.",
+        "2": "Benda yang dikeluarkan dari hidung penyu adalah sedotan plastik, bukan jaring ikan.",
+        "3": "Ilmuwan awalnya mengira itu mungkin parasit, tetapi setelah ditarik ternyata benda tersebut adalah sedotan plastik."
+      }
+    },
+    {
+      "id": "eng-d-8-c4-q09",
+      "difficulty": "medium",
+      "prompt": "Which sentence uses the Past Continuous Tense correctly to describe an action in progress in the past?",
+      "options": [
+        "The scientists were collecting data on sea turtles when they saw the turtle.",
+        "The scientists was collecting data on sea turtles when they saw the turtle.",
+        "The scientists were collect data on sea turtles when they saw the turtle.",
+        "The scientists collected data while they were see the turtle."
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Subjek \"The scientists\" (jamak) berpasangan dengan \"were\" dan kata kerja berakhiran -ing (\"collecting\") untuk membentuk Past Continuous Tense."
+      },
+      "distractorWhy": {
+        "1": "Subjek jamak \"The scientists\" harus menggunakan \"were\", bukan \"was\".",
+        "2": "Past Continuous Tense membutuhkan kata kerja berakhiran -ing (\"collecting\"), bukan bentuk dasar (\"collect\").",
+        "3": "Kata kerja setelah \"were\" harus berbentuk V-ing (\"seeing\"), bukan bentuk dasar (\"see\")."
+      }
+    },
+    {
+      "id": "eng-d-8-c4-q10",
+      "difficulty": "easy",
+      "prompt": "Complete the Wh- question based on Language Focus Unit 2:\n\"______ did the team of scientists sail when they found the injured turtle?\"\nAnswer: \"They sailed in the ocean near Costa Rica.\"",
+      "options": [
+        "Where",
+        "What",
+        "Why",
+        "Who"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Kata tanya \"Where\" digunakan untuk menanyakan tempat atau lokasi (\"in the ocean near Costa Rica\")."
+      },
+      "distractorWhy": {
+        "1": "Kata tanya \"What\" digunakan untuk menanyakan benda atau tindakan, bukan lokasi.",
+        "2": "Kata tanya \"Why\" digunakan untuk menanyakan alasan atau sebab.",
+        "3": "Kata tanya \"Who\" digunakan untuk menanyakan orang atau pelaku."
+      }
+    },
+    {
+      "id": "eng-d-8-c4-q11",
+      "difficulty": "medium",
+      "prompt": "Choose the correct structure for asking about the reason why the scientists caught the turtle in Simple Past tense:",
+      "options": [
+        "Why did the scientists catch the sea turtle?",
+        "Why did the scientists caught the sea turtle?",
+        "Why were the scientists caught the sea turtle?",
+        "Why the scientists did catch the sea turtle?"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Formasi pertanyaan Wh- Simple Past menggunakan pola: Wh-word + did + subject + Verb 1 (\"catch\")."
+      },
+      "distractorWhy": {
+        "1": "Setelah kata bantu \"did\", kata kerja yang digunakan harus berupa Verb 1 (\"catch\"), bukan Verb 2 (\"caught\").",
+        "2": "Penggunaan to be \"were\" bersama dengan Verb 2 \"caught\" dalam struktur pertanyaan ini tidak tepat.",
+        "3": "Urutan kata menyimpang karena kata bantu \"did\" diletakkan setelah subjek."
+      }
+    },
+    {
+      "id": "eng-d-8-c4-q12",
+      "difficulty": "medium",
+      "prompt": "Based on the story in Unit 2 Section 3, how long did it take for the scientists to pull the plastic straw out of the turtle's nostril?",
+      "options": [
+        "About 10 minutes.",
+        "About 2 hours.",
+        "The entire afternoon.",
+        "More than two days."
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Teks menyatakan dengan jelas bahwa proses mengeluarkan sedotan plastik dari hidung penyu memakan waktu sekitar 10 menit (\"about 10 minutes\")."
+      },
+      "distractorWhy": {
+        "1": "Durasi 2 jam merujuk pada lamanya hujan turun pada kejadian banjir di Unit 1, bukan waktu pencabutan sedotan plastik.",
+        "2": "Teks tidak menyebutkan bahwa proses tersebut berlangsung sepanjang sore.",
+        "3": "Waktu 10 menit jauh lebih singkat daripada dua hari."
+      }
+    },
+    {
+      "id": "eng-d-8-c4-q13",
+      "difficulty": "hard",
+      "prompt": "Identify the sentence that correctly combines Past Continuous and Simple Past using 'when' based on Language Focus Unit 2:",
+      "options": [
+        "The turtle was swimming near the boat when the scientists noticed the object.",
+        "The turtle is swimming near the boat when the scientists notice the object.",
+        "The turtle swam near the boat when the scientists were notice the object.",
+        "The turtle was swam near the boat when the scientists noticing the object."
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Kalimat ini secara tepat menggabungkan kejadian yang sedang berlangsung di masa lalu (\"was swimming\") dengan kejadian singkat yang menyela (\"noticed\") menggunakan kata hubung \"when\"."
+      },
+      "distractorWhy": {
+        "1": "Kalimat tersebut menggunakan Present Continuous dan Present Simple, bukan struktur lampau (Past Tense).",
+        "2": "Bentuk \"were notice\" tidak sesuai kaidah tata bahasa bahasa Inggris.",
+        "3": "Bentuk \"was swam\" dan \"noticing\" menyalahi aturan pembentukan Past Continuous dan Simple Past."
+      }
+    },
+    {
+      "id": "eng-d-8-c4-q14",
+      "difficulty": "easy",
+      "prompt": "Read the excerpt from Unit 3 Section 2:\n\"Melati and Isabel Wijsen live in Bali. They spent their teenage years cleaning up the island from plastic. Melati and Isabel were only 12 and 10 years old when they decided to tackle plastic pollution.\"\n\nWhat movement did Melati and Isabel Wijsen start in Bali?",
+      "options": [
+        "Bye Bye Plastic Bags.",
+        "Save the Forest Campaign.",
+        "Clean Water Project.",
+        "No More Chemical Waste."
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Teks dan informasi pendukung di Unit 3 menyebutkan gerakan yang diprakarsai oleh Melati dan Isabel Wijsen bernama \"Bye Bye Plastic Bags\"."
+      },
+      "distractorWhy": {
+        "1": "Gerakan kedua bersaudara tersebut berfokus pada polusi sampah plastik, bukan penyelamatan hutan.",
+        "2": "Fokus utama kampanye mereka adalah pengurangan sampah plastik di Bali, bukan proyek air bersih.",
+        "3": "Teks secara khusus membahas tentang kantong plastik dan sampah plastik, bukan limbah kimia."
+      }
+    },
+    {
+      "id": "eng-d-8-c4-q15",
+      "difficulty": "medium",
+      "prompt": "Based on Unit 3 Section 4, what is the main purpose of the 'Orientation' section in a factual recount text?",
+      "options": [
+        "To introduce the background information such as who, where, when, and why the event happened.",
+        "To state the author's final personal feeling or recommendation at the very end of the text.",
+        "To list all step-by-step chronological actions taken by the main characters.",
+        "To present a fictional story with magical resolution."
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Bagian Orientation berfungsi memperkenalkan informasi latar belakang seperti siapa (who), di mana (where), kapan (when), dan mengapa (why) peristiwa tersebut terjadi."
+      },
+      "distractorWhy": {
+        "1": "Pernyataan kesan akhir atau evaluasi merupakan fungsi dari bagian Comment / Re-orientation.",
+        "2": "Urutan kejadian kronologis merupakan bagian dari Records of Events.",
+        "3": "Factual recount menyajikan cerita berdasarkan fakta nyata, bukan cerita rekaan imajinatif atau magis."
+      }
+    },
+    {
+      "id": "eng-d-8-c4-q16",
+      "difficulty": "medium",
+      "prompt": "Which sentence correctly uses 'when' at the beginning of a complex sentence with proper punctuation according to Language Focus Unit 3?",
+      "options": [
+        "When Melati and Isabel went hiking to Mount Batur, they saw plastic bottles along the way.",
+        "When Melati and Isabel went hiking to Mount Batur they saw plastic bottles along the way.",
+        "When Melati and Isabel went hiking to Mount Batur, and they saw plastic bottles along the way.",
+        "When did Melati and Isabel went hiking to Mount Batur, they saw plastic bottles."
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Ketika klausa \"when\" diletakkan di awal kalimat, koma (,) wajib digunakan untuk memisahkan klausa anak dari klausa utama."
+      },
+      "distractorWhy": {
+        "1": "Kalimat tersebut kekurangan tanda koma yang diperlukan untuk memisahkan klausa \"when\" di awal kalimat.",
+        "2": "Penggunaan kata hubung tambahan \"and\" setelah koma adalah redundan dan tidak tepat.",
+        "3": "Penggunaan struktur kalimat tanya \"did ... went\" pada klausa anak di awal kalimat adalah salah secara tata bahasa."
+      }
+    },
+    {
+      "id": "eng-d-8-c4-q17",
+      "difficulty": "medium",
+      "prompt": "Combine these two events into a single sentence using 'when' based on Language Focus Unit 3:\nEvent 1: \"The scientists were collecting data on sea turtles.\"\nEvent 2: \"They spotted an injured sea turtle swimming near their boat.\"",
+      "options": [
+        "The scientists were collecting data on sea turtles when they spotted an injured sea turtle.",
+        "The scientists were collecting data on sea turtles when were they spot an injured sea turtle.",
+        "When were the scientists collecting data on sea turtles they spotted an injured sea turtle.",
+        "The scientists collect data on sea turtles when they were spotted an injured sea turtle."
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Kalimat ini secara tepat menyambungkan aksi yang berlangsung (\"were collecting data\") dengan kejadian penyela (\"spotted\") menggunakan kata penghubung \"when\"."
+      },
+      "distractorWhy": {
+        "1": "Bentuk \"when were they spot\" salah secara tata bahasa.",
+        "2": "Klausa \"when\" di awal memerlukan koma pemisah, dan frasa \"When were the scientists\" berstruktur kalimat tanya yang tidak sesuai.",
+        "3": "Bentuk \"they were spotted\" bermakna pasif (\"mereka ditemukan\") yang mengubah makna cerita asli."
+      }
+    },
+    {
+      "id": "eng-d-8-c4-q18",
+      "difficulty": "easy",
+      "prompt": "In waste sorting and management, items such as plastic bottles, plastic straws, and aluminum cans are categorized as:",
+      "options": [
+        "Inorganic waste",
+        "Organic waste",
+        "Hazardous waste (B3)",
+        "Compostable waste"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Botol plastik, sedotan plastik, dan kaleng aluminium merupakan limbah anorganik (inorganic waste) yang tidak dapat terurai secara hayati."
+      },
+      "distractorWhy": {
+        "1": "Limbah organik terdiri dari bahan hayati yang mudah membusuk seperti sisa makanan dan dedaunan.",
+        "2": "Limbah B3 (bahan berbahaya dan beracun) meliputi baterai, lampu, dan zat kimia berbahaya.",
+        "3": "Sampah plastik dan aluminium tidak dapat diolah menjadi kompos."
+      }
+    },
+    {
+      "id": "eng-d-8-c4-q19",
+      "difficulty": "hard",
+      "prompt": "Which group of waste items should be sorted specifically into the Hazardous Waste (B3) bin?",
+      "options": [
+        "Used batteries, fluorescent light bulbs, and aerosol spray cans.",
+        "Banana peels, leftover rice, and dry tree leaves.",
+        "Plastic shopping bags, plastic bottles, and plastic cutlery.",
+        "Cardboard boxes, newspaper sheets, and paper bags."
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Baterai bekas, lampu neon, dan kaleng aerosol mengandung zat kimia berbahaya dan beracun sehingga termasuk dalam kategori limbah B3 (Hazardous Waste)."
+      },
+      "distractorWhy": {
+        "1": "Kulit pisang, sisa nasi, dan daun kering adalah contoh limbah organik.",
+        "2": "Kantong plastik, botol plastik, dan sendok plastik adalah contoh limbah anorganik non-B3.",
+        "3": "Kardus, koran, dan kantong kertas adalah sampah daur ulang bahan kertas."
+      }
+    },
+    {
+      "id": "eng-d-8-c4-q20",
+      "difficulty": "hard",
+      "prompt": "Read the final sentence of the factual recount about the sea turtle rescue in Unit 2 Section 4:\n\"The straw incident proved how dangerous plastic was to animals in the oceans.\"\n\nWhat role does this sentence play in the structure of a factual recount text?",
+      "options": [
+        "It serves as the final comment/evaluation reflecting on the incident.",
+        "It serves as the initial orientation introducing the characters.",
+        "It serves as the first record of event in chronological order.",
+        "It serves as an interview question directed to the reader."
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Kalimat tersebut memberikan evaluasi atau pendapat akhir (final comment/evaluation) yang menyimpulkan dampak dari peristiwa yang diceritakan."
+      },
+      "distractorWhy": {
+        "1": "Orientasi awal berada di bagian awal teks dan mengenalkan latar tokoh, waktu, serta tempat.",
+        "2": "Record of events memuat urutan aksi atau tindakan kronologis yang terjadi dalam peristiwa.",
+        "3": "Kalimat tersebut merupakan kalimat pernyataan evaluatif, bukan kalimat tanya wawancara."
+      }
+    }
+  ]
+}
+
+target_file = r"c:\Users\hp\fiezel-apps\tools\chunk_eng_8_c4.json"
+with open(target_file, "w", encoding="utf-8") as f:
+    json.dump(data, f, indent=2, ensure_ascii=False)
+
+print("Saved to", target_file)

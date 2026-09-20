@@ -1,0 +1,249 @@
+{
+  "code": "KOMP-ENG-D-7-BAB3-01",
+  "grade": 7,
+  "name": "Chapter 3: Home Sweet Home",
+  "materi": "Rooms & Furniture in a House, Describing House Chores & Cleaning Activities, Prepositions of Place (in, on, under, next to), Rules and Abilities (can/can't)",
+  "cpRef": "English for Nusantara untuk SMP/MTs Kelas VII",
+  "items": [
+    {
+      "id": "eng-d-7-c3-q01",
+      "difficulty": "dasar",
+      "prompt": "Based on English for Nusantara Grade VII (pages 105-110 Unit 1 'My House'), which room is primarily used for cooking meals and preparing drinks?",
+      "options": [
+        "Kitchen",
+        "Bedroom",
+        "Bathroom",
+        "Living room"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "The kitchen is the room in a house dedicated to cooking and food preparation."
+      },
+      "distractorWhy": {
+        "1": "Bedroom is for sleeping.",
+        "2": "Bathroom is for bathing.",
+        "3": "Living room is for family gathering."
+      }
+    },
+    {
+      "id": "eng-d-7-c3-q02",
+      "difficulty": "sedang",
+      "prompt": "Based on English for Nusantara Grade VII (page 115 Prepositions of Place), look at the sentence: 'Galang puts his school bag ___ the desk in his bedroom.' What is the correct preposition?",
+      "options": [
+        "on",
+        "under",
+        "behind",
+        "in"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "'on' is used when an object is supported by a flat horizontal surface (on the desk)."
+      },
+      "distractorWhy": {
+        "1": "under means beneath.",
+        "2": "behind means at the back.",
+        "3": "in means inside an enclosed space."
+      }
+    },
+    {
+      "id": "eng-d-7-c3-q03",
+      "difficulty": "sedang",
+      "prompt": "Based on English for Nusantara Grade VII (page 120 Unit 2 'House Chores'), what expression describes Monita's daily cleaning activity of using a broom on the floor?",
+      "options": [
+        "'She sweeps the floor.'",
+        "'She washes the dishes.'",
+        "'She waters the plants.'",
+        "'She irons the clothes.'"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "'sweeps the floor' (menyapu lantai) is the chore associated with a broom."
+      },
+      "distractorWhy": {
+        "1": "Washing dishes is for plates/cups.",
+        "2": "Watering plants is for garden.",
+        "3": "Ironing clothes is for garments."
+      }
+    },
+    {
+      "id": "eng-d-7-c3-q04",
+      "difficulty": "tinggi",
+      "prompt": "Based on English for Nusantara Grade VII (page 128 Language Focus - Modals for Rules), choose the correct sentence to state a household rule about cleanliness:",
+      "options": [
+        "'We must keep our bedroom clean and tidy.'",
+        "'We can throw trash on the floor.'",
+        "'We cannot sleep at night.'",
+        "'We must break the window.'"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "'must keep our bedroom clean' states a positive house rule requirement."
+      },
+      "distractorWhy": {
+        "1": "Contradicts cleanliness rules.",
+        "2": "Illogical rule.",
+        "3": "Destructive behavior."
+      }
+    },
+    {
+      "id": "eng-d-7-c3-q05",
+      "difficulty": "dasar",
+      "prompt": "Based on English for Nusantara Grade VII (page 112), what piece of furniture is typically found in the living room for people to sit comfortably?",
+      "options": [
+        "Sofa",
+        "Stove",
+        "Refrigerator",
+        "Wardrobe"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "A sofa is comfortable seating furniture in a living room."
+      },
+      "distractorWhy": {
+        "1": "Stove is in the kitchen.",
+        "2": "Refrigerator is for food cold storage.",
+        "3": "Wardrobe is in bedroom for clothes."
+      }
+    },
+    {
+      "id": "eng-d-7-c3-q06",
+      "difficulty": "sedang",
+      "prompt": "Based on English for Nusantara Grade VII (page 132 Unit 3 Review), complete the sentence with 'can' or 'can't': 'Sinta ___ cook fried rice because her mother taught her last week.'",
+      "options": [
+        "can",
+        "can't",
+        "must not",
+        "should not"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "'can' expresses learned ability/capability in the present."
+      },
+      "distractorWhy": {
+        "1": "can't expresses inability.",
+        "2": "must not expresses prohibition.",
+        "3": "should not expresses negative advice."
+      }
+    },
+    {
+      "id": "eng-d-7-c3-q07",
+      "difficulty": "dasar",
+      "prompt": "Based on English for Nusantara Grade VII (page 114), which preposition completes the sentence: 'The cat is sleeping ___ the bed.'",
+      "options": [
+        "under",
+        "between",
+        "inside of",
+        "through"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "'under' (di bawah) is the correct preposition showing the cat's sleeping spot beneath the bed frame."
+      },
+      "distractorWhy": {
+        "1": "between requires two objects.",
+        "2": "inside of is inside mattress.",
+        "3": "through implies motion."
+      }
+    },
+    {
+      "id": "eng-d-7-c3-q08",
+      "difficulty": "sedang",
+      "prompt": "Based on English for Nusantara Grade VII (page 122), what is the household chore expression for washing dirty dishes and spoons in the sink?",
+      "options": [
+        "'Wash the dishes'",
+        "'Make the bed'",
+        "'Clean the window'",
+        "'Mop the floor'"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "'Wash the dishes' (mencuci piring) is the chore for cleaning eating utensils."
+      },
+      "distractorWhy": {
+        "1": "Make the bed is tidying blankets.",
+        "2": "Clean the window is glass cleaning.",
+        "3": "Mop the floor is floor cleaning."
+      }
+    },
+    {
+      "id": "eng-d-7-c3-q09",
+      "difficulty": "sedang",
+      "prompt": "Based on English for Nusantara Grade VII (page 126), complete the sentence: 'Galang ___ play video games after finishing his homework.'",
+      "options": [
+        "can",
+        "can't",
+        "must not",
+        "should not"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "'can' expresses permission granted after completing duties."
+      },
+      "distractorWhy": {
+        "1": "can't expresses refusal.",
+        "2": "must not is prohibition.",
+        "3": "should not is advice."
+      }
+    },
+    {
+      "id": "eng-d-7-c3-q10",
+      "difficulty": "tinggi",
+      "prompt": "Based on English for Nusantara Grade VII (page 130), what room is used for taking a shower and brushing teeth?",
+      "options": [
+        "Bathroom",
+        "Dining room",
+        "Garage",
+        "Terrace"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "The bathroom is the designated room for personal hygiene and bathing."
+      },
+      "distractorWhy": {
+        "1": "Dining room is for eating.",
+        "2": "Garage is for vehicles.",
+        "3": "Terrace is outdoor porch."
+      }
+    },
+    {
+      "id": "eng-d-7-c3-q11",
+      "difficulty": "dasar",
+      "prompt": "Based on English for Nusantara Grade VII (page 118), where do people park their cars and motorcycles at home?",
+      "options": [
+        "Garage",
+        "Living room",
+        "Attic",
+        "Balcony"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "The garage is the enclosed room/area used for parking vehicles."
+      },
+      "distractorWhy": {
+        "1": "Living room is indoor seating.",
+        "2": "Attic is under roof storage.",
+        "3": "Balcony is upper level floor."
+      }
+    },
+    {
+      "id": "eng-d-7-c3-q12",
+      "difficulty": "tinggi",
+      "prompt": "Based on English for Nusantara Grade VII (page 134 Review), why is it important for family members to share house chores?",
+      "options": [
+        "To make the house clean faster and foster cooperation among family members",
+        "To make one person do all the hard work alone",
+        "To ruin the house furniture",
+        "To increase electricity bills"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Sharing chores teaches teamwork and keeps the living environment clean efficiently."
+      },
+      "distractorWhy": {
+        "1": "Unfair single workload.",
+        "2": "Not intended to ruin furniture.",
+        "3": "Chores do not aim to raise bills."
+      }
+    }
+  ]
+}

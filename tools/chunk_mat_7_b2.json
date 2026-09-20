@@ -1,0 +1,409 @@
+{
+  "code": "KOMP-MAT-D-7-BAB2-01",
+  "grade": 7,
+  "name": "Aljabar",
+  "materi": "Unsur Bentuk Aljabar, Penjumlahan & Pengurangan Bentuk Aljabar, Perkalian & Pembagian Bentuk Aljabar, Pemodelan & Penyederhanaan",
+  "cpRef": "Matematika untuk SMP/MTs Kelas VII — Bab 2",
+  "items": [
+    {
+      "id": "mat-d-7-b2-q01",
+      "difficulty": "dasar",
+      "prompt": "Berdasarkan Buku Siswa Matematika Kelas VII hal. 132 pada Latihan 4.1 nomor 1, diberikan bentuk aljabar 3x - y + 10. Manakah yang menunjukkan variabel, koefisien dari x, dan konstanta pada bentuk aljabar tersebut secara berturut-turut?",
+      "options": [
+        "x dan y; 3; 10",
+        "3 dan 10; x; y",
+        "x; 3; -y",
+        "x dan y; -1; 3"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Variabel pada bentuk aljabar 3x - y + 10 adalah lambang huruf yaitu x dan y. Koefisien dari x adalah faktor pengali angka di depan x yaitu 3. Konstanta adalah suku berupa bilangan tetap tanpa variabel yaitu 10."
+      },
+      "distractorWhy": {
+        "1": "Angka 3 dan 10 merupakan koefisien dan konstanta, bukan variabel.",
+        "2": "Variabel tidak hanya x saja melainkan juga y, dan -y adalah suku bukan konstanta.",
+        "3": "Koefisien dari x adalah 3, sedangkan -1 adalah koefisien dari y."
+      }
+    },
+    {
+      "id": "mat-d-7-b2-q02",
+      "difficulty": "dasar",
+      "prompt": "Berdasarkan Buku Siswa Matematika Kelas VII hal. 132 pada Latihan 4.1 nomor 2, diberikan bentuk aljabar -3m - 1. Berapakah nilai bentuk aljabar tersebut jika m = 3?",
+      "options": [
+        "-10",
+        "-8",
+        "8",
+        "10"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Substitusikan nilai m = 3 ke dalam bentuk aljabar: -3m - 1 = -3(3) - 1 = -9 - 1 = -10."
+      },
+      "distractorWhy": {
+        "1": "Hasil -8 diperoleh dari kesalahan perhitungan -9 + 1.",
+        "2": "Hasil 8 diperoleh dari kesalahan mengabaikan tanda negatif pada perkalian 3(3) - 1.",
+        "3": "Hasil 10 diperoleh dari kesalahan perhitungan 9 + 1."
+      }
+    },
+    {
+      "id": "mat-d-7-b2-q03",
+      "difficulty": "dasar",
+      "prompt": "Berdasarkan Buku Siswa Matematika Kelas VII hal. 143 pada Latihan 4.2 nomor 1b, bentuk jabaran dari 8(2x - 5) adalah ...",
+      "options": [
+        "16x - 40",
+        "16x - 5",
+        "16x + 40",
+        "8x - 40"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Menggunakan sifat distributif: 8(2x - 5) = (8 * 2x) - (8 * 5) = 16x - 40."
+      },
+      "distractorWhy": {
+        "1": "Hasil 16x - 5 terjadi karena lupa mengalikan pengali 8 dengan konstanta -5.",
+        "2": "Hasil 16x + 40 terjadi karena kesalahan tanda operasi dari negatif menjadi positif.",
+        "3": "Hasil 8x - 40 terjadi karena kesalahan mengalikan 8 dengan 2x."
+      }
+    },
+    {
+      "id": "mat-d-7-b2-q04",
+      "difficulty": "dasar",
+      "prompt": "Berdasarkan Buku Siswa Matematika Kelas VII hal. 143 pada Latihan 4.2 nomor 2a, bentuk faktor dari 12x + 6 adalah ...",
+      "options": [
+        "6(2x + 1)",
+        "6(2x + 6)",
+        "12(x + 1)",
+        "2(6x + 3)"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Faktor persekutuan terbesar dari 12x dan 6 adalah 6. Dengan sifat distributif, 12x + 6 = 6(2x + 1)."
+      },
+      "distractorWhy": {
+        "1": "Bentuk 6(2x + 6) jika dijabarkan menghasilkan 12x + 36.",
+        "2": "Bentuk 12(x + 1) jika dijabarkan menghasilkan 12x + 12.",
+        "3": "Meskipun 2(6x + 3) ekuivalen, bentuk tersebut belum difaktorkan secara sempurna dengan FPB terbesar."
+      }
+    },
+    {
+      "id": "mat-d-7-b2-q05",
+      "difficulty": "dasar",
+      "prompt": "Berdasarkan Buku Siswa Matematika Kelas VII hal. 144 pada Latihan 4.2 nomor 5a, hasil penjumlahan suku sejenis (1/2)x + (1/2)x adalah ...",
+      "options": [
+        "x",
+        "(1/4)x",
+        "2x",
+        "(1/2)x^2"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Dengan sifat distributif: (1/2)x + (1/2)x = (1/2 + 1/2)x = 1x = x."
+      },
+      "distractorWhy": {
+        "1": "Hasil (1/4)x terjadi akibat kesalahan mengalikan penyebut pecahan.",
+        "2": "Hasil 2x terjadi akibat mengabaikan koefisien pecahan 1/2 dan hanya menjumlahkan 1 + 1.",
+        "3": "Hasil (1/2)x^2 terjadi akibat mengelirukan operasi penjumlahan dengan perkalian."
+      }
+    },
+    {
+      "id": "mat-d-7-b2-q06",
+      "difficulty": "dasar",
+      "prompt": "Berdasarkan Buku Siswa Matematika Kelas VII hal. 145 pada Latihan 4.2 nomor 9a, hasil penyederhanaan dari (2x + 2) + (x + 5) adalah ...",
+      "options": [
+        "3x + 7",
+        "3x + 10",
+        "2x + 7",
+        "3x^2 + 7"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Jumlahkan suku-suku sejenis: (2x + x) + (2 + 5) = 3x + 7."
+      },
+      "distractorWhy": {
+        "1": "Hasil 3x + 10 terjadi karena kesalahan mengalikan 2 dan 5 alih-alih menjumlahkannya.",
+        "2": "Hasil 2x + 7 terjadi karena lupa mengikutsertakan koefisien 1 pada x.",
+        "3": "Hasil 3x^2 + 7 terjadi karena mengalikan variabel x alih-alih menjumlahkannya."
+      }
+    },
+    {
+      "id": "mat-d-7-b2-q07",
+      "difficulty": "sedang",
+      "prompt": "Berdasarkan Buku Siswa Matematika Kelas VII hal. 132-133 pada Latihan 4.1 nomor 3, Rahmat membeli tiket taman bermain untuk keluarganya dengan total harga dinyatakan dalam 3a + 2b, di mana a adalah harga tiket anak-anak dan b adalah harga tiket dewasa. Jika harga tiket anak-anak Rp20.000,00 dan tiket dewasa Rp30.000,00 serta biaya parkir kendaraan tetap Rp25.000,00, berapa total pengeluaran Rahmat seluruhnya?",
+      "options": [
+        "Rp145.000,00",
+        "Rp120.000,00",
+        "Rp175.000,00",
+        "Rp150.000,00"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Bentuk aljabar total pengeluaran adalah 3a + 2b + 25.000. Substitusi a = 20.000 dan b = 30.000: 3(20.000) + 2(30.000) + 25.000 = 60.000 + 60.000 + 25.000 = Rp145.000,00."
+      },
+      "distractorWhy": {
+        "1": "Nilai Rp120.000,00 hanya menghitung total tiket tanpa memasukkan biaya parkir Rp25.000,00.",
+        "2": "Nilai Rp175.000,00 terjadi akibat kesalahan mengalikan 3 tiket dewasa dan 2 tiket anak-anak.",
+        "3": "Nilai Rp150.000,00 terjadi akibat kesalahan penjumlahan 60.000 + 60.000 + 30.000."
+      }
+    },
+    {
+      "id": "mat-d-7-b2-q08",
+      "difficulty": "sedang",
+      "prompt": "Berdasarkan Buku Siswa Matematika Kelas VII hal. 133 pada Latihan 4.1 nomor 4, Cakra membeli sembako di mana harga 1 liter minyak goreng Rp14.500,00, 1 kg beras Rp10.000,00, dan 1 kg tepung terigu Rp15.000,00. Berapa uang yang harus dibayar Cakra jika ia membeli 2 liter minyak goreng, 3 kg beras, dan 2 kg tepung terigu?",
+      "options": [
+        "Rp89.000,00",
+        "Rp79.000,00",
+        "Rp99.000,00",
+        "Rp84.000,00"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Bentuk aljabar pembayaran: 14.500x + 10.000y + 15.000z. Substitusi x = 2, y = 3, z = 2: 14.500(2) + 10.000(3) + 15.000(2) = 29.000 + 30.000 + 30.000 = Rp89.000,00."
+      },
+      "distractorWhy": {
+        "1": "Nilai Rp79.000,00 terjadi jika hanya membeli 1 kg beras.",
+        "2": "Nilai Rp99.000,00 terjadi akibat kesalahan menghitung 2 liter minyak goreng menjadi Rp39.000,00.",
+        "3": "Nilai Rp84.000,00 terjadi akibat kesalahan perkalian 14.500 * 2 = 24.000."
+      }
+    },
+    {
+      "id": "mat-d-7-b2-q09",
+      "difficulty": "sedang",
+      "prompt": "Berdasarkan Buku Siswa Matematika Kelas VII hal. 143 pada Latihan 4.2 nomor 1d, bentuk jabaran perkalian suku dua (x + 1)(x + 3) adalah ...",
+      "options": [
+        "x^2 + 4x + 3",
+        "x^2 + 3x + 1",
+        "x^2 + 4x + 4",
+        "x^2 + 3"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Gunakan sifat distributif perkalian suku dua: (x + 1)(x + 3) = x(x + 3) + 1(x + 3) = x^2 + 3x + x + 3 = x^2 + 4x + 3."
+      },
+      "distractorWhy": {
+        "1": "Bentuk x^2 + 3x + 1 terjadi karena lupa menjumlahkan suku x dari perkalian 1 * x.",
+        "2": "Bentuk x^2 + 4x + 4 terjadi karena kesalahan perkalian 1 * 3 = 4.",
+        "3": "Bentuk x^2 + 3 hanya mengalikan suku pertama dengan pertama dan suku kedua dengan kedua tanpa suku tengah."
+      }
+    },
+    {
+      "id": "mat-d-7-b2-q10",
+      "difficulty": "sedang",
+      "prompt": "Berdasarkan Buku Siswa Matematika Kelas VII hal. 144 pada Latihan 4.2 nomor 5b, hasil penjumlahan pecahan aljabar (2/3)a + (1/4)a adalah ...",
+      "options": [
+        "(11/12)a",
+        "(3/7)a",
+        "(3/12)a",
+        "(11/7)a"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Samakan penyebut kedua pecahan ke KPK 12: (2/3)a + (1/4)a = (8/12)a + (3/12)a = (8 + 3)/12 a = (11/12)a."
+      },
+      "distractorWhy": {
+        "1": "Hasil (3/7)a terjadi karena kesalahan menjumlahkan pembilang dengan pembilang (2+1) dan penyebut dengan penyebut (3+4).",
+        "2": "Hasil (3/12)a terjadi karena kesalahan mengurangkan suku alih-alih menjumlahkannya.",
+        "3": "Hasil (11/7)a terjadi karena penyebut dijumlahkan secara langsung menjadi 7."
+      }
+    },
+    {
+      "id": "mat-d-7-b2-q11",
+      "difficulty": "sedang",
+      "prompt": "Berdasarkan Buku Siswa Matematika Kelas VII hal. 144-145 pada Latihan 4.2 nomor 6, di antara empat bentuk aljabar berikut: (1) 5x - 2x + 3, (2) 3(x + 1), (3) 2x - 5x + 3, dan (4) 3x + 3. Bentuk aljabar mana yang TIDAK ekuivalen dengan ketiga bentuk aljabar lainnya?",
+      "options": [
+        "2x - 5x + 3",
+        "5x - 2x + 3",
+        "3(x + 1)",
+        "3x + 3"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Mari sederhanakan bentuk aljabar: 5x - 2x + 3 = 3x + 3; 3(x + 1) = 3x + 3; 2x - 5x + 3 = -3x + 3. Jadi 2x - 5x + 3 bernilai -3x + 3 yang tidak ekuivalen dengan 3x + 3."
+      },
+      "distractorWhy": {
+        "1": "Bentuk 5x - 2x + 3 setelah disederhanakan menghasilkan 3x + 3 (ekuivalen).",
+        "2": "Bentuk 3(x + 1) setelah dijabarkan menghasilkan 3x + 3 (ekuivalen).",
+        "3": "Bentuk 3x + 3 adalah bentuk sederhana standar yang ekuivalen dengan dua bentuk lainnya."
+      }
+    },
+    {
+      "id": "mat-d-7-b2-q12",
+      "difficulty": "sedang",
+      "prompt": "Berdasarkan Buku Siswa Matematika Kelas VII hal. 145 pada Latihan 4.2 nomor 9c, hasil pengurangan bentuk aljabar (5x - 1) - (2x + 3) adalah ...",
+      "options": [
+        "3x - 4",
+        "3x + 2",
+        "7x + 2",
+        "3x - 2"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Buka tanda kurung dengan memperhitungkan tanda negatif: (5x - 1) - (2x + 3) = 5x - 1 - 2x - 3 = (5x - 2x) + (-1 - 3) = 3x - 4."
+      },
+      "distractorWhy": {
+        "1": "Hasil 3x + 2 terjadi akibat kesalahan mengurangkan -1 dengan 3 menjadi +2.",
+        "2": "Hasil 7x + 2 terjadi karena kesalahan menjumlahkan 5x + 2x alih-alih mengurangkannya.",
+        "3": "Hasil 3x - 2 terjadi karena kesalahan perhitungan -1 - (-3) = 2."
+      }
+    },
+    {
+      "id": "mat-d-7-b2-q13",
+      "difficulty": "sedang",
+      "prompt": "Berdasarkan Buku Siswa Matematika Kelas VII hal. 147 pada Eksplorasi 4.4, Wisnu diantar ayahnya ke sekolah sejauh 5.000 meter dengan sepeda motor berkecerdasan konstan 15 meter per detik. Manakah bentuk aljabar yang menyatakan jarak tersisa yang perlu ditempuh Wisnu setelah t detik?",
+      "options": [
+        "5.000 - 15t",
+        "15t",
+        "5.000 + 15t",
+        "15t - 5.000"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Jarak yang telah ditempuh setelah t detik adalah 15t meter. Karena jarak total adalah 5.000 meter, maka jarak tersisa yang perlu ditempuh adalah 5.000 - 15t."
+      },
+      "distractorWhy": {
+        "1": "Bentuk 15t menyatakan jarak yang sudah ditempuh, bukan jarak tersisa.",
+        "2": "Bentuk 5.000 + 15t menyatakan penambahan jarak total.",
+        "3": "Bentuk 15t - 5.000 menghasilkan nilai negatif karena jarak yang ditempuh belum melebihi 5.000 meter."
+      }
+    },
+    {
+      "id": "mat-d-7-b2-q14",
+      "difficulty": "sedang",
+      "prompt": "Berdasarkan Buku Siswa Matematika Kelas VII hal. 151 pada Latihan 4.3 nomor 2, Malik naik bus pergi dan pulang sekolah setiap hari Senin hingga Jumat (5 hari kerja). Tarif naik bus satu kali adalah n rupiah dan orang tuanya memberikan uang saku transportasi Rp50.000,00 per minggu. Jika tarif satu kali naik bus n = Rp6.000,00, berapa sisa uang transportasi Malik pada akhir minggu?",
+      "options": [
+        "Rp-10.000,00 (Kurang Rp10.000,00 / Minus Rp10.000,00)",
+        "Rp20.000,00",
+        "Rp10.000,00",
+        "Rp5.000,00"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Dalam 1 hari Malik naik bus 2 kali (pergi & pulang) sehingga biaya per hari = 2n. Dalam 5 hari kerja (per minggu), total kali naik bus = 10 kali dengan biaya = 10n. Sisa uang = 50.000 - 10n = 50.000 - 10(6.000) = 50.000 - 60.000 = -10.000 rupiah (artinya kurang Rp10.000,00)."
+      },
+      "distractorWhy": {
+        "1": "Hasil Rp20.000,00 terjadi jika menganggap Malik hanya naik bus 5 kali dalam seminggu (1 kali per hari).",
+        "2": "Hasil Rp10.000,00 terjadi akibat kesalahan hitung 50.000 - 40.000.",
+        "3": "Hasil Rp5.000,00 terjadi akibat kesalahan menghitung total hari menjadi 6 atau 7 hari."
+      }
+    },
+    {
+      "id": "mat-d-7-b2-q15",
+      "difficulty": "tinggi",
+      "prompt": "Berdasarkan Buku Siswa Matematika Kelas VII hal. 145 pada Latihan 4.2 nomor 9e, bentuk sederhana dari 3(x + 10) + 4(3x - 2) adalah ...",
+      "options": [
+        "15x + 22",
+        "15x + 38",
+        "15x + 28",
+        "13x + 22"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Jabarkan kedua kurung dengan sifat distributif: 3(x + 10) + 4(3x - 2) = 3x + 30 + 12x - 8. Kelompokkan suku sejenis: (3x + 12x) + (30 - 8) = 15x + 22."
+      },
+      "distractorWhy": {
+        "1": "Hasil 15x + 38 terjadi karena kesalahan tanda saat mengalikan 4 * (-2) menjadi +8.",
+        "2": "Hasil 15x + 28 terjadi karena kesalahan mengurangkan 30 - 2 = 28 alih-alih 30 - 8.",
+        "3": "Hasil 13x + 22 terjadi akibat kesalahan mengalikan 3 * 1x = 1x alih-alih 3x."
+      }
+    },
+    {
+      "id": "mat-d-7-b2-q16",
+      "difficulty": "tinggi",
+      "prompt": "Berdasarkan Buku Siswa Matematika Kelas VII hal. 145 pada Latihan 4.2 nomor 9f, bentuk sederhana dari 7(2x + 6) - 3(3x + 8) adalah ...",
+      "options": [
+        "5x + 18",
+        "5x + 66",
+        "23x + 18",
+        "5x - 18"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Jabarkan dengan sifat distributif: 7(2x + 6) - 3(3x + 8) = 14x + 42 - 9x - 24. Kelompokkan suku sejenis: (14x - 9x) + (42 - 24) = 5x + 18."
+      },
+      "distractorWhy": {
+        "1": "Hasil 5x + 66 terjadi karena kesalahan menjumlahkan 42 + 24 = 66 akibat lupa mendistribusikan tanda negatif dari -3 ke +8.",
+        "2": "Hasil 23x + 18 terjadi akibat kesalahan menjumlahkan 14x + 9x = 23x.",
+        "3": "Hasil 5x - 18 terjadi akibat kesalahan mengurangkan 24 - 42 = -18."
+      }
+    },
+    {
+      "id": "mat-d-7-b2-q17",
+      "difficulty": "tinggi",
+      "prompt": "Berdasarkan Buku Siswa Matematika Kelas VII hal. 146 pada Latihan 4.2 nomor 10, Retno berinvestasi deposito dengan bunga 4% per tahun sehingga uangnya pada akhir tahun pertama dinyatakan dalam P + 0,04P. Jika Retno berinvestasi sebesar P = Rp10.000.000,00, manakah bentuk faktor dari rumus tersebut dan berapa total uang Retno pada akhir tahun pertama?",
+      "options": [
+        "1,04P ; Rp10.400.000,00",
+        "1,4P ; Rp14.000.000,00",
+        "0,04P ; Rp400.000,00",
+        "1,04P ; Rp10.040.000,00"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Bentuk faktor dari P + 0,04P adalah (1 + 0,04)P = 1,04P. Untuk P = Rp10.000.000,00, total uang = 1,04 * 10.000.000 = Rp10.400.000,00."
+      },
+      "distractorWhy": {
+        "1": "Bentuk 1,4P menganggap bunga 40% per tahun.",
+        "2": "Bentuk 0,04P hanya menghitung besar bunga yang didapat (Rp400.000,00) tanpa menjumlahkan dengan modal awal P.",
+        "3": "Hasil Rp10.040.000,00 terjadi akibat kesalahan mengalikan 0,004 (bunga 0,4%)."
+      }
+    },
+    {
+      "id": "mat-d-7-b2-q18",
+      "difficulty": "tinggi",
+      "prompt": "Berdasarkan Buku Siswa Matematika Kelas VII hal. 152 pada Latihan 4.3 nomor 4, Bayu membandingkan tarif tiga perusahan ojek online: Gogo menetapkan tarif 5.000 + 1.500x, Gaga menetapkan tarif 2.000x, dan Gugu menetapkan tarif 3.000 + 1.800x (x dalam km). Layanan manakah yang paling murah jika Bayu menempuh jarak 5 km, serta layanan manakah yang paling murah jika menempuh jarak 20 km?",
+      "options": [
+        "Gaga untuk jarak 5 km, dan Gogo untuk jarak 20 km",
+        "Gogo untuk jarak 5 km, dan Gaga untuk jarak 20 km",
+        "Gugu untuk jarak 5 km, dan Gogo untuk jarak 20 km",
+        "Gaga untuk jarak 5 km, dan Gugu untuk jarak 20 km"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Untuk x = 5 km: Gogo = 5.000 + 1.500(5) = Rp12.500, Gaga = 2.000(5) = Rp10.000, Gugu = 3.000 + 1.800(5) = Rp12.000. Jadi termurah untuk 5 km adalah Gaga. Untuk x = 20 km: Gogo = 5.000 + 1.500(20) = Rp35.000, Gaga = 2.000(20) = Rp40.000, Gugu = 3.000 + 1.800(20) = Rp39.000. Jadi termurah untuk 20 km adalah Gogo."
+      },
+      "distractorWhy": {
+        "1": "Terbalik antara pilihan penyedia layanan pada masing-masing jarak.",
+        "2": "Gugu bukan yang termurah pada jarak 5 km (tarifnya Rp12.000, lebih mahal dari Gaga Rp10.000).",
+        "3": "Gugu bukan yang termurah pada jarak 20 km (tarifnya Rp39.000, lebih mahal dari Gogo Rp35.000)."
+      }
+    },
+    {
+      "id": "mat-d-7-b2-q19",
+      "difficulty": "tinggi",
+      "prompt": "Berdasarkan Buku Siswa Matematika Kelas VII hal. 155 pada Uji Kompetensi nomor 7e, bentuk sederhana dari -2(2x + 5) + 8(3x - 1) adalah ...",
+      "options": [
+        "20x - 18",
+        "20x + 2",
+        "28x - 18",
+        "20x - 2"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Gunakan sifat distributif: -2(2x + 5) + 8(3x - 1) = -4x - 10 + 24x - 8. Kelompokkan suku sejenis: (-4x + 24x) + (-10 - 8) = 20x - 18."
+      },
+      "distractorWhy": {
+        "1": "Hasil 20x + 2 terjadi karena kesalahan tanda saat menghitung -10 + (-8) = +2.",
+        "2": "Hasil 28x - 18 terjadi akibat kesalahan perkalian -2 * 2x = 4x positif alih-alih -4x.",
+        "3": "Hasil 20x - 2 terjadi karena kesalahan mengurangkan 10 - 8 = 2."
+      }
+    },
+    {
+      "id": "mat-d-7-b2-q20",
+      "difficulty": "tinggi",
+      "prompt": "Berdasarkan Buku Siswa Matematika Kelas VII hal. 156-157 pada Uji Kompetensi nomor 9, Panitia Pentas Seni OSIS mengumpulkan sponsor: 3 sponsor memberikan dana tetap masing-masing Rp500.000,00; 5 sponsor memberikan dana masing-masing Rp1.000.000,00 plus tambahan Rp100.000,00 per jenis lomba (x); serta 10 sponsor memberikan dana Rp200.000,00 per jenis lomba (x). Jika panitia menyelenggarakan x = 5 jenis lomba, berapa total dana sponsor yang terkumpul seluruhnya?",
+      "options": [
+        "Rp19.000.000,00",
+        "Rp12.500.000,00",
+        "Rp6.500.000,00",
+        "Rp21.500.000,00"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Bentuk aljabar total dana: 3(500.000) + 5(1.000.000 + 100.000x) + 10(200.000x) = 1.500.000 + 5.000.000 + 500.000x + 2.000.000x = 6.500.000 + 2.500.000x. Untuk x = 5 jenis lomba: Total = 6.500.000 + 2.500.000(5) = 6.500.000 + 12.500.000 = Rp19.000.000,00."
+      },
+      "distractorWhy": {
+        "1": "Nilai Rp12.500.000,00 hanya menghitung dana variabel dari 5 jenis lomba (2.500.000 * 5) tanpa dana tetap Rp6.500.000,00.",
+        "2": "Nilai Rp6.500.000,00 hanya menghitung total dana tetap tanpa memasukkan dana per jenis lomba.",
+        "3": "Nilai Rp21.500.000,00 terjadi akibat kesalahan mengalikan 3.000.000 * 5."
+      }
+    }
+  ]
+}

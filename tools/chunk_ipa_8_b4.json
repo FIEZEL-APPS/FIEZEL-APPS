@@ -1,0 +1,389 @@
+{
+  "code": "KOMP-IPA-D-8-BAB4-01",
+  "grade": 8,
+  "name": "Tekanan",
+  "materi": "Tekanan Zat Padat & Hidrostatis, Hukum Archimedes & Pascal, Tekanan Gas/Udara, Aplikasi pada Makhluk Hidup",
+  "cpRef": "Ilmu Pengetahuan Alam untuk SMP/MTs Kelas VIII (Edisi Revisi)",
+  "items": [
+    {
+      "id": "ipa-d-8-b4-q01",
+      "difficulty": "dasar",
+      "prompt": "Berdasarkan Buku Siswa IPA Kelas VIII hal. 108–109 (Ayo Uji Kemampuan), sebuah mobil bak memiliki berat kosong 100.000 N dan 4 buah roda. Jika masing-masing area tanah yang bersentuhan dengan roda adalah 0,4 m², berapakah tekanan yang dirasakan pada masing-masing roda?",
+      "options": [
+        "62.500 N/m²",
+        "100.000 N/m²",
+        "250.000 N/m²",
+        "25.000 N/m²"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Gaya tekan total dipikul seimbang oleh 4 roda, sehingga gaya pada tiap roda adalah F = 100.000 N / 4 = 25.000 N. Dengan luas sentuh tiap roda A = 0,4 m², maka tekanan pada masing-masing roda adalah P = F / A = 25.000 N / 0,4 m² = 62.500 N/m²."
+      },
+      "distractorWhy": {
+        "1": "Nilai ini diperoleh jika membagi berat total 100.000 N dengan luas sentuh satu roda tanpa membagi berat total ke 4 roda terlebih dahulu.",
+        "2": "Nilai ini diperoleh jika membagi berat total 100.000 N dengan 0,4 m² secara langsung tanpa memperhitungkan distribusi beban pada 4 roda.",
+        "3": "Nilai ini adalah gaya tekan (F) yang dialami oleh satu roda, bukan tekanan (P = F/A) pada tanah."
+      }
+    },
+    {
+      "id": "ipa-d-8-b4-q02",
+      "difficulty": "sedang",
+      "prompt": "Berdasarkan Buku Siswa IPA Kelas VIII hal. 108–109 (Ayo Uji Kemampuan), mengapa kendaraan atau truk-truk besar dirancang memiliki roda yang berjumlah lebih dari empat?",
+      "options": [
+        "Menambah luas permukaan bidang sentuh roda sehingga tekanan pada jalan menjadi lebih kecil dan jalan tidak cepat rusak",
+        "Menambah gaya tekan kendaraan pada jalan agar kendaraan dapat melaju lebih cepat",
+        "Memperkecil luas permukaan bidang sentuh roda sehingga tekanan pada jalan semakin besar",
+        "Mengurangi massa jenis muatan kendaraan agar tidak mudah terbalik saat membawa beban berat"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Berdasarkan konsep tekanan zat padat P = F/A, menambah jumlah roda akan memperluas area bidang sentuh (A) antara roda dan jalan. Semakin besar luas bidang sentuh A untuk gaya tekan F yang sama, maka tekanan P yang dirasakan permukaan jalan menjadi lebih kecil sehingga jalan tidak mudah rusak."
+      },
+      "distractorWhy": {
+        "1": "Penambahan roda tidak menambah gaya tekan total kendaraan (yang bergantung pada berat total), melainkan mendistribusikan gaya tekan tersebut.",
+        "2": "Memperkecil luas bidang sentuh justru akan memperbesar tekanan pada jalan sehingga jalan menjadi cepat berlubang dan rusak.",
+        "3": "Penambahan roda tidak mengubah massa jenis muatan barang yang diangkut oleh kendaraan."
+      }
+    },
+    {
+      "id": "ipa-d-8-b4-q03",
+      "difficulty": "dasar",
+      "prompt": "Berdasarkan Buku Siswa IPA Kelas VIII hal. 109 (Aktivitas 4.1 Ayo Identifikasi), apabila seorang wanita berjalan di atas tanah liat menggunakan sepatu hak tinggi dibandingkan sepatu olahraga, sepatu hak tinggi memberikan bekas injakan yang lebih dalam. Alasan fisika yang tepat berdasarkan konsep tekanan adalah...",
+      "options": [
+        "Sepatu hak tinggi memiliki luas alas yang sangat kecil sehingga menghasilkan tekanan yang besar pada tanah",
+        "Sepatu hak tinggi memberikan gaya berat yang jauh lebih besar dibandingkan sepatu olahraga",
+        "Sepatu olahraga memiliki luas alas yang lebih kecil sehingga tekanannya ke tanah lebih kecil",
+        "Sepatu olahraga menghasilkan gaya gesek yang menghilangkan gaya tekan ke permukaan tanah"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Tekanan berbanding terbalik dengan luas alas (P = F/A). Sepatu hak tinggi (stiletto) memiliki area kontak alas yang sangat kecil (A kecil), sehingga dengan gaya berat orang yang sama, tekanan (P) yang dihasilkan ke tanah menjadi sangat besar dan menancap lebih dalam."
+      },
+      "distractorWhy": {
+        "1": "Gaya berat wanita tersebut tetap sama baik saat memakai sepatu hak tinggi maupun sepatu olahraga.",
+        "2": "Sepatu olahraga memiliki luas alas yang lebih besar, bukan lebih kecil.",
+        "3": "Gaya gesek tidak menghilangkan gaya tekan vertikal akibat gravitasional."
+      }
+    },
+    {
+      "id": "ipa-d-8-b4-q04",
+      "difficulty": "sedang",
+      "prompt": "Berdasarkan Buku Siswa IPA Kelas VIII hal. 112–113 (Aktivitas 4.2 Ayo Bereksperimen), ketika sebuah botol plastik berisi air diberi beberapa lubang kecil pada ketinggian yang berbeda-beda, lubang manakah yang memancarkan air paling jauh?",
+      "options": [
+        "Lubang paling bawah karena memiliki kedalaman paling besar sehingga tekanan hidrostatisnya paling tinggi",
+        "Lubang paling atas karena paling dekat dengan permukaan udara luar yang menekan air",
+        "Semua lubang memancarkan air dengan jarak yang sama karena kedalaman tidak mempengaruhi cairan",
+        "Lubang paling atas karena gaya gravitasi mendorong air dari atas menuju ke bawah dengan lebih cepat"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Tekanan hidrostatis dirumuskan sebagai P = rho x g x h, di mana h adalah kedalaman dari permukaan zat cair. Lubang paling bawah berada pada kedalaman paling besar (h paling besar), sehingga mengalami tekanan hidrostatis paling tinggi yang menyebabkan pancaran air paling kuat dan paling jauh."
+      },
+      "distractorWhy": {
+        "1": "Kedalaman zat cair diukur dari permukaan atas, sehingga posisi paling atas justru memiliki kedalaman h paling kecil dan tekanan hidrostatis paling rendah.",
+        "2": "Tekanan hidrostatis berbanding lurus dengan kedalaman zat cair, sehingga pancaran air dari tiap lubang tidak sama.",
+        "3": "Gaya gravitasi bekerja pada seluruh massa air, namun tekanan cairan di dalam wadah bertambah besar seiring bertambahnya kedalaman."
+      }
+    },
+    {
+      "id": "ipa-d-8-b4-q05",
+      "difficulty": "sedang",
+      "prompt": "Berdasarkan Buku Siswa IPA Kelas VIII hal. 121 (Ayo Uji Kemampuan Subbab B), mengapa seseorang yang menyelam ke dalam air yang terlalu dalam tanpa perlengkapan khusus dapat membahayakan keselamatan tubuhnya?",
+      "options": [
+        "Semakin dalam menyelam, tekanan hidrostatis air semakin besar sehingga dapat menekan gendang telinga dan paru-paru hingga rusak",
+        "Semakin dalam menyelam, gaya apung Archimedes menjadi hilang sepenuhnya sehingga tubuh tersedot ke dasar",
+        "Semakin dalam menyelam, massa jenis air bertambah secara drastis sehingga membekukan aliran darah",
+        "Semakin dalam menyelam, tekanan udara di dalam tubuh meningkat tajam melampaui tekanan cairan di sekitarnya"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Tekanan hidrostatis bertambah secara signifikan seiring bertambahnya kedalaman (P = rho g h). Pada kedalaman yang sangat dalam, tekanan air luar yang luar biasa besar menekan rongga tubuh berisi udara seperti gendang telinga dan paru-paru, yang dapat menyebabkan pecahnya gendang telinga atau kerusakan organ dalam."
+      },
+      "distractorWhy": {
+        "1": "Gaya apung tetap bekerja berdasarkan volume air yang dipindahkan oleh tubuh penyelam.",
+        "2": "Massa jenis air cair relatif konstan dan tidak mengalami pembekuan darah akibat massa jenis air.",
+        "3": "Tekanan udara di dalam rongga tubuh penyelam tanpa peralatan adalah tekanan atmosfer normal, yang justru jauh lebih rendah daripada tekanan hidrostatis air di kedalaman luar."
+      }
+    },
+    {
+      "id": "ipa-d-8-b4-q06",
+      "difficulty": "tinggi",
+      "prompt": "Berdasarkan Buku Siswa IPA Kelas VIII hal. 121 (Ayo Uji Kemampuan Subbab B), sebuah kapal laut memiliki volume total 500 m³ dan mengapung di permukaan air laut (massa jenis air laut = 1.025 kg/m³, percepatan gravitasi g = 10 m/s²). Tentukan massa maksimal total (kapal + beban) agar kapal tersebut dapat mengapung tepat batas tenggelam sepenuhnya!",
+      "options": [
+        "512.500 kg",
+        "500.000 kg",
+        "1.025.000 kg",
+        "51.250 kg"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Agar kapal mengapung tepat saat seluruh volumenya tercelup (batas tenggelam), gaya apung maksimal sama dengan berat total kapal dan beban: Fa = W_total => rho_cair x V_celup x g = m_total x g => m_total = rho_cair x V_celup = 1.025 kg/m³ x 500 m³ = 512.500 kg."
+      },
+      "distractorWhy": {
+        "1": "Nilai ini diperoleh jika menganggap massa jenis air laut sama dengan massa jenis air murni (1.000 kg/m³ x 500 m³).",
+        "2": "Nilai ini diperoleh jika mengalikan volume dengan massa jenis kemudian dikali 2 secara keliru.",
+        "3": "Nilai ini terjadi akibat kesalahan perhitungan pembagian atau pergeseran koma desimal."
+      }
+    },
+    {
+      "id": "ipa-d-8-b4-q07",
+      "difficulty": "dasar",
+      "prompt": "Berdasarkan Buku Siswa IPA Kelas VIII hal. 121 (Ayo Uji Kemampuan Subbab B), apakah langkah fisika dasar yang dapat dilakukan perenang agar mudah mengapung di permukaan air?",
+      "options": [
+        "Melentangkan tubuh terlentang dan menghirup udara penuh ke paru-paru untuk memperbesar volume tubuh sehingga gaya apung meningkat",
+        "Mengencangkan seluruh otot tubuh dan menggulung diri menjadi bola agar massa jenis tubuh bertambah besar",
+        "Menghembuskan seluruh udara keluar dari paru-paru agar beban tubuh menjadi lebih ringan",
+        "Menyelam tegak lurus ke dasar air agar gaya dorong dari dasar wadah mendorong tubuh ke atas"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Dengan menghirup udara penuh dan mengapung terlentang, paru-paru terisi udara sehingga volume rata-rata tubuh membesar dan massa jenis rata-rata tubuh menjadi lebih kecil dari massa jenis air. Sesuai Hukum Archimedes, volume tubuh yang besar menghasilkan gaya apung (Fa) yang lebih besar dari gaya berat (W)."
+      },
+      "distractorWhy": {
+        "1": "Menggulung tubuh menjadi bola memperkecil volume displacement dan meningkatkan massa jenis rata-rata tubuh sehingga tubuh lebih mudah tenggelam.",
+        "2": "Menghembuskan seluruh udara dari paru-paru justru memperkecil volume paru-paru/tubuh sehingga mengurangi gaya apung.",
+        "3": "Dasar air tidak memberikan gaya dorong ke atas secara hidrostatis pada benda di atasnya."
+      }
+    },
+    {
+      "id": "ipa-d-8-b4-q08",
+      "difficulty": "tinggi",
+      "prompt": "Berdasarkan Buku Siswa IPA Kelas VIII hal. 124 (Ayo Uji Kemampuan Subbab C), manakah penjelasan fisika yang benar mengenai prinsip kerja dan keberadaan balon udara saat terbang di atmosfer?",
+      "options": [
+        "Udara di dalam balon dipanaskan sehingga massa jenis udara dalam balon menjadi lebih kecil daripada massa jenis udara di sekitarnya, menghasilkan gaya apung ke atas",
+        "Udara di dalam balon dipompa hingga bertekanan sangat tinggi agar gaya berat balon menjadi lebih ringan daripada gaya gesek udara",
+        "Balon udara terbang karena ditarik oleh tekanan vakum di lapisan atmosfer bagian atas yang tidak memiliki kerapatan udara",
+        "Balon udara dapat naik karena menyerap gas karbon dioksida berat dari lingkungan sekitar yang mendorong dasar balon ke atas"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Prinsip kerja balon udara menggunakan hukum Archimedes pada fluida gas. Ketika udara di dalam balon dipanaskan, udara memuai dan massa jenisnya berkurang (menjadi lebih ringan dari udara dingin di luar balon). Perbedaan massa jenis ini menciptakan gaya apung ke atas (Fa) yang lebih besar daripada gaya berat balon."
+      },
+      "distractorWhy": {
+        "1": "Memompa udara hingga bertekanan tinggi (tanpa pemanasan) justru menambah jumlah molekul udara di dalam balon sehingga memperbesar gaya berat balon.",
+        "2": "Atmosfer bumi tidak menarik benda dengan tekanan vakum; penerbangan balon murni disebabkan oleh gaya apung fluida.",
+        "3": "Gas karbon dioksida memiliki massa jenis lebih berat dari udara, bukan lebih ringan."
+      }
+    },
+    {
+      "id": "ipa-d-8-b4-q09",
+      "difficulty": "sedang",
+      "prompt": "Berdasarkan Buku Siswa IPA Kelas VIII hal. 125–126 (Subbab D.1 Hukum Pascal), sebuah pompa hidrolik memiliki penampang kecil A1 = 1 cm² dan penampang besar A2 = 100 cm². Jika gaya F1 sebesar 10 N diberikan pada penampang kecil, berapakah gaya angkat F2 yang dihasilkan pada penampang besar?",
+      "options": [
+        "1.000 N",
+        "100 N",
+        "10 N",
+        "10.000 N"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Berdasarkan Hukum Pascal, tekanan diteruskan sama besar (P1 = P2). Maka F1 / A1 = F2 / A2 => 10 N / 1 cm² = F2 / 100 cm² => F2 = 10 N x 100 = 1.000 N."
+      },
+      "distractorWhy": {
+        "1": "Nilai ini diperoleh jika mengalikan gaya F1 hanya dengan 10 bukan perbandingan luas A2/A1 = 100.",
+        "2": "Nilai ini adalah gaya masukan F1 pada penampang kecil.",
+        "3": "Nilai ini diperoleh dari kesalahan mengalikan F1 dengan A2 kuadrat."
+      }
+    },
+    {
+      "id": "ipa-d-8-b4-q10",
+      "difficulty": "dasar",
+      "prompt": "Berdasarkan Buku Siswa IPA Kelas VIII hal. 125–126, prinsip fisika utama yang dimanfaatkan pada mesin pompa hidrolik tempat pencucian mobil untuk mengangkat mobil yang berat adalah...",
+      "options": [
+        "Tekanan yang diberikan pada zat cair dalam ruang tertutup akan diteruskan ke segala arah dengan sama besar",
+        "Setiap benda yang dicelupkan sebagian atau seluruhnya ke dalam zat cair akan mengalami gaya ke atas sebesar berat zat cair yang dipindahkan",
+        "Tekanan zat cair pada dasar wadah berbanding lurus dengan massa jenis dan kedalaman zat cair tersebut",
+        "Gas yang mengalami pemanasan akan memuai dan menurunkan tekanan parsial di dalam ruang tertutup"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Pernyataan ini merupakan bunyi Hukum Pascal, yang menjadi dasar kerja pompa hidrolik, dongkrak hidrolik, dan rem hidrolik."
+      },
+      "distractorWhy": {
+        "1": "Pernyataan ini merupakan bunyi Hukum Archimedes tentang gaya apung benda dalam fluida.",
+        "2": "Pernyataan ini merupakan konsep tekanan hidrostatis pada fluida diam.",
+        "3": "Pernyataan ini berkaitan dengan hukum gas ideal dan pemuaian gas, bukan prinsip hidrolik."
+      }
+    },
+    {
+      "id": "ipa-d-8-b4-q11",
+      "difficulty": "sedang",
+      "prompt": "Berdasarkan Buku Siswa IPA Kelas VIII hal. 127–128 (Tekanan pada Makhluk Hidup), pengangkutan air dan mineral dari akar menuju ke daun pada tumbuhan tinggi dapat terjadi antara lain karena adanya daya kapilaritas batang. Faktor fisika utama yang mempengaruhi daya kapilaritas batang tersebut adalah...",
+      "options": [
+        "Gaya kohesi antarmolekul air dan gaya adhesi antara molekul air dengan dinding pembuluh xilem",
+        "Tekanan hidrostatis air tanah yang mendorong air naik secara alami melalui pembuluh floem",
+        "Gaya gravitasi bumi yang menarik molekul air dari bagian permukaan daun menuju ke akar",
+        "Gaya Archimedes yang memberikan gaya apung pada molekul air di dalam jaringan parenkim"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Kapilaritas batang pada pembuluh xilem dipengaruhi oleh gaya kohesi (ikatan antarmolekul air sejenis) dan gaya adhesi (ikatan molekul air dengan dinding pembuluh xilem yang tidak sejenis). Adhesi menyebabkan air menempel dan merambat naik pada dinding xilem yang sempit."
+      },
+      "distractorWhy": {
+        "1": "Pengangkutan air dan mineral dari akar terjadi melalui pembuluh xilem, bukan floem.",
+        "2": "Gaya gravitasi bumi mengarah ke bawah dan melawan arah pengangkutan air ke atas.",
+        "3": "Gaya Archimedes bekerja pada benda yang tercelup dalam fluida, bukan mekanisme utama kapilaritas pipa sempit."
+      }
+    },
+    {
+      "id": "ipa-d-8-b4-q12",
+      "difficulty": "sedang",
+      "prompt": "Berdasarkan Buku Siswa IPA Kelas VIII hal. 129 (Pengangkutan Nutrisi pada Tumbuhan), bagaimana arah pengangkutan zat-zat hasil fotosintesis di dalam tubuh tumbuhan?",
+      "options": [
+        "Melalui pembuluh floem dari daun (daerah konsentrasi gula tinggi) menuju ke bagian tubuh tanaman lain (daerah konsentrasi gula rendah)",
+        "Melalui pembuluh xilem dari akar (daerah tekanan air tinggi) menuju ke seluruh daun di bagian atas",
+        "Melalui jaringan epidermis dari batang bagian luar menuju ke dalam bagian korteks dan empulur",
+        "Melalui pembuluh kapiler darah dari bunga menuju ke buah dengan bantuan gaya dorong kapilaritas"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Hasil fotosintesis berupa gula dan asam amino diangkut melalui pembuluh floem dari daerah sumber (daun dengan konsentrasi gula tinggi) menuju daerah tujuan/penyimpanan (konsentrasi gula rendah)."
+      },
+      "distractorWhy": {
+        "1": "Pembuluh xilem berfungsi mengangkut air dan mineral dari akar ke daun, bukan hasil fotosintesis.",
+        "2": "Jaringan epidermis berfungsi sebagai pelindung luar, bukan jalur pengangkutan nutrisi fotosintesis.",
+        "3": "Tumbuhan tidak memiliki pembuluh darah; pengangkutan menggunakan jaringan vaskular xilem dan floem."
+      }
+    },
+    {
+      "id": "ipa-d-8-b4-q13",
+      "difficulty": "sedang",
+      "prompt": "Berdasarkan Buku Siswa IPA Kelas VIII hal. 130–131 (Tekanan Darah pada Manusia), mengapa prinsip Hukum Pascal juga berlaku pada sistem peredaran darah manusia?",
+      "options": [
+        "Darah merupakan zat cair yang berada di dalam pembuluh darah yang membentuk sistem ruang tertutup",
+        "Darah mengalir di dalam organ terbuka sehingga tekanan darah di seluruh tubuh selalu bernilai nol",
+        "Darah mengandung sel darah merah yang memiliki gaya apung Archimedes terhadap plasma darah",
+        "Darah dipompa oleh paru-paru sehingga tekanan udara di dalam pembuluh darah selalu konstan"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Pembuluh darah dan jantung manusia merupakan sistem kardiovaskular tertutup (ruang tertutup). Tekanan pendorongan yang diberikan oleh kontraksi jantung pada darah (zat cair) diteruskan ke seluruh bagian pembuluh darah sesuai Hukum Pascal."
+      },
+      "distractorWhy": {
+        "1": "Sistem peredaran darah manusia adalah sistem tertutup, dan tekanannya tidak bernilai nol.",
+        "2": "Gaya apung sel darah merah bukan penyebab diteruskannya tekanan pompa jantung pada pembuluh darah.",
+        "3": "Darah dipompa oleh organ jantung, bukan paru-paru."
+      }
+    },
+    {
+      "id": "ipa-d-8-b4-q14",
+      "difficulty": "dasar",
+      "prompt": "Berdasarkan Buku Siswa IPA Kelas VIII hal. 130, alat yang digunakan oleh dokter atau tenaga medis untuk mengukur tekanan darah manusia dinamakan...",
+      "options": [
+        "Sphygmomanometer (tensimeter)",
+        "Barometer",
+        "Manometer ruang terbuka",
+        "Hydrometer"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Sphygmomanometer atau tensimeter adalah alat standar medis yang digunakan untuk mengukur tekanan darah pada pembuluh arteri."
+      },
+      "distractorWhy": {
+        "1": "Barometer adalah alat untuk mengukur tekanan udara/atmosfer luar.",
+        "2": "Manometer adalah alat untuk mengukur tekanan gas dalam ruang tertutup lab.",
+        "3": "Hydrometer adalah alat untuk mengukur massa jenis cairan."
+      }
+    },
+    {
+      "id": "ipa-d-8-b4-q15",
+      "difficulty": "sedang",
+      "prompt": "Berdasarkan Buku Siswa IPA Kelas VIII hal. 131–132 (Tekanan Gas pada Proses Pernapasan Manusia), mekanisme pertukaran gas oksigen (O₂) dan karbon dioksida (CO₂) antara udara di alveolus dengan darah di dalam kapiler paru-paru terjadi melalui proses...",
+      "options": [
+        "Difusi, yaitu perpindahan gas dari daerah berpariabel tekanan parsial tinggi ke daerah berpariabel tekanan parsial rendah",
+        "Osmosis, yaitu perpindahan pelarut air melewati membran semipermeabel dari larutan encer ke larutan pekat",
+        "Kapilaritas, yaitu penyerapan cairan darah oleh dinding alveolus akibat gaya kohesi",
+        "Konveksi, yaitu pergerakan massa udara secara melingkar akibat perbedaan suhu di dalam alveolus"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Pertukaran O₂ dan CO₂ di paru-paru dan jaringan tubuh terjadi secara difusi berdasarkan perbedaan tekanan parsial gas. Gas berpindah dari area tekanan parsial tinggi ke area tekanan parsial rendah."
+      },
+      "distractorWhy": {
+        "1": "Osmosis adalah perpindahan molekul air/pelarut menembus membran, bukan pertukaran gas pernapasan.",
+        "2": "Kapilaritas adalah gejala naik/turunnya cairan pada pipa sempit, bukan mekanisme pertukaran gas.",
+        "3": "Konveksi adalah perpindahan kalor melalui aliran massa fluida, bukan difusi pasif gas pernapasan."
+      }
+    },
+    {
+      "id": "ipa-d-8-b4-q16",
+      "difficulty": "tinggi",
+      "prompt": "Berdasarkan Buku Siswa IPA Kelas VIII hal. 132–133 (Aktivitas 4.5 Paru-Paru Buatan), ketika bagian membran balon bawah (berfungsi sebagai diafragma) ditarik ke bawah, hal yang terjadi pada balon di dalam botol dan tekanan udara di dalam botol adalah...",
+      "options": [
+        "Tekanan udara di dalam botol menurun (menjadi lebih rendah dari luar) sehingga udara masuk dan kedua balon di dalam mengembang",
+        "Tekanan udara di dalam botol meningkat sehingga mendorong udara keluar dan balon mengempis",
+        "Tekanan udara di dalam botol tidak berubah sehingga balon tetap dalam posisi awal",
+        "Tekanan udara di dalam botol menjadi nol sehingga balon meletus akibat vakum total"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Ketika diafragma ditarik ke bawah, volume ruangan di dalam botol bertambah besar. Berdasarkan hukum tekanan gas, bertambahnya volume menyebabkan tekanan udara di dalam botol menurun di bawah tekanan udara luar. Akibat perbedaan tekanan ini, udara luar masuk melalui sedotan dan mengembangkan kedua balon (paru-paru)."
+      },
+      "distractorWhy": {
+        "1": "Mendorong diafragma ke atas (bukan menarik ke bawah) yang akan memperkecil volume botol dan meningkatkan tekanan udara di dalamnya sehingga balon mengempis.",
+        "2": "Perubahan volume botol pasti mengubah tekanan udara di dalam botol.",
+        "3": "Penarikan diafragma tidak menciptakan kondisi vakum total (tekanan nol)."
+      }
+    },
+    {
+      "id": "ipa-d-8-b4-q17",
+      "difficulty": "sedang",
+      "prompt": "Berdasarkan Buku Siswa IPA Kelas VIII hal. 114–115 (Hukum Archimedes), sebuah benda memiliki berat saat di udara sebesar 50 N. Ketika dicelupkan seluruhnya ke dalam air, berat benda yang terukur pada timbangan pegas menjadi 35 N. Berapakah besar gaya apung (Fa) yang dialami benda tersebut?",
+      "options": [
+        "15 N",
+        "85 N",
+        "35 N",
+        "50 N"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Berdasarkan rumus pers. 4.4 di buku paket hal. 114: Fa = W_udara - W_air. Maka gaya apung Fa = 50 N - 35 N = 15 N."
+      },
+      "distractorWhy": {
+        "1": "Nilai ini diperoleh jika menjumlahkan W_udara dan W_air (50 N + 35 N).",
+        "2": "Nilai ini adalah berat semu benda saat berada di dalam air (W_air).",
+        "3": "Nilai ini adalah berat asli benda saat berada di udara (W_udara)."
+      }
+    },
+    {
+      "id": "ipa-d-8-b4-q18",
+      "difficulty": "sedang",
+      "prompt": "Berdasarkan Buku Siswa IPA Kelas VIII hal. 116–117 (Hukum Archimedes), posisi suatu benda yang dimasukkan ke dalam zat cair (terapung, melayang, atau tenggelam) ditentukan oleh perbandingan massa jenis benda (rho_benda) dengan massa jenis zat cair (rho_cair). Kondisi yang benar saat benda melayang di dalam zat cair adalah...",
+      "options": [
+        "Massa jenis benda sama dengan massa jenis zat cair (rho_benda = rho_cair)",
+        "Massa jenis benda jauh lebih besar daripada massa jenis zat cair (rho_benda > rho_cair)",
+        "Massa jenis benda lebih kecil daripada massa jenis zat cair (rho_benda < rho_cair)",
+        "Volume benda lebih kecil daripada volume seluruh zat cair di wadah"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Benda akan melayang di dalam fluida apabila massa jenis rata-rata benda sama dengan massa jenis zat cair (rho_benda = rho_cair), sehingga gaya apung Fa sama persis dengan gaya berat W."
+      },
+      "distractorWhy": {
+        "1": "Jika rho_benda > rho_cair, benda akan tenggelam ke dasar wadah.",
+        "2": "Jika rho_benda < rho_cair, benda akan terapung sebagian di permukaan zat cair.",
+        "3": "Posisi terapung, melayang, atau tenggelam ditentukan oleh massa jenis, bukan perbandingan volume total wadah."
+      }
+    },
+    {
+      "id": "ipa-d-8-b4-q19",
+      "difficulty": "sedang",
+      "prompt": "Berdasarkan Buku Siswa IPA Kelas VIII hal. 111 (Tekanan Hidrostatis), faktor-faktor utama yang mempengaruhi besarnya tekanan hidrostatis pada suatu titik di dalam zat cair diam adalah...",
+      "options": [
+        "Massa jenis zat cair, percepatan gravitasi, dan kedalaman titik dari permukaan zat cair",
+        "Luas alas wadah, bentuk wadah, dan warna zat cair",
+        "Massa total wadah, volume seluruh air, dan suhu ruangan",
+        "Gaya tarik magnet bumi, luas permukaan atas wadah, dan ketebalan dinding wadah"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Sesuai pers. 4.3 pada buku hal. 111, P = rho x g x h, tekanan hidrostatis murni ditentukan oleh massa jenis cairan (rho), percepatan gravitasi (g), dan kedalaman dari permukaan (h)."
+      },
+      "distractorWhy": {
+        "1": "Tekanan hidrostatis tidak tergantung pada bentuk wadah, luas alas wadah (bejana berhubungan), maupun warna cairan.",
+        "2": "Tekanan hidrostatis tidak bergantung pada massa wadah maupun volume total air.",
+        "3": "Ketebalan dinding wadah dan magnet bumi tidak mempengaruhi tekanan hidrostatis fluida."
+      }
+    }
+  ]
+}

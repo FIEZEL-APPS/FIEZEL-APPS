@@ -1,0 +1,409 @@
+{
+  "code": "KOMP-ENG-D-9-BAB5-01",
+  "grade": 9,
+  "name": "Chapter 5: Digital Life",
+  "materi": "Digital Literacy & Online Safety, Analytical Exposition Texts, Expressing Arguments & Opinions, Cyber Etiquette",
+  "cpRef": "English for Nusantara untuk SMP/MTs Kelas IX",
+  "items": [
+    {
+      "id": "eng-d-9-c5-q01",
+      "difficulty": "easy",
+      "prompt": "In Section 2 of Unit 1 (Let's Check the Facts!), Galang asks Monita how to search for information on the internet. According to Monita, what is the very first step to do before typing keywords?",
+      "options": [
+        "Open a web browser on a laptop or smartphone",
+        "Click on the first advertisement link in search results",
+        "Type a complete paragraph into the address bar",
+        "Turn off the internet connection and restart the computer"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Berdasarkan dialog Galang dan Monita di Unit 1, langkah paling awal saat ingin mencari informasi adalah membuka peramban web (web browser) di perangkat komputer atau ponsel pintar."
+      },
+      "distractorWhy": {
+        "1": "Mengklik iklan secara langsung berisiko mengarahkan ke situs yang tidak aman atau tidak relevan.",
+        "2": "Ketiklah kata kunci utama (keywords) di kolom pencarian, bukan mengetik seluruh paragraf panjang.",
+        "3": "Mematikan koneksi internet justru membuat peramban web tidak dapat mengakses mesin pencari."
+      }
+    },
+    {
+      "id": "eng-d-9-c5-q02",
+      "difficulty": "easy",
+      "prompt": "Based on Monita's advice to Galang in Unit 1, why is it essential to check the source of information found on the internet?",
+      "options": [
+        "In order to avoid using false or misleading information",
+        "To increase the internet connection speed",
+        "To automatically download pocket book templates",
+        "To change the browser's default background color"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Monita menjelaskan bahwa memeriksa sumber informasi (source of information) sangat penting agar kita terhindar dari penggunaan data atau informasi palsu (false information)."
+      },
+      "distractorWhy": {
+        "1": "Memeriksa sumber data adalah tindakan verifikasi keabsahan isi, bukan untuk mempercepat koneksi internet.",
+        "2": "Memeriksa kredibilitas sumber tidak mengunduh templat secara otomatis.",
+        "3": "Sumber informasi berkaitan dengan isi materi, bukan pengaturan warna tampilan peramban."
+      }
+    },
+    {
+      "id": "eng-d-9-c5-q03",
+      "difficulty": "medium",
+      "prompt": "Read the passage from Unit 1 Section 7:\n'Facts about search engines: Internet users must be familiar with search engines. It only takes a few seconds for search engines to find desired information. Search engines put relevant sites at the top of the search results... Everyday there are more than 500 million searches completed.'\n\nHow do search engines organize search results to help users find information quickly?",
+      "options": [
+        "By placing the most relevant websites at the top of the results list",
+        "By sorting websites strictly in alphabetical order of their full URLs",
+        "By hiding secure websites and displaying unverified blogs first",
+        "By randomly changing the order of search results every few seconds"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Teks 'Facts about search engines' menyebutkan bahwa mesin pencari menempatkan situs-situs yang paling relevan di urutan paling atas (top of the search results) agar pengguna dapat menemukan informasi dengan cepat."
+      },
+      "distractorWhy": {
+        "1": "Mesin pencari mengurutkan hasil berdasarkan relevansi dan peringkat algoritma, bukan urutan abjad URL.",
+        "2": "Mesin pencari memprioritaskan situs terverifikasi dan relevan, bukan menyembunyikannya.",
+        "3": "Urutan pencarian disusun secara terstruktur sesuai relevansi pencarian, bukan diacak secara acak setiap detik."
+      }
+    },
+    {
+      "id": "eng-d-9-c5-q04",
+      "difficulty": "easy",
+      "prompt": "According to Ibu Ida Ayu's instructions in Unit 1 on making a biography pocket book, which action verb correctly completes the step: '______ the key words in the search box'?",
+      "options": [
+        "Type",
+        "Erase",
+        "Fold",
+        "Glue"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Kata kerja imperatif yang tepat untuk menggunakan kolom pencarian (search box) di peramban web adalah 'Type' (ketiklah kata kunci)."
+      },
+      "distractorWhy": {
+        "1": "'Erase' berarti menghapus, bukan tindakan memasukkan kata kunci pencarian.",
+        "2": "'Fold' adalah instruksi melipat kertas saat membuat buku saku, bukan perintah di peramban.",
+        "3": "'Glue' adalah tindakan menempelkan bahan kertas."
+      }
+    },
+    {
+      "id": "eng-d-9-c5-q05",
+      "difficulty": "easy",
+      "prompt": "In Unit 2 (Staying safe in the digital world), students learn digital security terms. What is the definition of 'privacy settings' on digital devices and social media?",
+      "options": [
+        "Controls that allow users to manage who can see their personal information and posts",
+        "A public list of passwords shared with all online friends",
+        "Hardware tools used to increase the display brightness of a screen",
+        "An automatic notification sent to unknown internet users"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "'Privacy settings' (pengaturan privasi) adalah fitur keamanan yang memungkinkan pengguna mengatur siapa saja yang berhak melihat data pribadi maupun unggahan mereka."
+      },
+      "distractorWhy": {
+        "1": "Kata sandi tidak boleh dibuat menjadi daftar publik yang dibagikan kepada teman online.",
+        "2": "Pengaturan privasi adalah fitur perangkat lunak keamanan digital, bukan pengatur kecerahan layar.",
+        "3": "Pengaturan privasi bertujuan membatasi akses orang tidak dikenal, bukan mengirim notifikasi otomatis kepada mereka."
+      }
+    },
+    {
+      "id": "eng-d-9-c5-q06",
+      "difficulty": "medium",
+      "prompt": "Read the rule from 'Internet Safety Rules' in Unit 2 Section 2:\n'Verify a link is safe... Know about hovering. Hovering is when you place your mouse cursor over a link (without clicking it) to see the link embedded in the text.'\n\nWhat should an internet user do if the embedded web address shown during hovering differs from the visible text link?",
+      "options": [
+        "Never click the link because it may be suspicious or fraudulent",
+        "Immediately forward the link to all contacts in your address book",
+        "Click the link twice to force the browser to fix the web address",
+        "Enter your personal banking password on the displayed page"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Aturan keselamatan internet di Unit 2 menegaskan bahwa jika alamat tautan yang tersembunyi berbeda dari teks yang terlihat saat dilayangkan kursor (hovering), tautan tersebut tidak boleh diklik (never click it) karena berpotensi jebakan/scam."
+      },
+      "distractorWhy": {
+        "1": "Meneruskan tautan mencurigakan ke orang lain dapat menyebarkan ancaman siber.",
+        "2": "Mengklik tautan berbeda dua kali tetap dapat mengarahkan ke situs peretas atau malware.",
+        "3": "Memasukkan kata sandi rahasia pada situs mencurigakan sangat berbahaya dan memicu pencurian identitas."
+      }
+    },
+    {
+      "id": "eng-d-9-c5-q07",
+      "difficulty": "medium",
+      "prompt": "In Unit 2 Section 5 ('10 Ways to Protect Yourself Against Cybercrimes'), what is recommended regarding passwords to protect your digital accounts against unauthorized access?",
+      "options": [
+        "Keep passwords secret from peers and change them regularly",
+        "Share passwords with online gaming acquaintances to gain bonus points",
+        "Use your full name and date of birth as a simple password for all websites",
+        "Post your passwords on social media profiles so you never forget them"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Poin ke-6 dari 10 cara perlindungan diri di Unit 2 menyarankan agar kata sandi dijaga kerahasiaannya dan diubah secara berkala (change it regularly)."
+      },
+      "distractorWhy": {
+        "1": "Membagikan kata sandi kepada kenalan online dapat menyebabkan akun diretas.",
+        "2": "Menggunakan nama lengkap dan tanggal lahir membuat kata sandi sangat mudah ditebak peretas.",
+        "3": "Mengunggah kata sandi di profil media sosial akan menghilangkan perlindungan akun."
+      }
+    },
+    {
+      "id": "eng-d-9-c5-q08",
+      "difficulty": "medium",
+      "prompt": "According to the UNICEF survey text presented in Unit 2 ('Online bullying in Indonesia'), what percentage of the 2,777 young Indonesians surveyed had experienced cyberbullying?",
+      "options": [
+        "45%",
+        "10%",
+        "75%",
+        "90%"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Teks hasil survei UNICEF 2019 di Unit 2 menyebutkan bahwa dari 2.777 remaja Indonesia berusia 14-24 tahun, sebanyak 45% pernah mengalami perundungan siber (cyberbullying)."
+      },
+      "distractorWhy": {
+        "1": "Angka 10% terlalu rendah dan tidak sesuai dengan data resmi survei di buku teks.",
+        "2": "Angka 75% bukan merupakan data persentase total korban perundungan siber dalam teks tersebut.",
+        "3": "Angka 90% tidak menggambarkan data statistik yang tercantum pada materi Unit 2."
+      }
+    },
+    {
+      "id": "eng-d-9-c5-q09",
+      "difficulty": "medium",
+      "prompt": "In Unit 2 Section 6, what safe action should a student take if they receive an abusive or nasty message from an unknown user on a messaging application?",
+      "options": [
+        "Block the sender, screenshot the evidence, and tell a trusted adult",
+        "Reply with angry insults to retaliate against the sender",
+        "Delete your entire computer operating system immediately",
+        "Blame yourself and keep the abusive messages secret from everyone"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Panduan penanganan cyberbullying di Unit 2 menyarankan untuk memblokir akun pengirim, menyimpan bukti berupa tangkapan layar (screenshot), dan melaporkannya kepada orang dewasa yang dipercaya."
+      },
+      "distractorWhy": {
+        "1": "Membalas dengan hinaan akan memperkeruh konflik dan memicu perundungan balasan.",
+        "2": "Menghapus seluruh sistem operasi komputer adalah tindakan berlebihan yang tidak menyelesaikan masalah akun.",
+        "3": "Menyalahkan diri sendiri dan merahasikannya dapat mengganggu kesehatan mental korban perundungan."
+      }
+    },
+    {
+      "id": "eng-d-9-c5-q10",
+      "difficulty": "easy",
+      "prompt": "Unit 2 focuses on imperative sentences for digital safety rules using adverbs of frequency 'always' or 'never'. Which of the following sentences correctly states an online safety rule?",
+      "options": [
+        "Never give out personal information to strangers online.",
+        "Always share your home address on public forums.",
+        "Never check if a web address begins with HTTPS.",
+        "Always open email attachments from unknown senders."
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Kalimat imperatif aturan keselamatan online yang benar adalah larangan memberikan informasi pribadi kepada orang asing ('Never give out personal information to strangers online')."
+      },
+      "distractorWhy": {
+        "1": "Membagikan alamat rumah di forum publik melanggar prinsip privasi dan keselamatan digital.",
+        "2": "Kita justru harus selalu memeriksa indikator HTTPS pada alamat situs web.",
+        "3": "Membuka lampiran email dari pengirim tak dikenal berisiko terkena virus atau malware."
+      }
+    },
+    {
+      "id": "eng-d-9-c5-q11",
+      "difficulty": "medium",
+      "prompt": "In Unit 3 (Turn back hoax!), students learn how to check the source of internet news. Which top-level domain ending is typically associated with official educational institutions?",
+      "options": [
+        ".edu",
+        ".com",
+        ".xyz",
+        ".temp"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Unit 3 menjelaskan identifikasi alamat URL, di mana ekstensi domain '.edu' khusus digunakan oleh lembaga pendidikan resmi (educational institutions)."
+      },
+      "distractorWhy": {
+        "1": "Domain '.com' umumnya digunakan oleh organisasi komersial atau umum.",
+        "2": "Domain '.xyz' adalah domain tingkat atas umum yang sering dipakai situs komersial atau blog bebas.",
+        "3": "Domain '.temp' bukan merupakan ekstensi domain resmi lembaga pendidikan."
+      }
+    },
+    {
+      "id": "eng-d-9-c5-q12",
+      "difficulty": "medium",
+      "prompt": "Unit 3 provides steps to identify fake news or hoaxes online. What should you do when encountering a sensational headline before sharing it on social media?",
+      "options": [
+        "Cross-check the facts with reliable news sources and official websites",
+        "Immediately share the news to gain views and likes",
+        "Assume the news is true if it includes an dramatic photo",
+        "Rewrite the news with extra exaggerated details"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Langkah utama menangkal hoaks di Unit 3 adalah memverifikasi dan mencocokkan fakta (cross-check facts) dengan sumber berita tepercaya sebelum menyebarkannya."
+      },
+      "distractorWhy": {
+        "1": "Langsung menyebarkan berita demi jumlah suka (likes) memicu penyebaran informasi palsu.",
+        "2": "Foto dramatis sering diubah atau dipakai di luar konteks asli oleh pembuat hoaks.",
+        "3": "Menambah rincian berlebihan justru memperburuk kualitas dan kebenaran informasi."
+      }
+    },
+    {
+      "id": "eng-d-9-c5-q13",
+      "difficulty": "hard",
+      "prompt": "In Chapter 5 Unit 3, analytical exposition texts are introduced to state arguments regarding digital issues. What is the standard generic structure of an analytical exposition text?",
+      "options": [
+        "Thesis - Arguments - Reiteration / Conclusion",
+        "Goal - Materials - Steps",
+        "Orientation - Complication - Resolution",
+        "Identification - Description"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Struktur generik teks eksposisi analitis (analytical exposition text) terdiri dari Tesis (penyataan pendapat utama), Argumen-argumen pendukung, dan Reinterasi/Kesimpulan (penegasan ulang tesis)."
+      },
+      "distractorWhy": {
+        "1": "Struktur 'Goal - Materials - Steps' merupakan struktur generik dari Teks Prosedur (Procedure Text).",
+        "2": "Struktur 'Orientation - Complication - Resolution' merupakan struktur generik dari Teks Naratif (Narrative Text).",
+        "3": "Struktur 'Identification - Description' merupakan struktur generik dari Teks Deskriptif (Descriptive Text)."
+      }
+    },
+    {
+      "id": "eng-d-9-c5-q14",
+      "difficulty": "hard",
+      "prompt": "What is the primary communicative purpose of an analytical exposition text discussed in digital literacy topics?",
+      "options": [
+        "To persuade readers that a particular topic or issue is important by presenting logical arguments",
+        "To entertain readers with a fictional story about internet superheroes",
+        "To provide step-by-step instructions on how to assemble a computer desktop",
+        "To describe the physical appearance of a digital device in detail"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Tujuan komunikatif teks eksposisi analitis adalah meyakinkan pembaca bahwa topik atau isu yang dibahas itu penting melalui argumen-argumen yang logis."
+      },
+      "distractorWhy": {
+        "1": "Menghibur pembaca dengan cerita rekaan adalah tujuan dari teks naratif.",
+        "2": "Memberikan petunjuk langkah demi langkah melakukan sesuatu adalah tujuan teks prosedur.",
+        "3": "Mendeskripsikan penampilan fisik suatu benda secara detail adalah tujuan teks deskriptif."
+      }
+    },
+    {
+      "id": "eng-d-9-c5-q15",
+      "difficulty": "medium",
+      "prompt": "Which expression is commonly used to introduce a personal opinion or argument when discussing online etiquette in Unit 3?",
+      "options": [
+        "In my opinion, we should always verify information before posting it.",
+        "Once upon a time, there lived a wise king in a digital kingdom.",
+        "First, cut the paper into two equal rectangular parts.",
+        "Congratulations on winning the internet safety competition!"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Ungkapan 'In my opinion,...' adalah ungkapan standar untuk menyampaikan pendapat atau argumen pribadi dalam materi teks eksposisi dan etika digital."
+      },
+      "distractorWhy": {
+        "1": "'Once upon a time,...' adalah frasa pembuka dongeng/teks naratif.",
+        "2": "'First, cut the paper...' merupakan instruksi dalam teks prosedur.",
+        "3": "'Congratulations...' adalah ungkapan selamat (congratulating)."
+      }
+    },
+    {
+      "id": "eng-d-9-c5-q16",
+      "difficulty": "hard",
+      "prompt": "Analytical exposition texts rely heavily on the Simple Present Tense to state general truths and facts. Which sentence correctly uses the Simple Present Tense with proper subject-verb agreement?",
+      "options": [
+        "A responsible internet user checks the credibility of news sources.",
+        "A responsible internet user checking the credibility of news sources yesterday.",
+        "A responsible internet user check the credibility of news sources tomorrow.",
+        "A responsible internet user were check the credibility of news sources."
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Subjek tunggal 'A responsible internet user' membutuhkan kata kerja bentuk Simple Present Tense dengan akhiran -s, yaitu 'checks'."
+      },
+      "distractorWhy": {
+        "1": "Penggunaan bentuk 'checking' dengan kata keterangan 'yesterday' melanggar kaidah Simple Present Tense.",
+        "2": "Subjek orang ketiga tunggal memerlukan kata kerja 'checks', bukan 'check' tanpa -s.",
+        "3": "Bentuk 'were check' secara tata bahasa tidak baku dan salah."
+      }
+    },
+    {
+      "id": "eng-d-9-c5-q17",
+      "difficulty": "hard",
+      "prompt": "In Chapter 5, formal vocabulary related to digital ethics is introduced. Which word pair consists of synonyms relevant to online safety and verifying facts?",
+      "options": [
+        "Verify - Confirm",
+        "Hoax - Truth",
+        "Scam - Protection",
+        "Suspicious - Trusted"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Pasangan kata 'Verify' (memverifikasi) dan 'Confirm' (mengonfirmasi) adalah sinonim (persamaan kata) yang sesuai dalam konteks verifikasi kebenaran informasi digital."
+      },
+      "distractorWhy": {
+        "1": "'Hoax' (berita bohong) dan 'Truth' (kebenaran) adalah antonim (lawan kata).",
+        "2": "'Scam' (penipuan) dan 'Protection' (perlindungan) adalah dua konsep yang berlawanan.",
+        "3": "'Suspicious' (mencurigakan) dan 'Trusted' (dapat dipercaya) merupakan kata yang berlawanan arti."
+      }
+    },
+    {
+      "id": "eng-d-9-c5-q18",
+      "difficulty": "hard",
+      "prompt": "Consider the following online situation: A news post headline claims 'Drinking salt water cures all viral infections instantly' without citing any medical research or doctor's name. Applying the steps from Unit 3 (Turn Back Hoax!), how should a digitally literate student evaluate this post?",
+      "options": [
+        "Classify it as potential hoax/misinformation because it lacks credible scientific evidence and source verification",
+        "Accept it as real news because the headline contains strong exclamation marks",
+        "Share it immediately to all family chat groups to prevent illness",
+        "Assume it is authentic because it was posted on an unverified personal blog"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Berdasarkan langkah-langkah penangkalan hoaks di Unit 3, klaim medis tanpa bukti ilmiah dan tanpa rujukan pihak berwenang wajib dikategorikan sebagai potensi hoaks/disinformasi."
+      },
+      "distractorWhy": {
+        "1": "Tanda seru pada judul berita sering digunakan oleh pembuat berita sensasional/palsu untuk memancing emosi pembaca.",
+        "2": "Menyebarkan informasi medis yang belum terbukti kebenaran ilmiahnya dapat membahayakan kesehatan orang lain.",
+        "3": "Unggahan di blog pribadi tanpa verifikasi bukan merupakan sumber warta resmi yang tepercaya."
+      }
+    },
+    {
+      "id": "eng-d-9-c5-q19",
+      "difficulty": "hard",
+      "prompt": "What is the key takeaway regarding cyber etiquette when interacting on social media platforms as outlined in Chapter 5?",
+      "options": [
+        "Think critically before sharing information and respect others' privacy online",
+        "Post every personal detail of your daily life to maintain online popularity",
+        "Comment harsh critiques on strangers' photos to express freedom of speech",
+        "Use other people's account passwords whenever you need internet access"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Inti dari etika digital (cyber etiquette) di Chapter 5 adalah berpikir kritis sebelum membagikan informasi (think before sharing) serta menghormati hak privasi orang lain."
+      },
+      "distractorWhy": {
+        "1": "Mengunggah seluruh detail pribadi mengabaikan prinsip keamanan dan privasi data.",
+        "2": "Komentar kasar dan menghina melanggar etika digital dan tergolong perundungan siber.",
+        "3": "Menggunakan akun milik orang lain tanpa izin merupakan pelanggaran keamanan digital."
+      }
+    },
+    {
+      "id": "eng-d-9-c5-q20",
+      "difficulty": "easy",
+      "prompt": "In Chapter 5 (Digital Life), which combination of actions best demonstrates a student who practices good digital literacy and online safety?",
+      "options": [
+        "Using strong passwords, verifying news sources, and reporting cyberbullying",
+        "Sharing account passwords with friends, clicking unknown web links, and spreading unverified news",
+        "Ignoring browser security warnings, downloading illegal attachments, and insulting online users",
+        "Using fake identities to scam others, disabling firewall protections, and hiding passwords under keyboards"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Kombinasi penggunaan kata sandi kuat, memverifikasi berita, dan melaporkan perundungan siber adalah bentuk nyata dari literasi digital dan keselamatan online yang baik."
+      },
+      "distractorWhy": {
+        "1": "Membagikan kata sandi dan mengklik tautan tidak dikenal adalah tindakan berisiko tinggi terhadap kejahatan siber.",
+        "2": "Abaikan peringatan keamanan dan mengunduh lampiran ilegal dapat merusak sistem komputer.",
+        "3": "Penipuan identitas dan mematikan benteng keamanan (firewall) melanggar etika serta hukum digital."
+      }
+    }
+  ]
+}

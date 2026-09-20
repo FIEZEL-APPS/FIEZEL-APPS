@@ -1,0 +1,249 @@
+{
+  "code": "KOMP-IPA-D-8-BAB5-01",
+  "grade": 8,
+  "name": "Getaran, Gelombang, dan Cahaya",
+  "materi": "Getaran & Frekuensi, Gelombang Transversal & Longitudinal, Gelombang Bunyi & Ekolokasi, Sifat Cahaya & Alat Optik",
+  "cpRef": "Ilmu Pengetahuan Alam untuk SMP/MTs Kelas VII (Edisi Revisi)",
+  "items": [
+    {
+      "id": "ipa-d-8-b5-q01",
+      "difficulty": "dasar",
+      "prompt": "Berdasarkan Buku Siswa IPA Kelas VIII (hal. 175-178), jumlah getaran yang terjadi dalam waktu satu detik dinamakan…",
+      "options": [
+        "Frekuensi (f)",
+        "Periode (T)",
+        "Amplitudo (A)",
+        "Panjang gelombang (lambda)"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Frekuensi (f = n/t) diukur dalam Hertz (Hz) menyatakan banyaknya getaran per detik."
+      },
+      "distractorWhy": {
+        "1": "Periode adalah waktu untuk satu getaran penuh.",
+        "2": "Amplitudo adalah simpangan terjauh.",
+        "3": "Panjang gelombang adalah jarak 1 gelombang."
+      }
+    },
+    {
+      "id": "ipa-d-8-b5-q02",
+      "difficulty": "sedang",
+      "prompt": "Berdasarkan Buku Siswa IPA Kelas VIII (hal. 182), jika sebuah ayunan menghasilkan 60 getaran dalam waktu 15 detik, frekuensi ayunan tersebut adalah…",
+      "options": [
+        "4 Hz",
+        "0,25 Hz",
+        "900 Hz",
+        "45 Hz"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "f = n / t = 60 / 15 = 4 Hz."
+      },
+      "distractorWhy": {
+        "1": "T = 15 / 60 = 0,25 s (periode).",
+        "2": "60 × 15 = 900.",
+        "3": "60 - 15 = 45."
+      }
+    },
+    {
+      "id": "ipa-d-8-b5-q03",
+      "difficulty": "sedang",
+      "prompt": "Berdasarkan Buku Siswa IPA Kelas VIII (hal. 186 Gelombang Longitudinal), contoh gelombang longitudinal yang arah rambatnya sejajar dengan arah getarnya adalah…",
+      "options": [
+        "Gelombang bunyi dan gelombang slinki (pegas)",
+        "Gelombang permukaan air",
+        "Gelombang cahaya tampak",
+        "Gelombang radio"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Gelombang bunyi dan slinki terdiri dari rapatan dan renggangan yang berarah sejajar rambatan."
+      },
+      "distractorWhy": {
+        "1": "Gelombang air adalah gelombang transversal.",
+        "2": "Cahaya adalah gelombang transversal elektromagnetik.",
+        "3": "Gelombang radio adalah transversal."
+      }
+    },
+    {
+      "id": "ipa-d-8-b5-q04",
+      "difficulty": "tinggi",
+      "prompt": "Berdasarkan Buku Siswa IPA Kelas VIII (hal. 192 Bunyi & Ekolokasi), hewan seperti kelelawar dan lumba-lumba memanfaatkan gelombang bunyi berfrekuensi tinggi di atas 20.000 Hz untuk navigasi dinamakan…",
+      "options": [
+        "Ultrasonik",
+        "Infrasonik",
+        "Audiosonik",
+        "Supersonik"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Bunyi ultrasonik memiliki frekuensi > 20.000 Hz yang dimanfaatkan pada ekolokasi hewan dan USG medis."
+      },
+      "distractorWhy": {
+        "1": "Infrasonik < 20 Hz.",
+        "2": "Audiosonik 20 - 20.000 Hz (dengar manusia).",
+        "3": "Supersonik adalah kecepatan melebihi bunyi."
+      }
+    },
+    {
+      "id": "ipa-d-8-b5-q05",
+      "difficulty": "dasar",
+      "prompt": "Berdasarkan Buku Siswa IPA Kelas VIII (hal. 198 Sifat Cahaya), pensil yang dimasukkan sebagian ke dalam gelas berisi air bening tampak patah/bengkok karena sifat cahaya yaitu…",
+      "options": [
+        "Pembiasan cahaya (refraksi)",
+        "Pemantulan cahaya (refleksi)",
+        "Pelenturan cahaya (difraksi)",
+        "Penguraian cahaya (dispersi)"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Pembiasan terjadi saat cahaya merambat melewati dua medium dengan kerapatan optik berbeda (udara dan air)."
+      },
+      "distractorWhy": {
+        "1": "Pemantulan adalah membaliknya arah cahaya.",
+        "2": "Difraksi adalah belokan celah sempit.",
+        "3": "Dispersi adalah pemisahan warna pelangi."
+      }
+    },
+    {
+      "id": "ipa-d-8-b5-q06",
+      "difficulty": "sedang",
+      "prompt": "Berdasarkan Buku Siswa IPA Kelas VIII (hal. 204 Cermin Cembung), kaca spion kendaraan bermotor menggunakan cermin cembung karena sifat bayangan yang dihasilkan selalu…",
+      "options": [
+        "Maya, tegak, dan diperkecil sehingga jangkauan pandangan pengemudi lebih luas",
+        "Nyata, terbalik, dan diperbesar",
+        "Maya, terbalik, dan sama besar",
+        "Nyata, tegak, dan hilang"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Cermin cembung selalu membentuk bayangan maya, tegak, dan diperkecil untuk memperluas medan pandang."
+      },
+      "distractorWhy": {
+        "1": "Sifat cermin cekung jarak tertentu.",
+        "2": "Bayangan maya tidak terbalik.",
+        "3": "Sifat tidak sesuai optik."
+      }
+    },
+    {
+      "id": "ipa-d-8-b5-q07",
+      "difficulty": "tinggi",
+      "prompt": "Berdasarkan Buku Siswa IPA Kelas VIII (hal. 210 Alat Optik Mata), penderita rabun jauh (miopi) tidak dapat melihat benda jauh dengan jelas karena bayangan jatuh di depan retina. Cacatan mata ini ditolong dengan kaca mata berlensa…",
+      "options": [
+        "Cekung (lensa negatif / divergen)",
+        "Cembung (lensa positif / konvergen)",
+        "Rangkap (bifokal)",
+        "Silindris"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Lensa cekung menyebarkan sinar sebelum masuk ke mata agar bayangan bergeser tepat ke retina."
+      },
+      "distractorWhy": {
+        "1": "Lensa cembung untuk rabun dekat (hipermetropi).",
+        "2": "Lensa bifokal untuk presbiopi (mata tua).",
+        "3": "Lensa silindris untuk astigmatisme."
+      }
+    },
+    {
+      "id": "ipa-d-8-b5-q08",
+      "difficulty": "dasar",
+      "prompt": "Berdasarkan Buku Siswa IPA Kelas VIII (hal. 180), rumus hubungan kecepatan rambat gelombang (v), panjang gelombang (lambda), dan frekuensi (f) adalah…",
+      "options": [
+        "v = lambda × f",
+        "v = lambda / f",
+        "v = f / lambda",
+        "v = lambda + f"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Cepat rambat gelombang v merupakan hasil kali panjang gelombang lambda dan frekuensinya f: v = lambda × f."
+      },
+      "distractorWhy": {
+        "1": "Pembagian lambda/f keliru.",
+        "2": "f/lambda keliru.",
+        "3": "Penjumlahan keliru."
+      }
+    },
+    {
+      "id": "ipa-d-8-b5-q09",
+      "difficulty": "sedang",
+      "prompt": "Berdasarkan Buku Siswa IPA Kelas VIII (hal. 190), syarat utama terjadinya gaung atau kerdam pada gedung pertunjukan adalah…",
+      "options": [
+        "Bunyi pantul terdengar hampir bersamaan sebelum bunyi asli selesai diucapkan sehingga mengaburkan kata",
+        "Bunyi pantul terdengar jelas setelah bunyi asli selesai",
+        "Terdapat peredam suara dari busa",
+        "Gedung tidak memiliki dinding"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Gaung timbul bila jarak dinding pantul dekat sehingga bunyi pantul tumpang tindih mengaburkan bunyi asli."
+      },
+      "distractorWhy": {
+        "1": "Syarat gema.",
+        "2": "Peredam busa justru mencegah gaung.",
+        "3": "Tanpa dinding tidak ada pemantulan."
+      }
+    },
+    {
+      "id": "ipa-d-8-b5-q10",
+      "difficulty": "tinggi",
+      "prompt": "Berdasarkan Buku Siswa IPA Kelas VIII (hal. 215 Mikroskop Optik), bayangan akhir yang dibentuk oleh mikroskop cahaya pembesar jaringan biologis bersifat…",
+      "options": [
+        "Maya, terbalik, dan diperbesar terhadap objek asli",
+        "Nyata, tegak, dan diperkecil",
+        "Maya, tegak, dan sama besar",
+        "Nyata, terbalik, dan sama besar"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Kombinasi lensa objektif dan okuler mikroskop menghasilkan bayangan akhir maya, terbalik, diperbesar."
+      },
+      "distractorWhy": {
+        "1": "Mikroskop memperbesar bayangan.",
+        "2": "Bayangan terbalik.",
+        "3": "Bayangan diperbesar."
+      }
+    },
+    {
+      "id": "ipa-d-8-b5-q11",
+      "difficulty": "dasar",
+      "prompt": "Berdasarkan Buku Siswa IPA Kelas VIII (hal. 196), bagian mata yang berfungsi mengatur jumlah cahaya yang masuk ke dalam pupil mata adalah…",
+      "options": [
+        "Iris (selaput pelangi)",
+        "Retina",
+        "Kornea",
+        "Lensa mata"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Iris memberi warna mata dan membesar/membendung bukaan pupil untuk mengatur cahaya masuk."
+      },
+      "distractorWhy": {
+        "1": "Retina adalah layar pembentuk bayangan.",
+        "2": "Kornea membiaskan cahaya di depan.",
+        "3": "Lensa mata mengatur fokus bayangan (akomodasi)."
+      }
+    },
+    {
+      "id": "ipa-d-8-b5-q12",
+      "difficulty": "sedang",
+      "prompt": "Berdasarkan Buku Siswa IPA Kelas VIII (hal. 202), pelangi terbentuk di langit setelah hujan akibat fenomena cahaya yaitu…",
+      "options": [
+        "Dispersi dan pembiasan cahaya matahari oleh titik-titik air hujan",
+        "Penyerapan penuh cahaya oleh awan",
+        "Pemantulan cermin alam",
+        "Interferensi cahaya lampu"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Dispersi memisahkan cahaya polikromatik matahari menjadi spektrum warna mejikuhibiniu melalui pembiasan titik air."
+      },
+      "distractorWhy": {
+        "1": "Penyerapan tidak menghasilkan warna.",
+        "2": "Bukan pemantulan cermin.",
+        "3": "Lampu tidak membentuk pelangi alam."
+      }
+    }
+  ]
+}

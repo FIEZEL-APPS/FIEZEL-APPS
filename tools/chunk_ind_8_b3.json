@@ -1,0 +1,409 @@
+{
+  "code": "KOMP-IND-D-8-BAB3-01",
+  "grade": 8,
+  "name": "Bab 3: Artikel Ilmiah Populer",
+  "materi": "Memahami Artikel Ilmiah Populer, Membedakan Fakta & Opini, Pengumpulan Data, Unsur Kebahasaan: Kata Denotatif & Konjungsi",
+  "cpRef": "Bahasa Indonesia untuk SMP/MTs Kelas VIII (Edisi Revisi)",
+  "items": [
+    {
+      "id": "ind-d-8-b3-q01",
+      "difficulty": "dasar",
+      "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VIII (hal. 91-93), artikel ilmiah populer merupakan karya tulis yang memuat ilmu pengetahuan dan disajikan dengan…",
+      "options": [
+        "Bahasa yang santai, populer, dan mudah dipahami oleh masyarakat awam",
+        "Bahasa latin formal yang hanya dipahami oleh para peneliti di laboratorium",
+        "Bahasa kiasan puisi Melayu klasik yang penuh majas dan perlambangan",
+        "Formula rumus matematika murni tanpa penjelasan kalimat naratif"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Artikel ilmiah populer menyajikan topik pengetahuan ilmiah dengan gaya bahasa populer dan komunikatif agar mudah dipahami pembaca umum."
+      },
+      "distractorWhy": {
+        "1": "Bukan laporan ilmiah murni untuk akademisi.",
+        "2": "Bukan karya sastra puisi.",
+        "3": "Bukan teks formula matematis."
+      }
+    },
+    {
+      "id": "ind-d-8-b3-q02",
+      "difficulty": "dasar",
+      "prompt": "Berdasarkan teks \"Fasilitas Sekolah untuk Peserta Didik Difabel\" pada Buku Siswa Bahasa Indonesia Kelas VIII (hal. 91-93), istilah 'difabel' merupakan kata yang merujuk pada…",
+      "options": [
+        "Peserta didik yang memiliki keterbatasan fisik atau mental tertentu",
+        "Siswa yang selalu mendapat nilai tertinggi di seluruh mata pelajaran",
+        "Tenaga pengajar dan staf administrasi sekolah yang bersertifikasi",
+        "Peserta didik yang tinggal di daerah terluar dan terisolasi"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Difabel (different ability) merujuk pada orang yang memiliki keterbatasan kemampuan fisik maupun mental."
+      },
+      "distractorWhy": {
+        "1": "Istilah tersebut merujuk pada siswa berprestasi.",
+        "2": "Merujuk pada pendidik.",
+        "3": "Merujuk pada kondisi geografis siswa."
+      }
+    },
+    {
+      "id": "ind-d-8-b3-q03",
+      "difficulty": "sedang",
+      "prompt": "Berdasarkan kotak Jelajah Kata dalam Buku Siswa Bahasa Indonesia Kelas VIII (hal. 94), kata 'akomodasi' dalam konteks penyediaan fasilitas difabel di sekolah bermakna…",
+      "options": [
+        "Sesuatu yang disediakan untuk memenuhi kebutuhan dasar atau penyesuaian khusus",
+        "Pembayaran pajak berkala kepada pemerintah daerah",
+        "Kegiatan tamasya bersama seluruh warga sekolah pada akhir semester",
+        "Perlombaan antarruang kelas dalam bidang olahraga dan seni"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Akomodasi berarti sarana penunjang atau penyesuaian yang disediakan untuk memenuhi kebutuhan khusus."
+      },
+      "distractorWhy": {
+        "1": "Merujuk pada kewajiban retribusi.",
+        "2": "Merujuk pada kegiatan wisata.",
+        "3": "Merujuk pada ajang kompetisi."
+      }
+    },
+    {
+      "id": "ind-d-8-b3-q04",
+      "difficulty": "dasar",
+      "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VIII (hal. 99), salah satu ciri utama dari artikel ilmiah populer adalah memuat…",
+      "options": [
+        "Pendapat penulis yang didukung oleh bukti, data, dan alasan yang masuk akal (logis)",
+        "Dongeng rakyat dan kisah fiktif tanpa pendukung fakta nyata",
+        "Puisi berbait-bait yang disusun menggunakan rima A-B-A-B",
+        "Mantra dan ramalan masa depan yang tidak dapat diverifikasi"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Artikel ilmiah populer mengandung gagasan/pandangan penulis yang disertai pembuktian data faktual dan nalar logis."
+      },
+      "distractorWhy": {
+        "1": "Merupakan ciri cerita rekaan/fabel.",
+        "2": "Merupakan struktur karya puisi.",
+        "3": "Merupakan bentuk kepercayaan intuitif."
+      }
+    },
+    {
+      "id": "ind-d-8-b3-q05",
+      "difficulty": "sedang",
+      "prompt": "Berdasarkan analisis ciri-ciri artikel ilmiah populer pada Buku Siswa Bahasa Indonesia Kelas VIII (hal. 99-100), ragam bahasa yang digunakan harus bersifat 'populer'. Hal ini berarti…",
+      "options": [
+        "Menggunakan kata-kata yang mudah dimengerti oleh masyarakat luas dan tidak rumit",
+        "Menggunakan istilah teknis asing tanpa disertai penjelasan atau penerjemahan",
+        "Menggunakan kalimat berbelit-belit yang penuh dengan sandi rahasia",
+        "Menggunakan ragam bahasa daerah purba yang sudah punah"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Bahasa populer ditandai dengan kosakata komunikatif yang familiar bagi publik luas."
+      },
+      "distractorWhy": {
+        "1": "Bahasa ilmiah murni jargon teknis.",
+        "2": "Bentuk penulisan yang tidak komunikatif.",
+        "3": "Ragam bahasa kuno yang tidak dapat dipahami pembaca."
+      }
+    },
+    {
+      "id": "ind-d-8-b3-q06",
+      "difficulty": "dasar",
+      "prompt": "Berdasarkan penjelasan pada Buku Siswa Bahasa Indonesia Kelas VIII (hal. 104-105), kalimat fakta dalam artikel ilmiah populer memiliki ciri utama yaitu…",
+      "options": [
+        "Berisi peristiwa yang benar-benar terjadi, memiliki data objektif, dan dapat dibuktikan kebenarannya",
+        "Berisi tanggapan subjektif dan prasangka pribadi yang belum pernah teruji",
+        "Berisi angan-angan dan harapan penulis mengenai kejadian di masa mendatang",
+        "Menggunakan kata-kata relatif seperti 'mungkin', 'sebaiknya', dan 'kira-kira'"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Fakta menyajikan kejadian nyata yang terverifikasi lewat data angka, tempat, atau hasil pengamatan."
+      },
+      "distractorWhy": {
+        "1": "Ciri khas opini subjektif.",
+        "2": "Bentuk gagasan atau harapan (opini).",
+        "3": "Penggunaan modalitas ketidakpastian dalam opini."
+      }
+    },
+    {
+      "id": "ind-d-8-b3-q07",
+      "difficulty": "dasar",
+      "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VIII (hal. 104-105), pernyataan opini dalam sebuah artikel ilmiah populer ditandai oleh…",
+      "options": [
+        "Pendapat, pikiran, atau pandangan pribadi yang bersifat subjektif dan belum terbukti secara pasti",
+        "Hasil pengukuran laboratorium yang telah disetujui oleh lembaga standar internasional",
+        "Data statistik resmi yang dikeluarkan oleh badan pusat statistik pemerintah",
+        "Tanggal lahir dan lokasi sejarah yang tercatat pada dokumen identitas resmi"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Opini mencerminkan sudut pandang atau pemikiran individual penulis yang sifatnya belum menjadi kepastian universal."
+      },
+      "distractorWhy": {
+        "1": "Hasil laboratorium merupakan fakta eksperimental.",
+        "2": "Data statistik pemerintah merupakan fakta numerik.",
+        "3": "Pencatatan sejarah/identitas adalah fakta historis."
+      }
+    },
+    {
+      "id": "ind-d-8-b3-q08",
+      "difficulty": "sedang",
+      "prompt": "Perhatikan kalimat berikut: \"SMP Merdeka memiliki dua jalur jalan khusus (ramp) yang menghubungkan lantai dasar dengan lantai dua untuk kursi roda.\" Berdasarkan Buku Siswa Bahasa Indonesia Kelas VIII (hal. 105), kalimat tersebut tergolong fakta karena…",
+      "options": [
+        "Menyatakan keberadaan fasilitas fisik nyata yang dapat dilihat, dihitung, dan dibuktikan di lapangan",
+        "Menggambarkan perasaan pribadi siswa terhadap kondisi sekolah",
+        "Memuat saran agar sekolah segera membangun jalan khusus kursi roda",
+        "Menggunakan kata-kata penilaian seperti 'sangat indah' dan 'amat megah'"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Kalimat tersebut memuat keberadaan fisik yang dapat diverifikasi kebenarannya secara nyata."
+      },
+      "distractorWhy": {
+        "1": "Bukan ekspresi emosi/perasaan.",
+        "2": "Bukan kalimat imbauan/rekomendasi.",
+        "3": "Tidak memuat kata sifat subjektif."
+      }
+    },
+    {
+      "id": "ind-d-8-b3-q09",
+      "difficulty": "tinggi",
+      "prompt": "Di antara kalimat-kalimat berikut, manakah yang merupakan bentuk 'opini' berdasarkan kaidah penulisan artikel ilmiah populer (Buku Siswa Kelas VIII hal. 104-106)?",
+      "options": [
+        "\"Fasilitas untuk peserta didik difabel di sekolah ini tampaknya masih perlu ditingkatkan lagi.\"",
+        "\"Jumlah siswa difabel di SMP Merdeka pada tahun ajaran ini berjumlah empat orang.\"",
+        "\"Kepala Sekolah meresmikan ruang perpustakaan inklusif pada tanggal 10 Mei 2023.\"",
+        "\"Gedung sekolah tersebut memiliki lima ruang kelas yang terletak di lantai dasar.\""
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Kata 'tampaknya' dan 'perlu ditingkatkan lagi' menunjukkan penilaian subjektif dan saran yang tergolong opini."
+      },
+      "distractorWhy": {
+        "1": "Merupakan fakta jumlah angka pasti.",
+        "2": "Merupakan fakta tanggal dan peristiwa sejarah.",
+        "3": "Merupakan fakta jumlah dan tata letak fisik."
+      }
+    },
+    {
+      "id": "ind-d-8-b3-q10",
+      "difficulty": "sedang",
+      "prompt": "Berdasarkan penjelasan unsur kebahasaan pada Buku Siswa Bahasa Indonesia Kelas VIII (hal. 108), kata 'denotatif' yang wajib digunakan dalam artikel ilmiah populer adalah kata yang…",
+      "options": [
+        "Memiliki arti lugas, sebenarnya, dan tidak mengandung makna kiasan atau kias",
+        "Mempunyai arti kiasan yang tersirat dan tergantung pada perasaan pembaca",
+        "Mengandung makna ganda atau ambigu yang membingungkan masyarakat",
+        "Berasal dari bahasa peribahasa kuno yang bermakna konotatif tinggi"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Kata denotatif adalah kata bermakna eksplisit/sebenarnya (konseptual) agar informasi ilmiah disampaikan secara jernih."
+      },
+      "distractorWhy": {
+        "1": "Definisi dari kata konotatif.",
+        "2": "Karakteristik bahasa ambigu yang dihindari.",
+        "3": "Definisi makna ungkapan/kiasan."
+      }
+    },
+    {
+      "id": "ind-d-8-b3-q11",
+      "difficulty": "tinggi",
+      "prompt": "Perhatikan kalimat: \"Ibu guru memegang tangan siswa difabel itu saat menyeberangi jalan.\" Kata 'memegang' dalam kalimat tersebut bermakna denotatif karena…",
+      "options": [
+        "Merujuk pada tindakan fisik nyata menyentuh atau menggenggam dengan jemari tangan",
+        "Memiliki arti kiasan memegang jabatan atau posisi penting di sekolah",
+        "Berarti menguasai seluruh harta benda dan fasilitas fisik sekolah",
+        "Mengandung makna kiasan menyimpan rahasia pribadi orang lain"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Makna denotatif kata 'memegang' adalah aktivitas fisik menggenggam bagian tubuh/benda secara harfiah."
+      },
+      "distractorWhy": {
+        "1": "Makna kiasan untuk jabatan.",
+        "2": "Makna kiasan kepemilikan/kekuasaan.",
+        "3": "Makna kiasan menjaga rahasia."
+      }
+    },
+    {
+      "id": "ind-d-8-b3-q12",
+      "difficulty": "dasar",
+      "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VIII (hal. 109-110), teknik pengumpulan data artikel ilmiah populer melalui kegiatan tanya jawab langsung dengan narasumber dinamakan…",
+      "options": [
+        "Wawancara",
+        "Kuesioner",
+        "Studi Pustaka",
+        "Eksperimen laboratorium"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Wawancara dilakukan dengan mengajukan pertanyaan secara lisan langsung kepada narasumber ahli atau terkait."
+      },
+      "distractorWhy": {
+        "1": "Kuesioner menggunakan lembar pertanyaan tertulis.",
+        "2": "Studi pustaka membaca sumber tulisan.",
+        "3": "Eksperimen melakukan pengujian ilmiah."
+      }
+    },
+    {
+      "id": "ind-d-8-b3-q13",
+      "difficulty": "sedang",
+      "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VIII (hal. 110), apabila seorang penulis membagikan daftar pertanyaan tertulis kepada puluhan responden untuk mengetahui pendapat mereka, metode pengumpulan data yang digunakan adalah…",
+      "options": [
+        "Kuesioner (angket)",
+        "Wawancara mendalam",
+        "Obrolan santai tanpa catatan",
+        "Studi dokumen arsip tua"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Kuesioner atau angket berupa lembar instrumen tertulis yang diisi oleh responden."
+      },
+      "distractorWhy": {
+        "1": "Wawancara dilakukan secara lisan tatap muka.",
+        "2": "Obrolan informal bukan metode sistematis.",
+        "3": "Studi dokumen mengkaji arsip bacaan."
+      }
+    },
+    {
+      "id": "ind-d-8-b3-q14",
+      "difficulty": "sedang",
+      "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VIII (hal. 111), pengumpulan data artikel ilmiah populer yang dilakukan dengan cara membaca buku, artikel jurnal, atau dokumen resmi disebut…",
+      "options": [
+        "Studi pustaka",
+        "Wawancara narasumber",
+        "Survei lapangan tertutup",
+        "Pengamatan lingkungan hidup"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Studi pustaka memanfaatkan sumber-sumber literatur ilmiah, buku, cetakan, atau bahan digital terpercaya."
+      },
+      "distractorWhy": {
+        "1": "Melibatkan dialog lisan dengan orang.",
+        "2": "Melibatkan penyebaran lembar angket.",
+        "3": "Melibatkan pengamatan fisik langsung."
+      }
+    },
+    {
+      "id": "ind-d-8-b3-q15",
+      "difficulty": "sedang",
+      "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VIII (hal. 113), kalimat perbandingan digunakan untuk membandingkan dua hal yang memiliki perbedaan atau persamaan. Kata penanda perbandingan yang tepat adalah…",
+      "options": [
+        "Seperti, bagaikan, daripada, dan sama halnya",
+        "Oleh karena itu, sebab, dan akibatnya",
+        "Kemudian, setelah itu, dan selanjutnya",
+        "Meskipun, walaupun, dan kendati demikian"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Kata 'seperti', 'bagaikan', 'daripada', dan 'sama halnya' berfungsi membandingkan dua objek atau kondisi."
+      },
+      "distractorWhy": {
+        "1": "Konjungsi hubungan kausalitas (sebab-akibat).",
+        "2": "Konjungsi urutan waktu (kronologis).",
+        "3": "Konjungsi pertentangan (konsesif)."
+      }
+    },
+    {
+      "id": "ind-d-8-b3-q16",
+      "difficulty": "tinggi",
+      "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VIII (hal. 114), kalimat analogi berfungsi membandingkan dua hal yang berbeda tetapi memiliki kesamaan sifat atau fungsi untuk memperjelas pemahaman pembaca. Contoh kalimat analogi yang tepat adalah…",
+      "options": [
+        "\"Otak manusia bekerja mirip dengan unit pemrosesan pusat (CPU) pada komputer.\"",
+        "\"Jumlah ruang kelas di SMP Merdeka lebih banyak daripada jumlah ruang laboratorium.\"",
+        "\"Siswa kelas VIII menyukai pelajaran bahasa Indonesia daripada pelajaran matematika.\"",
+        "\"Sekolah tersebut dibangun pada tahun 2005 di atas tanah seluas dua hektar.\""
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Kalimat tersebut menganalogikan mekanisme kerja otak dengan CPU komputer untuk mempermudah pemahaman fungsi dasarnya."
+      },
+      "distractorWhy": {
+        "1": "Kalimat perbandingan komparatif kuantitas.",
+        "2": "Kalimat perbandingan preferensi/selera.",
+        "3": "Kalimat fakta historis dan spasial."
+      }
+    },
+    {
+      "id": "ind-d-8-b3-q17",
+      "difficulty": "sedang",
+      "prompt": "Berdasarkan penjelasan unsur kebahasaan pada Buku Siswa Bahasa Indonesia Kelas VIII (hal. 115-116), konjungsi yang berfungsi menghubungkan alasan dengan dampak terjadinya suatu peristiwa dinamakan konjungsi…",
+      "options": [
+        "Sebab-akibat (kausalitas)",
+        "Urutan waktu (kronologis)",
+        "Pertentangan (adversatif)",
+        "Pengandaian (kondisional)"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Konjungsi sebab-akibat (seperti 'karena', 'sebab', 'sehingga', 'oleh karena itu') menerangkan hubungan kausal antara peristiwa dan dampaknya."
+      },
+      "distractorWhy": {
+        "1": "Menghubungkan urutan temporal.",
+        "2": "Menghubungkan dua hal yang berlawanan.",
+        "3": "Menghubungkan syarat atau kemungkinan."
+      }
+    },
+    {
+      "id": "ind-d-8-b3-q18",
+      "difficulty": "tinggi",
+      "prompt": "Perhatikan kalimat: \"Fasilitas jalan ramp belum dibangun di gedung belakang, […] siswa yang menggunakan kursi roda kesulitan menuju laboratorium IPA.\" Konjungsi sebab-akibat yang paling tepat untuk melengkapi bagian rumpang tersebut (Buku Siswa Kelas VIII hal. 115) adalah…",
+      "options": [
+        "Sehingga",
+        "Seandainya",
+        "Walaupun",
+        "Melainkan"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "'Sehingga' menandakan akibat atau dampak dari belum dibangunnya fasilitas jalan ramp."
+      },
+      "distractorWhy": {
+        "1": "Konjungsi syarat/pengandaian.",
+        "2": "Konjungsi pertentangan.",
+        "3": "Konjungsi korelatif/koreksi."
+      }
+    },
+    {
+      "id": "ind-d-8-b3-q19",
+      "difficulty": "dasar",
+      "prompt": "Berdasarkan penjelasan langkah-langkah menulis artikel ilmiah populer pada Buku Siswa Bahasa Indonesia Kelas VIII (hal. 118-119), langkah paling awal yang harus dilakukan oleh seorang penulis sebelum mengumpulkan data adalah…",
+      "options": [
+        "Menentukan topik dan tujuan penulisan artikel",
+        "Menulis naskah akhir dan mempublikasikannya di media cetak",
+        "Menyunting ejaan dan tanda baca dalam teks orang lain",
+        "Menggambar ilustrasi sampul depan artikel ilmiah"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Langkah awal sebelum menulis adalah memilih topik yang jelas serta menetapkan tujuan penulisan."
+      },
+      "distractorWhy": {
+        "1": "Merupakan tahap akhir (publikasi).",
+        "2": "Merupakan tahap penyuntingan (editing).",
+        "3": "Merupakan kegiatan desain grafis penunjang."
+      }
+    },
+    {
+      "id": "ind-d-8-b3-q20",
+      "difficulty": "sedang",
+      "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VIII (hal. 120), tahap akhir dalam proses penulisan artikel ilmiah populer sebelum dipublikasikan adalah 'menyunting', yang bertujuan untuk…",
+      "options": [
+        "Memeriksa dan memperbaiki kesalahan ejaan, tata bahasa, serta kebenaran data dalam draft artikel",
+        "Merubah seluruh isi topik tulisan menjadi cerita fiksi dongeng",
+        "Menghapus semua data angka dan grafik yang telah dikumpulkan",
+        "Mengganti judul artikel dengan judul karya sastra lama"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Menyunting bertujuan menyempurnakan tulisan agar bebas dari kekeliruan kebahasaan, ejaan, maupun fakta ilmiah."
+      },
+      "distractorWhy": {
+        "1": "Mengubah jenis teks bukan tujuan penyuntingan.",
+        "2": "Menghapus data ilmiah merusak bobot fakta artikel.",
+        "3": "Mengganti judul tanpa relevansi tidak logis."
+      }
+    }
+  ]
+}

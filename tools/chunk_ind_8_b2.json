@@ -1,0 +1,409 @@
+{
+  "code": "KOMP-IND-D-8-BAB2-01",
+  "grade": 8,
+  "name": "Bab 2: Iklan, Slogan, dan Poster",
+  "materi": "Mengenal Iklan, Slogan, dan Poster, Ciri Bahasa Persuasif & Imperatif, Struktur Iklan Komersial & Layanan Masyarakat",
+  "cpRef": "Bahasa Indonesia untuk SMP/MTs Kelas VIII (Edisi Revisi)",
+  "items": [
+    {
+      "id": "ind-d-8-b2-q01",
+      "difficulty": "mudah",
+      "prompt": "Menurut Tjiptono (2008) sebagaimana dikutip dalam Buku Siswa Bahasa Indonesia Kelas VIII Edisi Revisi, apakah yang dimaksud dengan iklan?",
+      "options": [
+        "Bentuk komunikasi tidak langsung yang didasarkan pada informasi tentang keunggulan suatu produk untuk mengubah pikiran seseorang agar melakukan pembelian",
+        "Pengumuman langsung di depan umum yang disampaikan oleh penjual tanpa menggunakan media atau visualisasi",
+        "Teks berita resmi yang diterbitkan oleh badan pemerintah untuk menginformasikan kebijakan ekonomi terbaru",
+        "Karya sastra berupa puisi pendek yang bertujuan memberikan nasihat moral bagi khalayak ramai"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Iklan menurut Tjiptono (2008) dalam buku teks didefinisikan sebagai bentuk komunikasi tidak langsung yang didasarkan pada informasi keunggulan produk untuk mengubah pikiran seseorang agar melakukan pembelian."
+      },
+      "distractorWhy": {
+        "1": "Iklan bukan sekadar pengumuman lisan tanpa media, melainkan komunikasi terstruktur yang memanfaatkan media massa atau tempat umum.",
+        "2": "Iklan bukan merupakan teks berita resmi pemerintah tentang kebijakan ekonomi.",
+        "3": "Iklan bukan berupa puisi pendek sastra untuk nasihat moral semata."
+      }
+    },
+    {
+      "id": "ind-d-8-b2-q02",
+      "difficulty": "mudah",
+      "prompt": "Berdasarkan Kamus Besar Bahasa Indonesia (KBBI) yang tercantum dalam Buku Siswa, apakah arti iklan?",
+      "options": [
+        "Pemberitahuan kepada khalayak mengenai barang atau jasa yang dijual, dipasang di media massa atau tempat umum",
+        "Cerita rekaan tentang kehidupan sehari-hari yang diterbitkan dalam majalah mingguan",
+        "Catatan keuangan perbankan yang dipublikasikan secara periodik untuk pemegang saham",
+        "Karangan ilmiah yang memuat hasil penelitian empiris di laboratorium sekolah"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Menurut KBBI dalam buku teks, iklan diartikan sebagai pemberitahuan kepada khalayak mengenai barang atau jasa yang dijual, dipasang di dalam media massa atau di tempat umum."
+      },
+      "distractorWhy": {
+        "1": "Cerita rekaan dalam majalah merupakan karya fiksi atau cerpen, bukan iklan.",
+        "2": "Catatan keuangan perbankan merupakan laporan keuangan perusahaan.",
+        "3": "Karangan ilmiah hasil laboratorium merupakan artikel atau laporan penelitian."
+      }
+    },
+    {
+      "id": "ind-d-8-b2-q03",
+      "difficulty": "mudah",
+      "prompt": "Di dalam Buku Siswa Bahasa Indonesia Kelas VIII Bab 2, iklan dibedakan menjadi dua jenis utama berdasarkan tujuannya, yaitu...",
+      "options": [
+        "Iklan komersial dan iklan nonkomersial",
+        "Iklan cetak dan iklan audiovisual",
+        "Iklan primer dan iklan sekunder",
+        "Iklan lokal dan iklan internasional"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Buku teks membagi iklan menjadi dua jenis utama berdasarkan tujuannya, yaitu iklan komersial (mencari keuntungan atau perdagangan) dan iklan nonkomersial (tidak mencari keuntungan/nonprofit)."
+      },
+      "distractorWhy": {
+        "1": "Cetak dan audiovisual adalah pembagian berdasarkan media penyampaian, bukan jenis utama tujuannya dalam pembahasan subbab.",
+        "2": "Primer dan sekunder bukan pembagian jenis iklan yang dibahas dalam Bab 2.",
+        "3": "Lokal dan internasional merupakan jangkauan geografis, bukan jenis utama berdasarkan tujuannya dalam buku teks."
+      }
+    },
+    {
+      "id": "ind-d-8-b2-q04",
+      "difficulty": "sedang",
+      "prompt": "Perhatikan analisis iklan Kios Pak Jal pada Bab 2. Informasi apakah yang TIDAK dicantumkan secara eksplisit dalam iklan Kios Pak Jal tersebut?",
+      "options": [
+        "Informasi harga sayuran secara spesifik",
+        "Nama kios dan alamat lokasi",
+        "Keunggulan produk bahan masakan segar",
+        "Testimoni dari pelanggan"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Dalam Tabel 2.2 analisis iklan Kios Pak Jal, informasi harga dinyatakan tidak ada karena iklan menyajikan sayuran secara umum, tidak spesifik untuk jenis sayuran tertentu."
+      },
+      "distractorWhy": {
+        "1": "Nama kios dan alamat lokasi tertera di bagian atas iklan.",
+        "2": "Keunggulan produk tertera melalui penjelasan bahwa sayur dan buah langsung diambil dari kebun.",
+        "3": "Testimoni pelanggan tertera melalui penyataan dan foto pelanggan Bu Yati."
+      }
+    },
+    {
+      "id": "ind-d-8-b2-q05",
+      "difficulty": "sedang",
+      "prompt": "Berdasarkan iklan Kedai Cukur Panglima pada Kegiatan 2 Bab 2, jasa apakah yang ditawarkan selain pelayanan cukur di tempat kedai?",
+      "options": [
+        "Melayani panggilan ke rumah, sekolah, dan rumah sakit",
+        "Layanan antar-jemput pelanggan secara gratis",
+        "Penjualan produk minyak rambut impor",
+        "Kursus pelatihan memotong rambut profesional"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Iklan Kedai Cukur Panglima secara eksplisit memuat teks melayani panggilan ke rumah, sekolah, rumah sakit, dan lainnya."
+      },
+      "distractorWhy": {
+        "1": "Iklan tidak mencantumkan fasilitas layanan antar-jemput pelanggan.",
+        "2": "Penjualan produk minyak rambut impor tidak tertera pada teks atau gambar iklan.",
+        "3": "Iklan tersebut tidak menawarkan kursus pelatihan memotong rambut."
+      }
+    },
+    {
+      "id": "ind-d-8-b2-q06",
+      "difficulty": "sedang",
+      "prompt": "Apakah dampak utama jika sebuah iklan komersial menyajikan informasi yang tidak lengkap atau tidak jelas?",
+      "options": [
+        "Menimbulkan kebingungan bagi pembaca sehingga mereka kurang tertarik mengenali produk",
+        "Meningkatkan daya tarik karena pembaca merasa penasaran dan langsung membeli",
+        "Menjadikan biaya pemuatan iklan di media massa menjadi jauh lebih murah",
+        "Menyebabkan produk tersebut otomatis ditarik dari peredaran pasar oleh pemerintah"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Buku teks menjelaskan bahwa iklan yang tidak lengkap akan menimbulkan kebingungan bagi pembaca sehingga membuat mereka kurang tertarik mengenali produk yang diiklankan."
+      },
+      "distractorWhy": {
+        "1": "Informasi yang membingungkan justru menurunkan minat pembaca, bukan meningkatkan pembelian.",
+        "2": "Kelengkapan informasi iklan tidak menentukan tarif biaya pemuatan media.",
+        "3": "Ketidaklengkapan informasi tidak secara otomatis menyebabkan penarikan produk oleh pemerintah."
+      }
+    },
+    {
+      "id": "ind-d-8-b2-q07",
+      "difficulty": "sulit",
+      "prompt": "Pada analisis perbandingan Iklan Permen Milki 1 dan Iklan Permen Milki 2 di Bab 2, mengapa Iklan Permen Milki 1 dinilai lebih efektif daripada Iklan Permen Milki 2?",
+      "options": [
+        "Iklan 1 menggunakan teks sederhana, gambar anak bergembira, dan sesuai sasaran konsumen anak-anak",
+        "Iklan 1 memuat penjelasan nutrisi susu sapi segar yang sangat panjang dan ilmiah",
+        "Iklan 1 tidak menggunakan gambar sama sekali sehingga pembaca fokus pada tulisan permen",
+        "Iklan 1 memberikan diskon harga sebesar lima puluh persen untuk pembeli pertama"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Tabel 2.8 menjelaskan bahwa Iklan Permen Milki 1 lebih efektif karena memiliki teks sedikit yang mudah dimengerti anak-anak, memuat ekspresi anak bergembira, serta informasi produk yang lengkap."
+      },
+      "distractorWhy": {
+        "1": "Penjelasan nutrisi yang panjang terdapat pada Iklan 2 yang dinilai kurang cocok untuk konsumen anak-anak.",
+        "2": "Iklan 1 menonjolkan gambar permen dan anak yang bergembira dengan warna mencolok.",
+        "3": "Iklan 1 tidak mencantumkan informasi diskon harga lima puluh persen."
+      }
+    },
+    {
+      "id": "ind-d-8-b2-q08",
+      "difficulty": "mudah",
+      "prompt": "Menurut Liliweri (2013) dalam Buku Siswa Bahasa Indonesia Kelas VIII, apakah sifat utama dari iklan layanan masyarakat?",
+      "options": [
+        "Bersifat nonprofit atau tidak mencari keuntungan",
+        "Berfokus pada promosi diskon produk niaga secara besar-besaran",
+        "Bertujuan meningkatkan margin penjualan perusahaan swasta",
+        "Mewajibkan masyarakat membayar retribusi bulanan"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Menurut Liliweri (2013) yang dikutip di subbab C, iklan layanan masyarakat merupakan iklan yang bersifat nonprofit atau tidak mencari keuntungan."
+      },
+      "distractorWhy": {
+        "1": "Promosi diskon produk niaga adalah ciri iklan komersial.",
+        "2": "Meningkatkan margin penjualan adalah tujuan iklan komersial perusahaan.",
+        "3": "Iklan layanan masyarakat bukan sarana penarikan retribusi bulanan."
+      }
+    },
+    {
+      "id": "ind-d-8-b2-q09",
+      "difficulty": "sedang",
+      "prompt": "Pada iklan nonkomersial Asosiasi Bus Kota di Bab 2, siapakah yang dimaksud sebagai penumpang prioritas?",
+      "options": [
+        "Ibu hamil, ibu membawa balita, manula, dan penyandang difabel",
+        "Penumpang yang membeli tiket bus kelas eksekutif dengan harga termahal",
+        "Pelajar yang mengenakan seragam sekolah pada jam berangkat pagi",
+        "Petugas pemeriksa tiket dan pengemudi armada bus kota"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Dalam Gambar 2.10 (iklan Asosiasi Bus Kota), penumpang prioritas ditunjukkan melalui visual dan teks yaitu ibu hamil, ibu dengan balita, manula, dan difabel."
+      },
+      "distractorWhy": {
+        "1": "Penumpang prioritas dalam fasilitas umum tidak didasarkan pada harga tiket eksekutif.",
+        "2": "Pelajar tidak termasuk dalam kelompok penumpang prioritas fasilitas tempat duduk bus.",
+        "3": "Petugas bus merupakan kru operasional, bukan kelompok penumpang prioritas yang dimaksud."
+      }
+    },
+    {
+      "id": "ind-d-8-b2-q10",
+      "difficulty": "mudah",
+      "prompt": "Apakah yang dimaksud dengan poster menurut pembahasan dalam Bab 2 Buku Siswa?",
+      "options": [
+        "Plakat yang dipasang di tempat umum berupa pengumuman atau iklan",
+        "Buku panduan tebal yang dibagikan secara gratis kepada siswa",
+        "Surat kabar harian yang memuat berita politik nasional",
+        "Nota pembayaran resmi setelah melakukan transaksi jual beli"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Dalam subbab C2 dijelaskan bahwa poster adalah plakat yang dipasang di tempat umum (berupa pengumuman atau iklan)."
+      },
+      "distractorWhy": {
+        "1": "Buku panduan tebal bukan merupakan poster.",
+        "2": "Surat kabar harian adalah media cetak berkala.",
+        "3": "Nota pembayaran adalah kuitansi atau bukti transaksi."
+      }
+    },
+    {
+      "id": "ind-d-8-b2-q11",
+      "difficulty": "sedang",
+      "prompt": "Menurut Kamus Besar Bahasa Indonesia (KBBI) sebagaimana dijelaskan dalam subbab D, apakah definisi slogan?",
+      "options": [
+        "Perkataan atau kalimat pendek yang menarik dan mudah diingat untuk mengiklankan sesuatu atau menjelaskan ideologi",
+        "Karangan eksposisi panjang yang memuat data statistik lengkap dari lembaga pemerintah",
+        "Teks berita di koran yang menjelaskan kronologi suatu peristiwa kejahatan",
+        "Surat keputusan resmi yang dikeluarkan oleh pihak berwenang di kepolisian"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "KBBI mengartikan slogan sebagai perkataan atau kalimat pendek yang menarik atau mencolok dan mudah diingat untuk mengiklankan sesuatu atau menjelaskan tujuan ideologi/organisasi."
+      },
+      "distractorWhy": {
+        "1": "Slogan berupa kalimat pendek yang ringkas, bukan karangan eksposisi panjang.",
+        "2": "Teks berita kronologi kejahatan adalah berita kriminal.",
+        "3": "Surat keputusan resmi adalah dokumen hukum atau administrasi."
+      }
+    },
+    {
+      "id": "ind-d-8-b2-q12",
+      "difficulty": "sedang",
+      "prompt": "Perhatikan contoh slogan pada Bus Patas dalam Gambar 2.15: Cepat dan Selamat. Pesan apakah yang ingin disampaikan oleh perusahaan bus melalui slogan tersebut?",
+      "options": [
+        "Bus melaju cepat tetapi tetap memperhatikan keselamatan penumpang",
+        "Bus hanya berjalan lambat agar terhindar dari kecelakaan lalu lintas",
+        "Tarif perjalanan bus sangat mahal karena fasilitas super mewah",
+        "Bus hanya melayani rute perjalanan antarprovinsi di malam hari"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Buku teks menjelaskan bahwa slogan Cepat dan Selamat memberi pesan bahwa bus melaju cepat, tetapi tetap memperhatikan keselamatan penumpang."
+      },
+      "distractorWhy": {
+        "1": "Kata Cepat menunjukkan bus tidak berjalan lambat.",
+        "2": "Slogan tersebut berfokus pada kecepatan dan keselamatan, bukan tingginya tarif.",
+        "3": "Slogan tidak membatasi rute atau waktu malam hari."
+      }
+    },
+    {
+      "id": "ind-d-8-b2-q13",
+      "difficulty": "sulit",
+      "prompt": "Di antara kalimat-kalimat berikut, manakah yang termasuk contoh slogan berdasarkan latihan Kegiatan 6 di Buku Siswa?",
+      "options": [
+        "Menghubungkan Nusantara, menyatukan Indonesia.",
+        "Sekolah menyediakan tempat parkir sepeda.",
+        "Jam pelajaran sekolah dimulai pukul delapan pagi.",
+        "Pakailah produk ini karena sangat bermanfaat untuk Anda."
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Dalam latihan Kegiatan 6, Menghubungkan Nusantara, menyatukan Indonesia merupakan bentuk slogan karena berupa kalimat pendek yang menarik, mencolok, dan mudah diingat."
+      },
+      "distractorWhy": {
+        "1": "Sekolah menyediakan tempat parkir sepeda adalah kalimat pengumuman biasa.",
+        "2": "Jam pelajaran sekolah dimulai pukul delapan pagi adalah tata tertib/informasi rutin.",
+        "3": "Pakailah produk ini... adalah kalimat ajakan umum tanpa kepadatan karakteristik slogan."
+      }
+    },
+    {
+      "id": "ind-d-8-b2-q14",
+      "difficulty": "sedang",
+      "prompt": "Apakah yang dimaksud dengan kalimat imperatif menurut Alwi, dkk. (2003) dalam subbab E?",
+      "options": [
+        "Kalimat yang menyatakan perintah, larangan, keharusan, suruhan, atau permintaan",
+        "Kalimat yang berisi pujian dan sanjungan terhadap penampilan seseorang",
+        "Kalimat yang menjelaskan teori ilmiah secara mendetail dan sistematis",
+        "Kalimat yang menanyakan kabar dan kondisi kesehatan pendengar"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Menurut Alwi, dkk. (2003) dalam buku teks, kalimat imperatif adalah kalimat yang menyatakan perintah, larangan, keharusan, suruhan, dan permintaan."
+      },
+      "distractorWhy": {
+        "1": "Kalimat pujian adalah kalimat apresiasi.",
+        "2": "Kalimat teori ilmiah adalah kalimat deklaratif/ekspositoris.",
+        "3": "Kalimat menanyakan kabar adalah kalimat interogatif."
+      }
+    },
+    {
+      "id": "ind-d-8-b2-q15",
+      "difficulty": "sedang",
+      "prompt": "Apakah definisi kalimat persuasif sebagaimana dijelaskan dalam Buku Siswa Bab 2?",
+      "options": [
+        "Kalimat yang bersifat membujuk secara halus agar orang yang dibujuk menjadi yakin",
+        "Kalimat yang memaksa pendengar dengan ancaman hukuman pidana",
+        "Kalimat yang menggambarkan objek visual secara rinci dan puitis",
+        "Kalimat yang menolak pendapat orang lain dengan bahasa kasar"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Buku teks mendefinisikan kalimat persuasif sebagai kalimat yang bersifat membujuk secara halus (supaya orang yang dibujuk menjadi yakin)."
+      },
+      "distractorWhy": {
+        "1": "Kalimat persuasif membujuk secara halus, bukan memaksa dengan ancaman.",
+        "2": "Kalimat menggambarkan objek visual adalah kalimat deskripsi.",
+        "3": "Kalimat persuasif menggunakan bahasa yang santun dan halus, bukan menolak dengan kasar."
+      }
+    },
+    {
+      "id": "ind-d-8-b2-q16",
+      "difficulty": "sulit",
+      "prompt": "Cermatilah ciri-ciri kalimat berikut: (1) Subjek pelaku dihilangkan, (2) Menggunakan kata penegas/ajakan/halus, (3) Diakhiri tanda seru (!) atau tanda tanya (?), (4) Diucapkan dengan intonasi tinggi. Ciri-ciri tersebut merupakan karakteristik dari...",
+      "options": [
+        "Kalimat imperatif",
+        "Kalimat persuasif",
+        "Kalimat deklaratif",
+        "Kalimat interogatif"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Kupas Teori subbab E merinci ciri-ciri kalimat imperatif yaitu subjek dihilangkan, menggunakan penegas/larangan/halus, diakhiri (!) atau (?), dan berintonasi tinggi saat diucapkan."
+      },
+      "distractorWhy": {
+        "1": "Ciri kalimat persuasif lebih menekankan membujuk halus, memengaruhi pembaca, dan pemilihan kata yang santun.",
+        "2": "Kalimat deklaratif diakhiri tanda titik dan menyampaikan berita.",
+        "3": "Kalimat interogatif bertujuan meminta informasi (kalimat tanya)."
+      }
+    },
+    {
+      "id": "ind-d-8-b2-q17",
+      "difficulty": "sedang",
+      "prompt": "Manakah di antara kalimat berikut yang merupakan contoh kalimat persuasif dalam iklan?",
+      "options": [
+        "Mari menjaga lingkungan agar tetap bersih!",
+        "Buanglah sampah pada tempatnya!",
+        "Dilarang merokok di area ruangan ber-AC!",
+        "Matikan lampu sebelum meninggalkan ruangan!"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Kalimat Mari menjaga lingkungan agar tetap bersih! menggunakan kata ajakan halus Mari yang merupakan ciri khas kalimat persuasif."
+      },
+      "distractorWhy": {
+        "1": "Buanglah sampah pada tempatnya! merupakan contoh kalimat imperatif perintah.",
+        "2": "Dilarang merokok... merupakan kalimat imperatif berupa larangan.",
+        "3": "Matikan lampu... merupakan kalimat imperatif suruhan langsung."
+      }
+    },
+    {
+      "id": "ind-d-8-b2-q18",
+      "difficulty": "sulit",
+      "prompt": "Menurut petunjuk dalam subbab F (Langkah Membuat Iklan), apakah dua langkah pertama yang harus dilakukan oleh seorang pembuat iklan?",
+      "options": [
+        "Kenali keunggulan produk yang diiklankan dan tentukan konsumen produk",
+        "Membeli peralatan kamera mahal dan menyewa gedung pertunjukan",
+        "Mengatur harga setinggi mungkin dan mencetak ribuan brosur",
+        "Meminta bantuan tokoh terkenal untuk membagikan barang gratis"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Dalam Gambar 2.17 dan penjelasan subbab F, dua langkah awal membuat iklan yaitu: 1. Kenali keunggulan produk yang akan diiklankan, dan 2. Tentukan konsumen produk kalian."
+      },
+      "distractorWhy": {
+        "1": "Membeli kamera mahal dan menyewa gedung bukan langkah metodologis awal perancangan iklan.",
+        "2": "Mengatur harga tinggi dan cetak brosur tanpa riset produk dan konsumen bukan langkah dasar dalam buku.",
+        "3": "Meminta bantuan tokoh terkenal membagikan barang gratis bukan langkah perancangan iklan yang diajarkan dalam bab ini."
+      }
+    },
+    {
+      "id": "ind-d-8-b2-q19",
+      "difficulty": "sedang",
+      "prompt": "Dalam rancangan iklan Donat Madu karya Nabila, Ayu, dan Bima pada Tabel 2.13, bagaimana cara penyampaian pesan bahwa Donat madu adalah pilihan tepat?",
+      "options": [
+        "Melalui teks Semua orang suka makanan lezat. Donat madu adalah PILIHAN TEPAT",
+        "Melalui lagu komersial yang diputar berulang-ulang di radio sekolah",
+        "Melalui pembagian sampel donat secara cuma-cuma kepada guru",
+        "Melalui spanduk raksasa yang dipasang di atas gerbang kota"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Dalam Tabel 2.13 (Rancangan Iklan Donat Madu), pesan disampaikan melalui teks tulisan Semua orang suka makanan lezat. Donat madu adalah PILIHAN TEPAT."
+      },
+      "distractorWhy": {
+        "1": "Penyampaian bukan melalui lagu jingle radio sekolah.",
+        "2": "Penyampaian pada tabel perancangan menggunakan teks pada iklan cetak, bukan pembagian sampel donat.",
+        "3": "Penyampaian dalam rancangan Ayu dkk adalah iklan cetak yang disebar di kelas, bukan spanduk kota."
+      }
+    },
+    {
+      "id": "ind-d-8-b2-q20",
+      "difficulty": "sulit",
+      "prompt": "Jelajah Kata pada Bab 2 memuat beberapa kata serapan dan maknanya dari KBBI. Apakah arti kata bijak dan santun secara berurutan dalam tabel kosakata buku tersebut?",
+      "options": [
+        "Bijak berarti selalu menggunakan akal budi (pandai/mahir), sedangkan santun berarti halus, sabar, tenang, dan sopan",
+        "Bijak berarti cepat marah, sedangkan santun berarti tegas dan keras dalam bertindak",
+        "Bijak berarti memiliki kekayaan berlimpah, sedangkan santun berarti pandai berbicara di depan umum",
+        "Bijak berarti suka memberi barang gratis, sedangkan santun berarti tidak pernah berbicara dengan orang lain"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Tabel Jelajah Kata pada Bab 2 mendefinisikan bijak sebagai selalu menggunakan akal budinya; pandai; mahir dan santun sebagai halus, sabar, tenang, dan sopan."
+      },
+      "distractorWhy": {
+        "1": "Bijak bukan berarti cepat marah dan santun bukan berarti tegas atau keras.",
+        "2": "Bijak tidak berhubungan dengan kekayaan berlimpah.",
+        "3": "Bijak bukan suka memberi barang gratis dan santun bukan berarti tidak pernah berbicara."
+      }
+    }
+  ]
+}

@@ -1,0 +1,249 @@
+{
+  "code": "KOMP-IND-D-7-BAB3-01",
+  "grade": 7,
+  "name": "Bab 3: Hal yang Baik bagi Tubuh",
+  "materi": "Memahami Teks Prosedur Kesehatan & Olahraga, Struktur Teks Prosedur (Tujuan, Bahan, Langkah), Unsur Kebahasaan: Kalimat Imperatif & Kata Keterangan",
+  "cpRef": "Bahasa Indonesia untuk SMP/MTs Kelas VII (Edisi Revisi)",
+  "items": [
+    {
+      "id": "ind-d-7-b3-q01",
+      "difficulty": "dasar",
+      "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VII (hal. 75-80), tujuan utama penulisan teks prosedur adalah…",
+      "options": [
+        "Petunjuk atau panduan langkah-langkah dalam membuat atau melakukan sesuatu secara runtut",
+        "Menceritakan kisah fiktif tokoh pahlawan",
+        "Menggambarkan keindahan alam secara detail",
+        "Menyampaikan pendapat pro dan kontra terhadap isu sosial"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Teks prosedur memberikan petunjuk operasional sistematis membuat/melakukan sesuatu."
+      },
+      "distractorWhy": {
+        "1": "Teks narasi.",
+        "2": "Teks deskripsi.",
+        "3": "Teks diskusi."
+      }
+    },
+    {
+      "id": "ind-d-7-b3-q02",
+      "difficulty": "sedang",
+      "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VII (hal. 84 Struktur Prosedur), urutan struktur teks prosedur yang tepat adalah…",
+      "options": [
+        "Tujuan -> Alat/Bahan -> Langkah-langkah -> Penutup/Penegasan",
+        "Langkah-langkah -> Tujuan -> Alat/Bahan",
+        "Judul -> Kesimpulan -> Langkah-langkah",
+        "Orientasi -> Komplikasi -> Resolusi"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Struktur baku teks prosedur diawali Tujuan, Bahan/Alat, Urutan Langkah, dan Penutup."
+      },
+      "distractorWhy": {
+        "1": "Urutan acak.",
+        "2": "Struktur tidak baku.",
+        "3": "Struktur cerita fantasi."
+      }
+    },
+    {
+      "id": "ind-d-7-b3-q03",
+      "difficulty": "sedang",
+      "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VII (hal. 88 Kebahasaan), kalimat imperatif (perintah) yang tepat dalam prosedur pembuatan minuman sehat adalah…",
+      "options": [
+        "Aduk campuran jahe dan madu tersebut hingga larut sempurna!",
+        "Apakah jahe tersebut sudah diiris tipis?",
+        "Saya sangat menyukai aroma jahe segar.",
+        "Jahe adalah tanaman rimpang obat keluarga."
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Kalimat imperatif ditandai kata kerja aksi di awal (aduk) dan akhiran perintah (!)."
+      },
+      "distractorWhy": {
+        "1": "Kalimat interogatif (tanya).",
+        "2": "Kalimat deklaratif opini.",
+        "3": "Kalimat deklaratif fakta."
+      }
+    },
+    {
+      "id": "ind-d-7-b3-q04",
+      "difficulty": "tinggi",
+      "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VII (hal. 92), penggunaan kata keterangan cara yang tepat dalam teks prosedur olahraga adalah…",
+      "options": [
+        "Tarik napas secara perlahan-lahan dan hembuskan lewat mulut",
+        "Olahraga dilakukan pada pagi hari pukul 06.00 WIB",
+        "Gunakan sepatu olahraga ukuran 40",
+        "Lakukan gerakan ini sebanyak 10 kali"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "'Secara perlahan-lahan' adalah keterangan cara (adverbia cara) pelaksanaan aksi."
+      },
+      "distractorWhy": {
+        "1": "Keterangan waktu.",
+        "2": "Keterangan alat/ukuran.",
+        "3": "Keterangan kuantitas/jumlah."
+      }
+    },
+    {
+      "id": "ind-d-7-b3-q05",
+      "difficulty": "dasar",
+      "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VII (hal. 82), contoh kata penghubung (konjungsi) urutan dalam teks prosedur adalah…",
+      "options": [
+        "Pertama, kemudian, selanjutnya, dan akhirnya",
+        "Sebab, karena, dan akibatnya",
+        "Tetapi, namun, dan melainkan",
+        "Jika, seandainya, dan jikalau"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Konjungsi urutan (kronologis) menyusun langkah bertahap."
+      },
+      "distractorWhy": {
+        "1": "Konjungsi kausalitas.",
+        "2": "Konjungsi pertentangan.",
+        "3": "Konjungsi pengandaian."
+      }
+    },
+    {
+      "id": "ind-d-7-b3-q06",
+      "difficulty": "sedang",
+      "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VII (hal. 96 Uji Kemampuan), bagian penutup dalam teks prosedur berfungsi untuk…",
+      "options": [
+        "Memberikan penegasan ulang ucapan selamat mencoba atau manfaat dari kegiatan yang dipraktikkan",
+        "Merinci daftar harga bahan-bahan yang dibeli",
+        "Menjelaskan kegagalan yang mungkin terjadi",
+        "Menuliskan nama-nama penulis buku"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Penutup berisi apresiasi 'Selamat mencoba' atau ringkasan manfaat hasil."
+      },
+      "distractorWhy": {
+        "1": "Bukan fungsi penutup.",
+        "2": "Bukan fokus penutup.",
+        "3": "Biografi penulis."
+      }
+    },
+    {
+      "id": "ind-d-7-b3-q07",
+      "difficulty": "dasar",
+      "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VII (hal. 86), contoh kata kerja aksi dalam teks prosedur mencuci tangan yang benar adalah…",
+      "options": [
+        "Basahi, tuangkan, gosok, dan bilas",
+        "Melihat, mendengar, dan meraba",
+        "Indah, cantik, dan elok",
+        "Satu, dua, dan tiga"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Basahi, tuangkan, gosok, dan bilas merupakan bentuk kata kerja imperatif (aksi) dalam prosedur."
+      },
+      "distractorWhy": {
+        "1": "Kata kerja persepsi indra.",
+        "2": "Kata sifat estetika.",
+        "3": "Kata bilangan numerik."
+      }
+    },
+    {
+      "id": "ind-d-7-b3-q08",
+      "difficulty": "sedang",
+      "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VII (hal. 90), ciri bahasa teks prosedur yang menggunakan batasan ukuran secara akurat adalah…",
+      "options": [
+        "Rebus air sebanyak 500 ml selama 10 menit",
+        "Rebus air secukupnya sebentar saja",
+        "Gunakan air yang sangat banyak",
+        "Masakkan air sampai hangat"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Penggunaan angka '500 ml' dan '10 menit' memberikan batasan kuantitatif yang presisi."
+      },
+      "distractorWhy": {
+        "1": "Kata 'secukupnya' bersifat kualitatif umum.",
+        "2": "Kata 'sangat banyak' tidak presisi.",
+        "3": "Kata 'hangat' tanpa batas derajat."
+      }
+    },
+    {
+      "id": "ind-d-7-b3-q09",
+      "difficulty": "sedang",
+      "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VII (hal. 94), penulisan kalimat saran dalam teks prosedur kesehatan yang tepat adalah…",
+      "options": [
+        "Sebaiknya konsumsi buah segar setiap hari agar imun tubuh tetap terjaga",
+        "Jangan pernah makan buah apel!",
+        "Buah apel rasanya sangat manis sekali",
+        "Mengapa Anda tidak membeli buah apel?"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Penggunaan kata 'sebaiknya' menandakan bentuk kalimat saran (persuasif halus) dalam prosedur."
+      },
+      "distractorWhy": {
+        "1": "Kalimat larangan keras.",
+        "2": "Kalimat opini subjektif.",
+        "3": "Kalimat pertanyaan."
+      }
+    },
+    {
+      "id": "ind-d-7-b3-q10",
+      "difficulty": "tinggi",
+      "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VII (hal. 98), bagian rincian bahan dan alat dalam prosedur pembuatan jus alpukat berfungsi untuk…",
+      "options": [
+        "Memudahkan pembaca menyiapkan seluruh perlengkapan dan takaran bahan sebelum memulai proses pembuatan",
+        "Menjelaskan sejarah penemuan buah alpukat",
+        "Menceritakan pengalaman minum jus alpukat",
+        "Menampilkan iklan merek blender"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Rincian bahan dan alat memastikan persiapan (persiapan material) memadai sebelum merangkai langkah."
+      },
+      "distractorWhy": {
+        "1": "Bukan sejarah tanaman.",
+        "2": "Bukan narasi pengalaman.",
+        "3": "Bukan materi promosi iklan."
+      }
+    },
+    {
+      "id": "ind-d-7-b3-q11",
+      "difficulty": "dasar",
+      "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VII (hal. 80), teks prosedur dapat disajikan dalam bentuk visual infografis dengan tujuan…",
+      "options": [
+        "Memperjelas urutan langkah melalui panduan gambar ilustrasi yang menarik dan mudah dipahami",
+        "Mengurangi isi tulisan menjadi teka-teki",
+        "Menghilangkan kata kerja perintah",
+        "Membuat pembaca bingung"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Infografis mengombinasikan elemen visual dan teks singkat agar tahapan prosedur lebih komunikatif."
+      },
+      "distractorWhy": {
+        "1": "Bukan teka-teki.",
+        "2": "Kata kerja tetap ada.",
+        "3": "Infografis mempermudah pemahaman."
+      }
+    },
+    {
+      "id": "ind-d-7-b3-q12",
+      "difficulty": "tinggi",
+      "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VII (hal. 100 Uji Kemampuan), peletakan urutan langkah yang tidak logis dalam teks prosedur dapat berakibat…",
+      "options": [
+        "Kegagalan dalam mencapai hasil akhir yang diinginkan serta berpotensi membahayakan pengguna",
+        "Hasil pembuatan menjadi lebih sempurna",
+        "Waktu pembuatan menjadi lebih cepat",
+        "Teks prosedur menjadi lebih panjang"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Urutan langkah acak/salah merusak urutan proses dan menggagalkan hasil."
+      },
+      "distractorWhy": {
+        "1": "Langkah acak tidak menyempurnakan hasil.",
+        "2": "Langkah salah tidak mempercepat.",
+        "3": "Panjang teks tidak ditentukan urutan."
+      }
+    }
+  ]
+}

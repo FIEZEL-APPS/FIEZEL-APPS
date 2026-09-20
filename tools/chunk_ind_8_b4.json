@@ -1,0 +1,409 @@
+{
+  "code": "KOMP-IND-D-8-BAB4-01",
+  "grade": 8,
+  "name": "Bab 4: Teks Ulasan Karya Fiksi",
+  "materi": "Memahami Teks Ulasan Novel & Cerpen, Struktur Teks Ulasan (Identitas, Orientasi, Sinopsis, Evaluasi), Unsur Kebahasaan Teks Ulasan",
+  "cpRef": "Bahasa Indonesia untuk SMP/MTs Kelas VIII (Edisi Revisi)",
+  "items": [
+    {
+      "id": "ind-d-8-b4-q01",
+      "difficulty": "dasar",
+      "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VIII (hal. 126), pengertian karya fiksi (sastra) menurut Suharianto (2005) adalah…",
+      "options": [
+        "Karya hasil perpaduan antara perasaan dan pikiran",
+        "Cerita yang sepenuhnya berisi fakta sejarah ilmiah tanpa rekaan",
+        "Tulisan berita aktual yang disiarkan melalui media massa",
+        "Karya nonfiksi yang berisi petunjuk pembuatan suatu benda"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Suharianto (2005) mendefinisikan karya fiksi (sastra) sebagai karya hasil perpaduan antara perasaan dan pikiran."
+      },
+      "distractorWhy": {
+        "1": "Fakta sejarah ilmiah merupakan ciri tulisan nonfiksi.",
+        "2": "Tulisan berita merupakan contoh teks informatif nonfiksi.",
+        "3": "Petunjuk pembuatan benda adalah teks prosedur nonfiksi."
+      }
+    },
+    {
+      "id": "ind-d-8-b4-q02",
+      "difficulty": "dasar",
+      "prompt": "Menurut Wellek dan Warren (2009) yang dikutip dalam Buku Siswa Bahasa Indonesia Kelas VIII (hal. 126), karya fiksi didefinisikan sebagai…",
+      "options": [
+        "Cerita atau latar yang bersumber dari imajinasi",
+        "Laporan pengamatan ilmiah yang dilakukan di laboratorium",
+        "Kumpulan data statistik kependudukan suatu daerah",
+        "Rangkaian aturan hukum yang berlaku secara resmi"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Wellek dan Warren (2009) mendefinisikan karya fiksi sebagai cerita atau latar yang bersumber dari imajinasi."
+      },
+      "distractorWhy": {
+        "1": "Laporan pengamatan ilmiah merupakan teks fakta nonfiksi.",
+        "2": "Data statistik merupakan data faktual kuantitatif.",
+        "3": "Aturan hukum merupakan dokumen resmi perundang-undangan."
+      }
+    },
+    {
+      "id": "ind-d-8-b4-q03",
+      "difficulty": "sedang",
+      "prompt": "Berdasarkan analisis cerpen \"Kotak Sulap Paman Tom\" karya Maya Lestari Gf. pada Buku Siswa Bahasa Indonesia Kelas VIII (hal. 131), kata \"lunglai\" memiliki padanan kata yaitu…",
+      "options": [
+        "Lemah",
+        "Tegas",
+        "Marah",
+        "Gembira"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Pada materi Kupas Teori halaman 131, padanan kata 'lunglai' adalah 'lemah'."
+      },
+      "distractorWhy": {
+        "1": "Tegas berlawanan dengan kesan lunglai.",
+        "2": "Marah menggambarkan emosi gusar.",
+        "3": "Gembira menggambarkan perasaan bahagia."
+      }
+    },
+    {
+      "id": "ind-d-8-b4-q04",
+      "difficulty": "sedang",
+      "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VIII (hal. 134), unsur cerita yang berupa pokok pikiran atau dasar cerita (dipercakapkan atau dipakai sebagai dasar mengarang) dinamakan…",
+      "options": [
+        "Tema cerita",
+        "Latar cerita",
+        "Tokoh cerita",
+        "Alur cerita"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Tema cerita adalah unsur pokok dalam cerita yang menjadi dasar mengarang atau pokok pikiran."
+      },
+      "distractorWhy": {
+        "1": "Latar cerita berkenaan dengan tempat dan waktu peristiwa.",
+        "2": "Tokoh cerita adalah orang-orang yang terlibat dalam cerita.",
+        "3": "Alur cerita adalah rangkaian kejadian yang dihadapi tokoh."
+      }
+    },
+    {
+      "id": "ind-d-8-b4-q05",
+      "difficulty": "sedang",
+      "prompt": "Dalam Buku Siswa Bahasa Indonesia Kelas VIII (hal. 134-135), ciri utama dari tokoh utama dalam sebuah karya fiksi adalah…",
+      "options": [
+        "Tokoh yang paling banyak muncul dan memiliki peran penting dalam cerita",
+        "Tokoh yang hanya muncul sekali pada paragraf terakhir",
+        "Tokoh figuran yang tidak memengaruhi jalannya cerita",
+        "Tokoh penyampai pesan moral di akhir cerita saja"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Tokoh utama ditandai oleh kemunculannya yang paling banyak dan perannya yang vital dalam jalinan cerita."
+      },
+      "distractorWhy": {
+        "1": "Kemunculan sekali di akhir cerita biasanya milik tokoh pendukung.",
+        "2": "Tokoh figuran yang tidak memengaruhi cerita merupakan tokoh pendukung.",
+        "3": "Tokoh penyampai pesan di akhir tidak selalu merupakan tokoh utama."
+      }
+    },
+    {
+      "id": "ind-d-8-b4-q06",
+      "difficulty": "sedang",
+      "prompt": "Menurut Nurgiyantoro (2005) seperti dikutip dalam Buku Siswa Bahasa Indonesia Kelas VIII (hal. 135), alur atau plot dalam karya fiksi adalah…",
+      "options": [
+        "Peristiwa-peristiwa dalam cerita yang disusun berdasarkan kaitan sebab akibat",
+        "Daftar nama tokoh beserta watak individual masing-masing",
+        "Penjelasan gambaran tempat dan waktu terjadinya peristiwa",
+        "Pesan moral yang ingin disampaikan penulis kepada pembaca"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Nurgiyantoro (2005) menyatakan bahwa alur adalah peristiwa-peristiwa dalam cerita yang disusun pengarang berdasarkan hubungan sebab akibat."
+      },
+      "distractorWhy": {
+        "1": "Daftar nama tokoh dan watak merupakan unsur penokohan.",
+        "2": "Gambaran tempat dan waktu merupakan unsur latar.",
+        "3": "Pesan moral merupakan amanat cerita."
+      }
+    },
+    {
+      "id": "ind-d-8-b4-q07",
+      "difficulty": "sulit",
+      "prompt": "Berdasarkan penjelasan dalam Buku Siswa Bahasa Indonesia Kelas VIII (hal. 135), alur yang diawali dengan peristiwa masa kini berkonflik datar, meningkat di bagian tengah, lalu klimaks dan selesai di akhir dinamakan…",
+      "options": [
+        "Alur maju",
+        "Alur mundur",
+        "Alur campuran",
+        "Alur kilas balik"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Alur maju mengurutkan cerita dari kejadian masa kini, konflik menanjak di tengah, hingga klimaks dan penyelesaian di akhir."
+      },
+      "distractorWhy": {
+        "1": "Alur mundur dibuka dengan penceritaan kejadian masa lampau.",
+        "2": "Alur campuran menggabungkan masa kini dan masa lalu secara bergantian.",
+        "3": "Alur kilas balik merupakan istilah lain alur mundur."
+      }
+    },
+    {
+      "id": "ind-d-8-b4-q08",
+      "difficulty": "sedang",
+      "prompt": "Dalam Buku Siswa Bahasa Indonesia Kelas VIII (hal. 135-136), cara kreatif untuk mengenali urutan peristiwa yang membentuk alur cerita dikenal dengan akronim PASKA, yang kepanjangannya adalah…",
+      "options": [
+        "Pada mulanya, Selanjutnya, Kemudian, dan Akhirnya",
+        "Peristiwa, Awal, Sebab, Konflik, dan Akhir",
+        "Pengenalan, Aksi, Solusi, Konflik, dan Amanat",
+        "Pertama, Alasan, Sebab, Penyebab, dan Akibat"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "PASKA merupakan akronim dari Pada mulanya, Selanjutnya, Kemudian, dan Akhirnya untuk mengurutkan alur cerita."
+      },
+      "distractorWhy": {
+        "1": "Rincian tersebut bukan padanan akronim PASKA pada buku.",
+        "2": "Istilah tidak sesuai dengan teks panduan buku.",
+        "3": "Kepanjangan tersebut tidak dikenal dalam konteks alur PASKA."
+      }
+    },
+    {
+      "id": "ind-d-8-b4-q09",
+      "difficulty": "sulit",
+      "prompt": "Perhatikan kutipan cerpen \"Parki dan Alergi Telur\" karya Maya Lestari Gf. pada Buku Siswa Bahasa Indonesia Kelas VIII (hal. 137):\n\"Suatu pagi, ketika Parki bangun tidur, ia merasa matanya berat sekali. Dikucek-kuceknya matanya. Terasa ada sesuatu di kelopaknya. Cepat ia menuju cermin. Astaga! Apakah itu? Kenapa ada bengkak di kelopak matanya?\"\nBerdasarkan kutipan di atas, konflik cerita mulai muncul ketika…",
+      "options": [
+        "Parki mendapati kelopak matanya bengkak saat bangun tidur",
+        "Ibu Parki pergi membeli kacang pagar di pasar",
+        "Ayah Parki mengalami bintitan saat masih kecil",
+        "Dokter memberikan resep obat mata kepada Parki"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Konflik cerita diawali dari peristiwa bengkaknya mata Parki akibat reaksi alergi."
+      },
+      "distractorWhy": {
+        "1": "Keinginan makan kacang pagar tidak mengawali timbulnya bengkak mata.",
+        "2": "Pengalaman Ayah waktu kecil diungkapkan setelah bengkak terjadi.",
+        "3": "Resep dokter diberikan pada tahap pemeriksaan akhir."
+      }
+    },
+    {
+      "id": "ind-d-8-b4-q10",
+      "difficulty": "sedang",
+      "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VIII (hal. 143), aspek gambaran tokoh fiksi yang menjadi motif atau alasan tokoh melakukan suatu tindakan dinamakan…",
+      "options": [
+        "Latar belakang",
+        "Data diri",
+        "Sifat tokoh",
+        "Amanat cerita"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Latar belakang merupakan motif atau alasan yang mendorong tokoh melakukan suatu tindakan."
+      },
+      "distractorWhy": {
+        "1": "Data diri memuat nama, usia, jenis kelamin, dan informasi fisik.",
+        "2": "Sifat tokoh tercermin melalui perkataan dan perilakunya.",
+        "3": "Amanat cerita adalah pesan moral tulisan."
+      }
+    },
+    {
+      "id": "ind-d-8-b4-q11",
+      "difficulty": "sulit",
+      "prompt": "Cermati analisis tokoh Randu dari cerpen \"Kotak Sulap Paman Tom\" pada Buku Siswa Bahasa Indonesia Kelas VIII (hal. 144). Tindakan Randu membongkar rahasia sulap Paman Tom di depan umum menunjukkan sifat tokoh yang…",
+      "options": [
+        "Mementingkan diri sendiri dan emosional",
+        "Penyabar dan suka mengalah",
+        "Bijaksana dan penuh kehati-hatian",
+        "Dermawan dan suka menolong"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Tindakan Randu melampiaskan kekecewaannya tanpa memikirkan nasib Paman Tom mencerminkan sifat mementingkan diri sendiri dan emosional."
+      },
+      "distractorWhy": {
+        "1": "Tindakan membongkar rahasia tidak mencerminkan sifat penyabar.",
+        "2": "Tindakan gegabah di depan umum bertolak belakang dengan sifat bijaksana.",
+        "3": "Sifat dermawan tidak terbukti dari pembongkaran rahasia sulap."
+      }
+    },
+    {
+      "id": "ind-d-8-b4-q12",
+      "difficulty": "sulit",
+      "prompt": "Bacalah cuplikan penggambaran latar pada Buku Siswa Bahasa Indonesia Kelas VIII (hal. 146):\n\"Jalannya masih jalan tanah, berlumpur di musim hujan dan berdebu di musim kemarau... Daun dan ranting-rantingnya berjatuhan dan menimbulkan suara keretak saat kakiku menginjaknya... Bau tanah kering menyumbat hidungku.\"\nTeknik penggambaran latar di atas memanfaatkan…",
+      "options": [
+        "Pendekatan pancaindra (penglihatan, pendengaran, dan penciuman)",
+        "Data statistik dan angka kuantitatif ilmiah",
+        "Dialog langsung antartokoh utama",
+        "Istilah-istilah teknis laboratorium"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Deskripsi latar tersebut memanfaatkan imaji pancaindra agar pembaca seolah melihat, mendengar suara keretak, dan mencium bau tanah."
+      },
+      "distractorWhy": {
+        "1": "Cuplikan tersebut bukan data statistik ilmiah.",
+        "2": "Cuplikan tersebut merupakan deskripsi naratif latar, bukan dialog.",
+        "3": "Tidak ada istilah laboratorium dalam teks tersebut."
+      }
+    },
+    {
+      "id": "ind-d-8-b4-q13",
+      "difficulty": "dasar",
+      "prompt": "Berdasarkan pendapat Keraf (2007) yang dikutip dalam Buku Siswa Bahasa Indonesia Kelas VIII (hal. 149), kata yang mengandung makna kiasan, memicu stimulus, respons, dan nilai emosional dinamakan kata bermakna…",
+      "options": [
+        "Konotasi",
+        "Denotasi",
+        "Antonim",
+        "Leksikal dasar"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Keraf (2007) menjelaskan bahwa kata konotasi adalah kata bermakna kiasan yang mengandung nilai emosional."
+      },
+      "distractorWhy": {
+        "1": "Denotasi mengacu pada makna faktual atau sebenarnya.",
+        "2": "Antonim adalah kata yang berlawanan makna.",
+        "3": "Leksikal dasar mengacu pada makna kamus yang sebenarnya."
+      }
+    },
+    {
+      "id": "ind-d-8-b4-q14",
+      "difficulty": "dasar",
+      "prompt": "Dalam Buku Siswa Bahasa Indonesia Kelas VIII (hal. 149), lawan dari kata bermakna konotasi adalah denotasi, yang diartikan sebagai…",
+      "options": [
+        "Kata yang mengandung makna faktual atau makna paling dasar/sebenarnya",
+        "Ungkapan kiasan berlebihan untuk memperindah cerita",
+        "Kata yang memiliki bunyi rima sama di akhir larik",
+        "Kata yang diserap penuh dari bahasa asing tanpa ubahan"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Denotasi adalah makna faktual, asli, atau makna sebenarnya dari suatu kata."
+      },
+      "distractorWhy": {
+        "1": "Ungkapan kiasan berlebihan merupakan konotasi atau majas.",
+        "2": "Bunyi rima sama merupakan unsur perwajahan puisi.",
+        "3": "Kata serapan asing tidak menentukan makna denotatif."
+      }
+    },
+    {
+      "id": "ind-d-8-b4-q15",
+      "difficulty": "sedang",
+      "prompt": "Cermati tabel ungkapan konotatif pada Buku Siswa Bahasa Indonesia Kelas VIII (hal. 150):\n\"Rianti adalah gadis yang ringan tangan atau suka menolong. Ia selalu menjadi buah bibir...\"\nMakna konotatif dari ungkapan \"buah bibir\" pada kalimat tersebut adalah…",
+      "options": [
+        "Bahan pembicaraan orang banyak",
+        "Buah-buahan segar hasil panen",
+        "Senyuman manis di bibir seseorang",
+        "Orang yang sangat dipercayai"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Ungkapan 'buah bibir' bermakna kiasan yaitu bahan pembicaraan banyak orang."
+      },
+      "distractorWhy": {
+        "1": "Buah hasil panen adalah makna denotatif kata buah.",
+        "2": "Senyuman manis bukan arti kiasan dari buah bibir.",
+        "3": "Orang yang dipercayai merupakan makna dari ungkapan tangan kanan."
+      }
+    },
+    {
+      "id": "ind-d-8-b4-q16",
+      "difficulty": "sedang",
+      "prompt": "Dalam Buku Siswa Bahasa Indonesia Kelas VIII (hal. 150), jika ungkapan \"tangan kanan\" memiliki makna konotasi \"orang yang dipercayai\", maka ungkapan \"buah pikiran\" memiliki makna konotasi yaitu…",
+      "options": [
+        "Gagasan atau ide",
+        "Oleh-oleh perjalanan",
+        "Bahan gunjingan",
+        "Suka memberi bantuan"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Pada Tabel 4.4, 'buah pikiran' bermakna konotasi gagasan atau ide."
+      },
+      "distractorWhy": {
+        "1": "Oleh-oleh perjalanan adalah makna dari buah tangan.",
+        "2": "Bahan gunjingan adalah makna dari buah bibir.",
+        "3": "Suka memberi bantuan adalah makna dari ringan tangan."
+      }
+    },
+    {
+      "id": "ind-d-8-b4-q17",
+      "difficulty": "sedang",
+      "prompt": "Berdasarkan penjelasan mengenai resensi/ulasan karya fiksi pada Buku Siswa Bahasa Indonesia Kelas VIII (hal. 152), tujuan utama penulisan artikel ulasan/resensi buku bagi pembaca umum adalah…",
+      "options": [
+        "Mengenalkan buku baru kepada publik dan menyajikan penilaian keunggulan serta kelemahannya",
+        "Mengkritik penulis buku agar berhenti memublikasikan karya cerita",
+        "Mengubah alur cerita fiksi sesuai keinginan pembaca sendiri",
+        "Menyalin seluruh isi cerita dari halaman awal hingga akhir tanpa koreksi"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Resensi buku bertujuan mengenalkan buku kepada publik dengan menguraikan keunggulan, kelemahan, dan penilaian karya."
+      },
+      "distractorWhy": {
+        "1": "Resensi bertujuan memberikan apresiasi dan penilaian objektif, bukan menjatuhkan penulis.",
+        "2": "Resensi tidak mengubah alur asli cerita.",
+        "3": "Resensi bukan berupa penjiplakan atau salinan utuh buku."
+      }
+    },
+    {
+      "id": "ind-d-8-b4-q18",
+      "difficulty": "sulit",
+      "prompt": "Cermati sampel teks ulasan cerita \"Bawang Merah dan Bawang Putih\" pada Buku Siswa Bahasa Indonesia Kelas VIII (hal. 153-154):\n\"Bawang Merah dan Bawang Putih merupakan salah satu cerita rakyat Indonesia yang sangat populer. Cerita ini ditulis ulang oleh Rifan di Majalah Sekolah Cerdas...\"\nBagian teks ulasan di atas memuat bagian struktur ulasan yaitu…",
+      "options": [
+        "Identitas dan Orientasi karya",
+        "Evaluasi kekurangan buku",
+        "Rincian latar belakang pengarang",
+        "Simpulan rekomendasi pembelian"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Kutipan menyebutkan judul, penulis (Rifan), media penerbit (Majalah Sekolah Cerdas), serta perkenalan awal cerita (orientasi/identitas)."
+      },
+      "distractorWhy": {
+        "1": "Evaluasi kekurangan berisi ulasan kelemahan karya.",
+        "2": "Latar belakang pribadi pengarang tidak dibahas di kutipan tersebut.",
+        "3": "Rekomendasi pembelian biasanya terdapat di paragraf simpulan akhir."
+      }
+    },
+    {
+      "id": "ind-d-8-b4-q19",
+      "difficulty": "sulit",
+      "prompt": "Perhatikan kutipan ulasan pada Buku Siswa Bahasa Indonesia Kelas VIII (hal. 154):\n\"Menurut saya, cerita yang ditulis oleh Rifan ini cukup menarik. Tokoh-tokohnya digambarkan dengan jelas. Alur atau rangkaian peristiwanya juga menarik. Lebih dari itu, kita dapat mengambil pelajaran bahwa kesabaran dan kejujuran itu sangat penting dalam hidup.\"\nDalam struktur teks ulasan, paragraf tersebut dikategorikan sebagai bagian…",
+      "options": [
+        "Evaluasi / Penilaian karya",
+        "Identitas fisik buku",
+        "Sinopsis ringkasan alur",
+        "Glosarium daftar kata sulit"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Paragraf berisi pandangan, pendapat, dan penilaian kelebihan serta pesan moral cerita merupakan bagian evaluasi/penilaian."
+      },
+      "distractorWhy": {
+        "1": "Identitas fisik berisi judul, penulis, jumlah halaman, dan penerbit.",
+        "2": "Sinopsis berisi ringkasan alur jalannya cerita.",
+        "3": "Glosarium berisi senarai kata-kata sukar."
+      }
+    },
+    {
+      "id": "ind-d-8-b4-q20",
+      "difficulty": "sedang",
+      "prompt": "Berdasarkan langkah-langkah penulisan ulasan karya fiksi pada Buku Siswa Bahasa Indonesia Kelas VIII (hal. 152-155), sebelum menyusun artikel ulasan secara utuh, hal pertama yang harus dilakukan oleh seorang pengulas adalah…",
+      "options": [
+        "Membaca karya fiksi dan melakukan penilaian unsur-unsur cerita pada lembar penilaian",
+        "Memublikasikan artikel ulasan di koran atau media massa cetak",
+        "Meminta penulis buku mengganti ending cerita yang tidak disukai",
+        "Membeli seluruh cetakan buku fiksi yang ada di toko buku"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Langkah pertama adalah membaca cerita dan menilai unsur-unsurnya (tokoh, latar, alur, tema) di lembar penilaian."
+      },
+      "distractorWhy": {
+        "1": "Publikasi dilakukan setelah artikel ulasan selesai ditulis.",
+        "2": "Mengubah ending pengarang bukan tugas pengulas karya.",
+        "3": "Membeli seluruh cetakan buku bukan syarat menulis ulasan."
+      }
+    }
+  ]
+}

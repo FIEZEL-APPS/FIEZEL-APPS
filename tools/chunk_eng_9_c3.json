@@ -1,0 +1,409 @@
+{
+  "code": "KOMP-ENG-D-9-BAB3-01",
+  "grade": 9,
+  "name": "Chapter 3: Journey to the Fantasy World",
+  "materi": "Analyzing Fantasy Narrative Texts, Character & Plot Analysis, Indirect/Reported Speech in Stories, Moral Values in Literature",
+  "cpRef": "English for Nusantara untuk SMP/MTs Kelas IX",
+  "items": [
+    {
+      "id": "eng-d-9-c3-q01",
+      "difficulty": "easy",
+      "prompt": "In Chapter 3 Unit 1 (\"Andre and Princess Suripit\"), Andre suddenly finds himself sucked into his mobile game in the Mangrovian Kingdom. What outfit is Andre wearing when he arrives in Mangrovian?",
+      "options": [
+        "A metal breastplate and gauntlets (a knight outfit)",
+        "His comfortable pajamas from home",
+        "A school uniform from SMP Merdeka",
+        "A royal cloak and golden crown"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Based on Audio 3.2 text in Unit 1, Andre realizes he is no longer wearing his pajamas. Instead, he wears a metal breastplate and gauntlets on his hands, which is a knight outfit."
+      },
+      "distractorWhy": {
+        "1": "Andre was wearing pajamas before being sucked into the game, but upon arrival in Mangrovian, his outfit changed to a knight outfit.",
+        "2": "The school uniform of SMP Merdeka is related to Monita in Unit 2, not Andre in Unit 1.",
+        "3": "Princess Suripit is the guardian of the Mangrovian Kingdom, whereas Andre is equipped as a knight with plate armor, not royal cloaks."
+      }
+    },
+    {
+      "id": "eng-d-9-c3-q02",
+      "difficulty": "medium",
+      "prompt": "In Unit 1 (\"Andre and Princess Suripit\"), Princess Suripit informs Andre about his final mission in order to return to his world. What is Andre's main mission?",
+      "options": [
+        "To find the endangered black orchid",
+        "To defeat the giant monster in the factory",
+        "To build a time travel car with red buttons",
+        "To collect three magical items from a golden cucumber"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "According to Audio 3.3 in Unit 1 Section 4, Princess Suripit states that Andre can only go home after completing his final mission, which is to find the endangered black orchid."
+      },
+      "distractorWhy": {
+        "1": "Defeating a giant factory owner is related to the multiverse story of Timun Mas in Unit 3, not Andre's mission in Unit 1.",
+        "2": "Building a time travel car is part of Monita's story in Unit 2, not Andre's mission in Unit 1.",
+        "3": "Collecting magical items from a golden cucumber refers to Timun Mas's story in Unit 3."
+      }
+    },
+    {
+      "id": "eng-d-9-c3-q03",
+      "difficulty": "medium",
+      "prompt": "Read the explanatory note on plate armor from Unit 1 Section 4: \"Plate armor is body armor made of iron or steel plates. Knights used plate armor to protect them from sword slashes and spears when they were on the battlefield.\" Why did knights wear plate armor?",
+      "options": [
+        "To protect themselves from sword slashes and spears during battle",
+        "To make themselves fly faster in mobile games",
+        "To keep themselves warm during cold nights in the forest",
+        "To disguise themselves as ordinary villagers"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "The text explicitly states that knights used plate armor made of iron or steel plates to protect themselves from sword slashes and spears on the battlefield."
+      },
+      "distractorWhy": {
+        "1": "Plate armor is heavy (over 20 kg) and does not grant flying abilities.",
+        "2": "Plate armor was designed for combat protection on the battlefield, not for temperature regulation.",
+        "3": "Plate armor is distinct knight attire and would not serve as a civilian disguise."
+      }
+    },
+    {
+      "id": "eng-d-9-c3-q04",
+      "difficulty": "easy",
+      "prompt": "In Unit 1 Section 3 (\"Language Focus: Was and Were\"), we use \"was\" with singular subjects and \"were\" with plural subjects to describe past situations. Which sentence correctly follows this rule?",
+      "options": [
+        "There were gauntlets on his hands and the armor was made of metal.",
+        "There was gauntlets on his hands and the armor were made of metal.",
+        "There were a strange message from the game.",
+        "Andre were amazed to see the Mangrovian kingdom."
+      ],
+      "answer": 0,
+      "why": {
+        "0": "\"Gauntlets\" is plural so it takes \"were\" (\"There were gauntlets\"), while \"armor\" is singular so it takes \"was\" (\"the armor was made of metal\")."
+      },
+      "distractorWhy": {
+        "1": "\"Gauntlets\" is plural and requires \"were\", while \"armor\" is singular and requires \"was\".",
+        "2": "\"A strange message\" is singular, so it requires \"was\" (\"There was a strange message\") rather than \"were\".",
+        "3": "\"Andre\" is a singular proper noun, so it requires \"was\" (\"Andre was amazed\") rather than \"were\"."
+      }
+    },
+    {
+      "id": "eng-d-9-c3-q05",
+      "difficulty": "medium",
+      "prompt": "In Worksheet 3.4 (Unit 1), students complete sentences about past states. Choose the correct form of to be (was/were) for the sentence: \"Andre ___ amazed to see Mangrovian kingdom because Andre's armor ___ shiny.\"",
+      "options": [
+        "was / was",
+        "were / were",
+        "was / were",
+        "were / was"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Both \"Andre\" and \"Andre's armor\" are singular subjects, so both blanks require the singular past form \"was\"."
+      },
+      "distractorWhy": {
+        "1": "\"Were\" is used for plural subjects, whereas both Andre and his armor are singular.",
+        "2": "\"Armor\" is singular and requires \"was\", not \"were\".",
+        "3": "\"Andre\" is singular and requires \"was\", not \"were\"."
+      }
+    },
+    {
+      "id": "eng-d-9-c3-q06",
+      "difficulty": "easy",
+      "prompt": "In Unit 2 Section 2 (\"Time Travel Car\"), Monita enters a strange flying car outside her house. How does Monita start the car engine?",
+      "options": [
+        "By pressing the big red button located at the center of the dashboard panel",
+        "By turning a silver key inside the ignition switch",
+        "By shouting a magical phrase to the car dashboard",
+        "By pulling the emergency handbrake next to her seat"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "The text states: \"One big red button was located at the center of the panel. Push the red button to start... Then, she pressed the red button.\""
+      },
+      "distractorWhy": {
+        "1": "The car did not use a silver key; it was activated by pressing a big red button on the dashboard panel.",
+        "2": "The car spoke to Monita, but starting it required pressing the red button rather than shouting magic words.",
+        "3": "Monita fastened her seatbelt after starting the car with the red button, not by pulling a handbrake."
+      }
+    },
+    {
+      "id": "eng-d-9-c3-q07",
+      "difficulty": "medium",
+      "prompt": "In Unit 2 Section 5, Monita is questioned in Banjarmasin about her school, SMP Merdeka. Why is the local resident / security officer surprised by Monita's statement?",
+      "options": [
+        "Because Monita traveled back to 1992, and SMP Merdeka was not established until 2014",
+        "Because SMP Merdeka is located in Jakarta, not in Banjarmasin",
+        "Because Monita forgot the exact address of her home in Banjarmasin",
+        "Because the security officer had already graduated from SMP Merdeka long ago"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "The security officer explains that there is no SMP Merdeka in 1992 because SMP Merdeka was only established in 2014, revealing Monita's time travel to the past."
+      },
+      "distractorWhy": {
+        "1": "Monita states she lives in Banjarmasin near SMP Merdeka, but the issue is the time period (1992 vs 2014), not the city.",
+        "2": "Monita knows her address in Banjarmasin, but the school does not exist yet in 1992.",
+        "3": "The officer did not attend SMP Merdeka; he states the school does not exist in 1992."
+      }
+    },
+    {
+      "id": "eng-d-9-c3-q08",
+      "difficulty": "medium",
+      "prompt": "In Unit 2 Section 3 (Worksheet 3.12), the text includes an informational snippet about time travel: \"Is time travel possible? According to Albert Einstein, ...\" What principle is mentioned regarding time travel?",
+      "options": [
+        "Time and space are linked together",
+        "Time moves backward only during full moons",
+        "Time travel requires a magic spell and a potion",
+        "Space is completely separate from time"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "According to the text in Unit 2 Section 3, Albert Einstein proposed that time and space are linked together."
+      },
+      "distractorWhy": {
+        "1": "The text discusses scientific theories by Albert Einstein, not lunar cycles.",
+        "2": "The passage references physics concepts by Albert Einstein rather than magical spells or potions.",
+        "3": "Einstein's theory states that time and space are linked together, not separate."
+      }
+    },
+    {
+      "id": "eng-d-9-c3-q09",
+      "difficulty": "hard",
+      "prompt": "In Unit 2 Section 4 (\"Language Focus: Indirect Speech\"), learn how to report questions. Convert this direct Wh- question into indirect speech: Monita asked, \"Where can I buy this newspaper?\"",
+      "options": [
+        "Monita asked where she could buy that newspaper.",
+        "Monita asked where can she buy this newspaper.",
+        "Monita asked if she could buy this newspaper where.",
+        "Monita asked where did she buy that newspaper."
+      ],
+      "answer": 0,
+      "why": {
+        "0": "In indirect Wh- questions, the question word (\"where\") is kept, subject-verb order changes to statement word order (\"she could buy\"), past tense modal (\"can\" -> \"could\") is used, and \"this\" changes to \"that\"."
+      },
+      "distractorWhy": {
+        "1": "In indirect speech, question word order (\"can she\") must change to statement word order (\"she could\").",
+        "2": "Wh- questions retain the question word at the beginning of the reported clause rather than using \"if\".",
+        "3": "Auxiliary \"did\" is not inserted for reported modal questions; \"can\" changes directly to \"could\"."
+      }
+    },
+    {
+      "id": "eng-d-9-c3-q10",
+      "difficulty": "hard",
+      "prompt": "In Unit 2 Section 4 (Worksheet 3.14), convert this direct Yes/No question into indirect speech: The security officer asked, \"Do you want to meet the professor?\"",
+      "options": [
+        "The security officer asked if she wanted to meet the professor.",
+        "The security officer asked that did she want to meet the professor.",
+        "The security officer asked where she wanted to meet the professor.",
+        "The security officer asked whether does she want to meet the professor."
+      ],
+      "answer": 0,
+      "why": {
+        "0": "For reported Yes/No questions, we use \"if\" or \"whether\", change question structure to statement order, and backshift present tense (\"do you want\") to past tense (\"she wanted\")."
+      },
+      "distractorWhy": {
+        "1": "Reported questions do not use \"that did she want\"; they use \"if/whether\" followed by statement word order.",
+        "2": "\"Where\" is used for location questions, whereas this is a Yes/No question requiring \"if\" or \"whether\".",
+        "3": "In indirect speech, present tense \"does she want\" must backshift to past tense \"she wanted\"."
+      }
+    },
+    {
+      "id": "eng-d-9-c3-q11",
+      "difficulty": "hard",
+      "prompt": "From Progress Check 2 (No. 1), convert the following direct speech into indirect speech: Andre asked, \"What do you want to buy in the supermarket?\"",
+      "options": [
+        "Andre asked what I wanted to buy in the supermarket.",
+        "Andre asked what do I want to buy in the supermarket.",
+        "Andre asked if I wanted to buy what in the supermarket.",
+        "Andre asked what did I want to buy in the supermarket."
+      ],
+      "answer": 0,
+      "why": {
+        "0": "The Wh- question \"What do you want...\" becomes \"what I wanted...\" in reported speech, shifting present tense to past tense and changing question order to statement order."
+      },
+      "distractorWhy": {
+        "1": "Present tense \"do I want\" must be backshifted to past tense \"I wanted\" in reported speech.",
+        "2": "Wh- questions use the question word (\"what\") directly after the reporting verb, not \"if\".",
+        "3": "Indirect speech uses statement order (\"what I wanted\") without auxiliary \"did\"."
+      }
+    },
+    {
+      "id": "eng-d-9-c3-q12",
+      "difficulty": "hard",
+      "prompt": "From Progress Check 2 (No. 5), convert the direct speech into indirect speech: Monita asked, \"Do you like the moon orchid?\"",
+      "options": [
+        "Monita asked whether I liked the moon orchid.",
+        "Monita asked what I liked the moon orchid.",
+        "Monita asked if did I like the moon orchid.",
+        "Monita asked that I liked the moon orchid."
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Yes/No questions use \"if\" or \"whether\", backshifting \"do you like\" to \"I liked\" in statement word order."
+      },
+      "distractorWhy": {
+        "1": "\"What\" is used for Wh- content questions, not for Yes/No questions.",
+        "2": "Reported questions do not combine \"if\" with auxiliary \"did\".",
+        "3": "Reported questions use \"if\" or \"whether\" instead of the conjunction \"that\"."
+      }
+    },
+    {
+      "id": "eng-d-9-c3-q13",
+      "difficulty": "easy",
+      "prompt": "In Unit 3 Section 4 (\"Writing: Stages of a Narrative Text\"), Table 3.1 describes the stages of narrative text structure. What is the main description of the Orientation stage?",
+      "options": [
+        "It describes the setting in time and place and introduces the main characters or narrator.",
+        "It describes a sequence of unusual or problematic events faced by characters.",
+        "It deals with attempts to solve or overcome the main problem.",
+        "It provides an optional overall evaluation of events and moral lessons."
+      ],
+      "answer": 0,
+      "why": {
+        "0": "According to Table 3.1 in Unit 3 Section 4, Orientation describes the setting in time and place and introduces the main characters or narrator."
+      },
+      "distractorWhy": {
+        "1": "Describing unusual or problematic events is the function of the Complication stage.",
+        "2": "Dealing with attempts to solve the problem is the function of the Resolution stage.",
+        "3": "Providing an evaluation or moral lesson is the function of the Coda stage."
+      }
+    },
+    {
+      "id": "eng-d-9-c3-q14",
+      "difficulty": "easy",
+      "prompt": "In narrative text structure (Unit 3 Section 4), which stage describes a sequence of events where a problem or conflict arises for the main characters?",
+      "options": [
+        "Complication",
+        "Orientation",
+        "Resolution",
+        "Coda"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Complication is the stage in a narrative text where problematic, unusual, or conflicting events occur."
+      },
+      "distractorWhy": {
+        "1": "Orientation introduces the characters and setting before the problem begins.",
+        "2": "Resolution shows how the problem is solved.",
+        "3": "Coda provides the concluding evaluation or moral lesson."
+      }
+    },
+    {
+      "id": "eng-d-9-c3-q15",
+      "difficulty": "medium",
+      "prompt": "In Unit 3 Section 4, what happens during the Resolution stage of a narrative text structure?",
+      "options": [
+        "The characters make attempts to solve or overcome the problem",
+        "The background setting and time period are first introduced",
+        "The central conflict reaches its highest point of mystery without solution",
+        "The author listed past action verbs in comic panels"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Table 3.1 defines Resolution as the stage that deals with attempts to solve or overcome the problem in the story."
+      },
+      "distractorWhy": {
+        "1": "Introducing background setting and time period is the Orientation stage.",
+        "2": "Reaching the peak conflict without solution belongs to the Complication phase.",
+        "3": "Listing past action verbs is a classroom writing activity, not a narrative text stage."
+      }
+    },
+    {
+      "id": "eng-d-9-c3-q16",
+      "difficulty": "medium",
+      "prompt": "In Unit 3 Table 3.2 (\"The Multiverse Story of Timun Mas\"), what special items does Timun Mas's mother give her in this modern fantasy version to help her beat the Giant?",
+      "options": [
+        "A pencil, a pen, and an eraser",
+        "Cucumber seeds, salt, and shrimp paste",
+        "A magical shield, a sword, and plate armor",
+        "A time travel car and a digital map"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "In the multiverse adaptation presented in Table 3.2, Timun Mas's mother gives her three stationery items: a pencil, a pen, and an eraser."
+      },
+      "distractorWhy": {
+        "1": "Cucumber seeds, salt, and shrimp paste belong to the traditional folklore version, whereas this multiverse version uses school supplies.",
+        "2": "Magical shield and plate armor are from Andre's knight outfit in Unit 1.",
+        "3": "A time travel car belongs to Monita's story in Unit 2."
+      }
+    },
+    {
+      "id": "eng-d-9-c3-q17",
+      "difficulty": "hard",
+      "prompt": "In the multiverse story of Timun Mas (Unit 3 Section 4 text snippet), how do Timun Mas and the Giant successfully escape from the labyrinth?",
+      "options": [
+        "Timun Mas reads the digital map while the Giant uses his strong power to destroy obstacles along the way.",
+        "Timun Mas throws salt to turn the labyrinth into a muddy sea.",
+        "The Giant carries Timun Mas on a flying time travel car through the green flash.",
+        "Princess Suripit guides them out using a black orchid."
+      ],
+      "answer": 0,
+      "why": {
+        "0": "The text states: \"Alright, we should use a digital map. You can read the map for us... Using his strong power, the Giant destroyed the obstacles along the way... Timun Mas and the Giant successfully found their way out.\""
+      },
+      "distractorWhy": {
+        "1": "Throwing salt to create a muddy sea is from the traditional folk tale, not the multiverse labyrinth scene.",
+        "2": "The flying time travel car belongs to Monita's story in Unit 2.",
+        "3": "Princess Suripit and the black orchid belong to Andre's story in Unit 1."
+      }
+    },
+    {
+      "id": "eng-d-9-c3-q18",
+      "difficulty": "easy",
+      "prompt": "In Unit 3 Section 5 (Worksheet 3.24), students analyze past action verbs in narrative comics. Which option contains ONLY past action verbs?",
+      "options": [
+        "pressed, destroyed, carried, opened",
+        "beautiful, brave, shiny, excited",
+        "because, although, suddenly, happily",
+        "is, are, was, were"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "\"Pressed\", \"destroyed\", \"carried\", and \"opened\" are past action verbs describing physical actions performed in the past."
+      },
+      "distractorWhy": {
+        "1": "\"Beautiful\", \"brave\", \"shiny\", and \"excited\" are adjectives, not action verbs.",
+        "2": "\"Because\", \"although\", \"suddenly\", and \"happily\" are conjunctions and adverbs.",
+        "3": "\"Is\", \"are\", \"was\", and \"were\" are linking verbs / auxiliaries, not physical action verbs."
+      }
+    },
+    {
+      "id": "eng-d-9-c3-q19",
+      "difficulty": "medium",
+      "prompt": "Chapter 3 explores fantasy stories, time travel, and multiverse folk tales. What main lesson about problem-solving is emphasized in narrative texts (Unit 3 Section 4)?",
+      "options": [
+        "Characters find creative solutions to overcome unexpected problems through intelligence, courage, and cooperation.",
+        "Characters should avoid all challenges and never venture into unknown worlds.",
+        "Problems can only be solved by using physical violence against opponents.",
+        "Fantasy worlds must always end with characters remaining trapped forever."
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Unit 3 Section 4 highlights that narrative texts entertain and convey messages about how characters find solutions to their unusual and unexpected problems."
+      },
+      "distractorWhy": {
+        "1": "Narrative texts encourage character growth and facing challenges, not avoiding them.",
+        "2": "The stories in Chapter 3 show peaceful or clever resolutions (e.g. Timun Mas studying at university, Andre completing missions).",
+        "3": "The resolution stage in narrative texts provides a way out, enabling characters to overcome their problems."
+      }
+    },
+    {
+      "id": "eng-d-9-c3-q20",
+      "difficulty": "hard",
+      "prompt": "In Progress Check 2 (No. 3), convert the following direct speech into indirect speech: Pipit asked, \"Can I see your notes?\"",
+      "options": [
+        "Pipit asked if she could see my notes.",
+        "Pipit asked can she see my notes.",
+        "Pipit asked that she saw my notes.",
+        "Pipit asked where she can see my notes."
+      ],
+      "answer": 0,
+      "why": {
+        "0": "The Yes/No modal question \"Can I see...\" is reported using \"if\", changing subject \"I\" to \"she\", modal \"can\" to past form \"could\", and pronoun \"your\" to \"my\"."
+      },
+      "distractorWhy": {
+        "1": "Reported questions must use statement order (\"she could see\") and backshift \"can\" to \"could\".",
+        "2": "Indirect questions do not use \"that\"; they use \"if\" or \"whether\".",
+        "3": "\"Where\" is used for location questions, whereas \"Can I see...\" is a Yes/No question requiring \"if\"."
+      }
+    }
+  ]
+}

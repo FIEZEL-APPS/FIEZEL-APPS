@@ -1,0 +1,249 @@
+{
+  "code": "KOMP-MAT-D-7-BAB3-01",
+  "grade": 7,
+  "name": "Rasio dan Proporsi",
+  "materi": "Konsep Rasio & Perbandingan, Perbandingan Senilai & Berbalik Nilai, Skala Peta, Penerapan Kontekstual Kecepatan & Waktu",
+  "cpRef": "Matematika untuk SMP/MTs Kelas VII",
+  "items": [
+    {
+      "id": "mat-d-7-b3-q01",
+      "difficulty": "dasar",
+      "prompt": "Berdasarkan Buku Siswa Matematika Kelas VII (hal. 102-106), bentuk paling sederhana dari rasio 24 : 36 adalah…",
+      "options": [
+        "2 : 3",
+        "4 : 6",
+        "1 : 2",
+        "3 : 4"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Kedua angka dibagi FPB (12): 24:12 = 2 dan 36:12 = 3. Bentuk sederhana 2 : 3."
+      },
+      "distractorWhy": {
+        "1": "4 : 6 belum paling sederhana (masih bisa dibagi 2).",
+        "2": "1 : 2 salah pembagian.",
+        "3": "3 : 4 terbalik."
+      }
+    },
+    {
+      "id": "mat-d-7-b3-q02",
+      "difficulty": "sedang",
+      "prompt": "Berdasarkan Buku Siswa Matematika Kelas VII (hal. 110 Perbandingan Senilai), harga 5 kg beras adalah Rp60.000,00. Harga 8 kg beras yang sama adalah…",
+      "options": [
+        "Rp96.000,00",
+        "Rp80.000,00",
+        "Rp100.000,00",
+        "Rp90.000,00"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Harga per kg = 60.000 / 5 = 12.000. Harga 8 kg = 8 × 12.000 = Rp96.000,00."
+      },
+      "distractorWhy": {
+        "1": "80.000 keliru.",
+        "2": "100.000 keliru.",
+        "3": "90.000 keliru."
+      }
+    },
+    {
+      "id": "mat-d-7-b3-q03",
+      "difficulty": "tinggi",
+      "prompt": "Berdasarkan Buku Siswa Matematika Kelas VII (hal. 118 Perbandingan Berbalik Nilai), sebuah pekerjaan pembangunan gedung dapat diselesaikan oleh 12 pekerja dalam waktu 20 hari. Jika pekerjaan ingin diselesaikan dalam waktu 15 hari, banyak pekerja yang dibutuhkan adalah…",
+      "options": [
+        "16 pekerja",
+        "15 pekerja",
+        "18 pekerja",
+        "20 pekerja"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Perbandingan berbalik nilai: 12 × 20 = x × 15 => x = 240 / 15 = 16 pekerja."
+      },
+      "distractorWhy": {
+        "1": "15 pekerja keliru.",
+        "2": "18 pekerja keliru.",
+        "3": "20 pekerja keliru."
+      }
+    },
+    {
+      "id": "mat-d-7-b3-q04",
+      "difficulty": "sedang",
+      "prompt": "Berdasarkan Buku Siswa Matematika Kelas VII (hal. 125 Skala Peta), jarak antara Kota A dan Kota B pada peta berskala 1 : 2.000.000 adalah 4 cm. Jarak sebenarnya di permukaan bumi adalah…",
+      "options": [
+        "80 km",
+        "8 km",
+        "800 km",
+        "50 km"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Jarak asli = 4 cm × 2.000.000 = 8.000.000 cm = 80 km."
+      },
+      "distractorWhy": {
+        "1": "8 km salah konversi cm ke km.",
+        "2": "800 km berlebihan nol.",
+        "3": "50 km keliru perkalian."
+      }
+    },
+    {
+      "id": "mat-d-7-b3-q05",
+      "difficulty": "dasar",
+      "prompt": "Berdasarkan Buku Siswa Matematika Kelas VII (hal. 108), di dalam sebuah kelas terdapat 15 siswa laki-laki dan 20 siswa perempuan. Rasio siswa laki-laki terhadap seluruh siswa di kelas adalah…",
+      "options": [
+        "3 : 7",
+        "3 : 4",
+        "4 : 3",
+        "3 : 5"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Total siswa = 15 + 20 = 35. Rasio laki-laki : total = 15 : 35 = 3 : 7."
+      },
+      "distractorWhy": {
+        "1": "3 : 4 adalah rasio laki-laki : perempuan.",
+        "2": "4 : 3 adalah perempuan : laki-laki.",
+        "3": "3 : 5 salah penyederhanaan."
+      }
+    },
+    {
+      "id": "mat-d-7-b3-q06",
+      "difficulty": "tinggi",
+      "prompt": "Berdasarkan Buku Siswa Matematika Kelas VII (hal. 130 Kecepatan), sebuah mobil melaju dengan kecepatan rata-rata 60 km/jam dan membutuhkan waktu 3 jam untuk sampai di tujuan. Jika mobil melaju dengan kecepatan 90 km/jam, waktu yang dibutuhkan adalah…",
+      "options": [
+        "2 jam",
+        "1,5 jam",
+        "2,5 jam",
+        "4 jam"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Jarak = v × t = 60 × 3 = 180 km. Waktu baru = 180 / 90 = 2 jam."
+      },
+      "distractorWhy": {
+        "1": "1,5 jam keliru.",
+        "2": "2,5 jam keliru.",
+        "3": "4 jam keliru."
+      }
+    },
+    {
+      "id": "mat-d-7-b3-q07",
+      "difficulty": "dasar",
+      "prompt": "Berdasarkan Buku Siswa Matematika Kelas VII (hal. 104), rasio senilai dengan 4 : 5 adalah…",
+      "options": [
+        "12 : 15",
+        "8 : 12",
+        "16 : 25",
+        "10 : 12"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "4×3 : 5×3 = 12 : 15."
+      },
+      "distractorWhy": {
+        "1": "8:12 = 2:3.",
+        "2": "16:25 = (4/5)².",
+        "3": "10:12 = 5:6."
+      }
+    },
+    {
+      "id": "mat-d-7-b3-q08",
+      "difficulty": "sedang",
+      "prompt": "Berdasarkan Buku Siswa Matematika Kelas VII (hal. 115), resep kue membutuhkan 200 gram gula untuk 500 gram tepung. Jika Ibu menggunakan 750 gram tepung, gula yang dibutuhkan adalah…",
+      "options": [
+        "300 gram",
+        "250 gram",
+        "350 gram",
+        "400 gram"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Gula = (750 / 500) × 200 = 1,5 × 200 = 300 gram."
+      },
+      "distractorWhy": {
+        "1": "250 g keliru.",
+        "2": "350 g keliru.",
+        "3": "400 g keliru."
+      }
+    },
+    {
+      "id": "mat-d-7-b3-q09",
+      "difficulty": "tinggi",
+      "prompt": "Berdasarkan Buku Siswa Matematika Kelas VII (hal. 128 Uji Kemampuan), persediaan makanan untuk 30 ekor sapi cukup untuk 12 hari. Jika sapi bertambah 6 ekor, makanan tersebut akan habis dalam…",
+      "options": [
+        "10 hari",
+        "9 hari",
+        "8 hari",
+        "11 hari"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Total sapi = 36. Berbalik nilai: 30 × 12 = 36 × h => h = 360 / 36 = 10 hari."
+      },
+      "distractorWhy": {
+        "1": "9 hari keliru.",
+        "2": "8 hari keliru.",
+        "3": "11 hari keliru."
+      }
+    },
+    {
+      "id": "mat-d-7-b3-q10",
+      "difficulty": "dasar",
+      "prompt": "Berdasarkan Buku Siswa Matematika Kelas VII (hal. 122), skala foto menunjukan 1 : 20. Jika tinggi rumah pada foto adalah 15 cm, tinggi asli rumah tersebut adalah…",
+      "options": [
+        "3 meter (300 cm)",
+        "30 meter",
+        "1,5 meter",
+        "30 cm"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Tinggi asli = 15 cm × 20 = 300 cm = 3 meter."
+      },
+      "distractorWhy": {
+        "1": "30 m berlebihan.",
+        "2": "1,5 m keliru.",
+        "3": "30 cm keliru."
+      }
+    },
+    {
+      "id": "mat-d-7-b3-q11",
+      "difficulty": "sedang",
+      "prompt": "Berdasarkan Buku Siswa Matematika Kelas VII (hal. 112), rasio jumlah uang Tabungan Ani dan Budi adalah 3 : 5. Jika jumlah uang mereka berdua adalah Rp400.000,00, besar uang Budi adalah…",
+      "options": [
+        "Rp250.000,00",
+        "Rp150.000,00",
+        "Rp200.000,00",
+        "Rp300.000,00"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Uang Budi = (5 / (3+5)) × 400.000 = (5/8) × 400.000 = Rp250.000,00."
+      },
+      "distractorWhy": {
+        "1": "150.000 uang Ani.",
+        "2": "200.000 setengahnya.",
+        "3": "300.000 keliru."
+      }
+    },
+    {
+      "id": "mat-d-7-b3-q12",
+      "difficulty": "tinggi",
+      "prompt": "Berdasarkan Buku Siswa Matematika Kelas VII (hal. 132), selisih umur Ayah dan Kaka adalah 24 tahun. Jika rasio umur Ayah dan Kaka adalah 7 : 3, umur Ayah adalah…",
+      "options": [
+        "42 tahun",
+        "18 tahun",
+        "36 tahun",
+        "48 tahun"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Selisih rasio = 7 - 3 = 4 bagian. 1 bagian = 24 / 4 = 6 tahun. Umur Ayah = 7 × 6 = 42 tahun."
+      },
+      "distractorWhy": {
+        "1": "18 tahun umur Kaka.",
+        "2": "36 tahun keliru.",
+        "3": "48 tahun keliru."
+      }
+    }
+  ]
+}

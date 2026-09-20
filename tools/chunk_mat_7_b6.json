@@ -1,0 +1,409 @@
+{
+  "code": "KOMP-MAT-D-7-BAB6-01",
+  "grade": 7,
+  "name": "Bab 6: Data dan Diagram",
+  "materi": "Investigasi Statistika, Jenis-jenis Data, Penyajian Data (Diagram Batang, Diagram Lingkaran, Line Plot), Interpretasi dan Analisis Diagram",
+  "cpRef": "Matematika untuk SMP/MTs Kelas VII",
+  "items": [
+    {
+      "id": "mat-d-7-b6-q01",
+      "difficulty": "dasar",
+      "prompt": "Pada Bab 6 Buku Siswa Matematika Kelas VII disajikan konsep dasar investigasi statistika. Statistika didefinisikan sebagai cabang ilmu matematika yang berkaitan dengan pengumpulan, pengorganisasian, penyajian, analisis, dan interpretasi data. Dalam alur investigasi statistika, langkah utama yang harus dilakukan sebelum mengumpulkan data adalah...",
+      "options": [
+        "Merumuskan pertanyaan statistika yang ingin dijawab",
+        "Membuat diagram batang atau diagram lingkaran",
+        "Menghitung persentase dan nilai rata-rata data",
+        "Menarik kesimpulan akhir dari hasil analisis"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Langkah awal dalam alur investigasi statistika adalah merumuskan pertanyaan statistika yang jelas agar proses pengumpulan data terarah dan relevan."
+      },
+      "distractorWhy": {
+        "1": "Membuat diagram merupakan tahap penyajian data yang dilakukan setelah data berhasil dikumpulkan dan diolah.",
+        "2": "Menghitung persentase dan rata-rata merupakan tahap pengolahan data setelah data terkumpul.",
+        "3": "Menarik kesimpulan adalah tahap akhir investigasi setelah data dianalisis dan diinterpretasikan."
+      }
+    },
+    {
+      "id": "mat-d-7-b6-q02",
+      "difficulty": "dasar",
+      "prompt": "Dalam investigasi statistika (hal. 189), pertanyaan statistika harus menghasilkan data yang memiliki variasi (keragaman jawaban). Di antara pertanyaan berikut, manakah yang merupakan pertanyaan statistika?",
+      "options": [
+        "Berapa lama waktu yang dihabiskan oleh siswa kelas VII setiap hari untuk mengakses media sosial?",
+        "Siapakah nama kepala sekolah SMP Negeri 1 saat ini?",
+        "Berapakah jumlah provinsi di Indonesia pada tahun 2022?",
+        "Pada tanggal berapakah Hari Kemerdekaan Republik Indonesia diperingati?"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Pertanyaan tentang waktu pengaksesan media sosial siswa kelas VII akan menghasilkan jawaban yang bervariasi dari setiap siswa sehingga memenuhi kriteria pertanyaan statistika."
+      },
+      "distractorWhy": {
+        "1": "Nama kepala sekolah merupakan fakta tunggal yang bernilai tunggal dan tidak memiliki variasi data.",
+        "2": "Jumlah provinsi pada tahun tertentu adalah nilai tetap yang bernilai tunggal.",
+        "3": "Tanggal Hari Kemerdekaan RI bersifat pasti dan bernilai tunggal."
+      }
+    },
+    {
+      "id": "mat-d-7-b6-q03",
+      "difficulty": "dasar",
+      "prompt": "Berdasarkan penjelasan pada Subbab B (hal. 195), data terbagi menjadi data kategorik dan data numerik. Di antara kumpulan data berikut, manakah yang tergolong data kategorik?",
+      "options": [
+        "Jenis olahraga favorit yang dipilih oleh siswa kelas VII",
+        "Banyaknya aplikasi permainan online yang terpasang pada gawai siswa",
+        "Lamanya waktu (dalam menit) yang digunakan siswa untuk membaca buku",
+        "Skor hasil pertandingan bulutangkis antar kelas"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Jenis olahraga favorit bernilai kualitatif (berupa kata atau nama kategori seperti sepakbola, bulutangkis, basket) sehingga tergolong data kategorik."
+      },
+      "distractorWhy": {
+        "1": "Banyaknya aplikasi berbentuk bilangan bulat hasil pencacahan sehingga merupakan data numerik.",
+        "2": "Lamanya waktu berupa nilai bilangan hasil pengukuran waktu sehingga merupakan data numerik.",
+        "3": "Skor pertandingan berupa nilai bilangan sehingga tergolong data numerik."
+      }
+    },
+    {
+      "id": "mat-d-7-b6-q04",
+      "difficulty": "sedang",
+      "prompt": "Data numerik terbagi menjadi data diskrit (hasil pencacahan) dan data kontinu (hasil pengukuran). Dari jenis data berikut, manakah yang merupakan data numerik kontinu?",
+      "options": [
+        "Tinggi badan siswa kelas VII dalam satuan sentimeter",
+        "Jumlah medali emas yang diperoleh kontingen Indonesia di Asian Games",
+        "Banyaknya lagu yang diunduh siswa dalam satu hari",
+        "Jumlah anggota keluarga yang tinggal dalam satu rumah"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Tinggi badan diperoleh dari hasil pengukuran menggunakan alat ukur dan dapat bernilai pecahan/desimal sehingga tergolong data numerik kontinu."
+      },
+      "distractorWhy": {
+        "1": "Jumlah medali emas diperoleh dari hasil perhitungan/pencacahan bilangan bulat sehingga tergolong data numerik diskrit.",
+        "2": "Banyaknya lagu diunduh merupakan hasil pencacahan berupa bilangan bulat sehingga tergolong data numerik diskrit.",
+        "3": "Jumlah anggota keluarga merupakan hasil pencacahan manusia yang bernilai bulat sehingga tergolong data numerik diskrit."
+      }
+    },
+    {
+      "id": "mat-d-7-b6-q05",
+      "difficulty": "sedang",
+      "prompt": "Pada Latihan 6.2 (hal. 197-198), siswa diminta mengklasifikasikan data berikut: (1) Kota tempat lahir siswa, (2) Bulan kelahiran siswa, (3) Jumlah saudara kandung, (4) Waktu belajar di rumah per hari. Kelompok data yang keduanya merupakan data numerik adalah...",
+      "options": [
+        "(3) dan (4)",
+        "(1) dan (2)",
+        "(1) dan (3)",
+        "(2) dan (4)"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Jumlah saudara kandung (3) berupa bilangan pencacahan dan waktu belajar (4) berupa bilangan pengukuran waktu, keduanya berbentuk angka sehingga merupakan data numerik."
+      },
+      "distractorWhy": {
+        "1": "Kota tempat lahir (1) dan bulan kelahiran (2) berupa kata/kategori sehingga merupakan data kategorik.",
+        "2": "Kota tempat lahir (1) merupakan data kategorik.",
+        "3": "Bulan kelahiran (2) merupakan data kategorik."
+      }
+    },
+    {
+      "id": "mat-d-7-b6-q06",
+      "difficulty": "dasar",
+      "prompt": "Pada Eksplorasi 6.1 (hal. 191), disajikan diagram line plot untuk menampilkan sebaran panjang nama siswa kelas VII A (banyaknya huruf). Jika pada angka 12 di garis bilangan terdapat 5 tanda silang (x), hal ini berarti...",
+      "options": [
+        "Terdapat 5 orang siswa kelas VII A yang namanya terdiri atas 12 huruf",
+        "Panjang nama seluruh siswa kelas VII A rata-rata adalah 12 huruf",
+        "Terdapat 12 orang siswa yang memiliki nama dengan panjang 5 huruf",
+        "Siswa dengan nama terpanjang di kelas VII A memiliki 5 huruf"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Pada line plot, nilai pada garis horizontal menyatakan ukuran variabel (12 huruf) dan banyaknya tanda silang menyatakan frekuensi siswa (5 siswa)."
+      },
+      "distractorWhy": {
+        "1": "Banyaknya tanda silang menunjukkan frekuensi siswa pada angka 12, bukan rata-rata nilai seluruh kelas.",
+        "2": "Angka 12 menunjukkan panjang huruf, sedangkan jumlah tanda silang menunjukkan banyaknya siswa, bukan sebaliknya.",
+        "3": "Panjang nama ditunjukkan oleh posisi skala horizontal 12 huruf, bukan 5 huruf."
+      }
+    },
+    {
+      "id": "mat-d-7-b6-q07",
+      "difficulty": "sedang",
+      "prompt": "Pada diagram line plot hasil survei jumlah buku cerita yang dibaca siswa dalam sebulan, tumpukan tanda titik paling tinggi berada di atas angka 4. Pernyataan yang tepat untuk menginterpretasikan data tersebut adalah...",
+      "options": [
+        "Kebanyakan siswa membaca sebanyak 4 buku cerita dalam sebulan",
+        "Jumlah siswa yang membaca buku cerita secara keseluruhan adalah 4 orang",
+        "Jumlah buku terbanyak yang dibaca oleh seorang siswa adalah 4 buku",
+        "Tidak ada siswa yang membaca buku cerita lebih dari 4 buku"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Tumpukan titik tertinggi pada line plot menandakan nilai dengan frekuensi terbesar (modus), yaitu 4 buku cerita dibaca oleh paling banyak siswa."
+      },
+      "distractorWhy": {
+        "1": "Angka 4 menyatakan nilai kategori/variabel buku yang dibaca, bukan total responden siswa.",
+        "2": "Tumpukan tertinggi menunjukkan frekuensi terbanyak (banyak siswa), bukan batas maksimum nilai variabel.",
+        "3": "Line plot masih dapat memiliki titik di angka di atas 4 dengan frekuensi lebih sedikit."
+      }
+    },
+    {
+      "id": "mat-d-7-b6-q08",
+      "difficulty": "dasar",
+      "prompt": "Pada Latihan 6.2 nomor 5 (hal. 199), tercatat data jumlah aplikasi permainan online pada gawai siswa kelas VII B: 0 aplikasi (1 siswa), 1 aplikasi (3 siswa), 2 aplikasi (7 siswa), 3 aplikasi (10 siswa), 4 aplikasi (8 siswa), 5 aplikasi (2 siswa), dan 6 aplikasi (1 siswa). Banyaknya siswa yang memiliki aplikasi permainan online lebih dari 3 adalah...",
+      "options": [
+        "11 siswa",
+        "10 siswa",
+        "21 siswa",
+        "8 siswa"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Siswa dengan aplikasi lebih dari 3 adalah siswa yang memiliki 4, 5, atau 6 aplikasi, yaitu 8 + 2 + 1 = 11 siswa."
+      },
+      "distractorWhy": {
+        "1": "Angka 10 merupakan banyaknya siswa yang memiliki tepat 3 aplikasi.",
+        "2": "Angka 21 merupakan akumulasi siswa yang memiliki 3 aplikasi atau kurang (1 + 3 + 7 + 10 = 21).",
+        "3": "Angka 8 hanya memperhitungkan siswa yang memiliki tepat 4 aplikasi saja."
+      }
+    },
+    {
+      "id": "mat-d-7-b6-q09",
+      "difficulty": "sedang",
+      "prompt": "Berdasarkan data aplikasi permainan online siswa kelas VII B (0 aplikasi: 1 siswa, 1: 3 siswa, 2: 7 siswa, 3: 10 siswa, 4: 8 siswa, 5: 2 siswa, 6: 1 siswa), selisih antara banyaknya siswa yang memiliki 3 aplikasi dengan siswa yang memiliki 2 aplikasi pada gawainya adalah...",
+      "options": [
+        "3 siswa",
+        "2 siswa",
+        "4 siswa",
+        "5 siswa"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Siswa yang memiliki 3 aplikasi berjumlah 10 orang dan yang memiliki 2 aplikasi berjumlah 7 orang. Selisihnya adalah 10 - 7 = 3 siswa."
+      },
+      "distractorWhy": {
+        "1": "Angka 2 diperoleh dari selisih antara nilai aplikasi (3 - 2 = 1) atau kesalahan perhitungan.",
+        "2": "Angka 4 merupakan selisih 10 - 6.",
+        "3": "Angka 5 merupakan selisih 10 - 5."
+      }
+    },
+    {
+      "id": "mat-d-7-b6-q10",
+      "difficulty": "tinggi",
+      "prompt": "Pada Latihan 6.3 (hal. 204), disajikan diagram batang ganda perolehan medali emas pada Olimpiade 2016 Rio dan Olimpiade 2020 Tokyo. Jika Amerika Serikat meraih 46 medali emas pada tahun 2016 dan 39 medali emas pada tahun 2020, maka perubahan perolehan medali emas Amerika Serikat adalah...",
+      "options": [
+        "Penurunan sebanyak 7 medali emas",
+        "Peningkatan sebanyak 7 medali emas",
+        "Penurunan sebanyak 5 medali emas",
+        "Peningkatan sebanyak 85 medali emas"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Perubahan dihitung dari perolehan 2020 dikurangi 2016: 39 - 46 = -7, yang berarti terjadi penurunan sebanyak 7 medali emas."
+      },
+      "distractorWhy": {
+        "1": "Perolehan medali mengalami penurunan dari 46 menjadi 39, bukan peningkatan.",
+        "2": "Selisih antara 46 dan 39 adalah 7, bukan 5.",
+        "3": "Angka 85 merupakan hasil penjumlahan kedua perolehan medali (46 + 39)."
+      }
+    },
+    {
+      "id": "mat-d-7-b6-q11",
+      "difficulty": "sedang",
+      "prompt": "Berdasarkan data perolehan medali emas Olimpiade 2016 dan 2020 pada Latihan 6.3, negara Britania Raya meraih 27 medali emas pada tahun 2016 sehingga menjadi runner-up. Pada Olimpiade 2020 Tokyo, negara yang berhasil menempati posisi runner-up perolehan medali emas terbanyak di bawah Amerika Serikat adalah...",
+      "options": [
+        "Tiongkok dengan 38 medali emas",
+        "Britania Raya dengan 22 medali emas",
+        "Jepang dengan 27 medali emas",
+        "Australia dengan 17 medali emas"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Pada Olimpiade 2020 Tokyo, Tiongkok meraih 38 medali emas di bawah Amerika Serikat (39 medali) sehingga menjadi runner-up."
+      },
+      "distractorWhy": {
+        "1": "Britania Raya berada di peringkat keempat pada 2020 dengan 22 medali emas.",
+        "2": "Jepang berada di peringkat ketiga pada 2020 dengan 27 medali emas.",
+        "3": "Australia berada di peringkat kelima pada 2020 dengan 17 medali emas."
+      }
+    },
+    {
+      "id": "mat-d-7-b6-q12",
+      "difficulty": "sedang",
+      "prompt": "Pada Eksplorasi 6.5 (hal. 215), sebuah kelas terdiri atas 40 siswa. Data ekstrakurikuler yang diikuti siswa mencatat: 14 siswa memilih Olahraga, 10 siswa memilih Kesenian, 8 siswa memilih Pramuka, dan 8 siswa memilih PMR. Persentase siswa yang memilih ekstrakurikuler Olahraga pada diagram lingkaran adalah...",
+      "options": [
+        "35%",
+        "25%",
+        "20%",
+        "14%"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Persentase Olahraga dihitung dengan (14 / 40) x 100% = 35%."
+      },
+      "distractorWhy": {
+        "1": "Angka 25% merupakan persentase untuk kelompok Kesenian (10 / 40 x 100%).",
+        "2": "Angka 20% merupakan persentase untuk Pramuka atau PMR (8 / 40 x 100%).",
+        "3": "Angka 14% adalah jumlah siswa pemilih Olahraga, bukan bentuk persentasentasenya."
+      }
+    },
+    {
+      "id": "mat-d-7-b6-q13",
+      "difficulty": "tinggi",
+      "prompt": "Dari data ekstrakurikuler siswa (total 40 siswa: 14 Olahraga, 10 Kesenian, 8 Pramuka, 8 PMR) pada soal sebelumnya, besar sudut pusat juring yang mewakili kelompok siswa pemilih Kesenian adalah...",
+      "options": [
+        "90°",
+        "72°",
+        "126°",
+        "100°"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Besar sudut pusat Kesenian dihitung dengan (10 / 40) x 360° = 1/4 x 360° = 90°."
+      },
+      "distractorWhy": {
+        "1": "Angka 72° merupakan sudut pusat untuk kelompok Pramuka atau PMR (8 / 40 x 360°).",
+        "2": "Angka 126° merupakan sudut pusat untuk kelompok Olahraga (14 / 40 x 360°).",
+        "3": "Angka 100° menunjukkan persentase total atau kesalahan rasio."
+      }
+    },
+    {
+      "id": "mat-d-7-b6-q14",
+      "difficulty": "tinggi",
+      "prompt": "Sebuah diagram lingkaran menyajikan data jenis bahan bacaan favorit 120 siswa di perpustakaan sekolah. Juring yang menunjukkan buku Komik memiliki sudut pusat sebesar 120°. Banyaknya siswa yang menyukai buku komik adalah...",
+      "options": [
+        "40 siswa",
+        "30 siswa",
+        "60 siswa",
+        "45 siswa"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Banyaknya siswa dihitung dengan (120° / 360°) x 120 siswa = 1/3 x 120 = 40 siswa."
+      },
+      "distractorWhy": {
+        "1": "Angka 30 siswa merupakan hasil perhitungan rasio 90° / 360° x 120.",
+        "2": "Angka 60 siswa merupakan hasil perhitungan rasio 180° / 360° x 120.",
+        "3": "Angka 45 siswa merupakan kesalahan perhitungan perkalian rasio."
+      }
+    },
+    {
+      "id": "mat-d-7-b6-q15",
+      "difficulty": "dasar",
+      "prompt": "Berdasarkan penjelasan pada Subbab F (hal. 221-222), pemilihan jenis diagram tergantung pada tujuan penyajian data. Diagram yang paling tepat digunakan untuk menunjukkan perkembangan atau perubahan data yang berkesinambungan dari waktu ke waktu adalah...",
+      "options": [
+        "Diagram garis",
+        "Diagram lingkaran",
+        "Diagram batang tunggal",
+        "Line plot"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Diagram garis sangat cocok untuk memperlihatkan tren, perubahan, atau perkembangan data yang kontinu dari waktu ke waktu."
+      },
+      "distractorWhy": {
+        "1": "Diagram lingkaran digunakan untuk menunjukkan proporsi bagian terhadap keseluruhan.",
+        "2": "Diagram batang digunakan untuk membandingkan jumlah antar kategori yang diskrit.",
+        "3": "Line plot digunakan untuk menunjukkan sebaran data numerik pada garis bilangan."
+      }
+    },
+    {
+      "id": "mat-d-7-b6-q16",
+      "difficulty": "sedang",
+      "prompt": "Jika kita ingin menampilkan data yang menekankan proporsi atau perbandingan tiap kategori terhadap jumlah keseluruhan (total 100% atau 360°), diagram yang paling tepat dan efektif digunakan adalah...",
+      "options": [
+        "Diagram lingkaran",
+        "Diagram garis",
+        "Line plot",
+        "Diagram batang ganda"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Diagram lingkaran dirancang khusus untuk memperlihatkan pembagian proporsi atau persentase setiap komponen terhadap jumlah total."
+      },
+      "distractorWhy": {
+        "1": "Diagram garis digunakan untuk mencatat tren perubahan waktu.",
+        "2": "Line plot digunakan untuk melihat distribusi frekuensi data tunggal.",
+        "3": "Diagram batang ganda digunakan untuk membandingkan dua kelompok data kategorik."
+      }
+    },
+    {
+      "id": "mat-d-7-b6-q17",
+      "difficulty": "sedang",
+      "prompt": "Seorang peneliti ingin membandingkan angka penjualan hasil panen padi dan jagung di 5 kecamatan berbeda pada tahun yang sama. Penyajian data yang paling tepat untuk membandingkan kedua jenis tanaman tersebut pada tiap kecamatan adalah...",
+      "options": [
+        "Diagram batang ganda",
+        "Diagram garis tunggal",
+        "Diagram lingkaran",
+        "Diagram line plot"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Diagram batang ganda memungkinkan pembandingan dua kelompok data (padi dan jagung) secara bersisian untuk setiap kategori kecamatan."
+      },
+      "distractorWhy": {
+        "1": "Diagram garis tunggal hanya dapat menyajikan satu jenis tren data dari waktu ke waktu.",
+        "2": "Diagram lingkaran kurang efektif untuk membandingkan dua komoditas sekaligus di 5 lokasi.",
+        "3": "Line plot menyajikan sebaran frekuensi data numerik tunggal, bukan perbandingan dua variabel."
+      }
+    },
+    {
+      "id": "mat-d-7-b6-q18",
+      "difficulty": "tinggi",
+      "prompt": "Pada Uji Kompetensi Bab 6 (hal. 227-228), disajikan diagram lingkaran kandungan gizi makanan. Jika juring Karbohidrat mencakup 50% dari keseluruhan diagram dan total massa makanan adalah 400 gram, maka massa karbohidrat dalam makanan tersebut adalah...",
+      "options": [
+        "200 gram",
+        "100 gram",
+        "150 gram",
+        "250 gram"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Massa karbohidrat dihitung dengan 50% x 400 gram = 0,5 x 400 = 200 gram."
+      },
+      "distractorWhy": {
+        "1": "Angka 100 gram merupakan hasil dari 25% x 400 gram.",
+        "2": "Angka 150 gram merupakan hasil dari 37,5% x 400 gram.",
+        "3": "Angka 250 gram merupakan hasil dari 62,5% x 400 gram."
+      }
+    },
+    {
+      "id": "mat-d-7-b6-q19",
+      "difficulty": "sedang",
+      "prompt": "Pada tabel frekuensi penjualan sepatu di sebuah toko selama sepekan dicatat: Senin 12 pasang, Selasa 15 pasang, Rabu 10 pasang, Kamis 18 pasang, Jumat 20 pasang, Sabtu 25 pasang, dan Minggu 30 pasang. Total penjualan sepatu khusus pada akhir pekan (Jumat hingga Minggu) adalah...",
+      "options": [
+        "75 pasang",
+        "55 pasang",
+        "65 pasang",
+        "130 pasang"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Total penjualan Jumat hingga Minggu dihitung dengan menjumlahkan 20 + 25 + 30 = 75 pasang."
+      },
+      "distractorWhy": {
+        "1": "Angka 55 pasang merupakan jumlah penjualan hari Sabtu dan Minggu saja (25 + 30).",
+        "2": "Angka 65 pasang merupakan jumlah penjualan hari Kamis, Jumat, dan Sabtu (18 + 20 + 25).",
+        "3": "Angka 130 pasang merupakan total seluruh penjualan sepatu dari Senin hingga Minggu."
+      }
+    },
+    {
+      "id": "mat-d-7-b6-q20",
+      "difficulty": "tinggi",
+      "prompt": "Pada penyajian diagram lingkaran (hal. 207), kadang-kadang terdapat juring dengan label Lain-lain atau Lainnya. Fungsi utama dari kelompok Lain-lain tersebut dalam penyajian data adalah...",
+      "options": [
+        "Menggabungkan beberapa kategori yang frekuensinya sangat kecil agar diagram tidak terlalu rumit",
+        "Menampung data yang salah atau tidak valid saat proses pengumpulan data berlangsung",
+        "Menunjukkan kategori yang nilainya paling tinggi dan paling dominan dalam penelitian",
+        "Memastikan besar sudut pusat seluruh diagram lingkaran menjadi kurang dari 360 derajat"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Kategori Lain-lain digunakan untuk menyatukan banyak kategori kecil agar diagram lingkaran tetap rapi dan mudah dibaca tanpa juring yang terlalu sempit."
+      },
+      "distractorWhy": {
+        "1": "Data yang salah harus dibersihkan (data cleaning) dan tidak dimasukkan ke dalam diagram.",
+        "2": "Kategori dominan digambarkan dalam juring tersendiri dengan sudut pusat terbesar.",
+        "3": "Total sudut pusat seluruh juring dalam diagram lingkaran harus tetap tepat 360 derajat."
+      }
+    }
+  ]
+}

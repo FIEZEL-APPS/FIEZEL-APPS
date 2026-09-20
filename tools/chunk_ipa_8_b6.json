@@ -1,0 +1,409 @@
+{
+  "code": "KOMP-IPA-D-8-BAB6-01",
+  "grade": 8,
+  "name": "Unsur, Senyawa, dan Campuran",
+  "materi": "Klasifikasi Materi (Unsur, Senyawa, Campuran), Larutan, Koloid & Suspensi, Metode Pemisahan Campuran (Filtrasi, Distilasi, Kromatografi)",
+  "cpRef": "Ilmu Pengetahuan Alam untuk SMP/MTs Kelas VII (Edisi Revisi)",
+  "items": [
+    {
+      "id": "ipa-d-8-b6-q01",
+      "difficulty": "dasar",
+      "prompt": "Berdasarkan Buku Siswa IPA Kelas VIII hal. 165, Anton tidak sengaja menjatuhkan kacang hijau ke dalam baskom berisi tepung terigu. Metode pemisahan sederhana yang paling tepat untuk memisahkan kedua bahan tersebut berdasarkan perbedaan ukuran partikelnya adalah...",
+      "options": [
+        "Pengayakan menggunakan ayakan berpori sedang",
+        "Dekantasi dengan mendiamkan campuran dalam air",
+        "Sentrifugasi dengan memutar campuran pada kecepatan tinggi",
+        "Kromatografi menggunakan kertas saring"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Pengayakan memanfaatkan perbedaan ukuran partikel padat, di mana partikel tepung terigu yang lebih kecil akan lolos melewati pori-pori ayakan, sedangkan kacang hijau yang berukuran lebih besar akan tertahan di atas ayakan."
+      },
+      "distractorWhy": {
+        "1": "Dekantasi digunakan untuk memisahkan endapan padat dari cairan dengan cara menuangkan cairan secara perlahan, bukan untuk memisahkan dua bahan padat kering.",
+        "2": "Sentrifugasi digunakan untuk memisahkan partikel halus dalam cairan yang sulit mengendap, bukan untuk memisahkan dua zat padat kering berukuran jauh berbeda.",
+        "3": "Kromatografi digunakan untuk memisahkan komponen zat warna atau zat terlarut berdasarkan perbedaan kecepatan rambat pada media stasioner."
+      }
+    },
+    {
+      "id": "ipa-d-8-b6-q02",
+      "difficulty": "dasar",
+      "prompt": "Berdasarkan Buku Siswa IPA Kelas VIII hal. 165, Pak Buyung ingin menikmati minuman kopi tanpa ampas dari bubuk kopi khas Lampung yang didapatkannya. Langkah pemisahan campuran yang paling tepat dilakukan Pak Buyung adalah...",
+      "options": [
+        "Menyaring seduhan air kopi menggunakan kertas atau kain penyaring",
+        "Menguapkan air kopi hingga terbentuk kristal kopi",
+        "Memutar seduhan kopi dengan mesin sentrifugal",
+        "Menggunakan magnet untuk menarik bubuk kopi"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Penyaringan (filtrasi) menggunakan kertas atau kain saring berpori kecil dapat menahan partikel ampas kopi (residu) sehingga menghasilkan cairan kopi murni (filtrat) tanpa ampas."
+      },
+      "distractorWhy": {
+        "1": "Evaporasi akan menguapkan seluruh air pelarut dan menyisakan padatan kopi, sehingga tidak menghasilkan minuman kopi cair.",
+        "2": "Sentrifugasi kurang praktis untuk menyeduh minuman sehari-hari dan ampas kopi berukuran relatif cukup besar sehingga lebih efektif dipisahkan dengan penyaringan.",
+        "3": "Bubuk kopi bukan merupakan bahan feromagnetik seperti besi atau baja, sehingga magnet tidak dapat menarik ampas kopi."
+      }
+    },
+    {
+      "id": "ipa-d-8-b6-q03",
+      "difficulty": "sedang",
+      "prompt": "Berdasarkan Buku Siswa IPA Kelas VIII hal. 168 dan 173, campuran terbentuk dari penggabungan dua zat atau lebih. Sifat utama yang dimiliki oleh suatu campuran adalah...",
+      "options": [
+        "Memiliki sifat penyusun yang tetap terbawa dan tidak membentuk zat baru",
+        "Membentuk zat baru dengan sifat kimia yang sama sekali berbeda dari pembentuknya",
+        "Zat penyusunnya hanya dapat dipisahkan melalui reaksi kimia yang kompleks",
+        "Komposisi massa zat penyusunnya selalu memiliki perbandingan yang tetap"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Campuran terdiri atas dua atau lebih zat yang bergabung secara fisik tanpa membentuk zat baru, sehingga masing-masing zat penyusunnya tetap mempertahankan sifat aslinya dan dapat dipisahkan kembali secara fisik."
+      },
+      "distractorWhy": {
+        "1": "Pembentukan zat baru dengan sifat kimia yang berbeda merupakan ciri dari reaksi pembentukan senyawa, bukan campuran.",
+        "2": "Zat penyusun campuran dapat dipisahkan secara fisik tanpa harus melalui reaksi kimia.",
+        "3": "Perbandingan massa zat penyusun yang selalu tetap merupakan ciri khas senyawa, sedangkan komposisi campuran bersifat bervariasi."
+      }
+    },
+    {
+      "id": "ipa-d-8-b6-q04",
+      "difficulty": "dasar",
+      "prompt": "Mengutip Fakta Sains dalam Buku Siswa IPA Kelas VIII hal. 172, ketika 27 gram gula pasir dilarutkan sempurna ke dalam 100 gram air murni, massa total larutan gula yang dihasilkan adalah...",
+      "options": [
+        "127 gram",
+        "100 gram",
+        "73 gram",
+        "27 gram"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Saat zat terlarut larut dalam pelarut, partikel zat terlarut tidak hilang melainkan tersebar di antara molekul pelarut. Total massa larutan selalu sama dengan jumlah massa pelarut ditambah massa zat terlarut (100 g + 27 g = 127 g)."
+      },
+      "distractorWhy": {
+        "1": "Massa 100 gram hanya menghitung massa air pelarut dan mengabaikan massa gula terlarut yang sebenarnya tidak lenyap.",
+        "2": "Angka 73 gram merupakan hasil pengurangan massa pelarut dengan zat terlarut, bukan penjumlahan total massa.",
+        "3": "Angka 27 gram hanya memperhitungkan massa zat terlarut gula saja."
+      }
+    },
+    {
+      "id": "ipa-d-8-b6-q05",
+      "difficulty": "sedang",
+      "prompt": "Berdasarkan penjelasan dan Gambar 6.7 dalam Buku Siswa IPA Kelas VIII hal. 174-175, suatu larutan gula dikategori sebagai larutan jenuh apabila...",
+      "options": [
+        "Jumlah gula yang ditambahkan sudah berlebihan sehingga pelarut tidak dapat melarutkannya lagi dan tersisa endapan di dasar wadah",
+        "Jumlah gula yang dilarutkan sangat sedikit dibandingkan volume air",
+        "Seluruh gula telah larut sempurna dan masih dapat melarutkan gula tambahan",
+        "Air pelarut dipanaskan hingga mendidih dan seluruhnya menguap habis"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Larutan jenuh terjadi ketika konsentrasi zat terlarut telah mencapai batas maksimum kemampuan pelarut pada suhu tertentu, sehingga zat terlarut tambahan tidak dapat larut lagi dan mengendap di dasar gelas."
+      },
+      "distractorWhy": {
+        "1": "Kondisi zat terlarut yang sedikit menggambarkan larutan encer, bukan larutan jenuh.",
+        "2": "Kondisi di mana pelarut masih mampu melarutkan penambahan zat terlarut menggambarkan larutan belum jenuh.",
+        "3": "Penguapan pelarut hingga habis merupakan proses evaporasi atau kristalisasi, bukan definisi dari larutan jenuh."
+      }
+    },
+    {
+      "id": "ipa-d-8-b6-q06",
+      "difficulty": "tinggi",
+      "prompt": "Berdasarkan Aktivitas 6.4 pada Buku Siswa IPA Kelas VIII hal. 175-177 tentang kelarutan gula, gula pasir yang ditumbuk halus akan lebih cepat larut dalam air hangat dibandingkan gula batu utuh dalam air dingin karena...",
+      "options": [
+        "Luas permukaan sentuh partikel gula halus lebih besar dan suhu tinggi meningkatkan energi kinetik partikel",
+        "Gula batu memiliki ikatan kimia yang berbeda dengan gula pasir halus",
+        "Air dingin memiliki jumlah molekul pelarut yang lebih sedikit dibandingkan air hangat",
+        "Tumbukan pada gula pasir mengubah wujud gula menjadi zat cair sebelum dilarutkan"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Makin halus ukuran partikel, makin besar luas permukaan sentuhnya dengan pelarut sehingga frekuensi tumbukan antarpartikel meningkat. Selain itu, kenaikan suhu air meningkatkan energi kinetik gerak molekul air sehingga mempercepat proses pelarutan."
+      },
+      "distractorWhy": {
+        "1": "Gula batu dan gula pasir halus memiliki rumus dan ikatan kimia yang identik (sukrosa), perbedaan hanya terletak pada ukuran fisik kristal.",
+        "2": "Suhu tidak mengubah jumlah molekul air jika volumenya sama, melainkan mempengaruhi kecepatan gerak molekul air.",
+        "3": "Penumbukan gula pasir hanya memperkecil ukuran fisik padatan, tidak mengubah wujud padat gula menjadi cair."
+      }
+    },
+    {
+      "id": "ipa-d-8-b6-q07",
+      "difficulty": "sedang",
+      "prompt": "Berdasarkan Buku Siswa IPA Kelas VIII hal. 177-178, campuran air dan pasir dikategorikan sebagai suspensi, sedangkan air gula dikategorikan sebagai larutan. Perbedaan mendasar di antara keduanya adalah...",
+      "options": [
+        "Partikel pasir berukuran lebih besar dari partikel air sehingga tidak larut dan mudah mengendap, sedangkan partikel gula terlarut sempurna",
+        "Partikel gula dapat disaring dengan kertas saring biasa, sedangkan pasir menembus kertas saring",
+        "Suspensi bersifat homogen dan stabil, sedangkan larutan bersifat heterogen",
+        "Air gula akan membentuk dua lapisan jika didiamkan beberapa jam"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Suspensi merupakan campuran heterogen dengan ukuran partikel terlarut yang relatif besar sehingga tidak dapat larut sempurna dan akan mengendap jika didiamkan. Larutan merupakan campuran homogen yang partikel terlarutnya berukuran molekuler dan tersebar merata."
+      },
+      "distractorWhy": {
+        "1": "Partikel gula berukuran sangat kecil sehingga lolos dari kertas saring, sebaliknya partikel pasir tertahan oleh kertas saring.",
+        "2": "Suspensi bersifat heterogen dan tidak stabil (mengendap), sedangkan larutan bersifat homogen dan stabil.",
+        "3": "Air gula bersifat stabil dan homogen sehingga tidak akan memisah menjadi dua lapisan meskipun didiamkan dalam waktu lama."
+      }
+    },
+    {
+      "id": "ipa-d-8-b6-q08",
+      "difficulty": "tinggi",
+      "prompt": "Mengutip Tabel 6.2 dalam Buku Siswa IPA Kelas VIII hal. 178, pasangan antara contoh koloid dan tipe koloid yang tepat adalah...",
+      "options": [
+        "Susu dan mayones tergolong emulsi (fase terdispersi cair dalam media pendispersi cair)",
+        "Darah dan cat minyak tergolong aerosol padat (fase terdispersi padat dalam media gas)",
+        "Busa pencukur dan krim kocok tergolong gel (fase terdispersi cair dalam media padat)",
+        "Kabut dan awan tergolong sol (fase terdispersi padat dalam media cair)"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Emulsi adalah sistem koloid di mana zat cair terdispersi di dalam zat cair lainnya, seperti contohnya susu, mayones, dan losion."
+      },
+      "distractorWhy": {
+        "1": "Darah dan cat minyak tergolong sol (padat dalam cair), sedangkan aerosol padat contohnya adalah asap dan debu di udara.",
+        "2": "Busa pencukur dan krim kocok tergolong buih (gas dalam cair), sedangkan gel contohnya jeli dan gel rambut.",
+        "3": "Kabut dan awan tergolong aerosol (cair dalam gas), sedangkan sol contohnya darah, tinta, dan cat."
+      }
+    },
+    {
+      "id": "ipa-d-8-b6-q09",
+      "difficulty": "sedang",
+      "prompt": "Berdasarkan Soal Ayo Uji Kemampuan dan Gambar 6.10 pada Buku Siswa IPA Kelas VIII hal. 178-179, pada kemasan obat lambung cair sering tertera petunjuk 'Kocok Dahulu Sebelum Diminum'. Alasan ilmiah dari petunjuk tersebut adalah...",
+      "options": [
+        "Obat lambung merupakan suspensi sehingga zat aktif padatnya cenderung mengendap di dasar botol jika didiamkan",
+        "Pengocokan bertujuan mengubah obat lambung dari campuran heterogen menjadi larutan homogen permanen",
+        "Petunjuk pengocokan diperlukan untuk menaikkan suhu larutan obat agar cepat bereaksi",
+        "Obat lambung tergolong koloid aerosol yang akan menguap jika tidak dikocok secara berkala"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Obat lambung cair berbentuk suspensi heterogen, di mana partikel obat padat tidak larut dan akan mengendap di dasar botol saat disimpan. Pengocokan sebelum diminum memastikan zat aktif obat terdistribusi merata dalam cairan sehingga dosis yang diminum tepat."
+      },
+      "distractorWhy": {
+        "1": "Pengocokan hanya meratakan partikel secara sementara dan tidak mengubah sifat dasar suspensi menjadi larutan homogen permanen.",
+        "2": "Tujuan pengocokan adalah meratakan endapan partikel padat, bukan untuk meningkatkan suhu cairan obat.",
+        "3": "Obat lambung cair adalah suspensi (padat dalam cair), bukan aerosol (cair/padat dalam gas)."
+      }
+    },
+    {
+      "id": "ipa-d-8-b6-q10",
+      "difficulty": "dasar",
+      "prompt": "Berdasarkan Buku Siswa IPA Kelas VIII hal. 178, di antara bahan-bahan berikut: (1) Larutan gula, (2) Pasta gigi, (3) Air sirop, (4) Lumpur sungai, manakah yang tergolong campuran heterogen?",
+      "options": [
+        "Pasta gigi dan lumpur sungai",
+        "Larutan gula dan air sirop",
+        "Larutan gula dan lumpur sungai",
+        "Air sirop dan pasta gigi"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Pasta gigi (koloid/suspensi padat) dan lumpur sungai (suspensi pasir/tanah dalam air) merupakan campuran heterogen karena partikel penyusunnya tidak tersebar sempurna secara molekuler dan dapat dibedakan. Larutan gula dan air sirop adalah campuran homogen."
+      },
+      "distractorWhy": {
+        "1": "Larutan gula dan air sirop keduanya merupakan contoh campuran homogen (larutan).",
+        "2": "Larutan gula adalah campuran homogen, sedangkan lumpur sungai adalah campuran heterogen.",
+        "3": "Air sirop merupakan campuran homogen, sedangkan pasta gigi merupakan campuran heterogen."
+      }
+    },
+    {
+      "id": "ipa-d-8-b6-q11",
+      "difficulty": "sedang",
+      "prompt": "Berdasarkan penjelasan dan Gambar 6.12 dalam Buku Siswa IPA Kelas VIII hal. 180-181, metode dekantasi dilakukan dengan cara menuangkan cairan secara perlahan untuk memisahkan...",
+      "options": [
+        "Cairan bening dari endapan padatan yang telah mengendap di dasar wadah",
+        "Dua jenis zat cair yang memiliki titik didih berbeda jauh",
+        "Zat terlarut yang berukuran mikroskopis dari pelarutnya",
+        "Pigmen warna yang merambat pada media kertas saring"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Dekantasi adalah metode pemisahan sederhana untuk campuran suspensi kasar dengan cara membiarkan endapan padat mengendap di dasar wadah, lalu cairan di bagian atas dituangkan secara perlahan ke wadah lain."
+      },
+      "distractorWhy": {
+        "1": "Pemisahan dua zat cair berdasarkan perbedaan titik didih menggunakan metode distilasi (penyulingan).",
+        "2": "Pemisahan zat terlarut mikroskopis dari pelarutnya memerlukan penguapan (evaporasi) atau kristalisasi.",
+        "3": "Pemisahan pigmen warna berdasarkan kecepatan rambat adalah prinsip dasar kromatografi."
+      }
+    },
+    {
+      "id": "ipa-d-8-b6-q12",
+      "difficulty": "sedang",
+      "prompt": "Mengutip Fakta Sains dalam Buku Siswa IPA Kelas VIII hal. 182-183, pemisahan sel darah merah dari plasma darah di laboratorium medis serta proses pengeringan pakaian pada mesin cuci menggunakan prinsip kerja...",
+      "options": [
+        "Sentrifugasi, yaitu pemutaran cepat yang menghempaskan/mendorong partikel lebih berat ke dasar atau luar",
+        "Kromatografi, yaitu gaya kapilaritas pada media perambat",
+        "Distilasi, yaitu penguapan dan pengembunan kembali uap pelarut",
+        "Evaporasi, yaitu pemanasan cairan hingga mendidih di atas kompor"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Sentrifugasi memanfaatkan pemutaran tabung atau pemintal dengan kecepatan tinggi. Gaya sentrifugal mendorong sel darah merah yang lebih berat ke dasar tabung (membentuk sedimen) atau menghempaskan air keluar dari pakaian basah."
+      },
+      "distractorWhy": {
+        "1": "Kromatografi bergantung pada kapilaritas dan perbedaan kelarutan/rambatan warna pada media stasioner.",
+        "2": "Distilasi didasarkan pada titik didih dan perubahan wujud cair-gas-cair.",
+        "3": "Evaporasi didasarkan pada penguapan pelarut menggunakan panas."
+      }
+    },
+    {
+      "id": "ipa-d-8-b6-q13",
+      "difficulty": "dasar",
+      "prompt": "Berdasarkan Soal Uji Kemampuan Buku Siswa IPA Kelas VIII hal. 188, Simon tidak sengaja menjatuhkan kotak berisi tumpukan mur dan baut berbahan logam besi di lapangan rumput. Metode pemisahan campuran yang paling cepat dan tepat dilakukan Simon adalah...",
+      "options": [
+        "Pemisahan magnetis dengan mendekatkan batang magnet ke rumput",
+        "Penyaringan menggunakan kertas saring halus",
+        "Dekantasi dengan menyiram rumput menggunakan air mengalir",
+        "Evaporasi dengan memanaskan area rumput menggunakan pembakar"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Mur dan baut terbuat dari logam feromagnetik (besi/baja), sehingga pemisahan magnetis dapat menarik mur dan baut dari sela-sela rumput dengan cepat tanpa merusak lingkungan."
+      },
+      "distractorWhy": {
+        "1": "Penyaringan tidak dapat digunakan di lapangan rumput karena rumput bukan cairan dan mur/baut berukuran besar.",
+        "2": "Dekantasi tidak cocok untuk memisahkan benda padat logam yang tersangkut pada rumput padat.",
+        "3": "Evaporasi hanya menguapkan cairan dan tidak dapat mengangkat atau memisahkan mur dan baut dari rumput."
+      }
+    },
+    {
+      "id": "ipa-d-8-b6-q14",
+      "difficulty": "sedang",
+      "prompt": "Berdasarkan Buku Siswa IPA Kelas VIII hal. 185, para petani garam di daerah pesisir pantai memisahkan kristal garam dapur (residu) dari air laut dengan memanfaatkan metode...",
+      "options": [
+        "Evaporasi dan kristalisasi melalui penguapan air pelarut oleh sinar matahari",
+        "Distilasi bertingkat menggunakan kondensor pendingin uap",
+        "Sentrifugasi dengan memutar air laut pada mesin berkecepatan tinggi",
+        "Kromatografi kertas dengan mencelupkan media serap ke air laut"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Air laut ditampung di tambak garam dan dibiarkan menguap (evaporasi) di bawah paparan panas matahari. Ketika air laut menguap habis, zat terlarut (garam) akan tertinggal dan membentuk kristal-kristal garam (kristalisasi)."
+      },
+      "distractorWhy": {
+        "1": "Distilasi bertingkat digunakan untuk mengumpulkan pelarut murni atau memisahkan cairan bercampur, bukan metode utama petani garam tradisional yang mengincar kristal padatnya.",
+        "2": "Sentrifugasi tidak memisahkan zat terlarut terionisasi (seperti NaCl) dari air pelarutnya.",
+        "3": "Kromatografi digunakan untuk memisahkan komponen zat warna, bukan untuk produksi kristal garam."
+      }
+    },
+    {
+      "id": "ipa-d-8-b6-q15",
+      "difficulty": "tinggi",
+      "prompt": "Mengutip Buku Siswa IPA Kelas VIII hal. 185-186, perbedaan utama antara metode evaporasi biasa dengan metode distilasi (penyulingan) dalam pemisahan larutan adalah...",
+      "options": [
+        "Distilasi mengumpulkan uap pelarut dan mengembunkannya kembali menjadi cairan suling, sedangkan evaporasi membiarkan pelarut menguap ke udara",
+        "Evaporasi hanya digunakan untuk campuran heterogen, sedangkan distilasi untuk campuran suspensi",
+        "Distilasi tidak membutuhkan pemanasan larutan, sedangkan evaporasi membutuhkan pendinginan",
+        "Evaporasi menghasilkan cairan murni (distilat), sedangkan distilasi hanya menghasilkan endapan padat"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Pada evaporasi, pelarut dibiarkan menguap lepas ke udara untuk mendapatkan padatan terlarut (residu). Pada distilasi, uap pelarut ditangkap, dialirkan melalui pendingin (kondensor), dan diembunkan kembali menjadi cairan murni (distilat)."
+      },
+      "distractorWhy": {
+        "1": "Baik evaporasi maupun distilasi diterapkan pada larutan (partikel terlarut/homogen).",
+        "2": "Distilasi tetap memerlukan pemanasan untuk menguapkan pelarut sebelum uapnya didinginkan.",
+        "3": "Hasil cairan murni dari pengembunan uap dinamakan distilat pada proses distilasi, bukan evaporasi."
+      }
+    },
+    {
+      "id": "ipa-d-8-b6-q16",
+      "difficulty": "sedang",
+      "prompt": "Berdasarkan penjelasan metode kromatografi pada Buku Siswa IPA Kelas VIII hal. 186-188, pemisahan warna-warna penyusun tinta spidol terjadi karena adanya perbedaan...",
+      "options": [
+        "Kecepatan rambat zat warna pada kertas saring yang dicelupkan ke dalam pelarut",
+        "Titik didih dari masing-masing pigmen warna saat dipanaskan",
+        "Ukuran partikel kasat mata yang tertahan oleh pori-pori kertas",
+        "Daya tarik magnetik dari masing-masing komponen pigmen warna"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Kromatografi kertas mengandalkan perbedaan kelarutan dan kecepatan rambat (migrasi) partikel zat warna di sepanjang media penyerap (kertas saring) saat terbawa oleh aliran pelarut."
+      },
+      "distractorWhy": {
+        "1": "Kromatografi kertas tidak melibatkan pemanasan hingga titik didih.",
+        "2": "Pigmen warna tinta sudah terlarut secara molekuler, pemisahan terjadi karena kecepatan rambat (kapilaritas), bukan penyaringan fisik pori.",
+        "3": "Pigmen warna spidol tidak memiliki sifat feromagnetik."
+      }
+    },
+    {
+      "id": "ipa-d-8-b6-q17",
+      "difficulty": "dasar",
+      "prompt": "Berdasarkan Fakta Sains Buku Siswa IPA Kelas VIII hal. 182, ketika kantong teh celup dimasukkan ke dalam gelas berisi air panas, proses yang terjadi menerapkan metode...",
+      "options": [
+        "Penyaringan, di mana kemasan teh bertindak sebagai penyaring berpori kecil yang melewatkan sari teh terlarut tetapi menahan daun teh",
+        "Sentrifugasi, di mana kantong teh diputar dengan kecepatan tinggi",
+        "Dekantasi, di mana daun teh diendapkan di dasar gelas tanpa kemasan",
+        "Distilasi, di mana uap air panas ditampung pada tutup gelas"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Pori-pori kecil pada kantong teh celup berfungsi sebagai penyaring (filtrasi). Air panas melarutkan ekstrak daun teh dan keluar menembus pori kemasan, sementara serpihan daun teh tetap tertahan di dalam kantong."
+      },
+      "distractorWhy": {
+        "1": "Teh celup dicelupkan secara biasa tanpa proses pemutaran sentrifugal.",
+        "2": "Dekantasi adalah penuangan cairan dari endapan tanpa media saring berpori.",
+        "3": "Distilasi melibatkan penguapan dan pengembunan kembali uap dalam alat kondensor."
+      }
+    },
+    {
+      "id": "ipa-d-8-b6-q18",
+      "difficulty": "tinggi",
+      "prompt": "Berdasarkan Soal Uji Kemampuan Buku Siswa IPA Kelas VIII hal. 189, jika kalian diminta merancang tahapan untuk memperoleh air murni yang layak minum dari air laut, urutan metode pemisahan yang paling tepat adalah...",
+      "options": [
+        "Penyaringan awal untuk memisahkan pasir/kotoran padat, dilanjutkan distilasi untuk mengumpulkan uap air murni",
+        "Dekantasi air laut kemudian dikromatografi menggunakan kertas saring",
+        "Pengayakan kasar dilanjutkan pemisahan magnetis di dalam wadah",
+        "Sentrifugasi air laut hingga seluruh garam mengendap di dasar"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Penyaringan awal membuang partikel tersuspensi seperti pasir dan sampah mikro. Selanjutnya, distilasi memanaskan air laut hingga menguap (meninggalkan garam sebagai residu) dan mengembunkan uap air murni (distilat) yang bebas garam."
+      },
+      "distractorWhy": {
+        "1": "Kromatografi digunakan untuk pemisahan warna/pigmen dalam jumlah mikro, tidak dapat menghasilkan volume air minum dari air laut.",
+        "2": "Pemisahan magnetis tidak dapat memisahkan garam (NaCl) yang terlarut dari air laut.",
+        "3": "Garam terlarut secara sempurna (homogen/ionik) dalam air sehingga tidak dapat diendapkan hanya dengan sentrifugasi biasa."
+      }
+    },
+    {
+      "id": "ipa-d-8-b6-q19",
+      "difficulty": "sedang",
+      "prompt": "Berdasarkan Tabel Pemisahan Campuran pada Buku Siswa IPA Kelas VIII hal. 188-189, untuk memisahkan partikel padat yang melayang dalam cairan pada pemeriksaan laboratorium medis dengan cara diputar cepat dalam mesin, metode yang dituliskan pada tabel tersebut adalah...",
+      "options": [
+        "Sentrifugasi",
+        "Evaporasi",
+        "Penyaringan",
+        "Dekantasi"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Pemisahan campuran padat-cair dengan meletakkan sampel dalam tabung reaksi lalu diputar dalam mesin centrifuge merupakan deskripsi tepat dari metode sentrifugasi."
+      },
+      "distractorWhy": {
+        "1": "Evaporasi melibatkan pemanasan hingga pelarut menguap, bukan pemutaran sampel.",
+        "2": "Penyaringan mengalirkan campuran melewati media berpori seperti kertas saring.",
+        "3": "Dekantasi adalah penuangan cairan secara perlahan setelah endapan mengendap secara alami."
+      }
+    },
+    {
+      "id": "ipa-d-8-b6-q20",
+      "difficulty": "sedang",
+      "prompt": "Mengutip Buku Siswa IPA Kelas VIII hal. 168-170, udara segar yang kita hirup sehari-hari dan tumpukan sampah anorganik di rumah merupakan contoh campuran. Jenis campuran yang tepat untuk udara dan sampah anorganik berturut-turut adalah...",
+      "options": [
+        "Udara tergolong campuran homogen gas, sedangkan tumpukan sampah anorganik tergolong campuran heterogen padat",
+        "Udara tergolong campuran heterogen, sedangkan tumpukan sampah tergolong larutan murni",
+        "Udara dan tumpukan sampah keduanya tergolong larutan homogen",
+        "Udara tergolong senyawa kimia tunggal, sedangkan tumpukan sampah tergolong koloid emulsi"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Udara terdiri dari bermacam gas (nitrogen, oksigen, CO2, dll.) yang bercampur secara homogen sehingga tidak dapat dibedakan komponennya oleh mata. Tumpukan sampah terdiri dari plastik, kertas, kaca, dan logam yang terpisah jelas sehingga bersifat heterogen."
+      },
+      "distractorWhy": {
+        "1": "Udara yang bersih dan tercampur merata bersifat homogen, sedangkan sampah anorganik bukan merupakan larutan.",
+        "2": "Tumpukan sampah anorganik jelas tampak komponen-komponen bedanya sehingga tidak mungkin homogen.",
+        "3": "Udara adalah campuran berbagai gas (bukan senyawa tunggal), dan sampah anorganik padat bukan merupakan emulsi (cair dalam cair)."
+      }
+    }
+  ]
+}

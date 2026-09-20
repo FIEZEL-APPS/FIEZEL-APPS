@@ -1,0 +1,2020 @@
+{
+  "schema": "fiezel-mapel-bank-v1",
+  "subjectId": "IPS",
+  "phase": "fase_d",
+  "provenance": {
+    "dokumen": "Ilmu Pengetahuan Sosial untuk SMP/MTs Kelas VII (Edisi Revisi)",
+    "penerbit": "Pusat Perbukuan, Badan Standar, Kurikulum, dan Asesmen Pendidikan, Kementerian Pendidikan, Kebudayaan, Riset, dan Teknologi",
+    "tahun": "2023",
+    "isbn": "978-623-118-437-5",
+    "diperolehDari": "https://buku.kemendikdasmen.go.id",
+    "penyusunButir": "resmi-terverifikasi"
+  },
+  "competencies": [
+    {
+      "code": "KOMP-IPS-D-7-BAB1-01",
+      "grade": 7,
+      "name": "Tema 01: Keberadaan Diri dan Keluarga",
+      "materi": "Mengenal Sejarah Keluarga & Silsilah, Pemahaman Lokasi pada Peta & Komponen Peta, Interaksi Sosial & Agen Sosialisasi, Pemenuhan Kebutuhan Manusia",
+      "cpRef": "Ilmu Pengetahuan Sosial untuk SMP/MTs Kelas VII (Edisi Revisi) — Tema 01",
+      "items": [
+        {
+          "id": "ips-d-7-t1-q01",
+          "difficulty": "dasar",
+          "prompt": "Berdasarkan Buku Siswa IPS Kelas VII Edisi Revisi (hal. 2), seorang siswa diminta menuliskan sejarah asal-usul keluarganya mulai dari kakek-nenek hingga silsilah dirinya. Keberadaan silsilah keluarga tersebut penting dalam IPS karena ....",
+          "options": [
+            "menjelaskan silsilah dan asal-usul keberadaan diri serta keluarga dalam sejarah lokal",
+            "mengharuskan setiap keluarga mencatat seluruh harta warisan generasi terdahulu",
+            "menentukan tingkat status ekonomi sosial keluarga di mata masyarakat sekitar",
+            "menghapus perbedaan peran sosial antara generasi tua dan generasi muda"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Silsilah keluarga berfungsi untuk mengenali sejarah keluarga, hubungan kekerabatan, serta asal-usul keberadaan diri sebagai bagian dari satuan sosial pertama."
+          },
+          "distractorWhy": {
+            "1": "Silsilah keluarga berfokus pada hubungan kekerabatan dan asal-usul sejarah keluarga, bukan pencatatan harta warisan.",
+            "2": "Tujuan silsilah keluarga adalah memahami identitas dan sejarah diri/keluarga, bukan untuk menentukan status ekonomi.",
+            "3": "Silsilah keluarga menjelaskan bagan silsilah dan ikatan darah, bukan untuk menghapuskan perbedaan peran antar-generasi."
+          }
+        },
+        {
+          "id": "ips-d-7-t1-q02",
+          "difficulty": "sedang",
+          "prompt": "Berdasarkan Buku Siswa IPS Kelas VII Edisi Revisi (hal. 51), keluarga Iqbal sedang mudik dari Tasikmalaya menuju Pacitan. Mereka memilih mudik melalui jalur selatan daripada jalur pantai utara karena pertimbangan waktu tempuh yang kira-kira 5 jam lebih singkat. Konsep lokasi yang sesuai dengan cerita tersebut adalah lokasi ....",
+          "options": [
+            "relatif",
+            "absolut",
+            "tetap",
+            "jarak tempuh"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Lokasi relatif ditentukan berdasarkan kondisi daerah sekitar dan aksesibilitas atau waktu tempuh, yang dapat berubah sesuai jalur/sarana yang dipilih."
+          },
+          "distractorWhy": {
+            "1": "Lokasi absolut didasarkan pada titik koordinat astronomis (garis lintang dan garis bujur) yang sifatnya tetap.",
+            "2": "Konsep lokasi dalam geografi IPS dibagi menjadi lokasi absolut dan relatif; lokasi tetap bukan istilah standar konsep lokasi.",
+            "3": "Jarak tempuh merupakan faktor pembeda waktu/kondisi, tetapi konsep lokasi utamanya merujuk pada lokasi relatif."
+          }
+        },
+        {
+          "id": "ips-d-7-t1-q03",
+          "difficulty": "dasar",
+          "prompt": "Berdasarkan Buku Siswa IPS Kelas VII Edisi Revisi (hal. 4-5), letak suatu tempat di permukaan bumi yang didasarkan pada sistem koordinat garis lintang dan garis bujur dinamakan lokasi ....",
+          "options": [
+            "absolut",
+            "relatif",
+            "dinamis",
+            "strategis"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Lokasi absolut adalah letak yang bersifat tetap berdasarkan sistem koordinat garis lintang dan garis bujur astronomis."
+          },
+          "distractorWhy": {
+            "1": "Lokasi relatif dapat berubah-ubah bergantung pada objek atau wilayah sekitarnya.",
+            "2": "Lokasi absolut sifatnya tetap (statis), bukan dinamis.",
+            "3": "Lokasi strategis menggambarkan nilai/keuntungan posisi terhadap jalur transportasi/ekonomi, bukan letak berdasarkan koordinat."
+          }
+        },
+        {
+          "id": "ips-d-7-t1-q04",
+          "difficulty": "tinggi",
+          "prompt": "Berdasarkan Buku Siswa IPS Kelas VII Edisi Revisi (hal. 9), harga tanah di Penajam Paser Utara melonjak hingga 5-10 kali lipat setelah pemerintah mengumumkan pemindahan Ibu Kota Negara (IKN). Kenaikan harga tanah tersebut terjadi karena pengaruh perubahan lokasi ....",
+          "options": [
+            "relatif daerah tersebut terhadap pusat pemerintahan baru",
+            "absolut karena letak garis astronomisnya bergeser",
+            "geologis akibat aktivitas lempeng bumi di sekitar IKN",
+            "astronomis yang mengubah zona waktu secara drastis"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Perubahan status kawasan sekitar IKN mengubah nilai strategis tempat (lokasi relatif), sehingga meningkatkan harga tanah secara drastis."
+          },
+          "distractorWhy": {
+            "1": "Koordinat garis astronomis (lokasi absolut) suatu tempat tidak berubah meskipun ada pembangunan IKN.",
+            "2": "Lonjakan harga tanah dipicu perkembangan pembangunan IKN (lokasi relatif), bukan oleh aktivitas lempeng geologis.",
+            "3": "Letak astronomis dan zona waktu wilayah tersebut tetap sama, tidak berpengaruh pada fluktuasi harga tanah."
+          }
+        },
+        {
+          "id": "ips-d-7-t1-q05",
+          "difficulty": "sedang",
+          "prompt": "Berdasarkan Buku Siswa IPS Kelas VII Edisi Revisi (hal. 6), pada tahun 1884 Konferensi Internasional Meridian menetapkan Greenwich di London sebagai standar waktu dunia (GMT). Penentuan pembagian zona waktu dunia ini memanfaatkan komponen lokasi astronomis berupa ....",
+          "options": [
+            "garis bujur dengan pergeseran 15 derajat mewakili perbedaan 1 jam",
+            "garis lintang yang dihitung 10 derajat untuk setiap perbedaan suhu",
+            "garis khatulistiwa yang membagi wilayah menjadi iklim tropis",
+            "garis kontur ketinggian yang diukur dari permukaan laut"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Garis bujur (meridian) digunakan untuk menentukan zona waktu di bumi; setiap selisih 15 derajat garis bujur setara dengan perbedaan waktu 1 jam."
+          },
+          "distractorWhy": {
+            "1": "Garis lintang berfungsi membagi zona iklim matahari, bukan pembagian zona waktu.",
+            "2": "Garis khatulistiwa adalah garis lintang 0 derajat untuk batas iklim tropis, bukan acuan pembagian jam waktu.",
+            "3": "Garis kontur menunjukkan ketinggian relief daratan pada peta topografi, bukan waktu."
+          }
+        },
+        {
+          "id": "ips-d-7-t1-q06",
+          "difficulty": "dasar",
+          "prompt": "Berdasarkan Buku Siswa IPS Kelas VII Edisi Revisi (hal. 7-8), pemanfaatan peta digital pada aplikasi pengiriman barang dan transportasi daring memberikan kemudahan bagi masyarakat, yaitu ....",
+          "options": [
+            "memudahkan pencarian rute efisien serta estimasi biaya dan waktu pengiriman",
+            "menghapuskan seluruh biaya pengiriman barang antarwilayah",
+            "mengubah koordinat lokasi absolut tempat tinggal pelanggan secara otomatis",
+            "menjamin barang pasti sampai tanpa memerlukan sarana transportasi"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Peta digital pada layanan pengiriman membantu menentukan rute terbaik, memantau posisi, dan menghitung estimasi biaya/waktu secara efisien."
+          },
+          "distractorWhy": {
+            "1": "Peta digital memberikan estimasi biaya yang presisi, bukan menghapuskan biaya pengiriman.",
+            "2": "Peta digital menampilkan koordinat lokasi tempat tinggal, bukan mengubah titik koordinat absolutnya.",
+            "3": "Peta digital adalah alat bantu navigasi dan pemantauan, sarana transportasi fisik tetap diperlukan."
+          }
+        },
+        {
+          "id": "ips-d-7-t1-q07",
+          "difficulty": "sedang",
+          "prompt": "Berdasarkan Buku Siswa IPS Kelas VII Edisi Revisi (hal. 51-52), perhatikan skema interaksi antarwilayah berikut!\n- Wilayah A: Surplus sayuran, minus ikan\n- Wilayah B: Surplus ikan, minus sayuran\n- Wilayah C: Surplus ikan, surplus sayuran\nInformasi yang tepat mengenai interaksi interregional tersebut adalah ....",
+          "options": [
+            "wilayah A dan wilayah B dapat saling melengkapi kebutuhan karena perbedaan komoditas",
+            "wilayah A hanya dapat melakukan perdagangan dengan wilayah C saja",
+            "wilayah B tidak membutuhkan hasil komoditas dari wilayah A",
+            "hubungan perdagangan antara wilayah B dan C lebih kuat daripada wilayah A dan B"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Syarat interaksi antarruang terjadi jika ada komparasi surplus-minus yang saling melengkapi (regional complementary) antara Wilayah A dan Wilayah B."
+          },
+          "distractorWhy": {
+            "1": "Wilayah A juga dapat berinteraksi dengan Wilayah B karena saling membutuhkan sayur dan ikan.",
+            "2": "Wilayah B mengalami minus sayuran sehingga tetap memerlukan sayuran dari Wilayah A.",
+            "3": "Wilayah B dan C sama-sama surplus ikan sehingga potensi interaksi komoditas ikan di antara keduanya lebih kecil."
+          }
+        },
+        {
+          "id": "ips-d-7-t1-q08",
+          "difficulty": "tinggi",
+          "prompt": "Berdasarkan Buku Siswa IPS Kelas VII Edisi Revisi (hal. 52), Indonesia terletak di antara 6LU-11LS dan 95BT-141BT serta di antara dua samudra. Pengaruh kondisi astronomis dan geografis tersebut terhadap karakteristik wilayah di Indonesia adalah ....",
+          "options": [
+            "wilayah seperti Bogor dan Bukit Tinggi beriklim sejuk dan basah sehingga cocok sebagai penghasil sayuran",
+            "seluruh wilayah pulau di Indonesia memiliki kondisi cuaca dan curah hujan yang persis sama",
+            "wilayah Nusa Tenggara tidak mengalami musim kemarau karena dikelilingi oleh samudra",
+            "pulau-pulau di wilayah timur Indonesia tidak terpengaruh oleh angin muson"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Topografi dataran tinggi dan iklim tropis basah di Bogor serta Bukittinggi mendukung iklim sejuk untuk budi daya tanaman hortikultura/sayuran."
+          },
+          "distractorWhy": {
+            "1": "Kondisi relief dan topografi Indonesia beragam sehingga cuaca dan curah hujan berbeda antarwilayah.",
+            "2": "Nusa Tenggara memiliki padang savana dan musim kemarau yang relatif lebih panjang dibanding wilayah barat.",
+            "3": "Seluruh wilayah Indonesia dipengaruhi oleh gerak semu matahari dan pergerakan angin muson."
+          }
+        },
+        {
+          "id": "ips-d-7-t1-q09",
+          "difficulty": "sedang",
+          "prompt": "Berdasarkan Buku Siswa IPS Kelas VII Edisi Revisi (hal. 52), perhatikan jenis peristiwa berikut:\n(1) Kebakaran\n(2) Puting beliung\n(3) Tsunami\n(4) Gempa bumi\n(5) Gunung meletus\n(6) Banjir\n(7) Tanah longsor\nBencana alam murni yang tidak dipengaruhi oleh perilaku manusia ditunjukkan oleh nomor ....",
+          "options": [
+            "(3), (4), dan (5)",
+            "(1), (4), dan (5)",
+            "(2), (3), dan (6)",
+            "(4), (6), dan (7)"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Tsunami, gempa bumi, dan gunung meletus adalah bencana alam geologis murni akibat aktivitas endogen bumi tanpa campur tangan manusia."
+          },
+          "distractorWhy": {
+            "1": "Kebakaran hutan/lahan sering kali dipicu oleh kelalaian atau aktivitas pembukaan lahan oleh manusia.",
+            "2": "Banjir bisa dipengaruhi oleh perilaku manusia seperti membuang sampah sembarangan dan penyempitan saluran air.",
+            "3": "Tanah longsor dan banjir sering kali disebabkan oleh pembalakan liar dan alih fungsi lahan oleh manusia."
+          }
+        },
+        {
+          "id": "ips-d-7-t1-q10",
+          "difficulty": "sedang",
+          "prompt": "Berdasarkan Buku Siswa IPS Kelas VII Edisi Revisi (hal. 53), perhatikan kegiatan berikut:\n(1) Sani meminum es degan di depan sekolah.\n(2) Risa membuat kue untuk dijual dengan cara menitipkannya ke warung-warung.\n(3) Rumi mengantarkan kue pesanan ke desa seberang.\nAktivitas yang mencerminkan kegiatan produksi, distribusi, dan konsumsi secara berurutan adalah ....",
+          "options": [
+            "(2), (3), dan (1)",
+            "(1), (2), dan (3)",
+            "(1), (3), dan (2)",
+            "(3), (1), dan (2)"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "(2) Risa membuat kue adalah produksi, (3) Rumi mengantarkan kue pesanan adalah distribusi, dan (1) Sani meminum es degan adalah konsumsi."
+          },
+          "distractorWhy": {
+            "1": "Pernyataan (1) adalah kegiatan konsumsi, bukan produksi.",
+            "2": "Pernyataan (1) adalah konsumsi dan (3) adalah distribusi.",
+            "3": "Pernyataan (3) adalah distribusi, bukan produksi."
+          }
+        },
+        {
+          "id": "ips-d-7-t1-q11",
+          "difficulty": "dasar",
+          "prompt": "Berdasarkan Buku Siswa IPS Kelas VII Edisi Revisi (hal. 53), Candi Borobudur merupakan hasil perpaduan kebudayaan Hindu-Buddha dengan budaya asli Indonesia berupa punden berundak. Bentuk interaksi sosial budaya tersebut dinamakan ....",
+          "options": [
+            "akulturasi",
+            "akomodasi",
+            "kerja sama",
+            "kontravensi"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Akulturasi adalah percampuran dua kebudayaan atau lebih yang menyatu tanpa menghilangkan ciri khas kepribadian kebudayaan aslinya."
+          },
+          "distractorWhy": {
+            "1": "Akomodasi adalah upaya penyelesaian konflik atau perselisihan antara pihak-pihak yang bertikai.",
+            "2": "Kerja sama adalah usaha bersama antarindividu/kelompok untuk mencapai tujuan bersama.",
+            "3": "Kontravensi adalah bentuk interaksi disosiatif berupa rasa tidak suka atau penolakan yang disembunyikan."
+          }
+        },
+        {
+          "id": "ips-d-7-t1-q12",
+          "difficulty": "dasar",
+          "prompt": "Berdasarkan Buku Siswa IPS Kelas VII Edisi Revisi (hal. 54), perselisihan antarsuporter sepak bola di jalanan yang berujung pada perkelahian dan kerusakan fisik merupakan contoh interaksi sosial disosiatif berbentuk ....",
+          "options": [
+            "disosiatif berupa pertentangan (konflik)",
+            "asosiatif berupa konflik",
+            "disosiatif berupa persaingan",
+            "disosiatif berupa kontravensi"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Pertentangan (konflik) adalah proses sosial disosiatif di mana pihak yang bertikai berusaha menyingkirkan lawan disertai ancaman atau kekerasan."
+          },
+          "distractorWhy": {
+            "1": "Konflik termasuk ke dalam bentuk interaksi disosiatif, bukan asosiatif.",
+            "2": "Persaingan (kompetisi) dilakukan secara sehat tanpa ancaman kekerasan fisik.",
+            "3": "Kontravensi merupakan sikap ragu-ragu, cemburu, atau kebencian yang belum meletus menjadi konflik terbuka."
+          }
+        },
+        {
+          "id": "ips-d-7-t1-q13",
+          "difficulty": "sedang",
+          "prompt": "Berdasarkan Buku Siswa IPS Kelas VII Edisi Revisi (hal. 37-38), interaksi sosial antarmanusia di masyarakat memerlukan dua syarat utama agar dapat berlangsung, yaitu ....",
+          "options": [
+            "kontak sosial dan komunikasi",
+            "persaingan dan konflik",
+            "sumber daya alam dan modal",
+            "status sosial dan jabatan"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Syarat terjadinya interaksi sosial adalah adanya kontak sosial (hubungan antarpihak) dan komunikasi (penyampaian pesan yang dipahami bersama)."
+          },
+          "distractorWhy": {
+            "1": "Persaingan dan konflik adalah contoh bentuk proses interaksi disosiatif, bukan syarat terjadinya interaksi.",
+            "2": "Sumber daya alam dan modal merupakan faktor produksi dalam kegiatan ekonomi.",
+            "3": "Status sosial dan jabatan merupakan struktur sosial di masyarakat, bukan syarat dasar berlangsungnya interaksi."
+          }
+        },
+        {
+          "id": "ips-d-7-t1-q14",
+          "difficulty": "sedang",
+          "prompt": "Berdasarkan Buku Siswa IPS Kelas VII Edisi Revisi (hal. 54), sejarah perlu dipelajari oleh setiap generasi manusia. Manusia, waktu, dan ruang memiliki keterkaitan yang tidak terpisahkan dalam sejarah karena ....",
+          "options": [
+            "ketiganya merupakan unsur-unsur utama dalam pembentukan peristiwa sejarah",
+            "ruang dan waktu dapat berdiri sendiri tanpa kehadiran subjek manusia",
+            "peristiwa masa lalu hanya ditentukan oleh faktor alam semata",
+            "manusia tidak dapat mempengaruhi arah perjalanan sejarah"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Unsur sejarah terdiri dari manusia (pelaku/subjek), ruang (tempat terjadinya), dan waktu (kapan terjadinya) yang saling melengkapi."
+          },
+          "distractorWhy": {
+            "1": "Tanpa adanya manusia sebagai pelaku, dinamika peristiwa sejarah tidak akan tercipta.",
+            "2": "Peristiwa sejarah senantiasa melibatkan peran dan peradaban manusia, bukan hanya alam.",
+            "3": "Manusia merupakan aktor utama yang menciptakan dan mengukir peristiwa sejarah."
+          }
+        },
+        {
+          "id": "ips-d-7-t1-q15",
+          "difficulty": "tinggi",
+          "prompt": "Berdasarkan Buku Siswa IPS Kelas VII Edisi Revisi (hal. 44 dan 54), analisis terhadap tradisi lisan (seperti mitos, legenda, dan cerita rakyat) cenderung lebih sulit dilakukan oleh sejarawan dibandingkan sumber tertulis karena ....",
+          "options": [
+            "sejarawan perlu menangkap kenyataan fakta di balik cerita yang dipengaruhi mitos dan ingatan subjektif",
+            "tradisi lisan telah dicatat secara detail pada prasasti batu masa purbakala",
+            "isi cerita rakyat selalu menyajikan fakta ilmiah yang konsisten dari waktu ke waktu",
+            "tidak ada narasumber yang bersedia menceritakan kembali tradisi lisan daerah"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Tradisi lisan bercampur dengan imajinasi, takhayul, atau perubahan penuturan verbal sehingga membutuhkan kehati-hatian untuk menemukan kenyataan historis di baliknya."
+          },
+          "distractorWhy": {
+            "1": "Tradisi lisan diwariskan dari mulut ke mulut, bukan dalam bentuk prasasti tertulis.",
+            "2": "Tradisi lisan sering kali mengandung unsur khayalan atau mitos yang kurang rasional.",
+            "3": "Tradisi lisan masih dituturkan oleh generasi tua, tetapi keabsahan informasinya perlu diuji kritis."
+          }
+        },
+        {
+          "id": "ips-d-7-t1-q16",
+          "difficulty": "sedang",
+          "prompt": "Berdasarkan Buku Siswa IPS Kelas VII Edisi Revisi (hal. 43 dan 54), peristiwa sejarah memiliki sifat abadi, unik, dan penting. Peristiwa sejarah dikatakan memiliki nilai penting karena ....",
+          "options": [
+            "memiliki pengaruh yang besar dan dikenang oleh banyak orang sepanjang masa",
+            "dapat diulang kembali dengan pelaku dan tempat yang sama persis",
+            "hanya terjadi di daerah pedesaan pada zaman kuno",
+            "tidak memberikan pelajaran bagi kehidupan generasi masa depan"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Peristiwa sejarah memiliki nilai penting karena dampaknya yang luas dan signifikan bagi kehidupan bermasyarakat sehingga terus dikenang."
+          },
+          "distractorWhy": {
+            "1": "Peristiwa sejarah bersifat unik (einmalig), artinya hanya terjadi satu kali dan tidak dapat diulang persis sama.",
+            "2": "Peristiwa sejarah dapat terjadi di mana saja (nasional, internasional, maupun lokal), bukan terbatas di pedesaan kuno.",
+            "3": "Sejarah memberikan hikmah dan pelajaran berharga untuk masa kini dan masa depan."
+          }
+        },
+        {
+          "id": "ips-d-7-t1-q17",
+          "difficulty": "tinggi",
+          "prompt": "Berdasarkan Buku Siswa IPS Kelas VII Edisi Revisi (hal. 56-57), maraknya penawaran promosi belanja pada aplikasi digital saat pandemi dapat memicu perilaku konsumtif di masyarakat. Langkah paling tepat sebagai konsumen yang bijak agar tidak terjebak gaya hidup konsumtif adalah ....",
+          "options": [
+            "membuat perencanaan keuangan yang matang dan berbelanja sesuai dengan skala prioritas kebutuhan",
+            "menggunakan pinjaman daring untuk membeli semua produk barang yang diskon",
+            "membeli barang berlebihan demi gengsi sosial di media sosial",
+            "menghentikan seluruh kegiatan konsumsi barang makanan pokok sehari-hari"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Konsumen bijak harus membedakan antara kebutuhan (needs) dan keinginan (wants) dengan menyusun skala prioritas pengeluaran."
+          },
+          "distractorWhy": {
+            "1": "Menggunakan utang/pinjaman online untuk barang non-primer memicu masalah finansial yang buruk.",
+            "2": "Membeli barang atas dasar gengsi memperparah perilaku konsumtif dan hedonisme.",
+            "3": "Konsumsi barang kebutuhan pokok tetap wajib dilakukan untuk kelangsungan hidup sehari-hari."
+          }
+        },
+        {
+          "id": "ips-d-7-t1-q18",
+          "difficulty": "sedang",
+          "prompt": "Berdasarkan Buku Siswa IPS Kelas VII Edisi Revisi (hal. 57-58), budaya menyontek saat ujian merupakan tindakan curang yang melanggar nilai dan norma kejujuran di sekolah. Agen sosialisasi pertama dan utama yang paling berperan membentuk karakter jujur sejak dini adalah ....",
+          "options": [
+            "keluarga",
+            "kelompok bermain",
+            "media massa",
+            "partai politik"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Keluarga merupakan agen sosialisasi primer yang pertama kali menanamkan nilai-nilai moral, keimanan, dan kejujuran kepada anak."
+          },
+          "distractorWhy": {
+            "1": "Kelompok bermain (peer group) merupakan agen sosialisasi sekunder setelah anak berada di luar rumah.",
+            "2": "Media massa berperan menyampaikan informasi publik dan hiburan, bukan wadah sosialisasi primer dasar.",
+            "3": "Partai politik berperan dalam sosialisasi politik pada jenjang usia dewasa."
+          }
+        }
+      ]
+    },
+    {
+      "code": "KOMP-IPS-D-7-BAB2-01",
+      "grade": 7,
+      "name": "Tema 02: Keberagaman Lingkungan Sekitar",
+      "materi": "Proses Pembentukan Bumi & Masa Praaksara, Keberagaman Bentang Alam & Lingkungan, Interaksi Manusia & Konservasi SDA, Peran Lembaga Sosial & Ekonomi",
+      "cpRef": "Ilmu Pengetahuan Sosial untuk SMP/MTs Kelas VII (Edisi Revisi) — Tema 02",
+      "items": [
+        {
+          "id": "ips-d-7-t2-q01",
+          "difficulty": "dasar",
+          "prompt": "Berdasarkan Buku Siswa IPS Kelas VII hal. 97 (Evaluasi Tema 02), kemunculan makhluk hidup di permukaan bumi yang menandakan kondisi bumi sudah mulai stabil terjadi sekitar 140 juta tahun lalu pada zaman...",
+          "options": [
+            "Mesozoikum",
+            "Arkaekum",
+            "Paleozoikum",
+            "Neozoikum"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Zaman Mesozoikum (sekitar 140–65 juta tahun lalu) merupakan masa sekunder saat kondisi bumi mulai stabil dan ditandai oleh munculnya reptil raksasa serta mamalia purba."
+          },
+          "distractorWhy": {
+            "1": "Masa Arkaekum terjadi sekitar 2,5 miliar tahun lalu ketika bumi masih sangat panas dan belum ada tanda-tanda kehidupan.",
+            "2": "Masa Paleozoikum terjadi sekitar 340 juta tahun lalu saat organisme bersel satu dan bertulang belakang awal mulai muncul.",
+            "3": "Masa Neozoikum terjadi sekitar 60 juta tahun lalu hingga sekarang dan terbagi menjadi zaman tersier serta kuarter."
+          }
+        },
+        {
+          "id": "ips-d-7-t2-q02",
+          "difficulty": "sedang",
+          "prompt": "Berdasarkan Buku Siswa IPS Kelas VII hal. 97 (Evaluasi Tema 02), kota-kota metropolitan seperti Jakarta, Surabaya, dan Bandung memiliki tingkat pencemaran udara PM 2.5 berkisar 30–42 mikrogram akibat tingginya penggunaan kendaraan bermotor, sedangkan kota dengan mobilitas kendaraan rendah memiliki tingkat cemaran udara rendah. Hal ini menunjukkan bahwa...",
+          "options": [
+            "Kota-kota metropolitan memberikan sumbangan yang besar terhadap pencemaran udara dibandingkan dengan kota-kota kecil",
+            "Kota-kota metropolitan memberikan sumbangan yang kecil terhadap pencemaran udara dibandingkan dengan kota-kota kecil",
+            "Kota-kota metropolitan memiliki tingkat pencemaran udara yang sama persis dengan kota-kota kecil",
+            "Penggunaan kendaraan bermotor di kota metropolitan tidak memengaruhi kualitas udara secara signifikan"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Tingginya volume kendaraan bermotor di kawasan metropolitan berbanding lurus dengan jumlah emisi gas buang dan partikel PM 2.5 yang mencemari udara."
+          },
+          "distractorWhy": {
+            "1": "Pernyataan ini berlawanan dengan fakta empiris bahwa emisi kendaraan padat di kota besar menyumbang polusi udara terbesar.",
+            "2": "Tingkat polusi udara di kota metropolitan jauh lebih tinggi daripada kota kecil karena perbedaan densitas kendaraan bermotor.",
+            "3": "Emisi gas buang dari kendaraan bermotor merupakan penyebab utama penurunan kualitas udara di wilayah perkotaan."
+          }
+        },
+        {
+          "id": "ips-d-7-t2-q03",
+          "difficulty": "sedang",
+          "prompt": "Berdasarkan Buku Siswa IPS Kelas VII hal. 98, perhatikan empat aktivitas berikut:\n(1) Menggunakan sarana transportasi umum\n(2) Mengembangkan kendaraan bertenaga listrik\n(3) Menanam pohon-pohon di hutan\n(4) Memakai masker ketika beraktivitas\n\nSolusi yang paling tepat untuk menanggulangi dan memitigasi sumber pencemaran udara dari sektor transportasi adalah...",
+          "options": [
+            "(1) dan (2)",
+            "(2) dan (3)",
+            "(3) dan (4)",
+            "(1) dan (4)"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Menggunakan transportasi umum menekan jumlah emisi per kapita, sedangkan mengembangkan kendaraan listrik mengurangi ketergantungan pada bahan bakar fosil penyebab polusi."
+          },
+          "distractorWhy": {
+            "1": "Penanaman pohon di hutan menanggulangi deforestasi, tetapi kurang spesifik mengatasi emisi transportasi perkotaan secara langsung.",
+            "2": "Memakai masker hanya langkah proteksi diri individu dari paparan polusi, bukan solusi menurunkan sumber polusi udara.",
+            "3": "Memakai masker tidak mengurangi jumlah gas buang yang dihasilkan oleh kendaraan bermotor di jalan raya."
+          }
+        },
+        {
+          "id": "ips-d-7-t2-q04",
+          "difficulty": "dasar",
+          "prompt": "Berdasarkan Buku Siswa IPS Kelas VII hal. 98 (Evaluasi Tema 02), faktor internal yang mendukung terjadinya dinamika sosial di dalam masyarakat mencakup hal-hal berikut, KECUALI...",
+          "options": [
+            "Bencana alam",
+            "Dinamika jumlah penduduk",
+            "Konflik sosial antar kelompok",
+            "Revolusi atau pemberontakan internal"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Bencana alam merupakan faktor eksternal yang berasal dari lingkungan fisik di luar struktur internal masyarakat."
+          },
+          "distractorWhy": {
+            "1": "Perubahan atau dinamika jumlah penduduk merupakan faktor internal yang memicu perubahan struktur sosial.",
+            "2": "Konflik sosial di dalam masyarakat merupakan faktor internal penyebab pergeseran dan dinamika sosial.",
+            "3": "Revolusi internal merupakan dorongan perubahan sosial yang berasal dari dalam masyarakat itu sendiri."
+          }
+        },
+        {
+          "id": "ips-d-7-t2-q05",
+          "difficulty": "dasar",
+          "prompt": "Berdasarkan Buku Siswa IPS Kelas VII hal. 98, pada era 2000-an penggunaan telepon genggam belum meluas, namun saat ini ketergantungan individu terhadap smartphone sangat tinggi hingga mengubah pola komunikasi dan perilaku masyarakat. Fenomena ini dikategorikan sebagai...",
+          "options": [
+            "Perubahan sosial",
+            "Interaksi sosial",
+            "Dinamika sosial",
+            "Mobilitas sosial"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Perubahan sosial merujuk pada peralihan pola perilaku, norma, dan peradaban masyarakat akibat perkembangan teknologi informasi."
+          },
+          "distractorWhy": {
+            "1": "Interaksi sosial merujuk pada hubungan timbal balik antarindividu atau kelompok, bukan fenomena peralihan pola budaya akibat teknologi.",
+            "2": "Dinamika sosial adalah proses pergerakan internal kelompok, bukan istilah umum untuk perubahan pola hidup masyarakat.",
+            "3": "Mobilitas sosial merujuk pada perpindahan status sosial seseorang dalam hierarki masyarakat."
+          }
+        },
+        {
+          "id": "ips-d-7-t2-q06",
+          "difficulty": "tinggi",
+          "prompt": "Berdasarkan Buku Siswa IPS Kelas VII hal. 99, penggunaan bahan kimia seperti pestisida dan pupuk anorganik sejak Revolusi Hijau dapat meningkatkan produksi pertanian, namun dampak jangka panjangnya menyebabkan pencemaran tanah sehingga tanah menjadi tidak subur. Solusi yang tepat untuk memulihkan tanah tercemar tersebut adalah...",
+          "options": [
+            "Mendegradasi zat pencemar dan racun dalam tanah melalui pemulihan lingkungan",
+            "Menambah dosis pupuk kimia sintetis agar unsur hara bertambah cepat",
+            "Membiarkan tanah tanpa pengolahan agar zat racun menguap sendiri secara alami",
+            "Mengubah seluruh lahan pertanian tercemar menjadi kawasan pemukiman industri"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Degradasi zat pencemar (remediasi/bioremediasi) menguraikan racun kimia sintetis dalam tanah menjadi senyawa tidak berbahaya sehingga kesuburan tanah pulih."
+          },
+          "distractorWhy": {
+            "1": "Menambah pupuk kimia sintetis justru akan memperparah akumulasi racun dan merusak struktur tanah.",
+            "2": "Zat cemaran pestisida kimia bersifat persisten di dalam tanah dan tidak mudah hilang tanpa upaya pemulihan aktif.",
+            "3": "Mengubah fungsi lahan pertanian mengurangi ketersediaan lahan pangan nasional dan tidak menyelesaikan pencemaran tanah."
+          }
+        },
+        {
+          "id": "ips-d-7-t2-q07",
+          "difficulty": "sedang",
+          "prompt": "Berdasarkan Buku Siswa IPS Kelas VII hal. 99, pada masa berburu dan mengumpulkan makanan tingkat sederhana (50.000–10.000 SM), manusia praaksara telah mengenal pembagian kerja berdasarkan jenis kelamin. Peran utama kaum perempuan pada masa tersebut adalah...",
+          "options": [
+            "Mengumpulkan makanan di sekitar tempat tinggal dan mengasuh anak",
+            "Berburu binatang buas berukuran besar di hutan rimba",
+            "Membuat alat-alat dari logam dan perunggu untuk bertani",
+            "Membuka lahan pertanian skala besar dengan teknik tebang bakar"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Pada masa berburu tingkat sederhana, perempuan bertugas mengumpulkan tumbuh-tumbuhan, buah, dan mengasuh anak di dekat perkemahan sementara kaum laki-laki berburu hewan."
+          },
+          "distractorWhy": {
+            "1": "Berburu binatang buas jarak jauh memerlukan fisik kuat dan merupakan tugas utama kelompok laki-laki.",
+            "2": "Teknologi perunggu dan logam baru berkembang pada masa Perundagian ribuan tahun kemudian.",
+            "3": "Pembukaan lahan pertanian tebang bakar baru dikenal pada masa bercocok tanam (Neolitikum)."
+          }
+        },
+        {
+          "id": "ips-d-7-t2-q08",
+          "difficulty": "sedang",
+          "prompt": "Berdasarkan Buku Siswa IPS Kelas VII hal. 99, jumlah penduduk Indonesia terus meningkat dari 272,6 juta jiwa (2020) menjadi 278,6 juta jiwa (2023). Untuk menjamin kesejahteraan penduduk melalui pemenuhan layanan dasar pendidikan dan kesehatan, program pembangunan diselaraskan dengan SDGs pada pilar...",
+          "options": [
+            "Pembangunan sosial",
+            "Pembangunan ekonomi",
+            "Pembangunan lingkungan",
+            "Pembangunan tata kelola"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Pilar pembangunan sosial SDGs berfokus pada pemenuhan hak dasar manusia mencakup pengentasan kemiskinan, kesehatan, pendidikan berkualitas, dan kesetaraan."
+          },
+          "distractorWhy": {
+            "1": "Pilar pembangunan ekonomi berfokus pada pertumbuhan ekonomi berkualitas, pekerjaan layak, dan inovasi industri.",
+            "2": "Pilar pembangunan lingkungan berfokus pada konservasi ekosistem darat, lautan, serta penanganan perubahan iklim.",
+            "3": "Pilar pembangunan tata kelola berfokus pada perdamaian, keadilan, dan kelembagaan yang tangguh."
+          }
+        },
+        {
+          "id": "ips-d-7-t2-q09",
+          "difficulty": "tinggi",
+          "prompt": "Berdasarkan Buku Siswa IPS Kelas VII hal. 100, lonjakan minat dan penggunaan mobil listrik di Indonesia dari 3.205 unit menjadi 20.681 unit direspon pemerintah dan produsen melalui pengembangan teknologi ramah lingkungan. Fenomena ini merupakan bentuk respons terhadap sumber daya minyak bumi yang...",
+          "options": [
+            "Terbatas dan tidak dapat diperbarui",
+            "Jumlahnya tidak terbatas di alam",
+            "Sangat mudah didaur ulang secara alami",
+            "Tidak memiliki dampak emisi karbon"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Minyak bumi merupakan bahan bakar fosil yang jumlahnya terbatas di alam dan depositnya akan habis sehingga mendorong transisi ke energi listrik."
+          },
+          "distractorWhy": {
+            "1": "Minyak bumi terbentuk dari fosil yang memerlukan waktu jutaan tahun sehingga persediaannya terbatas.",
+            "2": "Minyak bumi tidak bisa didaur ulang setelah dibakar menjadi energi emisi.",
+            "3": "Pembakaran minyak bumi menghasilkan emisi gas rumah kaca yang memicu pemanasan global."
+          }
+        },
+        {
+          "id": "ips-d-7-t2-q10",
+          "difficulty": "sedang",
+          "prompt": "Berdasarkan Buku Siswa IPS Kelas VII hal. 100, produsen UMKM kuliner moci mengalami peningkatan permintaan dua kali lipat sehingga membeli mesin modern untuk menambah kapasitas dan variasi rasa. Hal ini menunjukkan bahwa perkembangan IPTEK dalam kegiatan ekonomi bertujuan untuk...",
+          "options": [
+            "Memaksimalkan proses produksi serta meningkatkan kualitas dan kuantitas produk",
+            "Mengurangi ketergantungan pada konsumen luar daerah",
+            "Menghilangkan kebutuhan akan tenaga kerja manusia secara total",
+            "Membatasi jumlah barang yang beredar di pasar"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Penerapan IPTEK dan mesin modern mempermudah produsen menghasilkan produk berkualitas lebih baik dalam jumlah yang sesuai kebutuhan pasar."
+          },
+          "distractorWhy": {
+            "1": "Penggunaan teknologi justru membantu UMKM menjangkau pasar konsumen luar daerah yang lebih luas.",
+            "2": "Penerapan mesin pada UMKM bertujuan mendukung efisiensi kerja, bukan menghapus seluruh tenaga kerja.",
+            "3": "Mesin baru digunakan untuk meningkatkan volume produksi, bukan membatasi barang beredar."
+          }
+        },
+        {
+          "id": "ips-d-7-t2-q11",
+          "difficulty": "dasar",
+          "prompt": "Berdasarkan Buku Siswa IPS Kelas VII hal. 74 (Aktivitas 2), proses perpaduan dua kebudayaan atau lebih yang saling memengaruhi sehingga menghasilkan unsur kebudayaan baru tanpa menghilangkan ciri khas kebudayaan aslinya disebut...",
+          "options": [
+            "Akulturasi",
+            "Asimilasi",
+            "Difusi",
+            "Internalisasi"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Akulturasi terjadi ketika budaya asing diterima dan diolah ke dalam kebudayaan sendiri tanpa menyebabkan hilangnya kepribadian kebudayaan asli."
+          },
+          "distractorWhy": {
+            "1": "Asimilasi merupakan pembauran dua kebudayaan yang disertai dengan hilangnya ciri khas kebudayaan asli membentuk budaya baru.",
+            "2": "Difusi adalah proses penyebaran unsur-unsur kebudayaan dari satu individu/masyarakat ke individu/masyarakat lain.",
+            "3": "Internalisasi adalah proses penanaman nilai dan norma ke dalam kepribadian individu sejak kecil."
+          }
+        },
+        {
+          "id": "ips-d-7-t2-q12",
+          "difficulty": "dasar",
+          "prompt": "Berdasarkan Buku Siswa IPS Kelas VII hal. 81 (Aktivitas 4), pembabakan masa praaksara secara arkeologis yang ditandai dengan penggunaan alat batu yang masih kasar dan belum diasah seperti kapak genggam adalah...",
+          "options": [
+            "Paleolitikum",
+            "Mesolitikum",
+            "Neolitikum",
+            "Perundagian"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Zaman Paleolitikum (zaman batu tua) ditandai oleh alat-alat batu yang dikerjakan secara kasar dan belum dihaluskan untuk berburu."
+          },
+          "distractorWhy": {
+            "1": "Zaman Mesolitikum (zaman batu tengah) ditandai oleh pembuat kapak genggam Sumatra dan mulai menetap di gua-gua.",
+            "2": "Zaman Neolitikum (zaman batu baru) ditandai oleh perkakas batu yang sudah diasah halus seperti beliung persegi.",
+            "3": "Zaman Perundagian merupakan masa pertukangan logam (perunggu dan besi)."
+          }
+        },
+        {
+          "id": "ips-d-7-t2-q13",
+          "difficulty": "tinggi",
+          "prompt": "Berdasarkan Buku Siswa IPS Kelas VII hal. 86 (Aktivitas 6), manusia praaksara pada masa berburu dan mengumpulkan makanan tingkat lanjut mulai membuat lukisan dinding gua berupa cap-cap tangan dan gambar binatang. Makna utama seni lukis gua tersebut adalah...",
+          "options": [
+            "Sebagai bagian dari ritual kepercayaan, permohonan perlindungan, dan rekaman pengalaman berburu",
+            "Sebagai barang dagangan bernilai ekonomi tinggi untuk ditukarkan dengan suku lain",
+            "Sebagai hiasan estetis komersial untuk menarik perhatian kelompok luar",
+            "Sebagai alat komunikasi berbasis sistem tulisan alfabet formal"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Lukisan dinding gua pada masa praaksara bernilai magis-religius yang berkaitan dengan simbol permohonan keberhasilan berburu dan penghormatan roh."
+          },
+          "distractorWhy": {
+            "1": "Pada masa batu pertengahan belum terdapat aktivitas perdagangan lukisan komersial.",
+            "2": "Lukisan gua dibuat bukan untuk tujuan dekorasi komersial melainkan kebutuhan spritual dan ekspresi pengalaman.",
+            "3": "Masa tersebut merupakan masa praaksara sehingga masyarakat belum mengenal sistem aksara tulisan alfabet."
+          }
+        },
+        {
+          "id": "ips-d-7-t2-q14",
+          "difficulty": "sedang",
+          "prompt": "Berdasarkan Buku Siswa IPS Kelas VII hal. 87 (Aktivitas 7), pada masa bercocok tanam (Neolitikum), masyarakat membangun berbagai bangunan batu besar seperti dolmen, menhir, dan sarkofagus. Keberadaan bangunan megalitikum ini mencerminkan sistem kepercayaan...",
+          "options": [
+            "Penghormatan terhadap roh nenek moyang dan pemujaan kekuatan alam",
+            "Kepercayaan monoteisme modern berbasis kitab tertulis",
+            "Penolakan terhadap semua bentuk bangunan ritual keagamaan",
+            "Penyembahan berhala berbasis teknologi manufaktur mesin"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Tradisi megalitikum berkembang karena adanya keyakinan bahwa roh nenek moyang tetap mengawasi dan memengaruhi kehidupan keturunannya."
+          },
+          "distractorWhy": {
+            "1": "Masyarakat praaksara belum mengenal agama monoteisme modern dengan kitab suci.",
+            "2": "Bangunan dolmen dan menhir justru membuktikan keberadaan ritual keagamaan yang sangat kuat.",
+            "3": "Masyarakat Neolitikum belum menggunakan teknologi mesin manufaktur."
+          }
+        },
+        {
+          "id": "ips-d-7-t2-q15",
+          "difficulty": "tinggi",
+          "prompt": "Berdasarkan Buku Siswa IPS Kelas VII hal. 89 (Aktivitas 8), pada masa Perundagian perdagangan antarpulau semakin ramai dengan memanfaatkan sarana perahu bercadik. Mekanisme transaksi ekonomi yang berlaku pada era tersebut adalah...",
+          "options": [
+            "Barter atau tukar-menukar barang berupa nekara perunggu, perhiasan, dan hasil bumi",
+            "Penggunaan mata uang kertas resmi terbitan bank sentral",
+            "Pembayaran menggunakan koin emas berstempel standar internasional",
+            "Sistem transfer kredit digital berbasis perbankan"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Meskipun teknologi perunggu sudah maju, alat pembayaran uang resmi belum ada sehingga perdagangan dilakukan secara barter dengan barang bernilai tinggi seperti nekara dan perhiasan."
+          },
+          "distractorWhy": {
+            "1": "Mata uang kertas belum dikenal pada masa praaksara.",
+            "2": "Koin emas berskala internasional baru hadir pada era kerajaan Hindu-Buddha dan Islam.",
+            "3": "Sistem transfer digital merupakan inovasi teknologi keuangan masa modern."
+          }
+        },
+        {
+          "id": "ips-d-7-t2-q16",
+          "difficulty": "sedang",
+          "prompt": "Berdasarkan Buku Siswa IPS Kelas VII hal. 93 (Aktivitas 9), fenomena pemanasan suhu permukaan laut di Samudra Pasifik bagian tengah dan timur yang berakibat pada menurunnya curah hujan drastis dan kekeringan panjang di Indonesia dinamakan...",
+          "options": [
+            "El Nino",
+            "La Nina",
+            "Efek rumah kaca",
+            "Gelombang tsunami"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "El Nino memicu pergeseran awan hujan menjauhi wilayah Indonesia sehingga menyebabkan kemarau panjang dan kekeringan."
+          },
+          "distractorWhy": {
+            "1": "La Nina merupakan fenomena pendinginan suhu muka laut Pasifik yang menyebabkan curah hujan tinggi dan banjir di Indonesia.",
+            "2": "Efek rumah kaca adalah proses terperangkapnya panas matahari oleh gas atmosfer secara global.",
+            "3": "Tsunami adalah gelombang laut raksasa yang dipicu oleh gempa bumi atau letusan gunung api bawah laut."
+          }
+        },
+        {
+          "id": "ips-d-7-t2-q17",
+          "difficulty": "tinggi",
+          "prompt": "Berdasarkan Buku Siswa IPS Kelas VII hal. 101 (Evaluasi Essay No. 5), perburuan hiu secara masif untuk diambil siripnya memberikan nilai ekonomi tinggi bagi nelayan, namun mengancam kepunahan predator puncak laut. Berdasarkan prinsip pembangunan berkelanjutan, langkah pengelolaan yang tepat adalah...",
+          "options": [
+            "Menghentikan perburuan hiu liar dan mengembangkan mata pencaharian alternatif berkelanjutan demi menjaga ekosistem laut",
+            "Meningkatkan kapasitas kuota penangkapan hiu agar pendapatan nelayan melonjak pesat",
+            "Membiarkan perburuan sirip hiu tanpa batasan karena memberikan harga jual tinggi bagi pasar",
+            "Memusnahkan seluruh habitat laut agar tidak ada persaingan ekosistem"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Pembangunan berkelanjutan menjamin pemanfaatan sumber daya tanpa mengorbankan kelestarian ekosistem dan keanekaragaman hayati laut bagi generasi mendatang."
+          },
+          "distractorWhy": {
+            "1": "Meningkatkan kuota penangkapan akan mempercepat kepunahan hiu dan merusak keseimbangan ekosistem laut.",
+            "2": "Pembiaran perburuan liar bertentangan dengan pilar pembangunan lingkungan SDGs.",
+            "3": "Memusnahkan habitat laut akan menghancurkan sumber kehidupan manusia dan biota lingkungan."
+          }
+        },
+        {
+          "id": "ips-d-7-t2-q18",
+          "difficulty": "dasar",
+          "prompt": "Berdasarkan Buku Siswa IPS Kelas VII hal. 65, pada pembabakan sejarah bumi secara geologis, masa Arkaekum yang berlangsung sekitar 2,5 miliar tahun lalu memiliki karakteristik utama yaitu...",
+          "options": [
+            "Kulit bumi masih sangat panas dan dalam proses pembentukan sehingga belum ada tanda kehidupan",
+            "Suhu bumi sudah stabil dan ditumbuhi hutan hujan tropis lebat",
+            "Bumi didominasi oleh reptil raksasa dinosaurus",
+            "Manusia praaksara mulai hidup menetap di sekitar sungai"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Masa Arkaekum merupakan masa tertua ketika bumi dalam keadaan sangat panas dan belum memungkinkan adanya kehidupan."
+          },
+          "distractorWhy": {
+            "1": "Kondisi bumi yang stabil dengan tumbuhan lebat terjadi pada masa Paleozoikum dan Mesozoikum.",
+            "2": "Reptil raksasa hidup pada masa Mesozoikum.",
+            "3": "Kehadiran manusia praaksara baru terjadi pada zaman Kuarter di masa Neozoikum."
+          }
+        },
+        {
+          "id": "ips-d-7-t2-q19",
+          "difficulty": "sedang",
+          "prompt": "Berdasarkan Buku Siswa IPS Kelas VII hal. 70, pencemaran tanah sering terjadi akibat penumpukan limbah padat non-biodegradable seperti sampah plastik dan limbah B3. Dampak ekologis paling serius dari pencemaran tanah ini adalah...",
+          "options": [
+            "Menurunnya kesuburan tanah serta rusaknya populasi mikroorganisme pengurai",
+            "Meningkatnya kandungan oksigen murni di dalam pori-pori tanah",
+            "Mempercepat pematangan tanaman pertanian tanpa perlu penyiraman",
+            "Mencegah erosi dan tanah longsor saat musim hujan"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Bahan pencemar mematikan cacing dan mikroorganisme tanah sehingga proses pembentukan humus terganggu dan kesuburan tanah merosot."
+          },
+          "distractorWhy": {
+            "1": "Pencemaran tanah justru menurunkan kualitas aerasi dan mematikan biota tanah.",
+            "2": "Limbah beracun merusak akar tanaman dan menurunkan produktivitas pertanian.",
+            "3": "Pencemaran tanah merusak struktur tanah sehingga tanah menjadi rawan erosi."
+          }
+        },
+        {
+          "id": "ips-d-7-t2-q20",
+          "difficulty": "sedang",
+          "prompt": "Berdasarkan Buku Siswa IPS Kelas VII hal. 90-91, kerangka Pembangunan Berkelanjutan (SDGs) ditopang oleh empat pilar utama. Pilar yang secara khusus mengatur konservasi ekosistem daratan dan perairan serta penanganan iklim adalah...",
+          "options": [
+            "Pilar pembangunan lingkungan",
+            "Pilar pembangunan ekonomi",
+            "Pilar pembangunan sosial",
+            "Pilar pembangunan tata kelola"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Pilar pembangunan lingkungan mencakup keberlanjutan sumber daya alam, keanekaragaman hayati darat dan air, serta aksi iklim."
+          },
+          "distractorWhy": {
+            "1": "Pilar pembangunan ekonomi berfokus pada pekerjaan layak, energi bersih, dan inovasi industri.",
+            "2": "Pilar pembangunan sosial mencakup bidang pendidikan, kesehatan, dan pengentasan kemiskinan.",
+            "3": "Pilar pembangunan tata kelola mencakup penegakan hukum, keadilan, dan perdamaian."
+          }
+        }
+      ]
+    },
+    {
+      "code": "KOMP-IPS-D-7-BAB3-01",
+      "grade": 7,
+      "name": "Tema 03: Potensi Ekonomi Lingkungan",
+      "materi": "Potensi Sumber Daya Alam (Hutan, Tambang, Laut), Kegiatan Ekonomi (Produksi, Distribusi, Konsumsi), Hukum Permintaan & Penawaran, Pasar & Peran Teknologi",
+      "cpRef": "Ilmu Pengetahuan Sosial untuk SMP/MTs Kelas VII (Edisi Revisi) — Tema 03",
+      "items": [
+        {
+          "id": "ips-d-7-t3-q01",
+          "difficulty": "dasar",
+          "prompt": "Berdasarkan Buku Siswa IPS Kelas VII hal. 150, hutan merupakan salah satu potensi sumber daya alam Indonesia yang berfungsi sebagai sumber bahan baku untuk menghasilkan barang dan jasa. Hutan dapat berfungsi sebagai hutan produksi, hutan lindung, dan hutan konservasi. Jenis hutan yang dimanfaatkan secara khusus untuk diambil hasil kayunya maupun non-kayu dalam kegiatan produksi adalah...",
+          "options": [
+            "Hutan produksi",
+            "Hutan lindung",
+            "Hutan konservasi",
+            "Hutan suaka alam"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Hutan produksi adalah kawasan hutan yang memiliki fungsi pokok menghasilkan hasil hutan, baik kayu maupun non-kayu, untuk memenuhi kebutuhan industri dan kegiatan ekonomi masyarakat."
+          },
+          "distractorWhy": {
+            "1": "Hutan lindung berfungsi utama untuk melindungi sistem penyangga kehidupan seperti mengatur tata air, mencegah banjir, dan mengendalikan erosi, bukan diproduksi hasil kayunya.",
+            "2": "Hutan konservasi difokuskan untuk pengawetan keanekaragaman tumbuhan dan satwa serta ekosistemnya.",
+            "3": "Hutan suaka alam merupakan bagian dari hutan konservasi yang ditujukan khusus untuk perlindungan cagar alam dan suaka margasatwa."
+          }
+        },
+        {
+          "id": "ips-d-7-t3-q02",
+          "difficulty": "sedang",
+          "prompt": "Berdasarkan Buku Siswa IPS Kelas VII hal. 150, Pak Bambang melakukan penelusuran jejak serpihan mineral dengan cara mengambil sampel endapan sungai, kemudian mendulangnya untuk mengetahui keberadaan kandungan mineral berharga. Tahapan awal kegiatan pertambangan yang dilakukan Pak Bambang tersebut dinamakan...",
+          "options": [
+            "Prospeksi",
+            "Eksplorasi",
+            "Eksploitasi",
+            "Pengolahan"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Prospeksi merupakan kegiatan penyelidikan dan pencarian awal untuk menemukan keberadaan serpihan endapan atau keterdapatan mineral berharga di suatu wilayah."
+          },
+          "distractorWhy": {
+            "1": "Eksplorasi adalah tahap lanjutan untuk mengetahui ukuran, bentuk, posisi, kadar rata-rata, dan besarnya cadangan dari endapan bahan galian.",
+            "2": "Eksploitasi adalah kegiatan penambangan yang meliputi aktivitas pengambilan dan pengangkutan bahan tambang.",
+            "3": "Pengolahan adalah kegiatan untuk memurnikan dan meningkatkan mutu bahan tambang yang telah ditambang."
+          }
+        },
+        {
+          "id": "ips-d-7-t3-q03",
+          "difficulty": "sedang",
+          "prompt": "Berdasarkan Buku Siswa IPS Kelas VII hal. 150-151, pada tahun 2045 Indonesia diproyeksikan mendapat bonus demografi. Sebagai peserta didik, langkah yang paling tepat dilakukan untuk mempersiapkan diri menghadapi bonus demografi tersebut adalah...",
+          "options": [
+            "Meningkatkan kemampuan literasi keuangan dan literasi digital serta rajin belajar",
+            "Mengambil alih proyek pembangunan fisik infrastruktur nasional secara langsung",
+            "Fokus mencari pekerjaan kasar tanpa memperhitungkan tingkat pendidikan",
+            "Menyerahkan seluruh pengelolaan sumber daya alam kepada pihak asing"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Peserta didik sebagai generasi muda perlu menyiapkan kapasitas diri melalui rajin belajar, serta menguasai literasi digital dan literasi keuangan untuk menjadi sumber daya manusia yang berkualitas tinggi."
+          },
+          "distractorWhy": {
+            "1": "Pembangunan fisik infrastruktur nasional merupakan kewajiban pemerintah dan pihak penyedia konstruksi profesional, bukan tugas primer peserta didik.",
+            "2": "Bekerja tanpa memperhatikan tingkat pendidikan dan keterampilan akan menempatkan tenaga kerja pada daya saing rendah.",
+            "3": "Menyerahkan pengawasan sumber daya alam sepenuhnya kepada pihak luar akan mengancam kedaulatan ekonomi bangsa."
+          }
+        },
+        {
+          "id": "ips-d-7-t3-q04",
+          "difficulty": "dasar",
+          "prompt": "Berdasarkan Buku Siswa IPS Kelas VII hal. 151, seseorang memiliki kehormatan dan pengaruh tertentu di tengah masyarakat karena kedudukan yang dimilikinya. Hal ini menunjukkan pengaruh dari...",
+          "options": [
+            "Status sosial",
+            "Peran sosial",
+            "Pola sosial",
+            "Konflik sosial"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Status sosial merupakan posisi atau kedudukan seseorang dalam kelompok masyarakat yang menentukan tingkat penghormatan dan hak istimewa yang diterimanya."
+          },
+          "distractorWhy": {
+            "1": "Peran sosial adalah aspek dinamis dari status, yaitu pelaksanaan hak dan kewajiban sesuai dengan status yang disandang.",
+            "2": "Pola sosial merujuk pada bentuk pengulangan perilaku interaksi sosial dalam jangka waktu tertentu.",
+            "3": "Konflik sosial adalah proses perselisihan atau pertentangan antara dua pihak atau lebih."
+          }
+        },
+        {
+          "id": "ips-d-7-t3-q05",
+          "difficulty": "sedang",
+          "prompt": "Berdasarkan Buku Siswa IPS Kelas VII hal. 151, toponimi merupakan kajian kebudayaan secara historis dan simbolis untuk mengetahui asal-usul penamaan suatu tempat yang disepakati dari generasi ke generasi. Di bawah ini yang bukan merupakan contoh penamaan toponimi adalah...",
+          "options": [
+            "Gunung Vulkanik",
+            "Taman Nasional Gunung Leuser",
+            "Gunung Rinjani",
+            "Sungai Musi"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Gunung Vulkanik merupakan istilah umum dalam ilmu geologi untuk menyebut jenis gunung api, bukan nama geografis spesifik (toponimi) suatu wilayah."
+          },
+          "distractorWhy": {
+            "1": "Taman Nasional Gunung Leuser merupakan nama geografis spesifik kawasan konservasi di Sumatra.",
+            "2": "Gunung Rinjani merupakan nama rupa bumi spesifik gunung yang terletak di Pulau Lombok.",
+            "3": "Sungai Musi adalah nama rupa bumi spesifik sungai yang mengalir di Sumatra Selatan."
+          }
+        },
+        {
+          "id": "ips-d-7-t3-q06",
+          "difficulty": "tinggi",
+          "prompt": "Berdasarkan Buku Siswa IPS Kelas VII hal. 151-152, masyarakat memiliki keberagaman horizontal yang tidak berjenjang (diferensiasi sosial). Faktor-faktor yang mencerminkan konsep diferensiasi sosial ditunjukkan oleh keanekaragaman...",
+          "options": [
+            "Warna kulit, pekerjaan/profesi yang beraneka ragam, dan agama yang dianut",
+            "Sistem kasta, perbedaan warna kulit, dan jenjang pendidikan formal",
+            "Sistem kasta, jenjang pendidikan formal, dan agama yang dianut",
+            "Tingkat pendidikan formal, pekerjaan yang beraneka ragam, dan kasta sosial"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Diferensiasi sosial membagi masyarakat secara horizontal berdasarkan ciri fisik (warna kulit), profesi, dan agama tanpa ada tingkatan tinggi atau rendah."
+          },
+          "distractorWhy": {
+            "1": "Kasta dan tingkat pendidikan merupakan bentuk stratifikasi sosial bertingkat (vertikal).",
+            "2": "Kasta dan pendidikan membuat struktur masyarakat berjenjang secara vertikal.",
+            "3": "Kasta sosial membagi masyarakat secara hierarkis (vertikal), bukan horizontal."
+          }
+        },
+        {
+          "id": "ips-d-7-t3-q07",
+          "difficulty": "sedang",
+          "prompt": "Berdasarkan Buku Siswa IPS Kelas VII hal. 152, sistem stratifikasi sosial tertutup tidak memungkinkan individu untuk berpindah kedudukan sosial secara bebas. Sistem stratifikasi tertutup ini dikenal juga sebagai sistem...",
+          "options": [
+            "Kasta, yang mengakibatkan masyarakat tidak dapat berpindah kelas sosial",
+            "Kelas, yang mengakibatkan masyarakat tidak dapat berpindah kelas sosial",
+            "Meritokrasi, yang mengakibatkan masyarakat tidak dapat berpindah kelas sosial",
+            "Kasta, yang mengakibatkan masyarakat sangat mudah berpindah kelas sosial"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Sistem kasta merupakan contoh stratifikasi sosial tertutup di mana status seseorang ditentukan sejak lahir sehingga tidak memungkinkan perpindahan kelas sosial."
+          },
+          "distractorWhy": {
+            "1": "Sistem kelas bersifat terbuka sehingga masyarakat masih memiliki kesempatan untuk berpindah kedudukan.",
+            "2": "Meritokrasi adalah sistem pemberian kedudukan berdasarkan prestasi dan keahlian, yang bersifat terbuka.",
+            "3": "Sistem kasta justru menutup mobilitas sosial sehingga individu tidak mudah berpindah status."
+          }
+        },
+        {
+          "id": "ips-d-7-t3-q08",
+          "difficulty": "tinggi",
+          "prompt": "Berdasarkan Buku Siswa IPS Kelas VII hal. 153, perhatikan kegiatan berikut:\n(1) Perusahaan mengirimkan barang ke minimarket.\n(2) Mega membeli seragam sekolah untuk dipakai.\n(3) Arif membeli pertalite untuk bahan bakar sepeda motornya.\n(4) Perusahaan SR memproduksi roti dalam jumlah besar.\n(5) Ibu Tanti membeli tepung lalu mengolahnya menjadi makanan untuk dikonsumsi sendiri.\nKegiatan yang tergolong ke dalam aktivitas konsumsi ditunjukkan oleh nomor...",
+          "options": [
+            "(2), (3), dan (5)",
+            "(1), (2), dan (5)",
+            "(3), (4), dan (5)",
+            "(2), (3), dan (4)"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Kegiatan (2), (3), dan (5) merupakan tindakan menghabiskan atau mengurangi nilai guna barang untuk memenuhi kebutuhan hidup langsung."
+          },
+          "distractorWhy": {
+            "1": "Kegiatan nomor (1) merupakan aktivitas distribusi yaitu penyaluran barang dari produsen ke retail.",
+            "2": "Kegiatan nomor (4) merupakan kegiatan produksi yaitu pembuatan roti.",
+            "3": "Kegiatan nomor (4) adalah produksi barang, bukan kegiatan konsumsi."
+          }
+        },
+        {
+          "id": "ips-d-7-t3-q09",
+          "difficulty": "dasar",
+          "prompt": "Berdasarkan Buku Siswa IPS Kelas VII hal. 153, saat merasa lapar, Dimas memilih membeli bakso, Erry memilih satai, Ismi memilih ayam goreng, sedangkan Lili memilih mi. Keberagaman pilihan dalam memenuhi kebutuhan makanan tersebut menunjukkan bahwa permintaan dipengaruhi oleh faktor...",
+          "options": [
+            "Selera",
+            "Harga barang",
+            "Tingkat pendapatan",
+            "Kualitas barang"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Selera perseorangan yang berbeda-beda memengaruhi jenis barang atau jasa yang diminta meskipun kebutuhan dasarnya sama (memenuhi rasa lapar)."
+          },
+          "distractorWhy": {
+            "1": "Faktor harga berkaitan dengan tinggi rendahnya nominal uang yang harus dibayar untuk suatu produk.",
+            "2": "Faktor pendapatan berkaitan dengan daya beli konsumen berdasarkan penghasilan yang diperoleh.",
+            "3": "Faktor kualitas barang berkaitan dengan keunggulan mutu produk yang ditawarkan."
+          }
+        },
+        {
+          "id": "ips-d-7-t3-q10",
+          "difficulty": "dasar",
+          "prompt": "Berdasarkan Buku Siswa IPS Kelas VII hal. 154, pasar memegang peranan penting dalam kegiatan ekonomi masyarakat. Fungsi pasar dalam menyalurkan produk hasil barang dan jasa dari pihak produsen sampai ke tangan konsumen disebut...",
+          "options": [
+            "Fungsi distribusi",
+            "Fungsi pembentuk harga",
+            "Fungsi promosi",
+            "Fungsi produksi"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Fungsi distribusi pasar bertugas menjembatani penyampaian barang dan jasa dari produsen kepada konsumen yang membutuhkan."
+          },
+          "distractorWhy": {
+            "1": "Fungsi pembentuk harga adalah menetapkan harga kesepakatan antara penjual dan pembeli melalui proses tawar-menawar.",
+            "2": "Fungsi promosi adalah memperkenalkan barang atau jasa kepada masyarakat pembeli.",
+            "3": "Fungsi produksi terjadi di unit pembuatan barang, bukan fungsi utama keberadaan pasar."
+          }
+        },
+        {
+          "id": "ips-d-7-t3-q11",
+          "difficulty": "sedang",
+          "prompt": "Berdasarkan Buku Siswa IPS Kelas VII hal. 110-111, Indonesia memiliki kawasan hutan yang sangat luas. Kawasan hutan suaka alam yang memiliki ciri khas berupa keanekaragaman dan keunikan tumbuhan serta ekosistemnya yang perkembangannya diserahkan pada alam tanpa campur tangan manusia dinamakan...",
+          "options": [
+            "Cagar alam",
+            "Suaka margasatwa",
+            "Taman hutan raya",
+            "Hutan produksi terbatas"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Cagar alam adalah kawasan suaka alam yang melindungi keunikan tumbuhan beserta ekosistem aslinya agar berkembang secara alami."
+          },
+          "distractorWhy": {
+            "1": "Suaka margasatwa difokuskan pada perlindungan dan kelestarian keanekaragaman jenis satwa liar.",
+            "2": "Taman hutan raya difungsikan untuk koleksi tumbuhan dan satwa alami atau buatan bagi kepentingan penelitian dan rekreasi.",
+            "3": "Hutan produksi terbatas diperuntukkan bagi eksploitasi kayu dengan kuota tebang tertentu."
+          }
+        },
+        {
+          "id": "ips-d-7-t3-q12",
+          "difficulty": "tinggi",
+          "prompt": "Berdasarkan Buku Siswa IPS Kelas VII hal. 113-114, pemanfaatan sumber daya alam tambang dilakukan melalui empat tahapan secara berurutan. Urutan tahapan kegiatan pertambangan yang benar adalah...",
+          "options": [
+            "Prospeksi, eksplorasi, eksploitasi, dan pengolahan",
+            "Eksplorasi, prospeksi, pengolahan, dan eksploitasi",
+            "Prospeksi, eksploitasi, eksplorasi, dan pengolahan",
+            "Eksploitasi, prospeksi, eksplorasi, dan pengolahan"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Tahapan pertambangan dimulai dari pencarian awal (prospeksi), pengukuran cadangan (eksplorasi), penambangan/penambangan nyata (eksploitasi), hingga pemurnian (pengolahan)."
+          },
+          "distractorWhy": {
+            "1": "Tahap eksplorasi tidak dapat mendahului prospeksi karena eksplorasi membutuhkan data titik keberadaan awal dari prospeksi.",
+            "2": "Eksploitasi (penambangan) tidak boleh dilakukan sebelum tahap pengukuran besarnya cadangan (eksplorasi) selesai.",
+            "3": "Eksploitasi merupakan langkah ketiga setelah prospeksi dan eksplorasi dilakukan."
+          }
+        },
+        {
+          "id": "ips-d-7-t3-q13",
+          "difficulty": "sedang",
+          "prompt": "Berdasarkan Buku Siswa IPS Kelas VII hal. 118-120, wilayah laut Indonesia menyimpan potensi kemaritiman yang besar. Selain ikan tangkap dan terumbu karang, ekosistem pesisir yang berfungsi mencegah erosi pantai (abrasi) serta menjadi tempat pembiakan satwa laut adalah...",
+          "options": [
+            "Hutan bakau (mangrove)",
+            "Padang lamun",
+            "Palung laut",
+            "Taman laut dangkal"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Hutan bakau (mangrove) berperan penting sebagai benteng alami pemecah gelombang pencegah abrasi pantai serta habitat pembiakan biota laut."
+          },
+          "distractorWhy": {
+            "1": "Padang lamun adalah tumbuhan berbunga yang hidup di perairan dangkal sebagai penstabil dasar laut dan pakan mamalia laut.",
+            "2": "Palung laut merupakan jurang di dasar laut yang sangat dalam dan tidak berfungsi menahan abrasi garis pantai.",
+            "3": "Taman laut dangkal merupakan ekosistem terumbu karang untuk keanekaragaman hayati dan wisata."
+          }
+        },
+        {
+          "id": "ips-d-7-t3-q14",
+          "difficulty": "sedang",
+          "prompt": "Berdasarkan Buku Siswa IPS Kelas VII hal. 125-128, perbedaan potensi sumber daya alam antarwilayah memicu terjadinya hubungan perdagangan antardaerah maupun internasional. Alasan utama terjadinya perdagangan antarwilayah tersebut adalah...",
+          "options": [
+            "Setiap wilayah memiliki keterbatasan sumber daya alam sehingga perlu saling menutupi kebutuhan",
+            "Keinginan setiap wilayah untuk menguasai perekonomian daerah lain secara sepihak",
+            "Adanya kesamaan iklim dan kondisi geografis di seluruh pelosok Indonesia",
+            "Pemerintah melarang setiap daerah memproduksi barang kebutuhan sendiri"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Perbedaan kondisi geografis menyebabkan persebaran sumber daya alam tidak merata sehingga perdagangan dilakukan untuk memenuhi kebutuhan antarwilayah."
+          },
+          "distractorWhy": {
+            "1": "Perdagangan bertujuan memenuhi kebutuhan bersama dan kerja sama ekonomi, bukan untuk ekspansi penguasaan sepihak.",
+            "2": "Kondisi geografis dan iklim di Indonesia beranekaragam, bukan sama persis.",
+            "3": "Pemerintah tidak melarang daerah memproduksi barang, tetapi mendorong pemenuhan kebutuhan secara efisien."
+          }
+        },
+        {
+          "id": "ips-d-7-t3-q15",
+          "difficulty": "dasar",
+          "prompt": "Berdasarkan Buku Siswa IPS Kelas VII hal. 129-130, fenomena bonus demografi yang dialami suatu negara ditandai oleh...",
+          "options": [
+            "Jumlah penduduk usia produktif (15-64 tahun) lebih besar dibandingkan usia non-produktif",
+            "Jumlah penduduk usia lanjut (di atas 65 tahun) mendominasi seluruh populasi negara",
+            "Tingginya angka kelahiran bayi yang menyebabkan ledakan usia anak-anak",
+            "Penurunan tingkat pendidikan dan keterampilan pada angkatan kerja produktif"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Bonus demografi terjadi ketika proporsi penduduk usia produktif (15-64 tahun) mencapai lebih dari 60% dari total populasi penduduk."
+          },
+          "distractorWhy": {
+            "1": "Dominasi usia lanjut menciptakan fenomena ageing population yang meningkatkan beban ketergantungan.",
+            "2": "Tingginya kelahiran anak-anak memperbesar angka ketergantungan usia muda.",
+            "3": "Penurunan keterampilan angkatan kerja akan mengagalkan peluang pemanfaatan bonus demografi."
+          }
+        },
+        {
+          "id": "ips-d-7-t3-q16",
+          "difficulty": "sedang",
+          "prompt": "Berdasarkan Buku Siswa IPS Kelas VII hal. 136-138, dalam arus kegiatan ekonomi, Rumah Tangga Konsumen (RTK) berperan menyediakan faktor-faktor produksi. Imbalan yang diterima RTK atas penyerahan faktor produksi berupa tenaga kerja adalah...",
+          "options": [
+            "Upah atau gaji (wage)",
+            "Sewa (rent)",
+            "Bunga modal (interest)",
+            "Laba usaha (profit)"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Rumah tangga konsumen yang menyerahkan jasa tenaga kerja kepada rumah tangga produsen mendapatkan balas jasa dalam bentuk upah atau gaji."
+          },
+          "distractorWhy": {
+            "1": "Sewa (rent) merupakan imbalan atas penyerahan faktor produksi berupa tanah atau lahan.",
+            "2": "Bunga modal (interest) adalah imbalan atas penyerahan faktor produksi modal.",
+            "3": "Laba usaha (profit) merupakan balasan atas kemampuan kewirausahaan (entrepreneurship)."
+          }
+        },
+        {
+          "id": "ips-d-7-t3-q17",
+          "difficulty": "tinggi",
+          "prompt": "Berdasarkan Buku Siswa IPS Kelas VII hal. 141-143, hukum permintaan menyatakan hubungan antara harga dengan jumlah barang yang diminta. Pernyataan yang sesuai dengan hukum permintaan adalah...",
+          "options": [
+            "Jika harga suatu barang naik, maka jumlah barang yang diminta akan berkurang",
+            "Jika harga suatu barang naik, maka jumlah barang yang diminta akan bertambah",
+            "Harga barang tidak memiliki pengaruh apapun terhadap jumlah barang yang diminta",
+            "Jika harga barang turun, maka penjual akan menambah jumlah barang yang ditawarkan"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Hukum permintaan berbunyi jika harga suatu barang naik (ceteris paribus), maka jumlah barang yang diminta konsumen akan berkurang, dan sebaliknya."
+          },
+          "distractorWhy": {
+            "1": "Pernyataan tersebut berlawanan dengan hukum permintaan di mana kenaikan harga justru menurunkan minat beli.",
+            "2": "Harga merupakan faktor utama yang memengaruhi tingkat permintaan konsumen.",
+            "3": "Pernyataan tersebut menguraikan hukum penawaran dari sudut pandang produsen, bukan hukum permintaan."
+          }
+        },
+        {
+          "id": "ips-d-7-t3-q18",
+          "difficulty": "sedang",
+          "prompt": "Berdasarkan Buku Siswa IPS Kelas VII hal. 144-145, pasar dapat dibedakan menjadi pasar konkret dan pasar abstrak. Contoh aktivitas transaksi pada pasar abstrak adalah...",
+          "options": [
+            "Membeli barang kebutuhan harian secara daring (online marketplace) tanpa bertemu penjual langsung",
+            "Membeli sayur-mayur dan bumbu dapur langsung di pasar tradisional setempat",
+            "Melakukan tawar-menawar harga ikan basah di tempat pelelangan ikan pantai",
+            "Membeli pakaian dengan memilih dan mencoba pakaian secara langsung di toko fisik"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Pasar abstrak adalah pasar di mana penjual dan pembeli tidak bertemu langsung secara fisik dan barang yang diperjualbelikan tidak dibawa secara langsung (seperti e-commerce)."
+          },
+          "distractorWhy": {
+            "1": "Membeli di pasar tradisional merupakan transaksi di pasar konkret karena ada pertemuan fisik dan barang langsung diserahterimakan.",
+            "2": "Pelelangan ikan di lokasi pantai adalah contoh transaksi pasar konkret.",
+            "3": "Mencoba pakaian di toko fisik adalah bentuk transaksi pasar konkret."
+          }
+        },
+        {
+          "id": "ips-d-7-t3-q19",
+          "difficulty": "tinggi",
+          "prompt": "Berdasarkan Buku Siswa IPS Kelas VII hal. 146-147, kedudukan atau status sosial dapat diperoleh dengan berbagai cara. Status sosial yang diperoleh seseorang melalui usaha, kerja keras, dan prestasi yang disengaja dinamakan...",
+          "options": [
+            "Achieved status",
+            "Ascribed status",
+            "Assigned status",
+            "Inherited status"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Achieved status adalah kedudukan yang dicapai seseorang melalui usaha sengaja, pendidikan, dan prestasi (seperti menjadi dokter atau sarjana)."
+          },
+          "distractorWhy": {
+            "1": "Ascribed status adalah kedudukan yang diperoleh secara otomatis sejak lahir tanpa usaha (seperti keturunan bangsawan).",
+            "2": "Assigned status adalah kedudukan yang diberikan oleh masyarakat atas jasa-jasa seseorang (seperti gelar pahlawan).",
+            "3": "Inherited status bukan istilah baku dalam sosiologi untuk kategori status sosial."
+          }
+        },
+        {
+          "id": "ips-d-7-t3-q20",
+          "difficulty": "sedang",
+          "prompt": "Berdasarkan Buku Siswa IPS Kelas VII hal. 145-146, perkembangan teknologi informasi memberikan pengaruh besar bagi kegiatan ekonomi. Salah satu dampak positif kemajuan teknologi terhadap kegiatan distribusi barang adalah...",
+          "options": [
+            "Mempercepat proses pemesanan dan pengiriman barang dari produsen ke konsumen",
+            "Meningkatkan biaya operasional pemasaran produk secara signifikan",
+            "Membatasi jangkauan pasar barang hanya di sekitar daerah tempat produksi",
+            "Menghilangkan peran produsen dalam pembuatan barang dan jasa"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Teknologi logistik dan e-commerce mempermudah pelacakan, pemesanan, dan pengiriman barang sehingga saluran distribusi menjadi lebih cepat dan efisien."
+          },
+          "distractorWhy": {
+            "1": "Teknologi digital justru memangkas biaya pemasaran dan iklan konvensional.",
+            "2": "Kemajuan teknologi memperluas jangkauan pasar hingga ke tingkat antarnegara.",
+            "3": "Produsen tetap dibutuhkan untuk memproduksi barang; teknologi hanya membantu proses pembuatan dan distribusinya."
+          }
+        }
+      ]
+    },
+    {
+      "code": "KOMP-IPS-D-7-BAB4-01",
+      "grade": 7,
+      "name": "Tema IV: Pemberdayaan Masyarakat",
+      "materi": "Keanekaragaman Keragaman Etnis & Budaya Indonesia, Pemberdayaan Ekonomi Masyarakat, Literasi & Pengelolaan Keuangan Keluarga, Peran Komunitas Lokal",
+      "cpRef": "Ilmu Pengetahuan Sosial untuk SMP/MTs Kelas VII (Edisi Revisi) — Tema 04",
+      "items": [
+        {
+          "id": "ips-d-7-t4-q01",
+          "difficulty": "dasar",
+          "prompt": "Berdasarkan materi IPS Kelas VII Edisi Revisi Tema IV (halaman 169/222), faktor geografis yang memengaruhi perbedaan bentuk dan model pakaian adat antara masyarakat di wilayah pesisir (suhu tinggi, pakaian tanpa lengan) dan wilayah pegunungan (suhu rendah, pakaian berlengan panjang) dipengaruhi oleh ....",
+          "options": [
+            "suhu dan kelembapan udara",
+            "posisi strategis wilayah",
+            "luas wilayah daratan",
+            "isolasi kepulauan oleh lautan"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Faktor geografis berupa suhu dan kelembapan udara menentukan kondisi iklim setempat yang memengaruhi adaptasi busana/pakaian adat masyarakat setempat."
+          },
+          "distractorWhy": {
+            "1": "Posisi strategis berkaitan dengan posisi geografis dalam jalur perdagangan internasional, bukan faktor perbedaan suhu lokal.",
+            "2": "Luas wilayah daratan mempengaruhi bentang alam, bukan secara langsung membentuk penyesuaian jenis pakaian adat.",
+            "3": "Isolasi kepulauan oleh lautan membatasi komunikasi antar pulau, bukan pembeda suhu pesisir dan pegunungan."
+          }
+        },
+        {
+          "id": "ips-d-7-t4-q02",
+          "difficulty": "dasar",
+          "prompt": "Perhatikan unsur-unsur berikut: (1) Warisan, (2) Bahasa, (3) Sistem politik, (4) Sistem mata pencaharian, (5) Sistem pengetahuan. Berdasarkan pembahasan keragaman budaya (halaman 222-223), yang termasuk unsur-unsur budaya universal menurut C. Kluckhohn adalah ....",
+          "options": [
+            "(2), (4), dan (5)",
+            "(1), (2), dan (3)",
+            "(1), (2), dan (4)",
+            "(1), (3), dan (5)"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Bahasa, sistem mata pencaharian, dan sistem pengetahuan termasuk dalam 7 unsur budaya universal (cultural universals) yang ditemukan di seluruh kebudayaan dunia."
+          },
+          "distractorWhy": {
+            "1": "Pernyataan ini salah karena Warisan bukan bagian dari 7 unsur budaya universal Kluckhohn.",
+            "2": "Pernyataan ini keliru karena memasukkan Warisan sebagai unsur universal.",
+            "3": "Pernyataan ini kurang tepat karena Warisan dan sistem politik bukan bagian utama dari 7 unsur universal Kluckhohn."
+          }
+        },
+        {
+          "id": "ips-d-7-t4-q03",
+          "difficulty": "dasar",
+          "prompt": "Dalam catatan sejarah maritim lokal dan perlawanan terhadap kolonialisme di Nusantara (halaman 184/223), pahlawan wanita Ratu Kalinyamat dari Jepara merupakan putri ketiga dari tokoh Kesultanan Demak yaitu ....",
+          "options": [
+            "Sultan Trenggana",
+            "Raden Toyib",
+            "Sunan Prawata",
+            "Arya Penangsang"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Ratu Kalinyamat adalah putri ketiga dari Sultan Trenggana, raja Kesultanan Demak yang memimpin ekspansi kekuasaan di pesisir utara Jawa."
+          },
+          "distractorWhy": {
+            "1": "Raden Toyib (Sultan Hadlirin) adalah suami dari Ratu Kalinyamat, bukan ayahnya.",
+            "2": "Sunan Prawata adalah kakak kandung Ratu Kalinyamat (putra tertua Sultan Trenggana).",
+            "3": "Arya Penangsang adalah bupati Jipang Panolan yang berkonflik dengan Ratu Kalinyamat."
+          }
+        },
+        {
+          "id": "ips-d-7-t4-q04",
+          "difficulty": "sedang",
+          "prompt": "Perhatikan pernyataan berikut: (1) Mengoordinasikan sejumlah pasukan laut, (2) Mengawasi pelabuhan di bawah syahbandar, (3) Mengawasi kapal-kapal jenis galley milik Kerajaan Aceh, (4) Bekerja sama dengan Belanda dalam perdagangan lada, (5) Melakukan balas dendam pribadi. Berdasarkan teks sejarah lokal (halaman 185/223), tugas resmi Laksamana Keumalahayati ditunjukkan oleh nomor ....",
+          "options": [
+            "(1), (2), dan (3)",
+            "(1), (2), dan (4)",
+            "(1), (3), dan (5)",
+            "(2), (4), dan (5)"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Keumalahayati menjabat Laksamana Kesultanan Aceh yang bertugas mengoordinasikan armada laut, mengawasi pelabuhan syahbandar, serta memimpin kapal perang (galley)."
+          },
+          "distractorWhy": {
+            "1": "Nomor (4) salah karena Keumalahayati bertempur melawan ancaman asing termasuk armada Belanda pimpinan Cornelis de Houtman.",
+            "2": "Nomor (5) bukan merupakan tugas resmi ketatanegaraan militer Laksamana Kerajaan Aceh.",
+            "3": "Kombinasi ini keliru karena melibatkan pernyataan (4) dan (5) yang tidak sesuai fakta tugas militer."
+          }
+        },
+        {
+          "id": "ips-d-7-t4-q05",
+          "difficulty": "tinggi",
+          "prompt": "Berdasarkan data Forest Watch Indonesia dalam Buku Siswa IPS Kelas VII (halaman 189/224), region di Indonesia yang tercatat memiliki persentase tutupan hutan alam tertinggi terhadap luas daratannya (mencapai 81%) adalah ....",
+          "options": [
+            "Papua",
+            "Kalimantan",
+            "Maluku",
+            "Sumatra"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Papua memiliki luas hutan alam 33.119.514 Ha dari luas daratan 40.640.520 Ha, sehingga persentase tutupan hutan alamnya tertinggi yaitu 81%."
+          },
+          "distractorWhy": {
+            "1": "Kalimantan memiliki persentase tutupan hutan alam 47% terhadap luas daratannya.",
+            "2": "Maluku memiliki persentase tutupan hutan alam 57% terhadap luas daratannya.",
+            "3": "Sumatra memiliki persentase tutupan hutan alam 22% terhadap luas daratannya."
+          }
+        },
+        {
+          "id": "ips-d-7-t4-q06",
+          "difficulty": "sedang",
+          "prompt": "Perjuangan para pahlawan wanita Indonesia seperti R.A. Kartini, Dewi Sartika, Cut Nyak Dien, dan Laksamana Keumalahayati (halaman 224-225) memberikan teladan relevan untuk mengatasi isu permasalahan sosial budaya masa kini, yaitu ....",
+          "options": [
+            "kesetaraan gender",
+            "kesenjangan sosial dan kemiskinan",
+            "penyalahgunaan narkotika",
+            "tawuran antarpelajar"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Perjuangan para pahlawan wanita tersebut membuktikan peran strategis perempuan di bidang pendidikan, sosial, dan militer untuk memperjuangkan kesetaraan gender."
+          },
+          "distractorWhy": {
+            "1": "Kesenjangan sosial dan kemiskinan merupakan isu perbedaan tingkat pendapatan dan ekonomi.",
+            "2": "Penyalahgunaan narkotika merupakan masalah patologi sosial zat adiktif.",
+            "3": "Tawuran antarpelajar adalah bentuk kenakalan remaja dan gangguan ketertiban sekolah."
+          }
+        },
+        {
+          "id": "ips-d-7-t4-q07",
+          "difficulty": "dasar",
+          "prompt": "Menabung merupakan salah satu aspek penting dalam pengelolaan keuangan keluarga (halaman 200/225). Di antara hal berikut, yang bukan merupakan manfaat dari kebiasaan menabung adalah ....",
+          "options": [
+            "menambah beban utang",
+            "melatih gaya hidup hemat",
+            "tersedianya dana untuk kebutuhan mendesak",
+            "membantu mencapai tujuan keuangan masa depan"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Menabung menyisihkan bagian pendapatan untuk disimpan, sehingga memperkuat cadangan finansial dan tidak menambah beban utang."
+          },
+          "distractorWhy": {
+            "1": "Melatih gaya hidup hemat merupakan salah satu fungsi dan manfaat utama kegiatan menabung.",
+            "2": "Tersedianya uang darurat untuk hal mendesak adalah manfaat langsung dari tabungan.",
+            "3": "Menabung mempermudah pencapaian target keuangan jangka panjang di masa depan."
+          }
+        },
+        {
+          "id": "ips-d-7-t4-q08",
+          "difficulty": "sedang",
+          "prompt": "Dalam tahapan pengelolaan keuangan keluarga (halaman 204/225), langkah membedakan antara kebutuhan primer yang mendesak dengan keinginan pribadi dilakukan dalam rangka ....",
+          "options": [
+            "memilih prioritas pengeluaran",
+            "menyusun rencana pendapatan",
+            "menyusun rencana pengeluaran",
+            "melakukan reviu perencanaan"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Membedakan kebutuhan dan keinginan merupakan inti dari memilih prioritas pengeluaran agar alokasi dana mendahulukan hal-hal vital."
+          },
+          "distractorWhy": {
+            "1": "Menyusun rencana pendapatan adalah kegiatan mencatat estimasi total penghasilan yang akan diterima.",
+            "2": "Menyusun rencana pengeluaran adalah membuat rincian alokasi biaya untuk tiap kategori.",
+            "3": "Melakukan reviu perencanaan adalah kegiatan evaluasi atas pelaksanaan pencatatan kas di akhir periode."
+          }
+        },
+        {
+          "id": "ips-d-7-t4-q09",
+          "difficulty": "tinggi",
+          "prompt": "Seorang warga yang paham mengenai produk keuangan (seperti memilih reksa dana yang relatif aman dibanding saham) serta terampil membuat keputusan finansial yang tepat tergolong ke dalam tingkat literasi keuangan (halaman 203/226) yaitu ....",
+          "options": [
+            "well literate",
+            "sufficient literate",
+            "less literate",
+            "not literate"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Kategori well literate ditandai dengan tingginya pemahaman, keterampilan, dan kepercayaan diri dalam memilih serta memanfaatkan produk jasa keuangan."
+          },
+          "distractorWhy": {
+            "1": "Sufficient literate hanya memiliki pengetahuan dan kepercayaan tentang produk keuangan, namun kurang terampil memilih instrumen.",
+            "2": "Less literate hanya mengetahui lembaga dan produk keuangan tanpa pemahaman cara memanfaatkannya.",
+            "3": "Not literate adalah kondisi tidak memiliki pemahaman maupun kepercayaan terhadap institusi keuangan."
+          }
+        },
+        {
+          "id": "ips-d-7-t4-q10",
+          "difficulty": "tinggi",
+          "prompt": "Perhatikan kegiatan berikut: (1) Pelatihan kewirausahaan pekarangan rumah di Desa Paremono, (2) Pelatihan pembuatan tas daur ulang sampah plastik untuk PKK, (3) Sosialisasi Desa Tangguh Bencana, (4) Sosialisasi safety riding komunitas sepeda, (5) Pelatihan desain grafis postcrossing. Kegiatan yang merupakan bentuk pemberdayaan masyarakat berbasis ekonomi dan lingkungan desa (halaman 219/226) ditunjukkan oleh nomor ....",
+          "options": [
+            "(1), (2), dan (3)",
+            "(1), (2), dan (4)",
+            "(1), (3), dan (5)",
+            "(2), (4), dan (5)"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Wirausaha pekarangan, daur ulang sampah plastik PKK, dan Desa Tangguh Bencana secara konkrit mencerminkan kegiatan pemberdayaan masyarakat desa."
+          },
+          "distractorWhy": {
+            "1": "Nomor (4) safety riding merupakan edukasi tertib lalu lintas, bukan fokus pemberdayaan ekonomi/lingkungan lokal.",
+            "2": "Nomor (5) pelatihan desain grafis komunitas hobi tidak berorientasi langsung pada pemberdayaan masyarakat desa.",
+            "3": "Pernyataan (4) dan (5) kurang tepat dimasukkan sebagai wujud utama pemberdayaan ekonomi dan resiliensi lingkungan masyarakat desa."
+          }
+        },
+        {
+          "id": "ips-d-7-t4-q11",
+          "difficulty": "sedang",
+          "prompt": "Sultan Nuku dari Tidore dan raja-raja Papua membentuk persekutuan erat dalam perjuangan sejarah lokal Tema IV (halaman 181). Faktor utama yang menyatukan mereka adalah ....",
+          "options": [
+            "tekad yang kuat untuk mengusir penjajah Belanda dan menciptakan kedamaian di Maluku-Papua",
+            "keinginan menguasai monopoli perdagangan rempah-rempah di kawasan Eropa",
+            "upaya mendirikan pelabuhan khusus untuk kapal persekutuan Inggris",
+            "rencana merebut jalur pelayaran niaga di sepanjang pesisir utara Jawa"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Persatuan Sultan Nuku dan raja-raja Papua dilandasi tekad gigih tanpa lelah untuk mengusir penjajah Belanda yang mengganggu kedamaian rakyat."
+          },
+          "distractorWhy": {
+            "1": "Perjuangan Nuku bertujuan membebaskan rakyat dari cengkeraman monopoli penjajah, bukan mencari monopoli sendiri.",
+            "2": "Diplomasi dengan Inggris hanya taktik perjuangan, bukan tujuan utama persekutuan dengan raja-raja Papua.",
+            "3": "Jalur pesisir utara Jawa merupakan fokus wilayah maritim Kesultanan Demak/Jepara."
+          }
+        },
+        {
+          "id": "ips-d-7-t4-q12",
+          "difficulty": "dasar",
+          "prompt": "Sikap atau kecenderungan suatu kelompok masyarakat yang memandang kebudayaan sendiri paling baik dan menganggap rendah kebudayaan kelompok lain (halaman 169) disebut ....",
+          "options": [
+            "etnosentrisme",
+            "akulturasi",
+            "asimilasi",
+            "pluralisme"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Etnosentrisme adalah pandangan yang menilai budaya lain berdasarkan ukuran kebudayaannya sendiri dan merasa budayanya paling unggul."
+          },
+          "distractorWhy": {
+            "1": "Akulturasi adalah proses bercampurnya dua budaya tanpa menghilangkan kepribadian kebudayaan asli.",
+            "2": "Asimilasi adalah pembauran dua kebudayaan menjadi satu budaya baru dengan menghilangkan ciri asli.",
+            "3": "Pluralisme adalah sikap menerima dan menganggap positif adanya keberagaman dalam masyarakat."
+          }
+        },
+        {
+          "id": "ips-d-7-t4-q13",
+          "difficulty": "dasar",
+          "prompt": "Metode pencatatan keuangan sederhana dengan membukukan setiap transaksi pemasukan dan pengeluaran secara rutin saban hari selama satu bulan (halaman 210) dinamakan ....",
+          "options": [
+            "sistem buku kas harian",
+            "sistem amplop keuangan",
+            "sistem kas keluarga",
+            "sistem investasi reksa dana"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Sistem buku kas harian dilakukan dengan mencatat arus pemasukan dan pengeluaran setiap hari guna mengontrol belanja bulanan."
+          },
+          "distractorWhy": {
+            "1": "Sistem amplop memisahkan uang tunai fisik ke kantong/amplop alokasi belanja tertentu.",
+            "2": "Sistem kas keluarga membagi pos pengeluaran menjadi pengeluaran tetap, harian, dan berkala.",
+            "3": "Reksa dana adalah wahana investasi modal, bukan metode pencatatan kas harian."
+          }
+        },
+        {
+          "id": "ips-d-7-t4-q14",
+          "difficulty": "sedang",
+          "prompt": "Berdasarkan data Survei Nasional Literasi dan Inklusi Keuangan (SNLIK) OJK tahun 2022 (halaman 203), selisih atau kesenjangan (gap) antara indeks inklusi keuangan (85,10%) dan indeks literasi keuangan (49,68%) adalah sebesar ....",
+          "options": [
+            "35,42%",
+            "25,12%",
+            "45,30%",
+            "15,20%"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Selisih ketimpangan literasi dan inklusi finansial diperoleh dari 85,10% dikurangi 49,68% yang menghasilkan nilai 35,42%."
+          },
+          "distractorWhy": {
+            "1": "Nilai 25,12% bukan merupakan hasil kalkulasi gap data SNLIK 2022.",
+            "2": "Nilai 45,30% keliru dan tidak sesuai dengan perbandingan dua indeks OJK.",
+            "3": "Nilai 15,20% jauh dari fakta besarnya perbedaan akses dan pemahaman finansial."
+          }
+        },
+        {
+          "id": "ips-d-7-t4-q15",
+          "difficulty": "tinggi",
+          "prompt": "Pakar hukum asal Belanda yang dikenal sebagai Bapak Hukum Adat Indonesia (halaman 227-231) karena gigih mempertahankan eksistensi 19 lingkungan hukum adat serta mengusulkan konsep dualisme progresif adalah ....",
+          "options": [
+            "Cornelis van Vollenhoven",
+            "Snouck Hurgronje",
+            "R. Soepomo",
+            "Djokosutono"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Cornelis van Vollenhoven menyusun karya Het adatrecht van Nederlandsch-Indie dan berjuang agar hukum adat bumiputra diakui serta diteliti secara sistematis."
+          },
+          "distractorWhy": {
+            "1": "Snouck Hurgronje adalah ahli ketimuran yang pertama menggunakan istilah adatrecht dalam De Atjehers (1893).",
+            "2": "R. Soepomo adalah pakar hukum adat Indonesia yang banyak mengutip konsep perjuangan Van Vollenhoven.",
+            "3": "Djokosutono adalah ahli hukum Indonesia yang bersama Soepomo mengulas sejarah hukum adat."
+          }
+        },
+        {
+          "id": "ips-d-7-t4-q16",
+          "difficulty": "sedang",
+          "prompt": "Salah satu wujud partisipasi aktif komunitas dalam mendorong pembangunan berkelanjutan (SDGs) di bidang lingkungan dan ekonomi masyarakat (halaman 220) adalah ....",
+          "options": [
+            "membentuk komunitas peduli sampah yang mengelola bank sampah untuk kegiatan daur ulang",
+            "meningkatkan konsumsi produk impor secara berlebihan",
+            "menggunakan kantong plastik sekali pakai dalam setiap kegiatan warga",
+            "membatasi masyarakat desa dalam mengakses sarana internet"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Bank sampah yang dikelola komunitas mendidik masyarakat memilah limbah untuk didaur ulang, mencerminkan prinsip pembangunan berkelanjutan."
+          },
+          "distractorWhy": {
+            "1": "Konsumsi barang impor berlebihan tidak mendukung kemandirian ekonomi lokal.",
+            "2": "Penggunaan plastik sekali pakai mencemari lingkungan dan merusak ekosistem.",
+            "3": "Membatasi akses internet justru menghambat kemajuan literasi dan ekonomi digital."
+          }
+        },
+        {
+          "id": "ips-d-7-t4-q17",
+          "difficulty": "tinggi",
+          "prompt": "Kapasitas, pemahaman, dan keterampilan seseorang dalam mengelola instrumen keuangan pribadi serta menggunakan lembaga keuangan formal secara bijak (halaman 204) dinamakan ....",
+          "options": [
+            "literasi keuangan",
+            "inklusif sosial",
+            "skala prioritas",
+            "diferensiasi sosial"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Literasi keuangan (literasi finansial) mencakup pengetahuan dan kemampuan membuat keputusan keuangan yang sehat serta terhindar dari kerugian."
+          },
+          "distractorWhy": {
+            "1": "Inklusif sosial merujuk pada keterlibatan seluruh elemen masyarakat dalam pembangunan.",
+            "2": "Skala prioritas adalah penentuan urutan pemenuhan kebutuhan berdasarkan tingkat kepentingannya.",
+            "3": "Diferensiasi sosial adalah pengelompokan masyarakat secara vertikal/horizontal berdasarkan karakteristik sosial."
+          }
+        },
+        {
+          "id": "ips-d-7-t4-q18",
+          "difficulty": "sedang",
+          "prompt": "Upaya pemberdayaan masyarakat desa dapat dilakukan dengan mengembangkan wirausaha di pekarangan rumah, seperti budi daya tanaman hias anggrek (halaman 219). Manfaat utama kegiatan tersebut adalah ....",
+          "options": [
+            "meningkatkan potensi ekonomi keluarga sekaligus memberikan sarana rekreasi bagi pembudi daya",
+            "mengubah seluruh fungsi lahan pertanian utama menjadi kebun bunga non-pangan",
+            "mengharuskan warga desa meninggalkan pekerjaan utama mereka",
+            "menyebabkan kelangkaan bahan makanan pokok di wilayah pedesaan"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Budi daya anggrek di pekarangan rumah memberikan cadangan pendapatan tambahan serta efek hiburan/rekreasi saat mekar."
+          },
+          "distractorWhy": {
+            "1": "Kegiatan ini memanfaatkan pekarangan rumah, bukan menggantikan lahan pertanian pangan desa.",
+            "2": "Budi daya pekarangan bersifat usaha sampingan yang fleksibel di waktu senggang.",
+            "3": "Pemanfaatan pekarangan rumah untuk tanaman hias tidak mengganggu pasokan pangan pokok."
+          }
+        },
+        {
+          "id": "ips-d-7-t4-q19",
+          "difficulty": "sedang",
+          "prompt": "Kondisi ketidakmampuan seorang individu atau keluarga dalam memenuhi kebutuhan dasar minimal seperti sandang, pangan, dan papan (halaman 193/209) dinamakan ....",
+          "options": [
+            "kemiskinan",
+            "etnosentrisme",
+            "akulturasi",
+            "deforestasi"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Kemiskinan adalah situasi di mana individu tidak mampu memenuhi standar kebutuhan dasar hidupnya."
+          },
+          "distractorWhy": {
+            "1": "Etnosentrisme adalah pandangan mengagungkan kebudayaan sendiri secara berlebihan.",
+            "2": "Akulturasi adalah proses percampuran dua kebudayaan.",
+            "3": "Deforestasi adalah penebangan hutan secara luas."
+          }
+        },
+        {
+          "id": "ips-d-7-t4-q20",
+          "difficulty": "tinggi",
+          "prompt": "Kegiatan penebangan hutan alam secara masif dalam skala besar untuk kepentingan komersial yang dapat memicu kerusakan lingkungan hidup (halaman 224/234) disebut ....",
+          "options": [
+            "deforestasi",
+            "eutrofikasi",
+            "eksplorasi",
+            "akomodasi"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Deforestasi adalah aktivitas penebangan hutan komersial skala besar yang mengurangi tutupan lahan hutan."
+          },
+          "distractorWhy": {
+            "1": "Eutrofikasi adalah pengayaan nutrisi air yang memicu pesatnya pertumbuhan eceng gondok/alga.",
+            "2": "Eksplorasi adalah kegiatan penyelidikan awal untuk menemukan cadangan tambang.",
+            "3": "Akomodasi adalah upaya penyelesaian konflik sosial."
+          }
+        }
+      ]
+    },
+    {
+      "code": "KOMP-IPS-D-8-BAB1-01",
+      "grade": 8,
+      "name": "Tema 01: Kondisi Geografis dan Pelestarian Sumber Daya Alam",
+      "materi": "Kondisi Geografis & Iklim Indonesia, Keragaman Flora & Fauna (Garis Wallace & Weber), Pelestarian Sumber Daya Alam, Potensi Maritim",
+      "cpRef": "Ilmu Pengetahuan Sosial untuk SMP/MTs Kelas VII (Edisi Revisi) — Tema 01 (Kelas VIII)",
+      "items": [
+        {
+          "id": "ips-d-8-t1-q01",
+          "difficulty": "dasar",
+          "prompt": "Berdasarkan Buku Siswa IPS Kelas VIII Edisi Revisi Tema 01, letak astronomis Indonesia berada pada 6°LU – 11°LS dan 95°BT – 141°BT. Pengaruh letak astronomis tersebut terhadap kondisi iklim di sebagian besar wilayah Indonesia adalah ....",
+          "options": [
+            "memiliki iklim tropis dengan suhu udara tinggi dan curah hujan rata-rata melimpah sepanjang tahun",
+            "memiliki empat musim yang berganti secara teratur setiap tiga bulan sekali",
+            "didominasi iklim subtropis kering dengan gurun pasir yang luas di wilayah pesisir",
+            "mengalami penurunan suhu ekstrem hingga di bawah titik beku pada pertengahan tahun"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Letak astronomis Indonesia di wilayah khatulistiwa (6°LU – 11°LS) menyebabkan Indonesia beriklim tropis dengan intensitas penyinaran matahari tinggi dan kelembapan serta curah hujan yang melimpah sepanjang tahun."
+          },
+          "distractorWhy": {
+            "1": "Empat musim teratur adalah ciri daerah beriklim sedang atau sedang-subtropis, bukan wilayah tropis khatulistiwa.",
+            "2": "Iklim subtropis kering terdapat di kawasan lintang menengah seperti Afrika Utara dan Australia Tengah, bukan di Indonesia.",
+            "3": "Suhu ekstrem di bawah titik beku merupakan karakteristik iklim kutub atau iklim sedang pada musim dingin."
+          }
+        },
+        {
+          "id": "ips-d-8-t1-q02",
+          "difficulty": "sedang",
+          "prompt": "Berdasarkan Buku Siswa IPS Kelas VIII Edisi Revisi Tema 01, posisi geografis Indonesia diapit oleh Benua Asia dan Benua Australia serta Samudra Hindia dan Samudra Pasifik. Keuntungan strategis dari posisi silang tersebut bagi Indonesia adalah ....",
+          "options": [
+            "menjadi jalur persimpangan lalu lintas perdagangan internasional dan interaksi budaya dunia",
+            "terbebas sepenuhnya dari ancaman bencana alam geologis seperti gempa bumi dan tsunami",
+            "memiliki garis pantai terkecil sehingga kawasan daratan lebih mudah diolah",
+            "menjadi wilayah yang tidak terpengaruh oleh dinamika iklim global maupun pola angin muson"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Posisi silang di antara dua benua dan dua samudra menempatkan Indonesia pada jalur pelayaran komersial utama dunia yang mendorong jalur perdagangan internasional dan pertukaran budaya."
+          },
+          "distractorWhy": {
+            "1": "Posisi geografis tidak menghilangkan risiko bencana geologis karena Indonesia berada di jalur cincin api pasifik dan pertemuan lempeng tektonik.",
+            "2": "Indonesia justru memiliki garis pantai terpanjang kedua di dunia sebagai negara kepulauan.",
+            "3": "Posisi di antara dua benua dan samudra sangat memengaruhi pola pergerakan angin muson barat dan muson timur."
+          }
+        },
+        {
+          "id": "ips-d-8-t1-q03",
+          "difficulty": "dasar",
+          "prompt": "Berdasarkan Buku Siswa IPS Kelas VIII Edisi Revisi Tema 01, wilayah Indonesia terbagi menjadi tiga daerah waktu karena perentangan garis bujur sebesar 46° (95°BT – 141°BT). Daerah di bawah ini yang termasuk dalam zona Waktu Indonesia Tengah (WITA) adalah ....",
+          "options": [
+            "Sulawesi, Bali, Nusa Tenggara, dan Kalimantan Selatan",
+            "Jawa, Sumatra, Kalimantan Barat, dan Madura",
+            "Maluku, Maluku Utara, Papua, dan Papua Barat",
+            "Aceh, Sumatra Utara, Riau, dan Kepulauan Riau"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Waktu Indonesia Tengah (WITA, UTC+8) mencakup wilayah Sulawesi, Bali, Nusa Tenggara Barat, Nusa Tenggara Timur, Kalimantan Selatan, dan Kalimantan Timur."
+          },
+          "distractorWhy": {
+            "1": "Jawa, Sumatra, Kalimantan Barat, dan Madura masuk dalam zona Waktu Indonesia Barat (WIB, UTC+7).",
+            "2": "Maluku, Maluku Utara, Papua, dan Papua Barat masuk dalam zona Waktu Indonesia Timur (WIT, UTC+9).",
+            "3": "Aceh, Sumatra Utara, Riau, dan Kepulauan Riau berlokasi di Sumatra yang masuk zona Waktu Indonesia Barat (WIB)."
+          }
+        },
+        {
+          "id": "ips-d-8-t1-q04",
+          "difficulty": "sedang",
+          "prompt": "Berdasarkan Buku Siswa IPS Kelas VIII Edisi Revisi Tema 01, pergantian musim di Indonesia dipengaruhi oleh pergerakan angin muson. Pola pergerakan Angin Muson Barat yang bertiup dari Benua Asia menuju Benua Australia pada periode Oktober hingga April berdampak pada ....",
+          "options": [
+            "terjadinya musim hujan di sebagian besar wilayah Indonesia karena angin membawa uap air melimpah dari Samudra Pasifik dan Laut Cina Selatan",
+            "terjadinya musim kemarau panjang karena angin melewati gurun pasir yang kering di Benua Australia",
+            "terjadinya gelombang panas ekstrem di pulau Jawa dan Bali karena udara kering yang bertiup cepat",
+            "menurunnya tingkat kelembapan udara secara drastis di kawasan pesisir utara Sumatra"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Angin Muson Barat bertiup dari Asia melewati Samudra Pasifik dan lautan luas, membawa banyak uap air sehingga menyebabkan musim hujan di Indonesia."
+          },
+          "distractorWhy": {
+            "1": "Angin bertiup dari Benua Australia yang bersifat kering adalah Angin Muson Timur yang memicu musim kemarau (April–Oktober).",
+            "2": "Muson Barat membawa kelembapan tinggi dan curah hujan, bukan gelombang panas atau udara kering.",
+            "3": "Kelembapan udara saat musim hujan relatif tinggi, bukan menurun drastis."
+          }
+        },
+        {
+          "id": "ips-d-8-t1-q05",
+          "difficulty": "dasar",
+          "prompt": "Berdasarkan Buku Siswa IPS Kelas VIII Edisi Revisi Tema 01, Indonesia berada pada titik pertemuan tiga lempeng tektonik utama dunia, yaitu Lempeng Indo-Australia, Lempeng Eurasia, dan Lempeng Pasifik. Kondisi geologis tersebut mengakibatkan wilayah Indonesia ....",
+          "options": [
+            "memiliki banyak gunung api aktif serta sering mengalami gempa bumi tektonik dan vulkanik",
+            "menjadi kawasan yang bebas dari aktivitas tektonik dan lipatan kerak bumi",
+            "memiliki lapisan tanah yang tandus dan tidak dapat dimanfaatkan untuk pertanian",
+            "terdiri atas daratan tua yang stabil dan tidak pernah mengalami pergeseran kerak bumi"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Pertemuan tiga lempeng tektonik memicu pembentukan jalur gunung api (cincin api) serta aktivitas seismik berupa gempa bumi tektonik dan vulkanik."
+          },
+          "distractorWhy": {
+            "1": "Kawasan pertemuan lempeng tektonik justru sangat aktif dalam aktivitas tektonik dan pembentukan pegunungan lipatan.",
+            "2": "Aktivitas vulkanisme dari gunung api di Indonesia justru menghasilkan tanah vulkanis yang sangat subur.",
+            "3": "Kerak bumi di Indonesia bersifat dinamis akibat pergerakan dan tumbukan lempeng yang terus berlangsung."
+          }
+        },
+        {
+          "id": "ips-d-8-t1-q06",
+          "difficulty": "sedang",
+          "prompt": "Berdasarkan Buku Siswa IPS Kelas VIII Edisi Revisi Tema 01, keragaman flora dan fauna di Indonesia dibagi menjadi tiga wilayah utama yang dipisahkan oleh Garis Wallace dan Garis Weber. Karakteristik utama dari kelompok fauna Asiatis (Barat) adalah ....",
+          "options": [
+            "didominasi oleh mamalia berukuran besar dan berbagai jenis kera, serta tidak terdapat mamalia berkantong",
+            "didominasi oleh mamalia berkantong kecil dan burung-burung berbulu indah dan berwarna-warni",
+            "terdiri atas hewan-hewan purba endemis yang tidak ditemukan di benua mana pun",
+            "hanya diisi oleh jenis unggas air dan mamalia laut tanpa adanya reptil darat"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Fauna Asiatis di bagian barat Indonesia (Sumatra, Jawa, Kalimantan, Bali) memiliki kemiripan dengan fauna Asia, ditandai oleh mamalia besar (gajah, harimau, badak) dan primates/kera tanpa mamalia berkantong."
+          },
+          "distractorWhy": {
+            "1": "Mamalia berkantong dan burung berbulu indah berwarna-warni merupakan ciri khas fauna Australis di Indonesia bagian timur.",
+            "2": "Hewan purba endemis unik merupakan ciri fauna Peralihan/Wallacea seperti komodo dan anoa.",
+            "3": "Fauna Asiatis mencakup ekosistem darat yang luas termasuk berbagai jenis reptil, mamalia, dan burung."
+          }
+        },
+        {
+          "id": "ips-d-8-t1-q07",
+          "difficulty": "sedang",
+          "prompt": "Berdasarkan Buku Siswa IPS Kelas VIII Edisi Revisi Tema 01, Garis Wallace membatasi persebaran fauna bagian barat dengan kawasan peralihan, sedangkan Garis Weber membatasi kawasan peralihan dengan bagian timur. Hewan di bawah ini yang termasuk dalam kelompok fauna kawasan Peralihan (Wallacea) adalah ....",
+          "options": [
+            "komodo, anoa, babirusa, dan burung maleo",
+            "gajah surowiti, harimau sumatra, orangutan, dan badak bercula satu",
+            "kanguru pohon, burung cendrawasih, kasuari, dan walabi",
+            "banteng jawa, beruang madu, pesut mahakam, dan macan tutul"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Kawasan Peralihan (Sulawesi, Nusa Tenggara, Maluku) memiliki hewan khas/endemis Indonesia seperti komodo, anoa, babirusa, dan burung maleo."
+          },
+          "distractorWhy": {
+            "1": "Gajah, harimau sumatra, orangutan, dan badak merupakan contoh fauna tipe Asiatis (bagian barat).",
+            "2": "Kanguru pohon, cendrawasih, kasuari, dan walabi merupakan contoh fauna tipe Australis (bagian timur/Papua).",
+            "3": "Banteng jawa, beruang madu, pesut mahakam, dan macan tutul tergolong dalam kelompok fauna tipe Asiatis."
+          }
+        },
+        {
+          "id": "ips-d-8-t1-q08",
+          "difficulty": "dasar",
+          "prompt": "Berdasarkan Buku Siswa IPS Kelas VIII Edisi Revisi Tema 01, fauna bagian timur Indonesia memilik kemiripan dengan fauna di Benua Australia (tipe Australis). Salah satu contoh hewan khas yang terdapat di kawasan Papua dan sekitarnya adalah ....",
+          "options": [
+            "burung cendrawasih dan kanguru pohon",
+            "orangutan dan harimau sumatra",
+            "babirusa dan anoa darat",
+            "badak bercula satu dan gajah sumatra"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Burung cendrawasih dan kanguru pohon adalah hewan khas tipe Australis yang hidup di Papua dan pulau-pulau sekitarnya."
+          },
+          "distractorWhy": {
+            "1": "Orangutan dan harimau sumatra hidup di Sumatra dan Kalimantan (tipe Asiatis).",
+            "2": "Babirusa dan anoa hidup di Sulawesi (tipe Peralihan/Wallacea).",
+            "3": "Badak bercula satu dan gajah sumatra hidup di Jawa dan Sumatra (tipe Asiatis)."
+          }
+        },
+        {
+          "id": "ips-d-8-t1-q09",
+          "difficulty": "sedang",
+          "prompt": "Berdasarkan Buku Siswa IPS Kelas VIII Edisi Revisi Tema 01, Hutan Hujan Tropis di Indonesia kaya akan keberagaman flora heterogen. Ciri-ciri vegetasi yang tumbuh pada kawasan hutan hujan tropis adalah ....",
+          "options": [
+            "pohon-pohon berdaun lebat dan rapat membentuk kanopi dengan ketinggian bervariasi serta kelembapan tinggi",
+            "pohon-pohon menggugurkan daunnya pada musim kemarau untuk mengurangi penguapan air",
+            "didominasi oleh tumbuhan jenis konifer yang tahan terhadap suhu di bawah titik beku",
+            "terdiri atas padang rumput yang luas tanpa dijumpai adanya pepohonan berkayu"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Hutan hujan tropis ditandai oleh keanekaragaman vegetasi heterogen yang tumbuh rapat, berdaun lebat membentuk kanopi, dan kelembapan di dalam hutan sangat tinggi."
+          },
+          "distractorWhy": {
+            "1": "Menggugurkan daun pada musim kemarau adalah ciri hutan musim (hutan meranggas) seperti hutan jati.",
+            "2": "Tumbuhan konifer merupakan vegetasi hutan taiga di daerah beriklim dingin/subtropis.",
+            "3": "Padang rumput tanpa pohon merupakan ciri vegetasi sabana atau padang rumput stepa."
+          }
+        },
+        {
+          "id": "ips-d-8-t1-q10",
+          "difficulty": "dasar",
+          "prompt": "Berdasarkan Buku Siswa IPS Kelas VIII Edisi Revisi Tema 01, di kawasan Nusa Tenggara dengan curah hujan yang relatif sedikit, jenis vegetasi alami yang dominan dijumpai adalah ....",
+          "options": [
+            "sabana dan padang rumput",
+            "hutan hujan tropis heterogen",
+            "hutan lumut dan tundra",
+            "hutan bakau pedalaman"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Wilayah Nusa Tenggara memiliki iklim yang cenderung lebih kering dengan masa kemarau panjang sehingga ditumbuhi vegetasi sabana dan padang rumput."
+          },
+          "distractorWhy": {
+            "1": "Hutan hujan tropis heterogen tumbuh di daerah bersuhu basah dengan curah hujan tinggi seperti Sumatra, Kalimantan, dan Papua.",
+            "2": "Hutan lumut dan tundra terdapat di kawasan pegunungan tinggi atau daerah kutub.",
+            "3": "Hutan bakau tumbuh di daerah pesisir pantai berlumpur yang dipengaruhi pasang surut air laut."
+          }
+        },
+        {
+          "id": "ips-d-8-t1-q11",
+          "difficulty": "sedang",
+          "prompt": "Berdasarkan Buku Siswa IPS Kelas VIII Edisi Revisi Tema 01, hutan memiliki fungsi ekologis dan ekonomis bagi kehidupan. Salah satu fungsi ekologis hutan sebagai pengatur tata air (fungsi hidrologis) adalah ....",
+          "options": [
+            "menampung air hujan dan menyerapnya ke dalam tanah sehingga mencegah banjir serta menjaga ketersediaan air tanah",
+            "menghasilkan kayu pertukangan dan bahan baku kertas untuk diekspor ke luar negeri",
+            "menjadi tempat objek wisata alam yang mendatangkan pendapatan bagi daerah",
+            "menyediakan lahan permukiman baru bagi penduduk yang direlokasi dari perkotaan"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Fungsi hidrologis hutan adalah menyerap dan menyimpan air hujan dalam tanah sehingga menjaga keseimbangan tata air tanah dan mencegah banjir."
+          },
+          "distractorWhy": {
+            "1": "Menghasilkan kayu pertukangan merupakan fungsi produksi atau ekonomis hutan.",
+            "2": "Tempat objek wisata merupakan fungsi pariwisata/ekonomis jasa lingkungan.",
+            "3": "Penyediaan lahan permukiman bukan fungsi ekologis hutan, melainkan alih fungsi lahan."
+          }
+        },
+        {
+          "id": "ips-d-8-t1-q12",
+          "difficulty": "dasar",
+          "prompt": "Berdasarkan Buku Siswa IPS Kelas VIII Edisi Revisi Tema 01, pelestarian sumber daya alam hayati dapat dilakukan melalui bentuk konservasi *in-situ* dan *ex-situ*. Pernyataan yang menggambarkan konservasi *in-situ* secara tepat adalah ....",
+          "options": [
+            "perlindungan flora dan fauna yang dilakukan di dalam habitat aslinya seperti di Taman Nasional Ujung Kulon",
+            "pemeliharaan dan pembiakan hewan langka di dalam kebun binatang atau taman safari di luar habitat asli",
+            "penyimpanan benih tanaman langka dalam bank genetik berteknologi tinggi di laboratorium kota",
+            "penangkaran tumbuhan langka di dalam kebun raya buatan di pusat perkotaan"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Konservasi *in-situ* adalah perlindungan flora dan fauna yang dilakukan di dalam kawasan habitat aslinya (misalnya Taman Nasional, Cagar Alam, Suaka Margasatwa)."
+          },
+          "distractorWhy": {
+            "1": "Pemeliharaan di kebun binatang atau taman safari merupakan contoh konservasi *ex-situ* (di luar habitat asli).",
+            "2": "Bank genetik laboratorium adalah bentuk pelestarian *ex-situ* berbasis teknologi.",
+            "3": "Kebun raya di kota juga merupakan bentuk pelestarian *ex-situ* karena berada di luar habitat alami tanaman."
+          }
+        },
+        {
+          "id": "ips-d-8-t1-q13",
+          "difficulty": "dasar",
+          "prompt": "Berdasarkan Buku Siswa IPS Kelas VIII Edisi Revisi Tema 01, Indonesia memiliki potensi sumber daya maritim yang melimpah. Kawasan pesisir pantai yang ditumbuhi oleh hutan mangrove bermanfaat secara fisik untuk ....",
+          "options": [
+            "mencegah terjadinya erosi dan abrasi pantai akibat terjangan gelombang laut",
+            "meningkatkan kadar garam air laut sehingga memudahkan pembuatan garam industri",
+            "mempercepat pendangkalan pelabuhan kapal komersial di muara sungai",
+            "menaikkan suhu permukaan air laut agar biota laut berkembang biak lebih cepat"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Akar hutan mangrove berfungsi menahan gempuran gelombang laut sehingga mencegah erosi dan abrasi di garis pantai."
+          },
+          "distractorWhy": {
+            "1": "Mangrove tidak ditujukan untuk meningkatkan kadar garam air laut.",
+            "2": "Pendangkalan pelabuhan justru merupakan dampak negatif sedimentasi yang merugikan navigasi kapal.",
+            "3": "Mangrove tidak berfungsi menaikkan suhu air laut, melainkan menjaga keseimbangan ekosistem pesisir."
+          }
+        },
+        {
+          "id": "ips-d-8-t1-q14",
+          "difficulty": "dasar",
+          "prompt": "Berdasarkan Buku Siswa IPS Kelas VIII Edisi Revisi Tema 01, terumbu karang merupakan salah satu potensi maritim utama Indonesia. Syarat lingkungan yang diperlukan agar ekosistem terumbu karang dapat tumbuh dengan baik dan sehat adalah ....",
+          "options": [
+            "air laut yang jernih, bersuhu hangat antara 20°C–29°C, dan mendapat sinar matahari yang cukup di perairan dangkal",
+            "perairan laut dalam yang gelap dan bersuhu sangat dingin di dasar samudra",
+            "air yang keruh dan kaya kandungan lumpur dari muara sungai berarus deras",
+            "perairan dengan kadar pencemaran minyak tinggi agar zat hara lebih pekat"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Terumbu karang membutuhkan air laut yang jernih agar sinar matahari dapat menembus untuk fotosintesis alga simbion (zooxanthellae), serta suhu hangat berkisar 20°C–29°C di perairan dangkal."
+          },
+          "distractorWhy": {
+            "1": "Dasar samudra yang gelap dan dingin tidak memungkinkan fotosintesis alga simbion terumbu karang.",
+            "2": "Air laut yang keruh dan berlumpur menutup permukaan karang sehingga menahan masuknya sinar matahari.",
+            "3": "Pencemaran minyak sangat merusak dan mematikan polip karang."
+          }
+        },
+        {
+          "id": "ips-d-8-t1-q15",
+          "difficulty": "dasar",
+          "prompt": "Berdasarkan Buku Siswa IPS Kelas VIII Edisi Revisi Tema 01, hutan mangrove juga memiliki fungsi biologis yang penting bagi keberlangsungan hewan air. Fungsi biologis tersebut diantaranya adalah ....",
+          "options": [
+            "sebagai tempat pemijahan (*spawning ground*) serta tempat mencari makan bagi ikan dan udang kecil",
+            "sebagai bahan baku pembuat kayu arang dan bahan kayu pertukangan industri",
+            "sebagai benteng pertahanan militer di pulau-pulau terluar Indonesia",
+            "sebagai sarana pembatas wilayah laut teritorial antarnegara tetangga"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Fungsi biologis hutan mangrove mencakup penyediaan habitat tempat bertelur, memijah, membesar, dan mencari makan bagi beragam biota laut."
+          },
+          "distractorWhy": {
+            "1": "Bahan baku kayu arang merupakan fungsi ekonomis/eksploitasi kayu, bukan fungsi biologis ekosistem.",
+            "2": "Benteng pertahanan militer bukan merupakan fungsi biologis alami ekosistem mangrove.",
+            "3": "Pembatas wilayah teritorial ditentukan oleh koordinat hukum internasional, bukan oleh hutan mangrove."
+          }
+        },
+        {
+          "id": "ips-d-8-t1-q16",
+          "difficulty": "sedang",
+          "prompt": "Berdasarkan Buku Siswa IPS Kelas VIII Edisi Revisi Tema 01, maraknya praktik *Illegal, Unreported, and Unregulated Fishing* (IUU Fishing) serta penggunaan alat tangkap pukat harimau (*trawl*) di perairan Indonesia dapat mengakibatkan ....",
+          "options": [
+            "kerusakan ekosistem dasar laut dan penurunan populasi ikan secara drastis karena terumbu karang hancur dan anak ikan ikut tertangkap",
+            "meningkatnya kelestarian populasi ikan besar karena anak ikan terlindungi di dasar laut",
+            "bertambahnya produktivitas terumbu karang akibat pembajakan dasar laut oleh jaring",
+            "meningkatnya kesejahteraan nelayan tradisional dalam jangka panjang tanpa batas waktu"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Pukat harimau merusak ekosistem terumbu karang di dasar laut dan menangkap seluruh ukuran ikan (termasuk bibit/anak ikan), pemicu krisis sumber daya perikanan."
+          },
+          "distractorWhy": {
+            "1": "Penggunaan alat tangkap tidak ramah lingkungan tidak melindungi anak ikan, melainkan pemicu kepunahan populasi ikan.",
+            "2": "Jaring yang menyapu dasar laut menghancurkan struktur terumbu karang, bukan meningkatkan produktivitas.",
+            "3": "Eksploitasi berlebihan merusak mata pencaharian nelayan tradisional dalam jangka panjang."
+          }
+        },
+        {
+          "id": "ips-d-8-t1-q17",
+          "difficulty": "sedang",
+          "prompt": "Berdasarkan Buku Siswa IPS Kelas VIII Edisi Revisi Tema 01, alih fungsi lahan hutan menjadi perkebunan kelapa sawit secara massif tanpa memperhatikan daya dukung lingkungan dapat memicu terjadinya ancaman ....",
+          "options": [
+            "hilangnya habitat flora-fauna endemik, erosi tanah, dan peningkatkan risiko bencana banjir serta kekeringan",
+            "meningkatnya keberagaman jenis fauna liar di sekitar wilayah pemukiman warga",
+            "bertambahnya volume air tanah yang jernih dan bebas dari bahan kimia industri",
+            "penurunan suhu udara global karena bertambahnya luasan tanaman monokultur"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Deforestasi dan alih fungsi lahan hutan mengurangi kemampuan tanah menyerap air, menghilangkan habitat satwa liar, serta memicu erupsi erosi tanah dan banjir."
+          },
+          "distractorWhy": {
+            "1": "Pembukaan hutan justru menghancurkan habitat alami satwa liar dan menurunkan keanekaragaman hayati.",
+            "2": "Pembukaan hutan mengganggu siklus hidrologi sehingga pasokan air tanah justru berkurang.",
+            "3": "Pengurangan luas hutan hujan menurunkan penyerapan karbon yang dapat memperparah pemanasan global."
+          }
+        },
+        {
+          "id": "ips-d-8-t1-q18",
+          "difficulty": "tinggi",
+          "prompt": "Berdasarkan Buku Siswa IPS Kelas VIII Edisi Revisi Tema 01, pemanfaatan sumber daya maritim di Indonesia dapat dikembangkan melalui sektor pariwisata bahari. Upaya pemanfaatan yang paling sesuai dengan prinsip pembangunan berkelanjutan adalah ....",
+          "options": [
+            "mengembangkan ekowisata berbasis pemberdayaan masyarakat lokal dengan menjaga keaslian ekosistem terumbu karang",
+            "membangun resor mewah di atas terumbu karang dengan mengeruk dasar laut agar kapal pesiar besar dapat bersandar",
+            "memperbolehkan wisatawan mengambil suvenir berupa terumbu karang dan kerang langka untuk dijual kembali",
+            "membuka kawasan konservasi maritim secara bebas tanpa batasan jumlah pengunjung harian"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Ekowisata bahari berkelanjutan memadukan pemanfaatan ekonomi melalui wisata dengan perlindungan kelestarian ekosistem laut serta pelibatan masyarakat lokal."
+          },
+          "distractorWhy": {
+            "1": "Pengerukan dasar laut merusak ekosistem terumbu karang dan biota laut di sekitarnya.",
+            "2": "Mengambil terumbu karang dan kerang langka melanggar hukum konservasi dan merusak rantai makanan laut.",
+            "3": "Wisata tanpa pembatasan daya dukung lingkungan (*overtourism*) akan mempercepat kerusakan kawasan konservasi."
+          }
+        },
+        {
+          "id": "ips-d-8-t1-q19",
+          "difficulty": "tinggi",
+          "prompt": "Berdasarkan Buku Siswa IPS Kelas VIII Edisi Revisi Tema 01, tanah vulkanis di Indonesia sangat subur dan bernilai ekonomis tinggi untuk sektor pertanian. Pembentukan jenis tanah vulkanis tersebut terjadi akibat ....",
+          "options": [
+            "pelapukan material letusan gunung api seperti abu vulkanis yang kaya akan unsur hara mineral",
+            "pengendapan sisa-sisa cangkang kerang dan hewan laut di perairan pantai dangkal",
+            "pelapukan dedaunan yang membusuk di dasar rawa-rawa berair tenang",
+            "pengikisan batuan kapur oleh air hujan di wilayah pegunungan karst"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Tanah vulkanis terbentuk dari material endapan abu dan tefra erupsi gunung api yang mengalami pelapukan sehingga kaya mineral pendukung kesuburan tanaman."
+          },
+          "distractorWhy": {
+            "1": "Pengendapan kerang di laut membentuk batuan kapur/gamping, bukan tanah vulkanis.",
+            "2": "Pelapukan tumbuhan rawa membentuk tanah gambut atau tanah organosol.",
+            "3": "Pengikisan batuan kapur menghasilkan tanah mediteran atau tanah kapur yang cenderung kurang subur."
+          }
+        },
+        {
+          "id": "ips-d-8-t1-q20",
+          "difficulty": "tinggi",
+          "prompt": "Berdasarkan Buku Siswa IPS Kelas VIII Edisi Revisi Tema 01, pengelolaan sumber daya alam harus menerapkan prinsip efisiensi dan pembangunan berkelanjutan (*sustainable development*). Penerapan prinsip tersebut dalam kegiatan pemanfaatan sumber daya alam tercermin pada tindakan ....",
+          "options": [
+            "melakukan reboisasi pada lahan bekas tambang dan menerapkan sistem tebang pilih dalam pemanfaatan kayu hutan",
+            "menguras habis seluruh cadangan bahan tambang fosil demi mengejar target pertumbuhan ekonomi setinggi-tingginya",
+            "membuang limbah industri secara langsung ke aliran sungai untuk menekan biaya operasional pabrik",
+            "mengubah seluruh kawasan cagar alam menjadi kawasan industri dan permukiman modern"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Pembangunan berkelanjutan menjamin pemanfaatan SDA secara efisien dengan memperhatikan kelestarian lingkungan bagi generasi mendatang (seperti tebang pilih dan reklamasi/reboisasi bekas tambang)."
+          },
+          "distractorWhy": {
+            "1": "Menguras habis cadangan SDA tanpa pemikiran masa depan melanggar prinsip keadilan antargenerasi dalam pembangunan berkelanjutan.",
+            "2": "Membuang limbah tanpa pengolahan merusak lingkungan dan mencemari sumber air bersih.",
+            "3": "Mengubah cagar alam menjadi kawasan industri merusak kawasan perlindungan ekosistem alami."
+          }
+        }
+      ]
+    }
+  ]
+}
