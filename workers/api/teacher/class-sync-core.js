@@ -24,10 +24,11 @@ export const LIMITS = Object.freeze({
   LEARNER_MIN_INTERVAL_MS: 15000, TEACHER_MIN_INTERVAL_MS: 3000
 });
 
-/** normalizeClassCode(raw) -> 'FZ-XXXXXX' | null. Toleran terhadap huruf kecil dan tanpa strip. */
+/** normalizeClassCode(raw) -> 'FZ-XXXXXX' | null. Toleran terhadap huruf kecil dan tanpa strip. Alfabet kode 6 karakter tanpa O/I/0/1. */
 export function normalizeClassCode(raw) {
   let v = String(raw || '').toUpperCase().replace(/[^A-Z0-9]/g, '');
   if (v.startsWith('FZ')) v = v.slice(2);
+  if (!v || v.length !== 6) return null;
   const code = 'FZ-' + v;
   return CLASS_CODE_RE.test(code) ? code : null;
 }

@@ -895,6 +895,15 @@ async function readClasses(env, fetchImpl) {
   };
 }
 
+function make6CharClassCode() {
+  const chars = '23456789ABCDEFGHJKMNPQRSTUVWXYZ';
+  let rand = '';
+  for (let i = 0; i < 6; i++) {
+    rand += chars[Math.floor(Math.random() * chars.length)];
+  }
+  return `FZ-${rand}`;
+}
+
 async function createClass(env, input, fetchImpl) {
   return await ownerApiFetch(env, '/api/owner/class', fetchImpl, {
     method: 'POST',
@@ -2818,15 +2827,15 @@ function renderTeacherSection(m) {
   // Daftar kelas unik dari tc_class (D1), invites, dan teachers
   const knownClassMap = new Map();
   classes.forEach((c) => {
-    if (c.code) knownClassMap.set(c.code, c);
+    if (c.code && c.code !== 'FZ-MERDEKA1') knownClassMap.set(c.code, c);
   });
   invites.forEach((inv) => {
-    if (inv.classCode && !knownClassMap.has(inv.classCode)) {
+    if (inv.classCode && inv.classCode !== 'FZ-MERDEKA1' && !knownClassMap.has(inv.classCode)) {
       knownClassMap.set(inv.classCode, { code: inv.classCode, title: 'Kelas ' + inv.classCode });
     }
   });
   teachers.forEach((tc) => {
-    if (tc.classCode && !knownClassMap.has(tc.classCode)) {
+    if (tc.classCode && tc.classCode !== 'FZ-MERDEKA1' && !knownClassMap.has(tc.classCode)) {
       knownClassMap.set(tc.classCode, { code: tc.classCode, title: 'Kelas ' + tc.classCode });
     }
   });
@@ -2834,8 +2843,9 @@ function renderTeacherSection(m) {
 
   // Pastikan currentClass STABIL dan TIDAK PERNAH ACAK SAAT DI-REFRESH
   let currentClass = m.selectedClass;
-  if (!currentClass || (classList.length > 0 && !knownClassMap.has(currentClass))) {
-    currentClass = classList.length > 0 ? classList[0].code : (m.selectedClass || 'FZ-MERDEKA1');
+  if (!currentClass || currentClass === 'FZ-MERDEKA1' || (classList.length > 0 && !knownClassMap.has(currentClass))) {
+    const validFirst = classList.find(c => c.code && c.code !== 'FZ-MERDEKA1');
+    currentClass = validFirst ? validFirst.code : (m.selectedClass && m.selectedClass !== 'FZ-MERDEKA1' ? m.selectedClass : make6CharClassCode());
   }
 
   let alertBanner = '';
@@ -5128,26 +5138,26 @@ async function handle(request, env, ctx, nowMs) {
     // Resolusi daftar kelas yang persisten dari tc_class, invites, dan teachers
     const dbClasses = (model.classes && model.classes.classes) || [];
     const knownClassSet = new Set();
-    dbClasses.forEach((c) => { if (c.code) knownClassSet.add(c.code); });
-    (model.teachers && model.teachers.invites || []).forEach((i) => { if (i.classCode) knownClassSet.add(i.classCode); });
-    (model.teachers && model.teachers.teachers || []).forEach((t) => { if (t.classCode) knownClassSet.add(t.classCode); });
+    dbClasses.forEach((c) => { if (c.code && c.code !== 'FZ-MERDEKA1') knownClassSet.add(c.code); });
+    (model.teachers && model.teachers.invites || []).forEach((i) => { if (i.classCode && i.classCode !== 'FZ-MERDEKA1') knownClassSet.add(i.classCode); });
+    (model.teachers && model.teachers.teachers || []).forEach((t) => { if (t.classCode && t.classCode !== 'FZ-MERDEKA1') knownClassSet.add(t.classCode); });
 
     // Jika database tc_class benar-benar kosong, otomatis terbitkan kelas awal di D1 agar tersimpan permanen
     if (dbClasses.length === 0 && knownClassSet.size === 0) {
       try {
+        const initCode = make6CharClassCode();
         const autoInit = await createClass(env, {
           title: 'Kelas 7-A (Utama)',
           level: 'SMP',
-          code: 'FZ-MERDEKA1'
+          code: initCode
         }, fetchImpl);
-        if (autoInit && autoInit.body && autoInit.body.code) {
-          knownClassSet.add(autoInit.body.code);
-          dbClasses.push({
-            code: autoInit.body.code,
-            title: 'Kelas 7-A (Utama)',
-            level: 'SMP'
-          });
-        }
+        const establishedCode = (autoInit && autoInit.body && autoInit.body.code) || initCode;
+        knownClassSet.add(establishedCode);
+        dbClasses.push({
+          code: establishedCode,
+          title: 'Kelas 7-A (Utama)',
+          level: 'SMP'
+        });
       } catch (_) {}
     }
 
@@ -5157,19 +5167,19 @@ async function handle(request, env, ctx, nowMs) {
 
     // Tentukan kelas aktif secara stabil (TIDAK PERNAH ACAK SAAT REFRESH!)
     let activeClass = '';
-    const isDeleted = (code) => teacherAction && teacherAction.deletedCode === code;
-    if (teacherAction && teacherAction.action === 'class' && teacherAction.code) {
+    const isDeleted = (code) => !code || code === 'FZ-MERDEKA1' || (teacherAction && teacherAction.deletedCode === code);
+    if (teacherAction && teacherAction.action === 'class' && teacherAction.code && !isDeleted(teacherAction.code)) {
       activeClass = teacherAction.code;
     } else if (paramCls && knownClassSet.has(paramCls) && !isDeleted(paramCls)) {
       activeClass = paramCls;
-    } else if (paramCls && /^FZ-[A-Z0-9]{4,10}$/.test(paramCls) && !isDeleted(paramCls)) {
+    } else if (paramCls && /^FZ-[A-HJ-NP-Z2-9]{6}$/.test(paramCls) && !isDeleted(paramCls)) {
       activeClass = paramCls;
     } else if (cookieCls && knownClassSet.has(cookieCls) && !isDeleted(cookieCls)) {
       activeClass = cookieCls;
     } else if (classArray.filter(c => !isDeleted(c)).length > 0) {
       activeClass = classArray.filter(c => !isDeleted(c))[0];
     } else {
-      activeClass = 'FZ-MERDEKA1';
+      activeClass = make6CharClassCode();
     }
 
     model.selectedClass = activeClass;
