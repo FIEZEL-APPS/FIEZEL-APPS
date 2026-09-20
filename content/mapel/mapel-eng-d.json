@@ -1,0 +1,2259 @@
+{
+  "schema": "fiezel-mapel-bank-v1",
+  "subjectId": "ENG",
+  "subjectName": "Bahasa Inggris",
+  "phase": "fase_d",
+  "catatan": "Bank soal Fase D (SMP kelas 7-9) untuk jalur Kurikulum Nasional 17 Mapel di Ruang Guru. Kunci jawaban selalu di indeks 0 pada berkas sumber; pengacakan opsi terjadi saat tugas diterbitkan (shuffleOptions di features/teacher/fiezel-teacher-shell.js), jadi tidak ada penjelasan yang boleh menyebut posisi pilihan. distractorWhy adalah peta miskonsepsi yang dibaca Braincore untuk diagnosis.",
+  "competencies": [
+    {
+      "code": "KOMP-ENG-D-7-DSC-01",
+      "grade": 7,
+      "semester": 1,
+      "name": "Descriptive Text & Everyday Adjectives",
+      "materi": "Describing people, objects, animals, and daily environment using Simple Present and to be",
+      "cpRef": "Kepmendikbudristek/BSKAP No. 032/H/KR/2024 — CP Bahasa Inggris Fase D, Elemen Membaca–Memirsa",
+      "items": [
+        {
+          "id": "eng-d7-dsc-001",
+          "prompt": "Rina wants to describe her classmate Bagas. Which sentence is correct?",
+          "options": [
+            "Bagas is tall and friendly.",
+            "Bagas tall and friendly.",
+            "Bagas are tall and friendly.",
+            "Bagas is tall and friend."
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Subjek orang ketiga tunggal dalam Simple Present menuntut to be 'is', dan kata yang mengikutinya harus kata sifat untuk menyatakan ciri seseorang."
+          },
+          "distractorWhy": {
+            "1": "Murid menghilangkan to be karena dalam Bahasa Indonesia kalimat yang menyebut sifat seseorang sudah lengkap tanpa kata kerja; Bahasa Inggris tetap menuntut is.",
+            "2": "Murid memukul rata semua bentuk to be menjadi are; padahal are hanya untuk subjek jamak dan untuk you, sedangkan satu nama orang memakai is.",
+            "3": "Murid memakai kata benda 'friend' pada tempat yang menuntut kata sifat; yang menerangkan watak seseorang sesudah is adalah kata sifat 'friendly'."
+          },
+          "difficulty": "dasar"
+        },
+        {
+          "id": "eng-d7-dsc-002",
+          "prompt": "Nadia describes her classroom to a new friend. Which sentence uses the adjective correctly?",
+          "options": [
+            "We have a big classroom.",
+            "We have a classroom big.",
+            "We have a big classrooms.",
+            "We has a big classroom."
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Dalam Bahasa Inggris kata sifat berdiri sebelum kata benda yang diterangkannya, sehingga susunannya kata sandang, kata sifat, lalu kata benda."
+          },
+          "distractorWhy": {
+            "1": "Murid memindahkan urutan Bahasa Indonesia yang menaruh kata sifat sesudah kata benda; Bahasa Inggris membalik urutan itu.",
+            "2": "Murid menambahkan -s pada kata benda padahal kata sandang a menandai satu benda saja; a dan bentuk jamak tidak boleh bertemu.",
+            "3": "Murid memakai has untuk subjek we; has hanya untuk orang ketiga tunggal, sedangkan we memakai have."
+          },
+          "difficulty": "dasar"
+        },
+        {
+          "id": "eng-d7-dsc-003",
+          "prompt": "Complete the description: 'Rina ___ long black hair and a round face.'",
+          "options": [
+            "has",
+            "have",
+            "is",
+            "haves"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Subjek orang ketiga tunggal dalam Simple Present memakai bentuk has untuk menyatakan ciri fisik yang dimiliki seseorang."
+          },
+          "distractorWhy": {
+            "1": "Murid memakai bentuk dasar have untuk semua subjek karena kata kerja Bahasa Indonesia tidak pernah berubah mengikuti pelakunya.",
+            "2": "Murid memilih is karena menganggap semua kalimat deskriptif memakai kata penghubung; ciri yang dimiliki seseorang dinyatakan dengan has, bukan dengan to be.",
+            "3": "Murid menerapkan aturan tambah -s secara mekanis pada have; bentuk orang ketiga tunggal kata kerja ini tidak beraturan, yaitu has."
+          },
+          "difficulty": "dasar"
+        },
+        {
+          "id": "eng-d7-dsc-004",
+          "prompt": "Bagas describes the school canteen in his writing task. Which sentence is correct?",
+          "options": [
+            "There are three tables in our canteen.",
+            "There are three table in our canteen.",
+            "There is three tables in our canteen.",
+            "There have three tables in our canteen."
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Kata benda terhitung yang lebih dari satu wajib berakhiran -s, dan keberadaan benda jamak dinyatakan dengan there are."
+          },
+          "distractorWhy": {
+            "1": "Murid tidak menandai jamak pada kata bendanya karena dalam Bahasa Indonesia kata bilangan sudah dianggap cukup menunjukkan jumlah; Bahasa Inggris tetap menuntut akhiran -s.",
+            "2": "Murid memakai there is untuk benda jamak; bentuk is hanya untuk satu benda, sedangkan tiga meja menuntut are.",
+            "3": "Murid menerjemahkan kata 'ada' menjadi have; keberadaan benda di suatu tempat dinyatakan dengan there is atau there are."
+          },
+          "difficulty": "dasar"
+        },
+        {
+          "id": "eng-d7-dsc-005",
+          "prompt": "Bagas writes about his pet for the English class. Which sentence is correct?",
+          "options": [
+            "My cat is an animal with soft grey fur.",
+            "My cat is a animal with soft grey fur.",
+            "My cat is an animal with soft grey furs.",
+            "My cat is animal with soft grey fur."
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Kata benda tunggal yang diawali bunyi vokal memakai kata sandang an, sedangkan kata benda tak terhitung yang berarti bulu tidak pernah dijamakkan."
+          },
+          "distractorWhy": {
+            "1": "Murid menghafal a sebagai kata sandang untuk semua kata benda; padahal pilihan a atau an ditentukan oleh bunyi awal kata sesudahnya.",
+            "2": "Murid menambahkan -s pada kata yang berarti bulu karena membayangkan jumlahnya banyak; kata benda tak terhitung tetap berbentuk tunggal.",
+            "3": "Murid menghilangkan kata sandang karena Bahasa Indonesia tidak mengenal a atau an; kata benda tunggal yang dapat dihitung selalu membutuhkannya."
+          },
+          "difficulty": "sedang"
+        },
+        {
+          "id": "eng-d7-dsc-006",
+          "prompt": "Which sentence describes the new seventh graders correctly?",
+          "options": [
+            "The new students are diligent and polite.",
+            "The new students is diligent and polite.",
+            "The new students are diligents and polites.",
+            "The students new are diligent and polite."
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Subjek jamak memakai are, dan kata sifat dalam Bahasa Inggris tidak pernah berubah bentuk mengikuti jumlah kata bendanya."
+          },
+          "distractorWhy": {
+            "1": "Murid mengira sekelompok murid dihitung sebagai satu kesatuan sehingga memilih is; bentuk to be mengikuti bentuk jamak kata bendanya.",
+            "2": "Murid memindahkan penanda jamak ke kata sifat karena menyangka semua kata harus sejalan jumlahnya; hanya kata benda yang menerima akhiran -s.",
+            "3": "Murid menaruh kata sifat sesudah kata benda seperti urutan Bahasa Indonesia; dalam Bahasa Inggris kata sifat mendahului kata benda."
+          },
+          "difficulty": "sedang"
+        },
+        {
+          "id": "eng-d7-dsc-007",
+          "prompt": "Rina describes the bag that belongs to Nadia. Which sentence is correct?",
+          "options": [
+            "Nadia's bag is red and small.",
+            "Nadia bag is red and small.",
+            "Nadias bag is red and small.",
+            "Nadia's bag are red and small."
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Kepemilikan oleh satu orang ditandai apostrof dan -s pada nama pemiliknya, dan karena bendanya tunggal maka to be-nya is."
+          },
+          "distractorWhy": {
+            "1": "Murid menyandingkan nama dan benda begitu saja seperti pola kepemilikan Bahasa Indonesia; Bahasa Inggris menuntut penanda kepemilikan pada nama.",
+            "2": "Murid menulis -s tanpa apostrof sehingga yang terbaca adalah bentuk jamak sebuah nama, bukan kepemilikan.",
+            "3": "Murid mencocokkan to be dengan dua kata sifat yang terasa banyak; yang menentukan bentuk to be adalah subjeknya, yaitu satu tas."
+          },
+          "difficulty": "sedang"
+        },
+        {
+          "id": "eng-d7-dsc-008",
+          "prompt": "Rina wants to say that her brother is not tall. Which sentence is correct?",
+          "options": [
+            "My brother is not tall.",
+            "My brother does not tall.",
+            "My brother not tall.",
+            "My brother is no tall."
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Kalimat menyangkal yang predikatnya kata sifat dibentuk dengan to be ditambah not, tanpa kata kerja bantu lain."
+          },
+          "distractorWhy": {
+            "1": "Murid memakai does not karena menganggap semua pengingkaran Simple Present memerlukan do; kata kerja bantu itu hanya dipakai bila predikatnya kata kerja biasa.",
+            "2": "Murid menaruh kata ingkar langsung di depan kata sifat seperti pola Bahasa Indonesia; Bahasa Inggris tetap menuntut is sebelum not.",
+            "3": "Murid menukar no dengan not; no menerangkan kata benda, sedangkan yang menyangkal kata sifat sesudah to be adalah not."
+          },
+          "difficulty": "sedang"
+        },
+        {
+          "id": "eng-d7-dsc-009",
+          "prompt": "Nadia describes the gate of her school. Which phrase is correct?",
+          "options": [
+            "a tall black gate",
+            "a black tall gate",
+            "a gate tall black",
+            "a tall blacks gate"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Bila dua kata sifat menerangkan satu benda, urutan lazimnya adalah keterangan ukuran lebih dahulu, baru keterangan warna."
+          },
+          "distractorWhy": {
+            "1": "Murid menyusun kata sifat menurut kata yang lebih dulu terlintas; Bahasa Inggris menempatkan keterangan ukuran sebelum keterangan warna.",
+            "2": "Murid memakai pola Bahasa Indonesia yang menaruh semua kata sifat sesudah kata bendanya.",
+            "3": "Murid menambahkan -s pada kata sifat warna karena mengira kata sifat ikut berubah; kata sifat Bahasa Inggris selalu tetap bentuknya."
+          },
+          "difficulty": "sedang"
+        },
+        {
+          "id": "eng-d7-dsc-010",
+          "prompt": "Which sentence about the girl in the school library is correct?",
+          "options": [
+            "The girl with two big books is my sister.",
+            "The girl with two big books are my sister.",
+            "The girl with two big book is my sister.",
+            "The girl with two big books she is my sister."
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Inti subjek kalimat ini adalah kata benda tunggal yang berarti anak perempuan, sehingga to be-nya is meskipun ada kata jamak di dalam keterangan penyertanya."
+          },
+          "distractorWhy": {
+            "1": "Murid mencocokkan to be dengan kata benda jamak yang paling dekat; yang menentukan bentuk to be adalah inti subjek, bukan kata di dalam keterangan.",
+            "2": "Murid melupakan penanda jamak sesudah kata bilangan; setiap kata benda terhitung yang lebih dari satu berakhiran -s.",
+            "3": "Murid mengulang subjek dengan kata ganti seperti kebiasaan bertutur Bahasa Indonesia; dalam Bahasa Inggris satu subjek cukup disebut sekali."
+          },
+          "difficulty": "tinggi"
+        },
+        {
+          "id": "eng-d7-dsc-011",
+          "prompt": "Bagas describes his habit at school. Which sentence is correct?",
+          "options": [
+            "He always wears a neat uniform on Monday.",
+            "He wears always a neat uniform on Monday.",
+            "He always wear a neat uniform on Monday.",
+            "He is always wears a neat uniform on Monday."
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Keterangan kekerapan seperti always berdiri sebelum kata kerja biasa, dan subjek orang ketiga tunggal menuntut akhiran -s pada kata kerjanya."
+          },
+          "distractorWhy": {
+            "1": "Murid menaruh keterangan kekerapan sesudah kata kerja meniru letak keterangan dalam bahasa lisan; tempatnya mendahului kata kerja biasa.",
+            "2": "Murid melupakan akhiran -s karena kata kerja Bahasa Indonesia tidak pernah berubah mengikuti subjeknya.",
+            "3": "Murid memasang to be dan kata kerja biasa sekaligus karena menerjemahkan kata 'adalah'; satu kalimat Simple Present hanya boleh punya satu penanda predikat."
+          },
+          "difficulty": "tinggi"
+        },
+        {
+          "id": "eng-d7-dsc-012",
+          "prompt": "Rina finishes her descriptive text about her cat. Which sentence is correct?",
+          "options": [
+            "My cat is small, and its fur is very soft.",
+            "My cat is small, and it's fur is very soft.",
+            "My cat is small, and its fur are very soft.",
+            "My cat is small, and its fur very soft."
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Bentuk its tanpa apostrof adalah kata ganti kepemilikan, dan kata benda tak terhitung yang berarti bulu memakai is."
+          },
+          "distractorWhy": {
+            "1": "Murid menulis bentuk singkat dari it is karena bunyinya sama; bentuk berapostrof itu berarti 'benda itu adalah', bukan penanda kepemilikan.",
+            "2": "Murid memakai are karena membayangkan bulu berjumlah banyak; kata benda tak terhitung diperlakukan sebagai satu kesatuan dengan is.",
+            "3": "Murid menghilangkan to be pada bagian kedua kalimat karena kalimat bersifat dalam Bahasa Indonesia tidak memerlukannya."
+          },
+          "difficulty": "tinggi"
+        }
+      ]
+    },
+    {
+      "code": "KOMP-ENG-D-7-PRO-01",
+      "grade": 7,
+      "semester": 1,
+      "name": "Procedure Text: Imperatives & Sequencing Connectives",
+      "materi": "Menulis dan memahami langkah prosedur dengan kalimat imperatif serta konjungsi urutan",
+      "cpRef": "Kepmendikbudristek/BSKAP No. 032/H/KR/2024 — CP Bahasa Inggris Fase D, Elemen Menulis–Mempresentasikan",
+      "items": [
+        {
+          "id": "eng-d7-pro-001",
+          "prompt": "This is the opening step of a nasi goreng recipe. Which sentence is a correct imperative?",
+          "options": [
+            "Heat two spoons of oil in a pan.",
+            "To heat two spoons of oil in a pan.",
+            "Heats two spoons of oil in a pan.",
+            "Heating two spoons of oil in a pan."
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Langkah prosedur ditulis sebagai kalimat perintah yang dimulai kata kerja bentuk dasar tanpa menyebut subjek."
+          },
+          "distractorWhy": {
+            "1": "Murid memakai bentuk to dan kata kerja karena menerjemahkan kata 'untuk'; bentuk itu belum menjadi kalimat perintah yang utuh.",
+            "2": "Murid menambahkan -s seolah ada subjek orang ketiga tunggal; kalimat perintah tidak bersubjek sehingga kata kerjanya tetap bentuk dasar.",
+            "3": "Murid memilih bentuk -ing karena kata kerja berimbuhan Bahasa Indonesia terasa sepadan dengannya; bentuk -ing bukan kalimat perintah."
+          },
+          "difficulty": "dasar"
+        },
+        {
+          "id": "eng-d7-pro-002",
+          "prompt": "Rina warns her friend about the salt while they cook. Which sentence is correct?",
+          "options": [
+            "Do not add too much salt.",
+            "Not add too much salt.",
+            "Do not adds too much salt.",
+            "No add too much salt."
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Larangan di dalam teks prosedur dibentuk dengan do not diikuti kata kerja bentuk dasar."
+          },
+          "distractorWhy": {
+            "1": "Murid menaruh kata ingkar langsung di depan kata kerja seperti bentuk larangan Bahasa Indonesia; Bahasa Inggris menambahkan do sebelum not.",
+            "2": "Murid menambahkan -s pada kata kerja sesudah do not; kata kerja yang mengikuti kata bantu selalu berbentuk dasar.",
+            "3": "Murid memakai no yang tugasnya menerangkan kata benda; larangan terhadap sebuah tindakan memakai not bersama do."
+          },
+          "difficulty": "dasar"
+        },
+        {
+          "id": "eng-d7-pro-003",
+          "prompt": "Complete the recipe for es teh: '___, boil two glasses of water.'",
+          "options": [
+            "First",
+            "At first",
+            "Finally",
+            "After"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Langkah pembuka teks prosedur ditandai konjungsi urutan First yang menyatakan tindakan paling awal."
+          },
+          "distractorWhy": {
+            "1": "Murid mengira ungkapan berpreposisi itu bermakna sama; ungkapan tersebut menandai keadaan mula-mula yang kemudian berubah, bukan langkah pembuka sebuah prosedur.",
+            "2": "Murid memakai penanda langkah penutup untuk mengawali prosedur sehingga urutan langkahnya terbalik.",
+            "3": "Murid memenggal ungkapan urutannya; kata itu masih menuntut kata benda atau anak kalimat sesudahnya, sehingga belum dapat berdiri sebagai penanda urutan."
+          },
+          "difficulty": "dasar"
+        },
+        {
+          "id": "eng-d7-pro-004",
+          "prompt": "Rina writes the second step of frying rice. Which sentence is correct?",
+          "options": [
+            "Then, put the cold rice into the pan.",
+            "Then, putting the cold rice into the pan.",
+            "Then, please you put the cold rice into the pan.",
+            "Than, put the cold rice into the pan."
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Konjungsi urutan Then diikuti kalimat perintah yang berkata kerja bentuk dasar dan tidak bersubjek."
+          },
+          "distractorWhy": {
+            "1": "Murid memakai bentuk -ing sebagai judul langkah; langkah prosedur tetap harus berupa perintah dengan kata kerja bentuk dasar.",
+            "2": "Murid memunculkan subjek you di dalam kalimat perintah; perintah Bahasa Inggris tidak menyebut pelakunya.",
+            "3": "Murid menukar dua kata yang bunyinya mirip; kata yang dipakainya bertugas membandingkan, bukan menandai urutan langkah."
+          },
+          "difficulty": "dasar"
+        },
+        {
+          "id": "eng-d7-pro-005",
+          "prompt": "Step two says 'Fry the garlic until it is fragrant.' Which connective opens step three: '___, add the cold rice and stir it well.'",
+          "options": [
+            "After that",
+            "First of all",
+            "Finally",
+            "After"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Langkah lanjutan di tengah prosedur ditandai After that yang menunjuk pada langkah yang baru saja disebutkan."
+          },
+          "distractorWhy": {
+            "1": "Murid memakai penanda pembuka untuk langkah ketiga sehingga alur urutannya hilang.",
+            "2": "Murid memilih penanda penutup padahal masih ada langkah lain yang menyusul.",
+            "3": "Murid memotong ungkapan urutannya; bentuk yang tersisa masih menuntut kata benda atau anak kalimat sesudahnya."
+          },
+          "difficulty": "sedang"
+        },
+        {
+          "id": "eng-d7-pro-006",
+          "prompt": "Nadia writes a step for making es teh in the school kitchen. Which sentence is correct?",
+          "options": [
+            "Stir the tea until the sugar dissolves.",
+            "Stir the tea until the sugar dissolve.",
+            "Stir the tea until the sugar is dissolves.",
+            "Stir the tea until the sugar dissolved."
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Anak kalimat waktu sesudah until memakai Simple Present, dan subjeknya orang ketiga tunggal sehingga kata kerjanya berakhiran -s."
+          },
+          "distractorWhy": {
+            "1": "Murid melupakan akhiran -s di anak kalimat karena perhatiannya tertuju pada kalimat perintahnya saja.",
+            "2": "Murid memasang to be sekaligus kata kerja biasa sehingga predikatnya tertandai dua kali.",
+            "3": "Murid memakai bentuk lampau karena membayangkan langkah yang sudah selesai; teks prosedur selalu memakai Simple Present."
+          },
+          "difficulty": "sedang"
+        },
+        {
+          "id": "eng-d7-pro-007",
+          "prompt": "Which sentence lists the ingredients of nasi goreng correctly?",
+          "options": [
+            "You need two eggs, a little salt, and some cooking oil.",
+            "You need two egg, a little salt, and some cooking oil.",
+            "You need two eggs, a few salt, and some cooking oil.",
+            "You need two eggs, a little salt, and some cooking oils."
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Kata benda terhitung yang lebih dari satu memakai -s, sedangkan kata benda tak terhitung memakai a little atau some tanpa akhiran."
+          },
+          "distractorWhy": {
+            "1": "Murid tidak menandai jamak karena menganggap kata bilangan sudah cukup menunjukkan jumlah seperti kebiasaan Bahasa Indonesia.",
+            "2": "Murid memakai a few untuk bahan yang tidak dapat dihitung satuannya; bentuk itu hanya untuk kata benda terhitung jamak.",
+            "3": "Murid menjamakkan kata benda tak terhitung; nama bahan cair itu tetap tanpa akhiran walaupun jumlahnya banyak."
+          },
+          "difficulty": "sedang"
+        },
+        {
+          "id": "eng-d7-pro-008",
+          "prompt": "Bagas writes the closing step of the nasi goreng recipe. Which sentence is correct?",
+          "options": [
+            "Finally, serve the fried rice on a plate while it is hot.",
+            "Finally, serving the fried rice on a plate while it is hot.",
+            "Finally, you must to serve the fried rice on a plate while it is hot.",
+            "Finally, serve the fried rice on a plate while it hot."
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Langkah penutup memakai konjungsi Finally diikuti kalimat perintah, dan anak kalimat waktunya tetap memerlukan to be sebelum kata sifat."
+          },
+          "distractorWhy": {
+            "1": "Murid memakai bentuk -ing sesudah konjungsi urutan; langkah prosedur tetap berupa perintah dengan kata kerja bentuk dasar.",
+            "2": "Murid menyisipkan to sesudah kata bantu must; kata kerja sesudah kata bantu selalu berbentuk dasar, lagipula langkah prosedur cukup ditulis sebagai perintah.",
+            "3": "Murid menghilangkan to be sebelum kata sifat karena kalimat bersifat dalam Bahasa Indonesia tidak memerlukannya."
+          },
+          "difficulty": "sedang"
+        },
+        {
+          "id": "eng-d7-pro-009",
+          "prompt": "Which safety step for the cooking practice at school is correct?",
+          "options": [
+            "Before you turn on the stove, check the gas hose.",
+            "Before you turn on the stove, checking the gas hose.",
+            "Before you turns on the stove, check the gas hose.",
+            "Before turn on the stove, check the gas hose."
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Anak kalimat waktu dengan before memuat subjek dan kata kerja yang lengkap, sedangkan langkahnya sendiri berupa perintah berkata kerja dasar."
+          },
+          "distractorWhy": {
+            "1": "Murid menulis langkah utamanya dengan bentuk -ing sehingga kalimat itu kehilangan sifat perintahnya.",
+            "2": "Murid menambahkan -s pada kata kerja yang bersubjek you; akhiran itu hanya untuk subjek orang ketiga tunggal.",
+            "3": "Murid membuang subjek di anak kalimat karena kalimat Bahasa Indonesia dapat berdiri tanpa menyebut pelaku; sesudah before diperlukan subjek dan kata kerja."
+          },
+          "difficulty": "sedang"
+        },
+        {
+          "id": "eng-d7-pro-010",
+          "prompt": "Bagas arranges four steps for making es teh. Which arrangement uses the sequencing connectives correctly?",
+          "options": [
+            "First, boil the water. Next, put a tea bag into a glass. After that, add two spoons of sugar. Finally, put in some ice cubes.",
+            "Finally, boil the water. Next, put a tea bag into a glass. After that, add two spoons of sugar. First, put in some ice cubes.",
+            "First, boil the water. First, put a tea bag into a glass. First, add two spoons of sugar. First, put in some ice cubes.",
+            "First, boiling the water. Next, putting a tea bag into a glass. After that, adding two spoons of sugar. Finally, putting in some ice cubes."
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Konjungsi urutan bergerak dari First ke Next, lalu After that, dan ditutup Finally, sementara setiap langkah ditulis sebagai kalimat perintah."
+          },
+          "distractorWhy": {
+            "1": "Murid menukar penanda pembuka dengan penanda penutup karena menganggap konjungsi urutan sekadar hiasan; justru kata itulah yang memberi tahu langkah mana yang lebih dahulu.",
+            "2": "Murid mengulang satu penanda untuk seluruh langkah sehingga pembaca tidak tahu langkah mana yang berikutnya.",
+            "3": "Murid menulis seluruh langkah dengan bentuk -ing; teks prosedur menuntut kata kerja perintah bentuk dasar."
+          },
+          "difficulty": "tinggi"
+        },
+        {
+          "id": "eng-d7-pro-011",
+          "prompt": "Rina joins the two closing steps of the recipe in one sentence. Which sentence is correct?",
+          "options": [
+            "Turn off the stove, and then move the fried rice to a plate.",
+            "Turn off the stove, and then moving the fried rice to a plate.",
+            "Turn off the stove, and then you moves the fried rice to a plate.",
+            "Turn off the stove, and then the fried rice move to a plate."
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Dua perintah yang digabung dengan and then keduanya tetap berkata kerja bentuk dasar dan tidak bersubjek."
+          },
+          "distractorWhy": {
+            "1": "Murid mengubah perintah keduanya menjadi bentuk -ing sehingga bagian itu tidak lagi sejajar dengan perintah sebelumnya.",
+            "2": "Murid memunculkan subjek sekaligus menambahkan -s; kalimat perintah tidak bersubjek dan kata kerjanya tetap bentuk dasar.",
+            "3": "Murid menaruh sasaran tindakan sebelum kata kerjanya mengikuti kebiasaan menonjolkan benda pada awal kalimat Bahasa Indonesia; perintah Bahasa Inggris selalu dibuka kata kerja."
+          },
+          "difficulty": "tinggi"
+        },
+        {
+          "id": "eng-d7-pro-012",
+          "prompt": "Nadia writes the ingredient list for es teh on the whiteboard. Which line is correct?",
+          "options": [
+            "Ingredients: two glasses of water, three spoons of sugar, and one tea bag.",
+            "Ingredients: two glass of water, three spoon of sugar, and one tea bag.",
+            "Ingredients: two glasses of waters, three spoons of sugars, and one tea bag.",
+            "Ingredients: two glasses water, three spoons sugar, and one tea bag."
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Takaran ditulis dengan kata wadah berbentuk jamak, lalu kata of, kemudian kata benda tak terhitung yang tetap tanpa akhiran."
+          },
+          "distractorWhy": {
+            "1": "Murid tidak menjamakkan kata wadah walaupun jumlahnya lebih dari satu; yang dihitung justru gelas dan sendoknya, sehingga kata itulah yang berakhiran -s.",
+            "2": "Murid menjamakkan bahan yang tidak dapat dihitung; nama bahan seperti air dan gula tidak pernah menerima akhiran -s.",
+            "3": "Murid menghilangkan of karena susunan takaran Bahasa Indonesia langsung menyandingkan wadah dengan bahannya; Bahasa Inggris memerlukan of di antaranya."
+          },
+          "difficulty": "tinggi"
+        }
+      ]
+    },
+    {
+      "code": "KOMP-ENG-D-7-GRT-01",
+      "grade": 7,
+      "semester": 2,
+      "name": "Greetings, Introductions & WH-Questions",
+      "materi": "Sapaan, perkenalan diri, dan kalimat tanya WH-question dasar dalam percakapan sehari-hari",
+      "cpRef": "Kepmendikbudristek/BSKAP No. 032/H/KR/2024 — CP Bahasa Inggris Fase D, Elemen Menyimak–Berbicara",
+      "items": [
+        {
+          "id": "eng-d7-grt-001",
+          "prompt": "Rina meets her English teacher in the school corridor at seven o'clock in the morning. Which greeting is correct?",
+          "options": [
+            "Good morning, Mrs. Dewi.",
+            "Good night, Mrs. Dewi.",
+            "Good afternoon, Mrs. Dewi.",
+            "Good mornings, Mrs. Dewi."
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Sapaan Good morning dipakai sejak pagi hari sampai menjelang tengah hari, dan bentuknya tetap karena merupakan ungkapan baku."
+          },
+          "distractorWhy": {
+            "1": "Murid memakai Good night sebagai sapaan ketika bertemu karena 'selamat malam' dalam Bahasa Indonesia dapat dipakai untuk menyapa; dalam Bahasa Inggris Good night hanya diucapkan saat berpisah atau hendak tidur.",
+            "2": "Murid menyamakan 'siang' dengan afternoon lalu memakainya untuk pukul tujuh pagi; afternoon baru dipakai sesudah tengah hari.",
+            "3": "Murid menambahkan -s karena mengira setiap kata benda Bahasa Inggris boleh dijamakkan; ungkapan sapaan ini berbentuk tetap dan tidak pernah menerima akhiran jamak."
+          },
+          "difficulty": "dasar"
+        },
+        {
+          "id": "eng-d7-grt-002",
+          "prompt": "Bagas introduces himself in front of his new class on the first day of school. Which sentence is correct?",
+          "options": [
+            "Good morning, friends. My name is Bagas, and I am twelve years old.",
+            "Good morning, friends. My name Bagas, and I am twelve years old.",
+            "Good morning, friends. I name is Bagas, and I am twelve years old.",
+            "Good morning, friends. My name is Bagas, and I have twelve years old."
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Perkenalan diri memakai kata ganti kepemilikan my sebelum name, to be is untuk menghubungkan nama, dan to be am untuk menyatakan usia."
+          },
+          "distractorWhy": {
+            "1": "Murid menghilangkan is karena kalimat 'Nama saya Bagas' dalam Bahasa Indonesia sudah lengkap tanpa kata kerja; Bahasa Inggris tetap menuntut to be di antara name dan namanya.",
+            "2": "Murid memakai kata ganti subjek I pada tempat yang menuntut kata ganti kepemilikan karena kata 'saya' dalam Bahasa Indonesia mengisi kedua peran itu sekaligus.",
+            "3": "Murid memakai have untuk menyatakan umur karena membayangkan usia sebagai sesuatu yang dimiliki; dalam Bahasa Inggris usia dinyatakan dengan to be."
+          },
+          "difficulty": "dasar"
+        },
+        {
+          "id": "eng-d7-grt-003",
+          "prompt": "Nadia wants to know the place where Bagas lives. Which question is correct?",
+          "options": [
+            "Where do you live?",
+            "Where you live?",
+            "Where are you live?",
+            "Where does you live?"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Kata tanya Where menanyakan tempat, dan kalimat tanya berkata kerja biasa dalam Simple Present memerlukan kata bantu do untuk subjek you."
+          },
+          "distractorWhy": {
+            "1": "Murid menyusun kalimat tanya tanpa kata bantu karena 'Di mana kamu tinggal?' dalam Bahasa Indonesia tidak memerlukannya; Bahasa Inggris menuntut do sebelum subjek.",
+            "2": "Murid memasang to be sekaligus kata kerja biasa karena terbiasa dengan pola Where are you from; satu kalimat hanya memakai salah satu penanda predikat.",
+            "3": "Murid memakai does untuk subjek you; does hanya untuk subjek orang ketiga tunggal, sedangkan you memakai do."
+          },
+          "difficulty": "dasar"
+        },
+        {
+          "id": "eng-d7-grt-004",
+          "prompt": "Bagas points at a teacher on the school field and wants to know who she is. Which question is correct?",
+          "options": [
+            "Who is that teacher?",
+            "Who that teacher?",
+            "Who are that teacher?",
+            "What is that teacher?"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Identitas seseorang ditanyakan dengan kata tanya Who, dan karena yang ditanyakan satu orang maka to be-nya is."
+          },
+          "distractorWhy": {
+            "1": "Murid menghilangkan to be karena 'Siapa guru itu?' dalam Bahasa Indonesia tidak memakai kata kerja; Bahasa Inggris tetap menuntut is.",
+            "2": "Murid memakai are untuk satu orang; are hanya untuk subjek jamak dan untuk you, sedangkan satu orang guru memakai is.",
+            "3": "Murid memakai What untuk menanyakan orang; What menanyakan benda atau jenis pekerjaan, sedangkan identitas orang ditanyakan dengan Who."
+          },
+          "difficulty": "dasar"
+        },
+        {
+          "id": "eng-d7-grt-005",
+          "prompt": "Nadia wants to know the starting time of the flag ceremony on Monday. Which question is correct?",
+          "options": [
+            "What time does the flag ceremony start?",
+            "What time do the flag ceremony start?",
+            "How does the flag ceremony start?",
+            "What time is the flag ceremony start?"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Waktu jam ditanyakan dengan What time, dan subjek orang ketiga tunggal menuntut kata bantu does yang diikuti kata kerja bentuk dasar."
+          },
+          "distractorWhy": {
+            "1": "Murid memakai do untuk subjek orang ketiga tunggal karena kata kerja Bahasa Indonesia tidak pernah berubah mengikuti pelakunya.",
+            "2": "Murid memakai How untuk menanyakan pukul berapa karena terbiasa dengan How many dan How much yang menanyakan angka; How menanyakan cara berlangsungnya sesuatu, bukan waktu.",
+            "3": "Murid menyisipkan is di depan kata kerja biasa; kalimat tanya yang berkata kerja biasa memakai does, bukan to be."
+          },
+          "difficulty": "sedang"
+        },
+        {
+          "id": "eng-d7-grt-006",
+          "prompt": "Rina introduces her friend Nadia to the new English teacher. Which sentence is correct?",
+          "options": [
+            "This is my friend. Her name is Nadia.",
+            "This is my friend. She name is Nadia.",
+            "This is my friend. His name is Nadia.",
+            "This my friend. Her name is Nadia."
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Memperkenalkan orang lain memakai pola This is, dan nama seorang perempuan dirujuk dengan kata ganti kepemilikan her."
+          },
+          "distractorWhy": {
+            "1": "Murid memakai kata ganti subjek she pada tempat yang menuntut kata ganti kepemilikan her karena kata 'dia' dalam Bahasa Indonesia tidak berubah bentuk.",
+            "2": "Murid memakai his untuk perempuan karena kata ganti Bahasa Indonesia tidak membedakan jenis kelamin; his hanya untuk laki-laki.",
+            "3": "Murid menghilangkan is sesudah This karena 'Ini teman saya' sudah lengkap dalam Bahasa Indonesia; Bahasa Inggris tetap menuntut to be."
+          },
+          "difficulty": "sedang"
+        },
+        {
+          "id": "eng-d7-grt-007",
+          "prompt": "The teacher asks Bagas, 'What does your sister do every morning?' Which answer is correct?",
+          "options": [
+            "She goes to school at half past six.",
+            "She go to school at half past six.",
+            "She is go to school at half past six.",
+            "She goes to school in half past six."
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Subjek orang ketiga tunggal dalam Simple Present menuntut akhiran -s pada kata kerjanya, dan waktu jam ditandai kata depan at."
+          },
+          "distractorWhy": {
+            "1": "Murid melupakan akhiran -s karena kata kerja Bahasa Indonesia tidak berubah mengikuti subjeknya.",
+            "2": "Murid memasang to be dan kata kerja biasa sekaligus; kalimat Simple Present hanya memakai salah satunya sebagai penanda predikat.",
+            "3": "Murid memakai in untuk waktu jam karena kata 'pada' dalam Bahasa Indonesia dipakai bagi semua keterangan waktu; penunjuk pukul memakai at."
+          },
+          "difficulty": "sedang"
+        },
+        {
+          "id": "eng-d7-grt-008",
+          "prompt": "Nadia wants to know the number of students in Bagas's class. Which question is correct?",
+          "options": [
+            "How many students are there in your class?",
+            "How much students are there in your class?",
+            "How many student are there in your class?",
+            "How many students is there in your class?"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Jumlah kata benda terhitung ditanyakan dengan How many, kata bendanya berbentuk jamak, dan keberadaannya dinyatakan dengan there are."
+          },
+          "distractorWhy": {
+            "1": "Murid memakai How much untuk benda terhitung karena kata 'berapa' dalam Bahasa Indonesia tidak membedakan benda yang dapat dihitung dan yang tidak.",
+            "2": "Murid tidak menjamakkan kata bendanya karena menganggap kata tanya jumlah sudah cukup menunjukkan banyaknya; sesudah How many kata benda terhitung selalu berbentuk jamak.",
+            "3": "Murid memakai is untuk kata benda jamak; keberadaan benda yang lebih dari satu dinyatakan dengan there are."
+          },
+          "difficulty": "sedang"
+        },
+        {
+          "id": "eng-d7-grt-009",
+          "prompt": "Rina asks a new student about his hometown. Which question is correct?",
+          "options": [
+            "Where are you from?",
+            "Where do you from?",
+            "Where are you come from?",
+            "From where you are?"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Asal seseorang ditanyakan dengan pola Where are you from yang berpredikat to be karena di dalamnya tidak ada kata kerja biasa."
+          },
+          "distractorWhy": {
+            "1": "Murid menambahkan do pada kalimat tanya yang berpredikat to be; do hanya dipakai bila kalimatnya memuat kata kerja biasa.",
+            "2": "Murid memasang are sekaligus kata kerja come; yang benar memakai to be bersama from saja, atau kata kerja come bersama kata bantu do.",
+            "3": "Murid menyusun kalimat tanya tanpa membalik urutan subjek dan to be karena 'Dari mana kamu?' dalam Bahasa Indonesia tidak mengenal pembalikan itu."
+          },
+          "difficulty": "sedang"
+        },
+        {
+          "id": "eng-d7-grt-010",
+          "prompt": "Nadia wants to know the school subject that Bagas likes most. Which question is correct?",
+          "options": [
+            "What subject does Bagas like best?",
+            "What subject does Bagas likes best?",
+            "What subject do Bagas like best?",
+            "What subject is Bagas like best?"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Kalimat tanya Simple Present dengan subjek orang ketiga tunggal memakai kata bantu does, dan kata kerja sesudahnya kembali ke bentuk dasar."
+          },
+          "distractorWhy": {
+            "1": "Murid mempertahankan akhiran -s pada kata kerja walaupun sudah ada does; penanda orang ketiga tunggal cukup muncul sekali, yaitu pada kata bantunya.",
+            "2": "Murid memakai do untuk nama satu orang karena kata kerja Bahasa Indonesia tidak berubah mengikuti pelakunya.",
+            "3": "Murid memakai to be sebagai kata bantu kalimat tanya; kalimat tanya yang berkata kerja biasa memakai does."
+          },
+          "difficulty": "tinggi"
+        },
+        {
+          "id": "eng-d7-grt-011",
+          "prompt": "Read the dialogue in front of the classroom. Nadia: '___' Bagas: 'Because my house is far from school.' Which question completes the dialogue?",
+          "options": [
+            "Why do you come to school by bus?",
+            "How do you come to school?",
+            "When do you come to school by bus?",
+            "Why are you come to school by bus?"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Balasan Bagas dibuka kata Because yang menyatakan alasan, sehingga kata tanya yang cocok adalah Why, dan kalimat tanyanya memakai kata bantu do."
+          },
+          "distractorWhy": {
+            "1": "Murid memakai How karena mengira kata itu meminta penjelasan; How menanyakan cara, dan jawabannya berupa alat atau tata cara, bukan alasan.",
+            "2": "Murid memakai When karena tertarik pada keterangan waktu yang biasa muncul dalam percakapan sekolah; When menuntut jawaban berupa waktu, sedangkan balasan Bagas menyatakan alasan.",
+            "3": "Murid memasang are sekaligus kata kerja come karena terbiasa dengan pola Where are you from; kalimat tanya berkata kerja biasa memakai do tanpa to be."
+          },
+          "difficulty": "tinggi"
+        },
+        {
+          "id": "eng-d7-grt-012",
+          "prompt": "Rina finds a blue bag on the classroom floor and wants to know its owner. Which question is correct?",
+          "options": [
+            "Whose bag is this?",
+            "Who bag is this?",
+            "Whose is bag this?",
+            "Who's bag is this?"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Pemilik sebuah benda ditanyakan dengan kata tanya Whose yang langsung diikuti kata bendanya, baru to be dan kata penunjuknya."
+          },
+          "distractorWhy": {
+            "1": "Murid memakai Who untuk menanyakan pemilik karena kata 'siapa' dalam Bahasa Indonesia dipakai untuk keduanya; Who menanyakan orangnya, sedangkan Whose menanyakan pemiliknya.",
+            "2": "Murid menaruh to be sebelum kata bendanya sehingga susunannya rusak; sesudah Whose kata benda menyusul lebih dahulu, baru to be.",
+            "3": "Murid menulis bentuk berapostrof yang sebenarnya singkatan dari who is; penanda kepemilikan ini ditulis tanpa apostrof."
+          },
+          "difficulty": "tinggi"
+        }
+      ]
+    },
+    {
+      "code": "KOMP-ENG-D-8-RCT-01",
+      "grade": 8,
+      "semester": 1,
+      "name": "Recount Text & Simple Past Tense",
+      "materi": "Retelling personal past events with regular and irregular verbs and time connectors",
+      "cpRef": "Kepmendikbudristek/BSKAP No. 032/H/KR/2024 — CP Bahasa Inggris Fase D, Elemen Menulis–Mempresentasikan",
+      "items": [
+        {
+          "id": "eng-d8-rct-001",
+          "prompt": "Last Saturday, our class ____ the school yard before the flag ceremony.",
+          "options": [
+            "cleaned",
+            "clean",
+            "cleans",
+            "cleaning"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Peristiwa yang sudah selesai pada waktu lampau memakai Simple Past, dan kata kerja beraturan clean berubah menjadi cleaned dengan akhiran -ed."
+          },
+          "distractorWhy": {
+            "1": "Bentuk dasar dipertahankan karena dalam bahasa Indonesia kata kerja tidak berubah meskipun ada keterangan waktu lampau seperti last Saturday.",
+            "2": "Akhiran -s menandai kebiasaan pada Simple Present, padahal keterangan last Saturday menunjuk waktu yang sudah lewat.",
+            "3": "Bentuk -ing tidak bisa menjadi kata kerja utama tanpa to be di depannya, sehingga kalimat itu kehilangan penanda waktu lampau."
+          },
+          "difficulty": "dasar"
+        },
+        {
+          "id": "eng-d8-rct-002",
+          "prompt": "Bagas ____ to Yogyakarta with his family during the last school holiday.",
+          "options": [
+            "went",
+            "goed",
+            "go",
+            "gone"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Go termasuk kata kerja tak beraturan sehingga bentuk lampaunya berubah menjadi went, bukan dibentuk dengan akhiran -ed."
+          },
+          "distractorWhy": {
+            "1": "Goed muncul dari kebiasaan menempelkan -ed pada semua kata kerja, padahal go berubah bentuk menjadi went.",
+            "2": "Kata kerja dibiarkan berbentuk dasar karena murid merasa keterangan during the last school holiday sudah cukup menandai waktu lampau.",
+            "3": "Gone adalah bentuk ketiga yang hanya dipakai bersama have, has, atau had, bukan kata kerja lampau yang berdiri sendiri."
+          },
+          "difficulty": "dasar"
+        },
+        {
+          "id": "eng-d8-rct-003",
+          "prompt": "Nadia wrote about her study tour: 'First, we visited Candi Prambanan. ____, we had lunch near the temple. Finally, we went back to the bus.'",
+          "options": [
+            "After that",
+            "First of all",
+            "In conclusion",
+            "At last"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Recount menyusun kejadian dengan penanda urutan waktu; sesudah First, kejadian berikutnya disambung dengan After that sebelum cerita ditutup dengan Finally."
+          },
+          "distractorWhy": {
+            "1": "Penanda pembuka dipakai untuk kejadian kedua, padahal kejadian yang paling awal sudah selesai diceritakan.",
+            "2": "In conclusion adalah penanda simpulan pada teks bergaya uraian, bukan penanda urutan kejadian dalam recount.",
+            "3": "At last menandai kejadian terakhir yang lama dinanti, padahal cerita masih berlanjut ke kegiatan sesudahnya."
+          },
+          "difficulty": "dasar"
+        },
+        {
+          "id": "eng-d8-rct-004",
+          "prompt": "The weather ____ very hot when our class arrived at the campsite in Sukabumi.",
+          "options": [
+            "was",
+            "were",
+            "is",
+            "been"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Bentuk lampau to be untuk subjek tunggal the weather adalah was."
+          },
+          "distractorWhy": {
+            "1": "Were dipakai untuk subjek jamak, sedangkan the weather dihitung sebagai satu hal.",
+            "2": "Is menunjuk waktu sekarang, padahal kejadiannya sudah berlalu dan ditandai kata kerja arrived.",
+            "3": "Been adalah bentuk ketiga yang menuntut have, has, atau had di depannya."
+          },
+          "difficulty": "dasar"
+        },
+        {
+          "id": "eng-d8-rct-005",
+          "prompt": "Did Rina ____ a speech at the Independence Day ceremony last Monday?",
+          "options": [
+            "give",
+            "gave",
+            "gives",
+            "giving"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Penanda waktu lampau sudah dibawa oleh kata bantu did, sehingga kata kerja utama kembali ke bentuk dasar give."
+          },
+          "distractorWhy": {
+            "1": "Murid menandai lampau dua kali (did + gave) karena bahasa Indonesia tidak mengubah bentuk kata kerja sehingga penanda waktu terasa perlu diulang.",
+            "2": "Akhiran -s milik Simple Present dipakai sesudah did, padahal did sudah memindahkan kalimat ke waktu lampau.",
+            "3": "Bentuk -ing hanya berpasangan dengan to be, bukan dengan kata bantu did."
+          },
+          "difficulty": "sedang"
+        },
+        {
+          "id": "eng-d8-rct-006",
+          "prompt": "Nadia ____ the drawing contest last year because she was ill.",
+          "options": [
+            "did not join",
+            "did not joined",
+            "was not join",
+            "not joined"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Kalimat negatif Simple Past dibentuk dengan did not diikuti kata kerja dasar join."
+          },
+          "distractorWhy": {
+            "1": "Akhiran -ed tetap dipasang sesudah did not, sehingga waktu lampau ditandai dua kali.",
+            "2": "To be dipakai sebagai kata bantu negatif untuk kata kerja biasa, padahal was hanya berdiri bersama kata sifat, keterangan, atau bentuk -ing.",
+            "3": "Kata not diletakkan langsung di depan kata kerja meniru pola tidak ikut dalam bahasa Indonesia, padahal kalimat negatif lampau memerlukan kata bantu did."
+          },
+          "difficulty": "sedang"
+        },
+        {
+          "id": "eng-d8-rct-007",
+          "prompt": "Our futsal team ____ the final match and then ____ a trophy from the headmaster.",
+          "options": [
+            "won ... received",
+            "winned ... received",
+            "won ... receive",
+            "win ... received"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Kedua kejadian berlangsung pada waktu lampau; win tak beraturan berubah menjadi won, sedangkan receive beraturan memakai akhiran -ed."
+          },
+          "distractorWhy": {
+            "1": "Winned dibentuk dengan menempelkan -ed pada kata kerja tak beraturan, padahal win berubah menjadi won.",
+            "2": "Kata kerja receive dibiarkan berbentuk dasar karena murid mengira satu penanda lampau sudah mewakili seluruh kalimat.",
+            "3": "Hanya receive yang diubah ke bentuk lampau, sedangkan win dibiarkan berbentuk dasar padahal kedua kejadian sama-sama sudah terjadi."
+          },
+          "difficulty": "sedang"
+        },
+        {
+          "id": "eng-d8-rct-008",
+          "prompt": "Which sentence is the orientation of a recount text about a study tour?",
+          "options": [
+            "Last Thursday, my class and I went to Museum Fatahillah in Jakarta.",
+            "After that, we took a group photo in front of the old building.",
+            "We felt tired but very happy when we got home that evening.",
+            "In my opinion, every school should hold a study tour every year."
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Orientation membuka recount dengan menyebutkan siapa pelakunya, kapan, dan di mana peristiwa itu terjadi."
+          },
+          "distractorWhy": {
+            "1": "Kalimat itu bagian events karena penanda After that menyambung urutan kejadian; murid mengira setiap penanda waktu adalah pembuka cerita.",
+            "2": "Kalimat itu reorientation yang berisi perasaan penulis pada akhir cerita.",
+            "3": "Kalimat itu pendapat bergaya teks argumentasi, bukan pengalaman yang diceritakan kembali."
+          },
+          "difficulty": "sedang"
+        },
+        {
+          "id": "eng-d8-rct-009",
+          "prompt": "Our study tour bus left school at six o'clock and arrived at Candi Borobudur at nine o'clock. Which sentence retells this correctly?",
+          "options": [
+            "The bus left school three hours before it arrived at Candi Borobudur.",
+            "The bus left school three hours after it arrived at Candi Borobudur.",
+            "The bus leaves school three hours before it arrived at Candi Borobudur.",
+            "The bus left school three hours ago it arrived at Candi Borobudur."
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Bus berangkat pukul enam dan tiba pukul sembilan, sehingga keberangkatan terjadi tiga jam sebelum kedatangan dan kedua kata kerjanya berbentuk lampau."
+          },
+          "distractorWhy": {
+            "1": "Makna before dan after tertukar sehingga urutan kejadiannya menjadi terbalik.",
+            "2": "Kata kerja leave dipindahkan ke waktu sekarang, padahal seluruh cerita pengalaman dituturkan dalam waktu lampau.",
+            "3": "Ago dipakai sebagai kata penghubung antarklausa, padahal ago hanya mengikuti keterangan lama waktu seperti three hours ago dan tidak dapat menyambung dua klausa."
+          },
+          "difficulty": "sedang"
+        },
+        {
+          "id": "eng-d8-rct-010",
+          "prompt": "Read Bagas's recount: 'Last Friday, our scout club camped at Bumi Perkemahan Cibubur. We arrived at three o'clock and put up our tents. After dinner, we sat around a campfire and sang together. It started to rain at midnight, so we went into our tents and slept.' According to the text, which sentence is true?",
+          "options": [
+            "The students put up their tents before they had dinner.",
+            "The students sang around the campfire before they put up their tents.",
+            "The students went into their tents before the rain started.",
+            "The students arrived at the camping ground after dinner."
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Teks menyebut tenda didirikan sesaat setelah rombongan tiba pukul tiga, sedangkan makan malam terjadi kemudian, sehingga hubungan before di antara kedua kejadian itu benar."
+          },
+          "distractorWhy": {
+            "1": "Urutannya dibalik karena menyanyi di sekitar api unggun terjadi sesudah tenda berdiri, bukan sebelumnya.",
+            "2": "Makna before dan after tertukar, padahal murid masuk ke tenda justru sesudah hujan mulai turun.",
+            "3": "Kedatangan diletakkan sesudah makan malam, padahal teks menyebut rombongan tiba pukul tiga."
+          },
+          "difficulty": "tinggi"
+        },
+        {
+          "id": "eng-d8-rct-011",
+          "prompt": "Bagas wrote: 'After the competition finished, we goed home and we was very tired.' Which version of the sentence is completely correct?",
+          "options": [
+            "After the competition finished, we went home and we were very tired.",
+            "After the competition finished, we goed home and we were very tired.",
+            "After the competition finished, we went home and we was very tired.",
+            "After the competition finished, we went home and we are very tired."
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Dua kekeliruan harus dibetulkan sekaligus: kata kerja tak beraturan go menjadi went, dan bentuk lampau to be untuk subjek jamak we adalah were."
+          },
+          "distractorWhy": {
+            "1": "Bentuk goed dipertahankan sehingga kata kerja tak beraturan tetap diberi akhiran -ed meskipun bentuk to be sudah dibetulkan.",
+            "2": "Was dipakai untuk subjek jamak we, padahal bentuk lampau to be untuk we adalah were.",
+            "3": "Kata kerja to be berpindah ke waktu sekarang, padahal seluruh recount dituturkan dalam waktu lampau."
+          },
+          "difficulty": "tinggi"
+        },
+        {
+          "id": "eng-d8-rct-012",
+          "prompt": "Which sentence from Nadia's recount about the 17 Agustus competitions is completely correct?",
+          "options": [
+            "Before the sack race began, Rina tied her shoes and drank a glass of water.",
+            "Before the sack race began, Rina tied her shoes and drinked a glass of water.",
+            "Before the sack race begun, Rina tied her shoes and drank a glass of water.",
+            "Before the sack race began, Rina tie her shoes and drank a glass of water."
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Semua kata kerja dalam kalimat berwaktu lampau ikut berubah bentuk: begin menjadi began, tie menjadi tied, dan drink menjadi drank."
+          },
+          "distractorWhy": {
+            "1": "Drinked dibentuk dengan akhiran -ed pada kata kerja tak beraturan, padahal drink berubah menjadi drank.",
+            "2": "Begun adalah bentuk ketiga yang menuntut have, has, atau had, bukan bentuk lampau yang berdiri sendiri.",
+            "3": "Kata kerja tie dibiarkan berbentuk dasar karena murid mengira cukup satu kata kerja yang ditandai lampau dalam satu kalimat."
+          },
+          "difficulty": "tinggi"
+        }
+      ]
+    },
+    {
+      "code": "KOMP-ENG-D-8-NAR-01",
+      "grade": 8,
+      "semester": 1,
+      "name": "Narrative Text: Fables & Past Continuous",
+      "materi": "Memahami struktur cerita fabel, latar Past Continuous, dan pesan moral",
+      "cpRef": "Kepmendikbudristek/BSKAP No. 032/H/KR/2024 — CP Bahasa Inggris Fase D, Elemen Membaca–Memirsa",
+      "items": [
+        {
+          "id": "eng-d8-nar-001",
+          "prompt": "While Kancil ____ along the riverbank, he saw a hungry crocodile in the water.",
+          "options": [
+            "was walking",
+            "was walk",
+            "were walking",
+            "walking"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Past Continuous dibentuk dari was atau were ditambah kata kerja berakhiran -ing, dan subjek tunggal Kancil memakai was walking."
+          },
+          "distractorWhy": {
+            "1": "Sesudah was kata kerja harus berbentuk -ing; murid memakai bentuk dasar karena menyamakannya dengan pola sedang berjalan dalam bahasa Indonesia.",
+            "2": "Were dipakai untuk subjek jamak, sedangkan Kancil adalah satu tokoh sehingga membutuhkan was.",
+            "3": "Bentuk -ing berdiri tanpa to be, padahal Past Continuous selalu memerlukan was atau were sebagai penopang."
+          },
+          "difficulty": "dasar"
+        },
+        {
+          "id": "eng-d8-nar-002",
+          "prompt": "Which sentence is the orientation of a fable about Kancil?",
+          "options": [
+            "Once upon a time, a clever mouse deer lived near a wide river in Java.",
+            "Suddenly, a hungry crocodile appeared in front of him.",
+            "In the end, the crocodiles were very angry with the little mouse deer.",
+            "The story teaches us to use our brain, not our muscles."
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Orientation memperkenalkan tokoh, waktu, dan tempat cerita sebelum masalah muncul."
+          },
+          "distractorWhy": {
+            "1": "Kalimat itu adalah complication karena memunculkan masalah; murid tertipu oleh kata Suddenly yang dikira pembuka cerita.",
+            "2": "Kalimat itu adalah resolution yang menutup masalah di akhir cerita.",
+            "3": "Kalimat itu adalah pesan moral berupa simpulan penutur, bukan pengenalan latar."
+          },
+          "difficulty": "dasar"
+        },
+        {
+          "id": "eng-d8-nar-003",
+          "prompt": "Kancil was sleeping under a big tree ____ a hunter came quietly into the forest.",
+          "options": [
+            "when",
+            "so",
+            "because",
+            "although"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Kegiatan panjang dalam Past Continuous dipotong oleh kegiatan singkat, dan hubungan waktu semacam itu ditandai dengan when."
+          },
+          "distractorWhy": {
+            "1": "So menandai akibat, padahal kedatangan pemburu bukan hasil dari Kancil yang tertidur.",
+            "2": "Because menandai sebab, sehingga kalimat berubah seolah pemburu datang karena Kancil tidur.",
+            "3": "Although menandai pertentangan makna, padahal kedua kejadian hanya berhubungan dalam urutan waktu."
+          },
+          "difficulty": "dasar"
+        },
+        {
+          "id": "eng-d8-nar-004",
+          "prompt": "The monkeys ____ near the river when the heavy rain started.",
+          "options": [
+            "were not playing",
+            "was not playing",
+            "did not playing",
+            "not were playing"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Bentuk negatif Past Continuous menyisipkan not di antara to be dan kata kerja -ing, dan subjek jamak the monkeys memakai were."
+          },
+          "distractorWhy": {
+            "1": "Was dipilih karena murid tidak memperhatikan bentuk jamak monkeys yang menuntut were.",
+            "2": "Did tidak pernah bertemu bentuk -ing karena kata bantu itu menuntut kata kerja dasar dan hanya dipakai pada Simple Past.",
+            "3": "Urutan kata mengikuti pola tidak sedang bermain dalam bahasa Indonesia, padahal dalam bahasa Inggris not diletakkan sesudah to be."
+          },
+          "difficulty": "dasar"
+        },
+        {
+          "id": "eng-d8-nar-005",
+          "prompt": "Read the text: 'One quiet morning, Kancil was walking beside the river. He wanted to visit his friend on the other side. Suddenly, a big crocodile came out of the water and said, \"I will eat you today.\"' Which sentence states the complication of the story?",
+          "options": [
+            "A big crocodile came out of the water and threatened to eat Kancil.",
+            "Kancil was walking beside the river on a quiet morning.",
+            "Kancil wanted to visit his friend on the other side of the river.",
+            "Kancil crossed the river safely and met his friend."
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Complication adalah bagian saat masalah muncul dan mengancam tokoh utama, yaitu ketika buaya mengancam Kancil."
+          },
+          "distractorWhy": {
+            "1": "Kalimat itu bagian orientation karena hanya melukiskan latar waktu dan kegiatan tokoh sebelum masalah muncul.",
+            "2": "Keinginan tokoh termasuk pengenalan tujuan pada bagian orientation, bukan masalah yang menghambatnya.",
+            "3": "Murid menjawab dari ingatan cerita Kancil yang sudah dikenal, padahal penyelesaian itu tidak tertulis dalam teks."
+          },
+          "difficulty": "sedang"
+        },
+        {
+          "id": "eng-d8-nar-006",
+          "prompt": "Which question about the fable is grammatically correct?",
+          "options": [
+            "What was Kancil doing when the crocodile appeared?",
+            "What did Kancil doing when the crocodile appeared?",
+            "What was Kancil do when the crocodile appeared?",
+            "What Kancil was doing when the crocodile appeared?"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Pertanyaan Past Continuous menempatkan was sebelum subjek dan mempertahankan kata kerja berakhiran -ing."
+          },
+          "distractorWhy": {
+            "1": "Did tidak pernah berpasangan dengan bentuk -ing karena kata bantu itu menuntut kata kerja dasar.",
+            "2": "Sesudah was kata kerja harus berakhiran -ing, bukan kembali ke bentuk dasar.",
+            "3": "Urutan subjek dan kata bantu tidak dibalik karena murid mengikuti susunan kalimat berita bahasa Indonesia."
+          },
+          "difficulty": "sedang"
+        },
+        {
+          "id": "eng-d8-nar-007",
+          "prompt": "Read the ending: 'The crocodiles were angry, but Kancil was already standing safely on the other side. He was small, yet he used his clever mind.' What is the moral of the story?",
+          "options": [
+            "Clever thinking can help us solve a problem that strength cannot.",
+            "Small animals should never leave their own forest.",
+            "Angry animals always win the fight in the end.",
+            "We must be afraid of every animal that lives in a river."
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Pesan moral ditarik dari keseluruhan cerita: Kancil berhasil karena akalnya, bukan karena tubuhnya besar."
+          },
+          "distractorWhy": {
+            "1": "Murid menarik nasihat harfiah dari satu detail latar tempat, bukan dari perilaku tokoh yang membuat cerita berakhir demikian.",
+            "2": "Murid membalik hasil cerita karena hanya membaca kata angry tanpa melihat siapa yang berhasil.",
+            "3": "Murid mengubah cerita menjadi peringatan bahaya, padahal fokus penutup adalah kecerdikan tokoh, bukan rasa takut."
+          },
+          "difficulty": "sedang"
+        },
+        {
+          "id": "eng-d8-nar-008",
+          "prompt": "The clever mouse deer ____ across the crocodiles' backs and ____ the other side safely.",
+          "options": [
+            "ran ... reached",
+            "runned ... reached",
+            "ran ... reach",
+            "was ran ... reached"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Kedua kegiatan terjadi di masa lampau, sehingga run berubah menjadi bentuk tak beraturan ran dan reach memakai akhiran -ed."
+          },
+          "distractorWhy": {
+            "1": "Runned lahir dari kebiasaan menempelkan -ed pada semua kata kerja, padahal run berubah menjadi ran.",
+            "2": "Kata kerja kedua dibiarkan berbentuk dasar karena murid merasa satu penanda lampau sudah mewakili seluruh kalimat.",
+            "3": "Was disandingkan dengan bentuk lampau ran, padahal to be hanya berpasangan dengan bentuk -ing dalam cerita semacam itu."
+          },
+          "difficulty": "sedang"
+        },
+        {
+          "id": "eng-d8-nar-009",
+          "prompt": "Nadia is retelling a fable. Which word best opens the sentence that introduces the problem: '____, a big storm broke the little bird's nest.'?",
+          "options": [
+            "Suddenly",
+            "Once upon a time",
+            "In conclusion",
+            "Every morning"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Bagian complication biasanya dibuka dengan penanda kejutan seperti Suddenly karena masalah datang tiba-tiba."
+          },
+          "distractorWhy": {
+            "1": "Once upon a time adalah pembuka orientation, sehingga tidak tepat untuk memulai bagian masalah.",
+            "2": "In conclusion adalah penanda penutup teks bergaya uraian, bukan penanda peristiwa dalam cerita.",
+            "3": "Every morning menandai kebiasaan berulang pada Simple Present, sedangkan fabel dituturkan dalam bentuk lampau."
+          },
+          "difficulty": "sedang"
+        },
+        {
+          "id": "eng-d8-nar-010",
+          "prompt": "Read: 'The mouse deer was drinking at the river when a tiger jumped out of the bushes. The tiger wanted to eat him, so Kancil told the tiger about a magic drum. While the tiger was hitting the drum, Kancil ran away and hid in a cave.' Which sentence states the complication?",
+          "options": [
+            "A tiger jumped out of the bushes and wanted to eat the mouse deer.",
+            "The mouse deer was drinking quietly at the river.",
+            "Kancil ran away and hid in a cave.",
+            "The tiger was hitting the magic drum in the forest."
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Complication adalah munculnya ancaman yang mengubah jalan cerita, yaitu saat harimau melompat dan hendak memangsa Kancil."
+          },
+          "distractorWhy": {
+            "1": "Kegiatan berlatar Past Continuous di awal cerita berfungsi sebagai orientation, yakni latar sebelum masalah datang.",
+            "2": "Kalimat itu adalah resolution karena menjelaskan bagaimana tokoh lolos dari ancaman.",
+            "3": "Kalimat itu hanya latar kegiatan yang memungkinkan Kancil kabur; murid memilihnya karena melihat bentuk Past Continuous dan mengira setiap kalimat -ing adalah inti masalah."
+          },
+          "difficulty": "tinggi"
+        },
+        {
+          "id": "eng-d8-nar-011",
+          "prompt": "Rina wrote: 'While the farmer was work in his rice field, his buffalo was eating young grass.' Which form corrects her mistake?",
+          "options": [
+            "was working",
+            "was worked",
+            "were working",
+            "did working"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Sesudah was, kata kerja utama harus berakhiran -ing sehingga bentuk yang benar adalah was working."
+          },
+          "distractorWhy": {
+            "1": "Akhiran -ed dipasang sesudah to be, mencampur penanda lampau Simple Past dengan susunan Past Continuous.",
+            "2": "Were dipakai untuk subjek jamak, sedangkan the farmer hanya satu orang.",
+            "3": "Did tidak pernah berpasangan dengan bentuk -ing dan tidak dipakai dalam kalimat berita seperti itu."
+          },
+          "difficulty": "tinggi"
+        },
+        {
+          "id": "eng-d8-nar-012",
+          "prompt": "Which sentence about the fable of the rabbits and the turtle is completely correct?",
+          "options": [
+            "While the rabbits were sleeping under the tree, the turtle passed them slowly.",
+            "While the rabbits were sleeping under the tree, the turtle passing them slowly.",
+            "While the rabbits sleeping under the tree, the turtle passed them slowly.",
+            "While the rabbits were sleeping under the tree, the turtle passes them slowly."
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Kegiatan panjang memakai Past Continuous were sleeping, sedangkan kegiatan singkat yang menyelanya memakai Simple Past passed."
+          },
+          "distractorWhy": {
+            "1": "Bentuk -ing dipakai tanpa was, sehingga kegiatan singkat itu kehilangan kata kerja utamanya.",
+            "2": "To be dihilangkan karena murid mengira akhiran -ing sudah cukup menandai kegiatan yang sedang berlangsung.",
+            "3": "Kata kerja kedua berpindah ke bentuk masa kini, padahal seluruh fabel dituturkan dalam waktu lampau."
+          },
+          "difficulty": "tinggi"
+        }
+      ]
+    },
+    {
+      "code": "KOMP-ENG-D-8-DEG-01",
+      "grade": 8,
+      "semester": 2,
+      "name": "Degrees of Comparison",
+      "materi": "Perbandingan kata sifat: bentuk positive, comparative, dan superlative",
+      "cpRef": "Kepmendikbudristek/BSKAP No. 032/H/KR/2024 — CP Bahasa Inggris Fase D, Elemen Menyimak–Berbicara",
+      "items": [
+        {
+          "id": "eng-d8-deg-001",
+          "prompt": "Mount Semeru is ____ than Mount Merapi.",
+          "options": [
+            "higher",
+            "more high",
+            "highest",
+            "high"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Kata sifat pendek satu suku kata seperti high membentuk tingkat perbandingan dengan akhiran -er, lalu diikuti than."
+          },
+          "distractorWhy": {
+            "1": "More hanya dipakai untuk kata sifat panjang; murid menyamakannya dengan pola lebih tinggi yang selalu memakai kata lebih dalam bahasa Indonesia.",
+            "2": "Bentuk -est adalah tingkat tertinggi yang membandingkan satu benda dengan seluruh kelompok, sehingga tidak boleh berpasangan dengan than.",
+            "3": "Bentuk dasar high tidak mengandung makna perbandingan, padahal kata than menuntut bentuk perbandingan."
+          },
+          "difficulty": "dasar"
+        },
+        {
+          "id": "eng-d8-deg-002",
+          "prompt": "Lake Toba is ____ lake in Southeast Asia.",
+          "options": [
+            "the largest",
+            "the most largest",
+            "the most large",
+            "larger"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Untuk membandingkan satu benda dengan seluruh kelompok, kata sifat pendek memakai the ditambah akhiran -est."
+          },
+          "distractorWhy": {
+            "1": "Penanda tingkat tertinggi dipasang dua kali pada most dan -est, padahal cukup satu penanda saja.",
+            "2": "Most dipakai pada kata sifat pendek, padahal large cukup berubah menjadi largest tanpa bantuan most.",
+            "3": "Bentuk -er hanya membandingkan dua benda, sedangkan kalimat itu membandingkan Danau Toba dengan semua danau di Asia Tenggara."
+          },
+          "difficulty": "dasar"
+        },
+        {
+          "id": "eng-d8-deg-003",
+          "prompt": "Bagas got 85 and Rina got 85 too. Bagas's score is ____ Rina's score.",
+          "options": [
+            "as high as",
+            "as higher as",
+            "as high than",
+            "so high as"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Dua hal yang sama derajatnya dinyatakan dengan pola as ditambah kata sifat bentuk dasar ditambah as."
+          },
+          "distractorWhy": {
+            "1": "Bentuk -er diselipkan ke dalam pola as ... as, padahal pola kesetaraan selalu memakai kata sifat bentuk dasar.",
+            "2": "Than adalah pasangan bentuk -er, bukan pasangan as, sehingga murid mencampur dua pola perbandingan.",
+            "3": "Pola so ... as hanya muncul pada kalimat negatif, sehingga tidak tepat untuk menyatakan dua nilai yang sama."
+          },
+          "difficulty": "dasar"
+        },
+        {
+          "id": "eng-d8-deg-004",
+          "prompt": "My English score this semester is ____ than my score last semester.",
+          "options": [
+            "better",
+            "gooder",
+            "more good",
+            "best"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Good termasuk kata sifat tak beraturan, dan tingkat perbandingannya adalah better."
+          },
+          "distractorWhy": {
+            "1": "Akhiran -er ditempelkan pada good seperti kata sifat biasa, padahal bentuknya berubah menjadi better.",
+            "2": "More dipasangkan pada kata sifat pendek yang sudah punya bentuk khusus; good tidak pernah menjadi more good.",
+            "3": "Best adalah tingkat tertinggi untuk membandingkan dengan seluruh kelompok, sedangkan kalimat itu hanya membandingkan dua semester."
+          },
+          "difficulty": "dasar"
+        },
+        {
+          "id": "eng-d8-deg-005",
+          "prompt": "This exercise is ____ than the one we did yesterday.",
+          "options": [
+            "easier",
+            "more easy",
+            "easyer",
+            "easiest"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Kata sifat dua suku kata yang berakhiran -y mengubah y menjadi i lalu menambah -er, sehingga easy menjadi easier."
+          },
+          "distractorWhy": {
+            "1": "More dipakai pada kata sifat berakhiran -y, padahal kelompok kata sifat itu tetap memakai akhiran -er.",
+            "2": "Akhiran -er ditempel langsung tanpa mengubah y menjadi i, sehingga ejaannya keliru.",
+            "3": "Bentuk -est menandai tingkat tertinggi, sedangkan than menuntut bentuk perbandingan dua hal."
+          },
+          "difficulty": "sedang"
+        },
+        {
+          "id": "eng-d8-deg-006",
+          "prompt": "Candi Borobudur is ____ than the small temple near my house.",
+          "options": [
+            "more famous",
+            "famouser",
+            "more famouser",
+            "most famous"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Kata sifat panjang seperti famous membentuk perbandingan dengan more di depannya, bukan dengan akhiran -er."
+          },
+          "distractorWhy": {
+            "1": "Akhiran -er dipasang pada kata sifat panjang, padahal aturan itu hanya berlaku untuk kata sifat pendek.",
+            "2": "Penanda perbandingan dipasang dua kali pada more dan -er, padahal satu penanda sudah cukup.",
+            "3": "Most menandai tingkat tertinggi di antara banyak hal, sedangkan kalimat itu hanya membandingkan dua bangunan."
+          },
+          "difficulty": "sedang"
+        },
+        {
+          "id": "eng-d8-deg-007",
+          "prompt": "Pantai Kuta is more crowded ____ Pantai Parangtritis in July.",
+          "options": [
+            "than",
+            "then",
+            "from",
+            "with"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Setiap perbandingan dengan -er maupun more selalu berpasangan dengan than."
+          },
+          "distractorWhy": {
+            "1": "Then bermakna kemudian dan hanya mirip bunyinya, sehingga murid tertukar antara dua kata yang terdengar hampir sama.",
+            "2": "Kata daripada dalam bahasa Indonesia diterjemahkan kata demi kata menjadi from, padahal pasangan perbandingan dalam bahasa Inggris adalah than.",
+            "3": "With menandai kebersamaan, bukan pembanding antara dua tempat."
+          },
+          "difficulty": "sedang"
+        },
+        {
+          "id": "eng-d8-deg-008",
+          "prompt": "Rina is 150 cm tall, Nadia is 155 cm tall, and Bagas is 160 cm tall. Which sentence is true?",
+          "options": [
+            "Bagas is the tallest of the three students.",
+            "Nadia is taller than Bagas.",
+            "Rina is the tallest of the three students.",
+            "Nadia is the shortest of the three students."
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Bagas memiliki angka paling besar di antara tiga anak, sehingga dipakai tingkat tertinggi the tallest."
+          },
+          "distractorWhy": {
+            "1": "Arah perbandingan dibalik karena angka Nadia lebih kecil daripada angka Bagas, sehingga bentuk taller than tidak cocok.",
+            "2": "Angka terkecil dibaca sebagai yang paling tinggi karena murid tidak mengaitkan bentuk the tallest dengan angka terbesar.",
+            "3": "Bentuk the shortest diberikan kepada nilai tengah, padahal angka terkecil dimiliki Rina."
+          },
+          "difficulty": "sedang"
+        },
+        {
+          "id": "eng-d8-deg-009",
+          "prompt": "Of all the mountains our club climbed last year, Mount Rinjani was ____.",
+          "options": [
+            "the most difficult",
+            "the difficultest",
+            "the more difficult",
+            "more difficult"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Membandingkan satu hal dengan seluruh kelompok memakai the most di depan kata sifat panjang difficult."
+          },
+          "distractorWhy": {
+            "1": "Akhiran -est dipasang pada kata sifat panjang, padahal kata sifat sepanjang itu memakai most.",
+            "2": "Bentuk more berarti membandingkan dua hal, sehingga tidak cocok dengan frasa of all yang menunjuk seluruh kelompok.",
+            "3": "Kata the sebagai penanda tingkat tertinggi dihilangkan, sehingga maknanya menyusut menjadi perbandingan dua hal saja."
+          },
+          "difficulty": "sedang"
+        },
+        {
+          "id": "eng-d8-deg-010",
+          "prompt": "Nadia wrote: 'Gunung Bromo is more higher than Gunung Merapi.' Which sentence corrects her mistake?",
+          "options": [
+            "Gunung Bromo is higher than Gunung Merapi.",
+            "Gunung Bromo is more high than Gunung Merapi.",
+            "Gunung Bromo is highest than Gunung Merapi.",
+            "Gunung Bromo is the higher than Gunung Merapi."
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Kata sifat pendek high cukup memakai akhiran -er tanpa tambahan more."
+          },
+          "distractorWhy": {
+            "1": "Akhiran -er diganti more, padahal kata sifat satu suku kata tidak pernah memakai more.",
+            "2": "Bentuk -est menandai tingkat tertinggi dan tidak berpasangan dengan than.",
+            "3": "Kata the dipakai pada perbandingan dua hal, padahal the hanya menyertai tingkat tertinggi."
+          },
+          "difficulty": "tinggi"
+        },
+        {
+          "id": "eng-d8-deg-011",
+          "prompt": "The school library is quieter than the canteen. Which sentence has the same meaning?",
+          "options": [
+            "The canteen is noisier than the library.",
+            "The canteen is quieter than the library.",
+            "The library is as quiet as the canteen.",
+            "The library is the quietest place in the school."
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Membalik urutan pembanding menuntut kata sifat yang berlawanan, sehingga quieter berubah menjadi noisier saat perpustakaan dan kantin bertukar tempat."
+          },
+          "distractorWhy": {
+            "1": "Pembanding ditukar tempat tanpa mengganti kata sifatnya, sehingga makna kalimat berbalik.",
+            "2": "Pola as ... as menyatakan dua hal setara, padahal kalimat asalnya justru menyebut salah satu lebih sunyi.",
+            "3": "Tingkat tertinggi menyatakan perbandingan dengan seluruh tempat di sekolah, padahal kalimat asal hanya membandingkan dua tempat."
+          },
+          "difficulty": "tinggi"
+        },
+        {
+          "id": "eng-d8-deg-012",
+          "prompt": "Which sentence about Indonesian cities is completely correct?",
+          "options": [
+            "Jakarta is the most crowded city in Indonesia, and it is busier than Bandung.",
+            "Jakarta is the most crowded city in Indonesia, and it is more busier than Bandung.",
+            "Jakarta is most crowded city in Indonesia, and it is busier than Bandung.",
+            "Jakarta is the most crowdest city in Indonesia, and it is busier than Bandung."
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Kata sifat panjang crowded memakai the most, sedangkan kata sifat pendek busy berubah menjadi busier untuk membandingkan dua kota."
+          },
+          "distractorWhy": {
+            "1": "More dan -er dipasang bersamaan pada busy, padahal satu penanda perbandingan sudah cukup.",
+            "2": "Kata the dihilangkan di depan tingkat tertinggi, padahal most selalu didahului the.",
+            "3": "Most dan -est dipakai sekaligus, kekeliruan penandaan ganda yang sering muncul pada tingkat tertinggi."
+          },
+          "difficulty": "tinggi"
+        }
+      ]
+    },
+    {
+      "code": "KOMP-ENG-D-9-RPT-01",
+      "grade": 9,
+      "semester": 1,
+      "name": "Report Text & Passive Voice",
+      "materi": "Deskripsi ilmiah faktual tentang spesies atau fenomena menggunakan passive voice dan simple present",
+      "cpRef": "Kepmendikbudristek/BSKAP No. 032/H/KR/2024 — CP Bahasa Inggris Fase D, Elemen Membaca–Memirsa",
+      "items": [
+        {
+          "id": "eng-d9-rpt-001",
+          "prompt": "Komodo dragons ___ only on a few small islands in East Nusa Tenggara.",
+          "options": [
+            "are found",
+            "are find",
+            "is found",
+            "found"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Kalimat pasif simple present memakai am/is/are + Verb 3. Subjeknya jamak (Komodo dragons), sehingga bentuknya are found."
+          },
+          "distractorWhy": {
+            "1": "Murid mengira pasif sudah cukup ditandai kata are, lalu tetap memakai Verb 1 sesudahnya.",
+            "2": "Murid menganggap nama spesies sebagai satu jenis tunggal sehingga memilih is, padahal subjeknya jamak dan menuntut are.",
+            "3": "Murid menerjemahkan \"ditemukan\" langsung menjadi found tanpa to be, karena dalam bahasa Indonesia awalan di- sudah menandai makna pasif."
+          },
+          "difficulty": "dasar"
+        },
+        {
+          "id": "eng-d9-rpt-002",
+          "prompt": "Rafflesia arnoldii ___ the corpse flower because of its very strong smell.",
+          "options": [
+            "is called",
+            "is calling",
+            "are called",
+            "calls"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Bunganya menerima tindakan (disebut), jadi dipakai pasif simple present: is + Verb 3, yaitu is called, karena subjeknya tunggal."
+          },
+          "distractorWhy": {
+            "1": "Murid memakai bentuk -ing karena mengira setiap kata kerja sesudah to be harus berakhiran -ing.",
+            "2": "Murid menyamakan nama ilmiah dua kata dengan subjek jamak, lalu memilih are padahal yang dibicarakan satu jenis bunga.",
+            "3": "Murid memakai bentuk aktif karena membaca kalimat sebagai \"bunga itu menyebut\", bukan \"bunga itu disebut\"."
+          },
+          "difficulty": "dasar"
+        },
+        {
+          "id": "eng-d9-rpt-003",
+          "prompt": "A report text about the orangutan usually ___ with a general classification of the animal.",
+          "options": [
+            "begins",
+            "begin",
+            "began",
+            "beginning"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Report text memakai simple present untuk fakta umum, dan subjek tunggal A report text menuntut akhiran -s pada kata kerjanya."
+          },
+          "distractorWhy": {
+            "1": "Murid lupa menambahkan akhiran -s karena dalam bahasa Indonesia kata kerja tidak berubah mengikuti subjek.",
+            "2": "Murid memakai bentuk lampau karena mengira teks yang menjelaskan sesuatu selalu menceritakan kejadian yang sudah lewat.",
+            "3": "Murid memakai bentuk -ing tanpa to be karena mengira akhiran -ing sendiri sudah menjadi kata kerja lengkap."
+          },
+          "difficulty": "dasar"
+        },
+        {
+          "id": "eng-d9-rpt-004",
+          "prompt": "Which sentence best opens the general classification of a report text about the proboscis monkey?",
+          "options": [
+            "The proboscis monkey is a long-nosed monkey that lives in the mangrove forests of Kalimantan.",
+            "Last Sunday, Rina and Bagas saw a proboscis monkey at the zoo in Surabaya.",
+            "First, prepare a camera and a pair of binoculars before you start the trip.",
+            "I think the proboscis monkey is the funniest animal in the whole world."
+          ],
+          "answer": 0,
+          "why": {
+            "0": "General classification membuka report text dengan menjelaskan spesies secara umum memakai simple present dan sudut pandang faktual."
+          },
+          "distractorWhy": {
+            "1": "Murid memilih kalimat pengalaman pribadi bertanda waktu lampau karena mencampurkan report text dengan recount text.",
+            "2": "Murid memilih kalimat berisi langkah kerja karena mencampurkan report text dengan procedure text.",
+            "3": "Murid memilih kalimat berisi opini pribadi karena mengira report text boleh dibuka dengan pendapat penulis."
+          },
+          "difficulty": "dasar"
+        },
+        {
+          "id": "eng-d9-rpt-005",
+          "prompt": "Komodo dragons must ___ from poachers, so the park rangers patrol the island every day.",
+          "options": [
+            "be protected",
+            "be protect",
+            "protected",
+            "being protected"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Kalimat pasif yang memakai modal berpola modal + be + Verb 3, sehingga sesudah must dipakai be protected."
+          },
+          "distractorWhy": {
+            "1": "Murid memakai Verb 1 sesudah be karena mengira kata be saja sudah cukup menandai makna pasif.",
+            "2": "Murid langsung menempelkan Verb 3 pada modal dan menghilangkan be, sehingga pola pasifnya tidak lengkap.",
+            "3": "Murid memilih bentuk being karena mengira setiap kalimat pasif ditandai akhiran -ing."
+          },
+          "difficulty": "sedang"
+        },
+        {
+          "id": "eng-d9-rpt-006",
+          "prompt": "The Rafflesia flower ___ by Joseph Arnold and Thomas Stamford Raffles in Bengkulu in 1818.",
+          "options": [
+            "was discovered",
+            "was discover",
+            "were discovered",
+            "discovered"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Peristiwa masa lalu dalam bentuk pasif memakai was/were + Verb 3. Subjeknya tunggal (The Rafflesia flower), jadi dipakai was discovered."
+          },
+          "distractorWhy": {
+            "1": "Murid memakai Verb 1 sesudah was karena mengira penanda lampau cukup diletakkan pada to be saja.",
+            "2": "Murid menyesuaikan to be dengan dua nama pelaku di belakang kata by, padahal to be harus menyesuaikan subjek kalimat.",
+            "3": "Murid menulis kata kerja tanpa to be karena awalan di- pada \"ditemukan\" membuatnya merasa makna pasif sudah tersampaikan."
+          },
+          "difficulty": "sedang"
+        },
+        {
+          "id": "eng-d9-rpt-007",
+          "prompt": "Active sentence: \"Rangers feed the young orangutans twice a day.\" Which sentence has the same meaning in the passive voice?",
+          "options": [
+            "The young orangutans are fed twice a day by the rangers.",
+            "The young orangutans are feeding twice a day by the rangers.",
+            "The young orangutans is fed twice a day by the rangers.",
+            "The rangers are fed twice a day by the young orangutans."
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Saat diubah ke pasif, objek kalimat aktif menjadi subjek, kata kerjanya menjadi are + Verb 3 (are fed), dan pelakunya masuk ke dalam frasa by."
+          },
+          "distractorWhy": {
+            "1": "Murid memakai bentuk -ing karena mengira to be + -ing dan to be + Verb 3 sama-sama menghasilkan makna pasif.",
+            "2": "Murid memilih is meskipun subjeknya jamak, karena menyamakan bentuk to be dengan kata benda terdekat yang terasa tunggal.",
+            "3": "Murid menukar posisi pelaku dan penderita, sehingga yang memberi makan justru menjadi pihak yang diberi makan."
+          },
+          "difficulty": "sedang"
+        },
+        {
+          "id": "eng-d9-rpt-008",
+          "prompt": "Read the paragraph. \"The bekantan, or proboscis monkey, is endemic to Borneo. It is easily recognised by its long nose and reddish-brown fur. Its food is mostly made up of young leaves and unripe fruit.\" What does the paragraph say about the food of the bekantan?",
+          "options": [
+            "It consists mainly of young leaves and unripe fruit.",
+            "It consists mainly of ripe fruit and small insects.",
+            "It is brought to the forest by the park rangers every morning.",
+            "It is found only in the mangrove trees along the river."
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Kalimat \"Its food is mostly made up of young leaves and unripe fruit\" langsung menyebutkan isi makanan bekantan."
+          },
+          "distractorWhy": {
+            "1": "Murid mengabaikan kata unripe dan menambahkan jenis makanan yang tidak pernah disebutkan di dalam paragraf.",
+            "2": "Murid membaca bentuk pasif is made up of sebagai \"diberikan oleh orang\", padahal frasa itu berarti tersusun atas.",
+            "3": "Murid mencampur informasi tempat hidup dengan informasi makanan karena keduanya berada dalam paragraf yang sama."
+          },
+          "difficulty": "sedang"
+        },
+        {
+          "id": "eng-d9-rpt-009",
+          "prompt": "Why do writers of report texts often use the passive voice, as in \"Komodo dragons are protected by law\"?",
+          "options": [
+            "Because the focus is on the animal that is described, not on who does the action.",
+            "Because the passive voice changes the whole sentence into the past tense.",
+            "Because a report text must always mention the person who does the action.",
+            "Because the passive voice makes the writer's own opinion sound stronger."
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Passive voice dipilih agar perhatian pembaca tertuju pada spesies atau fenomena yang dibahas, bukan pada pelaku tindakannya."
+          },
+          "distractorWhy": {
+            "1": "Murid mengira bentuk pasif adalah penanda waktu lampau, padahal pasif bisa dipakai di semua tenses.",
+            "2": "Murid mengira frasa by selalu wajib, padahal dalam report text pelaku justru sering sengaja tidak disebut.",
+            "3": "Murid mengira report text bertujuan meyakinkan pembaca, padahal report text hanya memaparkan fakta."
+          },
+          "difficulty": "sedang"
+        },
+        {
+          "id": "eng-d9-rpt-010",
+          "prompt": "Which sentence is grammatically correct for a report text about the Javan rhino?",
+          "options": [
+            "The Javan rhino, which is hunted for its horn, is now found only in Ujung Kulon National Park.",
+            "The Javan rhino, which is hunt for its horn, is now found only in Ujung Kulon National Park.",
+            "The Javan rhino, which is hunted for its horn, is now finds only in Ujung Kulon National Park.",
+            "The Javan rhino, which hunted for its horn, is now found only in Ujung Kulon National Park."
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Kedua klausa sama-sama pasif simple present, sehingga keduanya berpola is + Verb 3: is hunted dan is found."
+          },
+          "distractorWhy": {
+            "1": "Murid memakai Verb 1 sesudah is karena mengira kehadiran is saja sudah menandai makna pasif.",
+            "2": "Murid mencampur pola pasif dengan kata kerja aktif berakhiran -s, sehingga satu kalimat memuat dua pola sekaligus.",
+            "3": "Murid menghilangkan is pada klausa sisipan, sehingga hunted terbaca sebagai kata kerja aktif bentuk lampau."
+          },
+          "difficulty": "tinggi"
+        },
+        {
+          "id": "eng-d9-rpt-011",
+          "prompt": "Since 1980, the number of Javan rhinos ___ carefully by the park rangers every year.",
+          "options": [
+            "has been counted",
+            "have been counted",
+            "has been count",
+            "has counted"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Frasa the number of ... adalah subjek tunggal, dan pasif present perfect berpola has/have + been + Verb 3, sehingga bentuknya has been counted."
+          },
+          "distractorWhy": {
+            "1": "Murid menyesuaikan kata kerja bantu dengan kata rhinos yang jamak, padahal inti subjeknya adalah the number yang tunggal.",
+            "2": "Murid memakai Verb 1 sesudah been karena mengira been saja sudah membuat kalimatnya pasif.",
+            "3": "Murid menghilangkan been sehingga kalimatnya menjadi aktif, seolah badak yang melakukan penghitungan."
+          },
+          "difficulty": "tinggi"
+        },
+        {
+          "id": "eng-d9-rpt-012",
+          "prompt": "Read the paragraph. \"Rafflesia arnoldii has no leaves, stems or roots of its own. It lives on the Tetrastigma vine, from which water and nutrients are taken. The flower can only be seen for about five to seven days before it rots.\" What can be concluded about Rafflesia arnoldii?",
+          "options": [
+            "It depends on another plant in order to stay alive.",
+            "It makes its own food through the process of photosynthesis.",
+            "It grows new roots after five to seven days.",
+            "It is the only flower that can live without any water."
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Karena bunga ini tidak punya daun, batang, dan akar sendiri, lalu air serta zat haranya diambil dari Tetrastigma, kesimpulannya ia hidup bergantung pada tumbuhan inang."
+          },
+          "distractorWhy": {
+            "1": "Murid mengira semua tumbuhan berbunga pasti berfotosintesis, sehingga mengabaikan keterangan bahwa bunga ini tidak berdaun.",
+            "2": "Murid salah membaca rentang lima sampai tujuh hari sebagai lama tumbuhnya akar, padahal itu lama bunganya mekar.",
+            "3": "Murid mengabaikan kalimat bahwa air diambil dari tumbuhan inang, lalu menyimpulkan bunga ini hidup tanpa air."
+          },
+          "difficulty": "tinggi"
+        }
+      ]
+    },
+    {
+      "code": "KOMP-ENG-D-9-CND-01",
+      "grade": 9,
+      "semester": 1,
+      "name": "Conditional Sentences & Modals",
+      "materi": "Kalimat pengandaian tipe 1 dan tipe 2 serta penggunaan modal auxiliary verbs",
+      "cpRef": "Kepmendikbudristek/BSKAP No. 032/H/KR/2024 — CP Bahasa Inggris Fase D, Elemen Menulis–Mempresentasikan",
+      "items": [
+        {
+          "id": "eng-d9-cnd-001",
+          "prompt": "If it ___ tomorrow morning, the flag ceremony will be held in the school hall.",
+          "options": [
+            "rains",
+            "will rain",
+            "rained",
+            "rain"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Pengandaian tipe 1 berpola If + simple present, ... will + Verb 1. Subjek it menuntut kata kerja berakhiran -s, sehingga dipakai rains."
+          },
+          "distractorWhy": {
+            "1": "Murid memakai will di dalam klausa if karena merasa seluruh kalimat berbicara tentang masa depan.",
+            "2": "Murid memakai bentuk lampau karena mengira semua kalimat berkata \"jika\" adalah pengandaian yang tidak nyata.",
+            "3": "Murid lupa akhiran -s pada kata kerja setelah subjek it, sebab dalam bahasa Indonesia kata kerja tidak berubah."
+          },
+          "difficulty": "dasar"
+        },
+        {
+          "id": "eng-d9-cnd-002",
+          "prompt": "If Rina finishes her homework early, she ___ her mother in the kitchen.",
+          "options": [
+            "will help",
+            "helps",
+            "would help",
+            "will helps"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Induk kalimat pengandaian tipe 1 memakai will + Verb 1 tanpa perubahan bentuk, sehingga jawabannya will help."
+          },
+          "distractorWhy": {
+            "1": "Murid memakai simple present di kedua klausa karena mengira bentuk kata kerja harus selalu sama di seluruh kalimat.",
+            "2": "Murid memakai would yang merupakan penanda pengandaian tipe 2, padahal syaratnya masih mungkin terjadi.",
+            "3": "Murid menambahkan akhiran -s sesudah will karena terbawa aturan subjek tunggal she."
+          },
+          "difficulty": "dasar"
+        },
+        {
+          "id": "eng-d9-cnd-003",
+          "prompt": "Bagas has a high fever. The school nurse gives him advice: \"You ___ stay at home and rest today.\"",
+          "options": [
+            "should",
+            "can",
+            "may",
+            "would"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Saran atau nasihat dinyatakan dengan modal should, yang berarti sebaiknya melakukan sesuatu."
+          },
+          "distractorWhy": {
+            "1": "Murid memilih can karena mengira nasihat sama dengan pemberian kemampuan atau kesempatan.",
+            "2": "Murid memilih may karena mengira setiap kalimat sopan dari orang dewasa memakai modal perizinan.",
+            "3": "Murid memilih would karena menerjemahkan kata \"sebaiknya\" dan \"akan\" sebagai modal yang sama."
+          },
+          "difficulty": "dasar"
+        },
+        {
+          "id": "eng-d9-cnd-004",
+          "prompt": "Nadia asks her teacher politely, \"Excuse me, Ma'am. ___ I borrow the English dictionary for a moment?\"",
+          "options": [
+            "May",
+            "Must",
+            "Will",
+            "Should"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Permintaan izin yang sopan kepada guru dinyatakan dengan modal may."
+          },
+          "distractorWhy": {
+            "1": "Murid memilih must karena mengira modal yang terdengar tegas otomatis terdengar sopan.",
+            "2": "Murid memilih will karena merasa perbuatan meminjam belum terjadi sehingga harus ditandai masa depan.",
+            "3": "Murid memilih should karena mengira modal untuk nasihat juga dipakai untuk meminta izin."
+          },
+          "difficulty": "dasar"
+        },
+        {
+          "id": "eng-d9-cnd-005",
+          "prompt": "If Rina ___ in Labuan Bajo, she would visit the komodo national park every holiday.",
+          "options": [
+            "lived",
+            "lives",
+            "will live",
+            "would live"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Pengandaian tipe 2 menggambarkan keadaan yang tidak nyata sekarang dan berpola If + simple past, ... would + Verb 1."
+          },
+          "distractorWhy": {
+            "1": "Murid memakai simple present karena membaca kalimat itu sebagai kemungkinan nyata seperti pengandaian tipe 1.",
+            "2": "Murid meletakkan will di dalam klausa if karena mengira syarat yang belum terjadi selalu ditandai masa depan.",
+            "3": "Murid menyalin would ke dalam klausa if karena melihat would sudah ada di bagian lain kalimat."
+          },
+          "difficulty": "sedang"
+        },
+        {
+          "id": "eng-d9-cnd-006",
+          "prompt": "If I ___ the chairperson of the OSIS, I would start an English club for every class.",
+          "options": [
+            "were",
+            "am",
+            "will be",
+            "would be"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Dalam pengandaian tipe 2, to be yang dipakai adalah were untuk semua subjek, termasuk subjek I."
+          },
+          "distractorWhy": {
+            "1": "Murid memakai am karena mengikuti aturan to be pada kalimat biasa, padahal ini situasi yang tidak nyata.",
+            "2": "Murid memakai will be karena mengira menjadi ketua OSIS adalah rencana masa depan yang bisa terjadi.",
+            "3": "Murid memakai would be di klausa if, padahal would hanya boleh berada di induk kalimat."
+          },
+          "difficulty": "sedang"
+        },
+        {
+          "id": "eng-d9-cnd-007",
+          "prompt": "If our school had a bigger library, more students ___ books during the long break.",
+          "options": [
+            "would borrow",
+            "will borrow",
+            "would borrowed",
+            "borrowed"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Induk kalimat pengandaian tipe 2 memakai would + Verb 1, sehingga bentuk yang benar adalah would borrow."
+          },
+          "distractorWhy": {
+            "1": "Murid memakai will karena mencampur induk kalimat tipe 1 dengan klausa if tipe 2.",
+            "2": "Murid menambahkan Verb 2 sesudah would karena mengira penanda lampau harus muncul di kedua klausa.",
+            "3": "Murid memakai simple past di induk kalimat karena meniru bentuk kata kerja pada klausa if."
+          },
+          "difficulty": "sedang"
+        },
+        {
+          "id": "eng-d9-cnd-008",
+          "prompt": "Bagas says, \"If I had a bicycle, I would ride it to school every day.\" What does his sentence mean?",
+          "options": [
+            "Bagas does not have a bicycle at the moment.",
+            "Bagas had a bicycle when he was in primary school.",
+            "Bagas is going to buy a bicycle tomorrow morning.",
+            "Bagas rides his own bicycle to school every day."
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Pengandaian tipe 2 menyatakan keadaan yang berlawanan dengan kenyataan sekarang, jadi kenyataannya Bagas tidak memiliki sepeda."
+          },
+          "distractorWhy": {
+            "1": "Murid membaca kata had sebagai kejadian lampau yang benar-benar terjadi, bukan sebagai penanda pengandaian.",
+            "2": "Murid mengira would selalu berarti rencana yang akan dilaksanakan dalam waktu dekat.",
+            "3": "Murid mengira kalimat pengandaian menceritakan kebiasaan sehari-hari yang nyata."
+          },
+          "difficulty": "sedang"
+        },
+        {
+          "id": "eng-d9-cnd-009",
+          "prompt": "The school rule says, \"Students ___ bring mobile phones into the examination room.\"",
+          "options": [
+            "must not",
+            "do not have to",
+            "would not",
+            "must not to"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Larangan dalam peraturan sekolah dinyatakan dengan must not + Verb 1 tanpa kata to."
+          },
+          "distractorWhy": {
+            "1": "Murid menyamakan \"tidak boleh\" dengan \"tidak perlu\", padahal frasa ini hanya berarti tidak diwajibkan.",
+            "2": "Murid memakai would not karena mengira bentuk sopan otomatis cocok untuk kalimat larangan.",
+            "3": "Murid menambahkan kata to sesudah modal karena meniru pola have to yang memang memakai to."
+          },
+          "difficulty": "sedang"
+        },
+        {
+          "id": "eng-d9-cnd-010",
+          "prompt": "Which sentence is a correct type 1 conditional about the futsal match?",
+          "options": [
+            "If the rain stops before three o'clock, we will continue the futsal match.",
+            "If the rain will stop before three o'clock, we will continue the futsal match.",
+            "If the rain stops before three o'clock, we would continue the futsal match.",
+            "If the rain stopped before three o'clock, we will continue the futsal match."
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Pengandaian tipe 1 dipakai untuk kemungkinan yang masih nyata dan berpola If + simple present, ... will + Verb 1."
+          },
+          "distractorWhy": {
+            "1": "Murid memakai will di dalam klausa if karena mengira syarat masa depan harus ditandai will juga.",
+            "2": "Murid memasangkan klausa if tipe 1 dengan induk kalimat tipe 2, sehingga dua pola tercampur.",
+            "3": "Murid memakai bentuk lampau di klausa if tetapi tetap memakai will di induk kalimat, sehingga waktunya tidak sejalan."
+          },
+          "difficulty": "tinggi"
+        },
+        {
+          "id": "eng-d9-cnd-011",
+          "prompt": "Fact: Nadia is not good at swimming, so she does not join the swimming club. Which type 2 conditional expresses the same idea?",
+          "options": [
+            "If Nadia were good at swimming, she would join the swimming club.",
+            "If Nadia is good at swimming, she will join the swimming club.",
+            "If Nadia were not good at swimming, she would not join the swimming club.",
+            "If Nadia were good at swimming, she will join the swimming club."
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Pengandaian tipe 2 membalik kenyataan, jadi fakta negatif diubah menjadi bentuk positif dengan pola If + were, ... would + Verb 1."
+          },
+          "distractorWhy": {
+            "1": "Murid mengubah fakta menjadi pengandaian tipe 1 karena mengira syaratnya masih bisa terjadi.",
+            "2": "Murid menyalin kata not dari kalimat fakta, padahal pengandaian tipe 2 justru membalik kenyataan itu.",
+            "3": "Murid memakai were di klausa if tetapi tetap memakai will di induk kalimat, sehingga polanya tidak konsisten."
+          },
+          "difficulty": "tinggi"
+        },
+        {
+          "id": "eng-d9-cnd-012",
+          "prompt": "The sentence \"If I would have more free time, I would join the traditional dance club\" is incorrect. Which sentence is the correct form?",
+          "options": [
+            "If I had more free time, I would join the traditional dance club.",
+            "If I have more free time, I would join the traditional dance club.",
+            "If I would have more free time, I joined the traditional dance club.",
+            "If I had more free time, I will join the traditional dance club."
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Dalam pengandaian tipe 2, would hanya boleh muncul di induk kalimat, sedangkan klausa if memakai simple past."
+          },
+          "distractorWhy": {
+            "1": "Murid hanya membuang would dari klausa if lalu memakai simple present, sehingga tipe kalimatnya berubah tidak sepadan.",
+            "2": "Murid mengubah induk kalimat menjadi bentuk lampau, padahal bagian yang salah justru klausa if, sehingga kesalahan aslinya tetap tertinggal.",
+            "3": "Murid membetulkan klausa if tetapi mengganti would di induk kalimat dengan will, sehingga polanya kembali tercampur."
+          },
+          "difficulty": "tinggi"
+        }
+      ]
+    },
+    {
+      "code": "KOMP-ENG-D-9-TXT-01",
+      "grade": 9,
+      "semester": 2,
+      "name": "Short Functional Text & Reading Strategy",
+      "materi": "Memahami teks fungsional pendek (pengumuman, undangan, label, pesan singkat) dan strategi menemukan informasi",
+      "cpRef": "Kepmendikbudristek/BSKAP No. 032/H/KR/2024 — CP Bahasa Inggris Fase D, Elemen Membaca–Memirsa",
+      "items": [
+        {
+          "id": "eng-d9-txt-001",
+          "prompt": "Read the announcement. \"ANNOUNCEMENT. All Grade 9 students must collect their graduation photos at the administration office on Friday, 20 June, from 09.00 to 12.00. Please bring your student card.\" What is the purpose of the text?",
+          "options": [
+            "To tell Grade 9 students when and where to collect their graduation photos.",
+            "To invite Grade 9 students to a graduation party in the school hall.",
+            "To remind all students to bring their student card to class every day.",
+            "To announce that the administration office will be closed on Friday."
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Tujuan pengumuman terletak pada informasi intinya, yaitu waktu dan tempat pengambilan foto kelulusan."
+          },
+          "distractorWhy": {
+            "1": "Murid mengira setiap teks yang menyebut kelulusan pasti berupa undangan pesta perpisahan.",
+            "2": "Murid mengambil kalimat penutup sebagai tujuan utama, padahal kalimat itu hanya syarat tambahan.",
+            "3": "Murid membalik makna jam layanan menjadi jam penutupan kantor."
+          },
+          "difficulty": "dasar"
+        },
+        {
+          "id": "eng-d9-txt-002",
+          "prompt": "Read the notice. \"LIBRARY NOTICE. The school library will be closed on Monday, 5 May, for book stock-taking. It will reopen on Tuesday at 07.30.\" When can students use the library again?",
+          "options": [
+            "On Tuesday at 07.30.",
+            "On Monday at 07.30.",
+            "On Tuesday at 05.00.",
+            "On Monday, as soon as the stock-taking is finished."
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Kalimat \"It will reopen on Tuesday at 07.30\" menyebutkan dengan jelas hari dan jam perpustakaan dibuka kembali."
+          },
+          "distractorWhy": {
+            "1": "Murid memakai hari penutupan sebagai hari pembukaan karena hanya mengambil tanggal yang paling menonjol.",
+            "2": "Murid membaca angka tanggal 5 May sebagai penunjuk jam, sehingga tertukar dengan waktu buka.",
+            "3": "Murid menyimpulkan sendiri bahwa perpustakaan buka setelah pendataan selesai, padahal teks menyebut hari tertentu."
+          },
+          "difficulty": "dasar"
+        },
+        {
+          "id": "eng-d9-txt-003",
+          "prompt": "Read the invitation. \"Dear Nadia, you are invited to the OSIS English Night. Day: Saturday, 12 October. Time: 18.30. Place: School Hall. Dress code: batik. Rina, Chairperson of OSIS.\" Who sends the invitation?",
+          "options": [
+            "Rina, the chairperson of the OSIS.",
+            "Nadia, a Grade 9 student of the school.",
+            "The committee that takes care of the school hall.",
+            "The English teacher who teaches Grade 9."
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Nama pengirim undangan ditulis pada bagian penutup, sedangkan nama sesudah kata Dear adalah penerimanya."
+          },
+          "distractorWhy": {
+            "1": "Murid mengira nama yang muncul lebih dulu selalu pengirim, padahal nama sesudah Dear adalah orang yang diundang.",
+            "2": "Murid mengira tempat berlangsungnya acara sekaligus menjadi pihak penyelenggara.",
+            "3": "Murid menebak pengirim dari kata English pada nama acara tanpa dasar di dalam teks."
+          },
+          "difficulty": "dasar"
+        },
+        {
+          "id": "eng-d9-txt-004",
+          "prompt": "Read the label. \"MILK CHOCOLATE BAR. Keep in a cool and dry place. Best before: 12/2026. Not suitable for people with a milk allergy.\" Who should not eat this chocolate?",
+          "options": [
+            "People who are allergic to milk.",
+            "People who live in a hot and dry place.",
+            "Anyone who eats it before December 2026.",
+            "Children who are under twelve years old."
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Kalimat \"Not suitable for people with a milk allergy\" langsung menyebutkan siapa yang tidak boleh memakannya."
+          },
+          "distractorWhy": {
+            "1": "Murid membaca petunjuk cara menyimpan sebagai larangan yang ditujukan kepada orang tertentu.",
+            "2": "Murid membalik makna best before, padahal tanggal itu menandai batas akhir mutu terbaik, bukan waktu mulai boleh dimakan.",
+            "3": "Murid membaca angka 12 pada tanggal kedaluwarsa sebagai batas usia pemakan."
+          },
+          "difficulty": "dasar"
+        },
+        {
+          "id": "eng-d9-txt-005",
+          "prompt": "Rina only wants to know the exact starting time of the OSIS English Night on a long invitation card. Which reading strategy should she use?",
+          "options": [
+            "Scanning, because she is looking for one specific piece of information.",
+            "Skimming, because she needs one exact detail from the card.",
+            "Reading every single word from the first line to the last line.",
+            "Guessing the time from the pictures that decorate the card."
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Scanning adalah strategi menyapu teks dengan cepat untuk menemukan satu informasi tertentu seperti angka jam."
+          },
+          "distractorWhy": {
+            "1": "Murid menyamakan skimming dengan membaca cepat untuk detail, padahal skimming dipakai untuk menangkap gagasan umum.",
+            "2": "Murid mengira semua teks harus dibaca utuh, sehingga tidak memilih strategi yang sesuai tujuan bacanya.",
+            "3": "Murid mengganti kegiatan mencari informasi dengan menebak, padahal jawabannya tertulis di dalam teks."
+          },
+          "difficulty": "sedang"
+        },
+        {
+          "id": "eng-d9-txt-006",
+          "prompt": "Read the short message. \"Hi Bagas, our group has to present the science report at 08.00 tomorrow. Please come to the lab at 07.30 so that we can check the slides first. Nadia.\" Why does Nadia ask Bagas to come at 07.30?",
+          "options": [
+            "So that the group has time to check the slides before the presentation.",
+            "Because the group presentation itself begins at 07.30.",
+            "Because the science lab will be locked at 08.00.",
+            "So that Bagas can finish writing the science report in the lab."
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Alasannya tertulis pada anak kalimat \"so that we can check the slides first\", yaitu menyiapkan slide sebelum presentasi."
+          },
+          "distractorWhy": {
+            "1": "Murid menyamakan jam berkumpul dengan jam presentasi karena hanya menangkap satu angka waktu.",
+            "2": "Murid menambahkan alasan tentang laboratorium yang tidak pernah disebutkan di dalam pesan.",
+            "3": "Murid mengira laporannya belum ditulis, padahal pesan itu hanya membahas pemeriksaan slide."
+          },
+          "difficulty": "sedang"
+        },
+        {
+          "id": "eng-d9-txt-007",
+          "prompt": "Read the announcement. \"The English speech contest has been postponed to Friday, 8 September, because the school hall is being repaired.\" The word \"postponed\" is closest in meaning to ___.",
+          "options": [
+            "moved to a later time",
+            "cancelled completely",
+            "made much shorter",
+            "moved to another school"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Postponed berarti diundur ke waktu yang lebih lambat, dan hal itu diperkuat oleh penyebutan tanggal baru di dalam teks."
+          },
+          "distractorWhy": {
+            "1": "Murid menyamakan \"ditunda\" dengan \"dibatalkan\", padahal teks tetap menyebutkan tanggal pelaksanaan yang baru.",
+            "2": "Murid menebak makna dari konteks perbaikan aula dan mengira acaranya dipersingkat.",
+            "3": "Murid mengira perbaikan aula berarti acara dipindahkan ke sekolah lain, padahal yang berubah hanya waktunya."
+          },
+          "difficulty": "sedang"
+        },
+        {
+          "id": "eng-d9-txt-008",
+          "prompt": "Read the notice. \"Students who join the study tour must submit the permission letter to Mr Hadi before Wednesday. He will not accept any letter after that day.\" The word \"He\" in the second sentence refers to ___.",
+          "options": [
+            "Mr Hadi",
+            "the student who joins the study tour",
+            "the parent who signs the permission letter",
+            "the head of the study tour committee"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Kata ganti he merujuk pada orang laki-laki yang paling dekat disebutkan sebelumnya, yaitu Mr Hadi sebagai penerima surat."
+          },
+          "distractorWhy": {
+            "1": "Murid mengira kata ganti selalu merujuk subjek kalimat pertama, padahal rujukannya adalah orang yang paling dekat disebut.",
+            "2": "Murid menghubungkan he dengan pihak yang menandatangani surat, padahal orang itu tidak disebut di dalam teks.",
+            "3": "Murid menebak jabatan yang terdengar masuk akal, padahal teks hanya menyebut satu nama orang."
+          },
+          "difficulty": "sedang"
+        },
+        {
+          "id": "eng-d9-txt-009",
+          "prompt": "Which information is usually NOT written in a school announcement about a coming event?",
+          "options": [
+            "The personal feelings of the writer about the event.",
+            "The day and the date when the event will be held.",
+            "The place where the event will be held.",
+            "The name of the person to contact for more information."
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Pengumuman sekolah bersifat faktual dan ringkas, sehingga hanya memuat informasi kegiatan tanpa perasaan pribadi penulisnya."
+          },
+          "distractorWhy": {
+            "1": "Murid mengira hari dan tanggal boleh dihilangkan karena sudah disampaikan secara lisan di kelas.",
+            "2": "Murid mengira tempat tidak perlu ditulis karena menganggap semua kegiatan pasti berlangsung di sekolah.",
+            "3": "Murid mengira nama narahubung hanya ada pada surat resmi, bukan pada pengumuman singkat."
+          },
+          "difficulty": "sedang"
+        },
+        {
+          "id": "eng-d9-txt-010",
+          "prompt": "Read the announcement. \"CLASS MEETING 2026. The futsal final will be held on Saturday, 14 June, at 14.00 on the school field. If it rains, the match will be moved to the indoor court. Supporters may enter from 13.30.\" Which statement is true according to the text?",
+          "options": [
+            "Supporters may come in half an hour before the match starts.",
+            "The final match will be cancelled if the rain falls.",
+            "Supporters have to arrive at 14.00 together with the players.",
+            "The futsal final is always played on the indoor court."
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Penonton boleh masuk pukul 13.30 sedangkan pertandingan mulai pukul 14.00, jadi selisihnya setengah jam."
+          },
+          "distractorWhy": {
+            "1": "Murid menyamakan kata moved dengan dibatalkan, padahal teks menyebut pertandingan hanya berpindah tempat.",
+            "2": "Murid menyamakan jam masuk penonton dengan jam mulai pertandingan karena hanya melihat satu angka waktu.",
+            "3": "Murid membaca rencana cadangan saat hujan sebagai tempat pertandingan yang utama."
+          },
+          "difficulty": "tinggi"
+        },
+        {
+          "id": "eng-d9-txt-011",
+          "prompt": "Read the invitation. \"GRADUATION DINNER for Grade 9 students and their parents. Friday, 19 June, 18.00, School Hall. Please confirm your attendance to Nadia before 15 June.\" What must a student do before 15 June?",
+          "options": [
+            "Tell Nadia whether he or she is coming or not.",
+            "Meet Nadia in the school hall to sign a list.",
+            "Pay the cost of the graduation dinner to Nadia.",
+            "Bring his or her parents to the school hall."
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Frasa \"confirm your attendance\" berarti memberi kepastian hadir atau tidak kepada Nadia sebelum batas tanggal itu."
+          },
+          "distractorWhy": {
+            "1": "Murid mengira konfirmasi harus dilakukan dengan datang langsung, padahal teks tidak menyebutkan cara tertentu.",
+            "2": "Murid menambahkan kewajiban membayar biaya yang sama sekali tidak tertulis dalam undangan.",
+            "3": "Murid membaca batas waktu konfirmasi sebagai tanggal pelaksanaan acaranya."
+          },
+          "difficulty": "tinggi"
+        },
+        {
+          "id": "eng-d9-txt-012",
+          "prompt": "Read the notice. \"To all members of the English Club: our meeting on Thursday will start one hour earlier than usual, because the room is used for a teachers' meeting at 16.00. Our club meeting is normally from 15.00 to 16.30.\" What time will the club meeting start on Thursday?",
+          "options": [
+            "At 14.00.",
+            "At 16.00.",
+            "At 15.00.",
+            "At 16.30."
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Jam biasa adalah 15.00 dan frasa \"one hour earlier\" berarti dimajukan satu jam, sehingga pertemuannya mulai pukul 14.00."
+          },
+          "distractorWhy": {
+            "1": "Murid memakai jam rapat guru sebagai jam mulai klub, padahal angka itu hanya menjelaskan alasan perubahan.",
+            "2": "Murid mengabaikan frasa one hour earlier sehingga tetap memakai jam pertemuan yang biasa.",
+            "3": "Murid mengambil jam selesai pertemuan sebagai jam mulainya."
+          },
+          "difficulty": "tinggi"
+        }
+      ]
+    }
+  ]
+}
