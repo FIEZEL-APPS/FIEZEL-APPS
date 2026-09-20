@@ -3373,6 +3373,824 @@
       ]
     },
     {
+      "code": "KOMP-ENG-D-9-BAB2-01",
+      "grade": 9,
+      "name": "Chapter 2: Taking Care of Yourself",
+      "materi": "Giving Advice & Suggestions (should/shouldn't), Expressing Agreement & Disagreement, Healthy Habits & Mental Health",
+      "cpRef": "English for Nusantara untuk SMP/MTs Kelas VII — Chapter 2 (Kelas IX)",
+      "items": [
+        {
+          "id": "eng-d-9-c2-q01",
+          "difficulty": "dasar",
+          "prompt": "Read the following text snippet about daily healthy routines:\n\"Teenagers undergo rapid physical and mental growth. To support their active school life and body development, health experts recommend that teenagers get around 8 to 10 hours of quality sleep every night.\"\nBased on the text, what is the recommended amount of sleep for teenagers every night?",
+          "options": [
+            "Getting 8 to 10 hours of quality sleep every night",
+            "Sleeping for only 4 to 5 hours on school days",
+            "Staying awake until midnight and sleeping 12 hours on weekends",
+            "Sleeping intermittently for 2 hours throughout the day"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Teks secara jelas menyebutkan bahwa remaja membutuhkan tidur berkualitas selama 8 hingga 10 jam setiap malam untuk mendukung pertumbuhan fisik dan mental."
+          },
+          "distractorWhy": {
+            "1": "Tidur selama 4 hingga 5 jam terlalu singkat dan dapat membahayakan kesehatan serta fokus belajar remaja.",
+            "2": "Pola tidur tidak teratur dengan mengganti waktu tidur di akhir pekan tidak disarankan untuk menjaga ritme sirkadian tubuh.",
+            "3": "Tidur terputus-putus selama 2 jam tidak memberikan fase tidur lelap yang cukup bagi pemulihan tubuh."
+          }
+        },
+        {
+          "id": "eng-d-9-c2-q02",
+          "difficulty": "dasar",
+          "prompt": "Read the dialogue snippet between Monita and Pipit:\nMonita: \"Pipit, don't forget to wash your hands before eating your lunch!\"\nPipit: \"Sure! How should I wash my hands properly?\"\nMonita: \"You should wash your hands with soap and clean running water for at least 20 seconds.\"\nWhat is Monita's advice regarding proper hand hygiene?",
+          "options": [
+            "Wash hands with soap and running water for at least 20 seconds",
+            "Rinse hands with warm water without using any soap",
+            "Wipe hands using a dry tissue paper before eating",
+            "Dip hands into a bowl of stagnant water quickly"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Saran Monita sesuai percakapan adalah mencuci tangan menggunakan sabun dan air mengalir minimal selama 20 detik."
+          },
+          "distractorWhy": {
+            "1": "Membilas dengan air hangat tanpa sabun tidak efektif membunuh kuman dan bakteri pada tangan.",
+            "2": "Mengelap tangan dengan tisu kering hanya membersihkan kotoran kasat mata, bukan kuman penyakit.",
+            "3": "Mencelupkan tangan ke air tenang dapat memindahkan kuman dari wadah ke tangan."
+          }
+        },
+        {
+          "id": "eng-d-9-c2-q03",
+          "difficulty": "sedang",
+          "prompt": "Read the following scenario:\nGalang just finished playing a heavy match of football on the school field. He feels sweaty, exhausted, and covered in dirt.\nWhich sentence expresses the most suitable advice using 'should' for Galang's hygiene?",
+          "options": [
+            "He should take a bath and change into clean dry clothes",
+            "He should continue wearing his dirty sports uniform all day",
+            "He should sleep on his bed immediately without washing",
+            "He should eat heavy fried food before washing his hands"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Ungkapan saran yang tepat setelah berolahraga dan berkeringat adalah mandi serta mengganti pakaian yang bersih dan kering."
+          },
+          "distractorWhy": {
+            "1": "Memakai seragam olahraga yang kotor dan berkeringat sepanjang hari dapat menyebabkan iritasi kulit dan bau badan.",
+            "2": "Langsung tidur tanpa membersihkan badan membuat kotoran dan keringat menempel di tempat tidur.",
+            "3": "Makan makanan berminyak tanpa mencuci tangan dapat menimbulkan masalah pencernaan akibat kuman."
+          }
+        },
+        {
+          "id": "eng-d-9-c2-q04",
+          "difficulty": "sedang",
+          "prompt": "Read the text snippet on body hydration:\n\"Water plays a crucial role in maintaining body temperature, flushing out toxins, and keeping our concentration high. Drinking at least eight glasses of clean water daily helps prevent dehydration during physical school activities.\"\nWhy is drinking enough water essential for students?",
+          "options": [
+            "To keep the body hydrated and maintain optimal concentration",
+            "To replace the main intake of solid nutritious meals",
+            "To increase sugar levels in the blood before taking tests",
+            "To slow down the heart rate while doing morning sports"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Teks menjelaskan bahwa minum air yang cukup menjaga hidrasi tubuh, membantu membuang racun, dan menjaga konsentrasi belajar."
+          },
+          "distractorWhy": {
+            "1": "Air minum tidak menggantikan asupan makanan bergizi seimbang yang dibutuhkan tubuh.",
+            "2": "Air putih tidak mengandung gula sehingga tidak berfungsi menaikkan kadar gula darah secara drastis.",
+            "3": "Tujuan utama minum air adalah mencegah dehidrasi, bukan memperlambat detak jantung saat berolahraga."
+          }
+        },
+        {
+          "id": "eng-d-9-c2-q05",
+          "difficulty": "tinggi",
+          "prompt": "Read the text on personal dental care:\n\"Tooth decay is often caused by food particles and bacteria left on teeth after meals. Dentists suggest brushing teeth twice a day—once after breakfast and once before going to bed at night—to maintain healthy teeth and fresh breath.\"\nBased on the text, what is the recommended dental care routine?",
+          "options": [
+            "Brushing teeth twice daily, after breakfast and before bedtime",
+            "Brushing teeth only when experiencing severe toothache",
+            "Rinsing the mouth with sweet syrup after every meal",
+            "Brushing teeth once a week using hard metal scrapers"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Rekomendasi perawatan gigi yang benar adalah menyikat gigi dua kali sehari, yaitu setelah sarapan dan sebelum tidur malam."
+          },
+          "distractorWhy": {
+            "1": "Menyikat gigi hanya saat sakit gigi sudah terlambat untuk memelihara kesehatan gigi.",
+            "2": "Berkumur dengan sirup manis justru meninggalkan gula yang mempercepat kerusakan gigi oleh bakteri.",
+            "3": "Menyikat gigi seminggu sekali tidak cukup dan penggunaan pengikis logam keras berisiko merusak lapisan email gigi."
+          }
+        },
+        {
+          "id": "eng-d-9-c2-q06",
+          "difficulty": "dasar",
+          "prompt": "Read the short story excerpt:\n\"Andre has a big English presentation tomorrow morning. He feels his heart beating fast, his hands sweating, and he cannot stop worrying about making mistakes in front of the class.\"\nHow can Andre's emotional state be best described?",
+          "options": [
+            "Anxious and stressed about his upcoming presentation",
+            "Delighted and cheerful about meeting his friends",
+            "Bored and uninterested in the school activity",
+            "Calm and completely relaxed about the exam"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Ciri-ciri fisik seperti jantung berdebar cepat, tangan berkeringat, dan rasa khawatir menunjukkan kondisi cemas dan stres."
+          },
+          "distractorWhy": {
+            "1": "Rasa gembira ditandai dengan perasaan senang dan ceria, bukan kekhawatiran berlebih.",
+            "2": "Rasa bosan ditandai dengan kurangnya perhatian atau rasa jenuh, bukan kecemasan fisik.",
+            "3": "Kondisi tenang ditandai dengan pikiran rileks dan denyut jantung yang stabil."
+          }
+        },
+        {
+          "id": "eng-d-9-c2-q07",
+          "difficulty": "sedang",
+          "prompt": "Read the dialogue between Monita and Andre:\nMonita: \"Andre, you look so exhausted and stressed. Have you been studying all night?\"\nAndre: \"Yes, I stayed up until 3 AM reading all the textbook units.\"\nMonita: \"________.\"\nWhich expression of giving advice using 'should' best fits Monita's response?",
+          "options": [
+            "You should take short rest breaks and manage your study time better",
+            "You should stay up even later until the morning exam starts",
+            "You should skip the examination and stay in bed all week",
+            "You should stop studying English completely from now on"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Saran yang sehat untuk mengatasi kelelahan akibat belajar berlebihan adalah mengambil istirahat sejenak dan mengatur waktu belajar dengan lebih baik."
+          },
+          "distractorWhy": {
+            "1": "Begadang lebih lama hingga pagi akan memperburuk kelelahan fisik dan menurunkan konsentrasi saat ujian.",
+            "2": "Membawa diri untuk membolos ujian bukan solusi bertanggung jawab atas kelelahan belajar.",
+            "3": "Berhenti belajar bahasa Inggris secara total merupakan tindakan ekstrem yang tidak memecahkan masalah."
+          }
+        },
+        {
+          "id": "eng-d-9-c2-q08",
+          "difficulty": "sedang",
+          "prompt": "Read the text on mental health awareness:\n\"When teenagers feel overwhelmed by feelings of sadness or anxiety, keeping emotions bottled up can make things worse. Sharing worries with a trusted adult, counselor, or friend helps lighten the emotional burden.\"\nAccording to the passage, what should students do when feeling emotionally overwhelmed?",
+          "options": [
+            "Talk about their feelings with a counselor or trusted adult",
+            "Keep all negative feelings hidden inside without telling anyone",
+            "Blame their classmates for every emotional distress they feel",
+            "Avoid interacting with anyone and lock themselves in room forever"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Teks menyarankan agar siswa membicarakan perasaan mereka kepada guru BK, orang tua, atau orang dewasa terpercaya untuk meringankan beban emosional."
+          },
+          "distractorWhy": {
+            "1": "Memendam perasaan secara terus-menerus dapat memperburuk kondisi kesehatan mental.",
+            "2": "Menyalahkan teman tidak memecahkan akar masalah emosional yang sedang dihadapi.",
+            "3": "Mengisolasi diri secara permanen menghambat dukungan sosial yang dibutuhkan untuk pemulihan emosi."
+          }
+        },
+        {
+          "id": "eng-d-9-c2-q09",
+          "difficulty": "tinggi",
+          "prompt": "Read the following paragraph about digital wellness:\n\"Spending late hours staring at smartphone screens exposes the eyes to blue light, which suppresses melatonin production. As a result, teenagers often experience sleep disturbances, mood swings, and difficulty focusing during morning classes.\"\nWhat is the main conclusion of the text regarding screen time before sleeping?",
+          "options": [
+            "Excessive late-night screen time negatively impacts sleep quality and mood",
+            "Using smartphones at night guarantees better memory retention for exams",
+            "Blue light from screens helps the body produce more sleep hormones",
+            "Students should play mobile games right before going to bed every night"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Kesimpulan utama teks adalah bahwa penggunaan gawai hingga larut malam berpotensi mengganggu kualitas tidur dan suasana hati remaja."
+          },
+          "distractorWhy": {
+            "1": "Teks tidak pernah menyatakan bahwa penggunaan ponsel malam hari meningkatkan daya ingat.",
+            "2": "Cahaya biru dari layar justru menekan produksi hormon melatonin (hormon tidur), bukan menaikkannya.",
+            "3": "Bermain gim ponsel tepat sebelum tidur tidak disarankan karena merangsang aktivitas otak dan mengganggu tidur."
+          }
+        },
+        {
+          "id": "eng-d-9-c2-q10",
+          "difficulty": "dasar",
+          "prompt": "Read the advice on building positive self-esteem:\n\"Everyone makes mistakes while learning a new language or skill. Instead of harsh self-criticism, practicing positive self-talk helps build self-confidence and mental resilience.\"\nWhat action is encouraged to foster mental resilience?",
+          "options": [
+            "Practicing positive self-talk and learning from mistakes",
+            "Comparing oneself constantly with others to feel superior",
+            "Giving up immediately whenever a mistake is made",
+            "Punishing oneself severely for small grammar errors"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Teks mendorong praktik dialog diri yang positif (positive self-talk) dan belajar dari kesalahan untuk membangun ketahanan mental."
+          },
+          "distractorWhy": {
+            "1": "Membandingkan diri secara terus-menerus dengan orang lain dapat memicu rasa iri dan menurunkan percaya diri.",
+            "2": "Langsung menyerah saat berbuat salah menghambat kemajuan belajar.",
+            "3": "Menghukum diri sendiri secara berlebihan dapat merusak kesehatan emosional."
+          }
+        },
+        {
+          "id": "eng-d-9-c2-q11",
+          "difficulty": "dasar",
+          "prompt": "Read the infographic guidance on healthy nutrition:\n\"A balanced plate should contain carbohydrates for energy, proteins for muscle repair, vitamins from vegetables and fruits for immunity, and clean water for bodily functions.\"\nWhich item combination represents a balanced and healthy lunch menu?",
+          "options": [
+            "Steamed rice, grilled fish, fresh spinach soup, and an apple",
+            "Instant noodles, fried potato chips, and a sweet soda drink",
+            "Double chocolate cake, ice cream, and sweet milk tea",
+            "Deep-fried snacks, candy bars, and energy drinks"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Kombinasi nasi kukus, ikan bakar, sayur bayam, dan buah apel mencakup karbohidrat, protein, vitamin, dan serat yang seimbang."
+          },
+          "distractorWhy": {
+            "1": "Mie instan, keripik kentang goreng, dan soda kaya akan gula dan garam serta minim serat dan gizi seimbang.",
+            "2": "Kue cokelat, es krim, dan teh manis mengandung kadar gula tinggi tanpa protein dan sayuran.",
+            "3": "Gorengan, permen, dan minuman berenergi mengandung lemak jenuh dan pemanis buatan berlebih."
+          }
+        },
+        {
+          "id": "eng-d-9-c2-q12",
+          "difficulty": "sedang",
+          "prompt": "Read the dialogue snippet:\nGalang: \"I feel sluggish and sleepy every afternoon during class.\"\nPipit: \"What do you usually eat for lunch at the canteen?\"\nGalang: \"I eat three fried snacks and drink two cups of extra sweet iced tea.\"\nPipit: \"Well, you ________ consume too much sugar and fried food if you want to stay energetic.\"\nWhich modal verb best completes Pipit's advice?",
+          "options": [
+            "shouldn't",
+            "must",
+            "should",
+            "can"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Kata 'shouldn't' (tidak seharusnya) digunakan untuk memberi saran agar tidak melakukan kebiasaan buruk mengonsumsi gula dan makanan berminyak berlebihan."
+          },
+          "distractorWhy": {
+            "1": "'must' menyatakan keharusan mutlak/aturan, bukan saran larangan kebiasaan makan.",
+            "2": "'should' akan bermakna menyarankan untuk mengonsumsi makanan tidak sehat, yang bertentangan dengan konteks.",
+            "3": "'can' menyatakan kemampuan atau izin, bukan saran perbaikan pola makan."
+          }
+        },
+        {
+          "id": "eng-d-9-c2-q13",
+          "difficulty": "sedang",
+          "prompt": "Read the dialogue snippet between Monita and Pipit:\nMonita: \"Why did you go to the school clinic during the flag ceremony this morning?\"\nPipit: \"I felt dizzy because I rushed out of home without eating anything.\"\nMonita: \"Oh dear, you ________ eat a nutritious breakfast before school to keep your body strong.\"\nWhich modal verb correctly fills the blank to give a helpful suggestion?",
+          "options": [
+            "should",
+            "shouldn't",
+            "might not",
+            "wouldn't"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Kata 'should' (seharusnya) tepat digunakan untuk menyarankan tindakan positif yang bermanfaat, yaitu sarapan bergizi sebelum ke sekolah."
+          },
+          "distractorWhy": {
+            "1": "'shouldn't' membuat kalimat bermakna melarang sarapan, yang bertentangan dengan saran kesehatan.",
+            "2": "'might not' menyatakan kemungkinan negatif, bukan ungkapan saran.",
+            "3": "'wouldn't' menyatakan ketidakmauan di masa lalu/kondisional, bukan ungkapan saran."
+          }
+        },
+        {
+          "id": "eng-d-9-c2-q14",
+          "difficulty": "tinggi",
+          "prompt": "Read the conversation on healthy lifestyle choices:\nGalang: \"In my opinion, replacing sweet snacks with fresh fruits during break time gives us more natural energy.\"\nPipit: \"________. I tried eating bananas yesterday and felt much more active during sports class.\"\nWhich expression best completes Pipit's statement to show strong agreement?",
+          "options": [
+            "I completely agree with you",
+            "I'm afraid I have a different opinion",
+            "I totally disagree with your idea",
+            "I doubt that fruits contain any vitamins"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Ungkapan 'I completely agree with you' (Saya sangat setuju denganmu) tepat digunakan karena Pipit mendukung pendapat Galang berdasarkan pengalamannya sendiri."
+          },
+          "distractorWhy": {
+            "1": "'I'm afraid I have a different opinion' digunakan untuk menyatakan ketidaksetujuan secara halus.",
+            "2": "'I totally disagree with your idea' menyatakan ketidaksetujuan secara tegas.",
+            "3": "'I doubt that...' menyatakan keraguan atas fakta kandungan buah."
+          }
+        },
+        {
+          "id": "eng-d-9-c2-q15",
+          "difficulty": "tinggi",
+          "prompt": "Read the dialogue snippet during a health discussion:\nAndre: \"Skipping dinner completely is the best and fastest way for teenagers to maintain a slim body.\"\nMonita: \"________. Teenagers still need balanced nutrients at night, but in smaller and healthier portions.\"\nWhich expression best fills the blank to express polite disagreement?",
+          "options": [
+            "I don't think so",
+            "That's exactly what I think",
+            "You are absolutely right",
+            "I couldn't agree more"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Ungkapan 'I don't think so' (Saya rasa tidak demikian) menunjukkan ketidaksetujuan yang santun terhadap gagasan melewatkan makan malam."
+          },
+          "distractorWhy": {
+            "1": "'That's exactly what I think' menyatakan persetujuan penuh terhadap pendapat Andre.",
+            "2": "'You are absolutely right' menyatakan bahwa pendapat Andre sepenuhnya benar.",
+            "3": "'I couldn't agree more' merupakan ungkapan persetujuan yang sangat kuat."
+          }
+        },
+        {
+          "id": "eng-d-9-c2-q16",
+          "difficulty": "dasar",
+          "prompt": "Read the comparison text:\n\"Ultra-processed snacks often contain high amounts of sodium, artificial colors, and saturated fats, which can lead to long-term health issues. On the other hand, natural whole foods like fruits, nuts, and boiled eggs provide clean energy and dietary fiber.\"\nWhy are natural whole foods better than ultra-processed snacks?",
+          "options": [
+            "They provide clean energy and essential dietary fiber without harmful additives",
+            "They contain higher levels of artificial colors and sodium",
+            "They spoil immediately within five seconds of opening",
+            "They cause rapid weight gain and high blood pressure"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Makanan alami menyediakan energi bersih dan serat penting tanpa zat aditif berbahaya yang terdapat pada makanan olahan berlebih."
+          },
+          "distractorWhy": {
+            "1": "Pewarna buatan dan kadar natrium tinggi adalah ciri makanan olahan berlebih, bukan makanan alami.",
+            "2": "Teks tidak menyebutkan bahwa makanan alami langsung basi dalam hitungan detik.",
+            "3": "Penyebab kenaikan berat badan drastis dan tekanan darah tinggi adalah konsumsi gorengan/makanan olahan bergaram tinggi."
+          }
+        },
+        {
+          "id": "eng-d-9-c2-q17",
+          "difficulty": "sedang",
+          "prompt": "Read the situation:\nPipit ate extra spicy chili sauce with her fried noodles during lunch break. An hour later, she complains of a sharp burning pain in her stomach.\nWhich advice combines proper health guidance and correct modal verb usage for Pipit?",
+          "options": [
+            "She should drink warm water and avoid eating overly spicy food",
+            "She should eat more chili sauce to cure the burning sensation",
+            "She shouldn't rest or tell anyone about her stomach pain",
+            "She should drink ice cold carbonated soda immediately"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Saran medis yang tepat untuk sakit perut akibat makanan pedas adalah minum air hangat dan tidak mengonsumsi makanan sangat pedas lagi."
+          },
+          "distractorWhy": {
+            "1": "Menambah konsumsi sambal akan memperparah iritasi lambung.",
+            "2": "Melarang beristirahat atau melaporkan rasa sakit dapat membahayakan keselamatan siswa.",
+            "3": "Minuman bersoda dingin berkarbonasi dapat memicu peningkatan asam lambung dan memperburuk rasa nyeri."
+          }
+        },
+        {
+          "id": "eng-d-9-c2-q18",
+          "difficulty": "sedang",
+          "prompt": "Read the discussion excerpt:\nGalang: \"Our school canteen should stop selling all fried snacks starting tomorrow.\"\nMonita: \"That's a good point, but ________. We should introduce healthy food choices gradually so students can adapt.\"\nWhich option completes Monita's response to express a partial agreement with a constructive suggestion?",
+          "options": [
+            "a complete sudden ban might be difficult for everyone right away",
+            "fried snacks are the healthiest food available on earth",
+            "canteen sellers should be closed down permanently",
+            "nobody in school cares about healthy food choices"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Monita menyetujui tujuan Galang tetapi memberikan masukan konstruktif bahwa larangan mendadak secara total bisa menyulitkan, sehingga transisi bertahap lebih realistis."
+          },
+          "distractorWhy": {
+            "1": "Menyatakan gorengan makanan tersehat bertentangan dengan prinsip kesehatan dalam teks.",
+            "2": "Menutup kantin secara permanen adalah tindakan ekstrem yang tidak relevan dengan diskusi pilihan menu.",
+            "3": "Menyatakan tidak ada yang peduli merupakan prasangka negatif yang tidak membimbing."
+          }
+        },
+        {
+          "id": "eng-d-9-c2-q19",
+          "difficulty": "tinggi",
+          "prompt": "Which of the following sentences correctly combines the advice structure using 'should' and 'shouldn't' to promote good personal health habits?",
+          "options": [
+            "You should eat fresh vegetables every day, and you shouldn't stay up late every night.",
+            "You shouldn't eat fresh vegetables every day, and you should stay up late every night.",
+            "You should eating fresh vegetables every day, and you shouldn't to stay up late every night.",
+            "You should to eat fresh vegetables every day, and you shouldn't staying up late every night."
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Kalimat ini secara tata bahasa benar (menggunakan modal 'should/shouldn't' + bare infinitive 'eat' dan 'stay') dan bermakna tepat untuk kesehatan."
+          },
+          "distractorWhy": {
+            "1": "Makna kalimat terbalik: melarang makan sayur dan menyuruh begadang tiap malam.",
+            "2": "Penggunaan bentuk '-ing' ('should eating') dan 'to infinitive' setelah modal 'shouldn't' ('shouldn't to stay') secara tata bahasa salah.",
+            "3": "Penggunaan 'to infinitive' ('should to eat') dan bentuk '-ing' ('shouldn't staying') secara tata bahasa salah."
+          }
+        },
+        {
+          "id": "eng-d-9-c2-q20",
+          "difficulty": "tinggi",
+          "prompt": "Read the summary passage of Chapter 2 (\"Taking Care of Yourself\"):\n\"Taking care of oneself involves a holistic approach. It requires maintaining personal physical hygiene, eating nutritious balanced meals, engaging in physical activities, getting sufficient rest, and taking care of one's mental health through positive social interactions and emotional expression.\"\nBased on the chapter summary, what does taking care of oneself comprehensively require?",
+          "options": [
+            "Balancing physical hygiene, nutritious diet, adequate rest, and mental emotional health",
+            "Focusing exclusively on physical appearance while ignoring mental stress",
+            "Relying solely on medicine without changing daily lifestyle habits",
+            "Exercising continuously for 10 hours a day without taking any break"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Merawat diri secara menyeluruh (holistik) mencakup keseimbangan antara kebersihan fisik, nutrisi seimbang, istirahat cukup, dan kesehatan emosional mental."
+          },
+          "distractorWhy": {
+            "1": "Hanya berfokus pada penampilan fisik tanpa memedulikan stres mental bukan pendekatan holistik yang sehat.",
+            "2": "Hanya mengandalkan obat tanpa memperbaiki gaya hidup sehari-hari tidak menyelesaikan masalah jangka panjang.",
+            "3": "Berolahraga 10 jam nonstop tanpa istirahat dapat menyebabkan cedera fisik dan kelelahan ekstrim."
+          }
+        }
+      ]
+    },
+    {
+      "code": "KOMP-ENG-D-9-BAB3-01",
+      "grade": 9,
+      "name": "Chapter 3: Journey to the Fantasy World",
+      "materi": "Analyzing Fantasy Narrative Texts, Character & Plot Analysis, Indirect/Reported Speech in Stories, Moral Values in Literature",
+      "cpRef": "English for Nusantara untuk SMP/MTs Kelas VII — Chapter 3 (Kelas IX)",
+      "items": [
+        {
+          "id": "eng-d-9-c3-q01",
+          "difficulty": "dasar",
+          "prompt": "In Chapter 3 Unit 1 (\"Andre and Princess Suripit\"), Andre suddenly finds himself sucked into his mobile game in the Mangrovian Kingdom. What outfit is Andre wearing when he arrives in Mangrovian?",
+          "options": [
+            "A metal breastplate and gauntlets (a knight outfit)",
+            "His comfortable pajamas from home",
+            "A school uniform from SMP Merdeka",
+            "A royal cloak and golden crown"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Based on Audio 3.2 text in Unit 1, Andre realizes he is no longer wearing his pajamas. Instead, he wears a metal breastplate and gauntlets on his hands, which is a knight outfit."
+          },
+          "distractorWhy": {
+            "1": "Andre was wearing pajamas before being sucked into the game, but upon arrival in Mangrovian, his outfit changed to a knight outfit.",
+            "2": "The school uniform of SMP Merdeka is related to Monita in Unit 2, not Andre in Unit 1.",
+            "3": "Princess Suripit is the guardian of the Mangrovian Kingdom, whereas Andre is equipped as a knight with plate armor, not royal cloaks."
+          }
+        },
+        {
+          "id": "eng-d-9-c3-q02",
+          "difficulty": "sedang",
+          "prompt": "In Unit 1 (\"Andre and Princess Suripit\"), Princess Suripit informs Andre about his final mission in order to return to his world. What is Andre's main mission?",
+          "options": [
+            "To find the endangered black orchid",
+            "To defeat the giant monster in the factory",
+            "To build a time travel car with red buttons",
+            "To collect three magical items from a golden cucumber"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "According to Audio 3.3 in Unit 1 Section 4, Princess Suripit states that Andre can only go home after completing his final mission, which is to find the endangered black orchid."
+          },
+          "distractorWhy": {
+            "1": "Defeating a giant factory owner is related to the multiverse story of Timun Mas in Unit 3, not Andre's mission in Unit 1.",
+            "2": "Building a time travel car is part of Monita's story in Unit 2, not Andre's mission in Unit 1.",
+            "3": "Collecting magical items from a golden cucumber refers to Timun Mas's story in Unit 3."
+          }
+        },
+        {
+          "id": "eng-d-9-c3-q03",
+          "difficulty": "sedang",
+          "prompt": "Read the explanatory note on plate armor from Unit 1 Section 4: \"Plate armor is body armor made of iron or steel plates. Knights used plate armor to protect them from sword slashes and spears when they were on the battlefield.\" Why did knights wear plate armor?",
+          "options": [
+            "To protect themselves from sword slashes and spears during battle",
+            "To make themselves fly faster in mobile games",
+            "To keep themselves warm during cold nights in the forest",
+            "To disguise themselves as ordinary villagers"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "The text explicitly states that knights used plate armor made of iron or steel plates to protect themselves from sword slashes and spears on the battlefield."
+          },
+          "distractorWhy": {
+            "1": "Plate armor is heavy (over 20 kg) and does not grant flying abilities.",
+            "2": "Plate armor was designed for combat protection on the battlefield, not for temperature regulation.",
+            "3": "Plate armor is distinct knight attire and would not serve as a civilian disguise."
+          }
+        },
+        {
+          "id": "eng-d-9-c3-q04",
+          "difficulty": "dasar",
+          "prompt": "In Unit 1 Section 3 (\"Language Focus: Was and Were\"), we use \"was\" with singular subjects and \"were\" with plural subjects to describe past situations. Which sentence correctly follows this rule?",
+          "options": [
+            "There were gauntlets on his hands and the armor was made of metal.",
+            "There was gauntlets on his hands and the armor were made of metal.",
+            "There were a strange message from the game.",
+            "Andre were amazed to see the Mangrovian kingdom."
+          ],
+          "answer": 0,
+          "why": {
+            "0": "\"Gauntlets\" is plural so it takes \"were\" (\"There were gauntlets\"), while \"armor\" is singular so it takes \"was\" (\"the armor was made of metal\")."
+          },
+          "distractorWhy": {
+            "1": "\"Gauntlets\" is plural and requires \"were\", while \"armor\" is singular and requires \"was\".",
+            "2": "\"A strange message\" is singular, so it requires \"was\" (\"There was a strange message\") rather than \"were\".",
+            "3": "\"Andre\" is a singular proper noun, so it requires \"was\" (\"Andre was amazed\") rather than \"were\"."
+          }
+        },
+        {
+          "id": "eng-d-9-c3-q05",
+          "difficulty": "sedang",
+          "prompt": "In Worksheet 3.4 (Unit 1), students complete sentences about past states. Choose the correct form of to be (was/were) for the sentence: \"Andre ___ amazed to see Mangrovian kingdom because Andre's armor ___ shiny.\"",
+          "options": [
+            "was / was",
+            "were / were",
+            "was / were",
+            "were / was"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Both \"Andre\" and \"Andre's armor\" are singular subjects, so both blanks require the singular past form \"was\"."
+          },
+          "distractorWhy": {
+            "1": "\"Were\" is used for plural subjects, whereas both Andre and his armor are singular.",
+            "2": "\"Armor\" is singular and requires \"was\", not \"were\".",
+            "3": "\"Andre\" is singular and requires \"was\", not \"were\"."
+          }
+        },
+        {
+          "id": "eng-d-9-c3-q06",
+          "difficulty": "dasar",
+          "prompt": "In Unit 2 Section 2 (\"Time Travel Car\"), Monita enters a strange flying car outside her house. How does Monita start the car engine?",
+          "options": [
+            "By pressing the big red button located at the center of the dashboard panel",
+            "By turning a silver key inside the ignition switch",
+            "By shouting a magical phrase to the car dashboard",
+            "By pulling the emergency handbrake next to her seat"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "The text states: \"One big red button was located at the center of the panel. Push the red button to start... Then, she pressed the red button.\""
+          },
+          "distractorWhy": {
+            "1": "The car did not use a silver key; it was activated by pressing a big red button on the dashboard panel.",
+            "2": "The car spoke to Monita, but starting it required pressing the red button rather than shouting magic words.",
+            "3": "Monita fastened her seatbelt after starting the car with the red button, not by pulling a handbrake."
+          }
+        },
+        {
+          "id": "eng-d-9-c3-q07",
+          "difficulty": "sedang",
+          "prompt": "In Unit 2 Section 5, Monita is questioned in Banjarmasin about her school, SMP Merdeka. Why is the local resident / security officer surprised by Monita's statement?",
+          "options": [
+            "Because Monita traveled back to 1992, and SMP Merdeka was not established until 2014",
+            "Because SMP Merdeka is located in Jakarta, not in Banjarmasin",
+            "Because Monita forgot the exact address of her home in Banjarmasin",
+            "Because the security officer had already graduated from SMP Merdeka long ago"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "The security officer explains that there is no SMP Merdeka in 1992 because SMP Merdeka was only established in 2014, revealing Monita's time travel to the past."
+          },
+          "distractorWhy": {
+            "1": "Monita states she lives in Banjarmasin near SMP Merdeka, but the issue is the time period (1992 vs 2014), not the city.",
+            "2": "Monita knows her address in Banjarmasin, but the school does not exist yet in 1992.",
+            "3": "The officer did not attend SMP Merdeka; he states the school does not exist in 1992."
+          }
+        },
+        {
+          "id": "eng-d-9-c3-q08",
+          "difficulty": "sedang",
+          "prompt": "In Unit 2 Section 3 (Worksheet 3.12), the text includes an informational snippet about time travel: \"Is time travel possible? According to Albert Einstein, ...\" What principle is mentioned regarding time travel?",
+          "options": [
+            "Time and space are linked together",
+            "Time moves backward only during full moons",
+            "Time travel requires a magic spell and a potion",
+            "Space is completely separate from time"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "According to the text in Unit 2 Section 3, Albert Einstein proposed that time and space are linked together."
+          },
+          "distractorWhy": {
+            "1": "The text discusses scientific theories by Albert Einstein, not lunar cycles.",
+            "2": "The passage references physics concepts by Albert Einstein rather than magical spells or potions.",
+            "3": "Einstein's theory states that time and space are linked together, not separate."
+          }
+        },
+        {
+          "id": "eng-d-9-c3-q09",
+          "difficulty": "tinggi",
+          "prompt": "In Unit 2 Section 4 (\"Language Focus: Indirect Speech\"), learn how to report questions. Convert this direct Wh- question into indirect speech: Monita asked, \"Where can I buy this newspaper?\"",
+          "options": [
+            "Monita asked where she could buy that newspaper.",
+            "Monita asked where can she buy this newspaper.",
+            "Monita asked if she could buy this newspaper where.",
+            "Monita asked where did she buy that newspaper."
+          ],
+          "answer": 0,
+          "why": {
+            "0": "In indirect Wh- questions, the question word (\"where\") is kept, subject-verb order changes to statement word order (\"she could buy\"), past tense modal (\"can\" -> \"could\") is used, and \"this\" changes to \"that\"."
+          },
+          "distractorWhy": {
+            "1": "In indirect speech, question word order (\"can she\") must change to statement word order (\"she could\").",
+            "2": "Wh- questions retain the question word at the beginning of the reported clause rather than using \"if\".",
+            "3": "Auxiliary \"did\" is not inserted for reported modal questions; \"can\" changes directly to \"could\"."
+          }
+        },
+        {
+          "id": "eng-d-9-c3-q10",
+          "difficulty": "tinggi",
+          "prompt": "In Unit 2 Section 4 (Worksheet 3.14), convert this direct Yes/No question into indirect speech: The security officer asked, \"Do you want to meet the professor?\"",
+          "options": [
+            "The security officer asked if she wanted to meet the professor.",
+            "The security officer asked that did she want to meet the professor.",
+            "The security officer asked where she wanted to meet the professor.",
+            "The security officer asked whether does she want to meet the professor."
+          ],
+          "answer": 0,
+          "why": {
+            "0": "For reported Yes/No questions, we use \"if\" or \"whether\", change question structure to statement order, and backshift present tense (\"do you want\") to past tense (\"she wanted\")."
+          },
+          "distractorWhy": {
+            "1": "Reported questions do not use \"that did she want\"; they use \"if/whether\" followed by statement word order.",
+            "2": "\"Where\" is used for location questions, whereas this is a Yes/No question requiring \"if\" or \"whether\".",
+            "3": "In indirect speech, present tense \"does she want\" must backshift to past tense \"she wanted\"."
+          }
+        },
+        {
+          "id": "eng-d-9-c3-q11",
+          "difficulty": "tinggi",
+          "prompt": "From Progress Check 2 (No. 1), convert the following direct speech into indirect speech: Andre asked, \"What do you want to buy in the supermarket?\"",
+          "options": [
+            "Andre asked what I wanted to buy in the supermarket.",
+            "Andre asked what do I want to buy in the supermarket.",
+            "Andre asked if I wanted to buy what in the supermarket.",
+            "Andre asked what did I want to buy in the supermarket."
+          ],
+          "answer": 0,
+          "why": {
+            "0": "The Wh- question \"What do you want...\" becomes \"what I wanted...\" in reported speech, shifting present tense to past tense and changing question order to statement order."
+          },
+          "distractorWhy": {
+            "1": "Present tense \"do I want\" must be backshifted to past tense \"I wanted\" in reported speech.",
+            "2": "Wh- questions use the question word (\"what\") directly after the reporting verb, not \"if\".",
+            "3": "Indirect speech uses statement order (\"what I wanted\") without auxiliary \"did\"."
+          }
+        },
+        {
+          "id": "eng-d-9-c3-q12",
+          "difficulty": "tinggi",
+          "prompt": "From Progress Check 2 (No. 5), convert the direct speech into indirect speech: Monita asked, \"Do you like the moon orchid?\"",
+          "options": [
+            "Monita asked whether I liked the moon orchid.",
+            "Monita asked what I liked the moon orchid.",
+            "Monita asked if did I like the moon orchid.",
+            "Monita asked that I liked the moon orchid."
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Yes/No questions use \"if\" or \"whether\", backshifting \"do you like\" to \"I liked\" in statement word order."
+          },
+          "distractorWhy": {
+            "1": "\"What\" is used for Wh- content questions, not for Yes/No questions.",
+            "2": "Reported questions do not combine \"if\" with auxiliary \"did\".",
+            "3": "Reported questions use \"if\" or \"whether\" instead of the conjunction \"that\"."
+          }
+        },
+        {
+          "id": "eng-d-9-c3-q13",
+          "difficulty": "dasar",
+          "prompt": "In Unit 3 Section 4 (\"Writing: Stages of a Narrative Text\"), Table 3.1 describes the stages of narrative text structure. What is the main description of the Orientation stage?",
+          "options": [
+            "It describes the setting in time and place and introduces the main characters or narrator.",
+            "It describes a sequence of unusual or problematic events faced by characters.",
+            "It deals with attempts to solve or overcome the main problem.",
+            "It provides an optional overall evaluation of events and moral lessons."
+          ],
+          "answer": 0,
+          "why": {
+            "0": "According to Table 3.1 in Unit 3 Section 4, Orientation describes the setting in time and place and introduces the main characters or narrator."
+          },
+          "distractorWhy": {
+            "1": "Describing unusual or problematic events is the function of the Complication stage.",
+            "2": "Dealing with attempts to solve the problem is the function of the Resolution stage.",
+            "3": "Providing an evaluation or moral lesson is the function of the Coda stage."
+          }
+        },
+        {
+          "id": "eng-d-9-c3-q14",
+          "difficulty": "dasar",
+          "prompt": "In narrative text structure (Unit 3 Section 4), which stage describes a sequence of events where a problem or conflict arises for the main characters?",
+          "options": [
+            "Complication",
+            "Orientation",
+            "Resolution",
+            "Coda"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Complication is the stage in a narrative text where problematic, unusual, or conflicting events occur."
+          },
+          "distractorWhy": {
+            "1": "Orientation introduces the characters and setting before the problem begins.",
+            "2": "Resolution shows how the problem is solved.",
+            "3": "Coda provides the concluding evaluation or moral lesson."
+          }
+        },
+        {
+          "id": "eng-d-9-c3-q15",
+          "difficulty": "sedang",
+          "prompt": "In Unit 3 Section 4, what happens during the Resolution stage of a narrative text structure?",
+          "options": [
+            "The characters make attempts to solve or overcome the problem",
+            "The background setting and time period are first introduced",
+            "The central conflict reaches its highest point of mystery without solution",
+            "The author listed past action verbs in comic panels"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Table 3.1 defines Resolution as the stage that deals with attempts to solve or overcome the problem in the story."
+          },
+          "distractorWhy": {
+            "1": "Introducing background setting and time period is the Orientation stage.",
+            "2": "Reaching the peak conflict without solution belongs to the Complication phase.",
+            "3": "Listing past action verbs is a classroom writing activity, not a narrative text stage."
+          }
+        },
+        {
+          "id": "eng-d-9-c3-q16",
+          "difficulty": "sedang",
+          "prompt": "In Unit 3 Table 3.2 (\"The Multiverse Story of Timun Mas\"), what special items does Timun Mas's mother give her in this modern fantasy version to help her beat the Giant?",
+          "options": [
+            "A pencil, a pen, and an eraser",
+            "Cucumber seeds, salt, and shrimp paste",
+            "A magical shield, a sword, and plate armor",
+            "A time travel car and a digital map"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "In the multiverse adaptation presented in Table 3.2, Timun Mas's mother gives her three stationery items: a pencil, a pen, and an eraser."
+          },
+          "distractorWhy": {
+            "1": "Cucumber seeds, salt, and shrimp paste belong to the traditional folklore version, whereas this multiverse version uses school supplies.",
+            "2": "Magical shield and plate armor are from Andre's knight outfit in Unit 1.",
+            "3": "A time travel car belongs to Monita's story in Unit 2."
+          }
+        },
+        {
+          "id": "eng-d-9-c3-q17",
+          "difficulty": "tinggi",
+          "prompt": "In the multiverse story of Timun Mas (Unit 3 Section 4 text snippet), how do Timun Mas and the Giant successfully escape from the labyrinth?",
+          "options": [
+            "Timun Mas reads the digital map while the Giant uses his strong power to destroy obstacles along the way.",
+            "Timun Mas throws salt to turn the labyrinth into a muddy sea.",
+            "The Giant carries Timun Mas on a flying time travel car through the green flash.",
+            "Princess Suripit guides them out using a black orchid."
+          ],
+          "answer": 0,
+          "why": {
+            "0": "The text states: \"Alright, we should use a digital map. You can read the map for us... Using his strong power, the Giant destroyed the obstacles along the way... Timun Mas and the Giant successfully found their way out.\""
+          },
+          "distractorWhy": {
+            "1": "Throwing salt to create a muddy sea is from the traditional folk tale, not the multiverse labyrinth scene.",
+            "2": "The flying time travel car belongs to Monita's story in Unit 2.",
+            "3": "Princess Suripit and the black orchid belong to Andre's story in Unit 1."
+          }
+        },
+        {
+          "id": "eng-d-9-c3-q18",
+          "difficulty": "dasar",
+          "prompt": "In Unit 3 Section 5 (Worksheet 3.24), students analyze past action verbs in narrative comics. Which option contains ONLY past action verbs?",
+          "options": [
+            "pressed, destroyed, carried, opened",
+            "beautiful, brave, shiny, excited",
+            "because, although, suddenly, happily",
+            "is, are, was, were"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "\"Pressed\", \"destroyed\", \"carried\", and \"opened\" are past action verbs describing physical actions performed in the past."
+          },
+          "distractorWhy": {
+            "1": "\"Beautiful\", \"brave\", \"shiny\", and \"excited\" are adjectives, not action verbs.",
+            "2": "\"Because\", \"although\", \"suddenly\", and \"happily\" are conjunctions and adverbs.",
+            "3": "\"Is\", \"are\", \"was\", and \"were\" are linking verbs / auxiliaries, not physical action verbs."
+          }
+        },
+        {
+          "id": "eng-d-9-c3-q19",
+          "difficulty": "sedang",
+          "prompt": "Chapter 3 explores fantasy stories, time travel, and multiverse folk tales. What main lesson about problem-solving is emphasized in narrative texts (Unit 3 Section 4)?",
+          "options": [
+            "Characters find creative solutions to overcome unexpected problems through intelligence, courage, and cooperation.",
+            "Characters should avoid all challenges and never venture into unknown worlds.",
+            "Problems can only be solved by using physical violence against opponents.",
+            "Fantasy worlds must always end with characters remaining trapped forever."
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Unit 3 Section 4 highlights that narrative texts entertain and convey messages about how characters find solutions to their unusual and unexpected problems."
+          },
+          "distractorWhy": {
+            "1": "Narrative texts encourage character growth and facing challenges, not avoiding them.",
+            "2": "The stories in Chapter 3 show peaceful or clever resolutions (e.g. Timun Mas studying at university, Andre completing missions).",
+            "3": "The resolution stage in narrative texts provides a way out, enabling characters to overcome their problems."
+          }
+        },
+        {
+          "id": "eng-d-9-c3-q20",
+          "difficulty": "tinggi",
+          "prompt": "In Progress Check 2 (No. 3), convert the following direct speech into indirect speech: Pipit asked, \"Can I see your notes?\"",
+          "options": [
+            "Pipit asked if she could see my notes.",
+            "Pipit asked can she see my notes.",
+            "Pipit asked that she saw my notes.",
+            "Pipit asked where she can see my notes."
+          ],
+          "answer": 0,
+          "why": {
+            "0": "The Yes/No modal question \"Can I see...\" is reported using \"if\", changing subject \"I\" to \"she\", modal \"can\" to past form \"could\", and pronoun \"your\" to \"my\"."
+          },
+          "distractorWhy": {
+            "1": "Reported questions must use statement order (\"she could see\") and backshift \"can\" to \"could\".",
+            "2": "Indirect questions do not use \"that\"; they use \"if\" or \"whether\".",
+            "3": "\"Where\" is used for location questions, whereas \"Can I see...\" is a Yes/No question requiring \"if\"."
+          }
+        }
+      ]
+    },
+    {
       "code": "KOMP-ENG-D-9-BAB4-01",
       "grade": 9,
       "name": "Chapter 4: Upcycling Used Materials",

@@ -120,7 +120,7 @@ for c_num in [1, 2, 3, 4, 5]:
         c["cpRef"] = f"{eng_doc} — Chapter {c_num} (Kelas VIII)"
         eng_data["competencies"].append(fix_difficulty(c))
 
-for c_num in [1, 4, 5]:
+for c_num in [1, 2, 3, 4, 5]:
     c = load_json(os.path.join(tools_dir, f"chunk_eng_9_c{c_num}.json"))
     if c:
         c["cpRef"] = f"{eng_doc} — Chapter {c_num} (Kelas IX)"

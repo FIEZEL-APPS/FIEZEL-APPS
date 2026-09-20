@@ -1,0 +1,409 @@
+{
+  "code": "KOMP-ENG-D-9-BAB2-01",
+  "grade": 9,
+  "name": "Chapter 2: Taking Care of Yourself",
+  "materi": "Giving Advice & Suggestions (should/shouldn't), Expressing Agreement & Disagreement, Healthy Habits & Mental Health",
+  "cpRef": "English for Nusantara untuk SMP/MTs Kelas IX",
+  "items": [
+    {
+      "id": "eng-d-9-c2-q01",
+      "difficulty": "dasar",
+      "prompt": "Read the following text snippet about daily healthy routines:\n\"Teenagers undergo rapid physical and mental growth. To support their active school life and body development, health experts recommend that teenagers get around 8 to 10 hours of quality sleep every night.\"\nBased on the text, what is the recommended amount of sleep for teenagers every night?",
+      "options": [
+        "Getting 8 to 10 hours of quality sleep every night",
+        "Sleeping for only 4 to 5 hours on school days",
+        "Staying awake until midnight and sleeping 12 hours on weekends",
+        "Sleeping intermittently for 2 hours throughout the day"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Teks secara jelas menyebutkan bahwa remaja membutuhkan tidur berkualitas selama 8 hingga 10 jam setiap malam untuk mendukung pertumbuhan fisik dan mental."
+      },
+      "distractorWhy": {
+        "1": "Tidur selama 4 hingga 5 jam terlalu singkat dan dapat membahayakan kesehatan serta fokus belajar remaja.",
+        "2": "Pola tidur tidak teratur dengan mengganti waktu tidur di akhir pekan tidak disarankan untuk menjaga ritme sirkadian tubuh.",
+        "3": "Tidur terputus-putus selama 2 jam tidak memberikan fase tidur lelap yang cukup bagi pemulihan tubuh."
+      }
+    },
+    {
+      "id": "eng-d-9-c2-q02",
+      "difficulty": "dasar",
+      "prompt": "Read the dialogue snippet between Monita and Pipit:\nMonita: \"Pipit, don't forget to wash your hands before eating your lunch!\"\nPipit: \"Sure! How should I wash my hands properly?\"\nMonita: \"You should wash your hands with soap and clean running water for at least 20 seconds.\"\nWhat is Monita's advice regarding proper hand hygiene?",
+      "options": [
+        "Wash hands with soap and running water for at least 20 seconds",
+        "Rinse hands with warm water without using any soap",
+        "Wipe hands using a dry tissue paper before eating",
+        "Dip hands into a bowl of stagnant water quickly"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Saran Monita sesuai percakapan adalah mencuci tangan menggunakan sabun dan air mengalir minimal selama 20 detik."
+      },
+      "distractorWhy": {
+        "1": "Membilas dengan air hangat tanpa sabun tidak efektif membunuh kuman dan bakteri pada tangan.",
+        "2": "Mengelap tangan dengan tisu kering hanya membersihkan kotoran kasat mata, bukan kuman penyakit.",
+        "3": "Mencelupkan tangan ke air tenang dapat memindahkan kuman dari wadah ke tangan."
+      }
+    },
+    {
+      "id": "eng-d-9-c2-q03",
+      "difficulty": "sedang",
+      "prompt": "Read the following scenario:\nGalang just finished playing a heavy match of football on the school field. He feels sweaty, exhausted, and covered in dirt.\nWhich sentence expresses the most suitable advice using 'should' for Galang's hygiene?",
+      "options": [
+        "He should take a bath and change into clean dry clothes",
+        "He should continue wearing his dirty sports uniform all day",
+        "He should sleep on his bed immediately without washing",
+        "He should eat heavy fried food before washing his hands"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Ungkapan saran yang tepat setelah berolahraga dan berkeringat adalah mandi serta mengganti pakaian yang bersih dan kering."
+      },
+      "distractorWhy": {
+        "1": "Memakai seragam olahraga yang kotor dan berkeringat sepanjang hari dapat menyebabkan iritasi kulit dan bau badan.",
+        "2": "Langsung tidur tanpa membersihkan badan membuat kotoran dan keringat menempel di tempat tidur.",
+        "3": "Makan makanan berminyak tanpa mencuci tangan dapat menimbulkan masalah pencernaan akibat kuman."
+      }
+    },
+    {
+      "id": "eng-d-9-c2-q04",
+      "difficulty": "sedang",
+      "prompt": "Read the text snippet on body hydration:\n\"Water plays a crucial role in maintaining body temperature, flushing out toxins, and keeping our concentration high. Drinking at least eight glasses of clean water daily helps prevent dehydration during physical school activities.\"\nWhy is drinking enough water essential for students?",
+      "options": [
+        "To keep the body hydrated and maintain optimal concentration",
+        "To replace the main intake of solid nutritious meals",
+        "To increase sugar levels in the blood before taking tests",
+        "To slow down the heart rate while doing morning sports"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Teks menjelaskan bahwa minum air yang cukup menjaga hidrasi tubuh, membantu membuang racun, dan menjaga konsentrasi belajar."
+      },
+      "distractorWhy": {
+        "1": "Air minum tidak menggantikan asupan makanan bergizi seimbang yang dibutuhkan tubuh.",
+        "2": "Air putih tidak mengandung gula sehingga tidak berfungsi menaikkan kadar gula darah secara drastis.",
+        "3": "Tujuan utama minum air adalah mencegah dehidrasi, bukan memperlambat detak jantung saat berolahraga."
+      }
+    },
+    {
+      "id": "eng-d-9-c2-q05",
+      "difficulty": "tinggi",
+      "prompt": "Read the text on personal dental care:\n\"Tooth decay is often caused by food particles and bacteria left on teeth after meals. Dentists suggest brushing teeth twice a day—once after breakfast and once before going to bed at night—to maintain healthy teeth and fresh breath.\"\nBased on the text, what is the recommended dental care routine?",
+      "options": [
+        "Brushing teeth twice daily, after breakfast and before bedtime",
+        "Brushing teeth only when experiencing severe toothache",
+        "Rinsing the mouth with sweet syrup after every meal",
+        "Brushing teeth once a week using hard metal scrapers"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Rekomendasi perawatan gigi yang benar adalah menyikat gigi dua kali sehari, yaitu setelah sarapan dan sebelum tidur malam."
+      },
+      "distractorWhy": {
+        "1": "Menyikat gigi hanya saat sakit gigi sudah terlambat untuk memelihara kesehatan gigi.",
+        "2": "Berkumur dengan sirup manis justru meninggalkan gula yang mempercepat kerusakan gigi oleh bakteri.",
+        "3": "Menyikat gigi seminggu sekali tidak cukup dan penggunaan pengikis logam keras berisiko merusak lapisan email gigi."
+      }
+    },
+    {
+      "id": "eng-d-9-c2-q06",
+      "difficulty": "dasar",
+      "prompt": "Read the short story excerpt:\n\"Andre has a big English presentation tomorrow morning. He feels his heart beating fast, his hands sweating, and he cannot stop worrying about making mistakes in front of the class.\"\nHow can Andre's emotional state be best described?",
+      "options": [
+        "Anxious and stressed about his upcoming presentation",
+        "Delighted and cheerful about meeting his friends",
+        "Bored and uninterested in the school activity",
+        "Calm and completely relaxed about the exam"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Ciri-ciri fisik seperti jantung berdebar cepat, tangan berkeringat, dan rasa khawatir menunjukkan kondisi cemas dan stres."
+      },
+      "distractorWhy": {
+        "1": "Rasa gembira ditandai dengan perasaan senang dan ceria, bukan kekhawatiran berlebih.",
+        "2": "Rasa bosan ditandai dengan kurangnya perhatian atau rasa jenuh, bukan kecemasan fisik.",
+        "3": "Kondisi tenang ditandai dengan pikiran rileks dan denyut jantung yang stabil."
+      }
+    },
+    {
+      "id": "eng-d-9-c2-q07",
+      "difficulty": "sedang",
+      "prompt": "Read the dialogue between Monita and Andre:\nMonita: \"Andre, you look so exhausted and stressed. Have you been studying all night?\"\nAndre: \"Yes, I stayed up until 3 AM reading all the textbook units.\"\nMonita: \"________.\"\nWhich expression of giving advice using 'should' best fits Monita's response?",
+      "options": [
+        "You should take short rest breaks and manage your study time better",
+        "You should stay up even later until the morning exam starts",
+        "You should skip the examination and stay in bed all week",
+        "You should stop studying English completely from now on"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Saran yang sehat untuk mengatasi kelelahan akibat belajar berlebihan adalah mengambil istirahat sejenak dan mengatur waktu belajar dengan lebih baik."
+      },
+      "distractorWhy": {
+        "1": "Begadang lebih lama hingga pagi akan memperburuk kelelahan fisik dan menurunkan konsentrasi saat ujian.",
+        "2": "Membawa diri untuk membolos ujian bukan solusi bertanggung jawab atas kelelahan belajar.",
+        "3": "Berhenti belajar bahasa Inggris secara total merupakan tindakan ekstrem yang tidak memecahkan masalah."
+      }
+    },
+    {
+      "id": "eng-d-9-c2-q08",
+      "difficulty": "sedang",
+      "prompt": "Read the text on mental health awareness:\n\"When teenagers feel overwhelmed by feelings of sadness or anxiety, keeping emotions bottled up can make things worse. Sharing worries with a trusted adult, counselor, or friend helps lighten the emotional burden.\"\nAccording to the passage, what should students do when feeling emotionally overwhelmed?",
+      "options": [
+        "Talk about their feelings with a counselor or trusted adult",
+        "Keep all negative feelings hidden inside without telling anyone",
+        "Blame their classmates for every emotional distress they feel",
+        "Avoid interacting with anyone and lock themselves in room forever"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Teks menyarankan agar siswa membicarakan perasaan mereka kepada guru BK, orang tua, atau orang dewasa terpercaya untuk meringankan beban emosional."
+      },
+      "distractorWhy": {
+        "1": "Memendam perasaan secara terus-menerus dapat memperburuk kondisi kesehatan mental.",
+        "2": "Menyalahkan teman tidak memecahkan akar masalah emosional yang sedang dihadapi.",
+        "3": "Mengisolasi diri secara permanen menghambat dukungan sosial yang dibutuhkan untuk pemulihan emosi."
+      }
+    },
+    {
+      "id": "eng-d-9-c2-q09",
+      "difficulty": "tinggi",
+      "prompt": "Read the following paragraph about digital wellness:\n\"Spending late hours staring at smartphone screens exposes the eyes to blue light, which suppresses melatonin production. As a result, teenagers often experience sleep disturbances, mood swings, and difficulty focusing during morning classes.\"\nWhat is the main conclusion of the text regarding screen time before sleeping?",
+      "options": [
+        "Excessive late-night screen time negatively impacts sleep quality and mood",
+        "Using smartphones at night guarantees better memory retention for exams",
+        "Blue light from screens helps the body produce more sleep hormones",
+        "Students should play mobile games right before going to bed every night"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Kesimpulan utama teks adalah bahwa penggunaan gawai hingga larut malam berpotensi mengganggu kualitas tidur dan suasana hati remaja."
+      },
+      "distractorWhy": {
+        "1": "Teks tidak pernah menyatakan bahwa penggunaan ponsel malam hari meningkatkan daya ingat.",
+        "2": "Cahaya biru dari layar justru menekan produksi hormon melatonin (hormon tidur), bukan menaikkannya.",
+        "3": "Bermain gim ponsel tepat sebelum tidur tidak disarankan karena merangsang aktivitas otak dan mengganggu tidur."
+      }
+    },
+    {
+      "id": "eng-d-9-c2-q10",
+      "difficulty": "dasar",
+      "prompt": "Read the advice on building positive self-esteem:\n\"Everyone makes mistakes while learning a new language or skill. Instead of harsh self-criticism, practicing positive self-talk helps build self-confidence and mental resilience.\"\nWhat action is encouraged to foster mental resilience?",
+      "options": [
+        "Practicing positive self-talk and learning from mistakes",
+        "Comparing oneself constantly with others to feel superior",
+        "Giving up immediately whenever a mistake is made",
+        "Punishing oneself severely for small grammar errors"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Teks mendorong praktik dialog diri yang positif (positive self-talk) dan belajar dari kesalahan untuk membangun ketahanan mental."
+      },
+      "distractorWhy": {
+        "1": "Membandingkan diri secara terus-menerus dengan orang lain dapat memicu rasa iri dan menurunkan percaya diri.",
+        "2": "Langsung menyerah saat berbuat salah menghambat kemajuan belajar.",
+        "3": "Menghukum diri sendiri secara berlebihan dapat merusak kesehatan emosional."
+      }
+    },
+    {
+      "id": "eng-d-9-c2-q11",
+      "difficulty": "dasar",
+      "prompt": "Read the infographic guidance on healthy nutrition:\n\"A balanced plate should contain carbohydrates for energy, proteins for muscle repair, vitamins from vegetables and fruits for immunity, and clean water for bodily functions.\"\nWhich item combination represents a balanced and healthy lunch menu?",
+      "options": [
+        "Steamed rice, grilled fish, fresh spinach soup, and an apple",
+        "Instant noodles, fried potato chips, and a sweet soda drink",
+        "Double chocolate cake, ice cream, and sweet milk tea",
+        "Deep-fried snacks, candy bars, and energy drinks"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Kombinasi nasi kukus, ikan bakar, sayur bayam, dan buah apel mencakup karbohidrat, protein, vitamin, dan serat yang seimbang."
+      },
+      "distractorWhy": {
+        "1": "Mie instan, keripik kentang goreng, dan soda kaya akan gula dan garam serta minim serat dan gizi seimbang.",
+        "2": "Kue cokelat, es krim, dan teh manis mengandung kadar gula tinggi tanpa protein dan sayuran.",
+        "3": "Gorengan, permen, dan minuman berenergi mengandung lemak jenuh dan pemanis buatan berlebih."
+      }
+    },
+    {
+      "id": "eng-d-9-c2-q12",
+      "difficulty": "sedang",
+      "prompt": "Read the dialogue snippet:\nGalang: \"I feel sluggish and sleepy every afternoon during class.\"\nPipit: \"What do you usually eat for lunch at the canteen?\"\nGalang: \"I eat three fried snacks and drink two cups of extra sweet iced tea.\"\nPipit: \"Well, you ________ consume too much sugar and fried food if you want to stay energetic.\"\nWhich modal verb best completes Pipit's advice?",
+      "options": [
+        "shouldn't",
+        "must",
+        "should",
+        "can"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Kata 'shouldn't' (tidak seharusnya) digunakan untuk memberi saran agar tidak melakukan kebiasaan buruk mengonsumsi gula dan makanan berminyak berlebihan."
+      },
+      "distractorWhy": {
+        "1": "'must' menyatakan keharusan mutlak/aturan, bukan saran larangan kebiasaan makan.",
+        "2": "'should' akan bermakna menyarankan untuk mengonsumsi makanan tidak sehat, yang bertentangan dengan konteks.",
+        "3": "'can' menyatakan kemampuan atau izin, bukan saran perbaikan pola makan."
+      }
+    },
+    {
+      "id": "eng-d-9-c2-q13",
+      "difficulty": "sedang",
+      "prompt": "Read the dialogue snippet between Monita and Pipit:\nMonita: \"Why did you go to the school clinic during the flag ceremony this morning?\"\nPipit: \"I felt dizzy because I rushed out of home without eating anything.\"\nMonita: \"Oh dear, you ________ eat a nutritious breakfast before school to keep your body strong.\"\nWhich modal verb correctly fills the blank to give a helpful suggestion?",
+      "options": [
+        "should",
+        "shouldn't",
+        "might not",
+        "wouldn't"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Kata 'should' (seharusnya) tepat digunakan untuk menyarankan tindakan positif yang bermanfaat, yaitu sarapan bergizi sebelum ke sekolah."
+      },
+      "distractorWhy": {
+        "1": "'shouldn't' membuat kalimat bermakna melarang sarapan, yang bertentangan dengan saran kesehatan.",
+        "2": "'might not' menyatakan kemungkinan negatif, bukan ungkapan saran.",
+        "3": "'wouldn't' menyatakan ketidakmauan di masa lalu/kondisional, bukan ungkapan saran."
+      }
+    },
+    {
+      "id": "eng-d-9-c2-q14",
+      "difficulty": "tinggi",
+      "prompt": "Read the conversation on healthy lifestyle choices:\nGalang: \"In my opinion, replacing sweet snacks with fresh fruits during break time gives us more natural energy.\"\nPipit: \"________. I tried eating bananas yesterday and felt much more active during sports class.\"\nWhich expression best completes Pipit's statement to show strong agreement?",
+      "options": [
+        "I completely agree with you",
+        "I'm afraid I have a different opinion",
+        "I totally disagree with your idea",
+        "I doubt that fruits contain any vitamins"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Ungkapan 'I completely agree with you' (Saya sangat setuju denganmu) tepat digunakan karena Pipit mendukung pendapat Galang berdasarkan pengalamannya sendiri."
+      },
+      "distractorWhy": {
+        "1": "'I'm afraid I have a different opinion' digunakan untuk menyatakan ketidaksetujuan secara halus.",
+        "2": "'I totally disagree with your idea' menyatakan ketidaksetujuan secara tegas.",
+        "3": "'I doubt that...' menyatakan keraguan atas fakta kandungan buah."
+      }
+    },
+    {
+      "id": "eng-d-9-c2-q15",
+      "difficulty": "tinggi",
+      "prompt": "Read the dialogue snippet during a health discussion:\nAndre: \"Skipping dinner completely is the best and fastest way for teenagers to maintain a slim body.\"\nMonita: \"________. Teenagers still need balanced nutrients at night, but in smaller and healthier portions.\"\nWhich expression best fills the blank to express polite disagreement?",
+      "options": [
+        "I don't think so",
+        "That's exactly what I think",
+        "You are absolutely right",
+        "I couldn't agree more"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Ungkapan 'I don't think so' (Saya rasa tidak demikian) menunjukkan ketidaksetujuan yang santun terhadap gagasan melewatkan makan malam."
+      },
+      "distractorWhy": {
+        "1": "'That's exactly what I think' menyatakan persetujuan penuh terhadap pendapat Andre.",
+        "2": "'You are absolutely right' menyatakan bahwa pendapat Andre sepenuhnya benar.",
+        "3": "'I couldn't agree more' merupakan ungkapan persetujuan yang sangat kuat."
+      }
+    },
+    {
+      "id": "eng-d-9-c2-q16",
+      "difficulty": "dasar",
+      "prompt": "Read the comparison text:\n\"Ultra-processed snacks often contain high amounts of sodium, artificial colors, and saturated fats, which can lead to long-term health issues. On the other hand, natural whole foods like fruits, nuts, and boiled eggs provide clean energy and dietary fiber.\"\nWhy are natural whole foods better than ultra-processed snacks?",
+      "options": [
+        "They provide clean energy and essential dietary fiber without harmful additives",
+        "They contain higher levels of artificial colors and sodium",
+        "They spoil immediately within five seconds of opening",
+        "They cause rapid weight gain and high blood pressure"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Makanan alami menyediakan energi bersih dan serat penting tanpa zat aditif berbahaya yang terdapat pada makanan olahan berlebih."
+      },
+      "distractorWhy": {
+        "1": "Pewarna buatan dan kadar natrium tinggi adalah ciri makanan olahan berlebih, bukan makanan alami.",
+        "2": "Teks tidak menyebutkan bahwa makanan alami langsung basi dalam hitungan detik.",
+        "3": "Penyebab kenaikan berat badan drastis dan tekanan darah tinggi adalah konsumsi gorengan/makanan olahan bergaram tinggi."
+      }
+    },
+    {
+      "id": "eng-d-9-c2-q17",
+      "difficulty": "sedang",
+      "prompt": "Read the situation:\nPipit ate extra spicy chili sauce with her fried noodles during lunch break. An hour later, she complains of a sharp burning pain in her stomach.\nWhich advice combines proper health guidance and correct modal verb usage for Pipit?",
+      "options": [
+        "She should drink warm water and avoid eating overly spicy food",
+        "She should eat more chili sauce to cure the burning sensation",
+        "She shouldn't rest or tell anyone about her stomach pain",
+        "She should drink ice cold carbonated soda immediately"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Saran medis yang tepat untuk sakit perut akibat makanan pedas adalah minum air hangat dan tidak mengonsumsi makanan sangat pedas lagi."
+      },
+      "distractorWhy": {
+        "1": "Menambah konsumsi sambal akan memperparah iritasi lambung.",
+        "2": "Melarang beristirahat atau melaporkan rasa sakit dapat membahayakan keselamatan siswa.",
+        "3": "Minuman bersoda dingin berkarbonasi dapat memicu peningkatan asam lambung dan memperburuk rasa nyeri."
+      }
+    },
+    {
+      "id": "eng-d-9-c2-q18",
+      "difficulty": "sedang",
+      "prompt": "Read the discussion excerpt:\nGalang: \"Our school canteen should stop selling all fried snacks starting tomorrow.\"\nMonita: \"That's a good point, but ________. We should introduce healthy food choices gradually so students can adapt.\"\nWhich option completes Monita's response to express a partial agreement with a constructive suggestion?",
+      "options": [
+        "a complete sudden ban might be difficult for everyone right away",
+        "fried snacks are the healthiest food available on earth",
+        "canteen sellers should be closed down permanently",
+        "nobody in school cares about healthy food choices"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Monita menyetujui tujuan Galang tetapi memberikan masukan konstruktif bahwa larangan mendadak secara total bisa menyulitkan, sehingga transisi bertahap lebih realistis."
+      },
+      "distractorWhy": {
+        "1": "Menyatakan gorengan makanan tersehat bertentangan dengan prinsip kesehatan dalam teks.",
+        "2": "Menutup kantin secara permanen adalah tindakan ekstrem yang tidak relevan dengan diskusi pilihan menu.",
+        "3": "Menyatakan tidak ada yang peduli merupakan prasangka negatif yang tidak membimbing."
+      }
+    },
+    {
+      "id": "eng-d-9-c2-q19",
+      "difficulty": "tinggi",
+      "prompt": "Which of the following sentences correctly combines the advice structure using 'should' and 'shouldn't' to promote good personal health habits?",
+      "options": [
+        "You should eat fresh vegetables every day, and you shouldn't stay up late every night.",
+        "You shouldn't eat fresh vegetables every day, and you should stay up late every night.",
+        "You should eating fresh vegetables every day, and you shouldn't to stay up late every night.",
+        "You should to eat fresh vegetables every day, and you shouldn't staying up late every night."
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Kalimat ini secara tata bahasa benar (menggunakan modal 'should/shouldn't' + bare infinitive 'eat' dan 'stay') dan bermakna tepat untuk kesehatan."
+      },
+      "distractorWhy": {
+        "1": "Makna kalimat terbalik: melarang makan sayur dan menyuruh begadang tiap malam.",
+        "2": "Penggunaan bentuk '-ing' ('should eating') dan 'to infinitive' setelah modal 'shouldn't' ('shouldn't to stay') secara tata bahasa salah.",
+        "3": "Penggunaan 'to infinitive' ('should to eat') dan bentuk '-ing' ('shouldn't staying') secara tata bahasa salah."
+      }
+    },
+    {
+      "id": "eng-d-9-c2-q20",
+      "difficulty": "tinggi",
+      "prompt": "Read the summary passage of Chapter 2 (\"Taking Care of Yourself\"):\n\"Taking care of oneself involves a holistic approach. It requires maintaining personal physical hygiene, eating nutritious balanced meals, engaging in physical activities, getting sufficient rest, and taking care of one's mental health through positive social interactions and emotional expression.\"\nBased on the chapter summary, what does taking care of oneself comprehensively require?",
+      "options": [
+        "Balancing physical hygiene, nutritious diet, adequate rest, and mental emotional health",
+        "Focusing exclusively on physical appearance while ignoring mental stress",
+        "Relying solely on medicine without changing daily lifestyle habits",
+        "Exercising continuously for 10 hours a day without taking any break"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Merawat diri secara menyeluruh (holistik) mencakup keseimbangan antara kebersihan fisik, nutrisi seimbang, istirahat cukup, dan kesehatan emosional mental."
+      },
+      "distractorWhy": {
+        "1": "Hanya berfokus pada penampilan fisik tanpa memedulikan stres mental bukan pendekatan holistik yang sehat.",
+        "2": "Hanya mengandalkan obat tanpa memperbaiki gaya hidup sehari-hari tidak menyelesaikan masalah jangka panjang.",
+        "3": "Berolahraga 10 jam nonstop tanpa istirahat dapat menyebabkan cedera fisik dan kelelahan ekstrim."
+      }
+    }
+  ]
+}
