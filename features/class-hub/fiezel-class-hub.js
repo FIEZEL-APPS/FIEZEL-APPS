@@ -846,38 +846,6 @@
     '</section>';
   }
 
-  function fullClassSubjectsView() {
-    var code = classCode();
-    if (!code) return '';
-    var u = ui();
-    var teachers = u.classTeachers || [];
-    var tMap = {};
-    teachers.forEach(function (t) { if (t.subjectId) tMap[t.subjectId] = t.teacherName; });
-
-    return '<section class="ch-card ch-all-subjects" data-testid="class-all-subjects-panel">' +
-      '<div class="ch-card-top">' +
-        '<span class="ch-kicker">' + icon('book-open') + ' ' + esc(t('kelas.panel-17-mapel', 'Kurikulum Merdeka (17 Mapel)')) + '</span>' +
-        '<span class="ch-badge">' + (teachers.length ? esc(t('kelas.panel-guru-terdaftar', '{n} Guru Terdaftar', { n: teachers.length })) : esc(t('kelas.panel-kelas-terpadu', 'Kelas Terpadu'))) + '</span>' +
-      '</div>' +
-      '<h3>' + esc(t('kelas.panel-semua-judul', 'Panel Mata Pelajaran {kelas}', { kelas: className() || t('kelas.panel-semua-kelas-fallback', 'Kelas {kode}', { kode: code }) })) + '</h3>' +
-      '<p class="ch-muted">' + esc(t('kelas.panel-17-mapel-desc', 'Satu kode kelas menghubungkan seluruh guru mata pelajaran. Tugas dari masing-masing guru otomatis teralokasi ke kartu panel mapel bersangkutan.')) + '</p>' +
-      '<div class="ch-subjects-compact-list">' +
-        SUBJECTS_17.map(function (s) {
-          var tName = tMap[s.id] || (s.id === 'ENG' && teacherName() ? teacherName() : null);
-          return '<div class="ch-subject-row" data-testid="compact-subject-' + esc(s.id) + '">' +
-            '<div class="ch-subject-meta">' +
-              '<span class="ch-subject-bullet" style="background:' + s.color + '"></span>' +
-              '<strong>' + esc(s.name) + '</strong>' +
-            '</div>' +
-            '<div class="ch-subject-status">' +
-              (tName ? '<span class="ch-teacher-pill">' + icon('user') + ' ' + esc(tName) + '</span>' : '<span class="ch-empty-pill">' + esc(t('kelas.mapel-menunggu-penugasan', 'Menunggu penugasan')) + '</span>') +
-            '</div>' +
-          '</div>';
-        }).join('') +
-      '</div>' +
-    '</section>';
-  }
-
   function tugasView(pend, done) {
     var allPend = pend.slice().sort(function (a, b) { return String(a.deadline || '9').localeCompare(String(b.deadline || '9')); });
     var allDone = done.slice().sort(function (a, b) { return b.at - a.at; });
@@ -907,9 +875,19 @@
   function kelasView() {
     var lf = null; try { lf = LF() ? LF().load() : null; } catch (_) {}
     var rep = lf && lf.classReport;
-    return '<div class="ch-body"><section class="ch-card ch-class-card" data-testid="class-my-class">' + (classCode() ? '<p class="ch-kicker">' + WM + ' terhubung</p><h3>' + esc(className() || '') + (className() ? '' : WM + ' ' + esc(classCode())) + '</h3><p class="ch-muted">Kode ' + WM + ' <b class="ch-mono">' + esc(classCode()) + '</b>' + (teacherName() ? ' · Guru <b>' + esc(teacherName()) + '</b>' : '') + '</p>' + (rep ? '<p class="ch-muted ch-small">' + (rep.ok ? icon('check') + ' Laporan terakhir terkirim ke guru ' + esc(fmtDate(rep.at)) : icon('clock') + ' Laporan terakhir belum terkirim (' + esc(rep.error || 'offline') + ') — dikirim ulang otomatis saat online.') + '</p>' : '') + '<div class="ch-actions"><button type="button" class="ch-btn is-ghost" data-ch="change-code">Ganti kode</button></div>' : '<p class="ch-kicker">Gabung ' + WM + '</p><h3><span class="kelasku-wordmark">Masukkan kode dari KelasKu</span></h3><p class="ch-muted">Kode berbentuk FZ-XXXXXX. Setelah tergabung, tugas guru masuk otomatis dan hasilmu kembali ke guru.</p>') +
+    /* Hitung guru mapel sekali untuk baris ringkas kartu kelas. Daftar 17 baris
+       fullClassSubjectsView() DIHAPUS TOTAL (instruksi owner): panel itu mendorong
+       konten berguna ke bawah dan kebanyakan barisnya hanya berbunyi "Menunggu
+       penugasan". Rincian per mapel tetap hidup di kartu filter tab Tugas. */
+    var teachers = [];
+    try { teachers = ((ui() || {}).classTeachers) || []; } catch (_) { teachers = []; }
+    if (!Array.isArray(teachers)) teachers = [];
+    var teacherLine = '';
+    if (classCode() && teachers.length) {
+      teacherLine = '<p class="ch-muted ch-small" data-testid="class-teachers-line">' + icon('user-check') + ' ' + esc(t('kelas.panel-guru-terdaftar', '{n} Guru Terdaftar', { n: teachers.length })) + ' <button type="button" class="ch-btn is-small is-ghost" data-ch="tab" data-tab="tugas" data-testid="class-jump-tugas">' + esc(t('umum.tugas', 'Tugas')) + ' ' + icon('arrow-right') + '</button></p>';
+    }
+    return '<div class="ch-body"><section class="ch-card ch-class-card" data-testid="class-my-class">' + (classCode() ? '<p class="ch-kicker">' + WM + ' terhubung</p><h3>' + esc(className() || '') + (className() ? '' : WM + ' ' + esc(classCode())) + '</h3><p class="ch-muted">Kode ' + WM + ' <b class="ch-mono">' + esc(classCode()) + '</b>' + (teacherName() ? ' · Guru <b>' + esc(teacherName()) + '</b>' : '') + '</p>' + (rep ? '<p class="ch-muted ch-small">' + (rep.ok ? icon('check') + ' Laporan terakhir terkirim ke guru ' + esc(fmtDate(rep.at)) : icon('clock') + ' Laporan terakhir belum terkirim (' + esc(rep.error || 'offline') + ') — dikirim ulang otomatis saat online.') + '</p>' : '') + teacherLine + '<div class="ch-actions"><button type="button" class="ch-btn is-ghost" data-ch="change-code">Ganti kode</button></div>' : '<p class="ch-kicker">Gabung ' + WM + '</p><h3><span class="kelasku-wordmark">Masukkan kode dari KelasKu</span></h3><p class="ch-muted">Kode berbentuk FZ-XXXXXX. Setelah tergabung, tugas guru masuk otomatis dan hasilmu kembali ke guru.</p>') +
       (!classCode() || ui().editCode ? '<form class="ch-form" data-ch-form="join"><input name="code" value="' + esc(studentDraftCode) + '" placeholder="FZ-ABC234" maxlength="9" autocomplete="off" required data-testid="class-code-input"><button type="submit" class="ch-btn is-primary" data-testid="class-code-submit">Gabung</button></form>' : '') + '</section>' +
-      fullClassSubjectsView() +
       '<section class="ch-grid2"><button type="button" class="ch-card ch-link-card" data-ch="tutor" data-testid="class-open-tutor"><span class="ch-link-icon">' + icon('mic') + '</span><div><b>Tutor FIEZEL</b><small>Pelajaran bersuara Inggris + subtitle Indonesia, sesuai levelmu.</small></div>' + icon('arrow-up-right') + '</button>' +
       '<button type="button" class="ch-card ch-link-card" data-ch="learn" data-testid="class-open-learn"><span class="ch-link-icon">' + icon('route') + '</span><div><b>' + t('kelas.belajar-mandiri', 'Belajar mandiri hari ini') + '</b><small>Rencana harian dari peta kemampuanmu — tugas guru ikut masuk ke sana.</small></div>' + icon('arrow-up-right') + '</button>' +
       (kurikulumTersedia() ? '<button type="button" class="ch-card ch-link-card" data-ch="open-curriculum" data-testid="class-curriculum-link"><span class="ch-link-icon">' + icon('compass') + '</span><div><b>' + esc(t('kelas.misi-kurikulum-link', 'Misi Belajar Kurikulum')) + '</b><small>' + esc(t('kelas.misi-kurikulum-sub', 'Target kompetensi SMP/SMA & Paspor Belajar adaptif.')) + '</small></div>' + icon('arrow-up-right') + '</button>' : '') + '</section></div>';
