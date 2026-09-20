@@ -159,3 +159,39 @@ Sesuai instruksi OWNER ("JANGAN HANYA 12, TAPI HARUS PERSIS SAMA DENGAN JUMLAH S
    - `tests/mapel-fase-d-content-test.js`: **25/25 PASS** (38 butir valid, 10 dasar, 18 sedang, 10 tinggi, 0 duplikasi, 0 rujukan posisi opsi).
    - `tests/kelasku-17mapel-assignment-test.js`: **25.373/25.373 PASS**.
    - `tests/modal-assign-teacher-ux-test.js`: **27/27 PASS**.
+
+## 11. Ekstraksi Tahap 2: Bab 2 Zat dan Perubahannya (22 Butir Asli, Akumulasi 60 Soal)
+
+Seluruh butir latihan bernomor di Bab II ("Zat dan Perubahannya") dari Buku Siswa IPA Kelas VII Edisi Revisi (`IPA_BS_KLS_VII_Rev (1).pdf` hal. 54–76) telah diekstraksi ke dalam `KOMP-IPA-D-7-BAB2-01`:
+1. **Hal. 54–55 (Wujud Zat dan Model Partikel)**:
+   - Sifat bentuk & volume padat, cair, gas berdasarkan kerapatan ikatan partikel (Tabel 2.1).
+   - Penjelasan mengapa baja tidak dapat dihancurkan dengan tangan kosong (ikatan kisi kristal logam).
+   - Penjelasan partikel susu cair yang dapat meluncur dan mengikuti bentuk wadah.
+   - Penjelasan hembusan angin di wajah oleh aliran partikel gas berkecepatan tinggi.
+   - Perbandingan laju difusi zat dalam medium gas vs cairan.
+   - Status wujud materi butiran kristal padat gula pasir.
+   - Peristiwa difusi molekul gas pengharum ruangan ke seluruh bagian rumah.
+2. **Hal. 60–61 (Perubahan Wujud Zat, Titik Leleh & Didih)**:
+   - Pemanasan besi hingga titik leleh 1.535°C oleh tukang las.
+   - Analisis fase wujud air pada suhu 15°C (cair), 85°C (cair), dan 120°C (gas/uap).
+   - Wujud aluminium pada suhu kamar 25°C berkaitan dengan titik leleh 660°C.
+   - Penentuan materi bertitik leleh tertinggi (permata/intan pada 3.550°C).
+   - Analisis urutan pembekuan saat suhu didinginkan (air di 0°C, nitrogen di -210°C, oksigen di -218°C).
+3. **Hal. 65–66 (Perubahan Fisika dan Kimia)**:
+   - Perbedaan mendasar perubahan fisika (merobek kertas) vs perubahan kimia (membakar kertas).
+   - Pembentukan endapan kuning timbal(II) iodida pada reaksi timbal(II) nitrat + kalium iodida.
+   - Pembentukan gelembung gas hidrogen pada reaksi pita magnesium + asam klorida.
+   - Empat indikator utama reaksi kimia (warna, gas, endapan, suhu).
+4. **Hal. 73–76 (Kerapatan Zat & Massa Jenis)**:
+   - Daya apung materi di air: es dan minyak mengapung; aluminium, besi, tembaga, seng, emas tenggelam.
+   - Urutan lapisan cairan berdensitas beda: sirup di dasar, air di tengah, minyak di permukaan.
+   - Perhitungan rumus massa jenis $\rho = m/V$ balok kuningan (168 g / 20 cm³ = 8,4 g/cm³).
+   - Kasus kapal Titanic 46.328 ton: rongga udara raksasa menghasilkan massa jenis rata-rata lebih kecil dari air laut.
+   - Kasus tenggelamnya Titanic: masuknya air laut menaikkan massa jenis rata-rata kapal melebihi air laut.
+   - Kasus tumpahan minyak di laut: massa jenis minyak lebih ringan dari air laut dan mekanisme penanggulangan oil boom.
+
+**Verifikasi Mutu Bab 1 & Bab 2 (60 Butir Soal Autentik)**:
+- `tests/mapel-fase-d-content-test.js`: **27/27 PASS**
+  - Bab 1 (`KOMP-IPA-D-7-BAB1-01`): 38 butir (10 dasar, 18 sedang, 10 tinggi)
+  - Bab 2 (`KOMP-IPA-D-7-BAB2-01`): 22 butir (6 dasar, 10 sedang, 6 tinggi)
+  - Total bank soal IPA Fase D aktif: **60 butir soal asli terverifikasi**.
