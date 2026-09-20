@@ -158,6 +158,26 @@ const swHantu = swBankRefs.filter((r) => !fs.existsSync(path.join(ROOT, r.replac
 check('precache: sw.js tidak menyebut satu pun berkas bank yang tidak ada',
   swHantu.length === 0, swHantu.join(', ') || swBankRefs.length + ' rujukan, semuanya ada');
 
+/* =================== A-1 · SUMBER RESMI BUKU SISWA (MANIFEST.tsv) =================== */
+
+const manifestPath = path.join(ROOT, 'content/mapel/sumber/MANIFEST.tsv');
+const manifestAda = fs.existsSync(manifestPath);
+check('sumber: MANIFEST.tsv tersedia di content/mapel/sumber/', manifestAda, manifestPath);
+
+if (manifestAda) {
+  const tsvRaw = fs.readFileSync(manifestPath, 'utf8').replace(/\r/g, '').trim().split('\n');
+  const header = tsvRaw[0].split('\t').map((h) => h.trim());
+  const kolomWajib = ['berkas', 'judul resmi', 'penerbit', 'tahun', 'isbn', 'alamat unduh', 'tanggal unduh'];
+  const headerValid = kolomWajib.length === header.length && kolomWajib.every((k, i) => header[i] === k);
+  check('sumber: header MANIFEST.tsv sesuai kontrak (' + kolomWajib.join(', ') + ')',
+    headerValid, header.join(', '));
+
+  const baris = tsvRaw.slice(1).filter((l) => l.trim().length > 0).map((l) => l.split('\t').map((c) => c.trim()));
+  const berkasHilang = baris.filter((b) => !fs.existsSync(path.join(ROOT, 'content/mapel/sumber', b[0])));
+  check('sumber: setiap berkas di MANIFEST.tsv benar-benar ada di repo (' + baris.length + ' buku)',
+    berkasHilang.length === 0, berkasHilang.map((b) => b[0]).join(', ') || (baris.length + ' berkas ada'));
+}
+
 if (adaBank.length === 0) {
   check('keadaan: NOL bank mapel — gerbang tidak menuntut isi, dan itu memang keadaan jujur',
     true, 'isi menunggu sumber resmi Kemendikbudristek; lihat docs/handoffs/BUKU-SISWA-BAB-HANDOFF.md');

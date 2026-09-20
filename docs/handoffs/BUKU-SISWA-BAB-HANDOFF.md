@@ -102,3 +102,21 @@ diletakkan di repo, bukan direkonstruksi oleh agen.
   menerbitkan bank 972 soal resmi. Soal latihan di dalam Buku Siswa jumlahnya terbatas, dan
   menyalinnya utuh adalah persoalan lisensi tersendiri. Bank sebesar apa pun pasti disusun
   seseorang — yang menentukan adalah **siapa**, dan apakah itu **dinyatakan jujur**.
+
+## 7. Perkembangan: 9 Dokumen Sumber Resmi Buku Siswa Telah Mendarat
+
+OWNER telah mengunduh 9 berkas PDF resmi Buku Siswa Kemendikbudristek dari portal SIBI (`buku.kemendikdasmen.go.id`) ke dalam direktori kerja `C:\Users\hp\Downloads\ku`.
+
+Daftar isi lengkap, metadata hak cipta, penerbit, tahun terbit, dan nomor ISBN resmi telah diekstrak dan dicatat di `content/mapel/sumber/MANIFEST.tsv` beserta berkas teks daftar isi resminya:
+1. `buku-siswa-ipa-kelas-7-daftar-isi.txt` (ISBN: 978-623-118-457-3, 7 Bab)
+2. `buku-siswa-ipa-kelas-8-daftar-isi.txt` (ISBN: 978-623-388-560-7, 7 Bab)
+3. `buku-siswa-mat-kelas-7-daftar-isi.txt` (ISBN: 978-602-244-883-9, 6 Bab)
+4. `buku-siswa-ind-kelas-7-daftar-isi.txt` (ISBN: 978-623-118-368-2, 6 Bab)
+5. `buku-siswa-ind-kelas-8-daftar-isi.txt` (ISBN: 978-623-388-142-5, 6 Bab)
+6. `buku-siswa-eng-kelas-7-daftar-isi.txt` (ISBN: 978-602-244-885-3, 5 Chapters)
+7. `buku-siswa-eng-kelas-8-daftar-isi.txt` (ISBN: 978-602-427-941-7, 5 Chapters)
+8. `buku-siswa-eng-kelas-9-daftar-isi.txt` (ISBN: 978-602-427-942-4, 5 Chapters)
+9. `buku-siswa-ips-kelas-7-daftar-isi.txt` (ISBN: 978-623-118-437-5, 4 Tema)
+
+Gerbang `tests/mapel-fase-d-content-test.js` kini secara otomatis memvalidasi keberadaan kontrak `MANIFEST.tsv` dan keutuhan kesembilan berkas sumber tersebut (12/12 PASS).
+
