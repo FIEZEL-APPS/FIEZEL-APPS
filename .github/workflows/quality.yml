@@ -237,6 +237,7 @@ jobs:
           node tests/teacher-csv-test.js
           node tests/teacher-braincore-test.js
           node tests/class-sync-test.js
+          node tests/auto-class-adopt-test.js
           node tests/class-hub-test.js
           node tests/exam-focus-guard-test.js
           node tests/class-join-test.js

@@ -470,8 +470,24 @@ function proxyForward(workerHeaders, list) {
       '(c) noindex bertahan lewat proxy (dashboard owner tidak boleh terindeks)');
     assert(/no-store/.test(forwarded.headers.get('cache-control') || ''),
       '(c) Cache-Control: no-store bertahan (hosting bersama tidak boleh menyimpan halaman owner)');
-    // Sesi diperbarui tiap akses -> Set-Cookie harus sampai ke browser.
-    assert(forwarded.cookies.length === 1 && /fz_owner=/.test(forwarded.cookies[0]),
+    /* Sesi diperbarui tiap akses -> Set-Cookie harus sampai ke browser.
+     *
+     * DULU assert ini berbunyi `cookies.length === 1`. Itu bukan kontraknya, hanya
+     * kebetulan: saat ditulis, Worker owner memang hanya memasang satu cookie. Ketika
+     * m025-340/341 menambah `fz_cls` (mengingat kelas yang sedang dibuka di panel),
+     * assert itu merah — padahal tidak ada yang rusak, dan baris TEPAT DI BAWAHNYA
+     * sudah menyatakan sebaliknya: "boleh lebih dari satu".
+     *
+     * Yang sesungguhnya dijaga, dan sekarang ditulis apa adanya:
+     *   1. TIDAK ADA cookie yang hilang di jembatan - berapa pun jumlahnya;
+     *   2. cookie sesi owner (`fz_owner`) termasuk di dalamnya.
+     * Keduanya lebih ketat dari `=== 1`, bukan lebih longgar: menambah cookie baru
+     * tetap aman, tetapi MENJATUHKAN satu cookie di proxy tetap merah. */
+    const workerCookies = [...page.headers].filter(([n]) => String(n).toLowerCase() === 'set-cookie');
+    assert(forwarded.cookies.length === workerCookies.length,
+      '(c) semua Set-Cookie Worker lolos proxy — Worker memasang ' + workerCookies.length +
+      ', sampai ke browser ' + forwarded.cookies.length + ' (yang hilang = sesi/preferensi mati)');
+    assert(forwarded.cookies.some((c) => /fz_owner=/.test(c)),
       '(c) Set-Cookie sesi owner diteruskan proxy (tanpa ini sesi mati di setiap muat halaman)');
     assert(/if \(\$name === 'set-cookie'\) \{ header\('Set-Cookie: ' \. \$val, false\);/.test(phpSource),
       '(c) proxy meneruskan Set-Cookie dengan replace=false (boleh lebih dari satu)');
