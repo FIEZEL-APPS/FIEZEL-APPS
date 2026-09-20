@@ -276,6 +276,24 @@
     'kurikulum.an-sinyal-over': 'มั่นใจแต่ผิด',
     'kurikulum.an-sinyal-careless': 'เลินเล่อ',
     'kurikulum.an-sinyal-miskon': 'ความเข้าใจผิด',
-    'kurikulum.scrim-tutup': 'ปิด'
+    'kurikulum.scrim-tutup': 'ปิด',
+    /* m025-351 (F7, รายงานสำหรับผู้ปกครอง) — นสครใหม่ถือกำเนิดแบบสองภาษา */
+    'kurikulum.rapor-png-btn': 'ดาวน์โหลด PNG',
+    'kurikulum.rapor-print-btn': 'พิมพ์ / PDF',
+    'kurikulum.rapor-doc-title': 'รายงานผลความสามารถ',
+    'kurikulum.rapor-kpi-komp': 'สมรรถนะ',
+    'kurikulum.rapor-kpi-kuasai': 'เชี่ยวชาญแล้ว',
+    'kurikulum.rapor-kpi-tahan': 'คงอยู่',
+    'kurikulum.rapor-kpi-trans': 'ประยุกต์ใช้ได้',
+    'kurikulum.rapor-kuat': 'แข็งแกร่ง',
+    'kurikulum.rapor-berkembang': 'กำลังพัฒนา',
+    'kurikulum.rapor-awal': 'เริ่มต้น',
+    'kurikulum.rapor-tanpa-bukti': 'ยังไม่มีหลักฐานการเรียนรู้ — เริ่มทำภารกิจแล้วพาสปอร์ตจะเต็มเอง',
+    'kurikulum.rapor-kaki': 'เอกสารนี้สรุปหลักฐานการเรียนรู้ที่มีบันทึกไว้ — ไม่ใช่คะแนนที่แต่งขึ้น',
+    'kurikulum.rapor-ortu-card-title': 'รายงานสำหรับผู้ปกครอง',
+    'kurikulum.rapor-ortu-card-sub': 'เอกสารชุดเดียวกับที่ครูอ่าน — ดาวน์โหลดรูปเพื่อแชร์ หรือพิมพ์',
+    'kurikulum.rapor-gagal-unduh': 'สร้างรูปไม่สำเร็จ ลองกดปุ่มพิมพ์',
+    'kurikulum.rapor-gagal-cetak': 'เปิดหน้าต่างพิมพ์ไม่สำเร็จ',
+    'kurikulum.rapor-modul-hilang': 'โมดูลแชร์รายงานยังไม่โหลด โปรดโหลดหน้าซ้ำ'
   });
 })();

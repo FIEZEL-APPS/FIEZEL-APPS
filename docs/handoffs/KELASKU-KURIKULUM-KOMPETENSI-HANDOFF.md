@@ -17,7 +17,7 @@ mengikuti lima gelombang di laporan audit.
 | **2 — pintu** | X2, X3, K10, G1 | **SELESAI** · `m025-349` |
 | **3 — satu buku kompetensi** | X4, X5, F1 (sebagian) | **SELESAI** · `m025-349` |
 | **4 — alat, bukan rapor** | F3, F4, F6, K3, K5, K6, K11, K13 | **SELESAI** · `m025-349` |
-| **5 — jangkauan** | A1–A5, G2–G4, G6–G10, K12 · F7–F10 | **SEBAGIAN** · `m025-351` (butir teknis selesai + gerbang `kurikulum-jangkauan-test.js` terdaftar di CI; F7–F10 menunggu) |
+| **5 — jangkauan** | A1–A5, G2–G4, G6–G10, K12, F7 · F8–F10 | **SEBAGIAN** · build `m025-351` (butir teknis + F7 selesai; gerbang `kurikulum-jangkauan-test.js` & `kurikulum-rapor-ortu-test.js` terdaftar di CI; F8–F10 menunggu) |
 
 Di luar gelombang, sudah mendarat di program yang sama:
 `tests/modal-assign-teacher-ux-test.js` didaftarkan di `quality.yml`, dan 32 kunci hantu
@@ -139,13 +139,21 @@ Gelombang 5 — **jangkauan**. Butir teknisnya sudah selesai dan terkunci gerban
   lokal berpenanda asal data.
 - ✅ **K12** — layar kurikulum adalah lapisan `FiezelBackNav` (pushLayer + dismiss),
   bukan modal kertas.
-- ⏳ **F7–F10** — rapor yang bisa dibagikan ke orang tua, cakupan per mapel untuk wali kelas,
+- ⏳ **F8–F10** — cakupan per mapel untuk wali kelas,
   misi luring, papan "kelas saya vs kurikulum".
 
-Status `m025-351`: butir A1–A5, G2–G4, G6–G10, dan K12 **selesai** (lihat tabel Status dan
-`tests/kurikulum-jangkauan-test.js`). A1 memakai prinsip yang sama dengan gelombang
-m025-314/m025-290: kosakata zona kurikulum masuk `ID_WORDS` penjaga `th-ui-leak-test`, dan
-pukulan sampingan di zona Merdeka yang di-SK-kan owner 7 September 2026 (konsol guru,
-misi Belajar, bank konten, layar guru) naik anggarannya di `ALLOWLIST` dengan alasan
-tertulis, bukan pelonggaran diam-diam. Yang masih terbuka dari Gelombang 5 tinggal
-F7–F10, dan itu sengaja: empat fitur besar yang belum di-scope ke butir kerja.
+Status build `m025-351`: **F7 selesai** — modul bersama `features/curriculum/rapor-share.js`
+merender dokumen yang sama untuk guru (drawer paspor konsol) dan murid (kartu rapor di
+paspor Belajar); format PNG via Canvas + Cetak/PDF via `window.print`, render sisi klien
+sesuai keputusan owner; 17 kunci `kurikulum.rapor-*` baru lahir dwibahasa (id+th);
+gerbang `tests/kurikulum-rapor-ortu-test.js` (10 asersi) terdaftar di `quality.yml`.
+Yang masih terbuka dari Gelombang 5 tinggal F8–F10.
+
+Status `m025-351`: butir A1–A5, G2–G4, G6–G10, K12, dan F7 **selesai** (lihat tabel Status,
+`tests/kurikulum-jangkauan-test.js`, dan `tests/kurikulum-rapor-ortu-test.js`). A1 memakai
+prinsip yang sama dengan gelombang m025-314/m025-290: kosakata zona kurikulum masuk
+`ID_WORDS` penjaga `th-ui-leak-test`, dan pukulan sampingan di zona Merdeka yang di-SK-kan
+owner 7 September 2026 (konsol guru, misi Belajar, bank konten, layar guru) naik
+anggarannya di `ALLOWLIST` dengan alasan tertulis, bukan pelonggaran diam-diam. Yang
+masih terbuka dari Gelombang 5 tinggal F8–F10, dan itu sengaja: tiga fitur besar yang
+belum di-scope ke butir kerja.

@@ -932,6 +932,13 @@
   function openPassport(sid) {
     api('/braincore/passport/' + sid).then(function (p) {
       var raporNarrative = makeRaporNarrative(p.name, p.rows, p.open_misconceptions);
+      /* F7 (m025-351): bekukan dokumen rapor yang dibagikan — modul bersama merender
+         DOKUMEN YANG SAMA untuk guru dan murid, jadi payloadnya disimpan sekali. */
+      var RS = root.FiezelRaporShare;
+      S.rapor = RS ? RS.ringkas({
+        nama: p.name || sid, kelas: S.cls && S.cls.name, mapel: subjName(activeSubj()),
+        tanggal: RS.hariIni(), totals: p.totals, rows: p.rows, narasi: raporNarrative
+      }) : null;
       S.drawer = '<div class="row between"><p class="kicker">' + t('kurikulum.paspor-kicker', 'Learning Passport') + '</p><button class="btn sm ghost" data-a="close">' + t('kurikulum.tutup', 'Tutup') + '</button></div>' +
         '<h2>' + esc(p.name || sid) + '</h2>' +
         '<div class="row">' + [[t('kurikulum.kpi-komp', 'Kompetensi'), p.totals.competencies], [t('kurikulum.kpi-kuasai', 'Dikuasai'), p.totals.mastered], [t('kurikulum.kpi-tahan', 'Bertahan'), p.totals.retained], [t('kurikulum.kpi-trans', 'Transfer'), p.totals.transferred]].map(function (tRow) {
@@ -940,7 +947,10 @@
         '<div class="card tight accent" style="margin-top:14px" data-testid="rapor-card">' +
         '<div class="row between"><div><p class="kicker">' + t('kurikulum.rapor-card-kicker', 'Catatan Capaian Kompetensi') + '</p><b>' + t('kurikulum.rapor-card-title', 'Draf Narasi e-Rapor Kemendikbud') + '</b></div>' +
         '<button class="btn primary sm" data-a="copy-rapor" data-text="' + esc(raporNarrative) + '" data-testid="copy-rapor-btn">📋 ' + t('kurikulum.rapor-copy-btn', 'Salin Narasi') + '</button></div>' +
-        '<p class="muted" style="margin-top:8px;font-size:13.5px;line-height:1.5">' + esc(raporNarrative) + '</p></div>' +
+        '<p class="muted" style="margin-top:8px;font-size:13.5px;line-height:1.5">' + esc(raporNarrative) + '</p>' +
+        '<div class="row rapor-no-print" style="margin-top:10px;gap:8px;flex-wrap:wrap">' +
+        '<button class="btn sm" data-a="rapor-png" data-testid="rapor-png-btn">🖼️ ' + t('kurikulum.rapor-png-btn', 'Unduh PNG') + '</button>' +
+        '<button class="btn sm ghost" data-a="rapor-print" data-testid="rapor-print-btn">🖨️ ' + t('kurikulum.rapor-print-btn', 'Cetak / PDF') + '</button></div></div>' +
         (p.rows.length ? p.rows.map(function (r) {
           return '<div class="card tight" style="margin-top:10px"><div class="row between"><b>' + esc(r.tp_code || '-') + '</b><span class="pill mute">' + r.mastery_pct + '%</span></div>' +
             '<p class="muted">' + esc((r.tp_name || '').slice(0, 90)) + '</p>' +
@@ -1271,6 +1281,18 @@
         });
       } else {
         toast(t('kurikulum.rapor-manual', 'Teks siap disalin secara manual.'));
+      }
+      return;
+    }
+    if (a === 'rapor-png' || a === 'rapor-print') {
+      /* F7 (m025-351): ekspor sisi klien — PNG via Canvas, cetak via window.print.
+         Kegagalan dua-duanya dilaporkan jujur, bukan diam. */
+      var RS2 = root.FiezelRaporShare;
+      if (!RS2 || !S.rapor) { toast(t('kurikulum.rapor-modul-hilang', 'Modul berbagi rapor belum termuat. Muat ulang halaman.')); return; }
+      if (a === 'rapor-png') {
+        if (!RS2.unduhPNG(S.rapor)) toast(t('kurikulum.rapor-gagal-unduh', 'Gagal membuat gambar. Coba tombol Cetak.'));
+      } else if (!RS2.cetak(S.rapor)) {
+        toast(t('kurikulum.rapor-gagal-cetak', 'Gagal membuka dialog cetak.'));
       }
       return;
     }
