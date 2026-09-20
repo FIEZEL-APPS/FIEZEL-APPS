@@ -470,22 +470,23 @@ function proxyForward(workerHeaders, list) {
       '(c) noindex bertahan lewat proxy (dashboard owner tidak boleh terindeks)');
     assert(/no-store/.test(forwarded.headers.get('cache-control') || ''),
       '(c) Cache-Control: no-store bertahan (hosting bersama tidak boleh menyimpan halaman owner)');
-    // Sesi diperbarui tiap akses -> Set-Cookie harus sampai ke browser.
-    //
-    // DULU baris ini berbunyi `forwarded.cookies.length === 1 && /fz_owner=/.test(cookies[0])`,
-    // dan itu MENUDUH JEMBATAN ATAS DOSA YANG TIDAK ADA. Dashboard kini memasang DUA cookie
-    // (`fz_owner` sesi + `fz_cls` kelas terpilih, workers/owner/index.js), jadi hitungan "tepat
-    // satu" merah bukan karena ada cookie yang hilang, melainkan karena ada cookie yang LAHIR.
-    // Assert di bawahnya sendiri sudah menuntut proxy memakai `replace=false` supaya Set-Cookie
-    // "boleh lebih dari satu" — dua baris bertetangga yang saling membantah.
-    //
-    // Yang menggantikannya lebih ketat, bukan lebih longgar: dulu cookie kedua yang HILANG di
-    // jembatan tetap hijau selama yang pertama `fz_owner`; sekarang setiap Set-Cookie yang
-    // dipasang Worker wajib sampai, berapa pun jumlahnya.
+    /* Sesi diperbarui tiap akses -> Set-Cookie harus sampai ke browser.
+     *
+     * DULU assert ini berbunyi `cookies.length === 1`. Itu bukan kontraknya, hanya
+     * kebetulan: saat ditulis, Worker owner memang hanya memasang satu cookie. Ketika
+     * m025-340/341 menambah `fz_cls` (mengingat kelas yang sedang dibuka di panel),
+     * assert itu merah — padahal tidak ada yang rusak, dan baris TEPAT DI BAWAHNYA
+     * sudah menyatakan sebaliknya: "boleh lebih dari satu".
+     *
+     * Yang sesungguhnya dijaga, dan sekarang ditulis apa adanya:
+     *   1. TIDAK ADA cookie yang hilang di jembatan - berapa pun jumlahnya;
+     *   2. cookie sesi owner (`fz_owner`) termasuk di dalamnya.
+     * Keduanya lebih ketat dari `=== 1`, bukan lebih longgar: menambah cookie baru
+     * tetap aman, tetapi MENJATUHKAN satu cookie di proxy tetap merah. */
     const workerCookies = [...page.headers].filter(([n]) => String(n).toLowerCase() === 'set-cookie');
     assert(forwarded.cookies.length === workerCookies.length,
-      '(c) SEMUA Set-Cookie Worker lolos proxy — nol hilang di jembatan (worker ' +
-      workerCookies.length + ', lolos ' + forwarded.cookies.length + ')');
+      '(c) semua Set-Cookie Worker lolos proxy — Worker memasang ' + workerCookies.length +
+      ', sampai ke browser ' + forwarded.cookies.length + ' (yang hilang = sesi/preferensi mati)');
     assert(forwarded.cookies.some((c) => /fz_owner=/.test(c)),
       '(c) Set-Cookie sesi owner diteruskan proxy (tanpa ini sesi mati di setiap muat halaman)');
     assert(/if \(\$name === 'set-cookie'\) \{ header\('Set-Cookie: ' \. \$val, false\);/.test(phpSource),

@@ -411,6 +411,7 @@
     'kelas.panel-semua-judul': 'Panel Mata Pelajaran {kelas}',
     'kelas.panel-semua-kelas-fallback': 'Kelas {kode}',
     'kelas.filter-mapel-kosong': 'Belum ada tugas untuk mapel ini.',
-    'kelas.filter-tampilkan-semua': 'Tampilkan Semua'
+    'kelas.filter-tampilkan-semua': 'Tampilkan Semua',
+    'guru.kelas-mapel-tanpa-nama': 'Kelas'
   });
 }());

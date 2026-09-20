@@ -1,6 +1,6 @@
 {
   "schema": "fiezel-th-ui-leak-v1",
-  "generatedAt": "2026-09-19T20:08:38.699Z",
+  "generatedAt": "2026-09-20T06:06:24.036Z",
   "files": {
     "app.js": {
       "leaks": 3,
@@ -11,12 +11,22 @@
           "text": "Selesaikan ritme hari ini"
         },
         {
-          "line": 9382,
+          "line": 9395,
           "text": "Nama kriteria: n/4 - satu kalimat alasan yang menunjuk bukti di tulisannya"
         },
         {
-          "line": 14169,
+          "line": 14182,
           "text": "Latihan"
+        }
+      ]
+    },
+    "features/auth/fiezel-account.js": {
+      "leaks": 1,
+      "budget": 0,
+      "sample": [
+        {
+          "line": 312,
+          "text": "Kelas"
         }
       ]
     },
@@ -403,15 +413,15 @@
       "budget": 3,
       "sample": [
         {
-          "line": 2644,
+          "line": 2691,
           "text": "Akurasi"
         },
         {
-          "line": 2661,
+          "line": 2708,
           "text": "Latihan ·"
         },
         {
-          "line": 2998,
+          "line": 3045,
           "text": "📖 Kosakata Kunci:"
         }
       ]
@@ -468,5 +478,5 @@
     "th": 2855,
     "idTanpaTh": 0
   },
-  "pass": true
+  "pass": false
 }

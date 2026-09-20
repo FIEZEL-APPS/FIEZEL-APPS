@@ -3408,7 +3408,15 @@ function zpdFrontierPick(openIds){
 function bktMasteredSkills(bktState=bktRead()){
   const B=self.FiezelMasteryBKT,out=new Set();
   if(!B||typeof B.masteryGate!=='function'||!bktState?.lessons)return out;
-  for(const skill in bktState.lessons){try{if(B.masteryGate(bktState,skill))out.add(skill)}catch{}}
+  /* m025-341: ambang bukti tambahan saat kalibrasi model buruk. bump=0 (kasus normal dan
+     semua kegagalan) membuat baris ini tidak berpengaruh sama sekali - perilakunya identik
+     dengan sebelum kewenangan kalibrasi ada. Arahnya satu: hanya menambah tuntutan. */
+  const bump=brierEvidenceBump();
+  for(const skill in bktState.lessons){try{
+    if(!B.masteryGate(bktState,skill))continue;
+    if(bump>0){const m=B.mastery(bktState,skill);if(!(Number(m?.n)>=Number(B.GATE?.minN||0)+bump))continue}
+    out.add(skill)
+  }catch{}}
   return out;
 }
 /* ---- Butir 4: confusion matrix lesson-x-lesson dari opsi pinjaman ---- */
@@ -3587,10 +3595,120 @@ function retentionProbeSnapshot(now=Date.now()){
     return {lessons:Object.keys(st.probes).length,scheduled:scheduledCount,due:dueCount,measured:results.length,evaluation:evalOut};
   }catch{return null}
 }
+/* KEWENANGAN kalibrasi (Langkah 1, m025-341): otak menilai ramalannya sendiri, lalu
+ * bertindak atas penilaian itu.
+ *
+ * brierCalibration() sudah dihitung sejak lama tetapi hasilnya hanya dipajang. Brier Skill
+ * Score = 1 - brier/baseline: > 0 berarti prediksi model mengalahkan tebakan base-rate,
+ * <= 0 berarti TIDAK - model ini, untuk murid ini, tidak lebih baik daripada menebak.
+ *
+ * Kalau model tidak bisa dipercaya meramal, ia juga tidak boleh dipercaya MEMBUKA lesson
+ * dengan bukti seadanya. Maka vonis buruk menaikkan ambang bukti (n) yang dituntut sebelum
+ * mastery BKT boleh ikut membuka prasyarat.
+ *
+ * DUA PAGAR YANG MENENTUKAN BENTUK FUNGSI INI:
+ *   1. SATU ARAH. Kembaliannya selalu >= 0. Kalibrasi buruk hanya bisa membuat sistem
+ *      lebih KETAT; tidak ada jalan bagi fungsi ini untuk melonggarkan apa pun. Kalibrasi
+ *      yang bagus bukan alasan membuka lesson lebih mudah.
+ *   2. FAIL-QUIET. Modul absen, riwayat tipis (modul menahan di bawah brierMinTotal=10),
+ *      baseline nol, atau apa pun yang melempar => 0, dan perilaku persis seperti sebelum
+ *      langkah ini. */
+function brierEvidenceBump(now=Date.now()){
+  const M=self.FiezelLearningMetrics;
+  if(!M||typeof M.brierCalibration!=='function')return 0;
+  try{
+    const c=M.brierCalibration(Array.isArray(state.history)?state.history:[],now);
+    /* HATI-HATI: modul mengembalikan skillScore === null saat bukti tipis (thin) atau
+       baseline nol, dan Number(null) adalah 0 - bukan NaN. Menyaring lewat Number.isFinite
+       saja akan membaca "belum cukup bukti" sebagai "kalibrasi persis nol" lalu memperketat
+       gerbang justru ketika kita paling tidak tahu apa-apa. Null dites LEBIH DULU. */
+    if(c?.skillScore===null||c?.skillScore===undefined)return 0;
+    const skill=Number(c.skillScore);
+    if(!Number.isFinite(skill))return 0;
+    return skill<=0?2:0;
+  }catch{return 0}
+}
+/* PENYAJI + KEWENANGAN probe retensi (Langkah 1, m025-341).
+ *
+ * Yang SUDAH hidup sebelum ini: penjadwalnya (retentionProbeSync di bktRecord). Yang tidak
+ * pernah ada: jalan dari jadwal itu KE MURID. Jadwal ditulis ke localStorage lalu tidak
+ * dibaca siapa pun kecuali panel diagnostik, jadi tidak satu pun lesson pernah benar-benar
+ * diuji ulang - kata 'mastery' tetap berarti "benar 5x berturut di satu sesi".
+ *
+ * Dua fungsi di bawah menutup itu, dan keduanya sengaja mengembalikan Set kosong pada
+ * kegagalan apa pun: modul absen, state rusak, riwayat tipis => kolam soal persis seperti
+ * sebelum langkah ini. */
+
+/** Lesson yang punya probe JATUH TEMPO. Dipakai buildAdaptivePool untuk menandainya `due`,
+ *  yaitu mengembalikannya ke kolam review BIASA. Tidak ada layar "ujian retensi": murid
+ *  yang tahu sedang diukur retensinya mengubah perilakunya, dan itu merusak angkanya. */
+function retentionProbeDueLessons(now=Date.now()){
+  const out=new Set();
+  if(!retentionProbeAvailable())return out;
+  try{
+    const st=retentionProbeRead(),probes=st&&st.probes&&typeof st.probes==='object'?st.probes:null;
+    if(!probes)return out;
+    /* Probe yang SUDAH dijawab sesudah jatuh temponya = sudah terukur, dan harus berhenti
+       menandai lessonnya. Tanpa saringan ini probe bukan pemeriksaan sekali-jalan melainkan
+       penghuni tetap: schedule() idempoten per lesson (ia melewati lesson yang sudah punya
+       jadwal) dan tidak ada yang mencoret barisnya, jadi dueAt yang lewat tidak pernah
+       bergerak lagi — lesson mastered akan menempati slot kolam review di SETIAP sesi
+       berikutnya, termasuk tepat sesudah murid menjawab benar dan retensinya justru
+       terbukti. Sinyal "dijawab sesudah jatuh tempo" dipinjam apa adanya dari
+       retentionProbeResults() supaya kedua jalur tidak bisa berbeda pendapat. */
+    const rows=(state.history||[]).filter(h=>h&&Number(h.at)>0);
+    for(const lesson of Object.keys(probes)){
+      const list=Array.isArray(probes[lesson]?.probes)?probes[lesson].probes:[];
+      for(const pr of list){const d=Number(pr?.dueAt);
+        if(!Number.isFinite(d)||d>now)continue;
+        if(rows.some(h=>String(h.skill||'')===lesson&&Number(h.at)>=d))continue;
+        out.add(String(lesson));break}
+    }
+  }catch{}
+  return out;
+}
+
+/** Lesson bervonis RAPUH: probe gagal padahal model yakin masih ingat (predicted >= 0.8).
+ *
+ *  Kewenangannya dua, dan berhenti di situ:
+ *    1. klaim penguasaannya ditarik di tampilan (grammarMasteryShown), dan
+ *    2. lesson tetap di kolam review walau mastery-nya di atas ambang.
+ *
+ *  Yang TIDAK dilakukan, disengaja: mengunci ulang lesson. Kontrak satu arah yang sama
+ *  dengan bktUnlock - boleh menarik klaim, tidak boleh menarik akses. Murid yang kehilangan
+ *  lesson yang kemarin terbuka akan menyimpulkan aplikasinya rusak, dan dia benar.
+ *
+ *  `adjustments` dari evaluate() tetap TIDAK diteruskan: modulnya menandainya advisory:true
+ *  dan penerapan half-life milik jalur single-writer FSRS di core brain. */
+function retentionFragileLessons(now=Date.now()){
+  const out=new Set();
+  if(!retentionProbeAvailable()||typeof self.FiezelPostTest.evaluate!=='function')return out;
+  try{
+    const st=retentionProbeRead();if(!st?.probes)return out;
+    const results=retentionProbeResults(st,now);if(!results.length)return out;
+    const ev=self.FiezelPostTest.evaluate(st,results);
+    for(const f of (ev?.fragileLessons||[]))if(f?.lesson)out.add(String(f.lesson));
+  }catch{}
+  return out;
+}
+
+/** Penguasaan yang DITAMPILKAN. Sama dengan grammarMastery(), kecuali lesson bervonis rapuh
+ *  dipotong ke bawah ambang - klaimnya ditarik sampai probe berikutnya membuktikan
+ *  sebaliknya. Ambil `fragile` dari pemanggil supaya satu render tidak menghitung ulang
+ *  evaluate() untuk tiap baris. */
+function grammarMasteryShown(skill,fragile=null,sourceState=state){
+  const raw=grammarMastery(skill,sourceState);
+  try{if(fragile&&typeof fragile.has==='function'&&fragile.has(String(skill||'')))
+    return Math.min(raw,MASTERY_THRESHOLD-1)}catch{}
+  return raw;
+}
 /* ---- Langkah 1: metrik belajar longitudinal, dihitung DI PERANGKAT ------------------
  * Riwayat lengkap memang sudah hidup di localStorage; modul ini mengubahnya jadi lima
  * angka yang bisa dipakai otak untuk menilai dirinya sendiri nanti (Langkah 2 dan 3).
- * Hari ini: TAMPILAN SAJA. Tidak ada digest yang naik ke mana pun - fiezel-metrics-digest.js
+ * m025-341: tidak lagi tampilan saja. brierCalibration() sekarang punya KEWENANGAN lewat
+ * brierEvidenceBump() — kalibrasi yang kalah dari tebakan base-rate menaikkan ambang bukti
+ * sebelum mastery BKT boleh ikut membuka prasyarat. Arahnya satu: hanya memperketat.
+ * Yang TETAP tidak berubah: nol byte tambahan keluar dari perangkat. fiezel-metrics-digest.js
  * tetap 'off' sampai ada keputusan produk soal telemetri, dan menyalakan pengunggah tanpa
  * keputusan itu adalah menambah permukaan privasi diam-diam. */
 function learningMetricsSnapshot(now=Date.now()){
@@ -4520,7 +4638,11 @@ function buildAdaptivePool(count,policy=buildAdaptivePolicy(),reservoirMultiplie
  const targetD=Number(policy?.exactDifficulty??policy?.targetDifficulty);
  score-=Math.abs(difficulty-(Number.isFinite(targetD)&&targetD>0?targetD:difficulty))*1.4;candidates.push({q,score,domain,skill,measured,due,risk})};
  for(const v of V){if(v.level!==level)continue;const b=state.vocab[v.id],due=!!(b?.nextReview&&b.nextReview<=now);if(!b?.total||(b.mastery>=MASTERY_THRESHOLD&&!due))continue;const risk=forgettingProbability(b),score=(profile.weakTargets[v.id]||0)*3+risk*6+(100-(b.mastery||0))*.04;const q=makeVocabQuestion(v);q.difficulty=LEVELS.indexOf(v.level)+1;add(q,score,{measured:true,due,risk})}
- for(const [skill,b] of Object.entries(state.grammar)){const grammarMeta=GRAMMAR_ITEMS.find(x=>x.skill===skill);if(grammarMeta?.level!==level)continue;const due=!!(b?.nextReview&&b.nextReview<=now);if(!b?.total||(b.mastery>=MASTERY_THRESHOLD&&!due))continue;for(const item of (G[skill]||[])){const risk=forgettingProbability(b),score=(profile.weakSkills[skill]?.score||0)*10+risk*6+(100-b.mastery)*.04,variants=targetSkill===skill?Math.min(8,GRAMMAR_PRACTICE_MODES.length):1;for(let variant=0;variant<variants;variant++){const q=makeGrammarQuestion(skill,item,variant,skill);
+ /* Langkah 1 (m025-341): probe retensi jatuh tempo dan vonis rapuh mengembalikan lesson
+    yang SUDAH mastered ke kolam review - sebagai review biasa, bukan layar terpisah. Set
+    kosong (modul absen / state rusak / belum ada jadwal) = kolam persis seperti sebelumnya. */
+ const probeDue=retentionProbeDueLessons(now),probeFragile=retentionFragileLessons(now);
+ for(const [skill,b] of Object.entries(state.grammar)){const grammarMeta=GRAMMAR_ITEMS.find(x=>x.skill===skill);if(grammarMeta?.level!==level)continue;const probeHit=probeDue.has(skill)||probeFragile.has(skill),due=!!(b?.nextReview&&b.nextReview<=now)||probeHit;if(!b?.total||(b.mastery>=MASTERY_THRESHOLD&&!due))continue;for(const item of (G[skill]||[])){const risk=forgettingProbability(b),score=(profile.weakSkills[skill]?.score||0)*10+risk*6+(100-b.mastery)*.04,variants=targetSkill===skill?Math.min(8,GRAMMAR_PRACTICE_MODES.length):1;for(let variant=0;variant<variants;variant++){const q=makeGrammarQuestion(skill,item,variant,skill);
   /* Braincore v3 (temuan T1 council): semua item ber-difficulty = indeks level CEFR, jadi IRT
      berdegenerasi menjadi pelacak akurasi. FiezelItemPrior memberi variansi kesulitan NYATA
      per mode latihan (teach_back lebih berat daripada recognition dasar). Dijaga penuh:
@@ -10007,9 +10129,15 @@ window.toggleGrammarHubView=toggleGrammarHubView;
 function grammar(){const level=getActiveLevel(),entries=grammarItemsForLevel(level).slice().sort((a,b)=>Number(a.sequence||Number.MAX_SAFE_INTEGER)-Number(b.sequence||Number.MAX_SAFE_INTEGER)),skills=entries.map(x=>x.skill).filter((x,i,a)=>a.indexOf(x)===i);
   const examEntry=levelTrustState(state).exams[level]||null;
   const bktMastered=bktMasteredSkills();
+  /* m025-341: lesson yang GAGAL probe retensi kehilangan KLAIM penguasaannya di jalur ini —
+     badge "sudah kuasai" dicabut dan simpulnya kembali jadi kandidat node aktif. Yang TIDAK
+     tersentuh: `unlock` di bawah, yang dihitung lessonUnlockState() secara terpisah. Itu
+     disengaja dan merupakan pagar utama gelombang ini — klaim boleh ditarik, akses tidak.
+     Set kosong (modul absen / belum ada probe yang terukur) = baris ini tidak berefek. */
+  const fragile=retentionFragileLessons();
   const rows=skills.map((k,index)=>{
     const entry=entries.find(x=>x.skill===k)||{},item=entry.item||G[k]?.[0]||[],family=grammarFamilyLabel(item),meta=grammarCurriculumEntry(k)||entry,title=friendlySkillName(k),prerequisites=Array.isArray(meta?.prerequisites)&&meta.prerequisites.length?FiezelI18n.t('grammar.prasyarat',{join:meta.prerequisites.map(friendlySkillName).join(', ')}):FiezelI18n.t('grammar.fondasi-awal');
-    const unlock=lessonUnlockState(k,state,bktMastered),mastery=state.grammar[k]?.mastery||0,touched=!!state.grammar[k]?.total;
+    const unlock=lessonUnlockState(k,state,bktMastered),mastery=grammarMasteryShown(k,fragile),touched=!!state.grammar[k]?.total;
     return{k,index,title,family,prerequisites,unlock,mastery,
       mastered:mastery>=MASTERY_THRESHOLD,
       completed:mastery>=GRAMMAR_UNLOCK_MASTERY,

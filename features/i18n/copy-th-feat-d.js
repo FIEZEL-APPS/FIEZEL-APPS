@@ -406,6 +406,7 @@
     'kelas.panel-semua-judul': 'แผงวิชาเรียน {kelas}',
     'kelas.panel-semua-kelas-fallback': 'ชั้นเรียน {kode}',
     'kelas.filter-mapel-kosong': 'ยังไม่มีงานสำหรับวิชานี้',
-    'kelas.filter-tampilkan-semua': 'แสดงทั้งหมด'
+    'kelas.filter-tampilkan-semua': 'แสดงทั้งหมด',
+    'guru.kelas-mapel-tanpa-nama': 'ชั้นเรียน'
   });
 }());

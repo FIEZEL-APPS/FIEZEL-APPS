@@ -97,15 +97,17 @@ const SENSUS = new Map([
     sejak: '2026-09-14', medan: 54, berTh: 0,
     catatan: 'petunjuk Indonesia tiap prompt, 54 prompt N5+N4',
   }],
+  /* Masuk sensus, BUKAN TANPA_TEKS_MURID — dan itu keputusan berdasar bukti, bukan selera.
+   * Saudara kandungnya dalam bahasa Inggris, `misconception-taxonomy-v1.json`, punya bentuk
+   * medan yang sama persis (label + description_id) dan SUDAH diperlakukan sebagai naskah
+   * murid: ia punya sidecar Thai di features/i18n/misconception-th.json yang dirakit
+   * tools/generate-th-misconception.js, dengan catatan sidecar itu menyebut kedua medan itu
+   * satu per satu. Jadi bentuk data ini sudah pernah dijawab repo ini, dan jawabannya
+   * "naskah murid". Bank Jepang-nya belum dirujuk satu baris kode pun hari ini, tetapi
+   * utangnya dicatat SEKARANG supaya ia tidak menyelinap masuk saat nanti dirujuk. */
   ['japanese-misconception-taxonomy.json', {
     sejak: '2026-09-20', medan: 18, berTh: 0,
-    catatan: 'label + description_id, 9 kode miskonsepsi N5-N4. Masuk repo lewat 34f88c35 ' +
-      'TANPA baris sensus, jadi gerbang ini merah sejak saat itu — tidak pernah terlihat ' +
-      'karena job CI selalu mati lebih dulu di th-ui-leak (step 8). Bank ini BELUM ' +
-      'TERSAMBUNG: nol perujuk di kode, tidak ada di precache sw.js maupun index.html, jadi ' +
-      'ke-18 medannya belum pernah sampai ke layar murid mana pun. Utangnya karena itu ' +
-      'BELUM berdarah — tetapi ia jatuh tempo pada hari taksonomi ini disambungkan ke ' +
-      'jalur murid, bukan hari ini.',
+    catatan: 'label + description_id untuk 9 kode miskonsepsi partikel/kata kerja N5-N4; belum dirujuk kode mana pun, sidecar Thai belum ada',
   }],
 ]);
 
@@ -143,6 +145,9 @@ function medanMurid(nama, doc) {
   } else if (nama === 'writing-prompts-ja.json') {
     for (const p of doc.prompts || []) pungut(p.id_hint);
   } else if (nama === 'japanese-misconception-taxonomy.json') {
+    /* `familyHint` ('particles', 'verbs', ...) adalah kunci pengelompokan, bukan kalimat —
+     * tidak dipungut. `catatan` adalah nota penulis di tingkat berkas, juga bukan naskah
+     * murid. Yang dipungut sama dengan yang dipungut sidecar Thai versi Inggrisnya. */
     for (const c of Object.values(doc.codes || {})) { pungut(c.label); pungut(c.description_id); }
   }
   return keluar;
