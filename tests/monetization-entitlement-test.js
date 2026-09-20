@@ -439,5 +439,138 @@ test('snapshot murid gratis jujur tentang apa yang masih terbuka', () => {
   assert.strictEqual(s.neuralVoice, false);
 });
 
+// ======================================================================================
+// J. PENYAMBUNGAN — mesin yang tidak dipanggil sama saja dengan mesin yang tidak ada
+// ======================================================================================
+//
+// Bagian A-I menguji mesinnya. Bagian ini menguji bahwa mesin itu BENAR-BENAR DIPASANG:
+// seseorang bisa menghapus satu baris pemanggilan di app.js dan seluruh uji di atas tetap
+// hijau, sementara di lapangan setiap pintu terbuka lebar. Karena itu gerbang membaca
+// sumber produksinya dan menuntut sambungannya ada.
+
+const appSrc = fs.readFileSync(path.join(__fzRoot, 'app.js'), 'utf8');
+const indexSrc = fs.readFileSync(path.join(__fzRoot, 'index.html'), 'utf8');
+const swSrc = fs.readFileSync(path.join(__fzRoot, 'sw.js'), 'utf8');
+const thLoaderSrc = fs.readFileSync(path.join(__fzRoot, 'features', 'i18n', 'fiezel-th-loader.js'), 'utf8');
+
+/* Urutan diperiksa DI DALAM quizLoop, bukan di seluruh app.js: definisi fungsinya sendiri
+   berdiri sebelum quizLoop, jadi indexOf global akan menemukan definisi itu dan membaca
+   urutan yang salah sebagai benar — persis jenis uji yang lulus tanpa menguji apa pun. */
+const quizLoopSrc = (() => {
+  const start = appSrc.indexOf('function quizLoop(cfg){');
+  assert.ok(start > 0, 'function quizLoop(cfg) tidak ditemukan — jangkar penyambungan berubah');
+  return appSrc.slice(start, start + 40000);
+})();
+
+test('gerbang jatah dipanggil SEBELUM sesi dibuka, dan pencatatnya SESUDAH', () => {
+  const gate = quizLoopSrc.indexOf('entitlementAllowSession(cfg)');
+  const begin = quizLoopSrc.indexOf('beginLearningSession(cfg,planned)');
+  const note = quizLoopSrc.indexOf('noteEntitlementSession(cfg)');
+  assert.ok(gate > 0, 'entitlementAllowSession tidak pernah dipanggil di quizLoop');
+  assert.ok(begin > 0, 'pemanggilan beginLearningSession hilang — jangkar penyambungan berubah');
+  assert.ok(note > 0, 'noteEntitlementSession tidak pernah dipanggil; jatah tidak akan pernah bertambah');
+  assert.ok(gate < begin, 'gerbang harus mendahului pembukaan sesi, bukan menyusul');
+  assert.ok(note > begin, 'pencatatan harus sesudah sesi benar-benar dibuka');
+});
+
+test('gerbang jatah benar-benar menghentikan sesi (bukan sekadar memberi tahu)', () => {
+  assert.ok(/if\(!entitlementAllowSession\(cfg\)\)return;/.test(appSrc),
+    'hasil gerbang harus dipakai untuk return; memanggil tanpa memakai hasilnya = hiasan');
+});
+
+test('gerbang level komersial terpasang di setActiveLevel dan menolak dengan false', () => {
+  assert.ok(/if\(!entitlementAllowLevel\(next\)\)return false;/.test(appSrc),
+    'entitlementAllowLevel harus dipanggil dan hasilnya dipakai di setActiveLevel');
+});
+
+test('gerbang komersial berdiri SESUDAH gerbang pedagogis, bukan menggantikannya', () => {
+  const pedagogis = appSrc.indexOf('isLevelLocked(state,next)');
+  const komersial = appSrc.indexOf('entitlementAllowLevel(next)');
+  assert.ok(pedagogis > 0 && komersial > 0, 'kedua gerbang harus ada');
+  assert.ok(pedagogis < komersial,
+    'murid yang terkunci karena demosi harus membaca alasan pedagogisnya dulu — ' +
+    'menawarkan Pro kepada murid yang perlu mengulang ujian adalah menjual di saat yang salah');
+});
+
+test('catatan hak akses punya tempat di state dan disanitasi saat dimuat', () => {
+  assert.ok(/entitlement:\{schema:'fiezel-entitlement-v1'/.test(appSrc), 'defaultState harus punya catatan hak akses');
+  assert.ok(/entitlement:sanitizeEntitlement\(raw\?\.entitlement\)/.test(appSrc), 'sanitizeState harus menyaringnya');
+  assert.ok(/function sanitizeEntitlement\(/.test(appSrc), 'sanitizer-nya harus ada');
+});
+
+test('sanitizer state tidak boleh bisa MENCIPTAKAN langganan dari state korup', () => {
+  const fn = appSrc.slice(appSrc.indexOf('function sanitizeEntitlement('), appSrc.indexOf('function sanitizeState('));
+  assert.ok(/pro:src\.pro&&typeof src\.pro==='object'\?src\.pro:null/.test(fn), 'pro harus jatuh ke null');
+  assert.ok(/school:src\.school&&typeof src\.school==='object'\?src\.school:null/.test(fn), 'school harus jatuh ke null');
+});
+
+test('mesin dan naskah id dimuat halaman, dan ikut precache shell', () => {
+  for (const src of ['./features/monetization/fiezel-entitlement.js', './features/i18n/copy-id-monetization.js']) {
+    assert.ok(indexSrc.indexOf(src) > 0, 'index.html tidak memuat ' + src);
+    assert.ok(swSrc.indexOf("'" + src + "'") > 0,
+      src + ' tidak ada di precache sw.js — di PWA terpasang ia hanya sampai kalau jaringan kebetulan baik');
+  }
+});
+
+test('mesin dimuat SEBELUM app.js (app.js menanyainya saat memulai sesi)', () => {
+  const engine = indexSrc.indexOf('./features/monetization/fiezel-entitlement.js');
+  const app = indexSrc.indexOf('./app.js');
+  assert.ok(engine > 0 && app > 0, 'kedua skrip harus dimuat halaman');
+  assert.ok(engine < app, 'urutan muat salah: app.js akan memanggil mesin yang belum ada');
+});
+
+test('naskah th disuntik pemuat dinamis dan ikut lapisan offline th', () => {
+  assert.ok(thLoaderSrc.indexOf('./features/i18n/copy-th-monetization.js') > 0,
+    'copy-th-monetization.js tidak pernah disuntik — murid th membaca layar tagihan dalam bahasa Indonesia');
+  const manifest = JSON.parse(fs.readFileSync(path.join(__fzRoot, 'features', 'i18n', 'locale-assets-th.json'), 'utf8'));
+  assert.ok(manifest.assets.indexOf('./features/i18n/copy-th-monetization.js') >= 0,
+    'naskah th hak akses harus ikut lapisan offline th');
+});
+
+test('adapter app.js fail-open saat mesin absen (tidak mengunci pelanggan karena bug kita)', () => {
+  const adapter = appSrc.slice(appSrc.indexOf('function entitlementAllowSession('), appSrc.indexOf('function noteEntitlementSession('));
+  assert.ok(/if\(!E\)return true/.test(adapter),
+    'modul absen harus berarti gerbang absen; menganggap semua murid gratis akan mengunci yang sudah membayar');
+});
+
+// ======================================================================================
+// K. BENDERA PENEGAKAN — mendarat utuh, tetapi gelap
+// ======================================================================================
+//
+// Mesin ini selesai dan teruji, tetapi alur pembayaran BELUM ADA. Menyalakan penegakan
+// hari ini berarti memagari B1-C2 untuk seluruh murid yang sudah memakai FIEZEL tanpa
+// satu pun jalan untuk membayar — itu bukan monetisasi, itu pemadaman. Bendera
+// `monetizationEnforce` memisahkan MENGHITUNG (selalu jalan) dari MENGHALANGI (hanya saat
+// bendera hidup), dan bagian ini menjaga pemisahan itu tetap benar.
+
+test('bendera penegakan ada dan MATI saat mendarat', () => {
+  const flags = require('../fiezel-ux-flags.js');
+  assert.strictEqual(flags.DEFAULTS.monetizationEnforce, false,
+    'menaikkan bendera ini sebelum ada alur pembayaran akan mengunci murid yang sudah ada');
+});
+
+test('kedua gerbang benar-benar menanyakan bendera sebelum menghalangi', () => {
+  const sesi = appSrc.slice(appSrc.indexOf('function entitlementAllowSession('), appSrc.indexOf('function noteEntitlementSession('));
+  const level = appSrc.slice(appSrc.indexOf('function entitlementAllowLevel('), appSrc.indexOf('function entitlementAllowLevel(') + 800);
+  assert.ok(/if\(!entitlementEnforced\(\)\)return true/.test(sesi), 'gerbang sesi harus menanyakan bendera');
+  assert.ok(/if\(!entitlementEnforced\(\)\)return true/.test(level), 'gerbang level harus menanyakan bendera');
+});
+
+test('pembacaan bendera fail-closed ke MATI (tidak terbaca = tidak menghalangi)', () => {
+  const fn = appSrc.slice(appSrc.indexOf('function entitlementEnforced()'), appSrc.indexOf('function entitlementEnforced()') + 200);
+  assert.ok(/catch\(_\)\{return false\}/.test(fn),
+    'bendera yang gagal dibaca harus berarti tidak menghalangi apa pun');
+  assert.ok(/on\('monetizationEnforce'\)===true/.test(fn),
+    'hanya true persis yang menyalakan penegakan');
+});
+
+test('MENGHITUNG tetap jalan walau bendera mati — supaya angkanya teruji sebelum dinyalakan', () => {
+  const note = appSrc.slice(appSrc.indexOf('function noteEntitlementSession('), appSrc.indexOf('function noteEntitlementSession(') + 600);
+  assert.ok(!/entitlementEnforced\(\)/.test(note),
+    'pencatatan buku hari TIDAK boleh berpagar bendera: saat bendera naik nanti, angkanya ' +
+    'harus sudah mengalir dan teruji di lapangan, bukan dinyalakan bersamaan dengan kode ' +
+    'yang belum pernah dipakai siapa pun');
+});
+
 console.log(failures === 0 ? '\nSEMUA GERBANG HIJAU' : '\n' + failures + ' GERBANG MERAH');
 process.exit(failures === 0 ? 0 : 1);

@@ -1168,6 +1168,16 @@ jobs:
         # terhadap berkas yang ditambahkan sesudah daftarnya ditulis; gerbang ini
         # menurunkan tuntutannya dari index.html sendiri.
         run: node tests/precache-covers-shell-test.js
+      - name: 'Hak akses free/pro/sekolah: gerbang uang dan penyambungannya'
+        # Aturan uang salah ke DUA arah yang sama-sama merusak: membuka pintu untuk yang
+        # belum membayar, atau mengunci pintu untuk yang sudah membayar. Gerbang ini
+        # menembak dari sudut penyerang - kode kelas palsu (joinClassWithCode hanya
+        # memeriksa BENTUK kode, tidak pernah bertanya ke server), jam perangkat diputar
+        # mundur untuk mengisi ulang jatah, dan tugas guru yang terhalang batas konsumen.
+        # Ia juga menjaga PENYAMBUNGANNYA: mesin yang tidak dipanggil sama saja dengan
+        # mesin yang tidak ada, jadi menghapus satu baris pemanggilan di app.js harus
+        # memerahkan gerbang ini, bukan lolos diam-diam.
+        run: node tests/monetization-entitlement-test.js
       - name: 'Sumbu bahasa target: kunci murid Inggris identik byte per byte'
         # Menambah bahasa kedua punya satu cara gampang dan satu cara benar. Yang gampang:
         # beri SEMUA kunci awalan bahasa, termasuk kunci Inggris. Sekali dikirim, setiap murid
