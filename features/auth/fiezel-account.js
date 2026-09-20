@@ -266,7 +266,8 @@
       institution: acc.institution ? String(acc.institution) : '',
       institutionType: acc.institutionType ? String(acc.institutionType) : '',
       classCode: acc.classCode ? String(acc.classCode) : null,
-      subjectId: acc.subjectId ? String(acc.subjectId) : null
+      subjectId: acc.subjectId ? String(acc.subjectId) : null,
+      gradeId: acc.gradeId ? String(acc.gradeId) : null
     });
     if (typeof FiezelTeacherStore !== 'undefined' && session.role === 'teacher') {
       try {
@@ -280,6 +281,44 @@
         if (session.institution && profile.teacher.school !== session.institution) {
           profile.teacher.school = session.institution;
           modified = true;
+        }
+        /* ----------------------------------------------------------------
+         * AUTO-BUAT KELAS dari classCode + subjectId yang dibawa token guru.
+         *
+         * Saat owner mencetak token, ia memilih kode kelas dan mata pelajaran.
+         * Data itu dikembalikan server di respons aktivasi/refresh/login dan
+         * sudah tersimpan di `session` di atas. Tugas blok ini: pastikan kelas
+         * dengan kode itu SUDAH ADA di penyimpanan lokal guru SEBELUM
+         * FiezelTeacherShell.mount() dipanggil, sehingga guru TIDAK PERNAH
+         * melihat layar kosong "Buat kelas pertamamu".
+         *
+         * Idempoten: kalau kelas sudah ada (guru reload, login ulang), blok
+         * ini tidak menambah duplikat.
+         * ---------------------------------------------------------------- */
+        if (session.classCode && FiezelTeacherStore.normalizeClassCode) {
+          var normCode = FiezelTeacherStore.normalizeClassCode(session.classCode);
+          if (normCode) {
+            if (!Array.isArray(profile.classes)) profile.classes = [];
+            var exists = profile.classes.some(function (c) {
+              return FiezelTeacherStore.normalizeClassCode(c.code) === normCode;
+            });
+            if (!exists) {
+              // Bersihkan tanda "dihapus" untuk kode ini — token baru sengaja
+              // menghubungkan kembali, jadi penanda hapus lama harus dibuang.
+              if (profile.deletedClassCodes && profile.deletedClassCodes[normCode]) {
+                delete profile.deletedClassCodes[normCode];
+              }
+              var mapelNames = FiezelTeacherStore.MAPEL_NAMES || {};
+              var subName = mapelNames[session.subjectId] || session.subjectId || 'Kelas';
+              var clsTitle = (session.institution ? session.institution + ' — ' : '') + subName;
+              var autoCls = FiezelTeacherStore.newClass(clsTitle, session.gradeId || 'SMP', session.subjectId || 'MAT');
+              autoCls.code = normCode;
+              profile.classes.unshift(autoCls);
+              profile.activeClassId = autoCls.id;
+              profile.onboarded = true;
+              modified = true;
+            }
+          }
         }
         if (modified) {
           FiezelTeacherStore.save(profile);

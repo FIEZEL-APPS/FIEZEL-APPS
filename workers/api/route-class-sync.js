@@ -209,6 +209,47 @@ export async function routeLearnerClassTeachers(ctx) {
   return jsonResponse({ ok: true, cls: code, title: cls.title, level: cls.level, teachers }, o);
 }
 
+/* ========================================================================== */
+/* POST /api/teacher/class/delete — guru menghapus kelas dari akunnya          */
+/* ========================================================================== */
+
+export async function routeClassDelete(ctx) {
+  const gate = await roleGate(ctx);
+  if (!gate.ok) return gate.response;
+  const body = await readJsonFromCtx(ctx, gate.opt);
+  if (!body.ok) return body.response;
+  const code = normalizeClassCode((body.value && (body.value.code || body.value.class_code)) || '');
+  if (!code) return jsonError(400, ERR.SCHEMA_INVALID, { reason: 'bad_class_code' }, gate.opt);
+
+  await ensureAuthSchema(gate.db);
+
+  // 1. Hapus relasi guru dari tc_class_teacher
+  await gate.db.prepare('DELETE FROM tc_class_teacher WHERE class_code = ?1 AND teacher_sub = ?2')
+    .bind(code, gate.sub).run().catch(() => null);
+
+  // 2. Cek apakah guru adalah pembuat utama di tc_class
+  const cls = await gate.db.prepare('SELECT code, teacher_sub FROM tc_class WHERE code = ?1').bind(code).first();
+  if (cls && cls.teacher_sub === gate.sub) {
+    // Cek apakah masih ada guru lain di kelas ini
+    const otherTeacher = await gate.db.prepare('SELECT teacher_sub FROM tc_class_teacher WHERE class_code = ?1 LIMIT 1').bind(code).first();
+    if (otherTeacher && otherTeacher.teacher_sub) {
+      // Alihkan kepemilikan kelas ke guru berikutnya
+      await gate.db.prepare('UPDATE tc_class SET teacher_sub = ?1 WHERE code = ?2').bind(otherTeacher.teacher_sub, code).run().catch(() => null);
+    } else {
+      // Tidak ada guru lain: bersihkan tc_class dan tugas/laporan
+      await gate.db.prepare('DELETE FROM tc_class WHERE code = ?1').bind(code).run().catch(() => null);
+      await gate.db.prepare('DELETE FROM tc_class_assignment WHERE class_code = ?1').bind(code).run().catch(() => null);
+      await gate.db.prepare('DELETE FROM tc_class_report WHERE class_code = ?1').bind(code).run().catch(() => null);
+    }
+  }
+
+  // 3. Lepaskan ikatan class_code di teacher_profile guru jika cocok
+  await gate.db.prepare('UPDATE teacher_profile SET class_code = NULL WHERE sub = ?1 AND class_code = ?2')
+    .bind(gate.sub, code).run().catch(() => null);
+
+  return jsonResponse({ ok: true, code, deleted: true }, gate.opt);
+}
+
 export const ROUTES = [
   ['POST', '/api/learner/class-report', routeLearnerClassReport],
   ['GET', '/api/learner/class-assignments', routeLearnerClassAssignments],
@@ -216,7 +257,8 @@ export const ROUTES = [
   ['POST', '/api/teacher/class/claim', routeClassClaim],
   ['GET', '/api/teacher/class/list', routeClassList],
   ['GET', '/api/teacher/class/reports', routeClassReports],
-  ['POST', '/api/teacher/class/assign', routeClassAssign]
+  ['POST', '/api/teacher/class/assign', routeClassAssign],
+  ['POST', '/api/teacher/class/delete', routeClassDelete]
 ];
 
 /* ========================================================================== */
