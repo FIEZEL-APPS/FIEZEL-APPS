@@ -309,7 +309,7 @@
                 delete profile.deletedClassCodes[normCode];
               }
               var mapelNames = FiezelTeacherStore.MAPEL_NAMES || {};
-              var subName = mapelNames[session.subjectId] || session.subjectId || 'Kelas';
+              var subName = mapelNames[session.subjectId] || session.subjectId || t('guru.kelas-mapel-tanpa-nama', 'Kelas');
               var clsTitle = (session.institution ? session.institution + ' — ' : '') + subName;
               var autoCls = FiezelTeacherStore.newClass(clsTitle, session.gradeId || 'SMP', session.subjectId || 'MAT');
               autoCls.code = normCode;

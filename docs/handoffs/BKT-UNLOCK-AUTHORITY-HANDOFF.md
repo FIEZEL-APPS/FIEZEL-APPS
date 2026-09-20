@@ -143,6 +143,41 @@ yang `!b?.total` — ia kolam ULANGAN untuk yang sudah pernah disentuh, dan tida
 memperkenalkan lesson baru sama sekali. Yang benar-benar memutuskan "lesson mana
 berikutnya" adalah simpul aktif di hub Grammar, dan di situlah frontier dipasang.
 
+## 43 kunci hantu yang membuat `main` merah — dan apa yang sebenarnya dilihat guru
+
+`quality` merah saat PR ini berjalan, tetapi bukan karena PR ini: gerbang
+`i18n-kunci-hantu-test` menemukan **43 kunci `t('...')` yang dipanggil tanpa pernah
+didaftarkan**, semuanya dari gelombang kurikulum/KelasKu yang baru mendarat
+(`fiezel-teacher-shell.js` 41, `teacher-console.js` 2). Dibuktikan dengan menjalankan
+gerbang itu pada checkout `origin/main` yang bersih (`git worktree`): **merah juga di sana**,
+tanpa satu baris pun dari PR ini.
+
+### Kenapa ini bukan cacat kosmetik
+
+Setiap pemanggilnya berbentuk `t('guru.pilih-mapel', 'Pilih Mata Pelajaran')` — penulisnya
+jelas mengira argumen kedua adalah teks cadangan. **Bukan.** Di
+`features/i18n/fiezel-i18n.js` parameter kedua `t(key, params)` adalah objek substitusi
+`{placeholder}`, dan kunci yang tidak ditemukan berakhir di baris:
+
+```js
+if (s === undefined) { misses[key] = (misses[key] || 0) + 1; s = key; }
+```
+
+Artinya layar Ruang Guru menampilkan **nama kuncinya sendiri** — `guru.pilih-mapel`,
+`guru.semai-soal`, `guru.kode-kompetensi` — bukan kalimat. Argumen kedua itu tidak pernah
+menyelamatkan apa pun; ia hanya membuat cacatnya tidak terlihat saat membaca kode.
+
+### Cara memperbaikinya tanpa mengarang
+
+Naskah Indonesia TIDAK ditulis ulang: ia diekstrak **persis** dari argumen kedua di tiap
+pemanggil (43/43 terekstrak terprogram, bukan diketik ulang), sehingga layar menampilkan
+tepat kalimat yang dimaksud penulisnya. Yang benar-benar baru hanya sisi Thai-nya, dengan
+`{topik}` dipertahankan di dua kunci yang memakainya. Ditempatkan mengikuti domainnya:
+`guru.*` → `copy-{id,th}-feat-d.js`, `kurikulum.*` → `copy-{id,th}-kurikulum.js`.
+
+Dikerjakan di PR ini atas permintaan owner ("lanjutkan perbaikan yang merah"), sesudah
+sebelumnya dicatat sebagai bukan-milik-PR-ini di komentar PR.
+
 ## Satu berkas asing yang ikut didaftarkan
 
 `tests/kelasku-17mapel-assignment-test.js` mendarat lewat merge `main` **tanpa pernah
