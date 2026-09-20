@@ -2893,6 +2893,1411 @@
         }
       ]
     },
+    {
+      "id": "d_g8_ind_pidato",
+      "phaseId": "fase_d",
+      "grade": 8,
+      "semester": 2,
+      "genre": "Bahasa Indonesia",
+      "title": "Bahasa Indonesia — Menulis Teks Pidato (Buku Resmi Kelas 8 Bab VI)",
+      "targetCefr": "Literasi",
+      "socialFunction": "Memahami struktur teks pidato persuasif dan menyampaikan pidato dengan bahasa yang tepat.",
+      "genericStructure": [
+        "Salam pembuka",
+        "Pendahuluan",
+        "Isi",
+        "Penutup"
+      ],
+      "languageFeatures": [
+        "Konsep & Struktur Pidato",
+        "Kebahasaan & Penyampaian Pidato"
+      ],
+      "subChapters": [
+        {
+          "id": "d_g8_ind_pidato_2_1",
+          "no": "2.1",
+          "title": "Konsep, Struktur & Metode Pidato",
+          "feature": "Konsep & Struktur Pidato"
+        },
+        {
+          "id": "d_g8_ind_pidato_2_2",
+          "no": "2.2",
+          "title": "Kebahasaan & Penyampaian Pidato",
+          "feature": "Kebahasaan & Penyampaian Pidato"
+        }
+      ],
+      "teachingBrief": {
+        "summary": "Unit offline B.Indonesia kelas 8 Bab VI. Sumber tools/chunk_ind_8_b6.json (19 butir, KOMP-IND-D-8-BAB6-01).",
+        "hook5Minutes": "Putar 1 menit pidato kepala sekolah, minta siswa menandai salam pembuka dan ajakannya.",
+        "boardFormula": "Pidato = sapaan + isi persuasif + penutup ajakan",
+        "commonMisconceptions": [
+          {
+            "trap": "Struktur pidato disamakan teks lain",
+            "pattern": "Tesis-argumen-penegasan",
+            "fix": "Pidato: pembukaan, isi, penutup — bukan struktur eksposisi."
+          },
+          {
+            "trap": "Kalimat persuasif tidak dikenali",
+            "pattern": "Semua kalimat dianggap sama",
+            "fix": "Cari kata ajakan (marilah, ayo) dan kata kerja mental."
+          }
+        ],
+        "differentiation": {
+          "struggling": "Beri kerangka pidato rumpang 4 bagian.",
+          "advanced": "Minta siswa menulis dan menyampaikan pidato 2 menit tentang sampah."
+        },
+        "keyVocabulary": [
+          {
+            "word": "orator",
+            "meaning": "ahli berpidato"
+          },
+          {
+            "word": "persuasif",
+            "meaning": "mengajak/membujuk"
+          },
+          {
+            "word": "kata sapaan",
+            "meaning": "panggilan hormat pendengar"
+          },
+          {
+            "word": "kalimat ajakan",
+            "meaning": "kalimat memengaruhi pembaca"
+          }
+        ]
+      },
+      "items": [
+        {
+          "id": "cur_ind_d_8_b6_q01",
+          "subChapterId": "d_g8_ind_pidato_2_1",
+          "feature": "Konsep & Struktur Pidato",
+          "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VIII (Bab VI Menulis Teks Pidato), pengertian pidato secara umum adalah…",
+          "options": [
+            "Kegiatan mengungkapkan pikiran atau ide/gagasan dalam bentuk kata-kata yang ditujukan kepada orang banyak dengan bahasa formal",
+            "Uraian cerita rekaan tentang tokoh dan konflik sosial yang diperankan oleh para pemain di atas panggung pertunjukan",
+            "Catatan harian pribadi yang berisi luapan emosi dan pengalaman batin penulis tanpa ditujukan kepada audiens",
+            "Ringkasan berita fakta ilmiah yang dipublikasikan secara tertulis melalui media cetak atau elektronik"
+          ],
+          "answer": 0,
+          "marker": "Buku IND D 8 BAB6 01 · dasar",
+          "why": {
+            "1": "Pernyataan tersebut merupakan definisi dari naskah drama atau pertunjukan drama.",
+            "2": "Pernyataan tersebut merupakan definisi dari buku harian (diari).",
+            "3": "Pernyataan tersebut merupakan karakter teks berita atau artikel jurnalistik."
+          },
+          "note": "Pidato merupakan kegiatan menyampaikan pikiran, ide, atau gagasan secara lisan dalam bentuk kata-kata yang ditujukan kepada khalayak ramai menggunakan bahasa formal."
+        },
+        {
+          "id": "cur_ind_d_8_b6_q02",
+          "subChapterId": "d_g8_ind_pidato_2_1",
+          "feature": "Konsep & Struktur Pidato",
+          "prompt": "Dalam Buku Siswa Bahasa Indonesia Kelas VIII (Bab VI), sebutan bagi orang yang ahli atau pandai berpidato di hadapan umum dinamakan…",
+          "options": [
+            "Orator",
+            "Moderator",
+            "Notulis",
+            "Narator"
+          ],
+          "answer": 0,
+          "marker": "Buku IND D 8 BAB6 01 · dasar",
+          "why": {
+            "1": "Moderator adalah orang yang memimpin dan memandu jalannya diskusi atau seminar.",
+            "2": "Notulis adalah orang yang bertugas mencatat hasil rapat atau diskusi.",
+            "3": "Narator adalah orang yang membacakan narasi atau menceritakan alur cerita."
+          },
+          "note": "Orator adalah sebutan khusus bagi orang yang mempunyai keahlian dan kepandaian dalam menyampaikan pidato di depan umum, seperti Ir. Sukarno dan Buya Hamka."
+        },
+        {
+          "id": "cur_ind_d_8_b6_q03",
+          "subChapterId": "d_g8_ind_pidato_2_1",
+          "feature": "Konsep & Struktur Pidato",
+          "prompt": "Menurut Buku Siswa Bahasa Indonesia Kelas VIII (Bab VI Tabel 6.1), struktur umum penulisan teks pidato secara runtut terdiri atas…",
+          "options": [
+            "Pembukaan, isi, dan penutup",
+            "Tesis, argumentasi, dan penegasan ulang",
+            "Orientasi, komplikasi, dan resolusi",
+            "Pernyataan umum, urutan sebab-akibat, dan interpretasi"
+          ],
+          "answer": 0,
+          "marker": "Buku IND D 8 BAB6 01 · dasar",
+          "why": {
+            "1": "Struktur tersebut milik teks eksposisi.",
+            "2": "Struktur tersebut milik teks cerpen atau narasi naskah drama.",
+            "3": "Struktur tersebut milik teks eksplanasi."
+          },
+          "note": "Struktur teks pidato terdiri atas bagian pembukaan (salam dan sapaan), bagian isi (gagasan utama/argumen), serta bagian penutup (kesimpulan dan salam penutup)."
+        },
+        {
+          "id": "cur_ind_d_8_b6_q04",
+          "subChapterId": "d_g8_ind_pidato_2_1",
+          "feature": "Konsep & Struktur Pidato",
+          "prompt": "Berdasarkan pembahasan salam keagamaan di Indonesia pada Bab VI Buku Siswa Bahasa Indonesia Kelas VIII, ucapan salam 'Om swastiastu' berasal dari agama Hindu yang memiliki arti…",
+          "options": [
+            "Semoga dalam keadaan selamat atas karunia Sang Hyang Widhi",
+            "Semoga keselamatan dan rahmat Allah serta keberkahan-Nya terlimpah kepada kalian",
+            "Salam sejahtera bagi kita semua",
+            "Terpujilah Buddha"
+          ],
+          "answer": 0,
+          "marker": "Buku IND D 8 BAB6 01 · dasar",
+          "why": {
+            "1": "Merupakan makna dari salam Assalamualaikum dalam agama Islam.",
+            "2": "Merupakan makna dari Salam Sejahtera dalam agama Kristen dan Katolik.",
+            "3": "Merupakan makna dari salam Namo Buddhaya dalam agama Buddha."
+          },
+          "note": "Om swastiastu merupakan salam pembuka keagamaan Hindu yang bermakna memohon keselamatan atas karunia Tuhan (Sang Hyang Widhi)."
+        },
+        {
+          "id": "cur_ind_d_8_b6_q05",
+          "subChapterId": "d_g8_ind_pidato_2_1",
+          "feature": "Konsep & Struktur Pidato",
+          "prompt": "Berdasarkan bagian istilah-istilah dalam pidato pada Buku Siswa Bahasa Indonesia Kelas VIII (Bab VI), ilmu tentang pidato atau seni berbicara didefinisikan sebagai…",
+          "options": [
+            "Retorika",
+            "Estetika",
+            "Semiotika",
+            "Fonetika"
+          ],
+          "answer": 0,
+          "marker": "Buku IND D 8 BAB6 01 · dasar",
+          "why": {
+            "1": "Estetika adalah ilmu tentang keindahan dan keharmonisan seni.",
+            "2": "Semiotika adalah ilmu tentang tanda dan simbol dalam bahasa.",
+            "3": "Fonetika adalah ilmu linguistik yang mempelajari bunyi bahasa."
+          },
+          "note": "Retorika adalah istilah ilmiah yang merujuk pada ilmu tentang pidato atau seni berbicara secara efektif di depan publik."
+        },
+        {
+          "id": "cur_ind_d_8_b6_q06",
+          "subChapterId": "d_g8_ind_pidato_2_1",
+          "feature": "Konsep & Struktur Pidato",
+          "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VIII (Bab VI), metode berpidato yang dilakukan secara spontan dan tiba-tiba tanpa persiapan naskah sebelumnya disebut…",
+          "options": [
+            "Pidato impromptu",
+            "Pidato manuskrip",
+            "Pidato memoriter",
+            "Pidato ekstempore"
+          ],
+          "answer": 0,
+          "marker": "Buku IND D 8 BAB6 01 · dasar",
+          "why": {
+            "1": "Pidato manuskrip menggunakan naskah lengkap tulisan.",
+            "2": "Pidato memoriter menyampaikan pidato dengan cara menghafalkan naskah kata demi kata.",
+            "3": "Pidato ekstempore menyampaikan pidato dengan menyiapkan garis besar atau catatan poin penting."
+          },
+          "note": "Pidato impromptu adalah metode penyampaian pidato secara serta-merta/spontan tanpa membawa naskah atau persiapan khusus sebelumnya."
+        },
+        {
+          "id": "cur_ind_d_8_b6_q07",
+          "subChapterId": "d_g8_ind_pidato_2_2",
+          "feature": "Kebahasaan & Penyampaian Pidato",
+          "prompt": "Cermatilah penggalan pidato berikut:\n\"Pada saat penyampaian visi dan misi, saya mengungkapkan keinginan untuk mengaktifkan kembali beberapa kegiatan, antara lain pembuatan majalah dinding OSIS, kegiatan lomba pidato, dan kegiatan ekstrakurikuler debat bahasa Inggris. Saya berharap nantinya kita dapat bekerja sama untuk mewujudkan ide tersebut.\"\nBerdasarkan Buku Siswa Bahasa Indonesia Kelas VIII (Bab VI), penggalan teks pidato Ketua OSIS tersebut termasuk ke dalam bagian struktur…",
+          "options": [
+            "Isi pidato, karena memuat gagasan utama dan program kerja yang ingin disampaikan oleh orator",
+            "Pembukaan pidato, karena memuat salam keagamaan dan ungkapan sapaan penghormatan",
+            "Penutup pidato, karena berisi kalimat permohonan maaf dan salam perpisahan",
+            "Salam pembuka pidato, karena berisi penghormatan formal kepada kepala sekolah dan dewan guru"
+          ],
+          "answer": 0,
+          "marker": "Buku IND D 8 BAB6 01 · sedang",
+          "why": {
+            "1": "Bagian pembukaan terletak di awal pidato dan berisi salam serta sapaan penghormatan.",
+            "2": "Bagian penutup berada di akhir pidato dan memuat simpulan serta pesan/harapan akhir.",
+            "3": "Salam pembuka merupakan ucapan sapaan awal seperti selamat pagi atau Assalamualaikum."
+          },
+          "note": "Bagian isi pidato memuat gagasan pokok, ide, gagasan program, serta pandangan yang ingin disampaikan pembawa pidato kepada audiens."
+        },
+        {
+          "id": "cur_ind_d_8_b6_q08",
+          "subChapterId": "d_g8_ind_pidato_2_2",
+          "feature": "Kebahasaan & Penyampaian Pidato",
+          "prompt": "Dalam Jelajah Kata Bab VI Buku Siswa Bahasa Indonesia Kelas VIII, gerakan anggota tubuh saat berpidato yang berfungsi meyakinkan pendengar dinamakan…",
+          "options": [
+            "Gestur",
+            "Intonasi",
+            "Artikulasi",
+            "Khalayak"
+          ],
+          "answer": 0,
+          "marker": "Buku IND D 8 BAB6 01 · sedang",
+          "why": {
+            "1": "Intonasi adalah ketepatan irama kalimat dalam berbicara saat berpidato.",
+            "2": "Artikulasi adalah kejelasan pengucapan lafal kata.",
+            "3": "Khalayak adalah sebutan bagi orang banyak atau pendengar pidato."
+          },
+          "note": "Gestur adalah gerakan anggota tubuh (seperti tangan, bahu, dan mimik) saat berpidato yang berfungsi memperkuat pesan dan meyakinkan khalayak."
+        },
+        {
+          "id": "cur_ind_d_8_b6_q09",
+          "subChapterId": "d_g8_ind_pidato_2_2",
+          "feature": "Kebahasaan & Penyampaian Pidato",
+          "prompt": "Cermatilah kutipan pidato dari teks \"Masalah Sampah\" berikut:\n\"Kementerian Lingkungan Hidup dan Kehutanan (KLHK) merilis bahwa jumlah timbunan sampah nasional sebesar 175.000 ton per hari atau setara 64 juta ton per tahun dengan asumsi sampah yang dihasilkan setiap orang 0,7 kg per hari.\"\nBerdasarkan Buku Siswa Bahasa Indonesia Kelas VIII (Bab VI), fungsi penyampaian data kuantitatif tersebut dalam pidato adalah…",
+          "options": [
+            "Memperkuat argumen pidato dengan fakta resmi agar pendengar percaya akan keseriusan masalah sampah",
+            "Menghibur pendengar agar suasana pembacaan pidato menjadi santai dan lucu",
+            "Memenuhi kaidah tata bahasa yang mewajibkan angka matematis dalam pidato",
+            "Mengubah teks pidato persuasif menjadi naskah laporan keuangan instansi"
+          ],
+          "answer": 0,
+          "marker": "Buku IND D 8 BAB6 01 · sedang",
+          "why": {
+            "1": "Data statistik sampah disajikan untuk memberikan bukti faktual objektif, bukan sarana hiburan.",
+            "2": "Kaidah bahasa pidato tidak mewajibkan menyertakan perhitungan matematika.",
+            "3": "Penyajian data KLHK tidak mengubah genre pidato menjadi laporan akuntansi."
+          },
+          "note": "Penyampaian fakta dan data resmi (seperti rilis KLHK) berfungsi memperkuat argumen dan dasar pemikiran pidato sehingga audiens terpengaruh dan meyakini pesan pidato."
+        },
+        {
+          "id": "cur_ind_d_8_b6_q10",
+          "subChapterId": "d_g8_ind_pidato_2_2",
+          "feature": "Kebahasaan & Penyampaian Pidato",
+          "prompt": "Dalam Bab VI Buku Siswa Bahasa Indonesia Kelas VIII, dijelaskan bahwa teks pidato sering memuat kata ilmiah. Pasangan kata ilmiah dan bidang ilmu terkait yang sesuai menurut buku siswa adalah…",
+          "options": [
+            "Ekosistem merupakan kata ilmiah dari bidang ilmu biologi",
+            "Atom merupakan kata ilmiah dari bidang ilmu sejarah",
+            "Khatulistiwa merupakan kata ilmiah dari bidang ilmu bahasa dan sastra",
+            "Bait merupakan kata ilmiah dari bidang ilmu kimia"
+          ],
+          "answer": 0,
+          "marker": "Buku IND D 8 BAB6 01 · sedang",
+          "why": {
+            "1": "Atom merupakan kata ilmiah dari bidang ilmu kimia.",
+            "2": "Khatulistiwa merupakan kata ilmiah dari bidang ilmu geografi.",
+            "3": "Bait merupakan kata ilmiah dari bidang ilmu bahasa dan sastra."
+          },
+          "note": "Ekosistem merujuk pada keilmuan biologi tentang lingkungan tempat tinggal komunitas organik."
+        },
+        {
+          "id": "cur_ind_d_8_b6_q11",
+          "subChapterId": "d_g8_ind_pidato_2_2",
+          "feature": "Kebahasaan & Penyampaian Pidato",
+          "prompt": "Cermatilah kalimat-kalimat berikut:\n(1) Marilah kita melatih diri untuk disiplin dalam membuang sampah pada tempatnya.\n(2) Hari ini hujan deras menyebabkan beberapa jalan di kawasan sekolah tergenang air.\n(3) Buanglah sampah organik ke dalam wadah pengomposan agar bermanfaat.\n(4) Halaman sekolah kami dikelilingi oleh berbagai jenis pepohonan yang rindang.\nBerdasarkan materi penulisan kalimat persuasif pada Bab VI Buku Siswa Bahasa Indonesia Kelas VIII, kalimat yang termasuk contoh kalimat persuasif ditunjukkan oleh nomor…",
+          "options": [
+            "(1) dan (3)",
+            "(2) dan (4)",
+            "(1) dan (2)",
+            "(3) dan (4)"
+          ],
+          "answer": 0,
+          "marker": "Buku IND D 8 BAB6 01 · sedang",
+          "why": {
+            "1": "Kalimat (2) dan (4) merupakan kalimat berita/deskriptif informatif, bukan kalimat persuasif.",
+            "2": "Kalimat (2) merupakan kalimat berita fenomena alam.",
+            "3": "Kalimat (4) merupakan kalimat deskripsi lingkungan."
+          },
+          "note": "Kalimat (1) dan (3) mengandung ajakan dan bujukan yang ditandai oleh kata 'marilah' dan kata imperatif 'buanglah'."
+        },
+        {
+          "id": "cur_ind_d_8_b6_q12",
+          "subChapterId": "d_g8_ind_pidato_2_2",
+          "feature": "Kebahasaan & Penyampaian Pidato",
+          "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VIII (Bab VI), manakah di antara kalimat berikut yang merupakan contoh ungkapan rasa peduli atau simpati dalam teks pidato?",
+          "options": [
+            "\"Saya berharap pada masa yang akan datang kita lebih peduli dan memperhatikan masalah sampah.\"",
+            "\"Data menunjukkan produksi sampah nasional mencapai 175.000 ton per hari.\"",
+            "\"Selamat pagi Bapak Kepala Sekolah dan Bapak/Ibu Guru yang saya hormati.\"",
+            "\"Pidato impromptu dilakukan secara spontan tanpa bantuan naskah tertulis.\""
+          ],
+          "answer": 0,
+          "marker": "Buku IND D 8 BAB6 01 · sedang",
+          "why": {
+            "1": "Kalimat tersebut memuat pernyataan fakta data kuantitatif.",
+            "2": "Kalimat tersebut memuat sapaan pembuka pidato.",
+            "3": "Kalimat tersebut memuat definisi metode berpidato."
+          },
+          "note": "Kalimat tersebut mengekspresikan perhatian, rasa empati, dan kepedulian terhadap kelestarian lingkungan dan penanganan sampah."
+        },
+        {
+          "id": "cur_ind_d_8_b6_q13",
+          "subChapterId": "d_g8_ind_pidato_2_2",
+          "feature": "Kebahasaan & Penyampaian Pidato",
+          "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VIII (Bab VI), urutan langkah awal yang tepat dalam menyusun teks pidato sebelum mengumpulkan fakta dan data adalah…",
+          "options": [
+            "Memilih dan menentukan topik, lalu menentukan tujuan pidato dan menyusun kerangka pidato",
+            "Berpidato di depan umum terlebih dahulu baru menentukan topik dan kerangka naskah",
+            "Menghafal naskah pidato secara keseluruhan lalu menyusun ucapan salam pembuka",
+            "Menyunting tata bahasa naskah pidato sebelum menentukan masalah yang akan dibahas"
+          ],
+          "answer": 0,
+          "marker": "Buku IND D 8 BAB6 01 · sedang",
+          "why": {
+            "1": "Praktik berpidato dilakukan setelah naskah pidato selesai disusun dan disunting.",
+            "2": "Menghafal naskah adalah salah satu metode berpidato, bukan langkah awal penyusunan.",
+            "3": "Menyunting merupakan tahap akhir perbaikan teks setelah naskah lengkap selesai ditulis."
+          },
+          "note": "Langkah penulisan pidato dimulai dengan menentukan topik yang dikuasai/disukai, menetapkan tujuan pidato, lalu membuat kerangka bagian pidato sebelum mencari data pendukung."
+        },
+        {
+          "id": "cur_ind_d_8_b6_q14",
+          "subChapterId": "d_g8_ind_pidato_2_2",
+          "feature": "Kebahasaan & Penyampaian Pidato",
+          "prompt": "Cermatilah penggalan teks pidato berikut:\n\"Bapak dan Ibu Guru serta teman-teman semua. Kita telah mengetahui akibat buruk yang ditimbulkan oleh sampah. Marilah kita melatih diri untuk disiplin membuang sampah pada tempatnya. Jika perlu, kita harus mencari cara untuk mengolah sampah menjadi sesuatu yang bermanfaat...\"\nBerdasarkan analisis struktur dan kebahasaan pidato pada Bab VI Buku Siswa Bahasa Indonesia Kelas VIII, penggalan paragraf tersebut menggabungkan unsur kebahasaan…",
+          "options": [
+            "Kata sapaan khalayak, simpulan dampak masalah, dan kalimat persuasif dengan kata penanda 'marilah'",
+            "Salam keagamaan lima agama, permohonan maaf penutup, dan kata ilmiah astronomi",
+            "Pengenalan identitas orator, pembacaan rima puisi, dan larangan hukum perundang-undangan",
+            "Biodata pengurus OSIS, paparan anggaran biaya sekolah, dan salam perpisahan alumni"
+          ],
+          "answer": 0,
+          "marker": "Buku IND D 8 BAB6 01 · tinggi",
+          "why": {
+            "1": "Teks tidak mengandung ucapan salam keagamaan lima agama maupun istilah astronomi.",
+            "2": "Teks tidak memuat unsur naskah puisi atau perundang-undangan.",
+            "3": "Teks tidak membahas rincian anggaran biaya atau biodata pengurus."
+          },
+          "note": "Paragraf tersebut memuat sapaan khalayak ('Bapak dan Ibu Guru serta teman-teman'), penegasan pemahaman dampak sampah, serta ajakan persuasif yang ditandai kata 'marilah'."
+        },
+        {
+          "id": "cur_ind_d_8_b6_q15",
+          "subChapterId": "d_g8_ind_pidato_2_2",
+          "feature": "Kebahasaan & Penyampaian Pidato",
+          "prompt": "Seorang orator menyampaikan pidato pada acara sekolah. Ia tidak membaca naskah secara utuh kata demi kata, melainkan hanya membawa lembaran catatan kecil yang memuat garis-garis besar topik dan poin penting yang hendak disampaikan.\nBerdasarkan penjelasannya pada Bab VI Buku Siswa Bahasa Indonesia Kelas VIII, metode berpidato yang diterapkan oleh orator tersebut dinamakan…",
+          "options": [
+            "Ekstempore, karena menyampaikan pidato dengan bantuan kerangka/garis besar topik",
+            "Manuskrip, karena membaca seluruh teks naskah pidato kata demi kata sampai selesai",
+            "Memoriter, karena menghafal seluruh isi teks naskah pidato tanpa membawa catatan",
+            "Impromptu, karena berpidato secara mendadak tanpa ada persiapan naskah atau catatan sama sekali"
+          ],
+          "answer": 0,
+          "marker": "Buku IND D 8 BAB6 01 · tinggi",
+          "why": {
+            "1": "Metode manuskrip mewajibkan pembacaan naskah lengkap secara verbatim.",
+            "2": "Metode memoriter mengandalkan hafalan total tanpa lembaran catatan di tangan.",
+            "3": "Metode impromptu dilakukan mendadak tanpa ada waktu menyiapkan catatan garis besar."
+          },
+          "note": "Metode ekstempore dilakukan dengan menyiapkan catatan garis besar atau poin-poin penting isi pidato sebagai panduan alur berbicara."
+        },
+        {
+          "id": "cur_ind_d_8_b6_q16",
+          "subChapterId": "d_g8_ind_pidato_2_2",
+          "feature": "Kebahasaan & Penyampaian Pidato",
+          "prompt": "Cermatilah kutipan kalimat pidato berikut:\n\"KLHK merilis bahwa jumlah timbunan sampah nasional sebesar 175.000 ton per hari dengan asumsi sampah per orang 0,7 kg. Produksi sampah yang sangat besar ini akan berakibat fatal jika diikuti oleh perilaku tidak terpuji masyarakat.\"\nBerdasarkan kotak Jelajah Kata Bab VI Buku Siswa Bahasa Indonesia Kelas VIII, arti kata 'asumsi' dan 'fatal' secara berurutan adalah…",
+          "options": [
+            "Dugaan atau landasan berpikir yang dianggap benar; serta kesalahan/perilaku yang berakibat buruk",
+            "Kenyataan objektif yang teruji di laboratorium; serta keuntungan finansial yang sangat melimpah",
+            "Keputusan hukum perundang-undangan; serta hasil musyawarah kesepakatan bersama",
+            "Rekomendasi tertulis dari tokoh; serta imbauan resmi dari lembaga daerah"
+          ],
+          "answer": 0,
+          "marker": "Buku IND D 8 BAB6 01 · tinggi",
+          "why": {
+            "1": "Arti tersebut bertolak belakang dengan makna asumsi dan fatal.",
+            "2": "Merupakan definisi istilah perundang-undangan atau musyawarah.",
+            "3": "Merupakan definisi dari anjuran atau surat imbauan resmi."
+          },
+          "note": "Menurut kotak Jelajah Kata halaman 205, asumsi berarti dugaan atau landasan berpikir yang dianggap benar, sedangkan fatal berarti perilaku atau kesalahan yang berakibat buruk."
+        },
+        {
+          "id": "cur_ind_d_8_b6_q17",
+          "subChapterId": "d_g8_ind_pidato_2_2",
+          "feature": "Kebahasaan & Penyampaian Pidato",
+          "prompt": "Menurut penjelasan pada Bab VI Buku Siswa Bahasa Indonesia Kelas VIII (halaman 206), pendengar atau pembaca dapat menyimpulkan pesan-pesan yang terkandung dalam naskah pidato melalui tiga langkah mendasar, yaitu…",
+          "options": [
+            "Menemukan topik/gagasan pidato, memahami isi teks pidato, dan mencermati kata-kata yang sering muncul",
+            "Menghafal seluruh naskah pidato, mengukur durasi waktu berbicara, dan menilai intonasi orator",
+            "Mengubah teks pidato menjadi naskah drama, mencatat kata ilmiah, dan menghitung jumlah paragraf",
+            "Menuliskan salam pembuka lima agama, membuat spanduk promosi, dan mengamati gestur audiens"
+          ],
+          "answer": 0,
+          "marker": "Buku IND D 8 BAB6 01 · tinggi",
+          "why": {
+            "1": "Tiga hal tersebut merupakan aspek teknik penyampaian pidato, bukan cara menemukan pesan pidato.",
+            "2": "Mengubah bentuk teks menjadi drama dan menghitung paragraf tidak menjamin pemahaman pesan.",
+            "3": "Salam lima agama dan spanduk adalah unsur pelengkap pembuka dan media visual."
+          },
+          "note": "Buku siswa menjelaskan 3 cara mengidentifikasi pesan pidato: (1) menemukan topik/gagasan pidato, (2) memahami isi teks pidato, dan (3) mencermati kata-kata yang sering muncul dalam teks."
+        },
+        {
+          "id": "cur_ind_d_8_b6_q18",
+          "subChapterId": "d_g8_ind_pidato_2_2",
+          "feature": "Kebahasaan & Penyampaian Pidato",
+          "prompt": "Dalam Bab VI Buku Siswa Bahasa Indonesia Kelas VIII (halaman 215), salah satu langkah penting sebelum menyusun teks pidato adalah memperhitungkan durasi atau lamanya pidato jika dipraktikkan. Alasan utama menentukan alokasi waktu tersebut adalah…",
+          "options": [
+            "Agar pidato dapat disampaikan dalam waktu yang pas serta sesuai dengan situasi dan alokasi susunan acara",
+            "Supaya pembawa pidato dapat menghabiskan waktu acara meskipun materi keluar dari topik utama",
+            "Agar pendengar merasa jenuh sehingga tidak memberikan pertanyaan kritis kepada orator",
+            "Untuk memastikan teks pidato memiliki jumlah paragraf yang sangat tebal"
+          ],
+          "answer": 0,
+          "marker": "Buku IND D 8 BAB6 01 · tinggi",
+          "why": {
+            "1": "Pidato tidak boleh melebar ke luar topik hanya demi menghabiskan alokasi waktu.",
+            "2": "Pidato hendaknya membuat pendengar antusias, bukan membuat jenuh.",
+            "3": "Kualitas pidato diukur dari ketepatan pesan dan struktur, bukan ketebalan halaman naskah."
+          },
+          "note": "Menentukan lamanya pidato bertujuan agar teks yang disusun pas dengan alokasi waktu yang diberikan panitia acara serta efisien bagi pendengar."
+        },
+        {
+          "id": "cur_ind_d_8_b6_q19",
+          "subChapterId": "d_g8_ind_pidato_2_2",
+          "feature": "Kebahasaan & Penyampaian Pidato",
+          "prompt": "Dalam penyusunan teks pidato di lingkungan majemuk, pembawa pidato sering menggunakan salam keagamaan resmi. Berdasarkan Bab VI Buku Siswa Bahasa Indonesia Kelas VIII, pasangan ucapan salam keagamaan beserta makna/asal agama yang tepat adalah…",
+          "options": [
+            "'Namo Buddhaya' dari agama Buddha yang bermakna terpujilah Buddha, serta 'Salam Kebajikan' dari agama Konghucu",
+            "'Om Swastiastu' dari agama Kristen Katolik yang bermakna ucapan selamat pagi bagi seluruh jemaat",
+            "'Salam Sejahtera' dari agama Hindu yang bermakna permohonan maaf kepada para dewa",
+            "'Assalamualaikum' dari agama Konghucu yang bermakna kedamaian bagi seluruh umat manusia"
+          ],
+          "answer": 0,
+          "marker": "Buku IND D 8 BAB6 01 · tinggi",
+          "why": {
+            "1": "Om Swastiastu merupakan ucapan salam dari agama Hindu.",
+            "2": "Salam Sejahtera merupakan ucapan salam dari agama Kristen dan Katolik.",
+            "3": "Assalamualaikum merupakan ucapan salam dari agama Islam."
+          },
+          "note": "Namo Buddhaya merupakan ucapan salam agama Buddha (terpujilah Buddha) dan Salam Kebajikan merupakan salam agama Konghucu."
+        }
+      ]
+    },
+    {
+      "id": "d_g7_ips_berdaya",
+      "phaseId": "fase_d",
+      "grade": 7,
+      "semester": 2,
+      "genre": "Ilmu Pengetahuan Sosial",
+      "title": "IPS — Pemberdayaan Masyarakat (Buku Resmi Kelas 7 Tema IV)",
+      "targetCefr": "Literasi Sosial",
+      "socialFunction": "Menghargai keragaman budaya dan mengelola keuangan keluarga secara bijak.",
+      "genericStructure": [
+        "Mengamati keragaman",
+        "Menganalisis sejarah lokal",
+        "Merencanakan keuangan",
+        "Berperan di komunitas"
+      ],
+      "languageFeatures": [
+        "Budaya, Sejarah & Lingkungan",
+        "Literasi Keuangan & Komunitas"
+      ],
+      "subChapters": [
+        {
+          "id": "d_g7_ips_berdaya_2_1",
+          "no": "2.1",
+          "title": "Keragaman Budaya, Sejarah & Lingkungan",
+          "feature": "Budaya, Sejarah & Lingkungan"
+        },
+        {
+          "id": "d_g7_ips_berdaya_2_2",
+          "no": "2.2",
+          "title": "Literasi Keuangan & Komunitas",
+          "feature": "Literasi Keuangan & Komunitas"
+        }
+      ],
+      "teachingBrief": {
+        "summary": "Unit offline IPS kelas 7 Tema IV. Sumber tools/chunk_ips_7_t4.json (20 butir, KOMP-IPS-D-7-BAB4-01).",
+        "hook5Minutes": "Tanya: pakaian adat pesisir vs pegunungan beda mengapa? Tarik ke faktor geografis.",
+        "boardFormula": "Budaya dipengaruhi alam + sejarah | Keuangan: dahulukan kebutuhan",
+        "commonMisconceptions": [
+          {
+            "trap": "Etnosentrisme dianggap wajar",
+            "pattern": "Budayaku paling unggul",
+            "fix": "Keberagaman menuntut sikap saling menghargai, bukan merasa paling unggul."
+          },
+          {
+            "trap": "Tabungan disamakan investasi",
+            "pattern": "Sama-sama menyimpan uang",
+            "fix": "Bedakan tujuan, risiko, dan imbal hasilnya."
+          }
+        ],
+        "differentiation": {
+          "struggling": "Beri tabel kebutuhan vs keinginan dan unsur budaya universal.",
+          "advanced": "Minta siswa menyusun skala prioritas anggaran keluarga Rp2 juta."
+        },
+        "keyVocabulary": [
+          {
+            "word": "etnosentrisme",
+            "meaning": "merasa budaya sendiri paling unggul"
+          },
+          {
+            "word": "literasi keuangan",
+            "meaning": "paham produk dan risiko keuangan"
+          },
+          {
+            "word": "skala prioritas",
+            "meaning": "urutan kepentingan pengeluaran"
+          },
+          {
+            "word": "pemberdayaan",
+            "meaning": "penguatan kemampuan masyarakat"
+          }
+        ]
+      },
+      "items": [
+        {
+          "id": "cur_ips_d_7_t4_q01",
+          "subChapterId": "d_g7_ips_berdaya_2_1",
+          "feature": "Budaya, Sejarah & Lingkungan",
+          "prompt": "Perhatikan perbandingan dua wilayah berikut!\n- Wilayah X: Terletak di pesisir, suhu tinggi, pakaian adat tidak memiliki lengan.\n- Wilayah Z: Terletak di pegunungan, suhu rendah, pakaian adat berlengan panjang.\nFaktor geografis yang memengaruhi keragaman budaya berpakaian pada kedua wilayah tersebut dipengaruhi oleh....",
+          "options": [
+            "suhu dan kelembapan udara",
+            "posisi strategis",
+            "luas wilayah",
+            "isolasi kepulauan oleh lautan"
+          ],
+          "answer": 0,
+          "marker": "Buku IPS D 7 BAB4 01 · sedang",
+          "why": {
+            "1": "Posisi strategis lebih berpengaruh terhadap jalur perdagangan dan akulturasi budaya, bukan perbedaan jenis bahan pakaian karena suhu lingkungan.",
+            "2": "Luas wilayah mempengaruhi sebaran populasi dan variasi bentang alam, tetapi bukan faktor utama penyusunan desain pakaian adat tahan dingin atau panas.",
+            "3": "Isolasi kepulauan oleh lautan membentuk perbedaan bahasa dan tradisi lokal secara terpisah, bukan penyesuaian pakaian terhadap iklim atau cuaca."
+          },
+          "note": "Perbedaan kondisi suhu dan kelembapan udara antara daerah pesisir (panas) dan pegunungan (dingin) secara langsung memengaruhi jenis pakaian adat yang dirancang oleh masyarakat setempat untuk menyesuaikan dengan kenyamanan tubuh."
+        },
+        {
+          "id": "cur_ips_d_7_t4_q02",
+          "subChapterId": "d_g7_ips_berdaya_2_1",
+          "feature": "Budaya, Sejarah & Lingkungan",
+          "prompt": "Perhatikan setiap unsur budaya berikut!\n(1) Warisan\n(2) Bahasa\n(3) Sistem politik\n(4) Sistem mata pencaharian\n(5) Sistem pengetahuan\nUnsur-unsur budaya universal dalam masyarakat ditunjukkan oleh nomor....",
+          "options": [
+            "(2), (4), dan (5)",
+            "(1), (2), dan (3)",
+            "(1), (2), dan (4)",
+            "(1), (3), dan (5)"
+          ],
+          "answer": 0,
+          "marker": "Buku IPS D 7 BAB4 01 · dasar",
+          "why": {
+            "1": "Pernyataan (1) warisan dan (3) sistem politik bukan merupakan kategori baku 7 unsur kebudayaan universal menurut teori antropologi.",
+            "2": "Pernyataan (1) warisan tidak termasuk dalam tujuh unsur budaya universal.",
+            "3": "Pernyataan (1) warisan dan (3) sistem politik bukan unsur budaya universal utama."
+          },
+          "note": "Unsur budaya universal merupakan unsur kebudayaan yang dapat ditemukan di seluruh kelompok masyarakat di dunia, mencakup bahasa, sistem mata pencaharian, dan sistem pengetahuan (serta sistem religi, organisasi sosial, teknologi, dan kesenian)."
+        },
+        {
+          "id": "cur_ips_d_7_t4_q03",
+          "subChapterId": "d_g7_ips_berdaya_2_1",
+          "feature": "Budaya, Sejarah & Lingkungan",
+          "prompt": "Dalam sejarah lokal perkembangan Kesultanan Demak, Ratu Kalinyamat yang terkenal dengan kepemimpinan dan kekuatan armadanya di Jepara merupakan putri ketiga dari....",
+          "options": [
+            "Sultan Trenggana",
+            "Raden Toyib",
+            "Sunan Prawata",
+            "Arya Penangsang"
+          ],
+          "answer": 0,
+          "marker": "Buku IPS D 7 BAB4 01 · dasar",
+          "why": {
+            "1": "Raden Toyib adalah nama lain dari Sultan Hadlirin (suami Ratu Kalinyamat), bukan ayah kandungnya.",
+            "2": "Sunan Prawata adalah saudara laki-laki dari Ratu Kalinyamat, bukan ayahnya.",
+            "3": "Arya Penangsang adalah adipati Jipang yang menjadi rival politik keluarga Demak, bukan ayah Ratu Kalinyamat."
+          },
+          "note": "Ratu Kalinyamat adalah putri ketiga dari Sultan Trenggana (raja ketiga Kesultanan Demak) yang memerintah wilayah Jepara dan memiliki peranan besar dalam sejarah maritim Nusantara."
+        },
+        {
+          "id": "cur_ips_d_7_t4_q04",
+          "subChapterId": "d_g7_ips_berdaya_2_1",
+          "feature": "Budaya, Sejarah & Lingkungan",
+          "prompt": "Perhatikan setiap pernyataan tugas berikut!\n(1) Mengoordinasikan sejumlah pasukan laut.\n(2) Mengawasi pelabuhan yang berada di bawah syahbandar.\n(3) Mengawasi kapal-kapal jenis galley (perang) milik Kerajaan Aceh.\n(4) Bekerja sama dengan pihak Belanda dalam perdagangan lada.\n(5) Melakukan balas dendam bersama para wanita yang ditinggal wafat oleh suaminya di medan perang.\nTugas resmi Laksamana Keumalahayati dalam struktur Kerajaan Aceh ditunjukkan oleh nomor....",
+          "options": [
+            "(1), (2), dan (3)",
+            "(1), (2), dan (4)",
+            "(1), (3), dan (5)",
+            "(2), (4), dan (5)"
+          ],
+          "answer": 0,
+          "marker": "Buku IPS D 7 BAB4 01 · sedang",
+          "why": {
+            "1": "Pernyataan (4) tidak tepat karena Keumalahayati gigih melawan perompak dan pengacau Eropa seperti Cornelis de Houtman dari Belanda.",
+            "2": "Pernyataan (5) bukan tugas resmi kedinasan laksamana Kerajaan Aceh.",
+            "3": "Pernyataan (4) bertentangan dengan perlawanan Keumalahayati terhadap bangsa Belanda."
+          },
+          "note": "Laksamana Keumalahayati bertugas mengoordinasikan armada laut, mengawasi pelabuhan di bawah syahbandar, serta mengawasi kapal-kapal perang jenis galley milik Kerajaan Aceh."
+        },
+        {
+          "id": "cur_ips_d_7_t4_q05",
+          "subChapterId": "d_g7_ips_berdaya_2_1",
+          "feature": "Budaya, Sejarah & Lingkungan",
+          "prompt": "Berdasarkan data statistik kawasan hutan Indonesia tahun 2009–2013, region Sumatra memiliki persentase tutupan hutan alam sebesar 22% dari total luas daratan. Wilayah ini mengalami ancaman deforestasi tinggi yang disebabkan oleh....",
+          "options": [
+            "alih fungsi lahan hutan secara masif untuk perkebunan dan industri",
+            "tingginya intensitas erupsi gunung berapi di sepanjang pesisir",
+            "luas daratan yang terlalu kecil dibandingkan kawasan perairan",
+            "rendahnya tingkat curah hujan tahunan di wilayah khatulistiwa"
+          ],
+          "answer": 0,
+          "marker": "Buku IPS D 7 BAB4 01 · tinggi",
+          "why": {
+            "1": "Erupsi gunung berapi memengaruhi lingkungan sekitar letusan, namun bukan penyebab utama hilangnya puluhan juta hektar tutupan hutan alam.",
+            "2": "Sumatra memiliki luas daratan sangat besar (47 juta hektar), sehingga persentase kecil menunjukkan deforestasi yang intensif.",
+            "3": "Sumatra berada di lintang khatulistiwa dengan curah hujan tropis yang sangat tinggi, bukan curah hujan rendah."
+          },
+          "note": "Penurunan persentase hutan alam di Sumatra terutama disebabkan oleh pembukaan lahan masif untuk industri perkebunan, pembalakan liar, dan alih fungsi lahan."
+        },
+        {
+          "id": "cur_ips_d_7_t4_q06",
+          "subChapterId": "d_g7_ips_berdaya_2_1",
+          "feature": "Budaya, Sejarah & Lingkungan",
+          "prompt": "Perjuangan pahlawan nasional wanita seperti R.A. Kartini, Dewi Sartika, Christina Martha Tiahahu, Keumalahayati, dan Cut Nyak Dien memberikan keteladanan yang sangat relevan dengan upaya penyelesaian masalah sosial saat ini, yaitu terkait....",
+          "options": [
+            "kesetaraan gender",
+            "kesenjangan sosial dan kemiskinan",
+            "penyalahgunaan narkotika",
+            "tawuran antarpelajar"
+          ],
+          "answer": 0,
+          "marker": "Buku IPS D 7 BAB4 01 · dasar",
+          "why": {
+            "1": "Kesenjangan sosial dan kemiskinan berkaitan dengan masalah ekonomi, bukan inti perjuangan emansipasi pahlawan wanita tersebut.",
+            "2": "Penyalahgunaan narkotika merupakan masalah kejahatan narkoba masa modern.",
+            "3": "Tawuran antarpelajar merupakan kenakalan remaja yang bertentangan dengan semangat pendidikan pahlawan nasional."
+          },
+          "note": "Perjuangan para pahlawan wanita Nusantara membuktikan bahwa perempuan memiliki kemampuan, kepemimpinan, dan hak yang sama dengan laki-laki dalam pendidikan, pemerintahan, dan perjuangan bangsa (kesetaraan gender)."
+        },
+        {
+          "id": "cur_ips_d_7_t4_q07",
+          "subChapterId": "d_g7_ips_berdaya_2_2",
+          "feature": "Literasi Keuangan & Komunitas",
+          "prompt": "Sebagian dari pendapatan yang tidak habis digunakan untuk konsumsi dapat disisihkan sebagai tabungan. Di antara pilihan berikut, yang BUKAN merupakan manfaat menabung adalah....",
+          "options": [
+            "menambah utang",
+            "melatih gaya hidup hemat",
+            "tersedianya uang untuk kebutuhan mendesak",
+            "mencapai tujuan keuangan pada masa mendatang"
+          ],
+          "answer": 0,
+          "marker": "Buku IPS D 7 BAB4 01 · dasar",
+          "why": {
+            "1": "Melatih gaya hidup hemat adalah salah satu manfaat utama dari kebiasaan menabung secara teratur.",
+            "2": "Menyediakan dana darurat untuk kebutuhan mendesak merupakan fungsi penting dari tabungan.",
+            "3": "Tabungan membantu mengumpulkan dana untuk mencapai tujuan keuangan jangka panjang."
+          },
+          "note": "Menabung justru mencegah seseorang dari ketergantungan pada pinjaman atau utang, sehingga menambah utang bukanlah manfaat menabung."
+        },
+        {
+          "id": "cur_ips_d_7_t4_q08",
+          "subChapterId": "d_g7_ips_berdaya_2_2",
+          "feature": "Literasi Keuangan & Komunitas",
+          "prompt": "Dalam pengelolaan keuangan keluarga, seseorang harus dapat membedakan antara Kebutuhan (hal yang wajib dipenuhi) dan Keinginan (hal yang tidak mendesak). Tindakan membedakan kedua hal tersebut merupakan bagian dari langkah perencanaan keuangan yaitu....",
+          "options": [
+            "memilih prioritas pengeluaran",
+            "menyusun rencana pendapatan",
+            "menyusun rencana pengeluaran",
+            "melakukan reviu perencanaan"
+          ],
+          "answer": 0,
+          "marker": "Buku IPS D 7 BAB4 01 · sedang",
+          "why": {
+            "1": "Menyusun rencana pendapatan berfokus pada sumber-sumber penerimaan uang, bukan memilah daftar pengeluaran.",
+            "2": "Menyusun rencana pengeluaran mencatat seluruh perkiraan biaya tanpa memisahkan tingkat urgensinya.",
+            "3": "Melakukan reviu perencanaan adalah evaluasi setelah rencana dijalankan."
+          },
+          "note": "Membedakan kebutuhan dan keinginan membantu menentukan skala prioritas sehingga pengeluaran dialokasikan untuk hal yang paling mendesak dan penting terlebih dahulu."
+        },
+        {
+          "id": "cur_ips_d_7_t4_q09",
+          "subChapterId": "d_g7_ips_berdaya_2_2",
+          "feature": "Literasi Keuangan & Komunitas",
+          "prompt": "Ismi memiliki modal sebesar Rp10.000.000,00 dan memutuskan berinvestasi pada instrumen reksa dana karena memahami tingkat risiko dan potensi imbal hasilnya dibanding saham. Keputusan Ismi yang memahami produk dan risiko keuangan ini menunjukkan tingkat literasi keuangan....",
+          "options": [
+            "well literate",
+            "sufficient literate",
+            "less literate",
+            "not literate"
+          ],
+          "answer": 0,
+          "marker": "Buku IPS D 7 BAB4 01 · tinggi",
+          "why": {
+            "1": "Sufficient literate hanya memiliki pengetahuan dan keyakinan tentang lembaga serta produk keuangan, tetapi belum mahir mengelola atau memilih risiko investasi secara tepat.",
+            "2": "Less literate hanya memiliki pengetahuan minimal tentang lembaga jasa keuangan dan produknya.",
+            "3": "Not literate adalah kondisi seseorang yang tidak memiliki pengetahuan dan keyakinan terhadap lembaga serta produk keuangan."
+          },
+          "note": "Well literate adalah tingkatan di mana seseorang mempunyai pengetahuan dan keyakinan tentang lembaga jasa keuangan serta produk keuangan, termasuk fitur, manfaat, risiko, dan hak-kewajiban."
+        },
+        {
+          "id": "cur_ips_d_7_t4_q10",
+          "subChapterId": "d_g7_ips_berdaya_2_2",
+          "feature": "Literasi Keuangan & Komunitas",
+          "prompt": "Perhatikan setiap kegiatan berikut!\n(1) Pelatihan kewirausahaan dari halaman rumah di Desa Paremono.\n(2) Pelatihan keterampilan membuat tas daur ulang dari sampah plastik untuk ibu-ibu PKK.\n(3) Sosialisasi Desa Tangguh Bencana.\n(4) Sosialisasi safety riding pada komunitas sepeda.\n(5) Pelatihan desain grafis bagi anggota komunitas postcrossing.\nKegiatan yang merupakan bentuk wujud pemberdayaan masyarakat berbasis komunitas lokal ditunjukkan oleh nomor....",
+          "options": [
+            "(1), (2), dan (3)",
+            "(1), (2), dan (4)",
+            "(1), (3), dan (5)",
+            "(2), (4), dan (5)"
+          ],
+          "answer": 0,
+          "marker": "Buku IPS D 7 BAB4 01 · tinggi",
+          "why": {
+            "1": "Sosialisasi keselamatan berkendara (4) lebih bersifat edukasi umum lalu lintas, bukan program peningkatan kemandirian ekonomi/sosial masyarakat.",
+            "2": "Pelatihan desain grafis komunitas hobi (5) tidak secara langsung memberdayakan kapasitas ekonomi atau kemasyarakatan desa.",
+            "3": "Kombinasi (2), (4), dan (5) memuat sosialisasi hobi dan lalu lintas yang bukan inti pemberdayaan desa."
+          },
+          "note": "Pemberdayaan masyarakat berfokus pada peningkatan kapasitas kemandirian ekonomi, pengelolaan lingkungan (daur ulang), dan ketangguhan bencana warga lokal."
+        },
+        {
+          "id": "cur_ips_d_7_t4_q11",
+          "subChapterId": "d_g7_ips_berdaya_2_1",
+          "feature": "Budaya, Sejarah & Lingkungan",
+          "prompt": "Pada abad ke-18, Sultan Nuku dari Tidore berhasil menyatukan wilayah Maluku dan Papua dalam perjuangan melawan penjajahan kolonial Belanda. Nilai utama yang dapat diteladani dari perjuangan Sultan Nuku adalah....",
+          "options": [
+            "persatuan, keberanian, dan kesetiaan pada kedaulatan wilayah",
+            "persaingan antarkerajaan lokal untuk memperluas wilayah kekuasaan",
+            "kerja sama dengan kongsi dagang asing untuk meraih keuntungan pribadi",
+            "sikap menyerah kepada kolonial demi keamanan daerah"
+          ],
+          "answer": 0,
+          "marker": "Buku IPS D 7 BAB4 01 · sedang",
+          "why": {
+            "1": "Sultan Nuku justru menghentikan konflik internal antarkerajaan untuk bersatu melawan Belanda.",
+            "2": "Sultan Nuku memanfaatkan diplomasi secara cerdik tanpa mengorbankan kedaulatan rakyat demi keuntungan pribadi.",
+            "3": "Sultan Nuku pantang menyerah dan terus berjuang hingga berhasil membebaskan Tidore."
+          },
+          "note": "Sultan Nuku menunjukkan kepemimpinan yang menyatukan berbagai suku dan wilayah (Maluku dan Papua) serta gigih mempertahankan kedaulatan dari penjajahan asing."
+        },
+        {
+          "id": "cur_ips_d_7_t4_q12",
+          "subChapterId": "d_g7_ips_berdaya_2_1",
+          "feature": "Budaya, Sejarah & Lingkungan",
+          "prompt": "Keberagaman sosial budaya di Indonesia dapat memicu konflik antarkebudayaan apabila terdapat kelompok masyarakat yang merasa kebudayaannya paling unggul (etnosentrisme). Sikap yang harus dikembangkan untuk mencegah konflik tersebut adalah....",
+          "options": [
+            "toleransi dan menghargai keragaman budaya bangsa",
+            "etnosentrisme dan mengagungkan budaya sendiri",
+            "asimilasi paksa seluruh budaya daerah menjadi satu",
+            "mengisolasi diri dari interaksi dengan kelompok budaya lain"
+          ],
+          "answer": 0,
+          "marker": "Buku IPS D 7 BAB4 01 · dasar",
+          "why": {
+            "1": "Etnosentrisme memicu rasa superioritas yang justru menjadi penyebab utama konflik antarbudaya.",
+            "2": "Pemaksaan budaya melanggar hak asasi dan merusak kekayaan budaya lokal.",
+            "3": "Mengisolasi diri menghambat komunikasi dan memperluas prasangka buruk antarwarga."
+          },
+          "note": "Sikap toleransi dan saling menghargai keragaman budaya merupakan kunci utama menjaga persatuan dan mencegah perpecahan di masyarakat majemuk."
+        },
+        {
+          "id": "cur_ips_d_7_t4_q13",
+          "subChapterId": "d_g7_ips_berdaya_2_2",
+          "feature": "Literasi Keuangan & Komunitas",
+          "prompt": "Berdasarkan Hasil Survei Nasional Literasi dan Inklusi Keuangan (SNLIK) tahun 2022, indeks inklusi finansial Indonesia mencapai 85,10% sedangkan literasi finansial sebesar 49,68%. Hal ini menunjukkan kondisi bahwa....",
+          "options": [
+            "banyak masyarakat sudah mengakses produk keuangan tetapi pemahamannya belum sebanding",
+            "tingkat pemahaman keuangan masyarakat jauh lebih tinggi daripada akses produk keuangan",
+            "masyarakat Indonesia sama sekali belum memanfaatkan layanan perbankan dan jasa keuangan",
+            "indeks literasi dan inklusi keuangan Indonesia telah mencapai angka sempurna 100%"
+          ],
+          "answer": 0,
+          "marker": "Buku IPS D 7 BAB4 01 · tinggi",
+          "why": {
+            "1": "Kenyataannya angka literasi (49,68%) lebih rendah dari angka inklusi (85,10%).",
+            "2": "Angka inklusi 85,10% membuktikan mayoritas masyarakat telah memiliki akses dan menggunakan jasa keuangan.",
+            "3": "Kedua indeks masih di bawah 100% dan memerlukan peningkatan pemahaman literasi."
+          },
+          "note": "Tingginya angka inklusi (85,10%) dibanding literasi (49,68%) berarti sebagian besar masyarakat telah menggunakan produk/layanan keuangan tetapi belum memahami risiko dan manfaatnya secara mendalam."
+        },
+        {
+          "id": "cur_ips_d_7_t4_q14",
+          "subChapterId": "d_g7_ips_berdaya_2_2",
+          "feature": "Literasi Keuangan & Komunitas",
+          "prompt": "Masyarakat sering kali menganggap tabungan dan investasi adalah hal yang sama. Perbedaan mendasar antara tabungan dan investasi terletak pada....",
+          "options": [
+            "tabungan bertujuan menyimpan uang dengan risiko rendah, sedangkan investasi bertujuan meningkatkan nilai aset di masa depan",
+            "tabungan selalu menghasilkan keuntungan sangat tinggi, sedangkan investasi tidak memiliki potensi imbal hasil",
+            "tabungan hanya dapat dilakukan di bank swasta, sedangkan investasi wajib dilakukan di lembaga pemerintah",
+            "tabungan membutuhkan modal sangat besar, sedangkan investasi dapat dilakukan tanpa modal sama sekali"
+          ],
+          "answer": 0,
+          "marker": "Buku IPS D 7 BAB4 01 · sedang",
+          "why": {
+            "1": "Investasi justru memiliki potensi imbal hasil lebih tinggi dibanding tabungan biasa.",
+            "2": "Baik tabungan maupun investasi dapat diakses melalui berbagai lembaga keuangan resmi swasta maupun pemerintah.",
+            "3": "Investasi dan tabungan saat ini dapat dimulai dari jumlah nominal yang relatif terjangkau."
+          },
+          "note": "Tabungan berfungsi mengamankan uang simpanan untuk jangka pendek dengan risiko minimal, sedangkan investasi menempatkan dana pada instrumen tertentu guna memperoleh pertumbuhan nilai aset dalam jangka panjang."
+        },
+        {
+          "id": "cur_ips_d_7_t4_q15",
+          "subChapterId": "d_g7_ips_berdaya_2_1",
+          "feature": "Budaya, Sejarah & Lingkungan",
+          "prompt": "Cornelis van Vollenhoven dijuluki sebagai 'Bapak Hukum Adat Indonesia' karena kontribusi ilmiah besarnya dalam....",
+          "options": [
+            "mengidentifikasi dan mempertahankan 19 lingkungan hukum adat dari upaya penghapusan kolonial Belanda",
+            "menghapuskan seluruh sistem hukum adat dan menggantikannya dengan Hukum Perdata Barat",
+            "menerapkan hukum tunggal Kerajaan Belanda untuk seluruh pribumi tanpa terkecuali",
+            "mendirikan kongsi perdagangan baru di wilayah kepulauan Hindia Belanda"
+          ],
+          "answer": 0,
+          "marker": "Buku IPS D 7 BAB4 01 · tinggi",
+          "why": {
+            "1": "Van Vollenhoven justru menentang pemaksaan Hukum Perdata Barat terhadap masyarakat adat pribumi.",
+            "2": "Ia membantah proyek unifikasi hukum tunggal dan memperjuangkan konsepsi dualisme hukum.",
+            "3": "Van Vollenhoven adalah guru besar akademisi hukum di Universitas Leiden, bukan pendiri kongsi dagang."
+          },
+          "note": "Melalui karyanya Het Adatrecht van Nederlandsch-Indië, Van Vollenhoven meneliti 19 lingkungan hukum adat dan gigih membela eksistensi hukum adat pribumi dari upaya unifikasi hukum Barat oleh pemerintah kolonial."
+        },
+        {
+          "id": "cur_ips_d_7_t4_q16",
+          "subChapterId": "d_g7_ips_berdaya_2_1",
+          "feature": "Budaya, Sejarah & Lingkungan",
+          "prompt": "Kondisi iklim dan cuaca memengaruhi bentuk arsitektur rumah tradisional di Indonesia. Sebagai contoh, rumah adat Baduy di Kanekes dibangun menghadap ke utara dan selatan dengan tujuan....",
+          "options": [
+            "mengatur sirkulasi udara dan intensitas sinar matahari yang masuk ke dalam rumah",
+            "mempermudah perluasan permukiman ke arah timur dan barat",
+            "menyesuaikan dengan arah angin laut di kawasan pesisir pantai",
+            "menghindari bencana tanah longsor di kawasan lereng gunung"
+          ],
+          "answer": 0,
+          "marker": "Buku IPS D 7 BAB4 01 · sedang",
+          "why": {
+            "1": "Arah bangunan didasarkan pada kenyamanan suhu dan iklim mikro, bukan sekadar ruang perluasan.",
+            "2": "Kanekes terletak di pedalaman perbukitan Banten, bukan kawasan pesisir pantai.",
+            "3": "Orientasi rumah utara-selatan berfokus pada pencahayaan dan penghawaan alami."
+          },
+          "note": "Rumah adat Baduy dibangun menghadap utara-selatan agar mendapat pencahayaan sinar matahari yang cukup tanpa terlalu panas serta menjaga sirkulasi udara yang baik."
+        },
+        {
+          "id": "cur_ips_d_7_t4_q17",
+          "subChapterId": "d_g7_ips_berdaya_2_1",
+          "feature": "Budaya, Sejarah & Lingkungan",
+          "prompt": "Kepemimpinan Ratu Kalinyamat dari Kesultanan Demak/Jepara yang mampu mengorganisasi puluhan kapal perang dan ribuan prajurit untuk membantu Malaka melawan Portugis menunjukkan keunggulan daerah Nusantara dalam hal....",
+          "options": [
+            "kekuatan armada maritim dan keberanian melawan dominasi asing di perairan Nusantara",
+            "penerapan sistem pertanian irigasi sawah di kawasan pegunungan pedalaman",
+            "penerapan monopoli perdagangan eksklusif di wilayah daratan",
+            "pembentukan pasukan militer khusus berkuda untuk pertempuran darat"
+          ],
+          "answer": 0,
+          "marker": "Buku IPS D 7 BAB4 01 · sedang",
+          "why": {
+            "1": "Jepara dikenal sebagai pusat maritim dan perdagangan laut, bukan sektor pertanian pegunungan.",
+            "2": "Ekspedisi Ratu Kalinyamat adalah pengiriman armada militer laut untuk menolong Malaka dari Portugis.",
+            "3": "Kekuatan utama Jepara terletak pada armada kapal perang (maritim), bukan pasukan darat berkuda."
+          },
+          "note": "Kekuatan Jepara di bawah Ratu Kalinyamat membuktikan ketangguhan maritim dan armada laut Nusantara yang disegani di kawasan Asia Tenggara."
+        },
+        {
+          "id": "cur_ips_d_7_t4_q18",
+          "subChapterId": "d_g7_ips_berdaya_2_2",
+          "feature": "Literasi Keuangan & Komunitas",
+          "prompt": "Dalam menyusun skala prioritas pengelolaan keuangan keluarga, alokasi dana utama dari pendapatan harus didahulukan untuk....",
+          "options": [
+            "pemenuhan kebutuhan pokok seperti pangan, kesehatan, dan pendidikan",
+            "pembelian barang-barang mewah untuk mengikuti tren gaya hidup",
+            "pengeluaran rekreasi dan hiburan setiap akhir pekan",
+            "pembelian barang-barang yang sifatnya hanya dorongan keinginan"
+          ],
+          "answer": 0,
+          "marker": "Buku IPS D 7 BAB4 01 · dasar",
+          "why": {
+            "1": "Barang mewah merupakan bentuk keinginan yang berada pada prioritas rendah.",
+            "2": "Rekreasi dan hiburan adalah kebutuhan sekunder/tersier yang disesuaikan setelah kebutuhan utama terpenuhi.",
+            "3": "Keinginan tidak mendesak dapat ditunda demi menjaga kestabilan keuangan keluarga."
+          },
+          "note": "Kebutuhan pokok (pangan, papan, kesehatan, dan pendidikan) wajib dipenuhi terlebih dahulu sebelum mengalokasikan dana untuk keinginan atau hiburan."
+        },
+        {
+          "id": "cur_ips_d_7_t4_q19",
+          "subChapterId": "d_g7_ips_berdaya_2_1",
+          "feature": "Budaya, Sejarah & Lingkungan",
+          "prompt": "Tindakan merusak atau mencorat-coret fasilitas umum dan menandai dinding publik dengan inisial kelompok atau sekolah merupakan bentuk permasalahan sosial budaya yang disebut....",
+          "options": [
+            "vandalisme",
+            "akumulasi modal",
+            "diferensiasi sosial",
+            "akulturasi budaya"
+          ],
+          "answer": 0,
+          "marker": "Buku IPS D 7 BAB4 01 · dasar",
+          "why": {
+            "1": "Akumulasi modal adalah istilah ekonomi dalam pengumpulan dana atau aset.",
+            "2": "Diferensiasi sosial adalah pembedaan anggota masyarakat secara horizontal tanpa tingkatan.",
+            "3": "Akulturasi budaya adalah perpaduan dua kebudayaan yang melahirkan kebudayaan baru tanpa menghilangkan unsur asli."
+          },
+          "note": "Vandalisme adalah perbuatan merusak atau menghancurkan barang/fasilitas umum atau milik orang lain secara sembarangan dan tanpa izin."
+        },
+        {
+          "id": "cur_ips_d_7_t4_q20",
+          "subChapterId": "d_g7_ips_berdaya_2_2",
+          "feature": "Literasi Keuangan & Komunitas",
+          "prompt": "Kehadiran komunitas lokal seperti kelompok pengelola sampah daur ulang dan desa tangguh bencana memiliki peranan penting dalam pemberdayaan masyarakat, yaitu....",
+          "options": [
+            "meningkatkan kemandirian dan kepedulian masyarakat terhadap permasalahan lingkungan dan sosial",
+            "mengambil alih seluruh kewenangan dan tugas dari pemerintah pusat",
+            "membatasi warga masyarakat agar tidak berinteraksi dengan pihak luar",
+            "menggantikan peran lembaga perbankan dalam menyalurkan pinjaman modal"
+          ],
+          "answer": 0,
+          "marker": "Buku IPS D 7 BAB4 01 · tinggi",
+          "why": {
+            "1": "Komunitas lokal bersifat bermitra dan melengkapi, bukan menggantikan kewenangan pemerintah.",
+            "2": "Pemberdayaan komunitas justru memperluas jaringan dan kerja sama dengan berbagai pihak luar.",
+            "3": "Komunitas berfokus pada gerakan sosial dan lingkungan, bukan bertindak sebagai bank pinjaman modal."
+          },
+          "note": "Komunitas lokal berperan membangun kesadaran bersama, keterampilan warga, dan kemandirian dalam mengatasi permasalahan di lingkungan tempat tinggal."
+        }
+      ]
+    },
+    {
+      "id": "d_g8_ips_geo",
+      "phaseId": "fase_d",
+      "grade": 8,
+      "semester": 1,
+      "genre": "Ilmu Pengetahuan Sosial",
+      "title": "IPS — Kondisi Geografis & SDA (Buku Resmi Kelas 8 Tema 01)",
+      "targetCefr": "Literasi Sosial",
+      "socialFunction": "Menjelaskan kondisi geografis Indonesia dan pentingnya pelestarian SDA.",
+      "genericStructure": [
+        "Mengamati letak geografis",
+        "Memetakan flora-fauna",
+        "Menganalisis potensi SDA",
+        "Merencanakan pelestarian"
+      ],
+      "languageFeatures": [
+        "Kondisi Geografis Indonesia",
+        "Flora, Fauna & Pelestarian SDA"
+      ],
+      "subChapters": [
+        {
+          "id": "d_g8_ips_geo_1_1",
+          "no": "1.1",
+          "title": "Kondisi Geografis Indonesia",
+          "feature": "Kondisi Geografis Indonesia"
+        },
+        {
+          "id": "d_g8_ips_geo_1_2",
+          "no": "1.2",
+          "title": "Flora, Fauna & Pelestarian SDA",
+          "feature": "Flora, Fauna & Pelestarian SDA"
+        }
+      ],
+      "teachingBrief": {
+        "summary": "Unit offline IPS kelas 8 Tema 01. Sumber tools/chunk_ips_8_t1.json (20 butir, KOMP-IPS-D-8-BAB1-01).",
+        "hook5Minutes": "Tunjuk peta garis Wallace-Weber, tanya mengapa komodo hanya di timur.",
+        "boardFormula": "Astronomis = lintang+bujur | Wallace = barat-tengah | Weber = tengah-timur",
+        "commonMisconceptions": [
+          {
+            "trap": "Geografis tertukar astronomis",
+            "pattern": "Benua = astronomis",
+            "fix": "Astronomis memakai koordinat; geografis memakai benua/samudra sekitar."
+          },
+          {
+            "trap": "Wujud beda dianggap zat beda",
+            "pattern": "Uap bukan air",
+            "fix": "SDA hayati vs nonhayati ditentukan daya pulihnya, bukan wujudnya."
+          }
+        ],
+        "differentiation": {
+          "struggling": "Beri peta buta garis Wallace-Weber dan tabel SDA.",
+          "advanced": "Minta siswa menulis rencana pelestarian mangrove 5 langkah."
+        },
+        "keyVocabulary": [
+          {
+            "word": "garis Wallace",
+            "meaning": "batas fauna barat-tengah"
+          },
+          {
+            "word": "garis Weber",
+            "meaning": "batas fauna tengah-timur"
+          },
+          {
+            "word": "pelestarian",
+            "meaning": "perlindungan SDA"
+          },
+          {
+            "word": "maritim",
+            "meaning": "kelautan"
+          }
+        ]
+      },
+      "items": [
+        {
+          "id": "cur_ips_d_8_t1_q01",
+          "subChapterId": "d_g8_ips_geo_1_1",
+          "feature": "Kondisi Geografis Indonesia",
+          "prompt": "Berdasarkan Buku Siswa IPS Kelas VIII Edisi Revisi Tema 01, letak astronomis Indonesia berada pada 6°LU – 11°LS dan 95°BT – 141°BT. Pengaruh letak astronomis tersebut terhadap kondisi iklim di sebagian besar wilayah Indonesia adalah ....",
+          "options": [
+            "memiliki iklim tropis dengan suhu udara tinggi dan curah hujan rata-rata melimpah sepanjang tahun",
+            "memiliki empat musim yang berganti secara teratur setiap tiga bulan sekali",
+            "didominasi iklim subtropis kering dengan gurun pasir yang luas di wilayah pesisir",
+            "mengalami penurunan suhu ekstrem hingga di bawah titik beku pada pertengahan tahun"
+          ],
+          "answer": 0,
+          "marker": "Buku IPS D 8 BAB1 01 · dasar",
+          "why": {
+            "1": "Empat musim teratur adalah ciri daerah beriklim sedang atau sedang-subtropis, bukan wilayah tropis khatulistiwa.",
+            "2": "Iklim subtropis kering terdapat di kawasan lintang menengah seperti Afrika Utara dan Australia Tengah, bukan di Indonesia.",
+            "3": "Suhu ekstrem di bawah titik beku merupakan karakteristik iklim kutub atau iklim sedang pada musim dingin."
+          },
+          "note": "Letak astronomis Indonesia di wilayah khatulistiwa (6°LU – 11°LS) menyebabkan Indonesia beriklim tropis dengan intensitas penyinaran matahari tinggi dan kelembapan serta curah hujan yang melimpah sepanjang tahun."
+        },
+        {
+          "id": "cur_ips_d_8_t1_q02",
+          "subChapterId": "d_g8_ips_geo_1_1",
+          "feature": "Kondisi Geografis Indonesia",
+          "prompt": "Berdasarkan Buku Siswa IPS Kelas VIII Edisi Revisi Tema 01, posisi geografis Indonesia diapit oleh Benua Asia dan Benua Australia serta Samudra Hindia dan Samudra Pasifik. Keuntungan strategis dari posisi silang tersebut bagi Indonesia adalah ....",
+          "options": [
+            "menjadi jalur persimpangan lalu lintas perdagangan internasional dan interaksi budaya dunia",
+            "terbebas sepenuhnya dari ancaman bencana alam geologis seperti gempa bumi dan tsunami",
+            "memiliki garis pantai terkecil sehingga kawasan daratan lebih mudah diolah",
+            "menjadi wilayah yang tidak terpengaruh oleh dinamika iklim global maupun pola angin muson"
+          ],
+          "answer": 0,
+          "marker": "Buku IPS D 8 BAB1 01 · sedang",
+          "why": {
+            "1": "Posisi geografis tidak menghilangkan risiko bencana geologis karena Indonesia berada di jalur cincin api pasifik dan pertemuan lempeng tektonik.",
+            "2": "Indonesia justru memiliki garis pantai terpanjang kedua di dunia sebagai negara kepulauan.",
+            "3": "Posisi di antara dua benua dan samudra sangat memengaruhi pola pergerakan angin muson barat dan muson timur."
+          },
+          "note": "Posisi silang di antara dua benua dan dua samudra menempatkan Indonesia pada jalur pelayaran komersial utama dunia yang mendorong jalur perdagangan internasional dan pertukaran budaya."
+        },
+        {
+          "id": "cur_ips_d_8_t1_q03",
+          "subChapterId": "d_g8_ips_geo_1_1",
+          "feature": "Kondisi Geografis Indonesia",
+          "prompt": "Berdasarkan Buku Siswa IPS Kelas VIII Edisi Revisi Tema 01, wilayah Indonesia terbagi menjadi tiga daerah waktu karena perentangan garis bujur sebesar 46° (95°BT – 141°BT). Daerah di bawah ini yang termasuk dalam zona Waktu Indonesia Tengah (WITA) adalah ....",
+          "options": [
+            "Sulawesi, Bali, Nusa Tenggara, dan Kalimantan Selatan",
+            "Jawa, Sumatra, Kalimantan Barat, dan Madura",
+            "Maluku, Maluku Utara, Papua, dan Papua Barat",
+            "Aceh, Sumatra Utara, Riau, dan Kepulauan Riau"
+          ],
+          "answer": 0,
+          "marker": "Buku IPS D 8 BAB1 01 · dasar",
+          "why": {
+            "1": "Jawa, Sumatra, Kalimantan Barat, dan Madura masuk dalam zona Waktu Indonesia Barat (WIB, UTC+7).",
+            "2": "Maluku, Maluku Utara, Papua, dan Papua Barat masuk dalam zona Waktu Indonesia Timur (WIT, UTC+9).",
+            "3": "Aceh, Sumatra Utara, Riau, dan Kepulauan Riau berlokasi di Sumatra yang masuk zona Waktu Indonesia Barat (WIB)."
+          },
+          "note": "Waktu Indonesia Tengah (WITA, UTC+8) mencakup wilayah Sulawesi, Bali, Nusa Tenggara Barat, Nusa Tenggara Timur, Kalimantan Selatan, dan Kalimantan Timur."
+        },
+        {
+          "id": "cur_ips_d_8_t1_q04",
+          "subChapterId": "d_g8_ips_geo_1_1",
+          "feature": "Kondisi Geografis Indonesia",
+          "prompt": "Berdasarkan Buku Siswa IPS Kelas VIII Edisi Revisi Tema 01, pergantian musim di Indonesia dipengaruhi oleh pergerakan angin muson. Pola pergerakan Angin Muson Barat yang bertiup dari Benua Asia menuju Benua Australia pada periode Oktober hingga April berdampak pada ....",
+          "options": [
+            "terjadinya musim hujan di sebagian besar wilayah Indonesia karena angin membawa uap air melimpah dari Samudra Pasifik dan Laut Cina Selatan",
+            "terjadinya musim kemarau panjang karena angin melewati gurun pasir yang kering di Benua Australia",
+            "terjadinya gelombang panas ekstrem di pulau Jawa dan Bali karena udara kering yang bertiup cepat",
+            "menurunnya tingkat kelembapan udara secara drastis di kawasan pesisir utara Sumatra"
+          ],
+          "answer": 0,
+          "marker": "Buku IPS D 8 BAB1 01 · sedang",
+          "why": {
+            "1": "Angin bertiup dari Benua Australia yang bersifat kering adalah Angin Muson Timur yang memicu musim kemarau (April–Oktober).",
+            "2": "Muson Barat membawa kelembapan tinggi dan curah hujan, bukan gelombang panas atau udara kering.",
+            "3": "Kelembapan udara saat musim hujan relatif tinggi, bukan menurun drastis."
+          },
+          "note": "Angin Muson Barat bertiup dari Asia melewati Samudra Pasifik dan lautan luas, membawa banyak uap air sehingga menyebabkan musim hujan di Indonesia."
+        },
+        {
+          "id": "cur_ips_d_8_t1_q05",
+          "subChapterId": "d_g8_ips_geo_1_1",
+          "feature": "Kondisi Geografis Indonesia",
+          "prompt": "Berdasarkan Buku Siswa IPS Kelas VIII Edisi Revisi Tema 01, Indonesia berada pada titik pertemuan tiga lempeng tektonik utama dunia, yaitu Lempeng Indo-Australia, Lempeng Eurasia, dan Lempeng Pasifik. Kondisi geologis tersebut mengakibatkan wilayah Indonesia ....",
+          "options": [
+            "memiliki banyak gunung api aktif serta sering mengalami gempa bumi tektonik dan vulkanik",
+            "menjadi kawasan yang bebas dari aktivitas tektonik dan lipatan kerak bumi",
+            "memiliki lapisan tanah yang tandus dan tidak dapat dimanfaatkan untuk pertanian",
+            "terdiri atas daratan tua yang stabil dan tidak pernah mengalami pergeseran kerak bumi"
+          ],
+          "answer": 0,
+          "marker": "Buku IPS D 8 BAB1 01 · dasar",
+          "why": {
+            "1": "Kawasan pertemuan lempeng tektonik justru sangat aktif dalam aktivitas tektonik dan pembentukan pegunungan lipatan.",
+            "2": "Aktivitas vulkanisme dari gunung api di Indonesia justru menghasilkan tanah vulkanis yang sangat subur.",
+            "3": "Kerak bumi di Indonesia bersifat dinamis akibat pergerakan dan tumbukan lempeng yang terus berlangsung."
+          },
+          "note": "Pertemuan tiga lempeng tektonik memicu pembentukan jalur gunung api (cincin api) serta aktivitas seismik berupa gempa bumi tektonik dan vulkanik."
+        },
+        {
+          "id": "cur_ips_d_8_t1_q06",
+          "subChapterId": "d_g8_ips_geo_1_2",
+          "feature": "Flora, Fauna & Pelestarian SDA",
+          "prompt": "Berdasarkan Buku Siswa IPS Kelas VIII Edisi Revisi Tema 01, keragaman flora dan fauna di Indonesia dibagi menjadi tiga wilayah utama yang dipisahkan oleh Garis Wallace dan Garis Weber. Karakteristik utama dari kelompok fauna Asiatis (Barat) adalah ....",
+          "options": [
+            "didominasi oleh mamalia berukuran besar dan berbagai jenis kera, serta tidak terdapat mamalia berkantong",
+            "didominasi oleh mamalia berkantong kecil dan burung-burung berbulu indah dan berwarna-warni",
+            "terdiri atas hewan-hewan purba endemis yang tidak ditemukan di benua mana pun",
+            "hanya diisi oleh jenis unggas air dan mamalia laut tanpa adanya reptil darat"
+          ],
+          "answer": 0,
+          "marker": "Buku IPS D 8 BAB1 01 · sedang",
+          "why": {
+            "1": "Mamalia berkantong dan burung berbulu indah berwarna-warni merupakan ciri khas fauna Australis di Indonesia bagian timur.",
+            "2": "Hewan purba endemis unik merupakan ciri fauna Peralihan/Wallacea seperti komodo dan anoa.",
+            "3": "Fauna Asiatis mencakup ekosistem darat yang luas termasuk berbagai jenis reptil, mamalia, dan burung."
+          },
+          "note": "Fauna Asiatis di bagian barat Indonesia (Sumatra, Jawa, Kalimantan, Bali) memiliki kemiripan dengan fauna Asia, ditandai oleh mamalia besar (gajah, harimau, badak) dan primates/kera tanpa mamalia berkantong."
+        },
+        {
+          "id": "cur_ips_d_8_t1_q07",
+          "subChapterId": "d_g8_ips_geo_1_2",
+          "feature": "Flora, Fauna & Pelestarian SDA",
+          "prompt": "Berdasarkan Buku Siswa IPS Kelas VIII Edisi Revisi Tema 01, Garis Wallace membatasi persebaran fauna bagian barat dengan kawasan peralihan, sedangkan Garis Weber membatasi kawasan peralihan dengan bagian timur. Hewan di bawah ini yang termasuk dalam kelompok fauna kawasan Peralihan (Wallacea) adalah ....",
+          "options": [
+            "komodo, anoa, babirusa, dan burung maleo",
+            "gajah surowiti, harimau sumatra, orangutan, dan badak bercula satu",
+            "kanguru pohon, burung cendrawasih, kasuari, dan walabi",
+            "banteng jawa, beruang madu, pesut mahakam, dan macan tutul"
+          ],
+          "answer": 0,
+          "marker": "Buku IPS D 8 BAB1 01 · sedang",
+          "why": {
+            "1": "Gajah, harimau sumatra, orangutan, dan badak merupakan contoh fauna tipe Asiatis (bagian barat).",
+            "2": "Kanguru pohon, cendrawasih, kasuari, dan walabi merupakan contoh fauna tipe Australis (bagian timur/Papua).",
+            "3": "Banteng jawa, beruang madu, pesut mahakam, dan macan tutul tergolong dalam kelompok fauna tipe Asiatis."
+          },
+          "note": "Kawasan Peralihan (Sulawesi, Nusa Tenggara, Maluku) memiliki hewan khas/endemis Indonesia seperti komodo, anoa, babirusa, dan burung maleo."
+        },
+        {
+          "id": "cur_ips_d_8_t1_q08",
+          "subChapterId": "d_g8_ips_geo_1_2",
+          "feature": "Flora, Fauna & Pelestarian SDA",
+          "prompt": "Berdasarkan Buku Siswa IPS Kelas VIII Edisi Revisi Tema 01, fauna bagian timur Indonesia memilik kemiripan dengan fauna di Benua Australia (tipe Australis). Salah satu contoh hewan khas yang terdapat di kawasan Papua dan sekitarnya adalah ....",
+          "options": [
+            "burung cendrawasih dan kanguru pohon",
+            "orangutan dan harimau sumatra",
+            "babirusa dan anoa darat",
+            "badak bercula satu dan gajah sumatra"
+          ],
+          "answer": 0,
+          "marker": "Buku IPS D 8 BAB1 01 · dasar",
+          "why": {
+            "1": "Orangutan dan harimau sumatra hidup di Sumatra dan Kalimantan (tipe Asiatis).",
+            "2": "Babirusa dan anoa hidup di Sulawesi (tipe Peralihan/Wallacea).",
+            "3": "Badak bercula satu dan gajah sumatra hidup di Jawa dan Sumatra (tipe Asiatis)."
+          },
+          "note": "Burung cendrawasih dan kanguru pohon adalah hewan khas tipe Australis yang hidup di Papua dan pulau-pulau sekitarnya."
+        },
+        {
+          "id": "cur_ips_d_8_t1_q09",
+          "subChapterId": "d_g8_ips_geo_1_2",
+          "feature": "Flora, Fauna & Pelestarian SDA",
+          "prompt": "Berdasarkan Buku Siswa IPS Kelas VIII Edisi Revisi Tema 01, Hutan Hujan Tropis di Indonesia kaya akan keberagaman flora heterogen. Ciri-ciri vegetasi yang tumbuh pada kawasan hutan hujan tropis adalah ....",
+          "options": [
+            "pohon-pohon berdaun lebat dan rapat membentuk kanopi dengan ketinggian bervariasi serta kelembapan tinggi",
+            "pohon-pohon menggugurkan daunnya pada musim kemarau untuk mengurangi penguapan air",
+            "didominasi oleh tumbuhan jenis konifer yang tahan terhadap suhu di bawah titik beku",
+            "terdiri atas padang rumput yang luas tanpa dijumpai adanya pepohonan berkayu"
+          ],
+          "answer": 0,
+          "marker": "Buku IPS D 8 BAB1 01 · sedang",
+          "why": {
+            "1": "Menggugurkan daun pada musim kemarau adalah ciri hutan musim (hutan meranggas) seperti hutan jati.",
+            "2": "Tumbuhan konifer merupakan vegetasi hutan taiga di daerah beriklim dingin/subtropis.",
+            "3": "Padang rumput tanpa pohon merupakan ciri vegetasi sabana atau padang rumput stepa."
+          },
+          "note": "Hutan hujan tropis ditandai oleh keanekaragaman vegetasi heterogen yang tumbuh rapat, berdaun lebat membentuk kanopi, dan kelembapan di dalam hutan sangat tinggi."
+        },
+        {
+          "id": "cur_ips_d_8_t1_q10",
+          "subChapterId": "d_g8_ips_geo_1_2",
+          "feature": "Flora, Fauna & Pelestarian SDA",
+          "prompt": "Berdasarkan Buku Siswa IPS Kelas VIII Edisi Revisi Tema 01, di kawasan Nusa Tenggara dengan curah hujan yang relatif sedikit, jenis vegetasi alami yang dominan dijumpai adalah ....",
+          "options": [
+            "sabana dan padang rumput",
+            "hutan hujan tropis heterogen",
+            "hutan lumut dan tundra",
+            "hutan bakau pedalaman"
+          ],
+          "answer": 0,
+          "marker": "Buku IPS D 8 BAB1 01 · dasar",
+          "why": {
+            "1": "Hutan hujan tropis heterogen tumbuh di daerah bersuhu basah dengan curah hujan tinggi seperti Sumatra, Kalimantan, dan Papua.",
+            "2": "Hutan lumut dan tundra terdapat di kawasan pegunungan tinggi atau daerah kutub.",
+            "3": "Hutan bakau tumbuh di daerah pesisir pantai berlumpur yang dipengaruhi pasang surut air laut."
+          },
+          "note": "Wilayah Nusa Tenggara memiliki iklim yang cenderung lebih kering dengan masa kemarau panjang sehingga ditumbuhi vegetasi sabana dan padang rumput."
+        },
+        {
+          "id": "cur_ips_d_8_t1_q11",
+          "subChapterId": "d_g8_ips_geo_1_2",
+          "feature": "Flora, Fauna & Pelestarian SDA",
+          "prompt": "Berdasarkan Buku Siswa IPS Kelas VIII Edisi Revisi Tema 01, hutan memiliki fungsi ekologis dan ekonomis bagi kehidupan. Salah satu fungsi ekologis hutan sebagai pengatur tata air (fungsi hidrologis) adalah ....",
+          "options": [
+            "menampung air hujan dan menyerapnya ke dalam tanah sehingga mencegah banjir serta menjaga ketersediaan air tanah",
+            "menghasilkan kayu pertukangan dan bahan baku kertas untuk diekspor ke luar negeri",
+            "menjadi tempat objek wisata alam yang mendatangkan pendapatan bagi daerah",
+            "menyediakan lahan permukiman baru bagi penduduk yang direlokasi dari perkotaan"
+          ],
+          "answer": 0,
+          "marker": "Buku IPS D 8 BAB1 01 · sedang",
+          "why": {
+            "1": "Menghasilkan kayu pertukangan merupakan fungsi produksi atau ekonomis hutan.",
+            "2": "Tempat objek wisata merupakan fungsi pariwisata/ekonomis jasa lingkungan.",
+            "3": "Penyediaan lahan permukiman bukan fungsi ekologis hutan, melainkan alih fungsi lahan."
+          },
+          "note": "Fungsi hidrologis hutan adalah menyerap dan menyimpan air hujan dalam tanah sehingga menjaga keseimbangan tata air tanah dan mencegah banjir."
+        },
+        {
+          "id": "cur_ips_d_8_t1_q12",
+          "subChapterId": "d_g8_ips_geo_1_2",
+          "feature": "Flora, Fauna & Pelestarian SDA",
+          "prompt": "Berdasarkan Buku Siswa IPS Kelas VIII Edisi Revisi Tema 01, pelestarian sumber daya alam hayati dapat dilakukan melalui bentuk konservasi *in-situ* dan *ex-situ*. Pernyataan yang menggambarkan konservasi *in-situ* secara tepat adalah ....",
+          "options": [
+            "perlindungan flora dan fauna yang dilakukan di dalam habitat aslinya seperti di Taman Nasional Ujung Kulon",
+            "pemeliharaan dan pembiakan hewan langka di dalam kebun binatang atau taman safari di luar habitat asli",
+            "penyimpanan benih tanaman langka dalam bank genetik berteknologi tinggi di laboratorium kota",
+            "penangkaran tumbuhan langka di dalam kebun raya buatan di pusat perkotaan"
+          ],
+          "answer": 0,
+          "marker": "Buku IPS D 8 BAB1 01 · mahir",
+          "why": {
+            "1": "Pemeliharaan di kebun binatang atau taman safari merupakan contoh konservasi *ex-situ* (di luar habitat asli).",
+            "2": "Bank genetik laboratorium adalah bentuk pelestarian *ex-situ* berbasis teknologi.",
+            "3": "Kebun raya di kota juga merupakan bentuk pelestarian *ex-situ* karena berada di luar habitat alami tanaman."
+          },
+          "note": "Konservasi *in-situ* adalah perlindungan flora dan fauna yang dilakukan di dalam kawasan habitat aslinya (misalnya Taman Nasional, Cagar Alam, Suaka Margasatwa)."
+        },
+        {
+          "id": "cur_ips_d_8_t1_q13",
+          "subChapterId": "d_g8_ips_geo_1_2",
+          "feature": "Flora, Fauna & Pelestarian SDA",
+          "prompt": "Berdasarkan Buku Siswa IPS Kelas VIII Edisi Revisi Tema 01, Indonesia memiliki potensi sumber daya maritim yang melimpah. Kawasan pesisir pantai yang ditumbuhi oleh hutan mangrove bermanfaat secara fisik untuk ....",
+          "options": [
+            "mencegah terjadinya erosi dan abrasi pantai akibat terjangan gelombang laut",
+            "meningkatkan kadar garam air laut sehingga memudahkan pembuatan garam industri",
+            "mempercepat pendangkalan pelabuhan kapal komersial di muara sungai",
+            "menaikkan suhu permukaan air laut agar biota laut berkembang biak lebih cepat"
+          ],
+          "answer": 0,
+          "marker": "Buku IPS D 8 BAB1 01 · dasar",
+          "why": {
+            "1": "Mangrove tidak ditujukan untuk meningkatkan kadar garam air laut.",
+            "2": "Pendangkalan pelabuhan justru merupakan dampak negatif sedimentasi yang merugikan navigasi kapal.",
+            "3": "Mangrove tidak berfungsi menaikkan suhu air laut, melainkan menjaga keseimbangan ekosistem pesisir."
+          },
+          "note": "Akar hutan mangrove berfungsi menahan gempuran gelombang laut sehingga mencegah erosi dan abrasi di garis pantai."
+        },
+        {
+          "id": "cur_ips_d_8_t1_q14",
+          "subChapterId": "d_g8_ips_geo_1_2",
+          "feature": "Flora, Fauna & Pelestarian SDA",
+          "prompt": "Berdasarkan Buku Siswa IPS Kelas VIII Edisi Revisi Tema 01, terumbu karang merupakan salah satu potensi maritim utama Indonesia. Syarat lingkungan yang diperlukan agar ekosistem terumbu karang dapat tumbuh dengan baik dan sehat adalah ....",
+          "options": [
+            "air laut yang jernih, bersuhu hangat antara 20°C–29°C, dan mendapat sinar matahari yang cukup di perairan dangkal",
+            "perairan laut dalam yang gelap dan bersuhu sangat dingin di dasar samudra",
+            "air yang keruh dan kaya kandungan lumpur dari muara sungai berarus deras",
+            "perairan dengan kadar pencemaran minyak tinggi agar zat hara lebih pekat"
+          ],
+          "answer": 0,
+          "marker": "Buku IPS D 8 BAB1 01 · mahir",
+          "why": {
+            "1": "Dasar samudra yang gelap dan dingin tidak memungkinkan fotosintesis alga simbion terumbu karang.",
+            "2": "Air laut yang keruh dan berlumpur menutup permukaan karang sehingga menahan masuknya sinar matahari.",
+            "3": "Pencemaran minyak sangat merusak dan mematikan polip karang."
+          },
+          "note": "Terumbu karang membutuhkan air laut yang jernih agar sinar matahari dapat menembus untuk fotosintesis alga simbion (zooxanthellae), serta suhu hangat berkisar 20°C–29°C di perairan dangkal."
+        },
+        {
+          "id": "cur_ips_d_8_t1_q15",
+          "subChapterId": "d_g8_ips_geo_1_2",
+          "feature": "Flora, Fauna & Pelestarian SDA",
+          "prompt": "Berdasarkan Buku Siswa IPS Kelas VIII Edisi Revisi Tema 01, hutan mangrove juga memiliki fungsi biologis yang penting bagi keberlangsungan hewan air. Fungsi biologis tersebut diantaranya adalah ....",
+          "options": [
+            "sebagai tempat pemijahan (*spawning ground*) serta tempat mencari makan bagi ikan dan udang kecil",
+            "sebagai bahan baku pembuat kayu arang dan bahan kayu pertukangan industri",
+            "sebagai benteng pertahanan militer di pulau-pulau terluar Indonesia",
+            "sebagai sarana pembatas wilayah laut teritorial antarnegara tetangga"
+          ],
+          "answer": 0,
+          "marker": "Buku IPS D 8 BAB1 01 · dasar",
+          "why": {
+            "1": "Bahan baku kayu arang merupakan fungsi ekonomis/eksploitasi kayu, bukan fungsi biologis ekosistem.",
+            "2": "Benteng pertahanan militer bukan merupakan fungsi biologis alami ekosistem mangrove.",
+            "3": "Pembatas wilayah teritorial ditentukan oleh koordinat hukum internasional, bukan oleh hutan mangrove."
+          },
+          "note": "Fungsi biologis hutan mangrove mencakup penyediaan habitat tempat bertelur, memijah, membesar, dan mencari makan bagi beragam biota laut."
+        },
+        {
+          "id": "cur_ips_d_8_t1_q16",
+          "subChapterId": "d_g8_ips_geo_1_2",
+          "feature": "Flora, Fauna & Pelestarian SDA",
+          "prompt": "Berdasarkan Buku Siswa IPS Kelas VIII Edisi Revisi Tema 01, maraknya praktik *Illegal, Unreported, and Unregulated Fishing* (IUU Fishing) serta penggunaan alat tangkap pukat harimau (*trawl*) di perairan Indonesia dapat mengakibatkan ....",
+          "options": [
+            "kerusakan ekosistem dasar laut dan penurunan populasi ikan secara drastis karena terumbu karang hancur dan anak ikan ikut tertangkap",
+            "meningkatnya kelestarian populasi ikan besar karena anak ikan terlindungi di dasar laut",
+            "bertambahnya produktivitas terumbu karang akibat pembajakan dasar laut oleh jaring",
+            "meningkatnya kesejahteraan nelayan tradisional dalam jangka panjang tanpa batas waktu"
+          ],
+          "answer": 0,
+          "marker": "Buku IPS D 8 BAB1 01 · sedang",
+          "why": {
+            "1": "Penggunaan alat tangkap tidak ramah lingkungan tidak melindungi anak ikan, melainkan pemicu kepunahan populasi ikan.",
+            "2": "Jaring yang menyapu dasar laut menghancurkan struktur terumbu karang, bukan meningkatkan produktivitas.",
+            "3": "Eksploitasi berlebihan merusak mata pencaharian nelayan tradisional dalam jangka panjang."
+          },
+          "note": "Pukat harimau merusak ekosistem terumbu karang di dasar laut dan menangkap seluruh ukuran ikan (termasuk bibit/anak ikan), pemicu krisis sumber daya perikanan."
+        },
+        {
+          "id": "cur_ips_d_8_t1_q17",
+          "subChapterId": "d_g8_ips_geo_1_2",
+          "feature": "Flora, Fauna & Pelestarian SDA",
+          "prompt": "Berdasarkan Buku Siswa IPS Kelas VIII Edisi Revisi Tema 01, alih fungsi lahan hutan menjadi perkebunan kelapa sawit secara massif tanpa memperhatikan daya dukung lingkungan dapat memicu terjadinya ancaman ....",
+          "options": [
+            "hilangnya habitat flora-fauna endemik, erosi tanah, dan peningkatkan risiko bencana banjir serta kekeringan",
+            "meningkatnya keberagaman jenis fauna liar di sekitar wilayah pemukiman warga",
+            "bertambahnya volume air tanah yang jernih dan bebas dari bahan kimia industri",
+            "penurunan suhu udara global karena bertambahnya luasan tanaman monokultur"
+          ],
+          "answer": 0,
+          "marker": "Buku IPS D 8 BAB1 01 · sedang",
+          "why": {
+            "1": "Pembukaan hutan justru menghancurkan habitat alami satwa liar dan menurunkan keanekaragaman hayati.",
+            "2": "Pembukaan hutan mengganggu siklus hidrologi sehingga pasokan air tanah justru berkurang.",
+            "3": "Pengurangan luas hutan hujan menurunkan penyerapan karbon yang dapat memperparah pemanasan global."
+          },
+          "note": "Deforestasi dan alih fungsi lahan hutan mengurangi kemampuan tanah menyerap air, menghilangkan habitat satwa liar, serta memicu erupsi erosi tanah dan banjir."
+        },
+        {
+          "id": "cur_ips_d_8_t1_q18",
+          "subChapterId": "d_g8_ips_geo_1_2",
+          "feature": "Flora, Fauna & Pelestarian SDA",
+          "prompt": "Berdasarkan Buku Siswa IPS Kelas VIII Edisi Revisi Tema 01, pemanfaatan sumber daya maritim di Indonesia dapat dikembangkan melalui sektor pariwisata bahari. Upaya pemanfaatan yang paling sesuai dengan prinsip pembangunan berkelanjutan adalah ....",
+          "options": [
+            "mengembangkan ekowisata berbasis pemberdayaan masyarakat lokal dengan menjaga keaslian ekosistem terumbu karang",
+            "membangun resor mewah di atas terumbu karang dengan mengeruk dasar laut agar kapal pesiar besar dapat bersandar",
+            "memperbolehkan wisatawan mengambil suvenir berupa terumbu karang dan kerang langka untuk dijual kembali",
+            "membuka kawasan konservasi maritim secara bebas tanpa batasan jumlah pengunjung harian"
+          ],
+          "answer": 0,
+          "marker": "Buku IPS D 8 BAB1 01 · mahir",
+          "why": {
+            "1": "Pengerukan dasar laut merusak ekosistem terumbu karang dan biota laut di sekitarnya.",
+            "2": "Mengambil terumbu karang dan kerang langka melanggar hukum konservasi dan merusak rantai makanan laut.",
+            "3": "Wisata tanpa pembatasan daya dukung lingkungan (*overtourism*) akan mempercepat kerusakan kawasan konservasi."
+          },
+          "note": "Ekowisata bahari berkelanjutan memadukan pemanfaatan ekonomi melalui wisata dengan perlindungan kelestarian ekosistem laut serta pelibatan masyarakat lokal."
+        },
+        {
+          "id": "cur_ips_d_8_t1_q19",
+          "subChapterId": "d_g8_ips_geo_1_2",
+          "feature": "Flora, Fauna & Pelestarian SDA",
+          "prompt": "Berdasarkan Buku Siswa IPS Kelas VIII Edisi Revisi Tema 01, tanah vulkanis di Indonesia sangat subur dan bernilai ekonomis tinggi untuk sektor pertanian. Pembentukan jenis tanah vulkanis tersebut terjadi akibat ....",
+          "options": [
+            "pelapukan material letusan gunung api seperti abu vulkanis yang kaya akan unsur hara mineral",
+            "pengendapan sisa-sisa cangkang kerang dan hewan laut di perairan pantai dangkal",
+            "pelapukan dedaunan yang membusuk di dasar rawa-rawa berair tenang",
+            "pengikisan batuan kapur oleh air hujan di wilayah pegunungan karst"
+          ],
+          "answer": 0,
+          "marker": "Buku IPS D 8 BAB1 01 · mahir",
+          "why": {
+            "1": "Pengendapan kerang di laut membentuk batuan kapur/gamping, bukan tanah vulkanis.",
+            "2": "Pelapukan tumbuhan rawa membentuk tanah gambut atau tanah organosol.",
+            "3": "Pengikisan batuan kapur menghasilkan tanah mediteran atau tanah kapur yang cenderung kurang subur."
+          },
+          "note": "Tanah vulkanis terbentuk dari material endapan abu dan tefra erupsi gunung api yang mengalami pelapukan sehingga kaya mineral pendukung kesuburan tanaman."
+        },
+        {
+          "id": "cur_ips_d_8_t1_q20",
+          "subChapterId": "d_g8_ips_geo_1_2",
+          "feature": "Flora, Fauna & Pelestarian SDA",
+          "prompt": "Berdasarkan Buku Siswa IPS Kelas VIII Edisi Revisi Tema 01, pengelolaan sumber daya alam harus menerapkan prinsip efisiensi dan pembangunan berkelanjutan (*sustainable development*). Penerapan prinsip tersebut dalam kegiatan pemanfaatan sumber daya alam tercermin pada tindakan ....",
+          "options": [
+            "melakukan reboisasi pada lahan bekas tambang dan menerapkan sistem tebang pilih dalam pemanfaatan kayu hutan",
+            "menguras habis seluruh cadangan bahan tambang fosil demi mengejar target pertumbuhan ekonomi setinggi-tingginya",
+            "membuang limbah industri secara langsung ke aliran sungai untuk menekan biaya operasional pabrik",
+            "mengubah seluruh kawasan cagar alam menjadi kawasan industri dan permukiman modern"
+          ],
+          "answer": 0,
+          "marker": "Buku IPS D 8 BAB1 01 · mahir",
+          "why": {
+            "1": "Menguras habis cadangan SDA tanpa pemikiran masa depan melanggar prinsip keadilan antargenerasi dalam pembangunan berkelanjutan.",
+            "2": "Membuang limbah tanpa pengolahan merusak lingkungan dan mencemari sumber air bersih.",
+            "3": "Mengubah cagar alam menjadi kawasan industri merusak kawasan perlindungan ekosistem alami."
+          },
+          "note": "Pembangunan berkelanjutan menjamin pemanfaatan SDA secara efisien dengan memperhatikan kelestarian lingkungan bagi generasi mendatang (seperti tebang pilih dan reklamasi/reboisasi bekas tambang)."
+        }
+      ]
+    },
   ];
 
   // Lookup peta cepat
