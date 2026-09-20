@@ -1,114 +1,104 @@
-# HANDOFF — Penyelarasan 5 Mapel Inti dengan Daftar Isi Buku Siswa Kemendikbudristek
+# HANDOFF — Bank Mapel Fase D: kenapa isinya DICABUT, dan apa syarat isinya boleh kembali
 
-**Repo:** `FIEZEL-APPS/FIEZEL-APPS` · **Basis ukur:** `m025-349` · **Status:** taksonomi selesai, pengisian bab berjalan
+**Repo:** `FIEZEL-APPS/FIEZEL-APPS` · **Basis ukur:** `m025-349` · **Keputusan:** OWNER
 
 ---
 
-## 1. Kenapa ini dikerjakan
+## 1. Apa yang dicabut
 
-Sampai `m025-348`, guru yang menyusun tugas di Ruang Guru membaca daftar seperti ini:
+Seluruh sepuluh berkas bank mapel Fase D dihapus:
 
 ```
-KOMP-IPA-D-7-MET-01   Besaran, Satuan & Metode Ilmiah
-KOMP-IPA-D-7-ZAT-01   Wujud Zat, Perubahan Fisika & Kimia
+content/mapel/mapel-{ipa,mat,eng,ind,ips}-d.json
+content/mapel/mapel-{ipa,mat,eng,ind,ips}-d-th.json
 ```
 
-Tidak satu pun dari empat baris itu tercetak di buku yang dipegang muridnya. Buku Siswa
-Kemendikbudristek Kurikulum Merdeka menyebutnya **"Bab 1: Hakikat Ilmu Sains dan Metode
-Ilmiah"** dan **"Bab 2: Zat dan Perubahannya"**. Kodenya lebih buruk lagi: `MET`, `ZAT`,
-`TEK` adalah singkatan buatan sendiri, bukan alamat yang bisa ditunjuk guru di kelas.
+Isinya 408 butir soal. **Semuanya ditulis AI**, termasuk 324 butir yang sudah lebih dulu
+hidup di `main` lewat PR #444 dan sudah sampai ke guru.
 
-Biayanya ditanggung guru, tiap kali: ia harus menerjemahkan istilah aplikasi ke istilah
-buku sebelum bisa memilih tugas yang benar.
+## 2. Kenapa dicabut
 
----
+Tidak satu pun butir itu berasal dari bank soal resmi Kemendikbudristek, dan **tidak ada
+satu pun berkas sumber resmi di repo ini** yang bisa dirujuk — dicari dengan `find` untuk
+PDF, "buku siswa", "kemendikbud", "bskap": nol hasil.
 
-## 2. Apa yang berubah
+Yang lebih berbahaya daripada butirnya adalah kutipannya. Tiap kompetensi mencantumkan:
 
-**Satu kompetensi = satu BAB Buku Siswa.** Nama bab, sub-bab, dan nomor bab ditulis persis
-seperti Daftar Isi bukunya.
-
-Kode berubah bentuk:
-
-```
-KOMP-IPA-D-7-MET-01   ->   KOMP-IPA-D-7-BAB1-01
-KOMP-<MAPEL>-D-<kelas>-BAB<n>-<NN>
+```json
+"cpRef": "Kepmendikbudristek/BSKAP No. 032/H/KR/2024 — Buku Siswa IPA Kelas 7 Bab 1"
 ```
 
-**Dua kompetensi berpindah kelas mengikuti bukunya, bukan kebiasaan lama:**
+Nomor kepmen itu tidak pernah diverifikasi terhadap dokumen aslinya. Ia lahir di commit
+`2ae61ab` (agen AI), lalu dibuat **lebih spesifik** di cabang ini dengan menambahkan
+"Buku Siswa IPA Kelas 7 Bab 1" — sehingga kutipannya tampak lebih bisa ditelusuri padahal
+tetap tidak terverifikasi.
 
-| Kompetensi | Sebelum | Sesudah | Alasan |
-|---|---|---|---|
-| Tekanan Zat dan Penerapannya | kelas 8 | kelas 9 Bab 3 | di situlah bab itu dicetak |
-| Bilangan Berpangkat dan Bentuk Akar | kelas 9 | kelas 8 Bab 1 | di situlah bab itu dicetak |
+Gerbang lama ikut bersalah: ia menuntut `cpRef` sepanjang >= 10 karakter. Kutipan yang
+TERDENGAR resmi lolos; kutipan yang benar-benar resmi tidak dibedakan sama sekali. **Panjang
+string bukan bukti keabsahan.** Gerbang yang mengukur panjang mengajari penulis berikutnya
+menulis string yang panjang, bukan string yang benar.
 
-Perpindahan ini tampak sepele dan tidak. Guru kelas 8 yang mencari "Bilangan Berpangkat"
-sebelumnya tidak menemukannya sama sekali, karena bank menaruhnya di kelas 9.
+Guru memakai materi ini di kelas. Kutipan resmi palsu lebih berbahaya daripada tanpa
+kutipan, karena guru mempercayainya dan tidak punya alasan memeriksanya.
 
-**Dua mapel baru masuk jalur bank:** Bahasa Indonesia (`IND`) dan IPS (`IPS`). Sebelumnya
-keduanya hidup di jalur template lama bersama 14 mapel lain.
+## 3. Apa yang TIDAK ikut mati
 
----
+Pencabutan ini tidak boleh terasa oleh guru mana pun. Yang dijaga:
 
-## 3. Sensus sasaran
+- **Ketujuh belas mapel tetap melayani soal** lewat jalur template lama (`fail-quiet`).
+  Gerbang menuntut ini secara eksplisit untuk ke-17 mapel, bukan sampel.
+- **`sw.js` tidak lagi menyebut berkas bank mana pun.** Ini bukan kerapian: `addAll()`
+  menolak SELURUH precache bila satu alamat gagal, jadi satu entri hantu membuat service
+  worker gagal pasang. Gerbang sekarang memeriksa silang daftar precache terhadap berkas
+  yang benar-benar ada.
+- **Mekanisme banknya tetap utuh** di `fiezel-teacher-shell.js`. Yang hilang isinya, bukan
+  jalurnya — begitu bank resmi ada, ia langsung terbaca.
 
-| Mapel | Bab | Butir |
-|---|---|---|
-| IPA | 19 | 228 |
-| Matematika | 18 | 216 |
-| Bahasa Indonesia | 17 | 204 |
-| Bahasa Inggris | 15 | 180 |
-| IPS | 12 | 144 |
-| **Total** | **81** | **972** |
+## 4. Syarat isinya boleh kembali
 
-Angka 81 bukan target bulat buatan gerbang — ia jumlah bab yang benar-benar tercetak di
-Daftar Isi kelima Buku Siswa untuk Fase D.
+Gerbang `tests/mapel-fase-d-content-test.js` sekarang **tidak menuntut isi sama sekali**.
+Nol bank = hijau. Bank kosong bukan utang yang harus ditambal cepat-cepat; ia keadaan jujur
+sampai sumbernya ada.
 
----
+Tetapi begitu satu berkas bank muncul, ia wajib membawa asal-usulnya:
 
-## 4. Yang ditegakkan gerbang
+```json
+"provenance": {
+  "dokumen": "Ilmu Pengetahuan Alam untuk SMP/MTs Kelas VII (Edisi Revisi)",
+  "penerbit": "Pusat Perbukuan, Kemendikdasmen",
+  "tahun": "2023",
+  "isbn": "978-623-118-458-0",
+  "diperolehDari": "<alamat unduh resmi + tanggal unduh>",
+  "penyusunButir": "resmi-terverifikasi | guru-tervalidasi"
+}
+```
 
-`tests/mapel-fase-d-content-test.js` (naik dari tiga mapel menjadi lima):
+Dua aturan yang membuat kesalahan kemarin tidak bisa terulang tanpa terlihat:
 
-1. Bentuk kode `KOMP-<MAPEL>-D-<kelas>-BAB<n>-<NN>`, dan kelas di dalam kode = medan `grade`.
-2. >= 12 butir per bab; >= 3 bab per kelas 7/8/9 tiap mapel.
-3. Sensus 81 kompetensi / 972 butir.
-4. Tiap butir: 4 opsi berbeda, kunci di indeks 0 pada sumber, `why` kunci terisi, dan
-   `distractorWhy` ketiga pengecoh terisi.
-5. Sebaran kesulitan tiap bab: >= 3 `dasar`, >= 3 `sedang`, >= 2 `tinggi`.
-6. NOL rujukan posisi pilihan di `why`/`distractorWhy`, dalam bahasa apa pun. Opsi diacak
-   saat terbit, jadi "pilihan pertama yang benar" berbohong 3 dari 4 kali.
-7. Paritas sidecar Thai: tiap `code` dan `id` punya kembaran, nilai th ber-aksara Thai,
-   himpunan `{placeholder}` sama persis, dan **himpunan angka di dalam opsi id vs th sama
-   persis** — supaya murid Thai tidak pernah mengerjakan soal dengan angka berbeda.
-8. Fail-quiet: bank absen => perilaku lama, nol lemparan.
+1. **`penyusunButir` wajib** bernilai `resmi-terverifikasi` atau `guru-tervalidasi`. Nilai
+   `ai-belum-divalidasi` sengaja disediakan supaya draf AI bisa disimpan tanpa berbohong
+   tentang dirinya — dan sengaja **DITOLAK** gerbang, supaya draf itu tidak pernah diam-diam
+   menjadi materi kelas.
+2. **`cpRef` harus menunjuk dokumen yang sama** dengan `provenance.dokumen`. Kutipan yang
+   tidak bisa ditelusuri ke dokumen yang dipegang bank itu bukan kutipan, melainkan hiasan.
+   Panjang string tidak lagi diukur sama sekali.
 
-**Bahasa Inggris punya satu kelonggaran yang disengaja:** batang soal dan opsi tetap dalam
-bahasa Inggris pada kedua berkas, karena bahasa Inggris memang materinya — menerjemahkannya
-merusak soalnya. Yang tetap wajib ber-aksara Thai adalah `why` dan `distractorWhy`, karena
-itu penjelasan untuk murid, bukan materi ujian.
+## 5. Kenapa agen tidak bisa mengunduh sendiri sumbernya
 
----
+Lingkungan eksekusi ini memblokir seluruh egress keluar — bukan hanya domain Kemendikbud.
+`curl` ke `example.com` pun mengembalikan `000`, dan `WebFetch` menjawab `EGRESS_BLOCKED`
+untuk setiap domain. Yang masih jalan hanya pencarian web, yang mengembalikan cuplikan dari
+situs pihak ketiga.
 
-## 5. Cara menambah bab baru
+Menyusun daftar isi dari blog pihak ketiga lalu menyebutnya resmi adalah persis kesalahan
+yang dicabut di dokumen ini. Karena itu sumber resminya **diunduh oleh OWNER** dan
+diletakkan di repo, bukan direkonstruksi oleh agen.
 
-Bank ditulis dari SATU sumber yang melahirkan dua berkas sekaligus (Indonesia + sidecar
-Thai), sehingga tidak mungkin mengirim kunci tanpa kembarannya. Pola penulisannya ada di
-riwayat commit cabang ini. Yang perlu diingat:
+## 6. Dua persoalan berbeda yang tidak boleh dikaburkan
 
-- `content/mapel/mapel-<mapel>-d.json` dan `-th.json` wajib punya `code`, `id`, `answer`,
-  dan jumlah opsi yang sama persis dan berurutan sama.
-- Kunci jawaban SELALU indeks 0 di berkas sumber. `shuffleOptions()` yang mengacaknya saat
-  tugas diterbitkan.
-- `distractorWhy` bukan hiasan: tiap pengecoh menjelaskan MISKONSEPSI yang membuat murid
-  memilihnya, bukan sekadar menyatakan bahwa itu salah. Inilah yang dibaca guru saat
-  membahas hasil ulangan.
-
----
-
-## 6. Yang BELUM selesai
-
-Pengisian 81 bab berjalan bab demi bab. Gerbang `mapel-fase-d-content-test` MERAH sampai
-kelimanya lengkap — itu memang maksudnya, bukan kelalaian. Jangan menurunkan angka sensus
-di gerbang untuk menghijaukannya; turunkan hanya bila OWNER memang memutuskan cakupannya
-berkurang, dan catat keputusannya di sini.
+- **Struktur bab** BISA dibuat benar-benar resmi: daftar isi Buku Siswa terbatas, terbaca,
+  dan bisa dicocokkan persis — tidak kurang tidak lebih.
+- **Butir soal** TIDAK bisa "resmi" dengan cara yang sama. Kemendikbudristek tidak
+  menerbitkan bank 972 soal resmi. Soal latihan di dalam Buku Siswa jumlahnya terbatas, dan
+  menyalinnya utuh adalah persoalan lisensi tersendiri. Bank sebesar apa pun pasti disusun
+  seseorang — yang menentukan adalah **siapa**, dan apakah itu **dinyatakan jujur**.
