@@ -1,413 +1,417 @@
 import json
+
 data = {
-  "code": "KOMP-IND-D-7-BAB1-01",
-  "grade": 7,
-  "name": "Bab 1: Jelajah Nusantara",
-  "materi": "Mengakses Informasi & Menjelajah Keindahan Alam, Memahami Gaya & Isi Teks Deskripsi, Unsur Kebahasaan: Kata Berimbuhan meN- & Majas Personifikasi",
-  "cpRef": "Bahasa Indonesia untuk SMP/MTs Kelas VII (Edisi Revisi) — Bab 1",
+  "code": "KOMP-ENG-D-8-BAB4-01",
+  "grade": 8,
+  "name": "Chapter 4: No Littering",
+  "materi": "Recounting Waste Clean-Up Events, Waste Sorting & Management, Past Continuous Tense (was/were + v-ing), Environmental Action",
+  "cpRef": "English for Nusantara untuk SMP/MTs Kelas VIII",
   "items": [
     {
-      "id": "ind-d-7-b1-q01",
-      "difficulty": "dasar",
-      "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VII hal. 4, dalam teks 'Pantan Terong yang Instagramable', objek wisata Pantan Terong terletak di kota...",
+      "id": "eng-d-8-c4-q01",
+      "difficulty": "easy",
+      "prompt": "Read the dialogue snippet from Unit 1 Section 2:\nGalang: \"Was the river this dirty back then? Did you swim in the river?\"\nPak Rahmansyah: \"I did! The river was quite clean back then. A lot of kids swam and played in the river.\"\n\nWhat condition was Sungai Lestari in when Pak Rahmansyah was a child?",
       "options": [
-        "Takengon",
-        "Banda Aceh",
-        "Lampung",
-        "Pangandaran"
+        "It was clean and local children often swam and played in it.",
+        "It was already filled with plastic trash and polluted.",
+        "It was deep and dangerous so children were forbidden to go near.",
+        "It was dried up because of a severe drought in the nearby town."
       ],
       "answer": 0,
       "why": {
-        "0": "Teks deskripsi 'Pantan Terong yang Instagramable' secara eksplisit menyebutkan bahwa Pantan Terong merupakan nama tempat wisata populer yang berada di Kota Takengon, Aceh."
+        "0": "Teks percakapan menyebutkan bahwa dahulu Sungai Lestari cukup bersih (\"quite clean back then\") dan banyak anak-anak berenang serta bermain di sana."
       },
       "distractorWhy": {
-        "1": "Banda Aceh merupakan kota asal keberangkatan rombongan Rafa pada pukul 01.00 siang, bukan lokasi dari objek wisata Pantan Terong.",
-        "2": "Lampung merupakan lokasi objek wisata kuliner Gang PU yang dibahas dalam teks deskripsi lain berjudul 'Jelajah Rasa di Lampung'.",
-        "3": "Pangandaran merupakan lokasi destinasi wisata Green Canyon dan Sungai Santirah yang dibahas pada bab mengenai pamflet wisata."
+        "1": "Pernyataan ini bertentangan dengan penjelasan Pak Rahmansyah yang menyatakan bahwa sungai tersebut dahulu masih bersih.",
+        "2": "Dialog tidak menyebutkan sungai itu berbahaya atau melarang anak-anak mendekat, melainkan menceritakan bahwa banyak anak bermain di sungai.",
+        "3": "Teks tidak menyebutkan terjadinya kekeringan atau sungai kering."
       }
     },
     {
-      "id": "ind-d-7-b1-q02",
-      "difficulty": "dasar",
-      "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VII hal. 5, berapakah ketinggian bukit Pantan Terong di atas permukaan laut?",
+      "id": "eng-d-8-c4-q02",
+      "difficulty": "easy",
+      "prompt": "Based on Bu Posma's explanation in Unit 1 Section 2, why does plastic trash cause long-term pollution in rivers like Sungai Lestari?",
       "options": [
-        "1.830 meter dpl",
-        "2.662 meter dpl",
-        "1.500 meter dpl",
-        "3.000 meter dpl"
+        "Because plastic does not decay easily and accumulates in many places.",
+        "Because plastic dissolves instantly in water and poisons river fish.",
+        "Because plastic turns into organic fertilizer that attracts algae.",
+        "Because plastic sinks to the bottom and burns underwater."
       ],
       "answer": 0,
       "why": {
-        "0": "Pada teks halaman 5 disebutkan secara rinci bahwa pemandangan cantik di Pantan Terong dinikmati dari ketinggian 1.830 meter di atas permukaan laut."
+        "0": "Bu Posma menjelaskan bahwa sampah plastik menjadi masalah utama karena tidak mudah terurai (\"plastic does not decay easily\") sehingga mengotori berbagai tempat."
       },
       "distractorWhy": {
-        "1": "Ketinggian 2.662 mdpl merupakan ketinggian Gunung Papandayan sebagaimana tercantum dalam pamflet wisata Papandayan di halaman 16.",
-        "2": "Ketinggian 1.500 meter dpl bukan angka ketinggian yang tercantum dalam teks deskripsi Pantan Terong maupun Gunung Papandayan.",
-        "3": "Angka 3.000 merupakan rata-rata curah hujan (mm/tahun) Gunung Papandayan, bukan ukuran ketinggian Pantan Terong di atas permukaan laut."
+        "1": "Plastik tidak larut secara instan dalam air, melainkan justru sangat sulit terurai.",
+        "2": "Plastik adalah bahan anorganik dan tidak berubah menjadi pupuk organik.",
+        "3": "Plastik yang berada di dalam air sungai tidak terbakar di bawah air."
       }
     },
     {
-      "id": "ind-d-7-b1-q03",
-      "difficulty": "sedang",
-      "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VII hal. 5-6, manakah yang merupakan kalimat perincian untuk menggambarkan keindahan pemandangan alam dari atas Pantan Terong?",
+      "id": "eng-d-8-c4-q03",
+      "difficulty": "medium",
+      "prompt": "Choose the grammatically correct interrogative sentence in Simple Past tense based on Language Focus Unit 1:",
       "options": [
-        "Dari ketinggian, terlihat warna langit yang jingga terkena semburat sinar matahari di balik deretan gunung-gunung yang kokoh.",
-        "Sebelum pulang, ibuku membeli suvenir yang berbentuk kopi gayo untuk membantu perajin lokal.",
-        "Kami berangkat dari Banda Aceh pukul 01.00 siang dan tiba pukul 08.00 malam di rumah Paman.",
-        "Jalanan kecil menuju puncak sangat menanjak dan curam dengan tikungan-tikungan yang tajam."
+        "Did people throw their trash into the river?",
+        "Did people threw their trash into the river?",
+        "Was people throw their trash into the river?",
+        "Were people threw their trash into the river?"
       ],
       "answer": 0,
       "why": {
-        "0": "Kalimat tersebut merinci secara spesifik gambaran visual pemandangan alam (warna langit jingga, semburat matahari, deretan gunung kokoh) yang melibatkan pancaindra penglihatan."
+        "0": "Dalam kalimat tanya Simple Past Tense menggunakan kata bantu \"Did\", kata kerja utama kembali ke bentuk dasar (infinitive/Verb 1), yaitu \"throw\"."
       },
       "distractorWhy": {
-        "1": "Kalimat tentang membeli suvenir merupakan bagian dari ajakan mempromosikan produk/kerajinan lokal, bukan perincian keindahan alam.",
-        "2": "Kalimat tersebut menguraikan alur perjalanan waktu dan tempat dari Banda Aceh ke Takengon, bukan kalimat perincian gambaran alam.",
-        "3": "Kalimat tentang jalanan menanjak dan curam menggambarkan kondisi medan perjalanan menuju puncak bukit, bukan perincian keindahan pemandangan dari atas."
+        "1": "Kata kerja setelah kata bantu \"Did\" harus berupa Verb 1 (\"throw\"), bukan kata kerja bentuk lampau (\"threw\").",
+        "2": "Kata bantu \"Was\" tidak digunakan bersama kata kerja aksi (\"throw\") dalam struktur kalimat tanya sederhana ini.",
+        "3": "Kata bantu \"Were\" tidak dipadukan dengan Verb 2 (\"threw\") dalam pembentukan kalimat tanya Simple Past."
       }
     },
     {
-      "id": "ind-d-7-b1-q04",
-      "difficulty": "dasar",
-      "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VII hal. 6, jenis makanan atau minuman khas yang dapat dicicipi wisatawan saat berkunjung ke Pantan Terong di Tanah Gayo adalah...",
+      "id": "eng-d-8-c4-q04",
+      "difficulty": "medium",
+      "prompt": "In Audio 4.2 (Unit 1), what main obstacle caused the rainwater to back up and flood the area after the heavy rain?",
       "options": [
-        "Kopi gayo",
-        "Keripik pisang",
-        "Bandrek hangat",
-        "Kue balok lumer"
+        "Almost all gutters were clogged and full of plastic trash.",
+        "The river dam broke due to an earthquake.",
+        "The local residents blocked the water pipes intentionally.",
+        "The sea level rose suddenly and flooded the town."
       ],
       "answer": 0,
       "why": {
-        "0": "Teks menyebutkan bahwa pengunjung dapat mencicipi aneka varian sajian kopi asli Tanah Gayo seperti espresso, cappuccino, mochacino, hingga latte."
+        "0": "Petugas penyelamat melaporkan bahwa saluran air (gutters) tersumbat dan penuh dengan sampah plastik sehingga air hujan meluap."
       },
       "distractorWhy": {
-        "1": "Keripik pisang merupakan makanan khas yang diulas dalam teks deskripsi lisan 'Jelajah Rasa di Lampung' di Gang PU Bandar Lampung.",
-        "2": "Bandrek merupakan sajian minuman hangat yang dijadikan contoh objek latihan deskripsi gambar pada Kegiatan 5a halaman 14.",
-        "3": "Kue balok merupakan contoh objek wacana pembanding kalimat perincian rasa dan tekstur makanan pada halaman 12."
+        "1": "Teks tidak menyebutkan adanya bendungan yang jebol akibat gempa bumi.",
+        "2": "Tidak ada informasi mengenai warga yang sengaja menyumbat pipa air.",
+        "3": "Banjir disebabkan oleh hujan lebat dan saluran air yang tersumbat sampah plastik, bukan oleh kenaikan permukaan laut."
       }
     },
     {
-      "id": "ind-d-7-b1-q05",
-      "difficulty": "sedang",
-      "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VII hal. 7, kata 'instagramable' yang digunakan dalam teks deskripsi merupakan istilah yang memiliki makna...",
+      "id": "eng-d-8-c4-q05",
+      "difficulty": "easy",
+      "prompt": "Complete the sentence with the correct past form of 'be' based on Language Focus Unit 1:\n\"In some areas of the town, many houses _____ almost underwater during the flood.\"",
       "options": [
-        "Layak atau indah untuk diunggah dan dijadikan latar berswafoto di media sosial Instagram",
-        "Dapat dibeli dengan harga murah sebagai suvenir khas daerah",
-        "Memiliki nilai sejarah yang tinggi dan dilindungi pemerintah",
-        "Dapat diakses dengan mudah menggunakan kendaraan umum"
+        "were",
+        "was",
+        "is",
+        "are"
       ],
       "answer": 0,
       "why": {
-        "0": "Dalam penjelasan buku hal. 9, instagramable adalah kata serapan bahasa Inggris yang disematkan pada tempat yang indah untuk latar swafoto di Instagram."
+        "0": "Subjek kalimat adalah \"many houses\" (jamak/plural), sehingga kata bantu 'be' dalam bentuk lampau yang tepat adalah \"were\"."
       },
       "distractorWhy": {
-        "1": "Makna barang murah yang dijadikan oleh-oleh merujuk pada pengertian suvenir atau cendera mata lokal.",
-        "2": "Nilai sejarah dan perlindungan pemerintah merujuk pada objek cagar budaya atau cagar alam, bukan makna istilah instagramable.",
-        "3": "Keterjangkauan akses kendaraan umum merupakan aspek aksesibilitas tempat wisata seperti yang dibahas pada analisis pamflet Papandayan."
+        "1": "Bentuk \"was\" digunakan untuk subjek tunggal (singular), sedangkan subjek kalimat ini jamak.",
+        "2": "Bentuk \"is\" merupakan to be present tense untuk subjek tunggal, tidak cocok untuk konteks kejadian masa lalu.",
+        "3": "Bentuk \"are\" merupakan to be present tense, padahal kalimat menceritakan peristiwa di masa lalu (past tense)."
       }
     },
     {
-      "id": "ind-d-7-b1-q06",
-      "difficulty": "sedang",
-      "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VII hal. 8-9 (Kegiatan 3), perhatikan pencarian makna kata dalam KBBI cetak. Jika kita mencari makna kata dasar 'meredup' dalam KBBI cetak, kata dasar yang harus dicari pada abjad 'R' adalah...",
+      "id": "eng-d-8-c4-q06",
+      "difficulty": "medium",
+      "prompt": "Which of the following questions correctly asks about the state of the gutters in the past using Was/Were?",
       "options": [
-        "redup",
-        "meredup",
-        "edup",
-        "redupkan"
+        "Were the gutters full of plastic trash after the storm?",
+        "Did the gutters was full of plastic trash after the storm?",
+        "Was the gutters full of plastic trash after the storm?",
+        "Were the gutters filled trash do after the storm?"
       ],
       "answer": 0,
       "why": {
-        "0": "Kaidah pencarian kata dalam KBBI cetak mengharuskan pengguna menemukan kata dasarnya terlebih dahulu. Kata dasar dari kata berimbuhan 'meredup' adalah 'redup'."
+        "0": "Subjek \"the gutters\" berbentuk jamak, sehingga kalimat tanya nominal di masa lalu diawali dengan \"Were\" diikuti subjek dan kata sifat/frasa preposisi."
       },
       "distractorWhy": {
-        "1": "Pencarian langsung menggunakan kata berimbuhan 'meredup' kurang tepat dalam KBBI cetak karena entri disusun berdasarkan kata dasar.",
-        "2": "Bentuk 'edup' bukanlah kata dasar bahasa Indonesia yang valid dari verba meredup.",
-        "3": "Bentuk 'redupkan' adalah bentuk kata dasar yang sudah mendapat akhiran -kan, bukan kata dasar murni."
+        "1": "Penggabungan kata bantu \"Did\" dan \"was\" secara bersamaan dalam satu klausa tidak sesuai tata bahasa.",
+        "2": "Bentuk \"Was\" seharusnya digunakan untuk subjek tunggal, sedangkan \"the gutters\" adalah kata benda jamak.",
+        "3": "Susunan kata dan penggunaan \"filled trash do\" tidak memenuhi struktur tata bahasa yang valid."
       }
     },
     {
-      "id": "ind-d-7-b1-q07",
-      "difficulty": "dasar",
-      "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VII hal. 10-11 (Kupas Teori), manakah yang BUKAN merupakan ciri atau tujuan utama dari teks deskripsi?",
+      "id": "eng-d-8-c4-q07",
+      "difficulty": "easy",
+      "prompt": "Read the excerpt from Unit 2 Section 3:\n\"A team of scientists from Texas University helped an injured sea turtle when they sailed in the ocean near Costa Rica. The scientists were collecting data on sea turtles when they saw the injured turtle.\"\n\nWhere were the scientists when they spotted the injured sea turtle?",
       "options": [
-        "Menceritakan urutan peristiwa rekaan dengan plot konflik yang rumit",
-        "Menggambarkan atau melukiskan suatu benda, tempat, atau suasana tertentu",
-        "Melibatkan pancaindra agar pembaca seolah-olah melihat atau merasakan sendiri",
-        "Menjelaskan ciri-ciri objek seperti warna, ukuran, dan bentuk secara terperinci"
+        "In the ocean near Costa Rica.",
+        "At a turtle breeding center in Texas.",
+        "On a public beach in Kuta, Bali.",
+        "In a laboratory at Texas University."
       ],
       "answer": 0,
       "why": {
-        "0": "Menceritakan urutan peristiwa rekaan dengan konflik rumit merupakan ciri dari teks narasi/fantasi, bukan teks deskripsi yang berfokus melukiskan objek konkret."
+        "0": "Teks bacaan menyebutkan bahwa para ilmuwan sedang berlayar di samudra dekat Costa Rica ketika mereka melihat penyu yang terluka."
       },
       "distractorWhy": {
-        "1": "Pernyataan ini tepat merupakan salah satu poin utama tujuan teks deskripsi pada halaman 9.",
-        "2": "Pernyataan ini tepat merupakan ciri teks deskripsi yang melibatkan penglihatan, pendengaran, penciuman, dan perabaan pada halaman 10.",
-        "3": "Pernyataan ini tepat merupakan ciri teks deskripsi yang menguraikan rupa dan bentuk objek secara mendetail pada halaman 10."
+        "1": "Meskipun para ilmuwan berasal dari Texas University, lokasi penemuan penyu berada di laut dekat Costa Rica.",
+        "2": "Pantai Kuta Bali merupakan latar lokasi untuk cerita di Unit 3 (gerakan Bye Bye Plastic Bags), bukan cerita penyu di Unit 2.",
+        "3": "Para ilmuwan melihat penyu saat berlayar di laut, bukan di dalam laboratorium."
       }
     },
     {
-      "id": "ind-d-7-b1-q08",
-      "difficulty": "sedang",
-      "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VII hal. 12 (Tabel 1.2), perhatikan kalimat umum: 'Kue balok itu enak sekali.' Manakah kalimat perincian yang tepat untuk mendukung kalimat umum tersebut?",
+      "id": "eng-d-8-c4-q08",
+      "difficulty": "easy",
+      "prompt": "Based on the story in Unit 2 Section 3, what object did the scientists pull out of the injured sea turtle's nostril?",
       "options": [
-        "Teksturnya lembut saat digigit dan isian cokelatnya akan lumer di mulutmu.",
-        "Kue balok dibeli oleh Paman di toko roti terkenal kemarin sore.",
-        "Harganya sangat murah sehingga terjangkau oleh semua kalangan.",
-        "Kue tersebut dikemas dalam kotak karton berwarna cokelat tua."
+        "A plastic straw.",
+        "A sharp fish hook.",
+        "A piece of fishing net.",
+        "A dangerous natural parasite."
       ],
       "answer": 0,
       "why": {
-        "0": "Teks buku halaman 12 memberikan contoh kalimat perinci untuk rasa kue balok yang enak: 'Teksturnya lembut saat digigit dan isian cokelatnya akan lumer di mulutmu.'"
+        "0": "Hasil pemeriksaan menunjukkan bahwa benda yang tersumbat di lubang hidung penyu adalah sedotan plastik (\"plastic straw\")."
       },
       "distractorWhy": {
-        "1": "Kalimat ini menjelaskan alur transaksi pembelian kue, bukan perincian citra rasa atau tekstur yang membuktikan kue itu enak.",
-        "2": "Kalimat ini menguraikan aspek ekonomis atau harga kue, bukan perincian kelezatan rasa kue balok.",
-        "3": "Kalimat ini menggambarkan aspek kemasan luar (wadah), bukan perincian rasa atau kualitas makanan saat dikonsumsi."
+        "1": "Teks tidak menyebutkan adanya kail pancing.",
+        "2": "Benda yang dikeluarkan dari hidung penyu adalah sedotan plastik, bukan jaring ikan.",
+        "3": "Ilmuwan awalnya mengira itu mungkin parasit, tetapi setelah ditarik ternyata benda tersebut adalah sedotan plastik."
       }
     },
     {
-      "id": "ind-d-7-b1-q09",
-      "difficulty": "dasar",
-      "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VII hal. 13 (Kupas Teori), gaya bahasa yang mengumpamakan benda mati seolah-olah hidup dan dapat berperilaku seperti manusia disebut...",
+      "id": "eng-d-8-c4-q09",
+      "difficulty": "medium",
+      "prompt": "Which sentence uses the Past Continuous Tense correctly to describe an action in progress in the past?",
       "options": [
-        "Majas personifikasi",
-        "Majas metafora",
-        "Majas hiperbola",
-        "Majas asosiasi"
+        "The scientists were collecting data on sea turtles when they saw the turtle.",
+        "The scientists was collecting data on sea turtles when they saw the turtle.",
+        "The scientists were collect data on sea turtles when they saw the turtle.",
+        "The scientists collected data while they were see the turtle."
       ],
       "answer": 0,
       "why": {
-        "0": "Kupas Teori halaman 13 mendefinisikan majas personifikasi sebagai gaya bahasa yang mengumpamakan benda mati seolah-olah hidup seperti manusia."
+        "0": "Subjek \"The scientists\" (jamak) berpasangan dengan \"were\" dan kata kerja berakhiran -ing (\"collecting\") untuk membentuk Past Continuous Tense."
       },
       "distractorWhy": {
-        "1": "Majas metafora adalah pemakaian kata yang bukan arti sebenarnya sebagai pembanding langsung tanpa kata pembanding, bukan penginsanan benda mati.",
-        "2": "Majas hiperbola adalah gaya bahasa pengungkapan yang berlebih-lebihan untuk menekankan kesan.",
-        "3": "Majas asosiasi adalah perbandingan dua hal yang sifatnya berbeda tetapi dianggap sama dengan kata pembanding seperti bagai, ibarat, bak."
+        "1": "Subjek jamak \"The scientists\" harus menggunakan \"were\", bukan \"was\".",
+        "2": "Past Continuous Tense membutuhkan kata kerja berakhiran -ing (\"collecting\"), bukan bentuk dasar (\"collect\").",
+        "3": "Kata kerja setelah \"were\" harus berbentuk V-ing (\"seeing\"), bukan bentuk dasar (\"see\")."
       }
     },
     {
-      "id": "ind-d-7-b1-q10",
-      "difficulty": "sedang",
-      "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VII hal. 13, perhatikan kalimat berikut: 'Angin yang bertiup memainkan rambut dan berputar di sekeliling tubuh.' Kata kerja yang menandai pengumpamaan benda mati seolah-olah hidup pada kalimat tersebut adalah...",
+      "id": "eng-d-8-c4-q10",
+      "difficulty": "easy",
+      "prompt": "Complete the Wh- question based on Language Focus Unit 2:\n\"______ did the team of scientists sail when they found the injured turtle?\"\nAnswer: \"They sailed in the ocean near Costa Rica.\"",
       "options": [
-        "memainkan dan berputar",
-        "bertiup dan sekeliling",
-        "angin dan rambut",
-        "tubuh dan bertiup"
+        "Where",
+        "What",
+        "Why",
+        "Who"
       ],
       "answer": 0,
       "why": {
-        "0": "Kata 'memainkan' dan 'berputar' adalah tindakan manusiawi yang disematkan kepada angin (benda mati) sehingga menciptakan majas personifikasi."
+        "0": "Kata tanya \"Where\" digunakan untuk menanyakan tempat atau lokasi (\"in the ocean near Costa Rica\")."
       },
       "distractorWhy": {
-        "1": "Kata 'bertiup' adalah pergerakan alami angin, sedangkan 'sekeliling' adalah kata penunjuk ruang/posisi.",
-        "2": "Kata 'angin' dan 'rambut' keduanya merupakan kata benda (nomina), bukan kata kerja penggerak majas.",
-        "3": "Kata 'tubuh' adalah nomina dan 'bertiup' adalah verba alami angin, tidak mengandung tindakan personifikasi khas manusia."
+        "1": "Kata tanya \"What\" digunakan untuk menanyakan benda atau tindakan, bukan lokasi.",
+        "2": "Kata tanya \"Why\" digunakan untuk menanyakan alasan atau sebab.",
+        "3": "Kata tanya \"Who\" digunakan untuk menanyakan orang atau pelaku."
       }
     },
     {
-      "id": "ind-d-7-b1-q11",
-      "difficulty": "tinggi",
-      "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VII hal. 13-14, bacalah kutipan novel 'Misteri Terowongan Kereta' karya Tere Liye: '...Meski si ular besi ini sudah menjadi bagian kehidupan kampung, dengan suara klaksonnya yang tidak pernah alpa, melenguh nyaring setiap subuh buta dan tengah malam...' Ungkapan majas personifikasi dalam kutipan tersebut ditunjukkan oleh ungkapan...",
+      "id": "eng-d-8-c4-q11",
+      "difficulty": "medium",
+      "prompt": "Choose the correct structure for asking about the reason why the scientists caught the turtle in Simple Past tense:",
       "options": [
-        "suara klaksonnya yang tidak pernah alpa, melenguh nyaring",
-        "perjalanan pertama kalinya aku dan Burlian dengan kereta api",
-        "hutan pedalaman Sumatra yang selalu berkabut di pagi hari",
-        "bapak tersenyum sambil takzim menatap langit-langit gerbong"
+        "Why did the scientists catch the sea turtle?",
+        "Why did the scientists caught the sea turtle?",
+        "Why were the scientists caught the sea turtle?",
+        "Why the scientists did catch the sea turtle?"
       ],
       "answer": 0,
       "why": {
-        "0": "Klakson kereta api (benda mati) digambarkan memiliki sifat 'tidak pernah alpa' dan dapat 'melenguh nyaring' seperti lembu/hewan bernyawa, yang merupakan majas personifikasi."
+        "0": "Formasi pertanyaan Wh- Simple Past menggunakan pola: Wh-word + did + subject + Verb 1 (\"catch\")."
       },
       "distractorWhy": {
-        "1": "Kalimat ini menceritakan pengalaman tokoh aku dan Burlian menaiki kereta api, merupakan fakta peristiwa naratif tanpa majas.",
-        "2": "Kalimat ini menggambarkan keadaan alam hutan Sumatra yang berkabut, merupakan kenyataan fenomena alamik biasa.",
-        "3": "Kalimat ini menceritakan ekspresi dan tindakan manusia (Bapak) yang menatap langit gerbong, bukan personifikasi benda mati."
+        "1": "Setelah kata bantu \"did\", kata kerja yang digunakan harus berupa Verb 1 (\"catch\"), bukan Verb 2 (\"caught\").",
+        "2": "Penggunaan to be \"were\" bersama dengan Verb 2 \"caught\" dalam struktur pertanyaan ini tidak tepat.",
+        "3": "Urutan kata menyimpang karena kata bantu \"did\" diletakkan setelah subjek."
       }
     },
     {
-      "id": "ind-d-7-b1-q12",
-      "difficulty": "sedang",
-      "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VII hal. 16-17, pamflet wisata 'Taklukkan Puncak Papandayan' memuat informasi detail berupa kelembapan udara 70—80% dan temperatur 10—25°C yang didasarkan pada klasifikasi iklim menurut...",
+      "id": "eng-d-8-c4-q12",
+      "difficulty": "medium",
+      "prompt": "Based on the story in Unit 2 Section 3, how long did it take for the scientists to pull the plastic straw out of the turtle's nostril?",
       "options": [
-        "Schmidt dan Ferguson",
-        "Junghuhn",
-        "Koppen",
-        "Oldeman"
+        "About 10 minutes.",
+        "About 2 hours.",
+        "The entire afternoon.",
+        "More than two days."
       ],
       "answer": 0,
       "why": {
-        "0": "Dalam teks pamflet wisata Papandayan halaman 16 tertulis eksplisit: 'Menurut klasifikasi Schmidt dan Ferguson, gunung ini memiliki curah hujan rata-rata 3.000 mm/tahun, kelembapan udara 70—80% dan temperatur 10—25° C.'"
+        "0": "Teks menyatakan dengan jelas bahwa proses mengeluarkan sedotan plastik dari hidung penyu memakan waktu sekitar 10 menit (\"about 10 minutes\")."
       },
       "distractorWhy": {
-        "1": "Klasifikasi Junghuhn didasarkan pada ketinggian tempat dan jenis vegetasi tanaman budidaya, bukan rujukan yang tertulis dalam teks pamflet.",
-        "2": "Klasifikasi Koppen didasarkan pada suhu dan curah hujan global, tidak disebutkan dalam teks pamflet Papandayan.",
-        "3": "Klasifikasi Oldeman didasarkan pada bulan basah dan bulan kering untuk pertanian tanaman pangan, tidak dirujuk pada pamflet tersebut."
+        "1": "Durasi 2 jam merujuk pada lamanya hujan turun pada kejadian banjir di Unit 1, bukan waktu pencabutan sedotan plastik.",
+        "2": "Teks tidak menyebutkan bahwa proses tersebut berlangsung sepanjang sore.",
+        "3": "Waktu 10 menit jauh lebih singkat daripada dua hari."
       }
     },
     {
-      "id": "ind-d-7-b1-q13",
-      "difficulty": "tinggi",
-      "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VII hal. 16, jika seorang wisatawan dari Jakarta ingin mengunjungi Taman Wisata Alam Gunung Papandayan menggunakan bus jurusan Jakarta—Garut, rute angkutan umum lanjutan yang benar dari Terminal Guntur Garut adalah...",
+      "id": "eng-d-8-c4-q13",
+      "difficulty": "hard",
+      "prompt": "Identify the sentence that correctly combines Past Continuous and Simple Past using 'when' based on Language Focus Unit 2:",
       "options": [
-        "Naik angkutan elf jurusan Garut—Cikajang dengan tarif Rp15.000,00",
-        "Naik angkutan elf dari Terminal Cicaheum jurusan Bandung—Cikajang",
-        "Naik bus Primajasa langsung menuju lokasi tempat perkemahan Pondok Saladah",
-        "Naik taksi online langsung menuju gerbang pos 2 Poco Roko"
+        "The turtle was swimming near the boat when the scientists noticed the object.",
+        "The turtle is swimming near the boat when the scientists notice the object.",
+        "The turtle swam near the boat when the scientists were notice the object.",
+        "The turtle was swam near the boat when the scientists noticing the object."
       ],
       "answer": 0,
       "why": {
-        "0": "Pamflet wisata Papandayan di hal. 16 menyebutkan rute secara presisi: turun di Terminal Guntur—Garut, lalu lanjutkan dengan angkutan elf jurusan Garut—Cikajang dengan tarif Rp15.000,00."
+        "0": "Kalimat ini secara tepat menggabungkan kejadian yang sedang berlangsung di masa lalu (\"was swimming\") dengan kejadian singkat yang menyela (\"noticed\") menggunakan kata hubung \"when\"."
       },
       "distractorWhy": {
-        "1": "Rute Terminal Cicaheum (Bandung) merupakan rute alternatif jika wisatawan berangkat dari Bandung, bukan sambungan dari Terminal Guntur Garut.",
-        "2": "Bus Primajasa hanya beroperasi antar kota (Jakarta—Garut) hingga terminal, tidak masuk ke lokasi perkemahan gunung.",
-        "3": "Pos 2 Poco Roko merupakan pos pendakian di Desa Wae Rebo NTT (halaman 32-33), bukan lokasi di Gunung Papandayan Garut."
+        "1": "Kalimat tersebut menggunakan Present Continuous dan Present Simple, bukan struktur lampau (Past Tense).",
+        "2": "Bentuk \"were notice\" tidak sesuai kaidah tata bahasa bahasa Inggris.",
+        "3": "Bentuk \"was swam\" dan \"noticing\" menyalahi aturan pembentukan Past Continuous dan Simple Past."
       }
     },
     {
-      "id": "ind-d-7-b1-q14",
-      "difficulty": "sedang",
-      "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VII hal. 21 (Gambar 1.6 & 1.7), tempat wisata Sungai Santirah yang menyajikan kegiatan River Tubing secara geografis terletak di...",
+      "id": "eng-d-8-c4-q14",
+      "difficulty": "easy",
+      "prompt": "Read the excerpt from Unit 3 Section 2:\n\"Melati and Isabel Wijsen live in Bali. They spent their teenage years cleaning up the island from plastic. Melati and Isabel were only 12 and 10 years old when they decided to tackle plastic pollution.\"\n\nWhat movement did Melati and Isabel Wijsen start in Bali?",
       "options": [
-        "Dusun Giriharja, Desa Selasari, Kecamatan Parigi, Kabupaten Pangandaran",
-        "Desa Sirna Jaya dan Desa Kramat Wangi, Kabupaten Garut",
-        "Kecamatan Takengon, Kabupaten Aceh Tengah, Provinsi Aceh",
-        "Desa Denge, Kecamatan Satarmese Barat, Kabupaten Manggarai"
+        "Bye Bye Plastic Bags.",
+        "Save the Forest Campaign.",
+        "Clean Water Project.",
+        "No More Chemical Waste."
       ],
       "answer": 0,
       "why": {
-        "0": "Keterangan lokasi pada pamflet Wisata Green Canyon (Gambar 1.7) menyebutkan lokasi Sungai Santirah berada di dusun Giriharja, Desa Selasari, Kecamatan Parigi, Kabupaten Pangandaran, Jawa Barat."
+        "0": "Teks dan informasi pendukung di Unit 3 menyebutkan gerakan yang diprakarsai oleh Melati dan Isabel Wijsen bernama \"Bye Bye Plastic Bags\"."
       },
       "distractorWhy": {
-        "1": "Lokasi tersebut merupakan letak kawasan Taman Wisata Alam Gunung Papandayan di Kabupaten Garut.",
-        "2": "Kecamatan Takengon Aceh Tengah merupakan lokasi objek wisata Bukit Pantan Terong dan Danau Laut Tawar.",
-        "3": "Desa Denge Kabupaten Manggarai NTT merupakan lokasi gerbang awal pendakian menuju Desa Wae Rebo."
+        "1": "Gerakan kedua bersaudara tersebut berfokus pada polusi sampah plastik, bukan penyelamatan hutan.",
+        "2": "Fokus utama kampanye mereka adalah pengurangan sampah plastik di Bali, bukan proyek air bersih.",
+        "3": "Teks secara khusus membahas tentang kantong plastik dan sampah plastik, bukan limbah kimia."
       }
     },
     {
-      "id": "ind-d-7-b1-q15",
-      "difficulty": "tinggi",
-      "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VII hal. 23 (Kupas Teori Awalan meN-), manakah aturan yang BENAR mengenai peluluhan fonem k, p, t, s saat mendapat awalan meN-?",
+      "id": "eng-d-8-c4-q15",
+      "difficulty": "medium",
+      "prompt": "Based on Unit 3 Section 4, what is the main purpose of the 'Orientation' section in a factual recount text?",
       "options": [
-        "Fonem k, p, t, s luluh jika diikuti kata dasar yang berawalan huruf k, p, t, s tunggal (bukan kluster)",
-        "Fonem k, p, t, s tetap luluh meskipun diikuti oleh kata dasar yang berawalan konsonan rangkap (kluster)",
-        "Fonem k, p, t, s luluh ketika bergabung dengan kata berimbuhan berawalan k, p, t, s seperti memperluas",
-        "Fonem k, p, t, s tidak pernah luluh dalam kondisi penambahan awalan meN- bentuk apa pun"
+        "To introduce the background information such as who, where, when, and why the event happened.",
+        "To state the author's final personal feeling or recommendation at the very end of the text.",
+        "To list all step-by-step chronological actions taken by the main characters.",
+        "To present a fictional story with magical resolution."
       ],
       "answer": 0,
       "why": {
-        "0": "Teori bahasa hal. 23 menjelaskan fonem k, p, t, s luluh jika diawali kata dasar berawalan huruf k, p, t, s tunggal (contoh: meN- + pesona -> memesona, meN- + pengaruh -> memengaruhi)."
+        "0": "Bagian Orientation berfungsi memperkenalkan informasi latar belakang seperti siapa (who), di mana (where), kapan (when), dan mengapa (why) peristiwa tersebut terjadi."
       },
       "distractorWhy": {
-        "1": "Jika diikuti konsonan rangkap (kluster) seperti pr, kr, kl, fonem k, p, t, s TIDAK luluh (contoh: memprakarsai, mengkriminalkan).",
-        "2": "Pada kata berimbuhan yang diawali k, p, t, s seperti memperluas / mempertaruhkan, fonem p atau t TIDAK luluh.",
-        "3": "Pernyataan ini salah karena dalam kaidah tata bahasa Indonesia standar fonem k, p, t, s mengalami peluluhan jika memenuhi syarat tertentu."
+        "1": "Pernyataan kesan akhir atau evaluasi merupakan fungsi dari bagian Comment / Re-orientation.",
+        "2": "Urutan kejadian kronologis merupakan bagian dari Records of Events.",
+        "3": "Factual recount menyajikan cerita berdasarkan fakta nyata, bukan cerita rekaan imajinatif atau magis."
       }
     },
     {
-      "id": "ind-d-7-b1-q16",
-      "difficulty": "sedang",
-      "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VII hal. 23 (Tantangan), manakah kalimat yang menggunakan kata berimbuhan meN- dengan peluluhan kata dasar yang BENAR?",
+      "id": "eng-d-8-c4-q16",
+      "difficulty": "medium",
+      "prompt": "Which sentence correctly uses 'when' at the beginning of a complex sentence with proper punctuation according to Language Focus Unit 3?",
       "options": [
-        "Kilau sinar matahari yang menerpa permukaan danau itu sangat mengagumkan.",
-        "Perajin memroduksi suvenir dalam kegiatan industri rumah tangga skala kecil.",
-        "Pemandu wisata itu secara tangkas menterjemahkan paparannya ke bahasa Jerman.",
-        "Pendaki gunung tidak memersoalkan kenaikan tarif fasilitas di jalur pendakian."
+        "When Melati and Isabel went hiking to Mount Batur, they saw plastic bottles along the way.",
+        "When Melati and Isabel went hiking to Mount Batur they saw plastic bottles along the way.",
+        "When Melati and Isabel went hiking to Mount Batur, and they saw plastic bottles along the way.",
+        "When did Melati and Isabel went hiking to Mount Batur, they saw plastic bottles."
       ],
       "answer": 0,
       "why": {
-        "0": "Kata 'menerpa' berasal dari awalan meN- + terpa (huruf t luluh menjadi n). Ini merupakan pembentukan kata berimbuhan meN- yang baku dan tepat."
+        "0": "Ketika klausa \"when\" diletakkan di awal kalimat, koma (,) wajib digunakan untuk memisahkan klausa anak dari klausa utama."
       },
       "distractorWhy": {
-        "1": "Bentuk 'memroduksi' salah; kata dasar 'produksi' berawalan kluster pr- sehingga p TIDAK luluh (seharusnya memproduksi).",
-        "2": "Bentuk 'menterjemahkan' salah; kata dasar 'terjemah' berawalan t tunggal sehingga t LULUH menjadi n (seharusnya menerjemahkan).",
-        "3": "Bentuk 'memersoalkan' salah; kata asal 'persoal' mendapat imbuhan me-kan pada bentuk dasar soal/persoal (seharusnya mempersoalkan)."
+        "1": "Kalimat tersebut kekurangan tanda koma yang diperlukan untuk memisahkan klausa \"when\" di awal kalimat.",
+        "2": "Penggunaan kata hubung tambahan \"and\" setelah koma adalah redundan dan tidak tepat.",
+        "3": "Penggunaan struktur kalimat tanya \"did ... went\" pada klausa anak di awal kalimat adalah salah secara tata bahasa."
       }
     },
     {
-      "id": "ind-d-7-b1-q17",
-      "difficulty": "sedang",
-      "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VII hal. 25-27 (Menganalisis Informasi Lisan 'Jelajah Wae Rebo'), apakah nama rumah adat tradisional khas Manggarai yang berbentuk kerucut dan memiliki lima tingkat?",
+      "id": "eng-d-8-c4-q17",
+      "difficulty": "medium",
+      "prompt": "Combine these two events into a single sentence using 'when' based on Language Focus Unit 3:\nEvent 1: \"The scientists were collecting data on sea turtles.\"\nEvent 2: \"They spotted an injured sea turtle swimming near their boat.\"",
       "options": [
-        "Mbaru Niang",
-        "Tongkonan",
-        "Rumah Gadang",
-        "Honai"
+        "The scientists were collecting data on sea turtles when they spotted an injured sea turtle.",
+        "The scientists were collecting data on sea turtles when were they spot an injured sea turtle.",
+        "When were the scientists collecting data on sea turtles they spotted an injured sea turtle.",
+        "The scientists collect data on sea turtles when they were spotted an injured sea turtle."
       ],
       "answer": 0,
       "why": {
-        "0": "Teks lisan 'Jelajah Wae Rebo' karya Eugenia Rakhma Subarna menyebutkan bahwa rumah tradisional khas Manggarai yang memiliki 5 tingkat berbentuk kerucut dinamakan Mbaru Niang."
+        "0": "Kalimat ini secara tepat menyambungkan aksi yang berlangsung (\"were collecting data\") dengan kejadian penyela (\"spotted\") menggunakan kata penghubung \"when\"."
       },
       "distractorWhy": {
-        "1": "Tongkonan merupakan rumah adat tradisional masyarakat suku Toraja di Sulawesi Selatan.",
-        "2": "Rumah Gadang merupakan rumah adat tradisional Minangkabau di Sumatera Barat.",
-        "3": "Honai merupakan rumah adat tradisional suku-suku di wilayah pegunungan Papua."
+        "1": "Bentuk \"when were they spot\" salah secara tata bahasa.",
+        "2": "Klausa \"when\" di awal memerlukan koma pemisah, dan frasa \"When were the scientists\" berstruktur kalimat tanya yang tidak sesuai.",
+        "3": "Bentuk \"they were spotted\" bermakna pasif (\"mereka ditemukan\") yang mengubah makna cerita asli."
       }
     },
     {
-      "id": "ind-d-7-b1-q18",
-      "difficulty": "tinggi",
-      "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VII hal. 26-27, pada bangunan rumah Mbaru Niang di Desa Wae Rebo, bagian tingkat ketiga yang berfungsi khusus untuk menyimpan benih jagung dan tanaman bercocok tanam dinamakan...",
+      "id": "eng-d-8-c4-q18",
+      "difficulty": "easy",
+      "prompt": "In waste sorting and management, items such as plastic bottles, plastic straws, and aluminum cans are categorized as:",
       "options": [
-        "lentar",
-        "lutur",
-        "lobo",
-        "hempang"
+        "Inorganic waste",
+        "Organic waste",
+        "Hazardous waste (B3)",
+        "Compostable waste"
       ],
       "answer": 0,
       "why": {
-        "0": "Dalam penuturan pandu wisata teks Jelajah Wae Rebo di hal. 27 dijelaskan: '...inilah tingkat ketiga atau yang biasa disebut lentar, berfungsi menyimpan benih jagung dan tanaman untuk bercocok tanam...'"
+        "0": "Botol plastik, sedotan plastik, dan kaleng aluminium merupakan limbah anorganik (inorganic waste) yang tidak dapat terurai secara hayati."
       },
       "distractorWhy": {
-        "1": "Lutur atau tenda adalah tingkat pertama Mbaru Niang yang berfungsi sebagai tempat tinggal dan berkumpul keluarga.",
-        "2": "Lobo (tingkat keempat) dan tempat lainnya memiliki fungsi penyimpanan bahan makanan cadangan saat paceklik.",
-        "3": "Hempang adalah istilah lain dari susunan konstruksi kayu/perabot, bukan nama struktur tingkat ketiga Mbaru Niang."
+        "1": "Limbah organik terdiri dari bahan hayati yang mudah membusuk seperti sisa makanan dan dedaunan.",
+        "2": "Limbah B3 (bahan berbahaya dan beracun) meliputi baterai, lampu, dan zat kimia berbahaya.",
+        "3": "Sampah plastik dan aluminium tidak dapat diolah menjadi kompos."
       }
     },
     {
-      "id": "ind-d-7-b1-q19",
-      "difficulty": "sedang",
-      "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VII hal. 28-29 ('Jelajah Rasa di Lampung'), apakah nama kawasan yang terkenal sebagai pusat sentra keripik pisang di Jalan Pagar Alam, Kota Bandar Lampung?",
+      "id": "eng-d-8-c4-q19",
+      "difficulty": "hard",
+      "prompt": "Which group of waste items should be sorted specifically into the Hazardous Waste (B3) bin?",
       "options": [
-        "Gang PU",
-        "Gang Malioboro",
-        "Pasar Beringharjo",
-        "Pantan Terong"
+        "Used batteries, fluorescent light bulbs, and aerosol spray cans.",
+        "Banana peels, leftover rice, and dry tree leaves.",
+        "Plastic shopping bags, plastic bottles, and plastic cutlery.",
+        "Cardboard boxes, newspaper sheets, and paper bags."
       ],
       "answer": 0,
       "why": {
-        "0": "Teks 'Jelajah Rasa di Lampung' menyebutkan bahwa pusat sentra keripik pisang lampung terletak di Jalan Pagar Alam, Kota Bandar Lampung, yang terkenal dengan sebutan Gang PU."
+        "0": "Baterai bekas, lampu neon, dan kaleng aerosol mengandung zat kimia berbahaya dan beracun sehingga termasuk dalam kategori limbah B3 (Hazardous Waste)."
       },
       "distractorWhy": {
-        "1": "Gang Malioboro merupakan kawasan sentra wisata belanja terkenal di Kota Yogyakarta.",
-        "2": "Pasar Beringharjo adalah pasar tradisional di Yogyakarta yang dipakai sebagai contoh teks deskripsi lokasi di hal. 10.",
-        "3": "Pantan Terong adalah bukit tempat wisata pemandangan alam di Kota Takengon Aceh Tengah."
+        "1": "Kulit pisang, sisa nasi, dan daun kering adalah contoh limbah organik.",
+        "2": "Kantong plastik, botol plastik, dan sendok plastik adalah contoh limbah anorganik non-B3.",
+        "3": "Kardus, koran, dan kantong kertas adalah sampah daur ulang bahan kertas."
       }
     },
     {
-      "id": "ind-d-7-b1-q20",
-      "difficulty": "tinggi",
-      "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VII hal. 31-32 (Kegiatan 9: Kupas Teori Tanda Baca), manakah kalimat yang menggunakan tanda koma (,) dengan BENAR sesuai kaidah kebahasaan?",
+      "id": "eng-d-8-c4-q20",
+      "difficulty": "hard",
+      "prompt": "Read the final sentence of the factual recount about the sea turtle rescue in Unit 2 Section 4:\n\"The straw incident proved how dangerous plastic was to animals in the oceans.\"\n\nWhat role does this sentence play in the structure of a factual recount text?",
       "options": [
-        "Wah, indah sekali pemandangan di Pantan Terong!",
-        "Gunung Papandayan telah meletus beberapa kali, Meskipun demikian kawahnya tetap indah.",
-        "Ia membeli kopi kain dan tas sebagai oleh-oleh.",
-        "Lili mengambil foto sementara Fajar memilih menikmati kopi."
+        "It serves as the final comment/evaluation reflecting on the incident.",
+        "It serves as the initial orientation introducing the characters.",
+        "It serves as the first record of event in chronological order.",
+        "It serves as an interview question directed to the reader."
       ],
       "answer": 0,
       "why": {
-        "0": "Halaman 32 menjelaskan bahwa tanda koma dipakai sebelum dan/atau sesudah kata seru (seperti wah, o, ya, aduh) sehingga pemisahan 'Wah, indah sekali...' adalah tepat."
+        "0": "Kalimat tersebut memberikan evaluasi atau pendapat akhir (final comment/evaluation) yang menyimpulkan dampak dari peristiwa yang diceritakan."
       },
       "distractorWhy": {
-        "1": "Setelah ungkapan penghubung antarkalimat 'Meskipun demikian', WAJIB diikuti tanda koma: 'Meskipun demikian, kawahnya...'.",
-        "2": "Pada rincian lebih dari dua unsur (pemerincian), wajib menggunakan tanda koma sebelum kata 'dan': 'kopi, kain, dan tas'.",
-        "3": "Pada kalimat majemuk setara dengan pertentangan/penghubung 'sementara', wajib didahului tanda koma sebelum kata 'sementara'."
+        "1": "Orientasi awal berada di bagian awal teks dan mengenalkan latar tokoh, waktu, serta tempat.",
+        "2": "Record of events memuat urutan aksi atau tindakan kronologis yang terjadi dalam peristiwa.",
+        "3": "Kalimat tersebut merupakan kalimat pernyataan evaluatif, bukan kalimat tanya wawancara."
       }
     }
   ]
 }
-with open(r"c:\Users\hp\fiezel-apps\tools\chunk_ind_7_b1.json", "w", encoding="utf-8") as out:
-    json.dump(data, out, ensure_ascii=False, indent=2)
-print("Done generating JSON")
+
+target_file = r"c:\Users\hp\fiezel-apps\tools\chunk_eng_8_c4.json"
+with open(target_file, "w", encoding="utf-8") as f:
+    json.dump(data, f, indent=2, ensure_ascii=False)
+
+print("Saved to", target_file)

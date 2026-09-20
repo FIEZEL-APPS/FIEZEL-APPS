@@ -1166,6 +1166,415 @@
           }
         }
       ]
+    },
+    {
+      "code": "KOMP-ENG-D-8-BAB2-01",
+      "grade": 8,
+      "name": "Chapter 2: Kindness Begins with Me",
+      "materi": "Reading Narrative Texts & Fables, Moral Values of Kindness, Narrative Structure (Orientation, Complication, Resolution), Direct & Indirect Speech",
+      "cpRef": "English for Nusantara untuk SMP/MTs Kelas VII — Chapter 2 (Kelas VIII)",
+      "items": [
+        {
+          "id": "eng-d-8-c2-q01",
+          "difficulty": "dasar",
+          "prompt": "Berdasarkan cerita The Ugly Duckling Part 1 pada Chapter 2 Unit 1 (halaman 97-101), bagaimana sikap Mother Duck ketika telur kelima menetas dan menghasilkan seekor anak bebek berwarna abu-abu yang berbeda dari empat anak bebek kuning lainnya?",
+          "options": [
+            "Mother Duck tetap menenangkan anak bebek abu-abu itu dengan menyebutnya berbeda, berwarna abu-abu, dan pemberani.",
+            "Mother Duck langsung mengusir anak bebek abu-abu tersebut keluar dari sarang.",
+            "Mother Duck marah dan menolak mengakui telur kelima yang menetas.",
+            "Mother Duck mengabaikan anak bebek abu-abu itu dan membiarkannya sendirian di kolam."
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Dalam teks cerita Ugly Duckling Part 1, Mother Duck berusaha menenangkan anak bebek abu-abu dengan berkata: \"You're different. You are not yellow but gray and brave.\" Ini menunjukkan kasih sayang seorang ibu yang menerima perbedaan anaknya."
+          },
+          "distractorWhy": {
+            "1": "Mother Duck tidak mengusirnya; ia justru membela dan menenangkannya dari cemoohan bebek lain.",
+            "2": "Mother Duck tidak marah dan tetap menghitung serta merawat semua anak bebeknya.",
+            "3": "Mother Duck tidak mengabaikan anak bebek abu-abu tersebut, melainkan mengajaknya berenang bersama anak-anak bebek lainnya."
+          }
+        },
+        {
+          "id": "eng-d-8-c2-q02",
+          "difficulty": "dasar",
+          "prompt": "Dalam teks naratif seperti cerita The Ugly Duckling (halaman 103-105), kata kerja bentuk lampau (past tense action verbs) digunakan untuk menyatakan kejadian yang sudah terjadi. Manakah pasangan kata kerja bentuk lampau yang tepat untuk melengkapi kalimat: \"The gray duck _____ with a funny wobble, while a yellow duckling _____ his muddy wings.\"?",
+          "options": [
+            "walked - shook",
+            "walk - shake",
+            "walks - shakes",
+            "walking - shaking"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Kata \"walked\" (V2 dari walk) dan \"shook\" (V2 dari shake) adalah bentuk past tense yang tepat sesuai tata bahasa naratif dalam Worksheet 2.4/2.5."
+          },
+          "distractorWhy": {
+            "1": "Kata \"walk\" dan \"shake\" merupakan bentuk kata kerja dasar (infinitive/V1), bukan past tense.",
+            "2": "Kata \"walks\" dan \"shakes\" merupakan bentuk simple present tense untuk subjek tunggal, bukan past tense.",
+            "3": "Kata \"walking\" dan \"shaking\" merupakan bentuk present participle (-ing) yang memerlukan to be untuk membentuk continuous tense."
+          }
+        },
+        {
+          "id": "eng-d-8-c2-q03",
+          "difficulty": "dasar",
+          "prompt": "Berdasarkan konteks cerita The Ugly Duckling Part 1 (halaman 95-99), di manakah latar tempat dan apa peristiwa pembuka (orientation) dalam cerita tersebut?",
+          "options": [
+            "Di sarang bebek dekat kolam pada hari yang hangat, tempat telur-telur Mother Duck menetas menjadi empat bebek kuning dan satu bebek abu-abu.",
+            "Di tengah kota besar yang ramai, tempat burung-burung mencari sisa makanan di jalanan.",
+            "Di puncak gunung yang tinggi, tempat induk elang melatih anak-anaknya terbang.",
+            "Di dalam kandang peternakan, tempat ayam dan sapi berbincang-bincang mengenai kegiatan sehari-hari."
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Orientation cerita mengenalkan latar tempat di dekat kolam pada musim panas/hari hangat saat telur-telur bebek menetas menjadi empat bebek kuning dan satu bebek abu-abu."
+          },
+          "distractorWhy": {
+            "1": "Latar kota besar bukan lokasi cerita fabel The Ugly Duckling dalam buku teks ini.",
+            "2": "Cerita tidak berlatar di puncak gunung ataupun menceritakan induk elang.",
+            "3": "Kandang peternakan dengan percakapan ayam dan sapi bukan bagian dari orientation Part 1."
+          }
+        },
+        {
+          "id": "eng-d-8-c2-q04",
+          "difficulty": "sedang",
+          "prompt": "Pada cerita The Ugly Duckling Part 2 (halaman 115-117), mengapa si Ugly Duckling akhirnya memutuskan untuk terbang meninggalkan sarang dan pergi ke seberang sungai?",
+          "options": [
+            "Karena ia merasa sedih dan tertekan akibat sering diejek dan ditolak karena perbedaannya.",
+            "Karena ia ingin berpetualang mencari harta karun rahasia di seberang sungai.",
+            "Karena disuruh oleh ibunya untuk mencari makanan tambahan bagi saudara-saudaranya.",
+            "Karena ingin menantang ayam-ayam dewasa dalam perlombaan terbang."
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Ugly Duckling pergi karena tidak tahan dengan perlakuan buruk dan ejekan dari lingkungan sekitar yang memperlakukannya secara tidak adil hanya karena penampilannya berbeda."
+          },
+          "distractorWhy": {
+            "1": "Tujuan kepindahannya bukan untuk mencari harta karun, melainkan karena rasa sedih atas penolakan.",
+            "2": "Ibunya tidak pernah menyuruhnya pergi mencari makanan di seberang sungai.",
+            "3": "Ia tidak berniat menantang siapa pun dalam perlombaan terbang."
+          }
+        },
+        {
+          "id": "eng-d-8-c2-q05",
+          "difficulty": "dasar",
+          "prompt": "Berdasarkan cerita The Ugly Duckling Part 3 (halaman 119-121), bagaimana perasaan si Ugly Duckling saat seekor anjing besar yang lapar tiba-tiba muncul di peternakan?",
+          "options": [
+            "Ia merasa sangat ketakutan (terrified) dan cemas akan keselamatan nyawanya.",
+            "Ia merasa gembira dan antusias ingin mengajak anjing tersebut bermain.",
+            "Ia merasa marah dan berusaha menyerang anjing besar itu.",
+            "Ia merasa bangga dan memamerkan bulu abu-abunya kepada anjing tersebut."
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Dalam Teks Part 3 dan Worksheet 2.10, dijelaskan bahwa saat anjing besar mendekat, Ugly Duckling merasa \"terrified\" (sangat ketakutan)."
+          },
+          "distractorWhy": {
+            "1": "Perasaan gembira bertentangan dengan situasi ancaman bahaya dari anjing lapar.",
+            "2": "Ugly Duckling tidak bersikap agresif atau menyerang anjing tersebut.",
+            "3": "Ia tidak merasa bangga; ia bersembunyi ketakutan."
+          }
+        },
+        {
+          "id": "eng-d-8-c2-q06",
+          "difficulty": "sedang",
+          "prompt": "Nilai moral utama apakah yang dapat dipetik dari perubahan Ugly Duckling menjadi seekor angsa putih yang anggun (beautiful swan) di akhir cerita (halaman 121-123)?",
+          "options": [
+            "Keindahan dan harga diri sejati berasal dari dalam diri, dan kita tidak boleh menilai seseorang hanya dari fisik luar atau penampilan awalnya.",
+            "Melarikan diri dari rumah adalah cara terbaik untuk menyelesaikan setiap masalah pribadi.",
+            "Menjadi berbeda secara fisik menjamin bahwa semua orang akan langsung mengagumi kita sejak awal.",
+            "Penampilan luar adalah satu-satunya hal yang menentukan karakter dan kebaikan seseorang."
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Pesan moral utama fabel ini mengajarkan agar kita menghargai perbedaan dan tidak menghakimi seseorang berdasarkan rupa fisik semata."
+          },
+          "distractorWhy": {
+            "1": "Melarikan diri bukanlah solusi utama yang diajarkan, melainkan ketabahan dan penemuan jati diri.",
+            "2": "Perbedaan fisik dalam cerita justru sempat membuat Ugly Duckling dimusuhi sebelum ia tumbuh dewasa.",
+            "3": "Penampilan luar bukan satu-satunya penentu karakter; kebaikan hati dan ketabahan jauh lebih utama."
+          }
+        },
+        {
+          "id": "eng-d-8-c2-q07",
+          "difficulty": "dasar",
+          "prompt": "Kalimat langsung (direct speech) ditandai dengan penggunaan tanda petik untuk mengutip ucapan tokoh secara persis. Manakah contoh kalimat langsung yang tepat sesuai teks cerita di Chapter 2?",
+          "options": [
+            "\"Can I please stay here?\" asked the Ugly Duckling softly.",
+            "The Ugly Duckling asked if he could stay there softly.",
+            "Mother Duck told everyone that the gray duckling was brave.",
+            "The animals said that the tiger was very scary."
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Kalimat \"Can I please stay here?\" asked the Ugly Duckling softly merupakan contoh direct speech karena mengutip ucapan langsung tokoh di dalam tanda petik."
+          },
+          "distractorWhy": {
+            "1": "Kalimat tersebut merupakan kalimat tidak langsung (indirect/reported speech).",
+            "2": "Kalimat tersebut merupakan struktur indirect speech yang melaporkan pernyataan Mother Duck.",
+            "3": "Kalimat tersebut merupakan bentuk indirect speech tanpa tanda petik pengutip dialog."
+          }
+        },
+        {
+          "id": "eng-d-8-c2-q08",
+          "difficulty": "sedang",
+          "prompt": "Dalam cerita Elephant and Friends pada Chapter 2 Unit 3 (halaman 131-133), bagian manakah yang berfungsi sebagai Orientation (pengenalan cerita)?",
+          "options": [
+            "Suatu hari seekor gajah mengembara di hutan untuk mencari teman dan bertemu seekor monyet di atas pohon.",
+            "Harimau mulai mengejar dan berusaha melahap semua hewan di dalam hutan.",
+            "Gajah menendang harimau hingga lari ketakutan dan menyelamatkan seluruh penghuni hutan.",
+            "Semua hewan akhirnya sepakat bahwa ukuran tubuh gajah sangat pas untuk menjadi teman mereka."
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Orientation berisikan pengenalan tokoh (gajah, monyet), waktu (suatu hari), dan tempat (hutan) saat gajah mulai mencari teman."
+          },
+          "distractorWhy": {
+            "1": "Peristiwa munculnya harimau mengejar hewan adalah bagian Complication (masalah).",
+            "2": "Tindakan gajah menendang harimau merupakan bagian Resolution (penyelesaian).",
+            "3": "Kesepakatan akhir hewan-hewan menerima gajah adalah penutup/Resolution dari cerita."
+          }
+        },
+        {
+          "id": "eng-d-8-c2-q09",
+          "difficulty": "dasar",
+          "prompt": "Berdasarkan percakapan pada halaman 133, apa alasan monyet menolak permintaan gajah untuk menjadi temannya?",
+          "options": [
+            "Monyet menganggap gajah terlalu besar dan tidak bisa berayun di pohon seperti dirinya.",
+            "Monyet menganggap gajah terlalu kecil sehingga tidak bisa memanjat pohon tinggi.",
+            "Monyet takut gajah akan menghabiskan pisang persediaannya di hutan.",
+            "Monyet marah karena gajah tidak menyapanya dengan sopan."
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Monyet yang sombong menjawab: \"You are too big. You cannot swing from trees like me,\" yang menegaskan alasannya menolak gajah karena ukuran fisiknya."
+          },
+          "distractorWhy": {
+            "1": "Monyet menolak karena tubuh gajah terlalu besar, bukan terlalu kecil.",
+            "2": "Dalam teks tidak disebutkan alasan mengenai makanan atau pisang.",
+            "3": "Gajah menyapa dengan sopan (\"Will you be my friend?\"), namun monyet menolaknya karena keangkuhannya."
+          }
+        },
+        {
+          "id": "eng-d-8-c2-q10",
+          "difficulty": "sedang",
+          "prompt": "Selain monyet, kelinci dan katak juga menolak menjadi teman gajah (halaman 133). Apakah alasan serupa yang disampaikan oleh kelinci dan katak tersebut?",
+          "options": [
+            "Mereka menganggap tubuh gajah yang terlalu besar menghalanginya untuk beraktivitas bersama seperti masuk ke liang atau melompat.",
+            "Mereka menilai gajah merupakan hewan yang terlalu pendiam dan membosankan.",
+            "Mereka marah karena gajah telah merusak tempat tinggal mereka secara tidak sengaja.",
+            "Mereka hanya ingin berteman dengan hewan yang bisa terbang di udara."
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Kelinci beralasan gajah terlalu besar untuk masuk ke liangnya (\"too big to play in my burrow\"), dan katak beralasan gajah terlalu besar untuk melompat (\"too big to leap about\")."
+          },
+          "distractorWhy": {
+            "1": "Alasan penolakan murni karena ukuran fisik tubuh gajah, bukan karena kepribadian pendiam.",
+            "2": "Gajah tidak merusak tempat tinggal kelinci maupun katak.",
+            "3": "Kelinci dan katak tidak menyebutkan syarat berteman hanya dengan hewan yang bisa terbang."
+          }
+        },
+        {
+          "id": "eng-d-8-c2-q11",
+          "difficulty": "sedang",
+          "prompt": "Masalah utama (Complication) apa yang terjadi di hutan pada hari berikutnya dalam cerita Elephant and Friends (halaman 134)?",
+          "options": [
+            "Seekor harimau ganas mengancam keselamatan seluruh hewan dengan mencoba memangsa mereka.",
+            "Banjir bandang meluap dan menghancurkan semua pepohonan serta liang tempat tinggal hewan.",
+            "Gajah tersesat di dalam hutan dan tidak bisa menemukan jalan pulang.",
+            "Terjadi perselisihan besar antar-hewan untuk menentukan siapa peminpin hutan."
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Complication muncul ketika harimau datang dan memangsa hewan-hewan hutan sehingga semua hewan berlarian menyelamatkan diri (\"There is a tiger in the forest. He's trying to gobble us all up!\")."
+          },
+          "distractorWhy": {
+            "1": "Bencana banjir tidak pernah diceritakan dalam teks fabel ini.",
+            "2": "Masalah utama bukan gajah tersesat, melainkan ancaman dari harimau.",
+            "3": "Tidak ada perebutan kepemimpinan hutan antar-hewan dalam cerita tersebut."
+          }
+        },
+        {
+          "id": "eng-d-8-c2-q12",
+          "difficulty": "sedang",
+          "prompt": "Bagaimana cara gajah menyelesaikan masalah (Resolution) dan menyelamatkan hewan-hewan lain dari ancaman harimau (halaman 134)?",
+          "options": [
+            "Gajah dengan berani berjalan mendekati harimau, memintanya berhenti, lalu memberikan tendangan keras hingga harimau lari ketakutan.",
+            "Gajah berlari cepat dan bersembunyi di dalam goa yang dalam bersama kelinci.",
+            "Gajah meminta bantuan monyet untuk melemparkan buah kelapa ke arah harimau dari atas pohon.",
+            "Gajah membujuk harimau untuk menjadi vegetarian dan memakan rumput."
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Gajah menemui harimau, memperingatkannya, dan ketika harimau menolak, gajah memberikan tendangan kuat (\"hefty kick\") hingga harimau melarikan diri."
+          },
+          "distractorWhy": {
+            "1": "Gajah tidak bersembunyi; ia justru berdiri membela hewan-hewan lain.",
+            "2": "Gajah bertindak sendiri tanpa meminta monyet melemparkan kelapa.",
+            "3": "Gajah tidak membujuk harimau makan rumput, melainkan melawannya secara fisik."
+          }
+        },
+        {
+          "id": "eng-d-8-c2-q13",
+          "difficulty": "sedang",
+          "prompt": "Pada bagian penjelasan karakter (halaman 137), kata sifat (adjectives) digunakan untuk menggambarkan sifat tokoh. Manakah urutan kata sifat yang paling tepat untuk menggambarkan watak monyet, kelinci, dan katak sebelum datangnya ancaman harimau?",
+          "options": [
+            "Arrogant (sombong), shy (pemalu), dan disgruntled (kesal/jengkel).",
+            "Generous (dermawan), brave (berani), dan humble (rendah hati).",
+            "Lazy (pemalas), polite (sopan), dan helpful (suka menolong).",
+            "Fierce (galak), dishonest (curang), dan cruel (kejam)."
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Dalam Teks Halaman 133 dan 137, monyet disebut \"arrogant monkey\", kelinci disebut \"shy rabbit\", dan katak disebut \"disgruntled frog\"."
+          },
+          "distractorWhy": {
+            "1": "Ketiga sifat tersebut bertolak belakang dengan sikap awal ketiga hewan yang menolak berteman.",
+            "2": "Ketiga hewan tersebut tidak ditunjukkan sebagai pemalas atau bersikap sopan pada gajah.",
+            "3": "Fierce dan cruel adalah sifat harimau, bukan monyet, kelinci, atau katak."
+          }
+        },
+        {
+          "id": "eng-d-8-c2-q14",
+          "difficulty": "tinggi",
+          "prompt": "Pesan moral apakah yang disampaikan di akhir cerita Elephant and Friends ketika hewan-hewan berkata: \"You are just the right size to be our friend!\" (halaman 134-135)?",
+          "options": [
+            "Pertemanan sejati diukur dari kebaikan hati dan kesediaan membantu sesama, bukan dari ukuran atau penampilan fisik.",
+            "Hanya hewan yang berbadan besar dan kuat yang layak memiliki banyak teman di hutan.",
+            "Kita hanya perlu membantu orang lain yang pernah bersikap baik kepada kita di masa lalu.",
+            "Hewan berukuran kecil selalu lebih cerdas daripada hewan berukuran besar."
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Pesan moral fabel menekankan bahwa persahabatan tidak memandang fisik. Gajah yang tadinya ditolak karena terlalu besar akhirnya diterima karena kebaikan hati dan keberaniannya membantu."
+          },
+          "distractorWhy": {
+            "1": "Pernyataan ini salah karena ukuran fisik bukan syarat utama pertemanan.",
+            "2": "Gajah tetap menolong hewan-hewan meskipun sebelumnya mereka menolaknya, mengajarkan kebaikan tanpa pamrih.",
+            "3": "Cerita tidak membandingkan kecerdasan berdasarkan ukuran tubuh."
+          }
+        },
+        {
+          "id": "eng-d-8-c2-q15",
+          "difficulty": "dasar",
+          "prompt": "Berdasarkan Word Box pada halaman 132, manakah kelompok kata kerja tak beraturan (irregular verbs) yang semuanya dalam bentuk past tense (V2) secara tepat?",
+          "options": [
+            "saw, hid, leapt, flew, came",
+            "seed, hided, leaped, flyed, comed",
+            "seeing, hiding, leaping, flying, coming",
+            "sees, hides, leaps, flies, comes"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Kata saw (dari see), hid (dari hide), leapt (dari leap), flew (dari fly), dan came (dari come) adalah bentuk past tense irregular verbs yang benar."
+          },
+          "distractorWhy": {
+            "1": "Bentuk dengan akhiran -ed pada kata-kata tersebut salah karena kata-kata tersebut termasuk irregular verbs.",
+            "2": "Bentuk berakhiran -ing adalah present participle, bukan past tense (V2).",
+            "3": "Bentuk dengan s/es adalah simple present tense untuk subjek orang ketiga tunggal."
+          }
+        },
+        {
+          "id": "eng-d-8-c2-q16",
+          "difficulty": "tinggi",
+          "prompt": "Berdasarkan tabel struktur teks naratif pada halaman 140-143, apakah fungsi utama dari bagian Complication dalam sebuah cerita fabel?",
+          "options": [
+            "Memaparkan konflik, tantangan, atau masalah utama yang dihadapi oleh para tokoh.",
+            "Memperkenalkan tokoh, latar tempat, dan latar waktu terjadinya peristiwa.",
+            "Memberikan penyelesaian atau solusi atas masalah yang terjadi.",
+            "Menyampaikan pesan moral secara tertulis dalam bentuk daftar poin di akhir teks."
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Sesuai penjelasan struktur teks naratif di halaman 141-143, Complication berfungsi \"Showing the conflict(s) or problem(s) in the story\"."
+          },
+          "distractorWhy": {
+            "1": "Fungsi memperkenalkan tokoh dan latar adalah milik bagian Orientation.",
+            "2": "Fungsi memberikan penyelesaian adalah milik bagian Resolution.",
+            "3": "Pesan moral terintegrasi dalam cerita atau re-orientation, bukan fungsi utama complication."
+          }
+        },
+        {
+          "id": "eng-d-8-c2-q17",
+          "difficulty": "tinggi",
+          "prompt": "Perhatikan kalimat langsung berikut: The elephant asked, \"Will you be my friend?\". Manakah bentuk kalimat tidak langsung (indirect speech) yang tepat dari kalimat tersebut?",
+          "options": [
+            "The elephant asked if the animal would be his friend.",
+            "The elephant says that you will be my friend.",
+            "The elephant ask will you be my friend yesterday.",
+            "The elephant is asking to be friends right now."
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Pengubahan direct speech berupa yes/no question memakai kata hubung \"if\", tenses berubah menjadi past (will -> would), dan kata ganti disesuaikan (you -> the animal/he, my -> his)."
+          },
+          "distractorWhy": {
+            "1": "Kata kerja reporting verb \"says\" menggunakan present tense dan kata ganti tidak disesuaikan.",
+            "2": "Kata kerja \"ask\" tidak beraturan (kurang -ed) dan struktur tanda petik tidak diubah.",
+            "3": "Penggunaan present continuous tense (\"is asking\") tidak sesuai dengan pengubahan past narrative."
+          }
+        },
+        {
+          "id": "eng-d-8-c2-q18",
+          "difficulty": "tinggi",
+          "prompt": "Dalam cerita Elephant and Friends (halaman 134), terdapat kalimat: \"The elephant wondered what he could do to save everyone in the forest.\" Kata sifat (adjective) manakah yang paling tepat untuk menggambarkan karakter gajah berdasarkan tindakan tersebut?",
+          "options": [
+            "Brave (berani) dan compassionate (bela rasa/peduli).",
+            "Arrogant (sombong) dan greedy (serakah).",
+            "Cowardly (penakut) dan selfish (egois).",
+            "Indifferent (cuek) dan lazy (pemalas)."
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Tindakan gajah yang memikirkan keselamatan hewan lain dan menghadapi harimau mencerminkan sifat berani (brave) serta peduli/bela rasa (compassionate)."
+          },
+          "distractorWhy": {
+            "1": "Gajah tidak sombong ataupun serakah; ia justru rendah hati dan mau berbagi.",
+            "2": "Gajah tidak penakut atau egois karena ia bertindak menyelamatkan hewan lain.",
+            "3": "Gajah sangat peduli dan aktif bergerak, bukan acuh tak acuh atau pemalas."
+          }
+        },
+        {
+          "id": "eng-d-8-c2-q19",
+          "difficulty": "tinggi",
+          "prompt": "Chapter 2 memiliki judul utama \"Kindness Begins with Me\". Apakah benang merah (tema utama) yang menghubungkan cerita The Ugly Duckling dan Elephant and Friends?",
+          "options": [
+            "Menunjukkan kebaikan hati dan kepedulian terhadap sesama tanpa memandang perbedaan fisik akan membawa kedamaian dan pertemanan sejati.",
+            "Saling bersaing untuk membuktikan siapa hewan terkuat dan paling indah di dalam hutan.",
+            "Prinsip bertahan hidup di mana hanya hewan berpenampilan menarik yang berhak bahagia.",
+            "Menjauhi semua interaksi dengan hewan lain yang berbeda spesies untuk menghindari masalah."
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Kedua cerita mengusung sub-tema Kindness towards Differences dan Kindness and Friendship, menegaskan bahwa kebaikan hati mengatasi segala perbedaan fisik."
+          },
+          "distractorWhy": {
+            "1": "Persaingan dan adu kekuatan bukan tema yang diangkat dalam Chapter 2.",
+            "2": "Teks justru menolak anggapan bahwa hanya hewan menarik yang berhak bahagia.",
+            "3": "Teks mendorong interaksi dan kebaikan antar-spesies/hewan yang berbeda."
+          }
+        },
+        {
+          "id": "eng-d-8-c2-q20",
+          "difficulty": "tinggi",
+          "prompt": "Dalam penulisan naratif, dua kejadian di masa lalu dapat dihubungkan menggunakan Past Continuous Tense dan Simple Past Tense. Lengkapilah kalimat berikut: \"While the other animals _____ in fear, the elephant _____ forward to face the tiger.\"",
+          "options": [
+            "were hiding - stepped",
+            "are hiding - steps",
+            "hide - step",
+            "will hide - will step"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Klausa \"While...\" menyatakan tindakan yang sedang berlangsung di masa lalu menggunakan past continuous (were hiding), disusul tindakan selingan dalam simple past (stepped)."
+          },
+          "distractorWhy": {
+            "1": "Bentuk \"are hiding\" dan \"steps\" menggunakan present tense, tidak cocok untuk konteks teks naratif lampau.",
+            "2": "Bentuk \"hide\" dan \"step\" menggunakan verb 1 (present), bukan past tense.",
+            "3": "Bentuk \"will hide\" dan \"will step\" menggunakan future tense untuk kejadian di masa depan."
+          }
+        }
+      ]
     }
   ]
 }

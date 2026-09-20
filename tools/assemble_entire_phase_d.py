@@ -36,7 +36,6 @@ for b in [1, 2, 3, 4]:
         c["cpRef"] = f"{mat_doc} — Bab {b}"
         mat_data["competencies"].append(c)
 save_json(os.path.join(content_dir, "mapel-mat-d.json"), mat_data)
-print(f"MAT bank assembled with {len(mat_data['competencies'])} competencies.")
 
 
 # 2. BAHASA INDONESIA (Grade 7 Bab 1-4 + Grade 8 Bab 1)
@@ -67,10 +66,9 @@ if c_ind_8_b1:
     ind_data["competencies"].append(c_ind_8_b1)
 
 save_json(os.path.join(content_dir, "mapel-ind-d.json"), ind_data)
-print(f"IND bank assembled with {len(ind_data['competencies'])} competencies.")
 
 
-# 3. BAHASA INGGRIS (Grade 7 Chapter 1-3 + Grade 8 Chapter 1)
+# 3. BAHASA INGGRIS (Grade 7 Chapter 1-3 + Grade 8 Chapter 1-2)
 eng_doc = "English for Nusantara untuk SMP/MTs Kelas VII"
 eng_data = {
     "schema": "fiezel-mapel-bank-v1",
@@ -92,13 +90,13 @@ for c_num in [1, 2, 3]:
         c["cpRef"] = f"{eng_doc} — Chapter {c_num}"
         eng_data["competencies"].append(c)
 
-c_eng_8_c1 = load_json(os.path.join(tools_dir, "chunk_eng_8_c1.json"))
-if c_eng_8_c1:
-    c_eng_8_c1["cpRef"] = f"{eng_doc} — Chapter 1 (Kelas VIII)"
-    eng_data["competencies"].append(c_eng_8_c1)
+for c_num in [1, 2]:
+    c = load_json(os.path.join(tools_dir, f"chunk_eng_8_c{c_num}.json"))
+    if c:
+        c["cpRef"] = f"{eng_doc} — Chapter {c_num} (Kelas VIII)"
+        eng_data["competencies"].append(c)
 
 save_json(os.path.join(content_dir, "mapel-eng-d.json"), eng_data)
-print(f"ENG bank assembled with {len(eng_data['competencies'])} competencies.")
 
 
 # 4. IPS
@@ -123,7 +121,6 @@ for t_num in [1, 2, 3]:
         c["cpRef"] = f"{ips_doc} — Tema {t_num:02d}"
         ips_data["competencies"].append(c)
 save_json(os.path.join(content_dir, "mapel-ips-d.json"), ips_data)
-print(f"IPS bank assembled with {len(ips_data['competencies'])} competencies.")
 
 
 # 5. IPA (Grade 7 Bab 1-7 + Grade 8 Bab 1-6)
@@ -139,4 +136,5 @@ for b in [1, 2, 3, 4, 5, 6]:
 
 ipa_data["competencies"] = list(existing_ipa.values())
 save_json(os.path.join(content_dir, "mapel-ipa-d.json"), ipa_data)
-print(f"IPA bank assembled with total {len(ipa_data['competencies'])} competencies (Grade 7 + Grade 8).")
+
+print("Assembled Phase D including ENG Grade 8 Chapter 2.")
