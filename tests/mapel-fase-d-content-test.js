@@ -270,11 +270,20 @@ if (bankLengkap) {
   }
   /* Nilai th lolos bila ber-aksara Thai, ATAU identik dengan padanan id-nya. Jalur kedua
      itu bukan kelonggaran: batang soal Bahasa Inggris MEMANG materinya (menerjemahkannya
-     merusak soalnya), dan "56 cm²" tidak punya bentuk Thai yang berbeda. */
+     merusak soalnya), dan "56 cm²" tidak punya bentuk Thai yang berbeda.
+
+     Satu-satunya perbedaan penulisan yang ikut dimaafkan adalah pemisah desimal: Indonesia
+     menulis "2,5" sementara Thai menulis "2.5". Memaksa th memakai koma berarti memaksakan
+     ejaan angka Indonesia kepada pembaca Thai. Pemaafan ini SENGAJA sesempit mungkin — ia
+     hanya menyamakan koma dengan titik DI ANTARA DIGIT, jadi angka yang benar-benar berbeda
+     ("25" vs "2.5", "52" vs "25") tetap tertangkap. Mutasi M18 membuktikan itu. */
+  function samakanDesimal(v) {
+    return String(v).replace(/(\d),(\d)/g, '$1.$2');
+  }
   function nilaiThSah(th, id) {
     if (typeof th !== 'string' || th.trim() === '') return false;
     if (RE_THAI.test(th)) return true;
-    return th === id;
+    return th === id || samakanDesimal(th) === samakanDesimal(id);
   }
 
   for (const s of SUBJECTS) {
