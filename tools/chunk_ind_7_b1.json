@@ -1,0 +1,249 @@
+{
+  "code": "KOMP-IND-D-7-BAB1-01",
+  "grade": 7,
+  "name": "Bab 1: Jelajah Nusantara",
+  "materi": "Mengakses Informasi & Menjelajah Keindahan Alam, Memahami Gaya & Isi Teks Deskripsi, Unsur Kebahasaan: Kata Berimbuhan meN- & Majas Personifikasi",
+  "cpRef": "Bahasa Indonesia untuk SMP/MTs Kelas VII (Edisi Revisi) — Bab 1",
+  "items": [
+    {
+      "id": "ind-d-7-b1-q01",
+      "difficulty": "dasar",
+      "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VII (hal. 6-9 Teks 'Pantan Terong yang Instagramable'), objek utama yang dideskripsikan oleh penulis dalam teks tersebut adalah…",
+      "options": [
+        "Keindahan pemandangan alam dari bukit Pantan Terong di Kota Takengon, Aceh",
+        "Sejarah pembangunan dermaga penyeberangan di Danau Toba",
+        "Fasilitas penginapan mewah dan arena bermain di Kota Banda Aceh",
+        "Rute penerbangan komersial menuju Bandara Sultan Iskandar Muda"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Teks deskripsi 'Pantan Terong yang Instagramable' memaparkan lanskap keindahan bukit Pantan Terong yang menyuguhkan pemandangan Danau Laut Tawar di Takengon, Aceh."
+      },
+      "distractorWhy": {
+        "1": "Danau Toba terletak di Sumatera Utara, bukan fokus teks Pantan Terong Aceh.",
+        "2": "Teks tidak membahas arena bermain atau penginapan mewah.",
+        "3": "Rute penerbangan bukan merupakan isi fisik teks deskripsi wisata alam ini."
+      }
+    },
+    {
+      "id": "ind-d-7-b1-q02",
+      "difficulty": "sedang",
+      "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VII (hal. 12), kalimat berikut yang menggunakan majas personifikasi secara tepat adalah…",
+      "options": [
+        "Angin laut berbisik menyampaikan salam hangat pada dedaunan nyiur di pantai",
+        "Pemandangan Gunung Leuser sangat indah bagaikan lukisan surga",
+        "Suara ombak Samudra Hindia menggelegar memecah kesunyian malam",
+        "Air laut di Teluk Kiluan jernih sekali seperti kaca bening"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Majas personifikasi memberikan sifat atau perilaku manusia (berbisik menyampaikan salam) kepada benda mati/alam (angin laut)."
+      },
+      "distractorWhy": {
+        "1": "Kalimat ini menggunakan majas asosiasi/simile (menggunakan kata pembanding 'bagaikan').",
+        "2": "Kalimat ini menggunakan ungkapan deskriptif pendengaran (bukan perilaku manusia).",
+        "3": "Kalimat ini menggunakan pembanding 'seperti' (simile)."
+      }
+    },
+    {
+      "id": "ind-d-7-b1-q03",
+      "difficulty": "sedang",
+      "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VII (hal. 15 Kebahasaan), penulisan kata berimbuhan meN- yang luluh secara benar sesuai kaidah EYD adalah…",
+      "options": [
+        "Memesona (meN- + pesona)",
+        "Mempesona (meN- + pesona)",
+        "Mengkristal (meN- + kristal)",
+        "Mensapu (meN- + sapu)"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Kaidah fonologi: Kata dasar berawalan huruf K, T, S, P yang diikuti huruf vokal akan luluh jika diberi imbuhan meN-. P pada 'pesona' luluh menjadi 'memesona'."
+      },
+      "distractorWhy": {
+        "1": "Bentuk 'mempesona' tidak luluh dan melanggar kaidah KTSP.",
+        "2": "Huruf K pada 'kristal' diikuti konsonan 'r', sehingga tidak luluh (mengkristal benar tapi contoh tidak luluh).",
+        "3": "Bentuk 'mensapu' salah karena huruf S harus luluh menjadi 'menyapu'."
+      }
+    },
+    {
+      "id": "ind-d-7-b1-q04",
+      "difficulty": "tinggi",
+      "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VII (hal. 20-22 'Menjelajah Keindahan Riau'), tujuan utama penulisan teks deskripsi adalah…",
+      "options": [
+        "Menggambarkan objek secara terperinci sehingga pembaca seolah-olah dapat melihat, mendengar, atau merasakan sendiri objek tersebut",
+        "Mempengaruhi pembaca agar membeli produk wisata daerah",
+        "Menjelaskan langkah-langkah prosedural menuju tempat wisata",
+        "Menceritakan kisah rukun kehidupan tokoh fiktif di daerah wisata"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Tujuan utama teks deskripsi adalah melukiskan pancaindra objek secara mendalam agar pembaca seakan mengalami langsung objek yang dideskripsikan."
+      },
+      "distractorWhy": {
+        "1": "Mempengaruhi membeli produk adalah tujuan teks persuasi/iklan.",
+        "2": "Menjelaskan langkah prosedural adalah fungsi teks prosedur.",
+        "3": "Menceritakan kisah tokoh fiktif adalah fungsi teks cerpen/fantasi."
+      }
+    },
+    {
+      "id": "ind-d-7-b1-q05",
+      "difficulty": "dasar",
+      "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VII (hal. 18), kata konkret yang digunakan untuk menggambarkan indra penglihatan dalam deskripsi pantai adalah…",
+      "options": [
+        "Pasir putih bersih, kebiruan air laut, dan jajaran pohon kelapa",
+        "Deru ombak menggelegar dan hisikan angin",
+        "Aroma khas garam laut dan wangi ikan bakar",
+        "Tekstur pasir yang halus dan dinginnya tetesan air laut"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Kata konkret penglihatan melibatkan ciri visual seperti warna (putih, kebiruan) dan bentuk fisik (jajaran pohon)."
+      },
+      "distractorWhy": {
+        "1": "Deru dan hisikan melibatkan indra pendengaran.",
+        "2": "Aroma melibatkan indra penciuman.",
+        "3": "Tekstur halus dan dingin melibatkan indra perabaan."
+      }
+    },
+    {
+      "id": "ind-d-7-b1-q06",
+      "difficulty": "sedang",
+      "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VII (hal. 24), penggunaan tanda koma (,) yang tepat dalam rincian unsur teks deskripsi adalah…",
+      "options": [
+        "Ibu membeli buah jeruk, apel, dan mangga di pasar tradisional.",
+        "Ibu membeli buah jeruk apel dan mangga, di pasar tradisional.",
+        "Ibu membeli buah, jeruk, apel dan mangga di pasar tradisional.",
+        "Ibu membeli, buah jeruk, apel, dan mangga di pasar tradisional."
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Tanda koma digunakan di antara unsur-unsur dalam suatu pemerincian atau pembilangan, termasuk sebelum kata hubung 'dan' di akhir rincian."
+      },
+      "distractorWhy": {
+        "1": "Kurang tanda koma sebelum kata hubung 'dan'.",
+        "2": "Penggunaan tanda koma sebelum keterangan tempat salah.",
+        "3": "Penggunaan koma setelah kata kerja transitif 'membeli' tidak tepat."
+      }
+    },
+    {
+      "id": "ind-d-7-b1-q07",
+      "difficulty": "tinggi",
+      "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VII (hal. 28 Uji Kemampuan), kutipan teks: 'Dari kejauhan, perbukitan hijau berdiri kokoh memagari lembah. Kabut tipis menyelimuti puncaknya bagaikan selendang sutra putih.' Struktur bagian teks deskripsi di atas merupakan bagian…",
+      "options": [
+        "Deskripsi bagian",
+        "Identifikasi / Gambaran umum",
+        "Simpulan / Kesan umum",
+        "Judul utama"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Bagian ini merinci kondisi rupa fisik perbukitan dan kabut secara mendalam (rincian pancaindra), yang merupakan ciri struktur 'Deskripsi bagian'."
+      },
+      "distractorWhy": {
+        "1": "Identifikasi memuat penetapan nama objek, lokasi, dan pernyataan umum awal.",
+        "2": "Simpulan berisi ringkasan atau kesan pribadi penulis di akhir teks.",
+        "3": "Judul utama berada di kepala teks."
+      }
+    },
+    {
+      "id": "ind-d-7-b1-q08",
+      "difficulty": "sedang",
+      "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VII (hal. 14), imbuhan meN- yang bergabung dengan kata dasar 'tulis' membentuk kata…",
+      "options": [
+        "Menulis",
+        "Mentulis",
+        "Memtulis",
+        "Mengtulis"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Kata dasar berawalan huruf 't' (tulis) akan luluh menjadi 'n' saat diberi imbuhan meN-, menghasilkan kata 'menulis'."
+      },
+      "distractorWhy": {
+        "1": "Bentuk 'mentulis' tidak mengalami peluluhan huruf 't'.",
+        "2": "Bentuk 'memtulis' salah penggabungan alomor.",
+        "3": "Bentuk 'mengtulis' salah alomor."
+      }
+    },
+    {
+      "id": "ind-d-7-b1-q09",
+      "difficulty": "dasar",
+      "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VII (hal. 10), kalimat deskripsi yang melibatkan citraan indra pendengaran adalah…",
+      "options": [
+        "Gemericik air sungai terdengar jernih menenangkan jiwa di pagi hari",
+        "Warna merah menyala bunga mawar menghiasi sudut taman",
+        "Bau harum aroma kopi menyengat di sepanjang lorong pasar",
+        "Permukaan daun keladi itu sangat licin dan halus saat diusap"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Kata 'gemericik' dan 'terdengar' menstimulasi indra pendengaran (auditori)."
+      },
+      "distractorWhy": {
+        "1": "Warna merah menyala menstimulasi penglihatan.",
+        "2": "Bau harum menyengat menstimulasi penciuman.",
+        "3": "Licin dan halus menstimulasi perabaan."
+      }
+    },
+    {
+      "id": "ind-d-7-b1-q10",
+      "difficulty": "tinggi",
+      "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VII (hal. 32), kata emotif yang digunakan untuk memperkuat kesan keindahan dalam deskripsi pantai adalah…",
+      "options": [
+        "Memukau, menakjubkan, dan memesona",
+        "Besar, tinggi, dan panjang",
+        "Berjalan, berlari, dan melompat",
+        "Satu, dua, dan tiga"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Kata emotif adalah kata-kata yang memicu emosi atau rasa kagum pembaca, seperti 'memukau', 'menakjubkan', dan 'memesona'."
+      },
+      "distractorWhy": {
+        "1": "Kata besar, tinggi, dan panjang adalah kata ukuran objektif.",
+        "2": "Kata berjalan, berlari, melompat adalah kata kerja aksi.",
+        "3": "Kata satu, dua, tiga adalah kata bilangan."
+      }
+    },
+    {
+      "id": "ind-d-7-b1-q11",
+      "difficulty": "dasar",
+      "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VII (hal. 16), kata sinonim dari kata 'elok' dalam kalimat 'Pemandangan laut di sore hari sangat elok' adalah…",
+      "options": [
+        "Indah / Cantik",
+        "Buruk / Jelek",
+        "Gelap / Suram",
+        "Biasa / Standar"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Kata 'elok' bermakna indah, cantik, atau bagus dipandang."
+      },
+      "distractorWhy": {
+        "1": "Buruk/jelek adalah antonim (lawan kata).",
+        "2": "Gelap/suram tidak sesuai makna.",
+        "3": "Biasa/standar tidak memiliki kadar estetika kata elok."
+      }
+    },
+    {
+      "id": "ind-d-7-b1-q12",
+      "difficulty": "sedang",
+      "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VII (hal. 30), penggunaan kata depan 'di' yang benar sebagai penunjuk lokasi/tempat adalah…",
+      "options": [
+        "di Takengon",
+        "ditakengon",
+        "di makan",
+        "di baca"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Kata depan 'di' yang menunjukkan tempat ditulis terpisah dari kata yang mengikutinya (di Takengon)."
+      },
+      "distractorWhy": {
+        "1": "Bentuk 'ditakengon' salah karena disambung.",
+        "2": "Bentuk 'di makan' salah karena di- pada kata kerja harus disambung (dimakan).",
+        "3": "Bentuk 'di baca' salah karena di- awalan pasif harus disambung (dibaca)."
+      }
+    }
+  ]
+}

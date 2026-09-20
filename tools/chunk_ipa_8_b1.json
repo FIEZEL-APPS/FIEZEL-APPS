@@ -1,0 +1,409 @@
+{
+  "code": "KOMP-IPA-D-8-BAB1-01",
+  "grade": 8,
+  "name": "Pengenalan Sel",
+  "materi": "Struktur & Fungsi Organel Sel, Perbedaan Sel Tumbuhan & Sel Hewan, Spesialisasi Sel & Penggunaan Mikroskop",
+  "cpRef": "Ilmu Pengetahuan Alam untuk SMP/MTs Kelas VIII (Edisi Revisi) — Bab 1",
+  "items": [
+    {
+      "id": "ipa-d-8-b1-q01",
+      "difficulty": "dasar",
+      "prompt": "Berdasarkan Buku Siswa IPA Kelas VIII (hal. 6-10), organel sel yang berfungsi sebagai pusat pengendali seluruh aktivitas sel serta menyimpan informasi genetik (DNA) adalah…",
+      "options": [
+        "Nukleus (inti sel)",
+        "Mitokondria",
+        "Ribosom",
+        "Lisosom"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Nukleus (inti sel) mengandung materi genetik (DNA/kromosom) dan mengatur sintesis protein serta seluruh aktivitas selular."
+      },
+      "distractorWhy": {
+        "1": "Mitokondria adalah tempat pembentukan energi melalui respirasi sel.",
+        "2": "Ribosom adalah tempat sintesis protein.",
+        "3": "Lisosom berisi enzim pencernaan intraseluler."
+      }
+    },
+    {
+      "id": "ipa-d-8-b1-q02",
+      "difficulty": "sedang",
+      "prompt": "Berdasarkan Buku Siswa IPA Kelas VIII (hal. 14-16 Perbedaan Sel Tumbuhan dan Sel Hewan), organel sel berikut yang hanya ditemukan pada sel tumbuhan dan tidak dimiliki oleh sel hewan adalah…",
+      "options": [
+        "Dinding sel dan kloroplas",
+        "Mitokondria dan membran sel",
+        "Nukleus dan sitoplasma",
+        "Ribosom dan retikulum endoplasma"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Sel tumbuhan memiliki dinding sel yang kaku berbahan selulosa dan kloroplas untuk fotosintesis yang tidak ditemukan pada sel hewan."
+      },
+      "distractorWhy": {
+        "1": "Mitokondria dan membran sel ditemukan baik pada sel tumbuhan maupun sel hewan.",
+        "2": "Nukleus dan sitoplasma dimiliki oleh semua sel eukariotik.",
+        "3": "Ribosom dan retikulum endoplasma terdapat pada kedua jenis sel."
+      }
+    },
+    {
+      "id": "ipa-d-8-b1-q03",
+      "difficulty": "sedang",
+      "prompt": "Berdasarkan Buku Siswa IPA Kelas VIII (hal. 18 Spesialisasi Sel), sel tumbuhan yang mengalami spesialisasi dengan membentuk juluran rambut halus untuk memperluas bidang penyerapan air dan garam mineral dari tanah adalah…",
+      "options": [
+        "Sel akar rambut (epidermis akar)",
+        "Sel penutup stomata",
+        "Sel pembuluh xilem",
+        "Sel pembuluh floem"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Sel akar rambut merupakan modifikasi sel epidermis akar yang berfungsi meningkatkan luas permukaan penyerapan air dan hara tanah."
+      },
+      "distractorWhy": {
+        "1": "Sel penutup stomata mengatur membuka dan menutupnya pori daun untuk pertukaran gas.",
+        "2": "Sel xilem berfungsi mengangkut air dan mineral dari akar menuju daun.",
+        "3": "Sel floem berfungsi mengangkut hasil fotosintesis dari daun ke seluruh bagian tumbuhan."
+      }
+    },
+    {
+      "id": "ipa-d-8-b1-q04",
+      "difficulty": "tinggi",
+      "prompt": "Berdasarkan Buku Siswa IPA Kelas VIII (hal. 22 Penggunaan Mikroskop), saat mengamati preparat sel menggunakan mikroskop cahaya, jika pengamat ingin menajamkan fokus bayangan objek secara halus setelah fokus awal ditemukan, komponen mikroskop yang harus diputar adalah…",
+      "options": [
+        "Mikrometer (pemutar halus)",
+        "Makrometer (pemutar kasar)",
+        "Revolver pemutar lensa",
+        "Diafragma pengatur cahaya"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Mikrometer (pemutar halus) berfungsi menggerakkan tabung atau meja preparat secara sangat perlahan untuk mendapatkan fokus bayangan yang tajam dan jelas."
+      },
+      "distractorWhy": {
+        "1": "Makrometer digunakan untuk menggerakkan tabung atau meja preparat secara cepat dalam pencarian fokus awal.",
+        "2": "Revolver berfungsi mengganti perbesaran lensa objektif.",
+        "3": "Diafragma berfungsi mengatur jumlah cahaya yang masuk menuju preparat."
+      }
+    },
+    {
+      "id": "ipa-d-8-b1-q05",
+      "difficulty": "dasar",
+      "prompt": "Berdasarkan Buku Siswa IPA Kelas VIII (hal. 8 Organel Sel), organel sel yang dikenal sebagai tempat berlangsungnya respirasi seluler untuk menghasilkan energi kimia dalam bentuk ATP adalah…",
+      "options": [
+        "Mitokondria",
+        "Badan Golgi",
+        "Vakuola",
+        "Peroksisom"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Mitokondria mengoksidasi glukosa melalui respirasi seluler untuk menghasilkan energi dalam bentuk molekul ATP."
+      },
+      "distractorWhy": {
+        "1": "Badan Golgi berfungsi memodifikasi, mengemas, dan menyalurkan sekresi sel.",
+        "2": "Vakuola berfungsi menyimpan cadangan makanan, zat sisa, dan mempertahankan tekanan turgor.",
+        "3": "Peroksisom berfungsi menguraikan zat racun seperti hidrogen peroksida."
+      }
+    },
+    {
+      "id": "ipa-d-8-b1-q06",
+      "difficulty": "sedang",
+      "prompt": "Berdasarkan Buku Siswa IPA Kelas VIII (hal. 25 Spesialisasi Sel Hewan), sel darah merah (eritrosit) manusia memiliki struktur berbentuk bikonkaf dan tidak memiliki inti sel saat dewasa. Spesialisasi struktur ini bertujuan untuk…",
+      "options": [
+        "Memaksimalkan ruang sel untuk mengikat molekul hemoglobin dan mengangkut oksigen secara efisien",
+        "Memudahkan sel melakukan fagositosis terhadap bakteri patogen",
+        "Mempercepat proses pembekuan darah ketika terjadi luka",
+        "Menghasilkan molekul antibodi untuk sistem kekebalan tubuh"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Hilangnya inti sel memberikan ruang yang maksimal bagi hemoglobin untuk mengikat oksigen dan mendistribusikannya ke seluruh jaringan tubuh."
+      },
+      "distractorWhy": {
+        "1": "Melakukan fagositosis terhadap patogen merupakan fungsi sel darah putih (leukosit).",
+        "2": "Mempercepat pembekuan darah merupakan peran utama keping darah (trombosit).",
+        "3": "Menghasilkan antibodi merupakan fungsi sel darah putih limfosit."
+      }
+    },
+    {
+      "id": "ipa-d-8-b1-q07",
+      "difficulty": "tinggi",
+      "prompt": "Berdasarkan Buku Siswa IPA Kelas VIII (hal. 28 Organisasi Kehidupan), urutan hierarki organisasi kehidupan pada makhluk hidup multiseluler dari tingkat terendah hingga tertinggi yang benar adalah…",
+      "options": [
+        "Sel -> Jaringan -> Organ -> Sistem Organ -> Organisme",
+        "Organisme -> Sistem Organ -> Organ -> Jaringan -> Sel",
+        "Jaringan -> Sel -> Organ -> Organisme -> Sistem Organ",
+        "Sel -> Organ -> Jaringan -> Organisme -> Sistem Organ"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Hierarki organisasi biologis dimulai dari sel sebagai unit terkecil, kumpulan sel sejenis membentuk jaringan, jaringan menyusun organ, organ membentuk sistem organ, dan kumpulan sistem organ membentuk satu organisme utuh."
+      },
+      "distractorWhy": {
+        "1": "Urutan tersebut merupakan urutan terbalik dari tingkat tertinggi ke terendah.",
+        "2": "Jaringan berada pada tingkat yang lebih tinggi daripada sel.",
+        "3": "Organ berada pada tingkat setelah jaringan, bukan sebelum jaringan."
+      }
+    },
+    {
+      "id": "ipa-d-8-b1-q08",
+      "difficulty": "dasar",
+      "prompt": "Berdasarkan Buku Siswa IPA Kelas VIII (hal. 12 Komponen Sel), cairan sel berupa koloid kompleks yang mengisi ruang di antara membran sel dan inti sel tempat organel-organel berada dinamakan…",
+      "options": [
+        "Sitoplasma",
+        "Nukleoplasma",
+        "Selulosa",
+        "Cairan plasma darah"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Sitoplasma adalah matriks cairan di dalam sel yang mengandung air, garam terlarut, enzim, dan merupakan tempat organel sel tersuspensi."
+      },
+      "distractorWhy": {
+        "1": "Nukleoplasma adalah cairan khusus yang terdapat di dalam inti sel (nukleus).",
+        "2": "Selulosa adalah karbohidrat kompleks penyusun dinding sel tumbuhan.",
+        "3": "Cairan plasma darah adalah komponen penyusun cairan ekstraseluler dalam sistem sirkulasi darah."
+      }
+    },
+    {
+      "id": "ipa-d-8-b1-q09",
+      "difficulty": "sedang",
+      "prompt": "Berdasarkan Buku Siswa IPA Kelas VIII (hal. 20 Penggunaan Mikroskop), jika seorang siswa mengamati sel tumbuhan menggunakan mikroskop dengan perbesaran lensa okuler 10x dan lensa objektif 40x, maka perbesaran total bayangan objek yang dihasilkan adalah…",
+      "options": [
+        "400x",
+        "50x",
+        "30x",
+        "4000x"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Perbesaran total mikroskop diperoleh dengan mengalikan perbesaran lensa okuler dengan perbesaran lensa objektif (10 × 40 = 400x)."
+      },
+      "distractorWhy": {
+        "1": "Angka 50x merupakan hasil penjumlahan nilai perbesaran (10 + 40), bukan perkalian.",
+        "2": "Angka 30x merupakan hasil pengurangan nilai perbesaran (40 - 10).",
+        "3": "Angka 4000x merupakan kesalahan perhitungan perkalian."
+      }
+    },
+    {
+      "id": "ipa-d-8-b1-q10",
+      "difficulty": "tinggi",
+      "prompt": "Berdasarkan Buku Siswa IPA Kelas VIII (hal. 30 Transpor Sel), pergerakan molekul air melewati membran semipermeabel dari larutan dengan konsentrasi pelarut tinggi (hipotonis) menuju konsentrasi pelarut rendah (hipertonis) dinamakan…",
+      "options": [
+        "Osmosis",
+        "Difusi terfasilitasi",
+        "Endositosis",
+        "Transpor aktif"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Osmosis adalah perpindahan khusus molekul air (pelarut) menembus membran selektif permeabel dari kondisi encer ke kondisi lebih pekat."
+      },
+      "distractorWhy": {
+        "1": "Difusi terfasilitasi merupakan perpindahan zat terlarut dengan bantuan saluran protein membran.",
+        "2": "Endositosis merupakan mekanisme masuknya partikel besar melalui pembungkusan membran sel.",
+        "3": "Transpor aktif merupakan perpindahan zat melawan gradien konsentrasi yang memerlukan energi ATP."
+      }
+    },
+    {
+      "id": "ipa-d-8-b1-q11",
+      "difficulty": "dasar",
+      "prompt": "Berdasarkan Buku Siswa IPA Kelas VIII (hal. 15 Organel Sel Tumbuhan), pigmen hijau yang terdapat di dalam organel kloroplas dan berfungsi menangkap energi cahaya matahari untuk proses fotosintesis adalah…",
+      "options": [
+        "Klorofil",
+        "Karotenoid",
+        "Antosianin",
+        "Fukosantin"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Klorofil adalah pigmen fotosintetik hijau utama pada tumbuhan yang berfungsi menyerap gelombang cahaya matahari."
+      },
+      "distractorWhy": {
+        "1": "Karotenoid merupakan pigmen pelengkap berwarna kuning, oranye, atau merah.",
+        "2": "Antosianin merupakan pigmen larut air yang memberikan warna merah, ungu, atau biru pada buah dan bunga.",
+        "3": "Fukosantin merupakan pigmen cokelat khas pada ganggang cokelat (Phaeophyta)."
+      }
+    },
+    {
+      "id": "ipa-d-8-b1-q12",
+      "difficulty": "sedang",
+      "prompt": "Berdasarkan Buku Siswa IPA Kelas VIII (hal. 26 Struktur Sel Tumbuhan), vakuola sentral berukuran besar yang terdapat pada sel tumbuhan masak memiliki fungsi utama untuk…",
+      "options": [
+        "Menyimpan air, cadangan makanan, zat sisa metabolik, serta menjaga tekanan turgor sel",
+        "Menghasilkan energi listrik kimia melalui sintesis ATP",
+        "Mencerna materi asing dan partikel makanan menggunakan enzim hidrolitik",
+        "Membentuk benang spindel saat pembelahan sel berlangsung"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Vakuola sentral pada sel tumbuhan menampung cadangan nutrisi, sisa metabolit, serta mempertahankan tekanan turgor agar sel tetap kaku."
+      },
+      "distractorWhy": {
+        "1": "Menghasilkan energi ATP merupakan fungsi dari mitokondria.",
+        "2": "Mencerna materi menggunakan enzim hidrolitik merupakan fungsi utama lisosom.",
+        "3": "Membentuk benang spindel merupakan fungsi dari sentriol/sentrosom."
+      }
+    },
+    {
+      "id": "ipa-d-8-b1-q13",
+      "difficulty": "dasar",
+      "prompt": "Berdasarkan Buku Siswa IPA Kelas VIII (hal. 4 Penemuan Sel), ilmuwan yang pertama kali menemukan struktur seperti kamar-kamar kecil pada sayatan gabus batang tumbuhan dan menamakannya sebagai 'cellula' adalah…",
+      "options": [
+        "Robert Hooke",
+        "Antonie van Leeuwenhoek",
+        "Matthias Schleiden",
+        "Theodor Schwann"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Robert Hooke pada tahun 1665 mengamati sayatan gabus dengan mikroskop buatannya dan menemukan ruangan kecil kaku yang dinamai sel (cellula)."
+      },
+      "distractorWhy": {
+        "1": "Antonie van Leeuwenhoek adalah penemu mikroorganisme hidup pertama menggunakan mikroskop lensa tunggal.",
+        "2": "Matthias Schleiden menyatakan bahwa seluruh jaringan tumbuhan tersusun atas sel.",
+        "3": "Theodor Schwann menyatakan bahwa seluruh tubuh hewan tersusun atas sel."
+      }
+    },
+    {
+      "id": "ipa-d-8-b1-q14",
+      "difficulty": "sedang",
+      "prompt": "Berdasarkan Buku Siswa IPA Kelas VIII (hal. 21 Bagian Mikroskop), bagian mikroskop yang terletak di bawah meja preparat dan berfungsi mengumpulkan serta memfokuskan sinar cahaya menuju objek pengamatan adalah…",
+      "options": [
+        "Kondensor",
+        "Diafragma",
+        "Lensa okuler",
+        "Revolver"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Kondensor berfungsi memfokuskan dan mengarahkan berkas cahaya yang berasal dari cermin atau lampu menuju ke preparat."
+      },
+      "distractorWhy": {
+        "1": "Diafragma berfungsi mengatur jumlah intensitas cahaya yang melintasi kondensor.",
+        "2": "Lensa okuler adalah lensa yang dekat dengan mata pengamat untuk membesarkan bayangan.",
+        "3": "Revolver adalah tempat meletakkan dan memilih lensa objektif dengan perbesaran tertentu."
+      }
+    },
+    {
+      "id": "ipa-d-8-b1-q15",
+      "difficulty": "tinggi",
+      "prompt": "Berdasarkan Buku Siswa IPA Kelas VIII (hal. 17 Transpor Membran), apabila sel darah merah diletakkan di dalam larutan garam hipertonis (konsentrasi tinggi), maka peristiwa yang akan terjadi pada sel tersebut adalah…",
+      "options": [
+        "Krenasi (sel mengerut karena air keluar dari sel)",
+        "Lisis (sel membengkak lalu pecah karena air masuk)",
+        "Turgid (sel menjadi tegar tanpa mengalami kerusakan)",
+        "Plasmolisis (membran sel terlepas dari dinding sel)"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Dalam larutan hipertonis, air keluar dari eritrosit secara osmosis sehingga sel darah merah kehilangan volume dan mengerut (krenasi)."
+      },
+      "distractorWhy": {
+        "1": "Lisis terjadi jika eritrosit berada di dalam larutan hipotonis sehingga air masuk berlebihan hingga sel pecah.",
+        "2": "Turgid terjadi pada sel tumbuhan di larutan hipotonis karena adanya dinding sel.",
+        "3": "Plasmolisis terjadi khusus pada sel tumbuhan yang memiliki dinding sel kaku ketika berada di media hipertonis."
+      }
+    },
+    {
+      "id": "ipa-d-8-b1-q16",
+      "difficulty": "dasar",
+      "prompt": "Berdasarkan Buku Siswa IPA Kelas VIII (hal. 10 Organel Sel), organel sel yang berfungsi untuk mensintesis protein dalam sel adalah…",
+      "options": [
+        "Ribosom",
+        "Lisosom",
+        "Vakuola",
+        "Sentrosom"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Ribosom merupakan tempat perakitan asam amino menjadi rantai polipeptida (sintesis protein)."
+      },
+      "distractorWhy": {
+        "1": "Lisosom berfungsi mencerna makromolekul dan limbah seluler.",
+        "2": "Vakuola berfungsi menyimpan cairan dan cadangan makanan.",
+        "3": "Sentrosom/sentriol berperan dalam pembelahan sel hewan."
+      }
+    },
+    {
+      "id": "ipa-d-8-b1-q17",
+      "difficulty": "sedang",
+      "prompt": "Berdasarkan Buku Siswa IPA Kelas VIII (hal. 19 Spesialisasi Sel Tumbuhan), sel spesialisasi pada tumbuhan yang berfungsi sebagai saluran untuk mengangkut air dan garam mineral dari akar menuju ke daun adalah…",
+      "options": [
+        "Pembuluh xilem",
+        "Pembuluh floem",
+        "Sel stomata",
+        "Sel korteks"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Pembuluh xilem tersusun dari sel-sel mati yang membentuk saluran kapiler panjang untuk mentranspor air dan mineral dari akar ke daun."
+      },
+      "distractorWhy": {
+        "1": "Pembuluh floem mengangkut hasil fotosintesis (gula/sukrosa) dari daun ke bagian tumbuhan lainnya.",
+        "2": "Sel stomata mengatur pertukaran gas O₂ dan CO₂ pada permukaan daun.",
+        "3": "Sel korteks berfungsi terutama sebagai jaringan pengisi dan penyimpan cadangan makanan."
+      }
+    },
+    {
+      "id": "ipa-d-8-b1-q18",
+      "difficulty": "tinggi",
+      "prompt": "Berdasarkan Buku Siswa IPA Kelas VIII (hal. 11 Organel Sel), organel bermembran rangkap yang menghubungkan membran inti dengan membran sel serta berperan dalam transpor bahan dan sintesis lipid (pada tipe halus) adalah…",
+      "options": [
+        "Retikulum endoplasma",
+        "Badan Golgi",
+        "Peroksisom",
+        "Mikrotubulus"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Retikulum endoplasma (RE) membentuk jaringan membran intraseluler tempat sintesis protein (RE kasar) dan sintesis lipid/detoksifikasi (RE halus)."
+      },
+      "distractorWhy": {
+        "1": "Badan Golgi berperan memodifikasi dan memaketkan hasil sintesis dari RE.",
+        "2": "Peroksisom berperan memecah asam lemak dan mereduksi hidrogen peroksida.",
+        "3": "Mikrotubulus adalah bagian dari sitoskeleton pengatur bentuk sel."
+      }
+    },
+    {
+      "id": "ipa-d-8-b1-q19",
+      "difficulty": "dasar",
+      "prompt": "Berdasarkan Buku Siswa IPA Kelas VIII (hal. 14 Sel Tumbuhan), struktur luar yang bersifat kaku dan memberikan bentuk tetap serta perlindungan mekanis pada sel tumbuhan adalah…",
+      "options": [
+        "Dinding sel",
+        "Membran sel",
+        "Kapsul sel",
+        "Glikokaliks"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Dinding sel terbuat dari serat selulosa yang memberikan struktur kaku, bentuk tetap, serta proteksi bagi sel tumbuhan."
+      },
+      "distractorWhy": {
+        "1": "Membran sel bersifat fleksibel dan selektif permeabel yang terdapat pada seluruh sel.",
+        "2": "Kapsul sel merupakan lapisan pelindung tambahan pada sel bakteri (prokariot).",
+        "3": "Glikokaliks adalah lapisan matriks ekstraseluler pada sel hewan."
+      }
+    },
+    {
+      "id": "ipa-d-8-b1-q20",
+      "difficulty": "sedang",
+      "prompt": "Berdasarkan Buku Siswa IPA Kelas VIII (hal. 24 Spesialisasi Sel Hewan), spesialisasi sel saraf (neuron) pada tubuh manusia ditandai dengan adanya struktur panjang yang dinamakan akson. Fungsi utama dari struktur akson tersebut adalah…",
+      "options": [
+        "Meneruskan impuls listrik dari badan sel menuju ke sel saraf atau organ target lainnya",
+        "Menerima impuls dari sel saraf lain dan meneruskannya ke badan sel",
+        "Memproduksi molekul neurotransmiter di dalam inti sel",
+        "Mencerna sel-sel saraf yang telah rusak"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Akson (neurit) berfungsi menghantarkan sinyal sinapsis/impuls listrik menjauhi badan sel menuju ke sel saraf lain atau efektor."
+      },
+      "distractorWhy": {
+        "1": "Menerima impuls dan menghantarkannya ke badan sel merupakan fungsi dendrit.",
+        "2": "Memproduksi molekul neurotransmiter dilakukan terutama di ujung akson/badan sel.",
+        "3": "Mencerna sel berkerusakan dilakukan oleh sel glia (mikroglia)."
+      }
+    }
+  ]
+}

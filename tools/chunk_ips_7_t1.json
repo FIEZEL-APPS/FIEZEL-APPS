@@ -1,0 +1,369 @@
+{
+  "code": "KOMP-IPS-D-7-BAB1-01",
+  "grade": 7,
+  "name": "Tema 01: Keberadaan Diri dan Keluarga",
+  "materi": "Mengenal Sejarah Keluarga & Silsilah, Pemahaman Lokasi pada Peta & Komponen Peta, Interaksi Sosial & Agen Sosialisasi, Pemenuhan Kebutuhan Manusia",
+  "cpRef": "Ilmu Pengetahuan Sosial untuk SMP/MTs Kelas VII (Edisi Revisi) — Tema 01",
+  "items": [
+    {
+      "id": "ips-d-7-t1-q01",
+      "difficulty": "dasar",
+      "prompt": "Berdasarkan Buku Siswa IPS Kelas VII Edisi Revisi (hal. 2), seorang siswa diminta menuliskan sejarah asal-usul keluarganya mulai dari kakek-nenek hingga silsilah dirinya. Keberadaan silsilah keluarga tersebut penting dalam IPS karena ....",
+      "options": [
+        "menjelaskan silsilah dan asal-usul keberadaan diri serta keluarga dalam sejarah lokal",
+        "mengharuskan setiap keluarga mencatat seluruh harta warisan generasi terdahulu",
+        "menentukan tingkat status ekonomi sosial keluarga di mata masyarakat sekitar",
+        "menghapus perbedaan peran sosial antara generasi tua dan generasi muda"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Silsilah keluarga berfungsi untuk mengenali sejarah keluarga, hubungan kekerabatan, serta asal-usul keberadaan diri sebagai bagian dari satuan sosial pertama."
+      },
+      "distractorWhy": {
+        "1": "Silsilah keluarga berfokus pada hubungan kekerabatan dan asal-usul sejarah keluarga, bukan pencatatan harta warisan.",
+        "2": "Tujuan silsilah keluarga adalah memahami identitas dan sejarah diri/keluarga, bukan untuk menentukan status ekonomi.",
+        "3": "Silsilah keluarga menjelaskan bagan silsilah dan ikatan darah, bukan untuk menghapuskan perbedaan peran antar-generasi."
+      }
+    },
+    {
+      "id": "ips-d-7-t1-q02",
+      "difficulty": "sedang",
+      "prompt": "Berdasarkan Buku Siswa IPS Kelas VII Edisi Revisi (hal. 51), keluarga Iqbal sedang mudik dari Tasikmalaya menuju Pacitan. Mereka memilih mudik melalui jalur selatan daripada jalur pantai utara karena pertimbangan waktu tempuh yang kira-kira 5 jam lebih singkat. Konsep lokasi yang sesuai dengan cerita tersebut adalah lokasi ....",
+      "options": [
+        "relatif",
+        "absolut",
+        "tetap",
+        "jarak tempuh"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Lokasi relatif ditentukan berdasarkan kondisi daerah sekitar dan aksesibilitas atau waktu tempuh, yang dapat berubah sesuai jalur/sarana yang dipilih."
+      },
+      "distractorWhy": {
+        "1": "Lokasi absolut didasarkan pada titik koordinat astronomis (garis lintang dan garis bujur) yang sifatnya tetap.",
+        "2": "Konsep lokasi dalam geografi IPS dibagi menjadi lokasi absolut dan relatif; lokasi tetap bukan istilah standar konsep lokasi.",
+        "3": "Jarak tempuh merupakan faktor pembeda waktu/kondisi, tetapi konsep lokasi utamanya merujuk pada lokasi relatif."
+      }
+    },
+    {
+      "id": "ips-d-7-t1-q03",
+      "difficulty": "dasar",
+      "prompt": "Berdasarkan Buku Siswa IPS Kelas VII Edisi Revisi (hal. 4-5), letak suatu tempat di permukaan bumi yang didasarkan pada sistem koordinat garis lintang dan garis bujur dinamakan lokasi ....",
+      "options": [
+        "absolut",
+        "relatif",
+        "dinamis",
+        "strategis"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Lokasi absolut adalah letak yang bersifat tetap berdasarkan sistem koordinat garis lintang dan garis bujur astronomis."
+      },
+      "distractorWhy": {
+        "1": "Lokasi relatif dapat berubah-ubah bergantung pada objek atau wilayah sekitarnya.",
+        "2": "Lokasi absolut sifatnya tetap (statis), bukan dinamis.",
+        "3": "Lokasi strategis menggambarkan nilai/keuntungan posisi terhadap jalur transportasi/ekonomi, bukan letak berdasarkan koordinat."
+      }
+    },
+    {
+      "id": "ips-d-7-t1-q04",
+      "difficulty": "tinggi",
+      "prompt": "Berdasarkan Buku Siswa IPS Kelas VII Edisi Revisi (hal. 9), harga tanah di Penajam Paser Utara melonjak hingga 5-10 kali lipat setelah pemerintah mengumumkan pemindahan Ibu Kota Negara (IKN). Kenaikan harga tanah tersebut terjadi karena pengaruh perubahan lokasi ....",
+      "options": [
+        "relatif daerah tersebut terhadap pusat pemerintahan baru",
+        "absolut karena letak garis astronomisnya bergeser",
+        "geologis akibat aktivitas lempeng bumi di sekitar IKN",
+        "astronomis yang mengubah zona waktu secara drastis"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Perubahan status kawasan sekitar IKN mengubah nilai strategis tempat (lokasi relatif), sehingga meningkatkan harga tanah secara drastis."
+      },
+      "distractorWhy": {
+        "1": "Koordinat garis astronomis (lokasi absolut) suatu tempat tidak berubah meskipun ada pembangunan IKN.",
+        "2": "Lonjakan harga tanah dipicu perkembangan pembangunan IKN (lokasi relatif), bukan oleh aktivitas lempeng geologis.",
+        "3": "Letak astronomis dan zona waktu wilayah tersebut tetap sama, tidak berpengaruh pada fluktuasi harga tanah."
+      }
+    },
+    {
+      "id": "ips-d-7-t1-q05",
+      "difficulty": "sedang",
+      "prompt": "Berdasarkan Buku Siswa IPS Kelas VII Edisi Revisi (hal. 6), pada tahun 1884 Konferensi Internasional Meridian menetapkan Greenwich di London sebagai standar waktu dunia (GMT). Penentuan pembagian zona waktu dunia ini memanfaatkan komponen lokasi astronomis berupa ....",
+      "options": [
+        "garis bujur dengan pergeseran 15 derajat mewakili perbedaan 1 jam",
+        "garis lintang yang dihitung 10 derajat untuk setiap perbedaan suhu",
+        "garis khatulistiwa yang membagi wilayah menjadi iklim tropis",
+        "garis kontur ketinggian yang diukur dari permukaan laut"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Garis bujur (meridian) digunakan untuk menentukan zona waktu di bumi; setiap selisih 15 derajat garis bujur setara dengan perbedaan waktu 1 jam."
+      },
+      "distractorWhy": {
+        "1": "Garis lintang berfungsi membagi zona iklim matahari, bukan pembagian zona waktu.",
+        "2": "Garis khatulistiwa adalah garis lintang 0 derajat untuk batas iklim tropis, bukan acuan pembagian jam waktu.",
+        "3": "Garis kontur menunjukkan ketinggian relief daratan pada peta topografi, bukan waktu."
+      }
+    },
+    {
+      "id": "ips-d-7-t1-q06",
+      "difficulty": "dasar",
+      "prompt": "Berdasarkan Buku Siswa IPS Kelas VII Edisi Revisi (hal. 7-8), pemanfaatan peta digital pada aplikasi pengiriman barang dan transportasi daring memberikan kemudahan bagi masyarakat, yaitu ....",
+      "options": [
+        "memudahkan pencarian rute efisien serta estimasi biaya dan waktu pengiriman",
+        "menghapuskan seluruh biaya pengiriman barang antarwilayah",
+        "mengubah koordinat lokasi absolut tempat tinggal pelanggan secara otomatis",
+        "menjamin barang pasti sampai tanpa memerlukan sarana transportasi"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Peta digital pada layanan pengiriman membantu menentukan rute terbaik, memantau posisi, dan menghitung estimasi biaya/waktu secara efisien."
+      },
+      "distractorWhy": {
+        "1": "Peta digital memberikan estimasi biaya yang presisi, bukan menghapuskan biaya pengiriman.",
+        "2": "Peta digital menampilkan koordinat lokasi tempat tinggal, bukan mengubah titik koordinat absolutnya.",
+        "3": "Peta digital adalah alat bantu navigasi dan pemantauan, sarana transportasi fisik tetap diperlukan."
+      }
+    },
+    {
+      "id": "ips-d-7-t1-q07",
+      "difficulty": "sedang",
+      "prompt": "Berdasarkan Buku Siswa IPS Kelas VII Edisi Revisi (hal. 51-52), perhatikan skema interaksi antarwilayah berikut!\n- Wilayah A: Surplus sayuran, minus ikan\n- Wilayah B: Surplus ikan, minus sayuran\n- Wilayah C: Surplus ikan, surplus sayuran\nInformasi yang tepat mengenai interaksi interregional tersebut adalah ....",
+      "options": [
+        "wilayah A dan wilayah B dapat saling melengkapi kebutuhan karena perbedaan komoditas",
+        "wilayah A hanya dapat melakukan perdagangan dengan wilayah C saja",
+        "wilayah B tidak membutuhkan hasil komoditas dari wilayah A",
+        "hubungan perdagangan antara wilayah B dan C lebih kuat daripada wilayah A dan B"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Syarat interaksi antarruang terjadi jika ada komparasi surplus-minus yang saling melengkapi (regional complementary) antara Wilayah A dan Wilayah B."
+      },
+      "distractorWhy": {
+        "1": "Wilayah A juga dapat berinteraksi dengan Wilayah B karena saling membutuhkan sayur dan ikan.",
+        "2": "Wilayah B mengalami minus sayuran sehingga tetap memerlukan sayuran dari Wilayah A.",
+        "3": "Wilayah B dan C sama-sama surplus ikan sehingga potensi interaksi komoditas ikan di antara keduanya lebih kecil."
+      }
+    },
+    {
+      "id": "ips-d-7-t1-q08",
+      "difficulty": "tinggi",
+      "prompt": "Berdasarkan Buku Siswa IPS Kelas VII Edisi Revisi (hal. 52), Indonesia terletak di antara 6LU-11LS dan 95BT-141BT serta di antara dua samudra. Pengaruh kondisi astronomis dan geografis tersebut terhadap karakteristik wilayah di Indonesia adalah ....",
+      "options": [
+        "wilayah seperti Bogor dan Bukit Tinggi beriklim sejuk dan basah sehingga cocok sebagai penghasil sayuran",
+        "seluruh wilayah pulau di Indonesia memiliki kondisi cuaca dan curah hujan yang persis sama",
+        "wilayah Nusa Tenggara tidak mengalami musim kemarau karena dikelilingi oleh samudra",
+        "pulau-pulau di wilayah timur Indonesia tidak terpengaruh oleh angin muson"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Topografi dataran tinggi dan iklim tropis basah di Bogor serta Bukittinggi mendukung iklim sejuk untuk budi daya tanaman hortikultura/sayuran."
+      },
+      "distractorWhy": {
+        "1": "Kondisi relief dan topografi Indonesia beragam sehingga cuaca dan curah hujan berbeda antarwilayah.",
+        "2": "Nusa Tenggara memiliki padang savana dan musim kemarau yang relatif lebih panjang dibanding wilayah barat.",
+        "3": "Seluruh wilayah Indonesia dipengaruhi oleh gerak semu matahari dan pergerakan angin muson."
+      }
+    },
+    {
+      "id": "ips-d-7-t1-q09",
+      "difficulty": "sedang",
+      "prompt": "Berdasarkan Buku Siswa IPS Kelas VII Edisi Revisi (hal. 52), perhatikan jenis peristiwa berikut:\n(1) Kebakaran\n(2) Puting beliung\n(3) Tsunami\n(4) Gempa bumi\n(5) Gunung meletus\n(6) Banjir\n(7) Tanah longsor\nBencana alam murni yang tidak dipengaruhi oleh perilaku manusia ditunjukkan oleh nomor ....",
+      "options": [
+        "(3), (4), dan (5)",
+        "(1), (4), dan (5)",
+        "(2), (3), dan (6)",
+        "(4), (6), dan (7)"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Tsunami, gempa bumi, dan gunung meletus adalah bencana alam geologis murni akibat aktivitas endogen bumi tanpa campur tangan manusia."
+      },
+      "distractorWhy": {
+        "1": "Kebakaran hutan/lahan sering kali dipicu oleh kelalaian atau aktivitas pembukaan lahan oleh manusia.",
+        "2": "Banjir bisa dipengaruhi oleh perilaku manusia seperti membuang sampah sembarangan dan penyempitan saluran air.",
+        "3": "Tanah longsor dan banjir sering kali disebabkan oleh pembalakan liar dan alih fungsi lahan oleh manusia."
+      }
+    },
+    {
+      "id": "ips-d-7-t1-q10",
+      "difficulty": "sedang",
+      "prompt": "Berdasarkan Buku Siswa IPS Kelas VII Edisi Revisi (hal. 53), perhatikan kegiatan berikut:\n(1) Sani meminum es degan di depan sekolah.\n(2) Risa membuat kue untuk dijual dengan cara menitipkannya ke warung-warung.\n(3) Rumi mengantarkan kue pesanan ke desa seberang.\nAktivitas yang mencerminkan kegiatan produksi, distribusi, dan konsumsi secara berurutan adalah ....",
+      "options": [
+        "(2), (3), dan (1)",
+        "(1), (2), dan (3)",
+        "(1), (3), dan (2)",
+        "(3), (1), dan (2)"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "(2) Risa membuat kue adalah produksi, (3) Rumi mengantarkan kue pesanan adalah distribusi, dan (1) Sani meminum es degan adalah konsumsi."
+      },
+      "distractorWhy": {
+        "1": "Pernyataan (1) adalah kegiatan konsumsi, bukan produksi.",
+        "2": "Pernyataan (1) adalah konsumsi dan (3) adalah distribusi.",
+        "3": "Pernyataan (3) adalah distribusi, bukan produksi."
+      }
+    },
+    {
+      "id": "ips-d-7-t1-q11",
+      "difficulty": "dasar",
+      "prompt": "Berdasarkan Buku Siswa IPS Kelas VII Edisi Revisi (hal. 53), Candi Borobudur merupakan hasil perpaduan kebudayaan Hindu-Buddha dengan budaya asli Indonesia berupa punden berundak. Bentuk interaksi sosial budaya tersebut dinamakan ....",
+      "options": [
+        "akulturasi",
+        "akomodasi",
+        "kerja sama",
+        "kontravensi"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Akulturasi adalah percampuran dua kebudayaan atau lebih yang menyatu tanpa menghilangkan ciri khas kepribadian kebudayaan aslinya."
+      },
+      "distractorWhy": {
+        "1": "Akomodasi adalah upaya penyelesaian konflik atau perselisihan antara pihak-pihak yang bertikai.",
+        "2": "Kerja sama adalah usaha bersama antarindividu/kelompok untuk mencapai tujuan bersama.",
+        "3": "Kontravensi adalah bentuk interaksi disosiatif berupa rasa tidak suka atau penolakan yang disembunyikan."
+      }
+    },
+    {
+      "id": "ips-d-7-t1-q12",
+      "difficulty": "dasar",
+      "prompt": "Berdasarkan Buku Siswa IPS Kelas VII Edisi Revisi (hal. 54), perselisihan antarsuporter sepak bola di jalanan yang berujung pada perkelahian dan kerusakan fisik merupakan contoh interaksi sosial disosiatif berbentuk ....",
+      "options": [
+        "disosiatif berupa pertentangan (konflik)",
+        "asosiatif berupa konflik",
+        "disosiatif berupa persaingan",
+        "disosiatif berupa kontravensi"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Pertentangan (konflik) adalah proses sosial disosiatif di mana pihak yang bertikai berusaha menyingkirkan lawan disertai ancaman atau kekerasan."
+      },
+      "distractorWhy": {
+        "1": "Konflik termasuk ke dalam bentuk interaksi disosiatif, bukan asosiatif.",
+        "2": "Persaingan (kompetisi) dilakukan secara sehat tanpa ancaman kekerasan fisik.",
+        "3": "Kontravensi merupakan sikap ragu-ragu, cemburu, atau kebencian yang belum meletus menjadi konflik terbuka."
+      }
+    },
+    {
+      "id": "ips-d-7-t1-q13",
+      "difficulty": "sedang",
+      "prompt": "Berdasarkan Buku Siswa IPS Kelas VII Edisi Revisi (hal. 37-38), interaksi sosial antarmanusia di masyarakat memerlukan dua syarat utama agar dapat berlangsung, yaitu ....",
+      "options": [
+        "kontak sosial dan komunikasi",
+        "persaingan dan konflik",
+        "sumber daya alam dan modal",
+        "status sosial dan jabatan"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Syarat terjadinya interaksi sosial adalah adanya kontak sosial (hubungan antarpihak) dan komunikasi (penyampaian pesan yang dipahami bersama)."
+      },
+      "distractorWhy": {
+        "1": "Persaingan dan konflik adalah contoh bentuk proses interaksi disosiatif, bukan syarat terjadinya interaksi.",
+        "2": "Sumber daya alam dan modal merupakan faktor produksi dalam kegiatan ekonomi.",
+        "3": "Status sosial dan jabatan merupakan struktur sosial di masyarakat, bukan syarat dasar berlangsungnya interaksi."
+      }
+    },
+    {
+      "id": "ips-d-7-t1-q14",
+      "difficulty": "sedang",
+      "prompt": "Berdasarkan Buku Siswa IPS Kelas VII Edisi Revisi (hal. 54), sejarah perlu dipelajari oleh setiap generasi manusia. Manusia, waktu, dan ruang memiliki keterkaitan yang tidak terpisahkan dalam sejarah karena ....",
+      "options": [
+        "ketiganya merupakan unsur-unsur utama dalam pembentukan peristiwa sejarah",
+        "ruang dan waktu dapat berdiri sendiri tanpa kehadiran subjek manusia",
+        "peristiwa masa lalu hanya ditentukan oleh faktor alam semata",
+        "manusia tidak dapat mempengaruhi arah perjalanan sejarah"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Unsur sejarah terdiri dari manusia (pelaku/subjek), ruang (tempat terjadinya), dan waktu (kapan terjadinya) yang saling melengkapi."
+      },
+      "distractorWhy": {
+        "1": "Tanpa adanya manusia sebagai pelaku, dinamika peristiwa sejarah tidak akan tercipta.",
+        "2": "Peristiwa sejarah senantiasa melibatkan peran dan peradaban manusia, bukan hanya alam.",
+        "3": "Manusia merupakan aktor utama yang menciptakan dan mengukir peristiwa sejarah."
+      }
+    },
+    {
+      "id": "ips-d-7-t1-q15",
+      "difficulty": "tinggi",
+      "prompt": "Berdasarkan Buku Siswa IPS Kelas VII Edisi Revisi (hal. 44 dan 54), analisis terhadap tradisi lisan (seperti mitos, legenda, dan cerita rakyat) cenderung lebih sulit dilakukan oleh sejarawan dibandingkan sumber tertulis karena ....",
+      "options": [
+        "sejarawan perlu menangkap kenyataan fakta di balik cerita yang dipengaruhi mitos dan ingatan subjektif",
+        "tradisi lisan telah dicatat secara detail pada prasasti batu masa purbakala",
+        "isi cerita rakyat selalu menyajikan fakta ilmiah yang konsisten dari waktu ke waktu",
+        "tidak ada narasumber yang bersedia menceritakan kembali tradisi lisan daerah"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Tradisi lisan bercampur dengan imajinasi, takhayul, atau perubahan penuturan verbal sehingga membutuhkan kehati-hatian untuk menemukan kenyataan historis di baliknya."
+      },
+      "distractorWhy": {
+        "1": "Tradisi lisan diwariskan dari mulut ke mulut, bukan dalam bentuk prasasti tertulis.",
+        "2": "Tradisi lisan sering kali mengandung unsur khayalan atau mitos yang kurang rasional.",
+        "3": "Tradisi lisan masih dituturkan oleh generasi tua, tetapi keabsahan informasinya perlu diuji kritis."
+      }
+    },
+    {
+      "id": "ips-d-7-t1-q16",
+      "difficulty": "sedang",
+      "prompt": "Berdasarkan Buku Siswa IPS Kelas VII Edisi Revisi (hal. 43 dan 54), peristiwa sejarah memiliki sifat abadi, unik, dan penting. Peristiwa sejarah dikatakan memiliki nilai penting karena ....",
+      "options": [
+        "memiliki pengaruh yang besar dan dikenang oleh banyak orang sepanjang masa",
+        "dapat diulang kembali dengan pelaku dan tempat yang sama persis",
+        "hanya terjadi di daerah pedesaan pada zaman kuno",
+        "tidak memberikan pelajaran bagi kehidupan generasi masa depan"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Peristiwa sejarah memiliki nilai penting karena dampaknya yang luas dan signifikan bagi kehidupan bermasyarakat sehingga terus dikenang."
+      },
+      "distractorWhy": {
+        "1": "Peristiwa sejarah bersifat unik (einmalig), artinya hanya terjadi satu kali dan tidak dapat diulang persis sama.",
+        "2": "Peristiwa sejarah dapat terjadi di mana saja (nasional, internasional, maupun lokal), bukan terbatas di pedesaan kuno.",
+        "3": "Sejarah memberikan hikmah dan pelajaran berharga untuk masa kini dan masa depan."
+      }
+    },
+    {
+      "id": "ips-d-7-t1-q17",
+      "difficulty": "tinggi",
+      "prompt": "Berdasarkan Buku Siswa IPS Kelas VII Edisi Revisi (hal. 56-57), maraknya penawaran promosi belanja pada aplikasi digital saat pandemi dapat memicu perilaku konsumtif di masyarakat. Langkah paling tepat sebagai konsumen yang bijak agar tidak terjebak gaya hidup konsumtif adalah ....",
+      "options": [
+        "membuat perencanaan keuangan yang matang dan berbelanja sesuai dengan skala prioritas kebutuhan",
+        "menggunakan pinjaman daring untuk membeli semua produk barang yang diskon",
+        "membeli barang berlebihan demi gengsi sosial di media sosial",
+        "menghentikan seluruh kegiatan konsumsi barang makanan pokok sehari-hari"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Konsumen bijak harus membedakan antara kebutuhan (needs) dan keinginan (wants) dengan menyusun skala prioritas pengeluaran."
+      },
+      "distractorWhy": {
+        "1": "Menggunakan utang/pinjaman online untuk barang non-primer memicu masalah finansial yang buruk.",
+        "2": "Membeli barang atas dasar gengsi memperparah perilaku konsumtif dan hedonisme.",
+        "3": "Konsumsi barang kebutuhan pokok tetap wajib dilakukan untuk kelangsungan hidup sehari-hari."
+      }
+    },
+    {
+      "id": "ips-d-7-t1-q18",
+      "difficulty": "sedang",
+      "prompt": "Berdasarkan Buku Siswa IPS Kelas VII Edisi Revisi (hal. 57-58), budaya menyontek saat ujian merupakan tindakan curang yang melanggar nilai dan norma kejujuran di sekolah. Agen sosialisasi pertama dan utama yang paling berperan membentuk karakter jujur sejak dini adalah ....",
+      "options": [
+        "keluarga",
+        "kelompok bermain",
+        "media massa",
+        "partai politik"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Keluarga merupakan agen sosialisasi primer yang pertama kali menanamkan nilai-nilai moral, keimanan, dan kejujuran kepada anak."
+      },
+      "distractorWhy": {
+        "1": "Kelompok bermain (peer group) merupakan agen sosialisasi sekunder setelah anak berada di luar rumah.",
+        "2": "Media massa berperan menyampaikan informasi publik dan hiburan, bukan wadah sosialisasi primer dasar.",
+        "3": "Partai politik berperan dalam sosialisasi politik pada jenjang usia dewasa."
+      }
+    }
+  ]
+}

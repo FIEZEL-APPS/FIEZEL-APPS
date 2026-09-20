@@ -1,0 +1,249 @@
+{
+  "code": "KOMP-ENG-D-7-BAB2-01",
+  "grade": 7,
+  "name": "Chapter 2: Culinary and Me",
+  "materi": "Describing Foods & Drinks (Taste & Texture), Recipe Procedural Text Analysis, Imperative Verbs & Cooking Steps",
+  "cpRef": "English for Nusantara SMP/MTs Kelas VII — Chapter 2",
+  "items": [
+    {
+      "id": "eng-d-7-c2-q01",
+      "difficulty": "dasar",
+      "prompt": "Based on English for Nusantara Grade VII (page 55-60 Unit 1 'Favorite Foods'), how does Monita describe the taste of fried rice with chili?",
+      "options": [
+        "'It is spicy and savory.'",
+        "'It is sweet and sour.'",
+        "'It is bitter and salty.'",
+        "'It is cold and creamy.'"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Fried rice with chili is described as spicy (pedas) and savory (gurih)."
+      },
+      "distractorWhy": {
+        "1": "Sweet and sour is for certain fruit dishes or tamarind soup.",
+        "2": "Bitter is for coffee or herbal medicine.",
+        "3": "Cold and creamy is for ice cream."
+      }
+    },
+    {
+      "id": "eng-d-7-c2-q02",
+      "difficulty": "sedang",
+      "prompt": "Based on English for Nusantara Grade VII (page 65 Unit 2 'Secret Recipe'), what imperative verb is used to instructionally separate liquid from solid ingredients when making iced tea?",
+      "options": [
+        "Pour the tea into the glass",
+        "Bake the tea in an oven",
+        "Chop the tea with a knife",
+        "Grill the tea on charcoal"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "'Pour' (tuangkan) is the action verb used for liquids into a container."
+      },
+      "distractorWhy": {
+        "1": "'Bake' is for baking bread/cake in an oven.",
+        "2": "'Chop' is for cutting solid food into small pieces.",
+        "3": "'Grill' is for cooking on direct heat."
+      }
+    },
+    {
+      "id": "eng-d-7-c2-q03",
+      "difficulty": "sedang",
+      "prompt": "Based on English for Nusantara Grade VII (page 72 Procedural Text Structure), what are the three main parts of a cooking recipe procedural text?",
+      "options": [
+        "Goal/Title, Ingredients/Materials, and Steps/Instructions",
+        "Orientation, Complication, and Resolution",
+        "General Statement, Description, and Conclusion",
+        "Thesis, Argument, and Reiteration"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "A procedural recipe text consists of Goal (what to make), Ingredients (materials needed), and Steps (method/instructions)."
+      },
+      "distractorWhy": {
+        "1": "Structure of narrative text.",
+        "2": "Structure of descriptive text.",
+        "3": "Structure of analytical exposition text."
+      }
+    },
+    {
+      "id": "eng-d-7-c2-q04",
+      "difficulty": "tinggi",
+      "prompt": "Based on English for Nusantara Grade VII (page 78 Language Focus), choose the sentence that correctly uses sequential action connectors for a recipe:",
+      "options": [
+        "First, wash the bananas. Next, peel them. Then, slice them into round pieces. Finally, fry them until golden brown.",
+        "Finally, fry the bananas. First, peel them. Next, buy bananas.",
+        "Because wash bananas, but fry them.",
+        "Although bananas are sweet, wash them."
+      ],
+      "answer": 0,
+      "why": {
+        "0": "The sequence connectors 'First', 'Next', 'Then', and 'Finally' logically structure procedural steps chronological order."
+      },
+      "distractorWhy": {
+        "1": "Illogical order (starts with Finally before buying).",
+        "2": "Incorrect causal connector usage.",
+        "3": "Incorrect concession connector usage."
+      }
+    },
+    {
+      "id": "eng-d-7-c2-q05",
+      "difficulty": "dasar",
+      "prompt": "Based on English for Nusantara Grade VII (page 62), what action verb means to cut vegetables into thin small pieces using a knife?",
+      "options": [
+        "Slice",
+        "Boil",
+        "Stir",
+        "Freeze"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "'Slice' (iris) means cutting ingredients into thin pieces with a knife."
+      },
+      "distractorWhy": {
+        "1": "'Boil' means cooking in boiling water.",
+        "2": "'Stir' means mixing ingredients with a spoon.",
+        "3": "'Freeze' means turning liquid into ice."
+      }
+    },
+    {
+      "id": "eng-d-7-c2-q06",
+      "difficulty": "sedang",
+      "prompt": "Based on English for Nusantara Grade VII (page 80 Unit 3), read the step: 'Add two spoonfuls of sugar into the cup of warm coffee and stir it well.' What is the purpose of adding sugar?",
+      "options": [
+        "To make the coffee taste sweet",
+        "To change the color to green",
+        "To cool down the temperature",
+        "To make it spicy"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Adding sugar to coffee increases sweetness and balances bitter taste."
+      },
+      "distractorWhy": {
+        "1": "Sugar does not turn coffee green.",
+        "2": "Sugar does not cool down temperature.",
+        "3": "Sugar does not add spice."
+      }
+    },
+    {
+      "id": "eng-d-7-c2-q07",
+      "difficulty": "dasar",
+      "prompt": "Based on English for Nusantara Grade VII (page 68 Unit 2), what tool is used to mix salad ingredients together thoroughly in a bowl?",
+      "options": [
+        "A large mixing spoon",
+        "A sharp knife",
+        "A drinking straw",
+        "A napkin"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "A large mixing spoon is used to toss and combine salad ingredients evenly."
+      },
+      "distractorWhy": {
+        "1": "A knife is for cutting.",
+        "2": "A straw is for drinking liquids.",
+        "3": "A napkin is for wiping hands."
+      }
+    },
+    {
+      "id": "eng-d-7-c2-q08",
+      "difficulty": "sedang",
+      "prompt": "Based on English for Nusantara Grade VII (page 74 Unit 3), choose the correct sentence to describe a crispy banana fritter:",
+      "options": [
+        "'The fried banana fritter is warm, sweet, and crunchy on the outside.'",
+        "'The banana fritter is cold and sour like lemon.'",
+        "'The fritter tastes bitter like dark coffee.'",
+        "'The banana fritter is salty like sea water.'"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Banana fritters (pisang goreng) are described as warm, sweet, and crunchy."
+      },
+      "distractorWhy": {
+        "1": "Banana fritters are not cold or sour.",
+        "2": "Banana fritters are sweet, not bitter.",
+        "3": "Banana fritters are sweet, not salty."
+      }
+    },
+    {
+      "id": "eng-d-7-c2-q09",
+      "difficulty": "sedang",
+      "prompt": "Based on English for Nusantara Grade VII (page 79), what imperative verb completes the recipe step: '___ the boiling soup into four bowls before serving.'",
+      "options": [
+        "Ladle",
+        "Bake",
+        "Freeze",
+        "Grill"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "'Ladle' (sendokkan) is the specific cooking verb for serving soup from a pot into bowls."
+      },
+      "distractorWhy": {
+        "1": "Bake is for ovens.",
+        "2": "Freeze turns liquids to ice.",
+        "3": "Grill is direct flame."
+      }
+    },
+    {
+      "id": "eng-d-7-c2-q10",
+      "difficulty": "tinggi",
+      "prompt": "Based on English for Nusantara Grade VII (page 82 Language Focus), choose the correct adverb of sequence to start the first cooking step:",
+      "options": [
+        "First",
+        "Finally",
+        "After that",
+        "Lastly"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "'First' is the initial sequence marker used at the start of procedural instructions."
+      },
+      "distractorWhy": {
+        "1": "'Finally' is used at the end.",
+        "2": "'After that' is used in middle steps.",
+        "3": "'Lastly' is used at the end."
+      }
+    },
+    {
+      "id": "eng-d-7-c2-q11",
+      "difficulty": "dasar",
+      "prompt": "Based on English for Nusantara Grade VII (page 58), what taste word describes honey and sugar?",
+      "options": [
+        "Sweet",
+        "Sour",
+        "Salty",
+        "Spicy"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Honey and sugar are sweet (manis)."
+      },
+      "distractorWhy": {
+        "1": "Sour describes lemons.",
+        "2": "Salty describes salt.",
+        "3": "Spicy describes chili."
+      }
+    },
+    {
+      "id": "eng-d-7-c2-q12",
+      "difficulty": "tinggi",
+      "prompt": "Based on English for Nusantara Grade VII (page 85 Unit 3 Review), why do recipes use exact measurements like 'two teaspoons' or '500 ml'?",
+      "options": [
+        "To ensure the dish turns out with the correct balance of taste and consistency",
+        "To make the cooking process longer",
+        "To confuse the reader",
+        "To increase the price of the ingredients"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Exact measurements ensure consistent flavor balance and proper cooking results."
+      },
+      "distractorWhy": {
+        "1": "Measurements do not aim to lengthen time needlessly.",
+        "2": "Recipes aim to clarify, not confuse.",
+        "3": "Measurements do not alter ingredient prices."
+      }
+    }
+  ]
+}

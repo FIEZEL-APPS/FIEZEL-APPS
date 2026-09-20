@@ -1,0 +1,409 @@
+{
+  "code": "KOMP-MAT-D-7-BAB1-01",
+  "grade": 7,
+  "name": "Bilangan Bulat",
+  "materi": "Operasi Penjumlahan & Pengurangan Bilangan Bulat, Perkalian & Pembagian, Faktor & Kelipatan (KPK/FPB), Penerapan Kontekstual",
+  "cpRef": "Matematika untuk SMP/MTs Kelas VII — Bab 1",
+  "items": [
+    {
+      "id": "mat-d-7-b1-q01",
+      "difficulty": "dasar",
+      "prompt": "Berdasarkan Buku Siswa Matematika Kelas VII hal. 11 (Latihan 1.1 No. 1a), Lia baru membuka tabungan di koperasi sekolah lalu menyetorkan uang sebesar Rp100.000,00. Bagaimana penyataan transaksi penyetoran uang tersebut jika dinyatakan dalam bentuk bilangan bulat bertanda?",
+      "options": [
+        "+100.000",
+        "-100.000",
+        "+50.000",
+        "0"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Penyetoran uang menambah jumlah saldo tabungan, sehingga bernilai positif dan dituliskan sebagai +100.000."
+      },
+      "distractorWhy": {
+        "1": "Penulisan -100.000 menyatakan penarikan atau pengeluaran uang (kerugian/hutang), bukan penyetoran.",
+        "2": "Nilai +50.000 tidak sesuai dengan nominal yang disetorkan Lia yaitu Rp100.000,00.",
+        "3": "Nilai 0 menandakan tidak ada perubahan saldo sama sekali."
+      }
+    },
+    {
+      "id": "mat-d-7-b1-q02",
+      "difficulty": "dasar",
+      "prompt": "Berdasarkan Buku Siswa Matematika Kelas VII hal. 11 (Latihan 1.1 No. 1b & 1c), Dino meminjam uang sebesar Rp50.000,00 dan suatu toko mengalami kerugian penjualan sebesar Rp250.000,00. Bentuk bilangan bulat bertanda yang tepat untuk menyatakan pinjaman Dino dan kerugian toko tersebut berturut-turut adalah...",
+      "options": [
+        "-50.000 dan -250.000",
+        "+50.000 dan +250.000",
+        "-50.000 dan +250.000",
+        "+50.000 dan -250.000"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Pinjaman uang (utang) dan kerugian penjualan mengurangi nilai finansial/aset, sehingga keduanya bernilai negatif dan ditulis -50.000 serta -250.000."
+      },
+      "distractorWhy": {
+        "1": "Tanda positif digunakan untuk menyatakan tabungan atau keuntungan, bukan hutang dan kerugian.",
+        "2": "Kerugian toko bernilai negatif (-250.000), bukan positif (+250.000).",
+        "3": "Pinjaman uang bernilai negatif (-50.000), bukan positif (+50.000)."
+      }
+    },
+    {
+      "id": "mat-d-7-b1-q03",
+      "difficulty": "dasar",
+      "prompt": "Berdasarkan Buku Siswa Matematika Kelas VII hal. 11 (Latihan 1.1 No. 2), perhatikan pasangan bilangan bulat berikut: (i) -253 ... 108, (ii) 38 ... -79, (iii) -1000 ... 500. Tanda pembanding yang tepat untuk mengisi titik-titik ketiga pasangan tersebut secara berurutan adalah...",
+      "options": [
+        "<, >, <",
+        ">, <, >",
+        "<, <, <",
+        ">, >, >"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "(i) -253 berada di sebelah kiri 108 pada garis bilangan (-253 < 108). (ii) 38 terletak di sebelah kanan -79 (38 > -79). (iii) -1000 terletak di sebelah kiri 500 (-1000 < 500). Jadi tanda yang tepat adalah <, >, <."
+      },
+      "distractorWhy": {
+        "1": "Urutan tanda ini terbalik untuk ketiga pembandingan tersebut.",
+        "2": "Tanda kedua seharusnya lebih dari (>) karena 38 positif sedangkan -79 negatif.",
+        "3": "Tanda pertama dan ketiga salah karena bilangan negatif nilainya lebih kecil dari bilangan positif."
+      }
+    },
+    {
+      "id": "mat-d-7-b1-q04",
+      "difficulty": "dasar",
+      "prompt": "Berdasarkan Buku Siswa Matematika Kelas VII hal. 12 (Latihan 1.1 No. 3a), urutan bilangan bulat -8, 4, -2, 12 dari yang nilainya terkecil ke terbesar adalah...",
+      "options": [
+        "-8, -2, 4, 12",
+        "-2, -8, 4, 12",
+        "12, 4, -2, -8",
+        "-8, 4, -2, 12"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Pada garis bilangan, semakin ke kiri letak bilangan nilainya semakin kecil. Di antara -8, 4, -2, 12, urutan dari yang paling kiri adalah -8, kemudian -2, lalu 4, dan paling kanan 12."
+      },
+      "distractorWhy": {
+        "1": "Urutan ini keliru karena -8 nilainya lebih kecil dari -2 (terletak lebih kiri dari -2).",
+        "2": "Urutan ini disajikan dari yang terbesar ke terkecil.",
+        "3": "Urutan ini belum terurut karena -2 masih ditulis setelah 4."
+      }
+    },
+    {
+      "id": "mat-d-7-b1-q05",
+      "difficulty": "sedang",
+      "prompt": "Berdasarkan Buku Siswa Matematika Kelas VII hal. 12 (Latihan 1.1 No. 3c), urutan bilangan bulat -59, -100, -11, 21 dari yang terkecil ke terbesar adalah...",
+      "options": [
+        "-100, -59, -11, 21",
+        "-11, -59, -100, 21",
+        "21, -11, -59, -100",
+        "-59, -100, -11, 21"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Pada bilangan negatif, semakin besar angka mutlaknya maka nilainya semakin kecil. Nilai -100 paling kecil, diikuti -59, -11, dan bilangan positif 21 paling besar. Urutannya: -100, -59, -11, 21."
+      },
+      "distractorWhy": {
+        "1": "Urutan ini terbalik pada bagian bilangan negatif (-100 terkecil, bukan -11).",
+        "2": "Urutan ini dari terbesar ke terkecil.",
+        "3": "Urutan belum benar karena -100 lebih kecil daripada -59."
+      }
+    },
+    {
+      "id": "mat-d-7-b1-q06",
+      "difficulty": "dasar",
+      "prompt": "Berdasarkan Buku Siswa Matematika Kelas VII hal. 20 (Latihan 1.2 No. 1a), hasil dari operasi hitung 2 + (-6) - 7 adalah...",
+      "options": [
+        "-11",
+        "-3",
+        "1",
+        "15"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Kerjakan berurutan dari kiri: 2 + (-6) = -4. Kemudian -4 - 7 = -11."
+      },
+      "distractorWhy": {
+        "1": "Kekeliruan menghitung 2 + (-6) sebagai 4, lalu 4 - 7 = -3.",
+        "2": "Kekeliruan akibat kesalahan tanda pada operasi penjumlahan dan pengurangan.",
+        "3": "Kekeliruan mengabaikan tanda negatif sehingga menghitung 2 + 6 + 7 = 15."
+      }
+    },
+    {
+      "id": "mat-d-7-b1-q07",
+      "difficulty": "sedang",
+      "prompt": "Berdasarkan Buku Siswa Matematika Kelas VII hal. 20 (Latihan 1.2 No. 1b), hasil dari operasi hitung (-4) x (-8) : 2 adalah...",
+      "options": [
+        "16",
+        "-16",
+        "32",
+        "-32"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Perkalian dua bilangan negatif menghasilkan bilangan positif: (-4) x (-8) = 32. Kemudian pembagian dengan bilangan positif: 32 : 2 = 16."
+      },
+      "distractorWhy": {
+        "1": "Kesalahan tanda negatif pada perkalian dua bilangan negatif (-4) x (-8) = -32, lalu dibagi 2 menjadi -16.",
+        "2": "Hasil dari (-4) x (-8) sebelum dibagi dengan 2.",
+        "3": "Hasil dari (-4) x (-8) jika salah tanda menjadi -32 dan belum dibagi 2."
+      }
+    },
+    {
+      "id": "mat-d-7-b1-q08",
+      "difficulty": "sedang",
+      "prompt": "Berdasarkan Buku Siswa Matematika Kelas VII hal. 20 (Latihan 1.2 No. 1c), hasil dari operasi hitung 5 x 6 + (-3) x 9 adalah...",
+      "options": [
+        "3",
+        "57",
+        "-3",
+        "243"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Utamakan operasi perkalian: (5 x 6) + ((-3) x 9) = 30 + (-27) = 30 - 27 = 3."
+      },
+      "distractorWhy": {
+        "1": "Kekeliruan mengabaikan tanda negatif pada (-3) x 9 sehingga menghitung 30 + 27 = 57.",
+        "2": "Kekeliruan tanda sehingga memperoleh hasil negatif -3.",
+        "3": "Kekeliruan menghitung dari kiri ke kanan tanpa memperhatikan hirarki operasi hitung: (5x6 - 3) x 9 = 27 x 9 = 243."
+      }
+    },
+    {
+      "id": "mat-d-7-b1-q09",
+      "difficulty": "sedang",
+      "prompt": "Berdasarkan Buku Siswa Matematika Kelas VII hal. 20 (Latihan 1.2 No. 2), Ibu Ratih meminjam uang di Koperasi Desa sebesar Rp1.000.000,00. Pada bulan berikutnya, ia hanya mampu mengembalikan sebesar Rp750.000,00. Sisa utang Ibu Ratih jika dinyatakan dalam bentuk bilangan bulat bertanda adalah...",
+      "options": [
+        "-250.000",
+        "+250.000",
+        "-1.750.000",
+        "+750.000"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Pinjaman awal dianggap sebagai hutang (-1.000.000) dan pengembalian sebagai saldo masuk (+750.000). Sisa utang = -1.000.000 + 750.000 = -250.000 rupiah."
+      },
+      "distractorWhy": {
+        "1": "Nilai +250.000 menyatakan kelebihan uang/tabungan, padahal Ibu Ratih masih memiliki tanggungan sisa utang.",
+        "2": "Hasil ini merupakan akibat menjumlahkan dua bilangan sebagai beban utang (-1.000.000 - 750.000).",
+        "3": "Angka Rp750.000,00 adalah nominal yang sudah dikembalikan, bukan sisa utang."
+      }
+    },
+    {
+      "id": "mat-d-7-b1-q10",
+      "difficulty": "tinggi",
+      "prompt": "Berdasarkan Buku Siswa Matematika Kelas VII hal. 20-21 (Latihan 1.2 No. 3), pada tes penerimaan siswa baru SMP Bakti Utama terdapat 30 soal. Aturan skor: jawaban benar mendapat poin 5, jawaban salah bernilai -2, dan tidak menjawab mendapat poin 0. Saka menjawab 20 soal dengan benar dari total 25 soal yang dikerjakannya. Total nilai yang diperoleh Saka adalah...",
+      "options": [
+        "90",
+        "100",
+        "85",
+        "95"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Jumlah soal dikerjakan = 25. Jawaban benar = 20, maka jawaban salah = 25 - 20 = 5. Soal tidak dijawab = 30 - 25 = 5. Total nilai = (20 x 5) + (5 x (-2)) + (5 x 0) = 100 + (-10) + 0 = 90."
+      },
+      "distractorWhy": {
+        "1": "Hanya menghitung skor dari jawaban benar (20 x 5 = 100) tanpa memperhitungkan pengurangan skor akibat 5 soal salah.",
+        "2": "Kekeliruan menganggap 30 - 20 = 10 soal salah, sehingga skor = 100 - (10 x 2) = 80 atau 85.",
+        "3": "Kekeliruan menghitung pengurangan poin salah hanya -5 (bukan 5 x (-2) = -10)."
+      }
+    },
+    {
+      "id": "mat-d-7-b1-q11",
+      "difficulty": "sedang",
+      "prompt": "Berdasarkan Buku Siswa Matematika Kelas VII hal. 21 (Latihan 1.2 No. 4), Raja kehilangan total 200 subscriber dalam 4 bulan terakhir secara konstan tiap bulannya. Jumlah perubahan subscriber Raja setiap bulannya jika dinyatakan dalam bentuk bilangan bulat adalah...",
+      "options": [
+        "-50 subscriber",
+        "+50 subscriber",
+        "-200 subscriber",
+        "-800 subscriber"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Pengurangan total subscriber adalah -200 dalam kurun waktu 4 bulan. Perubahan rata-rata tiap bulan = (-200) : 4 = -50 subscriber."
+      },
+      "distractorWhy": {
+        "1": "Nilai +50 menyatakan penambahan jumlah subscriber, padahal subscriber Raja mengalami penurunan.",
+        "2": "Nilai -200 merupakan total penurunan selama 4 bulan, bukan penurunan per bulan.",
+        "3": "Hasil ini merupakan kesalahan akibat mengalikan total penurunan dengan 4 (-200 x 4)."
+      }
+    },
+    {
+      "id": "mat-d-7-b1-q12",
+      "difficulty": "tinggi",
+      "prompt": "Berdasarkan Buku Siswa Matematika Kelas VII hal. 21 (Latihan 1.2 No. 5), pada praktikum laboratorium suatu cairan beku bersuhu -8°C dipanaskan. Setiap 3 menit suhu cairan naik sebesar 30°C. Jika cairan dipanaskan selama 15 menit, suhu akhir cairan tersebut adalah...",
+      "options": [
+        "142°C",
+        "150°C",
+        "158°C",
+        "132°C"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Banyaknya kenaikan suhu dalam 15 menit = 15 : 3 = 5 kali. Total kenaikan suhu = 5 x 30°C = 150°C. Suhu akhir = suhu awal + total kenaikan = -8°C + 150°C = 142°C."
+      },
+      "distractorWhy": {
+        "1": "Hanya menghitung total kenaikan suhu (5 x 30°C = 150°C) tanpa memperhitungkan suhu awal yang bernilai -8°C.",
+        "2": "Kesalahan penjumlahan akibat menganggap suhu awal +8°C sehingga 8 + 150 = 158°C.",
+        "3": "Kekeliruan menghitung frekuensi pemanasan sebagai 15 : 3 - 1 = 4 kali, sehingga 4 x 30 - 8 = 112°C atau 132°C."
+      }
+    },
+    {
+      "id": "mat-d-7-b1-q13",
+      "difficulty": "dasar",
+      "prompt": "Berdasarkan Buku Siswa Matematika Kelas VII hal. 30 (Latihan 1.3 No. 1c), bentuk faktorisasi prima dari bilangan 28 adalah...",
+      "options": [
+        "2^2 x 7",
+        "2 x 14",
+        "4 x 7",
+        "2^3 x 7"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Pohon faktor dari 28: 28 = 2 x 14 = 2 x 2 x 7 = 2^2 x 7. Semua perkalian faktor prima menghasilkan 2^2 x 7."
+      },
+      "distractorWhy": {
+        "1": "Bentuk 2 x 14 belum merupakan faktorisasi prima karena 14 bukan bilangan prima.",
+        "2": "Bentuk 4 x 7 bukan faktorisasi prima karena 4 bukan bilangan prima (4 = 2^2).",
+        "3": "Bentuk 2^3 x 7 menghasilkan 8 x 7 = 56, bukan 28."
+      }
+    },
+    {
+      "id": "mat-d-7-b1-q14",
+      "difficulty": "sedang",
+      "prompt": "Berdasarkan Buku Siswa Matematika Kelas VII hal. 30 (Latihan 1.3 No. 2), klub sains beranggotakan 24 siswa perempuan dan 32 siswa laki-laki. Pelatih membagi anggota menjadi beberapa kelompok dengan jumlah siswa perempuan dan laki-laki yang sama pada setiap kelompok. Jumlah kelompok paling banyak yang dapat dibentuk adalah...",
+      "options": [
+        "8 kelompok",
+        "4 kelompok",
+        "6 kelompok",
+        "12 kelompok"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Jumlah kelompok paling banyak ditentukan oleh Faktor Persekutuan Terbesar (FPB) dari 24 dan 32. Faktorisasi prima: 24 = 2^3 x 3, 32 = 2^5. FPB(24, 32) = 2^3 = 8."
+      },
+      "distractorWhy": {
+        "1": "Angka 4 merupakan faktor persekutuan dari 24 dan 32, tetapi bukan merupakan faktor persekutuan terbesar.",
+        "2": "Angka 6 adalah faktor dari 24 tetapi bukan faktor dari 32.",
+        "3": "Angka 12 adalah faktor dari 24 tetapi tidak dapat membagi habis 32."
+      }
+    },
+    {
+      "id": "mat-d-7-b1-q15",
+      "difficulty": "sedang",
+      "prompt": "Berdasarkan Buku Siswa Matematika Kelas VII hal. 30 (Latihan 1.3 No. 3), Arjuna bersepeda setiap 12 hari sekali dan berenang setiap 14 hari sekali. Jika hari ini ia melakukan kedua olahraga tersebut bersamaan, berapa hari lagi Arjuna akan bersepeda dan berenang secara bersamaan berikutnya?",
+      "options": [
+        "84 hari",
+        "26 hari",
+        "168 hari",
+        "42 hari"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Waktu pertemuan bersama kembali ditentukan oleh Kelipatan Persekutuan Terkecil (KPK) dari 12 dan 14. Faktorisasi prima: 12 = 2^2 x 3, 14 = 2 x 7. KPK(12, 14) = 2^2 x 3 x 7 = 4 x 3 x 7 = 84 hari."
+      },
+      "distractorWhy": {
+        "1": "Hasil 26 merupakan penjumlahan langsung dari kedua interval hari (12 + 14 = 26).",
+        "2": "Hasil 168 merupakan perkalian langsung dari kedua bilangan (12 x 14 = 168) yang belum diperkecil dengan FPB.",
+        "3": "Hasil 42 adalah kelipatan dari 14 tetapi tidak habis dibagi 12."
+      }
+    },
+    {
+      "id": "mat-d-7-b1-q16",
+      "difficulty": "sedang",
+      "prompt": "Berdasarkan Buku Siswa Matematika Kelas VII hal. 30 (Latihan 1.3 No. 4), Sasha memanggang 30 kue nastar dan 48 kue kastengel. Ia ingin membagi kue ke dalam beberapa wadah plastik dengan jumlah yang sama untuk setiap jenis kue. Banyak wadah plastik terbanyak yang harus disiapkan Sasha adalah...",
+      "options": [
+        "6 wadah",
+        "3 wadah",
+        "12 wadah",
+        "15 wadah"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Jumlah wadah terbanyak ditentukan oleh FPB dari 30 dan 48. Faktorisasi prima: 30 = 2 x 3 x 5, 48 = 2^4 x 3. FPB(30, 48) = 2 x 3 = 6 wadah."
+      },
+      "distractorWhy": {
+        "1": "Angka 3 merupakan faktor persekutuan dari 30 dan 48, namun bukan yang terbesar.",
+        "2": "Angka 12 dapat membagi habis 48 tetapi tidak membagi habis 30.",
+        "3": "Angka 15 dapat membagi habis 30 tetapi tidak dapat membagi habis 48."
+      }
+    },
+    {
+      "id": "mat-d-7-b1-q17",
+      "difficulty": "tinggi",
+      "prompt": "Berdasarkan Buku Siswa Matematika Kelas VII hal. 30 (Latihan 1.3 No. 5), tiga buah bus sekolah tiba di tempat pemberhentian masing-masing setiap 6 menit, 10 menit, dan 15 menit. Jika ketiga bus berangkat bersamaan pada pukul 06.30 pagi, pukul berapa ketiga bus akan berhenti bersamaan berikutnya?",
+      "options": [
+        "07.00 pagi",
+        "06.45 pagi",
+        "07.30 pagi",
+        "06.50 pagi"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Interval waktu berhenti bersama ditentukan oleh KPK(6, 10, 15). 6 = 2 x 3, 10 = 2 x 5, 15 = 3 x 5. KPK(6, 10, 15) = 2 x 3 x 5 = 30 menit. Berangkat bersama pukul 06.30 + 30 menit = pukul 07.00 pagi."
+      },
+      "distractorWhy": {
+        "1": "Hasil 06.45 menganggap interval waktu hanya 15 menit.",
+        "2": "Hasil 07.30 mengasumsikan interval waktu 60 menit.",
+        "3": "Hasil 06.50 merupakan kesalahan menghitung 06.30 + 20 menit."
+      }
+    },
+    {
+      "id": "mat-d-7-b1-q18",
+      "difficulty": "dasar",
+      "prompt": "Berdasarkan Buku Siswa Matematika Kelas VII hal. 31 (Uji Kompetensi No. 1a), urutan suhu 5°C, -3°C, -8°C, 10°C, -13°C dari yang paling dingin adalah...",
+      "options": [
+        "-13°C, -8°C, -3°C, 5°C, 10°C",
+        "-3°C, -8°C, -13°C, 5°C, 10°C",
+        "10°C, 5°C, -3°C, -8°C, -13°C",
+        "-8°C, -13°C, -3°C, 5°C, 10°C"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Suhu paling dingin diwakili oleh bilangan bulat dengan nilai terkecil (paling kiri di garis bilangan). Urutan dari terdingin (terkecil): -13°C, -8°C, -3°C, 5°C, 10°C."
+      },
+      "distractorWhy": {
+        "1": "Urutan bagian suhu negatif terbalik (-13°C lebih dingin daripada -3°C).",
+        "2": "Urutan ini disajikan dari yang paling panas ke paling dingin.",
+        "3": "Urutan suhu negatif belum tepat karena -13°C lebih dingin dari -8°C."
+      }
+    },
+    {
+      "id": "mat-d-7-b1-q19",
+      "difficulty": "tinggi",
+      "prompt": "Berdasarkan Buku Siswa Matematika Kelas VII hal. 31-32 (Uji Kompetensi No. 2), pada buku tabungan Haris tercatat: Januari (Debet Rp150.000,00; Kredit Rp200.000,00) dan Februari (Kredit Rp100.000,00). Pada bulan Maret Haris menarik uang sebesar Rp500.000,00. Berapa minimal uang yang harus disetorkan Haris di bulan Maret agar saldo tabungannya tidak Rp0,00 (tidak nol rupiah)?",
+      "options": [
+        "Rp350.001,00",
+        "Rp350.000,00",
+        "Rp500.000,00",
+        "Rp150.000,00"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Saldo akhir Februari = (200.000 - 150.000) + 100.000 = Rp150.000,00. Jika Haris menarik Rp500.000,00, kekurangannya adalah 500.000 - 150.000 = Rp350.000,00. Agar saldo tidak Rp0,00 (harus lebih besar dari Rp0,00), uang yang disetor minimal harus lebih dari Rp350.000,00, yaitu minimal Rp350.001,00."
+      },
+      "distractorWhy": {
+        "1": "Setoran Rp350.000,00 tepat membuat saldo tabungan menjadi Rp0,00, sedangkan soal meminta saldo tidak Rp0,00 (lebih dari nol).",
+        "2": "Rp500.000,00 adalah total nominal uang yang ditarik Haris pada bulan Maret.",
+        "3": "Rp150.000,00 adalah saldo awal tabungan Haris sebelum transaksi bulan Maret."
+      }
+    },
+    {
+      "id": "mat-d-7-b1-q20",
+      "difficulty": "tinggi",
+      "prompt": "Berdasarkan Buku Siswa Matematika Kelas VII hal. 32 (Uji Kompetensi No. 5), pada hari pelanggan nasional bioskop membagikan minuman gratis untuk setiap pelanggan ke-25 dan satu paket popcorn untuk setiap pelanggan ke-30. Jika terdapat 1.500 pelanggan yang datang, berapa banyak pelanggan yang menerima KEDUA hadiah (minuman dan popcorn) secara gratis?",
+      "options": [
+        "10 orang",
+        "50 orang",
+        "60 orang",
+        "25 orang"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Pelanggan yang mendapat kedua hadiah adalah kelipatan persekutuan dari 25 dan 30. KPK(25, 30): 25 = 5^2, 30 = 2 x 3 x 5. KPK(25, 30) = 2 x 3 x 5^2 = 150. Artinya setiap pelanggan kelipatan ke-150 mendapat kedua hadiah. Banyaknya pelanggan = 1500 : 150 = 10 orang."
+      },
+      "distractorWhy": {
+        "1": "Kekeliruan membagi 1500 dengan 30 (banyak penerima popcorn = 50 orang).",
+        "2": "Kekeliruan membagi 1500 dengan 25 (banyak penerima minuman = 60 orang).",
+        "3": "Kekeliruan menganggap interval kelipatan bersama adalah 60 (1500 : 60 = 25)."
+      }
+    }
+  ]
+}

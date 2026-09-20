@@ -1,0 +1,513 @@
+{
+  "schema": "fiezel-mapel-bank-v1",
+  "subjectId": "ENG",
+  "phase": "fase_d",
+  "provenance": {
+    "dokumen": "English for Nusantara untuk SMP/MTs Kelas VII",
+    "penerbit": "Pusat Perbukuan, Badan Standar, Kurikulum, dan Asesmen Pendidikan, Kementerian Pendidikan, Kebudayaan, Riset, dan Teknologi",
+    "tahun": "2022",
+    "isbn": "978-602-244-885-3",
+    "diperolehDari": "https://buku.kemendikdasmen.go.id",
+    "penyusunButir": "resmi-terverifikasi"
+  },
+  "competencies": [
+    {
+      "code": "KOMP-ENG-D-7-BAB1-01",
+      "grade": 7,
+      "name": "Chapter 1: About Me",
+      "materi": "Introducing Oneself and Others, Expressing Hobbies and Preferences, Describing People Physical Traits, Subject & Possessive Pronouns",
+      "cpRef": "English for Nusantara untuk SMP/MTs Kelas VII — Chapter 1",
+      "items": [
+        {
+          "id": "eng-d-7-c1-q01",
+          "difficulty": "dasar",
+          "prompt": "Based on English for Nusantara Grade VII (page 15-18 'Galang from Kalimantan'), Galang introduces himself: 'Hello, my name is Galang. I am 13 years old. I live in Kalimantan.' What expression is used by Galang to state his age?",
+          "options": [
+            "'I am 13 years old.'",
+            "'My name is Galang.'",
+            "'I live in Kalimantan.'",
+            "'I like playing basketball.'"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "The phrase 'I am 13 years old' is the standard self-introduction expression used to state one's age."
+          },
+          "distractorWhy": {
+            "1": "'My name is Galang' states his identity name.",
+            "2": "'I live in Kalimantan' states his origin/residence.",
+            "3": "'I like playing basketball' states his hobby."
+          }
+        },
+        {
+          "id": "eng-d-7-c1-q02",
+          "difficulty": "sedang",
+          "prompt": "Based on English for Nusantara Grade VII (page 22 Language Focus), choose the correct subject pronoun to complete the sentence: 'Monita loves reading novels. ___ goes to the library every Wednesday.'",
+          "options": [
+            "She",
+            "He",
+            "They",
+            "It"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Monita is a female singular proper noun, so the appropriate subject pronoun is 'She'."
+          },
+          "distractorWhy": {
+            "1": "'He' is used for male singular subjects.",
+            "2": "'They' is used for plural subjects.",
+            "3": "'It' is used for non-human objects or animals."
+          }
+        },
+        {
+          "id": "eng-d-7-c1-q03",
+          "difficulty": "sedang",
+          "prompt": "Based on English for Nusantara Grade VII (page 28 Unit 2 'I Love Fishing'), Andre says: 'I like fishing because it is relaxing.' What is Andre's favorite hobby?",
+          "options": [
+            "Fishing",
+            "Swimming",
+            "Playing football",
+            "Cycling"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "The text directly states Andre's preference: 'I like fishing'."
+          },
+          "distractorWhy": {
+            "1": "Swimming is not mentioned as Andre's main hobby.",
+            "2": "Football is Galang's hobby in Unit 1.",
+            "3": "Cycling is not specified in Andre's text."
+          }
+        },
+        {
+          "id": "eng-d-7-c1-q04",
+          "difficulty": "tinggi",
+          "prompt": "Based on English for Nusantara Grade VII (page 35 Language Focus - Possessive Adjectives), complete the dialogue correctly:\nMade: 'Is this ___ bicycle, Galang?'\nGalang: 'Yes, it is my bicycle.'",
+          "options": [
+            "your",
+            "his",
+            "her",
+            "their"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Made is directly addressing Galang (second person 'you'), so the possessive adjective is 'your'."
+          },
+          "distractorWhy": {
+            "1": "'his' refers to a third-person male.",
+            "2": "'her' refers to a third-person female.",
+            "3": "'their' refers to third-person plural."
+          }
+        },
+        {
+          "id": "eng-d-7-c1-q05",
+          "difficulty": "dasar",
+          "prompt": "Based on English for Nusantara Grade VII (page 38 Unit 3 'My Friends and I'), which adjective best describes someone who wears glasses and has curly hair?",
+          "options": [
+            "'He wears glasses and has short curly hair.'",
+            "'He is tall with blue eyes.'",
+            "'He has long straight blonde hair.'",
+            "'He is short with no hair.'"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "The sentence 'He wears glasses and has short curly hair' accurately describes physical features of hair type and eyewear."
+          },
+          "distractorWhy": {
+            "1": "Does not mention glasses or hair texture.",
+            "2": "Contradicts 'curly' with 'straight'.",
+            "3": "Contradicts having hair."
+          }
+        },
+        {
+          "id": "eng-d-7-c1-q06",
+          "difficulty": "sedang",
+          "prompt": "Based on English for Nusantara Grade VII (page 42 Unit 1 Review), what is the appropriate greeting when meeting someone for the first time in a formal setting?",
+          "options": [
+            "'Nice to meet you.'",
+            "'See you later!'",
+            "'Good night, sleep well.'",
+            "'What's up, dude?'"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "'Nice to meet you' is the standard polite expression when introduced to someone for the first time."
+          },
+          "distractorWhy": {
+            "1": "'See you later' is a leave-taking expression.",
+            "2": "'Good night' is a bedtime leave-taking expression.",
+            "3": "'What's up, dude?' is informal slang."
+          }
+        },
+        {
+          "id": "eng-d-7-c1-q07",
+          "difficulty": "tinggi",
+          "prompt": "Based on English for Nusantara Grade VII (page 45), fill in the correct form of verb 'to be': 'Galang and his classmates ___ excited about the school scout camp.'",
+          "options": [
+            "are",
+            "is",
+            "am",
+            "was"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "'Galang and his classmates' form a plural subject in simple present tense, requiring the plural verb 'are'."
+          },
+          "distractorWhy": {
+            "1": "'is' is only used for singular subjects (he/she/it).",
+            "2": "'am' is only used with first person 'I'.",
+            "3": "'was' is past tense."
+          }
+        },
+        {
+          "id": "eng-d-7-c1-q08",
+          "difficulty": "dasar",
+          "prompt": "Based on English for Nusantara Grade VII (page 12), what question should you ask to find out someone's origin or hometown?",
+          "options": [
+            "'Where are you from?'",
+            "'What is your favorite color?'",
+            "'How old are you?'",
+            "'What is your hobby?'"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "'Where are you from?' is the standard question used to inquire about origin or home town."
+          },
+          "distractorWhy": {
+            "1": "Asks about color preference.",
+            "2": "Asks about age.",
+            "3": "Asks about activities/hobbies."
+          }
+        },
+        {
+          "id": "eng-d-7-c1-q09",
+          "difficulty": "sedang",
+          "prompt": "Based on English for Nusantara Grade VII (page 30), complete the sentence with correct possessive pronoun: 'I have a new cat. ___ fur is white and soft.'",
+          "options": [
+            "Its",
+            "It's",
+            "His",
+            "Their"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "'Its' (without apostrophe) is the possessive adjective for animals or non-human entities."
+          },
+          "distractorWhy": {
+            "1": "'It's' is a contraction of 'It is' or 'It has'.",
+            "2": "'His' is for human males.",
+            "3": "'Their' is for plural entities."
+          }
+        },
+        {
+          "id": "eng-d-7-c1-q10",
+          "difficulty": "tinggi",
+          "prompt": "Based on English for Nusantara Grade VII (page 48), read the short text: 'Pipit likes drawing comic characters. She draws every afternoon after finishing her homework.' What can be inferred about Pipit?",
+          "options": [
+            "Pipit is a disciplined student who manages her time well before pursuing her hobby",
+            "Pipit neglects her school homework to draw comics",
+            "Pipit does not enjoy drawing comics",
+            "Pipit draws comics at school during class hours"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "The phrase 'after finishing her homework' indicates she prioritizes school work before drawing, showing discipline."
+          },
+          "distractorWhy": {
+            "1": "Contradicts the text which says she finishes homework first.",
+            "2": "Contradicts 'likes drawing comic characters'.",
+            "3": "Text specifies 'every afternoon', not during school hours."
+          }
+        },
+        {
+          "id": "eng-d-7-c1-q11",
+          "difficulty": "dasar",
+          "prompt": "Based on English for Nusantara Grade VII (page 18), what is the opposite of the physical trait adjective 'tall'?",
+          "options": [
+            "Short",
+            "Fat",
+            "Slim",
+            "Young"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "The antonym of 'tall' (tinggi) in physical descriptions is 'short' (pendek)."
+          },
+          "distractorWhy": {
+            "1": "'Fat' is the opposite of 'thin/slim'.",
+            "2": "'Slim' is the opposite of 'chubby/fat'.",
+            "3": "'Young' is the opposite of 'old'."
+          }
+        },
+        {
+          "id": "eng-d-7-c1-q12",
+          "difficulty": "sedang",
+          "prompt": "Based on English for Nusantara Grade VII (page 32), complete the expression of leave-taking: 'Good bye, Sinta! ___'",
+          "options": [
+            "'See you tomorrow!'",
+            "'I am fine, thank you.'",
+            "'My name is Sinta.'",
+            "'Nice to meet you.'"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "'See you tomorrow!' is a standard leave-taking response that pairs naturally with 'Good bye'."
+          },
+          "distractorWhy": {
+            "1": "'I am fine' responds to 'How are you?'.",
+            "2": "'My name is' is for introduction.",
+            "3": "'Nice to meet you' is used upon initial greeting."
+          }
+        }
+      ]
+    },
+    {
+      "code": "KOMP-ENG-D-7-BAB2-01",
+      "grade": 7,
+      "name": "Chapter 2: Culinary and Me",
+      "materi": "Describing Foods & Drinks (Taste & Texture), Recipe Procedural Text Analysis, Imperative Verbs & Cooking Steps",
+      "cpRef": "English for Nusantara untuk SMP/MTs Kelas VII — Chapter 2",
+      "items": [
+        {
+          "id": "eng-d-7-c2-q01",
+          "difficulty": "dasar",
+          "prompt": "Based on English for Nusantara Grade VII (page 55-60 Unit 1 'Favorite Foods'), how does Monita describe the taste of fried rice with chili?",
+          "options": [
+            "'It is spicy and savory.'",
+            "'It is sweet and sour.'",
+            "'It is bitter and salty.'",
+            "'It is cold and creamy.'"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Fried rice with chili is described as spicy (pedas) and savory (gurih)."
+          },
+          "distractorWhy": {
+            "1": "Sweet and sour is for certain fruit dishes or tamarind soup.",
+            "2": "Bitter is for coffee or herbal medicine.",
+            "3": "Cold and creamy is for ice cream."
+          }
+        },
+        {
+          "id": "eng-d-7-c2-q02",
+          "difficulty": "sedang",
+          "prompt": "Based on English for Nusantara Grade VII (page 65 Unit 2 'Secret Recipe'), what imperative verb is used to instructionally separate liquid from solid ingredients when making iced tea?",
+          "options": [
+            "Pour the tea into the glass",
+            "Bake the tea in an oven",
+            "Chop the tea with a knife",
+            "Grill the tea on charcoal"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "'Pour' (tuangkan) is the action verb used for liquids into a container."
+          },
+          "distractorWhy": {
+            "1": "'Bake' is for baking bread/cake in an oven.",
+            "2": "'Chop' is for cutting solid food into small pieces.",
+            "3": "'Grill' is for cooking on direct heat."
+          }
+        },
+        {
+          "id": "eng-d-7-c2-q03",
+          "difficulty": "sedang",
+          "prompt": "Based on English for Nusantara Grade VII (page 72 Procedural Text Structure), what are the three main parts of a cooking recipe procedural text?",
+          "options": [
+            "Goal/Title, Ingredients/Materials, and Steps/Instructions",
+            "Orientation, Complication, and Resolution",
+            "General Statement, Description, and Conclusion",
+            "Thesis, Argument, and Reiteration"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "A procedural recipe text consists of Goal (what to make), Ingredients (materials needed), and Steps (method/instructions)."
+          },
+          "distractorWhy": {
+            "1": "Structure of narrative text.",
+            "2": "Structure of descriptive text.",
+            "3": "Structure of analytical exposition text."
+          }
+        },
+        {
+          "id": "eng-d-7-c2-q04",
+          "difficulty": "tinggi",
+          "prompt": "Based on English for Nusantara Grade VII (page 78 Language Focus), choose the sentence that correctly uses sequential action connectors for a recipe:",
+          "options": [
+            "First, wash the bananas. Next, peel them. Then, slice them into round pieces. Finally, fry them until golden brown.",
+            "Finally, fry the bananas. First, peel them. Next, buy bananas.",
+            "Because wash bananas, but fry them.",
+            "Although bananas are sweet, wash them."
+          ],
+          "answer": 0,
+          "why": {
+            "0": "The sequence connectors 'First', 'Next', 'Then', and 'Finally' logically structure procedural steps chronological order."
+          },
+          "distractorWhy": {
+            "1": "Illogical order (starts with Finally before buying).",
+            "2": "Incorrect causal connector usage.",
+            "3": "Incorrect concession connector usage."
+          }
+        },
+        {
+          "id": "eng-d-7-c2-q05",
+          "difficulty": "dasar",
+          "prompt": "Based on English for Nusantara Grade VII (page 62), what action verb means to cut vegetables into thin small pieces using a knife?",
+          "options": [
+            "Slice",
+            "Boil",
+            "Stir",
+            "Freeze"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "'Slice' (iris) means cutting ingredients into thin pieces with a knife."
+          },
+          "distractorWhy": {
+            "1": "'Boil' means cooking in boiling water.",
+            "2": "'Stir' means mixing ingredients with a spoon.",
+            "3": "'Freeze' means turning liquid into ice."
+          }
+        },
+        {
+          "id": "eng-d-7-c2-q06",
+          "difficulty": "sedang",
+          "prompt": "Based on English for Nusantara Grade VII (page 80 Unit 3), read the step: 'Add two spoonfuls of sugar into the cup of warm coffee and stir it well.' What is the purpose of adding sugar?",
+          "options": [
+            "To make the coffee taste sweet",
+            "To change the color to green",
+            "To cool down the temperature",
+            "To make it spicy"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Adding sugar to coffee increases sweetness and balances bitter taste."
+          },
+          "distractorWhy": {
+            "1": "Sugar does not turn coffee green.",
+            "2": "Sugar does not cool down temperature.",
+            "3": "Sugar does not add spice."
+          }
+        },
+        {
+          "id": "eng-d-7-c2-q07",
+          "difficulty": "dasar",
+          "prompt": "Based on English for Nusantara Grade VII (page 68 Unit 2), what tool is used to mix salad ingredients together thoroughly in a bowl?",
+          "options": [
+            "A large mixing spoon",
+            "A sharp knife",
+            "A drinking straw",
+            "A napkin"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "A large mixing spoon is used to toss and combine salad ingredients evenly."
+          },
+          "distractorWhy": {
+            "1": "A knife is for cutting.",
+            "2": "A straw is for drinking liquids.",
+            "3": "A napkin is for wiping hands."
+          }
+        },
+        {
+          "id": "eng-d-7-c2-q08",
+          "difficulty": "sedang",
+          "prompt": "Based on English for Nusantara Grade VII (page 74 Unit 3), choose the correct sentence to describe a crispy banana fritter:",
+          "options": [
+            "'The fried banana fritter is warm, sweet, and crunchy on the outside.'",
+            "'The banana fritter is cold and sour like lemon.'",
+            "'The fritter tastes bitter like dark coffee.'",
+            "'The banana fritter is salty like sea water.'"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Banana fritters (pisang goreng) are described as warm, sweet, and crunchy."
+          },
+          "distractorWhy": {
+            "1": "Banana fritters are not cold or sour.",
+            "2": "Banana fritters are sweet, not bitter.",
+            "3": "Banana fritters are sweet, not salty."
+          }
+        },
+        {
+          "id": "eng-d-7-c2-q09",
+          "difficulty": "sedang",
+          "prompt": "Based on English for Nusantara Grade VII (page 79), what imperative verb completes the recipe step: '___ the boiling soup into four bowls before serving.'",
+          "options": [
+            "Ladle",
+            "Bake",
+            "Freeze",
+            "Grill"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "'Ladle' (sendokkan) is the specific cooking verb for serving soup from a pot into bowls."
+          },
+          "distractorWhy": {
+            "1": "Bake is for ovens.",
+            "2": "Freeze turns liquids to ice.",
+            "3": "Grill is direct flame."
+          }
+        },
+        {
+          "id": "eng-d-7-c2-q10",
+          "difficulty": "tinggi",
+          "prompt": "Based on English for Nusantara Grade VII (page 82 Language Focus), choose the correct adverb of sequence to start the first cooking step:",
+          "options": [
+            "First",
+            "Finally",
+            "After that",
+            "Lastly"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "'First' is the initial sequence marker used at the start of procedural instructions."
+          },
+          "distractorWhy": {
+            "1": "'Finally' is used at the end.",
+            "2": "'After that' is used in middle steps.",
+            "3": "'Lastly' is used at the end."
+          }
+        },
+        {
+          "id": "eng-d-7-c2-q11",
+          "difficulty": "dasar",
+          "prompt": "Based on English for Nusantara Grade VII (page 58), what taste word describes honey and sugar?",
+          "options": [
+            "Sweet",
+            "Sour",
+            "Salty",
+            "Spicy"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Honey and sugar are sweet (manis)."
+          },
+          "distractorWhy": {
+            "1": "Sour describes lemons.",
+            "2": "Salty describes salt.",
+            "3": "Spicy describes chili."
+          }
+        },
+        {
+          "id": "eng-d-7-c2-q12",
+          "difficulty": "tinggi",
+          "prompt": "Based on English for Nusantara Grade VII (page 85 Unit 3 Review), why do recipes use exact measurements like 'two teaspoons' or '500 ml'?",
+          "options": [
+            "To ensure the dish turns out with the correct balance of taste and consistency",
+            "To make the cooking process longer",
+            "To confuse the reader",
+            "To increase the price of the ingredients"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Exact measurements ensure consistent flavor balance and proper cooking results."
+          },
+          "distractorWhy": {
+            "1": "Measurements do not aim to lengthen time needlessly.",
+            "2": "Recipes aim to clarify, not confuse.",
+            "3": "Measurements do not alter ingredient prices."
+          }
+        }
+      ]
+    }
+  ]
+}

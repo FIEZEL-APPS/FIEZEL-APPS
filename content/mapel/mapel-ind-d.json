@@ -1,0 +1,673 @@
+{
+  "schema": "fiezel-mapel-bank-v1",
+  "subjectId": "IND",
+  "phase": "fase_d",
+  "provenance": {
+    "dokumen": "Bahasa Indonesia untuk SMP/MTs Kelas VII (Edisi Revisi)",
+    "penerbit": "Pusat Perbukuan, Badan Standar, Kurikulum, dan Asesmen Pendidikan, Kementerian Pendidikan, Kebudayaan, Riset, dan Teknologi",
+    "tahun": "2023",
+    "isbn": "978-623-118-368-2",
+    "diperolehDari": "https://buku.kemendikdasmen.go.id",
+    "penyusunButir": "resmi-terverifikasi"
+  },
+  "competencies": [
+    {
+      "code": "KOMP-IND-D-7-BAB1-01",
+      "grade": 7,
+      "name": "Bab 1: Jelajah Nusantara",
+      "materi": "Mengakses Informasi & Menjelajah Keindahan Alam, Memahami Gaya & Isi Teks Deskripsi, Unsur Kebahasaan: Kata Berimbuhan meN- & Majas Personifikasi",
+      "cpRef": "Bahasa Indonesia untuk SMP/MTs Kelas VII (Edisi Revisi) — Bab 1",
+      "items": [
+        {
+          "id": "ind-d-7-b1-q01",
+          "difficulty": "dasar",
+          "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VII (hal. 6-9 Teks 'Pantan Terong yang Instagramable'), objek utama yang dideskripsikan oleh penulis dalam teks tersebut adalah…",
+          "options": [
+            "Keindahan pemandangan alam dari bukit Pantan Terong di Kota Takengon, Aceh",
+            "Sejarah pembangunan dermaga penyeberangan di Danau Toba",
+            "Fasilitas penginapan mewah dan arena bermain di Kota Banda Aceh",
+            "Rute penerbangan komersial menuju Bandara Sultan Iskandar Muda"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Teks deskripsi 'Pantan Terong yang Instagramable' memaparkan lanskap keindahan bukit Pantan Terong yang menyuguhkan pemandangan Danau Laut Tawar di Takengon, Aceh."
+          },
+          "distractorWhy": {
+            "1": "Danau Toba terletak di Sumatera Utara, bukan fokus teks Pantan Terong Aceh.",
+            "2": "Teks tidak membahas arena bermain atau penginapan mewah.",
+            "3": "Rute penerbangan bukan merupakan isi fisik teks deskripsi wisata alam ini."
+          }
+        },
+        {
+          "id": "ind-d-7-b1-q02",
+          "difficulty": "sedang",
+          "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VII (hal. 12), kalimat berikut yang menggunakan majas personifikasi secara tepat adalah…",
+          "options": [
+            "Angin laut berbisik menyampaikan salam hangat pada dedaunan nyiur di pantai",
+            "Pemandangan Gunung Leuser sangat indah bagaikan lukisan surga",
+            "Suara ombak Samudra Hindia menggelegar memecah kesunyian malam",
+            "Air laut di Teluk Kiluan jernih sekali seperti kaca bening"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Majas personifikasi memberikan sifat atau perilaku manusia (berbisik menyampaikan salam) kepada benda mati/alam (angin laut)."
+          },
+          "distractorWhy": {
+            "1": "Kalimat ini menggunakan majas asosiasi/simile (menggunakan kata pembanding 'bagaikan').",
+            "2": "Kalimat ini menggunakan ungkapan deskriptif pendengaran (bukan perilaku manusia).",
+            "3": "Kalimat ini menggunakan pembanding 'seperti' (simile)."
+          }
+        },
+        {
+          "id": "ind-d-7-b1-q03",
+          "difficulty": "sedang",
+          "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VII (hal. 15 Kebahasaan), penulisan kata berimbuhan meN- yang luluh secara benar sesuai kaidah EYD adalah…",
+          "options": [
+            "Memesona (meN- + pesona)",
+            "Mempesona (meN- + pesona)",
+            "Mengkristal (meN- + kristal)",
+            "Mensapu (meN- + sapu)"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Kaidah fonologi: Kata dasar berawalan huruf K, T, S, P yang diikuti huruf vokal akan luluh jika diberi imbuhan meN-. P pada 'pesona' luluh menjadi 'memesona'."
+          },
+          "distractorWhy": {
+            "1": "Bentuk 'mempesona' tidak luluh dan melanggar kaidah KTSP.",
+            "2": "Huruf K pada 'kristal' diikuti konsonan 'r', sehingga tidak luluh (mengkristal benar tapi contoh tidak luluh).",
+            "3": "Bentuk 'mensapu' salah karena huruf S harus luluh menjadi 'menyapu'."
+          }
+        },
+        {
+          "id": "ind-d-7-b1-q04",
+          "difficulty": "tinggi",
+          "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VII (hal. 20-22 'Menjelajah Keindahan Riau'), tujuan utama penulisan teks deskripsi adalah…",
+          "options": [
+            "Menggambarkan objek secara terperinci sehingga pembaca seolah-olah dapat melihat, mendengar, atau merasakan sendiri objek tersebut",
+            "Mempengaruhi pembaca agar membeli produk wisata daerah",
+            "Menjelaskan langkah-langkah prosedural menuju tempat wisata",
+            "Menceritakan kisah rukun kehidupan tokoh fiktif di daerah wisata"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Tujuan utama teks deskripsi adalah melukiskan pancaindra objek secara mendalam agar pembaca seakan mengalami langsung objek yang dideskripsikan."
+          },
+          "distractorWhy": {
+            "1": "Mempengaruhi membeli produk adalah tujuan teks persuasi/iklan.",
+            "2": "Menjelaskan langkah prosedural adalah fungsi teks prosedur.",
+            "3": "Menceritakan kisah tokoh fiktif adalah fungsi teks cerpen/fantasi."
+          }
+        },
+        {
+          "id": "ind-d-7-b1-q05",
+          "difficulty": "dasar",
+          "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VII (hal. 18), kata konkret yang digunakan untuk menggambarkan indra penglihatan dalam deskripsi pantai adalah…",
+          "options": [
+            "Pasir putih bersih, kebiruan air laut, dan jajaran pohon kelapa",
+            "Deru ombak menggelegar dan hisikan angin",
+            "Aroma khas garam laut dan wangi ikan bakar",
+            "Tekstur pasir yang halus dan dinginnya tetesan air laut"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Kata konkret penglihatan melibatkan ciri visual seperti warna (putih, kebiruan) dan bentuk fisik (jajaran pohon)."
+          },
+          "distractorWhy": {
+            "1": "Deru dan hisikan melibatkan indra pendengaran.",
+            "2": "Aroma melibatkan indra penciuman.",
+            "3": "Tekstur halus dan dingin melibatkan indra perabaan."
+          }
+        },
+        {
+          "id": "ind-d-7-b1-q06",
+          "difficulty": "sedang",
+          "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VII (hal. 24), penggunaan tanda koma (,) yang tepat dalam rincian unsur teks deskripsi adalah…",
+          "options": [
+            "Ibu membeli buah jeruk, apel, dan mangga di pasar tradisional.",
+            "Ibu membeli buah jeruk apel dan mangga, di pasar tradisional.",
+            "Ibu membeli buah, jeruk, apel dan mangga di pasar tradisional.",
+            "Ibu membeli, buah jeruk, apel, dan mangga di pasar tradisional."
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Tanda koma digunakan di antara unsur-unsur dalam suatu pemerincian atau pembilangan, termasuk sebelum kata hubung 'dan' di akhir rincian."
+          },
+          "distractorWhy": {
+            "1": "Kurang tanda koma sebelum kata hubung 'dan'.",
+            "2": "Penggunaan tanda koma sebelum keterangan tempat salah.",
+            "3": "Penggunaan koma setelah kata kerja transitif 'membeli' tidak tepat."
+          }
+        },
+        {
+          "id": "ind-d-7-b1-q07",
+          "difficulty": "tinggi",
+          "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VII (hal. 28 Uji Kemampuan), kutipan teks: 'Dari kejauhan, perbukitan hijau berdiri kokoh memagari lembah. Kabut tipis menyelimuti puncaknya bagaikan selendang sutra putih.' Struktur bagian teks deskripsi di atas merupakan bagian…",
+          "options": [
+            "Deskripsi bagian",
+            "Identifikasi / Gambaran umum",
+            "Simpulan / Kesan umum",
+            "Judul utama"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Bagian ini merinci kondisi rupa fisik perbukitan dan kabut secara mendalam (rincian pancaindra), yang merupakan ciri struktur 'Deskripsi bagian'."
+          },
+          "distractorWhy": {
+            "1": "Identifikasi memuat penetapan nama objek, lokasi, dan pernyataan umum awal.",
+            "2": "Simpulan berisi ringkasan atau kesan pribadi penulis di akhir teks.",
+            "3": "Judul utama berada di kepala teks."
+          }
+        },
+        {
+          "id": "ind-d-7-b1-q08",
+          "difficulty": "sedang",
+          "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VII (hal. 14), imbuhan meN- yang bergabung dengan kata dasar 'tulis' membentuk kata…",
+          "options": [
+            "Menulis",
+            "Mentulis",
+            "Memtulis",
+            "Mengtulis"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Kata dasar berawalan huruf 't' (tulis) akan luluh menjadi 'n' saat diberi imbuhan meN-, menghasilkan kata 'menulis'."
+          },
+          "distractorWhy": {
+            "1": "Bentuk 'mentulis' tidak mengalami peluluhan huruf 't'.",
+            "2": "Bentuk 'memtulis' salah penggabungan alomor.",
+            "3": "Bentuk 'mengtulis' salah alomor."
+          }
+        },
+        {
+          "id": "ind-d-7-b1-q09",
+          "difficulty": "dasar",
+          "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VII (hal. 10), kalimat deskripsi yang melibatkan citraan indra pendengaran adalah…",
+          "options": [
+            "Gemericik air sungai terdengar jernih menenangkan jiwa di pagi hari",
+            "Warna merah menyala bunga mawar menghiasi sudut taman",
+            "Bau harum aroma kopi menyengat di sepanjang lorong pasar",
+            "Permukaan daun keladi itu sangat licin dan halus saat diusap"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Kata 'gemericik' dan 'terdengar' menstimulasi indra pendengaran (auditori)."
+          },
+          "distractorWhy": {
+            "1": "Warna merah menyala menstimulasi penglihatan.",
+            "2": "Bau harum menyengat menstimulasi penciuman.",
+            "3": "Licin dan halus menstimulasi perabaan."
+          }
+        },
+        {
+          "id": "ind-d-7-b1-q10",
+          "difficulty": "tinggi",
+          "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VII (hal. 32), kata emotif yang digunakan untuk memperkuat kesan keindahan dalam deskripsi pantai adalah…",
+          "options": [
+            "Memukau, menakjubkan, dan memesona",
+            "Besar, tinggi, dan panjang",
+            "Berjalan, berlari, dan melompat",
+            "Satu, dua, dan tiga"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Kata emotif adalah kata-kata yang memicu emosi atau rasa kagum pembaca, seperti 'memukau', 'menakjubkan', dan 'memesona'."
+          },
+          "distractorWhy": {
+            "1": "Kata besar, tinggi, dan panjang adalah kata ukuran objektif.",
+            "2": "Kata berjalan, berlari, melompat adalah kata kerja aksi.",
+            "3": "Kata satu, dua, tiga adalah kata bilangan."
+          }
+        },
+        {
+          "id": "ind-d-7-b1-q11",
+          "difficulty": "dasar",
+          "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VII (hal. 16), kata sinonim dari kata 'elok' dalam kalimat 'Pemandangan laut di sore hari sangat elok' adalah…",
+          "options": [
+            "Indah / Cantik",
+            "Buruk / Jelek",
+            "Gelap / Suram",
+            "Biasa / Standar"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Kata 'elok' bermakna indah, cantik, atau bagus dipandang."
+          },
+          "distractorWhy": {
+            "1": "Buruk/jelek adalah antonim (lawan kata).",
+            "2": "Gelap/suram tidak sesuai makna.",
+            "3": "Biasa/standar tidak memiliki kadar estetika kata elok."
+          }
+        },
+        {
+          "id": "ind-d-7-b1-q12",
+          "difficulty": "sedang",
+          "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VII (hal. 30), penggunaan kata depan 'di' yang benar sebagai penunjuk lokasi/tempat adalah…",
+          "options": [
+            "di Takengon",
+            "ditakengon",
+            "di makan",
+            "di baca"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Kata depan 'di' yang menunjukkan tempat ditulis terpisah dari kata yang mengikutinya (di Takengon)."
+          },
+          "distractorWhy": {
+            "1": "Bentuk 'ditakengon' salah karena disambung.",
+            "2": "Bentuk 'di makan' salah karena di- pada kata kerja harus disambung (dimakan).",
+            "3": "Bentuk 'di baca' salah karena di- awalan pasif harus disambung (dibaca)."
+          }
+        }
+      ]
+    },
+    {
+      "code": "KOMP-IND-D-7-BAB2-01",
+      "grade": 7,
+      "name": "Bab 2: Kelana Cerita Unik",
+      "materi": "Mengenal Puisi Rakyat (Pantun & Gurindam), Cerita Fantasi, Analisis Tokoh & Alur, Unsur Kebahasaan Teks Narasi",
+      "cpRef": "Bahasa Indonesia untuk SMP/MTs Kelas VII (Edisi Revisi) — Bab 2",
+      "items": [
+        {
+          "id": "ind-d-7-b2-q01",
+          "difficulty": "dasar",
+          "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VII (Edisi Revisi) halaman 46, manakah pasangan struktur dan jumlah larik (baris) yang benar untuk puisi rakyat berupa pantun dan gurindam?",
+          "options": [
+            "Pantun terdiri atas 4 baris per bait, sedangkan gurindam terdiri atas 2 baris per bait.",
+            "Pantun terdiri atas 2 baris per bait, sedangkan gurindam terdiri atas 4 baris per bait.",
+            "Baik pantun maupun gurindam sama-sama terdiri atas 4 baris per bait.",
+            "Pantun bersifat bebas tanpa batasan baris, sedangkan gurindam terdiri atas 3 baris per bait."
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Sesuai dengan pembahasan ciri-ciri puisi rakyat di halaman 46-47, pantun merupakan puisi rakyat yang tiap baitnya terdiri dari 4 baris (larik), sedangkan gurindam tiap baitnya terdiri dari 2 baris (larik)."
+          },
+          "distractorWhy": {
+            "1": "Pernyataan ini terbalik karena gurindam lah yang terdiri dari 2 baris dan pantun 4 baris.",
+            "2": "Gurindam hanya terdiri dari 2 baris per bait, bukan 4 baris seperti pantun.",
+            "3": "Pantun memiliki aturan terikat (4 baris per bait) dan gurindam memiliki 2 baris per bait, bukan 3 baris."
+          }
+        },
+        {
+          "id": "ind-d-7-b2-q02",
+          "difficulty": "dasar",
+          "prompt": "Berdasarkan pemaparan unsur dan ciri-ciri puisi rakyat pada Buku Siswa Bahasa Indonesia Kelas VII halaman 47, aturan suku kata yang berlaku pada setiap baris pantun adalah...",
+          "options": [
+            "Setiap baris terdiri atas 8 hingga 12 suku kata.",
+            "Setiap baris terdiri atas 4 hingga 8 suku kata.",
+            "Setiap baris terdiri atas 10 hingga 16 suku kata.",
+            "Setiap baris bebas tanpa ada batasan jumlah suku kata."
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Buku Siswa halaman 47 menjelaskan secara eksplisit bahwa salah satu ciri utama pantun adalah setiap baris terdiri atas 8--12 suku kata."
+          },
+          "distractorWhy": {
+            "1": "Jumlah 4-8 suku kata terlalu pendek untuk standar norma suku kata pada larik pantun.",
+            "2": "Rentang 10-16 suku kata melebihi norma standar suku kata pantun yang berkisar 8-12 suku kata.",
+            "3": "Pantun merupakan puisi terikat yang memiliki aturan ketat mengenai jumlah suku kata per baris."
+          }
+        },
+        {
+          "id": "ind-d-7-b2-q03",
+          "difficulty": "sedang",
+          "prompt": "Berdasarkan uraian materi mengenai gurindam pada Buku Siswa Bahasa Indonesia Kelas VII halaman 47, hubungan antara larik pertama dan larik kedua pada gurindam adalah...",
+          "options": [
+            "Larik pertama merupakan syarat/sebab, sedangkan larik kedua merupakan akibat/penyelesaian.",
+            "Larik pertama merupakan sampiran berupa lukisan alam, sedangkan larik kedua merupakan isi pesan.",
+            "Larik pertama dan kedua merupakan bayangan cerita imajinatif tanpa hubungan sebab-akibat.",
+            "Larik pertama berisi pengenalan tokoh, sedangkan larik kedua berisi penutup dialog."
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Sesuai dengan materi Kupas Teori di halaman 47, larik pertama gurindam berisi syarat/soal/masalah, dan larik kedua berisi akibat atau pesan pemecah masalah dari larik pertama dalam wujud kalimat majemuk."
+          },
+          "distractorWhy": {
+            "1": "Sampiran dan isi adalah struktur pembentuk pantun, bukan gurindam.",
+            "2": "Larik-larik pada gurindam membentuk satu kesatuan kalimat majemuk yang saling berkaitan erat secara kausalitas.",
+            "3": "Gurindam berisi pesan atau nasihat moral, bukan teks naratif dialog tokoh."
+          }
+        },
+        {
+          "id": "ind-d-7-b2-q04",
+          "difficulty": "dasar",
+          "prompt": "Memperhatikan penjelasan bentuk puisi rakyat pada Buku Siswa Bahasa Indonesia Kelas VII halaman 47, pola rima akhir yang menjadi ciri khas gurindam adalah...",
+          "options": [
+            "Berpola rima a-a.",
+            "Berpola rima a-b-a-b.",
+            "Berpola rima a-b-c-d.",
+            "Berpola rima bebas tanpa persajakan."
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Buku Siswa halaman 47 menegaskan bahwa gurindam terdiri dari 2 baris yang rima akhirnya berpola sama (a-a)."
+          },
+          "distractorWhy": {
+            "1": "Pola rima a-b-a-b merupakan rima khas pada bait pantun 4 baris.",
+            "2": "Pola a-b-c-d tidak membentuk persajakan terikat puisi rakyat.",
+            "3": "Gurindam mengutamakan keindahan rima yang terikat (a-a)."
+          }
+        },
+        {
+          "id": "ind-d-7-b2-q05",
+          "difficulty": "sedang",
+          "prompt": "Berdasarkan rincian materi puisi tradisional pada Buku Siswa Bahasa Indonesia Kelas VII halaman 47, manakah yang merupakan salah satu ciri khas dari teks mantra?",
+          "options": [
+            "Isinya berhubungan dengan kekuatan gaib serta mengandung rayuan dan perintah.",
+            "Terdiri atas tepat 4 baris yang dipisah menjadi dua sampiran dan dua isi.",
+            "Setiap bait diakhiri dengan simpulan hukum sebab-akibat berupa kalimat majemuk.",
+            "Selalu mencantumkan nama pengarang/penulis secara lengkap di akhir teks."
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Halaman 47 menyebutkan bahwa mantra isinya berhubungan dengan kekuatan gaib, dibuat/diucapkan untuk tujuan tertentu, serta mengandung rayuan dan perintah."
+          },
+          "distractorWhy": {
+            "1": "Ciri 4 baris dengan sampiran dan isi adalah ciri pantun.",
+            "2": "Ciri hubungan sebab-akibat berupa kalimat majemuk merupakan ciri gurindam.",
+            "3": "Mantra dan sebagian besar puisi rakyat bersifat anonim (tidak diketahui pengarangnya)."
+          }
+        },
+        {
+          "id": "ind-d-7-b2-q06",
+          "difficulty": "dasar",
+          "prompt": "Berdasarkan pembahasan cerita fantasi pada Buku Siswa Bahasa Indonesia Kelas VII halaman 52-53, apa definisi mendasar dari teks cerita fantasi?",
+          "options": [
+            "Cerita yang bersifat khayalan atau imajinatif dengan mengunsurkan hal-hal ajaib/keajaiban yang tidak ada dalam kehidupan nyata.",
+            "Laporan kisah nyata kehidupan tokoh bersejarah yang ditulis berdasarkan bukti sejarah dan arsip faktual.",
+            "Teks petunjuk teknis yang memberikan arahan langkah demi langkah untuk menyelesaikan pekerjaan fisik.",
+            "Berita peristiwa aktual harian yang disiarkan melalui media massa cetak maupun elektronik."
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Sebagaimana dijelaskan pada halaman 52-53, cerita fantasi adalah cerita imajinatif/khayalan yang menghadirkan tokoh, latar, atau peristiwa ajaib/keajaiban di luar kenyataan sehari-hari."
+          },
+          "distractorWhy": {
+            "1": "Kisah nyata bersejarah termasuk dalam biografi atau historiografi faktual, bukan cerita fantasi.",
+            "2": "Teks petunjuk teknis langkah demi langkah merupakan teks prosedur.",
+            "3": "Berita harian aktual merupakan teks berita."
+          }
+        },
+        {
+          "id": "ind-d-7-b2-q07",
+          "difficulty": "sedang",
+          "prompt": "Dalam cerita fantasi Bola-Bola Waktu karya Rakhma Subarna (Buku Siswa Bahasa Indonesia Kelas VII hal. 53-56), apakah alasan utama yang membuat Ivan merasa lelah dan sempat bermimpi ingin mengubah kehidupannya?",
+          "options": [
+            "Ivan harus bangun pagi-pagi sekali untuk membantu ibunya membuat dan berjualan kue basah.",
+            "Ivan dipaksa oleh gurunya untuk mengikuti kompetisi olimpiade sains tingkat nasional.",
+            "Ivan dilarang bermain basket oleh kedua orang tuanya karena nilainya memburuk.",
+            "Ivan diusir dari rumah oleh ayahnya karena tidak mau merawat kedua adiknya."
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Dalam teks cerita hal. 53-54, Ivan merasa lelah dan malu karena setiap hari harus bangun pagi membantu memasak dan mengantarkan kue jualan ke toko-toko sebelum berangkat sekolah."
+          },
+          "distractorWhy": {
+            "1": "Dalam cerita Ivan bercita-cita bermain basket dan tidak ada paksaan kompetisi sains.",
+            "2": "Ivan justru ingin menjadi kapten tim basket agar dipuji, bukan dilarang oleh orang tuanya.",
+            "3": "Ivan tinggal bersama keluarganya dengan rukun meski lelah berjualan kue, tidak pernah diusir."
+          }
+        },
+        {
+          "id": "ind-d-7-b2-q08",
+          "difficulty": "sedang",
+          "prompt": "Berdasarkan alur cerita Bola-Bola Waktu pada Buku Siswa Bahasa Indonesia Kelas VII halaman 53-56, sosok misterius yang menawarkan bola-bola waktu berwarna-warni kepada Ivan adalah...",
+          "options": [
+            "Pria berkerudung hitam dengan bibir tersenyum misterius.",
+            "Kakek tua berjanggut putih yang membawa tongkat kayu ajaib.",
+            "Seorang wanita cantik bersayap peri yang muncul dari balik awan.",
+            "Teman sekelas Ivan yang menyamar memakai topeng pesta."
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Teks cerita hal. 54 mendeskripsikan secara eksplisit tokoh misterius tersebut sebagai seorang pria berkerudung hitam yang tiba-tiba hadir memandang Ivan."
+          },
+          "distractorWhy": {
+            "1": "Ciri kakek berjanggut putih tidak terdapat pada deskripsi teks cerita Bola-Bola Waktu.",
+            "2": "Tokoh pemberi bola waktu adalah pria berkerudung hitam, bukan wanita bersayap peri.",
+            "3": "Pria berkerudung hitam tersebut merupakan sosok ajaib dalam dunia fantasi cerita, bukan teman sekelasnya."
+          }
+        },
+        {
+          "id": "ind-d-7-b2-q09",
+          "difficulty": "tinggi",
+          "prompt": "Berdasarkan analisis alur cerita Bola-Bola Waktu pada Buku Siswa Bahasa Indonesia Kelas VII halaman 55-57 (Tabel 2.3), hal apakah yang akhirnya disadari oleh Ivan setelah menjelajahi masa depan melalui bola waktu?",
+          "options": [
+            "Ivan menyadari bahwa hasil penjualan kue itulah yang membiayai kehidupan keluarga serta kebahagiaannya bersama orang tua dan adik-adiknya.",
+            "Ivan menyadari bahwa menjadi pemain basket terkenal adalah satu-satunya cita-cita terpenting dalam hidupnya.",
+            "Ivan menyadari bahwa pria berkerudung hitam adalah musuh yang harus ia kalahkan dengan kesaktian.",
+            "Ivan menyadari bahwa ia sebaiknya berhenti sekolah dan fokus berjualan kue seharian."
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Di masa depan (hal. 55-56), Ivan mendapati usahanya berjualan kue dulu sangat berharga bagi kehangatan keluarganya, sehingga ia menyesali keinginannya dan bersyukur kembali ke masa kini."
+          },
+          "distractorWhy": {
+            "1": "Meskipun di masa depan ia menjadi populer di tim basket, Ivan justru merasa hampa karena keluarganya tidak utuh lagi.",
+            "2": "Pria berkerudung hitam bertindak sebagai perantara pemenuh keinginan/pembuka kesadaran Ivan, bukan musuh pertarungan.",
+            "3": "Pesan moral cerita mengajak Ivan menghargai kerja keras keluarga sambil tetap bersekolah bersama adik-adiknya."
+          }
+        },
+        {
+          "id": "ind-d-7-b2-q10",
+          "difficulty": "sedang",
+          "prompt": "Berdasarkan komik cerita fantasi Sihir Unik Mao pada Buku Siswa Bahasa Indonesia Kelas VII halaman 59-62, masalah utama yang dialami tokoh Mao di Sekolah Peri Juara adalah...",
+          "options": [
+            "Mao sering lupa dan sihirnya selalu salah atau menghasilkan hal yang tidak sesuai rencana.",
+            "Mao tidak bisa terbang karena sayap perinya patah sejak lahir.",
+            "Mao diusir oleh kepala sekolah karena tidak membayar biaya sekolah peri.",
+            "Mao menolak belajar sihir dan hanya ingin berbuat jahat kepada peri lain."
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Dalam komik hal. 59-60, Mao digambarkan sebagai peri pelupa yang sering salah saat mengucap mantera sihir sehingga hasil sihirnya menjadi unik/keliru."
+          },
+          "distractorWhy": {
+            "1": "Tidak ada bagian cerita yang menyebutkan sayap Mao patah.",
+            "2": "Mao diterima dan bersekolah di Sekolah Peri Juara, tidak pernah diusir karena biaya.",
+            "3": "Mao adalah tokoh baik yang tekun belajar walau sering lupa."
+          }
+        },
+        {
+          "id": "ind-d-7-b2-q11",
+          "difficulty": "sedang",
+          "prompt": "Berdasarkan dialog komik Sihir Unik Mao pada Buku Siswa Bahasa Indonesia Kelas VII halaman 60-61, keahlian unik yang akhirnya berhasil dikembangkan oleh Mao setelah terus berlatih adalah...",
+          "options": [
+            "Sihir menciptakan masakan dan makanan yang lezat.",
+            "Sihir mengubah batu menjadi emas murni.",
+            "Sihir menghilang dan berpindah tempat secara kilat.",
+            "Sihir mengendalikan cuaca dan menurunkan hujan."
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Dalam komik halaman 61, teman Mao memujinya dengan mengatakan: Wah, sekarang kau adalah peri makanan yang berbakat! karena masakan sihirnya sangat lezat."
+          },
+          "distractorWhy": {
+            "1": "Sihir mengubah batu menjadi emas adalah tema cerita lain, bukan keahlian Mao.",
+            "2": "Mao tidak mengembangkan sihir teleportasi/menghilang.",
+            "3": "Keahlian Mao secara spesifik berkaitan dengan kuliner/makanan lezat."
+          }
+        },
+        {
+          "id": "ind-d-7-b2-q12",
+          "difficulty": "dasar",
+          "prompt": "Berdasarkan materi Kupas Teori pada Buku Siswa Bahasa Indonesia Kelas VII halaman 63 (Kegiatan 7), apakah yang dimaksud dengan majas asosiasi?",
+          "options": [
+            "Gaya bahasa yang membandingkan dua hal berbeda yang sengaja dianggap sama menggunakan kata penghubung perbandingan.",
+            "Gaya bahasa yang memberikan sifat-sifat manusia kepada benda mati secara berlebihan.",
+            "Gaya bahasa berupa ungkapan sindiran halus untuk merendahkan diri sendiri.",
+            "Gaya bahasa yang menggunakan kata-kata dengan arti berlawanan dari maksud sebenarnya."
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Halaman 63 menjelaskan majas asosiasi sebagai gaya bahasa yang membandingkan dua objek berbeda yang dianggap sama dengan kata pembanding seperti bagaikan, bak, laksana, seperti."
+          },
+          "distractorWhy": {
+            "1": "Mengaitkan sifat manusia pada benda mati adalah majas personifikasi.",
+            "2": "Ungkapan merendahkan diri halus merujuk pada majas litotes.",
+            "3": "Penggunaan kata berlawanan arti merupakan ciri majas ironi."
+          }
+        },
+        {
+          "id": "ind-d-7-b2-q13",
+          "difficulty": "sedang",
+          "prompt": "Memperhatikan penjelasan ciri kebahasaan pada Buku Siswa Bahasa Indonesia Kelas VII halaman 63, manakah kelompok kata yang umum digunakan untuk menandai majas asosiasi dalam kalimat?",
+          "options": [
+            "bagaikan, bak, laksana, seperti, seumpama",
+            "sebab, karena, oleh karena itu, sehingga",
+            "meskipun, walaupun, kendatipun, namun",
+            "pertama, kedua, selanjutnya, kemudian"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Halaman 63 mencantumkan secara eksplisit bahwa majas asosiasi menggunakan kata-kata perbandingan seperti: sama, bagai, bagaikan, laksana, seumpama, bak, dan lain-lain."
+          },
+          "distractorWhy": {
+            "1": "Kata sebab, karena, sehingga merupakan konjungsi kausalitas (sebab-akibat).",
+            "2": "Kata meskipun, walaupun, namun merupakan konjungsi pertentangan/konsesif.",
+            "3": "Kata pertama, selanjutnya, kemudian merupakan konjungsi urutan waktu/kronologis."
+          }
+        },
+        {
+          "id": "ind-d-7-b2-q14",
+          "difficulty": "sedang",
+          "prompt": "Berdasarkan kutipan teks komik Keberanian Emas pada Buku Siswa Bahasa Indonesia Kelas VII halaman 64-65, manakah contoh kalimat yang mengandung majas asosiasi?",
+          "options": [
+            "Emas terus berlari, melesat seperti anak panah.",
+            "Emas menerima empat kantong ajaib dari pertapa.",
+            "Raksasa jatuh terperosok ke dalam lumpur hisap.",
+            "Ibu menyambut Emas dengan pelukan hangat di rumah."
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Kalimat Emas terus berlari, melesat seperti anak panah (hal. 65) membandingkan larian Emas dengan anak panah menggunakan kata perbandingan seperti."
+          },
+          "distractorWhy": {
+            "1": "Kalimat ini merupakan kalimat berita lugas tanpa kata pembanding asosiasi.",
+            "2": "Kalimat ini berisi uraian aksi peristiwa faktual dalam cerita.",
+            "3": "Kalimat ini merupakan deskripsi tindakan naratif biasa."
+          }
+        },
+        {
+          "id": "ind-d-7-b2-q15",
+          "difficulty": "tinggi",
+          "prompt": "Memperhatikan pemaparan tentang penokohan pada Buku Siswa Bahasa Indonesia Kelas VII halaman 67-68, perbandingan fungsi antara tokoh protagonis dan antagonis dalam teks cerita fantasi adalah...",
+          "options": [
+            "Protagonis adalah tokoh utama yang memperjuangkan tujuan/kebaikan, sedangkan antagonis adalah tokoh penentang yang menciptakan konflik.",
+            "Protagonis adalah tokoh pembantu yang serakah, sedangkan antagonis adalah tokoh utama yang bijaksana.",
+            "Protagonis selalu berwujud makhluk gaib jahat, sedangkan antagonis selalu berwujud manusia biasa.",
+            "Protagonis hanya muncul di awal cerita, sedangkan antagonis hanya muncul di akhir cerita."
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Halaman 67 mendefinisikan Protagonis sebagai tokoh utama dalam cerita fiksi dan Antagonis sebagai tokoh lawan yang menentang tokoh utama."
+          },
+          "distractorWhy": {
+            "1": "Definisi ini terbalik karena protagonis adalah tokoh utama dan tidak serakah.",
+            "2": "Wujud tokoh (gaib atau manusia) tidak menentukan wujud protagonis maupun antagonis.",
+            "3": "Kedua tokoh berperan sepanjang alur cerita membangun konflik dari awal hingga penyelesaian."
+          }
+        },
+        {
+          "id": "ind-d-7-b2-q16",
+          "difficulty": "sedang",
+          "prompt": "Berdasarkan alur komik Keberanian Emas pada Buku Siswa Bahasa Indonesia Kelas VII halaman 64-67, empat benda ajaib bekal dari pertapa yang digunakan Emas untuk mengalahkan Raksasa secara berurutan adalah...",
+          "options": [
+            "Biji timun, jarum, garam, dan terasi.",
+            "Batu akik, keris pusaka, air cermin, dan bunga wijayakusuma.",
+            "Padi emas, kunyit, minyak kelapa, dan tanah liat.",
+            "Panah ajaib, pedang perak, tali rotan, dan serbuk sihir."
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Dalam cerita komik adaptasi Timun Mas (hal. 64-67), Emas menebarkan biji timun (menjadi ladang timun), jarum (menjadi hutan bambu), garam (menjadi lautan), dan terasi (menjadi lautan lumpur mendidih)."
+          },
+          "distractorWhy": {
+            "1": "Benda-benda ini tidak ada dalam kelengkapan perbekalan pertapa untuk Emas.",
+            "2": "Padi emas dan tanah liat bukan benda bekal pertapa pada cerita ini.",
+            "3": "Senjata pedang dan panah bukan media yang diberikan pertapa kepada Emas."
+          }
+        },
+        {
+          "id": "ind-d-7-b2-q17",
+          "difficulty": "dasar",
+          "prompt": "Berdasarkan Kupas Teori pada Buku Siswa Bahasa Indonesia Kelas VII halaman 69 (Kegiatan 11), tanda baca utama yang digunakan untuk menandai bagian kalimat langsung adalah...",
+          "options": [
+            "Tanda petik ganda di awal dan akhir kalimat kutipan.",
+            "Tanda kurung di sekeliling kalimat ucapan.",
+            "Tanda titik koma di antara kata kerja ucap dan isi kalimat.",
+            "Tanda hubung di setiap awal kata ucapan."
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Halaman 69 menegaskan bahwa ciri khas utama kalimat langsung adalah menggunakan tanda petik buka di awal dan tanda petik tutup di akhir kutipan ucapan."
+          },
+          "distractorWhy": {
+            "1": "Tanda kurung digunakan untuk keterangan tambahan, bukan mengutip ucapan langsung.",
+            "2": "Tanda titik koma berfungsi memisahkan klausa setara, bukan penanda kalimat langsung.",
+            "3": "Tanda hubung digunakan untuk kata ulang atau penyambung suku kata."
+          }
+        },
+        {
+          "id": "ind-d-7-b2-q18",
+          "difficulty": "sedang",
+          "prompt": "Berdasarkan latihan mengubah bentuk kalimat pada Buku Siswa Bahasa Indonesia Kelas VII halaman 69-70, bentuk kalimat tidak langsung yang tepat untuk kalimat langsung Ibu berkata Terima kasih Tuan Pertapa adalah...",
+          "options": [
+            "Ibu mengucapkan terima kasih kepada Tuan Pertapa.",
+            "Ibu bertanya apakah Tuan Pertapa mau berterima kasih.",
+            "Tuan Pertapa memaksa Ibu untuk mengucapkan terima kasih.",
+            "Ibu berteriak agar Tuan Pertapa segera berterima kasih kepada Raksasa."
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Contoh di halaman 69 menunjukkan bahwa kalimat langsung Ibu berkata Terima kasih Tuan Pertapa diubah menjadi kalimat tidak langsung: Ibu mengatakan terima kasih kepada pertapa."
+          },
+          "distractorWhy": {
+            "1": "Penggunaan kata tanya apakah mengubah makna lontaran rasa syukur menjadi pertanyaan.",
+            "2": "Kata memaksa mengubah makna positif dari ucapan terima kasih.",
+            "3": "Subjek dan makna ucapan disimpangkan dari pesan asli kalimat."
+          }
+        },
+        {
+          "id": "ind-d-7-b2-q19",
+          "difficulty": "tinggi",
+          "prompt": "Berdasarkan soal Uji Kompetensi nomor 1 pada Buku Siswa Bahasa Indonesia Kelas VII halaman 71, bait puisi rakyat berikut ini digolongkan ke dalam jenis: Barang siapa meninggalkan zakat, Tiadalah artinya boleh berkat, Barang siapa berbuat fitnah, Ibarat dirinya menentang panah",
+          "options": [
+            "Gurindam",
+            "Pantun",
+            "Mantra",
+            "Syair komik"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Pada Uji Kompetensi hal. 71, bait ini dikutip dari Kosasih (2012:17) dan dipasangkan dengan jenis Gurindam karena terdiri dari 2 baris per seloka bait berima a-a yang berisi nasihat moral/agama."
+          },
+          "distractorWhy": {
+            "1": "Bait tersebut tidak memiliki 4 baris ber-sampiran seperti pantun.",
+            "2": "Bait tersebut berisi nasihat agama (zakat dan fitnah), bukan kata-kata gaib berirama magis seperti mantra.",
+            "3": "Syair komik bukan merupakan salah satu jenis puisi rakyat terikat."
+          }
+        },
+        {
+          "id": "ind-d-7-b2-q20",
+          "difficulty": "tinggi",
+          "prompt": "Berdasarkan cerita narasi fantasi pada Uji Kompetensi Buku Siswa Bahasa Indonesia Kelas VII halaman 72-73, objek ajaib yang membawa tokoh Rendra melintasi waktu untuk melihat peristiwa tiga tahun lalu adalah...",
+          "options": [
+            "Pintu jati dan kunci yang sedingin es saat diputar kenopnya.",
+            "Bola kristal berwarna ungu yang ditemukan di dalam lemari tua.",
+            "Cermin ajaib bertangkai perak di dinding kamar mandi.",
+            "Buku harian usang yang ditulis tangan oleh ibunya."
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Dalam teks Uji Kompetensi halaman 72, Rendra memegang kunci sedingin es, memasukkannya ke pintu jati, dan saat kenop pintu diputar ia disambut suasana masa lalu keluarga (3 tahun lalu)."
+          },
+          "distractorWhy": {
+            "1": "Bola kristal tidak terdapat dalam teks cerita Rendra.",
+            "2": "Media perantara waktu dalam cerita adalah pintu jati dan kunci es, bukan cermin.",
+            "3": "Meskipun menceritakan kisah ibu, medianya adalah penjelajahan pintu ajaib jati."
+          }
+        }
+      ]
+    }
+  ]
+}

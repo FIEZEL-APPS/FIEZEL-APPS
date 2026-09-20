@@ -1,0 +1,249 @@
+{
+  "code": "KOMP-IPA-D-8-BAB2-01",
+  "grade": 8,
+  "name": "Struktur dan Fungsi Tubuh Makhluk Hidup",
+  "materi": "Sistem Pencernaan & Nutrisi, Sistem Peredaran Darah & Jantung, Sistem Pernapasan & Paru-paru, Sistem Ekskresi & Ginjal",
+  "cpRef": "Ilmu Pengetahuan Alam untuk SMP/MTs Kelas VIII (Edisi Revisi) — Bab 2",
+  "items": [
+    {
+      "id": "ipa-d-8-b2-q01",
+      "difficulty": "dasar",
+      "prompt": "Berdasarkan Buku Siswa IPA Kelas VIII (hal. 42-46 Sistem Pencernaan), enzim ptialin (amilase mulut) yang dihasilkan oleh kelenjar ludah berfungsi untuk mencerna…",
+      "options": [
+        "Karbohidrat (amilum) menjadi gula sederhana (maltosa)",
+        "Protein menjadi pepton",
+        "Lemak menjadi asam lemak dan gliserol",
+        "Vitamin menjadi asam amino"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Enzim amilase/ptialin dalam rongga mulut memecah polisakarida pati (amilum) menjadi disakarida maltosa."
+      },
+      "distractorWhy": {
+        "1": "Pencernaan protein oleh enzim pepsin lambung.",
+        "2": "Pencernaan lemak oleh enzim lipase pankreas/usus.",
+        "3": "Vitamin tidak dipecah menjadi asam amino."
+      }
+    },
+    {
+      "id": "ipa-d-8-b2-q02",
+      "difficulty": "sedang",
+      "prompt": "Berdasarkan Buku Siswa IPA Kelas VIII (hal. 52-56 Sistem Peredaran Darah), ruang jantung manusia yang berfungsi memompa darah kaya oksigen (O₂) ke seluruh tubuh melalui pembuluh darah aorta adalah…",
+      "options": [
+        "Bilik kiri (ventrikel kiri)",
+        "Serambi kanan (atrium kanan)",
+        "Bilik kanan (ventrikel kanan)",
+        "Serambi kiri (atrium kiri)"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Ventricle kiri memiliki otot dinding tertebal untuk memompa darah bersih bersirkulasi ke seluruh sistemik tubuh."
+      },
+      "distractorWhy": {
+        "1": "Serambi kanan menerima darah kotor kaya CO₂ dari seluruh tubuh.",
+        "2": "Bilik kanan memompa darah kotor ke paru-paru.",
+        "3": "Serambi kiri menerima darah bersih dari paru-paru."
+      }
+    },
+    {
+      "id": "ipa-d-8-b2-q03",
+      "difficulty": "sedang",
+      "prompt": "Berdasarkan Buku Siswa IPA Kelas VIII (hal. 65 Sistem Pernapasan), proses pertukaran gas oksigen (O₂) dan karbondioksida (CO₂) secara difusi di dalam paru-paru terjadi pada struktur…",
+      "options": [
+        "Alveolus",
+        "Bronkus",
+        "Trakea",
+        "Laring"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Alveolus berupa kantung udara berdinding tipis yang dikelilingi kapiler darah tempat pertukaran gas difusi."
+      },
+      "distractorWhy": {
+        "1": "Bronkus adalah cabang batang tenggorokan.",
+        "2": "Trakea adalah saluran pipa pernapasan utama.",
+        "3": "Laring adalah pangkal tenggorokan pita suara."
+      }
+    },
+    {
+      "id": "ipa-d-8-b2-q04",
+      "difficulty": "tinggi",
+      "prompt": "Berdasarkan Buku Siswa IPA Kelas VIII (hal. 74-78 Sistem Ekskresi), proses pembentukan urine di dalam ginjal yang terjadi pada bagian glomerulus berupa penyaringan sel-sel darah dan protein dinamakan…",
+      "options": [
+        "Filtrasi (penyaringan)",
+        "Reabsorpsi (penyerapan kembali)",
+        "Augmentasi (pengeluaran zat sisa)",
+        "Defekasi (pembuangan feses)"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Filtrasi glomerulus menghasilkan urine primer yang bebas dari sel darah dan molekul protein besar."
+      },
+      "distractorWhy": {
+        "1": "Reabsorpsi terjadi di tubulus kontortus proksimal (menyerap zat berguna).",
+        "2": "Augmentasi terjadi di tubulus kontortus distal (membentuk urine sebenarnya).",
+        "3": "Defekasi adalah pembuangan sisa pencernaan usus besar."
+      }
+    },
+    {
+      "id": "ipa-d-8-b2-q05",
+      "difficulty": "dasar",
+      "prompt": "Berdasarkan Buku Siswa IPA Kelas VIII (hal. 48), organ pencernaan yang berfungsi utama menyerap air dan garam mineral dari sisa makanan serta membentuk feses adalah…",
+      "options": [
+        "Usus besar (kolon)",
+        "Usus halus (ileum)",
+        "Lambung",
+        "Kerongkongan (esofagus)"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Usus besar mengabsorpsi sisa air dan pembusukan materi makanan oleh bakteri E. coli."
+      },
+      "distractorWhy": {
+        "1": "Usus halus menyerap sari-sari makanan (nutrisi).",
+        "2": "Lambung mencerna makanan secara kimiawi dan mekanis.",
+        "3": "Kerongkongan menyalurkan makanan via gerak peristaltik."
+      }
+    },
+    {
+      "id": "ipa-d-8-b2-q06",
+      "difficulty": "sedang",
+      "prompt": "Berdasarkan Buku Siswa IPA Kelas VIII (hal. 82 Uji Kemampuan Bab 2), gangguan pada sistem peredaran darah berupa penyumbatan pembuluh darah arteri koroner jantung oleh endapan lemak/kolesterol dinamakan…",
+      "options": [
+        "Aterosklerosis (penyakit jantung koroner)",
+        "Anemia",
+        "Leukemia",
+        "Hemofilia"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Aterosklerosis adalah penyempitan arteri akibat plak kolesterol yang mengganggu pasokan O₂ ke otot jantung."
+      },
+      "distractorWhy": {
+        "1": "Anemia adalah kekurangan sel darah merah / hemoglobin.",
+        "2": "Leukemia adalah kanker sel darah putih berlebihan.",
+        "3": "Hemofilia adalah kelainan darah sulit membeku."
+      }
+    },
+    {
+      "id": "ipa-d-8-b2-q07",
+      "difficulty": "dasar",
+      "prompt": "Berdasarkan Buku Siswa IPA Kelas VIII (hal. 44), organ pencernaan mekanis utama di dalam mulut yang berfungsi memotong dan mengunyah makanan adalah…",
+      "options": [
+        "Gigi",
+        "Lidah",
+        "Kelenjar ludah",
+        "Kerongkongan"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Gigi memotong, merobek, dan mengunyah makanan secara mekanis menjadi bagian-bagian lebih kecil."
+      },
+      "distractorWhy": {
+        "1": "Lidah memindahkan dan meratakan makanan.",
+        "2": "Kelenjar ludah menghasilkan enzim amilase pencernaan kimiawi.",
+        "3": "Kerongkongan menyalurkan makanan ke lambung."
+      }
+    },
+    {
+      "id": "ipa-d-8-b2-q08",
+      "difficulty": "sedang",
+      "prompt": "Berdasarkan Buku Siswa IPA Kelas VIII (hal. 58), pembuluh darah balik (vena) memiliki ciri khas struktur yaitu…",
+      "options": [
+        "Dinding tipis kurang elastis dan memiliki banyak katup di sepanjang pembuluh untuk mencegah aliran balik darah",
+        "Dinding tebal elastis tanpa katup",
+        "Mengalirkan darah bertekanan sangat tinggi keluar dari jantung",
+        "Berada di dalam jaringan paling dalam jauh dari permukaan kulit"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Vena memiliki katup-katup berseri untuk menjaga darah tetap mengalir satu arah menuju jantung."
+      },
+      "distractorWhy": {
+        "1": "Ciri pembuluh nadi (arteri).",
+        "2": "Ciri aliran darah arteri.",
+        "3": "Ciri letak arteri."
+      }
+    },
+    {
+      "id": "ipa-d-8-b2-q09",
+      "difficulty": "sedang",
+      "prompt": "Berdasarkan Buku Siswa IPA Kelas VIII (hal. 68), gerakan pernapasan dada pada saat inspirasi (menghirup udara) ditandai oleh…",
+      "options": [
+        "Otot antartulang rusuk berkontraksi, tulang rusuk terangkat, dan volume rongga dada membesar",
+        "Otot diafragma melengkung ke atas",
+        "Tekanan udara di dalam paru-paru meningkat lebih tinggi dari luar",
+        "Rongga dada mengecil dan mengempis"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Inspirasi dada terjadi saat otot antartulang rusuk berkontraksi sehingga rusuk naik dan rongga dada membesar."
+      },
+      "distractorWhy": {
+        "1": "Diafragma melengkung terjadi saat ekspirasi.",
+        "2": "Tekanan paru tinggi terjadi saat ekspirasi menghembuskan udara.",
+        "3": "Rongga mengempis terjadi saat ekspirasi."
+      }
+    },
+    {
+      "id": "ipa-d-8-b2-q10",
+      "difficulty": "tinggi",
+      "prompt": "Berdasarkan Buku Siswa IPA Kelas VIII (hal. 76), penyakit ginjal kronis yang ditandai oleh ditemukannya molekul protein albumen di dalam urine (albuminuria) disebabkan oleh kerusakan pada bagian…",
+      "options": [
+        "Glomerulus pada badan Malpighi",
+        "Tubulus kontortus distal",
+        "Kantung kemih (vesika urinaria)",
+        "Ureter"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Kerusakan membran penyaring glomerulus menyebabkan protein lolos ke dalam filtrat urine."
+      },
+      "distractorWhy": {
+        "1": "Tubulus distal adalah tempat augmentasi.",
+        "2": "Kantung kemih penampung urine.",
+        "3": "Ureter saluran penyuplai ke vesika."
+      }
+    },
+    {
+      "id": "ipa-d-8-b2-q11",
+      "difficulty": "dasar",
+      "prompt": "Berdasarkan Buku Siswa IPA Kelas VIII (hal. 50), vitamin larut dalam lemak yang penting untuk kesehatan penglihatan mata dan integritas sel epitel adalah…",
+      "options": [
+        "Vitamin A",
+        "Vitamin C",
+        "Vitamin B12",
+        "Vitamin K"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Vitamin A (retinol) penting untuk pembentukan pigmen rhodopsin mata."
+      },
+      "distractorWhy": {
+        "1": "Vitamin C larut air untuk kekebalan.",
+        "2": "Vitamin B12 larut air untuk sel darah.",
+        "3": "Vitamin K untuk pembekuan darah."
+      }
+    },
+    {
+      "id": "ipa-d-8-b2-q12",
+      "difficulty": "tinggi",
+      "prompt": "Berdasarkan Buku Siswa IPA Kelas VIII (hal. 84 Uji Kompetensi), penyakit gangguan pernapasan yang disebabkan oleh infeksi bakteri Mycobacterium tuberculosis yang menyebabkan kerusakan dinding alveolus paru-paru dinamakan…",
+      "options": [
+        "Tuberkulosis (TBC)",
+        "Asma",
+        "Emfisema",
+        "Influenza"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "TBC adalah penyakit menular paru akibat infeksi bakteri M. tuberculosis."
+      },
+      "distractorWhy": {
+        "1": "Asma akibat penyempitan saluran pernapasan alergi.",
+        "2": "Emfisema akibat hilangnya elastisitas alveolus rokok.",
+        "3": "Influenza akibat virus flu."
+      }
+    }
+  ]
+}
