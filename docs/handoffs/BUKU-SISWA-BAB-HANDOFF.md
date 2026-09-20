@@ -231,3 +231,38 @@ Seluruh butir latihan bernomor di Bab III ("Suhu, Kalor, dan Pemuaian") dari Buk
   - Bab 2 (`KOMP-IPA-D-7-BAB2-01`): 22 butir (6 dasar, 10 sedang, 6 tinggi)
   - Bab 3 (`KOMP-IPA-D-7-BAB3-01`): 21 butir (6 dasar, 11 sedang, 4 tinggi)
   - Total bank soal IPA Fase D aktif: **81 butir soal asli terverifikasi**.
+
+## 13. Ekstraksi Tahap 4: Bab 4 Gerak dan Gaya (20 Butir Asli, Akumulasi 101 Soal)
+
+Seluruh butir latihan bernomor di Bab IV ("Gerak dan Gaya") dari Buku Siswa IPA Kelas VII Edisi Revisi (`IPA_BS_KLS_VII_Rev (1).pdf` hal. 113–134) telah diekstraksi ke dalam `KOMP-IPA-D-7-BAB4-01`:
+1. **Hal. 113–124 (Gerak Benda: Jarak, Perpindahan, Kelajuan, Kecepatan, Percepatan)**:
+   - Perbedaan mendasar jarak (skalar, total panjang lintasan) vs perpindahan (vektor, selisih posisi dan arah).
+   - Perhitungan jarak dan perpindahan gerak timur-barat (jalan 50 m ke timur, 20 m ke barat $\to$ jarak 70 m, perpindahan 30 m ke timur).
+   - Perbedaan mendasar kelajuan (skalar) vs kecepatan (vektor).
+   - Konversi satuan kelajuan jalan tol $72\text{ km/jam}$ ke satuan SI ($20\text{ m/s}$).
+   - Perhitungan kelajuan rata-rata balapan mobil-mobilan bertenaga angin ($s = 1\text{ m}$, $t = 0,5\text{ s} \to v = 2\text{ m/s}$).
+   - Perhitungan percepatan GLBB kendaraan yang bertambah kecepatan dari 0 m/s ke 20 m/s dalam 5 detik ($a = 4\text{ m/s}^2$).
+2. **Hal. 124–130 (Konsep Gaya, Resultan Gaya & Gaya Gesek)**:
+   - Pengertian gaya sebagai tarikan atau dorongan dan pengaruhnya terhadap keadaan gerak serta bentuk benda.
+   - Perhitungan resultan dua gaya berlawanan arah (100 N ke kanan dan 40 N ke kiri $\to$ 60 N ke kanan).
+   - Perbedaan sifat gaya gesek statis (benda diam/tepat akan bergerak) vs kinetis (benda meluncur).
+   - Contoh gaya gesek yang menguntungkan (alur ban mencengkeram aspal dan karet rem sepeda).
+   - Penerapan teknologi kereta cepat Maglev yang melayang dengan magnet untuk meniadakan gaya gesek dengan rel.
+3. **Hal. 130–134 (Hukum-Hukum Newton tentang Gerak)**:
+   - Hukum I Newton (kelembaman/inersia): tubuh penumpang bus kota terdorong ke depan saat pengereman mendadak.
+   - Massa benda sebagai ukuran kuantitatif kelembaman/inersia gerak.
+   - Hukum II Newton ($F = m \cdot a$): balok bermassa 20 kg didorong gaya 60 N menghasilkan percepatan $3\text{ m/s}^2$.
+   - Analisis relasi proporsional gaya dan percepatan: gaya diduakalikan menghasilkan percepatan dua kali lipat pada massa konstan.
+   - Analisis gerak meluncur bola pada bidang miring (Aktivitas 4.4): pengaruh sudut kemiringan terhadap komponen gaya berat percepatan.
+   - Hukum III Newton (Aksi-Reaksi): besar sama, arah berlawanan, bekerja simultan pada dua benda berbeda.
+   - Fenomena mencangkul tanah: gaya aksi cangkul ke tanah memicu gaya reaksi balik tanah ke cangkul/tangan pencangkul.
+   - Fenomena tarian kaleng penyiram tanaman berputar (Aktivitas 4.5): semburan air memicu gaya reaksi balik pemutar kaleng.
+   - Prinsip peluncuran roket korek api / roket antariksa: semburan gas panas ke bawah memicu gaya dorong reaksi ke atas.
+
+**Verifikasi Mutu Bab 1 s.d. Bab 4 (101 Butir Soal Autentik)**:
+- `tests/mapel-fase-d-content-test.js`: **31/31 PASS**
+  - Bab 1 (`KOMP-IPA-D-7-BAB1-01`): 38 butir (10 dasar, 18 sedang, 10 tinggi)
+  - Bab 2 (`KOMP-IPA-D-7-BAB2-01`): 22 butir (6 dasar, 10 sedang, 6 tinggi)
+  - Bab 3 (`KOMP-IPA-D-7-BAB3-01`): 21 butir (6 dasar, 11 sedang, 4 tinggi)
+  - Bab 4 (`KOMP-IPA-D-7-BAB4-01`): 20 butir (6 dasar, 11 sedang, 3 tinggi)
+  - Total bank soal IPA Fase D aktif: **101 butir soal asli terverifikasi**.
