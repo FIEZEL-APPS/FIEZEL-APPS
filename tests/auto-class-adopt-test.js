@@ -342,6 +342,112 @@ ok(typeof FA.state === 'function', 'FiezelAccount.state tersedia');
   ok(allMatch, 'S5: 17 mapel MAPEL_NAMES cocok semua');
 }
 
+// Skenario 6: normalizeClassCode mendukung panjang fleksibel (3-16 karakter)
+{
+  const TS = ctx.FiezelTeacherStore;
+  ok(TS.normalizeClassCode('FZ-MERDEKA1') === 'FZ-MERDEKA1', 'S6: FZ-MERDEKA1 (8 char) sah');
+  ok(TS.normalizeClassCode('MERDEKA1') === 'FZ-MERDEKA1', 'S6: MERDEKA1 otomatis ditambah FZ-');
+  ok(TS.normalizeClassCode('FZ-SMP1') === 'FZ-SMP1', 'S6: FZ-SMP1 (4 char) sah');
+  ok(TS.normalizeClassCode('FZ-A2B3C4') === 'FZ-A2B3C4', 'S6: FZ-A2B3C4 (6 char standar) sah');
+  ok(TS.normalizeClassCode('FZ-7A') === '', 'S6: FZ-7A (2 char) ditolak karena terlalu pendek');
+  ok(TS.normalizeClassCode('') === '', 'S6: string kosong menghasilkan kosong');
+}
+
+// Skenario 7: syncClassList tersedia di FiezelTeacherStore
+{
+  const TS = ctx.FiezelTeacherStore;
+  ok(typeof TS.syncClassList === 'function', 'S7: TS.syncClassList diekspor');
+}
+
+// Skenario 8: Guru tanpa classCode eksplisit tetap otomatis mendapatkan kelas terhubung
+{
+  ctx.localStorage.clear();
+  const TS = ctx.FiezelTeacherStore;
+
+  const session = {
+    role: 'teacher',
+    teacherName: 'FARZA',
+    institution: 'MAN 1 BANDA ACEH',
+    classCode: null, // Tanpa kode kelas eksplisit
+    subjectId: 'MAT',
+    gradeId: 'SMA'
+  };
+
+  let profile = TS.load();
+  if (!profile.teacher) profile.teacher = { name: '', school: '' };
+  profile.teacher.name = session.teacherName;
+  profile.teacher.school = session.institution;
+
+  if (!Array.isArray(profile.classes)) profile.classes = [];
+  let normCode = session.classCode && TS.normalizeClassCode
+    ? TS.normalizeClassCode(session.classCode)
+    : '';
+  if (!normCode && !profile.classes.length) {
+    normCode = TS.makeClassCode();
+  }
+
+  if (normCode) {
+    const mapelNames = TS.MAPEL_NAMES || {};
+    const subName = mapelNames[session.subjectId] || 'Matematika';
+    const clsTitle = (session.institution ? session.institution + ' — ' : '') + subName;
+    const autoCls = TS.newClass(clsTitle, session.gradeId || 'SMA', session.subjectId || 'MAT');
+    autoCls.code = normCode;
+    profile.classes.unshift(autoCls);
+    profile.activeClassId = autoCls.id;
+    profile.onboarded = true;
+    TS.save(profile);
+  }
+
+  const after = TS.load();
+  ok(after.classes.length === 1, 'S8: guru tanpa kode tetap dibuatkan kelas otomatis');
+  ok(after.classes[0].name === 'MAN 1 BANDA ACEH — Matematika', 'S8: judul kelas MAN 1 BANDA ACEH — Matematika');
+  ok(after.classes[0].subject === 'MAT', 'S8: mapel MAT');
+  ok(after.classes[0].code.startsWith('FZ-'), 'S8: kode kelas berformat FZ-XXXXXX');
+  ok(after.onboarded === true, 'S8: onboarded = true');
+}
+
+// Skenario 9: Sinkronisasi subjectId dari dashboard (mis. Farza diubah ke Bahasa Inggris / ENG)
+{
+  const TS = ctx.FiezelTeacherStore;
+  let profile = TS.load();
+
+  // Sebelum: Farza masih punya kelas Matematika dari S8
+  ok(profile.classes.length === 1, 'S9: awal ada 1 kelas');
+  ok(profile.classes[0].subject === 'MAT', 'S9: awal mapel MAT');
+
+  // Simulasikan session baru dari server (/api/account/me) dengan subjectId: 'ENG'
+  const updatedSession = {
+    role: 'teacher',
+    teacherName: 'FARZA',
+    institution: 'MAN 1 BANDA ACEH',
+    classCode: profile.classes[0].code,
+    subjectId: 'ENG',
+    gradeId: 'SMA'
+  };
+
+  const mapelNames = TS.MAPEL_NAMES || {};
+  const officialSub = updatedSession.subjectId || 'ENG';
+  const officialSubName = mapelNames[officialSub] || officialSub;
+
+  let modified = false;
+  if (updatedSession.subjectId && profile.classes.length) {
+    profile.classes.forEach(function (c) {
+      const prefix = updatedSession.institution ? updatedSession.institution + ' — ' : '';
+      if (c.subject !== updatedSession.subjectId || (c.name && c.name.indexOf('Matematika') !== -1 && updatedSession.subjectId !== 'MAT')) {
+        c.subject = updatedSession.subjectId;
+        c.name = prefix + officialSubName;
+        modified = true;
+      }
+    });
+  }
+  if (modified) TS.save(profile);
+
+  const synced = TS.load();
+  ok(synced.classes.length === 1, 'S9: tetap 1 kelas tanpa duplikasi');
+  ok(synced.classes[0].subject === 'ENG', 'S9: mapel tersinkronkan ke ENG (Bahasa Inggris)');
+  ok(synced.classes[0].name === 'MAN 1 BANDA ACEH — Bahasa Inggris', 'S9: nama kelas tersinkronkan menjadi MAN 1 BANDA ACEH — Bahasa Inggris');
+}
+
 // --- Ringkasan ---
 console.log(`\nauto-class-adopt-test: ${passed.length} PASS, ${failed.length} FAIL`);
 if (failed.length) {
@@ -349,3 +455,4 @@ if (failed.length) {
   failed.forEach(f => console.log(`  - ${f}`));
   process.exit(1);
 }
+
