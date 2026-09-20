@@ -641,12 +641,23 @@ html.fz-booting body{overflow:hidden}
   <!-- m025-276: naskah PAW ARENA (dwibahasa). Nama merek "PAW ARENA" tidak diterjemahkan;
        kalimat sekelilingnya dua bahasa. Domain sendiri → th-coverage menuntut copy-th-pawarena.js. -->
   <script defer src="./features/i18n/copy-id-pawarena.js"></script>
+  <!-- m025-349: naskah HAK AKSES (rencana gratis/Pro/sekolah, gerbang sesi, level,
+       suara, sertifikat). Domain sendiri -> th-coverage menuntut copy-th-monetization.js
+       sebagai kembarannya. Dipisah dari copy-id-quota.js dengan sengaja: "quota" di sana
+       berarti jatah BIAYA MESIN (TTS/AI), sedangkan yang di sini adalah HAK AKSES PRODUK -
+       dua hal yang kebetulan sama-sama membatasi, tetapi tidak pernah berubah bersama. -->
+  <script defer src="./features/i18n/copy-id-monetization.js"></script>
   <!-- W4-MERGE: aset th TIDAK dimuat statis (copy-th-*, naskah-th-brain, dua dataset th) —
        semuanya disuntik/difetch DINAMIS oleh pemuat kecil di bawah HANYA saat locale th
        (AI-13 F02/F05: murid Indonesia nol byte th). Pemuat wajib SETELAH fiezel-i18n.js
        (butuh getLocale/onChange) dan SEBELUM app.js (app.js memasang FiezelOnThDataReady). -->
   <script defer src="./features/i18n/fiezel-th-loader.js"></script>
   <!-- FIEZEL_I18N_END -->
+  <!-- m025-349: mesin hak akses. Murni (tanpa penyimpanan/jaringan/jam sendiri) dan
+       dimuat SEBELUM app.js, karena app.js menanyainya saat memulai sesi dan saat
+       memindahkan level. Kalau berkas ini tidak mendarat, app.js memilih jalur
+       fail-open yang sudah ada: murid tetap belajar, gerbangnya yang absen. -->
+  <script defer src="./features/monetization/fiezel-entitlement.js"></script>
   <script defer src="./features/diagnostics/fiezel-diagnostic-targets.js"></script>
   <script defer src="./features/diagnostics/fiezel-diagnostic-bus.js"></script>
   <script defer src="./features/diagnostics/fiezel-module-selftests.js"></script>
