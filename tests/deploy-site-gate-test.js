@@ -196,6 +196,40 @@ check('A langkah aset MENGECUALIKAN sw.js secara eksplisit',
   /--exclude=(['"]?)(\.\/)?sw\.js\1/.test(wf) || /exclude[^\n]*\bsw\.js\b/.test(wf),
   'tanpa ini sw.js ikut gelombang pertama dan urutannya batal');
 
+/* -------------------------------------------- (E2) satu asal-usul untuk tujuan unggah ----- */
+//
+// KETIGA langkah unggah menurunkan tujuannya dari `secrets.FIEZEL_DEPLOY_PATH`, dan ketiganya
+// WAJIB memakai bawaan yang sama saat secret itu kosong. Sebelum cek ini, langkah landing page
+// berbunyi `ROOT_DEST="${DEST%/app}"` — memotong akhiran dari DEST MENTAH, melewatkan bawaan
+// `~/public_html/app` yang dipakai dua langkah di atasnya.
+//
+// Yang dihasilkannya bukan deploy gagal, melainkan deploy yang SEBAGIAN menembak tempat lain:
+// tanpa `FIEZEL_DEPLOY_PATH`, aset dan sw.js mendarat benar di `~/public_html/app` sementara
+// seluruh `website/` disalin ke `$USER@$HOST:/` — akar filesystem. Satu secret yang lupa
+// dipasang tidak bersuara; ia hanya membelokkan satu dari tiga langkah.
+//
+// Cek ini menuntut ROOT_DEST diturunkan dari sebuah nilai yang SUDAH ber-bawaan, bukan dari
+// DEST mentah. Ia tidak mengunci nama variabelnya, hanya melarang bentuk yang melewatkan bawaan.
+{
+  // Baris komentar DIBUANG lebih dulu. Tanpa ini, catatan yang mengutip bentuk lama
+  // (`ROOT_DEST="${DEST%/app}"`) ikut terbaca sebagai kodenya sendiri, dan cek ini memerah
+  // justru pada perbaikan yang menjelaskan dirinya. Yang diperiksa adalah apa yang DIJALANKAN.
+  const wfCode = wf.split('\n').filter((l) => !/^\s*#/.test(l)).join('\n');
+  const mentah = /ROOT_DEST="\$\{DEST%\/app\}"/.test(wfCode);
+  const berbawaan = /ROOT_DEST="\$\{[A-Z_]+%\/app\}"/.test(wfCode) && !mentah;
+  check('E2 tujuan landing page diturunkan dari nilai ber-bawaan, bukan dari DEST mentah',
+    berbawaan,
+    mentah
+      ? 'ROOT_DEST masih dipotong dari DEST mentah — FIEZEL_DEPLOY_PATH kosong mengirim website/ ke "/"'
+      : 'pola ROOT_DEST tidak dikenali; pastikan ia diturunkan dari TARGET yang sudah ber-bawaan');
+
+  // Bawaan itu sendiri harus muncul lebih dari sekali: sekali per langkah yang memakainya.
+  // Kalau tinggal satu, berarti ada langkah yang diam-diam kehilangan bawaannya lagi.
+  const bawaan = (wfCode.match(/\$\{DEST:-~\/public_html\/app\}/g) || []).length;
+  check('E2 bawaan ~/public_html/app dipakai SETIAP langkah unggah, bukan sebagian',
+    bawaan >= 3, bawaan + ' kemunculan (aset, sw.js, landing page)');
+}
+
 /* ---------------------------------------------------------------- (C) syarat mutu -------- */
 check('C deploy hanya berjalan sesudah Quality Gate HIJAU',
   /workflow_run/.test(wf) && /conclusion\s*==\s*'success'/.test(wf),

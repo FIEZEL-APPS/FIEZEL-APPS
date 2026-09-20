@@ -221,6 +221,12 @@ jobs:
           # pernah dijalankan CI - dan gate-registry-test merah di main karenanya. Didaftarkan
           # di sini (23 assert, hijau saat didaftarkan) supaya benar-benar menjadi bukti.
           node tests/kelasku-17mapel-assignment-test.js
+          # Isi mapel Fase D (MAT/IPA/ENG): kompetensi berbeda WAJIB berkolam berbeda, kolam
+          # yang habis dipotong jujur alih-alih ditambal dari kolam mapel, nol pembahasan yang
+          # menyebut posisi pilihan, dan sidecar Thai punya kembaran untuk tiap code & id.
+          # Gerbang di atas hanya mengukur BENTUK soal untuk 17 mapel; ia hijau sekalipun
+          # ketiga mapel ini mengirim bab yang salah - itulah celah yang ditutup di sini.
+          node tests/mapel-fase-d-content-test.js
           node tests/question-allocator-test.js
           node tests/bankor-latihan-test.js
           node tests/fiezel-stat-gate-test.js

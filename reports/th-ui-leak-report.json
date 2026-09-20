@@ -1,21 +1,21 @@
 {
   "schema": "fiezel-th-ui-leak-v1",
-  "generatedAt": "2026-09-19T18:01:36.457Z",
+  "generatedAt": "2026-09-20T12:34:47.285Z",
   "files": {
     "app.js": {
       "leaks": 3,
       "budget": 3,
       "sample": [
         {
-          "line": 7961,
+          "line": 8086,
           "text": "Selesaikan ritme hari ini"
         },
         {
-          "line": 9379,
+          "line": 9518,
           "text": "Nama kriteria: n/4 - satu kalimat alasan yang menunjuk bukti di tulisannya"
         },
         {
-          "line": 14166,
+          "line": 14311,
           "text": "Latihan"
         }
       ]
@@ -99,23 +99,23 @@
       "budget": 5,
       "sample": [
         {
-          "line": 383,
+          "line": 426,
           "text": "Tugas disimpan sebagai"
         },
         {
-          "line": 383,
+          "line": 426,
           "text": ". Lanjutkan kapan saja."
         },
         {
-          "line": 444,
+          "line": 493,
           "text": "Latihan ·"
         },
         {
-          "line": 880,
+          "line": 1036,
           "text": "Latihan · ±"
         },
         {
-          "line": 902,
+          "line": 1058,
           "text": "Latihan — umpan balik tiap soal"
         }
       ]
@@ -255,15 +255,15 @@
       "budget": 3,
       "sample": [
         {
-          "line": 627,
+          "line": 633,
           "text": "Pilih bahasa untuk melanjutkan"
         },
         {
-          "line": 667,
+          "line": 673,
           "text": "Sudah punya akun? Masuk dulu supaya kelas dan tugas gurumu ikut."
         },
         {
-          "line": 1424,
+          "line": 1431,
           "text": "Belum berhasil masuk. Pilih bahasa dulu — masuk bisa nanti dari Pengaturan. ·"
         }
       ]
@@ -403,15 +403,15 @@
       "budget": 3,
       "sample": [
         {
-          "line": 2618,
+          "line": 2954,
           "text": "Akurasi"
         },
         {
-          "line": 2635,
+          "line": 2971,
           "text": "Latihan ·"
         },
         {
-          "line": 2972,
+          "line": 3518,
           "text": "📖 Kosakata Kunci:"
         }
       ]
@@ -421,15 +421,15 @@
       "budget": 3,
       "sample": [
         {
-          "line": 454,
+          "line": 459,
           "text": ". Aku bangga. Lanjutkan ritmenya — 1 sesi kecil tiap hari lebih ampuh daripada 1 sesi panjang seminggu."
         },
         {
-          "line": 460,
+          "line": 465,
           "text": "• Akurasi keseluruhan:"
         },
         {
-          "line": 483,
+          "line": 488,
           "text": "Akurasi"
         }
       ]
@@ -464,8 +464,8 @@
     }
   },
   "copyKeys": {
-    "id": 2844,
-    "th": 2846,
+    "id": 2854,
+    "th": 2856,
     "idTanpaTh": 0
   },
   "pass": true

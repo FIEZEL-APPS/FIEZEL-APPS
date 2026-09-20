@@ -423,9 +423,110 @@
     }
   };
 
+  /* ---------------------------------------------------------------------------
+   * BANK SOAL FASE D (MAT / IPA / ENG) — isinya JSON, bukan literal di modul ini.
+   *
+   * Ketiga mapel ini punya bank berjenjang di content/mapel/: satu berkas Indonesia
+   * plus sidecar Thai dengan kunci yang sama persis. Naskah yang DILIHAT MURID lahir
+   * di sana, bukan di sini. Itu syarat dua-bahasa CLAUDE.md, dan juga satu-satunya
+   * cara gerbang bahasa bisa melihat naskahnya sama sekali — literal di dalam .js
+   * tidak pernah terbaca oleh satu pun sensus bahasa yang dimiliki repo ini.
+   *
+   * Pemuatannya punya dua jalur, dan KEDUANYA gagal lunak:
+   *   - Node (gerbang, perkakas): fs sinkron, deterministik, tanpa jaringan.
+   *   - Peramban: fetch sekali saat mount; hasilnya disimpan, lalu render diminta
+   *     ulang. Selama bank belum mendarat jawabannya adalah bank tidak ada, dan itu
+   *     berarti perilaku lama (templates di bawah) — bukan lemparan, bukan layar
+   *     kosong.
+   * 14 mapel lain tidak punya bank JSON; bagi mereka jalur ini selalu menjawab null
+   * dan tidak satu pun perilakunya berubah.
+   */
+  var MAPEL_BANK_SUBJECTS = ['MAT', 'IPA', 'ENG'];
+  var mapelBankCache = {};
+  var mapelBankFetching = {};
+
+  function mapelBankFile(subjectId) { return 'mapel-' + String(subjectId).toLowerCase() + '-d.json'; }
+
+  /* Katalog kompetensi ikut bank begitu bank mendarat: satu sumber kebenaran, jadi
+     dropdown guru tidak bisa menawarkan kompetensi yang banknya tidak punya soalnya
+     — dan nama kompetensi yang sampai ke murid lewat judul tugas ikut punya kembaran
+     Thai, karena ia lahir di bank, bukan di sini. */
+  function adoptBankCompetencies(subjectId, bank) {
+    try {
+      var cat = MAPEL_CATALOG[subjectId];
+      if (!cat || !bank || !Array.isArray(bank.competencies) || !bank.competencies.length) return;
+      cat.competencies = bank.competencies.map(function (c) {
+        return { code: c.code, name: c.name, materi: c.materi, grade: c.grade, cpRef: c.cpRef };
+      });
+    } catch (_) {}
+  }
+
+  function mapelBank(subjectId) {
+    if (Object.prototype.hasOwnProperty.call(mapelBankCache, subjectId)) return mapelBankCache[subjectId];
+    if (MAPEL_BANK_SUBJECTS.indexOf(subjectId) < 0) { mapelBankCache[subjectId] = null; return null; }
+    var diNode = (typeof require === 'function' && typeof __dirname === 'string');
+    if (diNode) {
+      try {
+        var full = require('path').join(__dirname, '..', '..', 'content', 'mapel', mapelBankFile(subjectId));
+        var bank = JSON.parse(require('fs').readFileSync(full, 'utf8'));
+        mapelBankCache[subjectId] = bank;
+        adoptBankCompetencies(subjectId, bank);
+        return bank;
+      } catch (_) {
+        /* Di Node, berkas yang tidak terbaca berarti bank memang tidak ada. Jangan lanjut ke
+           fetch: alamat relatif tidak punya arti tanpa halaman, dan satu-satunya hasilnya
+           adalah lemparan yang harus ditangkap lagi. */
+        mapelBankCache[subjectId] = null;
+        return null;
+      }
+    }
+    if (!mapelBankFetching[subjectId] && typeof fetch === 'function') {
+      mapelBankFetching[subjectId] = true;
+      try {
+        fetch('content/mapel/' + mapelBankFile(subjectId), { credentials: 'same-origin' })
+          .then(function (r) { return r && r.ok ? r.json() : null; })
+          .then(function (bank) {
+            mapelBankCache[subjectId] = bank || null;
+            if (bank) { adoptBankCompetencies(subjectId, bank); try { render(); } catch (_) {} }
+          })
+          .catch(function () { mapelBankCache[subjectId] = null; });
+      } catch (_) { mapelBankCache[subjectId] = null; }
+    }
+    mapelBankCache[subjectId] = null;
+    return null;
+  }
+
+  /* Kolam soal disaring berjenjang: mapel -> kelas -> kompetensi. Kode kompetensi
+     sudah memuat kelasnya (KOMP-MAT-D-9-STA-01), jadi cocok-persis pada kode berarti
+     kelas ikut tersaring: dua kompetensi berbeda tidak pernah berbagi satu soal pun.
+
+     Yang paling penting ada di cabang `exact`. Kalau kompetensinya cocok tetapi
+     isinya lebih sedikit daripada yang diminta, sisanya dibiarkan KOSONG. Menambalnya
+     dari kolam mapel akan mengirim bab yang salah ke murid tanpa guru pernah tahu —
+     3 soal yang jujur lebih berguna daripada 8 soal yang separuhnya salah bab. */
+  function mapelPool(subjectId, compCode) {
+    var bank = mapelBank(subjectId);
+    if (!bank || !Array.isArray(bank.competencies)) return null;
+    var code = String(compCode == null ? '' : compCode);
+    for (var i = 0; i < bank.competencies.length; i++) {
+      if (bank.competencies[i].code === code) {
+        return { items: bank.competencies[i].items || [], exact: true };
+      }
+    }
+    /* Kode yang tidak dikenal — kosong, salah bentuk, atau milik fase lain — bukan
+       saringan, melainkan ketiadaan saringan. Kolamnya seluruh mapel, seperti dulu. */
+    var all = [];
+    for (var j = 0; j < bank.competencies.length; j++) {
+      var list = bank.competencies[j].items || [];
+      for (var k = 0; k < list.length; k++) all.push(list[k]);
+    }
+    return { items: all, exact: false };
+  }
+
   /* Acak posisi opsi jawaban agar kunci tidak selalu di index 0.
-     Menerima objek soal { options[], answer, why? } dan mengembalikan salinan
-     dengan urutan options teracak serta answer & why yang sudah diperbarui. */
+     Menerima objek soal { options[], answer, why?, distractorWhy? } dan mengembalikan
+     salinan dengan urutan options teracak serta answer, why & distractorWhy yang sudah
+     dipetakan ulang ke posisi barunya. */
   function shuffleOptions(q, seed) {
     var opts = q.options.slice();
     var correctText = opts[q.answer];
@@ -442,15 +543,24 @@
       var oldExpl = q.why[q.answer] || q.why[String(q.answer)] || '';
       if (oldExpl) newWhy[newAnswer] = oldExpl;
     }
-    return { options: opts, answer: newAnswer, why: newWhy };
+    /* Peta miskonsepsi ikut berpindah. Kalau tidak, penjelasan pengecoh menempel pada
+       posisi yang isinya sudah berganti — diagnosis yang menunjuk jawaban yang salah
+       lebih buruk daripada tidak ada diagnosis sama sekali. */
+    var newDistractorWhy = null;
+    if (q.distractorWhy) {
+      newDistractorWhy = {};
+      for (var oi = 0; oi < q.options.length; oi++) {
+        if (oi === q.answer) continue;
+        var expl = q.distractorWhy[oi] || q.distractorWhy[String(oi)];
+        if (expl == null) continue;
+        var moved = opts.indexOf(q.options[oi]);
+        if (moved >= 0) newDistractorWhy[moved] = expl;
+      }
+    }
+    return { options: opts, answer: newAnswer, why: newWhy, distractorWhy: newDistractorWhy };
   }
 
-  function synthesizeMapelQuestions(subjectId, compCode, compTitle, count) {
-    var num = Math.max(2, Math.min(20, Number(count) || 5));
-    var mName = mapelName(subjectId) || subjectId;
-    var topic = compTitle || (t('guru.materi', 'Materi') + ' ' + mName);
-    var items = [];
-    var templates = {
+  var MAPEL_TEMPLATES = {
   MAT: [
     {
       prompt: 'Hasil dari operasi hitung campuran -15 + (-8) \u00d7 3 - (-20) adalah…',
@@ -2017,9 +2127,30 @@
   ]
   };
 
-    var baseList = templates[subjectId] || templates.MAT || [];
-    for (var i = 0; i < num; i++) {
-      var src = baseList[i % baseList.length];
+  function getMapelQuestionsForCompetency(subjectId, compCode) {
+    var pool = mapelPool(subjectId, compCode);
+    if (pool && pool.items && pool.items.length) {
+      return { items: pool.items, exact: pool.exact, isBank: true };
+    }
+    var list = (MAPEL_TEMPLATES[subjectId] && MAPEL_TEMPLATES[subjectId].length) ? MAPEL_TEMPLATES[subjectId] : (MAPEL_TEMPLATES.MAT || []);
+    return { items: list, exact: false, isBank: false };
+  }
+
+  function synthesizeMapelQuestions(subjectId, compCode, compTitle, count) {
+    var num = Math.max(2, Math.min(20, Number(count) || 5));
+    var mName = mapelName(subjectId) || subjectId;
+    var topic = compTitle || (t('guru.materi', 'Materi') + ' ' + mName);
+    var items = [];
+    /* Bank Fase D kalau ada; kalau tidak, kolam literal template kurikulum bawaan */
+    var qData = getMapelQuestionsForCompetency(subjectId, compCode);
+    var baseList = qData.items;
+    if (!baseList.length) return items;
+    /* Kolam kompetensi dipotong jujur ketika permintaan melampaui isinya */
+    var take = qData.exact ? Math.min(num, baseList.length) : num;
+    /* Rotasi hanya pada kolam kompetensi */
+    var start = qData.exact ? Math.floor(Date.now() / 1000) % baseList.length : 0;
+    for (var i = 0; i < take; i++) {
+      var src = baseList[(start + i) % baseList.length];
       var itemObj = {
         id: 'q-' + subjectId.toLowerCase() + '-' + (i + 1) + '-' + Math.random().toString(36).slice(2, 6),
         prompt: src.prompt,
@@ -2029,11 +2160,13 @@
         context: topic,
         why: Object.assign({}, src.why)
       };
+      if (src.distractorWhy) itemObj.distractorWhy = Object.assign({}, src.distractorWhy);
       /* Acak posisi opsi jawaban agar kunci tidak selalu di index 0 */
       var shuffled = shuffleOptions(itemObj, (Date.now() % 997) + i * 31 + subjectId.charCodeAt(0));
       itemObj.options = shuffled.options;
       itemObj.answer = shuffled.answer;
       itemObj.why = shuffled.why;
+      if (shuffled.distractorWhy) itemObj.distractorWhy = shuffled.distractorWhy;
       items.push(itemObj);
     }
     return items;
@@ -2448,13 +2581,16 @@
     var gId = (acc && acc.gradeId) || 'SMP';
     var inst = (acc && acc.institution) || (st.teacher && st.teacher.school) || '';
     var mapelNames = (S() && S().MAPEL_NAMES) || {};
-    var subName = mapelNames[sId] || sId || 'Matematika';
-    var code = (acc && acc.classCode) ? S().normalizeClassCode(acc.classCode) : '';
+    var code = (acc && acc.classCode && acc.classCode !== 'FZ-MERDEKA1') ? S().normalizeClassCode(acc.classCode) : '';
+    if (code === 'FZ-MERDEKA1' || (code && !/^FZ-[A-HJ-NP-Z2-9]{6}$/.test(code))) code = '';
 
     if (!code) {
       try {
         var m = (typeof document !== 'undefined' && document.cookie) ? document.cookie.match(/(?:^|;\s*)fz_cls=([^;]+)/) : null;
-        if (m && m[1]) code = S().normalizeClassCode(decodeURIComponent(m[1]));
+        if (m && m[1]) {
+          var cand = S().normalizeClassCode(decodeURIComponent(m[1]));
+          if (cand && cand !== 'FZ-MERDEKA1' && /^FZ-[A-HJ-NP-Z2-9]{6}$/.test(cand)) code = cand;
+        }
       } catch (_) {}
     }
     if (!code) {
@@ -2462,6 +2598,15 @@
     }
 
     var modified = false;
+
+    // Bersihkan kelas yang tersimpan dengan kode FZ-MERDEKA1 atau kode bukan 6-char
+    st.classes.forEach(function (c) {
+      if (c.code === 'FZ-MERDEKA1' || (c.code && !/^FZ-[A-HJ-NP-Z2-9]{6}$/.test(c.code))) {
+        c.code = code || S().makeClassCode();
+        if (c.sync) c.sync.claimed = false;
+        modified = true;
+      }
+    });
 
     // Sinkronkan data guru jika akun membawa profil baru
     if (acc) {
@@ -2547,6 +2692,11 @@
   // ---- mount ------------------------------------------------------------------------------
   function mount(target, options) {
     el = target; env = options || {};
+    /* Bank Fase D dipanggil sedini mungkin dan TIDAK ditunggu: guru butuh beberapa
+       ketukan untuk sampai ke pembuat tugas, dan dalam rentang itu banknya sudah
+       mendarat. Kalau belum, pratinjau pertama memakai kolam lama lalu mengecat ulang
+       sendiri begitu bank tiba — tidak ada yang menunggu layar kosong. */
+    try { for (var bi = 0; bi < MAPEL_BANK_SUBJECTS.length; bi++) mapelBank(MAPEL_BANK_SUBJECTS[bi]); } catch (_) {}
     /* Urutannya penting: penyimpanan dialihkan SEBELUM load(), kalau tidak papan demo
        terisi dari data guru asli dan tulisan pertamanya mendarat di sana juga. */
     previewOn = previewAllowed();
@@ -2885,9 +3035,8 @@
 
   function curriculumView(c) {
     var sId = ui.curriculumSubject || 'MAT';
-    var statusText = ui.curriculumSeeded
-      ? (t('guru.status-tersedia', 'Tersedia') + ' ' + (ui.curriculumSeeded.mapel_count || 17) + ' ' + t('guru.mapel-di-mongo', 'mapel di MongoDB') + ' (' + (ui.curriculumSeeded.kompetensi_count || 0) + ' ' + t('guru.kompetensi', 'kompetensi') + ')')
-      : t('guru.status-periksa', 'Belum disemai / klik tombol Seed untuk inisialisasi');
+    var cat = MAPEL_CATALOG[sId] || MAPEL_CATALOG['MAT'];
+    var mItem = MAPEL_LIST.filter(function (x) { return x.id === sId; })[0] || { name: sId, grade: 'SD / SMP / SMA' };
 
     var toolbar = '<div class="tg-curriculum-toolbar">' +
       '<div class="tg-curriculum-actions">' +
@@ -2898,24 +3047,27 @@
             }).join('') +
           '</select>' +
         '</label>' +
-        '<button type="button" class="tg-btn is-ghost is-small" data-tg="seed-mapel" data-testid="tg-seed-mapel"' + (ui.seeding ? ' disabled' : '') + '>' + icon('database') + ' <span>' + (ui.seeding ? t('guru.sedang-menyemai', 'Sedang menyemai…') : t('guru.semai-mapel', 'Seed 17 Mapel')) + '</span></button>' +
-        '<button type="button" class="tg-btn is-ghost is-small" data-tg="seed-english" data-testid="tg-seed-english"' + (ui.seeding ? ' disabled' : '') + '>' + icon('library') + ' <span>' + t('guru.semai-english', 'Seed Bahasa Inggris') + '</span></button>' +
-        '<button type="button" class="tg-btn is-ghost is-small" data-tg="seed-soal" data-testid="tg-seed-soal"' + (ui.seeding ? ' disabled' : '') + '>' + icon('clipboard-list') + ' <span>' + t('guru.semai-soal', 'Seed Bank Soal') + '</span></button>' +
+        '<button type="button" class="tg-btn is-ghost is-small" data-tg="refresh-curriculum">' + icon('rotate-cw') + ' <span>' + esc(t('umum.muat-ulang', 'Muat Ulang')) + '</span></button>' +
       '</div>' +
-      '<div class="tg-seed-badge">' + icon('activity') + ' <span>' + esc(statusText) + '</span></div>' +
+      '<div class="tg-seed-badge">' + icon('book-open') + ' <span><b>' + esc(mItem.name) + '</b> (' + esc(mItem.grade) + ') · ' + esc(t('guru.kurikulum-nasional', 'Kurikulum Nasional')) + '</span></div>' +
     '</div>';
 
-    if (ui.curriculumLoading) {
-      return '<div class="tg-curriculum-wrap">' + toolbar + '<div class="tg-card tg-center"><p class="tg-muted">' + icon('hourglass') + ' ' + t('guru.memuat-kurikulum', 'Memuat pohon kurikulum dari FastAPI & MongoDB…') + '</p></div></div>';
-    }
-
-    if (ui.curriculumError) {
-      return '<div class="tg-curriculum-wrap">' + toolbar + '<div class="tg-card tg-center tg-card-warn"><h3>' + t('guru.gagal-muat-kurikulum', 'Kurikulum belum terhubung') + '</h3><p class="tg-muted">' + esc(ui.curriculumError) + '</p><div class="tg-actions"><button type="button" class="tg-btn is-primary is-small" data-tg="seed-mapel">' + icon('database') + ' ' + t('guru.coba-seed-mongo', 'Inisialisasi & Seed MongoDB') + '</button><button type="button" class="tg-btn is-ghost is-small" data-tg="refresh-curriculum">' + icon('rotate-cw') + ' ' + t('umum.coba-lagi', 'Coba lagi') + '</button></div></div></div>';
-    }
-
     var tree = ui.curriculumTree || [];
-    if (!tree.length) {
-      return '<div class="tg-curriculum-wrap">' + toolbar + '<div class="tg-card tg-center"><h3>' + t('guru.kurikulum-kosong', 'Bank kurikulum mapel ini belum memiliki data di MongoDB') + '</h3><p class="tg-muted">' + t('guru.silakan-tekan-seed', 'Tekan tombol "Seed 17 Mapel" di atas untuk mengisi database FastAPI & MongoDB secara otomatis.') + '</p><button type="button" class="tg-btn is-primary" data-tg="seed-mapel">' + icon('database') + ' ' + t('guru.semai-sekarang', 'Seed 17 Mapel Sekarang') + '</button></div></div>';
+    /* Fallback mulus ke katalog materi lokal jika pohon server belum dimuat */
+    if (!tree.length && cat && cat.competencies && cat.competencies.length) {
+      tree = cat.competencies.map(function (cp) {
+        return {
+          type: 'competency',
+          code: cp.code,
+          name: cp.name,
+          description: cp.materi,
+          bloom_level: 'C3/C4'
+        };
+      });
+    }
+
+    if (ui.curriculumLoading && !tree.length) {
+      return '<div class="tg-curriculum-wrap">' + toolbar + '<div class="tg-card tg-center"><p class="tg-muted">' + icon('hourglass') + ' ' + t('guru.memuat-kurikulum-silabus', 'Memuat kurikulum & capaian pembelajaran…') + '</p></div></div>';
     }
 
     function renderNode(node) {
@@ -3012,6 +3164,7 @@
     } else if (m.kind === 'assign') {
       title = t('guru.buat-tugas-ujian', 'Buat tugas / ujian'); wide = true;
       var C = root.FiezelCurriculum;
+      var mapelAvailable = 0;
       var tab = ui.assignTab || (m.tab || 'mapel');
       var curPhase = ui.curriculumPhase || (c && c.level === 'A1' ? 'fase_d' : c && (c.level === 'B1' || c.level === 'B2') ? 'fase_f' : 'fase_d');
       var phases = C ? C.getPhases() : [];
@@ -3040,19 +3193,89 @@
             for (var i = 0; i < arr.length; i++) {
               var nd = arr[i];
               if (nd.type === 'competency') {
-                comps.push({ code: nd.code || nd.id, name: nd.name || nd.title || '', materi: nd.description || nd.materi || '' });
+                var cGrade = nd.grade;
+                if (!cGrade && nd.code) {
+                  var gm = nd.code.match(/-(\d+)-/);
+                  if (gm) cGrade = parseInt(gm[1], 10);
+                }
+                comps.push({
+                  code: nd.code || nd.id,
+                  name: nd.name || nd.title || '',
+                  materi: nd.description || nd.materi || '',
+                  grade: cGrade || 7,
+                  cpRef: nd.cpRef || ''
+                });
               }
               if (nd.children) walkTree(nd.children);
             }
           })(ui.curriculumTree);
         }
         if (!comps.length && catItem && catItem.competencies) {
-          comps = catItem.competencies.slice();
+          comps = catItem.competencies.map(function (c) {
+            var cGrade = c.grade;
+            if (!cGrade && c.code) {
+              var gm = c.code.match(/-(\d+)-/);
+              if (gm) cGrade = parseInt(gm[1], 10);
+            }
+            return {
+              code: c.code,
+              name: c.name,
+              materi: c.materi || '',
+              grade: cGrade || 7,
+              cpRef: c.cpRef || ''
+            };
+          });
         }
-        if (!mCode && comps.length) {
-          mCode = comps[0].code;
-          mTitle = comps[0].name;
+
+        /* Hitung nomor Bab (babNum) berurutan per jenjang kelas agar persis buku siswa */
+        var gradeBabCounts = {};
+        for (var cIdx = 0; cIdx < comps.length; cIdx++) {
+          var cg = comps[cIdx].grade || 7;
+          if (!gradeBabCounts[cg]) gradeBabCounts[cg] = 0;
+          gradeBabCounts[cg]++;
+          comps[cIdx].babNum = gradeBabCounts[cg];
         }
+
+        var curGradeFilter = ui.assignGradeFilter || 'all';
+        var availableGrades = [];
+        for (var gi = 0; gi < comps.length; gi++) {
+          var gr = comps[gi].grade || 7;
+          if (availableGrades.indexOf(gr) === -1) availableGrades.push(gr);
+        }
+        availableGrades.sort(function (a, b) { return a - b; });
+
+        var displayedComps = comps;
+        if (curGradeFilter !== 'all') {
+          var targetGrade = parseInt(curGradeFilter, 10);
+          displayedComps = comps.filter(function (c) { return c.grade === targetGrade; });
+          if (!displayedComps.length) displayedComps = comps;
+        }
+
+        if (!mCode && displayedComps.length) {
+          mCode = displayedComps[0].code;
+          mTitle = displayedComps[0].name;
+        }
+
+        var curCompObj = null;
+        for (var ci = 0; ci < comps.length; ci++) {
+          if (comps[ci].code === mCode || comps[ci].name === mTitle) {
+            curCompObj = comps[ci];
+            break;
+          }
+        }
+        if (!curCompObj && displayedComps.length) {
+          curCompObj = displayedComps[0];
+          mCode = curCompObj.code;
+          mTitle = curCompObj.name;
+        }
+        var curMateri = (curCompObj && curCompObj.materi) || '';
+        var curGrade = curCompObj ? (curCompObj.grade || 7) : 7;
+        var curBabNum = curCompObj ? (curCompObj.babNum || 1) : 1;
+
+        var qData = getMapelQuestionsForCompetency(curSId, mCode);
+        var allQItems = qData.items || [];
+        var totalAvailable = allQItems.length;
+        mapelAvailable = totalAvailable;
 
         var subjectSelect = '<label class="tg-label">' + t('guru.pilih-mapel-tugas', 'Pilih Mata Pelajaran (17 Mapel)') +
           '<select name="subject_id" data-tg-select="assign-subject" class="tg-select-unit" data-testid="tg-assign-subject-select">' +
@@ -3061,57 +3284,194 @@
             }).join('') +
           '</select></label>';
 
-        var compSelectHtml = '';
-        if (comps.length) {
-          compSelectHtml = '<label class="tg-label">' + t('guru.pilih-kompetensi-dropdown', 'Pilih Capaian / Kompetensi Kurikulum') +
-            '<select name="comp_select" data-tg-select="assign-comp-select" class="tg-select-unit" data-testid="tg-assign-comp-select">' +
-              comps.map(function (cItem) {
-                var isSel = (cItem.code === mCode || cItem.name === mTitle);
-                return '<option value="' + esc(cItem.code) + '" data-title="' + esc(cItem.name) + '" data-materi="' + esc(cItem.materi || '') + '"' + (isSel ? ' selected' : '') + '>' +
-                  esc(cItem.code + ' · ' + cItem.name) +
-                '</option>';
-              }).join('') +
-            '</select></label>';
+        var chapterCardsHtml = '';
+        if (displayedComps.length) {
+          chapterCardsHtml = '<div class="tg-chapter-cards-grid">' +
+            displayedComps.map(function (cItem) {
+              var isSel = (cItem.code === mCode || cItem.name === mTitle);
+              var qCount = (getMapelQuestionsForCompetency(curSId, cItem.code).items || []).length;
+              return '<button type="button" class="tg-chapter-card' + (isSel ? ' is-active' : '') + '" data-tg="select-bab" data-code="' + esc(cItem.code) + '" data-title="' + esc(cItem.name) + '" data-testid="tg-assign-bab-card-' + cItem.babNum + '">' +
+                '<div class="tg-chap-top">' +
+                  '<span class="tg-chap-pill">📖 ' + esc(t('guru.bab-label', 'Bab')) + ' ' + cItem.babNum + '</span>' +
+                  '<span class="tg-chap-grade">' + esc(t('guru.kelas-label', 'Kelas')) + ' ' + cItem.grade + '</span>' +
+                '</div>' +
+                '<h5 class="tg-chap-title">' + esc(cItem.name) + '</h5>' +
+                '<div class="tg-chap-meta">' +
+                  '<span class="tg-chap-count">📚 ' + qCount + ' ' + esc(t('guru.soal-count', 'soal')) + '</span>' +
+                  (isSel ? '<span class="tg-chap-selected-pill">✓ ' + esc(t('guru.terpilih', 'Aktif')) + '</span>' : '') +
+                '</div>' +
+              '</button>';
+            }).join('') +
+          '</div>';
         }
 
-        var compInputs = '<div class="tg-form-row">' +
-          '<label class="tg-label">' + t('guru.kode-kompetensi', 'Kode Kompetensi / TP') +
-            '<input name="comp_code" value="' + esc(mCode) + '" placeholder="Contoh: KOMP-MAT-D-7-BIL-01" class="tg-input" data-testid="tg-assign-comp-code">' +
-          '</label>' +
-          '<label class="tg-label">' + t('guru.materi-kompetensi', 'Materi / Indikator TP') +
-            '<input name="comp_title" value="' + esc(mTitle) + '" placeholder="Contoh: Operasi hitung bilangan bulat dan pecahan" class="tg-input" data-testid="tg-assign-comp-title">' +
-          '</label>' +
+        var gradeFilterHtml = '';
+        if (availableGrades.length > 1) {
+          gradeFilterHtml = '<div class="tg-grade-filter-row">' +
+            '<span class="tg-filter-label">' + esc(t('guru.jenjang-kelas-label', '🎯 Jenjang Kelas:')) + '</span>' +
+            '<button type="button" class="tg-grade-pill' + (curGradeFilter === 'all' ? ' is-active' : '') + '" data-tg="filter-grade" data-grade="all">' + esc(t('guru.semua-kelas', 'Semua Kelas')) + '</button>' +
+            availableGrades.map(function (gr) {
+              return '<button type="button" class="tg-grade-pill' + (curGradeFilter === String(gr) ? ' is-active' : '') + '" data-tg="filter-grade" data-grade="' + gr + '">' + esc(t('guru.kelas-label', 'Kelas')) + ' ' + gr + '</button>';
+            }).join('') +
+          '</div>';
+        }
+
+        var compSelectHtml = '';
+        if (comps.length) {
+          var groupedByGrade = {};
+          comps.forEach(function (c) {
+            var gKey = c.grade || 7;
+            if (!groupedByGrade[gKey]) groupedByGrade[gKey] = [];
+            groupedByGrade[gKey].push(c);
+          });
+
+          var optGroupsHtml = Object.keys(groupedByGrade).sort(function (a, b) { return Number(a) - Number(b); }).map(function (gKey) {
+            var groupItems = groupedByGrade[gKey];
+            var opts = groupItems.map(function (cItem) {
+              var isSel = (cItem.code === mCode || cItem.name === mTitle);
+              var qCount = (getMapelQuestionsForCompetency(curSId, cItem.code).items || []).length;
+              var label = '📖 ' + t('guru.bab-label', 'Bab') + ' ' + cItem.babNum + ': ' + cItem.name + ' (' + qCount + ' ' + t('guru.soal-count', 'soal') + ')';
+              return '<option value="' + esc(cItem.code) + '" data-title="' + esc(cItem.name) + '" data-materi="' + esc(cItem.materi || '') + '"' + (isSel ? ' selected' : '') + '>' +
+                esc(label) +
+              '</option>';
+            }).join('');
+            return '<optgroup label="📚 ' + esc(t('guru.kelas-label', 'Kelas')) + ' ' + gKey + ' SMP / Fase D">' + opts + '</optgroup>';
+          }).join('');
+
+          compSelectHtml = '<div class="tg-bab-section">' +
+            '<div class="tg-bab-header-row">' +
+              '<label class="tg-label">📖 <b>' + esc(t('guru.pilih-bab-buku-ajar', 'Pilih Bab Buku Ajar (Kurikulum Merdeka)')) + '</b></label>' +
+              gradeFilterHtml +
+            '</div>' +
+            chapterCardsHtml +
+            '<select name="comp_select" data-tg-select="assign-comp-select" class="tg-select-unit tg-bab-select" data-testid="tg-assign-comp-select">' +
+              optGroupsHtml +
+            '</select>' +
+          '</div>';
+        }
+
+        var compInputs = '<input type="hidden" name="comp_code" value="' + esc(mCode) + '" data-testid="tg-assign-comp-code">' +
+          '<input type="hidden" name="comp_title" value="' + esc(mTitle) + '" data-testid="tg-assign-comp-title">';
+
+        var subTopicsHtml = '';
+        if (curMateri) {
+          var rawSubs = curMateri.split(/,|;/).map(function (s) {
+            return s.trim().replace(/^(dan|serta)\s+/i, '');
+          }).filter(Boolean);
+
+          if (rawSubs.length) {
+            subTopicsHtml = '<div class="tg-subbab-box">' +
+              '<div class="tg-subbab-head">🎯 <b>' + esc(t('guru.subbab-topik-bab', 'Sub-bab & Indikator Materi di Bab Ini:')) + '</b></div>' +
+              '<div class="tg-subbab-list">' +
+                rawSubs.map(function (st, sIdx) {
+                  return '<div class="tg-subbab-item">' +
+                    '<span class="tg-subbab-badge">📌 ' + esc(t('guru.subbab-label', 'Sub-bab')) + ' ' + curBabNum + '.' + (sIdx + 1) + '</span>' +
+                    '<span class="tg-subbab-title">' + esc(st) + '</span>' +
+                  '</div>';
+                }).join('') +
+              '</div>' +
+            '</div>';
+          }
+        }
+
+        var topicSummaryCard = '<div class="tg-topic-summary-card">' +
+          '<div class="tg-topic-badge-row">' +
+            '<span class="tg-badge is-subject">' + esc(catItem ? catItem.name : curSId) + '</span>' +
+            '<span class="tg-badge is-grade">' + esc(t('guru.kelas-label', 'Kelas')) + ' ' + curGrade + '</span>' +
+            '<span class="tg-badge is-bab">📖 ' + esc(t('guru.bab-label', 'Bab')) + ' ' + curBabNum + '</span>' +
+            '<span class="tg-badge is-count">📚 ' + totalAvailable + ' ' + esc(t('guru.soal-tersedia-bab', 'Soal Siap Pakai di Bab Ini')) + '</span>' +
+          '</div>' +
+          '<h4 class="tg-topic-title">📖 ' + esc(t('guru.bab-label', 'Bab')) + ' ' + curBabNum + ': ' + esc(mTitle || (catItem ? catItem.name : curSId)) + '</h4>' +
+          subTopicsHtml +
         '</div>';
 
         var briefCard = '';
         if (catItem && catItem.teachingBrief) {
           var tb = catItem.teachingBrief;
-          briefCard = '<div class="tg-brief-card" data-testid="tg-mapel-brief">' +
-            '<div class="tg-brief-head"><span class="tg-badge">💡 ' + esc(t('guru.panduan-mengajar', 'Panduan mengajar')) + '</span><h4>' + esc(catItem.name + (mTitle ? ' — ' + mTitle : '')) + '</h4><span class="tg-cefr-pill">' + esc(catItem.grade) + '</span></div>' +
-            '<p class="tg-brief-summary">' + esc(tb.summary) + '</p>' +
-            '<div class="tg-brief-grid">' +
-              '<div class="tg-brief-col"><b>' + esc(t('guru.apersepsi-5-menit', '🎤 Apersepsi 5 Menit (Hook Kelas):')) + '</b><p>' + esc(tb.hook5Minutes) + '</p></div>' +
-              '<div class="tg-brief-col"><b>' + esc(t('guru.papan-tulis-rumus', '📋 Rumus / Konsep Papan Tulis:')) + '</b><code>' + esc(tb.boardFormula) + '</code></div>' +
-            '</div>' +
-            (tb.commonMisconceptions && tb.commonMisconceptions.length ? '<div class="tg-brief-miscons"><b>' + esc(t('guru.top-miskonsepsi', '⚠️ Top Miskonsepsi Siswa:')) + '</b><ul>' + tb.commonMisconceptions.map(function (mc) { return '<li><b>' + esc(mc.trap) + ':</b> ' + esc(mc.pattern) + ' ➔ <em>' + esc(mc.fix) + '</em></li>'; }).join('') + '</ul></div>' : '') +
-            '</div>';
+          briefCard = '<details class="tg-brief-accordion" data-testid="tg-mapel-brief">' +
+            '<summary class="tg-brief-summary-toggle">' +
+              '<span>💡 <b>' + esc(t('guru.panduan-mengajar-buka', 'Panduan Mengajar Guru & Miskonsepsi Siswa')) + '</b> <small class="tg-muted">(' + esc(t('guru.klik-buka-panduan', 'Apersepsi 5 Menit, Rumus & Trap Miskonsepsi')) + ')</small></span>' +
+              '<span class="tg-accordion-arrow">▼</span>' +
+            '</summary>' +
+            '<div class="tg-brief-card">' +
+              '<div class="tg-brief-head"><span class="tg-badge">💡 ' + esc(t('guru.panduan-mengajar', 'Panduan mengajar')) + '</span><h4>' + esc(catItem.name + (mTitle ? ' — ' + mTitle : '')) + '</h4><span class="tg-cefr-pill">' + esc(catItem.grade) + '</span></div>' +
+              '<p class="tg-brief-summary">' + esc(tb.summary) + '</p>' +
+              '<div class="tg-brief-grid">' +
+                '<div class="tg-brief-col"><b>' + esc(t('guru.apersepsi-5-menit', '🎤 Apersepsi 5 Menit (Hook Kelas):')) + '</b><p>' + esc(tb.hook5Minutes) + '</p></div>' +
+                '<div class="tg-brief-col"><b>' + esc(t('guru.papan-tulis-rumus', '📋 Rumus / Konsep Papan Tulis:')) + '</b><code>' + esc(tb.boardFormula) + '</code></div>' +
+              '</div>' +
+              (tb.commonMisconceptions && tb.commonMisconceptions.length ? '<div class="tg-brief-miscons"><b>' + esc(t('guru.top-miskonsepsi', '⚠️ Top Miskonsepsi Siswa:')) + '</b><ul>' + tb.commonMisconceptions.map(function (mc) { return '<li><b>' + esc(mc.trap) + ':</b> ' + esc(mc.pattern) + ' ➔ <em>' + esc(mc.fix) + '</em></li>'; }).join('') + '</ul></div>' : '') +
+            '</div></details>';
         }
 
-        var sampleQs = synthesizeMapelQuestions(curSId, mCode, mTitle, 2);
-        var previewCard = '<div class="tg-preview-box" data-testid="tg-mapel-preview">' +
-          '<div class="tg-card-head"><h5>' + icon('eye') + ' ' + esc(t('guru.intip-contoh-soal', 'Pratinjau Contoh Soal yang Diterima Murid')) + '</h5><span class="tg-badge">' + sampleQs.length + ' ' + esc(t('guru.contoh-soal-pill', 'contoh soal')) + '</span></div>' +
-          '<div class="tg-sample-list">' + sampleQs.map(function (sq, sIdx) {
-            return '<div class="tg-sample-item"><strong>' + t('umum.soal', 'Soal') + ' ' + (sIdx + 1) + ': ' + esc(sq.prompt) + '</strong>' +
-              '<div class="tg-sample-opts">' + sq.options.map(function (opt, oIdx) {
-                var isAns = (oIdx === sq.answer);
-                return '<span class="tg-sample-opt' + (isAns ? ' is-answer' : '') + '">' + (isAns ? '✓ ' : '• ') + esc(opt) + '</span>';
-              }).join('') + '</div>' +
-              (sq.why && sq.why[sq.answer] ? '<small class="tg-muted">💡 Pembahasan: ' + esc(sq.why[sq.answer]) + '</small>' : '') +
+        var qCardsHtml = allQItems.map(function (qItem, qIdx) {
+          var diff = qItem.difficulty || 'sedang';
+          var diffLabel = diff === 'dasar' ? t('guru.diff-dasar', '🟢 Dasar') : (diff === 'tinggi' ? t('guru.diff-tinggi', '🔴 Tantangan') : t('guru.diff-sedang', '🟡 Sedang'));
+          var optsHtml = (qItem.options || []).map(function (optText, oIdx) {
+            var isAns = (oIdx === qItem.answer);
+            var letter = String.fromCharCode(65 + oIdx);
+            return '<div class="tg-q-opt' + (isAns ? ' is-correct' : '') + '">' +
+              '<span class="tg-opt-letter">' + letter + '.</span>' +
+              '<span class="tg-opt-text">' + esc(optText) + '</span>' +
+              (isAns ? '<span class="tg-correct-pill">✓ ' + esc(t('guru.kunci', 'Kunci')) + '</span>' : '') +
             '</div>';
-          }).join('') + '</div></div>';
+          }).join('');
+
+          var whyKey = qItem.answer;
+          var mainWhy = (qItem.why && (qItem.why[whyKey] || qItem.why[String(whyKey)])) || '';
+          var trapHtml = '';
+          if (qItem.distractorWhy) {
+            var traps = [];
+            for (var dKey in qItem.distractorWhy) {
+              if (qItem.distractorWhy.hasOwnProperty(dKey) && Number(dKey) !== whyKey) {
+                var dLetter = String.fromCharCode(65 + Number(dKey));
+                traps.push('<div><span class="tg-trap-note">⚠️ ' + esc(t('guru.jebakan-opsi', 'Miskonsepsi Opsi')) + ' ' + dLetter + ':</span> ' + esc(qItem.distractorWhy[dKey]) + '</div>');
+              }
+            }
+            if (traps.length) trapHtml = traps.join('');
+          }
+
+          var explanationHtml = (mainWhy || trapHtml) ? (
+            '<details class="tg-q-explanation">' +
+              '<summary class="tg-q-exp-toggle">💡 ' + esc(t('guru.lihat-pembahasan', 'Lihat Pembahasan & Catatan Guru')) + '</summary>' +
+              '<div class="tg-q-exp-body">' +
+                (mainWhy ? '<p><b>' + esc(t('guru.kunci-konsep', 'Konsep Jawaban:')) + '</b> ' + esc(mainWhy) + '</p>' : '') +
+                trapHtml +
+              '</div>' +
+            '</details>'
+          ) : '';
+
+          return '<div class="tg-qcard">' +
+            '<div class="tg-qcard-top">' +
+              '<label class="tg-qcard-label">' +
+                '<input type="checkbox" name="selected_q_idx" value="' + qIdx + '" class="tg-q-checkbox" data-tg-check="q-select" checked>' +
+                '<span class="tg-q-num">#' + (qIdx + 1) + '</span>' +
+              '</label>' +
+              '<span class="tg-diff-badge is-' + esc(diff) + '">' + esc(diffLabel) + '</span>' +
+            '</div>' +
+            '<div class="tg-qcard-prompt">' + esc(qItem.prompt) + '</div>' +
+            '<div class="tg-qcard-options">' + optsHtml + '</div>' +
+            explanationHtml +
+          '</div>';
+        }).join('');
+
+        var previewCard = '<div class="tg-qbank-section" data-testid="tg-mapel-preview">' +
+          '<div class="tg-qbank-header">' +
+            '<div class="tg-qbank-title-group">' +
+              '<h5>📚 ' + esc(t('guru.daftar-soal-bab', 'Bank Soal di Bab Ini')) + ' <span class="tg-count-pill" data-tg-q-count-label>' + totalAvailable + ' ' + esc(t('guru.soal-tersedia', 'Soal Siap Pakai')) + '</span></h5>' +
+              '<p class="tg-muted tg-small">' + esc(t('guru.sub-daftar-soal', 'Guru dapat melihat butir soal, kunci jawaban (hijau), pembahasan, dan memilih soal yang ingin diterbitkan.')) + '</p>' +
+            '</div>' +
+            '<div class="tg-qbank-quick-btns">' +
+              '<button type="button" class="tg-q-quick-btn" data-tg="quick-count" data-count="5">⚡ ' + esc(t('guru.pilih-5-soal', 'Pilih 5 Soal (Latihan)')) + '</button>' +
+              '<button type="button" class="tg-q-quick-btn" data-tg="quick-count" data-count="10">📝 ' + esc(t('guru.pilih-10-soal', 'Pilih 10 Soal (Ulangan)')) + '</button>' +
+              '<button type="button" class="tg-q-quick-btn" data-tg="quick-count" data-count="' + totalAvailable + '">💯 ' + esc(t('guru.pilih-semua-soal', 'Pilih Semua')) + ' (' + totalAvailable + ')</button>' +
+            '</div>' +
+          '</div>' +
+          '<div class="tg-qbank-list">' + qCardsHtml + '</div>' +
+        '</div>';
 
         tabContent = '<input type="hidden" name="assign_source" value="mapel">' +
-          subjectSelect + compSelectHtml + compInputs + briefCard + previewCard;
+          subjectSelect + compSelectHtml + compInputs + topicSummaryCard + briefCard + previewCard;
       } else if (tab === 'curriculum' && C) {
         var phasePills = '<div class="tg-phase-pills">' + phases.map(function (p) {
           return '<button type="button" class="tg-chip' + (curPhase === p.id ? ' is-active' : '') + '" data-tg="assign-phase" data-phase="' + p.id + '"><b>' + esc(p.name) + '</b><small>' + esc(p.cefr) + '</small></button>';
@@ -3178,7 +3538,9 @@
 
       var countOptions = (tab === 'curriculum' && curUnit)
         ? [2, 3, 5, 8, 10, 15].filter(function (n) { return n <= tersedia; }).concat(tersedia && [2, 3, 5, 8, 10, 15].every(function (n) { return n !== tersedia; }) ? [tersedia] : []).sort(function (a, b) { return a - b; })
-        : [2, 3, 5, 8, 10, 15, 20];
+        : (tab === 'mapel' && mapelAvailable)
+          ? [2, 3, 5, 8, 10, 12, 15].filter(function (n) { return n <= mapelAvailable; }).concat(mapelAvailable && [2, 3, 5, 8, 10, 12, 15].every(function (n) { return n !== mapelAvailable; }) ? [mapelAvailable] : []).sort(function (a, b) { return a - b; })
+          : [2, 3, 5, 8, 10, 15, 20];
 
       var curAssignMode = m.mode || ui.assignMode || 'latihan';
 
@@ -3190,7 +3552,7 @@
 
       body = '<form data-tg-form="assign" class="tg-form">' + stepGuide + tabHeader + tabContent +
         '<label class="tg-label">' + t('guru.judul-tugas-bab', 'Judul Tugas / Bab') + '<input name="title" maxlength="80" value="' + esc(defaultTitle) + '" placeholder="' + esc(t('guru.judul-otomatis', 'Kosongkan untuk judul otomatis')) + '" data-testid="tg-assign-title"></label>' +
-        '<div class="tg-form-row"><label class="tg-label">' + t('guru.jumlah-soal', 'Jumlah soal') + (tab === 'curriculum' && curUnit ? ' <small class="tg-muted">(tersedia ' + tersedia + ')</small>' : '') + '<select name="count">' + countOptions.map(function (n) { return '<option' + (n === (tab === 'curriculum' && curUnit ? Math.min(tersedia, 8) : 5) ? ' selected' : '') + '>' + n + '</option>'; }).join('') + '</select></label><label class="tg-label">Tenggat<input type="date" name="deadline" value="' + T.today(Date.now() + 2 * T.DAY) + '" data-testid="tg-assign-deadline"></label></div>' +
+        '<div class="tg-form-row"><label class="tg-label">' + t('guru.jumlah-soal', 'Jumlah soal') + (tab === 'mapel' && mapelAvailable ? (' <small class="tg-muted">(' + esc(t('guru.tersedia-label', 'tersedia')) + ' ' + mapelAvailable + ' ' + esc(t('guru.soal-di-bab-ini', 'soal di bab ini')) + ')</small>') : (tab === 'curriculum' && curUnit ? ' <small class="tg-muted">(tersedia ' + tersedia + ')</small>' : '')) + '<select name="count">' + countOptions.map(function (n) { return '<option' + (n === (tab === 'mapel' && mapelAvailable ? Math.min(mapelAvailable, 5) : tab === 'curriculum' && curUnit ? Math.min(tersedia, 8) : 5) ? ' selected' : '') + '>' + n + '</option>'; }).join('') + '</select></label><label class="tg-label">' + t('guru.tenggat-label', 'Tenggat') + '<input type="date" name="deadline" value="' + T.today(Date.now() + 2 * T.DAY) + '" data-testid="tg-assign-deadline"></label></div>' +
         '<label class="tg-label">' + esc(t('guru.langkah-2-mode', '2. Atur Mode & Waktu')) + '</label><div class="tg-mode"><label class="tg-mode-opt"><input type="radio" name="mode" value="latihan"' + (curAssignMode !== 'ujian' ? ' checked' : '') + '><div><b>🟢 ' + esc(t('guru.mode-latihan-title', 'Mode Latihan Mandiri')) + '</b><small>' + esc(t('guru.mode-latihan-sub', 'Kunci & pembahasan langsung terbuka setelah murid menjawab tiap soal. Cocok untuk PR & belajar mandiri.')) + '</small></div></label><label class="tg-mode-opt"><input type="radio" name="mode" value="ujian"' + (curAssignMode === 'ujian' ? ' checked' : '') + ' data-testid="tg-assign-mode-exam"><div><b>🛡️ ' + esc(t('guru.mode-ujian-title', 'Mode Ujian / Kuis Terjadwal')) + '</b><small>' + esc(t('guru.mode-ujian-sub', 'Ada timer hitung mundur, urutan soal diacak otomatis (anti-contek), nilai terekam otomatis ke rekap guru.')) + '</small></div></label></div>' +
         '<div class="tg-form-row"><label class="tg-label">' + t('guru.durasi-timer-ujian', 'Durasi Timer (khusus Ujian)') + '<select name="timer"><option value="10">10 Menit</option><option value="15" selected>15 Menit</option><option value="20">20 Menit</option><option value="30">30 Menit</option><option value="45">45 Menit</option><option value="60">60 Menit</option></select></label></div>' +
         '<label class="tg-label">Untuk siapa</label><div class="tg-chips tg-chips-select tg-chips-scroll"><label class="tg-chip is-check"><input type="radio" name="scope" value="all"' + (tgt.length ? '' : ' checked') + '><span>Seluruh kelas</span></label>' + c.students.map(function (s) { return '<label class="tg-chip is-check"><input type="checkbox" name="targets" value="' + s.id + '"' + (tgt.indexOf(s.id) !== -1 ? ' checked' : '') + '><span>' + esc(s.name) + '</span></label>'; }).join('') + '</div>' +
@@ -3417,6 +3779,57 @@
       case 'assign-tab': { ui.assignTab = btn.getAttribute('data-tab'); persist(); render(); return; }
       case 'assign-phase': { ui.curriculumPhase = btn.getAttribute('data-phase'); ui.curriculumUnitId = null; persist(); render(); return; }
       case 'assign-unit': { ui.curriculumUnitId = btn.getAttribute('data-unit'); persist(); render(); return; }
+      case 'select-bab': {
+        var bCode = btn.getAttribute('data-code');
+        var bTitle = btn.getAttribute('data-title') || '';
+        ui.assignCompCode = bCode;
+        ui.assignCompTitle = bTitle;
+        if (ui.modal && ui.modal.kind === 'assign') {
+          ui.modal.compCode = bCode;
+          ui.modal.compTitle = bTitle;
+        }
+        persist(); render(); return;
+      }
+      case 'filter-grade': {
+        var fGrade = btn.getAttribute('data-grade') || 'all';
+        ui.assignGradeFilter = fGrade;
+        persist(); render(); return;
+      }
+      case 'quick-count': {
+        var countReq = parseInt(btn.getAttribute('data-count'), 10) || 5;
+        var modalForm = el.querySelector('[data-tg-form="assign"]');
+        if (modalForm) {
+          var checkboxes = modalForm.querySelectorAll('[data-tg-check="q-select"]');
+          var checkedCount = 0;
+          checkboxes.forEach(function (cb, idx) {
+            cb.checked = (idx < countReq);
+            if (cb.checked) checkedCount++;
+          });
+          var countSel = modalForm.querySelector('[name="count"]');
+          if (countSel) {
+            var optFound = false;
+            for (var oi = 0; oi < countSel.options.length; oi++) {
+              if (parseInt(countSel.options[oi].value, 10) === checkedCount) {
+                countSel.selectedIndex = oi;
+                optFound = true;
+                break;
+              }
+            }
+            if (!optFound && checkedCount > 0) {
+              var newOpt = document.createElement('option');
+              newOpt.value = checkedCount;
+              newOpt.textContent = checkedCount;
+              newOpt.selected = true;
+              countSel.appendChild(newOpt);
+            }
+          }
+          var countLbl = modalForm.querySelector('[data-tg-q-count-label]');
+          if (countLbl) {
+            countLbl.textContent = checkedCount + ' ' + t('guru.soal-dipilih-pill', 'Soal Dipilih');
+          }
+        }
+        return;
+      }
       default: return;
     }
     persist(); render();
@@ -3465,7 +3878,40 @@
         title = fd.get('title') || (mObj.name + (cTitle ? ' · ' + cTitle : ' · ' + t('umum.tugas', 'Tugas') + ' ' + sId));
         skills = [sId];
         kurikulumOnly = true;
-        customItems = synthesizeMapelQuestions(sId, cCode, cTitle, count);
+
+        var selQIndices = fd.getAll('selected_q_idx');
+        var qData = getMapelQuestionsForCompetency(sId, cCode);
+        var baseList = qData.items;
+
+        if (selQIndices && selQIndices.length > 0 && baseList && baseList.length > 0) {
+          customItems = [];
+          for (var si = 0; si < selQIndices.length; si++) {
+            var sIdx = parseInt(selQIndices[si], 10);
+            var src = baseList[sIdx];
+            if (src) {
+              var itemObj = {
+                id: (src.id || ('q-' + sId.toLowerCase() + '-' + (sIdx + 1))) + '-' + Math.random().toString(36).slice(2, 6),
+                prompt: src.prompt,
+                options: src.options.slice(),
+                answer: src.answer,
+                skill: (cCode || sId || 'mat').toLowerCase().replace(/[^a-z0-9_]/g, '_').slice(0, 32),
+                context: title,
+                why: Object.assign({}, src.why)
+              };
+              if (src.distractorWhy) itemObj.distractorWhy = Object.assign({}, src.distractorWhy);
+              var shuffled = shuffleOptions(itemObj, (Date.now() % 997) + si * 31 + sId.charCodeAt(0));
+              itemObj.options = shuffled.options;
+              itemObj.answer = shuffled.answer;
+              itemObj.why = shuffled.why;
+              if (shuffled.distractorWhy) itemObj.distractorWhy = shuffled.distractorWhy;
+              customItems.push(itemObj);
+            }
+          }
+          count = customItems.length;
+        } else {
+          customItems = synthesizeMapelQuestions(sId, cCode, cTitle, count);
+        }
+
         sourceMeta = {
           subjectId: sId,
           subjectName: mObj.name,
@@ -3541,6 +3987,37 @@
   }
   function onChange(e) {
     var sel = e.target;
+    if (sel.getAttribute('data-tg-check') === 'q-select') {
+      var modalForm = el.querySelector('[data-tg-form="assign"]');
+      if (modalForm) {
+        var cbs = modalForm.querySelectorAll('[data-tg-check="q-select"]');
+        var cnt = 0;
+        cbs.forEach(function (cb) { if (cb.checked) cnt++; });
+        var countSelect = modalForm.querySelector('[name="count"]');
+        if (countSelect) {
+          var found = false;
+          for (var ci = 0; ci < countSelect.options.length; ci++) {
+            if (parseInt(countSelect.options[ci].value, 10) === cnt) {
+              countSelect.selectedIndex = ci;
+              found = true;
+              break;
+            }
+          }
+          if (!found && cnt > 0) {
+            var nOpt = document.createElement('option');
+            nOpt.value = cnt;
+            nOpt.textContent = cnt;
+            nOpt.selected = true;
+            countSelect.appendChild(nOpt);
+          }
+        }
+        var cLbl = modalForm.querySelector('[data-tg-q-count-label]');
+        if (cLbl) {
+          cLbl.textContent = cnt + ' ' + t('guru.soal-dipilih-pill', 'Soal Dipilih');
+        }
+      }
+      return;
+    }
     if (sel.getAttribute('data-tg-select') === 'class') { st.activeClassId = sel.value; ui.drawer = null; persist(); render(); }
     if (sel.getAttribute('data-tg-select') === 'curriculum-subject') {
       ui.curriculumSubject = sel.value;
@@ -3550,6 +4027,7 @@
       ui.assignSubject = sel.value;
       ui.assignCompCode = '';
       ui.assignCompTitle = '';
+      ui.assignGradeFilter = 'all';
       if (ui.modal && ui.modal.kind === 'assign') {
         ui.modal.subjectId = sel.value;
         ui.modal.compCode = '';
