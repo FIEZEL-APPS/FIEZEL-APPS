@@ -2424,6 +2424,75 @@
     return '<button type="button" class="tg-chip tg-sync is-' + (ui.syncing ? 'busy' : L.state) + '" data-tg="sync" title="Sinkron laporan murid dari server" data-testid="tg-sync">' + icon(ui.syncing ? 'refresh-cw' : L.state === 'ok' ? 'cloud-check' : L.state === 'err' ? 'cloud-alert' : 'cloud') + '<span>' + esc(ui.syncing ? 'Menyinkron…' : L.text) + '</span></button>';
   }
 
+  function isTeacherRole() {
+    try {
+      var acc = (root.FiezelAccount && root.FiezelAccount.state && root.FiezelAccount.state()) || null;
+      if (acc && acc.role === 'teacher') return true;
+      if (root.FiezelAccount && root.FiezelAccount.isTeacher && root.FiezelAccount.isTeacher()) return true;
+      if (root.localStorage && root.localStorage.getItem('fz_teacher_mode') === '1') return true;
+      if (root.state && root.state.preferences && root.state.preferences.role === 'guru') return true;
+      if (!previewOn && st && st.teacher && st.teacher.name && st.teacher.name.trim() !== '' && st.teacher.name !== 'Bu Sari') return true;
+      return false;
+    } catch (_) { return false; }
+  }
+
+  function ensureTeacherClass() {
+    if (previewOn) return null;
+    var acc = (root.FiezelAccount && root.FiezelAccount.state && root.FiezelAccount.state()) || null;
+    var isTeacher = isTeacherRole() || (acc && acc.role === 'teacher') || (st && st.teacher && st.teacher.name && st.teacher.name.trim() !== '' && st.teacher.name !== 'Bu Sari');
+    if (!isTeacher) return null;
+
+    if (!Array.isArray(st.classes)) st.classes = [];
+
+    var sId = (acc && acc.subjectId) || ui.curriculumSubject || ui.assignSubject || 'MAT';
+    var gId = (acc && acc.gradeId) || 'SMP';
+    var inst = (acc && acc.institution) || (st.teacher && st.teacher.school) || '';
+    var mapelNames = (S() && S().MAPEL_NAMES) || {};
+    var subName = mapelNames[sId] || sId || 'Matematika';
+    var code = (acc && acc.classCode) ? S().normalizeClassCode(acc.classCode) : '';
+
+    if (!code) {
+      try {
+        var m = (typeof document !== 'undefined' && document.cookie) ? document.cookie.match(/(?:^|;\s*)fz_cls=([^;]+)/) : null;
+        if (m && m[1]) code = S().normalizeClassCode(decodeURIComponent(m[1]));
+      } catch (_) {}
+    }
+    if (!code) {
+      code = S().makeClassCode();
+    }
+
+    var existing = st.classes.filter(function (c) {
+      return S().normalizeClassCode(c.code) === code;
+    })[0];
+
+    if (existing) {
+      st.activeClassId = existing.id;
+      st.onboarded = true;
+      if (!st.view || st.view === 'briefing') st.view = 'hub';
+      return existing;
+    }
+
+    // Jika guru belum punya kelas sama sekali, buat kelas otomatis
+    if (!st.classes.length) {
+      if (st.deletedClassCodes && st.deletedClassCodes[code]) {
+        delete st.deletedClassCodes[code];
+      }
+      var clsTitle = (inst ? inst + ' — ' : '') + subName;
+      var newCls = S().newClass(clsTitle, gId, sId);
+      newCls.code = code;
+      st.classes.unshift(newCls);
+      st.activeClassId = newCls.id;
+      st.onboarded = true;
+      st.view = 'hub';
+      ui.curriculumSubject = sId;
+      ui.assignSubject = sId;
+      persist();
+      return newCls;
+    }
+
+    return null;
+  }
+
   // ---- mount ------------------------------------------------------------------------------
   function mount(target, options) {
     el = target; env = options || {};
@@ -2445,32 +2514,9 @@
         S().save(st);
       } catch (_) { /* bank soal belum termuat: papan tetap terbuka, sekadar kosong */ }
     }
-    st.classes = st.classes.map(S().normalizeClass);
+    st.classes = (st.classes || []).map(S().normalizeClass);
     try {
-      var acc = (root.FiezelAccount && root.FiezelAccount.state && root.FiezelAccount.state()) || null;
-      if (acc && acc.role === 'teacher') {
-        if (acc.subjectId) {
-          ui.curriculumSubject = acc.subjectId;
-          ui.assignSubject = acc.subjectId;
-        }
-        if (acc.classCode) {
-          var normCode = S().normalizeClassCode(acc.classCode);
-          if (normCode) {
-            var matched = st.classes.filter(function (c) { return S().normalizeClassCode(c.code) === normCode; })[0];
-            if (matched) {
-              st.activeClassId = matched.id;
-            } else if (!st.deletedClassCodes || !st.deletedClassCodes[normCode]) {
-              var clsTitle = (acc.institution ? acc.institution + ' — ' : '') + (acc.subjectId || 'Kelas ' + normCode);
-              var autoCls = S().newClass(clsTitle, 'A2', acc.subjectId || 'English');
-              autoCls.code = normCode;
-              st.classes.unshift(autoCls);
-              st.activeClassId = autoCls.id;
-              st.onboarded = true;
-              persist();
-            }
-          }
-        }
-      }
+      ensureTeacherClass();
     } catch (_) {}
     if (!cls() && st.classes.length) st.activeClassId = st.classes[0].id;
     if (!st.classes.length && !st.onboarded) { st.view = 'briefing'; }
@@ -2482,15 +2528,19 @@
     document.addEventListener('keydown', onKey);
     render();
     startAutoSync();
+    // Sinkron daftar kelas dari server di latar belakang jika tersedia
+    try {
+      if (S() && typeof S().syncClassList === 'function' && !previewOn) {
+        S().syncClassList(st).then(function (res) {
+          if (res && res.ok && res.added > 0) {
+            render();
+          }
+        }).catch(function () {});
+      }
+    } catch (_) {}
   }
   function unmount() { stopAutoSync(); document.body.classList.remove('fz-teacher-mode'); document.removeEventListener('keydown', onKey); if (el) { el.removeEventListener('click', onClick); el.removeEventListener('submit', onSubmit); el.removeEventListener('change', onChange); el.removeEventListener('input', onInput); } el = null; ui.modal = null; ui.drawer = null; lastPaintKey = null; }
   function onKey(e) { if (e.key === 'Escape' && (ui.modal || ui.drawer || ui.inbox)) { ui.modal = null; ui.drawer = null; ui.inbox = false; render(); } }
-  function isTeacherRole() {
-    try {
-      return (root.FiezelAccount && root.FiezelAccount.isTeacher && root.FiezelAccount.isTeacher()) ||
-             (root.FiezelAccount && root.FiezelAccount.state && root.FiezelAccount.state() && root.FiezelAccount.state().role === 'teacher');
-    } catch (_) { return false; }
-  }
   function performTeacherLogout() {
     persist();
     try { localStorage.removeItem('fz_teacher_mode'); } catch(_) {}
@@ -2576,6 +2626,9 @@
   function render() {
     if (!el) return;
     pendingRender = false;
+    if (!previewOn && isTeacherRole() && (!st.classes || !st.classes.length)) {
+      try { ensureTeacherClass(); } catch (_) {}
+    }
     var c = cls(), saved = captureActive(el);
     var key = (st.view || 'briefing') + '|' + (st.activeClassId || '') + '|' + (ui.modal ? ui.modal.kind : '') + '|' + (ui.drawer || '');
     var repaint = key === lastPaintKey;
