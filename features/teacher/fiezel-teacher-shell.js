@@ -3035,9 +3035,8 @@
 
   function curriculumView(c) {
     var sId = ui.curriculumSubject || 'MAT';
-    var statusText = ui.curriculumSeeded
-      ? (t('guru.status-tersedia', 'Tersedia') + ' ' + (ui.curriculumSeeded.mapel_count || 17) + ' ' + t('guru.mapel-di-mongo', 'mapel di MongoDB') + ' (' + (ui.curriculumSeeded.kompetensi_count || 0) + ' ' + t('guru.kompetensi', 'kompetensi') + ')')
-      : t('guru.status-periksa', 'Belum disemai / klik tombol Seed untuk inisialisasi');
+    var cat = MAPEL_CATALOG[sId] || MAPEL_CATALOG['MAT'];
+    var mItem = MAPEL_LIST.filter(function (x) { return x.id === sId; })[0] || { name: sId, grade: 'SD / SMP / SMA' };
 
     var toolbar = '<div class="tg-curriculum-toolbar">' +
       '<div class="tg-curriculum-actions">' +
@@ -3048,24 +3047,27 @@
             }).join('') +
           '</select>' +
         '</label>' +
-        '<button type="button" class="tg-btn is-ghost is-small" data-tg="seed-mapel" data-testid="tg-seed-mapel"' + (ui.seeding ? ' disabled' : '') + '>' + icon('database') + ' <span>' + (ui.seeding ? t('guru.sedang-menyemai', 'Sedang menyemai…') : t('guru.semai-mapel', 'Seed 17 Mapel')) + '</span></button>' +
-        '<button type="button" class="tg-btn is-ghost is-small" data-tg="seed-english" data-testid="tg-seed-english"' + (ui.seeding ? ' disabled' : '') + '>' + icon('library') + ' <span>' + t('guru.semai-english', 'Seed Bahasa Inggris') + '</span></button>' +
-        '<button type="button" class="tg-btn is-ghost is-small" data-tg="seed-soal" data-testid="tg-seed-soal"' + (ui.seeding ? ' disabled' : '') + '>' + icon('clipboard-list') + ' <span>' + t('guru.semai-soal', 'Seed Bank Soal') + '</span></button>' +
+        '<button type="button" class="tg-btn is-ghost is-small" data-tg="refresh-curriculum">' + icon('rotate-cw') + ' <span>' + esc(t('umum.muat-ulang', 'Muat Ulang')) + '</span></button>' +
       '</div>' +
-      '<div class="tg-seed-badge">' + icon('activity') + ' <span>' + esc(statusText) + '</span></div>' +
+      '<div class="tg-seed-badge">' + icon('book-open') + ' <span><b>' + esc(mItem.name) + '</b> (' + esc(mItem.grade) + ') · ' + esc(t('guru.kurikulum-nasional', 'Kurikulum Nasional')) + '</span></div>' +
     '</div>';
 
-    if (ui.curriculumLoading) {
-      return '<div class="tg-curriculum-wrap">' + toolbar + '<div class="tg-card tg-center"><p class="tg-muted">' + icon('hourglass') + ' ' + t('guru.memuat-kurikulum', 'Memuat pohon kurikulum dari FastAPI & MongoDB…') + '</p></div></div>';
-    }
-
-    if (ui.curriculumError) {
-      return '<div class="tg-curriculum-wrap">' + toolbar + '<div class="tg-card tg-center tg-card-warn"><h3>' + t('guru.gagal-muat-kurikulum', 'Kurikulum belum terhubung') + '</h3><p class="tg-muted">' + esc(ui.curriculumError) + '</p><div class="tg-actions"><button type="button" class="tg-btn is-primary is-small" data-tg="seed-mapel">' + icon('database') + ' ' + t('guru.coba-seed-mongo', 'Inisialisasi & Seed MongoDB') + '</button><button type="button" class="tg-btn is-ghost is-small" data-tg="refresh-curriculum">' + icon('rotate-cw') + ' ' + t('umum.coba-lagi', 'Coba lagi') + '</button></div></div></div>';
-    }
-
     var tree = ui.curriculumTree || [];
-    if (!tree.length) {
-      return '<div class="tg-curriculum-wrap">' + toolbar + '<div class="tg-card tg-center"><h3>' + t('guru.kurikulum-kosong', 'Bank kurikulum mapel ini belum memiliki data di MongoDB') + '</h3><p class="tg-muted">' + t('guru.silakan-tekan-seed', 'Tekan tombol "Seed 17 Mapel" di atas untuk mengisi database FastAPI & MongoDB secara otomatis.') + '</p><button type="button" class="tg-btn is-primary" data-tg="seed-mapel">' + icon('database') + ' ' + t('guru.semai-sekarang', 'Seed 17 Mapel Sekarang') + '</button></div></div>';
+    /* Fallback mulus ke katalog materi lokal jika pohon server belum dimuat */
+    if (!tree.length && cat && cat.competencies && cat.competencies.length) {
+      tree = cat.competencies.map(function (cp) {
+        return {
+          type: 'competency',
+          code: cp.code,
+          name: cp.name,
+          description: cp.materi,
+          bloom_level: 'C3/C4'
+        };
+      });
+    }
+
+    if (ui.curriculumLoading && !tree.length) {
+      return '<div class="tg-curriculum-wrap">' + toolbar + '<div class="tg-card tg-center"><p class="tg-muted">' + icon('hourglass') + ' ' + t('guru.memuat-kurikulum-silabus', 'Memuat kurikulum & capaian pembelajaran…') + '</p></div></div>';
     }
 
     function renderNode(node) {

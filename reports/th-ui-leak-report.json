@@ -1,6 +1,6 @@
 {
   "schema": "fiezel-th-ui-leak-v1",
-  "generatedAt": "2026-09-20T12:20:05.626Z",
+  "generatedAt": "2026-09-20T12:34:47.285Z",
   "files": {
     "app.js": {
       "leaks": 3,
@@ -411,7 +411,7 @@
           "text": "Latihan ·"
         },
         {
-          "line": 3516,
+          "line": 3518,
           "text": "📖 Kosakata Kunci:"
         }
       ]
