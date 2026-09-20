@@ -279,6 +279,25 @@
     'kurikulum.an-sinyal-over': 'Yakin tapi salah',
     'kurikulum.an-sinyal-careless': 'Ceroboh',
     'kurikulum.an-sinyal-miskon': 'Miskonsepsi',
-    'kurikulum.scrim-tutup': 'Tutup'
+    'kurikulum.scrim-tutup': 'Tutup',
+    /* m025-351 (F7, Rapor Ortu) — dokumen yang sama dibaca guru & murid; naskah lahir
+       dwibahasa di kedua sisi karena renderernya satu modul bersama. */
+    'kurikulum.rapor-png-btn': 'Unduh PNG',
+    'kurikulum.rapor-print-btn': 'Cetak / PDF',
+    'kurikulum.rapor-doc-title': 'Rapor Kompetensi',
+    'kurikulum.rapor-kpi-komp': 'Kompetensi',
+    'kurikulum.rapor-kpi-kuasai': 'Dikuasai',
+    'kurikulum.rapor-kpi-tahan': 'Bertahan',
+    'kurikulum.rapor-kpi-trans': 'Diterapkan',
+    'kurikulum.rapor-kuat': 'Kuat',
+    'kurikulum.rapor-berkembang': 'Berkembang',
+    'kurikulum.rapor-awal': 'Awal',
+    'kurikulum.rapor-tanpa-bukti': 'Belum ada evidence tercatat — mulai satu misi dan paspor akan terisi.',
+    'kurikulum.rapor-kaki': 'Dokumen ini merangkum evidence belajar yang tercatat — bukan nilai karangan.',
+    'kurikulum.rapor-ortu-card-title': 'Rapor untuk orang tua',
+    'kurikulum.rapor-ortu-card-sub': 'Dokumen yang sama dibaca guru — unduh gambar untuk dibagikan, atau cetak.',
+    'kurikulum.rapor-gagal-unduh': 'Gagal membuat gambar. Coba tombol Cetak.',
+    'kurikulum.rapor-gagal-cetak': 'Gagal membuka dialog cetak.',
+    'kurikulum.rapor-modul-hilang': 'Modul berbagi rapor belum termuat. Muat ulang halaman.'
   });
 })();

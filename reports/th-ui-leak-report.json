@@ -1,6 +1,6 @@
 {
   "schema": "fiezel-th-ui-leak-v1",
-  "generatedAt": "2026-09-20T20:31:06.641Z",
+  "generatedAt": "2026-09-20T20:56:45.212Z",
   "files": {
     "app.js": {
       "leaks": 4,
@@ -381,23 +381,23 @@
       "budget": 11,
       "sample": [
         {
-          "line": 18,
+          "line": 20,
           "text": "Fase D (SMP / MTs)"
         },
         {
-          "line": 25,
+          "line": 27,
           "text": "Fase E (SMA / SMK Kelas 10)"
         },
         {
-          "line": 32,
+          "line": 34,
           "text": "Fase F (SMA / SMK Kelas 11 & 12)"
         },
         {
-          "line": 568,
+          "line": 570,
           "text": "Gunakan bagan alur cerita (Story Mountain) 3 kotak: Awal, Masalah, Selesai."
         },
         {
-          "line": 791,
+          "line": 793,
           "text": "Nama spesies tunggal + pasif"
         }
       ]
@@ -480,8 +480,8 @@
     }
   },
   "copyKeys": {
-    "id": 2954,
-    "th": 2956,
+    "id": 2971,
+    "th": 2973,
     "idTanpaTh": 0
   },
   "pass": true

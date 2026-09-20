@@ -255,6 +255,9 @@ jobs:
           # Jangkauan Gelombang 5: zona murid KelasKu dwibahasa (ID_WORDS + t()),
           # label BackNav kurikulum, konsol guru ramah ponsel/keyboard/kurangi-gerak.
           node tests/kurikulum-jangkauan-test.js
+          # Rapor ortu F7: satu modul bersama merender dokumen guru & murid (PNG
+          # Canvas + window.print, sisi klien), keadaan kosong tidak dikarang.
+          node tests/kurikulum-rapor-ortu-test.js
           node tests/question-allocator-test.js
           node tests/bankor-latihan-test.js
           node tests/fiezel-stat-gate-test.js

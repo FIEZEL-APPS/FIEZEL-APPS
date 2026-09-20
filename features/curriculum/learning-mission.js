@@ -257,6 +257,14 @@
           }).join('') +
           (r.next_target ? '<p class="mono" style="color:var(--clay)">Berikutnya: ' + esc(r.next_target) + '</p>' : '') + '</div>';
       }).join('') : '<div class="card"><p class="muted">Belum ada evidence. Mulai satu misi dan paspormu akan terisi.</p></div>') +
+      /* F7 (m025-351): versi murid dari dokumen yang sama — tombolnya memanggil modul
+         bersama yang dipakai guru, jadi narasi + angka tidak pernah menyimpang. */
+      '<div class="card" data-testid="rapor-ortu-card"><p class="kicker">FIEZEL · Learning Passport</p><h3>' +
+      esc(t('kurikulum.rapor-ortu-card-title', 'Rapor untuk orang tua')) + '</h3>' +
+      '<p class="muted">' + esc(t('kurikulum.rapor-ortu-card-sub', 'Dokumen yang sama dibaca guru — unduh gambar untuk dibagikan, atau cetak.')) + '</p>' +
+      '<div class="row" style="gap:8px;flex-wrap:wrap">' +
+      '<button class="btn primary sm" data-a="rapor-png" data-testid="rapor-png-btn">🖼️ ' + esc(t('kurikulum.rapor-png-btn', 'Unduh PNG')) + '</button>' +
+      '<button class="btn ghost sm" data-a="rapor-print" data-testid="rapor-print-btn">🖨️ ' + esc(t('kurikulum.rapor-print-btn', 'Cetak / PDF')) + '</button></div></div>' +
       '<div class="card"><label class="f">Gabung kelas dengan kode guru<input id="joinCode3" placeholder="FZ-XXXXXX" data-testid="join-code-3"></label>' +
       '<button class="btn primary sm" data-a="join" data-testid="join-btn-3">Gabung</button></div></div>';
   }
@@ -277,6 +285,22 @@
     if (a === 'logout') return E.login.logout().then(function () { S.user = null; renderAuth(); });
     if (a === 'go-today') { S.view = 'today'; return loadToday(); }
     if (a === 'go-passport') { S.view = 'passport'; S.passport = null; return render(); }
+    if (a === 'rapor-png' || a === 'rapor-print') {
+      /* F7 (m025-351): ekspor sisi klien dari payload paspor murid sendiri. Tanpa payload
+         tidak ada dokumen — gagal diam lebih buruk daripada tombol yang jujur. */
+      var RS = root.FiezelRaporShare;
+      if (!RS || !S.passport) return;
+      var namaM = (S.passport.student_name || S.passport.name || (S.user && S.user.name));
+      var dok = RS.ringkas({
+        nama: namaM, kelas: S.passport.class_name, mapel: S.passport.subject_name,
+        tanggal: RS.hariIni(), totals: S.passport.totals, rows: S.passport.rows,
+        narasi: RS.narrative(namaM, S.passport.rows, S.passport.open_misconceptions)
+      });
+      if (!dok) return;
+      if (a === 'rapor-png') { if (!RS.unduhPNG(dok)) toast(t('kurikulum.rapor-gagal-unduh', 'Gagal membuat gambar. Coba tombol Cetak.')); }
+      else if (!RS.cetak(dok)) toast(t('kurikulum.rapor-gagal-cetak', 'Gagal membuka dialog cetak.'));
+      return;
+    }
     if (a === 'join') {
       var code = val('joinCode2') || val('joinCode3');
       if (!code) return toast('Masukkan kode kelas.');
