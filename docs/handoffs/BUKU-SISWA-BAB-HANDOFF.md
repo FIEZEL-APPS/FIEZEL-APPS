@@ -136,4 +136,13 @@ Setiap bab memuat:
 4. `materi`: Rincian sub-bab/unit resmi dari Buku Siswa.
 5. `cpRef`: Rujukan judul buku resmi Kemendikbudristek.
 
+## 9. Ekstraksi Tahap 1: Bank Soal Resmi IPA Kelas VII Bab 1 Mendarat (30/30 PASS)
+
+Sebanyak 12 butir soal latihan autentik diekstrak langsung dari lembar latihan dan aktivitas eksperimen Buku Siswa IPA Kelas VII (`IPA_BS_KLS_VII_Rev (1).pdf` hal. 8, 12, 13, 24, 31-35, dan 42):
+- `content/mapel/mapel-ipa-d.json`: Berisi 12 butir soal terverifikasi (4 dasar, 5 sedang, 3 tinggi) dengan `provenance` buku resmi SIBI dan `penyusunButir: "resmi-terverifikasi"`. Kunci jawaban di indeks 0 sebelum diacak di runtime, lengkap dengan pembahasan `why` dan peta miskonsepsi `distractorWhy`.
+- `content/mapel/mapel-ipa-d-th.json`: Sidecar bahasa Thai berparitas 100% dengan kecocokan angka numerik pada opsi yang identik.
+- `features/teacher/fiezel-teacher-shell.js`: Fungsi `adoptBankCompetencies` diperkaya dengan mekanisme merge, menjaga keutuhan 20 bab IPA dan seluruh mapel lainnya.
+- Gerbang `tests/mapel-fase-d-content-test.js` kini menguji bank IPA yang ada dan lulus sempurna: **30/30 PASS**.
+
+
 

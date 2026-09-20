@@ -538,9 +538,16 @@
     try {
       var cat = MAPEL_CATALOG[subjectId];
       if (!cat || !bank || !Array.isArray(bank.competencies) || !bank.competencies.length) return;
-      cat.competencies = bank.competencies.map(function (c) {
-        return { code: c.code, name: c.name, materi: c.materi, grade: c.grade, cpRef: c.cpRef };
-      });
+      var bMap = {};
+      bank.competencies.forEach(function (bc) { bMap[bc.code] = bc; });
+      for (var i = 0; i < cat.competencies.length; i++) {
+        if (bMap[cat.competencies[i].code]) {
+          var bComp = bMap[cat.competencies[i].code];
+          cat.competencies[i].name = bComp.name;
+          cat.competencies[i].materi = bComp.materi;
+          cat.competencies[i].cpRef = bComp.cpRef;
+        }
+      }
     } catch (_) {}
   }
 

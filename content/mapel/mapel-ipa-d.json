@@ -1,0 +1,264 @@
+{
+  "schema": "fiezel-mapel-bank-v1",
+  "subjectId": "IPA",
+  "phase": "fase_d",
+  "provenance": {
+    "dokumen": "Ilmu Pengetahuan Alam untuk SMP/MTs Kelas VII (Edisi Revisi)",
+    "penerbit": "Pusat Perbukuan, Badan Standar, Kurikulum, dan Asesmen Pendidikan, Kementerian Pendidikan, Kebudayaan, Riset, dan Teknologi",
+    "tahun": "2023",
+    "isbn": "978-623-118-457-3",
+    "diperolehDari": "https://buku.kemendikdasmen.go.id",
+    "penyusunButir": "resmi-terverifikasi"
+  },
+  "competencies": [
+    {
+      "code": "KOMP-IPA-D-7-BAB1-01",
+      "grade": 7,
+      "name": "Hakikat Ilmu Sains dan Metode Ilmiah",
+      "materi": "Apa Itu Sains?, Laboratorium IPA & Keselamatan Kerja, Merancang Percobaan, Pengukuran Besaran & Satuan SI, Pelaporan Hasil Percobaan",
+      "cpRef": "Ilmu Pengetahuan Alam untuk SMP/MTs Kelas VII (Edisi Revisi) — Bab 1",
+      "items": [
+        {
+          "id": "ipa-d-7-b1-q01",
+          "difficulty": "dasar",
+          "prompt": "Berdasarkan Buku Siswa IPA Kelas VII (hal. 8), ilmuwan Indonesia Dr. Yogi Ahmad Erlangga berhasil memecahkan persamaan Helmholtz yang sangat berguna dalam bidang sains…",
+          "options": [
+            "Matematika dan Fisika Kebumian (Geofisika untuk eksplorasi minyak bumi)",
+            "Biologi Kelautan untuk konservasi terumbu karang tropis",
+            "Ilmu Tata Surya Astronomi untuk penanggalan orbit satelit",
+            "Farmasi Kedokteran untuk sintesis vaksin antibiotik modern"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Dr. Yogi A. Erlangga menerapkan persamaan matematika gelombang fisika untuk memetakan struktur bawah permukaan bumi pada eksplorasi minyak bumi."
+          },
+          "distractorWhy": {
+            "1": "Bidang biologi kelautan mengkaji ekosistem biota laut hayati, bukan persamaan matematika gelombang fisika bumi.",
+            "2": "Kajian astronomi meneliti benda-benda antariksa dan orbit satelit, bukan struktur lapisan batuan geofisika bumi.",
+            "3": "Farmasi kedokteran berfokus pada formula molekul kimia obat terhadap respons organ biologis makhluk hidup."
+          }
+        },
+        {
+          "id": "ipa-d-7-b1-q02",
+          "difficulty": "dasar",
+          "prompt": "Berdasarkan Buku Siswa IPA Kelas VII (hal. 8), seorang ilmuwan yang memfokuskan penelitiannya pada interaksi timbal balik antarmakhluk hidup dan lingkungan sekitarnya bekerja pada cabang ilmu Sains…",
+          "options": [
+            "Ekologi (cabang Biologi)",
+            "Geologi batuan mineral",
+            "Optika gelombang cahaya",
+            "Termodinamika energi kalor"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Ekologi adalah cabang biologi yang secara spesifik mempelajari pola interaksi antara organisme dengan lingkungan hidupnya."
+          },
+          "distractorWhy": {
+            "1": "Geologi adalah cabang geosains yang mempelajari susunan materi pembentuk bumi dan sejarah perubahannya.",
+            "2": "Optika adalah cabang fisika terapan yang meneliti sifat-sifat perambatan cahaya tampak dan alat optik.",
+            "3": "Termodinamika adalah cabang fisika yang mempelajari perpindahan kalor, usaha mekanis, dan energi sistem."
+          }
+        },
+        {
+          "id": "ipa-d-7-b1-q03",
+          "difficulty": "dasar",
+          "prompt": "Berdasarkan Buku Siswa IPA Kelas VII (hal. 12 Aktivitas 1.4), alat laboratorium manakah yang paling tepat digunakan untuk mengukur volume cairan sebanyak 25 mL dengan teliti?",
+          "options": [
+            "Gelas ukur kaca",
+            "Gelas kimia (beaker)",
+            "Labu Erlenmeyer",
+            "Tabung reaksi standar"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Gelas ukur kaca memiliki garis-garis skala volume presisi yang terkalibrasi khusus untuk pengukuran volume zat cair."
+          },
+          "distractorWhy": {
+            "1": "Gelas kimia terutama digunakan untuk menampung cairan larutan dan hanya memiliki skala estimasi perkiraan kasar.",
+            "2": "Labu Erlenmeyer dirancang untuk proses mencampur bahan atau titrasi kimia, bukan alat ukur volume yang akurat.",
+            "3": "Tabung reaksi digunakan untuk mereaksikan zat kimia dalam jumlah kecil dan tidak memiliki garis ukur volume."
+          }
+        },
+        {
+          "id": "ipa-d-7-b1-q04",
+          "difficulty": "dasar",
+          "prompt": "Berdasarkan Buku Siswa IPA Kelas VII (hal. 12), alat laboratorium yang digunakan untuk mengaduk larutan garam agar cepat larut merata dalam air adalah…",
+          "options": [
+            "Batang pengaduk kaca pejal",
+            "Spatula besi reagen",
+            "Pipet tetes karet kaca",
+            "Kaki tiga baja laboratorium"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Batang pengaduk dari bahan kaca pejal tahan zat kimia digunakan untuk mengaduk campuran agar zat terlarut merata sempurna."
+          },
+          "distractorWhy": {
+            "1": "Spatula besi digunakan untuk mengambil zat padat kristal atau serbuk kimia dari botol wadah penyimpanan.",
+            "2": "Pipet tetes kaca digunakan khusus untuk mengambil dan memindahkan cairan dalam volume tetesan kecil.",
+            "3": "Kaki tiga baja berfungsi sebagai penyangga bejana pemanas di atas api pembakar spiritus atau bunsen."
+          }
+        },
+        {
+          "id": "ipa-d-7-b1-q05",
+          "difficulty": "sedang",
+          "prompt": "Berdasarkan Buku Siswa IPA Kelas VII (hal. 12-13), langkah keselamatan kerja manakah yang WAJIB dilakukan siswa saat memanaskan tabung reaksi berisi larutan di atas pembakar spiritus?",
+          "options": [
+            "Mengarahkan mulut tabung reaksi menjauhi diri sendiri dan orang lain",
+            "Mengarahkan mulut tabung reaksi langsung menghadap ke arah wajah pengamat",
+            "Menutup rapat mulut tabung reaksi menggunakan sumbat karet kedap udara",
+            "Memegang langsung badan tabung reaksi yang dipanaskan memakai telapak tangan"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Mulut tabung reaksi harus selalu diarahkan ke area aman kosong untuk mencegah letupan cairan mendidih mengenai kulit atau wajah."
+          },
+          "distractorWhy": {
+            "1": "Mengarahkan tabung ke arah wajah sangat berbahaya karena uap panas atau percikan kimia dapat mencederai mata.",
+            "2": "Menyumbat tabung reaksi yang sedang dipanaskan akan menaikkan tekanan uap di dalam tabung hingga berisiko pecah meledak.",
+            "3": "Badan tabung reaksi menjadi sangat panas saat terkena nyala api dan wajib dipegang memakai penjepit kayu."
+          }
+        },
+        {
+          "id": "ipa-d-7-b1-q06",
+          "difficulty": "sedang",
+          "prompt": "Berdasarkan Buku Siswa IPA Kelas VII (hal. 13), botol bahan kimia di laboratorium yang memiliki simbol gambar cairan menetes pada tangan hingga berlubang menandakan zat tersebut bersifat…",
+          "options": [
+            "Korosif (dapat merusak jaringan kulit hidup dan mengikis logam)",
+            "Mudah meledak apabila terkena benturan mekanik",
+            "Mudah terbakar oleh percikan api terbuka",
+            "Mengandung radiasi nuklir pengion berbahaya"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Simbol cairan menetes pada tangan atau pelat logam menunjukkan zat bersifat korosif kuat seperti asam sulfat pekat."
+          },
+          "distractorWhy": {
+            "1": "Simbol bahan mudah meledak digambarkan dengan gambar bola meledak dengan serpihan yang berhamburan.",
+            "2": "Simbol bahan mudah terbakar digambarkan dengan lambang kobaran lidah api yang menyala terang.",
+            "3": "Simbol radioaktif digambarkan dengan lambang propeler tiga bilah berputar di sekeliling lingkaran pusat."
+          }
+        },
+        {
+          "id": "ipa-d-7-b1-q07",
+          "difficulty": "sedang",
+          "prompt": "Berdasarkan Buku Siswa IPA Kelas VII (hal. 24 Ayo Uji Kemampuan), manakah rumusan tujuan penyelidikan di bawah ini yang DAPAT diselidiki dengan metode ilmiah secara terukur?",
+          "options": [
+            "Apakah ketebalan senar memengaruhi tinggi-rendahnya frekuensi nada suara yang dihasilkan?",
+            "Apakah mobil berwarna putih terlihat jauh lebih keren dibanding mobil berwarna hitam?",
+            "Apakah alunan musik dangdut lebih enak dinikmati daripada musik beraliran rock?",
+            "Apakah lukisan pemandangan alam memiliki nilai keindahan yang melampaui lukisan abstrak?"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Ketebalan senar dan frekuensi getaran suara merupakan variabel fisik terukur yang dapat diuji secara objektif menggunakan eksperimen empiris."
+          },
+          "distractorWhy": {
+            "1": "Kata 'lebih keren' merupakan penilaian selera personal subjektif yang tidak memiliki besaran ukur satuan ilmiah.",
+            "2": "Kenikmatan mendengarkan alunan musik bergantung pada preferensi subjektif pendengar tanpa tolak ukur sains objektif.",
+            "3": "Penilaian nilai keindahan lukisan merupakan apresiasi estetika seni subjektif yang tidak dapat diukur secara empiris."
+          }
+        },
+        {
+          "id": "ipa-d-7-b1-q08",
+          "difficulty": "sedang",
+          "prompt": "Berdasarkan Buku Siswa IPA Kelas VII (hal. 24), dalam percobaan menyelidiki apakah banyaknya pupuk urea memengaruhi laju pertambahan tinggi tanaman jagung, variabel bebasnya adalah…",
+          "options": [
+            "Takaran atau jumlah pupuk urea yang diberikan ke tanaman",
+            "Pertambahan tinggi batang tanaman jagung yang diukur mingguan",
+            "Volume air penyiraman yang disiramkan setiap pagi",
+            "Intensitas sinar matahari yang menyinari area penanaman"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Variabel bebas adalah faktor perlakuan yang sengaja diubah-ubah nilainya oleh peneliti untuk mengetahui dampaknya pada objek uji."
+          },
+          "distractorWhy": {
+            "1": "Pertambahan tinggi tanaman adalah variabel terikat yang nilainya berubah sebagai akibat dari pemberian takaran pupuk.",
+            "2": "Volume air penyiraman adalah variabel kontrol yang wajib dijaga tetap sama pada seluruh tanaman uji.",
+            "3": "Intensitas cahaya matahari adalah variabel kontrol lingkungan yang harus diseragamkan pada semua pot tanaman."
+          }
+        },
+        {
+          "id": "ipa-d-7-b1-q09",
+          "difficulty": "sedang",
+          "prompt": "Berdasarkan Buku Siswa IPA Kelas VII (hal. 24), agar hasil percobaan pengaruh jenis tanah terhadap kecepatan tumbuh tanaman cabe benar-benar adil dan terpercaya, hal yang WAJIB dijadikan variabel kontrol adalah…",
+          "options": [
+            "Jenis bibit cabe, ukuran wadah pot, volume air penyiraman, dan paparan cahaya",
+            "Jenis tanah yang diisikan ke dalam masing-masing wadah pot",
+            "Laju kecepatan munculnya daun pertama pada bibit cabe",
+            "Tinggi tanaman cabe pada akhir masa pengamatan percobaan"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Variabel kontrol adalah semua faktor luar yang harus disamakan pada semua sampel agar perbedaan murni diakibatkan jenis tanah."
+          },
+          "distractorWhy": {
+            "1": "Jenis tanah adalah variabel bebas yang sengaja dibuat bervariasi untuk diuji perbandingannya.",
+            "2": "Kecepatan munculnya daun pertama adalah variabel terikat respons biologis dari bibit cabe.",
+            "3": "Tinggi akhir tanaman cabe adalah variabel terikat hasil pengukuran efek dari jenis tanah."
+          }
+        },
+        {
+          "id": "ipa-d-7-b1-q10",
+          "difficulty": "tinggi",
+          "prompt": "Berdasarkan Buku Siswa IPA Kelas VII (hal. 31-33), pasangan besaran pokok Sistem Internasional (SI) beserta satuan bakunya yang benar adalah…",
+          "options": [
+            "Massa (kilogram), Waktu (sekon), dan Suhu (kelvin)",
+            "Berat (newton), Waktu (menit), dan Suhu (derajat celsius)",
+            "Volume (liter), Panjang (meter), dan Massa (gram)",
+            "Kecepatan (meter per sekon), Kuat Arus (ampere), dan Usaha (joule)"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Besaran pokok SI yang diakui secara internasional meliputi panjang (m), massa (kg), waktu (s), suhu (K), kuat arus (A), dsb."
+          },
+          "distractorWhy": {
+            "1": "Berat adalah besaran turunan dari gaya gravitasi, menit bukan satuan SI waktu, dan derajat celsius bukan satuan SI suhu.",
+            "2": "Volume adalah besaran turunan panjang berdimensi kubik, dan satuan SI baku untuk besaran massa adalah kilogram.",
+            "3": "Kecepatan dan usaha adalah besaran turunan, bukan termasuk dalam kelompok tujuh besaran pokok SI."
+          }
+        },
+        {
+          "id": "ipa-d-7-b1-q11",
+          "difficulty": "tinggi",
+          "prompt": "Berdasarkan Buku Siswa IPA Kelas VII (hal. 35), sebuah batu tak beraturan dimasukkan ke dalam gelas ukur berisi 50 mL air sehingga permukaan air naik menjadi 78 mL. Volume batu tersebut adalah…",
+          "options": [
+            "28 mL (28 cm³)",
+            "128 mL (128 cm³)",
+            "50 mL (50 cm³)",
+            "78 mL (78 cm³)"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Volume batu dihitung dari selisih kenaikan cairan: Volume akhir dikurangi volume awal = 78 mL - 50 mL = 28 mL setara 28 cm³."
+          },
+          "distractorWhy": {
+            "1": "Nilai 128 mL keliru karena menjumlahkan volume air awal dengan volume campuran air dan batu (50 mL + 78 mL).",
+            "2": "Nilai 50 mL adalah pembacaan volume air mula-mula sebelum batu dimasukkan ke dalam gelas ukur.",
+            "3": "Nilai 78 mL adalah volume total gabungan air dan batu di dalam gelas ukur, bukan volume batu semata."
+          }
+        },
+        {
+          "id": "ipa-d-7-b1-q12",
+          "difficulty": "tinggi",
+          "prompt": "Berdasarkan Buku Siswa IPA Kelas VII (hal. 42 Ayo Uji Kemampuan), Dian memanaskan air dari suhu awal 28°C dan mencatat: menit ke-1 (35°C), menit ke-2 (42°C), menit ke-3 (49°C). Rata-rata laju kenaikan suhu air per menit adalah…",
+          "options": [
+            "7°C per menit",
+            "14°C per menit",
+            "21°C per menit",
+            "28°C per menit"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Kenaikan suhu: 35-28=7°C, 42-35=7°C, 49-42=7°C. Laju kenaikan suhu air stabil dan konstan sebesar 7°C setiap menitnya."
+          },
+          "distractorWhy": {
+            "1": "Nilai 14°C merupakan kenaikan suhu kumulatif selama rentang dua menit pengamatan (42°C - 28°C).",
+            "2": "Nilai 21°C adalah total pertambahan suhu selama tiga menit pemanasan penuh (49°C - 28°C).",
+            "3": "Nilai 28°C merupakan suhu awal air dingin sebelum proses pemanasan di atas api pembakar dimulai."
+          }
+        }
+      ]
+    }
+  ]
+}
