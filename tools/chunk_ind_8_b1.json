@@ -1,0 +1,249 @@
+{
+  "code": "KOMP-IND-D-8-BAB1-01",
+  "grade": 8,
+  "name": "Bab 1: Laporan Hasil Observasi",
+  "materi": "Memahami Teks Laporan Hasil Observasi (LHO), Struktur Teks LHO (Pernyataan Umum, Deskripsi Bagian, Manfaat), Unsur Kebahasaan Teks LHO",
+  "cpRef": "Bahasa Indonesia untuk SMP/MTs Kelas VIII (Edisi Revisi)",
+  "items": [
+    {
+      "id": "ind-d-8-b1-q01",
+      "difficulty": "dasar",
+      "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VIII (hal. 6-10 Teks 'Sepeda Motor di Indonesia'), tujuan utama penulisan teks Laporan Hasil Observasi (LHO) adalah…",
+      "options": [
+        "Satu cara untuk menyampaikan informasi secara objektif berdasarkan pengamatan atau pengujian sistematis di lapangan",
+        "Menceritakan kisah fantasi rekaan penulis",
+        "Mempengaruhi pembaca agar membeli barang dagangan",
+        "Menjelaskan langkah-langkah membuat kerajinan tangan"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Teks LHO menyampaikan fakta objektif hasil pengamatan faktual lapangan tanpa opini subjektif."
+      },
+      "distractorWhy": {
+        "1": "Teks fiksi fantasi.",
+        "2": "Teks persuasi/iklan.",
+        "3": "Teks prosedur."
+      }
+    },
+    {
+      "id": "ind-d-8-b1-q02",
+      "difficulty": "sedang",
+      "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VIII (hal. 12 Struktur LHO), bagian struktur teks LHO yang memuat pembukaan, pengertian umum, dan pengelompokan awal objek yang diamati dinamakan…",
+      "options": [
+        "Pernyataan umum / Klasifikasi awal",
+        "Deskripsi bagian",
+        "Deskripsi manfaat",
+        "Penutup cerita"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Pernyataan umum berisi batasan definisi awal dan pengategorian objek pengamatan."
+      },
+      "distractorWhy": {
+        "1": "Deskripsi bagian merinci ciri fisik.",
+        "2": "Deskripsi manfaat merinci fungsi.",
+        "3": "Penutup bukan istilah baku LHO."
+      }
+    },
+    {
+      "id": "ind-d-8-b1-q03",
+      "difficulty": "sedang",
+      "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VIII (hal. 18 Kebahasaan), kata kerja relasional yang sering digunakan dalam pembuka teks LHO untuk mendefinisikan objek adalah…",
+      "options": [
+        "Merupakan, adalah, dan yaitu",
+        "Mendorong, menarik, dan menendang",
+        "Berjalan, berlari, dan melompat",
+        "Sangat, amat, dan sekali"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Kata kerja relasional (kopula) berfungsi menyambungkan subjek dengan definisi keterangannya."
+      },
+      "distractorWhy": {
+        "1": "Kata kerja aksi fisik.",
+        "2": "Kata kerja lokomotor.",
+        "3": "Adverbia penguat."
+      }
+    },
+    {
+      "id": "ind-d-8-b1-q04",
+      "difficulty": "tinggi",
+      "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VIII (hal. 22), bagian deskripsi manfaat dalam laporan hasil observasi tentang lidah buaya berisi uraian mengenai…",
+      "options": [
+        "Khasiat dan kegunaan gel lidah buaya untuk obat luka bakar serta bahan kosmetik",
+        "Ciri warna hijau dan bentuk daun berduri lidah buaya",
+        "Asal-usul nama latin Aloe vera",
+        "Harga jual lidah buaya di pasar hias"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Deskripsi manfaat menguraikan nilai guna dan faedah objek observasi bagi manusia/lingkungan."
+      },
+      "distractorWhy": {
+        "1": "Bagian deskripsi fisik.",
+        "2": "Bagian pernyataan umum.",
+        "3": "Informasi pasar komersial."
+      }
+    },
+    {
+      "id": "ind-d-8-b1-q05",
+      "difficulty": "dasar",
+      "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VIII (hal. 14), teks Laporan Hasil Observasi harus bersifat ilmiah dan objektif, artinya…",
+      "options": [
+        "Ditulis berdasarkan data fakta yang sebenarnya tanpa dipengaruhi pendapat pribadi atau imajinasi penulis",
+        "Diisi dengan prasangka dan emosi pribadi",
+        "Menggunakan bahasa kiasan puisi Melayu",
+        "Mengabaikan hasil pengamatan di lapangan"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Objektif berarti data laporan sesuai kenyataan fakta yang diukur di lapangan."
+      },
+      "distractorWhy": {
+        "1": "Prasangka bertentangan dengan sains.",
+        "2": "Bahasa puisi untuk karya sastra.",
+        "3": "Pengamatan adalah sumber utama."
+      }
+    },
+    {
+      "id": "ind-d-8-b1-q06",
+      "difficulty": "sedang",
+      "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VIII (hal. 26 Uji Kemampuan), kalimat berikut yang merupakan kalimat definisi dalam teks LHO adalah…",
+      "options": [
+        "Bendi adalah kendaraan bermesin tarik hewan kuda yang biasa digunakan di Minangkabau.",
+        "Sungguh elok pemandangan di sore hari itu.",
+        "Ayo kita naik bendi bersama-sama!",
+        "Mengapa bendi itu berjalan sangat lambat?"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Kalimat definisi menjelaskan pengertian umum objek menggunakan verba 'adalah'."
+      },
+      "distractorWhy": {
+        "1": "Kalimat deskripsi kualitatif opini.",
+        "2": "Kalimat ajakan/persuasi.",
+        "3": "Kalimat tanya."
+      }
+    },
+    {
+      "id": "ind-d-8-b1-q07",
+      "difficulty": "tinggi",
+      "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VIII (hal. 28), perbedaan utama antara teks Laporan Hasil Observasi dengan teks Deskripsi terletak pada…",
+      "options": [
+        "LHO menggambarkan objek secara umum dan klasifikasi sistematis, sedangkan Teks Deskripsi menggambarkan objek individual secara spesifik",
+        "LHO berupa fiksi, Teks Deskripsi berupa fakta",
+        "LHO hanya berupa gambar tanpa teks",
+        "Teks Deskripsi ditulis oleh ilmuwan luar negeri"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "LHO membahas kelompok objek universal (misal: 'Sepeda Motor'), sedangkan deskripsi melukiskan objek tertentu (misal: 'Sepeda Motor Merah Pak Budi')."
+      },
+      "distractorWhy": {
+        "1": "Keduanya berbasis fakta.",
+        "2": "LHO memuat teks laporan ilmiah.",
+        "3": "Penulis teks bebas."
+      }
+    },
+    {
+      "id": "ind-d-8-b1-q08",
+      "difficulty": "dasar",
+      "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VIII (hal. 16), kata ilmiah istilah biologi untuk merujuk pada keanekaragaman flora dan fauna dalam teks LHO adalah…",
+      "options": [
+        "Biodiversitas",
+        "Ekosistemik",
+        "Fotosintetik",
+        "Metabolis"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Biodiversitas merujuk pada keanekaragaman hayati makhluk hidup."
+      },
+      "distractorWhy": {
+        "1": "Ekosistemik tatanan lingkungan.",
+        "2": "Fotosintetik proses cahaya.",
+        "3": "Metabolis proses zat."
+      }
+    },
+    {
+      "id": "ind-d-8-b1-q09",
+      "difficulty": "sedang",
+      "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VIII (hal. 20), penggunaan imbuhan pen-an yang tepat pada kata dasar 'darat' membentuk kata…",
+      "options": [
+        "Pendaratan",
+        "Pen-daratan",
+        "Pengdarat",
+        "Penyadarat"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Imbuhan konfiks pe-an pada 'darat' membentuk nomina 'pendaratan'."
+      },
+      "distractorWhy": {
+        "1": "Tanda hubung salah.",
+        "2": "Alomor salah.",
+        "3": "Alomor salah."
+      }
+    },
+    {
+      "id": "ind-d-8-b1-q10",
+      "difficulty": "tinggi",
+      "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VIII (hal. 30 Uji Kompetensi), langkah pertama dalam menyusun laporan hasil observasi adalah…",
+      "options": [
+        "Menentukan topik objek yang akan diamati dan menyusun jadwal observasi",
+        "Langsung menulis simpulan di akhir",
+        "Membuat hiasan sampul buku",
+        "Menjual hasil laporan ke media"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Menentukan objek observasi adalah tahap perencanaan paling awal."
+      },
+      "distractorWhy": {
+        "1": "Simpulan dibuat paling akhir.",
+        "2": "Hiasan sampul sekunder.",
+        "3": "Menjual laporan di luar proses ilmiah."
+      }
+    },
+    {
+      "id": "ind-d-8-b1-q11",
+      "difficulty": "dasar",
+      "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VIII (hal. 24), paragraf yang gagasan utamanya terletak di awal paragraf dinamakan paragraf…",
+      "options": [
+        "Deduktif",
+        "Induktif",
+        "Campuran",
+        "Ineratif"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Paragraf deduktif menempatkan kalimat utama di awal diawali gagasan umum."
+      },
+      "distractorWhy": {
+        "1": "Induktif gagasan di akhir.",
+        "2": "Campuran di awal dan akhir.",
+        "3": "Ineratif di tengah."
+      }
+    },
+    {
+      "id": "ind-d-8-b1-q12",
+      "difficulty": "sedang",
+      "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VIII (hal. 32), tanda baca koma (,) digunakan dalam teks LHO untuk…",
+      "options": [
+        "Memisahkan rincian unsur-unsur dalam suatu pemerincian atau kata penghubung antarklausa",
+        "Mengakhiri kalimat berita",
+        "Menandai pertanyaan narasumber",
+        "Menggantikan tanda petik ganda"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Tanda koma berfungsi memisahkan item rincian atau klausa anak."
+      },
+      "distractorWhy": {
+        "1": "Fungsi tanda titik (.).",
+        "2": "Fungsi tanda tanya (?).",
+        "3": "Fungsi tanda petik (\"\")."
+      }
+    }
+  ]
+}

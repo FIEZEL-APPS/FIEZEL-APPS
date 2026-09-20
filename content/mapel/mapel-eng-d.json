@@ -917,6 +917,255 @@
           }
         }
       ]
+    },
+    {
+      "code": "KOMP-ENG-D-8-BAB1-01",
+      "grade": 8,
+      "name": "Chapter 1: Celebrating Independence Day",
+      "materi": "Describing Past Independence Day Events, Recount Text Structure, Simple Past Tense (Regular & Irregular Verbs), Past Time Connectors",
+      "cpRef": "English for Nusantara untuk SMP/MTs Kelas VII — Chapter 1 (Kelas VIII)",
+      "items": [
+        {
+          "id": "eng-d-8-c1-q01",
+          "difficulty": "dasar",
+          "prompt": "Based on English for Nusantara Grade VIII (pages 15-20 Unit 1 'School Parade'), what event did Monita and her classmates participate in last August 17th?",
+          "options": [
+            "A school parade to celebrate Indonesian Independence Day",
+            "A science fair exhibition at town hall",
+            "A national swimming competition",
+            "A camping trip in the forest"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Monita and her classmates joined the August 17th school parade celebrating Independence Day."
+          },
+          "distractorWhy": {
+            "1": "Science fair not mentioned in Unit 1.",
+            "2": "Swimming competition is in Chapter 2.",
+            "3": "Camping trip is not August 17th event."
+          }
+        },
+        {
+          "id": "eng-d-8-c1-q02",
+          "difficulty": "sedang",
+          "prompt": "Based on English for Nusantara Grade VIII (page 25 Simple Past Tense), choose the correct regular past form of the verb 'join': 'Galang ___ the marble-in-spoon race last week.'",
+          "options": [
+            "joined",
+            "joins",
+            "joining",
+            "will join"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "The regular past tense of 'join' adds -ed ending: 'joined'."
+          },
+          "distractorWhy": {
+            "1": "joins is simple present.",
+            "2": "joining is present continuous.",
+            "3": "will join is future."
+          }
+        },
+        {
+          "id": "eng-d-8-c1-q03",
+          "difficulty": "sedang",
+          "prompt": "Based on English for Nusantara Grade VIII (page 30 Irregular Verbs), choose the correct past form of verb 'win': 'Pipit ___ first place in the sack race contest.'",
+          "options": [
+            "won",
+            "winned",
+            "win",
+            "winning"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "The irregular past tense form of 'win' is 'won'."
+          },
+          "distractorWhy": {
+            "1": "winned is incorrect regularization.",
+            "2": "win is present tense.",
+            "3": "winning is continuous."
+          }
+        },
+        {
+          "id": "eng-d-8-c1-q04",
+          "difficulty": "tinggi",
+          "prompt": "Based on English for Nusantara Grade VIII (page 38 Recount Text Structure), what are the three main parts of a recount text structure?",
+          "options": [
+            "Orientation, Events, and Reorientation",
+            "Goal, Materials, and Steps",
+            "Thesis, Arguments, and Recommendation",
+            "Title, Complication, and Resolution"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "A personal recount text consists of Orientation (who/where/when), Events (chronological past experiences), and Reorientation (feeling/summary)."
+          },
+          "distractorWhy": {
+            "1": "Structure of procedural text.",
+            "2": "Structure of analytical exposition.",
+            "3": "Structure of narrative text."
+          }
+        },
+        {
+          "id": "eng-d-8-c1-q05",
+          "difficulty": "dasar",
+          "prompt": "Based on English for Nusantara Grade VIII (page 22 Unit 3 'Panjat Pinang'), what traditional game involves climbing a slippery greased nut tree pole to grab prizes at the top?",
+          "options": [
+            "Panjat Pinang",
+            "Kelereng (marbles)",
+            "Makan Kerupuk",
+            "Tarik Tambang"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Panjat Pinang is the traditional Independence Day game where teams climb a greased pole for prizes."
+          },
+          "distractorWhy": {
+            "1": "Kelereng is marble race.",
+            "2": "Makan Kerupuk is cracker eating.",
+            "3": "Tarik Tambang is tug of war."
+          }
+        },
+        {
+          "id": "eng-d-8-c1-q06",
+          "difficulty": "sedang",
+          "prompt": "Based on English for Nusantara Grade VIII (page 42 Time Connectors), choose the correct past connector: '___, Made put on his costume. Next, he walked to the school yard.'",
+          "options": [
+            "First",
+            "Finally",
+            "Last year",
+            "Although"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "'First' is the initial time connector used at the start of chronological recount events."
+          },
+          "distractorWhy": {
+            "1": "Finally is at the end.",
+            "2": "Last year is time adverb.",
+            "3": "Although is contrast connector."
+          }
+        },
+        {
+          "id": "eng-d-8-c1-q07",
+          "difficulty": "tinggi",
+          "prompt": "Based on English for Nusantara Grade VIII (page 48 Unit 2 Review), complete the sentence in simple past negative form: 'We ___ win the kerupuk race, but we had a lot of fun.'",
+          "options": [
+            "didn't win",
+            "don't win",
+            "wasn't win",
+            "not winning"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Negative simple past tense uses 'didn't' + base verb: 'didn't win'."
+          },
+          "distractorWhy": {
+            "1": "don't win is present tense.",
+            "2": "wasn't win is ungrammatical.",
+            "3": "not winning lacks auxiliary verb."
+          }
+        },
+        {
+          "id": "eng-d-8-c1-q08",
+          "difficulty": "dasar",
+          "prompt": "Based on English for Nusantara Grade VIII (page 18), what costume did Galang wear during the school parade?",
+          "options": [
+            "A traditional warrior costume with a headpiece",
+            "A doctor white coat",
+            "A chef hat and apron",
+            "A pilot uniform"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Galang wore a traditional Indonesian warrior costume for the cultural parade."
+          },
+          "distractorWhy": {
+            "1": "Doctor coat is not Galang's costume.",
+            "2": "Chef hat is not his parade outfit.",
+            "3": "Pilot uniform is incorrect."
+          }
+        },
+        {
+          "id": "eng-d-8-c1-q09",
+          "difficulty": "sedang",
+          "prompt": "Based on English for Nusantara Grade VIII (page 32), what is the past tense form of 'eat' in the sentence: 'They ___ kerupuk attached to a string.'",
+          "options": [
+            "ate",
+            "eaten",
+            "eats",
+            "eating"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "The irregular simple past tense of 'eat' is 'ate'."
+          },
+          "distractorWhy": {
+            "1": "eaten is past participle.",
+            "2": "eats is simple present.",
+            "3": "eating is present participle."
+          }
+        },
+        {
+          "id": "eng-d-8-c1-q10",
+          "difficulty": "tinggi",
+          "prompt": "Based on English for Nusantara Grade VIII (page 52 Review), read the excerpt: 'Yesterday was August 17th. SMP Merdeka held an Independence Day celebration. All students felt happy.' What is the main feeling expressed in the reorientation?",
+          "options": [
+            "Joyful and proud",
+            "Sad and disappointed",
+            "Angry and frustrated",
+            "Bored and tired"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "The text states 'felt happy' indicating joy and pride in celebrating Independence Day."
+          },
+          "distractorWhy": {
+            "1": "Contradicts 'happy'.",
+            "2": "Contradicts the celebratory mood.",
+            "3": "Contradicts 'happy'."
+          }
+        },
+        {
+          "id": "eng-d-8-c1-q11",
+          "difficulty": "dasar",
+          "prompt": "Based on English for Nusantara Grade VIII (page 28), what is the past form of 'go'?",
+          "options": [
+            "went",
+            "goed",
+            "gone",
+            "going"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "The irregular past tense of 'go' is 'went'."
+          },
+          "distractorWhy": {
+            "1": "goed is incorrect regularization.",
+            "2": "gone is past participle.",
+            "3": "going is present participle."
+          }
+        },
+        {
+          "id": "eng-d-8-c1-q12",
+          "difficulty": "sedang",
+          "prompt": "Based on English for Nusantara Grade VIII (page 35), complete the sentence: 'Pak Rahmansyah ___ a speech at the opening of the school games.'",
+          "options": [
+            "gave",
+            "gives",
+            "given",
+            "giving"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "The simple past tense form of 'give' is 'gave'."
+          },
+          "distractorWhy": {
+            "1": "gives is present.",
+            "2": "given is past participle.",
+            "3": "giving is continuous."
+          }
+        }
+      ]
     }
   ]
 }

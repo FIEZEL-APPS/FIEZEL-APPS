@@ -14,7 +14,7 @@ def save_json(p, d):
     with open(p, "w", encoding="utf-8") as f:
         json.dump(d, f, indent=2, ensure_ascii=False)
 
-# 1. MATEMATIKA
+# 1. MATEMATIKA (Grade 7 Bab 1-4)
 mat_doc = "Matematika untuk SMP/MTs Kelas VII"
 mat_data = {
     "schema": "fiezel-mapel-bank-v1",
@@ -39,7 +39,7 @@ save_json(os.path.join(content_dir, "mapel-mat-d.json"), mat_data)
 print(f"MAT bank assembled with {len(mat_data['competencies'])} competencies.")
 
 
-# 2. BAHASA INDONESIA
+# 2. BAHASA INDONESIA (Grade 7 Bab 1-4 + Grade 8 Bab 1)
 ind_doc = "Bahasa Indonesia untuk SMP/MTs Kelas VII (Edisi Revisi)"
 ind_data = {
     "schema": "fiezel-mapel-bank-v1",
@@ -60,11 +60,17 @@ for b in [1, 2, 3, 4]:
     if c:
         c["cpRef"] = f"{ind_doc} — Bab {b}"
         ind_data["competencies"].append(c)
+
+c_ind_8_b1 = load_json(os.path.join(tools_dir, "chunk_ind_8_b1.json"))
+if c_ind_8_b1:
+    c_ind_8_b1["cpRef"] = f"{ind_doc} — Bab 1 (Kelas VIII)"
+    ind_data["competencies"].append(c_ind_8_b1)
+
 save_json(os.path.join(content_dir, "mapel-ind-d.json"), ind_data)
 print(f"IND bank assembled with {len(ind_data['competencies'])} competencies.")
 
 
-# 3. BAHASA INGGRIS
+# 3. BAHASA INGGRIS (Grade 7 Chapter 1-3 + Grade 8 Chapter 1)
 eng_doc = "English for Nusantara untuk SMP/MTs Kelas VII"
 eng_data = {
     "schema": "fiezel-mapel-bank-v1",
@@ -85,6 +91,12 @@ for c_num in [1, 2, 3]:
     if c:
         c["cpRef"] = f"{eng_doc} — Chapter {c_num}"
         eng_data["competencies"].append(c)
+
+c_eng_8_c1 = load_json(os.path.join(tools_dir, "chunk_eng_8_c1.json"))
+if c_eng_8_c1:
+    c_eng_8_c1["cpRef"] = f"{eng_doc} — Chapter 1 (Kelas VIII)"
+    eng_data["competencies"].append(c_eng_8_c1)
+
 save_json(os.path.join(content_dir, "mapel-eng-d.json"), eng_data)
 print(f"ENG bank assembled with {len(eng_data['competencies'])} competencies.")
 
