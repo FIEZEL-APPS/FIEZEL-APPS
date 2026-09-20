@@ -1575,6 +1575,1642 @@
           }
         }
       ]
+    },
+    {
+      "code": "KOMP-IND-D-8-BAB2-01",
+      "grade": 8,
+      "name": "Bab 2: Iklan, Slogan, dan Poster",
+      "materi": "Mengenal Iklan, Slogan, dan Poster, Ciri Bahasa Persuasif & Imperatif, Struktur Iklan Komersial & Layanan Masyarakat",
+      "cpRef": "Bahasa Indonesia untuk SMP/MTs Kelas VII (Edisi Revisi) — Bab 2 (Kelas VIII)",
+      "items": [
+        {
+          "id": "ind-d-8-b2-q01",
+          "difficulty": "dasar",
+          "prompt": "Menurut Tjiptono (2008) sebagaimana dikutip dalam Buku Siswa Bahasa Indonesia Kelas VIII Edisi Revisi, apakah yang dimaksud dengan iklan?",
+          "options": [
+            "Bentuk komunikasi tidak langsung yang didasarkan pada informasi tentang keunggulan suatu produk untuk mengubah pikiran seseorang agar melakukan pembelian",
+            "Pengumuman langsung di depan umum yang disampaikan oleh penjual tanpa menggunakan media atau visualisasi",
+            "Teks berita resmi yang diterbitkan oleh badan pemerintah untuk menginformasikan kebijakan ekonomi terbaru",
+            "Karya sastra berupa puisi pendek yang bertujuan memberikan nasihat moral bagi khalayak ramai"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Iklan menurut Tjiptono (2008) dalam buku teks didefinisikan sebagai bentuk komunikasi tidak langsung yang didasarkan pada informasi keunggulan produk untuk mengubah pikiran seseorang agar melakukan pembelian."
+          },
+          "distractorWhy": {
+            "1": "Iklan bukan sekadar pengumuman lisan tanpa media, melainkan komunikasi terstruktur yang memanfaatkan media massa atau tempat umum.",
+            "2": "Iklan bukan merupakan teks berita resmi pemerintah tentang kebijakan ekonomi.",
+            "3": "Iklan bukan berupa puisi pendek sastra untuk nasihat moral semata."
+          }
+        },
+        {
+          "id": "ind-d-8-b2-q02",
+          "difficulty": "dasar",
+          "prompt": "Berdasarkan Kamus Besar Bahasa Indonesia (KBBI) yang tercantum dalam Buku Siswa, apakah arti iklan?",
+          "options": [
+            "Pemberitahuan kepada khalayak mengenai barang atau jasa yang dijual, dipasang di media massa atau tempat umum",
+            "Cerita rekaan tentang kehidupan sehari-hari yang diterbitkan dalam majalah mingguan",
+            "Catatan keuangan perbankan yang dipublikasikan secara periodik untuk pemegang saham",
+            "Karangan ilmiah yang memuat hasil penelitian empiris di laboratorium sekolah"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Menurut KBBI dalam buku teks, iklan diartikan sebagai pemberitahuan kepada khalayak mengenai barang atau jasa yang dijual, dipasang di dalam media massa atau di tempat umum."
+          },
+          "distractorWhy": {
+            "1": "Cerita rekaan dalam majalah merupakan karya fiksi atau cerpen, bukan iklan.",
+            "2": "Catatan keuangan perbankan merupakan laporan keuangan perusahaan.",
+            "3": "Karangan ilmiah hasil laboratorium merupakan artikel atau laporan penelitian."
+          }
+        },
+        {
+          "id": "ind-d-8-b2-q03",
+          "difficulty": "dasar",
+          "prompt": "Di dalam Buku Siswa Bahasa Indonesia Kelas VIII Bab 2, iklan dibedakan menjadi dua jenis utama berdasarkan tujuannya, yaitu...",
+          "options": [
+            "Iklan komersial dan iklan nonkomersial",
+            "Iklan cetak dan iklan audiovisual",
+            "Iklan primer dan iklan sekunder",
+            "Iklan lokal dan iklan internasional"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Buku teks membagi iklan menjadi dua jenis utama berdasarkan tujuannya, yaitu iklan komersial (mencari keuntungan atau perdagangan) dan iklan nonkomersial (tidak mencari keuntungan/nonprofit)."
+          },
+          "distractorWhy": {
+            "1": "Cetak dan audiovisual adalah pembagian berdasarkan media penyampaian, bukan jenis utama tujuannya dalam pembahasan subbab.",
+            "2": "Primer dan sekunder bukan pembagian jenis iklan yang dibahas dalam Bab 2.",
+            "3": "Lokal dan internasional merupakan jangkauan geografis, bukan jenis utama berdasarkan tujuannya dalam buku teks."
+          }
+        },
+        {
+          "id": "ind-d-8-b2-q04",
+          "difficulty": "sedang",
+          "prompt": "Perhatikan analisis iklan Kios Pak Jal pada Bab 2. Informasi apakah yang TIDAK dicantumkan secara eksplisit dalam iklan Kios Pak Jal tersebut?",
+          "options": [
+            "Informasi harga sayuran secara spesifik",
+            "Nama kios dan alamat lokasi",
+            "Keunggulan produk bahan masakan segar",
+            "Testimoni dari pelanggan"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Dalam Tabel 2.2 analisis iklan Kios Pak Jal, informasi harga dinyatakan tidak ada karena iklan menyajikan sayuran secara umum, tidak spesifik untuk jenis sayuran tertentu."
+          },
+          "distractorWhy": {
+            "1": "Nama kios dan alamat lokasi tertera di bagian atas iklan.",
+            "2": "Keunggulan produk tertera melalui penjelasan bahwa sayur dan buah langsung diambil dari kebun.",
+            "3": "Testimoni pelanggan tertera melalui penyataan dan foto pelanggan Bu Yati."
+          }
+        },
+        {
+          "id": "ind-d-8-b2-q05",
+          "difficulty": "sedang",
+          "prompt": "Berdasarkan iklan Kedai Cukur Panglima pada Kegiatan 2 Bab 2, jasa apakah yang ditawarkan selain pelayanan cukur di tempat kedai?",
+          "options": [
+            "Melayani panggilan ke rumah, sekolah, dan rumah sakit",
+            "Layanan antar-jemput pelanggan secara gratis",
+            "Penjualan produk minyak rambut impor",
+            "Kursus pelatihan memotong rambut profesional"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Iklan Kedai Cukur Panglima secara eksplisit memuat teks melayani panggilan ke rumah, sekolah, rumah sakit, dan lainnya."
+          },
+          "distractorWhy": {
+            "1": "Iklan tidak mencantumkan fasilitas layanan antar-jemput pelanggan.",
+            "2": "Penjualan produk minyak rambut impor tidak tertera pada teks atau gambar iklan.",
+            "3": "Iklan tersebut tidak menawarkan kursus pelatihan memotong rambut."
+          }
+        },
+        {
+          "id": "ind-d-8-b2-q06",
+          "difficulty": "sedang",
+          "prompt": "Apakah dampak utama jika sebuah iklan komersial menyajikan informasi yang tidak lengkap atau tidak jelas?",
+          "options": [
+            "Menimbulkan kebingungan bagi pembaca sehingga mereka kurang tertarik mengenali produk",
+            "Meningkatkan daya tarik karena pembaca merasa penasaran dan langsung membeli",
+            "Menjadikan biaya pemuatan iklan di media massa menjadi jauh lebih murah",
+            "Menyebabkan produk tersebut otomatis ditarik dari peredaran pasar oleh pemerintah"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Buku teks menjelaskan bahwa iklan yang tidak lengkap akan menimbulkan kebingungan bagi pembaca sehingga membuat mereka kurang tertarik mengenali produk yang diiklankan."
+          },
+          "distractorWhy": {
+            "1": "Informasi yang membingungkan justru menurunkan minat pembaca, bukan meningkatkan pembelian.",
+            "2": "Kelengkapan informasi iklan tidak menentukan tarif biaya pemuatan media.",
+            "3": "Ketidaklengkapan informasi tidak secara otomatis menyebabkan penarikan produk oleh pemerintah."
+          }
+        },
+        {
+          "id": "ind-d-8-b2-q07",
+          "difficulty": "tinggi",
+          "prompt": "Pada analisis perbandingan Iklan Permen Milki 1 dan Iklan Permen Milki 2 di Bab 2, mengapa Iklan Permen Milki 1 dinilai lebih efektif daripada Iklan Permen Milki 2?",
+          "options": [
+            "Iklan 1 menggunakan teks sederhana, gambar anak bergembira, dan sesuai sasaran konsumen anak-anak",
+            "Iklan 1 memuat penjelasan nutrisi susu sapi segar yang sangat panjang dan ilmiah",
+            "Iklan 1 tidak menggunakan gambar sama sekali sehingga pembaca fokus pada tulisan permen",
+            "Iklan 1 memberikan diskon harga sebesar lima puluh persen untuk pembeli pertama"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Tabel 2.8 menjelaskan bahwa Iklan Permen Milki 1 lebih efektif karena memiliki teks sedikit yang mudah dimengerti anak-anak, memuat ekspresi anak bergembira, serta informasi produk yang lengkap."
+          },
+          "distractorWhy": {
+            "1": "Penjelasan nutrisi yang panjang terdapat pada Iklan 2 yang dinilai kurang cocok untuk konsumen anak-anak.",
+            "2": "Iklan 1 menonjolkan gambar permen dan anak yang bergembira dengan warna mencolok.",
+            "3": "Iklan 1 tidak mencantumkan informasi diskon harga lima puluh persen."
+          }
+        },
+        {
+          "id": "ind-d-8-b2-q08",
+          "difficulty": "dasar",
+          "prompt": "Menurut Liliweri (2013) dalam Buku Siswa Bahasa Indonesia Kelas VIII, apakah sifat utama dari iklan layanan masyarakat?",
+          "options": [
+            "Bersifat nonprofit atau tidak mencari keuntungan",
+            "Berfokus pada promosi diskon produk niaga secara besar-besaran",
+            "Bertujuan meningkatkan margin penjualan perusahaan swasta",
+            "Mewajibkan masyarakat membayar retribusi bulanan"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Menurut Liliweri (2013) yang dikutip di subbab C, iklan layanan masyarakat merupakan iklan yang bersifat nonprofit atau tidak mencari keuntungan."
+          },
+          "distractorWhy": {
+            "1": "Promosi diskon produk niaga adalah ciri iklan komersial.",
+            "2": "Meningkatkan margin penjualan adalah tujuan iklan komersial perusahaan.",
+            "3": "Iklan layanan masyarakat bukan sarana penarikan retribusi bulanan."
+          }
+        },
+        {
+          "id": "ind-d-8-b2-q09",
+          "difficulty": "sedang",
+          "prompt": "Pada iklan nonkomersial Asosiasi Bus Kota di Bab 2, siapakah yang dimaksud sebagai penumpang prioritas?",
+          "options": [
+            "Ibu hamil, ibu membawa balita, manula, dan penyandang difabel",
+            "Penumpang yang membeli tiket bus kelas eksekutif dengan harga termahal",
+            "Pelajar yang mengenakan seragam sekolah pada jam berangkat pagi",
+            "Petugas pemeriksa tiket dan pengemudi armada bus kota"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Dalam Gambar 2.10 (iklan Asosiasi Bus Kota), penumpang prioritas ditunjukkan melalui visual dan teks yaitu ibu hamil, ibu dengan balita, manula, dan difabel."
+          },
+          "distractorWhy": {
+            "1": "Penumpang prioritas dalam fasilitas umum tidak didasarkan pada harga tiket eksekutif.",
+            "2": "Pelajar tidak termasuk dalam kelompok penumpang prioritas fasilitas tempat duduk bus.",
+            "3": "Petugas bus merupakan kru operasional, bukan kelompok penumpang prioritas yang dimaksud."
+          }
+        },
+        {
+          "id": "ind-d-8-b2-q10",
+          "difficulty": "dasar",
+          "prompt": "Apakah yang dimaksud dengan poster menurut pembahasan dalam Bab 2 Buku Siswa?",
+          "options": [
+            "Plakat yang dipasang di tempat umum berupa pengumuman atau iklan",
+            "Buku panduan tebal yang dibagikan secara gratis kepada siswa",
+            "Surat kabar harian yang memuat berita politik nasional",
+            "Nota pembayaran resmi setelah melakukan transaksi jual beli"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Dalam subbab C2 dijelaskan bahwa poster adalah plakat yang dipasang di tempat umum (berupa pengumuman atau iklan)."
+          },
+          "distractorWhy": {
+            "1": "Buku panduan tebal bukan merupakan poster.",
+            "2": "Surat kabar harian adalah media cetak berkala.",
+            "3": "Nota pembayaran adalah kuitansi atau bukti transaksi."
+          }
+        },
+        {
+          "id": "ind-d-8-b2-q11",
+          "difficulty": "sedang",
+          "prompt": "Menurut Kamus Besar Bahasa Indonesia (KBBI) sebagaimana dijelaskan dalam subbab D, apakah definisi slogan?",
+          "options": [
+            "Perkataan atau kalimat pendek yang menarik dan mudah diingat untuk mengiklankan sesuatu atau menjelaskan ideologi",
+            "Karangan eksposisi panjang yang memuat data statistik lengkap dari lembaga pemerintah",
+            "Teks berita di koran yang menjelaskan kronologi suatu peristiwa kejahatan",
+            "Surat keputusan resmi yang dikeluarkan oleh pihak berwenang di kepolisian"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "KBBI mengartikan slogan sebagai perkataan atau kalimat pendek yang menarik atau mencolok dan mudah diingat untuk mengiklankan sesuatu atau menjelaskan tujuan ideologi/organisasi."
+          },
+          "distractorWhy": {
+            "1": "Slogan berupa kalimat pendek yang ringkas, bukan karangan eksposisi panjang.",
+            "2": "Teks berita kronologi kejahatan adalah berita kriminal.",
+            "3": "Surat keputusan resmi adalah dokumen hukum atau administrasi."
+          }
+        },
+        {
+          "id": "ind-d-8-b2-q12",
+          "difficulty": "sedang",
+          "prompt": "Perhatikan contoh slogan pada Bus Patas dalam Gambar 2.15: Cepat dan Selamat. Pesan apakah yang ingin disampaikan oleh perusahaan bus melalui slogan tersebut?",
+          "options": [
+            "Bus melaju cepat tetapi tetap memperhatikan keselamatan penumpang",
+            "Bus hanya berjalan lambat agar terhindar dari kecelakaan lalu lintas",
+            "Tarif perjalanan bus sangat mahal karena fasilitas super mewah",
+            "Bus hanya melayani rute perjalanan antarprovinsi di malam hari"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Buku teks menjelaskan bahwa slogan Cepat dan Selamat memberi pesan bahwa bus melaju cepat, tetapi tetap memperhatikan keselamatan penumpang."
+          },
+          "distractorWhy": {
+            "1": "Kata Cepat menunjukkan bus tidak berjalan lambat.",
+            "2": "Slogan tersebut berfokus pada kecepatan dan keselamatan, bukan tingginya tarif.",
+            "3": "Slogan tidak membatasi rute atau waktu malam hari."
+          }
+        },
+        {
+          "id": "ind-d-8-b2-q13",
+          "difficulty": "tinggi",
+          "prompt": "Di antara kalimat-kalimat berikut, manakah yang termasuk contoh slogan berdasarkan latihan Kegiatan 6 di Buku Siswa?",
+          "options": [
+            "Menghubungkan Nusantara, menyatukan Indonesia.",
+            "Sekolah menyediakan tempat parkir sepeda.",
+            "Jam pelajaran sekolah dimulai pukul delapan pagi.",
+            "Pakailah produk ini karena sangat bermanfaat untuk Anda."
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Dalam latihan Kegiatan 6, Menghubungkan Nusantara, menyatukan Indonesia merupakan bentuk slogan karena berupa kalimat pendek yang menarik, mencolok, dan mudah diingat."
+          },
+          "distractorWhy": {
+            "1": "Sekolah menyediakan tempat parkir sepeda adalah kalimat pengumuman biasa.",
+            "2": "Jam pelajaran sekolah dimulai pukul delapan pagi adalah tata tertib/informasi rutin.",
+            "3": "Pakailah produk ini... adalah kalimat ajakan umum tanpa kepadatan karakteristik slogan."
+          }
+        },
+        {
+          "id": "ind-d-8-b2-q14",
+          "difficulty": "sedang",
+          "prompt": "Apakah yang dimaksud dengan kalimat imperatif menurut Alwi, dkk. (2003) dalam subbab E?",
+          "options": [
+            "Kalimat yang menyatakan perintah, larangan, keharusan, suruhan, atau permintaan",
+            "Kalimat yang berisi pujian dan sanjungan terhadap penampilan seseorang",
+            "Kalimat yang menjelaskan teori ilmiah secara mendetail dan sistematis",
+            "Kalimat yang menanyakan kabar dan kondisi kesehatan pendengar"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Menurut Alwi, dkk. (2003) dalam buku teks, kalimat imperatif adalah kalimat yang menyatakan perintah, larangan, keharusan, suruhan, dan permintaan."
+          },
+          "distractorWhy": {
+            "1": "Kalimat pujian adalah kalimat apresiasi.",
+            "2": "Kalimat teori ilmiah adalah kalimat deklaratif/ekspositoris.",
+            "3": "Kalimat menanyakan kabar adalah kalimat interogatif."
+          }
+        },
+        {
+          "id": "ind-d-8-b2-q15",
+          "difficulty": "sedang",
+          "prompt": "Apakah definisi kalimat persuasif sebagaimana dijelaskan dalam Buku Siswa Bab 2?",
+          "options": [
+            "Kalimat yang bersifat membujuk secara halus agar orang yang dibujuk menjadi yakin",
+            "Kalimat yang memaksa pendengar dengan ancaman hukuman pidana",
+            "Kalimat yang menggambarkan objek visual secara rinci dan puitis",
+            "Kalimat yang menolak pendapat orang lain dengan bahasa kasar"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Buku teks mendefinisikan kalimat persuasif sebagai kalimat yang bersifat membujuk secara halus (supaya orang yang dibujuk menjadi yakin)."
+          },
+          "distractorWhy": {
+            "1": "Kalimat persuasif membujuk secara halus, bukan memaksa dengan ancaman.",
+            "2": "Kalimat menggambarkan objek visual adalah kalimat deskripsi.",
+            "3": "Kalimat persuasif menggunakan bahasa yang santun dan halus, bukan menolak dengan kasar."
+          }
+        },
+        {
+          "id": "ind-d-8-b2-q16",
+          "difficulty": "tinggi",
+          "prompt": "Cermatilah ciri-ciri kalimat berikut: (1) Subjek pelaku dihilangkan, (2) Menggunakan kata penegas/ajakan/halus, (3) Diakhiri tanda seru (!) atau tanda tanya (?), (4) Diucapkan dengan intonasi tinggi. Ciri-ciri tersebut merupakan karakteristik dari...",
+          "options": [
+            "Kalimat imperatif",
+            "Kalimat persuasif",
+            "Kalimat deklaratif",
+            "Kalimat interogatif"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Kupas Teori subbab E merinci ciri-ciri kalimat imperatif yaitu subjek dihilangkan, menggunakan penegas/larangan/halus, diakhiri (!) atau (?), dan berintonasi tinggi saat diucapkan."
+          },
+          "distractorWhy": {
+            "1": "Ciri kalimat persuasif lebih menekankan membujuk halus, memengaruhi pembaca, dan pemilihan kata yang santun.",
+            "2": "Kalimat deklaratif diakhiri tanda titik dan menyampaikan berita.",
+            "3": "Kalimat interogatif bertujuan meminta informasi (kalimat tanya)."
+          }
+        },
+        {
+          "id": "ind-d-8-b2-q17",
+          "difficulty": "sedang",
+          "prompt": "Manakah di antara kalimat berikut yang merupakan contoh kalimat persuasif dalam iklan?",
+          "options": [
+            "Mari menjaga lingkungan agar tetap bersih!",
+            "Buanglah sampah pada tempatnya!",
+            "Dilarang merokok di area ruangan ber-AC!",
+            "Matikan lampu sebelum meninggalkan ruangan!"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Kalimat Mari menjaga lingkungan agar tetap bersih! menggunakan kata ajakan halus Mari yang merupakan ciri khas kalimat persuasif."
+          },
+          "distractorWhy": {
+            "1": "Buanglah sampah pada tempatnya! merupakan contoh kalimat imperatif perintah.",
+            "2": "Dilarang merokok... merupakan kalimat imperatif berupa larangan.",
+            "3": "Matikan lampu... merupakan kalimat imperatif suruhan langsung."
+          }
+        },
+        {
+          "id": "ind-d-8-b2-q18",
+          "difficulty": "tinggi",
+          "prompt": "Menurut petunjuk dalam subbab F (Langkah Membuat Iklan), apakah dua langkah pertama yang harus dilakukan oleh seorang pembuat iklan?",
+          "options": [
+            "Kenali keunggulan produk yang diiklankan dan tentukan konsumen produk",
+            "Membeli peralatan kamera mahal dan menyewa gedung pertunjukan",
+            "Mengatur harga setinggi mungkin dan mencetak ribuan brosur",
+            "Meminta bantuan tokoh terkenal untuk membagikan barang gratis"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Dalam Gambar 2.17 dan penjelasan subbab F, dua langkah awal membuat iklan yaitu: 1. Kenali keunggulan produk yang akan diiklankan, dan 2. Tentukan konsumen produk kalian."
+          },
+          "distractorWhy": {
+            "1": "Membeli kamera mahal dan menyewa gedung bukan langkah metodologis awal perancangan iklan.",
+            "2": "Mengatur harga tinggi dan cetak brosur tanpa riset produk dan konsumen bukan langkah dasar dalam buku.",
+            "3": "Meminta bantuan tokoh terkenal membagikan barang gratis bukan langkah perancangan iklan yang diajarkan dalam bab ini."
+          }
+        },
+        {
+          "id": "ind-d-8-b2-q19",
+          "difficulty": "sedang",
+          "prompt": "Dalam rancangan iklan Donat Madu karya Nabila, Ayu, dan Bima pada Tabel 2.13, bagaimana cara penyampaian pesan bahwa Donat madu adalah pilihan tepat?",
+          "options": [
+            "Melalui teks Semua orang suka makanan lezat. Donat madu adalah PILIHAN TEPAT",
+            "Melalui lagu komersial yang diputar berulang-ulang di radio sekolah",
+            "Melalui pembagian sampel donat secara cuma-cuma kepada guru",
+            "Melalui spanduk raksasa yang dipasang di atas gerbang kota"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Dalam Tabel 2.13 (Rancangan Iklan Donat Madu), pesan disampaikan melalui teks tulisan Semua orang suka makanan lezat. Donat madu adalah PILIHAN TEPAT."
+          },
+          "distractorWhy": {
+            "1": "Penyampaian bukan melalui lagu jingle radio sekolah.",
+            "2": "Penyampaian pada tabel perancangan menggunakan teks pada iklan cetak, bukan pembagian sampel donat.",
+            "3": "Penyampaian dalam rancangan Ayu dkk adalah iklan cetak yang disebar di kelas, bukan spanduk kota."
+          }
+        },
+        {
+          "id": "ind-d-8-b2-q20",
+          "difficulty": "tinggi",
+          "prompt": "Jelajah Kata pada Bab 2 memuat beberapa kata serapan dan maknanya dari KBBI. Apakah arti kata bijak dan santun secara berurutan dalam tabel kosakata buku tersebut?",
+          "options": [
+            "Bijak berarti selalu menggunakan akal budi (pandai/mahir), sedangkan santun berarti halus, sabar, tenang, dan sopan",
+            "Bijak berarti cepat marah, sedangkan santun berarti tegas dan keras dalam bertindak",
+            "Bijak berarti memiliki kekayaan berlimpah, sedangkan santun berarti pandai berbicara di depan umum",
+            "Bijak berarti suka memberi barang gratis, sedangkan santun berarti tidak pernah berbicara dengan orang lain"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Tabel Jelajah Kata pada Bab 2 mendefinisikan bijak sebagai selalu menggunakan akal budinya; pandai; mahir dan santun sebagai halus, sabar, tenang, dan sopan."
+          },
+          "distractorWhy": {
+            "1": "Bijak bukan berarti cepat marah dan santun bukan berarti tegas atau keras.",
+            "2": "Bijak tidak berhubungan dengan kekayaan berlimpah.",
+            "3": "Bijak bukan suka memberi barang gratis dan santun bukan berarti tidak pernah berbicara."
+          }
+        }
+      ]
+    },
+    {
+      "code": "KOMP-IND-D-8-BAB3-01",
+      "grade": 8,
+      "name": "Bab 3: Artikel Ilmiah Populer",
+      "materi": "Memahami Artikel Ilmiah Populer, Membedakan Fakta & Opini, Pengumpulan Data, Unsur Kebahasaan: Kata Denotatif & Konjungsi",
+      "cpRef": "Bahasa Indonesia untuk SMP/MTs Kelas VII (Edisi Revisi) — Bab 3 (Kelas VIII)",
+      "items": [
+        {
+          "id": "ind-d-8-b3-q01",
+          "difficulty": "dasar",
+          "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VIII (hal. 91-93), artikel ilmiah populer merupakan karya tulis yang memuat ilmu pengetahuan dan disajikan dengan…",
+          "options": [
+            "Bahasa yang santai, populer, dan mudah dipahami oleh masyarakat awam",
+            "Bahasa latin formal yang hanya dipahami oleh para peneliti di laboratorium",
+            "Bahasa kiasan puisi Melayu klasik yang penuh majas dan perlambangan",
+            "Formula rumus matematika murni tanpa penjelasan kalimat naratif"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Artikel ilmiah populer menyajikan topik pengetahuan ilmiah dengan gaya bahasa populer dan komunikatif agar mudah dipahami pembaca umum."
+          },
+          "distractorWhy": {
+            "1": "Bukan laporan ilmiah murni untuk akademisi.",
+            "2": "Bukan karya sastra puisi.",
+            "3": "Bukan teks formula matematis."
+          }
+        },
+        {
+          "id": "ind-d-8-b3-q02",
+          "difficulty": "dasar",
+          "prompt": "Berdasarkan teks \"Fasilitas Sekolah untuk Peserta Didik Difabel\" pada Buku Siswa Bahasa Indonesia Kelas VIII (hal. 91-93), istilah 'difabel' merupakan kata yang merujuk pada…",
+          "options": [
+            "Peserta didik yang memiliki keterbatasan fisik atau mental tertentu",
+            "Siswa yang selalu mendapat nilai tertinggi di seluruh mata pelajaran",
+            "Tenaga pengajar dan staf administrasi sekolah yang bersertifikasi",
+            "Peserta didik yang tinggal di daerah terluar dan terisolasi"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Difabel (different ability) merujuk pada orang yang memiliki keterbatasan kemampuan fisik maupun mental."
+          },
+          "distractorWhy": {
+            "1": "Istilah tersebut merujuk pada siswa berprestasi.",
+            "2": "Merujuk pada pendidik.",
+            "3": "Merujuk pada kondisi geografis siswa."
+          }
+        },
+        {
+          "id": "ind-d-8-b3-q03",
+          "difficulty": "sedang",
+          "prompt": "Berdasarkan kotak Jelajah Kata dalam Buku Siswa Bahasa Indonesia Kelas VIII (hal. 94), kata 'akomodasi' dalam konteks penyediaan fasilitas difabel di sekolah bermakna…",
+          "options": [
+            "Sesuatu yang disediakan untuk memenuhi kebutuhan dasar atau penyesuaian khusus",
+            "Pembayaran pajak berkala kepada pemerintah daerah",
+            "Kegiatan tamasya bersama seluruh warga sekolah pada akhir semester",
+            "Perlombaan antarruang kelas dalam bidang olahraga dan seni"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Akomodasi berarti sarana penunjang atau penyesuaian yang disediakan untuk memenuhi kebutuhan khusus."
+          },
+          "distractorWhy": {
+            "1": "Merujuk pada kewajiban retribusi.",
+            "2": "Merujuk pada kegiatan wisata.",
+            "3": "Merujuk pada ajang kompetisi."
+          }
+        },
+        {
+          "id": "ind-d-8-b3-q04",
+          "difficulty": "dasar",
+          "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VIII (hal. 99), salah satu ciri utama dari artikel ilmiah populer adalah memuat…",
+          "options": [
+            "Pendapat penulis yang didukung oleh bukti, data, dan alasan yang masuk akal (logis)",
+            "Dongeng rakyat dan kisah fiktif tanpa pendukung fakta nyata",
+            "Puisi berbait-bait yang disusun menggunakan rima A-B-A-B",
+            "Mantra dan ramalan masa depan yang tidak dapat diverifikasi"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Artikel ilmiah populer mengandung gagasan/pandangan penulis yang disertai pembuktian data faktual dan nalar logis."
+          },
+          "distractorWhy": {
+            "1": "Merupakan ciri cerita rekaan/fabel.",
+            "2": "Merupakan struktur karya puisi.",
+            "3": "Merupakan bentuk kepercayaan intuitif."
+          }
+        },
+        {
+          "id": "ind-d-8-b3-q05",
+          "difficulty": "sedang",
+          "prompt": "Berdasarkan analisis ciri-ciri artikel ilmiah populer pada Buku Siswa Bahasa Indonesia Kelas VIII (hal. 99-100), ragam bahasa yang digunakan harus bersifat 'populer'. Hal ini berarti…",
+          "options": [
+            "Menggunakan kata-kata yang mudah dimengerti oleh masyarakat luas dan tidak rumit",
+            "Menggunakan istilah teknis asing tanpa disertai penjelasan atau penerjemahan",
+            "Menggunakan kalimat berbelit-belit yang penuh dengan sandi rahasia",
+            "Menggunakan ragam bahasa daerah purba yang sudah punah"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Bahasa populer ditandai dengan kosakata komunikatif yang familiar bagi publik luas."
+          },
+          "distractorWhy": {
+            "1": "Bahasa ilmiah murni jargon teknis.",
+            "2": "Bentuk penulisan yang tidak komunikatif.",
+            "3": "Ragam bahasa kuno yang tidak dapat dipahami pembaca."
+          }
+        },
+        {
+          "id": "ind-d-8-b3-q06",
+          "difficulty": "dasar",
+          "prompt": "Berdasarkan penjelasan pada Buku Siswa Bahasa Indonesia Kelas VIII (hal. 104-105), kalimat fakta dalam artikel ilmiah populer memiliki ciri utama yaitu…",
+          "options": [
+            "Berisi peristiwa yang benar-benar terjadi, memiliki data objektif, dan dapat dibuktikan kebenarannya",
+            "Berisi tanggapan subjektif dan prasangka pribadi yang belum pernah teruji",
+            "Berisi angan-angan dan harapan penulis mengenai kejadian di masa mendatang",
+            "Menggunakan kata-kata relatif seperti 'mungkin', 'sebaiknya', dan 'kira-kira'"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Fakta menyajikan kejadian nyata yang terverifikasi lewat data angka, tempat, atau hasil pengamatan."
+          },
+          "distractorWhy": {
+            "1": "Ciri khas opini subjektif.",
+            "2": "Bentuk gagasan atau harapan (opini).",
+            "3": "Penggunaan modalitas ketidakpastian dalam opini."
+          }
+        },
+        {
+          "id": "ind-d-8-b3-q07",
+          "difficulty": "dasar",
+          "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VIII (hal. 104-105), pernyataan opini dalam sebuah artikel ilmiah populer ditandai oleh…",
+          "options": [
+            "Pendapat, pikiran, atau pandangan pribadi yang bersifat subjektif dan belum terbukti secara pasti",
+            "Hasil pengukuran laboratorium yang telah disetujui oleh lembaga standar internasional",
+            "Data statistik resmi yang dikeluarkan oleh badan pusat statistik pemerintah",
+            "Tanggal lahir dan lokasi sejarah yang tercatat pada dokumen identitas resmi"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Opini mencerminkan sudut pandang atau pemikiran individual penulis yang sifatnya belum menjadi kepastian universal."
+          },
+          "distractorWhy": {
+            "1": "Hasil laboratorium merupakan fakta eksperimental.",
+            "2": "Data statistik pemerintah merupakan fakta numerik.",
+            "3": "Pencatatan sejarah/identitas adalah fakta historis."
+          }
+        },
+        {
+          "id": "ind-d-8-b3-q08",
+          "difficulty": "sedang",
+          "prompt": "Perhatikan kalimat berikut: \"SMP Merdeka memiliki dua jalur jalan khusus (ramp) yang menghubungkan lantai dasar dengan lantai dua untuk kursi roda.\" Berdasarkan Buku Siswa Bahasa Indonesia Kelas VIII (hal. 105), kalimat tersebut tergolong fakta karena…",
+          "options": [
+            "Menyatakan keberadaan fasilitas fisik nyata yang dapat dilihat, dihitung, dan dibuktikan di lapangan",
+            "Menggambarkan perasaan pribadi siswa terhadap kondisi sekolah",
+            "Memuat saran agar sekolah segera membangun jalan khusus kursi roda",
+            "Menggunakan kata-kata penilaian seperti 'sangat indah' dan 'amat megah'"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Kalimat tersebut memuat keberadaan fisik yang dapat diverifikasi kebenarannya secara nyata."
+          },
+          "distractorWhy": {
+            "1": "Bukan ekspresi emosi/perasaan.",
+            "2": "Bukan kalimat imbauan/rekomendasi.",
+            "3": "Tidak memuat kata sifat subjektif."
+          }
+        },
+        {
+          "id": "ind-d-8-b3-q09",
+          "difficulty": "tinggi",
+          "prompt": "Di antara kalimat-kalimat berikut, manakah yang merupakan bentuk 'opini' berdasarkan kaidah penulisan artikel ilmiah populer (Buku Siswa Kelas VIII hal. 104-106)?",
+          "options": [
+            "\"Fasilitas untuk peserta didik difabel di sekolah ini tampaknya masih perlu ditingkatkan lagi.\"",
+            "\"Jumlah siswa difabel di SMP Merdeka pada tahun ajaran ini berjumlah empat orang.\"",
+            "\"Kepala Sekolah meresmikan ruang perpustakaan inklusif pada tanggal 10 Mei 2023.\"",
+            "\"Gedung sekolah tersebut memiliki lima ruang kelas yang terletak di lantai dasar.\""
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Kata 'tampaknya' dan 'perlu ditingkatkan lagi' menunjukkan penilaian subjektif dan saran yang tergolong opini."
+          },
+          "distractorWhy": {
+            "1": "Merupakan fakta jumlah angka pasti.",
+            "2": "Merupakan fakta tanggal dan peristiwa sejarah.",
+            "3": "Merupakan fakta jumlah dan tata letak fisik."
+          }
+        },
+        {
+          "id": "ind-d-8-b3-q10",
+          "difficulty": "sedang",
+          "prompt": "Berdasarkan penjelasan unsur kebahasaan pada Buku Siswa Bahasa Indonesia Kelas VIII (hal. 108), kata 'denotatif' yang wajib digunakan dalam artikel ilmiah populer adalah kata yang…",
+          "options": [
+            "Memiliki arti lugas, sebenarnya, dan tidak mengandung makna kiasan atau kias",
+            "Mempunyai arti kiasan yang tersirat dan tergantung pada perasaan pembaca",
+            "Mengandung makna ganda atau ambigu yang membingungkan masyarakat",
+            "Berasal dari bahasa peribahasa kuno yang bermakna konotatif tinggi"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Kata denotatif adalah kata bermakna eksplisit/sebenarnya (konseptual) agar informasi ilmiah disampaikan secara jernih."
+          },
+          "distractorWhy": {
+            "1": "Definisi dari kata konotatif.",
+            "2": "Karakteristik bahasa ambigu yang dihindari.",
+            "3": "Definisi makna ungkapan/kiasan."
+          }
+        },
+        {
+          "id": "ind-d-8-b3-q11",
+          "difficulty": "tinggi",
+          "prompt": "Perhatikan kalimat: \"Ibu guru memegang tangan siswa difabel itu saat menyeberangi jalan.\" Kata 'memegang' dalam kalimat tersebut bermakna denotatif karena…",
+          "options": [
+            "Merujuk pada tindakan fisik nyata menyentuh atau menggenggam dengan jemari tangan",
+            "Memiliki arti kiasan memegang jabatan atau posisi penting di sekolah",
+            "Berarti menguasai seluruh harta benda dan fasilitas fisik sekolah",
+            "Mengandung makna kiasan menyimpan rahasia pribadi orang lain"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Makna denotatif kata 'memegang' adalah aktivitas fisik menggenggam bagian tubuh/benda secara harfiah."
+          },
+          "distractorWhy": {
+            "1": "Makna kiasan untuk jabatan.",
+            "2": "Makna kiasan kepemilikan/kekuasaan.",
+            "3": "Makna kiasan menjaga rahasia."
+          }
+        },
+        {
+          "id": "ind-d-8-b3-q12",
+          "difficulty": "dasar",
+          "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VIII (hal. 109-110), teknik pengumpulan data artikel ilmiah populer melalui kegiatan tanya jawab langsung dengan narasumber dinamakan…",
+          "options": [
+            "Wawancara",
+            "Kuesioner",
+            "Studi Pustaka",
+            "Eksperimen laboratorium"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Wawancara dilakukan dengan mengajukan pertanyaan secara lisan langsung kepada narasumber ahli atau terkait."
+          },
+          "distractorWhy": {
+            "1": "Kuesioner menggunakan lembar pertanyaan tertulis.",
+            "2": "Studi pustaka membaca sumber tulisan.",
+            "3": "Eksperimen melakukan pengujian ilmiah."
+          }
+        },
+        {
+          "id": "ind-d-8-b3-q13",
+          "difficulty": "sedang",
+          "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VIII (hal. 110), apabila seorang penulis membagikan daftar pertanyaan tertulis kepada puluhan responden untuk mengetahui pendapat mereka, metode pengumpulan data yang digunakan adalah…",
+          "options": [
+            "Kuesioner (angket)",
+            "Wawancara mendalam",
+            "Obrolan santai tanpa catatan",
+            "Studi dokumen arsip tua"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Kuesioner atau angket berupa lembar instrumen tertulis yang diisi oleh responden."
+          },
+          "distractorWhy": {
+            "1": "Wawancara dilakukan secara lisan tatap muka.",
+            "2": "Obrolan informal bukan metode sistematis.",
+            "3": "Studi dokumen mengkaji arsip bacaan."
+          }
+        },
+        {
+          "id": "ind-d-8-b3-q14",
+          "difficulty": "sedang",
+          "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VIII (hal. 111), pengumpulan data artikel ilmiah populer yang dilakukan dengan cara membaca buku, artikel jurnal, atau dokumen resmi disebut…",
+          "options": [
+            "Studi pustaka",
+            "Wawancara narasumber",
+            "Survei lapangan tertutup",
+            "Pengamatan lingkungan hidup"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Studi pustaka memanfaatkan sumber-sumber literatur ilmiah, buku, cetakan, atau bahan digital terpercaya."
+          },
+          "distractorWhy": {
+            "1": "Melibatkan dialog lisan dengan orang.",
+            "2": "Melibatkan penyebaran lembar angket.",
+            "3": "Melibatkan pengamatan fisik langsung."
+          }
+        },
+        {
+          "id": "ind-d-8-b3-q15",
+          "difficulty": "sedang",
+          "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VIII (hal. 113), kalimat perbandingan digunakan untuk membandingkan dua hal yang memiliki perbedaan atau persamaan. Kata penanda perbandingan yang tepat adalah…",
+          "options": [
+            "Seperti, bagaikan, daripada, dan sama halnya",
+            "Oleh karena itu, sebab, dan akibatnya",
+            "Kemudian, setelah itu, dan selanjutnya",
+            "Meskipun, walaupun, dan kendati demikian"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Kata 'seperti', 'bagaikan', 'daripada', dan 'sama halnya' berfungsi membandingkan dua objek atau kondisi."
+          },
+          "distractorWhy": {
+            "1": "Konjungsi hubungan kausalitas (sebab-akibat).",
+            "2": "Konjungsi urutan waktu (kronologis).",
+            "3": "Konjungsi pertentangan (konsesif)."
+          }
+        },
+        {
+          "id": "ind-d-8-b3-q16",
+          "difficulty": "tinggi",
+          "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VIII (hal. 114), kalimat analogi berfungsi membandingkan dua hal yang berbeda tetapi memiliki kesamaan sifat atau fungsi untuk memperjelas pemahaman pembaca. Contoh kalimat analogi yang tepat adalah…",
+          "options": [
+            "\"Otak manusia bekerja mirip dengan unit pemrosesan pusat (CPU) pada komputer.\"",
+            "\"Jumlah ruang kelas di SMP Merdeka lebih banyak daripada jumlah ruang laboratorium.\"",
+            "\"Siswa kelas VIII menyukai pelajaran bahasa Indonesia daripada pelajaran matematika.\"",
+            "\"Sekolah tersebut dibangun pada tahun 2005 di atas tanah seluas dua hektar.\""
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Kalimat tersebut menganalogikan mekanisme kerja otak dengan CPU komputer untuk mempermudah pemahaman fungsi dasarnya."
+          },
+          "distractorWhy": {
+            "1": "Kalimat perbandingan komparatif kuantitas.",
+            "2": "Kalimat perbandingan preferensi/selera.",
+            "3": "Kalimat fakta historis dan spasial."
+          }
+        },
+        {
+          "id": "ind-d-8-b3-q17",
+          "difficulty": "sedang",
+          "prompt": "Berdasarkan penjelasan unsur kebahasaan pada Buku Siswa Bahasa Indonesia Kelas VIII (hal. 115-116), konjungsi yang berfungsi menghubungkan alasan dengan dampak terjadinya suatu peristiwa dinamakan konjungsi…",
+          "options": [
+            "Sebab-akibat (kausalitas)",
+            "Urutan waktu (kronologis)",
+            "Pertentangan (adversatif)",
+            "Pengandaian (kondisional)"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Konjungsi sebab-akibat (seperti 'karena', 'sebab', 'sehingga', 'oleh karena itu') menerangkan hubungan kausal antara peristiwa dan dampaknya."
+          },
+          "distractorWhy": {
+            "1": "Menghubungkan urutan temporal.",
+            "2": "Menghubungkan dua hal yang berlawanan.",
+            "3": "Menghubungkan syarat atau kemungkinan."
+          }
+        },
+        {
+          "id": "ind-d-8-b3-q18",
+          "difficulty": "tinggi",
+          "prompt": "Perhatikan kalimat: \"Fasilitas jalan ramp belum dibangun di gedung belakang, […] siswa yang menggunakan kursi roda kesulitan menuju laboratorium IPA.\" Konjungsi sebab-akibat yang paling tepat untuk melengkapi bagian rumpang tersebut (Buku Siswa Kelas VIII hal. 115) adalah…",
+          "options": [
+            "Sehingga",
+            "Seandainya",
+            "Walaupun",
+            "Melainkan"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "'Sehingga' menandakan akibat atau dampak dari belum dibangunnya fasilitas jalan ramp."
+          },
+          "distractorWhy": {
+            "1": "Konjungsi syarat/pengandaian.",
+            "2": "Konjungsi pertentangan.",
+            "3": "Konjungsi korelatif/koreksi."
+          }
+        },
+        {
+          "id": "ind-d-8-b3-q19",
+          "difficulty": "dasar",
+          "prompt": "Berdasarkan penjelasan langkah-langkah menulis artikel ilmiah populer pada Buku Siswa Bahasa Indonesia Kelas VIII (hal. 118-119), langkah paling awal yang harus dilakukan oleh seorang penulis sebelum mengumpulkan data adalah…",
+          "options": [
+            "Menentukan topik dan tujuan penulisan artikel",
+            "Menulis naskah akhir dan mempublikasikannya di media cetak",
+            "Menyunting ejaan dan tanda baca dalam teks orang lain",
+            "Menggambar ilustrasi sampul depan artikel ilmiah"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Langkah awal sebelum menulis adalah memilih topik yang jelas serta menetapkan tujuan penulisan."
+          },
+          "distractorWhy": {
+            "1": "Merupakan tahap akhir (publikasi).",
+            "2": "Merupakan tahap penyuntingan (editing).",
+            "3": "Merupakan kegiatan desain grafis penunjang."
+          }
+        },
+        {
+          "id": "ind-d-8-b3-q20",
+          "difficulty": "sedang",
+          "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VIII (hal. 120), tahap akhir dalam proses penulisan artikel ilmiah populer sebelum dipublikasikan adalah 'menyunting', yang bertujuan untuk…",
+          "options": [
+            "Memeriksa dan memperbaiki kesalahan ejaan, tata bahasa, serta kebenaran data dalam draft artikel",
+            "Merubah seluruh isi topik tulisan menjadi cerita fiksi dongeng",
+            "Menghapus semua data angka dan grafik yang telah dikumpulkan",
+            "Mengganti judul artikel dengan judul karya sastra lama"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Menyunting bertujuan menyempurnakan tulisan agar bebas dari kekeliruan kebahasaan, ejaan, maupun fakta ilmiah."
+          },
+          "distractorWhy": {
+            "1": "Mengubah jenis teks bukan tujuan penyuntingan.",
+            "2": "Menghapus data ilmiah merusak bobot fakta artikel.",
+            "3": "Mengganti judul tanpa relevansi tidak logis."
+          }
+        }
+      ]
+    },
+    {
+      "code": "KOMP-IND-D-8-BAB4-01",
+      "grade": 8,
+      "name": "Bab 4: Teks Ulasan Karya Fiksi",
+      "materi": "Memahami Teks Ulasan Novel & Cerpen, Struktur Teks Ulasan (Identitas, Orientasi, Sinopsis, Evaluasi), Unsur Kebahasaan Teks Ulasan",
+      "cpRef": "Bahasa Indonesia untuk SMP/MTs Kelas VII (Edisi Revisi) — Bab 4 (Kelas VIII)",
+      "items": [
+        {
+          "id": "ind-d-8-b4-q01",
+          "difficulty": "dasar",
+          "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VIII (hal. 126), pengertian karya fiksi (sastra) menurut Suharianto (2005) adalah…",
+          "options": [
+            "Karya hasil perpaduan antara perasaan dan pikiran",
+            "Cerita yang sepenuhnya berisi fakta sejarah ilmiah tanpa rekaan",
+            "Tulisan berita aktual yang disiarkan melalui media massa",
+            "Karya nonfiksi yang berisi petunjuk pembuatan suatu benda"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Suharianto (2005) mendefinisikan karya fiksi (sastra) sebagai karya hasil perpaduan antara perasaan dan pikiran."
+          },
+          "distractorWhy": {
+            "1": "Fakta sejarah ilmiah merupakan ciri tulisan nonfiksi.",
+            "2": "Tulisan berita merupakan contoh teks informatif nonfiksi.",
+            "3": "Petunjuk pembuatan benda adalah teks prosedur nonfiksi."
+          }
+        },
+        {
+          "id": "ind-d-8-b4-q02",
+          "difficulty": "dasar",
+          "prompt": "Menurut Wellek dan Warren (2009) yang dikutip dalam Buku Siswa Bahasa Indonesia Kelas VIII (hal. 126), karya fiksi didefinisikan sebagai…",
+          "options": [
+            "Cerita atau latar yang bersumber dari imajinasi",
+            "Laporan pengamatan ilmiah yang dilakukan di laboratorium",
+            "Kumpulan data statistik kependudukan suatu daerah",
+            "Rangkaian aturan hukum yang berlaku secara resmi"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Wellek dan Warren (2009) mendefinisikan karya fiksi sebagai cerita atau latar yang bersumber dari imajinasi."
+          },
+          "distractorWhy": {
+            "1": "Laporan pengamatan ilmiah merupakan teks fakta nonfiksi.",
+            "2": "Data statistik merupakan data faktual kuantitatif.",
+            "3": "Aturan hukum merupakan dokumen resmi perundang-undangan."
+          }
+        },
+        {
+          "id": "ind-d-8-b4-q03",
+          "difficulty": "sedang",
+          "prompt": "Berdasarkan analisis cerpen \"Kotak Sulap Paman Tom\" karya Maya Lestari Gf. pada Buku Siswa Bahasa Indonesia Kelas VIII (hal. 131), kata \"lunglai\" memiliki padanan kata yaitu…",
+          "options": [
+            "Lemah",
+            "Tegas",
+            "Marah",
+            "Gembira"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Pada materi Kupas Teori halaman 131, padanan kata 'lunglai' adalah 'lemah'."
+          },
+          "distractorWhy": {
+            "1": "Tegas berlawanan dengan kesan lunglai.",
+            "2": "Marah menggambarkan emosi gusar.",
+            "3": "Gembira menggambarkan perasaan bahagia."
+          }
+        },
+        {
+          "id": "ind-d-8-b4-q04",
+          "difficulty": "sedang",
+          "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VIII (hal. 134), unsur cerita yang berupa pokok pikiran atau dasar cerita (dipercakapkan atau dipakai sebagai dasar mengarang) dinamakan…",
+          "options": [
+            "Tema cerita",
+            "Latar cerita",
+            "Tokoh cerita",
+            "Alur cerita"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Tema cerita adalah unsur pokok dalam cerita yang menjadi dasar mengarang atau pokok pikiran."
+          },
+          "distractorWhy": {
+            "1": "Latar cerita berkenaan dengan tempat dan waktu peristiwa.",
+            "2": "Tokoh cerita adalah orang-orang yang terlibat dalam cerita.",
+            "3": "Alur cerita adalah rangkaian kejadian yang dihadapi tokoh."
+          }
+        },
+        {
+          "id": "ind-d-8-b4-q05",
+          "difficulty": "sedang",
+          "prompt": "Dalam Buku Siswa Bahasa Indonesia Kelas VIII (hal. 134-135), ciri utama dari tokoh utama dalam sebuah karya fiksi adalah…",
+          "options": [
+            "Tokoh yang paling banyak muncul dan memiliki peran penting dalam cerita",
+            "Tokoh yang hanya muncul sekali pada paragraf terakhir",
+            "Tokoh figuran yang tidak memengaruhi jalannya cerita",
+            "Tokoh penyampai pesan moral di akhir cerita saja"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Tokoh utama ditandai oleh kemunculannya yang paling banyak dan perannya yang vital dalam jalinan cerita."
+          },
+          "distractorWhy": {
+            "1": "Kemunculan sekali di akhir cerita biasanya milik tokoh pendukung.",
+            "2": "Tokoh figuran yang tidak memengaruhi cerita merupakan tokoh pendukung.",
+            "3": "Tokoh penyampai pesan di akhir tidak selalu merupakan tokoh utama."
+          }
+        },
+        {
+          "id": "ind-d-8-b4-q06",
+          "difficulty": "sedang",
+          "prompt": "Menurut Nurgiyantoro (2005) seperti dikutip dalam Buku Siswa Bahasa Indonesia Kelas VIII (hal. 135), alur atau plot dalam karya fiksi adalah…",
+          "options": [
+            "Peristiwa-peristiwa dalam cerita yang disusun berdasarkan kaitan sebab akibat",
+            "Daftar nama tokoh beserta watak individual masing-masing",
+            "Penjelasan gambaran tempat dan waktu terjadinya peristiwa",
+            "Pesan moral yang ingin disampaikan penulis kepada pembaca"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Nurgiyantoro (2005) menyatakan bahwa alur adalah peristiwa-peristiwa dalam cerita yang disusun pengarang berdasarkan hubungan sebab akibat."
+          },
+          "distractorWhy": {
+            "1": "Daftar nama tokoh dan watak merupakan unsur penokohan.",
+            "2": "Gambaran tempat dan waktu merupakan unsur latar.",
+            "3": "Pesan moral merupakan amanat cerita."
+          }
+        },
+        {
+          "id": "ind-d-8-b4-q07",
+          "difficulty": "tinggi",
+          "prompt": "Berdasarkan penjelasan dalam Buku Siswa Bahasa Indonesia Kelas VIII (hal. 135), alur yang diawali dengan peristiwa masa kini berkonflik datar, meningkat di bagian tengah, lalu klimaks dan selesai di akhir dinamakan…",
+          "options": [
+            "Alur maju",
+            "Alur mundur",
+            "Alur campuran",
+            "Alur kilas balik"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Alur maju mengurutkan cerita dari kejadian masa kini, konflik menanjak di tengah, hingga klimaks dan penyelesaian di akhir."
+          },
+          "distractorWhy": {
+            "1": "Alur mundur dibuka dengan penceritaan kejadian masa lampau.",
+            "2": "Alur campuran menggabungkan masa kini dan masa lalu secara bergantian.",
+            "3": "Alur kilas balik merupakan istilah lain alur mundur."
+          }
+        },
+        {
+          "id": "ind-d-8-b4-q08",
+          "difficulty": "sedang",
+          "prompt": "Dalam Buku Siswa Bahasa Indonesia Kelas VIII (hal. 135-136), cara kreatif untuk mengenali urutan peristiwa yang membentuk alur cerita dikenal dengan akronim PASKA, yang kepanjangannya adalah…",
+          "options": [
+            "Pada mulanya, Selanjutnya, Kemudian, dan Akhirnya",
+            "Peristiwa, Awal, Sebab, Konflik, dan Akhir",
+            "Pengenalan, Aksi, Solusi, Konflik, dan Amanat",
+            "Pertama, Alasan, Sebab, Penyebab, dan Akibat"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "PASKA merupakan akronim dari Pada mulanya, Selanjutnya, Kemudian, dan Akhirnya untuk mengurutkan alur cerita."
+          },
+          "distractorWhy": {
+            "1": "Rincian tersebut bukan padanan akronim PASKA pada buku.",
+            "2": "Istilah tidak sesuai dengan teks panduan buku.",
+            "3": "Kepanjangan tersebut tidak dikenal dalam konteks alur PASKA."
+          }
+        },
+        {
+          "id": "ind-d-8-b4-q09",
+          "difficulty": "tinggi",
+          "prompt": "Perhatikan kutipan cerpen \"Parki dan Alergi Telur\" karya Maya Lestari Gf. pada Buku Siswa Bahasa Indonesia Kelas VIII (hal. 137):\n\"Suatu pagi, ketika Parki bangun tidur, ia merasa matanya berat sekali. Dikucek-kuceknya matanya. Terasa ada sesuatu di kelopaknya. Cepat ia menuju cermin. Astaga! Apakah itu? Kenapa ada bengkak di kelopak matanya?\"\nBerdasarkan kutipan di atas, konflik cerita mulai muncul ketika…",
+          "options": [
+            "Parki mendapati kelopak matanya bengkak saat bangun tidur",
+            "Ibu Parki pergi membeli kacang pagar di pasar",
+            "Ayah Parki mengalami bintitan saat masih kecil",
+            "Dokter memberikan resep obat mata kepada Parki"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Konflik cerita diawali dari peristiwa bengkaknya mata Parki akibat reaksi alergi."
+          },
+          "distractorWhy": {
+            "1": "Keinginan makan kacang pagar tidak mengawali timbulnya bengkak mata.",
+            "2": "Pengalaman Ayah waktu kecil diungkapkan setelah bengkak terjadi.",
+            "3": "Resep dokter diberikan pada tahap pemeriksaan akhir."
+          }
+        },
+        {
+          "id": "ind-d-8-b4-q10",
+          "difficulty": "sedang",
+          "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VIII (hal. 143), aspek gambaran tokoh fiksi yang menjadi motif atau alasan tokoh melakukan suatu tindakan dinamakan…",
+          "options": [
+            "Latar belakang",
+            "Data diri",
+            "Sifat tokoh",
+            "Amanat cerita"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Latar belakang merupakan motif atau alasan yang mendorong tokoh melakukan suatu tindakan."
+          },
+          "distractorWhy": {
+            "1": "Data diri memuat nama, usia, jenis kelamin, dan informasi fisik.",
+            "2": "Sifat tokoh tercermin melalui perkataan dan perilakunya.",
+            "3": "Amanat cerita adalah pesan moral tulisan."
+          }
+        },
+        {
+          "id": "ind-d-8-b4-q11",
+          "difficulty": "tinggi",
+          "prompt": "Cermati analisis tokoh Randu dari cerpen \"Kotak Sulap Paman Tom\" pada Buku Siswa Bahasa Indonesia Kelas VIII (hal. 144). Tindakan Randu membongkar rahasia sulap Paman Tom di depan umum menunjukkan sifat tokoh yang…",
+          "options": [
+            "Mementingkan diri sendiri dan emosional",
+            "Penyabar dan suka mengalah",
+            "Bijaksana dan penuh kehati-hatian",
+            "Dermawan dan suka menolong"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Tindakan Randu melampiaskan kekecewaannya tanpa memikirkan nasib Paman Tom mencerminkan sifat mementingkan diri sendiri dan emosional."
+          },
+          "distractorWhy": {
+            "1": "Tindakan membongkar rahasia tidak mencerminkan sifat penyabar.",
+            "2": "Tindakan gegabah di depan umum bertolak belakang dengan sifat bijaksana.",
+            "3": "Sifat dermawan tidak terbukti dari pembongkaran rahasia sulap."
+          }
+        },
+        {
+          "id": "ind-d-8-b4-q12",
+          "difficulty": "tinggi",
+          "prompt": "Bacalah cuplikan penggambaran latar pada Buku Siswa Bahasa Indonesia Kelas VIII (hal. 146):\n\"Jalannya masih jalan tanah, berlumpur di musim hujan dan berdebu di musim kemarau... Daun dan ranting-rantingnya berjatuhan dan menimbulkan suara keretak saat kakiku menginjaknya... Bau tanah kering menyumbat hidungku.\"\nTeknik penggambaran latar di atas memanfaatkan…",
+          "options": [
+            "Pendekatan pancaindra (penglihatan, pendengaran, dan penciuman)",
+            "Data statistik dan angka kuantitatif ilmiah",
+            "Dialog langsung antartokoh utama",
+            "Istilah-istilah teknis laboratorium"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Deskripsi latar tersebut memanfaatkan imaji pancaindra agar pembaca seolah melihat, mendengar suara keretak, dan mencium bau tanah."
+          },
+          "distractorWhy": {
+            "1": "Cuplikan tersebut bukan data statistik ilmiah.",
+            "2": "Cuplikan tersebut merupakan deskripsi naratif latar, bukan dialog.",
+            "3": "Tidak ada istilah laboratorium dalam teks tersebut."
+          }
+        },
+        {
+          "id": "ind-d-8-b4-q13",
+          "difficulty": "dasar",
+          "prompt": "Berdasarkan pendapat Keraf (2007) yang dikutip dalam Buku Siswa Bahasa Indonesia Kelas VIII (hal. 149), kata yang mengandung makna kiasan, memicu stimulus, respons, dan nilai emosional dinamakan kata bermakna…",
+          "options": [
+            "Konotasi",
+            "Denotasi",
+            "Antonim",
+            "Leksikal dasar"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Keraf (2007) menjelaskan bahwa kata konotasi adalah kata bermakna kiasan yang mengandung nilai emosional."
+          },
+          "distractorWhy": {
+            "1": "Denotasi mengacu pada makna faktual atau sebenarnya.",
+            "2": "Antonim adalah kata yang berlawanan makna.",
+            "3": "Leksikal dasar mengacu pada makna kamus yang sebenarnya."
+          }
+        },
+        {
+          "id": "ind-d-8-b4-q14",
+          "difficulty": "dasar",
+          "prompt": "Dalam Buku Siswa Bahasa Indonesia Kelas VIII (hal. 149), lawan dari kata bermakna konotasi adalah denotasi, yang diartikan sebagai…",
+          "options": [
+            "Kata yang mengandung makna faktual atau makna paling dasar/sebenarnya",
+            "Ungkapan kiasan berlebihan untuk memperindah cerita",
+            "Kata yang memiliki bunyi rima sama di akhir larik",
+            "Kata yang diserap penuh dari bahasa asing tanpa ubahan"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Denotasi adalah makna faktual, asli, atau makna sebenarnya dari suatu kata."
+          },
+          "distractorWhy": {
+            "1": "Ungkapan kiasan berlebihan merupakan konotasi atau majas.",
+            "2": "Bunyi rima sama merupakan unsur perwajahan puisi.",
+            "3": "Kata serapan asing tidak menentukan makna denotatif."
+          }
+        },
+        {
+          "id": "ind-d-8-b4-q15",
+          "difficulty": "sedang",
+          "prompt": "Cermati tabel ungkapan konotatif pada Buku Siswa Bahasa Indonesia Kelas VIII (hal. 150):\n\"Rianti adalah gadis yang ringan tangan atau suka menolong. Ia selalu menjadi buah bibir...\"\nMakna konotatif dari ungkapan \"buah bibir\" pada kalimat tersebut adalah…",
+          "options": [
+            "Bahan pembicaraan orang banyak",
+            "Buah-buahan segar hasil panen",
+            "Senyuman manis di bibir seseorang",
+            "Orang yang sangat dipercayai"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Ungkapan 'buah bibir' bermakna kiasan yaitu bahan pembicaraan banyak orang."
+          },
+          "distractorWhy": {
+            "1": "Buah hasil panen adalah makna denotatif kata buah.",
+            "2": "Senyuman manis bukan arti kiasan dari buah bibir.",
+            "3": "Orang yang dipercayai merupakan makna dari ungkapan tangan kanan."
+          }
+        },
+        {
+          "id": "ind-d-8-b4-q16",
+          "difficulty": "sedang",
+          "prompt": "Dalam Buku Siswa Bahasa Indonesia Kelas VIII (hal. 150), jika ungkapan \"tangan kanan\" memiliki makna konotasi \"orang yang dipercayai\", maka ungkapan \"buah pikiran\" memiliki makna konotasi yaitu…",
+          "options": [
+            "Gagasan atau ide",
+            "Oleh-oleh perjalanan",
+            "Bahan gunjingan",
+            "Suka memberi bantuan"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Pada Tabel 4.4, 'buah pikiran' bermakna konotasi gagasan atau ide."
+          },
+          "distractorWhy": {
+            "1": "Oleh-oleh perjalanan adalah makna dari buah tangan.",
+            "2": "Bahan gunjingan adalah makna dari buah bibir.",
+            "3": "Suka memberi bantuan adalah makna dari ringan tangan."
+          }
+        },
+        {
+          "id": "ind-d-8-b4-q17",
+          "difficulty": "sedang",
+          "prompt": "Berdasarkan penjelasan mengenai resensi/ulasan karya fiksi pada Buku Siswa Bahasa Indonesia Kelas VIII (hal. 152), tujuan utama penulisan artikel ulasan/resensi buku bagi pembaca umum adalah…",
+          "options": [
+            "Mengenalkan buku baru kepada publik dan menyajikan penilaian keunggulan serta kelemahannya",
+            "Mengkritik penulis buku agar berhenti memublikasikan karya cerita",
+            "Mengubah alur cerita fiksi sesuai keinginan pembaca sendiri",
+            "Menyalin seluruh isi cerita dari halaman awal hingga akhir tanpa koreksi"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Resensi buku bertujuan mengenalkan buku kepada publik dengan menguraikan keunggulan, kelemahan, dan penilaian karya."
+          },
+          "distractorWhy": {
+            "1": "Resensi bertujuan memberikan apresiasi dan penilaian objektif, bukan menjatuhkan penulis.",
+            "2": "Resensi tidak mengubah alur asli cerita.",
+            "3": "Resensi bukan berupa penjiplakan atau salinan utuh buku."
+          }
+        },
+        {
+          "id": "ind-d-8-b4-q18",
+          "difficulty": "tinggi",
+          "prompt": "Cermati sampel teks ulasan cerita \"Bawang Merah dan Bawang Putih\" pada Buku Siswa Bahasa Indonesia Kelas VIII (hal. 153-154):\n\"Bawang Merah dan Bawang Putih merupakan salah satu cerita rakyat Indonesia yang sangat populer. Cerita ini ditulis ulang oleh Rifan di Majalah Sekolah Cerdas...\"\nBagian teks ulasan di atas memuat bagian struktur ulasan yaitu…",
+          "options": [
+            "Identitas dan Orientasi karya",
+            "Evaluasi kekurangan buku",
+            "Rincian latar belakang pengarang",
+            "Simpulan rekomendasi pembelian"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Kutipan menyebutkan judul, penulis (Rifan), media penerbit (Majalah Sekolah Cerdas), serta perkenalan awal cerita (orientasi/identitas)."
+          },
+          "distractorWhy": {
+            "1": "Evaluasi kekurangan berisi ulasan kelemahan karya.",
+            "2": "Latar belakang pribadi pengarang tidak dibahas di kutipan tersebut.",
+            "3": "Rekomendasi pembelian biasanya terdapat di paragraf simpulan akhir."
+          }
+        },
+        {
+          "id": "ind-d-8-b4-q19",
+          "difficulty": "tinggi",
+          "prompt": "Perhatikan kutipan ulasan pada Buku Siswa Bahasa Indonesia Kelas VIII (hal. 154):\n\"Menurut saya, cerita yang ditulis oleh Rifan ini cukup menarik. Tokoh-tokohnya digambarkan dengan jelas. Alur atau rangkaian peristiwanya juga menarik. Lebih dari itu, kita dapat mengambil pelajaran bahwa kesabaran dan kejujuran itu sangat penting dalam hidup.\"\nDalam struktur teks ulasan, paragraf tersebut dikategorikan sebagai bagian…",
+          "options": [
+            "Evaluasi / Penilaian karya",
+            "Identitas fisik buku",
+            "Sinopsis ringkasan alur",
+            "Glosarium daftar kata sulit"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Paragraf berisi pandangan, pendapat, dan penilaian kelebihan serta pesan moral cerita merupakan bagian evaluasi/penilaian."
+          },
+          "distractorWhy": {
+            "1": "Identitas fisik berisi judul, penulis, jumlah halaman, dan penerbit.",
+            "2": "Sinopsis berisi ringkasan alur jalannya cerita.",
+            "3": "Glosarium berisi senarai kata-kata sukar."
+          }
+        },
+        {
+          "id": "ind-d-8-b4-q20",
+          "difficulty": "sedang",
+          "prompt": "Berdasarkan langkah-langkah penulisan ulasan karya fiksi pada Buku Siswa Bahasa Indonesia Kelas VIII (hal. 152-155), sebelum menyusun artikel ulasan secara utuh, hal pertama yang harus dilakukan oleh seorang pengulas adalah…",
+          "options": [
+            "Membaca karya fiksi dan melakukan penilaian unsur-unsur cerita pada lembar penilaian",
+            "Memublikasikan artikel ulasan di koran atau media massa cetak",
+            "Meminta penulis buku mengganti ending cerita yang tidak disukai",
+            "Membeli seluruh cetakan buku fiksi yang ada di toko buku"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Langkah pertama adalah membaca cerita dan menilai unsur-unsurnya (tokoh, latar, alur, tema) di lembar penilaian."
+          },
+          "distractorWhy": {
+            "1": "Publikasi dilakukan setelah artikel ulasan selesai ditulis.",
+            "2": "Mengubah ending pengarang bukan tugas pengulas karya.",
+            "3": "Membeli seluruh cetakan buku bukan syarat menulis ulasan."
+          }
+        }
+      ]
+    },
+    {
+      "code": "KOMP-IND-D-8-BAB5-01",
+      "grade": 8,
+      "name": "Bab 5: Teks Drama",
+      "materi": "Mengenal Pertunjukan & Naskah Drama, Unsur Intrinsik Drama (Tokoh, Dialog, Kramagung, Konflik), Pementasan Drama",
+      "cpRef": "Bahasa Indonesia untuk SMP/MTs Kelas VII (Edisi Revisi) — Bab 5 (Kelas VIII)",
+      "items": [
+        {
+          "id": "ind-d-8-b5-q01",
+          "difficulty": "dasar",
+          "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VIII (Bab 5 Drama), pengertian drama secara umum adalah karya sastra dan seni pertunjukan yang bertujuan untuk…",
+          "options": [
+            "Menggambarkan kehidupan dan watak manusia melalui tingkah laku (akting) dan dialog yang dipentaskan di atas panggung",
+            "Menyampaikan fakta objektif hasil observasi lapangan secara sistematis",
+            "Menyajikan gagasan argumentatif dalam bentuk bait-bait berirama",
+            "Menjelaskan petunjuk langkah-langkah teknis pembuatan suatu barang"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Drama merupakan karya seni yang melukiskan realitas kehidupan dan karakter manusia lewat peragaan akting serta dialog pemeran."
+          },
+          "distractorWhy": {
+            "1": "Teks Laporan Hasil Observasi.",
+            "2": "Teks Puisi.",
+            "3": "Teks Prosedur."
+          }
+        },
+        {
+          "id": "ind-d-8-b5-q02",
+          "difficulty": "dasar",
+          "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VIII (Bab 5 Unsur Drama), perbedaan fisik paling mendasar antara naskah drama dengan cerpen atau novel terletak pada…",
+          "options": [
+            "Penyajian cerita yang didominasi oleh dialog antartokoh dan petunjuk lakuan (kramagung)",
+            "Penggunaan bait dan rima yang terikat oleh aturan larik",
+            "Struktur teks yang hanya terdiri atas tesis dan rekomendasi",
+            "Penulisan paragraf deskriptif tanpa keterlibatan penokohan"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Naskah drama ditulis dalam format naskah dialog lengkap dengan petunjuk tindakan/ekspresi (kramagung)."
+          },
+          "distractorWhy": {
+            "1": "Ciri khas karya puisi.",
+            "2": "Struktur teks eksposisi.",
+            "3": "Teks laporan deskriptif."
+          }
+        },
+        {
+          "id": "ind-d-8-b5-q03",
+          "difficulty": "sedang",
+          "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VIII (Bab 5 Struktur Dialog), tuturan atau kata-kata yang harus diucapkan oleh pemeran tokoh dalam dialog naskah drama dinamakan…",
+          "options": [
+            "Wawancang",
+            "Kramagung",
+            "Prolog",
+            "Epilog"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Wawancang adalah ucapan/dialog langsung yang dituturkan oleh para tokoh drama."
+          },
+          "distractorWhy": {
+            "1": "Kramagung adalah petunjuk tindakan/ekspresi fisik.",
+            "2": "Prolog adalah kata pengantar pembuka drama.",
+            "3": "Epilog adalah kata penutup drama."
+          }
+        },
+        {
+          "id": "ind-d-8-b5-q04",
+          "difficulty": "sedang",
+          "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VIII (Bab 5 Unsur Naskah Drama), petunjuk tindakan, peragaan, atau ekspresi tokoh yang biasanya ditulis dalam tanda kurung atau dicetak miring dinamakan…",
+          "options": [
+            "Kramagung",
+            "Wawancang",
+            "Monolog",
+            "Solilokui"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Kramagung merupakan petunjuk teknis pementasan atau aksi fisik tokoh di panggung."
+          },
+          "distractorWhy": {
+            "1": "Wawancang adalah bagian kata-kata yang diucapkan.",
+            "2": "Monolog adalah percakapan tokoh dengan dirinya sendiri.",
+            "3": "Solilokui adalah ungkapan pikiran batin tokoh."
+          }
+        },
+        {
+          "id": "ind-d-8-b5-q05",
+          "difficulty": "sedang",
+          "prompt": "Cermatilah kutipan naskah drama berikut:\nAris: (Mengepalkan tangan dan menatap tajam ke arah Budi) \"Jangan sekali-kali kau mengambil buku itu tanpa izinku!\"\nBerdasarkan kutipan tersebut, kalimat dalam tanda kurung '(Mengepalkan tangan dan menatap tajam ke arah Budi)' berfungsi sebagai…",
+          "options": [
+            "Kramagung yang memberi petunjuk ekspresi fisik dan emosi pemeran Aris",
+            "Wawancang yang harus diucapkan oleh pemeran Budi",
+            "Prolog pembuka yang dibacakan oleh narator",
+            "Epilog simpulan cerita di akhir pementasan"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Teks dalam kurung tersebut memuat panduan lakuan gestur dan raut wajah (kramagung) bagi pemain."
+          },
+          "distractorWhy": {
+            "1": "Bukan ucapan lisan (wawancang).",
+            "2": "Bukan narasi pembuka adegan.",
+            "3": "Bukan kalimat penutup drama."
+          }
+        },
+        {
+          "id": "ind-d-8-b5-q06",
+          "difficulty": "tinggi",
+          "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VIII (Bab 5 Alur Drama), bagian struktur dialog tempat dimulainya kemunculan masalah atau pertentangan antartokoh dinamakan…",
+          "options": [
+            "Komplikasi",
+            "Orientasi",
+            "Resolusi",
+            "Klimaks"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Komplikasi berisi pengembangan konflik dan munculnya rintangan yang dihadapi tokoh utama."
+          },
+          "distractorWhy": {
+            "1": "Orientasi merupakan tahap pengenalan tokoh dan latar.",
+            "2": "Resolusi merupakan tahap penyelesaian masalah.",
+            "3": "Klimaks merupakan puncak tertinggi konflik."
+          }
+        },
+        {
+          "id": "ind-d-8-b5-q07",
+          "difficulty": "sedang",
+          "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VIII (Bab 5 Penokohan), tokoh dalam drama yang berkedudukan sebagai penentang tokoh utama dan memicu munculnya konflik cerita disebut…",
+          "options": [
+            "Tokoh antagonis",
+            "Tokoh protagonis",
+            "Tokoh tritagonis",
+            "Tokoh figuran"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Tokoh antagonis membawa penolakan/hambatan yang menimbulkan pertentangan terhadap tokoh protagonis."
+          },
+          "distractorWhy": {
+            "1": "Tokoh protagonis adalah pembawa ide utama/pemeran utama positif.",
+            "2": "Tokoh tritagonis adalah penengah konflik.",
+            "3": "Tokoh figuran adalah pemeran pelengkap latar."
+          }
+        },
+        {
+          "id": "ind-d-8-b5-q08",
+          "difficulty": "sedang",
+          "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VIII (Bab 5 Penokohan Drama), fungsi utama tokoh tritagonis dalam jalinan cerita drama adalah…",
+          "options": [
+            "Sebagai penengah atau pendamai jika terjadi perselisihan antara protagonis dan antagonis",
+            "Sebagai musuh utama yang menghancurkan cita-cita protagonis",
+            "Sebagai pengatur pencahayaan di luar naskah drama",
+            "Sebagai narator tunggal pembaca prolog drama"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Tritagonis berperan sebagai pihak ketiga penengah yang memberikan nasihat atau jalan keluar netral."
+          },
+          "distractorWhy": {
+            "1": "Fungsi tokoh antagonis.",
+            "2": "Fungsi penata panggung/tata lampu.",
+            "3": "Fungsi narator/dalang."
+          }
+        },
+        {
+          "id": "ind-d-8-b5-q09",
+          "difficulty": "tinggi",
+          "prompt": "Cermatilah dialog berikut:\nRina: \"Mengapa kamu selalu menuduhku mengambil dompetmu, Maya? Kita sudah bersahabat sejak kecil!\"\nMaya: \"Semua bukti mengarah kepadamu! Hanya kamu yang berada di kelas saat barang itu hilang!\"\nBerdasarkan petikan dialog tersebut, jenis konflik yang terjadi adalah…",
+          "options": [
+            "Konflik eksternal (antarmanusia/antartokoh) akibat kesalahpahaman dan tuduhan",
+            "Konflik batin internal dalam diri Rina mengenai cita-cita masa depan",
+            "Konflik fisik manusia melawan keganasan alam",
+            "Konflik kebudayaan antara tradisi modern dan tradisional"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Dialog menunjukkan percekcokan terbuka antara dua tokoh (Rina dan Maya) sehingga termasuk konflik eksternal antartokoh."
+          },
+          "distractorWhy": {
+            "1": "Bukan konflik batin pribadi.",
+            "2": "Bukan pertentangan dengan unsur alam.",
+            "3": "Tidak membahas benturan budaya."
+          }
+        },
+        {
+          "id": "ind-d-8-b5-q10",
+          "difficulty": "tinggi",
+          "prompt": "Cermatilah petikan naskah drama berikut:\nPak Hadi: (Duduk termenung di sudut meja, memegang kepalanya) \"Haruskah aku menjual tanah warisan orang tuaku ini demi biaya pengobatan anakku, atau membiarkannya tetap utuh? Sungguh pilihan yang sangat berat…\"\nBerdasarkan kutipan tersebut, jenis konflik yang dialami Pak Hadi adalah…",
+          "options": [
+            "Konflik batin (internal) karena pergulatan perasaan dalam mengambil keputusan sulit",
+            "Konflik sosial eksternal akibat bentrok warga desa",
+            "Konflik ideologi antarpartai politik",
+            "Konflik fisik perkelahian di atas panggung"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Pak Hadi mengalami perebutan batin dan keraguan dilematis di dalam dirinya sendiri."
+          },
+          "distractorWhy": {
+            "1": "Tidak ada bentrokan dengan warga lain.",
+            "2": "Tidak berkaitan dengan paham politik.",
+            "3": "Tidak ada pertarungan fisik."
+          }
+        },
+        {
+          "id": "ind-d-8-b5-q11",
+          "difficulty": "sedang",
+          "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VIII (Bab 5 Alur dan Plot), titik puncak ketegangan cerita dalam naskah drama ketika masalah mencapai tingkat paling intens dinamakan…",
+          "options": [
+            "Klimaks",
+            "Antiklimaks / Peleraian",
+            "Orientasi",
+            "Resolusi"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Klimaks adalah puncak ketegangan di mana nasib tokoh utama ditentukan."
+          },
+          "distractorWhy": {
+            "1": "Antiklimaks adalah tahap meredanya ketegangan.",
+            "2": "Orientasi adalah tahap awal cerita.",
+            "3": "Resolusi adalah penyelesaian akhir."
+          }
+        },
+        {
+          "id": "ind-d-8-b5-q12",
+          "difficulty": "sedang",
+          "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VIII (Bab 5 Latar Drama), unsur latar (setting) dalam pertunjukan drama mencakup tiga hal utama, yaitu…",
+          "options": [
+            "Latar tempat, latar waktu, dan latar suasana",
+            "Latar belakang penulis, latar pendidikan, dan latar usia",
+            "Latar musik, latar kamera, dan latar penonton",
+            "Latar sampul, latar halaman, dan latar cetakan"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Setting drama membentuk gambaran lokasi kejadian, masa berlangsungnya cerita, dan situasi emosional pentas."
+          },
+          "distractorWhy": {
+            "1": "Merupakan biografi pengarang.",
+            "2": "Istilah produksi audio visual.",
+            "3": "Istilah tata letak buku."
+          }
+        },
+        {
+          "id": "ind-d-8-b5-q13",
+          "difficulty": "tinggi",
+          "prompt": "Cermatilah deskripsi adegan berikut:\nSuara gemuruh petir bersahut-sahutan diiringi tiupan angin kencang. Cahaya lampu panggung temaram kebiruan. Para warga berlarian ke sana kemari sambil berteriak ketakutan.\nBerdasarkan deskripsi adegan tersebut, latar suasana yang tercipta adalah…",
+          "options": [
+            "Mencekam dan penuh kecemasan",
+            "Gembira dan penuh suka cita",
+            "Hening dan penuh kedamaian",
+            "Lucu dan mengundang gelak tawa"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Kombinasi bunyi petir, lampu temaram, dan jeritan warga menciptakan nuansa genting mencekam."
+          },
+          "distractorWhy": {
+            "1": "Bertentangan dengan situasi bahaya.",
+            "2": "Keadaan sangat bising dan kacau.",
+            "3": "Tidak ada unsur humor."
+          }
+        },
+        {
+          "id": "ind-d-8-b5-q14",
+          "difficulty": "sedang",
+          "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VIII (Bab 5 Kebahasaan Drama), ragam bahasa yang dominan digunakan dalam dialog naskah drama adalah…",
+          "options": [
+            "Bahasa lisan yang komunikatif menggunakan kalimat langsung dan kata sapaan",
+            "Bahasa baku ilmiah lugas seperti karya tulis penelitian formal",
+            "Bahasa rumus matematika dan simbol logika",
+            "Bahasa hukum perundang-undangan resmi"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Dialog drama merepresentasikan percakapan nyata antarmanusia sehingga menggunakan tuturan langsung serta kata sapaan."
+          },
+          "distractorWhy": {
+            "1": "Bahasa karya ilmiah laras akademik.",
+            "2": "Bahasa notasi eksakta.",
+            "3": "Bahasa laras hukum formal."
+          }
+        },
+        {
+          "id": "ind-d-8-b5-q15",
+          "difficulty": "sedang",
+          "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VIII (Bab 5 Kaidah Kebahasaan), kata kerja aksi (action verbs) sering ditemukan pada bagian kramagung untuk menggambarkan…",
+          "options": [
+            "Tindakan atau perbuatan fisik yang harus dilakukan oleh pemain di panggung",
+            "Pengertian definisi kata menurut kamus",
+            "Sifat abstrak seperti kejujuran dan keberanian",
+            "Urutan angka statistik pementasan"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Kata kerja aksi (seperti 'melangkah', 'menunjuk', 'berlutut') menuntun gerakan nyata pemeran."
+          },
+          "distractorWhy": {
+            "1": "Fungsi kalimat definisi.",
+            "2": "Nomina abstrak.",
+            "3": "Data kuantitatif."
+          }
+        },
+        {
+          "id": "ind-d-8-b5-q16",
+          "difficulty": "tinggi",
+          "prompt": "Cermatilah prolog berikut:\n\"Setelah tiga tahun merantau di negeri orang, akhirnya Danu melangkah kembali ke kampung halamannya. Kemudian, ia tertegun melihat rumah tuanya telah kosong…\"\nPenggunaan kata 'setelah' dan 'kemudian' dalam prolog naskah drama tersebut menandakan kaidah kebahasaan berupa…",
+          "options": [
+            "Konjungsi kronologis (urutan waktu)",
+            "Kata kerja relasional definisi",
+            "Kalimat tanya retoris",
+            "Kata ganti penanya"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Kata 'setelah' dan 'kemudian' memuat keterhubungan urutan kejadian secara kronologis."
+          },
+          "distractorWhy": {
+            "1": "Verba definisi menggunakan 'adalah'.",
+            "2": "Bukan bentuk pertanyaan.",
+            "3": "Bukan kata tanya."
+          }
+        },
+        {
+          "id": "ind-d-8-b5-q17",
+          "difficulty": "sedang",
+          "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VIII (Bab 5 Penyuntingan Drama), tujuan utama kegiatan menyunting naskah drama sebelum dipentaskan adalah…",
+          "options": [
+            "Memperbaiki kesalahan ejaan, tanda baca, kelogisan dialog, serta keselarasan kramagung",
+            "Mengubah naskah drama menjadi artikel ilmiah populer",
+            "Menghilangkan seluruh dialog tokoh sehingga hanya tersisa musik penutup",
+            "Menjual hak cipta naskah kepada sutradara asing"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Menyunting bertujuan menyempurnakan keutuhan naskah dari segi EBI, keterbacaan dialog, dan instruksi teknis kramagung."
+          },
+          "distractorWhy": {
+            "1": "Mengubah jenis genre teks.",
+            "2": "Menghancurkan struktur naskah drama.",
+            "3": "Tindakan transaksi bisnis."
+          }
+        },
+        {
+          "id": "ind-d-8-b5-q18",
+          "difficulty": "dasar",
+          "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VIII (Bab 5 Pementasan Drama), sosok yang bertanggung jawab memimpin proses latihan, menafsirkan naskah, dan mengarahkan akting para pemain di panggung adalah…",
+          "options": [
+            "Sutradara",
+            "Produser",
+            "Penata panggung",
+            "Penonton"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Sutradara adalah pemimpin artistik utama yang mengatur jalannya adegan dan akting pemain."
+          },
+          "distractorWhy": {
+            "1": "Produser bertanggung jawab pada pendanaan.",
+            "2": "Penata panggung mengurus properti dan dekorasi.",
+            "3": "Penonton adalah penikmat pertunjukan."
+          }
+        },
+        {
+          "id": "ind-d-8-b5-q19",
+          "difficulty": "sedang",
+          "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VIII (Bab 5 Unsur Pementasan), unsur tata panggung (scenery) dan penataan lampu (lighting) dalam pertunjukan drama berfungsi untuk…",
+          "options": [
+            "Mendukung keutuhan latar tempat, waktu, dan suasana adegan agar terasa hidup bagi penonton",
+            "Menggantikan peran actor dalam menyampaikan dialog utama",
+            "Menghitung penjualan tiket penonton pementasan",
+            "Menulis ulang naskah drama di balik panggung"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Dekorasi panggung dan pencahayaan memperkuat efek visual konteks tempat serta emosi adegan."
+          },
+          "distractorWhy": {
+            "1": "Pemeran utama tetap menyampaikan dialog.",
+            "2": "Tugas seksi tiket/bendahara.",
+            "3": "Tugas penulis naskah."
+          }
+        },
+        {
+          "id": "ind-d-8-b5-q20",
+          "difficulty": "tinggi",
+          "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VIII (Bab 5 Evaluasi Pementasan), sebuah pementasan drama dinilai berhasil dan memukau apabila…",
+          "options": [
+            "Para pemain mampu menghayati karakter tokoh, menyampaikan dialog secara jelas, serta menyelaraskan ekspresi dengan petunjuk kramagung",
+            "Pemain hafal naskah tetapi tampil kaku tanpa penjiwaan emosi",
+            "Tata lampu padam total selama pertunjukan berlangsung",
+            "Dialog diucapkan secara terburu-buru tanpa memperhatikan jeda intonasi"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Keberhasilan pertunjukan drama ditentukan oleh kedalaman penghayatan peran, kejernihan vokal, dan keserasian ekspresi fisik."
+          },
+          "distractorWhy": {
+            "1": "Penampilan kaku mengurangi kualitas akting.",
+            "2": "Lampu padam menghalangi pengamatan penonton.",
+            "3": "Intonasi terburu-buru merusak penyampaian pesan."
+          }
+        }
+      ]
     }
   ]
 }

@@ -1,43 +1,44 @@
 import json
+import re
 
-with open(r'c:\Users\hp\fiezel-apps\tools\chunk_ips_7_t2.json', 'r', encoding='utf-8') as f:
+path = r'c:\Users\hp\fiezel-apps\tools\chunk_eng_8_c1.json'
+with open(path, encoding='utf-8') as f:
     data = json.load(f)
 
-print('Code:', data['code'])
-print('Grade:', data['grade'])
-print('Name:', data['name'])
-print('Materi:', data['materi'])
-print('cpRef:', data['cpRef'])
-print('Items count:', len(data['items']))
+assert data['code'] == 'KOMP-ENG-D-8-BAB1-01'
+assert data['grade'] == 8
+assert data['name'] == 'Chapter 1: Celebrating Independence Day'
+assert data['materi'] == 'Describing Past Independence Day Events, Recount Text Structure, Simple Past Tense (Regular & Irregular Verbs), Past Time Connectors'
+assert data['cpRef'] == 'English for Nusantara untuk SMP/MTs Kelas VIII'
 
-forbidden = ['posisi', 'pilihan a', 'pilihan b', 'pilihan c', 'pilihan d', 'opsi a', 'opsi b', 'opsi c', 'opsi d', 'jawaban a', 'jawaban b', 'jawaban c', 'jawaban d', 'pilihan pertama', 'opsi pertama']
-errors = []
+items = data['items']
+assert len(items) == 20, f'Expected 20 items, got {len(items)}'
 
-diff_count = {}
+forbidden_patterns = [
+    r'pilihan\s+[a-d0-3]', r'opsi\s+[a-d0-3]', r'jawaban\s+[a-d0-3]',
+    r'opsi\s+di\s+atas', r'pilihan\s+di\s+atas', r'jawaban\s+di\s+atas',
+    r'opsi\s+pertama', r'pilihan\s+pertama', r'jawaban\s+pertama'
+]
 
-for idx, item in enumerate(data['items']):
-    d_level = item['difficulty']
-    diff_count[d_level] = diff_count.get(d_level, 0) + 1
+diff_counts = {}
+
+for idx, item in enumerate(items):
+    expected_id = f'eng-d-8-c1-q{idx+1:02d}'
+    assert item['id'] == expected_id, f'Item id mismatch: {item["id"]} vs {expected_id}'
+    assert item['difficulty'] in ['dasar', 'sedang', 'tinggi'], f'Invalid diff: {item["difficulty"]}'
+    diff_counts[item['difficulty']] = diff_counts.get(item['difficulty'], 0) + 1
     
-    if len(item['options']) != 4:
-        errors.append(item['id'] + ': options count is not 4')
-    if item['answer'] != 0:
-        errors.append(item['id'] + ': answer is not 0')
-    if list(item['why'].keys()) != ['0']:
-        errors.append(item['id'] + ': why keys is not ["0"]')
-    if set(item['distractorWhy'].keys()) != {'1', '2', '3'}:
-        errors.append(item['id'] + ': distractorWhy keys mismatch')
-    
-    full_text = (item['prompt'] + ' ' + ' '.join(item['options']) + ' ' + item['why']['0'] + ' ' + ' '.join(item['distractorWhy'].values())).lower()
-    for w in forbidden:
-        if w in full_text:
-            errors.append(item['id'] + ': contains forbidden word "' + w + '"')
+    assert len(item['options']) == 4, f'Options count error in {item["id"]}'
+    assert len(set(item['options'])) == 4, f'Duplicate options in {item["id"]}'
+    assert item['answer'] == 0, f'Answer must be 0 in {item["id"]}'
+    assert '0' in item['why'], f'Missing why[0] in {item["id"]}'
+    for k in ['1', '2', '3']:
+        assert k in item['distractorWhy'], f'Missing distractorWhy[{k}] in {item["id"]}'
+        
+    full_str = json.dumps(item, ensure_ascii=False).lower()
+    for pat in forbidden_patterns:
+        match = re.search(pat, full_str)
+        assert not match, f'Forbidden pattern "{pat}" matched in {item["id"]}: {match.group(0)}'
 
-print('Difficulty distribution:', diff_count)
-
-if errors:
-    print('ERRORS FOUND:')
-    for e in errors:
-        print(' -', e)
-else:
-    print('ALL VALIDATIONS PASSED SUCCESSFULY!')
+print('All validation checks passed successfully!')
+print('Difficulty distribution:', diff_counts)

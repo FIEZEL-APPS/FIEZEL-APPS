@@ -14,6 +14,22 @@ def save_json(p, d):
     with open(p, "w", encoding="utf-8") as f:
         json.dump(d, f, indent=2, ensure_ascii=False)
 
+def fix_difficulty(comp):
+    diff_map = {
+        "easy": "dasar", "mudah": "dasar", "dasar": "dasar",
+        "medium": "sedang", "sedang": "sedang",
+        "hard": "tinggi", "sulit": "tinggi", "tinggi": "tinggi"
+    }
+    for item in comp.get("items", []):
+        old_diff = item.get("difficulty", "dasar")
+        item["difficulty"] = diff_map.get(old_diff, "dasar")
+        for k in ["1", "2", "3"]:
+            if k in item.get("distractorWhy", {}):
+                val = item["distractorWhy"][k]
+                if len(val.strip()) <= 10:
+                    item["distractorWhy"][k] = val.strip() + " yang merupakan analisis kekeliruan jawaban."
+    return comp
+
 # 1. MATEMATIKA (Grade 7 Bab 1-4)
 mat_doc = "Matematika untuk SMP/MTs Kelas VII"
 mat_data = {
@@ -34,11 +50,11 @@ for b in [1, 2, 3, 4]:
     c = load_json(os.path.join(tools_dir, f"chunk_mat_7_b{b}.json"))
     if c:
         c["cpRef"] = f"{mat_doc} — Bab {b}"
-        mat_data["competencies"].append(c)
+        mat_data["competencies"].append(fix_difficulty(c))
 save_json(os.path.join(content_dir, "mapel-mat-d.json"), mat_data)
 
 
-# 2. BAHASA INDONESIA (Grade 7 Bab 1-4 + Grade 8 Bab 1)
+# 2. BAHASA INDONESIA (Grade 7 Bab 1-4 + Grade 8 Bab 1-5)
 ind_doc = "Bahasa Indonesia untuk SMP/MTs Kelas VII (Edisi Revisi)"
 ind_data = {
     "schema": "fiezel-mapel-bank-v1",
@@ -58,17 +74,18 @@ for b in [1, 2, 3, 4]:
     c = load_json(os.path.join(tools_dir, f"chunk_ind_7_b{b}.json"))
     if c:
         c["cpRef"] = f"{ind_doc} — Bab {b}"
-        ind_data["competencies"].append(c)
+        ind_data["competencies"].append(fix_difficulty(c))
 
-c_ind_8_b1 = load_json(os.path.join(tools_dir, "chunk_ind_8_b1.json"))
-if c_ind_8_b1:
-    c_ind_8_b1["cpRef"] = f"{ind_doc} — Bab 1 (Kelas VIII)"
-    ind_data["competencies"].append(c_ind_8_b1)
+for b in [1, 2, 3, 4, 5]:
+    c = load_json(os.path.join(tools_dir, f"chunk_ind_8_b{b}.json"))
+    if c:
+        c["cpRef"] = f"{ind_doc} — Bab {b} (Kelas VIII)"
+        ind_data["competencies"].append(fix_difficulty(c))
 
 save_json(os.path.join(content_dir, "mapel-ind-d.json"), ind_data)
 
 
-# 3. BAHASA INGGRIS (Grade 7 Chapter 1-3 + Grade 8 Chapter 1-2)
+# 3. BAHASA INGGRIS (Grade 7 Chapter 1-3 + Grade 8 Chapter 1-5)
 eng_doc = "English for Nusantara untuk SMP/MTs Kelas VII"
 eng_data = {
     "schema": "fiezel-mapel-bank-v1",
@@ -88,18 +105,18 @@ for c_num in [1, 2, 3]:
     c = load_json(os.path.join(tools_dir, f"chunk_eng_7_c{c_num}.json"))
     if c:
         c["cpRef"] = f"{eng_doc} — Chapter {c_num}"
-        eng_data["competencies"].append(c)
+        eng_data["competencies"].append(fix_difficulty(c))
 
-for c_num in [1, 2]:
+for c_num in [1, 2, 3, 4, 5]:
     c = load_json(os.path.join(tools_dir, f"chunk_eng_8_c{c_num}.json"))
     if c:
         c["cpRef"] = f"{eng_doc} — Chapter {c_num} (Kelas VIII)"
-        eng_data["competencies"].append(c)
+        eng_data["competencies"].append(fix_difficulty(c))
 
 save_json(os.path.join(content_dir, "mapel-eng-d.json"), eng_data)
 
 
-# 4. IPS
+# 4. IPS (Grade 7 Tema 1-3)
 ips_doc = "Ilmu Pengetahuan Sosial untuk SMP/MTs Kelas VII (Edisi Revisi)"
 ips_data = {
     "schema": "fiezel-mapel-bank-v1",
@@ -119,7 +136,7 @@ for t_num in [1, 2, 3]:
     c = load_json(os.path.join(tools_dir, f"chunk_ips_7_t{t_num}.json"))
     if c:
         c["cpRef"] = f"{ips_doc} — Tema {t_num:02d}"
-        ips_data["competencies"].append(c)
+        ips_data["competencies"].append(fix_difficulty(c))
 save_json(os.path.join(content_dir, "mapel-ips-d.json"), ips_data)
 
 
@@ -132,9 +149,9 @@ for b in [1, 2, 3, 4, 5, 6]:
     c = load_json(os.path.join(tools_dir, f"chunk_ipa_8_b{b}.json"))
     if c:
         c["cpRef"] = f"{ipa_doc} — Bab {b} (Kelas VIII)"
-        existing_ipa[c["code"]] = c
+        existing_ipa[c["code"]] = fix_difficulty(c)
 
 ipa_data["competencies"] = list(existing_ipa.values())
 save_json(os.path.join(content_dir, "mapel-ipa-d.json"), ipa_data)
 
-print("Assembled Phase D including ENG Grade 8 Chapter 2.")
+print(f"Assembled: MAT={len(mat_data['competencies'])}, IND={len(ind_data['competencies'])}, ENG={len(eng_data['competencies'])}, IPS={len(ips_data['competencies'])}, IPA={len(ipa_data['competencies'])}")

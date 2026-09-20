@@ -928,241 +928,401 @@
         {
           "id": "eng-d-8-c1-q01",
           "difficulty": "dasar",
-          "prompt": "Based on English for Nusantara Grade VIII (pages 15-20 Unit 1 'School Parade'), what event did Monita and her classmates participate in last August 17th?",
+          "prompt": "Based on the dialogue between Galang and his father in Unit 1 (page 15), what game did Galang win during the school's Independence Day celebration?",
           "options": [
-            "A school parade to celebrate Indonesian Independence Day",
-            "A science fair exhibition at town hall",
-            "A national swimming competition",
-            "A camping trip in the forest"
+            "Marble in spoon race",
+            "Tug of war",
+            "Sack race",
+            "Panjat Pinang"
           ],
           "answer": 0,
           "why": {
-            "0": "Monita and her classmates joined the August 17th school parade celebrating Independence Day."
+            "0": "In the dialogue, Galang explicitly tells his father, 'I won the marble in spoon race.'"
           },
           "distractorWhy": {
-            "1": "Science fair not mentioned in Unit 1.",
-            "2": "Swimming competition is in Chapter 2.",
-            "3": "Camping trip is not August 17th event."
+            "1": "Galang mentions tug of war as one of the games held at school, but he did not win it.",
+            "2": "Galang mentions sack race as one of the school activities, but he did not win this event.",
+            "3": "Panjat Pinang was the game joined by Galang's father when he was young, not Galang."
           }
         },
         {
           "id": "eng-d-8-c1-q02",
-          "difficulty": "sedang",
-          "prompt": "Based on English for Nusantara Grade VIII (page 25 Simple Past Tense), choose the correct regular past form of the verb 'join': 'Galang ___ the marble-in-spoon race last week.'",
+          "difficulty": "dasar",
+          "prompt": "Based on Pak Rahmansyah's experience in Panjat Pinang (Unit 1, page 18), what was the first strategy his team used to overcome the slippery tree?",
           "options": [
-            "joined",
-            "joins",
-            "joining",
-            "will join"
+            "Making a human ladder and wiping off the grease bit by bit",
+            "Throwing the prizes directly from the ground with ropes",
+            "Using a long bamboo ladder brought from home",
+            "Asking the event committee to clean the whole tree first"
           ],
           "answer": 0,
           "why": {
-            "0": "The regular past tense of 'join' adds -ed ending: 'joined'."
+            "0": "Pak Rahmansyah explains that his team made a human ladder and wiped off the grease bit by bit to allow a climber to reach the top."
           },
           "distractorWhy": {
-            "1": "joins is simple present.",
-            "2": "joining is present continuous.",
-            "3": "will join is future."
+            "1": "The climber threw prizes down after reaching the top, not from the ground.",
+            "2": "Pak Rahmansyah's team built a human ladder using their own bodies, not a bamboo ladder.",
+            "3": "The team wiped off the grease themselves step by step rather than relying on the committee."
           }
         },
         {
           "id": "eng-d-8-c1-q03",
           "difficulty": "sedang",
-          "prompt": "Based on English for Nusantara Grade VIII (page 30 Irregular Verbs), choose the correct past form of verb 'win': 'Pipit ___ first place in the sack race contest.'",
+          "prompt": "In recount texts describing past events (Unit 1, page 20), regular past simple verbs are formed by adding '-d', '-ed', or '-ied' to the base verb. Which group contains ONLY regular past simple verbs from Chapter 1?",
           "options": [
-            "won",
-            "winned",
-            "win",
-            "winning"
+            "celebrated, watched, pushed, grabbed",
+            "won, held, ate, fell",
+            "gave, made, threw, came",
+            "ran, led, beat, spoke"
           ],
           "answer": 0,
           "why": {
-            "0": "The irregular past tense form of 'win' is 'won'."
+            "0": "The verbs 'celebrated', 'watched', 'pushed', and 'grabbed' all end with the regular past suffix '-ed' or '-d'."
           },
           "distractorWhy": {
-            "1": "winned is incorrect regularization.",
-            "2": "win is present tense.",
-            "3": "winning is continuous."
+            "1": "The verbs 'won', 'held', 'ate', and 'fell' are all irregular past simple verbs.",
+            "2": "The verbs 'gave', 'made', 'threw', and 'came' change root vowels or endings irregularly.",
+            "3": "The verbs 'ran', 'led', 'beat', and 'spoke' are irregular past forms."
           }
         },
         {
           "id": "eng-d-8-c1-q04",
-          "difficulty": "tinggi",
-          "prompt": "Based on English for Nusantara Grade VIII (page 38 Recount Text Structure), what are the three main parts of a recount text structure?",
+          "difficulty": "sedang",
+          "prompt": "Based on the simple past tense rules in Unit 1 (page 20), what is the correct past form (V2) of the irregular verb 'win' to complete this sentence: 'Galang ___ the marble in spoon race yesterday'?",
           "options": [
-            "Orientation, Events, and Reorientation",
-            "Goal, Materials, and Steps",
-            "Thesis, Arguments, and Recommendation",
-            "Title, Complication, and Resolution"
+            "won",
+            "winned",
+            "winning",
+            "wins"
           ],
           "answer": 0,
           "why": {
-            "0": "A personal recount text consists of Orientation (who/where/when), Events (chronological past experiences), and Reorientation (feeling/summary)."
+            "0": "The verb 'win' is an irregular verb whose past simple form is 'won'."
           },
           "distractorWhy": {
-            "1": "Structure of procedural text.",
-            "2": "Structure of analytical exposition.",
-            "3": "Structure of narrative text."
+            "1": "The form 'winned' is incorrect because 'win' does not take the regular '-ed' ending.",
+            "2": "The form 'winning' is a present participle / gerund, not a simple past verb.",
+            "3": "The form 'wins' is a third-person singular present simple verb."
           }
         },
         {
           "id": "eng-d-8-c1-q05",
-          "difficulty": "dasar",
-          "prompt": "Based on English for Nusantara Grade VIII (page 22 Unit 3 'Panjat Pinang'), what traditional game involves climbing a slippery greased nut tree pole to grab prizes at the top?",
+          "difficulty": "sedang",
+          "prompt": "Complete Pak Rahmansyah's statement about reaching the prizes in Panjat Pinang using the correct Simple Past Tense verb (Unit 1, page 18): 'One of us finally got to the top and ___ the prizes to the ground.'",
           "options": [
-            "Panjat Pinang",
-            "Kelereng (marbles)",
-            "Makan Kerupuk",
-            "Tarik Tambang"
+            "threw",
+            "throwed",
+            "throws",
+            "throwing"
           ],
           "answer": 0,
           "why": {
-            "0": "Panjat Pinang is the traditional Independence Day game where teams climb a greased pole for prizes."
+            "0": "The past simple tense of the irregular verb 'throw' is 'threw'."
           },
           "distractorWhy": {
-            "1": "Kelereng is marble race.",
-            "2": "Makan Kerupuk is cracker eating.",
-            "3": "Tarik Tambang is tug of war."
+            "1": "The form 'throwed' is non-standard because 'throw' forms its past tense irregularly.",
+            "2": "The form 'throws' represents simple present tense third-person singular.",
+            "3": "The form 'throwing' is a continuous form requiring an auxiliary verb."
           }
         },
         {
           "id": "eng-d-8-c1-q06",
-          "difficulty": "sedang",
-          "prompt": "Based on English for Nusantara Grade VIII (page 42 Time Connectors), choose the correct past connector: '___, Made put on his costume. Next, he walked to the school yard.'",
+          "difficulty": "dasar",
+          "prompt": "In Unit 2 (page 29), Andre talks about his experience in the Krupuk race: 'I beat Galang in the Krupuk race.' Galang replies: 'Yeah, I came second.' How did Galang finish in the Krupuk race?",
           "options": [
-            "First",
-            "Finally",
-            "Last year",
-            "Although"
+            "He finished in second place.",
+            "He won first place.",
+            "He was disqualified from the race.",
+            "He did not participate in the race."
           ],
           "answer": 0,
           "why": {
-            "0": "'First' is the initial time connector used at the start of chronological recount events."
+            "0": "Galang explicitly states 'I came second', meaning he earned second place behind Andre."
           },
           "distractorWhy": {
-            "1": "Finally is at the end.",
-            "2": "Last year is time adverb.",
-            "3": "Although is contrast connector."
+            "1": "Andre won first place by beating Galang.",
+            "2": "There is no mention of disqualification in the comic strip.",
+            "3": "Galang actively participated and reached the final stage of the competition."
           }
         },
         {
           "id": "eng-d-8-c1-q07",
-          "difficulty": "tinggi",
-          "prompt": "Based on English for Nusantara Grade VIII (page 48 Unit 2 Review), complete the sentence in simple past negative form: 'We ___ win the kerupuk race, but we had a lot of fun.'",
+          "difficulty": "sedang",
+          "prompt": "Based on Andre's recount text 'A Parade in My Hometown' (Unit 2, page 31), what traditional musical instruments accompanied the people marching in the second line of the parade?",
           "options": [
-            "didn't win",
-            "don't win",
-            "wasn't win",
-            "not winning"
+            "Angklung, suling, and rebana",
+            "Drums, trumpets, and electric guitars",
+            "Gamelan, kulintang, and piano",
+            "Violin, flute, and saxophone"
           ],
           "answer": 0,
           "why": {
-            "0": "Negative simple past tense uses 'didn't' + base verb: 'didn't win'."
+            "0": "The text specifically mentions that singing was accompanied by traditional instruments like angklung, suling, and rebana."
           },
           "distractorWhy": {
-            "1": "don't win is present tense.",
-            "2": "wasn't win is ungrammatical.",
-            "3": "not winning lacks auxiliary verb."
+            "1": "Drums, trumpets, and electric guitars are modern western instruments not listed in Andre's story.",
+            "2": "Gamelan, kulintang, and piano are not mentioned in this section of the text.",
+            "3": "Violin, flute, and saxophone are orchestra instruments not specified in the reading passage."
           }
         },
         {
           "id": "eng-d-8-c1-q08",
-          "difficulty": "dasar",
-          "prompt": "Based on English for Nusantara Grade VIII (page 18), what costume did Galang wear during the school parade?",
+          "difficulty": "tinggi",
+          "prompt": "Why did Andre only watch the parade from his front yard with his father when he was a child, instead of joining it? (Unit 2, page 31)",
           "options": [
-            "A traditional warrior costume with a headpiece",
-            "A doctor white coat",
-            "A chef hat and apron",
-            "A pilot uniform"
+            "Because he was too shy to join the parade",
+            "Because children were forbidden to participate",
+            "Because he did not own a bicycle",
+            "Because he was sick during Independence Day"
           ],
           "answer": 0,
           "why": {
-            "0": "Galang wore a traditional Indonesian warrior costume for the cultural parade."
+            "0": "Andre explains in his recount: 'I always wanted to join the parade but I was too shy.'"
           },
           "distractorWhy": {
-            "1": "Doctor coat is not Galang's costume.",
-            "2": "Chef hat is not his parade outfit.",
-            "3": "Pilot uniform is incorrect."
+            "1": "Children actively participated by riding decorated bicycles in the parade.",
+            "2": "Owning a bicycle was not a requirement to march in the parade.",
+            "3": "The text does not state that Andre was sick on Independence Day."
           }
         },
         {
           "id": "eng-d-8-c1-q09",
           "difficulty": "sedang",
-          "prompt": "Based on English for Nusantara Grade VIII (page 32), what is the past tense form of 'eat' in the sentence: 'They ___ kerupuk attached to a string.'",
+          "prompt": "Based on the reading text 'SMP Merdeka's School Parade' (Unit 2, page 32-33), what did Galang and his friends wear for the parade?",
           "options": [
-            "ate",
-            "eaten",
-            "eats",
-            "eating"
+            "Indonesian freedom fighters' costumes and red-and-white attributes",
+            "Traditional sports jerseys with gold medals",
+            "Scary ghost costumes and dark masks",
+            "Formal school uniforms with black ties"
           ],
           "answer": 0,
           "why": {
-            "0": "The irregular simple past tense of 'eat' is 'ate'."
+            "0": "The text states that students dressed up like Indonesian freedom fighters and wore red and white attributes."
           },
           "distractorWhy": {
-            "1": "eaten is past participle.",
-            "2": "eats is simple present.",
-            "3": "eating is present participle."
+            "1": "They wore freedom fighter costumes, not sports jerseys.",
+            "2": "Ghost costumes were mentioned in Andre's hometown parade, not SMP Merdeka's school parade.",
+            "3": "The participants wore thematic parade costumes rather than standard daily uniforms."
           }
         },
         {
           "id": "eng-d-8-c1-q10",
-          "difficulty": "tinggi",
-          "prompt": "Based on English for Nusantara Grade VIII (page 52 Review), read the excerpt: 'Yesterday was August 17th. SMP Merdeka held an Independence Day celebration. All students felt happy.' What is the main feeling expressed in the reorientation?",
+          "difficulty": "dasar",
+          "prompt": "In Unit 2 Language Focus (page 36), time connectives are used to connect past events in sequence. Which time connective is specifically categorized under the ENDING group?",
           "options": [
-            "Joyful and proud",
-            "Sad and disappointed",
-            "Angry and frustrated",
-            "Bored and tired"
+            "Finally",
+            "In the beginning",
+            "First of all",
+            "First"
           ],
           "answer": 0,
           "why": {
-            "0": "The text states 'felt happy' indicating joy and pride in celebrating Independence Day."
+            "0": "'Finally' is listed in Table 1.2 under the Ending category to signal the final event of a story."
           },
           "distractorWhy": {
-            "1": "Contradicts 'happy'.",
-            "2": "Contradicts the celebratory mood.",
-            "3": "Contradicts 'happy'."
+            "1": "'In the beginning' belongs to the Beginning category of time connectives.",
+            "2": "'First of all' is used to introduce the initial event of a recount.",
+            "3": "'First' is an introductory connective marking the start of a sequence."
           }
         },
         {
           "id": "eng-d-8-c1-q11",
-          "difficulty": "dasar",
-          "prompt": "Based on English for Nusantara Grade VIII (page 28), what is the past form of 'go'?",
+          "difficulty": "sedang",
+          "prompt": "Read the sentence from Monita's blog: '___, after the rain stopped, we gathered back at the schoolyard. The headmaster announced the winner.' (Unit 2, page 39). Which time connective best fits the blank to indicate the concluding stage?",
           "options": [
-            "went",
-            "goed",
-            "gone",
-            "going"
+            "Finally",
+            "First of all",
+            "In the beginning",
+            "Before"
           ],
           "answer": 0,
           "why": {
-            "0": "The irregular past tense of 'go' is 'went'."
+            "0": "'Finally' introduces the ultimate resolution and ending phase after the rain delay."
           },
           "distractorWhy": {
-            "1": "goed is incorrect regularization.",
-            "2": "gone is past participle.",
-            "3": "going is present participle."
+            "1": "'First of all' introduces the start of an event, which is inappropriate at the conclusion.",
+            "2": "'In the beginning' marks the opening context rather than the final announcement.",
+            "3": "'Before' requires a dependent clause or noun phrase to show temporal priority."
           }
         },
         {
           "id": "eng-d-8-c1-q12",
-          "difficulty": "sedang",
-          "prompt": "Based on English for Nusantara Grade VIII (page 35), complete the sentence: 'Pak Rahmansyah ___ a speech at the opening of the school games.'",
+          "difficulty": "tinggi",
+          "prompt": "In Monita's blog about her school parade (Unit 2, page 39), who did Monita dress up as during the event?",
           "options": [
-            "gave",
-            "gives",
-            "given",
-            "giving"
+            "Cut Nyak Dien",
+            "Tuanku Imam Bonjol",
+            "R.A. Kartini",
+            "Pattimura"
           ],
           "answer": 0,
           "why": {
-            "0": "The simple past tense form of 'give' is 'gave'."
+            "0": "Monita explicitly writes: 'I was chosen as the class representative. I dressed as Cut Nyak Dien.'"
           },
           "distractorWhy": {
-            "1": "gives is present.",
-            "2": "given is past participle.",
-            "3": "giving is continuous."
+            "1": "Tuanku Imam Bonjol was the hero costume worn by a student from another class who won best costume.",
+            "2": "R.A. Kartini is an Indonesian national heroine, but Monita did not dress up as her.",
+            "3": "Pattimura is a national hero from Maluku, not the costume chosen by Monita."
+          }
+        },
+        {
+          "id": "eng-d-8-c1-q13",
+          "difficulty": "sedang",
+          "prompt": "Why did Monita and her schoolmates run back to their classroom in the middle of the school parade? (Unit 2, page 39)",
+          "options": [
+            "Because it suddenly started to rain",
+            "Because the marching band stopped playing music",
+            "Because the headmaster called an urgent assembly",
+            "Because they needed to change their costumes"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Monita explains: 'Suddenly, it started to rain. We ran back to our classroom.'"
+          },
+          "distractorWhy": {
+            "1": "The marching band was playing during the parade, but rain was the reason they ran back.",
+            "2": "The headmaster spoke at the schoolyard after the rain stopped, not during the parade.",
+            "3": "The students had already prepared and worn their costumes before marching."
+          }
+        },
+        {
+          "id": "eng-d-8-c1-q14",
+          "difficulty": "dasar",
+          "prompt": "According to Monita's recount text in Unit 3 (page 43), how many bites did Monita need to finish her krupuk and beat Galang in the final krupuk race?",
+          "options": [
+            "Three or four bites",
+            "One single bite",
+            "Ten bites",
+            "Seven or eight bites"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Monita notes in her story: 'I finished my krupuk with three or four bites.'"
+          },
+          "distractorWhy": {
+            "1": "One bite was mentioned as a caption in a fun time game, but not in Monita's actual race text.",
+            "2": "Ten bites would be too slow to win a krupuk race.",
+            "3": "Seven or eight bites is inaccurate based on Monita's written recount."
+          }
+        },
+        {
+          "id": "eng-d-8-c1-q15",
+          "difficulty": "sedang",
+          "prompt": "In Unit 3 (page 43), what happened to Andre during the sack race competition?",
+          "options": [
+            "He led the race at first, but fell in the middle and finished second",
+            "He won first place without any trouble",
+            "He withdrew from the race due to an injury",
+            "He came third behind Pipit's team"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Monita recounts: 'At first, he led the race, but suddenly he fell in the middle of the race. But finally, he came second.'"
+          },
+          "distractorWhy": {
+            "1": "Andre did not win first place because he fell midway through the race.",
+            "2": "Andre completed the race despite falling and managed to earn second place.",
+            "3": "Pipit's team came third in the tandem race, not the sack race."
+          }
+        },
+        {
+          "id": "eng-d-8-c1-q16",
+          "difficulty": "tinggi",
+          "prompt": "Based on the Recount Text Structure explained in Unit 3 (page 45), what is the main purpose of the 'Orientation' section?",
+          "options": [
+            "To set the context by providing background information about who, where, and when the events occurred",
+            "To present a sequence of events in chronological order",
+            "To give step-by-step instructions on how to play a game",
+            "To state a personal conclusion or feeling about the events"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Table 1.3 defines Orientation as setting the context and providing background details regarding who, where, and when."
+          },
+          "distractorWhy": {
+            "1": "Recording events in chronological order is the function of the Events section.",
+            "2": "Giving step-by-step instructions is the structure of a procedure text, not recount orientation.",
+            "3": "Stating personal feelings or conclusions is the function of Re-orientation."
+          }
+        },
+        {
+          "id": "eng-d-8-c1-q17",
+          "difficulty": "tinggi",
+          "prompt": "Read the final paragraph of Monita's story (Unit 3, page 43): 'It was a joyful day at my school. Everyone put a smile on their faces. I was delighted. At the end of the event, my class was announced as the grand champion of the whole competition.' Which structural element of recount text does this paragraph illustrate? (Unit 3, page 45)",
+          "options": [
+            "Re-orientation",
+            "Orientation",
+            "Events",
+            "Identification"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Re-orientation summarizes the writer's personal feelings, comments, and the overall outcome of the experience."
+          },
+          "distractorWhy": {
+            "1": "Orientation appears at the beginning to set context (who, where, when).",
+            "2": "Events detail the specific series of actions that occurred during the day.",
+            "3": "Identification is part of descriptive text structure, not recount text structure."
+          }
+        },
+        {
+          "id": "eng-d-8-c1-q18",
+          "difficulty": "sedang",
+          "prompt": "Identify the sentence that uses correct Simple Past Tense irregular verbs based on the recount text in Chapter 1:",
+          "options": [
+            "Monita felt happy because her class won the grand champion title.",
+            "Monita feel happy because her class winned the grand champion title.",
+            "Monita feeled happy because her class win the grand champion title.",
+            "Monita feeling happy because her class wins the grand champion title."
+          ],
+          "answer": 0,
+          "why": {
+            "0": "The irregular past simple form of 'feel' is 'felt' and the irregular past simple form of 'win' is 'won'."
+          },
+          "distractorWhy": {
+            "1": "'feel' is present tense and 'winned' is an incorrect regularized form of 'win'.",
+            "2": "'feeled' is incorrect because 'feel' is irregular, and 'win' is base form.",
+            "3": "'feeling' lacks a past auxiliary verb and 'wins' is present tense."
+          }
+        },
+        {
+          "id": "eng-d-8-c1-q19",
+          "difficulty": "tinggi",
+          "prompt": "In Unit 1 (page 20), how is an interrogative sentence (question) correctly structured in Simple Past Tense when asking about past participation?",
+          "options": [
+            "Did you participate in the krupuk race yesterday?",
+            "Did you participated in the krupuk race yesterday?",
+            "Were you participate in the krupuk race yesterday?",
+            "Do you participated in the krupuk race yesterday?"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "The rule for simple past questions is 'Did + subject + base verb (V1)', so 'participate' stays in base form after 'Did'."
+          },
+          "distractorWhy": {
+            "1": "Using 'participated' (V2) after auxiliary 'Did' creates a double past tense error.",
+            "2": "'Were' cannot function as an auxiliary verb before a base action verb like 'participate'.",
+            "3": "'Do' is present tense auxiliary, which conflicts with past tense context."
+          }
+        },
+        {
+          "id": "eng-d-8-c1-q20",
+          "difficulty": "sedang",
+          "prompt": "In Unit 2 (page 36 Table 1.2), time connectives are categorized into Beginning, Middle, and Ending. Which time connective belongs to the MIDDLE category?",
+          "options": [
+            "After that",
+            "In the beginning",
+            "First of all",
+            "In the end"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "'After that' is listed in Table 1.2 under Middle time connectives to show sequence between past events."
+          },
+          "distractorWhy": {
+            "1": "'In the beginning' belongs to the Beginning category of time connectives.",
+            "2": "'First of all' belongs to the Beginning category used to start a recount.",
+            "3": "'In the end' belongs to the Ending category of time connectives."
           }
         }
       ]
@@ -1572,6 +1732,1233 @@
             "1": "Bentuk \"are hiding\" dan \"steps\" menggunakan present tense, tidak cocok untuk konteks teks naratif lampau.",
             "2": "Bentuk \"hide\" dan \"step\" menggunakan verb 1 (present), bukan past tense.",
             "3": "Bentuk \"will hide\" dan \"will step\" menggunakan future tense untuk kejadian di masa depan."
+          }
+        }
+      ]
+    },
+    {
+      "code": "KOMP-ENG-D-8-BAB3-01",
+      "grade": 8,
+      "name": "Chapter 3: Love Our World",
+      "materi": "Environmental Conservation Texts, Reducing Plastic Waste, Procedural Posters & Tips, Imperative Expressions for Saving Water/Energy",
+      "cpRef": "English for Nusantara untuk SMP/MTs Kelas VII — Chapter 3 (Kelas VIII)",
+      "items": [
+        {
+          "id": "eng-d-8-c3-q01",
+          "difficulty": "dasar",
+          "prompt": "Based on English for Nusantara Grade VIII (pages 157-159 Unit 1 Comic Strip 3.1), what causes the trash bin at the school canteen to overflow?",
+          "options": [
+            "Plastic waste from snack wrappers and straws",
+            "Overflowing paper waste from old school notebooks",
+            "Leftover organic food waste from the school kitchen",
+            "Broken glass bottles and discarded aluminium cans"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "The trash bin at the canteen overflows mainly because it is filled with plastic waste from snack wrappers and straws."
+          },
+          "distractorWhy": {
+            "1": "Notebook paper waste is not mentioned as filling the canteen trash bin.",
+            "2": "Kitchen organic food waste is not the primary cause stated in the text.",
+            "3": "Glass bottles and aluminium cans are not mentioned in Comic Strip 3.1."
+          }
+        },
+        {
+          "id": "eng-d-8-c3-q02",
+          "difficulty": "sedang",
+          "prompt": "Based on English for Nusantara Grade VIII (page 158 Unit 1 Comic Strip 3.1), what action do Monita and Andre decide to take for their future canteen lunches to reduce plastic waste?",
+          "options": [
+            "Bring their own food containers from home",
+            "Buy more packaged snacks with plastic straws",
+            "Ask the canteen sellers to use single-use paper bags",
+            "Throw their plastic trash in another school bin"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Monita suggests bringing their own food containers next time to avoid generating plastic wrapper waste."
+          },
+          "distractorWhy": {
+            "1": "Buying more packaged snacks increases plastic consumption.",
+            "2": "Asking canteen sellers for paper bags is not the specific action agreed upon.",
+            "3": "Throwing trash elsewhere does not reduce overall plastic usage."
+          }
+        },
+        {
+          "id": "eng-d-8-c3-q03",
+          "difficulty": "dasar",
+          "prompt": "Based on English for Nusantara Grade VIII (page 159 Unit 1 Worksheet 3.2), what does Monita mean when she says \"Good idea, Andre!\"?",
+          "options": [
+            "She agrees with Andre's suggestion to reduce plastic waste",
+            "She thinks Andre should buy more snacks at the canteen",
+            "She wants Andre to clean the canteen trash bin by himself",
+            "She doubts whether reducing plastic waste will help the environment"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "\"Good idea\" expresses agreement with Andre's proposal to bring food containers from home to reduce plastic waste."
+          },
+          "distractorWhy": {
+            "1": "Buying more snacks contradicts the idea of reducing waste.",
+            "2": "She is not instructing Andre to clean the trash bin.",
+            "3": "She fully supports saving the environment rather than doubting it."
+          }
+        },
+        {
+          "id": "eng-d-8-c3-q04",
+          "difficulty": "sedang",
+          "prompt": "Based on English for Nusantara Grade VIII (pages 160-163 Unit 1 Handwashing Procedure), what is the proper action regarding the water faucet while rubbing hands with soap?",
+          "options": [
+            "Turn off the faucet while rubbing hands to save water",
+            "Keep the faucet running continuously throughout handwashing",
+            "Increase the water flow to rinse the soap faster",
+            "Splash water onto the floor to keep hands wet"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "The procedure specifies turning off the faucet while rubbing hands with soap so water is not wasted."
+          },
+          "distractorWhy": {
+            "1": "Leaving the faucet running wastes clean water needlessly.",
+            "2": "Increasing water flow while soaping is wasteful.",
+            "3": "Splashing water on the floor is improper and unhygienic."
+          }
+        },
+        {
+          "id": "eng-d-8-c3-q05",
+          "difficulty": "dasar",
+          "prompt": "Based on English for Nusantara Grade VIII (page 163 Unit 1 Did You Know section), what common health problem is caused by unhygienic water and unsafe sanitation?",
+          "options": [
+            "Diarrhea",
+            "Influenza",
+            "Asthma",
+            "Tooth decay"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Unhygienic water and poor sanitation frequently cause diarrhea, which can prevent children from attending school."
+          },
+          "distractorWhy": {
+            "1": "Influenza is an airborne viral respiratory disease.",
+            "2": "Asthma is a chronic respiratory condition unrelated to water sanitation.",
+            "3": "Tooth decay is related to dental hygiene and diet rather than waterborne pathogens."
+          }
+        },
+        {
+          "id": "eng-d-8-c3-q06",
+          "difficulty": "sedang",
+          "prompt": "Based on English for Nusantara Grade VIII (page 164 Unit 1 Language Focus Table 3.2), which expression is appropriate for the \"Showing the steps\" stage of a procedural presentation?",
+          "options": [
+            "First, turn on the faucet and wash our hands with running water.",
+            "Good afternoon everyone, my name is Alifandra.",
+            "I am going to show you how to wash our hands without wasting water.",
+            "Thank you very much for your kind attention."
+          ],
+          "answer": 0,
+          "why": {
+            "0": "\"First, ...\" is a sequential transition marker used to present procedural steps."
+          },
+          "distractorWhy": {
+            "1": "This expression belongs to the starting the presentation stage.",
+            "2": "This expression belongs to the stating the goal stage.",
+            "3": "This expression belongs to the ending the presentation stage."
+          }
+        },
+        {
+          "id": "eng-d-8-c3-q07",
+          "difficulty": "sedang",
+          "prompt": "Based on English for Nusantara Grade VIII (pages 166-168 Unit 1 Comic Strip 3.3), why does Galang remind Pipit while she is washing her hands?",
+          "options": [
+            "Because Pipit left the faucet running while rubbing her hands with soap",
+            "Because Pipit forgot to use soap when washing her hands",
+            "Because Pipit rubbed her hands for only five seconds",
+            "Because Pipit used dirty river water instead of tap water"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Galang points out that leaving the tap running while soaping hands wastes precious water."
+          },
+          "distractorWhy": {
+            "1": "Pipit was using soap, but left the water running.",
+            "2": "Pipit was rubbing her hands for 60 seconds.",
+            "3": "Pipit was using tap water at school."
+          }
+        },
+        {
+          "id": "eng-d-8-c3-q08",
+          "difficulty": "dasar",
+          "prompt": "Based on English for Nusantara Grade VIII (pages 174-175 Unit 2 Comic Strip 3.4), what topic is discussed in the social media post that Monita shares with her friends?",
+          "options": [
+            "Sorting trash to help save the earth",
+            "Playing online video games on weekends",
+            "Ordering fast food online for school lunch",
+            "Buying fashion items on discount sales"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Monita shares a social media post written by a girl about how to sort household trash to save the environment."
+          },
+          "distractorWhy": {
+            "1": "Video games are not mentioned in Monita's post.",
+            "2": "Fast food delivery is unrelated to the environmental post.",
+            "3": "Online shopping is not the topic of the post."
+          }
+        },
+        {
+          "id": "eng-d-8-c3-q09",
+          "difficulty": "sedang",
+          "prompt": "Based on English for Nusantara Grade VIII (pages 178-179 Unit 2 Picture 3.3 Language Focus), what should we do before commenting on social media?",
+          "options": [
+            "Read and understand the content carefully, then think if we have something necessary and polite to offer",
+            "Post immediate emotional reactions without reading the whole text",
+            "Use aggressive words to win arguments in the comment section",
+            "Share private personal phone numbers and home addresses publicly"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Responsible social media etiquette requires reading carefully and commenting politely only when offering necessary, constructive thoughts."
+          },
+          "distractorWhy": {
+            "1": "Reacting emotionally without reading causes misunderstanding.",
+            "2": "Aggressive words spark unnecessary quarrels.",
+            "3": "Sharing private details online compromises personal safety."
+          }
+        },
+        {
+          "id": "eng-d-8-c3-q10",
+          "difficulty": "dasar",
+          "prompt": "Based on English for Nusantara Grade VIII (page 180 Unit 2 Internet Safety Rules), which practice is recommended for staying safe online?",
+          "options": [
+            "Do not share personal information such as home address and phone number online",
+            "Download files freely from unknown and suspicious websites",
+            "Trust anyone you meet on social media right away",
+            "Post negative comments to criticise classmates publicly"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Protecting privacy by withholding home address and phone number is a core rule for online safety."
+          },
+          "distractorWhy": {
+            "1": "Downloading from suspicious sites exposes devices to malware.",
+            "2": "Trusting strangers online poses serious safety risks.",
+            "3": "Posting hurtful content constitutes cyberbullying."
+          }
+        },
+        {
+          "id": "eng-d-8-c3-q11",
+          "difficulty": "dasar",
+          "prompt": "Based on English for Nusantara Grade VIII (pages 183-184 Unit 2 Section 6), what main problem does @in22day express in the social media post?",
+          "options": [
+            "Having too many old books in the room that are no longer read",
+            "Lacking money to buy school textbooks",
+            "Losing an important library book at school",
+            "Wanting to build a commercial bookstore in town"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "@in22day asks friends for advice on what to do with accumulated old books that are no longer read."
+          },
+          "distractorWhy": {
+            "1": "Lacking money is not @in22day's expressed problem.",
+            "2": "No mention of losing a school library book.",
+            "3": "@in22day is seeking ways to manage personal unused books, not starting a commercial business."
+          }
+        },
+        {
+          "id": "eng-d-8-c3-q12",
+          "difficulty": "sedang",
+          "prompt": "Based on English for Nusantara Grade VIII (pages 183-184 Unit 2 Worksheet 3.14), what is the first step to donate old books to Bina Karya orphanage according to @titalesta?",
+          "options": [
+            "Fill in the donation form on the provided website link",
+            "Send the books directly by post without filling out any form",
+            "Sell the books at Palasari Market first",
+            "Cover the books with plastic layers"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "@titalesta states: \"First fill in the form in the link www.binakaryadonation.com\"."
+          },
+          "distractorWhy": {
+            "1": "Sending books before filling out the online form misses the required initial step.",
+            "2": "Selling books at Palasari Market is @zalvafsp's suggestion, not @titalesta's donation step.",
+            "3": "Covering books with plastic is part of @zalvafsp's selling procedure."
+          }
+        },
+        {
+          "id": "eng-d-8-c3-q13",
+          "difficulty": "tinggi",
+          "prompt": "Based on English for Nusantara Grade VIII (pages 183-184 Unit 2 Section 6), which commenter gives a response that is not related to solving @in22day's problem with old books?",
+          "options": [
+            "@shakila, who recommends watching movies",
+            "@agungibr, who suggests making a cardboard mini library",
+            "@titalesta, who invites book donations for an orphanage",
+            "@zalvafsp, who suggests selling good condition books at Palasari Market"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "@shakila's comment asks about movie recommendations, which does not address the issue of managing old books."
+          },
+          "distractorWhy": {
+            "1": "@agungibr gives a detailed step-by-step method to build a mini bookshelf.",
+            "2": "@titalesta offers a clear donation channel for the books.",
+            "3": "@zalvafsp provides practical steps to resell unused books."
+          }
+        },
+        {
+          "id": "eng-d-8-c3-q14",
+          "difficulty": "sedang",
+          "prompt": "Based on English for Nusantara Grade VIII (pages 187-193 Unit 3 Section 3), what are the two main elements of an instructional procedural poster?",
+          "options": [
+            "Goal and Steps",
+            "Orientation and Reorientation",
+            "Complication and Resolution",
+            "Thesis and Arguments"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Instructional procedural posters focus on communicating a clear Goal and procedural Steps."
+          },
+          "distractorWhy": {
+            "1": "Orientation and Reorientation belong to recount or narrative text structures.",
+            "2": "Complication and Resolution belong to narrative texts.",
+            "3": "Thesis and Arguments belong to exposition texts."
+          }
+        },
+        {
+          "id": "eng-d-8-c3-q15",
+          "difficulty": "tinggi",
+          "prompt": "Based on English for Nusantara Grade VIII (pages 194-195 Unit 3 Language Focus Table 3.4), what visual effect do warm colors (ranging from yellow to reddish violet) create in poster design?",
+          "options": [
+            "They appear to come forward, look larger, and are suitable for foreground elements",
+            "They appear to move backward, look smaller, and are suitable for background elements",
+            "They create a cold, quiet, and sad atmosphere exclusively",
+            "They make text unreadable and obscure all visual details"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Warm colors make visual elements come forward and look larger, making them ideal for foreground emphasis."
+          },
+          "distractorWhy": {
+            "1": "Moving backward and looking smaller is the visual effect of cool colors.",
+            "2": "Cold, quiet, and sad moods are associated with cool colors.",
+            "3": "Warm colors are strategically used to draw attention, not obscure details."
+          }
+        },
+        {
+          "id": "eng-d-8-c3-q16",
+          "difficulty": "tinggi",
+          "prompt": "Based on English for Nusantara Grade VIII (page 195 Unit 3 Table 3.4), how is an analogous color combination formed on a color wheel for poster creation?",
+          "options": [
+            "By combining colors that are next to each other on the color wheel, such as sky blue, green, and yellowish green",
+            "By combining colors directly opposite each other on the color wheel, such as yellow and violet",
+            "By combining dark black and pure white without any hues",
+            "By selecting random colors with no spatial relationship on the wheel"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Analogous color schemes use adjacent colors on the color wheel to create harmonious visual balance."
+          },
+          "distractorWhy": {
+            "1": "Combining opposite colors forms a complementary color scheme.",
+            "2": "Black and white form a monochromatic/achromatic contrast, not analogous hues.",
+            "3": "Analogous combinations follow strict adjacency rules on the color wheel."
+          }
+        },
+        {
+          "id": "eng-d-8-c3-q17",
+          "difficulty": "sedang",
+          "prompt": "Based on English for Nusantara Grade VIII (page 196 Unit 3 Table 3.4), what visual characteristic distinguishes a complementary color combination (e.g., yellow and violet)?",
+          "options": [
+            "Striking contrast between opposite colors on the color wheel",
+            "Subtle, calm, and invisible blending of identical tones",
+            "Monochrome grayscale without any bright highlights",
+            "Smooth pastel shades with zero visual impact"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Complementary colors sit opposite each other on the color wheel, producing high-contrast, striking visuals."
+          },
+          "distractorWhy": {
+            "1": "Identical tones lack the high contrast of complementary pairs.",
+            "2": "Grayscale does not describe chromatic complementary color pairs.",
+            "3": "Complementary colors produce striking visual impact rather than zero impact."
+          }
+        },
+        {
+          "id": "eng-d-8-c3-q18",
+          "difficulty": "sedang",
+          "prompt": "Based on English for Nusantara Grade VIII (page 197 Unit 3 Table 3.5), what is the main purpose of adding illustrations to an environmental procedural poster?",
+          "options": [
+            "To clarify and represent the intended procedural steps visually",
+            "To fill all blank spaces so that no text can be read",
+            "To decorate the poster with unrelated cartoon characters",
+            "To hide the main goal of the poster from readers"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Illustrations in posters complement the text, making the procedural steps clear and engaging."
+          },
+          "distractorWhy": {
+            "1": "Overcrowding blank space makes posters unreadable.",
+            "2": "Unrelated decorative images distract from the poster's key message.",
+            "3": "Illustrations should clarify the main goal, not hide it."
+          }
+        },
+        {
+          "id": "eng-d-8-c3-q19",
+          "difficulty": "dasar",
+          "prompt": "Based on English for Nusantara Grade VIII (page 198 Unit 3 Section 5 Fun Time), what word in the crossword puzzle corresponds to the clue \"the thing that runs water\"?",
+          "options": [
+            "Faucet",
+            "Towel",
+            "Soap",
+            "Poster"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "A faucet is the plumbing fixture that controls and supplies running water."
+          },
+          "distractorWhy": {
+            "1": "A towel is used for drying hands.",
+            "2": "Soap is used for cleansing.",
+            "3": "A poster is a printed paper or cardboard displaying information."
+          }
+        },
+        {
+          "id": "eng-d-8-c3-q20",
+          "difficulty": "tinggi",
+          "prompt": "Based on English for Nusantara Grade VIII (pages 160 and 190 Imperative Expressions), which sentence correctly uses an imperative form to instruct someone to conserve water when washing hands?",
+          "options": [
+            "Turn off the faucet while rubbing your hands with soap.",
+            "You are turning off the faucet right now.",
+            "Did you turn off the faucet after washing?",
+            "The faucet was turned off by Galang."
+          ],
+          "answer": 0,
+          "why": {
+            "0": "\"Turn off...\" is a direct imperative sentence starting with a base verb to give clear procedural instructions."
+          },
+          "distractorWhy": {
+            "1": "This is a present continuous declarative sentence.",
+            "2": "This is a past tense interrogative sentence.",
+            "3": "This is a passive voice sentence in the simple past tense."
+          }
+        }
+      ]
+    },
+    {
+      "code": "KOMP-ENG-D-8-BAB4-01",
+      "grade": 8,
+      "name": "Chapter 4: No Littering",
+      "materi": "Recounting Waste Clean-Up Events, Waste Sorting & Management, Past Continuous Tense (was/were + v-ing), Environmental Action",
+      "cpRef": "English for Nusantara untuk SMP/MTs Kelas VII — Chapter 4 (Kelas VIII)",
+      "items": [
+        {
+          "id": "eng-d-8-c4-q01",
+          "difficulty": "dasar",
+          "prompt": "Read the dialogue snippet from Unit 1 Section 2:\nGalang: \"Was the river this dirty back then? Did you swim in the river?\"\nPak Rahmansyah: \"I did! The river was quite clean back then. A lot of kids swam and played in the river.\"\n\nWhat condition was Sungai Lestari in when Pak Rahmansyah was a child?",
+          "options": [
+            "It was clean and local children often swam and played in it.",
+            "It was already filled with plastic trash and polluted.",
+            "It was deep and dangerous so children were forbidden to go near.",
+            "It was dried up because of a severe drought in the nearby town."
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Teks percakapan menyebutkan bahwa dahulu Sungai Lestari cukup bersih (\"quite clean back then\") dan banyak anak-anak berenang serta bermain di sana."
+          },
+          "distractorWhy": {
+            "1": "Pernyataan ini bertentangan dengan penjelasan Pak Rahmansyah yang menyatakan bahwa sungai tersebut dahulu masih bersih.",
+            "2": "Dialog tidak menyebutkan sungai itu berbahaya atau melarang anak-anak mendekat, melainkan menceritakan bahwa banyak anak bermain di sungai.",
+            "3": "Teks tidak menyebutkan terjadinya kekeringan atau sungai kering."
+          }
+        },
+        {
+          "id": "eng-d-8-c4-q02",
+          "difficulty": "dasar",
+          "prompt": "Based on Bu Posma's explanation in Unit 1 Section 2, why does plastic trash cause long-term pollution in rivers like Sungai Lestari?",
+          "options": [
+            "Because plastic does not decay easily and accumulates in many places.",
+            "Because plastic dissolves instantly in water and poisons river fish.",
+            "Because plastic turns into organic fertilizer that attracts algae.",
+            "Because plastic sinks to the bottom and burns underwater."
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Bu Posma menjelaskan bahwa sampah plastik menjadi masalah utama karena tidak mudah terurai (\"plastic does not decay easily\") sehingga mengotori berbagai tempat."
+          },
+          "distractorWhy": {
+            "1": "Plastik tidak larut secara instan dalam air, melainkan justru sangat sulit terurai.",
+            "2": "Plastik adalah bahan anorganik dan tidak berubah menjadi pupuk organik.",
+            "3": "Plastik yang berada di dalam air sungai tidak terbakar di bawah air."
+          }
+        },
+        {
+          "id": "eng-d-8-c4-q03",
+          "difficulty": "sedang",
+          "prompt": "Choose the grammatically correct interrogative sentence in Simple Past tense based on Language Focus Unit 1:",
+          "options": [
+            "Did people throw their trash into the river?",
+            "Did people threw their trash into the river?",
+            "Was people throw their trash into the river?",
+            "Were people threw their trash into the river?"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Dalam kalimat tanya Simple Past Tense menggunakan kata bantu \"Did\", kata kerja utama kembali ke bentuk dasar (infinitive/Verb 1), yaitu \"throw\"."
+          },
+          "distractorWhy": {
+            "1": "Kata kerja setelah kata bantu \"Did\" harus berupa Verb 1 (\"throw\"), bukan kata kerja bentuk lampau (\"threw\").",
+            "2": "Kata bantu \"Was\" tidak digunakan bersama kata kerja aksi (\"throw\") dalam struktur kalimat tanya sederhana ini.",
+            "3": "Kata bantu \"Were\" tidak dipadukan dengan Verb 2 (\"threw\") dalam pembentukan kalimat tanya Simple Past."
+          }
+        },
+        {
+          "id": "eng-d-8-c4-q04",
+          "difficulty": "sedang",
+          "prompt": "In Audio 4.2 (Unit 1), what main obstacle caused the rainwater to back up and flood the area after the heavy rain?",
+          "options": [
+            "Almost all gutters were clogged and full of plastic trash.",
+            "The river dam broke due to an earthquake.",
+            "The local residents blocked the water pipes intentionally.",
+            "The sea level rose suddenly and flooded the town."
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Petugas penyelamat melaporkan bahwa saluran air (gutters) tersumbat dan penuh dengan sampah plastik sehingga air hujan meluap."
+          },
+          "distractorWhy": {
+            "1": "Teks tidak menyebutkan adanya bendungan yang jebol akibat gempa bumi.",
+            "2": "Tidak ada informasi mengenai warga yang sengaja menyumbat pipa air.",
+            "3": "Banjir disebabkan oleh hujan lebat dan saluran air yang tersumbat sampah plastik, bukan oleh kenaikan permukaan laut."
+          }
+        },
+        {
+          "id": "eng-d-8-c4-q05",
+          "difficulty": "dasar",
+          "prompt": "Complete the sentence with the correct past form of 'be' based on Language Focus Unit 1:\n\"In some areas of the town, many houses _____ almost underwater during the flood.\"",
+          "options": [
+            "were",
+            "was",
+            "is",
+            "are"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Subjek kalimat adalah \"many houses\" (jamak/plural), sehingga kata bantu 'be' dalam bentuk lampau yang tepat adalah \"were\"."
+          },
+          "distractorWhy": {
+            "1": "Bentuk \"was\" digunakan untuk subjek tunggal (singular), sedangkan subjek kalimat ini jamak.",
+            "2": "Bentuk \"is\" merupakan to be present tense untuk subjek tunggal, tidak cocok untuk konteks kejadian masa lalu.",
+            "3": "Bentuk \"are\" merupakan to be present tense, padahal kalimat menceritakan peristiwa di masa lalu (past tense)."
+          }
+        },
+        {
+          "id": "eng-d-8-c4-q06",
+          "difficulty": "sedang",
+          "prompt": "Which of the following questions correctly asks about the state of the gutters in the past using Was/Were?",
+          "options": [
+            "Were the gutters full of plastic trash after the storm?",
+            "Did the gutters was full of plastic trash after the storm?",
+            "Was the gutters full of plastic trash after the storm?",
+            "Were the gutters filled trash do after the storm?"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Subjek \"the gutters\" berbentuk jamak, sehingga kalimat tanya nominal di masa lalu diawali dengan \"Were\" diikuti subjek dan kata sifat/frasa preposisi."
+          },
+          "distractorWhy": {
+            "1": "Penggabungan kata bantu \"Did\" dan \"was\" secara bersamaan dalam satu klausa tidak sesuai tata bahasa.",
+            "2": "Bentuk \"Was\" seharusnya digunakan untuk subjek tunggal, sedangkan \"the gutters\" adalah kata benda jamak.",
+            "3": "Susunan kata dan penggunaan \"filled trash do\" tidak memenuhi struktur tata bahasa yang valid."
+          }
+        },
+        {
+          "id": "eng-d-8-c4-q07",
+          "difficulty": "dasar",
+          "prompt": "Read the excerpt from Unit 2 Section 3:\n\"A team of scientists from Texas University helped an injured sea turtle when they sailed in the ocean near Costa Rica. The scientists were collecting data on sea turtles when they saw the injured turtle.\"\n\nWhere were the scientists when they spotted the injured sea turtle?",
+          "options": [
+            "In the ocean near Costa Rica.",
+            "At a turtle breeding center in Texas.",
+            "On a public beach in Kuta, Bali.",
+            "In a laboratory at Texas University."
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Teks bacaan menyebutkan bahwa para ilmuwan sedang berlayar di samudra dekat Costa Rica ketika mereka melihat penyu yang terluka."
+          },
+          "distractorWhy": {
+            "1": "Meskipun para ilmuwan berasal dari Texas University, lokasi penemuan penyu berada di laut dekat Costa Rica.",
+            "2": "Pantai Kuta Bali merupakan latar lokasi untuk cerita di Unit 3 (gerakan Bye Bye Plastic Bags), bukan cerita penyu di Unit 2.",
+            "3": "Para ilmuwan melihat penyu saat berlayar di laut, bukan di dalam laboratorium."
+          }
+        },
+        {
+          "id": "eng-d-8-c4-q08",
+          "difficulty": "dasar",
+          "prompt": "Based on the story in Unit 2 Section 3, what object did the scientists pull out of the injured sea turtle's nostril?",
+          "options": [
+            "A plastic straw.",
+            "A sharp fish hook.",
+            "A piece of fishing net.",
+            "A dangerous natural parasite."
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Hasil pemeriksaan menunjukkan bahwa benda yang tersumbat di lubang hidung penyu adalah sedotan plastik (\"plastic straw\")."
+          },
+          "distractorWhy": {
+            "1": "Teks tidak menyebutkan adanya kail pancing.",
+            "2": "Benda yang dikeluarkan dari hidung penyu adalah sedotan plastik, bukan jaring ikan.",
+            "3": "Ilmuwan awalnya mengira itu mungkin parasit, tetapi setelah ditarik ternyata benda tersebut adalah sedotan plastik."
+          }
+        },
+        {
+          "id": "eng-d-8-c4-q09",
+          "difficulty": "sedang",
+          "prompt": "Which sentence uses the Past Continuous Tense correctly to describe an action in progress in the past?",
+          "options": [
+            "The scientists were collecting data on sea turtles when they saw the turtle.",
+            "The scientists was collecting data on sea turtles when they saw the turtle.",
+            "The scientists were collect data on sea turtles when they saw the turtle.",
+            "The scientists collected data while they were see the turtle."
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Subjek \"The scientists\" (jamak) berpasangan dengan \"were\" dan kata kerja berakhiran -ing (\"collecting\") untuk membentuk Past Continuous Tense."
+          },
+          "distractorWhy": {
+            "1": "Subjek jamak \"The scientists\" harus menggunakan \"were\", bukan \"was\".",
+            "2": "Past Continuous Tense membutuhkan kata kerja berakhiran -ing (\"collecting\"), bukan bentuk dasar (\"collect\").",
+            "3": "Kata kerja setelah \"were\" harus berbentuk V-ing (\"seeing\"), bukan bentuk dasar (\"see\")."
+          }
+        },
+        {
+          "id": "eng-d-8-c4-q10",
+          "difficulty": "dasar",
+          "prompt": "Complete the Wh- question based on Language Focus Unit 2:\n\"______ did the team of scientists sail when they found the injured turtle?\"\nAnswer: \"They sailed in the ocean near Costa Rica.\"",
+          "options": [
+            "Where",
+            "What",
+            "Why",
+            "Who"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Kata tanya \"Where\" digunakan untuk menanyakan tempat atau lokasi (\"in the ocean near Costa Rica\")."
+          },
+          "distractorWhy": {
+            "1": "Kata tanya \"What\" digunakan untuk menanyakan benda atau tindakan, bukan lokasi.",
+            "2": "Kata tanya \"Why\" digunakan untuk menanyakan alasan atau sebab.",
+            "3": "Kata tanya \"Who\" digunakan untuk menanyakan orang atau pelaku."
+          }
+        },
+        {
+          "id": "eng-d-8-c4-q11",
+          "difficulty": "sedang",
+          "prompt": "Choose the correct structure for asking about the reason why the scientists caught the turtle in Simple Past tense:",
+          "options": [
+            "Why did the scientists catch the sea turtle?",
+            "Why did the scientists caught the sea turtle?",
+            "Why were the scientists caught the sea turtle?",
+            "Why the scientists did catch the sea turtle?"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Formasi pertanyaan Wh- Simple Past menggunakan pola: Wh-word + did + subject + Verb 1 (\"catch\")."
+          },
+          "distractorWhy": {
+            "1": "Setelah kata bantu \"did\", kata kerja yang digunakan harus berupa Verb 1 (\"catch\"), bukan Verb 2 (\"caught\").",
+            "2": "Penggunaan to be \"were\" bersama dengan Verb 2 \"caught\" dalam struktur pertanyaan ini tidak tepat.",
+            "3": "Urutan kata menyimpang karena kata bantu \"did\" diletakkan setelah subjek."
+          }
+        },
+        {
+          "id": "eng-d-8-c4-q12",
+          "difficulty": "sedang",
+          "prompt": "Based on the story in Unit 2 Section 3, how long did it take for the scientists to pull the plastic straw out of the turtle's nostril?",
+          "options": [
+            "About 10 minutes.",
+            "About 2 hours.",
+            "The entire afternoon.",
+            "More than two days."
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Teks menyatakan dengan jelas bahwa proses mengeluarkan sedotan plastik dari hidung penyu memakan waktu sekitar 10 menit (\"about 10 minutes\")."
+          },
+          "distractorWhy": {
+            "1": "Durasi 2 jam merujuk pada lamanya hujan turun pada kejadian banjir di Unit 1, bukan waktu pencabutan sedotan plastik.",
+            "2": "Teks tidak menyebutkan bahwa proses tersebut berlangsung sepanjang sore.",
+            "3": "Waktu 10 menit jauh lebih singkat daripada dua hari."
+          }
+        },
+        {
+          "id": "eng-d-8-c4-q13",
+          "difficulty": "tinggi",
+          "prompt": "Identify the sentence that correctly combines Past Continuous and Simple Past using 'when' based on Language Focus Unit 2:",
+          "options": [
+            "The turtle was swimming near the boat when the scientists noticed the object.",
+            "The turtle is swimming near the boat when the scientists notice the object.",
+            "The turtle swam near the boat when the scientists were notice the object.",
+            "The turtle was swam near the boat when the scientists noticing the object."
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Kalimat ini secara tepat menggabungkan kejadian yang sedang berlangsung di masa lalu (\"was swimming\") dengan kejadian singkat yang menyela (\"noticed\") menggunakan kata hubung \"when\"."
+          },
+          "distractorWhy": {
+            "1": "Kalimat tersebut menggunakan Present Continuous dan Present Simple, bukan struktur lampau (Past Tense).",
+            "2": "Bentuk \"were notice\" tidak sesuai kaidah tata bahasa bahasa Inggris.",
+            "3": "Bentuk \"was swam\" dan \"noticing\" menyalahi aturan pembentukan Past Continuous dan Simple Past."
+          }
+        },
+        {
+          "id": "eng-d-8-c4-q14",
+          "difficulty": "dasar",
+          "prompt": "Read the excerpt from Unit 3 Section 2:\n\"Melati and Isabel Wijsen live in Bali. They spent their teenage years cleaning up the island from plastic. Melati and Isabel were only 12 and 10 years old when they decided to tackle plastic pollution.\"\n\nWhat movement did Melati and Isabel Wijsen start in Bali?",
+          "options": [
+            "Bye Bye Plastic Bags.",
+            "Save the Forest Campaign.",
+            "Clean Water Project.",
+            "No More Chemical Waste."
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Teks dan informasi pendukung di Unit 3 menyebutkan gerakan yang diprakarsai oleh Melati dan Isabel Wijsen bernama \"Bye Bye Plastic Bags\"."
+          },
+          "distractorWhy": {
+            "1": "Gerakan kedua bersaudara tersebut berfokus pada polusi sampah plastik, bukan penyelamatan hutan.",
+            "2": "Fokus utama kampanye mereka adalah pengurangan sampah plastik di Bali, bukan proyek air bersih.",
+            "3": "Teks secara khusus membahas tentang kantong plastik dan sampah plastik, bukan limbah kimia."
+          }
+        },
+        {
+          "id": "eng-d-8-c4-q15",
+          "difficulty": "sedang",
+          "prompt": "Based on Unit 3 Section 4, what is the main purpose of the 'Orientation' section in a factual recount text?",
+          "options": [
+            "To introduce the background information such as who, where, when, and why the event happened.",
+            "To state the author's final personal feeling or recommendation at the very end of the text.",
+            "To list all step-by-step chronological actions taken by the main characters.",
+            "To present a fictional story with magical resolution."
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Bagian Orientation berfungsi memperkenalkan informasi latar belakang seperti siapa (who), di mana (where), kapan (when), dan mengapa (why) peristiwa tersebut terjadi."
+          },
+          "distractorWhy": {
+            "1": "Pernyataan kesan akhir atau evaluasi merupakan fungsi dari bagian Comment / Re-orientation.",
+            "2": "Urutan kejadian kronologis merupakan bagian dari Records of Events.",
+            "3": "Factual recount menyajikan cerita berdasarkan fakta nyata, bukan cerita rekaan imajinatif atau magis."
+          }
+        },
+        {
+          "id": "eng-d-8-c4-q16",
+          "difficulty": "sedang",
+          "prompt": "Which sentence correctly uses 'when' at the beginning of a complex sentence with proper punctuation according to Language Focus Unit 3?",
+          "options": [
+            "When Melati and Isabel went hiking to Mount Batur, they saw plastic bottles along the way.",
+            "When Melati and Isabel went hiking to Mount Batur they saw plastic bottles along the way.",
+            "When Melati and Isabel went hiking to Mount Batur, and they saw plastic bottles along the way.",
+            "When did Melati and Isabel went hiking to Mount Batur, they saw plastic bottles."
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Ketika klausa \"when\" diletakkan di awal kalimat, koma (,) wajib digunakan untuk memisahkan klausa anak dari klausa utama."
+          },
+          "distractorWhy": {
+            "1": "Kalimat tersebut kekurangan tanda koma yang diperlukan untuk memisahkan klausa \"when\" di awal kalimat.",
+            "2": "Penggunaan kata hubung tambahan \"and\" setelah koma adalah redundan dan tidak tepat.",
+            "3": "Penggunaan struktur kalimat tanya \"did ... went\" pada klausa anak di awal kalimat adalah salah secara tata bahasa."
+          }
+        },
+        {
+          "id": "eng-d-8-c4-q17",
+          "difficulty": "sedang",
+          "prompt": "Combine these two events into a single sentence using 'when' based on Language Focus Unit 3:\nEvent 1: \"The scientists were collecting data on sea turtles.\"\nEvent 2: \"They spotted an injured sea turtle swimming near their boat.\"",
+          "options": [
+            "The scientists were collecting data on sea turtles when they spotted an injured sea turtle.",
+            "The scientists were collecting data on sea turtles when were they spot an injured sea turtle.",
+            "When were the scientists collecting data on sea turtles they spotted an injured sea turtle.",
+            "The scientists collect data on sea turtles when they were spotted an injured sea turtle."
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Kalimat ini secara tepat menyambungkan aksi yang berlangsung (\"were collecting data\") dengan kejadian penyela (\"spotted\") menggunakan kata penghubung \"when\"."
+          },
+          "distractorWhy": {
+            "1": "Bentuk \"when were they spot\" salah secara tata bahasa.",
+            "2": "Klausa \"when\" di awal memerlukan koma pemisah, dan frasa \"When were the scientists\" berstruktur kalimat tanya yang tidak sesuai.",
+            "3": "Bentuk \"they were spotted\" bermakna pasif (\"mereka ditemukan\") yang mengubah makna cerita asli."
+          }
+        },
+        {
+          "id": "eng-d-8-c4-q18",
+          "difficulty": "dasar",
+          "prompt": "In waste sorting and management, items such as plastic bottles, plastic straws, and aluminum cans are categorized as:",
+          "options": [
+            "Inorganic waste",
+            "Organic waste",
+            "Hazardous waste (B3)",
+            "Compostable waste"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Botol plastik, sedotan plastik, dan kaleng aluminium merupakan limbah anorganik (inorganic waste) yang tidak dapat terurai secara hayati."
+          },
+          "distractorWhy": {
+            "1": "Limbah organik terdiri dari bahan hayati yang mudah membusuk seperti sisa makanan dan dedaunan.",
+            "2": "Limbah B3 (bahan berbahaya dan beracun) meliputi baterai, lampu, dan zat kimia berbahaya.",
+            "3": "Sampah plastik dan aluminium tidak dapat diolah menjadi kompos."
+          }
+        },
+        {
+          "id": "eng-d-8-c4-q19",
+          "difficulty": "tinggi",
+          "prompt": "Which group of waste items should be sorted specifically into the Hazardous Waste (B3) bin?",
+          "options": [
+            "Used batteries, fluorescent light bulbs, and aerosol spray cans.",
+            "Banana peels, leftover rice, and dry tree leaves.",
+            "Plastic shopping bags, plastic bottles, and plastic cutlery.",
+            "Cardboard boxes, newspaper sheets, and paper bags."
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Baterai bekas, lampu neon, dan kaleng aerosol mengandung zat kimia berbahaya dan beracun sehingga termasuk dalam kategori limbah B3 (Hazardous Waste)."
+          },
+          "distractorWhy": {
+            "1": "Kulit pisang, sisa nasi, dan daun kering adalah contoh limbah organik.",
+            "2": "Kantong plastik, botol plastik, dan sendok plastik adalah contoh limbah anorganik non-B3.",
+            "3": "Kardus, koran, dan kantong kertas adalah sampah daur ulang bahan kertas."
+          }
+        },
+        {
+          "id": "eng-d-8-c4-q20",
+          "difficulty": "tinggi",
+          "prompt": "Read the final sentence of the factual recount about the sea turtle rescue in Unit 2 Section 4:\n\"The straw incident proved how dangerous plastic was to animals in the oceans.\"\n\nWhat role does this sentence play in the structure of a factual recount text?",
+          "options": [
+            "It serves as the final comment/evaluation reflecting on the incident.",
+            "It serves as the initial orientation introducing the characters.",
+            "It serves as the first record of event in chronological order.",
+            "It serves as an interview question directed to the reader."
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Kalimat tersebut memberikan evaluasi atau pendapat akhir (final comment/evaluation) yang menyimpulkan dampak dari peristiwa yang diceritakan."
+          },
+          "distractorWhy": {
+            "1": "Orientasi awal berada di bagian awal teks dan mengenalkan latar tokoh, waktu, serta tempat.",
+            "2": "Record of events memuat urutan aksi atau tindakan kronologis yang terjadi dalam peristiwa.",
+            "3": "Kalimat tersebut merupakan kalimat pernyataan evaluatif, bukan kalimat tanya wawancara."
+          }
+        }
+      ]
+    },
+    {
+      "code": "KOMP-ENG-D-8-BAB5-01",
+      "grade": 8,
+      "name": "Chapter 5: Embrace Yourself",
+      "materi": "Describing Feelings and Personality Traits, Personal Recount Text, Self-Acceptance & Empathy, Encouraging Expressions",
+      "cpRef": "English for Nusantara untuk SMP/MTs Kelas VII — Chapter 5 (Kelas VIII)",
+      "items": [
+        {
+          "id": "eng-d-8-c5-q01",
+          "difficulty": "dasar",
+          "prompt": "Read the conversation from Unit 1 (p. 239):\nMonita: \"Pipit, look at these models!\"\nPipit: \"They are white and tall. They have no flaws at all. They are so beautiful. Should we put on makeup?\"\nMonita: \"I think so. That's what makes them beautiful.\"\n\nWhat is the main topic of Monita and Pipit's discussion?",
+          "options": [
+            "Beauty standards and advertisements",
+            "Types of physical exercise",
+            "School sports competition",
+            "Cooking healthy meals"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Monita dan Pipit sedang mendiskusikan iklan perawatan kecantikan dan standar kecantikan model yang sempurna tanpa cela."
+          },
+          "distractorWhy": {
+            "1": "Pilihan ini membahas olahraga fisik yang tidak disebutkan dalam percakapan.",
+            "2": "Pilihan ini membahas kompetisi olahraga sekolah yang tidak relevan dengan dialog.",
+            "3": "Pilihan ini mengenai memasak makanan sehat yang tidak sesuai dengan isi dialog."
+          }
+        },
+        {
+          "id": "eng-d-8-c5-q02",
+          "difficulty": "dasar",
+          "prompt": "Read Kak Shinta's response in Unit 1 (p. 240):\nKak Shinta: \"You know, we are beautiful just the way we are, with or without makeup.\"\n\nWhat message is Kak Shinta conveying to Monita and Pipit?",
+          "options": [
+            "Self-acceptance and loving oneself naturally",
+            "The mandatory requirement to wear cosmetics daily",
+            "The importance of saving money to buy expensive makeup",
+            "Becoming professional fashion models in the future"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Kak Shinta menekankan penerimaan diri (self-acceptance) bahwa setiap individu cantik apa adanya tanpa perlu bergantung pada tata rias."
+          },
+          "distractorWhy": {
+            "1": "Pilihan ini bertolak belakang karena Kak Shinta tidak mewajibkan kosmetik.",
+            "2": "Pilihan ini membahas tabungan kosmetik mahal yang tidak disampaikan Kak Shinta.",
+            "3": "Pilihan ini mengenai cita-cita menjadi model yang tidak relevan dengan pesan Kak Shinta."
+          }
+        },
+        {
+          "id": "eng-d-8-c5-q03",
+          "difficulty": "dasar",
+          "prompt": "In Unit 1 (p. 241), match the word 'intently' with its correct meaning provided in Section 3:",
+          "options": [
+            "With earnest and eager attention",
+            "A quick look or glance",
+            "A slight hollow in a hard surface",
+            "Cosmetics applied to the face"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Sesuai dengan padanan kosakata di Section 3 (p. 241), 'intently' bermakna menatap dengan penuh perhatian dan sungguh-sungguh."
+          },
+          "distractorWhy": {
+            "1": "Pilihan ini merupakan definisi dari 'a glance'.",
+            "2": "Pilihan ini merupakan definisi dari 'dent'.",
+            "3": "Pilihan ini merupakan definisi dari 'makeup'."
+          }
+        },
+        {
+          "id": "eng-d-8-c5-q04",
+          "difficulty": "sedang",
+          "prompt": "Read the story text from Unit 1 (p. 242):\n\"'You'd look prettier with makeup on.' She looked at me intently; her eyes were scanning every inch of my face. Every dent, every scratch, every line. Every flaw. Suddenly, all the words I had made friends with throughout my life vanished. I didn't say anything to her for a solid minute...\"\n\nHow did the main character ('I') feel when her classmate made that comment?",
+          "options": [
+            "Hurt and speechless",
+            "Cheered and excited",
+            "Amused and cheerful",
+            "Proud and confident"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Karakter 'I' merasa tersakiti perasaannya dan tidak mampu berkata-kata (speechless) selama satu menit penuh akibat komentar tersebut."
+          },
+          "distractorWhy": {
+            "1": "Pilihan ini menggambarkan perasaan gembira yang berlawanan dengan konteks narasi.",
+            "2": "Pilihan ini menggambarkan rasa terhibur yang tidak sesuai dengan dampak emosional cerita.",
+            "3": "Pilihan ini menggambarkan rasa bangga dan percaya diri yang bertentangan dengan isi teks."
+          }
+        },
+        {
+          "id": "eng-d-8-c5-q05",
+          "difficulty": "sedang",
+          "prompt": "Read the ending of the narrative in Unit 1 (p. 242):\n\"Maybe someday I'll carefully conceal my dents, my scratches, my lines. Maybe someday I'll 'prettify' my face. Maybe someday, but for now, I'll learn how to embrace every imperfection, flaw, and part of me...\"\n\nWhat resolution does the narrator reach at the end of the story?",
+          "options": [
+            "Learning to embrace every flaw and imperfection",
+            "Buying whitening skin products immediately",
+            "Avoiding going to school forever",
+            "Confronting her classmate aggressively"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Narator memutuskan untuk belajar merangkul dan menerima setiap kekurangan serta ketidaksempurnaan dirinya (embracing imperfection)."
+          },
+          "distractorWhy": {
+            "1": "Pilihan ini mengenai membeli produk pemutih yang tidak menjadi keputusan narator.",
+            "2": "Pilihan ini mengenai membolos sekolah yang tidak disebutkan dalam teks.",
+            "3": "Pilihan ini mengenai konfrontasi agresif yang tidak dilakukan oleh narator."
+          }
+        },
+        {
+          "id": "eng-d-8-c5-q06",
+          "difficulty": "dasar",
+          "prompt": "Based on Table 5.1 Language Focus (p. 244), which of the following expressions is used to express personal opinion with 'I'?",
+          "options": [
+            "I think (that) ...",
+            "Once upon a time ...",
+            "The next morning ...",
+            "Suddenly ..."
+          ],
+          "answer": 0,
+          "why": {
+            "0": "'I think (that)...' adalah salah satu ungkapan standar untuk menyampaikan pendapat pribadi (expressing opinion)."
+          },
+          "distractorWhy": {
+            "1": "Pilihan ini merupakan kosa kata pembuka cerita naratif/dongeng.",
+            "2": "Pilihan ini merupakan penanda urutan waktu (adverbial of time).",
+            "3": "Pilihan ini merupakan kata keterangan urutan peristiwa mendadak."
+          }
+        },
+        {
+          "id": "eng-d-8-c5-q07",
+          "difficulty": "sedang",
+          "prompt": "Complete the opinion sentence based on Table 5.2 & 5.3 (p. 245):\n\"________, swimming helps you to stay healthy.\"\nWhich expression correctly completes the opinion statement?",
+          "options": [
+            "In my opinion",
+            "Look at me",
+            "Long ago",
+            "Behind the door"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "'In my opinion' merupakan frasa resmi yang digunakan untuk menyatakan pandangan/pendapat."
+          },
+          "distractorWhy": {
+            "1": "Pilihan ini merupakan kalimat perintah untuk melihat.",
+            "2": "Pilihan ini merupakan keterangan waktu lampau.",
+            "3": "Pilihan ini merupakan keterangan tempat."
+          }
+        },
+        {
+          "id": "eng-d-8-c5-q08",
+          "difficulty": "sedang",
+          "prompt": "Read the dialogue in Unit 2 (p. 255):\nGalang: \"I was in the same situation once. I thought I was not good at anything.\"\nMonita: \"But, I found out that I was good at playing basketball.\"\nMade: \"In my case, I thought I was not good at fishing but Galang proved me wrong. He taught me how to fish well. Thanks, Galang.\"\n\nWhat role did Galang play in helping Made build self-confidence?",
+          "options": [
+            "He patiently taught Made how to fish well",
+            "He bought new fishing gear for Made",
+            "He teased Made for lacking sports skills",
+            "He forced Made to join the basketball team"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Galang membantu Made membuktikan bahwa anggapan dirinya buruk dalam memancing adalah keliru dengan mengajarinya teknik memancing yang baik."
+          },
+          "distractorWhy": {
+            "1": "Pilihan ini membahas membelikan alat pancing baru yang tidak ada dalam dialog.",
+            "2": "Pilihan ini membahas mengejek Made yang bertolak belakang dengan sikap suportif Galang.",
+            "3": "Pilihan ini mengenai memaksa masuk tim basket yang tidak sesuai dengan dialog."
+          }
+        },
+        {
+          "id": "eng-d-8-c5-q09",
+          "difficulty": "sedang",
+          "prompt": "Read Part 1 of Mirza's story in Unit 2 (p. 257):\n\"While everyone was so eager to defend and score, Mirza was not sure about his role as a keeper. He ran left, then to the right, clumsily leaving the goal area empty. The next thing he knew, the other team already scored.\"\n\nWhy did the opposing team manage to score easily?",
+          "options": [
+            "Mirza moved clumsily and left the goal area empty",
+            "The soccer ball broke in the middle of the game",
+            "Siti played as the goalkeeper for Mirza's team",
+            "The referee stopped the match unexpectedly"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Tim lawan berhasil mencetak gol karena Mirza merasa canggung dan meninggalkan area gawang dalam keadaan kosong."
+          },
+          "distractorWhy": {
+            "1": "Pilihan ini mengenai bola plastik yang rusak yang tidak disebutkan saat pertandingan.",
+            "2": "Pilihan ini keliru karena Siti bermain di pos penyerang/pemain depan.",
+            "3": "Pilihan ini mengenai wasit menghentikan pertandingan yang tidak ada dalam teks."
+          }
+        },
+        {
+          "id": "eng-d-8-c5-q10",
+          "difficulty": "tinggi",
+          "prompt": "Read the conversation after the street soccer match in Unit 2 (p. 257):\nSiti: \"You were no use, Mirza. You can't play football.\"\nBayu: \"I think he guarded the goal area well.\"\nSiti: \"But he didn't know what to do in the game. He was just running here and there.\"\n\nHow did Mirza react to Siti's discouraging harsh words?",
+          "options": [
+            "He kept silent and remained calm without arguing",
+            "He shouted angrily at Siti and Bayu",
+            "He cried out loud and ran away immediately",
+            "He quit school soccer activities on the spot"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Mirza memilih diam (kept silent) dan tidak membalas ucapan tajam Siti tersebut."
+          },
+          "distractorWhy": {
+            "1": "Pilihan ini berlawanan dengan fakta bahwa Mirza memilih untuk diam.",
+            "2": "Pilihan ini menyatakan Mirza menangis keras yang tidak tercantum dalam narasi.",
+            "3": "Pilihan ini mengenai keluar sekolah yang tidak sesuai dengan alur cerita."
+          }
+        },
+        {
+          "id": "eng-d-8-c5-q11",
+          "difficulty": "tinggi",
+          "prompt": "Read Part 2 of Mirza's story in Unit 2 (p. 259):\nMirza asked his mother if he could join Winners Football Club, but his mother whispered, \"But you know our financial condition.\" Then she suggested, \"There's a community football club here. I heard Pak RT was looking for children to join the club.\"\n\nWhy could Mirza not join Winners Football Club?",
+          "options": [
+            "His family had financial constraints to pay for the club",
+            "Pak RT banned Mirza from joining soccer clubs",
+            "Winners Football Club moved to another country",
+            "Mirza did not like soccer training at all"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Mirza tidak dapat bergabung dengan Winners Football Club karena keterbatasan biaya keluarga (financial condition)."
+          },
+          "distractorWhy": {
+            "1": "Pilihan ini menyalahkan Pak RT padahal Pak RT justru memfasilitasi klub komunitas gratis.",
+            "2": "Pilihan ini mengenai klub pindah negara yang tidak ada dalam konteks.",
+            "3": "Pilihan ini menyatakan Mirza tidak suka sepak bola padahal ia sangat ingin berlatih."
+          }
+        },
+        {
+          "id": "eng-d-8-c5-q12",
+          "difficulty": "tinggi",
+          "prompt": "Read Part 3 of Mirza's story in Unit 2 (p. 261):\n\"Pak RT came to him and suggested that he should try other positions. After trying some positions, he found that being a midfielder was the best position for him. A month later... He helped his team to win as a midfielder.\"\n\nWhat key change led to Mirza's success in football?",
+          "options": [
+            "Switching his position from goalkeeper to midfielder based on advice",
+            "Quitting the community soccer club to join a commercial academy",
+            "Refusing to pass the soccer ball to any of his teammates",
+            "Playing without a coach or any formal practice"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Kunci keberhasilan Mirza adalah berpindah posisi dari penjaga gawang menjadi gelandang (midfielder) atas saran Pak RT."
+          },
+          "distractorWhy": {
+            "1": "Pilihan ini bertolak belakang dengan fakta bahwa Mirza berlatih di klub komunitas Pak RT.",
+            "2": "Pilihan ini menyatakan tidak mau mengoper bola padahal umpan presisi Mirza membantu Siti mencetak gol.",
+            "3": "Pilihan ini menyatakan bermain tanpa pelatih yang tidak sesuai cerita."
+          }
+        },
+        {
+          "id": "eng-d-8-c5-q13",
+          "difficulty": "sedang",
+          "prompt": "Read Siti's words at the end of Unit 2 (p. 261):\nSiti: \"I'm sorry for underestimating you, Mirza. I should not have pushed you to be a goalkeeper. You are such a great midfielder!\"\nMirza: \"That's okay. Let's practice together to become a better team.\"\n\nWhat personal quality does Mirza show when responding to Siti's apology?",
+          "options": [
+            "Forgiveness and a supportive team spirit",
+            "Arrogance and holding long-term grudges",
+            "Indifference and lack of respect",
+            "Selfishness and boasting about his talent"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Mirza menunjukkan kebesaran hati untuk memaafkan (forgiveness) dan semangat kerja sama tim (team spirit) tanpa menyimpan dendam."
+          },
+          "distractorWhy": {
+            "1": "Pilihan ini menggambarkan kesombongan dan dendam yang bertentangan dengan respon Mirza.",
+            "2": "Pilihan ini menggambarkan sikap acuh tak acuh yang tidak sesuai dengan ajakan Mirza.",
+            "3": "Pilihan ini menggambarkan rasa egois dan pamer yang bertolak belakang dengan karakter Mirza."
+          }
+        },
+        {
+          "id": "eng-d-8-c5-q14",
+          "difficulty": "sedang",
+          "prompt": "Based on Language Focus in Unit 2 (p. 265), identify the sentence that contains an adverb of manner ending in '-ly':",
+          "options": [
+            "He ran left, then to the right, clumsily leaving the goal area empty.",
+            "Galang is always friendly to all of his classmates.",
+            "Andre sometimes feels lonely at home.",
+            "We have to respect elderly people in our neighborhood."
+          ],
+          "answer": 0,
+          "why": {
+            "0": "'clumsily' adalah adverb of manner yang menerangkan bagaimana Mirza meninggalkan area gawang. Kata seperti friendly, lonely, dan elderly adalah adjective."
+          },
+          "distractorWhy": {
+            "1": "Pilihan ini menggunakan kata 'friendly' yang berkategori kata sifat (adjective).",
+            "2": "Pilihan ini menggunakan kata 'lonely' yang berkategori kata sifat (adjective).",
+            "3": "Pilihan ini menggunakan kata 'elderly' yang berkategori kata sifat (adjective)."
+          }
+        },
+        {
+          "id": "eng-d-8-c5-q15",
+          "difficulty": "sedang",
+          "prompt": "Based on Language Focus in Unit 2 (p. 265), which of the following words is an adverb of manner that DOES NOT end in '-ly'?",
+          "options": [
+            "well",
+            "clumsily",
+            "sternly",
+            "hesitantly"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Kata 'well' merupakan contoh adverb of manner bentuk tidak berakhiran '-ly' (berasal dari kata sifat 'good')."
+          },
+          "distractorWhy": {
+            "1": "Pilihan ini adalah adverb of manner yang berakhiran '-ly'.",
+            "2": "Pilihan ini adalah adverb of manner yang berakhiran '-ly'.",
+            "3": "Pilihan ini adalah adverb of manner yang berakhiran '-ly'."
+          }
+        },
+        {
+          "id": "eng-d-8-c5-q16",
+          "difficulty": "tinggi",
+          "prompt": "Complete the sentence in Worksheet 5.12 (p. 267) using the correct adjective and adverb of manner:\n\"Mirza is a ________ soccer player. He plays soccer very ________.\"",
+          "options": [
+            "good ; well",
+            "well ; good",
+            "good ; goodly",
+            "well ; well"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "'good' digunakan sebagai kata sifat (adjective) menerangkan kata benda 'soccer player', sedangkan 'well' digunakan sebagai kata keterangan (adverb of manner) menerangkan kata kerja 'plays'."
+          },
+          "distractorWhy": {
+            "1": "Pilihan ini terbalik dalam penempatan kata sifat dan kata keterangan.",
+            "2": "Pilihan ini salah karena bentuk 'goodly' tidak tepat digunakan sebagai keterangan cara bermain.",
+            "3": "Pilihan ini menggunakan kata keterangan di posisi kata sifat."
+          }
+        },
+        {
+          "id": "eng-d-8-c5-q17",
+          "difficulty": "sedang",
+          "prompt": "Read the story 'Getting into the Band' in Unit 3 (p. 274):\n\"I did a few auditions. The first time was a disaster. I couldn't get my breath and I started to cry. I just wanted to run home but the leader was very understanding. He fixed an appointment for the following week. He explained how to relax and do breathing techniques.\"\n\nHow did the band leader show empathy toward Peter during his failed first audition?",
+          "options": [
+            "By giving breathing techniques and offering a re-audition",
+            "By disqualifying Peter from music activities permanently",
+            "By laughing at Peter's nervousness in front of everyone",
+            "By ordering Peter to leave the town hall immediately"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Pemimpin grup musik menunjukkan empati dengan memahami kondisi Peter, mengajarkan teknik pernapasan/relaksasi, serta memberikan kesempatan audisi ulang."
+          },
+          "distractorWhy": {
+            "1": "Pilihan ini mengenai diskualifikasi permanen yang bertentangan dengan sikap suportif sang pemimpin.",
+            "2": "Pilihan ini mengenai mengetawai kegugupan yang berlawanan dengan empati sang pemimpin.",
+            "3": "Pilihan ini mengenai mengusir Peter yang tidak sesuai dengan isi narasi."
+          }
+        },
+        {
+          "id": "eng-d-8-c5-q18",
+          "difficulty": "tinggi",
+          "prompt": "Read the progression of Peter's auditions in Unit 3 (p. 274):\n\"The next time I had prepared everything. But, I did not play well enough because I was still nervous... The third time was a completely different story. I enjoyed it.\"\n\nWhat key takeaway does Peter's story demonstrate regarding skill development?",
+          "options": [
+            "Continuous practice and perseverance overcome initial anxiety",
+            "Relying on luck without preparation is sufficient for success",
+            "Giving up immediately after the first failure avoids stress",
+            "Natural talent requires no practice or breathing guidance"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Pengalaman Peter membuktikan bahwa latihan tekun (practice) dan pantang menyerah (perseverance) mampu mengatasi kecemasan hingga meraih keberhasilan."
+          },
+          "distractorWhy": {
+            "1": "Pilihan ini mengandalkan keberuntungan semata yang bertolak belakang dengan usaha Peter.",
+            "2": "Pilihan ini menyarankan menyerah pada kegagalan pertama yang bertentangan dengan semangat Peter.",
+            "3": "Pilihan ini mengklaim bakat tidak butuh latihan yang berlawanan dengan judul bab 'Practice Makes Perfect'."
+          }
+        },
+        {
+          "id": "eng-d-8-c5-q19",
+          "difficulty": "tinggi",
+          "prompt": "Read Section 4 Language Focus on Narrative Text Structure in Unit 3 (p. 276):\nWhich generic structure of a personal recount narrative text functions to introduce the time, location, and characters of the story?",
+          "options": [
+            "Orientation",
+            "Complication",
+            "Resolution",
+            "Re-orientation"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "'Orientation' adalah bagian struktur naratif yang berfungsi mengenalkan tokoh, waktu, dan tempat terjadinya peristiwa."
+          },
+          "distractorWhy": {
+            "1": "Pilihan ini merupakan bagian yang menyajikan konflik atau permasalahan dalam cerita.",
+            "2": "Pilihan ini merupakan bagian penyelesaian masalah.",
+            "3": "Pilihan ini merupakan bagian penutup atau penyimpulan cerita."
+          }
+        },
+        {
+          "id": "eng-d-8-c5-q20",
+          "difficulty": "tinggi",
+          "prompt": "Based on the text elements in Unit 3 (p. 276), what section of the narrative presents the solution to the conflict experienced by the characters?",
+          "options": [
+            "Resolution",
+            "Complication",
+            "Orientation",
+            "Identification"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "'Resolution' memuat solusi atau penyelesaian dari konflik (complication) yang dialami para tokoh."
+          },
+          "distractorWhy": {
+            "1": "Pilihan ini adalah bagian munculnya konflik/masalah.",
+            "2": "Pilihan ini adalah bagian pengenalan latar dan tokoh.",
+            "3": "Pilihan ini adalah struktur umum teks deskriptif, bukan naratif."
           }
         }
       ]

@@ -8,241 +8,401 @@
     {
       "id": "eng-d-8-c1-q01",
       "difficulty": "dasar",
-      "prompt": "Based on English for Nusantara Grade VIII (pages 15-20 Unit 1 'School Parade'), what event did Monita and her classmates participate in last August 17th?",
+      "prompt": "Based on the dialogue between Galang and his father in Unit 1 (page 15), what game did Galang win during the school's Independence Day celebration?",
       "options": [
-        "A school parade to celebrate Indonesian Independence Day",
-        "A science fair exhibition at town hall",
-        "A national swimming competition",
-        "A camping trip in the forest"
+        "Marble in spoon race",
+        "Tug of war",
+        "Sack race",
+        "Panjat Pinang"
       ],
       "answer": 0,
       "why": {
-        "0": "Monita and her classmates joined the August 17th school parade celebrating Independence Day."
+        "0": "In the dialogue, Galang explicitly tells his father, 'I won the marble in spoon race.'"
       },
       "distractorWhy": {
-        "1": "Science fair not mentioned in Unit 1.",
-        "2": "Swimming competition is in Chapter 2.",
-        "3": "Camping trip is not August 17th event."
+        "1": "Galang mentions tug of war as one of the games held at school, but he did not win it.",
+        "2": "Galang mentions sack race as one of the school activities, but he did not win this event.",
+        "3": "Panjat Pinang was the game joined by Galang's father when he was young, not Galang."
       }
     },
     {
       "id": "eng-d-8-c1-q02",
-      "difficulty": "sedang",
-      "prompt": "Based on English for Nusantara Grade VIII (page 25 Simple Past Tense), choose the correct regular past form of the verb 'join': 'Galang ___ the marble-in-spoon race last week.'",
+      "difficulty": "dasar",
+      "prompt": "Based on Pak Rahmansyah's experience in Panjat Pinang (Unit 1, page 18), what was the first strategy his team used to overcome the slippery tree?",
       "options": [
-        "joined",
-        "joins",
-        "joining",
-        "will join"
+        "Making a human ladder and wiping off the grease bit by bit",
+        "Throwing the prizes directly from the ground with ropes",
+        "Using a long bamboo ladder brought from home",
+        "Asking the event committee to clean the whole tree first"
       ],
       "answer": 0,
       "why": {
-        "0": "The regular past tense of 'join' adds -ed ending: 'joined'."
+        "0": "Pak Rahmansyah explains that his team made a human ladder and wiped off the grease bit by bit to allow a climber to reach the top."
       },
       "distractorWhy": {
-        "1": "joins is simple present.",
-        "2": "joining is present continuous.",
-        "3": "will join is future."
+        "1": "The climber threw prizes down after reaching the top, not from the ground.",
+        "2": "Pak Rahmansyah's team built a human ladder using their own bodies, not a bamboo ladder.",
+        "3": "The team wiped off the grease themselves step by step rather than relying on the committee."
       }
     },
     {
       "id": "eng-d-8-c1-q03",
       "difficulty": "sedang",
-      "prompt": "Based on English for Nusantara Grade VIII (page 30 Irregular Verbs), choose the correct past form of verb 'win': 'Pipit ___ first place in the sack race contest.'",
+      "prompt": "In recount texts describing past events (Unit 1, page 20), regular past simple verbs are formed by adding '-d', '-ed', or '-ied' to the base verb. Which group contains ONLY regular past simple verbs from Chapter 1?",
       "options": [
-        "won",
-        "winned",
-        "win",
-        "winning"
+        "celebrated, watched, pushed, grabbed",
+        "won, held, ate, fell",
+        "gave, made, threw, came",
+        "ran, led, beat, spoke"
       ],
       "answer": 0,
       "why": {
-        "0": "The irregular past tense form of 'win' is 'won'."
+        "0": "The verbs 'celebrated', 'watched', 'pushed', and 'grabbed' all end with the regular past suffix '-ed' or '-d'."
       },
       "distractorWhy": {
-        "1": "winned is incorrect regularization.",
-        "2": "win is present tense.",
-        "3": "winning is continuous."
+        "1": "The verbs 'won', 'held', 'ate', and 'fell' are all irregular past simple verbs.",
+        "2": "The verbs 'gave', 'made', 'threw', and 'came' change root vowels or endings irregularly.",
+        "3": "The verbs 'ran', 'led', 'beat', and 'spoke' are irregular past forms."
       }
     },
     {
       "id": "eng-d-8-c1-q04",
-      "difficulty": "tinggi",
-      "prompt": "Based on English for Nusantara Grade VIII (page 38 Recount Text Structure), what are the three main parts of a recount text structure?",
+      "difficulty": "sedang",
+      "prompt": "Based on the simple past tense rules in Unit 1 (page 20), what is the correct past form (V2) of the irregular verb 'win' to complete this sentence: 'Galang ___ the marble in spoon race yesterday'?",
       "options": [
-        "Orientation, Events, and Reorientation",
-        "Goal, Materials, and Steps",
-        "Thesis, Arguments, and Recommendation",
-        "Title, Complication, and Resolution"
+        "won",
+        "winned",
+        "winning",
+        "wins"
       ],
       "answer": 0,
       "why": {
-        "0": "A personal recount text consists of Orientation (who/where/when), Events (chronological past experiences), and Reorientation (feeling/summary)."
+        "0": "The verb 'win' is an irregular verb whose past simple form is 'won'."
       },
       "distractorWhy": {
-        "1": "Structure of procedural text.",
-        "2": "Structure of analytical exposition.",
-        "3": "Structure of narrative text."
+        "1": "The form 'winned' is incorrect because 'win' does not take the regular '-ed' ending.",
+        "2": "The form 'winning' is a present participle / gerund, not a simple past verb.",
+        "3": "The form 'wins' is a third-person singular present simple verb."
       }
     },
     {
       "id": "eng-d-8-c1-q05",
-      "difficulty": "dasar",
-      "prompt": "Based on English for Nusantara Grade VIII (page 22 Unit 3 'Panjat Pinang'), what traditional game involves climbing a slippery greased nut tree pole to grab prizes at the top?",
+      "difficulty": "sedang",
+      "prompt": "Complete Pak Rahmansyah's statement about reaching the prizes in Panjat Pinang using the correct Simple Past Tense verb (Unit 1, page 18): 'One of us finally got to the top and ___ the prizes to the ground.'",
       "options": [
-        "Panjat Pinang",
-        "Kelereng (marbles)",
-        "Makan Kerupuk",
-        "Tarik Tambang"
+        "threw",
+        "throwed",
+        "throws",
+        "throwing"
       ],
       "answer": 0,
       "why": {
-        "0": "Panjat Pinang is the traditional Independence Day game where teams climb a greased pole for prizes."
+        "0": "The past simple tense of the irregular verb 'throw' is 'threw'."
       },
       "distractorWhy": {
-        "1": "Kelereng is marble race.",
-        "2": "Makan Kerupuk is cracker eating.",
-        "3": "Tarik Tambang is tug of war."
+        "1": "The form 'throwed' is non-standard because 'throw' forms its past tense irregularly.",
+        "2": "The form 'throws' represents simple present tense third-person singular.",
+        "3": "The form 'throwing' is a continuous form requiring an auxiliary verb."
       }
     },
     {
       "id": "eng-d-8-c1-q06",
-      "difficulty": "sedang",
-      "prompt": "Based on English for Nusantara Grade VIII (page 42 Time Connectors), choose the correct past connector: '___, Made put on his costume. Next, he walked to the school yard.'",
+      "difficulty": "dasar",
+      "prompt": "In Unit 2 (page 29), Andre talks about his experience in the Krupuk race: 'I beat Galang in the Krupuk race.' Galang replies: 'Yeah, I came second.' How did Galang finish in the Krupuk race?",
       "options": [
-        "First",
-        "Finally",
-        "Last year",
-        "Although"
+        "He finished in second place.",
+        "He won first place.",
+        "He was disqualified from the race.",
+        "He did not participate in the race."
       ],
       "answer": 0,
       "why": {
-        "0": "'First' is the initial time connector used at the start of chronological recount events."
+        "0": "Galang explicitly states 'I came second', meaning he earned second place behind Andre."
       },
       "distractorWhy": {
-        "1": "Finally is at the end.",
-        "2": "Last year is time adverb.",
-        "3": "Although is contrast connector."
+        "1": "Andre won first place by beating Galang.",
+        "2": "There is no mention of disqualification in the comic strip.",
+        "3": "Galang actively participated and reached the final stage of the competition."
       }
     },
     {
       "id": "eng-d-8-c1-q07",
-      "difficulty": "tinggi",
-      "prompt": "Based on English for Nusantara Grade VIII (page 48 Unit 2 Review), complete the sentence in simple past negative form: 'We ___ win the kerupuk race, but we had a lot of fun.'",
+      "difficulty": "sedang",
+      "prompt": "Based on Andre's recount text 'A Parade in My Hometown' (Unit 2, page 31), what traditional musical instruments accompanied the people marching in the second line of the parade?",
       "options": [
-        "didn't win",
-        "don't win",
-        "wasn't win",
-        "not winning"
+        "Angklung, suling, and rebana",
+        "Drums, trumpets, and electric guitars",
+        "Gamelan, kulintang, and piano",
+        "Violin, flute, and saxophone"
       ],
       "answer": 0,
       "why": {
-        "0": "Negative simple past tense uses 'didn't' + base verb: 'didn't win'."
+        "0": "The text specifically mentions that singing was accompanied by traditional instruments like angklung, suling, and rebana."
       },
       "distractorWhy": {
-        "1": "don't win is present tense.",
-        "2": "wasn't win is ungrammatical.",
-        "3": "not winning lacks auxiliary verb."
+        "1": "Drums, trumpets, and electric guitars are modern western instruments not listed in Andre's story.",
+        "2": "Gamelan, kulintang, and piano are not mentioned in this section of the text.",
+        "3": "Violin, flute, and saxophone are orchestra instruments not specified in the reading passage."
       }
     },
     {
       "id": "eng-d-8-c1-q08",
-      "difficulty": "dasar",
-      "prompt": "Based on English for Nusantara Grade VIII (page 18), what costume did Galang wear during the school parade?",
+      "difficulty": "tinggi",
+      "prompt": "Why did Andre only watch the parade from his front yard with his father when he was a child, instead of joining it? (Unit 2, page 31)",
       "options": [
-        "A traditional warrior costume with a headpiece",
-        "A doctor white coat",
-        "A chef hat and apron",
-        "A pilot uniform"
+        "Because he was too shy to join the parade",
+        "Because children were forbidden to participate",
+        "Because he did not own a bicycle",
+        "Because he was sick during Independence Day"
       ],
       "answer": 0,
       "why": {
-        "0": "Galang wore a traditional Indonesian warrior costume for the cultural parade."
+        "0": "Andre explains in his recount: 'I always wanted to join the parade but I was too shy.'"
       },
       "distractorWhy": {
-        "1": "Doctor coat is not Galang's costume.",
-        "2": "Chef hat is not his parade outfit.",
-        "3": "Pilot uniform is incorrect."
+        "1": "Children actively participated by riding decorated bicycles in the parade.",
+        "2": "Owning a bicycle was not a requirement to march in the parade.",
+        "3": "The text does not state that Andre was sick on Independence Day."
       }
     },
     {
       "id": "eng-d-8-c1-q09",
       "difficulty": "sedang",
-      "prompt": "Based on English for Nusantara Grade VIII (page 32), what is the past tense form of 'eat' in the sentence: 'They ___ kerupuk attached to a string.'",
+      "prompt": "Based on the reading text 'SMP Merdeka's School Parade' (Unit 2, page 32-33), what did Galang and his friends wear for the parade?",
       "options": [
-        "ate",
-        "eaten",
-        "eats",
-        "eating"
+        "Indonesian freedom fighters' costumes and red-and-white attributes",
+        "Traditional sports jerseys with gold medals",
+        "Scary ghost costumes and dark masks",
+        "Formal school uniforms with black ties"
       ],
       "answer": 0,
       "why": {
-        "0": "The irregular simple past tense of 'eat' is 'ate'."
+        "0": "The text states that students dressed up like Indonesian freedom fighters and wore red and white attributes."
       },
       "distractorWhy": {
-        "1": "eaten is past participle.",
-        "2": "eats is simple present.",
-        "3": "eating is present participle."
+        "1": "They wore freedom fighter costumes, not sports jerseys.",
+        "2": "Ghost costumes were mentioned in Andre's hometown parade, not SMP Merdeka's school parade.",
+        "3": "The participants wore thematic parade costumes rather than standard daily uniforms."
       }
     },
     {
       "id": "eng-d-8-c1-q10",
-      "difficulty": "tinggi",
-      "prompt": "Based on English for Nusantara Grade VIII (page 52 Review), read the excerpt: 'Yesterday was August 17th. SMP Merdeka held an Independence Day celebration. All students felt happy.' What is the main feeling expressed in the reorientation?",
+      "difficulty": "dasar",
+      "prompt": "In Unit 2 Language Focus (page 36), time connectives are used to connect past events in sequence. Which time connective is specifically categorized under the ENDING group?",
       "options": [
-        "Joyful and proud",
-        "Sad and disappointed",
-        "Angry and frustrated",
-        "Bored and tired"
+        "Finally",
+        "In the beginning",
+        "First of all",
+        "First"
       ],
       "answer": 0,
       "why": {
-        "0": "The text states 'felt happy' indicating joy and pride in celebrating Independence Day."
+        "0": "'Finally' is listed in Table 1.2 under the Ending category to signal the final event of a story."
       },
       "distractorWhy": {
-        "1": "Contradicts 'happy'.",
-        "2": "Contradicts the celebratory mood.",
-        "3": "Contradicts 'happy'."
+        "1": "'In the beginning' belongs to the Beginning category of time connectives.",
+        "2": "'First of all' is used to introduce the initial event of a recount.",
+        "3": "'First' is an introductory connective marking the start of a sequence."
       }
     },
     {
       "id": "eng-d-8-c1-q11",
-      "difficulty": "dasar",
-      "prompt": "Based on English for Nusantara Grade VIII (page 28), what is the past form of 'go'?",
+      "difficulty": "sedang",
+      "prompt": "Read the sentence from Monita's blog: '___, after the rain stopped, we gathered back at the schoolyard. The headmaster announced the winner.' (Unit 2, page 39). Which time connective best fits the blank to indicate the concluding stage?",
       "options": [
-        "went",
-        "goed",
-        "gone",
-        "going"
+        "Finally",
+        "First of all",
+        "In the beginning",
+        "Before"
       ],
       "answer": 0,
       "why": {
-        "0": "The irregular past tense of 'go' is 'went'."
+        "0": "'Finally' introduces the ultimate resolution and ending phase after the rain delay."
       },
       "distractorWhy": {
-        "1": "goed is incorrect regularization.",
-        "2": "gone is past participle.",
-        "3": "going is present participle."
+        "1": "'First of all' introduces the start of an event, which is inappropriate at the conclusion.",
+        "2": "'In the beginning' marks the opening context rather than the final announcement.",
+        "3": "'Before' requires a dependent clause or noun phrase to show temporal priority."
       }
     },
     {
       "id": "eng-d-8-c1-q12",
-      "difficulty": "sedang",
-      "prompt": "Based on English for Nusantara Grade VIII (page 35), complete the sentence: 'Pak Rahmansyah ___ a speech at the opening of the school games.'",
+      "difficulty": "tinggi",
+      "prompt": "In Monita's blog about her school parade (Unit 2, page 39), who did Monita dress up as during the event?",
       "options": [
-        "gave",
-        "gives",
-        "given",
-        "giving"
+        "Cut Nyak Dien",
+        "Tuanku Imam Bonjol",
+        "R.A. Kartini",
+        "Pattimura"
       ],
       "answer": 0,
       "why": {
-        "0": "The simple past tense form of 'give' is 'gave'."
+        "0": "Monita explicitly writes: 'I was chosen as the class representative. I dressed as Cut Nyak Dien.'"
       },
       "distractorWhy": {
-        "1": "gives is present.",
-        "2": "given is past participle.",
-        "3": "giving is continuous."
+        "1": "Tuanku Imam Bonjol was the hero costume worn by a student from another class who won best costume.",
+        "2": "R.A. Kartini is an Indonesian national heroine, but Monita did not dress up as her.",
+        "3": "Pattimura is a national hero from Maluku, not the costume chosen by Monita."
+      }
+    },
+    {
+      "id": "eng-d-8-c1-q13",
+      "difficulty": "sedang",
+      "prompt": "Why did Monita and her schoolmates run back to their classroom in the middle of the school parade? (Unit 2, page 39)",
+      "options": [
+        "Because it suddenly started to rain",
+        "Because the marching band stopped playing music",
+        "Because the headmaster called an urgent assembly",
+        "Because they needed to change their costumes"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Monita explains: 'Suddenly, it started to rain. We ran back to our classroom.'"
+      },
+      "distractorWhy": {
+        "1": "The marching band was playing during the parade, but rain was the reason they ran back.",
+        "2": "The headmaster spoke at the schoolyard after the rain stopped, not during the parade.",
+        "3": "The students had already prepared and worn their costumes before marching."
+      }
+    },
+    {
+      "id": "eng-d-8-c1-q14",
+      "difficulty": "dasar",
+      "prompt": "According to Monita's recount text in Unit 3 (page 43), how many bites did Monita need to finish her krupuk and beat Galang in the final krupuk race?",
+      "options": [
+        "Three or four bites",
+        "One single bite",
+        "Ten bites",
+        "Seven or eight bites"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Monita notes in her story: 'I finished my krupuk with three or four bites.'"
+      },
+      "distractorWhy": {
+        "1": "One bite was mentioned as a caption in a fun time game, but not in Monita's actual race text.",
+        "2": "Ten bites would be too slow to win a krupuk race.",
+        "3": "Seven or eight bites is inaccurate based on Monita's written recount."
+      }
+    },
+    {
+      "id": "eng-d-8-c1-q15",
+      "difficulty": "sedang",
+      "prompt": "In Unit 3 (page 43), what happened to Andre during the sack race competition?",
+      "options": [
+        "He led the race at first, but fell in the middle and finished second",
+        "He won first place without any trouble",
+        "He withdrew from the race due to an injury",
+        "He came third behind Pipit's team"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Monita recounts: 'At first, he led the race, but suddenly he fell in the middle of the race. But finally, he came second.'"
+      },
+      "distractorWhy": {
+        "1": "Andre did not win first place because he fell midway through the race.",
+        "2": "Andre completed the race despite falling and managed to earn second place.",
+        "3": "Pipit's team came third in the tandem race, not the sack race."
+      }
+    },
+    {
+      "id": "eng-d-8-c1-q16",
+      "difficulty": "tinggi",
+      "prompt": "Based on the Recount Text Structure explained in Unit 3 (page 45), what is the main purpose of the 'Orientation' section?",
+      "options": [
+        "To set the context by providing background information about who, where, and when the events occurred",
+        "To present a sequence of events in chronological order",
+        "To give step-by-step instructions on how to play a game",
+        "To state a personal conclusion or feeling about the events"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Table 1.3 defines Orientation as setting the context and providing background details regarding who, where, and when."
+      },
+      "distractorWhy": {
+        "1": "Recording events in chronological order is the function of the Events section.",
+        "2": "Giving step-by-step instructions is the structure of a procedure text, not recount orientation.",
+        "3": "Stating personal feelings or conclusions is the function of Re-orientation."
+      }
+    },
+    {
+      "id": "eng-d-8-c1-q17",
+      "difficulty": "tinggi",
+      "prompt": "Read the final paragraph of Monita's story (Unit 3, page 43): 'It was a joyful day at my school. Everyone put a smile on their faces. I was delighted. At the end of the event, my class was announced as the grand champion of the whole competition.' Which structural element of recount text does this paragraph illustrate? (Unit 3, page 45)",
+      "options": [
+        "Re-orientation",
+        "Orientation",
+        "Events",
+        "Identification"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "Re-orientation summarizes the writer's personal feelings, comments, and the overall outcome of the experience."
+      },
+      "distractorWhy": {
+        "1": "Orientation appears at the beginning to set context (who, where, when).",
+        "2": "Events detail the specific series of actions that occurred during the day.",
+        "3": "Identification is part of descriptive text structure, not recount text structure."
+      }
+    },
+    {
+      "id": "eng-d-8-c1-q18",
+      "difficulty": "sedang",
+      "prompt": "Identify the sentence that uses correct Simple Past Tense irregular verbs based on the recount text in Chapter 1:",
+      "options": [
+        "Monita felt happy because her class won the grand champion title.",
+        "Monita feel happy because her class winned the grand champion title.",
+        "Monita feeled happy because her class win the grand champion title.",
+        "Monita feeling happy because her class wins the grand champion title."
+      ],
+      "answer": 0,
+      "why": {
+        "0": "The irregular past simple form of 'feel' is 'felt' and the irregular past simple form of 'win' is 'won'."
+      },
+      "distractorWhy": {
+        "1": "'feel' is present tense and 'winned' is an incorrect regularized form of 'win'.",
+        "2": "'feeled' is incorrect because 'feel' is irregular, and 'win' is base form.",
+        "3": "'feeling' lacks a past auxiliary verb and 'wins' is present tense."
+      }
+    },
+    {
+      "id": "eng-d-8-c1-q19",
+      "difficulty": "tinggi",
+      "prompt": "In Unit 1 (page 20), how is an interrogative sentence (question) correctly structured in Simple Past Tense when asking about past participation?",
+      "options": [
+        "Did you participate in the krupuk race yesterday?",
+        "Did you participated in the krupuk race yesterday?",
+        "Were you participate in the krupuk race yesterday?",
+        "Do you participated in the krupuk race yesterday?"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "The rule for simple past questions is 'Did + subject + base verb (V1)', so 'participate' stays in base form after 'Did'."
+      },
+      "distractorWhy": {
+        "1": "Using 'participated' (V2) after auxiliary 'Did' creates a double past tense error.",
+        "2": "'Were' cannot function as an auxiliary verb before a base action verb like 'participate'.",
+        "3": "'Do' is present tense auxiliary, which conflicts with past tense context."
+      }
+    },
+    {
+      "id": "eng-d-8-c1-q20",
+      "difficulty": "sedang",
+      "prompt": "In Unit 2 (page 36 Table 1.2), time connectives are categorized into Beginning, Middle, and Ending. Which time connective belongs to the MIDDLE category?",
+      "options": [
+        "After that",
+        "In the beginning",
+        "First of all",
+        "In the end"
+      ],
+      "answer": 0,
+      "why": {
+        "0": "'After that' is listed in Table 1.2 under Middle time connectives to show sequence between past events."
+      },
+      "distractorWhy": {
+        "1": "'In the beginning' belongs to the Beginning category of time connectives.",
+        "2": "'First of all' belongs to the Beginning category used to start a recount.",
+        "3": "'In the end' belongs to the Ending category of time connectives."
       }
     }
   ]
