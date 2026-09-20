@@ -264,6 +264,9 @@ jobs:
           # Misi luring F9 fase 1: precache shell, sesi terakhir + konfirmasi,
           # runner lokal 6 butir, antrean question_answered idempoten.
           node tests/kurikulum-luring-test.js
+          # Luring fase 2: endpoint batch paparan-tanpa-mastery, peta eksak,
+          # klien batch-dulu-warisan-bila-404.
+          node tests/kurikulum-luring-fase2-test.js
           node tests/question-allocator-test.js
           node tests/bankor-latihan-test.js
           node tests/fiezel-stat-gate-test.js

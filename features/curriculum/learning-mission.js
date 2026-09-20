@@ -412,30 +412,16 @@
     simpanJSON(QUEUE_KEY, q.slice(-500));
   }
 
-  /* Mengirim antrean sebagai question_answered idempoten. event_id stabil dari
-     (pengguna, butir, waktu jawab) — kirim ulang tidak pernah double-count. */
+  /* Mengirim antrean: pertama ke /offline-batch (F9 fase 2: paparan + aktivitas,
+     bentuk payload sama seperti antrean fase 1). Bila backend lebih tua dan belum
+     mengenal rute itu (404), jatuh kembali ke pengiriman per-event fase 1 — antrean
+     tidak boleh terdampar oleh skew deploy. */
   function kirimAntre(manual) {
     if (S.flushing) return Promise.resolve(false);
     var q = muatAntre();
     if (!q.length || !S.user) return Promise.resolve(true);
     S.flushing = true;
-    var sisa = [];
-    var rantai = Promise.resolve();
-    q.forEach(function (e) {
-      rantai = rantai.then(function () {
-        return api('/learning/events', { body: {
-          type: 'question_answered',
-          event_id: e.eid,
-          payload: {
-            question_id: e.itemId, unit_id: e.unitId, subchapter_id: e.sub || null,
-            correct: e.correct ? 1 : 0, offline: true, at: e.at
-          }
-        } }).then(function (r) {
-          if (!(r && (r.stored || r.reason === 'duplicate'))) sisa.push(e);
-        }, function () { sisa.push(e); });
-      });
-    });
-    return rantai.then(function () {
+    function selesai(sisa) {
       simpanJSON(QUEUE_KEY, sisa);
       S.flushing = false;
       if (manual) {
@@ -445,6 +431,45 @@
       }
       if (S.user) render();
       return !sisa.length;
+    }
+    function warisan() {
+      var sisa = [];
+      var rantai = Promise.resolve();
+      q.forEach(function (e) {
+        rantai = rantai.then(function () {
+          return api('/learning/events', { body: {
+            type: 'question_answered',
+            event_id: e.eid,
+            payload: {
+              question_id: e.itemId, unit_id: e.unitId, subchapter_id: e.sub || null,
+              correct: e.correct ? 1 : 0, offline: true, at: e.at
+            }
+          } }).then(function (r) {
+            if (!(r && (r.stored || r.reason === 'duplicate'))) sisa.push(e);
+          }, function () { sisa.push(e); });
+        });
+      });
+      return rantai.then(function () { return selesai(sisa); });
+    }
+    return api('/learning/offline-batch', { body: {
+      attempts: q.map(function (e) {
+        return {
+          event_id: e.eid, static_item_id: e.itemId, unit_id: e.unitId,
+          subchapter_id: e.sub || null, client_correct: !!e.correct, at: e.at
+        };
+      })
+    } }).then(function (r) {
+      var okSet = {};
+      ((r && r.results) || []).forEach(function (x) {
+        if (x && (x.status === 'stored' || x.status === 'duplicate')) okSet[x.event_id] = true;
+      });
+      var sisa = q.filter(function (e) { return !okSet[e.eid]; });
+      /* Backend tua tanpa rute batch: seluruh antrean "gagal" sekaligus — warisan. */
+      if (sisa.length === q.length && q.length) return warisan();
+      return selesai(sisa);
+    }, function (e) {
+      if (e && (e.status === 404 || /404|tidak ditemukan/i.test(e.message || ''))) return warisan();
+      return selesai(q);
     });
   }
 
