@@ -587,6 +587,29 @@ body.reduce-motion .ch-student,body.reduce-motion .ch-body,body.reduce-motion .c
   color: var(--ch-ok);
   font-weight: 700;
 }
+/* Keadaan "belum ada apa-apa" tidak boleh memakai warna aksen. Badge dasar berwarna
+   aksen putih-di-atas-warna, dan itu membaca sebagai SOROTAN — persis kebalikan dari yang
+   dimaksud. Varian ini diam, supaya mapel tanpa tugas terlihat sebagai mapel tanpa tugas
+   dan bukan sebagai kabar baik. (m025-349, temuan K8.) */
+.ch-badge.is-mute,
+.ch-subject-top .ch-badge:not(.is-warn):not(.is-ok) {
+  background: var(--ch-line, rgba(0,0,0,.08));
+  color: var(--ch-muted);
+  font-weight: 600;
+}
+/* Ruang lingkup kartu kurikulum: ikon sebaris dengan teksnya, tanpa menaikkan tinggi baris. */
+.ch-curriculum-scope {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0 0 10px;
+}
+.ch-curriculum-scope i,
+.ch-curriculum-scope svg {
+  width: 14px;
+  height: 14px;
+  flex: none;
+}
 .ch-subject-name {
   margin: 0;
   font-size: .95rem;

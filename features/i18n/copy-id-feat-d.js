@@ -412,6 +412,18 @@
     'kelas.panel-semua-kelas-fallback': 'Kelas {kode}',
     'kelas.filter-mapel-kosong': 'Belum ada tugas untuk mapel ini.',
     'kelas.filter-tampilkan-semua': 'Tampilkan Semua',
+    'kelas.paspor-jejak': 'Terbaik {terbaik} dari {n}× dikerjakan',
+    'kelas.paspor-terakhir': 'terakhir {terakhir}',
+    'kelas.kurikulum-belum-termuat': 'Daftar misi kurikulum belum bisa dimuat di perangkat ini. Tutup lalu buka kembali aplikasi; kalau masih kosong, sambungkan internet sebentar supaya materinya ikut terunduh.',
+    'kelas.panel-mapel-kosong': 'Belum ada guru mapel yang terdaftar di kelas ini. Kartu mata pelajaran muncul sendiri begitu gurumu mengirim tugas pertamanya.',
+    'kelas.mapel-tugas-menunggu': '{n} tugas',
+    'kelas.mapel-tanpa-tugas': 'Belum ada tugas',
+    'kelas.mapel-menunggu-guru': 'Menunggu guru',
+    'kelas.mapel-menunggu-penugasan': 'Menunggu penugasan',
+    'kelas.misi-ruang-lingkup': 'Tersedia untuk Bahasa Inggris, Kelas 7-12 (Fase D-F). Mata pelajaran lain menyusul.',
+    'kelas.panel-17-mapel': 'Kurikulum Merdeka (17 Mapel)',
+    'kelas.panel-17-mapel-desc': 'Satu kode kelas menghubungkan seluruh guru mata pelajaran. Tugas dari masing-masing guru otomatis teralokasi ke kartu panel mapel bersangkutan.',
+    'kelas.panel-guru-terdaftar': '{n} Guru Terdaftar',
     'guru.kelas-mapel-tanpa-nama': 'Kelas'
   });
 }());

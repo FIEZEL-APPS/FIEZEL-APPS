@@ -407,6 +407,18 @@
     'kelas.panel-semua-kelas-fallback': 'ชั้นเรียน {kode}',
     'kelas.filter-mapel-kosong': 'ยังไม่มีงานสำหรับวิชานี้',
     'kelas.filter-tampilkan-semua': 'แสดงทั้งหมด',
+    'kelas.paspor-jejak': 'ดีที่สุด {terbaik} จากการทำ {n} ครั้ง',
+    'kelas.paspor-terakhir': 'ครั้งล่าสุด {terakhir}',
+    'kelas.kurikulum-belum-termuat': 'ยังโหลดรายการภารกิจหลักสูตรบนเครื่องนี้ไม่ได้ กรุณาปิดแล้วเปิดแอปใหม่อีกครั้ง หากยังว่างอยู่ ให้เชื่อมต่ออินเทอร์เน็ตสักครู่เพื่อให้ดาวน์โหลดเนื้อหาด้วย',
+    'kelas.panel-mapel-kosong': 'ยังไม่มีครูประจำวิชาลงทะเบียนในชั้นเรียนนี้ การ์ดวิชาเรียนจะปรากฏขึ้นเองทันทีที่ครูของคุณส่งงานชิ้นแรก',
+    'kelas.mapel-tugas-menunggu': '{n} งาน',
+    'kelas.mapel-tanpa-tugas': 'ยังไม่มีงาน',
+    'kelas.mapel-menunggu-guru': 'รอครู',
+    'kelas.mapel-menunggu-penugasan': 'รอการมอบหมาย',
+    'kelas.misi-ruang-lingkup': 'ขณะนี้มีให้เฉพาะวิชาภาษาอังกฤษ ชั้น ม.1-ม.6 (เฟส D-F) วิชาอื่นจะตามมาภายหลัง',
+    'kelas.panel-17-mapel': 'หลักสูตรเมอร์เดกา (17 วิชา)',
+    'kelas.panel-17-mapel-desc': 'รหัสชั้นเรียนเดียวเชื่อมครูประจำวิชาทั้งหมดเข้าด้วยกัน งานจากครูแต่ละคนจะถูกจัดเข้าการ์ดวิชาที่เกี่ยวข้องโดยอัตโนมัติ',
+    'kelas.panel-guru-terdaftar': 'ครูที่ลงทะเบียน {n} คน',
     'guru.kelas-mapel-tanpa-nama': 'ชั้นเรียน'
   });
 }());

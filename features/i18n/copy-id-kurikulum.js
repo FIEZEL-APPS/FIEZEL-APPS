@@ -261,6 +261,9 @@
     'kurikulum.bp-adv-toggle': "Pengaturan Kesulitan & Soal Cerita (Opsional)",
     'kurikulum.kode-kelas-label': "Kode kelas: ",
     'kurikulum.kode-kelas-sub': "berikan kode ini saat murid bergabung.",
-    'kurikulum.server-wakeup': "Menghubungkan ke server kurikulum... (proses wake-up butuh beberapa detik)"
+    'kurikulum.server-wakeup': "Menghubungkan ke server kurikulum... (proses wake-up butuh beberapa detik)",
+    'kurikulum.cakupan-kosong': "Belum ada data belajar di kelas ini. Matriks terisi sendiri setelah murid mengerjakan kuis pertamanya \u2014 terbitkan satu dari tab Kuis & Ulangan.",
+    'kurikulum.murid-kosong': "Belum ada murid di kelas ini. Bagikan kode kelas di atas, atau tambahkan namanya lewat kotak \"Tambah murid\".",
+    'kurikulum.asesmen-kosong': "Belum ada asesmen di kelas ini. Pakai Template Blueprint Cepat di sebelah kiri untuk menerbitkan kuis pertama dalam satu klik."
   });
 })();
