@@ -424,9 +424,9 @@
   };
 
   /* ---------------------------------------------------------------------------
-   * BANK SOAL FASE D (MAT / IPA / ENG) — isinya JSON, bukan literal di modul ini.
+   * BANK SOAL FASE D (MAT / IPA / ENG / IND / IPS) — isinya JSON, bukan literal di sini.
    *
-   * Ketiga mapel ini punya bank berjenjang di content/mapel/: satu berkas Indonesia
+   * Kelima mapel inti punya bank berjenjang di content/mapel/: satu berkas Indonesia
    * plus sidecar Thai dengan kunci yang sama persis. Naskah yang DILIHAT MURID lahir
    * di sana, bukan di sini. Itu syarat dua-bahasa CLAUDE.md, dan juga satu-satunya
    * cara gerbang bahasa bisa melihat naskahnya sama sekali — literal di dalam .js
@@ -438,10 +438,13 @@
    *     ulang. Selama bank belum mendarat jawabannya adalah bank tidak ada, dan itu
    *     berarti perilaku lama (templates di bawah) — bukan lemparan, bukan layar
    *     kosong.
-   * 14 mapel lain tidak punya bank JSON; bagi mereka jalur ini selalu menjawab null
+   * Satu kompetensi di bank = satu BAB Buku Siswa Kemendikbudristek, dengan nama bab
+   * dan sub-bab persis seperti Daftar Isi bukunya. Guru mencari "Bab 3", bukan "TEK".
+   *
+   * 12 mapel lain tidak punya bank JSON; bagi mereka jalur ini selalu menjawab null
    * dan tidak satu pun perilakunya berubah.
    */
-  var MAPEL_BANK_SUBJECTS = ['MAT', 'IPA', 'ENG'];
+  var MAPEL_BANK_SUBJECTS = ['MAT', 'IPA', 'ENG', 'IND', 'IPS'];
   var mapelBankCache = {};
   var mapelBankFetching = {};
 
