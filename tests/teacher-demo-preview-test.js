@@ -137,7 +137,21 @@ test('R6 · pita demo tampil dengan jalan keluar dan jalan naik ke akun guru', (
   assert.ok(/function demoBanner\(/.test(shellCode), 'pita demo tidak ada');
   assert.ok(/previewOn\s*\?\s*' is-demo'/.test(shellCode) || /is-demo/.test(shellCode),
     'kelas penanda demo tidak dipasang di kerangka');
-  assert.ok(/demoBanner\(\)/.test(shellCode.slice(shellCode.indexOf('function render('), shellCode.indexOf('function render(') + 900)),
+  /* Ditambat ke PERNYATAAN CATNYA, bukan ke hitungan karakter dari awal render().
+   *
+   * Versi lama mengambil 900 karakter pertama sesudah `function render(`. Itu bukan
+   * kontraknya, hanya kebetulan tata letak: yang dijaga R6 adalah "pita demo ikut
+   * tercetak ke kerangka", dan letaknya di dalam `el.innerHTML = ...`. Ketika m025-345
+   * menyisipkan blok penjaga (muat ulang data guru + ensureTeacherClass) di ATAS
+   * pernyataan cat itu, `demoBanner()` terdorong ke offset 960 — 60 karakter lewat
+   * jendela — dan gerbang memerah padahal pitanya tetap dirender dengan benar.
+   *
+   * Menambat ke `el.innerHTML` membuat penyisipan kode di awal render() tidak lagi
+   * memerahkan gerbang, TANPA melonggarkan yang dijaga: kalau `demoBanner()` benar-benar
+   * dicabut dari pernyataan cat, assert ini tetap merah. Dibuktikan lewat mutasi. */
+  const catStart = shellCode.indexOf('el.innerHTML', shellCode.indexOf('function render('));
+  assert.ok(catStart > 0, 'pernyataan cat render() tidak ditemukan — tambatan R6 perlu ditinjau');
+  assert.ok(/demoBanner\(\)/.test(shellCode.slice(catStart, catStart + 900)),
     'pita demo tidak dirender');
   assert.ok(/case 'demo-exit':[\s\S]{0,120}exitPreview\(\)/.test(shellCode), 'tombol keluar demo tidak menghapus penanda');
   assert.ok(/case 'demo-activate':[\s\S]{0,80}openAccount\('teacher'\)/.test(shellCode),
