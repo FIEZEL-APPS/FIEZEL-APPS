@@ -136,6 +136,32 @@ Tiga kejujuran dikunci gerbang:
 Kedalaman bank adalah **hiasan yang berguna, bukan syarat**: kalau permintaannya gagal,
 pohon tetap terbaca dan tombol "+ Buat Tugas" tetap hidup, yang hilang hanya angkanya.
 
+**Koreksi kedua, dan kali ini T4 melanggar aturannya sendiri.** Versi pertama perbaikan
+ini menjaga tiga hal di atas dan melewatkan yang keempat: simpul dari **katalog cadangan
+perangkat tidak punya `node.id`** sama sekali — ia hanya membawa `code`, `name`,
+`description`, `bloom_level`. Karena kedalaman dicocokkan lewat `node.id`, setiap simpul
+cadangan menghasilkan `n = 0`, dan `n = 0` tergambar sebagai pil merah **"Bank soal
+kosong"**.
+
+Itu bukan sekadar tidak berguna, itu berbohong. Ketiga penyemai berdiri sendiri-sendiri,
+jadi keadaan berikut benar-benar bisa terjadi: guru sudah menyemai **bank soal**
+(`seed-soal`) sementara **kurikulum mapelnya belum**. Dalam keadaan itu `ui.bankDepth`
+terisi — jadi `depthCocok` bernilai benar — tetapi pohonnya datang dari katalog lokal,
+sehingga **seluruh** kompetensi dicap banknya kosong padahal banknya penuh. Guru yang
+percaya kepadanya akan menyemai ulang tanpa perlu, atau melewati kompetensi yang
+sebenarnya sudah siap dilatih.
+
+Kode katalog lokal tidak akan pernah cocok dengan `competency_id` milik soal, jadi tidak
+ada hitungan jujur yang bisa dibuat untuk simpul cadangan. Yang jujur adalah **diam**:
+pil tidak digambar sama sekali, dan spanduk "Sumber: katalog cadangan perangkat" di
+atasnya sudah menjelaskan kenapa layar itu tidak membawa angka.
+
+Ditemukan gitar-bot pada PR #454, diperiksa terhadap sumbernya, dan benar. Dikunci dua
+lapis: **C5** (statis — penjaganya ada, dan berdiri **sebelum** pembacaan `depth`, karena
+sesudahnya ia tidak menjaga apa pun) dan **F8** (dijalankan — panel dirender pada keadaan
+"bank terisi, kurikulum belum", lalu dituntut nol pil; ditambah kebalikannya, supaya
+penjaganya tidak ikut mematikan pil untuk simpul server yang sah).
+
 ### T5 — KUNING · Satu tombol Muat Ulang yang hanya menyegarkan sepertiga layar
 
 `refresh-curriculum` dulu hanya memanggil `loadCurriculumTree()`. Sejak panel membawa tiga
@@ -289,7 +315,7 @@ Dicatat supaya tidak diaudit ulang.
 
 ## 4. Gerbang
 
-`tests/kelasku-kurikulum-dashboard-test.js` — **28 assert**, terdaftar di `quality.yml`.
+`tests/kelasku-kurikulum-dashboard-test.js` — **30 assert**, terdaftar di `quality.yml`.
 Sebagian besar **dijalankan**, bukan dibaca: hub benar-benar dipasang dengan `env` tiruan,
 tabnya benar-benar diketuk, dan yang diperiksa adalah HTML yang keluar.
 
@@ -320,6 +346,7 @@ string kosong untuk setiap keadaan dan seluruh bagian D tetap hijau.
 | kartu `seed-soal` dihapus dari tabel | MERAH (B1) ✓ |
 | penjaga tab dicabut (`if (true)`) | MERAH (D1, D2, D7) ✓ |
 | pemuatan dipindah ke perender | MERAH (D3, D4) ✓ |
+| penjaga simpul-tanpa-id dicabut | MERAH (C5, F8) ✓ |
 
 `tests/lucide-icon-coverage-test.js` diperluas menutup titik buta pembantu `icon()` (T9):
 cakupannya naik dari 75 menjadi 173 nama ikon.
