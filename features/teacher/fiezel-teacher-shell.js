@@ -203,7 +203,7 @@
     var mapel = (sc && sc.locked) ? sc.active : null;
     return (c.students || []).map(function (s) {
       var acc = T.overallAcc(s);
-      var status = acc == null ? 'Belum ada nilai' : acc >= 0.75 ? 'Tuntas' : 'Remedial';
+      var status = acc == null ? t('guru.rekap-belum-ada', 'Belum ada nilai') : acc >= 0.75 ? 'Tuntas' : 'Remedial';
       return { nama: s.name, akurasi: acc == null ? null : Math.round(acc * 100), status: status, mapel: mapel || (c.subject || ''), kehadiran: T.attendanceRate(s, 10) };
     });
   }
@@ -4423,7 +4423,7 @@
         var __scExp = null;
         try { __scExp = teacherSubjectScope(); } catch (_) {}
         var __rows = rekapRows(c);
-        var __head = ['Nama', 'Mapel', 'Akurasi %', 'Status (KKM 75)', 'Kehadiran 10x'];
+        var __head = ['Nama', 'Mapel', t('guru.rekap-akurasi-pct', 'Akurasi %'), t('guru.rekap-status-kkm', 'Status (KKM 75)'), 'Kehadiran 10x'];
         var __csv = [__head].concat(__rows.map(function (r) { return [r.nama, r.mapel, r.akurasi == null ? '' : r.akurasi, r.status, r.kehadiran == null ? '' : Math.round(r.kehadiran * 100) + '%']; })).map(function (r) { return r.map(function (v) { return '"' + String(v == null ? '' : v).replace(/"/g, '""') + '"'; }).join(','); }).join('\n');
         var __fname = (c.name || 'kelas').replace(/\W+/g, '-') + '-' + ((__scExp && __scExp.locked) ? __scExp.active + '-' : '') + 'rekap.csv';
         download(__fname, __csv, 'text/csv'); saveMinutes(10); toast('CSV rekap' + ((__scExp && __scExp.locked) ? ' ' + __scExp.active : '') + ' diunduh — siap dibuka di Excel / e-Rapor.');
@@ -4438,7 +4438,7 @@
           '<h1>Rekap Nilai — ' + esc(c.name) + '</h1><h2>' + esc(__mapel2 + ' · ' + (st.teacher.school || '') + ' · ' + (st.teacher.name || 'Guru') + ' · KKM 75 · ' + new Date().toLocaleDateString('id-ID')) + '</h2>' +
           '<table><thead><tr><th>No</th><th>Nama</th><th>Mapel</th><th>Nilai</th><th>Status</th></tr></thead><tbody>' +
           __rows2.map(function (r, i) { return '<tr><td>' + (i + 1) + '</td><td>' + esc(r.nama) + '</td><td>' + esc(r.mapel) + '</td><td>' + (r.akurasi == null ? '—' : r.akurasi) + '</td><td class="' + (r.status === 'Remedial' ? 'rem' : 'ok') + '">' + esc(r.status) + '</td></tr>'; }).join('') +
-          '</tbody></table><p>Dicetak dari KelasKu untuk Guru — siap diunggah ke e-Rapor Kemendikbudristek.</p></body></html>';
+          '</tbody></table><p>' + esc(t('guru.rekap-cetak-note', 'Dicetak dari KelasKu untuk Guru — siap diunggah ke e-Rapor Kemendikbudristek.')) + '</p></body></html>';
         var w2 = null;
         try { w2 = window.open('', '_blank'); } catch (_) {}
         if (w2) { w2.document.write(__html); w2.document.close(); try { w2.print(); } catch (_) {} } else { download(c.name.replace(/\W+/g, '-') + '-rekap.html', __html, 'text/html'); }

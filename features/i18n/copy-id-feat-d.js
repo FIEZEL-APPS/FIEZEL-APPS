@@ -527,6 +527,42 @@
     'kelas.kembali-kelas-saya': 'Kembali ke Kelas Saya',
     /* m025-351 (Gelombang 5, G10) — penanda asal data pohon kurikulum di Ruang Guru. */
     'guru.kurikulum-sumber-lokal': 'Sumber: katalog cadangan perangkat — server belum menyemai kurikulum mapel ini. Tekan kartu penyemai agar papan ini terisi dari server KelasKu.',
-    'guru.kurikulum-sumber-server': 'Sumber: kurikulum dari server KelasKu.'
+    'guru.kurikulum-sumber-server': 'Sumber: kurikulum dari server KelasKu.',
+    /* Isolasi mapel per token guru KelasKu (scope badge, saring analitik, paralegal
+       penerbitan massal, remedial/pengayaan otomatis, rekap e-Rapor). Nilai id disalin
+       verbatim dari kalimat cadangan pemanggilnya. */
+    'guru.scope-kelas-smp': 'Kelas 7, 8, 9',
+    'guru.scope-kelas-sma': 'Kelas 10, 11, 12',
+    'guru.scope-kelas-sd': 'Kelas 1–6',
+    'guru.scope-terkunci': 'Terkunci ke mapel Anda',
+    'guru.scope-tolak': 'Mapel itu di luar lisensi Anda — tugas dibatalkan.',
+    'guru.belum-tugas-scope': 'Belum ada tugas {mapel} di kelas ini. Buat tugas pertama dari bab {mapel} — hanya butuh 1 menit.',
+    'guru.belum-data-mapel': 'Belum ada data {mapel}',
+    'guru.tambah-tugas-mapel-dulu': 'Terbitkan tugas mapel Anda dulu — analitik lain disembunyikan agar tidak tercampur.',
+    'guru.remedial-otomatis': 'Remedial & pengayaan otomatis (KKM 75%)',
+    'guru.remedial-judul': 'Siapa remedial, siapa pengayaan',
+    'guru.remedial-perlu': 'Perlu remedial',
+    'guru.remedial-kosong': 'Nol siswa di bawah KKM. Pertahankan.',
+    'guru.pengayaan-judul': 'Pengayaan (≥90%)',
+    'guru.pengayaan-kosong': 'Belum ada siswa ≥90%.',
+    'guru.buat-pengayaan': 'Buat pengayaan',
+    'guru.target-kelas-paralel': 'Terapkan ke kelas paralel (1 klik untuk banyak kelas)',
+    'guru.rekap-erapor': 'Rekap e-Rapor',
+    'guru.rekap-belum-ada': 'Belum ada nilai',
+    'guru.rekap-akurasi-pct': 'Akurasi %',
+    'guru.rekap-status-kkm': 'Status (KKM 75)',
+    'guru.rekap-cetak-note': 'Dicetak dari KelasKu untuk Guru — siap diunggah ke e-Rapor Kemendikbudristek.',
+    'guru.pengumuman-kelas': 'Pengumuman kelas',
+    'guru.satu-pesan-semua-kanal': 'Satu pesan, semua kanal',
+    'guru.laporan-ortu': 'Laporan orang tua',
+    'guru.rapor-naratif': 'Rapor naratif otomatis',
+    'guru.kartu-sapa': 'Kartu sapa',
+    'guru.pesan-personal': 'Pesan personal 1 ketuk',
+    'guru.refleksi-60': 'Refleksi 60 detik',
+    'guru.apa-berhasil': 'Apa yang berhasil hari ini?',
+    'guru.tandai-siswa': 'Tandai siswa (opsional)',
+    'guru.peta-panas': 'Peta panas',
+    'guru.peta-judul': 'Siswa × skill — sekali lihat, tahu siapa butuh apa',
+    'guru.nav-komunikasi': 'Komunikasi'
   });
 }());
