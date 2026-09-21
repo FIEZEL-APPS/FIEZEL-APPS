@@ -4,9 +4,10 @@
 Cabang: `claude/gallant-archimedes-l85qlc` · PR: [#456](https://github.com/FIEZEL-APPS/FIEZEL-APPS/pull/456)
 Basis: `m025-357`. Ditulis 21 September 2026.
 
-Dokumen ini ditulis **di tengah pekerjaan, atas permintaan OWNER**, supaya agen lain bisa
-melanjutkan persis dari titik berhenti kalau sesi terputus. Ia bukan laporan "selesai" —
-bagian §6 adalah daftar yang MASIH KOSONG.
+Dokumen ini lahir **di tengah pekerjaan, atas permintaan OWNER**, supaya agen lain bisa
+melanjutkan persis dari titik berhenti kalau sesi terputus — lalu diperbarui saat
+pekerjaannya rampung. Yang tersisa di §6 bukan sisa rencana, melainkan **utang yang
+ditemukan sambil jalan**; §8 mencatat klaim palsu yang dicabut.
 
 ---
 
