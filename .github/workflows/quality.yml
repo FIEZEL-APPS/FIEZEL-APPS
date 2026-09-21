@@ -1101,6 +1101,17 @@ jobs:
         # menuntut benderanya MATI di kedua jalur dan tautannya dijaga bendera - sekaligus
         # menuntut mesinnya TIDAK dihapus, supaya satu bendera cukup saat backend siap.
         run: node tests/curriculum-console-gate-test.js
+      - name: 'Kurikulum & Kompetensi hidup DI DALAM dasbor KelasKu, bukan sebagai butir nav'
+        # Instruksi owner (21 Sep 2026): cabut panel Kurikulum & Kompetensi dari dasbor
+        # Ruang Guru, integrasikan sistemnya ke halaman dasbor KelasKu, dan tidak boleh
+        # ada yang kurang. Tiga kegagalan dijaga sekaligus: (1) pintu yatim - butir nav
+        # dicabut tanpa tab pengganti; (2) pintu ke ruangan kosong - tab dipasang tanpa
+        # penjaga alamat backend; (3) mesin tanpa tombol - tiga penyemai yang sudah punya
+        # penangan + runSeed*() sejak lama tetapi nol tombol yang memanggilnya, sementara
+        # naskah sumber-lokal menyuruh guru menekan kartu penyemai yang tidak ada di layar
+        # itu. Sebagian besar assert DIJALANKAN: hub dipasang dengan env tiruan, tabnya
+        # diketuk, dan yang diperiksa adalah HTML yang keluar.
+        run: node tests/kelasku-kurikulum-dashboard-test.js
       - name: 'Konsol kurikulum hanya punya SATU pintu: KelasKu'
         # Keputusan owner 14 Sep 2026: guru dan murid yang sudah punya akun KelasKu tidak
         # boleh diminta identitas kedua. Tiga pintu lama di mesin kurikulum (token FZG-,
