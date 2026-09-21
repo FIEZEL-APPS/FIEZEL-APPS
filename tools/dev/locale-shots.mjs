@@ -38,7 +38,8 @@ const seed = (loc) => {
 
 // Dimensi TERIKAT ke atribut width/height yang ditulis halaman marketing. Mengubahnya
 // tanpa mengubah halaman membuat browser melakukan layout shift (CLS) di Core Web Vitals.
-const SHOTS = [
+const ONLY = process.env.ONLY;
+const SHOTS_ALL = [
   { name:'latihan-mobile',  view:'latihan', w:390,  h:844, dsf:2 },
   { name:'grammar-mobile',  view:'grammar', w:390,  h:844, dsf:2 },
   { name:'reading-mobile',  view:'reading', w:390,  h:844, dsf:2 },
@@ -46,6 +47,7 @@ const SHOTS = [
   { name:'latihan-desktop', view:'latihan', w:1280, h:800, dsf:2 },
   { name:'teacher-desktop', view:'teacher', w:1440, h:900, dsf:1 },
 ];
+const SHOTS = ONLY ? SHOTS_ALL.filter(x=>x.name===ONLY) : SHOTS_ALL;
 
 for (const s of SHOTS){
   const ctx = await browser.newContext({ viewport:{width:s.w,height:s.h}, deviceScaleFactor:s.dsf, locale: LOCALE==='th'?'th-TH':'id-ID' });

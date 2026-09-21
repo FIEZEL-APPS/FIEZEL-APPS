@@ -563,6 +563,49 @@
     'guru.tandai-siswa': 'Tandai siswa (opsional)',
     'guru.peta-panas': 'Peta panas',
     'guru.peta-judul': 'Siswa × skill — sekali lihat, tahu siapa butuh apa',
-    'guru.nav-komunikasi': 'Komunikasi'
+    'guru.nav-komunikasi': 'Komunikasi',
+    /* m025-359: lima kalimat yang dulu literal telanjang di dasbor guru. Semuanya
+       kasatmata di sidebar, jadi murid Thai membacanya dalam bahasa Indonesia. */
+    'guru.keluar-akun': 'Keluar akun guru',
+    'guru.ke-mode-murid': 'Ke mode murid',
+    'guru.nama-default': 'Guru FIEZEL',
+    'guru.atur-profil': 'Atur profil →',
+    'kelas.hasil': 'Hasil',
+    /* Panel sambutan dasbor guru — tujuh kalimat yang dulu literal telanjang. */
+    'guru.selamat-datang': 'Selamat datang',
+    'guru.siapa-disapa': 'siapa yang perlu disapa hari ini',
+    'guru.welcome-lead': 'FIEZEL KelasKu untuk Guru mengubah data latihan murid menjadi tindakan: deteksi dini siswa tertinggal, kartu sapa personal 1 ketuk, laporan orang tua otomatis, kelompok belajar yang dipasangkan sendiri, dan tugas yang menilai dirinya sendiri.',
+    'guru.coba-kelas-contoh': 'Coba dengan kelas contoh ({n} siswa)',
+    'guru.welcome-privasi': 'Data tetap di perangkatmu — tanpa jawaban mentah murid.',
+    'guru.welcome-hemat': 'Rata-rata guru menghemat 40+ menit/minggu untuk laporan & pesan.',
+    'guru.welcome-offline': 'Bekerja offline, cocok untuk sekolah dengan sinyal terbatas.'
+,
+    /* m025-359: kalimat antarmuka dasbor guru & ruang kelas yang dulu literal
+       telanjang di dalam potongan HTML. Dijaga tests/teacher-i18n-lazy-test.js cek (D). */
+    'guru.kode-kelas-jelas': 'murid mengetiknya saat onboarding; setiap selesai sesi, hasilnya dikirim ke server dan masuk ke sini otomatis.',
+    'guru.siapa-belum': 'Siapa yang belum',
+    'guru.kelompok-otomatis': 'Kelompok belajar otomatis',
+    'guru.kelompok-mentor': 'tiap kelompok punya mentor',
+    'guru.kelompok-jelas': 'Siswa yang kuat dipasangkan dengan yang lemah (peer tutoring). Menjelaskan ke teman adalah latihan terbaik untuk si mentor sendiri.',
+    'guru.jurnal-contoh': 'Contoh: Metode timeline di papan ampuh untuk yesterday/ago. Fikri masih tertukar verb 1/2.',
+    'guru.proctor-catatan': 'Terdeteksi berpindah dari layar FIEZEL saat sesi berjalan. Tanyakan dulu ke muridnya — bisa saja ia dipanggil atau sinyalnya putus.',
+    'guru.nama-depan-saja': 'Nomor urut dan nama belakang dibuang otomatis — FIEZEL hanya menyimpan nama depan.',
+    'guru.punya-kode-hasil': 'Punya kode hasil murid?',
+    'guru.kode-hasil-tutor': 'Kode hasil untuk tutor',
+    'guru.impor-kode-jelas': 'dari Today Plan-nya (Peta → ringkasan). Kode hanya berisi nama depan + akurasi per skill. Tugas yang cocok otomatis dinilai selesai.',
+    'guru.salin-pengingat': 'Salin pengingat untuk yang belum',
+    'umum.salin': 'Salin',
+    'umum.tambahkan': 'Tambahkan',
+    'kelas.masukkan-kode': 'Masukkan kode dari KelasKu',
+    'kelas.kode-jelas': 'Kode berbentuk FZ-XXXXXX. Setelah tergabung, tugas guru masuk otomatis dan hasilmu kembali ke guru.',
+    'kelas.isi-peta-skill': 'Kerjakan tugas atau sesi belajar untuk mengisi peta skill.',
+    'kelas.tanpa-saran': 'Tidak ada perubahan yang disarankan.',
+    'kelas.sumber-angka': 'Semua angka di bawah berasal dari bukti murid di kelas ini: laporan sinkron dan soal yang keliru pada tugasmu. Tidak ada AI cloud, tidak ada tebakan tanpa data.',
+    'kelas.jawaban-keliru': 'jawaban keliru pada tugas yang kamu kirim.',
+    'kelas.tempel-soal-jelas': 'Tempel soal — satu baris per soal:',
+    'kelas.tempel-soal-format': '(kunci: huruf, nomor, atau teks). Blok bernomor dengan A./B./C./D. dan “Answer: B” juga dikenali.'
+,
+    'guru.n-menit': '{n} menit',
+    'guru.waktu-hemat-tip': 'Perkiraan waktu administrasi yang FIEZEL kerjakan untukmu'
   });
 }());
