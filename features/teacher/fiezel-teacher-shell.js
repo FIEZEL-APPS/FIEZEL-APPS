@@ -33,18 +33,27 @@
     } catch (_) { return false; }
   }
 
-  function t(k, fb) {
+  function t(k, fb, params) {
     /* FiezelI18n.t() mengembalikan KUNCINYA saat kalimatnya belum termuat. Mengembalikan
        itu apa adanya berarti guru membaca 'guru.tab-jurnal' di layarnya, padahal kalimat
        cadangannya sudah tertulis di pemanggil. Cadangan dipakai untuk DUA keadaan:
-       FiezelI18n tidak ada, dan kuncinya tidak terpecahkan. */
+       FiezelI18n tidak ada, dan kuncinya tidak terpecahkan.
+
+       `params` (m025-357) menyejajarkan tanda tangan ini dengan t() di
+       features/class-hub/fiezel-class-hub.js. Tanpa itu, kalimat berlubang seperti
+       'Sudah tersemai: {tp} tujuan pembelajaran' tercetak apa adanya — LENGKAP DENGAN
+       KURUNG KURAWALNYA — setiap kali cadangan dipakai, karena substitusi hanya terjadi
+       di dalam FiezelI18n. Substitusi diulang di sini supaya jalur cadangan dan jalur
+       terdaftar menghasilkan kalimat yang sama. */
     var s;
-    try { var I = (typeof self !== 'undefined' ? self : this).FiezelI18n; s = I && I.t ? I.t(k) : undefined; } catch (_) {}
-    return (s === undefined || s === k) ? (fb == null ? k : fb) : s;
+    try { var I = (typeof self !== 'undefined' ? self : this).FiezelI18n; s = I && I.t ? I.t(k, params) : undefined; } catch (_) {}
+    if (s === undefined || s === k) s = fb == null ? k : fb;
+    if (params) s = String(s).replace(/\{(\w+)\}/g, function (m, n) { return Object.prototype.hasOwnProperty.call(params, n) ? String(params[n]) : m; });
+    return s;
   }
   if (!root) return;
   var S = function () { return root.FiezelTeacherStore; };
-  var el = null, env = {}, st = null, ui = { modal: null, drawer: null, filter: '', insightSkill: 'past_tense', attDate: null, pick: {}, syncing: false, curriculumSubject: 'MAT', curriculumGrade: 'ALL', curriculumTree: null, curriculumLoading: false, curriculumError: null, curriculumSeeded: null, seeding: false }, syncTimer = null, chipTimer = null, visListener = null;
+  var el = null, env = {}, st = null, ui = { modal: null, drawer: null, filter: '', insightSkill: 'past_tense', attDate: null, pick: {}, syncing: false, curriculumSubject: 'MAT', curriculumGrade: 'ALL', curriculumTree: null, curriculumLoading: false, curriculumError: null, curriculumSeeded: null, seeding: false, seedStatus: null, seedStatusLoading: false, seedStatusError: null, seedBusy: '', bankDepth: null, bankDepthSubject: '', bankDepthLoading: false, bankDepthCapped: false }, syncTimer = null, chipTimer = null, visListener = null;
   /*
    * DUA detak, bukan satu. m025-261 menyatukan keduanya pada 3 detik dan itu merusak dua hal
    * sekaligus; m025-262 memisahkannya lagi.
@@ -67,7 +76,7 @@
   var syncFailStreak = 0;
   var pendingRender = false;
   var NAV = [['hub', t('guru.nav-ruang-kelas', 'Ruang Kelas'), 'school'], ['briefing', t('guru.nav-ringkasan', 'Ringkasan Hari Ini'), 'sunrise'], ['classes', t('guru.tab-kelas-siswa', 'Kelas & Siswa'), 'users'], ['assignments', t('guru.tab-tugas-ujian', 'Tugas & Ujian'), 'clipboard-list'], ['insights', 'Analitik', 'activity'], ['comms', 'Komunikasi', 'megaphone'], ['journal', t('guru.tab-jurnal', 'Jurnal Guru'), 'notebook-pen']];
-  var TITLE = { hub: t('guru.judul-ruang-kelas', 'Ruang Kelas — guru, murid, dan hasil belajar dalam satu layar'), briefing: t('guru.judul-ringkasan', 'Ringkasan hari ini'), classes: t('guru.tab-kelas-siswa', 'Kelas & Siswa'), assignments: t('guru.tab-tugas-ujian', 'Tugas & Ujian'), insights: t('guru.judul-analitik', 'Analitik — siapa yang perlu dibantu'), comms: 'Komunikasi', journal: t('guru.tab-jurnal', 'Jurnal Guru'), settings: t('guru.tab-profil', 'Profil Guru'), curriculum: t('guru.nav-kurikulum', 'Kurikulum & Materi') };
+  var TITLE = { hub: t('guru.judul-ruang-kelas', 'Ruang Kelas — guru, murid, dan hasil belajar dalam satu layar'), briefing: t('guru.judul-ringkasan', 'Ringkasan hari ini'), classes: t('guru.tab-kelas-siswa', 'Kelas & Siswa'), assignments: t('guru.tab-tugas-ujian', 'Tugas & Ujian'), insights: t('guru.judul-analitik', 'Analitik — siapa yang perlu dibantu'), comms: 'Komunikasi', journal: t('guru.tab-jurnal', 'Jurnal Guru'), settings: t('guru.tab-profil', 'Profil Guru') };
 
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (m) { return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' })[m]; }); }
   function pct(v) { return S().pct(v); }
@@ -2269,6 +2278,7 @@
 
   function runSeedMapel() {
     ui.seeding = true;
+    ui.seedBusy = 'mapel';
     render();
     ensureFzEngine().then(function (FZE) {
       if (!isFzEngineValid(FZE)) {
@@ -2280,10 +2290,17 @@
       });
     }).then(function (res) {
       ui.seeding = false;
+      ui.seedBusy = '';
       toast(t('guru.semai-mapel-sukses', 'Berhasil menyemai 17 mata pelajaran ke MongoDB!'));
+      /* Status penyemai dan kedalaman bank DIPAKSA dibaca ulang: keduanya baru saja
+         berubah di server, dan kartu yang masih menampilkan angka sebelum penyemaian
+         adalah kartu yang berbohong tepat pada detik guru paling memperhatikannya. */
+      loadSeedStatus(true);
+      loadBankDepth(ui.curriculumSubject, true);
       loadCurriculumTree(ui.curriculumSubject);
     }).catch(function (err) {
       ui.seeding = false;
+      ui.seedBusy = '';
       toast(t('guru.err-seeding', 'Gagal seeding: ') + ((err && err.message) || err));
       render();
     });
@@ -2291,6 +2308,7 @@
 
   function runSeedEnglish() {
     ui.seeding = true;
+    ui.seedBusy = 'english';
     render();
     ensureFzEngine().then(function (FZE) {
       if (!isFzEngineValid(FZE)) {
@@ -2302,10 +2320,17 @@
       });
     }).then(function (res) {
       ui.seeding = false;
+      ui.seedBusy = '';
       toast(t('guru.semai-english-sukses', 'Berhasil menyemai Bahasa Inggris ke MongoDB!'));
+      /* Status penyemai dan kedalaman bank DIPAKSA dibaca ulang: keduanya baru saja
+         berubah di server, dan kartu yang masih menampilkan angka sebelum penyemaian
+         adalah kartu yang berbohong tepat pada detik guru paling memperhatikannya. */
+      loadSeedStatus(true);
+      loadBankDepth(ui.curriculumSubject, true);
       loadCurriculumTree(ui.curriculumSubject);
     }).catch(function (err) {
       ui.seeding = false;
+      ui.seedBusy = '';
       toast(t('guru.err-seeding', 'Gagal seeding: ') + ((err && err.message) || err));
       render();
     });
@@ -2313,6 +2338,7 @@
 
   function runSeedSoal() {
     ui.seeding = true;
+    ui.seedBusy = 'soal';
     render();
     ensureFzEngine().then(function (FZE) {
       if (!isFzEngineValid(FZE)) {
@@ -2324,10 +2350,17 @@
       });
     }).then(function (res) {
       ui.seeding = false;
+      ui.seedBusy = '';
       toast(t('guru.semai-soal-sukses', 'Berhasil menyemai Bank Soal ke MongoDB!'));
+      /* Status penyemai dan kedalaman bank DIPAKSA dibaca ulang: keduanya baru saja
+         berubah di server, dan kartu yang masih menampilkan angka sebelum penyemaian
+         adalah kartu yang berbohong tepat pada detik guru paling memperhatikannya. */
+      loadSeedStatus(true);
+      loadBankDepth(ui.curriculumSubject, true);
       loadCurriculumTree(ui.curriculumSubject);
     }).catch(function (err) {
       ui.seeding = false;
+      ui.seedBusy = '';
       toast(t('guru.err-seeding', 'Gagal seeding: ') + ((err && err.message) || err));
       render();
     });
@@ -2724,10 +2757,32 @@
     // Kelas (class-hub) = landing default Ruang Guru: guru, murid, tugas, hasil, Braincore satu tempat.
     if (st.classes.length && (!st.view || st.view === 'briefing') && !st.hubSeen && root.FiezelClassHub) { st.view = 'hub'; st.hubSeen = true; }
     if (st.view === 'hub' && !root.FiezelClassHub) st.view = 'briefing';
+    /* MIGRASI VIEW 'curriculum' (m025-357). `st.view` ikut disimpan ke localStorage, jadi
+       guru yang menutup aplikasi di layar Kurikulum lama akan membukanya kembali di sana —
+       dan sejak panel itu pindah ke dalam hub, 'curriculum' bukan lagi view yang ada.
+       Tanpa baris ini render() jatuh ke views.briefing dan guru mendarat di layar yang
+       BUKAN yang ia tinggalkan, tanpa satu pun petunjuk ke mana perginya. Ia dibawa ke
+       tempat panelnya sekarang berada: hub, tab Kurikulum. */
+    if (st.view === 'curriculum') {
+      if (root.FiezelClassHub && konsolKurikulumSiap()) {
+        st.view = 'hub';
+        try { root.FiezelClassHub._teacherUi().tab = 'kurikulum'; } catch (_) {}
+      } else {
+        st.view = 'briefing';
+      }
+    }
     document.body.classList.add('fz-teacher-mode');
     el.addEventListener('click', onClick); el.addEventListener('submit', onSubmit); el.addEventListener('change', onChange); el.addEventListener('input', onInput);
     document.addEventListener('keydown', onKey);
     render();
+    /* Panel kurikulum dimuat juga saat hub DIPASANG dengan tab itu sudah aktif — yaitu
+       sesudah migrasi view di atas, dan setiap kali guru kembali ke Ruang Guru sementara
+       tab terakhirnya Kurikulum. Tanpa ini, satu-satunya pemicu muat adalah KETUKAN pada
+       tabnya, sehingga guru yang mendarat langsung di sana menatap panel kosong permanen. */
+    try {
+      if (st.view === 'hub' && root.FiezelClassHub && root.FiezelClassHub._teacherUi &&
+          root.FiezelClassHub._teacherUi().tab === 'kurikulum') bukaPanelKurikulum();
+    } catch (_) {}
     startAutoSync();
     // Sinkron daftar kelas dari server di latar belakang jika tersedia
     try {
@@ -2842,9 +2897,22 @@
     var key = (st.view || 'briefing') + '|' + (st.activeClassId || '') + '|' + (ui.modal ? ui.modal.kind : '') + '|' + (ui.drawer || '');
     var repaint = key === lastPaintKey;
     lastPaintKey = key;
-    el.innerHTML = '<div class="tg' + (repaint ? ' is-repaint' : '') + (previewOn ? ' is-demo' : '') + (ui.modal && ui.modal.kind === 'board' ? ' tg-board-open' : '') + '" data-testid="teacher-shell">' + demoBanner() + sidebar(c) + '<div class="tg-main">' + topbar(c) + '<div class="tg-content">' + (st.classes.length || st.view === 'curriculum' || st.view === 'settings' ? (views[st.view] ? views[st.view](c) : views.briefing(c)) : welcome()) + '</div></div>' + mobileNav() + drawer(c) + modal(c) + '</div>';
+    el.innerHTML = '<div class="tg' + (repaint ? ' is-repaint' : '') + (previewOn ? ' is-demo' : '') + (ui.modal && ui.modal.kind === 'board' ? ' tg-board-open' : '') + '" data-testid="teacher-shell">' + demoBanner() + sidebar(c) + '<div class="tg-main">' + topbar(c) + '<div class="tg-content">' + (st.classes.length || st.view === 'hub' || st.view === 'settings' ? (views[st.view] ? views[st.view](c) : views.briefing(c)) : welcome()) + '</div></div>' + mobileNav() + drawer(c) + modal(c) + '</div>';
     var hubEl = el.querySelector('#tgClassHub');
-    if (hubEl && root.FiezelClassHub) root.FiezelClassHub.mountTeacher(hubEl, { st: function () { return st; }, cls: cls, persist: persist, toast: toast, rerender: render });
+    /* Hub KelasKu menerima sistem kurikulum lewat env, bukan dengan menyalin mesinnya
+       (m025-357). Yang menyeberang hanya TIGA fungsi: penjaga, perender, dan pemicu muat.
+       FZEngine, alamat backend, dan seluruh keadaan muat tetap milik berkas ini, sehingga
+       hub tidak perlu tahu satu pun di antaranya — dan tombol di dalam panel tetap memakai
+       `data-tg`, yang memang sudah ditangani pengirim aksi shell ini karena #tgClassHub
+       berada di dalam DOM yang sama. */
+    if (hubEl && root.FiezelClassHub) root.FiezelClassHub.mountTeacher(hubEl, {
+      st: function () { return st; }, cls: cls, persist: persist, toast: toast, rerender: render,
+      kurikulum: {
+        siap: konsolKurikulumSiap,
+        panel: kurikulumPanel,
+        buka: bukaPanelKurikulum
+      }
+    });
     restoreActive(el, saved);
     if (env.afterRender) try { env.afterRender(); } catch (_) {}
     /* Autofokus hanya saat layarnya benar-benar berganti. Pada cat ulang ia akan merebut kursor
@@ -2881,13 +2949,18 @@
       '<button type="button" class="tg-teacher" data-tg="view" data-view="settings" data-testid="tg-profile">' + icon('user-round') + '<div><b>' + esc(st.teacher.name || accountHandle() || 'Guru FIEZEL') + '</b><small>' + esc(st.teacher.school || 'Atur profil →') + '</small></div></button>' +
       (st.classes.length ? '<label class="tg-class-switch">' + t('guru.kelas-aktif', 'Kelas aktif') + '<select data-tg-select="class" data-testid="tg-class-select">' + st.classes.map(function (k) { return '<option value="' + k.id + '"' + (c && k.id === c.id ? ' selected' : '') + '>' + esc(k.name) + '</option>'; }).join('') + '</select></label>' : '') +
       '<nav class="tg-nav">' + NAV.map(function (n) { return '<button type="button" class="tg-nav-item' + (st.view === n[0] ? ' is-active' : '') + '" data-tg="view" data-view="' + n[0] + '" data-testid="tg-nav-' + n[0] + '">' + icon(n[2]) + '<span>' + n[1] + '</span></button>'; }).join('') + '</nav>' +
-      /* Pintu konsol kurikulum HANYA dibuka kalau benderanya menyala. Backend yang
-         melayaninya (/api/...) belum berjalan di produksi — diperiksa owner 7 Sep 2026,
-         404. Nama bendera yang salah ketik jatuh ke false, jadi kegagalannya menyembunyikan
-         pintu, bukan membukanya. Lihat alasan lengkap di fiezel-ux-flags.js. */
-      (konsolKurikulumSiap()
-        ? '<button type="button" class="tg-nav-item' + (st.view === 'curriculum' ? ' is-active' : '') + '" data-tg="view" data-view="curriculum" data-testid="tg-nav-curriculum">' + icon('library') + '<span>' + esc(t('guru.nav-kurikulum', 'Kurikulum & Materi')) + '</span></button>'
-        : '') +
+      /* BUTIR NAV "Kurikulum & Kompetensi" DICABUT DARI SIDEBAR (m025-357, instruksi owner).
+         ===================================================================================
+         Ia dulu butir nav kedelapan yang membuka layar tersendiri, dan layar itu isinya
+         pohon kurikulum + satu kartu pintu keluar ke kurikulum.html. Jadi guru yang
+         menekannya meninggalkan dasbor KelasKu untuk sampai ke pekerjaan yang justru
+         paling dekat dengan kelasnya: menyemai bank, membaca kompetensi, dan membuat tugas
+         dari kompetensi itu.
+
+         Sistemnya tidak dibuang — ia PINDAH ke dalam dasbor KelasKu sebagai tab
+         "Kurikulum & Kompetensi" di hub Ruang Kelas (features/class-hub/fiezel-class-hub.js,
+         tab `kurikulum`). Penjaganya tetap konsolKurikulumSiap(), sekarang diteruskan lewat
+         env.kurikulum.siap() ke hub; lihat mountTeacher() di bawah. */
       '<div class="tg-side-foot"><div class="tg-saved" title="Perkiraan waktu administrasi yang FIEZEL kerjakan untukmu">' + icon('hourglass') + '<div><small>' + esc(t('guru.waktu-hemat', 'Waktu administrasi yang dihemat')) + '</small><b>' + Math.round(st.savedMinutes || 0) + ' menit</b></div></div>' +
       '<button type="button" class="tg-exit" data-tg="' + exitAction + '" data-testid="tg-exit">' + icon('log-out') + ' ' + exitLabel + '</button></div></aside>';
   }
@@ -2914,9 +2987,8 @@
     return '<nav class="tg-mnav">' + NAV.map(function (n) {
       return '<button type="button" class="' + (st.view === n[0] ? 'is-active' : '') + '" data-tg="view" data-view="' + n[0] + '">' + icon(n[2]) + '<span>' + n[1].split(' ')[0] + '</span></button>';
     }).join('') +
-    (konsolKurikulumSiap()
-      ? '<button type="button" class="' + (st.view === 'curriculum' ? 'is-active' : '') + '" data-tg="view" data-view="curriculum">' + icon('library') + '<span>' + esc(t('guru.nav-kurikulum-singkat', 'Kurikulum')) + '</span></button>'
-      : '') +
+    /* Nav ponsel mengikuti sidebar: butir kurikulum dicabut dari sini juga (m025-357).
+       Menyisakannya berarti ponsel punya pintu ke view yang sudah tidak ada lagi. */
     '</nav>';
   }
 
@@ -3033,10 +3105,183 @@
       + status + '<div class="tg-actions">' + actions + '</div></section>';
   }
 
-  function curriculumView(c) {
+  /* =====================================================================================
+     PANEL KURIKULUM & KOMPETENSI — DIRENDER DI DALAM DASBOR KELASKU (m025-357)
+     =====================================================================================
+     Dulu ini `curriculumView(c)`, isi dari butir nav kedelapan di sidebar Ruang Guru.
+     Butir nav itu dicabut atas instruksi owner (lihat sidebar() di atas) dan panelnya
+     dipasang sebagai tab di hub KelasKu, tempat guru sudah memegang kelasnya.
+
+     YANG BERUBAH BUKAN CUMA ALAMATNYA. Versi lama panel ini hanya bisa dua hal —
+     menggambar pohon kurikulum dan menawarkan satu pintu keluar ke kurikulum.html —
+     sementara tiga penanganan penyemai (`seed-english`, `seed-mapel`, `seed-soal`)
+     sudah terpasang di pengirim aksi berkas ini, lengkap dengan runSeedEnglish/
+     runSeedMapel/runSeedSoal. Tidak ada satu pun tombol di Ruang Guru yang mengirimkan
+     aksi itu: dicari di seluruh repo, pemanggilnya hanya ada di teacher-console.js,
+     yaitu di halaman yang lain. Jadi ~60 baris mesin penyemai duduk mati di sini.
+
+     Lebih buruk lagi, kalimat `guru.kurikulum-sumber-lokal` di bawah berkata kepada guru
+     "Tekan kartu penyemai agar papan ini terisi dari server KelasKu" — menunjuk kartu
+     yang tidak ada di layar itu. Layar yang menyuruh menekan sesuatu yang tidak ada
+     membuat guru mengira dirinya yang tidak becus mencari.
+
+     Panel ini menyalakan mesin yang sudah ada itu: tiga kartu penyemai, status dibaca
+     LEBIH DULU supaya tombolnya jujur (pola yang sama dengan kartuSemai() di konsol),
+     dan kalimat sumber-lokal kini menunjuk kartu yang benar-benar ada di layar yang sama.
+
+     Yang SENGAJA TIDAK dibawa ke sini: matriks cakupan per kelas. Ia menuntut
+     `class_id` milik backend kurikulum, sedangkan kelas di dasbor ini adalah kelas
+     KelasKu lokal. Tidak ada pemetaan jujur di antara keduanya (lihat bagian "Yang BELUM
+     selesai dari X4" di docs/handoffs/KELASKU-KURIKULUM-KOMPETENSI-HANDOFF.md), dan
+     mengarangnya berarti mengirim bukti palsu ke layar yang dipakai guru memutuskan siapa
+     yang perlu remedial. Cakupan per kelas tetap dikerjakan di konsol penuh, dan pintunya
+     ada di panel ini. */
+
+  var SEMAI_KARTU = [
+    { jenis: 'english', aksi: 'seed-english',
+      judul: function () { return t('guru.semai-english-judul', 'Kurikulum Bahasa Inggris Kelas 1–12'); },
+      ajakan: function () { return t('guru.semai-english-ajakan', 'Kurikulum Merdeka Bahasa Inggris lengkap Fase A–F: 72 tujuan pembelajaran, 144 kompetensi, plus materi ajar dan prasyarat antar kelas. Disemai sekali, lalu menjadi milik bank kurikulummu.'); } },
+    { jenis: 'mapel', aksi: 'seed-mapel',
+      judul: function () { return t('guru.semai-mapel-judul', 'Mata pelajaran lain — Kelas 1–12'); },
+      ajakan: function () { return t('guru.semai-mapel-ajakan', 'Tujuh belas mata pelajaran Fase A–F: Matematika, B. Indonesia, Pancasila, IPAS, IPA, IPS, Sejarah, Informatika, Fisika, Kimia, Biologi, Ekonomi, Sosiologi, Geografi, PJOK, Seni Budaya, Prakarya. 210 tujuan pembelajaran, 420 kompetensi, lengkap materi ajar dan prasyarat antar kelas.'); } },
+    { jenis: 'soal', aksi: 'seed-soal',
+      judul: function () { return t('guru.semai-soal-judul', 'Bank soal'); },
+      ajakan: function () { return t('guru.semai-soal-ajakan', 'Soal pilihan ganda berpembahasan, berpetunjuk, dan berpeta miskonsepsi — inilah yang membuat kompetensi bisa dilatih, bukan sekadar dilihat. Semai kurikulumnya lebih dulu.'); } }
+  ];
+
+  /* Status ketiga penyemai dibaca dalam SATU jalan, dan kegagalan satu kartu tidak
+     menjatuhkan dua lainnya (`.catch` per janji, bukan satu catch di ujung). Kartu yang
+     statusnya gagal dibaca mengatakan bahwa ia gagal dibaca — ia TIDAK jatuh ke
+     "belum tersemai", karena itu kalimat yang berbeda artinya dan guru bisa menekan
+     "Semai sekarang" atas bank yang sebenarnya sudah penuh. */
+  function loadSeedStatus(paksa) {
+    if (!konsolKurikulumSiap()) return;
+    if (ui.seedStatusLoading) return;
+    if (ui.seedStatus && !paksa) return;
+    ui.seedStatusLoading = true;
+    ui.seedStatusError = null;
+    ensureFzEngine().then(function (FZE) {
+      if (!isFzEngineValid(FZE)) throw new Error(t('guru.err-fz-api-stale', 'Modul kurikulum di peramban belum mutakhir. Silakan muat ulang halaman.'));
+      var gagal = function () { return 'ERR'; };
+      return Promise.all([
+        FZE.seed.englishStatus().catch(gagal),
+        FZE.seed.mapelStatus().catch(gagal),
+        FZE.seed.soalStatus().catch(gagal)
+      ]);
+    }).then(function (r) {
+      ui.seedStatus = { english: r[0], mapel: r[1], soal: r[2] };
+      ui.seedStatusLoading = false;
+      render();
+    }).catch(function (err) {
+      ui.seedStatusLoading = false;
+      ui.seedStatusError = (err && err.message) || t('guru.err-muat-kurikulum', 'Gagal memuat kurikulum');
+      render();
+    });
+  }
+
+  /* KEDALAMAN BANK PER KOMPETENSI. "Kompetensi" tanpa angka di belakangnya hanya kata:
+     guru tidak bisa tahu kompetensi mana yang benar-benar bisa dilatih hari ini dan mana
+     yang baru judul. Angka ini dihitung dari bank soal yang sama yang akan dipakai
+     tugasnya, jadi ia menjawab tepat pertanyaan itu.
+
+     BATAS 1000 DINYATAKAN, BUKAN DISEMBUNYIKAN. Kalau jawabannya menyentuh batas, panel
+     memasang penanda bahwa hitungannya terpotong halaman — angka yang terpotong diam-diam
+     akan membuat guru menyimpulkan kompetensi tertentu kosong padahal hanya tidak
+     terbawa. Pola penanda ini sama dengan `bank-capped-note` di konsol penuh. */
+  var BANK_DEPTH_LIMIT = 1000;
+  function loadBankDepth(subjectId, paksa) {
+    if (!konsolKurikulumSiap()) return;
+    var sId = subjectId || ui.curriculumSubject || 'MAT';
+    if (ui.bankDepthLoading) return;
+    if (ui.bankDepth && ui.bankDepthSubject === sId && !paksa) return;
+    ui.bankDepthLoading = true;
+    ensureFzEngine().then(function (FZE) {
+      if (!isFzEngineValid(FZE) || !FZE.questions || typeof FZE.questions.list !== 'function') {
+        throw new Error(t('guru.err-fz-api-stale', 'Modul kurikulum di peramban belum mutakhir. Silakan muat ulang halaman.'));
+      }
+      return FZE.questions.list({ subject_id: sId, limit: BANK_DEPTH_LIMIT });
+    }).then(function (rows) {
+      var peta = {};
+      var list = Array.isArray(rows) ? rows : [];
+      list.forEach(function (q) {
+        var k = q && q.competency_id;
+        if (!k) return;
+        peta[k] = (peta[k] || 0) + 1;
+      });
+      ui.bankDepth = peta;
+      ui.bankDepthSubject = sId;
+      ui.bankDepthCapped = list.length >= BANK_DEPTH_LIMIT;
+      ui.bankDepthLoading = false;
+      render();
+    }).catch(function () {
+      /* Kedalaman bank adalah HIASAN yang berguna, bukan syarat. Kalau ia gagal, pohon
+         kurikulum tetap terbaca dan tombol "Buat Tugas" tetap hidup; yang hilang hanya
+         angkanya. Karena itu kegagalannya tidak menjadi layar merah — ia menjadi peta
+         kosong, dan baris kompetensi tidak mencetak angka apa pun. */
+      ui.bankDepth = null;
+      ui.bankDepthSubject = sId;
+      ui.bankDepthCapped = false;
+      ui.bankDepthLoading = false;
+      render();
+    });
+  }
+
+  /* Satu pintu masuk yang dipanggil hub saat tab Kurikulum dibuka. Ia yang memutuskan
+     apa yang perlu diambil, supaya hub tidak perlu tahu apa pun tentang FZEngine. */
+  function bukaPanelKurikulum() {
+    if (!konsolKurikulumSiap()) return;
+    if (!ui.curriculumTree && !ui.curriculumLoading) loadCurriculumTree(ui.curriculumSubject || 'MAT');
+    loadSeedStatus(false);
+    loadBankDepth(ui.curriculumSubject || 'MAT', false);
+  }
+
+  function kartuSemai(d) {
+    var peta = ui.seedStatus || {};
+    var st = ui.seedStatus ? peta[d.jenis] : null;
+    var sibuk = ui.seedBusy === d.jenis;
+    var baris, sudah = false;
+    if (ui.seedStatusLoading || st === undefined || st === null) {
+      baris = esc(t('guru.semai-memeriksa', 'Memeriksa isi bank kurikulum…'));
+    } else if (st === 'ERR') {
+      baris = esc(t('guru.semai-status-gagal', 'Status bank ini gagal dibaca. Angka di bawah tidak diketahui — bukan berarti kosong.'));
+    } else if (st && st.seeded) {
+      sudah = true;
+      baris = d.jenis === 'soal'
+        ? esc(t('guru.semai-soal-sudah', 'Sudah tersemai: {n} soal, mencakup {k} dari {total} kompetensi.',
+            { n: st.from_this_seeder, k: st.competencies_with_questions, total: st.competencies_total }))
+        : esc(t('guru.semai-sudah', 'Sudah tersemai: {tp} tujuan pembelajaran, {komp} kompetensi, {materi} materi ajar.',
+            { tp: st.tp, komp: st.competencies, materi: st.materials }));
+    } else {
+      baris = esc(t('guru.semai-belum', 'Belum tersemai. Bank kurikulum masih berisi contoh demo saja.'));
+    }
+    return '<div class="tg-card tg-seed-card" data-testid="tg-' + d.aksi + '-card">' +
+      '<p class="tg-kicker">' + icon('sprout') + ' ' + esc(t('guru.semai-kicker', 'Bank kurikulum')) + '</p>' +
+      '<h4>' + esc(d.judul()) + '</h4>' +
+      '<p class="tg-muted tg-small">' + esc(d.ajakan()) + '</p>' +
+      '<p class="tg-seed-status" data-testid="tg-' + d.aksi + '-status">' + baris + '</p>' +
+      '<button type="button" class="tg-btn is-small ' + (sudah ? 'is-ghost' : 'is-primary') + '" data-tg="' + d.aksi + '" data-testid="tg-' + d.aksi + '-btn"' + (sibuk ? ' disabled' : '') + '>' +
+        icon('sprout') + ' ' + esc(sibuk
+          ? t('guru.semai-jalan', 'Sedang menyemai — butuh beberapa detik.')
+          : (sudah ? t('guru.semai-ulang', 'Semai ulang') : t('guru.semai-tombol', 'Semai sekarang'))) +
+      '</button>' +
+    '</div>';
+  }
+
+  function kurikulumPanel() {
+    /* Penjaga yang SAMA dengan pintu konsol. Hub sudah memeriksanya sebelum memasang
+       tabnya; pemeriksaan kedua di sini menjaga panel ini tetap mustahil tergambar tanpa
+       alamat backend, walau nanti ada pemanggil lain. */
+    if (!konsolKurikulumSiap()) return '';
+
     var sId = ui.curriculumSubject || 'MAT';
     var cat = MAPEL_CATALOG[sId] || MAPEL_CATALOG['MAT'];
     var mItem = MAPEL_LIST.filter(function (x) { return x.id === sId; })[0] || { name: sId, grade: 'SD / SMP / SMA' };
+
+    var kepala = '<div class="tg-kur-head">' +
+      '<p class="tg-kicker">' + icon('compass') + ' ' + esc(t('guru.nav-kurikulum', 'Kurikulum & Kompetensi')) + '</p>' +
+      '<h3>' + esc(t('guru.kurikulum-panel-judul', 'Kurikulum Merdeka, di dalam kelasmu')) + '</h3>' +
+      '<p class="tg-muted">' + esc(t('guru.kurikulum-panel-sub', 'Semai bank kurikulum, baca kompetensi beserta kedalaman banknya, lalu ubah satu kompetensi menjadi tugas atau ujian — tanpa meninggalkan KelasKu.')) + '</p>' +
+    '</div>';
 
     var toolbar = '<div class="tg-curriculum-toolbar">' +
       '<div class="tg-curriculum-actions">' +
@@ -3052,25 +3297,28 @@
       '<div class="tg-seed-badge">' + icon('book-open') + ' <span><b>' + esc(mItem.name) + '</b> (' + esc(mItem.grade) + ') · ' + esc(t('guru.kurikulum-nasional', 'Kurikulum Nasional')) + '</span></div>' +
     '</div>';
 
+    var kartuPenyemai = '<div class="tg-seed-grid" data-testid="tg-seed-grid">' +
+      SEMAI_KARTU.map(kartuSemai).join('') +
+      '</div>' +
+      (ui.seedStatusError
+        ? '<div class="tg-curriculum-source is-local" data-testid="tg-seed-error">' + icon('alert-triangle') + ' <span>' + esc(ui.seedStatusError) + '</span></div>'
+        : '');
+
     /* PINTU KE KONSOL KURIKULUM & KOMPETENSI (m025-349, temuan X2).
        ==========================================================================
        kurikulum.html adalah permukaan kurikulum paling lengkap di repo ini: rekomendasi
        mengajar harian, matriks cakupan per TP, learning graph, bank soal, blueprint
-       delapan jenis asesmen, dan draf narasi e-Rapor. Sampai baris ini ditulis, SATU-
-       SATUNYA tautan menujunya di seluruh repo ada di features/curriculum/learning-mission.js
-       — yaitu di layar MURID. Guru hanya bisa sampai ke sana dengan mengetik alamatnya.
+       delapan jenis asesmen, draf narasi e-Rapor, tab Wali Kelas, dan Papan Kelas.
+       Panel ini sengaja TIDAK menirunya — ia membawa bagian yang tidak butuh `class_id`
+       backend kurikulum, dan menyerahkan sisanya lewat pintu ini.
 
        Pintunya memang pernah sengaja ditutup: 7 September 2026 backend-nya menjawab 404,
        dan pintu yang terbuka ke ruangan kosong lebih merugikan daripada fitur yang belum
        ada (alasan lengkapnya di fiezel-ux-flags.js). Tapi yang menutup pintu itu adalah
        ALAMAT BACKEND YANG KOSONG, dan alamat itu kini terisi — konsolKurikulumSiap() di
-       kepala berkas ini sudah menjadi syaratnya, dan syarat itulah yang memutuskan view
+       kepala berkas ini sudah menjadi syaratnya, dan syarat itulah yang memutuskan panel
        ini boleh tampil sama sekali. Jadi menautkannya di sini tidak melonggarkan pagar
-       apa pun: ia memakai pagar yang sama.
-
-       Ditaruh DI DALAM view kurikulum, bukan sebagai butir nav baru: di sinilah guru
-       sudah sedang memikirkan kurikulum, dan di sinilah batas kemampuan layar ini
-       (pohon + penyemaian) bertemu dengan yang hanya bisa dilakukan konsol penuh. */
+       apa pun: ia memakai pagar yang sama. */
     var pintuKonsol = konsolKurikulumSiap()
       ? '<a class="tg-card tg-console-door" href="./kurikulum.html" data-testid="tg-curriculum-console-door">' +
           '<span class="tg-console-door-icon">' + icon('compass') + '</span>' +
@@ -3081,6 +3329,16 @@
           icon('arrow-up-right') +
         '</a>'
       : '';
+
+    /* Kegagalan muat dinyatakan sebagai kegagalan, lengkap dengan jalan keluarnya.
+       Daftar kosong yang diam membuat guru menyimpulkan mapelnya memang belum ada. */
+    if (ui.curriculumError) {
+      return '<div class="tg-curriculum-wrap" data-testid="tg-curriculum-panel">' + kepala + toolbar +
+        '<div class="tg-card tg-center" data-testid="tg-curriculum-error">' +
+          '<p>' + icon('alert-triangle') + ' ' + esc(t('guru.kurikulum-gagal', 'Kurikulum gagal dimuat: {pesan}', { pesan: ui.curriculumError })) + '</p>' +
+          '<div class="tg-actions"><button type="button" class="tg-btn is-primary is-small" data-tg="refresh-curriculum" data-testid="tg-curriculum-retry">' + icon('rotate-cw') + ' ' + esc(t('umum.muat-ulang', 'Muat Ulang')) + '</button></div>' +
+        '</div>' + kartuPenyemai + pintuKonsol + '</div>';
+    }
 
     var tree = ui.curriculumTree || [];
     /* Fallback mulus ke katalog materi lokal jika pohon server belum dimuat */
@@ -3099,7 +3357,45 @@
     }
 
     if (ui.curriculumLoading && !tree.length) {
-      return '<div class="tg-curriculum-wrap">' + toolbar + pintuKonsol + '<div class="tg-card tg-center"><p class="tg-muted">' + icon('hourglass') + ' ' + t('guru.memuat-kurikulum-silabus', 'Memuat kurikulum & capaian pembelajaran…') + '</p></div></div>';
+      return '<div class="tg-curriculum-wrap" data-testid="tg-curriculum-panel">' + kepala + toolbar + kartuPenyemai + pintuKonsol + '<div class="tg-card tg-center"><p class="tg-muted">' + icon('hourglass') + ' ' + t('guru.memuat-kurikulum-silabus', 'Memuat kurikulum & capaian pembelajaran…') + '</p></div></div>';
+    }
+
+    var depth = ui.bankDepth;
+    var depthCocok = !!depth && ui.bankDepthSubject === sId;
+
+    function bankPill(node) {
+      if (!depthCocok) return '';
+      /* SIMPUL TANPA ID TIDAK MENDAPAT PIL SAMA SEKALI (temuan gitar-bot, m025-357).
+         ==================================================================================
+         Pohon yang gagal dimuat jatuh ke katalog cadangan perangkat, dan simpul buatan
+         itu hanya membawa code/name/description/bloom_level — TIDAK ada `id`. Karena
+         kedalaman bank dicocokkan lewat node.id (alasannya tepat di bawah), setiap simpul
+         cadangan menghasilkan n = 0.
+
+         Tanpa baris ini, n = 0 itu tergambar sebagai pil merah "Bank soal kosong". Dan itu
+         BUKAN sekadar tidak berguna, ia BERBOHONG: ketiga penyemai berdiri sendiri-sendiri,
+         jadi guru bisa saja sudah menyemai bank soal (seed-soal) sementara kurikulum
+         mapelnya belum. Dalam keadaan itu `depth` terisi — `depthCocok` benar — tetapi
+         pohonnya datang dari katalog lokal, sehingga SELURUH kompetensi dicap banknya
+         kosong padahal banknya penuh. Guru yang percaya kepadanya akan menyemai ulang
+         tanpa perlu, atau melewati kompetensi yang sebenarnya siap dilatih.
+
+         Kode katalog lokal tidak akan pernah cocok dengan competency_id milik soal, jadi
+         tidak ada hitungan jujur yang bisa dibuat untuk simpul cadangan. Yang jujur adalah
+         DIAM: spanduk "Sumber: katalog cadangan perangkat" di atas sudah mengatakan kenap
+         layar ini tidak membawa angka. Ini persis kelas kebohongan yang T4 ada untuk
+         mencegahnya — dan versi pertama T4 sendiri melanggarnya. */
+      if (!node || !node.id) return '';
+      /* Dicari lewat ID SIMPUL, bukan kode. `competency_id` pada soal adalah id simpul
+         kurikulum (KOMP-…), sedangkan `code` dipakai bersama lintas mapel dan tingkat —
+         mencocokkan lewat code akan menempelkan soal mapel lain ke kompetensi ini. */
+      var n = depth[node.id] || 0;
+      if (!n) {
+        return '<span class="tg-bank-pill is-empty" data-testid="tg-bank-empty-' + esc(node.code || '') + '">' +
+          icon('circle-slash') + ' ' + esc(t('guru.kurikulum-kompetensi-kosong', 'Bank soal kosong')) + '</span>';
+      }
+      return '<span class="tg-bank-pill" data-testid="tg-bank-depth-' + esc(node.code || '') + '">' +
+        icon('layers') + ' ' + esc(t('guru.kurikulum-kompetensi-bank', '{n} soal di bank', { n: n })) + '</span>';
     }
 
     function renderNode(node) {
@@ -3113,7 +3409,7 @@
       if (nType === 'competency') {
         return '<div class="tg-comp-row" data-testid="tg-comp-' + nCode + '">' +
           '<div class="tg-comp-info">' +
-            '<div class="tg-comp-head"><span class="tg-comp-code">' + nCode + '</span>' + bloom + '<b>' + nTitle + '</b></div>' +
+            '<div class="tg-comp-head"><span class="tg-comp-code">' + nCode + '</span>' + bloom + '<b>' + nTitle + '</b>' + bankPill(node) + '</div>' +
             (nDesc ? '<p class="tg-comp-desc">' + nDesc + '</p>' : '') +
           '</div>' +
           '<div class="tg-comp-actions">' +
@@ -3148,7 +3444,20 @@
         esc(t('guru.kurikulum-sumber-server', 'Sumber: kurikulum dari server KelasKu.')) +
         '</span></div>';
 
-    return '<div class="tg-curriculum-wrap">' + toolbar + pintuKonsol + pinSumber + '<div class="tg-curriculum-tree">' + tree.map(renderNode).join('') + '</div></div>';
+    var pinBatas = (depthCocok && ui.bankDepthCapped)
+      ? '<div class="tg-curriculum-source is-local" data-testid="tg-bank-capped">' + icon('alert-triangle') + ' <span>' +
+        esc(t('guru.kurikulum-bank-terpotong', 'Hitungan soal per kompetensi dibaca dari {n} soal pertama — batas halaman, bukan jumlah seluruh bank. Kompetensi yang tertulis kosong bisa jadi hanya tidak terbawa.', { n: BANK_DEPTH_LIMIT })) +
+        '</span></div>'
+      : '';
+
+    /* Pohon yang benar-benar kosong berkata bahwa ia kosong, dan menunjuk kartu penyemai
+       yang ada di layar yang sama — bukan membiarkan guru menatap ruang putih. */
+    var isiPohon = tree.length
+      ? '<div class="tg-curriculum-tree">' + tree.map(renderNode).join('') + '</div>'
+      : '<div class="tg-card tg-center" data-testid="tg-curriculum-empty"><p class="tg-muted">' + icon('inbox') + ' ' +
+        esc(t('guru.kurikulum-pohon-kosong', 'Belum ada kompetensi untuk mata pelajaran ini di bank. Semai kurikulumnya lewat kartu di atas, lalu tekan Muat Ulang.')) + '</p></div>';
+
+    return '<div class="tg-curriculum-wrap" data-testid="tg-curriculum-panel">' + kepala + toolbar + kartuPenyemai + pintuKonsol + pinSumber + pinBatas + isiPohon + '</div>';
   }
 
   function settings() {
@@ -3156,7 +3465,7 @@
       '<section class="tg-card tg-narrow" data-testid="tg-settings"><p class="tg-kicker">Profil guru</p><h3>' + t('guru.nama-sekolah-ttd', 'Nama & sekolah dipakai di tanda tangan laporan') + '</h3><form data-tg-form="teacher" class="tg-form"><label class="tg-label">' + t('guru.nama-panggilan', 'Nama panggilan') + '<input name="name" value="' + esc(st.teacher.name) + '" placeholder="Bu Rina / Pak Dimas" maxlength="40" data-testid="tg-teacher-name"></label><label class="tg-label">Sekolah / lembaga<input name="school" value="' + esc(st.teacher.school) + '" placeholder="SMA Negeri 3 Bandung" maxlength="60" data-testid="tg-teacher-school"></label><div class="tg-actions"><button type="submit" class="tg-btn is-primary is-small" data-testid="tg-teacher-save">' + t('umum.simpan', 'Simpan') + '</button></div></form>' +
       '<hr class="tg-hr"><p class="tg-kicker">Data</p><p class="tg-muted">' + t('guru.data-lokal-warn', 'Semua data KelasKu untuk Guru tersimpan di perangkat ini. Ekspor cadangan sebelum ganti perangkat.') + '</p><div class="tg-actions"><button type="button" class="tg-btn is-ghost is-small" data-tg="export-json">' + icon('download') + ' Ekspor cadangan</button><label class="tg-btn is-ghost is-small">' + icon('upload') + ' Pulihkan cadangan<input type="file" accept="application/json" hidden data-tg-file="import-json"></label><button type="button" class="tg-btn is-ghost is-small" data-tg="clear-all-classes" data-testid="tg-clear-classes">' + icon('trash-2') + ' Bersihkan semua kelas</button><button type="button" class="tg-btn is-danger is-small" data-tg="reset-all" data-testid="tg-reset">' + icon('trash-2') + ' ' + t('guru.hapus-semua-data', 'Hapus semua data guru') + '</button></div></section>';
   }
-  var views = { hub: function () { return '<div id="tgClassHub" class="tg-hub-host"></div>'; }, briefing: briefing, classes: classes, assignments: assignments, insights: insights, comms: comms, journal: journal, settings: settings, curriculum: curriculumView };
+  var views = { hub: function () { return '<div id="tgClassHub" class="tg-hub-host"></div>'; }, briefing: briefing, classes: classes, assignments: assignments, insights: insights, comms: comms, journal: journal, settings: settings };
 
   // ---- DRAWER siswa -------------------------------------------------------------------------------
   /* Pendeteksi keluar layar: yang ditampilkan di sini adalah UJIAN yang benar-benar punya
@@ -3685,9 +3994,6 @@
         st.view = btn.getAttribute('data-view');
         if (btn.getAttribute('data-skill')) ui.insightSkill = btn.getAttribute('data-skill');
         ui.modal = null; ui.drawer = null; ui.filter = '';
-        if (st.view === 'curriculum' && !ui.curriculumTree && !ui.curriculumLoading) {
-          loadCurriculumTree(ui.curriculumSubject || 'MAT');
-        }
         if (st.view === 'owner_tokens' && !ui.ownerInvites && !ui.ownerLoading) {
           loadOwnerTeachers();
         }
@@ -3815,7 +4121,15 @@
       case 'seed-mapel': runSeedMapel(); return;
       case 'seed-english': runSeedEnglish(); return;
       case 'seed-soal': runSeedSoal(); return;
-      case 'refresh-curriculum': loadCurriculumTree(ui.curriculumSubject || 'MAT'); return;
+      case 'refresh-curriculum':
+        /* Satu tombol Muat Ulang menyegarkan KETIGA sumber panel ini. Menyegarkan
+           pohon saja akan meninggalkan kartu penyemai dan hitungan bank pada angka
+           lama, dan guru tidak punya cara menebak bagian mana yang basi. */
+        ui.curriculumError = null;
+        loadCurriculumTree(ui.curriculumSubject || 'MAT');
+        loadSeedStatus(true);
+        loadBankDepth(ui.curriculumSubject || 'MAT', true);
+        return;
       case 'assign-tab': { ui.assignTab = btn.getAttribute('data-tab'); persist(); render(); return; }
       case 'assign-phase': { ui.curriculumPhase = btn.getAttribute('data-phase'); ui.curriculumUnitId = null; persist(); render(); return; }
       case 'assign-unit': { ui.curriculumUnitId = btn.getAttribute('data-unit'); persist(); render(); return; }
@@ -4062,6 +4376,11 @@
     if (sel.getAttribute('data-tg-select') === 'curriculum-subject') {
       ui.curriculumSubject = sel.value;
       loadCurriculumTree(sel.value);
+      /* Kedalaman bank dihitung per mapel. Tanpa baris ini, pindah mapel meninggalkan
+         hitungan mapel SEBELUMNYA menempel pada kompetensi mapel baru — angka yang salah
+         tetapi terlihat meyakinkan. bankDepthSubject di panel menjaga ketidakcocokan itu
+         tidak pernah tergambar, dan panggilan ini yang membuatnya cocok lagi. */
+      loadBankDepth(sel.value, true);
     }
     if (sel.getAttribute('data-tg-select') === 'assign-subject') {
       ui.assignSubject = sel.value;
@@ -4105,5 +4424,9 @@
   }
   function download(name, text, type) { try { var a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([text], { type: type || 'text/plain' })); a.download = name; document.body.appendChild(a); a.click(); setTimeout(function () { URL.revokeObjectURL(a.href); a.remove(); }, 800); } catch (_) { copy(text, 'Unduhan tidak didukung — isi tersalin.'); } }
 
-  root.FiezelTeacherShell = { mount: mount, unmount: unmount, render: render, previewAllowed: previewAllowed, exitPreview: exitPreview, _state: function () { return st; }, _autoSyncPlan: autoSyncPlan, _syncTicks: function () { return { every: SYNC_EVERY_MS, chip: CHIP_TICK_MS, stuck: (root.FiezelSyncPlan && root.FiezelSyncPlan.STUCK_MS) || 45000 }; }, _armed: function () { return !!syncTimer && !!chipTimer; }, _synthesizeMapelQuestions: synthesizeMapelQuestions, _MAPEL_LIST: MAPEL_LIST, _MAPEL_CATALOG: MAPEL_CATALOG };
+  root.FiezelTeacherShell = { mount: mount, unmount: unmount, render: render, previewAllowed: previewAllowed, exitPreview: exitPreview, _state: function () { return st; }, _autoSyncPlan: autoSyncPlan, _syncTicks: function () { return { every: SYNC_EVERY_MS, chip: CHIP_TICK_MS, stuck: (root.FiezelSyncPlan && root.FiezelSyncPlan.STUCK_MS) || 45000 }; }, _armed: function () { return !!syncTimer && !!chipTimer; }, _synthesizeMapelQuestions: synthesizeMapelQuestions, _MAPEL_LIST: MAPEL_LIST, _MAPEL_CATALOG: MAPEL_CATALOG, /* m025-357: panel kurikulum dibuka untuk gerbang supaya HTML-nya bisa diperiksa
+        sungguhan, bukan lewat regex atas sumbernya. `_ui` menyertainya karena panel
+        ini dikendalikan keadaan muat (pohon, status semai, kedalaman bank) dan tanpa
+        akses ke sana gerbang hanya bisa menguji satu keadaan dari lima. */
+    _kurikulumPanel: kurikulumPanel, _ui: function () { return ui; } };
 })(typeof window !== 'undefined' ? window : null);
