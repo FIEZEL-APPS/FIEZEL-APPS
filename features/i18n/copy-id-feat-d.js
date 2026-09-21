@@ -603,7 +603,9 @@
     'kelas.sumber-angka': 'Semua angka di bawah berasal dari bukti murid di kelas ini: laporan sinkron dan soal yang keliru pada tugasmu. Tidak ada AI cloud, tidak ada tebakan tanpa data.',
     'kelas.jawaban-keliru': 'jawaban keliru pada tugas yang kamu kirim.',
     'kelas.tempel-soal-jelas': 'Tempel soal — satu baris per soal:',
-    'kelas.tempel-soal-format': '(kunci: huruf, nomor, atau teks). Blok bernomor dengan A./B./C./D. dan “Answer: B” juga dikenali.'
+    'kelas.tempel-soal-format': '(kunci: huruf, nomor, atau teks). Blok bernomor dengan A./B./C./D. dan “Answer: B” juga dikenali.',
+    'kelas.panduan-bab': '2. Pilih jenjang kelas (Kelas 7 atau Kelas 8) dan pilih kartu Bab materi.',
+    'kelas.panduan-soal': '3. Pilih jumlah soal (5 butir latihan cepat atau 10 butir ulangan), lalu terbitkan.'
 ,
     'guru.n-menit': '{n} menit',
     'guru.waktu-hemat-tip': 'Perkiraan waktu administrasi yang FIEZEL kerjakan untukmu'
