@@ -8,7 +8,7 @@
         xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
     <loc>https://fiezel.my.id/</loc>
-    <lastmod>2026-09-14</lastmod>
+    <lastmod>2026-09-21</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
     <xhtml:link rel="alternate" hreflang="id" href="https://fiezel.my.id/"/>
@@ -17,7 +17,7 @@
   </url>
   <url>
     <loc>https://fiezel.my.id/th/</loc>
-    <lastmod>2026-09-14</lastmod>
+    <lastmod>2026-09-21</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
     <xhtml:link rel="alternate" hreflang="id" href="https://fiezel.my.id/"/>
@@ -44,6 +44,28 @@
     <xhtml:link rel="alternate" hreflang="id" href="https://fiezel.my.id/tentang.html"/>
     <xhtml:link rel="alternate" hreflang="th" href="https://fiezel.my.id/th/tentang.html"/>
     <xhtml:link rel="alternate" hreflang="x-default" href="https://fiezel.my.id/tentang.html"/>
+  </url>
+  <!-- Halaman Untuk Sekolah (id + th). Ditambahkan saat rebrand m025-357: pintu masuk
+       pencarian untuk guru dan kepala sekolah, yang kata kuncinya sama sekali berbeda
+       dari kata kunci murid. Ia JUJUR menyatakan pilot belum berjalan — tidak ada klaim
+       "dipakai di sekolah" di mana pun, karena belum ada satu pun. -->
+  <url>
+    <loc>https://fiezel.my.id/untuk-sekolah.html</loc>
+    <lastmod>2026-09-21</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+    <xhtml:link rel="alternate" hreflang="id" href="https://fiezel.my.id/untuk-sekolah.html"/>
+    <xhtml:link rel="alternate" hreflang="th" href="https://fiezel.my.id/th/untuk-sekolah.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://fiezel.my.id/untuk-sekolah.html"/>
+  </url>
+  <url>
+    <loc>https://fiezel.my.id/th/untuk-sekolah.html</loc>
+    <lastmod>2026-09-21</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="id" href="https://fiezel.my.id/untuk-sekolah.html"/>
+    <xhtml:link rel="alternate" hreflang="th" href="https://fiezel.my.id/th/untuk-sekolah.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://fiezel.my.id/untuk-sekolah.html"/>
   </url>
   <url>
     <loc>https://fiezel.my.id/app/</loc>

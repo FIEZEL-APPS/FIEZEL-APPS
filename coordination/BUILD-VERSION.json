@@ -1,7 +1,7 @@
 {
-  "version": "m025-358",
-  "claimedBy": "branch feat/teacher-subject-isolation",
-  "claimedAt": "2026-09-21T11:00:37.813Z",
-  "reason": "isolasi mapel per token guru KelasKu",
+  "version": "m025-359",
+  "claimedBy": "branch claude/gallant-archimedes-l85qlc",
+  "claimedAt": "2026-09-21T13:13:36.994445Z",
+  "reason": "rebrand permukaan publik: dua kursus bahasa + lapisan guru, SEO/AEO/GEO, halaman Untuk Sekolah, screenshot per bahasa",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }
