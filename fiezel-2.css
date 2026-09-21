@@ -111,7 +111,7 @@ body.fz-lux .modal-panel,body .modal-panel{border-radius:var(--radius-xl)}
 body.fz-lux .fz2-social,body .fz2-social{padding:16px 18px;margin-top:var(--sp-4);border-radius:var(--radius-xl);background:var(--panel);border:1px solid var(--line)}
 body.fz-lux .fz2-social-head,body .fz2-social-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
 body.fz-lux .fz2-social-sub,body .fz2-social-sub{margin:4px 0 0;font-size:.9rem;color:var(--text);font-weight:600;line-height:1.4}
-body.fz-lux .fz2-link,body .fz2-link{position:relative;background:transparent;border:0;box-shadow:none;padding:6px 4px;min-height:32px;color:var(--maroon);font-weight:700;font-size:.85rem;display:inline-flex;align-items:center;gap:4px;white-space:nowrap}
+body.fz-lux .fz2-link,body .fz2-link{position:relative;background:transparent;border:0;box-shadow:none;padding:10px 8px;min-height:44px;color:var(--maroon);font-weight:700;font-size:.85rem;display:inline-flex;align-items:center;gap:4px;white-space:nowrap}
 body.fz-lux .fz2-link i,body .fz2-link i{width:16px;height:16px}
 body.fz-lux .fz2-link .social-badge,body .fz2-link .social-badge{position:absolute;top:-4px;right:-10px}
 body.fz-lux .fz2-friends,body .fz2-friends{display:flex;margin:12px 0 2px;padding-left:4px}
@@ -125,7 +125,10 @@ body.fz-lux .fz2-acts,body .fz2-acts{display:grid;grid-template-columns:minmax(0
 body.fz-lux .fz2-act,body .fz2-act{display:flex;align-items:center;justify-content:center;gap:8px;min-height:48px;padding:10px 12px;border-radius:999px;background:var(--panel);border:1.5px solid var(--line);box-shadow:var(--lift-line);font-size:.88rem;font-weight:700;color:var(--text)}
 body.fz-lux .fz2-act i,body .fz2-act i{width:18px;height:18px;color:var(--maroon)}
 body.fz-lux .fz2-act,body .fz2-act{min-width:0}
-body.fz-lux .fz2-act span,body .fz2-act span{min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+/* AUDIT-2026-09-21 T7: label "Gabung KelasKu" terpotong 9px di 390px ("Gabung Kela…") dan
+   44px di 320px — ellipsis satu-baris di kolom 2× membuat nama merek tak terbaca.
+   Label boleh membungkus dua baris; pemotongan diam-diam tidak boleh. */
+body.fz-lux .fz2-act span,body .fz2-act span{min-width:0;white-space:normal;overflow:visible;text-overflow:clip;text-align:center;line-height:1.25}
 body.fz-lux .fz2-act.is-set,body .fz2-act.is-set{background:var(--pz-mint);border-color:var(--pz-mint-line);box-shadow:0 3px 0 var(--pz-mint-line);color:var(--pz-mint-ink)}
 body.fz-lux .fz2-act.is-set i,body .fz2-act.is-set i{color:var(--pz-mint-ink)}
 body.fz-lux .fz2-act.is-hot,body .fz2-act.is-hot{grid-column:1/-1;background:var(--sun-soft);border-color:var(--pz-yellow-line);box-shadow:0 3px 0 var(--pz-yellow-line)}
@@ -155,6 +158,11 @@ body.fz-lux .fz2-more[open] summary,body .fz2-more[open] summary{margin-bottom:8
 @media (min-width:720px){
   body.fz-lux .fz2-acts,body .fz2-acts{grid-template-columns:repeat(3,minmax(0,1fr))}
   body.fz-lux .fz2-act.is-hot,body .fz2-act.is-hot{grid-column:auto}
+}
+/* AUDIT-2026-09-21 T7: di 320px dua kolom memaksa "Tambah teman" jadi "Tamba…" (32px hilang).
+   Satu kolom di layar sangat sempit — tombol penuh selalu lebih baik daripada label terpotong. */
+@media (max-width:360px){
+  body.fz-lux .fz2-acts,body .fz2-acts{grid-template-columns:minmax(0,1fr)}
 }
 
 /* ---------- Jalur Grammar bernode ---------- */

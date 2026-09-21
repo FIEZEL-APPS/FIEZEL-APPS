@@ -41,7 +41,8 @@
 
     /* ── Home "Hari ini" ────────────────────────────────────────────────────── */
     'today.eyebrow': 'Hari ini',
-    'today.cta': 'Mulai 10 menit',
+    /* AUDIT-2026-09-21 T1: CTA memakai {menit} dari todaySessionShape(), bukan angka paku. */
+    'today.cta': 'Mulai {menit} menit',
     'today.cta-lanjut': 'Lanjutkan sesi',
     'today.cta-kenalan': 'Cari level kamu dulu',
     'today.isi-judul': 'Isi sesi',
@@ -142,12 +143,17 @@
     'skill.speaking': 'Berbicara',
 
     /* Beranda: sapaan maskot, ritme harian, chip latihan singkat. */
-    'home.sapaan-runtun-aktif': 'Runtun {hari} hari! Mantap sekali, {nama}. Siap lanjut 10 menit hari ini?',
+    /* AUDIT-2026-09-21 T1+T3+T9: "10 menit" dipaku diganti {menit} dari todaySessionShape();
+       balon tidak lagi menyapa nama (kartu "Halo, {nama}" yang menyapa); kunci selesai baru
+       untuk apresiasi-bukan-ajakan saat sesi tuntas. */
+    'home.sapaan-runtun-aktif': 'Runtun {hari} hari! Siap lanjut {menit} menit hari ini?',
+    'home.sapaan-selesai': 'Runtun {hari} hari! Sesi hari ini sudah beres. Keren, {nama}.',
+    'home.sapaan-selesai-baru': 'Sesi hari ini sudah beres. Keren, {nama}!',
     'home.paw-avatar-aria': 'Maskot PAW',
     'home.paw-bubble-title': 'Kata PAW',
     'home.ritme-harian': 'Ritme Harian',
     'home.ritme-harian-hitung': '({selesai}/{target} soal)',
-    'home.latihan-singkat': 'Latihan Singkat 3 Menit',
+    'home.latihan-singkat': 'Latihan Singkat',
     'home.chip-vocab-sub': '10 kartu cepat',
     'home.chip-grammar-sub': 'Pola kalimat',
     'home.chip-dengar': 'Dengar',

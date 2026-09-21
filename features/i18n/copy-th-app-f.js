@@ -170,7 +170,7 @@
     'guru.toast-mengaktifkan': 'กำลังเปิดสิทธิ์เข้าห้องครู...',
     'guru.toast-selamat-datang': 'ยินดีต้อนรับ {nama}! ห้องครูพร้อมใช้งานแล้ว',
     'home.continue-btn': 'ไปต่อ',
-    'home.sapaan-runtun-baru': 'สวัสดี {nama}! เรียน 10 นาทีวันนี้ เพื่อเริ่มสตรีคใหม่ของคุณ',
+    'home.sapaan-runtun-baru': 'เรียน {menit} นาทีวันนี้ เพื่อเริ่มสตรีคใหม่ของคุณ',
     'account.card-title': 'บัญชี FIEZEL',
     'account.card-desc': 'เข้าสู่ระบบหรือสมัคร เพื่อเก็บประวัติการเรียนและซิงก์ข้ามอุปกรณ์',
     'account.status-label': 'สถานะบัญชี',
