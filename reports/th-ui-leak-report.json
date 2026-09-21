@@ -1,6 +1,6 @@
 {
   "schema": "fiezel-th-ui-leak-v1",
-  "generatedAt": "2026-09-21T00:34:05.173Z",
+  "generatedAt": "2026-09-21T01:04:53.652Z",
   "files": {
     "app.js": {
       "leaks": 4,
@@ -115,11 +115,11 @@
           "text": "Latihan ·"
         },
         {
-          "line": 1468,
+          "line": 1446,
           "text": "Latihan · ±"
         },
         {
-          "line": 1490,
+          "line": 1468,
           "text": "Tenggat"
         }
       ]
