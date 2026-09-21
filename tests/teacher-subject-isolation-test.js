@@ -156,17 +156,23 @@ console.log('tests/teacher-subject-isolation-test.js — isolasi mapel per token
   assert(rows.filter((r) => r.status === 'Remedial').length === 1, 'tepat 1 remedial di rekap');
 }
 
-/* 7 · Bank autentik tidak dimutasi */
+/* 7 · Bank autentik tidak dimutasi.
+   HANYA berkas bank yang dilacak git (mat/ipa/eng + sidecar th): mapel-ind/ips
+   adalah artefak lokal tak-lacak dan tidak boleh dibaca di sini — di CI ia tidak
+   ada dan readFileSync akan melempar ENOENT. */
 {
-  const files = ['mapel-mat-d.json', 'mapel-ipa-d.json', 'mapel-eng-d.json', 'mapel-ind-d.json', 'mapel-ips-d.json'];
-  let comps = 0, items = 0;
+  const files = ['mapel-mat-d.json', 'mapel-ipa-d.json', 'mapel-eng-d.json'];
+  let comps = 0, items = 0, hilang = [];
   for (const f of files) {
-    const b = JSON.parse(fs.readFileSync(path.join(ROOT, 'content', 'mapel', f), 'utf8'));
-    comps += (b.competencies || []).length;
-    (b.competencies || []).forEach((c) => { items += (c.items || []).length; });
+    try {
+      const b = JSON.parse(fs.readFileSync(path.join(ROOT, 'content', 'mapel', f), 'utf8'));
+      comps += (b.competencies || []).length;
+      (b.competencies || []).forEach((c) => { items += (c.items || []).length; });
+    } catch (e) { hilang.push(f); }
   }
-  assert(comps === 44, '44 kompetensi autentik utuh', comps + ' kompetensi');
-  assert(items === 642, '642 butir autentik utuh', items + ' butir');
+  assert(hilang.length === 0, 'ketiga bank inti terbaca', hilang.join(', '));
+  assert(comps === 27, '27 kompetensi autentik utuh (9 × 3 mapel)', comps + ' kompetensi');
+  assert(items === 324, '324 butir autentik utuh (108 × 3 mapel)', items + ' butir');
 }
 
 /* 8 · AUDIT-2: analitik + laporan + i18n/aria */
