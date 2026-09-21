@@ -138,10 +138,42 @@ function installAntiBurstRules() {
   }
 }
 
+/* Ditandai saat service OpenCode tidak bisa dihubungi sama sekali. Dipisahkan dari
+   "nol sesi" dengan sengaja: keduanya menghasilkan daftar kosong, tetapi artinya berbeda
+   dan `--status` tidak boleh menyamakannya. */
+let serviceUnreachable = false;
+
 async function listSessions() {
-  const res = await apiFetch('/api/session');
-  if (res.ok && res.data && Array.isArray(res.data.data)) {
-    return res.data.data;
+  /* KENAPA try/catch DI SINI, DAN KENAPA BUKAN DI apiFetch().
+     ------------------------------------------------------------------
+     apiFetch() memanggil `await fetch(...)` yang MENOLAK (bukan mengembalikan res.ok
+     false) ketika tidak ada yang mendengarkan di port-nya — ECONNREFUSED. Tanpa penangkap
+     di sini, penolakan itu naik lewat listSessions() ke main() lalu mendarat di
+     main().catch(), sehingga SELURUH alur berhenti: installAntiBurstRules() dan
+     restartService() di ujung main() tidak pernah dijalankan.
+
+     Yang membuatnya serius: keadaan "service mati atau macet" itu justru ALASAN UTAMA
+     alat ini ada. Jadi persis ketika ia paling dibutuhkan, ia berhenti sebelum
+     memperbaiki apa pun. (Temuan gitar-bot di PR #453.)
+
+     Penangkapnya ditaruh di sini, bukan di apiFetch(), karena apiFetch() juga dipakai
+     deleteSession() — yang memang punya penangkapnya sendiri dan memang harus tahu kalau
+     penghapusan gagal. Menelan galat di lapisan bawah akan membuat kegagalan hapus
+     terbaca sebagai sukses.
+
+     Dan gagal-hubung TIDAK diam-diam menjadi "nol sesi": keduanya sama-sama daftar
+     kosong, tetapi `--status` yang mencetak "Ditemukan 0 sesi terdaftar" atas service
+     yang sebenarnya mati adalah layar yang berbohong. Karena itu ada serviceUnreachable. */
+  try {
+    const res = await apiFetch('/api/session');
+    if (res.ok && res.data && Array.isArray(res.data.data)) {
+      return res.data.data;
+    }
+  } catch (e) {
+    serviceUnreachable = true;
+    const sebab = (e && (e.code || e.message)) || 'tidak diketahui';
+    console.log(`  [!] Service OpenCode tidak menjawab (${sebab}).`);
+    console.log('      Daftar sesi dianggap kosong; pemasangan aturan dan restart service TETAP dijalankan.');
   }
   return [];
 }
@@ -294,6 +326,13 @@ async function main() {
   let sessions = await listSessions();
 
   if (isStatusOnly) {
+    /* Service yang tidak bisa dihubungi BUKAN "nol sesi". Menyamakannya membuat
+       `--status` melaporkan keadaan sehat atas service yang sebenarnya mati. */
+    if (serviceUnreachable) {
+      console.log('\n📋 Status sesi TIDAK DIKETAHUI — service OpenCode tidak bisa dihubungi.');
+      console.log('   Jalankan tanpa --status (atau dengan --restart) untuk menyalakannya kembali.\n');
+      return;
+    }
     console.log(`\n📋 Ditemukan ${sessions.length} sesi terdaftar:`);
     sessions.forEach((s, idx) => {
       console.log(`  ${idx + 1}. [${s.id}] "${s.title}" (${s.model?.id || 'unknown'}) - outcome: ${s.outcome || 'running'}`);
@@ -303,7 +342,9 @@ async function main() {
   }
 
   if (sessions.length === 0) {
-    console.log('ℹ️  Tidak ada sesi yang tersimpan di OpenCode.');
+    console.log(serviceUnreachable
+      ? 'ℹ️  Sesi tidak bisa dibaca (service mati) — lanjut ke pemasangan aturan dan restart.'
+      : 'ℹ️  Tidak ada sesi yang tersimpan di OpenCode.');
   } else {
     console.log(`📋 Ditemukan ${sessions.length} sesi.`);
 
