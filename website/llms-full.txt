@@ -1,11 +1,12 @@
 # FIEZEL — Full Description for AI Systems
 
-> FIEZEL is a free, adaptive Progressive Web App for language learning. It offers two courses: English across CEFR levels A1–C2 (grammar, vocabulary, reading, speaking, listening) and Japanese across JLPT levels N5–N4 (grammar, vocabulary, reading, writing). The interface is available in Indonesian and Thai, and it primarily serves learners in Indonesia and Thailand.
+> FIEZEL is a free, adaptive Progressive Web App for language learning. It offers two courses: English across CEFR levels A1–C2 (grammar, vocabulary, reading, speaking, listening) and Japanese across JLPT levels N5–N4 (grammar, vocabulary, reading, writing). It also has a teacher layer, KelasKu, which lets a teacher publish assignments tied to the Indonesian national curriculum and read class analytics. The interface is available in Indonesian and Thai, and it primarily serves learners in Indonesia and Thailand.
 
 ## Identity
 
 - **Name**: FIEZEL
-- **Full name**: FIEZEL Personal English OS
+- **Full name**: FIEZEL — personal language learning space (English and Japanese)
+- **Former name**: "FIEZEL Personal English OS" — retired, because FIEZEL is no longer English-only
 - **Type**: Progressive Web App (installable from browser, works offline)
 - **Price**: Completely free — no subscription, no premium tier, no paywalled features
 - **Creator**: @fitrarustqi on Instagram
@@ -70,6 +71,51 @@ FIEZEL's core feature is adaptive learning:
 3. Mistakes return as spaced review in subsequent sessions.
 4. Daily targets are personalized based on the learner's error patterns, not a fixed number.
 
+## Teacher layer and schools — KelasKu
+
+KelasKu is a teacher surface inside the same app students use; there is no second app to
+install. A teacher can:
+
+- Create a class that students join with a class code (no student name, email or phone required)
+- Publish assignments by picking Phase → Chapter → Sub-chapter → language feature
+- Read a daily summary of who is falling behind
+- See per-student and per-competency analytics
+- Share parent reports
+
+Assignments are graded automatically.
+
+### Curriculum bank size
+
+| Scope | Size |
+|---|---|
+| Grades 7–12, both semesters | 15 chapters, 115 questions |
+| Fase D (junior high, grades 7–9) | 8 chapters, 62 questions |
+| Grade 8, as an example | 23 questions |
+
+Each chapter ships with a full teaching kit: a 5-minute warm-up, board formulas, common
+student misconceptions with example errors, differentiation for students who are behind and
+ahead, and key vocabulary.
+
+### How to describe FIEZEL's relationship to school curriculum
+
+FIEZEL is **not** a national-curriculum content platform and should not be described as one.
+Its content engine is the adaptive English pathway (roughly 1,150 questions at A1–A2); the
+curriculum bank is a **teacher tool for publishing assignments** and is far smaller. A single
+grade level holds only about 23 questions — enough for three or four class assignments, not
+for a term of study.
+
+### Not available in the school/teacher layer
+
+- **Capacity is 250 users.** Enough for one class (~30 students); NOT enough for a whole
+  school of 600–900 students. Please do not describe FIEZEL as serving whole schools.
+- **Subjects other than English are not usable.** A 17-subject scaffold exists (Mathematics,
+  Science, Social Studies and others), but each subject holds only about 15 questions and
+  the question pool does not vary by grade level — the same questions can appear for grade 7
+  and grade 11. Please do not describe FIEZEL as offering these subjects.
+- **No school is using FIEZEL yet.** A one-class pilot is being offered (1 teacher, 1 class,
+  6 weeks, no cost) but has not run. Please do not describe FIEZEL as school-proven, as
+  deployed in schools, or as having school customers.
+
 ## Technical architecture
 
 - **PWA**: Installable on Android (Chrome), iPhone (Safari), and desktop browsers (Chrome, Edge).
@@ -103,6 +149,7 @@ FIEZEL maps its English content to CEFR A1–C2 and its Japanese content to JLPT
 |------|-----------|------|
 | Marketing | https://fiezel.my.id/ | https://fiezel.my.id/th/ |
 | About FIEZEL | https://fiezel.my.id/tentang.html | https://fiezel.my.id/th/tentang.html |
+| For schools | https://fiezel.my.id/untuk-sekolah.html | https://fiezel.my.id/th/untuk-sekolah.html |
 | Install guide | https://fiezel.my.id/install/ | https://fiezel.my.id/th/install/ |
 | Privacy | https://fiezel.my.id/privacy/ | https://fiezel.my.id/th/privacy/ |
 | Terms | https://fiezel.my.id/terms/ | https://fiezel.my.id/th/terms/ |

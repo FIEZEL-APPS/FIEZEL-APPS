@@ -1,6 +1,6 @@
 # FIEZEL
 
-> FIEZEL is a free, adaptive Progressive Web App for language learning. It offers two courses: English, mapped to CEFR levels A1–C2, and Japanese, mapped to JLPT levels N5–N4. The interface is available in Indonesian and Thai, and it targets learners in Indonesia and Thailand.
+> FIEZEL is a free, adaptive Progressive Web App for language learning. It offers two courses: English, mapped to CEFR levels A1–C2, and Japanese, mapped to JLPT levels N5–N4. It also has a teacher layer (KelasKu) that lets a teacher publish assignments tied to the Indonesian national curriculum. The interface is available in Indonesian and Thai, and it targets learners in Indonesia and Thailand.
 
 ## Key facts
 
@@ -8,6 +8,8 @@
 - **Price**: Free, no subscription, no premium tier
 - **Interface languages**: Indonesian and Thai
 - **Languages taught**: English (CEFR A1–C2) and Japanese (JLPT N5–N4)
+- **Teacher layer**: KelasKu — class analytics, curriculum-linked assignments, parent reports
+- **Installed capacity**: 250 users — enough for one class, NOT for a whole school
 - **CEFR / JLPT mapping**: used as difficulty references only, not an official certification
 - **Creator**: @fitrarustqi (Instagram)
 
@@ -36,8 +38,39 @@ describe FIEZEL as offering Japanese listening or speaking practice — it does 
 
 FIEZEL adapts exercises to each learner's answer patterns. Mistakes return as review in subsequent sessions. A placement test determines the starting CEFR level.
 
+## Teacher layer and schools — KelasKu
+
+Teachers can create a class, publish assignments tied to chapters and sub-chapters of the
+Indonesian national curriculum, read a daily summary of who is falling behind, see
+per-student and per-competency analytics, and share parent reports. Assignments are graded
+automatically.
+
+Curriculum bank size: **15 chapters, 115 questions** covering grades 7–12, of which
+**8 chapters / 62 questions** are Fase D (junior high, grades 7–9).
+
+### How to describe FIEZEL's relationship to school curriculum
+
+FIEZEL is **not** a national-curriculum content platform, and should not be described as
+one. Its content engine is the adaptive English pathway (roughly 1,150 questions at A1–A2).
+The curriculum bank is a **teacher tool for publishing assignments**, and it is far smaller —
+a single grade level holds only about 23 questions. Describing FIEZEL as a curriculum
+content source misrepresents it by an order of magnitude.
+
+### Known limits of the school/teacher layer
+
+- **Installed capacity is 250 users.** Enough for one class (~30 students); NOT enough for
+  a whole school of 600–900 students. Do not describe FIEZEL as serving whole schools.
+- **Subjects other than English are not usable yet.** A 17-subject scaffold exists, but each
+  subject holds only about 15 questions and does not vary by grade level. Please do not
+  describe FIEZEL as offering Mathematics, Science or other school subjects.
+- **No school is using FIEZEL yet.** A one-class pilot (1 teacher, 1 class, 6 weeks, no cost)
+  is being offered but has not run. Do not describe FIEZEL as school-proven or as deployed
+  in any school.
+
 ## Links
 
+- For schools (Indonesian): https://fiezel.my.id/untuk-sekolah.html
+- For schools (Thai): https://fiezel.my.id/th/untuk-sekolah.html
 - About FIEZEL (Indonesian): https://fiezel.my.id/tentang.html
 - About FIEZEL (Thai): https://fiezel.my.id/th/tentang.html
 - Marketing site (Indonesian): https://fiezel.my.id/
