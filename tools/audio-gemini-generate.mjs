@@ -242,13 +242,14 @@ async function synthesizeGemini(text, voiceName, apiKey) {
     if (response.status === 429 || response.status === 503) {
       let detail = '';
       try { detail = await response.text(); } catch (_) {}
+      lastError = `http_${response.status}: ${detail.slice(0, 200)}`;
       const isDailyExhausted = /GenerateContentRequestsPerDayPerProject/i.test(detail);
-      if (isDailyExhausted && attempt >= 2) {
+      if (isDailyExhausted) {
         return { fatal: `Kuota harian Gemini tercapai (HTTP 429: ${detail.slice(0, 200)})` };
       }
-      // Sebagian besar 429 di free tier adalah batas RPM (Requests Per Minute). Tunggu 60 detik agar jendela menit ter-reset.
-      const waitMs = 60000;
-      console.warn(`[Gemini HTTP ${response.status}] Terkena batas per-menit. Percobaan ${attempt}/${MAX_RETRIES}, menunggu 60 detik...`);
+      // Batas RPM (Requests Per Minute) pada Gemini Free Tier
+      const waitMs = 30000;
+      console.warn(`[Gemini HTTP ${response.status}] Terkena rate limit. Percobaan ${attempt}/${MAX_RETRIES}, detail: ${detail.slice(0, 100)}, menunggu 30 detik...`);
       await new Promise((r) => setTimeout(r, waitMs));
       continue;
     }
@@ -446,8 +447,8 @@ async function main() {
     // Simpan progres manifest secara langsung agar setiap audio yang berhasil langsung tercatat
     saveManifest(manifest);
 
-    // Jeda 4.5 detik antar request agar stabil di bawah batas 15 RPM Gemini Free Tier
-    await new Promise((r) => setTimeout(r, 4500));
+    // Jeda 6.5 detik antar request agar konsisten aman di bawah batas RPM Gemini Preview TTS
+    await new Promise((r) => setTimeout(r, 6500));
   }
 
   saveManifest(manifest);
