@@ -135,10 +135,18 @@
       name: 'Matematika',
       grade: 'SD / SMP / SMA',
       competencies: [
-        { code: 'KOMP-MAT-D-7-BIL-01', name: t('mapel_mat_c1_name', 'Operasi Hitung Bilangan Bulat & Pecahan'), materi: t('mapel_mat_c1_mat', 'Penjumlahan, pengurangan, perkalian, pembagian bilangan rasional dan estimasi') },
-        { code: 'KOMP-MAT-D-8-ALJ-01', name: t('mapel_mat_c2_name', 'Aljabar & Persamaan Linier Dua Variabel'), materi: t('mapel_mat_c2_mat', 'Menyelesaikan SPLDV dengan metode substitusi dan eliminasi kontekstual') },
-        { code: 'KOMP-MAT-D-8-GEO-01', name: t('mapel_mat_c3_name', 'Geometri & Teorema Pythagoras'), materi: t('mapel_mat_c3_mat', 'Membuktikan dan menghitung panjang sisi segitiga siku-siku serta tripel Pythagoras') },
-        { code: 'KOMP-MAT-D-9-STA-01', name: t('mapel_mat_c4_name', 'Statistika & Peluang Empiris'), materi: t('mapel_mat_c4_mat', 'Menghitung pemusatan data rata-rata, median, modus, dan frekuensi relatif') }
+        { code: 'KOMP-MAT-D-7-BAB1-01', name: t('mapel_mat_c1_name', 'Bilangan Bulat'), materi: t('mapel_mat_c1_mat', 'Operasi Penjumlahan & Pengurangan Bilangan Bulat, Perkalian & Pembagian, Faktor & Kelipatan (KPK/FPB), Penerapan Kontekstual'), grade: 7 },
+        { code: 'KOMP-MAT-D-7-BAB2-01', name: t('mapel_mat_c2_name', 'Aljabar'), materi: t('mapel_mat_c2_mat', 'Unsur Bentuk Aljabar, Penjumlahan & Pengurangan Bentuk Aljabar, Perkalian & Pembagian Bentuk Aljabar, Pemodelan & Penyederhanaan'), grade: 7 },
+        { code: 'KOMP-MAT-D-7-BAB3-01', name: t('mapel_mat_c3_name', 'Rasio dan Proporsi'), materi: t('mapel_mat_c3_mat', 'Konsep Rasio & Perbandingan, Perbandingan Senilai & Berbalik Nilai, Skala Peta, Penerapan Kontekstual Kecepatan & Waktu'), grade: 7 },
+        { code: 'KOMP-MAT-D-7-BAB4-01', name: t('mapel_mat_c4_name', 'Bentuk Geometri dan Bangun Datar'), materi: t('mapel_mat_c4_mat', 'Sifat Garis & Sudut, Hubungan Antarsudut, Keliling & Luas Segitiga & Segi Empat (Persegi, Persegi Panjang, Jajar Genjang, Trapesium)'), grade: 7 },
+        { code: 'KOMP-MAT-D-7-BAB5-01', name: t('mapel_mat_c5_name', 'Bab 5: Kesebangunan dan Hubungan Antar Garis'), materi: t('mapel_mat_c5_mat', 'Hubungan Antar Garis & Sudut, Sudut Sejajar & Berpotongan, Konsep Kesebangunan & Kekongruenan Bangun Datar'), grade: 7 },
+        { code: 'KOMP-MAT-D-7-BAB6-01', name: t('mapel_mat_c6_name', 'Bab 6: Data dan Diagram'), materi: t('mapel_mat_c6_mat', 'Investigasi Statistika, Jenis-jenis Data, Penyajian Data (Diagram Batang, Diagram Lingkaran, Line Plot), Interpretasi dan Analisis Diagram'), grade: 7 },
+        { code: 'KOMP-MAT-D-8-BAB1-01', name: t('mapel_mat_c7_name', 'Teorema Pythagoras dan Lingkaran'), materi: t('mapel_mat_c7_mat', 'Teorema Pythagoras & Tripel Pythagoras, Penerapan Pythagoras, Keliling & Luas Lingkaran, Panjang Busur & Luas Juring'), grade: 8 },
+        { code: 'KOMP-MAT-D-8-ALJ-01', name: t('mapel_mat_c8_name', 'Aljabar & Persamaan Linier Dua Variabel'), materi: t('mapel_mat_c8_mat', 'Menyelesaikan SPLDV dengan metode substitusi dan eliminasi kontekstual'), grade: 8 },
+        { code: 'KOMP-MAT-D-8-FUN-01', name: t('mapel_mat_c9_name', 'Relasi, Fungsi & Persamaan Garis Lurus'), materi: t('mapel_mat_c9_mat', 'Pemetaan relasi fungsi, gradien garis lurus, dan persamaan garis lurus'), grade: 8 },
+        { code: 'KOMP-MAT-D-9-STA-01', name: t('mapel_mat_c10_name', 'Statistika & Peluang Empiris'), materi: t('mapel_mat_c10_mat', 'Menghitung pemusatan data rata-rata, median, modus, dan frekuensi relatif'), grade: 9 },
+        { code: 'KOMP-MAT-D-9-BAK-01', name: t('mapel_mat_c11_name', 'Bilangan Berpangkat & Bentuk Akar'), materi: t('mapel_mat_c11_mat', 'Sifat-sifat eksponen, merasionalkan bentuk akar, dan notasi ilmiah'), grade: 9 },
+        { code: 'KOMP-MAT-D-9-KUA-01', name: t('mapel_mat_c12_name', 'Persamaan & Fungsi Kuadrat'), materi: t('mapel_mat_c12_mat', 'Faktorisasi kuadrat, rumus abc, nilai optimum, dan grafik fungsi kuadrat'), grade: 9 }
       ],
       teachingBrief: {
         summary: t('mapel_mat_tb_sum', 'Penguasaan konsep bilangan rasional, pemodelan aljabar, dan logika spasial geometri.'),
@@ -153,9 +161,18 @@
       name: 'Bahasa Indonesia',
       grade: 'SD / SMP / SMA',
       competencies: [
-        { code: 'KOMP-IND-D-7-TEK-01', name: t('mapel_ind_c1_name', 'Teks Deskripsi & Ide Pokok Paragraf'), materi: t('mapel_ind_c1_mat', 'Menemukan gagasan utama dan mencirikan teks deskriptif objektif') },
-        { code: 'KOMP-IND-D-8-EKS-01', name: t('mapel_ind_c2_name', 'Teks Eksplanasi Fenomena Alam & Sosial'), materi: t('mapel_ind_c2_mat', 'Menganalisis hubungan kausalitas sebab-akibat dan konjungsi kronologis') },
-        { code: 'KOMP-IND-E-10-ARG-01', name: t('mapel_ind_c3_name', 'Teks Argumentasi & Membedakan Fakta vs Opini'), materi: t('mapel_ind_c3_mat', 'Berpikir kritis memilah bukti empiris faktual terhadap klaim opini subjektif') }
+        { code: 'KOMP-IND-D-7-BAB1-01', name: t('mapel_ind_c1_name', 'Bab 1: Jelajah Nusantara'), materi: t('mapel_ind_c1_mat', 'Mengakses Informasi & Menjelajah Keindahan Alam, Memahami Gaya & Isi Teks Deskripsi, Unsur Kebahasaan: Kata Berimbuhan meN- & Majas Personifikasi'), grade: 7 },
+        { code: 'KOMP-IND-D-7-BAB2-01', name: t('mapel_ind_c2_name', 'Bab 2: Kelana Cerita Unik'), materi: t('mapel_ind_c2_mat', 'Mengenal Puisi Rakyat (Pantun & Gurindam), Cerita Fantasi, Analisis Tokoh & Alur, Unsur Kebahasaan Teks Narasi'), grade: 7 },
+        { code: 'KOMP-IND-D-7-BAB3-01', name: t('mapel_ind_c3_name', 'Bab 3: Hal yang Baik bagi Tubuh'), materi: t('mapel_ind_c3_mat', 'Memahami Teks Prosedur Kesehatan & Olahraga, Struktur Teks Prosedur (Tujuan, Bahan, Langkah), Unsur Kebahasaan: Kalimat Imperatif & Kata Keterangan'), grade: 7 },
+        { code: 'KOMP-IND-D-7-BAB4-01', name: t('mapel_ind_c4_name', 'Bab 4: Aksi Nyata Pelindung Bumi'), materi: t('mapel_ind_c4_mat', 'Memahami Teks Berita Lingkungan, Unsur Berita 5W+1H (ADIKSIMBA), Struktur Berita (Kepala, Tubuh, Ekor), Membandingkan Media Cetak & Digital'), grade: 7 },
+        { code: 'KOMP-IND-D-7-BAB5-01', name: t('mapel_ind_c5_name', 'Bab V: Membuka Gerbang Dunia'), materi: t('mapel_ind_c5_mat', 'Membedah Buku Bergambar, Bagian-Bagian Buku (Cover, Daftar Isi, Ilustrasi), Merangkum Buku & Peta Pikiran, Menyajikan Teks Tanggapan dan Ragam Kalimat Tanggapan'), grade: 7 },
+        { code: 'KOMP-IND-D-7-BAB6-01', name: t('mapel_ind_c6_name', 'Bab VI: Sampaikan Melalui Surat'), materi: t('mapel_ind_c6_mat', 'Mengenal Surat Pribadi dan Surat Resmi, Unsur-Unsur dan Struktur Surat, Berkomunikasi Santun via Surat, Etika Komunikasi Digital di Ruang Bincang / Email'), grade: 7 },
+        { code: 'KOMP-IND-D-8-BAB1-01', name: t('mapel_ind_c7_name', 'Bab 1: Laporan Hasil Observasi'), materi: t('mapel_ind_c7_mat', 'Memahami Teks Laporan Hasil Observasi (LHO), Struktur Teks LHO (Pernyataan Umum, Deskripsi Bagian, Manfaat), Unsur Kebahasaan Teks LHO'), grade: 8 },
+        { code: 'KOMP-IND-D-8-BAB2-01', name: t('mapel_ind_c8_name', 'Bab 2: Iklan, Slogan, dan Poster'), materi: t('mapel_ind_c8_mat', 'Mengenal Iklan, Slogan, dan Poster, Ciri Bahasa Persuasif & Imperatif, Struktur Iklan Komersial & Layanan Masyarakat'), grade: 8 },
+        { code: 'KOMP-IND-D-8-BAB3-01', name: t('mapel_ind_c9_name', 'Bab 3: Artikel Ilmiah Populer'), materi: t('mapel_ind_c9_mat', 'Memahami Artikel Ilmiah Populer, Membedakan Fakta & Opini, Pengumpulan Data, Unsur Kebahasaan: Kata Denotatif & Konjungsi'), grade: 8 },
+        { code: 'KOMP-IND-D-8-BAB4-01', name: t('mapel_ind_c10_name', 'Bab 4: Teks Ulasan Karya Fiksi'), materi: t('mapel_ind_c10_mat', 'Memahami Teks Ulasan Novel & Cerpen, Struktur Teks Ulasan (Identitas, Orientasi, Sinopsis, Evaluasi), Unsur Kebahasaan Teks Ulasan'), grade: 8 },
+        { code: 'KOMP-IND-D-8-BAB5-01', name: t('mapel_ind_c11_name', 'Bab 5: Teks Drama'), materi: t('mapel_ind_c11_mat', 'Mengenal Pertunjukan & Naskah Drama, Unsur Intrinsik Drama (Tokoh, Dialog, Kramagung, Konflik), Pementasan Drama'), grade: 8 },
+        { code: 'KOMP-IND-D-8-BAB6-01', name: t('mapel_ind_c12_name', 'Bab VI: Menulis Teks Pidato'), materi: t('mapel_ind_c12_mat', 'Memahami Teks Pidato Persuasif, Struktur Teks Pidato (Salam Pembuka, Pendahuluan, Isi, Penutup), Kebahasaan Pidato (Kata Sapaan, Kalimat Persuasif, Kata Kerja Mental)'), grade: 8 }
       ],
       teachingBrief: {
         summary: t('mapel_ind_tb_sum', 'Kemampuan literasi membaca kritis, penalaran logika argumen, dan sintesis wacana.'),
@@ -170,9 +187,19 @@
       name: 'Bahasa Inggris',
       grade: 'SD / SMP / SMA',
       competencies: [
-        { code: 'KOMP-ENG-D-7-DSC-01', name: t('mapel_eng_c1_name', 'Descriptive Text & Everyday Adjectives'), materi: t('mapel_eng_c1_mat', 'Describing people, objects, animals, and daily environment using Simple Present') },
-        { code: 'KOMP-ENG-D-8-RCT-01', name: t('mapel_eng_c2_name', 'Recount Text & Simple Past Tense'), materi: t('mapel_eng_c2_mat', 'Retelling personal past events with regular and irregular verbs and time connectors') },
-        { code: 'KOMP-ENG-E-10-EXP-01', name: t('mapel_eng_c3_name', 'Analytical Exposition & Opinion Stance'), materi: t('mapel_eng_c3_mat', 'Formulating arguments, thesis statement, and reiteration for critical reasoning') }
+        { code: 'KOMP-ENG-D-7-BAB1-01', name: t('mapel_eng_c1_name', 'Chapter 1: About Me'), materi: t('mapel_eng_c1_mat', 'Introducing Oneself and Others, Expressing Hobbies and Preferences, Describing People Physical Traits, Subject & Possessive Pronouns'), grade: 7 },
+        { code: 'KOMP-ENG-D-7-BAB2-01', name: t('mapel_eng_c2_name', 'Chapter 2: Culinary and Me'), materi: t('mapel_eng_c2_mat', 'Describing Foods & Drinks (Taste & Texture), Recipe Procedural Text Analysis, Imperative Verbs & Cooking Steps'), grade: 7 },
+        { code: 'KOMP-ENG-D-7-BAB3-01', name: t('mapel_eng_c3_name', 'Chapter 3: Home Sweet Home'), materi: t('mapel_eng_c3_mat', 'Rooms & Furniture in a House, Describing House Chores & Cleaning Activities, Prepositions of Place (in, on, under, next to), Rules and Abilities (can/can\'t)'), grade: 7 },
+        { code: 'KOMP-ENG-D-8-BAB1-01', name: t('mapel_eng_c4_name', 'Chapter 1: Celebrating Independence Day'), materi: t('mapel_eng_c4_mat', 'Describing Past Independence Day Events, Recount Text Structure, Simple Past Tense (Regular & Irregular Verbs), Past Time Connectors'), grade: 8 },
+        { code: 'KOMP-ENG-D-8-BAB2-01', name: t('mapel_eng_c5_name', 'Chapter 2: Kindness Begins with Me'), materi: t('mapel_eng_c5_mat', 'Reading Narrative Texts & Fables, Moral Values of Kindness, Narrative Structure (Orientation, Complication, Resolution), Direct & Indirect Speech'), grade: 8 },
+        { code: 'KOMP-ENG-D-8-BAB3-01', name: t('mapel_eng_c6_name', 'Chapter 3: Love Our World'), materi: t('mapel_eng_c6_mat', 'Environmental Conservation Texts, Reducing Plastic Waste, Procedural Posters & Tips, Imperative Expressions for Saving Water/Energy'), grade: 8 },
+        { code: 'KOMP-ENG-D-8-BAB4-01', name: t('mapel_eng_c7_name', 'Chapter 4: No Littering'), materi: t('mapel_eng_c7_mat', 'Recounting Waste Clean-Up Events, Waste Sorting & Management, Past Continuous Tense (was/were + v-ing), Environmental Action'), grade: 8 },
+        { code: 'KOMP-ENG-D-8-BAB5-01', name: t('mapel_eng_c8_name', 'Chapter 5: Embrace Yourself'), materi: t('mapel_eng_c8_mat', 'Describing Feelings and Personality Traits, Personal Recount Text, Self-Acceptance & Empathy, Encouraging Expressions'), grade: 8 },
+        { code: 'KOMP-ENG-D-9-BAB1-01', name: t('mapel_eng_c9_name', 'Chapter 1: Exploring Fauna of Indonesia'), materi: t('mapel_eng_c9_mat', 'Reading Report Texts on Indonesian Wildlife (Bekantan, Orangutan, Birds), Passive Voice in Science Context, Describing Animals Physical & Behavior'), grade: 9 },
+        { code: 'KOMP-ENG-D-9-BAB2-01', name: t('mapel_eng_c10_name', 'Chapter 2: Taking Care of Yourself'), materi: t('mapel_eng_c10_mat', 'Giving Advice & Suggestions (should/shouldn\'t), Expressing Agreement & Disagreement, Healthy Habits & Mental Health'), grade: 9 },
+        { code: 'KOMP-ENG-D-9-BAB3-01', name: t('mapel_eng_c11_name', 'Chapter 3: Journey to the Fantasy World'), materi: t('mapel_eng_c11_mat', 'Analyzing Fantasy Narrative Texts, Character & Plot Analysis, Indirect/Reported Speech in Stories, Moral Values in Literature'), grade: 9 },
+        { code: 'KOMP-ENG-D-9-BAB4-01', name: t('mapel_eng_c12_name', 'Chapter 4: Upcycling Used Materials'), materi: t('mapel_eng_c12_mat', 'Upcycling & Recycling Crafts Procedural Texts, Imperative Action Verbs, DIY Project Instructions, Environmental Sustainability'), grade: 9 },
+        { code: 'KOMP-ENG-D-9-BAB5-01', name: t('mapel_eng_c13_name', 'Chapter 5: Digital Life'), materi: t('mapel_eng_c13_mat', 'Digital Literacy & Online Safety, Analytical Exposition Texts, Expressing Arguments & Opinions, Cyber Etiquette'), grade: 9 }
       ],
       teachingBrief: {
         summary: t('mapel_eng_tb_sum', 'Pengembangan kompetensi komunikatif lintas genre teks: deskripsi, recount, dan eksposisi analitis.'),
@@ -187,9 +214,18 @@
       name: 'Ilmu Pengetahuan Alam (IPA)',
       grade: 'SD / SMP',
       competencies: [
-        { code: 'KOMP-IPA-D-7-MET-01', name: t('mapel_ipa_c1_name', 'Besaran, Satuan & Metode Ilmiah'), materi: t('mapel_ipa_c1_mat', 'Pengukuran besaran pokok dan turunan, konversi satuan SI, dan keselamatan laboratorium') },
-        { code: 'KOMP-IPA-D-8-SEL-01', name: t('mapel_ipa_c2_name', 'Sel, Jaringan & Sistem Organ Manusia'), materi: t('mapel_ipa_c2_mat', 'Struktur sel hewan dan tumbuhan, mikroskop, serta organ respirasi dan ekskresi') },
-        { code: 'KOMP-IPA-D-9-LIS-01', name: t('mapel_ipa_c3_name', 'Listrik Dinamis, Hambatan & Kemagnetan'), materi: t('mapel_ipa_c3_mat', 'Hukum Ohm (V = I·R), rangkaian seri-paralel, dan induksi elektromagnetik') }
+        { code: 'KOMP-IPA-D-7-MET-01', name: t('mapel_ipa_c1_name', 'Besaran, Satuan & Metode Ilmiah'), materi: t('mapel_ipa_c1_mat', 'Pengukuran besaran pokok dan turunan, konversi satuan SI, dan keselamatan laboratorium'), grade: 7 },
+        { code: 'KOMP-IPA-D-7-ZAT-01', name: t('mapel_ipa_c2_name', 'Wujud Zat, Perubahan Fisika & Kimia'), materi: t('mapel_ipa_c2_mat', 'Wujud materi, wujud fisika-kimia, dan kerapatan massa jenis'), grade: 7 },
+        { code: 'KOMP-IPA-D-7-EKO-01', name: t('mapel_ipa_c3_name', 'Klasifikasi Makhluk Hidup, Ekosistem & Interaksinya'), materi: t('mapel_ipa_c3_mat', 'Kunci determinasi makhluk hidup, rantai makanan ekosistem, dan pencemaran lingkungan'), grade: 7 },
+        { code: 'KOMP-IPA-D-8-BAB1-01', name: t('mapel_ipa_c4_name', 'Pengenalan Sel'), materi: t('mapel_ipa_c4_mat', 'Struktur & Fungsi Organel Sel, Perbedaan Sel Tumbuhan & Sel Hewan, Spesialisasi Sel & Penggunaan Mikroskop'), grade: 8 },
+        { code: 'KOMP-IPA-D-8-BAB2-01', name: t('mapel_ipa_c5_name', 'Struktur dan Fungsi Tubuh Makhluk Hidup'), materi: t('mapel_ipa_c5_mat', 'Sistem Pencernaan & Nutrisi, Sistem Peredaran Darah & Jantung, Sistem Pernapasan & Paru-paru, Sistem Ekskresi & Ginjal'), grade: 8 },
+        { code: 'KOMP-IPA-D-8-BAB3-01', name: t('mapel_ipa_c6_name', 'Usaha, Energi, dan Pesawat Sederhana'), materi: t('mapel_ipa_c6_mat', 'Konsep Usaha & Energi, Energi Kinetik & Potensial, Keuntungan Mekanis Pesawat Sederhana (Tuas, Katrol, Bidang Miring)'), grade: 8 },
+        { code: 'KOMP-IPA-D-8-BAB4-01', name: t('mapel_ipa_c7_name', 'Tekanan'), materi: t('mapel_ipa_c7_mat', 'Tekanan Zat Padat & Hidrostatis, Hukum Archimedes & Pascal, Tekanan Gas/Udara, Aplikasi pada Makhluk Hidup'), grade: 8 },
+        { code: 'KOMP-IPA-D-8-BAB5-01', name: t('mapel_ipa_c8_name', 'Getaran, Gelombang, dan Cahaya'), materi: t('mapel_ipa_c8_mat', 'Getaran & Frekuensi, Gelombang Transversal & Longitudinal, Gelombang Bunyi & Ekolokasi, Sifat Cahaya & Alat Optik'), grade: 8 },
+        { code: 'KOMP-IPA-D-8-BAB6-01', name: t('mapel_ipa_c9_name', 'Unsur, Senyawa, dan Campuran'), materi: t('mapel_ipa_c9_mat', 'Klasifikasi Materi (Unsur, Senyawa, Campuran), Larutan, Koloid & Suspensi, Metode Pemisahan Campuran (Filtrasi, Distilasi, Kromatografi)'), grade: 8 },
+        { code: 'KOMP-IPA-D-9-LIS-01', name: t('mapel_ipa_c10_name', 'Listrik Dinamis, Hambatan & Kemagnetan'), materi: t('mapel_ipa_c10_mat', 'Hukum Ohm (V = I·R), rangkaian seri-paralel, dan induksi elektromagnetik'), grade: 9 },
+        { code: 'KOMP-IPA-D-9-GEN-01', name: t('mapel_ipa_c11_name', 'Sistem Reproduksi & Pewarisan Sifat'), materi: t('mapel_ipa_c11_mat', 'Pembelahan sel mitosis-meiosis, persilangan monohibrid-dihibrid Mendel, dan genetika'), grade: 9 },
+        { code: 'KOMP-IPA-D-9-BIO-01', name: t('mapel_ipa_c12_name', 'Bioteknologi & Kelestarian Lingkungan'), materi: t('mapel_ipa_c12_mat', 'Bioteknologi konvensional dan modern, tanah, serta teknologi ramah lingkungan'), grade: 9 }
       ],
       teachingBrief: {
         summary: t('mapel_ipa_tb_sum', 'Penyelidikan ilmiah empiris fenomena alam, organisasi materi kehidupan, dan konversi energi.'),
@@ -204,9 +240,13 @@
       name: 'Ilmu Pengetahuan Sosial (IPS)',
       grade: 'SD / SMP',
       competencies: [
-        { code: 'KOMP-IPS-D-7-RNG-01', name: t('mapel_ips_c1_name', 'Interaksi Antarruang & Letak Geografis'), materi: t('mapel_ips_c1_mat', 'Peta Indonesia, letak astronomis-geologis, dan potensi sumber daya alam maritim') },
-        { code: 'KOMP-IPS-D-8-SOS-01', name: t('mapel_ips_c2_name', 'Interaksi Sosial, Diferensiasi & Integrasi'), materi: t('mapel_ips_c2_mat', 'Bentuk interaksi asosiatif dan disosiatif, lembaga sosial, serta pluralitas budaya nusantara') },
-        { code: 'KOMP-IPS-D-9-GLB-01', name: t('mapel_ips_c3_name', 'Globalisasi & Perkembangan Ekonomi Digital'), materi: t('mapel_ips_c3_mat', 'Dampak perubahan sosial budaya, perdagangan internasional, dan ekonomi kreatif') }
+        { code: 'KOMP-IPS-D-7-BAB1-01', name: t('mapel_ips_c1_name', 'Tema 01: Keberadaan Diri dan Keluarga'), materi: t('mapel_ips_c1_mat', 'Mengenal Sejarah Keluarga & Silsilah, Pemahaman Lokasi pada Peta & Komponen Peta, Interaksi Sosial & Agen Sosialisasi, Pemenuhan Kebutuhan Manusia'), grade: 7 },
+        { code: 'KOMP-IPS-D-7-BAB2-01', name: t('mapel_ips_c2_name', 'Tema 02: Keberagaman Lingkungan Sekitar'), materi: t('mapel_ips_c2_mat', 'Proses Pembentukan Bumi & Masa Praaksara, Keberagaman Bentang Alam & Lingkungan, Interaksi Manusia & Konservasi SDA, Peran Lembaga Sosial & Ekonomi'), grade: 7 },
+        { code: 'KOMP-IPS-D-7-BAB3-01', name: t('mapel_ips_c3_name', 'Tema 03: Potensi Ekonomi Lingkungan'), materi: t('mapel_ips_c3_mat', 'Potensi Sumber Daya Alam (Hutan, Tambang, Laut), Kegiatan Ekonomi (Produksi, Distribusi, Konsumsi), Hukum Permintaan & Penawaran, Pasar & Peran Teknologi'), grade: 7 },
+        { code: 'KOMP-IPS-D-7-BAB4-01', name: t('mapel_ips_c4_name', 'Tema IV: Pemberdayaan Masyarakat'), materi: t('mapel_ips_c4_mat', 'Keanekaragaman Keragaman Etnis & Budaya Indonesia, Pemberdayaan Ekonomi Masyarakat, Literasi & Pengelolaan Keuangan Keluarga, Peran Komunitas Lokal'), grade: 7 },
+        { code: 'KOMP-IPS-D-8-BAB1-01', name: t('mapel_ips_c5_name', 'Tema 01: Kondisi Geografis dan Pelestarian Sumber Daya Alam'), materi: t('mapel_ips_c5_mat', 'Kondisi Geografis & Iklim Indonesia, Keragaman Flora & Fauna (Garis Wallace & Weber), Pelestarian Sumber Daya Alam, Potensi Maritim'), grade: 8 },
+        { code: 'KOMP-IPS-D-8-SOS-01', name: t('mapel_ips_c6_name', 'Interaksi Sosial, Diferensiasi & Integrasi'), materi: t('mapel_ips_c6_mat', 'Bentuk interaksi asosiatif dan disosiatif, lembaga sosial, serta pluralitas budaya nusantara'), grade: 8 },
+        { code: 'KOMP-IPS-D-9-GLB-01', name: t('mapel_ips_c7_name', 'Globalisasi & Perkembangan Ekonomi Digital'), materi: t('mapel_ips_c7_mat', 'Dampak perubahan sosial budaya, perdagangan internasional, dan ekonomi kreatif'), grade: 9 }
       ],
       teachingBrief: {
         summary: t('mapel_ips_tb_sum', 'Kajian keterhubungan spasial, pranata sosial kemasyarakatan, dan dinamika perekonomian masyarakat.'),
