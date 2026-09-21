@@ -253,25 +253,18 @@ Thai — dashboard KelasKu dicapai lewat `?teacher=preview`, bukan lewat `go()`.
 Tidak ada lagi yang memblokir rilis. Yang tersisa adalah **utang yang ditemukan sambil
 jalan**, dan semuanya bisa dikerjakan terpisah:
 
-1. **Kebocoran bahasa Thai di KelasKu untuk Guru — ini yang paling besar.**
-   Saat `learnerLocale = th`, dasbor guru bercampur bahasa: judulnya berganti bahasa
-   **di tengah kalimat** ("พื้นที่ทำงานที่อ่านชั้นเรียนของคุณ แล้วบอกให้รู้ *siapa yang perlu disapa
-   hari ini*"), dan seluruh sidebar tetap Indonesia — Ruang Kelas, Ringkasan Hari Ini,
-   Kelas & Siswa, Tugas & Ujian, Analitik, Komunikasi, Jurnal Guru, Keluar akun guru.
-   Begitu juga paragraf pembuka, tombol "Coba dengan kelas contoh", dan ketiga baris
-   manfaat.
-   **Akibat langsung ke PR ini:** potret `teacher-desktop.png` berbahasa Thai **tidak
-   diterbitkan**, karena memamerkan layar campur lebih buruk daripada menundanya. Halaman
-   th karena itu masih memakai potret dasbor guru berbahasa Indonesia — satu-satunya
-   gambar di halaman th yang belum sesuai bahasa.
-   **Cara mengulang temuannya:** `node tools/dev/locale-shots.mjs th /tmp/x`, lalu lihat
-   `teacher-desktop.png`. Harness-nya sudah bisa membuka dasbor guru (seed
-   `fz_teacher_mode=1`), jadi begitu i18n-nya dibayar, potretnya tinggal dijalankan ulang
-   dan `website/th/index.html` baris ~912 diarahkan ke `../assets/shots/th/`.
+1. ~~Kebocoran bahasa Thai di KelasKu untuk Guru~~ — **SUDAH DIBAYAR** (m025-359).
+   Akarnya bukan terjemahan yang hilang: ke-229 kuncinya lengkap di id dan th, dan
+   `th-coverage-test.js` hijau sepanjang cacat itu hidup. Yang salah adalah **waktu** —
+   `NAV`/`TITLE` konstanta lingkup modul, dievaluasi sebelum copy Thai dimuat, lalu
+   membeku ke cadangan Indonesia. Kini fungsi yang dipanggil saat render. Ikut dibayar:
+   29 kalimat antarmuka yang tidak pernah lewat `t()`, dan tanggal kepala dasbor yang
+   dipaku `id-ID`. Dijaga `tests/teacher-i18n-lazy-test.js` (4 cek, termasuk uji-diri).
+   Potret `teacher-desktop.png` berbahasa Thai sudah diterbitkan.
 
-2. **Gelembung coach masih berbahasa Indonesia saat locale th** ("Gue udah siapin rencana
-   hari ini, tinggal jalan"). Ia overlay, jadi harness membuangnya dari potret — tetapi
-   murid Thai di aplikasi sungguhan tetap membacanya.
+2. ~~Gelembung coach berbahasa Indonesia saat locale th~~ — **masih terbuka**, tetapi
+   bukan lagi bagian dari dasbor guru. Ia overlay milik modul lain; harness potret
+   membuangnya, murid Thai di aplikasi sungguhan masih membacanya.
 
 3. **`website/tentang.html` + `th/tentang.html`** belum menyebut lapisan guru/kurikulum dan
    belum menautkan halaman Untuk Sekolah. Isinya sudah benar soal dua bahasa, jadi ini
