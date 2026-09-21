@@ -117,10 +117,19 @@ api.fiezel.my.id      ← Cloudflare Worker (workers/api/)
 | Practice blueprint | `focused-25-v1` |
 | Core protocol | `1.7` |
 
-Ketiga penanda build (`core-config.js`, `features/neural-voice/fiezel-diag-panel.js`,
-`sw.js`) harus dinaikkan bersamaan — dan hanya saat berkas yang ada di daftar `ASSETS`
-`sw.js` benar-benar berubah. Tiap kenaikan memaksa semua perangkat terpasang mengunduh
-ulang cangkang ±9,7 MB.
+**Setiap PR product-deploy wajib menaikkan penanda tepat +1 terhadap `origin/main`** —
+bukan hanya saat berkas shell berubah. `A7 Automated Release Safety` tidak memeriksa berkas
+apa yang berubah; ia hanya membandingkan angkanya, dan memerahkan PR yang tidak naik.
+
+Enam tempat naik bersamaan: `coordination/BUILD-VERSION.json`, `core-config.js`
+(`FIEZEL_PAGE_BUILD`), `features/neural-voice/fiezel-diag-panel.js` (`DIAG_BUILD`), `sw.js`
+(`SW_REV`, awalannya wajib `m025-<N>-`), `?v=` di `kurikulum.html` + `misi.html`, dan tabel
+di atas. Kalau `main` bergerak sementara PR terbuka, angkanya bergeser dan bump harus
+diulang.
+
+Konsekuensi yang disadari: tiap kenaikan memaksa semua perangkat terpasang mengunduh ulang
+cangkang ±9,7 MB. Itu harga yang memang dipilih repo ini demi jaminan bahwa PWA terpasang
+tidak pernah menjalankan kode baru di atas cangkang lama.
 
 ## Quality gate
 
