@@ -98,7 +98,7 @@ api.fiezel.my.id      ← Cloudflare Worker (workers/api/)
 | `content/ja/` | Bank kursus Bahasa Jepang (grammar, kosakata, reading, writing) |
 | `content/mapel/` | Bank mata pelajaran Fase D |
 | `features/` | 33 modul fitur yang dimuat shell dan di-precache `sw.js` |
-| `tests/` | 306 gerbang mutu. Jalankan dari akar: `node tests/<nama>-test.js` |
+| `tests/` | 307 gerbang mutu. Jalankan dari akar: `node tests/<nama>-test.js` |
 | `website/` | Situs marketing (id + th) yang terbit di ROOT domain: beranda, tentang, untuk-sekolah, install, legal, sitemap, robots.txt, llms.txt. Akar repo terbit di `/app/` — dua permukaan berbeda, dijaga `tests/seo-surface-gate-test.js` |
 | `workers/` | Cloudflare Worker (api, owner) |
 | `deploy/` | Konfigurasi dan skrip deploy edge |
@@ -144,7 +144,7 @@ node tests/th-coverage-test.js
 node tests/seo-surface-gate-test.js
 
 # Semua gerbang (lihat .github/workflows/quality.yml)
-# CI menjalankan 306 gerbang pada setiap PR
+# CI menjalankan 307 gerbang pada setiap PR
 ```
 
 Aplikasi harus dijalankan melalui HTTP/HTTPS, bukan `file://`.
