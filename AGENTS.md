@@ -16,3 +16,12 @@ Whenever the user requests animation, motion graphics, character animation, or v
    - Render Poster Still: `cd remotion; npx remotion still <CompositionId> ../assets/motion/posters/<filename>.jpg --frame=<midFrame>`
 5. **Interactive Preview**:
    - Always update or provide an interactive HTML player in `mockups/preview-<name>.html` with loop controls, speed pills (0.25x/0.5x/1.0x), and frame-stepping so the user can easily view and evaluate the motion.
+
+
+## OpenCode Autonomous Execution Rules (Rate Limit Prevention)
+1. **Strict Sequential Execution**:
+   - Always execute all plans, edits, and tool calls sequentially within the main session thread.
+   - **NEVER** spawn parallel sub-agents or fork concurrent background sub-agents.
+   - Spawning parallel sub-agents triggers provider concurrency rate limits (HTTP 429: "Rate limit exceeded").
+2. **Deterministic Step-by-Step Delivery**:
+   - Complete tasks step-by-step: inspect -> modify -> test -> verify.
