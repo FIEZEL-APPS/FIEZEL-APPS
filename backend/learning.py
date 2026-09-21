@@ -4,6 +4,7 @@ hint, retry, evidence, mastery, retensi, transfer. Termasuk telemetry idempoten.
 import re
 import uuid
 import hashlib
+import random
 from datetime import datetime, timezone, timedelta
 from typing import Any
 
@@ -28,6 +29,36 @@ EVENT_TYPES = [
 
 def now():
     return datetime.now(timezone.utc)
+
+
+def get_shuffled_question_data(session_id: str, q: dict) -> dict:
+    if not q:
+        return q
+    q_copy = dict(q)
+    if q_copy.get("question_type") == "mcq" and q_copy.get("options"):
+        opts = list(q_copy["options"])
+        key_letter = (q_copy.get("answer_key") or "A").upper()[:1]
+        orig_correct_idx = ord(key_letter) - ord('A')
+        if 0 <= orig_correct_idx < len(opts):
+            correct_val = opts[orig_correct_idx]
+        else:
+            correct_val = opts[0] if opts else ""
+
+        rng = random.Random(f"{session_id}:{q_copy['question_id']}")
+        indexed_opts = list(enumerate(opts))
+        rng.shuffle(indexed_opts)
+        
+        shuffled_opts = [item[1] for item in indexed_opts]
+        new_correct_idx = 0
+        for i, (orig_idx, val) in enumerate(indexed_opts):
+            if orig_idx == orig_correct_idx or val == correct_val:
+                new_correct_idx = i
+                break
+        new_key_letter = chr(65 + new_correct_idx)
+        
+        q_copy["options"] = shuffled_opts
+        q_copy["answer_key"] = new_key_letter
+    return q_copy
 
 
 async def record_event(event_type: str, student_id: str, payload: dict,
@@ -236,11 +267,16 @@ async def start_session(body: StartIn, u=Depends(current_user)):
     if existing:
         return existing
     mission = await build_mission(a, u["user_id"])
-    doc = {"id": f"SES-{uuid.uuid4().hex[:10].upper()}", "assessment_id": a["id"],
+    session_id = f"SES-{uuid.uuid4().hex[:10].upper()}"
+    q_ids = list(a.get("question_ids") or [])
+    rng_q = random.Random(f"{session_id}:{u['user_id']}")
+    rng_q.shuffle(q_ids)
+
+    doc = {"id": session_id, "assessment_id": a["id"],
            "assessment_type": a["assessment_type"], "adaptive": a.get("adaptive", True),
            "class_id": a.get("class_id"), "student_id": u["user_id"],
            "competency_ids": a.get("competency_ids") or [], "tp_ids": a.get("tp_ids") or [],
-           "queue": list(a.get("question_ids") or []), "served": [], "state": "active",
+           "queue": q_ids, "served": [], "state": "active",
            "target_count": a.get("question_count") or len(a.get("question_ids") or []) or 10,
            "answered_count": 0, "correct_count": 0, "hint_count": 0, "retry_count": 0,
            "transfer_attempts": 0, "transfer_correct": 0, "score": None,
@@ -284,7 +320,8 @@ async def next_question(session_id: str, u=Depends(current_user)):
         q = await db.questions.find_one({"question_id": s["current"]["question_id"], "is_current": True},
                                          {"_id": 0})
         if q:
-            return {"done": False, "question": _public_question(q), "reason": s["current"].get("reason"),
+            shuffled_q = get_shuffled_question_data(session_id, q)
+            return {"done": False, "question": _public_question(shuffled_q), "reason": s["current"].get("reason"),
                     "phase": s["current"].get("phase"), "progress": _progress(s), "resumed": True}
     if s["answered_count"] >= s["target_count"]:
         return await finish_session(session_id, u)
@@ -303,21 +340,22 @@ async def next_question(session_id: str, u=Depends(current_user)):
         pick = {"question": q, "reason": "Soal berikutnya dari daftar guru.", "reason_code": "fixed_queue",
                 "competency_id": q["competency_id"], "phase": "practice"}
     q = pick["question"]
-    current = {"question_id": q["question_id"], "version": q["version"],
+    shuffled_q = get_shuffled_question_data(session_id, q)
+    current = {"question_id": shuffled_q["question_id"], "version": shuffled_q["version"],
                "competency_id": pick["competency_id"], "reason": pick["reason"],
                "reason_code": pick["reason_code"], "phase": pick.get("phase"),
                "served_at": now(), "attempt_count": 0, "hints_used": 0}
     await db.sessions.update_one({"id": session_id}, {"$set": {"current": current}})
     await record_event("question_presented", s["student_id"],
-                       {"session_id": session_id, "question_id": q["question_id"],
+                       {"session_id": session_id, "question_id": shuffled_q["question_id"],
                         "competency_id": pick["competency_id"], "reason_code": pick["reason_code"],
                         "seq": s["answered_count"]})
-    if q.get("is_transfer"):
+    if shuffled_q.get("is_transfer"):
         await record_event("transfer_attempted", s["student_id"],
-                           {"session_id": session_id, "question_id": q["question_id"],
+                           {"session_id": session_id, "question_id": shuffled_q["question_id"],
                             "competency_id": pick["competency_id"], "seq": s["answered_count"]})
     s = await _session(session_id, u)
-    return {"done": False, "question": _public_question(q), "reason": pick["reason"],
+    return {"done": False, "question": _public_question(shuffled_q), "reason": pick["reason"],
             "phase": pick.get("phase"), "progress": _progress(s)}
 
 
@@ -334,7 +372,8 @@ async def request_hint(session_id: str, u=Depends(current_user)):
     if not cur:
         raise HTTPException(400, "Belum ada soal aktif")
     q = await db.questions.find_one({"question_id": cur["question_id"], "is_current": True}, {"_id": 0})
-    hints = (q or {}).get("hints") or []
+    shuffled_q = get_shuffled_question_data(session_id, q)
+    hints = (shuffled_q or {}).get("hints") or []
     idx = min(cur.get("hints_used", 0), max(0, len(hints) - 1))
     text = hints[idx] if hints else "Coba baca ulang soalnya dan tandai informasi yang diketahui lebih dulu."
     await db.sessions.update_one({"id": session_id},
@@ -389,31 +428,32 @@ async def submit_answer(session_id: str, body: AnswerIn, u=Depends(current_user)
     q = await db.questions.find_one({"question_id": body.question_id, "is_current": True}, {"_id": 0})
     if not q:
         raise HTTPException(404, "soal tidak ditemukan")
+    shuffled_q = get_shuffled_question_data(session_id, q)
     cfg = ASSESSMENT_TYPES.get(s["assessment_type"], {})
     conf = body.confidence
     if isinstance(conf, str):
         conf = CONF_MAP.get(conf.lower())
-    correct = grade(q, body.answer)
-    chosen_letter = norm_answer(body.answer)[:1].upper() if q["question_type"] == "mcq" else ""
+    correct = grade(shuffled_q, body.answer)
+    chosen_letter = norm_answer(body.answer)[:1].upper() if shuffled_q["question_type"] == "mcq" else ""
     misconception = None
     if correct is False:
-        misconception = (q.get("distractor_misconceptions") or {}).get(chosen_letter) or q.get("misconception_id")
+        misconception = (shuffled_q.get("distractor_misconceptions") or {}).get(chosen_letter) or shuffled_q.get("misconception_id")
     diag = bc.diagnose(bool(correct), conf, body.time_ms, cur.get("hints_used", 0),
-                       q["estimated_time"], misconception) if correct is not None else {
+                       shuffled_q["estimated_time"], misconception) if correct is not None else {
         "label": "needs_teacher_grading", "message": "Jawaban esai kamu menunggu penilaian guru."}
 
     attempt_id = f"AT-{uuid.uuid4().hex[:12].upper()}"
     idem = body.idempotency_key or f"{session_id}:{body.question_id}:{cur.get('attempt_count', 0)}"
     attempt = {"id": attempt_id, "idempotency_key": idem, "session_id": session_id,
                "assessment_id": s["assessment_id"], "student_id": s["student_id"],
-               "class_id": s.get("class_id"), "question_id": q["question_id"],
-               "question_version": q["version"], "competency_id": q["competency_id"],
-               "tp_id": q.get("tp_id"), "cp_id": q.get("cp_id"), "indicator_id": q.get("indicator_id"),
-               "curriculum_id": q.get("curriculum_id"), "difficulty": q["difficulty"],
-               "cognitive_level": q["cognitive_level"], "chosen": chosen_letter or None,
+               "class_id": s.get("class_id"), "question_id": shuffled_q["question_id"],
+               "question_version": shuffled_q["version"], "competency_id": shuffled_q["competency_id"],
+               "tp_id": shuffled_q.get("tp_id"), "cp_id": shuffled_q.get("cp_id"), "indicator_id": shuffled_q.get("indicator_id"),
+               "curriculum_id": shuffled_q.get("curriculum_id"), "difficulty": shuffled_q["difficulty"],
+               "cognitive_level": shuffled_q["cognitive_level"], "chosen": chosen_letter or None,
                "correct": correct, "confidence": conf, "time_ms": body.time_ms,
                "hints_used": cur.get("hints_used", 0), "retry_of": body.retry_of,
-               "is_transfer": q.get("is_transfer", False), "misconception_id": misconception,
+               "is_transfer": shuffled_q.get("is_transfer", False), "misconception_id": misconception,
                "diagnosis": diag["label"], "at": now()}
     try:
         await db.attempts.insert_one(dict(attempt))
@@ -422,10 +462,10 @@ async def submit_answer(session_id: str, body: AnswerIn, u=Depends(current_user)
         return {"duplicate": True, "attempt": prev, "note": "Attempt ini sudah tercatat (idempoten)."}
 
     update: dict[str, Any] = {"$inc": {"answered_count": 1, "current.attempt_count": 1},
-                              "$push": {"served": q["question_id"]}}
+                              "$push": {"served": shuffled_q["question_id"]}}
     if correct:
         update["$inc"]["correct_count"] = 1
-    if q.get("is_transfer"):
+    if shuffled_q.get("is_transfer"):
         update["$inc"]["transfer_attempts"] = 1
         if correct:
             update["$inc"]["transfer_correct"] = 1
@@ -433,91 +473,93 @@ async def submit_answer(session_id: str, body: AnswerIn, u=Depends(current_user)
         update["$inc"]["retry_count"] = 1
     await db.sessions.update_one({"id": session_id}, update)
 
-    result = {"state": await bc.get_state(s["student_id"], q["competency_id"]),
+    result = {"state": await bc.get_state(s["student_id"], shuffled_q["competency_id"]),
               "state_changed": False, "previous_state": None}
     if correct is not None:
         result = await bc.apply_attempt(attempt)
 
     await record_event("question_answered", s["student_id"],
-                       {"session_id": session_id, "question_id": q["question_id"],
-                        "competency_id": q["competency_id"], "correct": correct,
+                       {"session_id": session_id, "question_id": shuffled_q["question_id"],
+                        "competency_id": shuffled_q["competency_id"], "correct": correct,
                         "diagnosis": diag["label"], "seq": s["answered_count"]})
     if conf is not None:
         await record_event("confidence_submitted", s["student_id"],
-                           {"session_id": session_id, "question_id": q["question_id"],
+                           {"session_id": session_id, "question_id": shuffled_q["question_id"],
                             "confidence": conf, "seq": s["answered_count"]})
     if misconception:
         await record_event("misconception_detected", s["student_id"],
-                           {"session_id": session_id, "competency_id": q["competency_id"],
+                           {"session_id": session_id, "competency_id": shuffled_q["competency_id"],
                             "misconception_id": misconception, "seq": s["answered_count"]})
     await record_event("competency_updated", s["student_id"],
-                       {"session_id": session_id, "competency_id": q["competency_id"],
+                       {"session_id": session_id, "competency_id": shuffled_q["competency_id"],
                         "p_mastery": result["state"]["p_mastery"], "state": result["state"]["state"],
                         "seq": s["answered_count"]})
     if result.get("state_changed"):
         await record_event("mastery_changed", s["student_id"],
-                           {"session_id": session_id, "competency_id": q["competency_id"],
+                           {"session_id": session_id, "competency_id": shuffled_q["competency_id"],
                             "from": result.get("previous_state"), "to": result["state"]["state"],
                             "seq": s["answered_count"]})
         if result["state"]["state"] in ("MASTERED", "RETAINED"):
             await record_event("review_scheduled", s["student_id"],
-                               {"session_id": session_id, "competency_id": q["competency_id"],
+                               {"session_id": session_id, "competency_id": shuffled_q["competency_id"],
                                 "due_at": str(result["state"].get("due_at")), "seq": s["answered_count"]})
-    if q.get("is_transfer") and correct:
+    if shuffled_q.get("is_transfer") and correct:
         await record_event("transfer_completed", s["student_id"],
-                           {"session_id": session_id, "question_id": q["question_id"],
-                            "competency_id": q["competency_id"], "seq": s["answered_count"]})
+                           {"session_id": session_id, "question_id": shuffled_q["question_id"],
+                            "competency_id": shuffled_q["competency_id"], "seq": s["answered_count"]})
 
     # ---- loop penjelasan: salah -> diagnosis -> penjelasan -> hint -> retry terarah ----
     wrong_streak = dict(s.get("wrong_streak") or {})
     next_action: dict[str, Any] = {"kind": "next_question"}
     explanation = None
     if correct is False:
-        wrong_streak[q["competency_id"]] = wrong_streak.get(q["competency_id"], 0) + 1
-        explanation = q.get("explanation") or "Perhatikan kembali langkah kuncinya."
+        wrong_streak[shuffled_q["competency_id"]] = wrong_streak.get(shuffled_q["competency_id"], 0) + 1
+        explanation = shuffled_q.get("explanation") or "Perhatikan kembali langkah kuncinya."
         await record_event("explanation_viewed", s["student_id"],
-                           {"session_id": session_id, "question_id": q["question_id"],
+                           {"session_id": session_id, "question_id": shuffled_q["question_id"],
                             "seq": s["answered_count"]})
-        if wrong_streak[q["competency_id"]] >= 2:
-            rem = await bc.remediation_item(s["student_id"], q["competency_id"], s["served"] + [q["question_id"]])
+        if wrong_streak[shuffled_q["competency_id"]] >= 2:
+            rem = await bc.remediation_item(s["student_id"], shuffled_q["competency_id"], s["served"] + [shuffled_q["question_id"]])
             if rem:
+                shuffled_rem_q = get_shuffled_question_data(session_id, rem["question"])
                 next_action = {"kind": "micro_remediation", "reason": rem["reason"],
-                               "question": _public_question(rem["question"]),
+                               "question": _public_question(shuffled_rem_q),
                                "prerequisite_check": rem["reason_code"] == "micro_remediation"}
                 await db.sessions.update_one({"id": session_id}, {"$set": {"current": {
-                    "question_id": rem["question"]["question_id"], "version": rem["question"]["version"],
-                    "competency_id": rem["competency_id"], "reason": rem["reason"],
-                    "reason_code": rem["reason_code"], "phase": rem.get("phase"),
+                    "question_id": shuffled_rem_q["question_id"], "version": shuffled_rem_q["version"],
+                    "competency_id": shuffled_rem_q["competency_id"], "reason": rem["reason"],
+                    "reason_code": rem["reason_code"], "phase": shuffled_rem_q.get("phase"),
                     "served_at": now(), "attempt_count": 0, "hints_used": 0}}})
         elif cfg.get("allow_retry"):
             variants = await db.questions.find(
-                {"variant_group_id": q.get("variant_group_id"), "is_current": True,
-                 "status": "PUBLISHED", "question_id": {"$ne": q["question_id"]}}, {"_id": 0}).to_list(10)
+                {"variant_group_id": shuffled_q.get("variant_group_id"), "is_current": True,
+                 "status": "PUBLISHED", "question_id": {"$ne": shuffled_q["question_id"]}}, {"_id": 0}).to_list(10)
             retry_q = variants[0] if variants else None
             if not retry_q:
                 same = await db.questions.find(
-                    {"competency_id": q["competency_id"], "is_current": True, "status": "PUBLISHED",
-                     "is_transfer": False, "question_id": {"$nin": s["served"] + [q["question_id"]]}},
+                    {"competency_id": shuffled_q["competency_id"], "is_current": True, "status": "PUBLISHED",
+                     "is_transfer": False, "question_id": {"$nin": s["served"] + [shuffled_q["question_id"]]}},
                     {"_id": 0}).to_list(20)
-                same.sort(key=lambda x: abs(x["difficulty"] - q["difficulty"]))
+                same.sort(key=lambda x: abs(x["difficulty"] - shuffled_q["difficulty"]))
                 retry_q = same[0] if same else None
             if retry_q:
+                shuffled_retry_q = get_shuffled_question_data(session_id, retry_q)
                 next_action = {"kind": "targeted_retry", "reason":
                                "Kita coba soal serupa dengan angka/konteks berbeda supaya kamu bisa langsung mempraktikkan penjelasan tadi.",
-                               "question": _public_question(retry_q), "retry_of": q["question_id"]}
+                               "question": _public_question(shuffled_retry_q), "retry_of": shuffled_q["question_id"]}
                 await db.sessions.update_one({"id": session_id}, {"$set": {"current": {
-                    "question_id": retry_q["question_id"], "version": retry_q["version"],
-                    "competency_id": retry_q["competency_id"],
+                    "question_id": shuffled_retry_q["question_id"], "version": shuffled_retry_q["version"],
+                    "competency_id": shuffled_retry_q["competency_id"],
                     "reason": next_action["reason"], "reason_code": "targeted_retry",
                     "phase": "practice", "served_at": now(), "attempt_count": 0, "hints_used": 0}}})
                 await record_event("retry_started", s["student_id"],
-                                   {"session_id": session_id, "question_id": retry_q["question_id"],
-                                    "retry_of": q["question_id"], "seq": s["answered_count"]})
+                                   {"session_id": session_id, "question_id": shuffled_retry_q["question_id"],
+                                    "retry_of": shuffled_q["question_id"], "seq": s["answered_count"]})
     else:
-        wrong_streak[q["competency_id"]] = 0
+        wrong_streak[shuffled_q["competency_id"]] = 0
         if body.retry_of:
             await record_event("retry_completed", s["student_id"],
-                               {"session_id": session_id, "question_id": q["question_id"],
+                               {"session_id": session_id, "question_id": shuffled_q["question_id"],
                                 "retry_of": body.retry_of, "seq": s["answered_count"]})
     if next_action["kind"] == "next_question":
         await db.sessions.update_one({"id": session_id}, {"$set": {"current": None}})
@@ -526,12 +568,12 @@ async def submit_answer(session_id: str, body: AnswerIn, u=Depends(current_user)
     st = result["state"]
     return {
         "correct": correct,
-        "answer_key": q.get("answer_key") if cfg.get("immediate_feedback") else None,
+        "answer_key": shuffled_q.get("answer_key") if cfg.get("immediate_feedback") else None,
         "diagnosis": diag,
         "explanation": explanation if cfg.get("immediate_feedback") else None,
         "misconception_id": misconception,
         "next_action": next_action,
-        "learner_state": {"competency_id": q["competency_id"], "state": st["state"],
+        "learner_state": {"competency_id": shuffled_q["competency_id"], "state": st["state"],
                           "state_label": bc.STATE_LABEL.get(st["state"]),
                           "progress_pct": round(st["p_mastery"] * 100)},
         "attempt_id": attempt_id,
