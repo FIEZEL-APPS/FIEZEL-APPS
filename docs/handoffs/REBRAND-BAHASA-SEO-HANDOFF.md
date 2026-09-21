@@ -2,7 +2,7 @@
 
 **Wewenang: OWNER.** Status: **SELURUH PERMUKAAN SUDAH PINDAH; sisa pekerjaan ada di §6.**
 Cabang: `claude/gallant-archimedes-l85qlc` · PR: [#456](https://github.com/FIEZEL-APPS/FIEZEL-APPS/pull/456)
-Basis: `m025-357`. Ditulis 21 September 2026.
+Basis: `m025-357`, di-merge ke `main` pada `m025-358`. Ditulis 21 September 2026.
 
 Dokumen ini lahir **di tengah pekerjaan, atas permintaan OWNER**, supaya agen lain bisa
 melanjutkan persis dari titik berhenti kalau sesi terputus — lalu diperbarui saat
@@ -131,12 +131,14 @@ marketing (`website/`) polanya berbeda — halaman Thai adalah berkas terpisah d
 `core-config.js` `FIEZEL_PAGE_BUILD` · `features/neural-voice/fiezel-diag-panel.js`
 `DIAG_BUILD` · `sw.js` `SW_REV` — naik **bersamaan**.
 
-**KEPUTUSAN DI PR INI: TIDAK dinaikkan, dan itu disengaja.** Alasannya:
+**KEPUTUSAN DI PR INI: TIDAK dinaikkan oleh PR ini, dan itu disengaja.**
+(Catatan 21 Sep, sesudah merge: penanda kini `m025-358` — kenaikan itu datang dari `main`
+lewat `c421fae`, bukan dari PR ini.) Alasannya:
 `landing.html` **tidak ada** di daftar `ASSETS` `sw.js`, dan `website/` permukaan deploy
 terpisah. Catatan di `sw.js` menyatakan tiap kenaikan revisi memaksa SEMUA perangkat
 terpasang mengunduh ulang cangkang **±9,7 MB**. Membayar itu untuk perubahan yang tidak
 menyentuh shell adalah kerugian tanpa imbalan. **Kalau agen penerus menyentuh berkas yang
-ADA di `ASSETS`, ritual bump wajib dijalankan** (+1 dari `m025-357` → `m025-358`, ketiganya).
+ADA di `ASSETS`, ritual bump wajib dijalankan** (+1 dari penanda yang sedang berlaku, ketiganya sekaligus).
 
 ---
 
