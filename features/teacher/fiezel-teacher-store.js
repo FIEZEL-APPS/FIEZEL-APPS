@@ -149,10 +149,11 @@
   function targeted(a, s) { return !a.targets || a.targets.indexOf(s.id) !== -1; }
   function weakestSkill(s) {
     var best = null;
-    var list = SKILL_ORDER.slice();
+    var list = [];
     (s.results || []).forEach(function (r) {
       if (r.skill && list.indexOf(r.skill) === -1) list.push(r.skill);
     });
+    if (!list.length) list = SKILL_ORDER.slice();
     list.forEach(function (k) {
       var v = skillAcc(s, k);
       if (v != null && (!best || v < best.acc)) best = { skill: k, acc: v };
@@ -178,15 +179,17 @@
     if (d != null && d >= 7) action = 'Kirim Kartu Sapa hari ini — sapaan personal, bukan tagihan tugas.';
     else if (late.length) action = 'Ingatkan tugas “' + late[0].a.title + '” lewat pesan singkat + tawarkan waktu tambahan.';
     else if (weak && weak.acc < 0.5) action = 'Beri 5 soal ' + (SKILL_LABEL[weak.skill] || weak.skill) + ' ' + t('guru.pendamping-teman', 'dengan pendamping teman (lihat Kelompok Belajar).');
-    else if (level === 'pantau') action = 'Sapa 1 kalimat apresiasi supaya momentumnya tidak putus.';
-    else action = 'Pertahankan — beri tantangan kecil satu level di atas.';
+    else if (score >= 25) action = 'Pantau keaktifan minggu ini, pastikan koneksi dan waktu belajarnya cukup.';
+    else action = 'Aman — pertahankan momentum belajar minggu ini.';
     return { score: score, level: level, reasons: reasons, action: action, weak: weak, pending: pend.length, late: late.length, inactiveDays: d };
   }
   function recentAttendance(s, n) { var out = []; for (var i = 0; i < n; i++) { var k = today(Date.now() - i * DAY); out.push({ date: k, v: (s.attendance || {})[k] || null }); } return out; }
   function attendanceRate(s, n) { var a = recentAttendance(s, n || 10).filter(function (x) { return x.v; }); if (!a.length) return null; return a.filter(function (x) { return x.v === 'H'; }).length / a.length; }
   function classStats(c) {
-    var st = c.students, active7 = st.filter(function (s) { var d = daysSince(s.lastActiveAt); return d != null && d <= 7; }).length;
-    var accs = st.map(overallAcc).filter(function (v) { return v != null; }), avg = accs.length ? accs.reduce(function (a, b) { return a + b; }, 0) / accs.length : null;
+    var st = c.students;
+    var accs = st.map(function (s) { return overallAcc(s); }).filter(function (v) { return v != null; });
+    var avg = accs.length ? accs.reduce(function (x, y) { return x + y; }, 0) / accs.length : null;
+    var active7 = st.filter(function (s) { var d = daysSince(s.lastActiveAt); return d != null && d <= 7; }).length;
     var risks = st.map(function (s) { return risk(c, s); }), atRisk = risks.filter(function (r) { return r.level === 'risiko'; }).length, watch = risks.filter(function (r) { return r.level === 'pantau'; }).length;
     var open = (c.assignments || []).filter(function (a) { return st.some(function (s) { return targeted(a, s) && !(a.done && a.done[s.id]); }); }).length;
     return { total: st.length, active7: active7, avgAcc: avg, atRisk: atRisk, watch: watch, openAssignments: open };
@@ -207,12 +210,17 @@
     if (s && s.results) {
       s.results.forEach(function (r) { add(r.skill); });
     }
-    if (!order.length) {
-      SKILL_ORDER.forEach(add);
+    var isNonEng = c && c.subject && c.subject !== 'ENG' && c.subject !== 'English';
+    if (isNonEng) {
+      if (!order.length) add(c.subject);
     } else {
-      SKILL_ORDER.forEach(function (k) {
-        if (!set[k] && (!c || !c.assignments || !c.assignments.length)) add(k);
-      });
+      if (!order.length) {
+        SKILL_ORDER.forEach(add);
+      } else {
+        SKILL_ORDER.forEach(function (k) {
+          if (!set[k] && (!c || !c.assignments || !c.assignments.length)) add(k);
+        });
+      }
     }
     return order;
   }

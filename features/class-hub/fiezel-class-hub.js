@@ -1431,7 +1431,9 @@
   function statusCounts(c, a) { var TS = T(), out = { belum: 0, sedang: 0, selesai: 0, terlambat: 0, total: 0 }; c.students.filter(function (s) { return TS.targeted(a, s); }).forEach(function (s) { out.total++; out[statusOf(a, studentRec(a, s)).id]++; }); return out; }
   function tKelas(c, env) {
     var TS = T(), stt = TS.classStats(c), sync = TS.syncLabel(c);
-    return '<div class="ch-body"><section class="ch-card ch-class-card"><div class="ch-card-top"><div><p class="ch-kicker">' + esc(c.level) + ' · ' + esc(skillLabel(c.subject) || c.subject || 'English') + '</p><h2>' + esc(c.name) + '</h2></div><span class="ch-sync is-' + sync.state + '">' + esc(sync.text) + '</span></div><p class="ch-muted">Kode kelas <b class="ch-mono">' + esc(c.code) + '</b> — murid memasukkannya di tab Kelas ▸ Kelas Saya. Setelah itu tugasmu masuk ke lonceng mereka dan hasilnya kembali ke sini.</p>' +
+    var sc = env && env.scope;
+    var subDisplay = (c.subject && skillLabel(c.subject)) || c.subject || (sc && sc.active) || 'Mapel';
+    return '<div class="ch-body"><section class="ch-card ch-class-card"><div class="ch-card-top"><div><p class="ch-kicker">' + esc(c.level) + ' · ' + esc(subDisplay) + '</p><h2>' + esc(c.name) + '</h2></div><span class="ch-sync is-' + sync.state + '">' + esc(sync.text) + '</span></div><p class="ch-muted">Kode kelas <b class="ch-mono">' + esc(c.code) + '</b> — murid memasukkannya di tab Kelas ▸ Kelas Saya. Setelah itu tugasmu masuk ke lonceng mereka dan hasilnya kembali ke sini.</p>' +
       '<div class="ch-kpis"><div class="ch-kpi"><b>' + stt.total + '</b><span>murid</span></div><div class="ch-kpi"><b>' + stt.active7 + '</b><span>aktif 7 hari</span></div><div class="ch-kpi"><b>' + pct(stt.avgAcc) + '</b><span>akurasi</span></div><div class="ch-kpi"><b>' + stt.openAssignments + '</b><span>tugas terbuka</span></div></div>' +
       '<div class="ch-actions"><button type="button" class="tg-btn is-primary" data-tg="modal" data-kind="add-students" data-testid="tclass-add-students">' + icon('user-plus') + ' ' + t('kelas.tambah-murid', 'Tambah murid') + '</button><button type="button" class="tg-btn is-ghost" data-tg="sync" data-testid="tclass-sync">' + icon('refresh-cw') + ' Sinkron</button><button type="button" class="tg-btn is-ghost" data-tg="copy" data-text="' + esc(c.code) + '">' + icon('copy') + ' Salin kode</button><button type="button" class="tg-btn is-ghost" data-ch="ttab" data-tab="buat">' + icon('plus') + ' ' + t('kelas.buat-tugas', 'Buat tugas') + '</button><button type="button" class="tg-btn is-ghost" data-tg="modal" data-kind="edit-class">' + icon('pencil') + ' ' + t('umum.ubah', 'Ubah') + '</button><button type="button" class="tg-btn is-danger" data-tg="delete-class" data-testid="tclass-delete-class">' + icon('trash-2') + ' ' + t('guru.hapus-kelas', 'Hapus kelas') + '</button></div></section>' +
       pendingCard(c) +
@@ -1439,7 +1441,7 @@
   }
   function itemList(a) { return a.itemIds.map(function (id, i) { var q = resolveItem(a, id); if (!q) return '<li class="ch-muted">Soal ' + (i + 1) + ' (' + esc(id) + ') tidak dapat ditampilkan.</li>'; var custom = (a.items || []).some(function (x) { return x.id === id; }); return '<li><p class="ch-muted">Soal ' + (i + 1) + ' · ' + esc(skillLabel(q.skill)) + ' · ' + (custom ? 'soal guru' : 'bank FIEZEL') + '</p>' + (q.context ? '<p class="ch-context">' + esc(q.context) + '</p>' : '') + '<b>' + esc(q.prompt) + '</b><ol class="ch-opts-inline">' + q.options.map(function (o, j) { return '<li class="' + (j === q.answer ? 'is-key' : '') + '">' + esc(o) + '</li>'; }).join('') + '</ol></li>'; }).join(''); }
   function tTugas(c, env) {
-    var TS = T(), list = (c.assignments || []).slice().sort(function (a, b) { return b.createdAt - a.createdAt; });
+    var TS = T(), list = (c.assignments || []).filter(function (a) { return env && env.isAssignmentVisible ? env.isAssignmentVisible(a) : true; }).slice().sort(function (a, b) { return b.createdAt - a.createdAt; });
     return '<div class="ch-body"><div class="ch-row ch-between"><h3 class="ch-h2">' + t('kelas.tugas-ujian', 'Tugas & ujian') + ' <small>' + list.length + '</small></h3><button type="button" class="tg-btn is-primary" data-ch="ttab" data-tab="buat" data-testid="tclass-new">' + icon('plus') + ' ' + t('kelas.buat-tugas', 'Buat tugas') + '</button></div>' +
       (list.length ? list.map(function (a) {
         var sc = statusCounts(c, a), open = tUi.expand === a.id, sentAll = a.sent && a.sent.all;
@@ -1454,6 +1456,32 @@
   function draft(c) { if (!tUi.draft) tUi.draft = { step: 1, source: 'bank', title: '', skills: ['past_tense'], count: 10, deadline: T().today(Date.now() + 2 * T().DAY), mode: 'latihan', targets: [], raw: '', items: [], bankIds: [], review: null, finals: [], approved: {}, useSuggest: {}, q_prompt: '', q_opts: ['', '', '', ''], q_answer: 0 }; return tUi.draft; }
   function bankSkills() { var TS = T(); return TS.SKILL_ORDER.filter(function (k) { return k !== 'speaking' && B() && B().SKILLS[k]; }); }
   function tBuat(c, env) {
+    var sc = env && env.scope;
+    var isNonEng = (c && c.subject && c.subject !== 'ENG' && c.subject !== 'English') || (sc && sc.locked && sc.active !== 'ENG');
+    var sName = (c && c.subject && skillLabel(c.subject)) || (sc && sc.active) || 'Mata Pelajaran';
+    if (isNonEng) {
+      return '<div class="ch-body" data-testid="tclass-mapel-hub">' +
+        '<div class="ch-card ch-card-ink" data-testid="tclass-mapel-hub-card">' +
+          '<div class="ch-card-top"><div>' +
+            '<p class="ch-kicker">' + icon('book-open') + ' Kurikulum Nasional Fase D · ' + esc(sName) + '</p>' +
+            '<h3>Penugasan Bank Soal Buku Siswa Kemendikbudristek</h3>' +
+          '</div></div>' +
+          '<p class="ch-muted">Tersedia bank soal autentik Kurikulum Merdeka (Buku Siswa Resmi). Pilih bab sesuai jenjang kelasmu, atur jumlah butir soal, tenggat pengerjaan, dan terbitkan langsung ke murid.</p>' +
+          '<div class="ch-actions">' +
+            '<button type="button" class="tg-btn is-primary" data-tg="modal" data-kind="assign" data-testid="tclass-open-assign-modal">' + icon('plus') + ' Buka Bank Soal & Terbitkan Tugas ' + esc(sName) + '</button>' +
+            '<button type="button" class="tg-btn is-ghost" data-ch="ttab" data-tab="kurikulum">' + icon('compass') + ' Buka Tab Kurikulum & Kompetensi</button>' +
+          '</div>' +
+        '</div>' +
+        '<div class="ch-card">' +
+          '<h4>Panduan Penugasan Cepat</h4>' +
+          '<ol class="ch-mini-list">' +
+            '<li><span class="ch-grow">1. Klik tombol <b>Buka Bank Soal</b> di atas.</span></li>' +
+            '<li><span class="ch-grow">2. Pilih jenjang kelas (Kelas 7 atau Kelas 8) dan pilih kartu Bab materi.</span></li>' +
+            '<li><span class="ch-grow">3. Pilih jumlah soal (5 butir latihan cepat atau 10 butir ulangan), lalu terbitkan.</span></li>' +
+          '</ol>' +
+        '</div>' +
+      '</div>';
+    }
     var d = draft(c), TS = T();
     var steps = '<ol class="ch-steps">' + ['Sumber soal', 'Tinjauan Braincore', t('umum.kirim', 'Kirim')].map(function (s, i) { return '<li class="' + (d.step === i + 1 ? 'is-current' : d.step > i + 1 ? 'is-done' : '') + '"><span>' + (i + 1) + '</span>' + s + '</li>'; }).join('') + '</ol>';
     if (d.step === 1) {
@@ -1519,7 +1547,7 @@
     return { rows: rows, misconceptions: Object.keys(mis).map(function (k) { return { label: k, n: mis[k] }; }).sort(function (x, y) { return y.n - x.n; }) };
   }
   function tHasil(c, env) {
-    var TS = T(), list = (c.assignments || []).slice().sort(function (a, b) { return b.createdAt - a.createdAt; });
+    var TS = T(), list = (c.assignments || []).filter(function (a) { return env && env.isAssignmentVisible ? env.isAssignmentVisible(a) : true; }).slice().sort(function (a, b) { return b.createdAt - a.createdAt; });
     if (!list.length) return '<div class="ch-body"><section class="ch-card ch-empty">' + icon('bar-chart-3') + '<p>' + t('kelas.hasil-muncul', 'Hasil muncul setelah murid mengerjakan tugas. Buat tugas dulu.') + '</p></section></div>';
     var a = list.filter(function (x) { return x.id === tUi.resultId; })[0] || list[0], tgt = c.students.filter(function (s) { return TS.targeted(a, s); }), sc = statusCounts(c, a);
     var accs = tgt.map(function (s) { return a.done && a.done[s.id] ? a.done[s.id].acc : null; }).filter(function (v) { return v != null; }), avg = accs.length ? accs.reduce(function (x, y) { return x + y; }, 0) / accs.length : null, im = itemMisses(c, a);
@@ -1531,6 +1559,10 @@
   }
   function tBraincore(c, env) {
     var TS = T(), map = TS.classSkillMap(c), mis = TS.misconceptions(c), agg = {}, n = 0;
+    if (env && env.skillMatchesSubject) {
+      map = map.filter(function (m) { return env.skillMatchesSubject(m.skill); });
+      mis = mis.filter(function (m) { return env.skillMatchesSubject(m.skill); });
+    }
     (c.assignments || []).forEach(function (a) { itemMisses(c, a).misconceptions.forEach(function (m) { agg[m.label] = (agg[m.label] || 0) + m.n; n += m.n; }); });
     var fromEvidence = Object.keys(agg).map(function (k) { return { label: k, n: agg[k] }; }).sort(function (x, y) { return y.n - x.n; }).slice(0, 5);
     var weakest = map.filter(function (m) { return m.acc != null; }).sort(function (x, y) { return x.acc - y.acc; })[0];
