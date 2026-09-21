@@ -1,6 +1,6 @@
 # REBRAND FIEZEL — dari "Personal English OS" ke ruang belajar bahasa + lapisan guru
 
-**Wewenang: OWNER.** Status: **SEDANG BERJALAN, BELUM SELESAI.**
+**Wewenang: OWNER.** Status: **SELURUH PERMUKAAN SUDAH PINDAH; sisa pekerjaan ada di §6.**
 Cabang: `claude/gallant-archimedes-l85qlc` · PR: [#456](https://github.com/FIEZEL-APPS/FIEZEL-APPS/pull/456)
 Basis: `m025-357`. Ditulis 21 September 2026.
 
@@ -186,53 +186,62 @@ Thai — dashboard KelasKu dicapai lewat `?teacher=preview`, bukan lewat `go()`.
 
 - [x] Riset + verifikasi seluruh angka §2 dari bank data.
 - [x] Keputusan positioning dikunci bersama OWNER (§1).
-- [x] `website/index.html` — `<title>`, `meta description`, OG, Twitter, nav
-      (+ tautan "Untuk Sekolah"), JSON-LD `WebApplication` (`description`, `inLanguage`
-      +`ja`, `featureList` +Jepang +kurikulum, `teaches`, `keywords`) dan
-      `EducationalOrganization` (`alternateName`, `description`).
-- [x] Harness screenshot per-locale disimpan permanen: `tools/dev/locale-shots.mjs`.
-- [x] Screenshot Thai: 4 mobile + 1 desktop di `website/assets/shots/th/`.
+- [x] **`website/index.html` (id)** — judul, meta, OG/Twitter, nav (+ "Untuk Sekolah"),
+      `<h1>`, lede, stats, ticker, seksi Tentang, dua kartu baru di `#fitur` (kursus Jepang
+      + KelasKu), dua tanya-jawab baru kasatmata + FAQPage, dan JSON-LD
+      (`WebApplication`, `EducationalOrganization`, `WebSite`).
+- [x] **`website/th/index.html`** — paritas penuh dengan id, seluruh butir di atas.
+- [x] **`"FIEZEL Personal English OS"` dicabut** dari enam simpul schema.org di tiga berkas.
+- [x] **Halaman Untuk Sekolah** `website/untuk-sekolah.html` + `website/th/untuk-sekolah.html`
+      — kanonik, hreflang timbal balik, `WebPage` + `BreadcrumbList` + `FAQPage` (6 tanya-jawab),
+      seksi "Batasnya, disebut lebih dulu", tawaran pilot 1 guru / 1 kelas / 6 minggu / Rp 0.
+- [x] **`website/sitemap.xml`** — 2 halaman baru + `lastmod` beranda id/th.
+- [x] **`website/llms.txt` + `llms-full.txt`** — bagian lapisan guru DAN bagian batasnya,
+      ditulis sebagai instruksi langsung kepada mesin AI.
+- [x] **`landing.html`** — meta, featureList, FAQ baru, dan **satu klaim palsu dicabut**
+      (lihat §8).
+- [x] **`README.md`** — positioning + angkanya, tabel konten Jepang, tabel bank kurikulum,
+      status pilot, build `m025-357`, aturan bump, catatan harness screenshot.
+- [x] **Screenshot per bahasa** (§4) — harness `tools/dev/locale-shots.mjs`, potret Thai di
+      `website/assets/shots/th/`, layar murid diambil dari **Latihan**, bukan Home.
+- [x] **Gerbang** — `regression`, `http-smoke`, `th-coverage` (233/233), `a11y`, `pwa-cache`,
+      `seo-surface-gate` (21/21), `deploy-site-gate` (32/32), `install-health`,
+      `pwa-release-coherence`, `japanese-surface-honesty` → semuanya PASS.
 
 ---
 
 ## 6. BELUM SELESAI — lanjutkan dari sini
 
-Urutan ini disengaja: gerbang SEO menuntut pasangan id/th ada **sebelum** sitemap
-mendaftarkannya.
+Tidak ada lagi yang memblokir rilis. Yang tersisa adalah **utang yang ditemukan sambil
+jalan**, dan semuanya bisa dikerjakan terpisah:
 
-1. **`website/index.html` badan halaman** — `<h1>` masih *"Ruang belajar bahasa Inggris
-   personal milikmu"*; `lede`, `stats`, `ticker`, seksi `#tentang`, `#fitur` (perlu kartu
-   Jepang + kartu lapisan guru), `#faq` (perlu tanya-jawab Jepang & sekolah). **Angka di
-   JSON-LD wajib muncul juga di teks halaman** — itu syarat kebijakan Google dan alasan
-   komentar panjang di atas blok `ld+json`.
-2. **`website/th/index.html`** — paritas penuh dengan (1), plus `src` screenshot dialihkan
-   ke `../assets/shots/th/...`.
-3. **`teacher-desktop.png` Thai** + ulangi `home-desktop.png` Thai di 1280×800 (§4).
-4. **`website/untuk-sekolah.html` + `website/th/untuk-sekolah.html`** — canonical, hreflang
-   timbal balik (cek C & D), JSON-LD tanpa `@id` bentrok (cek E). Isi: lapisan guru,
-   KelasKu, tugas Fase D, rapor ortu, kapasitas jujur 250, ajakan pilot 1 guru / 1 kelas /
-   6 minggu / Rp 0. **Jangan** mengklaim sudah dipakai sekolah.
-5. **`website/sitemap.xml`** — daftarkan 2 halaman baru + `lastmod` halaman yang berubah.
-6. **`website/llms.txt` + `llms-full.txt`** — tambah lapisan kurikulum/guru + status pilot;
-   pertahankan blok "Known limits".
-7. **`landing.html`** (`/app/landing.html`) — sudah dua bahasa, belum menyebut lapisan guru.
-8. **`README.md`** — buang "Personal English OS"; dua kursus, lapisan kurikulum, status
-   pilot, build `m025-357` (sekarang tertulis `m025-314`), tabel konten Jepang.
-9. **Gerbang mutu** — minimal:
-   ```bash
-   node tests/seo-surface-gate-test.js
-   node tests/th-coverage-test.js
-   node tests/deploy-site-gate-test.js
-   node tests/regression-test.js
-   node tests/a11y-test.js
-   node tests/install-health-test.js
-   node tests/pwa-release-coherence-test.js
-   ```
-   Kegagalan pra-ada yang TIDAK memblokir: hash-lock `vendor/kokoro-js/kokoro.web.js`
-   (merah juga di `main` bersih). Konfirmasi dengan `git diff main -- <path>` sebelum
-   menyebut sesuatu pra-ada.
+1. **Kebocoran bahasa Thai di KelasKu untuk Guru — ini yang paling besar.**
+   Saat `learnerLocale = th`, dasbor guru bercampur bahasa: judulnya berganti bahasa
+   **di tengah kalimat** ("พื้นที่ทำงานที่อ่านชั้นเรียนของคุณ แล้วบอกให้รู้ *siapa yang perlu disapa
+   hari ini*"), dan seluruh sidebar tetap Indonesia — Ruang Kelas, Ringkasan Hari Ini,
+   Kelas & Siswa, Tugas & Ujian, Analitik, Komunikasi, Jurnal Guru, Keluar akun guru.
+   Begitu juga paragraf pembuka, tombol "Coba dengan kelas contoh", dan ketiga baris
+   manfaat.
+   **Akibat langsung ke PR ini:** potret `teacher-desktop.png` berbahasa Thai **tidak
+   diterbitkan**, karena memamerkan layar campur lebih buruk daripada menundanya. Halaman
+   th karena itu masih memakai potret dasbor guru berbahasa Indonesia — satu-satunya
+   gambar di halaman th yang belum sesuai bahasa.
+   **Cara mengulang temuannya:** `node tools/dev/locale-shots.mjs th /tmp/x`, lalu lihat
+   `teacher-desktop.png`. Harness-nya sudah bisa membuka dasbor guru (seed
+   `fz_teacher_mode=1`), jadi begitu i18n-nya dibayar, potretnya tinggal dijalankan ulang
+   dan `website/th/index.html` baris ~912 diarahkan ke `../assets/shots/th/`.
 
----
+2. **Gelembung coach masih berbahasa Indonesia saat locale th** ("Gue udah siapin rencana
+   hari ini, tinggal jalan"). Ia overlay, jadi harness membuangnya dari potret — tetapi
+   murid Thai di aplikasi sungguhan tetap membacanya.
+
+3. **`website/tentang.html` + `th/tentang.html`** belum menyebut lapisan guru/kurikulum dan
+   belum menautkan halaman Untuk Sekolah. Isinya sudah benar soal dua bahasa, jadi ini
+   penambahan, bukan koreksi.
+
+4. **Potret `home-*.png` lama masih ada** di `website/assets/shots/` dan masih dipakai
+   `tentang.html` serta `landing.html`. Tidak salah — layar Home memang masih ada — tetapi
+   kalau OWNER ingin seluruh situs memakai Latihan, keempat rujukan itu yang tersisa.
 
 ## 7. Jebakan yang sudah dibayar — jangan diulang
 
@@ -245,3 +254,21 @@ mendaftarkannya.
 - **Jangan memblokir `.js`/`.json`** di robots — `/app/` SPA, bank soalnya `.json`.
 - **Jangan menyentuh animasi landing page.** Perintah OWNER eksplisit (§4).
 - **Jangan menaikkan `SW_REV`** kecuali berkas di `ASSETS` benar-benar berubah (§3).
+
+---
+
+## 8. Klaim palsu yang dicabut di PR ini
+
+Dicatat supaya tidak ditulis ulang oleh siapa pun yang menyalin copy lama.
+
+| Berkas | Klaim lama | Kenyataan |
+|---|---|---|
+| `landing.html` kartu Tugas & Ujian | "dari **ribuan** bank soal kurikulum" | Bank kurikulum = **115 soal** |
+
+Selisihnya bukan pembulatan. Guru yang membuka tab itu akan menemukan sendiri selisihnya
+di minggu pertama pilot, dan itu persis cara kepercayaan hilang. Diganti dengan yang
+sungguhan dilakukan produknya: memilih Fase → bab → sub-bab → fitur bahasa. Diperbaiki di
+HTML serta di kamus `id` dan `th` sekaligus — kamus th-nya juga menyimpan klaim yang sama.
+
+Kalau menemukan klaim serupa: yang menentukan bukan enaknya kalimat, melainkan apakah
+angkanya bisa ditunjuk ke berkas di repo. Daftar sumber ada di §2.
