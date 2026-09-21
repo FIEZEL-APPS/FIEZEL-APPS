@@ -132,6 +132,9 @@ for (const name of Object.keys(REQUIRED)) {
     ['scenePhases', APP],
     ['skillExams', APP + fs.readFileSync(path.join(__fzRoot, 'features/speaking-listening/fiezel-speaking-listening-addon.js'), 'utf8')],
     ['personalJourneyTab', APP],
+    /* AUDIT-2026-09-21 T10: skillsLabDestination kini menyaring chip Dengar di Home —
+       bendera mati = pintu terpisah disembunyikan, sesuai maksud yang tertulis di T1. */
+    ['skillsLabDestination', APP],
     /* voicePackGate SENGAJA TIDAK ada di daftar pembaca. OWNER 4 Sep 2026 membatalkan
        sakelar opt-in-nya: unduhan latar 152 MB kembali menyala sendiri di boot dan tidak
        melihat bendera apa pun. Yang tersisa untuk dikendalikan bendera ini adalah GERBANG

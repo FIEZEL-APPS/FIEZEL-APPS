@@ -171,7 +171,7 @@
     'guru.toast-mengaktifkan': 'Mengaktifkan akses KelasKu untuk Guru...',
     'guru.toast-selamat-datang': 'Selamat datang, {nama}! KelasKu untuk Guru aktif.',
     'home.continue-btn': 'Lanjut',
-    'home.sapaan-runtun-baru': 'Halo, {nama}! Belajar 10 menit hari ini untuk mulai runtun barumu.',
+    'home.sapaan-runtun-baru': 'Belajar {menit} menit hari ini untuk mulai runtun barumu.',
     'account.card-title': 'Akun FIEZEL',
     'account.card-desc': 'Masuk atau daftar untuk menyimpan riwayat belajar dan sinkronisasi antar perangkat.',
     'account.status-label': 'Status Akun',

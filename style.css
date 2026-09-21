@@ -1274,12 +1274,23 @@ button svg,.creator-link svg{width:17px;height:17px;flex:0 0 auto}
   display:flex;flex-direction:column;gap:var(--sp-3);
   max-width:640px;margin:0 auto}
 .today-head{display:flex;align-items:center;justify-content:space-between;gap:var(--sp-3)}
+/* AUDIT-2026-09-21 T5: keping LEVEL+REVIEW di today-head — versi ringkas dari .hero-stat,
+   satu baris di 320px, tetap ≥24px (WCAG 2.5.8) dan memakai token (syarat Tema Malam). */
+.today-head-chips{display:flex;align-items:center;gap:8px}
+.today-head-chips .hero-stat{padding:5px 10px;gap:4px}
+.today-head-chips .hero-stat b{font-size:.85rem}
+.today-head-chips .hero-stat small{font-size:.58rem}
 .today-eyebrow{
   font-size:var(--fs-caption);letter-spacing:.14em;text-transform:uppercase;
   color:var(--muted);font-weight:700}
 .today-title{
   font-family:var(--fz-display);font-weight:400;letter-spacing:-.015em;
   font-size:var(--fs-display);line-height:var(--lh-tight);margin:0;color:var(--text)}
+/* AUDIT-2026-09-21 T8: kepala seksi latihan singkat — dulu h4 + tiga style= inline di luar
+   jangkauan contrast-test/ui-structure-test. Kini lewat token. */
+.quick-practice-head{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.quick-practice-title{margin:0;font-size:13px;font-weight:700;color:var(--text)}
+.quick-practice-hint{color:var(--muted)}
 .today-lead{margin:0;color:var(--muted);font-size:var(--fs-small);line-height:var(--lh-body)}
 .today-isi-head{
   margin:var(--sp-2) 0 0;font-size:var(--fs-caption);letter-spacing:.1em;

@@ -7961,8 +7961,8 @@ function todayHomeMarkup(){
   if(locked){aksi=`openActiveLevelExamPanel('${esc(examLevel)}')`;label=FiezelI18n.t('home.entry-exam-cta',{exam:esc(LEVEL_GUARD_COPY.entryExam),level:esc(examLevel)});}
   else if(state.activeSession){aksi='startAdaptive()';label=FiezelI18n.t('today.cta-lanjut');}
   else if(!state.placementDone){aksi="go('test')";label=FiezelI18n.t('today.cta-kenalan');}
-  else if(state.adaptiveReady){aksi='startAdaptive()';label=FiezelI18n.t('today.cta');}
-  else{aksi=`startLevelPractice('${esc(getActiveLevel())}')`;label=FiezelI18n.t('today.cta');}
+  else if(state.adaptiveReady){aksi='startAdaptive()';label=FiezelI18n.t('today.cta',{menit:shape.menit});}
+  else{aksi=`startLevelPractice('${esc(getActiveLevel())}')`;label=FiezelI18n.t('today.cta',{menit:shape.menit});}
 
   const isi=blocks.length
     ? `<ul class="today-blocks">${blocks.map((b,i)=>`<li style="--ti:${i}"><b>${esc(b.label)}</b>${b.why?`<span>${esc(b.why)}</span>`:''}</li>`).join('')}</ul>`
@@ -7972,54 +7972,76 @@ function todayHomeMarkup(){
      Tombol tambahannya sengaja bukan .primary - target harian sudah tercapai, dan
      mendorong sesi kedua dengan tombol sekuat tombol utama adalah pola yang membuat
      aplikasi belajar terasa menagih. */
+  /* AUDIT-2026-09-21 T8: judul kartu adalah h1 — satu-satunya layar tanpa judul tingkat
+     satu, dan "Isi sesi" h2 di bawahnya (bukan lompatan h2→h4). */
   const badan=selesai
-    ? `<h2 class="today-title">${FiezelI18n.t('today.selesai-judul')}</h2>
+    ? `<h1 class="today-title">${FiezelI18n.t('today.selesai-judul')}</h1>
        <p class="today-lead">${FiezelI18n.t('today.selesai-body')}</p>
        <button type="button" class="today-cta-soft" onclick="${aksi}">${esc(FiezelI18n.t('today.selesai-cta'))} <i data-lucide="arrow-up-right"></i></button>`
-    : `<h2 class="today-title">${esc(FiezelI18n.t('today.judul-sapaan',{nama:learnerName()}))}</h2>
+    : `<h1 class="today-title">${esc(FiezelI18n.t('today.judul-sapaan',{nama:learnerName()}))}</h1>
        <p class="today-lead">${esc(FiezelI18n.t('today.ringkas',{soal:shape.soal,menit:shape.menit}))}</p>
-       <h3 class="today-isi-head">${FiezelI18n.t('today.isi-judul')}</h3>
+       <h2 class="today-isi-head">${FiezelI18n.t('today.isi-judul')}</h2>
        ${isi}
        <button class="primary luxe today-cta" onclick="${aksi}">${esc(label)} <i data-lucide="arrow-right"></i></button>`;
 
-  /* Hero PAW Maskot Hidup dengan Balon Percakapan Kontekstual (Versi B) */
-  const heroSpeech=streak>0
-    ? FiezelI18n.t('home.sapaan-runtun-aktif',{hari:streak,nama:esc(learnerName())})
-    : FiezelI18n.t('home.sapaan-runtun-baru',{nama:esc(learnerName())});
+  /* Hero PAW Maskot Hidup dengan Balon Percakapan Kontekstual (Versi B)
+     AUDIT-2026-09-21 T3+T9: balon membaca `selesai` (apresiasi, bukan ajakan saat tuntas)
+     dan tidak lagi menyapa nama — kartu "Halo, {nama}" yang menyapa. */
+  const heroSpeech=selesai
+    ? (streak>0
+      ? FiezelI18n.t('home.sapaan-selesai',{hari:streak,nama:esc(learnerName())})
+      : FiezelI18n.t('home.sapaan-selesai-baru',{nama:esc(learnerName())}))
+    : streak>0
+    ? FiezelI18n.t('home.sapaan-runtun-aktif',{hari:streak,menit:shape.menit})
+    : FiezelI18n.t('home.sapaan-runtun-baru',{menit:shape.menit});
 
-  const heroMascotMarkup=`<aside class="paw-hero-cockpit" onclick="pawReact('wake');uiSfx('paw_greet')">
-    <div class="paw-hero-avatar" aria-label="${esc(FiezelI18n.t('home.paw-avatar-aria'))}">${pawFaceMarkup()}</div>
+  /* AUDIT-2026-09-21 T6: kokpit dapat diklik HARUS dapat difokus keyboard. aside+onclick
+     tidak pernah masuk urutan tab; jadikan tombol-semantik via role+tabindex+keydown,
+     dan pindahkan aria-label ke unsur ber-role (label di div tanpa role diabaikan SR). */
+  const heroMascotMarkup=`<aside class="paw-hero-cockpit" role="button" tabindex="0" aria-label="${esc(FiezelI18n.t('home.paw-avatar-aria'))}" onclick="pawReact('wake');uiSfx('paw_greet')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();pawReact('wake');uiSfx('paw_greet')}">
+    <div class="paw-hero-avatar" aria-hidden="true">${pawFaceMarkup()}</div>
     <div class="paw-speech-bubble">
       <div class="paw-bubble-title"><span>${esc(FiezelI18n.t('home.paw-bubble-title'))}</span> <i class="fz-i" data-fz-icon="flame" style="width:14px;height:14px"></i></div>
       <p class="paw-bubble-text">${heroSpeech}</p>
     </div>
   </aside>`;
 
-  /* Indikator Ritme Harian (Versi C) */
+  /* Indikator Ritme Harian (Versi C)
+     AUDIT-2026-09-21 T1: SATU sumber kebenaran — todaySessionShape().soal. Penyebut literal
+     10 membuat 16/10 dan 70%-padahal-beres. Pembilang dijepit untuk teksnya. */
   const doneCount=Number(state.daily?.attempts||0);
-  const rhythmPct=Math.min(100,Math.round((doneCount/10)*100));
+  const rhythmTarget=(Number(shape.soal)>0?Math.round(Number(shape.soal)):10);
+  const rhythmShown=Math.min(doneCount,rhythmTarget);
+  const rhythmPct=Math.min(100,Math.round((doneCount/rhythmTarget)*100));
   const rhythmBar=`<div class="today-rhythm-bar">
-    <span><b>${esc(FiezelI18n.t('home.ritme-harian'))}</b> ${esc(FiezelI18n.t('home.ritme-harian-hitung',{selesai:doneCount,target:10}))}</span>
+    <span><b>${esc(FiezelI18n.t('home.ritme-harian'))}</b> ${esc(FiezelI18n.t('home.ritme-harian-hitung',{selesai:rhythmShown,target:rhythmTarget}))}</span>
     <div class="rhythm-track"><div class="rhythm-fill" style="width:${rhythmPct}%"></div></div>
     <span style="font-weight:700;color:var(--text)">${rhythmPct}%</span>
   </div>`;
 
-  /* Latihan Singkat 3 Menit (Versi C)
+  /* Latihan Singkat (Versi C)
      ------------------------------------------------------------------------
+     AUDIT-2026-09-21 T11: judul seksi tidak lagi menjanjikan "3 Menit" — isinya
+     (10 kartu, pola kalimat, audio) tidak berdurasi sama, dan janji waktu adalah
+     satu-satunya dasar murid memutuskan mulai atau tidak.
      m025-314: chip "Dengar" dulu menunjuk go('skills') TANPA penjaga bahasa, dan ia berdiri
      TEPAT DI BAWAH targetLangChipMarkup() — chip yang mengantar murid ke Bahasa Jepang.
      Murid menekan yang atas untuk pindah ke Jepang, lalu menekan yang bawah dan mendengar
      bahasa Inggris. Daftar chip kini disaring penjaga yang sama dengan go(), jadi chip yang
      rutenya ditolak tidak pernah digambar. */
+  /* AUDIT-2026-09-21 T10: bendera skillsLabDestination ("SEMBUNYIKAN") tidak dibaca kode
+     mana pun — chip Dengar tetap mengantar ke hub Skills Lab. Disaring benderanya, sama
+     seperti ia sudah disaring targetLangSurfaceBlocked(). OWNER dapat mengembalikan pintu
+     ini kapan saja dengan menyalakan benderanya; tidak ada kode yang perlu ditulis ulang. */
   const quickChipRows=[
     {view:'vocab',icon:'vocab',label:FiezelI18n.t('skill.vocab'),sub:FiezelI18n.t('home.chip-vocab-sub')},
     {view:'grammar',icon:'grammar',label:FiezelI18n.t('skill.grammar'),sub:FiezelI18n.t('home.chip-grammar-sub')},
     {view:'skills',icon:'listening',label:FiezelI18n.t('home.chip-dengar'),sub:FiezelI18n.t('home.chip-dengar-sub')}
-  ].filter(c=>!targetLangSurfaceBlocked(c.view));
-  const quickChips=`<section class="quick-practice-section">
-    <div style="display:flex;align-items:center;justify-content:space-between">
-      <h4 style="margin:0;font-size:13px;font-weight:700;color:var(--text)">${esc(FiezelI18n.t('home.latihan-singkat'))}</h4>
-      <small style="color:var(--muted)">${FiezelI18n.t('home.pilih-fokus-label')}</small>
+  ].filter(c=>!targetLangSurfaceBlocked(c.view)&&(c.view!=='skills'||uxOn('skillsLabDestination')));
+  const quickChips=`<section class="quick-practice-section" aria-label="${esc(FiezelI18n.t('home.latihan-singkat'))}">
+    <div class="quick-practice-head">
+      <h2 class="quick-practice-title">${esc(FiezelI18n.t('home.latihan-singkat'))}</h2>
+      <small class="quick-practice-hint">${FiezelI18n.t('home.pilih-fokus-label')}</small>
     </div>
     ${targetLangChipMarkup()}
     <div class="quick-chips-grid">${quickChipRows.map(c=>`
@@ -8030,16 +8052,29 @@ function todayHomeMarkup(){
     </div>
   </section>`;
 
+  /* AUDIT-2026-09-21 T5: keping LEVEL + REVIEW hidup di today-head. homeStatStripMarkup()
+     mati di cabang todayHome (pemanggilnya di cabang else), jadi murid tidak pernah melihat
+     levelnya sendiri maupun tagihan review. Bukan strip penuh — hanya dua keping ber-aksi. */
+  let todayLevel='A1',todayReview=0;
+  try{todayLevel=getActiveLevel()}catch(_){}
+  try{todayReview=Number(buildLearningSnapshot()?.dueReviews)||0}catch(_){try{todayReview=Number(state?.reviewDue)||0}catch(_){}}
+  const todayHeadChips=`<span class="today-head-chips">`
+    + `<button type="button" class="hero-stat is-level" onclick="openLevelPanel()" title="${esc(FiezelI18n.t('home.level-title-attr'))}"><b>${esc(todayLevel)}</b><small>${FiezelI18n.t('home.keping-level')}</small></button>`
+    + (todayReview>0?`<button type="button" class="hero-stat is-review" onclick="startAdaptive()" title="${esc(FiezelI18n.t('home.review-title-attr'))}"><b>${todayReview}</b><small>${FiezelI18n.t('home.keping-review')}</small></button>`:'')
+    + `</span>`;
+
+  /* AUDIT-2026-09-21 T2+T4: learnerFlow pindah ke BAWAH kartu HARI INI (CTA naik ~346px ke
+     atas lipatan 844px); wajah kedua di today-head dilepas — satu Pau di Home. */
   return `<div class="today-home-cockpit">
   ${heroMascotMarkup}
-  ${learnerFlowHomeMarkup()}
   <section class="today-card" aria-label="${esc(FiezelI18n.t('today.aria-kartu'))}">
-    <div class="today-head"><span class="today-eyebrow">${FiezelI18n.t('today.eyebrow')}</span>${pawFaceMarkup()}</div>
+    <div class="today-head"><span class="today-eyebrow">${FiezelI18n.t('today.eyebrow')}</span>${todayHeadChips}</div>
     ${rhythmBar}
     ${badan}
     ${streak>0?`<p class="today-streak"><i class="fz-i" data-fz-icon="flame" aria-hidden="true"></i> ${esc(FiezelI18n.t('today.streak',{days:streak}))}</p>`:''}
     ${activeLevelTrustLineMarkup()}
   </section>
+  ${learnerFlowHomeMarkup()}
   ${quickChips}
   ${socialHomeMarkup()}
 </div>`;

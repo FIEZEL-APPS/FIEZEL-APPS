@@ -57,7 +57,7 @@
 
     /* ── Home "Hari ini" ───────────────────────────────────── */
     'today.eyebrow': 'วันนี้',
-    'today.cta': 'เริ่ม 10 นาที',
+    'today.cta': 'เริ่ม {menit} นาที',
     'today.cta-lanjut': 'เรียนต่อ',
     'today.cta-kenalan': 'หาระดับของคุณก่อน',
     'today.isi-judul': 'เนื้อหาของรอบนี้',
@@ -143,12 +143,14 @@
     'skill.listening': 'การฟัง',
     'skill.speaking': 'การพูด',
 
-    'home.sapaan-runtun-aktif': 'ต่อเนื่อง {hari} วันแล้ว! เยี่ยมมาก {nama} วันนี้ไปต่ออีก 10 นาทีไหม',
+    'home.sapaan-runtun-aktif': 'ต่อเนื่อง {hari} วันแล้ว! วันนี้ไปต่ออีก {menit} นาทีไหม',
+    'home.sapaan-selesai': 'ต่อเนื่อง {hari} วันแล้ว! รอบของวันนี้เสร็จแล้ว เก่งมาก {nama}',
+    'home.sapaan-selesai-baru': 'รอบของวันนี้เสร็จแล้ว เก่งมาก {nama}!',
     'home.paw-avatar-aria': 'มาสคอต PAW',
     'home.paw-bubble-title': 'PAW บอกว่า',
     'home.ritme-harian': 'จังหวะประจำวัน',
     'home.ritme-harian-hitung': '({selesai}/{target} ข้อ)',
-    'home.latihan-singkat': 'ฝึกสั้น ๆ 3 นาที',
+    'home.latihan-singkat': 'ฝึกสั้น ๆ',
     'home.chip-vocab-sub': 'การ์ดเร็ว 10 ใบ',
     'home.chip-grammar-sub': 'รูปประโยค',
     'home.chip-dengar': 'ฟัง',
