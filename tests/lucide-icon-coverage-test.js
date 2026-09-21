@@ -96,6 +96,66 @@ if (hilang.length === 0) {
 console.log(`catatan - ${dinamis.length} pemanggilan memakai nama dari variabel (tidak bisa diperiksa statis)` +
   (dinamis.length ? ': ' + dinamis.slice(0, 4).join(' | ') : ''));
 
+/* ============================================================================
+ * TITIK BUTA PEMINDAI: PEMBANTU `icon('nama')` (ditutup m025-357)
+ * ============================================================================
+ * Pemindai di atas hanya melihat `data-lucide="nama"` yang tertulis LITERAL di
+ * sumber. Dua permukaan terbesar KelasKu tidak pernah menulisnya begitu: baik
+ * features/class-hub/fiezel-class-hub.js maupun features/teacher/fiezel-teacher-shell.js
+ * memusatkannya di satu pembantu —
+ *
+ *     function icon(n) { return '<i data-lucide="' + n + '" aria-hidden="true"></i>'; }
+ *
+ * — sehingga di sumbernya yang ada hanyalah `data-lucide="' + n + '"`. Regex di atas
+ * menolak nilai yang mengandung kutip, jadi SELURUH pemanggilan di kedua berkas itu
+ * lolos tanpa diperiksa satu pun.
+ *
+ * Yang bersembunyi di balik titik buta itu bukan perkara teoretis. Disisir pada
+ * 21 September 2026: 21 dari 43 nama ikon di class-hub dan 9 dari 55 di teacher shell
+ * tidak ada di subset mana pun — termasuk `brain` (ikon tab Braincore), `clock`,
+ * `calendar`, `target`, `inbox`, dan `user-check`. Ketiga puluhnya merender <i> KOSONG
+ * di KelasKu murid MAUPUN guru, tanpa satu pun error, persis kelas bug yang gerbang ini
+ * ada untuk mencegah. Semuanya ditambahkan ke subset di commit yang sama dengan blok ini.
+ *
+ * DUA HIMPUNAN PENYELESAIAN, karena kedua pembantu itu TIDAK sama:
+ *   - class-hub  : langsung memancarkan data-lucide  -> hanya subset lucide.min.js.
+ *   - teacher shell: `I.has(n) ? I.svg(n) : <i data-lucide>` -> subset lucide DITAMBAH
+ *     registry inline features/teacher/fiezel-teacher-icons.js (50 glyph, ada karena
+ *     lucide.min.js repo ini hanya memuat ikon cangkang murid).
+ * Menyamakan keduanya akan melahirkan merah palsu di class-hub untuk glyph yang memang
+ * hanya dipunyai Ruang Guru.
+ */
+const REG_GURU = new Set(
+  [...read('features/teacher/fiezel-teacher-icons.js').matchAll(/'([a-z0-9-]+)':\s*'/g)].map((m) => m[1])
+);
+if (REG_GURU.size >= 30) ok(`registry ikon Ruang Guru terbaca: ${REG_GURU.size} glyph`);
+else salah(`registry ikon Ruang Guru hanya ${REG_GURU.size} glyph - ekstraktornya rusak, bukan repo-nya`);
+
+/* Hanya berkas yang pembantunya BENAR-BENAR memancarkan data-lucide yang dipindai.
+ * `icon(` adalah nama yang lazim; memindai semuanya akan menuduh pembantu lain yang
+ * kebetulan senama tetapi tidak ada hubungannya dengan lucide. */
+const PEMBANTU = SUMBER.filter((f) => /function icon\s*\([a-z]\)[^\n]*data-lucide/.test(read(f)));
+if (PEMBANTU.length >= 2) ok(`berkas ber-pembantu icon(): ${PEMBANTU.length}`);
+else salah(`hanya ${PEMBANTU.length} berkas ber-pembantu icon() terbaca - pemindainya rusak, bukan repo-nya`);
+
+let lewatPembantu = 0;
+for (const f of PEMBANTU) {
+  /* Ruang Guru memeriksa registry inline LEBIH DULU, jadi himpunan penyelesaiannya
+     lebih luas. Dideteksi dari kodenya sendiri, bukan dari nama berkasnya. */
+  const pakaiRegistry = /FiezelTeacherIcons/.test(read(f));
+  const bisa = pakaiRegistry ? new Set([...tersedia, ...REG_GURU]) : tersedia;
+  const dipanggil = [...new Set([...read(f).matchAll(/\bicon\('([a-z0-9-]+)'\)/g)].map((m) => m[1]))];
+  const hilangDiSini = dipanggil.filter((n) => !bisa.has(n)).sort();
+  lewatPembantu += dipanggil.length;
+  if (hilangDiSini.length) {
+    salah(`${f}: ${hilangDiSini.length} ikon dipanggil lewat icon() tapi tidak ada di ` +
+      (pakaiRegistry ? 'subset lucide MAUPUN registry Ruang Guru' : 'subset lucide') +
+      ' - akan merender <i> KOSONG tanpa satu pun error: ' + hilangDiSini.join(', '));
+  }
+}
+if (lewatPembantu >= 60) ok(`pemanggilan lewat icon() diperiksa: ${lewatPembantu}`);
+else salah(`hanya ${lewatPembantu} pemanggilan icon() terbaca - pemindainya rusak, bukan repo-nya`);
+
 /* Ikon lonceng notifikasi (m025-254) disebut eksplisit: ia yang melahirkan gerbang ini. */
 for (const n of ['bell', 'bell-off', 'clipboard-list', 'shield-check', 'party-popper', 'trophy', 'user-plus', 'mail-open']) {
   if (!tersedia.has(n)) salah(`ikon lembar Notifikasi hilang dari subset: ${n}`);
