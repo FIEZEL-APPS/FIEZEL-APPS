@@ -98,7 +98,7 @@ api.fiezel.my.id      ← Cloudflare Worker (workers/api/)
 | `content/ja/` | Bank kursus Bahasa Jepang (grammar, kosakata, reading, writing) |
 | `content/mapel/` | Bank mata pelajaran Fase D |
 | `features/` | 33 modul fitur yang dimuat shell dan di-precache `sw.js` |
-| `tests/` | 305 gerbang mutu. Jalankan dari akar: `node tests/<nama>-test.js` |
+| `tests/` | 306 gerbang mutu. Jalankan dari akar: `node tests/<nama>-test.js` |
 | `website/` | Situs marketing (id + th) yang terbit di ROOT domain: beranda, tentang, untuk-sekolah, install, legal, sitemap, robots.txt, llms.txt. Akar repo terbit di `/app/` — dua permukaan berbeda, dijaga `tests/seo-surface-gate-test.js` |
 | `workers/` | Cloudflare Worker (api, owner) |
 | `deploy/` | Konfigurasi dan skrip deploy edge |
@@ -111,8 +111,8 @@ api.fiezel.my.id      ← Cloudflare Worker (workers/api/)
 
 | Penanda | Nilai |
 | --- | --- |
-| `FIEZEL_PAGE_BUILD` | `m025-357` |
-| `SW_REV` | `m025-357-paw-kembali-20260913` |
+| `FIEZEL_PAGE_BUILD` | `m025-358` |
+| `SW_REV` | `m025-358-paw-kembali-20260913` |
 | Grammar schema | `2.0.0` |
 | Practice blueprint | `focused-25-v1` |
 | Core protocol | `1.7` |
@@ -135,7 +135,7 @@ node tests/th-coverage-test.js
 node tests/seo-surface-gate-test.js
 
 # Semua gerbang (lihat .github/workflows/quality.yml)
-# CI menjalankan 305 gerbang pada setiap PR
+# CI menjalankan 306 gerbang pada setiap PR
 ```
 
 Aplikasi harus dijalankan melalui HTTP/HTTPS, bukan `file://`.
