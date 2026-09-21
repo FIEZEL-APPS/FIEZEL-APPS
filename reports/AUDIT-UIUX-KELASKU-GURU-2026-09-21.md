@@ -146,17 +146,28 @@ yang basi.
 **Perbaikan.** Satu tombol menyegarkan ketiganya, sekaligus membersihkan
 `ui.curriculumError` supaya layar gagal-muat punya jalan keluar yang benar-benar mencoba lagi.
 
-### T6 — KUNING · Gagal muat dan pohon kosong sama-sama berakhir sebagai ruang putih
+### T6 — KUNING · `ui.curriculumError` diisi, lalu tidak pernah dibaca siapa pun
 
-Versi lama merender `tree.map(renderNode).join('')` tanpa cabang untuk daftar kosong, dan
-`ui.curriculumError` tidak pernah dipakai perender sama sekali — ia diisi `loadCurriculumTree`
-lalu tidak dibaca siapa pun. Kurikulum yang gagal dimuat dan mapel yang memang belum disemai
-menghasilkan layar yang **identik**: kosong, diam.
+`loadCurriculumTree()` menangkap kegagalan dan menyimpannya di `ui.curriculumError` —
+dan **tidak ada satu pun perender yang membacanya**. Kurikulum yang gagal dimuat karena
+itu tidak pernah mengatakan apa pun; ia hanya jatuh ke katalog cadangan seolah tidak
+terjadi apa-apa, dan guru tidak punya cara tahu bahwa servernya sedang tidak menjawab.
 
-**Perbaikan.** Tiga keadaan dibedakan: gagal-muat menyebutkan pesannya dan menawarkan
-Muat Ulang; pohon kosong berkata bahwa mapel ini belum disemai dan menunjuk kartu penyemai
-yang ada di layar yang sama; sedang-memuat tetap memajang kartu penyemai (yang tidak
-menunggu pohon) alih-alih menyembunyikan seluruh layar.
+**Perbaikan.** Tiga keadaan kini dibedakan tegas: gagal-muat menyebutkan pesannya dan
+menawarkan Muat Ulang yang benar-benar mencoba lagi (sekaligus membersihkan
+`curriculumError`); sedang-memuat tetap memajang kartu penyemai — yang tidak menunggu
+pohon — alih-alih menyembunyikan seluruh layar; pohon kosong berkata bahwa ia kosong.
+
+**Koreksi terhadap draf audit ini sendiri.** Draf pertama menuliskan temuan ini sebagai
+"gagal muat dan pohon kosong sama-sama berakhir sebagai ruang putih". Separuh keduanya
+KELIRU, dan ketahuan justru oleh gerbang yang ditulis untuk menjaganya (F7 merah pada
+percobaan pertama): pohon yang gagal dimuat **jatuh ke katalog cadangan perangkat**
+(`MAPEL_CATALOG`) berikut spanduk "Sumber: katalog cadangan", jadi daftar kosong hampir
+tidak pernah sampai ke layar guru. Cabang kosong yang ditambahkan rilis ini adalah jaring
+TERAKHIR — ia hanya tergambar kalau katalog cadangannya pun kosong. Yang benar-benar rusak
+adalah `curriculumError` yang tidak pernah dibaca, dan itulah yang diperbaiki. Gerbang F7
+menguji keduanya: keadaan kosong dipicu dengan mengosongkan katalognya, dan jaring
+cadangannya diuji terpisah supaya ia tidak diam-diam hilang.
 
 ### T7 — KUNING · `st.view` tersimpan, dan viewnya baru saja dihapus
 
@@ -278,7 +289,7 @@ Dicatat supaya tidak diaudit ulang.
 
 ## 4. Gerbang
 
-`tests/kelasku-kurikulum-dashboard-test.js` — **21 assert**, terdaftar di `quality.yml`.
+`tests/kelasku-kurikulum-dashboard-test.js` — **28 assert**, terdaftar di `quality.yml`.
 Sebagian besar **dijalankan**, bukan dibaca: hub benar-benar dipasang dengan `env` tiruan,
 tabnya benar-benar diketuk, dan yang diperiksa adalah HTML yang keluar.
 
@@ -291,6 +302,15 @@ jaringan** (D4); tab bekerja tanpa kelas (D5); panel kosong / panel yang melempa
 sebagai kalimat jujur, bukan hub yang jatuh (D6); penjaga yang padam di tengah sesi tidak
 meninggalkan tab tergantung (D7); naskah dwibahasa (E1); `t()` benar-benar mengisi lubang
 (E2); keempat belas kelas CSS punya aturan (E3).
+
+Tujuh assert terakhir (F1–F7) memuat **cangkang guru sungguhan di sandbox `vm`** dan
+memanggil panelnya, lalu memeriksa HTML yang keluar: ketiga tombol penyemai benar-benar
+terpancar, kartu tidak mengarang angka sebelum statusnya terbaca, angka `/seed/soal/status`
+yang tercetak memakai ruas yang benar-benar dikirim backend (`from_this_seeder`,
+`competencies_with_questions`, `competencies_total`), gagal-baca tidak menyamar sebagai
+belum-tersemai, kedalaman bank tidak menyeberang antar mapel, dan tidak ada `undefined`
+atau `{lubang}` naskah yang bocor ke layar. Tanpa bagian ini, panel bisa mengembalikan
+string kosong untuk setiap keadaan dan seluruh bagian D tetap hijau.
 
 **Red-proof** (empat kerusakan disuntikkan, gerbang wajib merah, lalu dipulihkan):
 
