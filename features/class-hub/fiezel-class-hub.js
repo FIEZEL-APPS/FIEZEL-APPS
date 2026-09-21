@@ -1380,14 +1380,50 @@
   /* ===================================================================================== */
   var tUi = { tab: 'kelas', expand: null, resultId: null, draft: null };
   var TABS = [['kelas', t('kelas.kelas-saya', 'Kelas Saya'), 'users'], ['tugas', t('umum.tugas', 'Tugas'), 'clipboard-list'], ['buat', t('kelas.buat-tugas-judul', 'Buat Tugas'), 'plus-circle'], ['hasil', 'Hasil', 'bar-chart-3'], ['braincore', 'Braincore', 'brain']];
+
+  /* TAB KURIKULUM & KOMPETENSI (m025-357, instruksi owner).
+     =====================================================================================
+     Sistem kurikulum dulu adalah butir nav kedelapan di sidebar Ruang Guru — layar
+     terpisah yang isinya pohon kurikulum dan satu pintu keluar. Owner mencabut butir nav
+     itu dan memindahkan sistemnya ke SINI, ke dasbor KelasKu, tempat guru sudah memegang
+     kelas, tugas, dan hasilnya.
+
+     Tabnya bersyarat karena panelnya bersyarat: tanpa alamat backend kurikulum
+     (konsolKurikulumSiap() di teacher shell, diteruskan sebagai env.kurikulum.siap)
+     panel itu tidak punya apa pun untuk digambar, dan tab yang membuka layar kosong
+     adalah persis bug m025-296 yang dicatat fiezel-ux-flags.js. Penjaganya karena itu
+     TIDAK disalin ke sini — ia dibaca dari env, supaya hanya ada satu penjaga di repo. */
+  function kurikulumSiap(env) {
+    try { return !!(env && env.kurikulum && env.kurikulum.siap && env.kurikulum.siap()); } catch (_) { return false; }
+  }
+  function teacherTabs(env) {
+    var list = TABS.slice();
+    if (kurikulumSiap(env)) list.push(['kurikulum', t('guru.nav-kurikulum', 'Kurikulum & Kompetensi'), 'compass']);
+    return list;
+  }
   function mountTeacher(el, env) {
     el.innerHTML = teacherMarkup(env);
     if (!el.__chBound) { el.__chBound = true; el.addEventListener('click', function (e) { onTeacherClick(e, env); }); el.addEventListener('submit', function (e) { onTeacherSubmit(e, env); }); el.addEventListener('input', function (e) { onTeacherInput(e, env); }); el.addEventListener('change', function (e) { onTeacherInput(e, env); }); }
   }
   function teacherMarkup(env) {
     var c = env.cls();
-    var body = !c ? '<section class="ch-card ch-empty">' + icon('school') + '<p>' + t('kelas.buat-kelas-dulu', 'Buat kelas dulu, lalu Kelas menjadi pusat tugas, hasil, dan insight.') + '</p><button type="button" class="tg-btn is-primary" data-tg="modal" data-kind="new-class">' + t('kelas.buat-kelas', 'Buat kelas') + '</button></section>' : tUi.tab === 'tugas' ? tTugas(c, env) : tUi.tab === 'buat' ? tBuat(c, env) : tUi.tab === 'hasil' ? tHasil(c, env) : tUi.tab === 'braincore' ? tBraincore(c, env) : tKelas(c, env);
-    return '<div class="ch ch-teacher" data-testid="class-hub-teacher"><p class="ch-principle">' + icon('brain') + ' ' + t('kelas.braincore-alur-dot', 'Braincore menyarankan · Guru memutuskan · Murid belajar') + '</p><nav class="ch-tabs is-teacher" role="tablist" aria-label="' + esc(t('kelas.nav-guru-aria', 'Bagian Ruang Kelas Guru')) + '">' + TABS.map(function (t) { var active = tUi.tab === t[0]; return '<button type="button" role="tab" id="chg-tab-' + t[0] + '" aria-controls="chg-panel-' + t[0] + '" aria-selected="' + (active ? 'true' : 'false') + '" tabindex="' + (active ? '0' : '-1') + '" class="ch-tab' + (active ? ' is-active' : '') + '" data-ch="ttab" data-tab="' + t[0] + '" data-testid="tclass-tab-' + t[0] + '">' + icon(t[2]) + '<span>' + t[1] + '</span></button>'; }).join('') + '</nav><div class="ch-tabpanel" role="tabpanel" id="chg-panel-' + tUi.tab + '" aria-label="' + esc(t('kelas.panel-guru-aria', 'Isi Ruang Kelas Guru')) + '">' + body + '</div></div>';
+    /* Tab yang penjaganya padam ditinggalkan, bukan dibiarkan menggambar panel kosong:
+       bendera bisa mati di tengah sesi (alamat backend dicabut, atau modul gagal dimuat)
+       dan tUi.tab yang tersimpan masih menunjuk ke sana. */
+    if (tUi.tab === 'kurikulum' && !kurikulumSiap(env)) tUi.tab = 'kelas';
+    var body;
+    if (tUi.tab === 'kurikulum') {
+      /* SATU-SATUNYA tab yang dirender TANPA kelas aktif, dan itu disengaja: menyemai bank
+         kurikulum, membaca kompetensi, dan menghitung kedalaman bank tidak menyentuh satu
+         pun kelas. Memaksanya lewat "Buat kelas dulu" akan mengunci pekerjaan persiapan di
+         balik pekerjaan yang belum tentu mau dikerjakan guru hari itu. */
+      body = teacherKurikulum(env);
+    } else if (!c) {
+      body = '<section class="ch-card ch-empty">' + icon('school') + '<p>' + t('kelas.buat-kelas-dulu', 'Buat kelas dulu, lalu Kelas menjadi pusat tugas, hasil, dan insight.') + '</p><button type="button" class="tg-btn is-primary" data-tg="modal" data-kind="new-class">' + t('kelas.buat-kelas', 'Buat kelas') + '</button></section>';
+    } else {
+      body = tUi.tab === 'tugas' ? tTugas(c, env) : tUi.tab === 'buat' ? tBuat(c, env) : tUi.tab === 'hasil' ? tHasil(c, env) : tUi.tab === 'braincore' ? tBraincore(c, env) : tKelas(c, env);
+    }
+    return '<div class="ch ch-teacher" data-testid="class-hub-teacher"><p class="ch-principle">' + icon('brain') + ' ' + t('kelas.braincore-alur-dot', 'Braincore menyarankan · Guru memutuskan · Murid belajar') + '</p><nav class="ch-tabs is-teacher" role="tablist" aria-label="' + esc(t('kelas.nav-guru-aria', 'Bagian Ruang Kelas Guru')) + '">' + teacherTabs(env).map(function (t) { var active = tUi.tab === t[0]; return '<button type="button" role="tab" id="chg-tab-' + t[0] + '" aria-controls="chg-panel-' + t[0] + '" aria-selected="' + (active ? 'true' : 'false') + '" tabindex="' + (active ? '0' : '-1') + '" class="ch-tab' + (active ? ' is-active' : '') + '" data-ch="ttab" data-tab="' + t[0] + '" data-testid="tclass-tab-' + t[0] + '">' + icon(t[2]) + '<span>' + t[1] + '</span></button>'; }).join('') + '</nav><div class="ch-tabpanel" role="tabpanel" id="chg-panel-' + tUi.tab + '" aria-label="' + esc(t('kelas.panel-guru-aria', 'Isi Ruang Kelas Guru')) + '">' + body + '</div></div>';
   }
   /* Permintaan bergabung: murid sudah mengetik kode kelas ini, guru yang memutuskan ia masuk
      atau tidak. Kartunya hanya muncul kalau memang ada yang menunggu — kelas yang tidak
@@ -1525,12 +1561,43 @@
       '<section class="ch-card"><p class="ch-kicker">Miskonsepsi terdeteksi</p>' + (fromEvidence.length ? '<p class="ch-muted ch-small">Dari ' + n + ' jawaban keliru pada tugas yang kamu kirim.</p><ol class="ch-mis">' + fromEvidence.map(function (m) { return '<li><b>' + esc(m.label) + '</b><small>' + m.n + '×</small></li>'; }).join('') + '</ol>' : '') + (mis.length ? '<p class="ch-muted ch-small">Dari pola skill kelas:</p><ol class="ch-mis">' + mis.map(function (m) { return '<li><b>' + esc(m.label) + '</b> — ' + esc(m.pattern) + '<small>' + esc(m.lesson) + '</small></li>'; }).join('') + '</ol>' : '') + (!fromEvidence.length && !mis.length ? '<p class="ch-muted">' + t('kelas.belum-cukup-bukti', 'Belum ada bukti cukup. Kirim satu tugas dan tunggu murid mengerjakannya.') + '</p>' : '') + '</section>' +
       '<section class="ch-card"><p class="ch-kicker">Saran Braincore untuk langkah berikutnya</p>' + (weakest ? '<p>Skill terlemah kelas: <b>' + esc(weakest.label) + '</b> (' + pct(weakest.acc) + '). Saran: tugas remedial 8 soal, mode latihan, tenggat 3 hari.</p><div class="ch-actions"><button type="button" class="tg-btn is-primary" data-ch="remedial" data-skill="' + esc(weakest.skill) + '" data-title="' + esc('Remedial ' + weakest.label) + '" data-testid="tclass-braincore-remedial">' + icon('life-buoy') + ' Susun tugas remedial</button><button type="button" class="tg-btn is-ghost" data-tg="view" data-view="insights">' + icon('activity') + ' Analitik lengkap</button></div>' : '<p class="ch-muted">Saran muncul setelah ada akurasi per skill.</p>') + '</section></div>';
   }
+  /* Panel Kurikulum & Kompetensi. Isinya dirender oleh teacher shell — lihat
+     kurikulumPanel() di features/teacher/fiezel-teacher-shell.js — dan diteruskan ke sini
+     lewat env. Pembagiannya disengaja: mesin kurikulum (FZEngine, alamat backend, keadaan
+     muat, penyemai) sudah hidup di shell, dan menyalinnya ke modul ini berarti dua
+     salinan yang akan menyimpang. Hub menyediakan TEMPATNYA; shell menyediakan ISINYA.
+
+     Tombol di dalam panel memakai `data-tg`, bukan `data-ch`. Itu bukan kelalaian: hub
+     dipasang di dalam DOM shell (#tgClassHub), jadi klik di panel ini menggelembung ke
+     pengirim aksi shell yang memang sudah menangani `create-assign-from-comp`,
+     `refresh-curriculum`, dan ketiga penyemai. Menyalin penanganan itu ke onTeacherClick
+     hanya akan melahirkan jalur kedua yang harus dijaga selaras. */
+  function teacherKurikulum(env) {
+    var html = '';
+    try { html = (env.kurikulum && env.kurikulum.panel) ? (env.kurikulum.panel() || '') : ''; } catch (_) { html = ''; }
+    if (html) return '<div class="ch-body ch-kurikulum">' + html + '</div>';
+    /* Panel kosong berarti penjaganya padam di antara pemasangan tab dan penggambaran
+       isinya. Layar mengatakan itu apa adanya; ia TIDAK berpura-pura sedang memuat. */
+    return '<div class="ch-body ch-kurikulum"><section class="ch-card ch-empty" data-testid="tclass-kurikulum-mati">' + icon('cloud-off') +
+      '<p>' + esc(t('kelas.kurikulum-mati', 'Sistem kurikulum sedang tidak tersambung ke server KelasKu, jadi tidak ada kompetensi yang bisa ditampilkan. Bagian lain KelasKu tetap berjalan.')) + '</p>' +
+      '<button type="button" class="tg-btn is-ghost" data-ch="ttab" data-tab="kelas">' + esc(t('kelas.kembali-kelas-saya', 'Kembali ke Kelas Saya')) + '</button></section></div>';
+  }
+
   // ---- events guru -----------------------------------------------------------------------------
   function onTeacherClick(e, env) {
     var b = e.target.closest ? e.target.closest('[data-ch]') : null; if (!b) return;
     var act = b.getAttribute('data-ch'), id = b.getAttribute('data-id'), i = Number(b.getAttribute('data-i')), c = env.cls(), d;
     switch (act) {
-      case 'ttab': tUi.tab = b.getAttribute('data-tab'); break;
+      case 'ttab':
+        tUi.tab = b.getAttribute('data-tab');
+        /* Memuat DI SINI, bukan di dalam perender. Perender dipanggil pada setiap cat
+           ulang shell (setiap sinkron latar yang selesai ikut memanggilnya), jadi memicu
+           permintaan jaringan dari sana berarti menembaki backend kurikulum sepanjang
+           guru membuka tab itu. Pembukaan tab terjadi sekali per ketukan. */
+        if (tUi.tab === 'kurikulum' && kurikulumSiap(env) && env.kurikulum.buka) {
+          try { env.kurikulum.buka(); } catch (_) {}
+        }
+        break;
       case 'join-accept': {
         if (!c) return;
         var nm = b.getAttribute('data-name');

@@ -496,6 +496,35 @@
     'kelas.panel-aria': 'Isi KelasKu',
     'kelas.nav-guru-aria': 'Bagian Ruang Kelas Guru',
     'kelas.panel-guru-aria': 'Isi Ruang Kelas Guru',
+    /* ===== m025-357 — PANEL KURIKULUM & KOMPETENSI PINDAH KE DASBOR KELASKU =====
+       Butir nav kedelapan Ruang Guru dicabut atas instruksi owner; sistemnya menjadi tab
+       di hub KelasKu. Kunci di bawah adalah naskah panel itu — termasuk tiga kartu
+       penyemai yang mesinnya sudah ada di teacher shell sejak lama tetapi tidak pernah
+       punya satu pun tombol yang memanggilnya. */
+    'guru.kurikulum-panel-judul': 'Kurikulum Merdeka, di dalam kelasmu',
+    'guru.kurikulum-panel-sub': 'Semai bank kurikulum, baca kompetensi beserta kedalaman banknya, lalu ubah satu kompetensi menjadi tugas atau ujian — tanpa meninggalkan KelasKu.',
+    'guru.semai-kicker': 'Bank kurikulum',
+    'guru.semai-english-judul': 'Kurikulum Bahasa Inggris Kelas 1–12',
+    'guru.semai-english-ajakan': 'Kurikulum Merdeka Bahasa Inggris lengkap Fase A–F: 72 tujuan pembelajaran, 144 kompetensi, plus materi ajar dan prasyarat antar kelas. Disemai sekali, lalu menjadi milik bank kurikulummu.',
+    'guru.semai-mapel-judul': 'Mata pelajaran lain — Kelas 1–12',
+    'guru.semai-mapel-ajakan': 'Tujuh belas mata pelajaran Fase A–F: Matematika, B. Indonesia, Pancasila, IPAS, IPA, IPS, Sejarah, Informatika, Fisika, Kimia, Biologi, Ekonomi, Sosiologi, Geografi, PJOK, Seni Budaya, Prakarya. 210 tujuan pembelajaran, 420 kompetensi, lengkap materi ajar dan prasyarat antar kelas.',
+    'guru.semai-soal-judul': 'Bank soal',
+    'guru.semai-soal-ajakan': 'Soal pilihan ganda berpembahasan, berpetunjuk, dan berpeta miskonsepsi — inilah yang membuat kompetensi bisa dilatih, bukan sekadar dilihat. Semai kurikulumnya lebih dulu.',
+    'guru.semai-memeriksa': 'Memeriksa isi bank kurikulum…',
+    'guru.semai-status-gagal': 'Status bank ini gagal dibaca. Angka di bawah tidak diketahui — bukan berarti kosong.',
+    'guru.semai-sudah': 'Sudah tersemai: {tp} tujuan pembelajaran, {komp} kompetensi, {materi} materi ajar.',
+    'guru.semai-soal-sudah': 'Sudah tersemai: {n} soal, mencakup {k} dari {total} kompetensi.',
+    'guru.semai-belum': 'Belum tersemai. Bank kurikulum masih berisi contoh demo saja.',
+    'guru.semai-tombol': 'Semai sekarang',
+    'guru.semai-ulang': 'Semai ulang',
+    'guru.semai-jalan': 'Sedang menyemai — butuh beberapa detik.',
+    'guru.kurikulum-kompetensi-bank': '{n} soal di bank',
+    'guru.kurikulum-kompetensi-kosong': 'Bank soal kosong',
+    'guru.kurikulum-bank-terpotong': 'Hitungan soal per kompetensi dibaca dari {n} soal pertama — batas halaman, bukan jumlah seluruh bank. Kompetensi yang tertulis kosong bisa jadi hanya tidak terbawa.',
+    'guru.kurikulum-gagal': 'Kurikulum gagal dimuat: {pesan}',
+    'guru.kurikulum-pohon-kosong': 'Belum ada kompetensi untuk mata pelajaran ini di bank. Semai kurikulumnya lewat kartu di atas, lalu tekan Muat Ulang.',
+    'kelas.kurikulum-mati': 'Sistem kurikulum sedang tidak tersambung ke server KelasKu, jadi tidak ada kompetensi yang bisa ditampilkan. Bagian lain KelasKu tetap berjalan.',
+    'kelas.kembali-kelas-saya': 'Kembali ke Kelas Saya',
     /* m025-351 (Gelombang 5, G10) — penanda asal data pohon kurikulum di Ruang Guru. */
     'guru.kurikulum-sumber-lokal': 'Sumber: katalog cadangan perangkat — server belum menyemai kurikulum mapel ini. Tekan kartu penyemai agar papan ini terisi dari server KelasKu.',
     'guru.kurikulum-sumber-server': 'Sumber: kurikulum dari server KelasKu.'
