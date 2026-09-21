@@ -329,12 +329,7 @@
         { code: 'KOMP-MAT-D-7-BAB4-01', name: t('mapel_mat_c4_name', 'Bentuk Geometri dan Bangun Datar'), materi: t('mapel_mat_c4_mat', 'Sifat Garis & Sudut, Hubungan Antarsudut, Keliling & Luas Segitiga & Segi Empat (Persegi, Persegi Panjang, Jajar Genjang, Trapesium)'), grade: 7 },
         { code: 'KOMP-MAT-D-7-BAB5-01', name: t('mapel_mat_c5_name', 'Bab 5: Kesebangunan dan Hubungan Antar Garis'), materi: t('mapel_mat_c5_mat', 'Hubungan Antar Garis & Sudut, Sudut Sejajar & Berpotongan, Konsep Kesebangunan & Kekongruenan Bangun Datar'), grade: 7 },
         { code: 'KOMP-MAT-D-7-BAB6-01', name: t('mapel_mat_c6_name', 'Bab 6: Data dan Diagram'), materi: t('mapel_mat_c6_mat', 'Investigasi Statistika, Jenis-jenis Data, Penyajian Data (Diagram Batang, Diagram Lingkaran, Line Plot), Interpretasi dan Analisis Diagram'), grade: 7 },
-        { code: 'KOMP-MAT-D-8-BAB1-01', name: t('mapel_mat_c7_name', 'Teorema Pythagoras dan Lingkaran'), materi: t('mapel_mat_c7_mat', 'Teorema Pythagoras & Tripel Pythagoras, Penerapan Pythagoras, Keliling & Luas Lingkaran, Panjang Busur & Luas Juring'), grade: 8 },
-        { code: 'KOMP-MAT-D-8-ALJ-01', name: t('mapel_mat_c8_name', 'Aljabar & Persamaan Linier Dua Variabel'), materi: t('mapel_mat_c8_mat', 'Menyelesaikan SPLDV dengan metode substitusi dan eliminasi kontekstual'), grade: 8 },
-        { code: 'KOMP-MAT-D-8-FUN-01', name: t('mapel_mat_c9_name', 'Relasi, Fungsi & Persamaan Garis Lurus'), materi: t('mapel_mat_c9_mat', 'Pemetaan relasi fungsi, gradien garis lurus, dan persamaan garis lurus'), grade: 8 },
-        { code: 'KOMP-MAT-D-9-STA-01', name: t('mapel_mat_c10_name', 'Statistika & Peluang Empiris'), materi: t('mapel_mat_c10_mat', 'Menghitung pemusatan data rata-rata, median, modus, dan frekuensi relatif'), grade: 9 },
-        { code: 'KOMP-MAT-D-9-BAK-01', name: t('mapel_mat_c11_name', 'Bilangan Berpangkat & Bentuk Akar'), materi: t('mapel_mat_c11_mat', 'Sifat-sifat eksponen, merasionalkan bentuk akar, dan notasi ilmiah'), grade: 9 },
-        { code: 'KOMP-MAT-D-9-KUA-01', name: t('mapel_mat_c12_name', 'Persamaan & Fungsi Kuadrat'), materi: t('mapel_mat_c12_mat', 'Faktorisasi kuadrat, rumus abc, nilai optimum, dan grafik fungsi kuadrat'), grade: 9 }
+        { code: 'KOMP-MAT-D-8-BAB1-01', name: t('mapel_mat_c7_name', 'Teorema Pythagoras dan Lingkaran'), materi: t('mapel_mat_c7_mat', 'Teorema Pythagoras & Tripel Pythagoras, Penerapan Pythagoras, Keliling & Luas Lingkaran, Panjang Busur & Luas Juring'), grade: 8 }
       ],
       teachingBrief: {
         summary: t('mapel_mat_tb_sum', 'Penguasaan konsep bilangan rasional, pemodelan aljabar, dan logika spasial geometri.'),
@@ -402,18 +397,19 @@
       name: 'Ilmu Pengetahuan Alam (IPA)',
       grade: 'SD / SMP',
       competencies: [
-        { code: 'KOMP-IPA-D-7-MET-01', name: t('mapel_ipa_c1_name', 'Besaran, Satuan & Metode Ilmiah'), materi: t('mapel_ipa_c1_mat', 'Pengukuran besaran pokok dan turunan, konversi satuan SI, dan keselamatan laboratorium'), grade: 7 },
-        { code: 'KOMP-IPA-D-7-ZAT-01', name: t('mapel_ipa_c2_name', 'Wujud Zat, Perubahan Fisika & Kimia'), materi: t('mapel_ipa_c2_mat', 'Wujud materi, wujud fisika-kimia, dan kerapatan massa jenis'), grade: 7 },
-        { code: 'KOMP-IPA-D-7-EKO-01', name: t('mapel_ipa_c3_name', 'Klasifikasi Makhluk Hidup, Ekosistem & Interaksinya'), materi: t('mapel_ipa_c3_mat', 'Kunci determinasi makhluk hidup, rantai makanan ekosistem, dan pencemaran lingkungan'), grade: 7 },
-        { code: 'KOMP-IPA-D-8-BAB1-01', name: t('mapel_ipa_c4_name', 'Pengenalan Sel'), materi: t('mapel_ipa_c4_mat', 'Struktur & Fungsi Organel Sel, Perbedaan Sel Tumbuhan & Sel Hewan, Spesialisasi Sel & Penggunaan Mikroskop'), grade: 8 },
-        { code: 'KOMP-IPA-D-8-BAB2-01', name: t('mapel_ipa_c5_name', 'Struktur dan Fungsi Tubuh Makhluk Hidup'), materi: t('mapel_ipa_c5_mat', 'Sistem Pencernaan & Nutrisi, Sistem Peredaran Darah & Jantung, Sistem Pernapasan & Paru-paru, Sistem Ekskresi & Ginjal'), grade: 8 },
-        { code: 'KOMP-IPA-D-8-BAB3-01', name: t('mapel_ipa_c6_name', 'Usaha, Energi, dan Pesawat Sederhana'), materi: t('mapel_ipa_c6_mat', 'Konsep Usaha & Energi, Energi Kinetik & Potensial, Keuntungan Mekanis Pesawat Sederhana (Tuas, Katrol, Bidang Miring)'), grade: 8 },
-        { code: 'KOMP-IPA-D-8-BAB4-01', name: t('mapel_ipa_c7_name', 'Tekanan'), materi: t('mapel_ipa_c7_mat', 'Tekanan Zat Padat & Hidrostatis, Hukum Archimedes & Pascal, Tekanan Gas/Udara, Aplikasi pada Makhluk Hidup'), grade: 8 },
-        { code: 'KOMP-IPA-D-8-BAB5-01', name: t('mapel_ipa_c8_name', 'Getaran, Gelombang, dan Cahaya'), materi: t('mapel_ipa_c8_mat', 'Getaran & Frekuensi, Gelombang Transversal & Longitudinal, Gelombang Bunyi & Ekolokasi, Sifat Cahaya & Alat Optik'), grade: 8 },
-        { code: 'KOMP-IPA-D-8-BAB6-01', name: t('mapel_ipa_c9_name', 'Unsur, Senyawa, dan Campuran'), materi: t('mapel_ipa_c9_mat', 'Klasifikasi Materi (Unsur, Senyawa, Campuran), Larutan, Koloid & Suspensi, Metode Pemisahan Campuran (Filtrasi, Distilasi, Kromatografi)'), grade: 8 },
-        { code: 'KOMP-IPA-D-9-LIS-01', name: t('mapel_ipa_c10_name', 'Listrik Dinamis, Hambatan & Kemagnetan'), materi: t('mapel_ipa_c10_mat', 'Hukum Ohm (V = I·R), rangkaian seri-paralel, dan induksi elektromagnetik'), grade: 9 },
-        { code: 'KOMP-IPA-D-9-GEN-01', name: t('mapel_ipa_c11_name', 'Sistem Reproduksi & Pewarisan Sifat'), materi: t('mapel_ipa_c11_mat', 'Pembelahan sel mitosis-meiosis, persilangan monohibrid-dihibrid Mendel, dan genetika'), grade: 9 },
-        { code: 'KOMP-IPA-D-9-BIO-01', name: t('mapel_ipa_c12_name', 'Bioteknologi & Kelestarian Lingkungan'), materi: t('mapel_ipa_c12_mat', 'Bioteknologi konvensional dan modern, tanah, serta teknologi ramah lingkungan'), grade: 9 }
+        { code: 'KOMP-IPA-D-7-BAB1-01', name: t('mapel_ipa_c1_name', 'Hakikat Ilmu Sains dan Metode Ilmiah'), materi: t('mapel_ipa_c1_mat', 'Pengukuran besaran pokok dan turunan, konversi satuan SI, dan keselamatan laboratorium'), grade: 7 },
+        { code: 'KOMP-IPA-D-7-BAB2-01', name: t('mapel_ipa_c2_name', 'Zat dan Perubahannya'), materi: t('mapel_ipa_c2_mat', 'Wujud materi, wujud fisika-kimia, dan kerapatan massa jenis'), grade: 7 },
+        { code: 'KOMP-IPA-D-7-BAB3-01', name: t('mapel_ipa_c3_name', 'Suhu, Kalor, dan Pemuaian'), materi: t('mapel_ipa_c3_mat', 'Konsep suhu dan termometer, kalor dan perubahannya, serta pemuaian zat'), grade: 7 },
+        { code: 'KOMP-IPA-D-7-BAB4-01', name: t('mapel_ipa_c4_name', 'Gerak dan Gaya'), materi: t('mapel_ipa_c4_mat', 'Gerak lurus beraturan, gaya dan Hukum Newton, serta penerapannya'), grade: 7 },
+        { code: 'KOMP-IPA-D-7-BAB5-01', name: t('mapel_ipa_c5_name', 'Karakteristik dan Klasifikasi Makhluk Hidup'), materi: t('mapel_ipa_c5_mat', 'Kunci determinasi makhluk hidup, ciri-ciri kehidupan, dan taksonomi'), grade: 7 },
+        { code: 'KOMP-IPA-D-7-BAB6-01', name: t('mapel_ipa_c6_name', 'Ekologi dan Pelestarian Lingkungan'), materi: t('mapel_ipa_c6_mat', 'Interaksi antarkomponen ekosistem, rantai makanan, jaring-jaring makanan, dan konservasi alam'), grade: 7 },
+        { code: 'KOMP-IPA-D-7-BAB7-01', name: t('mapel_ipa_c7_name', 'Bumi dan Tata Surya'), materi: t('mapel_ipa_c7_mat', 'Sistem tata surya, rotasi dan revolusi bumi, fase bulan, dan struktur lapisan bumi'), grade: 7 },
+        { code: 'KOMP-IPA-D-8-BAB1-01', name: t('mapel_ipa_c8_name', 'Pengenalan Sel'), materi: t('mapel_ipa_c8_mat', 'Struktur & Fungsi Organel Sel, Perbedaan Sel Tumbuhan & Sel Hewan, Spesialisasi Sel & Penggunaan Mikroskop'), grade: 8 },
+        { code: 'KOMP-IPA-D-8-BAB2-01', name: t('mapel_ipa_c9_name', 'Struktur dan Fungsi Tubuh Makhluk Hidup'), materi: t('mapel_ipa_c9_mat', 'Sistem Pencernaan & Nutrisi, Sistem Peredaran Darah & Jantung, Sistem Pernapasan & Paru-paru, Sistem Ekskresi & Ginjal'), grade: 8 },
+        { code: 'KOMP-IPA-D-8-BAB3-01', name: t('mapel_ipa_c10_name', 'Usaha, Energi, dan Pesawat Sederhana'), materi: t('mapel_ipa_c10_mat', 'Konsep Usaha & Energi, Energi Kinetik & Potensial, Keuntungan Mekanis Pesawat Sederhana (Tuas, Katrol, Bidang Miring)'), grade: 8 },
+        { code: 'KOMP-IPA-D-8-BAB4-01', name: t('mapel_ipa_c11_name', 'Tekanan'), materi: t('mapel_ipa_c11_mat', 'Tekanan Zat Padat & Hidrostatis, Hukum Archimedes & Pascal, Tekanan Gas/Udara, Aplikasi pada Makhluk Hidup'), grade: 8 },
+        { code: 'KOMP-IPA-D-8-BAB5-01', name: t('mapel_ipa_c12_name', 'Getaran, Gelombang, dan Cahaya'), materi: t('mapel_ipa_c12_mat', 'Getaran & Frekuensi, Gelombang Transversal & Longitudinal, Gelombang Bunyi & Ekolokasi, Sifat Cahaya & Alat Optik'), grade: 8 },
+        { code: 'KOMP-IPA-D-8-BAB6-01', name: t('mapel_ipa_c13_name', 'Unsur, Senyawa, dan Campuran'), materi: t('mapel_ipa_c13_mat', 'Klasifikasi Materi (Unsur, Senyawa, Campuran), Larutan, Koloid & Suspensi, Metode Pemisahan Campuran (Filtrasi, Distilasi, Kromatografi)'), grade: 8 }
       ],
       teachingBrief: {
         summary: t('mapel_ipa_tb_sum', 'Penyelidikan ilmiah empiris fenomena alam, organisasi materi kehidupan, dan konversi energi.'),
@@ -432,9 +428,7 @@
         { code: 'KOMP-IPS-D-7-BAB2-01', name: t('mapel_ips_c2_name', 'Tema 02: Keberagaman Lingkungan Sekitar'), materi: t('mapel_ips_c2_mat', 'Proses Pembentukan Bumi & Masa Praaksara, Keberagaman Bentang Alam & Lingkungan, Interaksi Manusia & Konservasi SDA, Peran Lembaga Sosial & Ekonomi'), grade: 7 },
         { code: 'KOMP-IPS-D-7-BAB3-01', name: t('mapel_ips_c3_name', 'Tema 03: Potensi Ekonomi Lingkungan'), materi: t('mapel_ips_c3_mat', 'Potensi Sumber Daya Alam (Hutan, Tambang, Laut), Kegiatan Ekonomi (Produksi, Distribusi, Konsumsi), Hukum Permintaan & Penawaran, Pasar & Peran Teknologi'), grade: 7 },
         { code: 'KOMP-IPS-D-7-BAB4-01', name: t('mapel_ips_c4_name', 'Tema IV: Pemberdayaan Masyarakat'), materi: t('mapel_ips_c4_mat', 'Keanekaragaman Keragaman Etnis & Budaya Indonesia, Pemberdayaan Ekonomi Masyarakat, Literasi & Pengelolaan Keuangan Keluarga, Peran Komunitas Lokal'), grade: 7 },
-        { code: 'KOMP-IPS-D-8-BAB1-01', name: t('mapel_ips_c5_name', 'Tema 01: Kondisi Geografis dan Pelestarian Sumber Daya Alam'), materi: t('mapel_ips_c5_mat', 'Kondisi Geografis & Iklim Indonesia, Keragaman Flora & Fauna (Garis Wallace & Weber), Pelestarian Sumber Daya Alam, Potensi Maritim'), grade: 8 },
-        { code: 'KOMP-IPS-D-8-SOS-01', name: t('mapel_ips_c6_name', 'Interaksi Sosial, Diferensiasi & Integrasi'), materi: t('mapel_ips_c6_mat', 'Bentuk interaksi asosiatif dan disosiatif, lembaga sosial, serta pluralitas budaya nusantara'), grade: 8 },
-        { code: 'KOMP-IPS-D-9-GLB-01', name: t('mapel_ips_c7_name', 'Globalisasi & Perkembangan Ekonomi Digital'), materi: t('mapel_ips_c7_mat', 'Dampak perubahan sosial budaya, perdagangan internasional, dan ekonomi kreatif'), grade: 9 }
+        { code: 'KOMP-IPS-D-8-BAB1-01', name: t('mapel_ips_c5_name', 'Tema 01: Kondisi Geografis dan Pelestarian Sumber Daya Alam'), materi: t('mapel_ips_c5_mat', 'Kondisi Geografis & Iklim Indonesia, Keragaman Flora & Fauna (Garis Wallace & Weber), Pelestarian Sumber Daya Alam, Potensi Maritim'), grade: 8 }
       ],
       teachingBrief: {
         summary: t('mapel_ips_tb_sum', 'Kajian keterhubungan spasial, pranata sosial kemasyarakatan, dan dinamika perekonomian masyarakat.'),
@@ -669,7 +663,7 @@
    * 14 mapel lain tidak punya bank JSON; bagi mereka jalur ini selalu menjawab null
    * dan tidak satu pun perilakunya berubah.
    */
-  var MAPEL_BANK_SUBJECTS = ['MAT', 'IPA', 'ENG'];
+  var MAPEL_BANK_SUBJECTS = ['MAT', 'IPA', 'ENG', 'IND', 'IPS'];
   var mapelBankCache = {};
   var mapelBankFetching = {};
 
@@ -2833,6 +2827,7 @@
     var gId = (acc && acc.gradeId) || 'SMP';
     var inst = (acc && acc.institution) || (st.teacher && st.teacher.school) || '';
     var mapelNames = (S() && S().MAPEL_NAMES) || {};
+    var subName = mapelNames[sId] || sId;
     var code = (acc && acc.classCode && acc.classCode !== 'FZ-MERDEKA1') ? S().normalizeClassCode(acc.classCode) : '';
     if (code === 'FZ-MERDEKA1' || (code && !/^FZ-[A-HJ-NP-Z2-9]{6}$/.test(code))) code = '';
 
@@ -2897,6 +2892,9 @@
           if (c.subject !== officialSub || (c.name && c.name.indexOf('Matematika') !== -1 && officialSub !== 'MAT')) {
             c.subject = officialSub;
             c.name = prefix + officialSubName;
+            if (gId === 'SMP' && (!c.level || c.level === 'A1' || c.level === 'A2' || c.level === 'B1' || c.level === 'B2')) {
+              c.level = 'Kelas 7';
+            }
             modified = true;
           }
         });
@@ -2951,7 +2949,8 @@
         delete st.deletedClassCodes[code];
       }
       var clsTitle = (inst ? inst + ' — ' : '') + subName;
-      var newCls = S().newClass(clsTitle, gId, sId);
+      var newClsLvl = (gId === 'SMP') ? 'Kelas 7' : gId;
+      var newCls = S().newClass(clsTitle, newClsLvl, sId);
       newCls.code = code;
       st.classes.unshift(newCls);
       st.activeClassId = newCls.id;
@@ -3150,8 +3149,13 @@
        hub tidak perlu tahu satu pun di antaranya — dan tombol di dalam panel tetap memakai
        `data-tg`, yang memang sudah ditangani pengirim aksi shell ini karena #tgClassHub
        berada di dalam DOM yang sama. */
+    var __scHub = null;
+    try { __scHub = teacherSubjectScope(); } catch (_) {}
     if (hubEl && root.FiezelClassHub) root.FiezelClassHub.mountTeacher(hubEl, {
       st: function () { return st; }, cls: cls, persist: persist, toast: toast, rerender: render,
+      scope: __scHub,
+      isAssignmentVisible: isAssignmentVisible,
+      skillMatchesSubject: skillMatchesSubject,
       kurikulum: {
         siap: konsolKurikulumSiap,
         panel: kurikulumPanel,
@@ -3356,8 +3360,11 @@
     var __scCo = null;
     try { __scCo = teacherSubjectScope(); } catch (_) {}
     var __noteCo = (__scCo && __scCo.locked) ? subjectScopeBadge() : '';
+    var __annPlaceholder = (__scCo && __scCo.locked)
+      ? 'Contoh: Besok latihan ' + (__scCo.active) + ' 10 soal, 15 menit. Siapkan catatan bab ini!'
+      : 'Contoh: Besok kuis Past Tense 10 soal, 15 menit. Bawa catatan penanda waktu!';
     return __noteCo + '<div class="tg-grid tg-grid-2">' +
-      '<div class="tg-stack"><section class="tg-card" data-testid="tg-announce"><div class="tg-card-head"><div><p class="tg-kicker">' + t('guru.pengumuman-kelas', 'Pengumuman kelas') + '</p><h3>' + t('guru.satu-pesan-semua-kanal', 'Satu pesan, semua kanal') + '</h3></div></div><form data-tg-form="announce" class="tg-form"><textarea name="text" rows="3" required placeholder="Contoh: Besok kuis Past Tense 10 soal, 15 menit. Bawa catatan penanda waktu!" data-testid="tg-announce-text" aria-label="' + esc(t('guru.pengumuman-kelas', 'Pengumuman kelas')) + '"></textarea><div class="tg-actions"><button type="submit" class="tg-btn is-primary is-small" data-testid="tg-announce-submit">' + icon('megaphone') + ' ' + t('guru.simpan-salin', 'Simpan & salin') + '</button><button type="submit" class="tg-btn is-ghost is-small" name="wa" value="1">' + icon('message-circle') + ' ' + t('guru.kirim-whatsapp', 'Kirim via WhatsApp') + '</button></div></form>' +
+      '<div class="tg-stack"><section class="tg-card" data-testid="tg-announce"><div class="tg-card-head"><div><p class="tg-kicker">' + t('guru.pengumuman-kelas', 'Pengumuman kelas') + '</p><h3>' + t('guru.satu-pesan-semua-kanal', 'Satu pesan, semua kanal') + '</h3></div></div><form data-tg-form="announce" class="tg-form"><textarea name="text" rows="3" required placeholder="' + esc(__annPlaceholder) + '" data-testid="tg-announce-text" aria-label="' + esc(t('guru.pengumuman-kelas', 'Pengumuman kelas')) + '"></textarea><div class="tg-actions"><button type="submit" class="tg-btn is-primary is-small" data-testid="tg-announce-submit">' + icon('megaphone') + ' ' + t('guru.simpan-salin', 'Simpan & salin') + '</button><button type="submit" class="tg-btn is-ghost" data-tg="wa" value="1">' + icon('message-circle') + ' ' + t('guru.kirim-whatsapp', 'Kirim via WhatsApp') + '</button></div></form>' +
       (ann.length ? '<ul class="tg-feed">' + ann.slice(0, 5).map(function (a) { return '<li><small>' + esc(T.fmtDate(a.at)) + '</small><p>' + esc(a.text) + '</p><button type="button" class="tg-link" data-tg="copy" data-text="' + esc(a.text) + '">Salin ulang</button></li>'; }).join('') + '</ul>' : '') + '</section>' +
       '<section class="tg-card" data-testid="tg-parent-section"><div class="tg-card-head"><div><p class="tg-kicker">' + t('guru.laporan-ortu', 'Laporan orang tua') + '</p><h3>' + t('guru.rapor-naratif', 'Rapor naratif otomatis') + '</h3></div><span class="tg-count">' + c.students.length + '</span></div><p class="tg-muted">Bahasa hangat, berisi angka nyata, plus satu saran 5 menit yang bisa orang tua lakukan di rumah. ' + withPhone.length + ' siswa punya nomor ortu (kirim langsung via WhatsApp).</p>' +
       '<div class="tg-chips">' + c.students.map(function (s) { return '<button type="button" class="tg-chip' + (s.parentPhone ? ' has-phone' : '') + '" data-tg="modal" data-kind="parent" data-id="' + s.id + '" data-testid="tg-parent-' + s.id + '">' + esc(s.name) + (s.parentPhone ? ' ' + icon('phone') : '') + '</button>'; }).join('') + '</div>' +
@@ -3369,10 +3376,14 @@
   // ---- JURNAL ------------------------------------------------------------------------------------
   function journal(c) {
     var T = S(), list = (c.journal || []).slice().reverse();
-    var __scopeJ = '';
-    try { __scopeJ = subjectScopeBadge(); } catch (_) {}
+    var __scJ = null;
+    try { __scJ = teacherSubjectScope(); } catch (_) {}
+    var __scopeJ = (__scJ && __scJ.locked) ? subjectScopeBadge() : '';
+    var __journalPlaceholder = (__scJ && __scJ.locked)
+      ? 'Contoh: Praktik mandiri konsep ' + (__scJ.active) + ' berjalan baik. Andi perlu latihan tambahan pemodelan.'
+      : 'Contoh: Metode timeline di papan ampuh untuk yesterday/ago. Fikri masih tertukar verb 1/2.';
     return __scopeJ + '<div class="tg-grid tg-grid-2"><section class="tg-card" data-testid="tg-journal-form"><div class="tg-card-head"><div><p class="tg-kicker">' + t('guru.refleksi-60', 'Refleksi 60 detik') + '</p><h3>' + t('guru.apa-berhasil', 'Apa yang berhasil hari ini?') + '</h3></div></div><p class="tg-muted">Guru hebat mencatat metode yang ampuh — tapi jarang ada tempatnya. Catatan di sini menempel ke siswa yang kamu tandai, dan muncul lagi saat kamu membuka profil mereka.</p>' +
-      '<form data-tg-form="journal" class="tg-form"><textarea name="text" rows="4" required placeholder="' + esc(t('guru.jurnal-contoh', 'Contoh: Metode timeline di papan ampuh untuk yesterday/ago. Fikri masih tertukar verb 1/2.')) + '" data-testid="tg-journal-text" aria-label="' + esc(t('guru.refleksi-60', 'Refleksi 60 detik')) + '"></textarea><label class="tg-label">' + t('guru.tandai-siswa', 'Tandai siswa (opsional)') + '</label><div class="tg-chips tg-chips-select">' + c.students.map(function (s) { return '<label class="tg-chip is-check"><input type="checkbox" name="tags" value="' + s.id + '"><span>' + esc(s.name) + '</span></label>'; }).join('') + '</div><div class="tg-actions"><button type="submit" class="tg-btn is-primary is-small" data-testid="tg-journal-submit">' + icon('notebook-pen') + ' ' + t('guru.simpan-refleksi', 'Simpan refleksi') + '</button></div></form></section>' +
+      '<form data-tg-form="journal" class="tg-form"><textarea name="text" rows="4" required placeholder="' + esc(__journalPlaceholder) + '" data-testid="tg-journal-text" aria-label="' + esc(t('guru.refleksi-60', 'Refleksi 60 detik')) + '"></textarea><label class="tg-label">' + t('guru.tandai-siswa', 'Tandai siswa (opsional)') + '</label><div class="tg-chips tg-chips-select">' + c.students.map(function (s) { return '<label class="tg-chip is-check"><input type="checkbox" name="tags" value="' + s.id + '"><span>' + esc(s.name) + '</span></label>'; }).join('') + '</div><div class="tg-actions"><button type="submit" class="tg-btn is-primary is-small" data-testid="tg-journal-submit">' + icon('notebook-pen') + ' ' + t('guru.simpan-refleksi', 'Simpan refleksi') + '</button></div></form></section>' +
       '<section class="tg-card"><div class="tg-card-head"><div><p class="tg-kicker">' + t('umum.riwayat', 'Riwayat') + '</p><h3>Jurnal ' + esc(c.name) + '</h3></div><span class="tg-count">' + list.length + '</span></div>' + (list.length ? '<ul class="tg-feed">' + list.map(function (j) { return '<li><small>' + esc(T.fmtDate(j.at)) + (j.tags && j.tags.length ? ' · ' + j.tags.map(function (id) { var s = student(id); return s ? esc(s.name) : ''; }).filter(Boolean).join(', ') : '') + '</small><p>' + esc(j.text) + '</p></li>'; }).join('') + '</ul>' : '<p class="tg-empty">' + t('guru.belum-ada-catatan', 'Belum ada catatan.') + '</p>') + '</section></div>';
   }
   /* Kartu AKUN. Sebelum ini halaman ini hanya memuat profil LOKAL (nama & sekolah untuk
@@ -3612,7 +3623,10 @@
     '</div>';
 
     var kartuPenyemai = '<div class="tg-seed-grid" data-testid="tg-seed-grid">' +
-      SEMAI_KARTU.map(kartuSemai).join('') +
+      SEMAI_KARTU.map(kartuSemai).filter(function (html, idx) {
+        if (__scPk && __scPk.locked && SEMAI_KARTU[idx].jenis === 'english' && __scPk.subjects.indexOf('ENG') < 0) return false;
+        return true;
+      }).join('') +
       '</div>' +
       (ui.seedStatusError
         ? '<div class="tg-curriculum-source is-local" data-testid="tg-seed-error">' + icon('alert-triangle') + ' <span>' + esc(ui.seedStatusError) + '</span></div>'
@@ -3655,9 +3669,22 @@
     }
 
     var tree = ui.curriculumTree || [];
-    /* Fallback mulus ke katalog materi lokal jika pohon server belum dimuat */
+    /* Prioritaskan bank kurikulum autentik buku siswa jika tersedia */
     var sumberLokal = false;
-    if (!tree.length && cat && cat.competencies && cat.competencies.length) {
+    var bBank = mapelBank(sId);
+    if (bBank && bBank.competencies && bBank.competencies.length) {
+      sumberLokal = true;
+      tree = bBank.competencies.map(function (cp) {
+        return {
+          type: 'competency',
+          code: cp.code,
+          name: cp.name,
+          description: cp.materi,
+          grade: cp.grade,
+          bloom_level: 'C3/C4'
+        };
+      });
+    } else if (!tree.length && cat && cat.competencies && cat.competencies.length) {
       sumberLokal = true;
       tree = cat.competencies.map(function (cp) {
         return {
@@ -3665,6 +3692,7 @@
           code: cp.code,
           name: cp.name,
           description: cp.materi,
+          grade: cp.grade,
           bloom_level: 'C3/C4'
         };
       });
@@ -3830,7 +3858,12 @@
       } else {
         __subField = '<label class="tg-label">Mata pelajaran<input name="subject" value="' + esc(__defSub) + '" maxlength="40"></label>';
       }
-      body = '<form data-tg-form="' + m.kind + '" class="tg-form"><label class="tg-label">' + t('guru.nama-kelas', 'Nama kelas') + '<input name="name" required maxlength="60" value="' + esc(e ? e.name : '') + '" placeholder="English A2 — Kelas 10A" data-autofocus data-testid="tg-class-name"></label><div class="tg-form-row"><label class="tg-label">Level<select name="level" data-testid="tg-class-level">' + ['A1', 'A2', 'B1', 'B2', 'C1'].map(function (l) { return '<option' + ((e ? e.level : 'A2') === l ? ' selected' : '') + '>' + l + '</option>'; }).join('') + '</select></label>' + __subField + '</div><label class="tg-label">Kode kelas (mis. FZ-QVQDHM)<input name="code" value="' + esc(e ? e.code : '') + '" placeholder="FZ-XXXXXX (otomatis atau gunakan kode sekolah)" maxlength="16"></label><div class="tg-actions"><button type="submit" class="tg-btn is-primary" data-testid="tg-class-submit">' + (e ? t('umum.simpan', 'Simpan') : t('guru.buat-kelas', 'Buat kelas')) + '</button>' + (e ? '' : '<button type="button" class="tg-btn is-ghost" data-tg="seed-demo">Atau muat kelas contoh</button>') + '</div></form>';
+      var __isSMP = (__scCls2 && (__scCls2.grade === 'SMP' || __scCls2.locked));
+      var __levels = __isSMP ? ['Kelas 7', 'Kelas 8', 'Kelas 9', 'Fase D (SMP)'] : ['A1', 'A2', 'B1', 'B2', 'C1'];
+      var __defLvl = __isSMP ? 'Kelas 7' : 'A2';
+      var __curLvl = (e ? e.level : __defLvl);
+      var __clsPlaceholder = (__scCls2 && __scCls2.locked ? esc(__scCls2.active) + ' — Kelas 7A' : 'English A2 — Kelas 10A');
+      body = '<form data-tg-form="' + m.kind + '" class="tg-form"><label class="tg-label">' + t('guru.nama-kelas', 'Nama kelas') + '<input name="name" required maxlength="60" value="' + esc(e ? e.name : '') + '" placeholder="' + __clsPlaceholder + '" data-autofocus data-testid="tg-class-name"></label><div class="tg-form-row"><label class="tg-label">Level<select name="level" data-testid="tg-class-level">' + __levels.map(function (l) { return '<option' + (__curLvl === l ? ' selected' : '') + '>' + l + '</option>'; }).join('') + '</select></label>' + __subField + '</div><label class="tg-label">Kode kelas (mis. FZ-QVQDHM)<input name="code" value="' + esc(e ? e.code : '') + '" placeholder="FZ-XXXXXX (otomatis atau gunakan kode sekolah)" maxlength="16"></label><div class="tg-actions"><button type="submit" class="tg-btn is-primary" data-testid="tg-class-submit">' + (e ? t('umum.simpan', 'Simpan') : t('guru.buat-kelas', 'Buat kelas')) + '</button>' + (e ? '' : '<button type="button" class="tg-btn is-ghost" data-tg="seed-demo">Atau muat kelas contoh</button>') + '</div></form>';
     } else if (m.kind === 'add-students') {
       title = t('guru.tambah-siswa', 'Tambah siswa');
       body = '<form data-tg-form="add-students" class="tg-form"><label class="tg-label">' + t('guru.nama-siswa-baris', 'Nama siswa — satu per baris, atau tempel daftar absen') + '<textarea name="names" rows="6" required placeholder="1. Rina Kartika\n2. Dimas Prasetyo\nSari, Bagas, Nadia" data-autofocus data-testid="tg-add-names"></textarea></label><p class="tg-muted">' + esc(t('guru.nama-depan-saja', 'Nomor urut dan nama belakang dibuang otomatis — FIEZEL hanya menyimpan nama depan.')) + '</p><div class="tg-actions"><button type="submit" class="tg-btn is-primary" data-testid="tg-add-submit">' + esc(t('umum.tambahkan', 'Tambahkan')) + '</button><button type="button" class="tg-btn is-ghost" data-tg="modal" data-kind="import-code">' + esc(t('guru.punya-kode-hasil', 'Punya kode hasil murid?')) + '</button></div></form>';
@@ -3879,7 +3912,38 @@
         var catItem = MAPEL_CATALOG[curSId] || MAPEL_CATALOG['MAT'];
 
         var comps = [];
-        if (ui.curriculumTree && ui.curriculumTree.length) {
+        var bBank = mapelBank(curSId);
+        if (bBank && Array.isArray(bBank.competencies) && bBank.competencies.length) {
+          comps = bBank.competencies.map(function (c) {
+            var cGrade = c.grade;
+            if (!cGrade && c.code) {
+              var gm = c.code.match(/-(\d+)-/);
+              if (gm) cGrade = parseInt(gm[1], 10);
+            }
+            return {
+              code: c.code,
+              name: c.name,
+              materi: c.materi || '',
+              grade: cGrade || 7,
+              cpRef: c.cpRef || ''
+            };
+          });
+        } else if (catItem && catItem.competencies && catItem.competencies.length) {
+          comps = catItem.competencies.map(function (c) {
+            var cGrade = c.grade;
+            if (!cGrade && c.code) {
+              var gm = c.code.match(/-(\d+)-/);
+              if (gm) cGrade = parseInt(gm[1], 10);
+            }
+            return {
+              code: c.code,
+              name: c.name,
+              materi: c.materi || '',
+              grade: cGrade || 7,
+              cpRef: c.cpRef || ''
+            };
+          });
+        } else if (ui.curriculumTree && ui.curriculumTree.length) {
           (function walkTree(arr) {
             if (!Array.isArray(arr)) return;
             for (var i = 0; i < arr.length; i++) {
@@ -3902,22 +3966,6 @@
             }
           })(ui.curriculumTree);
         }
-        if (!comps.length && catItem && catItem.competencies) {
-          comps = catItem.competencies.map(function (c) {
-            var cGrade = c.grade;
-            if (!cGrade && c.code) {
-              var gm = c.code.match(/-(\d+)-/);
-              if (gm) cGrade = parseInt(gm[1], 10);
-            }
-            return {
-              code: c.code,
-              name: c.name,
-              materi: c.materi || '',
-              grade: cGrade || 7,
-              cpRef: c.cpRef || ''
-            };
-          });
-        }
 
         /* Hitung nomor Bab (babNum) berurutan per jenjang kelas agar persis buku siswa */
         var gradeBabCounts = {};
@@ -3928,7 +3976,14 @@
           comps[cIdx].babNum = gradeBabCounts[cg];
         }
 
-        var curGradeFilter = ui.assignGradeFilter || 'all';
+        var curGradeFilter = ui.assignGradeFilter;
+        if (!curGradeFilter) {
+          if (c && c.level) {
+            var lm = String(c.level).match(/(\d+)/);
+            if (lm) curGradeFilter = lm[1];
+          }
+          if (!curGradeFilter) curGradeFilter = 'all';
+        }
         var availableGrades = [];
         for (var gi = 0; gi < comps.length; gi++) {
           var gr = comps[gi].grade || 7;
