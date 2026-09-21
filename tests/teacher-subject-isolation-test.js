@@ -156,12 +156,9 @@ console.log('tests/teacher-subject-isolation-test.js — isolasi mapel per token
   assert(rows.filter((r) => r.status === 'Remedial').length === 1, 'tepat 1 remedial di rekap');
 }
 
-/* 7 · Bank autentik tidak dimutasi.
-   HANYA berkas bank yang dilacak git (mat/ipa/eng + sidecar th): mapel-ind/ips
-   adalah artefak lokal tak-lacak dan tidak boleh dibaca di sini — di CI ia tidak
-   ada dan readFileSync akan melempar ENOENT. */
+/* 7 · Bank autentik tidak dimutasi (50 bab / 928 soal Fase D Kemendikbudristek). */
 {
-  const files = ['mapel-mat-d.json', 'mapel-ipa-d.json', 'mapel-eng-d.json'];
+  const files = ['mapel-mat-d.json', 'mapel-ipa-d.json', 'mapel-eng-d.json', 'mapel-ind-d.json', 'mapel-ips-d.json'];
   let comps = 0, items = 0, hilang = [];
   for (const f of files) {
     try {
@@ -170,18 +167,18 @@ console.log('tests/teacher-subject-isolation-test.js — isolasi mapel per token
       (b.competencies || []).forEach((c) => { items += (c.items || []).length; });
     } catch (e) { hilang.push(f); }
   }
-  assert(hilang.length === 0, 'ketiga bank inti terbaca', hilang.join(', '));
-  assert(comps === 27, '27 kompetensi autentik utuh (9 × 3 mapel)', comps + ' kompetensi');
-  assert(items === 324, '324 butir autentik utuh (108 × 3 mapel)', items + ' butir');
+  assert(hilang.length === 0, 'kelima bank inti terbaca', hilang.join(', '));
+  assert(comps === 50, '50 bab autentik utuh Kemendikbudristek Fase D', comps + ' kompetensi');
+  assert(items === 928, '928 butir autentik utuh Kemendikbudristek Fase D', items + ' butir');
 }
 
-/* 8 · AUDIT-2: analitik + laporan + i18n/aria */
+/* 8 · AUDIT-2: analitik + laporan + i18n/aria + isolasi kelas SMP & ClassHub */
 {
-  const { Shell, code } = loadShell({ role: 'teacher', subjectId: 'IPA', gradeId: 'SMP' });
+  const { Shell, code, sb } = loadShell({ role: 'teacher', subjectId: 'IPA', gradeId: 'SMP', teacherName: 'Bu Sari' });
   assert(typeof Shell._scopeMapelList === 'function', 'helper scope list terekspos');
   /* analitik: skill Inggris tidak bocor ke guru IPA */
   const cls = {
-    id: 'c9', name: 'Kelas 7A', subject: 'IPA', code: 'FZ-AAAAAA',
+    id: 'c9', name: 'Kelas 7A', subject: 'IPA', level: 'Kelas 7', code: 'FZ-AAAAAA',
     students: [{ id: 's1', name: 'Andi', results: [{ skill: 'past_tense', correct: 9, total: 10 }, { skill: 'IPA', correct: 5, total: 10 }], attendance: {}, lastActiveAt: Date.now() }],
     assignments: [], announcements: [], journal: [],
   };
@@ -198,7 +195,13 @@ console.log('tests/teacher-subject-isolation-test.js — isolasi mapel per token
   /* ARIA: modal/drawer/inbox berdialog + ESC */
   assert(code.includes("e.key === 'Escape'"), 'ESC menutup modal/drawer/inbox');
   assert(code.includes('aria-label'), 'label aksesibilitas terpasang');
-  void sc; void cls;
+  /* Level SMP di modal kelas baru */
+  assert(code.includes("'Kelas 7', 'Kelas 8', 'Kelas 9', 'Fase D (SMP)'"), 'level SMP terpasang di modal kelas baru');
+  /* Class Hub isolasi */
+  const hubCode = fs.readFileSync(path.join(ROOT, 'features/class-hub/fiezel-class-hub.js'), 'utf8');
+  assert(hubCode.includes('tclass-mapel-hub-card'), 'kartu penugasan mapel nasional terpasang di tBuat ClassHub');
+  assert(hubCode.includes('skillLabel(c.subject)'), 'tKelas menampilkan nama mapel resmi');
+  void sc; void cls; void sb;
 }
 
 console.log(`\nHasil: ${pass} lulus, ${fail} gagal.`);
