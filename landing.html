@@ -12,7 +12,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#FFF9EE">
   <title>FIEZEL — Belajar Bahasa Inggris &amp; Jepang untuk Indonesia &amp; Thailand</title>
-  <meta name="description" content="FIEZEL adalah platform belajar bahasa Inggris dan Jepang adaptif berbasis AI untuk pelajar Indonesia dan Thailand. Vocabulary, Grammar, Reading, Speaking, Listening, AI Tutor, dan Teacher Dashboard. Gratis, bisa dipakai offline.">
+  <meta name="description" content="FIEZEL adalah platform belajar bahasa Inggris dan Jepang adaptif berbasis AI untuk pelajar Indonesia dan Thailand. Vocabulary, Grammar, Reading, Speaking, Listening, AI Tutor, serta KelasKu untuk Guru yang menyambungkan tugas kelas ke Kurikulum Nasional. Gratis, bisa dipakai offline.">
   <meta name="keywords" content="FIEZEL, belajar bahasa Inggris, belajar bahasa Jepang, aplikasi bahasa Inggris, aplikasi bahasa Jepang, English learning, Japanese learning, adaptive learning, vocabulary, grammar, CEFR, JLPT, Indonesia, Thailand, เรียนภาษาอังกฤษ, เรียนภาษาญี่ปุ่น">
   <meta name="author" content="FIEZEL">
   <!-- Berkas ini diterbitkan ke ~/public_html/app/, jadi URL-nya /app/landing.html.
@@ -67,6 +67,7 @@
           "Tes penempatan CEFR otomatis",
           "AI Tutor personal",
           "Teacher Dashboard untuk guru",
+          "Tugas kelas yang menempel bab Kurikulum Nasional (15 bab, 115 soal, kelas 7–12)",
           "Duel Belajar antar murid",
           "Offline-first PWA",
           "Gratis tanpa biaya"
@@ -108,6 +109,14 @@
             "acceptedAnswer": {
               "@type": "Answer",
               "text": "Ya, FIEZEL tersedia untuk pengguna di Thailand (ประเทศไทย). Platform ini mendukung antarmuka dan konten dalam bahasa Thailand (ภาษาไทย), sehingga pelajar di Thailand dapat belajar Bahasa Inggris dan Bahasa Jepang dengan nyaman menggunakan FIEZEL."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Apakah FIEZEL bisa dipakai guru dan sekolah?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Bisa, lewat KelasKu untuk Guru: membuat ruang kelas, menerbitkan tugas yang menempel bab dan sub-bab Kurikulum Nasional, melihat analitik per murid dan per kompetensi, serta membagikan rapor orang tua. Perlu dicatat apa adanya: bank kurikulumnya berisi 15 bab dan 115 soal untuk kelas 7–12, jadi ia alat guru menerbitkan tugas, bukan sumber materi kurikulum utama. Kapasitas terpasang 250 pengguna — cukup untuk satu kelas, belum cukup untuk satu sekolah. Selengkapnya di https://fiezel.my.id/untuk-sekolah.html"
             }
           },
           {
@@ -1192,7 +1201,7 @@
             <span class="t-benefit-icon">📋</span>
             <div>
               <h4 data-i18n="teach.b2-title">Tugas &amp; Ujian Dinilai Otomatis</h4>
-              <p data-i18n="teach.b2-desc">Buat kuis mini atau latihan dari ribuan bank soal kurikulum, hasil terkoreksi instan tanpa koreksi manual.</p>
+              <p data-i18n="teach.b2-desc">Terbitkan tugas yang menempel bab Kurikulum Nasional — pilih Fase, bab, sub-bab, lalu fitur bahasanya. Hasil terkoreksi instan tanpa koreksi manual.</p>
             </div>
           </div>
 
@@ -1311,7 +1320,7 @@
         'teach.title': 'KelasKu untuk Guru: Dasbor Manajemen Kelas Cerdas',
         'teach.lead': 'Bebaskan guru dari beban administrasi manual. Pantau kemajuan siswa, deteksi dini siswa tertinggal, dan bagikan tugas dalam hitungan detik.',
         'teach.b1-title': 'Deteksi Dini Siswa Tertinggal', 'teach.b1-desc': 'Algoritma langsung menandai siswa yang memerlukan perhatian khusus sebelum mereka tertinggal jauh.',
-        'teach.b2-title': 'Tugas & Ujian Dinilai Otomatis', 'teach.b2-desc': 'Buat kuis mini atau latihan dari ribuan bank soal kurikulum, hasil terkoreksi instan tanpa koreksi manual.',
+        'teach.b2-title': 'Tugas & Ujian Dinilai Otomatis', 'teach.b2-desc': 'Terbitkan tugas yang menempel bab Kurikulum Nasional — pilih Fase, bab, sub-bab, lalu fitur bahasanya. Hasil terkoreksi instan tanpa koreksi manual.',
         'teach.b3-title': 'Kartu Sapa & Laporan Wali Murid', 'teach.b3-desc': 'Kirim apresiasi atau laporan perkembangan belajar ke WhatsApp orang tua hanya dengan satu klik.',
         'teach.cta': 'Buka Demo <span class="kelasku-brand"><span class="kelasku-main">KelasKu</span> <span class="kelasku-tag">untuk Guru</span></span> →',
         'articles.kicker': 'Wawasan Pembelajaran',
@@ -1364,7 +1373,7 @@
         'teach.title': 'FIEZEL KelasKu สำหรับครู: แดชบอร์ดจัดการชั้นเรียนอัจฉริยะ',
         'teach.lead': 'ปลดปล่อยครูจากภาระงานเอกสาร ติดตามความก้าวหน้า ตรวจจับนักเรียนที่ต้องการความช่วยเหลือ และมอบหมายงานในไม่กี่วินาที',
         'teach.b1-title': 'ตรวจจับนักเรียนที่เสี่ยงตามไม่ทัน', 'teach.b1-desc': 'อัลกอริทึมแจ้งเตือนนักเรียนที่ต้องการการดูแลเป็นพิเศษทันทีก่อนจะตามไม่ทัน',
-        'teach.b2-title': 'ตรวจการบ้านและข้อสอบอัตโนมัติ', 'teach.b2-desc': 'สร้างแบบทดสอบย่อยจากคลังข้อสอบตามหลักสูตร ตรวจผลทันทีโดยไม่ต้องตรวจมือ',
+        'teach.b2-title': 'ตรวจการบ้านและข้อสอบอัตโนมัติ', 'teach.b2-desc': 'เผยแพร่การบ้านที่ยึดกับบทในหลักสูตรแกนกลาง — เลือกช่วงชั้น บท บทย่อย แล้วจุดภาษา ตรวจผลทันทีโดยไม่ต้องตรวจมือ',
         'teach.b3-title': 'การ์ดทักทายและรายงานผู้ปกครอง', 'teach.b3-desc': 'ส่งคำชมหรือรายงานพัฒนาการไปยัง WhatsApp ของผู้ปกครองได้ในคลิกเดียว',
         'teach.cta': 'เปิดดูเดโม KelasKu สำหรับครู →',
         'articles.kicker': 'มุมมองการเรียนรู้',
