@@ -552,6 +552,48 @@
     'guru.tandai-siswa': 'แท็กนักเรียน (ไม่บังคับ)',
     'guru.peta-panas': 'แผนที่ความร้อน',
     'guru.peta-judul': 'นักเรียน × ทักษะ — มองครั้งเดียวรู้ว่าใครต้องการอะไร',
-    'guru.nav-komunikasi': 'การสื่อสาร'
+    'guru.nav-komunikasi': 'การสื่อสาร',
+    /* m025-359: pasangan Thai untuk lima kalimat sidebar yang dulu literal telanjang. */
+    'guru.keluar-akun': 'ออกจากบัญชีครู',
+    'guru.ke-mode-murid': 'ไปที่โหมดนักเรียน',
+    'guru.nama-default': 'ครู FIEZEL',
+    'guru.atur-profil': 'ตั้งค่าโปรไฟล์ →',
+    'kelas.hasil': 'ผลลัพธ์',
+    /* Panel sambutan dasbor guru — pasangan Thai untuk tujuh kalimat itu. */
+    'guru.selamat-datang': 'ยินดีต้อนรับ',
+    'guru.siapa-disapa': 'ว่าควรทักใครในวันนี้',
+    'guru.welcome-lead': 'FIEZEL KelasKu สำหรับครู เปลี่ยนข้อมูลการฝึกของนักเรียนให้เป็นการลงมือ: ตรวจพบนักเรียนที่ตามไม่ทันแต่เนิ่น ๆ การ์ดทักทายเฉพาะบุคคลในคลิกเดียว รายงานถึงผู้ปกครองอัตโนมัติ กลุ่มเรียนที่จับคู่ให้เอง และการบ้านที่ตรวจตัวเอง',
+    'guru.coba-kelas-contoh': 'ลองด้วยชั้นเรียนตัวอย่าง ({n} คน)',
+    'guru.welcome-privasi': 'ข้อมูลอยู่ในเครื่องของคุณ — ไม่มีคำตอบดิบของนักเรียน',
+    'guru.welcome-hemat': 'โดยเฉลี่ยครูประหยัดเวลาได้ 40+ นาทีต่อสัปดาห์สำหรับรายงานและข้อความ',
+    'guru.welcome-offline': 'ใช้งานออฟไลน์ได้ เหมาะกับโรงเรียนที่สัญญาณจำกัด'
+,
+    /* m025-359: kalimat antarmuka dasbor guru & ruang kelas yang dulu literal
+       telanjang di dalam potongan HTML. Dijaga tests/teacher-i18n-lazy-test.js cek (D). */
+    'guru.kode-kelas-jelas': 'นักเรียนพิมพ์รหัสนี้ตอนเริ่มใช้งาน เมื่อจบแต่ละเซสชัน ผลจะถูกส่งไปยังเซิร์ฟเวอร์และเข้ามาที่นี่โดยอัตโนมัติ',
+    'guru.siapa-belum': 'ใครที่ยังไม่ทำ',
+    'guru.kelompok-otomatis': 'กลุ่มเรียนอัตโนมัติ',
+    'guru.kelompok-mentor': 'แต่ละกลุ่มมีพี่เลี้ยง',
+    'guru.kelompok-jelas': 'นักเรียนที่เก่งถูกจับคู่กับที่ยังอ่อน (peer tutoring) การอธิบายให้เพื่อนฟังคือการฝึกที่ดีที่สุดสำหรับตัวพี่เลี้ยงเอง',
+    'guru.jurnal-contoh': 'ตัวอย่าง: วิธีไทม์ไลน์บนกระดานได้ผลดีกับ yesterday/ago ส่วนฟิกรียังสับสน verb 1/2',
+    'guru.proctor-catatan': 'ตรวจพบการสลับออกจากหน้าจอ FIEZEL ระหว่างทำเซสชัน ลองถามนักเรียนก่อน — อาจถูกเรียกหรือสัญญาณหลุด',
+    'guru.nama-depan-saja': 'เลขลำดับและนามสกุลจะถูกตัดออกอัตโนมัติ — FIEZEL เก็บเฉพาะชื่อต้น',
+    'guru.punya-kode-hasil': 'มีรหัสผลของนักเรียนไหม',
+    'guru.kode-hasil-tutor': 'รหัสผลสำหรับติวเตอร์',
+    'guru.impor-kode-jelas': 'จาก Today Plan ของเขา (แผนที่ → สรุป) รหัสมีเพียงชื่อต้นและความแม่นยำรายทักษะ การบ้านที่ตรงกันจะถูกนับว่าเสร็จอัตโนมัติ',
+    'guru.salin-pengingat': 'คัดลอกคำเตือนสำหรับผู้ที่ยังไม่ทำ',
+    'umum.salin': 'คัดลอก',
+    'umum.tambahkan': 'เพิ่ม',
+    'kelas.masukkan-kode': 'กรอกรหัสจาก KelasKu',
+    'kelas.kode-jelas': 'รหัสอยู่ในรูปแบบ FZ-XXXXXX เมื่อเข้าร่วมแล้ว การบ้านของครูจะเข้ามาอัตโนมัติและผลของคุณจะกลับไปหาครู',
+    'kelas.isi-peta-skill': 'ทำการบ้านหรือเซสชันการเรียนเพื่อเติมแผนที่ทักษะ',
+    'kelas.tanpa-saran': 'ไม่มีการเปลี่ยนแปลงที่แนะนำ',
+    'kelas.sumber-angka': 'ตัวเลขทั้งหมดด้านล่างมาจากหลักฐานของนักเรียนในชั้นเรียนนี้: รายงานการซิงก์และข้อที่ตอบผิดในการบ้านของคุณ ไม่มี AI คลาวด์ ไม่มีการเดาโดยไม่มีข้อมูล',
+    'kelas.jawaban-keliru': 'ข้อที่ตอบผิดในการบ้านที่คุณส่ง',
+    'kelas.tempel-soal-jelas': 'วางโจทย์ — หนึ่งบรรทัดต่อหนึ่งข้อ:',
+    'kelas.tempel-soal-format': '(เฉลย: ตัวอักษร ตัวเลข หรือข้อความ) บล็อกที่มีหมายเลขพร้อม A./B./C./D. และ “Answer: B” ก็อ่านได้เช่นกัน'
+,
+    'guru.n-menit': '{n} นาที',
+    'guru.waktu-hemat-tip': 'เวลางานธุรการโดยประมาณที่ FIEZEL ทำแทนคุณ'
   });
 }());
