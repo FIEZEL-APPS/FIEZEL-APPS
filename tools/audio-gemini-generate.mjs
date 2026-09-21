@@ -25,7 +25,7 @@ const AudioKey = require(path.join(ROOT, 'features/audio-assets/fiezel-audio-key
 
 const MANIFEST_PATH = path.join(ROOT, 'audio/manifest.json');
 const R2_API = 'https://api.cloudflare.com/client/v4/accounts';
-const MAX_RETRIES = 5;
+const MAX_RETRIES = 2;
 
 /**
  * Gemini Voice Profiles:
@@ -420,6 +420,10 @@ async function main() {
     if (!result.bytes) {
       failed++;
       console.error(`[FAILED] Gagal generate ${identity.audioKey.slice(0, 8)}: ${result.error}`);
+      if (failed >= 3 && generated === 0) {
+        console.warn(`[CIRCUIT BREAKER] 3 item gagal berturut-turut. Menghentikan batch untuk menghemat kuota/waktu.`);
+        break;
+      }
       continue;
     }
 
@@ -439,15 +443,11 @@ async function main() {
 
     manifest.assets[identity.audioKey] = manifestEntry(identity, objectKey, result.bytes, sourceRef);
     generated++;
+    // Simpan progres manifest secara langsung agar setiap audio yang berhasil langsung tercatat
+    saveManifest(manifest);
 
     // Jeda 4.5 detik antar request agar stabil di bawah batas 15 RPM Gemini Free Tier
     await new Promise((r) => setTimeout(r, 4500));
-
-    // Simpan progres manifest setiap 20 item agar aman jika terhenti
-    if (generated % 20 === 0) {
-      saveManifest(manifest);
-      console.log(`--> Progress tersimpan: ${generated} item selesai.`);
-    }
   }
 
   saveManifest(manifest);
