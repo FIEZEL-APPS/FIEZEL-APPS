@@ -207,7 +207,6 @@
       return { nama: s.name, akurasi: acc == null ? null : Math.round(acc * 100), status: status, mapel: mapel || (c.subject || ''), kehadiran: T.attendanceRate(s, 10) };
     });
   }
-  /* PILAR 1 helpers (scope token guru) berlanjut di bawah. */
   /*
    * DUA detak, bukan satu. m025-261 menyatukan keduanya pada 3 detik dan itu merusak dua hal
    * sekaligus; m025-262 memisahkannya lagi.
