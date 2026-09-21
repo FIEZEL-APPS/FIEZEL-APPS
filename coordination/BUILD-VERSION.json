@@ -1,7 +1,7 @@
 {
-  "version": "m025-357",
-  "claimedBy": "branch claude/blissful-ritchie-ozerrx",
-  "claimedAt": "2026-09-21T01:03:45.703Z",
-  "reason": "m025-357: sistem Kurikulum & Kompetensi pindah ke dalam dasbor KelasKu guru + 26 glyph ikon",
+  "version": "m025-358",
+  "claimedBy": "branch feat/teacher-subject-isolation",
+  "claimedAt": "2026-09-21T11:00:37.813Z",
+  "reason": "isolasi mapel per token guru KelasKu",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }

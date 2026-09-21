@@ -54,6 +54,159 @@
   if (!root) return;
   var S = function () { return root.FiezelTeacherStore; };
   var el = null, env = {}, st = null, ui = { modal: null, drawer: null, filter: '', insightSkill: 'past_tense', attDate: null, pick: {}, syncing: false, curriculumSubject: 'MAT', curriculumGrade: 'ALL', curriculumTree: null, curriculumLoading: false, curriculumError: null, curriculumSeeded: null, seeding: false, seedStatus: null, seedStatusLoading: false, seedStatusError: null, seedBusy: '', bankDepth: null, bankDepthSubject: '', bankDepthLoading: false, bankDepthCapped: false }, syncTimer = null, chipTimer = null, visListener = null;
+
+  /* ---------------------------------------------------------------------------
+   * PILAR 1 · ISOLASI MATA PELAJARAN PER TOKEN GURU (Token-Based Subject Scope)
+   *
+   * Token guru (FiezelAccount.state()) membawa subjectId (+ gradeId). Seluruh
+   * dashboard dikunci ke lisensi itu:
+   *  - 1 mapel  -> dropdown disembunyikan, diganti badge; semua fitur tersaring.
+   *  - N mapel  -> dropdown HANYA berisi mapel berlisensi (acc.subjectIds).
+   *  - tanpa token -> perilaku lama (17 mapel), nol breaking change untuk demo.
+   *
+   * Bentuk multi-mapel yang didukung (salah satu cukup):
+   *   acc.subjectIds: ['IPA','MAT'] | acc.subjects: [...] | acc.subjectId: 'IPA'
+   * Grade: acc.gradeId ('SMP'/'SMA'/'SD') atau acc.grade. Dipakai untuk badge
+   * dan filter bab per kelas (Fase D = 7,8,9).
+   * Murni + fail-soft supaya bisa diuji di Node tanpa DOM.
+   * ------------------------------------------------------------------------- */
+  function teacherAccount() {
+    try { return (root.FiezelAccount && root.FiezelAccount.state && root.FiezelAccount.state()) || null; }
+    catch (_) { return null; }
+  }
+  function validSubjectId(id) {
+    if (!id) return null;
+    var v = String(id).trim().toUpperCase();
+    for (var i = 0; i < MAPEL_LIST.length; i++) if (MAPEL_LIST[i].id === v) return v;
+    return null;
+  }
+  function teacherSubjectScope() {
+    var acc = teacherAccount();
+    var licensed = [];
+    try {
+      if (acc) {
+        if (Array.isArray(acc.subjectIds)) licensed = acc.subjectIds.slice();
+        else if (Array.isArray(acc.subjects)) licensed = acc.subjects.slice();
+        else if (Array.isArray(acc.subject_ids)) licensed = acc.subject_ids.slice();
+        if (acc.subjectId) licensed.push(acc.subjectId);
+        if (acc.subject_id) licensed.push(acc.subject_id);
+      }
+    } catch (_) { licensed = []; }
+    licensed = licensed.map(validSubjectId).filter(Boolean);
+    /* dedup, pertahankan urutan lisensi */
+    var seen = {}, uniq = [];
+    licensed.forEach(function (x) { if (!seen[x]) { seen[x] = 1; uniq.push(x); } });
+    licensed = uniq;
+    var grade = null;
+    try {
+      if (acc) grade = acc.gradeId || acc.grade_id || acc.grade || null;
+      if (grade) grade = String(grade).trim().toUpperCase();
+      if (grade !== 'SMP' && grade !== 'SMA' && grade !== 'SD') {
+        if (grade === 'FASE D' || grade === 'FASE-D' || grade === 'D') grade = 'SMP';
+        else if (grade === 'FASE E' || grade === 'FASE F') grade = 'SMA';
+        else if (!grade) grade = null;
+        else grade = 'SMP';
+      }
+    } catch (_) { grade = null; }
+    if (!grade) grade = 'SMP';
+    if (!licensed.length) {
+      var cur = validSubjectId(ui.curriculumSubject) || validSubjectId(ui.assignSubject) || 'MAT';
+      return { subjects: MAPEL_LIST.map(function (m) { return m.id; }), active: cur, grade: grade, locked: false, multi: false };
+    }
+    var active = validSubjectId(ui.curriculumSubject) || validSubjectId(ui.assignSubject);
+    if (!active || licensed.indexOf(active) < 0) active = licensed[0];
+    return { subjects: licensed, active: active, grade: grade, locked: true, multi: licensed.length > 1 };
+  }
+  function scopeMapelList() {
+    var sc = teacherSubjectScope();
+    if (!sc.locked) return MAPEL_LIST.slice();
+    return MAPEL_LIST.filter(function (m) { return sc.subjects.indexOf(m.id) !== -1; });
+  }
+  function gradeKelasLabel(grade) {
+    if (grade === 'SMA') return t('guru.scope-kelas-sma', 'Kelas 10, 11, 12');
+    if (grade === 'SD') return t('guru.scope-kelas-sd', 'Kelas 1–6');
+    return t('guru.scope-kelas-smp', 'Kelas 7, 8, 9');
+  }
+  function subjectScopeBadge() {
+    var sc = teacherSubjectScope();
+    if (!sc.locked) return '';
+    var m = null;
+    for (var i = 0; i < MAPEL_LIST.length; i++) if (MAPEL_LIST[i].id === sc.active) m = MAPEL_LIST[i];
+    var nama = m ? m.name : sc.active;
+    return '<div class="tg-subject-scope" data-testid="tg-subject-scope-badge" role="status" aria-label="' + esc(nama + ' ' + sc.grade) + '">' +
+      icon('book-open') + '<span><b>' + esc(nama) + ' · ' + esc(sc.grade) + '</b><small>' + esc(gradeKelasLabel(sc.grade)) + '</small></span></div>';
+  }
+  /* Subjek sebuah tugas: sumber mapel > skill mapel > null (non-mapel/legacy). */
+  function assignmentSubject(a) {
+    try {
+      if (a && a.source && a.source.subjectId && validSubjectId(a.source.subjectId)) return validSubjectId(a.source.subjectId);
+      var sk = a && a.skills && a.skills[0] ? String(a.skills[0]).toUpperCase() : '';
+      if (validSubjectId(sk)) return sk;
+      /* skill turunannya berbentuk komp_ipa_d_7_... atau KOMP-IPA-... -> petik mapelnya */
+      if (sk.indexOf('KOMP') === 0) {
+        var m = sk.match(/KOMP[-_]([A-Z]{3})/);
+        if (m && validSubjectId(m[1])) return m[1];
+      }
+      if (sk.indexOf('Q-') === 0 || sk.indexOf('Q_') === 0) return null;
+    } catch (_) {}
+    return null;
+  }
+  function isAssignmentVisible(a, sc) {
+    if (!sc || !sc.locked) return true;
+    var sub = assignmentSubject(a);
+    if (!sub) return false;
+    return sc.subjects.indexOf(sub) !== -1;
+  }
+  /* Apakah sebuah skill analitik milik subjek berlisensi? Dipakai menyaring
+     heatmap/skill-map/miskonsepsi agar guru IPA tidak membaca Past Tense. */
+  function skillMatchesSubject(skill, sc) {
+    if (!sc || !sc.locked) return true;
+    var k = String(skill || '').toUpperCase();
+    for (var i = 0; i < sc.subjects.length; i++) {
+      var sub = sc.subjects[i];
+      if (k === sub) return true;
+      if (k.indexOf('KOMP_' + sub) === 0 || k.indexOf('KOMP-' + sub) === 0) return true;
+    }
+    return false;
+  }
+  /* Kelompok remedial/pengayaan otomatis per KKM (default 75%). Murni. */
+  function remedialGroups(c, kkm) {
+    var T = S(), out = { kkm: (kkm == null ? 0.75 : kkm), remedial: [], pengayaan: [], tuntas: [] };
+    if (!c || !c.students) return out;
+    var sc = null;
+    try { sc = teacherSubjectScope(); } catch (_) { sc = null; }
+    c.students.forEach(function (s) {
+      var v = null;
+      try {
+        if (sc && sc.locked) {
+          /* nilai mapel: rata-rata skill yang berlabel subjek aktif */
+          var vals = [];
+          (s.results || []).forEach(function (r) {
+            var k = String(r.skill || '').toUpperCase();
+            var milik = (k === sc.active) || k.indexOf('KOMP_' + sc.active) === 0 || k.indexOf('KOMP-' + sc.active) === 0;
+            if (milik && r.total) vals.push(r.correct / r.total);
+          });
+          v = vals.length ? vals.reduce(function (x, y) { return x + y; }, 0) / vals.length : T.overallAcc(s);
+        } else v = T.overallAcc(s);
+      } catch (_) { v = null; }
+      var row = { s: s, acc: v };
+      if (v == null) { out.tuntas.push(row); return; }
+      if (v < out.kkm) out.remedial.push(row);
+      else if (v >= 0.9) out.pengayaan.push(row);
+      else out.tuntas.push(row);
+    });
+    return out;
+  }
+  function rekapRows(c) {
+    var T = S(), sc = null;
+    try { sc = teacherSubjectScope(); } catch (_) {}
+    var mapel = (sc && sc.locked) ? sc.active : null;
+    return (c.students || []).map(function (s) {
+      var acc = T.overallAcc(s);
+      var status = acc == null ? t('guru.rekap-belum-ada', 'Belum ada nilai') : acc >= 0.75 ? 'Tuntas' : 'Remedial';
+      return { nama: s.name, akurasi: acc == null ? null : Math.round(acc * 100), status: status, mapel: mapel || (c.subject || ''), kehadiran: T.attendanceRate(s, 10) };
+    });
+  }
   /*
    * DUA detak, bukan satu. m025-261 menyatukan keduanya pada 3 detik dan itu merusak dua hal
    * sekaligus; m025-262 memisahkannya lagi.
@@ -75,8 +228,8 @@
   var SYNC_EVERY_MS = 10000;
   var syncFailStreak = 0;
   var pendingRender = false;
-  var NAV = [['hub', t('guru.nav-ruang-kelas', 'Ruang Kelas'), 'school'], ['briefing', t('guru.nav-ringkasan', 'Ringkasan Hari Ini'), 'sunrise'], ['classes', t('guru.tab-kelas-siswa', 'Kelas & Siswa'), 'users'], ['assignments', t('guru.tab-tugas-ujian', 'Tugas & Ujian'), 'clipboard-list'], ['insights', 'Analitik', 'activity'], ['comms', 'Komunikasi', 'megaphone'], ['journal', t('guru.tab-jurnal', 'Jurnal Guru'), 'notebook-pen']];
-  var TITLE = { hub: t('guru.judul-ruang-kelas', 'Ruang Kelas — guru, murid, dan hasil belajar dalam satu layar'), briefing: t('guru.judul-ringkasan', 'Ringkasan hari ini'), classes: t('guru.tab-kelas-siswa', 'Kelas & Siswa'), assignments: t('guru.tab-tugas-ujian', 'Tugas & Ujian'), insights: t('guru.judul-analitik', 'Analitik — siapa yang perlu dibantu'), comms: 'Komunikasi', journal: t('guru.tab-jurnal', 'Jurnal Guru'), settings: t('guru.tab-profil', 'Profil Guru') };
+  var NAV = [['hub', t('guru.nav-ruang-kelas', 'Ruang Kelas'), 'school'], ['briefing', t('guru.nav-ringkasan', 'Ringkasan Hari Ini'), 'sunrise'], ['classes', t('guru.tab-kelas-siswa', 'Kelas & Siswa'), 'users'], ['assignments', t('guru.tab-tugas-ujian', 'Tugas & Ujian'), 'clipboard-list'], ['insights', t('guru.judul-analitik', 'Analitik'), 'activity'], ['comms', t('guru.nav-komunikasi', 'Komunikasi'), 'megaphone'], ['journal', t('guru.tab-jurnal', 'Jurnal Guru'), 'notebook-pen']];
+  var TITLE = { hub: t('guru.judul-ruang-kelas', 'Ruang Kelas — guru, murid, dan hasil belajar dalam satu layar'), briefing: t('guru.judul-ringkasan', 'Ringkasan hari ini'), classes: t('guru.tab-kelas-siswa', 'Kelas & Siswa'), assignments: t('guru.tab-tugas-ujian', 'Tugas & Ujian'), insights: t('guru.judul-analitik', 'Analitik — siapa yang perlu dibantu'), comms: t('guru.nav-komunikasi', 'Komunikasi'), journal: t('guru.tab-jurnal', 'Jurnal Guru'), settings: t('guru.tab-profil', 'Profil Guru'), curriculum: t('guru.nav-kurikulum', 'Kurikulum & Materi') };
 
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (m) { return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' })[m]; }); }
   function pct(v) { return S().pct(v); }
@@ -144,10 +297,18 @@
       name: 'Matematika',
       grade: 'SD / SMP / SMA',
       competencies: [
-        { code: 'KOMP-MAT-D-7-BIL-01', name: t('mapel_mat_c1_name', 'Operasi Hitung Bilangan Bulat & Pecahan'), materi: t('mapel_mat_c1_mat', 'Penjumlahan, pengurangan, perkalian, pembagian bilangan rasional dan estimasi') },
-        { code: 'KOMP-MAT-D-8-ALJ-01', name: t('mapel_mat_c2_name', 'Aljabar & Persamaan Linier Dua Variabel'), materi: t('mapel_mat_c2_mat', 'Menyelesaikan SPLDV dengan metode substitusi dan eliminasi kontekstual') },
-        { code: 'KOMP-MAT-D-8-GEO-01', name: t('mapel_mat_c3_name', 'Geometri & Teorema Pythagoras'), materi: t('mapel_mat_c3_mat', 'Membuktikan dan menghitung panjang sisi segitiga siku-siku serta tripel Pythagoras') },
-        { code: 'KOMP-MAT-D-9-STA-01', name: t('mapel_mat_c4_name', 'Statistika & Peluang Empiris'), materi: t('mapel_mat_c4_mat', 'Menghitung pemusatan data rata-rata, median, modus, dan frekuensi relatif') }
+        { code: 'KOMP-MAT-D-7-BAB1-01', name: t('mapel_mat_c1_name', 'Bilangan Bulat'), materi: t('mapel_mat_c1_mat', 'Operasi Penjumlahan & Pengurangan Bilangan Bulat, Perkalian & Pembagian, Faktor & Kelipatan (KPK/FPB), Penerapan Kontekstual'), grade: 7 },
+        { code: 'KOMP-MAT-D-7-BAB2-01', name: t('mapel_mat_c2_name', 'Aljabar'), materi: t('mapel_mat_c2_mat', 'Unsur Bentuk Aljabar, Penjumlahan & Pengurangan Bentuk Aljabar, Perkalian & Pembagian Bentuk Aljabar, Pemodelan & Penyederhanaan'), grade: 7 },
+        { code: 'KOMP-MAT-D-7-BAB3-01', name: t('mapel_mat_c3_name', 'Rasio dan Proporsi'), materi: t('mapel_mat_c3_mat', 'Konsep Rasio & Perbandingan, Perbandingan Senilai & Berbalik Nilai, Skala Peta, Penerapan Kontekstual Kecepatan & Waktu'), grade: 7 },
+        { code: 'KOMP-MAT-D-7-BAB4-01', name: t('mapel_mat_c4_name', 'Bentuk Geometri dan Bangun Datar'), materi: t('mapel_mat_c4_mat', 'Sifat Garis & Sudut, Hubungan Antarsudut, Keliling & Luas Segitiga & Segi Empat (Persegi, Persegi Panjang, Jajar Genjang, Trapesium)'), grade: 7 },
+        { code: 'KOMP-MAT-D-7-BAB5-01', name: t('mapel_mat_c5_name', 'Bab 5: Kesebangunan dan Hubungan Antar Garis'), materi: t('mapel_mat_c5_mat', 'Hubungan Antar Garis & Sudut, Sudut Sejajar & Berpotongan, Konsep Kesebangunan & Kekongruenan Bangun Datar'), grade: 7 },
+        { code: 'KOMP-MAT-D-7-BAB6-01', name: t('mapel_mat_c6_name', 'Bab 6: Data dan Diagram'), materi: t('mapel_mat_c6_mat', 'Investigasi Statistika, Jenis-jenis Data, Penyajian Data (Diagram Batang, Diagram Lingkaran, Line Plot), Interpretasi dan Analisis Diagram'), grade: 7 },
+        { code: 'KOMP-MAT-D-8-BAB1-01', name: t('mapel_mat_c7_name', 'Teorema Pythagoras dan Lingkaran'), materi: t('mapel_mat_c7_mat', 'Teorema Pythagoras & Tripel Pythagoras, Penerapan Pythagoras, Keliling & Luas Lingkaran, Panjang Busur & Luas Juring'), grade: 8 },
+        { code: 'KOMP-MAT-D-8-ALJ-01', name: t('mapel_mat_c8_name', 'Aljabar & Persamaan Linier Dua Variabel'), materi: t('mapel_mat_c8_mat', 'Menyelesaikan SPLDV dengan metode substitusi dan eliminasi kontekstual'), grade: 8 },
+        { code: 'KOMP-MAT-D-8-FUN-01', name: t('mapel_mat_c9_name', 'Relasi, Fungsi & Persamaan Garis Lurus'), materi: t('mapel_mat_c9_mat', 'Pemetaan relasi fungsi, gradien garis lurus, dan persamaan garis lurus'), grade: 8 },
+        { code: 'KOMP-MAT-D-9-STA-01', name: t('mapel_mat_c10_name', 'Statistika & Peluang Empiris'), materi: t('mapel_mat_c10_mat', 'Menghitung pemusatan data rata-rata, median, modus, dan frekuensi relatif'), grade: 9 },
+        { code: 'KOMP-MAT-D-9-BAK-01', name: t('mapel_mat_c11_name', 'Bilangan Berpangkat & Bentuk Akar'), materi: t('mapel_mat_c11_mat', 'Sifat-sifat eksponen, merasionalkan bentuk akar, dan notasi ilmiah'), grade: 9 },
+        { code: 'KOMP-MAT-D-9-KUA-01', name: t('mapel_mat_c12_name', 'Persamaan & Fungsi Kuadrat'), materi: t('mapel_mat_c12_mat', 'Faktorisasi kuadrat, rumus abc, nilai optimum, dan grafik fungsi kuadrat'), grade: 9 }
       ],
       teachingBrief: {
         summary: t('mapel_mat_tb_sum', 'Penguasaan konsep bilangan rasional, pemodelan aljabar, dan logika spasial geometri.'),
@@ -162,9 +323,18 @@
       name: 'Bahasa Indonesia',
       grade: 'SD / SMP / SMA',
       competencies: [
-        { code: 'KOMP-IND-D-7-TEK-01', name: t('mapel_ind_c1_name', 'Teks Deskripsi & Ide Pokok Paragraf'), materi: t('mapel_ind_c1_mat', 'Menemukan gagasan utama dan mencirikan teks deskriptif objektif') },
-        { code: 'KOMP-IND-D-8-EKS-01', name: t('mapel_ind_c2_name', 'Teks Eksplanasi Fenomena Alam & Sosial'), materi: t('mapel_ind_c2_mat', 'Menganalisis hubungan kausalitas sebab-akibat dan konjungsi kronologis') },
-        { code: 'KOMP-IND-E-10-ARG-01', name: t('mapel_ind_c3_name', 'Teks Argumentasi & Membedakan Fakta vs Opini'), materi: t('mapel_ind_c3_mat', 'Berpikir kritis memilah bukti empiris faktual terhadap klaim opini subjektif') }
+        { code: 'KOMP-IND-D-7-BAB1-01', name: t('mapel_ind_c1_name', 'Bab 1: Jelajah Nusantara'), materi: t('mapel_ind_c1_mat', 'Mengakses Informasi & Menjelajah Keindahan Alam, Memahami Gaya & Isi Teks Deskripsi, Unsur Kebahasaan: Kata Berimbuhan meN- & Majas Personifikasi'), grade: 7 },
+        { code: 'KOMP-IND-D-7-BAB2-01', name: t('mapel_ind_c2_name', 'Bab 2: Kelana Cerita Unik'), materi: t('mapel_ind_c2_mat', 'Mengenal Puisi Rakyat (Pantun & Gurindam), Cerita Fantasi, Analisis Tokoh & Alur, Unsur Kebahasaan Teks Narasi'), grade: 7 },
+        { code: 'KOMP-IND-D-7-BAB3-01', name: t('mapel_ind_c3_name', 'Bab 3: Hal yang Baik bagi Tubuh'), materi: t('mapel_ind_c3_mat', 'Memahami Teks Prosedur Kesehatan & Olahraga, Struktur Teks Prosedur (Tujuan, Bahan, Langkah), Unsur Kebahasaan: Kalimat Imperatif & Kata Keterangan'), grade: 7 },
+        { code: 'KOMP-IND-D-7-BAB4-01', name: t('mapel_ind_c4_name', 'Bab 4: Aksi Nyata Pelindung Bumi'), materi: t('mapel_ind_c4_mat', 'Memahami Teks Berita Lingkungan, Unsur Berita 5W+1H (ADIKSIMBA), Struktur Berita (Kepala, Tubuh, Ekor), Membandingkan Media Cetak & Digital'), grade: 7 },
+        { code: 'KOMP-IND-D-7-BAB5-01', name: t('mapel_ind_c5_name', 'Bab V: Membuka Gerbang Dunia'), materi: t('mapel_ind_c5_mat', 'Membedah Buku Bergambar, Bagian-Bagian Buku (Cover, Daftar Isi, Ilustrasi), Merangkum Buku & Peta Pikiran, Menyajikan Teks Tanggapan dan Ragam Kalimat Tanggapan'), grade: 7 },
+        { code: 'KOMP-IND-D-7-BAB6-01', name: t('mapel_ind_c6_name', 'Bab VI: Sampaikan Melalui Surat'), materi: t('mapel_ind_c6_mat', 'Mengenal Surat Pribadi dan Surat Resmi, Unsur-Unsur dan Struktur Surat, Berkomunikasi Santun via Surat, Etika Komunikasi Digital di Ruang Bincang / Email'), grade: 7 },
+        { code: 'KOMP-IND-D-8-BAB1-01', name: t('mapel_ind_c7_name', 'Bab 1: Laporan Hasil Observasi'), materi: t('mapel_ind_c7_mat', 'Memahami Teks Laporan Hasil Observasi (LHO), Struktur Teks LHO (Pernyataan Umum, Deskripsi Bagian, Manfaat), Unsur Kebahasaan Teks LHO'), grade: 8 },
+        { code: 'KOMP-IND-D-8-BAB2-01', name: t('mapel_ind_c8_name', 'Bab 2: Iklan, Slogan, dan Poster'), materi: t('mapel_ind_c8_mat', 'Mengenal Iklan, Slogan, dan Poster, Ciri Bahasa Persuasif & Imperatif, Struktur Iklan Komersial & Layanan Masyarakat'), grade: 8 },
+        { code: 'KOMP-IND-D-8-BAB3-01', name: t('mapel_ind_c9_name', 'Bab 3: Artikel Ilmiah Populer'), materi: t('mapel_ind_c9_mat', 'Memahami Artikel Ilmiah Populer, Membedakan Fakta & Opini, Pengumpulan Data, Unsur Kebahasaan: Kata Denotatif & Konjungsi'), grade: 8 },
+        { code: 'KOMP-IND-D-8-BAB4-01', name: t('mapel_ind_c10_name', 'Bab 4: Teks Ulasan Karya Fiksi'), materi: t('mapel_ind_c10_mat', 'Memahami Teks Ulasan Novel & Cerpen, Struktur Teks Ulasan (Identitas, Orientasi, Sinopsis, Evaluasi), Unsur Kebahasaan Teks Ulasan'), grade: 8 },
+        { code: 'KOMP-IND-D-8-BAB5-01', name: t('mapel_ind_c11_name', 'Bab 5: Teks Drama'), materi: t('mapel_ind_c11_mat', 'Mengenal Pertunjukan & Naskah Drama, Unsur Intrinsik Drama (Tokoh, Dialog, Kramagung, Konflik), Pementasan Drama'), grade: 8 },
+        { code: 'KOMP-IND-D-8-BAB6-01', name: t('mapel_ind_c12_name', 'Bab VI: Menulis Teks Pidato'), materi: t('mapel_ind_c12_mat', 'Memahami Teks Pidato Persuasif, Struktur Teks Pidato (Salam Pembuka, Pendahuluan, Isi, Penutup), Kebahasaan Pidato (Kata Sapaan, Kalimat Persuasif, Kata Kerja Mental)'), grade: 8 }
       ],
       teachingBrief: {
         summary: t('mapel_ind_tb_sum', 'Kemampuan literasi membaca kritis, penalaran logika argumen, dan sintesis wacana.'),
@@ -179,9 +349,19 @@
       name: 'Bahasa Inggris',
       grade: 'SD / SMP / SMA',
       competencies: [
-        { code: 'KOMP-ENG-D-7-DSC-01', name: t('mapel_eng_c1_name', 'Descriptive Text & Everyday Adjectives'), materi: t('mapel_eng_c1_mat', 'Describing people, objects, animals, and daily environment using Simple Present') },
-        { code: 'KOMP-ENG-D-8-RCT-01', name: t('mapel_eng_c2_name', 'Recount Text & Simple Past Tense'), materi: t('mapel_eng_c2_mat', 'Retelling personal past events with regular and irregular verbs and time connectors') },
-        { code: 'KOMP-ENG-E-10-EXP-01', name: t('mapel_eng_c3_name', 'Analytical Exposition & Opinion Stance'), materi: t('mapel_eng_c3_mat', 'Formulating arguments, thesis statement, and reiteration for critical reasoning') }
+        { code: 'KOMP-ENG-D-7-BAB1-01', name: t('mapel_eng_c1_name', 'Chapter 1: About Me'), materi: t('mapel_eng_c1_mat', 'Introducing Oneself and Others, Expressing Hobbies and Preferences, Describing People Physical Traits, Subject & Possessive Pronouns'), grade: 7 },
+        { code: 'KOMP-ENG-D-7-BAB2-01', name: t('mapel_eng_c2_name', 'Chapter 2: Culinary and Me'), materi: t('mapel_eng_c2_mat', 'Describing Foods & Drinks (Taste & Texture), Recipe Procedural Text Analysis, Imperative Verbs & Cooking Steps'), grade: 7 },
+        { code: 'KOMP-ENG-D-7-BAB3-01', name: t('mapel_eng_c3_name', 'Chapter 3: Home Sweet Home'), materi: t('mapel_eng_c3_mat', 'Rooms & Furniture in a House, Describing House Chores & Cleaning Activities, Prepositions of Place (in, on, under, next to), Rules and Abilities (can/can\'t)'), grade: 7 },
+        { code: 'KOMP-ENG-D-8-BAB1-01', name: t('mapel_eng_c4_name', 'Chapter 1: Celebrating Independence Day'), materi: t('mapel_eng_c4_mat', 'Describing Past Independence Day Events, Recount Text Structure, Simple Past Tense (Regular & Irregular Verbs), Past Time Connectors'), grade: 8 },
+        { code: 'KOMP-ENG-D-8-BAB2-01', name: t('mapel_eng_c5_name', 'Chapter 2: Kindness Begins with Me'), materi: t('mapel_eng_c5_mat', 'Reading Narrative Texts & Fables, Moral Values of Kindness, Narrative Structure (Orientation, Complication, Resolution), Direct & Indirect Speech'), grade: 8 },
+        { code: 'KOMP-ENG-D-8-BAB3-01', name: t('mapel_eng_c6_name', 'Chapter 3: Love Our World'), materi: t('mapel_eng_c6_mat', 'Environmental Conservation Texts, Reducing Plastic Waste, Procedural Posters & Tips, Imperative Expressions for Saving Water/Energy'), grade: 8 },
+        { code: 'KOMP-ENG-D-8-BAB4-01', name: t('mapel_eng_c7_name', 'Chapter 4: No Littering'), materi: t('mapel_eng_c7_mat', 'Recounting Waste Clean-Up Events, Waste Sorting & Management, Past Continuous Tense (was/were + v-ing), Environmental Action'), grade: 8 },
+        { code: 'KOMP-ENG-D-8-BAB5-01', name: t('mapel_eng_c8_name', 'Chapter 5: Embrace Yourself'), materi: t('mapel_eng_c8_mat', 'Describing Feelings and Personality Traits, Personal Recount Text, Self-Acceptance & Empathy, Encouraging Expressions'), grade: 8 },
+        { code: 'KOMP-ENG-D-9-BAB1-01', name: t('mapel_eng_c9_name', 'Chapter 1: Exploring Fauna of Indonesia'), materi: t('mapel_eng_c9_mat', 'Reading Report Texts on Indonesian Wildlife (Bekantan, Orangutan, Birds), Passive Voice in Science Context, Describing Animals Physical & Behavior'), grade: 9 },
+        { code: 'KOMP-ENG-D-9-BAB2-01', name: t('mapel_eng_c10_name', 'Chapter 2: Taking Care of Yourself'), materi: t('mapel_eng_c10_mat', 'Giving Advice & Suggestions (should/shouldn\'t), Expressing Agreement & Disagreement, Healthy Habits & Mental Health'), grade: 9 },
+        { code: 'KOMP-ENG-D-9-BAB3-01', name: t('mapel_eng_c11_name', 'Chapter 3: Journey to the Fantasy World'), materi: t('mapel_eng_c11_mat', 'Analyzing Fantasy Narrative Texts, Character & Plot Analysis, Indirect/Reported Speech in Stories, Moral Values in Literature'), grade: 9 },
+        { code: 'KOMP-ENG-D-9-BAB4-01', name: t('mapel_eng_c12_name', 'Chapter 4: Upcycling Used Materials'), materi: t('mapel_eng_c12_mat', 'Upcycling & Recycling Crafts Procedural Texts, Imperative Action Verbs, DIY Project Instructions, Environmental Sustainability'), grade: 9 },
+        { code: 'KOMP-ENG-D-9-BAB5-01', name: t('mapel_eng_c13_name', 'Chapter 5: Digital Life'), materi: t('mapel_eng_c13_mat', 'Digital Literacy & Online Safety, Analytical Exposition Texts, Expressing Arguments & Opinions, Cyber Etiquette'), grade: 9 }
       ],
       teachingBrief: {
         summary: t('mapel_eng_tb_sum', 'Pengembangan kompetensi komunikatif lintas genre teks: deskripsi, recount, dan eksposisi analitis.'),
@@ -196,9 +376,18 @@
       name: 'Ilmu Pengetahuan Alam (IPA)',
       grade: 'SD / SMP',
       competencies: [
-        { code: 'KOMP-IPA-D-7-MET-01', name: t('mapel_ipa_c1_name', 'Besaran, Satuan & Metode Ilmiah'), materi: t('mapel_ipa_c1_mat', 'Pengukuran besaran pokok dan turunan, konversi satuan SI, dan keselamatan laboratorium') },
-        { code: 'KOMP-IPA-D-8-SEL-01', name: t('mapel_ipa_c2_name', 'Sel, Jaringan & Sistem Organ Manusia'), materi: t('mapel_ipa_c2_mat', 'Struktur sel hewan dan tumbuhan, mikroskop, serta organ respirasi dan ekskresi') },
-        { code: 'KOMP-IPA-D-9-LIS-01', name: t('mapel_ipa_c3_name', 'Listrik Dinamis, Hambatan & Kemagnetan'), materi: t('mapel_ipa_c3_mat', 'Hukum Ohm (V = I·R), rangkaian seri-paralel, dan induksi elektromagnetik') }
+        { code: 'KOMP-IPA-D-7-MET-01', name: t('mapel_ipa_c1_name', 'Besaran, Satuan & Metode Ilmiah'), materi: t('mapel_ipa_c1_mat', 'Pengukuran besaran pokok dan turunan, konversi satuan SI, dan keselamatan laboratorium'), grade: 7 },
+        { code: 'KOMP-IPA-D-7-ZAT-01', name: t('mapel_ipa_c2_name', 'Wujud Zat, Perubahan Fisika & Kimia'), materi: t('mapel_ipa_c2_mat', 'Wujud materi, wujud fisika-kimia, dan kerapatan massa jenis'), grade: 7 },
+        { code: 'KOMP-IPA-D-7-EKO-01', name: t('mapel_ipa_c3_name', 'Klasifikasi Makhluk Hidup, Ekosistem & Interaksinya'), materi: t('mapel_ipa_c3_mat', 'Kunci determinasi makhluk hidup, rantai makanan ekosistem, dan pencemaran lingkungan'), grade: 7 },
+        { code: 'KOMP-IPA-D-8-BAB1-01', name: t('mapel_ipa_c4_name', 'Pengenalan Sel'), materi: t('mapel_ipa_c4_mat', 'Struktur & Fungsi Organel Sel, Perbedaan Sel Tumbuhan & Sel Hewan, Spesialisasi Sel & Penggunaan Mikroskop'), grade: 8 },
+        { code: 'KOMP-IPA-D-8-BAB2-01', name: t('mapel_ipa_c5_name', 'Struktur dan Fungsi Tubuh Makhluk Hidup'), materi: t('mapel_ipa_c5_mat', 'Sistem Pencernaan & Nutrisi, Sistem Peredaran Darah & Jantung, Sistem Pernapasan & Paru-paru, Sistem Ekskresi & Ginjal'), grade: 8 },
+        { code: 'KOMP-IPA-D-8-BAB3-01', name: t('mapel_ipa_c6_name', 'Usaha, Energi, dan Pesawat Sederhana'), materi: t('mapel_ipa_c6_mat', 'Konsep Usaha & Energi, Energi Kinetik & Potensial, Keuntungan Mekanis Pesawat Sederhana (Tuas, Katrol, Bidang Miring)'), grade: 8 },
+        { code: 'KOMP-IPA-D-8-BAB4-01', name: t('mapel_ipa_c7_name', 'Tekanan'), materi: t('mapel_ipa_c7_mat', 'Tekanan Zat Padat & Hidrostatis, Hukum Archimedes & Pascal, Tekanan Gas/Udara, Aplikasi pada Makhluk Hidup'), grade: 8 },
+        { code: 'KOMP-IPA-D-8-BAB5-01', name: t('mapel_ipa_c8_name', 'Getaran, Gelombang, dan Cahaya'), materi: t('mapel_ipa_c8_mat', 'Getaran & Frekuensi, Gelombang Transversal & Longitudinal, Gelombang Bunyi & Ekolokasi, Sifat Cahaya & Alat Optik'), grade: 8 },
+        { code: 'KOMP-IPA-D-8-BAB6-01', name: t('mapel_ipa_c9_name', 'Unsur, Senyawa, dan Campuran'), materi: t('mapel_ipa_c9_mat', 'Klasifikasi Materi (Unsur, Senyawa, Campuran), Larutan, Koloid & Suspensi, Metode Pemisahan Campuran (Filtrasi, Distilasi, Kromatografi)'), grade: 8 },
+        { code: 'KOMP-IPA-D-9-LIS-01', name: t('mapel_ipa_c10_name', 'Listrik Dinamis, Hambatan & Kemagnetan'), materi: t('mapel_ipa_c10_mat', 'Hukum Ohm (V = I·R), rangkaian seri-paralel, dan induksi elektromagnetik'), grade: 9 },
+        { code: 'KOMP-IPA-D-9-GEN-01', name: t('mapel_ipa_c11_name', 'Sistem Reproduksi & Pewarisan Sifat'), materi: t('mapel_ipa_c11_mat', 'Pembelahan sel mitosis-meiosis, persilangan monohibrid-dihibrid Mendel, dan genetika'), grade: 9 },
+        { code: 'KOMP-IPA-D-9-BIO-01', name: t('mapel_ipa_c12_name', 'Bioteknologi & Kelestarian Lingkungan'), materi: t('mapel_ipa_c12_mat', 'Bioteknologi konvensional dan modern, tanah, serta teknologi ramah lingkungan'), grade: 9 }
       ],
       teachingBrief: {
         summary: t('mapel_ipa_tb_sum', 'Penyelidikan ilmiah empiris fenomena alam, organisasi materi kehidupan, dan konversi energi.'),
@@ -213,9 +402,13 @@
       name: 'Ilmu Pengetahuan Sosial (IPS)',
       grade: 'SD / SMP',
       competencies: [
-        { code: 'KOMP-IPS-D-7-RNG-01', name: t('mapel_ips_c1_name', 'Interaksi Antarruang & Letak Geografis'), materi: t('mapel_ips_c1_mat', 'Peta Indonesia, letak astronomis-geologis, dan potensi sumber daya alam maritim') },
-        { code: 'KOMP-IPS-D-8-SOS-01', name: t('mapel_ips_c2_name', 'Interaksi Sosial, Diferensiasi & Integrasi'), materi: t('mapel_ips_c2_mat', 'Bentuk interaksi asosiatif dan disosiatif, lembaga sosial, serta pluralitas budaya nusantara') },
-        { code: 'KOMP-IPS-D-9-GLB-01', name: t('mapel_ips_c3_name', 'Globalisasi & Perkembangan Ekonomi Digital'), materi: t('mapel_ips_c3_mat', 'Dampak perubahan sosial budaya, perdagangan internasional, dan ekonomi kreatif') }
+        { code: 'KOMP-IPS-D-7-BAB1-01', name: t('mapel_ips_c1_name', 'Tema 01: Keberadaan Diri dan Keluarga'), materi: t('mapel_ips_c1_mat', 'Mengenal Sejarah Keluarga & Silsilah, Pemahaman Lokasi pada Peta & Komponen Peta, Interaksi Sosial & Agen Sosialisasi, Pemenuhan Kebutuhan Manusia'), grade: 7 },
+        { code: 'KOMP-IPS-D-7-BAB2-01', name: t('mapel_ips_c2_name', 'Tema 02: Keberagaman Lingkungan Sekitar'), materi: t('mapel_ips_c2_mat', 'Proses Pembentukan Bumi & Masa Praaksara, Keberagaman Bentang Alam & Lingkungan, Interaksi Manusia & Konservasi SDA, Peran Lembaga Sosial & Ekonomi'), grade: 7 },
+        { code: 'KOMP-IPS-D-7-BAB3-01', name: t('mapel_ips_c3_name', 'Tema 03: Potensi Ekonomi Lingkungan'), materi: t('mapel_ips_c3_mat', 'Potensi Sumber Daya Alam (Hutan, Tambang, Laut), Kegiatan Ekonomi (Produksi, Distribusi, Konsumsi), Hukum Permintaan & Penawaran, Pasar & Peran Teknologi'), grade: 7 },
+        { code: 'KOMP-IPS-D-7-BAB4-01', name: t('mapel_ips_c4_name', 'Tema IV: Pemberdayaan Masyarakat'), materi: t('mapel_ips_c4_mat', 'Keanekaragaman Keragaman Etnis & Budaya Indonesia, Pemberdayaan Ekonomi Masyarakat, Literasi & Pengelolaan Keuangan Keluarga, Peran Komunitas Lokal'), grade: 7 },
+        { code: 'KOMP-IPS-D-8-BAB1-01', name: t('mapel_ips_c5_name', 'Tema 01: Kondisi Geografis dan Pelestarian Sumber Daya Alam'), materi: t('mapel_ips_c5_mat', 'Kondisi Geografis & Iklim Indonesia, Keragaman Flora & Fauna (Garis Wallace & Weber), Pelestarian Sumber Daya Alam, Potensi Maritim'), grade: 8 },
+        { code: 'KOMP-IPS-D-8-SOS-01', name: t('mapel_ips_c6_name', 'Interaksi Sosial, Diferensiasi & Integrasi'), materi: t('mapel_ips_c6_mat', 'Bentuk interaksi asosiatif dan disosiatif, lembaga sosial, serta pluralitas budaya nusantara'), grade: 8 },
+        { code: 'KOMP-IPS-D-9-GLB-01', name: t('mapel_ips_c7_name', 'Globalisasi & Perkembangan Ekonomi Digital'), materi: t('mapel_ips_c7_mat', 'Dampak perubahan sosial budaya, perdagangan internasional, dan ekonomi kreatif'), grade: 9 }
       ],
       teachingBrief: {
         summary: t('mapel_ips_tb_sum', 'Kajian keterhubungan spasial, pranata sosial kemasyarakatan, dan dinamika perekonomian masyarakat.'),
@@ -2655,23 +2848,49 @@
       }
     }
 
-    // SELALU SINKRONKAN MAPEL PADA SEMUA KELAS GURU INI JIKA ADA SUBJECTID RESMI
-    if (acc && acc.subjectId && st.classes.length) {
-      var officialSub = acc.subjectId;
-      var officialSubName = mapelNames[officialSub] || officialSub;
-      st.classes.forEach(function (c) {
-        var prefix = inst ? inst + ' — ' : (st.teacher && st.teacher.school ? st.teacher.school + ' — ' : '');
-        if (c.subject !== officialSub || (c.name && c.name.indexOf('Matematika') !== -1 && officialSub !== 'MAT')) {
-          c.subject = officialSub;
-          c.name = prefix + officialSubName;
-          modified = true;
+    // SELALU SINKRONKAN MAPEL PADA SEMUA KELAS GURU INI JIKA ADA SUBJECTID RESMI.
+    // AUDIT multi: lisensi N mapel TIDAK memaksa semua kelas ke mapel pertama —
+    // kelas MAT yang sah tetap MAT; hanya kelas di luar lisensi yang dikembalikan.
+    if (acc && st.classes.length) {
+      var __lic = [];
+      try {
+        if (Array.isArray(acc.subjectIds)) __lic = acc.subjectIds.slice();
+        else if (Array.isArray(acc.subjects)) __lic = acc.subjects.slice();
+        if (acc.subjectId) __lic.push(acc.subjectId);
+        if (acc.subject_id) __lic.push(acc.subject_id);
+      } catch (_) {}
+      __lic = __lic.map(function (x) { return String(x || '').trim().toUpperCase(); }).filter(function (x) { return !!x; });
+      var __seen = {}, __uniq = [];
+      __lic.forEach(function (x) { if (!__seen[x]) { __seen[x] = 1; __uniq.push(x); } });
+      __lic = __uniq;
+      if (__lic.length === 1) {
+        var officialSub = __lic[0];
+        var officialSubName = mapelNames[officialSub] || officialSub;
+        st.classes.forEach(function (c) {
+          var prefix = inst ? inst + ' — ' : (st.teacher && st.teacher.school ? st.teacher.school + ' — ' : '');
+          if (c.subject !== officialSub || (c.name && c.name.indexOf('Matematika') !== -1 && officialSub !== 'MAT')) {
+            c.subject = officialSub;
+            c.name = prefix + officialSubName;
+            modified = true;
+          }
+        });
+        if (ui.curriculumSubject !== officialSub) {
+          ui.curriculumSubject = officialSub;
         }
-      });
-      if (ui.curriculumSubject !== officialSub) {
-        ui.curriculumSubject = officialSub;
-      }
-      if (ui.assignSubject !== officialSub) {
-        ui.assignSubject = officialSub;
+        if (ui.assignSubject !== officialSub) {
+          ui.assignSubject = officialSub;
+        }
+      } else if (__lic.length > 1) {
+        /* multi: perbaiki yang bocor saja, hormati yang sudah berlisensi */
+        st.classes.forEach(function (c) {
+          var cur = String(c.subject || '').toUpperCase();
+          if (__lic.indexOf(cur) < 0) {
+            c.subject = __lic[0];
+            modified = true;
+          }
+        });
+        if (__lic.indexOf(ui.curriculumSubject) < 0) ui.curriculumSubject = __lic[0];
+        if (__lic.indexOf(ui.assignSubject) < 0) ui.assignSubject = __lic[0];
       }
     }
 
@@ -2966,7 +3185,9 @@
   }
   function topbar(c) {
     var d = new Date();
-    return '<header class="tg-top"><div><p class="tg-kicker">' + esc(d.toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long' })) + '</p><h1>' + esc(st.classes.length ? (TITLE[st.view] || t('guru.merek-penuh', 'KelasKu untuk Guru')) : t('guru.merek-penuh', 'KelasKu untuk Guru')) + '</h1></div>' +
+    var scope = '';
+    try { scope = subjectScopeBadge(); } catch (_) { scope = ''; }
+    return '<header class="tg-top"><div><p class="tg-kicker">' + esc(d.toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long' })) + '</p><h1>' + esc(st.classes.length ? (TITLE[st.view] || t('guru.merek-penuh', 'KelasKu untuk Guru')) : t('guru.merek-penuh', 'KelasKu untuk Guru')) + '</h1>' + scope + '</div>' +
       '<div class="tg-top-actions">' + (c ? syncChip(c) + '<button type="button" class="tg-chip tg-code" data-tg="copy" data-text="' + esc(c.code) + '" title="Salin kode kelas" data-testid="tg-class-code">' + icon('hash') + '<span>' + esc(c.code) + '</span></button>' : '') + bell() + (c ? '<button type="button" class="tg-btn is-ghost" data-tg="modal" data-kind="board" data-testid="tg-open-board">' + icon('presentation') + '<span>Mode papan</span></button><button type="button" class="tg-btn is-primary" data-tg="modal" data-kind="assign" data-testid="tg-quick-assign">' + icon('plus') + '<span>' + t('guru.tugas-baru', 'Tugas baru') + '</span></button>' : '') + '</div></header>' + inboxPanel();
   }
   function bell() {
@@ -3002,8 +3223,17 @@
   // ---- BRIEFING -----------------------------------------------------------------------------
   function briefing(c) {
     var T = S(), stt = T.classStats(c), greet = T.needsGreeting(c), ag = T.agenda(c), mis = T.misconceptions(c);
-    var kpi = [['Siswa aktif 7 hari', stt.active7 + '<small>/' + stt.total + '</small>', 'users', stt.total ? stt.active7 / stt.total : 0], ['Rata-rata akurasi', pct(stt.avgAcc), 'target', stt.avgAcc || 0], [t('guru.kpi-perlu-dibantu', 'Perlu dibantu'), (stt.atRisk + stt.watch) + '<small> siswa</small>', 'alert-triangle', stt.total ? (stt.atRisk + stt.watch) / stt.total : 0], [t('guru.tugas-berjalan', 'Tugas berjalan'), stt.openAssignments + '<small> tugas</small>', 'clipboard-list', null]];
-    return '<div class="tg-grid tg-grid-kpi">' + kpi.map(function (k, i) { return '<div class="tg-kpi tg-rise" style="--d:' + i * 60 + 'ms" data-testid="tg-kpi-' + i + '">' + icon(k[2]) + '<small>' + k[0] + '</small><b>' + k[1] + '</b>' + (k[3] != null ? bar(k[3], i === 2 ? 'is-warn' : '') : '') + '</div>'; }).join('') + '</div>' +
+    var __scB = null;
+    try { __scB = teacherSubjectScope(); } catch (_) {}
+    /* AUDIT: agenda & miskonsepsi mengikuti lisensi; badge tampil di atas. */
+    if (__scB && __scB.locked) {
+      ag = ag.filter(function (x) { return isAssignmentVisible(x.a, __scB); });
+      mis = mis.filter(function (m) { return skillMatchesSubject(m.skill, __scB); });
+    }
+    var scopeB = (__scB && __scB.locked) ? subjectScopeBadge() : '';
+    var openN = (__scB && __scB.locked) ? ag.length : stt.openAssignments;
+    var kpi = [['Siswa aktif 7 hari', stt.active7 + '<small>/' + stt.total + '</small>', 'users', stt.total ? stt.active7 / stt.total : 0], ['Rata-rata akurasi', pct(stt.avgAcc), 'target', stt.avgAcc || 0], [t('guru.kpi-perlu-dibantu', 'Perlu dibantu'), (stt.atRisk + stt.watch) + '<small> siswa</small>', 'alert-triangle', stt.total ? (stt.atRisk + stt.watch) / stt.total : 0], [t('guru.tugas-berjalan', 'Tugas berjalan'), openN + '<small> tugas</small>', 'clipboard-list', null]];
+    return scopeB + '<div class="tg-grid tg-grid-kpi">' + kpi.map(function (k, i) { return '<div class="tg-kpi tg-rise" style="--d:' + i * 60 + 'ms" data-testid="tg-kpi-' + i + '">' + icon(k[2]) + '<small>' + k[0] + '</small><b>' + k[1] + '</b>' + (k[3] != null ? bar(k[3], i === 2 ? 'is-warn' : '') : '') + '</div>'; }).join('') + '</div>' +
       '<div class="tg-grid tg-grid-2">' +
       '<section class="tg-card tg-rise" style="--d:200ms" data-testid="tg-greet-list"><div class="tg-card-head"><div><p class="tg-kicker">Deteksi dini</p><h3>Siapa yang perlu disapa hari ini</h3></div><span class="tg-count">' + greet.length + '</span></div>' +
       (greet.length ? '<ul class="tg-list">' + greet.slice(0, 6).map(function (x) { return '<li class="tg-row" data-testid="tg-greet-' + x.s.id + '">' + avatar(x.s) + '<div class="tg-row-body"><b>' + esc(x.s.name) + ' ' + riskPill(x.r) + '</b><small>' + esc(x.r.reasons.join(' · ') || 'perlu dipantau') + '</small><em>' + esc(x.r.action) + '</em></div><div class="tg-row-actions"><button type="button" class="tg-btn is-small is-primary" data-tg="modal" data-kind="greet" data-id="' + x.s.id + '" data-testid="tg-greet-btn-' + x.s.id + '">' + icon('message-circle-heart') + ' Kartu sapa</button><button type="button" class="tg-btn is-small is-ghost" data-tg="drawer" data-id="' + x.s.id + '">Detail</button></div></li>'; }).join('') + '</ul>' : '<p class="tg-empty">Semua siswa dalam kondisi aman. Nikmati kopimu ☕</p>') + '</section>' +
@@ -3018,8 +3248,11 @@
   function classes(c) {
     var T = S(), q = ui.filter.toLowerCase(), list = c.students.filter(function (s) { return !q || s.name.toLowerCase().indexOf(q) !== -1; }).map(function (s) { return { s: s, r: T.risk(c, s) }; }).sort(function (a, b) { return b.r.score - a.r.score; });
     var mapelNames = (T && T.MAPEL_NAMES) || {};
-    return '<div class="tg-toolbar"><div class="tg-tabs">' + st.classes.map(function (k) { return '<button type="button" class="tg-tab' + (k.id === c.id ? ' is-active' : '') + '" data-tg="pick-class" data-id="' + k.id + '">' + esc(k.name) + '<small>' + k.students.length + '</small></button>'; }).join('') + '<button type="button" class="tg-tab is-add" data-tg="modal" data-kind="new-class" data-testid="tg-new-class">' + t('guru.kelas-tambah-btn', '+ Kelas') + '</button></div>' +
-      '<div class="tg-toolbar-actions"><label class="tg-search">' + icon('search') + '<input type="search" placeholder="' + t('guru.cari-siswa', 'Cari siswa…') + '" value="' + esc(ui.filter) + '" data-tg-input="filter" data-testid="tg-student-search"></label><button type="button" class="tg-btn is-ghost" data-tg="modal" data-kind="attendance" data-testid="tg-attendance">' + icon('check-square') + '<span>Absensi</span></button><button type="button" class="tg-btn is-ghost" data-tg="export-csv" data-testid="tg-export-csv">' + icon('download') + '<span>CSV</span></button><button type="button" class="tg-btn is-primary" data-tg="modal" data-kind="add-students" data-testid="tg-add-students">' + icon('user-plus') + '<span>' + t('guru.tambah-siswa', 'Tambah siswa') + '</span></button></div></div>' +
+    var __scCls = null;
+    try { __scCls = teacherSubjectScope(); } catch (_) {}
+    var __scopeNote = (__scCls && __scCls.locked) ? subjectScopeBadge() : '';
+    return __scopeNote + '<div class="tg-toolbar"><div class="tg-tabs">' + st.classes.map(function (k) { return '<button type="button" class="tg-tab' + (k.id === c.id ? ' is-active' : '') + '" data-tg="pick-class" data-id="' + k.id + '">' + esc(k.name) + '<small>' + k.students.length + '</small></button>'; }).join('') + '<button type="button" class="tg-tab is-add" data-tg="modal" data-kind="new-class" data-testid="tg-new-class">' + t('guru.kelas-tambah-btn', '+ Kelas') + '</button></div>' +
+      '<div class="tg-toolbar-actions"><label class="tg-search">' + icon('search') + '<input type="search" placeholder="' + t('guru.cari-siswa', 'Cari siswa…') + '" value="' + esc(ui.filter) + '" data-tg-input="filter" data-testid="tg-student-search" aria-label="' + esc(t('guru.cari-siswa', 'Cari siswa…')) + '"></label><button type="button" class="tg-btn is-ghost" data-tg="modal" data-kind="attendance" data-testid="tg-attendance">' + icon('check-square') + '<span>Absensi</span></button><button type="button" class="tg-btn is-ghost" data-tg="export-csv" data-testid="tg-export-csv">' + icon('download') + '<span>CSV</span></button><button type="button" class="tg-btn is-ghost" data-tg="export-rekap" data-testid="tg-export-rekap">' + icon('file-text') + '<span>' + t('guru.rekap-erapor', 'Rekap e-Rapor') + '</span></button><button type="button" class="tg-btn is-primary" data-tg="modal" data-kind="add-students" data-testid="tg-add-students">' + icon('user-plus') + '<span>' + t('guru.tambah-siswa', 'Tambah siswa') + '</span></button></div></div>' +
       '<section class="tg-card tg-class-meta"><div><p class="tg-kicker">' + esc(mapelNames[c.subject] || c.subject || 'English') + ' · Level ' + esc(c.level) + (c.demo ? ' · <span class="tg-demo">data contoh</span>' : '') + '</p><h3>' + esc(c.name) + '</h3>' +
       (c.latestAnnouncement && c.latestAnnouncement.text ? '<p class="tg-latest-ann" style="margin:4px 0 8px;font-size:13px;color:var(--tg-text)">📢 <b>Pengumuman:</b> ' + esc(c.latestAnnouncement.text) + ' <small class="tg-muted">(' + esc(c.latestAnnouncement.teacher || 'Wali kelas') + (c.latestAnnouncement.at ? ' · ' + T.fmtDate(c.latestAnnouncement.at) : '') + ')</small></p>' : '') +
       '<small>Kode kelas <b class="tg-mono">' + esc(c.code) + '</b> — murid mengetiknya saat onboarding; setiap selesai sesi, hasilnya dikirim ke server dan masuk ke sini otomatis. ' + (c.sync && c.sync.claimed ? '<span class="tg-ok">Kode terdaftar di server.</span>' : S().syncAvailable() === 'ok' ? '<span class="tg-muted">Kode belum terdaftar — tekan Sinkron.</span>' : '<span class="tg-muted">Tanpa akun guru, tempel kode hasil murid secara manual.</span>') + '</small></div><div class="tg-actions"><button type="button" class="tg-btn is-ghost is-small" data-tg="modal" data-kind="edit-class">' + icon('pencil') + ' ' + t('umum.ubah', 'Ubah') + '</button><button type="button" class="tg-btn is-danger is-small" data-tg="delete-class" data-testid="tg-delete-class">' + icon('trash-2') + ' ' + t('guru.hapus-kelas', 'Hapus kelas') + '</button></div></section>' +
@@ -3030,8 +3263,12 @@
 
   // ---- TUGAS & UJIAN -------------------------------------------------------------------------
   function assignments(c) {
-    var T = S(), td = T.today(), list = (c.assignments || []).slice().sort(function (a, b) { return b.createdAt - a.createdAt; });
-    return '<div class="tg-toolbar"><p class="tg-lead-sm">' + t('guru.tugas-menilai-diri', 'Tugas yang menilai dirinya sendiri: kirim ke murid, tugasnya') + ' <b>langsung masuk notifikasi</b> di aplikasi mereka; setelah selesai, hasilnya kembali ke sini otomatis — tidak ada koreksi manual.</p><div class="tg-toolbar-actions"><button type="button" class="tg-btn is-ghost" data-tg="modal" data-kind="import-code" data-testid="tg-grade-code">' + icon('clipboard-paste') + '<span>Tempel kode hasil</span></button><button type="button" class="tg-btn is-primary" data-tg="modal" data-kind="assign" data-testid="tg-new-assign">' + icon('plus') + '<span>' + t('guru.buat-tugas-ujian', 'Buat tugas / ujian') + '</span></button></div></div>' +
+    var T = S(), td = T.today(), allList = (c.assignments || []).slice().sort(function (a, b) { return b.createdAt - a.createdAt; });
+    var sc = null;
+    try { sc = teacherSubjectScope(); } catch (_) { sc = null; }
+    var list = (sc && sc.locked) ? allList.filter(function (a) { return isAssignmentVisible(a, sc); }) : allList;
+    var scopeNote = (sc && sc.locked) ? subjectScopeBadge() : '';
+    return scopeNote + '<div class="tg-toolbar"><p class="tg-lead-sm">' + t('guru.tugas-menilai-diri', 'Tugas yang menilai dirinya sendiri: kirim ke murid, tugasnya') + ' <b>langsung masuk notifikasi</b> di aplikasi mereka; setelah selesai, hasilnya kembali ke sini otomatis — tidak ada koreksi manual.</p><div class="tg-toolbar-actions"><button type="button" class="tg-btn is-ghost" data-tg="modal" data-kind="import-code" data-testid="tg-grade-code">' + icon('clipboard-paste') + '<span>Tempel kode hasil</span></button><button type="button" class="tg-btn is-primary" data-tg="modal" data-kind="assign" data-testid="tg-new-assign">' + icon('plus') + '<span>' + t('guru.buat-tugas-ujian', 'Buat tugas / ujian') + '</span></button></div></div>' +
       (list.length ? '<div class="tg-grid tg-grid-cards">' + list.map(function (a) {
         var tgt = c.students.filter(function (s) { return T.targeted(a, s); }), done = tgt.filter(function (s) { return a.done && a.done[s.id]; }), accs = done.map(function (s) { return a.done[s.id].acc; }).filter(function (v) { return v != null; }), avg = accs.length ? accs.reduce(function (x, y) { return x + y; }, 0) / accs.length : null;
         var late = a.deadline && a.deadline < td && done.length < tgt.length;
@@ -3044,18 +3281,38 @@
           '<p class="tg-muted">' + a.skills.map(function (k) { return mapelName(k) || T.SKILL_LABEL[k] || k; }).join(' + ') + ' · ' + a.itemIds.length + ' soal · ' + (a.targets ? tgt.length + ' siswa terpilih' : 'seluruh kelas') + '</p>' +
           '<div class="tg-progress"><div class="tg-progress-head"><span>' + done.length + '/' + tgt.length + ' selesai' + (avg != null ? ' · rata-rata ' + pct(avg) : '') + '</span><span class="' + (late ? 'tg-late' : '') + '">' + (a.deadline ? 'Tenggat ' + esc(a.deadline) + (late ? ' (lewat)' : '') : 'Tanpa tenggat') + '</span></div>' + bar(tgt.length ? done.length / tgt.length : 0, avg != null && avg < 0.5 ? 'is-warn' : '') + '</div>' +
           '<div class="tg-actions"><button type="button" class="tg-btn is-small is-primary" data-tg="send-assign" data-id="' + a.id + '" data-testid="tg-send-all-' + a.id + '"' + (ui.sending === a.id ? ' disabled' : '') + '>' + icon('send') + (a.targets ? (a.sent && a.sent.all ? ' ' + t('guru.kirim-ulang-ke', 'Kirim ulang ke') + ' ' : ' ' + t('guru.kirim-ke', 'Kirim ke') + ' ') + tgt.length + ' murid terpilih' : (a.sent && a.sent.all ? ' ' + t('guru.kirim-ulang-semua', 'Kirim ulang ke semua') : ' ' + t('guru.kirim-semua-murid', 'Kirim ke semua murid'))) + '</button><a class="tg-btn is-small is-wa-ghost" target="_blank" rel="noopener" href="' + T.waLink('', waMsgCard) + '" data-testid="tg-card-wa-' + a.id + '">' + icon('message-circle') + ' ' + esc(t('guru.bagikan-wa-singkat', 'WhatsApp')) + '</a><button type="button" class="tg-btn is-small is-ghost" data-tg="copy" data-text="' + esc(asgCode) + '" data-testid="tg-card-copy-' + a.id + '">' + icon('copy') + ' ' + esc(t('guru.salin-kode-singkat', 'Salin Kode')) + '</button><button type="button" class="tg-btn is-small is-ghost" data-tg="modal" data-kind="share-assign" data-id="' + a.id + '" data-testid="tg-share-assign-' + a.id + '">' + icon('users') + ' ' + t('guru.pilih-murid-kode', 'Pilih murid / kode') + '</button><button type="button" class="tg-btn is-small is-ghost" data-tg="modal" data-kind="assign-detail" data-id="' + a.id + '">' + icon('list-checks') + ' Siapa yang belum</button></div>' + (a.sent && a.sent.all ? '<p class="tg-muted tg-sent-note">' + icon('check') + ' Terkirim ke semua murid ' + esc(T.fmtDate(a.sent.all)) + '</p>' : '') + '</article>';
-      }).join('') + '</div>' : '<section class="tg-card tg-center"><h3>' + t('guru.belum-ada-tugas', 'Belum ada tugas') + '</h3><p class="tg-muted">Buat tugas dari bank soal FIEZEL: pilih skill, jumlah soal, tenggat. Mode ujian mengacak urutan dan memberi timer.</p></section>');
+      }).join('') + '</div>' : '<section class="tg-card tg-center tg-empty-state" data-testid="tg-empty-assignments"><div class="tg-empty-ill" aria-hidden="true">' + icon('clipboard-list') + '</div><h3>' + t('guru.belum-ada-tugas', 'Belum ada tugas') + '</h3><p class="tg-muted">' + ((sc && sc.locked) ? esc(t('guru.belum-tugas-scope', 'Belum ada tugas {mapel} di kelas ini. Buat tugas pertama dari bab {mapel} — hanya butuh 1 menit.').replace('{mapel}', sc.active)) : 'Buat tugas dari bank soal FIEZEL: pilih skill, jumlah soal, tenggat. Mode ujian mengacak urutan dan memberi timer.') + '</p><button type="button" class="tg-btn is-primary" data-tg="modal" data-kind="assign" data-testid="tg-empty-new-assign">' + icon('plus') + '<span>' + t('guru.buat-tugas-ujian', 'Buat tugas / ujian') + '</span></button></section>');
   }
 
   // ---- ANALITIK -------------------------------------------------------------------------------
   function insights(c) {
     var T = S(), heat = T.heatmap(c), map = T.classSkillMap(c), mis = T.misconceptions(c);
     var activeList = T.activeSkills ? T.activeSkills(c) : T.SKILL_ORDER;
-    if (!ui.insightSkill || activeList.indexOf(ui.insightSkill) === -1) ui.insightSkill = activeList[0] || 'past_tense';
+    var sc = null;
+    try { sc = teacherSubjectScope(); } catch (_) { sc = null; }
+    /* AUDIT: analitik mengikuti lisensi — guru IPA tidak membaca Past Tense. */
+    if (sc && sc.locked) {
+      map = map.filter(function (m) { return skillMatchesSubject(m.skill, sc); });
+      activeList = activeList.filter(function (k) { return skillMatchesSubject(k, sc); });
+      mis = mis.filter(function (m) { return skillMatchesSubject(m.skill, sc); });
+      heat = heat.map(function (h) {
+        return { s: h.s, cells: h.cells.filter(function (x) { return skillMatchesSubject(x.skill, sc); }), risk: h.risk };
+      });
+    }
+    if (!ui.insightSkill || activeList.indexOf(ui.insightSkill) === -1) ui.insightSkill = activeList[0] || map[0] && map[0].skill || 'past_tense';
     var groups = T.studyGroups(c, ui.insightSkill);
-    if (!c.students.length) return '<section class="tg-card tg-center"><h3>' + t('guru.belum-data-analisis', 'Belum ada data untuk dianalisis') + '</h3><p class="tg-muted">' + t('guru.tambah-siswa-dulu', 'Tambah siswa atau tempel kode hasil latihan murid dulu.') + '</p></section>';
-    return '<div class="tg-grid tg-grid-skill">' + map.map(function (m, i) { return '<button type="button" class="tg-skill' + (ui.insightSkill === m.skill ? ' is-active' : '') + ' tg-rise" style="--d:' + i * 40 + 'ms" data-tg="insight-skill" data-skill="' + m.skill + '" data-testid="tg-skill-' + m.skill + '"><small>' + esc(m.label) + '</small><b>' + pct(m.acc) + '</b>' + bar(m.acc, m.acc != null && m.acc < 0.5 ? 'is-warn' : '') + '<em>' + (m.low ? m.low + ' siswa <50%' : m.acc == null ? 'belum ada data' : 'merata') + '</em></button>'; }).join('') + '</div>' +
-      '<section class="tg-card" data-testid="tg-heatmap"><div class="tg-card-head"><div><p class="tg-kicker">Peta panas</p><h3>Siswa × skill — sekali lihat, tahu siapa butuh apa</h3></div><small class="tg-legend"><span class="is-hi">≥75%</span><span class="is-mid">50–74%</span><span class="is-lo">&lt;50%</span></small></div>' +
+    var scopeNote = (sc && sc.locked) ? subjectScopeBadge() : '';
+    if (!c.students.length) return scopeNote + '<section class="tg-card tg-center tg-empty-state" data-testid="tg-empty-insights"><div class="tg-empty-ill" aria-hidden="true">' + icon('activity') + '</div><h3>' + t('guru.belum-data-analisis', 'Belum ada data untuk dianalisis') + '</h3><p class="tg-muted">' + t('guru.tambah-siswa-dulu', 'Tambah siswa atau tempel kode hasil latihan murid dulu.') + '</p></section>';
+    if (sc && sc.locked && !map.length) return scopeNote + '<section class="tg-card tg-center tg-empty-state" data-testid="tg-empty-insights-scoped"><div class="tg-empty-ill" aria-hidden="true">' + icon('activity') + '</div><h3>' + esc(t('guru.belum-data-mapel', 'Belum ada data {mapel}').replace('{mapel}', sc.active)) + '</h3><p class="tg-muted">' + t('guru.tambah-tugas-mapel-dulu', 'Terbitkan tugas mapel Anda dulu — analitik lain disembunyikan agar tidak tercampur.') + '</p><button type="button" class="tg-btn is-primary" data-tg="modal" data-kind="assign" data-testid="tg-empty-insights-assign">' + icon('plus') + '<span>' + t('guru.buat-tugas-ujian', 'Buat tugas / ujian') + '</span></button></section>';
+    var rem = null;
+    try { rem = remedialGroups(c, 0.75); } catch (_) { rem = { remedial: [], pengayaan: [] }; }
+    var remedialCard = '<section class="tg-card tg-remedial" data-testid="tg-remedial-auto"><div class="tg-card-head"><div><p class="tg-kicker">' + t('guru.remedial-otomatis', 'Remedial & pengayaan otomatis (KKM 75%)') + '</p><h3>' + t('guru.remedial-judul', 'Siapa remedial, siapa pengayaan') + '</h3></div><span class="tg-count">' + (rem.remedial.length + rem.pengayaan.length) + '</span></div>' +
+      '<div class="tg-grid tg-grid-2">' +
+      '<div><h4>' + t('guru.remedial-perlu', 'Perlu remedial') + ' (' + rem.remedial.length + ')</h4>' + (rem.remedial.length ? '<ul class="tg-mini-list">' + rem.remedial.map(function (x) { return '<li>' + avatar(x.s, 'sm') + ' <span class="tg-grow">' + esc(x.s.name) + ' · ' + pct(x.acc) + '</span></li>'; }).join('') + '</ul><div class="tg-actions"><button type="button" class="tg-btn is-primary is-small" data-tg="modal" data-kind="assign" data-targets="' + esc(rem.remedial.map(function (x) { return x.s.id; }).join(',')) + '" data-testid="tg-remedial-create">' + icon('plus') + ' ' + t('guru.buat-remedial', 'Buat sesi remedial') + '</button></div>' : '<p class="tg-empty">' + t('guru.remedial-kosong', 'Nol siswa di bawah KKM. Pertahankan.') + '</p>') + '</div>' +
+      '<div><h4>' + t('guru.pengayaan-judul', 'Pengayaan (≥90%)') + ' (' + rem.pengayaan.length + ')</h4>' + (rem.pengayaan.length ? '<ul class="tg-mini-list">' + rem.pengayaan.map(function (x) { return '<li>' + avatar(x.s, 'sm') + ' <span class="tg-grow">' + esc(x.s.name) + ' · ' + pct(x.acc) + '</span></li>'; }).join('') + '</ul><div class="tg-actions"><button type="button" class="tg-btn is-ghost is-small" data-tg="modal" data-kind="assign" data-targets="' + esc(rem.pengayaan.map(function (x) { return x.s.id; }).join(',')) + '" data-testid="tg-enrich-create">' + icon('sparkles') + ' ' + t('guru.buat-pengayaan', 'Buat pengayaan') + '</button></div>' : '<p class="tg-empty">' + t('guru.pengayaan-kosong', 'Belum ada siswa ≥90%.') + '</p>') + '</div>' +
+      '</div></section>';
+    return scopeNote + remedialCard + '<div class="tg-grid tg-grid-skill">' + map.map(function (m, i) { return '<button type="button" class="tg-skill' + (ui.insightSkill === m.skill ? ' is-active' : '') + ' tg-rise" style="--d:' + i * 40 + 'ms" data-tg="insight-skill" data-skill="' + m.skill + '" data-testid="tg-skill-' + m.skill + '"><small>' + esc(m.label) + '</small><b>' + pct(m.acc) + '</b>' + bar(m.acc, m.acc != null && m.acc < 0.5 ? 'is-warn' : '') + '<em>' + (m.low ? m.low + ' siswa <50%' : m.acc == null ? 'belum ada data' : 'merata') + '</em></button>'; }).join('') + '</div>' +
+      '<section class="tg-card" data-testid="tg-heatmap"><div class="tg-card-head"><div><p class="tg-kicker">' + t('guru.peta-panas', 'Peta panas') + '</p><h3>' + t('guru.peta-judul', 'Siswa × skill — sekali lihat, tahu siapa butuh apa') + '</h3></div><small class="tg-legend"><span class="is-hi">≥75%</span><span class="is-mid">50–74%</span><span class="is-lo">&lt;50%</span></small></div>' +
       '<div class="tg-table-wrap"><table class="tg-table tg-heat-table"><thead><tr><th>Siswa</th>' + activeList.map(function (k) { var lbl = T.SKILL_LABEL[k] || (k.indexOf('KOMP-') === 0 ? k.replace(/^KOMP-/, '') : k); return '<th>' + esc(lbl) + '</th>'; }).join('') + '<th>Risiko</th></tr></thead><tbody>' + heat.map(function (h) { return '<tr data-tg="drawer" data-id="' + h.s.id + '"><td><div class="tg-who">' + avatar(h.s) + '<b>' + esc(h.s.name) + '</b></div></td>' + h.cells.map(function (x) { return cell(x.acc); }).join('') + '<td>' + riskPill(h.risk) + '</td></tr>'; }).join('') + '</tbody></table></div></section>' +
       '<div class="tg-grid tg-grid-2">' +
       '<section class="tg-card" data-testid="tg-groups"><div class="tg-card-head"><div><p class="tg-kicker">Kelompok belajar otomatis</p><h3>' + esc(T.SKILL_LABEL[ui.insightSkill] || ui.insightSkill || '') + ' — tiap kelompok punya mentor</h3></div><button type="button" class="tg-btn is-small is-ghost" data-tg="copy-groups">' + icon('copy') + ' Salin</button></div><p class="tg-muted">Siswa yang kuat dipasangkan dengan yang lemah (peer tutoring). Menjelaskan ke teman adalah latihan terbaik untuk si mentor sendiri.</p>' +
@@ -3066,21 +3323,26 @@
   // ---- KOMUNIKASI ---------------------------------------------------------------------------------
   function comms(c) {
     var T = S(), ann = (c.announcements || []).slice().reverse(), greet = T.needsGreeting(c), withPhone = c.students.filter(function (s) { return s.parentPhone; });
-    return '<div class="tg-grid tg-grid-2">' +
-      '<div class="tg-stack"><section class="tg-card" data-testid="tg-announce"><div class="tg-card-head"><div><p class="tg-kicker">Pengumuman kelas</p><h3>Satu pesan, semua kanal</h3></div></div><form data-tg-form="announce" class="tg-form"><textarea name="text" rows="3" required placeholder="Contoh: Besok kuis Past Tense 10 soal, 15 menit. Bawa catatan penanda waktu!" data-testid="tg-announce-text"></textarea><div class="tg-actions"><button type="submit" class="tg-btn is-primary is-small" data-testid="tg-announce-submit">' + icon('megaphone') + ' ' + t('guru.simpan-salin', 'Simpan & salin') + '</button><button type="submit" class="tg-btn is-ghost is-small" name="wa" value="1">' + icon('message-circle') + ' ' + t('guru.kirim-whatsapp', 'Kirim via WhatsApp') + '</button></div></form>' +
+    var __scCo = null;
+    try { __scCo = teacherSubjectScope(); } catch (_) {}
+    var __noteCo = (__scCo && __scCo.locked) ? subjectScopeBadge() : '';
+    return __noteCo + '<div class="tg-grid tg-grid-2">' +
+      '<div class="tg-stack"><section class="tg-card" data-testid="tg-announce"><div class="tg-card-head"><div><p class="tg-kicker">' + t('guru.pengumuman-kelas', 'Pengumuman kelas') + '</p><h3>' + t('guru.satu-pesan-semua-kanal', 'Satu pesan, semua kanal') + '</h3></div></div><form data-tg-form="announce" class="tg-form"><textarea name="text" rows="3" required placeholder="Contoh: Besok kuis Past Tense 10 soal, 15 menit. Bawa catatan penanda waktu!" data-testid="tg-announce-text" aria-label="' + esc(t('guru.pengumuman-kelas', 'Pengumuman kelas')) + '"></textarea><div class="tg-actions"><button type="submit" class="tg-btn is-primary is-small" data-testid="tg-announce-submit">' + icon('megaphone') + ' ' + t('guru.simpan-salin', 'Simpan & salin') + '</button><button type="submit" class="tg-btn is-ghost is-small" name="wa" value="1">' + icon('message-circle') + ' ' + t('guru.kirim-whatsapp', 'Kirim via WhatsApp') + '</button></div></form>' +
       (ann.length ? '<ul class="tg-feed">' + ann.slice(0, 5).map(function (a) { return '<li><small>' + esc(T.fmtDate(a.at)) + '</small><p>' + esc(a.text) + '</p><button type="button" class="tg-link" data-tg="copy" data-text="' + esc(a.text) + '">Salin ulang</button></li>'; }).join('') + '</ul>' : '') + '</section>' +
-      '<section class="tg-card" data-testid="tg-parent-section"><div class="tg-card-head"><div><p class="tg-kicker">Laporan orang tua</p><h3>Rapor naratif otomatis</h3></div><span class="tg-count">' + c.students.length + '</span></div><p class="tg-muted">Bahasa hangat, berisi angka nyata, plus satu saran 5 menit yang bisa orang tua lakukan di rumah. ' + withPhone.length + ' siswa punya nomor ortu (kirim langsung via WhatsApp).</p>' +
+      '<section class="tg-card" data-testid="tg-parent-section"><div class="tg-card-head"><div><p class="tg-kicker">' + t('guru.laporan-ortu', 'Laporan orang tua') + '</p><h3>' + t('guru.rapor-naratif', 'Rapor naratif otomatis') + '</h3></div><span class="tg-count">' + c.students.length + '</span></div><p class="tg-muted">Bahasa hangat, berisi angka nyata, plus satu saran 5 menit yang bisa orang tua lakukan di rumah. ' + withPhone.length + ' siswa punya nomor ortu (kirim langsung via WhatsApp).</p>' +
       '<div class="tg-chips">' + c.students.map(function (s) { return '<button type="button" class="tg-chip' + (s.parentPhone ? ' has-phone' : '') + '" data-tg="modal" data-kind="parent" data-id="' + s.id + '" data-testid="tg-parent-' + s.id + '">' + esc(s.name) + (s.parentPhone ? ' ' + icon('phone') : '') + '</button>'; }).join('') + '</div>' +
       '<div class="tg-actions"><button type="button" class="tg-btn is-ghost is-small" data-tg="modal" data-kind="weekly-report">' + icon('file-text') + ' Laporan kelas mingguan</button><button type="button" class="tg-btn is-ghost is-small" data-tg="copy-all-parents">' + icon('copy') + ' Salin semua laporan</button></div></section></div>' +
-      '<section class="tg-card" data-testid="tg-greet-cards"><div class="tg-card-head"><div><p class="tg-kicker">Kartu sapa</p><h3>Pesan personal 1 ketuk</h3></div><span class="tg-count">' + greet.length + '</span></div><p class="tg-muted">Masalah klasik: guru tahu siapa yang mulai menjauh, tapi tak sempat menulis 30 pesan berbeda. FIEZEL menyusun pesan dari data tiap anak — kamu tinggal baca sekali dan kirim.</p>' +
+      '<section class="tg-card" data-testid="tg-greet-cards"><div class="tg-card-head"><div><p class="tg-kicker">' + t('guru.kartu-sapa', 'Kartu sapa') + '</p><h3>' + t('guru.pesan-personal', 'Pesan personal 1 ketuk') + '</h3></div><span class="tg-count">' + greet.length + '</span></div><p class="tg-muted">Masalah klasik: guru tahu siapa yang mulai menjauh, tapi tak sempat menulis 30 pesan berbeda. FIEZEL menyusun pesan dari data tiap anak — kamu tinggal baca sekali dan kirim.</p>' +
       (greet.length ? '<ul class="tg-list">' + greet.map(function (x) { return '<li class="tg-row">' + avatar(x.s) + '<div class="tg-row-body"><b>' + esc(x.s.name) + ' ' + riskPill(x.r) + '</b><small>' + esc(T.greetingCard(c, x.s, st.teacher)) + '</small></div><div class="tg-row-actions"><button type="button" class="tg-btn is-small is-primary" data-tg="modal" data-kind="greet" data-id="' + x.s.id + '">' + icon('send') + ' ' + t('umum.kirim', 'Kirim') + '</button></div></li>'; }).join('') + '</ul>' : '<p class="tg-empty">Semua siswa aman — kirimkan apresiasi lewat pengumuman.</p>') + '</section></div>';
   }
 
   // ---- JURNAL ------------------------------------------------------------------------------------
   function journal(c) {
     var T = S(), list = (c.journal || []).slice().reverse();
-    return '<div class="tg-grid tg-grid-2"><section class="tg-card" data-testid="tg-journal-form"><div class="tg-card-head"><div><p class="tg-kicker">Refleksi 60 detik</p><h3>Apa yang berhasil hari ini?</h3></div></div><p class="tg-muted">Guru hebat mencatat metode yang ampuh — tapi jarang ada tempatnya. Catatan di sini menempel ke siswa yang kamu tandai, dan muncul lagi saat kamu membuka profil mereka.</p>' +
-      '<form data-tg-form="journal" class="tg-form"><textarea name="text" rows="4" required placeholder="Contoh: Metode timeline di papan ampuh untuk yesterday/ago. Fikri masih tertukar verb 1/2." data-testid="tg-journal-text"></textarea><label class="tg-label">Tandai siswa (opsional)</label><div class="tg-chips tg-chips-select">' + c.students.map(function (s) { return '<label class="tg-chip is-check"><input type="checkbox" name="tags" value="' + s.id + '"><span>' + esc(s.name) + '</span></label>'; }).join('') + '</div><div class="tg-actions"><button type="submit" class="tg-btn is-primary is-small" data-testid="tg-journal-submit">' + icon('notebook-pen') + ' ' + t('guru.simpan-refleksi', 'Simpan refleksi') + '</button></div></form></section>' +
+    var __scopeJ = '';
+    try { __scopeJ = subjectScopeBadge(); } catch (_) {}
+    return __scopeJ + '<div class="tg-grid tg-grid-2"><section class="tg-card" data-testid="tg-journal-form"><div class="tg-card-head"><div><p class="tg-kicker">' + t('guru.refleksi-60', 'Refleksi 60 detik') + '</p><h3>' + t('guru.apa-berhasil', 'Apa yang berhasil hari ini?') + '</h3></div></div><p class="tg-muted">Guru hebat mencatat metode yang ampuh — tapi jarang ada tempatnya. Catatan di sini menempel ke siswa yang kamu tandai, dan muncul lagi saat kamu membuka profil mereka.</p>' +
+      '<form data-tg-form="journal" class="tg-form"><textarea name="text" rows="4" required placeholder="Contoh: Metode timeline di papan ampuh untuk yesterday/ago. Fikri masih tertukar verb 1/2." data-testid="tg-journal-text" aria-label="' + esc(t('guru.refleksi-60', 'Refleksi 60 detik')) + '"></textarea><label class="tg-label">' + t('guru.tandai-siswa', 'Tandai siswa (opsional)') + '</label><div class="tg-chips tg-chips-select">' + c.students.map(function (s) { return '<label class="tg-chip is-check"><input type="checkbox" name="tags" value="' + s.id + '"><span>' + esc(s.name) + '</span></label>'; }).join('') + '</div><div class="tg-actions"><button type="submit" class="tg-btn is-primary is-small" data-testid="tg-journal-submit">' + icon('notebook-pen') + ' ' + t('guru.simpan-refleksi', 'Simpan refleksi') + '</button></div></form></section>' +
       '<section class="tg-card"><div class="tg-card-head"><div><p class="tg-kicker">' + t('umum.riwayat', 'Riwayat') + '</p><h3>Jurnal ' + esc(c.name) + '</h3></div><span class="tg-count">' + list.length + '</span></div>' + (list.length ? '<ul class="tg-feed">' + list.map(function (j) { return '<li><small>' + esc(T.fmtDate(j.at)) + (j.tags && j.tags.length ? ' · ' + j.tags.map(function (id) { var s = student(id); return s ? esc(s.name) : ''; }).filter(Boolean).join(', ') : '') + '</small><p>' + esc(j.text) + '</p></li>'; }).join('') + '</ul>' : '<p class="tg-empty">' + t('guru.belum-ada-catatan', 'Belum ada catatan.') + '</p>') + '</section></div>';
   }
   /* Kartu AKUN. Sebelum ini halaman ini hanya memuat profil LOKAL (nama & sekolah untuk
@@ -3105,6 +3367,14 @@
       + status + '<div class="tg-actions">' + actions + '</div></section>';
   }
 
+  /* PILAR 1 · penjepit scope untuk panel kurikulum: lisensi token memaksa
+     ui.curriculumSubject kembali ke mapel berlisensi sebelum panel membaca apa pun. */
+  try {
+    var __scPanel = teacherSubjectScope();
+    if (__scPanel && __scPanel.locked && __scPanel.subjects.indexOf(ui.curriculumSubject) < 0) {
+      ui.curriculumSubject = __scPanel.active;
+    }
+  } catch (_) {}
   /* =====================================================================================
      PANEL KURIKULUM & KOMPETENSI — DIRENDER DI DALAM DASBOR KELASKU (m025-357)
      =====================================================================================
@@ -3277,6 +3547,25 @@
     var cat = MAPEL_CATALOG[sId] || MAPEL_CATALOG['MAT'];
     var mItem = MAPEL_LIST.filter(function (x) { return x.id === sId; })[0] || { name: sId, grade: 'SD / SMP / SMA' };
 
+    /* PILAR 1 · pemilih mapel panel mengikuti lisensi token: single-mapel menjadi
+       badge terkunci, multi-mapel hanya berisi lisensi. */
+    var __scPk = null;
+    try { __scPk = teacherSubjectScope(); } catch (_) {}
+    var allowedList = (__scPk && __scPk.locked) ? scopeMapelList() : MAPEL_LIST;
+    var subjectPicker = '';
+    if (__scPk && __scPk.locked && !__scPk.multi) {
+      subjectPicker = '<div class="tg-subject-badge" data-testid="tg-curriculum-subject-badge" role="status">' +
+        icon('lock') + '<span><b>' + esc(mItem.id + ' — ' + mItem.name) + '</b><small>' + esc(__scPk.grade + ' · ' + gradeKelasLabel(__scPk.grade) + ' · ' + t('guru.scope-terkunci', 'Terkunci ke mapel Anda')) + '</small></span></div>';
+    } else {
+      subjectPicker = '<label class="tg-label-inline">' + t('guru.pilih-mapel', 'Pilih Mata Pelajaran') + ': ' +
+        '<select class="tg-select" data-tg-select="curriculum-subject" data-testid="tg-curriculum-subject-select" aria-label="' + esc(t('guru.pilih-mapel', 'Pilih Mata Pelajaran')) + '">' +
+          allowedList.map(function (m) {
+            return '<option value="' + m.id + '"' + (m.id === sId ? ' selected' : '') + '>' + esc(m.id + ' — ' + m.name + ' (' + m.grade + ')') + '</option>';
+          }).join('') +
+        '</select>' +
+      '</label>';
+    }
+
     var kepala = '<div class="tg-kur-head">' +
       '<p class="tg-kicker">' + icon('compass') + ' ' + esc(t('guru.nav-kurikulum', 'Kurikulum & Kompetensi')) + '</p>' +
       '<h3>' + esc(t('guru.kurikulum-panel-judul', 'Kurikulum Merdeka, di dalam kelasmu')) + '</h3>' +
@@ -3284,14 +3573,9 @@
     '</div>';
 
     var toolbar = '<div class="tg-curriculum-toolbar">' +
+      subjectScopeBadge() +
       '<div class="tg-curriculum-actions">' +
-        '<label class="tg-label-inline">' + t('guru.pilih-mapel', 'Pilih Mata Pelajaran') + ': ' +
-          '<select class="tg-select" data-tg-select="curriculum-subject" data-testid="tg-curriculum-subject-select">' +
-            MAPEL_LIST.map(function (m) {
-              return '<option value="' + m.id + '"' + (m.id === sId ? ' selected' : '') + '>' + esc(m.id + ' — ' + m.name + ' (' + m.grade + ')') + '</option>';
-            }).join('') +
-          '</select>' +
-        '</label>' +
+        subjectPicker +
         '<button type="button" class="tg-btn is-ghost is-small" data-tg="refresh-curriculum">' + icon('rotate-cw') + ' <span>' + esc(t('umum.muat-ulang', 'Muat Ulang')) + '</span></button>' +
       '</div>' +
       '<div class="tg-seed-badge">' + icon('book-open') + ' <span><b>' + esc(mItem.name) + '</b> (' + esc(mItem.grade) + ') · ' + esc(t('guru.kurikulum-nasional', 'Kurikulum Nasional')) + '</span></div>' +
@@ -3503,7 +3787,20 @@
     var m = ui.modal, T = S(), body = '', title = '', wide = false;
     if (m.kind === 'new-class' || m.kind === 'edit-class') {
       var e = m.kind === 'edit-class' ? c : null; title = e ? t('guru.ubah-kelas', 'Ubah kelas') : t('guru.kelas-baru', 'Kelas baru');
-      body = '<form data-tg-form="' + m.kind + '" class="tg-form"><label class="tg-label">' + t('guru.nama-kelas', 'Nama kelas') + '<input name="name" required maxlength="60" value="' + esc(e ? e.name : '') + '" placeholder="English A2 — Kelas 10A" data-autofocus data-testid="tg-class-name"></label><div class="tg-form-row"><label class="tg-label">Level<select name="level" data-testid="tg-class-level">' + ['A1', 'A2', 'B1', 'B2', 'C1'].map(function (l) { return '<option' + ((e ? e.level : 'A2') === l ? ' selected' : '') + '>' + l + '</option>'; }).join('') + '</select></label><label class="tg-label">Mata pelajaran<input name="subject" value="' + esc(e ? e.subject : 'English') + '" maxlength="40"></label></div><label class="tg-label">Kode kelas (mis. FZ-QVQDHM)<input name="code" value="' + esc(e ? e.code : '') + '" placeholder="FZ-XXXXXX (otomatis atau gunakan kode sekolah)" maxlength="16"></label><div class="tg-actions"><button type="submit" class="tg-btn is-primary" data-testid="tg-class-submit">' + (e ? t('umum.simpan', 'Simpan') : t('guru.buat-kelas', 'Buat kelas')) + '</button>' + (e ? '' : '<button type="button" class="tg-btn is-ghost" data-tg="seed-demo">Atau muat kelas contoh</button>') + '</div></form>';
+      /* AUDIT: input mapel bebas adalah lubang isolasi — guru IPA bisa mengetik MAT.
+         Saat terkunci: hidden + badge (single) atau select lisensi (multi). */
+      var __scCls2 = null;
+      try { __scCls2 = teacherSubjectScope(); } catch (_) {}
+      var __defSub = (e && e.subject) || (__scCls2 && __scCls2.locked ? __scCls2.active : 'English');
+      var __subField = '';
+      if (__scCls2 && __scCls2.locked && !__scCls2.multi) {
+        __subField = '<label class="tg-label">' + t('guru.pilih-mapel', 'Pilih Mata Pelajaran') + '<input type="hidden" name="subject" value="' + esc(__scCls2.active) + '"><div class="tg-subject-badge" data-testid="tg-class-subject-badge">' + icon('lock') + '<span><b>' + esc(__scCls2.active) + '</b></span></div></label>';
+      } else if (__scCls2 && __scCls2.locked) {
+        __subField = '<label class="tg-label">' + t('guru.pilih-mapel', 'Pilih Mata Pelajaran') + '<select name="subject" data-testid="tg-class-subject">' + __scCls2.subjects.map(function (sid) { return '<option value="' + sid + '"' + (__defSub === sid ? ' selected' : '') + '>' + esc(sid + ' — ' + mapelName(sid)) + '</option>'; }).join('') + '</select></label>';
+      } else {
+        __subField = '<label class="tg-label">Mata pelajaran<input name="subject" value="' + esc(__defSub) + '" maxlength="40"></label>';
+      }
+      body = '<form data-tg-form="' + m.kind + '" class="tg-form"><label class="tg-label">' + t('guru.nama-kelas', 'Nama kelas') + '<input name="name" required maxlength="60" value="' + esc(e ? e.name : '') + '" placeholder="English A2 — Kelas 10A" data-autofocus data-testid="tg-class-name"></label><div class="tg-form-row"><label class="tg-label">Level<select name="level" data-testid="tg-class-level">' + ['A1', 'A2', 'B1', 'B2', 'C1'].map(function (l) { return '<option' + ((e ? e.level : 'A2') === l ? ' selected' : '') + '>' + l + '</option>'; }).join('') + '</select></label>' + __subField + '</div><label class="tg-label">Kode kelas (mis. FZ-QVQDHM)<input name="code" value="' + esc(e ? e.code : '') + '" placeholder="FZ-XXXXXX (otomatis atau gunakan kode sekolah)" maxlength="16"></label><div class="tg-actions"><button type="submit" class="tg-btn is-primary" data-testid="tg-class-submit">' + (e ? t('umum.simpan', 'Simpan') : t('guru.buat-kelas', 'Buat kelas')) + '</button>' + (e ? '' : '<button type="button" class="tg-btn is-ghost" data-tg="seed-demo">Atau muat kelas contoh</button>') + '</div></form>';
     } else if (m.kind === 'add-students') {
       title = t('guru.tambah-siswa', 'Tambah siswa');
       body = '<form data-tg-form="add-students" class="tg-form"><label class="tg-label">' + t('guru.nama-siswa-baris', 'Nama siswa — satu per baris, atau tempel daftar absen') + '<textarea name="names" rows="6" required placeholder="1. Rina Kartika\n2. Dimas Prasetyo\nSari, Bagas, Nadia" data-autofocus data-testid="tg-add-names"></textarea></label><p class="tg-muted">Nomor urut dan nama belakang dibuang otomatis — FIEZEL hanya menyimpan nama depan.</p><div class="tg-actions"><button type="submit" class="tg-btn is-primary" data-testid="tg-add-submit">Tambahkan</button><button type="button" class="tg-btn is-ghost" data-tg="modal" data-kind="import-code">Punya kode hasil murid?</button></div></form>';
@@ -3514,15 +3811,26 @@
       title = t('guru.buat-tugas-ujian', 'Buat tugas / ujian'); wide = true;
       var C = root.FiezelCurriculum;
       var mapelAvailable = 0;
+      /* AUDIT: saat scope terkunci, tab Inggris & skill-cepat disembunyikan — keduanya
+         selalu ditolak guard saat terbit, jadi menampilkannya hanya jebakan UX. */
+      var __scTab = null;
+      try { __scTab = teacherSubjectScope(); } catch (_) {}
       var tab = ui.assignTab || (m.tab || 'mapel');
+      if (__scTab && __scTab.locked && (tab === 'curriculum' || tab === 'skills')) tab = 'mapel';
       var curPhase = ui.curriculumPhase || (c && c.level === 'A1' ? 'fase_d' : c && (c.level === 'B1' || c.level === 'B2') ? 'fase_f' : 'fase_d');
       var phases = C ? C.getPhases() : [];
       var units = C ? C.getUnits({ phaseId: curPhase }) : [];
       var selUnitId = ui.curriculumUnitId || (units[0] ? units[0].id : null);
       var curUnit = C && selUnitId ? C.getUnit(selUnitId) : (units[0] || null);
       var skills = T.SKILL_ORDER.filter(function (k) { return k !== 'speaking'; }), pre = m.skill || 'past_tense', tgt = m.target ? [m.target] : [];
+      try {
+        if (m.targets && Array.isArray(m.targets) && m.targets.length) tgt = m.targets.slice();
+        else if (typeof m.targets === 'string' && m.targets) tgt = String(m.targets).split(',');
+      } catch (_) {}
 
-      var tabHeader = '<div class="tg-assign-tabs">' +
+      var tabHeader = (__scTab && __scTab.locked)
+        ? '<div class="tg-assign-tabs" data-testid="tg-assign-tabs-locked"><span class="tg-tab-btn is-active">' + icon('library') + ' 🏛️ ' + esc(t('guru.tab-kurikulum-nasional', 'Kurikulum Nasional (17 Mapel)')) + '</span></div>'
+        : '<div class="tg-assign-tabs">' +
         '<button type="button" class="tg-tab-btn' + (tab === 'mapel' ? ' is-active' : '') + '" data-tg="assign-tab" data-tab="mapel">' + icon('library') + ' 🏛️ ' + esc(t('guru.tab-kurikulum-nasional', 'Kurikulum Nasional (17 Mapel)')) + '</button>' +
         '<button type="button" class="tg-tab-btn' + (tab === 'curriculum' ? ' is-active' : '') + '" data-tg="assign-tab" data-tab="curriculum">' + icon('notebook-pen') + ' 📘 ' + esc(t('guru.tab-kurikulum-inggris', 'Bahasa Inggris (Kurmer)')) + '</button>' +
         '<button type="button" class="tg-tab-btn' + (tab === 'skills' ? ' is-active' : '') + '" data-tg="assign-tab" data-tab="skills">' + icon('sparkles') + ' ⚡ ' + esc(t('guru.tab-bank-cepat', 'Latihan cepat per skill (A2)')) + '</button>' +
@@ -3530,7 +3838,12 @@
 
       var tabContent = '';
       if (tab === 'mapel') {
+        var __sc = null;
+        try { __sc = teacherSubjectScope(); } catch (_) { __sc = null; }
+        var __allowed = (__sc && __sc.locked) ? scopeMapelList() : MAPEL_LIST;
         var curSId = m.subjectId || ui.assignSubject || ui.curriculumSubject || 'MAT';
+        if (__sc && __sc.locked && __sc.subjects.indexOf(curSId) < 0) curSId = __sc.active;
+        if (!validSubjectId(curSId)) curSId = (__sc && __sc.locked ? __sc.active : 'MAT');
         var mCode = m.compCode || ui.assignCompCode || '';
         var mTitle = m.compTitle || ui.assignCompTitle || '';
         var catItem = MAPEL_CATALOG[curSId] || MAPEL_CATALOG['MAT'];
@@ -3626,12 +3939,19 @@
         var totalAvailable = allQItems.length;
         mapelAvailable = totalAvailable;
 
-        var subjectSelect = '<label class="tg-label">' + t('guru.pilih-mapel-tugas', 'Pilih Mata Pelajaran (17 Mapel)') +
-          '<select name="subject_id" data-tg-select="assign-subject" class="tg-select-unit" data-testid="tg-assign-subject-select">' +
-            MAPEL_LIST.map(function (mItem) {
-              return '<option value="' + mItem.id + '"' + (mItem.id === curSId ? ' selected' : '') + '>' + esc(mItem.id + ' — ' + mItem.name + ' (' + mItem.grade + ')') + '</option>';
-            }).join('') +
-          '</select></label>';
+        var subjectSelect = '';
+        if (__sc && __sc.locked && !__sc.multi) {
+          var __m = MAPEL_LIST.filter(function (x) { return x.id === curSId; })[0] || { id: curSId, name: curSId };
+          subjectSelect = '<input type="hidden" name="subject_id" value="' + esc(curSId) + '">' +
+            '<div class="tg-subject-badge" data-testid="tg-assign-subject-badge" role="status">' + icon('lock') + '<span><b>' + esc(__m.id + ' — ' + __m.name) + '</b><small>' + esc(__sc.grade + ' · ' + gradeKelasLabel(__sc.grade)) + '</small></span></div>';
+        } else {
+          subjectSelect = '<label class="tg-label">' + t('guru.pilih-mapel-tugas', 'Pilih Mata Pelajaran (17 Mapel)') +
+            '<select name="subject_id" data-tg-select="assign-subject" class="tg-select-unit" data-testid="tg-assign-subject-select" aria-label="' + esc(t('guru.pilih-mapel-tugas', 'Pilih Mata Pelajaran (17 Mapel)')) + '">' +
+              __allowed.map(function (mItem) {
+                return '<option value="' + mItem.id + '"' + (mItem.id === curSId ? ' selected' : '') + '>' + esc(mItem.id + ' — ' + mItem.name + ' (' + mItem.grade + ')') + '</option>';
+              }).join('') +
+            '</select></label>';
+        }
 
         var chapterCardsHtml = '';
         if (displayedComps.length) {
@@ -3904,6 +4224,7 @@
         '<div class="tg-form-row"><label class="tg-label">' + t('guru.jumlah-soal', 'Jumlah soal') + (tab === 'mapel' && mapelAvailable ? (' <small class="tg-muted">(' + esc(t('guru.tersedia-label', 'tersedia')) + ' ' + mapelAvailable + ' ' + esc(t('guru.soal-di-bab-ini', 'soal di bab ini')) + ')</small>') : (tab === 'curriculum' && curUnit ? ' <small class="tg-muted">(tersedia ' + tersedia + ')</small>' : '')) + '<select name="count">' + countOptions.map(function (n) { return '<option' + (n === (tab === 'mapel' && mapelAvailable ? Math.min(mapelAvailable, 5) : tab === 'curriculum' && curUnit ? Math.min(tersedia, 8) : 5) ? ' selected' : '') + '>' + n + '</option>'; }).join('') + '</select></label><label class="tg-label">' + t('guru.tenggat-label', 'Tenggat') + '<input type="date" name="deadline" value="' + T.today(Date.now() + 2 * T.DAY) + '" data-testid="tg-assign-deadline"></label></div>' +
         '<label class="tg-label">' + esc(t('guru.langkah-2-mode', '2. Atur Mode & Waktu')) + '</label><div class="tg-mode"><label class="tg-mode-opt"><input type="radio" name="mode" value="latihan"' + (curAssignMode !== 'ujian' ? ' checked' : '') + '><div><b>🟢 ' + esc(t('guru.mode-latihan-title', 'Mode Latihan Mandiri')) + '</b><small>' + esc(t('guru.mode-latihan-sub', 'Kunci & pembahasan langsung terbuka setelah murid menjawab tiap soal. Cocok untuk PR & belajar mandiri.')) + '</small></div></label><label class="tg-mode-opt"><input type="radio" name="mode" value="ujian"' + (curAssignMode === 'ujian' ? ' checked' : '') + ' data-testid="tg-assign-mode-exam"><div><b>🛡️ ' + esc(t('guru.mode-ujian-title', 'Mode Ujian / Kuis Terjadwal')) + '</b><small>' + esc(t('guru.mode-ujian-sub', 'Ada timer hitung mundur, urutan soal diacak otomatis (anti-contek), nilai terekam otomatis ke rekap guru.')) + '</small></div></label></div>' +
         '<div class="tg-form-row"><label class="tg-label">' + t('guru.durasi-timer-ujian', 'Durasi Timer (khusus Ujian)') + '<select name="timer"><option value="10">10 Menit</option><option value="15" selected>15 Menit</option><option value="20">20 Menit</option><option value="30">30 Menit</option><option value="45">45 Menit</option><option value="60">60 Menit</option></select></label></div>' +
+        '<label class="tg-label">' + t('guru.target-kelas-paralel', 'Terapkan ke kelas paralel (1 klik untuk banyak kelas)') + '</label><div class="tg-chips tg-chips-select" data-testid="tg-assign-classes">' + st.classes.map(function (k) { return '<label class="tg-chip is-check"><input type="checkbox" name="target_classes" value="' + k.id + '"' + (k.id === (c && c.id) ? ' checked' : '') + ' data-testid="tg-assign-class-' + k.id + '"><span>' + esc(k.name) + ' <b>(' + (k.students ? k.students.length : 0) + ')</b></span></label>'; }).join('') + '</div>' +
         '<label class="tg-label">Untuk siapa</label><div class="tg-chips tg-chips-select tg-chips-scroll"><label class="tg-chip is-check"><input type="radio" name="scope" value="all"' + (tgt.length ? '' : ' checked') + '><span>Seluruh kelas</span></label>' + c.students.map(function (s) { return '<label class="tg-chip is-check"><input type="checkbox" name="targets" value="' + s.id + '"' + (tgt.indexOf(s.id) !== -1 ? ' checked' : '') + '><span>' + esc(s.name) + '</span></label>'; }).join('') + '</div>' +
         (tab === 'mapel'
           ? '<div class="tg-actions"><button type="submit" class="tg-btn is-primary" data-testid="tg-assign-submit">' + icon('sparkles') + ' ' + t('guru.terbitkan-tugas-mapel', 'Terbitkan Tugas / Ujian Mapel') + '</button></div></form>'
@@ -4041,7 +4362,13 @@
         });
         return;
       }
-      case 'modal': ui.modal = { kind: btn.getAttribute('data-kind'), id: id, skill: btn.getAttribute('data-skill'), target: btn.getAttribute('data-target') }; break;
+      case 'modal': {
+        var __tg = btn.getAttribute('data-targets') || btn.getAttribute('data-target') || null;
+        var __tgt = null;
+        if (__tg && __tg.indexOf(',') !== -1) __tgt = __tg.split(',').map(function (x) { return String(x).trim(); }).filter(Boolean);
+        ui.modal = { kind: btn.getAttribute('data-kind'), id: id, skill: btn.getAttribute('data-skill'), target: btn.getAttribute('data-target'), targets: __tgt };
+        break;
+      }
       case 'drawer': ui.drawer = id; ui.modal = null; break;
       case 'close': ui.modal = null; ui.drawer = null; ui.inbox = false; break;
       case 'pick-class': st.activeClassId = id; break;
@@ -4092,7 +4419,31 @@
       case 'mark-done': { var a = c.assignments.filter(function (x) { return x.id === id; })[0], sid = btn.getAttribute('data-sid'); if (a) { a.done = a.done || {}; a.done[sid] = { at: Date.now(), acc: T.skillAcc(student(sid) || {}, a.skills[0]) }; } saveMinutes(1); break; }
       case 'att': { var s3 = student(id), date = ui.attDate || T.today(); if (s3) { var v = btn.getAttribute('data-v'); s3.attendance[date] = s3.attendance[date] === v ? undefined : v; if (!s3.attendance[date]) delete s3.attendance[date]; if (v === 'H' && (!s3.lastActiveAt || T.today(s3.lastActiveAt) < date)) { /* kehadiran ≠ belajar mandiri; jangan ubah lastActiveAt */ } } saveMinutes(0.2); break; }
       case 'att-all': { var dt = ui.attDate || T.today(); c.students.forEach(function (s) { s.attendance[dt] = 'H'; }); saveMinutes(3); toast('Semua ditandai hadir. Ubah yang tidak hadir saja.'); break; }
-      case 'export-csv': download(c.name.replace(/\W+/g, '-') + '-siswa.csv', T.csvStudents(c), 'text/csv'); saveMinutes(10); toast('CSV diunduh.'); break;
+      case 'export-csv': {
+        var __scExp = null;
+        try { __scExp = teacherSubjectScope(); } catch (_) {}
+        var __rows = rekapRows(c);
+        var __head = ['Nama', 'Mapel', t('guru.rekap-akurasi-pct', 'Akurasi %'), t('guru.rekap-status-kkm', 'Status (KKM 75)'), 'Kehadiran 10x'];
+        var __csv = [__head].concat(__rows.map(function (r) { return [r.nama, r.mapel, r.akurasi == null ? '' : r.akurasi, r.status, r.kehadiran == null ? '' : Math.round(r.kehadiran * 100) + '%']; })).map(function (r) { return r.map(function (v) { return '"' + String(v == null ? '' : v).replace(/"/g, '""') + '"'; }).join(','); }).join('\n');
+        var __fname = (c.name || 'kelas').replace(/\W+/g, '-') + '-' + ((__scExp && __scExp.locked) ? __scExp.active + '-' : '') + 'rekap.csv';
+        download(__fname, __csv, 'text/csv'); saveMinutes(10); toast('CSV rekap' + ((__scExp && __scExp.locked) ? ' ' + __scExp.active : '') + ' diunduh — siap dibuka di Excel / e-Rapor.');
+        break;
+      }
+      case 'export-rekap': {
+        var __sc2 = null;
+        try { __sc2 = teacherSubjectScope(); } catch (_) {}
+        var __rows2 = rekapRows(c);
+        var __mapel2 = (__sc2 && __sc2.locked) ? __sc2.active : (c.subject || '');
+        var __html = '<html><head><meta charset="utf-8"><title>Rekap Nilai ' + esc(c.name) + '</title><style>body{font-family:Georgia,serif;max-width:760px;margin:32px auto;padding:0 16px}table{width:100%;border-collapse:collapse;font-size:13px}th,td{border:1px solid #999;padding:6px 8px;text-align:left}th{background:#eee}h1{font-size:20px}h2{font-size:14px;color:#444}.rem{color:#B93F2A;font-weight:bold}.ok{color:#166052}</style></head><body>' +
+          '<h1>Rekap Nilai — ' + esc(c.name) + '</h1><h2>' + esc(__mapel2 + ' · ' + (st.teacher.school || '') + ' · ' + (st.teacher.name || 'Guru') + ' · KKM 75 · ' + new Date().toLocaleDateString('id-ID')) + '</h2>' +
+          '<table><thead><tr><th>No</th><th>Nama</th><th>Mapel</th><th>Nilai</th><th>Status</th></tr></thead><tbody>' +
+          __rows2.map(function (r, i) { return '<tr><td>' + (i + 1) + '</td><td>' + esc(r.nama) + '</td><td>' + esc(r.mapel) + '</td><td>' + (r.akurasi == null ? '—' : r.akurasi) + '</td><td class="' + (r.status === 'Remedial' ? 'rem' : 'ok') + '">' + esc(r.status) + '</td></tr>'; }).join('') +
+          '</tbody></table><p>' + esc(t('guru.rekap-cetak-note', 'Dicetak dari KelasKu untuk Guru — siap diunggah ke e-Rapor Kemendikbudristek.')) + '</p></body></html>';
+        var w2 = null;
+        try { w2 = window.open('', '_blank'); } catch (_) {}
+        if (w2) { w2.document.write(__html); w2.document.close(); try { w2.print(); } catch (_) {} } else { download(c.name.replace(/\W+/g, '-') + '-rekap.html', __html, 'text/html'); }
+        saveMinutes(10); persist(); return;
+      }
       case 'export-json': download('fiezel-kelasku-guru-cadangan.json', JSON.stringify(st), 'application/json'); return;
       case 'reset-all': if (!confirm(t('guru.konfirm-hapus-semua', 'Hapus SEMUA data KelasKu untuk Guru di perangkat ini?'))) return; st = T.defaults(); break;
       case 'copy-groups': { var g = T.studyGroups(c, ui.insightSkill); copy('Kelompok belajar ' + T.SKILL_LABEL[ui.insightSkill] + ' — ' + c.name + '\n' + g.map(function (x) { return 'Kelompok ' + x.no + ' (mentor: ' + x.mentor.s.name + '): ' + x.members.map(function (m) { return m.s.name; }).join(', '); }).join('\n'), t('guru.kelompok-tersalin', 'Daftar kelompok tersalin.')); saveMinutes(15); persist(); return; }
@@ -4100,6 +4451,10 @@
       case 'print-weekly': { var w = window.open('', '_blank'); if (w) { w.document.write('<pre style="font:15px/1.5 Georgia,serif;white-space:pre-wrap;max-width:720px;margin:40px auto">' + esc(T.weeklyClassReport(c, st.teacher)) + '</pre>'); w.document.close(); w.print(); } saveMinutes(20); persist(); return; }
       case 'create-assign-from-comp': {
         var cSubject = ui.curriculumSubject || 'MAT';
+        try {
+          var __scBtn = teacherSubjectScope();
+          if (__scBtn && __scBtn.locked) cSubject = __scBtn.active;
+        } catch (_) {}
         var code = btn.getAttribute('data-code') || '';
         var cTit = btn.getAttribute('data-title') || '';
         var cMode = btn.getAttribute('data-mode') || 'latihan';
@@ -4121,16 +4476,26 @@
       case 'seed-mapel': runSeedMapel(); return;
       case 'seed-english': runSeedEnglish(); return;
       case 'seed-soal': runSeedSoal(); return;
-      case 'refresh-curriculum':
-        /* Satu tombol Muat Ulang menyegarkan KETIGA sumber panel ini. Menyegarkan
-           pohon saja akan meninggalkan kartu penyemai dan hitungan bank pada angka
-           lama, dan guru tidak punya cara menebak bagian mana yang basi. */
+      case 'refresh-curriculum': {
+        /* Satu tombol Muat Ulang menyegarkan KETIGA sumber panel (main), dengan
+           subjek mengikuti lisensi token (scope). */
         ui.curriculumError = null;
-        loadCurriculumTree(ui.curriculumSubject || 'MAT');
+        var __rs = null;
+        try { __rs = teacherSubjectScope(); } catch (_) {}
+        var __rSub = (__rs && __rs.locked) ? __rs.active : (ui.curriculumSubject || 'MAT');
+        loadCurriculumTree(__rSub);
         loadSeedStatus(true);
-        loadBankDepth(ui.curriculumSubject || 'MAT', true);
+        loadBankDepth(__rSub, true);
         return;
-      case 'assign-tab': { ui.assignTab = btn.getAttribute('data-tab'); persist(); render(); return; }
+      }
+      case 'assign-tab': {
+        var __nt = btn.getAttribute('data-tab');
+        try {
+          var __scTab2 = teacherSubjectScope();
+          if (__scTab2 && __scTab2.locked && (__nt === 'curriculum' || __nt === 'skills')) { toast(t('guru.scope-tolak', 'Mapel itu di luar lisensi Anda — tugas dibatalkan.')); return; }
+        } catch (_) {}
+        ui.assignTab = __nt; persist(); render(); return;
+      }
       case 'assign-phase': { ui.curriculumPhase = btn.getAttribute('data-phase'); ui.curriculumUnitId = null; persist(); render(); return; }
       case 'assign-unit': { ui.curriculumUnitId = btn.getAttribute('data-unit'); persist(); render(); return; }
       case 'select-bab': {
@@ -4193,6 +4558,16 @@
     e.preventDefault();
     var kind = form.getAttribute('data-tg-form'), fd = new FormData(form), c = cls(), T = S(), viaWa = e.submitter && e.submitter.name === 'wa';
     if (kind === 'new-class') {
+      var __reqSub = String(fd.get('subject') || '').trim().toUpperCase();
+      try {
+        var __scNew = teacherSubjectScope();
+        if (__scNew && __scNew.locked) {
+          if (__scNew.subjects.indexOf(__reqSub) < 0) {
+            toast(t('guru.scope-tolak', 'Mapel itu di luar lisensi Anda — tugas dibatalkan.'));
+            return;
+          }
+        }
+      } catch (_) {}
       var k = T.newClass(fd.get('name'), fd.get('level'), fd.get('subject'));
       var customCode = T.normalizeClassCode(fd.get('code'));
       if (customCode) k.code = customCode;
@@ -4203,6 +4578,14 @@
     else if (kind === 'edit-class' && c) {
       c.name = String(fd.get('name')).slice(0, 60);
       c.level = fd.get('level');
+      var __editSub = String(fd.get('subject') || '').trim().toUpperCase();
+      try {
+        var __scEdit = teacherSubjectScope();
+        if (__scEdit && __scEdit.locked && __scEdit.subjects.indexOf(__editSub) < 0) {
+          toast(t('guru.scope-tolak', 'Mapel itu di luar lisensi Anda — tugas dibatalkan.'));
+          return;
+        }
+      } catch (_) {}
       c.subject = fd.get('subject');
       var editCode = T.normalizeClassCode(fd.get('code'));
       if (editCode && editCode !== c.code) { c.code = editCode; if (c.sync) c.sync.claimed = false; }
@@ -4308,19 +4691,57 @@
         curriculumOnly: kurikulumOnly,
         source: sourceMeta
       });
+      /* PILAR 1 GUARD: tugas yang diterbitkan saat scope terkunci wajib berlabel
+         subjek berlisensi — menolak penyelundupan mapel lain via DevTools. */
+      try {
+        var __scPub = teacherSubjectScope();
+        if (__scPub && __scPub.locked) {
+          var __sub = (sourceMeta && sourceMeta.subjectId) || (skills[0] || '');
+          __sub = validSubjectId(__sub) || null;
+          if (!__sub || __scPub.subjects.indexOf(__sub) < 0) {
+            toast(t('guru.scope-tolak', 'Mapel itu di luar lisensi Anda — tugas dibatalkan.'));
+            return;
+          }
+        }
+      } catch (_) {}
       c.assignments.push(a);
       c.sentItemIds = (c.sentItemIds || []).concat(a.itemIds).slice(-120);
+      /* PILAR 3 · penerbitan massal paralel: target_classes berisi id kelas tujuan.
+         Tugas yang sama (items/skills/mode/deadline identik, id baru) diterbitkan ke
+         tiap kelas paralel yang dicentang dalam 1 klik. Idempoten per kelas. */
+      var publishedTo = [c.id];
+      try {
+        var tcIds = fd.getAll ? fd.getAll('target_classes') : [];
+        if (tcIds && tcIds.length) {
+          st.classes.forEach(function (k) {
+            if (!k || k.id === c.id) return;
+            if (tcIds.indexOf(k.id) < 0) return;
+            var clone = T.buildAssignment({
+              title: title, skills: skills.slice(), items: (customItems || []).slice(),
+              count: count, deadline: deadline, mode: mode, timer: timer,
+              targets: null, teacher: (st && st.teacher && st.teacher.name) || 'Guru',
+              avoid: k.sentItemIds, curriculumOnly: kurikulumOnly, source: sourceMeta
+            });
+            /* items identik (prompt/opsi sama), id unik per kelas supaya sinkron
+               server tidak menganggapnya satu tugas yang sama. */
+            k.assignments = k.assignments || [];
+            k.assignments.push(clone);
+            k.sentItemIds = (k.sentItemIds || []).concat(clone.itemIds).slice(-120);
+            publishedTo.push(k.id);
+          });
+        }
+      } catch (_) {}
       st.view = 'assignments';
       ui.modal = { kind: 'share-assign', id: a.id };
       ui.drawer = null;
       saveMinutes(25);
       if (srcType === 'mapel') {
         var sName = (sourceMeta && sourceMeta.subjectName) || 'Mapel';
-        toast(t('guru.tugas-mapel-tersusun', 'Tugas Kurikulum Nasional tersusun:') + ' ' + a.itemIds.length + ' soal ' + sName + '.');
+        toast(t('guru.tugas-mapel-tersusun', 'Tugas Kurikulum Nasional tersusun:') + ' ' + a.itemIds.length + ' soal ' + sName + (publishedTo.length > 1 ? ' · ' + publishedTo.length + ' kelas paralel.' : '.'));
       } else if (srcType === 'curriculum') {
-        toast(t('guru.tugas-tersusun', 'Tugas tersusun:') + ' ' + a.itemIds.length + ' soal kurikulum.');
+        toast(t('guru.tugas-tersusun', 'Tugas tersusun:') + ' ' + a.itemIds.length + ' soal kurikulum' + (publishedTo.length > 1 ? ' · ' + publishedTo.length + ' kelas.' : '.'));
       } else {
-        toast(t('guru.tugas-tersusun', 'Tugas tersusun:') + ' ' + a.itemIds.length + ' soal dari bank FIEZEL.');
+        toast(t('guru.tugas-tersusun', 'Tugas tersusun:') + ' ' + a.itemIds.length + ' soal dari bank FIEZEL' + (publishedTo.length > 1 ? ' · ' + publishedTo.length + ' kelas.' : '.'));
       }
     }
     else if (kind === 'announce' && c) {
@@ -4374,6 +4795,14 @@
     }
     if (sel.getAttribute('data-tg-select') === 'class') { st.activeClassId = sel.value; ui.drawer = null; persist(); render(); }
     if (sel.getAttribute('data-tg-select') === 'curriculum-subject') {
+      try {
+        var __scCur = teacherSubjectScope();
+        if (__scCur && __scCur.locked && __scCur.subjects.indexOf(sel.value) < 0) {
+          toast(t('guru.scope-tolak', 'Mapel itu di luar lisensi Anda — tugas dibatalkan.'));
+          render();
+          return;
+        }
+      } catch (_) {}
       ui.curriculumSubject = sel.value;
       loadCurriculumTree(sel.value);
       /* Kedalaman bank dihitung per mapel. Tanpa baris ini, pindah mapel meninggalkan
@@ -4383,6 +4812,14 @@
       loadBankDepth(sel.value, true);
     }
     if (sel.getAttribute('data-tg-select') === 'assign-subject') {
+      try {
+        var __scAs = teacherSubjectScope();
+        if (__scAs && __scAs.locked && __scAs.subjects.indexOf(sel.value) < 0) {
+          toast(t('guru.scope-tolak', 'Mapel itu di luar lisensi Anda — tugas dibatalkan.'));
+          render();
+          return;
+        }
+      } catch (_) {}
       ui.assignSubject = sel.value;
       ui.assignCompCode = '';
       ui.assignCompTitle = '';
@@ -4424,7 +4861,7 @@
   }
   function download(name, text, type) { try { var a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([text], { type: type || 'text/plain' })); a.download = name; document.body.appendChild(a); a.click(); setTimeout(function () { URL.revokeObjectURL(a.href); a.remove(); }, 800); } catch (_) { copy(text, 'Unduhan tidak didukung — isi tersalin.'); } }
 
-  root.FiezelTeacherShell = { mount: mount, unmount: unmount, render: render, previewAllowed: previewAllowed, exitPreview: exitPreview, _state: function () { return st; }, _autoSyncPlan: autoSyncPlan, _syncTicks: function () { return { every: SYNC_EVERY_MS, chip: CHIP_TICK_MS, stuck: (root.FiezelSyncPlan && root.FiezelSyncPlan.STUCK_MS) || 45000 }; }, _armed: function () { return !!syncTimer && !!chipTimer; }, _synthesizeMapelQuestions: synthesizeMapelQuestions, _MAPEL_LIST: MAPEL_LIST, _MAPEL_CATALOG: MAPEL_CATALOG, /* m025-357: panel kurikulum dibuka untuk gerbang supaya HTML-nya bisa diperiksa
+  root.FiezelTeacherShell = { mount: mount, unmount: unmount, render: render, previewAllowed: previewAllowed, exitPreview: exitPreview, _state: function () { return st; }, _autoSyncPlan: autoSyncPlan, _syncTicks: function () { return { every: SYNC_EVERY_MS, chip: CHIP_TICK_MS, stuck: (root.FiezelSyncPlan && root.FiezelSyncPlan.STUCK_MS) || 45000 }; }, _armed: function () { return !!syncTimer && !!chipTimer; }, _synthesizeMapelQuestions: synthesizeMapelQuestions, _MAPEL_LIST: MAPEL_LIST, _MAPEL_CATALOG: MAPEL_CATALOG, _teacherSubjectScope: teacherSubjectScope, _scopeMapelList: scopeMapelList, _assignmentSubject: assignmentSubject, _isAssignmentVisible: isAssignmentVisible, _remedialGroups: remedialGroups, _rekapRows: rekapRows, _subjectScopeBadge: subjectScopeBadge, /* m025-357: panel kurikulum dibuka untuk gerbang supaya HTML-nya bisa diperiksa
         sungguhan, bukan lewat regex atas sumbernya. `_ui` menyertainya karena panel
         ini dikendalikan keadaan muat (pohon, status semai, kedalaman bank) dan tanpa
         akses ke sana gerbang hanya bisa menguji satu keadaan dari lima. */
