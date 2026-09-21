@@ -593,7 +593,21 @@
     'kelas.tempel-soal-jelas': 'วางโจทย์ — หนึ่งบรรทัดต่อหนึ่งข้อ:',
     'kelas.tempel-soal-format': '(เฉลย: ตัวอักษร ตัวเลข หรือข้อความ) บล็อกที่มีหมายเลขพร้อม A./B./C./D. และ “Answer: B” ก็อ่านได้เช่นกัน',
     'kelas.panduan-bab': '2. เลือกระดับชั้น (ม.1 หรือ ม.2) และเลือกการ์ดบทเรียน',
-    'kelas.panduan-soal': '3. เลือกจำนวนข้อสอบ (5 ข้อฝึกเร็ว หรือ 10 ข้อสอบย่อย) แล้วมอบหมาย'
+    'kelas.panduan-soal': '3. เลือกจำนวนข้อสอบ (5 ข้อฝึกเร็ว หรือ 10 ข้อสอบย่อย) แล้วมอบหมาย',
+    'guru.lvl-kelas-7': 'มัธยมศึกษาปีที่ 1 (ม.1)',
+    'guru.lvl-kelas-8': 'มัธยมศึกษาปีที่ 2 (ม.2)',
+    'guru.lvl-kelas-9': 'มัธยมศึกษาปีที่ 3 (ม.3)',
+    'guru.lvl-fase-d': 'ช่วงชั้น D (มัธยมต้น)',
+    'guru.placeholder-kelas-7a': 'ม.1A',
+    'guru.placeholder-kelas-10a': 'English A2 — ม.4A',
+    'guru.mapel-singkat': 'รายวิชา',
+    'kelas.kicker-fase-d': 'หลักสูตรแห่งชาติช่วงชั้น D',
+    'kelas.judul-penugasan-buku': 'การมอบหมายคลังข้อสอบจากแบบเรียนกระทรวงศึกษาธิการ',
+    'kelas.desc-penugasan-buku': 'มีคลังข้อสอบจริงจากหลักสูตร Merdeka (แบบเรียนทางการ) เลือกบทตามระดับชั้น กำหนดจำนวนข้อ กำหนดส่ง และมอบหมายให้นักเรียนได้ทันที',
+    'kelas.btn-buka-bank-tugas': 'เปิดคลังข้อสอบและมอบหมายงาน',
+    'kelas.btn-tab-kurikulum': 'เปิดแท็บหลักสูตรและสมรรถนะ',
+    'kelas.panduan-cepat-judul': 'คำแนะนำการมอบหมายงานด่วน',
+    'kelas.panduan-langkah-1': '1. คลิกปุ่มเปิดคลังข้อสอบด้านบน'
 ,
     'guru.n-menit': '{n} นาที',
     'guru.waktu-hemat-tip': 'เวลางานธุรการโดยประมาณที่ FIEZEL ทำแทนคุณ'

@@ -605,7 +605,21 @@
     'kelas.tempel-soal-jelas': 'Tempel soal — satu baris per soal:',
     'kelas.tempel-soal-format': '(kunci: huruf, nomor, atau teks). Blok bernomor dengan A./B./C./D. dan “Answer: B” juga dikenali.',
     'kelas.panduan-bab': '2. Pilih jenjang kelas (Kelas 7 atau Kelas 8) dan pilih kartu Bab materi.',
-    'kelas.panduan-soal': '3. Pilih jumlah soal (5 butir latihan cepat atau 10 butir ulangan), lalu terbitkan.'
+    'kelas.panduan-soal': '3. Pilih jumlah soal (5 butir latihan cepat atau 10 butir ulangan), lalu terbitkan.',
+    'guru.lvl-kelas-7': 'Kelas 7',
+    'guru.lvl-kelas-8': 'Kelas 8',
+    'guru.lvl-kelas-9': 'Kelas 9',
+    'guru.lvl-fase-d': 'Fase D (SMP)',
+    'guru.placeholder-kelas-7a': 'Kelas 7A',
+    'guru.placeholder-kelas-10a': 'English A2 — Kelas 10A',
+    'guru.mapel-singkat': 'Mapel',
+    'kelas.kicker-fase-d': 'Kurikulum Nasional Fase D',
+    'kelas.judul-penugasan-buku': 'Penugasan Bank Soal Buku Siswa Kemendikbudristek',
+    'kelas.desc-penugasan-buku': 'Tersedia bank soal autentik Kurikulum Merdeka (Buku Siswa Resmi). Pilih bab sesuai jenjang kelasmu, atur jumlah butir soal, tenggat pengerjaan, dan terbitkan langsung ke murid.',
+    'kelas.btn-buka-bank-tugas': 'Buka Bank Soal & Terbitkan Tugas',
+    'kelas.btn-tab-kurikulum': 'Buka Tab Kurikulum & Kompetensi',
+    'kelas.panduan-cepat-judul': 'Panduan Penugasan Cepat',
+    'kelas.panduan-langkah-1': '1. Klik tombol Buka Bank Soal di atas.'
 ,
     'guru.n-menit': '{n} menit',
     'guru.waktu-hemat-tip': 'Perkiraan waktu administrasi yang FIEZEL kerjakan untukmu'

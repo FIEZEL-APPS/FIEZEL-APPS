@@ -1,6 +1,6 @@
 {
   "schema": "fiezel-th-ui-leak-v1",
-  "generatedAt": "2026-09-21T11:54:32.217Z",
+  "generatedAt": "2026-09-21T15:22:15.368Z",
   "files": {
     "app.js": {
       "leaks": 4,
@@ -115,11 +115,11 @@
           "text": "Latihan ·"
         },
         {
-          "line": 1446,
+          "line": 1455,
           "text": "Latihan · ±"
         },
         {
-          "line": 1468,
+          "line": 1503,
           "text": "Tenggat"
         }
       ]
@@ -407,23 +407,23 @@
       "budget": 7,
       "sample": [
         {
-          "line": 1161,
+          "line": 1181,
           "text": "Penugasan Kontingen Pasukan Garuda ke wilayah konflik"
         },
         {
-          "line": 1241,
+          "line": 1261,
           "text": "Penugasan nilai (assignment)"
         },
         {
-          "line": 3241,
+          "line": 3275,
           "text": "Tenggat & tugas"
         },
         {
-          "line": 3259,
+          "line": 3293,
           "text": "Akurasi"
         },
         {
-          "line": 3280,
+          "line": 3314,
           "text": "Latihan ·"
         }
       ]
@@ -433,15 +433,15 @@
       "budget": 3,
       "sample": [
         {
-          "line": 459,
+          "line": 467,
           "text": ". Aku bangga. Lanjutkan ritmenya — 1 sesi kecil tiap hari lebih ampuh daripada 1 sesi panjang seminggu."
         },
         {
-          "line": 468,
+          "line": 476,
           "text": "• Akurasi keseluruhan:"
         },
         {
-          "line": 491,
+          "line": 499,
           "text": "Akurasi"
         }
       ]
@@ -480,8 +480,8 @@
     }
   },
   "copyKeys": {
-    "id": 3070,
-    "th": 3072,
+    "id": 3122,
+    "th": 3124,
     "idTanpaTh": 0
   },
   "pass": true

@@ -3862,7 +3862,8 @@
       var __levels = __isSMP ? ['Kelas 7', 'Kelas 8', 'Kelas 9', 'Fase D (SMP)'] : ['A1', 'A2', 'B1', 'B2', 'C1'];
       var __defLvl = __isSMP ? 'Kelas 7' : 'A2';
       var __curLvl = (e ? e.level : __defLvl);
-      var __clsPlaceholder = (__scCls2 && __scCls2.locked ? esc(__scCls2.active) + ' — Kelas 7A' : 'English A2 — Kelas 10A');
+      var __clsPlaceholder = (__scCls2 && __scCls2.locked ? esc(__scCls2.active) + ' — ' + t('guru.placeholder-kelas-7a', 'Kelas 7A') : t('guru.placeholder-kelas-10a', 'English A2 — Kelas 10A'));
+      function __smpLevelsHelper() { t('guru.lvl-kelas-7', 'Kelas 7'); t('guru.lvl-kelas-8', 'Kelas 8'); t('guru.lvl-kelas-9', 'Kelas 9'); t('guru.lvl-fase-d', 'Fase D (SMP)'); }
       body = '<form data-tg-form="' + m.kind + '" class="tg-form"><label class="tg-label">' + t('guru.nama-kelas', 'Nama kelas') + '<input name="name" required maxlength="60" value="' + esc(e ? e.name : '') + '" placeholder="' + __clsPlaceholder + '" data-autofocus data-testid="tg-class-name"></label><div class="tg-form-row"><label class="tg-label">Level<select name="level" data-testid="tg-class-level">' + __levels.map(function (l) { return '<option' + (__curLvl === l ? ' selected' : '') + '>' + l + '</option>'; }).join('') + '</select></label>' + __subField + '</div><label class="tg-label">Kode kelas (mis. FZ-QVQDHM)<input name="code" value="' + esc(e ? e.code : '') + '" placeholder="FZ-XXXXXX (otomatis atau gunakan kode sekolah)" maxlength="16"></label><div class="tg-actions"><button type="submit" class="tg-btn is-primary" data-testid="tg-class-submit">' + (e ? t('umum.simpan', 'Simpan') : t('guru.buat-kelas', 'Buat kelas')) + '</button>' + (e ? '' : '<button type="button" class="tg-btn is-ghost" data-tg="seed-demo">Atau muat kelas contoh</button>') + '</div></form>';
     } else if (m.kind === 'add-students') {
       title = t('guru.tambah-siswa', 'Tambah siswa');
