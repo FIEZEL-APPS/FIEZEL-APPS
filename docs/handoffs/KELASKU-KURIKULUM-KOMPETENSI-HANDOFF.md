@@ -128,6 +128,12 @@ program ini dimulai.
     mapel dan tingkat. Batas halaman 1000 DINYATAKAN di layar, dan hitungan tidak pernah
     tergambar untuk mapel yang tidak cocok (`bankDepthSubject`).
 
+    Dan simpul TANPA `node.id` — yaitu seluruh isi katalog cadangan perangkat — tidak
+    mendapat pil sama sekali. Ketiga penyemai berdiri sendiri, jadi bank soal bisa sudah
+    terisi sementara kurikulum mapelnya belum; menggambar `n = 0` di sana mencap seluruh
+    kompetensi "Bank soal kosong" padahal banknya penuh. Penjaganya wajib berdiri SEBELUM
+    pembacaan `depth`. Dikunci C5 (statis) dan F8 (dijalankan).
+
 23. **Cakupan per kelas TIDAK boleh masuk panel ini.** `/coverage` dan
     `/braincore/tp-detail` menuntut `class_id` backend kurikulum; kelas di dasbor ini
     kelas KelasKu lokal. Ini kasus yang sama dengan "Yang BELUM selesai dari X4" di bawah.
@@ -272,7 +278,7 @@ tidak boleh ada yang kurang — **sisi guru saja, sisi murid dipertahankan**.
 - ✅ **T9** — 26 glyph ditambahkan ke subset lucide (92 → 118) dan titik buta gerbang
   ikon ditutup (kontrak §24). 30 ikon kosong di KelasKu murid **dan** guru, hilang.
 
-Gerbang baru: `tests/kelasku-kurikulum-dashboard-test.js` (21 assert, red-proof 4 kerusakan),
+Gerbang baru: `tests/kelasku-kurikulum-dashboard-test.js` (30 assert, red-proof 5 kerusakan),
 terdaftar di `quality.yml`. `tests/lucide-icon-coverage-test.js` dan
 `tests/curriculum-console-gate-test.js` diperluas.
 

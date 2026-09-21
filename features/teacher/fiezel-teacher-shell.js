@@ -3365,10 +3365,31 @@
 
     function bankPill(node) {
       if (!depthCocok) return '';
+      /* SIMPUL TANPA ID TIDAK MENDAPAT PIL SAMA SEKALI (temuan gitar-bot, m025-357).
+         ==================================================================================
+         Pohon yang gagal dimuat jatuh ke katalog cadangan perangkat, dan simpul buatan
+         itu hanya membawa code/name/description/bloom_level — TIDAK ada `id`. Karena
+         kedalaman bank dicocokkan lewat node.id (alasannya tepat di bawah), setiap simpul
+         cadangan menghasilkan n = 0.
+
+         Tanpa baris ini, n = 0 itu tergambar sebagai pil merah "Bank soal kosong". Dan itu
+         BUKAN sekadar tidak berguna, ia BERBOHONG: ketiga penyemai berdiri sendiri-sendiri,
+         jadi guru bisa saja sudah menyemai bank soal (seed-soal) sementara kurikulum
+         mapelnya belum. Dalam keadaan itu `depth` terisi — `depthCocok` benar — tetapi
+         pohonnya datang dari katalog lokal, sehingga SELURUH kompetensi dicap banknya
+         kosong padahal banknya penuh. Guru yang percaya kepadanya akan menyemai ulang
+         tanpa perlu, atau melewati kompetensi yang sebenarnya siap dilatih.
+
+         Kode katalog lokal tidak akan pernah cocok dengan competency_id milik soal, jadi
+         tidak ada hitungan jujur yang bisa dibuat untuk simpul cadangan. Yang jujur adalah
+         DIAM: spanduk "Sumber: katalog cadangan perangkat" di atas sudah mengatakan kenap
+         layar ini tidak membawa angka. Ini persis kelas kebohongan yang T4 ada untuk
+         mencegahnya — dan versi pertama T4 sendiri melanggarnya. */
+      if (!node || !node.id) return '';
       /* Dicari lewat ID SIMPUL, bukan kode. `competency_id` pada soal adalah id simpul
          kurikulum (KOMP-…), sedangkan `code` dipakai bersama lintas mapel dan tingkat —
          mencocokkan lewat code akan menempelkan soal mapel lain ke kompetensi ini. */
-      var n = node && node.id ? (depth[node.id] || 0) : 0;
+      var n = depth[node.id] || 0;
       if (!n) {
         return '<span class="tg-bank-pill is-empty" data-testid="tg-bank-empty-' + esc(node.code || '') + '">' +
           icon('circle-slash') + ' ' + esc(t('guru.kurikulum-kompetensi-kosong', 'Bank soal kosong')) + '</span>';

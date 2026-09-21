@@ -146,9 +146,29 @@ test('C1 kedalaman bank dicocokkan lewat ID SIMPUL, bukan lewat kode kompetensi'
      §1 di docs/handoffs/KELASKU-KURIKULUM-KOMPETENSI-HANDOFF.md. */
   const i = SHELL.indexOf('function bankPill(node)');
   assert.ok(i > 0, 'bankPill() tidak ada');
-  const blok = SHELL.slice(i, i + 700);
+  /* Jendelanya dilebarkan ke 2200 di m025-357: penjaga simpul-tanpa-id membawa blok
+     alasan panjang di depan pembacaan depth, dan jendela 700 lama berhenti sebelum
+     sampai ke sana — assert ini akan merah karena TIDAK MELIHAT, bukan karena rusak. */
+  const blok = SHELL.slice(i, i + 2200);
   assert.ok(/depth\[node\.id\]/.test(blok), 'kedalaman bank dibaca lewat sesuatu selain node.id');
   assert.ok(!/depth\[node\.code\]/.test(blok), 'kedalaman bank dibaca lewat node.code — soal mapel lain akan ikut terhitung');
+});
+
+test('C5 simpul TANPA id tidak pernah dicap "bank kosong"', () => {
+  /* Pohon yang gagal dimuat jatuh ke katalog cadangan perangkat, dan simpul buatan itu
+     tidak punya node.id. Tanpa penjaga, kedalaman bank membacanya sebagai 0 lalu
+     mencetak pil merah "Bank soal kosong" — padahal ketiga penyemai berdiri sendiri,
+     jadi bank soal bisa SUDAH penuh sementara kurikulum mapelnya belum disemai.
+     (Temuan gitar-bot di PR #454; versi pertama T4 melanggar aturannya sendiri.) */
+  const i = SHELL.indexOf('function bankPill(node)');
+  assert.ok(i > 0, 'bankPill() tidak ada');
+  const blok = SHELL.slice(i, i + 2200);
+  assert.ok(/if \(!node \|\| !node\.id\) return '';/.test(blok),
+    'bankPill() tidak memulangkan string kosong untuk simpul tanpa id — setiap kompetensi ' +
+    'katalog cadangan akan dicap "Bank soal kosong" walau banknya penuh');
+  /* Penjaganya WAJIB berdiri SEBELUM pembacaan depth, kalau tidak ia tidak menjaga apa pun. */
+  assert.ok(blok.indexOf("if (!node || !node.id) return '';") < blok.indexOf('depth[node.id]'),
+    'penjaga simpul-tanpa-id berdiri sesudah pembacaan depth — urutannya membuatnya tidak berguna');
 });
 
 test('C2 hitungan yang TERPOTONG batas halaman dinyatakan, bukan disembunyikan', () => {
@@ -438,6 +458,35 @@ test('F7 gagal muat dan pohon kosong adalah dua kalimat yang BERBEDA', () => {
     'katalog cadangan dipakai tanpa menyatakan asal datanya');
   assert.ok(!hC.includes('data-testid="tg-curriculum-empty"'),
     'katalog cadangan terisi tetapi layar tetap mengaku kosong');
+});
+
+test('F8 katalog cadangan + bank terisi: NOL pil, bukan sebaris "bank kosong"', () => {
+  /* Keadaan yang benar-benar bisa terjadi: guru menyemai bank soal lebih dulu
+     (seed-soal), kurikulum mapelnya belum. bankDepth terisi, pohon datang dari katalog
+     cadangan. Setiap kompetensi TIDAK boleh dicap kosong. */
+  const Sh = sandboxShell({ alamat: 'https://contoh.example', bendera: true });
+  const ui = Sh._ui();
+  ui.curriculumSubject = 'MAT';
+  ui.curriculumTree = [];                       // server kosong -> jatuh ke katalog lokal
+  ui.bankDepth = { 'KOMP-MAT-1': 12 };          // bank soal SUDAH tersemai
+  ui.bankDepthSubject = 'MAT';
+  const html = Sh._kurikulumPanel();
+  assert.ok(html.includes('data-testid="tg-curriculum-source-local"'),
+    'prasyarat uji meleset: pohon tidak jatuh ke katalog cadangan');
+  assert.ok(!/Bank soal kosong/.test(html),
+    'kompetensi katalog cadangan dicap "Bank soal kosong" padahal banknya terisi — angka yang berbohong');
+  assert.ok(!/tg-bank-empty-/.test(html) && !/tg-bank-depth-/.test(html),
+    'ada pil kedalaman bank yang tergambar untuk simpul tanpa id; yang jujur adalah diam');
+
+  /* Dan penjaganya TIDAK boleh mematikan pil untuk pohon server yang sah. */
+  const server = sandboxShell({ alamat: 'https://contoh.example', bendera: true });
+  const su = server._ui();
+  su.curriculumSubject = 'MAT';
+  su.curriculumTree = [{ type: 'competency', id: 'KOMP-MAT-1', code: 'M.1', name: 'Bilangan' }];
+  su.bankDepth = { 'KOMP-MAT-1': 12 };
+  su.bankDepthSubject = 'MAT';
+  assert.ok(/tg-bank-depth-/.test(server._kurikulumPanel()),
+    'penjaga simpul-tanpa-id ikut mematikan pil untuk simpul server yang punya id');
 });
 
 /* ------------------------------------------------------------------- E. naskah & CSS */
