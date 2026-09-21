@@ -461,14 +461,17 @@
   function parentReport(c, s, teacher) {
     var acc = overallAcc(s), r = risk(c, s), w = r.weak, att = attendanceRate(s, 10), pend = pendingAssignments(c, s);
     var strong = null; SKILL_ORDER.forEach(function (k) { var v = skillAcc(s, k); if (v != null && (!strong || v > strong.acc)) strong = { skill: k, acc: v }; });
-    var lines = ['Assalamu’alaikum / Selamat ' + timeGreeting() + ' Bapak/Ibu orang tua ' + s.name + ',', 'Berikut laporan singkat belajar Bahasa Inggris ' + s.name + ' di kelas ' + c.name + ' (' + fmtDate(Date.now()) + '):', ''];
+    /* AUDIT: nama mapel mengikuti kelasnya — sebelumnya hardcode "Bahasa Inggris"
+       sehingga guru IPA mengirim rapor "belajar Bahasa Inggris" ke orang tua. */
+    var mapelLap = (c && c.subject && MAPEL_NAMES[c.subject]) || (c && c.subject) || 'Bahasa Inggris';
+    var lines = ['Assalamu’alaikum / Selamat ' + timeGreeting() + ' Bapak/Ibu orang tua ' + s.name + ',', 'Berikut laporan singkat belajar ' + mapelLap + ' ' + s.name + ' di kelas ' + c.name + ' (' + fmtDate(Date.now()) + '):', ''];
     lines.push('• Akurasi keseluruhan: ' + pct(acc) + (acc != null ? (acc >= 0.75 ? ' — baik' : acc >= 0.55 ? ' — berkembang' : ' — perlu pendampingan') : ''));
     if (strong) lines.push('• Kekuatan: ' + SKILL_LABEL[strong.skill] + ' (' + pct(strong.acc) + ')');
     if (w) lines.push('• Perlu latihan: ' + SKILL_LABEL[w.skill] + ' (' + pct(w.acc) + ')');
     if (att != null) lines.push('• Kehadiran 10 pertemuan terakhir: ' + Math.round(att * 100) + '%');
     lines.push('• Terakhir belajar mandiri: ' + (s.lastActiveAt ? fmtDate(s.lastActiveAt) : 'belum tercatat'));
     if (pend.length) lines.push(t('guru.tugas-belum-selesai', '• Tugas belum selesai:') + ' ' + pend.map(function (p) { return p.a.title; }).join(', '));
-    lines.push('', 'Yang bisa dibantu di rumah: tanyakan 1 kalimat Bahasa Inggris tentang kegiatan ' + s.name + ' kemarin (melatih ' + (w ? SKILL_LABEL[w.skill] : 'ingatan') + '). Cukup 5 menit.', '', 'Terima kasih atas kerja samanya 🙏', (teacher && teacher.name) || t('guru.tanda-tangan', 'Guru Bahasa Inggris'), (teacher && teacher.school) || '');
+    lines.push('', 'Yang bisa dibantu di rumah: tanyakan 1 hal tentang ' + mapelLap + ' yang dipelajari ' + s.name + ' kemarin (melatih ' + (w ? SKILL_LABEL[w.skill] : 'ingatan') + '). Cukup 5 menit.', '', 'Terima kasih atas kerja samanya 🙏', (teacher && teacher.name) || t('guru.tanda-tangan', 'Guru ' + mapelLap), (teacher && teacher.school) || '');
     return lines.join('\n').trim();
   }
   function weeklyClassReport(c, teacher) {

@@ -40,6 +40,9 @@
     "test:class-sync": "node tests/class-sync-test.js",
     "test:class-hub": "node tests/class-hub-test.js",
     "test:owner-teacher-panel": "node tests/owner-teacher-panel-test.js",
+    "test:teacher-isolation": "node tests/teacher-subject-isolation-test.js",
+    "test:modal-assign-ux": "node tests/modal-assign-teacher-ux-test.js",
+    "test:mapel-fase-d": "node tests/mapel-fase-d-content-test.js",
     "invite:teacher": "node tools/mint-teacher-invite.mjs",
     "opencode:reset": "node tools/opencode-reset.js",
     "opencode:fresh-user": "node tools/opencode-reset.js --fresh-user"

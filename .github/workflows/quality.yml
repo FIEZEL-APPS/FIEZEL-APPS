@@ -232,6 +232,11 @@ jobs:
           # jadi gate-registry-test merah sejak commit itu. Didaftarkan di sini (27 assert,
           # hijau saat didaftarkan) supaya ia benar-benar menjadi bukti, bukan berkas yang ada.
           node tests/modal-assign-teacher-ux-test.js
+          # Isolasi mapel per token guru KelasKu: token IPA/ENG mengunci dasbor ke
+          # mapelnya (badge ganti dropdown, tugas/analitik tersaring, guard tolak
+          # lintas-mapel), multi-mapel terbatas lisensi, tanpa token 17 mapel utuh —
+          # plus remedial/pengayaan otomatis, rekap e-Rapor, dan penerbitan paralel.
+          node tests/teacher-subject-isolation-test.js
           # Paspor Kompetensi murid: stempel dikunci pada ID unit (bukan genre, yang dipakai
           # bersama lintas tingkat kelas), buku bukti terpisah dari riwayat kiriman yang
           # dipotong, dan mengulang misi tidak pernah menurunkan stempel. Temuan K1/K2/K4
