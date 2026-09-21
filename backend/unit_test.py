@@ -236,6 +236,22 @@ async def test_state_sync():
     check("sync_state mencatat pembaruan server", res["server_updated_count"] >= 1)
 
 
+def test_shuffled_questions_and_options():
+    q = {
+        "question_id": "Q-TEST-1",
+        "version": 1,
+        "question_type": "mcq",
+        "options": ["Aplikasi 1", "Aplikasi 2", "Aplikasi 3", "Aplikasi 4"],
+        "answer_key": "A"
+    }
+    q1 = learning.get_shuffled_question_data("SES-STUDENT-1", q)
+    q2 = learning.get_shuffled_question_data("SES-STUDENT-2", q)
+    
+    check("shuffled options tetap memiliki 4 opsi", len(q1["options"]) == 4)
+    check("kunci jawaban menyesuaikan opsi yang diacak", q1["answer_key"] in ["A", "B", "C", "D"])
+    check("shuffling berbeda antar siswa (anti-cheating)", q1["options"] != q2["options"] or q1["answer_key"] != q2["answer_key"])
+
+
 async def main():
     test_bkt()
     test_irt_3pl()
@@ -246,6 +262,7 @@ async def main():
     await test_validation()
     await test_blueprint()
     await test_state_sync()
+    test_shuffled_questions_and_options()
     print(f"\n=== {ok} PASS / {fail} FAIL ===")
     if fail:
         sys.exit(1)
