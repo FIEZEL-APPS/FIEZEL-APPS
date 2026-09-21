@@ -1439,7 +1439,7 @@
   function tKelas(c, env) {
     var TS = T(), stt = TS.classStats(c), sync = TS.syncLabel(c);
     var sc = env && env.scope;
-    var subDisplay = (c.subject && skillLabel(c.subject)) || c.subject || (sc && sc.active) || 'Mapel';
+    var subDisplay = (c.subject && skillLabel(c.subject)) || c.subject || (sc && sc.active) || t('guru.mapel-singkat', 'Mapel');
     return '<div class="ch-body"><section class="ch-card ch-class-card"><div class="ch-card-top"><div><p class="ch-kicker">' + esc(c.level) + ' · ' + esc(subDisplay) + '</p><h2>' + esc(c.name) + '</h2></div><span class="ch-sync is-' + sync.state + '">' + esc(sync.text) + '</span></div><p class="ch-muted">Kode kelas <b class="ch-mono">' + esc(c.code) + '</b> — murid memasukkannya di tab Kelas ▸ Kelas Saya. Setelah itu tugasmu masuk ke lonceng mereka dan hasilnya kembali ke sini.</p>' +
       '<div class="ch-kpis"><div class="ch-kpi"><b>' + stt.total + '</b><span>murid</span></div><div class="ch-kpi"><b>' + stt.active7 + '</b><span>aktif 7 hari</span></div><div class="ch-kpi"><b>' + pct(stt.avgAcc) + '</b><span>akurasi</span></div><div class="ch-kpi"><b>' + stt.openAssignments + '</b><span>tugas terbuka</span></div></div>' +
       '<div class="ch-actions"><button type="button" class="tg-btn is-primary" data-tg="modal" data-kind="add-students" data-testid="tclass-add-students">' + icon('user-plus') + ' ' + t('kelas.tambah-murid', 'Tambah murid') + '</button><button type="button" class="tg-btn is-ghost" data-tg="sync" data-testid="tclass-sync">' + icon('refresh-cw') + ' Sinkron</button><button type="button" class="tg-btn is-ghost" data-tg="copy" data-text="' + esc(c.code) + '">' + icon('copy') + ' Salin kode</button><button type="button" class="tg-btn is-ghost" data-ch="ttab" data-tab="buat">' + icon('plus') + ' ' + t('kelas.buat-tugas', 'Buat tugas') + '</button><button type="button" class="tg-btn is-ghost" data-tg="modal" data-kind="edit-class">' + icon('pencil') + ' ' + t('umum.ubah', 'Ubah') + '</button><button type="button" class="tg-btn is-danger" data-tg="delete-class" data-testid="tclass-delete-class">' + icon('trash-2') + ' ' + t('guru.hapus-kelas', 'Hapus kelas') + '</button></div></section>' +
@@ -1470,19 +1470,19 @@
       return '<div class="ch-body" data-testid="tclass-mapel-hub">' +
         '<div class="ch-card ch-card-ink" data-testid="tclass-mapel-hub-card">' +
           '<div class="ch-card-top"><div>' +
-            '<p class="ch-kicker">' + icon('book-open') + ' Kurikulum Nasional Fase D · ' + esc(sName) + '</p>' +
-            '<h3>Penugasan Bank Soal Buku Siswa Kemendikbudristek</h3>' +
+            '<p class="ch-kicker">' + icon('book-open') + ' ' + t('kelas.kicker-fase-d', 'Kurikulum Nasional Fase D') + ' · ' + esc(sName) + '</p>' +
+            '<h3>' + t('kelas.judul-penugasan-buku', 'Penugasan Bank Soal Buku Siswa Kemendikbudristek') + '</h3>' +
           '</div></div>' +
-          '<p class="ch-muted">Tersedia bank soal autentik Kurikulum Merdeka (Buku Siswa Resmi). Pilih bab sesuai jenjang kelasmu, atur jumlah butir soal, tenggat pengerjaan, dan terbitkan langsung ke murid.</p>' +
+          '<p class="ch-muted">' + t('kelas.desc-penugasan-buku', 'Tersedia bank soal autentik Kurikulum Merdeka (Buku Siswa Resmi). Pilih bab sesuai jenjang kelasmu, atur jumlah butir soal, tenggat pengerjaan, dan terbitkan langsung ke murid.') + '</p>' +
           '<div class="ch-actions">' +
-            '<button type="button" class="tg-btn is-primary" data-tg="modal" data-kind="assign" data-testid="tclass-open-assign-modal">' + icon('plus') + ' Buka Bank Soal & Terbitkan Tugas ' + esc(sName) + '</button>' +
-            '<button type="button" class="tg-btn is-ghost" data-ch="ttab" data-tab="kurikulum">' + icon('compass') + ' Buka Tab Kurikulum & Kompetensi</button>' +
+            '<button type="button" class="tg-btn is-primary" data-tg="modal" data-kind="assign" data-testid="tclass-open-assign-modal">' + icon('plus') + ' ' + t('kelas.btn-buka-bank-tugas', 'Buka Bank Soal & Terbitkan Tugas') + ' ' + esc(sName) + '</button>' +
+            '<button type="button" class="tg-btn is-ghost" data-ch="ttab" data-tab="kurikulum">' + icon('compass') + ' ' + t('kelas.btn-tab-kurikulum', 'Buka Tab Kurikulum & Kompetensi') + '</button>' +
           '</div>' +
         '</div>' +
         '<div class="ch-card">' +
-          '<h4>Panduan Penugasan Cepat</h4>' +
+          '<h4>' + t('kelas.panduan-cepat-judul', 'Panduan Penugasan Cepat') + '</h4>' +
           '<ol class="ch-mini-list">' +
-            '<li><span class="ch-grow">1. Klik tombol <b>Buka Bank Soal</b> di atas.</span></li>' +
+            '<li><span class="ch-grow">' + esc(t('kelas.panduan-langkah-1', '1. Klik tombol Buka Bank Soal di atas.')) + '</span></li>' +
             '<li><span class="ch-grow">' + esc(t('kelas.panduan-bab', '2. Pilih jenjang kelas (Kelas 7 atau Kelas 8) dan pilih kartu Bab materi.')) + '</span></li>' +
             '<li><span class="ch-grow">' + esc(t('kelas.panduan-soal', '3. Pilih jumlah soal (5 butir latihan cepat atau 10 butir ulangan), lalu terbitkan.')) + '</span></li>' +
           '</ol>' +
