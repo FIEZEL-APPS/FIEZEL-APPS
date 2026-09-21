@@ -296,6 +296,150 @@ test('D7 penjaga yang padam di tengah sesi tidak meninggalkan tab tergantung', (
     'hub tidak kembali ke tab yang sah — guru terjebak di panel yang sudah tidak ada');
 });
 
+/* ------------------------------ F. DIJALANKAN: panel benar-benar dirender teacher shell */
+
+/* Bagian D membuktikan hub memasang TEMPATNYA. Bagian ini membuktikan shell benar-benar
+   mengisi ISINYA: cangkang dimuat di sandbox, panelnya dipanggil, dan yang diperiksa
+   adalah HTML sungguhan — bukan regex atas sumbernya. Tanpa ini, panel bisa saja
+   mengembalikan string kosong untuk setiap keadaan dan seluruh bagian D tetap hijau. */
+function sandboxShell(cfg) {
+  const vm = require('vm');
+  const sandbox = {
+    console, setTimeout, clearTimeout, Promise, Date, Math, JSON, encodeURIComponent, String, Number, Object, Array,
+    FIEZEL_CURRICULUM_CONFIG: { curriculumApiUrl: cfg.alamat },
+    FiezelUX: { on: (f) => f === 'curriculumConsole' && cfg.bendera },
+    localStorage: { getItem: () => null, setItem() {}, removeItem() {} },
+    fetch: () => Promise.reject(new Error('offline')),
+    navigator: { onLine: false },
+    document: {
+      createElement: () => ({ setAttribute() {}, style: {} }),
+      head: { appendChild() {} },
+      body: { classList: { add() {}, remove() {} } },
+      getElementById: () => null,
+      querySelectorAll: () => []
+    }
+  };
+  sandbox.window = sandbox; sandbox.self = sandbox; sandbox.globalThis = sandbox;
+  vm.createContext(sandbox);
+  vm.runInContext(baca('features/teacher/fiezel-teacher-shell.js'), sandbox);
+  return sandbox.FiezelTeacherShell;
+}
+
+test('F1 tanpa alamat backend panel mengembalikan string KOSONG', () => {
+  const S1 = sandboxShell({ alamat: '', bendera: true });
+  assert.strictEqual(S1._kurikulumPanel(), '', 'panel tergambar walau alamat backend kosong');
+  const S2 = sandboxShell({ alamat: 'https://contoh.example', bendera: false });
+  assert.strictEqual(S2._kurikulumPanel(), '', 'sakelar mati paksa tidak menutup panel');
+});
+
+test('F2 panel MEMANCARKAN ketiga tombol penyemai, pemilih mapel, dan pintu konsol', () => {
+  const Sh = sandboxShell({ alamat: 'https://contoh.example', bendera: true });
+  const html = Sh._kurikulumPanel();
+  assert.ok(html, 'panel kosong padahal penjaganya menyala');
+  ['seed-english', 'seed-mapel', 'seed-soal'].forEach((a) => {
+    assert.ok(html.includes('data-tg="' + a + '"'),
+      'HTML panel tidak memancarkan tombol ' + a + ' — mesin penyemainya kembali tanpa pintu');
+    assert.ok(html.includes('data-testid="tg-' + a + '-card"'), 'kartu ' + a + ' tidak ada di HTML');
+  });
+  assert.ok(html.includes('data-tg-select="curriculum-subject"'), 'pemilih mapel tidak ada');
+  assert.ok(html.includes('data-tg="refresh-curriculum"'), 'tombol Muat Ulang tidak ada');
+  assert.ok(html.includes('data-testid="tg-curriculum-console-door"'), 'pintu konsol penuh tidak ada');
+  assert.ok(html.includes('href="./kurikulum.html"'), 'pintu konsol tidak menaut ke mana pun');
+  assert.ok(html.includes('data-testid="tg-curriculum-panel"'), 'penanda panel tidak ada');
+});
+
+test('F3 kartu penyemai TIDAK mengarang angka sebelum statusnya terbaca', () => {
+  const Sh = sandboxShell({ alamat: 'https://contoh.example', bendera: true });
+  const html = Sh._kurikulumPanel();
+  assert.ok(/Memeriksa isi bank kurikulum/.test(html),
+    'kartu tidak menyatakan bahwa ia masih memeriksa — ia akan terbaca seperti fakta');
+  assert.ok(!/Sudah tersemai/.test(html), 'kartu mengaku "sudah tersemai" sebelum statusnya dibaca');
+  assert.ok(!/undefined|\{tp\}|\{komp\}|\{n\}/.test(html),
+    'ada lubang naskah atau undefined yang bocor ke layar: ' +
+    (html.match(/undefined|\{\w+\}/) || [''])[0]);
+});
+
+test('F4 status terbaca: angka asli tercetak, dan tombolnya berubah jadi "Semai ulang"', () => {
+  const Sh = sandboxShell({ alamat: 'https://contoh.example', bendera: true });
+  const ui = Sh._ui();
+  ui.seedStatus = {
+    english: { seeded: true, tp: 72, competencies: 144, materials: 288 },
+    mapel: { seeded: false, tp: 0, competencies: 0, materials: 0 },
+    soal: { seeded: true, from_this_seeder: 1260, competencies_with_questions: 310, competencies_total: 564 }
+  };
+  const html = Sh._kurikulumPanel();
+  assert.ok(html.includes('72') && html.includes('144') && html.includes('288'),
+    'angka status kurikulum Inggris tidak tercetak');
+  assert.ok(html.includes('1260') && html.includes('310') && html.includes('564'),
+    'angka status bank soal tidak tercetak — ruas /seed/soal/status berbeda dari yang dibaca kartu');
+  assert.ok(/Semai ulang/.test(html), 'bank yang sudah terisi masih menawarkan "Semai sekarang"');
+  assert.ok(/Belum tersemai/.test(html), 'bank yang kosong tidak dinyatakan kosong');
+  assert.ok(!/undefined|\{\w+\}/.test(html), 'lubang naskah atau undefined bocor: ' +
+    (html.match(/undefined|\{\w+\}/) || [''])[0]);
+});
+
+test('F5 status GAGAL DIBACA tidak menyamar sebagai "belum tersemai"', () => {
+  const Sh = sandboxShell({ alamat: 'https://contoh.example', bendera: true });
+  Sh._ui().seedStatus = { english: 'ERR', mapel: 'ERR', soal: 'ERR' };
+  const html = Sh._kurikulumPanel();
+  assert.ok(/gagal dibaca/i.test(html), 'gagal-baca status tidak dinyatakan');
+  assert.ok(!/Belum tersemai/.test(html),
+    'gagal-baca jatuh ke "belum tersemai" — guru akan menyemai ulang bank yang sudah penuh');
+});
+
+test('F6 kedalaman bank tercetak per kompetensi, dan tidak lintas mapel', () => {
+  const Sh = sandboxShell({ alamat: 'https://contoh.example', bendera: true });
+  const ui = Sh._ui();
+  ui.curriculumSubject = 'MAT';
+  ui.curriculumTree = [{ type: 'competency', id: 'KOMP-MAT-1', code: 'M.1', name: 'Bilangan bulat' },
+                       { type: 'competency', id: 'KOMP-MAT-2', code: 'M.2', name: 'Pecahan' }];
+  ui.bankDepth = { 'KOMP-MAT-1': 12 };
+  ui.bankDepthSubject = 'MAT';
+  let html = Sh._kurikulumPanel();
+  assert.ok(html.includes('12'), 'kedalaman bank tidak tercetak');
+  assert.ok(/Bank soal kosong/.test(html), 'kompetensi tanpa soal tidak ditandai kosong');
+
+  /* Mapel berpindah, hitungannya belum: satu angka pun tidak boleh tergambar. */
+  ui.curriculumSubject = 'IPA';
+  html = Sh._kurikulumPanel();
+  assert.ok(!/Bank soal kosong/.test(html) && !/12 soal di bank/.test(html),
+    'hitungan mapel lama menempel pada mapel baru — angka yang salah tetapi terlihat meyakinkan');
+});
+
+test('F7 gagal muat dan pohon kosong adalah dua kalimat yang BERBEDA', () => {
+  const gagal = sandboxShell({ alamat: 'https://contoh.example', bendera: true });
+  gagal._ui().curriculumError = 'Gagal (503)';
+  const hG = gagal._kurikulumPanel();
+  assert.ok(hG.includes('503'), 'pesan kegagalan tidak disebutkan');
+  assert.ok(hG.includes('data-testid="tg-curriculum-retry"'), 'layar gagal tanpa jalan keluar');
+  assert.ok(hG.includes('data-tg="seed-english"'), 'layar gagal menyembunyikan kartu penyemai yang tidak butuh pohon');
+
+  /* KEADAAN KOSONG ITU JARANG, DAN ITU DISENGAJA. Pohon yang gagal dimuat jatuh ke
+     katalog cadangan perangkat (MAPEL_CATALOG) berikut spanduk "Sumber: katalog
+     cadangan", jadi guru hampir tidak pernah melihat daftar kosong. Cabang kosong ini
+     jaring terakhir: ia hanya tergambar kalau katalog cadangannya pun kosong. Diuji
+     dengan mengosongkan katalognya, bukan dengan mapel yang tidak dikenal — mapel tak
+     dikenal justru jatuh ke katalog MAT dan menghasilkan pohon yang TIDAK kosong. */
+  const kosong = sandboxShell({ alamat: 'https://contoh.example', bendera: true });
+  const ui = kosong._ui();
+  ui.curriculumSubject = 'MAT';
+  ui.curriculumTree = [];
+  kosong._MAPEL_CATALOG['MAT'].competencies = [];
+  const hK = kosong._kurikulumPanel();
+  assert.ok(hK.includes('data-testid="tg-curriculum-empty"'), 'pohon kosong tidak berkata apa-apa');
+  assert.ok(!hK.includes('data-testid="tg-curriculum-error"'), 'pohon kosong disamakan dengan gagal muat');
+
+  /* Dan jaring cadangannya benar-benar bekerja: pohon kosong dengan katalog TERISI
+     menghasilkan daftar cadangan berspanduk asal-data, bukan layar kosong. */
+  const cadangan = sandboxShell({ alamat: 'https://contoh.example', bendera: true });
+  cadangan._ui().curriculumTree = [];
+  const hC = cadangan._kurikulumPanel();
+  assert.ok(hC.includes('data-testid="tg-curriculum-source-local"'),
+    'katalog cadangan dipakai tanpa menyatakan asal datanya');
+  assert.ok(!hC.includes('data-testid="tg-curriculum-empty"'),
+    'katalog cadangan terisi tetapi layar tetap mengaku kosong');
+});
+
 /* ------------------------------------------------------------------- E. naskah & CSS */
 
 test('E1 naskah panel lahir dwibahasa (id + th, placeholder sama persis)', () => {
