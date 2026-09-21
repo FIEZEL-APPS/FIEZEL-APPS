@@ -314,8 +314,23 @@ assert(weakest && weakest.skill === 'FIS', 'weakestSkill mengidentifikasi FIS (3
 assert(shellCode.includes('data-testid="tg-mapel-brief"'), 'Kartu panduan mengajar tg-mapel-brief terpasang di modal');
 assert(shellCode.includes('data-testid="tg-assign-comp-select"'), 'Dropdown pilihan kompetensi terpasang di modal mapel');
 
-// 13. Uji Integrasi Mobile Navigation untuk Kurikulum
-assert(shellCode.includes("data-view=\"curriculum\">' + icon('library') + '<span>' + esc(t('guru.nav-kurikulum-singkat', 'Kurikulum'))"), 'Navigasi mobile menyertakan tombol kurikulum yang dijaga gerbang');
+// 13. Uji Integrasi Navigasi Kurikulum — PINTUNYA BERPINDAH DI m025-357
+//
+// Sampai m025-356 butir kurikulum ada di nav ponsel Ruang Guru, dan assert lama di sini
+// menuntut ejaan persisnya. Owner mencabut butir itu: sistem kurikulum kini tab di dalam
+// dasbor KelasKu (features/class-hub/fiezel-class-hub.js, tab `kurikulum`), bukan layar
+// tersendiri yang dicapai lewat nav.
+//
+// Yang dijaga tetap sama — kurikulum PUNYA pintu, dan pintunya bersyarat — hanya alamat
+// pintunya yang berubah. Tiga assert di bawah menggantikan satu assert lama; rantai
+// penjaganya diikuti dari hub sampai ke cangkang, bukan berhenti pada ejaan satu tombol.
+assert(!shellCode.includes('data-view="curriculum"'),
+  'View `curriculum` dicabut dari cangkang guru — tidak ada tombol yatim menuju layar yang sudah tidak ada (m025-357)');
+assert(/siap:\s*konsolKurikulumSiap/.test(shellCode),
+  'Cangkang guru meneruskan konsolKurikulumSiap sebagai env.kurikulum.siap — rantai penjaga tab kurikulum utuh');
+const hubCode = fs.readFileSync(path.join(__dirname, '..', 'features/class-hub/fiezel-class-hub.js'), 'utf8');
+assert(/list\.push\(\['kurikulum'/.test(hubCode) && /kurikulumSiap\(env\)/.test(hubCode),
+  'Dasbor KelasKu memasang tab Kurikulum yang dijaga alamat backend — sistem kurikulum punya pintunya');
 
 console.log(`\nHasil: ${pass} assert PASS, ${fail} assert FAIL`);
 if (fail > 0) {
