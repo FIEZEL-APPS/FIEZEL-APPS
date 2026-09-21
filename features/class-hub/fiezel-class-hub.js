@@ -1483,8 +1483,8 @@
           '<h4>Panduan Penugasan Cepat</h4>' +
           '<ol class="ch-mini-list">' +
             '<li><span class="ch-grow">1. Klik tombol <b>Buka Bank Soal</b> di atas.</span></li>' +
-            '<li><span class="ch-grow">2. Pilih jenjang kelas (Kelas 7 atau Kelas 8) dan pilih kartu Bab materi.</span></li>' +
-            '<li><span class="ch-grow">3. Pilih jumlah soal (5 butir latihan cepat atau 10 butir ulangan), lalu terbitkan.</span></li>' +
+            '<li><span class="ch-grow">' + esc(t('kelas.panduan-bab', '2. Pilih jenjang kelas (Kelas 7 atau Kelas 8) dan pilih kartu Bab materi.')) + '</span></li>' +
+            '<li><span class="ch-grow">' + esc(t('kelas.panduan-soal', '3. Pilih jumlah soal (5 butir latihan cepat atau 10 butir ulangan), lalu terbitkan.')) + '</span></li>' +
           '</ol>' +
         '</div>' +
       '</div>';
