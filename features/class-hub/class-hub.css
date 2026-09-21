@@ -747,3 +747,10 @@ body.reduce-motion .ch-student,body.reduce-motion .ch-body,body.reduce-motion .c
 .ch-tabpanel { display: contents; }
 
 
+
+/* Tab Kurikulum & Kompetensi di hub guru (m025-357). Isinya dirender teacher shell dan
+   memakai kelas .tg-*, jadi yang perlu di sini hanya WADAHNYA: jarak antar bagian yang
+   sama dengan tab lain, dan pembatalan animasi masuk .ch-body — panel ini bisa mengecat
+   ulang berkali-kali saat tiga permintaan latarnya mendarat satu per satu, dan animasi
+   yang diulang di setiap cat ulang terbaca sebagai layar berkedip. */
+.ch-kurikulum{gap:18px;animation:none}

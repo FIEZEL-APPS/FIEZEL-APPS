@@ -500,6 +500,74 @@ html.fiezel-ui-v6 body.fz-teacher-mode .tg button.tg-seg-btn:not(.primary):not(.
 .tg-tp-item{background:var(--tg-paper);border:1px solid var(--tg-line);border-radius:var(--tg-r);padding:14px;margin-top:10px}
 .tg-comp-row{display:flex;align-items:center;justify-content:space-between;gap:12px;background:#fff;border:1px solid var(--tg-line);border-radius:8px;padding:10px 14px;margin-top:8px}
 
+/* ---------- Kurikulum & Kompetensi: gaya yang selama ini tidak pernah ditulis ----------
+   Empat belas kelas di bawah ini SUDAH dipancarkan perender kurikulum sejak m025-294 —
+   .tg-comp-head, .tg-comp-code, .tg-comp-desc, .tg-comp-actions, .tg-bloom-badge,
+   .tg-tp-head, .tg-tp-children, .tg-curriculum-card-head, .tg-curriculum-card-body,
+   .tg-curriculum-actions, .tg-label-inline, .tg-select, .tg-seed-badge, .tg-center —
+   dan tidak satu pun punya aturan di berkas ini. Layarnya karena itu tergambar dengan
+   bawaan peramban: kode kompetensi sebesar judulnya, dua tombol aksi menempel tanpa
+   jarak, dan pemilih mapel sebagai <select> telanjang di tengah papan bernada kertas.
+
+   Selama panel itu tersembunyi di balik butir nav kedelapan, kerusakannya jarang
+   terlihat. Sejak m025-357 ia menjadi salah satu tab dasbor KelasKu, jadi ia harus
+   terbaca seperti bagian dasbor yang lain. */
+.tg-kur-head{background:var(--tg-paper-2);border:1px solid var(--tg-line);border-radius:var(--tg-r-lg);padding:20px 24px}
+.tg-kur-head h3{margin:2px 0 6px}
+.tg-kur-head .tg-muted{margin:0;max-width:72ch}
+.tg-small{font-size:.84rem;line-height:1.5}
+
+.tg-curriculum-actions{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.tg-label-inline{display:inline-flex;align-items:center;gap:8px;font-size:.84rem;font-weight:600;color:var(--tg-muted)}
+.tg-select{padding:9px 12px;border:1px solid var(--tg-line);border-radius:var(--tg-r);background:#fff;color:var(--tg-text);font:inherit;font-size:.88rem;max-width:min(100%,32ch)}
+.tg-seed-badge{display:inline-flex;align-items:center;gap:8px;padding:8px 14px;border-radius:99px;background:var(--tg-sage-soft);border:1px solid rgba(31,122,99,.25);color:var(--tg-ink);font-size:.84rem}
+.tg-seed-badge svg{flex:none}
+.tg-center{text-align:center}
+
+/* Kartu penyemai. Tiga kartu sejajar di papan lebar, menumpuk sendiri di ponsel —
+   auto-fit, bukan tiga kolom mati, supaya dua kartu pun tetap mengisi barisnya. */
+.tg-seed-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px}
+.tg-seed-card{display:flex;flex-direction:column;gap:8px;padding:18px 20px}
+.tg-seed-card h4{margin:0;font-family:var(--tg-display);font-size:1rem;text-transform:none;letter-spacing:0;color:var(--tg-ink);font-weight:600}
+.tg-seed-card .tg-muted{margin:0}
+.tg-seed-card .tg-btn{align-self:flex-start;margin-top:4px}
+.tg-seed-status{margin:0;font-size:.84rem;line-height:1.5;color:var(--tg-ink-2);background:var(--tg-paper);border:1px solid var(--tg-line);border-radius:10px;padding:8px 12px}
+
+/* Kedalaman bank per kompetensi. Yang kosong memakai nada bata, bukan abu-abu: ia
+   bukan sekadar "tidak ada angka", ia kompetensi yang belum bisa dilatih hari ini. */
+.tg-bank-pill{display:inline-flex;align-items:center;gap:5px;padding:2px 9px;border-radius:99px;font-size:.74rem;font-weight:600;background:var(--tg-sage-soft);border:1px solid rgba(31,122,99,.3);color:var(--tg-ink)}
+.tg-bank-pill svg{width:13px;height:13px;flex:none}
+.tg-bank-pill.is-empty{background:var(--tg-brick-soft);border-color:rgba(185,63,42,.3)}
+
+.tg-curriculum-card-head{display:flex;align-items:baseline;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.tg-curriculum-card-head h4{margin:0;font-family:var(--tg-display);font-size:1.05rem;text-transform:none;letter-spacing:0;color:var(--tg-ink);font-weight:600;display:flex;align-items:center;gap:8px}
+.tg-curriculum-card-head small{font-family:var(--tg-mono);font-size:.76rem;color:var(--tg-muted)}
+.tg-curriculum-card-body{margin-top:10px}
+.tg-tp-head{display:flex;align-items:baseline;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.tg-tp-head b{display:flex;align-items:center;gap:7px;font-size:.94rem;color:var(--tg-ink)}
+.tg-tp-head small{font-family:var(--tg-mono);font-size:.74rem;color:var(--tg-muted)}
+.tg-tp-children{margin-top:6px}
+.tg-comp-head{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.tg-comp-head b{font-size:.92rem;color:var(--tg-ink);font-weight:600}
+.tg-comp-code{font-family:var(--tg-mono);font-size:.74rem;font-weight:700;color:var(--tg-muted);background:var(--tg-paper);border:1px solid var(--tg-line);border-radius:6px;padding:2px 7px}
+.tg-comp-desc{margin:6px 0 0;font-size:.84rem;line-height:1.5;color:var(--tg-muted);max-width:70ch}
+.tg-comp-info{min-width:0}
+.tg-comp-actions{display:flex;align-items:center;gap:8px;flex:none;flex-wrap:wrap}
+.tg-bloom-badge{font-family:var(--tg-mono);font-size:.7rem;font-weight:700;color:var(--tg-ink);background:var(--tg-amber-soft);border:1px solid rgba(217,142,31,.35);border-radius:6px;padding:2px 7px}
+
+/* Di ponsel baris kompetensi berhenti menjadi dua kolom: judul kompetensi yang panjang
+   akan meremas dua tombol aksi menjadi pita setinggi tiga baris kalau dipaksa sejajar. */
+@media(max-width:720px){
+  .tg-comp-row{flex-direction:column;align-items:stretch;gap:10px}
+  .tg-comp-actions{width:100%}
+  .tg-comp-actions .tg-btn{flex:1 1 auto;justify-content:center}
+  .tg-curriculum-toolbar{flex-direction:column;align-items:stretch}
+  .tg-curriculum-actions{width:100%}
+  .tg-select{max-width:100%;width:100%}
+  .tg-label-inline{width:100%;flex-direction:column;align-items:flex-start;gap:4px}
+  .tg-kur-head{padding:16px 18px}
+}
+
 /* ---------- Panel Owner & Token di KelasKu ---------- */
 .tg-owner-wrap{display:flex;flex-direction:column;gap:20px}
 .tg-token-pill{display:inline-block;padding:4px 10px;background:rgba(21,76,121,.1);border:1px solid rgba(21,76,121,.25);border-radius:6px;font-family:var(--tg-mono);font-size:.84rem;font-weight:700;color:var(--tg-ink);user-select:all;cursor:pointer}
