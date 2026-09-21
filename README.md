@@ -111,8 +111,8 @@ api.fiezel.my.id      ← Cloudflare Worker (workers/api/)
 
 | Penanda | Nilai |
 | --- | --- |
-| `FIEZEL_PAGE_BUILD` | `m025-358` |
-| `SW_REV` | `m025-358-paw-kembali-20260913` |
+| `FIEZEL_PAGE_BUILD` | `m025-359` |
+| `SW_REV` | `m025-359-paw-kembali-20260913` |
 | Grammar schema | `2.0.0` |
 | Practice blueprint | `focused-25-v1` |
 | Core protocol | `1.7` |
