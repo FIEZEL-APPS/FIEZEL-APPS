@@ -18,6 +18,7 @@ mengikuti lima gelombang di laporan audit.
 | **3 — satu buku kompetensi** | X4, X5, F1 (sebagian) | **SELESAI** · `m025-349` |
 | **4 — alat, bukan rapor** | F3, F4, F6, K3, K5, K6, K11, K13 | **SELESAI** · `m025-349` |
 | **5 — jangkauan** | A1–A5, G2–G4, G6–G10, K12, F7, F8, F10, F9 | **SELESAI** · build `m025-355` (seluruh butir gelombang + 5 gerbang baru terdaftar di CI) |
+| **6 — satu dasbor** | T1–T9 (audit sisi guru 21 Sep 2026) | **SELESAI** · build `m025-357` |
 
 Di luar gelombang, sudah mendarat di program yang sama:
 `tests/modal-assign-teacher-ux-test.js` didaftarkan di `quality.yml`, dan 32 kunci hantu
@@ -96,6 +97,58 @@ program ini dimulai.
     terkirim ke guru (lihat `tutorCode`: ruas `assign`). Misi mandiri memakai
     `selfDirected: true` dan tidak masuk ke sana — peta skill dan jurnal tetap terisi; yang
     tidak terjadi hanyalah pengakuan palsu atas penugasan.
+
+18. **Kurikulum & Kompetensi hidup DI DALAM dasbor KelasKu, bukan sebagai butir nav.**
+    Instruksi owner 21 September 2026. Butir nav kedelapan (`tg-nav-curriculum`) dan
+    kembarannya di nav ponsel DICABUT, beserta view `curriculum` di peta views. Sistemnya
+    menjadi tab `kurikulum` di hub KelasKu guru. Memasang lagi butir nav itu berarti dua
+    pintu ke sistem yang sama — salah satunya akan menyimpang.
+    Dijaga `tests/kelasku-kurikulum-dashboard-test.js` (A1–A2) dan
+    `tests/curriculum-console-gate-test.js`.
+
+19. **Pembagiannya: hub menyediakan TEMPAT, shell menyediakan ISI.** FZEngine, alamat
+    backend, keadaan muat, dan ketiga penyemai tetap milik `fiezel-teacher-shell.js`.
+    Yang menyeberang lewat `env.kurikulum` hanya tiga fungsi — `siap`, `panel`, `buka`.
+    Menyalin mesinnya ke `fiezel-class-hub.js` melahirkan salinan kedua yang akan
+    menyimpang. Tombol di panel memakai `data-tg` dan itu BUKAN kelalaian: hub dipasang
+    di dalam DOM shell (`#tgClassHub`), jadi pengirim aksi shell sudah menanganinya.
+
+20. **Pemuatan dipicu KETUKAN TAB, tidak pernah dari perender.** `rerender()` dipanggil
+    dari setiap sinkron latar yang selesai; memicu permintaan jaringan dari perender
+    berarti menembaki backend kurikulum sepanjang guru membuka tab itu. Dikunci gerbang
+    (D4) yang mengecat ulang tiga kali lalu menuntut `buka()` tetap terpanggil sekali.
+
+21. **Tab Kurikulum bekerja TANPA kelas aktif, dan itu disengaja.** Menyemai bank,
+    membaca kompetensi, dan menghitung kedalaman bank tidak menyentuh satu pun kelas.
+    Gerbang render shell karena itu meloloskan `st.view === 'hub'`. Layar pembuka guru
+    baru tidak berubah — bawaan `st.view` tetap `briefing`.
+
+22. **Kedalaman bank per kompetensi dicocokkan lewat ID SIMPUL, tidak pernah lewat kode.**
+    Aturan yang sama dengan kontrak §1, alasan yang sama: kode dipakai bersama lintas
+    mapel dan tingkat. Batas halaman 1000 DINYATAKAN di layar, dan hitungan tidak pernah
+    tergambar untuk mapel yang tidak cocok (`bankDepthSubject`).
+
+    Dan simpul TANPA `node.id` — yaitu seluruh isi katalog cadangan perangkat — tidak
+    mendapat pil sama sekali. Ketiga penyemai berdiri sendiri, jadi bank soal bisa sudah
+    terisi sementara kurikulum mapelnya belum; menggambar `n = 0` di sana mencap seluruh
+    kompetensi "Bank soal kosong" padahal banknya penuh. Penjaganya wajib berdiri SEBELUM
+    pembacaan `depth`. Dikunci C5 (statis) dan F8 (dijalankan).
+
+23. **Cakupan per kelas TIDAK boleh masuk panel ini.** `/coverage` dan
+    `/braincore/tp-detail` menuntut `class_id` backend kurikulum; kelas di dasbor ini
+    kelas KelasKu lokal. Ini kasus yang sama dengan "Yang BELUM selesai dari X4" di bawah.
+    Dikunci gerbang (C4).
+
+24. **Ikon dipanggil lewat pembantu `icon('nama')`, dan pembantu itu punya titik buta.**
+    `lucide.min.js` adalah subset kurasi tangan; `createIcons()` melewati nama yang tidak
+    dikenal tanpa error, menyisakan `<i>` KOSONG. Sampai m025-357,
+    `tests/lucide-icon-coverage-test.js` hanya membaca `data-lucide="literal"`, sehingga
+    98 pemanggilan di class-hub dan teacher shell tidak pernah diperiksa — 30 di antaranya
+    memang kosong, termasuk `brain`, ikon tab Braincore. Gerbangnya kini ikut memindai
+    `icon('nama')`, dengan DUA himpunan penyelesaian: class-hub terhadap subset lucide
+    saja, teacher shell terhadap subset + registry inline `fiezel-teacher-icons.js`.
+    Menyamakan keduanya melahirkan merah palsu. Ikon baru wajib ditambahkan ke subset
+    di commit yang sama dengan pemanggilnya.
 
 ## Yang BELUM selesai dari X4, dan kenapa
 
@@ -198,3 +251,40 @@ owner 7 September 2026 (konsol guru, misi Belajar, bank konten, layar guru) naik
 anggarannya di `ALLOWLIST` dengan alasan tertulis, bukan pelonggaran diam-diam.
 Gelombang 5 kini **SELESAI seluruhnya** (F9 fase 1 = butir terakhir); fase 2 F9 (pipa
 penilaian bukti luring di backend) adalah pekerjaan backend di luar pintu klien ini.
+
+---
+
+## Gelombang 6 — satu dasbor (`m025-357`)
+
+Lahir dari audit sisi guru 21 September 2026,
+`reports/AUDIT-UIUX-KELASKU-GURU-2026-09-21.md` (9 temuan). Perintah owner: cabut panel
+Kurikulum & Kompetensi dari dasbor, integrasikan sistemnya ke halaman dasbor KelasKu,
+tidak boleh ada yang kurang — **sisi guru saja, sisi murid dipertahankan**.
+
+- ✅ **T1** — tiga penyemai (`seed-english`/`seed-mapel`/`seed-soal`) punya tombolnya.
+  Penanganannya dan `runSeed*()` sudah ada sejak lama dengan **nol** tombol di Ruang Guru
+  yang memanggilnya, sementara naskah `guru.kurikulum-sumber-lokal` menyuruh guru menekan
+  kartu penyemai yang tidak ada di layar itu. Status dibaca lebih dulu; gagal-baca
+  dibedakan dari belum-tersemai; sibuk per-kartu.
+- ✅ **T2** — 14 kelas CSS yang dipancarkan perender kurikulum sejak m025-294 tanpa satu
+  pun aturan akhirnya ditulis, berikut penumpukan baris kompetensi di ponsel.
+- ✅ **T3** — `t()` di teacher shell menerima `params`; kalimat berlubang di jalur cadangan
+  berhenti mencetak kurung kurawalnya.
+- ✅ **T4** — setiap kompetensi membawa kedalaman banknya (kontrak §22).
+- ✅ **T5** — satu tombol Muat Ulang menyegarkan ketiga sumber panel.
+- ✅ **T6** — gagal-muat, pohon kosong, dan sedang-memuat dibedakan tegas.
+- ✅ **T7** — `st.view === 'curriculum'` yang tersimpan dimigrasikan ke hub + tab.
+- ✅ **T8** — tab Kurikulum bekerja tanpa kelas aktif (kontrak §21).
+- ✅ **T9** — 26 glyph ditambahkan ke subset lucide (92 → 118) dan titik buta gerbang
+  ikon ditutup (kontrak §24). 30 ikon kosong di KelasKu murid **dan** guru, hilang.
+
+Gerbang baru: `tests/kelasku-kurikulum-dashboard-test.js` (30 assert, red-proof 5 kerusakan),
+terdaftar di `quality.yml`. `tests/lucide-icon-coverage-test.js` dan
+`tests/curriculum-console-gate-test.js` diperluas.
+
+### Langkah berikutnya
+
+F1 penuh masih menunggu pekerjaan KONTEN, bukan kode: 15 unit statis
+`fiezel-teacher-curriculum.js` perlu padanan TP server sebelum bukti misi in-app boleh
+mengalir ke cakupan guru. Sampai itu ada, kontrak §23 berlaku — cakupan per kelas tetap
+di konsol penuh.

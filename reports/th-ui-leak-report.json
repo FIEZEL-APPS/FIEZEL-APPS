@@ -1,6 +1,6 @@
 {
   "schema": "fiezel-th-ui-leak-v1",
-  "generatedAt": "2026-09-20T22:14:16.539Z",
+  "generatedAt": "2026-09-21T01:11:20.515Z",
   "files": {
     "app.js": {
       "leaks": 4,
@@ -115,11 +115,11 @@
           "text": "Latihan ·"
         },
         {
-          "line": 1432,
+          "line": 1446,
           "text": "Latihan · ±"
         },
         {
-          "line": 1454,
+          "line": 1468,
           "text": "Tenggat"
         }
       ]
@@ -407,23 +407,23 @@
       "budget": 7,
       "sample": [
         {
-          "line": 959,
+          "line": 968,
           "text": "Penugasan Kontingen Pasukan Garuda ke wilayah konflik"
         },
         {
-          "line": 1039,
+          "line": 1048,
           "text": "Penugasan nilai (assignment)"
         },
         {
-          "line": 2939,
+          "line": 3011,
           "text": "Tenggat & tugas"
         },
         {
-          "line": 2954,
+          "line": 3026,
           "text": "Akurasi"
         },
         {
-          "line": 2971,
+          "line": 3043,
           "text": "Latihan ·"
         }
       ]
@@ -480,8 +480,8 @@
     }
   },
   "copyKeys": {
-    "id": 3013,
-    "th": 3015,
+    "id": 3037,
+    "th": 3039,
     "idTanpaTh": 0
   },
   "pass": true
