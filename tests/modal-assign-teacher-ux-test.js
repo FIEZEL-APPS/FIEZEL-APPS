@@ -99,5 +99,17 @@ assert(typeof Shell._synthesizeMapelQuestions === 'function', 'Fungsi generator 
   assert(qs.every(q => q.prompt && q.options.length === 4 && typeof q.answer === 'number'), 'Semua soal ' + subj + ' memiliki prompt, 4 opsi, dan kunci jawaban');
 });
 
+// 3. Pilar 1–3: isolasi subjek, paralel, remedial, rekap (tanpa memecah assert lama)
+assert(shellCode.includes('data-testid="tg-assign-subject-badge"'), 'Isolasi single-mapel: badge assign menggantikan dropdown saat terkunci');
+assert(shellCode.includes('data-testid="tg-curriculum-subject-badge"'), 'Isolasi single-mapel: badge kurikulum terpasang');
+assert(shellCode.includes('data-testid="tg-subject-scope-badge"'), 'Badge scope mapel+grade tampil di topbar');
+assert(shellCode.includes('data-testid="tg-assign-classes"'), 'Penerbitan massal paralel: pemilih kelas terpasang');
+assert(shellCode.includes('data-testid="tg-remedial-auto"'), 'Remedial & pengayaan otomatis (KKM) terpasang di analitik');
+assert(shellCode.includes('data-testid="tg-export-rekap"'), 'Ekspor rekap e-Rapor (PDF/CSV) terpasang');
+assert(shellCode.includes('data-testid="tg-empty-assignments"'), 'Empty state ramah tugas terpasang');
+assert(typeof Shell._teacherSubjectScope === 'function', 'Helper isolasi subjek tersedia untuk gerbang');
+assert(typeof Shell._remedialGroups === 'function', 'Helper remedial otomatis tersedia');
+assert(typeof Shell._rekapRows === 'function', 'Helper rekap e-Rapor tersedia');
+
 console.log(`\nHasil: ${pass} assert PASS, ${fail} assert FAIL`);
 if (fail > 0) process.exit(1);
