@@ -51,9 +51,22 @@ program ini dimulai.
    Layar yang diam saat rusak membuat murid menyalahkan dirinya sendiri.
 
 6. **Ruang lingkup disebut sebelum diketuk.** Misi Belajar hari ini hanya Bahasa Inggris
-   Fase D–F sementara panel di sebelahnya menjanjikan 17 mapel. Baris ruang lingkup di
-   `curriculumCard()` turun sendiri begitu mapel lain benar-benar menyusul — jangan
-   dihapus sebelum itu.
+   Fase D–F. Baris ruang lingkup di `curriculumCard()` turun sendiri begitu mapel lain
+   benar-benar menyusul — jangan dihapus sebelum itu.
+
+   Alasannya berubah di `m025-356`, kewajibannya tidak. Sampai rilis itu baris ini
+   dibenarkan oleh tetangganya: panel "Kurikulum Merdeka (17 Mapel)" duduk persis di
+   sebelahnya dan menjanjikan tujuh belas mapel, jadi kartu di sampingnya wajib menyebut
+   bahwa isinya satu mapel. Panel itu kini **DIHAPUS TOTAL** atas instruksi owner — ia
+   memenuhi tab KelasKu dan mendorong konten berguna ke bawah, sementara kebanyakan
+   barisnya hanya berbunyi "Menunggu penugasan". Yang menggantikannya di tab KelasKu
+   adalah satu baris ringkas jumlah guru terdaftar (`class-teachers-line`) plus tombol
+   lompat ke tab Tugas (`class-jump-tugas`), tempat kartu filter per mapel memang berada.
+
+   Baris ruang lingkup TETAP WAJIB tanpa panel itu: janji tujuh belas mapel tidak hilang
+   bersama panelnya. Ia hanya pindah ke tempat lain yang masih dilihat murid — daftar
+   mapel di kartu filter tab Tugas, dan hitungan guru mapel di baris ringkas tadi. Murid
+   yang membuka Misi Belajar untuk mencari Matematika tetap berhak tahu sebelum mengetuk.
 
 7. **Setiap naskah lahir dwibahasa.** Berlaku penuh di program ini; lihat CLAUDE.md dan
    `docs/handoffs/I18N-TH-PARITY-HANDOFF.md`.

@@ -40,6 +40,8 @@
     "test:class-sync": "node tests/class-sync-test.js",
     "test:class-hub": "node tests/class-hub-test.js",
     "test:owner-teacher-panel": "node tests/owner-teacher-panel-test.js",
-    "invite:teacher": "node tools/mint-teacher-invite.mjs"
+    "invite:teacher": "node tools/mint-teacher-invite.mjs",
+    "opencode:reset": "node tools/opencode-reset.js",
+    "opencode:fresh-user": "node tools/opencode-reset.js --fresh-user"
   }
 }

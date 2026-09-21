@@ -314,6 +314,12 @@ test('soal bergambar: runner kelas BENAR-BENAR mencetak gambarnya', () => {
 });
 
 test('student subject panels: kartu panel mapel dan filter tugas per mapel', () => {
+  /* Higiene isolasi: modul hub menyimpan ui() di memori antar mount, jadi store
+     yang diganti tiap tes TIDAK terbaca ulang tanpa muat-ulang modul. Tanpa ini,
+     classTeachers di bawah adalah sisa tes sebelumnya (dulu lolos karena panel
+     17-baris dirender tanpa guru sekalipun — justru yang dihapus instruksi ini). */
+  delete require.cache[require.resolve('../features/class-hub/fiezel-class-hub.js')];
+  require('../features/class-hub/fiezel-class-hub.js');
   const store = {};
   globalThis.localStorage = { getItem: (k) => (k in store ? store[k] : null), setItem: (k, v) => { store[k] = String(v); }, removeItem: (k) => { delete store[k]; } };
   store['fiezel-onboarding-v1'] = JSON.stringify({ name: 'Rani', classCode: 'FZ-998877' });
@@ -356,8 +362,18 @@ test('student subject panels: kartu panel mapel dan filter tugas per mapel', () 
 
   // Buka tab KelasKu
   sEl.fire('click', btn({ 'data-ch': 'tab', 'data-tab': 'kelas' }));
-  assert.ok(sEl.innerHTML.includes('class-all-subjects-panel'), 'panel 17 mapel lengkap muncul di tab KelasKu');
-  assert.ok(sEl.innerHTML.includes('Kurikulum Merdeka (17 Mapel)'), 'kicker 17 mapel muncul');
+  /* Panel 17 baris DIHAPUS TOTAL (instruksi owner): menuh-menuhi tab KelasKu dan
+     kebanyakan barisnya hanya "Menunggu penugasan". Rincian per mapel tetap hidup
+     di kartu filter tab Tugas; tab Kelas hanya membawa baris ringkas + lompat. */
+  assert.ok(!sEl.innerHTML.includes('class-all-subjects-panel'), 'panel 17 mapel sudah hilang total dari tab KelasKu');
+  assert.ok(!sEl.innerHTML.includes('compact-subject-'), 'tak ada sisa baris 17 mapel');
+  assert.ok(sEl.innerHTML.includes('class-teachers-line'), 'baris ringkas guru mapel muncul');
+  assert.ok(sEl.innerHTML.includes('2 Guru Terdaftar'), 'hitungan guru jujur (2 guru di kelas uji)');
+  assert.ok(sEl.innerHTML.includes('class-jump-tugas'), 'tombol lompat ke Tugas tersedia');
+
+  // Tombol lompat membawa murid ke tab Tugas tempat kartu filter mapel berada
+  sEl.fire('click', btn({ 'data-ch': 'tab', 'data-tab': 'tugas' }));
+  assert.ok(sEl.innerHTML.includes('class-subject-panels'), 'lompat mendarat di tab Tugas berpanel mapel');
 });
 
 test('sintaks: app.js & modul class-hub dapat di-parse', () => {
