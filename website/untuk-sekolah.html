@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FIEZEL untuk Sekolah — Sedang Membuka Pilot Kelas</title>
+<meta name="description" content="FIEZEL untuk guru dan sekolah: murid belajar bahasa adaptif setiap hari, guru menerbitkan tugas yang menempel Kurikulum Nasional lewat KelasKu. Sedang membuka pilot satu kelas, gratis.">
+<meta name="theme-color" content="#FFF9EE">
+<link rel="icon" href="assets/brand/fiezel-icon.svg" type="image/svg+xml">
+<link rel="icon" href="assets/brand/fiezel-icon-192.png" type="image/png">
+<link rel="apple-touch-icon" href="assets/brand/fiezel-icon-192.png">
+
+<!-- Kanonik + hreflang TIMBAL BALIK. Pasangan th ada di /th/untuk-sekolah.html dan
+     menunjuk balik ke sini. hreflang id dan th TIDAK BOLEH menunjuk URL yang sama —
+     pasangan yang menunjuk dirinya sendiri dibuang Google tanpa satu pun pesan galat,
+     dan itulah cacat yang dijaga tests/seo-surface-gate-test.js cek (C) dan (D). -->
+<link rel="canonical" href="https://fiezel.my.id/untuk-sekolah.html">
+<link rel="alternate" hreflang="id" href="https://fiezel.my.id/untuk-sekolah.html">
+<link rel="alternate" hreflang="th" href="https://fiezel.my.id/th/untuk-sekolah.html">
+<link rel="alternate" hreflang="x-default" href="https://fiezel.my.id/untuk-sekolah.html">
+
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://fiezel.my.id/untuk-sekolah.html">
+<meta property="og:locale" content="id_ID">
+<meta property="og:locale:alternate" content="th_TH">
+<meta property="og:site_name" content="FIEZEL">
+<meta property="og:title" content="FIEZEL untuk Sekolah — Sedang Membuka Pilot Kelas">
+<meta property="og:description" content="Murid belajar bahasa adaptif setiap hari; guru menerbitkan tugas yang menempel Kurikulum Nasional dan membaca hasilnya tanpa mengoreksi manual.">
+<meta property="og:image" content="https://fiezel.my.id/assets/shots/teacher-desktop.png">
+<meta property="og:image:width" content="1440">
+<meta property="og:image:height" content="900">
+<meta property="og:image:alt" content="Dashboard KelasKu untuk Guru dengan Ringkasan Hari Ini dan daftar kelas">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="FIEZEL untuk Sekolah — Sedang Membuka Pilot Kelas">
+<meta name="twitter:description" content="Lapisan guru FIEZEL: tugas yang menempel Kurikulum Nasional, analitik kelas, dan rapor orang tua. Gratis.">
+<meta name="twitter:image" content="https://fiezel.my.id/assets/shots/teacher-desktop.png">
+<meta name="twitter:image:alt" content="Dashboard KelasKu untuk Guru">
+<meta name="author" content="FIEZEL">
+<meta name="publisher" content="FIEZEL">
+<meta name="application-name" content="FIEZEL">
+<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1">
+<meta name="googlebot" content="index, follow, max-image-preview:large, max-snippet:-1">
+
+<link rel="preload" href="assets/fonts/PlusJakartaSans-700.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="assets/fonts/PlusJakartaSans-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="tokens.css?v=20260903-hula02">
+<link rel="stylesheet" href="style.css?v=20260906-fzflow02">
+
+<!-- Kelas yang belum ada di style.css, sengaja inline. Alasannya sama dengan tentang.html:
+     style.css dipakai beranda id + th dan seluruh halaman legal, jadi menyisipkan aturan
+     baru ke sana demi satu halaman berarti mengirim ulang 80 KB CSS ke setiap pengunjung
+     untuk aturan yang hanya dipakai di satu tempat. -->
+<style>
+  .brand-text{font-weight:800;letter-spacing:.02em;font-size:1.15rem;color:var(--maroon-mid,#8C2233)}
+  .crumbs{font-size:.86rem;opacity:.75;margin:0 0 18px}
+  .crumbs a{color:inherit}
+  .list-plain{margin:0 0 18px;padding-left:1.25rem;line-height:1.75;max-width:68ch}
+  .list-plain li{margin:0 0 .5rem}
+  .callout{border:1px solid rgba(140,34,51,.22);border-radius:16px;padding:18px 20px;margin:0 0 20px;background:rgba(255,222,89,.10)}
+  .callout p:last-child{margin-bottom:0}
+  .tbl-wrap{overflow-x:auto;margin:0 0 20px}
+  .tbl{border-collapse:collapse;width:100%;min-width:480px;font-size:.95rem}
+  .tbl th,.tbl td{text-align:left;padding:10px 12px;border-bottom:1px solid rgba(51,32,31,.14);vertical-align:top}
+  .tbl th{font-weight:700}
+  .pilot-grid{display:grid;gap:14px;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));margin:0 0 20px}
+  .pilot-card{border:1px solid rgba(51,32,31,.14);border-radius:16px;padding:16px 18px}
+  .pilot-card b{display:block;font-size:1.5rem;line-height:1.2;margin-bottom:2px}
+  .pilot-card span{font-size:.9rem;opacity:.8}
+</style>
+
+<!-- ============================================================================
+     STRUCTURED DATA — SEO / AEO / GEO
+
+     @id halaman ini SENGAJA berawalan URL halamannya sendiri (#webpage, #faq,
+     #breadcrumb). Simpul global (#org, #app) hanya DIRUJUK, tidak didefinisikan ulang:
+     satu @id yang dipakai dengan dua @type berbeda di dua halaman merusak konsolidasi
+     entitas, dan itu yang dijaga tests/seo-surface-gate-test.js cek (E).
+
+     TIDAK ADA aggregateRating/review di sini, dan tidak boleh ditambahkan: belum ada satu
+     pun sekolah yang memakai FIEZEL, jadi angka apa pun akan karangan. Cek (I).
+     ============================================================================ -->
+<script type="application/ld+json">
+[
+  {
+    "@context": "https://schema.org",
+    "@type": "WebPage",
+    "@id": "https://fiezel.my.id/untuk-sekolah.html#webpage",
+    "url": "https://fiezel.my.id/untuk-sekolah.html",
+    "name": "FIEZEL untuk Sekolah — Sedang Membuka Pilot Kelas",
+    "description": "Lapisan guru FIEZEL: KelasKu, tugas yang menempel Kurikulum Nasional, analitik kelas, dan rapor orang tua. Sedang membuka pilot satu kelas.",
+    "inLanguage": "id",
+    "isPartOf": {"@id": "https://fiezel.my.id/#website"},
+    "about": {"@id": "https://fiezel.my.id/#app"},
+    "publisher": {"@id": "https://fiezel.my.id/#org"},
+    "primaryImageOfPage": {
+      "@type": "ImageObject",
+      "url": "https://fiezel.my.id/assets/shots/teacher-desktop.png",
+      "caption": "Dashboard KelasKu untuk Guru",
+      "width": 1440,
+      "height": 900
+    }
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "@id": "https://fiezel.my.id/untuk-sekolah.html#breadcrumb",
+    "itemListElement": [
+      {"@type": "ListItem", "position": 1, "name": "Beranda", "item": "https://fiezel.my.id/"},
+      {"@type": "ListItem", "position": 2, "name": "Untuk Sekolah", "item": "https://fiezel.my.id/untuk-sekolah.html"}
+    ]
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "@id": "https://fiezel.my.id/untuk-sekolah.html#faq",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "Apakah FIEZEL aplikasi Kurikulum Nasional?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Bukan, dan kami menyebutnya terang-terangan. FIEZEL adalah aplikasi belajar bahasa adaptif yang tugasnya bisa disambungkan ke Kurikulum Nasional. Mesin kontennya adalah jalur bahasa Inggris adaptif dengan sekitar 1.150 soal di tingkat A1–A2; bank kurikulumnya jauh lebih kecil — 15 bab dan 115 soal untuk kelas 7 sampai 12. Kalau FIEZEL dipakai sebagai sumber materi kurikulum utama, materi satu tingkat kelas akan habis dalam hitungan minggu."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Berapa banyak murid yang bisa ditampung FIEZEL?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Kapasitas terpasang saat ini 250 pengguna. Itu cukup untuk satu kelas (sekitar 30 murid) dengan ruang lebih, tetapi tidak cukup untuk satu sekolah utuh yang berisi 600 sampai 900 murid. Kami tidak menawarkan pemakaian satu sekolah sebelum kapasitasnya dinaikkan."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Apa yang bisa dilakukan guru di FIEZEL?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Lewat KelasKu untuk Guru: membuat ruang kelas, menerbitkan tugas yang menempel pada bab dan sub-bab Kurikulum Nasional, membaca Ringkasan Hari Ini untuk melihat siapa yang tertinggal, melihat analitik per murid dan per kompetensi, serta membagikan rapor kepada orang tua. Tugas dinilai otomatis, jadi guru tidak mengoreksi manual."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Apakah mata pelajaran selain Bahasa Inggris sudah bisa dipakai?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Belum, dan sebaiknya jangan dipakai dulu. Ada rangka untuk 17 mata pelajaran, tetapi isinya baru sekitar 15 soal per mata pelajaran dan belum menyesuaikan tingkat kelas — soal yang sama bisa muncul untuk kelas 7 maupun kelas 11. Yang sudah matang dan kami tawarkan hari ini hanya Bahasa Inggris."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Berapa biaya pilot untuk sekolah?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Rp 0. Tidak ada biaya lisensi, tidak ada langganan, dan tidak ada biaya tersembunyi. Yang kami minta adalah satu guru, satu kelas, sekitar satu jam pelatihan, dan izin menyebarkan formulir persetujuan orang tua. Yang sekolah terima adalah aplikasinya plus laporan akhir tertulis yang menjadi milik sekolah."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Data murid disimpan di mana?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Progres belajar murid tersimpan lokal di perangkat masing-masing. FIEZEL tidak meminta nama, email, atau nomor telepon untuk mulai belajar. Untuk fitur kelas, guru memakai kode kelas, bukan data pribadi murid. Rinciannya ada di Kebijakan Privasi."
+        }
+      }
+    ]
+  }
+]
+</script>
+</head>
+<body>
+<a class="skip" href="#main">Lewati ke konten utama</a>
+
+<header class="topbar">
+  <div class="wrap topbar-in">
+    <a class="brand" href="./" aria-label="FIEZEL — halaman utama">
+      <svg class="brand-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><g fill="currentColor"><rect x="4.6" y="7.5" width="3.1" height="4.6" rx="1.55"/><rect x="8.9" y="5.1" width="3.1" height="7" rx="1.55"/><rect x="13.2" y="3.4" width="3.1" height="8.7" rx="1.55"/><rect x="17.5" y="6.2" width="3.1" height="5.9" rx="1.55"/><path d="M12.6 14c3.5 0 5.9 1.9 5.9 4.1 0 2-2 3.4-5.9 3.4s-5.9-1.4-5.9-3.4c0-2.2 2.4-4.1 5.9-4.1Z"/></g></svg>
+      <strong class="brand-text">FIEZEL</strong>
+    </a>
+    <nav class="topnav" aria-label="Navigasi utama">
+      <a href="./">Beranda</a>
+      <a href="tentang.html">Tentang</a>
+      <a class="lang-switch" href="th/untuk-sekolah.html" hreflang="th" lang="th" aria-label="เปลี่ยนเป็นภาษาไทย">ไทย</a>
+      <a class="btn btn-sm btn-primary" href="app/?teacher=preview">Buka KelasKu</a>
+    </nav>
+  </div>
+</header>
+
+<main id="main">
+
+  <section class="sec">
+    <div class="wrap">
+      <nav class="crumbs" aria-label="Remah roti">
+        <a href="./">Beranda</a> <span aria-hidden="true">›</span> <span>Untuk Sekolah</span>
+      </nav>
+
+      <div class="sec-head">
+        <h1>FIEZEL untuk Sekolah</h1>
+      </div>
+
+      <!-- Kalimat pembuka sengaja berbentuk definisi utuh satu kalimat: itu bentuk yang
+           paling mudah dikutip utuh oleh ringkasan AI dan featured snippet, sekaligus
+           bentuk paling jujur untuk pembaca manusia — jawabannya ada di baris pertama. -->
+      <p class="body-lg"><strong>Murid belajar bahasa adaptif setiap hari; gurunya menerbitkan tugas yang menempel pada Kurikulum Nasional dan melihat hasilnya tanpa mengoreksi manual.</strong> Itu seluruh tawaran FIEZEL untuk sekolah, dalam satu kalimat.</p>
+
+      <div class="callout">
+        <p><strong>Status hari ini: kami sedang membuka pilot, dan belum ada sekolah yang memakai FIEZEL.</strong> Halaman ini bukan daftar pelanggan. Ia undangan untuk menjadi kelas pertama, dan seluruh angka di bawah adalah angka apa adanya — termasuk yang belum bagus.</p>
+      </div>
+
+      <p><a class="btn btn-primary" href="app/?teacher=preview">Lihat KelasKu untuk Guru</a> <a class="btn btn-ghost" href="https://instagram.com/fitrarustqi" target="_blank" rel="noopener">Hubungi lewat Instagram</a></p>
+    </div>
+  </section>
+
+  <section class="sec" id="untuk-guru">
+    <div class="wrap">
+      <div class="sec-head">
+        <h2 class="sec-title">Yang guru dapat: KelasKu</h2>
+        <hr class="rule" aria-hidden="true">
+      </div>
+      <p class="body-lg">KelasKu adalah lapisan guru di dalam aplikasi yang sama dengan yang dipakai murid — tidak ada aplikasi kedua yang harus dipasang.</p>
+      <ul class="list-plain">
+        <li><strong>Ruang Kelas</strong> — buat kelas, murid bergabung lewat kode kelas. Tidak perlu mendaftarkan nama, email, atau nomor telepon murid.</li>
+        <li><strong>Ringkasan Hari Ini</strong> — satu layar yang menjawab pertanyaan yang sebenarnya ditanyakan guru: siapa yang tertinggal, dan siapa yang perlu disapa hari ini.</li>
+        <li><strong>Tugas &amp; Ujian</strong> — pilih Fase, bab, sub-bab, lalu centang fitur bahasa yang sedang diajarkan. Tugas dinilai otomatis.</li>
+        <li><strong>Analitik</strong> — hasil per murid dan per kompetensi, bukan hanya nilai akhir.</li>
+        <li><strong>Rapor orang tua</strong> — ringkasan yang bisa guru bagikan tanpa menyusun ulang secara manual.</li>
+      </ul>
+
+      <figure class="phone-none">
+        <img src="assets/shots/teacher-desktop.png" alt="Dashboard KelasKu untuk Guru dengan Ringkasan Hari Ini, daftar kelas, dan menu Tugas &amp; Ujian" width="1440" height="900" loading="lazy" decoding="async" style="max-width:100%;height:auto;border-radius:16px">
+      </figure>
+    </div>
+  </section>
+
+  <section class="sec" id="kurikulum">
+    <div class="wrap">
+      <div class="sec-head">
+        <h2 class="sec-title">Tugas yang menempel Kurikulum Nasional</h2>
+        <hr class="rule" aria-hidden="true">
+      </div>
+      <p class="body-lg">Guru tidak mengajar satu bab utuh sekaligus — ia mengajar To Be hari Senin dan Simple Present hari Rabu. Karena itu pemilihan materinya bertingkat: <strong>Fase → Bab → Sub-bab → fitur bahasa</strong>, dan yang ditawarkan hanya fitur yang benar-benar punya soal.</p>
+
+      <div class="tbl-wrap">
+        <table class="tbl">
+          <caption class="sr-only">Cakupan bank kurikulum FIEZEL per tingkat kelas</caption>
+          <thead>
+            <tr><th scope="col">Tingkat</th><th scope="col">Cakupan</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Kelas 7–12</td><td><strong>15 bab</strong>, total <strong>115 soal</strong>, kedua semester terisi</td></tr>
+            <tr><td>Fase D (SMP kelas 7–9)</td><td><strong>8 bab</strong>, total <strong>62 soal</strong></td></tr>
+            <tr><td>Kelas 8, sebagai contoh</td><td>Recount, Narrative, dan Notice &amp; Instruction — <strong>23 soal</strong></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p class="body-lg">Tiap bab membawa perangkat mengajar yang lengkap: apersepsi lima menit, rumus papan tulis, miskonsepsi khas siswa beserta contoh kesalahannya, diferensiasi untuk yang tertinggal dan yang sudah maju, serta kosakata kunci.</p>
+    </div>
+  </section>
+
+  <section class="sec" id="batasnya">
+    <div class="wrap">
+      <div class="sec-head">
+        <h2 class="sec-title">Batasnya, disebut lebih dulu</h2>
+        <hr class="rule" aria-hidden="true">
+      </div>
+      <p class="body-lg">Bagian ini ada karena pilot yang gagal hampir selalu gagal dengan cara yang sama: sesuatu dijanjikan di awal, lalu guru menemukan sendiri bahwa isinya tidak ada. Lebih murah membacanya sekarang.</p>
+      <ul class="list-plain">
+        <li><strong>Bank kurikulum bukan mesin kontennya.</strong> Dengan 23 soal, kelas 8 punya bahan untuk tiga sampai empat tugas kelas — bukan untuk enam minggu belajar. Enam minggu belajarnya datang dari jalur bahasa Inggris adaptif, yang punya sekitar 1.150 soal di tingkat A1–A2.</li>
+        <li><strong>Mata pelajaran selain Bahasa Inggris belum layak dipakai.</strong> Rangkanya ada untuk 17 mata pelajaran, tetapi isinya baru sekitar 15 soal per mata pelajaran dan belum menyesuaikan tingkat kelas. Jangan memakainya di kelas.</li>
+        <li><strong>Kapasitas terpasang 250 pengguna.</strong> Satu kelas aman. Satu sekolah berisi 600–900 murid tidak muat, dan kami tidak akan menjanjikannya.</li>
+        <li><strong>Kursus Bahasa Jepang belum punya listening dan speaking.</strong> Kedua latihan itu disembunyikan saat kursus Jepang dipilih, bukan ditampilkan sebagai menu kosong.</li>
+        <li><strong>CEFR dan JLPT dipakai sebagai acuan tingkat kesulitan</strong>, bukan sertifikasi dan bukan afiliasi resmi lembaga mana pun.</li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="sec" id="pilot">
+    <div class="wrap">
+      <div class="sec-head">
+        <h2 class="sec-title">Bentuk pilot yang kami tawarkan</h2>
+        <hr class="rule" aria-hidden="true">
+      </div>
+      <p class="body-lg">Sengaja dibuat sekecil mungkin supaya keputusan "ya" jadi murah, dan supaya kalau hasilnya jelek pun sekolah tidak kehilangan apa pun.</p>
+
+      <div class="pilot-grid">
+        <div class="pilot-card"><b>1</b><span>guru bahasa Inggris</span></div>
+        <div class="pilot-card"><b>1</b><span>kelas, sekitar 30 murid</span></div>
+        <div class="pilot-card"><b>6</b><span>minggu berjalan</span></div>
+        <div class="pilot-card"><b>Rp 0</b><span>biaya ke sekolah</span></div>
+      </div>
+
+      <p class="body-lg"><strong>Yang kami minta:</strong> satu guru, satu kelas, sekitar satu jam pelatihan, dan izin menyebarkan formulir persetujuan orang tua.</p>
+      <p class="body-lg"><strong>Yang sekolah terima:</strong> aplikasinya tanpa biaya, plus laporan akhir tertulis berisi apa yang terjadi selama enam minggu — dan laporan itu milik sekolah, bukan milik kami.</p>
+      <p class="body-lg">Kami mencari satu guru yang benar-benar ingin mencoba, bukan delapan guru yang disuruh atasannya. Kalau Anda guru bahasa Inggris dan tertarik, atau Anda kepala sekolah yang ingin menghubungkan kami dengan satu guru, jalurnya di bawah.</p>
+
+      <p><a class="btn btn-primary" href="https://instagram.com/fitrarustqi" target="_blank" rel="noopener">Hubungi lewat Instagram @fitrarustqi</a> <a class="btn btn-ghost" href="app/?teacher=preview">Coba KelasKu sendiri dulu</a></p>
+    </div>
+  </section>
+
+  <section class="sec sec-faq" id="faq">
+    <div class="wrap wrap-narrow">
+      <div class="sec-head">
+        <h2 class="sec-title">Pertanyaan dari guru dan kepala sekolah</h2>
+        <hr class="rule" aria-hidden="true">
+      </div>
+      <div class="faq">
+        <details>
+          <summary>Apakah FIEZEL aplikasi Kurikulum Nasional?<span class="chev" aria-hidden="true"></span></summary>
+          <div class="faq-body"><p>Bukan, dan kami menyebutnya terang-terangan. FIEZEL adalah aplikasi belajar bahasa adaptif yang tugasnya bisa disambungkan ke Kurikulum Nasional. Mesin kontennya adalah jalur bahasa Inggris adaptif dengan sekitar 1.150 soal di tingkat A1–A2; bank kurikulumnya jauh lebih kecil — 15 bab dan 115 soal untuk kelas 7 sampai 12. Kalau FIEZEL dipakai sebagai sumber materi kurikulum utama, materi satu tingkat kelas akan habis dalam hitungan minggu.</p></div>
+        </details>
+        <details>
+          <summary>Berapa banyak murid yang bisa ditampung?<span class="chev" aria-hidden="true"></span></summary>
+          <div class="faq-body"><p>Kapasitas terpasang saat ini 250 pengguna. Itu cukup untuk satu kelas (sekitar 30 murid) dengan ruang lebih, tetapi tidak cukup untuk satu sekolah utuh yang berisi 600 sampai 900 murid. Kami tidak menawarkan pemakaian satu sekolah sebelum kapasitasnya dinaikkan.</p></div>
+        </details>
+        <details>
+          <summary>Apa yang bisa dilakukan guru di FIEZEL?<span class="chev" aria-hidden="true"></span></summary>
+          <div class="faq-body"><p>Lewat KelasKu untuk Guru: membuat ruang kelas, menerbitkan tugas yang menempel pada bab dan sub-bab Kurikulum Nasional, membaca Ringkasan Hari Ini untuk melihat siapa yang tertinggal, melihat analitik per murid dan per kompetensi, serta membagikan rapor kepada orang tua. Tugas dinilai otomatis, jadi guru tidak mengoreksi manual.</p></div>
+        </details>
+        <details>
+          <summary>Mata pelajaran selain Bahasa Inggris sudah bisa dipakai?<span class="chev" aria-hidden="true"></span></summary>
+          <div class="faq-body"><p>Belum, dan sebaiknya jangan dipakai dulu. Ada rangka untuk 17 mata pelajaran, tetapi isinya baru sekitar 15 soal per mata pelajaran dan belum menyesuaikan tingkat kelas — soal yang sama bisa muncul untuk kelas 7 maupun kelas 11. Yang sudah matang dan kami tawarkan hari ini hanya Bahasa Inggris.</p></div>
+        </details>
+        <details>
+          <summary>Berapa biaya pilot untuk sekolah?<span class="chev" aria-hidden="true"></span></summary>
+          <div class="faq-body"><p>Rp 0. Tidak ada biaya lisensi, tidak ada langganan, dan tidak ada biaya tersembunyi. Yang kami minta adalah satu guru, satu kelas, sekitar satu jam pelatihan, dan izin menyebarkan formulir persetujuan orang tua. Yang sekolah terima adalah aplikasinya plus laporan akhir tertulis yang menjadi milik sekolah.</p></div>
+        </details>
+        <details>
+          <summary>Data murid disimpan di mana?<span class="chev" aria-hidden="true"></span></summary>
+          <div class="faq-body"><p>Progres belajar murid tersimpan lokal di perangkat masing-masing. FIEZEL tidak meminta nama, email, atau nomor telepon untuk mulai belajar. Untuk fitur kelas, guru memakai kode kelas, bukan data pribadi murid. Rinciannya ada di <a href="privacy/">Kebijakan Privasi</a>.</p></div>
+        </details>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="foot">
+  <div class="wrap foot-in">
+    <div class="foot-brand">
+      <p class="foot-tag">Ruang belajar bahasa personal — Inggris dan Jepang.</p>
+      <nav class="foot-links" aria-label="Tautan footer">
+        <a href="./">Beranda</a>
+        <span aria-hidden="true">·</span>
+        <a href="tentang.html">Tentang FIEZEL</a>
+        <span aria-hidden="true">·</span>
+        <a href="app/">Buka Aplikasi Murid</a>
+        <span aria-hidden="true">·</span>
+        <a href="install/">Cara Install</a>
+        <span aria-hidden="true">·</span>
+        <a href="th/untuk-sekolah.html" hreflang="th" lang="th">สำหรับโรงเรียน (ไทย)</a>
+        <span aria-hidden="true">·</span>
+        <a href="privacy/">Kebijakan Privasi</a>
+        <span aria-hidden="true">·</span>
+        <a href="terms/">Syarat Penggunaan</a>
+      </nav>
+    </div>
+    <div class="foot-notes">
+      <p>Belum ada sekolah yang memakai FIEZEL. Halaman ini undangan pilot, bukan daftar pelanggan.</p>
+      <p>Kapasitas terpasang 250 pengguna — cukup satu kelas, bukan satu sekolah.</p>
+      <p>Materi Inggris dipetakan ke CEFR A1–C2, materi Jepang ke JLPT N5–N4. Bukan sertifikasi resmi.</p>
+    </div>
+  </div>
+  <div class="wrap foot-copy"><p>© 2026 FIEZEL</p></div>
+</footer>
+</body>
+</html>
