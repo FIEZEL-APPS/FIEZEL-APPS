@@ -1,6 +1,6 @@
 {
   "schema": "fiezel-student-single-registration-v1",
-  "generatedAt": "2026-09-20T19:40:29.530Z",
+  "generatedAt": "2026-09-22T23:45:30.217Z",
   "pass": true,
   "checks": [
     {
@@ -29,9 +29,19 @@
       "detail": ""
     },
     {
-      "name": "R2 profileCreate memakai friendsVisible:true dan leagueOptIn:true",
+      "name": "R2 profileCreate memakai friendsVisible:true dan leagueOptIn:false",
       "pass": true,
-      "detail": "sudah mendaftar = wajib tampil di papan dengan nama yang dipilih sendiri"
+      "detail": "audit F06: liga global bukan bawaan; papan teman hanya untuk teman yang diterima"
+    },
+    {
+      "name": "R2 papan Liga punya pintu ikut/keluar sendiri (audit F06)",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "R2 langkah nama menjelaskan bahwa nama menjadi ID online (audit F06)",
+      "pass": true,
+      "detail": ""
     },
     {
       "name": "R2 nol kotak centang persetujuan sosial di app.js",

@@ -184,6 +184,7 @@
     'onboarding.role-guru-desc': 'Kelola kelas, lihat pola kesalahan murid, dan buat sesi review dalam 60 detik.',
     'onboarding.role-guru-cta': 'Masuk ke Tutor Action Center',
     'onboarding.name-field-label': 'Nama panggilan',
+    'onboarding.name-privacy-hint': 'Nama ini jadi ID online-mu. Yang melihatnya hanya teman yang kamu terima, jadi boleh pakai nama samaran.',
     'onboarding.name-placeholder': 'Tulis nama kamu',
     'onboarding.name-aria': 'Nama panggilan kamu',
     'onboarding.greet-schedule': 'Soal pengingat: aku yang cari waktunya, kamu tinggal belajar.',

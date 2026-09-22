@@ -46,7 +46,8 @@
     evidence:'/api/social/rank/evidence',
     boardFriends:'/api/social/rank/board/friends',
     boardLeague:'/api/social/rank/board/league',
-    optout:'/api/social/rank/optout'
+    optout:'/api/social/rank/optout',
+    league:'/api/social/rank/league'
   });
   // Enum stiker sorakan (token mesin dari server; emoji + label urusan sini).
   var STICKERS=Object.freeze([
@@ -247,7 +248,8 @@
     cheer:function(handle,sticker){return call(API_PATHS.cheer,{handle:String(handle||''),sticker:String(sticker||'')})},
     boardFriends:function(){return call(API_PATHS.boardFriends)},
     boardLeague:function(){return call(API_PATHS.boardLeague)},
-    optout:function(hidden){return call(API_PATHS.optout,{hidden:hidden===true})}
+    optout:function(hidden){return call(API_PATHS.optout,{hidden:hidden===true})},
+    league:function(optIn){return call(API_PATHS.league,{optIn:optIn===true})}
   });
 
   // ---------------------------------------------------------------- outbox bukti (offline-first)

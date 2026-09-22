@@ -181,6 +181,7 @@
     'onboarding.role-guru-desc': 'จัดการชั้นเรียน ดูรูปแบบข้อผิดพลาดของนักเรียน และสร้างเซสชันทบทวนใน 60 วินาที',
     'onboarding.role-guru-cta': 'เข้าสู่ Tutor Action Center',
     'onboarding.name-field-label': 'ชื่อเล่น',
+    'onboarding.name-privacy-hint': 'ชื่อนี้จะเป็น ID ออนไลน์ของคุณ มีแค่เพื่อนที่คุณยอมรับเท่านั้นที่เห็น จึงใช้นามแฝงได้',
     'onboarding.name-placeholder': 'พิมพ์ชื่อของคุณ',
     'onboarding.name-aria': 'ชื่อเล่นของคุณ',
     'onboarding.greet-schedule': 'เรื่องตัวเตือน: เราหาเวลาให้เอง คุณแค่มาเรียนก็พอ',

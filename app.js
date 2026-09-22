@@ -13538,9 +13538,12 @@ async function renderOnlineTab(){
      1. Nama yang diketik di onboarding (Step 1) diubah jadi handle yang sah oleh
         socialHandleCandidates() — murni, tanpa jaringan, jadi bisa diuji tanpa DOM.
      2. registerStudentOnce() menerbitkan identitas anonim (cookie fz_id), memilih kandidat
-        pertama yang tersedia, lalu membuat profil dengan dua bekas centang persetujuan
-        DITANAMKAN: friendsVisible:true, leagueOptIn:true. Sudah mendaftar = tampil di papan
-        dengan nama yang dipilih sendiri. Tidak ada lagi kotak centang untuk itu.
+        pertama yang tersedia, lalu membuat profil TANPA kotak centang: friendsVisible:true
+        (hanya teman yang kamu terima yang melihat progresmu) dan leagueOptIn:false.
+        Audit UI/UX F06 (2026-09-23): liga kohor memperlihatkan handle + PB kepada orang
+        asing, dan sasaran KelasKu banyak yang di bawah 18 tahun, jadi ikut liga kini satu
+        ketukan di papan Liga (socialSetLeague), bukan bawaan diam-diam. Langkah nama di
+        onboarding menjelaskan bahwa nama panggilan itu menjadi ID online.
      3. Idempoten dan aman dipanggil berkali-kali: profil yang sudah ada dipakai apa adanya,
         dan panggilan yang tumpang tindih berbagi satu promise.
    Kegagalan (offline, flag mati, server diam) TIDAK PERNAH menahan belajar — ia diam, dan
@@ -13597,7 +13600,7 @@ function registerStudentOnce(opts){
       let free=false;
       try{const chk=await core.api.profileCheck(v.handle);free=!!(chk.ok&&chk.data?.available===true);if(!chk.ok)lastMessage=chk.message||lastMessage}catch(_){}
       if(!free)continue;
-      const res=await core.api.profileCreate({handle:v.handle,friendsVisible:true,leagueOptIn:true});
+      const res=await core.api.profileCreate({handle:v.handle,friendsVisible:true,leagueOptIn:false});
       if(res.ok){socialProfileCache=res.data?.profile||null;socialSummaryAt=0;try{queueSocialEvidence()}catch(_){}return {ok:true,handle:rememberSocialHandle(v.handle),profile:socialProfileCache}}
       if(res.error==='profile_exists'){
         try{const me2=await core.api.profileMe();if(me2.ok&&me2.data?.profile){socialProfileCache=me2.data.profile;return {ok:true,handle:rememberSocialHandle(me2.data.profile.handle),profile:me2.data.profile}}}catch(_){}
@@ -13794,11 +13797,12 @@ async function socialPapanMarkup(core){
     const b=await core.api.boardLeague();
     if(b.error==='profile_required')return boardTabs+socialNeedProfileCard();
     if(!b.ok)return boardTabs+card(`<h3>${FiezelI18n.t('social.board-league-error')}</h3><p class="muted">${esc(b.message)}</p>`,'social-card');
-    if(b.data?.optedIn!==true)return boardTabs+card(`<h3>${FiezelI18n.t('social.board-league-tab')}</h3>${cdLine}<p class="muted">${FiezelI18n.t('social.board-league-not-joined')}</p><div class="modal-actions"><button class="primary" onclick="switchOnlineBoard('teman')">${FiezelI18n.t('social.board-league-see-friends')}</button></div>`,'social-card');
-    if(b.data?.leagueOpen!==true)return boardTabs+card(`<h3>${FiezelI18n.t('social.board-league-tab')}</h3>${cdLine}<p class="muted">${FiezelI18n.t('social.board-cohort-empty')}</p>`,'social-card');
+    if(b.data?.optedIn!==true)return boardTabs+card(`<h3>${FiezelI18n.t('social.board-league-tab')}</h3>${cdLine}<p class="muted">${FiezelI18n.t('social.board-league-not-joined')}</p><div class="modal-actions"><button type="button" onclick="switchOnlineBoard('teman')">${FiezelI18n.t('social.board-league-see-friends')}</button><button type="button" class="primary" id="socialLeagueBtn" data-testid="league-join" onclick="socialSetLeague(true)"><i data-lucide="trophy"></i> ${FiezelI18n.t('social.board-league-join-btn')}</button></div>`,'social-card');
+    const leaveLeague=`<div class="modal-actions"><button type="button" class="text-button" id="socialLeagueBtn" data-testid="league-leave" onclick="socialSetLeague(false)">${FiezelI18n.t('social.board-league-leave-btn')}</button></div>`;
+    if(b.data?.leagueOpen!==true)return boardTabs+card(`<h3>${FiezelI18n.t('social.board-league-tab')}</h3>${cdLine}<p class="muted">${FiezelI18n.t('social.board-cohort-empty')}</p>${leaveLeague}`,'social-card');
     const rows=socialBoardRows(core,b.data?.rows);
     const meNote=b.data?.me==null?`<p class="muted">${FiezelI18n.t('social.board-private-mode')}</p>`:'';
-    return boardTabs+card(`<h3>${FiezelI18n.t('social.board-league-tab')}</h3><p class="muted">${FiezelI18n.t('social.board-league-desc')}</p>${cdLine}${rows||`<div class="social-empty"><p class="muted">${FiezelI18n.t('social.board-cohort-quiet')}</p></div>`}${meNote}`,'social-card');
+    return boardTabs+card(`<h3>${FiezelI18n.t('social.board-league-tab')}</h3><p class="muted">${FiezelI18n.t('social.board-league-desc')}</p>${cdLine}${rows||`<div class="social-empty"><p class="muted">${FiezelI18n.t('social.board-cohort-quiet')}</p></div>`}${meNote}${leaveLeague}`,'social-card');
   }
   const b=await core.api.boardFriends();
   if(b.error==='profile_required')return boardTabs+socialNeedProfileCard();
@@ -13808,6 +13812,25 @@ async function socialPapanMarkup(core){
   const empty=`<div class="social-empty"><p><b>${FiezelI18n.t('social.board-friends-empty-title')}</b></p><p class="muted">${FiezelI18n.t('social.board-friends-empty-body')}</p><div class="modal-actions"><button class="primary" onclick="switchOnlineTab('teman')"><i data-lucide="ticket"></i> ${FiezelI18n.t('social.board-invite-btn')}</button></div></div>`;
   return boardTabs+card(`<h3>${FiezelI18n.t('social.board-friends-desc')}</h3><p class="muted">${FiezelI18n.t('social.board-pb-desc')}</p>${cdLine}${rows||empty}${meNote}`,'social-card');
 }
+/* ---------------------------------------------------------------- ikut / keluar liga (audit F06) */
+async function socialSetLeague(optIn){
+  const want=optIn===true;
+  const core=socialCore();
+  if(!core||typeof core.api.league!=='function'){showToast(FiezelI18n.t('social.not-loaded-toast'),'warn');return false}
+  const btn=$('socialLeagueBtn');if(btn)btn.disabled=true;
+  const res=await core.api.league(want);
+  if(res.ok){
+    if(socialProfileCache?.flags)socialProfileCache.flags.leagueOptIn=want;
+    socialSummaryAt=0;
+    showToast(want?FiezelI18n.t('social.league-joined-toast'):FiezelI18n.t('social.league-left-toast'),'success');
+    renderOnlineTab();
+    return true;
+  }
+  if(btn)btn.disabled=false;
+  showToast(res.error==='offline'?res.message:FiezelI18n.t('social.league-failed-toast'),'warn');
+  return false;
+}
+window.socialSetLeague=socialSetLeague;
 /* ---------------------------------------------------------------- sakelar Mode Privat (Pengaturan) */
 async function socialToggleHidden(input){
   const want=!!input?.checked;

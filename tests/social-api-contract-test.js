@@ -609,6 +609,21 @@ function evidenceBody(jti, day, events) {
     assert(open.json.rows.length <= 20, 'kohor tidak pernah melebihi 20 baris');
     assert(open.json.rows[0].handle === 'liga_tiga' && open.json.me.rank === 1,
       'papan liga terurut PB; pengumpul PB di peringkat 1');
+
+    // Audit F06: ikut liga adalah pilihan murid SESUDAH profil ada, dan bisa dibatalkan.
+    const badLeague = await callSocial(appLg, 'POST', '/api/social/rank/league', { body: { optIn: 'ya' }, cookie: uOut.cookie });
+    assert(badLeague.status === 400, 'rank/league menolak optIn non-boolean');
+    const join = await callSocial(appLg, 'POST', '/api/social/rank/league', { body: { optIn: true }, cookie: uOut.cookie });
+    assert(join.status === 200 && join.json.optIn === true, 'rank/league {optIn:true} => 200 {optIn:true}');
+    const joined = await callSocial(appLg, 'GET', '/api/social/rank/board/league', { cookie: uOut.cookie });
+    assert(joined.json.optedIn === true, 'sesudah ikut liga, papan liga menganggapku opt-in');
+    const meJoined = await callSocial(appLg, 'GET', '/api/social/profile/me', { cookie: uOut.cookie });
+    assert(meJoined.json.profile.flags.leagueOptIn === true && meJoined.json.profile.flags.friendsVisible === true,
+      'ikut liga hanya menyalakan LEAGUE_OPT_IN; friendsVisible tidak tersentuh');
+    const leave = await callSocial(appLg, 'POST', '/api/social/rank/league', { body: { optIn: false }, cookie: uOut.cookie });
+    assert(leave.status === 200 && leave.json.optIn === false, 'rank/league {optIn:false} => keluar liga');
+    const left = await callSocial(appLg, 'GET', '/api/social/rank/board/league', { cookie: uOut.cookie });
+    assert(left.json.optedIn === false && left.json.rows.length === 0, 'sesudah keluar liga, papan liga tertutup lagi');
   }
 
   /* ---------- 12. Skema runtime vs migrasi: dua jalur, satu perilaku --------- */

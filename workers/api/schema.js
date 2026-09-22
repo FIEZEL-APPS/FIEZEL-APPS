@@ -111,6 +111,7 @@ export const BYTE_LIMITS = Object.freeze({
   '/api/social/rank/board/friends': 512, // GET, tanpa body
   '/api/social/rank/board/league': 512,  // GET, tanpa body
   '/api/social/rank/optout': 512,
+  '/api/social/rank/league': 512,
   // --- SLOT 8: lane bukti belajar Braincore (evidence/route-evidence.js).
   // 8192 = LIMITS.MAX_BODY_BYTES di evidence-core.js, angka yang sama dengan
   // batas batch analytics/learning. Cap di sini, bukan di handler: mw-guard
