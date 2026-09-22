@@ -998,6 +998,45 @@ test('alur ringkas: stepper menghitung tiga, bukan enam', () => {
   });
 });
 
+/* Audit UI/UX F01/F04/F05 (2026-09-22). Alur ringkas adalah alur yang DIKIRIM ke murid
+   (leanIntro + placementLite hidup di fiezel-ux-flags.js), jadi janjinya diperiksa DI SANA:
+   salinan lama menyebut "25 soal listening" padahal tes yang benar-benar dijalankan app.js
+   12 soal tanpa listening; dan langkah terakhir punya tiga jalan keluar berbeda arti. */
+function withLeanAndLite(fn) {
+  const prev = globalThis.FiezelUX;
+  globalThis.FiezelUX = { on(f) { return f === 'leanIntro' || f === 'placementLite'; }, off(f) { return !this.on(f); } };
+  try { return fn(); } finally { globalThis.FiezelUX = prev; }
+}
+
+test('alur ringkas: tes awal menyebut jumlah soal yang BENAR-BENAR dijalankan (placement-lite)', () => {
+  withLeanAndLite(() => {
+    const targets = require('../features/diagnostics/fiezel-diagnostic-targets.js');
+    const lite = targets.leveltest.liteQuestions;
+    assert.ok(Number(lite) > 0, 'leveltest.liteQuestions wajib ada di diagnostic targets');
+    const liteInApp = /const PLACEMENT_LITE_SIZE=(\d+);/.exec(app);
+    assert.ok(liteInApp && Number(liteInApp[1]) === lite,
+      'PLACEMENT_LITE_SIZE di app.js (' + (liteInApp && liteInApp[1]) + ') harus sama dengan liteQuestions (' + lite + ')');
+    const html = onboarding.placementMarkup(fakeEnv());
+    assert.ok(new RegExp('>' + lite + ' soal').test(html), 'tes awal ringkas harus menyebut ' + lite + ' soal');
+    assert.ok(!/25 soal/.test(html), 'tidak boleh menjanjikan 25 soal pada tes 12 soal');
+    assert.ok(!/listening/.test(html), 'placement-lite tidak memuat listening, jadi tidak boleh menjanjikannya');
+  });
+});
+
+test('alur ringkas: satu jalan lewati per langkah (audit F05)', () => {
+  withLeanAndLite(() => {
+    const env = fakeEnv();
+    const goal = onboarding.goalMarkup(env, 'school', '');
+    const place = onboarding.placementMarkup(env);
+    const count = (html, re) => (html.match(re) || []).length;
+    assert.strictEqual(count(goal, /data-ob-skip\b/g) + count(goal, /data-ob-step-skip\b/g), 1,
+      'langkah tujuan: tepat satu tombol lewati');
+    assert.strictEqual(count(place, /data-ob-skip\b/g) + count(place, /data-ob-step-skip\b/g), 1,
+      'langkah tes awal: tepat satu tombol lewati');
+    assert.ok(/class="fiezel-back" data-ob-back/.test(goal), 'langkah tujuan wajib punya Kembali yang terlihat');
+  });
+});
+
 test('murid dengan kode kelas langsung menyelesaikan perkenalan dan menyimpan kode', () => {
   const env = fakeEnv();
   let finished = false;

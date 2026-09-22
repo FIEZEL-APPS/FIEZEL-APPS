@@ -128,6 +128,8 @@
     'level.deskripsi-c2': 'Sangat mahir · hampir seperti penutur asli',
     'level.deskripsi-fallback': 'Level kamu sekarang',
     'level.entry-chip': 'Belum diuji',
+    'level.entry-tes-awal': 'Mulai tes awal',
+    'level.entry-line-tes-awal': 'Level {level} belum terbukti. Tes awal ({soal} soal, tanpa nilai dan tanpa hukuman) yang menentukan level kerjamu.',
     'level.entry-ikuti-ujian': 'Ikuti ujian',
     'level.entry-nanti-aja': 'Nanti aja',
     'level.ujian-badge': 'Lulus ujian',

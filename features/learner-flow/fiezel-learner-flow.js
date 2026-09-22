@@ -38,6 +38,21 @@
     { id: 'everyday', label: 'Everyday English', desc: 'Percakapan harian dan pesan singkat.' }
   ];
 
+  /* Audit F05 (2026-09-22): tujuan yang sama ditanya DUA kali - di perkenalan (bahasa murid:
+     "Sekolah", "Kampus") lalu lagi di sini dengan label Inggris ("English for school").
+     Id-nya identik dengan FiezelPersonalJourney.GOAL_IDS, jadi labelnya diambil dari profil
+     yang sama (sudah dwibahasa id/th), dan jawaban perkenalan mengisi langkah ini sendiri. */
+  function goalLabel(g) {
+    try { var J = root.FiezelPersonalJourney; if (J && J.buildGoalProfile) { var p = J.buildGoalProfile(g.id); if (p && p.id === g.id && p.label) return p.label; } } catch (_) {}
+    return g.label;
+  }
+  function onboardingGoal() {
+    try {
+      var r = JSON.parse(localStorage.getItem('fiezel-onboarding-v1') || '{}'), g = String((r && r.goal) || '');
+      return GOALS.some(function (x) { return x.id === g; }) ? g : '';
+    } catch (_) { return ''; }
+  }
+
   function bank() { return root.FiezelReviewBank; }
   function backup() { return root.FiezelProgressBackup; }
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (m) { return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' })[m]; }); }
@@ -442,6 +457,7 @@
 
   function mount(el, options) {
     mountEl = el; env = options || {}; st = load();
+    if (!st.goal) { var og = onboardingGoal(); if (og) { st.goal = og; save(st); } }
     if (st.goal && st.step === 'goal') st.step = st.diagnostic ? 'plan' : 'diagnostic';
     try { if (new URL(location.href).searchParams.get('duel')) st.tab = 'duel'; } catch (_) {}
     el.addEventListener('click', onClick);
@@ -464,7 +480,7 @@
   }
 
   function stepper() {
-    var steps = [['goal', 'Tujuan'], ['diagnostic', 'Tes singkat'], ['skillmap', 'Peta kemampuan'], ['plan', 'Rencana hari ini'], ['lesson', t('umum.materi', 'Materi')], ['next', 'Berikutnya']];
+    var steps = [['goal', 'Tujuan'], ['diagnostic', t('flow.step-cek', 'Cek cepat')], ['skillmap', 'Peta kemampuan'], ['plan', 'Rencana hari ini'], ['lesson', t('umum.materi', 'Materi')], ['next', 'Berikutnya']];
     var idx = steps.findIndex(function (s) { return s[0] === st.step; });
     return '<ol class="lf-stepper">' + steps.map(function (s, i) { return '<li class="' + (i < idx ? 'is-done' : i === idx ? 'is-current' : '') + '"><span>' + (i + 1) + '</span>' + s[1] + '</li>'; }).join('') + '</ol>';
   }
@@ -485,9 +501,9 @@
   function goalView() {
     return '<div class="lf-card"><h2>Apa tujuan belajarmu?</h2><p class="lf-muted">Tujuan menentukan contoh dan urutan skill. FIEZEL memberi fondasi dan skill map — bukan skor IELTS/TOEFL resmi atau sertifikat.</p>' +
       '<div class="lf-goal-grid">' + GOALS.map(function (g) {
-        return '<button type="button" class="lf-goal' + (st.goal === g.id ? ' is-selected' : '') + '" data-lf="goal" data-goal="' + g.id + '" data-testid="lf-goal-' + g.id + '"><b>' + esc(g.label) + '</b><small>' + esc(g.desc) + '</small></button>';
+        return '<button type="button" class="lf-goal' + (st.goal === g.id ? ' is-selected' : '') + '" data-lf="goal" data-goal="' + g.id + '" data-testid="lf-goal-' + g.id + '"><b>' + esc(goalLabel(g)) + '</b><small>' + esc(g.desc) + '</small></button>';
       }).join('') + '</div>' +
-      '<div class="lf-actions"><button type="button" class="lf-primary" data-lf="start-diagnostic" data-testid="lf-start-diagnostic"' + (st.goal ? '' : ' disabled') + '>Jawab 5 soal singkat</button></div></div>';
+      '<div class="lf-actions"><button type="button" class="lf-primary" data-lf="start-diagnostic" data-testid="lf-start-diagnostic"' + (st.goal ? '' : ' disabled') + '>' + esc(t('flow.btn-cek', 'Cek cepat · 5 soal')) + '</button></div></div>';
   }
 
   function ensureDiagRun() {

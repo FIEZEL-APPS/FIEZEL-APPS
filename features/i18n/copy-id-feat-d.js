@@ -137,6 +137,8 @@
     'account.logout-done': 'Kamu sudah keluar. Progres di perangkat ini tetap aman.',
     'account.busy': 'Sebentar…',
     'flow.tab-desc': 'Tugas, ulangan, dan teks pelajaran.',
+    'flow.step-cek': 'Cek cepat',
+    'flow.btn-cek': 'Cek cepat · 5 soal',
     'flow.tugas-guru': 'Tugas dari guru',
     'flow.tugas-hilang': 'Tugas ini sudah selesai atau tidak ditemukan.',
     'flow.tugas-selesai': 'Tugas ini sudah kamu selesaikan.',
