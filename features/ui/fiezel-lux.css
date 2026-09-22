@@ -85,26 +85,10 @@ body.fz-lux .home-section-head .text-button{font-size:.82rem;font-weight:700;col
 body.fz-lux .home-section-head .text-button:hover{background:var(--lux-paper)}
 body.fz-lux .journey-week{display:none}
 
-/* ---------- kartu PREMIUM ---------- */
+/* ---------- kartu ---------- */
 body.fz-lux .card{
-  background:linear-gradient(165deg,#FFFFFF 0%,#FFFBF0 60%,#FFF6DD 100%);
-  border:1.5px solid rgba(255,199,0,.18);border-radius:var(--lux-r-lg);
-  padding:20px;
-  box-shadow:
-    var(--lux-shadow-sm),
-    inset 0 1px 0 rgba(255,255,255,.95),
-    inset 0 -1px 0 rgba(255,199,0,.06);
-  margin-bottom:12px;
-  position:relative;overflow:hidden;
-}
-body.fz-lux .card::before{
-  content:"";position:absolute;top:0;left:16px;right:16px;height:1.5px;
-  background:linear-gradient(90deg,rgba(255,199,0,0),rgba(255,199,0,.40) 30%,rgba(230,168,0,.50) 50%,rgba(255,199,0,.40) 70%,rgba(255,199,0,0));
-  z-index:1;pointer-events:none;
-}
-body.fz-lux .card:hover{
-  transform:translateY(-3px);border-color:rgba(255,199,0,.35);
-  box-shadow:var(--lux-shadow-md),inset 0 1px 0 rgba(255,255,255,1);
+  background:var(--lux-paper);border:1px solid var(--lux-line);border-radius:var(--lux-r-lg);
+  padding:20px;box-shadow:var(--lux-shadow-sm);margin-bottom:12px;
 }
 body.fz-lux .card h3{font:400 1.25rem/1.15 var(--fz-display);letter-spacing:-.01em;margin:0 0 10px;color:var(--lux-ink)}
 body.fz-lux .muted{color:var(--lux-muted)}
@@ -118,14 +102,9 @@ body.fz-lux button{
 body.fz-lux button:hover{border-color:var(--lux-ink);box-shadow:var(--lux-shadow-sm)}
 body.fz-lux button:active{transform:scale(.98)}
 body.fz-lux button.primary,body.fz-lux .primary,body.fz-lux .primary.luxe,body.fz-lux .quiz-next:not(:disabled){
-  background:linear-gradient(145deg,var(--lux-accent),var(--lux-accent-deep));color:#FFFFFF;
-  border:1.5px solid var(--lux-accent);
-  box-shadow:var(--lux-glow),inset 0 1px 0 rgba(255,255,255,.15);
+  background:var(--lux-accent);color:#FFFFFF;border-color:var(--lux-accent);box-shadow:var(--lux-glow);
 }
-body.fz-lux button.primary:hover,body.fz-lux .primary:hover,body.fz-lux .primary.luxe:hover{
-  background:linear-gradient(145deg,#C84E38,var(--lux-accent-deep));border-color:var(--lux-accent-deep);color:#FFFFFF;
-  box-shadow:0 12px 32px -4px rgba(184,67,45,.45),inset 0 1px 0 rgba(255,255,255,.2);
-}
+body.fz-lux button.primary:hover,body.fz-lux .primary:hover,body.fz-lux .primary.luxe:hover{background:var(--lux-accent-deep);border-color:var(--lux-accent-deep);color:#FFFFFF}
 body.fz-lux .primary.wide,body.fz-lux .coach-strip-go{min-height:54px;font-size:1rem}
 body.fz-lux .danger{background:transparent;color:#B8432D;border-color:rgba(184,67,45,.25)}
 body.fz-lux .danger:hover{background:#FDE3DE;border-color:#B8432D}
@@ -178,48 +157,28 @@ body.fz-lux .coach-strip-say small{color:var(--lux-muted);letter-spacing:.16em}
 body.fz-lux .coach-strip-say b{font-size:1rem;font-weight:600;line-height:1.4;-webkit-line-clamp:3;line-clamp:3}
 body.fz-lux .coach-strip-more{font-size:.82rem;font-weight:700;color:var(--lux-ink);opacity:.8;border:0;box-shadow:none;background:transparent}
 
-/* ---------- kartu skill & pintu belajar PREMIUM ---------- */
+/* ---------- kartu skill & pintu belajar ---------- */
 body.fz-lux .skill-hub{gap:12px}
 body.fz-lux .skill-card{
   --skill-bg:var(--lux-paper);--skill-line:var(--lux-line);
-  background:linear-gradient(155deg,#FFFFFF 0%,#FFFBF0 60%,var(--lux-yellow-soft) 100%);
-  border:2px solid rgba(255,199,0,.15);border-radius:var(--lux-r-lg);
-  padding:18px;
-  box-shadow:
-    var(--lux-shadow-sm),
-    inset 0 1px 0 rgba(255,255,255,.95);
-  min-height:128px;
-  transition:transform .22s cubic-bezier(.34,1.56,.64,1),box-shadow .22s ease,border-color .22s ease;
+  background:var(--lux-paper);border:1px solid var(--lux-line);border-radius:var(--lux-r-lg);
+  padding:16px;box-shadow:var(--lux-shadow-sm);min-height:128px;
+  transition:transform .18s var(--ease),box-shadow .18s var(--ease),border-color .18s var(--ease);
 }
-body.fz-lux .skill-card:hover{
-  transform:translateY(-4px);
-  border-color:rgba(255,199,0,.40);
-  box-shadow:var(--lux-shadow-md),inset 0 1px 0 rgba(255,255,255,1);
-}
+body.fz-lux .skill-card:hover{transform:translateY(-2px);box-shadow:var(--lux-shadow-md);border-color:rgba(36,26,17,.22)}
 body.fz-lux .skill-card:active{transform:translateY(0) scale(.99);box-shadow:var(--lux-shadow-sm)}
 body.fz-lux .skill-card .fz-i{--fz-i-fill:var(--lux-yellow);--fz-i-line:var(--lux-ink)}
 body.fz-lux .skill-card b{font-size:1.02rem;font-weight:700}
 body.fz-lux .skill-card small{color:var(--lux-muted)}
 body.fz-lux .skill-badge{color:var(--lux-muted)}
-body.fz-lux .skill-ring{background:conic-gradient(var(--lux-yellow) var(--ring,0%),rgba(18,16,16,.10) 0)}
+body.fz-lux .skill-ring{background:conic-gradient(var(--lux-yellow) var(--ring,0%),rgba(36,26,17,.08) 0)}
 body.fz-lux .skill-ring::before{background:var(--lux-paper)}
 body.fz-lux .learning-launcher{gap:12px}
 body.fz-lux .launch-card{
-  background:linear-gradient(155deg,#FFFFFF 0%,#FFFBF0 70%,#FFF6DD 100%);
-  border:1.5px solid rgba(255,199,0,.18);border-radius:var(--lux-r-lg);
-  padding:16px;
-  box-shadow:var(--lux-shadow-sm),inset 0 1px 0 rgba(255,255,255,.95);
-  text-align:left;position:relative;overflow:hidden;
+  background:var(--lux-paper);border:1px solid var(--lux-line);border-radius:var(--lux-r-lg);
+  padding:16px;box-shadow:var(--lux-shadow-sm);text-align:left;
 }
-body.fz-lux .launch-card::before{
-  content:"";position:absolute;top:0;left:12px;right:12px;height:1px;
-  background:linear-gradient(90deg,rgba(255,199,0,0),rgba(255,199,0,.35),rgba(255,199,0,0));
-  pointer-events:none;
-}
-body.fz-lux .launch-card:hover{
-  transform:translateY(-3px);border-color:rgba(255,199,0,.35);
-  box-shadow:var(--lux-shadow-md),inset 0 1px 0 rgba(255,255,255,1);
-}
+body.fz-lux .launch-card:hover{transform:translateY(-2px);box-shadow:var(--lux-shadow-md);border-color:rgba(36,26,17,.22)}
 body.fz-lux .launch-card b{font-size:1rem;font-weight:700}
 body.fz-lux .launch-card small{color:var(--lux-muted)}
 body.fz-lux .launch-icon{width:40px;height:40px;border-radius:12px;background:var(--lux-yellow-soft);color:var(--lux-ink)}
