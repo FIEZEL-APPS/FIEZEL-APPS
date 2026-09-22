@@ -1,31 +1,48 @@
 /* ==========================================================================
    FIEZEL · features/ui/fiezel-lux.css — LAPISAN TAMPILAN PREMIUM (murid)
-   AUDIT 2026-09-22: palet diubah dari "lembut pucat" menjadi HITAM + EMAS PEKAT.
-   Tinta hitam pekat, kuning emas saturasi penuh, bayangan dalam, kontras tinggi.
-   Aktif hanya bila <body class="fz-lux">. Ruang Guru (body.fz-teacher-mode) tidak disentuh.
+   AUDIT 2026-09-22 v3: HYBRID DARK LUXURY — kartu gelap di atas background
+   terang hangat. Brass gold, bukan neon. Grain texture, bukan flat.
+   Aktif hanya bila <body class="fz-lux">. Ruang Guru tidak disentuh.
    ========================================================================== */
 body.fz-lux:not(.fz-teacher-mode){
-  /* AUDIT 2026-09-22: palet Bold Gold — hitam pekat + emas penuh.
-     Sebelumnya "lembut": krem pucat #FBF7F3, kuning pudar #F7EACB, tinta cokelat #2E2724.
-     Sekarang: hitam pekat #121010, emas penuh #FFC700, background hangat #FFF5D6. */
+  /* === HYBRID DARK LUXURY PALETTE ===
+     Background TERANG (#FFF5D6) + kartu GELAP (#1A1614) = kontras dramatis.
+     Emas pakai brass (#D4A847), bukan neon (#FFC700). */
   --lux-ink:#121010;
   --lux-cream:#FFF5D6;
   --lux-paper:#FFFFFF;
   --lux-paper-warm:#FFF9E6;
-  --lux-yellow:#FFC700;
-  --lux-yellow-deep:#E6A800;
-  --lux-yellow-soft:#FFF0B3;
-  --lux-line:rgba(18,16,16,.10);
-  --lux-line-soft:rgba(18,16,16,.06);
-  --lux-muted:#4A4340;
+  /* Dark card surfaces */
+  --lux-card:#1A1614;
+  --lux-card-text:#F0EBE3;
+  --lux-card-muted:#8A7E72;
+  --lux-card-line:rgba(212,168,71,.12);
+  /* Brass gold (warm, bukan neon) */
+  --lux-yellow:#D4A847;
+  --lux-yellow-deep:#B8922E;
+  --lux-yellow-soft:#F5E6C4;
+  --lux-yellow-bright:#FFC700;
+  /* Borders & lines */
+  --lux-line:rgba(18,16,16,.08);
+  --lux-line-soft:rgba(18,16,16,.04);
+  --lux-muted:#6E635C;
+  /* Accent */
   --lux-accent:#B8432D;
   --lux-accent-deep:#8C2A18;
-  --lux-shadow-sm:0 6px 18px rgba(18,16,16,.10);
-  --lux-shadow-md:0 14px 36px rgba(18,16,16,.13);
-  --lux-shadow-lg:0 22px 50px rgba(18,16,16,.18);
+  /* Skill identity colors */
+  --lux-skill-speaking:#7CB342;
+  --lux-skill-grammar:#5C9EAD;
+  --lux-skill-vocab:#D4A847;
+  --lux-skill-reading:#9B7EB8;
+  /* Shadows — warm tinted */
+  --lux-shadow-sm:0 6px 20px rgba(26,20,20,.14);
+  --lux-shadow-md:0 14px 40px rgba(26,20,20,.18);
+  --lux-shadow-lg:0 24px 56px rgba(26,20,20,.24);
   --lux-glow:0 10px 30px -4px rgba(184,67,45,.35);
+  /* Radii */
   --lux-r-xl:34px;--lux-r-lg:28px;--lux-r-md:22px;--lux-r-sm:18px;
-  --panel:var(--lux-paper);
+  /* Aliases */
+  --panel:var(--lux-card);
   --line:var(--lux-line);
   --line-soft:var(--lux-line-soft);
   --radius-lg:var(--lux-r-lg);
@@ -42,13 +59,15 @@ body.fz-lux:not(.fz-teacher-mode){
   color:var(--lux-ink);
   -webkit-font-smoothing:antialiased;
 }
+/* Grain texture overlay — bukan flat, terasa seperti kertas premium */
 body.fz-lux:not(.fz-teacher-mode)::before{
   content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
   background:
-    radial-gradient(60% 40% at 50% -5%,rgba(255,199,0,.10),rgba(255,199,0,0) 70%),
-    radial-gradient(40% 30% at 100% 100%,rgba(255,199,0,.15),rgba(255,199,0,0) 70%);
+    url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.03'/%3E%3C/svg%3E"),
+    radial-gradient(60% 40% at 50% -5%,rgba(212,168,71,.08),transparent 70%),
+    radial-gradient(40% 30% at 100% 100%,rgba(212,168,71,.06),transparent 70%);
 }
-body.fz-lux:not(.fz-teacher-mode) ::selection{background:var(--lux-yellow);color:var(--lux-ink)}
+body.fz-lux:not(.fz-teacher-mode) ::selection{background:var(--lux-yellow);color:#1A1614}
 
 /* ---------- cangkang ---------- */
 body.fz-lux .app{max-width:720px;padding:14px 18px calc(124px + env(safe-area-inset-bottom))}
@@ -85,29 +104,29 @@ body.fz-lux .home-section-head .text-button{font-size:.82rem;font-weight:700;col
 body.fz-lux .home-section-head .text-button:hover{background:var(--lux-paper)}
 body.fz-lux .journey-week{display:none}
 
-/* ---------- kartu PREMIUM ---------- */
+/* ---------- kartu HYBRID DARK LUXURY ---------- */
 body.fz-lux .card{
-  background:linear-gradient(165deg,#FFFFFF 0%,#FFFBF0 60%,#FFF6DD 100%);
-  border:1.5px solid rgba(255,199,0,.18);border-radius:var(--lux-r-lg);
+  background:var(--lux-card);color:var(--lux-card-text);
+  border:1.5px solid var(--lux-card-line);border-radius:var(--lux-r-lg);
   padding:20px;
   box-shadow:
     var(--lux-shadow-sm),
-    inset 0 1px 0 rgba(255,255,255,.95),
-    inset 0 -1px 0 rgba(255,199,0,.06);
+    inset 0 1px 0 rgba(255,255,255,.04),
+    inset 0 -1px 0 rgba(0,0,0,.15);
   margin-bottom:12px;
   position:relative;overflow:hidden;
 }
 body.fz-lux .card::before{
-  content:"";position:absolute;top:0;left:16px;right:16px;height:1.5px;
-  background:linear-gradient(90deg,rgba(255,199,0,0),rgba(255,199,0,.40) 30%,rgba(230,168,0,.50) 50%,rgba(255,199,0,.40) 70%,rgba(255,199,0,0));
+  content:"";position:absolute;top:0;left:16px;right:16px;height:1px;
+  background:linear-gradient(90deg,rgba(212,168,71,0),rgba(212,168,71,.35) 30%,rgba(184,146,46,.45) 50%,rgba(212,168,71,.35) 70%,rgba(212,168,71,0));
   z-index:1;pointer-events:none;
 }
 body.fz-lux .card:hover{
-  transform:translateY(-3px);border-color:rgba(255,199,0,.35);
-  box-shadow:var(--lux-shadow-md),inset 0 1px 0 rgba(255,255,255,1);
+  transform:translateY(-3px);border-color:rgba(212,168,71,.25);
+  box-shadow:var(--lux-shadow-md),inset 0 1px 0 rgba(255,255,255,.06);
 }
-body.fz-lux .card h3{font:400 1.25rem/1.15 var(--fz-display);letter-spacing:-.01em;margin:0 0 10px;color:var(--lux-ink)}
-body.fz-lux .muted{color:var(--lux-muted)}
+body.fz-lux .card h3{font:400 1.25rem/1.15 var(--fz-display);letter-spacing:-.01em;margin:0 0 10px;color:var(--lux-card-text)}
+body.fz-lux .muted{color:var(--lux-card-muted)}
 
 /* ---------- tombol ---------- */
 body.fz-lux button{
@@ -133,98 +152,103 @@ body.fz-lux .text-button{border:0;background:transparent;box-shadow:none;color:v
 body.fz-lux .text-button:hover{box-shadow:none;text-decoration:underline;text-underline-offset:3px}
 body.fz-lux button:focus-visible{outline:2px solid var(--lux-accent);outline-offset:3px}
 
-/* ---------- BERANDA: kartu peluncur BOLD GOLD ---------- */
+/* ---------- BERANDA: kartu peluncur HYBRID DARK ---------- */
 body.fz-lux .launcher-shell{
   position:relative;overflow:hidden;
-  background:linear-gradient(155deg,#FFFFFF 0%,var(--lux-yellow-soft) 40%,var(--lux-yellow) 100%);
-  color:var(--lux-ink);
-  border:1.5px solid rgba(255,199,0,.35);border-radius:var(--lux-r-xl);
-  padding:22px 20px 20px;box-shadow:var(--lux-shadow-md),0 0 0 1px rgba(255,199,0,.12);
+  background:var(--lux-card);color:var(--lux-card-text);
+  border:1.5px solid var(--lux-card-line);border-radius:var(--lux-r-xl);
+  padding:22px 20px 20px;box-shadow:var(--lux-shadow-md);
 }
 body.fz-lux .launcher-shell::after{
-  content:"";position:absolute;width:320px;height:320px;right:-120px;top:-160px;border-radius:50%;
-  background:radial-gradient(circle,rgba(255,199,0,.30) 0%,rgba(255,199,0,.08) 40%,rgba(255,199,0,0) 70%);
+  content:"";position:absolute;width:280px;height:280px;right:-100px;top:-140px;border-radius:50%;
+  background:radial-gradient(circle,rgba(212,168,71,.15) 0%,rgba(212,168,71,.04) 40%,transparent 70%);
   filter:none;pointer-events:none;
 }
 body.fz-lux .launcher-shell::before{
-  content:"";position:absolute;left:20px;right:20px;top:0;height:1.5px;
-  background:linear-gradient(90deg,rgba(255,199,0,0),rgba(255,199,0,.65),rgba(255,199,0,0));
+  content:"";position:absolute;left:20px;right:20px;top:0;height:1px;
+  background:linear-gradient(90deg,rgba(212,168,71,0),rgba(212,168,71,.50),rgba(212,168,71,0));
 }
-body.fz-lux .launcher-meta{color:var(--lux-muted);opacity:1;font-size:.62rem;letter-spacing:.2em;font-weight:700}
-body.fz-lux .launcher-meta .live-signal{background:var(--lux-accent);box-shadow:0 0 0 4px rgba(155,58,74,.14)}
+body.fz-lux .launcher-meta{color:var(--lux-yellow);opacity:1;font-size:.62rem;letter-spacing:.2em;font-weight:700}
+body.fz-lux .launcher-meta .live-signal{background:var(--lux-accent);box-shadow:0 0 0 4px rgba(184,67,45,.20)}
 body.fz-lux .hero-stats{margin:18px 0 12px;gap:8px}
 body.fz-lux .hero-stat{
-  background:rgba(255,255,255,.8);border:1px solid var(--lux-line);box-shadow:var(--lux-shadow-sm);
-  color:var(--lux-ink);border-radius:14px;padding:9px 13px;backdrop-filter:blur(6px);
+  background:rgba(255,255,255,.06);border:1px solid rgba(212,168,71,.15);box-shadow:none;
+  color:var(--lux-card-text);border-radius:14px;padding:9px 13px;backdrop-filter:blur(6px);
 }
-body.fz-lux .hero-stat small{color:var(--lux-muted);letter-spacing:.14em}
-body.fz-lux .hero-stat b{color:var(--lux-ink)}
-body.fz-lux .hero-stat.is-level{background:var(--lux-yellow);border-color:var(--lux-yellow-deep);color:var(--lux-ink);box-shadow:var(--lux-shadow-sm)}
-body.fz-lux .hero-stat.is-level small,body.fz-lux .hero-stat.is-level b{color:var(--lux-ink)}
-body.fz-lux .hero-stat.is-streak{background:rgba(255,255,255,.85)}
-body.fz-lux .hero-stat.is-streak svg{color:var(--lux-accent)}
+body.fz-lux .hero-stat small{color:var(--lux-card-muted);letter-spacing:.14em}
+body.fz-lux .hero-stat b{color:var(--lux-yellow)}
+body.fz-lux .hero-stat.is-level{background:rgba(124,179,66,.12);border-color:rgba(124,179,66,.25);color:var(--lux-card-text)}
+body.fz-lux .hero-stat.is-level small{color:var(--lux-card-muted)}
+body.fz-lux .hero-stat.is-level b{color:var(--lux-skill-speaking)}
+body.fz-lux .hero-stat.is-streak{background:rgba(212,168,71,.10);border-color:rgba(212,168,71,.20)}
+body.fz-lux .hero-stat.is-streak svg{color:var(--lux-yellow)}
 body.fz-lux .hero-line{
   font:400 clamp(1.45rem,5.2vw,1.9rem)/1.2 var(--fz-display);letter-spacing:-.015em;
-  color:var(--lux-ink);margin:6px 0 18px;max-width:26ch;-webkit-line-clamp:3;line-clamp:3;
+  color:var(--lux-card-text);margin:6px 0 18px;max-width:26ch;-webkit-line-clamp:3;line-clamp:3;
 }
-body.fz-lux .hero-line span{font-weight:600;color:var(--lux-accent)}
-body.fz-lux .trust-line{color:var(--lux-muted)}
+body.fz-lux .hero-line span{font-weight:600;color:var(--lux-yellow)}
+body.fz-lux .trust-line{color:var(--lux-card-muted)}
 body.fz-lux .coach-strip{
-  background:var(--lux-cream);color:var(--lux-ink);border:1px solid rgba(251,247,243,.2);
-  border-radius:20px;box-shadow:0 12px 30px -10px rgba(0,0,0,.45);padding:16px;
+  background:rgba(26,22,20,.85);color:var(--lux-card-text);border:1px solid var(--lux-card-line);
+  border-radius:20px;box-shadow:var(--lux-shadow-md);padding:16px;
 }
-body.fz-lux .coach-strip-face{background:var(--lux-yellow-soft);border:0;box-shadow:var(--lux-shadow-sm)}
-body.fz-lux .coach-strip-say small{color:var(--lux-muted);letter-spacing:.16em}
-body.fz-lux .coach-strip-say b{font-size:1rem;font-weight:600;line-height:1.4;-webkit-line-clamp:3;line-clamp:3}
-body.fz-lux .coach-strip-more{font-size:.82rem;font-weight:700;color:var(--lux-ink);opacity:.8;border:0;box-shadow:none;background:transparent}
+body.fz-lux .coach-strip-face{background:rgba(212,168,71,.15);border:0;box-shadow:none}
+body.fz-lux .coach-strip-say small{color:var(--lux-yellow);letter-spacing:.16em}
+body.fz-lux .coach-strip-say b{font-size:1rem;font-weight:600;line-height:1.4;color:var(--lux-card-text);-webkit-line-clamp:3;line-clamp:3}
+body.fz-lux .coach-strip-more{font-size:.82rem;font-weight:700;color:var(--lux-yellow);opacity:.8;border:0;box-shadow:none;background:transparent}
 
-/* ---------- kartu skill & pintu belajar PREMIUM ---------- */
-body.fz-lux .skill-hub{gap:12px}
+/* ---------- kartu skill & pintu belajar HYBRID DARK ---------- */
+body.fz-lux .skill-hub{gap:12px;grid-template-columns:1.4fr 1fr}
 body.fz-lux .skill-card{
-  --skill-bg:var(--lux-paper);--skill-line:var(--lux-line);
-  background:linear-gradient(155deg,#FFFFFF 0%,#FFFBF0 60%,var(--lux-yellow-soft) 100%);
-  border:2px solid rgba(255,199,0,.15);border-radius:var(--lux-r-lg);
+  --skill-accent:var(--lux-yellow);
+  background:var(--lux-card);color:var(--lux-card-text);
+  border:1.5px solid var(--lux-card-line);border-radius:var(--lux-r-lg);
+  border-left:3px solid var(--skill-accent);
   padding:18px;
   box-shadow:
-    var(--lux-shadow-sm),
-    inset 0 1px 0 rgba(255,255,255,.95);
+    0 8px 24px -4px rgba(26,22,20,.20),
+    inset 0 1px 0 rgba(255,255,255,.03);
   min-height:128px;
   transition:transform .22s cubic-bezier(.34,1.56,.64,1),box-shadow .22s ease,border-color .22s ease;
 }
 body.fz-lux .skill-card:hover{
   transform:translateY(-4px);
-  border-color:rgba(255,199,0,.40);
-  box-shadow:var(--lux-shadow-md),inset 0 1px 0 rgba(255,255,255,1);
+  box-shadow:0 16px 40px -6px rgba(26,22,20,.28),inset 0 1px 0 rgba(255,255,255,.05);
 }
-body.fz-lux .skill-card:active{transform:translateY(0) scale(.99);box-shadow:var(--lux-shadow-sm)}
-body.fz-lux .skill-card .fz-i{--fz-i-fill:var(--lux-yellow);--fz-i-line:var(--lux-ink)}
-body.fz-lux .skill-card b{font-size:1.02rem;font-weight:700}
-body.fz-lux .skill-card small{color:var(--lux-muted)}
-body.fz-lux .skill-badge{color:var(--lux-muted)}
-body.fz-lux .skill-ring{background:conic-gradient(var(--lux-yellow) var(--ring,0%),rgba(18,16,16,.10) 0)}
-body.fz-lux .skill-ring::before{background:var(--lux-paper)}
+body.fz-lux .skill-card:active{transform:translateY(1px) scale(.98)}
+body.fz-lux .skill-card .fz-i{--fz-i-fill:var(--skill-accent);--fz-i-line:var(--skill-accent)}
+body.fz-lux .skill-card b{font-size:1.02rem;font-weight:700;color:var(--lux-card-text)}
+body.fz-lux .skill-card small{color:var(--lux-card-muted)}
+body.fz-lux .skill-badge{color:var(--lux-card-muted)}
+/* Skill identity: accent bar + icon color + ring + shadow tint */
+body.fz-lux .skill-card.skill-speaking{--skill-accent:var(--lux-skill-speaking);box-shadow:0 8px 24px -4px rgba(124,179,66,.15),inset 0 1px 0 rgba(255,255,255,.03)}
+body.fz-lux .skill-card.skill-grammar{--skill-accent:var(--lux-skill-grammar);box-shadow:0 8px 24px -4px rgba(92,158,173,.15),inset 0 1px 0 rgba(255,255,255,.03)}
+body.fz-lux .skill-card.skill-vocab{--skill-accent:var(--lux-skill-vocab);box-shadow:0 8px 24px -4px rgba(212,168,71,.15),inset 0 1px 0 rgba(255,255,255,.03)}
+body.fz-lux .skill-card.skill-reading{--skill-accent:var(--lux-skill-reading);box-shadow:0 8px 24px -4px rgba(155,126,184,.15),inset 0 1px 0 rgba(255,255,255,.03)}
+body.fz-lux .skill-ring{background:conic-gradient(var(--skill-accent,var(--lux-yellow)) var(--ring,0%),rgba(255,255,255,.08) 0)}
+body.fz-lux .skill-ring::before{background:var(--lux-card)}
 body.fz-lux .learning-launcher{gap:12px}
 body.fz-lux .launch-card{
-  background:linear-gradient(155deg,#FFFFFF 0%,#FFFBF0 70%,#FFF6DD 100%);
-  border:1.5px solid rgba(255,199,0,.18);border-radius:var(--lux-r-lg);
+  background:var(--lux-card);color:var(--lux-card-text);
+  border:1.5px solid var(--lux-card-line);border-radius:var(--lux-r-lg);
   padding:16px;
-  box-shadow:var(--lux-shadow-sm),inset 0 1px 0 rgba(255,255,255,.95);
+  box-shadow:var(--lux-shadow-sm),inset 0 1px 0 rgba(255,255,255,.03);
   text-align:left;position:relative;overflow:hidden;
 }
 body.fz-lux .launch-card::before{
   content:"";position:absolute;top:0;left:12px;right:12px;height:1px;
-  background:linear-gradient(90deg,rgba(255,199,0,0),rgba(255,199,0,.35),rgba(255,199,0,0));
+  background:linear-gradient(90deg,rgba(212,168,71,0),rgba(212,168,71,.30),rgba(212,168,71,0));
   pointer-events:none;
 }
 body.fz-lux .launch-card:hover{
-  transform:translateY(-3px);border-color:rgba(255,199,0,.35);
-  box-shadow:var(--lux-shadow-md),inset 0 1px 0 rgba(255,255,255,1);
+  transform:translateY(-3px);border-color:rgba(212,168,71,.25);
+  box-shadow:var(--lux-shadow-md),inset 0 1px 0 rgba(255,255,255,.05);
 }
-body.fz-lux .launch-card b{font-size:1rem;font-weight:700}
-body.fz-lux .launch-card small{color:var(--lux-muted)}
-body.fz-lux .launch-icon{width:40px;height:40px;border-radius:12px;background:var(--lux-yellow-soft);color:var(--lux-ink)}
-body.fz-lux .launch-icon .fz-i{--fz-i-fill:var(--lux-yellow);--fz-i-line:var(--lux-ink)}
-body.fz-lux .launch-card>i[data-lucide],body.fz-lux .launch-card>svg.lucide{color:var(--lux-muted)}
+body.fz-lux .launch-card b{font-size:1rem;font-weight:700;color:var(--lux-card-text)}
+body.fz-lux .launch-card small{color:var(--lux-card-muted)}
+body.fz-lux .launch-icon{width:40px;height:40px;border-radius:12px;background:rgba(212,168,71,.12);color:var(--lux-yellow)}
+body.fz-lux .launch-icon .fz-i{--fz-i-fill:var(--lux-yellow);--fz-i-line:var(--lux-yellow)}
+body.fz-lux .launch-card>i[data-lucide],body.fz-lux .launch-card>svg.lucide{color:var(--lux-card-muted)}
 
 /* ---------- kontrol level & catatan ---------- */
 body.fz-lux .active-level-control,body.fz-lux .home-level-context{
@@ -320,16 +344,34 @@ body.fz-lux .card:has(> .row > .creator-link),
 body.fz-lux .card:has(.creator-link),
 body.fz-lux [data-fz-student-hide]{display:none !important}
 
-/* ---------- gerak masuk yang bertahap ---------- */
+/* ---------- gerak masuk bertahap + micro-interaction ---------- */
 @media (prefers-reduced-motion:no-preference){
-  body.fz-lux .fade>*{animation:luxRise .5s var(--ease) both}
-  body.fz-lux .fade>*:nth-child(2){animation-delay:.05s}
-  body.fz-lux .fade>*:nth-child(3){animation-delay:.1s}
-  body.fz-lux .fade>*:nth-child(4){animation-delay:.15s}
-  body.fz-lux .fade>*:nth-child(n+5){animation-delay:.2s}
+  body.fz-lux .fade>*{animation:luxRise .55s cubic-bezier(.22,1,.36,1) both}
+  body.fz-lux .fade>*:nth-child(2){animation-delay:.06s}
+  body.fz-lux .fade>*:nth-child(3){animation-delay:.12s}
+  body.fz-lux .fade>*:nth-child(4){animation-delay:.18s}
+  body.fz-lux .fade>*:nth-child(5){animation-delay:.24s}
+  body.fz-lux .fade>*:nth-child(6){animation-delay:.30s}
+  body.fz-lux .fade>*:nth-child(7){animation-delay:.36s}
+  body.fz-lux .fade>*:nth-child(n+8){animation-delay:.42s}
+
+  /* Micro-interaction: tap feedback */
+  body.fz-lux .card:active,
+  body.fz-lux .skill-card:active,
+  body.fz-lux .launch-card:active{
+    transform:translateY(2px) scale(.97) !important;
+    transition:transform .1s ease !important;
+  }
+
+  /* Button press spring */
+  body.fz-lux button.primary:active,
+  body.fz-lux .primary:active{
+    transform:scale(.94) !important;
+    transition:transform .08s ease !important;
+  }
 }
-@keyframes luxRise{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
-@keyframes luxPulse{0%,100%{box-shadow:0 0 0 0 rgba(255,199,0,.0)}50%{box-shadow:0 0 0 8px rgba(255,199,0,.18)}}
+@keyframes luxRise{from{opacity:0;transform:translateY(16px) scale(.98)}to{opacity:1;transform:none}}
+@keyframes luxPulse{0%,100%{box-shadow:0 0 0 0 rgba(212,168,71,0)}50%{box-shadow:0 0 0 8px rgba(212,168,71,.20)}}
 
 /* ---------- Thai ---------- */
 body.fz-lux:lang(th),body.fz-lux :lang(th){font-family:'FZ Plus Jakarta Sans','Noto Sans Thai','Sarabun','Tahoma',sans-serif}

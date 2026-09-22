@@ -5,42 +5,45 @@
    ========================================================================== */
 
 :root {
-  /* Palet Warna Bold Gold Marshmallow — AUDIT 2026-09-22 */
+  /* Palet Warna Hybrid Dark Luxury — AUDIT 2026-09-22 v3 */
   --fz-marsh-bg: #FFF5D6;
-  --fz-marsh-card: #FFFFFF;
-  --fz-marsh-card-soft: #FFFBF0;
+  --fz-marsh-card: #1A1614;
+  --fz-marsh-card-soft: #211D1A;
+  --fz-marsh-card-text: #F0EBE3;
+  --fz-marsh-card-muted: #8A7E72;
   
-  /* Bold Gold Primaries */
-  --fz-marsh-yellow: #FFC700;
-  --fz-marsh-yellow-deep: #E6A800;
-  --fz-marsh-yellow-light: #FFEFB3;
-  --fz-marsh-yellow-ink: #2A1800;
+  /* Brass Gold Primaries */
+  --fz-marsh-yellow: #D4A847;
+  --fz-marsh-yellow-deep: #B8922E;
+  --fz-marsh-yellow-light: #F5E6C4;
+  --fz-marsh-yellow-bright: #FFC700;
+  --fz-marsh-yellow-ink: #1A1614;
 
-  --fz-marsh-mint: #D4F5B0;
-  --fz-marsh-mint-deep: #3D8A0F;
-  --fz-marsh-mint-ink: #0E2204;
+  --fz-marsh-mint: #7CB342;
+  --fz-marsh-mint-deep: #5A8A1A;
+  --fz-marsh-mint-ink: #F0EBE3;
 
-  --fz-marsh-sky: #9AEEFF;
-  --fz-marsh-sky-deep: #0FADD4;
-  --fz-marsh-sky-ink: #052535;
+  --fz-marsh-sky: #5C9EAD;
+  --fz-marsh-sky-deep: #3D7A8A;
+  --fz-marsh-sky-ink: #F0EBE3;
 
-  --fz-marsh-coral: #FFBFB3;
-  --fz-marsh-coral-deep: #B8432D;
-  --fz-marsh-coral-ink: #5A1408;
+  --fz-marsh-coral: #B8432D;
+  --fz-marsh-coral-deep: #8C2A18;
+  --fz-marsh-coral-ink: #F0EBE3;
 
-  --fz-marsh-lavender: #DDD2F0;
-  --fz-marsh-lavender-ink: #261548;
+  --fz-marsh-lavender: #9B7EB8;
+  --fz-marsh-lavender-ink: #F0EBE3;
 
   --fz-marsh-ink: #121010;
-  --fz-marsh-muted: #3D3530;
-  --fz-marsh-border: rgba(18, 16, 16, 0.12);
+  --fz-marsh-muted: #6E635C;
+  --fz-marsh-border: rgba(212, 168, 71, 0.12);
 
-  /* Bayangan Claymorphism Diperkuat */
-  --fz-clay-shadow: 0 12px 28px -4px rgba(18, 16, 16, 0.12), inset 0 2px 4px rgba(255, 255, 255, 0.95);
-  --fz-clay-shadow-sm: 0 6px 16px -2px rgba(18, 16, 16, 0.10), inset 0 1.5px 3px rgba(255, 255, 255, 0.95);
-  --fz-clay-shadow-lg: 0 20px 48px -8px rgba(18, 16, 16, 0.18), inset 0 3px 6px rgba(255, 255, 255, 0.95);
-  --fz-clay-btn-shadow: 0 6px 14px rgba(18, 16, 16, 0.12), inset 0 2px 3px rgba(255, 255, 255, 0.75);
-  --fz-clay-btn-yellow-shadow: 0 8px 20px rgba(230, 168, 0, 0.45), inset 0 2px 3px rgba(255, 255, 255, 0.85);
+  /* Bayangan untuk Dark Cards */
+  --fz-clay-shadow: 0 12px 32px -4px rgba(26, 22, 20, 0.20), inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  --fz-clay-shadow-sm: 0 6px 18px -2px rgba(26, 22, 20, 0.16), inset 0 1px 0 rgba(255, 255, 255, 0.03);
+  --fz-clay-shadow-lg: 0 24px 56px -8px rgba(26, 22, 20, 0.28), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  --fz-clay-btn-shadow: 0 6px 16px rgba(26, 22, 20, 0.16), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  --fz-clay-btn-yellow-shadow: 0 8px 22px rgba(212, 168, 71, 0.40), inset 0 1px 0 rgba(255, 255, 255, 0.10);
 
   /* Sudut Lengkung Empuk */
   --fz-clay-radius-xl: 32px;
@@ -303,27 +306,24 @@ header.topbar {
 }
 
 /* ==========================================================================
-   4. HOME & DASHBOARD CARDS — PREMIUM LUXURY SURFACES
-   AUDIT 2026-09-22: dari kotak putih polos (Excel-like) ke kartu berlapis
-   dengan gradient halus, aksen emas, inner glow, dan kedalaman visual.
+   4. HOME & DASHBOARD CARDS — HYBRID DARK LUXURY
+   AUDIT 2026-09-22 v3: kartu gelap #1A1614 di atas background terang.
+   Brass gold accent, grain texture implied, warm white text.
    ========================================================================== */
 .card, 
 .today-card,
 .paw-hero-cockpit {
-  background: linear-gradient(165deg, #FFFFFF 0%, #FFFBF0 60%, #FFF6DD 100%) !important;
+  background: var(--fz-marsh-card) !important;
+  color: var(--fz-marsh-card-text, #F0EBE3) !important;
   border-radius: var(--fz-clay-radius-lg) !important;
-  border: 1.5px solid rgba(255, 199, 0, 0.18) !important;
-  box-shadow:
-    0 12px 32px -4px rgba(18, 16, 16, 0.12),
-    0 2px 6px rgba(18, 16, 16, 0.04),
-    inset 0 1px 0 rgba(255, 255, 255, 0.95),
-    inset 0 -1px 0 rgba(255, 199, 0, 0.06) !important;
+  border: 1.5px solid rgba(212, 168, 71, 0.12) !important;
+  box-shadow: var(--fz-clay-shadow) !important;
   position: relative;
   overflow: hidden;
   transition: transform 0.22s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.22s ease !important;
 }
 
-/* Garis emas halus di atas setiap kartu — sentuhan eksklusif */
+/* Garis brass halus di atas setiap kartu */
 .card::before,
 .paw-hero-cockpit::before {
   content: "" !important;
@@ -331,51 +331,43 @@ header.topbar {
   top: 0 !important;
   left: 16px !important;
   right: 16px !important;
-  height: 1.5px !important;
+  height: 1px !important;
   background: linear-gradient(90deg,
-    rgba(255, 199, 0, 0) 0%,
-    rgba(255, 199, 0, 0.45) 30%,
-    rgba(230, 168, 0, 0.55) 50%,
-    rgba(255, 199, 0, 0.45) 70%,
-    rgba(255, 199, 0, 0) 100%) !important;
+    rgba(212, 168, 71, 0) 0%,
+    rgba(212, 168, 71, 0.30) 30%,
+    rgba(184, 146, 46, 0.40) 50%,
+    rgba(212, 168, 71, 0.30) 70%,
+    rgba(212, 168, 71, 0) 100%) !important;
   z-index: 1 !important;
   pointer-events: none !important;
 }
 
-/* Hover: angkat + bayangan dalam + border emas muncul */
+/* Hover: angkat + border brass muncul */
 .card:hover,
 .paw-hero-cockpit:hover {
   transform: translateY(-3px) !important;
-  border-color: rgba(255, 199, 0, 0.35) !important;
-  box-shadow:
-    0 20px 44px -6px rgba(18, 16, 16, 0.16),
-    0 4px 12px rgba(18, 16, 16, 0.06),
-    inset 0 1px 0 rgba(255, 255, 255, 1),
-    inset 0 -1px 0 rgba(255, 199, 0, 0.10) !important;
+  border-color: rgba(212, 168, 71, 0.25) !important;
+  box-shadow: var(--fz-clay-shadow-lg) !important;
 }
 
 .today-card {
-  background: linear-gradient(145deg, #FFFFFF 0%, #FFF4CC 40%, #FFE680 100%) !important;
-  border: 2px solid rgba(230, 168, 0, 0.40) !important;
+  background: var(--fz-marsh-card) !important;
+  border: 2px solid rgba(212, 168, 71, 0.20) !important;
   border-radius: var(--fz-clay-radius-xl) !important;
   padding: 24px 22px !important;
-  box-shadow:
-    0 16px 40px -6px rgba(18, 16, 16, 0.15),
-    0 0 0 1px rgba(255, 199, 0, 0.15),
-    inset 0 1px 0 rgba(255, 255, 255, 0.95),
-    inset 0 -2px 0 rgba(230, 168, 0, 0.08) !important;
+  box-shadow: var(--fz-clay-shadow-lg) !important;
 }
 
-/* Cahaya sudut emas — efek premium foil */
+/* Corner brass glow */
 .today-card::after {
   content: "" !important;
   position: absolute !important;
   top: -60px !important;
   right: -60px !important;
-  width: 200px !important;
-  height: 200px !important;
+  width: 180px !important;
+  height: 180px !important;
   border-radius: 50% !important;
-  background: radial-gradient(circle, rgba(255, 199, 0, 0.25) 0%, rgba(255, 199, 0, 0) 70%) !important;
+  background: radial-gradient(circle, rgba(212, 168, 71, 0.15) 0%, rgba(212, 168, 71, 0) 70%) !important;
   pointer-events: none !important;
   z-index: 0 !important;
 }
@@ -393,7 +385,7 @@ header.topbar {
   height: 64px;
   flex-shrink: 0;
   object-fit: contain;
-  filter: drop-shadow(0 6px 12px rgba(70, 33, 4, 0.08));
+  filter: drop-shadow(0 6px 12px rgba(0, 0, 0, 0.15));
 }
 
 /* Speech Bubble Tip with Flat Vector */
@@ -449,62 +441,63 @@ button.primary:active {
 }
 
 /* ==========================================================================
-   5. SKILL HUB & MODULE TILES (Marshmallow Pastels)
+   5. SKILL HUB & MODULE TILES — HYBRID DARK with COLOR IDENTITY
    ========================================================================== */
 .skill-card {
+  --skill-accent: var(--fz-marsh-yellow);
+  background: var(--fz-marsh-card) !important;
+  color: var(--fz-marsh-card-text, #F0EBE3) !important;
   border-radius: var(--fz-clay-radius-lg) !important;
-  border: 2px solid rgba(255, 199, 0, 0.15) !important;
-  box-shadow:
-    0 12px 32px -4px rgba(18, 16, 16, 0.12),
-    0 2px 4px rgba(18, 16, 16, 0.04),
-    inset 0 1px 0 rgba(255, 255, 255, 0.95) !important;
+  border: 1.5px solid rgba(212, 168, 71, 0.10) !important;
+  border-left: 3px solid var(--skill-accent) !important;
+  box-shadow: var(--fz-clay-shadow) !important;
   padding: 20px !important;
   transition: transform 0.22s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.22s ease !important;
 }
 
 .skill-card:hover {
-  transform: translateY(-4px) scale(1.015) !important;
-  border-color: rgba(255, 199, 0, 0.35) !important;
-  box-shadow:
-    0 20px 48px -6px rgba(18, 16, 16, 0.18),
-    0 4px 8px rgba(18, 16, 16, 0.06),
-    inset 0 1px 0 rgba(255, 255, 255, 1) !important;
+  transform: translateY(-4px) scale(1.01) !important;
+  box-shadow: var(--fz-clay-shadow-lg) !important;
 }
 
 .skill-card:active {
-  transform: translateY(1px) scale(0.99) !important;
+  transform: translateY(1px) scale(0.98) !important;
 }
 
-/* Pastel Tint per Skill — warna lebih kaya */
+/* Dark cards — setiap skill punya identity warna */
 .skill-speaking {
-  background: linear-gradient(155deg, #FFFFFF 0%, #E8FCE0 50%, #D0F4B0 100%) !important;
-  border-color: rgba(61, 138, 15, 0.20) !important;
+  --skill-accent: var(--fz-marsh-mint);
+  background: var(--fz-marsh-card) !important;
+  box-shadow: 0 8px 24px -4px rgba(124, 179, 66, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.03) !important;
   --skill-line: var(--fz-marsh-mint);
   --skill-ink: var(--fz-marsh-mint-ink);
 }
 
 .skill-grammar {
-  background: linear-gradient(155deg, #FFFFFF 0%, #D8F6FD 50%, #B0EDFF 100%) !important;
-  border-color: rgba(15, 173, 212, 0.20) !important;
+  --skill-accent: var(--fz-marsh-sky);
+  background: var(--fz-marsh-card) !important;
+  box-shadow: 0 8px 24px -4px rgba(92, 158, 173, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.03) !important;
   --skill-line: var(--fz-marsh-sky);
   --skill-ink: var(--fz-marsh-sky-ink);
 }
 
 .skill-vocab {
-  background: linear-gradient(155deg, #FFFFFF 0%, #FFF4CC 50%, #FFE680 100%) !important;
-  border-color: rgba(230, 168, 0, 0.25) !important;
+  --skill-accent: var(--fz-marsh-yellow);
+  background: var(--fz-marsh-card) !important;
+  box-shadow: 0 8px 24px -4px rgba(212, 168, 71, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.03) !important;
   --skill-line: var(--fz-marsh-yellow);
   --skill-ink: var(--fz-marsh-yellow-ink);
 }
 
 .skill-reading {
-  background: linear-gradient(155deg, #FFFFFF 0%, #EDE4F8 50%, #DDD2F0 100%) !important;
-  border-color: rgba(110, 69, 184, 0.18) !important;
+  --skill-accent: var(--fz-marsh-lavender);
+  background: var(--fz-marsh-card) !important;
+  box-shadow: 0 8px 24px -4px rgba(155, 126, 184, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.03) !important;
   --skill-line: var(--fz-marsh-lavender);
   --skill-ink: var(--fz-marsh-lavender-ink);
 }
 
-/* Exclusive Tactile Clay Pod for Skill Module Icons */
+/* Dark Glass Icon Pods */
 .skill-card-top > .fz-i,
 .skill-card-top > i,
 .launch-icon .fz-i {
@@ -514,43 +507,43 @@ button.primary:active {
   display: flex !important;
   align-items: center !important;
   justify-content: center !important;
-  box-shadow: 0 8px 18px rgba(70, 33, 4, 0.08), inset 0 2px 3px rgba(255, 255, 255, 0.95) !important;
-  border: 1.5px solid rgba(255, 255, 255, 0.95) !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.20), inset 0 1px 0 rgba(255, 255, 255, 0.05) !important;
+  border: 1.5px solid rgba(212, 168, 71, 0.10) !important;
   background: #FFFFFF !important;
   transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s ease !important;
 }
 
 .skill-speaking .skill-card-top > .fz-i {
-  background: linear-gradient(135deg, #FFFFFF 0%, #E5F9CE 100%) !important;
-  border-color: rgba(169, 236, 114, 0.7) !important;
-  --fz-i-fill: var(--fz-marsh-mint-ink) !important;
-  --fz-i-line: var(--fz-marsh-mint-deep) !important;
+  background: rgba(124, 179, 66, 0.15) !important;
+  border-color: rgba(124, 179, 66, 0.25) !important;
+  --fz-i-fill: #7CB342 !important;
+  --fz-i-line: #7CB342 !important;
 }
 
 .skill-grammar .skill-card-top > .fz-i {
-  background: linear-gradient(135deg, #FFFFFF 0%, #BAF4FF 100%) !important;
-  border-color: rgba(30, 198, 242, 0.5) !important;
-  --fz-i-fill: var(--fz-marsh-sky-ink) !important;
-  --fz-i-line: var(--fz-marsh-sky-deep) !important;
+  background: rgba(92, 158, 173, 0.15) !important;
+  border-color: rgba(92, 158, 173, 0.25) !important;
+  --fz-i-fill: #5C9EAD !important;
+  --fz-i-line: #5C9EAD !important;
 }
 
 .skill-vocab .skill-card-top > .fz-i {
-  background: linear-gradient(135deg, #FFFFFF 0%, #FFD680 100%) !important;
-  border-color: rgba(230, 168, 0, 0.45) !important;
-  --fz-i-fill: var(--fz-marsh-yellow-ink) !important;
-  --fz-i-line: var(--fz-marsh-yellow-deep) !important;
+  background: rgba(212, 168, 71, 0.15) !important;
+  border-color: rgba(212, 168, 71, 0.25) !important;
+  --fz-i-fill: #D4A847 !important;
+  --fz-i-line: #D4A847 !important;
 }
 
 .skill-reading .skill-card-top > .fz-i {
-  background: linear-gradient(135deg, #FFFFFF 0%, #EBE4F7 100%) !important;
-  border-color: rgba(184, 153, 235, 0.6) !important;
-  --fz-i-fill: var(--fz-marsh-lavender-ink) !important;
-  --fz-i-line: #6E45B8 !important;
+  background: rgba(155, 126, 184, 0.15) !important;
+  border-color: rgba(155, 126, 184, 0.25) !important;
+  --fz-i-fill: #9B7EB8 !important;
+  --fz-i-line: #9B7EB8 !important;
 }
 
 .skill-card:hover .skill-card-top > .fz-i {
   transform: translateY(-3px) scale(1.08) rotate(-3deg) !important;
-  box-shadow: 0 12px 24px rgba(70, 33, 4, 0.12), inset 0 2px 4px #FFFFFF !important;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.05) !important;
 }
 
 /* ==========================================================================
@@ -655,7 +648,7 @@ button.primary:active {
 }
 
 /* ==========================================================================
-   7. BOTTOM NAVIGATION BAR (Floating Frosted Milk Dock & Exclusive Icon Pods)
+   7. BOTTOM NAVIGATION — DARK GLASS DOCK
    ========================================================================== */
 nav.bottomnav {
   position: fixed !important;
@@ -664,17 +657,29 @@ nav.bottomnav {
   transform: translateX(-50%) !important;
   width: min(640px, calc(100% - 24px)) !important;
   border-radius: var(--fz-clay-radius-pill) !important;
-  background: rgba(255, 255, 255, 0.97) !important;
+  background: rgba(26, 22, 20, 0.95) !important;
   backdrop-filter: blur(28px) !important;
   -webkit-backdrop-filter: blur(28px) !important;
-  border: 2px solid rgba(255, 199, 0, 0.30) !important;
-  box-shadow: 0 16px 44px rgba(18, 16, 16, 0.18), 0 2px 6px rgba(18, 16, 16, 0.06) !important;
+  border: 1.5px solid rgba(212, 168, 71, 0.12) !important;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.30), 0 2px 6px rgba(0, 0, 0, 0.10) !important;
   padding: 6px 8px !important;
   z-index: 1000 !important;
   margin: 0 !important;
   display: flex !important;
   justify-content: space-around !important;
   align-items: center !important;
+}
+
+/* Brass gradient line at top edge */
+nav.bottomnav::before {
+  content: "" !important;
+  position: absolute !important;
+  top: 0 !important;
+  left: 24px !important;
+  right: 24px !important;
+  height: 1px !important;
+  background: linear-gradient(90deg, rgba(212,168,71,0), rgba(212,168,71,.30), rgba(212,168,71,0)) !important;
+  pointer-events: none !important;
 }
 
 nav.bottomnav .nav {
@@ -690,7 +695,7 @@ nav.bottomnav .nav {
   background: transparent !important;
   border: 1px solid transparent !important;
   box-shadow: none !important;
-  color: var(--fz-marsh-muted) !important;
+  color: #8A7E72 !important;
   font-weight: 700 !important;
   font-size: 0.75rem !important;
   letter-spacing: 0.01em !important;
@@ -698,7 +703,6 @@ nav.bottomnav .nav {
   cursor: pointer !important;
 }
 
-/* Minimalist, Fine-line Luxury Icon (No clunky boxed backgrounds for inactive tabs) */
 nav.bottomnav .nav .fz-i {
   width: 34px !important;
   height: 34px !important;
@@ -711,57 +715,75 @@ nav.bottomnav .nav .fz-i {
   box-shadow: none !important;
   transition: all 0.22s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
   --fz-i-fill: transparent !important;
-  --fz-i-line: #3D3530 !important;
+  --fz-i-line: #8A7E72 !important;
 }
 
 nav.bottomnav .nav .fz-i svg {
   width: 22px !important;
   height: 22px !important;
-  stroke: #3D3530 !important;
+  stroke: #8A7E72 !important;
   transition: transform 0.2s ease, stroke 0.2s ease !important;
 }
 
 nav.bottomnav .nav:hover .fz-i {
   transform: translateY(-2px) scale(1.08) !important;
-  background: rgba(255, 248, 231, 0.6) !important;
+  background: rgba(212, 168, 71, 0.08) !important;
 }
 
 nav.bottomnav .nav:hover .fz-i svg {
-  stroke: var(--fz-marsh-yellow-ink) !important;
+  stroke: #D4A847 !important;
 }
 
-/* Active State: Exclusive Gold Marshmallow Highlight */
+/* Active: brass gold icon + dot indicator */
 nav.bottomnav .nav.active {
-  color: var(--fz-marsh-yellow-ink) !important;
+  color: #D4A847 !important;
   font-weight: 800 !important;
   transform: translateY(-2px) !important;
   background: transparent !important;
 }
 
 nav.bottomnav .nav.active .fz-i {
-  background: linear-gradient(135deg, #FFE094 0%, var(--fz-marsh-yellow) 100%) !important;
-  border: 1.5px solid rgba(255, 255, 255, 0.95) !important;
-  box-shadow: 0 8px 18px rgba(230, 168, 0, 0.35), inset 0 2px 3px rgba(255, 255, 255, 0.95) !important;
+  background: rgba(212, 168, 71, 0.15) !important;
+  border: 1.5px solid rgba(212, 168, 71, 0.25) !important;
+  box-shadow: 0 4px 16px rgba(212, 168, 71, 0.25) !important;
   border-radius: 13px !important;
-  --fz-i-fill: var(--fz-marsh-yellow-ink) !important;
-  --fz-i-line: var(--fz-marsh-yellow-ink) !important;
+  --fz-i-fill: #D4A847 !important;
+  --fz-i-line: #D4A847 !important;
   transform: scale(1.08) !important;
 }
 
 nav.bottomnav .nav.active .fz-i svg {
-  stroke: var(--fz-marsh-yellow-ink) !important;
+  stroke: #D4A847 !important;
   transform: scale(1.04) !important;
-  filter: drop-shadow(0 1px 2px rgba(70, 33, 4, 0.12));
+  filter: drop-shadow(0 1px 3px rgba(212, 168, 71, 0.30));
 }
 
-/* Custom Emerald Pod for KelasKu tab */
+/* Dot indicator below active icon */
+nav.bottomnav .nav.active::after {
+  content: "" !important;
+  position: absolute !important;
+  bottom: 2px !important;
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+  width: 4px !important;
+  height: 4px !important;
+  border-radius: 50% !important;
+  background: #D4A847 !important;
+  box-shadow: 0 0 6px rgba(212, 168, 71, 0.40) !important;
+}
+
+/* KelasKu tab: mint accent on dark */
 nav.bottomnav .nav[data-view="classroom"].active .fz-i {
-  background: linear-gradient(135deg, #F0FCE6 0%, var(--fz-marsh-mint) 100%) !important;
-  border-color: #A9EC72 !important;
-  box-shadow: 0 8px 20px rgba(82, 153, 23, 0.32), inset 0 2px 4px rgba(255, 255, 255, 0.95) !important;
-  --fz-i-fill: #162B08 !important;
-  --fz-i-line: #1F7A63 !important;
+  background: rgba(124, 179, 66, 0.15) !important;
+  border-color: rgba(124, 179, 66, 0.25) !important;
+  box-shadow: 0 4px 16px rgba(124, 179, 66, 0.25) !important;
+  --fz-i-fill: #7CB342 !important;
+  --fz-i-line: #7CB342 !important;
 }
 nav.bottomnav .nav[data-view="classroom"].active .kelasku-wordmark {
-  color: #1F7A63 !important;
+  color: #7CB342 !important;
+}
+nav.bottomnav .nav[data-view="classroom"].active::after {
+  background: #7CB342 !important;
+  box-shadow: 0 0 6px rgba(124, 179, 66, 0.40) !important;
 }
