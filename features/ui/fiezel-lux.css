@@ -1,29 +1,36 @@
 /* ==========================================================================
    FIEZEL · features/ui/fiezel-lux.css — LAPISAN TAMPILAN PREMIUM (murid)
-   AUDIT 2026-09-22: palet diubah dari "lembut pucat" menjadi HITAM + EMAS PEKAT.
-   Tinta hitam pekat, kuning emas saturasi penuh, bayangan dalam, kontras tinggi.
+   Palet resmi tidak berubah: kuning #FFC700 / #E6A800, tinta #241A11, krem #FFF9EE.
+   Yang berubah: cara palet dipakai — tinta pekat sebagai "kartu hitam" eksklusif,
+   kuning hanya untuk aksi & sorotan, garis tipis, bayangan lembut, tipografi serif.
    Aktif hanya bila <body class="fz-lux">. Ruang Guru (body.fz-teacher-mode) tidak disentuh.
    ========================================================================== */
 body.fz-lux:not(.fz-teacher-mode){
-  /* AUDIT 2026-09-22: palet Bold Gold — hitam pekat + emas penuh.
-     Sebelumnya "lembut": krem pucat #FBF7F3, kuning pudar #F7EACB, tinta cokelat #2E2724.
-     Sekarang: hitam pekat #121010, emas penuh #FFC700, background hangat #FFF5D6. */
-  --lux-ink:#121010;
-  --lux-cream:#FFF5D6;
+  /* m029 "Lembut": lapisan ini yang benar-benar mengecat permukaan yang terlihat,
+     jadi ia ikut pindah palet. Dua perubahan yang bukan sekadar warna:
+       - --lux-line diredam dari .10 ke .04. Arah Lembut tidak memakai garis tepi;
+         kedalaman dipikul bayangan. Meredamnya di satu token lebih aman daripada
+         mencabut belasan deklarasi border di berkas ini.
+       - keluarga kuning berhenti jadi bidang terang dan jadi emas pucat. #FFC700
+         cuma 1,5:1 di atas kertas; sebagai bidang di bawah tinta gelap ia masih
+         bekerja, tetapi ia yang membuat seluruh aplikasi terbaca "ceria terang",
+         bukan "lembut". */
+  --lux-ink:#2E2724;
+  --lux-cream:#FBF7F3;
   --lux-paper:#FFFFFF;
-  --lux-paper-warm:#FFF9E6;
-  --lux-yellow:#FFC700;
-  --lux-yellow-deep:#E6A800;
-  --lux-yellow-soft:#FFF0B3;
-  --lux-line:rgba(18,16,16,.10);
-  --lux-line-soft:rgba(18,16,16,.06);
-  --lux-muted:#4A4340;
-  --lux-accent:#B8432D;
-  --lux-accent-deep:#8C2A18;
-  --lux-shadow-sm:0 6px 18px rgba(18,16,16,.10);
-  --lux-shadow-md:0 14px 36px rgba(18,16,16,.13);
-  --lux-shadow-lg:0 22px 50px rgba(18,16,16,.18);
-  --lux-glow:0 10px 30px -4px rgba(184,67,45,.35);
+  --lux-paper-warm:#FDFAF7;
+  --lux-yellow:#F7EACB;
+  --lux-yellow-deep:#EFDFB8;
+  --lux-yellow-soft:#FBF3E2;
+  --lux-line:rgba(46,39,36,.04);
+  --lux-line-soft:rgba(46,39,36,.025);
+  --lux-muted:#6E635C;
+  --lux-accent:#9B3A4A;
+  --lux-accent-deep:#7E2D3B;
+  --lux-shadow-sm:0 6px 16px rgba(46,39,36,.06);
+  --lux-shadow-md:0 14px 32px rgba(46,39,36,.07);
+  --lux-shadow-lg:0 20px 44px rgba(46,39,36,.10);
+  --lux-glow:0 10px 28px -6px rgba(155,58,74,.28);
   --lux-r-xl:34px;--lux-r-lg:28px;--lux-r-md:22px;--lux-r-sm:18px;
   --panel:var(--lux-paper);
   --line:var(--lux-line);
@@ -45,8 +52,8 @@ body.fz-lux:not(.fz-teacher-mode){
 body.fz-lux:not(.fz-teacher-mode)::before{
   content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
   background:
-    radial-gradient(60% 40% at 50% -5%,rgba(255,199,0,.10),rgba(255,199,0,0) 70%),
-    radial-gradient(40% 30% at 100% 100%,rgba(255,199,0,.15),rgba(255,199,0,0) 70%);
+    radial-gradient(60% 40% at 50% -5%,rgba(155,58,74,.05),rgba(155,58,74,0) 70%),
+    radial-gradient(40% 30% at 100% 100%,rgba(247,234,203,.28),rgba(247,234,203,0) 70%);
 }
 body.fz-lux:not(.fz-teacher-mode) ::selection{background:var(--lux-yellow);color:var(--lux-ink)}
 
@@ -112,22 +119,22 @@ body.fz-lux .text-button{border:0;background:transparent;box-shadow:none;color:v
 body.fz-lux .text-button:hover{box-shadow:none;text-decoration:underline;text-underline-offset:3px}
 body.fz-lux button:focus-visible{outline:2px solid var(--lux-accent);outline-offset:3px}
 
-/* ---------- BERANDA: kartu peluncur BOLD GOLD ---------- */
+/* ---------- BERANDA: kartu peluncur ceria & hangat ---------- */
 body.fz-lux .launcher-shell{
   position:relative;overflow:hidden;
-  background:linear-gradient(155deg,#FFFFFF 0%,var(--lux-yellow-soft) 40%,var(--lux-yellow) 100%);
+  background:linear-gradient(155deg,#FFFFFF 0%,var(--lux-yellow-soft) 65%,var(--lux-yellow) 100%);
   color:var(--lux-ink);
-  border:1.5px solid rgba(255,199,0,.35);border-radius:var(--lux-r-xl);
-  padding:22px 20px 20px;box-shadow:var(--lux-shadow-md),0 0 0 1px rgba(255,199,0,.12);
+  border:1px solid var(--lux-line);border-radius:var(--lux-r-xl);
+  padding:22px 20px 20px;box-shadow:var(--lux-shadow-md);
 }
 body.fz-lux .launcher-shell::after{
   content:"";position:absolute;width:320px;height:320px;right:-120px;top:-160px;border-radius:50%;
-  background:radial-gradient(circle,rgba(255,199,0,.30) 0%,rgba(255,199,0,.08) 40%,rgba(255,199,0,0) 70%);
+  background:radial-gradient(circle,rgba(247,234,203,.65) 0%,rgba(247,234,203,.18) 40%,rgba(247,234,203,0) 70%);
   filter:none;pointer-events:none;
 }
 body.fz-lux .launcher-shell::before{
-  content:"";position:absolute;left:20px;right:20px;top:0;height:1.5px;
-  background:linear-gradient(90deg,rgba(255,199,0,0),rgba(255,199,0,.65),rgba(255,199,0,0));
+  content:"";position:absolute;left:20px;right:20px;top:0;height:1px;
+  background:linear-gradient(90deg,rgba(247,234,203,0),rgba(201,162,75,.35),rgba(247,234,203,0));
 }
 body.fz-lux .launcher-meta{color:var(--lux-muted);opacity:1;font-size:.62rem;letter-spacing:.2em;font-weight:700}
 body.fz-lux .launcher-meta .live-signal{background:var(--lux-accent);box-shadow:0 0 0 4px rgba(155,58,74,.14)}
