@@ -303,81 +303,24 @@ header.topbar {
 }
 
 /* ==========================================================================
-   4. HOME & DASHBOARD CARDS — PREMIUM LUXURY SURFACES
-   AUDIT 2026-09-22: dari kotak putih polos (Excel-like) ke kartu berlapis
-   dengan gradient halus, aksen emas, inner glow, dan kedalaman visual.
+   4. HOME & DASHBOARD CARDS (Soft Clay & Flat Vector Integration)
    ========================================================================== */
 .card, 
 .today-card,
 .paw-hero-cockpit {
-  background: linear-gradient(165deg, #FFFFFF 0%, #FFFBF0 60%, #FFF6DD 100%) !important;
+  background: #FFFFFF !important;
   border-radius: var(--fz-clay-radius-lg) !important;
-  border: 1.5px solid rgba(255, 199, 0, 0.18) !important;
-  box-shadow:
-    0 12px 32px -4px rgba(18, 16, 16, 0.12),
-    0 2px 6px rgba(18, 16, 16, 0.04),
-    inset 0 1px 0 rgba(255, 255, 255, 0.95),
-    inset 0 -1px 0 rgba(255, 199, 0, 0.06) !important;
+  border: 1.5px solid rgba(255, 255, 255, 0.8) !important;
+  box-shadow: var(--fz-clay-shadow) !important;
   position: relative;
-  overflow: hidden;
-  transition: transform 0.22s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.22s ease !important;
-}
-
-/* Garis emas halus di atas setiap kartu — sentuhan eksklusif */
-.card::before,
-.paw-hero-cockpit::before {
-  content: "" !important;
-  position: absolute !important;
-  top: 0 !important;
-  left: 16px !important;
-  right: 16px !important;
-  height: 1.5px !important;
-  background: linear-gradient(90deg,
-    rgba(255, 199, 0, 0) 0%,
-    rgba(255, 199, 0, 0.45) 30%,
-    rgba(230, 168, 0, 0.55) 50%,
-    rgba(255, 199, 0, 0.45) 70%,
-    rgba(255, 199, 0, 0) 100%) !important;
-  z-index: 1 !important;
-  pointer-events: none !important;
-}
-
-/* Hover: angkat + bayangan dalam + border emas muncul */
-.card:hover,
-.paw-hero-cockpit:hover {
-  transform: translateY(-3px) !important;
-  border-color: rgba(255, 199, 0, 0.35) !important;
-  box-shadow:
-    0 20px 44px -6px rgba(18, 16, 16, 0.16),
-    0 4px 12px rgba(18, 16, 16, 0.06),
-    inset 0 1px 0 rgba(255, 255, 255, 1),
-    inset 0 -1px 0 rgba(255, 199, 0, 0.10) !important;
+  transition: transform 0.18s ease, box-shadow 0.18s ease !important;
 }
 
 .today-card {
-  background: linear-gradient(145deg, #FFFFFF 0%, #FFF4CC 40%, #FFE680 100%) !important;
-  border: 2px solid rgba(230, 168, 0, 0.40) !important;
+  background: linear-gradient(145deg, #FFFFFF 0%, #FFF9E0 35%, #FFEFB3 100%) !important;
+  border: 2px solid rgba(255, 199, 0, 0.35) !important;
   border-radius: var(--fz-clay-radius-xl) !important;
   padding: 24px 22px !important;
-  box-shadow:
-    0 16px 40px -6px rgba(18, 16, 16, 0.15),
-    0 0 0 1px rgba(255, 199, 0, 0.15),
-    inset 0 1px 0 rgba(255, 255, 255, 0.95),
-    inset 0 -2px 0 rgba(230, 168, 0, 0.08) !important;
-}
-
-/* Cahaya sudut emas — efek premium foil */
-.today-card::after {
-  content: "" !important;
-  position: absolute !important;
-  top: -60px !important;
-  right: -60px !important;
-  width: 200px !important;
-  height: 200px !important;
-  border-radius: 50% !important;
-  background: radial-gradient(circle, rgba(255, 199, 0, 0.25) 0%, rgba(255, 199, 0, 0) 70%) !important;
-  pointer-events: none !important;
-  z-index: 0 !important;
 }
 
 /* Flat Vector Mascot Slot inside Cards */
@@ -453,53 +396,42 @@ button.primary:active {
    ========================================================================== */
 .skill-card {
   border-radius: var(--fz-clay-radius-lg) !important;
-  border: 2px solid rgba(255, 199, 0, 0.15) !important;
-  box-shadow:
-    0 12px 32px -4px rgba(18, 16, 16, 0.12),
-    0 2px 4px rgba(18, 16, 16, 0.04),
-    inset 0 1px 0 rgba(255, 255, 255, 0.95) !important;
-  padding: 20px !important;
-  transition: transform 0.22s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.22s ease !important;
+  border: 1.5px solid rgba(255, 255, 255, 0.85) !important;
+  box-shadow: var(--fz-clay-shadow) !important;
+  padding: 18px !important;
+  transition: transform 0.18s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.18s ease !important;
 }
 
 .skill-card:hover {
-  transform: translateY(-4px) scale(1.015) !important;
-  border-color: rgba(255, 199, 0, 0.35) !important;
-  box-shadow:
-    0 20px 48px -6px rgba(18, 16, 16, 0.18),
-    0 4px 8px rgba(18, 16, 16, 0.06),
-    inset 0 1px 0 rgba(255, 255, 255, 1) !important;
+  transform: translateY(-3px) scale(1.02) !important;
+  box-shadow: var(--fz-clay-shadow-lg) !important;
 }
 
 .skill-card:active {
   transform: translateY(1px) scale(0.99) !important;
 }
 
-/* Pastel Tint per Skill — warna lebih kaya */
+/* Pastel Tint per Skill */
 .skill-speaking {
-  background: linear-gradient(155deg, #FFFFFF 0%, #E8FCE0 50%, #D0F4B0 100%) !important;
-  border-color: rgba(61, 138, 15, 0.20) !important;
+  background: linear-gradient(145deg, #FFFFFF 0%, #F1FCE8 100%) !important;
   --skill-line: var(--fz-marsh-mint);
   --skill-ink: var(--fz-marsh-mint-ink);
 }
 
 .skill-grammar {
-  background: linear-gradient(155deg, #FFFFFF 0%, #D8F6FD 50%, #B0EDFF 100%) !important;
-  border-color: rgba(15, 173, 212, 0.20) !important;
+  background: linear-gradient(145deg, #FFFFFF 0%, #E6F9FD 100%) !important;
   --skill-line: var(--fz-marsh-sky);
   --skill-ink: var(--fz-marsh-sky-ink);
 }
 
 .skill-vocab {
-  background: linear-gradient(155deg, #FFFFFF 0%, #FFF4CC 50%, #FFE680 100%) !important;
-  border-color: rgba(230, 168, 0, 0.25) !important;
+  background: linear-gradient(145deg, #FFFFFF 0%, #FFF9E6 100%) !important;
   --skill-line: var(--fz-marsh-yellow);
   --skill-ink: var(--fz-marsh-yellow-ink);
 }
 
 .skill-reading {
-  background: linear-gradient(155deg, #FFFFFF 0%, #EDE4F8 50%, #DDD2F0 100%) !important;
-  border-color: rgba(110, 69, 184, 0.18) !important;
+  background: linear-gradient(145deg, #FFFFFF 0%, #F5F0FD 100%) !important;
   --skill-line: var(--fz-marsh-lavender);
   --skill-ink: var(--fz-marsh-lavender-ink);
 }
