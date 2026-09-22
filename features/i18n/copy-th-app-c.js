@@ -84,7 +84,7 @@
     'level.err-ujian-asing': 'ไม่รู้จักระดับการสอบนี้',
     'level.lihat-level': 'ดูระดับ',
     'level.pakai-hasil-tes': 'ใช้ผลการทดสอบ ({level})',
-    'level.probation-hitung': 'ระดับ {level} · พลาด {miss}/{batas} · ยืนยันแล้วถึง {verif}',
+    'level.probation-hitung': 'ระดับที่ใช้เรียน: {level} · ใช้โควตาผิดไป {miss} จาก {batas} · ผ่านแล้วถึง {verif}',
     'level.rantai-ujian': 'การสอบเป็นขั้นบันได: ระดับที่คุณยืนยันแล้วตอนนี้คือ <b>{verif}</b> ดังนั้นระดับที่สอบได้คือ <b>{berikut}</b> หนึ่งการสอบ หนึ่งขั้นบันได',
     'level.riwayat-percobaan': 'ครั้งล่าสุด: {skor}/{total} ({akurasi}%)',
     'level.selesai': 'เสร็จแล้ว',

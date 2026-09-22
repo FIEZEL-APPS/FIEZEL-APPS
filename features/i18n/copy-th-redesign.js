@@ -60,6 +60,7 @@
     'today.cta': 'เริ่ม {menit} นาที',
     'today.cta-lanjut': 'เรียนต่อ',
     'today.cta-kenalan': 'หาระดับของคุณก่อน',
+    'today.cta-tes-awal': 'เริ่มแบบทดสอบแรก · ประมาณ {menit} นาที',
     'today.isi-judul': 'เนื้อหาของรอบนี้',
     'today.ringkas': '{soal} ข้อ · ราว {menit} นาที',
     'today.streak': 'ต่อเนื่อง {days} วัน',

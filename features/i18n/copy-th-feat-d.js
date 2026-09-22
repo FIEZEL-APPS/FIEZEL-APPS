@@ -132,6 +132,8 @@
     'account.logout-done': 'คุณออกจากระบบแล้ว ความก้าวหน้าในอุปกรณ์นี้ยังอยู่',
     'account.busy': 'สักครู่…',
     'flow.tab-desc': 'งาน แบบทดสอบ และเนื้อหาบทเรียน',
+    'flow.step-cek': 'เช็กเร็ว',
+    'flow.btn-cek': 'เช็กเร็ว · 5 ข้อ',
     'flow.tugas-guru': 'งานจากครู',
     'flow.tugas-hilang': 'งานนี้เสร็จแล้วหรือไม่พบ',
     'flow.tugas-selesai': 'คุณทำงานนี้เสร็จแล้ว',

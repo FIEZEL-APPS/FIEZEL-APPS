@@ -156,8 +156,8 @@
     'onboarding.dialog-aria': 'Perkenalan FIEZEL',
     'onboarding.step-name': 'Nama',
     'onboarding.step-intro': 'Kenalan',
-    'onboarding.step-goal': 'Tujuan',
-    'onboarding.step-level': 'Level',
+    'onboarding.step-goal': 'Tujuan & level',
+    'onboarding.step-level': 'Tes awal',
     'onboarding.step-reminder': 'Pengingat',
     'onboarding.step-done': 'Selesai',
     'onboarding.last-step': ' · terakhir',
@@ -174,7 +174,7 @@
     'onboarding.btn-back': 'Kembali',
     'onboarding.btn-skip-all': 'Lewati',
     'onboarding.btn-skip-step': 'Lewati langkah ini',
-    'onboarding.btn-placement': 'Mulai tes penempatan',
+    'onboarding.btn-placement': 'Mulai tes awal',
     'onboarding.classcode-label': 'Kode kelas dari guru (opsional)',
     'onboarding.role-question': 'Kamu masuk sebagai siapa?',
     'onboarding.role-aria': 'Pilih peran: murid atau guru',
@@ -360,7 +360,7 @@
     // features/onboarding/fiezel-onboarding.js:568
     'onboarding.apa-level-lang-you-inline': '<h2 class="fiezel-title">Apa level bahasa kamu?</h2>',
     'onboarding.level-perkiraan-singkat': '<p class="fiezel-note">Perkiraan aja, bukan hasil tes.</p>',
-    'onboarding.apa-level-lang-you': '<h2 class="fiezel-title">Apa level bahasa kamu?</h2>',
+    'onboarding.apa-level-lang-you': '<h2 class="fiezel-title">Mau dites sekarang?</h2>',
     // features/onboarding/fiezel-onboarding.js:550
     'onboarding.apa-tujuan-you-study': '<h2 class="fiezel-title">Apa tujuan kamu belajar?</h2>',
     // features/onboarding/fiezel-onboarding.js:552
@@ -370,7 +370,9 @@
     // features/onboarding/fiezel-onboarding.js:553
     'onboarding.ini-cuma-perkiraan-awal-darimu': '<p class="fiezel-note">Ini cuma perkiraan awal darimu sendiri, akan disesuaikan otomatis setelah kamu mengerjakan latihan - bukan hasil tes.</p>',
     // features/onboarding/fiezel-onboarding.js:570
-    'onboarding.isinya-item-listening-grammar-and': '<p class="fiezel-note">25 soal listening, grammar, dan vocabulary. Bisa dihentikan kapan saja.</p>',
+    'onboarding.isinya-item-listening-grammar-and': '<p class="fiezel-note">{soal} soal listening, grammar, dan vocabulary, sekitar {menit} menit. Tanpa nilai, tanpa hukuman, dan bisa dihentikan kapan saja.</p>',
+    'onboarding.tes-awal-isi-lite': '<p class="fiezel-note">{soal} soal grammar dan kosakata, sekitar {menit} menit. Tanpa nilai, tanpa hukuman, dan bisa dihentikan kapan saja.</p>',
+    'onboarding.btn-skip-test': 'Nanti saja',
     // features/onboarding/fiezel-onboarding.js:569
     'onboarding.kerjakan-santai-aja-ini-bukan': '<p class="fiezel-body">Kerjakan santai aja, ini bukan ujian — cuma buat aku kenal kemampuanmu.</p>',
     // features/onboarding/fiezel-onboarding.js:481

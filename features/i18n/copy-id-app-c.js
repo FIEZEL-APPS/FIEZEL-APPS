@@ -154,7 +154,7 @@
     // app.js:4319 — openLevelPanel: tombol pakai hasil tes
     'level.pakai-hasil-tes': 'Gunakan hasil tes ({level})',
     // app.js:4549 — activeLevelTrustMarkup: hitungan probation
-    'level.probation-hitung': 'Level {level} · salah {miss}/{batas} · terverifikasi sampai {verif}',
+    'level.probation-hitung': 'Level kerja: {level} · {miss} dari {batas} jatah salah terpakai · aman sampai {verif}',
     // app.js:4525 — openActiveLevelExamPanel: paragraf rantai
     'level.rantai-ujian': 'Ujiannya berantai: level terverifikasimu sekarang <b>{verif}</b>, jadi yang boleh diuji adalah <b>{berikut}</b>. Satu ujian, satu anak tangga.',
     // app.js:4524 — openActiveLevelExamPanel: riwayat percobaan

@@ -119,6 +119,8 @@
     'level.deskripsi-c2': 'สูงมาก · ใกล้เจ้าของภาษา',
     'level.deskripsi-fallback': 'ระดับปัจจุบันของคุณ',
     'level.entry-chip': 'ยังไม่สอบ',
+    'level.entry-tes-awal': 'เริ่มแบบทดสอบแรก',
+    'level.entry-line-tes-awal': 'ระดับ {level} ยังไม่ได้พิสูจน์ แบบทดสอบแรก ({soal} ข้อ ไม่มีคะแนนและไม่มีบทลงโทษ) จะเป็นตัวกำหนดระดับที่คุณใช้เรียน',
     'level.entry-ikuti-ujian': 'ทำข้อสอบ',
     'level.entry-nanti-aja': 'ไว้ก่อน',
     'level.ujian-badge': 'สอบผ่านแล้ว',
