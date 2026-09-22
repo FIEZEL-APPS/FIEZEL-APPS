@@ -5,42 +5,42 @@
    ========================================================================== */
 
 :root {
-  /* Palet Warna Soft Marshmallow (Option 5) */
-  --fz-marsh-bg: #FFF8E7;
+  /* Palet Warna Bold Gold Marshmallow — AUDIT 2026-09-22 */
+  --fz-marsh-bg: #FFF5D6;
   --fz-marsh-card: #FFFFFF;
-  --fz-marsh-card-soft: #FFFDF8;
+  --fz-marsh-card-soft: #FFFBF0;
   
-  /* Pastel Primaries */
-  --fz-marsh-yellow: #FFD680;
+  /* Bold Gold Primaries */
+  --fz-marsh-yellow: #FFC700;
   --fz-marsh-yellow-deep: #E6A800;
-  --fz-marsh-yellow-light: #FFF7D3;
-  --fz-marsh-yellow-ink: #462104;
+  --fz-marsh-yellow-light: #FFEFB3;
+  --fz-marsh-yellow-ink: #2A1800;
 
-  --fz-marsh-mint: #E5F9CE;
-  --fz-marsh-mint-deep: #529917;
-  --fz-marsh-mint-ink: #162B08;
+  --fz-marsh-mint: #D4F5B0;
+  --fz-marsh-mint-deep: #3D8A0F;
+  --fz-marsh-mint-ink: #0E2204;
 
-  --fz-marsh-sky: #BAF4FF;
-  --fz-marsh-sky-deep: #1EC6F2;
-  --fz-marsh-sky-ink: #072F45;
+  --fz-marsh-sky: #9AEEFF;
+  --fz-marsh-sky-deep: #0FADD4;
+  --fz-marsh-sky-ink: #052535;
 
-  --fz-marsh-coral: #FFD1C9;
+  --fz-marsh-coral: #FFBFB3;
   --fz-marsh-coral-deep: #B8432D;
-  --fz-marsh-coral-ink: #6B1C10;
+  --fz-marsh-coral-ink: #5A1408;
 
-  --fz-marsh-lavender: #EBE4F7;
-  --fz-marsh-lavender-ink: #311B58;
+  --fz-marsh-lavender: #DDD2F0;
+  --fz-marsh-lavender-ink: #261548;
 
-  --fz-marsh-ink: #241A11;
-  --fz-marsh-muted: #6E5E47;
-  --fz-marsh-border: rgba(70, 33, 4, 0.08);
+  --fz-marsh-ink: #121010;
+  --fz-marsh-muted: #3D3530;
+  --fz-marsh-border: rgba(18, 16, 16, 0.12);
 
-  /* Bayangan Claymorphism (Inner Highlight + Outer Diffuse Soft Drop) */
-  --fz-clay-shadow: 0 12px 28px -4px rgba(70, 33, 4, 0.07), inset 0 2px 4px rgba(255, 255, 255, 0.95);
-  --fz-clay-shadow-sm: 0 6px 16px -2px rgba(70, 33, 4, 0.05), inset 0 1.5px 3px rgba(255, 255, 255, 0.95);
-  --fz-clay-shadow-lg: 0 20px 48px -8px rgba(70, 33, 4, 0.10), inset 0 3px 6px rgba(255, 255, 255, 0.95);
-  --fz-clay-btn-shadow: 0 6px 14px rgba(70, 33, 4, 0.08), inset 0 2px 3px rgba(255, 255, 255, 0.75);
-  --fz-clay-btn-yellow-shadow: 0 8px 18px rgba(230, 168, 0, 0.32), inset 0 2px 3px rgba(255, 255, 255, 0.85);
+  /* Bayangan Claymorphism Diperkuat */
+  --fz-clay-shadow: 0 12px 28px -4px rgba(18, 16, 16, 0.12), inset 0 2px 4px rgba(255, 255, 255, 0.95);
+  --fz-clay-shadow-sm: 0 6px 16px -2px rgba(18, 16, 16, 0.10), inset 0 1.5px 3px rgba(255, 255, 255, 0.95);
+  --fz-clay-shadow-lg: 0 20px 48px -8px rgba(18, 16, 16, 0.18), inset 0 3px 6px rgba(255, 255, 255, 0.95);
+  --fz-clay-btn-shadow: 0 6px 14px rgba(18, 16, 16, 0.12), inset 0 2px 3px rgba(255, 255, 255, 0.75);
+  --fz-clay-btn-yellow-shadow: 0 8px 20px rgba(230, 168, 0, 0.45), inset 0 2px 3px rgba(255, 255, 255, 0.85);
 
   /* Sudut Lengkung Empuk */
   --fz-clay-radius-xl: 32px;
@@ -217,11 +217,11 @@ body {
    3. TOPBAR FLOATING PILL HEADER & EXCLUSIVE PANEL CONTROLS
    ========================================================================== */
 header.topbar {
-  background: rgba(255, 255, 255, 0.92) !important;
+  background: rgba(255, 255, 255, 0.95) !important;
   backdrop-filter: blur(24px) !important;
   -webkit-backdrop-filter: blur(24px) !important;
-  border-bottom: 1.5px solid rgba(255, 255, 255, 0.9) !important;
-  box-shadow: 0 8px 24px rgba(70, 33, 4, 0.05) !important;
+  border-bottom: 2px solid rgba(255, 199, 0, 0.25) !important;
+  box-shadow: 0 8px 24px rgba(18, 16, 16, 0.10) !important;
   padding: 8px 18px !important;
   border-radius: 0 0 26px 26px !important;
   max-width: 720px !important;
@@ -317,8 +317,8 @@ header.topbar {
 }
 
 .today-card {
-  background: linear-gradient(145deg, #FFFFFF 0%, #FFFDF8 45%, #FFF8E7 100%) !important;
-  border: 1.5px solid rgba(255, 214, 128, 0.4) !important;
+  background: linear-gradient(145deg, #FFFFFF 0%, #FFF9E0 35%, #FFEFB3 100%) !important;
+  border: 2px solid rgba(255, 199, 0, 0.35) !important;
   border-radius: var(--fz-clay-radius-xl) !important;
   padding: 24px 22px !important;
 }
@@ -596,11 +596,11 @@ nav.bottomnav {
   transform: translateX(-50%) !important;
   width: min(640px, calc(100% - 24px)) !important;
   border-radius: var(--fz-clay-radius-pill) !important;
-  background: rgba(255, 255, 255, 0.95) !important;
+  background: rgba(255, 255, 255, 0.97) !important;
   backdrop-filter: blur(28px) !important;
   -webkit-backdrop-filter: blur(28px) !important;
-  border: 2px solid rgba(255, 255, 255, 0.9) !important;
-  box-shadow: 0 16px 40px rgba(70, 33, 4, 0.12), 0 2px 6px rgba(70, 33, 4, 0.04) !important;
+  border: 2px solid rgba(255, 199, 0, 0.30) !important;
+  box-shadow: 0 16px 44px rgba(18, 16, 16, 0.18), 0 2px 6px rgba(18, 16, 16, 0.06) !important;
   padding: 6px 8px !important;
   z-index: 1000 !important;
   margin: 0 !important;
@@ -643,13 +643,13 @@ nav.bottomnav .nav .fz-i {
   box-shadow: none !important;
   transition: all 0.22s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
   --fz-i-fill: transparent !important;
-  --fz-i-line: #8C7F6E !important;
+  --fz-i-line: #3D3530 !important;
 }
 
 nav.bottomnav .nav .fz-i svg {
   width: 22px !important;
   height: 22px !important;
-  stroke: #8C7F6E !important;
+  stroke: #3D3530 !important;
   transition: transform 0.2s ease, stroke 0.2s ease !important;
 }
 
