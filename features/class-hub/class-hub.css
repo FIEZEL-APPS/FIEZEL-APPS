@@ -754,3 +754,191 @@ body.reduce-motion .ch-student,body.reduce-motion .ch-body,body.reduce-motion .c
    ulang berkali-kali saat tiga permintaan latarnya mendarat satu per satu, dan animasi
    yang diulang di setiap cat ulang terbaca sebagai layar berkedip. */
 .ch-kurikulum{gap:18px;animation:none}
+
+/* ==========================================================================
+   AUDIT 2026-09-22: Chip Strip Filter (mengganti grid 17 kartu mapel)
+   ========================================================================== */
+.ch-chip-strip {
+  display: flex;
+  gap: 6px;
+  padding: 6px 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+  mask-image: linear-gradient(to right, transparent 0, #000 0, #000 calc(100% - 24px), transparent 100%);
+  -webkit-mask-image: linear-gradient(to right, transparent 0, #000 0, #000 calc(100% - 24px), transparent 100%);
+}
+.ch-chip-strip::-webkit-scrollbar { display: none; }
+
+.ch-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  border: 1.5px solid var(--ch-line);
+  background: var(--ch-bg);
+  color: var(--ch-text);
+  font: inherit;
+  font-weight: 700;
+  font-size: .76rem;
+  padding: 7px 12px;
+  border-radius: 999px;
+  cursor: pointer;
+  white-space: nowrap;
+  flex: none;
+  transition: border-color .15s, background-color .15s, transform .15s;
+}
+.ch-chip:hover { transform: translateY(-1px); border-color: var(--chip-color, var(--ch-accent)); }
+.ch-chip.is-active {
+  background: var(--chip-color, var(--ch-accent));
+  color: #fff;
+  border-color: var(--chip-color, var(--ch-accent));
+  box-shadow: 0 4px 12px -6px var(--chip-color, var(--ch-accent));
+}
+.ch-chip.is-clear {
+  background: var(--ch-bad-soft);
+  color: var(--ch-bad);
+  border-color: transparent;
+  font-weight: 800;
+}
+.ch-chip i, .ch-chip svg { width: 14px; height: 14px; }
+.ch-chip-badge {
+  background: var(--ch-accent);
+  color: #fff;
+  border-radius: 999px;
+  font-size: .62rem;
+  padding: 1px 6px;
+  margin-left: 2px;
+  font-weight: 800;
+}
+.ch-chip.is-active .ch-chip-badge {
+  background: rgba(255,255,255,.3);
+  color: #fff;
+}
+
+/* ==========================================================================
+   AUDIT 2026-09-22: Section Dividers & Headings
+   ========================================================================== */
+.ch-divider {
+  border: none;
+  border-top: 1px dashed var(--ch-line);
+  margin: 8px 0;
+}
+.ch-section-tugas,
+.ch-section-done,
+.ch-section-kurikulum {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.ch-section-tugas .ch-h2 i,
+.ch-section-tugas .ch-h2 svg,
+.ch-section-done .ch-h2 i,
+.ch-section-done .ch-h2 svg,
+.ch-section-kurikulum .ch-h2 i,
+.ch-section-kurikulum .ch-h2 svg {
+  width: 18px;
+  height: 18px;
+  color: var(--ch-accent);
+}
+
+/* ==========================================================================
+   AUDIT 2026-09-22: Combined Kurikulum Card (compact)
+   ========================================================================== */
+.ch-curriculum-compact {
+  padding: 14px;
+}
+.ch-curriculum-compact .ch-actions {
+  margin-top: 10px;
+}
+
+/* ==========================================================================
+   AUDIT 2026-09-22: Enhanced Progres Tab
+   ========================================================================== */
+.ch-streak-card {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 16px;
+  background: linear-gradient(135deg, var(--ch-ok-soft), var(--ch-bg));
+  border: 1.5px solid rgba(31, 107, 78, 0.2);
+}
+.ch-streak-emoji {
+  font-size: 2rem;
+  line-height: 1;
+  flex: none;
+}
+.ch-streak-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+}
+.ch-streak-info b {
+  font-size: 1.2rem;
+  font-family: var(--fz-heading, inherit);
+}
+.ch-streak-info span {
+  font-size: .78rem;
+  color: var(--ch-muted);
+  font-weight: 600;
+}
+.ch-top-skills {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 8px 0 0;
+}
+.ch-top-skill-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: .84rem;
+  padding: 8px 10px;
+  border-radius: 12px;
+  background: var(--ch-soft);
+}
+.ch-top-skill-row .ch-bar { flex: 1; min-width: 40px; }
+.ch-top-skill-row b { flex: none; font-size: .82rem; font-variant-numeric: tabular-nums; }
+.ch-top-skill-row span { flex: none; min-width: 80px; font-weight: 600; }
+.ch-top-skill-row.is-strong { border-left: 3px solid var(--ch-ok); }
+.ch-top-skill-row.is-weak { border-left: 3px solid var(--ch-bad); }
+
+/* ==========================================================================
+   AUDIT 2026-09-22: Auto-label for Generated Announcements
+   ========================================================================== */
+.ch-greeting-auto {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: .62rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  color: rgba(82, 62, 134, .55);
+  margin-top: 4px;
+}
+.ch-greeting-auto i, .ch-greeting-auto svg {
+  width: 11px;
+  height: 11px;
+}
+
+/* ==========================================================================
+   AUDIT 2026-09-22: Leaderboard Sample Data Indicator
+   ========================================================================== */
+.ch-papan-sample-notice {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: .72rem;
+  color: var(--ch-muted);
+  padding: 8px 12px;
+  border-radius: 10px;
+  background: var(--ch-soft);
+  margin-top: 8px;
+}
+.ch-papan-sample-notice i, .ch-papan-sample-notice svg {
+  width: 14px;
+  height: 14px;
+  flex: none;
+}
