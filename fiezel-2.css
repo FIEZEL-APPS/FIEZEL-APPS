@@ -278,3 +278,58 @@ body .learning-launcher .launch-card b{font-weight:700;letter-spacing:0}
   body .fiezel-ob .fiezel-stage{max-width:560px;width:100%;margin-left:auto;margin-right:auto;box-sizing:border-box}
   body .fz-tour-card{left:50%;right:auto;width:min(440px,calc(100vw - 32px));transform:translateX(-50%)}
 }
+
+/* ==== Kursus Bahasa Jepang: tema khas Jepang (body.fz-lang-ja, dipasang renderInner) ====
+   Palet tradisional: shu (朱, merah vermilion torii) sebagai aksen, ai (藍, nila) sebagai tinta,
+   washi (kertas krem) sebagai latar, sakura sebagai lembut. Motif seigaiha (gelombang) sangat
+   tipis di latar, judul memakai huruf Mincho bawaan sistem (tanpa unduhan font - CSP).
+   Kontras teks tetap >= 4.5:1: shu #B3372A di atas putih ~5.6:1, ai #1E2B45 ~14:1. */
+html body.fz-lang-ja,html.fiezel-ui-v6 body.fz-lang-ja{
+  --bg:#F7F2E8;--panel:#FFFDF8;--panel-soft:#F2EBDD;
+  --line:#E6DCCB;--line-soft:#EFE8DA;--line-strong:#D6C8B0;
+  --text:#1E2B45;--muted:#555C6B;--muted-soft:#5F6574;--black:#1E2B45;--ambient-muted:#555C6B;
+  --accent:#B3372A;--accent-strong:#8C2920;--accent-soft:#FBE7E1;--accent-on-glass:#8C2920;
+  --chrome-bg:rgba(247,242,232,.94);--launcher-start:#FBEDE8;--launcher-end:#F6DCD3;
+  --lux-accent:#B3372A;--lux-accent-deep:#8C2920;--lux-cream:#F7F2E8;--lux-ink:#1E2B45;--lux-muted:#555C6B;
+  --lux-paper:#FFFDF8;--lux-paper-warm:#FBF6EC;--lux-yellow:#F6DCD3;--lux-yellow-soft:#FBEDE8;--lux-yellow-deep:#E9BFB2;
+  --lux-glow:0 10px 28px -6px rgba(179,55,42,.28);
+  --ui-accent:#B3372A;--ui-accent-soft:#FBE7E1;--ui-tint-soft:#FBEDE8;
+  --fz-accent:#B3372A;--fz-accent-deep:#8C2920;--fz-soft:#FBE7E1;--fz-sun:#F4DDD2;--fz-sun-soft:#FBEDE8;--fz-sun-press:#E9C6B8;
+  --maroon:#B3372A;--maroon-deep:#8C2920;--maroon-soft:#FBE7E1;--wordmark-accent-lo:#B3372A;
+  --sun:#F4DDD2;--sun-soft:#FBEDE8;--sun-deep:#E9C6B8;--yellow:#F4DDD2;--yellow-soft:#FBEDE8;--yellow-deep:#E9C6B8;
+  --pz-yellow:#F4DDD2;--pz-yellow-line:#E9C6B8;--skill-bg:#FBEDE8;--skill-line:#E9C6B8;--info-soft:#FBEDE8;
+  --scene-light:rgba(179,55,42,.07);
+  /* Pastel kartu -> warna tradisional: sakura, matcha, fuji (wisteria), sora (langit). */
+  --pz-pink:#F7DEDF;--pz-pink-line:#EDC4C7;--pz-pink-ink:#8C2F3E;
+  --pz-mint:#E0E8CF;--pz-mint-line:#C8D6AE;--pz-mint-ink:#3F5A1E;
+  --pz-lilac:#E4DEEF;--pz-lilac-line:#CDC3E2;--pz-lilac-ink:#4B3D7A;
+  --pz-sky:#DCE5EF;--pz-sky-line:#C1D0E0;--pz-sky-ink:#1E3F5E;
+  --fz-ja-serif:"Hiragino Mincho ProN","Yu Mincho","YuMincho","Noto Serif JP","Noto Serif CJK JP","Source Han Serif JP",serif;
+  --fz-ja-wave:rgba(30,43,69,.045);
+}
+/* html.fiezel-ui-v6 body (tutor-v3.css) melukis latar krem; spesifisitas disamakan agar washi menang. */
+html body.fz-lang-ja,html.fiezel-ui-v6 body.fz-lang-ja{
+  background-color:var(--bg);
+  background-image:
+    radial-gradient(circle at 50% 100%,transparent 9px,var(--fz-ja-wave) 10px 11px,transparent 12px 15px,var(--fz-ja-wave) 16px 17px,transparent 18px),
+    radial-gradient(circle at 0 50%,transparent 9px,var(--fz-ja-wave) 10px 11px,transparent 12px 15px,var(--fz-ja-wave) 16px 17px,transparent 18px),
+    radial-gradient(circle at 100% 50%,transparent 9px,var(--fz-ja-wave) 10px 11px,transparent 12px 15px,var(--fz-ja-wave) 16px 17px,transparent 18px);
+  background-size:40px 20px,40px 20px,40px 20px;
+  background-position:0 0,20px 10px,20px 10px;
+}
+/* Judul dan merek: Mincho, sedikit renggang seperti papan nama kuil. */
+html body.fz-lang-ja :is(h1,h2,.fz-display,.today-title,.page-title):not(#quizStem,#quizStem *,.quiz-shell *,.quiz-stage *){font-family:var(--fz-ja-serif);letter-spacing:.02em}
+/* Kartu: kertas washi dengan garis shu tipis di atas (seperti sabuk obi). */
+body.fz-lang-ja :is(.card,.panel,.lux-card,.today-card,.setting-card){background-color:var(--panel);border-color:var(--line);box-shadow:inset 0 3px 0 -1px rgba(179,55,42,.55),var(--shadow-sm)}
+/* Kartu Hari ini: washi dengan matahari terbit samar di belakang lencana level. */
+html body.fz-lang-ja .today-card{background:radial-gradient(circle at calc(100% - 66px) 64px,rgba(179,55,42,.13) 0 62px,transparent 63px),linear-gradient(160deg,#FFFBF4 0%,#F4E3D8 100%)}
+/* Topbar: garis bawah nila tipis seperti noren. */
+body.fz-lang-ja .topbar{border-bottom:1px solid rgba(30,43,69,.12)}
+/* Tombol utama: shu padat, sudut sedikit lebih tegas. */
+body.fz-lang-ja :is(.btn-primary,.primary,.fiezel-btn-primary,.quiz-next):not([disabled]){background:var(--accent);border-color:var(--accent);color:#fff}
+body.fz-lang-ja :is(.btn-primary,.primary,.fiezel-btn-primary,.quiz-next):not([disabled]):hover{background:var(--accent-strong)}
+/* Kuis: pilihan jawaban di atas washi, huruf Jepang di soal sedikit lebih besar agar kana/kanji terbaca. */
+body.fz-lang-ja .option{background:var(--panel);border-color:var(--line-strong)}
+body.fz-lang-ja .option:lang(ja),body.fz-lang-ja [lang="ja"]{font-family:"Hiragino Sans","Yu Gothic","Noto Sans JP","Noto Sans CJK JP",system-ui,sans-serif;line-height:1.7}
+@media (prefers-reduced-transparency:reduce){html.fiezel-ui-v6 body.fz-lang-ja{background-image:none}}
+@media print{html.fiezel-ui-v6 body.fz-lang-ja{background:#fff}}
