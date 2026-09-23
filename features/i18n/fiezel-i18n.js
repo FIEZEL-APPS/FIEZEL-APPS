@@ -117,8 +117,20 @@
    *  supaya gerbang th-coverage kelak bisa menghitungnya — audit AI-07 F08: Thai parsial
    *  yang lolos diam-diam adalah mode kegagalan paling realistis. */
   var misses = Object.create(null);
+  /* Lapisan kursus: kursus Bahasa Jepang memakai istilahnya sendiri (Kotoba, Bunpō, Renshū…).
+     Kunci 'kursus-ja.<kunci>' didaftarkan id + th di copy-*-bahasa.js; bila ada, ia menang
+     atas kunci biasanya. Kunci tanpa padanan kursus tetap jatuh ke kalimat umum. */
+  var course = null;
+  function setCourse(next) { course = next === 'ja' ? 'ja' : null; return course; }
+  function getCourse() { return course; }
   function t(key, params) {
-    var s = registry[current][key];
+    var s;
+    if (course) {
+      var ck = 'kursus-' + course + '.' + key;
+      s = registry[current][ck];
+      if (s === undefined && current !== DEFAULT_LOCALE) s = registry[DEFAULT_LOCALE][ck];
+    }
+    if (s === undefined) s = registry[current][key];
     if (s === undefined && current !== DEFAULT_LOCALE) {
       misses[key] = (misses[key] || 0) + 1;
       s = registry[DEFAULT_LOCALE][key];
@@ -162,6 +174,8 @@
     whenAvailable: whenAvailable,
     t: t,
     getLocale: getLocale,
+    setCourse: setCourse,
+    getCourse: getCourse,
     getBcp47: getBcp47,
     setLocale: setLocale,
     onChange: onChange,

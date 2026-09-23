@@ -518,7 +518,7 @@
     var cards = session.books().map(function (b) {
       var progress = session.progressFor(b.id);
       var accent = esc((b.cover && b.cover.accent) || '#8C2233');
-      var metaStr = t('library.book-meta', esc(b.level) + ' · ' + esc(b.minutes) + ' menit · ' + esc(b.sentences) + ' kalimat', {level: esc(b.level), minutes: esc(b.minutes), sentences: esc(b.sentences)});
+      var metaStr = t('library.book-meta', {level: esc(b.level), minutes: esc(b.minutes), sentences: esc(b.sentences)});
       return '<button type="button" class="library-card" data-book="' + esc(b.id) + '" style="--book-accent:' + accent + '">' +
         '<span class="library-cover">' + esc((b.cover && b.cover.emoji) || '📖') + '</span>' +
         '<span class="library-meta"><b>' + esc(b.title) + '</b>' +
