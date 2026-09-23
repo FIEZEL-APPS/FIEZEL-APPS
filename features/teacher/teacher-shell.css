@@ -1,9 +1,12 @@
 /* FIEZEL KelasKu untuk Guru — tema terpisah dari cangkang murid (cream/pastel/maskot).
    Guru: ruang kerja tenang. Tinta hijau-gelap, kertas hangat, aksen sage & amber. Tipografi
-   Fraunces (judul) + IBM Plex Sans (teks) + IBM Plex Mono (kode). */
-@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500&display=swap');
+   Judul: FZ Instrument Serif · teks: FZ Plus Jakarta Sans · kode: monospace sistem. */
+/* Audit F24 (2026-09-23): @import Google Fonts DICABUT. CSP aplikasi tidak mengizinkan
+   fonts.googleapis.com, jadi judul dasbor jatuh ke Georgia/Times dan konsol mencatat galat
+   di SETIAP halaman (berkas ini juga dimuat untuk murid). Sesuai kebijakan offline-first,
+   dasbor guru kini memakai fon yang sudah di-self-host aplikasi (@font-face di style.css). */
 
-body.fz-teacher-mode{--tg-ink:#12211F;--tg-ink-2:#1B2F2C;--tg-ink-3:#284440;--tg-paper:#F3EFE6;--tg-paper-2:#FBF9F4;--tg-line:#E2DCCE;--tg-text:#182220;--tg-muted:#4E5C58;--tg-sage:#1F7A63;--tg-sage-2:#166052;--tg-sage-soft:#DDEFE7;--tg-amber:#D98E1F;--tg-amber-soft:#FBEBCF;--tg-brick:#B93F2A;--tg-brick-soft:#F7DDD6;--tg-mist:#A9C4BC;--tg-display:'Fraunces',Georgia,'Times New Roman',serif;--tg-body:'IBM Plex Sans',-apple-system,'Segoe UI',sans-serif;--tg-mono:'IBM Plex Mono',ui-monospace,Menlo,monospace;--tg-r:14px;--tg-r-lg:22px;--tg-shadow:0 10px 30px -18px rgba(18,33,31,.35);background:var(--tg-paper);color:var(--tg-text)}
+body.fz-teacher-mode{--tg-ink:#12211F;--tg-ink-2:#1B2F2C;--tg-ink-3:#284440;--tg-paper:#F3EFE6;--tg-paper-2:#FBF9F4;--tg-line:#E2DCCE;--tg-text:#182220;--tg-muted:#4E5C58;--tg-sage:#1F7A63;--tg-sage-2:#166052;--tg-sage-soft:#DDEFE7;--tg-amber:#D98E1F;--tg-amber-soft:#FBEBCF;--tg-brick:#B93F2A;--tg-brick-soft:#F7DDD6;--tg-mist:#A9C4BC;--tg-display:'FZ Instrument Serif',Georgia,serif;--tg-body:'FZ Plus Jakarta Sans',-apple-system,'Segoe UI',sans-serif;--tg-mono:ui-monospace,SFMono-Regular,Menlo,monospace;--tg-r:14px;--tg-r-lg:22px;--tg-shadow:0 10px 30px -18px rgba(18,33,31,.35);background:var(--tg-paper);color:var(--tg-text)}
 body.fz-teacher-mode .topbar,body.fz-teacher-mode .bottomnav,body.fz-teacher-mode .nav-scrim,body.fz-teacher-mode #globalSky,body.fz-teacher-mode .fz-coach-bubble,body.fz-teacher-mode .fz-coach-mascot,body.fz-teacher-mode .fz-coach-panel,body.fz-teacher-mode [class^=fz-coach],body.fz-teacher-mode .voice-bundle-pill{display:none!important}
 body.fz-teacher-mode .app{max-width:none;padding:0;margin:0}
 body.fz-teacher-mode #app{font-family:var(--tg-body)}
@@ -252,7 +255,7 @@ body.reduce-motion .tg-rise,body.reduce-motion .tg-drawer,body.reduce-motion .tg
   .tg{grid-template-columns:1fr}.tg-side{display:none}
   .tg-top{padding:22px 18px 14px;flex-direction:column;align-items:flex-start}.tg-content{padding:16px 16px calc(96px + env(safe-area-inset-bottom))}
   .tg-btn span{display:none}.tg-btn.is-primary span,.tg-modal .tg-btn span,.tg-card .tg-btn span,.tg-welcome .tg-btn span{display:inline}
-  .tg-mnav{display:grid;grid-template-columns:repeat(8,1fr);position:fixed;left:0;right:0;bottom:0;background:var(--tg-ink);padding:8px 6px calc(8px + env(safe-area-inset-bottom));z-index:50;overflow-x:auto}
+  .tg-mnav{display:grid;grid-template-columns:repeat(5,1fr);position:fixed;left:0;right:0;bottom:0;background:var(--tg-ink);padding:8px 6px calc(8px + env(safe-area-inset-bottom));z-index:50;overflow:visible}
   .tg-mnav button{display:flex;flex-direction:column;align-items:center;gap:3px;background:transparent;border:0;color:#C8D6D1;font:inherit;font-size:.62rem;font-weight:600;padding:6px 2px;border-radius:10px}.tg-mnav button svg{width:18px;height:18px}.tg-mnav button.is-active{color:#fff;background:var(--tg-sage)}
   .tg-quick-row{grid-template-columns:repeat(2,1fr)}.tg-grid-skill{grid-template-columns:repeat(2,1fr)}.tg-welcome-list{grid-template-columns:1fr}.tg-form-row,.tg-mode{grid-template-columns:1fr}
   .tg-board-kpi{grid-template-columns:1fr}.tg-board-skills div{grid-template-columns:1fr 3fr 60px;gap:10px}.tg-board{padding:70px 20px 24px}
@@ -669,3 +672,18 @@ html.fiezel-ui-v6 body.fz-teacher-mode .tg button.tg-seg-btn:not(.primary):not(.
   .tg-subject-scope{width:100%}
   .tg-heat-table{min-width:720px}
 }
+
+/* Audit F25 (2026-09-23): menu "Lainnya" nav ponsel + menu aksi kelas (Hapus kelas tidak
+   lagi sejajar dengan aksi rutin). */
+.tg-mnav-more{position:relative;flex:1 1 0;display:flex}
+.tg-mnav-more>summary{list-style:none;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;width:100%;cursor:pointer;color:#C8D6D1;font-size:.62rem;font-weight:600;padding:6px 2px;border-radius:10px}
+.tg-mnav-more>summary svg{width:18px;height:18px}
+.tg-mnav-more.is-active>summary,.tg-mnav-more[open]>summary{color:#fff;background:var(--tg-ink-3)}
+.tg-mnav-more>summary::-webkit-details-marker{display:none}
+.tg-mnav-more .tg-mnav-sheet{position:absolute;right:4px;bottom:calc(100% + 8px);display:grid;gap:4px;min-width:190px;padding:8px;border-radius:var(--tg-r);background:var(--tg-ink);box-shadow:var(--tg-shadow)}
+.tg-mnav-more .tg-mnav-sheet button{display:flex;align-items:center;gap:8px;justify-content:flex-start;min-height:44px;padding:0 12px;color:#fff;background:transparent;border:0;border-radius:10px;text-align:left}
+.tg-mnav-more .tg-mnav-sheet button.is-active{background:var(--tg-ink-3)}
+.tg-more{position:relative;display:inline-block}
+.tg-more>summary{list-style:none;cursor:pointer}
+.tg-more>summary::-webkit-details-marker{display:none}
+.tg-more .tg-more-menu{position:absolute;right:0;top:calc(100% + 6px);z-index:5;padding:6px;border-radius:12px;background:var(--tg-paper-2);border:1px solid var(--tg-line);box-shadow:var(--tg-shadow)}
