@@ -385,3 +385,10 @@ html body .ja-kana .kana-tab[aria-selected="true"]{background:var(--accent);colo
 .ja-kotoba-word{margin:14px 0 2px;font-family:"Hiragino Mincho ProN","Yu Mincho","Noto Serif JP",serif;font-size:40px;line-height:1.35;color:var(--text)}
 .ja-kotoba-reading{margin:0;font-size:15px;font-weight:700;color:var(--muted)}
 .ja-kotoba-meaning{margin:8px 0 0;font-size:16px;color:var(--text)}
+/* Anotasi soal & jawaban kursus Jepang: romaji duduk di bawah potongan Jepang, bukan menyela. */
+.ja-run{display:inline-flex;flex-direction:column;align-items:flex-start;vertical-align:bottom;line-height:1.5}
+.option .ja-run{align-items:center}
+.ja-run-romaji{font-size:.62em;font-weight:600;letter-spacing:.01em;color:var(--muted);line-height:1.2;margin-top:1px;white-space:normal}
+.ja-quiz-display{display:flex;justify-content:center;margin:8px 0 2px}
+.ja-quiz-display .ja-display{margin:0}
+body.fz-ja-no-romaji .ja-run{display:inline}
