@@ -331,5 +331,20 @@ body.fz-lang-ja :is(.btn-primary,.primary,.fiezel-btn-primary,.quiz-next):not([d
 /* Kuis: pilihan jawaban di atas washi, huruf Jepang di soal sedikit lebih besar agar kana/kanji terbaca. */
 body.fz-lang-ja .option{background:var(--panel);border-color:var(--line-strong)}
 body.fz-lang-ja .option:lang(ja),body.fz-lang-ja [lang="ja"]{font-family:"Hiragino Sans","Yu Gothic","Noto Sans JP","Noto Sans CJK JP",system-ui,sans-serif;line-height:1.7}
+/* Bentuk: sudut lebih tegas seperti ubin dan papan kayu, bukan kapsul marshmallow kursus Inggris. */
+html body.fz-lang-ja,html.fiezel-ui-v6 body.fz-lang-ja{--radius-xl:18px;--radius-lg:14px;--radius-md:10px;--radius-sm:8px;--lux-r-xl:20px;--lux-r-lg:16px;--lux-r-md:12px;--lux-r-sm:10px}
+/* Nav bawah: pita nila (ai) seperti noren; tab aktif diberi cap shu. Kontras krem #EDE6D6 di atas #1E2B45 ~11:1. */
+html body.fz-lang-ja nav.bottomnav,html body.fz-lang-ja .bottomnav{background:#1E2B45!important;border:1px solid #1E2B45!important;box-shadow:0 12px 30px -10px rgba(30,43,69,.55)!important;border-radius:18px!important}
+html body.fz-lang-ja nav.bottomnav .nav,html body.fz-lang-ja .bottomnav .nav{color:#EDE6D6!important}
+html body.fz-lang-ja nav.bottomnav .nav .fz-i{--fz-i-fill:transparent!important;--fz-i-line:#EDE6D6!important}
+html body.fz-lang-ja nav.bottomnav .nav .fz-i svg{stroke:#EDE6D6!important}
+html body.fz-lang-ja nav.bottomnav .nav.active,html body.fz-lang-ja .bottomnav .nav.active{color:#FFFFFF!important;background:transparent!important}
+html body.fz-lang-ja nav.bottomnav .nav.active::after{background:transparent!important}
+html body.fz-lang-ja nav.bottomnav .nav.active .fz-i,html body.fz-lang-ja nav.bottomnav .nav[data-view="classroom"].active .fz-i{background:#B3372A!important;border:1.5px solid rgba(255,255,255,.85)!important;border-radius:50%!important;box-shadow:0 6px 14px rgba(179,55,42,.45)!important;--fz-i-fill:#B3372A!important;--fz-i-line:#FFFFFF!important}
+html body.fz-lang-ja nav.bottomnav .nav.active .fz-i svg{stroke:#FFFFFF!important}
+html body.fz-lang-ja nav.bottomnav .nav .kelasku-wordmark,html body.fz-lang-ja nav.bottomnav .nav[data-view="classroom"].active .kelasku-wordmark{color:inherit!important}
+html body.fz-lang-ja #app :is(.launch-card,.today-card,.card){border-radius:16px!important}
+/* Judul bagian: garis shu tegak di kiri, seperti penanda bab buku ajar Jepang. */
+html body.fz-lang-ja #app :is(h2,.section-title):not(#quizStem):not(.quiz-shell *){border-left:4px solid var(--accent);padding-left:10px}
 @media (prefers-reduced-transparency:reduce){html.fiezel-ui-v6 body.fz-lang-ja{background-image:none}}
 @media print{html.fiezel-ui-v6 body.fz-lang-ja{background:#fff}}
