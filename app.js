@@ -6388,7 +6388,8 @@ if(pendingAfterGate==='placement'){pendingAfterGate=null;startPlacement()}
    SEKALI di onboarding (registerStudentOnce), dan akun Puter menjadi tambahan opsional
    yang pintunya ada di Pengaturan -> Akun Puter. Popup kedua yang menanyakan identitas
    yang sudah diberikan murid adalah persis keluhan owner. */
-if(!deferWelcomeUntilStageExit)offerNotificationInvitation('after_onboarding');
+/* Audit F23: demo guru tidak ditawari pengingat belajar murid. */
+if(!deferWelcomeUntilStageExit&&!(()=>{try{return !!self.FiezelTeacherShell?.previewAllowed?.()}catch(_){return false}})())offerNotificationInvitation('after_onboarding');
 try{maybeRegisterStudentOnce()}catch(_){}
 armOfflineVoiceAutoload();
 // Creator Report menunggu SDK-nya, bukan menyerah. Antrean laporan dulu pasti terkirim
@@ -8707,6 +8708,11 @@ window.showBrandSplash=showBrandSplash;
 // ada - goal ASLI dari FiezelPersonalJourney, tes penempatan yang sungguhan 25 soal, level
 // self-report yang tidak menimpa state.level.
 function showOnboarding(now=Date.now()){
+  /* Audit F23 (2026-09-23): "Buka Demo Guru" (?teacher=preview) dan guru terverifikasi tidak
+     pernah melihat perkenalan MURID. openApp() memanggil showBrandSplash() tanpa argumen,
+     dan jalur bawaannya membuka perkenalan - jadi pengunjung demo mendarat di pemilih
+     bahasa, nama, lalu peran sebelum demonya muncul. Terukur di Chromium. */
+  try{if(isVerifiedTeacher())return null}catch(_){}
   const onboarding=self.FiezelOnboarding;
   if(!onboarding||typeof onboarding.show!=='function')return null;
   try{
