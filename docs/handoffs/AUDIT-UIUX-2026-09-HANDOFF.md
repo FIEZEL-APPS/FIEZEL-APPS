@@ -12,7 +12,13 @@ m025-360) diperbaiki dalam satu PR, **kecuali F06 (privasi ID online/liga) dan F
 | F08 dua tombol Lanjut, tombol menembus dialog | selesai (m025-361) |
 | F01–F05 tes awal, CTA Home, gerbang level, nama tes, pertanyaan berulang | selesai |
 | F06, F22 | **tidak disentuh atas perintah OWNER** |
-| Temuan lain | lihat deskripsi PR — diperbarui per commit |
+| F10 intro materi grammar mengajarkan aturan topik (bukan strategi umum), soal 1 ≠ contoh | selesai (m025-363) · `tests/grammar-lesson-rule-test.js` |
+| F15 Progress murid baru: kartu kosong disembunyikan, galeri Prasasti dilipat (390px: 2683 → 1520 px) | selesai (m025-363) |
+| F17 satu `:root` token di `style.css`, `docs/DESIGN-SYSTEM.md` ditulis ulang ke token nyata | selesai (m025-363) · `tests/pastel-field-contrast-test.js` |
+| F21 tata letak desktop ≥1100px: rel kiri, Home dua kolom, kuis/pelajaran 780px | selesai (m025-363) |
+| F25 ruang guru satu navigasi (tab hub pindah ke sidebar), "Hapus kelas" masuk menu ⋯ | selesai (m025-363) · `tests/teacher-single-nav-test.js` |
+| F28 shell + kurikulum guru dimuat malas; prefetch listening/pak ditunda sampai onboarding selesai (unduhan 15 dtk pertama 13,2 → ±10,9 MB) | selesai (m025-363) · `tests/teacher-lazy-load-test.js` |
+| Temuan lain (F09, F11–F14, F16, F18–F20, F23, F24, F26, F27) | selesai di PR #459 |
 
 Ikut diperbaiki karena merah di `main` sebelum PR ini: 27 kunci `kelas.*` tanpa
 registrasi id/th, tab Kelas kehilangan pintu Tutor/Belajar mandiri dan baris guru
