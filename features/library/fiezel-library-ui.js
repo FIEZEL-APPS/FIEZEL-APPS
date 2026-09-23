@@ -871,7 +871,16 @@
   // fetch backed by the service-worker cache; this only moves JSON parse/session setup
   // away from the user's navigation tap. A single shared promise prevents duplicate work.
   function schedulePackWarm() {
-    var run = function () { ensurePack().catch(function () {}); };
+    /* Audit F28: indeks buku (±320 KB) tidak dihangatkan selama perkenalan atau saat hemat
+       data aktif; ensurePack() tetap memuatnya ketika Perpustakaan benar-benar dibuka. */
+    var run = function () {
+      try {
+        if (root.navigator && root.navigator.connection && root.navigator.connection.saveData) return;
+        var ob = root.FiezelOnboarding;
+        if (ob && typeof ob.completed === 'function' && !ob.completed(root)) return;
+      } catch (_) {}
+      ensurePack().catch(function () {});
+    };
     try {
       if (typeof root.requestIdleCallback === 'function') {
         root.requestIdleCallback(run, { timeout: 1800 });

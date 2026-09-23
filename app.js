@@ -6590,7 +6590,7 @@ function startNotificationInvitation(){
 // sudah menjaga diri sendiri (sekali per hari / sekali selesai) lewat pemeriksaan di dalam
 // modulnya masing-masing.
 let pendingAfterGate=null;let pendingAfterGateFn=null;/* v06 2026-08-29: penundaan generik \u2014 kuis apa pun yang diminta saat gerbang akun menutup layar dijalankan ulang setelah gerbang selesai/dilewati. */
-function afterOnboardingExit(action){
+function afterOnboardingExit(action){try{prefetchPlacementListening()}catch(_){}
   if(isVerifiedTeacher()){
     if(state.view!=='tutor')go('tutor');
     return;
@@ -10908,6 +10908,13 @@ async function loadPlacementListening(){
 // prasyarat, dan tes tetap boleh jalan tanpa listening (lihat guard `floor` di startPlacement).
 function prefetchPlacementListening(){
   if(placementListeningBank||placementListeningInflight)return;
+  /* Audit F28: 1,8 MB ini tidak boleh ikut terunduh saat murid baru masih di layar perkenalan
+     (belum memilih apa pun), tidak ada gunanya bila tes awal sudah selesai, dan dihormati
+     pilihan hemat data. afterOnboardingExit() memanggil ulang fungsi ini begitu perkenalan
+     ditutup, jadi tes awal tetap mendapat banknya lebih dulu. */
+  try{if(state?.placementDone)return}catch(_){}
+  try{if(navigator?.connection?.saveData)return}catch(_){}
+  try{if(self.FiezelOnboarding?.completed&&!self.FiezelOnboarding.completed(self))return}catch(_){}
   const run=()=>{try{loadPlacementListening()?.catch?.(()=>{})}catch{}};
   if(typeof window!=='undefined'&&typeof window.requestIdleCallback==='function')window.requestIdleCallback(run,{timeout:6000});
   else setTimeout(run,1500);
@@ -12372,7 +12379,10 @@ function tutorCenterView(){
   const shell=self.FiezelTeacherShell;
   if(shell&&self.FiezelTeacherStore){
     setApp('<div id="fzTeacherShell" class="teacher-shell-root"></div>');
-    shell.mount($('fzTeacherShell'),{
+    /* F28: shell guru kini dimuat malas (features/teacher/fiezel-teacher-loader.js), jadi mount
+       bisa berupa janji. Bila modul penuh gagal diunduh, jatuh ke Tutor Action Center di bawah
+       alih-alih meninggalkan layar kosong. */
+    const mounted=shell.mount($('fzTeacherShell'),{
       toast:showToast,
       afterRender:refreshIcons,
       exit:(opts)=>{
@@ -12414,6 +12424,7 @@ function tutorCenterView(){
         go('home');
       }
     });
+    if(mounted&&typeof mounted.catch==='function')mounted.catch(()=>{try{if(self.FiezelTeacherShell?.__lazy)self.FiezelTeacherShell=null}catch(_){}if(state.view==='tutor')render()});
     return;
   }
   setApp('<div id="fzTutorCenter" class="tutor-center-shell"></div>');

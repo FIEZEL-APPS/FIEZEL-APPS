@@ -876,7 +876,6 @@ html.fz-booting body{overflow:hidden}
   <!-- Ruang Guru (cangkang guru terpisah). Wajib SEBELUM app.js: tutorCenterView() memasangnya,
        dan isVerifiedTeacher() menanyakan previewAllowed() saat Home digambar pertama kali. -->
   <script defer src="./features/teacher/fiezel-teacher-icons.js"></script>
-  <script defer src="./features/teacher/fiezel-teacher-curriculum.js"></script>
   <script defer src="./features/teacher/fiezel-teacher-store.js"></script>
   <!-- Class hub: Kelas = pusat Guru ↔ Murid ↔ Braincore (dipakai tab Kelas murid & view Kelas Ruang Guru). Harus sebelum teacher-shell. -->
   <!-- Kunci ujian: satu penanda "sedang ujian" untuk pendeteksi DAN pintu AI. Harus sebelum app.js. -->
@@ -887,7 +886,9 @@ html.fz-booting body{overflow:hidden}
   <script defer src="./features/curriculum/fiezel-curriculum-inbox.js"></script>
   <script defer src="./features/class-hub/fiezel-class-hub.js"></script>
   <script defer src="./features/curriculum/fz-api.js"></script>
-  <script defer src="./features/teacher/fiezel-teacher-shell.js"></script>
+  <!-- F28: shell + kurikulum guru (±600 KB) dimuat malas; pemuat kecil ini menyediakan
+       previewAllowed() seketika dan mengambil modul penuh hanya untuk guru/demo guru. -->
+  <script defer src="./features/teacher/fiezel-teacher-loader.js"></script>
   <script defer src="./app.js"></script>
   <script defer src="./features/skills-evidence/fiezel-skills-evidence.js"></script>
   <script defer src="./features/academic-readiness/fiezel-academic-readiness.js"></script>
