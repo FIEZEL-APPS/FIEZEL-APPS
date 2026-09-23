@@ -1214,6 +1214,8 @@ jobs:
         # Pemuat kecil menjawab previewAllowed() seketika dan mengambil modul penuh hanya
         # untuk guru/demo; kegagalan unduh jatuh ke Tutor Action Center.
         run: node tests/teacher-lazy-load-test.js
+      - name: 'Ruang Guru: satu lapis navigasi (audit F25)'
+        run: node tests/teacher-single-nav-test.js
       - name: 'Penjaga bahasa target duduk di rute, bukan di kartu'
         # Gerbang japanese-surface-honesty di atas HIJAU sepanjang audit m025-314, dan tetap
         # ada tiga pintu ke latihan dengar/bicara yang tidak dijaganya: kartu skill hub di
