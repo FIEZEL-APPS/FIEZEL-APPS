@@ -401,3 +401,11 @@ body.fz-ja-no-romaji .ja-run{display:inline}
   .learning-launcher{grid-template-columns:repeat(3,minmax(0,1fr))}
   #app .stats:has(> :nth-child(5):last-child){grid-template-columns:repeat(5,minmax(0,1fr))}
 }
+/* Audit F15: galeri Prasasti terlipat untuk murid baru (lencana redup semua), terbuka bagi yang sudah punya riwayat. */
+.prasasti-fold>summary{display:flex;align-items:center;justify-content:space-between;gap:10px;cursor:pointer;list-style:none;min-height:44px}
+.prasasti-fold>summary::-webkit-details-marker{display:none}
+.prasasti-fold>summary h3{margin:0}
+.prasasti-fold>summary svg,.prasasti-fold>summary i{transition:transform .2s ease;flex:none}
+.prasasti-fold[open]>summary svg,.prasasti-fold[open]>summary i{transform:rotate(180deg)}
+@media (prefers-reduced-motion:reduce){.prasasti-fold>summary svg,.prasasti-fold>summary i{transition:none}}
+@media (max-width:1099px){#app .stats > :nth-child(5):last-child:nth-child(odd){grid-column:1/-1}}
