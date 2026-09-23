@@ -14,49 +14,52 @@ paling umum sebuah aplikasi perlahan-lahan terlihat "campur aduk".
 
 ## 1. Warna
 
-Sumber kebenaran: blok `:root` **kedua** di `style.css` (bertanda `FIEZEL Design System
-v6.0`, ±baris 652–790). Blok `:root` pertama di kepala berkas adalah generasi lama dan
-**ditimpa** oleh v6 — jangan menambah token baru di sana. (`--yellow`/`--yellow-deep` di
-blok pertama adalah alias lawas yang nilainya sudah disamakan dengan `--sun`/`--sun-deep`;
-pemakaian baru harus memakai keluarga `--sun`.)
+Sumber kebenaran: **satu-satunya** blok `:root` di kepala `style.css` (audit UI/UX 2026-09,
+temuan F17). Dulu ada empat blok `:root` di `style.css` dan satu di `fiezel-2.css` yang saling
+menimpa, sehingga dokumen ini sempat menuliskan palet kuning/terracotta yang tidak pernah
+lagi dirender. Blok tunggal itu memuat nilai pemenang cascade lama, jadi tampilan tidak
+berubah saat digabung. Aturan baru: **token baru hanya ditambahkan di blok itu**;
+`fiezel-2.css` dan berkas fitur tidak boleh membuka `:root` sendiri. Satu-satunya penimpaan
+yang sah adalah per konteks (mis. `html[lang="th"]` untuk font Thai, `body.fz-lang-ja` untuk
+kursus Jepang, `.scene-*` untuk fase suasana).
 
-### Kuning adalah warna BIDANG, bukan warna teks
+### Aksen marun adalah warna aksi
 
-Ini aturan warna terpenting seluruh produk (komentar style.css di blok v6): `--sun` di
-atas `--bg` hanya 1,5:1. Kuning boleh mengisi tombol, kapsul, dan latar — teks di atasnya
-selalu tinta (`--text` di atas `--sun` ≈ 10,9:1). Satu-satunya "kuning" yang boleh menjadi
-teks adalah `--info` `#7A5F1B` (≈5,9:1 di atas cream). Chip yang melanggar aturan ini
-(`.level-trust-chip`) sudah dikoreksi pada audit 02-003.
+Tombol utama, tab aktif, tautan, dan sorotan memakai `--accent` (marun). Teks di atas
+bidang marun selalu putih (≈8,6:1). Keluarga "sun" kini krem-emas lembut, dipakai sebagai
+**bidang** (kartu Hari ini, kapsul, isian ikon), tidak pernah sebagai teks. Satu-satunya
+teks bernuansa emas yang sah adalah `--info` `#7A5512`.
 
-### Keluarga merek (bidang kuning)
+### Aksen
 
 | Token | Nilai | Dipakai untuk |
 |---|---|---|
-| `--sun` | `#FFC700` | Bidang merek: tombol utama (`.primary`), kapsul nav aktif, isian ikon. |
-| `--sun-deep` | `#E6A800` | Garis/tepi di atas bidang kuning; border `.primary`. |
-| `--sun-press` | `#CC9600` | Keadaan tekan bidang kuning. |
-| `--sun-soft` | `#FFF3C4` | Latar kuning lembut (kapsul tab aktif, hover). |
-| `--sun-grad` | `linear-gradient(180deg,#FFDE59,#FFA500)` | Gradien splash/hero. |
+| `--accent` | `#9B3A4A` | Marun. Tombol utama, tab aktif, tautan, status terpilih. |
+| `--accent-strong` | `#7E2D3B` | Hover/tekan aksen; tinta aksen di teks kecil. |
+| `--accent-soft` | `#F6E9EB` | Latar lembut bernuansa aksen (isian terpilih). |
+| `--maroon` / `--maroon-deep` / `--maroon-soft` | alias `--accent*` | Nama lama di `fiezel-2.css`; pemakaian baru pakai `--accent*`. |
+| `--gold` | `#C9A24B` | Dekorasi saja (garis jalur, hadiah); 1,9:1 di atas latar, bukan teks/fokus. |
+
+### Keluarga bidang "sun" (krem-emas)
+
+| Token | Nilai | Dipakai untuk |
+|---|---|---|
+| `--sun` | `#F7EACB` | Bidang hangat: kartu Hari ini, kapsul nav aktif, isian ikon. |
+| `--sun-deep` | `#EFDFB8` | Tepi di atas bidang sun. |
+| `--sun-press` | `#E3CE9E` | Keadaan tekan bidang sun. |
+| `--sun-soft` | `#FBF3E2` | Latar sun lembut. |
+| `--sun-grad` | `linear-gradient(180deg,#F7EACB,#EFDFB8)` | Gradien kartu/hero. |
 
 ### Netral "kertas hangat"
 
 | Token | Nilai | Dipakai untuk |
 |---|---|---|
-| `--bg` | `#FFF9EE` | Latar halaman (cream). |
+| `--bg` | `#FBF7F3` | Latar halaman. |
 | `--panel` | `#FFFFFF` | Permukaan kartu, modal, gerbang. |
-| `--panel-soft` | `#FFF3DC` | Permukaan sekunder, kolom isian. |
-| `--line` / `--line-soft` | `#F0E4CF` / `#F7EFDF` | Garis rambut, pemisah. |
-| `--text` (= `--black`) | `#241A11` | Tinta utama. |
-| `--muted` / `--muted-soft` | `#6E5E47` / `#7E6C4B` | Teks pendukung. `--muted` di atas cream ≈5,7:1 — **jangan** diturunkan lagi dengan `opacity` (pelajaran audit 14-002). |
-
-### Aksen dan emas
-
-| Token | Nilai | Dipakai untuk |
-|---|---|---|
-| `--accent` | `#C2402C` | **Terracotta — BUKAN marun.** Aksen, tautan, sorotan. |
-| `--accent-strong` | `#A33422` | Keadaan tekan/hover aksen; tinta aksen di teks kecil. |
-| `--accent-soft` | `#FDE3DE` | Latar lembut bernuansa aksen. |
-| `--gold` | `#C9A24B` | Aksen kedua dekoratif: garis jalur, hadiah. Hanya 1,9:1 di atas cream — dekorasi saja, bukan teks/fokus. |
+| `--panel-soft` | `#F6F1EA` | Permukaan sekunder, kolom isian. |
+| `--line` / `--line-soft` / `--line-strong` | `#EFE7DE` / `#F5F0E9` / `#E2D6C8` | Garis rambut, pemisah, tepi tegas. |
+| `--text` (= `--black`) | `#2E2724` | Tinta utama. |
+| `--muted` / `--muted-soft` | `#6E635C` / `#786D64` | Teks pendukung. Jangan diturunkan lagi dengan `opacity`. |
 
 ### Semantik
 
@@ -64,9 +67,10 @@ teks adalah `--info` `#7A5F1B` (≈5,9:1 di atas cream). Chip yang melanggar atu
 |---|---|---|
 | `--good` / `--good-bright` / `--good-soft` | `#1F6B4E` / `#2E8B69` / `#E9F7F0` | Berhasil (tinta / bidang terang / latar). |
 | `--bad` / `--bad-bright` / `--bad-soft` | `#AC3E2A` / `#B8432D` / `#FDE3DE` | Gagal, bahaya. `--bad-bright` untuk garis/bidang, bukan teks kecil. |
-| `--info` / `--info-soft` | `#7A5F1B` / `#FFF3C4` | Satu-satunya kuning-teks yang sah + latarnya. |
-| `--focus-ring` | `#A67A00` | Cincin fokus tunggal seluruh aplikasi. |
-| `--scrim` / `--scrim-soft` | `rgba(36,26,17,.45)` / `rgba(36,26,17,.28)` | Backdrop modal (turunan tinta, bukan kabut terang). |
+| `--info` / `--info-soft` | `#7A5512` / `#FBF3E2` | Satu-satunya teks bernuansa emas + latarnya. |
+| `--focus-ring` | `#2E2724` | Cincin fokus tunggal (tinta, ≥12:1 di atas latar terang). |
+| `--focus-ring-on-core` | `#FDFAF3` | Cincin fokus di atas permukaan gelap `--core`. |
+| `--scrim` / `--scrim-soft` | `rgba(36,26,17,.45)` / `rgba(36,26,17,.28)` | Backdrop modal. |
 
 ### Permukaan gelap "core"
 
@@ -80,7 +84,7 @@ Satu-satunya keluarga gelap yang tersisa — panggung splash, kartu highlight, t
 `body` membawa salah satu dari `scene-day` / `scene-dawn` / `scene-dusk` / `scene-night`.
 Fase ini menimpa token *ambient* dan *glass* (`--ambient-text`, `--chrome-bg`, `--glass-*`)
 mengikuti waktu setempat. Ini **bukan** mode gelap — keempat fase tetap keluarga terang, dan
-`theme-color` runtime ikut kroma fase (chrome boot tetap `#FFF9EE`).
+`theme-color` runtime ikut kroma fase.
 
 ---
 
@@ -136,19 +140,19 @@ turun ke `--fs-h2` dengan `--fz-heading`. Ukuran bespoke yang sengaja dipertahan
 
 ---
 
-## 4. Bentuk, kedalaman, dan spasi (v6.1 CALM, O4 2026-08)
+## 4. Bentuk, kedalaman, dan spasi
 
 | Token | Nilai | Dipakai untuk |
 |---|---|---|
-| `--radius-lg` | `24px` | Kartu, panel besar (21px+ lama memetakan ke sini). |
-| `--radius-md` | `16px` | Kotak sekunder, kolom isian (15–20px lama). |
-| `--radius-sm` | `12px` | Chip, lencana (11–14px lama). |
-| `--radius-xs` | `8px` | Sudut kecil: tombol ghost, elemen mikro (6–10px lama). |
-| `--radius-pill` | `999px` | Tombol pil, kapsul (99/999 lama). |
+| `--radius-xl` | `34px` | Kartu hero (kartu Hari ini). |
+| `--radius-lg` | `28px` | Kartu, panel besar. |
+| `--radius-md` | `22px` | Kotak sekunder, kolom isian, tombol. |
+| `--radius-sm` | `18px` | Chip, lencana. |
+| `--radius-xs` | `14px` | Sudut kecil: tombol ghost, elemen mikro. |
+| `--radius-pill` | `999px` | Tombol pil, kapsul. |
 
-**Hukum pemetaan radius:** ≤4px tetap mentah (nub dekoratif); 6–10→`xs`; 11–14→`sm`;
-15–20→`md`; 21+→`lg`; 99/999→`pill`. Gelembung bicara memakai token per sudut:
-`var(--radius-md) var(--radius-md) var(--sp-1) var(--radius-md)`.
+Bayangan ambient: `--shadow-sm` `0 6px 16px rgba(46,39,36,.06)`, `--shadow-md`
+`0 14px 32px rgba(46,39,36,.07)`, `--shadow-lg` `0 20px 44px rgba(46,39,36,.10)`.
 
 ### Elevasi — maksimal 3 tingkat ambient
 
@@ -160,7 +164,7 @@ turun ke `--fs-h2` dengan `--fz-heading`. Ukuran bespoke yang sengaja dipertahan
 | E3 overlay | `--shadow-lg` | di atas scrim | `.modal-panel`, gerbang, `.toast`, kartu prasasti/ritual |
 
 **Tanda tangan taktil FIEZEL** kini token (saluran terpisah, BUKAN elevasi):
-`--lift-sun:0 4px 0 var(--sun-deep)` / `--lift-sun-press` (tombol utama),
+`--lift-sun:0 8px 18px rgba(155,58,74,.18)` / `--lift-sun-press` (tombol utama),
 `--lift-edge:0 3px 0 var(--surface-edge)` / `--lift-edge-press` (tombol biasa, launch-card).
 Boleh dikomposisi dengan SATU tingkat ambient: `box-shadow:var(--lift-sun),var(--shadow-sm)`.
 Jangan mengetik ulang offset mentah — pakai tokennya.
@@ -174,13 +178,20 @@ layar (border+bg+`--shadow-sm`). `.feedback` = tint + stripe status inset (tanpa
 `.card.card-flat` (benar-benar rata). Baris `.grammar-grid .card` dan semua kartu di
 panggung kuis selain kartu soal otomatis E0.
 
-### Tiga tingkat tombol
+### Empat keadaan tombol (F17)
 
-1. **Primary** — resep chunky v6 (satu-satunya sumber): `--sun`, `var(--lift-sun),var(--shadow-sm)`,
-   `--radius-md`, `min-height:52px`, tekan = `translateY(3px)`+`--lift-sun-press`. Satu per layar.
-2. **Secondary** — tombol biasa: border `--surface-edge` 1.5px + `var(--lift-edge)`, `--radius-md`.
-3. **Ghost** — `.text-button`: tanpa border/bayangan, `min-height:44px`, `--fs-small`,
-   hover = bidang `--panel-soft`. Lapisan primary era-accent dan `.luxe` raw-hex DIHAPUS (F2-16).
+Satu set token untuk semua tombol dan pilihan; tidak ada warna tombol yang ditulis mentah.
+
+1. **Primary**: bidang `--accent`, teks putih, `--radius-md`, `min-height:52px`,
+   bayangan `var(--lift-sun),var(--shadow-sm)`; hover/tekan `--accent-strong`. Satu per layar.
+2. **Secondary**: bidang `--panel`, tepi `--line-strong` 1,5px, teks `--text`.
+3. **Disabled**: resep global `button:disabled`: bidang `--panel-soft`, teks `--text-disabled`,
+   tepi `--line`, tanpa bayangan dan tanpa gerak tekan. Nonaktif selalu netral-redup, tidak pernah
+   berwarna (dulu pink di onboarding, sama dengan status terpilih).
+4. **Selected** (kartu pilihan, chip level): tepi `--accent` 2px + isian `--accent-soft` +
+   ikon centang, ≥3:1 terhadap sekitarnya, dengan `role="radio"` + `aria-checked`.
+
+Ghost (`.text-button`) tetap tanpa tepi/bayangan, `min-height:44px`, hover `--panel-soft`.
 
 ### Skala spasi — basis 4/8
 
@@ -270,7 +281,7 @@ jangan menambah sakelar baru untuk hal sejenis.
 |---|---|---|
 | Ikon aplikasi | `assets/brand/fiezel-icon.svg` (sumber) | Huruf F + dua batang: inisial merek sekaligus gelombang suara. |
 | Ikon ter-render | `favicon-64`, `apple-touch-icon` (180), `fiezel-icon-192`, `fiezel-icon-512` | Di-render dari SVG, diperkecil dengan LANCZOS. |
-| Wordmark | `assets/brand/fiezel-wordmark.svg` / `-mono.svg` | Topbar: tinta coklat + dua balok terracotta (token `--wordmark-*`). |
+| Wordmark | `assets/brand/fiezel-wordmark.svg` / `-mono.svg` | Topbar: tinta coklat + dua balok marun (token `--wordmark-*`). |
 | **Maskot PAW — HIDUP** | `assets/brand/paw-mascot-full.svg` / `-head.svg` (+ PNG 512) | Kucing maskot produk. Bukan konsep — dipakai di ritual harian, kuis, gerbang level. |
 | Motion maskot — HIDUP | `features/mascot/fiezel-mascot.js` + `fiezel-motion.css` | Custom element `<fiezel-mascot>`, 14 state. Panggil lewat `pawReact`/`pawFaceMarkup` di `app.js` (pembungkus itu yang menghormati kurangi-gerak), jangan lewat elemennya langsung. |
 
@@ -278,9 +289,9 @@ jangan menambah sakelar baru untuk hal sejenis.
 seluruh isi ikon harus berada di dalam lingkaran berjari-jari **204,8 px** dari pusat kanvas
 512. Periksa ulang setiap kali bentuknya diubah.
 
-**Warna chrome PWA**: `manifest.json` memakai `background_color:#FFF9EE` (menyambung mulus
-ke splash cream) dan `theme_color:#FFC700`; meta `theme-color` statis di `index.html`
-adalah `#FFF9EE` dan boleh ditimpa runtime oleh fase suasana (§1).
+**Warna chrome PWA**: `manifest.json` memakai `background_color:#FBF7F3` dan `theme_color:#FBF7F3`
+(= `--bg`); meta `theme-color` statis di `index.html` juga `#FBF7F3` dan boleh ditimpa runtime oleh
+fase suasana (§1).
 
 > **Maskot.** [PAW 2026-08] Koreksi catatan lama: m025-80 menghapus maskot **dari layar
 > splash saja** (lihat `features/brand/fiezel-splash.js`), bukan dari produk. Produk punya

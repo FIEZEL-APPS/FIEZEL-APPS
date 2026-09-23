@@ -1,13 +1,6 @@
 /* FIEZEL 2.0 — lapisan redesign (dimuat SETELAH style.css & fiezel-lux.css).
    Prinsip: token dulu, komponen kemudian. Maskot PAW tidak disentuh. */
-:root{
-  --radius-xl:34px;--radius-lg:28px;--radius-md:22px;--radius-sm:18px;--radius-xs:14px;
-  --shadow-sm:0 6px 16px rgba(46,39,36,.06);--shadow-md:0 14px 32px rgba(46,39,36,.07);--shadow-lg:0 20px 44px rgba(46,39,36,.10);
-  --fz-display:'FZ Plus Jakarta Sans',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
-  --maroon:#9B3A4A;--maroon-deep:#7E2D3B;--maroon-soft:#F6E9EB;
-  --pz-sky:#D8E8F4;--pz-sky-line:#C7DCEC;--pz-sky-ink:#2A566F;
-  --lift-sun:0 8px 18px rgba(155,58,74,.18);--lift-ink:0 10px 24px rgba(46,39,36,.16);--lift-line:0 4px 12px rgba(46,39,36,.06);
-}
+/* F17: token lapisan ini pindah ke :root tunggal di style.css (satu sumber token). */
 html[lang="th"]{--fz-display:'Noto Sans Thai Looped','FZ Plus Jakarta Sans',-apple-system,sans-serif}
 body{letter-spacing:-.005em}
 

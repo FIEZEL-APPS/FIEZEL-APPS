@@ -84,14 +84,16 @@ function ratio(a, b) {
   return (Math.max(x, y) + 0.05) / (Math.min(x, y) + 0.05);
 }
 
-test('style.css punya lebih dari satu blok :root, dan tes ini membaca semuanya', () => {
-  // Ini bukan gaya - inilah yang membuat bug palet terus lolos. Blok kedua menang, tetapi
-  // seluruh palet pastel justru hanya hidup di blok pertama. Siapa pun yang mengubah palet
-  // harus menyentuh keduanya, dan tes ini harus membaca keduanya.
+test('style.css punya TEPAT satu blok :root, dan fiezel-2.css tidak membuka :root sendiri', () => {
+  // Audit UI/UX 2026-09 F17: empat blok :root di style.css + satu di fiezel-2.css dulu saling
+  // menimpa, dan bug palet lolos karena orang menyunting blok yang kalah. Kini semua token
+  // hidup di satu blok; tes ini menjaga supaya blok kedua tidak tumbuh lagi.
   const roots = LINES.filter((l) => /^:root\s*{/.test(l)).length;
-  if (roots < 2) throw new Error('struktur berubah: hanya ' + roots + ' blok :root ditemukan');
+  if (roots !== 1) throw new Error('style.css harus punya tepat 1 blok :root, ditemukan ' + roots);
+  const f2 = fs.readFileSync(path.join(__fzRoot, 'fiezel-2.css'), 'utf8');
+  if (/^:root\s*{/m.test(f2)) throw new Error('fiezel-2.css membuka :root sendiri; pindahkan tokennya ke style.css');
   if (!LIGHT['--yellow'] || !LIGHT['--panel']) {
-    throw new Error('penggabungan blok :root gagal; token dari salah satu blok hilang');
+    throw new Error('pembacaan blok :root gagal; token hilang');
   }
 });
 
