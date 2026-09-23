@@ -238,8 +238,9 @@ html.fz-booting body{overflow:hidden}
   <link rel="stylesheet" href="./features/tutor-classroom/tutor-v3.css">
   <link rel="stylesheet" href="./features/learner-flow/learner-flow.css">
   <link rel="stylesheet" href="./features/learner-flow/home-polish.css">
-  <!-- Ruang Guru: tema terpisah untuk cangkang guru (features/teacher). Hanya aktif saat body.fz-teacher-mode. -->
-  <link rel="stylesheet" href="./features/teacher/teacher-shell.css">
+  <!-- Ruang Guru: tema cangkang guru (features/teacher/teacher-shell.css, 72 KB) TIDAK lagi
+       dimuat untuk murid (audit F28). FiezelTeacherShell.ensureCss() memasangnya begitu mode
+       guru/demo menyala. -->
   <link rel="stylesheet" href="./features/class-hub/class-hub.css">
   <!-- m026-01: motion system maskot PAW. Sengaja PALING AKHIR di antara stylesheet:
        berkasnya memakai nama token yang bertabrakan dengan style.css (--fz-gold,
