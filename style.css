@@ -5800,8 +5800,8 @@ html body #app .social-home-launcher .launch-card{background:var(--pz-sky);borde
 /* Audit F28 (2026-09-23): tiga aturan merek KelasKu dipindah dari teacher-shell.css karena
    layar murid juga memakainya; teacher-shell.css (72 KB) kini hanya dimuat di mode guru. */
 .kelasku-brand{display:inline-flex;align-items:baseline;gap:8px;white-space:nowrap;line-height:1}
-.kelasku-main{font-family:var(--tg-display,'Plus Jakarta Sans',sans-serif);font-weight:700;font-size:1.18rem;color:#0F224A;letter-spacing:-0.02em}
-.kelasku-tag{font-family:var(--tg-body,'Plus Jakarta Sans',sans-serif);font-size:0.52rem;font-weight:500;color:#5B6B82;letter-spacing:0.02em;text-transform:none}
+.kelasku-main{font-family:'FZ Instrument Serif',Georgia,serif;font-weight:700;font-size:1.18rem;color:#0F224A;letter-spacing:-0.02em}
+.kelasku-tag{font-family:'FZ Plus Jakarta Sans',-apple-system,'Segoe UI',sans-serif;font-size:0.52rem;font-weight:500;color:#5B6B82;letter-spacing:0.02em;text-transform:none}
 
 /* Audit F10 (2026-09-23): pasangan contoh salah/benar di intro materi. Tanda teks (\u2717/\u2713)
    membawa artinya - warna hanya penguat (kontrak non-warna). */
