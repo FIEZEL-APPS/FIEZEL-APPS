@@ -33,7 +33,7 @@
     // app.js:2757 — status skipped
     'auth.status-dilewati': 'Oke, lanjut tanpa akun.',
     // app.js:2758 — status idle
-    'auth.status-idle': 'Progres belajar, streak, dan AI tutor tersimpan di akunmu.',
+    'auth.status-idle': 'Progres belajar, runtun belajar, dan AI tutor tersimpan di akunmu.',
     // app.js:2753 — status pending
     'auth.status-menghubungkan': 'Menghubungkan ke Google…',
     // app.js:2752 — status signed_in (karakter … asli)
@@ -185,7 +185,7 @@
 
     // ---------- Auth Gate, Notification Gate, Update Prompt, Recovery, Shell, Toasts ----------
     'auth.gate-title': 'Masuk ke FIEZEL',
-    'auth.gate-body': 'Akunmu menyimpan progres belajar, streak, dan AI tutor supaya tetap sama di setiap perangkat.',
+    'auth.gate-body': 'Akunmu menyimpan progres belajar, runtun belajar, dan AI tutor supaya tetap sama di setiap perangkat.',
     'auth.status-check': 'Memeriksa status akun…',
     'auth.skip-btn': 'Lanjut tanpa akun',
     'auth.skip-help': 'Semua materi dan latihan tetap jalan tanpa akun — tutor AI dan sinkronisasi tersambung saat kamu masuk akun Google.',

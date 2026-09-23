@@ -152,12 +152,13 @@
     // ---------- features/onboarding/fiezel-onboarding.js ----------
     // Seluruh naskah yang terlihat di enam langkah onboarding hidup di sini. Satu-satunya
     // pengecualian adalah pemilih bahasa pertama yang sengaja bilingual sebelum locale ada.
-    'onboarding.brand-tag': 'Adaptive English',
+    'onboarding.brand-tag': 'Adaptive Languages',
     'onboarding.dialog-aria': 'Perkenalan FIEZEL',
     'onboarding.step-name': 'Nama',
     'onboarding.step-intro': 'Kenalan',
     'onboarding.step-goal': 'Tujuan & level',
     'onboarding.step-level': 'Tes awal',
+    'onboarding.step-level-aria': 'Perkiraan level bahasa',
     'onboarding.step-reminder': 'Pengingat',
     'onboarding.step-done': 'Selesai',
     'onboarding.last-step': ' · terakhir',
@@ -188,7 +189,7 @@
     'onboarding.name-aria': 'Nama panggilan kamu',
     'onboarding.greet-schedule': 'Soal pengingat: aku yang cari waktunya, kamu tinggal belajar.',
     'onboarding.schedule-title': 'Kapan kamu ingin belajar?',
-    'onboarding.schedule-body': 'Aku ingetin kamu belajar ya, biar streak-nya nggak putus.',
+    'onboarding.schedule-body': 'Aku ingetin kamu belajar ya, biar runtun belajarmu nggak putus.',
     'onboarding.schedule-note': 'Waktunya dipilih otomatis dari kebiasaan belajarmu.',
     'onboarding.summary-bubble': 'Sudah beres semua. Ini rangkumannya.',
     'onboarding.summary-ready-named': '{name}, siap belajar bersama FIEZEL!',
@@ -198,7 +199,7 @@
     'onboarding.summary-goal-label': 'Tujuan',
     'onboarding.summary-level-label': 'Perkiraan level',
     'onboarding.summary-reminder-label': 'Pengingat',
-    'onboarding.summary-streak-label': 'Streak',
+    'onboarding.summary-streak-label': 'Runtun',
     'onboarding.reminder-on': 'Aktif',
     'onboarding.summary-streak-zero': '0 hari · mulai sekarang!',
     'onboarding.btn-start': 'Mulai Belajar',
@@ -366,7 +367,7 @@
     // features/onboarding/fiezel-onboarding.js:552
     'onboarding.berapa-perkiraan-level-lang-inggrismu': '<p class="fiezel-note">Berapa perkiraan level bahasa Inggrismu sekarang?</p>',
     // features/onboarding/fiezel-onboarding.js:480
-    'onboarding.halo-me-fiezel-nama-you': '<h2 class="fiezel-title">Halo! Aku Fiezel. Nama kamu siapa?</h2>',
+    'onboarding.halo-me-fiezel-nama-you': '<h2 class="fiezel-title">Halo! Aku PAW. Nama kamu siapa?</h2>',
     // features/onboarding/fiezel-onboarding.js:553
     'onboarding.ini-cuma-perkiraan-awal-darimu': '<p class="fiezel-note">Ini cuma perkiraan awal darimu sendiri, akan disesuaikan otomatis setelah kamu mengerjakan latihan - bukan hasil tes.</p>',
     // features/onboarding/fiezel-onboarding.js:570

@@ -21,7 +21,7 @@
     'level.exam-pass-rule': 'Lulus mulai {threshold}%, dengan tiap seksi minimal grammar {minGrammar}% · kosakata {minVocab}% · bacaan {minReading}% · tanpa petunjuk, tanpa percobaan kedua',
     'level.exam-exit-rule': 'Keluar di tengah ujian (atau menutup aplikasinya) sesudah menjawab = percobaan terpakai, jeda 24 jamnya berlaku',
     'level.exam-time-note': 'Sekitar {menit} menit. Siapkan waktu yang tenang, tanpa gangguan',
-    'level.exam-fail-rule': 'Kalau belum lulus, jeda 24 jam untuk level ini — progres dan streak tetap utuh',
+    'level.exam-fail-rule': 'Kalau belum lulus, jeda 24 jam untuk level ini — progres dan runtun belajar tetap utuh',
     'level.exam-cancel-btn': 'Nanti dulu',
     'level.trust-line': 'Level kerja: {active} · belum dites · aman sampai {verified}',
     'level.detail-btn': 'detail',

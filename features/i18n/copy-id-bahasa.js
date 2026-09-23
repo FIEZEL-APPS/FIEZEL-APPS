@@ -25,14 +25,14 @@
     'bahasa.en': 'Bahasa Inggris',
     'bahasa.ja': 'Bahasa Jepang',
     'bahasa.en-catatan': 'Kursus lengkap',
-    'bahasa.ja-catatan': 'Tingkat A1/N5 · masih draf',
+    'bahasa.ja-catatan': 'Tingkat A1/N5 · kosakata & tata bahasa dasar',
     // m025-312: menulis DIKELUARKAN dari daftar yang belum ada - banknya sudah dibuat
     // (24 prompt N5, dua untuk tiap keluarga silabus) dan kartunya sudah ditawarkan.
     // Menyimak dan berbicara tetap disebut, dan alasannya kini disebut apa adanya:
     // bukan "banknya belum ditulis" melainkan suaranya masih bahasa Inggris.
     'bahasa.ja-peringatan': 'Kursus Jepang masih tahap awal: baru tingkat A1. Latihan menyimak dan berbicara belum ada karena suara dan pengenalan ucapannya masih bahasa Inggris, jadi kartunya disembunyikan. Latihan menulis sudah tersedia. Naskahnya belum ditinjau penutur asli.',
     'bahasa.chip-coba-ja': 'Coba Bahasa Jepang',
-    'bahasa.chip-coba-ja-sub': 'Tingkat A1/N5 · masih draf',
+    'bahasa.chip-coba-ja-sub': 'Tingkat A1/N5 · kosakata & tata bahasa dasar',
     'bahasa.chip-aktif-ja': 'Bahasa Jepang aktif',
     'bahasa.chip-kembali-en': 'Ketuk untuk kembali ke Bahasa Inggris',
     'bahasa.chip-aria': 'Ganti bahasa yang dipelajari',

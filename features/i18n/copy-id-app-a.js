@@ -266,7 +266,7 @@
     // app.js:181 — LOGIN_MESSAGES[] (top-level const)
     'login.pesan-22-lead': 'Bikin dia jadi skill sehari-hari: baca, ngerti pola, recall kata, dan berani salah.',
     // app.js:182 — LOGIN_MESSAGES[] (top-level const)
-    'login.pesan-23-headline': 'Woy, streak lu sayang kalau dibiarin mati gara-gara “nanti”.',
+    'login.pesan-23-headline': 'Woy, runtun belajar lu sayang kalau dibiarin mati gara-gara “nanti”.',
     // app.js:182 — LOGIN_MESSAGES[] (top-level const)
     'login.pesan-23-lead': 'Buka FIEZEL, selesaikan target minimum, terus bebas lanjut aktivitas lain.',
     // app.js:183 — LOGIN_MESSAGES[] (top-level const)
@@ -346,7 +346,7 @@
     // app.js:201 — LOGIN_MESSAGES[] (top-level const)
     'login.pesan-42-lead': 'Nggak ada hukuman di sini. Buka satu sesi, rantainya nyambung lagi, kita lanjut kayak nggak terjadi apa-apa.',
     // app.js:202 — LOGIN_MESSAGES[] (top-level const)
-    'login.pesan-43-headline': 'Streak lu lagi jalan. Sayang banget kalau putus gara-gara mager sepuluh menit.',
+    'login.pesan-43-headline': 'Runtun belajar lu lagi jalan. Sayang banget kalau putus gara-gara mager sepuluh menit.',
     // app.js:202 — LOGIN_MESSAGES[] (top-level const)
     'login.pesan-43-lead': 'Yang bikin skill naik bukan hari terbaik lu, tapi hari-hari biasa yang tetap lu isi.',
     // app.js:203 — LOGIN_MESSAGES[] (top-level const)
@@ -558,7 +558,7 @@
     // app.js:273 — REMINDER_MESSAGES.daily_goal
     'push.pesan-daily-goal-3': 'Bro, tinggal dikit buat jaga ritme. Beresin dulu sebelum lanjut rebahan.',
     // app.js:274 — REMINDER_MESSAGES.daily_goal
-    'push.pesan-daily-goal-4': 'No pressure, tapi streak lu sayang 😭 kelarin target kecil hari ini.',
+    'push.pesan-daily-goal-4': 'No pressure, tapi runtun belajar lu sayang 😭 kelarin target kecil hari ini.',
     // app.js:277 — REMINDER_MESSAGES.due_review
     'push.pesan-due-review-1': 'Otak lu mulai nge-blur beberapa materi 😭 Review bentar sebelum lupa menang.',
     // app.js:278 — REMINDER_MESSAGES.due_review

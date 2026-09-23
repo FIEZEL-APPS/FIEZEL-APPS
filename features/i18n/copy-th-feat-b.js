@@ -149,12 +149,13 @@
     'tour.ready': 'พร้อม!',
 
     // ---------- onboarding.* ----------
-    'onboarding.brand-tag': 'ภาษาอังกฤษที่ปรับตามผู้เรียน',
+    'onboarding.brand-tag': 'ภาษาที่ปรับตามผู้เรียน',
     'onboarding.dialog-aria': 'การแนะนำ FIEZEL',
     'onboarding.step-name': 'ชื่อ',
     'onboarding.step-intro': 'ทำความรู้จัก',
     'onboarding.step-goal': 'เป้าหมายและระดับ',
     'onboarding.step-level': 'แบบทดสอบแรก',
+    'onboarding.step-level-aria': 'ระดับภาษาโดยประมาณ',
     'onboarding.step-reminder': 'ตัวเตือน',
     'onboarding.step-done': 'เสร็จแล้ว',
     'onboarding.last-step': ' · ขั้นสุดท้าย',
@@ -330,7 +331,7 @@
     'onboarding.apa-level-lang-you': '<h2 class="fiezel-title">อยากทำแบบทดสอบตอนนี้เลยไหม?</h2>',
     'onboarding.apa-tujuan-you-study': '<h2 class="fiezel-title">คุณเรียนเพื่อเป้าหมายอะไร?</h2>',
     'onboarding.berapa-perkiraan-level-lang-inggrismu': '<p class="fiezel-note">ตอนนี้คุณประเมินระดับภาษาอังกฤษของตัวเองไว้ประมาณไหน?</p>',
-    'onboarding.halo-me-fiezel-nama-you': '<h2 class="fiezel-title">สวัสดี! เราคือ Fiezel คุณชื่ออะไร?</h2>',
+    'onboarding.halo-me-fiezel-nama-you': '<h2 class="fiezel-title">สวัสดี! เราคือ PAW คุณชื่ออะไร?</h2>',
     'onboarding.ini-cuma-perkiraan-awal-darimu': '<p class="fiezel-note">นี่เป็นแค่การประเมินเริ่มต้นจากตัวคุณเอง ระบบจะปรับให้อัตโนมัติหลังคุณทำแบบฝึกหัด - ไม่ใช่ผลสอบ</p>',
     'onboarding.isinya-item-listening-grammar-and': '<p class="fiezel-note">{soal} ข้อ listening, grammar และ vocabulary ประมาณ {menit} นาที ไม่มีคะแนน ไม่มีบทลงโทษ หยุดเมื่อไหร่ก็ได้</p>',
     'onboarding.tes-awal-isi-lite': '<p class="fiezel-note">{soal} ข้อ grammar และคำศัพท์ ประมาณ {menit} นาที ไม่มีคะแนน ไม่มีบทลงโทษ หยุดเมื่อไหร่ก็ได้</p>',

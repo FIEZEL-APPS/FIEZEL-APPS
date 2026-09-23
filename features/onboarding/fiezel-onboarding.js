@@ -748,13 +748,15 @@
     var goals = goalOptions(env);
     var cards = goals.map(function (g) {
       var selected = g.id === selectedGoal;
-      return '<button type="button" class="fiezel-goal-card' + (selected ? ' is-selected' : '') + '" data-ob-goal="' + escapeHtml(g.id) + '">'
+      return '<button type="button" role="radio" aria-checked="' + (selected ? 'true' : 'false') + '" class="fiezel-goal-card' + (selected ? ' is-selected' : '') + '" data-ob-goal="' + escapeHtml(g.id) + '">'
         + '<b>' + escapeHtml(g.label) + '</b></button>';
     }).join('');
-    var levelRow = selectedGoal ? '<div class="fiezel-level-row">' + CEFR_LEVELS.map(function (lv) {
+    var levelRow = selectedGoal ? '<div class="fiezel-level-row" role="radiogroup" aria-label="' + escapeHtml(T('onboarding.step-level-aria')) + '">' + CEFR_LEVELS.map(function (lv) {
       var selected = lv === selectedLevel;
-      return '<button type="button" class="fiezel-level-chip' + (selected ? ' is-selected' : '') + '" data-ob-level="' + lv + '">' + lv + '</button>';
+      return '<button type="button" role="radio" aria-checked="' + (selected ? 'true' : 'false') + '" class="fiezel-level-chip' + (selected ? ' is-selected' : '') + '" data-ob-level="' + lv + '">' + lv + '</button>';
     }).join('') + '</div>' : '';
+    // Audit F18 (2026-09-23): kartu tujuan dan chip level dulu tanpa role/aria-checked -
+    // pembaca layar tidak tahu mana yang terpilih (kartu peran di langkah 1 sudah benar).
     // Audit F05: "Kembali" kini ada di langkah ini (dulu tidak, padahal langkah sesudahnya
     // punya), dan jalan lewatinya satu saja - "Lewati langkah ini" di bawah, yang tetap
     // mengantar ke tawaran tes awal alih-alih menutup seluruh perkenalan.
@@ -768,7 +770,7 @@
         T('onboarding.tujuanmu-yang-menentukan-materi-mana'))
       + '<div class="fiezel-sheet" data-ob-step="3">'
       + T('onboarding.apa-tujuan-you-study')
-      + '<div class="fiezel-goal-grid">' + cards + '</div>'
+      + '<div class="fiezel-goal-grid" role="radiogroup" aria-label="' + escapeHtml(T('onboarding.step-goal')) + '">' + cards + '</div>'
       + (selectedGoal ? T('onboarding.apa-level-lang-you-inline') + levelRow
         + T('onboarding.level-perkiraan-singkat') : '')
       + btn(T('onboarding.next-l554'), 'data-ob-advance' + (selectedGoal ? '' : ' disabled'))
