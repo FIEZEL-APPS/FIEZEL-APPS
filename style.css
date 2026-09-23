@@ -5802,3 +5802,10 @@ html body #app .social-home-launcher .launch-card{background:var(--pz-sky);borde
 .kelasku-brand{display:inline-flex;align-items:baseline;gap:8px;white-space:nowrap;line-height:1}
 .kelasku-main{font-family:var(--tg-display,'Plus Jakarta Sans',sans-serif);font-weight:700;font-size:1.18rem;color:#0F224A;letter-spacing:-0.02em}
 .kelasku-tag{font-family:var(--tg-body,'Plus Jakarta Sans',sans-serif);font-size:0.52rem;font-weight:500;color:#5B6B82;letter-spacing:0.02em;text-transform:none}
+
+/* Audit F10 (2026-09-23): pasangan contoh salah/benar di intro materi. Tanda teks (\u2717/\u2713)
+   membawa artinya - warna hanya penguat (kontrak non-warna). */
+.lesson-contrast{display:grid;gap:6px;margin:10px 0 0}
+.lesson-contrast span{display:block;padding:8px 12px;border-radius:var(--radius-sm);font-weight:600;line-height:1.45}
+.lesson-contrast .is-wrong{background:var(--bad-soft);color:var(--bad);text-decoration:line-through;text-decoration-thickness:1px}
+.lesson-contrast .is-right{background:var(--good-soft);color:var(--good)}
