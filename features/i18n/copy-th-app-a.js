@@ -329,6 +329,8 @@
     'quiz.keyakinan-aria': 'เมื่อกี้มั่นใจแค่ไหน',
     'quiz.keyakinan-kecatat': '{label} — บันทึกแล้ว',
     'quiz.keyakinan-lihat-pembahasan': 'ดูคำอธิบาย',
+    'quiz.lanjut-soal-berikut': 'ไปต่อ',
+    'quiz.pembahasan-lengkap': 'คำอธิบายฉบับเต็ม',
     'quiz.keyakinan-skala-1': 'ยังไม่แน่ใจ',
     'quiz.keyakinan-skala-2': 'ค่อนข้างมั่นใจ',
     'quiz.keyakinan-skala-3': 'มั่นใจมาก',

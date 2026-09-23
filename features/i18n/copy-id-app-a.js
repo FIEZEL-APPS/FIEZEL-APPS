@@ -625,6 +625,8 @@
     'quiz.keyakinan-kecatat': `{label} — kecatat`,
     // app.js:1325 — tombol lanjut popup keyakinan
     'quiz.keyakinan-lihat-pembahasan': 'Lihat pembahasan',
+    'quiz.lanjut-soal-berikut': 'Lanjut',
+    'quiz.pembahasan-lengkap': 'Pembahasan lengkap',
     // app.js:1323
     'quiz.keyakinan-skala-1': 'Masih ragu',
     // app.js:1323

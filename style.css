@@ -862,7 +862,7 @@ input[type="checkbox"],input[type="radio"]{min-width:24px;min-height:24px}
 }
 .quiz-floating-next-btn:active{transform:scale(.96);transition-duration:.08s}
 .quiz-floating-next-btn svg{width:20px;height:20px}
-.quiz-shell{padding-bottom:84px!important}
+.quiz-shell{padding-bottom:calc(92px + env(safe-area-inset-bottom, 0px))!important}/* audit F08: 52px tombol + 16px jarak + nafas, ditambah area aman iOS - pembahasan terakhir tidak pernah tertutup */
 /* ==========================================================================
    Popup keyakinan (m025-133)
    ==========================================================================
@@ -4491,7 +4491,8 @@ body.fz-lesson-mode .topline{position:sticky;top:0;z-index:30;
 .prasasti-badge.is-locked .prasasti-icon{background:#F1EADB;color:rgba(36,26,17,.35)}
 .prasasti-badge.is-locked b{color:rgba(36,26,17,.5)}
 .fz-prasasti-moment{position:fixed;inset:0;z-index:96;display:grid;place-items:center;padding:22px;background:rgba(36,26,17,.34)}
-.fz-prasasti-card{width:min(340px,92vw);display:grid;justify-items:center;gap:10px;text-align:center;padding:26px 22px 20px;border-radius:var(--radius-lg);background:var(--bg);box-shadow:var(--shadow-lg)}
+.fz-prasasti-close{position:absolute;top:8px;right:8px;min-width:44px;min-height:44px}/* audit F13: modal lencana wajib punya tombol tutup */
+.fz-prasasti-card{position:relative;width:min(340px,92vw);display:grid;justify-items:center;gap:10px;text-align:center;padding:26px 22px 20px;border-radius:var(--radius-lg);background:var(--bg);box-shadow:var(--shadow-lg)}
 .fz-prasasti-hero{display:grid;justify-items:center;gap:6px}
 .fz-prasasti-hero .prasasti-icon{width:72px;height:72px;background:linear-gradient(140deg,#FFF2C9,#FCE3B0);color:#8A6A24;box-shadow:0 3px 12px rgba(201,162,75,.4)}
 .fz-prasasti-hero .prasasti-icon svg{width:38px;height:38px}
@@ -4805,6 +4806,19 @@ body.fz-lesson-mode.fz-stage-quiz .quiz-shell{padding-bottom:calc(28px + env(saf
 .quiz-bubble::before{left:-19px;border-right-color:var(--line)}
 .quiz-bubble::after{left:-16px;border-right-color:var(--panel-soft)}
 @media (max-height:640px){.quiz-stage .fz-paw-above{width:clamp(64px,20%,96px)}.quiz-stage{margin-bottom:8px}}
+/* Audit F11 (2026-09-23): di ponsel gelembung di samping maskot hanya ~45% lebar layar -
+   satu kalimat soal jadi tujuh baris dan pilihan D terdorong keluar layar. Di bawah 640px
+   soal kembali selebar kartu; maskot mengecil dan duduk DI ATAS gelembung, ekornya
+   menunjuk ke atas. Lebar maskot (bukan tinggi) yang dikunci, jadi ruang tetap dipesan
+   saat render (kontrak nol-CLS PAW C3). */
+@media (max-width:640px){
+  .quiz-stage{flex-direction:column;align-items:flex-start;gap:12px}
+  .quiz-stage .fz-paw-above{width:clamp(72px,22%,96px)}
+  .quiz-bubble{width:100%}
+  .quiz-bubble::before,.quiz-bubble::after{top:auto;left:28px;transform:none}
+  .quiz-bubble::before{top:-19px;border-right-color:transparent;border-bottom-color:var(--line)}
+  .quiz-bubble::after{top:-16px;border-right-color:transparent;border-bottom-color:var(--panel-soft)}
+}
 
 /* URUTAN LAPIS: KARTU DI ATAS MASKOT.
    .fz-paw-slot memasang z-index:1 dan .fz-mascot .fz-svg memakai overflow:visible - jadi

@@ -48,8 +48,8 @@ function sourceBlock(name, source = app) {
  */
 const COPY = {
   menu: [
-    ['Mulai dari Home',
-      'Ini beranda kamu: progres harian, streak, dan saran latihan dari PAW. Semua perjalananmu berangkat dari sini.'],
+    ['Mulai dari Hari ini', // audit F12 2026-09-23: satu nama per tujuan (tab = "Hari ini")
+      'Ini halaman Hari ini: progres harian, runtun belajar, dan saran latihan dari PAW. Semua perjalananmu berangkat dari sini.'],
     /* m025-246: dua langkah ini menunjuk tab yang berbeda sekarang - Vocab dan Reading
        tidak lagi punya tab sendiri; keduanya hidup di dalam Latihan, dan Peta berganti
        nama jadi Progres. Naskahnya diperbarui bersama reports/copy-tour-gems.md, sesuai

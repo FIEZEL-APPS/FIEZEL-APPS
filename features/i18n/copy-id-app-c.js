@@ -575,6 +575,7 @@
     'prasasti.catatan-galeri': 'Prasasti hanya terukir dari hal yang benar-benar kamu kerjakan — tidak dijual, tidak bisa dipalsukan.',
     // app.js:5756 — showPrasastiMoment: tombol simpan
     'prasasti.simpan': 'Simpan di galeri',
+    'prasasti.tutup': 'Tutup',
     // app.js:4735 — ritual: baris runtun
     'ritual.streak': 'Runtun {days} hari — jaga nyalanya.',
     // app.js:4998 — installHealthReportMarkup: catatan privasi

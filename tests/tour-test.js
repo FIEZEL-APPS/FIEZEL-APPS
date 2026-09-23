@@ -246,15 +246,15 @@ test('pilihan Thai setelah modul termuat mengganti langkah dan seluruh chrome tu
     if (!require.cache[thPath]) require(thPath);
     i18n.setLocale('th');
 
-    assert.strictEqual(tour.stepsFor('menu')[0].title, 'เริ่มจาก Home',
+    assert.strictEqual(tour.stepsFor('menu')[0].title, 'เริ่มจากหน้าวันนี้',
       'judul harus dibaca ulang dari locale aktif, bukan hasil T() saat require');
     const env = fakeEnv();
     const run = tour.show(env, { force: true });
     assert.strictEqual(run.element.getAttribute('aria-label'), 'ทำความรู้จัก FIEZEL แบบสั้น ๆ');
-    assert.ok(/เริ่มจาก Home/.test(run.element.innerHTML), 'judul langkah pertama harus Thai');
+    assert.ok(/เริ่มจากหน้าวันนี้/.test(run.element.innerHTML), 'judul langkah pertama harus Thai');
     assert.ok(/ข้าม/.test(run.element.innerHTML), 'tombol lewati harus Thai');
     assert.ok(/ต่อไป/.test(run.element.innerHTML), 'tombol lanjut harus Thai');
-    assert.ok(!/Kenalan cepat|Mulai dari Home|Lewati/.test(run.element.innerHTML),
+    assert.ok(!/Kenalan cepat|Mulai dari Hari ini|Lewati/.test(run.element.innerHTML),
       'copy Indonesia tidak boleh bocor ke tur Thai');
     run.close();
 

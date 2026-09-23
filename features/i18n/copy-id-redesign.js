@@ -33,7 +33,7 @@
     'nav.school': '<span class="kelasku-wordmark">KelasKu</span>',
     'nav.school-aria': 'Ruang KelasKu dan tugas sekolah',
     'nav.home-primary': 'Hari ini',
-    'nav.home-primary-aria': 'Beranda dan fokus harian',
+    'nav.home-primary-aria': 'Hari ini, fokus harian',
     'nav.progress': 'Progres',
     'nav.progress-aria': 'Peta CEFR dan kemahiran',
     'nav.profile': 'Profil',

@@ -7,7 +7,7 @@
     'social.tab-profile': 'Profil',
     'social.tab-friends': 'Teman',
     'social.tab-leaderboard': 'Papan Peringkat',
-    'social.shell-title': 'Online & Teman',
+    'social.shell-title': 'Profil',
     'social.shell-desc': 'Saling menyaksikan proses belajar — nama samaran, tanpa chat, dan sepenuhnya opsional.',
     'social.loading': 'Menyiapkan fitur online…',
     'social.offline-title': 'Kamu sedang offline',

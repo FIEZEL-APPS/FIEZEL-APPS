@@ -213,7 +213,7 @@
     'skills.lead-listening': 'Dengar dulu, baru jawab. Kalau belum jelas, putar lagi — itu bagian dari latihan.',
     'skills.catatan-level': 'Level kamu: <b>{level}</b> · ganti dari tombol Level',
     'settings.all-can-diatur-dikelompokkan-each': 'Ketuk kelompok untuk membuka pengaturannya.',
-    'social.shell-title': 'Teman',
+    'social.shell-title': 'Profil',
     'social.shell-desc': 'Belajar bareng teman — pakai nama samaran, tanpa chat, dan boleh dimatikan kapan saja.',
     'quiz.vonis-benar': 'Benar! Mantap.',
     'quiz.vonis-salah': 'Belum tepat. Nggak apa-apa, coba lagi.',
