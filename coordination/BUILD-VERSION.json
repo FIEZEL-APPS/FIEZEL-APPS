@@ -1,7 +1,7 @@
 {
-  "version": "m025-361",
+  "version": "m025-362",
   "claimedBy": "branch claude/adoring-goodall-nshlug",
-  "claimedAt": "2026-09-22T22:17:58.594Z",
-  "reason": "kuis: label pilihan satu baris + satu tombol Lanjut di bawah dialog",
+  "claimedAt": "2026-09-23T17:20:06.139Z",
+  "reason": "kursus Jepang: furigana/romaji, tabel kana, segera hadir",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }
