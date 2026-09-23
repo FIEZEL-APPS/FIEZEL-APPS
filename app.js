@@ -511,6 +511,10 @@ function friendlySkillName(skill){
 function difficultyLabel(d){return({1:FiezelI18n.t('diff.dasar'),2:FiezelI18n.t('diff.dasar'),3:FiezelI18n.t('diff.menengah'),4:FiezelI18n.t('diff.menengah'),5:FiezelI18n.t('diff.lanjut'),6:FiezelI18n.t('diff.lanjut')})[Number(d)]||''}
 function grammarFamilyLabel(item){return GRAMMAR_FAMILY_LABELS[item?.[6]]||FiezelI18n.t('grammar.keluarga-fallback')}
 function grammarRuleIndonesian(item){return GRAMMAR_FAMILY_RULES[item?.[6]]||GRAMMAR_FAMILY_RULES.core_grammar}
+/* Audit F10: intro materi mengajarkan ATURAN topiknya (explanation.ruleId per template, 328/328
+   terisi id; overlay Thai menulis slot yang sama), bukan strategi umum per keluarga yang dulu
+   dipakai bersama puluhan materi. Strategi keluarga tetap jadi cadangan bila aturannya kosong. */
+function grammarLessonRule(item){try{const r=String(grammarMeta(item).rule||'').trim();if(r)return r}catch(_){}return grammarRuleIndonesian(item)}
 function grammarClue(base){const text=String(base||'');const hit=text.match(/\b(look|now|right now|every day|usually|always|yesterday|last [a-z]+|in \d{4}|since|for \d+|tomorrow|next [a-z]+|already|yet|if|unless|than|said|told|must|should|might|because|although)\b/i)?.[0];return hit?FiezelI18n.t('grammar.petunjuk-clue',{petunjuk:hit}):FiezelI18n.t('grammar.petunjuk-umum')}
 /**
  * Diagnosis Indonesia untuk tiap nama miskonsepsi di bank soal.
@@ -10344,7 +10348,7 @@ function grammarLessonHelpMarkup(skill){
 }
 function openGrammarLessonHelp(skill){const html=grammarLessonHelpMarkup(skill);if(html)openModal(html);return !!html}
 window.openGrammarLessonHelp=openGrammarLessonHelp;
-function renderGrammarLesson(skill){const meta=GRAMMAR_ITEMS.find(x=>x.skill===skill);if(!meta||meta.level!==getActiveLevel())return showToast(FiezelI18n.t('grammar.lesson-hanya-tersedia-pada-level',{level:getActiveLevel()}));const lessonUnlock=lessonUnlockState(skill,state,bktMasteredSkills());if(lessonUnlock.locked)return showToast(lessonLockMessage(lessonUnlock));const arr=G[skill]||[];if(!arr.length)return showToast(FiezelI18n.t('grammar.lesson-belum-memiliki-materi'));const item=arr[0],base=item[0],opts=item[1]||[],correct=opts[item[2]],rule=grammarRuleIndonesian(item),clue=grammarClue(base),curriculum=grammarCurriculumEntry(skill)||meta;const prereq=Array.isArray(curriculum.prerequisites)&&curriculum.prerequisites.length?FiezelI18n.t('grammar.prasyarat-2',{join:curriculum.prerequisites.map(friendlySkillName).join(', ')}):FiezelI18n.t('grammar.lesson-fondasi-pertama');/* 2026-08-31 (permintaan OWNER: "design ulang bagian grammar seperti listening"):
+function renderGrammarLesson(skill){const meta=GRAMMAR_ITEMS.find(x=>x.skill===skill);if(!meta||meta.level!==getActiveLevel())return showToast(FiezelI18n.t('grammar.lesson-hanya-tersedia-pada-level',{level:getActiveLevel()}));const lessonUnlock=lessonUnlockState(skill,state,bktMasteredSkills());if(lessonUnlock.locked)return showToast(lessonLockMessage(lessonUnlock));const arr=G[skill]||[];if(!arr.length)return showToast(FiezelI18n.t('grammar.lesson-belum-memiliki-materi'));const item=arr[0],base=item[0],opts=item[1]||[],correct=opts[item[2]],rule=grammarLessonRule(item),clue=grammarClue(base),curriculum=grammarCurriculumEntry(skill)||meta;const prereq=Array.isArray(curriculum.prerequisites)&&curriculum.prerequisites.length?FiezelI18n.t('grammar.prasyarat-2',{join:curriculum.prerequisites.map(friendlySkillName).join(', ')}):FiezelI18n.t('grammar.lesson-fondasi-pertama');/* 2026-08-31 (permintaan OWNER: "design ulang bagian grammar seperti listening"):
      layar materi memakai resep yang sama dengan sesi Listening, dan alasannya sama.
      Yang berdiri di sini dulu adalah shell(judul, subjudul) - dan judulnya DICETAK DUA
      KALI: sekali sebagai hero halaman, sekali lagi sebagai <h2 class="lesson-title"> di
@@ -10377,6 +10381,11 @@ function buildGrammarLessonQuestions(skill,count=GRAMMAR_SESSION_SIZE){const met
   const shift=own.length>1?1:0;
   for(let variant=0;variant<GRAMMAR_PRACTICE_MODES.length&&unique.length<count;variant++)for(let i=0;i<own.length;i++)if(take(makeGrammarQuestion(skill,own[(variant+i+shift)%own.length],variant,skill)))break;
   for(let variant=0;variant<GRAMMAR_PRACTICE_MODES.length&&unique.length<count;variant++)for(const item of own){if(unique.length>=count)break;take(makeGrammarQuestion(skill,item,variant,skill))}
+  /* Audit F10: materi dengan SATU template memakai kalimatnya sebagai contoh di intro; kartu
+     yang memajang kalimat contoh itu apa adanya dipindah ke akhir sesi, jadi soal 1 bukan
+     contoh yang jawabannya baru saja ditunjukkan. */
+  const exampleStem=String(own[0]?.[0]||'').replace(/\s+/g,' ').trim().toLowerCase();
+  if(exampleStem&&unique.length>1){const idx=unique.findIndex(q=>String(q.question||'').replace(/\s+/g,' ').trim().toLowerCase().includes(exampleStem));if(idx===0)unique.push(unique.shift())}
   return unique}
 function practiceSkill(skill){if((GRAMMAR_ITEMS.find(x=>x.skill===skill)?.level||'')!==getActiveLevel())return showToast(FiezelI18n.t('grammar.pilih-lesson-terlebih-dahulu',{level:getActiveLevel()}));const unlock=lessonUnlockState(skill,state,bktMasteredSkills());if(unlock.locked)return showToast(lessonLockMessage(unlock));const questions=buildGrammarLessonQuestions(skill,GRAMMAR_SESSION_SIZE);if(questions.length<GRAMMAR_SESSION_SIZE)return showToast(FiezelI18n.t('grammar.lesson-new-memiliki-item-valid',{jumlahSoal:questions.length}));quizLoop({type:'grammar',count:GRAMMAR_SESSION_SIZE,pool:questions,factory:item=>item,preserveOrder:true})}
 /* ---- Sesi Kilat: 10 soal grammar campuran lintas lesson satu level ----------------------

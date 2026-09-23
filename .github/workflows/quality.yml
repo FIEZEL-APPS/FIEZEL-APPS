@@ -1216,6 +1216,8 @@ jobs:
         run: node tests/teacher-lazy-load-test.js
       - name: 'Ruang Guru: satu lapis navigasi (audit F25)'
         run: node tests/teacher-single-nav-test.js
+      - name: 'Intro materi mengajarkan aturan topiknya (audit F10)'
+        run: node tests/grammar-lesson-rule-test.js
       - name: 'Penjaga bahasa target duduk di rute, bukan di kartu'
         # Gerbang japanese-surface-honesty di atas HIJAU sepanjang audit m025-314, dan tetap
         # ada tiga pintu ke latihan dengar/bicara yang tidak dijaganya: kartu skill hub di
