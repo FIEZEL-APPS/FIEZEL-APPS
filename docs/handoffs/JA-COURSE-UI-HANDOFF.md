@@ -15,6 +15,13 @@ Kursus Jepang kini berbeda dari kursus Inggris di tiga lapis:
      menyembunyikannya (disimpan di `fiezel-ja-display-v1`, diterapkan sebagai kelas body
      `fz-ja-no-furigana` / `fz-ja-no-romaji`, tanpa melukis ulang). Tampil di kuis
      kosakata, flashcard, dan kata hari ini.
+   - **Semua soal, jawaban, dan pembahasan** di layar kuis dan flashcard: pengamat
+     (`FiezelJaUi.observe`, dipasang `renderInner` saat kursus Jepang aktif) memberi setiap
+     potongan teks Jepang furigana di atas kanji + baris romaji, dan memasang tombol
+     ふりがな / ローマ字 di bawah topbar setiap kuis. Bacaan diturunkan dari bank kosakata:
+     kata utuh terpanjang dulu, lalu batang kanji dari kata ber-okurigana (遊ぶ → 遊 = あそ)
+     untuk bentuk berkonjugasi; は/を/へ sesudah kata dibaca wa/o/e. Romaji HANYA ditulis bila
+     seluruh potongan terbaca; kanji di luar bank dibiarkan tanpa furigana.
    - Tabel kana (rute `kana`, diblokir di kursus Inggris): 46 gojūon + 25 dakuten,
      hiragana ↔ katakana.
    - Kata hari ini (今日の言葉) di Kyō, deterministik per hari dari bank level aktif.
@@ -38,6 +45,6 @@ hadir tidak bisa diketuk, label JLPT, rute kana diblokir di kursus Inggris.
   lepaskan `TARGET_LANG_BLOCKED_VIEWS.ja`.
 - Kanji: butuh data urutan goresan (mis. KanjiVG) dan bank kanji N5.
 - JLPT Moshi: butuh bank soal format JLPT.
-- Furigana di kalimat contoh: bank belum menyimpan bacaan per kata; perlu segmentasi.
+- Kanji di luar bank kosakata (mis. 友だち bila tidak ada) tidak mendapat furigana/romaji; kamus bacaan (mis. KANJIDIC/JMdict) akan menutupnya.
 - Suara kana di tabel: menunggu suara ja-JP yang sama.
 - Kostum PAW khas Jepang (hachimaki): registry outfit tertutup, butuh keputusan OWNER.

@@ -12,6 +12,8 @@
  *       belum ada — pasangan jujur dari japanese-surface-honesty-test.
  *   J6  label JLPT hanya tampilan: A1→N5 ... C1→N1.
  *   J7  kursus Inggris memblokir rute 'kana'; app.js memasang modul lewat index.html + sw.js.
+ *   J8  soal & jawaban: teks Jepang di dalam kuis diberi furigana + romaji dari bank kosakata;
+ *       romaji hanya ditulis bila SELURUH potongan terbaca, partikel は/を/へ dibaca wa/o/e.
  */
 const assert = require('assert');
 const fs = require('fs');
@@ -33,8 +35,9 @@ let passed = 0;
 function ok(cond, msg) { assert.ok(cond, msg); passed++; console.log('ok - ' + msg); }
 
 // J1 + J2
-ok(J.wordMarkup('青い', 'あおい · aoi') === '<ruby class="ja-word" lang="ja">青い<rp>(</rp><rt>あおい</rt><rp>)</rp></ruby>',
-  'J1 kata ber-kanji mendapat furigana <ruby>');
+ok(J.wordMarkup('青い', 'あおい · aoi') === '<span class="ja-word-wrap" lang="ja"><ruby class="ja-word">青<rp>(</rp><rt>あお</rt><rp>)</rp></ruby>い</span>',
+  'J1 kata ber-kanji mendapat furigana <ruby> hanya di atas kanjinya');
+ok(J.wordMarkup('教室', 'きょうしつ · kyoushitsu').indexOf('<rt>きょうしつ</rt>') >= 0, 'J1 kata kanji penuh: furigana utuh');
 ok(J.wordMarkup('ください', 'ください · kudasai').indexOf('<ruby') < 0, 'J1 kata tanpa kanji tidak diberi ruby');
 ok(J.wordMarkup('<b>', 'x · y').indexOf('<b>') < 0, 'J1 kata di-escape');
 ok(J.phoneticMarkup('あおい · aoi') === '<span class="ja-romaji">aoi</span>', 'J2 baris bacaan hanya romaji');
@@ -74,5 +77,23 @@ ok(/en:Object\.freeze\(\['kana'\]\)/.test(app), "J7 kursus Inggris memblokir rut
 ok(/VALID_VIEWS=new Set\(\['kana',/.test(app) && app.indexOf("if(state.view==='kana')kanaView();") >= 0, 'J7 rute kana terdaftar dan dilukis');
 ok(index.indexOf('./features/japanese/fiezel-ja-ui.js') >= 0 && sw.indexOf('./features/japanese/fiezel-ja-ui.js') >= 0,
   'J7 modul dimuat index.html dan di-cache sw.js');
+
+// J8
+const bank = JSON.parse(fs.readFileSync(path.join(__fzRoot, 'content/ja/vocabulary-master-ja.json'), 'utf8'))
+  .words.map((w) => ({ word: w.word, phonetic: w.phonetic }));
+function romajiOf(text) {
+  const m = J.annotateText(text, bank).match(/class="ja-romaji ja-run-romaji"[^>]*>([^<]*)</);
+  return m ? m[1] : null;
+}
+ok(romajiOf('私は学生です。') === 'watashi wa gakusei desu.', 'J8 partikel は dibaca wa');
+ok(romajiOf('そちらはいかがですか。') === 'sochira wa ikaga desu ka.', 'J8 はい tidak menelan partikel は');
+ok(romajiOf('学校へ行きます。') === 'gakkou e ikimasu.', 'J8 batang kanji + okurigana (行きます) terbaca');
+ok(/<rt>がっこう<\/rt>/.test(J.annotateText('学校へ行きます。', bank)), 'J8 furigana untuk kata utuh dari bank');
+ok(/<rt>あそ<\/rt>.*<\/ruby>び/.test(J.annotateText('遊びました。', bank)), 'J8 furigana batang kanji untuk bentuk berkonjugasi (遊びました)');
+ok(romajiOf('日曜日は友だちと遊ぶ。') === null, 'J8 potongan yang tak terbaca utuh tidak diberi romaji setengah jadi');
+ok(J.annotateText('Dalam kalimat "他の色", apa?', bank).indexOf('Dalam kalimat &quot;') === 0, 'J8 teks non-Jepang dibiarkan (di-escape)');
+ok(J.kanaToRomaji('きょうしつ') === 'kyoushitsu' && J.kanaToRomaji('がっこう') === 'gakkou' && J.kanaToRomaji('じゃあ') === 'jyaa',
+  'J8 kana → romaji mengikuti gaya bank (ou, jyo, konsonan ganda)');
+ok(app.indexOf("self.FiezelJaUi?.observe?.($('app'),()=>V)") >= 0, 'J8 pengamat anotasi dipasang saat kursus Jepang aktif');
 
 console.log('FIEZEL japanese ja-ui: PASS (' + passed + ')');
