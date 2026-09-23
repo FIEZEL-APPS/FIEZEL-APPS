@@ -236,7 +236,7 @@ test('smoke DOM-stub: alur murid (terima → kerjakan → hasil → laporan w/s)
   assert.ok(tEl.innerHTML.includes('tclass-result-items') && tEl.innerHTML.includes('1 murid keliru') && /Bentuk dasar dipakai/.test(tEl.innerHTML), 'guru melihat soal keliru + miskonsepsi');
   assert.ok(tEl.innerHTML.includes('tclass-remedial'));
   tEl.fire('click', btn({ 'data-ch': 'ttab', 'data-tab': 'braincore' }));
-  assert.ok(tEl.innerHTML.includes('Braincore menyarankan. Guru memutuskan. Murid belajar.') && /Bentuk dasar dipakai/.test(tEl.innerHTML));
+  assert.ok(tEl.innerHTML.includes('Saran otomatis. Guru memutuskan. Murid belajar.') && /Bentuk dasar dipakai/.test(tEl.innerHTML));
   tEl.fire('click', btn({ 'data-ch': 'remedial', 'data-skill': 'past_tense', 'data-title': 'Remedial Past tense' }));
   assert.strictEqual(Hub._teacherUi().tab, 'buat'); assert.strictEqual(Hub._teacherUi().draft.title, 'Remedial Past tense');
 });

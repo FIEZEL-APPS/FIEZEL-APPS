@@ -389,8 +389,9 @@ check('S6c · tombol "Coba dulu" dan "Ikut Ujian Skip Level" tidak ada lagi di U
 const gateBlock = sourceBlock('openLevelEntryGate');
 check('S6d · popup gerbang memakai keputusan murni, dua tombol, dan maskot PAW',
   /levelEntryDecision\(/.test(gateBlock) && /entryExam/.test(gateBlock) && /entryLater/.test(gateBlock) &&
-  /pawFaceMarkup\(\)/.test(gateBlock) && /levelEntryDefer\(/.test(gateBlock) && /startLevelExam\(/.test(gateBlock),
-  '"Ikuti ujian" membuka ujian berikutnya di rantai; "Nanti aja" mengalihkan ke A1');
+  /pawFaceMarkup\(\)/.test(gateBlock) && /levelEntryDefer\(/.test(gateBlock) && /openActiveLevelExamPanel\(/.test(gateBlock) &&
+  /startPlacement\(/.test(gateBlock) && !/startLevelExam\(/.test(gateBlock),
+  '"Ikuti ujian" membuka LAYAR ATURAN ujian berikutnya di rantai (audit F03: tidak pernah langsung soal pertama); murid yang belum tes awal ditawari tes awal, bukan ujian berpenalti; "Nanti aja" mengalihkan ke A1');
 check('S6e · gerakan popup hanya transform+opacity, memakai token easing, dan hormat pada gerak minimal',
   /pawMotionAllowed\(/.test(gateBlock) && /is-static/.test(gateBlock),
   'kelas is-static memadamkan animasi saat murid mematikan gerak; prefers-reduced-motion ditangani di style.css');

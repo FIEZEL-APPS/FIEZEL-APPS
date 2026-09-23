@@ -113,8 +113,8 @@
     // ---------- features/onboarding/fiezel-tour.js ----------
     // Copy VERBATIM dari reports/copy-tour-gems.md; tests/tours-test.js membandingkan karakter
     // demi karakter dengan nilai runtime langkah tur.
-    'tour.menu-home-title': 'Mulai dari Home',
-    'tour.menu-home-body': 'Ini beranda kamu: progres harian, streak, dan saran latihan dari PAW. Semua perjalananmu berangkat dari sini.',
+    'tour.menu-home-title': 'Mulai dari Hari ini',
+    'tour.menu-home-body': 'Ini halaman Hari ini: progres harian, runtun belajar, dan saran latihan dari PAW. Semua perjalananmu berangkat dari sini.',
     'tour.menu-vocab-title': 'Tab Latihan',
     'tour.menu-vocab-body': 'Semua latihan mandiri ada di sini: Vocabulary, Grammar, Reading, bicara \u0026 dengar, nulis, sama perpustakaan. Buka kalau kamu pengin ngelatih satu hal tertentu.',
     'tour.menu-reading-title': 'Tab Progres',
@@ -126,7 +126,7 @@
     'tour.menu-level-title': 'Chip level kamu',
     'tour.menu-level-body': 'Chip ini nunjukin level aktifmu. Ketuk buat pindah level \u2014 materi dan latihan langsung ngikutin pilihanmu.',
     'tour.menu-settings-title': 'Tombol Pengaturan',
-    'tour.menu-settings-body': 'Ini pintu ke FIEZEL Control Room: suara, gerak, tampilan, sampai data belajarmu \u2014 semuanya kamu yang pegang.',
+    'tour.menu-settings-body': 'Ini pintu ke Pengaturan: suara, gerak, tampilan, sampai data belajarmu \u2014 semuanya kamu yang pegang.',
     'tour.menu-end-title': 'Tur menu selesai!',
     'tour.menu-end-body': 'Kamu udah kenal semua menunya. Tur lanjutan bakal muncul otomatis tiap kamu masuk fitur baru \u2014 santai aja.',
     'tour.lib-play-title': 'Ketuk buat mulai',
@@ -136,7 +136,7 @@
     'tour.lib-translate-title': 'Terjemahan Otomatis',
     'tour.lib-translate-body': 'Nyalakan toggle ini, dan tiap kalimat subtitle langsung diterjemahkan ke bahasa Indonesia. Harganya 1 Gem Terjemahan per sesi, dan butuh jaringan, ya.',
     'tour.lib-speed-title': 'Mau lebih pelan?',
-    'tour.lib-speed-body': 'Kecepatan suara bisa kamu atur di FIEZEL Control Room, lewat tombol Pengaturan. Setelannya nempel buat semua sesi berikutnya.',
+    'tour.lib-speed-body': 'Kecepatan suara bisa kamu atur di Pengaturan. Setelannya nempel buat semua sesi berikutnya.',
     'tour.listen-once-title': 'Dengar dulu, baru jawab',
     'tour.listen-once-body': 'Putar audionya dan pasang telinga baik-baik. Kalau belum nangkep, ulang — ada jatah replay di tiap soal.',
     'tour.listen-miss-title': 'Meleset? Nggak apa-apa',
@@ -144,7 +144,7 @@
     'tour.listen-translate-title': 'Terjemahan Indonesia',
     'tour.listen-translate-body': 'Toggle ini nampilin terjemahan tiap soal, seharga 1 Gem Terjemahan per sesi. Gem-nya kamu dapat gratis dari streak jawaban benar.',
     'tour.listen-speed-title': 'Atur kecepatan suara',
-    'tour.listen-speed-body': 'Terlalu cepat? Kecepatan suara bisa diatur di FIEZEL Control Room \u2014 buka lewat tombol Pengaturan kapan aja.',
+    'tour.listen-speed-body': 'Terlalu cepat? Kecepatan suara bisa diatur di Pengaturan kapan aja.',
     'tour.dialog-aria': 'Kenalan cepat dengan FIEZEL',
     'tour.skip': 'Lewati',
     'tour.ready': 'Siap!',
@@ -152,12 +152,13 @@
     // ---------- features/onboarding/fiezel-onboarding.js ----------
     // Seluruh naskah yang terlihat di enam langkah onboarding hidup di sini. Satu-satunya
     // pengecualian adalah pemilih bahasa pertama yang sengaja bilingual sebelum locale ada.
-    'onboarding.brand-tag': 'Adaptive English',
+    'onboarding.brand-tag': 'Adaptive Languages',
     'onboarding.dialog-aria': 'Perkenalan FIEZEL',
     'onboarding.step-name': 'Nama',
     'onboarding.step-intro': 'Kenalan',
-    'onboarding.step-goal': 'Tujuan',
-    'onboarding.step-level': 'Level',
+    'onboarding.step-goal': 'Tujuan & level',
+    'onboarding.step-level': 'Tes awal',
+    'onboarding.step-level-aria': 'Perkiraan level bahasa',
     'onboarding.step-reminder': 'Pengingat',
     'onboarding.step-done': 'Selesai',
     'onboarding.last-step': ' · terakhir',
@@ -174,7 +175,7 @@
     'onboarding.btn-back': 'Kembali',
     'onboarding.btn-skip-all': 'Lewati',
     'onboarding.btn-skip-step': 'Lewati langkah ini',
-    'onboarding.btn-placement': 'Mulai tes penempatan',
+    'onboarding.btn-placement': 'Mulai tes awal',
     'onboarding.classcode-label': 'Kode kelas dari guru (opsional)',
     'onboarding.role-question': 'Kamu masuk sebagai siapa?',
     'onboarding.role-aria': 'Pilih peran: murid atau guru',
@@ -188,7 +189,7 @@
     'onboarding.name-aria': 'Nama panggilan kamu',
     'onboarding.greet-schedule': 'Soal pengingat: aku yang cari waktunya, kamu tinggal belajar.',
     'onboarding.schedule-title': 'Kapan kamu ingin belajar?',
-    'onboarding.schedule-body': 'Aku ingetin kamu belajar ya, biar streak-nya nggak putus.',
+    'onboarding.schedule-body': 'Aku ingetin kamu belajar ya, biar runtun belajarmu nggak putus.',
     'onboarding.schedule-note': 'Waktunya dipilih otomatis dari kebiasaan belajarmu.',
     'onboarding.summary-bubble': 'Sudah beres semua. Ini rangkumannya.',
     'onboarding.summary-ready-named': '{name}, siap belajar bersama FIEZEL!',
@@ -198,7 +199,7 @@
     'onboarding.summary-goal-label': 'Tujuan',
     'onboarding.summary-level-label': 'Perkiraan level',
     'onboarding.summary-reminder-label': 'Pengingat',
-    'onboarding.summary-streak-label': 'Streak',
+    'onboarding.summary-streak-label': 'Runtun',
     'onboarding.reminder-on': 'Aktif',
     'onboarding.summary-streak-zero': '0 hari · mulai sekarang!',
     'onboarding.btn-start': 'Mulai Belajar',
@@ -360,17 +361,19 @@
     // features/onboarding/fiezel-onboarding.js:568
     'onboarding.apa-level-lang-you-inline': '<h2 class="fiezel-title">Apa level bahasa kamu?</h2>',
     'onboarding.level-perkiraan-singkat': '<p class="fiezel-note">Perkiraan aja, bukan hasil tes.</p>',
-    'onboarding.apa-level-lang-you': '<h2 class="fiezel-title">Apa level bahasa kamu?</h2>',
+    'onboarding.apa-level-lang-you': '<h2 class="fiezel-title">Mau dites sekarang?</h2>',
     // features/onboarding/fiezel-onboarding.js:550
     'onboarding.apa-tujuan-you-study': '<h2 class="fiezel-title">Apa tujuan kamu belajar?</h2>',
     // features/onboarding/fiezel-onboarding.js:552
     'onboarding.berapa-perkiraan-level-lang-inggrismu': '<p class="fiezel-note">Berapa perkiraan level bahasa Inggrismu sekarang?</p>',
     // features/onboarding/fiezel-onboarding.js:480
-    'onboarding.halo-me-fiezel-nama-you': '<h2 class="fiezel-title">Halo! Aku Fiezel. Nama kamu siapa?</h2>',
+    'onboarding.halo-me-fiezel-nama-you': '<h2 class="fiezel-title">Halo! Aku PAW. Nama kamu siapa?</h2>',
     // features/onboarding/fiezel-onboarding.js:553
     'onboarding.ini-cuma-perkiraan-awal-darimu': '<p class="fiezel-note">Ini cuma perkiraan awal darimu sendiri, akan disesuaikan otomatis setelah kamu mengerjakan latihan - bukan hasil tes.</p>',
     // features/onboarding/fiezel-onboarding.js:570
-    'onboarding.isinya-item-listening-grammar-and': '<p class="fiezel-note">25 soal listening, grammar, dan vocabulary. Bisa dihentikan kapan saja.</p>',
+    'onboarding.isinya-item-listening-grammar-and': '<p class="fiezel-note">{soal} soal listening, grammar, dan vocabulary, sekitar {menit} menit. Tanpa nilai, tanpa hukuman, dan bisa dihentikan kapan saja.</p>',
+    'onboarding.tes-awal-isi-lite': '<p class="fiezel-note">{soal} soal grammar dan kosakata, sekitar {menit} menit. Tanpa nilai, tanpa hukuman, dan bisa dihentikan kapan saja.</p>',
+    'onboarding.btn-skip-test': 'Nanti saja',
     // features/onboarding/fiezel-onboarding.js:569
     'onboarding.kerjakan-santai-aja-ini-bukan': '<p class="fiezel-body">Kerjakan santai aja, ini bukan ujian — cuma buat aku kenal kemampuanmu.</p>',
     // features/onboarding/fiezel-onboarding.js:481

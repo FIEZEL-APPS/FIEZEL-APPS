@@ -154,7 +154,7 @@
     // app.js:4319 — openLevelPanel: tombol pakai hasil tes
     'level.pakai-hasil-tes': 'Gunakan hasil tes ({level})',
     // app.js:4549 — activeLevelTrustMarkup: hitungan probation
-    'level.probation-hitung': 'Level {level} · salah {miss}/{batas} · terverifikasi sampai {verif}',
+    'level.probation-hitung': 'Level kerja: {level} · {miss} dari {batas} jatah salah terpakai · aman sampai {verif}',
     // app.js:4525 — openActiveLevelExamPanel: paragraf rantai
     'level.rantai-ujian': 'Ujiannya berantai: level terverifikasimu sekarang <b>{verif}</b>, jadi yang boleh diuji adalah <b>{berikut}</b>. Satu ujian, satu anak tangga.',
     // app.js:4524 — openActiveLevelExamPanel: riwayat percobaan
@@ -337,7 +337,7 @@
     // app.js:5222 — accountSettingsMarkup: judul kartu
     'akun.judul': 'Akun',
     // app.js:5222 — accountSettingsMarkup: keterangan kartu
-    'akun.keterangan': 'Progres belajar, streak, dan tutor AI tersimpan di akun ini.',
+    'akun.keterangan': 'Progres belajar, runtun belajar, dan tutor AI tersimpan di akun ini.',
     // app.js:5222 — accountSettingsMarkup: sub belum
     'akun.sub-belum': 'Belum ada akun tersambung',
     // app.js:5222 — accountSettingsMarkup: sub tersambung
@@ -513,7 +513,7 @@
     // app.js:4527 — openActiveLevelExamPanel: fakta 2
     'level.fakta-acak': 'Soal diacak dari bank level {level} setiap percobaan',
     // app.js:4527 — openActiveLevelExamPanel: fakta 4
-    'level.fakta-jeda': 'Kalau belum lulus, jeda 24 jam untuk level ini — progres dan streak tetap utuh',
+    'level.fakta-jeda': 'Kalau belum lulus, jeda 24 jam untuk level ini — progres dan runtun belajar tetap utuh',
     // app.js:4527 — openActiveLevelExamPanel: fakta 1
     'level.fakta-komposisi': '{jumlah} soal: grammar {grammar}, kosakata {vocab}, bacaan {bacaan}',
     // app.js:4527 — openActiveLevelExamPanel: fakta 3
@@ -575,6 +575,7 @@
     'prasasti.catatan-galeri': 'Prasasti hanya terukir dari hal yang benar-benar kamu kerjakan — tidak dijual, tidak bisa dipalsukan.',
     // app.js:5756 — showPrasastiMoment: tombol simpan
     'prasasti.simpan': 'Simpan di galeri',
+    'prasasti.tutup': 'Tutup',
     // app.js:4735 — ritual: baris runtun
     'ritual.streak': 'Runtun {days} hari — jaga nyalanya.',
     // app.js:4998 — installHealthReportMarkup: catatan privasi

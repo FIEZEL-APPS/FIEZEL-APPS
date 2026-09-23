@@ -65,7 +65,7 @@
   var MIN_TAIL_MS = 1360;
   var COPY = Object.freeze({
     word: 'FIEZEL',
-    tagline: 'ADAPTIVE ENGLISH'
+    tagline: 'ADAPTIVE LANGUAGES' // audit F20 2026-09-23: ada kursus Jepang - tagline tidak boleh menjanjikan Inggris saja
   });
 
   /* Garis waktu master v4 — nilai teruji QA prototipe (crossfade mengikuti

@@ -748,15 +748,20 @@
     var goals = goalOptions(env);
     var cards = goals.map(function (g) {
       var selected = g.id === selectedGoal;
-      return '<button type="button" class="fiezel-goal-card' + (selected ? ' is-selected' : '') + '" data-ob-goal="' + escapeHtml(g.id) + '">'
+      return '<button type="button" role="radio" aria-checked="' + (selected ? 'true' : 'false') + '" class="fiezel-goal-card' + (selected ? ' is-selected' : '') + '" data-ob-goal="' + escapeHtml(g.id) + '">'
         + '<b>' + escapeHtml(g.label) + '</b></button>';
     }).join('');
-    var levelRow = selectedGoal ? '<div class="fiezel-level-row">' + CEFR_LEVELS.map(function (lv) {
+    var levelRow = selectedGoal ? '<div class="fiezel-level-row" role="radiogroup" aria-label="' + escapeHtml(T('onboarding.step-level-aria')) + '">' + CEFR_LEVELS.map(function (lv) {
       var selected = lv === selectedLevel;
-      return '<button type="button" class="fiezel-level-chip' + (selected ? ' is-selected' : '') + '" data-ob-level="' + lv + '">' + lv + '</button>';
+      return '<button type="button" role="radio" aria-checked="' + (selected ? 'true' : 'false') + '" class="fiezel-level-chip' + (selected ? ' is-selected' : '') + '" data-ob-level="' + lv + '">' + lv + '</button>';
     }).join('') + '</div>' : '';
+    // Audit F18 (2026-09-23): kartu tujuan dan chip level dulu tanpa role/aria-checked -
+    // pembaca layar tidak tahu mana yang terpilih (kartu peran di langkah 1 sudah benar).
+    // Audit F05: "Kembali" kini ada di langkah ini (dulu tidak, padahal langkah sesudahnya
+    // punya), dan jalan lewatinya satu saja - "Lewati langkah ini" di bawah, yang tetap
+    // mengantar ke tawaran tes awal alih-alih menutup seluruh perkenalan.
     return reveal(env)
-      + topbar(false)
+      + topbar(true, uxOn('leanIntro') ? false : undefined)
       + stepper(3)
       // Selama tujuan belum dipilih maskot MENGAMATI pilihan (curious). Begitu tujuan
       // terpilih dan enam chip level muncul, pekerjaannya berubah: ia menimbang jawaban
@@ -765,7 +770,7 @@
         T('onboarding.tujuanmu-yang-menentukan-materi-mana'))
       + '<div class="fiezel-sheet" data-ob-step="3">'
       + T('onboarding.apa-tujuan-you-study')
-      + '<div class="fiezel-goal-grid">' + cards + '</div>'
+      + '<div class="fiezel-goal-grid" role="radiogroup" aria-label="' + escapeHtml(T('onboarding.step-goal')) + '">' + cards + '</div>'
       + (selectedGoal ? T('onboarding.apa-level-lang-you-inline') + levelRow
         + T('onboarding.level-perkiraan-singkat') : '')
       + btn(T('onboarding.next-l554'), 'data-ob-advance' + (selectedGoal ? '' : ' disabled'))
@@ -776,16 +781,41 @@
   // ---------------------------------------------------------------------------------------
   // Step 4: Placement (mengarah ke tes 25 soal yang sungguhan, bukan versi 4-5 soal palsu)
   // ---------------------------------------------------------------------------------------
+  /* Audit F01/F04 (2026-09-22): jumlah soal tes awal dibaca dari sumber yang SAMA dengan tes
+     yang benar-benar dijalankan. Salinan lama memaku "25 soal listening" sementara
+     placement-lite (bendera bawaan) menjalankan 12 soal tanpa listening - janji pertama
+     produk meleset sejak angka pertamanya. Sumbernya fiezel-diagnostic-targets.js
+     (leveltest.totalQuestions / liteQuestions); app.js memakai angka yang sama. */
+  function placementFacts(env) {
+    var lite = uxOn('placementLite'), targets = null;
+    try { targets = (env && env.FiezelDiagnosticTargets) || null; } catch (_) {}
+    if (!targets && typeof require === 'function' && typeof module === 'object') {
+      try { targets = require('../diagnostics/fiezel-diagnostic-targets.js'); } catch (_) {}
+    }
+    var lt = (targets && targets.leveltest) || {};
+    var soal = lite ? Number(lt.liteQuestions) || 12 : Number(lt.totalQuestions) || 25;
+    return { lite: lite, soal: soal, menit: lite ? 5 : 10 };
+  }
+
   function placementMarkup(env) {
+    var facts = placementFacts(env);
+    // Audit F05: SATU jalan lewati per langkah. Dulu langkah ini punya tiga jalan keluar
+    // yang artinya berbeda ("Lewati" di pojok, "Lewati langkah ini", "Kembali"). Pada
+    // perkenalan ringkas (bawaan) ia langkah TERAKHIR, jadi kedua "lewati" berarti hal yang
+    // sama - yang tersisa satu: "Nanti saja" (data-ob-skip, menutup perkenalan). Urutan enam
+    // langkah lama (leanIntro mati) masih punya jadwal & ringkasan sesudahnya, jadi di sana
+    // "Lewati langkah ini" tetap berarti maju satu langkah.
+    var seq = stepSequence(), last = seq[seq.length - 1] === PLACEMENT_STEP;
     return reveal(env)
-      + topbar(true)
+      + topbar(true, last ? false : undefined)
       + stepper(4)
       + greet(env, 'encouraging', T('onboarding.santai-this-bukan-ujian-can'))
       + '<div class="fiezel-sheet" data-ob-step="4">'
       + T('onboarding.apa-level-lang-you')
-      + T('onboarding.isinya-item-listening-grammar-and')
+      + T(facts.lite ? 'onboarding.tes-awal-isi-lite' : 'onboarding.isinya-item-listening-grammar-and', { soal: facts.soal, menit: facts.menit })
       + btn(T('onboarding.btn-placement'), 'data-ob-primary')
-      + btn(T('onboarding.btn-skip-step'), 'data-ob-step-skip', 'ghost')
+      + (last ? btn(T('onboarding.btn-skip-test'), 'data-ob-skip', 'ghost')
+        : btn(T('onboarding.btn-skip-step'), 'data-ob-step-skip', 'ghost'))
       + '</div>';
   }
 

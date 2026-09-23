@@ -580,6 +580,13 @@ input[type="checkbox"],input[type="radio"]{min-width:24px;min-height:24px}
    teks 2,4:1, tidak terbaca. Sekarang keadaan nonaktif punya warnanya sendiri (4,8:1):
    tetap jelas terbaca sebagai TIDAK BISA DIKLIK, tanpa menghilang. */
 .quiz-next:disabled{background:var(--panel-soft);color:var(--text-disabled);border-color:var(--line);opacity:1}
+/* m025-361: setelah menjawab, Lanjut tampil DUA kali - di sini dan di bilah melayang
+   bawah (.quiz-floating-bar). Yang dipertahankan yang di zona jempol. #quizNext TIDAK
+   dicabut dari markup: ia tetap satu-satunya pintu maju terprogram (bilah melayang,
+   confidencePopNext, lewati-listening, dan tests/r2-ux-overhaul-smoke-test memanggilnya);
+   click() tetap jalan pada elemen display:none. Setiap jalur yang menyalakannya juga
+   memanggil showQuizFloatingNext(). */
+.quiz-topbar .quiz-next{display:none}
 
 /* m025-114: soal listening di tes penempatan. Tombolnya harus terbaca sebagai satu-satunya
    jalan ke soal - naskahnya sengaja tidak pernah dirender, jadi tanpa tombol ini murid
@@ -830,11 +837,16 @@ input[type="checkbox"],input[type="radio"]{min-width:24px;min-height:24px}
 .quiz-audio-wave span:nth-child(5){animation-delay:.15s;height:40%}
 @keyframes audioWavePulse{0%{transform:scaleY(.3)}100%{transform:scaleY(1)}}
 
-/* Floating Next Action Bar (Thumb-Zone Ergonomics) */
+/* Floating Next Action Bar (Thumb-Zone Ergonomics)
+   m025-361: z-index dulu 999 - di atas SEMUA lapisan, termasuk dialog .modal (z100), jadi
+   "Lanjut" menimpa "Yakin mau keluar?" dan bisa diketuk di balik dialog itu. Bilah ini
+   bagian halaman kuis, bukan lapisan: 50 = di atas isi kuis (topbar z30, pembimbing z41),
+   di bawah setiap lapisan (dock tutor z55, overlay z60+, toast z80 yang tembus-pointer,
+   lembar z95, .modal z100, #confidencePop). */
 .quiz-floating-bar{
   position:fixed;bottom:calc(16px + env(safe-area-inset-bottom, 0px));
   left:0;right:0;display:flex;justify-content:center;align-items:center;
-  padding:0 16px;z-index:999;pointer-events:none;opacity:0;
+  padding:0 16px;z-index:50;pointer-events:none;opacity:0;
   transform:translateY(16px);
   transition:opacity .22s cubic-bezier(.16,1,.3,1),transform .22s cubic-bezier(.16,1,.3,1);
 }
@@ -850,7 +862,7 @@ input[type="checkbox"],input[type="radio"]{min-width:24px;min-height:24px}
 }
 .quiz-floating-next-btn:active{transform:scale(.96);transition-duration:.08s}
 .quiz-floating-next-btn svg{width:20px;height:20px}
-.quiz-shell{padding-bottom:84px!important}
+.quiz-shell{padding-bottom:calc(92px + env(safe-area-inset-bottom, 0px))!important}/* audit F08: 52px tombol + 16px jarak + nafas, ditambah area aman iOS - pembahasan terakhir tidak pernah tertutup */
 /* ==========================================================================
    Popup keyakinan (m025-133)
    ==========================================================================
@@ -3463,11 +3475,14 @@ eteach) dan tawaran berhenti (reathe).
 /* --- Bottom Navigation (.bottomnav .nav[data-view="classroom"]) --- */
 .bottomnav .nav[data-view="classroom"] .kelasku-wordmark,
 .bottomnav .nav .kelasku-wordmark {
+  /* Audit F12 (2026-09-23): di nav bawah wordmark mengikuti gaya label tab lain - dulu
+     selalu hijau tebal sehingga KelasKu tampak aktif di setiap layar. Hijau + tebal kini
+     hanya saat tabnya memang aktif (aturan .active di bawah). */
   font-size: var(--fs-caption, 0.75rem);
-  font-weight: 800;
+  font-weight: inherit;
   line-height: 1.35;
   letter-spacing: -0.02em;
-  color: #1F7A63 !important;
+  color: inherit !important;
   white-space: nowrap;
   display: block;
   text-align: center;
@@ -4167,11 +4182,19 @@ body.fz-lesson-mode .topline{position:sticky;top:0;z-index:30;
 .option.correct::after,
 .option.wrong::after,
 .option.was-tried::after{
-  display:block;width:fit-content;margin-top:9px;padding:3px 9px;border-radius:var(--radius-pill);
-  font-size:.75rem;font-weight:700;letter-spacing:.08em
+  display:block;width:fit-content;margin-top:0;padding:3px 9px;border-radius:var(--radius-pill);
+  font-size:.75rem;font-weight:700;letter-spacing:.08em;white-space:nowrap;flex:none
 }
 /* Tag ditaruh DI BAWAH teks pilihan, bukan mengambang di sudut: pilihan jawaban bisa
-   dua baris pada layar sempit, dan tag mengambang akan menabraknya. */
+   dua baris pada layar sempit, dan tag mengambang akan menabraknya.
+   m025-361: niat "di bawah" itu dulu tidak pernah terjadi. .option mewarisi
+   display:inline-flex ARAH BARIS dari resep button global, jadi ::after menjadi flex item
+   DI SAMPING teks. Di HP teks jawaban memakan lebar, tag dipaksa menyusut sampai
+   min-content - dan word-break:break-word (fiezel-2.css) membuat min-content itu selebar
+   SATU huruf: "DICOBA" tersusun ke bawah per huruf. Pilihan bertag kini disusun kolom
+   (tag benar-benar turun, dengan lebar penuh), nowrap + flex:none menjaganya satu baris.
+   Perataan tetap milik resep button (tengah), sama dengan pilihan yang belum bertag. */
+.option.correct,.option.wrong,.option.was-tried{flex-direction:column;gap:9px}
 .option.correct::after{content:"BENAR";background:var(--good);color:var(--on-core)}
 .option.wrong::after{content:"PILIHANMU";background:var(--bad);color:var(--on-core)}
 :lang(th) .option.correct::after{content:"ถูกต้อง"}
@@ -4471,7 +4494,8 @@ body.fz-lesson-mode .topline{position:sticky;top:0;z-index:30;
 .prasasti-badge.is-locked .prasasti-icon{background:#F1EADB;color:rgba(36,26,17,.35)}
 .prasasti-badge.is-locked b{color:rgba(36,26,17,.5)}
 .fz-prasasti-moment{position:fixed;inset:0;z-index:96;display:grid;place-items:center;padding:22px;background:rgba(36,26,17,.34)}
-.fz-prasasti-card{width:min(340px,92vw);display:grid;justify-items:center;gap:10px;text-align:center;padding:26px 22px 20px;border-radius:var(--radius-lg);background:var(--bg);box-shadow:var(--shadow-lg)}
+.fz-prasasti-close{position:absolute;top:8px;right:8px;min-width:44px;min-height:44px}/* audit F13: modal lencana wajib punya tombol tutup */
+.fz-prasasti-card{position:relative;width:min(340px,92vw);display:grid;justify-items:center;gap:10px;text-align:center;padding:26px 22px 20px;border-radius:var(--radius-lg);background:var(--bg);box-shadow:var(--shadow-lg)}
 .fz-prasasti-hero{display:grid;justify-items:center;gap:6px}
 .fz-prasasti-hero .prasasti-icon{width:72px;height:72px;background:linear-gradient(140deg,#FFF2C9,#FCE3B0);color:#8A6A24;box-shadow:0 3px 12px rgba(201,162,75,.4)}
 .fz-prasasti-hero .prasasti-icon svg{width:38px;height:38px}
@@ -4785,6 +4809,19 @@ body.fz-lesson-mode.fz-stage-quiz .quiz-shell{padding-bottom:calc(28px + env(saf
 .quiz-bubble::before{left:-19px;border-right-color:var(--line)}
 .quiz-bubble::after{left:-16px;border-right-color:var(--panel-soft)}
 @media (max-height:640px){.quiz-stage .fz-paw-above{width:clamp(64px,20%,96px)}.quiz-stage{margin-bottom:8px}}
+/* Audit F11 (2026-09-23): di ponsel gelembung di samping maskot hanya ~45% lebar layar -
+   satu kalimat soal jadi tujuh baris dan pilihan D terdorong keluar layar. Di bawah 640px
+   soal kembali selebar kartu; maskot mengecil dan duduk DI ATAS gelembung, ekornya
+   menunjuk ke atas. Lebar maskot (bukan tinggi) yang dikunci, jadi ruang tetap dipesan
+   saat render (kontrak nol-CLS PAW C3). */
+@media (max-width:640px){
+  .quiz-stage{flex-direction:column;align-items:flex-start;gap:12px}
+  .quiz-stage .fz-paw-above{width:clamp(72px,22%,96px)}
+  .quiz-bubble{width:100%}
+  .quiz-bubble::before,.quiz-bubble::after{top:auto;left:28px;transform:none}
+  .quiz-bubble::before{top:-19px;border-right-color:transparent;border-bottom-color:var(--line)}
+  .quiz-bubble::after{top:-16px;border-right-color:transparent;border-bottom-color:var(--panel-soft)}
+}
 
 /* URUTAN LAPIS: KARTU DI ATAS MASKOT.
    .fz-paw-slot memasang z-index:1 dan .fz-mascot .fz-svg memakai overflow:visible - jadi
@@ -5748,3 +5785,27 @@ html body #app .social-home-launcher .launch-card{background:var(--pz-sky);borde
 .social-request-who small{color:var(--muted)}
 .social-request-acts{display:flex;align-items:center;gap:8px;flex:none}
 .social-request-acts .primary{padding:8px 14px;min-height:40px}
+
+/* ---------- Audit F16 (2026-09-23): Pengaturan di ponsel ----------
+   Di 390px baris pengaturan ber-dropdown membagi lebar jadi tiga kolom: deskripsi turun satu
+   kata per baris dan dropdown terpotong di tepi modal ("Bahasa Inggris — Ku…"). Di bawah
+   480px barisnya ditumpuk: ikon + label di atas, kontrol selebar baris di bawahnya. Baris
+   bersakelar (checkbox) tetap satu baris - sakelarnya kecil dan memang di kanan. */
+@media (max-width:480px){
+  .setting-row:has(> select){grid-template-columns:auto 1fr}
+  .setting-row:has(> select)>select{grid-column:1/-1;width:100%;max-width:100%;min-width:0}
+  .modal-actions.settings-actions button{min-width:0;height:auto;min-height:44px;white-space:normal;line-height:1.25;padding-inline:14px}
+}
+
+/* Audit F28 (2026-09-23): tiga aturan merek KelasKu dipindah dari teacher-shell.css karena
+   layar murid juga memakainya; teacher-shell.css (72 KB) kini hanya dimuat di mode guru. */
+.kelasku-brand{display:inline-flex;align-items:baseline;gap:8px;white-space:nowrap;line-height:1}
+.kelasku-main{font-family:'FZ Instrument Serif',Georgia,serif;font-weight:700;font-size:1.18rem;color:#0F224A;letter-spacing:-0.02em}
+.kelasku-tag{font-family:'FZ Plus Jakarta Sans',-apple-system,'Segoe UI',sans-serif;font-size:0.52rem;font-weight:500;color:#5B6B82;letter-spacing:0.02em;text-transform:none}
+
+/* Audit F10 (2026-09-23): pasangan contoh salah/benar di intro materi. Tanda teks (\u2717/\u2713)
+   membawa artinya - warna hanya penguat (kontrak non-warna). */
+.lesson-contrast{display:grid;gap:6px;margin:10px 0 0}
+.lesson-contrast span{display:block;padding:8px 12px;border-radius:var(--radius-sm);font-weight:600;line-height:1.45}
+.lesson-contrast .is-wrong{background:var(--bad-soft);color:var(--bad);text-decoration:line-through;text-decoration-thickness:1px}
+.lesson-contrast .is-right{background:var(--good-soft);color:var(--good)}

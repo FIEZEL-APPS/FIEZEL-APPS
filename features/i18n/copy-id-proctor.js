@@ -28,6 +28,11 @@
     'ujian.mode-aktif': 'Mode ujian: pembimbing FIEZEL nonaktif, dan kalau kamu keluar dari layar ini gurumu menerima catatannya.',
     'ujian.ai-terkunci': 'Pembimbing FIEZEL nonaktif selama sesi ujian. Kerjakan dengan kemampuanmu sendiri — ia kembali begitu ujian selesai.',
     'ujian.ai-terkunci-singkat': 'Nonaktif selama ujian.',
-    'ujian.keluar-tercatat': 'Kamu keluar dari layar ujian {n}× ({detik} detik terakhir). Catatannya sudah sampai ke gurumu.'
+    'ujian.keluar-tercatat': 'Kamu keluar dari layar ujian {n}× ({detik} detik terakhir). Catatannya sudah sampai ke gurumu.',
+    // Audit F01/F03 (2026-09-22): murid tanpa kelas tidak punya guru yang menerima catatan,
+    // dan tes awal dijanjikan "bukan ujian" - kalimatnya harus benar untuk keduanya.
+    'ujian.mode-aktif-tes-awal': 'Tes awal: kerjakan sendiri, PAW istirahat dulu. Tidak ada nilai dan tidak ada hukuman.',
+    'ujian.mode-aktif-tanpa-kelas': 'Mode ujian: pembimbing FIEZEL nonaktif sampai ujian selesai.',
+    'ujian.keluar-tercatat-tanpa-kelas': 'Kamu keluar dari layar ujian {n}× ({detik} detik terakhir).'
   });
 })();
