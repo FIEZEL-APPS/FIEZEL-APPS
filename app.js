@@ -2685,7 +2685,7 @@ function openConfidencePop(ok){
   pop.innerHTML=`<div class="confidence-card">
     <div class="confidence-verdict ${ok?'is-ok':'is-no'}"><i data-lucide="${ok?'circle-check-big':'circle-x'}"></i><b>${ok?FiezelI18n.t('quiz.vonis-benar'):FiezelI18n.t('quiz.vonis-salah')}</b></div>
     <div id="confidenceAsk">
-      <button type="button" class="primary luxe confidence-go" onclick="confidencePopNext()">${FiezelI18n.t('quiz.keyakinan-lihat-pembahasan')} <i data-lucide="arrow-right"></i></button>
+      ${ok&&typeof confidencePopSkipThen==='function'?`<button type="button" class="primary luxe confidence-skip" onclick="confidencePopSkip()">${FiezelI18n.t('quiz.lanjut-soal-berikut')} <i data-lucide="arrow-right"></i></button><button type="button" class="confidence-go" onclick="confidencePopNext()">${FiezelI18n.t('quiz.keyakinan-lihat-pembahasan')}</button>`:`<button type="button" class="primary luxe confidence-go" onclick="confidencePopNext()">${FiezelI18n.t('quiz.keyakinan-lihat-pembahasan')} <i data-lucide="arrow-right"></i></button>`}
     </div>
   </div>`;
   document.body.appendChild(pop);
@@ -2696,7 +2696,7 @@ function openConfidencePop(ok){
   // R2 bug-hunt #2: dialog aria-modal dibuka tanpa memindahkan fokus - pengguna keyboard
   // tertinggal di tombol pilihan yang baru saja dimatikan. Fokus diantar ke skala pertama,
   // pola waktu yang sama dengan confidencePopAnswered.
-  setTimeout(()=>{try{pop.querySelector('.confidence-go')?.focus()}catch(_){}},60);
+  setTimeout(()=>{try{(pop.querySelector('.confidence-skip')||pop.querySelector('.confidence-go'))?.focus()}catch(_){}},60);
 }
 /** Pilihan diambil: skalanya diganti tombol Lanjut, di popup yang sama. */
 function confidencePopAnswered(value){
@@ -2711,7 +2711,21 @@ function confidencePopAnswered(value){
  *  jalan majunya adalah kelanjutan yang dititipkan (analyzing -> reveal). Kalau tidak ada
  *  kelanjutan (jalur lama), ia jatuh ke tombol Lanjut di layar kuis - satu jalur cadangan,
  *  bukan dua jalur yang menyimpang. */
+/* Audit F09 (2026-09-23): jawaban BENAR dulu wajib tiga ketukan (Lihat pembahasan -> baca
+   -> Lanjut) di setiap soal, 25 soal per materi. Kini jawaban benar menawarkan "Lanjut"
+   sebagai tombol utama: pembahasan tetap tercat di belakang (bukti, jadwal ulangan, dan
+   riwayat tidak dilompati), lalu soal berikutnya langsung dibuka. "Lihat pembahasan"
+   tetap tersedia sebagai pilihan kedua. */
+let confidencePopSkipThen=null;
+function confidencePopSkip(){
+  const skip=confidencePopSkipThen;confidencePopSkipThen=null;confidencePopThen=null;
+  closeConfidencePop();
+  if(typeof skip==='function'){skip();return}
+  $('quizNext')?.click()
+}
+window.confidencePopSkip=confidencePopSkip;
 function confidencePopNext(){
+  confidencePopSkipThen=null;
   const then=confidencePopThen;confidencePopThen=null;
   closeConfidencePop();
   if(typeof then==='function'){then();return}
@@ -6106,7 +6120,7 @@ function homeScreenIsClear(){
   try{
     if(state.view!=='home')return false;
     if(document.body?.classList?.contains?.('auth-locked'))return false;
-    if(document.querySelector('.fiezel-splash,.fiezel-ob,.fz-tour'))return false;
+    if(document.querySelector('.fiezel-splash,.fiezel-ob,.fz-tour,#fzPrasasti'))return false;
     const gate=$('welcome'),auth=$('authGate'),modal=$('modal');
     if(gate&&!gate.classList.contains('hidden'))return false;
     if(auth&&!auth.classList.contains('hidden'))return false;
@@ -6143,7 +6157,7 @@ function tourLayerIsClear(){
        state.view) dan tur mendarat di atas soal hidup. */
     if(self.FiezelStage?.lessonMode?.())return false;
     if(document.body?.classList?.contains?.('auth-locked'))return false;
-    if(document.querySelector('.fiezel-splash,.fiezel-ob,.fz-tour'))return false;
+    if(document.querySelector('.fiezel-splash,.fiezel-ob,.fz-tour,#fzPrasasti'))return false;
     const gate=$('welcome'),auth=$('authGate'),modal=$('modal');
     if(gate&&!gate.classList.contains('hidden'))return false;
     if(auth&&!auth.classList.contains('hidden'))return false;
@@ -6351,7 +6365,7 @@ function openApp(){
 
    `onLine===false` dipakai sebagai satu-satunya sinyal, bukan `!onLine`: nilai true bisa
    bohong (terhubung Wi-Fi tanpa internet), tetapi false dapat dipercaya. Jadi yang
-   dilewati hanya keadaan yang jelas luring, dan keadaan ragu tetap mencoba. */if(CORE_WORKER_URL&&self.navigator?.onLine!==false){coreBrainHealth().then(health=>{const quietToast=m=>{try{if(self.FiezelStage?.lessonMode?.())return console.debug('FIEZEL:',m);showToast(m)}catch(_){showToast(m)}};/* q19-P3: jargon infra tidak memotong ujian pertama */if(!health.ok){if(REMOTE_PUSH_REQUIRED)quietToast(FiezelI18n.t('sys.core-belum-tersambung'));return}return ensureRemotePushSubscription().then(result=>{if(result.ok){syncRemoteLearningActivity();quietToast(FiezelI18n.t('sys.core-push-aktif'))}else if(REMOTE_PUSH_REQUIRED)quietToast(FiezelI18n.t('sys.core-push-belum'))})})}// m025-42: the third install prompt. It runs after the notification gate clears so the
+   dilewati hanya keadaan yang jelas luring, dan keadaan ragu tetap mencoba. */if(CORE_WORKER_URL&&self.navigator?.onLine!==false){coreBrainHealth().then(health=>{/* Audit F14 (2026-09-23): jargon infrastruktur tanpa aksi tidak lagi jadi toast saat aplikasi dibuka (termasuk di tengah tur pertama). Keadaannya tetap tercatat untuk diagnosis dan terbaca di Pengaturan -> Notifikasi, tempat murid bisa bertindak. */const quietToast=m=>{try{console.debug('FIEZEL:',m)}catch(_){}};/* q19-P3: jargon infra tidak memotong ujian pertama */if(!health.ok){if(REMOTE_PUSH_REQUIRED)quietToast(FiezelI18n.t('sys.core-belum-tersambung'));return}return ensureRemotePushSubscription().then(result=>{if(result.ok){syncRemoteLearningActivity();quietToast(FiezelI18n.t('sys.core-push-aktif'))}else if(REMOTE_PUSH_REQUIRED)quietToast(FiezelI18n.t('sys.core-push-belum'))})})}// m025-42: the third install prompt. It runs after the notification gate clears so the
 // three popups never stack, and it silences itself for good once both bundles exist.
 // m025-96: gerbang unduhan suara dipensiunkan - tidak ada lagi bundel yang diunduh.
 // m025-254: kunci "target harian WAJIB" (m025-42/43) DIHAPUS seluruhnya - modul, lembar,
@@ -9785,15 +9799,20 @@ function prasastiIconSvg(id){
 }
 // Momen lencana: SATU kartu untuk semua lencana yang jatuh bersamaan (audit §5:
 // "kalau dua milestone jatuh bersamaan, gabungkan dalam satu layar"), bisa di-tap-skip.
-function dismissPrasastiMoment(){const el=document.getElementById('fzPrasasti');if(!el)return false;el.classList.add('is-leaving');setTimeout(()=>{try{el.remove()}catch(_){}},280);return true}
+function dismissPrasastiMoment(){const el=document.getElementById('fzPrasasti');if(!el)return false;try{document.removeEventListener('keydown',prasastiEscKey)}catch(_){}el.classList.add('is-leaving');setTimeout(()=>{try{el.remove()}catch(_){}},280);return true}
+function prasastiEscKey(e){if(e&&(e.key==='Escape'||e.key==='Esc'))dismissPrasastiMoment()}
 window.dismissPrasastiMoment=dismissPrasastiMoment;
 function showPrasastiMoment(fresh){
   if(!Array.isArray(fresh)||!fresh.length)return false;
   if(document.getElementById('fzPrasasti'))return false;
-  const host=document.createElement('div');host.id='fzPrasasti';host.className='fz-prasasti-moment';host.setAttribute('role','dialog');host.setAttribute('aria-label',FiezelI18n.t('prasasti.aria-baru'));
-  host.innerHTML=`<div class="fz-prasasti-card"><div class="modal-mark">${FiezelI18n.t('prasasti.modal-mark')}</div>${fresh.map(b=>{const bTitle=FiezelI18n.t('prasasti.title.'+b.id)||b.title;const bDesc=FiezelI18n.t('prasasti.desc.'+b.id)||b.desc;return `<div class="fz-prasasti-hero"><span class="prasasti-icon">${prasastiIconSvg(b.id)}</span><b>${esc(bTitle)}</b><p>${esc(bDesc)}</p></div>`;}).join('')}<p class="fz-prasasti-note">${FiezelI18n.t('prasasti.catatan')}</p><button class="primary" onclick="dismissPrasastiMoment()">${FiezelI18n.t('prasasti.simpan')} <i data-lucide="arrow-right"></i></button></div>`;
+  /* Audit F13: satu lapisan dalam satu waktu - lencana menunggu tur selesai (buktinya tidak
+     hangus; ia terukir pada pemeriksaan berikutnya). */
+  if(document.querySelector('.fz-tour'))return false;
+  const host=document.createElement('div');host.id='fzPrasasti';host.className='fz-prasasti-moment';host.setAttribute('role','dialog');host.setAttribute('aria-modal','true');host.setAttribute('aria-label',FiezelI18n.t('prasasti.aria-baru'));
+  host.innerHTML=`<div class="fz-prasasti-card"><button type="button" class="icon-button fz-prasasti-close" onclick="dismissPrasastiMoment()" aria-label="${esc(FiezelI18n.t('prasasti.tutup'))}"><i data-lucide="x"></i></button><div class="modal-mark">${FiezelI18n.t('prasasti.modal-mark')}</div>${fresh.map(b=>{const bTitle=FiezelI18n.t('prasasti.title.'+b.id)||b.title;const bDesc=FiezelI18n.t('prasasti.desc.'+b.id)||b.desc;return `<div class="fz-prasasti-hero"><span class="prasasti-icon">${prasastiIconSvg(b.id)}</span><b>${esc(bTitle)}</b><p>${esc(bDesc)}</p></div>`;}).join('')}<p class="fz-prasasti-note">${FiezelI18n.t('prasasti.catatan')}</p><button class="primary" onclick="dismissPrasastiMoment()">${FiezelI18n.t('prasasti.simpan')} <i data-lucide="arrow-right"></i></button></div>`;
   host.addEventListener('click',e=>{if(e.target===host)dismissPrasastiMoment()});
   document.body.appendChild(host);enhanceUI();
+  try{document.addEventListener('keydown',prasastiEscKey)}catch(_){}
   try{host.querySelector('button.primary')?.focus()}catch(_){}
   // Resep momen dari spek: kartu + maskot proud + konfeti + bunyi pencapaian. Konfeti dan
   // maskot lewat gerbang reduced-motion yang sudah ada (celebrate()/pawReact); bunyi
@@ -11342,12 +11361,17 @@ function quizLoop(cfg){
   }
   document.querySelectorAll('.option')[q.answerIndex]?.classList.add('correct');
   const turn=tutorCompose(q,j,ok,answer.scaffold||'tell',forced?'reteach':answer.move,answer.timing);
-  const f=$('feedback');f.classList.remove('hidden');f.classList.add(ok?'feedback-success':'feedback-error');
+  const f=$('feedback');f.classList.remove('hidden','feedback-success','feedback-error');f.classList.add(ok?'feedback-success':'feedback-error');
+  /* Audit F09: giliran tutor dari percobaan PERTAMA (yang salah) dulu tetap terpampang di
+     bawah pembahasan jawaban yang sudah benar - dua vonis yang saling membantah. */
+  /* Audit F09: yang terbuka hanya kalimat inti (aturan + alasan) dan pegangan ingatan;
+     paragraf strategi umum dan rincian pengecoh kini satu lipatan opsional. */
+  if(ok){const tt=$('tutorTurn');if(tt){tt.innerHTML='';tt.classList.add('hidden')}}
   /* i10 2026-08-28 (O5 §6.2): saat BENAR, kalimat gema "Jawabanmu X. Jawaban yang paling
      tepat adalah X." mengulang string yang sama dua kali — kini satu kalimat konfirmasi.
      Cabang salah tetap memakai literal "Jawaban yang paling tepat" (jangkar r2 smoke:109
      memastikan literal ini TIDAK bocor di mode ukur — cabang MEASURE di atas tak tersentuh). */
-  f.innerHTML=`<div class="feedback-title"><i data-lucide="${ok?'circle-check-big':'circle-x'}"></i><b>${ok?FiezelI18n.t('quiz.verdict-correct'):FiezelI18n.t('quiz.verdict-wrong')}</b></div><p>${ok?FiezelI18n.t('quiz.correct-answer',{answer:`<strong>${esc(q.options[j])}</strong>`}):`${FiezelI18n.t('quiz.jawabanmu')} <strong>${esc(q.options[j])}</strong>${FiezelI18n.t('quiz.answer-paling-tepat-adalah')} <strong>${esc(q.options[q.answerIndex])}</strong>`}</p><p><strong>${FiezelI18n.t('quiz.intinya')}</strong> ${esc(q.explain?.why||FiezelI18n.t('quiz.fallback-context'))} ${q.explain?.rule?esc(q.explain.rule):''}</p><p class="muted">${esc(q.explain?.distractor||FiezelI18n.t('quiz.fallback-unsupported'))} ${esc(q.explain?.avoid||FiezelI18n.t('quiz.fallback-hint-check'))}</p>${q.explain?.distractors?`<details class="acc"><summary>${FiezelI18n.t('quiz.bandingkan-pilihan-lain')}</summary><div class="distractor-breakdown">${q.explain.distractors.map(x=>`<p><b>${esc(x.option)}:</b> ${esc(x.reason)}</p>`).join('')}</div></details>`:''}<p class="memory-tip"><i data-lucide="lightbulb"></i><span>${esc(q.explain?.memory||FiezelI18n.t('quiz.fallback-hint-connect'))}</span></p><button class="ai-btn" id="aiExplainBtn"><i data-lucide="sparkles"></i> ${FiezelI18n.t('quiz.jelaskan-dengan-cara-lebih-sederhana')}</button>`;
+  f.innerHTML=`<div class="feedback-title"><i data-lucide="${ok?'circle-check-big':'circle-x'}"></i><b>${ok?FiezelI18n.t('quiz.verdict-correct'):FiezelI18n.t('quiz.verdict-wrong')}</b></div><p>${ok?FiezelI18n.t('quiz.correct-answer',{answer:`<strong>${esc(q.options[j])}</strong>`}):`${FiezelI18n.t('quiz.jawabanmu')} <strong>${esc(q.options[j])}</strong>${FiezelI18n.t('quiz.answer-paling-tepat-adalah')} <strong>${esc(q.options[q.answerIndex])}</strong>`}</p><p><strong>${FiezelI18n.t('quiz.intinya')}</strong> ${esc(q.explain?.why||FiezelI18n.t('quiz.fallback-context'))} ${q.explain?.rule?esc(q.explain.rule):''}</p><details class="acc"><summary>${FiezelI18n.t(q.explain?.distractors?'quiz.bandingkan-pilihan-lain':'quiz.pembahasan-lengkap')}</summary><p class="muted">${esc(q.explain?.distractor||FiezelI18n.t('quiz.fallback-unsupported'))} ${esc(q.explain?.avoid||FiezelI18n.t('quiz.fallback-hint-check'))}</p>${q.explain?.distractors?`<div class="distractor-breakdown">${q.explain.distractors.map(x=>`<p><b>${esc(x.option)}:</b> ${esc(x.reason)}</p>`).join('')}</div>`:''}</details><p class="memory-tip"><i data-lucide="lightbulb"></i><span>${esc(q.explain?.memory||FiezelI18n.t('quiz.fallback-hint-connect'))}</span></p><button class="ai-btn" id="aiExplainBtn"><i data-lucide="sparkles"></i> ${FiezelI18n.t('quiz.jelaskan-dengan-cara-lebih-sederhana')}</button>`;
   speak(turn);
   answer.locked=true;
   $('quizNext').disabled=false;
@@ -11483,6 +11507,7 @@ function quizLoop(cfg){
      teater analyzing 700ms \u2014 langsung ke tanda terima netral. */
   if(MEASURE){reveal(q,j,ok);return}
   confidencePopThen=()=>showCoreAnalyzing(()=>reveal(q,j,ok));
+  confidencePopSkipThen=ok?()=>{reveal(q,j,ok);$('quizNext')?.click()}:null;
   openConfidencePop(ok);
  }
 

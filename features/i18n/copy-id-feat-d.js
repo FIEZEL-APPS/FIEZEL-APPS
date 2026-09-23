@@ -457,7 +457,7 @@
     'guru.tenggat-label': 'Tenggat',
     'guru.terpilih': 'Aktif',
     'guru.tersedia-label': 'tersedia',
-    'kelas.tab-progres': 'Progres',
+    'kelas.tab-progres': 'Hasilku',
     'kelas.misi-adaptif-judul': 'Misi Belajar Adaptif',
     'kelas.misi-adaptif-sub': 'Jalur yang menyesuaikan diri: pemanasan, contoh, latihan, lalu tantangan — dengan petunjuk saat kamu tersendat dan pengulangan terjadwal supaya tidak cepat lupa.',
     'guru.konsol-kurikulum-judul': 'Buka Konsol Kurikulum & Kompetensi',

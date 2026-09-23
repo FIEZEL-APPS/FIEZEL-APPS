@@ -200,7 +200,7 @@
     'skills.lead-listening': 'ฟังก่อนแล้วค่อยตอบ ถ้ายังไม่ชัด ฟังซ้ำได้ — นั่นคือส่วนหนึ่งของการฝึก',
     'skills.catatan-level': 'ระดับของคุณ: <b>{level}</b> · เปลี่ยนได้จากปุ่มระดับ',
     'settings.all-can-diatur-dikelompokkan-each': 'แตะที่กลุ่มเพื่อเปิดการตั้งค่า',
-    'social.shell-title': 'เพื่อน',
+    'social.shell-title': 'โปรไฟล์',
     'social.shell-desc': 'เรียนไปพร้อมกับเพื่อน — ใช้ชื่อเล่น ไม่มีแชต และปิดได้ทุกเมื่อ',
     'quiz.vonis-benar': 'ถูกต้อง เยี่ยมมาก',
     'quiz.vonis-salah': 'ยังไม่ถูก ไม่เป็นไร ลองใหม่ได้',

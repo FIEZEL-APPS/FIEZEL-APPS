@@ -49,7 +49,7 @@
     'nav.school': 'ห้องเรียน',
     'nav.school-aria': 'ห้องเรียนและงานจากโรงเรียน',
     'nav.home-primary': 'วันนี้',
-    'nav.home-primary-aria': 'หน้าแรกและสิ่งที่ต้องเน้นวันนี้',
+    'nav.home-primary-aria': 'วันนี้ สิ่งที่ต้องเน้นวันนี้',
     'nav.progress': 'คืบหน้า',
     'nav.progress-aria': 'แผนที่ CEFR และระดับความชำนาญ',
     'nav.profile': 'โปรไฟล์',

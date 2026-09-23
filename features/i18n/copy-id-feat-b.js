@@ -113,8 +113,8 @@
     // ---------- features/onboarding/fiezel-tour.js ----------
     // Copy VERBATIM dari reports/copy-tour-gems.md; tests/tours-test.js membandingkan karakter
     // demi karakter dengan nilai runtime langkah tur.
-    'tour.menu-home-title': 'Mulai dari Home',
-    'tour.menu-home-body': 'Ini beranda kamu: progres harian, streak, dan saran latihan dari PAW. Semua perjalananmu berangkat dari sini.',
+    'tour.menu-home-title': 'Mulai dari Hari ini',
+    'tour.menu-home-body': 'Ini halaman Hari ini: progres harian, runtun belajar, dan saran latihan dari PAW. Semua perjalananmu berangkat dari sini.',
     'tour.menu-vocab-title': 'Tab Latihan',
     'tour.menu-vocab-body': 'Semua latihan mandiri ada di sini: Vocabulary, Grammar, Reading, bicara \u0026 dengar, nulis, sama perpustakaan. Buka kalau kamu pengin ngelatih satu hal tertentu.',
     'tour.menu-reading-title': 'Tab Progres',

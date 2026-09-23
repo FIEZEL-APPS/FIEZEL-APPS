@@ -452,7 +452,7 @@
     'guru.tenggat-label': 'กำหนดส่ง',
     'guru.terpilih': 'ใช้งานอยู่',
     'guru.tersedia-label': 'มีอยู่',
-    'kelas.tab-progres': 'ความคืบหน้า',
+    'kelas.tab-progres': 'ผลของฉัน',
     'kelas.misi-adaptif-judul': 'ภารกิจการเรียนรู้แบบปรับตัว',
     'kelas.misi-adaptif-sub': 'เส้นทางที่ปรับตามตัวคุณ: อุ่นเครื่อง ตัวอย่าง แบบฝึกหัด แล้วจึงถึงโจทย์ท้าทาย พร้อมคำใบ้เมื่อคุณติดขัด และการทบทวนตามกำหนดเพื่อไม่ให้ลืมเร็ว',
     'guru.konsol-kurikulum-judul': 'เปิดคอนโซลหลักสูตรและสมรรถนะ',
