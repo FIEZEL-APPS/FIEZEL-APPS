@@ -78,7 +78,7 @@
     'kelas.skill-terkuat': 'Skill terkuat',
     'kelas.streak-n': '{n} hari berturut-turut',
     'kelas.streak-nol': 'Belum belajar hari ini',
-    'kelas.streak-sub': 'Kerjakan tugas setiap hari untuk menjaga streak',
+    'kelas.streak-sub': 'Kerjakan tugas setiap hari untuk menjaga runtun belajar',
     'kelas.terhubung': 'terhubung',
     'kelas.tutor-judul': 'Tutor FIEZEL',
     'kelas.tutor-sub': 'Pelajaran bersuara Inggris + subtitle Indonesia, sesuai levelmu.',

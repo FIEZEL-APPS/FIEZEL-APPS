@@ -73,7 +73,7 @@
     'fsl.explain-dictation-prompt': 'Ketik kalimat yang kamu dengar. Teks jawaban tidak disimpan setelah penilaian.',
     'gems.price-hint': '1 gem per sesi · saldo kamu: {balance} gem',
     'gems.chip-balance': '1 gem per sesi · saldo kamu: {balance} gem',
-    'gems.chip-aria-balance': 'Gem Terjemahan kamu: {balance}. Didapat gratis dari streak jawaban benar, dipakai buat terjemahan otomatis.',
+    'gems.chip-aria-balance': 'Gem Terjemahan kamu: {balance}. Didapat gratis dari rentetan jawaban benar, dipakai buat terjemahan otomatis.',
     'gems.streak-prefix': 'Runtun ',
     'gems.streak-progress': 'Runtun {current}/{target}',
     'library.speed-label': 'Kecepatan suara ',

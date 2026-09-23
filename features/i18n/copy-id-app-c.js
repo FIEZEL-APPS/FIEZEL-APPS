@@ -337,7 +337,7 @@
     // app.js:5222 — accountSettingsMarkup: judul kartu
     'akun.judul': 'Akun',
     // app.js:5222 — accountSettingsMarkup: keterangan kartu
-    'akun.keterangan': 'Progres belajar, streak, dan tutor AI tersimpan di akun ini.',
+    'akun.keterangan': 'Progres belajar, runtun belajar, dan tutor AI tersimpan di akun ini.',
     // app.js:5222 — accountSettingsMarkup: sub belum
     'akun.sub-belum': 'Belum ada akun tersambung',
     // app.js:5222 — accountSettingsMarkup: sub tersambung
@@ -513,7 +513,7 @@
     // app.js:4527 — openActiveLevelExamPanel: fakta 2
     'level.fakta-acak': 'Soal diacak dari bank level {level} setiap percobaan',
     // app.js:4527 — openActiveLevelExamPanel: fakta 4
-    'level.fakta-jeda': 'Kalau belum lulus, jeda 24 jam untuk level ini — progres dan streak tetap utuh',
+    'level.fakta-jeda': 'Kalau belum lulus, jeda 24 jam untuk level ini — progres dan runtun belajar tetap utuh',
     // app.js:4527 — openActiveLevelExamPanel: fakta 1
     'level.fakta-komposisi': '{jumlah} soal: grammar {grammar}, kosakata {vocab}, bacaan {bacaan}',
     // app.js:4527 — openActiveLevelExamPanel: fakta 3
