@@ -936,7 +936,7 @@
 
     return '<div class="ch-body">' +
       teacherGreetingCard() +
-      subjectChipStrip(allPend, allDone) +
+      subjectPanelsSection(allPend, allDone) +
       targetCard() +
       pendSection +
       curriculumInboxSection() +
@@ -955,22 +955,17 @@
     try { teachers = ((ui() || {}).classTeachers) || []; } catch (_) { teachers = []; }
     if (!Array.isArray(teachers)) teachers = [];
 
-    var teacherListHtml = '';
-    if (classCode() && teachers.length) {
-      teacherListHtml = '<section class="ch-card" data-testid="class-teachers-card">' +
-        '<p class="ch-kicker">' + icon('users') + ' ' + esc(t('kelas.guru-terdaftar', 'Guru Terdaftar')) + ' · ' + teachers.length + '</p>' +
-        '<ul class="ch-mini-list">' +
-        teachers.map(function (tr) {
-          var subj = SUBJECTS_17.filter(function (s) { return s.id === tr.subjectId; })[0];
-          return '<li>' +
-            (subj ? icon(subj.icon) + ' ' : '') +
-            '<span style="flex:1">' + esc(tr.teacherName || t('kelas.guru', 'Guru')) + '</span>' +
-            (subj ? '<small>' + esc(subj.name) + '</small>' : '') +
-          '</li>';
-        }).join('') +
-        '</ul>' +
-      '</section>';
-    }
+    /* Audit UI/UX F12 (2026-09-23): tab Kelas = koneksi kelas + satu baris guru + dua pintu
+       (Tutor bersuara, Belajar mandiri). Restrukturisasi 659a1a0 mencabut kedua pintu itu,
+       padahal tutor bersuara hanya bisa dibuka dari sini; ringkasan guru kembali satu baris
+       dengan lompatan ke tab Tugas, tempat kartu filter mapel berada. */
+    var teacherLine = (classCode() && teachers.length)
+      ? '<p class="ch-muted ch-small" data-testid="class-teachers-line">' + icon('user-check') + ' ' + esc(t('kelas.panel-guru-terdaftar', '{n} Guru Terdaftar', { n: teachers.length })) + ' <button type="button" class="ch-btn is-small is-ghost" data-ch="tab" data-tab="tugas" data-testid="class-jump-tugas">' + esc(t('umum.tugas', 'Tugas')) + ' ' + icon('arrow-right') + '</button></p>'
+      : '';
+    var linkCards = '<section class="ch-grid2">' +
+      '<button type="button" class="ch-card ch-link-card" data-ch="tutor" data-testid="class-open-tutor"><span class="ch-link-icon">' + icon('mic') + '</span><div><b>' + esc(t('kelas.tutor-judul', 'Tutor FIEZEL')) + '</b><small>' + esc(t('kelas.tutor-sub', 'Pelajaran bersuara Inggris + subtitle Indonesia, sesuai levelmu.')) + '</small></div>' + icon('arrow-up-right') + '</button>' +
+      '<button type="button" class="ch-card ch-link-card" data-ch="learn" data-testid="class-open-learn"><span class="ch-link-icon">' + icon('route') + '</span><div><b>' + esc(t('kelas.belajar-mandiri', 'Belajar mandiri hari ini')) + '</b><small>' + esc(t('kelas.belajar-mandiri-sub', 'Rencana harian dari peta kemampuanmu — tugas guru ikut masuk ke sana.')) + '</small></div>' + icon('arrow-up-right') + '</button>' +
+    '</section>';
 
     return '<div class="ch-body">' +
       '<section class="ch-card ch-class-card" data-testid="class-my-class">' +
@@ -985,6 +980,7 @@
                     : icon('clock') + ' ' + esc(t('kelas.laporan-belum-terkirim', 'Laporan terakhir belum terkirim')) + ' (' + esc(rep.error || 'offline') + ') — ' + esc(t('kelas.dikirim-ulang', 'dikirim ulang otomatis saat online.'))) +
                 '</p>'
               : '') +
+            teacherLine +
             '<div class="ch-actions">' +
               '<button type="button" class="ch-btn is-ghost" data-ch="change-code">' + icon('refresh-cw') + ' ' + esc(t('kelas.ganti-kode', 'Ganti kode')) + '</button>' +
             '</div>'
@@ -995,7 +991,7 @@
           ? '<form class="ch-form" data-ch-form="join"><input name="code" value="' + esc(studentDraftCode) + '" placeholder="FZ-ABC234" maxlength="9" autocomplete="off" required data-testid="class-code-input"><button type="submit" class="ch-btn is-primary" data-testid="class-code-submit">' + esc(t('kelas.gabung-btn', 'Gabung')) + '</button></form>'
           : '') +
       '</section>' +
-      teacherListHtml +
+      linkCards +
     '</div>';
   }
   function progresView() {
@@ -1078,7 +1074,7 @@
 
       /* Skill perlu perhatian */
       (topWeak.length ? '<section class="ch-card" data-testid="class-top-weak">' +
-        '<p class="ch-kicker">' + icon('alert-triangle') + ' ' + esc(t('kelas.skill-perlu-perhatian', 'Perlu perhatian')) + '</p>' +
+        '<p class="ch-kicker">' + icon('triangle-alert') + ' ' + esc(t('kelas.skill-perlu-perhatian', 'Perlu perhatian')) + '</p>' +
         '<div class="ch-top-skills">' + topWeak.map(function (s) { return skillRow(s, 'is-weak'); }).join('') + '</div>' +
       '</section>' : '') +
 
