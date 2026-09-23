@@ -34,9 +34,8 @@ body.fz-teacher-mode #app{font-family:var(--tg-body)}
 .tg-brand b{display:block;font-family:var(--tg-display);font-size:1.15rem;letter-spacing:.02em}.tg-brand small{color:var(--tg-mist);font-size:.75rem;text-transform:uppercase;letter-spacing:.14em}
 
 /* Reusable Wordmark: KelasKu untuk Guru */
-.kelasku-brand{display:inline-flex;align-items:baseline;gap:8px;white-space:nowrap;line-height:1}
-.kelasku-main{font-family:var(--tg-display,'Plus Jakarta Sans',sans-serif);font-weight:700;font-size:1.18rem;color:#0F224A;letter-spacing:-0.02em}
-.kelasku-tag{font-family:var(--tg-body,'Plus Jakarta Sans',sans-serif);font-size:0.52rem;font-weight:500;color:#5B6B82;letter-spacing:0.02em;text-transform:none}
+/* .kelasku-brand/.kelasku-main/.kelasku-tag pindah ke style.css (dipakai layar murid juga) -
+   berkas ini kini dimuat HANYA saat mode guru/demo (audit F28). */
 .tg-side .kelasku-brand .kelasku-main{color:#FFFFFF}
 .tg-side .kelasku-brand .kelasku-tag{color:#9DB0CC}
 .tg-teacher{display:flex;align-items:center;gap:10px;background:var(--tg-ink-2);border:1px solid var(--tg-ink-3);border-radius:var(--tg-r);padding:10px 12px;color:inherit;text-align:left;cursor:pointer;transition:background-color .2s,transform .2s;font:inherit}

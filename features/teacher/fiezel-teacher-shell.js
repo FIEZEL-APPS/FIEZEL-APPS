@@ -2602,6 +2602,15 @@
    * Guru yang benar-benar sudah masuk tidak boleh terseret ke sini: kalau akunnya
    * berperan guru, demo dimatikan supaya papan aslinya yang tampil.
    */
+  /* Audit F28 (2026-09-23): tema Ruang Guru dimuat sesuai kebutuhan. Murid tidak lagi
+     mengunduh 72 KB CSS guru di pembukaan pertama; guru/demo memasangnya di sini sekali. */
+  function ensureCss() {
+    try {
+      var d = root.document; if (!d || d.getElementById('fzTeacherCss')) return true;
+      var l = d.createElement('link'); l.id = 'fzTeacherCss'; l.rel = 'stylesheet'; l.href = './features/teacher/teacher-shell.css';
+      (d.head || d.documentElement).appendChild(l); return true;
+    } catch (_) { return false; }
+  }
   function previewAllowed() {
     try {
       if (isTeacherRole()) return false;
@@ -3015,6 +3024,7 @@
         st.view = 'briefing';
       }
     }
+    ensureCss();
     document.body.classList.add('fz-teacher-mode');
     el.addEventListener('click', onClick); el.addEventListener('submit', onSubmit); el.addEventListener('change', onChange); el.addEventListener('input', onInput);
     document.addEventListener('keydown', onKey);
@@ -4955,7 +4965,7 @@
   }
   function download(name, text, type) { try { var a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([text], { type: type || 'text/plain' })); a.download = name; document.body.appendChild(a); a.click(); setTimeout(function () { URL.revokeObjectURL(a.href); a.remove(); }, 800); } catch (_) { copy(text, 'Unduhan tidak didukung — isi tersalin.'); } }
 
-  root.FiezelTeacherShell = { mount: mount, unmount: unmount, render: render, previewAllowed: previewAllowed, exitPreview: exitPreview, _state: function () { return st; }, _autoSyncPlan: autoSyncPlan, _syncTicks: function () { return { every: SYNC_EVERY_MS, chip: CHIP_TICK_MS, stuck: (root.FiezelSyncPlan && root.FiezelSyncPlan.STUCK_MS) || 45000 }; }, _armed: function () { return !!syncTimer && !!chipTimer; }, _synthesizeMapelQuestions: synthesizeMapelQuestions, _MAPEL_LIST: MAPEL_LIST, _MAPEL_CATALOG: MAPEL_CATALOG, _teacherSubjectScope: teacherSubjectScope, _scopeMapelList: scopeMapelList, _assignmentSubject: assignmentSubject, _isAssignmentVisible: isAssignmentVisible, _remedialGroups: remedialGroups, _rekapRows: rekapRows, _subjectScopeBadge: subjectScopeBadge, /* m025-357: panel kurikulum dibuka untuk gerbang supaya HTML-nya bisa diperiksa
+  root.FiezelTeacherShell = { mount: mount, unmount: unmount, render: render, previewAllowed: previewAllowed, ensureCss: ensureCss, exitPreview: exitPreview, _state: function () { return st; }, _autoSyncPlan: autoSyncPlan, _syncTicks: function () { return { every: SYNC_EVERY_MS, chip: CHIP_TICK_MS, stuck: (root.FiezelSyncPlan && root.FiezelSyncPlan.STUCK_MS) || 45000 }; }, _armed: function () { return !!syncTimer && !!chipTimer; }, _synthesizeMapelQuestions: synthesizeMapelQuestions, _MAPEL_LIST: MAPEL_LIST, _MAPEL_CATALOG: MAPEL_CATALOG, _teacherSubjectScope: teacherSubjectScope, _scopeMapelList: scopeMapelList, _assignmentSubject: assignmentSubject, _isAssignmentVisible: isAssignmentVisible, _remedialGroups: remedialGroups, _rekapRows: rekapRows, _subjectScopeBadge: subjectScopeBadge, /* m025-357: panel kurikulum dibuka untuk gerbang supaya HTML-nya bisa diperiksa
         sungguhan, bukan lewat regex atas sumbernya. `_ui` menyertainya karena panel
         ini dikendalikan keadaan muat (pohon, status semai, kedalaman bank) dan tanpa
         akses ke sana gerbang hanya bisa menguji satu keadaan dari lima. */

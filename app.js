@@ -6328,7 +6328,7 @@ function openApp(){
   if(appOpened)return true;appOpened=true;
   if(isVerifiedTeacher()){
     state.view='tutor';
-    document.body?.classList?.add?.('fz-teacher-mode');
+    try{self.FiezelTeacherShell?.ensureCss?.()}catch(_){}document.body?.classList?.add?.('fz-teacher-mode');
   }
   // Sesi lama bisa saja masih memegang kelas kunci m025-34 di <body> (mis. tab yang dibuka
   // sebelum rilis ini). Dibersihkan sekali di sini supaya .app/.bottomnav tidak tetap

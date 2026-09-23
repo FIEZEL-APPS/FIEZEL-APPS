@@ -5796,3 +5796,9 @@ html body #app .social-home-launcher .launch-card{background:var(--pz-sky);borde
   .setting-row:has(> select)>select{grid-column:1/-1;width:100%;max-width:100%;min-width:0}
   .modal-actions.settings-actions button{min-width:0;height:auto;min-height:44px;white-space:normal;line-height:1.25;padding-inline:14px}
 }
+
+/* Audit F28 (2026-09-23): tiga aturan merek KelasKu dipindah dari teacher-shell.css karena
+   layar murid juga memakainya; teacher-shell.css (72 KB) kini hanya dimuat di mode guru. */
+.kelasku-brand{display:inline-flex;align-items:baseline;gap:8px;white-space:nowrap;line-height:1}
+.kelasku-main{font-family:var(--tg-display,'Plus Jakarta Sans',sans-serif);font-weight:700;font-size:1.18rem;color:#0F224A;letter-spacing:-0.02em}
+.kelasku-tag{font-family:var(--tg-body,'Plus Jakarta Sans',sans-serif);font-size:0.52rem;font-weight:500;color:#5B6B82;letter-spacing:0.02em;text-transform:none}
