@@ -236,7 +236,7 @@
     'student.classroom-title': 'ห้องเรียน',
     'student.coming-soon': 'เร็ว ๆ นี้',
     'student.skills-title': 'พูด & ฟัง',
-    'student.settings-mark': 'การตั้งค่า',
+    'student.settings-mark': 'FIEZEL',
     'student.greet-pagi': 'อรุณสวัสดิ์ เริ่มวันนี้ด้วยแบบฝึกเล็ก ๆ กัน',
     'student.greet-siang': 'สวัสดีตอนบ่าย ฝึกนิดเดียววันนี้ก็ช่วยให้คล่องขึ้น',
     'student.greet-sore': 'สวัสดีตอนเย็น เวลาเหมาะสำหรับฝึกสั้น ๆ',

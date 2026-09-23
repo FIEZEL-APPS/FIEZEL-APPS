@@ -5782,3 +5782,14 @@ html body #app .social-home-launcher .launch-card{background:var(--pz-sky);borde
 .social-request-who small{color:var(--muted)}
 .social-request-acts{display:flex;align-items:center;gap:8px;flex:none}
 .social-request-acts .primary{padding:8px 14px;min-height:40px}
+
+/* ---------- Audit F16 (2026-09-23): Pengaturan di ponsel ----------
+   Di 390px baris pengaturan ber-dropdown membagi lebar jadi tiga kolom: deskripsi turun satu
+   kata per baris dan dropdown terpotong di tepi modal ("Bahasa Inggris — Ku…"). Di bawah
+   480px barisnya ditumpuk: ikon + label di atas, kontrol selebar baris di bawahnya. Baris
+   bersakelar (checkbox) tetap satu baris - sakelarnya kecil dan memang di kanan. */
+@media (max-width:480px){
+  .setting-row:has(> select){grid-template-columns:auto 1fr}
+  .setting-row:has(> select)>select{grid-column:1/-1;width:100%;max-width:100%;min-width:0}
+  .modal-actions.settings-actions button{min-width:0;height:auto;min-height:44px;white-space:normal;line-height:1.25;padding-inline:14px}
+}

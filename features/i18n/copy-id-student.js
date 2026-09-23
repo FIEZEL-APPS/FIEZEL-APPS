@@ -250,7 +250,7 @@
     'student.classroom-title': 'KelasKu',
     'student.coming-soon': 'Segera hadir',
     'student.skills-title': 'Bicara & Dengar',
-    'student.settings-mark': 'PENGATURAN',
+    'student.settings-mark': 'FIEZEL',
     'student.greet-pagi': 'selamat pagi. Mulai hari ini dengan satu latihan kecil.',
     'student.greet-siang': 'selamat siang. Sedikit latihan hari ini bikin kamu makin lancar.',
     'student.greet-sore': 'selamat sore. Waktu yang pas untuk latihan sebentar.',
