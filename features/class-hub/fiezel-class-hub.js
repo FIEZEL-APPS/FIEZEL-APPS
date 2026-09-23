@@ -614,7 +614,7 @@
     var body = u.runner && !u.paused ? runnerView() : u.review ? reviewView(u.review) : u.curriculumView ? curriculumModalView(u.curriculumView) : u.tab === 'papan' ? papanView() : u.tab === 'kelas' ? kelasView() : u.tab === 'progres' ? progresView() : tugasView(pend, done);
     sEl.innerHTML = '<section class="ch ch-student' + (repaint ? ' is-repaint' : '') + '" data-testid="class-hub-student">' +
       '<header class="ch-head"><div><h1 data-testid="class-hub-title">' + (className() ? esc(className()) : (classCode() ? WM + ' ' + esc(classCode()) : t('kelas.belum-terhubung', 'Belum terhubung ke ') + WM)) + '</h1><p class="ch-sub">' + (teacherName() ? 'Guru: <b>' + esc(teacherName()) + '</b>' + (classCode() ? ' · ' : '') : '') + (classCode() ? 'Kode ' + esc(classCode()) : '') + '</p></div></header>' +
-      (u.runner && !u.paused || u.curriculumView ? '' : '<nav class="ch-tabs" role="tablist" aria-label="' + esc(t('kelas.nav-aria', 'Bagian KelasKu')) + '">' + [['tugas', t('umum.tugas', 'Tugas'), pend.length], ['papan', t('kelas.papan-kelas', 'Papan'), 0], ['progres', t('kelas.tab-progres', 'Progres'), 0], ['kelas', WM, 0]].map(function (t) { var active = u.tab === t[0] && !u.review; return '<button type="button" role="tab" id="ch-tab-' + t[0] + '" aria-controls="ch-panel-' + t[0] + '" aria-selected="' + (active ? 'true' : 'false') + '" tabindex="' + (active ? '0' : '-1') + '" class="ch-tab' + (active ? ' is-active' : '') + '" data-ch="tab" data-tab="' + t[0] + '" data-testid="class-tab-' + t[0] + '">' + t[1] + (t[2] ? '<span class="ch-badge">' + t[2] + '</span>' : '') + '</button>'; }).join('') + '</nav>') +
+      (u.runner && !u.paused || u.curriculumView ? '' : '<nav class="ch-tabs" role="tablist" aria-label="' + esc(t('kelas.nav-aria', 'Bagian KelasKu')) + '">' + [['tugas', t('umum.tugas', 'Tugas'), pend.length], ['papan', t('kelas.papan-kelas', 'Papan'), 0], ['progres', t('kelas.tab-progres', 'Hasilku'), 0], ['kelas', t('kelas.kelas-saya', 'Kelas Saya'), 0]].map(function (t) { var active = u.tab === t[0] && !u.review; return '<button type="button" role="tab" id="ch-tab-' + t[0] + '" aria-controls="ch-panel-' + t[0] + '" aria-selected="' + (active ? 'true' : 'false') + '" tabindex="' + (active ? '0' : '-1') + '" class="ch-tab' + (active ? ' is-active' : '') + '" data-ch="tab" data-tab="' + t[0] + '" data-testid="class-tab-' + t[0] + '">' + t[1] + (t[2] ? '<span class="ch-badge">' + t[2] + '</span>' : '') + '</button>'; }).join('') + '</nav>') +
       '<div class="ch-tabpanel" role="tabpanel" id="ch-panel-' + (u.curriculumView ? 'curriculum' : u.tab) + '" aria-label="' + esc(t('kelas.panel-aria', 'Isi KelasKu')) + '">' + body + '</div></section>';
     if (activeSaved) {
       try {
@@ -936,7 +936,7 @@
 
     return '<div class="ch-body">' +
       teacherGreetingCard() +
-      subjectChipStrip(allPend, allDone) +
+      subjectPanelsSection(allPend, allDone) +
       targetCard() +
       pendSection +
       curriculumInboxSection() +
@@ -955,22 +955,17 @@
     try { teachers = ((ui() || {}).classTeachers) || []; } catch (_) { teachers = []; }
     if (!Array.isArray(teachers)) teachers = [];
 
-    var teacherListHtml = '';
-    if (classCode() && teachers.length) {
-      teacherListHtml = '<section class="ch-card" data-testid="class-teachers-card">' +
-        '<p class="ch-kicker">' + icon('users') + ' ' + esc(t('kelas.guru-terdaftar', 'Guru Terdaftar')) + ' · ' + teachers.length + '</p>' +
-        '<ul class="ch-mini-list">' +
-        teachers.map(function (tr) {
-          var subj = SUBJECTS_17.filter(function (s) { return s.id === tr.subjectId; })[0];
-          return '<li>' +
-            (subj ? icon(subj.icon) + ' ' : '') +
-            '<span style="flex:1">' + esc(tr.teacherName || t('kelas.guru', 'Guru')) + '</span>' +
-            (subj ? '<small>' + esc(subj.name) + '</small>' : '') +
-          '</li>';
-        }).join('') +
-        '</ul>' +
-      '</section>';
-    }
+    /* Audit UI/UX F12 (2026-09-23): tab Kelas = koneksi kelas + satu baris guru + dua pintu
+       (Tutor bersuara, Belajar mandiri). Restrukturisasi 659a1a0 mencabut kedua pintu itu,
+       padahal tutor bersuara hanya bisa dibuka dari sini; ringkasan guru kembali satu baris
+       dengan lompatan ke tab Tugas, tempat kartu filter mapel berada. */
+    var teacherLine = (classCode() && teachers.length)
+      ? '<p class="ch-muted ch-small" data-testid="class-teachers-line">' + icon('user-check') + ' ' + esc(t('kelas.panel-guru-terdaftar', '{n} Guru Terdaftar', { n: teachers.length })) + ' <button type="button" class="ch-btn is-small is-ghost" data-ch="tab" data-tab="tugas" data-testid="class-jump-tugas">' + esc(t('umum.tugas', 'Tugas')) + ' ' + icon('arrow-right') + '</button></p>'
+      : '';
+    var linkCards = '<section class="ch-grid2">' +
+      '<button type="button" class="ch-card ch-link-card" data-ch="tutor" data-testid="class-open-tutor"><span class="ch-link-icon">' + icon('mic') + '</span><div><b>' + esc(t('kelas.tutor-judul', 'Tutor FIEZEL')) + '</b><small>' + esc(t('kelas.tutor-sub', 'Pelajaran bersuara Inggris + subtitle Indonesia, sesuai levelmu.')) + '</small></div>' + icon('arrow-up-right') + '</button>' +
+      '<button type="button" class="ch-card ch-link-card" data-ch="learn" data-testid="class-open-learn"><span class="ch-link-icon">' + icon('route') + '</span><div><b>' + esc(t('kelas.belajar-mandiri', 'Belajar mandiri hari ini')) + '</b><small>' + esc(t('kelas.belajar-mandiri-sub', 'Rencana harian dari peta kemampuanmu — tugas guru ikut masuk ke sana.')) + '</small></div>' + icon('arrow-up-right') + '</button>' +
+    '</section>';
 
     return '<div class="ch-body">' +
       '<section class="ch-card ch-class-card" data-testid="class-my-class">' +
@@ -985,6 +980,7 @@
                     : icon('clock') + ' ' + esc(t('kelas.laporan-belum-terkirim', 'Laporan terakhir belum terkirim')) + ' (' + esc(rep.error || 'offline') + ') — ' + esc(t('kelas.dikirim-ulang', 'dikirim ulang otomatis saat online.'))) +
                 '</p>'
               : '') +
+            teacherLine +
             '<div class="ch-actions">' +
               '<button type="button" class="ch-btn is-ghost" data-ch="change-code">' + icon('refresh-cw') + ' ' + esc(t('kelas.ganti-kode', 'Ganti kode')) + '</button>' +
             '</div>'
@@ -995,7 +991,7 @@
           ? '<form class="ch-form" data-ch-form="join"><input name="code" value="' + esc(studentDraftCode) + '" placeholder="FZ-ABC234" maxlength="9" autocomplete="off" required data-testid="class-code-input"><button type="submit" class="ch-btn is-primary" data-testid="class-code-submit">' + esc(t('kelas.gabung-btn', 'Gabung')) + '</button></form>'
           : '') +
       '</section>' +
-      teacherListHtml +
+      linkCards +
     '</div>';
   }
   function progresView() {
@@ -1078,7 +1074,7 @@
 
       /* Skill perlu perhatian */
       (topWeak.length ? '<section class="ch-card" data-testid="class-top-weak">' +
-        '<p class="ch-kicker">' + icon('alert-triangle') + ' ' + esc(t('kelas.skill-perlu-perhatian', 'Perlu perhatian')) + '</p>' +
+        '<p class="ch-kicker">' + icon('triangle-alert') + ' ' + esc(t('kelas.skill-perlu-perhatian', 'Perlu perhatian')) + '</p>' +
         '<div class="ch-top-skills">' + topWeak.map(function (s) { return skillRow(s, 'is-weak'); }).join('') + '</div>' +
       '</section>' : '') +
 
@@ -1614,7 +1610,7 @@
     } else {
       body = tUi.tab === 'tugas' ? tTugas(c, env) : tUi.tab === 'buat' ? tBuat(c, env) : tUi.tab === 'hasil' ? tHasil(c, env) : tUi.tab === 'braincore' ? tBraincore(c, env) : tKelas(c, env);
     }
-    return '<div class="ch ch-teacher" data-testid="class-hub-teacher"><p class="ch-principle">' + icon('brain') + ' ' + t('kelas.braincore-alur-dot', 'Braincore menyarankan · Guru memutuskan · Murid belajar') + '</p><nav class="ch-tabs is-teacher" role="tablist" aria-label="' + esc(t('kelas.nav-guru-aria', 'Bagian Ruang Kelas Guru')) + '">' + teacherTabs(env).map(function (t) { var active = tUi.tab === t[0]; return '<button type="button" role="tab" id="chg-tab-' + t[0] + '" aria-controls="chg-panel-' + t[0] + '" aria-selected="' + (active ? 'true' : 'false') + '" tabindex="' + (active ? '0' : '-1') + '" class="ch-tab' + (active ? ' is-active' : '') + '" data-ch="ttab" data-tab="' + t[0] + '" data-testid="tclass-tab-' + t[0] + '">' + icon(t[2]) + '<span>' + t[1] + '</span></button>'; }).join('') + '</nav><div class="ch-tabpanel" role="tabpanel" id="chg-panel-' + tUi.tab + '" aria-label="' + esc(t('kelas.panel-guru-aria', 'Isi Ruang Kelas Guru')) + '">' + body + '</div></div>';
+    return '<div class="ch ch-teacher" data-testid="class-hub-teacher"><p class="ch-principle">' + icon('brain') + ' ' + t('kelas.braincore-alur-dot', 'Saran otomatis · Guru memutuskan · Murid belajar') + '</p><nav class="ch-tabs is-teacher" role="tablist" aria-label="' + esc(t('kelas.nav-guru-aria', 'Bagian Ruang Kelas Guru')) + '">' + teacherTabs(env).map(function (t) { var active = tUi.tab === t[0]; return '<button type="button" role="tab" id="chg-tab-' + t[0] + '" aria-controls="chg-panel-' + t[0] + '" aria-selected="' + (active ? 'true' : 'false') + '" tabindex="' + (active ? '0' : '-1') + '" class="ch-tab' + (active ? ' is-active' : '') + '" data-ch="ttab" data-tab="' + t[0] + '" data-testid="tclass-tab-' + t[0] + '">' + icon(t[2]) + '<span>' + t[1] + '</span></button>'; }).join('') + '</nav><div class="ch-tabpanel" role="tabpanel" id="chg-panel-' + tUi.tab + '" aria-label="' + esc(t('kelas.panel-guru-aria', 'Isi Ruang Kelas Guru')) + '">' + body + '</div></div>';
   }
   /* Permintaan bergabung: murid sudah mengetik kode kelas ini, guru yang memutuskan ia masuk
      atau tidak. Kartunya hanya muncul kalau memang ada yang menunggu — kelas yang tidak
@@ -1663,7 +1659,7 @@
           '<div class="ch-status-row" data-testid="tclass-status-' + esc(a.id) + '"><span class="ch-status is-belum">' + sc.belum + ' belum mulai</span><span class="ch-status is-sedang">' + sc.sedang + ' mengerjakan</span><span class="ch-status is-selesai">' + sc.selesai + ' selesai</span><span class="ch-status is-terlambat">' + sc.terlambat + ' terlambat</span>' + (focusCount(c, a) ? '<span class="ch-focus is-berat" data-testid="tclass-focus-count-' + esc(a.id) + '">' + icon('eye-off') + ' ' + focusCount(c, a) + ' keluar layar</span>' : '') + '</div>' +
           '<div class="ch-actions"><button type="button" class="tg-btn is-small is-primary" data-tg="send-assign" data-id="' + esc(a.id) + '" data-testid="tclass-send-' + esc(a.id) + '">' + icon('send') + (sentAll ? ' Kirim ulang' : ' ' + t('kelas.kirim-ke-murid', 'Kirim ke murid')) + '</button><button type="button" class="tg-btn is-small is-ghost" data-ch="expand" data-id="' + esc(a.id) + '" data-testid="tclass-expand-' + esc(a.id) + '">' + icon(open ? 'chevron-up' : 'list-checks') + (open ? ' ' + t('umum.tutup', 'Tutup') : ' ' + t('kelas.status-murid-soal', 'Status murid & soal')) + '</button><button type="button" class="tg-btn is-small is-ghost" data-ch="result" data-id="' + esc(a.id) + '">' + icon('bar-chart-3') + ' Hasil</button><button type="button" class="tg-btn is-small is-ghost" data-tg="modal" data-kind="share-assign" data-id="' + esc(a.id) + '">' + icon('qr-code') + ' Kode</button></div>' +
           (open ? '<div class="ch-expand"><h4>' + t('kelas.status-per-murid', 'Status per murid') + '</h4><ul class="ch-mini-list">' + c.students.filter(function (s) { return TS.targeted(a, s); }).map(function (s) { var st = statusOf(a, studentRec(a, s)), d = a.done && a.done[s.id]; return '<li><span class="ch-grow">' + esc(s.name) + '</span>' + focusChip(a, s) + statusChip(st) + (d ? '<b>' + pct(d.acc) + '</b>' : '<button type="button" class="tg-btn is-small is-ghost" data-tg="send-assign" data-id="' + esc(a.id) + '" data-sid="' + esc(s.id) + '">' + icon('send') + '</button>') + '</li>'; }).join('') + '</ul><h4>' + t('kelas.soal-persis', 'Soal persis yang diterima murid') + '</h4><ol class="ch-item-list" data-testid="tclass-items-' + esc(a.id) + '">' + itemList(a) + '</ol></div>' : '') + '</article>';
-      }).join('') : '<section class="ch-card ch-empty">' + icon('clipboard-list') + '<p>' + t('kelas.belum-ada-tugas', 'Belum ada tugas. Susun dari bank FIEZEL, tulis sendiri, atau impor — Braincore meninjau sebelum dikirim.') + '</p></section>') + '</div>';
+      }).join('') : '<section class="ch-card ch-empty">' + icon('clipboard-list') + '<p>' + t('kelas.belum-ada-tugas', 'Belum ada tugas. Susun dari bank FIEZEL, tulis sendiri, atau impor — saran otomatis meninjaunya sebelum dikirim.') + '</p></section>') + '</div>';
   }
   // ---- Buat tugas: 3 langkah (Sumber → Tinjauan Braincore → Kirim) ----------------------------
   function draft(c) { if (!tUi.draft) tUi.draft = { step: 1, source: 'bank', title: '', skills: ['past_tense'], count: 10, deadline: T().today(Date.now() + 2 * T().DAY), mode: 'latihan', targets: [], raw: '', items: [], bankIds: [], review: null, finals: [], approved: {}, useSuggest: {}, q_prompt: '', q_opts: ['', '', '', ''], q_answer: 0 }; return tUi.draft; }
@@ -1779,7 +1775,7 @@
     (c.assignments || []).forEach(function (a) { itemMisses(c, a).misconceptions.forEach(function (m) { agg[m.label] = (agg[m.label] || 0) + m.n; n += m.n; }); });
     var fromEvidence = Object.keys(agg).map(function (k) { return { label: k, n: agg[k] }; }).sort(function (x, y) { return y.n - x.n; }).slice(0, 5);
     var weakest = map.filter(function (m) { return m.acc != null; }).sort(function (x, y) { return x.acc - y.acc; })[0];
-    return '<div class="ch-body"><section class="ch-card ch-card-ink"><p class="ch-kicker">Prinsip</p><h3>' + t('kelas.braincore-alur', 'Braincore menyarankan. Guru memutuskan. Murid belajar.') + '</h3><p class="ch-muted">' + esc(t('kelas.sumber-angka', 'Semua angka di bawah berasal dari bukti murid di kelas ini: laporan sinkron dan soal yang keliru pada tugasmu. Tidak ada AI cloud, tidak ada tebakan tanpa data.')) + '</p></section>' +
+    return '<div class="ch-body"><section class="ch-card ch-card-ink"><p class="ch-kicker">Prinsip</p><h3>' + t('kelas.braincore-alur', 'Saran otomatis. Guru memutuskan. Murid belajar.') + '</h3><p class="ch-muted">' + esc(t('kelas.sumber-angka', 'Semua angka di bawah berasal dari bukti murid di kelas ini: laporan sinkron dan soal yang keliru pada tugasmu. Tidak ada AI cloud, tidak ada tebakan tanpa data.')) + '</p></section>' +
       '<section class="ch-card"><p class="ch-kicker">Peta skill kelas</p><ul class="ch-skill-list">' + map.map(function (m) { return '<li><span>' + esc(m.label) + '</span><span class="ch-bar"><i style="width:' + Math.round((m.acc || 0) * 100) + '%"></i></span><b>' + pct(m.acc) + '</b><small>' + (m.low ? m.low + ' murid &lt;50%' : m.n ? m.n + ' soal' : 'belum ada data') + '</small></li>'; }).join('') + '</ul></section>' +
       '<section class="ch-card"><p class="ch-kicker">Miskonsepsi terdeteksi</p>' + (fromEvidence.length ? '<p class="ch-muted ch-small">Dari ' + n + ' ' + esc(t('kelas.jawaban-keliru', 'jawaban keliru pada tugas yang kamu kirim.')) + '</p><ol class="ch-mis">' + fromEvidence.map(function (m) { return '<li><b>' + esc(m.label) + '</b><small>' + m.n + '×</small></li>'; }).join('') + '</ol>' : '') + (mis.length ? '<p class="ch-muted ch-small">Dari pola skill kelas:</p><ol class="ch-mis">' + mis.map(function (m) { return '<li><b>' + esc(m.label) + '</b> — ' + esc(m.pattern) + '<small>' + esc(m.lesson) + '</small></li>'; }).join('') + '</ol>' : '') + (!fromEvidence.length && !mis.length ? '<p class="ch-muted">' + t('kelas.belum-cukup-bukti', 'Belum ada bukti cukup. Kirim satu tugas dan tunggu murid mengerjakannya.') + '</p>' : '') + '</section>' +
       '<section class="ch-card"><p class="ch-kicker">Saran Braincore untuk langkah berikutnya</p>' + (weakest ? '<p>Skill terlemah kelas: <b>' + esc(weakest.label) + '</b> (' + pct(weakest.acc) + '). Saran: tugas remedial 8 soal, mode latihan, tenggat 3 hari.</p><div class="ch-actions"><button type="button" class="tg-btn is-primary" data-ch="remedial" data-skill="' + esc(weakest.skill) + '" data-title="' + esc('Remedial ' + weakest.label) + '" data-testid="tclass-braincore-remedial">' + icon('life-buoy') + ' Susun tugas remedial</button><button type="button" class="tg-btn is-ghost" data-tg="view" data-view="insights">' + icon('activity') + ' Analitik lengkap</button></div>' : '<p class="ch-muted">Saran muncul setelah ada akurasi per skill.</p>') + '</section></div>';

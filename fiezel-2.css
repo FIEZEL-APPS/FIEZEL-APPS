@@ -226,3 +226,125 @@ body .fz2-day i.is-big{background:var(--sun-deep)}
 body .fz2-day i.is-today{background:transparent;border:2px dashed var(--sun-deep)}
 body .fz2-day span{display:block;margin-top:6px;font-size:.7rem;font-weight:700;color:var(--muted)}
 body .fz2-week-note{margin:12px 0 0;font-size:.8rem}
+
+/* ==========================================================================
+   Audit UI/UX F17 + F18 (2026-09-23): SATU wujud tombol dan SATU gaya "terpilih".
+   Akar F17: `body.fz-lux button` (fiezel-lux.css, 0-1-2) mengalahkan `.fiezel-btn-primary`
+   (style.css, 0-1-0), jadi "Lanjut" di perkenalan tercat putih - identik dengan "Lewati
+   langkah ini" - dan keadaan nonaktifnya memakai pink yang sama dengan "terpilih".
+   Empat keadaan, semuanya dari token tombol utama aplikasi (lihat baris .primary di atas):
+     primary  : --accent, teks putih        (sama dengan Home dan kuis)
+     secondary: tanpa bidang, teks tinta
+     disabled : redup (bidang --line-soft, teks --text-disabled) - BUKAN berwarna
+     selected : garis 2px --accent (7:1 terhadap putih, lolos WCAG 1.4.11) + tanda centang
+   ========================================================================== */
+body .fiezel-ob .fiezel-btn-primary:not([disabled]){background:var(--accent);background-image:none;color:#FFFFFF;border:0;box-shadow:var(--lift-sun)}
+body .fiezel-ob .fiezel-btn-ghost{background:transparent;color:var(--text);border:0!important;box-shadow:none!important;text-decoration:underline;text-underline-offset:3px}
+body .fiezel-ob .fiezel-btn[disabled]{background:var(--line-soft);background-image:none;color:var(--text-disabled);border:0;box-shadow:none;cursor:not-allowed}
+/* !important di tiga baris ini disengaja: resep tombol global `html.fiezel-ui-v6 body
+   button:not(...)x11` berspesifisitas 0-12-3 dan memaku border/bayangan ke SEMUA tombol. */
+body .fiezel-ob .fiezel-goal-card.is-selected,
+body .fiezel-ob .fiezel-level-chip.is-selected{position:relative;border:2px solid var(--accent)!important;background:#FFFFFF;color:var(--text);box-shadow:0 0 0 3px rgba(155,58,74,.14)!important}
+body .fiezel-ob .fiezel-goal-card.is-selected b,body .fiezel-ob .fiezel-level-chip.is-selected{color:var(--accent)}
+body .fiezel-ob .fiezel-goal-card.is-selected::after,body .fiezel-ob .fiezel-level-chip.is-selected::after{content:"\2713";position:absolute;top:8px;right:10px;width:20px;height:20px;border-radius:50%;background:var(--accent);color:#FFFFFF;font-size:12px;font-weight:800;line-height:20px;text-align:center}
+body .fiezel-ob .fiezel-level-chip.is-selected::after{top:-7px;right:-7px;width:18px;height:18px;line-height:18px;font-size:11px}
+/* Segmen progres perkenalan: yang selesai berwarna penuh (dulu 1,03-1,08:1 terhadap yang belum). */
+body .fiezel-ob .fiezel-segments i.is-done{background:var(--accent);background-image:none}
+
+/* ==========================================================================
+   Audit UI/UX F19 (2026-09-23): hierarki tipografi dan spasi kata.
+   Dua H2 setingkat di Home tampil sangat berbeda ("Rencana belajar" 24px tebal 400 vs
+   "Latihan Singkat" 13px tebal 700). Skala tetap untuk judul bagian di layar utama:
+   H2 18px/700. Plus Jakarta Sans berspasi kata sempit (0,17em); ditambah letter-spacing
+   negatif di teks 12,5-13px batas kata jadi kabur - teks kecil kini letter-spacing 0 dan
+   word-spacing .05em.
+   ========================================================================== */
+body main.app .section-head h2,
+body main.app h2.quick-practice-title,
+body main.app .home-section-head h2{font-size:1.125rem;font-weight:700;letter-spacing:0;line-height:1.3}
+body small,body .muted,body .ch-small,body .launch-card small,body .setting-row small,body .today-blocks span{letter-spacing:0;word-spacing:.05em}
+/* F19: judul kartu peluncur (Rencana Hari Ini, PAW ARENA) setebal judul lain. */
+body .learning-launcher .launch-card b{font-weight:700;letter-spacing:0}
+
+/* ==========================================================================
+   Audit UI/UX F21 (2026-09-23): desktop bukan ponsel yang dilebarkan.
+   Kartu perkenalan dan tur dulu melebar sampai 1.408px dengan teks kecil rata kiri. Di
+   layar lebar keduanya dibatasi ±560px (tur ±440px) dan diletakkan di tengah.
+   ========================================================================== */
+@media (min-width:900px){
+  body .fiezel-ob .fiezel-sheet,
+  body .fiezel-ob .fiezel-stepper,
+  body .fiezel-ob .fiezel-topbar,
+  body .fiezel-ob .fiezel-stage{max-width:560px;width:100%;margin-left:auto;margin-right:auto;box-sizing:border-box}
+  body .fz-tour-card{left:50%;right:auto;width:min(440px,calc(100vw - 32px));transform:translateX(-50%)}
+}
+
+/* ==== Kursus Bahasa Jepang: tema khas Jepang (body.fz-lang-ja, dipasang renderInner) ====
+   Palet tradisional: shu (朱, merah vermilion torii) sebagai aksen, ai (藍, nila) sebagai tinta,
+   washi (kertas krem) sebagai latar, sakura sebagai lembut. Motif seigaiha (gelombang) sangat
+   tipis di latar, judul memakai huruf Mincho bawaan sistem (tanpa unduhan font - CSP).
+   Kontras teks tetap >= 4.5:1: shu #B3372A di atas putih ~5.6:1, ai #1E2B45 ~14:1. */
+html body.fz-lang-ja,html.fiezel-ui-v6 body.fz-lang-ja{
+  --bg:#F7F2E8;--panel:#FFFDF8;--panel-soft:#F2EBDD;
+  --line:#E6DCCB;--line-soft:#EFE8DA;--line-strong:#D6C8B0;
+  --text:#1E2B45;--muted:#555C6B;--muted-soft:#5F6574;--black:#1E2B45;--ambient-muted:#555C6B;
+  --accent:#B3372A;--accent-strong:#8C2920;--accent-soft:#FBE7E1;--accent-on-glass:#8C2920;
+  --chrome-bg:rgba(247,242,232,.94);--launcher-start:#FBEDE8;--launcher-end:#F6DCD3;
+  --lux-accent:#B3372A;--lux-accent-deep:#8C2920;--lux-cream:#F7F2E8;--lux-ink:#1E2B45;--lux-muted:#555C6B;
+  --lux-paper:#FFFDF8;--lux-paper-warm:#FBF6EC;--lux-yellow:#F6DCD3;--lux-yellow-soft:#FBEDE8;--lux-yellow-deep:#E9BFB2;
+  --lux-glow:0 10px 28px -6px rgba(179,55,42,.28);
+  --ui-accent:#B3372A;--ui-accent-soft:#FBE7E1;--ui-tint-soft:#FBEDE8;
+  --fz-accent:#B3372A;--fz-accent-deep:#8C2920;--fz-soft:#FBE7E1;--fz-sun:#F4DDD2;--fz-sun-soft:#FBEDE8;--fz-sun-press:#E9C6B8;
+  --maroon:#B3372A;--maroon-deep:#8C2920;--maroon-soft:#FBE7E1;--wordmark-accent-lo:#B3372A;
+  --sun:#F4DDD2;--sun-soft:#FBEDE8;--sun-deep:#E9C6B8;--yellow:#F4DDD2;--yellow-soft:#FBEDE8;--yellow-deep:#E9C6B8;
+  --pz-yellow:#F4DDD2;--pz-yellow-line:#E9C6B8;--skill-bg:#FBEDE8;--skill-line:#E9C6B8;--info-soft:#FBEDE8;
+  --scene-light:rgba(179,55,42,.07);
+  /* Pastel kartu -> warna tradisional: sakura, matcha, fuji (wisteria), sora (langit). */
+  --pz-pink:#F7DEDF;--pz-pink-line:#EDC4C7;--pz-pink-ink:#8C2F3E;
+  --pz-mint:#E0E8CF;--pz-mint-line:#C8D6AE;--pz-mint-ink:#3F5A1E;
+  --pz-lilac:#E4DEEF;--pz-lilac-line:#CDC3E2;--pz-lilac-ink:#4B3D7A;
+  --pz-sky:#DCE5EF;--pz-sky-line:#C1D0E0;--pz-sky-ink:#1E3F5E;
+  --fz-ja-serif:"Hiragino Mincho ProN","Yu Mincho","YuMincho","Noto Serif JP","Noto Serif CJK JP","Source Han Serif JP",serif;
+  --fz-ja-wave:rgba(30,43,69,.045);
+}
+/* html.fiezel-ui-v6 body (tutor-v3.css) melukis latar krem; spesifisitas disamakan agar washi menang. */
+html body.fz-lang-ja,html.fiezel-ui-v6 body.fz-lang-ja{
+  background-color:var(--bg);
+  background-image:
+    radial-gradient(circle at 50% 100%,transparent 9px,var(--fz-ja-wave) 10px 11px,transparent 12px 15px,var(--fz-ja-wave) 16px 17px,transparent 18px),
+    radial-gradient(circle at 0 50%,transparent 9px,var(--fz-ja-wave) 10px 11px,transparent 12px 15px,var(--fz-ja-wave) 16px 17px,transparent 18px),
+    radial-gradient(circle at 100% 50%,transparent 9px,var(--fz-ja-wave) 10px 11px,transparent 12px 15px,var(--fz-ja-wave) 16px 17px,transparent 18px);
+  background-size:40px 20px,40px 20px,40px 20px;
+  background-position:0 0,20px 10px,20px 10px;
+}
+/* Judul dan merek: Mincho, sedikit renggang seperti papan nama kuil. */
+html body.fz-lang-ja :is(h1,h2,.fz-display,.today-title,.page-title):not(#quizStem,#quizStem *,.quiz-shell *,.quiz-stage *){font-family:var(--fz-ja-serif);letter-spacing:.02em}
+/* Kartu: kertas washi dengan garis shu tipis di atas (seperti sabuk obi). */
+body.fz-lang-ja :is(.card,.panel,.lux-card,.today-card,.setting-card){background-color:var(--panel);border-color:var(--line);box-shadow:inset 0 3px 0 -1px rgba(179,55,42,.55),var(--shadow-sm)}
+/* Kartu Hari ini: washi dengan matahari terbit samar di belakang lencana level. */
+html body.fz-lang-ja .today-card{background:radial-gradient(circle at calc(100% - 66px) 64px,rgba(179,55,42,.13) 0 62px,transparent 63px),linear-gradient(160deg,#FFFBF4 0%,#F4E3D8 100%)}
+/* Topbar: garis bawah nila tipis seperti noren. */
+body.fz-lang-ja .topbar{border-bottom:1px solid rgba(30,43,69,.12)}
+/* Tombol utama: shu padat, sudut sedikit lebih tegas. */
+body.fz-lang-ja :is(.btn-primary,.primary,.fiezel-btn-primary,.quiz-next):not([disabled]){background:var(--accent);border-color:var(--accent);color:#fff}
+body.fz-lang-ja :is(.btn-primary,.primary,.fiezel-btn-primary,.quiz-next):not([disabled]):hover{background:var(--accent-strong)}
+/* Kuis: pilihan jawaban di atas washi, huruf Jepang di soal sedikit lebih besar agar kana/kanji terbaca. */
+body.fz-lang-ja .option{background:var(--panel);border-color:var(--line-strong)}
+body.fz-lang-ja .option:lang(ja),body.fz-lang-ja [lang="ja"]{font-family:"Hiragino Sans","Yu Gothic","Noto Sans JP","Noto Sans CJK JP",system-ui,sans-serif;line-height:1.7}
+/* Bentuk: sudut lebih tegas seperti ubin dan papan kayu, bukan kapsul marshmallow kursus Inggris. */
+html body.fz-lang-ja,html.fiezel-ui-v6 body.fz-lang-ja{--radius-xl:18px;--radius-lg:14px;--radius-md:10px;--radius-sm:8px;--lux-r-xl:20px;--lux-r-lg:16px;--lux-r-md:12px;--lux-r-sm:10px}
+/* Nav bawah: pita nila (ai) seperti noren; tab aktif diberi cap shu. Kontras krem #EDE6D6 di atas #1E2B45 ~11:1. */
+html body.fz-lang-ja nav.bottomnav,html body.fz-lang-ja .bottomnav{background:#1E2B45!important;border:1px solid #1E2B45!important;box-shadow:0 12px 30px -10px rgba(30,43,69,.55)!important;border-radius:18px!important}
+html body.fz-lang-ja nav.bottomnav .nav,html body.fz-lang-ja .bottomnav .nav{color:#EDE6D6!important}
+html body.fz-lang-ja nav.bottomnav .nav .fz-i{--fz-i-fill:transparent!important;--fz-i-line:#EDE6D6!important}
+html body.fz-lang-ja nav.bottomnav .nav .fz-i svg{stroke:#EDE6D6!important}
+html body.fz-lang-ja nav.bottomnav .nav.active,html body.fz-lang-ja .bottomnav .nav.active{color:#FFFFFF!important;background:transparent!important}
+html body.fz-lang-ja nav.bottomnav .nav.active::after{background:transparent!important}
+html body.fz-lang-ja nav.bottomnav .nav.active .fz-i,html body.fz-lang-ja nav.bottomnav .nav[data-view="classroom"].active .fz-i{background:#B3372A!important;border:1.5px solid rgba(255,255,255,.85)!important;border-radius:50%!important;box-shadow:0 6px 14px rgba(179,55,42,.45)!important;--fz-i-fill:#B3372A!important;--fz-i-line:#FFFFFF!important}
+html body.fz-lang-ja nav.bottomnav .nav.active .fz-i svg{stroke:#FFFFFF!important}
+html body.fz-lang-ja nav.bottomnav .nav .kelasku-wordmark,html body.fz-lang-ja nav.bottomnav .nav[data-view="classroom"].active .kelasku-wordmark{color:inherit!important}
+html body.fz-lang-ja #app :is(.launch-card,.today-card,.card){border-radius:16px!important}
+/* Judul bagian: garis shu tegak di kiri, seperti penanda bab buku ajar Jepang. */
+html body.fz-lang-ja #app :is(h2,.section-title):not(#quizStem):not(.quiz-shell *){border-left:4px solid var(--accent);padding-left:10px}
+@media (prefers-reduced-transparency:reduce){html.fiezel-ui-v6 body.fz-lang-ja{background-image:none}}
+@media print{html.fiezel-ui-v6 body.fz-lang-ja{background:#fff}}

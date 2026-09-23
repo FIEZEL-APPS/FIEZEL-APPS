@@ -1,25 +1,25 @@
 {
   "schema": "fiezel-th-ui-leak-v1",
-  "generatedAt": "2026-09-21T18:57:15.092Z",
+  "generatedAt": "2026-09-23T13:04:29.847Z",
   "files": {
     "app.js": {
       "leaks": 4,
       "budget": 4,
       "sample": [
         {
-          "line": 8121,
+          "line": 8190,
           "text": "Selesaikan ritme hari ini"
         },
         {
-          "line": 8940,
+          "line": 9014,
           "text": "— Penugasan latihan dan pemantauan capaian murid."
         },
         {
-          "line": 9553,
+          "line": 9627,
           "text": "Nama kriteria: n/4 - satu kalimat alasan yang menunjuk bukti di tulisannya"
         },
         {
-          "line": 14346,
+          "line": 14468,
           "text": "Latihan"
         }
       ]
@@ -103,23 +103,23 @@
       "budget": 6,
       "sample": [
         {
-          "line": 591,
+          "line": 578,
           "text": "Tugas disimpan sebagai"
         },
         {
-          "line": 591,
+          "line": 578,
           "text": ". Lanjutkan kapan saja."
         },
         {
-          "line": 658,
+          "line": 645,
           "text": "Latihan ·"
         },
         {
-          "line": 1455,
+          "line": 1657,
           "text": "Latihan · ±"
         },
         {
-          "line": 1503,
+          "line": 1705,
           "text": "Tenggat"
         }
       ]
@@ -181,7 +181,7 @@
       "budget": 1,
       "sample": [
         {
-          "line": 239,
+          "line": 254,
           "text": ", jadi pola ini akan diulang lagi besok. Sekarang kita lanjut ke"
         }
       ]
@@ -267,7 +267,7 @@
           "text": "Sudah punya akun? Masuk dulu supaya kelas dan tugas gurumu ikut."
         },
         {
-          "line": 1431,
+          "line": 1461,
           "text": "Belum berhasil masuk. Pilih bahasa dulu — masuk bisa nanti dari Pengaturan. ·"
         }
       ]
@@ -415,15 +415,15 @@
           "text": "Penugasan nilai (assignment)"
         },
         {
-          "line": 3275,
+          "line": 3293,
           "text": "Tenggat & tugas"
         },
         {
-          "line": 3293,
+          "line": 3311,
           "text": "Akurasi"
         },
         {
-          "line": 3314,
+          "line": 3332,
           "text": "Latihan ·"
         }
       ]
@@ -480,8 +480,8 @@
     }
   },
   "copyKeys": {
-    "id": 3122,
-    "th": 3124,
+    "id": 3166,
+    "th": 3168,
     "idTanpaTh": 0
   },
   "pass": true

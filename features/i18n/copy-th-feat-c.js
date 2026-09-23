@@ -7,7 +7,7 @@
     'social.tab-profile': 'โปรไฟล์',
     'social.tab-friends': 'เพื่อน',
     'social.tab-leaderboard': 'กระดานผู้นำ',
-    'social.shell-title': 'ออนไลน์ & เพื่อน',
+    'social.shell-title': 'โปรไฟล์',
     'social.shell-desc': 'แบ่งปันการเรียนรู้ร่วมกัน — ใช้นามแฝง ไม่มีแชท และเป็นทางเลือกทั้งหมด',
     'social.loading': 'กำลังเตรียมฟีเจอร์ออนไลน์…',
     'social.offline-title': 'คุณออฟไลน์อยู่',

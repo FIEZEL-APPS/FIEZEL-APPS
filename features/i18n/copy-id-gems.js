@@ -29,17 +29,17 @@
     // gems-core.js GEMS_COPY.name
     'gems.name': 'Gem Terjemahan',
     // gems-core.js GEMS_COPY.toastStreak
-    'gems.toast-streak': 'Streak 5! +2 Gem Terjemahan buat kamu — simpan atau langsung pakai, bebas.',
+    'gems.toast-streak': '5 benar beruntun! +2 Gem Terjemahan buat kamu — simpan atau langsung pakai, bebas.',
     // gems-core.js GEMS_COPY.toggleLabel
     'gems.toggle-label': 'Terjemahan Indonesia',
     // gems-core.js GEMS_COPY.emptyTitle
     'gems.empty-title': 'Gem kamu lagi kosong',
     // gems-core.js GEMS_COPY.emptyBody
-    'gems.empty-body': 'Tenang, ini bukan tembok bayar — Gem Terjemahan memang nggak dijual, dan nggak akan pernah. Cara dapatnya cuma satu: belajar. Kumpulin streak jawaban benar, dan gem-nya ngalir sendiri. PAW yakin nggak butuh lama, kok.',
+    'gems.empty-body': 'Tenang, ini bukan tembok bayar — Gem Terjemahan memang nggak dijual, dan nggak akan pernah. Cara dapatnya cuma satu: belajar. Kumpulin rentetan jawaban benar, dan gem-nya ngalir sendiri. PAW yakin nggak butuh lama, kok.',
     // gems-core.js GEMS_COPY.settingsTitle
     'gems.settings-title': 'Gem Terjemahan',
     // gems-core.js GEMS_COPY.settingsBody
-    'gems.settings-body': 'Gem Terjemahan adalah mata uang belajarmu: kamu dapat gratis tiap streak jawaban benar, dan dipakai buat membuka terjemahan otomatis di sesi Listening (1 gem per sesi, butuh jaringan). Gem nggak dijual dan nggak bisa dibeli — satu-satunya jalan mendapatkannya ya belajar.',
+    'gems.settings-body': 'Gem Terjemahan adalah mata uang belajarmu: kamu dapat gratis tiap rentetan jawaban benar, dan dipakai buat membuka terjemahan otomatis di sesi Listening (1 gem per sesi, butuh jaringan). Gem nggak dijual dan nggak bisa dibeli — satu-satunya jalan mendapatkannya ya belajar.',
     // gems-core.js GEMS_COPY.unavailable
     'gems.unavailable': 'Terjemahan belum bisa diambil — butuh jaringan dan jatah AI masih terbatas. Gem kamu nggak terpakai.',
     // gems-core.js GEMS_COPY.autoNote

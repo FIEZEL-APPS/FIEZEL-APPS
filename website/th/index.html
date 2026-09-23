@@ -28,7 +28,7 @@
 <meta name="twitter:description" content="สองคอร์สภาษาที่ปรับตามคุณ: อังกฤษ (CEFR A1–C2) และญี่ปุ่น (JLPT N5–N4) พร้อมชั้นเครื่องมือสำหรับครู ฟรี">
 <meta name="twitter:image" content="https://fiezel.my.id/assets/shots/th/latihan-desktop.png">
 <link rel="stylesheet" href="../tokens.css?v=20260903-hula02">
-<link rel="stylesheet" href="../style.css?v=20260906-fzflow02">
+<link rel="stylesheet" href="../style.css?v=20260923-audit-uiux">
 <link rel="stylesheet" href="../assets/mascot/fiezel-motion.css?v=20260903-hula02">
 <!-- Font (W3-WEB): halaman th memakai stack font SISTEM Thai — brand font Plus Jakarta Sans tak punya glyph Thai,
      dan keputusan Noto Sans Thai Looped self-host di brief berlaku untuk APP; marketing tak wajib brand font (dicatat di laporan). -->
@@ -332,7 +332,7 @@
     "name": "FIEZEL",
     "alternateName": "FIEZEL — พื้นที่เรียนภาษา",
     "url": "https://fiezel.my.id/",
-    "description": "พื้นที่เรียนภาษาอังกฤษส่วนตัว — grammar คำศัพท์ reading speaking listening ฟรีและ adaptive",
+    "description": "พื้นที่เรียนภาษาส่วนตัว — grammar คำศัพท์ reading speaking listening ฟรีและ adaptive",
     "inLanguage": ["th", "id"],
     "publisher": {"@id": "https://fiezel.my.id/#org"}
   }
@@ -346,7 +346,7 @@
     "@type": "SpeakableSpecification",
     "cssSelector": [".mast-sub", ".sec-intro .lede", ".sec-about .body-lg", ".faq summary", ".faq .faq-body p"]
   },
-  "name": "FIEZEL — พื้นที่เรียนภาษาอังกฤษส่วนตัวของคุณ ฟรี",
+  "name": "FIEZEL — พื้นที่เรียนภาษาส่วนตัวของคุณ ฟรี",
   "url": "https://fiezel.my.id/th/"
 }
 </script>
@@ -355,15 +355,7 @@
 <a class="skip" href="#main">ข้ามไปยังเนื้อหาหลัก</a>
 
 <header class="topbar">
-  <div class="credit-strip">
-    <div class="wrap credit-in">
-      <span>Create by</span>
-      <a class="credit-ig" href="https://instagram.com/fitrarustqi" target="_blank" rel="noopener" aria-label="Instagram @fitrarustqi">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2.5" y="2.5" width="19" height="19" rx="5.5"/><circle cx="12" cy="12" r="4.2"/><circle cx="17.4" cy="6.6" r="1.2" fill="currentColor" stroke="none"/></svg>
-        <strong>@fitrarustqi</strong>
-      </a>
-    </div>
-  </div>
+  <!-- Audit F26 (2026-09-23): kredit pindah ke footer - dulu berada DI ATAS navigasi. -->
   <div class="wrap topbar-in">
     <a class="brand" href="./" aria-label="FIEZEL — หน้าหลัก">
       <!-- ikon logo resmi: geometri asli assets/brand/fiezel-paw.svg, diwarnai maroon -->
@@ -371,11 +363,19 @@
       <svg class="brand-word" viewBox="0 0 968 260" role="img" aria-label="Wordmark FIEZEL"><g fill="currentColor"><rect x="30" y="30" width="42" height="200" rx="21"/><rect x="30" y="30" width="144" height="42" rx="21"/><rect x="30" y="109" width="116" height="42" rx="21"/><rect x="268" y="30" width="42" height="200" rx="21"/><rect x="268" y="30" width="144" height="42" rx="21"/><rect x="268" y="109" width="100" height="42" rx="21"/><rect x="268" y="188" width="130" height="42" rx="21"/><rect x="446" y="30" width="150" height="42" rx="21"/><rect x="446" y="188" width="150" height="42" rx="21"/><rect x="575" y="30" width="191.38" height="42" rx="21" transform="rotate(124.354 575 51)"/><rect x="630" y="30" width="42" height="200" rx="21"/><rect x="630" y="30" width="144" height="42" rx="21"/><rect x="630" y="109" width="100" height="42" rx="21"/><rect x="630" y="188" width="130" height="42" rx="21"/><rect x="808" y="30" width="42" height="200" rx="21"/><rect x="808" y="188" width="130" height="42" rx="21"/><rect x="192" y="30" width="42" height="200" rx="21"/></g></svg>
     </a>
     <nav class="topnav" aria-label="เมนูหลัก">
+      <div class="topnav-links">
       <a href="untuk-sekolah.html">สำหรับโรงเรียน</a>
       <a href="../app/?teacher=preview"><span class="kelasku-brand"><span class="kelasku-main" style="color:#1F7A63">KelasKu</span> <span class="kelasku-tag" style="color:var(--maroon-mid)">สำหรับครู</span></span></a>
       <a href="install/">วิธีติดตั้ง</a>
       <a class="lang-switch" href="../" hreflang="id" lang="id" aria-label="Ganti ke Bahasa Indonesia" onclick="try{localStorage.setItem('fiezel-site-locale','id')}catch(e){}">Indonesia</a>
+      </div>
       <a class="btn btn-sm btn-primary" href="../app/">เริ่มเรียน</a>
+      <details class="topnav-more"><summary aria-label="เมนู"><span aria-hidden="true">☰</span> เมนู</summary><div class="topnav-sheet">
+      <a href="untuk-sekolah.html">สำหรับโรงเรียน</a>
+      <a href="../app/?teacher=preview"><span class="kelasku-brand"><span class="kelasku-main" style="color:#1F7A63">KelasKu</span> <span class="kelasku-tag" style="color:var(--maroon-mid)">สำหรับครู</span></span></a>
+      <a href="install/">วิธีติดตั้ง</a>
+      <a class="lang-switch" href="../" hreflang="id" lang="id" aria-label="Ganti ke Bahasa Indonesia" onclick="try{localStorage.setItem('fiezel-site-locale','id')}catch(e){}">Indonesia</a>
+      </div></details>
     </nav>
   </div>
 </header>
@@ -396,6 +396,7 @@
         <!-- wordmark RESMI repo: assets/brand/fiezel-wordmark.svg (inline, tint maroon) -->
         <svg class="mast-word" viewBox="0 0 1000 260" role="img" aria-label="FIEZEL"><defs><linearGradient id="fzwMaroon-mast" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#8C2233"/><stop offset="100%" stop-color="#6D1926"/></linearGradient><linearGradient id="fzwGold-mast" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#FFDE59"/><stop offset="45%" stop-color="#FFC700"/><stop offset="100%" stop-color="#E6A800"/></linearGradient></defs><g fill="url(#fzwMaroon-mast)"><rect x="30" y="30" width="42" height="200" rx="21"/><rect x="30" y="30" width="144" height="42" rx="21"/><rect x="30" y="109" width="116" height="42" rx="21"/><rect x="300" y="30" width="42" height="200" rx="21"/><rect x="300" y="30" width="144" height="42" rx="21"/><rect x="300" y="109" width="100" height="42" rx="21"/><rect x="300" y="188" width="130" height="42" rx="21"/><rect x="478" y="30" width="150" height="42" rx="21"/><rect x="478" y="188" width="150" height="42" rx="21"/><rect x="607" y="30" width="191.38" height="42" rx="21" transform="rotate(124.354 607 51)"/><rect x="662" y="30" width="42" height="200" rx="21"/><rect x="662" y="30" width="144" height="42" rx="21"/><rect x="662" y="109" width="100" height="42" rx="21"/><rect x="662" y="188" width="130" height="42" rx="21"/><rect x="840" y="30" width="42" height="200" rx="21"/><rect x="840" y="188" width="130" height="42" rx="21"/></g><g fill="url(#fzwGold-mast)"><rect x="192" y="30" width="26" height="200" rx="13"/><rect x="240" y="106" width="26" height="124" rx="13"/></g></svg>
       </div>
+      <h1 class="mast-h1 seq seq-2">เรียนภาษาอังกฤษและญี่ปุ่นที่ปรับตามคำตอบของคุณ ฟรี</h1>
       <p class="mast-sub seq seq-2">Not just learning with you. Learning about you.</p>
       <div class="cta-row cta-center mast-cta seq seq-3">
         <a class="btn btn-primary" href="../app/">เริ่มเรียน</a>
@@ -446,12 +447,6 @@
           <circle cx="180" cy="90" r="3" class="fzflow-lite"/>
           <circle cx="700" cy="450" r="3" class="fzflow-lite"/>
         </svg>
-        <span class="fzflow-label fzflow-l1" style="--i:0"><b>B1</b> · 87%</span>
-        <span class="fzflow-label fzflow-l2" style="--i:1"><b>A2 → B1</b></span>
-        <span class="fzflow-label fzflow-l3" style="--i:2">98.2%</span>
-        <span class="fzflow-label fzflow-l4" style="--i:3"><b>×1.4</b></span>
-        <span class="fzflow-label fzflow-l5" style="--i:4">Δ +12</span>
-        <span class="fzflow-label fzflow-l6" style="--i:5">CEFR <b>B2</b></span>
         <span class="fzflow-glyph fzflow-g1" style="--i:0" lang="ja">あ</span>
         <span class="fzflow-glyph fzflow-g2" style="--i:1" lang="ja">学</span>
         <span class="fzflow-glyph fzflow-g3" style="--i:2" lang="en">A</span>
@@ -989,7 +984,7 @@
     <div class="wrap intro-grid">
       <div class="intro-copy reveal">
         <p class="eyebrow">ฟรี ไม่มีค่าสมัครสมาชิก</p>
-        <h1>พื้นที่เรียนภาษาส่วนตัวของคุณ</h1>
+        <h2 class="h1-look">พื้นที่เรียนภาษาส่วนตัวของคุณ</h2>
         <p class="lede">สองคอร์สในแอปเดียว: <strong>ภาษาอังกฤษ</strong> จัดตามระดับ CEFR A1–C2 และ <strong>ภาษาญี่ปุ่น</strong> จัดตามระดับ JLPT N5–N4 โจทย์ปรับตามคำตอบของคุณ ไม่ใช่เรียงตามลำดับตายตัว ฟรี ไม่มีค่าสมัครสมาชิก</p>
         <div class="cta-row">
           <a class="btn btn-primary" href="../app/">เริ่มเรียน</a>
@@ -1248,7 +1243,11 @@
   <div class="wrap foot-in">
     <div class="foot-brand">
       <svg class="foot-word" viewBox="0 0 1000 260" role="img" aria-label="FIEZEL"><defs><linearGradient id="fzwMaroon-foot" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#8C2233"/><stop offset="100%" stop-color="#6D1926"/></linearGradient><linearGradient id="fzwGold-foot" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#FFDE59"/><stop offset="45%" stop-color="#FFC700"/><stop offset="100%" stop-color="#E6A800"/></linearGradient></defs><g fill="url(#fzwMaroon-foot)"><rect x="30" y="30" width="42" height="200" rx="21"/><rect x="30" y="30" width="144" height="42" rx="21"/><rect x="30" y="109" width="116" height="42" rx="21"/><rect x="300" y="30" width="42" height="200" rx="21"/><rect x="300" y="30" width="144" height="42" rx="21"/><rect x="300" y="109" width="100" height="42" rx="21"/><rect x="300" y="188" width="130" height="42" rx="21"/><rect x="478" y="30" width="150" height="42" rx="21"/><rect x="478" y="188" width="150" height="42" rx="21"/><rect x="607" y="30" width="191.38" height="42" rx="21" transform="rotate(124.354 607 51)"/><rect x="662" y="30" width="42" height="200" rx="21"/><rect x="662" y="30" width="144" height="42" rx="21"/><rect x="662" y="109" width="100" height="42" rx="21"/><rect x="662" y="188" width="130" height="42" rx="21"/><rect x="840" y="30" width="42" height="200" rx="21"/><rect x="840" y="188" width="130" height="42" rx="21"/></g><g fill="url(#fzwGold-foot)"><rect x="192" y="30" width="26" height="200" rx="13"/><rect x="240" y="106" width="26" height="124" rx="13"/></g></svg>
-      <p class="foot-tag">พื้นที่เรียนภาษาอังกฤษส่วนตัว</p>
+      <p class="foot-tag">พื้นที่เรียนภาษาส่วนตัว</p>
+      <p class="foot-credit">Created by <a class="credit-ig" href="https://instagram.com/fitrarustqi" target="_blank" rel="noopener" aria-label="Instagram @fitrarustqi">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2.5" y="2.5" width="19" height="19" rx="5.5"/><circle cx="12" cy="12" r="4.2"/><circle cx="17.4" cy="6.6" r="1.2" fill="currentColor" stroke="none"/></svg>
+        <strong>@fitrarustqi</strong>
+      </a></p>
       <nav class="foot-links" aria-label="ลิงก์ท้ายเว็บ">
         <a href="../app/">เปิดแอป</a>
         <span aria-hidden="true">·</span>
