@@ -385,3 +385,19 @@ html body .ja-kana .kana-tab[aria-selected="true"]{background:var(--accent);colo
 .ja-quiz-display{display:flex;justify-content:center;margin:8px 0 2px}
 .ja-quiz-display .ja-display{margin:0}
 body.fz-ja-no-romaji .ja-run{display:inline}
+
+/* ==== Audit F21: desktop bukan ponsel yang dilebarkan (≥1100px) ====
+   Kolom konten melebar, rel navigasi kiri MENEMPEL ke tepi kolom (bukan mengambang di tepi
+   layar), Home menjadi dua kolom: kartu Hari ini di kiri (menempel saat digulir), rencana +
+   latihan singkat + sosial di kanan. Layar baca/kuis tetap sempit supaya panjang baris nyaman. */
+@media (min-width:1100px){
+  html.fiezel-ui-v6 body.fz-lux .app{max-width:1240px;padding-left:136px;padding-right:32px}
+  html.fiezel-ui-v6 body.fz-lux .bottomnav{left:max(20px,calc(50% - 620px + 28px));top:112px;transform:none}
+  .today-home-cockpit{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);column-gap:28px;align-items:start}
+  .today-home-cockpit>*{grid-column:2;min-width:0}
+  .today-home-cockpit>.paw-hero-cockpit{grid-column:1/-1}
+  .today-home-cockpit>.today-card{grid-column:1;grid-row:2/span 12;position:sticky;top:88px;align-self:start;width:100%;max-width:none;margin-left:0;margin-right:0;box-sizing:border-box}
+  .quiz-shell,.lesson-page,.reading-stage{max-width:780px;margin-left:auto;margin-right:auto}
+  .learning-launcher{grid-template-columns:repeat(3,minmax(0,1fr))}
+  #app .stats:has(> :nth-child(5):last-child){grid-template-columns:repeat(5,minmax(0,1fr))}
+}
