@@ -14,7 +14,9 @@
     vocabulary: Object.freeze({ minEntries: 1500, maxEmptyMeaningPercent: 1, maxEmptyPhoneticPercent: 5 }),
     reading: Object.freeze({ minPassages: 200, maxDuplicatePercent: 1 }),
     grammar: Object.freeze({ minTemplates: 100, minItemsPerSkill: 1 }),
-    leveltest: Object.freeze({ totalQuestions: 25 }),
+    // liteQuestions: tes awal ringkas (bendera placementLite, bawaan HIDUP). Satu sumber untuk
+    // app.js (PLACEMENT_LITE_SIZE) dan salinan perkenalan - audit F01/F04 2026-09-22.
+    leveltest: Object.freeze({ totalQuestions: 25, liteQuestions: 12 }),
     listening: Object.freeze({ minItems: 30 }),
     speaking: Object.freeze({ minItems: 30 }),
     // m025-45: Supertonic 3 ships 11 files (wasm + js + worker + four int8 models +

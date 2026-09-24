@@ -1204,6 +1204,20 @@ jobs:
         # hal dan melakukan hal lain. Gerbang mengikat penjaganya ke ADA-TIDAKNYA berkas di
         # content/ja/, jadi ia BERBALIK menuntut penjaga dicabut begitu banknya dibuat.
         run: node tests/japanese-surface-honesty-test.js
+      - name: 'Permukaan kursus Jepang: furigana/romaji, tabel kana, kartu segera hadir'
+        # Kursus Jepang punya pola yang tidak ada di kursus Inggris: furigana <ruby> dan
+        # romaji yang bisa disembunyikan, tabel kana, label JLPT. Kartu "Segera hadir" untuk
+        # menyimak/berbicara/kanji/simulasi JLPT harus tetap tidak bisa diketuk.
+        run: node tests/japanese-ja-ui-test.js
+      - name: 'Ruang Guru dimuat malas (audit F28)'
+        # Shell + kurikulum guru (±600 KB) tidak lagi dimuat saat boot untuk setiap murid.
+        # Pemuat kecil menjawab previewAllowed() seketika dan mengambil modul penuh hanya
+        # untuk guru/demo; kegagalan unduh jatuh ke Tutor Action Center.
+        run: node tests/teacher-lazy-load-test.js
+      - name: 'Ruang Guru: satu lapis navigasi (audit F25)'
+        run: node tests/teacher-single-nav-test.js
+      - name: 'Intro materi mengajarkan aturan topiknya (audit F10)'
+        run: node tests/grammar-lesson-rule-test.js
       - name: 'Penjaga bahasa target duduk di rute, bukan di kartu'
         # Gerbang japanese-surface-honesty di atas HIJAU sepanjang audit m025-314, dan tetap
         # ada tiga pintu ke latihan dengar/bicara yang tidak dijaganya: kartu skill hub di

@@ -189,7 +189,11 @@ console.log('tests/teacher-subject-isolation-test.js — isolasi mapel per token
   assert(storeCode.includes('MAPEL_NAMES[c.subject]'), 'rapor memakai nama mapel kelas');
   /* CSS mobile + kontras */
   const css = fs.readFileSync(path.join(ROOT, 'features/teacher/teacher-shell.css'), 'utf8');
-  assert(css.includes('repeat(8,1fr)'), 'navigasi mobile 8 kolom (7 nav + kurikulum)');
+  /* Audit F25 (2026-09-23): nav bawah ponsel maksimal 5 butir - 4 tujuan utama + "Lainnya"
+     (butir kurikulum sudah dicabut sejak m025-357). */
+  assert(css.includes('repeat(5,1fr)') && !css.includes('repeat(8,1fr)'), 'navigasi mobile 5 kolom (4 nav + Lainnya)');
+  const shellSrc = fs.readFileSync(path.join(ROOT, 'features/teacher/fiezel-teacher-shell.js'), 'utf8');
+  assert(/tg-mnav-more/.test(shellSrc) && /items\.slice\(0, 4\)/.test(shellSrc), 'nav ponsel: 4 butir utama + menu Lainnya');
   assert(css.includes('.tg-empty-ill'), 'gaya empty state tersedia');
   assert(!css.includes('--tg-muted:#5F6D69'), 'kontras teks dimaksimalkan (#4E5C58)');
   /* ARIA: modal/drawer/inbox berdialog + ESC */
