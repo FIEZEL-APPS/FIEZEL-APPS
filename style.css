@@ -2676,12 +2676,15 @@ button.primary:active,.primary.luxe:active,html.fiezel-ui-v6 body .primary:activ
 /* i10 2026-08-28 (O5 §2): + :not(.option) — empat tombol jawaban berbayang tebal membuat
    layar soal terasa seperti empat kartu bersaing dengan soalnya; pilihan kembali ke resep
    dasar .option yang tenang (garis --line, tanpa bayangan lantai). */
-html.fiezel-ui-v6 body button:not(.primary):not(.nav):not(.icon-button):not(.brand-button):not(.text-button):not(.coach-link):not(.fz-coach-bubble):not(.launch-card):not(.skill-card):not(.option):not(.skill-help-dot):not(.olm-dispute){
+/* .ch-plain (m025-364): kontrol KelasKu yang BUKAN tombol angkat — segmen status, tombol
+   ikon di baris tugas, lipatan grup, tautan Arsip. Bingkai & bayangan angkat di sini membuat
+   segmen status terbaca sebagai deretan tab kedua di bawah tab KelasKu. */
+html.fiezel-ui-v6 body button:not(.primary):not(.nav):not(.icon-button):not(.brand-button):not(.text-button):not(.coach-link):not(.fz-coach-bubble):not(.launch-card):not(.skill-card):not(.option):not(.skill-help-dot):not(.olm-dispute):not(.ch-plain){
   border:1.5px solid var(--surface-edge);border-radius:var(--radius-md);
   box-shadow:var(--lift-edge);
   transition:transform var(--dur-xs) var(--ease),box-shadow var(--dur-xs) var(--ease);
 }
-html.fiezel-ui-v6 body button:not(.primary):not(.nav):not(.icon-button):not(.brand-button):not(.text-button):not(.coach-link):not(.fz-coach-bubble):not(.launch-card):not(.skill-card):not(.option):not(.skill-help-dot):not(.olm-dispute):active{
+html.fiezel-ui-v6 body button:not(.primary):not(.nav):not(.icon-button):not(.brand-button):not(.text-button):not(.coach-link):not(.fz-coach-bubble):not(.launch-card):not(.skill-card):not(.option):not(.skill-help-dot):not(.olm-dispute):not(.ch-plain):active{
   transform:translateY(2px);box-shadow:var(--lift-edge-press)}
 
 /* --------------------------------------------------------------------------
