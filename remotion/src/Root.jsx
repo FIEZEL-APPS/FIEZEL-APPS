@@ -4,6 +4,16 @@ import {Jungle, Mascot, Caption} from './Scene.jsx';
 import {FiezelHeroMotion} from './FiezelHeroMotion.jsx';
 import {MagicalBookMotion} from './MagicalBookMotion.jsx';
 import {PenyuMotion} from './PenyuMotion.jsx';
+import {GhibliGardenMotion} from './GhibliGardenMotion.jsx';
+import {FiezelPromoMotion} from './FiezelPromoMotion.jsx';
+import {GeminiGlowMotion} from './GeminiGlowMotion.jsx';
+import {FiezelLaunchMotion} from './FiezelLaunchMotion.jsx';
+import {FiezelSnappyPromoMotion} from './FiezelSnappyPromoMotion.jsx';
+import {IbuSriMotion} from './IbuSriMotion.jsx';
+import {FiezelOrdinaryFolkMotion} from './FiezelOrdinaryFolkMotion.jsx';
+import {FiezelBrightMotion} from './FiezelBrightMotion.jsx';
+import {FiezelCinematicMotion} from './FiezelCinematicMotion.jsx';
+import {FiezelCinematicVerticalMotion} from './FiezelCinematicVerticalMotion.jsx';
 
 const FPS = 30;
 
@@ -39,6 +49,16 @@ const WalkScene = () => {
 
 export const RemotionRoot = () => (
   <>
+    <Composition id="FiezelCinematicVertical30s" component={FiezelCinematicVerticalMotion} durationInFrames={1800} fps={60} width={1080} height={1920}/>
+    <Composition id="FiezelCinematic30s" component={FiezelCinematicMotion} durationInFrames={1800} fps={60} width={1920} height={1080}/>
+    <Composition id="FiezelBrightLaunch" component={FiezelBrightMotion} durationInFrames={720} fps={60} width={1920} height={1080}/>
+    <Composition id="FiezelGeminiLaunch" component={FiezelOrdinaryFolkMotion} durationInFrames={900} fps={60} width={1920} height={1080}/>
+    <Composition id="IbuSri" component={IbuSriMotion} durationInFrames={360} fps={60} width={1080} height={1920}/>
+    <Composition id="FiezelSnappyPromo" component={FiezelSnappyPromoMotion} durationInFrames={300} fps={60} width={1080} height={1920}/>
+    <Composition id="FiezelLaunch" component={FiezelLaunchMotion} durationInFrames={1440} fps={60} width={1920} height={1080}/>
+    <Composition id="GeminiGlow" component={GeminiGlowMotion} durationInFrames={300} fps={60} width={1920} height={1080}/>
+    <Composition id="FiezelPromo" component={FiezelPromoMotion} durationInFrames={1440} fps={60} width={1080} height={1920}/>
+    <Composition id="GhibliGarden" component={GhibliGardenMotion} durationInFrames={180} fps={60} width={1920} height={1080}/>
     <Composition id="FiezelHero" component={FiezelHeroMotion} durationInFrames={180} fps={60} width={1920} height={1080}/>
     <Composition id="Hero" component={Hero} durationInFrames={150} fps={FPS} width={1280} height={720}/>
     <Composition id="MagicalBook" component={MagicalBookMotion} durationInFrames={180} fps={60} width={1920} height={1080}/>

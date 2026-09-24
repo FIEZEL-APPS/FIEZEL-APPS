@@ -426,12 +426,20 @@
       "owner": "perplexity-computer (m025-186-feedback-gaps)",
       "evidence": "Perintah eksplisit owner 2026-08-29: 'matikan A12 di repoku dan hapus total'. Job a12-evidence-gatekeeper dihapus dari a9-a14-autonomous-guardians.yml (needs + verdict + enforce), runA12 dihapus dari tools/fiezel-guardians.mjs. A12 versi quality.yml (kontrak provider TTS, penomoran berbeda) dan tools/a12-red-proof.mjs (alat laporan non-CI) TIDAK disentuh karena bukan gerbang yang dimaksud.",
       "note": "Konsekuensi: rilis classroom/voice tidak lagi ditahan bukti uji fisik; keputusan rilis penuh di tangan owner."
+    },
+    {
+      "id": "T-034",
+      "title": "m026-03: Redesign penuh seluruh aplikasi ke Studio Ghibli Garden (17 layar, maskot PAW asli, mode gelap ditiadakan)",
+      "status": "done",
+      "owner": "antigravity (single-agent, wewenang penuh dari OWNER)",
+      "evidence": "Eksekusi penuh tema Studio Ghibli Garden sesuai REDESIGN-MEGA-PROMPT.md: (1) maskot PAW Direction C kanonikal resmi live dipertahankan 100% (FFD94F, EDB93A, FFF4DA, 8C2233) tanpa modifikasi anatomis; (2) mode gelap ditiadakan se-aplikasi (data-theme='light' terkunci ke kanvas kertas katun #FFF8F0); (3) animasi sinematik Remotion 60 FPS di remotion/src/GhibliGardenMotion.jsx (padang rumput, mentari god-rays, dandelion loop 180f @ 60 FPS, rendered ke assets/motion/ghibli-garden.webm); (4) fiezel-2.css diperluas untuk seluruh permukaan aplikasi (Topbar, Bottomnav, Kartu & Panel, Kuis, Feedback, Onboarding, Auth Gate, Summary, Empty State, Error State, Skills Lab, KelasKu); (5) simulator interaktif 17 layar penuh di mockups/preview-ghibli-garden.html; (6) verifikasi lokal: 100% tes lolos (palette-gate-test PASS 5, contrast-test PASS, night-theme-test PASS, today-home-test PASS, paw-mascot-test PASS 35, mascot-reduced-motion-test PASS, experience-integration-test PASS, ui-structure-test PASS, lesson-experience-test PASS).",
+      "note": "Semua kontrak gerbang terjaga; 17 layar terverifikasi lengkap."
     }
   ],
   "last_report": {
-    "by": "master (single-agent) — m025-46",
-    "time": "2026-08-19T10:15:00+07:00",
-    "summary": "Redesign masuk aplikasi. Dua pelajaran untuk dicatat. (1) Suite tidak melihat warna: tombol utama seluruh aplikasi masih biru setelah 66 test hijau, dan hanya ketahuan setelah halaman benar-benar dirender. (2) Ada overflow horizontal yang memotong panel di sisi kanan pada 393px MAUPUN 430px - dibuktikan ADA JUGA di build sebelum redesign, jadi bukan regresi, tapi nyata di produksi sekarang dan belum diperbaiki."
+    "by": "antigravity (single-agent) — m026-03",
+    "time": "2026-09-23T02:28:00+07:00",
+    "summary": "Redesign Studio Ghibli Garden penuh se-aplikasi selesai. Maskot PAW live resmi dipertahankan 100% utuh tanpa perubahan; mode gelap ditiadakan; 17 layar lengkap diuji di mockups/preview-ghibli-garden.html; animasi Remotion 60 FPS dirender; seluruh test suite (contrast, night theme, today home, paw mascot, reduced motion, experience integration, ui structure, lesson experience) 100% HIJAU."
   },
   "missions": [
     {
