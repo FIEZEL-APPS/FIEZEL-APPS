@@ -1,0 +1,1524 @@
+{
+ "T": {
+  "dimRaka": 1.2,
+  "dimYoga": 3.3,
+  "dimFajar": 3.6,
+  "whip": [
+   4.85,
+   5.85
+  ],
+  "monoRise": [
+   4.95,
+   6
+  ],
+  "dawn": [
+   5.1,
+   7
+  ],
+  "kodeIn": 7.2,
+  "kodeType": [
+   7.35,
+   7.75
+  ],
+  "codeReveal": [
+   7.8,
+   8.3
+  ],
+  "copy": 8.4,
+  "codeLift": 8.55,
+  "cutHigh": 8.9,
+  "chips": 8.95,
+  "cutNadia": 9.6,
+  "typeJoin": [
+   9.9,
+   10.8
+  ],
+  "join": 11.05,
+  "joinSent": 11.25,
+  "joinReq": 11.3,
+  "cutJoin": 12,
+  "add": [
+   12.55,
+   12.85,
+   13.15
+  ],
+  "cutWave": 13.35,
+  "wave": [
+   13.4,
+   14.3
+  ],
+  "cutTugas": 14.4,
+  "mode": 15.2,
+  "send": 16.35,
+  "fold": [
+   16.45,
+   16.8
+  ],
+  "cutCrane": 16.8,
+  "fly": 16.95,
+  "cutKerjakan": 19.2,
+  "start": 19.95,
+  "flip": [
+   20.05,
+   20.45
+  ],
+  "pick": 20.85,
+  "why": 21,
+  "cutSelesai": 21.6,
+  "sent": 22.05,
+  "cutBack": 22.3,
+  "back": 22.35,
+  "hasilIn": 22.55,
+  "cutYoga": 24,
+  "away": [
+   24.45,
+   25.25
+  ],
+  "cutFocus": 25.3,
+  "focus": 25.45,
+  "gap1": [
+   26.25,
+   26.4
+  ],
+  "drop": 26.4,
+  "wallRise": [
+   26.5,
+   27.4
+  ],
+  "cutRing": 27.7,
+  "kpi": [
+   27.95,
+   28.6
+  ],
+  "sapa": 28.8,
+  "rise": [
+   29.15,
+   29.8
+  ],
+  "rack": 30.3,
+  "kartu": 31.2,
+  "type": [
+   31.3,
+   32.65
+  ],
+  "kirim": 32.9,
+  "cutRaka": 33.15,
+  "disapa": 33.45,
+  "heat": 33.6,
+  "heatFill": [
+   33.7,
+   34.9
+  ],
+  "heatHl": 35.1,
+  "mis": 36,
+  "strike": [
+   36.55,
+   36.9
+  ],
+  "fix": [
+   37,
+   37.35
+  ],
+  "grp": 38.4,
+  "regroup": [
+   38.5,
+   39.5
+  ],
+  "mentor": [
+   39.4,
+   39.9
+  ],
+  "rem": 40.8,
+  "lanes": [
+   40.9,
+   41.7
+  ],
+  "remPress": 41.9,
+  "par": [
+   42.35,
+   42.95
+  ],
+  "home": [
+   43.2,
+   44.1
+  ],
+  "ortu": 43.2,
+  "ortuType": [
+   43.3,
+   44.75
+  ],
+  "ortuSend": 44.95,
+  "ortuFly": [
+   45.1,
+   45.55
+  ],
+  "absen": 45.6,
+  "allHadir": 46.1,
+  "rekapIn": 46.75,
+  "export": 47.6,
+  "kur": 48,
+  "make": 49.2,
+  "fan": [
+   49.3,
+   50.2
+  ],
+  "bc": 50.4,
+  "steps": [
+   50.5,
+   51.6
+  ],
+  "approve": 52,
+  "umum": 52.8,
+  "umumType": [
+   52.85,
+   53.35
+  ],
+  "umumSend": 53.5,
+  "cutMurid": 53.95,
+  "ann": 54.05,
+  "stamp": 54.6,
+  "waktu": 55.2,
+  "saved": [
+   55.35,
+   56.5
+  ],
+  "jurnalIn": 55.95,
+  "jurnalType": [
+   56.1,
+   57.1
+  ],
+  "golden": [
+   55.4,
+   58
+  ],
+  "climax": 57.6,
+  "implode": [
+   60.35,
+   61.75
+  ],
+  "orb": [
+   60.9,
+   61.75,
+   62
+  ],
+  "black": 62.05,
+  "splash": 62.4,
+  "lock": [
+   64.7,
+   65.5
+  ],
+  "kk": [
+   65.55,
+   66.35
+  ],
+  "cta": [
+   66.35,
+   67.1
+  ],
+  "ctaPress": 69.2,
+  "end": 72
+ },
+ "VO": [
+  {
+   "id": "01",
+   "at": 0.3,
+   "text": "Tiga puluh dua murid. Satu guru.",
+   "style": "pelan, hangat, seperti membuka cerita",
+   "max": 2.25
+  },
+  {
+   "id": "02",
+   "at": 2.7,
+   "text": "Siapa yang diam-diam tertinggal?",
+   "style": "bertanya lirih, ikut peduli",
+   "max": 2.15
+  },
+  {
+   "id": "03",
+   "at": 5,
+   "text": "KelasKu punya jawabannya.",
+   "say": "Kelasku punya jawabannya.",
+   "style": "yakin, hangat, sedikit tersenyum",
+   "max": 2.25
+  },
+  {
+   "id": "04",
+   "at": 7.4,
+   "text": "Buat kelas, bagikan satu kode.",
+   "style": "jelas, ringan",
+   "max": 2.25
+  },
+  {
+   "id": "05",
+   "at": 9.8,
+   "text": "Murid mengetik kode, lalu Gabung.",
+   "style": "jelas, ringan",
+   "max": 2.25
+  },
+  {
+   "id": "06",
+   "at": 12.2,
+   "text": "Kamu yang menyetujui siapa masuk.",
+   "style": "tenang, meyakinkan",
+   "max": 2.25
+  },
+  {
+   "id": "07",
+   "at": 14.6,
+   "text": "Kirim tugas atau ujian mini. Sekali ketuk, sampai ke semua murid.",
+   "style": "bersemangat tapi tenang",
+   "max": 4.65
+  },
+  {
+   "id": "08",
+   "at": 19.4,
+   "text": "Murid mengerjakannya di KelasKu.",
+   "say": "Murid mengerjakannya di Kelasku.",
+   "style": "ringan",
+   "max": 2.25
+  },
+  {
+   "id": "09",
+   "at": 21.8,
+   "text": "Hasilnya pulang sendiri.",
+   "style": "puas, tersenyum",
+   "max": 2.25
+  },
+  {
+   "id": "10",
+   "at": 24.2,
+   "text": "Saat ujian, pindah layar pun tercatat.",
+   "style": "tegas, tenang",
+   "max": 2.25
+  },
+  {
+   "id": "11",
+   "at": 26.6,
+   "text": "Tiap pagi, KelasKu memberi tahu siapa yang perlu disapa.",
+   "say": "Tiap pagi, Kelasku memberi tahu siapa yang perlu disapa.",
+   "style": "hangat, penuh perhatian",
+   "max": 4.65
+  },
+  {
+   "id": "12",
+   "at": 31.4,
+   "text": "Pesannya sudah tertulis. Tinggal kirim.",
+   "style": "ringan, tersenyum",
+   "max": 2.25
+  },
+  {
+   "id": "13",
+   "at": 33.8,
+   "text": "Sekali lihat, tahu siapa butuh apa.",
+   "style": "yakin",
+   "max": 2.25
+  },
+  {
+   "id": "14",
+   "at": 36.2,
+   "text": "Bukan cuma nilai, tapi letak salahnya.",
+   "style": "tegas, jelas",
+   "max": 2.25
+  },
+  {
+   "id": "15",
+   "at": 38.6,
+   "text": "Kelompok belajar tersusun sendiri.",
+   "style": "ringan",
+   "max": 2.25
+  },
+  {
+   "id": "16",
+   "at": 41,
+   "text": "Remedial dan pengayaan, otomatis.",
+   "style": "ringkas, mantap",
+   "max": 2.25
+  },
+  {
+   "id": "17",
+   "at": 43.4,
+   "text": "Laporan orang tua, jadi sendiri.",
+   "style": "ringan, tersenyum",
+   "max": 2.25
+  },
+  {
+   "id": "18",
+   "at": 45.8,
+   "text": "Absensi dan rekap e-Rapor, beres.",
+   "say": "Absensi dan rekap e-rapor, beres.",
+   "style": "ringkas, lega",
+   "max": 2.25
+  },
+  {
+   "id": "19",
+   "at": 48.2,
+   "text": "Kurikulum Merdeka, langsung jadi tugas.",
+   "style": "yakin",
+   "max": 2.25
+  },
+  {
+   "id": "20",
+   "at": 50.6,
+   "text": "Braincore menyarankan. Kamu yang memutuskan.",
+   "say": "Brein-kor menyarankan. Kamu yang memutuskan.",
+   "style": "tenang, menghormati guru",
+   "max": 2.75
+  },
+  {
+   "id": "21",
+   "at": 53.5,
+   "text": "Murid pun melihat langkah belajarnya.",
+   "style": "hangat",
+   "max": 1.75
+  },
+  {
+   "id": "22",
+   "at": 55.4,
+   "text": "Dan waktumu kembali untuk mengajar.",
+   "style": "hangat, lega, sedikit lebih pelan",
+   "max": 2.25
+  },
+  {
+   "id": "23",
+   "at": 57.8,
+   "text": "Satu kelas. Dua layar. Terhubung.",
+   "style": "mantap, pelan, penuh jeda di tiap titik",
+   "max": 4.13
+  },
+  {
+   "id": "24",
+   "at": 66.6,
+   "text": "Buka Demo Guru di fiezel.my.id.",
+   "say": "Buka Demo Guru, di fiezel titik my titik id.",
+   "style": "ramah, jelas, mengajak",
+   "max": 4.65
+  }
+ ],
+ "SHOTS": [
+  {
+   "t0": 0,
+   "t1": 4.85,
+   "name": "SH01 kait"
+  },
+  {
+   "t0": 4.85,
+   "t1": 7.2,
+   "name": "SH02 monolit bangkit"
+  },
+  {
+   "t0": 7.2,
+   "t1": 8.883333333333333,
+   "name": "SH03 kode"
+  },
+  {
+   "t0": 8.883333333333333,
+   "t1": 9.583333333333334,
+   "name": "SH03b kode terbang"
+  },
+  {
+   "t0": 9.583333333333334,
+   "t1": 11.983333333333333,
+   "name": "SH04 Nadia gabung"
+  },
+  {
+   "t0": 11.983333333333333,
+   "t1": 13.35,
+   "name": "SH05 persetujuan"
+  },
+  {
+   "t0": 13.35,
+   "t1": 14.383333333333333,
+   "name": "SH05b tersambung"
+  },
+  {
+   "t0": 14.383333333333333,
+   "t1": 16.783333333333335,
+   "name": "SH06 tugas"
+  },
+  {
+   "t0": 16.783333333333335,
+   "t1": 19.183333333333334,
+   "name": "SH07 kapsul"
+  },
+  {
+   "t0": 19.183333333333334,
+   "t1": 21.583333333333332,
+   "name": "SH08 kerjakan"
+  },
+  {
+   "t0": 21.583333333333332,
+   "t1": 22.283333333333335,
+   "name": "SH09 selesai"
+  },
+  {
+   "t0": 22.283333333333335,
+   "t1": 23.983333333333334,
+   "name": "SH09b hasil pulang"
+  },
+  {
+   "t0": 23.983333333333334,
+   "t1": 25.283333333333335,
+   "name": "SH10 Yoga ujian"
+  },
+  {
+   "t0": 25.283333333333335,
+   "t1": 26.383333333333333,
+   "name": "SH10b keluar layar"
+  },
+  {
+   "t0": 26.383333333333333,
+   "t1": 26.55,
+   "name": "SH11 nav"
+  },
+  {
+   "t0": 26.55,
+   "t1": 27.683333333333334,
+   "name": "SH11 amfiteater"
+  },
+  {
+   "t0": 27.683333333333334,
+   "t1": 28.783333333333335,
+   "name": "SH11b ringkasan"
+  },
+  {
+   "t0": 28.783333333333335,
+   "t1": 31.183333333333334,
+   "name": "SH12 disapa"
+  },
+  {
+   "t0": 31.183333333333334,
+   "t1": 33.15,
+   "name": "SH13 kartu sapa"
+  },
+  {
+   "t0": 33.15,
+   "t1": 33.583333333333336,
+   "name": "SH13b Raka disapa"
+  },
+  {
+   "t0": 33.583333333333336,
+   "t1": 35.983333333333334,
+   "name": "SH14 peta panas"
+  },
+  {
+   "t0": 35.983333333333334,
+   "t1": 38.38333333333333,
+   "name": "SH15 miskonsepsi"
+  },
+  {
+   "t0": 38.38333333333333,
+   "t1": 40.78333333333333,
+   "name": "SH16 kelompok"
+  },
+  {
+   "t0": 40.78333333333333,
+   "t1": 43.18333333333333,
+   "name": "SH17 remedial"
+  },
+  {
+   "t0": 43.18333333333333,
+   "t1": 45.583333333333336,
+   "name": "SH18 laporan ortu"
+  },
+  {
+   "t0": 45.583333333333336,
+   "t1": 47.983333333333334,
+   "name": "SH19 absensi & e-Rapor"
+  },
+  {
+   "t0": 47.983333333333334,
+   "t1": 50.38333333333333,
+   "name": "SH20 kurikulum"
+  },
+  {
+   "t0": 50.38333333333333,
+   "t1": 52.78333333333333,
+   "name": "SH21 braincore"
+  },
+  {
+   "t0": 52.78333333333333,
+   "t1": 53.95,
+   "name": "SH22 pengumuman"
+  },
+  {
+   "t0": 53.95,
+   "t1": 55.18333333333333,
+   "name": "SH22b murid"
+  },
+  {
+   "t0": 55.18333333333333,
+   "t1": 57.583333333333336,
+   "name": "SH23 waktu kembali"
+  },
+  {
+   "t0": 57.583333333333336,
+   "t1": 60.35,
+   "name": "SH24 terhubung"
+  },
+  {
+   "t0": 60.35,
+   "t1": 62.4,
+   "name": "SH25 implosi"
+  },
+  {
+   "t0": 62.4,
+   "t1": 73,
+   "name": "MEREK"
+  }
+ ],
+ "FLIGHTS": [
+  {
+   "i": 0,
+   "t0": 8.95,
+   "dur": 0.62,
+   "dir": 1,
+   "em": false,
+   "code": true
+  },
+  {
+   "i": 1,
+   "t0": 8.968,
+   "dur": 0.62,
+   "dir": 1,
+   "em": false,
+   "code": true
+  },
+  {
+   "i": 2,
+   "t0": 8.985999999999999,
+   "dur": 0.62,
+   "dir": 1,
+   "em": false,
+   "code": true
+  },
+  {
+   "i": 3,
+   "t0": 9.004,
+   "dur": 0.62,
+   "dir": 1,
+   "em": false,
+   "code": true
+  },
+  {
+   "i": 4,
+   "t0": 9.02,
+   "dur": 0.62,
+   "dir": 1,
+   "em": false,
+   "code": true
+  },
+  {
+   "i": 5,
+   "t0": 9.038,
+   "dur": 0.62,
+   "dir": 1,
+   "em": false,
+   "code": true
+  },
+  {
+   "i": 6,
+   "t0": 9.056,
+   "dur": 0.62,
+   "dir": 1,
+   "em": false,
+   "code": true
+  },
+  {
+   "i": 7,
+   "t0": 9.074,
+   "dur": 0.62,
+   "dir": 1,
+   "em": false,
+   "code": true
+  },
+  {
+   "i": 8,
+   "t0": 9.09,
+   "dur": 0.62,
+   "dir": 1,
+   "em": false,
+   "code": true
+  },
+  {
+   "i": 9,
+   "t0": 9.108,
+   "dur": 0.62,
+   "dir": 1,
+   "em": false,
+   "code": true
+  },
+  {
+   "i": 10,
+   "t0": 9.126,
+   "dur": 0.62,
+   "dir": 1,
+   "em": false,
+   "code": true
+  },
+  {
+   "i": 11,
+   "t0": 9.144,
+   "dur": 0.62,
+   "dir": 1,
+   "em": false,
+   "code": true
+  },
+  {
+   "i": 12,
+   "t0": 9.16,
+   "dur": 0.62,
+   "dir": 1,
+   "em": false,
+   "code": true
+  },
+  {
+   "i": 13,
+   "t0": 9.178,
+   "dur": 0.62,
+   "dir": 1,
+   "em": false,
+   "code": true
+  },
+  {
+   "i": 14,
+   "t0": 9.196,
+   "dur": 0.62,
+   "dir": 1,
+   "em": false,
+   "code": true
+  },
+  {
+   "i": 15,
+   "t0": 9.214,
+   "dur": 0.62,
+   "dir": 1,
+   "em": false,
+   "code": true
+  },
+  {
+   "i": 16,
+   "t0": 9.229999999999999,
+   "dur": 0.62,
+   "dir": 1,
+   "em": false,
+   "code": true
+  },
+  {
+   "i": 17,
+   "t0": 9.248,
+   "dur": 0.62,
+   "dir": 1,
+   "em": false,
+   "code": true
+  },
+  {
+   "i": 18,
+   "t0": 9.265999999999998,
+   "dur": 0.62,
+   "dir": 1,
+   "em": false,
+   "code": true
+  },
+  {
+   "i": 19,
+   "t0": 9.283999999999999,
+   "dur": 0.62,
+   "dir": 1,
+   "em": false,
+   "code": true
+  },
+  {
+   "i": 20,
+   "t0": 9.299999999999999,
+   "dur": 0.62,
+   "dir": 1,
+   "em": false,
+   "code": true
+  },
+  {
+   "i": 21,
+   "t0": 9.318,
+   "dur": 0.62,
+   "dir": 1,
+   "em": false,
+   "code": true
+  },
+  {
+   "i": 22,
+   "t0": 9.335999999999999,
+   "dur": 0.62,
+   "dir": 1,
+   "em": false,
+   "code": true
+  },
+  {
+   "i": 23,
+   "t0": 9.354,
+   "dur": 0.62,
+   "dir": 1,
+   "em": false,
+   "code": true
+  },
+  {
+   "i": 24,
+   "t0": 9.37,
+   "dur": 0.62,
+   "dir": 1,
+   "em": false,
+   "code": true
+  },
+  {
+   "i": 25,
+   "t0": 9.388,
+   "dur": 0.62,
+   "dir": 1,
+   "em": false,
+   "code": true
+  },
+  {
+   "i": 26,
+   "t0": 9.405999999999999,
+   "dur": 0.62,
+   "dir": 1,
+   "em": false,
+   "code": true
+  },
+  {
+   "i": 27,
+   "t0": 9.424,
+   "dur": 0.62,
+   "dir": 1,
+   "em": false,
+   "code": true
+  },
+  {
+   "i": 28,
+   "t0": 9.44,
+   "dur": 0.62,
+   "dir": 1,
+   "em": false,
+   "code": true
+  },
+  {
+   "i": 29,
+   "t0": 9.458,
+   "dur": 0.62,
+   "dir": 1,
+   "em": false,
+   "code": true
+  },
+  {
+   "i": 30,
+   "t0": 9.475999999999999,
+   "dur": 0.62,
+   "dir": 1,
+   "em": false,
+   "code": true
+  },
+  {
+   "i": 31,
+   "t0": 9.494,
+   "dur": 0.62,
+   "dir": 1,
+   "em": false,
+   "code": true
+  },
+  {
+   "i": 4,
+   "t0": 11.3,
+   "dur": 0.95,
+   "dir": -1,
+   "em": true
+  },
+  {
+   "i": 0,
+   "t0": 16.95,
+   "dur": 0.85,
+   "dir": 1,
+   "em": false
+  },
+  {
+   "i": 1,
+   "t0": 16.97,
+   "dur": 0.85,
+   "dir": 1,
+   "em": false
+  },
+  {
+   "i": 2,
+   "t0": 16.99,
+   "dur": 0.85,
+   "dir": 1,
+   "em": false
+  },
+  {
+   "i": 3,
+   "t0": 17.009999999999998,
+   "dur": 0.85,
+   "dir": 1,
+   "em": false
+  },
+  {
+   "i": 4,
+   "t0": 17.04,
+   "dur": 0.85,
+   "dir": 1,
+   "em": false
+  },
+  {
+   "i": 5,
+   "t0": 17.06,
+   "dur": 0.85,
+   "dir": 1,
+   "em": false
+  },
+  {
+   "i": 6,
+   "t0": 17.08,
+   "dur": 0.85,
+   "dir": 1,
+   "em": false
+  },
+  {
+   "i": 7,
+   "t0": 17.099999999999998,
+   "dur": 0.85,
+   "dir": 1,
+   "em": false
+  },
+  {
+   "i": 8,
+   "t0": 17.13,
+   "dur": 0.85,
+   "dir": 1,
+   "em": false
+  },
+  {
+   "i": 9,
+   "t0": 17.15,
+   "dur": 0.85,
+   "dir": 1,
+   "em": false
+  },
+  {
+   "i": 10,
+   "t0": 17.169999999999998,
+   "dur": 0.85,
+   "dir": 1,
+   "em": false
+  },
+  {
+   "i": 11,
+   "t0": 17.189999999999998,
+   "dur": 0.85,
+   "dir": 1,
+   "em": false
+  },
+  {
+   "i": 12,
+   "t0": 17.22,
+   "dur": 0.85,
+   "dir": 1,
+   "em": false
+  },
+  {
+   "i": 13,
+   "t0": 17.24,
+   "dur": 0.85,
+   "dir": 1,
+   "em": false
+  },
+  {
+   "i": 14,
+   "t0": 17.259999999999998,
+   "dur": 0.85,
+   "dir": 1,
+   "em": false
+  },
+  {
+   "i": 15,
+   "t0": 17.279999999999998,
+   "dur": 0.85,
+   "dir": 1,
+   "em": false
+  },
+  {
+   "i": 16,
+   "t0": 17.31,
+   "dur": 0.85,
+   "dir": 1,
+   "em": false
+  },
+  {
+   "i": 17,
+   "t0": 17.33,
+   "dur": 0.85,
+   "dir": 1,
+   "em": false
+  },
+  {
+   "i": 18,
+   "t0": 17.349999999999998,
+   "dur": 0.85,
+   "dir": 1,
+   "em": false
+  },
+  {
+   "i": 19,
+   "t0": 17.369999999999997,
+   "dur": 0.85,
+   "dir": 1,
+   "em": false
+  },
+  {
+   "i": 20,
+   "t0": 17.4,
+   "dur": 0.85,
+   "dir": 1,
+   "em": false
+  },
+  {
+   "i": 21,
+   "t0": 17.419999999999998,
+   "dur": 0.85,
+   "dir": 1,
+   "em": false
+  },
+  {
+   "i": 22,
+   "t0": 17.439999999999998,
+   "dur": 0.85,
+   "dir": 1,
+   "em": false
+  },
+  {
+   "i": 23,
+   "t0": 17.459999999999997,
+   "dur": 0.85,
+   "dir": 1,
+   "em": false
+  },
+  {
+   "i": 24,
+   "t0": 17.49,
+   "dur": 0.85,
+   "dir": 1,
+   "em": false
+  },
+  {
+   "i": 25,
+   "t0": 17.509999999999998,
+   "dur": 0.85,
+   "dir": 1,
+   "em": false
+  },
+  {
+   "i": 26,
+   "t0": 17.529999999999998,
+   "dur": 0.85,
+   "dir": 1,
+   "em": false
+  },
+  {
+   "i": 27,
+   "t0": 17.549999999999997,
+   "dur": 0.85,
+   "dir": 1,
+   "em": false
+  },
+  {
+   "i": 28,
+   "t0": 17.58,
+   "dur": 0.85,
+   "dir": 1,
+   "em": false
+  },
+  {
+   "i": 29,
+   "t0": 17.599999999999998,
+   "dur": 0.85,
+   "dir": 1,
+   "em": false
+  },
+  {
+   "i": 30,
+   "t0": 17.619999999999997,
+   "dur": 0.85,
+   "dir": 1,
+   "em": false
+  },
+  {
+   "i": 31,
+   "t0": 17.639999999999997,
+   "dur": 0.85,
+   "dir": 1,
+   "em": false
+  },
+  {
+   "i": 0,
+   "t0": 22.35,
+   "dur": 0.8,
+   "dir": -1,
+   "em": true,
+   "result": true
+  },
+  {
+   "i": 1,
+   "t0": 22.602,
+   "dur": 0.8,
+   "dir": -1,
+   "em": true,
+   "result": true
+  },
+  {
+   "i": 2,
+   "t0": 22.854000000000003,
+   "dur": 0.8,
+   "dir": -1,
+   "em": true,
+   "result": true
+  },
+  {
+   "i": 3,
+   "t0": 23.106,
+   "dur": 0.8,
+   "dir": -1,
+   "em": true,
+   "result": true
+  },
+  {
+   "i": 4,
+   "t0": 23.358,
+   "dur": 0.8,
+   "dir": -1,
+   "em": true,
+   "result": true
+  },
+  {
+   "i": 5,
+   "t0": 22.458000000000002,
+   "dur": 0.8,
+   "dir": -1,
+   "em": true,
+   "result": true
+  },
+  {
+   "i": 6,
+   "t0": 22.71,
+   "dur": 0.8,
+   "dir": -1,
+   "em": true,
+   "result": true
+  },
+  {
+   "i": 7,
+   "t0": 22.962,
+   "dur": 0.8,
+   "dir": -1,
+   "em": true,
+   "result": true
+  },
+  {
+   "i": 8,
+   "t0": 23.214000000000002,
+   "dur": 0.8,
+   "dir": -1,
+   "em": true,
+   "result": true
+  },
+  {
+   "i": 9,
+   "t0": 23.466,
+   "dur": 0.8,
+   "dir": -1,
+   "em": true,
+   "result": true
+  },
+  {
+   "i": 10,
+   "t0": 22.566000000000003,
+   "dur": 0.8,
+   "dir": -1,
+   "em": true,
+   "result": true
+  },
+  {
+   "i": 11,
+   "t0": 22.818,
+   "dur": 0.8,
+   "dir": -1,
+   "em": true,
+   "result": true
+  },
+  {
+   "i": 12,
+   "t0": 23.07,
+   "dur": 0.8,
+   "dir": -1,
+   "em": true,
+   "result": true
+  },
+  {
+   "i": 14,
+   "t0": 22.422,
+   "dur": 0.8,
+   "dir": -1,
+   "em": true,
+   "result": true
+  },
+  {
+   "i": 16,
+   "t0": 22.926000000000002,
+   "dur": 0.8,
+   "dir": -1,
+   "em": true,
+   "result": true
+  },
+  {
+   "i": 18,
+   "t0": 23.43,
+   "dur": 0.8,
+   "dir": -1,
+   "em": true,
+   "result": true
+  },
+  {
+   "i": 19,
+   "t0": 22.53,
+   "dur": 0.8,
+   "dir": -1,
+   "em": true,
+   "result": true
+  },
+  {
+   "i": 20,
+   "t0": 22.782,
+   "dur": 0.8,
+   "dir": -1,
+   "em": true,
+   "result": true
+  },
+  {
+   "i": 21,
+   "t0": 23.034000000000002,
+   "dur": 0.8,
+   "dir": -1,
+   "em": true,
+   "result": true
+  },
+  {
+   "i": 22,
+   "t0": 23.286,
+   "dur": 0.8,
+   "dir": -1,
+   "em": true,
+   "result": true
+  },
+  {
+   "i": 23,
+   "t0": 22.386000000000003,
+   "dur": 0.8,
+   "dir": -1,
+   "em": true,
+   "result": true
+  },
+  {
+   "i": 24,
+   "t0": 22.638,
+   "dur": 0.8,
+   "dir": -1,
+   "em": true,
+   "result": true
+  },
+  {
+   "i": 25,
+   "t0": 22.89,
+   "dur": 0.8,
+   "dir": -1,
+   "em": true,
+   "result": true
+  },
+  {
+   "i": 26,
+   "t0": 23.142000000000003,
+   "dur": 0.8,
+   "dir": -1,
+   "em": true,
+   "result": true
+  },
+  {
+   "i": 27,
+   "t0": 23.394000000000002,
+   "dur": 0.8,
+   "dir": -1,
+   "em": true,
+   "result": true
+  },
+  {
+   "i": 28,
+   "t0": 22.494,
+   "dur": 0.8,
+   "dir": -1,
+   "em": true,
+   "result": true
+  },
+  {
+   "i": 29,
+   "t0": 22.746000000000002,
+   "dur": 0.8,
+   "dir": -1,
+   "em": true,
+   "result": true
+  },
+  {
+   "i": 30,
+   "t0": 22.998,
+   "dur": 0.8,
+   "dir": -1,
+   "em": true,
+   "result": true
+  },
+  {
+   "i": 31,
+   "t0": 23.25,
+   "dur": 0.8,
+   "dir": -1,
+   "em": true,
+   "result": true
+  },
+  {
+   "i": 13,
+   "t0": 33.1,
+   "dur": 0.35,
+   "dir": 1,
+   "em": true
+  },
+  {
+   "i": 0,
+   "t0": 53.65,
+   "dur": 0.55,
+   "dir": 1,
+   "em": false
+  },
+  {
+   "i": 1,
+   "t0": 53.65,
+   "dur": 0.55,
+   "dir": 1,
+   "em": false
+  },
+  {
+   "i": 2,
+   "t0": 53.65,
+   "dur": 0.55,
+   "dir": 1,
+   "em": false
+  },
+  {
+   "i": 3,
+   "t0": 53.65,
+   "dur": 0.55,
+   "dir": 1,
+   "em": false
+  },
+  {
+   "i": 4,
+   "t0": 53.699999999999996,
+   "dur": 0.55,
+   "dir": 1,
+   "em": false
+  },
+  {
+   "i": 5,
+   "t0": 53.699999999999996,
+   "dur": 0.55,
+   "dir": 1,
+   "em": false
+  },
+  {
+   "i": 6,
+   "t0": 53.699999999999996,
+   "dur": 0.55,
+   "dir": 1,
+   "em": false
+  },
+  {
+   "i": 7,
+   "t0": 53.699999999999996,
+   "dur": 0.55,
+   "dir": 1,
+   "em": false
+  },
+  {
+   "i": 8,
+   "t0": 53.75,
+   "dur": 0.55,
+   "dir": 1,
+   "em": false
+  },
+  {
+   "i": 9,
+   "t0": 53.75,
+   "dur": 0.55,
+   "dir": 1,
+   "em": false
+  },
+  {
+   "i": 10,
+   "t0": 53.75,
+   "dur": 0.55,
+   "dir": 1,
+   "em": false
+  },
+  {
+   "i": 11,
+   "t0": 53.75,
+   "dur": 0.55,
+   "dir": 1,
+   "em": false
+  },
+  {
+   "i": 12,
+   "t0": 53.8,
+   "dur": 0.55,
+   "dir": 1,
+   "em": false
+  },
+  {
+   "i": 13,
+   "t0": 53.8,
+   "dur": 0.55,
+   "dir": 1,
+   "em": false
+  },
+  {
+   "i": 14,
+   "t0": 53.8,
+   "dur": 0.55,
+   "dir": 1,
+   "em": false
+  },
+  {
+   "i": 15,
+   "t0": 53.8,
+   "dur": 0.55,
+   "dir": 1,
+   "em": false
+  },
+  {
+   "i": 16,
+   "t0": 53.85,
+   "dur": 0.55,
+   "dir": 1,
+   "em": false
+  },
+  {
+   "i": 17,
+   "t0": 53.85,
+   "dur": 0.55,
+   "dir": 1,
+   "em": false
+  },
+  {
+   "i": 18,
+   "t0": 53.85,
+   "dur": 0.55,
+   "dir": 1,
+   "em": false
+  },
+  {
+   "i": 19,
+   "t0": 53.85,
+   "dur": 0.55,
+   "dir": 1,
+   "em": false
+  },
+  {
+   "i": 20,
+   "t0": 53.9,
+   "dur": 0.55,
+   "dir": 1,
+   "em": false
+  },
+  {
+   "i": 21,
+   "t0": 53.9,
+   "dur": 0.55,
+   "dir": 1,
+   "em": false
+  },
+  {
+   "i": 22,
+   "t0": 53.9,
+   "dur": 0.55,
+   "dir": 1,
+   "em": false
+  },
+  {
+   "i": 23,
+   "t0": 53.9,
+   "dur": 0.55,
+   "dir": 1,
+   "em": false
+  },
+  {
+   "i": 24,
+   "t0": 53.949999999999996,
+   "dur": 0.55,
+   "dir": 1,
+   "em": false
+  },
+  {
+   "i": 25,
+   "t0": 53.949999999999996,
+   "dur": 0.55,
+   "dir": 1,
+   "em": false
+  },
+  {
+   "i": 26,
+   "t0": 53.949999999999996,
+   "dur": 0.55,
+   "dir": 1,
+   "em": false
+  },
+  {
+   "i": 27,
+   "t0": 53.949999999999996,
+   "dur": 0.55,
+   "dir": 1,
+   "em": false
+  },
+  {
+   "i": 28,
+   "t0": 54,
+   "dur": 0.55,
+   "dir": 1,
+   "em": false
+  },
+  {
+   "i": 29,
+   "t0": 54,
+   "dur": 0.55,
+   "dir": 1,
+   "em": false
+  },
+  {
+   "i": 30,
+   "t0": 54,
+   "dur": 0.55,
+   "dir": 1,
+   "em": false
+  },
+  {
+   "i": 31,
+   "t0": 54,
+   "dur": 0.55,
+   "dir": 1,
+   "em": false
+  }
+ ],
+ "FPS": 30,
+ "DURATION": 72,
+ "FRAMES": 2160
+}

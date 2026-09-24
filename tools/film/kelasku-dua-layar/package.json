@@ -1,0 +1,27 @@
+{
+  "name": "fiezel-film-kelasku-dua-layar",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Film 3D KelasKu \u2014 Satu Kelas, Dua Layar (dirender dari kode: three.js \u2192 Chromium \u2192 FFmpeg)",
+  "type": "module",
+  "scripts": {
+    "vo": "node vo-gemini-kelasku.mjs",
+    "vo:list": "node vo-gemini-kelasku.mjs --list",
+    "render": "node render.mjs",
+    "finish": "node finish.mjs",
+    "stills": "node stills.mjs",
+    "events": "node events.mjs",
+    "preview": "node serve.mjs"
+  },
+  "dependencies": {
+    "three": "0.169.0",
+    "playwright-core": "1.56.1",
+    "@fontsource/plus-jakarta-sans": "5.1.0",
+    "@audio-samples/piano-velocity5": "1.0.5",
+    "@audio-samples/piano-velocity9": "1.0.5",
+    "@audio-samples/piano-velocity12": "1.0.5"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

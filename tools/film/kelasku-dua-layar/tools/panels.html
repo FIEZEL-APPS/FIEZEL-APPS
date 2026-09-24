@@ -1,0 +1,12 @@
+<!doctype html><html><head><meta charset="utf-8"><link rel="stylesheet" href="/web/fonts.css">
+<style>body{margin:0;background:#cfc6b8}</style></head><body><canvas id="c"></canvas>
+<script type="module">
+import { PANELS, G } from '/web/ui.js';
+const W=[1080,1920];
+await Promise.all([400,500,600,700,800].map(w=>document.fonts.load(`${w} 20px "PJS"`)));
+const names=Object.keys(PANELS); const cols=7, cell=600, rowH=960;
+const c=document.getElementById('c'); c.width=cols*cell; c.height=Math.ceil(names.length/cols)*rowH;
+const x=c.getContext('2d');
+names.forEach((n,i)=>{const P=PANELS[n]; x.save(); x.translate((i%cols)*cell+30, Math.floor(i/cols)*rowH+20); const s= n==='slate'?{name:'Raka',mode:'risk',why:'8 hari tidak belajar'}:{}; P.draw(new G(x), s); x.restore(); x.fillStyle='#000'; x.font='700 22px PJS'; x.fillText(n,(i%cols)*cell+30, Math.floor(i/cols)*rowH+955);});
+window.ready=true;
+</script></body></html>
