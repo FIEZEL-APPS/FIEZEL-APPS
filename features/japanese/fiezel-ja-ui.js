@@ -196,7 +196,7 @@
     var label = t('jepang.chokai') + ' JLPT (N5 & N4)';
     return '<button type="button" class="launch-card ja-chokai-card" onclick="openListeningPanel()" aria-label="' + esc(label) + '">' +
       '<span class="launch-icon ja-glyph" style="background:#FFF3C4;color:#B45309;" aria-hidden="true">🎧</span><span><small>' +
-      esc(t('jepang.chokai-note')) + ' · 30 Soal & Audio</small><b>' + esc(label) + '</b></span><i data-lucide="arrow-up-right"></i></button>';
+      esc(t('jepang.chokai-note')) + ' · 30 Audio JEES</small><b>' + esc(label) + '</b></span><i data-lucide="arrow-up-right"></i></button>';
   }
   function comingSoonMarkup() {
     var cards = SOON.map(function (item) {

@@ -1,25 +1,25 @@
 {
   "schema": "fiezel-th-ui-leak-v1",
-  "generatedAt": "2026-09-23T13:04:29.847Z",
+  "generatedAt": "2026-09-24T18:19:57.101Z",
   "files": {
     "app.js": {
       "leaks": 4,
       "budget": 4,
       "sample": [
         {
-          "line": 8190,
+          "line": 8296,
           "text": "Selesaikan ritme hari ini"
         },
         {
-          "line": 9014,
+          "line": 9129,
           "text": "— Penugasan latihan dan pemantauan capaian murid."
         },
         {
-          "line": 9627,
+          "line": 9742,
           "text": "Nama kriteria: n/4 - satu kalimat alasan yang menunjuk bukti di tulisannya"
         },
         {
-          "line": 14468,
+          "line": 14599,
           "text": "Latihan"
         }
       ]
@@ -99,28 +99,28 @@
       ]
     },
     "features/class-hub/fiezel-class-hub.js": {
-      "leaks": 6,
-      "budget": 6,
+      "leaks": 5,
+      "budget": 5,
       "sample": [
         {
-          "line": 578,
+          "line": 905,
           "text": "Tugas disimpan sebagai"
         },
         {
-          "line": 578,
+          "line": 905,
           "text": ". Lanjutkan kapan saja."
         },
         {
-          "line": 645,
-          "text": "Latihan ·"
-        },
-        {
-          "line": 1657,
+          "line": 1881,
           "text": "Latihan · ±"
         },
         {
-          "line": 1705,
+          "line": 1929,
           "text": "Tenggat"
+        },
+        {
+          "line": 1929,
+          "text": "Latihan — umpan balik tiap soal"
         }
       ]
     },
@@ -255,20 +255,12 @@
       ]
     },
     "features/onboarding/fiezel-onboarding.js": {
-      "leaks": 3,
-      "budget": 3,
+      "leaks": 1,
+      "budget": 1,
       "sample": [
         {
-          "line": 633,
+          "line": 643,
           "text": "Pilih bahasa untuk melanjutkan"
-        },
-        {
-          "line": 673,
-          "text": "Sudah punya akun? Masuk dulu supaya kelas dan tugas gurumu ikut."
-        },
-        {
-          "line": 1461,
-          "text": "Belum berhasil masuk. Pilih bahasa dulu — masuk bisa nanti dari Pengaturan. ·"
         }
       ]
     },
@@ -407,23 +399,23 @@
       "budget": 7,
       "sample": [
         {
-          "line": 1181,
+          "line": 1212,
           "text": "Penugasan Kontingen Pasukan Garuda ke wilayah konflik"
         },
         {
-          "line": 1261,
+          "line": 1292,
           "text": "Penugasan nilai (assignment)"
         },
         {
-          "line": 3293,
+          "line": 3324,
           "text": "Tenggat & tugas"
         },
         {
-          "line": 3311,
+          "line": 3342,
           "text": "Akurasi"
         },
         {
-          "line": 3332,
+          "line": 3423,
           "text": "Latihan ·"
         }
       ]
@@ -480,8 +472,8 @@
     }
   },
   "copyKeys": {
-    "id": 3166,
-    "th": 3168,
+    "id": 3372,
+    "th": 3374,
     "idTanpaTh": 0
   },
   "pass": true

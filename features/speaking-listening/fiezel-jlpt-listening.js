@@ -135,7 +135,7 @@
         audioPlaying = false;
         if (eq) eq.classList.remove('playing');
         if (playBtn) playBtn.innerHTML = '▶';
-        if (window.showToast) window.showToast('Gagal memuat audio resmi. Silakan coba kembali.');
+        if (window.showToast) window.showToast('Audio tidak dapat diputar.');
       };
     }
 
@@ -232,7 +232,7 @@
     var qs = getFilteredQuestions();
     if (qs.length === 0) {
       slot.innerHTML = '<div style="text-align:center;padding:32px 16px;color:var(--text-muted);">' +
-        '<p style="font-size:14px;font-weight:600;">Belum ada soal untuk kategori ini.</p>' +
+        '<p style="font-size:14px;font-weight:600;">Tidak ada item untuk filter ini.</p>' +
         '</div>';
       return;
     }
@@ -282,12 +282,12 @@
 
       '<!-- Question Card -->' +
       '<div class="jlpt-q-card">' +
-        '<div style="font-size:11.5px;color:var(--text-muted);margin-bottom:4px;font-weight:700;">PERTANYAAN SOAL:</div>' +
+        '<div style="font-size:11.5px;color:var(--text-muted);margin-bottom:4px;font-weight:700;">PERTANYAAN:</div>' +
         '<h3 style="font-size:15px;color:var(--text);margin:0 0 10px;line-height:1.4;">' + q.question + '</h3>' +
         (q.instruction ? '<div style="font-size:12px;color:#7A6F64;margin-bottom:8px;font-style:italic;">💡 ' + q.instruction + '</div>' : '') +
 
         '<div style="margin-top:12px;">' +
-          '<div style="font-size:11.5px;font-weight:700;color:var(--text-muted);margin-bottom:4px;">PILIHAN JAWABAN:</div>' +
+          '<div style="font-size:11.5px;font-weight:700;color:var(--text-muted);margin-bottom:4px;">OPSI:</div>' +
           optionsHtml +
         '</div>' +
 
@@ -306,17 +306,17 @@
 
           '<!-- Explanation Accordion -->' +
           '<button type="button" class="jlpt-acc-btn" onclick="toggleJlptAccordion(\'explain\')">' +
-            '<span>💡 Kunci Jawaban &amp; Penjelasan</span><span id="jlptExplainArrow">' + (explainOpen ? '▲' : '▼') + '</span>' +
+            '<span>💡 Kunci &amp; Pembahasan</span><span id="jlptExplainArrow">' + (explainOpen ? '▲' : '▼') + '</span>' +
           '</button>' +
           '<div class="jlpt-acc-content" id="jlptExplainBox" style="display:' + (explainOpen ? 'block' : 'none') + ';">' +
-            '<div style="margin-bottom:6px;"><b>Jawaban Benar:</b> Pilihan No. ' + q.correct_answer + '</div>' +
+            '<div style="margin-bottom:6px;"><b>Kunci Tepat:</b> Opsi No. ' + q.correct_answer + '</div>' +
             '<div><b>Pembahasan:</b> ' + q.explanation + '</div>' +
           '</div>' +
 
           (vocabListHtml ?
             '<!-- Vocab Accordion -->' +
             '<button type="button" class="jlpt-acc-btn" onclick="toggleJlptAccordion(\'vocab\')">' +
-              '<span>📚 Kosakata Kunci (' + q.vocab.length + ' kata)</span><span id="jlptVocabArrow">' + (vocabOpen ? '▲' : '▼') + '</span>' +
+              '<span>📚 Kotoba Penting (' + q.vocab.length + ' kata)</span><span id="jlptVocabArrow">' + (vocabOpen ? '▲' : '▼') + '</span>' +
             '</button>' +
             '<div class="jlpt-acc-content" id="jlptVocabBox" style="display:' + (vocabOpen ? 'block' : 'none') + ';">' +
               vocabListHtml +
@@ -326,9 +326,9 @@
 
         '<!-- Navigation Row -->' +
         '<div class="jlpt-nav-row">' +
-          '<button type="button" class="jlpt-nav-btn" ' + (curIndex === 0 ? 'disabled' : '') + ' onclick="prevListeningQuestion()">◀ Soal Sebelumnya</button>' +
+          '<button type="button" class="jlpt-nav-btn" ' + (curIndex === 0 ? 'disabled' : '') + ' onclick="prevListeningQuestion()">◀ Mundur</button>' +
           '<span style="font-size:12px;font-weight:700;color:var(--text-muted);">' + (curIndex + 1) + ' / ' + qs.length + '</span>' +
-          '<button type="button" class="jlpt-nav-btn" ' + (curIndex === qs.length - 1 ? 'disabled' : '') + ' onclick="nextListeningQuestion()">Soal Berikutnya ▶</button>' +
+          '<button type="button" class="jlpt-nav-btn" ' + (curIndex === qs.length - 1 ? 'disabled' : '') + ' onclick="nextListeningQuestion()">Maju ▶</button>' +
         '</div>' +
       '</div>';
   }
