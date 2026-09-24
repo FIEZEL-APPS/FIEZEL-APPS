@@ -7841,9 +7841,10 @@ function latihanCards(){
   }
   cards.push({view:'writing',icon:'writing',label:FiezelI18n.t('skill.writing'),note:FiezelI18n.t('latihan.writing-note')});
   cards.push({view:'library',icon:'library',label:FiezelI18n.t('home.library-card'),note:FiezelI18n.t('latihan.library-note')});
-  /* Kursus Jepang membuka dengan tabel kana: pintu masuk pertama setiap buku ajar Jepang. */
+  /* Kursus Jepang membuka dengan tabel kana & chokai: pintu masuk belajar & listening JLPT. */
   const kanaCard=jaCourseOn()?FiezelJaUi.kanaCardMarkup():'';
-  return kanaCard+cards.map(c=>`<button class="launch-card" onclick="go('${esc(c.view)}')" aria-label="${esc(c.label)}"><span class="launch-icon"><i class="fz-i" data-fz-icon="${esc(c.icon)}" aria-hidden="true"></i></span><span><small>${esc(c.note)}</small><b>${esc(c.label)}</b></span><i data-lucide="arrow-up-right"></i></button>`).join('');
+  const chokaiCard=jaCourseOn()?FiezelJaUi.chokaiCardMarkup():'';
+  return kanaCard+chokaiCard+cards.map(c=>`<button class="launch-card" onclick="go('${esc(c.view)}')" aria-label="${esc(c.label)}"><span class="launch-icon"><i class="fz-i" data-fz-icon="${esc(c.icon)}" aria-hidden="true"></i></span><span><small>${esc(c.note)}</small><b>${esc(c.label)}</b></span><i data-lucide="arrow-up-right"></i></button>`).join('');
 }
 /* PETA JENIS SOAL -> LAYAR. Dipakai kedua kartu di bawah untuk mengantar murid ke tempat
    materinya benar-benar hidup, bukan ke satu layar yang dipaku. */
@@ -8233,10 +8234,25 @@ function todayHomeMarkup(){
     ${activeLevelTrustLineMarkup()}
   </section>
   ${jaCourseOn()?FiezelJaUi.wordOfDayMarkup(V.filter(v=>v.level===getActiveLevel())):''}
+  ${jaChokaiHomeBannerMarkup()}
   ${learnerFlowHomeMarkup()}
   ${quickChips}
   ${socialHomeMarkup()}
 </div>`;
+}
+function jaChokaiHomeBannerMarkup(){
+  if(!jaCourseOn())return '';
+  return `<div class="card ja-chokai-banner" onclick="openListeningPanel()" role="button" tabindex="0" aria-label="Latihan Chōkai JLPT N5 dan N4" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openListeningPanel();}">
+    <div class="ja-chokai-banner-left">
+      <span class="ja-chokai-banner-icon" aria-hidden="true">🎧</span>
+      <div>
+        <span class="ja-chokai-banner-eyebrow">Resmi Japan Foundation &amp; JEES</span>
+        <b class="ja-chokai-banner-title">Listening &amp; Chōkai (JLPT N5 &amp; N4)</b>
+        <span class="ja-chokai-banner-sub">30 Soal Interaktif + Audio &amp; Kunci Jawaban</span>
+      </div>
+    </div>
+    <button type="button" class="today-cta-soft ja-chokai-btn" onclick="event.stopPropagation();openListeningPanel();">Mulai ➔</button>
+  </div>`;
 }
 function home(){pawStreakWatch();/* m028-06: kabar demosi yang tertahan selama kuis dibuka di sini, bukan di tengah soal. */if(!state.activeSession&&levelTrustState(state).pendingNotice)setTimeout(()=>{try{flushLevelGuardNotice()}catch(_){}},280);/* W1 P1-2: kabar percobaan-terputus dari boot (sanitizeState) diumumkan SEKALI di beranda. */if(state.pendingInterruptNotice){const iNotice=state.pendingInterruptNotice;state.pendingInterruptNotice='';save();setTimeout(()=>{try{showToast(iNotice)}catch(_){}},900)}/* m025-166: gerbang level yang dipasang di perkenalan muncul di sini - saat murid sudah
    benar-benar berada di dalam aplikasi, bukan di atas layar perkenalan. */if(!state.activeSession&&levelEntryGatePending)setTimeout(()=>{try{maybeShowLevelEntryGate()}catch(_){}},360);const activeLevel=getActiveLevel(),activeV=V.filter(v=>v.level===activeLevel),activeR=R.filter(r=>r.level===activeLevel),activeGrammar=grammarItemsForLevel(activeLevel),snapshot=buildLearningSnapshot(),policy=buildAdaptivePolicy(),signal=localCoachSignal(),loginMessage=selectLoginMessage(),review=snapshot.dueReviews,level=activeLevel;/* 2026-08-29 overhaul I12 (O6 #5, O1-005): saat level TERKUNCI, CTA hero-lah yang berganti
