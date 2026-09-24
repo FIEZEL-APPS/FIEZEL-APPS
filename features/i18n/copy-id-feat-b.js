@@ -424,6 +424,16 @@
     // features/tutor-classroom/fiezel-tutor-v3.js:587
     'tutor.v3-siap-for-pertanyaan-upcoming': 'Siap untuk pertanyaan berikutnya.',
     // features/tutor-classroom/fiezel-tutor-v3.js:570
-    'tutor.v3-suara-pending-siap-teks-lesson': 'Suara belum siap. Teks pelajaran tetap dapat digunakan.'
+    'tutor.v3-suara-pending-siap-teks-lesson': 'Suara belum siap. Teks pelajaran tetap dapat digunakan.',
+    /* m025-366 · langkah kursus di perkenalan (Bahasa Inggris / Bahasa Jepang). */
+    'onboarding.course-aria': 'Pilih kursus',
+    'onboarding.course-en': 'Bahasa Inggris',
+    'onboarding.course-en-desc': 'Kosakata, tata bahasa, membaca, dan menyimak',
+    'onboarding.course-greet': 'Pilih kursusmu. Kamu bisa menggantinya kapan saja di Pengaturan.',
+    'onboarding.course-ja': 'Bahasa Jepang',
+    'onboarding.course-ja-desc': 'Kotoba, Bunpō, hiragana, dan katakana',
+    'onboarding.course-note': 'Tes penempatan berikutnya memakai soal dari kursus yang kamu pilih.',
+    'onboarding.course-title': 'Mau belajar bahasa apa?',
+    'onboarding.step-course': 'Kursus'
   });
 }());

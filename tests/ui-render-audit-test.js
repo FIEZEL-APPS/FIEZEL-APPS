@@ -90,6 +90,7 @@ function seedScript() {
     try {
       localStorage.clear();
       localStorage.setItem('fiezel-onboarding-v1', JSON.stringify({ done: true, at: Date.now(), via: 'finish', locale: 'id', name: 'Rani' }));
+      localStorage.setItem('fiezel-auth-v1', JSON.stringify({ v: 1, signedIn: true, at: Date.now(), role: 'murid', via: 'akun' })); // m025-366: lewati layar masuk wajib
       localStorage.setItem('fiezel-reminder-invite-v1', JSON.stringify({ offers: 9, decided: true }));
       localStorage.setItem('fiezel-puter-auth-skipped', '1');
     } catch (_) {}
@@ -332,6 +333,7 @@ async function main() {
         try {
           localStorage.clear();
           localStorage.setItem('fiezel-onboarding-v1', JSON.stringify({ done: true, at: Date.now(), via: 'finish', locale: 'id', name: 'Rani' }));
+          localStorage.setItem('fiezel-auth-v1', JSON.stringify({ v: 1, signedIn: true, at: Date.now(), role: 'murid', via: 'akun' })); // m025-366: lewati layar masuk wajib
           localStorage.setItem('fiezel-puter-auth-skipped', '1');
         } catch (_) {}
       });

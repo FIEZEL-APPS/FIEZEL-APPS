@@ -4687,7 +4687,7 @@ function buildAdaptivePool(count,policy=buildAdaptivePolicy(),reservoirMultiplie
  if(policy?.mode==='balance'&&limit>=6)for(const d of ['vocabulary','grammar','reading'])if(!result.some(q=>normalizePolicyDomain(q.type)===d))take(x=>x.domain===d,1);
  take(()=>true,limit-result.length);return result.slice(0,limit)
 }
-async function load(){const root=document.baseURI;/* W1 P0-1 (16-001): fetch bank WAJIB punya batas waktu. Respons yang menggantung (umum di
+async function load(opts){const root=document.baseURI;/* W1 P0-1 (16-001): fetch bank WAJIB punya batas waktu. Respons yang menggantung (umum di
    koneksi seluler yang payah) dulu tidak pernah reject, jadi jalur load().catch tidak pernah
    berjalan dan #app kosong selamanya di balik chrome yang terlihat hidup. 20 detik cukup
    longgar untuk 3G nyata; lewat itu murid berhak diberi kartu galat + tombol Coba lagi. */
@@ -4800,7 +4800,12 @@ async function load(){const root=document.baseURI;/* W1 P0-1 (16-001): fetch ban
   V=V.map(v=>{const rawTranslation=v.exampleTranslation||v.examples?.[0]?.translation||v.examples?.[0]?.id||'';const exampleTranslation=/^[a-z]\d?[a-z]?_\d+$/i.test(rawTranslation)?'':rawTranslation;return{id:v.id,word:v.word,phonetic:v.phonetic||'',partOfSpeech:v.partOfSpeech||'',level:v.level||v.cefr||'',meaning:v.meaning||v.meanings?.[0]?.meaning||'',example:v.example||v.examples?.[0]?.en||'',exampleTranslation,topic:v.topic||'general',difficulty:v.difficulty||({A1:1,A2:2,B1:3,B2:4,C1:5,C2:6}[v.level]||3),synonyms:v.synonyms||[],antonyms:v.antonyms||[],collocations:v.collocations||[],commonMistakes:v.commonMistakes||[],relatedWords:v.relatedWords||[],usageNotes:v.usageNotes||'',status:v.status||'needs_review',canary:v.__fiezelCanary||null}}).filter(v=>v.status==='complete'&&LEVELS.includes(v.level)&&v.word&&v.meaning);
   // W4-MERGE: simpan hasil hidrasi id lalu terapkan locale aktif (id = no-op referensial).
   CONTENT_BASE={g:G,items:GRAMMAR_ITEMS,v:V,r:R};applyContentLocale();
-  backfillPolicyOutcomes();$('version').textContent=`v${APP_VERSION}`;startCelestialClock();startRoleResolution();startWelcomeExperience();startUpdateWatcher()}
+  backfillPolicyOutcomes();$('version').textContent=`v${APP_VERSION}`;
+  /* m025-366: ganti kursus DI TENGAH perkenalan hanya butuh bank barunya. Ekor boot di bawah
+     memanggil startWelcomeExperience(), dan karena perkenalan belum selesai, itu membuka
+     perkenalan KEDUA di atas yang pertama - murid terlempar balik ke langkah nama. */
+  if(opts&&opts.kontenSaja)return;
+  startCelestialClock();startRoleResolution();startWelcomeExperience();startUpdateWatcher()}
 // m025-115: dua sistem ikon hidup berdampingan dengan sengaja. Set duotone FIEZEL
 // (features/ui/fiezel-icons.js) memegang kroma yang dilihat murid tiap hari - tab bar,
 // kartu modul, kartu skill, wajah pembimbing - karena di situlah kesan "template" dibuat
@@ -6635,6 +6640,10 @@ function startWelcomeExperience(){
         dismissBootSplash();
         return openApp();
       }
+      /* m025-366 LOGIN WAJIB: sesudah splash, SEBELUM perkenalan - dan juga untuk murid lama
+         yang perkenalannya sudah selesai. Lihat authGateNeeded(). */
+      if(authGateNeeded()){showAuthGate(at,proceed);return null}
+      setTimeout(verifyAuthSession,1500);
       if(!onboardingDone&&showOnboarding(at)?.shown===true)return null;
       if(askLearnerNameIfMissing(at))return null;
       maybeSyncLearnerName(at);
@@ -6646,6 +6655,73 @@ function startWelcomeExperience(){
     }
     return proceed();
   })
+}
+/* ===== LOGIN WAJIB (m025-366, keputusan OWNER 24 September 2026) =========================
+   Audit login L1: FIEZEL bisa dipakai penuh tanpa akun, karena identitas anonim terbit
+   otomatis dan tombol masuk hanya tawaran sekunder. Owner: "user masih bisa masuk tanpa
+   harus membuat akun, itu sangat fatal". Layar masuk (features/auth/fiezel-auth-screen.js)
+   kini berdiri di antara splash dan perkenalan, untuk murid BARU maupun LAMA.
+
+   Yang lolos tanpa layar itu, dan alasannya:
+     - demo Ruang Guru (?teacher=preview): data contoh, tidak menyentuh akun siapa pun;
+     - perangkat yang SUDAH masuk (penanda fiezel-auth-v1, sesi akun FIEZEL, atau email
+       Google yang tersimpan dari login sebelum build ini) - termasuk saat OFFLINE, supaya
+       murid di sinyal lemah tidak terkunci dari materinya sendiri. Kebenarannya diperiksa
+       ke server begitu online (verifyAuthSession).
+     - modul layar masuk tidak termuat: gagal TERBUKA, bukan mengurung murid di layar kosong. */
+function teacherPreviewActive(){
+  try{if(new URL(location.href).searchParams.get('teacher')==='preview')return true}catch(_){}
+  try{if(sessionStorage.getItem('fz-teacher-preview')==='1')return true}catch(_){}
+  return false;
+}
+function authGateNeeded(){
+  if(teacherPreviewActive())return false;
+  const A=self.FiezelAuthScreen;
+  if(!A||typeof A.show!=='function')return false;
+  if(A.readSession(self))return false;
+  if(self.FiezelAccount?.signedIn?.()){try{A.saveSession(self,{role:isVerifiedTeacher()?'guru':'murid',via:'akun'})}catch(_){}return false}
+  if(self.FiezelGoogle?.rememberedEmail?.()){try{A.saveSession(self,{role:'murid',via:'google'})}catch(_){}return false}
+  return true;
+}
+function showAuthGate(at,next){
+  const A=self.FiezelAuthScreen;
+  if(!A)return typeof next==='function'?next():null;
+  try{dismissBootSplash()}catch(_){}
+  return A.show(self,{
+    onLocale:(locale)=>{
+      const supported=(self.FiezelI18n?.SUPPORTED)||['id','th'];
+      const value=supported.includes(locale)?locale:'id';
+      state.preferences={...state.preferences,learnerLocale:value,learnerLocaleExplicit:true};state.coachCache=null;save();
+      try{self.FiezelI18n?.setLocale?.(value)}catch(_){}
+      try{self.FiezelOnboarding?.markLocaleSelected?.(self,value)}catch(_){}
+    },
+    onDone:({role,classCode})=>{
+      /* Bahasa layar yang dipakai saat masuk dihitung sebagai pilihan: perkenalan tidak
+         menanyakannya lagi. Kode KelasKu dari layar masuk dipakai persis seperti kode yang
+         dulu diketik di perkenalan - disimpan, lalu guru diberi tahu murid ini bergabung. */
+      try{self.FiezelOnboarding?.markLocaleSelected?.(self,self.FiezelI18n?.getLocale?.()||'id')}catch(_){}
+      if(role==='murid'&&classCode){
+        saveClassCode(classCode);
+        try{self.FiezelLearnerFlow?.announceJoin?.()}catch(_){}
+        try{self.FiezelInbox?.poll?.(true)}catch(_){}
+      }
+      if(role==='guru'){state.view='tutor'}
+      try{if(typeof next==='function')next()}catch(_){}
+    }
+  });
+}
+/** Penanda lokal hanya tampilan; server yang tahu. Jawaban TEGAS "belum masuk" (cookie hilang,
+    data situs dihapus sebagian) membuka layar masuk lagi. Galat jaringan tidak mengubah apa pun. */
+async function verifyAuthSession(){
+  const A=self.FiezelAuthScreen;
+  if(!A||!A.readSession(self)||teacherPreviewActive())return;
+  try{if(navigator.onLine===false)return}catch(_){}
+  const r=await A.checkServer(self);
+  if(r&&r.ok&&r.signedIn===false){
+    A.clearSession(self);
+    try{self.FiezelGoogle?.forget?.()}catch(_){}
+    showAuthGate(Date.now(),()=>{try{render()}catch(_){}});
+  }
 }
 function dismissWelcome(){return declineStudyNotifications()}
 // m025-80: the generative soundtrack (features/audio/fiezel-soundtrack.js) was removed.
@@ -8769,6 +8845,17 @@ function showOnboarding(now=Date.now()){
         try{armLevelEntryGate(selectedLevel)}catch(_){}
         save();render();showToast(FiezelI18n.t('journey.toast-tujuan',{label:label}),'success')
       },
+      /* m025-366: kursus dipilih di perkenalan (Bahasa Inggris / Bahasa Jepang). Jalurnya
+         SAMA dengan chip kursus di Home (setTargetLangPreference), tanpa toast dan tanpa
+         menutup lapisan: perkenalan masih terbuka di atasnya, dan bank kursus harus sudah
+         termuat sebelum tes penempatan dimulai dua langkah kemudian. */
+      onCourse:({course})=>{
+        const value=course==='ja'?'ja':'en';
+        (async()=>{
+          try{if(activeTargetLang()===value)return;switchTargetLangStorage(value);await load({kontenSaja:true})}catch(_){}
+          try{render()}catch(_){}
+        })();
+      },
       onPlacement:()=>afterOnboardingExit('placement'),
       onFinish:()=>afterOnboardingExit('home')
     })
@@ -8950,7 +9037,6 @@ function bindFiezelAccountControls(){
     try{localStorage.removeItem('fz_teacher_mode')}catch(_){}
     try{sessionStorage.removeItem('fz-teacher-preview');sessionStorage.removeItem('fiezel-teacher-v1-preview')}catch(_){}
     try{self.FiezelTeacherShell?.unmount?.()}catch(_){}
-    const wasTeacher=(state.preferences?.role==='guru')||(self.FiezelAccount?.role?.()==='teacher');
     if(state.preferences?.role==='guru'){
       state.preferences={...state.preferences,role:'murid'};
       state.view='home';
@@ -8962,19 +9048,18 @@ function bindFiezelAccountControls(){
          tapi layar yang masih berbunyi "kamu masuk sebagai …" sesudah murid
          menekan Keluar adalah layar yang berbohong. */
       try{self.FiezelGoogle?.signOut?.()}catch(_){}
+      /* m025-366: keluar = kembali ke layar masuk. Penanda lokal dibuang di sini. */
+      try{self.FiezelAuthScreen?.clearSession?.(self)}catch(_){}
       showToast('Berhasil keluar dari akun.');
     }catch(_){
       showToast('Keluar dari sesi.');
     }
     closeModal();
-    if(wasTeacher){
-      try{go('home')}catch(_){try{render()}catch(_){}}
-      setTimeout(()=>{
-        try{openFiezelAuthModal('teacher')}catch(_){}
-      },150);
-    }else{
-      setTimeout(openSettings,100);
-    }
+    /* m025-366: sesudah keluar, perangkat kembali ke layar masuk - untuk murid maupun guru.
+       Dulu murid dikembalikan ke Pengaturan dan guru ke modal akun, sementara aplikasi
+       tetap bisa dipakai tanpa akun di belakangnya. */
+    try{go('home')}catch(_){try{render()}catch(_){}}
+    setTimeout(()=>{try{showAuthGate(Date.now(),()=>{try{render()}catch(_){}})}catch(_){}},150);
   });
 
   $('btnSubmitTeacherCodeInline')?.addEventListener('click',async()=>{
@@ -14737,18 +14822,16 @@ async function fiezelAccountLogout(){
   try{localStorage.removeItem('fz_teacher_mode')}catch(_){}
   try{sessionStorage.removeItem('fz-teacher-preview');sessionStorage.removeItem('fiezel-teacher-v1-preview')}catch(_){}
   try{self.FiezelTeacherShell?.unmount?.()}catch(_){}
-  const wasTeacher=(state.preferences?.role==='guru')||(core.role?.()==='teacher');
   state.preferences={...state.preferences,role:'murid'};
   state.view='home';
   try{save()}catch(_){}
   await core.logout();
+  try{self.FiezelGoogle?.signOut?.()}catch(_){}
+  /* m025-366: keluar = kembali ke layar masuk (murid maupun guru). */
+  try{self.FiezelAuthScreen?.clearSession?.(self)}catch(_){}
   showToast(FiezelI18n.t('account.logout-done'),'success');
   try{go('home')}catch(_){try{render()}catch(_){}}
-  if(wasTeacher){
-    setTimeout(()=>{
-      try{openFiezelAuthModal('teacher')}catch(_){}
-    },150);
-  }
+  setTimeout(()=>{try{showAuthGate(Date.now(),()=>{try{render()}catch(_){}})}catch(_){}},150);
   return true;
 }
 /** Baris status untuk Pengaturan. Kosong = anonim, dan itu keadaan yang sah. */

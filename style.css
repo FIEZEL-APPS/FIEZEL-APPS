@@ -2678,13 +2678,15 @@ button.primary:active,.primary.luxe:active,html.fiezel-ui-v6 body .primary:activ
    dasar .option yang tenang (garis --line, tanpa bayangan lantai). */
 /* .ch-plain (m025-364): kontrol KelasKu yang BUKAN tombol angkat — segmen status, tombol
    ikon di baris tugas, lipatan grup, tautan Arsip. Bingkai & bayangan angkat di sini membuat
-   segmen status terbaca sebagai deretan tab kedua di bawah tab KelasKu. */
-html.fiezel-ui-v6 body button:not(.primary):not(.nav):not(.icon-button):not(.brand-button):not(.text-button):not(.coach-link):not(.fz-coach-bubble):not(.launch-card):not(.skill-card):not(.option):not(.skill-help-dot):not(.olm-dispute):not(.ch-plain){
+   segmen status terbaca sebagai deretan tab kedua di bawah tab KelasKu.
+   .fz-plain (m025-366): hal yang sama untuk kontrol datar layar masuk (tab peran, tautan,
+   pemilih bahasa, tombol mata kata sandi, panah Lanjut). */
+html.fiezel-ui-v6 body button:not(.primary):not(.nav):not(.icon-button):not(.brand-button):not(.text-button):not(.coach-link):not(.fz-coach-bubble):not(.launch-card):not(.skill-card):not(.option):not(.skill-help-dot):not(.olm-dispute):not(.ch-plain):not(.fz-plain){
   border:1.5px solid var(--surface-edge);border-radius:var(--radius-md);
   box-shadow:var(--lift-edge);
   transition:transform var(--dur-xs) var(--ease),box-shadow var(--dur-xs) var(--ease);
 }
-html.fiezel-ui-v6 body button:not(.primary):not(.nav):not(.icon-button):not(.brand-button):not(.text-button):not(.coach-link):not(.fz-coach-bubble):not(.launch-card):not(.skill-card):not(.option):not(.skill-help-dot):not(.olm-dispute):not(.ch-plain):active{
+html.fiezel-ui-v6 body button:not(.primary):not(.nav):not(.icon-button):not(.brand-button):not(.text-button):not(.coach-link):not(.fz-coach-bubble):not(.launch-card):not(.skill-card):not(.option):not(.skill-help-dot):not(.olm-dispute):not(.ch-plain):not(.fz-plain):active{
   transform:translateY(2px);box-shadow:var(--lift-edge-press)}
 
 /* --------------------------------------------------------------------------
@@ -5683,3 +5685,86 @@ html body #app .social-home-launcher .launch-card{background:var(--pz-sky);borde
 .lesson-contrast span{display:block;padding:8px 12px;border-radius:var(--radius-sm);font-weight:600;line-height:1.45}
 .lesson-contrast .is-wrong{background:var(--bad-soft);color:var(--bad);text-decoration:line-through;text-decoration-thickness:1px}
 .lesson-contrast .is-right{background:var(--good-soft);color:var(--good)}
+
+/* ==========================================================================
+   m025-366 · LAYAR MASUK (features/auth/fiezel-auth-screen.js)
+   Referensi owner: Welcome → Sign in → Sign up, kepala bermotif kontur topografi yang
+   berakhir dengan gelombang. Diterjemahkan ke merek FIEZEL: bidang core gelap + kontur
+   emas (bukan koral), wordmark + PAW di kepala, tombol utama = .primary aplikasi.
+   Kepala MENGECIL dari Selamat datang → Masuk → Daftar, persis seperti referensinya.
+   ========================================================================== */
+body.fz-auth-open{overflow:hidden}
+.fz-auth{position:fixed;inset:0;z-index:2147481950;display:flex;flex-direction:column;background:var(--bg,#FBF7F3);color:var(--text,#2E2724);overflow-y:auto;overscroll-behavior:contain;animation:fzAuthIn .32s cubic-bezier(.2,.8,.2,1) both}
+.fz-auth.is-leaving{animation:fzAuthOut .24s ease both}
+@keyframes fzAuthIn{from{opacity:0}to{opacity:1}}
+@keyframes fzAuthOut{to{opacity:0;transform:translateY(8px)}}
+.fz-auth-hero{position:relative;flex:0 0 auto;overflow:hidden;color:var(--fz-on-core,#FDFAF3);
+  background:radial-gradient(120% 90% at 30% 0%,var(--fz-core-soft,#2A2126) 0%,var(--fz-core,#1B1418) 70%);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;
+  padding:max(28px,calc(env(safe-area-inset-top) + 16px)) 20px 64px;transition:min-height .35s cubic-bezier(.2,.8,.2,1)}
+.fz-auth-hero.is-welcome{min-height:58vh}
+.fz-auth-hero.is-masuk{min-height:30vh}
+.fz-auth-hero.is-daftar{min-height:22vh}
+.fz-auth-topo{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+.fz-auth-topo path{fill:none;stroke:rgba(255,199,0,.2);stroke-width:1.1}
+.fz-auth-hero::after{content:"";position:absolute;left:50%;top:40%;width:min(80vw,340px);height:220px;transform:translate(-50%,-50%);border-radius:50%;pointer-events:none;background:radial-gradient(closest-side,rgba(255,199,0,.22),rgba(255,199,0,0))}
+.fz-auth-wave{position:absolute;left:0;right:0;bottom:-1px;width:100%;height:58px;z-index:2}
+.fz-auth-wave path{fill:var(--bg,#FBF7F3)}
+.fz-auth-brand{position:relative;z-index:1}
+.fz-auth-brand .fiezel-wordmark{width:min(46vw,190px);display:block;margin:0 auto}
+.fz-auth-hero.is-daftar .fiezel-wordmark{width:min(34vw,140px)}
+.fz-auth-word{margin:0;font-family:var(--fz-heading);font-weight:800;font-size:2rem;letter-spacing:.04em}
+.fz-auth-paw{position:relative;z-index:1;width:112px;height:112px;display:block}
+.fz-auth .fz-auth-lang{position:absolute;z-index:3;top:max(14px,calc(env(safe-area-inset-top) + 6px));right:14px;display:flex;gap:2px;padding:3px;border-radius:999px;background:rgba(255,255,255,.1);backdrop-filter:blur(4px)}
+.fz-auth .fz-auth-lang button{border:0;background:transparent;box-shadow:none;color:rgba(253,250,243,.78);font:inherit;font-size:.78rem;font-weight:700;padding:6px 11px;border-radius:999px;min-height:0;cursor:pointer}
+.fz-auth .fz-auth-lang button.is-on{background:var(--fz-on-core,#FDFAF3);color:var(--fz-core,#1B1418)}
+.fz-auth-body{position:relative;flex:1 0 auto;width:100%;max-width:460px;margin:0 auto;padding:6px 24px calc(28px + env(safe-area-inset-bottom));display:flex;flex-direction:column}
+.fz-auth-title{margin:6px 0 14px;font-family:var(--fz-heading);font-size:2rem;line-height:1.1;letter-spacing:-.02em;color:var(--text,#2E2724)}
+.fz-auth-title.is-underlined{display:inline-block;align-self:flex-start;text-decoration:underline;text-decoration-color:var(--accent,#9B3A4A);text-decoration-thickness:3px;text-underline-offset:7px;text-decoration-skip-ink:none}
+.fz-auth-lead{margin:0;color:var(--muted,#6E635C);font-size:1rem;line-height:1.55;max-width:34ch}
+.fz-auth-next-row{margin-top:auto;padding-top:28px;display:flex;justify-content:flex-end}
+.fz-auth .fz-auth-next{display:inline-flex;align-items:center;gap:12px;border:0;background:transparent;box-shadow:none;color:var(--text,#2E2724);font:inherit;font-weight:700;font-size:1rem;padding:6px 4px 6px 10px;cursor:pointer}
+.fz-auth-next-dot{width:48px;height:48px;border-radius:50%;display:grid;place-items:center;background:var(--accent,#9B3A4A);color:#fff;box-shadow:0 10px 22px -12px var(--accent,#9B3A4A)}
+.fz-auth-i{width:18px;height:18px;flex:none;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.fz-auth-next-dot .fz-auth-i{width:22px;height:22px}
+.fz-auth-roles{display:flex;gap:4px;padding:4px;border-radius:14px;background:var(--line,#EFE7DE);margin:0 0 16px}
+.fz-auth .fz-auth-role{flex:1;border:0;background:transparent;box-shadow:none;color:var(--muted,#6E635C);font:inherit;font-weight:700;font-size:.92rem;padding:10px;border-radius:10px;cursor:pointer;min-height:0}
+.fz-auth .fz-auth-role.is-on{background:var(--panel,#fff);color:var(--text,#2E2724);box-shadow:0 4px 14px -10px rgba(0,0,0,.45)}
+.fz-auth-google{min-height:44px;display:flex;justify-content:center}
+.fz-auth-google[hidden]{display:none}
+.fz-auth-or[hidden]{display:none}
+.fz-auth-or{display:flex;align-items:center;gap:10px;margin:14px 0 4px;color:var(--muted,#6E635C);font-size:.8rem}
+.fz-auth-or::before,.fz-auth-or::after{content:"";flex:1;height:1px;background:var(--line,#EFE7DE)}
+.fz-auth-hint{margin:0 0 6px;color:var(--muted,#6E635C);font-size:.88rem;line-height:1.5}
+.fz-auth-form{display:flex;flex-direction:column;gap:14px;margin-top:6px}
+.fz-auth-field{display:flex;flex-direction:column;gap:6px}
+.fz-auth-label{font-weight:700;font-size:.9rem;color:var(--text,#2E2724)}
+.fz-auth-label small{font-weight:600;color:var(--muted,#6E635C)}
+.fz-auth-input{display:flex;align-items:center;gap:10px;border-bottom:1.5px solid var(--line,#EFE7DE);padding:4px 0;color:var(--muted,#6E635C);transition:border-color .2s}
+.fz-auth-input:focus-within{border-bottom-color:var(--accent,#9B3A4A);color:var(--accent,#9B3A4A)}
+/* (0,3,1): harus menang atas `body.fz-lux input[type="text"]` (0,2,2) yang menggambar kotak putih. */
+.fz-auth .fz-auth-input input[name]{flex:1;min-width:0;border:0;border-radius:0;background:transparent;box-shadow:none;font:inherit;font-size:1rem;color:var(--text,#2E2724);padding:8px 0;min-height:40px;outline:none}
+.fz-auth .fz-auth-eye{border:0;background:transparent;box-shadow:none;color:var(--muted,#6E635C);padding:6px;min-height:0;cursor:pointer;border-radius:8px}
+.fz-auth .fz-auth-eye[aria-pressed="true"]{color:var(--accent,#9B3A4A)}
+.fz-auth-row{display:flex;justify-content:flex-end;margin-top:-4px}
+.fz-auth .fz-auth-link{border:0;background:transparent;box-shadow:none;padding:4px 2px;min-height:0;font:inherit;font-weight:700;font-size:.86rem;color:var(--accent,#9B3A4A);cursor:pointer;text-decoration:none}
+.fz-auth-note{margin:6px 0 0;font-size:.84rem;line-height:1.45;color:var(--muted,#6E635C);text-align:center}
+.fz-auth-note:empty{display:none}
+.fz-auth-note.is-info{text-align:left;background:var(--line,#EFE7DE);border-radius:12px;padding:10px 12px}
+.fz-auth-error{margin:0;color:#A1302A;font-size:.86rem;font-weight:600;line-height:1.45}
+.fz-auth-error:empty{display:none}
+.fz-auth .fz-auth-submit{width:100%;margin-top:6px;padding:15px 20px;font-size:1rem}
+.fz-auth-alt{margin:16px 0 0;text-align:center;color:var(--muted,#6E635C);font-size:.9rem}
+.fz-auth-alt + .fz-auth-alt{margin-top:4px}
+.fz-auth .fz-plain:focus-visible,.fz-auth-input input:focus-visible{outline:2px solid var(--accent,#9B3A4A);outline-offset:2px}
+@media (max-height:680px){.fz-auth-hero.is-welcome{min-height:48vh}.fz-auth-hero.is-masuk{min-height:24vh}.fz-auth-hero.is-daftar{min-height:18vh}.fz-auth-paw{width:84px;height:84px}}
+@media (prefers-reduced-motion:reduce){.fz-auth,.fz-auth.is-leaving{animation:none}.fz-auth-hero{transition:none}}
+/* m025-366 · langkah kursus di perkenalan: dua kartu lebar (bendera + nama + isi kursus). */
+.fiezel-course-grid{display:grid;grid-template-columns:1fr;gap:10px;margin:14px 0 10px}
+/* .fiezel-goal-card menumpuk isinya ke bawah (column) dan mengecilkan semua span ke 13px;
+   kartu kursus butuh baris: bendera di kiri, judul + isi di kanan. */
+.fiezel-ob .fiezel-course-card{flex-direction:row;align-items:center;justify-content:flex-start;gap:14px;text-align:left;padding:16px 18px}
+.fiezel-ob .fiezel-course-card .fiezel-course-flag{flex:none;display:grid;place-items:center;width:52px;height:52px;border-radius:16px;background:var(--fz-soft,#F6EFE7);font-size:30px;line-height:1}
+.fiezel-ob .fiezel-course-card .fiezel-course-text{display:flex;flex-direction:column;gap:3px;min-width:0;font-size:inherit}
+.fiezel-ob .fiezel-course-card .fiezel-course-text b{font-size:1.05rem}
+.fiezel-ob .fiezel-course-card .fiezel-course-text small{font-size:.84rem;font-weight:500;color:var(--fz-ink-muted,#6E635C);line-height:1.4}

@@ -75,6 +75,7 @@ function makeDb() {
   const oauth = new Map();   // "provider|provider_sub" -> row
   const email = new Map();   // sub -> row
   const ident = new Map();   // sub -> row
+  const acct = new Map();    // sub -> baris auth_account (akun FIEZEL: nama pengguna + sandi)
   const sql = [];
   const hideOnce = { first: false };
   function run(text, args) {
@@ -101,6 +102,10 @@ function makeDb() {
       }
       return { rows: [] };
     }
+    if (/^SELECT sub, role, login_handle, status, institution_id FROM auth_account WHERE sub = \?1/.test(t)) {
+      const hit = acct.get(args[0]);
+      return { rows: hit ? [hit] : [] };
+    }
     if (/^INSERT INTO auth_oauth_identity/.test(t)) {
       const key = args[0] + '|' + args[1];
       if (!oauth.has(key)) {
@@ -119,7 +124,7 @@ function makeDb() {
     throw new Error('SQL tak dikenal di gerbang: ' + t.slice(0, 90));
   }
   return {
-    _oauth: oauth, _email: email, _ident: ident, _sql: sql, _hideOnce: hideOnce,
+    _oauth: oauth, _email: email, _ident: ident, _acct: acct, _sql: sql, _hideOnce: hideOnce,
     prepare(text) {
       let bound = [];
       const stmt = {
@@ -324,14 +329,55 @@ test('Google tak terjangkau DAN nol salinan: 503, bukan 200', async () => {
   assert.strictEqual(db._oauth.size, 0, 'nol baris');
 });
 
+/* m025-366 — GET /api/auth/session: layar masuk wajib (features/auth/fiezel-auth-screen.js)
+   bertanya ke sini apakah cookie perangkat ini BENAR-BENAR sudah masuk. Jawaban yang salah
+   ke arah "sudah" membuka aplikasi tanpa akun; ke arah "belum" menendang murid sah keluar. */
+test('sesi: cookie anonim / tanpa cookie → signedIn:false', async () => {
+  const db = makeDb(); const env = makeEnv(db);
+  const r1 = await readJson(await route.routeAuthSession(await makeCtx(env, { now: tick() })));
+  assert.deepStrictEqual(r1, { ok: true, signedIn: false, via: null, role: null }, 'tanpa identitas');
+  const r2 = await readJson(await route.routeAuthSession(await makeCtx(env, { now: tick(), sub: 'anon-tanpa-akun' })));
+  assert.strictEqual(r2.signedIn, false, 'fz_id anonim BUKAN tanda sudah masuk');
+});
+
+test('sesi: akun FIEZEL aktif → via akun, peran murid/guru; akun nonaktif → belum masuk', async () => {
+  const db = makeDb(); const env = makeEnv(db);
+  db._acct.set('sub-murid', { sub: 'sub-murid', role: 'learner', login_handle: 'sari', status: 'active', institution_id: null });
+  db._acct.set('sub-guru', { sub: 'sub-guru', role: 'teacher', login_handle: 'bu.ani', status: 'active', institution_id: 'i1' });
+  db._acct.set('sub-beku', { sub: 'sub-beku', role: 'learner', login_handle: 'beku', status: 'suspended', institution_id: null });
+  const m = await readJson(await route.routeAuthSession(await makeCtx(env, { now: tick(), sub: 'sub-murid' })));
+  assert.deepStrictEqual(m, { ok: true, signedIn: true, via: 'akun', role: 'murid' });
+  const g = await readJson(await route.routeAuthSession(await makeCtx(env, { now: tick(), sub: 'sub-guru' })));
+  assert.deepStrictEqual(g, { ok: true, signedIn: true, via: 'akun', role: 'guru' });
+  const b = await readJson(await route.routeAuthSession(await makeCtx(env, { now: tick(), sub: 'sub-beku' })));
+  assert.strictEqual(b.signedIn, false, 'akun dibekukan tidak dihitung masuk');
+});
+
+test('sesi: tertaut Google tanpa akun FIEZEL → via google, murid; respons tanpa email/nama', async () => {
+  const db = makeDb(); const env = makeEnv(db);
+  stubFetch(true);
+  const now = tick();
+  const ctx = await makeCtx(env, { now, body: { credential: await signToken({ sub: '5550001112223334445' }, Math.floor(now / 1000)) } });
+  assert.strictEqual((await route.routeAuthGoogle(ctx)).status, 200, 'login Google dulu');
+  const sub = await cookieSub(ctx);
+  assert.ok(sub, 'cookie terbit');
+  const res = await route.routeAuthSession(await makeCtx(env, { now: tick(), sub }));
+  const txt = await res.text();
+  assert.deepStrictEqual(JSON.parse(txt), { ok: true, signedIn: true, via: 'google', role: 'murid' });
+  assert.ok(!/@|sekolah|murid@/.test(txt), 'tidak membocorkan email');
+});
+
 test('rute terdaftar di slot dengan metode dan path yang benar', async () => {
-  assert.strictEqual(route.ROUTES.length, 1, 'satu rute');
+  assert.strictEqual(route.ROUTES.length, 2, 'dua rute: login Google + cek sesi');
   assert.deepStrictEqual(route.ROUTES[0].slice(0, 2), ['POST', '/api/auth/google'], 'POST /api/auth/google');
+  assert.deepStrictEqual(route.ROUTES[1].slice(0, 2), ['GET', '/api/auth/session'], 'GET /api/auth/session');
   const slots = await import(require('url').pathToFileURL(path.join(__fzRoot, 'workers/api/route-slots.js')).href);
   const cocok = slots.EXTRA_ROUTES.filter((r) => r[1] === '/api/auth/google');
   assert.strictEqual(cocok.length, 1, 'terpasang persis sekali di EXTRA_ROUTES');
+  assert.strictEqual(slots.EXTRA_ROUTES.filter((r) => r[1] === '/api/auth/session' && r[0] === 'GET').length, 1, 'cek sesi terpasang sekali');
   const schema = await import(require('url').pathToFileURL(path.join(__fzRoot, 'workers/api/schema.js')).href);
   assert.ok(schema.BYTE_LIMITS['/api/auth/google'] > 4096, 'cap byte terdaftar dan cukup untuk ID token');
+  assert.ok(schema.BYTE_LIMITS['/api/auth/session'] > 0, 'cap byte cek sesi terdaftar');
 });
 
 (async () => {
