@@ -235,6 +235,8 @@
     'adaptif.toast-pool-empty': 'Profil adaptif belum memiliki area yang cukup terukur. Lanjutkan latihan level terlebih dahulu.',
     'suara.toast-device-issue': 'Suara sedang bermasalah di perangkatmu. Teksnya tetap bisa kamu baca, dan kamu boleh mencoba lagi nanti.',
     'settings.toast-report-sent': 'Laporan agregat terkirim ke Creator Hub',
-    'settings.toast-report-queued': 'Laporan disimpan di antrean dan akan dicoba lagi'
+    'settings.toast-report-queued': 'Laporan disimpan di antrean dan akan dicoba lagi',
+    /* m025-365 · tugas yang ditarik guru. */
+    'notif.tugas-ditarik': 'Tugas “{title}” ditarik oleh gurumu. Kamu tidak perlu mengerjakannya.'
   });
 }());

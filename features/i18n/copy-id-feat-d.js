@@ -630,6 +630,36 @@
     'kelas.panduan-langkah-1': '1. Klik tombol Buka Bank Soal di atas.'
 ,
     'guru.n-menit': '{n} menit',
-    'guru.waktu-hemat-tip': 'Perkiraan waktu administrasi yang FIEZEL kerjakan untukmu'
+    'guru.waktu-hemat-tip': 'Perkiraan waktu administrasi yang FIEZEL kerjakan untukmu',
+    /* m025-365 · siklus tugas guru: Aktif / Lewat tenggat / Arsip, tarik, hapus dari Arsip. */
+    'guru.siklus.tarik': 'Tarik dari murid',
+    'guru.siklus.tarik-tanya': 'Tarik tugas ini dari murid? Yang belum mengerjakan tidak akan melihatnya lagi. Hasil yang sudah masuk tetap tersimpan.',
+    'guru.siklus.hapus-tanya': 'Hapus permanen? Tugas dan hasil murid untuk tugas ini hilang dari Ruang Guru dan tidak bisa dikembalikan.',
+    'guru.siklus.ya-tarik': 'Ya, tarik',
+    'guru.siklus.ya-hapus': 'Ya, hapus permanen',
+    'guru.siklus.batal': 'Batal',
+    'guru.siklus.ditarik-pada': 'Ditarik dari murid · {tanggal}',
+    'guru.siklus.diarsip-pada': 'Diarsipkan · {tanggal}',
+    'guru.siklus.ringkas-hasil': '{selesai}/{total} selesai',
+    'guru.siklus.tenggat': 'Tenggat {tanggal}',
+    'guru.siklus.lihat-hasil': 'Lihat hasil',
+    'guru.siklus.pulihkan': 'Pulihkan',
+    'guru.siklus.hapus': 'Hapus permanen',
+    'guru.siklus.tab-aria': 'Status tugas',
+    'guru.siklus.aktif': 'Aktif',
+    'guru.siklus.lewat': 'Lewat tenggat',
+    'guru.siklus.arsip': 'Arsip',
+    'guru.siklus.lewat-catatan': 'Tenggatnya sudah lewat. Tagih yang belum, lalu arsipkan — hasil murid tetap tersimpan.',
+    'guru.siklus.arsipkan-semua': 'Arsipkan semua ({n})',
+    'guru.siklus.arsip-catatan': 'Arsip hanya merapikan daftar ini: hasil murid tetap tersimpan dan tugas bisa dipulihkan. Hapus permanen hanya dari sini.',
+    'guru.siklus.arsipkan': 'Arsipkan',
+    'guru.siklus.lewat-kurung': '(lewat)',
+    'guru.siklus.toast-diarsip': 'Tugas dipindah ke Arsip. Hasil murid tetap tersimpan.',
+    'guru.siklus.toast-diarsip-n': '{n} tugas dipindah ke Arsip.',
+    'guru.siklus.toast-dipulihkan': 'Tugas dikembalikan dari Arsip.',
+    'guru.siklus.toast-ditarik': 'Tugas ditarik. Murid yang belum mengerjakan tidak melihatnya lagi.',
+    'guru.siklus.toast-ditarik-lokal': 'Tugas ini hanya pernah dibagikan lewat kode, jadi hanya ditarik dari daftar ini.',
+    'guru.siklus.toast-gagal-tarik': 'Gagal menarik tugas ({sebab}). Periksa koneksi lalu coba lagi.',
+    'guru.siklus.toast-dihapus': 'Tugas dihapus permanen.'
   });
 }());

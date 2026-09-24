@@ -291,6 +291,7 @@ jobs:
           node tests/auto-class-adopt-test.js
           node tests/class-hub-test.js
           node tests/kelasku-arsip-test.js
+          node tests/kelasku-tarik-test.js
           node tests/exam-focus-guard-test.js
           node tests/class-join-test.js
           node tests/exam-lock-test.js

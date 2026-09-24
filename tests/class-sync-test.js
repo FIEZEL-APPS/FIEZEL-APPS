@@ -22,6 +22,7 @@ function fakeD1() {
       async run() {
         if (/CREATE /.test(s)) return { success: true };
         if (/INSERT INTO tc_class \(/.test(s)) { cls.set(args[0], { code: args[0], teacher_sub: args[1], title: args[2], level: args[3], created_at: args[4], updated_at: args[4] }); return { meta: { changes: 1 } }; }
+        if (/UPDATE tc_class_assignment SET payload_json/.test(s)) { const a = asg.get(args[0] + '|' + args[1]); if (a && a.teacher_sub === args[2]) { a.payload_json = args[3]; a.updated_at = args[4]; } return { meta: { changes: a ? 1 : 0 } }; }
         if (/UPDATE tc_class SET/.test(s)) { const c = cls.get(args[0]); if (c && c.teacher_sub === args[4]) { c.title = args[1]; c.level = args[2]; c.updated_at = args[3]; } return { meta: { changes: 1 } }; }
         if (/INSERT (?:OR REPLACE )?INTO tc_class_teacher/.test(s)) { clsTeachers.set(args[0] + '|' + args[2], { class_code: args[0], teacher_sub: args[1], subject_id: args[2], teacher_name: args[3], created_at: args[4], updated_at: args[5] }); return { meta: { changes: 1 } }; }
         if (/INSERT INTO tc_class_assignment/.test(s)) { asg.set(args[0] + '|' + args[1], { class_code: args[0], id: args[1], teacher_sub: args[2], payload_json: args[3], targets_json: args[4], created_at: args[5], updated_at: args[5] }); return { meta: { changes: 1 } }; }
@@ -30,6 +31,7 @@ function fakeD1() {
       },
       async first() {
         if (/FROM auth_account WHERE sub/.test(s)) return accounts.get(args[0]) || null;
+        if (/SELECT payload_json FROM tc_class_assignment WHERE class_code = \?1 AND id = \?2 AND teacher_sub = \?3/.test(s)) { const a = asg.get(args[0] + '|' + args[1]); return a && a.teacher_sub === args[2] ? { payload_json: a.payload_json } : null; }
         if (/SELECT code FROM tc_class WHERE code = \?1 AND teacher_sub = \?2/.test(s)) { const c = cls.get(args[0]); return c && c.teacher_sub === args[1] ? { code: c.code } : null; }
         if (/SELECT class_code AS code FROM tc_class_teacher WHERE class_code = \?1 AND teacher_sub = \?2/.test(s)) {
           const match = [...clsTeachers.values()].find((ct) => ct.class_code === args[0] && ct.teacher_sub === args[1]);
@@ -173,6 +175,23 @@ async function json(res) { return { status: res.status, body: JSON.parse(await r
   r = await json(await routes.routeLearnerClassAssignments(ctxOf(db, { sub: 'anon-3', method: 'GET', pathname: '/api/learner/class-assignments', query: { cls: 'FZ-ZZZ234', name: 'X' }, now: 1_700_000_061_000 })));
   assert(r.status === 404, 'kode kelas tak dikenal -> 404');
 
+  /* ---------- 2b. tarik tugas (m025-365, audit KelasKu K2) ------------------------ */
+  r = await json(await routes.routeClassRetract(ctxOf(db, { sub: 't2', method: 'POST', pathname: '/api/teacher/class/retract', body: { code: 'FZ-AB2C3D', id: 'as-78' }, now: 1_700_000_062_000 })));
+  assert(r.status === 404, 'guru lain tidak bisa menarik tugas yang bukan kirimannya');
+  r = await json(await routes.routeClassRetract(ctxOf(db, { sub: 't1', method: 'POST', pathname: '/api/teacher/class/retract', body: { code: 'FZ-AB2C3D', id: 'belum-dikirim' }, now: 1_700_000_062_500 })));
+  assert(r.status === 404, 'tugas yang tidak pernah lewat server -> 404 (klien memperlakukannya sebagai tarikan lokal)');
+  r = await json(await routes.routeClassRetract(ctxOf(db, { sub: 't1', method: 'POST', pathname: '/api/teacher/class/retract', body: { code: 'FZ-AB2C3D', id: '../x' }, now: 1_700_000_062_600 })));
+  assert(r.status === 400, 'id tugas liar ditolak');
+  r = await json(await routes.routeClassRetract(ctxOf(db, { sub: 't1', method: 'POST', pathname: '/api/teacher/class/retract', body: { code: 'FZ-AB2C3D', id: 'as-78' }, now: 1_700_000_063_000 })));
+  assert(r.status === 200 && r.body.retracted === true, 'guru pengirim menarik tugasnya');
+  r = await json(await routes.routeLearnerClassAssignments(ctxOf(db, { sub: 'anon-4', method: 'GET', pathname: '/api/learner/class-assignments', query: { cls: 'FZ-AB2C3D', name: 'Dimas', since: '1700000041000' }, now: 1_700_000_064_000 })));
+  const tarikan = r.body.assignments && r.body.assignments[0];
+  assert(r.status === 200 && r.body.assignments.length === 1 && tarikan.assignment.t === 'retract' && tarikan.assignment.id === 'as-78', 'penanda tarikan tiba lewat kursor yang SAMA (tanpa kolom/migrasi baru)');
+  assert(tarikan && tarikan.assignment.title === 'Untuk semua' && !tarikan.assignment.itemIds && !tarikan.assignment.items, 'penanda hanya membawa judul — butir soal ikut hilang dari server');
+  r = await json(await routes.routeClassAssign(ctxOf(db, { sub: 't1', method: 'POST', pathname: '/api/teacher/class/assign', body: { code: 'FZ-AB2C3D', assignment: { ...asgBody, id: 'as-78', title: 'Untuk semua' } }, now: 1_700_000_065_000 })));
+  r = await json(await routes.routeLearnerClassAssignments(ctxOf(db, { sub: 'anon-5', method: 'GET', pathname: '/api/learner/class-assignments', query: { cls: 'FZ-AB2C3D', name: 'Dimas', since: '1700000063000' }, now: 1_700_000_066_000 })));
+  assert(r.status === 200 && r.body.assignments.length === 1 && r.body.assignments[0].assignment.t === 'assign', 'mengirim ulang menghidupkan tugas yang pernah ditarik');
+
   /* ---------- 2c. multi-guru berbagi kode kelas (17 mapel) ----------------------- */
   // Guru t2 mengklaim kelas yang sama untuk mapel MAT
   let rMg = await json(await routes.routeClassClaim(ctxOf(db, { sub: 't2', method: 'POST', pathname: '/api/teacher/class/claim', body: { code: 'FZ-AB2C3D', title: 'Kelas 10A', subjectId: 'MAT', teacherName: 'Pak Budi' } })));
@@ -200,7 +219,7 @@ async function json(res) { return { status: res.status, body: JSON.parse(await r
     assert(/teacher_sub/.test(q) || /INSERT INTO tc_class_report|SELECT code FROM tc_class WHERE code = \?1'/.test(q), 'kueri lane guru ber-teacher_sub: ' + q.slice(0, 60));
   }
   const rc = await import('file://' + path.join(API, 'auth', 'role-core.js'));
-  for (const p of ['/api/teacher/class/claim', '/api/teacher/class/list', '/api/teacher/class/reports', '/api/teacher/class/assign']) assert(rc.ROUTE_CAPABILITY[p], 'rute ' + p + ' terdaftar di ROUTE_CAPABILITY');
+  for (const p of ['/api/teacher/class/claim', '/api/teacher/class/list', '/api/teacher/class/reports', '/api/teacher/class/assign', '/api/teacher/class/retract']) assert(rc.ROUTE_CAPABILITY[p], 'rute ' + p + ' terdaftar di ROUTE_CAPABILITY');
   assert(!rc.ROUTE_CAPABILITY['/api/learner/class-report'] && !rc.ROUTE_CAPABILITY['/api/learner/class-assignments'], 'lane murid TIDAK lewat matriks peran (murid lokal-dulu tanpa akun)');
 
   /* ---------- 4. jeda klien vs lantai server (regresi m025-261) -------------------- */

@@ -618,6 +618,36 @@
     'kelas.panduan-langkah-1': '1. คลิกปุ่มเปิดคลังข้อสอบด้านบน'
 ,
     'guru.n-menit': '{n} นาที',
-    'guru.waktu-hemat-tip': 'เวลางานธุรการโดยประมาณที่ FIEZEL ทำแทนคุณ'
+    'guru.waktu-hemat-tip': 'เวลางานธุรการโดยประมาณที่ FIEZEL ทำแทนคุณ',
+    /* m025-365 · วงจรงานของครู: กำลังใช้งาน / เกินกำหนด / คลังเก็บ, ถอนงาน, ลบจากคลังเก็บ */
+    'guru.siklus.tarik': 'ถอนงานจากนักเรียน',
+    'guru.siklus.tarik-tanya': 'ถอนงานนี้จากนักเรียนไหม? นักเรียนที่ยังไม่ได้ทำจะไม่เห็นงานนี้อีก ผลที่ส่งมาแล้วยังเก็บไว้',
+    'guru.siklus.hapus-tanya': 'ลบถาวรไหม? งานและผลของนักเรียนสำหรับงานนี้จะหายไปจากห้องครูและกู้คืนไม่ได้',
+    'guru.siklus.ya-tarik': 'ใช่ ถอนงาน',
+    'guru.siklus.ya-hapus': 'ใช่ ลบถาวร',
+    'guru.siklus.batal': 'ยกเลิก',
+    'guru.siklus.ditarik-pada': 'ถอนจากนักเรียนแล้ว · {tanggal}',
+    'guru.siklus.diarsip-pada': 'ย้ายไปคลังเก็บ · {tanggal}',
+    'guru.siklus.ringkas-hasil': 'เสร็จ {selesai}/{total}',
+    'guru.siklus.tenggat': 'กำหนดส่ง {tanggal}',
+    'guru.siklus.lihat-hasil': 'ดูผล',
+    'guru.siklus.pulihkan': 'กู้คืน',
+    'guru.siklus.hapus': 'ลบถาวร',
+    'guru.siklus.tab-aria': 'สถานะงาน',
+    'guru.siklus.aktif': 'กำลังใช้งาน',
+    'guru.siklus.lewat': 'เกินกำหนด',
+    'guru.siklus.arsip': 'คลังเก็บ',
+    'guru.siklus.lewat-catatan': 'เลยกำหนดส่งแล้ว ติดตามคนที่ยังไม่ทำ แล้วย้ายไปคลังเก็บ ผลของนักเรียนยังเก็บไว้',
+    'guru.siklus.arsipkan-semua': 'ย้ายทั้งหมดไปคลังเก็บ ({n})',
+    'guru.siklus.arsip-catatan': 'คลังเก็บใช้จัดรายการนี้ให้เป็นระเบียบ ผลของนักเรียนยังเก็บไว้และกู้คืนงานได้ ลบถาวรได้จากที่นี่เท่านั้น',
+    'guru.siklus.arsipkan': 'ย้ายไปคลังเก็บ',
+    'guru.siklus.lewat-kurung': '(เกินกำหนด)',
+    'guru.siklus.toast-diarsip': 'ย้ายงานไปคลังเก็บแล้ว ผลของนักเรียนยังเก็บไว้',
+    'guru.siklus.toast-diarsip-n': 'ย้าย {n} งานไปคลังเก็บแล้ว',
+    'guru.siklus.toast-dipulihkan': 'นำงานกลับมาจากคลังเก็บแล้ว',
+    'guru.siklus.toast-ditarik': 'ถอนงานแล้ว นักเรียนที่ยังไม่ได้ทำจะไม่เห็นงานนี้อีก',
+    'guru.siklus.toast-ditarik-lokal': 'งานนี้เคยแชร์ผ่านรหัสเท่านั้น จึงถอนออกจากรายการนี้เท่านั้น',
+    'guru.siklus.toast-gagal-tarik': 'ถอนงานไม่สำเร็จ ({sebab}) ตรวจสอบการเชื่อมต่อแล้วลองอีกครั้ง',
+    'guru.siklus.toast-dihapus': 'ลบงานถาวรแล้ว'
   });
 }());
