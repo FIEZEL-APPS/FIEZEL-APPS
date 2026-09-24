@@ -205,6 +205,7 @@ jobs:
           node tests/backup-ui-test.js
           node tests/install-health-test.js
           node tests/onboarding-test.js
+          node tests/auth-screen-test.js
           node tests/tour-test.js
           node tests/tours-test.js
           node tests/adaptivity-simulation-v3-hardened-test.js

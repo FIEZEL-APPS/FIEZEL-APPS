@@ -533,7 +533,9 @@ async function boot(harness) { harness.runIdle(); await harness.api.cfConfigRefr
   const awaitedFetcher = /await\s+(?:self\.)?(?:cfConfigRefresh|cfFetchServerConfig|cfConfigBootOnce|FiezelCfKillSwitch\.refresh)/.test(appCode);
   check('(g) tidak ada `await` pada pengambil config di seluruh app.js',
     !awaitedFetcher, 'cari await cfConfigRefresh/cfFetchServerConfig/cfConfigBootOnce');
-  const loadAt = app.indexOf('async function load(){');
+  /* m025-367: load() menerima opsi ({kontenSaja}) — cari tanda tangannya, bukan teks persisnya. */
+  const loadSig = /async function load\([^)]*\)\{/.exec(app);
+  const loadAt = loadSig ? loadSig.index : -1;
   const loadBody = loadAt >= 0 ? app.slice(loadAt, app.indexOf('\n// m025-115: dua sistem ikon', loadAt)) : '';
   check('(g) fungsi boot load() tidak menyebut pengambil config sama sekali',
     loadBody.length > 0 && !/cfConfigRefresh|cfFetchServerConfig|cfConfigBootOnce|FiezelCfKillSwitch/.test(loadBody),

@@ -156,11 +156,18 @@ function typeName(run, value) {
 
 function advanceTo(run, targetStep) {
   let guard = 0;
-  while (run.stepIndex() < targetStep) {
+  /* m025-367: urutan langkah tidak lagi naik (langkah kursus bernomor 7 duduk kedua), jadi
+     yang dicari adalah langkah TARGET, bukan "nomor lebih kecil dari target". */
+  while (run.stepIndex() !== targetStep) {
     if (guard++ > 30) throw new Error('macet sebelum mencapai langkah ' + targetStep);
     const step = run.stepIndex();
     if (step === 1) {
       typeName(run, 'Ayu');
+      run.element.querySelector('[data-ob-advance]').listeners.click[0]();
+      continue;
+    }
+    if (step === onboarding.COURSE_STEP) {
+      run.element.querySelectorAll('[data-ob-course]')[0].listeners.click[0]();
       run.element.querySelector('[data-ob-advance]').listeners.click[0]();
       continue;
     }
@@ -189,16 +196,17 @@ test('enam langkah nyata (Step 1 nama + Step 2-6), carousel tetap dua slide', ()
   assert.strictEqual(onboarding.LANGUAGE_STEP, 0);
   assert.strictEqual(onboarding.LAST_STEP, 6);
   assert.strictEqual(onboarding.NAME_STEP, 1);
+  assert.strictEqual(onboarding.COURSE_STEP, 7, 'nomor langkah kursus adalah identitas, bukan urutan');
 });
 
 /* =====================================================================================
- * "Sudah punya akun?" DI LAYAR PALING AWAL (m025-271)
+ * MASUK PINDAH KE LAYAR SENDIRI; PERAN & KODE KELAS IKUT PINDAH; LANGKAH KURSUS (m025-367)
  *
- * Kenapa gerbang ini ada: murid yang ganti HP menyelesaikan seluruh onboarding sebagai
- * murid BARU, lalu baru menemukan tombol masuk tiga ketukan di dalam Pengaturan. Saat itu
- * `sub` perangkat sudah bukan `sub` akunnya — kelas, tugas guru, dan temannya hilang dari
- * pandangan gurunya. Tombol yang baru bisa ditemukan sesudah kerugian itu terjadi adalah
- * tombol yang datang terlambat, dan hanya gerbang yang bisa menahannya tetap di depan.
+ * Blok "Sudah punya akun?" m025-271 (tombol Google di bawah pemilih bahasa) DICABUT atas
+ * keputusan owner: masuk kini WAJIB dan berdiri sebagai layar sendiri sebelum perkenalan
+ * (features/auth/fiezel-auth-screen.js; gerbangnya tests/auth-screen-test.js). Owner juga
+ * memindahkan pilihan murid/guru dan kode KelasKu ke layar masuk, dan meminta pilihan
+ * kursus (Bahasa Inggris / Bahasa Jepang) muncul langsung di perkenalan.
  * ===================================================================================== */
 
 /** Tiruan FiezelGoogle: mencatat ke mana tombol digambar dan opsi apa yang dipakai. */
@@ -215,66 +223,49 @@ function fakeGoogle(over) {
   }, over || {});
 }
 
-test('KUNCI: tombol masuk Google tergambar di layar PERTAMA, sebelum pilih bahasa', () => {
-  const G = fakeGoogle();
-  const env = fakeEnv({ FiezelGoogle: G });
-  const run = onboarding.show(env, { now: NOW, force: true, onLocale: () => {} });
-  assert.strictEqual(run.stepIndex(), onboarding.LANGUAGE_STEP, 'masih di pra-langkah bahasa');
-  assert.ok(/data-ob-google/.test(run.element.innerHTML), 'slot tombol ada di markup');
-  assert.strictEqual(G._calls.length, 1, 'renderButton dipanggil tepat sekali');
-  assert.ok(G._calls[0].host, 'digambar ke elemen sungguhan, bukan null');
-});
-
-test('KUNCI: tombolnya memakai bahasa peramban — bukan dipaksa Indonesia', () => {
-  const G = fakeGoogle();
-  const env = fakeEnv({ FiezelGoogle: G });
-  onboarding.show(env, { now: NOW, force: true, onLocale: () => {} });
-  assert.strictEqual(G._calls[0].opts && G._calls[0].opts.locale, 'auto',
-    'memaksa locale di layar yang JUSTRU sedang menanyakan bahasa akan menyodorkan '
-    + 'tombol Indonesia kepada murid Thai');
-});
-
-test('KUNCI: pemilih bahasa tetap utuh dan tetap jadi aksi utama', () => {
-  const G = fakeGoogle();
-  const env = fakeEnv({ FiezelGoogle: G });
-  const run = onboarding.show(env, { now: NOW, force: true, onLocale: () => {} });
-  const html = run.element.innerHTML;
-  assert.ok(/Choose your language/.test(html), 'judul bahasa tetap ada');
-  const choices = run.element.querySelectorAll('[data-ob-locale]');
-  assert.deepStrictEqual(choices.map(b => b.getAttribute('data-ob-locale')), ['id', 'th'],
-    'kedua pilihan bahasa tetap ada dan bisa diklik');
-  assert.ok(html.indexOf('data-ob-locale') < html.indexOf('data-ob-google'),
-    'blok masuk berdiri DI BAWAH pemilih bahasa — sekunder, bukan aksi utama');
-});
-
-test('KUNCI: tanpa FiezelGoogle, layar bahasa tetap utuh (nol slot menganggur)', () => {
-  const run = onboarding.show(fakeEnv(), { now: NOW, force: true, onLocale: () => {} });
-  assert.ok(!/data-ob-google/.test(run.element.innerHTML),
-    'fitur mati = blok tidak digambar sama sekali, bukan kotak kosong tanpa tombol');
-  assert.strictEqual(run.element.querySelectorAll('[data-ob-locale]').length, 2,
-    'pemilih bahasa tidak terpengaruh');
-});
-
-test('KUNCI: naskah blok masuk lahir DUA BAHASA secara harfiah', () => {
+test('KUNCI: pemilih bahasa tidak lagi membawa tombol masuk — masuk adalah layar wajib sebelum perkenalan', () => {
   const G = fakeGoogle();
   const run = onboarding.show(fakeEnv({ FiezelGoogle: G }), { now: NOW, force: true, onLocale: () => {} });
-  const html = run.element.innerHTML;
-  assert.ok(/Sudah punya akun\?/.test(html), 'ada kalimat Indonesia');
-  assert.ok(/[\u0E00-\u0E7F]/.test(html.split('data-ob-google')[0].split('Sudah punya akun')[1] || ''),
-    'ada aksara Thai di blok yang sama — layar ini tidak boleh menunggu copy-map, '
-    + 'karena copy Thai memang belum diunduh saat cat pertama');
+  assert.strictEqual(run.stepIndex(), onboarding.LANGUAGE_STEP, 'masih di pra-langkah bahasa');
+  assert.ok(!/data-ob-google|Sudah punya akun/.test(run.element.innerHTML), 'pintu kedua ke hal yang sama tidak kembali');
+  assert.strictEqual(G._calls.length, 0, 'perkenalan tidak menggambar tombol Google');
+  assert.deepStrictEqual(run.element.querySelectorAll('[data-ob-locale]').map(b => b.getAttribute('data-ob-locale')), ['id', 'th'],
+    'kedua pilihan bahasa tetap utuh');
 });
 
-test('tombol Google digambar ULANG setiap layar bahasa dicat ulang', () => {
-  /* paint() menulis ulang innerHTML, jadi tombol yang digambar skrip Google ikut
-     terhapus. Kalau ia tidak digambar ulang, murid yang menunggu unduhan copy Thai
-     akan melihat kotak kosong di tempat tombol seharusnya berada. */
-  const G = fakeGoogle();
-  const env = fakeEnv({ FiezelGoogle: G });
-  const run = onboarding.show(env, { now: NOW, force: true, onLocale: () => {} });
-  const sebelum = G._calls.length;
-  run.element.querySelector('[data-ob-locale="th"]').listeners.click[0]();
-  assert.ok(G._calls.length >= sebelum, 'nol pemanggilan yang hilang saat cat ulang');
+test('KUNCI: langkah nama tidak lagi menanyakan peran atau kode KelasKu', () => {
+  const run = onboarding.show(fakeEnv(), { now: NOW, force: true });
+  assert.strictEqual(run.stepIndex(), onboarding.NAME_STEP);
+  assert.ok(!/data-ob-role|data-ob-classcode/.test(run.element.innerHTML), 'keduanya milik layar masuk');
+  assert.ok(run.element.querySelector('[data-ob-name]'), 'yang tersisa: satu pertanyaan, nama');
+});
+
+test('KUNCI: langkah kursus tepat sesudah nama — Inggris & Jepang, tanpa pilihan bawaan', () => {
+  let got = null;
+  const env = fakeEnv();
+  const run = onboarding.show(env, { now: NOW, force: true, onCourse: (c) => { got = c; }, onFinish() {} });
+  typeName(run, 'Ayu');
+  run.element.querySelector('[data-ob-advance]').listeners.click[0]();
+  assert.strictEqual(run.stepIndex(), onboarding.COURSE_STEP, 'langkah kursus langsung sesudah nama');
+  const cards = run.element.querySelectorAll('[data-ob-course]');
+  assert.deepStrictEqual(cards.map(b => b.getAttribute('data-ob-course')), ['en', 'ja'], 'Bahasa Inggris dan Bahasa Jepang');
+  assert.ok(cards.every(b => b.getAttribute('aria-checked') === 'false'), 'tidak ada pilihan bawaan');
+  assert.ok(run.element.querySelector('[data-ob-advance]').hasAttribute('disabled'), 'Lanjut mati sebelum memilih');
+  run.element.querySelector('[data-ob-course="ja"]').listeners.click[0]();
+  run.element.querySelector('[data-ob-advance]').listeners.click[0]();
+  assert.deepStrictEqual(got, { course: 'ja' }, 'aplikasi diberi tahu kursus yang dipilih');
+  assert.notStrictEqual(run.stepIndex(), onboarding.COURSE_STEP, 'dan perkenalan maju');
+});
+
+test('KUNCI: kursus tercatat bersama perkenalan yang selesai', () => {
+  const env = fakeEnv();
+  const run = onboarding.show(env, { now: NOW, force: true, onFinish() {} });
+  typeName(run, 'Ayu');
+  run.element.querySelector('[data-ob-advance]').listeners.click[0]();
+  run.element.querySelector('[data-ob-course="ja"]').listeners.click[0]();
+  run.element.querySelector('[data-ob-advance]').listeners.click[0]();
+  run.element.querySelector('[data-ob-skip]').listeners.click[0]();
+  assert.strictEqual(onboarding.storedCourse(env), 'ja');
 });
 
 test('popup pertama onboarding memilih Bahasa Indonesia atau Thai sebelum Step 1', () => {
@@ -823,7 +814,7 @@ test('nama WAJIB tetapi TIDAK mengurung: satu huruf sudah membuka jalannya', () 
   assert.ok(!run.element.querySelector('[data-ob-advance]').hasAttribute('disabled'),
     'jalan keluar langkah wajib harus satu ketukan, bukan syarat panjang tertentu');
   run.element.querySelector('[data-ob-advance]').listeners.click[0]();
-  assert.strictEqual(run.stepIndex(), 2);
+  assert.strictEqual(run.stepIndex(), onboarding.COURSE_STEP, 'm025-367: sesudah nama, langkah kursus');
 });
 
 test('nama diserahkan ke aplikasi SEKETIKA, bukan ditahan sampai ujung perkenalan', () => {
@@ -835,7 +826,7 @@ test('nama diserahkan ke aplikasi SEKETIKA, bukan ditahan sampai ujung perkenala
   typeName(run, '  Ayu   Lestari ');
   run.element.querySelector('[data-ob-advance]').listeners.click[0]();
   assert.deepStrictEqual(seen, ['Ayu Lestari'], 'nama dinormalkan sebelum diserahkan, spasi ganda dibuang');
-  assert.strictEqual(run.stepIndex(), 2);
+  assert.strictEqual(run.stepIndex(), onboarding.COURSE_STEP, 'm025-367: sesudah nama, langkah kursus');
 });
 
 test('nama tersimpan dan tidak ditanyakan lagi pada perkenalan berikutnya', () => {
@@ -924,7 +915,7 @@ function withLeanIntro(fn) {
   try { return fn(); } finally { leanIntroFlag = before; }
 }
 
-test('alur ringkas: tepat tiga layar, dan yang terakhir adalah pintu penempatan', () => {
+test('alur ringkas: tepat empat layar (nama, kursus, tujuan, penempatan), dan yang terakhir adalah pintu penempatan', () => {
   withLeanIntro(() => {
     const env = fakeEnv();
     const run = onboarding.show(env, { now: NOW, onName() {}, onGoal() {}, onPlacement() {}, onFinish() {} });
@@ -936,13 +927,15 @@ test('alur ringkas: tepat tiga layar, dan yang terakhir adalah pintu penempatan'
     while (run.stepIndex() !== seen[seen.length - 1] && guard++ < 10) {
       seen.push(run.stepIndex());
       if (run.stepIndex() === onboarding.PLACEMENT_STEP) break;
+      const course = run.element.querySelectorAll('[data-ob-course]')[0];
+      if (course) course.listeners.click[0]();
       const goal = run.element.querySelectorAll('[data-ob-goal]')[0];
       if (goal) goal.listeners.click[0]();
       run.element.querySelector('[data-ob-advance]').listeners.click[0]();
     }
-    assert.deepStrictEqual(seen, [onboarding.NAME_STEP, 3, onboarding.PLACEMENT_STEP],
-      'urutan layar ringkas harus nama -> tujuan -> penempatan, dapat: ' + JSON.stringify(seen));
-    assert.ok(seen.length <= 3, 'perkenalan ringkas tidak boleh lebih dari tiga layar');
+    assert.deepStrictEqual(seen, [onboarding.NAME_STEP, onboarding.COURSE_STEP, 3, onboarding.PLACEMENT_STEP],
+      'urutan layar ringkas harus nama -> kursus -> tujuan -> penempatan, dapat: ' + JSON.stringify(seen));
+    assert.ok(seen.length <= 4, 'perkenalan ringkas tidak boleh lebih dari empat layar');
   });
 });
 
@@ -956,6 +949,8 @@ test('alur ringkas: karosel, jadwal, dan ringkasan tidak pernah tercat', () => {
       dilihat.push(run.stepIndex());
       if (run.stepIndex() === onboarding.PLACEMENT_STEP) break;
       if (run.stepIndex() === onboarding.NAME_STEP) typeName(run, 'Ayu');
+      const course = run.element.querySelectorAll('[data-ob-course]')[0];
+      if (course) course.listeners.click[0]();
       const goal = run.element.querySelectorAll('[data-ob-goal]')[0];
       if (goal) goal.listeners.click[0]();
       const next = run.element.querySelector('[data-ob-advance]');
@@ -975,6 +970,8 @@ test('alur ringkas: mundur dari penempatan mendarat di tujuan, bukan di layar ko
     const run = onboarding.show(env, { now: NOW, onName() {}, onGoal() {}, onPlacement() {}, onFinish() {} });
     typeName(run, 'Ayu');
     run.element.querySelector('[data-ob-advance]').listeners.click[0]();
+    run.element.querySelectorAll('[data-ob-course]')[0].listeners.click[0]();
+    run.element.querySelector('[data-ob-advance]').listeners.click[0]();
     run.element.querySelectorAll('[data-ob-goal]')[0].listeners.click[0]();
     run.element.querySelector('[data-ob-advance]').listeners.click[0]();
     assert.strictEqual(run.stepIndex(), onboarding.PLACEMENT_STEP);
@@ -986,15 +983,15 @@ test('alur ringkas: mundur dari penempatan mendarat di tujuan, bukan di layar ko
   });
 });
 
-test('alur ringkas: stepper menghitung tiga, bukan enam', () => {
+test('alur ringkas: stepper menghitung empat, bukan tujuh', () => {
   withLeanIntro(() => {
     const env = fakeEnv();
     const run = onboarding.show(env, { now: NOW, onName() {}, onGoal() {}, onPlacement() {}, onFinish() {} });
     const html = run.element.innerHTML;
     const total = /aria-valuemax="(\d+)"/.exec(html);
     assert.ok(total, 'stepper harus punya aria-valuemax');
-    assert.strictEqual(total[1], '3',
-      'stepper mengumumkan total ' + total[1] + ' padahal layarnya tiga');
+    assert.strictEqual(total[1], '4',
+      'stepper mengumumkan total ' + total[1] + ' padahal layarnya empat');
   });
 });
 
@@ -1037,15 +1034,16 @@ test('alur ringkas: satu jalan lewati per langkah (audit F05)', () => {
   });
 });
 
-test('murid dengan kode kelas langsung menyelesaikan perkenalan dan menyimpan kode', () => {
+test('murid dengan kode kelas (dari layar masuk) memilih kursus lalu langsung selesai, kode tetap tersimpan', () => {
   const env = fakeEnv();
+  /* m025-367: kode KelasKu diketik di layar masuk; app.js menyimpannya ke rekam perkenalan. */
+  env.localStorage.setItem(onboarding.STORAGE_KEY, JSON.stringify({ classCode: 'FZ-ABC234' }));
   let finished = false;
   const run = onboarding.show(env, { now: NOW, force: true, onFinish() { finished = true; } });
   typeName(run, 'Budi');
-  const codeInput = run.element.querySelector('[data-ob-classcode]');
-  assert.ok(codeInput, 'kolom kode kelas harus ada');
-  codeInput.value = 'FZ-ABC234';
-  codeInput.listeners.input[0]();
+  run.element.querySelector('[data-ob-advance]').listeners.click[0]();
+  assert.strictEqual(run.stepIndex(), onboarding.COURSE_STEP, 'kursus tetap ditanya');
+  run.element.querySelector('[data-ob-course="en"]').listeners.click[0]();
   run.element.querySelector('[data-ob-advance]').listeners.click[0]();
   assert.strictEqual(finished, true, 'onboarding harus selesai langsung tanpa tes penempatan');
   assert.strictEqual(onboarding.storedClassCode(env), 'FZ-ABC234', 'kode kelas harus tersimpan');

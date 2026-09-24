@@ -366,6 +366,16 @@
     'skillslab.session-complete-selesai-evidence-sidecar': '<section class="fsl-shell"><article class="fsl-card"><span class="fsl-kicker">Session complete</span><h2>{Speaking} เสร็จแล้ว</h2><p>Evidence sidecar ตอนนี้: {attempts} attempt · average {averageScore}% · pass rate {passRate}%</p><p class="fsl-privacy">ไม่มี raw audio, transcript หรือคำตอบ dictation ถูกบันทึกลง state</p><div class="fsl-actions"><button class="fsl-primary" data-home>กลับไปที่แล็บ</button></div></article></section>',
     'tour.next': 'ต่อไป',
     'tutor.v3-siap-for-pertanyaan-upcoming': 'พร้อมสำหรับคำถามถัดไปแล้ว',
-    'tutor.v3-suara-pending-siap-teks-lesson': 'เสียงยังไม่พร้อม แต่ตัวหนังสือบทเรียนยังใช้ได้ตามปกติ'
+    'tutor.v3-suara-pending-siap-teks-lesson': 'เสียงยังไม่พร้อม แต่ตัวหนังสือบทเรียนยังใช้ได้ตามปกติ',
+    /* m025-367 · ขั้นตอนเลือกคอร์สในการแนะนำตัว */
+    'onboarding.course-aria': 'เลือกคอร์ส',
+    'onboarding.course-en': 'ภาษาอังกฤษ',
+    'onboarding.course-en-desc': 'คำศัพท์ ไวยากรณ์ การอ่าน และการฟัง',
+    'onboarding.course-greet': 'เลือกคอร์สของคุณ เปลี่ยนได้ทุกเมื่อในการตั้งค่า',
+    'onboarding.course-ja': 'ภาษาญี่ปุ่น',
+    'onboarding.course-ja-desc': 'คำศัพท์ (Kotoba) ไวยากรณ์ (Bunpō) ฮิรางานะ และคาตาคานะ',
+    'onboarding.course-note': 'แบบทดสอบวัดระดับถัดไปจะใช้ข้อสอบจากคอร์สที่คุณเลือก',
+    'onboarding.course-title': 'อยากเรียนภาษาอะไร?',
+    'onboarding.step-course': 'คอร์ส'
   });
 }());

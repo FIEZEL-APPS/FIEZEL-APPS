@@ -76,7 +76,7 @@ const ALLOWLIST = Object.freeze({
      ditulis dwibahasa secara harfiah — bukan lewat copy-map. Menaikkan anggaran di sini
      BUKAN pelonggaran diam-diam: setiap kalimat yang dihitung punya padanan Thai di
      baris yang sama, dan itulah yang membuatnya sah. */
-  'features/onboarding/fiezel-onboarding.js': 3,                // pemilih bahasa + blok masuk, keduanya dwibahasa harfiah
+  'features/onboarding/fiezel-onboarding.js': 1,                // pemilih bahasa dwibahasa harfiah (blok masuk pindah ke layar auth, m025-367)
   'features/neural-voice/fiezel-diag-panel.js': 6,              // zona audio: AI-17 F02 melarang FiezelI18n di sini
   'features/neural-voice/fiezel-neural-voice-audibility-fix.js': 2, // idem — lihat catatan ZONA AUDIO di bawah
   /* 3 -> 5 (m025-314): dua nama/keterangan prasasti ikut terlihat. Berkas KANON yang sha-nya
