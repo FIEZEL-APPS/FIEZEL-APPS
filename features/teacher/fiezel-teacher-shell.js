@@ -3259,7 +3259,7 @@
     var scope = '';
     try { scope = subjectScopeBadge(); } catch (_) { scope = ''; }
     return '<header class="tg-top"><div><p class="tg-kicker">' + esc(d.toLocaleDateString(bcp47(), { weekday: 'long', day: 'numeric', month: 'long' })) + '</p><h1>' + esc(st.classes.length ? ((st.view === 'hub' && ({ hasil: 1, braincore: 1, kurikulum: 1 })[hubTab()] ? (navItems().filter(function (n) { return navActive(n); })[0] || [])[1] : viewTitles()[st.view]) || t('guru.merek-penuh', 'KelasKu untuk Guru')) : t('guru.merek-penuh', 'KelasKu untuk Guru')) + '</h1>' + scope + '</div>' +
-      '<div class="tg-top-actions">' + (c ? syncChip(c) + '<button type="button" class="tg-chip tg-code" data-tg="copy" data-text="' + esc(c.code) + '" title="Salin kode kelas" data-testid="tg-class-code">' + icon('hash') + '<span>' + esc(c.code) + '</span></button>' : '') + bell() + (c ? '<button type="button" class="tg-btn is-ghost" data-tg="modal" data-kind="board" data-testid="tg-open-board">' + icon('presentation') + '<span>Mode papan</span></button><button type="button" class="tg-btn is-primary" data-tg="modal" data-kind="assign" data-testid="tg-quick-assign">' + icon('plus') + '<span>' + t('guru.tugas-baru', 'Tugas baru') + '</span></button>' : '') + '</div></header>' + inboxPanel();
+      '<div class="tg-top-actions">' + (c ? syncChip(c) + '<button type="button" class="tg-chip tg-code" data-tg="copy" data-text="' + esc(c.code) + '" title="Salin kode kelas" data-testid="tg-class-code">' + icon('hash') + '<span>' + esc(c.code) + '</span></button>' : '') + bell() + (c ? '<button type="button" class="tg-btn is-ghost" data-tg="modal" data-kind="board" data-testid="tg-open-board">' + icon('presentation') + '<span>Mode papan</span></button>' + (st.view === 'assignments' ? '' : '<button type="button" class="tg-btn is-primary" data-tg="modal" data-kind="assign" data-testid="tg-quick-assign">' + icon('plus') + '<span>' + t('guru.tugas-baru', 'Tugas baru') + '</span></button>') : '') + '</div></header>' + inboxPanel();
   }
   function bell() {
     var n = S().inboxUnread(st);
@@ -3345,14 +3345,74 @@
   }
 
   // ---- TUGAS & UJIAN -------------------------------------------------------------------------
+  /* ===== SIKLUS TUGAS GURU (m025-365, audit KelasKu K2/T4) ==============================
+     Sampai build ini seluruh tugas guru hidup di satu daftar urut-buat: tugas minggu ini,
+     tugas yang tenggatnya lewat sebulan lalu, dan tugas percobaan bercampur, dan satu-satunya
+     cara merapikannya adalah tong sampah — hapus permanen lewat confirm(), tanpa jalan
+     kembali, dan TANPA menariknya dari HP murid yang sudah menerimanya.
+
+     Sekarang tiap tugas punya tempat: AKTIF (belum lewat tenggat), LEWAT TENGGAT (tinggal
+     ditagih atau diarsipkan), ARSIP (disimpan beserta hasil murid). Merapikan = mengarsipkan.
+     Menarik = membatalkan untuk murid yang belum mengerjakan (lewat server). Menghapus hanya
+     dari Arsip, dengan konfirmasi di tempat — bukan jendela confirm() yang dilewati jempol. */
+  function sudahDikirim(a) { return !!(a.sent && (a.sent.all || (a.sent.to && Object.keys(a.sent.to).length))); }
+  function tombolTarik(a) {
+    if (!sudahDikirim(a) || a.retractedAt) return '';
+    return '<button type="button" class="tg-btn is-small is-danger" data-tg="retract-assign" data-id="' + a.id + '" data-testid="tg-retract-' + a.id + '">' + icon('undo-2') + ' ' + esc(t('guru.siklus.tarik', 'Tarik dari murid')) + '</button>';
+  }
+  function barKonfirmasi(jenis, a) {
+    var tarik = jenis === 'tarik';
+    if ((tarik ? ui.confirmRetract : ui.confirmDelete) !== a.id) return '';
+    return '<div class="tg-confirm" role="alert" data-testid="tg-confirm-' + jenis + '-' + a.id + '"><p>' +
+      esc(tarik
+        ? t('guru.siklus.tarik-tanya', 'Tarik tugas ini dari murid? Yang belum mengerjakan tidak akan melihatnya lagi. Hasil yang sudah masuk tetap tersimpan.')
+        : t('guru.siklus.hapus-tanya', 'Hapus permanen? Tugas dan hasil murid untuk tugas ini hilang dari Ruang Guru dan tidak bisa dikembalikan.')) +
+      '</p><div class="tg-actions">' +
+        '<button type="button" class="tg-btn is-small is-danger" data-tg="' + (tarik ? 'retract-yes' : 'delete-yes') + '" data-id="' + a.id + '" data-testid="tg-' + (tarik ? 'retract' : 'delete') + '-yes-' + a.id + '"' + (ui.sending === a.id ? ' disabled' : '') + '>' +
+          esc(tarik ? t('guru.siklus.ya-tarik', 'Ya, tarik') : t('guru.siklus.ya-hapus', 'Ya, hapus permanen')) + '</button>' +
+        '<button type="button" class="tg-btn is-small is-ghost" data-tg="confirm-no" data-id="' + a.id + '">' + esc(t('guru.siklus.batal', 'Batal')) + '</button>' +
+      '</div></div>';
+  }
+  function kartuArsip(c, a) {
+    var T = S(), tgt = c.students.filter(function (s) { return T.targeted(a, s); }), done = tgt.filter(function (s) { return a.done && a.done[s.id]; });
+    var accs = done.map(function (s) { return a.done[s.id].acc; }).filter(function (v) { return v != null; }), avg = accs.length ? accs.reduce(function (x, y) { return x + y; }, 0) / accs.length : null;
+    var ket = a.retractedAt
+      ? t('guru.siklus.ditarik-pada', 'Ditarik dari murid · {tanggal}').replace('{tanggal}', T.fmtDate(a.retractedAt))
+      : t('guru.siklus.diarsip-pada', 'Diarsipkan · {tanggal}').replace('{tanggal}', T.fmtDate(a.archivedAt));
+    return '<article class="tg-card tg-assign is-archived" data-testid="tg-archived-' + a.id + '">' +
+      '<div class="tg-card-head"><div><p class="tg-kicker">' + icon(a.retractedAt ? 'undo-2' : 'archive') + ' ' + esc(ket) + '</p><h3>' + esc(a.title) + '</h3></div></div>' +
+      '<p class="tg-muted">' + esc(t('guru.siklus.ringkas-hasil', '{selesai}/{total} selesai').replace('{selesai}', done.length).replace('{total}', tgt.length)) + (avg != null ? ' · ' + pct(avg) : '') + (a.deadline ? ' · ' + esc(t('guru.siklus.tenggat', 'Tenggat {tanggal}').replace('{tanggal}', T.fmtDate(a.deadline + 'T00:00:00'))) : '') + '</p>' +
+      '<div class="tg-actions">' +
+        '<button type="button" class="tg-btn is-small is-ghost" data-tg="modal" data-kind="assign-detail" data-id="' + a.id + '">' + icon('list-checks') + ' ' + esc(t('guru.siklus.lihat-hasil', 'Lihat hasil')) + '</button>' +
+        '<button type="button" class="tg-btn is-small is-ghost" data-tg="unarchive-assign" data-id="' + a.id + '" data-testid="tg-unarchive-' + a.id + '">' + icon('undo-2') + ' ' + esc(t('guru.siklus.pulihkan', 'Pulihkan')) + '</button>' +
+        '<button type="button" class="tg-btn is-small is-danger" data-tg="delete-assign" data-id="' + a.id + '" data-testid="tg-delete-' + a.id + '">' + icon('trash-2') + ' ' + esc(t('guru.siklus.hapus', 'Hapus permanen')) + '</button>' +
+      '</div>' + barKonfirmasi('hapus', a) +
+    '</article>';
+  }
   function assignments(c) {
     var T = S(), td = T.today(), allList = (c.assignments || []).slice().sort(function (a, b) { return b.createdAt - a.createdAt; });
     var sc = null;
     try { sc = teacherSubjectScope(); } catch (_) { sc = null; }
     var list = (sc && sc.locked) ? allList.filter(function (a) { return isAssignmentVisible(a, sc); }) : allList;
     var scopeNote = (sc && sc.locked) ? subjectScopeBadge() : '';
+    var arsipL = list.filter(function (a) { return a.archivedAt; });
+    var lewatL = list.filter(function (a) { return !a.archivedAt && a.deadline && a.deadline < td; });
+    var aktifL = list.filter(function (a) { return !a.archivedAt && !(a.deadline && a.deadline < td); });
+    var tab = ['aktif', 'lewat', 'arsip'].indexOf(ui.asgTab) !== -1 ? ui.asgTab : 'aktif', lewatTab = tab === 'lewat';
+    var shown = tab === 'arsip' ? arsipL : lewatTab ? lewatL : aktifL;
+    var lifeTabs = '<div class="tg-tabs tg-life-tabs" role="tablist" aria-label="' + esc(t('guru.siklus.tab-aria', 'Status tugas')) + '" data-testid="tg-life-tabs">' +
+      [['aktif', t('guru.siklus.aktif', 'Aktif'), aktifL.length], ['lewat', t('guru.siklus.lewat', 'Lewat tenggat'), lewatL.length], ['arsip', t('guru.siklus.arsip', 'Arsip'), arsipL.length]].map(function (x) {
+        return '<button type="button" role="tab" aria-selected="' + (x[0] === tab ? 'true' : 'false') + '" class="tg-tab' + (x[0] === tab ? ' is-active' : '') + '" data-tg="asg-tab" data-tab="' + x[0] + '" data-testid="tg-life-' + x[0] + '">' + esc(x[1]) + ' <small>' + x[2] + '</small></button>';
+      }).join('') + '</div>';
+    var lifeNote = lewatTab && lewatL.length
+      ? '<div class="tg-life-note"><p class="tg-muted">' + esc(t('guru.siklus.lewat-catatan', 'Tenggatnya sudah lewat. Tagih yang belum, lalu arsipkan — hasil murid tetap tersimpan.')) + '</p><button type="button" class="tg-btn is-small is-ghost" data-tg="archive-all-late" data-testid="tg-archive-all-late">' + icon('archive') + ' ' + esc(t('guru.siklus.arsipkan-semua', 'Arsipkan semua ({n})').replace('{n}', lewatL.length)) + '</button></div>'
+      : tab === 'arsip' && arsipL.length
+        ? '<div class="tg-life-note"><p class="tg-muted">' + esc(t('guru.siklus.arsip-catatan', 'Arsip hanya merapikan daftar ini: hasil murid tetap tersimpan dan tugas bisa dipulihkan. Hapus permanen hanya dari sini.')) + '</p></div>'
+        : '';
     return scopeNote + '<div class="tg-toolbar"><p class="tg-lead-sm">' + t('guru.tugas-menilai-diri', 'Tugas yang menilai dirinya sendiri: kirim ke murid, tugasnya') + ' <b>langsung masuk notifikasi</b> di aplikasi mereka; setelah selesai, hasilnya kembali ke sini otomatis — tidak ada koreksi manual.</p><div class="tg-toolbar-actions"><button type="button" class="tg-btn is-ghost" data-tg="modal" data-kind="import-code" data-testid="tg-grade-code">' + icon('clipboard-paste') + '<span>Tempel kode hasil</span></button><button type="button" class="tg-btn is-primary" data-tg="modal" data-kind="assign" data-testid="tg-new-assign">' + icon('plus') + '<span>' + t('guru.buat-tugas-ujian', 'Buat tugas / ujian') + '</span></button></div></div>' +
-      (list.length ? '<div class="tg-grid tg-grid-cards">' + list.map(function (a) {
+      lifeTabs + lifeNote +
+      (shown.length ? '<div class="tg-grid tg-grid-cards">' + shown.map(function (a) {
+        if (a.archivedAt) return kartuArsip(c, a);
         var tgt = c.students.filter(function (s) { return T.targeted(a, s); }), done = tgt.filter(function (s) { return a.done && a.done[s.id]; }), accs = done.map(function (s) { return a.done[s.id].acc; }).filter(function (v) { return v != null; }), avg = accs.length ? accs.reduce(function (x, y) { return x + y; }, 0) / accs.length : null;
         var late = a.deadline && a.deadline < td && done.length < tgt.length;
         var asgCode = T.assignmentCode(c, a);
@@ -3360,10 +3420,10 @@
           'Dari: ' + (st.teacher.name || 'Guru') + ' · ' + t('umum.kelas', 'Kelas') + ': ' + c.name + ' (' + c.code + ')\n' +
           '📝 ' + a.itemIds.length + ' ' + t('umum.soal', 'Soal') + ' · ' + a.minutes + ' min' + (a.deadline ? ' · Tenggat: ' + a.deadline : '') + '\n\n' +
           'Buka FIEZEL → KelasKu / Today Plan → tempel kode tugas ini:\n' + asgCode;
-        return '<article class="tg-card tg-assign' + (a.mode === 'ujian' ? ' is-exam' : '') + '" data-testid="tg-assign-' + a.id + '"><div class="tg-card-head"><div><p class="tg-kicker">' + (a.mode === 'ujian' ? icon('shield') + ' Ujian · ' + a.timer + ' mnt · acak' : icon('pencil-ruler') + ' Latihan · ' + a.minutes + ' mnt') + '</p><h3>' + esc(a.title) + '</h3></div><button type="button" class="tg-icon-btn" data-tg="delete-assign" data-id="' + a.id + '" aria-label="Hapus tugas">' + icon('trash-2') + '</button></div>' +
+        return '<article class="tg-card tg-assign' + (a.mode === 'ujian' ? ' is-exam' : '') + '" data-testid="tg-assign-' + a.id + '"><div class="tg-card-head"><div><p class="tg-kicker">' + (a.mode === 'ujian' ? icon('shield') + ' Ujian · ' + a.timer + ' mnt · acak' : icon('pencil-ruler') + ' Latihan · ' + a.minutes + ' mnt') + '</p><h3>' + esc(a.title) + '</h3></div><button type="button" class="tg-icon-btn" data-tg="archive-assign" data-id="' + a.id + '" aria-label="' + esc(t('guru.siklus.arsipkan', 'Arsipkan')) + '" title="' + esc(t('guru.siklus.arsipkan', 'Arsipkan')) + '" data-testid="tg-archive-' + a.id + '">' + icon('archive') + '</button></div>' +
           '<p class="tg-muted">' + a.skills.map(function (k) { return mapelName(k) || T.SKILL_LABEL[k] || k; }).join(' + ') + ' · ' + a.itemIds.length + ' soal · ' + (a.targets ? tgt.length + ' siswa terpilih' : 'seluruh kelas') + '</p>' +
-          '<div class="tg-progress"><div class="tg-progress-head"><span>' + done.length + '/' + tgt.length + ' selesai' + (avg != null ? ' · rata-rata ' + pct(avg) : '') + '</span><span class="' + (late ? 'tg-late' : '') + '">' + (a.deadline ? 'Tenggat ' + esc(a.deadline) + (late ? ' (lewat)' : '') : 'Tanpa tenggat') + '</span></div>' + bar(tgt.length ? done.length / tgt.length : 0, avg != null && avg < 0.5 ? 'is-warn' : '') + '</div>' +
-          '<div class="tg-actions"><button type="button" class="tg-btn is-small is-primary" data-tg="send-assign" data-id="' + a.id + '" data-testid="tg-send-all-' + a.id + '"' + (ui.sending === a.id ? ' disabled' : '') + '>' + icon('send') + (a.targets ? (a.sent && a.sent.all ? ' ' + t('guru.kirim-ulang-ke', 'Kirim ulang ke') + ' ' : ' ' + t('guru.kirim-ke', 'Kirim ke') + ' ') + tgt.length + ' murid terpilih' : (a.sent && a.sent.all ? ' ' + t('guru.kirim-ulang-semua', 'Kirim ulang ke semua') : ' ' + t('guru.kirim-semua-murid', 'Kirim ke semua murid'))) + '</button><a class="tg-btn is-small is-wa-ghost" target="_blank" rel="noopener" href="' + T.waLink('', waMsgCard) + '" data-testid="tg-card-wa-' + a.id + '">' + icon('message-circle') + ' ' + esc(t('guru.bagikan-wa-singkat', 'WhatsApp')) + '</a><button type="button" class="tg-btn is-small is-ghost" data-tg="copy" data-text="' + esc(asgCode) + '" data-testid="tg-card-copy-' + a.id + '">' + icon('copy') + ' ' + esc(t('guru.salin-kode-singkat', 'Salin Kode')) + '</button><button type="button" class="tg-btn is-small is-ghost" data-tg="modal" data-kind="share-assign" data-id="' + a.id + '" data-testid="tg-share-assign-' + a.id + '">' + icon('users') + ' ' + t('guru.pilih-murid-kode', 'Pilih murid / kode') + '</button><button type="button" class="tg-btn is-small is-ghost" data-tg="modal" data-kind="assign-detail" data-id="' + a.id + '">' + icon('list-checks') + ' ' + esc(t('guru.siapa-belum', 'Siapa yang belum')) + '</button></div>' + (a.sent && a.sent.all ? '<p class="tg-muted tg-sent-note">' + icon('check') + ' Terkirim ke semua murid ' + esc(T.fmtDate(a.sent.all)) + '</p>' : '') + '</article>';
+          '<div class="tg-progress"><div class="tg-progress-head"><span>' + done.length + '/' + tgt.length + ' selesai' + (avg != null ? ' · rata-rata ' + pct(avg) : '') + '</span><span class="' + (late ? 'tg-late' : '') + '">' + (a.deadline ? esc(t('guru.siklus.tenggat', 'Tenggat {tanggal}').replace('{tanggal}', T.fmtDate(a.deadline + 'T00:00:00'))) + (late ? ' ' + esc(t('guru.siklus.lewat-kurung', '(lewat)')) : '') : esc(t('kelas.tanpa-tenggat', 'Tanpa tenggat'))) + '</span></div>' + bar(tgt.length ? done.length / tgt.length : 0, avg != null && avg < 0.5 ? 'is-warn' : '') + '</div>' +
+          '<div class="tg-actions">' + (lewatTab ? '' : '<button type="button" class="tg-btn is-small is-primary" data-tg="send-assign" data-id="' + a.id + '" data-testid="tg-send-all-' + a.id + '"' + (ui.sending === a.id ? ' disabled' : '') + '>' + icon('send') + (a.targets ? (a.sent && a.sent.all ? ' ' + t('guru.kirim-ulang-ke', 'Kirim ulang ke') + ' ' : ' ' + t('guru.kirim-ke', 'Kirim ke') + ' ') + tgt.length + ' murid terpilih' : (a.sent && a.sent.all ? ' ' + t('guru.kirim-ulang-semua', 'Kirim ulang ke semua') : ' ' + t('guru.kirim-semua-murid', 'Kirim ke semua murid'))) + '</button><a class="tg-btn is-small is-wa-ghost" target="_blank" rel="noopener" href="' + T.waLink('', waMsgCard) + '" data-testid="tg-card-wa-' + a.id + '">' + icon('message-circle') + ' ' + esc(t('guru.bagikan-wa-singkat', 'WhatsApp')) + '</a><button type="button" class="tg-btn is-small is-ghost" data-tg="copy" data-text="' + esc(asgCode) + '" data-testid="tg-card-copy-' + a.id + '">' + icon('copy') + ' ' + esc(t('guru.salin-kode-singkat', 'Salin Kode')) + '</button><button type="button" class="tg-btn is-small is-ghost" data-tg="modal" data-kind="share-assign" data-id="' + a.id + '" data-testid="tg-share-assign-' + a.id + '">' + icon('users') + ' ' + t('guru.pilih-murid-kode', 'Pilih murid / kode') + '</button>') + '<button type="button" class="tg-btn is-small is-ghost" data-tg="modal" data-kind="assign-detail" data-id="' + a.id + '">' + icon('list-checks') + ' ' + esc(t('guru.siapa-belum', 'Siapa yang belum')) + '</button>' + (lewatTab ? '<button type="button" class="tg-btn is-small is-ghost" data-tg="archive-assign" data-id="' + a.id + '">' + icon('archive') + ' ' + esc(t('guru.siklus.arsipkan', 'Arsipkan')) + '</button>' : '') + tombolTarik(a) + '</div>' + barKonfirmasi('tarik', a) + (a.sent && a.sent.all ? '<p class="tg-muted tg-sent-note">' + icon('check') + ' Terkirim ke semua murid ' + esc(T.fmtDate(a.sent.all)) + '</p>' : '') + '</article>';
       }).join('') + '</div>' : '<section class="tg-card tg-center tg-empty-state" data-testid="tg-empty-assignments"><div class="tg-empty-ill" aria-hidden="true">' + icon('clipboard-list') + '</div><h3>' + t('guru.belum-ada-tugas', 'Belum ada tugas') + '</h3><p class="tg-muted">' + ((sc && sc.locked) ? esc(t('guru.belum-tugas-scope', 'Belum ada tugas {mapel} di kelas ini. Buat tugas pertama dari bab {mapel} — hanya butuh 1 menit.').replace('{mapel}', sc.active)) : 'Buat tugas dari bank soal FIEZEL: pilih skill, jumlah soal, tenggat. Mode ujian mengacak urutan dan memberi timer.') + '</p><button type="button" class="tg-btn is-primary" data-tg="modal" data-kind="assign" data-testid="tg-empty-new-assign">' + icon('plus') + '<span>' + t('guru.buat-tugas-ujian', 'Buat tugas / ujian') + '</span></button></section>');
   }
 
@@ -4495,6 +4555,7 @@
         ui.sending = asg.id; render();
         T.sendAssignment(c, asg, targets).then(function (r) {
           ui.sending = null;
+          if (r.ok) asg.retractedAt = null;
           if (r.ok) { saveMinutes(sid ? 1 : 5); toast(sid ? t('guru.toast-kirim-satu', 'Tugas dikirim ke {nama} — muncul di notifikasinya.').replace('{nama}', (student(sid) || {}).name) : t('guru.toast-kirim-banyak', 'Tugas dikirim ke {jumlah} murid — muncul di notifikasi mereka.').replace('{jumlah}', r.count)); }
           else toast(r.error === 'class_code_taken' ? 'Kode kelas dipakai guru lain — ubah kode kelas dulu.' : r.error === 'not_found' ? t('guru.kelas-belum-sinkron', 'Kelas belum terdaftar di server — tekan Sinkron lalu coba lagi.') : t('guru.toast-gagal-kirim', 'Gagal mengirim ({sebab}). Coba lagi.').replace('{sebab}', r.error || 'unknown'));
           persist(); render();
@@ -4554,7 +4615,33 @@
         break;
       }
       case 'delete-student': if (!c) return; c.students = c.students.filter(function (s) { return s.id !== id; }); ui.drawer = null; toast('Siswa dihapus dari kelas.'); break;
-      case 'delete-assign': if (!c || !confirm(t('guru.konfirm-hapus-tugas', 'Hapus tugas ini?'))) return; c.assignments = c.assignments.filter(function (a) { return a.id !== id; }); break;
+      case 'asg-tab': ui.asgTab = btn.getAttribute('data-tab'); ui.confirmDelete = ui.confirmRetract = null; break;
+      case 'archive-assign': { var arA = c && (c.assignments || []).filter(function (x) { return x.id === id; })[0]; if (!arA) return; arA.archivedAt = Date.now(); toast(t('guru.siklus.toast-diarsip', 'Tugas dipindah ke Arsip. Hasil murid tetap tersimpan.')); break; }
+      case 'archive-all-late': { if (!c) return; var tdL = T.today(), nL = 0, scL = null; try { scL = teacherSubjectScope(); } catch (_) { scL = null; } /* hanya yang TERLIHAT guru ini: guru mapel terkunci tidak boleh mengarsipkan tugas rekan di kelas yang sama */ (c.assignments || []).forEach(function (x) { if (scL && scL.locked && !isAssignmentVisible(x, scL)) return; if (!x.archivedAt && x.deadline && x.deadline < tdL) { x.archivedAt = Date.now(); nL++; } }); toast(t('guru.siklus.toast-diarsip-n', '{n} tugas dipindah ke Arsip.').replace('{n}', nL)); break; }
+      case 'unarchive-assign': { var unA = c && (c.assignments || []).filter(function (x) { return x.id === id; })[0]; if (!unA) return; unA.archivedAt = null; ui.confirmDelete = null; toast(t('guru.siklus.toast-dipulihkan', 'Tugas dikembalikan dari Arsip.')); break; }
+      case 'confirm-no': ui.confirmDelete = ui.confirmRetract = null; break;
+      case 'retract-assign': ui.confirmRetract = id; ui.confirmDelete = null; break;
+      case 'retract-yes': {
+        var rtA = c && (c.assignments || []).filter(function (x) { return x.id === id; })[0]; if (!rtA) return;
+        ui.sending = rtA.id; render();
+        T.retractAssignment(c, rtA).then(function (r) {
+          ui.sending = null;
+          if (r.ok) { rtA.archivedAt = Date.now(); ui.confirmRetract = null; toast(r.remote ? t('guru.siklus.toast-ditarik', 'Tugas ditarik. Murid yang belum mengerjakan tidak melihatnya lagi.') : t('guru.siklus.toast-ditarik-lokal', 'Tugas ini hanya pernah dibagikan lewat kode, jadi hanya ditarik dari daftar ini.')); }
+          else toast(t('guru.siklus.toast-gagal-tarik', 'Gagal menarik tugas ({sebab}). Periksa koneksi lalu coba lagi.').replace('{sebab}', r.error || '?'));
+          persist(); render();
+        });
+        return;
+      }
+      /* Hapus hanya hidup di Arsip dan dua langkah: tombol pertama membuka konfirmasi di tempat.
+         Tugas yang masih berlaku bagi murid ikut ditarik supaya tidak tertinggal di HP mereka. */
+      case 'delete-assign': ui.confirmDelete = id; ui.confirmRetract = null; break;
+      case 'delete-yes': {
+        var dlA = c && (c.assignments || []).filter(function (x) { return x.id === id; })[0]; if (!dlA) return;
+        if (sudahDikirim(dlA) && !dlA.retractedAt) { try { T.retractAssignment(c, dlA).catch(function () {}); } catch (_) {} }
+        c.assignments = c.assignments.filter(function (a) { return a.id !== id; }); ui.confirmDelete = null;
+        toast(t('guru.siklus.toast-dihapus', 'Tugas dihapus permanen.'));
+        break;
+      }
       case 'mark-done': { var a = c.assignments.filter(function (x) { return x.id === id; })[0], sid = btn.getAttribute('data-sid'); if (a) { a.done = a.done || {}; a.done[sid] = { at: Date.now(), acc: T.skillAcc(student(sid) || {}, a.skills[0]) }; } saveMinutes(1); break; }
       case 'att': { var s3 = student(id), date = ui.attDate || T.today(); if (s3) { var v = btn.getAttribute('data-v'); s3.attendance[date] = s3.attendance[date] === v ? undefined : v; if (!s3.attendance[date]) delete s3.attendance[date]; if (v === 'H' && (!s3.lastActiveAt || T.today(s3.lastActiveAt) < date)) { /* kehadiran ≠ belajar mandiri; jangan ubah lastActiveAt */ } } saveMinutes(0.2); break; }
       case 'att-all': { var dt = ui.attDate || T.today(); c.students.forEach(function (s) { s.attendance[dt] = 'H'; }); saveMinutes(3); toast('Semua ditandai hadir. Ubah yang tidak hadir saja.'); break; }

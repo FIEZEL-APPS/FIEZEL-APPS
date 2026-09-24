@@ -220,6 +220,32 @@ export function normalizeAssignment(body) {
   return { ok: true, code, id, payload, targets };
 }
 
+/**
+ * normalizeRetract(body) -> { ok, code, id } | { ok:false, reason }
+ * m025-365 (audit KelasKu K2): guru MENARIK tugas yang sudah dikirim.
+ */
+export function normalizeRetract(body) {
+  if (!body || typeof body !== 'object' || Array.isArray(body)) return { ok: false, reason: 'not_object' };
+  const code = normalizeClassCode(body.code);
+  if (!code) return { ok: false, reason: 'bad_class_code' };
+  const id = typeof body.id === 'string' && /^[A-Za-z0-9_-]{1,40}$/.test(body.id) ? body.id : null;
+  if (!id) return { ok: false, reason: 'bad_assign_id' };
+  return { ok: true, code, id };
+}
+
+/**
+ * Payload penanda tarikan. Ia MENIMPA payload tugas di baris yang sama, jadi murid yang
+ * belum pernah menerima tugasnya pun tidak lagi bisa menariknya dari server — yang tersisa
+ * hanya judul (untuk pesan singkat ke murid) dan nama guru. Butir soal ikut hilang.
+ */
+export function retractPayload(json, r) {
+  let old = null;
+  try { old = JSON.parse(json); } catch { old = null; }
+  const p = { v: 1, t: 'retract', id: r.id, cls: r.code, title: String((old && old.title) || '').slice(0, ASSIGN_LIMITS.TITLE_MAX) };
+  if (old && old.teacher) p.teacher = String(old.teacher).slice(0, ASSIGN_LIMITS.TEACHER_MAX);
+  return p;
+}
+
 /** Baris D1 -> tugas untuk murid; targets yang tidak memuat kunci murid dibuang. */
 export function rowToAssignment(row, key) {
   let payload = null, targets = null;

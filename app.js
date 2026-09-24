@@ -14544,6 +14544,13 @@ async function inboxPoll(force){
     try{if((state.view==='learn'||state.view==='home')&&!isInputActive()&&!modalOpen)render()}catch(_){}
     try{if(state.view==='classroom'&&!isInputActive())self.FiezelClassHub?.renderStudent?.({quiet:true})}catch(_){}
   }
+  /* m025-365: tugas yang ditarik guru sudah keluar dari antrean (fiezel-inbox.js tarik()).
+     Murid diberi satu kalimat, bukan dibiarkan bertanya ke mana tugasnya pergi. */
+  if(r&&r.retracted&&r.retracted.length){
+    const x=r.retracted[0];
+    try{showToast(FiezelI18n.t('notif.tugas-ditarik',{title:x.title||''}))}catch(_){}
+    try{if(state.view==='classroom'&&!isInputActive())self.FiezelClassHub?.renderStudent?.({quiet:true})}catch(_){}
+  }
   refreshNotifBadge();
   return r;
 }

@@ -144,7 +144,7 @@
   function daysSince(ts) { return ts ? Math.floor((Date.now() - ts) / DAY) : null; }
   function pendingAssignments(c, s) {
     var td = today();
-    return (c.assignments || []).filter(function (a) { return targeted(a, s) && !(a.done && a.done[s.id]); }).map(function (a) { return { a: a, late: !!(a.deadline && a.deadline < td) }; });
+    return (c.assignments || []).filter(function (a) { return !a.archivedAt && targeted(a, s) && !(a.done && a.done[s.id]); }).map(function (a) { return { a: a, late: !!(a.deadline && a.deadline < td) }; });
   }
   function targeted(a, s) { return !a.targets || a.targets.indexOf(s.id) !== -1; }
   function weakestSkill(s) {
@@ -268,7 +268,7 @@
   }
   function agenda(c) {
     var td = today(), out = [];
-    (c.assignments || []).forEach(function (a) { var pend = c.students.filter(function (s) { return targeted(a, s) && !(a.done && a.done[s.id]); }).length; if (pend) out.push({ kind: a.deadline && a.deadline < td ? 'lewat' : a.deadline === td ? 'hari-ini' : 'akan', a: a, pending: pend }); });
+    (c.assignments || []).forEach(function (a) { if (a.archivedAt) return; var pend = c.students.filter(function (s) { return targeted(a, s) && !(a.done && a.done[s.id]); }).length; if (pend) out.push({ kind: a.deadline && a.deadline < td ? 'lewat' : a.deadline === td ? 'hari-ini' : 'akan', a: a, pending: pend }); });
     return out.sort(function (x, y) { return String(x.a.deadline || '9').localeCompare(String(y.a.deadline || '9')); });
   }
 
@@ -506,7 +506,7 @@
   function fmtDate(ts) { try { return new Date(ts).toLocaleDateString('id-ID', { weekday: 'short', day: 'numeric', month: 'short' }); } catch (_) { return today(ts); } }
 
   // ---- sinkron server (kode kelas diklaim guru; murid melapor otomatis) -----------------------
-  var SYNC_PATHS = { claim: '/api/teacher/class/claim', list: '/api/teacher/class/list', reports: '/api/teacher/class/reports', report: '/api/learner/class-report', assign: '/api/teacher/class/assign', learnerAssignments: '/api/learner/class-assignments' };
+  var SYNC_PATHS = { claim: '/api/teacher/class/claim', list: '/api/teacher/class/list', reports: '/api/teacher/class/reports', report: '/api/learner/class-report', assign: '/api/teacher/class/assign', retract: '/api/teacher/class/retract', learnerAssignments: '/api/learner/class-assignments' };
   function account() { return root.FiezelAccount || null; }
   /**
    * Kirim tugas ke murid lewat server (masuk ke notifikasi murid). studentIds: null = seluruh
@@ -529,6 +529,22 @@
         if (!names) a.sent.all = Date.now(); else (studentIds || []).forEach(function (id) { a.sent.to[id] = Date.now(); });
         return { ok: true, count: names ? names.length : c.students.length };
       });
+    }).catch(function () { return { ok: false, error: 'unavailable' }; });
+  }
+  /**
+   * Tarik tugas dari murid (m025-365, audit KelasKu K2). Server menimpa baris tugasnya dengan
+   * penanda tarikan; kotak masuk murid membuangnya dari antrean pada tarikan berikutnya.
+   * 404 = tugas tidak pernah lewat server (hanya dibagikan lewat kode) — tidak ada yang bisa
+   * ditarik dari jauh, jadi yang terjadi hanya tarikan lokal, dan pemanggil diberi tahu.
+   */
+  function retractAssignment(c, a) {
+    var avail = syncAvailable();
+    if (avail !== 'ok') return Promise.resolve({ ok: false, error: avail });
+    var A = account();
+    return A.api(SYNC_PATHS.retract, { code: c.code, id: a.id }).then(function (res) {
+      if (!res.ok && res.error !== 'not_found') return { ok: false, error: res.error || 'unknown' };
+      a.retractedAt = Date.now();
+      return { ok: true, remote: !!res.ok };
     }).catch(function () { return { ok: false, error: 'unavailable' }; });
   }
   function sentTo(a, s) { return !!(a.sent && (a.sent.all || (a.sent.to && a.sent.to[s.id]))); }
@@ -696,7 +712,7 @@
     skillAcc: skillAcc, overallAcc: overallAcc, daysSince: daysSince, risk: risk, classStats: classStats, classSkillMap: classSkillMap, heatmap: heatmap, activeSkills: activeSkills, studyGroups: studyGroups, misconceptions: misconceptions, needsGreeting: needsGreeting, agenda: agenda, pendingAssignments: pendingAssignments, targeted: targeted, recentAttendance: recentAttendance, attendanceRate: attendanceRate, weakestSkill: weakestSkill,
     durasi: durasi, examLabel: examLabel, acceptJoin: acceptJoin, rejectJoin: rejectJoin, pendingJoins: pendingJoins, normalizeFocus: normalizeFocus, focusGrew: focusGrew, focusOf: focusOf, focusLabel: focusLabel, focusLevel: focusLevel,
     parseLearnerCode: parseLearnerCode, parseLearnerPayload: parseLearnerPayload, ingest: ingest, assignmentCode: assignmentCode, assignmentPayload: assignmentPayload, parseAssignmentCode: parseAssignmentCode, acceptAssignmentCode: acceptAssignmentCode, acceptAssignmentPayload: acceptAssignmentPayload, buildAssignment: buildAssignment,
-    SYNC_PATHS: SYNC_PATHS, syncAvailable: syncAvailable, claimClass: claimClass, pullReports: pullReports, syncClass: syncClass, syncClassList: syncClassList, reportToClass: reportToClass, syncLabel: syncLabel, sendAssignment: sendAssignment, sentTo: sentTo,
+    SYNC_PATHS: SYNC_PATHS, syncAvailable: syncAvailable, claimClass: claimClass, pullReports: pullReports, syncClass: syncClass, syncClassList: syncClassList, reportToClass: reportToClass, syncLabel: syncLabel, sendAssignment: sendAssignment, retractAssignment: retractAssignment, sentTo: sentTo,
     notify: notify, inboxUnread: inboxUnread, inboxMarkAllRead: inboxMarkAllRead, inboxText: inboxText,
     greetingCard: greetingCard, parentReport: parentReport, weeklyClassReport: weeklyClassReport, csvStudents: csvStudents, parseNames: parseNames, waLink: waLink, fmtDate: fmtDate, pct: pct };
 });

@@ -20,7 +20,7 @@ import { jsonResponse, jsonError, ERR } from './errors.js';
 import { readJsonFromCtx } from './mw-guard.js';
 import { roleGate, coreDb, unauthenticated } from './auth/gate.js';
 import { ensureAuthSchema } from './auth-schema.js';
-import { normalizeReport, normalizeClaim, normalizeClassCode, normalizeAssignment, rowToAssignment, learnerKey, makeRateLimiter, rowToReport, LIMITS, ASSIGN_LIMITS } from './teacher/class-sync-core.js';
+import { normalizeReport, normalizeClaim, normalizeClassCode, normalizeAssignment, normalizeRetract, retractPayload, rowToAssignment, learnerKey, makeRateLimiter, rowToReport, LIMITS, ASSIGN_LIMITS } from './teacher/class-sync-core.js';
 
 const learnerAllowed = makeRateLimiter(LIMITS.LEARNER_MIN_INTERVAL_MS);
 const learnerPollAllowed = makeRateLimiter(ASSIGN_LIMITS.LEARNER_POLL_MIN_INTERVAL_MS);
@@ -258,7 +258,8 @@ export const ROUTES = [
   ['GET', '/api/teacher/class/list', routeClassList],
   ['GET', '/api/teacher/class/reports', routeClassReports],
   ['POST', '/api/teacher/class/assign', routeClassAssign],
-  ['POST', '/api/teacher/class/delete', routeClassDelete]
+  ['POST', '/api/teacher/class/delete', routeClassDelete],
+  ['POST', '/api/teacher/class/retract', routeClassRetract]
 ];
 
 /* ========================================================================== */
@@ -290,6 +291,43 @@ export async function routeClassAssign(ctx) {
   ).bind(a.code, a.id, gate.sub, JSON.stringify(a.payload), a.targets ? JSON.stringify(a.targets) : null, ctx.now).run();
 
   return jsonResponse({ ok: true, code: a.code, id: a.id, targets: a.targets ? a.targets.length : 'all', at: ctx.now }, gate.opt);
+}
+
+/* ========================================================================== */
+/* POST /api/teacher/class/retract — guru MENARIK tugas yang sudah dikirim      */
+/* ========================================================================== */
+/* m025-365 (audit KelasKu K2). Sampai build ini tombol hapus di Ruang Guru hanya membuang
+   tugas dari data guru. Salinan di HP murid hidup selamanya — lama-lama berlabel
+   "Terlambat" — dan murid tidak punya cara menyingkirkannya.
+
+   Menarik = menimpa payload baris yang SAMA dengan penanda { t:'retract' } dan menaikkan
+   updated_at. Kursor murid yang sudah ada (`since`) membawanya pada tarikan berikutnya, jadi
+   tidak perlu kolom baru, migrasi, atau jalur tarik kedua. Mengirim ulang lewat
+   /class/assign menimpa penanda itu lagi dan tugasnya hidup kembali.
+
+   Hanya guru PENGIRIM yang bisa menarik (teacher_sub = ?3): guru mapel lain di kelas yang
+   sama tidak bisa membatalkan tugas rekannya. Tugas yang tidak pernah dikirim ke server
+   (hanya dibagikan lewat kode) menjawab 404 — klien memperlakukannya sebagai tarikan lokal. */
+
+export async function routeClassRetract(ctx) {
+  const gate = await roleGate(ctx);
+  if (!gate.ok) return gate.response;
+  const body = await readJsonFromCtx(ctx, gate.opt);
+  if (!body.ok) return body.response;
+  const r = normalizeRetract(body.value);
+  if (!r.ok) return jsonError(400, ERR.SCHEMA_INVALID, { reason: r.reason }, gate.opt);
+
+  await ensureAuthSchema(gate.db);
+  const row = await gate.db.prepare(
+    'SELECT payload_json FROM tc_class_assignment WHERE class_code = ?1 AND id = ?2 AND teacher_sub = ?3'
+  ).bind(r.code, r.id, gate.sub).first();
+  if (!row) return jsonError(404, ERR.NOT_FOUND, {}, gate.opt);
+
+  await gate.db.prepare(
+    'UPDATE tc_class_assignment SET payload_json = ?4, updated_at = ?5 WHERE class_code = ?1 AND id = ?2 AND teacher_sub = ?3'
+  ).bind(r.code, r.id, gate.sub, JSON.stringify(retractPayload(row.payload_json, r)), ctx.now).run();
+
+  return jsonResponse({ ok: true, code: r.code, id: r.id, retracted: true, at: ctx.now }, gate.opt);
 }
 
 /* ========================================================================== */
