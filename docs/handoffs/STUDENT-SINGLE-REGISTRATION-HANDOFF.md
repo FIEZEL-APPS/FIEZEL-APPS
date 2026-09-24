@@ -1,5 +1,9 @@
 # Pendaftaran murid SEKALI: satu identitas, lahir di onboarding
 
+> **Lanjutan m025-367:** pendaftaran tidak lagi lahir di onboarding. Ia lahir di layar masuk
+> wajib (Murid/Guru + kode KelasKu), dan onboarding tinggal nama → kursus → tujuan → tes
+> awal. Lihat `AUTH-LOGIN-WAJIB-HANDOFF.md`.
+
 Otoritas: OWNER. Dokumen ini lahir dari satu laporan owner pada m025-261:
 
 > "Aktivasi/autentifikasi murid ribet sekali — bukan sekali dua kali murid harus

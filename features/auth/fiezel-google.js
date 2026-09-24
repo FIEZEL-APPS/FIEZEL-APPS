@@ -252,6 +252,8 @@
       if (o.locale !== 'auto') cfg.locale = (o.locale === 'th' || o.locale === 'id') ? o.locale
         : (locale() === 'th' ? 'th' : 'id');
       if (o.width) cfg.width = o.width;
+      /* m025-367: layar Daftar memakai label "Daftar dengan Google"; nilai lain dari Google ditolak. */
+      if (o.text === 'signup_with' || o.text === 'continue_with' || o.text === 'signin_with') cfg.text = o.text;
       root.google.accounts.id.renderButton(host, cfg);
     } catch (_) {
       return { ok: false, error: 'script', message: t('google.gagal-muat', 'Tombol Google belum bisa dimuat. Masuk dengan akun FIEZEL di bawah, ya.') };
