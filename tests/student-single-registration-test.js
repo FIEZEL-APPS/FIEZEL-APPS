@@ -18,8 +18,11 @@
  *   R1  ID online lahir dari nama onboarding: socialHandleCandidates() murni dan SELALU
  *       melahirkan setidaknya satu handle yang lolos validateHandle() milik modul sosial
  *       (termasuk untuk nama kosong, nama satu huruf, angka, dan nama yang diblokir).
- *   R2  Persetujuan DITANAMKAN: profileCreate dipanggil dengan friendsVisible:true dan
- *       leagueOptIn:true, dan tidak ada satu pun kotak centang sosial tersisa di app.js.
+ *   R2  Tanpa kotak centang: profileCreate dipanggil dengan friendsVisible:true dan
+ *       leagueOptIn:false, dan tidak ada satu pun kotak centang sosial tersisa di app.js.
+ *       Audit UI/UX F06 (2026-09-23): liga global memperlihatkan handle + PB kepada orang
+ *       asing, jadi ikut liga adalah satu ketukan di papan Liga (socialSetLeague ->
+ *       POST /api/social/rank/league), bukan bawaan yang ditanam diam-diam.
  *   R3  Nol gerbang kedua: boot tidak lagi memasang gerbang akun Puter.
  *   R4  Satu pintu untuk murid lama: Pengaturan punya tombol pendaftaran sekali ketuk.
  *   R5  Pendaftaran idempoten: profil yang sudah ada dipakai apa adanya (profileMe dulu).
@@ -70,9 +73,17 @@ check(
 /* ---- R2: persetujuan ditanamkan, kotak centang hilang ---------------------------- */
 const regBlock = app.slice(app.indexOf('function registerStudentOnce'), app.indexOf('window.registerStudentOnce'));
 check(
-  'R2 profileCreate memakai friendsVisible:true dan leagueOptIn:true',
-  /profileCreate\(\{handle:[^}]*friendsVisible:true[^}]*leagueOptIn:true/.test(regBlock),
-  'sudah mendaftar = wajib tampil di papan dengan nama yang dipilih sendiri'
+  'R2 profileCreate memakai friendsVisible:true dan leagueOptIn:false',
+  /profileCreate\(\{handle:[^}]*friendsVisible:true[^}]*leagueOptIn:false/.test(regBlock),
+  'audit F06: liga global bukan bawaan; papan teman hanya untuk teman yang diterima'
+);
+check(
+  'R2 papan Liga punya pintu ikut/keluar sendiri (audit F06)',
+  /function socialSetLeague\(optIn\)/.test(app) && /socialSetLeague\(true\)/.test(app) && /socialSetLeague\(false\)/.test(app)
+);
+check(
+  'R2 langkah nama menjelaskan bahwa nama menjadi ID online (audit F06)',
+  /onboarding\.name-privacy-hint/.test(fs.readFileSync(path.join(__fzRoot, 'features/onboarding/fiezel-onboarding.js'), 'utf8'))
 );
 check(
   'R2 nol kotak centang persetujuan sosial di app.js',

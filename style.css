@@ -1907,6 +1907,7 @@ body.voice-bundle-locked .bottomnav,body.voice-bundle-locked .app-header{pointer
   color:var(--fz-ink);background:var(--fz-bg);border:1.5px solid var(--fz-line);border-radius:var(--radius-md);
   padding:12px 16px;transition:border-color .14s ease-out,box-shadow .14s ease-out}
 .fiezel-field input::placeholder{color:var(--fz-ink-muted);font-weight:500;opacity:1}
+.fiezel-field-hint{margin:-4px 0 0;font-size:13px;line-height:1.45;color:var(--fz-ink-muted);text-align:left}
 /* SATU aturan, dan HANYA :focus-visible. Sebelumnya ada aturan `:focus` telanjang kedua
    yang memasang garis --fz-gold emas tua plus cahaya kuning 3px - itulah "kotak kuning" yang
    muncul setiap kali murid MENGETUK kolom nama di ponsel. `:focus-visible` tidak menyala untuk

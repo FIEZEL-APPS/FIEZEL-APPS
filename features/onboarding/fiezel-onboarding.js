@@ -674,7 +674,10 @@
       + '<label class="fiezel-field"><span>' + T('onboarding.name-field-label') + '</span>'
       + '<input type="text" data-ob-name value="' + escapeHtml(typed || '') + '" maxlength="' + NAME_MAX + '"'
       + ' placeholder="' + T('onboarding.name-placeholder') + '" autocomplete="given-name" autocapitalize="words"'
-      + ' spellcheck="false" enterkeyhint="go" aria-label="' + T('onboarding.name-aria') + '"></label>'
+      + ' spellcheck="false" enterkeyhint="go" aria-label="' + T('onboarding.name-aria') + '" aria-describedby="fiezelNameHint"></label>'
+      // Audit F06: nama ini menjadi ID online (registerStudentOnce). Satu baris pendek,
+      // bukan paragraf m025-242 yang dulu membuat langkah ini harus digulir.
+      + '<p class="fiezel-field-hint" id="fiezelNameHint">' + T('onboarding.name-privacy-hint') + '</p>'
       // m025-242: kalimat panjang soal penyimpanan nama dilepas dari layar - ia benar, tapi
       // ia juga yang membuat langkah pertama harus digulir. Janji yang sama tetap ada di
       // Pengaturan, tempat nama itu bisa diganti.

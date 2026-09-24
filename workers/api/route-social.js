@@ -1104,6 +1104,37 @@ async function routeRankOptout(ctx) {
   return jsonResponse({ hidden }, gate.opt);
 }
 
+/* ========================================================== liga: ikut / keluar ===== */
+
+/* Audit UI/UX F06 (2026-09-23): pendaftaran di onboarding TIDAK lagi menanamkan
+   leagueOptIn:true. Liga kohor global memperlihatkan handle + PB kepada orang asing,
+   jadi keikutsertaannya harus pilihan murid sendiri, diambil di papan Liga, dan bisa
+   dibatalkan kapan saja. Sebelum rute ini ada, flag LEAGUE_OPT_IN hanya bisa diset
+   sekali saat profil dibuat. Keluar liga tidak menyentuh BOARD_HIDDEN (Mode privat):
+   papan teman tetap berjalan seperti sebelumnya. */
+const SCHEMA_LEAGUE = { allow: { optIn: { type: 'boolean', required: true } } };
+
+async function routeRankLeague(ctx) {
+  const gate = await socialGate(ctx);
+  if (gate.deny) return gate.deny;
+  const body = await readJsonFromCtx(ctx, gate.opt);
+  if (!body.ok) return body.response;
+  const shape = validateShape(body.value, SCHEMA_LEAGUE);
+  if (!shape.ok) return jsonError(400, ERR.SCHEMA_INVALID, {}, gate.opt);
+  const me = await requireProfile(gate);
+  if (!me) return jsonError(404, ERR.PROFILE_REQUIRED, {}, gate.opt);
+
+  const optIn = body.value.optIn === true;
+  const flags = optIn
+    ? (me.flags | PROFILE_FLAGS.LEAGUE_OPT_IN)
+    : (me.flags & ~PROFILE_FLAGS.LEAGUE_OPT_IN);
+  await gate.db
+    .prepare('UPDATE social_profile SET flags = ?2 WHERE sub = ?1')
+    .bind(gate.sub, flags)
+    .run();
+  return jsonResponse({ optIn }, gate.opt);
+}
+
 /* ========================================================== pendaftaran rute ======= */
 
 export const ROUTES = [
@@ -1121,5 +1152,6 @@ export const ROUTES = [
   ['POST', '/api/social/rank/evidence', routeRankEvidence],
   ['GET', '/api/social/rank/board/friends', routeBoardFriends],
   ['GET', '/api/social/rank/board/league', routeBoardLeague],
-  ['POST', '/api/social/rank/optout', routeRankOptout]
+  ['POST', '/api/social/rank/optout', routeRankOptout],
+  ['POST', '/api/social/rank/league', routeRankLeague]
 ];
