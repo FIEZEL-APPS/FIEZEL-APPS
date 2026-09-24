@@ -1872,7 +1872,9 @@
   }
   function itemList(a) { return a.itemIds.map(function (id, i) { var q = resolveItem(a, id); if (!q) return '<li class="ch-muted">Soal ' + (i + 1) + ' (' + esc(id) + ') tidak dapat ditampilkan.</li>'; var custom = (a.items || []).some(function (x) { return x.id === id; }); return '<li><p class="ch-muted">Soal ' + (i + 1) + ' · ' + esc(skillLabel(q.skill)) + ' · ' + (custom ? 'soal guru' : 'bank FIEZEL') + '</p>' + (q.context ? '<p class="ch-context">' + esc(q.context) + '</p>' : '') + '<b>' + esc(q.prompt) + '</b><ol class="ch-opts-inline">' + q.options.map(function (o, j) { return '<li class="' + (j === q.answer ? 'is-key' : '') + '">' + esc(o) + '</li>'; }).join('') + '</ol></li>'; }).join(''); }
   function tTugas(c, env) {
-    var TS = T(), list = (c.assignments || []).filter(function (a) { return env && env.isAssignmentVisible ? env.isAssignmentVisible(a) : true; }).slice().sort(function (a, b) { return b.createdAt - a.createdAt; });
+    /* m025-365: tugas yang diarsipkan guru dikelola di Ruang Guru › Tugas (tab Arsip); daftar ini
+       hanya memuat yang masih berjalan, supaya kedua daftar tidak saling membantah. */
+    var TS = T(), list = (c.assignments || []).filter(function (a) { return !a.archivedAt && (env && env.isAssignmentVisible ? env.isAssignmentVisible(a) : true); }).slice().sort(function (a, b) { return b.createdAt - a.createdAt; });
     return '<div class="ch-body"><div class="ch-row ch-between"><h3 class="ch-h2">' + t('kelas.tugas-ujian', 'Tugas & ujian') + ' <small>' + list.length + '</small></h3><button type="button" class="tg-btn is-primary" data-ch="ttab" data-tab="buat" data-testid="tclass-new">' + icon('plus') + ' ' + t('kelas.buat-tugas', 'Buat tugas') + '</button></div>' +
       (list.length ? list.map(function (a) {
         var sc = statusCounts(c, a), open = tUi.expand === a.id, sentAll = a.sent && a.sent.all;
