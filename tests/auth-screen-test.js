@@ -32,7 +32,6 @@ const __fzRoot = require('path').join(__dirname, '..'); /* m025-254: gerbang hid
 const assert = require('assert');
 const fs = require('fs');
 const path = require('path');
-const http = require('http');
 const vm = require('vm');
 
 const ROOT = __fzRoot;
@@ -258,18 +257,16 @@ function findChromium(pw) {
 }
 const MIME = { '.html': 'text/html', '.js': 'text/javascript', '.mjs': 'text/javascript', '.css': 'text/css',
   '.json': 'application/json', '.png': 'image/png', '.svg': 'image/svg+xml', '.woff2': 'font/woff2' };
-function serve() {
-  return new Promise((resolve) => {
-    const server = http.createServer((req, res) => {
-      let rel = decodeURIComponent(String(req.url || '/').split('?')[0]);
-      if (rel === '/') rel = '/index.html';
-      const file = path.join(ROOT, path.normalize(rel).replace(/^(\.\.[/\\])+/, ''));
-      if (!file.startsWith(ROOT) || !fs.existsSync(file) || fs.statSync(file).isDirectory()) { res.writeHead(404); res.end('nope'); return; }
-      res.writeHead(200, { 'content-type': MIME[path.extname(file).toLowerCase()] || 'application/octet-stream' });
-      fs.createReadStream(file).pipe(res);
-    });
-    server.listen(0, '127.0.0.1', () => resolve({ server, port: server.address().port }));
-  });
+/* Tanpa server dan tanpa socket (tests/no-network-test.js): Chromium meminta ke asal palsu
+   https://fiezel.uji dan router Playwright menjawab langsung dari disk. Permintaan ke asal
+   lain dibatalkan, jadi api.fiezel.my.id dan Google tidak pernah dihubungi. */
+const ORIGIN = 'https://fiezel.uji';
+function fromDisk(url) {
+  let rel = decodeURIComponent(new URL(url).pathname);
+  if (rel === '/') rel = '/index.html';
+  const file = path.join(ROOT, path.normalize(rel).replace(/^(\.\.[/\\])+/, ''));
+  if (!file.startsWith(ROOT) || !fs.existsSync(file) || fs.statSync(file).isDirectory()) return { status: 404, body: 'nope' };
+  return { status: 200, contentType: MIME[path.extname(file).toLowerCase()] || 'application/octet-stream', body: fs.readFileSync(file) };
 }
 
 async function browserGates() {
@@ -277,13 +274,11 @@ async function browserGates() {
   if (!pw) { console.log('SKIP C1-C4 - playwright tidak terpasang (bukan kegagalan).'); return; }
   const exe = findChromium(pw);
   if (!exe) { console.log('SKIP C1-C4 - Chromium Playwright tidak ditemukan (bukan kegagalan).'); return; }
-  const { server, port } = await serve();
   const browser = await pw.chromium.launch({ executablePath: exe, args: ['--no-sandbox', '--disable-dev-shm-usage', '--disable-background-networking', '--no-first-run'] });
-  const origin = `http://127.0.0.1:${port}`;
+  const origin = ORIGIN;
   async function open(url) {
-    const ctx = await browser.newContext({ viewport: { width: 390, height: 844 }, reducedMotion: 'reduce' });
-    /* Jaringan luar diblokir: gerbang CI tidak boleh menembak api.fiezel.my.id atau Google. */
-    await ctx.route('**/*', (r) => (r.request().url().startsWith(origin + '/') ? r.continue() : r.abort()));
+    const ctx = await browser.newContext({ viewport: { width: 390, height: 844 }, reducedMotion: 'reduce', serviceWorkers: 'block' });
+    await ctx.route('**/*', (r) => (r.request().url().startsWith(origin + '/') ? r.fulfill(fromDisk(r.request().url())) : r.abort()));
     const page = await ctx.newPage();
     const errors = [];
     page.on('pageerror', (e) => errors.push(e.message));
@@ -370,7 +365,6 @@ async function browserGates() {
     }
   } finally {
     await browser.close();
-    server.close();
   }
 }
 

@@ -5756,7 +5756,10 @@ body.fz-auth-open{overflow:hidden}
 .fz-auth .fz-auth-submit{width:100%;margin-top:6px;padding:15px 20px;font-size:1rem}
 .fz-auth-alt{margin:16px 0 0;text-align:center;color:var(--muted,#6E635C);font-size:.9rem}
 .fz-auth-alt + .fz-auth-alt{margin-top:4px}
-.fz-auth .fz-plain:focus-visible,.fz-auth-input input:focus-visible{outline:2px solid var(--accent,#9B3A4A);outline-offset:2px}
+.fz-auth .fz-plain:focus-visible{outline:2px solid var(--accent,#9B3A4A);outline-offset:2px}
+/* Penanda fokus kolom: garis bawah menebal (bukan kotak) supaya tetap sejalan dengan bentuk
+   kolom bergaris. Selektornya SAMA dengan aturan outline:none di atas, jadi ia menang. */
+.fz-auth .fz-auth-input input[name]:focus-visible{box-shadow:inset 0 -2px 0 var(--accent,#9B3A4A)}
 @media (max-height:680px){.fz-auth-hero.is-welcome{min-height:48vh}.fz-auth-hero.is-masuk{min-height:24vh}.fz-auth-hero.is-daftar{min-height:18vh}.fz-auth-paw{width:84px;height:84px}}
 @media (prefers-reduced-motion:reduce){.fz-auth,.fz-auth.is-leaving{animation:none}.fz-auth-hero{transition:none}}
 /* m025-367 · langkah kursus di perkenalan: dua kartu lebar (bendera + nama + isi kursus). */
