@@ -238,8 +238,9 @@ html.fz-booting body{overflow:hidden}
   <link rel="stylesheet" href="./features/tutor-classroom/tutor-v3.css">
   <link rel="stylesheet" href="./features/learner-flow/learner-flow.css">
   <link rel="stylesheet" href="./features/learner-flow/home-polish.css">
-  <!-- Ruang Guru: tema terpisah untuk cangkang guru (features/teacher). Hanya aktif saat body.fz-teacher-mode. -->
-  <link rel="stylesheet" href="./features/teacher/teacher-shell.css">
+  <!-- Ruang Guru: tema cangkang guru (features/teacher/teacher-shell.css, 72 KB) TIDAK lagi
+       dimuat untuk murid (audit F28). FiezelTeacherShell.ensureCss() memasangnya begitu mode
+       guru/demo menyala. -->
   <link rel="stylesheet" href="./features/class-hub/class-hub.css">
   <!-- m026-01: motion system maskot PAW. Sengaja PALING AKHIR di antara stylesheet:
        berkasnya memakai nama token yang bertabrakan dengan style.css (--fz-gold,
@@ -267,7 +268,7 @@ html.fz-booting body{overflow:hidden}
        features/brand/fiezel-splash.js mengadopsi elemen ini lewat [data-fiezel-boot-splash]
        alih-alih membuat lapisan kedua, jadi animasi yang sudah berjalan diteruskan, bukan
        diulang dari awal setelah boot selesai. -->
-  <div id="fiezelBootSplash" class="fiezel-splash fiezel-splash-dark" data-fiezel-boot-splash role="dialog" aria-label="Selamat datang di FIEZEL"><div class="fiezel-splash-body fiezel-splash-brand"><canvas class="fz-splash-canvas" aria-hidden="true"></canvas><svg class="fiezel-logo" viewBox="0 0 512 512" role="img" aria-label="FIEZEL"><defs><linearGradient id="fzsGold" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#FFD94F"/><stop offset="100%" stop-color="#F0C241"/></linearGradient></defs><g class="fz-fgroup" fill="#FFF4DA"><rect class="fz-f fz-f1" x="136" y="148" width="42"  height="216" rx="20"/><rect class="fz-f fz-f2" x="136" y="148" width="128" height="42"  rx="20"/><rect class="fz-f fz-f3" x="136" y="230" width="102" height="40"  rx="19"/></g><g class="fz-barsgroup" fill="url(#fzsGold)"><rect class="fz-bar fz-bar1" x="298" y="200" width="34" height="112" rx="17"/><rect class="fz-bar fz-bar2" x="348" y="166" width="34" height="180" rx="17"/></g></svg><div class="fiezel-splash-word"><svg class="fiezel-wordmark" viewBox="0 0 1000 260" role="img" aria-label="FIEZEL"><defs><linearGradient id="fzsIv" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#FFFBF3"/><stop offset="100%" stop-color="#EBDBC0"/></linearGradient><linearGradient id="fzsGo" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#FFD94F"/><stop offset="45%" stop-color="#F5CE45"/><stop offset="100%" stop-color="#F0C241"/></linearGradient></defs><g fill="url(#fzsIv)"><rect x="30" y="30" width="42" height="200" rx="21"/><rect x="30" y="30" width="144" height="42" rx="21"/><rect x="30" y="109" width="116" height="42" rx="21"/><rect x="300" y="30" width="42" height="200" rx="21"/><rect x="300" y="30" width="144" height="42" rx="21"/><rect x="300" y="109" width="100" height="42" rx="21"/><rect x="300" y="188" width="130" height="42" rx="21"/><rect x="478" y="30" width="150" height="42" rx="21"/><rect x="478" y="188" width="150" height="42" rx="21"/><rect x="607" y="30" width="191.38" height="42" rx="21" transform="rotate(124.354 607 51)"/><rect x="662" y="30" width="42" height="200" rx="21"/><rect x="662" y="30" width="144" height="42" rx="21"/><rect x="662" y="109" width="100" height="42" rx="21"/><rect x="662" y="188" width="130" height="42" rx="21"/><rect x="840" y="30" width="42" height="200" rx="21"/><rect x="840" y="188" width="130" height="42" rx="21"/></g><g fill="url(#fzsGo)"><rect x="192" y="30" width="26" height="200" rx="13"/><rect x="240" y="106" width="26" height="124" rx="13"/></g></svg><p class="fiezel-splash-tag">ADAPTIVE ENGLISH</p></div></div></div>
+  <div id="fiezelBootSplash" class="fiezel-splash fiezel-splash-dark" data-fiezel-boot-splash role="dialog" aria-label="Selamat datang di FIEZEL"><div class="fiezel-splash-body fiezel-splash-brand"><canvas class="fz-splash-canvas" aria-hidden="true"></canvas><svg class="fiezel-logo" viewBox="0 0 512 512" role="img" aria-label="FIEZEL"><defs><linearGradient id="fzsGold" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#FFD94F"/><stop offset="100%" stop-color="#F0C241"/></linearGradient></defs><g class="fz-fgroup" fill="#FFF4DA"><rect class="fz-f fz-f1" x="136" y="148" width="42"  height="216" rx="20"/><rect class="fz-f fz-f2" x="136" y="148" width="128" height="42"  rx="20"/><rect class="fz-f fz-f3" x="136" y="230" width="102" height="40"  rx="19"/></g><g class="fz-barsgroup" fill="url(#fzsGold)"><rect class="fz-bar fz-bar1" x="298" y="200" width="34" height="112" rx="17"/><rect class="fz-bar fz-bar2" x="348" y="166" width="34" height="180" rx="17"/></g></svg><div class="fiezel-splash-word"><svg class="fiezel-wordmark" viewBox="0 0 1000 260" role="img" aria-label="FIEZEL"><defs><linearGradient id="fzsIv" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#FFFBF3"/><stop offset="100%" stop-color="#EBDBC0"/></linearGradient><linearGradient id="fzsGo" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#FFD94F"/><stop offset="45%" stop-color="#F5CE45"/><stop offset="100%" stop-color="#F0C241"/></linearGradient></defs><g fill="url(#fzsIv)"><rect x="30" y="30" width="42" height="200" rx="21"/><rect x="30" y="30" width="144" height="42" rx="21"/><rect x="30" y="109" width="116" height="42" rx="21"/><rect x="300" y="30" width="42" height="200" rx="21"/><rect x="300" y="30" width="144" height="42" rx="21"/><rect x="300" y="109" width="100" height="42" rx="21"/><rect x="300" y="188" width="130" height="42" rx="21"/><rect x="478" y="30" width="150" height="42" rx="21"/><rect x="478" y="188" width="150" height="42" rx="21"/><rect x="607" y="30" width="191.38" height="42" rx="21" transform="rotate(124.354 607 51)"/><rect x="662" y="30" width="42" height="200" rx="21"/><rect x="662" y="30" width="144" height="42" rx="21"/><rect x="662" y="109" width="100" height="42" rx="21"/><rect x="662" y="188" width="130" height="42" rx="21"/><rect x="840" y="30" width="42" height="200" rx="21"/><rect x="840" y="188" width="130" height="42" rx="21"/></g><g fill="url(#fzsGo)"><rect x="192" y="30" width="26" height="200" rx="13"/><rect x="240" y="106" width="26" height="124" rx="13"/></g></svg><p class="fiezel-splash-tag">ADAPTIVE LANGUAGES</p></div></div></div>
   <script>
 
     /* Jaring pengaman storage: di iframe preview yang di-sandbox tanpa allow-same-origin,
@@ -737,6 +738,8 @@ html.fz-booting body{overflow:hidden}
   <!-- Sumbu bahasa target: kunci penyimpanan per bahasa. Bahasa bawaan (en) TIDAK punya
        awalan, jadi kunci murid Inggris identik byte per byte dengan sebelum modul ini ada. -->
   <script defer src="./features/brain/fiezel-target-language.js"></script>
+  <!-- Permukaan khusus kursus Jepang: furigana/romaji, tabel kana, kartu segera hadir. -->
+  <script defer src="./features/japanese/fiezel-ja-ui.js"></script>
   <script defer src="./features/brain/fiezel-question-allocator.js"></script>
   <!-- brain-learning-infra: lane telemetri belajar (config → events → queue → transport).
        Urutan penting: transport membaca queue, queue membaca events, semuanya membaca
@@ -873,7 +876,6 @@ html.fz-booting body{overflow:hidden}
   <!-- Ruang Guru (cangkang guru terpisah). Wajib SEBELUM app.js: tutorCenterView() memasangnya,
        dan isVerifiedTeacher() menanyakan previewAllowed() saat Home digambar pertama kali. -->
   <script defer src="./features/teacher/fiezel-teacher-icons.js"></script>
-  <script defer src="./features/teacher/fiezel-teacher-curriculum.js"></script>
   <script defer src="./features/teacher/fiezel-teacher-store.js"></script>
   <!-- Class hub: Kelas = pusat Guru ↔ Murid ↔ Braincore (dipakai tab Kelas murid & view Kelas Ruang Guru). Harus sebelum teacher-shell. -->
   <!-- Kunci ujian: satu penanda "sedang ujian" untuk pendeteksi DAN pintu AI. Harus sebelum app.js. -->
@@ -884,7 +886,9 @@ html.fz-booting body{overflow:hidden}
   <script defer src="./features/curriculum/fiezel-curriculum-inbox.js"></script>
   <script defer src="./features/class-hub/fiezel-class-hub.js"></script>
   <script defer src="./features/curriculum/fz-api.js"></script>
-  <script defer src="./features/teacher/fiezel-teacher-shell.js"></script>
+  <!-- F28: shell + kurikulum guru (±600 KB) dimuat malas; pemuat kecil ini menyediakan
+       previewAllowed() seketika dan mengambil modul penuh hanya untuk guru/demo guru. -->
+  <script defer src="./features/teacher/fiezel-teacher-loader.js"></script>
   <script defer src="./app.js"></script>
   <script defer src="./features/skills-evidence/fiezel-skills-evidence.js"></script>
   <script defer src="./features/academic-readiness/fiezel-academic-readiness.js"></script>

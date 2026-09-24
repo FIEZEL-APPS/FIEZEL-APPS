@@ -533,6 +533,13 @@
           setScene(context.view);
           chips();
           if (!sheet.hidden) return;
+          /* Audit F13 (2026-09-23): sapaan dulu muncul di SETIAP perpindahan layar dan
+             menutupi kartu di Latihan, KelasKu, Profil, dan Rencana Hari Ini. Kini ia menyapa
+             SEKALI per sesi; sesudahnya gelembung tetap ada untuk diketuk kapan pun. */
+          var greeted = false;
+          try { greeted = global.sessionStorage && global.sessionStorage.getItem('fz-coach-greeted') === '1'; } catch (_) {}
+          if (greeted) return;
+          try { if (global.sessionStorage) global.sessionStorage.setItem('fz-coach-greeted', '1'); } catch (_) {}
           showPeek(localGreeting(context));
         }
       },

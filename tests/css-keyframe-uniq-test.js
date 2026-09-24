@@ -162,11 +162,20 @@ assert(PAGES.length >= 3,
   'penemu halaman hanya menemukan ' + PAGES.length + ' halaman ber-CSS — dulu tiga ' +
   'halaman diperiksa dengan tangan, jadi angka di bawah itu berarti penemunya patah');
 
+/* Stylesheet yang dipasang JAVASCRIPT ke halaman, bukan lewat <link> statis. Ia tetap tinggal
+   di dokumen yang sama, jadi tabrakan @keyframes dengannya tetap nyata dan tetap diperiksa.
+   Audit F28 (2026-09-23): teacher-shell.css dipasang FiezelTeacherShell.ensureCss() hanya di
+   mode guru/demo supaya murid tidak mengunduh 72 KB CSS guru di pembukaan pertama. */
+const DISUNTIK = {
+  'index.html': [path.join(__fzRoot, 'features', 'teacher', 'teacher-shell.css')]
+};
+assert(/teacher-shell\.css/.test(fs.readFileSync(path.join(__fzRoot, 'features', 'teacher', 'fiezel-teacher-shell.js'), 'utf8')),
+  'teacher-shell.css masih dipasang oleh fiezel-teacher-shell.js (ensureCss) - kalau tidak, daftar DISUNTIK basi');
 let totalNames = 0;
 const seen = new Map(); // dipakai pagar khusus di bawah: nama -> lokasi di index.html
 for (const page of PAGES) {
   const rel = path.relative(__fzRoot, page);
-  const sheets = linkedCss(page);
+  const sheets = linkedCss(page).concat(DISUNTIK[path.relative(__fzRoot, page)] || []);
   const inline = inlineCss(page);
   // Syaratnya BUKAN "harus menautkan berkas" melainkan "CSS halaman ini harus bisa dibaca".
   // Halaman yang mengirim CSS-nya inline tetap wajib terperiksa; halaman tanpa CSS sama
