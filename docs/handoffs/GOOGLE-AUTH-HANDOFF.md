@@ -1,5 +1,9 @@
 # Login Google: fondasi (skema + verifikasi token)
 
+> **Lanjutan m025-367:** tombol Google sekarang aksi utama tab Murid di layar masuk WAJIB, dan
+> `GET /api/auth/session` memberi tahu klien apakah cookie ini sudah masuk. Lihat
+> `AUTH-LOGIN-WAJIB-HANDOFF.md`.
+
 Otoritas: OWNER. Keputusan diambil 6 September 2026, dengan dua pilihan eksplisit:
 
 1. **Yang tidak punya Google mendaftar dengan akun FIEZEL biasa** — jalur `login_handle` +

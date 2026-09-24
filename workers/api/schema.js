@@ -58,6 +58,7 @@ export const BYTE_LIMITS = Object.freeze({
   // --- SLOT 12: login Google. ID token Google ~1-2 KB; cap 8 KB memberi ruang
   //     token panjang tanpa membuka pintu bagi badan besar yang tidak dipakai.
   '/api/auth/google': 8192,
+  '/api/auth/session': 512,                // GET — m025-367
   '/api/account/register': 1024,
   '/api/account/login': 1024,
   '/api/account/logout': 512,
@@ -93,6 +94,7 @@ export const BYTE_LIMITS = Object.freeze({
   '/api/teacher/class/list': 512,          // GET
   '/api/teacher/class/reports': 512,       // GET
   '/api/teacher/class/assign': 32768,      // 40 itemIds + 80 nama target + ≤40 soal kustom (class-hub) + amplop
+  '/api/teacher/class/retract': 512,       // { code, id } — m025-365
   // --- SLOT 7: lapisan sosial (route-social.js). Payload kecil = CPU kecil;
   // satu-satunya yang besar adalah evidence batch (maks 20 event, pola LIMITS
   // analytics 8KB — spec sosial §4.4.2).

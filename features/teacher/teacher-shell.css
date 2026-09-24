@@ -137,6 +137,11 @@ body.fz-teacher-mode #app{font-family:var(--tg-body)}
 .tg-toolbar{display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap}
 .tg-toolbar-actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
 .tg-tabs{display:flex;gap:6px;flex-wrap:wrap}
+/* m025-365 · siklus tugas guru: tab status, catatan, konfirmasi di tempat, kartu arsip. */
+.tg-life-tabs{margin:14px 0 4px}
+.tg-life-note{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin:8px 0 12px}.tg-life-note .tg-muted{margin:0;max-width:62ch}
+.tg-confirm{margin-top:12px;padding:12px 14px;border-radius:12px;background:var(--tg-brick-soft);color:var(--tg-text)}.tg-confirm p{margin:0;font-size:.88rem;line-height:1.45}.tg-confirm .tg-actions{margin-top:10px}
+.tg-assign.is-archived{background:var(--tg-paper)}.tg-assign.is-archived h3{font-size:1.02rem}
 .tg-tab{display:inline-flex;gap:8px;align-items:center;padding:8px 14px;border-radius:99px;border:1px solid var(--tg-line);background:transparent;font:inherit;font-size:.88rem;font-weight:600;cursor:pointer;color:var(--tg-muted);transition:background-color .18s,color .18s,border-color .18s}
 .tg-tab small{font-family:var(--tg-mono);font-size:.72rem;opacity:.75}
 .tg-tab.is-active{background:var(--tg-ink);color:#fff;border-color:var(--tg-ink)}.tg-tab.is-add{border-style:dashed}

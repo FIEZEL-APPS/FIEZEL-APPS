@@ -20,10 +20,14 @@ Owner menyerahkan empat keputusan ("kamu saja yang putuskan"). Yang dipakai:
 - **Tahap 1 — sisi murid (build `m025-364`, PR #464): SELESAI.**
   `features/class-hub/fiezel-class-hub.js` blok "SIKLUS HIDUP TUGAS MURID". Gerbang:
   `tests/kelasku-arsip-test.js`.
-- **Tahap 2 — sisi guru + server (build berikutnya): SEDANG DIKERJAKAN.** Rute
-  `POST /api/teacher/class/retract`, tarikan di kotak masuk murid, tab Aktif / Lewat
-  tenggat / Arsip di Ruang Guru, hapus hanya dari Arsip. Gerbang: `tests/kelasku-tarik-test.js`
-  + `tests/class-sync-test.js` §2b.
+- **Tahap 2 — sisi guru + server (build `m025-366`): SELESAI.** Rute
+  `POST /api/teacher/class/retract` (hanya guru pengirim; menimpa payload baris dengan
+  `{ t:'retract' }` dan menaikkan `updated_at`, jadi kursor murid yang ada membawanya tanpa
+  migrasi). Kotak masuk murid (`features/notify/fiezel-inbox.js` `tarik`) mengeluarkan tugas
+  dari antrean, mencatatnya di Arsip sebagai `oleh:'guru'`, dan `app.js` memberi satu toast
+  `notif.tugas-ditarik`. Ruang Guru: tab Aktif / Lewat tenggat / Arsip, Tarik dari murid,
+  hapus permanen hanya dari Arsip (dua langkah, tanpa `confirm()`). Gerbang:
+  `tests/kelasku-tarik-test.js` + `tests/class-sync-test.js` §2b.
 
 ## Kontrak data (jangan dipecah tanpa memperbarui kedua sisi)
 
@@ -37,6 +41,11 @@ Owner menyerahkan empat keputusan ("kamu saja yang putuskan"). Yang dipakai:
 
 ## Jebakan yang sudah ditemui
 
+- Tarikan menimpa payload yang sama, jadi baris tarikan TIDAK membawa `items`. Pembaca kotak
+  masuk harus memeriksa `t === 'retract'` sebelum menormalkan tugas, bukan sesudahnya.
+- Arsipkan-semua di Ruang Guru hanya menyentuh tugas yang terlihat di tab itu (mis. terfilter
+  kelas), bukan seluruh daftar — jangan melebarkannya ke tugas guru lain di perangkat bersama.
+
 - Tombol global `html.fiezel-ui-v6 body button:not(...)` (spesifisitas 0,13,3) menimpa gaya
   kontrol KelasKu. Kontrol datar diberi kelas `ch-plain` (sudah dikecualikan di `style.css`)
   dan selektor ber-awalan `.ch` supaya menang atas `body.fz-lux button` (0,1,2).
@@ -47,8 +56,7 @@ Owner menyerahkan empat keputusan ("kamu saja yang putuskan"). Yang dipakai:
 
 ## Langkah berikutnya (roadmap)
 
-1. Tahap 2 (di atas) — tarik tugas lewat server, arsip & hapus di Ruang Guru.
-2. Tahap 3 — lebur "Hasilku" ke tab Progres aplikasi, pakai ulang tugas dari Arsip guru,
+1. Tahap 3 — lebur "Hasilku" ke tab Progres aplikasi, pakai ulang tugas dari Arsip guru,
    arsip otomatis akhir semester.
-3. Uji dengan 3-5 murid sungguhan (Indonesia dan Thailand): minta mereka menemukan tugas
+2. Uji dengan 3-5 murid sungguhan (Indonesia dan Thailand): minta mereka menemukan tugas
    terdekat dan tugas yang terlewat tanpa bantuan.
