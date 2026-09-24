@@ -25,3 +25,20 @@ Whenever the user requests animation, motion graphics, character animation, or v
    - Spawning parallel sub-agents triggers provider concurrency rate limits (HTTP 429: "Rate limit exceeded").
 2. **Deterministic Step-by-Step Delivery**:
    - Complete tasks step-by-step: inspect -> modify -> test -> verify.
+
+## Google Stitch Collaboration Rules
+When the user brings a Google Stitch design:
+1. **Always ask for the code export** (`<>` Code view) first — it's the most reliable handoff method.
+2. **Convert HTML/Tailwind to React components** with proper hierarchy, props, and accessibility.
+3. **Enhance with animations**: scroll-triggered reveals, micro-interactions, parallax effects.
+4. **Organize exports** in `stitch-export/` directory, production code in `website/`.
+5. **Be specific in prompts**: Use exact color codes, font weights, spacing values — never "make it beautiful".
+
+## Vibe Coding Best Practices
+1. **Image-First Workflow**: Design images FIRST, then animate. Image-to-video gives more control than text-to-video.
+2. **Small Iterative Prompts**: Refine one section at a time, not the whole page.
+3. **Error-Paste Debugging**: Paste error logs directly back for fixes instead of manual debugging.
+4. **Design-First, Code-Second**: Always have a clear visual reference before writing code.
+
+## Git Protection Rule
+- **NEVER COMMIT OR PUSH REDESIGN**: Jangan pernah melakukan `git commit` maupun `git push` untuk seluruh aset, berkas, mockup, dan kode redesign ini ke repositori git tanpa perintah tertulis eksplisit dari pengguna. Seluruh hasil kerja tetap berada di lingkungan lokal/preview.

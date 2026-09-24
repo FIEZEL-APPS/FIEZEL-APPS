@@ -111,9 +111,9 @@ const UTANG_TANPA_PALET = [
   'assets/brand/mascot/paw-mascot-hello.svg',               // kuning tetangga, hanya .png-nya di mockups/
   'website/assets/brand/paw-mascot-hello.svg',              // kembar website dari yang di atas
 ];
-/* design/ adalah prototipe yang tidak pernah dimuat produksi (sama seperti pengecualian
-   di css-keyframe-uniq-test), jadi ia di luar lingkup, bukan utang. */
-const BUKAN_PRODUKSI = ['design/', 'node_modules/', 'vendor/'];
+/* design/ dan remotion/ adalah prototipe/studio video yang tidak pernah dimuat produksi
+   (sama seperti pengecualian di css-keyframe-uniq-test dan deploy/site-exclude.txt), jadi di luar lingkup. */
+const BUKAN_PRODUKSI = ['design/', 'node_modules/', 'vendor/', 'remotion/'];
 
 test('inventaris: tidak ada SVG karakter yang tak bernama — lulus palet, atau tercatat sebagai utang', () => {
   const ditemukan = [];
