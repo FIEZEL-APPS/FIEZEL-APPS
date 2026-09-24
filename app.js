@@ -511,6 +511,10 @@ function friendlySkillName(skill){
 function difficultyLabel(d){return({1:FiezelI18n.t('diff.dasar'),2:FiezelI18n.t('diff.dasar'),3:FiezelI18n.t('diff.menengah'),4:FiezelI18n.t('diff.menengah'),5:FiezelI18n.t('diff.lanjut'),6:FiezelI18n.t('diff.lanjut')})[Number(d)]||''}
 function grammarFamilyLabel(item){return GRAMMAR_FAMILY_LABELS[item?.[6]]||FiezelI18n.t('grammar.keluarga-fallback')}
 function grammarRuleIndonesian(item){return GRAMMAR_FAMILY_RULES[item?.[6]]||GRAMMAR_FAMILY_RULES.core_grammar}
+/* Audit F10: intro materi mengajarkan ATURAN topiknya (explanation.ruleId per template, 328/328
+   terisi id; overlay Thai menulis slot yang sama), bukan strategi umum per keluarga yang dulu
+   dipakai bersama puluhan materi. Strategi keluarga tetap jadi cadangan bila aturannya kosong. */
+function grammarLessonRule(item){try{const r=String(grammarMeta(item).rule||'').trim();if(r)return r}catch(_){}return grammarRuleIndonesian(item)}
 function grammarClue(base){const text=String(base||'');const hit=text.match(/\b(look|now|right now|every day|usually|always|yesterday|last [a-z]+|in \d{4}|since|for \d+|tomorrow|next [a-z]+|already|yet|if|unless|than|said|told|must|should|might|because|although)\b/i)?.[0];return hit?FiezelI18n.t('grammar.petunjuk-clue',{petunjuk:hit}):FiezelI18n.t('grammar.petunjuk-umum')}
 /**
  * Diagnosis Indonesia untuk tiap nama miskonsepsi di bank soal.
@@ -6590,7 +6594,7 @@ function startNotificationInvitation(){
 // sudah menjaga diri sendiri (sekali per hari / sekali selesai) lewat pemeriksaan di dalam
 // modulnya masing-masing.
 let pendingAfterGate=null;let pendingAfterGateFn=null;/* v06 2026-08-29: penundaan generik \u2014 kuis apa pun yang diminta saat gerbang akun menutup layar dijalankan ulang setelah gerbang selesai/dilewati. */
-function afterOnboardingExit(action){
+function afterOnboardingExit(action){try{prefetchPlacementListening()}catch(_){}
   if(isVerifiedTeacher()){
     if(state.view!=='tutor')go('tutor');
     return;
@@ -10344,7 +10348,7 @@ function grammarLessonHelpMarkup(skill){
 }
 function openGrammarLessonHelp(skill){const html=grammarLessonHelpMarkup(skill);if(html)openModal(html);return !!html}
 window.openGrammarLessonHelp=openGrammarLessonHelp;
-function renderGrammarLesson(skill){const meta=GRAMMAR_ITEMS.find(x=>x.skill===skill);if(!meta||meta.level!==getActiveLevel())return showToast(FiezelI18n.t('grammar.lesson-hanya-tersedia-pada-level',{level:getActiveLevel()}));const lessonUnlock=lessonUnlockState(skill,state,bktMasteredSkills());if(lessonUnlock.locked)return showToast(lessonLockMessage(lessonUnlock));const arr=G[skill]||[];if(!arr.length)return showToast(FiezelI18n.t('grammar.lesson-belum-memiliki-materi'));const item=arr[0],base=item[0],opts=item[1]||[],correct=opts[item[2]],rule=grammarRuleIndonesian(item),clue=grammarClue(base),curriculum=grammarCurriculumEntry(skill)||meta;const prereq=Array.isArray(curriculum.prerequisites)&&curriculum.prerequisites.length?FiezelI18n.t('grammar.prasyarat-2',{join:curriculum.prerequisites.map(friendlySkillName).join(', ')}):FiezelI18n.t('grammar.lesson-fondasi-pertama');/* 2026-08-31 (permintaan OWNER: "design ulang bagian grammar seperti listening"):
+function renderGrammarLesson(skill){const meta=GRAMMAR_ITEMS.find(x=>x.skill===skill);if(!meta||meta.level!==getActiveLevel())return showToast(FiezelI18n.t('grammar.lesson-hanya-tersedia-pada-level',{level:getActiveLevel()}));const lessonUnlock=lessonUnlockState(skill,state,bktMasteredSkills());if(lessonUnlock.locked)return showToast(lessonLockMessage(lessonUnlock));const arr=G[skill]||[];if(!arr.length)return showToast(FiezelI18n.t('grammar.lesson-belum-memiliki-materi'));const item=arr[0],base=item[0],opts=item[1]||[],correct=opts[item[2]],rule=grammarLessonRule(item),clue=grammarClue(base),curriculum=grammarCurriculumEntry(skill)||meta;const prereq=Array.isArray(curriculum.prerequisites)&&curriculum.prerequisites.length?FiezelI18n.t('grammar.prasyarat-2',{join:curriculum.prerequisites.map(friendlySkillName).join(', ')}):FiezelI18n.t('grammar.lesson-fondasi-pertama');/* 2026-08-31 (permintaan OWNER: "design ulang bagian grammar seperti listening"):
      layar materi memakai resep yang sama dengan sesi Listening, dan alasannya sama.
      Yang berdiri di sini dulu adalah shell(judul, subjudul) - dan judulnya DICETAK DUA
      KALI: sekali sebagai hero halaman, sekali lagi sebagai <h2 class="lesson-title"> di
@@ -10377,6 +10381,11 @@ function buildGrammarLessonQuestions(skill,count=GRAMMAR_SESSION_SIZE){const met
   const shift=own.length>1?1:0;
   for(let variant=0;variant<GRAMMAR_PRACTICE_MODES.length&&unique.length<count;variant++)for(let i=0;i<own.length;i++)if(take(makeGrammarQuestion(skill,own[(variant+i+shift)%own.length],variant,skill)))break;
   for(let variant=0;variant<GRAMMAR_PRACTICE_MODES.length&&unique.length<count;variant++)for(const item of own){if(unique.length>=count)break;take(makeGrammarQuestion(skill,item,variant,skill))}
+  /* Audit F10: materi dengan SATU template memakai kalimatnya sebagai contoh di intro; kartu
+     yang memajang kalimat contoh itu apa adanya dipindah ke akhir sesi, jadi soal 1 bukan
+     contoh yang jawabannya baru saja ditunjukkan. */
+  const exampleStem=String(own[0]?.[0]||'').replace(/\s+/g,' ').trim().toLowerCase();
+  if(exampleStem&&unique.length>1){const idx=unique.findIndex(q=>String(q.question||'').replace(/\s+/g,' ').trim().toLowerCase().includes(exampleStem));if(idx===0)unique.push(unique.shift())}
   return unique}
 function practiceSkill(skill){if((GRAMMAR_ITEMS.find(x=>x.skill===skill)?.level||'')!==getActiveLevel())return showToast(FiezelI18n.t('grammar.pilih-lesson-terlebih-dahulu',{level:getActiveLevel()}));const unlock=lessonUnlockState(skill,state,bktMasteredSkills());if(unlock.locked)return showToast(lessonLockMessage(unlock));const questions=buildGrammarLessonQuestions(skill,GRAMMAR_SESSION_SIZE);if(questions.length<GRAMMAR_SESSION_SIZE)return showToast(FiezelI18n.t('grammar.lesson-new-memiliki-item-valid',{jumlahSoal:questions.length}));quizLoop({type:'grammar',count:GRAMMAR_SESSION_SIZE,pool:questions,factory:item=>item,preserveOrder:true})}
 /* ---- Sesi Kilat: 10 soal grammar campuran lintas lesson satu level ----------------------
@@ -10908,6 +10917,13 @@ async function loadPlacementListening(){
 // prasyarat, dan tes tetap boleh jalan tanpa listening (lihat guard `floor` di startPlacement).
 function prefetchPlacementListening(){
   if(placementListeningBank||placementListeningInflight)return;
+  /* Audit F28: 1,8 MB ini tidak boleh ikut terunduh saat murid baru masih di layar perkenalan
+     (belum memilih apa pun), tidak ada gunanya bila tes awal sudah selesai, dan dihormati
+     pilihan hemat data. afterOnboardingExit() memanggil ulang fungsi ini begitu perkenalan
+     ditutup, jadi tes awal tetap mendapat banknya lebih dulu. */
+  try{if(state?.placementDone)return}catch(_){}
+  try{if(navigator?.connection?.saveData)return}catch(_){}
+  try{if(self.FiezelOnboarding?.completed&&!self.FiezelOnboarding.completed(self))return}catch(_){}
   const run=()=>{try{loadPlacementListening()?.catch?.(()=>{})}catch{}};
   if(typeof window!=='undefined'&&typeof window.requestIdleCallback==='function')window.requestIdleCallback(run,{timeout:6000});
   else setTimeout(run,1500);
@@ -12372,7 +12388,10 @@ function tutorCenterView(){
   const shell=self.FiezelTeacherShell;
   if(shell&&self.FiezelTeacherStore){
     setApp('<div id="fzTeacherShell" class="teacher-shell-root"></div>');
-    shell.mount($('fzTeacherShell'),{
+    /* F28: shell guru kini dimuat malas (features/teacher/fiezel-teacher-loader.js), jadi mount
+       bisa berupa janji. Bila modul penuh gagal diunduh, jatuh ke Tutor Action Center di bawah
+       alih-alih meninggalkan layar kosong. */
+    const mounted=shell.mount($('fzTeacherShell'),{
       toast:showToast,
       afterRender:refreshIcons,
       exit:(opts)=>{
@@ -12414,6 +12433,7 @@ function tutorCenterView(){
         go('home');
       }
     });
+    if(mounted&&typeof mounted.catch==='function')mounted.catch(()=>{try{if(self.FiezelTeacherShell?.__lazy)self.FiezelTeacherShell=null}catch(_){}if(state.view==='tutor')render()});
     return;
   }
   setApp('<div id="fzTutorCenter" class="tutor-center-shell"></div>');
@@ -12500,10 +12520,10 @@ function progress(){
     kedua modul itu diganti SATU kalimat yang menjelaskan kapan mereka muncul. */
  const progressFresh=!(Array.isArray(state.history)&&state.history.length);
  const tabContent={
-  overview:`<div class="grid">${cefrRoadmapMarkup()}${weeklyActivityChartMarkup()}${nextSessionPanelMarkup()}${uxOn('personalJourneyTab')?journeyMarkup():''}${socialSummaryCardMarkup()}<div><h3>${FiezelI18n.t('progress.peta-study')}</h3>${mapCards}</div>
+  overview:`<div class="grid">${cefrRoadmapMarkup()}${weeklyActivityChartMarkup()}${nextSessionPanelMarkup()}${uxOn('personalJourneyTab')?journeyMarkup():''}${socialSummaryCardMarkup()}${/* Audit F15: modul kosong disembunyikan sampai ada bukti; murid baru membaca ringkasan di atas + satu kalimat di bawah, bukan belasan 0%. */progressFresh?'':`<div><h3>${FiezelI18n.t('progress.peta-study')}</h3>${mapCards}</div>`}
    ${uxOn('personalJourneyTab')?'':progressFresh?card(`<h3>${FiezelI18n.t('progress.modul-menunggu-judul')}</h3><p class="muted">${FiezelI18n.t('progress.modul-menunggu-isi')}</p>`):card(`<h3>${FiezelI18n.t('progress.readiness-heading')}</h3>${academicReadinessMarkup()}`)+card(`<h3>${FiezelI18n.t('progress.skills-heading')}</h3>${unifiedSkillsMarkup()}`)}
-   ${card(`<h3>${FiezelI18n.t('progress.ulangan-pintar')}</h3>${due.length?due.map(([k,x])=>`<div class="row"><span>${esc(friendlySkillName(k))}</span><span>${FiezelI18n.t('progress.dikuasai-risiko-lupa',{mastery:x.mastery||0,x:Math.round(forgettingProbability(x)*100)})}</span></div>`).join('<hr>')+`<div style="margin-top:12px"><button class="primary" onclick="reviewVocab()"><i data-lucide="history"></i> ${FiezelI18n.t('progress.mulai-review-btn',{jumlah:due.length})}</button></div>`:'<p class="muted">'+FiezelI18n.t('progress.belum-ada-materi-perlu-diulang')+'</p>'}`)}
-   ${card(`<h3>${FiezelI18n.t('progress.prasasti-judul')}</h3><p class="muted">${FiezelI18n.t('progress.lencana-bukti-study-redup-menunjukkan')}</p>${prasastiGalleryMarkup()}`,'prasasti-gallery-card')}
+   ${progressFresh&&!due.length?'':card(`<h3>${FiezelI18n.t('progress.ulangan-pintar')}</h3>${due.length?due.map(([k,x])=>`<div class="row"><span>${esc(friendlySkillName(k))}</span><span>${FiezelI18n.t('progress.dikuasai-risiko-lupa',{mastery:x.mastery||0,x:Math.round(forgettingProbability(x)*100)})}</span></div>`).join('<hr>')+`<div style="margin-top:12px"><button class="primary" onclick="reviewVocab()"><i data-lucide="history"></i> ${FiezelI18n.t('progress.mulai-review-btn',{jumlah:due.length})}</button></div>`:'<p class="muted">'+FiezelI18n.t('progress.belum-ada-materi-perlu-diulang')+'</p>'}`)}
+   ${card(`<details class="prasasti-fold"${progressFresh?'':' open'}><summary><h3>${FiezelI18n.t('progress.prasasti-judul')}</h3><i data-lucide="chevron-down" aria-hidden="true"></i></summary><p class="muted">${FiezelI18n.t('progress.lencana-bukti-study-redup-menunjukkan')}</p>${prasastiGalleryMarkup()}</details>`,'prasasti-gallery-card')}
    </div>`,
   analysis:`<div class="grid">
    ${card(`<h3>${FiezelI18n.t('progress.lab-kesalahan')}</h3>${patterns.length?patterns.map(x=>`<div class="row"><span>${esc(friendlySkillName(x.key))}</span><b>${FiezelI18n.t('progress.salah',{errors:x.errors,rate:Math.round(x.rate*100)})}</b></div>${x.common?`<p class="muted">${FiezelI18n.t('progress.pilihan-paling-sering-muncul-kali',{common:esc(x.common),count:x.count})}</p>`:''}`).join('<hr>'):'<p class="muted">'+FiezelI18n.t('progress.belum-ada-pola-kesalahan-berulang')+'</p>'}`)}

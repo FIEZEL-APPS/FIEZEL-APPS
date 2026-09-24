@@ -244,11 +244,42 @@
      melainkan menunda evaluasinya: keduanya kini fungsi yang dipanggil saat render.
      JANGAN mengubahnya kembali menjadi konstanta. Dijaga
      tests/teacher-i18n-lazy-test.js. */
+  /* Audit F25: SATU lapis navigasi. Dulu sidebar 7 butir ditambah 6 tab di dalam Ruang Kelas,
+     dengan tujuan tumpang tindih ("Kelas & Siswa" vs "Kelas Saya", "Tugas & Ujian" vs
+     "Tugas" + "Buat Tugas"). Kini tab hub disembunyikan di Ruang Guru dan tujuan yang unik
+     di hub (hasil per tugas, saran otomatis, kurikulum) menjadi butir sidebar biasa: elemen
+     keempat = tab hub yang dibuka. Setiap tujuan muncul tepat sekali. */
   function navItems() {
-    return [['hub', t('guru.nav-ruang-kelas', 'Ruang Kelas'), 'school'], ['briefing', t('guru.nav-ringkasan', 'Ringkasan Hari Ini'), 'sunrise'], ['classes', t('guru.tab-kelas-siswa', 'Kelas & Siswa'), 'users'], ['assignments', t('guru.tab-tugas-ujian', 'Tugas & Ujian'), 'clipboard-list'], ['insights', t('guru.judul-analitik', 'Analitik'), 'activity'], ['comms', t('guru.nav-komunikasi', 'Komunikasi'), 'megaphone'], ['journal', t('guru.tab-jurnal', 'Jurnal Guru'), 'notebook-pen']];
+    var list = [
+      ['hub', t('guru.nav-ruang-kelas', 'Ruang Kelas'), 'school', 'kelas'],
+      ['briefing', t('guru.nav-ringkasan', 'Ringkasan Hari Ini'), 'sunrise'],
+      ['classes', t('guru.nav-siswa', 'Siswa'), 'users'],
+      ['assignments', t('guru.tab-tugas-ujian', 'Tugas & Ujian'), 'clipboard-list'],
+      ['hub', t('guru.nav-hasil-tugas', 'Hasil per tugas'), 'bar-chart-3', 'hasil'],
+      ['insights', t('guru.nav-analitik-kelas', 'Analitik kelas'), 'activity'],
+      ['hub', t('guru.nav-saran', 'Saran otomatis'), 'brain', 'braincore']
+    ];
+    try { if (konsolKurikulumSiap()) list.push(['hub', t('guru.nav-kurikulum', 'Kurikulum & Kompetensi'), 'compass', 'kurikulum']); } catch (_) {}
+    list.push(['comms', t('guru.nav-komunikasi', 'Komunikasi'), 'megaphone'], ['journal', t('guru.tab-jurnal', 'Jurnal Guru'), 'notebook-pen']);
+    return list;
+  }
+  function hubTab() {
+    try { return (root.FiezelClassHub && root.FiezelClassHub._teacherUi && root.FiezelClassHub._teacherUi().tab) || 'kelas'; } catch (_) { return 'kelas'; }
+  }
+  /** Butir nav aktif: view sama, dan untuk butir hub juga tab hubnya sama. Tab hub yang tidak
+   *  punya butir sendiri (tugas, buat) tetap menandai "Ruang Kelas". */
+  function navActive(n) {
+    if (st.view !== n[0]) return false;
+    if (n[0] !== 'hub') return true;
+    var tab = hubTab(), own = { hasil: 1, braincore: 1, kurikulum: 1 };
+    return own[tab] ? n[3] === tab : n[3] === 'kelas';
+  }
+  function navAttrs(n) {
+    return 'data-tg="view" data-view="' + n[0] + '"' + (n[3] ? ' data-hub-tab="' + n[3] + '"' : '') +
+      ' data-testid="tg-nav-' + n[0] + (n[3] && n[3] !== 'kelas' ? '-' + n[3] : '') + '"';
   }
   function viewTitles() {
-    return { hub: t('guru.judul-ruang-kelas', 'Ruang Kelas — guru, murid, dan hasil belajar dalam satu layar'), briefing: t('guru.judul-ringkasan', 'Ringkasan hari ini'), classes: t('guru.tab-kelas-siswa', 'Kelas & Siswa'), assignments: t('guru.tab-tugas-ujian', 'Tugas & Ujian'), insights: t('guru.judul-analitik', 'Analitik — siapa yang perlu dibantu'), comms: t('guru.nav-komunikasi', 'Komunikasi'), journal: t('guru.tab-jurnal', 'Jurnal Guru'), settings: t('guru.tab-profil', 'Profil Guru'), curriculum: t('guru.nav-kurikulum', 'Kurikulum & Materi') };
+    return { hub: t('guru.judul-ruang-kelas', 'Ruang Kelas — guru, murid, dan hasil belajar dalam satu layar'), briefing: t('guru.judul-ringkasan', 'Ringkasan hari ini'), classes: t('guru.nav-siswa', 'Siswa'), assignments: t('guru.tab-tugas-ujian', 'Tugas & Ujian'), insights: t('guru.judul-analitik', 'Analitik — siapa yang perlu dibantu'), comms: t('guru.nav-komunikasi', 'Komunikasi'), journal: t('guru.tab-jurnal', 'Jurnal Guru'), settings: t('guru.tab-profil', 'Profil Guru'), curriculum: t('guru.nav-kurikulum', 'Kurikulum & Materi') };
   }
   /* Tanggal di kepala dasbor dulu dipaku 'id-ID', jadi murid Thai membaca
      "SENIN, 21 SEPTEMBER" di atas judul berbahasa Thai. Locale-nya kini ikut i18n. */
@@ -3207,7 +3238,7 @@
     return '<aside class="tg-side"><div class="tg-brand"><span class="tg-brand-mark">K</span><div class="kelasku-brand"><span class="kelasku-main">KelasKu</span> <span class="kelasku-tag">' + esc(t('guru.merek-tag', 'untuk Guru')) + '</span></div></div>' +
       '<button type="button" class="tg-teacher" data-tg="view" data-view="settings" data-testid="tg-profile">' + icon('user-round') + '<div><b>' + esc(st.teacher.name || accountHandle() || t('guru.nama-default', 'Guru FIEZEL')) + '</b><small>' + esc(st.teacher.school || t('guru.atur-profil', 'Atur profil →')) + '</small></div></button>' +
       (st.classes.length ? '<label class="tg-class-switch">' + t('guru.kelas-aktif', 'Kelas aktif') + '<select data-tg-select="class" data-testid="tg-class-select">' + st.classes.map(function (k) { return '<option value="' + k.id + '"' + (c && k.id === c.id ? ' selected' : '') + '>' + esc(k.name) + '</option>'; }).join('') + '</select></label>' : '') +
-      '<nav class="tg-nav">' + navItems().map(function (n) { return '<button type="button" class="tg-nav-item' + (st.view === n[0] ? ' is-active' : '') + '" data-tg="view" data-view="' + n[0] + '" data-testid="tg-nav-' + n[0] + '">' + icon(n[2]) + '<span>' + n[1] + '</span></button>'; }).join('') + '</nav>' +
+      '<nav class="tg-nav">' + navItems().map(function (n) { return '<button type="button" class="tg-nav-item' + (navActive(n) ? ' is-active' : '') + '" ' + navAttrs(n) + (navActive(n) ? ' aria-current="page"' : '') + '>' + icon(n[2]) + '<span>' + n[1] + '</span></button>'; }).join('') + '</nav>' +
       /* BUTIR NAV "Kurikulum & Kompetensi" DICABUT DARI SIDEBAR (m025-357, instruksi owner).
          ===================================================================================
          Ia dulu butir nav kedelapan yang membuka layar tersendiri, dan layar itu isinya
@@ -3227,7 +3258,7 @@
     var d = new Date();
     var scope = '';
     try { scope = subjectScopeBadge(); } catch (_) { scope = ''; }
-    return '<header class="tg-top"><div><p class="tg-kicker">' + esc(d.toLocaleDateString(bcp47(), { weekday: 'long', day: 'numeric', month: 'long' })) + '</p><h1>' + esc(st.classes.length ? (viewTitles()[st.view] || t('guru.merek-penuh', 'KelasKu untuk Guru')) : t('guru.merek-penuh', 'KelasKu untuk Guru')) + '</h1>' + scope + '</div>' +
+    return '<header class="tg-top"><div><p class="tg-kicker">' + esc(d.toLocaleDateString(bcp47(), { weekday: 'long', day: 'numeric', month: 'long' })) + '</p><h1>' + esc(st.classes.length ? ((st.view === 'hub' && ({ hasil: 1, braincore: 1, kurikulum: 1 })[hubTab()] ? (navItems().filter(function (n) { return navActive(n); })[0] || [])[1] : viewTitles()[st.view]) || t('guru.merek-penuh', 'KelasKu untuk Guru')) : t('guru.merek-penuh', 'KelasKu untuk Guru')) + '</h1>' + scope + '</div>' +
       '<div class="tg-top-actions">' + (c ? syncChip(c) + '<button type="button" class="tg-chip tg-code" data-tg="copy" data-text="' + esc(c.code) + '" title="Salin kode kelas" data-testid="tg-class-code">' + icon('hash') + '<span>' + esc(c.code) + '</span></button>' : '') + bell() + (c ? '<button type="button" class="tg-btn is-ghost" data-tg="modal" data-kind="board" data-testid="tg-open-board">' + icon('presentation') + '<span>Mode papan</span></button><button type="button" class="tg-btn is-primary" data-tg="modal" data-kind="assign" data-testid="tg-quick-assign">' + icon('plus') + '<span>' + t('guru.tugas-baru', 'Tugas baru') + '</span></button>' : '') + '</div></header>' + inboxPanel();
   }
   function bell() {
@@ -3249,12 +3280,12 @@
      memakai delegasi data-tg="view" yang sama). Sidebar desktop tidak berubah. */
   function mobileNav() {
     var items = navItems(), main = items.slice(0, 4), rest = items.slice(4);
-    var restActive = rest.some(function (n) { return st.view === n[0]; });
+    var restActive = rest.some(function (n) { return navActive(n); });
     return '<nav class="tg-mnav">' + main.map(function (n) {
-      return '<button type="button" class="' + (st.view === n[0] ? 'is-active' : '') + '" data-tg="view" data-view="' + n[0] + '">' + icon(n[2]) + '<span>' + n[1].split(' ')[0] + '</span></button>';
+      return '<button type="button" class="' + (navActive(n) ? 'is-active' : '') + '" ' + navAttrs(n) + '>' + icon(n[2]) + '<span>' + n[1].split(' ')[0] + '</span></button>';
     }).join('') +
     (rest.length ? '<details class="tg-mnav-more' + (restActive ? ' is-active' : '') + '"><summary>' + icon('more-horizontal') + '<span>' + esc(t('guru.nav-lainnya', 'Lainnya')) + '</span></summary><div class="tg-mnav-sheet">' + rest.map(function (n) {
-      return '<button type="button" class="' + (st.view === n[0] ? 'is-active' : '') + '" data-tg="view" data-view="' + n[0] + '">' + icon(n[2]) + '<span>' + esc(n[1]) + '</span></button>';
+      return '<button type="button" class="' + (navActive(n) ? 'is-active' : '') + '" ' + navAttrs(n) + '>' + icon(n[2]) + '<span>' + esc(n[1]) + '</span></button>';
     }).join('') + '</div></details>' : '') +
     /* Nav ponsel mengikuti sidebar: butir kurikulum dicabut dari sini juga (m025-357).
        Menyisakannya berarti ponsel punya pintu ke view yang sudah tidak ada lagi. */
@@ -4417,6 +4448,10 @@
     switch (act) {
       case 'view':
         st.view = btn.getAttribute('data-view');
+        if (btn.getAttribute('data-hub-tab')) {
+          try { root.FiezelClassHub._teacherUi().tab = btn.getAttribute('data-hub-tab'); } catch (_) {}
+          if (btn.getAttribute('data-hub-tab') === 'kurikulum') { try { bukaPanelKurikulum(); } catch (_) {} }
+        }
         if (btn.getAttribute('data-skill')) ui.insightSkill = btn.getAttribute('data-skill');
         ui.modal = null; ui.drawer = null; ui.filter = '';
         if (st.view === 'owner_tokens' && !ui.ownerInvites && !ui.ownerLoading) {

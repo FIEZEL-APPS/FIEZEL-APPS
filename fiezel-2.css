@@ -1,13 +1,6 @@
 /* FIEZEL 2.0 — lapisan redesign (dimuat SETELAH style.css & fiezel-lux.css).
    Prinsip: token dulu, komponen kemudian. Maskot PAW tidak disentuh. */
-:root{
-  --radius-xl:34px;--radius-lg:28px;--radius-md:22px;--radius-sm:18px;--radius-xs:14px;
-  --shadow-sm:0 6px 16px rgba(46,39,36,.06);--shadow-md:0 14px 32px rgba(46,39,36,.07);--shadow-lg:0 20px 44px rgba(46,39,36,.10);
-  --fz-display:'FZ Plus Jakarta Sans',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
-  --maroon:#9B3A4A;--maroon-deep:#7E2D3B;--maroon-soft:#F6E9EB;
-  --pz-sky:#D8E8F4;--pz-sky-line:#C7DCEC;--pz-sky-ink:#2A566F;
-  --lift-sun:0 8px 18px rgba(155,58,74,.18);--lift-ink:0 10px 24px rgba(46,39,36,.16);--lift-line:0 4px 12px rgba(46,39,36,.06);
-}
+/* F17: token lapisan ini pindah ke :root tunggal di style.css (satu sumber token). */
 html[lang="th"]{--fz-display:'Noto Sans Thai Looped','FZ Plus Jakarta Sans',-apple-system,sans-serif}
 body{letter-spacing:-.005em}
 
@@ -392,3 +385,27 @@ html body .ja-kana .kana-tab[aria-selected="true"]{background:var(--accent);colo
 .ja-quiz-display{display:flex;justify-content:center;margin:8px 0 2px}
 .ja-quiz-display .ja-display{margin:0}
 body.fz-ja-no-romaji .ja-run{display:inline}
+
+/* ==== Audit F21: desktop bukan ponsel yang dilebarkan (≥1100px) ====
+   Kolom konten melebar, rel navigasi kiri MENEMPEL ke tepi kolom (bukan mengambang di tepi
+   layar), Home menjadi dua kolom: kartu Hari ini di kiri (menempel saat digulir), rencana +
+   latihan singkat + sosial di kanan. Layar baca/kuis tetap sempit supaya panjang baris nyaman. */
+@media (min-width:1100px){
+  html.fiezel-ui-v6 body.fz-lux .app{max-width:1240px;padding-left:136px;padding-right:32px}
+  html.fiezel-ui-v6 body.fz-lux .bottomnav{left:max(20px,calc(50% - 620px + 28px));top:112px;transform:none}
+  .today-home-cockpit{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);column-gap:28px;align-items:start}
+  .today-home-cockpit>*{grid-column:2;min-width:0}
+  .today-home-cockpit>.paw-hero-cockpit{grid-column:1/-1}
+  .today-home-cockpit>.today-card{grid-column:1;grid-row:2/span 12;position:sticky;top:88px;align-self:start;width:100%;max-width:none;margin-left:0;margin-right:0;box-sizing:border-box}
+  .quiz-shell,.lesson-page,.reading-stage{max-width:780px;margin-left:auto;margin-right:auto}
+  .learning-launcher{grid-template-columns:repeat(3,minmax(0,1fr))}
+  #app .stats:has(> :nth-child(5):last-child){grid-template-columns:repeat(5,minmax(0,1fr))}
+}
+/* Audit F15: galeri Prasasti terlipat untuk murid baru (lencana redup semua), terbuka bagi yang sudah punya riwayat. */
+.prasasti-fold>summary{display:flex;align-items:center;justify-content:space-between;gap:10px;cursor:pointer;list-style:none;min-height:44px}
+.prasasti-fold>summary::-webkit-details-marker{display:none}
+.prasasti-fold>summary h3{margin:0}
+.prasasti-fold>summary svg,.prasasti-fold>summary i{transition:transform .2s ease;flex:none}
+.prasasti-fold[open]>summary svg,.prasasti-fold[open]>summary i{transform:rotate(180deg)}
+@media (prefers-reduced-motion:reduce){.prasasti-fold>summary svg,.prasasti-fold>summary i{transition:none}}
+@media (max-width:1099px){#app .stats > :nth-child(5):last-child:nth-child(odd){grid-column:1/-1}}

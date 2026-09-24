@@ -686,3 +686,6 @@ html.fiezel-ui-v6 body.fz-teacher-mode .tg button.tg-seg-btn:not(.primary):not(.
 .tg-more>summary{list-style:none;cursor:pointer}
 .tg-more>summary::-webkit-details-marker{display:none}
 .tg-more .tg-more-menu{position:absolute;right:0;top:calc(100% + 6px);z-index:5;padding:6px;border-radius:12px;background:var(--tg-paper-2);border:1px solid var(--tg-line);box-shadow:var(--tg-shadow)}
+/* Audit F25: satu lapis navigasi. Di Ruang Guru tab hub disembunyikan; sidebar (desktop) dan
+   nav bawah (ponsel) membuka tab hub lewat data-hub-tab. */
+.tg .ch-tabs.is-teacher{display:none}

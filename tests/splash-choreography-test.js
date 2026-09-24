@@ -319,7 +319,9 @@ test('wajah bulat dirujuk, dibatasi ke display, dan menjauhi wordmark', () => {
 });
 
 test('serif display dipakai di ukuran besar saja, dengan berat yang benar-benar ada', () => {
-  assert.ok(/--fz-display:'FZ Instrument Serif'/.test(css), 'token display harus ada');
+  // audit F17: :root kini tunggal; nilai pemenang cascade (Plus Jakarta) yang tersisa, serif tetap
+  // hidup di rantai --fz-display (mis. blok Thai), jadi cukup dituntut ada di sebuah token display.
+  assert.ok(/--fz-display:[^;]*'FZ Instrument Serif'/.test(css), 'token display harus ada');
   assert.ok(fs.existsSync(path.join(root, 'assets/fonts/InstrumentSerif-400.woff2')), 'berkas font display harus ada');
   const rule = /\.section-head h1,\.welcome-panel h2,[^{]*\{([^}]*)\}/.exec(css);
   assert.ok(rule, 'aturan display tidak ditemukan');

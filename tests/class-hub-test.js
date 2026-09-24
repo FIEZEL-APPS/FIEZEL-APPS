@@ -129,11 +129,15 @@ test('wiring: tab Kelas → classHubView; notifikasi tugas membuka Kelas; tutor 
      membaca 'Kelas'. Yang dijaga gerbang ini tetap sama persis — entri nav 'hub' dengan
      ikon 'school' dan pemasangan mountTeacher — hanya bentuk labelnya yang tidak lagi
      dibekukan sebagai literal Indonesia. */
-  assert.ok(/\['hub',[^\]]*'school'\]/.test(shell) && /FiezelClassHub\.mountTeacher\(hubEl/.test(shell), 'Ruang Guru memasang hub');
+  assert.ok(/\['hub',[^\]]*'school'(, 'kelas')?\]/.test(shell) && /FiezelClassHub\.mountTeacher\(hubEl/.test(shell), 'Ruang Guru memasang hub');
   assert.ok(/st\.view = 'hub'; st\.hubSeen = true/.test(shell), 'hub landing default sekali');
   const html = read('index.html');
   ['features/class-hub/fiezel-braincore-review.js', 'features/class-hub/fiezel-class-hub.js', 'features/class-hub/class-hub.css'].forEach((f) => assert.ok(html.includes(f), f + ' dimuat'));
-  assert.ok(html.indexOf('fiezel-class-hub.js') < html.indexOf('fiezel-teacher-shell.js'), 'hub sebelum teacher-shell');
+  // F28: teacher-shell kini dimuat malas oleh fiezel-teacher-loader.js SETELAH boot, jadi hub
+  // (tag defer statis) selalu sudah terurai saat shell tiba. Yang dijaga: hub tetap statis,
+  // pemuat ada, dan shell tidak kembali menjadi tag boot.
+  assert.ok(html.indexOf('fiezel-class-hub.js') > 0 && html.indexOf('fiezel-class-hub.js') < html.indexOf('fiezel-teacher-loader.js'), 'hub dimuat sebelum pemuat guru');
+  assert.ok(html.indexOf('features/teacher/fiezel-teacher-shell.js') < 0, 'teacher-shell tidak lagi dimuat saat boot (F28)');
   const sw = read('sw.js');
   ['features/class-hub/fiezel-braincore-review.js', 'features/class-hub/fiezel-class-hub.js', 'features/class-hub/class-hub.css'].forEach((f) => assert.ok(sw.includes(f), f + ' di precache'));
   const hub = read('features/class-hub/fiezel-class-hub.js');
