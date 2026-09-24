@@ -8242,13 +8242,13 @@ function todayHomeMarkup(){
 }
 function jaChokaiHomeBannerMarkup(){
   if(!jaCourseOn())return '';
-  return `<div class="card ja-chokai-banner" onclick="openListeningPanel()" role="button" tabindex="0" aria-label="Latihan Chōkai JLPT N5 dan N4" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openListeningPanel();}">
+  return `<div class="card ja-chokai-banner" onclick="openListeningPanel()" role="button" tabindex="0" aria-label="Chōkai JLPT N5 / N4" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openListeningPanel();}">
     <div class="ja-chokai-banner-left">
       <span class="ja-chokai-banner-icon" aria-hidden="true">🎧</span>
       <div>
-        <span class="ja-chokai-banner-eyebrow">Resmi Japan Foundation &amp; JEES</span>
+        <span class="ja-chokai-banner-eyebrow">Japan Foundation &amp; JEES</span>
         <b class="ja-chokai-banner-title">Listening &amp; Chōkai (JLPT N5 &amp; N4)</b>
-        <span class="ja-chokai-banner-sub">30 Soal Interaktif + Audio &amp; Kunci Jawaban</span>
+        <span class="ja-chokai-banner-sub">30 Item Interaktif + Audio JEES</span>
       </div>
     </div>
     <button type="button" class="today-cta-soft ja-chokai-btn" onclick="event.stopPropagation();openListeningPanel();">Mulai ➔</button>
