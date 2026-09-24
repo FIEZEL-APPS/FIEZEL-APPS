@@ -1,7 +1,7 @@
 {
-  "version": "m025-364",
+  "version": "m025-365",
   "claimedBy": "branch claude/adoring-goodall-nshlug",
-  "claimedAt": "2026-09-24T14:14:55.650Z",
-  "reason": "KelasKu murid: siklus tugas Kerjakan/Terlewat/Selesai + Arsip",
+  "claimedAt": "2026-09-24T15:37:06.765Z",
+  "reason": "Cabut tema Ghibli Garden dari fiezel-2.css (terkirim tak sengaja)",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }
