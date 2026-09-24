@@ -4,32 +4,16 @@
    ========================================================================== */
 
 :root{
-  /* m025-115 - palet PASTEL "ceria, eksklusif, minimalis, mahal" (brief redesign OWNER v1,
-     ditambah instruksi susulan: "SEMUA WARNANYA HARUS PASTEL").
-
-     Dasar cream menggantikan seluruh dasar maroon gelap. Kuning pastel jadi aksen utama
-     (CTA, progress, ikon aktif); koral pastel aksen kedua (streak, notifikasi, badge);
-     coklat lembut jadi tinta dan garis - inilah yang menahan pastel supaya tidak jatuh
-     jadi kartun; emas pastel HANYA untuk detail tipis, tidak pernah untuk teks.
-
-     Aksen adalah warna BIDANG, bukan warna teks: kuning penuh di atas cream 1,4:1 dan
-     #EE5D4A 3,2:1. Karena itu tiap keluarga punya satu turunan pekat yang khusus untuk
-     tinta (--accent 6,5:1) dan satu turunan gelap untuk bayangan tombol. Tidak ada satu
-     pun teks yang memakai warna pastelnya langsung di atas cream. */
+  /* F17 (audit UI/UX 2026-09): SATU-SATUNYA sumber token. Dulu empat blok :root di berkas
+     ini + satu di fiezel-2.css saling menimpa (radius 28 vs 34, bayangan, --fz-display). Nilai
+     di bawah adalah pemenang cascade lama, jadi tampilan tidak berubah; ubah token DI SINI saja.
+     Rujukan: docs/DESIGN-SYSTEM.md. */
   --cream:#FBF7F3;
   --cream-deep:#F6F1EA;
   --ink:#2E2724;
   --yellow:#F7EACB;
   --yellow-deep:#EFDFB8;
   --yellow-soft:#FBF3E2;
-  /* m028 fase2 F2-16: --coral/--coral-deep/--coral-soft/--mint/--mint-soft/
-     --teal-pastel/--lilac/--lilac-soft DIHAPUS. Ketiga keluarga ini dipensiunkan
-     sebagai permukaan kontrol oleh DIRECTION: tinta di atasnya gagal kontras
-     (#A8DCC4 1,4:1, #C9BCE4 1,8:1). Perannya diambil keluarga semantik yang punya
-     turunan pekat: koral -> --bad/--bad-soft, mint -> --good/--good-soft,
-     lilac -> --info/--info-soft. Tokennya dihapus PALING AKHIR di fase ini karena
-     dua belas pemakaian var(--coral*) tidak punya fallback - menghapusnya lebih
-     dulu berarti properti invalid dan bidang transparan, bukan warna lama. */
   --gold:#C9A24B;
   --sky-top:#F4EDE6;
   --sky-bottom:#FBF7F3;
@@ -46,12 +30,6 @@
   --panel-soft:#F6F1EA;
   --line:#EFE7DE;
   --line-soft:#F5F0E9;
-  /* Anak tangga KETIGA keluarga garis: soft (#F5F0E9) < line (#EFE7DE) < strong.
-     Dipakai HANYA untuk keadaan hover di .skill-back-btn dan .modal-close-corner —
-     keduanya sudah memanggil var(--line-strong) sejak b6f5a93a, tetapi tokennya tidak
-     pernah didefinisikan di mana pun, jadi border-color-nya jatuh ke nilai awal dan
-     hover-nya tidak terlihat sama sekali. Ditambahkan di KEDUA blok :root karena blok
-     kedualah yang menang; mengisi yang atas saja meninggalkan cacat yang sama. */
   --line-strong:#E2D6C8;
   --text:#2E2724;
   --muted:#6E635C;
@@ -59,44 +37,128 @@
   --accent:#9B3A4A;
   --accent-strong:#7E2D3B;
   --accent-soft:#F6E9EB;
-  /* m025-113: aksen yang duduk di atas material kaca. Sejak m025-115 material tidak lagi
-     dibalik oleh fase langit, jadi token ini cukup mengikuti tema - tetapi ia tetap ada
-     supaya satu tempat saja yang memutuskan warna aksen di atas permukaan. */
   --accent-on-glass:var(--accent-strong);
   --black:#2E2724;
   --green:#2E8B69;
   --green-soft:#E9F7F0;
   --red:#B8432D;
   --red-soft:#FDE3DE;
-  /* --radius-xl dipakai 13 kali oleh kartu besar redesign (kokpit Home, hero PAW, kartu
-     fz2) tetapi tidak pernah didefinisikan - tiap call site hidup dari nilai cadangannya
-     sendiri, dan gerbang token search-feedback menandainya. Didefinisikan sekali di sini. */
-  --radius-xl:28px;
-  --radius-lg:24px;
-  --radius-md:16px;
-  --radius-sm:12px;
+  --radius-xl:34px;
+  --radius-lg:28px;
+  --radius-md:22px;
+  --radius-sm:18px;
   --radius-pill:999px;
-  --shadow-sm:0 2px 10px rgba(36,26,17,.06);
-  --shadow-md:0 10px 30px rgba(36,26,17,.09);
-  --shadow-lg:0 24px 60px rgba(36,26,17,.15);
+  --shadow-sm:0 6px 16px rgba(46,39,36,.06);
+  --shadow-md:0 14px 32px rgba(46,39,36,.07);
+  --shadow-lg:0 20px 44px rgba(46,39,36,.10);
   --ease:cubic-bezier(.22,.8,.28,1);
   --ease-spring:cubic-bezier(.34,1.4,.4,1);
-  /* m025-166: dua token gerak yang dipakai popup gerbang level. Namanya --fz-* karena
-     lapisan gerak FIEZEL (fiezel-motion.css) memakai awalan yang sama; nilainya sengaja
-     menunjuk ke dua easing yang sudah ada supaya tidak ada kurva ketiga yang lahir. */
   --fz-spring:var(--ease-spring);
   --fz-out:var(--ease);
   --dur-s:.18s;
   --dur-m:.32s;
   --dur-l:.5s;
-  /* Material permukaan. Kedalaman dari blur dan garis rambut, bukan dari kotak di atas
-     kotak. Putihnya hangat (bukan #fff murni) supaya tidak pernah terbaca dingin. */
   --glass-thin:rgba(255,253,248,.58);
   --glass-regular:rgba(255,253,248,.72);
-  --glass-thick:rgba(255,253,248,.82);--glass-solid:rgba(255,253,248,.98);
+  --glass-thick:rgba(255,253,248,.82);
+  --glass-solid:rgba(255,253,248,.98);
   --glass-edge:rgba(255,255,255,.90);
   --glass-blur:blur(28px) saturate(180%);
   --glass-blur-heavy:blur(40px) saturate(180%);
+  --wordmark-ink-hi:#2E2724;
+  --wordmark-ink-lo:#4A382A;
+  --wordmark-accent-hi:#B8485C;
+  --wordmark-accent-lo:#9B3A4A;
+  --sun:#F7EACB;
+  --sun-deep:#EFDFB8;
+  --sun-press:#E3CE9E;
+  --sun-soft:#FBF3E2;
+  --sun-grad:linear-gradient(180deg,#F7EACB,#EFDFB8);
+  --core:#1B1418;
+  --core-soft:#2A2126;
+  --core-line:#3A3038;
+  --on-core:#FDFAF3;
+  --on-core-muted:rgba(253,250,243,.68);
+  --good:#1F6B4E;
+  --good-bright:#2E8B69;
+  --good-soft:#E9F7F0;
+  --bad:#AC3E2A;
+  --bad-soft:#FDE3DE;
+  --info:#7A5512;
+  --info-soft:#FBF3E2;
+  --focus-ring:#2E2724;
+  --text-disabled:#75654C;
+  --ink-hover:#3A2B1C;
+  --ink-press:#120C07;
+  --bad-bright:#B8432D;
+  --scrim:rgba(36,26,17,.45);
+  --scrim-soft:rgba(36,26,17,.28);
+  --surface-rgb:255,253,248;
+  --surface-pure-rgb:255,255,255;
+  --bg-rgb:255,249,238;
+  --surface-solid:#ffffff;
+  --surface-tint:#fffbf4;
+  --surface-warm:#fdf4e6;
+  --surface-cool:#f7f7f1;
+  --surface-edge:#f2e2cb;
+  --surface-mute:#f0e8dc;
+  --surface-edge-strong:#e8d3b2;
+  --ink-soft:#4E4130;
+  --ink-danger:#A63A24;
+  --glass-text:#2E2724;
+  --glass-muted:#6E635C;
+  --glass-line:rgba(27,20,24,.08);
+  --fz-display:'FZ Plus Jakarta Sans',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+  --fz-display-round:'FZ Plus Jakarta Sans',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+  --fz-heading:'FZ Plus Jakarta Sans',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+  --fz-body:'FZ Plus Jakarta Sans',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+  --sp-1:4px;
+  --sp-2:8px;
+  --sp-3:12px;
+  --sp-4:16px;
+  --sp-5:20px;
+  --sp-6:24px;
+  --sp-7:32px;
+  --sp-8:40px;
+  --fs-display:clamp(1.75rem,4vw,2.125rem);
+  --fs-h1:1.5rem;
+  --fs-h2:1.125rem;
+  --fs-body:1rem;
+  --fs-small:.875rem;
+  --fs-caption:.75rem;
+  --lh-tight:1.2;
+  --lh-body:1.55;
+  --radius-xs:14px;
+  --lift-sun:0 8px 18px rgba(155,58,74,.18);
+  --lift-sun-press:0 1px 0 var(--sun-deep);
+  --lift-edge:0 3px 0 var(--surface-edge);
+  --lift-edge-press:0 1px 0 var(--surface-edge);
+  --dur-xs:.12s;
+  --dur-xl:.6s;
+  --focus-ring-on-core:#FDFAF3;
+  --pz-yellow:#F7EACB;
+  --pz-yellow-line:#EFDFB8;
+  --pz-yellow-ink:#7A5512;
+  --pz-pink:#F8DDE3;
+  --pz-pink-line:#F0CBD4;
+  --pz-pink-ink:#963C54;
+  --pz-mint:#D5EBE5;
+  --pz-mint-line:#BEDFD6;
+  --pz-mint-ink:#1D5C52;
+  --pz-lilac:#E5DDF3;
+  --pz-lilac-line:#D3C7E9;
+  --pz-lilac-ink:#523E86;
+  --pz-sky:#D8E8F4;
+  --pz-sky-line:#C7DCEC;
+  --pz-sky-ink:#2A566F;
+  --pz-peach:#F8E2D2;
+  --pz-peach-line:#EFCEB5;
+  --pz-peach-ink:#8C4C1D;
+  --maroon:#9B3A4A;
+  --maroon-deep:#7E2D3B;
+  --maroon-soft:#F6E9EB;
+  --lift-ink:0 10px 24px rgba(46,39,36,.16);
+  --lift-line:0 4px 12px rgba(46,39,36,.06);
 }
 
 *{box-sizing:border-box}
@@ -962,182 +1024,7 @@ input[type="checkbox"],input[type="radio"]{min-width:24px;min-height:24px}
    m025-115: netralnya ikut pindah ke keluarga cream/pastel. Blok ini gampang terlewat
    justru karena ia yang menang - kalau hanya blok paling atas yang diganti, aplikasi
    tetap berjalan dengan netral marun lama sementara tokennya sudah pastel. */
-:root{
-  --bg:#FBF7F3;
-  --panel:#FFFFFF;
-  --panel-soft:#F6F1EA;
-  --line:#EFE7DE;
-  --line-soft:#F5F0E9;
-  /* Anak tangga KETIGA keluarga garis: soft (#F5F0E9) < line (#EFE7DE) < strong.
-     Dipakai HANYA untuk keadaan hover di .skill-back-btn dan .modal-close-corner —
-     keduanya sudah memanggil var(--line-strong) sejak b6f5a93a, tetapi tokennya tidak
-     pernah didefinisikan di mana pun, jadi border-color-nya jatuh ke nilai awal dan
-     hover-nya tidak terlihat sama sekali. Ditambahkan di KEDUA blok :root karena blok
-     kedualah yang menang; mengisi yang atas saja meninggalkan cacat yang sama. */
-  --line-strong:#E2D6C8;
-  --text:#2E2724;
-  --muted:#6E635C;
-  --muted-soft:#786D64;
-  --accent:#9B3A4A;
-  --accent-strong:#7E2D3B;
-  --accent-soft:#F6E9EB;
-  --black:#2E2724;
-  --gold:#C9A24B;
-  /* m025-127 wordmark topbar. Empat token ini ada karena logonya BUKAN teks: ia SVG dengan
-     gradien di dalamnya, jadi ia tidak ikut --ambient-text dan tidak ikut berbalik di mode
-     gelap. Sampai m025-118 itu benar - topbarnya maroon gelap dan gading di atasnya terbaca.
-     Sejak dasar berubah jadi cream (m025-119/120), gading #FFFBF3 duduk di atas cream
-     krem generasi lalu: 1,02:1. Bukan "kurang kontras" - benar-benar tidak terlihat.
-
-     Perannya persis peran yang brief palet berikan: coklat sebagai TINTA untuk hurufnya,
-     terracotta sebagai AKSEN untuk dua balok. Tidak ada warna baru yang ditambahkan. */
-  --wordmark-ink-hi:#2E2724;
-  --wordmark-ink-lo:#4A382A;
-  /* m025-302: kedua balok ikut pindah ke maroon, dan itu MENGIKUTI aturan yang sudah
-     tertulis di komentar di atas — "terracotta sebagai AKSEN" bukan warna merdeka milik
-     wordmark, melainkan peran AKSEN palet yang kebetulan terracotta waktu itu. Aksennya
-     kini maroon, jadi balok ikut. Bandingkan dengan logo splash di fiezel-splash.js yang
-     TIDAK ikut: di sana paletnya ditandai terkunci oleh ruling OWNER, di sini tidak. */
-  --wordmark-accent-hi:#B8485C;
-  --wordmark-accent-lo:#9B3A4A;
-  --green:#2E8B69;
-  --green-soft:#E9F7F0;
-  --red:#B8432D;
-  --red-soft:#FDE3DE;
-  /* --radius-xl dipakai 13 kali oleh kartu besar redesign (kokpit Home, hero PAW, kartu
-     fz2) tetapi tidak pernah didefinisikan - tiap call site hidup dari nilai cadangannya
-     sendiri, dan gerbang token search-feedback menandainya. Didefinisikan sekali di sini. */
-  --radius-xl:34px;
-  --radius-lg:28px;
-  --radius-md:22px;
-  --radius-sm:18px;
-  --radius-pill:999px;
-  /* m029 "Lembut": kedalaman datang dari bayangan halus, bukan dari garis. Ketiga
-     bayangan ini lebih lebar dan lebih lembut daripada pendahulunya, karena garis
-     tepi kartu dicabut dan bayangan yang harus memikul pemisahannya. */
-  --shadow-sm:0 6px 16px rgba(46,39,36,.06);
-  --shadow-md:0 14px 32px rgba(46,39,36,.07);
-  --shadow-lg:0 20px 44px rgba(46,39,36,.10);
-  /* ---- m028 "Warm Paper, Bright Mind" (design/redesign-v1/tokens/tokens.css) ----
-     Keluarga token BARU. Yang lama TIDAK dihapus di fase ini: nilainya sudah ditukar
-     di tempat, jadi seluruh layar ikut pindah tanpa satu selektor pun berubah. Keluarga
-     di bawah adalah yang dipakai lapisan baru (splash, onboarding, komponen hi-fi) dan
-     yang akan menggantikan alias lama di Fase 2.
-
-     Kuning adalah warna BIDANG, bukan warna teks: --sun di atas --bg 1,5:1. Setiap
-     keluarga karena itu punya turunan pekat khusus tinta (--sun-deep untuk garis,
-     --info untuk teks kecil) - tidak ada teks yang memakai --sun langsung. */
-  --sun:#F7EACB;
-  --sun-deep:#EFDFB8;
-  --sun-press:#E3CE9E;
-  --sun-soft:#FBF3E2;
-  --sun-grad:linear-gradient(180deg,#F7EACB,#EFDFB8);
-  /* Permukaan gelap "core": panggung splash, kartu highlight, toast. Satu keluarga saja,
-     supaya ikon aplikasi, splash, dan toast terbaca sebagai satu benda. */
-  --core:#1B1418;
-  --core-soft:#2A2126;
-  --core-line:#3A3038;
-  --on-core:#FDFAF3;
-  --on-core-muted:rgba(253,250,243,.68);
-  --good:#1F6B4E;
-  --good-bright:#2E8B69;
-  --good-soft:#E9F7F0;
-  --bad:#AC3E2A;
-  --bad-soft:#FDE3DE;
-  /* --info adalah SATU-SATUNYA kuning yang boleh jadi teks: #7A5512 di atas cream 6,3:1. */
-  --info:#7A5512;
-  --info-soft:#FBF3E2;
-  /* Cincin fokus tunggal untuk seluruh aplikasi.
-     RIWAYAT, supaya tidak ada yang memutarnya balik ke emas untuk ketiga kalinya:
-       --gold #C9A24B  -> hanya 1,9:1 terhadap cream; cincin yang tidak terlihat = tidak ada cincin.
-       #A67A00         -> 3,71:1, lolos WCAG 1.4.11 tetapi MASIH emas (hue 44 deg, saturasi penuh),
-                          dan pemilik menolaknya: "kotak kuning / outline emas".
-     tinta --ink. Bukan emas (hue 28 deg, saturasi 0,36) DAN jauh lebih terbaca:
-     16,28:1 di atas cream, 17,06:1 di atas putih. Menuruti pemilik di sini justru
-     menaikkan kontras, bukan menukarnya dengan aksesibilitas. */
-  --focus-ring:#2E2724;
-  --text-disabled:#75654C;
-  --ink-hover:#3A2B1C;
-  --ink-press:#120C07;
-  /* Fase 2: tiga token yang dipakai komponen fase ini tetapi belum ada di Fase 1.
-     --bad-bright = kembaran terang --bad (nilainya sama dengan --red sekarang) untuk
-     GARIS/bidang, bukan teks kecil. --scrim* = backdrop modal turunan --text; sebelum
-     ini backdrop dialog memakai rgba(var(--bg-rgb),.82) alias kabut TERANG di atas
-     layar terang - panelnya tidak pernah benar-benar terangkat dari latarnya. */
-  --bad-bright:#B8432D;
-  --scrim:rgba(36,26,17,.45);
-  --scrim-soft:rgba(36,26,17,.28);
-  /* m025-85 kontras: sebelum ini puluhan permukaan memaku warnanya sendiri (#fff,
-     rgba(255,254,250,.9), #f6f4ed, ...) sementara TEKS di atasnya memakai var(--text).
-     Di mode gelap teksnya jadi #fdf4f6 di atas putih - 1,08:1, tidak terbaca sama sekali,
-     dan itulah bug "warna tulisan dan background sama" yang dilaporkan OWNER.
-     Nilai terang di bawah SENGAJA sama persis dengan literal yang digantikannya, supaya
-     mode terang tidak bergeser satu piksel pun; hanya kembaran gelapnya yang baru.
-     --*-rgb dipakai lewat rgba(var(--x-rgb),alpha) karena banyak permukaan translusen. */
-  /* m025-115: nilainya digeser ke keluarga cream/pastel. Sampai rilis ini token-token di
-     bawah memang dikunci persis pada literal terang lamanya (kontrak m025-85 "mode terang
-     tidak boleh bergeser"); brief redesign OWNER memang meminta pergeseran itu, jadi
-     kuncinya dipindahkan ke nilai baru di contrast-test, bukan dibuang. */
-  --surface-rgb:255,253,248;
-  --surface-pure-rgb:255,255,255;
-  --bg-rgb:255,249,238;
-  --surface-solid:#ffffff;
-  --surface-tint:#fffbf4;
-  --surface-warm:#fdf4e6;
-  --surface-cool:#f7f7f1;
-  --surface-edge:#f2e2cb;
-  --surface-mute:#f0e8dc;
-  --surface-edge-strong:#e8d3b2;
-  --ink-soft:#4E4130;
-  --ink-danger:#A63A24;
-  /* --glass-text/-muted/-line hanya hidup di blok .scene-* sebelum ini, jadi setiap
-     layar yang lupa memasang kelas scene kehilangan warna tintanya. Diberi nilai bawaan. */
-  --glass-text:#2E2724;
-  --glass-muted:#6E635C;
-  --glass-line:rgba(27,20,24,.08);
-  /* Audit UX Bagian 5 + Roadmap #4: satu font display untuk judul, satu font teks untuk
-     tubuh, dan keduanya dinaikkan ke lingkup global. Sebelum ini kedua token hanya hidup
-     di dalam .fiezel-splash/.fiezel-ob, sehingga setiap dialog sistem - termasuk gerbang
-     izin - jatuh ke font bawaan OS dan membocorkan kesan "campur aduk" yang ditandai
-     audit. Berkas fontnya sudah ada di assets/fonts dan dimuat lewat @font-face di bawah. */
-  /* m025-86: satu wajah display, satu wajah teks. Serif display dipakai HANYA di ukuran
-     besar - wordmark, judul layar, judul dialog. Di ukuran kecil serif kontras-tinggi
-     kehilangan keterbacaan di layar ponsel, jadi judul kecil tetap memakai sans. */
-  --fz-display:'FZ Instrument Serif',Georgia,'Times New Roman',serif;
-  /* m025-246 — TIGA KELUARGA FONT JADI DUA. OWNER: "Tipografi: 3 -> 2 keluarga font
-     (buang Fredoka)."
-
-     Yang tersisa: Instrument Serif (--fz-display, ukuran besar saja) dan Plus Jakarta
-     Sans (--fz-heading/--fz-body). Fredoka dulu memegang --fz-display-round, dan
-     tokennya SENGAJA dipertahankan alih-alih dicari-ganti di ~40 titik pakai: satu
-     nilai yang berubah lebih mudah diaudit daripada empat puluh selektor yang berubah,
-     dan kalau owner memintanya kembali, yang perlu diubah tetap satu baris.
-
-     Ia menunjuk ke Jakarta 700, bukan ke serif: titik pakainya adalah judul LAYAR dan
-     kartu di ukuran menengah, dan serif kontras-tinggi kehilangan keterbacaan di sana
-     (alasan yang sama yang sudah tertulis di --fz-display tepat di atas). Berkas
-     Fredoka-var.woff2 ikut dicabut dari @font-face, preload index.html, dan precache
-     sw.js - membiarkan berkasnya terunduh untuk font yang tidak pernah dipakai
-     adalah ongkos jaringan tanpa satu piksel pun imbalan. */
-  --fz-display-round:'FZ Plus Jakarta Sans',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
-  --fz-heading:'FZ Plus Jakarta Sans',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
-  --fz-body:'FZ Plus Jakarta Sans',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
-  /* ===== v6.1 CALM delta (O4 2026-08) — spacing, type scale, lift, micro-durations.
-     EXTENDS the v6 root; --shadow-sm/md/lg + --radius-sm/md/lg/pill + --dur-s/m/l
-     sudah ada di atas dan TIDAK diduplikasi di sini. */
-  --sp-1:4px;  --sp-2:8px;  --sp-3:12px; --sp-4:16px;
-  --sp-5:20px; --sp-6:24px; --sp-7:32px; --sp-8:40px;
-  --fs-display:clamp(1.75rem,4vw,2.125rem);
-  --fs-h1:1.5rem; --fs-h2:1.125rem; --fs-body:1rem;
-  --fs-small:.875rem; --fs-caption:.75rem;
-  --lh-tight:1.2; --lh-body:1.55;
-  --radius-xs:8px;
-  --lift-sun:0 4px 0 var(--sun-deep);
-  --lift-sun-press:0 1px 0 var(--sun-deep);
-  --lift-edge:0 3px 0 var(--surface-edge);
-  --lift-edge-press:0 1px 0 var(--surface-edge);
-  --dur-xs:.12s; --dur-xl:.6s;
-}
+/* F17: token blok ini pindah ke :root tunggal di awal berkas. */
 
 /* ==========================================================================
    MODE GELAP DIHAPUS (Permintaan OWNER: "HAPUS KAN SISTEM MODE GELAP")
@@ -4036,14 +3923,7 @@ html.fiezel-ui-v6 .launcher-shell{
    bertengkar atas baris yang sama; urutan cascade juga menguntungkan kita —
    restyle di sini menang tanpa perlu !important.
    ========================================================================== */
-:root{
-  /* Cincin fokus DI ATAS permukaan core. --focus-ring (tinta) hilang di atas
-     --core #1B1418, jadi panel gelap butuh cincinnya sendiri - tetapi bukan kuning.
-     #FDFAF3 adalah --on-core, tinta yang MEMANG sudah dipakai panel ini, dan ia
-     17,37:1 di atas --core (vs 11,57:1 milik kuning penuh yang digantikan). Sekali lagi:
-     membuang kuningnya menaikkan kontras. */
-  --focus-ring-on-core:#FDFAF3;
-}
+/* F17: token blok ini pindah ke :root tunggal di awal berkas. */
 
 /* ---------- §9.2 toast: ikon + sejajar ----------
    Warna toast (permukaan --core, tinta --on-core) sudah dipasang Fase 2 di blok
@@ -5273,16 +5153,7 @@ html[data-fz-input="touch"] :focus{outline-color:transparent!important}
    nav 5 tab) + warna pastel yang lebih hidup: kuning, merah muda, mint, lilac bergilir di
    kartu, chip, dan ikon. Tinta tetap coklat gelap supaya kontras aman.
    ===================================================================================== */
-:root{
-  --pz-yellow:#F7EACB;--pz-yellow-line:#EFDFB8;--pz-yellow-ink:#7A5512;
-  --pz-pink:#F8DDE3;--pz-pink-line:#F0CBD4;--pz-pink-ink:#963C54;
-  --pz-mint:#D5EBE5;--pz-mint-line:#BEDFD6;--pz-mint-ink:#1D5C52;
-  --pz-lilac:#E5DDF3;--pz-lilac-line:#D3C7E9;--pz-lilac-ink:#523E86;
-  --pz-sky:#D8E8F4;--pz-sky-line:#C2D9EA;--pz-sky-ink:#2A566F;
-  --pz-peach:#F8E2D2;--pz-peach-line:#EFCEB5;--pz-peach-ink:#8C4C1D;
-  --bg:#FBF7F3;--sky-bottom:#FBF7F3;
-  --panel-soft:#F6F1EA;--line:#EFE7DE;--line-soft:#F5F0E9;
-}
+/* F17: token blok ini pindah ke :root tunggal di awal berkas. */
 body{background:var(--bg)}
 /* Judul seksi serif ramah */
 .home-section-head h2,.today-title,.lf h1,.lf-card h2,.launcher-copy h1{font-family:var(--fz-heading);font-weight:700;letter-spacing:-.015em}
