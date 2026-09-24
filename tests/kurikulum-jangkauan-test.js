@@ -62,9 +62,12 @@ test('A1 — 13 kata audit zona kurikulum masuk ID_WORDS penjaga th-leak', () =>
   });
 });
 
-test('A1 — anggaran class-hub pas 6: zona murid sudah dwibahasa, sisanya tercatat zona guru', () => {
-  assert.ok(/'features\/class-hub\/fiezel-class-hub\.js': 6,/.test(GAP),
-    'anggaran class-hub di ALLOWLIST tidak lagi pas 6 — perbaiki dengan alasan tertulis, jangan diam.');
+/* m025-364: 6 -> 5. Literal 'Latihan · ' di kartu tugas murid hilang bersama assignCard; baris
+   tugas ringkas siklus Kerjakan/Terlewat/Selesai lewat t() seluruhnya. Alasannya juga tertulis
+   di ALLOWLIST tests/th-ui-leak-test.js. */
+test('A1 — anggaran class-hub pas 5: zona murid sudah dwibahasa, sisanya tercatat zona guru', () => {
+  assert.ok(/'features\/class-hub\/fiezel-class-hub\.js': 5,/.test(GAP),
+    'anggaran class-hub di ALLOWLIST tidak lagi pas 5 — perbaiki dengan alasan tertulis, jangan diam.');
 });
 
 /* ---------------------------------------------------------- A2: tanggal mengikuti locale */

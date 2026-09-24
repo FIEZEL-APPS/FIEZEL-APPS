@@ -206,7 +206,9 @@ test('smoke DOM-stub: alur murid (terima → kerjakan → hasil → laporan w/s)
   assert.ok(TS.acceptAssignmentPayload(payload));
   const sEl = mkEl(); const senv = { toast() {}, go() {}, openTutor() { senv.tutor = true; }, afterRender() {} };
   Hub.mountStudent(sEl, senv);
-  assert.ok(sEl.innerHTML.includes('class-hub-student') && sEl.innerHTML.includes('Bu Rina') && sEl.innerHTML.includes('PR Past Tense') && sEl.innerHTML.includes('Belum mulai'));
+  /* m025-364: baris tugas ringkas tidak lagi memasang cap "Belum mulai" — tombol Kerjakan
+     sendirilah penanda belum dimulai, dan "Sedang dikerjakan" muncul begitu runner berjalan. */
+  assert.ok(sEl.innerHTML.includes('class-hub-student') && sEl.innerHTML.includes('Bu Rina') && sEl.innerHTML.includes('PR Past Tense') && sEl.innerHTML.includes('class-open-' + a.id) && sEl.innerHTML.includes('Kerjakan'));
   sEl.fire('click', btn({ 'data-ch': 'open', 'data-id': a.id }));
   assert.ok(sEl.innerHTML.includes('class-runner') && sEl.innerHTML.includes('Soal 1 dari 2'));
   let lf = LF.load(); assert.ok(lf.doneAssign.some((x) => x.id === a.id && x.s === 1), 'status sedang mengerjakan dilaporkan');
@@ -317,7 +319,7 @@ test('soal bergambar: runner kelas BENAR-BENAR mencetak gambarnya', () => {
   assert.ok(/aria-label="Gambar: /.test(sEl.innerHTML), 'gambar punya nama aksesibel');
 });
 
-test('student subject panels: kartu panel mapel dan filter tugas per mapel', () => {
+test('student subject chips: strip mapel dan filter tugas per mapel', () => {
   /* Higiene isolasi: modul hub menyimpan ui() di memori antar mount, jadi store
      yang diganti tiap tes TIDAK terbaca ulang tanpa muat-ulang modul. Tanpa ini,
      classTeachers di bawah adalah sisa tes sebelumnya (dulu lolos karena panel
@@ -354,9 +356,13 @@ test('student subject panels: kartu panel mapel dan filter tugas per mapel', () 
   const sEl = mkEl();
   Hub.mountStudent(sEl, { toast() {}, go() {}, openTutor() {}, afterRender() {} });
 
-  assert.ok(sEl.innerHTML.includes('class-subject-panels'), 'panel mata pelajaran muncul di murid');
-  assert.ok(sEl.innerHTML.includes('Bu Mardhiana'), 'nama Bu Mardhiana muncul di kartu mapel');
-  assert.ok(sEl.innerHTML.includes('Pak Budi'), 'nama Pak Budi muncul di kartu mapel');
+  /* m025-364: kartu mapel besar (±800px sebelum tugas pertama) diganti strip chip satu baris.
+     Nama guru kini ada di baris tugasnya sendiri, tempat murid membacanya. */
+  assert.ok(sEl.innerHTML.includes('class-chip-strip'), 'strip mapel muncul di murid');
+  assert.ok(!sEl.innerHTML.includes('class-subject-panels'), 'kartu mapel besar sudah dicabut');
+  assert.ok(sEl.innerHTML.includes('chip-ENG') && sEl.innerHTML.includes('chip-MAT'), 'kedua mapel punya chip');
+  assert.ok(sEl.innerHTML.includes('Bu Mardhiana'), 'nama Bu Mardhiana muncul di baris tugasnya');
+  assert.ok(sEl.innerHTML.includes('Pak Budi'), 'nama Pak Budi muncul di baris tugasnya');
   assert.ok(sEl.innerHTML.includes('as-eng-1') && sEl.innerHTML.includes('as-mat-1'), 'kedua tugas tampil sebelum filter');
 
   // Klik filter Bahasa Inggris
@@ -375,9 +381,9 @@ test('student subject panels: kartu panel mapel dan filter tugas per mapel', () 
   assert.ok(sEl.innerHTML.includes('2 Guru Terdaftar'), 'hitungan guru jujur (2 guru di kelas uji)');
   assert.ok(sEl.innerHTML.includes('class-jump-tugas'), 'tombol lompat ke Tugas tersedia');
 
-  // Tombol lompat membawa murid ke tab Tugas tempat kartu filter mapel berada
+  // Tombol lompat membawa murid ke tab Tugas tempat strip filter mapel berada
   sEl.fire('click', btn({ 'data-ch': 'tab', 'data-tab': 'tugas' }));
-  assert.ok(sEl.innerHTML.includes('class-subject-panels'), 'lompat mendarat di tab Tugas berpanel mapel');
+  assert.ok(sEl.innerHTML.includes('class-chip-strip'), 'lompat mendarat di tab Tugas ber-strip mapel');
 });
 
 test('sintaks: app.js & modul class-hub dapat di-parse', () => {

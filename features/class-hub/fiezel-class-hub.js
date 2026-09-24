@@ -194,7 +194,8 @@
     var d = subs().map(function (s) { return s.id + ':' + (s.at || 0) + ':' + (s.c || 0) + '/' + (s.t || 0); }).join(',');
     var run = u.runner ? (u.runner.aid + ':' + u.runner.idx + ':' + u.runner.finished + ':' + (u.runner.chosen != null ? u.runner.chosen : '')) : '';
     var ci = ''; try { var Mi = CI(); if (Mi) { var sn = Mi.snapshot(); ci = (sn.missions || []).map(function (m) { return m.id + ':' + (m.started ? 1 : 0) + ':' + (m.finished ? 1 : 0); }).join(','); } } catch (_) {}
-    return ci + '|' + (u.tab || '') + '|' + (u.curriculumView || '') + '|' + (u.review || '') + '|' + (u.editCode ? '1' : '0') + '|' + (u.filterSubject || '') + '|' + (Array.isArray(u.classTeachers) ? u.classTeachers.length : 0) + '|' + (classCode() || '') + '|' + (teacherName() || '') + '|' + p + '|' + d + '|' + run + '|' + studentDraftCode;
+    var ar = ''; try { var A0 = arsip(); ar = Object.keys(A0.ids).length + ':' + A0.missed.length; } catch (_) {}
+    return ci + '|' + ar + '|' + (u.seg || '') + '|' + (u.arsipView ? 'A' : '') + '|' + (u.tab || '') + '|' + (u.curriculumView || '') + '|' + (u.review || '') + '|' + (u.editCode ? '1' : '0') + '|' + (u.filterSubject || '') + '|' + (Array.isArray(u.classTeachers) ? u.classTeachers.length : 0) + '|' + (classCode() || '') + '|' + (teacherName() || '') + '|' + p + '|' + d + '|' + run + '|' + studentDraftCode;
   }
   function ui() { if (!sUi) { sUi = readJson(UI_KEY, {}); sUi.tab = sUi.tab || 'tugas'; sUi.runner = sUi.runner || null; } return sUi; }
   function saveUi() { writeJson(UI_KEY, sUi); }
@@ -202,24 +203,344 @@
   function subs() { return readJson(SUB_KEY, []); }
   function classCode() { return String((readJson('fiezel-onboarding-v1', {}) || {}).classCode || ''); }
 
+  /* ===== SIKLUS HIDUP TUGAS MURID (m025-364, audit KelasKu K1/K3) ======================
+     Sampai build ini tugas murid hanya punya dua keadaan: menunggu dan selesai. Yang
+     selesai menumpuk tanpa ujung di bawah tugas aktif (24 kartu = sepuluh layar HP), yang
+     lewat tenggat mengambang di paling atas selamanya, dan riwayatnya dipotong ke 30 tanpa
+     memberi tahu siapa pun. Murid tidak punya satu tombol pun untuk merapikannya.
+
+     Sekarang setiap tugas punya satu tempat:
+       KERJAKAN — belum lewat tenggat, atau tanpa tenggat.
+       TERLEWAT — lewat tenggat tapi masih bisa dikerjakan. Pindah sendiri ke Arsip
+                  ARSIP_TERLEWAT_HARI hari sesudah tenggatnya.
+       SELESAI  — sudah dikerjakan. Pindah sendiri ke Arsip ARSIP_SELESAI_HARI hari kemudian.
+       ARSIP    — tersimpan, bisa dicari, bisa dipulihkan. TIDAK bisa dihapus murid: hasil
+                  yang sama juga milik laporan guru, dan arsip yang bisa dihapus murid
+                  adalah laporan yang bisa dihapus murid.
+     Arsip hanya urusan tampilan di HP ini. Hasil yang sudah terkirim ke guru tidak berubah. */
+  var ARCH_KEY = 'fiezel-class-archive-v1';
+  var ARSIP_SELESAI_HARI = 14, ARSIP_TERLEWAT_HARI = 30;
+  /* Riwayat tidak lagi dipotong ke 30. Yang dipangkas hanya BERATNYA: RIWAYAT_LENGKAP
+     kiriman terbaru menyimpan butir & jawaban untuk pembahasan, yang lebih tua diringkas
+     menjadi judul, skor, dan tanggal (beberapa ratus byte). Batas keras RIWAYAT_MAKS
+     menjaga localStorage yang dipakai bersama seluruh aplikasi. */
+  var RIWAYAT_LENGKAP = 60, RIWAYAT_MAKS = 400, TERLEWAT_MAKS = 100;
+  var SEGMEN = ['kerjakan', 'terlewat', 'selesai'];
+  var ARSIP_LAYER = 'kelasku-arsip';
+  function arsip() {
+    var a = readJson(ARCH_KEY, null);
+    if (!a || typeof a !== 'object') a = {};
+    if (!a.ids || typeof a.ids !== 'object') a.ids = {};
+    if (!Array.isArray(a.missed)) a.missed = [];
+    a.v = 1;
+    return a;
+  }
+  function saveArsip(a) { writeJson(ARCH_KEY, a); }
+  function assignKey() { var TS = T(); return TS ? TS.ASSIGN_KEY : 'fiezel-learner-assignments-v1'; }
+  function isMissionRec(s) { return !!(s && (s.isMission || String(s.id || '').indexOf('misi_') === 0)); }
+  function hariLewat(a) {
+    if (!a || !a.deadline) return 0;
+    var d = R().daysLeft(a.deadline, today());
+    return d < 0 ? -d : 0;
+  }
+  function selesaiDiarsip(s, arch, now) {
+    var rec = arch.ids[s.id];
+    if (rec && rec.arsip) return true;
+    var sejak = Math.max(Number(s.at) || 0, (rec && Number(rec.pulih)) || 0);
+    return now - sejak > ARSIP_SELESAI_HARI * HARI;
+  }
+  var KUNCI_RINGKAS = ['id', 'title', 'from', 'teacher', 'cls', 'skills', 'mode', 'deadline', 'at', 'c', 't', 'unitId', 'sent', 'isMission', 'source'];
+  function ringkasKiriman(s) {
+    if (!s || s.ringkas) return s;
+    var r = { ringkas: true };
+    KUNCI_RINGKAS.forEach(function (k) { if (s[k] !== undefined) r[k] = s[k]; });
+    return r;
+  }
+  /** Simpan riwayat kiriman tanpa memotongnya diam-diam (pengganti `slice(-30)`). */
+  function simpanRiwayat(list) {
+    list = list.slice().sort(function (a, b) { return (Number(a.at) || 0) - (Number(b.at) || 0); });
+    if (list.length > RIWAYAT_MAKS) list = list.slice(-RIWAYAT_MAKS);
+    /* Kalau localStorage penuh, butir pembahasan yang lebih tua dikorbankan lebih dulu —
+       bukan kiriman terbarunya. */
+    for (var lengkap = RIWAYAT_LENGKAP; ; lengkap = Math.floor(lengkap / 3)) {
+      var batas = list.length - lengkap;
+      var out = list.map(function (s, i) { return i < batas ? ringkasKiriman(s) : s; });
+      try { localStorage.setItem(SUB_KEY, JSON.stringify(out)); return out; } catch (_) { if (!lengkap) return list; }
+    }
+  }
+  function arsipkanTugas(arch, a, oleh) {
+    arch.missed = arch.missed.filter(function (x) { return x.id !== a.id; });
+    arch.missed.push(Object.assign({}, a, { arsipAt: Date.now(), oleh: oleh }));
+    if (arch.missed.length > TERLEWAT_MAKS) arch.missed = arch.missed.slice(-TERLEWAT_MAKS);
+    delete arch.ids[a.id];
+  }
+  /** Tugas yang terlewat terlalu lama pindah sendiri ke Arsip. Dipanggil sebelum layar dibaca. */
+  function rapikanTerlewat() {
+    var pend = assignments(), u = ui(), arch = null, sisa = [];
+    pend.forEach(function (a) {
+      var jalan = u.runner && u.runner.aid === a.id && !u.runner.finished;
+      if (!jalan && hariLewat(a) > ARSIP_TERLEWAT_HARI) {
+        arch = arch || arsip();
+        var rec = arch.ids[a.id];
+        /* Yang dipulihkan murid sendiri tidak disapu lagi: ia sengaja memintanya kembali. */
+        if (!(rec && rec.pulih)) { arsipkanTugas(arch, a, 'otomatis'); return; }
+      }
+      sisa.push(a);
+    });
+    if (!arch) return;
+    saveArsip(arch);
+    writeJson(assignKey(), sisa);
+  }
+  function arsipkanTerlewat(id) {
+    var u = ui(), a = assignments().filter(function (x) { return x.id === id; })[0];
+    if (!a || !hariLewat(a) || (u.runner && u.runner.aid === id && !u.runner.finished)) return false;
+    var arch = arsip();
+    arsipkanTugas(arch, a, 'murid');
+    saveArsip(arch);
+    writeJson(assignKey(), assignments().filter(function (x) { return x.id !== id; }));
+    return true;
+  }
+  function arsipkanSelesai(id) {
+    var arch = arsip();
+    arch.ids[id] = { arsip: Date.now() };
+    saveArsip(arch);
+    return true;
+  }
+  /** Kembalikan dari Arsip. Tugas yang DITARIK guru tidak bisa dipulihkan — gurunya membatalkannya. */
+  function pulihkan(id) {
+    var arch = arsip(), m = arch.missed.filter(function (x) { return x.id === id; })[0];
+    if (m) {
+      if (m.oleh === 'guru') return false;
+      arch.missed = arch.missed.filter(function (x) { return x.id !== id; });
+      var a = Object.assign({}, m); delete a.arsipAt; delete a.oleh;
+      var pend = assignments().filter(function (x) { return x.id !== id; }); pend.push(a);
+      writeJson(assignKey(), pend);
+    }
+    arch.ids[id] = { pulih: Date.now() };
+    saveArsip(arch);
+    return true;
+  }
+  function jumlahArsip(done, arch, now) {
+    return done.filter(function (s) { return selesaiDiarsip(s, arch, now); }).length + arch.missed.length;
+  }
+  function lokal() { try { var I = root.FiezelI18n; return I && I.getLocale && I.getLocale() === 'th' ? 'th-TH' : 'id-ID'; } catch (_) { return 'id-ID'; } }
+  /* Nama mapel pendek untuk baris sempit: singkatan di dalam kurung bila ada. */
+  function mapelOf(a) {
+    var id = (a && a.source && a.source.subjectId) || '';
+    var s = id ? SUBJECTS_17.filter(function (x) { return x.id === id; })[0] : null;
+    var nama = (a && a.source && a.source.subjectName) || (s && s.name) || '';
+    if (!nama) return null;
+    var m = /\(([^)]+)\)\s*$/.exec(nama);
+    return { id: id, nama: m ? m[1] : nama.split(' & ')[0], color: s ? s.color : '' };
+  }
+  function titikMapel(mp) { return '<span class="ch-dot" aria-hidden="true"' + (mp.color ? ' style="--chip-color:' + mp.color + '"' : '') + '></span>'; }
+  function metaTugas(a, ekor) {
+    var mp = mapelOf(a), bag = [];
+    if (mp) bag.push(titikMapel(mp) + esc(mp.nama));
+    bag.push(isMissionRec(a) ? esc(t('kelas.siklus.misi-pilihanmu', 'Misi pilihanmu')) : esc(a.teacher || t('kelas.guru', 'Guru')));
+    if (ekor) bag.push(ekor);
+    return '<p class="ch-trow-meta">' + bag.join('<span class="ch-sep" aria-hidden="true">·</span>') + '</p>';
+  }
+  function ubinTanggal(iso, lewat) {
+    if (!iso) return '<span class="ch-trow-lead is-none" aria-hidden="true">' + icon('clock') + '</span>';
+    var d = new Date(iso + 'T00:00:00'), hari = '';
+    try { hari = d.toLocaleDateString(lokal(), { weekday: 'short' }); } catch (_) {}
+    return '<span class="ch-trow-lead' + (lewat ? ' is-late' : '') + '" aria-hidden="true"><small>' + esc(hari) + '</small><b>' + d.getDate() + '</b></span>';
+  }
+  function tombolIkon(aksi, id, ikon, label, testid) {
+    return '<button type="button" class="ch-icon-btn ch-plain" data-ch="' + aksi + '" data-id="' + esc(id) + '" aria-label="' + esc(label) + '" title="' + esc(label) + '" data-testid="' + testid + '">' + icon(ikon) + '</button>';
+  }
+  /* Tenggat pendek untuk kaki baris: tanggalnya sudah ada di ubin kiri, jadi yang diulang
+     hanya jaraknya. */
+  function tenggatPendek(a) {
+    if (!a.deadline) return t('kelas.tanpa-tenggat', 'Tanpa tenggat');
+    var d = R().daysLeft(a.deadline, today());
+    return d < 0 ? t('kelas.lewat-n-hari', 'Lewat {n} hari', { n: -d }) : d === 0 ? t('kelas.tenggat-hari-ini', 'Tenggat hari ini') : d === 1 ? t('kelas.tenggat-besok', 'Tenggat besok') : t('kelas.siklus.n-hari-lagi', '{n} hari lagi', { n: d });
+  }
+  function kakiBaris(kiri, urgent, aksi) {
+    return '<div class="ch-trow-foot"><span class="ch-trow-when' + (urgent ? ' is-urgent' : '') + '">' + kiri + '</span><span class="ch-trow-act">' + aksi + '</span></div>';
+  }
+  /** Satu baris tugas yang belum dikerjakan: judul, satu baris keterangan, tenggat + satu tombol. */
+  function barisTugas(a, jenis) {
+    var u = ui(), jalan = u.runner && u.runner.aid === a.id && !u.runner.finished;
+    var n = (a.itemIds || []).length, lewat = jenis === 'terlewat';
+    var sisa = a.deadline ? R().daysLeft(a.deadline, today()) : 99;
+    return '<article class="ch-card ch-trow' + (a.mode === 'ujian' ? ' is-exam' : '') + (lewat ? ' is-late' : '') + '" data-testid="class-assign-' + esc(a.id) + '">' +
+      ubinTanggal(a.deadline, lewat) +
+      '<div class="ch-trow-main">' +
+        (a.mode === 'ujian' ? '<span class="ch-trow-tag">' + icon('shield-check') + ' ' + esc(t('kelas.siklus.ujian-mini', 'Ujian mini')) + '</span>' : '') +
+        '<h3 class="ch-trow-title">' + esc(a.title) + '</h3>' +
+        metaTugas(a, esc(t('kelas.siklus.n-soal', '{n} soal', { n: n }))) +
+        kakiBaris((jalan ? esc(t('kelas.siklus.sedang', 'Sedang dikerjakan')) + ' · ' : '') + esc(tenggatPendek(a)), lewat || sisa <= 1,
+          '<button type="button" class="ch-btn is-primary is-small" data-ch="open" data-id="' + esc(a.id) + '" data-testid="class-open-' + esc(a.id) + '">' + esc(jalan ? t('umum.lanjutkan', 'Lanjutkan') : t('kelas.kerjakan', 'Kerjakan')) + '</button>' +
+          (lewat ? tombolIkon('arsip-terlewat', a.id, 'archive', t('kelas.siklus.arsipkan', 'Arsipkan'), 'class-archive-' + esc(a.id)) : '')) +
+      '</div>' +
+    '</article>';
+  }
+  /** Satu baris tugas selesai: skor di depan, pembahasan dan arsip di kaki. */
+  function barisSelesai(s, diArsip) {
+    var acc = s.t ? s.c / s.t : null;
+    var tingkat = acc == null ? '' : acc >= 0.8 ? ' is-hi' : acc >= 0.6 ? ' is-mid' : ' is-lo';
+    return '<article class="ch-card ch-trow is-done" data-testid="class-done-' + esc(s.id) + '">' +
+      '<span class="ch-trow-lead is-score' + tingkat + '" aria-label="' + esc(t('kelas.siklus.skor-aria', 'Skor {skor}', { skor: pct(acc) })) + '"><b>' + pct(acc) + '</b></span>' +
+      '<div class="ch-trow-main">' +
+        '<h3 class="ch-trow-title">' + esc(s.title) + '</h3>' +
+        metaTugas(s) +
+        kakiBaris(esc(t('kelas.siklus.selesai-tgl', 'Selesai {tanggal}', { tanggal: fmtDate(s.at) })), false,
+          (Array.isArray(s.results) ? '<button type="button" class="ch-btn is-ghost is-small" data-ch="review" data-id="' + esc(s.id) + '" data-testid="class-review-' + esc(s.id) + '">' + esc(t('kelas.siklus.lihat-hasil', 'Lihat hasil')) + '</button>' : '') +
+          (diArsip
+            ? tombolIkon('pulihkan', s.id, 'undo-2', t('kelas.siklus.pulihkan', 'Pulihkan'), 'class-restore-' + esc(s.id))
+            : tombolIkon('arsip-selesai', s.id, 'archive', t('kelas.siklus.arsipkan', 'Arsipkan'), 'class-archive-' + esc(s.id)))) +
+      '</div>' +
+    '</article>';
+  }
+  /** Tugas yang tidak dikerjakan dan sudah masuk Arsip (disapu, diarsipkan murid, atau ditarik guru). */
+  function barisTerlewatArsip(a) {
+    var ditarik = a.oleh === 'guru';
+    var ket = ditarik
+      ? t('kelas.siklus.ditarik-guru', 'Ditarik guru')
+      : t('kelas.siklus.tidak-dikerjakan', 'Tidak dikerjakan · tenggat {tanggal}', { tanggal: a.deadline ? fmtDate(a.deadline) : '—' });
+    return '<article class="ch-card ch-trow is-missed" data-testid="class-missed-' + esc(a.id) + '">' +
+      '<span class="ch-trow-lead is-none" aria-hidden="true">' + icon(ditarik ? 'circle-slash' : 'clock') + '</span>' +
+      '<div class="ch-trow-main">' +
+        '<h3 class="ch-trow-title">' + esc(a.title) + '</h3>' +
+        metaTugas(a) +
+        kakiBaris(esc(ket), false, ditarik ? '' : tombolIkon('pulihkan', a.id, 'undo-2', t('kelas.siklus.pulihkan', 'Pulihkan'), 'class-restore-' + esc(a.id))) +
+      '</div>' +
+    '</article>';
+  }
+  function kosong(ikon, teks, tambahan, testid) {
+    return '<div class="ch-card ch-empty"' + (testid ? ' data-testid="' + testid + '"' : '') + '>' + icon(ikon) + '<p>' + teks + '</p>' + (tambahan || '') + '</div>';
+  }
+  function segmenBar(seg, nK, nT, nS) {
+    return '<div class="ch-segbar" role="tablist" aria-label="' + esc(t('kelas.siklus.seg-aria', 'Status tugas')) + '" data-testid="class-seg">' +
+      [['kerjakan', t('kelas.siklus.seg-kerjakan', 'Kerjakan'), nK], ['terlewat', t('kelas.siklus.terlewat', 'Terlewat'), nT], ['selesai', t('umum.selesai', 'Selesai'), nS]].map(function (s) {
+        var on = s[0] === seg;
+        return '<button type="button" role="tab" aria-selected="' + (on ? 'true' : 'false') + '" class="ch-segbar-btn ch-plain' + (on ? ' is-active' : '') + (s[0] === 'terlewat' && s[2] ? ' has-late' : '') + '" data-ch="seg" data-seg="' + s[0] + '" data-testid="class-seg-' + s[0] + '">' +
+          esc(s[1]) + (s[2] ? ' <span class="ch-segbar-n">' + s[2] + '</span>' : '') + '</button>';
+      }).join('') +
+    '</div>';
+  }
+  function kerjakanPanel(list, nTerlewat, curFilter) {
+    var isi;
+    if (list.length) {
+      var grup = [[t('kelas.siklus.grup-segera', 'Hari ini & besok'), []], [t('kelas.siklus.grup-minggu', '7 hari ke depan'), []], [t('kelas.siklus.grup-nanti', 'Nanti'), []]];
+      list.forEach(function (a) { var d = a.deadline ? R().daysLeft(a.deadline, today()) : 99; grup[d <= 1 ? 0 : d <= 7 ? 1 : 2][1].push(a); });
+      isi = grup.filter(function (g) { return g[1].length; }).map(function (g) {
+        return '<h3 class="ch-group">' + esc(g[0]) + ' <small>' + g[1].length + '</small></h3>' + g[1].map(function (a) { return barisTugas(a, 'kerjakan'); }).join('');
+      }).join('');
+    } else if (curFilter) {
+      isi = kosong('inbox', esc(t('kelas.filter-mapel-kosong', 'Belum ada tugas untuk mapel ini.')),
+        '<button type="button" class="ch-btn is-small is-ghost" data-ch="clear-subject-filter">' + esc(t('kelas.filter-tampilkan-semua', 'Tampilkan Semua')) + '</button>', 'class-empty-pending');
+    } else if (!classCode()) {
+      isi = kosong('inbox', esc(t('kelas.siklus.kosong-tanpa-kelas', 'Masukkan kode kelas dari gurumu supaya tugasnya masuk ke sini.')),
+        '<button type="button" class="ch-btn is-primary is-small" data-ch="tab" data-tab="kelas"><span class="kelasku-wordmark">' + esc(t('kelas.gabung-kelas', 'Gabung KelasKu')) + '</span></button>', 'class-empty-pending');
+    } else {
+      isi = kosong('check-check', esc(t('kelas.siklus.kosong-kerjakan', 'Tidak ada tugas yang menunggu. Tugas baru dari guru muncul di sini dan di lonceng notifikasi.')),
+        nTerlewat ? '<button type="button" class="ch-btn is-small is-ghost" data-ch="seg" data-seg="terlewat" data-testid="class-empty-to-late">' + esc(t('kelas.siklus.lihat-terlewat', 'Lihat {n} tugas terlewat', { n: nTerlewat })) + '</button>' : '', 'class-empty-pending');
+    }
+    var target = targetCard(), kurikulum = combinedCurriculumSection();
+    return '<section class="ch-list ch-section-tugas" data-testid="class-section-pending">' + isi + '</section>' +
+      curriculumInboxSection() +
+      (target || kurikulum
+        ? '<section class="ch-mandiri" data-testid="class-section-mandiri">' +
+            '<h2 class="ch-h2">' + icon('sprout') + ' ' + esc(t('kelas.siklus.mandiri-judul', 'Latihan pilihanmu')) + '</h2>' +
+            '<p class="ch-muted ch-small">' + esc(t('kelas.siklus.mandiri-sub', 'Bukan tugas dari guru. Kamu yang memilih kapan mengerjakannya.')) + '</p>' +
+            target + kurikulum +
+          '</section>'
+        : '');
+  }
+  function terlewatPanel(list) {
+    return '<section class="ch-list" data-testid="class-section-terlewat">' +
+      '<p class="ch-note">' + icon('info') + ' ' + esc(t('kelas.siklus.terlewat-catatan', 'Masih bisa dikerjakan. Tugas terlewat pindah sendiri ke Arsip {n} hari setelah tenggat.', { n: ARSIP_TERLEWAT_HARI })) + '</p>' +
+      (list.length
+        ? list.map(function (a) { return barisTugas(a, 'terlewat'); }).join('')
+        : kosong('party-popper', esc(t('kelas.siklus.kosong-terlewat', 'Tidak ada tugas terlewat. Pertahankan!')), '', 'class-empty-late')) +
+    '</section>';
+  }
+  function awalMinggu(now) {
+    var d = new Date(now); d.setHours(0, 0, 0, 0);
+    d.setDate(d.getDate() - ((d.getDay() + 6) % 7));
+    return d.getTime();
+  }
+  function selesaiPanel(list, nArsip) {
+    var u = ui(), batas = awalMinggu(Date.now());
+    var ini = list.filter(function (s) { return (s.at || 0) >= batas; }), lalu = list.filter(function (s) { return (s.at || 0) < batas; });
+    var bukaLalu = !!u.bukaSebelumnya || !ini.length;
+    var isi = '';
+    if (ini.length) isi += '<h3 class="ch-group">' + esc(t('kelas.minggu-ini', 'Minggu ini')) + ' <small>' + ini.length + '</small></h3>' + ini.map(function (s) { return barisSelesai(s, false); }).join('');
+    if (lalu.length) {
+      isi += '<h3 class="ch-group">' + esc(t('kelas.siklus.grup-sebelumnya', 'Sebelumnya')) + ' <small>' + lalu.length + '</small></h3>' +
+        (bukaLalu
+          ? lalu.map(function (s) { return barisSelesai(s, false); }).join('')
+          : '<button type="button" class="ch-fold ch-plain" data-ch="toggle-sebelumnya" data-testid="class-done-more">' + esc(t('kelas.siklus.tampilkan-n', 'Tampilkan {n} tugas', { n: lalu.length })) + ' ' + icon('chevron-down') + '</button>');
+    }
+    if (!list.length) isi = kosong('clipboard-list', esc(t('kelas.siklus.kosong-selesai', 'Tugas yang sudah kamu kerjakan muncul di sini selama {n} hari, lalu pindah ke Arsip.', { n: ARSIP_SELESAI_HARI })), '', 'class-empty-done');
+    return '<section class="ch-list ch-section-done" data-testid="class-section-done">' + isi +
+      '<button type="button" class="ch-archive-link ch-plain" data-ch="buka-arsip" data-testid="class-open-archive">' + icon('archive') +
+        '<span><b>' + esc(t('kelas.siklus.arsip', 'Arsip')) + '</b><small>' + esc(t('kelas.siklus.arsip-n', '{n} tugas tersimpan', { n: nArsip })) + '</small></span>' + icon('chevron-right') + '</button>' +
+      '<p class="ch-note">' + icon('info') + ' ' + esc(t('kelas.siklus.selesai-catatan', 'Tugas selesai pindah sendiri ke Arsip setelah {n} hari. Hasilnya sudah terkirim ke gurumu.', { n: ARSIP_SELESAI_HARI })) + '</p>' +
+    '</section>';
+  }
+  function arsipView() {
+    var u = ui(), arch = arsip(), now = Date.now(), q = String(u.arsipQ || '').trim().toLowerCase();
+    var rows = subs().filter(function (s) { return selesaiDiarsip(s, arch, now); }).map(function (s) { return { at: Number(s.at) || 0, done: true, rec: s }; })
+      .concat(arch.missed.map(function (a) { return { at: Number(a.arsipAt) || 0, done: false, rec: a }; }));
+    var total = rows.length;
+    if (q) rows = rows.filter(function (r) { var mp = mapelOf(r.rec); return [r.rec.title, r.rec.teacher, r.rec.from, mp && mp.nama].join(' ').toLowerCase().indexOf(q) !== -1; });
+    rows.sort(function (a, b) { return b.at - a.at; });
+    var n = Math.max(20, Number(u.arsipN) || 40);
+    var daftar = rows.length
+      ? rows.slice(0, n).map(function (r) { return r.done ? barisSelesai(r.rec, true) : barisTerlewatArsip(r.rec); }).join('') +
+        (rows.length > n ? '<button type="button" class="ch-fold ch-plain" data-ch="arsip-lagi" data-testid="class-archive-more">' + esc(t('kelas.siklus.tampilkan-n', 'Tampilkan {n} tugas', { n: Math.min(40, rows.length - n) })) + ' ' + icon('chevron-down') + '</button>' : '')
+      : kosong('archive', esc(q ? t('kelas.siklus.arsip-tidak-ketemu', 'Tidak ada tugas yang cocok.') : t('kelas.siklus.arsip-kosong', 'Arsip masih kosong. Tugas selesai masuk ke sini sendiri setelah {n} hari.', { n: ARSIP_SELESAI_HARI })), '', 'class-archive-empty');
+    return '<div class="ch-body" data-testid="class-archive">' +
+      '<div><button type="button" class="ch-btn is-ghost is-small" data-ch="tutup-arsip" data-testid="class-archive-back">' + icon('chevron-left') + ' ' + esc(t('kelas.siklus.kembali-tugas', 'Kembali ke Tugas')) + '</button></div>' +
+      '<h2 class="ch-h2">' + icon('archive') + ' ' + esc(t('kelas.siklus.arsip', 'Arsip')) + ' <small>' + total + '</small></h2>' +
+      '<p class="ch-muted ch-small">' + esc(t('kelas.siklus.arsip-sub', 'Tersimpan di HP ini. Hasil yang sudah terkirim ke guru tidak berubah.')) + '</p>' +
+      (total ? '<label class="ch-search">' + icon('search') + '<input type="search" name="arsip-q" value="' + esc(u.arsipQ || '') + '" placeholder="' + esc(t('kelas.siklus.cari', 'Cari judul, mapel, atau guru')) + '" aria-label="' + esc(t('kelas.siklus.cari-aria', 'Cari di Arsip')) + '" autocomplete="off" data-testid="class-archive-search"></label>' : '') +
+      '<section class="ch-list">' + daftar + '</section>' +
+    '</div>';
+  }
+  function closeArsipLayer() {
+    var u = ui();
+    if (!u.arsipView) return false;
+    u.arsipView = false; u.arsipQ = '';
+    saveUi(); renderStudent();
+    return true;
+  }
+  function openArsip() {
+    var u = ui(); u.arsipView = true; u.arsipN = 40; u.arsipQ = ''; u.review = null;
+    var nav = root.FiezelBackNav;
+    if (nav && typeof nav.pushLayer === 'function') { try { nav.pushLayer({ id: ARSIP_LAYER, close: closeArsipLayer }); } catch (_) {} }
+  }
+  function closeArsip() {
+    var nav = root.FiezelBackNav;
+    if (nav && typeof nav.dismiss === 'function') { try { nav.dismiss(ARSIP_LAYER); } catch (_) {} }
+    var u = ui(); u.arsipView = false; u.arsipQ = '';
+  }
+
+  /* Ikon mapel DICABUT (m025-364): 12 dari 17 namanya tidak ada di subset lucide.min.js, jadi
+     kartu Matematika, IPA, IPS, dan sembilan lainnya merender kotak kosong. Warna mapel
+     sudah cukup membedakannya — ia dipakai titik di chip dan di baris tugas. */
   var SUBJECTS_17 = [
-    { id: 'MAT', name: 'Matematika', icon: 'calculator', color: '#1D5C52' },
-    { id: 'IPA', name: 'Ilmu Pengetahuan Alam (IPA)', icon: 'flask-conical', color: '#0E7490' },
-    { id: 'IPS', name: 'Ilmu Pengetahuan Sosial (IPS)', icon: 'globe', color: '#B45309' },
-    { id: 'IND', name: 'Bahasa Indonesia', icon: 'book-open', color: '#BE123C' },
-    { id: 'ENG', name: 'Bahasa Inggris', icon: 'languages', color: '#4338CA' },
-    { id: 'PPK', name: 'Pendidikan Pancasila', icon: 'shield', color: '#15803D' },
-    { id: 'INF', name: 'Informatika', icon: 'cpu', color: '#0369A1' },
-    { id: 'PAI', name: 'Pendidikan Agama & Budi Pekerti', icon: 'heart-handshake', color: '#047857' },
-    { id: 'PJK', name: 'PJOK', icon: 'activity', color: '#C2410C' },
-    { id: 'SNB', name: 'Seni & Budaya', icon: 'palette', color: '#7E22CE' },
-    { id: 'PRA', name: 'Prakarya & Kewirausahaan', icon: 'hammer', color: '#A16207' },
-    { id: 'FIS', name: 'Fisika', icon: 'zap', color: '#1E40AF' },
-    { id: 'KIM', name: 'Kimia', icon: 'atom', color: '#0D9488' },
-    { id: 'BIO', name: 'Biologi', icon: 'dna', color: '#16A34A' },
-    { id: 'EKO', name: 'Ekonomi', icon: 'trending-up', color: '#0284C7' },
-    { id: 'GEO', name: 'Geografi', icon: 'map-pin', color: '#D97706' },
-    { id: 'SOS', name: 'Sosiologi', icon: 'users', color: '#6D28D9' }
+    { id: 'MAT', name: 'Matematika', color: '#1D5C52' },
+    { id: 'IPA', name: 'Ilmu Pengetahuan Alam (IPA)', color: '#0E7490' },
+    { id: 'IPS', name: 'Ilmu Pengetahuan Sosial (IPS)', color: '#B45309' },
+    { id: 'IND', name: 'Bahasa Indonesia', color: '#BE123C' },
+    { id: 'ENG', name: 'Bahasa Inggris', color: '#4338CA' },
+    { id: 'PPK', name: 'Pendidikan Pancasila', color: '#15803D' },
+    { id: 'INF', name: 'Informatika', color: '#0369A1' },
+    { id: 'PAI', name: 'Pendidikan Agama & Budi Pekerti', color: '#047857' },
+    { id: 'PJK', name: 'PJOK', color: '#C2410C' },
+    { id: 'SNB', name: 'Seni & Budaya', color: '#7E22CE' },
+    { id: 'PRA', name: 'Prakarya & Kewirausahaan', color: '#A16207' },
+    { id: 'FIS', name: 'Fisika', color: '#1E40AF' },
+    { id: 'KIM', name: 'Kimia', color: '#0D9488' },
+    { id: 'BIO', name: 'Biologi', color: '#16A34A' },
+    { id: 'EKO', name: 'Ekonomi', color: '#0284C7' },
+    { id: 'GEO', name: 'Geografi', color: '#D97706' },
+    { id: 'SOS', name: 'Sosiologi', color: '#6D28D9' }
   ];
 
   function fetchClassTeachers() {
@@ -360,6 +681,7 @@
       el.addEventListener('input', function (e) {
         lastStudentInputAt = Date.now();
         if (e.target && e.target.name === 'code') studentDraftCode = e.target.value;
+        if (e.target && e.target.name === 'arsip-q') { ui().arsipQ = e.target.value; saveUi(); renderStudent(); }
       });
       el.addEventListener('keydown', function () {
         lastStudentInputAt = Date.now();
@@ -391,6 +713,7 @@
     if (!id) return false;
     if (!sEl) { pendingOpen = id; return true; }
     var a = assignments().filter(function (x) { return x.id === id; })[0];
+    if (!a) { var arsipan = arsip().missed.filter(function (x) { return x.id === id && x.oleh !== 'guru'; })[0]; if (arsipan && pulihkan(id)) a = assignments().filter(function (x) { return x.id === id; })[0]; }
     if (!a) { var done = subs().filter(function (x) { return x.id === id; })[0]; if (done) { ui().tab = 'tugas'; ui().review = id; saveUi(); renderStudent(); return true; } if (sEnv.toast) sEnv.toast(t('kelas.tugas-tidak-ditemukan', 'Tugas ini tidak ditemukan atau sudah selesai.')); return false; }
     startRunner(a); return true;
   }
@@ -544,10 +867,14 @@
     unbindFocus();
     var res = null; try { res = LF() ? LF().recordAssignmentResult({ id: a.id, title: a.title, skill: a.skills[0], mode: a.mode, minutes: Math.round((Date.now() - r.startedAt) / 60000), results: r.answers, focus: focus, selfDirected: !!a.isMission }) : null; } catch (_) {}
     var correct = r.answers.filter(function (x) { return x.correct; }).length;
-    var sub = { id: a.id, title: a.title, from: a.from, teacher: a.teacher || '', cls: a.cls || classCode(), skills: a.skills, mode: a.mode, deadline: a.deadline || null, at: Date.now(), c: correct, t: r.answers.length, results: r.answers, itemIds: a.itemIds, items: a.items || undefined, unitId: a.unitId || undefined, sent: !!res };
-    var list = subs().filter(function (x) { return x.id !== a.id; }); list.push(sub); writeJson(SUB_KEY, list.slice(-30));
-    /* Bukti unit kurikulum ditulis ke buku yang TIDAK dipotong. Baris di atas sengaja
-       dibiarkan memotong: ia riwayat layar Tugas, bukan bukti penguasaan. */
+    var sub = { id: a.id, title: a.title, from: a.from, teacher: a.teacher || '', cls: a.cls || classCode(), skills: a.skills, mode: a.mode, deadline: a.deadline || null, at: Date.now(), c: correct, t: r.answers.length, results: r.answers, itemIds: a.itemIds, items: a.items || undefined, unitId: a.unitId || undefined, sent: !!res, isMission: a.isMission ? true : undefined, source: a.source || undefined };
+    var list = subs().filter(function (x) { return x.id !== a.id; }); list.push(sub); simpanRiwayat(list);
+    /* Kiriman baru selalu mulai dari tab Selesai: tanda arsip/pulih lama untuk id yang sama
+       (misi yang diulang, tugas terlewat yang dipulihkan) tidak boleh ikut menyembunyikannya. */
+    try { var archF = arsip(); if (archF.ids[a.id] || archF.missed.some(function (x) { return x.id === a.id; })) { delete archF.ids[a.id]; archF.missed = archF.missed.filter(function (x) { return x.id !== a.id; }); saveArsip(archF); } } catch (_) {}
+    /* Bukti unit kurikulum ditulis ke buku yang TIDAK dipotong. Riwayat di atas kini juga
+       tidak dipotong diam-diam (simpanRiwayat), tapi ia tetap riwayat layar Tugas, bukan
+       bukti penguasaan. */
     if (a.isMission && a.unitId) {
       /* Hasil per sub-bab dihitung di sini, bukan disimpan di runner: `itemId` sudah ada
          di setiap jawaban, dan padanan sub-babnya ada di butir soalnya. */
@@ -582,6 +909,15 @@
     renderStudent();
   }
 
+  /* Baris bawah judul. Dulu "Guru: <satu nama>" diambil dari tugas TERAKHIR, padahal tugas
+     datang dari tiga guru — murid membaca kelasnya seolah hanya punya satu guru. */
+  function headSub() {
+    var u = ui(), n = Array.isArray(u.classTeachers) ? u.classTeachers.length : 0, bag = [];
+    if (n > 1) bag.push(esc(t('kelas.siklus.n-guru', '{n} guru', { n: n })));
+    else if (teacherName()) bag.push(esc(t('kelas.guru', 'Guru')) + ' <b>' + esc(teacherName()) + '</b>');
+    if (classCode()) bag.push(esc(t('kelas.kode-label', 'Kode')) + ' ' + esc(classCode()));
+    return bag.join(' · ');
+  }
   function renderStudent(opts) {
     if (!sEl) return;
     if (opts && opts.quiet && isStudentBusy()) {
@@ -594,8 +930,12 @@
     }
     lastStudentDataFp = fp;
     pendingStudentRender = false;
-    var u = ui(), pend = assignments(), done = subs();
-    var key = (u.runner && !u.paused ? 'runner|' + u.runner.aid + '|' + u.runner.idx : (u.review ? 'review|' + u.review : u.curriculumView ? 'curriculum|' + u.curriculumView : u.tab)) + '|' + (classCode() || '') + '|' + (u.editCode ? '1' : '0');
+    var u = ui();
+    /* Papan Kelas pindah ke tab Kelas (m025-364); ingatan tab lama mendarat di sana. */
+    if (u.tab === 'papan') u.tab = 'kelas';
+    try { rapikanTerlewat(); } catch (_) {}
+    var pend = assignments(), done = subs();
+    var key = (u.runner && !u.paused ? 'runner|' + u.runner.aid + '|' + u.runner.idx : (u.review ? 'review|' + u.review : u.curriculumView ? 'curriculum|' + u.curriculumView : u.arsipView ? 'arsip' : u.tab)) + '|' + (classCode() || '') + '|' + (u.editCode ? '1' : '0');
     var repaint = key === lastStudentPaintKey;
     lastStudentPaintKey = key;
     var activeSaved = null;
@@ -611,10 +951,10 @@
         };
       }
     } catch (_) {}
-    var body = u.runner && !u.paused ? runnerView() : u.review ? reviewView(u.review) : u.curriculumView ? curriculumModalView(u.curriculumView) : u.tab === 'papan' ? papanView() : u.tab === 'kelas' ? kelasView() : u.tab === 'progres' ? progresView() : tugasView(pend, done);
+    var body = u.runner && !u.paused ? runnerView() : u.review ? reviewView(u.review) : u.curriculumView ? curriculumModalView(u.curriculumView) : u.arsipView ? arsipView() : u.tab === 'kelas' ? kelasView() : u.tab === 'progres' ? progresView() : tugasView(pend, done);
     sEl.innerHTML = '<section class="ch ch-student' + (repaint ? ' is-repaint' : '') + '" data-testid="class-hub-student">' +
-      '<header class="ch-head"><div><h1 data-testid="class-hub-title">' + (className() ? esc(className()) : (classCode() ? WM + ' ' + esc(classCode()) : t('kelas.belum-terhubung', 'Belum terhubung ke ') + WM)) + '</h1><p class="ch-sub">' + (teacherName() ? 'Guru: <b>' + esc(teacherName()) + '</b>' + (classCode() ? ' · ' : '') : '') + (classCode() ? 'Kode ' + esc(classCode()) : '') + '</p></div></header>' +
-      (u.runner && !u.paused || u.curriculumView ? '' : '<nav class="ch-tabs" role="tablist" aria-label="' + esc(t('kelas.nav-aria', 'Bagian KelasKu')) + '">' + [['tugas', t('umum.tugas', 'Tugas'), pend.length], ['papan', t('kelas.papan-kelas', 'Papan'), 0], ['progres', t('kelas.tab-progres', 'Hasilku'), 0], ['kelas', t('kelas.kelas-saya', 'Kelas Saya'), 0]].map(function (t) { var active = u.tab === t[0] && !u.review; return '<button type="button" role="tab" id="ch-tab-' + t[0] + '" aria-controls="ch-panel-' + t[0] + '" aria-selected="' + (active ? 'true' : 'false') + '" tabindex="' + (active ? '0' : '-1') + '" class="ch-tab' + (active ? ' is-active' : '') + '" data-ch="tab" data-tab="' + t[0] + '" data-testid="class-tab-' + t[0] + '">' + t[1] + (t[2] ? '<span class="ch-badge">' + t[2] + '</span>' : '') + '</button>'; }).join('') + '</nav>') +
+      '<header class="ch-head"><div><h1 data-testid="class-hub-title">' + (className() ? esc(className()) : (classCode() ? WM + ' ' + esc(classCode()) : t('kelas.belum-terhubung', 'Belum terhubung ke ') + WM)) + '</h1><p class="ch-sub">' + headSub() + '</p></div></header>' +
+      (u.runner && !u.paused || u.curriculumView ? '' : '<nav class="ch-tabs" role="tablist" aria-label="' + esc(t('kelas.nav-aria', 'Bagian KelasKu')) + '">' + [['tugas', t('umum.tugas', 'Tugas'), pend.length], ['progres', t('kelas.tab-progres', 'Hasilku'), 0], ['kelas', t('kelas.kelas-saya', 'Kelas Saya'), 0]].map(function (t) { var active = u.tab === t[0] && !u.review && !u.arsipView; return '<button type="button" role="tab" id="ch-tab-' + t[0] + '" aria-controls="ch-panel-' + t[0] + '" aria-selected="' + (active ? 'true' : 'false') + '" tabindex="' + (active ? '0' : '-1') + '" class="ch-tab' + (active ? ' is-active' : '') + '" data-ch="tab" data-tab="' + t[0] + '" data-testid="class-tab-' + t[0] + '">' + t[1] + (t[2] ? '<span class="ch-badge">' + t[2] + '</span>' : '') + '</button>'; }).join('') + '</nav>') +
       '<div class="ch-tabpanel" role="tabpanel" id="ch-panel-' + (u.curriculumView ? 'curriculum' : u.tab) + '" aria-label="' + esc(t('kelas.panel-aria', 'Isi KelasKu')) + '">' + body + '</div></section>';
     if (activeSaved) {
       try {
@@ -630,21 +970,6 @@
       } catch (_) {}
     }
     if (sEnv.afterRender) try { sEnv.afterRender(); } catch (_) {}
-  }
-  function assignCard(a, pending) {
-    var u = ui(), inProgress = pending && u.runner && u.runner.aid === a.id && !u.runner.finished;
-    var st = pending ? statusOf(a, { startedAt: inProgress ? u.runner.startedAt : 0 }) : statusOf(a, { done: { at: a.at } });
-    var n = pending ? a.itemIds.length : a.t;
-    var subjTag = '';
-    if (a.source && (a.source.subjectName || a.source.subjectId)) {
-      var sName = a.source.subjectName || a.source.subjectId;
-      var sObj = SUBJECTS_17.filter(function (x) { return x.id === (a.source.subjectId || ''); })[0];
-      subjTag = '<span class="ch-subject-tag">' + (sObj ? icon(sObj.icon) + ' ' : '') + esc(sName) + '</span>';
-    }
-    return '<article class="ch-card ch-assign' + (a.mode === 'ujian' ? ' is-exam' : '') + '" data-testid="class-assign-' + esc(a.id) + '"><div class="ch-card-top"><span class="ch-from">' + subjTag + icon('graduation-cap') + ' Dari <b>' + esc(a.teacher || 'guru') + '</b>' + (a.from ? ' · ' + esc(a.from) : '') + '</span>' + statusChip(st) + '</div>' +
-      '<h3>' + esc(a.title) + '</h3><p class="ch-muted">' + (a.mode === 'ujian' ? 'Ujian mini · ' : 'Latihan · ') + n + ' soal · ' + (a.skills || []).map(skillLabel).join(' + ') + '</p>' +
-      '<div class="ch-card-foot"><span class="ch-deadline' + (st.late ? ' is-late' : '') + '">' + icon('calendar') + ' ' + (pending ? esc(deadlineText(a)) : 'Selesai ' + esc(fmtDate(a.at))) + '</span>' +
-      (pending ? '<button type="button" class="ch-btn is-primary" data-ch="open" data-id="' + esc(a.id) + '" data-testid="class-open-' + esc(a.id) + '">' + (inProgress ? 'Lanjutkan' : 'Kerjakan') + ' ' + icon('arrow-right') + '</button>' : '<button type="button" class="ch-btn is-ghost" data-ch="review" data-id="' + esc(a.id) + '" data-testid="class-review-' + esc(a.id) + '"><b>' + pct(a.t ? a.c / a.t : null) + '</b> · Lihat hasil</button>') + '</div></article>';
   }
   /* ===== TARGET MINGGU INI (m025-349, fitur F6) ========================================
      Lima belas kartu misi sejajar adalah KATALOG, bukan jalur. Murid yang membukanya
@@ -769,74 +1094,11 @@
     '</section>';
   }
 
-  function subjectPanelsSection(pend, done) {
-    var code = classCode();
-    if (!code) return '';
-    var u = ui();
-    var teachers = u.classTeachers || [];
-    var tMap = {};
-    teachers.forEach(function (t) { if (t.subjectId) tMap[t.subjectId] = t.teacherName; });
-
-    var activeSubjects = SUBJECTS_17.filter(function (s) {
-      if (tMap[s.id]) return true;
-      var hasPend = pend.some(function (a) { return (a.source && a.source.subjectId === s.id) || (Array.isArray(a.skills) && a.skills.indexOf(s.id) !== -1); });
-      var hasDone = done.some(function (a) { return (a.source && a.source.subjectId === s.id) || (Array.isArray(a.skills) && a.skills.indexOf(s.id) !== -1); });
-      return hasPend || hasDone;
-    });
-
-    /* Kelas yang belum punya guru mapel dan belum punya tugas TIDAK dikarang isinya.
-       Kode lama memajang lima mapel pertama dari daftar — lengkap dengan lonceng hijau
-       "Lengkap" dari badge di bawah — sehingga kelas kosong tampak seperti kelas yang
-       sudah berjalan, dan murid tidak punya cara tahu bedanya. */
-    if (!activeSubjects.length) {
-      return '<section class="ch-subject-panels-wrap" data-testid="class-subject-panels">' +
-        '<div class="ch-subject-panels-head"><div>' +
-          '<h3 class="ch-h3">' + icon('layers') + ' ' + esc(t('kelas.panel-mapel-judul', 'Mata Pelajaran Kelas')) + '</h3>' +
-        '</div></div>' +
-        '<div class="ch-card ch-empty" data-testid="class-subject-panels-empty">' + icon('user-plus') +
-          '<p>' + esc(t('kelas.panel-mapel-kosong', 'Belum ada guru mapel yang terdaftar di kelas ini. Kartu mata pelajaran muncul sendiri begitu gurumu mengirim tugas pertamanya.')) + '</p>' +
-        '</div>' +
-      '</section>';
-    }
-
-    var curFilter = u.filterSubject || null;
-
-    return '<section class="ch-subject-panels-wrap" data-testid="class-subject-panels">' +
-      '<div class="ch-subject-panels-head">' +
-        '<div>' +
-          '<h3 class="ch-h3">' + icon('layers') + ' ' + esc(t('kelas.panel-mapel-judul', 'Mata Pelajaran Kelas')) + '</h3>' +
-          '<p class="ch-muted ch-small">' + esc(t('kelas.panel-mapel-sub', 'Pilih kartu mapel untuk menyaring tugas & materi dari guru')) + '</p>' +
-        '</div>' +
-        (curFilter ? '<button type="button" class="ch-btn is-ghost is-small" data-ch="clear-subject-filter">' + icon('x') + ' ' + esc(t('kelas.semua-mapel', 'Tampilkan Semua Mapel')) + '</button>' : '') +
-      '</div>' +
-      '<div class="ch-subject-grid">' +
-        activeSubjects.map(function (s) {
-          var tName = tMap[s.id] || (s.id === 'ENG' && teacherName() ? teacherName() : '');
-          var taskCount = pend.filter(function (a) {
-            return (a.source && a.source.subjectId === s.id) || (Array.isArray(a.skills) && a.skills.indexOf(s.id) !== -1);
-          }).length;
-          var isSelected = (curFilter === s.id);
-          return '<button type="button" class="ch-subject-card' + (isSelected ? ' is-active' : '') + '" data-ch="filter-subject" data-subject="' + esc(s.id) + '" data-testid="subject-card-' + esc(s.id) + '" style="--mapel-color:' + s.color + '">' +
-            '<div class="ch-subject-top">' +
-              '<span class="ch-subject-icon">' + icon(s.icon) + '</span>' +
-              /* Nol tugas BUKAN "Lengkap". Badge hijau lama membuat mapel yang gurunya
-                 belum mengirim apa pun terbaca sebagai mapel yang sudah tuntas. */
-              (taskCount
-                ? '<span class="ch-badge is-warn">' + esc(t('kelas.mapel-tugas-menunggu', '{n} tugas', { n: taskCount })) + '</span>'
-                : '<span class="ch-badge is-mute">' + esc(t('kelas.mapel-tanpa-tugas', 'Belum ada tugas')) + '</span>') +
-            '</div>' +
-            '<h4 class="ch-subject-name">' + esc(s.name) + '</h4>' +
-            '<p class="ch-subject-teacher">' + (tName ? icon('user-check') + ' ' + esc(tName) : '<span class="ch-no-teacher">' + esc(t('kelas.mapel-menunggu-guru', 'Menunggu guru')) + '</span>') + '</p>' +
-          '</button>';
-        }).join('') +
-      '</div>' +
-    '</section>';
-  }
-
   /* ===== CHIP STRIP MAPEL (audit 2026-09-22, mengganti grid 17 kartu) =====================
      Grid lama memakan ~450px vertikal di 390px dan mendorong tugas yang harus dikerjakan
      ke bawah fold. Strip ini memakan 44px, berfungsi sebagai filter, dan bisa di-scroll
-     horizontal. Kartu lama (subjectPanelsSection) tetap tersedia untuk konteks lain. */
+     horizontal. m025-364: kartu lama (subjectPanelsSection) dicabut; strip ini satu-satunya
+     filter mapel, dan titik warnanya menggantikan ikon mapel yang dulu kosong. */
   function subjectChipStrip(pend, done) {
     var code = classCode();
     if (!code) return '';
@@ -862,7 +1124,7 @@
       }).length;
       var isSelected = (curFilter === s.id);
       return '<button type="button" class="ch-chip' + (isSelected ? ' is-active' : '') + '" data-ch="filter-subject" data-subject="' + esc(s.id) + '" data-testid="chip-' + esc(s.id) + '" style="--chip-color:' + s.color + '">' +
-        icon(s.icon) + ' ' + esc(s.name.length > 12 ? s.name.split(' ')[0] : s.name) +
+        titikMapel(s) + esc(mapelOf({ source: { subjectId: s.id } }).nama) +
         (taskCount ? ' <span class="ch-chip-badge">' + taskCount + '</span>' : '') +
       '</button>';
     }).join('');
@@ -893,56 +1155,22 @@
   }
 
   function tugasView(pend, done) {
-    var allPend = pend.slice().sort(function (a, b) { return String(a.deadline || '9').localeCompare(String(b.deadline || '9')); });
-    var allDone = done.slice().sort(function (a, b) { return b.at - a.at; });
-    var u = ui();
-    var curFilter = u.filterSubject || null;
-    var filteredPend = allPend;
-    var filteredDone = allDone;
-    if (curFilter) {
-      filteredPend = allPend.filter(function (a) {
-        return (a.source && a.source.subjectId === curFilter) ||
-               (Array.isArray(a.skills) && a.skills.indexOf(curFilter) !== -1);
-      });
-      filteredDone = allDone.filter(function (a) {
-        return (a.source && a.source.subjectId === curFilter) ||
-               (Array.isArray(a.skills) && a.skills.indexOf(curFilter) !== -1);
-      });
-    }
-    /* ── AUDIT FIX (2026-09-22): Restructured — tugas pertama, pendukung belakangan ── */
-    var pendSection = '<section class="ch-section-tugas" data-testid="class-section-pending">' +
-      '<h2 class="ch-h2">' + icon('clipboard-list') + ' ' + esc(t('kelas.perlu-dikerjakan', 'Perlu dikerjakan')) + ' <small>' + filteredPend.length + (curFilter ? ' (filter aktif)' : '') + '</small></h2>' +
-      (filteredPend.length
-        ? filteredPend.map(function (a) { return assignCard(a, true); }).join('')
-        : '<div class="ch-empty" data-testid="class-empty-pending">' + icon('inbox') +
-          (curFilter
-            ? '<p>' + esc(t('kelas.filter-mapel-kosong', 'Belum ada tugas untuk mapel ini.')) + ' <button type="button" class="ch-btn is-small is-ghost" data-ch="clear-subject-filter">' + esc(t('kelas.filter-tampilkan-semua', 'Tampilkan Semua')) + '</button></p>'
-            : (classCode()
-              ? '<p>' + t('kelas.murid-belum-ada-tugas', 'Belum ada tugas baru dari guru. Tugas yang dikirim guru muncul di sini dan di lonceng notifikasi.') + '</p>'
-              : '') +
-              (classCode() ? '' : '<button type="button" class="ch-btn" data-ch="tab" data-tab="kelas"><span class="kelasku-wordmark">Masukkan kode KelasKu</span></button>')) +
-          '</div>') +
-      '</section>';
-
-    var doneSection = filteredDone.length
-      ? '<section class="ch-section-done" data-testid="class-section-done">' +
-          '<h2 class="ch-h2">' + icon('check-circle') + ' ' + esc(t('umum.selesai', 'Selesai')) + ' <small>' + filteredDone.length + '</small></h2>' +
-          filteredDone.map(function (a) { return assignCard(a, false); }).join('') +
-        '</section>'
-      : '';
-
-    /* Kartu kurikulum gabungan: target + inbox + panel → satu blok ringkas */
-    var kurikulumGabungan = combinedCurriculumSection();
-
+    var u = ui(), now = Date.now(), arch = arsip(), curFilter = u.filterSubject || null;
+    function cocok(a) { return !curFilter || (a.source && a.source.subjectId === curFilter) || (Array.isArray(a.skills) && a.skills.indexOf(curFilter) !== -1); }
+    var kerjakan = pend.filter(function (a) { return !hariLewat(a) && cocok(a); })
+      .sort(function (a, b) { return String(a.deadline || '9').localeCompare(String(b.deadline || '9')); });
+    var terlewat = pend.filter(function (a) { return hariLewat(a) > 0 && cocok(a); })
+      .sort(function (a, b) { return String(b.deadline).localeCompare(String(a.deadline)); });
+    var selesai = done.filter(function (s) { return !selesaiDiarsip(s, arch, now) && cocok(s); })
+      .sort(function (a, b) { return (b.at || 0) - (a.at || 0); });
+    var seg = SEGMEN.indexOf(u.seg) !== -1 ? u.seg : 'kerjakan';
+    /* Satu tempat per status (m025-364). Dulu satu gulungan: sapaan, kartu mapel, target,
+       tugas aktif, kurikulum, LALU seluruh riwayat — sepuluh layar HP pada murid yang rajin. */
     return '<div class="ch-body">' +
       teacherGreetingCard() +
-      subjectPanelsSection(allPend, allDone) +
-      targetCard() +
-      pendSection +
-      curriculumInboxSection() +
-      doneSection +
-      '<hr class="ch-divider" aria-hidden="true">' +
-      kurikulumGabungan +
+      segmenBar(seg, kerjakan.length, terlewat.length, selesai.length) +
+      subjectChipStrip(pend, done) +
+      (seg === 'terlewat' ? terlewatPanel(terlewat) : seg === 'selesai' ? selesaiPanel(selesai, jumlahArsip(done, arch, now)) : kerjakanPanel(kerjakan, terlewat.length, curFilter)) +
       '</div>';
   }
   function kelasView() {
@@ -991,6 +1219,7 @@
           ? '<form class="ch-form" data-ch-form="join"><input name="code" value="' + esc(studentDraftCode) + '" placeholder="FZ-ABC234" maxlength="9" autocomplete="off" required data-testid="class-code-input"><button type="submit" class="ch-btn is-primary" data-testid="class-code-submit">' + esc(t('kelas.gabung-btn', 'Gabung')) + '</button></form>'
           : '') +
       '</section>' +
+      papanSection() +
       linkCards +
     '</div>';
   }
@@ -1101,7 +1330,11 @@
     { bg: '#F9E3DE', text: '#A03A30' }
   ];
 
-  function papanView() {
+  /* PAPAN KELAS PINDAH KE TAB KELAS (m025-364). Sebagai tab sendiri ia hampir selalu berisi
+     satu nama — murid itu sendiri — karena daftar teman hanya ada di HP guru. Tab kosong
+     yang tampak seperti fitur hanya menambah satu pintu yang harus dicoba murid. Sekarang
+     ia muncul di tab Kelas, dan HANYA bila teman sekelasnya benar-benar ada. */
+  function papanSection() {
     var ob = readJson('fiezel-onboarding-v1', {}) || {};
     var myName = ob.name || ob.nama || '';
     var mySubs = subs();
@@ -1144,24 +1377,7 @@
       studentsList = [{ name: myName, score: myScore, isMe: true }];
     }
 
-    /* AUDIT 2026-09-22: Empty state jujur — data palsu (Dara, Rafi, dll.) dihapus total */
-    if (!studentsList.length) {
-      return '<div class="ch-body ch-papan-body" data-testid="class-papan">' +
-        '<section class="ch-card ch-papan-card">' +
-          '<div class="ch-card-top">' +
-            '<div>' +
-              '<p class="ch-kicker">' + WM + (className() ? ' · ' + esc(className()) : (classCode() ? ' · ' + esc(classCode()) : '')) + '</p>' +
-              '<h3 style="font-size:18px;margin:0;">' + esc(t('kelas.papan-kelas', 'Papan kelas')) + '</h3>' +
-            '</div>' +
-            '<span class="ch-papan-period">' + esc(t('kelas.papan-minggu-ini', 'minggu ini')) + '</span>' +
-          '</div>' +
-          '<div class="ch-empty" style="padding:24px 16px;" data-testid="class-papan-empty">' + icon('users') +
-            '<p>' + esc(t('kelas.papan-kosong', 'Papan kelas muncul setelah kamu bergabung ke kelas dan ada teman yang mulai mengerjakan tugas.')) + '</p>' +
-            (!classCode() ? '<button type="button" class="ch-btn" data-ch="tab" data-tab="kelas"><span class="kelasku-wordmark">' + esc(t('kelas.gabung-kelas', 'Gabung KelasKu')) + '</span></button>' : '') +
-          '</div>' +
-        '</section>' +
-      '</div>';
-    }
+    if (!hasRealData || !studentsList.length) return '';
 
     studentsList.sort(function (a, b) { return b.score - a.score; });
 
@@ -1180,8 +1396,7 @@
     var myRank = 1;
     studentsList.forEach(function (st, idx) { if (st.isMe) myRank = idx + 1; });
 
-    return '<div class="ch-body ch-papan-body" data-testid="class-papan">' +
-      '<section class="ch-card ch-papan-card">' +
+    return '<section class="ch-card ch-papan-card" data-testid="class-papan">' +
         '<div class="ch-card-top">' +
           '<div>' +
             '<p class="ch-kicker">' + WM + (className() ? ' · ' + esc(className()) : (classCode() ? ' · ' + esc(classCode()) : '')) + '</p>' +
@@ -1196,9 +1411,7 @@
         '<div class="ch-papan-list" data-testid="class-leaderboard-list">' +
           rowsHtml +
         '</div>' +
-        (!hasRealData ? '<p class="ch-papan-sample-notice" data-testid="class-papan-solo-notice">' + icon('info') + ' ' + esc(t('kelas.papan-solo', 'Ini hanya skor pribadimu. Papan peringkat lengkap tersedia setelah teman sekelasmu bergabung.')) + '</p>' : '') +
-      '</section>' +
-    '</div>';
+      '</section>';
   }
 
   /* In-App Misi Belajar Kurikulum & Paspor */
@@ -1479,7 +1692,8 @@
   function reviewView(id) {
     var s = subs().filter(function (x) { return x.id === id; })[0]; if (!s) { ui().review = null; return tugasView(assignments(), subs()); }
     return '<div class="ch-body"><button type="button" class="ch-btn is-ghost is-small" data-ch="back">' + icon('chevron-left') + ' ' + t('umum.kembali', 'Kembali') + '</button><section class="ch-card"><p class="ch-kicker">Pembahasan · dari ' + esc(s.teacher || s.from || 'guru') + '</p><h2>' + esc(s.title) + '</h2><p class="ch-score">' + s.c + '<small>/' + s.t + '</small></p></section>' +
-      '<ol class="ch-review-list">' + s.results.map(function (r, i) { var item = resolveItem(s, r.itemId); if (!item) return ''; var why = item.why && item.why[r.chosen]; return '<li class="ch-card ' + (r.correct ? 'is-ok' : 'is-no') + '"><p class="ch-muted">' + t('umum.soal', 'Soal') + ' ' + (i + 1) + ' · ' + esc(skillLabel(item.skill || s.skills[0])) + '</p><b>' + esc(item.prompt) + '</b><p>Jawabanmu: <span class="' + (r.correct ? 'ch-ok' : 'ch-no') + '">' + esc(item.options[r.chosen] || '—') + '</span>' + (r.correct ? '' : ' · Benar: <b>' + esc(item.options[item.answer]) + '</b>') + '</p>' + (!r.correct && (why || item.note) ? '<p class="ch-muted">' + esc(why || item.note) + '</p>' : '') + '</li>'; }).join('') + '</ol></div>';
+      (Array.isArray(s.results) ? '' : '<p class="ch-note" data-testid="class-review-summary-only">' + icon('info') + ' ' + esc(t('kelas.siklus.pembahasan-ringkas', 'Pembahasan per soal hanya disimpan untuk {n} tugas terakhir. Skornya tetap tercatat.', { n: RIWAYAT_LENGKAP })) + '</p>') +
+      '<ol class="ch-review-list">' + (s.results || []).map(function (r, i) { var item = resolveItem(s, r.itemId); if (!item) return ''; var why = item.why && item.why[r.chosen]; return '<li class="ch-card ' + (r.correct ? 'is-ok' : 'is-no') + '"><p class="ch-muted">' + t('umum.soal', 'Soal') + ' ' + (i + 1) + ' · ' + esc(skillLabel(item.skill || s.skills[0])) + '</p><b>' + esc(item.prompt) + '</b><p>Jawabanmu: <span class="' + (r.correct ? 'ch-ok' : 'ch-no') + '">' + esc(item.options[r.chosen] || '—') + '</span>' + (r.correct ? '' : ' · Benar: <b>' + esc(item.options[item.answer]) + '</b>') + '</p>' + (!r.correct && (why || item.note) ? '<p class="ch-muted">' + esc(why || item.note) + '</p>' : '') + '</li>'; }).join('') + '</ol></div>';
   }
   var CURRICULUM_LAYER = 'kelasku-curriculum';
   /* K12 (m025-351): kartu kurikulum mengganti seluruh isi hub dan menyembunyikan tab bar.
@@ -1507,7 +1721,15 @@
     var b = e.target.closest ? e.target.closest('[data-ch]') : null; if (!b) return;
     var act = b.getAttribute('data-ch'), id = b.getAttribute('data-id'), u = ui();
     switch (act) {
-      case 'tab': u.tab = b.getAttribute('data-tab'); u.review = null; u.curriculumView = null; u.editCode = false; break;
+      case 'tab': u.tab = b.getAttribute('data-tab'); u.review = null; u.curriculumView = null; u.editCode = false; if (u.arsipView) closeArsip(); break;
+      case 'seg': u.seg = b.getAttribute('data-seg'); break;
+      case 'toggle-sebelumnya': u.bukaSebelumnya = !u.bukaSebelumnya; break;
+      case 'buka-arsip': openArsip(); break;
+      case 'tutup-arsip': closeArsip(); break;
+      case 'arsip-lagi': u.arsipN = (Number(u.arsipN) || 40) + 40; break;
+      case 'arsip-selesai': if (arsipkanSelesai(id) && sEnv.toast) sEnv.toast(t('kelas.siklus.toast-diarsip', 'Dipindah ke Arsip. Kamu bisa memulihkannya kapan saja.')); break;
+      case 'arsip-terlewat': if (arsipkanTerlewat(id) && sEnv.toast) sEnv.toast(t('kelas.siklus.toast-diarsip', 'Dipindah ke Arsip. Kamu bisa memulihkannya kapan saja.')); break;
+      case 'pulihkan': if (pulihkan(id) && sEnv.toast) sEnv.toast(t('kelas.siklus.toast-dipulihkan', 'Dikembalikan ke daftar tugas.')); break;
       case 'open': { var a = assignments().filter(function (x) { return x.id === id; })[0]; if (!a) return; if (u.runner && u.runner.aid === id && !u.runner.finished) { u.paused = false; saveUi(); renderStudent(); return; } startRunner(a); return; }
       case 'answer': answerRunner(b.getAttribute('data-i')); return;
       case 'next': nextRunner(); return;
