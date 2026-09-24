@@ -48,3 +48,24 @@ hadir tidak bisa diketuk, label JLPT, rute kana diblokir di kursus Inggris.
 - Kanji di luar bank kosakata (mis. 友だち bila tidak ada) tidak mendapat furigana/romaji; kamus bacaan (mis. KANJIDIC/JMdict) akan menutupnya.
 - Suara kana di tabel: menunggu suara ja-JP yang sama.
 - Kostum PAW khas Jepang (hachimaki): registry outfit tertutup, butuh keputusan OWNER.
+
+## Tema "Studio Ghibli Garden" dicabut dari produksi (m025-365)
+
+Commit `a6c0d11` (bank Listening JLPT N5/N4) ikut membawa redesign "Studio Ghibli Garden"
+ke `fiezel-2.css`: `:root` kedua dengan token `--ghibli-*`, `--maroon` menjadi sage `#6B8F71`,
+dan @import Nunito. Hasilnya, tema itu tampil di SELURUH aplikasi, termasuk kursus Inggris.
+Gerbang `pastel-field-contrast-test` memerahkan `main`.
+
+OWNER, 24 September 2026: tema itu terdorong tak sengaja, dan niatnya untuk **antarmuka
+kursus Jepang**. `fiezel-2.css` dikembalikan ke isi sebelum commit itu (`9fec4a1`). Yang tetap
+di repo:
+- bank `features/speaking-listening/jlpt-listening-bank-v1.json` (belum dimuat kode aplikasi
+  mana pun);
+- `preview-redesign.html` beserta alat pratinjaunya.
+
+Kalau tema ini dihidupkan lagi, dua syarat berlaku, dan keduanya menunggu perintah tertulis
+owner (aturan "NEVER COMMIT OR PUSH REDESIGN" di `AGENTS.md`):
+1. **Cakupannya `body.fz-lang-ja`**, bukan `:root`. Kursus Inggris tidak boleh ikut berubah.
+2. **Tokennya masuk ke `:root` tunggal di `style.css`** (F17, dijaga
+   `pastel-field-contrast-test`). Nilai yang khusus kursus Jepang ditimpa di
+   `html body.fz-lang-ja{...}`, pola yang sudah dipakai palet shu/ai/washi di `fiezel-2.css`.
