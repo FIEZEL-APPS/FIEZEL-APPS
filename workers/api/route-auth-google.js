@@ -247,7 +247,7 @@ async function upsertEmail(db, sub, check, nowMs) {
 }
 
 /* ========================================================================== */
-/* GET /api/auth/session — apakah perangkat ini SUDAH MASUK? (m025-366)        */
+/* GET /api/auth/session — apakah perangkat ini SUDAH MASUK? (m025-367)        */
 /* ========================================================================== */
 /* Sampai build ini tidak ada satu pun rute yang bisa menjawab pertanyaan itu untuk murid
    yang masuk HANYA dengan Google: mereka tidak punya baris auth_account, jadi

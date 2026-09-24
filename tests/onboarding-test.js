@@ -156,7 +156,7 @@ function typeName(run, value) {
 
 function advanceTo(run, targetStep) {
   let guard = 0;
-  /* m025-366: urutan langkah tidak lagi naik (langkah kursus bernomor 7 duduk kedua), jadi
+  /* m025-367: urutan langkah tidak lagi naik (langkah kursus bernomor 7 duduk kedua), jadi
      yang dicari adalah langkah TARGET, bukan "nomor lebih kecil dari target". */
   while (run.stepIndex() !== targetStep) {
     if (guard++ > 30) throw new Error('macet sebelum mencapai langkah ' + targetStep);
@@ -200,7 +200,7 @@ test('enam langkah nyata (Step 1 nama + Step 2-6), carousel tetap dua slide', ()
 });
 
 /* =====================================================================================
- * MASUK PINDAH KE LAYAR SENDIRI; PERAN & KODE KELAS IKUT PINDAH; LANGKAH KURSUS (m025-366)
+ * MASUK PINDAH KE LAYAR SENDIRI; PERAN & KODE KELAS IKUT PINDAH; LANGKAH KURSUS (m025-367)
  *
  * Blok "Sudah punya akun?" m025-271 (tombol Google di bawah pemilih bahasa) DICABUT atas
  * keputusan owner: masuk kini WAJIB dan berdiri sebagai layar sendiri sebelum perkenalan
@@ -814,7 +814,7 @@ test('nama WAJIB tetapi TIDAK mengurung: satu huruf sudah membuka jalannya', () 
   assert.ok(!run.element.querySelector('[data-ob-advance]').hasAttribute('disabled'),
     'jalan keluar langkah wajib harus satu ketukan, bukan syarat panjang tertentu');
   run.element.querySelector('[data-ob-advance]').listeners.click[0]();
-  assert.strictEqual(run.stepIndex(), onboarding.COURSE_STEP, 'm025-366: sesudah nama, langkah kursus');
+  assert.strictEqual(run.stepIndex(), onboarding.COURSE_STEP, 'm025-367: sesudah nama, langkah kursus');
 });
 
 test('nama diserahkan ke aplikasi SEKETIKA, bukan ditahan sampai ujung perkenalan', () => {
@@ -826,7 +826,7 @@ test('nama diserahkan ke aplikasi SEKETIKA, bukan ditahan sampai ujung perkenala
   typeName(run, '  Ayu   Lestari ');
   run.element.querySelector('[data-ob-advance]').listeners.click[0]();
   assert.deepStrictEqual(seen, ['Ayu Lestari'], 'nama dinormalkan sebelum diserahkan, spasi ganda dibuang');
-  assert.strictEqual(run.stepIndex(), onboarding.COURSE_STEP, 'm025-366: sesudah nama, langkah kursus');
+  assert.strictEqual(run.stepIndex(), onboarding.COURSE_STEP, 'm025-367: sesudah nama, langkah kursus');
 });
 
 test('nama tersimpan dan tidak ditanyakan lagi pada perkenalan berikutnya', () => {
@@ -1036,7 +1036,7 @@ test('alur ringkas: satu jalan lewati per langkah (audit F05)', () => {
 
 test('murid dengan kode kelas (dari layar masuk) memilih kursus lalu langsung selesai, kode tetap tersimpan', () => {
   const env = fakeEnv();
-  /* m025-366: kode KelasKu diketik di layar masuk; app.js menyimpannya ke rekam perkenalan. */
+  /* m025-367: kode KelasKu diketik di layar masuk; app.js menyimpannya ke rekam perkenalan. */
   env.localStorage.setItem(onboarding.STORAGE_KEY, JSON.stringify({ classCode: 'FZ-ABC234' }));
   let finished = false;
   const run = onboarding.show(env, { now: NOW, force: true, onFinish() { finished = true; } });

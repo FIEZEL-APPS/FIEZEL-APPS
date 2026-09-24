@@ -2679,7 +2679,7 @@ button.primary:active,.primary.luxe:active,html.fiezel-ui-v6 body .primary:activ
 /* .ch-plain (m025-364): kontrol KelasKu yang BUKAN tombol angkat — segmen status, tombol
    ikon di baris tugas, lipatan grup, tautan Arsip. Bingkai & bayangan angkat di sini membuat
    segmen status terbaca sebagai deretan tab kedua di bawah tab KelasKu.
-   .fz-plain (m025-366): hal yang sama untuk kontrol datar layar masuk (tab peran, tautan,
+   .fz-plain (m025-367): hal yang sama untuk kontrol datar layar masuk (tab peran, tautan,
    pemilih bahasa, tombol mata kata sandi, panah Lanjut). */
 html.fiezel-ui-v6 body button:not(.primary):not(.nav):not(.icon-button):not(.brand-button):not(.text-button):not(.coach-link):not(.fz-coach-bubble):not(.launch-card):not(.skill-card):not(.option):not(.skill-help-dot):not(.olm-dispute):not(.ch-plain):not(.fz-plain){
   border:1.5px solid var(--surface-edge);border-radius:var(--radius-md);
@@ -5687,7 +5687,7 @@ html body #app .social-home-launcher .launch-card{background:var(--pz-sky);borde
 .lesson-contrast .is-right{background:var(--good-soft);color:var(--good)}
 
 /* ==========================================================================
-   m025-366 · LAYAR MASUK (features/auth/fiezel-auth-screen.js)
+   m025-367 · LAYAR MASUK (features/auth/fiezel-auth-screen.js)
    Referensi owner: Welcome → Sign in → Sign up, kepala bermotif kontur topografi yang
    berakhir dengan gelombang. Diterjemahkan ke merek FIEZEL: bidang core gelap + kontur
    emas (bukan koral), wordmark + PAW di kepala, tombol utama = .primary aplikasi.
@@ -5759,7 +5759,7 @@ body.fz-auth-open{overflow:hidden}
 .fz-auth .fz-plain:focus-visible,.fz-auth-input input:focus-visible{outline:2px solid var(--accent,#9B3A4A);outline-offset:2px}
 @media (max-height:680px){.fz-auth-hero.is-welcome{min-height:48vh}.fz-auth-hero.is-masuk{min-height:24vh}.fz-auth-hero.is-daftar{min-height:18vh}.fz-auth-paw{width:84px;height:84px}}
 @media (prefers-reduced-motion:reduce){.fz-auth,.fz-auth.is-leaving{animation:none}.fz-auth-hero{transition:none}}
-/* m025-366 · langkah kursus di perkenalan: dua kartu lebar (bendera + nama + isi kursus). */
+/* m025-367 · langkah kursus di perkenalan: dua kartu lebar (bendera + nama + isi kursus). */
 .fiezel-course-grid{display:grid;grid-template-columns:1fr;gap:10px;margin:14px 0 10px}
 /* .fiezel-goal-card menumpuk isinya ke bawah (column) dan mengecilkan semua span ke 13px;
    kartu kursus butuh baris: bendera di kiri, judul + isi di kanan. */

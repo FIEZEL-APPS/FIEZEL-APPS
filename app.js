@@ -4801,7 +4801,7 @@ async function load(opts){const root=document.baseURI;/* W1 P0-1 (16-001): fetch
   // W4-MERGE: simpan hasil hidrasi id lalu terapkan locale aktif (id = no-op referensial).
   CONTENT_BASE={g:G,items:GRAMMAR_ITEMS,v:V,r:R};applyContentLocale();
   backfillPolicyOutcomes();$('version').textContent=`v${APP_VERSION}`;
-  /* m025-366: ganti kursus DI TENGAH perkenalan hanya butuh bank barunya. Ekor boot di bawah
+  /* m025-367: ganti kursus DI TENGAH perkenalan hanya butuh bank barunya. Ekor boot di bawah
      memanggil startWelcomeExperience(), dan karena perkenalan belum selesai, itu membuka
      perkenalan KEDUA di atas yang pertama - murid terlempar balik ke langkah nama. */
   if(opts&&opts.kontenSaja)return;
@@ -6640,7 +6640,7 @@ function startWelcomeExperience(){
         dismissBootSplash();
         return openApp();
       }
-      /* m025-366 LOGIN WAJIB: sesudah splash, SEBELUM perkenalan - dan juga untuk murid lama
+      /* m025-367 LOGIN WAJIB: sesudah splash, SEBELUM perkenalan - dan juga untuk murid lama
          yang perkenalannya sudah selesai. Lihat authGateNeeded(). */
       if(authGateNeeded()){showAuthGate(at,proceed);return null}
       setTimeout(verifyAuthSession,1500);
@@ -6656,7 +6656,7 @@ function startWelcomeExperience(){
     return proceed();
   })
 }
-/* ===== LOGIN WAJIB (m025-366, keputusan OWNER 24 September 2026) =========================
+/* ===== LOGIN WAJIB (m025-367, keputusan OWNER 24 September 2026) =========================
    Audit login L1: FIEZEL bisa dipakai penuh tanpa akun, karena identitas anonim terbit
    otomatis dan tombol masuk hanya tawaran sekunder. Owner: "user masih bisa masuk tanpa
    harus membuat akun, itu sangat fatal". Layar masuk (features/auth/fiezel-auth-screen.js)
@@ -8845,7 +8845,7 @@ function showOnboarding(now=Date.now()){
         try{armLevelEntryGate(selectedLevel)}catch(_){}
         save();render();showToast(FiezelI18n.t('journey.toast-tujuan',{label:label}),'success')
       },
-      /* m025-366: kursus dipilih di perkenalan (Bahasa Inggris / Bahasa Jepang). Jalurnya
+      /* m025-367: kursus dipilih di perkenalan (Bahasa Inggris / Bahasa Jepang). Jalurnya
          SAMA dengan chip kursus di Home (setTargetLangPreference), tanpa toast dan tanpa
          menutup lapisan: perkenalan masih terbuka di atasnya, dan bank kursus harus sudah
          termuat sebelum tes penempatan dimulai dua langkah kemudian. */
@@ -9048,14 +9048,14 @@ function bindFiezelAccountControls(){
          tapi layar yang masih berbunyi "kamu masuk sebagai …" sesudah murid
          menekan Keluar adalah layar yang berbohong. */
       try{self.FiezelGoogle?.signOut?.()}catch(_){}
-      /* m025-366: keluar = kembali ke layar masuk. Penanda lokal dibuang di sini. */
+      /* m025-367: keluar = kembali ke layar masuk. Penanda lokal dibuang di sini. */
       try{self.FiezelAuthScreen?.clearSession?.(self)}catch(_){}
       showToast('Berhasil keluar dari akun.');
     }catch(_){
       showToast('Keluar dari sesi.');
     }
     closeModal();
-    /* m025-366: sesudah keluar, perangkat kembali ke layar masuk - untuk murid maupun guru.
+    /* m025-367: sesudah keluar, perangkat kembali ke layar masuk - untuk murid maupun guru.
        Dulu murid dikembalikan ke Pengaturan dan guru ke modal akun, sementara aplikasi
        tetap bisa dipakai tanpa akun di belakangnya. */
     try{go('home')}catch(_){try{render()}catch(_){}}
@@ -14827,7 +14827,7 @@ async function fiezelAccountLogout(){
   try{save()}catch(_){}
   await core.logout();
   try{self.FiezelGoogle?.signOut?.()}catch(_){}
-  /* m025-366: keluar = kembali ke layar masuk (murid maupun guru). */
+  /* m025-367: keluar = kembali ke layar masuk (murid maupun guru). */
   try{self.FiezelAuthScreen?.clearSession?.(self)}catch(_){}
   showToast(FiezelI18n.t('account.logout-done'),'success');
   try{go('home')}catch(_){try{render()}catch(_){}}

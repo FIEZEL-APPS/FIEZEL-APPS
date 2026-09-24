@@ -2,7 +2,7 @@
  * features/auth/fiezel-auth-screen.js — LAYAR MASUK FIEZEL (Selamat datang · Masuk · Daftar).
  *
  * ==========================================================================
- * KENAPA LAYAR INI ADA (m025-366, keputusan OWNER 24 September 2026)
+ * KENAPA LAYAR INI ADA (m025-367, keputusan OWNER 24 September 2026)
  * ==========================================================================
  * Audit login & onboarding (https://claude.ai/artifact/Ucq5fvGRYbrKVTJUGuv8c4) menemukan
  * bahwa FIEZEL bisa dipakai penuh tanpa akun: identitas anonim terbit otomatis, tombol

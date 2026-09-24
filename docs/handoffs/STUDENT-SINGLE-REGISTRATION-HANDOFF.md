@@ -1,6 +1,6 @@
 # Pendaftaran murid SEKALI: satu identitas, lahir di onboarding
 
-> **Lanjutan m025-366:** pendaftaran tidak lagi lahir di onboarding. Ia lahir di layar masuk
+> **Lanjutan m025-367:** pendaftaran tidak lagi lahir di onboarding. Ia lahir di layar masuk
 > wajib (Murid/Guru + kode KelasKu), dan onboarding tinggal nama → kursus → tujuan → tes
 > awal. Lihat `AUTH-LOGIN-WAJIB-HANDOFF.md`.
 

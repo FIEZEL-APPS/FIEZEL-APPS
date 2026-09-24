@@ -367,7 +367,7 @@
     'tour.next': 'ต่อไป',
     'tutor.v3-siap-for-pertanyaan-upcoming': 'พร้อมสำหรับคำถามถัดไปแล้ว',
     'tutor.v3-suara-pending-siap-teks-lesson': 'เสียงยังไม่พร้อม แต่ตัวหนังสือบทเรียนยังใช้ได้ตามปกติ',
-    /* m025-366 · ขั้นตอนเลือกคอร์สในการแนะนำตัว */
+    /* m025-367 · ขั้นตอนเลือกคอร์สในการแนะนำตัว */
     'onboarding.course-aria': 'เลือกคอร์ส',
     'onboarding.course-en': 'ภาษาอังกฤษ',
     'onboarding.course-en-desc': 'คำศัพท์ ไวยากรณ์ การอ่าน และการฟัง',

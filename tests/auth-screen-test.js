@@ -1,7 +1,7 @@
 'use strict';
 const __fzRoot = require('path').join(__dirname, '..'); /* m025-254: gerbang hidup di tests/, berkas produksi di root. */
 /**
- * tests/auth-screen-test.js — GERBANG LAYAR MASUK WAJIB (m025-366).
+ * tests/auth-screen-test.js — GERBANG LAYAR MASUK WAJIB (m025-367).
  *
  * Owner, 24 September 2026: "user masih bisa masuk tanpa harus membuat akun, itu sangat
  * fatal". Lalu: pilihan murid/guru dan kode KelasKu pindah dari perkenalan ke layar masuk,

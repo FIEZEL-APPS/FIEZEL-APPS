@@ -129,7 +129,7 @@
   // jadi nomornya harus punya nama - angka lepas di dalam bind() adalah persis yang patah
   // ketika penomoran bergeser.
   var PLACEMENT_STEP = 4;
-  /* m025-366 OWNER: "pilihan kursus apa yang ingin dipelajari murid, langsung muncul
+  /* m025-367 OWNER: "pilihan kursus apa yang ingin dipelajari murid, langsung muncul
      pilihannya di onboarding — Bahasa Jepang dan Bahasa Inggris". Nomornya 7 karena nomor
      langkah adalah IDENTITAS (dipakai paint, data-ob-step, dan gate regresi), bukan urutan;
      urutannya milik LEAN_SEQUENCE/FULL_SEQUENCE di bawah. */
@@ -187,7 +187,7 @@
     }
     return UX_OB_FALLBACK[flag] === true;
   }
-  /* m025-366: langkah kursus berdiri tepat sesudah nama — kursus yang dipilih menentukan
+  /* m025-367: langkah kursus berdiri tepat sesudah nama — kursus yang dipilih menentukan
      bank soal tes penempatan, jadi ia harus sudah pasti sebelum tujuan dan tes. */
   var LEAN_SEQUENCE = Object.freeze([NAME_STEP, COURSE_STEP, 3, PLACEMENT_STEP]);
   var FULL_SEQUENCE = Object.freeze([1, COURSE_STEP, 2, 3, 4, 5, 6]);
@@ -249,7 +249,7 @@
     } catch (_) { return false; }
   }
 
-  // Peran pengguna: 'murid' (bawaan) atau 'guru'. Sejak m025-366 perannya dipilih di layar
+  // Peran pengguna: 'murid' (bawaan) atau 'guru'. Sejak m025-367 perannya dipilih di layar
   // masuk (features/auth/fiezel-auth-screen.js), bukan di sini; catatan lama tetap dibaca.
   var ROLES = ['murid', 'guru'];
   function normalizeRole(v) { v = String(v || '').toLowerCase(); return ROLES.indexOf(v) === -1 ? 'murid' : v; }
@@ -281,7 +281,7 @@
     return normalizeLocale(record && record.locale);
   }
 
-  /** Kursus yang dipilih di langkah kursus (m025-366), atau '' bila belum pernah dipilih. */
+  /** Kursus yang dipilih di langkah kursus (m025-367), atau '' bila belum pernah dipilih. */
   function storedCourse(env) {
     var record = readRecord(env);
     return normalizeCourse(record && record.course);
@@ -649,7 +649,7 @@
       + '</div>';
   }
 
-  // m025-366: pra-langkah bagian kedua ("sudah punya akun?") DICABUT. Alasannya dulu benar —
+  // m025-367: pra-langkah bagian kedua ("sudah punya akun?") DICABUT. Alasannya dulu benar —
   // tombol masuk yang ditemukan sesudah perkenalan datang terlambat — dan jawabannya kini
   // lebih kuat: masuk adalah layar WAJIB sebelum perkenalan (features/auth/fiezel-auth-screen.js).
 
@@ -678,14 +678,14 @@
       // m025-242: kalimat panjang soal penyimpanan nama dilepas dari layar - ia benar, tapi
       // ia juga yang membuat langkah pertama harus digulir. Janji yang sama tetap ada di
       // Pengaturan, tempat nama itu bisa diganti.
-      // m025-366 OWNER: pilihan murid/guru dan kode KelasKu PINDAH ke layar masuk
+      // m025-367 OWNER: pilihan murid/guru dan kode KelasKu PINDAH ke layar masuk
       // (features/auth/fiezel-auth-screen.js). Langkah ini kembali menanyakan satu hal.
       + btn(T('onboarding.next'), 'data-ob-advance' + (clean ? '' : ' disabled'))
       + '</div>';
   }
 
   // ---------------------------------------------------------------------------------------
-  // Langkah kursus (m025-366): Bahasa Inggris atau Bahasa Jepang. Tidak ada pilihan
+  // Langkah kursus (m025-367): Bahasa Inggris atau Bahasa Jepang. Tidak ada pilihan
   // bawaan — murid Jepang yang menekan Lanjut tanpa membaca dulu diam-diam berakhir di
   // kursus Inggris, persis keluhan yang membuat langkah ini ada.
   // ---------------------------------------------------------------------------------------
@@ -1442,7 +1442,7 @@
       finish('placement');
     }
 
-    /* m025-366: tombol Google di pemilih bahasa DICABUT. Masuk kini layar tersendiri yang
+    /* m025-367: tombol Google di pemilih bahasa DICABUT. Masuk kini layar tersendiri yang
        WAJIB dan berdiri sebelum perkenalan (features/auth/fiezel-auth-screen.js); blok
        sekunder "Sudah punya akun?" di sini hanya akan menjadi pintu kedua ke hal yang sama. */
     function bind() {

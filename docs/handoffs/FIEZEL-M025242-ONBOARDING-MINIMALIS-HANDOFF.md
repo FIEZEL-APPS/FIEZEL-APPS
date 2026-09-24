@@ -1,6 +1,6 @@
 # m025-242 — Panel perkenalan minimalis (tanpa gulir)
 
-> **Lanjutan m025-366:** urutan ringkas menjadi nama → KURSUS → tujuan → tes awal
+> **Lanjutan m025-367:** urutan ringkas menjadi nama → KURSUS → tujuan → tes awal
 > (`[1,7,3,4]`). Pemilih peran dan kode kelas pindah ke layar masuk. Lihat
 > `AUTH-LOGIN-WAJIB-HANDOFF.md`.
 

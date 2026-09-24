@@ -38,7 +38,7 @@
     'google.server-sibuk': 'Belum bisa dijawab sekarang. Coba lagi sebentar lagi, ya.',
     'google.sudah-tertaut': 'Akun FIEZEL ini sudah tertaut ke akun Google yang lain. Keluar dulu, lalu masuk lagi dengan akun Google itu.',
     'google.email-belum-terverifikasi': 'Alamat email akun Google itu belum diverifikasi Google, jadi belum bisa dipakai masuk.',
-    /* m025-366 · layar masuk wajib: Selamat datang · Masuk · Daftar (features/auth/fiezel-auth-screen.js). */
+    /* m025-367 · layar masuk wajib: Selamat datang · Masuk · Daftar (features/auth/fiezel-auth-screen.js). */
     'auth.layar.aktifkan': 'Aktifkan akun guru',
     'auth.layar.aktifkan-singkat': 'Aktifkan akun',
     'auth.layar.atau-akun': 'atau pakai akun FIEZEL',

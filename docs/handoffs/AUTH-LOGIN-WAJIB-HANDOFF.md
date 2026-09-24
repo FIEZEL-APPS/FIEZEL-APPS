@@ -1,4 +1,4 @@
-# Login wajib: layar Selamat datang · Masuk · Daftar (m025-366)
+# Login wajib: layar Selamat datang · Masuk · Daftar (m025-367)
 
 Otoritas: OWNER, 24 September 2026. Lahir dari audit login & onboarding
 (https://claude.ai/artifact/Ucq5fvGRYbrKVTJUGuv8c4) atas keluhan owner:

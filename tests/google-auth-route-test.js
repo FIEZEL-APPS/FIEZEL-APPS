@@ -329,7 +329,7 @@ test('Google tak terjangkau DAN nol salinan: 503, bukan 200', async () => {
   assert.strictEqual(db._oauth.size, 0, 'nol baris');
 });
 
-/* m025-366 — GET /api/auth/session: layar masuk wajib (features/auth/fiezel-auth-screen.js)
+/* m025-367 — GET /api/auth/session: layar masuk wajib (features/auth/fiezel-auth-screen.js)
    bertanya ke sini apakah cookie perangkat ini BENAR-BENAR sudah masuk. Jawaban yang salah
    ke arah "sudah" membuka aplikasi tanpa akun; ke arah "belum" menendang murid sah keluar. */
 test('sesi: cookie anonim / tanpa cookie → signedIn:false', async () => {
