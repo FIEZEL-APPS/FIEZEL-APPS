@@ -83,7 +83,8 @@ const SENGAJA_TIDAK_DIRESET = {
   // privasi — TAPI apakah reset progres seharusnya juga memulai ulang hari-0 adalah
   // pertanyaan produk yang belum dijawab siapa pun. Dicatat di sini, bukan diputuskan.
   LEARNING_TELEMETRY_DAY0_KEY: { literal: 'fiezel-lt-day0-v1', alasan: 'jangkar hari-0 lane telemetri; lane itu punya jalur opt-out purge sendiri (lihat catatan OWNER di atas)' },
-  KEY: { literal: 'fiezel.seenAppVersion', alasan: 'penanda versi aplikasi yang sudah dilihat di perangkat ini, bukan progres belajar' }
+  KEY: { literal: 'fiezel.seenAppVersion', alasan: 'penanda versi aplikasi yang sudah dilihat di perangkat ini, bukan progres belajar' },
+  FIEZEL_TARGET_COURSE_KEY: { literal: 'fz_target_course', alasan: 'preferensi kursus target aktif (Jepang/Inggris) per perangkat, bukan progres belajar' }
 };
 
 /** Isi daftar removeItem di dalam resetProgress(), dibaca dari sumber sungguhan. */

@@ -24,6 +24,21 @@ Whenever the user requests animation, motion graphics, commercial 3D film, or vi
 5. **Mandatory Frame-by-Frame Visual Inspection**:
    - NEVER declare video ready based on unit tests alone. Always extract milestone stills via `ffmpeg` ($t=1.0, 2.5, 4.0, 14.5, 22.0, 27.0, 43.5, 58.0\text{s}$) and visually inspect with `view_file` to certify zero cropping, zero slop, and cinematic camera depth.
 
+## Mandatory Protocol: Multi-Character Audio Pipeline for Listening (Chokai) Bank
+Whenever creating, regenerating, or updating listening exercises or audio banks:
+1. **ZERO Monotone Audio**: DILARANG KERAS merender naskah dialog percakapan dengan satu suara tunggal.
+2. **Three Mandatory Personas**:
+   - **Instruktor Ujian**: Suara pria dewasa tegas dan berwibawa (`ja-JP-KeitaNeural` pitch `-18Hz`, rate `-4%` atau Gemini `Charon`/`Fenrir`). Membacakan pembuka situasi dan pertanyaan penutup.
+   - **Mahasiswa Laki-laki**: Suara pemuda natural (`ja-JP-KeitaNeural` pitch `+4Hz`, rate `+3%` atau Gemini `Puck`).
+   - **Mahasiswi Perempuan**: Suara mahasiswi natural dan cerdas (`ja-JP-NanamiNeural` pitch `+3Hz`, rate `+1%` atau Gemini `Aoede`/`Kore`).
+3. **Sequential 4-Stage Composition**:
+   - Babak 1: Instruksi/Situasi oleh Instruktor (+500ms jeda nafas).
+   - Babak 2: Dialog percakapan bergantian antar karakter (+350ms-450ms jeda respon antar giliran).
+   - Babak 3: Pertanyaan oleh Instruktor (+1000ms jeda refleksi).
+   - Babak 4: Thinking pocket (1.5-2.0 detik buffer jeda hening di akhir).
+4. **Execution & CI**: Selalu jalankan pipeline otomatis melalui `tools/chokai-audio-pipeline/` dan pastikan gerbang validasi terpenuhi sebelum rilis.
+
+
 
 
 ## Google Stitch Collaboration Rules

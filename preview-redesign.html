@@ -4,6 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
   <title>FIEZEL — UI/UX Redesign Preview Studio</title>
+  <link rel="stylesheet" href="./features/speaking-listening/jlpt-listening.css">
   <style>
     @font-face {
       font-family: 'FZ Instrument Serif';
@@ -2127,6 +2128,43 @@
           </div>
         </div>
       </div>
+
+      <!-- JLPT Bottom Sheet Drawer (#jlptDetailSheet) inside modal box -->
+      <div id="jlptDetailSheet" class="jlpt-detail-sheet" aria-hidden="true">
+        <div class="jlpt-sheet-backdrop" onclick="closeJlptDetailSheet()"></div>
+        <div class="jlpt-sheet-container" id="jlptSheetContainer">
+          <div class="jlpt-sheet-handle-zone" id="jlptSheetHandleZone" onclick="closeJlptDetailSheet()" title="Geser ke bawah untuk menutup">
+            <span class="jlpt-sheet-handle-bar"></span>
+          </div>
+          <div class="jlpt-sheet-header">
+            <div>
+              <h3 class="jlpt-sheet-title">💡 Naskah &amp; Pembahasan</h3>
+              <span class="jlpt-sheet-subtitle" id="jlptSheetSubtitle">JLPT Listening</span>
+            </div>
+            <button type="button" class="jlpt-sheet-close" onclick="closeJlptDetailSheet()" aria-label="Tutup Sheet">✕</button>
+          </div>
+          <div class="jlpt-sheet-tabs">
+            <button type="button" class="jlpt-tab-chip active" id="tabChipScript" onclick="switchJlptSheetTab('script')">📝 Naskah</button>
+            <button type="button" class="jlpt-tab-chip" id="tabChipExplain" onclick="switchJlptSheetTab('explain')">💡 Kunci &amp; Bahas</button>
+            <button type="button" class="jlpt-tab-chip" id="tabChipVocab" onclick="switchJlptSheetTab('vocab')">📚 Kotoba (<span id="jlptVocabCount">0</span>)</button>
+          </div>
+          <div class="jlpt-sheet-content">
+            <div class="jlpt-sheet-pane active" id="paneScript">
+              <div class="jlpt-transcript-header">
+                <span class="jlpt-transcript-tag">Dialog Percakapan Asli</span>
+                <button type="button" class="jlpt-transcript-play-btn" onclick="togglePlayJlptPrimaryAudio()">▶ Putar Dialog</button>
+              </div>
+              <div class="jlpt-dialogue-bubbles" id="jlptDialogueBubbles"></div>
+            </div>
+            <div class="jlpt-sheet-pane" id="paneExplain" style="display:none;">
+              <div id="jlptExplainContent"></div>
+            </div>
+            <div class="jlpt-sheet-pane" id="paneVocab" style="display:none;">
+              <div id="jlptVocabContent"></div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -3243,299 +3281,19 @@
     let jlptVocabOpen = false;
 
     function openListeningPanel() {
-      const modal = document.getElementById('listeningPanelModal');
-      if (modal) modal.classList.add('open');
-      curJlptIndex = 0;
-      jlptSelectedChoice = null;
-      jlptReplayCount = 0;
-      jlptScriptOpen = false;
-      jlptExplainOpen = false;
-      jlptVocabOpen = false;
-      renderListeningQuestion();
+      if (window.FiezelJlptListening && window.FiezelJlptListening.open) {
+        window.FiezelJlptListening.open();
+      } else if (typeof window.openListeningPanel === 'function') {
+        window.openListeningPanel();
+      }
     }
 
     function closeListeningPanel() {
-      const modal = document.getElementById('listeningPanelModal');
-      if (modal) modal.classList.remove('open');
-      stopJlptAudio();
-    }
-
-    function setListeningLevel(lvl) {
-      curJlptLevel = lvl;
-      const btnN5 = document.getElementById('btnLvlN5');
-      const btnN4 = document.getElementById('btnLvlN4');
-      if (btnN5) btnN5.classList.toggle('active', lvl === 'N5');
-      if (btnN4) btnN4.classList.toggle('active', lvl === 'N4');
-      curJlptIndex = 0;
-      jlptSelectedChoice = null;
-      stopJlptAudio();
-      renderListeningQuestion();
-    }
-
-    function setListeningMondai(m) {
-      curJlptMondai = m;
-      document.querySelectorAll('.jlpt-mondai-chip').forEach(c => {
-        c.classList.toggle('active', c.getAttribute('data-mondai') === m);
-      });
-      curJlptIndex = 0;
-      jlptSelectedChoice = null;
-      stopJlptAudio();
-      renderListeningQuestion();
-    }
-
-    function getFilteredQuestions() {
-      return JLPT_QUESTIONS.filter(q => {
-        const matchLvl = q.level === curJlptLevel;
-        const matchMondai = (curJlptMondai === 'all') || (q.mondai === curJlptMondai);
-        return matchLvl && matchMondai;
-      });
-    }
-
-    function renderListeningQuestion() {
-      const slot = document.getElementById('listeningQuestionSlot');
-      if (!slot) return;
-      const list = getFilteredQuestions();
-      if (!list.length) {
-        slot.innerHTML = '<p class="f-body" style="text-align:center;padding:24px;">Belum ada soal untuk kategori ini.</p>';
-        return;
+      if (window.FiezelJlptListening && window.FiezelJlptListening.close) {
+        window.FiezelJlptListening.close();
+      } else if (typeof window.closeListeningPanel === 'function') {
+        window.closeListeningPanel();
       }
-
-      if (curJlptIndex >= list.length) curJlptIndex = 0;
-      const q = list[curJlptIndex];
-
-      const optHtml = q.options.map((opt, i) => {
-        const letter = ['1', '2', '3', '4'][i] || (i + 1);
-        let cls = 'jlpt-opt-btn';
-        if (jlptSelectedChoice !== null) {
-          cls += ' locked';
-          if (i === q.answerIndex) cls += ' correct';
-          else if (i === jlptSelectedChoice) cls += ' wrong';
-        }
-        return '<button type="button" class="' + cls + '" onclick="selectJlptChoice(' + i + ')">' +
-          '<span class="jlpt-opt-badge">' + letter + '</span>' +
-          '<div>' +
-            '<b style="display:block;margin-bottom:2px;">' + opt.text + '</b>' +
-            '<span style="font-size:11.5px;color:var(--text-muted);">' + opt.textId + '</span>' +
-          '</div>' +
-        '</button>';
-      }).join('');
-
-      let feedbackHtml = '';
-      if (jlptSelectedChoice !== null) {
-        const isRight = (jlptSelectedChoice === q.answerIndex);
-        feedbackHtml = '<div style="background:' + (isRight ? '#E8F5E9' : '#FFEBEE') + ';border:1.5px solid ' + (isRight ? '#2E8B69' : '#D32F2F') + ';border-radius:12px;padding:10px 14px;margin-top:10px;">' +
-          '<b style="color:' + (isRight ? '#1B5E20' : '#B71C1C') + ';font-size:13px;">' +
-            (isRight ? '✓ Jawabanmu Benar!' : '✗ Jawabanmu Belum Tepat') +
-          '</b>' +
-          '<p style="margin:4px 0 0;font-size:12px;color:#241A11;">' +
-            'Kunci: <b>Pilihan ' + (q.answerIndex + 1) + ' (' + q.options[q.answerIndex].text + ')</b>' +
-          '</p>' +
-        '</div>';
-      }
-
-      let scriptHtml = '';
-      if (jlptScriptOpen) {
-        scriptHtml = '<div class="jlpt-acc-content">' +
-          '<b style="color:var(--accent);display:block;margin-bottom:4px;">Naskah Asli (Jepang):</b>' +
-          '<div style="white-space:pre-line;margin-bottom:8px;font-size:13px;background:#FAF8F4;padding:8px 10px;border-radius:6px;">' + q.scriptJapanese + '</div>' +
-          '<b style="color:var(--text);display:block;margin-bottom:4px;">Romaji:</b>' +
-          '<div style="white-space:pre-line;margin-bottom:8px;font-size:12px;color:#555;">' + q.scriptRomaji + '</div>' +
-          '<b style="color:#2E8B69;display:block;margin-bottom:4px;">Terjemahan Bahasa Indonesia:</b>' +
-          '<div style="white-space:pre-line;font-size:12.5px;color:#241A11;">' + q.scriptIndonesian + '</div>' +
-        '</div>';
-      }
-
-      let explainHtml = '';
-      if (jlptExplainOpen) {
-        explainHtml = '<div class="jlpt-acc-content">' +
-          '<p style="margin:0;font-size:12.5px;line-height:1.6;">' + q.explain + '</p>' +
-        '</div>';
-      }
-
-      let vocabHtml = '';
-      if (jlptVocabOpen) {
-        const vItems = q.vocabularyKey.map(v => '<li><b>' + v.ja + '</b>: ' + v.id + '</li>').join('');
-        vocabHtml = '<div class="jlpt-acc-content">' +
-          '<ul style="margin:0;padding-left:18px;font-size:12px;">' + vItems + '</ul>' +
-        '</div>';
-      }
-
-      slot.innerHTML =
-        '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">' +
-          '<span style="font-size:11.5px;font-weight:700;color:var(--accent);background:var(--accent-soft);padding:3px 8px;border-radius:6px;">' +
-            q.mondaiLabel +
-          '</span>' +
-          '<span style="font-size:12px;font-weight:700;color:var(--text-muted);">' +
-            'Soal ' + (curJlptIndex + 1) + ' dari ' + list.length +
-          '</span>' +
-        '</div>' +
-
-        '<div style="background:#FDF8EE;border:1px dashed #DFC89D;border-radius:10px;padding:8px 12px;font-size:12px;color:#614E36;margin-bottom:12px;">' +
-          '<b>Konteks:</b> ' + q.situation +
-        '</div>' +
-
-        '<div class="jlpt-player-card">' +
-          '<div class="p-meta">' +
-            '<span>🎵 ' + q.audioTrack + '</span>' +
-            '<span id="jlptReplayStatus">Diputar ' + jlptReplayCount + '×</span>' +
-          '</div>' +
-          '<div class="p-controls">' +
-            '<button type="button" class="jlpt-play-btn" id="jlptPlayBtn" onclick="toggleJlptAudio(\'' + q.audioUrl + '\', \'' + encodeURIComponent(q.scriptJapanese) + '\')">' +
-              (jlptAudioPlaying ? '⏸' : '▶') +
-            '</button>' +
-            '<div class="jlpt-eq-bars ' + (jlptAudioPlaying ? 'playing' : '') + '" id="jlptEqBars">' +
-              '<div class="jlpt-eq-bar"></div><div class="jlpt-eq-bar"></div><div class="jlpt-eq-bar"></div><div class="jlpt-eq-bar"></div>' +
-              '<div class="jlpt-eq-bar"></div><div class="jlpt-eq-bar"></div><div class="jlpt-eq-bar"></div><div class="jlpt-eq-bar"></div>' +
-            '</div>' +
-            '<a href="' + q.audioUrl + '" target="_blank" download style="color:#FFD94F;text-decoration:none;font-size:11.5px;font-weight:700;white-space:nowrap;padding:4px 8px;background:rgba(255,255,255,0.1);border-radius:6px;" title="Unduh file MP3">' +
-              '⬇ MP3' +
-            '</a>' +
-          '</div>' +
-        '</div>' +
-
-        '<div class="jlpt-q-card" style="margin-top:12px;">' +
-          '<h3 style="font-size:15px;color:var(--text);margin:0 0 4px;font-weight:700;">' + q.questionJapanese + '</h3>' +
-          '<p style="font-size:12px;color:var(--text-muted);margin:0 0 12px;">(' + q.questionIndonesian + ')</p>' +
-          '<div>' + optHtml + '</div>' +
-        '</div>' +
-
-        feedbackHtml +
-
-        '<div style="margin-top:10px;">' +
-          '<button type="button" class="jlpt-acc-btn" onclick="toggleJlptScript()">' +
-            '<span>📜 Naskah Dialog &amp; Terjemahan</span>' +
-            '<span>' + (jlptScriptOpen ? '▲ Tutup' : '▼ Lihat') + '</span>' +
-          '</button>' +
-          scriptHtml +
-
-          '<button type="button" class="jlpt-acc-btn" onclick="toggleJlptExplain()">' +
-            '<span>💡 Pembahasan &amp; Analisis Kunci</span>' +
-            '<span>' + (jlptExplainOpen ? '▲ Tutup' : '▼ Lihat') + '</span>' +
-          '</button>' +
-          explainHtml +
-
-          '<button type="button" class="jlpt-acc-btn" onclick="toggleJlptVocab()">' +
-            '<span>🔑 Kosakata &amp; Tata Bahasa Penting</span>' +
-            '<span>' + (jlptVocabOpen ? '▲ Tutup' : '▼ Lihat') + '</span>' +
-          '</button>' +
-          vocabHtml +
-        '</div>' +
-
-        '<div style="display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:14px;">' +
-          '<button type="button" class="btn-secondary" style="flex:1;padding:10px;' + (curJlptIndex === 0 ? 'opacity:0.5;pointer-events:none;' : '') + '" onclick="prevJlptQuestion()">' +
-            '← Soal Sebelumnya' +
-          '</button>' +
-          '<button type="button" class="btn-primary" style="flex:1;padding:10px;' + (curJlptIndex >= list.length - 1 ? 'opacity:0.5;pointer-events:none;' : '') + '" onclick="nextJlptQuestion()">' +
-            'Soal Berikutnya →' +
-          '</button>' +
-        '</div>';
-    }
-
-    function selectJlptChoice(idx) {
-      if (jlptSelectedChoice !== null) return;
-      jlptSelectedChoice = idx;
-      const list = getFilteredQuestions();
-      const q = list[curJlptIndex];
-      if (idx === q.answerIndex) {
-        triggerToast('🎉 Benar! Pilihan tepat.');
-      } else {
-        triggerToast('💡 Belum tepat, periksa pembahasannya ya.');
-      }
-      renderListeningQuestion();
-    }
-
-    function toggleJlptScript() {
-      jlptScriptOpen = !jlptScriptOpen;
-      renderListeningQuestion();
-    }
-
-    function toggleJlptExplain() {
-      jlptExplainOpen = !jlptExplainOpen;
-      renderListeningQuestion();
-    }
-
-    function toggleJlptVocab() {
-      jlptVocabOpen = !jlptVocabOpen;
-      renderListeningQuestion();
-    }
-
-    function nextJlptQuestion() {
-      const list = getFilteredQuestions();
-      if (curJlptIndex < list.length - 1) {
-        curJlptIndex++;
-        jlptSelectedChoice = null;
-        jlptScriptOpen = false;
-        jlptExplainOpen = false;
-        jlptVocabOpen = false;
-        stopJlptAudio();
-        renderListeningQuestion();
-      }
-    }
-
-    function prevJlptQuestion() {
-      if (curJlptIndex > 0) {
-        curJlptIndex--;
-        jlptSelectedChoice = null;
-        jlptScriptOpen = false;
-        jlptExplainOpen = false;
-        jlptVocabOpen = false;
-        stopJlptAudio();
-        renderListeningQuestion();
-      }
-    }
-
-    function toggleJlptAudio(url, textEncoded) {
-      if (jlptAudioPlaying) {
-        stopJlptAudio();
-        return;
-      }
-
-      jlptAudioPlaying = true;
-      jlptReplayCount++;
-      const playBtn = document.getElementById('jlptPlayBtn');
-      const eqBars = document.getElementById('jlptEqBars');
-      const status = document.getElementById('jlptReplayStatus');
-      if (playBtn) playBtn.textContent = '⏸';
-      if (eqBars) eqBars.classList.add('playing');
-      if (status) status.textContent = 'Diputar ' + jlptReplayCount + '×';
-
-      try {
-        if (!jlptAudioObj) {
-          jlptAudioObj = new Audio();
-        }
-        jlptAudioObj.src = url;
-        jlptAudioObj.play().then(() => {
-          jlptAudioObj.onended = () => {
-            stopJlptAudio();
-          };
-        }).catch(err => {
-          console.warn("Direct mp3 playback error, fallback to SpeechSynthesis or timer:", err);
-          if ('speechSynthesis' in window) {
-            const ut = new SpeechSynthesisUtterance(decodeURIComponent(textEncoded));
-            ut.lang = 'ja-JP';
-            ut.rate = 0.9;
-            ut.onend = () => stopJlptAudio();
-            ut.onerror = () => stopJlptAudio();
-            window.speechSynthesis.speak(ut);
-          } else {
-            setTimeout(() => stopJlptAudio(), 8000);
-          }
-        });
-      } catch (e) {
-        setTimeout(() => stopJlptAudio(), 8000);
-      }
-    }
-
-    function stopJlptAudio() {
-      jlptAudioPlaying = false;
-      if (jlptAudioObj) {
-        try { jlptAudioObj.pause(); jlptAudioObj.currentTime = 0; } catch(_) {}
-      }
-      try { if ('speechSynthesis' in window) window.speechSynthesis.cancel(); } catch(_) {}
-      const playBtn = document.getElementById('jlptPlayBtn');
-      const eqBars = document.getElementById('jlptEqBars');
-      if (playBtn) playBtn.textContent = '▶';
-      if (eqBars) eqBars.classList.remove('playing');
     }
 
     // INITIAL MOUNT
