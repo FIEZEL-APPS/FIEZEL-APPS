@@ -1,30 +1,30 @@
 # Antigravity Workspace Guidelines for FIEZEL-APPS
 
-## Motion & Video Animation Guidelines (Remotion)
+## Motion & Video Animation Guidelines (Remotion & Three.js 3D Master)
 
-Whenever the user requests animation, motion graphics, character animation, or video generation:
-1. **Always Use Remotion**: The Remotion environment is already set up and configured in `./remotion`.
-2. **Component Creation**:
-   - Write pure React/SVG/CSS vector motion components in `remotion/src/<Name>Motion.jsx`.
-   - Use continuous procedural mathematical easing (`Math.sin`, `interpolate`, `Easing.inOut`, etc.) rather than static/flipbook images.
-   - For looping animations, ensure $C^1$ continuity where frame 0 matches the end frame identically ($0\text{ms}$ jump cut).
-3. **Register Composition**:
-   - Register every new composition in `remotion/src/Root.jsx` with exact `id`, `durationInFrames`, `fps` (default: 60 fps for ultra-smooth UI motion, or 30 fps for standard web), and resolution (1920x1080 for landscape, or 1080x1920 for mobile stories).
-4. **Rendering Commands**:
-   - Render MP4: `cd remotion; npx remotion render <CompositionId> ../assets/motion/<filename>.mp4`
-   - Render WebM: `cd remotion; npx remotion render <CompositionId> ../assets/motion/<filename>.webm --codec=vp8`
-   - Render Poster Still: `cd remotion; npx remotion still <CompositionId> ../assets/motion/posters/<filename>.jpg --frame=<midFrame>`
-5. **Interactive Preview**:
-   - Always update or provide an interactive HTML player in `mockups/preview-<name>.html` with loop controls, speed pills (0.25x/0.5x/1.0x), and frame-stepping so the user can easily view and evaluate the motion.
+Whenever the user requests animation, motion graphics, commercial 3D film, or video generation:
+1. **Mandatory Master Skill**: Always activate and strictly follow the skill `hollywood-film-choreography`.
+2. **Strict User Prohibitions**:
+   - ZERO occurrences of forbidden claims: `"100% Gratis"`, `"Latihan Bisa Offline"`, `"CEFR"`, `"JLPT"`.
+   - ZERO mascots or characters: NEVER use `"PAW"` or cartoon avatars.
+   - ZERO leftover scrap floor text or black voids.
+   - ZERO faux bold fonts (strictly weight `800`, never `900` on Plus Jakarta Sans).
+   - ZERO cropped text: Always enforce Title & Action Safe Zone margins ($\ge 64\text{px}$ horizontal, $\ge 120\text{px}$ vertical).
+3. **Mandatory 5-Act Gemini Choreography**:
+   - Act I: Clean logo opening -> damped spring split ($\omega=15, \zeta=0.44$, 25% overshoot) -> 4 UI pills -> Z-axis push-through micro-tunneling.
+   - Act II: 3-tier iridescent glow (`#00E5FF` -> `#2979FF` -> `#FFD700`) + 360° trim sweep -> 3D golden curved telemetry ribbon landing at $t=14.5\text{s}$ with shockwave ring.
+   - Act III: Dark Eclipse Flip to `#1B1418` (>16:1 contrast) -> coral warning strobe (`#FF3045`) on tab switch -> Hollywood rack focus -> freehand glowing Circle-to-Search gesture around Rian Pratama.
+   - Act IV: 25° Dutch Angle macro framing on score 88 -> emerald breathing pulse on WhatsApp CTA -> 3D haptic card fold at $t=43.5\text{s}$.
+   - Act V: Singularity implosion at $t=51.5\text{s}$ -> equalizer bar burst on "I" -> two-tone wordmark + "KelasKu untuk Guru" centered at $X=540.0\text{px}$ over daylight travertine quad `bgDay` (`#FDFAF3`).
+4. **Mandatory Audio Engineering (EBU R128)**:
+   - Voiceover TTS spelled phonetically `"Fizel"` (female educator tone).
+   - Zero speech collision: atempo compression (1.10x–1.15x) ensuring $\ge 140\text{ms}$ breathing pockets.
+   - Dynamic sidechain ducking: $-8.0\text{ dB}$ bed drop during speech ($150\text{ms}$ attack, $400\text{ms}$ release).
+   - Integrated Loudness $-14.0 \pm 0.5\text{ LUFS}$, True Peak $\le -1.5\text{ dBTP}$.
+5. **Mandatory Frame-by-Frame Visual Inspection**:
+   - NEVER declare video ready based on unit tests alone. Always extract milestone stills via `ffmpeg` ($t=1.0, 2.5, 4.0, 14.5, 22.0, 27.0, 43.5, 58.0\text{s}$) and visually inspect with `view_file` to certify zero cropping, zero slop, and cinematic camera depth.
 
 
-## OpenCode Autonomous Execution Rules (Rate Limit Prevention)
-1. **Strict Sequential Execution**:
-   - Always execute all plans, edits, and tool calls sequentially within the main session thread.
-   - **NEVER** spawn parallel sub-agents or fork concurrent background sub-agents.
-   - Spawning parallel sub-agents triggers provider concurrency rate limits (HTTP 429: "Rate limit exceeded").
-2. **Deterministic Step-by-Step Delivery**:
-   - Complete tasks step-by-step: inspect -> modify -> test -> verify.
 
 ## Google Stitch Collaboration Rules
 When the user brings a Google Stitch design:
