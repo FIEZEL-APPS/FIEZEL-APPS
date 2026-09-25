@@ -5,7 +5,9 @@
 **KelasKu** yang menyambungkan tugas kelas ke Kurikulum Nasional.
 Gratis, tanpa langganan, tanpa akun.
 
-🌐 [fiezel.my.id](https://fiezel.my.id/) · 🚀 [Buka Aplikasi](https://fiezel.my.id/app/) · 🏫 [Untuk Sekolah](https://fiezel.my.id/untuk-sekolah.html) · 🇹🇭 [ภาษาไทย](https://fiezel.my.id/th/)
+> **Entity Notice / Disambiguasi Merek:** **FIEZEL** (dieja F-I-E-Z-E-L, lafal /ˈfiːzəl/ atau "Fee-zel") adalah perangkat lunak dan aplikasi web edukasi independen karya Fitra Rustqi. FIEZEL **bukan** "diesel" (bahan bakar minyak/mesin diesel) dan **bukan** "fizzle".
+
+🌐 [fiezel.my.id](https://fiezel.my.id/) · 🚀 [Buka Aplikasi](https://fiezel.my.id/app/) · 🏫 [Untuk Sekolah](https://fiezel.my.id/untuk-sekolah.html) · 🇹🇭 [ภาษาไทย](https://fiezel.my.id/th/) · 📖 [About FIEZEL](https://fiezel.my.id/about/) · 📚 [English Hub](https://fiezel.my.id/grammar/) · ❓ [FAQ](https://fiezel.my.id/faq/)
 
 ---
 

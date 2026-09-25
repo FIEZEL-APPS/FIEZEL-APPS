@@ -1,0 +1,3397 @@
+{
+  "schema": "fiezel-buku-bank-v1",
+  "subjectId": "ENG",
+  "phase": "fase_d",
+  "chapters": [
+    {
+      "code": "KOMP-ENG-D-7-BAB1-01",
+      "grade": 7,
+      "name": "Chapter 1: About Me",
+      "materi": "",
+      "cpRef": "Matematika untuk SMP/MTs Kelas VII — Bab 2",
+      "target": 12,
+      "items": [
+        {
+          "id": "eng-d-7-c1-q01",
+          "difficulty": "dasar",
+          "prompt": "Based on English for Nusantara Grade VII (page 15-18 'Galang from Kalimantan'), Galang introduces himself: 'Hello, my name is Galang. I am 13 years old. I live in Kalimantan.' What expression is used by Galang to state his age?",
+          "options": [
+            "'I am 13 years old.'",
+            "'My name is Galang.'",
+            "'I live in Kalimantan.'",
+            "'I like playing basketball.'"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "The phrase 'I am 13 years old' is the standard self-introduction expression used to state one's age."
+          },
+          "distractorWhy": {
+            "1": "'My name is Galang' states his identity name.",
+            "2": "'I live in Kalimantan' states his origin/residence.",
+            "3": "'I like playing basketball' states his hobby."
+          },
+          "sumber": {
+            "dokumen": "Matematika untuk SMP/MTs Kelas VII — Bab 2",
+            "bab": "KOMP-ENG-D-7-BAB1-01"
+          }
+        },
+        {
+          "id": "eng-d-7-c1-q02",
+          "difficulty": "sedang",
+          "prompt": "Based on English for Nusantara Grade VII (page 22 Language Focus), choose the correct subject pronoun to complete the sentence: 'Monita loves reading novels. ___ goes to the library every Wednesday.'",
+          "options": [
+            "She",
+            "He",
+            "They",
+            "It"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Monita is a female singular proper noun, so the appropriate subject pronoun is 'She'."
+          },
+          "distractorWhy": {
+            "1": "'He' is used for male singular subjects.",
+            "2": "'They' is used for plural subjects.",
+            "3": "'It' is used for non-human objects or animals."
+          },
+          "sumber": {
+            "dokumen": "Matematika untuk SMP/MTs Kelas VII — Bab 2",
+            "bab": "KOMP-ENG-D-7-BAB1-01"
+          }
+        },
+        {
+          "id": "eng-d-7-c1-q03",
+          "difficulty": "sedang",
+          "prompt": "Based on English for Nusantara Grade VII (page 28 Unit 2 'I Love Fishing'), Andre says: 'I like fishing because it is relaxing.' What is Andre's favorite hobby?",
+          "options": [
+            "Fishing",
+            "Swimming",
+            "Playing football",
+            "Cycling"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "The text directly states Andre's preference: 'I like fishing'."
+          },
+          "distractorWhy": {
+            "1": "Swimming is not mentioned as Andre's main hobby.",
+            "2": "Football is Galang's hobby in Unit 1.",
+            "3": "Cycling is not specified in Andre's text."
+          },
+          "sumber": {
+            "dokumen": "Matematika untuk SMP/MTs Kelas VII — Bab 2",
+            "bab": "KOMP-ENG-D-7-BAB1-01"
+          }
+        },
+        {
+          "id": "eng-d-7-c1-q04",
+          "difficulty": "tinggi",
+          "prompt": "Based on English for Nusantara Grade VII (page 35 Language Focus - Possessive Adjectives), complete the dialogue correctly:\nMade: 'Is this ___ bicycle, Galang?'\nGalang: 'Yes, it is my bicycle.'",
+          "options": [
+            "your",
+            "his",
+            "her",
+            "their"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Made is directly addressing Galang (second person 'you'), so the possessive adjective is 'your'."
+          },
+          "distractorWhy": {
+            "1": "'his' refers to a third-person male.",
+            "2": "'her' refers to a third-person female.",
+            "3": "'their' refers to third-person plural."
+          },
+          "sumber": {
+            "dokumen": "Matematika untuk SMP/MTs Kelas VII — Bab 2",
+            "bab": "KOMP-ENG-D-7-BAB1-01"
+          }
+        },
+        {
+          "id": "eng-d-7-c1-q05",
+          "difficulty": "dasar",
+          "prompt": "Based on English for Nusantara Grade VII (page 38 Unit 3 'My Friends and I'), which adjective best describes someone who wears glasses and has curly hair?",
+          "options": [
+            "'He wears glasses and has short curly hair.'",
+            "'He is tall with blue eyes.'",
+            "'He has long straight blonde hair.'",
+            "'He is short with no hair.'"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "The sentence 'He wears glasses and has short curly hair' accurately describes physical features of hair type and eyewear."
+          },
+          "distractorWhy": {
+            "1": "Does not mention glasses or hair texture.",
+            "2": "Contradicts 'curly' with 'straight'.",
+            "3": "Contradicts having hair."
+          },
+          "sumber": {
+            "dokumen": "Matematika untuk SMP/MTs Kelas VII — Bab 2",
+            "bab": "KOMP-ENG-D-7-BAB1-01"
+          }
+        },
+        {
+          "id": "eng-d-7-c1-q06",
+          "difficulty": "sedang",
+          "prompt": "Based on English for Nusantara Grade VII (page 42 Unit 1 Review), what is the appropriate greeting when meeting someone for the first time in a formal setting?",
+          "options": [
+            "'Nice to meet you.'",
+            "'See you later!'",
+            "'Good night, sleep well.'",
+            "'What's up, dude?'"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "'Nice to meet you' is the standard polite expression when introduced to someone for the first time."
+          },
+          "distractorWhy": {
+            "1": "'See you later' is a leave-taking expression.",
+            "2": "'Good night' is a bedtime leave-taking expression.",
+            "3": "'What's up, dude?' is informal slang."
+          },
+          "sumber": {
+            "dokumen": "Matematika untuk SMP/MTs Kelas VII — Bab 2",
+            "bab": "KOMP-ENG-D-7-BAB1-01"
+          }
+        },
+        {
+          "id": "eng-d-7-c1-q07",
+          "difficulty": "tinggi",
+          "prompt": "Based on English for Nusantara Grade VII (page 45), fill in the correct form of verb 'to be': 'Galang and his classmates ___ excited about the school scout camp.'",
+          "options": [
+            "are",
+            "is",
+            "am",
+            "was"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "'Galang and his classmates' form a plural subject in simple present tense, requiring the plural verb 'are'."
+          },
+          "distractorWhy": {
+            "1": "'is' is only used for singular subjects (he/she/it).",
+            "2": "'am' is only used with first person 'I'.",
+            "3": "'was' is past tense."
+          },
+          "sumber": {
+            "dokumen": "Matematika untuk SMP/MTs Kelas VII — Bab 2",
+            "bab": "KOMP-ENG-D-7-BAB1-01"
+          }
+        },
+        {
+          "id": "eng-d-7-c1-q08",
+          "difficulty": "dasar",
+          "prompt": "Based on English for Nusantara Grade VII (page 12), what question should you ask to find out someone's origin or hometown?",
+          "options": [
+            "'Where are you from?'",
+            "'What is your favorite color?'",
+            "'How old are you?'",
+            "'What is your hobby?'"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "'Where are you from?' is the standard question used to inquire about origin or home town."
+          },
+          "distractorWhy": {
+            "1": "Asks about color preference.",
+            "2": "Asks about age.",
+            "3": "Asks about activities/hobbies."
+          },
+          "sumber": {
+            "dokumen": "Matematika untuk SMP/MTs Kelas VII — Bab 2",
+            "bab": "KOMP-ENG-D-7-BAB1-01"
+          }
+        },
+        {
+          "id": "eng-d-7-c1-q09",
+          "difficulty": "sedang",
+          "prompt": "Based on English for Nusantara Grade VII (page 30), complete the sentence with correct possessive pronoun: 'I have a new cat. ___ fur is white and soft.'",
+          "options": [
+            "Its",
+            "It's",
+            "His",
+            "Their"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "'Its' (without apostrophe) is the possessive adjective for animals or non-human entities."
+          },
+          "distractorWhy": {
+            "1": "'It's' is a contraction of 'It is' or 'It has'.",
+            "2": "'His' is for human males.",
+            "3": "'Their' is for plural entities."
+          },
+          "sumber": {
+            "dokumen": "Matematika untuk SMP/MTs Kelas VII — Bab 2",
+            "bab": "KOMP-ENG-D-7-BAB1-01"
+          }
+        },
+        {
+          "id": "eng-d-7-c1-q10",
+          "difficulty": "tinggi",
+          "prompt": "Based on English for Nusantara Grade VII (page 48), read the short text: 'Pipit likes drawing comic characters. She draws every afternoon after finishing her homework.' What can be inferred about Pipit?",
+          "options": [
+            "Pipit is a disciplined student who manages her time well before pursuing her hobby",
+            "Pipit neglects her school homework to draw comics",
+            "Pipit does not enjoy drawing comics",
+            "Pipit draws comics at school during class hours"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "The phrase 'after finishing her homework' indicates she prioritizes school work before drawing, showing discipline."
+          },
+          "distractorWhy": {
+            "1": "Contradicts the text which says she finishes homework first.",
+            "2": "Contradicts 'likes drawing comic characters'.",
+            "3": "Text specifies 'every afternoon', not during school hours."
+          },
+          "sumber": {
+            "dokumen": "Matematika untuk SMP/MTs Kelas VII — Bab 2",
+            "bab": "KOMP-ENG-D-7-BAB1-01"
+          }
+        },
+        {
+          "id": "eng-d-7-c1-q11",
+          "difficulty": "dasar",
+          "prompt": "Based on English for Nusantara Grade VII (page 18), what is the opposite of the physical trait adjective 'tall'?",
+          "options": [
+            "Short",
+            "Fat",
+            "Slim",
+            "Young"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "The antonym of 'tall' (tinggi) in physical descriptions is 'short' (pendek)."
+          },
+          "distractorWhy": {
+            "1": "'Fat' is the opposite of 'thin/slim'.",
+            "2": "'Slim' is the opposite of 'chubby/fat'.",
+            "3": "'Young' is the opposite of 'old'."
+          },
+          "sumber": {
+            "dokumen": "Matematika untuk SMP/MTs Kelas VII — Bab 2",
+            "bab": "KOMP-ENG-D-7-BAB1-01"
+          }
+        },
+        {
+          "id": "eng-d-7-c1-q12",
+          "difficulty": "sedang",
+          "prompt": "Based on English for Nusantara Grade VII (page 32), complete the expression of leave-taking: 'Good bye, Sinta! ___'",
+          "options": [
+            "'See you tomorrow!'",
+            "'I am fine, thank you.'",
+            "'My name is Sinta.'",
+            "'Nice to meet you.'"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "'See you tomorrow!' is a standard leave-taking response that pairs naturally with 'Good bye'."
+          },
+          "distractorWhy": {
+            "1": "'I am fine' responds to 'How are you?'.",
+            "2": "'My name is' is for introduction.",
+            "3": "'Nice to meet you' is used upon initial greeting."
+          },
+          "sumber": {
+            "dokumen": "Matematika untuk SMP/MTs Kelas VII — Bab 2",
+            "bab": "KOMP-ENG-D-7-BAB1-01"
+          }
+        }
+      ]
+    },
+    {
+      "code": "KOMP-ENG-D-7-BAB2-01",
+      "grade": 7,
+      "name": "Chapter 2: Culinary and Me",
+      "materi": "",
+      "cpRef": "Bahasa Indonesia untuk SMP/MTs Kelas VII (Edisi Revisi) — Bab 2",
+      "target": 20,
+      "items": [
+        {
+          "id": "eng-d-7-c2-q01",
+          "difficulty": "dasar",
+          "prompt": "Based on English for Nusantara Grade VII (page 55-60 Unit 1 'Favorite Foods'), how does Monita describe the taste of fried rice with chili?",
+          "options": [
+            "'It is spicy and savory.'",
+            "'It is sweet and sour.'",
+            "'It is bitter and salty.'",
+            "'It is cold and creamy.'"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Fried rice with chili is described as spicy (pedas) and savory (gurih)."
+          },
+          "distractorWhy": {
+            "1": "Sweet and sour is for certain fruit dishes or tamarind soup.",
+            "2": "Bitter is for coffee or herbal medicine.",
+            "3": "Cold and creamy is for ice cream."
+          },
+          "sumber": {
+            "dokumen": "Bahasa Indonesia untuk SMP/MTs Kelas VII (Edisi Revisi) — Bab 2",
+            "bab": "KOMP-ENG-D-7-BAB2-01"
+          }
+        },
+        {
+          "id": "eng-d-7-c2-q02",
+          "difficulty": "sedang",
+          "prompt": "Based on English for Nusantara Grade VII (page 65 Unit 2 'Secret Recipe'), what imperative verb is used to instructionally separate liquid from solid ingredients when making iced tea?",
+          "options": [
+            "Pour the tea into the glass",
+            "Bake the tea in an oven",
+            "Chop the tea with a knife",
+            "Grill the tea on charcoal"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "'Pour' (tuangkan) is the action verb used for liquids into a container."
+          },
+          "distractorWhy": {
+            "1": "'Bake' is for baking bread/cake in an oven.",
+            "2": "'Chop' is for cutting solid food into small pieces.",
+            "3": "'Grill' is for cooking on direct heat."
+          },
+          "sumber": {
+            "dokumen": "Bahasa Indonesia untuk SMP/MTs Kelas VII (Edisi Revisi) — Bab 2",
+            "bab": "KOMP-ENG-D-7-BAB2-01"
+          }
+        },
+        {
+          "id": "eng-d-7-c2-q03",
+          "difficulty": "sedang",
+          "prompt": "Based on English for Nusantara Grade VII (page 72 Procedural Text Structure), what are the three main parts of a cooking recipe procedural text?",
+          "options": [
+            "Goal/Title, Ingredients/Materials, and Steps/Instructions",
+            "Orientation, Complication, and Resolution",
+            "General Statement, Description, and Conclusion",
+            "Thesis, Argument, and Reiteration"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "A procedural recipe text consists of Goal (what to make), Ingredients (materials needed), and Steps (method/instructions)."
+          },
+          "distractorWhy": {
+            "1": "Structure of narrative text.",
+            "2": "Structure of descriptive text.",
+            "3": "Structure of analytical exposition text."
+          },
+          "sumber": {
+            "dokumen": "Bahasa Indonesia untuk SMP/MTs Kelas VII (Edisi Revisi) — Bab 2",
+            "bab": "KOMP-ENG-D-7-BAB2-01"
+          }
+        },
+        {
+          "id": "eng-d-7-c2-q04",
+          "difficulty": "tinggi",
+          "prompt": "Based on English for Nusantara Grade VII (page 78 Language Focus), choose the sentence that correctly uses sequential action connectors for a recipe:",
+          "options": [
+            "First, wash the bananas. Next, peel them. Then, slice them into round pieces. Finally, fry them until golden brown.",
+            "Finally, fry the bananas. First, peel them. Next, buy bananas.",
+            "Because wash bananas, but fry them.",
+            "Although bananas are sweet, wash them."
+          ],
+          "answer": 0,
+          "why": {
+            "0": "The sequence connectors 'First', 'Next', 'Then', and 'Finally' logically structure procedural steps chronological order."
+          },
+          "distractorWhy": {
+            "1": "Illogical order (starts with Finally before buying).",
+            "2": "Incorrect causal connector usage.",
+            "3": "Incorrect concession connector usage."
+          },
+          "sumber": {
+            "dokumen": "Bahasa Indonesia untuk SMP/MTs Kelas VII (Edisi Revisi) — Bab 2",
+            "bab": "KOMP-ENG-D-7-BAB2-01"
+          }
+        },
+        {
+          "id": "eng-d-7-c2-q05",
+          "difficulty": "dasar",
+          "prompt": "Based on English for Nusantara Grade VII (page 62), what action verb means to cut vegetables into thin small pieces using a knife?",
+          "options": [
+            "Slice",
+            "Boil",
+            "Stir",
+            "Freeze"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "'Slice' (iris) means cutting ingredients into thin pieces with a knife."
+          },
+          "distractorWhy": {
+            "1": "'Boil' means cooking in boiling water.",
+            "2": "'Stir' means mixing ingredients with a spoon.",
+            "3": "'Freeze' means turning liquid into ice."
+          },
+          "sumber": {
+            "dokumen": "Bahasa Indonesia untuk SMP/MTs Kelas VII (Edisi Revisi) — Bab 2",
+            "bab": "KOMP-ENG-D-7-BAB2-01"
+          }
+        },
+        {
+          "id": "eng-d-7-c2-q06",
+          "difficulty": "sedang",
+          "prompt": "Based on English for Nusantara Grade VII (page 80 Unit 3), read the step: 'Add two spoonfuls of sugar into the cup of warm coffee and stir it well.' What is the purpose of adding sugar?",
+          "options": [
+            "To make the coffee taste sweet",
+            "To change the color to green",
+            "To cool down the temperature",
+            "To make it spicy"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Adding sugar to coffee increases sweetness and balances bitter taste."
+          },
+          "distractorWhy": {
+            "1": "Sugar does not turn coffee green.",
+            "2": "Sugar does not cool down temperature.",
+            "3": "Sugar does not add spice."
+          },
+          "sumber": {
+            "dokumen": "Bahasa Indonesia untuk SMP/MTs Kelas VII (Edisi Revisi) — Bab 2",
+            "bab": "KOMP-ENG-D-7-BAB2-01"
+          }
+        }
+      ]
+    },
+    {
+      "code": "KOMP-ENG-D-7-BAB3-01",
+      "grade": 7,
+      "name": "Chapter 3: Home Sweet Home",
+      "materi": "",
+      "cpRef": "Ilmu Pengetahuan Alam untuk SMP/MTs Kelas VII (Edisi Revisi)",
+      "target": 12,
+      "items": [
+        {
+          "id": "eng-d-7-c3-q01",
+          "difficulty": "dasar",
+          "prompt": "Based on English for Nusantara Grade VII (pages 105-110 Unit 1 'My House'), which room is primarily used for cooking meals and preparing drinks?",
+          "options": [
+            "Kitchen",
+            "Bedroom",
+            "Bathroom",
+            "Living room"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "The kitchen is the room in a house dedicated to cooking and food preparation."
+          },
+          "distractorWhy": {
+            "1": "Bedroom is for sleeping.",
+            "2": "Bathroom is for bathing.",
+            "3": "Living room is for family gathering."
+          },
+          "sumber": {
+            "dokumen": "Ilmu Pengetahuan Alam untuk SMP/MTs Kelas VII (Edisi Revisi)",
+            "bab": "KOMP-ENG-D-7-BAB3-01"
+          }
+        },
+        {
+          "id": "eng-d-7-c3-q02",
+          "difficulty": "sedang",
+          "prompt": "Based on English for Nusantara Grade VII (page 115 Prepositions of Place), look at the sentence: 'Galang puts his school bag ___ the desk in his bedroom.' What is the correct preposition?",
+          "options": [
+            "on",
+            "under",
+            "behind",
+            "in"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "'on' is used when an object is supported by a flat horizontal surface (on the desk)."
+          },
+          "distractorWhy": {
+            "1": "under means beneath.",
+            "2": "behind means at the back.",
+            "3": "in means inside an enclosed space."
+          },
+          "sumber": {
+            "dokumen": "Ilmu Pengetahuan Alam untuk SMP/MTs Kelas VII (Edisi Revisi)",
+            "bab": "KOMP-ENG-D-7-BAB3-01"
+          }
+        },
+        {
+          "id": "eng-d-7-c3-q03",
+          "difficulty": "sedang",
+          "prompt": "Based on English for Nusantara Grade VII (page 120 Unit 2 'House Chores'), what expression describes Monita's daily cleaning activity of using a broom on the floor?",
+          "options": [
+            "'She sweeps the floor.'",
+            "'She washes the dishes.'",
+            "'She waters the plants.'",
+            "'She irons the clothes.'"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "'sweeps the floor' (menyapu lantai) is the chore associated with a broom."
+          },
+          "distractorWhy": {
+            "1": "Washing dishes is for plates/cups.",
+            "2": "Watering plants is for garden.",
+            "3": "Ironing clothes is for garments."
+          },
+          "sumber": {
+            "dokumen": "Ilmu Pengetahuan Alam untuk SMP/MTs Kelas VII (Edisi Revisi)",
+            "bab": "KOMP-ENG-D-7-BAB3-01"
+          }
+        },
+        {
+          "id": "eng-d-7-c3-q04",
+          "difficulty": "tinggi",
+          "prompt": "Based on English for Nusantara Grade VII (page 128 Language Focus - Modals for Rules), choose the correct sentence to state a household rule about cleanliness:",
+          "options": [
+            "'We must keep our bedroom clean and tidy.'",
+            "'We can throw trash on the floor.'",
+            "'We cannot sleep at night.'",
+            "'We must break the window.'"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "'must keep our bedroom clean' states a positive house rule requirement."
+          },
+          "distractorWhy": {
+            "1": "Contradicts cleanliness rules.",
+            "2": "Illogical rule.",
+            "3": "Destructive behavior."
+          },
+          "sumber": {
+            "dokumen": "Ilmu Pengetahuan Alam untuk SMP/MTs Kelas VII (Edisi Revisi)",
+            "bab": "KOMP-ENG-D-7-BAB3-01"
+          }
+        },
+        {
+          "id": "eng-d-7-c3-q05",
+          "difficulty": "dasar",
+          "prompt": "Based on English for Nusantara Grade VII (page 112), what piece of furniture is typically found in the living room for people to sit comfortably?",
+          "options": [
+            "Sofa",
+            "Stove",
+            "Refrigerator",
+            "Wardrobe"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "A sofa is comfortable seating furniture in a living room."
+          },
+          "distractorWhy": {
+            "1": "Stove is in the kitchen.",
+            "2": "Refrigerator is for food cold storage.",
+            "3": "Wardrobe is in bedroom for clothes."
+          },
+          "sumber": {
+            "dokumen": "Ilmu Pengetahuan Alam untuk SMP/MTs Kelas VII (Edisi Revisi)",
+            "bab": "KOMP-ENG-D-7-BAB3-01"
+          }
+        },
+        {
+          "id": "eng-d-7-c3-q06",
+          "difficulty": "sedang",
+          "prompt": "Based on English for Nusantara Grade VII (page 132 Unit 3 Review), complete the sentence with 'can' or 'can't': 'Sinta ___ cook fried rice because her mother taught her last week.'",
+          "options": [
+            "can",
+            "can't",
+            "must not",
+            "should not"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "'can' expresses learned ability/capability in the present."
+          },
+          "distractorWhy": {
+            "1": "can't expresses inability.",
+            "2": "must not expresses prohibition.",
+            "3": "should not expresses negative advice."
+          },
+          "sumber": {
+            "dokumen": "Ilmu Pengetahuan Alam untuk SMP/MTs Kelas VII (Edisi Revisi)",
+            "bab": "KOMP-ENG-D-7-BAB3-01"
+          }
+        }
+      ]
+    },
+    {
+      "code": "KOMP-ENG-D-8-BAB1-01",
+      "grade": 8,
+      "name": "Chapter 1: Celebrating Independence Day",
+      "materi": "",
+      "cpRef": "Bahasa Indonesia untuk SMP/MTs Kelas VIII (Edisi Revisi)",
+      "target": 20,
+      "items": [
+        {
+          "id": "eng-d-8-c1-q01",
+          "difficulty": "dasar",
+          "prompt": "Based on English for Nusantara Grade VIII (pages 15-20 Unit 1 'School Parade'), what event did Monita and her classmates participate in last August 17th?",
+          "options": [
+            "A school parade to celebrate Indonesian Independence Day",
+            "A science fair exhibition at town hall",
+            "A national swimming competition",
+            "A camping trip in the forest"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Monita and her classmates joined the August 17th school parade celebrating Independence Day."
+          },
+          "distractorWhy": {
+            "1": "Science fair not mentioned in Unit 1.",
+            "2": "Swimming competition is in Chapter 2.",
+            "3": "Camping trip is not August 17th event."
+          },
+          "sumber": {
+            "dokumen": "Bahasa Indonesia untuk SMP/MTs Kelas VIII (Edisi Revisi)",
+            "bab": "KOMP-ENG-D-8-BAB1-01"
+          }
+        },
+        {
+          "id": "eng-d-8-c1-q02",
+          "difficulty": "sedang",
+          "prompt": "Based on English for Nusantara Grade VIII (page 25 Simple Past Tense), choose the correct regular past form of the verb 'join': 'Galang ___ the marble-in-spoon race last week.'",
+          "options": [
+            "joined",
+            "joins",
+            "joining",
+            "will join"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "The regular past tense of 'join' adds -ed ending: 'joined'."
+          },
+          "distractorWhy": {
+            "1": "joins is simple present.",
+            "2": "joining is present continuous.",
+            "3": "will join is future."
+          },
+          "sumber": {
+            "dokumen": "Bahasa Indonesia untuk SMP/MTs Kelas VIII (Edisi Revisi)",
+            "bab": "KOMP-ENG-D-8-BAB1-01"
+          }
+        },
+        {
+          "id": "eng-d-8-c1-q03",
+          "difficulty": "sedang",
+          "prompt": "Based on English for Nusantara Grade VIII (page 30 Irregular Verbs), choose the correct past form of verb 'win': 'Pipit ___ first place in the sack race contest.'",
+          "options": [
+            "won",
+            "winned",
+            "win",
+            "winning"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "The irregular past tense form of 'win' is 'won'."
+          },
+          "distractorWhy": {
+            "1": "winned is incorrect regularization.",
+            "2": "win is present tense.",
+            "3": "winning is continuous."
+          },
+          "sumber": {
+            "dokumen": "Bahasa Indonesia untuk SMP/MTs Kelas VIII (Edisi Revisi)",
+            "bab": "KOMP-ENG-D-8-BAB1-01"
+          }
+        },
+        {
+          "id": "eng-d-8-c1-q04",
+          "difficulty": "tinggi",
+          "prompt": "Based on English for Nusantara Grade VIII (page 38 Recount Text Structure), what are the three main parts of a recount text structure?",
+          "options": [
+            "Orientation, Events, and Reorientation",
+            "Goal, Materials, and Steps",
+            "Thesis, Arguments, and Recommendation",
+            "Title, Complication, and Resolution"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "A personal recount text consists of Orientation (who/where/when), Events (chronological past experiences), and Reorientation (feeling/summary)."
+          },
+          "distractorWhy": {
+            "1": "Structure of procedural text.",
+            "2": "Structure of analytical exposition.",
+            "3": "Structure of narrative text."
+          },
+          "sumber": {
+            "dokumen": "Bahasa Indonesia untuk SMP/MTs Kelas VIII (Edisi Revisi)",
+            "bab": "KOMP-ENG-D-8-BAB1-01"
+          }
+        },
+        {
+          "id": "eng-d-8-c1-q05",
+          "difficulty": "dasar",
+          "prompt": "Based on English for Nusantara Grade VIII (page 22 Unit 3 'Panjat Pinang'), what traditional game involves climbing a slippery greased nut tree pole to grab prizes at the top?",
+          "options": [
+            "Panjat Pinang",
+            "Kelereng (marbles)",
+            "Makan Kerupuk",
+            "Tarik Tambang"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Panjat Pinang is the traditional Independence Day game where teams climb a greased pole for prizes."
+          },
+          "distractorWhy": {
+            "1": "Kelereng is marble race.",
+            "2": "Makan Kerupuk is cracker eating.",
+            "3": "Tarik Tambang is tug of war."
+          },
+          "sumber": {
+            "dokumen": "Bahasa Indonesia untuk SMP/MTs Kelas VIII (Edisi Revisi)",
+            "bab": "KOMP-ENG-D-8-BAB1-01"
+          }
+        },
+        {
+          "id": "eng-d-8-c1-q06",
+          "difficulty": "sedang",
+          "prompt": "Based on English for Nusantara Grade VIII (page 42 Time Connectors), choose the correct past connector: '___, Made put on his costume. Next, he walked to the school yard.'",
+          "options": [
+            "First",
+            "Finally",
+            "Last year",
+            "Although"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "'First' is the initial time connector used at the start of chronological recount events."
+          },
+          "distractorWhy": {
+            "1": "Finally is at the end.",
+            "2": "Last year is time adverb.",
+            "3": "Although is contrast connector."
+          },
+          "sumber": {
+            "dokumen": "Bahasa Indonesia untuk SMP/MTs Kelas VIII (Edisi Revisi)",
+            "bab": "KOMP-ENG-D-8-BAB1-01"
+          }
+        },
+        {
+          "id": "eng-d-8-c1-q07",
+          "difficulty": "tinggi",
+          "prompt": "Based on English for Nusantara Grade VIII (page 48 Unit 2 Review), complete the sentence in simple past negative form: 'We ___ win the kerupuk race, but we had a lot of fun.'",
+          "options": [
+            "didn't win",
+            "don't win",
+            "wasn't win",
+            "not winning"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Negative simple past tense uses 'didn't' + base verb: 'didn't win'."
+          },
+          "distractorWhy": {
+            "1": "don't win is present tense.",
+            "2": "wasn't win is ungrammatical.",
+            "3": "not winning lacks auxiliary verb."
+          },
+          "sumber": {
+            "dokumen": "Bahasa Indonesia untuk SMP/MTs Kelas VIII (Edisi Revisi)",
+            "bab": "KOMP-ENG-D-8-BAB1-01"
+          }
+        },
+        {
+          "id": "eng-d-8-c1-q08",
+          "difficulty": "dasar",
+          "prompt": "Based on English for Nusantara Grade VIII (page 18), what costume did Galang wear during the school parade?",
+          "options": [
+            "A traditional warrior costume with a headpiece",
+            "A doctor white coat",
+            "A chef hat and apron",
+            "A pilot uniform"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Galang wore a traditional Indonesian warrior costume for the cultural parade."
+          },
+          "distractorWhy": {
+            "1": "Doctor coat is not Galang's costume.",
+            "2": "Chef hat is not his parade outfit.",
+            "3": "Pilot uniform is incorrect."
+          },
+          "sumber": {
+            "dokumen": "Bahasa Indonesia untuk SMP/MTs Kelas VIII (Edisi Revisi)",
+            "bab": "KOMP-ENG-D-8-BAB1-01"
+          }
+        },
+        {
+          "id": "eng-d-8-c1-q09",
+          "difficulty": "sedang",
+          "prompt": "Based on English for Nusantara Grade VIII (page 32), what is the past tense form of 'eat' in the sentence: 'They ___ kerupuk attached to a string.'",
+          "options": [
+            "ate",
+            "eaten",
+            "eats",
+            "eating"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "The irregular simple past tense of 'eat' is 'ate'."
+          },
+          "distractorWhy": {
+            "1": "eaten is past participle.",
+            "2": "eats is simple present.",
+            "3": "eating is present participle."
+          },
+          "sumber": {
+            "dokumen": "Bahasa Indonesia untuk SMP/MTs Kelas VIII (Edisi Revisi)",
+            "bab": "KOMP-ENG-D-8-BAB1-01"
+          }
+        },
+        {
+          "id": "eng-d-8-c1-q10",
+          "difficulty": "tinggi",
+          "prompt": "Based on English for Nusantara Grade VIII (page 52 Review), read the excerpt: 'Yesterday was August 17th. SMP Merdeka held an Independence Day celebration. All students felt happy.' What is the main feeling expressed in the reorientation?",
+          "options": [
+            "Joyful and proud",
+            "Sad and disappointed",
+            "Angry and frustrated",
+            "Bored and tired"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "The text states 'felt happy' indicating joy and pride in celebrating Independence Day."
+          },
+          "distractorWhy": {
+            "1": "Contradicts 'happy'.",
+            "2": "Contradicts the celebratory mood.",
+            "3": "Contradicts 'happy'."
+          },
+          "sumber": {
+            "dokumen": "Bahasa Indonesia untuk SMP/MTs Kelas VIII (Edisi Revisi)",
+            "bab": "KOMP-ENG-D-8-BAB1-01"
+          }
+        },
+        {
+          "id": "eng-d-8-c1-q11",
+          "difficulty": "dasar",
+          "prompt": "Based on English for Nusantara Grade VIII (page 28), what is the past form of 'go'?",
+          "options": [
+            "went",
+            "goed",
+            "gone",
+            "going"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "The irregular past tense of 'go' is 'went'."
+          },
+          "distractorWhy": {
+            "1": "goed is incorrect regularization.",
+            "2": "gone is past participle.",
+            "3": "going is present participle."
+          },
+          "sumber": {
+            "dokumen": "Bahasa Indonesia untuk SMP/MTs Kelas VIII (Edisi Revisi)",
+            "bab": "KOMP-ENG-D-8-BAB1-01"
+          }
+        },
+        {
+          "id": "eng-d-8-c1-q12",
+          "difficulty": "sedang",
+          "prompt": "Based on English for Nusantara Grade VIII (page 35), complete the sentence: 'Pak Rahmansyah ___ a speech at the opening of the school games.'",
+          "options": [
+            "gave",
+            "gives",
+            "given",
+            "giving"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "The simple past tense form of 'give' is 'gave'."
+          },
+          "distractorWhy": {
+            "1": "gives is present.",
+            "2": "given is past participle.",
+            "3": "giving is continuous."
+          },
+          "sumber": {
+            "dokumen": "Bahasa Indonesia untuk SMP/MTs Kelas VIII (Edisi Revisi)",
+            "bab": "KOMP-ENG-D-8-BAB1-01"
+          }
+        }
+      ]
+    },
+    {
+      "code": "KOMP-ENG-D-8-BAB2-01",
+      "grade": 8,
+      "name": "Chapter 2: Kindness Begins with Me",
+      "materi": "",
+      "cpRef": "",
+      "target": 20,
+      "items": []
+    },
+    {
+      "code": "KOMP-ENG-D-8-BAB3-01",
+      "grade": 8,
+      "name": "Chapter 3: Love Our World",
+      "materi": "",
+      "cpRef": "English for Nusantara untuk SMP/MTs Kelas VIII",
+      "target": 20,
+      "items": [
+        {
+          "id": "eng-d-8-c3-q01",
+          "difficulty": "dasar",
+          "prompt": "Based on English for Nusantara Grade VIII (pages 157-159 Unit 1 Comic Strip 3.1), what causes the trash bin at the school canteen to overflow?",
+          "options": [
+            "Plastic waste from snack wrappers and straws",
+            "Overflowing paper waste from old school notebooks",
+            "Leftover organic food waste from the school kitchen",
+            "Broken glass bottles and discarded aluminium cans"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "The trash bin at the canteen overflows mainly because it is filled with plastic waste from snack wrappers and straws."
+          },
+          "distractorWhy": {
+            "1": "Notebook paper waste is not mentioned as filling the canteen trash bin.",
+            "2": "Kitchen organic food waste is not the primary cause stated in the text.",
+            "3": "Glass bottles and aluminium cans are not mentioned in Comic Strip 3.1."
+          },
+          "sumber": {
+            "dokumen": "English for Nusantara untuk SMP/MTs Kelas VIII",
+            "bab": "KOMP-ENG-D-8-BAB3-01"
+          }
+        },
+        {
+          "id": "eng-d-8-c3-q02",
+          "difficulty": "sedang",
+          "prompt": "Based on English for Nusantara Grade VIII (page 158 Unit 1 Comic Strip 3.1), what action do Monita and Andre decide to take for their future canteen lunches to reduce plastic waste?",
+          "options": [
+            "Bring their own food containers from home",
+            "Buy more packaged snacks with plastic straws",
+            "Ask the canteen sellers to use single-use paper bags",
+            "Throw their plastic trash in another school bin"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Monita suggests bringing their own food containers next time to avoid generating plastic wrapper waste."
+          },
+          "distractorWhy": {
+            "1": "Buying more packaged snacks increases plastic consumption.",
+            "2": "Asking canteen sellers for paper bags is not the specific action agreed upon.",
+            "3": "Throwing trash elsewhere does not reduce overall plastic usage."
+          },
+          "sumber": {
+            "dokumen": "English for Nusantara untuk SMP/MTs Kelas VIII",
+            "bab": "KOMP-ENG-D-8-BAB3-01"
+          }
+        },
+        {
+          "id": "eng-d-8-c3-q03",
+          "difficulty": "dasar",
+          "prompt": "Based on English for Nusantara Grade VIII (page 159 Unit 1 Worksheet 3.2), what does Monita mean when she says \"Good idea, Andre!\"?",
+          "options": [
+            "She agrees with Andre's suggestion to reduce plastic waste",
+            "She thinks Andre should buy more snacks at the canteen",
+            "She wants Andre to clean the canteen trash bin by himself",
+            "She doubts whether reducing plastic waste will help the environment"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "\"Good idea\" expresses agreement with Andre's proposal to bring food containers from home to reduce plastic waste."
+          },
+          "distractorWhy": {
+            "1": "Buying more snacks contradicts the idea of reducing waste.",
+            "2": "She is not instructing Andre to clean the trash bin.",
+            "3": "She fully supports saving the environment rather than doubting it."
+          },
+          "sumber": {
+            "dokumen": "English for Nusantara untuk SMP/MTs Kelas VIII",
+            "bab": "KOMP-ENG-D-8-BAB3-01"
+          }
+        },
+        {
+          "id": "eng-d-8-c3-q04",
+          "difficulty": "sedang",
+          "prompt": "Based on English for Nusantara Grade VIII (pages 160-163 Unit 1 Handwashing Procedure), what is the proper action regarding the water faucet while rubbing hands with soap?",
+          "options": [
+            "Turn off the faucet while rubbing hands to save water",
+            "Keep the faucet running continuously throughout handwashing",
+            "Increase the water flow to rinse the soap faster",
+            "Splash water onto the floor to keep hands wet"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "The procedure specifies turning off the faucet while rubbing hands with soap so water is not wasted."
+          },
+          "distractorWhy": {
+            "1": "Leaving the faucet running wastes clean water needlessly.",
+            "2": "Increasing water flow while soaping is wasteful.",
+            "3": "Splashing water on the floor is improper and unhygienic."
+          },
+          "sumber": {
+            "dokumen": "English for Nusantara untuk SMP/MTs Kelas VIII",
+            "bab": "KOMP-ENG-D-8-BAB3-01"
+          }
+        },
+        {
+          "id": "eng-d-8-c3-q05",
+          "difficulty": "dasar",
+          "prompt": "Based on English for Nusantara Grade VIII (page 163 Unit 1 Did You Know section), what common health problem is caused by unhygienic water and unsafe sanitation?",
+          "options": [
+            "Diarrhea",
+            "Influenza",
+            "Asthma",
+            "Tooth decay"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Unhygienic water and poor sanitation frequently cause diarrhea, which can prevent children from attending school."
+          },
+          "distractorWhy": {
+            "1": "Influenza is an airborne viral respiratory disease.",
+            "2": "Asthma is a chronic respiratory condition unrelated to water sanitation.",
+            "3": "Tooth decay is related to dental hygiene and diet rather than waterborne pathogens."
+          },
+          "sumber": {
+            "dokumen": "English for Nusantara untuk SMP/MTs Kelas VIII",
+            "bab": "KOMP-ENG-D-8-BAB3-01"
+          }
+        },
+        {
+          "id": "eng-d-8-c3-q06",
+          "difficulty": "sedang",
+          "prompt": "Based on English for Nusantara Grade VIII (page 164 Unit 1 Language Focus Table 3.2), which expression is appropriate for the \"Showing the steps\" stage of a procedural presentation?",
+          "options": [
+            "First, turn on the faucet and wash our hands with running water.",
+            "Good afternoon everyone, my name is Alifandra.",
+            "I am going to show you how to wash our hands without wasting water.",
+            "Thank you very much for your kind attention."
+          ],
+          "answer": 0,
+          "why": {
+            "0": "\"First, ...\" is a sequential transition marker used to present procedural steps."
+          },
+          "distractorWhy": {
+            "1": "This expression belongs to the starting the presentation stage.",
+            "2": "This expression belongs to the stating the goal stage.",
+            "3": "This expression belongs to the ending the presentation stage."
+          },
+          "sumber": {
+            "dokumen": "English for Nusantara untuk SMP/MTs Kelas VIII",
+            "bab": "KOMP-ENG-D-8-BAB3-01"
+          }
+        },
+        {
+          "id": "eng-d-8-c3-q07",
+          "difficulty": "sedang",
+          "prompt": "Based on English for Nusantara Grade VIII (pages 166-168 Unit 1 Comic Strip 3.3), why does Galang remind Pipit while she is washing her hands?",
+          "options": [
+            "Because Pipit left the faucet running while rubbing her hands with soap",
+            "Because Pipit forgot to use soap when washing her hands",
+            "Because Pipit rubbed her hands for only five seconds",
+            "Because Pipit used dirty river water instead of tap water"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Galang points out that leaving the tap running while soaping hands wastes precious water."
+          },
+          "distractorWhy": {
+            "1": "Pipit was using soap, but left the water running.",
+            "2": "Pipit was rubbing her hands for 60 seconds.",
+            "3": "Pipit was using tap water at school."
+          },
+          "sumber": {
+            "dokumen": "English for Nusantara untuk SMP/MTs Kelas VIII",
+            "bab": "KOMP-ENG-D-8-BAB3-01"
+          }
+        },
+        {
+          "id": "eng-d-8-c3-q08",
+          "difficulty": "dasar",
+          "prompt": "Based on English for Nusantara Grade VIII (pages 174-175 Unit 2 Comic Strip 3.4), what topic is discussed in the social media post that Monita shares with her friends?",
+          "options": [
+            "Sorting trash to help save the earth",
+            "Playing online video games on weekends",
+            "Ordering fast food online for school lunch",
+            "Buying fashion items on discount sales"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Monita shares a social media post written by a girl about how to sort household trash to save the environment."
+          },
+          "distractorWhy": {
+            "1": "Video games are not mentioned in Monita's post.",
+            "2": "Fast food delivery is unrelated to the environmental post.",
+            "3": "Online shopping is not the topic of the post."
+          },
+          "sumber": {
+            "dokumen": "English for Nusantara untuk SMP/MTs Kelas VIII",
+            "bab": "KOMP-ENG-D-8-BAB3-01"
+          }
+        },
+        {
+          "id": "eng-d-8-c3-q09",
+          "difficulty": "sedang",
+          "prompt": "Based on English for Nusantara Grade VIII (pages 178-179 Unit 2 Picture 3.3 Language Focus), what should we do before commenting on social media?",
+          "options": [
+            "Read and understand the content carefully, then think if we have something necessary and polite to offer",
+            "Post immediate emotional reactions without reading the whole text",
+            "Use aggressive words to win arguments in the comment section",
+            "Share private personal phone numbers and home addresses publicly"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Responsible social media etiquette requires reading carefully and commenting politely only when offering necessary, constructive thoughts."
+          },
+          "distractorWhy": {
+            "1": "Reacting emotionally without reading causes misunderstanding.",
+            "2": "Aggressive words spark unnecessary quarrels.",
+            "3": "Sharing private details online compromises personal safety."
+          },
+          "sumber": {
+            "dokumen": "English for Nusantara untuk SMP/MTs Kelas VIII",
+            "bab": "KOMP-ENG-D-8-BAB3-01"
+          }
+        },
+        {
+          "id": "eng-d-8-c3-q10",
+          "difficulty": "dasar",
+          "prompt": "Based on English for Nusantara Grade VIII (page 180 Unit 2 Internet Safety Rules), which practice is recommended for staying safe online?",
+          "options": [
+            "Do not share personal information such as home address and phone number online",
+            "Download files freely from unknown and suspicious websites",
+            "Trust anyone you meet on social media right away",
+            "Post negative comments to criticise classmates publicly"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Protecting privacy by withholding home address and phone number is a core rule for online safety."
+          },
+          "distractorWhy": {
+            "1": "Downloading from suspicious sites exposes devices to malware.",
+            "2": "Trusting strangers online poses serious safety risks.",
+            "3": "Posting hurtful content constitutes cyberbullying."
+          },
+          "sumber": {
+            "dokumen": "English for Nusantara untuk SMP/MTs Kelas VIII",
+            "bab": "KOMP-ENG-D-8-BAB3-01"
+          }
+        },
+        {
+          "id": "eng-d-8-c3-q11",
+          "difficulty": "dasar",
+          "prompt": "Based on English for Nusantara Grade VIII (pages 183-184 Unit 2 Section 6), what main problem does @in22day express in the social media post?",
+          "options": [
+            "Having too many old books in the room that are no longer read",
+            "Lacking money to buy school textbooks",
+            "Losing an important library book at school",
+            "Wanting to build a commercial bookstore in town"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "@in22day asks friends for advice on what to do with accumulated old books that are no longer read."
+          },
+          "distractorWhy": {
+            "1": "Lacking money is not @in22day's expressed problem.",
+            "2": "No mention of losing a school library book.",
+            "3": "@in22day is seeking ways to manage personal unused books, not starting a commercial business."
+          },
+          "sumber": {
+            "dokumen": "English for Nusantara untuk SMP/MTs Kelas VIII",
+            "bab": "KOMP-ENG-D-8-BAB3-01"
+          }
+        },
+        {
+          "id": "eng-d-8-c3-q12",
+          "difficulty": "sedang",
+          "prompt": "Based on English for Nusantara Grade VIII (pages 183-184 Unit 2 Worksheet 3.14), what is the first step to donate old books to Bina Karya orphanage according to @titalesta?",
+          "options": [
+            "Fill in the donation form on the provided website link",
+            "Send the books directly by post without filling out any form",
+            "Sell the books at Palasari Market first",
+            "Cover the books with plastic layers"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "@titalesta states: \"First fill in the form in the link www.binakaryadonation.com\"."
+          },
+          "distractorWhy": {
+            "1": "Sending books before filling out the online form misses the required initial step.",
+            "2": "Selling books at Palasari Market is @zalvafsp's suggestion, not @titalesta's donation step.",
+            "3": "Covering books with plastic is part of @zalvafsp's selling procedure."
+          },
+          "sumber": {
+            "dokumen": "English for Nusantara untuk SMP/MTs Kelas VIII",
+            "bab": "KOMP-ENG-D-8-BAB3-01"
+          }
+        },
+        {
+          "id": "eng-d-8-c3-q13",
+          "difficulty": "tinggi",
+          "prompt": "Based on English for Nusantara Grade VIII (pages 183-184 Unit 2 Section 6), which commenter gives a response that is not related to solving @in22day's problem with old books?",
+          "options": [
+            "@shakila, who recommends watching movies",
+            "@agungibr, who suggests making a cardboard mini library",
+            "@titalesta, who invites book donations for an orphanage",
+            "@zalvafsp, who suggests selling good condition books at Palasari Market"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "@shakila's comment asks about movie recommendations, which does not address the issue of managing old books."
+          },
+          "distractorWhy": {
+            "1": "@agungibr gives a detailed step-by-step method to build a mini bookshelf.",
+            "2": "@titalesta offers a clear donation channel for the books.",
+            "3": "@zalvafsp provides practical steps to resell unused books."
+          },
+          "sumber": {
+            "dokumen": "English for Nusantara untuk SMP/MTs Kelas VIII",
+            "bab": "KOMP-ENG-D-8-BAB3-01"
+          }
+        },
+        {
+          "id": "eng-d-8-c3-q14",
+          "difficulty": "sedang",
+          "prompt": "Based on English for Nusantara Grade VIII (pages 187-193 Unit 3 Section 3), what are the two main elements of an instructional procedural poster?",
+          "options": [
+            "Goal and Steps",
+            "Orientation and Reorientation",
+            "Complication and Resolution",
+            "Thesis and Arguments"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Instructional procedural posters focus on communicating a clear Goal and procedural Steps."
+          },
+          "distractorWhy": {
+            "1": "Orientation and Reorientation belong to recount or narrative text structures.",
+            "2": "Complication and Resolution belong to narrative texts.",
+            "3": "Thesis and Arguments belong to exposition texts."
+          },
+          "sumber": {
+            "dokumen": "English for Nusantara untuk SMP/MTs Kelas VIII",
+            "bab": "KOMP-ENG-D-8-BAB3-01"
+          }
+        },
+        {
+          "id": "eng-d-8-c3-q15",
+          "difficulty": "tinggi",
+          "prompt": "Based on English for Nusantara Grade VIII (pages 194-195 Unit 3 Language Focus Table 3.4), what visual effect do warm colors (ranging from yellow to reddish violet) create in poster design?",
+          "options": [
+            "They appear to come forward, look larger, and are suitable for foreground elements",
+            "They appear to move backward, look smaller, and are suitable for background elements",
+            "They create a cold, quiet, and sad atmosphere exclusively",
+            "They make text unreadable and obscure all visual details"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Warm colors make visual elements come forward and look larger, making them ideal for foreground emphasis."
+          },
+          "distractorWhy": {
+            "1": "Moving backward and looking smaller is the visual effect of cool colors.",
+            "2": "Cold, quiet, and sad moods are associated with cool colors.",
+            "3": "Warm colors are strategically used to draw attention, not obscure details."
+          },
+          "sumber": {
+            "dokumen": "English for Nusantara untuk SMP/MTs Kelas VIII",
+            "bab": "KOMP-ENG-D-8-BAB3-01"
+          }
+        },
+        {
+          "id": "eng-d-8-c3-q16",
+          "difficulty": "tinggi",
+          "prompt": "Based on English for Nusantara Grade VIII (page 195 Unit 3 Table 3.4), how is an analogous color combination formed on a color wheel for poster creation?",
+          "options": [
+            "By combining colors that are next to each other on the color wheel, such as sky blue, green, and yellowish green",
+            "By combining colors directly opposite each other on the color wheel, such as yellow and violet",
+            "By combining dark black and pure white without any hues",
+            "By selecting random colors with no spatial relationship on the wheel"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Analogous color schemes use adjacent colors on the color wheel to create harmonious visual balance."
+          },
+          "distractorWhy": {
+            "1": "Combining opposite colors forms a complementary color scheme.",
+            "2": "Black and white form a monochromatic/achromatic contrast, not analogous hues.",
+            "3": "Analogous combinations follow strict adjacency rules on the color wheel."
+          },
+          "sumber": {
+            "dokumen": "English for Nusantara untuk SMP/MTs Kelas VIII",
+            "bab": "KOMP-ENG-D-8-BAB3-01"
+          }
+        },
+        {
+          "id": "eng-d-8-c3-q17",
+          "difficulty": "sedang",
+          "prompt": "Based on English for Nusantara Grade VIII (page 196 Unit 3 Table 3.4), what visual characteristic distinguishes a complementary color combination (e.g., yellow and violet)?",
+          "options": [
+            "Striking contrast between opposite colors on the color wheel",
+            "Subtle, calm, and invisible blending of identical tones",
+            "Monochrome grayscale without any bright highlights",
+            "Smooth pastel shades with zero visual impact"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Complementary colors sit opposite each other on the color wheel, producing high-contrast, striking visuals."
+          },
+          "distractorWhy": {
+            "1": "Identical tones lack the high contrast of complementary pairs.",
+            "2": "Grayscale does not describe chromatic complementary color pairs.",
+            "3": "Complementary colors produce striking visual impact rather than zero impact."
+          },
+          "sumber": {
+            "dokumen": "English for Nusantara untuk SMP/MTs Kelas VIII",
+            "bab": "KOMP-ENG-D-8-BAB3-01"
+          }
+        },
+        {
+          "id": "eng-d-8-c3-q18",
+          "difficulty": "sedang",
+          "prompt": "Based on English for Nusantara Grade VIII (page 197 Unit 3 Table 3.5), what is the main purpose of adding illustrations to an environmental procedural poster?",
+          "options": [
+            "To clarify and represent the intended procedural steps visually",
+            "To fill all blank spaces so that no text can be read",
+            "To decorate the poster with unrelated cartoon characters",
+            "To hide the main goal of the poster from readers"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Illustrations in posters complement the text, making the procedural steps clear and engaging."
+          },
+          "distractorWhy": {
+            "1": "Overcrowding blank space makes posters unreadable.",
+            "2": "Unrelated decorative images distract from the poster's key message.",
+            "3": "Illustrations should clarify the main goal, not hide it."
+          },
+          "sumber": {
+            "dokumen": "English for Nusantara untuk SMP/MTs Kelas VIII",
+            "bab": "KOMP-ENG-D-8-BAB3-01"
+          }
+        },
+        {
+          "id": "eng-d-8-c3-q19",
+          "difficulty": "dasar",
+          "prompt": "Based on English for Nusantara Grade VIII (page 198 Unit 3 Section 5 Fun Time), what word in the crossword puzzle corresponds to the clue \"the thing that runs water\"?",
+          "options": [
+            "Faucet",
+            "Towel",
+            "Soap",
+            "Poster"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "A faucet is the plumbing fixture that controls and supplies running water."
+          },
+          "distractorWhy": {
+            "1": "A towel is used for drying hands.",
+            "2": "Soap is used for cleansing.",
+            "3": "A poster is a printed paper or cardboard displaying information."
+          },
+          "sumber": {
+            "dokumen": "English for Nusantara untuk SMP/MTs Kelas VIII",
+            "bab": "KOMP-ENG-D-8-BAB3-01"
+          }
+        },
+        {
+          "id": "eng-d-8-c3-q20",
+          "difficulty": "tinggi",
+          "prompt": "Based on English for Nusantara Grade VIII (pages 160 and 190 Imperative Expressions), which sentence correctly uses an imperative form to instruct someone to conserve water when washing hands?",
+          "options": [
+            "Turn off the faucet while rubbing your hands with soap.",
+            "You are turning off the faucet right now.",
+            "Did you turn off the faucet after washing?",
+            "The faucet was turned off by Galang."
+          ],
+          "answer": 0,
+          "why": {
+            "0": "\"Turn off...\" is a direct imperative sentence starting with a base verb to give clear procedural instructions."
+          },
+          "distractorWhy": {
+            "1": "This is a present continuous declarative sentence.",
+            "2": "This is a past tense interrogative sentence.",
+            "3": "This is a passive voice sentence in the simple past tense."
+          },
+          "sumber": {
+            "dokumen": "English for Nusantara untuk SMP/MTs Kelas VIII",
+            "bab": "KOMP-ENG-D-8-BAB3-01"
+          }
+        }
+      ]
+    },
+    {
+      "code": "KOMP-ENG-D-8-BAB4-01",
+      "grade": 8,
+      "name": "Chapter 4: No Littering",
+      "materi": "",
+      "cpRef": "English for Nusantara untuk SMP/MTs Kelas VIII",
+      "target": 20,
+      "items": [
+        {
+          "id": "eng-d-8-c4-q01",
+          "difficulty": "easy",
+          "prompt": "Read the dialogue snippet from Unit 1 Section 2:\nGalang: \"Was the river this dirty back then? Did you swim in the river?\"\nPak Rahmansyah: \"I did! The river was quite clean back then. A lot of kids swam and played in the river.\"\n\nWhat condition was Sungai Lestari in when Pak Rahmansyah was a child?",
+          "options": [
+            "It was clean and local children often swam and played in it.",
+            "It was already filled with plastic trash and polluted.",
+            "It was deep and dangerous so children were forbidden to go near.",
+            "It was dried up because of a severe drought in the nearby town."
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Teks percakapan menyebutkan bahwa dahulu Sungai Lestari cukup bersih (\"quite clean back then\") dan banyak anak-anak berenang serta bermain di sana."
+          },
+          "distractorWhy": {
+            "1": "Pernyataan ini bertentangan dengan penjelasan Pak Rahmansyah yang menyatakan bahwa sungai tersebut dahulu masih bersih.",
+            "2": "Dialog tidak menyebutkan sungai itu berbahaya atau melarang anak-anak mendekat, melainkan menceritakan bahwa banyak anak bermain di sungai.",
+            "3": "Teks tidak menyebutkan terjadinya kekeringan atau sungai kering."
+          },
+          "sumber": {
+            "dokumen": "English for Nusantara untuk SMP/MTs Kelas VIII",
+            "bab": "KOMP-ENG-D-8-BAB4-01"
+          }
+        },
+        {
+          "id": "eng-d-8-c4-q02",
+          "difficulty": "easy",
+          "prompt": "Based on Bu Posma's explanation in Unit 1 Section 2, why does plastic trash cause long-term pollution in rivers like Sungai Lestari?",
+          "options": [
+            "Because plastic does not decay easily and accumulates in many places.",
+            "Because plastic dissolves instantly in water and poisons river fish.",
+            "Because plastic turns into organic fertilizer that attracts algae.",
+            "Because plastic sinks to the bottom and burns underwater."
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Bu Posma menjelaskan bahwa sampah plastik menjadi masalah utama karena tidak mudah terurai (\"plastic does not decay easily\") sehingga mengotori berbagai tempat."
+          },
+          "distractorWhy": {
+            "1": "Plastik tidak larut secara instan dalam air, melainkan justru sangat sulit terurai.",
+            "2": "Plastik adalah bahan anorganik dan tidak berubah menjadi pupuk organik.",
+            "3": "Plastik yang berada di dalam air sungai tidak terbakar di bawah air."
+          },
+          "sumber": {
+            "dokumen": "English for Nusantara untuk SMP/MTs Kelas VIII",
+            "bab": "KOMP-ENG-D-8-BAB4-01"
+          }
+        },
+        {
+          "id": "eng-d-8-c4-q03",
+          "difficulty": "medium",
+          "prompt": "Choose the grammatically correct interrogative sentence in Simple Past tense based on Language Focus Unit 1:",
+          "options": [
+            "Did people throw their trash into the river?",
+            "Did people threw their trash into the river?",
+            "Was people throw their trash into the river?",
+            "Were people threw their trash into the river?"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Dalam kalimat tanya Simple Past Tense menggunakan kata bantu \"Did\", kata kerja utama kembali ke bentuk dasar (infinitive/Verb 1), yaitu \"throw\"."
+          },
+          "distractorWhy": {
+            "1": "Kata kerja setelah kata bantu \"Did\" harus berupa Verb 1 (\"throw\"), bukan kata kerja bentuk lampau (\"threw\").",
+            "2": "Kata bantu \"Was\" tidak digunakan bersama kata kerja aksi (\"throw\") dalam struktur kalimat tanya sederhana ini.",
+            "3": "Kata bantu \"Were\" tidak dipadukan dengan Verb 2 (\"threw\") dalam pembentukan kalimat tanya Simple Past."
+          },
+          "sumber": {
+            "dokumen": "English for Nusantara untuk SMP/MTs Kelas VIII",
+            "bab": "KOMP-ENG-D-8-BAB4-01"
+          }
+        },
+        {
+          "id": "eng-d-8-c4-q04",
+          "difficulty": "medium",
+          "prompt": "In Audio 4.2 (Unit 1), what main obstacle caused the rainwater to back up and flood the area after the heavy rain?",
+          "options": [
+            "Almost all gutters were clogged and full of plastic trash.",
+            "The river dam broke due to an earthquake.",
+            "The local residents blocked the water pipes intentionally.",
+            "The sea level rose suddenly and flooded the town."
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Petugas penyelamat melaporkan bahwa saluran air (gutters) tersumbat dan penuh dengan sampah plastik sehingga air hujan meluap."
+          },
+          "distractorWhy": {
+            "1": "Teks tidak menyebutkan adanya bendungan yang jebol akibat gempa bumi.",
+            "2": "Tidak ada informasi mengenai warga yang sengaja menyumbat pipa air.",
+            "3": "Banjir disebabkan oleh hujan lebat dan saluran air yang tersumbat sampah plastik, bukan oleh kenaikan permukaan laut."
+          },
+          "sumber": {
+            "dokumen": "English for Nusantara untuk SMP/MTs Kelas VIII",
+            "bab": "KOMP-ENG-D-8-BAB4-01"
+          }
+        },
+        {
+          "id": "eng-d-8-c4-q05",
+          "difficulty": "easy",
+          "prompt": "Complete the sentence with the correct past form of 'be' based on Language Focus Unit 1:\n\"In some areas of the town, many houses _____ almost underwater during the flood.\"",
+          "options": [
+            "were",
+            "was",
+            "is",
+            "are"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Subjek kalimat adalah \"many houses\" (jamak/plural), sehingga kata bantu 'be' dalam bentuk lampau yang tepat adalah \"were\"."
+          },
+          "distractorWhy": {
+            "1": "Bentuk \"was\" digunakan untuk subjek tunggal (singular), sedangkan subjek kalimat ini jamak.",
+            "2": "Bentuk \"is\" merupakan to be present tense untuk subjek tunggal, tidak cocok untuk konteks kejadian masa lalu.",
+            "3": "Bentuk \"are\" merupakan to be present tense, padahal kalimat menceritakan peristiwa di masa lalu (past tense)."
+          },
+          "sumber": {
+            "dokumen": "English for Nusantara untuk SMP/MTs Kelas VIII",
+            "bab": "KOMP-ENG-D-8-BAB4-01"
+          }
+        },
+        {
+          "id": "eng-d-8-c4-q06",
+          "difficulty": "medium",
+          "prompt": "Which of the following questions correctly asks about the state of the gutters in the past using Was/Were?",
+          "options": [
+            "Were the gutters full of plastic trash after the storm?",
+            "Did the gutters was full of plastic trash after the storm?",
+            "Was the gutters full of plastic trash after the storm?",
+            "Were the gutters filled trash do after the storm?"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Subjek \"the gutters\" berbentuk jamak, sehingga kalimat tanya nominal di masa lalu diawali dengan \"Were\" diikuti subjek dan kata sifat/frasa preposisi."
+          },
+          "distractorWhy": {
+            "1": "Penggabungan kata bantu \"Did\" dan \"was\" secara bersamaan dalam satu klausa tidak sesuai tata bahasa.",
+            "2": "Bentuk \"Was\" seharusnya digunakan untuk subjek tunggal, sedangkan \"the gutters\" adalah kata benda jamak.",
+            "3": "Susunan kata dan penggunaan \"filled trash do\" tidak memenuhi struktur tata bahasa yang valid."
+          },
+          "sumber": {
+            "dokumen": "English for Nusantara untuk SMP/MTs Kelas VIII",
+            "bab": "KOMP-ENG-D-8-BAB4-01"
+          }
+        },
+        {
+          "id": "eng-d-8-c4-q07",
+          "difficulty": "easy",
+          "prompt": "Read the excerpt from Unit 2 Section 3:\n\"A team of scientists from Texas University helped an injured sea turtle when they sailed in the ocean near Costa Rica. The scientists were collecting data on sea turtles when they saw the injured turtle.\"\n\nWhere were the scientists when they spotted the injured sea turtle?",
+          "options": [
+            "In the ocean near Costa Rica.",
+            "At a turtle breeding center in Texas.",
+            "On a public beach in Kuta, Bali.",
+            "In a laboratory at Texas University."
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Teks bacaan menyebutkan bahwa para ilmuwan sedang berlayar di samudra dekat Costa Rica ketika mereka melihat penyu yang terluka."
+          },
+          "distractorWhy": {
+            "1": "Meskipun para ilmuwan berasal dari Texas University, lokasi penemuan penyu berada di laut dekat Costa Rica.",
+            "2": "Pantai Kuta Bali merupakan latar lokasi untuk cerita di Unit 3 (gerakan Bye Bye Plastic Bags), bukan cerita penyu di Unit 2.",
+            "3": "Para ilmuwan melihat penyu saat berlayar di laut, bukan di dalam laboratorium."
+          },
+          "sumber": {
+            "dokumen": "English for Nusantara untuk SMP/MTs Kelas VIII",
+            "bab": "KOMP-ENG-D-8-BAB4-01"
+          }
+        },
+        {
+          "id": "eng-d-8-c4-q08",
+          "difficulty": "easy",
+          "prompt": "Based on the story in Unit 2 Section 3, what object did the scientists pull out of the injured sea turtle's nostril?",
+          "options": [
+            "A plastic straw.",
+            "A sharp fish hook.",
+            "A piece of fishing net.",
+            "A dangerous natural parasite."
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Hasil pemeriksaan menunjukkan bahwa benda yang tersumbat di lubang hidung penyu adalah sedotan plastik (\"plastic straw\")."
+          },
+          "distractorWhy": {
+            "1": "Teks tidak menyebutkan adanya kail pancing.",
+            "2": "Benda yang dikeluarkan dari hidung penyu adalah sedotan plastik, bukan jaring ikan.",
+            "3": "Ilmuwan awalnya mengira itu mungkin parasit, tetapi setelah ditarik ternyata benda tersebut adalah sedotan plastik."
+          },
+          "sumber": {
+            "dokumen": "English for Nusantara untuk SMP/MTs Kelas VIII",
+            "bab": "KOMP-ENG-D-8-BAB4-01"
+          }
+        },
+        {
+          "id": "eng-d-8-c4-q09",
+          "difficulty": "medium",
+          "prompt": "Which sentence uses the Past Continuous Tense correctly to describe an action in progress in the past?",
+          "options": [
+            "The scientists were collecting data on sea turtles when they saw the turtle.",
+            "The scientists was collecting data on sea turtles when they saw the turtle.",
+            "The scientists were collect data on sea turtles when they saw the turtle.",
+            "The scientists collected data while they were see the turtle."
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Subjek \"The scientists\" (jamak) berpasangan dengan \"were\" dan kata kerja berakhiran -ing (\"collecting\") untuk membentuk Past Continuous Tense."
+          },
+          "distractorWhy": {
+            "1": "Subjek jamak \"The scientists\" harus menggunakan \"were\", bukan \"was\".",
+            "2": "Past Continuous Tense membutuhkan kata kerja berakhiran -ing (\"collecting\"), bukan bentuk dasar (\"collect\").",
+            "3": "Kata kerja setelah \"were\" harus berbentuk V-ing (\"seeing\"), bukan bentuk dasar (\"see\")."
+          },
+          "sumber": {
+            "dokumen": "English for Nusantara untuk SMP/MTs Kelas VIII",
+            "bab": "KOMP-ENG-D-8-BAB4-01"
+          }
+        },
+        {
+          "id": "eng-d-8-c4-q10",
+          "difficulty": "easy",
+          "prompt": "Complete the Wh- question based on Language Focus Unit 2:\n\"______ did the team of scientists sail when they found the injured turtle?\"\nAnswer: \"They sailed in the ocean near Costa Rica.\"",
+          "options": [
+            "Where",
+            "What",
+            "Why",
+            "Who"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Kata tanya \"Where\" digunakan untuk menanyakan tempat atau lokasi (\"in the ocean near Costa Rica\")."
+          },
+          "distractorWhy": {
+            "1": "Kata tanya \"What\" digunakan untuk menanyakan benda atau tindakan, bukan lokasi.",
+            "2": "Kata tanya \"Why\" digunakan untuk menanyakan alasan atau sebab.",
+            "3": "Kata tanya \"Who\" digunakan untuk menanyakan orang atau pelaku."
+          },
+          "sumber": {
+            "dokumen": "English for Nusantara untuk SMP/MTs Kelas VIII",
+            "bab": "KOMP-ENG-D-8-BAB4-01"
+          }
+        },
+        {
+          "id": "eng-d-8-c4-q11",
+          "difficulty": "medium",
+          "prompt": "Choose the correct structure for asking about the reason why the scientists caught the turtle in Simple Past tense:",
+          "options": [
+            "Why did the scientists catch the sea turtle?",
+            "Why did the scientists caught the sea turtle?",
+            "Why were the scientists caught the sea turtle?",
+            "Why the scientists did catch the sea turtle?"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Formasi pertanyaan Wh- Simple Past menggunakan pola: Wh-word + did + subject + Verb 1 (\"catch\")."
+          },
+          "distractorWhy": {
+            "1": "Setelah kata bantu \"did\", kata kerja yang digunakan harus berupa Verb 1 (\"catch\"), bukan Verb 2 (\"caught\").",
+            "2": "Penggunaan to be \"were\" bersama dengan Verb 2 \"caught\" dalam struktur pertanyaan ini tidak tepat.",
+            "3": "Urutan kata menyimpang karena kata bantu \"did\" diletakkan setelah subjek."
+          },
+          "sumber": {
+            "dokumen": "English for Nusantara untuk SMP/MTs Kelas VIII",
+            "bab": "KOMP-ENG-D-8-BAB4-01"
+          }
+        },
+        {
+          "id": "eng-d-8-c4-q12",
+          "difficulty": "medium",
+          "prompt": "Based on the story in Unit 2 Section 3, how long did it take for the scientists to pull the plastic straw out of the turtle's nostril?",
+          "options": [
+            "About 10 minutes.",
+            "About 2 hours.",
+            "The entire afternoon.",
+            "More than two days."
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Teks menyatakan dengan jelas bahwa proses mengeluarkan sedotan plastik dari hidung penyu memakan waktu sekitar 10 menit (\"about 10 minutes\")."
+          },
+          "distractorWhy": {
+            "1": "Durasi 2 jam merujuk pada lamanya hujan turun pada kejadian banjir di Unit 1, bukan waktu pencabutan sedotan plastik.",
+            "2": "Teks tidak menyebutkan bahwa proses tersebut berlangsung sepanjang sore.",
+            "3": "Waktu 10 menit jauh lebih singkat daripada dua hari."
+          },
+          "sumber": {
+            "dokumen": "English for Nusantara untuk SMP/MTs Kelas VIII",
+            "bab": "KOMP-ENG-D-8-BAB4-01"
+          }
+        },
+        {
+          "id": "eng-d-8-c4-q13",
+          "difficulty": "hard",
+          "prompt": "Identify the sentence that correctly combines Past Continuous and Simple Past using 'when' based on Language Focus Unit 2:",
+          "options": [
+            "The turtle was swimming near the boat when the scientists noticed the object.",
+            "The turtle is swimming near the boat when the scientists notice the object.",
+            "The turtle swam near the boat when the scientists were notice the object.",
+            "The turtle was swam near the boat when the scientists noticing the object."
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Kalimat ini secara tepat menggabungkan kejadian yang sedang berlangsung di masa lalu (\"was swimming\") dengan kejadian singkat yang menyela (\"noticed\") menggunakan kata hubung \"when\"."
+          },
+          "distractorWhy": {
+            "1": "Kalimat tersebut menggunakan Present Continuous dan Present Simple, bukan struktur lampau (Past Tense).",
+            "2": "Bentuk \"were notice\" tidak sesuai kaidah tata bahasa bahasa Inggris.",
+            "3": "Bentuk \"was swam\" dan \"noticing\" menyalahi aturan pembentukan Past Continuous dan Simple Past."
+          },
+          "sumber": {
+            "dokumen": "English for Nusantara untuk SMP/MTs Kelas VIII",
+            "bab": "KOMP-ENG-D-8-BAB4-01"
+          }
+        },
+        {
+          "id": "eng-d-8-c4-q14",
+          "difficulty": "easy",
+          "prompt": "Read the excerpt from Unit 3 Section 2:\n\"Melati and Isabel Wijsen live in Bali. They spent their teenage years cleaning up the island from plastic. Melati and Isabel were only 12 and 10 years old when they decided to tackle plastic pollution.\"\n\nWhat movement did Melati and Isabel Wijsen start in Bali?",
+          "options": [
+            "Bye Bye Plastic Bags.",
+            "Save the Forest Campaign.",
+            "Clean Water Project.",
+            "No More Chemical Waste."
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Teks dan informasi pendukung di Unit 3 menyebutkan gerakan yang diprakarsai oleh Melati dan Isabel Wijsen bernama \"Bye Bye Plastic Bags\"."
+          },
+          "distractorWhy": {
+            "1": "Gerakan kedua bersaudara tersebut berfokus pada polusi sampah plastik, bukan penyelamatan hutan.",
+            "2": "Fokus utama kampanye mereka adalah pengurangan sampah plastik di Bali, bukan proyek air bersih.",
+            "3": "Teks secara khusus membahas tentang kantong plastik dan sampah plastik, bukan limbah kimia."
+          },
+          "sumber": {
+            "dokumen": "English for Nusantara untuk SMP/MTs Kelas VIII",
+            "bab": "KOMP-ENG-D-8-BAB4-01"
+          }
+        },
+        {
+          "id": "eng-d-8-c4-q15",
+          "difficulty": "medium",
+          "prompt": "Based on Unit 3 Section 4, what is the main purpose of the 'Orientation' section in a factual recount text?",
+          "options": [
+            "To introduce the background information such as who, where, when, and why the event happened.",
+            "To state the author's final personal feeling or recommendation at the very end of the text.",
+            "To list all step-by-step chronological actions taken by the main characters.",
+            "To present a fictional story with magical resolution."
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Bagian Orientation berfungsi memperkenalkan informasi latar belakang seperti siapa (who), di mana (where), kapan (when), dan mengapa (why) peristiwa tersebut terjadi."
+          },
+          "distractorWhy": {
+            "1": "Pernyataan kesan akhir atau evaluasi merupakan fungsi dari bagian Comment / Re-orientation.",
+            "2": "Urutan kejadian kronologis merupakan bagian dari Records of Events.",
+            "3": "Factual recount menyajikan cerita berdasarkan fakta nyata, bukan cerita rekaan imajinatif atau magis."
+          },
+          "sumber": {
+            "dokumen": "English for Nusantara untuk SMP/MTs Kelas VIII",
+            "bab": "KOMP-ENG-D-8-BAB4-01"
+          }
+        },
+        {
+          "id": "eng-d-8-c4-q16",
+          "difficulty": "medium",
+          "prompt": "Which sentence correctly uses 'when' at the beginning of a complex sentence with proper punctuation according to Language Focus Unit 3?",
+          "options": [
+            "When Melati and Isabel went hiking to Mount Batur, they saw plastic bottles along the way.",
+            "When Melati and Isabel went hiking to Mount Batur they saw plastic bottles along the way.",
+            "When Melati and Isabel went hiking to Mount Batur, and they saw plastic bottles along the way.",
+            "When did Melati and Isabel went hiking to Mount Batur, they saw plastic bottles."
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Ketika klausa \"when\" diletakkan di awal kalimat, koma (,) wajib digunakan untuk memisahkan klausa anak dari klausa utama."
+          },
+          "distractorWhy": {
+            "1": "Kalimat tersebut kekurangan tanda koma yang diperlukan untuk memisahkan klausa \"when\" di awal kalimat.",
+            "2": "Penggunaan kata hubung tambahan \"and\" setelah koma adalah redundan dan tidak tepat.",
+            "3": "Penggunaan struktur kalimat tanya \"did ... went\" pada klausa anak di awal kalimat adalah salah secara tata bahasa."
+          },
+          "sumber": {
+            "dokumen": "English for Nusantara untuk SMP/MTs Kelas VIII",
+            "bab": "KOMP-ENG-D-8-BAB4-01"
+          }
+        },
+        {
+          "id": "eng-d-8-c4-q17",
+          "difficulty": "medium",
+          "prompt": "Combine these two events into a single sentence using 'when' based on Language Focus Unit 3:\nEvent 1: \"The scientists were collecting data on sea turtles.\"\nEvent 2: \"They spotted an injured sea turtle swimming near their boat.\"",
+          "options": [
+            "The scientists were collecting data on sea turtles when they spotted an injured sea turtle.",
+            "The scientists were collecting data on sea turtles when were they spot an injured sea turtle.",
+            "When were the scientists collecting data on sea turtles they spotted an injured sea turtle.",
+            "The scientists collect data on sea turtles when they were spotted an injured sea turtle."
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Kalimat ini secara tepat menyambungkan aksi yang berlangsung (\"were collecting data\") dengan kejadian penyela (\"spotted\") menggunakan kata penghubung \"when\"."
+          },
+          "distractorWhy": {
+            "1": "Bentuk \"when were they spot\" salah secara tata bahasa.",
+            "2": "Klausa \"when\" di awal memerlukan koma pemisah, dan frasa \"When were the scientists\" berstruktur kalimat tanya yang tidak sesuai.",
+            "3": "Bentuk \"they were spotted\" bermakna pasif (\"mereka ditemukan\") yang mengubah makna cerita asli."
+          },
+          "sumber": {
+            "dokumen": "English for Nusantara untuk SMP/MTs Kelas VIII",
+            "bab": "KOMP-ENG-D-8-BAB4-01"
+          }
+        },
+        {
+          "id": "eng-d-8-c4-q18",
+          "difficulty": "easy",
+          "prompt": "In waste sorting and management, items such as plastic bottles, plastic straws, and aluminum cans are categorized as:",
+          "options": [
+            "Inorganic waste",
+            "Organic waste",
+            "Hazardous waste (B3)",
+            "Compostable waste"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Botol plastik, sedotan plastik, dan kaleng aluminium merupakan limbah anorganik (inorganic waste) yang tidak dapat terurai secara hayati."
+          },
+          "distractorWhy": {
+            "1": "Limbah organik terdiri dari bahan hayati yang mudah membusuk seperti sisa makanan dan dedaunan.",
+            "2": "Limbah B3 (bahan berbahaya dan beracun) meliputi baterai, lampu, dan zat kimia berbahaya.",
+            "3": "Sampah plastik dan aluminium tidak dapat diolah menjadi kompos."
+          },
+          "sumber": {
+            "dokumen": "English for Nusantara untuk SMP/MTs Kelas VIII",
+            "bab": "KOMP-ENG-D-8-BAB4-01"
+          }
+        },
+        {
+          "id": "eng-d-8-c4-q19",
+          "difficulty": "hard",
+          "prompt": "Which group of waste items should be sorted specifically into the Hazardous Waste (B3) bin?",
+          "options": [
+            "Used batteries, fluorescent light bulbs, and aerosol spray cans.",
+            "Banana peels, leftover rice, and dry tree leaves.",
+            "Plastic shopping bags, plastic bottles, and plastic cutlery.",
+            "Cardboard boxes, newspaper sheets, and paper bags."
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Baterai bekas, lampu neon, dan kaleng aerosol mengandung zat kimia berbahaya dan beracun sehingga termasuk dalam kategori limbah B3 (Hazardous Waste)."
+          },
+          "distractorWhy": {
+            "1": "Kulit pisang, sisa nasi, dan daun kering adalah contoh limbah organik.",
+            "2": "Kantong plastik, botol plastik, dan sendok plastik adalah contoh limbah anorganik non-B3.",
+            "3": "Kardus, koran, dan kantong kertas adalah sampah daur ulang bahan kertas."
+          },
+          "sumber": {
+            "dokumen": "English for Nusantara untuk SMP/MTs Kelas VIII",
+            "bab": "KOMP-ENG-D-8-BAB4-01"
+          }
+        },
+        {
+          "id": "eng-d-8-c4-q20",
+          "difficulty": "hard",
+          "prompt": "Read the final sentence of the factual recount about the sea turtle rescue in Unit 2 Section 4:\n\"The straw incident proved how dangerous plastic was to animals in the oceans.\"\n\nWhat role does this sentence play in the structure of a factual recount text?",
+          "options": [
+            "It serves as the final comment/evaluation reflecting on the incident.",
+            "It serves as the initial orientation introducing the characters.",
+            "It serves as the first record of event in chronological order.",
+            "It serves as an interview question directed to the reader."
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Kalimat tersebut memberikan evaluasi atau pendapat akhir (final comment/evaluation) yang menyimpulkan dampak dari peristiwa yang diceritakan."
+          },
+          "distractorWhy": {
+            "1": "Orientasi awal berada di bagian awal teks dan mengenalkan latar tokoh, waktu, serta tempat.",
+            "2": "Record of events memuat urutan aksi atau tindakan kronologis yang terjadi dalam peristiwa.",
+            "3": "Kalimat tersebut merupakan kalimat pernyataan evaluatif, bukan kalimat tanya wawancara."
+          },
+          "sumber": {
+            "dokumen": "English for Nusantara untuk SMP/MTs Kelas VIII",
+            "bab": "KOMP-ENG-D-8-BAB4-01"
+          }
+        }
+      ]
+    },
+    {
+      "code": "KOMP-ENG-D-8-BAB5-01",
+      "grade": 8,
+      "name": "Chapter 5: Embrace Yourself",
+      "materi": "",
+      "cpRef": "English for Nusantara untuk SMP/MTs Kelas VIII",
+      "target": 20,
+      "items": [
+        {
+          "id": "eng-d-8-c5-q01",
+          "difficulty": "easy",
+          "prompt": "Read the conversation from Unit 1 (p. 239):\nMonita: \"Pipit, look at these models!\"\nPipit: \"They are white and tall. They have no flaws at all. They are so beautiful. Should we put on makeup?\"\nMonita: \"I think so. That's what makes them beautiful.\"\n\nWhat is the main topic of Monita and Pipit's discussion?",
+          "options": [
+            "Beauty standards and advertisements",
+            "Types of physical exercise",
+            "School sports competition",
+            "Cooking healthy meals"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Monita dan Pipit sedang mendiskusikan iklan perawatan kecantikan dan standar kecantikan model yang sempurna tanpa cela."
+          },
+          "distractorWhy": {
+            "1": "Pilihan ini membahas olahraga fisik yang tidak disebutkan dalam percakapan.",
+            "2": "Pilihan ini membahas kompetisi olahraga sekolah yang tidak relevan dengan dialog.",
+            "3": "Pilihan ini mengenai memasak makanan sehat yang tidak sesuai dengan isi dialog."
+          },
+          "sumber": {
+            "dokumen": "English for Nusantara untuk SMP/MTs Kelas VIII",
+            "bab": "KOMP-ENG-D-8-BAB5-01"
+          }
+        },
+        {
+          "id": "eng-d-8-c5-q02",
+          "difficulty": "easy",
+          "prompt": "Read Kak Shinta's response in Unit 1 (p. 240):\nKak Shinta: \"You know, we are beautiful just the way we are, with or without makeup.\"\n\nWhat message is Kak Shinta conveying to Monita and Pipit?",
+          "options": [
+            "Self-acceptance and loving oneself naturally",
+            "The mandatory requirement to wear cosmetics daily",
+            "The importance of saving money to buy expensive makeup",
+            "Becoming professional fashion models in the future"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Kak Shinta menekankan penerimaan diri (self-acceptance) bahwa setiap individu cantik apa adanya tanpa perlu bergantung pada tata rias."
+          },
+          "distractorWhy": {
+            "1": "Pilihan ini bertolak belakang karena Kak Shinta tidak mewajibkan kosmetik.",
+            "2": "Pilihan ini membahas tabungan kosmetik mahal yang tidak disampaikan Kak Shinta.",
+            "3": "Pilihan ini mengenai cita-cita menjadi model yang tidak relevan dengan pesan Kak Shinta."
+          },
+          "sumber": {
+            "dokumen": "English for Nusantara untuk SMP/MTs Kelas VIII",
+            "bab": "KOMP-ENG-D-8-BAB5-01"
+          }
+        },
+        {
+          "id": "eng-d-8-c5-q03",
+          "difficulty": "easy",
+          "prompt": "In Unit 1 (p. 241), match the word 'intently' with its correct meaning provided in Section 3:",
+          "options": [
+            "With earnest and eager attention",
+            "A quick look or glance",
+            "A slight hollow in a hard surface",
+            "Cosmetics applied to the face"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Sesuai dengan padanan kosakata di Section 3 (p. 241), 'intently' bermakna menatap dengan penuh perhatian dan sungguh-sungguh."
+          },
+          "distractorWhy": {
+            "1": "Pilihan ini merupakan definisi dari 'a glance'.",
+            "2": "Pilihan ini merupakan definisi dari 'dent'.",
+            "3": "Pilihan ini merupakan definisi dari 'makeup'."
+          },
+          "sumber": {
+            "dokumen": "English for Nusantara untuk SMP/MTs Kelas VIII",
+            "bab": "KOMP-ENG-D-8-BAB5-01"
+          }
+        },
+        {
+          "id": "eng-d-8-c5-q04",
+          "difficulty": "medium",
+          "prompt": "Read the story text from Unit 1 (p. 242):\n\"'You'd look prettier with makeup on.' She looked at me intently; her eyes were scanning every inch of my face. Every dent, every scratch, every line. Every flaw. Suddenly, all the words I had made friends with throughout my life vanished. I didn't say anything to her for a solid minute...\"\n\nHow did the main character ('I') feel when her classmate made that comment?",
+          "options": [
+            "Hurt and speechless",
+            "Cheered and excited",
+            "Amused and cheerful",
+            "Proud and confident"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Karakter 'I' merasa tersakiti perasaannya dan tidak mampu berkata-kata (speechless) selama satu menit penuh akibat komentar tersebut."
+          },
+          "distractorWhy": {
+            "1": "Pilihan ini menggambarkan perasaan gembira yang berlawanan dengan konteks narasi.",
+            "2": "Pilihan ini menggambarkan rasa terhibur yang tidak sesuai dengan dampak emosional cerita.",
+            "3": "Pilihan ini menggambarkan rasa bangga dan percaya diri yang bertentangan dengan isi teks."
+          },
+          "sumber": {
+            "dokumen": "English for Nusantara untuk SMP/MTs Kelas VIII",
+            "bab": "KOMP-ENG-D-8-BAB5-01"
+          }
+        },
+        {
+          "id": "eng-d-8-c5-q05",
+          "difficulty": "medium",
+          "prompt": "Read the ending of the narrative in Unit 1 (p. 242):\n\"Maybe someday I'll carefully conceal my dents, my scratches, my lines. Maybe someday I'll 'prettify' my face. Maybe someday, but for now, I'll learn how to embrace every imperfection, flaw, and part of me...\"\n\nWhat resolution does the narrator reach at the end of the story?",
+          "options": [
+            "Learning to embrace every flaw and imperfection",
+            "Buying whitening skin products immediately",
+            "Avoiding going to school forever",
+            "Confronting her classmate aggressively"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Narator memutuskan untuk belajar merangkul dan menerima setiap kekurangan serta ketidaksempurnaan dirinya (embracing imperfection)."
+          },
+          "distractorWhy": {
+            "1": "Pilihan ini mengenai membeli produk pemutih yang tidak menjadi keputusan narator.",
+            "2": "Pilihan ini mengenai membolos sekolah yang tidak disebutkan dalam teks.",
+            "3": "Pilihan ini mengenai konfrontasi agresif yang tidak dilakukan oleh narator."
+          },
+          "sumber": {
+            "dokumen": "English for Nusantara untuk SMP/MTs Kelas VIII",
+            "bab": "KOMP-ENG-D-8-BAB5-01"
+          }
+        },
+        {
+          "id": "eng-d-8-c5-q06",
+          "difficulty": "easy",
+          "prompt": "Based on Table 5.1 Language Focus (p. 244), which of the following expressions is used to express personal opinion with 'I'?",
+          "options": [
+            "I think (that) ...",
+            "Once upon a time ...",
+            "The next morning ...",
+            "Suddenly ..."
+          ],
+          "answer": 0,
+          "why": {
+            "0": "'I think (that)...' adalah salah satu ungkapan standar untuk menyampaikan pendapat pribadi (expressing opinion)."
+          },
+          "distractorWhy": {
+            "1": "Pilihan ini merupakan kosa kata pembuka cerita naratif/dongeng.",
+            "2": "Pilihan ini merupakan penanda urutan waktu (adverbial of time).",
+            "3": "Pilihan ini merupakan kata keterangan urutan peristiwa mendadak."
+          },
+          "sumber": {
+            "dokumen": "English for Nusantara untuk SMP/MTs Kelas VIII",
+            "bab": "KOMP-ENG-D-8-BAB5-01"
+          }
+        },
+        {
+          "id": "eng-d-8-c5-q07",
+          "difficulty": "medium",
+          "prompt": "Complete the opinion sentence based on Table 5.2 & 5.3 (p. 245):\n\"________, swimming helps you to stay healthy.\"\nWhich expression correctly completes the opinion statement?",
+          "options": [
+            "In my opinion",
+            "Look at me",
+            "Long ago",
+            "Behind the door"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "'In my opinion' merupakan frasa resmi yang digunakan untuk menyatakan pandangan/pendapat."
+          },
+          "distractorWhy": {
+            "1": "Pilihan ini merupakan kalimat perintah untuk melihat.",
+            "2": "Pilihan ini merupakan keterangan waktu lampau.",
+            "3": "Pilihan ini merupakan keterangan tempat."
+          },
+          "sumber": {
+            "dokumen": "English for Nusantara untuk SMP/MTs Kelas VIII",
+            "bab": "KOMP-ENG-D-8-BAB5-01"
+          }
+        },
+        {
+          "id": "eng-d-8-c5-q08",
+          "difficulty": "medium",
+          "prompt": "Read the dialogue in Unit 2 (p. 255):\nGalang: \"I was in the same situation once. I thought I was not good at anything.\"\nMonita: \"But, I found out that I was good at playing basketball.\"\nMade: \"In my case, I thought I was not good at fishing but Galang proved me wrong. He taught me how to fish well. Thanks, Galang.\"\n\nWhat role did Galang play in helping Made build self-confidence?",
+          "options": [
+            "He patiently taught Made how to fish well",
+            "He bought new fishing gear for Made",
+            "He teased Made for lacking sports skills",
+            "He forced Made to join the basketball team"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Galang membantu Made membuktikan bahwa anggapan dirinya buruk dalam memancing adalah keliru dengan mengajarinya teknik memancing yang baik."
+          },
+          "distractorWhy": {
+            "1": "Pilihan ini membahas membelikan alat pancing baru yang tidak ada dalam dialog.",
+            "2": "Pilihan ini membahas mengejek Made yang bertolak belakang dengan sikap suportif Galang.",
+            "3": "Pilihan ini mengenai memaksa masuk tim basket yang tidak sesuai dengan dialog."
+          },
+          "sumber": {
+            "dokumen": "English for Nusantara untuk SMP/MTs Kelas VIII",
+            "bab": "KOMP-ENG-D-8-BAB5-01"
+          }
+        },
+        {
+          "id": "eng-d-8-c5-q09",
+          "difficulty": "medium",
+          "prompt": "Read Part 1 of Mirza's story in Unit 2 (p. 257):\n\"While everyone was so eager to defend and score, Mirza was not sure about his role as a keeper. He ran left, then to the right, clumsily leaving the goal area empty. The next thing he knew, the other team already scored.\"\n\nWhy did the opposing team manage to score easily?",
+          "options": [
+            "Mirza moved clumsily and left the goal area empty",
+            "The soccer ball broke in the middle of the game",
+            "Siti played as the goalkeeper for Mirza's team",
+            "The referee stopped the match unexpectedly"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Tim lawan berhasil mencetak gol karena Mirza merasa canggung dan meninggalkan area gawang dalam keadaan kosong."
+          },
+          "distractorWhy": {
+            "1": "Pilihan ini mengenai bola plastik yang rusak yang tidak disebutkan saat pertandingan.",
+            "2": "Pilihan ini keliru karena Siti bermain di pos penyerang/pemain depan.",
+            "3": "Pilihan ini mengenai wasit menghentikan pertandingan yang tidak ada dalam teks."
+          },
+          "sumber": {
+            "dokumen": "English for Nusantara untuk SMP/MTs Kelas VIII",
+            "bab": "KOMP-ENG-D-8-BAB5-01"
+          }
+        },
+        {
+          "id": "eng-d-8-c5-q10",
+          "difficulty": "hard",
+          "prompt": "Read the conversation after the street soccer match in Unit 2 (p. 257):\nSiti: \"You were no use, Mirza. You can't play football.\"\nBayu: \"I think he guarded the goal area well.\"\nSiti: \"But he didn't know what to do in the game. He was just running here and there.\"\n\nHow did Mirza react to Siti's discouraging harsh words?",
+          "options": [
+            "He kept silent and remained calm without arguing",
+            "He shouted angrily at Siti and Bayu",
+            "He cried out loud and ran away immediately",
+            "He quit school soccer activities on the spot"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Mirza memilih diam (kept silent) dan tidak membalas ucapan tajam Siti tersebut."
+          },
+          "distractorWhy": {
+            "1": "Pilihan ini berlawanan dengan fakta bahwa Mirza memilih untuk diam.",
+            "2": "Pilihan ini menyatakan Mirza menangis keras yang tidak tercantum dalam narasi.",
+            "3": "Pilihan ini mengenai keluar sekolah yang tidak sesuai dengan alur cerita."
+          },
+          "sumber": {
+            "dokumen": "English for Nusantara untuk SMP/MTs Kelas VIII",
+            "bab": "KOMP-ENG-D-8-BAB5-01"
+          }
+        },
+        {
+          "id": "eng-d-8-c5-q11",
+          "difficulty": "hard",
+          "prompt": "Read Part 2 of Mirza's story in Unit 2 (p. 259):\nMirza asked his mother if he could join Winners Football Club, but his mother whispered, \"But you know our financial condition.\" Then she suggested, \"There's a community football club here. I heard Pak RT was looking for children to join the club.\"\n\nWhy could Mirza not join Winners Football Club?",
+          "options": [
+            "His family had financial constraints to pay for the club",
+            "Pak RT banned Mirza from joining soccer clubs",
+            "Winners Football Club moved to another country",
+            "Mirza did not like soccer training at all"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Mirza tidak dapat bergabung dengan Winners Football Club karena keterbatasan biaya keluarga (financial condition)."
+          },
+          "distractorWhy": {
+            "1": "Pilihan ini menyalahkan Pak RT padahal Pak RT justru memfasilitasi klub komunitas gratis.",
+            "2": "Pilihan ini mengenai klub pindah negara yang tidak ada dalam konteks.",
+            "3": "Pilihan ini menyatakan Mirza tidak suka sepak bola padahal ia sangat ingin berlatih."
+          },
+          "sumber": {
+            "dokumen": "English for Nusantara untuk SMP/MTs Kelas VIII",
+            "bab": "KOMP-ENG-D-8-BAB5-01"
+          }
+        },
+        {
+          "id": "eng-d-8-c5-q12",
+          "difficulty": "hard",
+          "prompt": "Read Part 3 of Mirza's story in Unit 2 (p. 261):\n\"Pak RT came to him and suggested that he should try other positions. After trying some positions, he found that being a midfielder was the best position for him. A month later... He helped his team to win as a midfielder.\"\n\nWhat key change led to Mirza's success in football?",
+          "options": [
+            "Switching his position from goalkeeper to midfielder based on advice",
+            "Quitting the community soccer club to join a commercial academy",
+            "Refusing to pass the soccer ball to any of his teammates",
+            "Playing without a coach or any formal practice"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Kunci keberhasilan Mirza adalah berpindah posisi dari penjaga gawang menjadi gelandang (midfielder) atas saran Pak RT."
+          },
+          "distractorWhy": {
+            "1": "Pilihan ini bertolak belakang dengan fakta bahwa Mirza berlatih di klub komunitas Pak RT.",
+            "2": "Pilihan ini menyatakan tidak mau mengoper bola padahal umpan presisi Mirza membantu Siti mencetak gol.",
+            "3": "Pilihan ini menyatakan bermain tanpa pelatih yang tidak sesuai cerita."
+          },
+          "sumber": {
+            "dokumen": "English for Nusantara untuk SMP/MTs Kelas VIII",
+            "bab": "KOMP-ENG-D-8-BAB5-01"
+          }
+        },
+        {
+          "id": "eng-d-8-c5-q13",
+          "difficulty": "medium",
+          "prompt": "Read Siti's words at the end of Unit 2 (p. 261):\nSiti: \"I'm sorry for underestimating you, Mirza. I should not have pushed you to be a goalkeeper. You are such a great midfielder!\"\nMirza: \"That's okay. Let's practice together to become a better team.\"\n\nWhat personal quality does Mirza show when responding to Siti's apology?",
+          "options": [
+            "Forgiveness and a supportive team spirit",
+            "Arrogance and holding long-term grudges",
+            "Indifference and lack of respect",
+            "Selfishness and boasting about his talent"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Mirza menunjukkan kebesaran hati untuk memaafkan (forgiveness) dan semangat kerja sama tim (team spirit) tanpa menyimpan dendam."
+          },
+          "distractorWhy": {
+            "1": "Pilihan ini menggambarkan kesombongan dan dendam yang bertentangan dengan respon Mirza.",
+            "2": "Pilihan ini menggambarkan sikap acuh tak acuh yang tidak sesuai dengan ajakan Mirza.",
+            "3": "Pilihan ini menggambarkan rasa egois dan pamer yang bertolak belakang dengan karakter Mirza."
+          },
+          "sumber": {
+            "dokumen": "English for Nusantara untuk SMP/MTs Kelas VIII",
+            "bab": "KOMP-ENG-D-8-BAB5-01"
+          }
+        },
+        {
+          "id": "eng-d-8-c5-q14",
+          "difficulty": "medium",
+          "prompt": "Based on Language Focus in Unit 2 (p. 265), identify the sentence that contains an adverb of manner ending in '-ly':",
+          "options": [
+            "He ran left, then to the right, clumsily leaving the goal area empty.",
+            "Galang is always friendly to all of his classmates.",
+            "Andre sometimes feels lonely at home.",
+            "We have to respect elderly people in our neighborhood."
+          ],
+          "answer": 0,
+          "why": {
+            "0": "'clumsily' adalah adverb of manner yang menerangkan bagaimana Mirza meninggalkan area gawang. Kata seperti friendly, lonely, dan elderly adalah adjective."
+          },
+          "distractorWhy": {
+            "1": "Pilihan ini menggunakan kata 'friendly' yang berkategori kata sifat (adjective).",
+            "2": "Pilihan ini menggunakan kata 'lonely' yang berkategori kata sifat (adjective).",
+            "3": "Pilihan ini menggunakan kata 'elderly' yang berkategori kata sifat (adjective)."
+          },
+          "sumber": {
+            "dokumen": "English for Nusantara untuk SMP/MTs Kelas VIII",
+            "bab": "KOMP-ENG-D-8-BAB5-01"
+          }
+        },
+        {
+          "id": "eng-d-8-c5-q15",
+          "difficulty": "medium",
+          "prompt": "Based on Language Focus in Unit 2 (p. 265), which of the following words is an adverb of manner that DOES NOT end in '-ly'?",
+          "options": [
+            "well",
+            "clumsily",
+            "sternly",
+            "hesitantly"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Kata 'well' merupakan contoh adverb of manner bentuk tidak berakhiran '-ly' (berasal dari kata sifat 'good')."
+          },
+          "distractorWhy": {
+            "1": "Pilihan ini adalah adverb of manner yang berakhiran '-ly'.",
+            "2": "Pilihan ini adalah adverb of manner yang berakhiran '-ly'.",
+            "3": "Pilihan ini adalah adverb of manner yang berakhiran '-ly'."
+          },
+          "sumber": {
+            "dokumen": "English for Nusantara untuk SMP/MTs Kelas VIII",
+            "bab": "KOMP-ENG-D-8-BAB5-01"
+          }
+        },
+        {
+          "id": "eng-d-8-c5-q16",
+          "difficulty": "hard",
+          "prompt": "Complete the sentence in Worksheet 5.12 (p. 267) using the correct adjective and adverb of manner:\n\"Mirza is a ________ soccer player. He plays soccer very ________.\"",
+          "options": [
+            "good ; well",
+            "well ; good",
+            "good ; goodly",
+            "well ; well"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "'good' digunakan sebagai kata sifat (adjective) menerangkan kata benda 'soccer player', sedangkan 'well' digunakan sebagai kata keterangan (adverb of manner) menerangkan kata kerja 'plays'."
+          },
+          "distractorWhy": {
+            "1": "Pilihan ini terbalik dalam penempatan kata sifat dan kata keterangan.",
+            "2": "Pilihan ini salah karena bentuk 'goodly' tidak tepat digunakan sebagai keterangan cara bermain.",
+            "3": "Pilihan ini menggunakan kata keterangan di posisi kata sifat."
+          },
+          "sumber": {
+            "dokumen": "English for Nusantara untuk SMP/MTs Kelas VIII",
+            "bab": "KOMP-ENG-D-8-BAB5-01"
+          }
+        },
+        {
+          "id": "eng-d-8-c5-q17",
+          "difficulty": "medium",
+          "prompt": "Read the story 'Getting into the Band' in Unit 3 (p. 274):\n\"I did a few auditions. The first time was a disaster. I couldn't get my breath and I started to cry. I just wanted to run home but the leader was very understanding. He fixed an appointment for the following week. He explained how to relax and do breathing techniques.\"\n\nHow did the band leader show empathy toward Peter during his failed first audition?",
+          "options": [
+            "By giving breathing techniques and offering a re-audition",
+            "By disqualifying Peter from music activities permanently",
+            "By laughing at Peter's nervousness in front of everyone",
+            "By ordering Peter to leave the town hall immediately"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Pemimpin grup musik menunjukkan empati dengan memahami kondisi Peter, mengajarkan teknik pernapasan/relaksasi, serta memberikan kesempatan audisi ulang."
+          },
+          "distractorWhy": {
+            "1": "Pilihan ini mengenai diskualifikasi permanen yang bertentangan dengan sikap suportif sang pemimpin.",
+            "2": "Pilihan ini mengenai mengetawai kegugupan yang berlawanan dengan empati sang pemimpin.",
+            "3": "Pilihan ini mengenai mengusir Peter yang tidak sesuai dengan isi narasi."
+          },
+          "sumber": {
+            "dokumen": "English for Nusantara untuk SMP/MTs Kelas VIII",
+            "bab": "KOMP-ENG-D-8-BAB5-01"
+          }
+        },
+        {
+          "id": "eng-d-8-c5-q18",
+          "difficulty": "hard",
+          "prompt": "Read the progression of Peter's auditions in Unit 3 (p. 274):\n\"The next time I had prepared everything. But, I did not play well enough because I was still nervous... The third time was a completely different story. I enjoyed it.\"\n\nWhat key takeaway does Peter's story demonstrate regarding skill development?",
+          "options": [
+            "Continuous practice and perseverance overcome initial anxiety",
+            "Relying on luck without preparation is sufficient for success",
+            "Giving up immediately after the first failure avoids stress",
+            "Natural talent requires no practice or breathing guidance"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Pengalaman Peter membuktikan bahwa latihan tekun (practice) dan pantang menyerah (perseverance) mampu mengatasi kecemasan hingga meraih keberhasilan."
+          },
+          "distractorWhy": {
+            "1": "Pilihan ini mengandalkan keberuntungan semata yang bertolak belakang dengan usaha Peter.",
+            "2": "Pilihan ini menyarankan menyerah pada kegagalan pertama yang bertentangan dengan semangat Peter.",
+            "3": "Pilihan ini mengklaim bakat tidak butuh latihan yang berlawanan dengan judul bab 'Practice Makes Perfect'."
+          },
+          "sumber": {
+            "dokumen": "English for Nusantara untuk SMP/MTs Kelas VIII",
+            "bab": "KOMP-ENG-D-8-BAB5-01"
+          }
+        },
+        {
+          "id": "eng-d-8-c5-q19",
+          "difficulty": "hard",
+          "prompt": "Read Section 4 Language Focus on Narrative Text Structure in Unit 3 (p. 276):\nWhich generic structure of a personal recount narrative text functions to introduce the time, location, and characters of the story?",
+          "options": [
+            "Orientation",
+            "Complication",
+            "Resolution",
+            "Re-orientation"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "'Orientation' adalah bagian struktur naratif yang berfungsi mengenalkan tokoh, waktu, dan tempat terjadinya peristiwa."
+          },
+          "distractorWhy": {
+            "1": "Pilihan ini merupakan bagian yang menyajikan konflik atau permasalahan dalam cerita.",
+            "2": "Pilihan ini merupakan bagian penyelesaian masalah.",
+            "3": "Pilihan ini merupakan bagian penutup atau penyimpulan cerita."
+          },
+          "sumber": {
+            "dokumen": "English for Nusantara untuk SMP/MTs Kelas VIII",
+            "bab": "KOMP-ENG-D-8-BAB5-01"
+          }
+        },
+        {
+          "id": "eng-d-8-c5-q20",
+          "difficulty": "hard",
+          "prompt": "Based on the text elements in Unit 3 (p. 276), what section of the narrative presents the solution to the conflict experienced by the characters?",
+          "options": [
+            "Resolution",
+            "Complication",
+            "Orientation",
+            "Identification"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "'Resolution' memuat solusi atau penyelesaian dari konflik (complication) yang dialami para tokoh."
+          },
+          "distractorWhy": {
+            "1": "Pilihan ini adalah bagian munculnya konflik/masalah.",
+            "2": "Pilihan ini adalah bagian pengenalan latar dan tokoh.",
+            "3": "Pilihan ini adalah struktur umum teks deskriptif, bukan naratif."
+          },
+          "sumber": {
+            "dokumen": "English for Nusantara untuk SMP/MTs Kelas VIII",
+            "bab": "KOMP-ENG-D-8-BAB5-01"
+          }
+        }
+      ]
+    },
+    {
+      "code": "KOMP-ENG-D-9-BAB1-01",
+      "grade": 9,
+      "name": "Chapter 1: Exploring Fauna of Indonesia",
+      "materi": "",
+      "cpRef": "English for Nusantara untuk SMP/MTs Kelas IX",
+      "target": 20,
+      "items": [
+        {
+          "id": "eng-d-9-c1-q01",
+          "difficulty": "dasar",
+          "prompt": "Read the dialogue snippet from Comic Strip 1.1:\n\"Monita: Bekantan is a Proboscis monkey. Its scientific name is Nasalis larvatus.\"\nBased on the conversation in Unit 1, what does the common name 'Proboscis monkey' mean?",
+          "options": [
+            "A long-nosed monkey",
+            "A reddish-brown ape",
+            "A tailless primate",
+            "A short-tailed lemur"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Proboscis monkey secara harfiah merujuk pada monyet berhidung panjang (long-nosed monkey), sebagaimana dijelaskan Monita dalam percakapan di Unit 1."
+          },
+          "distractorWhy": {
+            "1": "Monyet bekantan memang berbulu cokelat kemerahan, tetapi kata proboscis secara khusus merujuk pada bentuk hidungnya yang panjang, bukan warna bulunya.",
+            "2": "Bekantan memiliki ekor yang hampir sama panjang dengan tubuhnya, sehingga bukan primata tanpa ekor.",
+            "3": "Bekantan tergolong primata jenis monyet berhidung panjang, bukan lemur berbuntut pendek."
+          },
+          "sumber": {
+            "dokumen": "English for Nusantara untuk SMP/MTs Kelas IX",
+            "bab": "KOMP-ENG-D-9-BAB1-01"
+          }
+        },
+        {
+          "id": "eng-d-9-c1-q02",
+          "difficulty": "dasar",
+          "prompt": "In Comic Strip 1.2, Andre says: \"Bekantans are grouped as arboreal animals.\" What is meant by arboreal animals based on the text explanation?",
+          "options": [
+            "Animals that eat, sleep, and play mostly in trees",
+            "Animals that spend most of their time swimming in deep oceans",
+            "Animals that live exclusively inside dark underground caves",
+            "Animals that migrate across long distances during winter"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Istilah arboreal dalam buku teks didefinisikan secara eksplisit sebagai hewan yang menghabiskan sebagian besar waktunya untuk makan, tidur, dan bermain di atas pohon."
+          },
+          "distractorWhy": {
+            "1": "Hewan laut yang hidup di samudera tergolong akuatik, bukan arboreal.",
+            "2": "Hewan yang tinggal di dalam goa bawah tanah disebut hewan gua (troglobit), bukan arboreal.",
+            "3": "Hewan yang melakukan migrasi musiman tidak didefinisikan sebagai hewan arboreal atas dasar perilaku migrasinya."
+          },
+          "sumber": {
+            "dokumen": "English for Nusantara untuk SMP/MTs Kelas IX",
+            "bab": "KOMP-ENG-D-9-BAB1-01"
+          }
+        },
+        {
+          "id": "eng-d-9-c1-q03",
+          "difficulty": "sedang",
+          "prompt": "Read the dialogue snippet from Comic Strip 1.3:\n\"Monita: The book says that Bekantans can swim well because they have a skin membrane on their feet and hands like frogs.\"\nWhy do Bekantans need to swim according to the text in Unit 1?",
+          "options": [
+            "To escape predators like crocodiles and cross rivers to find food",
+            "To clean their reddish-brown fur from dirt and parasites",
+            "To catch small marine fish in deep seawater habitats",
+            "To attract female mates by performing water dance routines"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Bekantan berenang melintasi sungai untuk menyelamatkan diri dari pemangsa seperti buaya serta untuk mencari sumber makanan di seberang sungai."
+          },
+          "distractorWhy": {
+            "1": "Tujuan utama bekantan berenang yang disebutkan dalam teks adalah menghindari pemangsa dan mencari makan, bukan untuk membersihkan bulu.",
+            "2": "Bekantan memakan dedaunan muda dan buah-buahan di hutan bakau, bukan berburu ikan laut di laut dalam.",
+            "3": "Bekantan menarik perhatian betina menggunakan hidungnya yang besar dan panjang, bukan dengan tarian air."
+          },
+          "sumber": {
+            "dokumen": "English for Nusantara untuk SMP/MTs Kelas IX",
+            "bab": "KOMP-ENG-D-9-BAB1-01"
+          }
+        },
+        {
+          "id": "eng-d-9-c1-q04",
+          "difficulty": "sedang",
+          "prompt": "Section 4 of Unit 1 explains Noun Groups: \"A noun group is a group of words around a headword noun. Adjectives give more information before the noun.\"\nWhich sentence correctly uses a noun group to describe an animal's physical feature according to the pattern in Chapter 1?",
+          "options": [
+            "The female Helmeted Hornbill has a bluish white featherless patch on its neck.",
+            "The female Helmeted Hornbill has a patch bluish white featherless on its neck.",
+            "The female Helmeted Hornbill featherless has patch a bluish white on its neck.",
+            "The female Helmeted Hornbill on its neck patch a bluish white featherless has."
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Urutan frasa nomina (noun group) yang benar menempatkan kata sifat (bluish white, featherless) sebelum kata benda inti (patch), membentuk frasa a bluish white featherless patch."
+          },
+          "distractorWhy": {
+            "1": "Kata sifat ditempatkan setelah kata benda sehingga struktur frasa nomina menjadi tidak tepat.",
+            "2": "Susunan kata sifat dan kata benda terpecah secara keliru di sekitar kata kerja.",
+            "3": "Tata kata acak ini merusak struktur frasa nomina dan tata bahasa kalimat."
+          },
+          "sumber": {
+            "dokumen": "English for Nusantara untuk SMP/MTs Kelas IX",
+            "bab": "KOMP-ENG-D-9-BAB1-01"
+          }
+        },
+        {
+          "id": "eng-d-9-c1-q05",
+          "difficulty": "sedang",
+          "prompt": "In Comic Strip 1.4, Monita explains the main danger facing Bekantans:\n\"The major threat is habitat destruction. It means they lose their home—their mangrove trees.\"\nWhat is the main conclusion regarding how to save Bekantans?",
+          "options": [
+            "People must save and protect the mangrove forests where Bekantans live",
+            "People should catch all Bekantans and move them to city zoos",
+            "People ought to feed Bekantans with commercial processed monkey food",
+            "People must eliminate all natural bird species in Borneo rainforests"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Karena ancaman terbesar bagi bekantan adalah kerusakan habitat pohon bakau, cara utama menyelamatkannya adalah dengan menjaga dan melestarikan hutan bakau tersebut."
+          },
+          "distractorWhy": {
+            "1": "Memindahkan seluruh populasi liar ke kebun binatang kota bukan solusi pelestarian habitat alami yang dimaksudkan dalam konteks teks.",
+            "2": "Memberi pakan buatan tidak mengatasi masalah hilangnya tempat tinggal alami mereka di hutan bakau.",
+            "3": "Membasmi spesies burung alami tidak relevan dan justru merusak ekosistem hutan Borneo."
+          },
+          "sumber": {
+            "dokumen": "English for Nusantara untuk SMP/MTs Kelas IX",
+            "bab": "KOMP-ENG-D-9-BAB1-01"
+          }
+        },
+        {
+          "id": "eng-d-9-c1-q06",
+          "difficulty": "dasar",
+          "prompt": "Read the informational text from 'Did you know?' in Unit 2:\n\"Apes and monkeys are two different animals. The first and easiest way to know the difference is by observing the absence or presence of their tails. Monkeys have tails while apes don't.\"\nBased on this rule, which animal is categorized as an ape because it has no tail?",
+          "options": [
+            "Orangutan",
+            "Proboscis monkey",
+            "Long-tailed macaque",
+            "Baboon"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Orangutan tergolong kera (ape) karena tidak memiliki ekor dan bertubuh besar, sesuai penjelasan perbedaan kera dan monyet di Unit 2."
+          },
+          "distractorWhy": {
+            "1": "Bekantan (Proboscis monkey) tergolong monyet karena memiliki ekor yang panjang.",
+            "2": "Macaca berkeor panjang merupakan jenis monyet karena jelas memiliki ekor.",
+            "3": "Babun merupakan spesies monyet yang memiliki ekor."
+          },
+          "sumber": {
+            "dokumen": "English for Nusantara untuk SMP/MTs Kelas IX",
+            "bab": "KOMP-ENG-D-9-BAB1-01"
+          }
+        },
+        {
+          "id": "eng-d-9-c1-q07",
+          "difficulty": "tinggi",
+          "prompt": "According to the reading text 'Orangutan' in Unit 2:\n\"The scientific name of Orangutan from Northern Sumatra is Pongo abelii and the scientific name of Orangutan from Borneo is Pongo pygmaeus.\"\nWhich statement accurately reflects the facts provided in the report text?",
+          "options": [
+            "Male orangutans can reach a height of up to 150 cm, whereas mature females average around 120 cm.",
+            "Female orangutans are heavier than male orangutans, weighing over 150 kg on average.",
+            "Orangutans live strictly in solitary desert areas without tree canopies.",
+            "Pongo pygmaeus is the scientific designation exclusive to Sumatran orangutans."
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Teks menjelaskan bahwa orangutan jantan dapat mencapai tinggi 150 cm, sementara betina dewasa berukuran lebih kecil dengan tinggi sekitar 120 cm."
+          },
+          "distractorWhy": {
+            "1": "Teks menyatakan orangutan jantan (bisa lebih dari 100 kg) jauh lebih berat daripada betina (sekitar 40 kg).",
+            "2": "Orangutan hidup di hutan hujan dan rawa di Sumatra dan Borneo di atas pepohonan, bukan di gurun pasir.",
+            "3": "Pongo pygmaeus adalah nama ilmiah untuk orangutan Borneo, sedangkan orangutan Sumatra bernama Pongo abelii."
+          },
+          "sumber": {
+            "dokumen": "English for Nusantara untuk SMP/MTs Kelas IX",
+            "bab": "KOMP-ENG-D-9-BAB1-01"
+          }
+        },
+        {
+          "id": "eng-d-9-c1-q08",
+          "difficulty": "dasar",
+          "prompt": "Study the rule in Unit 2 Language Focus:\n\"We use 'have' following a plural subject and 'has' following a singular subject to describe animal features.\"\nChoose the correct pair of verbs to complete these sentences:\n1) Gorillas ___ long arms.\n2) Bekantan ___ a unique shape of nose.",
+          "options": [
+            "have ; has",
+            "has ; have",
+            "have ; have",
+            "has ; has"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Subjek jamak (Gorillas) menggunakan kata kerja have, sedangkan subjek tunggal (Bekantan) menggunakan kata kerja has."
+          },
+          "distractorWhy": {
+            "1": "Penggunaan kata kerja terbalik untuk subjek jamak dan tunggal.",
+            "2": "Kata kerja have tidak tepat digunakan untuk subjek tunggal Bekantan.",
+            "3": "Kata kerja has tidak tepat digunakan untuk subjek jamak Gorillas."
+          },
+          "sumber": {
+            "dokumen": "English for Nusantara untuk SMP/MTs Kelas IX",
+            "bab": "KOMP-ENG-D-9-BAB1-01"
+          }
+        },
+        {
+          "id": "eng-d-9-c1-q09",
+          "difficulty": "sedang",
+          "prompt": "Examine the possessive adjective rules in Unit 2 Section 3:\n\"If the subject is singular, we add apostrophe+s ('s). If the subject is plural and ends with an 's', the possessive is formed by adding an apostrophe after the 's'.\"\nWhich sentence correctly applies this rule?",
+          "options": [
+            "Orangutans and gorillas' legs are long, but a gorilla's fur is black.",
+            "Orangutans and gorillas's legs are long, but a gorillas' fur is black.",
+            "Orangutans's and gorilla's legs are long, but a gorilla' fur is black.",
+            "Orangutan and gorilla legs's are long, but a gorilla's fur is black."
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Bentuk kepemilikan subjek jamak berakhiran s adalah gorillas', sedangkan subjek tunggal adalah gorilla's."
+          },
+          "distractorWhy": {
+            "1": "Penambahan apostrof s setelah s jamak (gorillas's) dan penggunaan apostrof saja untuk kata tunggal (gorillas') melanggar aturan tata bahasa buku.",
+            "2": "Kata Orangutans's dan gorilla' tidak sesuai dengan aturan penulisan kepemilikan tunggal dan jamak.",
+            "3": "Penempatan tanda apostrof dan huruf s pada kata benda yang salah merusak struktur kepemilikan."
+          },
+          "sumber": {
+            "dokumen": "English for Nusantara untuk SMP/MTs Kelas IX",
+            "bab": "KOMP-ENG-D-9-BAB1-01"
+          }
+        },
+        {
+          "id": "eng-d-9-c1-q10",
+          "difficulty": "tinggi",
+          "prompt": "Read the excerpt from Worksheet 1.15 ('Gorillas'):\n\"Gorillas are our closest cousins because they share 98.3% of their genetic code with humans... The group is led by a group leader called a silverback.\"\nWhy is the leader of a gorilla family group called a silverback?",
+          "options": [
+            "The mature male leader develops silver-gray hair on his back as he ages",
+            "The leader carries a piece of silver metal found in African rain forests",
+            "The leader's skin reflects silver light during night time",
+            "The leader exclusively eats plants with silver-colored leaves"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Pemimpin kelompok gorila jantan dewasa dinamakan silverback karena tumbuh bulu berwarna abu-abu keperakan di bagian punggungnya seiring bertambahnya usia."
+          },
+          "distractorWhy": {
+            "1": "Istilah tersebut berkaitan dengan karakteristik fisik bulu gorila, bukan karena membawa benda logam.",
+            "2": "Kulit gorila berwarna hitam dan tidak memancarkan cahaya keperakan di malam hari.",
+            "3": "Gorila memakan dedaunan, tunas, dan batang tumbuhan biasa, bukan tumbuhan khusus berdaun perak."
+          },
+          "sumber": {
+            "dokumen": "English for Nusantara untuk SMP/MTs Kelas IX",
+            "bab": "KOMP-ENG-D-9-BAB1-01"
+          }
+        },
+        {
+          "id": "eng-d-9-c1-q11",
+          "difficulty": "dasar",
+          "prompt": "In Comic Strip 1.5, Galang and Andre discuss the Helmeted Hornbill:\n\"Andre: It is the only hornbill with a casque made of keratin.\nMonita: What is a casque?\nAndre: The bird's helmet.\"\nWhat is the unique feature of the Helmeted Hornbill's casque mentioned in the text?",
+          "options": [
+            "It is a solid helmet-like structure on its beak made of keratin",
+            "It is a soft leather pouch under its throat used to hold water",
+            "It is a pair of long tail streamers used for steering in flight",
+            "It is a colorful crest feather located on its wing tips"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Casque adalah struktur mirip helm keras di atas paruh burung enggang gading yang terbuat dari zat tanduk (keratin)."
+          },
+          "distractorWhy": {
+            "1": "Casque berada di atas paruh dan bertekstur keras, bukan kantong kulit lunak di bawah tenggorokan.",
+            "2": "Bulu ekor yang panjang adalah fitur lain pada ekornya, bukan casque (helm).",
+            "3": "Casque berada di bagian kepala/paruh, bukan bulu jambul pada ujung sayap."
+          },
+          "sumber": {
+            "dokumen": "English for Nusantara untuk SMP/MTs Kelas IX",
+            "bab": "KOMP-ENG-D-9-BAB1-01"
+          }
+        },
+        {
+          "id": "eng-d-9-c1-q12",
+          "difficulty": "sedang",
+          "prompt": "According to Audio Transcript 2 in Unit 3:\n\"Males have a red featherless patch on the neck, while females have a bluish-white patch.\"\nIf a birder observes a Helmeted Hornbill in the forest with a bluish-white neck patch, what can be inferred?",
+          "options": [
+            "The observed bird is a female Helmeted Hornbill",
+            "The observed bird is a male Helmeted Hornbill",
+            "The observed bird is a young chick that has not grown feathers",
+            "The observed bird belongs to the Cendrawasih family"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Bercak kulit tanpa bulu berwarna putih kebiruan di bagian leher merupakan ciri khas burung enggang gading betina."
+          },
+          "distractorWhy": {
+            "1": "Burung jantan memiliki bercak kulit berwarna merah di bagian lehernya.",
+            "2": "Warna kulit leher putih kebiruan membedakan jenis kelamin betina dewasa, bukan indikator anak burung.",
+            "3": "Ciri fisik leher ini milik spesies Helmeted Hornbill (Rhinoplax vigil), bukan burung Cendrawasih."
+          },
+          "sumber": {
+            "dokumen": "English for Nusantara untuk SMP/MTs Kelas IX",
+            "bab": "KOMP-ENG-D-9-BAB1-01"
+          }
+        },
+        {
+          "id": "eng-d-9-c1-q13",
+          "difficulty": "sedang",
+          "prompt": "Read the report text on Cendrawasih from Unit 3 Section 3:\n\"Cendrawasihs or the birds of paradise are from the family of Paradisaeidae... The natural devastation and illegal hunting make Cenderawasih an endangered species. Their reproduction cycle also makes the preservation difficult as they only produce one until two eggs.\"\nWhat factors cause Cendrawasih to become endangered according to the text?",
+          "options": [
+            "Natural devastation, illegal hunting, and a low reproduction rate of 1-2 eggs",
+            "High consumption of toxic ocean fish and cold polar climate changes",
+            "Attacks from silverback gorillas and overpopulation of predators",
+            "Rapid growth of commercial tree plantations in Western Australia"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Kelangkaan Cendrawasih disebabkan oleh kerusakan alam, perburuan liar, serta siklus reproduksi yang lambat karena hanya bertelur 1 hingga 2 butir."
+          },
+          "distractorWhy": {
+            "1": "Cendrawasih hidup di hutan Indonesia Timur dan memakan buah serta artropoda, bukan ikan laut beracun.",
+            "2": "Gorila hidup di Afrika dan tidak berinteraksi dengan burung Cendrawasih di Indonesia Timur.",
+            "3": "Perkebunan Australia Barat bukan faktor utama ancaman kelangkaan yang dijelaskan dalam teks."
+          },
+          "sumber": {
+            "dokumen": "English for Nusantara untuk SMP/MTs Kelas IX",
+            "bab": "KOMP-ENG-D-9-BAB1-01"
+          }
+        },
+        {
+          "id": "eng-d-9-c1-q14",
+          "difficulty": "dasar",
+          "prompt": "Section 4 of Unit 3 explains Passive Voice:\n\"When we talk about facts or events, we sometimes want to emphasize the action rather than who is doing the action. We use passive voice to show interest in the person or object that experiences an action.\"\nWhy do scientific report texts frequently use passive voice?",
+          "options": [
+            "To focus on the animal or object experiencing the action rather than the doer",
+            "To make sentences longer and more difficult for readers to understand",
+            "To express personal emotional feelings and informal daily gossip",
+            "To hide factual information from scientific researchers"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Kalimat pasif digunakan dalam teks laporan ilmiah untuk memberikan penekanan pada objek atau hewan yang dikenai tindakan, bukan pada pelakunya."
+          },
+          "distractorWhy": {
+            "1": "Tujuan kalimat pasif bukan untuk memperrumit bacaan, melainkan menyampaikan fokus informasi ilmiah secara tepat.",
+            "2": "Teks laporan ilmiah bersifat objektif dan faktual, bukan untuk mengungkapkan perasaan emosional pribadi.",
+            "3": "Kalimat pasif digunakan untuk kejelasan fokus ilmiah, bukan untuk menyembunyikan fakta."
+          },
+          "sumber": {
+            "dokumen": "English for Nusantara untuk SMP/MTs Kelas IX",
+            "bab": "KOMP-ENG-D-9-BAB1-01"
+          }
+        },
+        {
+          "id": "eng-d-9-c1-q15",
+          "difficulty": "sedang",
+          "prompt": "Consider the grammar example from Unit 3 Section 4:\nActive: \"Galang brings binoculars to the forest.\" -> Passive: \"Binoculars are brought by Galang to the forest.\"\nNow, transform the active sentence below into passive voice following the rules in Chapter 1:\nActive: \"Monita reads a book about bekantan.\"",
+          "options": [
+            "A book about bekantan is read by Monita.",
+            "A book about bekantan was reading by Monita.",
+            "Monita is read a book about bekantan.",
+            "A book about bekantan is reading Monita."
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Objek A book about bekantan (tunggal) menjadi subjek pasif diikuti to be 'is' dan kata kerja bentuk ketiga 'read' (is read by Monita)."
+          },
+          "distractorWhy": {
+            "1": "Penggunaan bentuk was reading berubah menjadi kalimat lampau berlangsung (past continuous), bukan pasif sederhana.",
+            "2": "Menjadikan Monita sebagai pihak yang dibaca merusak makna kalimat secara logis.",
+            "3": "Penggunaan kata kerja aktif is reading membuat buku seolah-olah membaca Monita."
+          },
+          "sumber": {
+            "dokumen": "English for Nusantara untuk SMP/MTs Kelas IX",
+            "bab": "KOMP-ENG-D-9-BAB1-01"
+          }
+        },
+        {
+          "id": "eng-d-9-c1-q16",
+          "difficulty": "tinggi",
+          "prompt": "Choose the correct passive verb forms to complete the sentences below based on Worksheet 1.21 in Unit 3:\n1) Bekantan is ___ (find/found) in Kalimantan.\n2) The leaves are ___ (eat/eaten) by Bekantans.\n3) Water is ___ (drink/drunk) from holes between tree branches by orangutans.",
+          "options": [
+            "found ; eaten ; drunk",
+            "find ; eat ; drink",
+            "finding ; eating ; drinking",
+            "founded ; eated ; dranked"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Kalimat pasif dalam bahasa Inggris menggunakan kata kerja bentuk ketiga (past participle): found, eaten, dan drunk."
+          },
+          "distractorWhy": {
+            "1": "Bentuk kata kerja dasar (infinitive) tidak dapat digunakan setelah kata kerja bantu to be dalam struktur pasif.",
+            "2": "Bentuk present participle (-ing) membentuk kalimat aktif continuous, bukan kalimat pasif.",
+            "3": "Bentuk kata kerja tidak beraturan yang salah tata bahasanya (founded, eated, dranked)."
+          },
+          "sumber": {
+            "dokumen": "English for Nusantara untuk SMP/MTs Kelas IX",
+            "bab": "KOMP-ENG-D-9-BAB1-01"
+          }
+        },
+        {
+          "id": "eng-d-9-c1-q17",
+          "difficulty": "dasar",
+          "prompt": "Read the informational excerpt from Unit 3 Section 4 ('Did you know?'):\n\"What is bird watching exactly? It is an activity where birds are observed for the purpose of recreation or science. People who like birdwatching are called birders.\"\nWhat activities do birders do during bird watching according to the text?",
+          "options": [
+            "Observe birds' appearance and behavior, take notes, identify species, and share findings",
+            "Catch wild birds with nets and sell them at traditional animal markets",
+            "Shoot birds using slingshots for recreational outdoor sport competition",
+            "Train wild birds to perform acrobatic tricks in public entertainment shows"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Para pengamat burung (birders) melakukan pengamatan penampilan dan perilaku burung, mencatat, mengidentifikasi spesies, serta membagikan temuan mereka."
+          },
+          "distractorWhy": {
+            "1": "Kegiatan pengamatan burung bersifat rekreasi dan ilmiah, bukan penangkapan untuk dijual di pasar.",
+            "2": "Birdwatching tidak melibatkan perburuan atau penembakan burung.",
+            "3": "Pengamatan burung tidak bertujuan melatih burung liar untuk pertunjukan sirkus."
+          },
+          "sumber": {
+            "dokumen": "English for Nusantara untuk SMP/MTs Kelas IX",
+            "bab": "KOMP-ENG-D-9-BAB1-01"
+          }
+        },
+        {
+          "id": "eng-d-9-c1-q18",
+          "difficulty": "sedang",
+          "prompt": "Study the five steps of writing a report text outlined in Unit 3 Section 5:\n1. Gathering Information\n2. Organizing Information\n3. Writing the draft\n4. Revising and Editing the draft\n5. Publishing your work\nWhich step involves 'collecting information by reading references and making observations'?",
+          "options": [
+            "Gathering Information",
+            "Revising and Editing the draft",
+            "Publishing your work",
+            "Organizing Information"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Tahap Gathering Information (Pengumpulan Informasi) adalah langkah awal di mana penulis mengumpulkan data melalui membaca referensi dan pengamatan langsung."
+          },
+          "distractorWhy": {
+            "1": "Tahap revisi dan penyuntingan dilakukan setelah draf awal selesai ditulis untuk memperbaiki tata bahasa dan isi.",
+            "2": "Tahap publikasi adalah langkah akhir membagikan hasil laporan kepada guru atau media.",
+            "3": "Pengorganisasian informasi adalah tahap mengelompokkan data yang telah dikumpulkan ke dalam kategori yang sesuai."
+          },
+          "sumber": {
+            "dokumen": "English for Nusantara untuk SMP/MTs Kelas IX",
+            "bab": "KOMP-ENG-D-9-BAB1-01"
+          }
+        },
+        {
+          "id": "eng-d-9-c1-q19",
+          "difficulty": "tinggi",
+          "prompt": "Section 6 presents a fact sheet about the Bali Starling (Jalak Bali):\n- Threats: Poaching for illegal songbird trade, habitat loss\n- Lifespan: 5 years in the wild, up to 15 years in captivity\n- Interesting fact: The national bird of Bali, saved by breeding and reintroduction programmes.\nWhich passive sentence best represents the fact about saving the Bali Starling from extinction?",
+          "options": [
+            "Bali starlings were saved from extinction by breeding and reintroduction programmes.",
+            "Illegal songbird traders saved Bali starlings from habitat loss.",
+            "Bali starlings are being hunted to increase their population in captivity.",
+            "Programmers saved Bali starlings by building digital computer games."
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Kalimat pasif ini secara akurat menyampaikan fakta bahwa jalak bali diselamatkan dari kepunahan melalui program penangkaran dan pelepasliaran kembali."
+          },
+          "distractorWhy": {
+            "1": "Pedagang burung berkicau ilegal adalah ancaman kelangsungan hidup jalak bali, bukan pihak yang menyelamatkannya.",
+            "2": "Perburuan liar mengurangi populasi jalak bali, bukan meningkatkan populasinya.",
+            "3": "Program yang dimaksud adalah penangkaran biologi (breeding), bukan pemrograman komputer digital."
+          },
+          "sumber": {
+            "dokumen": "English for Nusantara untuk SMP/MTs Kelas IX",
+            "bab": "KOMP-ENG-D-9-BAB1-01"
+          }
+        },
+        {
+          "id": "eng-d-9-c1-q20",
+          "difficulty": "tinggi",
+          "prompt": "Across Chapter 1, students learn to read and write Report Texts on Indonesian fauna (Bekantan, Orangutan, Birds).\nWhat is the main social function and generic structure of a Report Text based on Chapter 1?",
+          "options": [
+            "To present factual information about natural phenomena or animals in general, typically structured with General Classification followed by Descriptions",
+            "To entertain readers with a fictional fairy tale about talking animals, structured with Orientation, Complication, and Resolution",
+            "To persuade readers to buy exotic pets, structured with Thesis, Arguments, and Recommendation",
+            "To instruct readers on how to cook traditional Indonesian dishes, structured with Goal, Materials, and Steps"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Teks laporan (Report Text) berfungsi menyajikan informasi faktual umum tentang hewan atau fenomena alam, dengan struktur Umum (General Classification) dan Deskripsi (Descriptions)."
+          },
+          "distractorWhy": {
+            "1": "Struktur Orientation, Complication, Resolution milik Teks Naratif (Narrative Text) yang bertujuan menghibur dengan cerita fiktif.",
+            "2": "Struktur Thesis, Arguments, Recommendation milik Teks Eksposisi yang bertujuan membujuk pembaca.",
+            "3": "Struktur Goal, Materials, Steps milik Teks Prosedur (Procedure Text) yang memberikan petunjuk langkah demi langkah."
+          },
+          "sumber": {
+            "dokumen": "English for Nusantara untuk SMP/MTs Kelas IX",
+            "bab": "KOMP-ENG-D-9-BAB1-01"
+          }
+        }
+      ]
+    },
+    {
+      "code": "KOMP-ENG-D-9-BAB2-01",
+      "grade": 9,
+      "name": "Chapter 2: Taking Care of Yourself",
+      "materi": "",
+      "cpRef": "",
+      "target": 20,
+      "items": []
+    },
+    {
+      "code": "KOMP-ENG-D-9-BAB3-01",
+      "grade": 9,
+      "name": "Chapter 3: Journey to the Fantasy World",
+      "materi": "",
+      "cpRef": "",
+      "target": 20,
+      "items": []
+    },
+    {
+      "code": "KOMP-ENG-D-9-BAB4-01",
+      "grade": 9,
+      "name": "Chapter 4: Upcycling Used Materials",
+      "materi": "",
+      "cpRef": "",
+      "target": 20,
+      "items": []
+    },
+    {
+      "code": "KOMP-ENG-D-9-BAB5-01",
+      "grade": 9,
+      "name": "Chapter 5: Digital Life",
+      "materi": "",
+      "cpRef": "English for Nusantara untuk SMP/MTs Kelas IX",
+      "target": 20,
+      "items": [
+        {
+          "id": "eng-d-9-c5-q01",
+          "difficulty": "easy",
+          "prompt": "In Section 2 of Unit 1 (Let's Check the Facts!), Galang asks Monita how to search for information on the internet. According to Monita, what is the very first step to do before typing keywords?",
+          "options": [
+            "Open a web browser on a laptop or smartphone",
+            "Click on the first advertisement link in search results",
+            "Type a complete paragraph into the address bar",
+            "Turn off the internet connection and restart the computer"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Berdasarkan dialog Galang dan Monita di Unit 1, langkah paling awal saat ingin mencari informasi adalah membuka peramban web (web browser) di perangkat komputer atau ponsel pintar."
+          },
+          "distractorWhy": {
+            "1": "Mengklik iklan secara langsung berisiko mengarahkan ke situs yang tidak aman atau tidak relevan.",
+            "2": "Ketiklah kata kunci utama (keywords) di kolom pencarian, bukan mengetik seluruh paragraf panjang.",
+            "3": "Mematikan koneksi internet justru membuat peramban web tidak dapat mengakses mesin pencari."
+          },
+          "sumber": {
+            "dokumen": "English for Nusantara untuk SMP/MTs Kelas IX",
+            "bab": "KOMP-ENG-D-9-BAB5-01"
+          }
+        },
+        {
+          "id": "eng-d-9-c5-q02",
+          "difficulty": "easy",
+          "prompt": "Based on Monita's advice to Galang in Unit 1, why is it essential to check the source of information found on the internet?",
+          "options": [
+            "In order to avoid using false or misleading information",
+            "To increase the internet connection speed",
+            "To automatically download pocket book templates",
+            "To change the browser's default background color"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Monita menjelaskan bahwa memeriksa sumber informasi (source of information) sangat penting agar kita terhindar dari penggunaan data atau informasi palsu (false information)."
+          },
+          "distractorWhy": {
+            "1": "Memeriksa sumber data adalah tindakan verifikasi keabsahan isi, bukan untuk mempercepat koneksi internet.",
+            "2": "Memeriksa kredibilitas sumber tidak mengunduh templat secara otomatis.",
+            "3": "Sumber informasi berkaitan dengan isi materi, bukan pengaturan warna tampilan peramban."
+          },
+          "sumber": {
+            "dokumen": "English for Nusantara untuk SMP/MTs Kelas IX",
+            "bab": "KOMP-ENG-D-9-BAB5-01"
+          }
+        },
+        {
+          "id": "eng-d-9-c5-q03",
+          "difficulty": "medium",
+          "prompt": "Read the passage from Unit 1 Section 7:\n'Facts about search engines: Internet users must be familiar with search engines. It only takes a few seconds for search engines to find desired information. Search engines put relevant sites at the top of the search results... Everyday there are more than 500 million searches completed.'\n\nHow do search engines organize search results to help users find information quickly?",
+          "options": [
+            "By placing the most relevant websites at the top of the results list",
+            "By sorting websites strictly in alphabetical order of their full URLs",
+            "By hiding secure websites and displaying unverified blogs first",
+            "By randomly changing the order of search results every few seconds"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Teks 'Facts about search engines' menyebutkan bahwa mesin pencari menempatkan situs-situs yang paling relevan di urutan paling atas (top of the search results) agar pengguna dapat menemukan informasi dengan cepat."
+          },
+          "distractorWhy": {
+            "1": "Mesin pencari mengurutkan hasil berdasarkan relevansi dan peringkat algoritma, bukan urutan abjad URL.",
+            "2": "Mesin pencari memprioritaskan situs terverifikasi dan relevan, bukan menyembunyikannya.",
+            "3": "Urutan pencarian disusun secara terstruktur sesuai relevansi pencarian, bukan diacak secara acak setiap detik."
+          },
+          "sumber": {
+            "dokumen": "English for Nusantara untuk SMP/MTs Kelas IX",
+            "bab": "KOMP-ENG-D-9-BAB5-01"
+          }
+        },
+        {
+          "id": "eng-d-9-c5-q04",
+          "difficulty": "easy",
+          "prompt": "According to Ibu Ida Ayu's instructions in Unit 1 on making a biography pocket book, which action verb correctly completes the step: '______ the key words in the search box'?",
+          "options": [
+            "Type",
+            "Erase",
+            "Fold",
+            "Glue"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Kata kerja imperatif yang tepat untuk menggunakan kolom pencarian (search box) di peramban web adalah 'Type' (ketiklah kata kunci)."
+          },
+          "distractorWhy": {
+            "1": "'Erase' berarti menghapus, bukan tindakan memasukkan kata kunci pencarian.",
+            "2": "'Fold' adalah instruksi melipat kertas saat membuat buku saku, bukan perintah di peramban.",
+            "3": "'Glue' adalah tindakan menempelkan bahan kertas."
+          },
+          "sumber": {
+            "dokumen": "English for Nusantara untuk SMP/MTs Kelas IX",
+            "bab": "KOMP-ENG-D-9-BAB5-01"
+          }
+        },
+        {
+          "id": "eng-d-9-c5-q05",
+          "difficulty": "easy",
+          "prompt": "In Unit 2 (Staying safe in the digital world), students learn digital security terms. What is the definition of 'privacy settings' on digital devices and social media?",
+          "options": [
+            "Controls that allow users to manage who can see their personal information and posts",
+            "A public list of passwords shared with all online friends",
+            "Hardware tools used to increase the display brightness of a screen",
+            "An automatic notification sent to unknown internet users"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "'Privacy settings' (pengaturan privasi) adalah fitur keamanan yang memungkinkan pengguna mengatur siapa saja yang berhak melihat data pribadi maupun unggahan mereka."
+          },
+          "distractorWhy": {
+            "1": "Kata sandi tidak boleh dibuat menjadi daftar publik yang dibagikan kepada teman online.",
+            "2": "Pengaturan privasi adalah fitur perangkat lunak keamanan digital, bukan pengatur kecerahan layar.",
+            "3": "Pengaturan privasi bertujuan membatasi akses orang tidak dikenal, bukan mengirim notifikasi otomatis kepada mereka."
+          },
+          "sumber": {
+            "dokumen": "English for Nusantara untuk SMP/MTs Kelas IX",
+            "bab": "KOMP-ENG-D-9-BAB5-01"
+          }
+        },
+        {
+          "id": "eng-d-9-c5-q06",
+          "difficulty": "medium",
+          "prompt": "Read the rule from 'Internet Safety Rules' in Unit 2 Section 2:\n'Verify a link is safe... Know about hovering. Hovering is when you place your mouse cursor over a link (without clicking it) to see the link embedded in the text.'\n\nWhat should an internet user do if the embedded web address shown during hovering differs from the visible text link?",
+          "options": [
+            "Never click the link because it may be suspicious or fraudulent",
+            "Immediately forward the link to all contacts in your address book",
+            "Click the link twice to force the browser to fix the web address",
+            "Enter your personal banking password on the displayed page"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Aturan keselamatan internet di Unit 2 menegaskan bahwa jika alamat tautan yang tersembunyi berbeda dari teks yang terlihat saat dilayangkan kursor (hovering), tautan tersebut tidak boleh diklik (never click it) karena berpotensi jebakan/scam."
+          },
+          "distractorWhy": {
+            "1": "Meneruskan tautan mencurigakan ke orang lain dapat menyebarkan ancaman siber.",
+            "2": "Mengklik tautan berbeda dua kali tetap dapat mengarahkan ke situs peretas atau malware.",
+            "3": "Memasukkan kata sandi rahasia pada situs mencurigakan sangat berbahaya dan memicu pencurian identitas."
+          },
+          "sumber": {
+            "dokumen": "English for Nusantara untuk SMP/MTs Kelas IX",
+            "bab": "KOMP-ENG-D-9-BAB5-01"
+          }
+        },
+        {
+          "id": "eng-d-9-c5-q07",
+          "difficulty": "medium",
+          "prompt": "In Unit 2 Section 5 ('10 Ways to Protect Yourself Against Cybercrimes'), what is recommended regarding passwords to protect your digital accounts against unauthorized access?",
+          "options": [
+            "Keep passwords secret from peers and change them regularly",
+            "Share passwords with online gaming acquaintances to gain bonus points",
+            "Use your full name and date of birth as a simple password for all websites",
+            "Post your passwords on social media profiles so you never forget them"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Poin ke-6 dari 10 cara perlindungan diri di Unit 2 menyarankan agar kata sandi dijaga kerahasiaannya dan diubah secara berkala (change it regularly)."
+          },
+          "distractorWhy": {
+            "1": "Membagikan kata sandi kepada kenalan online dapat menyebabkan akun diretas.",
+            "2": "Menggunakan nama lengkap dan tanggal lahir membuat kata sandi sangat mudah ditebak peretas.",
+            "3": "Mengunggah kata sandi di profil media sosial akan menghilangkan perlindungan akun."
+          },
+          "sumber": {
+            "dokumen": "English for Nusantara untuk SMP/MTs Kelas IX",
+            "bab": "KOMP-ENG-D-9-BAB5-01"
+          }
+        },
+        {
+          "id": "eng-d-9-c5-q08",
+          "difficulty": "medium",
+          "prompt": "According to the UNICEF survey text presented in Unit 2 ('Online bullying in Indonesia'), what percentage of the 2,777 young Indonesians surveyed had experienced cyberbullying?",
+          "options": [
+            "45%",
+            "10%",
+            "75%",
+            "90%"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Teks hasil survei UNICEF 2019 di Unit 2 menyebutkan bahwa dari 2.777 remaja Indonesia berusia 14-24 tahun, sebanyak 45% pernah mengalami perundungan siber (cyberbullying)."
+          },
+          "distractorWhy": {
+            "1": "Angka 10% terlalu rendah dan tidak sesuai dengan data resmi survei di buku teks.",
+            "2": "Angka 75% bukan merupakan data persentase total korban perundungan siber dalam teks tersebut.",
+            "3": "Angka 90% tidak menggambarkan data statistik yang tercantum pada materi Unit 2."
+          },
+          "sumber": {
+            "dokumen": "English for Nusantara untuk SMP/MTs Kelas IX",
+            "bab": "KOMP-ENG-D-9-BAB5-01"
+          }
+        },
+        {
+          "id": "eng-d-9-c5-q09",
+          "difficulty": "medium",
+          "prompt": "In Unit 2 Section 6, what safe action should a student take if they receive an abusive or nasty message from an unknown user on a messaging application?",
+          "options": [
+            "Block the sender, screenshot the evidence, and tell a trusted adult",
+            "Reply with angry insults to retaliate against the sender",
+            "Delete your entire computer operating system immediately",
+            "Blame yourself and keep the abusive messages secret from everyone"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Panduan penanganan cyberbullying di Unit 2 menyarankan untuk memblokir akun pengirim, menyimpan bukti berupa tangkapan layar (screenshot), dan melaporkannya kepada orang dewasa yang dipercaya."
+          },
+          "distractorWhy": {
+            "1": "Membalas dengan hinaan akan memperkeruh konflik dan memicu perundungan balasan.",
+            "2": "Menghapus seluruh sistem operasi komputer adalah tindakan berlebihan yang tidak menyelesaikan masalah akun.",
+            "3": "Menyalahkan diri sendiri dan merahasikannya dapat mengganggu kesehatan mental korban perundungan."
+          },
+          "sumber": {
+            "dokumen": "English for Nusantara untuk SMP/MTs Kelas IX",
+            "bab": "KOMP-ENG-D-9-BAB5-01"
+          }
+        },
+        {
+          "id": "eng-d-9-c5-q10",
+          "difficulty": "easy",
+          "prompt": "Unit 2 focuses on imperative sentences for digital safety rules using adverbs of frequency 'always' or 'never'. Which of the following sentences correctly states an online safety rule?",
+          "options": [
+            "Never give out personal information to strangers online.",
+            "Always share your home address on public forums.",
+            "Never check if a web address begins with HTTPS.",
+            "Always open email attachments from unknown senders."
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Kalimat imperatif aturan keselamatan online yang benar adalah larangan memberikan informasi pribadi kepada orang asing ('Never give out personal information to strangers online')."
+          },
+          "distractorWhy": {
+            "1": "Membagikan alamat rumah di forum publik melanggar prinsip privasi dan keselamatan digital.",
+            "2": "Kita justru harus selalu memeriksa indikator HTTPS pada alamat situs web.",
+            "3": "Membuka lampiran email dari pengirim tak dikenal berisiko terkena virus atau malware."
+          },
+          "sumber": {
+            "dokumen": "English for Nusantara untuk SMP/MTs Kelas IX",
+            "bab": "KOMP-ENG-D-9-BAB5-01"
+          }
+        },
+        {
+          "id": "eng-d-9-c5-q11",
+          "difficulty": "medium",
+          "prompt": "In Unit 3 (Turn back hoax!), students learn how to check the source of internet news. Which top-level domain ending is typically associated with official educational institutions?",
+          "options": [
+            ".edu",
+            ".com",
+            ".xyz",
+            ".temp"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Unit 3 menjelaskan identifikasi alamat URL, di mana ekstensi domain '.edu' khusus digunakan oleh lembaga pendidikan resmi (educational institutions)."
+          },
+          "distractorWhy": {
+            "1": "Domain '.com' umumnya digunakan oleh organisasi komersial atau umum.",
+            "2": "Domain '.xyz' adalah domain tingkat atas umum yang sering dipakai situs komersial atau blog bebas.",
+            "3": "Domain '.temp' bukan merupakan ekstensi domain resmi lembaga pendidikan."
+          },
+          "sumber": {
+            "dokumen": "English for Nusantara untuk SMP/MTs Kelas IX",
+            "bab": "KOMP-ENG-D-9-BAB5-01"
+          }
+        },
+        {
+          "id": "eng-d-9-c5-q12",
+          "difficulty": "medium",
+          "prompt": "Unit 3 provides steps to identify fake news or hoaxes online. What should you do when encountering a sensational headline before sharing it on social media?",
+          "options": [
+            "Cross-check the facts with reliable news sources and official websites",
+            "Immediately share the news to gain views and likes",
+            "Assume the news is true if it includes an dramatic photo",
+            "Rewrite the news with extra exaggerated details"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Langkah utama menangkal hoaks di Unit 3 adalah memverifikasi dan mencocokkan fakta (cross-check facts) dengan sumber berita tepercaya sebelum menyebarkannya."
+          },
+          "distractorWhy": {
+            "1": "Langsung menyebarkan berita demi jumlah suka (likes) memicu penyebaran informasi palsu.",
+            "2": "Foto dramatis sering diubah atau dipakai di luar konteks asli oleh pembuat hoaks.",
+            "3": "Menambah rincian berlebihan justru memperburuk kualitas dan kebenaran informasi."
+          },
+          "sumber": {
+            "dokumen": "English for Nusantara untuk SMP/MTs Kelas IX",
+            "bab": "KOMP-ENG-D-9-BAB5-01"
+          }
+        },
+        {
+          "id": "eng-d-9-c5-q13",
+          "difficulty": "hard",
+          "prompt": "In Chapter 5 Unit 3, analytical exposition texts are introduced to state arguments regarding digital issues. What is the standard generic structure of an analytical exposition text?",
+          "options": [
+            "Thesis - Arguments - Reiteration / Conclusion",
+            "Goal - Materials - Steps",
+            "Orientation - Complication - Resolution",
+            "Identification - Description"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Struktur generik teks eksposisi analitis (analytical exposition text) terdiri dari Tesis (penyataan pendapat utama), Argumen-argumen pendukung, dan Reinterasi/Kesimpulan (penegasan ulang tesis)."
+          },
+          "distractorWhy": {
+            "1": "Struktur 'Goal - Materials - Steps' merupakan struktur generik dari Teks Prosedur (Procedure Text).",
+            "2": "Struktur 'Orientation - Complication - Resolution' merupakan struktur generik dari Teks Naratif (Narrative Text).",
+            "3": "Struktur 'Identification - Description' merupakan struktur generik dari Teks Deskriptif (Descriptive Text)."
+          },
+          "sumber": {
+            "dokumen": "English for Nusantara untuk SMP/MTs Kelas IX",
+            "bab": "KOMP-ENG-D-9-BAB5-01"
+          }
+        },
+        {
+          "id": "eng-d-9-c5-q14",
+          "difficulty": "hard",
+          "prompt": "What is the primary communicative purpose of an analytical exposition text discussed in digital literacy topics?",
+          "options": [
+            "To persuade readers that a particular topic or issue is important by presenting logical arguments",
+            "To entertain readers with a fictional story about internet superheroes",
+            "To provide step-by-step instructions on how to assemble a computer desktop",
+            "To describe the physical appearance of a digital device in detail"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Tujuan komunikatif teks eksposisi analitis adalah meyakinkan pembaca bahwa topik atau isu yang dibahas itu penting melalui argumen-argumen yang logis."
+          },
+          "distractorWhy": {
+            "1": "Menghibur pembaca dengan cerita rekaan adalah tujuan dari teks naratif.",
+            "2": "Memberikan petunjuk langkah demi langkah melakukan sesuatu adalah tujuan teks prosedur.",
+            "3": "Mendeskripsikan penampilan fisik suatu benda secara detail adalah tujuan teks deskriptif."
+          },
+          "sumber": {
+            "dokumen": "English for Nusantara untuk SMP/MTs Kelas IX",
+            "bab": "KOMP-ENG-D-9-BAB5-01"
+          }
+        },
+        {
+          "id": "eng-d-9-c5-q15",
+          "difficulty": "medium",
+          "prompt": "Which expression is commonly used to introduce a personal opinion or argument when discussing online etiquette in Unit 3?",
+          "options": [
+            "In my opinion, we should always verify information before posting it.",
+            "Once upon a time, there lived a wise king in a digital kingdom.",
+            "First, cut the paper into two equal rectangular parts.",
+            "Congratulations on winning the internet safety competition!"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Ungkapan 'In my opinion,...' adalah ungkapan standar untuk menyampaikan pendapat atau argumen pribadi dalam materi teks eksposisi dan etika digital."
+          },
+          "distractorWhy": {
+            "1": "'Once upon a time,...' adalah frasa pembuka dongeng/teks naratif.",
+            "2": "'First, cut the paper...' merupakan instruksi dalam teks prosedur.",
+            "3": "'Congratulations...' adalah ungkapan selamat (congratulating)."
+          },
+          "sumber": {
+            "dokumen": "English for Nusantara untuk SMP/MTs Kelas IX",
+            "bab": "KOMP-ENG-D-9-BAB5-01"
+          }
+        },
+        {
+          "id": "eng-d-9-c5-q16",
+          "difficulty": "hard",
+          "prompt": "Analytical exposition texts rely heavily on the Simple Present Tense to state general truths and facts. Which sentence correctly uses the Simple Present Tense with proper subject-verb agreement?",
+          "options": [
+            "A responsible internet user checks the credibility of news sources.",
+            "A responsible internet user checking the credibility of news sources yesterday.",
+            "A responsible internet user check the credibility of news sources tomorrow.",
+            "A responsible internet user were check the credibility of news sources."
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Subjek tunggal 'A responsible internet user' membutuhkan kata kerja bentuk Simple Present Tense dengan akhiran -s, yaitu 'checks'."
+          },
+          "distractorWhy": {
+            "1": "Penggunaan bentuk 'checking' dengan kata keterangan 'yesterday' melanggar kaidah Simple Present Tense.",
+            "2": "Subjek orang ketiga tunggal memerlukan kata kerja 'checks', bukan 'check' tanpa -s.",
+            "3": "Bentuk 'were check' secara tata bahasa tidak baku dan salah."
+          },
+          "sumber": {
+            "dokumen": "English for Nusantara untuk SMP/MTs Kelas IX",
+            "bab": "KOMP-ENG-D-9-BAB5-01"
+          }
+        },
+        {
+          "id": "eng-d-9-c5-q17",
+          "difficulty": "hard",
+          "prompt": "In Chapter 5, formal vocabulary related to digital ethics is introduced. Which word pair consists of synonyms relevant to online safety and verifying facts?",
+          "options": [
+            "Verify - Confirm",
+            "Hoax - Truth",
+            "Scam - Protection",
+            "Suspicious - Trusted"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Pasangan kata 'Verify' (memverifikasi) dan 'Confirm' (mengonfirmasi) adalah sinonim (persamaan kata) yang sesuai dalam konteks verifikasi kebenaran informasi digital."
+          },
+          "distractorWhy": {
+            "1": "'Hoax' (berita bohong) dan 'Truth' (kebenaran) adalah antonim (lawan kata).",
+            "2": "'Scam' (penipuan) dan 'Protection' (perlindungan) adalah dua konsep yang berlawanan.",
+            "3": "'Suspicious' (mencurigakan) dan 'Trusted' (dapat dipercaya) merupakan kata yang berlawanan arti."
+          },
+          "sumber": {
+            "dokumen": "English for Nusantara untuk SMP/MTs Kelas IX",
+            "bab": "KOMP-ENG-D-9-BAB5-01"
+          }
+        },
+        {
+          "id": "eng-d-9-c5-q18",
+          "difficulty": "hard",
+          "prompt": "Consider the following online situation: A news post headline claims 'Drinking salt water cures all viral infections instantly' without citing any medical research or doctor's name. Applying the steps from Unit 3 (Turn Back Hoax!), how should a digitally literate student evaluate this post?",
+          "options": [
+            "Classify it as potential hoax/misinformation because it lacks credible scientific evidence and source verification",
+            "Accept it as real news because the headline contains strong exclamation marks",
+            "Share it immediately to all family chat groups to prevent illness",
+            "Assume it is authentic because it was posted on an unverified personal blog"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Berdasarkan langkah-langkah penangkalan hoaks di Unit 3, klaim medis tanpa bukti ilmiah dan tanpa rujukan pihak berwenang wajib dikategorikan sebagai potensi hoaks/disinformasi."
+          },
+          "distractorWhy": {
+            "1": "Tanda seru pada judul berita sering digunakan oleh pembuat berita sensasional/palsu untuk memancing emosi pembaca.",
+            "2": "Menyebarkan informasi medis yang belum terbukti kebenaran ilmiahnya dapat membahayakan kesehatan orang lain.",
+            "3": "Unggahan di blog pribadi tanpa verifikasi bukan merupakan sumber warta resmi yang tepercaya."
+          },
+          "sumber": {
+            "dokumen": "English for Nusantara untuk SMP/MTs Kelas IX",
+            "bab": "KOMP-ENG-D-9-BAB5-01"
+          }
+        },
+        {
+          "id": "eng-d-9-c5-q19",
+          "difficulty": "hard",
+          "prompt": "What is the key takeaway regarding cyber etiquette when interacting on social media platforms as outlined in Chapter 5?",
+          "options": [
+            "Think critically before sharing information and respect others' privacy online",
+            "Post every personal detail of your daily life to maintain online popularity",
+            "Comment harsh critiques on strangers' photos to express freedom of speech",
+            "Use other people's account passwords whenever you need internet access"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Inti dari etika digital (cyber etiquette) di Chapter 5 adalah berpikir kritis sebelum membagikan informasi (think before sharing) serta menghormati hak privasi orang lain."
+          },
+          "distractorWhy": {
+            "1": "Mengunggah seluruh detail pribadi mengabaikan prinsip keamanan dan privasi data.",
+            "2": "Komentar kasar dan menghina melanggar etika digital dan tergolong perundungan siber.",
+            "3": "Menggunakan akun milik orang lain tanpa izin merupakan pelanggaran keamanan digital."
+          },
+          "sumber": {
+            "dokumen": "English for Nusantara untuk SMP/MTs Kelas IX",
+            "bab": "KOMP-ENG-D-9-BAB5-01"
+          }
+        },
+        {
+          "id": "eng-d-9-c5-q20",
+          "difficulty": "easy",
+          "prompt": "In Chapter 5 (Digital Life), which combination of actions best demonstrates a student who practices good digital literacy and online safety?",
+          "options": [
+            "Using strong passwords, verifying news sources, and reporting cyberbullying",
+            "Sharing account passwords with friends, clicking unknown web links, and spreading unverified news",
+            "Ignoring browser security warnings, downloading illegal attachments, and insulting online users",
+            "Using fake identities to scam others, disabling firewall protections, and hiding passwords under keyboards"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Kombinasi penggunaan kata sandi kuat, memverifikasi berita, dan melaporkan perundungan siber adalah bentuk nyata dari literasi digital dan keselamatan online yang baik."
+          },
+          "distractorWhy": {
+            "1": "Membagikan kata sandi dan mengklik tautan tidak dikenal adalah tindakan berisiko tinggi terhadap kejahatan siber.",
+            "2": "Abaikan peringatan keamanan dan mengunduh lampiran ilegal dapat merusak sistem komputer.",
+            "3": "Penipuan identitas dan mematikan benteng keamanan (firewall) melanggar etika serta hukum digital."
+          },
+          "sumber": {
+            "dokumen": "English for Nusantara untuk SMP/MTs Kelas IX",
+            "bab": "KOMP-ENG-D-9-BAB5-01"
+          }
+        }
+      ]
+    }
+  ]
+}

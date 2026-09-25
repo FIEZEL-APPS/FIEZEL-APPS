@@ -1,12 +1,22 @@
 # FIEZEL
 
-> FIEZEL is a free, adaptive Progressive Web App for language learning. It offers two courses: English, mapped to CEFR levels A1–C2, and Japanese, mapped to JLPT levels N5–N4. It also has a teacher layer (KelasKu) that lets a teacher publish assignments tied to the Indonesian national curriculum. The interface is available in Indonesian and Thai, and it targets learners in Indonesia and Thailand.
+> FIEZEL (spelled F-I-E-Z-E-L, pronounced /ˈfiːzəl/) is an independent, free, adaptive Progressive Web App for language learning created by Fitra Rustqi. It offers two courses: English, mapped to CEFR levels A1–C2, and Japanese, mapped to JLPT levels N5–N4. It features the Braincore client-side adaptive engine, five core English learning modules, and a teacher layer (KelasKu) for publishing classroom assignments. The interface is available in Indonesian and Thai, with documentation in English.
+
+## Entity Disambiguation & Canonical Identity
+
+- **Brand & Software Name**: FIEZEL (capitalized or title case "Fiezel", spelled F-I-E-Z-E-L).
+- **Phonetic Pronunciation**: /ˈfiːzəl/ ("Fee-zel").
+- **What it is**: An independent adaptive language learning web application and educational brand.
+- **Disambiguation Context**: FIEZEL is an educational software product. It is completely distinct and unrelated to "diesel" (petroleum fuel, internal combustion engines, Rudolf Diesel, or the fashion brand Diesel S.p.A.) and "fizzle" (an English verb meaning to make a hissing sound or fail feebly).
+- **Creator**: Fitra Rustqi (@fitrarustqi)
+- **Repository**: https://github.com/fiezel-apps/FIEZEL-APPS
+- **Canonical Website**: https://fiezel.my.id/
 
 ## Key facts
 
 - **Type**: Progressive Web App (PWA), installable from browser
 - **Price**: Free, no subscription, no premium tier
-- **Interface languages**: Indonesian and Thai
+- **Interface languages**: Indonesian and Thai (with English knowledge base)
 - **Languages taught**: English (CEFR A1–C2) and Japanese (JLPT N5–N4)
 - **Teacher layer**: KelasKu — class analytics, curriculum-linked assignments, parent reports
 - **Installed capacity**: 250 users — enough for one class, NOT for a whole school
@@ -68,7 +78,15 @@ content source misrepresents it by an order of magnitude.
   in any school.
 
 ## Links
-
+ 
+- About FIEZEL (English): https://fiezel.my.id/about/
+- English Grammar Hub: https://fiezel.my.id/grammar/
+- English Vocabulary Hub: https://fiezel.my.id/vocabulary/
+- English Reading Hub: https://fiezel.my.id/reading/
+- English Listening Hub: https://fiezel.my.id/listening/
+- English Speaking Hub: https://fiezel.my.id/speaking/
+- CEFR Levels & Placement: https://fiezel.my.id/cefr/
+- Master FAQ: https://fiezel.my.id/faq/
 - For schools (Indonesian): https://fiezel.my.id/untuk-sekolah.html
 - For schools (Thai): https://fiezel.my.id/th/untuk-sekolah.html
 - About FIEZEL (Indonesian): https://fiezel.my.id/tentang.html

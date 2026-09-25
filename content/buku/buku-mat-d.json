@@ -1,0 +1,2092 @@
+{
+  "schema": "fiezel-buku-bank-v1",
+  "subjectId": "MAT",
+  "phase": "fase_d",
+  "chapters": [
+    {
+      "code": "KOMP-MAT-D-7-BAB1-01",
+      "grade": 7,
+      "name": "Bilangan Bulat",
+      "materi": "",
+      "cpRef": "Matematika untuk SMP/MTs Kelas VII — Bab 1",
+      "target": 20,
+      "items": [
+        {
+          "id": "mat-d-7-b1-q01",
+          "difficulty": "dasar",
+          "prompt": "Berdasarkan Buku Siswa Matematika Kelas VII (hal. 10-14), jika suhu puncak pegunungan pada malam hari adalah -5°C dan pada siang hari naik sebesar 12°C, maka suhu puncak pegunungan pada siang hari adalah…",
+          "options": [
+            "7°C",
+            "-17°C",
+            "17°C",
+            "-7°C"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Kenaikan suhu dihitung dengan penjumlahan bilangan bulat: (-5) + 12 = +7°C."
+          },
+          "distractorWhy": {
+            "1": "Pengurangan (-5) - 12 = -17°C keliru karena kata 'naik' menunjukkan operasi penjumlahan.",
+            "2": "Penjumlahan mutlak |-5| + 12 = 17°C mengabaikan tanda negatif suhu awal.",
+            "3": "Hasil -7°C terjadi jika tanda operasi tertukar."
+          },
+          "sumber": {
+            "dokumen": "Matematika untuk SMP/MTs Kelas VII — Bab 1",
+            "bab": "KOMP-MAT-D-7-BAB1-01"
+          }
+        },
+        {
+          "id": "mat-d-7-b1-q02",
+          "difficulty": "dasar",
+          "prompt": "Berdasarkan Buku Siswa Matematika Kelas VII (hal. 18-20), hasil dari operasi perkalian (-8) × (-6) adalah…",
+          "options": [
+            "48",
+            "-48",
+            "14",
+            "-14"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Perkalian dua bilangan negatif menghasilkan bilangan positif: (-a) × (-b) = +(a × b) = 48."
+          },
+          "distractorWhy": {
+            "1": "Hasil -48 keliru menganggap perkalian dua negatif menghasilkan negatif.",
+            "2": "Nilai 14 terjadi akibat kesalahan mengira operasi sebagai penjumlahan.",
+            "3": "Nilai -14 terjadi akibat kesalahan penjumlahan tanda."
+          },
+          "sumber": {
+            "dokumen": "Matematika untuk SMP/MTs Kelas VII — Bab 1",
+            "bab": "KOMP-MAT-D-7-BAB1-01"
+          }
+        },
+        {
+          "id": "mat-d-7-b1-q03",
+          "difficulty": "dasar",
+          "prompt": "Berdasarkan Buku Siswa Matematika Kelas VII (hal. 25-28), Kelipatan Persekutuan Terkecil (KPK) dari bilangan 12 dan 18 adalah…",
+          "options": [
+            "36",
+            "6",
+            "72",
+            "54"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Faktorisasi prima 12 = 2² × 3 dan 18 = 2 × 3². KPK mengalikan faktor prima pangkat tertinggi: 2² × 3² = 4 × 9 = 36."
+          },
+          "distractorWhy": {
+            "1": "Angka 6 adalah FPB (Faktor Persekutuan Terbesar), bukan KPK.",
+            "2": "Angka 72 adalah kelipatan bersama tetapi bukan kelipatan terkecil.",
+            "3": "Angka 54 bukan kelipatan dari 12."
+          },
+          "sumber": {
+            "dokumen": "Matematika untuk SMP/MTs Kelas VII — Bab 1",
+            "bab": "KOMP-MAT-D-7-BAB1-01"
+          }
+        },
+        {
+          "id": "mat-d-7-b1-q04",
+          "difficulty": "sedang",
+          "prompt": "Berdasarkan Buku Siswa Matematika Kelas VII (hal. 30), seorang penyelam berada pada kedalaman 15 meter di bawah permukaan laut (-15 m). Penyelam tersebut kemudian menyelam lebih dalam sejauh 8 meter, lalu naik kembali sejauh 11 meter. Posisi akhir penyelam berada pada…",
+          "options": [
+            "12 meter di bawah permukaan laut (-12 m)",
+            "32 meter di bawah permukaan laut (-32 m)",
+            "4 meter di bawah permukaan laut (-4 m)",
+            "18 meter di bawah permukaan laut (-18 m)"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Posisi diawali dari -15 m. Menyelam lebih dalam ditambahkan (-8 m), lalu naik ditambahkan (+11 m): (-15) + (-8) + 11 = -23 + 11 = -12 m."
+          },
+          "distractorWhy": {
+            "1": "Nilai -32 m terjadi jika semua perubahan dianggap menyelam lebih dalam.",
+            "2": "Nilai -4 m keliru dalam perhitungan penjumlahan bertahap.",
+            "3": "Nilai -18 m keliru memproses arah gerakan naik dan turun."
+          },
+          "sumber": {
+            "dokumen": "Matematika untuk SMP/MTs Kelas VII — Bab 1",
+            "bab": "KOMP-MAT-D-7-BAB1-01"
+          }
+        },
+        {
+          "id": "mat-d-7-b1-q05",
+          "difficulty": "sedang",
+          "prompt": "Berdasarkan Buku Siswa Matematika Kelas VII (hal. 35 Latihan 1.3), hasil dari bentuk campuran (-24) : 4 + (-5) × 3 adalah…",
+          "options": [
+            "-21",
+            "3",
+            "-33",
+            "21"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Operasi pembagian dan perkalian didahulukan daripada penjumlahan: (-24) : 4 = -6, dan (-5) × 3 = -15. Kemudian (-6) + (-15) = -21."
+          },
+          "distractorWhy": {
+            "1": "Nilai 3 terjadi jika operasi dikerjakan dari kiri ke kanan tanpa hirarki matematika.",
+            "2": "Nilai -33 terjadi karena kesalahan perkalian pertengahan.",
+            "3": "Nilai 21 terjadi karena pengabaian tanda negatif pada kedua hasil."
+          },
+          "sumber": {
+            "dokumen": "Matematika untuk SMP/MTs Kelas VII — Bab 1",
+            "bab": "KOMP-MAT-D-7-BAB1-01"
+          }
+        },
+        {
+          "id": "mat-d-7-b1-q06",
+          "difficulty": "sedang",
+          "prompt": "Berdasarkan Buku Siswa Matematika Kelas VII (hal. 40), dalam ujian matematika terdiri dari 30 soal, setiap jawaban benar diberi skor 4, salah diberi skor -2, dan tidak dijawab diberi skor 0. Jika Rian menjawab benar 22 soal dan salah 5 soal, total skor Rian adalah…",
+          "options": [
+            "78",
+            "88",
+            "68",
+            "73"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Skor benar: 22 × 4 = 88. Skor salah: 5 × (-2) = -10. Tidak dijawab (30 - 22 - 5 = 3): 3 × 0 = 0. Total skor: 88 + (-10) + 0 = 78."
+          },
+          "distractorWhy": {
+            "1": "Nilai 88 hanya menghitung skor benar tanpa pengurangan jawaban salah.",
+            "2": "Nilai 68 terjadi jika pengurangan skor salah dianggap -4 per soal.",
+            "3": "Nilai 73 keliru dalam perhitungan perkalian nilai salah."
+          },
+          "sumber": {
+            "dokumen": "Matematika untuk SMP/MTs Kelas VII — Bab 1",
+            "bab": "KOMP-MAT-D-7-BAB1-01"
+          }
+        },
+        {
+          "id": "mat-d-7-b1-q07",
+          "difficulty": "tinggi",
+          "prompt": "Berdasarkan Buku Siswa Matematika Kelas VII (hal. 44 Ayo Uji Kemampuan No. 5), lampu A menyala setiap 8 detik sekali, sedangkan lampu B menyala setiap 12 detik sekali. Jika kedua lampu menyala bersamaan pada pukul 10:00:00, pada pukul berapa kedua lampu akan menyala bersamaan kembali untuk kedua kalinya?",
+          "options": [
+            "10:00:48",
+            "10:00:24",
+            "10:01:36",
+            "10:02:00"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "KPK dari 8 dan 12 adalah 24 detik. Lampu menyala bersamaan pertama kali pada detik ke-24 (10:00:24), dan menyala bersamaan untuk kedua kalinya pada 2 × 24 = 48 detik, yaitu pukul 10:00:48."
+          },
+          "distractorWhy": {
+            "1": "Pukul 10:00:24 adalah saat kedua lampu menyala bersamaan untuk pertama kalinya (bukan kedua kalinya).",
+            "2": "Pukul 10:01:36 adalah saat keempat kalinya (96 detik).",
+            "3": "Pukul 10:02:00 tidak sesuai dengan kelipatan KPK 24 detik."
+          },
+          "sumber": {
+            "dokumen": "Matematika untuk SMP/MTs Kelas VII — Bab 1",
+            "bab": "KOMP-MAT-D-7-BAB1-01"
+          }
+        },
+        {
+          "id": "mat-d-7-b1-q08",
+          "difficulty": "tinggi",
+          "prompt": "Berdasarkan Buku Siswa Matematika Kelas VII (hal. 48), Ibu memiliki 36 buah apel dan 48 buah jeruk yang akan dibagikan ke dalam kantong plastik dengan jumlah setiap buah sama banyak di setiap kantong tanpa sisa. Jumlah kantong plastik terbanyak yang dibutuhkan Ibu adalah…",
+          "options": [
+            "12 kantong",
+            "6 kantong",
+            "24 kantong",
+            "144 kantong"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Jumlah kantong terbanyak ditentukan oleh FPB dari 36 dan 48. Faktorisasi: 36 = 2² × 3², 48 = 2⁴ × 3. FPB = 2² × 3 = 4 × 3 = 12 kantong."
+          },
+          "distractorWhy": {
+            "1": "Nilai 6 adalah faktor persekutuan tetapi bukan faktor persekutuan terbesar.",
+            "2": "Nilai 24 bukan pembagi dari 36.",
+            "3": "Nilai 144 adalah KPK dari 36 dan 48, bukan FPB pembagian kantong."
+          },
+          "sumber": {
+            "dokumen": "Matematika untuk SMP/MTs Kelas VII — Bab 1",
+            "bab": "KOMP-MAT-D-7-BAB1-01"
+          }
+        },
+        {
+          "id": "mat-d-7-b1-q09",
+          "difficulty": "tinggi",
+          "prompt": "Berdasarkan Buku Siswa Matematika Kelas VII (hal. 52 Uji Kompetensi Bab 1), nilai dari ekspresi berpangkat (-3)⁴ - (-2)³ adalah…",
+          "options": [
+            "89",
+            "73",
+            "-73",
+            "81"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "(-3)⁴ = +81 (pangkat genap). (-2)³ = -8 (pangkat ganjil). Maka (-3)⁴ - (-2)³ = 81 - (-8) = 81 + 8 = 89."
+          },
+          "distractorWhy": {
+            "1": "Nilai 73 terjadi jika pengurangan (-8) dihitung sebagai 81 - 8.",
+            "2": "Nilai -73 keliru pada perkalian tanda pemangkatan.",
+            "3": "Nilai 81 hanya menghitung (-3)⁴ dan mengabaikan (-2)³."
+          },
+          "sumber": {
+            "dokumen": "Matematika untuk SMP/MTs Kelas VII — Bab 1",
+            "bab": "KOMP-MAT-D-7-BAB1-01"
+          }
+        },
+        {
+          "id": "mat-d-7-b1-q10",
+          "difficulty": "sedang",
+          "prompt": "Berdasarkan Buku Siswa Matematika Kelas VII (hal. 15), jika nilai a = -4, b = 3, dan c = -2, maka nilai dari ekspresi a × b - c adalah…",
+          "options": [
+            "-10",
+            "-14",
+            "10",
+            "14"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Substitusi nilai: (-4) × 3 - (-2) = -12 - (-2) = -12 + 2 = -10."
+          },
+          "distractorWhy": {
+            "1": "Nilai -14 terjadi jika -12 dikurangi 2 alih-alih ditambah 2.",
+            "2": "Nilai 10 terjadi akibat kesalahan tanda pada hasil (-4) × 3.",
+            "3": "Nilai 14 terjadi akibat kesalahan tanda bertumpuk."
+          },
+          "sumber": {
+            "dokumen": "Matematika untuk SMP/MTs Kelas VII — Bab 1",
+            "bab": "KOMP-MAT-D-7-BAB1-01"
+          }
+        },
+        {
+          "id": "mat-d-7-b1-q11",
+          "difficulty": "dasar",
+          "prompt": "Berdasarkan Buku Siswa Matematika Kelas VII (hal. 8), sifat komutatif pada penjumlahan bilangan bulat ditunjukkan oleh persamaan…",
+          "options": [
+            "a + b = b + a",
+            "(a + b) + c = a + (b + c)",
+            "a × (b + c) = a × b + a × c",
+            "a + 0 = a"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Sifat komutatif adalah sifat pertukaran letak dua bilangan pada operasi penjumlahan/perkalian: a + b = b + a."
+          },
+          "distractorWhy": {
+            "1": "(a + b) + c = a + (b + c) adalah sifat asosiatif (pengelompokan).",
+            "2": "a × (b + c) = a × b + a × c adalah sifat distributif (penyebaran).",
+            "3": "a + 0 = a adalah sifat identitas penjumlahan."
+          },
+          "sumber": {
+            "dokumen": "Matematika untuk SMP/MTs Kelas VII — Bab 1",
+            "bab": "KOMP-MAT-D-7-BAB1-01"
+          }
+        },
+        {
+          "id": "mat-d-7-b1-q12",
+          "difficulty": "sedang",
+          "prompt": "Berdasarkan Buku Siswa Matematika Kelas VII (hal. 22), urutan bilangan bulat berikut dari yang terkecil hingga terbesar adalah…",
+          "options": [
+            "-15, -8, -2, 0, 5, 9",
+            "9, 5, 0, -2, -8, -15",
+            "-2, -8, -15, 0, 5, 9",
+            "0, -2, -8, -15, 5, 9"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Pada garis bilangan, semakin ke kiri nilai bilangan semakin kecil. Maka -15 < -8 < -2 < 0 < 5 < 9."
+          },
+          "distractorWhy": {
+            "1": "Urutan dari terbesar ke terkecil.",
+            "2": "Urutan keliru menganggap -2 lebih kecil dari -15.",
+            "3": "Pengurutan acak pada bagian negatif."
+          },
+          "sumber": {
+            "dokumen": "Matematika untuk SMP/MTs Kelas VII — Bab 1",
+            "bab": "KOMP-MAT-D-7-BAB1-01"
+          }
+        },
+        {
+          "id": "mat-d-7-b1-q13",
+          "difficulty": "tinggi",
+          "prompt": "Berdasarkan Buku Siswa Matematika Kelas VII (hal. 55), kapal selam berada pada kedalaman 250 m di bawah laut. Kapal bergerak naik 80 m, lalu turun lagi 120 m. Jika posisi permukaan laut dianggap 0 m, posisi akhir kapal selam adalah…",
+          "options": [
+            "-290 m",
+            "-210 m",
+            "-450 m",
+            "-90 m"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Kedalaman awal = -250 m. Naik 80 m (+80), turun 120 m (-120). Posisi = -250 + 80 - 120 = -170 - 120 = -290 m."
+          },
+          "distractorWhy": {
+            "1": "Nilai -210 m keliru pada perhitungan gerak turun.",
+            "2": "Nilai -450 m menganggap semua perubahan sebagai gerakan turun.",
+            "3": "Nilai -90 m keliru memproses tanda kedalaman awal."
+          },
+          "sumber": {
+            "dokumen": "Matematika untuk SMP/MTs Kelas VII — Bab 1",
+            "bab": "KOMP-MAT-D-7-BAB1-01"
+          }
+        },
+        {
+          "id": "mat-d-7-b1-q14",
+          "difficulty": "dasar",
+          "prompt": "Berdasarkan Buku Siswa Matematika Kelas VII (hal. 12), invers penjumlahan (lawan) dari bilangan -37 adalah…",
+          "options": [
+            "37",
+            "-37",
+            "1/37",
+            "-1/37"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Invers penjumlahan dari suatu bilangan a adalah -a sehingga a + (-a) = 0. Lawan dari -37 adalah +37."
+          },
+          "distractorWhy": {
+            "1": "Bilangan -37 adalah bilangan itu sendiri.",
+            "2": "Nilai 1/37 adalah invers perkalian (kebalikan), bukan invers penjumlahan.",
+            "3": "Nilai -1/37 adalah kebalikan negatif."
+          },
+          "sumber": {
+            "dokumen": "Matematika untuk SMP/MTs Kelas VII — Bab 1",
+            "bab": "KOMP-MAT-D-7-BAB1-01"
+          }
+        },
+        {
+          "id": "mat-d-7-b1-q15",
+          "difficulty": "sedang",
+          "prompt": "Berdasarkan Buku Siswa Matematika Kelas VII (hal. 38), toko grosir menerima pasokan 15 dus mie instan. Setiap dus berisi 40 bungkus mie. Jika mie tersebut dibagikan secara merata kepada 25 panti asuhan, banyak bungkus mie yang diterima tiap panti asuhan adalah…",
+          "options": [
+            "24 bungkus",
+            "20 bungkus",
+            "30 bungkus",
+            "15 bungkus"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Total mie instan = 15 × 40 = 600 bungkus. Mie per panti asuhan = 600 : 25 = 24 bungkus."
+          },
+          "distractorWhy": {
+            "1": "Nilai 20 bungkus keliru pada pembagian akhir 600 : 25.",
+            "2": "Nilai 30 bungkus keliru perkalian total bungkus.",
+            "3": "Nilai 15 bungkus hanya mengambil angka jumlah dus."
+          },
+          "sumber": {
+            "dokumen": "Matematika untuk SMP/MTs Kelas VII — Bab 1",
+            "bab": "KOMP-MAT-D-7-BAB1-01"
+          }
+        },
+        {
+          "id": "mat-d-7-b1-q16",
+          "difficulty": "tinggi",
+          "prompt": "Berdasarkan Buku Siswa Matematika Kelas VII (hal. 60 Uji Kemampuan), nilai dari (12 + (-8)) × (-5) : (-2) adalah…",
+          "options": [
+            "10",
+            "-10",
+            "50",
+            "-50"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Hitung dalam kurung: 12 + (-8) = 4. Lalu perkalian: 4 × (-5) = -20. Lalu pembagian: (-20) : (-2) = +10."
+          },
+          "distractorWhy": {
+            "1": "Nilai -10 terjadi jika pembagian dua negatif dihitung sebagai negatif.",
+            "2": "Nilai 50 terjadi karena kesalahan hasil penjumlahan dalam kurung.",
+            "3": "Nilai -50 terjadi akibat kesalahan tanda ganda."
+          },
+          "sumber": {
+            "dokumen": "Matematika untuk SMP/MTs Kelas VII — Bab 1",
+            "bab": "KOMP-MAT-D-7-BAB1-01"
+          }
+        }
+      ]
+    },
+    {
+      "code": "KOMP-MAT-D-7-BAB2-01",
+      "grade": 7,
+      "name": "Aljabar",
+      "materi": "",
+      "cpRef": "Matematika untuk SMP/MTs Kelas VII — Bab 2",
+      "target": 20,
+      "items": [
+        {
+          "id": "mat-d-7-b2-q01",
+          "difficulty": "dasar",
+          "prompt": "Berdasarkan Buku Siswa Matematika Kelas VII (hal. 68-72), koefisien dari variabel x² pada bentuk aljabar 5x³ - 3x² + 7x - 12 adalah…",
+          "options": [
+            "-3",
+            "3",
+            "5",
+            "7"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Koefisien adalah angka pengali yang melekat pada variabel tertentu. Pada suku -3x², koefisien variabel x² adalah -3."
+          },
+          "distractorWhy": {
+            "1": "Nilai 3 mengabaikan tanda negatif pada suku -3x².",
+            "2": "Nilai 5 adalah koefisien suku x³.",
+            "3": "Nilai 7 adalah koefisien suku x."
+          },
+          "sumber": {
+            "dokumen": "Matematika untuk SMP/MTs Kelas VII — Bab 2",
+            "bab": "KOMP-MAT-D-7-BAB2-01"
+          }
+        },
+        {
+          "id": "mat-d-7-b2-q02",
+          "difficulty": "dasar",
+          "prompt": "Berdasarkan Buku Siswa Matematika Kelas VII (hal. 75), kelompok suku-suku berikut yang merupakan suku sejenis adalah…",
+          "options": [
+            "4x²y dan -7x²y",
+            "3x² dan 3y²",
+            "5a dan 5ab",
+            "2px dan 2py"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Suku sejenis adalah suku-suku yang memiliki variabel yang sama persis beserta pangkat dari variabelnya (x²y)."
+          },
+          "distractorWhy": {
+            "1": "Variabel x² dan y² berbeda huruf dasar.",
+            "2": "Suku 5a dan 5ab memiliki variabel berbeda (ab mengandung b).",
+            "3": "Variabel px dan py tidak sama."
+          },
+          "sumber": {
+            "dokumen": "Matematika untuk SMP/MTs Kelas VII — Bab 2",
+            "bab": "KOMP-MAT-D-7-BAB2-01"
+          }
+        },
+        {
+          "id": "mat-d-7-b2-q03",
+          "difficulty": "sedang",
+          "prompt": "Berdasarkan Buku Siswa Matematika Kelas VII (hal. 80 Ayo Uji Kemampuan), bentuk sederhana dari (7a - 4b) + (3a + 9b) adalah…",
+          "options": [
+            "10a + 5b",
+            "10a - 13b",
+            "4a + 5b",
+            "10a + 13b"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Kelompokkan suku sejenis: (7a + 3a) + (-4b + 9b) = 10a + 5b."
+          },
+          "distractorWhy": {
+            "1": "Hasil 10a - 13b keliru mengoperasikan (-4b) + (9b) sebagai -13b.",
+            "2": "Hasil 4a + 5b keliru mengalikan atau mengurangi suku 7a - 3a.",
+            "3": "Hasil 10a + 13b keliru pada penjumlahan mutlak 4b + 9b."
+          },
+          "sumber": {
+            "dokumen": "Matematika untuk SMP/MTs Kelas VII — Bab 2",
+            "bab": "KOMP-MAT-D-7-BAB2-01"
+          }
+        },
+        {
+          "id": "mat-d-7-b2-q04",
+          "difficulty": "sedang",
+          "prompt": "Berdasarkan Buku Siswa Matematika Kelas VII (hal. 84), pengurangan (5x - 3y) dari (8x + 2y) menghasilkan bentuk aljabar…",
+          "options": [
+            "3x + 5y",
+            "3x - 5y",
+            "-3x - 5y",
+            "13x - y"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Frasa 'pengurangan A dari B' berarti B - A: (8x + 2y) - (5x - 3y) = 8x + 2y - 5x + 3y = (8x - 5x) + (2y + 3y) = 3x + 5y."
+          },
+          "distractorWhy": {
+            "1": "Hasil 3x - 5y keliru tidak mengubah tanda -(-3y) menjadi +3y.",
+            "2": "Hasil -3x - 5y keliru membalik arah pengurangan.",
+            "3": "Hasil 13x - y terjadi jika dikerjakan sebagai penjumlahan A + B."
+          },
+          "sumber": {
+            "dokumen": "Matematika untuk SMP/MTs Kelas VII — Bab 2",
+            "bab": "KOMP-MAT-D-7-BAB2-01"
+          }
+        },
+        {
+          "id": "mat-d-7-b2-q05",
+          "difficulty": "tinggi",
+          "prompt": "Berdasarkan Buku Siswa Matematika Kelas VII (hal. 88), hasil dari perkalian (2x - 3)(3x + 4) adalah…",
+          "options": [
+            "6x² - x - 12",
+            "6x² + x - 12",
+            "6x² - 12",
+            "6x² + 17x - 12"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Perkalian distributif: 2x(3x + 4) - 3(3x + 4) = 6x² + 8x - 9x - 12 = 6x² - x - 12."
+          },
+          "distractorWhy": {
+            "1": "Hasil 6x² + x - 12 keliru tanda suku tengah +8x - 9x.",
+            "2": "Hasil 6x² - 12 mengabaikan suku tengah (8x - 9x).",
+            "3": "Hasil 6x² + 17x - 12 keliru menambahkan 8x + 9x tanpa memperhatikan tanda negatif."
+          },
+          "sumber": {
+            "dokumen": "Matematika untuk SMP/MTs Kelas VII — Bab 2",
+            "bab": "KOMP-MAT-D-7-BAB2-01"
+          }
+        },
+        {
+          "id": "mat-d-7-b2-q06",
+          "difficulty": "sedang",
+          "prompt": "Berdasarkan Buku Siswa Matematika Kelas VII (hal. 92), jika x = -2 dan y = 3, maka nilai dari bentuk aljabar 3x² - 2xy + y² adalah…",
+          "options": [
+            "33",
+            "15",
+            "-15",
+            "21"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Substitusi x = -2 dan y = 3: 3(-2)² - 2(-2)(3) + (3)² = 3(4) - (-12) + 9 = 12 + 12 + 9 = 33."
+          },
+          "distractorWhy": {
+            "1": "Nilai 15 terjadi jika -2(-2)(3) dihitung sebagai -12 alih-alih +12.",
+            "2": "Nilai -15 terjadi karena kesalahan kuadrat (-2)² menjadi -4.",
+            "3": "Nilai 21 mengabaikan suku tengah -2xy."
+          },
+          "sumber": {
+            "dokumen": "Matematika untuk SMP/MTs Kelas VII — Bab 2",
+            "bab": "KOMP-MAT-D-7-BAB2-01"
+          }
+        },
+        {
+          "id": "mat-d-7-b2-q07",
+          "difficulty": "tinggi",
+          "prompt": "Berdasarkan Buku Siswa Matematika Kelas VII (hal. 96 Uji Kompetensi Bab 2), harga 3 buah buku tulis dan 2 buah pensil adalah Rp21.000,00. Jika harga 1 buah pensil dinyatakan sebagai p rupiah, dan harga 1 buah buku tulis adalah Rp2.000,00 lebih mahal dari pensil, persamaan aljabar yang tepat untuk menyatakan total harga tersebut adalah…",
+          "options": [
+            "5p + 6.000 = 21.000",
+            "5p + 2.000 = 21.000",
+            "3p + 2.000 = 21.000",
+            "6p + 4.000 = 21.000"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Misal pensil = p, maka buku = p + 2.000. Total harga = 3(buku) + 2(pensil) = 3(p + 2.000) + 2p = 3p + 6.000 + 2p = 5p + 6.000 = 21.000."
+          },
+          "distractorWhy": {
+            "1": "Hasil 5p + 2.000 tidak mengalikan selisih Rp2.000 dengan 3 buku.",
+            "2": "Hasil 3p + 2.000 mengabaikan harga 2 pensil.",
+            "3": "Hasil 6p + 4.000 keliru pemodelan koefisien."
+          },
+          "sumber": {
+            "dokumen": "Matematika untuk SMP/MTs Kelas VII — Bab 2",
+            "bab": "KOMP-MAT-D-7-BAB2-01"
+          }
+        },
+        {
+          "id": "mat-d-7-b2-q08",
+          "difficulty": "dasar",
+          "prompt": "Berdasarkan Buku Siswa Matematika Kelas VII (hal. 70), konstanta pada bentuk aljabar 4a² - 9a + 15 adalah…",
+          "options": [
+            "15",
+            "-9",
+            "4",
+            "a²"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Konstanta adalah suku berupa bilangan murni yang tidak memuat variabel. Suku konstanta adalah +15."
+          },
+          "distractorWhy": {
+            "1": "Angka -9 adalah koefisien suku a.",
+            "2": "Angka 4 adalah koefisien suku a².",
+            "3": "Huruf a² adalah variabel."
+          },
+          "sumber": {
+            "dokumen": "Matematika untuk SMP/MTs Kelas VII — Bab 2",
+            "bab": "KOMP-MAT-D-7-BAB2-01"
+          }
+        },
+        {
+          "id": "mat-d-7-b2-q09",
+          "difficulty": "sedang",
+          "prompt": "Berdasarkan Buku Siswa Matematika Kelas VII (hal. 86), pembagian bentuk aljabar (12x²y - 8xy²) : (4xy) menghasilkan…",
+          "options": [
+            "3x - 2y",
+            "3x + 2y",
+            "3x² - 2y²",
+            "8x - 4y"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Masing-masing suku dibagi 4xy: (12x²y / 4xy) - (8xy² / 4xy) = 3x - 2y."
+          },
+          "distractorWhy": {
+            "1": "Hasil 3x + 2y keliru tanda operasi pengurangan.",
+            "2": "Hasil 3x² - 2y² keliru tidak mengurangi pangkat variabel pembagian.",
+            "3": "Hasil 8x - 4y keliru mengurangi koefisien 12 - 4 dan 8 - 4 alih-alih membagi."
+          },
+          "sumber": {
+            "dokumen": "Matematika untuk SMP/MTs Kelas VII — Bab 2",
+            "bab": "KOMP-MAT-D-7-BAB2-01"
+          }
+        },
+        {
+          "id": "mat-d-7-b2-q10",
+          "difficulty": "tinggi",
+          "prompt": "Berdasarkan Buku Siswa Matematika Kelas VII (hal. 98), keliling sebuah persegi panjang dinyatakan sebagai 4x + 10 cm. Jika panjang persegi panjang tersebut adalah x + 7 cm, maka lebar persegi panjang tersebut dalam variabel x adalah…",
+          "options": [
+            "x - 2 cm",
+            "x + 3 cm",
+            "2x - 4 cm",
+            "x + 2 cm"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Keliling K = 2(p + l) => 4x + 10 = 2(x + 7 + l) => 2x + 5 = x + 7 + l => l = (2x + 5) - (x + 7) = x - 2 cm."
+          },
+          "distractorWhy": {
+            "1": "Nilai x + 3 cm keliru pengurangan 5 - 7.",
+            "2": "Nilai 2x - 4 cm keliru pembagian keliling.",
+            "3": "Nilai x + 2 cm keliru tanda operasi."
+          },
+          "sumber": {
+            "dokumen": "Matematika untuk SMP/MTs Kelas VII — Bab 2",
+            "bab": "KOMP-MAT-D-7-BAB2-01"
+          }
+        },
+        {
+          "id": "mat-d-7-b2-q11",
+          "difficulty": "dasar",
+          "prompt": "Berdasarkan Buku Siswa Matematika Kelas VII (hal. 66), variabel dalam bentuk aljabar 8p - 3q + 5 adalah…",
+          "options": [
+            "p dan q",
+            "8 dan -3",
+            "5",
+            "p, q, dan 5"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Variabel adalah lambang pengganti suatu bilangan yang belum diketahui nilainya, dinyatakan dalam huruf (p dan q)."
+          },
+          "distractorWhy": {
+            "1": "Angka 8 dan -3 adalah koefisien.",
+            "2": "Angka 5 adalah konstanta.",
+            "3": "Angka 5 bukan variabel."
+          },
+          "sumber": {
+            "dokumen": "Matematika untuk SMP/MTs Kelas VII — Bab 2",
+            "bab": "KOMP-MAT-D-7-BAB2-01"
+          }
+        },
+        {
+          "id": "mat-d-7-b2-q12",
+          "difficulty": "sedang",
+          "prompt": "Berdasarkan Buku Siswa Matematika Kelas VII (hal. 82), penyederhanaan bentuk aljabar 3(2x - 5) - 2(x + 4) adalah…",
+          "options": [
+            "4x - 23",
+            "4x - 7",
+            "4x + 23",
+            "8x - 23"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Jabarkan distributif: 6x - 15 - 2x - 8 = (6x - 2x) + (-15 - 8) = 4x - 23."
+          },
+          "distractorWhy": {
+            "1": "Hasil 4x - 7 keliru menghitung -15 - 8 menjadi -7 alih-alih -23.",
+            "2": "Hasil 4x + 23 keliru tanda positif negatif.",
+            "3": "Hasil 8x - 23 keliru penjumlahan 6x + 2x."
+          },
+          "sumber": {
+            "dokumen": "Matematika untuk SMP/MTs Kelas VII — Bab 2",
+            "bab": "KOMP-MAT-D-7-BAB2-01"
+          }
+        }
+      ]
+    },
+    {
+      "code": "KOMP-MAT-D-7-BAB3-01",
+      "grade": 7,
+      "name": "Rasio dan Proporsi",
+      "materi": "",
+      "cpRef": "Ilmu Pengetahuan Alam untuk SMP/MTs Kelas VII (Edisi Revisi)",
+      "target": 12,
+      "items": [
+        {
+          "id": "mat-d-7-b3-q01",
+          "difficulty": "dasar",
+          "prompt": "Berdasarkan Buku Siswa Matematika Kelas VII (hal. 102-106), bentuk paling sederhana dari rasio 24 : 36 adalah…",
+          "options": [
+            "2 : 3",
+            "4 : 6",
+            "1 : 2",
+            "3 : 4"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Kedua angka dibagi FPB (12): 24:12 = 2 dan 36:12 = 3. Bentuk sederhana 2 : 3."
+          },
+          "distractorWhy": {
+            "1": "4 : 6 belum paling sederhana (masih bisa dibagi 2).",
+            "2": "1 : 2 salah pembagian.",
+            "3": "3 : 4 terbalik."
+          },
+          "sumber": {
+            "dokumen": "Ilmu Pengetahuan Alam untuk SMP/MTs Kelas VII (Edisi Revisi)",
+            "bab": "KOMP-MAT-D-7-BAB3-01"
+          }
+        },
+        {
+          "id": "mat-d-7-b3-q02",
+          "difficulty": "sedang",
+          "prompt": "Berdasarkan Buku Siswa Matematika Kelas VII (hal. 110 Perbandingan Senilai), harga 5 kg beras adalah Rp60.000,00. Harga 8 kg beras yang sama adalah…",
+          "options": [
+            "Rp96.000,00",
+            "Rp80.000,00",
+            "Rp100.000,00",
+            "Rp90.000,00"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Harga per kg = 60.000 / 5 = 12.000. Harga 8 kg = 8 × 12.000 = Rp96.000,00."
+          },
+          "distractorWhy": {
+            "1": "80.000 keliru.",
+            "2": "100.000 keliru.",
+            "3": "90.000 keliru."
+          },
+          "sumber": {
+            "dokumen": "Ilmu Pengetahuan Alam untuk SMP/MTs Kelas VII (Edisi Revisi)",
+            "bab": "KOMP-MAT-D-7-BAB3-01"
+          }
+        },
+        {
+          "id": "mat-d-7-b3-q03",
+          "difficulty": "tinggi",
+          "prompt": "Berdasarkan Buku Siswa Matematika Kelas VII (hal. 118 Perbandingan Berbalik Nilai), sebuah pekerjaan pembangunan gedung dapat diselesaikan oleh 12 pekerja dalam waktu 20 hari. Jika pekerjaan ingin diselesaikan dalam waktu 15 hari, banyak pekerja yang dibutuhkan adalah…",
+          "options": [
+            "16 pekerja",
+            "15 pekerja",
+            "18 pekerja",
+            "20 pekerja"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Perbandingan berbalik nilai: 12 × 20 = x × 15 => x = 240 / 15 = 16 pekerja."
+          },
+          "distractorWhy": {
+            "1": "15 pekerja keliru.",
+            "2": "18 pekerja keliru.",
+            "3": "20 pekerja keliru."
+          },
+          "sumber": {
+            "dokumen": "Ilmu Pengetahuan Alam untuk SMP/MTs Kelas VII (Edisi Revisi)",
+            "bab": "KOMP-MAT-D-7-BAB3-01"
+          }
+        },
+        {
+          "id": "mat-d-7-b3-q04",
+          "difficulty": "sedang",
+          "prompt": "Berdasarkan Buku Siswa Matematika Kelas VII (hal. 125 Skala Peta), jarak antara Kota A dan Kota B pada peta berskala 1 : 2.000.000 adalah 4 cm. Jarak sebenarnya di permukaan bumi adalah…",
+          "options": [
+            "80 km",
+            "8 km",
+            "800 km",
+            "50 km"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Jarak asli = 4 cm × 2.000.000 = 8.000.000 cm = 80 km."
+          },
+          "distractorWhy": {
+            "1": "8 km salah konversi cm ke km.",
+            "2": "800 km berlebihan nol.",
+            "3": "50 km keliru perkalian."
+          },
+          "sumber": {
+            "dokumen": "Ilmu Pengetahuan Alam untuk SMP/MTs Kelas VII (Edisi Revisi)",
+            "bab": "KOMP-MAT-D-7-BAB3-01"
+          }
+        },
+        {
+          "id": "mat-d-7-b3-q05",
+          "difficulty": "dasar",
+          "prompt": "Berdasarkan Buku Siswa Matematika Kelas VII (hal. 108), di dalam sebuah kelas terdapat 15 siswa laki-laki dan 20 siswa perempuan. Rasio siswa laki-laki terhadap seluruh siswa di kelas adalah…",
+          "options": [
+            "3 : 7",
+            "3 : 4",
+            "4 : 3",
+            "3 : 5"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Total siswa = 15 + 20 = 35. Rasio laki-laki : total = 15 : 35 = 3 : 7."
+          },
+          "distractorWhy": {
+            "1": "3 : 4 adalah rasio laki-laki : perempuan.",
+            "2": "4 : 3 adalah perempuan : laki-laki.",
+            "3": "3 : 5 salah penyederhanaan."
+          },
+          "sumber": {
+            "dokumen": "Ilmu Pengetahuan Alam untuk SMP/MTs Kelas VII (Edisi Revisi)",
+            "bab": "KOMP-MAT-D-7-BAB3-01"
+          }
+        },
+        {
+          "id": "mat-d-7-b3-q06",
+          "difficulty": "tinggi",
+          "prompt": "Berdasarkan Buku Siswa Matematika Kelas VII (hal. 130 Kecepatan), sebuah mobil melaju dengan kecepatan rata-rata 60 km/jam dan membutuhkan waktu 3 jam untuk sampai di tujuan. Jika mobil melaju dengan kecepatan 90 km/jam, waktu yang dibutuhkan adalah…",
+          "options": [
+            "2 jam",
+            "1,5 jam",
+            "2,5 jam",
+            "4 jam"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Jarak = v × t = 60 × 3 = 180 km. Waktu baru = 180 / 90 = 2 jam."
+          },
+          "distractorWhy": {
+            "1": "1,5 jam keliru.",
+            "2": "2,5 jam keliru.",
+            "3": "4 jam keliru."
+          },
+          "sumber": {
+            "dokumen": "Ilmu Pengetahuan Alam untuk SMP/MTs Kelas VII (Edisi Revisi)",
+            "bab": "KOMP-MAT-D-7-BAB3-01"
+          }
+        },
+        {
+          "id": "mat-d-7-b3-q07",
+          "difficulty": "dasar",
+          "prompt": "Berdasarkan Buku Siswa Matematika Kelas VII (hal. 104), rasio senilai dengan 4 : 5 adalah…",
+          "options": [
+            "12 : 15",
+            "8 : 12",
+            "16 : 25",
+            "10 : 12"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "4×3 : 5×3 = 12 : 15."
+          },
+          "distractorWhy": {
+            "1": "8:12 = 2:3.",
+            "2": "16:25 = (4/5)².",
+            "3": "10:12 = 5:6."
+          },
+          "sumber": {
+            "dokumen": "Ilmu Pengetahuan Alam untuk SMP/MTs Kelas VII (Edisi Revisi)",
+            "bab": "KOMP-MAT-D-7-BAB3-01"
+          }
+        },
+        {
+          "id": "mat-d-7-b3-q08",
+          "difficulty": "sedang",
+          "prompt": "Berdasarkan Buku Siswa Matematika Kelas VII (hal. 115), resep kue membutuhkan 200 gram gula untuk 500 gram tepung. Jika Ibu menggunakan 750 gram tepung, gula yang dibutuhkan adalah…",
+          "options": [
+            "300 gram",
+            "250 gram",
+            "350 gram",
+            "400 gram"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Gula = (750 / 500) × 200 = 1,5 × 200 = 300 gram."
+          },
+          "distractorWhy": {
+            "1": "250 g keliru.",
+            "2": "350 g keliru.",
+            "3": "400 g keliru."
+          },
+          "sumber": {
+            "dokumen": "Ilmu Pengetahuan Alam untuk SMP/MTs Kelas VII (Edisi Revisi)",
+            "bab": "KOMP-MAT-D-7-BAB3-01"
+          }
+        },
+        {
+          "id": "mat-d-7-b3-q09",
+          "difficulty": "tinggi",
+          "prompt": "Berdasarkan Buku Siswa Matematika Kelas VII (hal. 128 Uji Kemampuan), persediaan makanan untuk 30 ekor sapi cukup untuk 12 hari. Jika sapi bertambah 6 ekor, makanan tersebut akan habis dalam…",
+          "options": [
+            "10 hari",
+            "9 hari",
+            "8 hari",
+            "11 hari"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Total sapi = 36. Berbalik nilai: 30 × 12 = 36 × h => h = 360 / 36 = 10 hari."
+          },
+          "distractorWhy": {
+            "1": "9 hari keliru.",
+            "2": "8 hari keliru.",
+            "3": "11 hari keliru."
+          },
+          "sumber": {
+            "dokumen": "Ilmu Pengetahuan Alam untuk SMP/MTs Kelas VII (Edisi Revisi)",
+            "bab": "KOMP-MAT-D-7-BAB3-01"
+          }
+        },
+        {
+          "id": "mat-d-7-b3-q10",
+          "difficulty": "dasar",
+          "prompt": "Berdasarkan Buku Siswa Matematika Kelas VII (hal. 122), skala foto menunjukan 1 : 20. Jika tinggi rumah pada foto adalah 15 cm, tinggi asli rumah tersebut adalah…",
+          "options": [
+            "3 meter (300 cm)",
+            "30 meter",
+            "1,5 meter",
+            "30 cm"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Tinggi asli = 15 cm × 20 = 300 cm = 3 meter."
+          },
+          "distractorWhy": {
+            "1": "30 m berlebihan.",
+            "2": "1,5 m keliru.",
+            "3": "30 cm keliru."
+          },
+          "sumber": {
+            "dokumen": "Ilmu Pengetahuan Alam untuk SMP/MTs Kelas VII (Edisi Revisi)",
+            "bab": "KOMP-MAT-D-7-BAB3-01"
+          }
+        },
+        {
+          "id": "mat-d-7-b3-q11",
+          "difficulty": "sedang",
+          "prompt": "Berdasarkan Buku Siswa Matematika Kelas VII (hal. 112), rasio jumlah uang Tabungan Ani dan Budi adalah 3 : 5. Jika jumlah uang mereka berdua adalah Rp400.000,00, besar uang Budi adalah…",
+          "options": [
+            "Rp250.000,00",
+            "Rp150.000,00",
+            "Rp200.000,00",
+            "Rp300.000,00"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Uang Budi = (5 / (3+5)) × 400.000 = (5/8) × 400.000 = Rp250.000,00."
+          },
+          "distractorWhy": {
+            "1": "150.000 uang Ani.",
+            "2": "200.000 setengahnya.",
+            "3": "300.000 keliru."
+          },
+          "sumber": {
+            "dokumen": "Ilmu Pengetahuan Alam untuk SMP/MTs Kelas VII (Edisi Revisi)",
+            "bab": "KOMP-MAT-D-7-BAB3-01"
+          }
+        },
+        {
+          "id": "mat-d-7-b3-q12",
+          "difficulty": "tinggi",
+          "prompt": "Berdasarkan Buku Siswa Matematika Kelas VII (hal. 132), selisih umur Ayah dan Kaka adalah 24 tahun. Jika rasio umur Ayah dan Kaka adalah 7 : 3, umur Ayah adalah…",
+          "options": [
+            "42 tahun",
+            "18 tahun",
+            "36 tahun",
+            "48 tahun"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Selisih rasio = 7 - 3 = 4 bagian. 1 bagian = 24 / 4 = 6 tahun. Umur Ayah = 7 × 6 = 42 tahun."
+          },
+          "distractorWhy": {
+            "1": "18 tahun umur Kaka.",
+            "2": "36 tahun keliru.",
+            "3": "48 tahun keliru."
+          },
+          "sumber": {
+            "dokumen": "Ilmu Pengetahuan Alam untuk SMP/MTs Kelas VII (Edisi Revisi)",
+            "bab": "KOMP-MAT-D-7-BAB3-01"
+          }
+        }
+      ]
+    },
+    {
+      "code": "KOMP-MAT-D-7-BAB4-01",
+      "grade": 7,
+      "name": "Bentuk Geometri dan Bangun Datar",
+      "materi": "",
+      "cpRef": "Ilmu Pengetahuan Alam untuk SMP/MTs Kelas VII (Edisi Revisi)",
+      "target": 12,
+      "items": [
+        {
+          "id": "mat-d-7-b4-q01",
+          "difficulty": "dasar",
+          "prompt": "Berdasarkan Buku Siswa Matematika Kelas VII (hal. 140-144), sudut berpelurus (suplemen) memiliki jumlah besar sudut sebesar…",
+          "options": [
+            "180°",
+            "90°",
+            "360°",
+            "45°"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Dua sudut dikatakan berpelurus jika jumlah kedua sudutnya membentuk garis lurus 180°."
+          },
+          "distractorWhy": {
+            "1": "90° adalah sudut berpenyiku (komplemen).",
+            "2": "360° adalah sudut satu putaran penuh.",
+            "3": "45° sudut lancip."
+          },
+          "sumber": {
+            "dokumen": "Ilmu Pengetahuan Alam untuk SMP/MTs Kelas VII (Edisi Revisi)",
+            "bab": "KOMP-MAT-D-7-BAB4-01"
+          }
+        },
+        {
+          "id": "mat-d-7-b4-q02",
+          "difficulty": "sedang",
+          "prompt": "Berdasarkan Buku Siswa Matematika Kelas VII (hal. 150), luas sebuah persegi panjang dengan panjang 12 cm dan lebar 8 cm adalah…",
+          "options": [
+            "96 cm²",
+            "40 cm²",
+            "48 cm²",
+            "80 cm²"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Luas persegi panjang L = p × l = 12 cm × 8 cm = 96 cm²."
+          },
+          "distractorWhy": {
+            "1": "40 cm keliling (2(12+8)).",
+            "2": "48 cm² setengahnya.",
+            "3": "80 cm² keliru."
+          },
+          "sumber": {
+            "dokumen": "Ilmu Pengetahuan Alam untuk SMP/MTs Kelas VII (Edisi Revisi)",
+            "bab": "KOMP-MAT-D-7-BAB4-01"
+          }
+        },
+        {
+          "id": "mat-d-7-b4-q03",
+          "difficulty": "sedang",
+          "prompt": "Berdasarkan Buku Siswa Matematika Kelas VII (hal. 158 Luas Segitiga), sebuah segitiga memiliki alas 10 cm dan tinggi 14 cm. Luas segitiga tersebut adalah…",
+          "options": [
+            "70 cm²",
+            "140 cm²",
+            "35 cm²",
+            "48 cm²"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Luas segitiga L = 1/2 × a × t = 1/2 × 10 cm × 14 cm = 70 cm²."
+          },
+          "distractorWhy": {
+            "1": "140 cm² lupa dibagi 2.",
+            "2": "35 cm² keliru.",
+            "3": "48 cm² keliru."
+          },
+          "sumber": {
+            "dokumen": "Ilmu Pengetahuan Alam untuk SMP/MTs Kelas VII (Edisi Revisi)",
+            "bab": "KOMP-MAT-D-7-BAB4-01"
+          }
+        },
+        {
+          "id": "mat-d-7-b4-q04",
+          "difficulty": "tinggi",
+          "prompt": "Berdasarkan Buku Siswa Matematika Kelas VII (hal. 165 Jajar Genjang), jajar genjang memiliki alas a = 15 cm dan tinggi t = 8 cm. Luas jajar genjang tersebut adalah…",
+          "options": [
+            "120 cm²",
+            "60 cm²",
+            "46 cm²",
+            "90 cm²"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Luas jajar genjang L = a × t = 15 cm × 8 cm = 120 cm²."
+          },
+          "distractorWhy": {
+            "1": "60 cm² keliru dibagi 2 seperti segitiga.",
+            "2": "46 cm² keliling.",
+            "3": "90 cm² keliru."
+          },
+          "sumber": {
+            "dokumen": "Ilmu Pengetahuan Alam untuk SMP/MTs Kelas VII (Edisi Revisi)",
+            "bab": "KOMP-MAT-D-7-BAB4-01"
+          }
+        },
+        {
+          "id": "mat-d-7-b4-q05",
+          "difficulty": "tinggi",
+          "prompt": "Berdasarkan Buku Siswa Matematika Kelas VII (hal. 172 Trapesium), sebuah trapesium memiliki panjang sisi sejajar a = 12 cm dan b = 18 cm, serta tinggi t = 10 cm. Luas trapesium adalah…",
+          "options": [
+            "150 cm²",
+            "300 cm²",
+            "108 cm²",
+            "216 cm²"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Luas trapesium L = 1/2 × (a + b) × t = 1/2 × (12 + 18) × 10 = 1/2 × 30 × 10 = 150 cm²."
+          },
+          "distractorWhy": {
+            "1": "300 cm² lupa dibagi 2.",
+            "2": "108 cm² keliru.",
+            "3": "216 cm² keliru."
+          },
+          "sumber": {
+            "dokumen": "Ilmu Pengetahuan Alam untuk SMP/MTs Kelas VII (Edisi Revisi)",
+            "bab": "KOMP-MAT-D-7-BAB4-01"
+          }
+        },
+        {
+          "id": "mat-d-7-b4-q06",
+          "difficulty": "dasar",
+          "prompt": "Berdasarkan Buku Siswa Matematika Kelas VII (hal. 148), keliling persegi dengan panjang sisi s = 15 cm adalah…",
+          "options": [
+            "60 cm",
+            "225 cm²",
+            "30 cm",
+            "45 cm"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Keliling persegi K = 4 × s = 4 × 15 cm = 60 cm."
+          },
+          "distractorWhy": {
+            "1": "225 cm² adalah Luas (s²).",
+            "2": "30 cm keliru 2s.",
+            "3": "45 cm keliru 3s."
+          },
+          "sumber": {
+            "dokumen": "Ilmu Pengetahuan Alam untuk SMP/MTs Kelas VII (Edisi Revisi)",
+            "bab": "KOMP-MAT-D-7-BAB4-01"
+          }
+        },
+        {
+          "id": "mat-d-7-b4-q07",
+          "difficulty": "sedang",
+          "prompt": "Berdasarkan Buku Siswa Matematika Kelas VII (hal. 178 Layang-layang), panjang diagonal-diagonal layang-layang adalah d1 = 16 cm dan d2 = 24 cm. Luas layang-layang adalah…",
+          "options": [
+            "192 cm²",
+            "384 cm²",
+            "96 cm²",
+            "80 cm²"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Luas layang-layang L = 1/2 × d1 × d2 = 1/2 × 16 × 24 = 192 cm²."
+          },
+          "distractorWhy": {
+            "1": "384 cm² lupa dibagi 2.",
+            "2": "96 cm² keliru.",
+            "3": "80 cm² keliru."
+          },
+          "sumber": {
+            "dokumen": "Ilmu Pengetahuan Alam untuk SMP/MTs Kelas VII (Edisi Revisi)",
+            "bab": "KOMP-MAT-D-7-BAB4-01"
+          }
+        },
+        {
+          "id": "mat-d-7-b4-q08",
+          "difficulty": "tinggi",
+          "prompt": "Berdasarkan Buku Siswa Matematika Kelas VII (hal. 142), dua sudut saling berpenyiku (komplemen). Jika sudut pertama besarnya 35°, besar sudut kedua adalah…",
+          "options": [
+            "55°",
+            "145°",
+            "65°",
+            "45°"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Sudut berpenyiku jumlahnya 90°. Sudut kedua = 90° - 35° = 55°."
+          },
+          "distractorWhy": {
+            "1": "145° berpelurus (180 - 35).",
+            "2": "65° keliru.",
+            "3": "45° keliru."
+          },
+          "sumber": {
+            "dokumen": "Ilmu Pengetahuan Alam untuk SMP/MTs Kelas VII (Edisi Revisi)",
+            "bab": "KOMP-MAT-D-7-BAB4-01"
+          }
+        },
+        {
+          "id": "mat-d-7-b4-q09",
+          "difficulty": "dasar",
+          "prompt": "Berdasarkan Buku Siswa Matematika Kelas VII (hal. 152), bangun datar segi empat yang memiliki dua pasang sisi sama panjang dan kedua diagonalnya saling tegak lurus tetapi tidak sama panjang adalah…",
+          "options": [
+            "Layang-layang",
+            "Persegi panjang",
+            "Trapesium sama kaki",
+            "Jajar genjang"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Layang-layang memiliki sifat 2 pasang sisi berdampingan sama panjang dan diagonal tegak lurus."
+          },
+          "distractorWhy": {
+            "1": "Persegi panjang diagonal tidak tegak lurus.",
+            "2": "Trapesium diagonal tidak tegak lurus.",
+            "3": "Jajar genjang tidak tegak lurus."
+          },
+          "sumber": {
+            "dokumen": "Ilmu Pengetahuan Alam untuk SMP/MTs Kelas VII (Edisi Revisi)",
+            "bab": "KOMP-MAT-D-7-BAB4-01"
+          }
+        },
+        {
+          "id": "mat-d-7-b4-q10",
+          "difficulty": "sedang",
+          "prompt": "Berdasarkan Buku Siswa Matematika Kelas VII (hal. 160), jumlah seluruh sudut dalam pada bangun datar segitiga selalu sama dengan…",
+          "options": [
+            "180°",
+            "360°",
+            "90°",
+            "270°"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Jumlah ketiga sudut dalam segitiga apa saja selalu 180°."
+          },
+          "distractorWhy": {
+            "1": "360° sudut dalam segi empat.",
+            "2": "90° sudut siku-siku.",
+            "3": "270° keliru."
+          },
+          "sumber": {
+            "dokumen": "Ilmu Pengetahuan Alam untuk SMP/MTs Kelas VII (Edisi Revisi)",
+            "bab": "KOMP-MAT-D-7-BAB4-01"
+          }
+        },
+        {
+          "id": "mat-d-7-b4-q11",
+          "difficulty": "tinggi",
+          "prompt": "Berdasarkan Buku Siswa Matematika Kelas VII (hal. 182 Uji Kompetensi), sebuah lapangan berbentuk persegi panjang berukuran 30 m × 20 m. Di sekeliling lapangan ditanami pohon dengan jarak antar pohon 5 m. Banyak pohon yang dibutuhkan adalah…",
+          "options": [
+            "20 pohon",
+            "100 pohon",
+            "10 pohon",
+            "25 pohon"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Keliling = 2 × (30 + 20) = 100 m. Banyak pohon = 100 m / 5 m = 20 pohon."
+          },
+          "distractorWhy": {
+            "1": "100 pohon keliru.",
+            "2": "10 pohon keliru.",
+            "3": "25 pohon keliru."
+          },
+          "sumber": {
+            "dokumen": "Ilmu Pengetahuan Alam untuk SMP/MTs Kelas VII (Edisi Revisi)",
+            "bab": "KOMP-MAT-D-7-BAB4-01"
+          }
+        },
+        {
+          "id": "mat-d-7-b4-q12",
+          "difficulty": "dasar",
+          "prompt": "Berdasarkan Buku Siswa Matematika Kelas VII (hal. 168), belah ketupat adalah bangun segi empat yang memiliki sifat khusus yaitu…",
+          "options": [
+            "Keempat sisinya sama panjang",
+            "Keempat sudutnya siku-siku 90°",
+            "Memiliki satu pasang sisi sejajar",
+            "Hanya memiliki satu simetri lipat"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Belah ketupat adalah jajar genjang yang keempat sisinya sama panjang."
+          },
+          "distractorWhy": {
+            "1": "Sifat persegi.",
+            "2": "Sifat trapesium.",
+            "3": "Layang-layang."
+          },
+          "sumber": {
+            "dokumen": "Ilmu Pengetahuan Alam untuk SMP/MTs Kelas VII (Edisi Revisi)",
+            "bab": "KOMP-MAT-D-7-BAB4-01"
+          }
+        }
+      ]
+    },
+    {
+      "code": "KOMP-MAT-D-7-BAB5-01",
+      "grade": 7,
+      "name": "Kesebangunan dan Hubungan Antar Garis",
+      "materi": "",
+      "cpRef": "",
+      "target": 20,
+      "items": []
+    },
+    {
+      "code": "KOMP-MAT-D-7-BAB6-01",
+      "grade": 7,
+      "name": "Data dan Diagram",
+      "materi": "",
+      "cpRef": "Matematika untuk SMP/MTs Kelas VII",
+      "target": 20,
+      "items": [
+        {
+          "id": "mat-d-7-b6-q01",
+          "difficulty": "dasar",
+          "prompt": "Pada Bab 6 Buku Siswa Matematika Kelas VII disajikan konsep dasar investigasi statistika. Statistika didefinisikan sebagai cabang ilmu matematika yang berkaitan dengan pengumpulan, pengorganisasian, penyajian, analisis, dan interpretasi data. Dalam alur investigasi statistika, langkah utama yang harus dilakukan sebelum mengumpulkan data adalah...",
+          "options": [
+            "Merumuskan pertanyaan statistika yang ingin dijawab",
+            "Membuat diagram batang atau diagram lingkaran",
+            "Menghitung persentase dan nilai rata-rata data",
+            "Menarik kesimpulan akhir dari hasil analisis"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Langkah awal dalam alur investigasi statistika adalah merumuskan pertanyaan statistika yang jelas agar proses pengumpulan data terarah dan relevan."
+          },
+          "distractorWhy": {
+            "1": "Membuat diagram merupakan tahap penyajian data yang dilakukan setelah data berhasil dikumpulkan dan diolah.",
+            "2": "Menghitung persentase dan rata-rata merupakan tahap pengolahan data setelah data terkumpul.",
+            "3": "Menarik kesimpulan adalah tahap akhir investigasi setelah data dianalisis dan diinterpretasikan."
+          },
+          "sumber": {
+            "dokumen": "Matematika untuk SMP/MTs Kelas VII",
+            "bab": "KOMP-MAT-D-7-BAB6-01"
+          }
+        },
+        {
+          "id": "mat-d-7-b6-q02",
+          "difficulty": "dasar",
+          "prompt": "Dalam investigasi statistika (hal. 189), pertanyaan statistika harus menghasilkan data yang memiliki variasi (keragaman jawaban). Di antara pertanyaan berikut, manakah yang merupakan pertanyaan statistika?",
+          "options": [
+            "Berapa lama waktu yang dihabiskan oleh siswa kelas VII setiap hari untuk mengakses media sosial?",
+            "Siapakah nama kepala sekolah SMP Negeri 1 saat ini?",
+            "Berapakah jumlah provinsi di Indonesia pada tahun 2022?",
+            "Pada tanggal berapakah Hari Kemerdekaan Republik Indonesia diperingati?"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Pertanyaan tentang waktu pengaksesan media sosial siswa kelas VII akan menghasilkan jawaban yang bervariasi dari setiap siswa sehingga memenuhi kriteria pertanyaan statistika."
+          },
+          "distractorWhy": {
+            "1": "Nama kepala sekolah merupakan fakta tunggal yang bernilai tunggal dan tidak memiliki variasi data.",
+            "2": "Jumlah provinsi pada tahun tertentu adalah nilai tetap yang bernilai tunggal.",
+            "3": "Tanggal Hari Kemerdekaan RI bersifat pasti dan bernilai tunggal."
+          },
+          "sumber": {
+            "dokumen": "Matematika untuk SMP/MTs Kelas VII",
+            "bab": "KOMP-MAT-D-7-BAB6-01"
+          }
+        },
+        {
+          "id": "mat-d-7-b6-q03",
+          "difficulty": "dasar",
+          "prompt": "Berdasarkan penjelasan pada Subbab B (hal. 195), data terbagi menjadi data kategorik dan data numerik. Di antara kumpulan data berikut, manakah yang tergolong data kategorik?",
+          "options": [
+            "Jenis olahraga favorit yang dipilih oleh siswa kelas VII",
+            "Banyaknya aplikasi permainan online yang terpasang pada gawai siswa",
+            "Lamanya waktu (dalam menit) yang digunakan siswa untuk membaca buku",
+            "Skor hasil pertandingan bulutangkis antar kelas"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Jenis olahraga favorit bernilai kualitatif (berupa kata atau nama kategori seperti sepakbola, bulutangkis, basket) sehingga tergolong data kategorik."
+          },
+          "distractorWhy": {
+            "1": "Banyaknya aplikasi berbentuk bilangan bulat hasil pencacahan sehingga merupakan data numerik.",
+            "2": "Lamanya waktu berupa nilai bilangan hasil pengukuran waktu sehingga merupakan data numerik.",
+            "3": "Skor pertandingan berupa nilai bilangan sehingga tergolong data numerik."
+          },
+          "sumber": {
+            "dokumen": "Matematika untuk SMP/MTs Kelas VII",
+            "bab": "KOMP-MAT-D-7-BAB6-01"
+          }
+        },
+        {
+          "id": "mat-d-7-b6-q04",
+          "difficulty": "sedang",
+          "prompt": "Data numerik terbagi menjadi data diskrit (hasil pencacahan) dan data kontinu (hasil pengukuran). Dari jenis data berikut, manakah yang merupakan data numerik kontinu?",
+          "options": [
+            "Tinggi badan siswa kelas VII dalam satuan sentimeter",
+            "Jumlah medali emas yang diperoleh kontingen Indonesia di Asian Games",
+            "Banyaknya lagu yang diunduh siswa dalam satu hari",
+            "Jumlah anggota keluarga yang tinggal dalam satu rumah"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Tinggi badan diperoleh dari hasil pengukuran menggunakan alat ukur dan dapat bernilai pecahan/desimal sehingga tergolong data numerik kontinu."
+          },
+          "distractorWhy": {
+            "1": "Jumlah medali emas diperoleh dari hasil perhitungan/pencacahan bilangan bulat sehingga tergolong data numerik diskrit.",
+            "2": "Banyaknya lagu diunduh merupakan hasil pencacahan berupa bilangan bulat sehingga tergolong data numerik diskrit.",
+            "3": "Jumlah anggota keluarga merupakan hasil pencacahan manusia yang bernilai bulat sehingga tergolong data numerik diskrit."
+          },
+          "sumber": {
+            "dokumen": "Matematika untuk SMP/MTs Kelas VII",
+            "bab": "KOMP-MAT-D-7-BAB6-01"
+          }
+        },
+        {
+          "id": "mat-d-7-b6-q05",
+          "difficulty": "sedang",
+          "prompt": "Pada Latihan 6.2 (hal. 197-198), siswa diminta mengklasifikasikan data berikut: (1) Kota tempat lahir siswa, (2) Bulan kelahiran siswa, (3) Jumlah saudara kandung, (4) Waktu belajar di rumah per hari. Kelompok data yang keduanya merupakan data numerik adalah...",
+          "options": [
+            "(3) dan (4)",
+            "(1) dan (2)",
+            "(1) dan (3)",
+            "(2) dan (4)"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Jumlah saudara kandung (3) berupa bilangan pencacahan dan waktu belajar (4) berupa bilangan pengukuran waktu, keduanya berbentuk angka sehingga merupakan data numerik."
+          },
+          "distractorWhy": {
+            "1": "Kota tempat lahir (1) dan bulan kelahiran (2) berupa kata/kategori sehingga merupakan data kategorik.",
+            "2": "Kota tempat lahir (1) merupakan data kategorik.",
+            "3": "Bulan kelahiran (2) merupakan data kategorik."
+          },
+          "sumber": {
+            "dokumen": "Matematika untuk SMP/MTs Kelas VII",
+            "bab": "KOMP-MAT-D-7-BAB6-01"
+          }
+        },
+        {
+          "id": "mat-d-7-b6-q06",
+          "difficulty": "dasar",
+          "prompt": "Pada Eksplorasi 6.1 (hal. 191), disajikan diagram line plot untuk menampilkan sebaran panjang nama siswa kelas VII A (banyaknya huruf). Jika pada angka 12 di garis bilangan terdapat 5 tanda silang (x), hal ini berarti...",
+          "options": [
+            "Terdapat 5 orang siswa kelas VII A yang namanya terdiri atas 12 huruf",
+            "Panjang nama seluruh siswa kelas VII A rata-rata adalah 12 huruf",
+            "Terdapat 12 orang siswa yang memiliki nama dengan panjang 5 huruf",
+            "Siswa dengan nama terpanjang di kelas VII A memiliki 5 huruf"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Pada line plot, nilai pada garis horizontal menyatakan ukuran variabel (12 huruf) dan banyaknya tanda silang menyatakan frekuensi siswa (5 siswa)."
+          },
+          "distractorWhy": {
+            "1": "Banyaknya tanda silang menunjukkan frekuensi siswa pada angka 12, bukan rata-rata nilai seluruh kelas.",
+            "2": "Angka 12 menunjukkan panjang huruf, sedangkan jumlah tanda silang menunjukkan banyaknya siswa, bukan sebaliknya.",
+            "3": "Panjang nama ditunjukkan oleh posisi skala horizontal 12 huruf, bukan 5 huruf."
+          },
+          "sumber": {
+            "dokumen": "Matematika untuk SMP/MTs Kelas VII",
+            "bab": "KOMP-MAT-D-7-BAB6-01"
+          }
+        },
+        {
+          "id": "mat-d-7-b6-q07",
+          "difficulty": "sedang",
+          "prompt": "Pada diagram line plot hasil survei jumlah buku cerita yang dibaca siswa dalam sebulan, tumpukan tanda titik paling tinggi berada di atas angka 4. Pernyataan yang tepat untuk menginterpretasikan data tersebut adalah...",
+          "options": [
+            "Kebanyakan siswa membaca sebanyak 4 buku cerita dalam sebulan",
+            "Jumlah siswa yang membaca buku cerita secara keseluruhan adalah 4 orang",
+            "Jumlah buku terbanyak yang dibaca oleh seorang siswa adalah 4 buku",
+            "Tidak ada siswa yang membaca buku cerita lebih dari 4 buku"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Tumpukan titik tertinggi pada line plot menandakan nilai dengan frekuensi terbesar (modus), yaitu 4 buku cerita dibaca oleh paling banyak siswa."
+          },
+          "distractorWhy": {
+            "1": "Angka 4 menyatakan nilai kategori/variabel buku yang dibaca, bukan total responden siswa.",
+            "2": "Tumpukan tertinggi menunjukkan frekuensi terbanyak (banyak siswa), bukan batas maksimum nilai variabel.",
+            "3": "Line plot masih dapat memiliki titik di angka di atas 4 dengan frekuensi lebih sedikit."
+          },
+          "sumber": {
+            "dokumen": "Matematika untuk SMP/MTs Kelas VII",
+            "bab": "KOMP-MAT-D-7-BAB6-01"
+          }
+        },
+        {
+          "id": "mat-d-7-b6-q08",
+          "difficulty": "dasar",
+          "prompt": "Pada Latihan 6.2 nomor 5 (hal. 199), tercatat data jumlah aplikasi permainan online pada gawai siswa kelas VII B: 0 aplikasi (1 siswa), 1 aplikasi (3 siswa), 2 aplikasi (7 siswa), 3 aplikasi (10 siswa), 4 aplikasi (8 siswa), 5 aplikasi (2 siswa), dan 6 aplikasi (1 siswa). Banyaknya siswa yang memiliki aplikasi permainan online lebih dari 3 adalah...",
+          "options": [
+            "11 siswa",
+            "10 siswa",
+            "21 siswa",
+            "8 siswa"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Siswa dengan aplikasi lebih dari 3 adalah siswa yang memiliki 4, 5, atau 6 aplikasi, yaitu 8 + 2 + 1 = 11 siswa."
+          },
+          "distractorWhy": {
+            "1": "Angka 10 merupakan banyaknya siswa yang memiliki tepat 3 aplikasi.",
+            "2": "Angka 21 merupakan akumulasi siswa yang memiliki 3 aplikasi atau kurang (1 + 3 + 7 + 10 = 21).",
+            "3": "Angka 8 hanya memperhitungkan siswa yang memiliki tepat 4 aplikasi saja."
+          },
+          "sumber": {
+            "dokumen": "Matematika untuk SMP/MTs Kelas VII",
+            "bab": "KOMP-MAT-D-7-BAB6-01"
+          }
+        },
+        {
+          "id": "mat-d-7-b6-q09",
+          "difficulty": "sedang",
+          "prompt": "Berdasarkan data aplikasi permainan online siswa kelas VII B (0 aplikasi: 1 siswa, 1: 3 siswa, 2: 7 siswa, 3: 10 siswa, 4: 8 siswa, 5: 2 siswa, 6: 1 siswa), selisih antara banyaknya siswa yang memiliki 3 aplikasi dengan siswa yang memiliki 2 aplikasi pada gawainya adalah...",
+          "options": [
+            "3 siswa",
+            "2 siswa",
+            "4 siswa",
+            "5 siswa"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Siswa yang memiliki 3 aplikasi berjumlah 10 orang dan yang memiliki 2 aplikasi berjumlah 7 orang. Selisihnya adalah 10 - 7 = 3 siswa."
+          },
+          "distractorWhy": {
+            "1": "Angka 2 diperoleh dari selisih antara nilai aplikasi (3 - 2 = 1) atau kesalahan perhitungan.",
+            "2": "Angka 4 merupakan selisih 10 - 6.",
+            "3": "Angka 5 merupakan selisih 10 - 5."
+          },
+          "sumber": {
+            "dokumen": "Matematika untuk SMP/MTs Kelas VII",
+            "bab": "KOMP-MAT-D-7-BAB6-01"
+          }
+        },
+        {
+          "id": "mat-d-7-b6-q10",
+          "difficulty": "tinggi",
+          "prompt": "Pada Latihan 6.3 (hal. 204), disajikan diagram batang ganda perolehan medali emas pada Olimpiade 2016 Rio dan Olimpiade 2020 Tokyo. Jika Amerika Serikat meraih 46 medali emas pada tahun 2016 dan 39 medali emas pada tahun 2020, maka perubahan perolehan medali emas Amerika Serikat adalah...",
+          "options": [
+            "Penurunan sebanyak 7 medali emas",
+            "Peningkatan sebanyak 7 medali emas",
+            "Penurunan sebanyak 5 medali emas",
+            "Peningkatan sebanyak 85 medali emas"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Perubahan dihitung dari perolehan 2020 dikurangi 2016: 39 - 46 = -7, yang berarti terjadi penurunan sebanyak 7 medali emas."
+          },
+          "distractorWhy": {
+            "1": "Perolehan medali mengalami penurunan dari 46 menjadi 39, bukan peningkatan.",
+            "2": "Selisih antara 46 dan 39 adalah 7, bukan 5.",
+            "3": "Angka 85 merupakan hasil penjumlahan kedua perolehan medali (46 + 39)."
+          },
+          "sumber": {
+            "dokumen": "Matematika untuk SMP/MTs Kelas VII",
+            "bab": "KOMP-MAT-D-7-BAB6-01"
+          }
+        },
+        {
+          "id": "mat-d-7-b6-q11",
+          "difficulty": "sedang",
+          "prompt": "Berdasarkan data perolehan medali emas Olimpiade 2016 dan 2020 pada Latihan 6.3, negara Britania Raya meraih 27 medali emas pada tahun 2016 sehingga menjadi runner-up. Pada Olimpiade 2020 Tokyo, negara yang berhasil menempati posisi runner-up perolehan medali emas terbanyak di bawah Amerika Serikat adalah...",
+          "options": [
+            "Tiongkok dengan 38 medali emas",
+            "Britania Raya dengan 22 medali emas",
+            "Jepang dengan 27 medali emas",
+            "Australia dengan 17 medali emas"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Pada Olimpiade 2020 Tokyo, Tiongkok meraih 38 medali emas di bawah Amerika Serikat (39 medali) sehingga menjadi runner-up."
+          },
+          "distractorWhy": {
+            "1": "Britania Raya berada di peringkat keempat pada 2020 dengan 22 medali emas.",
+            "2": "Jepang berada di peringkat ketiga pada 2020 dengan 27 medali emas.",
+            "3": "Australia berada di peringkat kelima pada 2020 dengan 17 medali emas."
+          },
+          "sumber": {
+            "dokumen": "Matematika untuk SMP/MTs Kelas VII",
+            "bab": "KOMP-MAT-D-7-BAB6-01"
+          }
+        },
+        {
+          "id": "mat-d-7-b6-q12",
+          "difficulty": "sedang",
+          "prompt": "Pada Eksplorasi 6.5 (hal. 215), sebuah kelas terdiri atas 40 siswa. Data ekstrakurikuler yang diikuti siswa mencatat: 14 siswa memilih Olahraga, 10 siswa memilih Kesenian, 8 siswa memilih Pramuka, dan 8 siswa memilih PMR. Persentase siswa yang memilih ekstrakurikuler Olahraga pada diagram lingkaran adalah...",
+          "options": [
+            "35%",
+            "25%",
+            "20%",
+            "14%"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Persentase Olahraga dihitung dengan (14 / 40) x 100% = 35%."
+          },
+          "distractorWhy": {
+            "1": "Angka 25% merupakan persentase untuk kelompok Kesenian (10 / 40 x 100%).",
+            "2": "Angka 20% merupakan persentase untuk Pramuka atau PMR (8 / 40 x 100%).",
+            "3": "Angka 14% adalah jumlah siswa pemilih Olahraga, bukan bentuk persentasentasenya."
+          },
+          "sumber": {
+            "dokumen": "Matematika untuk SMP/MTs Kelas VII",
+            "bab": "KOMP-MAT-D-7-BAB6-01"
+          }
+        },
+        {
+          "id": "mat-d-7-b6-q13",
+          "difficulty": "tinggi",
+          "prompt": "Dari data ekstrakurikuler siswa (total 40 siswa: 14 Olahraga, 10 Kesenian, 8 Pramuka, 8 PMR) pada soal sebelumnya, besar sudut pusat juring yang mewakili kelompok siswa pemilih Kesenian adalah...",
+          "options": [
+            "90°",
+            "72°",
+            "126°",
+            "100°"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Besar sudut pusat Kesenian dihitung dengan (10 / 40) x 360° = 1/4 x 360° = 90°."
+          },
+          "distractorWhy": {
+            "1": "Angka 72° merupakan sudut pusat untuk kelompok Pramuka atau PMR (8 / 40 x 360°).",
+            "2": "Angka 126° merupakan sudut pusat untuk kelompok Olahraga (14 / 40 x 360°).",
+            "3": "Angka 100° menunjukkan persentase total atau kesalahan rasio."
+          },
+          "sumber": {
+            "dokumen": "Matematika untuk SMP/MTs Kelas VII",
+            "bab": "KOMP-MAT-D-7-BAB6-01"
+          }
+        },
+        {
+          "id": "mat-d-7-b6-q14",
+          "difficulty": "tinggi",
+          "prompt": "Sebuah diagram lingkaran menyajikan data jenis bahan bacaan favorit 120 siswa di perpustakaan sekolah. Juring yang menunjukkan buku Komik memiliki sudut pusat sebesar 120°. Banyaknya siswa yang menyukai buku komik adalah...",
+          "options": [
+            "40 siswa",
+            "30 siswa",
+            "60 siswa",
+            "45 siswa"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Banyaknya siswa dihitung dengan (120° / 360°) x 120 siswa = 1/3 x 120 = 40 siswa."
+          },
+          "distractorWhy": {
+            "1": "Angka 30 siswa merupakan hasil perhitungan rasio 90° / 360° x 120.",
+            "2": "Angka 60 siswa merupakan hasil perhitungan rasio 180° / 360° x 120.",
+            "3": "Angka 45 siswa merupakan kesalahan perhitungan perkalian rasio."
+          },
+          "sumber": {
+            "dokumen": "Matematika untuk SMP/MTs Kelas VII",
+            "bab": "KOMP-MAT-D-7-BAB6-01"
+          }
+        },
+        {
+          "id": "mat-d-7-b6-q15",
+          "difficulty": "dasar",
+          "prompt": "Berdasarkan penjelasan pada Subbab F (hal. 221-222), pemilihan jenis diagram tergantung pada tujuan penyajian data. Diagram yang paling tepat digunakan untuk menunjukkan perkembangan atau perubahan data yang berkesinambungan dari waktu ke waktu adalah...",
+          "options": [
+            "Diagram garis",
+            "Diagram lingkaran",
+            "Diagram batang tunggal",
+            "Line plot"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Diagram garis sangat cocok untuk memperlihatkan tren, perubahan, atau perkembangan data yang kontinu dari waktu ke waktu."
+          },
+          "distractorWhy": {
+            "1": "Diagram lingkaran digunakan untuk menunjukkan proporsi bagian terhadap keseluruhan.",
+            "2": "Diagram batang digunakan untuk membandingkan jumlah antar kategori yang diskrit.",
+            "3": "Line plot digunakan untuk menunjukkan sebaran data numerik pada garis bilangan."
+          },
+          "sumber": {
+            "dokumen": "Matematika untuk SMP/MTs Kelas VII",
+            "bab": "KOMP-MAT-D-7-BAB6-01"
+          }
+        },
+        {
+          "id": "mat-d-7-b6-q16",
+          "difficulty": "sedang",
+          "prompt": "Jika kita ingin menampilkan data yang menekankan proporsi atau perbandingan tiap kategori terhadap jumlah keseluruhan (total 100% atau 360°), diagram yang paling tepat dan efektif digunakan adalah...",
+          "options": [
+            "Diagram lingkaran",
+            "Diagram garis",
+            "Line plot",
+            "Diagram batang ganda"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Diagram lingkaran dirancang khusus untuk memperlihatkan pembagian proporsi atau persentase setiap komponen terhadap jumlah total."
+          },
+          "distractorWhy": {
+            "1": "Diagram garis digunakan untuk mencatat tren perubahan waktu.",
+            "2": "Line plot digunakan untuk melihat distribusi frekuensi data tunggal.",
+            "3": "Diagram batang ganda digunakan untuk membandingkan dua kelompok data kategorik."
+          },
+          "sumber": {
+            "dokumen": "Matematika untuk SMP/MTs Kelas VII",
+            "bab": "KOMP-MAT-D-7-BAB6-01"
+          }
+        },
+        {
+          "id": "mat-d-7-b6-q17",
+          "difficulty": "sedang",
+          "prompt": "Seorang peneliti ingin membandingkan angka penjualan hasil panen padi dan jagung di 5 kecamatan berbeda pada tahun yang sama. Penyajian data yang paling tepat untuk membandingkan kedua jenis tanaman tersebut pada tiap kecamatan adalah...",
+          "options": [
+            "Diagram batang ganda",
+            "Diagram garis tunggal",
+            "Diagram lingkaran",
+            "Diagram line plot"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Diagram batang ganda memungkinkan pembandingan dua kelompok data (padi dan jagung) secara bersisian untuk setiap kategori kecamatan."
+          },
+          "distractorWhy": {
+            "1": "Diagram garis tunggal hanya dapat menyajikan satu jenis tren data dari waktu ke waktu.",
+            "2": "Diagram lingkaran kurang efektif untuk membandingkan dua komoditas sekaligus di 5 lokasi.",
+            "3": "Line plot menyajikan sebaran frekuensi data numerik tunggal, bukan perbandingan dua variabel."
+          },
+          "sumber": {
+            "dokumen": "Matematika untuk SMP/MTs Kelas VII",
+            "bab": "KOMP-MAT-D-7-BAB6-01"
+          }
+        },
+        {
+          "id": "mat-d-7-b6-q18",
+          "difficulty": "tinggi",
+          "prompt": "Pada Uji Kompetensi Bab 6 (hal. 227-228), disajikan diagram lingkaran kandungan gizi makanan. Jika juring Karbohidrat mencakup 50% dari keseluruhan diagram dan total massa makanan adalah 400 gram, maka massa karbohidrat dalam makanan tersebut adalah...",
+          "options": [
+            "200 gram",
+            "100 gram",
+            "150 gram",
+            "250 gram"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Massa karbohidrat dihitung dengan 50% x 400 gram = 0,5 x 400 = 200 gram."
+          },
+          "distractorWhy": {
+            "1": "Angka 100 gram merupakan hasil dari 25% x 400 gram.",
+            "2": "Angka 150 gram merupakan hasil dari 37,5% x 400 gram.",
+            "3": "Angka 250 gram merupakan hasil dari 62,5% x 400 gram."
+          },
+          "sumber": {
+            "dokumen": "Matematika untuk SMP/MTs Kelas VII",
+            "bab": "KOMP-MAT-D-7-BAB6-01"
+          }
+        },
+        {
+          "id": "mat-d-7-b6-q19",
+          "difficulty": "sedang",
+          "prompt": "Pada tabel frekuensi penjualan sepatu di sebuah toko selama sepekan dicatat: Senin 12 pasang, Selasa 15 pasang, Rabu 10 pasang, Kamis 18 pasang, Jumat 20 pasang, Sabtu 25 pasang, dan Minggu 30 pasang. Total penjualan sepatu khusus pada akhir pekan (Jumat hingga Minggu) adalah...",
+          "options": [
+            "75 pasang",
+            "55 pasang",
+            "65 pasang",
+            "130 pasang"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Total penjualan Jumat hingga Minggu dihitung dengan menjumlahkan 20 + 25 + 30 = 75 pasang."
+          },
+          "distractorWhy": {
+            "1": "Angka 55 pasang merupakan jumlah penjualan hari Sabtu dan Minggu saja (25 + 30).",
+            "2": "Angka 65 pasang merupakan jumlah penjualan hari Kamis, Jumat, dan Sabtu (18 + 20 + 25).",
+            "3": "Angka 130 pasang merupakan total seluruh penjualan sepatu dari Senin hingga Minggu."
+          },
+          "sumber": {
+            "dokumen": "Matematika untuk SMP/MTs Kelas VII",
+            "bab": "KOMP-MAT-D-7-BAB6-01"
+          }
+        },
+        {
+          "id": "mat-d-7-b6-q20",
+          "difficulty": "tinggi",
+          "prompt": "Pada penyajian diagram lingkaran (hal. 207), kadang-kadang terdapat juring dengan label Lain-lain atau Lainnya. Fungsi utama dari kelompok Lain-lain tersebut dalam penyajian data adalah...",
+          "options": [
+            "Menggabungkan beberapa kategori yang frekuensinya sangat kecil agar diagram tidak terlalu rumit",
+            "Menampung data yang salah atau tidak valid saat proses pengumpulan data berlangsung",
+            "Menunjukkan kategori yang nilainya paling tinggi dan paling dominan dalam penelitian",
+            "Memastikan besar sudut pusat seluruh diagram lingkaran menjadi kurang dari 360 derajat"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Kategori Lain-lain digunakan untuk menyatukan banyak kategori kecil agar diagram lingkaran tetap rapi dan mudah dibaca tanpa juring yang terlalu sempit."
+          },
+          "distractorWhy": {
+            "1": "Data yang salah harus dibersihkan (data cleaning) dan tidak dimasukkan ke dalam diagram.",
+            "2": "Kategori dominan digambarkan dalam juring tersendiri dengan sudut pusat terbesar.",
+            "3": "Total sudut pusat seluruh juring dalam diagram lingkaran harus tetap tepat 360 derajat."
+          },
+          "sumber": {
+            "dokumen": "Matematika untuk SMP/MTs Kelas VII",
+            "bab": "KOMP-MAT-D-7-BAB6-01"
+          }
+        }
+      ]
+    },
+    {
+      "code": "KOMP-MAT-D-8-BAB1-01",
+      "grade": 8,
+      "name": "Teorema Pythagoras dan Lingkaran",
+      "materi": "",
+      "cpRef": "English for Nusantara untuk SMP/MTs Kelas IX",
+      "target": 12,
+      "items": [
+        {
+          "id": "mat-d-8-b1-q01",
+          "difficulty": "dasar",
+          "prompt": "Berdasarkan Buku Siswa Matematika Kelas VIII (hal. 10-14), rumus Teorema Pythagoras untuk segitiga siku-siku dengan sisi penyiku a dan b serta hipotenusa c adalah…",
+          "options": [
+            "c² = a² + b²",
+            "c = a + b",
+            "c² = a² - b²",
+            "c² = a × b"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Teorema Pythagoras menyatakan kuadrat hipotenusa sama dengan jumlah kuadrat sisi penyikunya: c² = a² + b²."
+          },
+          "distractorWhy": {
+            "1": "c = a+b mengabaikan kuadrat.",
+            "2": "c² = a²-b² rumus mencari sisi penyiku.",
+            "3": "c² = a×b keliru."
+          },
+          "sumber": {
+            "dokumen": "English for Nusantara untuk SMP/MTs Kelas IX",
+            "bab": "KOMP-MAT-D-8-BAB1-01"
+          }
+        },
+        {
+          "id": "mat-d-8-b1-q02",
+          "difficulty": "sedang",
+          "prompt": "Berdasarkan Buku Siswa Matematika Kelas VIII (hal. 18), sebuah segitiga siku-siku memiliki panjang sisi penyiku 6 cm dan 8 cm. Panjang sisi miring (hipotenusa) segitiga tersebut adalah…",
+          "options": [
+            "10 cm",
+            "14 cm",
+            "100 cm",
+            "12 cm"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "c² = 6² + 8² = 36 + 64 = 100 => c = sqrt(100) = 10 cm."
+          },
+          "distractorWhy": {
+            "1": "6 + 8 = 14 cm.",
+            "2": "100 cm lupa diakar.",
+            "3": "12 cm keliru."
+          },
+          "sumber": {
+            "dokumen": "English for Nusantara untuk SMP/MTs Kelas IX",
+            "bab": "KOMP-MAT-D-8-BAB1-01"
+          }
+        },
+        {
+          "id": "mat-d-8-b1-q03",
+          "difficulty": "sedang",
+          "prompt": "Berdasarkan Buku Siswa Matematika Kelas VIII (hal. 25 Tripel Pythagoras), kelompok tiga bilangan berikut yang merupakan Tripel Pythagoras adalah…",
+          "options": [
+            "5, 12, 13",
+            "3, 4, 6",
+            "6, 8, 11",
+            "7, 10, 15"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "5² + 12² = 25 + 144 = 169 = 13² (Tripel Pythagoras sempurna)."
+          },
+          "distractorWhy": {
+            "1": "3² + 4² = 25 != 36.",
+            "2": "6² + 8² = 100 != 121.",
+            "3": "7² + 10² = 149 != 225."
+          },
+          "sumber": {
+            "dokumen": "English for Nusantara untuk SMP/MTs Kelas IX",
+            "bab": "KOMP-MAT-D-8-BAB1-01"
+          }
+        },
+        {
+          "id": "mat-d-8-b1-q04",
+          "difficulty": "tinggi",
+          "prompt": "Berdasarkan Buku Siswa Matematika Kelas VIII (hal. 45 Luas Lingkaran), luas lingkaran yang memiliki jari-jari r = 7 cm (dengan pi = 22/7) adalah…",
+          "options": [
+            "154 cm²",
+            "44 cm²",
+            "308 cm²",
+            "49 cm²"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Luas L = pi × r² = (22/7) × 7 × 7 = 22 × 7 = 154 cm²."
+          },
+          "distractorWhy": {
+            "1": "44 cm adalah Keliling (2×pi×r).",
+            "2": "308 cm² keliru.",
+            "3": "49 cm² hanya r²."
+          },
+          "sumber": {
+            "dokumen": "English for Nusantara untuk SMP/MTs Kelas IX",
+            "bab": "KOMP-MAT-D-8-BAB1-01"
+          }
+        },
+        {
+          "id": "mat-d-8-b1-q05",
+          "difficulty": "dasar",
+          "prompt": "Berdasarkan Buku Siswa Matematika Kelas VIII (hal. 40), keliling lingkaran dengan diameter d = 14 cm (pi = 22/7) adalah…",
+          "options": [
+            "44 cm",
+            "88 cm",
+            "154 cm",
+            "28 cm"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Keliling K = pi × d = (22/7) × 14 = 22 × 2 = 44 cm."
+          },
+          "distractorWhy": {
+            "1": "88 cm keliru 2×pi×d.",
+            "2": "154 cm adalah Luas.",
+            "3": "28 cm 2d."
+          },
+          "sumber": {
+            "dokumen": "English for Nusantara untuk SMP/MTs Kelas IX",
+            "bab": "KOMP-MAT-D-8-BAB1-01"
+          }
+        },
+        {
+          "id": "mat-d-8-b1-q06",
+          "difficulty": "tinggi",
+          "prompt": "Berdasarkan Buku Siswa Matematika Kelas VIII (hal. 55 Luas Juring), sudut pusat sebuah juring lingkaran adalah 90°. Jika luas total lingkaran tersebut adalah 200 cm², maka luas juring tersebut adalah…",
+          "options": [
+            "50 cm²",
+            "100 cm²",
+            "25 cm²",
+            "75 cm²"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Luas Juring = (Sudut Pusat / 360°) × Luas Lingkaran = (90/360) × 200 = 1/4 × 200 = 50 cm²."
+          },
+          "distractorWhy": {
+            "1": "100 cm² setengah lingkaran.",
+            "2": "25 cm² seperdelapan.",
+            "3": "75 cm² keliru."
+          },
+          "sumber": {
+            "dokumen": "English for Nusantara untuk SMP/MTs Kelas IX",
+            "bab": "KOMP-MAT-D-8-BAB1-01"
+          }
+        },
+        {
+          "id": "mat-d-8-b1-q07",
+          "difficulty": "dasar",
+          "prompt": "Berdasarkan Buku Siswa Matematika Kelas VIII (hal. 12), jika c adalah hipotenusa, rumus untuk mencari panjang sisi penyiku a adalah…",
+          "options": [
+            "a = sqrt(c² - b²)",
+            "a = sqrt(c² + b²)",
+            "a = c - b",
+            "a = c² / b²"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Dari a² + b² = c² => a² = c² - b² => a = sqrt(c² - b²)."
+          },
+          "distractorWhy": {
+            "1": "Penjumlahan untuk hipotenusa.",
+            "2": "Pengurangan tanpa kuadrat.",
+            "3": "Pembagian keliru."
+          },
+          "sumber": {
+            "dokumen": "English for Nusantara untuk SMP/MTs Kelas IX",
+            "bab": "KOMP-MAT-D-8-BAB1-01"
+          }
+        },
+        {
+          "id": "mat-d-8-b1-q08",
+          "difficulty": "sedang",
+          "prompt": "Berdasarkan Buku Siswa Matematika Kelas VIII (hal. 30), tangga sepanjang 5 meter disandarkan pada dinding tembok. Jika jarak ujung bawah tangga ke tembok adalah 3 meter, tinggi dinding yang dicapai tangga adalah…",
+          "options": [
+            "4 meter",
+            "2 meter",
+            "8 meter",
+            "16 meter"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "t² = 5² - 3² = 25 - 9 = 16 => t = sqrt(16) = 4 meter."
+          },
+          "distractorWhy": {
+            "1": "5 - 3 = 2 m.",
+            "2": "5 + 3 = 8 m.",
+            "3": "16 m lupa diakar."
+          },
+          "sumber": {
+            "dokumen": "English for Nusantara untuk SMP/MTs Kelas IX",
+            "bab": "KOMP-MAT-D-8-BAB1-01"
+          }
+        },
+        {
+          "id": "mat-d-8-b1-q09",
+          "difficulty": "tinggi",
+          "prompt": "Berdasarkan Buku Siswa Matematika Kelas VIII (hal. 60 Panjang Busur), sudut pusat busur AB adalah 60°. Jika keliling total lingkaran adalah 120 cm, panjang busur AB adalah…",
+          "options": [
+            "20 cm",
+            "60 cm",
+            "30 cm",
+            "10 cm"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Panjang Busur = (60 / 360) × 120 = 1/6 × 120 = 20 cm."
+          },
+          "distractorWhy": {
+            "1": "60 cm setengah keliling.",
+            "2": "30 cm seperempat.",
+            "3": "10 cm keliru."
+          },
+          "sumber": {
+            "dokumen": "English for Nusantara untuk SMP/MTs Kelas IX",
+            "bab": "KOMP-MAT-D-8-BAB1-01"
+          }
+        },
+        {
+          "id": "mat-d-8-b1-q10",
+          "difficulty": "dasar",
+          "prompt": "Berdasarkan Buku Siswa Matematika Kelas VIII (hal. 38), garis lurus yang menghubungkan titik pusat lingkaran dengan titik pada lengkungan lingkaran dinamakan…",
+          "options": [
+            "Jari-jari (r)",
+            "Diameter (d)",
+            "Tali busur",
+            "Apotema"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Jari-jari adalah jarak titik pusat ke tepi lengkungan lingkaran."
+          },
+          "distractorWhy": {
+            "1": "Diameter garis tengah membelah lingkaran.",
+            "2": "Tali busur menghubungkan 2 titik tepi.",
+            "3": "Apotema tegak lurus tali busur."
+          },
+          "sumber": {
+            "dokumen": "English for Nusantara untuk SMP/MTs Kelas IX",
+            "bab": "KOMP-MAT-D-8-BAB1-01"
+          }
+        },
+        {
+          "id": "mat-d-8-b1-q11",
+          "difficulty": "sedang",
+          "prompt": "Berdasarkan Buku Siswa Matematika Kelas VIII (hal. 22), kapal berlayar ke arah utara sejauh 9 km, kemudian berbelok ke arah timur sejauh 12 km. Jarak terpendek kapal dari titik awal keberangkatan adalah…",
+          "options": [
+            "15 km",
+            "21 km",
+            "3 km",
+            "225 km"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "s² = 9² + 12² = 81 + 144 = 225 => s = sqrt(225) = 15 km."
+          },
+          "distractorWhy": {
+            "1": "9 + 12 = 21 km.",
+            "2": "12 - 9 = 3 km.",
+            "3": "225 km lupa diakar."
+          },
+          "sumber": {
+            "dokumen": "English for Nusantara untuk SMP/MTs Kelas IX",
+            "bab": "KOMP-MAT-D-8-BAB1-01"
+          }
+        },
+        {
+          "id": "mat-d-8-b1-q12",
+          "difficulty": "tinggi",
+          "prompt": "Berdasarkan Buku Siswa Matematika Kelas VIII (hal. 65), sebuah roda sepeda memiliki jari-jari r = 35 cm. Jika roda berputar sebanyak 100 kali putaran, jarak yang ditempuh sepeda adalah…",
+          "options": [
+            "220 meter (22.000 cm)",
+            "110 meter",
+            "440 meter",
+            "70 meter"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Keliling K = 2 × (22/7) × 35 = 220 cm. Jarak = 100 × 220 cm = 22.000 cm = 220 meter."
+          },
+          "distractorWhy": {
+            "1": "110 m keliru pi×r.",
+            "2": "440 m keliru 2K.",
+            "3": "70 m keliru 2r."
+          },
+          "sumber": {
+            "dokumen": "English for Nusantara untuk SMP/MTs Kelas IX",
+            "bab": "KOMP-MAT-D-8-BAB1-01"
+          }
+        }
+      ]
+    }
+  ]
+}
