@@ -13,6 +13,7 @@
   var curIndex = 0;
   var audioPlaying = false;
   var audioObj = null;
+  var activeAudioSource = null; // 'ai' | 'jees' | 'speech'
   var selectedChoice = null;
   var replayCount = 0;
   var scriptOpen = false;
@@ -126,34 +127,60 @@
     renderListeningQuestion();
   }
 
-  function playJlptSpeech(text) {
-    if (!text) return;
-    if (typeof window !== 'undefined' && window.speechSynthesis) {
-      try {
-        window.speechSynthesis.cancel();
-        var utt = new SpeechSynthesisUtterance(text);
-        utt.lang = 'ja-JP';
-        utt.rate = 0.85;
-        var eq = document.getElementById('jlptEqBars');
-        var playBtn = document.getElementById('jlptPlayBtn');
-        utt.onstart = function () {
-          audioPlaying = true;
-          if (eq) eq.classList.add('playing');
-          if (playBtn) playBtn.innerHTML = '❚❚';
-        };
-        utt.onend = function () {
-          audioPlaying = false;
-          if (eq) eq.classList.remove('playing');
-          if (playBtn) playBtn.innerHTML = '▶';
-        };
-        utt.onerror = function () {
-          audioPlaying = false;
-          if (eq) eq.classList.remove('playing');
-          if (playBtn) playBtn.innerHTML = '▶';
-        };
-        window.speechSynthesis.speak(utt);
-      } catch (err) {
-        console.warn('Speech synthesis error:', err);
+  function updateAudioUi() {
+    var aiBtn = document.getElementById('jlptPlayAiBtn') || document.getElementById('jlptPlayBtn');
+    var jeesBtn = document.getElementById('jlptPlayJeesBtn');
+    var speechBtn = document.getElementById('jlptPlaySpeechBtn');
+    var eq = document.getElementById('jlptEqBars');
+    var counter = document.getElementById('jlptReplayBadge');
+
+    // Visualizer EQ bars
+    if (eq) {
+      if (audioPlaying) {
+        eq.classList.add('playing');
+      } else {
+        eq.classList.remove('playing');
+      }
+    }
+
+    // AI Button
+    if (aiBtn) {
+      if (audioPlaying && activeAudioSource === 'ai') {
+        aiBtn.innerHTML = '❚❚ Jeda Audio AI (Studio)';
+        aiBtn.classList.add('playing');
+      } else {
+        aiBtn.innerHTML = '▶ Putar Audio AI (Studio)';
+        aiBtn.classList.remove('playing');
+      }
+    }
+
+    // JEES Button
+    if (jeesBtn) {
+      if (audioPlaying && activeAudioSource === 'jees') {
+        jeesBtn.innerHTML = '❚❚ Jeda Rekaman JEES';
+        jeesBtn.classList.add('playing');
+      } else {
+        jeesBtn.innerHTML = '📻 Rekaman JEES';
+        jeesBtn.classList.remove('playing');
+      }
+    }
+
+    // Speech Button
+    if (speechBtn) {
+      if (audioPlaying && activeAudioSource === 'speech') {
+        speechBtn.classList.add('playing');
+      } else {
+        speechBtn.classList.remove('playing');
+      }
+    }
+
+    // Replay badge
+    if (counter) {
+      if (replayCount > 0) {
+        var srcTag = activeAudioSource === 'ai' ? ' (AI)' : (activeAudioSource === 'jees' ? ' (JEES)' : '');
+        counter.innerText = 'Diputar ' + replayCount + 'x' + srcTag;
+      } else {
+        counter.innerText = 'Audio AI / JEES';
       }
     }
   }
@@ -164,58 +191,146 @@
         audioObj.pause();
         audioObj.currentTime = 0;
       } catch (_) {}
+      audioObj = null;
     }
     if (typeof window !== 'undefined' && window.speechSynthesis) {
-      try { window.speechSynthesis.cancel(); } catch (_) {}
+      try {
+        window.speechSynthesis.cancel();
+      } catch (_) {}
     }
     audioPlaying = false;
-    var eq = document.getElementById('jlptEqBars');
-    var playBtn = document.getElementById('jlptPlayBtn');
-    if (eq) eq.classList.remove('playing');
-    if (playBtn) playBtn.innerHTML = '▶';
+    activeAudioSource = null;
+    updateAudioUi();
   }
 
-  function togglePlayJlptAudio(url, fallbackScript) {
-    var eq = document.getElementById('jlptEqBars');
-    var playBtn = document.getElementById('jlptPlayBtn');
+  function playJlptSpeech(text, source) {
+    if (!text) return;
+    if (audioObj) {
+      try {
+        audioObj.pause();
+        audioObj.currentTime = 0;
+      } catch (_) {}
+      audioObj = null;
+    }
+    if (typeof window !== 'undefined' && window.speechSynthesis) {
+      try {
+        window.speechSynthesis.cancel();
+        var utt = new SpeechSynthesisUtterance(text);
+        utt.lang = 'ja-JP';
+        utt.rate = 0.85;
 
-    if (audioPlaying) {
+        activeAudioSource = source || 'speech';
+
+        utt.onstart = function () {
+          audioPlaying = true;
+          updateAudioUi();
+        };
+        utt.onend = function () {
+          audioPlaying = false;
+          activeAudioSource = null;
+          updateAudioUi();
+        };
+        utt.onerror = function () {
+          audioPlaying = false;
+          activeAudioSource = null;
+          updateAudioUi();
+        };
+        window.speechSynthesis.speak(utt);
+      } catch (err) {
+        console.warn('Speech synthesis error:', err);
+        audioPlaying = false;
+        activeAudioSource = null;
+        updateAudioUi();
+      }
+    }
+  }
+
+  function playAudioStream(url, source, fallbackScript) {
+    if (audioPlaying && activeAudioSource === source) {
       stopJlptAudio();
       return;
     }
 
+    stopJlptAudio();
+
     if (!url) {
-      playJlptSpeech(fallbackScript);
+      playJlptSpeech(fallbackScript, source);
       return;
     }
 
-    if (!audioObj || audioObj.src !== url) {
+    try {
       audioObj = new Audio(url);
+      activeAudioSource = source;
+
       audioObj.onended = function () {
         audioPlaying = false;
-        if (eq) eq.classList.remove('playing');
-        if (playBtn) playBtn.innerHTML = '▶';
+        activeAudioSource = null;
+        updateAudioUi();
       };
-      audioObj.onerror = function () {
-        console.warn('[JLPT Audio] Fallback ke speech synthesis');
-        audioPlaying = false;
-        if (eq) eq.classList.remove('playing');
-        if (playBtn) playBtn.innerHTML = '▶';
-        playJlptSpeech(fallbackScript);
-      };
-    }
 
-    audioObj.play().then(function () {
-      audioPlaying = true;
-      replayCount++;
-      var counter = document.getElementById('jlptReplayBadge');
-      if (counter) counter.innerText = 'Diputar ' + replayCount + 'x';
-      if (eq) eq.classList.add('playing');
-      if (playBtn) playBtn.innerHTML = '❚❚';
-    }).catch(function (e) {
-      console.warn('[JLPT Audio] Play error, beralih ke speech:', e);
-      playJlptSpeech(fallbackScript);
-    });
+      audioObj.onerror = function () {
+        console.warn('[JLPT Audio] Gagal memuat audio ' + source + ', fallback ke Web Speech:', url);
+        audioPlaying = false;
+        activeAudioSource = null;
+        updateAudioUi();
+        playJlptSpeech(fallbackScript, source);
+      };
+
+      var playPromise = audioObj.play();
+      if (playPromise !== undefined) {
+        playPromise.then(function () {
+          audioPlaying = true;
+          activeAudioSource = source;
+          replayCount++;
+          updateAudioUi();
+        }).catch(function (e) {
+          console.warn('[JLPT Audio] Play error, fallback ke Web Speech:', e);
+          audioPlaying = false;
+          activeAudioSource = null;
+          updateAudioUi();
+          playJlptSpeech(fallbackScript, source);
+        });
+      }
+    } catch (err) {
+      console.warn('[JLPT Audio] Init error, fallback ke Web Speech:', err);
+      playJlptSpeech(fallbackScript, source);
+    }
+  }
+
+  function togglePlayJlptAiAudio() {
+    var qs = getFilteredQuestions();
+    if (!qs || qs.length === 0) return;
+    var q = qs[curIndex];
+    if (!q) return;
+
+    var url = q.aiAudioUrl || ('./features/speaking-listening/audio-jlpt/' + q.id + '.mp3');
+    var fallbackScript = q.scriptJapanese || q.script || '';
+    playAudioStream(url, 'ai', fallbackScript);
+  }
+
+  function togglePlayJlptJeesAudio() {
+    var qs = getFilteredQuestions();
+    if (!qs || qs.length === 0) return;
+    var q = qs[curIndex];
+    if (!q) return;
+
+    var url = q.audioUrl || q.audio_url || '';
+    var fallbackScript = q.scriptJapanese || q.script || '';
+    playAudioStream(url, 'jees', fallbackScript);
+  }
+
+  function togglePlayJlptAudio(url, fallbackScript) {
+    var qs = getFilteredQuestions();
+    var q = (qs && qs[curIndex]) ? qs[curIndex] : null;
+    if (!url && q) {
+      togglePlayJlptAiAudio();
+      return;
+    }
+    if (q && url === (q.audioUrl || q.audio_url)) {
+      togglePlayJlptJeesAudio();
+    } else {
+      togglePlayJlptAiAudio();
+    }
   }
 
   function selectJlptChoice(optId, correctOptId) {
@@ -332,6 +447,7 @@
     var qJa = q.questionJapanese || q.question || '';
     var qId = q.questionIndonesian || '';
     var audioUrl = q.audioUrl || q.audio_url || '';
+    var aiAudioUrl = q.aiAudioUrl || ('./features/speaking-listening/audio-jlpt/' + q.id + '.mp3');
     var scriptJa = q.scriptJapanese || q.script || '';
     var scriptRomaji = q.scriptRomaji || '';
     var scriptId = q.scriptIndonesian || q.script_translation || '';
@@ -376,16 +492,21 @@
       '<!-- Audio Player -->' +
       '<div class="jlpt-player-card">' +
         '<div class="p-meta">' +
-          '<span><b>' + q.level + ' · ' + (q.mondaiLabel || q.mondai) + '</b> (No. ' + (curIndex + 1) + ' dari ' + qs.length + ')</span>' +
-          '<span id="jlptReplayBadge">' + (replayCount > 0 ? 'Diputar ' + replayCount + 'x' : 'Audio JEES / AI') + '</span>' +
+          '<span><b>' + escapeHtml(q.level) + ' · ' + escapeHtml(q.mondaiLabel || q.mondai) + '</b> (No. ' + (curIndex + 1) + ' dari ' + qs.length + ')</span>' +
+          '<span id="jlptReplayBadge">' + (replayCount > 0 ? 'Diputar ' + replayCount + 'x' : 'Audio AI / JEES') + '</span>' +
         '</div>' +
         '<div class="p-controls">' +
-          '<button type="button" class="jlpt-play-btn" id="jlptPlayBtn" onclick="togglePlayJlptAudio(\'' + audioUrl + '\', \'' + safeScriptJa + '\')" aria-label="Putar Audio">▶</button>' +
-          '<div class="jlpt-eq-bars" id="jlptEqBars">' +
-            '<div class="jlpt-eq-bar"></div><div class="jlpt-eq-bar"></div><div class="jlpt-eq-bar"></div><div class="jlpt-eq-bar"></div>' +
-            '<div class="jlpt-eq-bar"></div><div class="jlpt-eq-bar"></div><div class="jlpt-eq-bar"></div><div class="jlpt-eq-bar"></div>' +
+          '<div class="jlpt-controls-row">' +
+            '<button type="button" class="jlpt-ai-play-btn" id="jlptPlayAiBtn" onclick="togglePlayJlptAiAudio()" aria-label="Putar Audio AI Studio">▶ Putar Audio AI (Studio)</button>' +
           '</div>' +
-          '<button type="button" onclick="playJlptSpeech(\'' + safeScriptJa + '\')" style="background:#FFF3C4;border:1px solid #E8DFD3;border-radius:14px;padding:6px 10px;font-size:11.5px;font-weight:700;color:#7A5F1B;cursor:pointer;white-space:nowrap;display:flex;align-items:center;gap:4px;">🔊 Audio Dialog</button>' +
+          '<div class="jlpt-controls-row">' +
+            '<button type="button" class="jlpt-jees-play-btn" id="jlptPlayJeesBtn" onclick="togglePlayJlptJeesAudio()" aria-label="Rekaman JEES">📻 Rekaman JEES</button>' +
+            '<div class="jlpt-eq-bars" id="jlptEqBars" title="Visualizer Audio">' +
+              '<div class="jlpt-eq-bar"></div><div class="jlpt-eq-bar"></div><div class="jlpt-eq-bar"></div><div class="jlpt-eq-bar"></div>' +
+              '<div class="jlpt-eq-bar"></div><div class="jlpt-eq-bar"></div><div class="jlpt-eq-bar"></div><div class="jlpt-eq-bar"></div>' +
+            '</div>' +
+            '<button type="button" class="jlpt-speech-btn" id="jlptPlaySpeechBtn" onclick="playJlptSpeech(\'' + safeScriptJa + '\')" title="Web Speech Audio (Luring)" aria-label="Audio Dialog">🔊 Dialog</button>' +
+          '</div>' +
         '</div>' +
       '</div>' +
 
@@ -448,6 +569,8 @@
           '<button type="button" class="jlpt-nav-btn" ' + (curIndex === qs.length - 1 ? 'disabled' : '') + ' onclick="nextListeningQuestion()">Maju ▶</button>' +
         '</div>' +
       '</div>';
+
+    updateAudioUi();
   }
 
   // Bind to global window
@@ -456,6 +579,8 @@
   window.setListeningLevel = setListeningLevel;
   window.setListeningMondai = setListeningMondai;
   window.togglePlayJlptAudio = togglePlayJlptAudio;
+  window.togglePlayJlptAiAudio = togglePlayJlptAiAudio;
+  window.togglePlayJlptJeesAudio = togglePlayJlptJeesAudio;
   window.playJlptSpeech = playJlptSpeech;
   window.stopJlptAudio = stopJlptAudio;
   window.selectJlptChoice = selectJlptChoice;
@@ -466,7 +591,11 @@
   window.FiezelJlptListening = {
     initBank: initBank,
     open: openListeningPanel,
-    close: closeListeningPanel
+    close: closeListeningPanel,
+    playAi: togglePlayJlptAiAudio,
+    playJees: togglePlayJlptJeesAudio,
+    playSpeech: playJlptSpeech,
+    stop: stopJlptAudio
   };
 
   // Pre-fetch bank saat idle
