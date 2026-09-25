@@ -14,7 +14,13 @@
   'use strict';
 
   if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('./sw.js').catch(() => {});
+    navigator.serviceWorker.register('./sw.js', { updateViaCache: 'none' }).then(function (reg) {
+      if (reg) {
+        setTimeout(function () {
+          try { reg.update().catch(function () {}); } catch (_) {}
+        }, 2000);
+      }
+    }).catch(function () {});
   }
 }());
 

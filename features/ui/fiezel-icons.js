@@ -129,11 +129,11 @@
       '<path class="fz-line" d="M5.4 6.9c0-.5.4-.9.9-.9h2.2c.5 0 .9.4.9.9v11.2c0 .5-.4.9-.9.9H6.3a.9.9 0 0 1-.9-.9z"/>' +
       '<path class="fz-line" d="M11 6.9c0-.5.4-.9.9-.9h1.6c.5 0 .9.4.9.9v11.2c0 .5-.4.9-.9.9h-1.6a.9.9 0 0 1-.9-.9z"/>' +
       '<path class="fz-line" d="m16.4 7.6 1.7-.4c.5-.1 1 .2 1.1.7l2 9.6c.1.5-.2 1-.7 1.1l-1.4.3"/>',
-    classroom: '<polygon class="fz-fill" points="12,3.5 22.5,8.5 12,13.5 1.5,8.5" opacity="0.18"/>' +
-      '<polygon class="fz-line" points="12,3.5 22.5,8.5 12,13.5 1.5,8.5"/>' +
-      '<path class="fz-line" d="M5.5 10.5v5c0 2.6 2.9 4.8 6.5 4.8s6.5-2.2 6.5-4.8v-5"/>' +
-      '<path class="fz-line" d="M20 9.2v6.8a1.5 1.5 0 0 1-1.5 1.5"/>' +
-      '<rect class="fz-fill" x="17.2" y="17.5" width="2.6" height="3" rx="0.8"/>',
+    classroom: '<rect class="fz-fill" x="3.5" y="4" width="17" height="11.5" rx="2" opacity="0.16"/>' +
+      '<rect class="fz-line" x="3.5" y="4" width="17" height="11.5" rx="2"/>' +
+      '<line class="fz-line" x1="6.8" y1="8" x2="13.2" y2="8"/>' +
+      '<line class="fz-line" x1="6.8" y1="11.5" x2="10.8" y2="11.5"/>' +
+      '<path class="fz-line" d="M7 15.5v4.5M17 15.5v4.5M9.5 20h5"/>',
     skills: '<path class="fz-fill" d="M6 10h2.2v4H6zM10.9 7.4h2.2v9.2h-2.2zM15.8 9h2.2v6h-2.2z"/>' +
       '<path class="fz-line" d="M6.9 9.4v5.2M12 6.6v10.8M17.1 8.4v7.2M3.6 11.2v1.6M20.4 11.2v1.6"/>',
     settings: '<path class="fz-fill" d="M4.2 7.2h15.6v2.4H4.2zM4.2 14.4h15.6v2.4H4.2z"/>' +

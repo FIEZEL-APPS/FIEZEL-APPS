@@ -1,4 +1,4 @@
-﻿/*
+/*
   X-Content-Type-Options: nosniff
   X-Frame-Options: SAMEORIGIN
   Referrer-Policy: strict-origin-when-cross-origin
@@ -24,6 +24,23 @@
   Cache-Control: public, max-age=0, must-revalidate
 /th/terms/
   Cache-Control: public, max-age=0, must-revalidate
+# Service Worker & Version Metadata: Wajib no-cache agar update terdeteksi instan
+/sw.js
+  Cache-Control: no-cache, no-store, must-revalidate, max-age=0
+/app/sw.js
+  Cache-Control: no-cache, no-store, must-revalidate, max-age=0
+/version.js
+  Cache-Control: no-cache, no-store, must-revalidate, max-age=0
+/app/version.js
+  Cache-Control: no-cache, no-store, must-revalidate, max-age=0
+/VERSION.json
+  Cache-Control: no-cache, no-store, must-revalidate, max-age=0
+/app/VERSION.json
+  Cache-Control: no-cache, no-store, must-revalidate, max-age=0
+/version.json
+  Cache-Control: no-cache, no-store, must-revalidate, max-age=0
+/app/version.json
+  Cache-Control: no-cache, no-store, must-revalidate, max-age=0
 
 # Static assets dengan cache-busting version query string
 /*.css

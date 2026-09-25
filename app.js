@@ -7244,7 +7244,7 @@ function examWatchSync(){
 }
 try{document.addEventListener('fiezel-exam-lock',examWatchSync)}catch(_){}
 
-function go(v,opts){if((v==='ask'||v==='search')&&!aiDoorAllowed())return false;if(isVerifiedTeacher()&&v!=='tutor'){v='tutor'}if(!VALID_VIEWS.has(v)){showToast(FiezelI18n.t('nav.halaman-tak-tersedia'));return false}/* m025-314: penolakan berbahasa duduk DI SINI, bukan di daftar kartu — setiap pintu ke permukaan yang belum punya isi bahasa target lewat go(), termasuk pintu yang belum ditulis. */if(targetLangSurfaceBlocked(v)){showToast(FiezelI18n.t('bahasa.permukaan-terkunci',{bahasa:FiezelI18n.t('bahasa.'+activeTargetLang())}));return false}uiSfx('nav');dropStages();if(opts?.viaHistory!==true)pushBackNavView(v);state.view=v;const swap=()=>{save();render()};if(document.startViewTransition&&state.preferences?.motion!==false&&!prefersReducedMotion())document.startViewTransition(swap);else swap();return true} window.go=go;
+function go(v,opts){if((v==='ask'||v==='search')&&!aiDoorAllowed())return false;if(isVerifiedTeacher()&&v!=='tutor'){v='tutor'}if(!VALID_VIEWS.has(v)){showToast(FiezelI18n.t('nav.halaman-tak-tersedia'));return false}/* m025-314: penolakan berbahasa duduk DI SINI, bukan di daftar kartu — setiap pintu ke permukaan yang belum punya isi bahasa target lewat go(), termasuk pintu yang belum ditulis. */if(targetLangSurfaceBlocked(v)){showToast(FiezelI18n.t('bahasa.permukaan-terkunci',{bahasa:FiezelI18n.t('bahasa.'+activeTargetLang())}));return false}uiSfx('nav');dropStages();if(opts?.viaHistory!==true)pushBackNavView(v);state.view=v;if(v==='classroom'||v==='home'){try{inboxPoll(v==='classroom')}catch(_){}}const swap=()=>{save();render()};if(document.startViewTransition&&state.preferences?.motion!==false&&!prefersReducedMotion())document.startViewTransition(swap);else swap();return true} window.go=go;
 function pushBackNavView(v){try{return self.FiezelBackNav?.pushView?.(v)===true}catch{return false}}
 /* ---- m025-117 lapisan layar-di-dalam-view (stage) ---------------------------------
  * OWNER: "misalnya sudah masuk ke dalam folder, dan ingin kembali, ketika swipe back malah
@@ -8265,57 +8265,103 @@ function todayHomeMarkup(){
     + (todayReview>0?`<button type="button" class="hero-stat is-review" onclick="startAdaptive()" title="${esc(FiezelI18n.t('home.review-title-attr'))}"><b>${todayReview}</b><small>${FiezelI18n.t('home.keping-review')}</small></button>`:'')
     + `</span>`;
 
-  /* AUDIT-2026-09-21 T2+T4: learnerFlow pindah ke BAWAH kartu HARI INI (CTA naik ~346px ke
-     atas lipatan 844px); wajah kedua di today-head dilepas — satu Pau di Home. */
-  const sportsTop = `<div class="fz-sports-topbar">`
-    + `<button type="button" class="fz-sports-brand-crest" onclick="pawReact('wake');uiSfx('paw_greet')" aria-label="FIEZEL" title="FIEZEL"><span class="fz-sports-brand-inner">${typeof Fiezel3DEmblems!=='undefined'?Fiezel3DEmblems.brandCrest(44):'⚡'}</span></button>`
-    + `<div class="fz-sports-actions">`
-    + `<button type="button" id="fzCourseSwitchBtnHome" class="course-switch-btn fz-sports-course-btn" onclick="toggleTargetCourse()" aria-label="Course"><span class="course-switch-flag" id="fzCourseFlagHome">${jaCourseOn() ? '🇯🇵' : '🇬🇧'}</span><span class="course-switch-label" id="fzCourseLabelHome" style="display:none">${jaCourseOn() ? 'JA' : 'EN'}</span></button>`
-    + `<button type="button" class="fz-sports-action-btn" onclick="go('vocab')" aria-label="Search"><i data-lucide="search"></i></button>`
-    + `<button type="button" class="fz-sports-action-btn" onclick="openNotifications()" aria-label="Notifications"><i data-lucide="bell"></i></button>`
+  /* Wordmark FIEZEL Resmi & Sapaan Ramah Pengganti Tema Olahraga */
+  const homeWordmark = (typeof self.FiezelSplash !== 'undefined' && typeof self.FiezelSplash.wordmarkMarkup === 'function')
+    ? self.FiezelSplash.wordmarkMarkup('fzhm')
+    : '<span class="fz-home-wordmark-text">FIEZEL</span>';
+
+  const timeGreeting = () => {
+    const h = new Date().getHours();
+    if (h >= 4 && h < 11) return 'Selamat Pagi';
+    if (h >= 11 && h < 15) return 'Selamat Siang';
+    if (h >= 15 && h < 18) return 'Selamat Sore';
+    return 'Selamat Malam';
+  };
+
+  const getMotivationQuote = () => {
+    const quotes = [
+      'Konsistensi kecil hari ini adalah lompatan besar esok hari. Tetap semangat! ✨',
+      'Setiap kata baru yang kamu pelajari membuka pintu dunia baru. Semangat! 🌟',
+      '10 menit latihan hari ini menjaga ritme belajarmu tetap prima. 🚀',
+      'Langkah hebat dibangun dari ketekunan harian. Terus melangkah! 💪',
+      '千里の行も足下に始まる — Perjalanan ribuan mil dimulai dari satu langkah. 🌸'
+    ];
+    const day = Math.floor(Date.now() / 86400000);
+    return quotes[day % quotes.length];
+  };
+
+  const homeTop = `<div class="fz-home-topbar">`
+    + `<div class="fz-home-brand-wrap" onclick="pawReact('wake');uiSfx('paw_greet')" role="button" tabindex="0" aria-label="FIEZEL Home">${homeWordmark}</div>`
+    + `<div class="fz-home-actions">`
+    + `<button type="button" id="fzCourseSwitchBtnHome" class="course-switch-btn fz-home-course-btn" onclick="toggleTargetCourse()" aria-label="Course"><span class="course-switch-flag" id="fzCourseFlagHome">${jaCourseOn() ? '🇯🇵' : '🇬🇧'}</span><span class="course-switch-label" id="fzCourseLabelHome" style="display:none">${jaCourseOn() ? 'JA' : 'EN'}</span></button>`
+    + `<button type="button" class="fz-home-action-btn" onclick="go('vocab')" aria-label="Search"><i data-lucide="search"></i></button>`
+    + `<button type="button" class="fz-home-action-btn" onclick="openNotifications()" aria-label="Notifications"><i data-lucide="bell"></i></button>`
     + `</div></div>`
-    + `<div class="fz-sports-header"><span class="fz-sports-subhead">${jaCourseOn() ? 'Target Belajar' : 'Learning Target'}</span><div class="fz-sports-title">HARI INI</div></div>`
-    + `<div class="fz-sports-pills-bar" role="tablist">`
-    + '<button type="button" class="fz-sports-pill is-active" role="tab">Target Harian</button>'
-    + `<button type="button" class="fz-sports-pill" onclick="openListeningPanel()" role="tab">Chōkai (Audio)</button>`
-    + `<button type="button" class="fz-sports-pill" onclick="go('vocab')" role="tab">Kotoba (単語)</button>`
-    + `<button type="button" class="fz-sports-pill" onclick="go('grammar')" role="tab">Bunpō (文法)</button>`
-    + `<button type="button" class="fz-sports-pill" onclick="openLevelPanel()" role="tab">Level ${esc(jaCourseOn() ? FiezelJaUi.jlptLabel(todayLevel) : todayLevel)}</button>`
+    + `<div class="fz-welcome-header">`
+    + `<div class="fz-welcome-greeting">${timeGreeting()}, <span class="fz-welcome-name">${esc(learnerName())}</span>! ✨</div>`
+    + `<p class="fz-welcome-quote">${esc(getMotivationQuote())}</p>`
+    + `</div>`
+    + `<div class="fz-learning-pills-bar" role="tablist">`
+    + '<button type="button" class="fz-learning-pill is-active" role="tab">🎯 Target Harian</button>'
+    + `<button type="button" class="fz-learning-pill" onclick="openListeningPanel()" role="tab">🎧 Chōkai (Audio)</button>`
+    + `<button type="button" class="fz-learning-pill" onclick="go('vocab')" role="tab">📖 Kotoba (単語)</button>`
+    + `<button type="button" class="fz-learning-pill" onclick="go('grammar')" role="tab">⚡ Bunpō (文法)</button>`
+    + `<button type="button" class="fz-learning-pill" onclick="openLevelPanel()" role="tab">🏆 Level ${esc(jaCourseOn() ? FiezelJaUi.jlptLabel(todayLevel) : todayLevel)}</button>`
     + `</div>`;
 
-  const card1Hero = `<div class="fz-card-top" onclick="${aksi}" role="button" tabindex="0">`
-    + `<div class="fz-entity-col"><div class="fz-entity-badge fz-crest-3d fz-crest-chokai">${typeof Fiezel3DEmblems!=='undefined'?Fiezel3DEmblems.chokai(54):'<span>🎧</span>'}</div><b class="fz-entity-name">CHŌKAI</b><span class="fz-entity-sub">SESI AUDIO</span></div>`
-    + `<div class="fz-match-center-badge">VS</div>`
-    + `<div class="fz-entity-col is-right"><div class="fz-entity-badge is-right fz-crest-3d fz-crest-jlpt">${typeof Fiezel3DEmblems!=='undefined'?Fiezel3DEmblems.target(54):'<span>🎯</span>'}</div><span class="fz-entity-sub">TARGET</span><b class="fz-entity-name">${esc(jaCourseOn() ? FiezelJaUi.jlptLabel(todayLevel) : todayLevel)}</b></div>`
+  const card1Hero = `<div class="fz-edu-card-content" onclick="${aksi}" role="button" tabindex="0">`
+    + `<div class="fz-edu-badge-row">`
+    + `<span class="fz-edu-tag is-primary"><i class="fz-i" data-fz-icon="listening" style="width:13px;height:13px"></i> ${jaCourseOn() ? 'CHŌKAI (AUDIO)' : 'LISTENING PRACTICE'}</span>`
+    + `<span class="fz-edu-level-badge">Level ${esc(jaCourseOn() ? FiezelJaUi.jlptLabel(todayLevel) : todayLevel)}</span>`
     + `</div>`
-    + '<div class="fz-card-bottom" onclick="' + aksi + '" role="button" tabindex="0">'
-    + `<div class="fz-chip-dashed">${shape.soal} SOAL</div>`
-    + `<div class="fz-score-box"><div class="fz-score-main"><span class="fz-score-dark">${shape.menit}:</span><span class="fz-score-gray">00</span></div><div class="fz-score-date">${esc(todayLabel().toUpperCase())}</div></div>`
-    + '<div class="fz-chip-action">+50 XP</div>'
-    + '</div>';
+    + `<h3 class="fz-edu-title">${jaCourseOn() ? 'Sesi Pendengaran & Pemahaman' : 'Daily Listening & Practice'}</h3>`
+    + `<p class="fz-edu-desc">${jaCourseOn() ? 'Latih kepekaan telinga dengan audio penutur asli Jepang untuk menjaga ritme harianmu.' : 'Improve your listening comprehension and maintain your daily learning rhythm.'}</p>`
+    + `<div class="fz-edu-stats-row">`
+    + `<span class="fz-edu-stat-item"><i class="fz-i" data-fz-icon="clock" style="width:13px;height:13px"></i> ${shape.menit}:00 Menit</span>`
+    + `<span class="fz-edu-stat-item"><i class="fz-i" data-fz-icon="quiz" style="width:13px;height:13px"></i> ${shape.soal} Soal</span>`
+    + `<span class="fz-edu-stat-item is-reward">✨ +50 XP</span>`
+    + `</div>`
+    + `<button type="button" class="fz-edu-primary-btn" onclick="event.stopPropagation();${aksi}">Mulai Latihan Sekarang ➔</button>`
+    + `</div>`;
 
-  const card2Hero = `<div class="fz-match-card fz-card-silver" onclick="go('vocab')" role="button" tabindex="0" aria-label="Kotoba Flashcards">`
-    + `<div class="fz-card-top"><div class="fz-entity-col"><div class="fz-entity-badge fz-crest-3d fz-crest-kotoba">${typeof Fiezel3DEmblems!=='undefined'?Fiezel3DEmblems.kotoba(54):'<span>📖</span>'}</div><b class="fz-entity-name">KOTOBA</b><span class="fz-entity-sub">FLASHCARD</span></div>`
-    + `<div class="fz-match-center-badge">VS</div>`
-    + `<div class="fz-entity-col is-right"><div class="fz-entity-badge is-right fz-crest-3d fz-crest-bunpo">${typeof Fiezel3DEmblems!=='undefined'?Fiezel3DEmblems.bunpo(54):'<span>⚡</span>'}</div><span class="fz-entity-sub">TATA BAHASA</span><b class="fz-entity-name">BUNPŌ</b></div></div>`
-    + `<div class="fz-card-bottom"><div class="fz-chip-dashed">25 KATA</div>`
-    + `<div class="fz-score-box"><div class="fz-score-main"><span class="fz-score-dark">05:</span><span class="fz-score-gray">00</span></div><div class="fz-score-date">REVIEW HARIAN</div></div>`
-    + `<div class="fz-chip-action">SRS MEMORY</div></div></div>`;
+  const card2Hero = `<div class="fz-edu-card fz-card-neutral" onclick="go('vocab')" role="button" tabindex="0" aria-label="Kotoba Flashcards">`
+    + `<div class="fz-edu-card-content">`
+    + `<div class="fz-edu-badge-row">`
+    + `<span class="fz-edu-tag is-emerald"><i class="fz-i" data-fz-icon="vocab" style="width:13px;height:13px"></i> ${jaCourseOn() ? 'KOTOBA & BUNPŌ' : 'VOCABULARY & GRAMMAR'}</span>`
+    + `<span class="fz-edu-sub-badge">REVIEW HARIAN</span>`
+    + `</div>`
+    + `<h3 class="fz-edu-title">${jaCourseOn() ? 'Flashcard Kosakata & Pola Kalimat' : 'Vocabulary Flashcards & Syntax'}</h3>`
+    + `<p class="fz-edu-desc">${jaCourseOn() ? '25 kata aktif dengan sistem pengulangan berjarak (Spaced Repetition System) agar tersimpan di memori jangka panjang.' : 'Active flashcards with spaced repetition system to reinforce long-term memory.'}</p>`
+    + `<div class="fz-edu-stats-row">`
+    + `<span class="fz-edu-stat-item">🗂️ 25 Kosakata</span>`
+    + `<span class="fz-edu-stat-item">⏱️ 05:00 Menit</span>`
+    + `<span class="fz-edu-stat-item">🧠 SRS Memory</span>`
+    + `</div>`
+    + `<button type="button" class="fz-edu-secondary-btn" onclick="event.stopPropagation();go('vocab')">Buka Flashcard ➔</button>`
+    + `</div></div>`;
 
-  const card3Hero = `<div class="fz-match-card fz-card-obsidian" onclick="openListeningPanel()" role="button" tabindex="0" aria-label="Dokkai dan Simulasi">`
-    + `<div class="fz-card-top"><div class="fz-entity-col"><div class="fz-entity-badge fz-crest-3d fz-crest-dokkai">${typeof Fiezel3DEmblems!=='undefined'?Fiezel3DEmblems.dokkai(54):'<span>📜</span>'}</div><b class="fz-entity-name">DOKKAI</b><span class="fz-entity-sub">BACAAN JLPT</span></div>`
-    + `<div class="fz-match-center-badge">VS</div>`
-    + `<div class="fz-entity-col is-right"><div class="fz-entity-badge is-right fz-crest-3d fz-crest-exam">${typeof Fiezel3DEmblems!=='undefined'?Fiezel3DEmblems.exam(54):'<span>🏆</span>'}</div><span class="fz-entity-sub">SIMULASI</span><b class="fz-entity-name">TRY OUT</b></div></div>`
-    + `<div class="fz-card-bottom"><div class="fz-chip-dashed">20 MENIT</div>`
-    + `<div class="fz-score-box"><div class="fz-score-main"><span class="fz-score-dark">88</span><span class="fz-score-gray">%</span></div><div class="fz-score-date">SKOR KELULUSAN</div></div>`
-    + `<div class="fz-chip-action">SIMULASI ➔</div></div></div>`;
+  const card3Hero = `<div class="fz-edu-card fz-card-obsidian" onclick="openListeningPanel()" role="button" tabindex="0" aria-label="Dokkai dan Simulasi">`
+    + `<div class="fz-edu-card-content">`
+    + `<div class="fz-edu-badge-row">`
+    + `<span class="fz-edu-tag is-gold"><i class="fz-i" data-fz-icon="reading" style="width:13px;height:13px"></i> ${jaCourseOn() ? 'DOKKAI & SIMULASI' : 'READING & EXAM PREP'}</span>`
+    + `<span class="fz-edu-sub-badge">JLPT N5/N4</span>`
+    + `</div>`
+    + `<h3 class="fz-edu-title">${jaCourseOn() ? 'Simulasi Ujian & Bacaan Teks' : 'Exam Simulation & Reading Comprehension'}</h3>`
+    + `<p class="fz-edu-desc">${jaCourseOn() ? 'Uji pemahaman wacana dan kecepatan membaca dengan format simulasi ujian standar resmi.' : 'Test reading comprehension and pacing with standardized test simulation.'}</p>`
+    + `<div class="fz-edu-stats-row">`
+    + `<span class="fz-edu-stat-item">⏱️ 20 Menit</span>`
+    + `<span class="fz-edu-stat-item">🎯 Target: 88%</span>`
+    + `<span class="fz-edu-stat-item">🏆 Try Out Resmi</span>`
+    + `</div>`
+    + `<button type="button" class="fz-edu-secondary-btn" onclick="event.stopPropagation();openListeningPanel()">Mulai Simulasi ➔</button>`
+    + `</div></div>`;
 
-  return `<div class="today-home-cockpit fz-sports-cockpit">
-  ${sportsTop}
-  <section class="today-card fz-match-card fz-card-yellow" aria-label="${esc(FiezelI18n.t('today.aria-kartu'))}">
+  return `<div class="today-home-cockpit fz-edu-cockpit">
+  ${homeTop}
+  <section class="today-card fz-edu-card fz-card-primary" aria-label="${esc(FiezelI18n.t('today.aria-kartu'))}">
     ${card1Hero}
     <details class="fz-card-drawer">
-      <summary class="fz-drawer-toggle"><span>${jaCourseOn() ? '⛩️ ' : '⚡ '}${esc(FiezelI18n.t('home.sesi-next') || 'SESSION DETAILS')}</span><span class="fz-drawer-arrow">▾</span></summary>
+      <summary class="fz-drawer-toggle"><span>${jaCourseOn() ? '⛩️ ' : '⚡ '}${esc(FiezelI18n.t('home.sesi-next') || 'DETAIL MATERI & RITME')}</span><span class="fz-drawer-arrow">▾</span></summary>
       <div class="fz-drawer-inner">
         <div class="today-head"><span class="today-eyebrow">${FiezelI18n.t('today.eyebrow')}</span>${todayHeadChips}</div>
         ${rhythmBar}
@@ -13046,7 +13092,7 @@ function openSettings(){const p=state.preferences||defaultPreferences,endpoint=p
   // itulah yang melaporkan shell usang, jadi tombol perbaikannya berdampingan dengannya.
   /* Audit F15: "Hapus semua progres" pindah dari dasar halaman Progres ke Pengaturan -> Data
      (tetap lewat konfirmasi resetProgress). */
-  const grupData=`${continuitySettingsMarkup()}<div class="card reset-card"><h3>${FiezelI18n.t('progress.reset-progres')}</h3><p class="muted">${FiezelI18n.t('settings.reset-lokasi-desc')}</p><button type="button" class="danger" data-testid="settings-reset-progress" onclick="resetProgress()">${FiezelI18n.t('progress.reset-progres')}</button></div><div class="card cache-card"><h3>${FiezelI18n.t('settings.bersihkan-cache-judul')}</h3><p class="muted">${FiezelI18n.t('settings.menghapus-berkas-aplikasi-lama-menumpuk')}</p><button id="settingClearCache" type="button"><i data-lucide="refresh-ccw"></i> ${FiezelI18n.t('settings.bersihkan-cache-amp-muat-ulang')}</button></div><div class="card"><h3>${FiezelI18n.t('settings.kesehatan-instalasi-judul')}</h3><div id="installHealth"><p class="muted">${FiezelI18n.t('settings.memeriksa-pemasangan')}</p></div></div>`;
+  const grupData=`${continuitySettingsMarkup()}<div class="card reset-card"><h3>${FiezelI18n.t('progress.reset-progres')}</h3><p class="muted">${FiezelI18n.t('settings.reset-lokasi-desc')}</p><button type="button" class="danger" data-testid="settings-reset-progress" onclick="resetProgress()">${FiezelI18n.t('progress.reset-progres')}</button></div><div class="card cache-card"><h3>${FiezelI18n.t('settings.bersihkan-cache-judul')}</h3><p class="muted">${FiezelI18n.t('settings.menghapus-berkas-aplikasi-lama-menumpuk')}</p><div style="display:flex;gap:8px;flex-wrap:wrap"><button id="settingCheckUpdate" type="button" class="primary" style="flex:1"><i data-lucide="refresh-cw"></i> Cek Pembaruan</button><button id="settingClearCache" type="button" style="flex:1"><i data-lucide="trash-2"></i> ${FiezelI18n.t('settings.bersihkan-cache-amp-muat-ulang')}</button></div></div><div class="card"><h3>${FiezelI18n.t('settings.kesehatan-instalasi-judul')}</h3><div id="installHealth"><p class="muted">${FiezelI18n.t('settings.memeriksa-pemasangan')}</p></div></div>`;
   /* Audit F16 (2026-09-23): "Creator Learning Report", "Endpoint Webhook Laporan", dan
      "Pasang Creator Hub" adalah alat pengembang, bukan pengaturan murid. Blok itu kini
      tersembunyi kecuali mode kreator (guru terverifikasi, ?creator=1, atau
@@ -13070,7 +13116,7 @@ function openSettings(){const p=state.preferences||defaultPreferences,endpoint=p
     +settingsFold(FiezelI18n.t('settings.data-amp-penyimpanan'),grupData,false)
     +settingsFold(FiezelI18n.t('settings.lanjutan'),grupLanjutan,false)
     +`<div class="modal-actions settings-actions"><button id="settingsCancel">${FiezelI18n.t('settings.cancel-btn')}</button><button class="primary" id="settingsSave">${FiezelI18n.t('settings.simpan-prefs')}</button></div>`);
-  $('settingsCancel').onclick=closeModal;setTimeout(refreshInstallHealth,0);setTimeout(refreshAudioDiagnostics,0);$('backupExport')?.addEventListener('click',runBackupExport);$('backupPick')?.addEventListener('click',()=>$('backupFile')?.click());$('backupFile')?.addEventListener('change',event=>runBackupImport(event.currentTarget.files?.[0]));$('openFeedback')?.addEventListener('click',()=>{closeModal();openFeedback('')});$('reportPreview').onclick=openReportPreview;$('settingsSave').onclick=saveSettings;$('settingClearCache')?.addEventListener('click',()=>{confirmClearAppCache()});bindVoiceSettingControls();bindAccountSettingControls();bindFiezelAccountControls();$('settingReminders')?.addEventListener('change',event=>toggleStudyReminders(event.currentTarget));$('settingLearnerLocale')?.addEventListener('change',event=>setLearnerLocalePreference(event.currentTarget.value));$('settingTargetLang')?.addEventListener('change',event=>setTargetLangPreference(event.currentTarget.value));$('settingBoardHidden')?.addEventListener('change',event=>socialToggleHidden(event.currentTarget));
+  $('settingsCancel').onclick=closeModal;setTimeout(refreshInstallHealth,0);setTimeout(refreshAudioDiagnostics,0);$('backupExport')?.addEventListener('click',runBackupExport);$('backupPick')?.addEventListener('click',()=>$('backupFile')?.click());$('backupFile')?.addEventListener('change',event=>runBackupImport(event.currentTarget.files?.[0]));$('openFeedback')?.addEventListener('click',()=>{closeModal();openFeedback('')});$('reportPreview').onclick=openReportPreview;$('settingsSave').onclick=saveSettings;$('settingClearCache')?.addEventListener('click',()=>{confirmClearAppCache()});$('settingCheckUpdate')?.addEventListener('click',async()=>{const btn=$('settingCheckUpdate');if(btn){btn.disabled=true;btn.textContent='Memeriksa...';}try{const hasUpdate=await self.FiezelUpdatePrompt?.check?.(true);if(!hasUpdate){showToast('Aplikasi sudah versi terbaru.','success');if(btn){btn.disabled=false;btn.innerHTML='<i data-lucide="check"></i> Versi Terbaru';enhanceUI();}}else{closeModal();}}catch(err){showToast('Gagal memeriksa: '+(err?.message||err),'warn');if(btn){btn.disabled=false;btn.innerHTML='<i data-lucide="refresh-cw"></i> Cek Pembaruan';enhanceUI();}}});bindVoiceSettingControls();bindAccountSettingControls();bindFiezelAccountControls();$('settingReminders')?.addEventListener('change',event=>toggleStudyReminders(event.currentTarget));$('settingLearnerLocale')?.addEventListener('change',event=>setLearnerLocalePreference(event.currentTarget.value));$('settingTargetLang')?.addEventListener('change',event=>setTargetLangPreference(event.currentTarget.value));$('settingBoardHidden')?.addEventListener('change',event=>socialToggleHidden(event.currentTarget));
 // Pengaturan sebelum gelombang idle selesai, kartunya akan berbunyi "tidak tersedia"
 // padahal berkasnya sedang dalam perjalanan - jadi kartunya digambar ulang begitu tiba.
 if(!self.FiezelVoiceRuntime)ensureVoiceRuntime().then(()=>{const holder=$('voiceSettingsCard');if(!holder)return;holder.innerHTML=neuralVoiceStatusMarkup();bindVoiceSettingControls();enhanceUI()});
@@ -14694,7 +14740,7 @@ function armSocialInviteSheet(tries){
   const first=setTimeout(tick,1600);first?.unref?.();
   // Kabar dari teman ditanyakan sekali sesudah boot tenang — sesudah konten dan suara
   // selesai berebut pita, bukan di tengahnya.
-  const poll=setTimeout(()=>{socialNotifyPoll(true);try{startNotifPolling()}catch(_){}},6500);poll?.unref?.();
+  const poll=setTimeout(()=>{socialNotifyPoll(true);try{startNotifPolling()}catch(_){}},1500);poll?.unref?.();
   return true;
 }
 /** Jumlah kabar belum terbaca — dipakai lencana kartu Home. */
@@ -14824,7 +14870,7 @@ async function notifSyncRound(){
    jadi 15 detik masih tiga kali lipat di atasnya - dan timer ini SUDAH diam total saat
    aplikasi tidak terlihat, sehingga biayanya hanya jatuh pada murid yang benar-benar sedang
    memandang layarnya. */
-const NOTIF_POLL_MS=15000;
+const NOTIF_POLL_MS=6000;
 function startNotifPolling(){
   if(notifPollTimer)return false;
   notifPollTimer=setInterval(()=>{

@@ -698,6 +698,16 @@
     if (pendingOpen) { var id = pendingOpen; pendingOpen = null; if (openAssignment(id)) return; }
     resumeFocus();
     try { fetchClassTeachers(); } catch (_) {}
+    /* Tarik tugas terbaru seketika saat murid membuka tab KelasKu */
+    try {
+      if (root.FiezelInbox && typeof root.FiezelInbox.poll === 'function') {
+        root.FiezelInbox.poll(true).then(function (r) {
+          if (r && ((r.added && r.added.length) || (r.retracted && r.retracted.length))) {
+            renderStudent({ quiet: true });
+          }
+        }).catch(function () {});
+      }
+    } catch (_) {}
     /* Kabar kurikulum diambil paling banyak sekali per lima menit (lihat perluRefresh),
        dan kegagalannya berakhir sebagai daftar kosong — tab Tugas tidak boleh bergantung
        pada layanan lain yang hidup. */
@@ -1721,7 +1731,16 @@
     var b = e.target.closest ? e.target.closest('[data-ch]') : null; if (!b) return;
     var act = b.getAttribute('data-ch'), id = b.getAttribute('data-id'), u = ui();
     switch (act) {
-      case 'tab': u.tab = b.getAttribute('data-tab'); u.review = null; u.curriculumView = null; u.editCode = false; if (u.arsipView) closeArsip(); break;
+      case 'tab':
+        u.tab = b.getAttribute('data-tab'); u.review = null; u.curriculumView = null; u.editCode = false; if (u.arsipView) closeArsip();
+        if (u.tab === 'tugas' && root.FiezelInbox && typeof root.FiezelInbox.poll === 'function') {
+          root.FiezelInbox.poll(true).then(function (r) {
+            if (r && ((r.added && r.added.length) || (r.retracted && r.retracted.length))) {
+              renderStudent({ quiet: true });
+            }
+          }).catch(function () {});
+        }
+        break;
       case 'seg': u.seg = b.getAttribute('data-seg'); break;
       case 'toggle-sebelumnya': u.bukaSebelumnya = !u.bukaSebelumnya; break;
       case 'buka-arsip': openArsip(); break;
@@ -1774,7 +1793,22 @@
   }
   function onStudentSubmit(e) {
     var f = e.target.closest ? e.target.closest('[data-ch-form]') : null; if (!f) return; e.preventDefault();
-    if (f.getAttribute('data-ch-form') === 'join') { var codeVal = new FormData(f).get('code') || studentDraftCode; var ok = setClassCode(codeVal); if (ok) studentDraftCode = ''; if (sEnv.toast) sEnv.toast(ok ? t('kelas.gabung-terkirim', 'Kode tersimpan. Permintaan bergabung sudah dikirim ke gurumu — tugas muncul otomatis setelah kamu ditambahkan.') : t('kelas.gabung-kode-salah', 'Kode tidak valid — bentuknya FZ-XXXXXX.')); ui().editCode = false; saveUi(); renderStudent(); }
+    if (f.getAttribute('data-ch-form') === 'join') {
+      var codeVal = new FormData(f).get('code') || studentDraftCode;
+      var ok = setClassCode(codeVal);
+      if (ok) {
+        studentDraftCode = '';
+        if (root.FiezelInbox && typeof root.FiezelInbox.poll === 'function') {
+          root.FiezelInbox.poll(true).then(function (r) {
+            if (r && ((r.added && r.added.length) || (r.retracted && r.retracted.length))) {
+              renderStudent({ quiet: true });
+            }
+          }).catch(function () {});
+        }
+      }
+      if (sEnv.toast) sEnv.toast(ok ? t('kelas.gabung-terkirim', 'Kode tersimpan. Permintaan bergabung sudah dikirim ke gurumu — tugas muncul otomatis setelah kamu ditambahkan.') : t('kelas.gabung-kode-salah', 'Kode tidak valid — bentuknya FZ-XXXXXX.'));
+      ui().editCode = false; saveUi(); renderStudent();
+    }
   }
 
   /* ===================================================================================== */
