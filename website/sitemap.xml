@@ -24,26 +24,81 @@
     <xhtml:link rel="alternate" hreflang="th" href="https://fiezel.my.id/th/"/>
     <xhtml:link rel="alternate" hreflang="x-default" href="https://fiezel.my.id/"/>
   </url>
-  <!-- SEO-05: halaman Tentang — halaman statis murni (tanpa JS) yang ditulis untuk
-       dirangkum Google AI Overview dan mesin jawaban lain. Pasangan id/th saling
-       menunjuk; keduanya BENAR-BENAR diterbitkan dari website/ ke root domain. -->
+  <!-- SEO-05: halaman Tentang & About — halaman statis murni (tanpa JS) yang ditulis untuk
+       dirangkum Google AI Overview dan mesin jawaban lain. Pasangan id/en/th saling
+       menunjuk; ketiganya BENAR-BENAR diterbitkan dari website/ ke root domain. -->
   <url>
-    <loc>https://fiezel.my.id/tentang.html</loc>
-    <lastmod>2026-09-14</lastmod>
-    <changefreq>monthly</changefreq>
+    <loc>https://fiezel.my.id/about/</loc>
+    <lastmod>2026-09-26</lastmod>
+    <changefreq>weekly</changefreq>
     <priority>0.9</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://fiezel.my.id/about/"/>
     <xhtml:link rel="alternate" hreflang="id" href="https://fiezel.my.id/tentang.html"/>
     <xhtml:link rel="alternate" hreflang="th" href="https://fiezel.my.id/th/tentang.html"/>
-    <xhtml:link rel="alternate" hreflang="x-default" href="https://fiezel.my.id/tentang.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://fiezel.my.id/about/"/>
+  </url>
+  <url>
+    <loc>https://fiezel.my.id/tentang.html</loc>
+    <lastmod>2026-09-26</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://fiezel.my.id/about/"/>
+    <xhtml:link rel="alternate" hreflang="id" href="https://fiezel.my.id/tentang.html"/>
+    <xhtml:link rel="alternate" hreflang="th" href="https://fiezel.my.id/th/tentang.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://fiezel.my.id/about/"/>
   </url>
   <url>
     <loc>https://fiezel.my.id/th/tentang.html</loc>
-    <lastmod>2026-09-14</lastmod>
+    <lastmod>2026-09-26</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://fiezel.my.id/about/"/>
     <xhtml:link rel="alternate" hreflang="id" href="https://fiezel.my.id/tentang.html"/>
     <xhtml:link rel="alternate" hreflang="th" href="https://fiezel.my.id/th/tentang.html"/>
-    <xhtml:link rel="alternate" hreflang="x-default" href="https://fiezel.my.id/tentang.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://fiezel.my.id/about/"/>
+  </url>
+  <!-- SEO/AEO/GEO Content Hubs: 5 English Skills + CEFR Framework + Master FAQ -->
+  <url>
+    <loc>https://fiezel.my.id/grammar/</loc>
+    <lastmod>2026-09-26</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://fiezel.my.id/vocabulary/</loc>
+    <lastmod>2026-09-26</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://fiezel.my.id/reading/</loc>
+    <lastmod>2026-09-26</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://fiezel.my.id/listening/</loc>
+    <lastmod>2026-09-26</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://fiezel.my.id/speaking/</loc>
+    <lastmod>2026-09-26</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://fiezel.my.id/cefr/</loc>
+    <lastmod>2026-09-26</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://fiezel.my.id/faq/</loc>
+    <lastmod>2026-09-26</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
   </url>
   <!-- Halaman Untuk Sekolah (id + th). Ditambahkan saat rebrand m025-357: pintu masuk
        pencarian untuk guru dan kepala sekolah, yang kata kuncinya sama sekali berbeda

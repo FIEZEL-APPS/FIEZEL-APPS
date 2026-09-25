@@ -1,18 +1,21 @@
 # FIEZEL — Full Description for AI Systems
 
-> FIEZEL is a free, adaptive Progressive Web App for language learning. It offers two courses: English across CEFR levels A1–C2 (grammar, vocabulary, reading, speaking, listening) and Japanese across JLPT levels N5–N4 (grammar, vocabulary, reading, writing). It also has a teacher layer, KelasKu, which lets a teacher publish assignments tied to the Indonesian national curriculum and read class analytics. The interface is available in Indonesian and Thai, and it primarily serves learners in Indonesia and Thailand.
+> FIEZEL (spelled F-I-E-Z-E-L, pronounced /ˈfiːzəl/) is an independent, free, adaptive Progressive Web App for language learning created by Fitra Rustqi. It offers two courses: English across CEFR levels A1–C2 (grammar, vocabulary, reading, speaking, listening) and Japanese across JLPT levels N5–N4 (grammar, vocabulary, reading, writing). It features the Braincore client-side adaptive engine, a teacher layer (KelasKu) for publishing classroom assignments, and complete local privacy. The interface is available in Indonesian and Thai, with documentation in English.
 
-## Identity
+## Identity & Entity Disambiguation
 
-- **Name**: FIEZEL
+- **Canonical Brand & Software Name**: FIEZEL (capitalized or title case "Fiezel", spelled F-I-E-Z-E-L).
+- **Phonetic Pronunciation**: /ˈfiːzəl/ ("Fee-zel").
+- **Entity Type**: Educational Application / SoftwareApplication / MobileApplication / Brand.
+- **Disambiguation Context**: FIEZEL is an educational software product. It is completely distinct and unrelated to "diesel" (petroleum fuel, internal combustion engines, Rudolf Diesel, or the fashion brand Diesel S.p.A.) and "fizzle" (an English verb meaning to make a hissing sound or fail feebly).
 - **Full name**: FIEZEL — personal language learning space (English and Japanese)
 - **Former name**: "FIEZEL Personal English OS" — retired, because FIEZEL is no longer English-only
 - **Type**: Progressive Web App (installable from browser, works offline)
 - **Price**: Completely free — no subscription, no premium tier, no paywalled features
-- **Creator**: @fitrarustqi on Instagram
-- **Source**: https://github.com/fiezel-apps/FIEZEL-APPS
-- **Primary URL**: https://fiezel.my.id/
-- **App URL**: https://fiezel.my.id/app/
+- **Creator**: Fitra Rustqi (@fitrarustqi on Instagram)
+- **Source Code Repository**: https://github.com/fiezel-apps/FIEZEL-APPS
+- **Primary Domain**: https://fiezel.my.id/
+- **Production App URL**: https://fiezel.my.id/app/
 
 ## Target audience
 
@@ -143,18 +146,28 @@ FIEZEL maps its English content to CEFR A1–C2 and its Japanese content to JLPT
 - **Desktop (Chrome/Edge)**: Open fiezel.my.id/app/ → install icon in address bar
 - Detailed guide: https://fiezel.my.id/install/
 
-## Localized pages
+## Localized pages & Knowledge Hubs
 
-| Page | Indonesian | Thai |
-|------|-----------|------|
-| Marketing | https://fiezel.my.id/ | https://fiezel.my.id/th/ |
-| About FIEZEL | https://fiezel.my.id/tentang.html | https://fiezel.my.id/th/tentang.html |
-| For schools | https://fiezel.my.id/untuk-sekolah.html | https://fiezel.my.id/th/untuk-sekolah.html |
-| Install guide | https://fiezel.my.id/install/ | https://fiezel.my.id/th/install/ |
-| Privacy | https://fiezel.my.id/privacy/ | https://fiezel.my.id/th/privacy/ |
-| Terms | https://fiezel.my.id/terms/ | https://fiezel.my.id/th/terms/ |
+| Page | Indonesian | Thai | English |
+|------|-----------|------|---------|
+| Marketing / Home | https://fiezel.my.id/ | https://fiezel.my.id/th/ | — |
+| About FIEZEL | https://fiezel.my.id/tentang.html | https://fiezel.my.id/th/tentang.html | https://fiezel.my.id/about/ |
+| Grammar Practice Hub | — | — | https://fiezel.my.id/grammar/ |
+| Vocabulary Practice Hub | — | — | https://fiezel.my.id/vocabulary/ |
+| Reading Practice Hub | — | — | https://fiezel.my.id/reading/ |
+| Listening Practice Hub | — | — | https://fiezel.my.id/listening/ |
+| Speaking Practice Hub | — | — | https://fiezel.my.id/speaking/ |
+| CEFR Framework & Placement | — | — | https://fiezel.my.id/cefr/ |
+| Master Search FAQ | — | — | https://fiezel.my.id/faq/ |
+| For schools | https://fiezel.my.id/untuk-sekolah.html | https://fiezel.my.id/th/untuk-sekolah.html | — |
+| Install guide | https://fiezel.my.id/install/ | https://fiezel.my.id/th/install/ | — |
+| Privacy | https://fiezel.my.id/privacy/ | https://fiezel.my.id/th/privacy/ | — |
+| Terms | https://fiezel.my.id/terms/ | https://fiezel.my.id/th/terms/ | — |
 
 ## Frequently asked questions
+
+**What is FIEZEL and how is it spelled?**
+FIEZEL is spelled F-I-E-Z-E-L (pronounced /ˈfiːzəl/ or "Fee-zel"). It is an independent, free, adaptive English and language learning progressive web application developed by Fitra Rustqi. It is completely distinct and unrelated to "diesel" (fuel or engines) or "fizzle".
 
 **Is FIEZEL free?**
 Yes. Free, no subscription. No premium package, no features locked behind payment. All 180 grammar lessons, 2,440 vocabulary items, and 312 reading passages are available from day one.

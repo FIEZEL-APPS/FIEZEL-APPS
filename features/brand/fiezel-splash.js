@@ -66,7 +66,7 @@
   var COPY = Object.freeze({
     word: 'FIEZEL',
     kelasku: 'KelasKu',
-    tagline: 'untuk Guru'
+    tagline: (typeof t === 'function' ? t('splash.tagline_for_teacher', 'untuk Guru') : 'untuk Guru')
   });
 
   /* Garis waktu master v4 — nilai teruji QA prototipe (crossfade mengikuti

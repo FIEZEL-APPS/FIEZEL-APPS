@@ -1,0 +1,628 @@
+{
+  "schema": "fiezel-buku-928-manifest-v1",
+  "totalBab": 50,
+  "totalSoal": 928,
+  "chapters": [
+    {
+      "code": "KOMP-IPA-D-7-BAB1-01",
+      "subject": "IPA",
+      "grade": 7,
+      "name": "Hakikat Ilmu Sains dan Metode Ilmiah",
+      "target": 38,
+      "integrated": 0,
+      "status": "BELUM-ADA",
+      "sources": [],
+      "dokumen": ""
+    },
+    {
+      "code": "KOMP-IPA-D-7-BAB2-01",
+      "subject": "IPA",
+      "grade": 7,
+      "name": "Zat dan Perubahannya",
+      "target": 22,
+      "integrated": 0,
+      "status": "BELUM-ADA",
+      "sources": [],
+      "dokumen": ""
+    },
+    {
+      "code": "KOMP-IPA-D-7-BAB3-01",
+      "subject": "IPA",
+      "grade": 7,
+      "name": "Suhu, Kalor, dan Pemuaian",
+      "target": 21,
+      "integrated": 0,
+      "status": "BELUM-ADA",
+      "sources": [],
+      "dokumen": ""
+    },
+    {
+      "code": "KOMP-IPA-D-7-BAB4-01",
+      "subject": "IPA",
+      "grade": 7,
+      "name": "Gerak dan Gaya",
+      "target": 20,
+      "integrated": 0,
+      "status": "BELUM-ADA",
+      "sources": [],
+      "dokumen": ""
+    },
+    {
+      "code": "KOMP-IPA-D-7-BAB5-01",
+      "subject": "IPA",
+      "grade": 7,
+      "name": "Karakteristik dan Klasifikasi Makhluk Hidup",
+      "target": 16,
+      "integrated": 16,
+      "status": "TUNTAS",
+      "sources": [
+        "tools/build-ipa-full-all-7bab.py:16"
+      ],
+      "dokumen": "Ilmu Pengetahuan Alam untuk SMP/MTs Kelas VII (Edisi Revisi) — Bab 5"
+    },
+    {
+      "code": "KOMP-IPA-D-7-BAB6-01",
+      "subject": "IPA",
+      "grade": 7,
+      "name": "Ekologi dan Pelestarian Lingkungan",
+      "target": 16,
+      "integrated": 16,
+      "status": "TUNTAS",
+      "sources": [
+        "tools/build-ipa-full-all-7bab.py:16"
+      ],
+      "dokumen": "Ilmu Pengetahuan Alam untuk SMP/MTs Kelas VII (Edisi Revisi) — Bab 5"
+    },
+    {
+      "code": "KOMP-IPA-D-7-BAB7-01",
+      "subject": "IPA",
+      "grade": 7,
+      "name": "Bumi dan Tata Surya",
+      "target": 16,
+      "integrated": 16,
+      "status": "TUNTAS",
+      "sources": [
+        "tools/build-ipa-full-all-7bab.py:16"
+      ],
+      "dokumen": "Ilmu Pengetahuan Alam untuk SMP/MTs Kelas VII (Edisi Revisi) — Bab 5"
+    },
+    {
+      "code": "KOMP-IPA-D-8-BAB1-01",
+      "subject": "IPA",
+      "grade": 8,
+      "name": "Pengenalan Sel",
+      "target": 20,
+      "integrated": 12,
+      "status": "PARSIAL",
+      "sources": [
+        "tools/build_all_core_chunks_master.py:12"
+      ],
+      "dokumen": "Matematika untuk SMP/MTs Kelas VII — Bab 2"
+    },
+    {
+      "code": "KOMP-IPA-D-8-BAB2-01",
+      "subject": "IPA",
+      "grade": 8,
+      "name": "Struktur dan Fungsi Tubuh Makhluk Hidup",
+      "target": 12,
+      "integrated": 6,
+      "status": "PARSIAL",
+      "sources": [
+        "tools/build_all_core_chunks_master_part2.py:6"
+      ],
+      "dokumen": "Bahasa Indonesia untuk SMP/MTs Kelas VII (Edisi Revisi) — Bab 2"
+    },
+    {
+      "code": "KOMP-IPA-D-8-BAB3-01",
+      "subject": "IPA",
+      "grade": 8,
+      "name": "Usaha, Energi, dan Pesawat Sederhana",
+      "target": 18,
+      "integrated": 12,
+      "status": "PARSIAL",
+      "sources": [
+        "tools/build_all_phase_d_remaining_chunks.py:12"
+      ],
+      "dokumen": "Ilmu Pengetahuan Alam untuk SMP/MTs Kelas VII (Edisi Revisi)"
+    },
+    {
+      "code": "KOMP-IPA-D-8-BAB4-01",
+      "subject": "IPA",
+      "grade": 8,
+      "name": "Tekanan",
+      "target": 19,
+      "integrated": 12,
+      "status": "PARSIAL",
+      "sources": [
+        "tools/build_all_phase_d_remaining_chunks.py:12"
+      ],
+      "dokumen": "Ilmu Pengetahuan Alam untuk SMP/MTs Kelas VII (Edisi Revisi)"
+    },
+    {
+      "code": "KOMP-IPA-D-8-BAB5-01",
+      "subject": "IPA",
+      "grade": 8,
+      "name": "Getaran, Gelombang, dan Cahaya",
+      "target": 12,
+      "integrated": 12,
+      "status": "TUNTAS",
+      "sources": [
+        "tools/build_all_phase_d_remaining_chunks.py:12"
+      ],
+      "dokumen": "Ilmu Pengetahuan Alam untuk SMP/MTs Kelas VII (Edisi Revisi)"
+    },
+    {
+      "code": "KOMP-IPA-D-8-BAB6-01",
+      "subject": "IPA",
+      "grade": 8,
+      "name": "Unsur, Senyawa, dan Campuran",
+      "target": 20,
+      "integrated": 12,
+      "status": "PARSIAL",
+      "sources": [
+        "tools/build_all_phase_d_remaining_chunks.py:12"
+      ],
+      "dokumen": "Ilmu Pengetahuan Alam untuk SMP/MTs Kelas VII (Edisi Revisi)"
+    },
+    {
+      "code": "KOMP-ENG-D-7-BAB1-01",
+      "subject": "ENG",
+      "grade": 7,
+      "name": "Chapter 1: About Me",
+      "target": 12,
+      "integrated": 12,
+      "status": "TUNTAS",
+      "sources": [
+        "tools/build_all_core_chunks_master.py:12"
+      ],
+      "dokumen": "Matematika untuk SMP/MTs Kelas VII — Bab 2"
+    },
+    {
+      "code": "KOMP-ENG-D-7-BAB2-01",
+      "subject": "ENG",
+      "grade": 7,
+      "name": "Chapter 2: Culinary and Me",
+      "target": 20,
+      "integrated": 6,
+      "status": "PARSIAL",
+      "sources": [
+        "tools/build_all_core_chunks_master_part2.py:6"
+      ],
+      "dokumen": "Bahasa Indonesia untuk SMP/MTs Kelas VII (Edisi Revisi) — Bab 2"
+    },
+    {
+      "code": "KOMP-ENG-D-7-BAB3-01",
+      "subject": "ENG",
+      "grade": 7,
+      "name": "Chapter 3: Home Sweet Home",
+      "target": 12,
+      "integrated": 6,
+      "status": "PARSIAL",
+      "sources": [
+        "tools/build_all_phase_d_remaining_chunks.py:6"
+      ],
+      "dokumen": "Ilmu Pengetahuan Alam untuk SMP/MTs Kelas VII (Edisi Revisi)"
+    },
+    {
+      "code": "KOMP-ENG-D-8-BAB1-01",
+      "subject": "ENG",
+      "grade": 8,
+      "name": "Chapter 1: Celebrating Independence Day",
+      "target": 20,
+      "integrated": 12,
+      "status": "PARSIAL",
+      "sources": [
+        "tools/build_grade_8_chunks.py:12"
+      ],
+      "dokumen": "Bahasa Indonesia untuk SMP/MTs Kelas VIII (Edisi Revisi)"
+    },
+    {
+      "code": "KOMP-ENG-D-8-BAB2-01",
+      "subject": "ENG",
+      "grade": 8,
+      "name": "Chapter 2: Kindness Begins with Me",
+      "target": 20,
+      "integrated": 0,
+      "status": "BELUM-ADA",
+      "sources": [],
+      "dokumen": ""
+    },
+    {
+      "code": "KOMP-ENG-D-8-BAB3-01",
+      "subject": "ENG",
+      "grade": 8,
+      "name": "Chapter 3: Love Our World",
+      "target": 20,
+      "integrated": 20,
+      "status": "TUNTAS",
+      "sources": [
+        "tools/create_c3.py:20"
+      ],
+      "dokumen": "English for Nusantara untuk SMP/MTs Kelas VIII"
+    },
+    {
+      "code": "KOMP-ENG-D-8-BAB4-01",
+      "subject": "ENG",
+      "grade": 8,
+      "name": "Chapter 4: No Littering",
+      "target": 20,
+      "integrated": 20,
+      "status": "TUNTAS",
+      "sources": [
+        "tools/generate_chunk.py:20"
+      ],
+      "dokumen": "English for Nusantara untuk SMP/MTs Kelas VIII"
+    },
+    {
+      "code": "KOMP-ENG-D-8-BAB5-01",
+      "subject": "ENG",
+      "grade": 8,
+      "name": "Chapter 5: Embrace Yourself",
+      "target": 20,
+      "integrated": 20,
+      "status": "TUNTAS",
+      "sources": [
+        "tools/create_chunk.py:20"
+      ],
+      "dokumen": "English for Nusantara untuk SMP/MTs Kelas VIII"
+    },
+    {
+      "code": "KOMP-ENG-D-9-BAB1-01",
+      "subject": "ENG",
+      "grade": 9,
+      "name": "Chapter 1: Exploring Fauna of Indonesia",
+      "target": 20,
+      "integrated": 20,
+      "status": "TUNTAS",
+      "sources": [
+        "tools/build_chunk.py:20"
+      ],
+      "dokumen": "English for Nusantara untuk SMP/MTs Kelas IX"
+    },
+    {
+      "code": "KOMP-ENG-D-9-BAB2-01",
+      "subject": "ENG",
+      "grade": 9,
+      "name": "Chapter 2: Taking Care of Yourself",
+      "target": 20,
+      "integrated": 0,
+      "status": "BELUM-ADA",
+      "sources": [],
+      "dokumen": ""
+    },
+    {
+      "code": "KOMP-ENG-D-9-BAB3-01",
+      "subject": "ENG",
+      "grade": 9,
+      "name": "Chapter 3: Journey to the Fantasy World",
+      "target": 20,
+      "integrated": 0,
+      "status": "BELUM-ADA",
+      "sources": [],
+      "dokumen": ""
+    },
+    {
+      "code": "KOMP-ENG-D-9-BAB4-01",
+      "subject": "ENG",
+      "grade": 9,
+      "name": "Chapter 4: Upcycling Used Materials",
+      "target": 20,
+      "integrated": 0,
+      "status": "BELUM-ADA",
+      "sources": [],
+      "dokumen": ""
+    },
+    {
+      "code": "KOMP-ENG-D-9-BAB5-01",
+      "subject": "ENG",
+      "grade": 9,
+      "name": "Chapter 5: Digital Life",
+      "target": 20,
+      "integrated": 20,
+      "status": "TUNTAS",
+      "sources": [
+        "tools/create_and_validate.py:20"
+      ],
+      "dokumen": "English for Nusantara untuk SMP/MTs Kelas IX"
+    },
+    {
+      "code": "KOMP-IND-D-7-BAB1-01",
+      "subject": "IND",
+      "grade": 7,
+      "name": "Bab 1: Jelajah Nusantara",
+      "target": 20,
+      "integrated": 20,
+      "status": "TUNTAS",
+      "sources": [
+        "tools/make_chunk.py:20"
+      ],
+      "dokumen": "Bahasa Indonesia untuk SMP/MTs Kelas VII (Edisi Revisi) — Bab 1"
+    },
+    {
+      "code": "KOMP-IND-D-7-BAB2-01",
+      "subject": "IND",
+      "grade": 7,
+      "name": "Bab 2: Kelana Cerita Unik",
+      "target": 20,
+      "integrated": 6,
+      "status": "PARSIAL",
+      "sources": [
+        "tools/build_all_core_chunks_master_part2.py:6"
+      ],
+      "dokumen": "Bahasa Indonesia untuk SMP/MTs Kelas VII (Edisi Revisi) — Bab 2"
+    },
+    {
+      "code": "KOMP-IND-D-7-BAB3-01",
+      "subject": "IND",
+      "grade": 7,
+      "name": "Bab 3: Hal yang Baik bagi Tubuh",
+      "target": 12,
+      "integrated": 6,
+      "status": "PARSIAL",
+      "sources": [
+        "tools/build_all_phase_d_remaining_chunks.py:6"
+      ],
+      "dokumen": "Ilmu Pengetahuan Alam untuk SMP/MTs Kelas VII (Edisi Revisi)"
+    },
+    {
+      "code": "KOMP-IND-D-7-BAB4-01",
+      "subject": "IND",
+      "grade": 7,
+      "name": "Bab 4: Aksi Nyata Pelindung Bumi",
+      "target": 12,
+      "integrated": 0,
+      "status": "BELUM-ADA",
+      "sources": [],
+      "dokumen": ""
+    },
+    {
+      "code": "KOMP-IND-D-7-BAB5-01",
+      "subject": "IND",
+      "grade": 7,
+      "name": "Bab 5: Membuka Gerbang Dunia",
+      "target": 18,
+      "integrated": 0,
+      "status": "BELUM-ADA",
+      "sources": [],
+      "dokumen": ""
+    },
+    {
+      "code": "KOMP-IND-D-7-BAB6-01",
+      "subject": "IND",
+      "grade": 7,
+      "name": "Bab 6: Sampaikan Melalui Surat",
+      "target": 19,
+      "integrated": 0,
+      "status": "BELUM-ADA",
+      "sources": [],
+      "dokumen": ""
+    },
+    {
+      "code": "KOMP-IND-D-8-BAB1-01",
+      "subject": "IND",
+      "grade": 8,
+      "name": "Bab 1: Laporan Hasil Observasi",
+      "target": 20,
+      "integrated": 12,
+      "status": "PARSIAL",
+      "sources": [
+        "tools/build_grade_8_chunks.py:12"
+      ],
+      "dokumen": "Bahasa Indonesia untuk SMP/MTs Kelas VIII (Edisi Revisi)"
+    },
+    {
+      "code": "KOMP-IND-D-8-BAB2-01",
+      "subject": "IND",
+      "grade": 8,
+      "name": "Bab 2: Iklan, Slogan, dan Poster",
+      "target": 20,
+      "integrated": 0,
+      "status": "BELUM-ADA",
+      "sources": [],
+      "dokumen": ""
+    },
+    {
+      "code": "KOMP-IND-D-8-BAB3-01",
+      "subject": "IND",
+      "grade": 8,
+      "name": "Bab 3: Artikel Ilmiah Populer",
+      "target": 20,
+      "integrated": 0,
+      "status": "BELUM-ADA",
+      "sources": [],
+      "dokumen": ""
+    },
+    {
+      "code": "KOMP-IND-D-8-BAB4-01",
+      "subject": "IND",
+      "grade": 8,
+      "name": "Bab 4: Teks Ulasan Karya Fiksi",
+      "target": 20,
+      "integrated": 0,
+      "status": "BELUM-ADA",
+      "sources": [],
+      "dokumen": ""
+    },
+    {
+      "code": "KOMP-IND-D-8-BAB5-01",
+      "subject": "IND",
+      "grade": 8,
+      "name": "Bab 5: Teks Drama",
+      "target": 20,
+      "integrated": 20,
+      "status": "TUNTAS",
+      "sources": [
+        "tools/build_ind_8_b5.py:20"
+      ],
+      "dokumen": "Bahasa Indonesia untuk SMP/MTs Kelas VIII (Edisi Revisi)"
+    },
+    {
+      "code": "KOMP-IND-D-8-BAB6-01",
+      "subject": "IND",
+      "grade": 8,
+      "name": "Bab 6: Menulis Teks Pidato",
+      "target": 19,
+      "integrated": 19,
+      "status": "TUNTAS",
+      "sources": [
+        "tools/chunk_ind_8_b6.json:19"
+      ],
+      "dokumen": "Bahasa Indonesia untuk SMP/MTs Kelas VIII (Edisi Revisi)"
+    },
+    {
+      "code": "KOMP-MAT-D-7-BAB1-01",
+      "subject": "MAT",
+      "grade": 7,
+      "name": "Bilangan Bulat",
+      "target": 20,
+      "integrated": 16,
+      "status": "PARSIAL",
+      "sources": [
+        "tools/build_mat_7_b1.py:16"
+      ],
+      "dokumen": "Matematika untuk SMP/MTs Kelas VII — Bab 1"
+    },
+    {
+      "code": "KOMP-MAT-D-7-BAB2-01",
+      "subject": "MAT",
+      "grade": 7,
+      "name": "Aljabar",
+      "target": 20,
+      "integrated": 12,
+      "status": "PARSIAL",
+      "sources": [
+        "tools/build_all_core_chunks_master.py:12"
+      ],
+      "dokumen": "Matematika untuk SMP/MTs Kelas VII — Bab 2"
+    },
+    {
+      "code": "KOMP-MAT-D-7-BAB3-01",
+      "subject": "MAT",
+      "grade": 7,
+      "name": "Rasio dan Proporsi",
+      "target": 12,
+      "integrated": 12,
+      "status": "TUNTAS",
+      "sources": [
+        "tools/build_all_phase_d_remaining_chunks.py:12"
+      ],
+      "dokumen": "Ilmu Pengetahuan Alam untuk SMP/MTs Kelas VII (Edisi Revisi)"
+    },
+    {
+      "code": "KOMP-MAT-D-7-BAB4-01",
+      "subject": "MAT",
+      "grade": 7,
+      "name": "Bentuk Geometri dan Bangun Datar",
+      "target": 12,
+      "integrated": 12,
+      "status": "TUNTAS",
+      "sources": [
+        "tools/build_all_phase_d_remaining_chunks.py:12"
+      ],
+      "dokumen": "Ilmu Pengetahuan Alam untuk SMP/MTs Kelas VII (Edisi Revisi)"
+    },
+    {
+      "code": "KOMP-MAT-D-7-BAB5-01",
+      "subject": "MAT",
+      "grade": 7,
+      "name": "Kesebangunan dan Hubungan Antar Garis",
+      "target": 20,
+      "integrated": 0,
+      "status": "BELUM-ADA",
+      "sources": [],
+      "dokumen": ""
+    },
+    {
+      "code": "KOMP-MAT-D-7-BAB6-01",
+      "subject": "MAT",
+      "grade": 7,
+      "name": "Data dan Diagram",
+      "target": 20,
+      "integrated": 20,
+      "status": "TUNTAS",
+      "sources": [
+        "create_chunk.py:20"
+      ],
+      "dokumen": "Matematika untuk SMP/MTs Kelas VII"
+    },
+    {
+      "code": "KOMP-MAT-D-8-BAB1-01",
+      "subject": "MAT",
+      "grade": 8,
+      "name": "Teorema Pythagoras dan Lingkaran",
+      "target": 12,
+      "integrated": 12,
+      "status": "TUNTAS",
+      "sources": [
+        "tools/build_expansion_chunks.py:12"
+      ],
+      "dokumen": "English for Nusantara untuk SMP/MTs Kelas IX"
+    },
+    {
+      "code": "KOMP-IPS-D-7-BAB1-01",
+      "subject": "IPS",
+      "grade": 7,
+      "name": "Tema 01: Keberadaan Diri dan Keluarga",
+      "target": 18,
+      "integrated": 12,
+      "status": "PARSIAL",
+      "sources": [
+        "tools/build_all_core_chunks_master.py:12"
+      ],
+      "dokumen": "Matematika untuk SMP/MTs Kelas VII — Bab 2"
+    },
+    {
+      "code": "KOMP-IPS-D-7-BAB2-01",
+      "subject": "IPS",
+      "grade": 7,
+      "name": "Tema 02: Keberagaman Lingkungan Sekitar",
+      "target": 20,
+      "integrated": 6,
+      "status": "PARSIAL",
+      "sources": [
+        "tools/build_all_core_chunks_master_part2.py:6"
+      ],
+      "dokumen": "Bahasa Indonesia untuk SMP/MTs Kelas VII (Edisi Revisi) — Bab 2"
+    },
+    {
+      "code": "KOMP-IPS-D-7-BAB3-01",
+      "subject": "IPS",
+      "grade": 7,
+      "name": "Tema 03: Potensi Ekonomi Lingkungan",
+      "target": 20,
+      "integrated": 6,
+      "status": "PARSIAL",
+      "sources": [
+        "tools/build_all_phase_d_remaining_chunks.py:6"
+      ],
+      "dokumen": "Ilmu Pengetahuan Alam untuk SMP/MTs Kelas VII (Edisi Revisi)"
+    },
+    {
+      "code": "KOMP-IPS-D-7-BAB4-01",
+      "subject": "IPS",
+      "grade": 7,
+      "name": "Tema 04: Pemberdayaan Masyarakat",
+      "target": 20,
+      "integrated": 20,
+      "status": "TUNTAS",
+      "sources": [
+        "tools/chunk_ips_7_t4.json:20"
+      ],
+      "dokumen": "Ilmu Pengetahuan Sosial untuk SMP/MTs Kelas VII (Edisi Revisi)"
+    },
+    {
+      "code": "KOMP-IPS-D-8-BAB1-01",
+      "subject": "IPS",
+      "grade": 8,
+      "name": "Tema 01: Kondisi Geografis dan Pelestarian Sumber Daya Alam",
+      "target": 20,
+      "integrated": 20,
+      "status": "TUNTAS",
+      "sources": [
+        "tools/chunk_ips_8_t1.json:20"
+      ],
+      "dokumen": "Ilmu Pengetahuan Sosial untuk SMP/MTs Kelas VIII (Edisi Revisi)"
+    }
+  ],
+  "integratedTotal": 481
+}
