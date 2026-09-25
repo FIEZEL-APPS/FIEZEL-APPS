@@ -1,7 +1,7 @@
 {
-  "version": "m025-372",
+  "version": "m025-373",
   "claimedBy": "branch main",
-  "claimedAt": "2026-09-25T13:39:04.802Z",
-  "reason": "fix(ci): perbarui id-golden-baseline untuk modul listening jlpt",
+  "claimedAt": "2026-09-25T15:42:08.415Z",
+  "reason": "chokai persistence, topbar switcher, audio multi-karakter dan responsive layout",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }

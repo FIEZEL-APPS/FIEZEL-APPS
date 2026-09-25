@@ -125,6 +125,26 @@ const EXCLUSIONS = new Map([
       '(exit code dari main(), gate residual + gate kalibrasi yang bisa merah) dan karena itu ' +
       'WAJIB terdaftar di quality.yml, bukan dikecualikan. Cara menjalankan alat v1 secara ' +
       'manual: `node adaptivity-simulation.js`.'
+  }],
+  ['tests/chokai-multi-voice-protocol-test.js', {
+    class: 'gerbang-pra-rilis-fitur',
+    reason:
+      'Gerbang pra-rilis fitur audio multi-karakter Chokai JLPT N5 dan N4. Memvalidasi kepatuhan 3 persona (Instruktur, Mahasiswa Laki-laki, Mahasiswi Perempuan) serta jeda breathing pocket 139 turns sebelum aset didistribusikan.'
+  }],
+  ['tests/course-persistence-and-jlpt-mobile-test.js', {
+    class: 'gerbang-pra-rilis-fitur',
+    reason:
+      'Gerbang pra-rilis fitur sinkronisasi dan persistensi kursus target FIEZEL (Jepang dan Inggris) serta arsitektur kartu geser JLPT mobile bottom sheet drawer di lingkungan browser peramban nyata.'
+  }],
+  ['tests/course-persistence-test.js', {
+    class: 'gerbang-pra-rilis-fitur',
+    reason:
+      'Gerbang pra-rilis fitur persistensi target kursus bahasa Jepang dan Inggris saat reload, refresh, maupun backgrounding PWA agar tidak kembali ke bahasa default Inggris.'
+  }],
+  ['tests/jlpt-sheet-drawer-test.js', {
+    class: 'gerbang-pra-rilis-fitur',
+    reason:
+      'Gerbang pra-rilis fitur antarmuka JLPT Bottom Sheet Drawer untuk menampilkan naskah dialog percakapan, terjemahan Indonesia, analisis kunci, dan kosakata secara ergonomis.'
   }]
 ]);
 

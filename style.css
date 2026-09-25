@@ -3448,9 +3448,74 @@ button.primary .kelasku-wordmark,
 .topbar .icon-button:active{transform:scale(.94)}
 .topbar .notif-button.has-new{background:var(--sun-soft)}
 .topbar .notif-badge{top:2px;right:2px;box-shadow:0 0 0 2px var(--glass-solid)}
+.course-switch-btn{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:6px;
+  min-height:38px;
+  height:38px;
+  padding:0 12px;
+  border-radius:20px;
+  border:1px solid var(--line);
+  background:var(--panel);
+  color:var(--ink);
+  font-family:inherit;
+  font-size:.82rem;
+  font-weight:700;
+  letter-spacing:.02em;
+  box-shadow:var(--shadow-sm);
+  cursor:pointer;
+  user-select:none;
+  -webkit-tap-highlight-color:transparent;
+  transition:background-color var(--dur-s) var(--ease),
+             border-color var(--dur-s) var(--ease),
+             transform var(--dur-s) var(--ease-spring),
+             box-shadow var(--dur-s) var(--ease);
+}
+.course-switch-btn:hover{
+  background:var(--panel-soft);
+  border-color:var(--surface-edge);
+  transform:translateY(-1px);
+}
+.course-switch-btn:active{
+  transform:scale(.94);
+  background:var(--accent-soft);
+}
+.course-switch-btn:focus-visible{
+  outline:2px solid var(--accent);
+  outline-offset:2px;
+}
+.course-switch-flag{
+  font-size:1.05rem;
+  line-height:1;
+  display:inline-block;
+}
+.course-switch-label{
+  font-size:.78rem;
+  font-weight:800;
+  letter-spacing:.06em;
+  color:var(--ink);
+}
+.course-switch-btn[data-target-lang="ja"] .course-switch-label{
+  color:var(--accent);
+}
+.course-switch-btn[data-target-lang="en"] .course-switch-label{
+  color:var(--accent-strong);
+}
 @media(max-width:640px){
   .topbar{top:6px;margin:0 0 16px;padding:5px 6px 5px 14px;min-height:56px}
   .topbar .brand{width:92px}
+  .course-switch-btn{min-height:36px;height:36px;padding:0 9px;gap:5px}
+  .course-switch-flag{font-size:.95rem}
+  .course-switch-label{font-size:.74rem}
+}
+@media(max-width:360px){
+  .topbar{padding:5px 4px 5px 10px;gap:6px}
+  .topbar .brand{width:80px}
+  .course-switch-btn{min-height:34px;height:34px;padding:0 7px;gap:4px}
+  .course-switch-label{font-size:.7rem}
+  .topbar .icon-button{width:38px;height:38px;min-height:38px}
 }
 
 /* ==========================================================================

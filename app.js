@@ -241,6 +241,8 @@ const DEFAULT_REPORT_ENDPOINT=String(self.FIEZEL_REPORT_ENDPOINT||'').trim();
 const LEGACY_STATE_KEY='fiezel-v4-state';
 const ACCOUNT_STATE_PREFIX='fiezel-v5-state:';
 const LEGACY_STATE_OWNER_KEY='fiezel-v5-legacy-owner';
+const FIEZEL_TARGET_COURSE_KEY='fz_target_course';
+function accountStateKey(uuid){const id=String(uuid||'').replace(/[^A-Za-z0-9_-]/g,'').slice(0,128);return id?ACCOUNT_STATE_PREFIX+id:''}
 function detectedTimeZone(){try{return Intl.DateTimeFormat().resolvedOptions().timeZone||'Asia/Jakarta'}catch{return'Asia/Jakarta'}}
 /* D4 bottleneck #1 (sisa yang belum tertutup): validasi zona waktu di-MEMO.
    studyDayKey sudah memo hasilnya, TETAPI kunci memonya sendiri dibangun dari
@@ -997,7 +999,101 @@ toursSeen:{menu:false,library:false,listening:false}};let stateReady=false;
 // jatuh ke temporal dead zone: loadState() melempar, catch-nya mengembalikan state kosong, dan
 // SELURUH progres murid hilang tanpa satu pun galat terlihat. Urutan ini bukan gaya penulisan.
 let V=[],R=[],G={},GRAMMAR_ITEMS=[],GRAMMAR_CURRICULUM={},GRAMMAR_CURRICULUM_INDEX=Object.create(null),WRITING_BANK=null,READING_EXAM=null;
-let activeStateStorageKey=LEGACY_STATE_KEY,activeAccountUuid='',state=loadState();
+let activeStateStorageKey=LEGACY_STATE_KEY,activeAccountUuid='';
+const PROGRESS_STATE_FIELDS=Object.freeze([
+  'level','placementDone','placementBandLevel','placementBands',
+  'totalAnswered','totalCorrect','totalTimeMs',
+  'history','wrongAnswers','vocab','grammar','reading',
+  'adaptiveReady','adaptiveReadyByLevel','confidenceHistory',
+  'sessionHistory','activeSession','inflightAttempt',
+  'levelTrust','adaptivePolicyMeta','policyOutcomeMeta','coachCache'
+]);
+const PROGRESS_PREF_FIELDS=Object.freeze(['activeLevel','selfAssessedLevel','levelMode']);
+const GLOBAL_RHYTHM_FIELDS=Object.freeze(['streak','daily','learningDays']);
+function targetLangOfRaw(raw){
+  let stored=null;
+  try{stored=localStorage.getItem(FIEZEL_TARGET_COURSE_KEY)}catch(_){}
+  const v=stored||(raw&&raw.preferences?raw.preferences.targetLang:'');
+  try{return self.FiezelTargetLanguage?.normalize?.(v)||'en'}catch(_){return v==='ja'?'ja':'en'}
+}
+function targetLangsKnown(){
+  try{const l=self.FiezelTargetLanguage?.all?.();if(Array.isArray(l)&&l.length)return l}catch(_){}
+  return ['en','ja'];
+}
+function progressStorageKey(baseKey,lang){
+  try{return self.FiezelTargetLanguage?.key?.(String(baseKey||''),lang)??String(baseKey||'')}
+  catch(_){return String(baseKey||'')}
+}
+function pickProgress(src){
+  const out={};
+  PROGRESS_STATE_FIELDS.forEach(f=>{if(src&&Object.prototype.hasOwnProperty.call(src,f))out[f]=src[f]});
+  const prefs={};
+  PROGRESS_PREF_FIELDS.forEach(f=>{if(src&&src.preferences&&Object.prototype.hasOwnProperty.call(src.preferences,f))prefs[f]=src.preferences[f]});
+  out.preferences=prefs;
+  return out;
+}
+function loadState(key=activeStateStorageKey){
+  try{
+    const raw=JSON.parse(localStorage.getItem(key));
+    const dasar=raw||defaultState;
+    const lang=targetLangOfRaw(dasar);
+    if(lang==='en')return sanitizeState(dasar);
+    const kunciProgres=progressStorageKey(key,lang);
+    let progres=null;
+    try{progres=JSON.parse(localStorage.getItem(kunciProgres))}catch(_){}
+    const kosong=pickProgress(defaultState);
+    const p=progres&&typeof progres==='object'?progres:kosong;
+    const digabung={...dasar};
+    PROGRESS_STATE_FIELDS.forEach(f=>{digabung[f]=Object.prototype.hasOwnProperty.call(p,f)?p[f]:kosong[f]});
+    digabung.preferences={...(dasar.preferences||{}),targetLang:lang};
+    PROGRESS_PREF_FIELDS.forEach(f=>{
+      const pp=p.preferences||{};
+      digabung.preferences[f]=Object.prototype.hasOwnProperty.call(pp,f)?pp[f]:kosong.preferences[f];
+    });
+    const bersih=sanitizeState(digabung);
+    GLOBAL_RHYTHM_FIELDS.forEach(f=>{
+      if(dasar&&Object.prototype.hasOwnProperty.call(dasar,f))bersih[f]=dasar[f];
+    });
+    return bersih;
+  }catch{return sanitizeState(defaultState)}
+}
+try{
+  let targetCourse=null;
+  try{targetCourse=localStorage.getItem(FIEZEL_TARGET_COURSE_KEY)}catch(_){}
+  let lastOwner=null;
+  try{lastOwner=localStorage.getItem(LEGACY_STATE_OWNER_KEY)||localStorage.getItem('fz_last_account')}catch(_){}
+  let lastUuid='';
+  if(lastOwner){
+    try{
+      const parsed=JSON.parse(lastOwner);
+      lastUuid=String(parsed?.uuid||parsed?.id||parsed?.accountUuid||'').replace(/[^A-Za-z0-9_-]/g,'').slice(0,128);
+    }catch(_){}
+    if(!lastUuid){
+      lastUuid=String(lastOwner).replace(/[^A-Za-z0-9_-]/g,'').slice(0,128);
+    }
+  }
+  if(lastUuid){
+    const candidateKey=accountStateKey(lastUuid);
+    if(candidateKey){
+      let hasCandidate=false;
+      try{hasCandidate=localStorage.getItem(candidateKey)!==null}catch(_){}
+      let hasLegacy=false;
+      try{hasLegacy=localStorage.getItem(LEGACY_STATE_KEY)!==null}catch(_){}
+      if(hasCandidate||!hasLegacy){
+        activeAccountUuid=lastUuid;
+        activeStateStorageKey=candidateKey;
+      }
+    }
+  }
+}catch(_){}
+let state=loadState();
+try{
+  let targetCourse=null;
+  try{targetCourse=localStorage.getItem(FIEZEL_TARGET_COURSE_KEY)}catch(_){}
+  if((targetCourse==='ja'||targetCourse==='en')&&state?.preferences){
+    state.preferences.targetLang=targetCourse;
+  }
+}catch(_){}
 stateReady=true;
 // m025-182 (W2-STATE, AI-11 F03 + AI-14 F03): locale murid diambil dari state SEBELUM render
 // pertama (render pertama baru terjadi di openApp(), jauh setelah baris ini dieksekusi).
@@ -1561,79 +1657,9 @@ function accountStateKey(uuid){const id=String(uuid||'').replace(/[^A-Za-z0-9_-]
 
    Dijaga tests/target-lang-progress-isolation-test.js, yang MENJALANKAN jalur simpan/muat
    yang sungguhan di kedua bahasa dan membandingkan bita kunci Inggris sebelum/sesudah. */
-const PROGRESS_STATE_FIELDS=Object.freeze([
-  'level','placementDone','placementBandLevel','placementBands',
-  'totalAnswered','totalCorrect','totalTimeMs',
-  'history','wrongAnswers','vocab','grammar','reading',
-  'adaptiveReady','adaptiveReadyByLevel','confidenceHistory',
-  'sessionHistory','activeSession','inflightAttempt',
-  'levelTrust','adaptivePolicyMeta','policyOutcomeMeta','coachCache'
-]);
-/* Level adalah PROGRES, bukan preferensi perangkat — murid B1 di Inggris bukan B1 di Jepang.
-   Ketiganya duduk di dalam `preferences` karena sejarah, jadi ia dipindahkan satu per satu. */
-const PROGRESS_PREF_FIELDS=Object.freeze(['activeLevel','selfAssessedLevel','levelMode']);
-/* RITME BELAJAR MILIK MURID, BUKAN MILIK KURSUS — dan ia perlu penyelamatan sendiri.
-   sanitizeState() memperlakukan state ber-totalAnswered 0 sebagai murid yang benar-benar
-   baru lalu membersihkan learningDays/daily; itu benar untuk state yang memang kosong.
-   Tetapi murid yang baru MEMBUKA kursus Jepang juga ber-totalAnswered 0 di kursus itu,
-   sementara ia sudah belajar 7 hari beruntun di kursus Inggris. Tanpa baris di bawah,
-   mencoba Jepang sekali akan menghanguskan runtunnya - hukuman untuk keingintahuan.
-   Karena itu ketiga bidang ini dikembalikan dari blob global SESUDAH sanitasi. */
-const GLOBAL_RHYTHM_FIELDS=Object.freeze(['streak','daily','learningDays']);
-/** Bahasa target dari sebuah blob state mentah, tanpa menyentuh `state` yang sedang hidup. */
-function targetLangOfRaw(raw){
-  const v=raw&&raw.preferences?raw.preferences.targetLang:'';
-  try{return self.FiezelTargetLanguage?.normalize?.(v)||'en'}catch(_){return v==='ja'?'ja':'en'}
-}
-/** Kunci progres untuk sebuah bahasa. Bahasa bawaan mengembalikan kunci dasar APA ADANYA. */
-/** Daftar bahasa yang dikenal sumbu. Dibaca dari modulnya supaya bahasa ketiga yang lahir
- *  nanti ikut termigrasi tanpa menyunting jalur migrasi lagi. */
-function targetLangsKnown(){
-  try{const l=self.FiezelTargetLanguage?.all?.();if(Array.isArray(l)&&l.length)return l}catch(_){}
-  return ['en','ja'];
-}
-function progressStorageKey(baseKey,lang){
-  try{return self.FiezelTargetLanguage?.key?.(String(baseKey||''),lang)??String(baseKey||'')}
-  catch(_){return String(baseKey||'')}
-}
-/** Petik bidang progres dari sebuah objek state. */
-function pickProgress(src){
-  const out={};
-  PROGRESS_STATE_FIELDS.forEach(f=>{if(src&&Object.prototype.hasOwnProperty.call(src,f))out[f]=src[f]});
-  const prefs={};
-  PROGRESS_PREF_FIELDS.forEach(f=>{if(src&&src.preferences&&Object.prototype.hasOwnProperty.call(src.preferences,f))prefs[f]=src.preferences[f]});
-  out.preferences=prefs;
-  return out;
-}
-function loadState(key=activeStateStorageKey){
-  try{
-    const raw=JSON.parse(localStorage.getItem(key));
-    const dasar=raw||defaultState;
-    const lang=targetLangOfRaw(dasar);
-    /* Bahasa bawaan: blob dasar SUDAH lengkap. Tidak ada overlay, tidak ada pembacaan kedua. */
-    if(lang==='en')return sanitizeState(dasar);
-    const kunciProgres=progressStorageKey(key,lang);
-    let progres=null;
-    try{progres=JSON.parse(localStorage.getItem(kunciProgres))}catch(_){}
-    /* Belum pernah belajar di bahasa ini: MULAI DARI NOL, bukan mewarisi progres Inggris.
-       Mewarisi akan membuat murid melihat penguasaan yang tidak pernah ia buktikan di
-       kursus ini - kebalikan persis dari yang dijanjikan pemilih bahasa. */
-    const kosong=pickProgress(defaultState);
-    const p=progres&&typeof progres==='object'?progres:kosong;
-    const digabung={...dasar};
-    PROGRESS_STATE_FIELDS.forEach(f=>{digabung[f]=Object.prototype.hasOwnProperty.call(p,f)?p[f]:kosong[f]});
-    digabung.preferences={...(dasar.preferences||{})};
-    PROGRESS_PREF_FIELDS.forEach(f=>{
-      const pp=p.preferences||{};
-      digabung.preferences[f]=Object.prototype.hasOwnProperty.call(pp,f)?pp[f]:kosong.preferences[f];
-    });
-    const bersih=sanitizeState(digabung);
-    GLOBAL_RHYTHM_FIELDS.forEach(f=>{
-      if(dasar&&Object.prototype.hasOwnProperty.call(dasar,f))bersih[f]=dasar[f];
-    });
-    return bersih;
-  }catch{return sanitizeState(defaultState)}
-}
+/* PROGRESS_STATE_FIELDS, PROGRESS_PREF_FIELDS, GLOBAL_RHYTHM_FIELDS, targetLangOfRaw,
+   progressStorageKey, pickProgress, and loadState are declared before startup line ~1000
+   to prevent Temporal Dead Zone during initial state load. */
 /* D4 bottleneck #2: satu jawaban memicu save() tiga kali (record -> updateMastery -> lalu
    setConfidence pada klik keyakinan). Field turunan (readiness/daily/streak) TETAP dihitung
    sinkron di save() - pembacanya (home, paw, snapshot, sesi) mengandalkannya segar di task
@@ -4745,10 +4771,15 @@ async function load(opts){const root=document.baseURI;/* W1 P0-1 (16-001): fetch
       try{self.FiezelCoreBrain?.setCurriculumGraph?.({schema:'fiezel-grammar-curriculum-v1',lessons:[]})}catch{}
     }else{
       // Bank Jepang gagal dimuat: JANGAN diam-diam menyajikan kursus Inggris dengan label
-      // Jepang. Kembalikan murid ke Inggris dan katakan, supaya kegagalannya terlihat.
-      try{self.FiezelCoreBrain?.resetFamilyGraph?.()}catch{}
-      state.preferences={...state.preferences,targetLang:'en'};
-      try{showToast(FiezelI18n.t('bahasa.berganti',{bahasa:FiezelI18n.t('bahasa.en')}),'success')}catch(_){}
+      // Jepang. Kembalikan murid ke Inggris dan katakan, supaya kegagalannya terlihat,
+      // KECUALI jika kursus Jepang sengaja dikunci via FIEZEL_TARGET_COURSE_KEY.
+      let persistentJa=false;
+      try{persistentJa=localStorage.getItem(FIEZEL_TARGET_COURSE_KEY)==='ja'}catch(_){}
+      if(!persistentJa){
+        try{self.FiezelCoreBrain?.resetFamilyGraph?.()}catch{}
+        state.preferences={...state.preferences,targetLang:'en'};
+        try{showToast(FiezelI18n.t('bahasa.berganti',{bahasa:FiezelI18n.t('bahasa.en')}),'success')}catch(_){}
+      }
     }
   }else{
     try{self.FiezelCoreBrain?.resetFamilyGraph?.()}catch{}
@@ -6342,7 +6373,7 @@ function openApp(){
   // Sesi lama bisa saja masih memegang kelas kunci m025-34 di <body> (mis. tab yang dibuka
   // sebelum rilis ini). Dibersihkan sekali di sini supaya .app/.bottomnav tidak tetap
   // tersembunyi oleh aturan CSS yang sekarang tidak pernah dipasang lagi.
-  document.body?.classList?.remove?.('notification-locked');notifyAppUpdateIfNew();render();
+  document.body?.classList?.remove?.('notification-locked');notifyAppUpdateIfNew();render();try{updateTopbarCourseButton()}catch(_){}
   // Deteksi token undangan guru di URL (?token=...): langsung aktivasi & buka KelasKu untuk Guru
   try{checkUrlTeacherToken()}catch(_){}
   // Tautan undangan Duel Belajar (?duel=KODE): langsung buka alur belajar tab Duel.
@@ -6867,13 +6898,13 @@ function openFeedback(prefill){
   };
   enhanceUI();
 }
-function render(){const __renderStartedAt=Date.now();try{return renderInner()}finally{window.__fiezelLastRenderMs=Date.now()-__renderStartedAt;/* [FASE-4] pasang ulang timer kantuk 90 dtk tiap layar dicat (mati sendiri di luar layar santai). */try{pawIdleArm()}catch(_){}/* [OUTFIT G5'] konteks layar untuk resolver outfit (19 §6.1) */try{self.FiezelPawOutfit?.screen?.(state.view)}catch(_){}}}
+function render(){const __renderStartedAt=Date.now();try{const __r=renderInner();try{updateTopbarCourseButton()}catch(_){}return __r}finally{window.__fiezelLastRenderMs=Date.now()-__renderStartedAt;/* [FASE-4] pasang ulang timer kantuk 90 dtk tiap layar dicat (mati sendiri di luar layar santai). */try{pawIdleArm()}catch(_){}/* [OUTFIT G5'] konteks layar untuk resolver outfit (19 §6.1) */try{self.FiezelPawOutfit?.screen?.(state.view)}catch(_){}}}
 // m025-41: render duration is recorded so the diagnostic scanner can see a slow screen,
 // which is how OWNER experienced the Classroom regression before any error was logged.
 let isViewChange=true,lastRenderedView=null;
 function captureActiveElement(container){try{const act=document.activeElement;if(act&&container&&container.contains(act)&&/^(INPUT|TEXTAREA)$/i.test(act.tagName||'')){return{id:act.id,name:act.name,testId:act.getAttribute('data-testid'),val:act.value,s:act.selectionStart,e:act.selectionEnd}}}catch(_){}return null}
 function restoreActiveElement(container,saved){if(!saved||!container)return;try{let r=null;if(saved.id)r=container.querySelector('#'+saved.id);if(!r&&saved.testId)r=container.querySelector('[data-testid="'+saved.testId+'"]');if(!r&&saved.name)r=container.querySelector('[name="'+saved.name+'"]');if(r){if(saved.val!=null&&r.value!==saved.val)r.value=saved.val;r.focus();if(typeof r.setSelectionRange==='function'&&saved.s!=null)r.setSelectionRange(saved.s,saved.e)}}catch(_){}}
-function renderInner(){if(isVerifiedTeacher()&&state.view!=='tutor'){state.view='tutor'}/* Kursus Jepang berbicara dengan istilahnya sendiri (Kotoba, Bunpō, Renshū): lapisan kunci 'kursus-ja.*' di FiezelI18n dinyalakan SEBELUM layar dilukis, dan tabel/elemen statis yang sudah memegang kalimat lama disegarkan sekali saat kursus berganti. */try{const __course=activeTargetLang()==='ja'&&!isVerifiedTeacher()?'ja':null;if(self.FiezelI18n?.getCourse&&FiezelI18n.getCourse()!==__course){FiezelI18n.setCourse(__course);__fzRefreshI18nTables();/* Soal, jawaban, dan pembahasan kursus Jepang diberi furigana + romaji dari bank kosakata, dan tiap kuis mendapat tombol ふりがな/ローマ字. */try{if(__course==='ja')self.FiezelJaUi?.observe?.($('app'),()=>V);else self.FiezelJaUi?.unobserve?.()}catch(_){}}}catch(_){}/* m025-314: go() menolak permukaan yang salah bahasa, tetapi state.view juga bisa datang dari sesi SEBELUM murid berganti kursus (ia tersimpan dan dipulihkan saat boot) — jadi pemulihan itu ikut dijepit di sini, bukan hanya jalur navigasi. */if(targetLangSurfaceBlocked(state.view)){state.view='home'}if(document.body?.classList?.contains?.('fz-teacher-mode')&&state.view!=='tutor'){try{self.FiezelTeacherShell?.unmount?.()}catch(_){}}isViewChange=state.view!==lastRenderedView;lastRenderedView=state.view;const appContainer=$('app'),savedActive=captureActiveElement(appContainer);if(!isViewChange&&appContainer)appContainer.classList.add('is-repaint');speakingListeningMountToken++;if(speakingListeningController){speakingListeningController.destroy();speakingListeningController=null;/* m026-01: satu-satunya tempat sesi dengar benar-benar bubar. Di dalam if, bukan di luar - kalau tidak, tiap navigasi biasa akan memaksa maskot kembali idle dan memotong selebrasi yang sedang jalan. */pawReact('listening-stop')}document.querySelectorAll('.nav').forEach(x=>x.classList.remove('active'));setApp('');if(state.view==='home')home();if(state.view==='latihan')latihan();if(state.view==='vocab')vocab();if(state.view==='grammar')grammar();if(state.view==='reading')reading();if(state.view==='skills')skillsLab();if(state.view==='listening')skillsLab('listening');if(state.view==='speaking')skillsLab('speaking');if(state.view==='writing')writing();if(state.view==='classroom')classHubView();if(state.view==='library')library();if(state.view==='ask'||state.view==='search')askView();if(state.view==='test')placement();if(state.view==='progress')progress();if(state.view==='online'||state.view==='profile')onlineView();if(state.view==='learn')learnerFlowView();if(state.view==='arena')arenaView();if(state.view==='tutor')tutorCenterView();if(state.view==='kana')kanaView();/* merge SLOT 7 sosial 2026-08-29 *//* Audit F12: layar tanpa tab sendiri tetap menandai tab induknya - Tes awal milik Hari ini, hub latihan milik Latihan. */const TAB_PARENT={kana:'latihan',test:'home',vocab:'latihan',grammar:'latihan',reading:'latihan',writing:'latihan',library:'latihan',skills:'latihan',listening:'latihan',speaking:'latihan',learn:'home',arena:'online'};const activeTabEl=document.querySelector(`[data-view="${state.view}"]`)||(state.view==='profile'?document.querySelector('[data-view="online"]'):state.view==='online'?document.querySelector('[data-view="profile"]'):TAB_PARENT[state.view]?document.querySelector(`.bottomnav [data-view="${TAB_PARENT[state.view]}"]`):null);activeTabEl?.classList.add('active');/* m028 fase3: bendera panggung Skills Lab. Addon listening memaku blok tombolnya ke dasar layar (speaking-listening-addon.css), jadi ia panggung kedua yang bisa ditutupi gelembung. */document.body?.classList?.toggle?.('fz-stage-sl',['skills','listening','speaking'].includes(state.view));/* m028 fase3 (QA §9): Peta Belajar ikut jadi panggung ber-kontrol sejak panel NEXT SESSION punya tombol "Mulai sesi" di dekat dasar layar - screenshot QA menunjukkan gelembung PAW menutupinya utuh. Aturannya sama dengan kuis: peek dilarang, dok mengecil, layar diberi ruang bawah. */document.body?.classList?.toggle?.('fz-stage-map',state.view==='progress');/* 2026-08-29 overhaul I12 (O6 #10): bendera panggung Home. Wajah coach-strip adalah SATU-SATUNYA Pau di Home; gelembung FAB pengambang (Pau kedua, terukur menimpa lipatan hero/skill-hub di 390px) disembunyikan lewat CSS body.fz-stage-home — pola yang sama dengan fz-stage-sl/fz-stage-map, modul gelembung tidak disentuh. */document.body?.classList?.toggle?.('fz-stage-home',state.view==='home');/* q16-P2-2 2026-08-29: hub juga panggung ber-CTA-dekat-dasar (Review Due, Buka flashcards, Mulai 25 soal) \u2014 peek dilarang, dok mengecil, pola sama dengan sl/map. */document.body?.classList?.toggle?.('fz-stage-hub',['vocab','grammar','reading','library','test'].includes(state.view));document.body?.classList?.toggle?.('fz-stage-writing',state.view==='writing');/* v24-F2 2026-08-29: Writing = layar mengarang; FAB disembunyikan via CSS (pola fz-stage-home), modul gelembung tidak disentuh. *//* Kursus Jepang berpakaian sendiri: palet shu/ai/washi di fiezel-2.css menempel lewat bendera ini, jadi layar Inggris tidak tersentuh sama sekali; KelasKu guru punya palet sendiri (teacher-shell.css). */document.body?.classList?.toggle?.('fz-lang-ja',self.FiezelI18n?.getCourse?.()==='ja');try{self.FiezelJaUi?.applyPrefs?.()}catch(_){}enhanceUI();syncExamLockForView();syncCoachBubble();try{refreshNotifBadge()}catch(_){}restoreActiveElement($('app'),savedActive);if(isViewChange){$('app')?.classList?.remove?.('is-repaint');window.scrollTo(0,0)}}
+function renderInner(){if(isVerifiedTeacher()&&state.view!=='tutor'){state.view='tutor'}/* Kursus Jepang berbicara dengan istilahnya sendiri (Kotoba, Bunpō, Renshū): lapisan kunci 'kursus-ja.*' di FiezelI18n dinyalakan SEBELUM layar dilukis, dan tabel/elemen statis yang sudah memegang kalimat lama disegarkan sekali saat kursus berganti. */try{const __course=activeTargetLang()==='ja'&&!isVerifiedTeacher()?'ja':null;if(self.FiezelI18n?.getCourse&&FiezelI18n.getCourse()!==__course){FiezelI18n.setCourse(__course);__fzRefreshI18nTables();/* Soal, jawaban, dan pembahasan kursus Jepang diberi furigana + romaji dari bank kosakata, dan tiap kuis mendapat tombol ふりがな/ローマ字. */try{if(__course==='ja')self.FiezelJaUi?.observe?.($('app'),()=>V);else self.FiezelJaUi?.unobserve?.()}catch(_){}}}catch(_){}/* m025-314: go() menolak permukaan yang salah bahasa, tetapi state.view juga bisa datang dari sesi SEBELUM murid berganti kursus (ia tersimpan dan dipulihkan saat boot) — jadi pemulihan itu ikut dijepit di sini, bukan hanya jalur navigasi. */if(targetLangSurfaceBlocked(state.view)){state.view='home'}if(document.body?.classList?.contains?.('fz-teacher-mode')&&state.view!=='tutor'){try{self.FiezelTeacherShell?.unmount?.()}catch(_){}}isViewChange=state.view!==lastRenderedView;lastRenderedView=state.view;const appContainer=$('app'),savedActive=captureActiveElement(appContainer);if(!isViewChange&&appContainer)appContainer.classList.add('is-repaint');speakingListeningMountToken++;if(speakingListeningController){speakingListeningController.destroy();speakingListeningController=null;/* m026-01: satu-satunya tempat sesi dengar benar-benar bubar. Di dalam if, bukan di luar - kalau tidak, tiap navigasi biasa akan memaksa maskot kembali idle dan memotong selebrasi yang sedang jalan. */pawReact('listening-stop')}document.querySelectorAll('.nav').forEach(x=>x.classList.remove('active'));setApp('');if(state.view==='home')home();if(state.view==='latihan')latihan();if(state.view==='vocab')vocab();if(state.view==='grammar')grammar();if(state.view==='reading')reading();if(state.view==='skills')skillsLab();if(state.view==='listening')skillsLab('listening');if(state.view==='speaking')skillsLab('speaking');if(state.view==='writing')writing();if(state.view==='classroom')classHubView();if(state.view==='library')library();if(state.view==='ask'||state.view==='search')askView();if(state.view==='test')placement();if(state.view==='progress')progress();if(state.view==='online'||state.view==='profile')onlineView();if(state.view==='learn')learnerFlowView();if(state.view==='arena')arenaView();if(state.view==='tutor')tutorCenterView();if(state.view==='kana')kanaView();/* merge SLOT 7 sosial 2026-08-29 *//* Audit F12: layar tanpa tab sendiri tetap menandai tab induknya - Tes awal milik Hari ini, hub latihan milik Latihan. */const TAB_PARENT={kana:'latihan',test:'home',vocab:'latihan',grammar:'latihan',reading:'latihan',writing:'latihan',library:'latihan',skills:'latihan',listening:'latihan',speaking:'latihan',learn:'home',arena:'online'};const activeTabEl=document.querySelector(`[data-view="${state.view}"]`)||(state.view==='profile'?document.querySelector('[data-view="online"]'):state.view==='online'?document.querySelector('[data-view="profile"]'):TAB_PARENT[state.view]?document.querySelector(`.bottomnav [data-view="${TAB_PARENT[state.view]}"]`):null);activeTabEl?.classList.add('active');/* m028 fase3: bendera panggung Skills Lab. Addon listening memaku blok tombolnya ke dasar layar (speaking-listening-addon.css), jadi ia panggung kedua yang bisa ditutupi gelembung. */document.body?.classList?.toggle?.('fz-stage-sl',['skills','listening','speaking'].includes(state.view));/* m028 fase3 (QA §9): Peta Belajar ikut jadi panggung ber-kontrol sejak panel NEXT SESSION punya tombol "Mulai sesi" di dekat dasar layar - screenshot QA menunjukkan gelembung PAW menutupinya utuh. Aturannya sama dengan kuis: peek dilarang, dok mengecil, layar diberi ruang bawah. */document.body?.classList?.toggle?.('fz-stage-map',state.view==='progress');/* 2026-08-29 overhaul I12 (O6 #10): bendera panggung Home. Wajah coach-strip adalah SATU-SATUNYA Pau di Home; gelembung FAB pengambang (Pau kedua, terukur menimpa lipatan hero/skill-hub di 390px) disembunyikan lewat CSS body.fz-stage-home — pola yang sama dengan fz-stage-sl/fz-stage-map, modul gelembung tidak disentuh. */document.body?.classList?.toggle?.('fz-stage-home',state.view==='home');/* q16-P2-2 2026-08-29: hub juga panggung ber-CTA-dekat-dasar (Review Due, Buka flashcards, Mulai 25 soal) \u2014 peek dilarang, dok mengecil, pola sama dengan sl/map. */document.body?.classList?.toggle?.('fz-stage-hub',['vocab','grammar','reading','library','test'].includes(state.view));document.body?.classList?.toggle?.('fz-stage-writing',state.view==='writing');/* v24-F2 2026-08-29: Writing = layar mengarang; FAB disembunyikan via CSS (pola fz-stage-home), modul gelembung tidak disentuh. *//* Kursus Jepang berpakaian sendiri: palet shu/ai/washi di fiezel-2.css menempel lewat bendera ini, jadi layar Inggris tidak tersentuh sama sekali; KelasKu guru punya palet sendiri (teacher-shell.css). */document.body?.classList?.toggle?.('fz-lang-ja',self.FiezelI18n?.getCourse?.()==='ja');try{self.FiezelJaUi?.applyPrefs?.()}catch(_){}enhanceUI();syncExamLockForView();syncCoachBubble();try{refreshNotifBadge()}catch(_){}try{updateTopbarCourseButton()}catch(_){}restoreActiveElement($('app'),savedActive);if(isViewChange){$('app')?.classList?.remove?.('is-repaint');window.scrollTo(0,0)}}
 // m025-115 - pembimbing yang ikut ke mana pun murid pergi (brief bagian 7).
 //
 // Gelembungnya dipasang SEKALI ke <body> dan tidak pernah ikut dicat ulang; yang dikirim
@@ -12753,7 +12784,9 @@ function targetLangRowMarkup(){
    rusak/asing SELALU jatuh ke 'en'. Tanpa normalisasi, satu nilai aneh di localStorage
    memindahkan murid ke kursus yang tidak ada dan layarnya kosong tanpa error. */
 function activeTargetLang(){
-  const raw=state.preferences?.targetLang;
+  let stored=null;
+  try{stored=localStorage.getItem(FIEZEL_TARGET_COURSE_KEY)}catch(_){}
+  const raw=stored||state?.preferences?.targetLang||'en';
   try{return self.FiezelTargetLanguage?.normalize?.(raw)||'en'}catch(_){return raw==='ja'?'ja':'en'}
 }
 window.activeTargetLang=activeTargetLang;
@@ -12876,6 +12909,7 @@ function syncTargetLangFamilyGraph(lang){
 window.syncTargetLangFamilyGraph=syncTargetLangFamilyGraph;
 function switchTargetLangStorage(value){
   saveFlushWrite();                       // progres bahasa LAMA aman di kuncinya sendiri
+  try{localStorage.setItem(FIEZEL_TARGET_COURSE_KEY,value)}catch(_){}
   let dasar=null;
   try{dasar=JSON.parse(localStorage.getItem(activeStateStorageKey))}catch(_){}
   const global=(dasar&&typeof dasar==='object')?dasar:{};
@@ -12887,15 +12921,56 @@ function switchTargetLangStorage(value){
 window.switchTargetLangStorage=switchTargetLangStorage;
 async function setTargetLangPreference(next){
   const value=(next==='ja')?'ja':'en';
-  if(activeTargetLang()===value)return true;
+  if(activeTargetLang()===value){
+    try{localStorage.setItem(FIEZEL_TARGET_COURSE_KEY,value)}catch(_){}
+    try{updateTopbarCourseButton()}catch(_){}
+    return true;
+  }
   switchTargetLangStorage(value);
+  try{localStorage.setItem(FIEZEL_TARGET_COURSE_KEY,value)}catch(_){}
   try{await load()}catch(_){}
   try{leaveAllStages()}catch(_){}
   closeModal();render();haptic('confirm');
   showToast(FiezelI18n.t('bahasa.berganti',{bahasa:FiezelI18n.t('bahasa.'+value)}),'success');
+  try{updateTopbarCourseButton()}catch(_){}
   return true;
 }
 window.setTargetLangPreference=setTargetLangPreference;
+
+function updateTopbarCourseButton(){
+  try{
+    const flagEl=document.getElementById('fzCourseFlag');
+    const labelEl=document.getElementById('fzCourseLabel');
+    const btn=document.getElementById('fzCourseSwitchBtn');
+    if(!flagEl&&!labelEl&&!btn)return;
+    const currentLang=activeTargetLang();
+    const isJa=(currentLang==='ja');
+    if(flagEl)flagEl.textContent=isJa?'🇯🇵':'🇬🇧';
+    if(labelEl)labelEl.textContent=isJa?'JA':'EN';
+    if(btn){
+      btn.setAttribute('data-target-lang',currentLang);
+      const activeName=isJa?FiezelI18n.t('bahasa.ja'):FiezelI18n.t('bahasa.en');
+      const targetName=isJa?FiezelI18n.t('bahasa.en'):FiezelI18n.t('bahasa.ja');
+      btn.setAttribute('aria-label',FiezelI18n.t('topbar.course-switch-active',{aktif:activeName,tujuan:targetName}));
+      btn.title=FiezelI18n.t('topbar.course-switch-title');
+    }
+  }catch(_){}
+}
+window.updateTopbarCourseButton=updateTopbarCourseButton;
+
+window.toggleTargetCourse = async function(){
+  try{
+    const currentLang=activeTargetLang();
+    const nextLang=(currentLang==='ja')?'en':'ja';
+    await setTargetLangPreference(nextLang);
+    updateTopbarCourseButton();
+    try{haptic('confirm')}catch(_){}
+  }catch(err){
+    console.warn('[toggleTargetCourse]',err);
+  }
+};
+try{updateTopbarCourseButton()}catch(_){}
+
 /* Mode gelap dihapus — baris pemilih tema tidak lagi ditampilkan. */
 function themeChoiceRowMarkup(){
   return '';
@@ -14945,7 +15020,8 @@ if(typeof document!=='undefined'&&document.addEventListener){
   });
 }
 /* ============================== akhir blok SOSIAL (SLOT 7) ========================== */
-window.istilahMurid=istilahMurid;/* dipapar untuk gerbang QA: penerjemah enum harus bisa disapu penuh */window.__getFiezelData=()=>({vocab:V.length,reading:R.length,grammar:Object.keys(G).length});window.__fiezelAudit={showBrandSplash,showOnboarding,prefersReducedMotion,readInstallHealth,installHealthReportMarkup,buildBackupFile,previewRestoreForState,applyRestore,continuitySettingsMarkup,academicReadinessMarkup,unifiedSkillsMarkup,buildPersonalJourney,journeyMarkup,setGoalProfile,loadState,sanitizeState,validateQuestion,makeGrammarQuestion,makeReadingQuestion,makeVocabQuestion,buildGrammarLessonQuestions,buildPlacement,/* m025-246: dipapar untuk regression-test - gerbang itu harus bisa MENANYAKAN ukuran rencana penempatan, bukan memaku 25 dan merah setiap kali ukurannya berubah dengan sengaja. */placementSize,placementBlueprint,/* cetak biru PENUH dipapar terpisah: gerbang harus tetap bisa menjaga invarian 'penempatan penuh memuat ketiga jenis konten' walau jalur murid memakai cetak biru lite */PLACEMENT_BLUEPRINT_FULL:PLACEMENT_BLUEPRINT,buildAdaptivePool,getScenePalette,getCelestialState,getDiagnosticProfile,buildLearningSnapshot,buildLearnerEvidenceModel,remoteLearnerEvidenceSnapshot,deriveAdaptivePolicy,buildAdaptivePolicy,adaptivePolicyRequestPayload,sanitizeAdaptivePolicy,/* m025-201: dipapar untuk tests/core-policy-parity-test.js - gerbang paritas tidak bisa membandingkan apa yang tidak bisa ia panggil */capRationaleCodes,policyEffectiveness,sanitizePolicyEffectiveness,resolveAdaptivePolicy,evaluatePolicyOutcome,sanitizePolicyOutcome,recordPolicyOutcomeFromSession,backfillPolicyOutcomes,recentPolicyOutcomes,policyOutcomeSummary,buildALRSContext,selectALRSDecision,buildCreatorReport,validReportEndpoint,forgettingProbability,scheduleNext,coreBrainMemory,tutorSession,tutorObserve,misconceptionLedgerRead,misconceptionLedgerActive,coreBrainAttempts,quizPredictedSuccess,evidenceKappa,bktRead,bktRecord,bktShadowMarkup,brainManifestMarkup,learningTelemetryMode,learningTelemetryEmitAnswer,learningTelemetryStudyDay,braincoreEvidenceMode,braincoreEvidenceCohort,braincoreEvidenceCohortForBuild,braincoreEvidenceDay,braincoreEvidenceEmitSnapshot,activeLevelOverallMastery,braincoreEvidenceEmitDecision,braincoreEvidenceFlush,braincoreEvidenceObserveSession,braincoreDecisionReason,braincoreEvidenceAnyLaneActive,identityEvidenceMode,learnerNameSyncToServer,maybeSyncLearnerName,identityEvidenceActive,identityEvidenceMirror,identityEvidenceFlush,forgetLearnerEvidence,confusionMatrixRead,confusionMatrixRecord,affectObserve,affectSessionSync,affectTargetSuccess,listeningAdaptivePolicy,olmPanelMarkup,coreBrainPanelMarkup,diagnosticEvidenceReady,skillTimeline,errorPatterns,confusionPairs,diagnosticReport,confidenceCalibration,dueItems,selectLoginMessage,notificationPermission,checkStudyReminders,lastLearningAt,beginLearningSession,abandonActiveSession,completeActiveSession,/* Fase 3 (C5): kalibrasi item, cloze, OLM negotiated, SRL, speaking adaptif, step tutor */itemCalibrationRead,itemCalibrationObserve,itemCalibrationEffective,calibrationItemId,ensureClozeBank,makeClozeQuestion,clozeAdaptivePicks,clozeSkillReady,clozeProductionRecord,olmSummarizeInput,olmDispute,olmProbeNextSkill,olmProbeConsume,olmNegotiationRead,srlSessionPlan,srlPredictPrompt,srlCaptureConfidence,srlReflect,srlSessionSync,speakingCoverageRows,speakingAdaptiveEvidence,speakingAdaptivePolicy,stepTutorGuidance,stepTutorGuidanceMarkup,record,quizLoop,startAdaptive,/* m025-308: dipapar untuk tests/th-content-overlay-test.js. Gerbang itu harus bisa memanggil overlay yang SUNGGUHAN lalu membacanya lewat jalur baca yang dipakai penyaji - kalau ia hanya boleh memeriksa isi sidecar, ia mengulang kebutaan yang justru membiarkan 45 petunjuk writing dan 96 umpan balik reading-exam menganggur. */applyContentLocale,writingPromptPool,writingExamTask,readingExamSets,makeExamReadingQuestion,/* m025-314: dipapar untuk tests/target-lang-surface-guard-test.js. Gerbang itu harus bisa MEMANGGIL daftar kartu yang sungguhan lalu membacanya, bukan menebak dari pola teks di app.js - penjaga yang hanya diuji lewat grep akan tetap hijau saat kartunya dipindah ke fungsi lain. */latihanCards,skillHubModel,skillHubMarkup,continueLearningCard,aiBoosterCard,targetLangSurfaceBlocked,targetLangVoiceBlocked,courseLanguageLabel,/* `state` adalah binding modul, jadi ia TIDAK muncul sebagai properti global di vm - gerbang yang perlu menggeser bahasa target atau membaca layar aktif tidak punya jalan lain. Diekspor sebagai FUNGSI, bukan nilai: salinan yang diambil saat berkas dimuat akan basi begitu state ditugaskan ulang (loadState dipanggil lagi saat akun berpindah). */liveState:()=>state,/* B1 (m025-317): dipapar untuk tests/target-lang-progress-isolation-test.js. Gerbang itu harus MENJALANKAN jalur simpan/muat yang sungguhan di kedua bahasa - sumbu yang hanya diuji lewat modulnya adalah persis cara cacat ini bertahan berbulan-bulan. */saveFlushWrite,switchTargetLangStorage,progressStorageKey,pickProgress,sideStateKey,PROGRESS_STATE_FIELDS,PROGRESS_PREF_FIELDS,/* Migrasi sekali-jalan saat murid masuk akun. Dipapar karena inilah satu-satunya jalur yang bisa MENELANTARKAN progres bahasa: ia lahir sebelum ruang nama @lang ada. Gerbang harus menjalankannya, bukan membaca namanya. */activateAccountStateFromPuter,migrateSideStateToAccount};
+window.istilahMurid=istilahMurid;/* dipapar untuk gerbang QA: penerjemah enum harus bisa disapu penuh */window.__getFiezelData=()=>({vocab:V.length,reading:R.length,grammar:Object.keys(G).length});window.__fiezelAudit={showBrandSplash,showOnboarding,prefersReducedMotion,readInstallHealth,installHealthReportMarkup,buildBackupFile,previewRestoreForState,applyRestore,continuitySettingsMarkup,academicReadinessMarkup,unifiedSkillsMarkup,buildPersonalJourney,journeyMarkup,setGoalProfile,loadState,sanitizeState,validateQuestion,makeGrammarQuestion,makeReadingQuestion,makeVocabQuestion,buildGrammarLessonQuestions,buildPlacement,/* m025-246: dipapar untuk regression-test - gerbang itu harus bisa MENANYAKAN ukuran rencana penempatan, bukan memaku 25 dan merah setiap kali ukurannya berubah dengan sengaja. */placementSize,placementBlueprint,/* cetak biru PENUH dipapar terpisah: gerbang harus tetap bisa menjaga invarian 'penempatan penuh memuat ketiga jenis konten' walau jalur murid memakai cetak biru lite */PLACEMENT_BLUEPRINT_FULL:PLACEMENT_BLUEPRINT,buildAdaptivePool,getScenePalette,getCelestialState,getDiagnosticProfile,buildLearningSnapshot,buildLearnerEvidenceModel,remoteLearnerEvidenceSnapshot,deriveAdaptivePolicy,buildAdaptivePolicy,adaptivePolicyRequestPayload,sanitizeAdaptivePolicy,/* m025-201: dipapar untuk tests/core-policy-parity-test.js - gerbang paritas tidak bisa membandingkan apa yang tidak bisa ia panggil */capRationaleCodes,policyEffectiveness,sanitizePolicyEffectiveness,resolveAdaptivePolicy,evaluatePolicyOutcome,sanitizePolicyOutcome,recordPolicyOutcomeFromSession,backfillPolicyOutcomes,recentPolicyOutcomes,policyOutcomeSummary,buildALRSContext,selectALRSDecision,buildCreatorReport,validReportEndpoint,forgettingProbability,scheduleNext,coreBrainMemory,tutorSession,tutorObserve,misconceptionLedgerRead,misconceptionLedgerActive,coreBrainAttempts,quizPredictedSuccess,evidenceKappa,bktRead,bktRecord,bktShadowMarkup,brainManifestMarkup,learningTelemetryMode,learningTelemetryEmitAnswer,learningTelemetryStudyDay,braincoreEvidenceMode,braincoreEvidenceCohort,braincoreEvidenceCohortForBuild,braincoreEvidenceDay,braincoreEvidenceEmitSnapshot,activeLevelOverallMastery,braincoreEvidenceEmitDecision,braincoreEvidenceFlush,braincoreEvidenceObserveSession,braincoreDecisionReason,braincoreEvidenceAnyLaneActive,identityEvidenceMode,learnerNameSyncToServer,maybeSyncLearnerName,identityEvidenceActive,identityEvidenceMirror,identityEvidenceFlush,forgetLearnerEvidence,confusionMatrixRead,confusionMatrixRecord,affectObserve,affectSessionSync,affectTargetSuccess,listeningAdaptivePolicy,olmPanelMarkup,coreBrainPanelMarkup,diagnosticEvidenceReady,skillTimeline,errorPatterns,confusionPairs,diagnosticReport,confidenceCalibration,dueItems,selectLoginMessage,notificationPermission,checkStudyReminders,lastLearningAt,beginLearningSession,abandonActiveSession,completeActiveSession,/* Fase 3 (C5): kalibrasi item, cloze, OLM negotiated, SRL, speaking adaptif, step tutor */itemCalibrationRead,itemCalibrationObserve,itemCalibrationEffective,calibrationItemId,ensureClozeBank,makeClozeQuestion,clozeAdaptivePicks,clozeSkillReady,clozeProductionRecord,olmSummarizeInput,olmDispute,olmProbeNextSkill,olmProbeConsume,olmNegotiationRead,srlSessionPlan,srlPredictPrompt,srlCaptureConfidence,srlReflect,srlSessionSync,speakingCoverageRows,speakingAdaptiveEvidence,speakingAdaptivePolicy,stepTutorGuidance,stepTutorGuidanceMarkup,record,quizLoop,startAdaptive,/* m025-308: dipapar untuk tests/th-content-overlay-test.js. Gerbang itu harus bisa memanggil overlay yang SUNGGUHAN lalu membacanya lewat jalur baca yang dipakai penyaji - kalau ia hanya boleh memeriksa isi sidecar, ia mengulang kebutaan yang justru membiarkan 45 petunjuk writing dan 96 umpan balik reading-exam menganggur. */applyContentLocale,writingPromptPool,writingExamTask,readingExamSets,makeExamReadingQuestion,/* m025-314: dipapar untuk tests/target-lang-surface-guard-test.js. Gerbang itu harus bisa MEMANGGIL daftar kartu yang sungguhan lalu membacanya, bukan menebak dari pola teks di app.js - penjaga yang hanya diuji lewat grep akan tetap hijau saat kartunya dipindah ke fungsi lain. */latihanCards,skillHubModel,skillHubMarkup,continueLearningCard,aiBoosterCard,targetLangSurfaceBlocked,targetLangVoiceBlocked,courseLanguageLabel,/* `state` adalah binding modul, jadi ia TIDAK muncul sebagai properti global di vm - gerbang yang perlu menggeser bahasa target atau membaca layar aktif tidak punya jalan lain. Diekspor sebagai FUNGSI, bukan nilai: salinan yang diambil saat berkas dimuat akan basi begitu state ditugaskan ulang (loadState dipanggil lagi saat akun berpindah). */liveState:()=>state,/* B1 (m025-317): dipapar untuk tests/target-lang-progress-isolation-test.js. Gerbang itu harus MENJALANKAN jalur simpan/muat yang sungguhan di kedua bahasa - sumbu yang hanya diuji lewat modulnya adalah persis cara cacat ini bertahan berbulan-bulan. */saveFlushWrite,switchTargetLangStorage,progressStorageKey,pickProgress,sideStateKey,PROGRESS_STATE_FIELDS,PROGRESS_PREF_FIELDS,/* Migrasi sekali-jalan saat murid masuk akun. Dipapar karena inilah satu-satunya jalur yang bisa MENELANTARKAN progres bahasa: ia lahir sebelum ruang nama @lang ada. Gerbang harus menjalankannya, bukan membaca namanya. */activateAccountStateFromPuter,migrateSideStateToAccount,FIEZEL_TARGET_COURSE_KEY};
+window.FIEZEL_TARGET_COURSE_KEY=FIEZEL_TARGET_COURSE_KEY;
 window.startVocabQuiz=startVocabQuiz;window.buildAdaptivePool=buildAdaptivePool;window.buildGrammarLessonQuestions=buildGrammarLessonQuestions;window.getScenePalette=getScenePalette;window.getCelestialState=getCelestialState;window.playFeedbackSound=playFeedbackSound;window.updateMastery=updateMastery;window.markMastered=markMastered;window.__getFiezelState=()=>state;window.__fiezelValidViews=()=>[...VALID_VIEWS];window.__fiezelDueReviews=()=>dueItems().length;window.buildAdaptivePolicy=buildAdaptivePolicy;window.studyDayKey=studyDayKey;window.startAdaptive=startAdaptive;window.showToast=showToast;window.answerFeedbackSignal=answerFeedbackSignal;window.practiceSkill=practiceSkill;window.openReadingLevel=openReadingLevel;window.startReadingRandom=startReadingRandom;window.startReadingAdaptive=startReadingAdaptive;window.startPlacement=startPlacement;window.startLevelPractice=startLevelPractice;window.startAdaptive=startAdaptive;window.resetProgress=resetProgress;window.closeModal=closeModal;window.openSettings=openSettings;window.openReportPreview=openReportPreview;window.sendCreatorReport=sendCreatorReport;window.askCoachAI=askCoachAI;window.dismissWelcome=dismissWelcome;window.requestStudyNotificationPermission=requestStudyNotificationPermission;window.declineStudyNotifications=declineStudyNotifications;window.skipPuterSignIn=skipPuterSignIn;window.attemptGoogleSignIn=attemptGoogleSignIn;window.shouldPresentPuterPopup=shouldPresentPuterPopup;window.notifyAppUpdateIfNew=notifyAppUpdateIfNew;window.setConfidence=setConfidence;window.explainWithAI=explainWithAI;window.explainWordWithAI=explainWordWithAI;window.olmDispute=olmDispute;/* Fase 3 (C5 butir 3): handler tombol sanggah di panel OLM */
 // m025-84: dipasang di ujung berkas, saat go()/state/VALID_VIEWS sudah ada, dan SEBELUM
 // load() supaya navigasi pertama pun sudah terekam di riwayat.
