@@ -48,7 +48,12 @@
   // 'id' tetap SATU sumber yang byte-identik dengan naskah beku gerbang emas.
   var I18N = (typeof FiezelI18n !== 'undefined') ? FiezelI18n
     : ((typeof module === 'object' && module.exports) ? require('../i18n/copy-id-feat-a.js') : null);
-  function t(key, params) { return I18N.t(key, params); }
+  function t(key, fallbackOrParams) {
+    if (!I18N || typeof I18N.t !== 'function') return typeof fallbackOrParams === 'string' ? fallbackOrParams : key;
+    var res = I18N.t(key, typeof fallbackOrParams === 'object' ? fallbackOrParams : undefined);
+    if ((!res || res === key) && typeof fallbackOrParams === 'string') return fallbackOrParams;
+    return res || key;
+  }
 
   var STORAGE_KEY = 'fiezel-splash-seen-v1';
   // v4: gerak selesai 2140, cap mulai 2200, cap rampung 2200+1360=3560 —
