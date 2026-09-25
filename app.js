@@ -8309,6 +8309,16 @@ function todayHomeMarkup(){
     + `<button type="button" class="fz-learning-pill" onclick="openLevelPanel()" role="tab">🏆 Level ${esc(jaCourseOn() ? FiezelJaUi.jlptLabel(todayLevel) : todayLevel)}</button>`
     + `</div>`;
 
+  const _t = (k, d) => {
+    try {
+      if (typeof FiezelI18n !== 'undefined' && FiezelI18n && typeof FiezelI18n.t === 'function') {
+        const val = FiezelI18n.t(k);
+        if (val && val !== k) return val;
+      }
+    } catch (_) {}
+    return d;
+  };
+
   const card1Hero = `<div class="fz-edu-card-content" onclick="${aksi}" role="button" tabindex="0">`
     + `<div class="fz-edu-badge-row">`
     + `<span class="fz-edu-tag is-primary"><i class="fz-i" data-fz-icon="listening" style="width:13px;height:13px"></i> ${jaCourseOn() ? 'CHŌKAI (AUDIO)' : 'LISTENING PRACTICE'}</span>`
@@ -8318,10 +8328,10 @@ function todayHomeMarkup(){
     + `<p class="fz-edu-desc">${jaCourseOn() ? 'Latih kepekaan telinga dengan audio penutur asli Jepang untuk menjaga ritme harianmu.' : 'Improve your listening comprehension and maintain your daily learning rhythm.'}</p>`
     + `<div class="fz-edu-stats-row">`
     + `<span class="fz-edu-stat-item"><i class="fz-i" data-fz-icon="clock" style="width:13px;height:13px"></i> ${shape.menit}:00 Menit</span>`
-    + `<span class="fz-edu-stat-item"><i class="fz-i" data-fz-icon="quiz" style="width:13px;height:13px"></i> ${shape.soal} ${t('today.quiz_suffix', 'Soal')}</span>`
+    + `<span class="fz-edu-stat-item"><i class="fz-i" data-fz-icon="quiz" style="width:13px;height:13px"></i> ${shape.soal} ${_t('today.quiz_suffix', 'Soal')}</span>`
     + `<span class="fz-edu-stat-item is-reward">✨ +50 XP</span>`
     + `</div>`
-    + `<button type="button" class="fz-edu-primary-btn" onclick="event.stopPropagation();${aksi}">${t('today.start_practice_btn', 'Mulai Latihan Sekarang ➔')}</button>`
+    + `<button type="button" class="fz-edu-primary-btn" onclick="event.stopPropagation();${aksi}">${_t('today.start_practice_btn', 'Mulai Latihan Sekarang ➔')}</button>`
     + `</div>`;
 
   const card2Hero = `<div class="fz-edu-card fz-card-neutral" onclick="go('vocab')" role="button" tabindex="0" aria-label="Kotoba Flashcards">`
@@ -8333,7 +8343,7 @@ function todayHomeMarkup(){
     + `<h3 class="fz-edu-title">${jaCourseOn() ? 'Flashcard Kosakata & Pola Kalimat' : 'Vocabulary Flashcards & Syntax'}</h3>`
     + `<p class="fz-edu-desc">${jaCourseOn() ? '25 kata aktif dengan sistem pengulangan berjarak (Spaced Repetition System) agar tersimpan di memori jangka panjang.' : 'Active flashcards with spaced repetition system to reinforce long-term memory.'}</p>`
     + `<div class="fz-edu-stats-row">`
-    + `<span class="fz-edu-stat-item">🗂️ 25 ${t('today.vocab_suffix', 'Kosakata')}</span>`
+    + `<span class="fz-edu-stat-item">🗂️ 25 ${_t('today.vocab_suffix', 'Kosakata')}</span>`
     + `<span class="fz-edu-stat-item">⏱️ 05:00 Menit</span>`
     + `<span class="fz-edu-stat-item">🧠 SRS Memory</span>`
     + `</div>`
