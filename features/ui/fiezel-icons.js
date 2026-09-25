@@ -91,17 +91,14 @@
        sendiri. `skills` (lima batang tipis) dan `map` (lipatan + dua garis) melanggar
        itu - yang satu terlalu ringan, yang lain terlalu ramai - jadi tab Latihan dan
        Progres pindah ke dua ikon ini. Keduanya TETAP tersedia untuk kartu di dalam layar. */
-    practice: '<rect class="fz-fill" x="3.6" y="7" width="13.6" height="13.4" rx="3.4"/>' +
-      '<rect class="fz-line" x="3.6" y="7" width="13.6" height="13.4" rx="3.4"/>' +
-      '<path class="fz-line" d="M7.4 7V6.2a2.6 2.6 0 0 1 2.6-2.6h7.8a2.6 2.6 0 0 1 2.6 2.6v7.6a2.6 2.6 0 0 1-2.6 2.6h-.6"/>' +
-      '<path class="fz-line" d="m7.6 13.8 2.2 2.2 4.2-4.6"/>',
-    progress: '<rect class="fz-fill" x="3.6" y="3.6" width="16.8" height="16.8" rx="4.4"/>' +
-      '<rect class="fz-line" x="3.6" y="3.6" width="16.8" height="16.8" rx="4.4"/>' +
-      '<path class="fz-line" d="m7.2 15.4 3.4-3.8 2.6 2.4 4-4.6"/>' +
-      '<path class="fz-line" d="M14.4 9.4h2.8v2.8"/>',
-    home: '<path class="fz-fill" d="M12 3.6 21 11v7.6a2.4 2.4 0 0 1-2.4 2.4H5.4A2.4 2.4 0 0 1 3 18.6V11z"/>' +
-      '<path class="fz-line" d="M12 3.6 21 11v7.6a2.4 2.4 0 0 1-2.4 2.4H5.4A2.4 2.4 0 0 1 3 18.6V11z"/>' +
-      '<path class="fz-line" d="M9.5 21v-4.6a1 1 0 0 1 1-1h3a1 1 0 0 1 1 1V21"/>',
+    practice: '<polygon class="fz-fill" points="12,2.5 15.1,8.8 22,9.8 17,14.6 18.2,21.5 12,18.2 5.8,21.5 7,14.6 2,9.8 8.9,8.8" opacity="0.15"/>' +
+      '<polygon class="fz-line" points="12,2.5 15.1,8.8 22,9.8 17,14.6 18.2,21.5 12,18.2 5.8,21.5 7,14.6 2,9.8 8.9,8.8"/>',
+    progress: '<circle class="fz-fill" cx="12" cy="12" r="9" opacity="0.15"/>' +
+      '<circle class="fz-line" cx="12" cy="12" r="9"/>' +
+      '<path class="fz-line" d="m7.5 12h2.5l1.6-3.8 2.4 7.6 1.8-3.8h2.7"/>',
+    home: '<path class="fz-fill" d="M12 3.8 20.5 10.5v8.5a2 2 0 0 1-2 2h-13a2 2 0 0 1-2-2v-8.5z" opacity="0.12"/>' +
+      '<path class="fz-line" d="M3.5 10.5 12 3.8l8.5 6.7v8.5a2 2 0 0 1-2 2h-13a2 2 0 0 1-2-2z"/>' +
+      '<path class="fz-line" d="M9.5 21v-5.5a1.5 1.5 0 0 1 1.5-1.5h2a1.5 1.5 0 0 1 1.5 1.5V21"/>',
     vocab: '<rect class="fz-fill" x="3.6" y="3.6" width="16.8" height="16.8" rx="4.4"/>' +
       '<rect class="fz-line" x="3.6" y="3.6" width="16.8" height="16.8" rx="4.4"/>' +
       '<path class="fz-line" d="M8.4 16.2 12 7.4l3.6 8.8M9.7 13.6h4.6"/>',
@@ -132,41 +129,27 @@
       '<path class="fz-line" d="M5.4 6.9c0-.5.4-.9.9-.9h2.2c.5 0 .9.4.9.9v11.2c0 .5-.4.9-.9.9H6.3a.9.9 0 0 1-.9-.9z"/>' +
       '<path class="fz-line" d="M11 6.9c0-.5.4-.9.9-.9h1.6c.5 0 .9.4.9.9v11.2c0 .5-.4.9-.9.9h-1.6a.9.9 0 0 1-.9-.9z"/>' +
       '<path class="fz-line" d="m16.4 7.6 1.7-.4c.5-.1 1 .2 1.1.7l2 9.6c.1.5-.2 1-.7 1.1l-1.4.3"/>',
-    /* m025-266: papan kelas disederhanakan - satu goresan kapur, bukan tiga baris teks,
-       supaya di 24 px ia sebobot tetangganya di tab bar. */
-    classroom: '<rect class="fz-fill" x="3.8" y="4" width="16.4" height="12.4" rx="3.2"/>' +
-      '<rect class="fz-line" x="3.8" y="4" width="16.4" height="12.4" rx="3.2"/>' +
-      '<path class="fz-line" d="M12 16.4v3.6M8.8 20h6.4M8.2 10.2h5.6"/>',
+    classroom: '<polygon class="fz-fill" points="12,3.5 22.5,8.5 12,13.5 1.5,8.5" opacity="0.18"/>' +
+      '<polygon class="fz-line" points="12,3.5 22.5,8.5 12,13.5 1.5,8.5"/>' +
+      '<path class="fz-line" d="M5.5 10.5v5c0 2.6 2.9 4.8 6.5 4.8s6.5-2.2 6.5-4.8v-5"/>' +
+      '<path class="fz-line" d="M20 9.2v6.8a1.5 1.5 0 0 1-1.5 1.5"/>' +
+      '<rect class="fz-fill" x="17.2" y="17.5" width="2.6" height="3" rx="0.8"/>',
     skills: '<path class="fz-fill" d="M6 10h2.2v4H6zM10.9 7.4h2.2v9.2h-2.2zM15.8 9h2.2v6h-2.2z"/>' +
       '<path class="fz-line" d="M6.9 9.4v5.2M12 6.6v10.8M17.1 8.4v7.2M3.6 11.2v1.6M20.4 11.2v1.6"/>',
-    /* m025-246: tab bar sekarang punya EMPAT tujuan dan salah satunya Pengaturan.
-       Ikon lucide `sliders-horizontal` sudah dipakai tombol gigi di topbar, tetapi
-       tab bar adalah wilayah set duotone (kontrak refreshIcons di app.js: duotone
-       memegang kroma yang dilihat murid tiap hari, lucide memegang ikon sekali-pakai
-       DI DALAM layar). Meminjam ikon lucide ke sana akan membuat satu dari empat tab
-       digambar dengan berat garis dan bahasa bentuk yang berbeda dari tiga tetangganya.
-       Aturan keluarga yang sama dengan ikon lain: kanvas 24x24, isi di kotak 3..21,
-       satu bidang, tanpa warna yang dipaku. */
     settings: '<path class="fz-fill" d="M4.2 7.2h15.6v2.4H4.2zM4.2 14.4h15.6v2.4H4.2z"/>' +
       '<path class="fz-line" d="M3.6 8.4h16.8M3.6 15.6h16.8"/>' +
       '<circle class="fz-line" cx="9.2" cy="8.4" r="2.3"/>' +
       '<circle class="fz-line" cx="15" cy="15.6" r="2.3"/>',
-    /* Wajah pembimbing FIEZEL - bentuknya milik FIEZEL sendiri, bukan maskot pihak lain:
-       satu kotak membulat (huruf F yang dibulatkan), dua mata, satu percik. */
     coach: '<rect class="fz-fill" x="4.2" y="4.6" width="15.6" height="14.4" rx="5"/>' +
       '<rect class="fz-line" x="4.2" y="4.6" width="15.6" height="14.4" rx="5"/>' +
       '<path class="fz-line" d="M9.2 11.4v1.4M14.8 11.4v1.4M10.2 15.4c1.1.9 2.5.9 3.6 0"/>' +
       '<path class="fz-line" d="m18.6 3.2.6 1.6 1.6.6-1.6.6-.6 1.6-.6-1.6-1.6-.6 1.6-.6z"/>',
-    /* Streak: dipakai badge, satu-satunya tempat koral jadi bidang penuh. */
     flame: '<path class="fz-fill" d="M12 3.8c3.4 3 5 5.3 5 7.9a5 5 0 0 1-10 0c0-1.5.6-2.9 1.8-4.4.5 1 .9 1.6 1.6 2 .2-2.1.7-3.9 1.6-5.5z"/>' +
       '<path class="fz-line" d="M12 3.8c3.4 3 5 5.3 5 7.9a5 5 0 0 1-10 0c0-1.5.6-2.9 1.8-4.4.5 1 .9 1.6 1.6 2 .2-2.1.7-3.9 1.6-5.5z"/>' +
       '<path class="fz-line" d="M12 12.6c1.2 1 1.8 1.9 1.8 2.8a1.8 1.8 0 0 1-3.6 0c0-.9.6-1.8 1.8-2.8z"/>',
-    /* Profil murid / akun dan teman untuk navigasi utama.
-       m025-266: bidangnya pindah ke BAHU, bukan kepala - lingkaran r4 nyaris tak punya
-       luas, sehingga di tab bar ikon ini terbaca garis tipis di antara empat bidang. */
-    profile: '<path class="fz-fill" d="M4.4 20.4c0-4 3.4-7 7.6-7s7.6 3 7.6 7z"/>' +
-      '<path class="fz-line" d="M4.4 20.4c0-4 3.4-7 7.6-7s7.6 3 7.6 7"/>' +
-      '<circle class="fz-line" cx="12" cy="7.8" r="4.2"/>'
+    profile: '<polygon class="fz-fill" points="12,2.8 19.5,7.1 19.5,16.9 12,21.2 4.5,16.9 4.5,7.1" opacity="0.15"/>' +
+      '<polygon class="fz-line" points="12,2.8 19.5,7.1 19.5,16.9 12,21.2 4.5,16.9 4.5,7.1"/>' +
+      '<circle class="fz-line" cx="12" cy="12" r="3.2"/>'
   };
 
   var SVG_HEAD = '<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">';

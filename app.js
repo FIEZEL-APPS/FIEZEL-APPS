@@ -7875,7 +7875,19 @@ function latihanCards(){
   /* Kursus Jepang membuka dengan tabel kana & chokai: pintu masuk belajar & listening JLPT. */
   const kanaCard=jaCourseOn()?FiezelJaUi.kanaCardMarkup():'';
   const chokaiCard=jaCourseOn()?FiezelJaUi.chokaiCardMarkup():'';
-  return kanaCard+chokaiCard+cards.map(c=>`<button class="launch-card" onclick="go('${esc(c.view)}')" aria-label="${esc(c.label)}"><span class="launch-icon"><i class="fz-i" data-fz-icon="${esc(c.icon)}" aria-hidden="true"></i></span><span><small>${esc(c.note)}</small><b>${esc(c.label)}</b></span><i data-lucide="arrow-up-right"></i></button>`).join('');
+  return kanaCard+chokaiCard+cards.map(c=>{
+    let emb=null;
+    if(typeof Fiezel3DEmblems!=='undefined'){
+      if(c.view==='vocab'||c.icon==='vocab')emb=Fiezel3DEmblems.kotoba(44);
+      else if(c.view==='grammar'||c.icon==='grammar')emb=Fiezel3DEmblems.bunpo(44);
+      else if(c.view==='reading'||c.icon==='reading')emb=Fiezel3DEmblems.dokkai(44);
+      else if(c.view==='skills'||c.icon==='skills'||c.icon==='listening')emb=Fiezel3DEmblems.chokai(44);
+    }
+    const iconSpan = emb
+      ? `<span class="launch-icon fz-launch-3d">${emb}</span>`
+      : `<span class="launch-icon"><i class="fz-i" data-fz-icon="${esc(c.icon)}" aria-hidden="true"></i></span>`;
+    return `<button class="launch-card" onclick="go('${esc(c.view)}')" aria-label="${esc(c.label)}">${iconSpan}<span><small>${esc(c.note)}</small><b>${esc(c.label)}</b></span><i data-lucide="arrow-up-right"></i></button>`;
+  }).join('');
 }
 /* PETA JENIS SOAL -> LAYAR. Dipakai kedua kartu di bawah untuk mengantar murid ke tempat
    materinya benar-benar hidup, bukan ke satu layar yang dipaku. */
@@ -8149,7 +8161,7 @@ function todayHomeMarkup(){
      awal. Dulu cabang sesi-tertunda didahulukan, jadi murid baru yang tesnya terputus melihat
      "Lanjutkan sesi" - label yang keliru (belum ada sesi latihan) untuk tombol yang buntu.
      "Lanjutkan" kini hanya untuk sesi yang memang bisa dilanjutkan. */
-  else if(!state.placementDone){aksi='startPlacement()';label=FiezelI18n.t('today.cta-tes-awal',{menit:placementMinutes()});}
+  else if(!state.placementDone && !jaCourseOn()){aksi='startPlacement()';label=FiezelI18n.t('today.cta-tes-awal',{menit:placementMinutes()});}
   else if(state.activeSession&&state.adaptiveReady){aksi='startAdaptive()';label=FiezelI18n.t('today.cta-lanjut');}
   else if(state.adaptiveReady){aksi='startAdaptive()';label=FiezelI18n.t('today.cta',{menit:shape.menit});}
   else{aksi=`startLevelPractice('${esc(getActiveLevel())}')`;label=FiezelI18n.t('today.cta',{menit:shape.menit});}
@@ -8255,17 +8267,68 @@ function todayHomeMarkup(){
 
   /* AUDIT-2026-09-21 T2+T4: learnerFlow pindah ke BAWAH kartu HARI INI (CTA naik ~346px ke
      atas lipatan 844px); wajah kedua di today-head dilepas — satu Pau di Home. */
-  return `<div class="today-home-cockpit">
-  ${heroMascotMarkup}
-  <section class="today-card" aria-label="${esc(FiezelI18n.t('today.aria-kartu'))}">
-    <div class="today-head"><span class="today-eyebrow">${FiezelI18n.t('today.eyebrow')}</span>${todayHeadChips}</div>
-    ${rhythmBar}
-    ${badan}
-    ${streak>0?`<p class="today-streak"><i class="fz-i" data-fz-icon="flame" aria-hidden="true"></i> ${esc(FiezelI18n.t('today.streak',{days:streak}))}</p>`:''}
-    ${activeLevelTrustLineMarkup()}
+  const sportsTop = `<div class="fz-sports-topbar">`
+    + `<button type="button" class="fz-sports-brand-crest" onclick="pawReact('wake');uiSfx('paw_greet')" aria-label="FIEZEL" title="FIEZEL"><span class="fz-sports-brand-inner">${typeof Fiezel3DEmblems!=='undefined'?Fiezel3DEmblems.brandCrest(44):'⚡'}</span></button>`
+    + `<div class="fz-sports-actions">`
+    + `<button type="button" id="fzCourseSwitchBtnHome" class="course-switch-btn fz-sports-course-btn" onclick="toggleTargetCourse()" aria-label="Course"><span class="course-switch-flag" id="fzCourseFlagHome">${jaCourseOn() ? '🇯🇵' : '🇬🇧'}</span><span class="course-switch-label" id="fzCourseLabelHome" style="display:none">${jaCourseOn() ? 'JA' : 'EN'}</span></button>`
+    + `<button type="button" class="fz-sports-action-btn" onclick="go('vocab')" aria-label="Search"><i data-lucide="search"></i></button>`
+    + `<button type="button" class="fz-sports-action-btn" onclick="openNotifications()" aria-label="Notifications"><i data-lucide="bell"></i></button>`
+    + `</div></div>`
+    + `<div class="fz-sports-header"><span class="fz-sports-subhead">${jaCourseOn() ? 'Target Belajar' : 'Learning Target'}</span><div class="fz-sports-title">HARI INI</div></div>`
+    + `<div class="fz-sports-pills-bar" role="tablist">`
+    + '<button type="button" class="fz-sports-pill is-active" role="tab">Target Harian</button>'
+    + `<button type="button" class="fz-sports-pill" onclick="openListeningPanel()" role="tab">Chōkai (Audio)</button>`
+    + `<button type="button" class="fz-sports-pill" onclick="go('vocab')" role="tab">Kotoba (単語)</button>`
+    + `<button type="button" class="fz-sports-pill" onclick="go('grammar')" role="tab">Bunpō (文法)</button>`
+    + `<button type="button" class="fz-sports-pill" onclick="openLevelPanel()" role="tab">Level ${esc(jaCourseOn() ? FiezelJaUi.jlptLabel(todayLevel) : todayLevel)}</button>`
+    + `</div>`;
+
+  const card1Hero = `<div class="fz-card-top" onclick="${aksi}" role="button" tabindex="0">`
+    + `<div class="fz-entity-col"><div class="fz-entity-badge fz-crest-3d fz-crest-chokai">${typeof Fiezel3DEmblems!=='undefined'?Fiezel3DEmblems.chokai(54):'<span>🎧</span>'}</div><b class="fz-entity-name">CHŌKAI</b><span class="fz-entity-sub">SESI AUDIO</span></div>`
+    + `<div class="fz-match-center-badge">VS</div>`
+    + `<div class="fz-entity-col is-right"><div class="fz-entity-badge is-right fz-crest-3d fz-crest-jlpt">${typeof Fiezel3DEmblems!=='undefined'?Fiezel3DEmblems.target(54):'<span>🎯</span>'}</div><span class="fz-entity-sub">TARGET</span><b class="fz-entity-name">${esc(jaCourseOn() ? FiezelJaUi.jlptLabel(todayLevel) : todayLevel)}</b></div>`
+    + `</div>`
+    + '<div class="fz-card-bottom" onclick="' + aksi + '" role="button" tabindex="0">'
+    + `<div class="fz-chip-dashed">${shape.soal} SOAL</div>`
+    + `<div class="fz-score-box"><div class="fz-score-main"><span class="fz-score-dark">${shape.menit}:</span><span class="fz-score-gray">00</span></div><div class="fz-score-date">${esc(todayLabel().toUpperCase())}</div></div>`
+    + '<div class="fz-chip-action">+50 XP</div>'
+    + '</div>';
+
+  const card2Hero = `<div class="fz-match-card fz-card-silver" onclick="go('vocab')" role="button" tabindex="0" aria-label="Kotoba Flashcards">`
+    + `<div class="fz-card-top"><div class="fz-entity-col"><div class="fz-entity-badge fz-crest-3d fz-crest-kotoba">${typeof Fiezel3DEmblems!=='undefined'?Fiezel3DEmblems.kotoba(54):'<span>📖</span>'}</div><b class="fz-entity-name">KOTOBA</b><span class="fz-entity-sub">FLASHCARD</span></div>`
+    + `<div class="fz-match-center-badge">VS</div>`
+    + `<div class="fz-entity-col is-right"><div class="fz-entity-badge is-right fz-crest-3d fz-crest-bunpo">${typeof Fiezel3DEmblems!=='undefined'?Fiezel3DEmblems.bunpo(54):'<span>⚡</span>'}</div><span class="fz-entity-sub">TATA BAHASA</span><b class="fz-entity-name">BUNPŌ</b></div></div>`
+    + `<div class="fz-card-bottom"><div class="fz-chip-dashed">25 KATA</div>`
+    + `<div class="fz-score-box"><div class="fz-score-main"><span class="fz-score-dark">05:</span><span class="fz-score-gray">00</span></div><div class="fz-score-date">REVIEW HARIAN</div></div>`
+    + `<div class="fz-chip-action">SRS MEMORY</div></div></div>`;
+
+  const card3Hero = `<div class="fz-match-card fz-card-obsidian" onclick="openListeningPanel()" role="button" tabindex="0" aria-label="Dokkai dan Simulasi">`
+    + `<div class="fz-card-top"><div class="fz-entity-col"><div class="fz-entity-badge fz-crest-3d fz-crest-dokkai">${typeof Fiezel3DEmblems!=='undefined'?Fiezel3DEmblems.dokkai(54):'<span>📜</span>'}</div><b class="fz-entity-name">DOKKAI</b><span class="fz-entity-sub">BACAAN JLPT</span></div>`
+    + `<div class="fz-match-center-badge">VS</div>`
+    + `<div class="fz-entity-col is-right"><div class="fz-entity-badge is-right fz-crest-3d fz-crest-exam">${typeof Fiezel3DEmblems!=='undefined'?Fiezel3DEmblems.exam(54):'<span>🏆</span>'}</div><span class="fz-entity-sub">SIMULASI</span><b class="fz-entity-name">TRY OUT</b></div></div>`
+    + `<div class="fz-card-bottom"><div class="fz-chip-dashed">20 MENIT</div>`
+    + `<div class="fz-score-box"><div class="fz-score-main"><span class="fz-score-dark">88</span><span class="fz-score-gray">%</span></div><div class="fz-score-date">SKOR KELULUSAN</div></div>`
+    + `<div class="fz-chip-action">SIMULASI ➔</div></div></div>`;
+
+  return `<div class="today-home-cockpit fz-sports-cockpit">
+  ${sportsTop}
+  <section class="today-card fz-match-card fz-card-yellow" aria-label="${esc(FiezelI18n.t('today.aria-kartu'))}">
+    ${card1Hero}
+    <details class="fz-card-drawer">
+      <summary class="fz-drawer-toggle"><span>${jaCourseOn() ? '⛩️ ' : '⚡ '}${esc(FiezelI18n.t('home.sesi-next') || 'SESSION DETAILS')}</span><span class="fz-drawer-arrow">▾</span></summary>
+      <div class="fz-drawer-inner">
+        <div class="today-head"><span class="today-eyebrow">${FiezelI18n.t('today.eyebrow')}</span>${todayHeadChips}</div>
+        ${rhythmBar}
+        ${badan}
+        ${streak>0?`<p class="today-streak"><i class="fz-i" data-fz-icon="flame" aria-hidden="true"></i> ${esc(FiezelI18n.t('today.streak',{days:streak}))}</p>`:''}
+        ${activeLevelTrustLineMarkup()}
+      </div>
+    </details>
   </section>
+  ${card2Hero}
+  ${card3Hero}
+  ${heroMascotMarkup}
   ${jaCourseOn()?FiezelJaUi.wordOfDayMarkup(V.filter(v=>v.level===getActiveLevel())):''}
-  ${jaChokaiHomeBannerMarkup()}
   ${learnerFlowHomeMarkup()}
   ${quickChips}
   ${socialHomeMarkup()}
@@ -8275,7 +8338,7 @@ function jaChokaiHomeBannerMarkup(){
   if(!jaCourseOn())return '';
   return `<div class="card ja-chokai-banner" onclick="openListeningPanel()" role="button" tabindex="0" aria-label="Chōkai JLPT N5 / N4" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openListeningPanel();}">
     <div class="ja-chokai-banner-left">
-      <span class="ja-chokai-banner-icon" aria-hidden="true">🎧</span>
+      <span class="ja-chokai-banner-icon" aria-hidden="true">${typeof Fiezel3DEmblems!=='undefined'?Fiezel3DEmblems.chokai(44):'🎧'}</span>
       <div>
         <span class="ja-chokai-banner-eyebrow">Japan Foundation &amp; JEES</span>
         <b class="ja-chokai-banner-title">Listening &amp; Chōkai (JLPT N5 &amp; N4)</b>
@@ -12939,21 +13002,17 @@ window.setTargetLangPreference=setTargetLangPreference;
 
 function updateTopbarCourseButton(){
   try{
-    const flagEl=document.getElementById('fzCourseFlag');
-    const labelEl=document.getElementById('fzCourseLabel');
-    const btn=document.getElementById('fzCourseSwitchBtn');
-    if(!flagEl&&!labelEl&&!btn)return;
     const currentLang=activeTargetLang();
     const isJa=(currentLang==='ja');
-    if(flagEl)flagEl.textContent=isJa?'🇯🇵':'🇬🇧';
-    if(labelEl)labelEl.textContent=isJa?'JA':'EN';
-    if(btn){
+    document.querySelectorAll('.course-switch-flag').forEach(el => { el.textContent = isJa ? '🇯🇵' : '🇬🇧'; });
+    document.querySelectorAll('.course-switch-label').forEach(el => { el.textContent = isJa ? 'JA' : 'EN'; });
+    document.querySelectorAll('.course-switch-btn').forEach(btn => {
       btn.setAttribute('data-target-lang',currentLang);
       const activeName=isJa?FiezelI18n.t('bahasa.ja'):FiezelI18n.t('bahasa.en');
       const targetName=isJa?FiezelI18n.t('bahasa.en'):FiezelI18n.t('bahasa.ja');
       btn.setAttribute('aria-label',FiezelI18n.t('topbar.course-switch-active',{aktif:activeName,tujuan:targetName}));
       btn.title=FiezelI18n.t('topbar.course-switch-title');
-    }
+    });
   }catch(_){}
 }
 window.updateTopbarCourseButton=updateTopbarCourseButton;
