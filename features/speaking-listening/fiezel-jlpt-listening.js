@@ -23,10 +23,11 @@
   function t(k, fallback) {
     try {
       if (typeof window !== 'undefined' && window.FiezelI18n && window.FiezelI18n.t) {
-        return window.FiezelI18n.t(k, fallback);
+        var res = window.FiezelI18n.t(k);
+        if (res && res !== k) return res;
       }
     } catch (_) {}
-    return fallback;
+    return fallback !== undefined ? fallback : k;
   }
 
   function getBankUrl() {

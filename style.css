@@ -5843,7 +5843,7 @@ body.fz-auth-open{overflow:hidden}
    FIEZEL HOME DASHBOARD — SPORTS / LEAGUES REDESIGN (DARK + RADIANT ELECTRIC YELLOW)
    ========================================================================== */
 
-:root {
+html, body {
   --fz-sports-bg: #0A0A0E;
   --fz-sports-card-bg: #14141A;
   --fz-sports-card-border: rgba(255, 255, 255, 0.15);
@@ -7403,7 +7403,744 @@ button.primary:hover,
 }
 
 /* ==========================================================================
-   ERADICATE FLOATING PAW COACH BUBBLE, PEEK & CARTOON MASCOTS ACROSS ALL PANELS
+   11. GRAMMAR VIEW & LESSON PATH HIGH-CONTRAST (DARK LUXURY ATHLETIC)
+   ========================================================================== */
+.path-step .path-label,
+body.fz-lux .path-label,
+body .path-label {
+  background: #14141B !important;
+  border: 1px solid rgba(255, 255, 255, 0.09) !important;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35) !important;
+  color: #FFFFFF !important;
+  border-radius: 18px !important;
+}
+
+.path-step .path-label b,
+body.fz-lux .path-label b,
+body .path-label b {
+  color: #FFFFFF !important;
+  font-weight: 700 !important;
+}
+
+.path-step .path-label > span,
+body.fz-lux .path-label > span,
+body .path-label > span {
+  color: #94A3B8 !important;
+}
+
+.path-step .path-label .lesson-lock-note,
+.lesson-lock-note {
+  color: #CBD5E1 !important;
+}
+
+.path-step.is-locked .path-label,
+body.fz-lux .path-step.is-locked .path-label,
+body .path-step.is-locked .path-label {
+  background: #111116 !important;
+  border-color: rgba(255, 255, 255, 0.05) !important;
+  opacity: 0.85 !important;
+}
+
+.path-step.is-locked .path-label b,
+body.fz-lux .path-step.is-locked .path-label b {
+  color: #94A3B8 !important;
+}
+
+.path-step.is-locked .path-label > span,
+body.fz-lux .path-step.is-locked .path-label > span {
+  color: #64748B !important;
+}
+
+.path-step.is-current .path-label,
+body.fz-lux .path-step.is-current .path-label,
+body .path-step.is-current .path-label {
+  border: 2px solid #FFE02E !important;
+  box-shadow: 0 0 20px rgba(255, 224, 46, 0.25), 0 4px 16px rgba(0, 0, 0, 0.4) !important;
+}
+
+.path-step.is-current .path-label b {
+  color: #FFFFFF !important;
+}
+
+.path-node,
+body.fz-lux .path-node {
+  background: #181824 !important;
+  border: 2px solid rgba(255, 255, 255, 0.12) !important;
+  color: #FFFFFF !important;
+}
+
+.path-ring > b,
+.path-ring > i,
+.path-ring {
+  color: #FFFFFF !important;
+}
+
+.path-ring-gold {
+  background: #FFE02E !important;
+  color: #0A0A0E !important;
+}
+
+/* Grammar Lesson Detail Page */
+.grammar-lesson-page {
+  background: radial-gradient(ellipse 90% 40% at 50% -5%, rgba(255, 224, 46, 0.08) 0%, transparent 60%), #0A0A0E !important;
+  color: #FFFFFF !important;
+}
+
+.grammar-lesson-card {
+  background: #14141B !important;
+  border: 1px solid rgba(255, 255, 255, 0.09) !important;
+  border-radius: 20px !important;
+  color: #FFFFFF !important;
+}
+
+.lesson-bubble {
+  background: #1C1C28 !important;
+  border: 1px solid rgba(255, 224, 46, 0.3) !important;
+  border-radius: 18px !important;
+  color: #FFFFFF !important;
+}
+
+.lesson-bubble b {
+  color: #FFE02E !important;
+  font-weight: 800 !important;
+}
+
+.lesson-bubble::before {
+  border-right-color: rgba(255, 224, 46, 0.3) !important;
+}
+
+.lesson-bubble::after {
+  border-right-color: #1C1C28 !important;
+}
+
+.lesson-stage p {
+  color: #E2E8F0 !important;
+}
+
+.lesson-example {
+  background: #181824 !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  border-radius: 16px !important;
+  color: #FFFFFF !important;
+}
+
+.lesson-example > span {
+  color: #F59E0B !important;
+  font-weight: 800 !important;
+}
+
+.lesson-example h3 {
+  color: #FFFFFF !important;
+  font-weight: 700 !important;
+}
+
+.lesson-example p {
+  color: #CBD5E1 !important;
+}
+
+.lesson-example p strong {
+  color: #FFE02E !important;
+}
+
+.lesson-contrast .is-wrong {
+  background: rgba(239, 68, 68, 0.18) !important;
+  color: #FCA5A5 !important;
+  border: 1px solid rgba(239, 68, 68, 0.3) !important;
+}
+
+.lesson-contrast .is-right {
+  background: rgba(16, 185, 129, 0.18) !important;
+  color: #6EE7B7 !important;
+  border: 1px solid rgba(16, 185, 129, 0.3) !important;
+}
+
+.memory-tip,
+.memory-tip span {
+  color: #E2E8F0 !important;
+}
+
+.skill-page-topbar button,
+.skill-back-btn {
+  background: #181824 !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  color: #FFFFFF !important;
+}
+
+.skill-help-dot {
+  background: #181824 !important;
+  color: #FFE02E !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+/* ==========================================================================
+   12. QUIZ & PRACTICE SCREENS HIGH-CONTRAST (DARK LUXURY ATHLETIC)
+   ========================================================================== */
+.quiz-shell,
+.stage-shell {
+  background: #0A0A0E !important;
+  color: #FFFFFF !important;
+}
+
+.quiz-topbar,
+.stage-header {
+  background: #14141B !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+  color: #FFFFFF !important;
+}
+
+.quiz-topbar span,
+.quiz-progress span,
+.stage-counter {
+  color: #FFFFFF !important;
+  font-weight: 800 !important;
+}
+
+.quiz-topbar em,
+.quiz-progress em {
+  color: #94A3B8 !important;
+}
+
+.quiz-exit {
+  background: #181824 !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  color: #FFFFFF !important;
+}
+
+.quiz-exit-label {
+  color: #FFFFFF !important;
+}
+
+.passage.passage-reading {
+  background: #14141B !important;
+  border: 1px solid rgba(255, 255, 255, 0.09) !important;
+  border-radius: 18px !important;
+  color: #E2E8F0 !important;
+}
+
+.passage.passage-reading .eyebrow {
+  color: #FFE02E !important;
+  font-weight: 800 !important;
+}
+
+.passage.passage-reading h3 {
+  color: #FFFFFF !important;
+  font-weight: 800 !important;
+}
+
+.passage.passage-reading p {
+  color: #CBD5E1 !important;
+}
+
+.quiz-bubble,
+.speech-bubble {
+  background: #181824 !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  border-radius: 18px !important;
+  color: #FFFFFF !important;
+}
+
+.quiz-bubble h2.question,
+.quiz-bubble p,
+.quiz-bubble span {
+  color: #FFFFFF !important;
+}
+
+.stage-furigana, .furigana {
+  color: #F87171 !important;
+}
+
+.stage-kanji, .kanji-lead {
+  color: #FFFFFF !important;
+}
+
+.stage-romaji, .romaji {
+  color: #CBD5E1 !important;
+}
+
+/* Quiz Option Buttons */
+.quiz-shell button.option,
+.stage-options button.option,
+button.option {
+  background: #181824 !important;
+  border: 1.5px solid rgba(255, 255, 255, 0.1) !important;
+  border-radius: 16px !important;
+  color: #FFFFFF !important;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25) !important;
+}
+
+button.option:hover {
+  background: #222232 !important;
+  border-color: #FFE02E !important;
+}
+
+button.option.is-selected {
+  background: #222232 !important;
+  border-color: #FFE02E !important;
+}
+
+button.option.is-correct,
+button.option.correct {
+  background: rgba(16, 185, 129, 0.22) !important;
+  border-color: #10B981 !important;
+  color: #FFFFFF !important;
+}
+
+button.option.is-wrong,
+button.option.wrong {
+  background: rgba(239, 68, 68, 0.22) !important;
+  border-color: #EF4444 !important;
+  color: #FFFFFF !important;
+}
+
+button.option .badge {
+  background: #252536 !important;
+  color: #FFFFFF !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+}
+
+button.option.is-correct .badge {
+  background: #10B981 !important;
+  color: #0A0A0E !important;
+  font-weight: 800 !important;
+}
+
+button.option.is-wrong .badge {
+  background: #EF4444 !important;
+  color: #FFFFFF !important;
+}
+
+/* Feedback Bottom Sheet / Card */
+.feedback,
+.feedback-card {
+  background: #14141C !important;
+  border-top: 1px solid rgba(255, 255, 255, 0.15) !important;
+  color: #FFFFFF !important;
+  box-shadow: 0 -8px 30px rgba(0, 0, 0, 0.6) !important;
+}
+
+.feedback h3,
+.feedback strong,
+.feedback p,
+.feedback span {
+  color: #FFFFFF !important;
+}
+
+.feedback.is-correct,
+.feedback-card.is-correct {
+  background: #0E241B !important;
+  border-color: #10B981 !important;
+}
+
+.feedback.is-correct h3,
+.feedback.is-correct p,
+.feedback.is-correct strong,
+.feedback.is-correct span {
+  color: #ECFDF5 !important;
+}
+
+.feedback.is-wrong,
+.feedback-card.is-wrong {
+  background: #281216 !important;
+  border-color: #EF4444 !important;
+}
+
+.feedback.is-wrong h3,
+.feedback.is-wrong p,
+.feedback.is-wrong strong,
+.feedback.is-wrong span {
+  color: #FEF2F2 !important;
+}
+
+/* ==========================================================================
+   13. VOCAB & FLASHCARD HIGH-CONTRAST
+   ========================================================================== */
+.flashcard-stage,
+.flashcard-topbar {
+  background: #14141B !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+  color: #FFFFFF !important;
+}
+
+.flashcard-topbar span,
+.flashcard-topbar button,
+.flashcard-counter {
+  color: #FFFFFF !important;
+  font-weight: 700 !important;
+}
+
+.flashcard-card,
+.vocab-card {
+  background: #181824 !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  border-radius: 20px !important;
+  color: #FFFFFF !important;
+}
+
+.vocab-card .part-of-speech,
+.flashcard-pos {
+  background: #242436 !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  color: #CBD5E1 !important;
+  border-radius: 9999px !important;
+}
+
+.vocab-card .part-of-speech span,
+.flashcard-pos span {
+  color: #CBD5E1 !important;
+}
+
+.flashcard-hint,
+.vocab-note,
+.flashcard-note {
+  color: #94A3B8 !important;
+}
+
+/* ==========================================================================
+   14. PROGRESS, PRASASTI & CALENDAR HIGH-CONTRAST
+   ========================================================================== */
+.fz2-week-pill {
+  background: #1E1E2A !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  color: #FFE02E !important;
+  font-weight: 700 !important;
+}
+
+.fz2-week-grid span,
+.calendar-grid span,
+.weekdays span,
+.day-label {
+  color: #CBD5E1 !important;
+  font-weight: 600 !important;
+}
+
+.day-box,
+.fz2-day-box {
+  background: #181824 !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  color: #FFFFFF !important;
+}
+
+.day-box.is-active,
+.fz2-day-box.is-active {
+  background: #FFE02E !important;
+  color: #0A0A0E !important;
+  font-weight: 800 !important;
+}
+
+.prasasti-badge,
+.prasasti-badge.is-locked {
+  background: #14141B !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  border-radius: 16px !important;
+  color: #FFFFFF !important;
+}
+
+.prasasti-badge b,
+.prasasti-badge.is-locked b {
+  color: #FFFFFF !important;
+  font-weight: 700 !important;
+}
+
+.prasasti-badge p,
+.prasasti-badge.is-locked p,
+.prasasti-badge small {
+  color: #94A3B8 !important;
+}
+
+.prasasti-badge.is-unlocked {
+  border-color: rgba(255, 224, 46, 0.4) !important;
+  box-shadow: 0 0 16px rgba(255, 224, 46, 0.15) !important;
+}
+
+.prasasti-badge.is-unlocked b {
+  color: #FFE02E !important;
+}
+
+/* ==========================================================================
+   15. KELASKU / CLASSROOM HUB HIGH-CONTRAST
+   ========================================================================== */
+.ch-tab {
+  background: #181822 !important;
+  border: 1px solid rgba(255, 255, 255, 0.09) !important;
+  color: #CBD5E1 !important;
+}
+
+.ch-tab.is-active {
+  background: #FFE02E !important;
+  color: #0A0A0E !important;
+  font-weight: 800 !important;
+}
+
+.ch-card p,
+.ch-card small,
+.ch-muted {
+  color: #A1A1AA !important;
+}
+
+.ch-form input {
+  background: #181822 !important;
+  border: 1px solid rgba(255, 255, 255, 0.15) !important;
+  color: #FFFFFF !important;
+}
+
+/* ==========================================================================
+   16. JLPT LISTENING MODAL & DETAIL SHEET HIGH-CONTRAST
+   ========================================================================== */
+.jlpt-opt-btn {
+  background: #1A1A26 !important;
+  border: 1px solid rgba(255, 255, 255, 0.09) !important;
+  color: #FFFFFF !important;
+}
+
+.jlpt-opt-btn:hover {
+  background: #242436 !important;
+  border-color: rgba(255, 224, 46, 0.4) !important;
+}
+
+.jlpt-opt-btn .jlpt-opt-ja {
+  color: #FFFFFF !important;
+  font-weight: 700 !important;
+}
+
+.jlpt-opt-btn .jlpt-opt-id {
+  color: #CBD5E1 !important;
+}
+
+.jlpt-opt-btn .jlpt-opt-badge {
+  background: #252536 !important;
+  color: #FFFFFF !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+}
+
+.jlpt-opt-btn.correct {
+  background: rgba(16, 185, 129, 0.22) !important;
+  border-color: #10B981 !important;
+}
+
+.jlpt-opt-btn.correct .jlpt-opt-badge {
+  background: #10B981 !important;
+  color: #0A0A0E !important;
+  font-weight: 800 !important;
+}
+
+.jlpt-opt-btn.correct .jlpt-opt-ja {
+  color: #FFFFFF !important;
+}
+
+.jlpt-opt-btn.correct .jlpt-opt-id {
+  color: #A7F3D0 !important;
+}
+
+.jlpt-opt-btn.wrong {
+  background: rgba(239, 68, 68, 0.22) !important;
+  border-color: #EF4444 !important;
+}
+
+.jlpt-opt-btn.wrong .jlpt-opt-badge {
+  background: #EF4444 !important;
+  color: #FFFFFF !important;
+}
+
+.jlpt-opt-btn.wrong .jlpt-opt-ja {
+  color: #FFFFFF !important;
+}
+
+.jlpt-opt-btn.wrong .jlpt-opt-id {
+  color: #FECACA !important;
+}
+
+.jlpt-tab-chip {
+  background: #1E1E2A !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  color: #CBD5E1 !important;
+}
+
+.jlpt-tab-chip.active {
+  background: #FFE02E !important;
+  color: #0A0A0E !important;
+  font-weight: 800 !important;
+}
+
+.jlpt-tab-chip.active span {
+  color: #0A0A0E !important;
+}
+
+.jlpt-turn-bubble {
+  background: #1A1A26 !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  color: #FFFFFF !important;
+}
+
+.jlpt-bubble-ja {
+  color: #FFFFFF !important;
+}
+
+.jlpt-bubble-ro {
+  color: #CBD5E1 !important;
+}
+
+.jlpt-bubble-id {
+  color: #94A3B8 !important;
+}
+
+.jlpt-speaker-chip {
+  background: #252536 !important;
+  color: #FFE02E !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+.jlpt-sheet-subtitle {
+  color: #CBD5E1 !important;
+}
+
+.jlpt-vocab-card-item,
+.jlpt-vocab-item {
+  background: #1A1A26 !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  color: #FFFFFF !important;
+}
+
+.jlpt-vocab-ja {
+  color: #FFFFFF !important;
+  font-weight: 700 !important;
+}
+
+.jlpt-vocab-ro {
+  color: #FFE02E !important;
+}
+
+.jlpt-vocab-meaning,
+.jlpt-vocab-id {
+  color: #CBD5E1 !important;
+}
+
+.jlpt-explain-article {
+  background: #1A1A26 !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  color: #FFFFFF !important;
+}
+
+.jlpt-explain-article h3,
+.jlpt-explain-article-title {
+  color: #FFE02E !important;
+}
+
+.jlpt-explain-article p,
+.jlpt-explain-article span {
+  color: #CBD5E1 !important;
+}
+
+.jlpt-download-box {
+  background: #181824 !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  color: #CBD5E1 !important;
+}
+
+.jlpt-download-box a {
+  color: #FFE02E !important;
+}
+
+.jlpt-key-card {
+  background: #0E241B !important;
+  border: 1px solid #10B981 !important;
+  color: #FFFFFF !important;
+}
+
+.jlpt-key-card span,
+.jlpt-key-card div {
+  color: #ECFDF5 !important;
+}
+
+.jlpt-lvl-btn {
+  background: #181822 !important;
+  color: #CBD5E1 !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+.jlpt-lvl-btn.active {
+  background: #FFE02E !important;
+  color: #0A0A0E !important;
+  font-weight: 800 !important;
+  border-color: #FFE02E !important;
+}
+
+.jlpt-primary-play-btn {
+  background: #FFE02E !important;
+  color: #0A0A0E !important;
+  font-weight: 800 !important;
+  border: none !important;
+  box-shadow: 0 4px 14px rgba(255, 224, 46, 0.35) !important;
+}
+
+.jlpt-jees-chip {
+  background: #252536 !important;
+  color: #CBD5E1 !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+.jlpt-sheet-trigger-btn {
+  background: #181824 !important;
+  color: #CBD5E1 !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+.jlpt-sheet-trigger-btn:hover {
+  background: #222232 !important;
+  color: #FFFFFF !important;
+}
+
+.jlpt-nav-pill {
+  background: #181824 !important;
+  color: #FFFFFF !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+body .fz2-day span,
+.fz2-day span {
+  color: #CBD5E1 !important;
+  font-weight: 700 !important;
+}
+
+body .fz2-day i,
+.fz2-day i {
+  background: #181824 !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+body .fz2-day i.is-on,
+.fz2-day i.is-on {
+  background: #FFE02E !important;
+  border-color: #FFE02E !important;
+  box-shadow: 0 0 12px rgba(255, 224, 46, 0.4) !important;
+}
+
+body .fz2-day i.is-today,
+.fz2-day i.is-today {
+  border: 2px dashed #FFE02E !important;
+}
+
+.continue-learning-card b {
+  color: #FFFFFF !important;
+  font-weight: 800 !important;
+}
+
+.continue-learning-card small {
+  color: #CBD5E1 !important;
+}
+
+.continue-learning-card .continue-card-btn {
+  background: #FFE02E !important;
+  color: #0A0A0E !important;
+  font-weight: 800 !important;
+}
+
+.learning-launcher h3,
+.learning-launcher h2 {
+  color: #FFFFFF !important;
+}
+
+/* ==========================================================================
+   17. ABSOLUTE TOTAL ERADICATION OF PAW CHAT BUBBLES & CARTOON MASCOTS
    ========================================================================== */
 .fz-coach-bubble,
 .fz-coach-peek,
@@ -7411,12 +8148,20 @@ button.primary:hover,
 button.fz-coach-bubble,
 .has-mascot.fz-coach-bubble,
 .coach-strip,
-fiezel-mascot {
+fiezel-mascot,
+.paw-hero-cockpit,
+.paw-speech-bubble,
+.paw-hero-avatar,
+.paw-bubble-title,
+.paw-mascot,
+.lesson-mascot,
+.fz-paw-slot {
   display: none !important;
   visibility: hidden !important;
   pointer-events: none !important;
   opacity: 0 !important;
 }
+
 
 
 
