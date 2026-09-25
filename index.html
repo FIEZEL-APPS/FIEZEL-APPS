@@ -425,6 +425,10 @@ html.fz-booting body{overflow:hidden}
         <span class="brand"><svg class="fiezel-wordmark" id="fzTopMark" viewBox="0 0 1000 260" role="img" aria-label="FIEZEL"><g class="fzw-sparks" aria-hidden="true"><circle class="fzw-spark" cx="51" cy="51" r="15" style="--sx:-70px;--sy:-85px;--sd:0s"/><circle class="fzw-spark" cx="51" cy="205" r="15" style="--sx:-78px;--sy:80px;--sd:.03s"/><circle class="fzw-spark" cx="102" cy="51" r="15" style="--sx:-52px;--sy:-96px;--sd:.06s"/><circle class="fzw-spark" cx="88" cy="130" r="15" style="--sx:-92px;--sy:0px;--sd:.09s"/><circle class="fzw-spark" cx="205" cy="60" r="15" style="--sx:-30px;--sy:-92px;--sd:.12s"/><circle class="fzw-spark" cx="253" cy="168" r="15" style="--sx:-22px;--sy:78px;--sd:.15s"/><circle class="fzw-spark" cx="321" cy="51" r="15" style="--sx:-40px;--sy:-90px;--sd:.18s"/><circle class="fzw-spark" cx="350" cy="130" r="15" style="--sx:-60px;--sy:-6px;--sd:.21s"/><circle class="fzw-spark" cx="365" cy="209" r="15" style="--sx:-44px;--sy:86px;--sd:.24s"/><circle class="fzw-spark" cx="553" cy="51" r="15" style="--sx:6px;--sy:-98px;--sd:.27s"/><circle class="fzw-spark" cx="553" cy="209" r="15" style="--sx:6px;--sy:92px;--sd:.3s"/><circle class="fzw-spark" cx="683" cy="130" r="15" style="--sx:30px;--sy:-4px;--sd:.33s"/><circle class="fzw-spark" cx="734" cy="51" r="15" style="--sx:44px;--sy:-88px;--sd:.36s"/><circle class="fzw-spark" cx="727" cy="209" r="15" style="--sx:40px;--sy:90px;--sd:.39s"/><circle class="fzw-spark" cx="861" cy="130" r="15" style="--sx:86px;--sy:-8px;--sd:.42s"/><circle class="fzw-spark" cx="905" cy="209" r="15" style="--sx:96px;--sy:84px;--sd:.45s"/></g><defs><linearGradient id="fztIv" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="var(--wordmark-ink-hi)"/><stop offset="100%" stop-color="var(--wordmark-ink-lo)"/></linearGradient><linearGradient id="fztGo" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="var(--wordmark-accent-hi)"/><stop offset="100%" stop-color="var(--wordmark-accent-lo)"/></linearGradient></defs><g class="fzw-mark"><g fill="url(#fztIv)"><rect x="30" y="30" width="42" height="200" rx="21"/><rect x="30" y="30" width="144" height="42" rx="21"/><rect x="30" y="109" width="116" height="42" rx="21"/><rect x="300" y="30" width="42" height="200" rx="21"/><rect x="300" y="30" width="144" height="42" rx="21"/><rect x="300" y="109" width="100" height="42" rx="21"/><rect x="300" y="188" width="130" height="42" rx="21"/><rect x="478" y="30" width="150" height="42" rx="21"/><rect x="478" y="188" width="150" height="42" rx="21"/><rect x="607" y="30" width="191.38" height="42" rx="21" transform="rotate(124.354 607 51)"/><rect x="662" y="30" width="42" height="200" rx="21"/><rect x="662" y="30" width="144" height="42" rx="21"/><rect x="662" y="109" width="100" height="42" rx="21"/><rect x="662" y="188" width="130" height="42" rx="21"/><rect x="840" y="30" width="42" height="200" rx="21"/><rect x="840" y="188" width="130" height="42" rx="21"/></g><g fill="url(#fztGo)"><rect x="192" y="30" width="26" height="200" rx="13"/><rect x="240" y="106" width="26" height="124" rx="13"/></g></g></svg></span>
       </button>
       <div class="topbar-actions">
+        <button type="button" id="fzCourseSwitchBtn" class="course-switch-btn" onclick="toggleTargetCourse()" aria-label="Ganti Bahasa Kursus" data-i18n-aria-label="topbar.course-switch-aria" title="Ganti Kursus (Jepang / Inggris)">
+          <span class="course-switch-flag" id="fzCourseFlag">🇯🇵</span>
+          <span class="course-switch-label" id="fzCourseLabel">JA</span>
+        </button>
         <!-- Lonceng notifikasi: tugas dari guru, teman baru, sorakan, undangan. Menggantikan
              pintu topbar "Tanya FIEZEL" (askView tetap ada; aksesnya lewat pembimbing PAW).
              TANPA data-view, dengan sengaja - lihat catatan renderInner() soal kelas active. -->
@@ -499,31 +503,31 @@ html.fz-booting body{overflow:hidden}
   </div>
 
   <!-- PANEL BANK SOAL LISTENING JLPT (N5 & N4) -->
-  <div class="listening-modal" id="listeningPanelModal" onclick="if(event.target===this)closeListeningPanel()" role="dialog" aria-modal="true" aria-label="Bank Soal Listening JLPT N5 dan N4">
+  <div class="listening-modal" id="listeningPanelModal" onclick="if(event.target===this)closeListeningPanel()" role="dialog" aria-modal="true" aria-label="Bank Soal Listening JLPT N5 dan N4" data-i18n-aria-label="jlpt.modal-aria">
     <div class="listening-modal-box">
       <div class="listening-head">
         <div>
-          <div class="f-tag" style="background:#FFF3C4;color:#7A5F1B;margin:0 0 4px;display:inline-block;padding:3px 8px;border-radius:6px;font-size:11px;font-weight:700;">🎧 RESMI JAPAN FOUNDATION &amp; JEES</div>
-          <h2 class="listening-head-title">Bank Soal Listening (Chōkai / 聴解)</h2>
-          <span class="listening-head-sub">Simulasi Ujian Asli JLPT N5 &amp; N4 Lengkap</span>
+          <div class="f-tag" style="background:var(--sun-soft);color:var(--gold);margin:0 0 4px;display:inline-block;padding:3px 8px;border-radius:6px;font-size:11px;font-weight:700;" data-i18n="jlpt.official-tag">🎧 RESMI JAPAN FOUNDATION & JEES</div>
+          <h2 class="listening-head-title" data-i18n="jlpt.title">Bank Soal Listening (Chōkai / 聴解)</h2>
+          <span class="listening-head-sub" data-i18n="jlpt.subtitle">Simulasi Ujian Asli JLPT N5 & N4 Lengkap</span>
         </div>
-        <button type="button" class="listening-close-btn" onclick="closeListeningPanel()" aria-label="Tutup Panel Listening">✕</button>
+        <button type="button" class="listening-close-btn" onclick="closeListeningPanel()" aria-label="Tutup Panel Listening" data-i18n-aria-label="jlpt.close-aria">✕</button>
       </div>
 
       <div class="listening-body">
         <!-- Level Switcher -->
         <div class="jlpt-level-tabs">
-          <button type="button" class="jlpt-lvl-btn active" id="btnLvlN5" onclick="setListeningLevel('N5')">⭐ JLPT N5 (Dasar)</button>
-          <button type="button" class="jlpt-lvl-btn" id="btnLvlN4" onclick="setListeningLevel('N4')">🌟 JLPT N4 (Menengah)</button>
+          <button type="button" class="jlpt-lvl-btn active" id="btnLvlN5" onclick="setListeningLevel('N5')" data-i18n="jlpt.lvl-n5">⭐ JLPT N5 (Dasar)</button>
+          <button type="button" class="jlpt-lvl-btn" id="btnLvlN4" onclick="setListeningLevel('N4')" data-i18n="jlpt.lvl-n4">🌟 JLPT N4 (Menengah)</button>
         </div>
 
         <!-- Mondai Category Scroll -->
         <div class="jlpt-mondai-scroll">
-          <button type="button" class="jlpt-mondai-chip active" data-mondai="all" onclick="setListeningMondai('all')">Semua Mondai</button>
-          <button type="button" class="jlpt-mondai-chip" data-mondai="mondai_1" onclick="setListeningMondai('mondai_1')">Mondai 1: Tugas (課題)</button>
-          <button type="button" class="jlpt-mondai-chip" data-mondai="mondai_2" onclick="setListeningMondai('mondai_2')">Mondai 2: Poin (ポイント)</button>
-          <button type="button" class="jlpt-mondai-chip" data-mondai="mondai_3" onclick="setListeningMondai('mondai_3')">Mondai 3: Ungkapan (発話)</button>
-          <button type="button" class="jlpt-mondai-chip" data-mondai="mondai_4" onclick="setListeningMondai('mondai_4')">Mondai 4: Respon (即時)</button>
+          <button type="button" class="jlpt-mondai-chip active" data-mondai="all" onclick="setListeningMondai('all')" data-i18n="jlpt.mondai-all">Semua Mondai</button>
+          <button type="button" class="jlpt-mondai-chip" data-mondai="mondai_1" onclick="setListeningMondai('mondai_1')" data-i18n="jlpt.mondai-1">Mondai 1: Tugas (課題)</button>
+          <button type="button" class="jlpt-mondai-chip" data-mondai="mondai_2" onclick="setListeningMondai('mondai_2')" data-i18n="jlpt.mondai-2">Mondai 2: Poin (ポイント)</button>
+          <button type="button" class="jlpt-mondai-chip" data-mondai="mondai_3" onclick="setListeningMondai('mondai_3')" data-i18n="jlpt.mondai-3">Mondai 3: Ungkapan (発話)</button>
+          <button type="button" class="jlpt-mondai-chip" data-mondai="mondai_4" onclick="setListeningMondai('mondai_4')" data-i18n="jlpt.mondai-4">Mondai 4: Respon (即時)</button>
         </div>
 
         <!-- Dynamic Question Card Slot -->
@@ -531,12 +535,49 @@ html.fz-booting body{overflow:hidden}
 
         <!-- Official Download Section Footer -->
         <div style="background:#F6EFE3;border-radius:12px;padding:12px 14px;border:1px solid var(--line, #E8DFD3);">
-          <b style="font-size:12px;color:var(--text, #241A11);display:block;margin-bottom:4px;">📥 Unduh Bahan Asli JLPT:</b>
+          <b style="font-size:12px;color:var(--text, var(--ink));display:block;margin-bottom:4px;" data-i18n="jlpt.download-title">📥 Unduh Bahan Asli JLPT:</b>
           <div style="display:flex;flex-wrap:wrap;gap:8px;font-size:11.5px;">
-            <a href="https://www.jlpt.jp/samples/sample2018/pdf/N5L.pdf" target="_blank" rel="noopener noreferrer" style="color:#B45309;text-decoration:none;font-weight:700;">📄 PDF Soal N5</a> ·
-            <a href="https://www.jlpt.jp/samples/sample2018/pdf/N5script.pdf" target="_blank" rel="noopener noreferrer" style="color:#B45309;text-decoration:none;font-weight:700;">📝 Naskah N5</a> ·
-            <a href="https://www.jlpt.jp/samples/sample2018/pdf/N4L.pdf" target="_blank" rel="noopener noreferrer" style="color:#B45309;text-decoration:none;font-weight:700;">📄 PDF Soal N4</a> ·
-            <a href="https://www.jlpt.jp/samples/sample2018/pdf/N4script.pdf" target="_blank" rel="noopener noreferrer" style="color:#B45309;text-decoration:none;font-weight:700;">📝 Naskah N4</a>
+            <a href="https://www.jlpt.jp/samples/sample2018/pdf/N5L.pdf" target="_blank" rel="noopener noreferrer" style="color:#B45309;text-decoration:none;font-weight:700;" data-i18n="jlpt.download-n5-pdf">📄 PDF Soal N5</a> ·
+            <a href="https://www.jlpt.jp/samples/sample2018/pdf/N5script.pdf" target="_blank" rel="noopener noreferrer" style="color:#B45309;text-decoration:none;font-weight:700;" data-i18n="jlpt.download-n5-script">📝 Naskah N5</a> ·
+            <a href="https://www.jlpt.jp/samples/sample2018/pdf/N4L.pdf" target="_blank" rel="noopener noreferrer" style="color:#B45309;text-decoration:none;font-weight:700;" data-i18n="jlpt.download-n4-pdf">📄 PDF Soal N4</a> ·
+            <a href="https://www.jlpt.jp/samples/sample2018/pdf/N4script.pdf" target="_blank" rel="noopener noreferrer" style="color:#B45309;text-decoration:none;font-weight:700;" data-i18n="jlpt.download-n4-script">📝 Naskah N4</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- JLPT Bottom Sheet Drawer (#jlptDetailSheet) inside modal box -->
+      <div id="jlptDetailSheet" class="jlpt-detail-sheet" role="dialog" aria-modal="true" aria-hidden="true" aria-label="Naskah dan Pembahasan Soal JLPT" data-i18n-aria-label="jlpt.sheet-aria">
+        <div id="jlptSheetBackdrop" class="jlpt-sheet-backdrop" onclick="closeJlptDetailSheet()" aria-hidden="true"></div>
+        <div class="jlpt-sheet-container" id="jlptSheetContainer">
+          <div class="jlpt-sheet-handle-zone sheet-drag-handle-wrapper" id="jlptSheetHandleZone" onclick="closeJlptDetailSheet()" title="Geser ke bawah untuk menutup" aria-label="Geser ke bawah untuk menutup" data-i18n-aria-label="jlpt.sheet-drag-handle">
+            <span class="sheet-drag-handle jlpt-sheet-handle-bar"></span>
+          </div>
+          <div class="jlpt-sheet-header">
+            <div>
+              <h3 class="jlpt-sheet-title" data-i18n="jlpt.sheet-title">Naskah &amp; Pembahasan</h3>
+              <span class="jlpt-sheet-subtitle" id="jlptSheetSubtitle">JLPT Listening</span>
+            </div>
+            <button type="button" class="jlpt-sheet-close" onclick="closeJlptDetailSheet()" aria-label="Tutup Sheet" data-i18n-aria-label="jlpt.sheet-close-aria">✕</button>
+          </div>
+          <div class="jlpt-sheet-tabs" role="tablist">
+            <button type="button" role="tab" class="jlpt-tab-chip active" id="tabChipScript" onclick="switchJlptSheetTab('script')"><span data-i18n="jlpt.tab-script">📝 Naskah</span></button>
+            <button type="button" role="tab" class="jlpt-tab-chip" id="tabChipExplain" onclick="switchJlptSheetTab('explain')"><span data-i18n="jlpt.tab-explain">Pembahasan</span></button>
+            <button type="button" role="tab" class="jlpt-tab-chip" id="tabChipVocab" onclick="switchJlptSheetTab('vocab')"><span data-i18n="jlpt.tab-vocab">Kosakata</span> (<span id="jlptVocabCount">0</span>)</button>
+          </div>
+          <div class="jlpt-sheet-content">
+            <div class="jlpt-sheet-pane active" id="paneScript" role="tabpanel">
+              <div class="jlpt-transcript-header">
+                <span class="jlpt-transcript-tag">Dialog Percakapan Asli</span>
+                <button type="button" class="jlpt-transcript-play-btn" onclick="togglePlayJlptPrimaryAudio()">▶ Putar Dialog</button>
+              </div>
+              <div class="jlpt-dialogue-bubbles" id="jlptDialogueBubbles"></div>
+            </div>
+            <div class="jlpt-sheet-pane" id="paneExplain" role="tabpanel" style="display:none;">
+              <div id="jlptExplainContent"></div>
+            </div>
+            <div class="jlpt-sheet-pane" id="paneVocab" role="tabpanel" style="display:none;">
+              <div id="jlptVocabContent"></div>
+            </div>
           </div>
         </div>
       </div>
