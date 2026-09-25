@@ -26,11 +26,9 @@
   var MAX = 60;
   var RETENTION_MS = 30 * 86400000;
   var PATH = '/api/learner/class-assignments';
-  /* Rem klien: jarak minimal antar tanya ke server. 10 detik, turun dari 20 — rem lama lebih
-     lambat daripada detak pemanggilnya sendiri (app.js kini menanya tiap 15 detik), jadi ia
-     akan membuang satu dari setiap dua tanya dan mengembalikan jeda menuju setengah menit.
-     Lantai sesungguhnya tetap milik server (5 detik). */
-  var MIN_GAP_MS = 10000;
+  /* Rem klien: jarak minimal antar tanya ke server. Diturunkan ke 5 detik (5000ms),
+     sejajar dengan lantai server (ASSIGN_LIMITS.LEARNER_POLL_MIN_INTERVAL_MS = 5000). */
+  var MIN_GAP_MS = 5000;
   var lastPollAt = 0, busy = false;
 
   function storage() { try { return root.localStorage || null; } catch (_) { return null; } }
@@ -108,8 +106,11 @@
   function learnerName() {
     var n = '';
     try { if (typeof root.learnerName === 'function') n = String(root.learnerName() || ''); } catch (_) {}
-    if (!n || /^(sobat|murid|teman)$/i.test(n)) { try { n = String(JSON.parse(storage().getItem('fiezel-onboarding-v1') || '{}').name || ''); } catch (_) {} }
-    return n.trim().split(/\s+/)[0] || '';
+    if (!n || /^(sobat|murid|teman)(\s+.*)?$/i.test(n)) {
+      try { var onb = String(JSON.parse(storage().getItem('fiezel-onboarding-v1') || '{}').name || '').trim(); if (onb) n = onb; } catch (_) {}
+    }
+    var first = (n || '').trim().split(/\s+/)[0] || '';
+    return first || 'Murid';
   }
   function account() { var A = root.FiezelAccount; return A && typeof A.api === 'function' ? A : null; }
   function isTeacher() { try { return !!(root.FiezelAccount && root.FiezelAccount.isTeacher && root.FiezelAccount.isTeacher()); } catch (_) { return false; } }
@@ -153,4 +154,22 @@
     items: items, unread: unread, get: get, add: add, markRead: markRead, markAllRead: markAllRead, remove: remove, clear: clear,
     poll: poll, text: text, classCode: classCode, learnerName: learnerName
   });
+
+  try {
+    if (typeof BroadcastChannel !== 'undefined') {
+      var bc = new BroadcastChannel('fiezel-assignment-sync');
+      bc.onmessage = function (ev) {
+        if (ev && ev.data && (ev.data.type === 'assignment-created' || ev.data.type === 'assignment-retracted' || ev.data.type === 'poll-now')) {
+          poll(true);
+        }
+      };
+    }
+    if (root.addEventListener) {
+      root.addEventListener('storage', function (ev) {
+        if (ev && (ev.key === 'fiezel-onboarding-v1' || ev.key === 'fiezel-assignment-sync')) {
+          poll(true);
+        }
+      });
+    }
+  } catch (_) {}
 })(typeof self !== 'undefined' ? self : this);

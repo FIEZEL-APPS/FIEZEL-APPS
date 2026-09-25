@@ -450,8 +450,8 @@ input[type="checkbox"],input[type="radio"]{min-width:24px;min-height:24px}
    Duduk di atas tab bar, bukan menutupi layar: murid boleh menunda dan terus belajar.
    Bukan .toast karena kartu ini menunggu keputusan - ia tidak boleh pergi sendiri. */
 .update-banner{
-  position:fixed;left:0;right:0;bottom:calc(84px + env(safe-area-inset-bottom,0px));
-  z-index:120;display:flex;justify-content:center;padding:0 14px;pointer-events:none;
+  position:fixed;left:0;right:0;bottom:calc(76px + env(safe-area-inset-bottom,0px));
+  z-index:250;display:flex;justify-content:center;padding:0 14px;pointer-events:none;
   opacity:0;transform:translateY(14px);
   transition:opacity var(--dur-m) var(--ease),transform var(--dur-m) var(--ease-spring)
 }
@@ -1987,6 +1987,12 @@ body.voice-bundle-locked .bottomnav,body.voice-bundle-locked .app-header{pointer
   font-family:var(--fz-body);font-size:12px;letter-spacing:.30em;
   text-transform:uppercase;color:#FFD94F;margin:14px 0 0;white-space:nowrap;
 }
+.fiezel-splash-brand .fiezel-splash-kelasku{margin-top:13px;display:flex;align-items:center;justify-content:center}
+.fiezel-splash-brand .kelasku-brand{display:inline-flex;align-items:baseline;justify-content:center;gap:6px;white-space:nowrap}
+.fiezel-splash-brand .kelasku-wordmark{font-family:var(--fz-heading,'Plus Jakarta Sans',sans-serif) !important;font-weight:800;font-size:16px;letter-spacing:.02em;color:#34D399 !important;line-height:1;display:inline-block;animation:fz-kelasku-reveal .75s cubic-bezier(.16,1,.3,1) 1.4s both}
+.fiezel-splash-brand .kelasku-tag{font-family:var(--fz-body,'Plus Jakarta Sans',sans-serif);font-size:10.5px;font-weight:600;letter-spacing:.04em;color:rgba(253,250,243,.65);line-height:1;display:inline-block;animation:fz-tag-reveal .65s cubic-bezier(.16,1,.3,1) 1.52s both}
+@keyframes fz-kelasku-reveal{from{opacity:0;transform:translateY(8px);filter:blur(4px)}to{opacity:1;transform:none;filter:none}}
+@keyframes fz-tag-reveal{from{opacity:0;transform:translateY(4px)}to{opacity:.65;transform:none}}
 /* Kurangi-gerak: lebih sedikit GERAKAN, bukan lebih sedikit pengalaman.
    Partikel dan hentakan dibuang; yang tersisa muncul dengan MEMUDAR pada
    KETUKAN YANG SAMA (--fz-b* dari fiezel-choreography.js) dan durasi yang
@@ -2003,6 +2009,7 @@ body.voice-bundle-locked .bottomnav,body.voice-bundle-locked .app-header{pointer
   transform:none!important;animation:fz-fade-in .3s ease var(--fz-b7,1150ms) both}
 .fiezel-splash-still .fiezel-splash-tag{
   transform:none!important;animation:fz-fade-in .24s ease var(--fz-b12,1900ms) both;opacity:0}
+.fiezel-splash-still .fiezel-splash-kelasku{transform:none!important;animation:fz-fade-in .24s ease var(--fz-b12,1900ms) both;opacity:0}
 
 /* ---------- Feature Carousel (Step 1) ---------- */
 .fiezel-carousel-track{display:flex;flex-direction:column;gap:8px;width:100%;text-align:left}
@@ -5772,8 +5779,12 @@ body.fz-auth-open{overflow:hidden}
 .fz-auth-hero.is-welcome{min-height:58vh}
 .fz-auth-hero.is-masuk{min-height:30vh}
 .fz-auth-hero.is-daftar{min-height:22vh}
-.fz-auth-topo{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
-.fz-auth-topo path{fill:none;stroke:rgba(255,199,0,.2);stroke-width:1.1}
+.fz-auth-topo{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:0}
+.fz-auth-topo path,
+.fz-auth-topo line,
+.fz-auth-topo circle{fill:none !important;stroke:rgba(255,199,0,.24) !important;stroke-width:1.1 !important;stroke-linecap:round !important;stroke-linejoin:round !important}
+.fz-auth-topo .accent{stroke:rgba(255,215,0,.55) !important;stroke-width:1.4 !important}
+.fz-auth-topo .whisper{stroke:rgba(255,199,0,.14) !important;stroke-width:0.95 !important}
 .fz-auth-hero::after{content:"";position:absolute;left:50%;top:40%;width:min(80vw,340px);height:220px;transform:translate(-50%,-50%);border-radius:50%;pointer-events:none;background:radial-gradient(closest-side,rgba(255,199,0,.22),rgba(255,199,0,0))}
 .fz-auth-wave{position:absolute;left:0;right:0;bottom:-1px;width:100%;height:58px;z-index:2}
 .fz-auth-wave path{fill:var(--bg,#FBF7F3)}
@@ -5906,103 +5917,94 @@ html.has-home-today #globalSky {
   padding-bottom: 140px !important;
 }
 
+/* /* ==========================================================================
+   FIEZEL STUDENT DASHBOARD (Warm Obsidian & Educational Learning Cockpit)
+   ========================================================================== */
+
 /* Topbar inside Home Dashboard */
-.fz-sports-topbar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 4px 2px 8px 2px;
-}
-
-html body:has(.home-today) .fz-sports-brand-crest,
-body.fz-lux:has(.home-today) button.fz-sports-brand-crest,
-body.fz-lang-ja:has(.home-today) button.fz-sports-brand-crest,
-.fz-sports-brand-crest {
-  width: 46px !important;
-  height: 46px !important;
-  border-radius: 50% !important;
-  background: transparent !important;
+.fz-home-topbar {
   display: flex !important;
   align-items: center !important;
-  justify-content: center !important;
-  box-shadow: none !important;
-  filter: drop-shadow(0 4px 12px rgba(255, 184, 0, 0.4)) !important;
+  justify-content: space-between !important;
+  padding: 8px 4px 10px 4px !important;
+}
+
+.fz-home-brand-wrap {
+  display: inline-flex !important;
+  align-items: center !important;
   cursor: pointer !important;
-  border: none !important;
-  padding: 0 !important;
   outline: none !important;
-  transition: transform 0.22s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.2s ease !important;
+  padding: 4px 0 !important;
 }
-.fz-sports-brand-crest:active {
-  transform: scale(0.92) !important;
+.fz-home-brand-wrap:active {
+  transform: scale(0.96) !important;
+}
+.fz-home-brand-wrap svg.fiezel-wordmark {
+  height: 28px !important;
+  width: auto !important;
+  max-width: 126px !important;
+  display: block !important;
+  filter: drop-shadow(0 2px 10px rgba(0, 0, 0, 0.6)) !important;
+}
+.fz-home-wordmark-text {
+  font-size: 22px !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.06em !important;
+  background: linear-gradient(135deg, #FFFBF3 0%, #FFD94F 100%) !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
 }
 
-html body:has(.home-today) .fz-sports-brand-inner,
-.fz-sports-brand-inner {
-  width: 100% !important;
-  height: 100% !important;
-  border-radius: 50% !important;
-  background: transparent !important;
+.fz-home-actions {
   display: flex !important;
   align-items: center !important;
-  justify-content: center !important;
-  color: var(--fz-sports-yellow) !important;
-}
-.fz-sports-brand-inner svg {
-  width: 100%;
-  height: 100%;
-  display: block;
+  gap: 10px !important;
 }
 
-.fz-sports-actions {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-html body:has(.home-today) .fz-sports-action-btn,
-body.fz-lux:has(.home-today) button.fz-sports-action-btn,
-body.fz-lang-ja:has(.home-today) button.fz-sports-action-btn,
-.fz-sports-action-btn {
+html body:has(.home-today) .fz-home-action-btn,
+body.fz-lux:has(.home-today) button.fz-home-action-btn,
+body.fz-lang-ja:has(.home-today) button.fz-home-action-btn,
+.fz-home-action-btn {
   width: 44px !important;
   height: 44px !important;
   border-radius: 50% !important;
   background: #18181D !important;
-  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  border: 1px solid rgba(255, 255, 255, 0.09) !important;
   box-shadow: none !important;
   display: flex !important;
   align-items: center !important;
   justify-content: center !important;
-  color: #8E8E93 !important;
+  color: #8E8E98 !important;
   cursor: pointer !important;
   padding: 0 !important;
   transition: all 0.2s ease !important;
   position: relative !important;
   outline: none !important;
 }
-.fz-sports-action-btn:hover {
+.fz-home-action-btn:hover {
   background: #242430 !important;
   color: #FFFFFF !important;
-  border-color: rgba(255, 255, 255, 0.16) !important;
+  border-color: rgba(255, 255, 255, 0.18) !important;
 }
-.fz-sports-action-btn:active {
+.fz-home-action-btn:active {
   transform: scale(0.94) !important;
 }
-.fz-sports-action-btn svg,
-.fz-sports-action-btn i {
+.fz-home-action-btn svg,
+.fz-home-action-btn i {
   width: 18px !important;
   height: 18px !important;
 }
 
-html body:has(.home-today) .fz-sports-course-btn,
-body.fz-lux:has(.home-today) button.fz-sports-course-btn,
-body.fz-lang-ja:has(.home-today) button.fz-sports-course-btn,
-.fz-sports-course-btn {
+html body:has(.home-today) .fz-home-course-btn,
+body.fz-lux:has(.home-today) button.fz-home-course-btn,
+body.fz-lang-ja:has(.home-today) button.fz-home-course-btn,
+.fz-home-course-btn {
   width: 44px !important;
   height: 44px !important;
   border-radius: 50% !important;
   background: #18181D !important;
-  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  border: 1px solid rgba(255, 255, 255, 0.09) !important;
   box-shadow: none !important;
   display: flex !important;
   align-items: center !important;
@@ -6013,66 +6015,63 @@ body.fz-lang-ja:has(.home-today) button.fz-sports-course-btn,
   transition: all 0.2s ease !important;
   outline: none !important;
 }
-.fz-sports-course-btn:hover {
+.fz-home-course-btn:hover {
   background: #242430 !important;
-  border-color: var(--fz-sports-yellow) !important;
+  border-color: var(--fz-sports-yellow, #FFD94F) !important;
 }
-.fz-sports-course-btn .course-switch-label {
-  display: none !important;
-}
-.fz-sports-course-btn .course-switch-flag {
+.fz-home-course-btn .course-switch-flag {
   font-size: 18px !important;
   line-height: 1 !important;
 }
 
-/* Title Section */
-.fz-sports-header {
-  padding: 4px 2px 2px 2px;
+/* Warm Greeting & Encouragement Header */
+.fz-welcome-header {
+  padding: 6px 4px 4px 4px !important;
+}
+.fz-welcome-greeting {
+  font-size: 26px !important;
+  font-weight: 800 !important;
+  color: #FFFFFF !important;
+  letter-spacing: -0.02em !important;
+  line-height: 1.25 !important;
+  margin-bottom: 6px !important;
+}
+.fz-welcome-name {
+  background: linear-gradient(135deg, #FFE082 0%, #FFC700 100%) !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+}
+.fz-welcome-quote {
+  font-size: 13.5px !important;
+  font-weight: 500 !important;
+  color: #A3A3B0 !important;
+  line-height: 1.5 !important;
+  margin: 0 !important;
 }
 
-.fz-sports-subhead {
-  display: block;
-  font-size: 22px;
-  font-weight: 500;
-  letter-spacing: -0.01em;
-  color: #C2C5CC;
-  margin-bottom: 2px;
+/* Learning Categories Pills Bar */
+.fz-learning-pills-bar {
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  overflow-x: auto !important;
+  padding: 4px 0 10px 0 !important;
+  scrollbar-width: none !important;
+  -webkit-overflow-scrolling: touch !important;
+}
+.fz-learning-pills-bar::-webkit-scrollbar {
+  display: none !important;
 }
 
-.fz-sports-title {
-  font-size: 58px;
-  font-weight: 800;
-  line-height: 0.94;
-  letter-spacing: -0.03em;
-  text-transform: uppercase;
-  color: #FFFFFF;
-  margin: 0 0 14px 0;
-  font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-}
-
-/* Horizontal Filter Pills */
-.fz-sports-pills-bar {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  overflow-x: auto;
-  padding: 2px 0 10px 0;
-  scrollbar-width: none;
-  -webkit-overflow-scrolling: touch;
-}
-.fz-sports-pills-bar::-webkit-scrollbar {
-  display: none;
-}
-
-html body:has(.home-today) .fz-sports-pill,
-body.fz-lux:has(.home-today) button.fz-sports-pill,
-body.fz-lang-ja:has(.home-today) button.fz-sports-pill,
-.fz-sports-pill {
-  border: 1px solid rgba(255, 255, 255, 0.07) !important;
+html body:has(.home-today) .fz-learning-pill,
+body.fz-lux:has(.home-today) button.fz-learning-pill,
+body.fz-lang-ja:has(.home-today) button.fz-learning-pill,
+.fz-learning-pill {
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
   outline: none !important;
   border-radius: 9999px !important;
-  padding: 11px 22px !important;
-  font-size: 14.5px !important;
+  padding: 9px 18px !important;
+  font-size: 13.5px !important;
   font-weight: 600 !important;
   white-space: nowrap !important;
   cursor: pointer !important;
@@ -6082,316 +6081,221 @@ body.fz-lang-ja:has(.home-today) button.fz-sports-pill,
   color: #7A7A84 !important;
   flex-shrink: 0 !important;
 }
-.fz-sports-pill:hover {
+.fz-learning-pill:hover {
   background: #22222C !important;
   color: #FFFFFF !important;
 }
-html body:has(.home-today) .fz-sports-pill.is-active,
-body.fz-lux:has(.home-today) button.fz-sports-pill.is-active,
-body.fz-lang-ja:has(.home-today) button.fz-sports-pill.is-active,
-.fz-sports-pill.is-active {
-  background: var(--fz-sports-yellow) !important;
-  color: var(--fz-sports-yellow-ink) !important;
+html body:has(.home-today) .fz-learning-pill.is-active,
+body.fz-lux:has(.home-today) button.fz-learning-pill.is-active,
+body.fz-lang-ja:has(.home-today) button.fz-learning-pill.is-active,
+.fz-learning-pill.is-active {
+  background: rgba(255, 215, 0, 0.15) !important;
+  color: #FFE082 !important;
   font-weight: 700 !important;
-  border-color: transparent !important;
-  box-shadow: 0 4px 18px var(--fz-sports-yellow-glow) !important;
+  border-color: rgba(255, 215, 0, 0.45) !important;
+  box-shadow: 0 2px 14px rgba(255, 215, 0, 0.15) !important;
 }
 
-/* Signature Sculpted Match Cards */
-.fz-match-card {
-  border-radius: 36px !important;
+/* Educational Cards */
+.fz-edu-card {
+  border-radius: 26px !important;
   overflow: hidden !important;
-  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.65) !important;
-  border: 1.5px solid rgba(255, 255, 255, 0.15) !important;
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.6) !important;
+  border: 1.5px solid rgba(255, 255, 255, 0.1) !important;
   transition: transform 0.22s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.22s ease !important;
-  position: relative;
-  background: #FFFFFF !important;
+  position: relative !important;
+  background: #14141A !important;
   padding: 0 !important;
   display: flex !important;
   flex-direction: column !important;
   gap: 0 !important;
-  scroll-margin-bottom: 140px !important;
 }
-.fz-match-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 20px 48px rgba(0, 0, 0, 0.75) !important;
+.fz-edu-card:hover {
+  transform: translateY(-2px) !important;
+  box-shadow: 0 20px 44px rgba(0, 0, 0, 0.7) !important;
 }
-.fz-match-card:active {
-  transform: scale(0.99);
-}
-
-/* Top & Bottom Ticket-Stub Notches */
-.fz-match-card::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 110px;
-  height: 12px;
-  background: #0A0A0E;
-  border-radius: 0 0 20px 20px;
-  z-index: 5;
-  pointer-events: none;
-}
-.fz-match-card::after {
-  content: '';
-  position: absolute;
-  bottom: 0;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 110px;
-  height: 12px;
-  background: #0A0A0E;
-  border-radius: 20px 20px 0 0;
-  z-index: 5;
-  pointer-events: none;
+.fz-edu-card + .fz-edu-card {
+  margin-top: 14px !important;
 }
 
-/* Card Top Section */
-.fz-card-top {
-  padding: 24px 22px 26px 22px;
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  cursor: pointer;
+/* Card Themes */
+.fz-card-primary {
+  background: linear-gradient(180deg, #1D1B22 0%, #121116 100%) !important;
+  border-color: rgba(255, 199, 0, 0.3) !important;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.55), 0 0 28px rgba(255, 199, 0, 0.08) !important;
+}
+.fz-card-neutral {
+  background: linear-gradient(180deg, #181920 0%, #111216 100%) !important;
+  border-color: rgba(52, 211, 153, 0.22) !important;
+}
+.fz-card-obsidian {
+  background: linear-gradient(180deg, #191B24 0%, #111218 100%) !important;
+  border-color: rgba(96, 165, 250, 0.22) !important;
 }
 
-.fz-card-yellow .fz-card-top {
-  background: linear-gradient(180deg, var(--fz-sports-yellow-hi) 0%, var(--fz-sports-yellow-lo) 100%);
-  color: var(--fz-sports-yellow-ink);
+.fz-edu-card-content {
+  padding: 22px 20px 20px 20px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 12px !important;
+  cursor: pointer !important;
 }
 
-.fz-card-silver .fz-card-top {
-  background: linear-gradient(180deg, var(--fz-sports-silver-hi) 0%, var(--fz-sports-silver-lo) 100%);
-  color: #0A0A0E;
-}
-
-.fz-card-obsidian .fz-card-top {
-  background: linear-gradient(180deg, var(--fz-sports-dark-hi) 0%, var(--fz-sports-dark-lo) 100%);
-  color: #FFFFFF;
-}
-
-/* Entity Column (Left & Right) */
-.fz-entity-col {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-  width: 110px;
-}
-.fz-entity-col.is-right {
-  align-items: center;
-  text-align: center;
-}
-
-.fz-entity-badge {
-  width: 52px;
-  height: 52px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 26px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-  margin-bottom: 8px;
-}
-
-.fz-entity-badge.fz-crest-3d {
-  width: 58px !important;
-  height: 58px !important;
-  background: transparent !important;
-  border: none !important;
-  box-shadow: none !important;
-  filter: none !important;
-  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
-}
-.fz-entity-badge.fz-crest-3d svg {
-  width: 100% !important;
-  height: 100% !important;
-  display: block !important;
-}
-.fz-match-card:hover .fz-entity-badge.fz-crest-3d,
-.fz-card-top:active .fz-entity-badge.fz-crest-3d {
-  transform: translateY(-2px) scale(1.06) !important;
-  filter: none !important;
-}
-
-.fz-crest-chokai {
-  background: #0284C7;
-  border: 2.5px solid #38BDF8;
-}
-.fz-crest-jlpt {
-  background: #C8102E;
-  border: 2.5px solid #FFD700;
-}
-.fz-crest-kotoba {
-  background: #059669;
-  border: 2.5px solid #34D399;
-}
-.fz-crest-bunpo {
-  background: #7C3AED;
-  border: 2.5px solid #A78BFA;
-}
-.fz-crest-dokkai {
-  background: #2563EB;
-  border: 2.5px solid #60A5FA;
-}
-.fz-crest-exam {
-  background: #D97706;
-  border: 2.5px solid #FBBF24;
-}
-.fz-crest-man-utd {
-  background: #C8102E;
-  border: 2.5px solid #FFD700;
-}
-.fz-crest-chelsea {
-  background: #034694;
-  border: 2.5px solid #FFFFFF;
-}
-
-.fz-entity-name {
-  font-size: 13.5px;
-  font-weight: 800;
-  letter-spacing: 0.03em;
-  text-transform: uppercase;
-  line-height: 1.1;
-  color: inherit;
-}
-
-.fz-entity-sub {
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  line-height: 1.1;
-  color: inherit;
-  opacity: 0.75;
-  margin-top: 2px;
-}
-
-/* Center Floating VS Badge (matching media_1790351730448.png) */
-.fz-match-center-badge {
-  width: 38px !important;
-  height: 38px !important;
-  border-radius: 50% !important;
-  background: #000000 !important;
-  color: #FFFFFF !important;
+.fz-edu-badge-row {
   display: flex !important;
   align-items: center !important;
-  justify-content: center !important;
-  font-size: 13.5px !important;
-  font-weight: 900 !important;
-  letter-spacing: 0.04em !important;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35) !important;
-  flex-shrink: 0 !important;
-  z-index: 2 !important;
+  justify-content: space-between !important;
+  gap: 8px !important;
 }
 
-/* Card Bottom Section (Crisp Card with 3 Columns) */
-.fz-card-bottom {
-  background: #FFFFFF;
-  color: #0A0A0E;
-  padding: 18px 18px 18px 18px;
-  display: grid;
-  grid-template-columns: 1fr auto 1fr;
-  align-items: center;
-  gap: 10px;
-  cursor: pointer;
-  position: relative;
-}
-
-.fz-chip-dashed,
-.fz-chip-action {
-  border: 1.5px dashed #C8CCD6 !important;
+.fz-edu-tag {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+  padding: 5px 12px !important;
   border-radius: 9999px !important;
-  padding: 12px 10px !important;
-  text-align: center !important;
+  font-size: 11px !important;
   font-weight: 800 !important;
-  font-size: 12.5px !important;
-  letter-spacing: 0.04em !important;
+  letter-spacing: 0.05em !important;
   text-transform: uppercase !important;
-  color: #0A0A0E !important;
-  background: #F8FAFC !important;
+}
+.fz-edu-tag.is-primary {
+  background: rgba(255, 199, 0, 0.14) !important;
+  color: #FFD43B !important;
+  border: 1px solid rgba(255, 199, 0, 0.35) !important;
+}
+.fz-edu-tag.is-emerald {
+  background: rgba(16, 185, 129, 0.14) !important;
+  color: #34D399 !important;
+  border: 1px solid rgba(16, 185, 129, 0.35) !important;
+}
+.fz-edu-tag.is-gold {
+  background: rgba(59, 130, 246, 0.14) !important;
+  color: #60A5FA !important;
+  border: 1px solid rgba(59, 130, 246, 0.35) !important;
+}
+
+.fz-edu-level-badge,
+.fz-edu-sub-badge {
+  font-size: 11px !important;
+  font-weight: 700 !important;
+  color: #9E9EA8 !important;
+  background: rgba(255, 255, 255, 0.06) !important;
+  padding: 4px 10px !important;
+  border-radius: 9999px !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+}
+
+.fz-edu-title {
+  font-size: 19px !important;
+  font-weight: 800 !important;
+  color: #FFFFFF !important;
+  letter-spacing: -0.01em !important;
+  line-height: 1.25 !important;
+  margin: 0 !important;
+}
+
+.fz-edu-desc {
+  font-size: 13px !important;
+  font-weight: 450 !important;
+  color: #9E9EA8 !important;
+  line-height: 1.48 !important;
+  margin: 0 !important;
+}
+
+.fz-edu-stats-row {
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  flex-wrap: wrap !important;
+  margin-top: 2px !important;
+}
+
+.fz-edu-stat-item {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 5px !important;
+  background: rgba(255, 255, 255, 0.05) !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  padding: 6px 12px !important;
+  border-radius: 10px !important;
+  font-size: 12px !important;
+  font-weight: 600 !important;
+  color: #C5C5D0 !important;
+}
+.fz-edu-stat-item.is-reward {
+  background: rgba(255, 199, 0, 0.1) !important;
+  border-color: rgba(255, 199, 0, 0.28) !important;
+  color: #FFE082 !important;
+  font-weight: 700 !important;
+}
+
+.fz-edu-primary-btn {
+  width: 100% !important;
+  padding: 13px 18px !important;
+  background: linear-gradient(135deg, #FFE048 0%, #FFB800 100%) !important;
+  color: #0F0E11 !important;
+  font-size: 14px !important;
+  font-weight: 800 !important;
+  border-radius: 14px !important;
+  border: none !important;
+  cursor: pointer !important;
   display: flex !important;
   align-items: center !important;
   justify-content: center !important;
+  gap: 8px !important;
+  box-shadow: 0 4px 16px rgba(255, 184, 0, 0.25) !important;
+  transition: transform 0.15s ease, box-shadow 0.15s ease !important;
+  margin-top: 4px !important;
+}
+.fz-edu-primary-btn:active {
+  transform: scale(0.98) !important;
 }
 
-.fz-score-box {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  min-width: 100px;
+.fz-edu-secondary-btn {
+  width: 100% !important;
+  padding: 12px 18px !important;
+  background: rgba(255, 255, 255, 0.06) !important;
+  color: #E2E8F0 !important;
+  font-size: 13.5px !important;
+  font-weight: 700 !important;
+  border-radius: 14px !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  cursor: pointer !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 8px !important;
+  transition: all 0.15s ease !important;
+  margin-top: 4px !important;
+}
+.fz-edu-secondary-btn:hover {
+  background: rgba(255, 255, 255, 0.1) !important;
+  color: #FFFFFF !important;
+  border-color: rgba(255, 255, 255, 0.2) !important;
+}
+.fz-edu-secondary-btn:active {
+  transform: scale(0.98) !important;
 }
 
-.fz-score-main {
-  font-size: 34px;
-  font-weight: 900;
-  line-height: 1;
-  letter-spacing: -0.02em;
-}
-.fz-score-dark {
-  color: #0A0A0E;
-}
-.fz-score-gray {
-  color: #64748B;
-}
-
-.fz-score-date {
-  font-size: 11px;
-  font-weight: 800;
-  color: #64748B;
-  text-transform: uppercase;
-  margin-top: 5px;
-  letter-spacing: 0.02em;
-}
-
-.fz-chip-action {
-  border: 1.5px dashed #CDD1DA;
-  border-radius: 9999px;
-  padding: 8px 10px;
-  font-size: 11px;
-  font-weight: 800;
-  text-transform: uppercase;
-  color: #101014;
-  text-align: center;
-  white-space: nowrap;
-  background: #F8F9FB;
-  cursor: pointer;
-  transition: all 0.15s ease;
-}
-.fz-chip-action:hover {
-  background: var(--fz-sports-yellow);
-  border-color: var(--fz-sports-yellow);
-}
-
-/* Force .today-card to adhere to edge-to-edge sculpted match card */
-html body #app .today-card.fz-match-card,
-html body #app section.today-card.fz-match-card {
+/* Force .today-card to adhere to edge-to-edge sculpted card */
+html body #app .today-card.fz-edu-card,
+html body #app section.today-card.fz-edu-card {
   padding: 0 !important;
-  border: none !important;
-  background: #FFFFFF !important;
+  border: 1.5px solid rgba(255, 199, 0, 0.3) !important;
+  background: linear-gradient(180deg, #1D1B22 0%, #121116 100%) !important;
   max-width: 100% !important;
   width: 100% !important;
   margin: 0 !important;
-  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.55) !important;
-  border-radius: 28px !important;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.55), 0 0 28px rgba(255, 199, 0, 0.08) !important;
+  border-radius: 26px !important;
   overflow: hidden !important;
-}
-
-/* Secondary cards in the stack */
-.fz-match-card + .fz-match-card {
-  margin-top: 16px;
 }
 
 /* Collapsible Details Drawer */
 .fz-card-drawer {
-  background: #FAFAFC !important;
-  border-top: 1px solid #EEF0F4 !important;
+  background: #101015 !important;
+  border-top: 1px solid rgba(255, 255, 255, 0.08) !important;
   padding: 0 !important;
 }
 
@@ -6399,28 +6303,29 @@ html body #app section.today-card.fz-match-card {
   display: flex !important;
   align-items: center !important;
   justify-content: space-between !important;
-  padding: 11px 18px !important;
-  font-size: 11px !important;
+  padding: 12px 18px !important;
+  font-size: 11.5px !important;
   font-weight: 800 !important;
   letter-spacing: 0.06em !important;
   text-transform: uppercase !important;
-  color: #6E7280 !important;
+  color: #A3A3B0 !important;
   cursor: pointer !important;
   user-select: none !important;
   list-style: none !important;
-  background: #F4F5F8 !important;
+  background: rgba(255, 255, 255, 0.03) !important;
   transition: all 0.2s ease !important;
 }
 .fz-drawer-toggle::-webkit-details-marker {
   display: none !important;
 }
 .fz-drawer-toggle:hover {
-  background: #ECEEF2 !important;
-  color: #0A0A0E !important;
+  background: rgba(255, 255, 255, 0.06) !important;
+  color: #FFFFFF !important;
 }
 .fz-drawer-arrow {
   font-size: 14px !important;
   transition: transform 0.2s ease !important;
+  color: #FFE082 !important;
 }
 details[open] .fz-drawer-arrow {
   transform: rotate(180deg) !important;
@@ -6431,6 +6336,7 @@ details[open] .fz-drawer-arrow {
   display: flex !important;
   flex-direction: column !important;
   gap: 12px !important;
+  background: #101015 !important;
 }
 
 .fz-drawer-inner .today-head {
@@ -6443,14 +6349,14 @@ details[open] .fz-drawer-arrow {
 .fz-drawer-inner .today-title {
   font-size: 20px !important;
   font-weight: 800 !important;
-  color: #0A0A0E !important;
+  color: #FFFFFF !important;
   margin: 0 !important;
   line-height: 1.2 !important;
 }
 
 .fz-drawer-inner .today-lead {
   font-size: 13px !important;
-  color: #64748B !important;
+  color: #94A3B8 !important;
   margin: 0 !important;
 }
 
@@ -6459,7 +6365,7 @@ details[open] .fz-drawer-arrow {
   font-weight: 800 !important;
   letter-spacing: 0.06em !important;
   text-transform: uppercase !important;
-  color: #8E8E98 !important;
+  color: #A3A3B0 !important;
   margin: 4px 0 0 0 !important;
 }
 
@@ -6473,11 +6379,12 @@ details[open] .fz-drawer-arrow {
 }
 
 .fz-drawer-inner .today-blocks li {
-  background: #F1F3F7 !important;
+  background: #181820 !important;
+  border: 1px solid rgba(255, 255, 255, 0.06) !important;
   border-radius: 14px !important;
   padding: 10px 14px !important;
   font-size: 13px !important;
-  color: #0F172A !important;
+  color: #E2E8F0 !important;
   display: flex !important;
   flex-direction: column !important;
   gap: 2px !important;
@@ -6485,35 +6392,37 @@ details[open] .fz-drawer-arrow {
 
 .fz-drawer-inner .today-blocks li b {
   font-weight: 700 !important;
+  color: #FFFFFF !important;
 }
 
 .fz-drawer-inner .today-blocks li span {
   font-size: 11px !important;
-  color: #64748B !important;
+  color: #94A3B8 !important;
 }
 
 .fz-drawer-inner .today-rhythm-bar {
-  background: #EDF0F5 !important;
+  background: #181820 !important;
+  border: 1px solid rgba(255, 255, 255, 0.06) !important;
   border-radius: 12px !important;
   padding: 10px 14px !important;
   display: flex !important;
   align-items: center !important;
   gap: 10px !important;
   font-size: 12px !important;
-  color: #334155 !important;
+  color: #E2E8F0 !important;
 }
 
 .fz-drawer-inner .rhythm-track {
   flex: 1 !important;
   height: 8px !important;
-  background: #D8DFE8 !important;
+  background: rgba(255, 255, 255, 0.1) !important;
   border-radius: 9999px !important;
   overflow: hidden !important;
 }
 
 .fz-drawer-inner .rhythm-fill {
   height: 100% !important;
-  background: var(--fz-sports-yellow) !important;
+  background: linear-gradient(90deg, #FFB800, #FFE048) !important;
   border-radius: 9999px !important;
 }
 
@@ -6586,42 +6495,30 @@ details[open] .fz-drawer-arrow {
   font-size: 10px !important;
 }
 
-/* Pau Avatar Cockpit in Sports Theme */
-.home-today .paw-hero-cockpit {
-  background: #14141A !important;
-  border: 1px solid rgba(255, 255, 255, 0.08) !important;
-  border-radius: 24px !important;
-  padding: 14px 18px !important;
-  display: flex !important;
-  align-items: center !important;
-  gap: 14px !important;
-  cursor: pointer !important;
-  transition: all 0.2s ease !important;
-}
-.home-today .paw-hero-cockpit:hover {
-  background: #1B1B24 !important;
-  border-color: rgba(255, 255, 255, 0.16) !important;
-}
-
-.home-today .paw-speech-bubble {
-  background: transparent !important;
+/* Totally eliminate PAW avatar & speech bubble cockpit */
+.home-today .paw-hero-cockpit,
+.today-home-cockpit > .paw-hero-cockpit,
+.paw-hero-cockpit,
+.paw-speech-bubble,
+.paw-hero-avatar,
+.paw-bubble-title,
+.paw-bubble-text,
+.paw-mascot,
+.lesson-mascot,
+.fz-paw-slot {
+  display: none !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+  opacity: 0 !important;
+  height: 0 !important;
+  margin: 0 !important;
   padding: 0 !important;
   border: none !important;
 }
-.home-today .paw-bubble-title {
-  color: var(--fz-sports-yellow) !important;
-  font-size: 12px !important;
-  font-weight: 800 !important;
-  text-transform: uppercase !important;
-}
-.home-today .paw-bubble-text {
-  color: #E2E8F0 !important;
-  font-size: 13px !important;
-  line-height: 1.4 !important;
-  margin: 2px 0 0 0 !important;
-}
 
-/* Floating Bottom Dock (Universal Luxury 3D Navigation) */
+/* ==========================================================================
+   ANCHORED LUXURY 2D BOTTOM NAVIGATION BAR (UNIVERSAL 5 TABS)
+   ========================================================================== */
 html.fiezel-ui-v6 nav.bottomnav,
 html.fiezel-ui-v6 .bottomnav,
 html body.fz-lang-ja nav.bottomnav,
@@ -6635,28 +6532,38 @@ nav.bottomnav,
 .home-today ~ .bottomnav {
   position: fixed !important;
   top: auto !important;
-  bottom: 22px !important;
-  left: 50% !important;
-  right: auto !important;
-  transform: translateX(-50%) !important;
-  width: fit-content !important;
+  bottom: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  transform: none !important;
+  width: 100% !important;
   height: auto !important;
-  max-width: calc(100vw - 32px) !important;
-  background: rgba(18, 18, 24, 0.94) !important;
-  backdrop-filter: blur(20px) !important;
-  -webkit-backdrop-filter: blur(20px) !important;
-  border-radius: 9999px !important;
-  padding: 6px 10px !important;
-  display: flex !important;
-  flex-direction: row !important;
+  max-width: 100vw !important;
+  background: rgba(14, 14, 20, 0.96) !important;
+  backdrop-filter: blur(24px) !important;
+  -webkit-backdrop-filter: blur(24px) !important;
+  border-radius: 0 !important;
+  padding: 8px 12px max(8px, env(safe-area-inset-bottom, 0px)) 12px !important;
+  display: grid !important;
+  grid-template-columns: repeat(5, 1fr) !important;
   align-items: center !important;
-  gap: 6px !important;
-  border: 1px solid rgba(255, 255, 255, 0.1) !important;
-  box-shadow: 0 20px 48px rgba(0, 0, 0, 0.75) !important;
+  gap: 4px !important;
+  border: none !important;
+  border-top: 1px solid rgba(255, 255, 255, 0.08) !important;
+  box-shadow: 0 -4px 24px rgba(0, 0, 0, 0.45) !important;
   z-index: 200 !important;
 }
 
-/* Hide floating bottomnav when listening modal or detail sheet is active or in lesson mode */
+/* Ensure body and app container have sufficient bottom padding so content is never covered */
+body,
+body.fz-lux,
+main.app,
+.view-container,
+#app {
+  padding-bottom: 96px !important;
+}
+
+/* Hide bottomnav when listening modal or detail sheet is active or in lesson mode */
 body:has(#listeningPanelModal.open) .bottomnav,
 body:has(.listening-modal.open) .bottomnav,
 body:has(#jlptDetailSheet.open) .bottomnav,
@@ -6670,19 +6577,22 @@ html body.fz-lang-ja .bottomnav .nav,
 html body .bottomnav .nav,
 nav.bottomnav .nav,
 .bottomnav .nav {
-  border-radius: 50% !important;
-  width: 44px !important;
-  height: 44px !important;
-  min-height: 44px !important;
+  border-radius: 12px !important;
+  width: 100% !important;
+  height: 52px !important;
+  min-height: 52px !important;
   display: flex !important;
+  flex-direction: column !important;
   align-items: center !important;
   justify-content: center !important;
-  color: #9A9AA2 !important;
-  background: linear-gradient(180deg, #24242C 0%, #17171E 100%) !important;
-  border: 1px solid rgba(255, 255, 255, 0.08) !important;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12), 0 3px 6px rgba(0, 0, 0, 0.4) !important;
-  padding: 0 !important;
-  transition: all 0.22s cubic-bezier(0.2, 0.8, 0.2, 1) !important;
+  gap: 3px !important;
+  color: #8E8E98 !important;
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  padding: 4px 2px !important;
+  transition: all 0.2s cubic-bezier(0.2, 0.8, 0.2, 1) !important;
+  cursor: pointer !important;
 }
 
 html body.fz-lang-ja nav.bottomnav .nav span,
@@ -6690,7 +6600,14 @@ html body.fz-lang-ja .bottomnav .nav span,
 html body .bottomnav .nav span,
 nav.bottomnav .nav span,
 .bottomnav .nav span {
-  display: none !important;
+  display: block !important;
+  font-size: 11px !important;
+  font-weight: 600 !important;
+  letter-spacing: -0.01em !important;
+  color: #8E8E98 !important;
+  line-height: 1 !important;
+  text-align: center !important;
+  white-space: nowrap !important;
 }
 
 html body.fz-lang-ja nav.bottomnav .nav .fz-i,
@@ -6701,8 +6618,8 @@ nav.bottomnav .nav .fz-i,
   background: transparent !important;
   border: none !important;
   box-shadow: none !important;
-  width: auto !important;
-  height: auto !important;
+  width: 24px !important;
+  height: 24px !important;
   display: flex !important;
   align-items: center !important;
   justify-content: center !important;
@@ -6716,10 +6633,10 @@ nav.bottomnav .nav svg,
 nav.bottomnav .nav i,
 .bottomnav .nav svg,
 .bottomnav .nav i {
-  width: 20px !important;
-  height: 20px !important;
-  stroke: #8E8E93 !important;
-  stroke-width: 2 !important;
+  width: 22px !important;
+  height: 22px !important;
+  stroke: #8E8E98 !important;
+  stroke-width: 1.8 !important;
   fill: none !important;
 }
 
@@ -6729,12 +6646,22 @@ html body nav.bottomnav .nav.active,
 html body .bottomnav .nav.active,
 nav.bottomnav .nav.active,
 .bottomnav .nav.active {
-  background: linear-gradient(180deg, #FFDE43 0%, #FFB800 100%) !important;
-  color: #0A0A0E !important;
-  width: 76px !important;
-  border-radius: 9999px !important;
-  border: 1px solid rgba(255, 255, 255, 0.4) !important;
-  box-shadow: 0 4px 20px rgba(255, 184, 0, 0.45), inset 0 1.5px 1.5px rgba(255, 255, 255, 0.7) !important;
+  background: rgba(255, 224, 46, 0.08) !important;
+  color: #FFE02E !important;
+  width: 100% !important;
+  border-radius: 12px !important;
+  border: 1px solid rgba(255, 224, 46, 0.25) !important;
+  box-shadow: 0 0 16px rgba(255, 224, 46, 0.12) !important;
+}
+
+html body.fz-lang-ja nav.bottomnav .nav.active span,
+html body.fz-lang-ja .bottomnav .nav.active span,
+html body nav.bottomnav .nav.active span,
+html body .bottomnav .nav.active span,
+nav.bottomnav .nav.active span,
+.bottomnav .nav.active span {
+  color: #FFE02E !important;
+  font-weight: 800 !important;
 }
 
 html body.fz-lang-ja nav.bottomnav .nav.active::after,
@@ -6749,11 +6676,9 @@ html body.fz-lang-ja .bottomnav .nav.active .fz-i,
 html body nav.bottomnav .nav.active .fz-i,
 nav.bottomnav .nav.active .fz-i,
 .bottomnav .nav.active .fz-i {
-  background: transparent !important;
-  border: none !important;
-  box-shadow: none !important;
-  --fz-i-fill: transparent !important;
-  --fz-i-line: #0A0A0E !important;
+  color: #FFE02E !important;
+  --fz-i-fill: rgba(255, 224, 46, 0.2) !important;
+  --fz-i-line: #FFE02E !important;
 }
 
 html body.fz-lang-ja nav.bottomnav .nav.active svg,
@@ -6761,9 +6686,17 @@ html body.fz-lang-ja .bottomnav .nav.active svg,
 html body .bottomnav .nav.active svg,
 nav.bottomnav .nav.active svg,
 .bottomnav .nav.active svg {
-  stroke: #0A0A0E !important;
-  stroke-width: 2.3 !important;
-  fill: none !important;
+  stroke: #FFE02E !important;
+  filter: drop-shadow(0 0 6px rgba(255, 224, 46, 0.4)) !important;
+}
+
+html body.fz-lang-ja nav.bottomnav .nav.active svg .fz-fill,
+html body.fz-lang-ja .bottomnav .nav.active svg .fz-fill,
+html body .bottomnav .nav.active svg .fz-fill,
+nav.bottomnav .nav.active svg .fz-fill,
+.bottomnav .nav.active svg .fz-fill {
+  fill: #FFE02E !important;
+  opacity: 0.25 !important;
 }
 
 html body.fz-lang-ja nav.bottomnav .nav:hover:not(.active),
@@ -6771,8 +6704,22 @@ html body.fz-lang-ja .bottomnav .nav:hover:not(.active),
 html body .bottomnav .nav:hover:not(.active),
 nav.bottomnav .nav:hover:not(.active),
 .bottomnav .nav:hover:not(.active) {
-  background: #2A2A34 !important;
+  background: rgba(255, 255, 255, 0.04) !important;
   color: #FFFFFF !important;
+}
+html body.fz-lang-ja nav.bottomnav .nav:hover:not(.active) span,
+html body.fz-lang-ja .bottomnav .nav:hover:not(.active) span,
+html body .bottomnav .nav:hover:not(.active) span,
+nav.bottomnav .nav:hover:not(.active) span,
+.bottomnav .nav:hover:not(.active) span {
+  color: #FFFFFF !important;
+}
+html body.fz-lang-ja nav.bottomnav .nav:hover:not(.active) svg,
+html body.fz-lang-ja .bottomnav .nav:hover:not(.active) svg,
+html body .bottomnav .nav:hover:not(.active) svg,
+nav.bottomnav .nav:hover:not(.active) svg,
+.bottomnav .nav:hover:not(.active) svg {
+  stroke: #FFFFFF !important;
 }
 
 /* ==========================================================================
@@ -7150,6 +7097,7 @@ html body #app .learning-launcher .launch-card svg,
   background: transparent !important;
   color: #8E8E98 !important;
   border: none !important;
+  box-shadow: none !important;
   border-radius: 9999px !important;
   padding: 8px 16px !important;
   font-size: 0.88rem !important;
@@ -7159,9 +7107,14 @@ html body #app .learning-launcher .launch-card svg,
   white-space: nowrap !important;
 }
 
+.progress-tab:not(.active) {
+  box-shadow: none !important;
+}
+
 .progress-tab:hover:not(.active) {
   color: #FFFFFF !important;
   background: rgba(255, 255, 255, 0.05) !important;
+  box-shadow: none !important;
 }
 
 .progress-tab.active {
@@ -7202,9 +7155,11 @@ html body #app .learning-launcher .launch-card svg,
 
 .stats strong {
   color: #FFFFFF !important;
-  font-size: 1.45rem !important;
+  font-size: 1.15rem !important;
+  line-height: 1.2 !important;
   font-weight: 800 !important;
   margin-top: 6px !important;
+  word-break: normal !important;
 }
 
 .map-row {
@@ -7305,6 +7260,64 @@ html body #app .learning-launcher .launch-card svg,
 
 .modal-panel p {
   color: #8E8E98 !important;
+}
+
+.modal-panel .text-button,
+#modalPanel .text-button,
+.modal-panel .notif-readall,
+.modal-panel [data-testid="notif-close"] {
+  color: #FFDE43 !important;
+  font-weight: 700 !important;
+}
+
+.modal-panel .text-button:hover,
+#modalPanel .text-button:hover {
+  color: #FFFFFF !important;
+  background: rgba(255, 255, 255, 0.08) !important;
+}
+
+.modal-panel .notif-item.is-teacher,
+.modal-panel .notif-item.is-teacher .notif-body b,
+.modal-panel .notif-item.is-teacher b {
+  color: #2D2214 !important;
+}
+
+.modal-panel .notif-item.is-teacher .notif-body small,
+.modal-panel .notif-item.is-teacher small {
+  color: #5C4825 !important;
+}
+
+.modal-panel .notif-item.is-social,
+.modal-panel .notif-item.is-social .notif-body b,
+.modal-panel .notif-item.is-social b {
+  color: #0A3825 !important;
+}
+
+.modal-panel .notif-item.is-social .notif-body small,
+.modal-panel .notif-item.is-social small {
+  color: #1C583E !important;
+}
+
+.modal-panel .notif-item.is-invite,
+.modal-panel .notif-item.is-invite .notif-body b,
+.modal-panel .notif-item.is-invite b {
+  color: #4A1226 !important;
+}
+
+.modal-panel .notif-item.is-invite .notif-body small,
+.modal-panel .notif-item.is-invite small {
+  color: #782944 !important;
+}
+
+.modal-panel .notif-item .notif-cta {
+  background: #14141C !important;
+  color: #FFDE43 !important;
+  border: 1px solid rgba(255, 222, 67, 0.3) !important;
+}
+
+.modal-panel .notif-item .notif-cta:hover {
+  background: #222230 !important;
+  color: #FFFFFF !important;
 }
 
 .settings-fold {
@@ -8148,7 +8161,6 @@ body .fz2-day i.is-today,
 button.fz-coach-bubble,
 .has-mascot.fz-coach-bubble,
 .coach-strip,
-fiezel-mascot,
 .paw-hero-cockpit,
 .paw-speech-bubble,
 .paw-hero-avatar,
@@ -8160,6 +8172,104 @@ fiezel-mascot,
   visibility: hidden !important;
   pointer-events: none !important;
   opacity: 0 !important;
+}
+
+/* ==========================================================================
+   ONBOARDING REFINEMENTS: FLAG SVG, TOPO TEXTURE, ANIMATED PAW MASCOT
+   ========================================================================== */
+/* Bendera SVG: Tajam, proporsional, dan konsisten di semua platform */
+.fiezel-flag-svg {
+  display: inline-block;
+  vertical-align: middle;
+  border-radius: 4px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.18);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+  flex-shrink: 0;
+}
+.fiezel-goal-card .fiezel-language-flag {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  font-size: 0 !important;
+  line-height: 1;
+}
+.fiezel-goal-card .fiezel-language-flag .fiezel-flag-svg {
+  width: 38px;
+  height: 26px;
+}
+.fiezel-course-flag {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  font-size: 0 !important;
+  line-height: 1;
+}
+.fiezel-course-flag .fiezel-flag-svg {
+  width: 38px;
+  height: 26px;
+}
+
+/* Tekstur topografi emas pada header onboarding (.fiezel-ob-reveal) seperti Auth Login */
+.fiezel-ob-reveal {
+  background: radial-gradient(120% 90% at 30% 0%, var(--fz-core-soft, #2A2126) 0%, var(--fz-core, #1B1418) 70%) !important;
+}
+.fiezel-ob-reveal .fz-auth-topo {
+  position: absolute !important;
+  inset: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  pointer-events: none !important;
+  z-index: 0 !important;
+}
+.fiezel-ob-reveal .fz-auth-topo path,
+.fiezel-ob-reveal .fz-auth-topo line,
+.fiezel-ob-reveal .fz-auth-topo circle {
+  fill: none !important;
+  stroke: rgba(255, 199, 0, 0.24) !important;
+  stroke-width: 1.1 !important;
+  stroke-linecap: round !important;
+  stroke-linejoin: round !important;
+}
+.fiezel-ob-reveal .fz-auth-topo .accent {
+  stroke: rgba(255, 215, 0, 0.55) !important;
+  stroke-width: 1.4 !important;
+}
+.fiezel-ob-reveal .fz-auth-topo .whisper {
+  stroke: rgba(255, 199, 0, 0.14) !important;
+  stroke-width: 0.95 !important;
+}
+.fiezel-ob-reveal .fiezel-wordmark,
+.fiezel-ob-reveal .fiezel-ob-word,
+.fiezel-ob-reveal .fiezel-ob-tag {
+  position: relative !important;
+  z-index: 1 !important;
+}
+
+/* Maskot PAW Onboarding: WAJIB TAMPIL & BERGERAK SEPERTI SEMULA */
+.fiezel-ob-mascot {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+}
+.fiezel-ob-mascot fiezel-mascot,
+.fiezel-ob-mascot .fiezel-ob-paw,
+.fiezel-ob-mascot .fz-mascot {
+  display: inline-block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  pointer-events: auto !important;
+}
+.fiezel-stage-art {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 12px !important;
+  min-height: 0 !important;
+  width: 100% !important;
 }
 
 

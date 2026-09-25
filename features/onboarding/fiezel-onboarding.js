@@ -133,10 +133,38 @@
      pilihannya di onboarding — Bahasa Jepang dan Bahasa Inggris". Nomornya 7 karena nomor
      langkah adalah IDENTITAS (dipakai paint, data-ob-step, dan gate regresi), bukan urutan;
      urutannya milik LEAN_SEQUENCE/FULL_SEQUENCE di bawah. */
+  // SVG Flags untuk konsistensi visual lintas platform (khususnya Windows yang tidak
+  // merender emoji bendera negara melainkan huruf regional indicator 'ID' / 'TH').
+  var FLAG_ID = '<svg class="fiezel-flag-svg" viewBox="0 0 36 24" width="36" height="24" aria-hidden="true" focusable="false">'
+    + '<rect width="36" height="12" fill="#E70011"/>'
+    + '<rect y="12" width="36" height="12" fill="#FFFFFF"/>'
+    + '</svg>';
+
+  var FLAG_TH = '<svg class="fiezel-flag-svg" viewBox="0 0 36 24" width="36" height="24" aria-hidden="true" focusable="false">'
+    + '<rect width="36" height="24" fill="#A51931"/>'
+    + '<rect y="4" width="36" height="16" fill="#FFFFFF"/>'
+    + '<rect y="8" width="36" height="8" fill="#2D2A4A"/>'
+    + '</svg>';
+
+  var FLAG_EN = '<svg class="fiezel-flag-svg" viewBox="0 0 60 40" width="36" height="24" aria-hidden="true" focusable="false">'
+    + '<clipPath id="fz-flag-en"><rect width="60" height="40"/></clipPath>'
+    + '<g clip-path="url(#fz-flag-en)">'
+    + '<path d="M0 0v40h60V0z" fill="#012169"/>'
+    + '<path d="M0 0l60 40m0-40L0 40" stroke="#fff" stroke-width="6.67"/>'
+    + '<path d="M0 0l60 40m0-40L0 40" stroke="#c8102e" stroke-width="4.44"/>'
+    + '<path d="M30 0v40M0 20h60" stroke="#fff" stroke-width="11.11"/>'
+    + '<path d="M30 0v40M0 20h60" stroke="#c8102e" stroke-width="6.67"/>'
+    + '</g></svg>';
+
+  var FLAG_JA = '<svg class="fiezel-flag-svg" viewBox="0 0 36 24" width="36" height="24" aria-hidden="true" focusable="false">'
+    + '<rect width="36" height="24" fill="#FFFFFF"/>'
+    + '<circle cx="18" cy="12" r="7.2" fill="#BC002D"/>'
+    + '</svg>';
+
   var COURSE_STEP = 7;
   var COURSES = Object.freeze([
-    Object.freeze({ id: 'en', flag: '\uD83C\uDDEC\uD83C\uDDE7', titleKey: 'onboarding.course-en', descKey: 'onboarding.course-en-desc' }),
-    Object.freeze({ id: 'ja', flag: '\uD83C\uDDEF\uD83C\uDDF5', titleKey: 'onboarding.course-ja', descKey: 'onboarding.course-ja-desc' })
+    Object.freeze({ id: 'en', flag: FLAG_EN, titleKey: 'onboarding.course-en', descKey: 'onboarding.course-en-desc' }),
+    Object.freeze({ id: 'ja', flag: FLAG_JA, titleKey: 'onboarding.course-ja', descKey: 'onboarding.course-ja-desc' })
   ]);
   function normalizeCourse(v) { return v === 'ja' || v === 'en' ? v : ''; }
 
@@ -390,6 +418,31 @@
     return STEP_LABEL_KEYS.map(function (key) { return T(key); });
   }
 
+  /* Ornamen Siluet Minimalis Pinto Aceh (Pinto Khob) Khas Aceh */
+  var ACEH_PINTO_SVG = '<svg class="fz-auth-topo" viewBox="0 0 390 295" preserveAspectRatio="none" aria-hidden="true" focusable="false">'
+    + '<path d="M -20 70 C 60 40, 110 85, 150 75" class="whisper"/>'
+    + '<path d="M 240 75 C 280 85, 330 40, 410 70" class="whisper"/>'
+    + '<path d="M -30 190 C 50 160, 95 210, 140 220" class="whisper"/>'
+    + '<path d="M 250 220 C 295 210, 340 160, 420 190" class="whisper"/>'
+    + '<path d="M -10 260 C 80 230, 195 265, 310 230 C 350 240, 390 255, 410 260" class="whisper"/>'
+    + '<path d="M 195 24 L 198 34 L 195 38 L 192 34 Z" class="accent"/>'
+    + '<circle cx="195" cy="20" r="2" class="accent"/>'
+    + '<path d="M 148 185 C 148 115, 165 52, 195 40 C 225 52, 242 115, 242 185" class="accent"/>'
+    + '<path d="M 158 185 C 158 125, 172 70, 195 58 C 218 70, 232 125, 232 185"/>'
+    + '<line x1="180" y1="88" x2="180" y2="112" class="whisper"/>'
+    + '<line x1="195" y1="80" x2="195" y2="112" class="whisper"/>'
+    + '<line x1="210" y1="88" x2="210" y2="112" class="whisper"/>'
+    + '<path d="M 148 125 C 112 115, 85 92, 88 68 C 91 44, 122 46, 122 66 C 122 82, 104 84, 102 72" class="accent"/>'
+    + '<path d="M 148 155 C 118 155, 88 135, 84 105" class="whisper"/>'
+    + '<path d="M 242 125 C 278 115, 305 92, 302 68 C 299 44, 268 46, 268 66 C 268 82, 286 84, 288 72" class="accent"/>'
+    + '<path d="M 242 155 C 272 155, 302 135, 306 105" class="whisper"/>'
+    + '<line x1="138" y1="185" x2="252" y2="185"/>'
+    + '</svg>';
+
+  function topo() {
+    return ACEH_PINTO_SVG;
+  }
+
   // Band gelap pembawa merek. Warnanya sama dengan panggung splash yang baru saja tutup,
   // jadi peralihan splash -> onboarding terbaca sebagai satu gerakan, bukan dua layar yang
   // tidak saling kenal. Wordmark diambil dari sumber tunggalnya (FiezelSplash) dengan
@@ -399,7 +452,7 @@
     var brand = env && env.FiezelSplash && typeof env.FiezelSplash.wordmarkMarkup === 'function'
       ? env.FiezelSplash.wordmarkMarkup('fzob')
       : '<p class="fiezel-ob-word">FIEZEL</p>';
-    return '<div class="fiezel-ob-reveal">' + brand
+    return '<div class="fiezel-ob-reveal">' + topo() + brand
       + '<p class="fiezel-ob-tag">' + escapeHtml(T('onboarding.brand-tag')) + '</p></div>';
   }
 
@@ -542,8 +595,10 @@
 
   function mascotReady(env) {
     try {
-      var api = env && env.FiezelPaw;
-      return !!(api && typeof api.ready === 'function' && api.ready());
+      var api = (env && env.FiezelPaw) || (typeof window !== 'undefined' && window.FiezelPaw) || (typeof self !== 'undefined' && self.FiezelPaw);
+      if (api && typeof api.ready === 'function' && api.ready()) return true;
+      var ce = (env && env.customElements) || (typeof window !== 'undefined' && window.customElements) || (typeof customElements !== 'undefined' && customElements);
+      return !!(ce && typeof ce.get === 'function' && ce.get('fiezel-mascot'));
     } catch (_) { return false; }
   }
 
@@ -642,8 +697,8 @@
       + '<h2 class="fiezel-title">Choose your language</h2>'
       + '<p class="fiezel-body">Pilih bahasa untuk melanjutkan<br><span lang="th">เลือกภาษาเพื่อดำเนินการต่อ</span></p>'
       + '<div class="fiezel-goal-grid fiezel-language-grid" role="group" aria-label="Language / Bahasa / ภาษา">'
-      + choice('id', '🇮🇩', 'Bahasa Indonesia', 'Indonesia')
-      + choice('th', '🇹🇭', 'ภาษาไทย', 'ไทย')
+      + choice('id', FLAG_ID, 'Bahasa Indonesia', 'Indonesia')
+      + choice('th', FLAG_TH, 'ภาษาไทย', 'ไทย')
       + '</div>'
       + (busy === 'th' ? '<p class="fiezel-note" role="status">Menyiapkan Bahasa Thai · <span lang="th">กำลังเตรียมภาษาไทย…</span></p>' : '')
       + '</div>';
