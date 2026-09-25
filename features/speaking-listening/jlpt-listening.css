@@ -322,8 +322,8 @@
 
 /* Compact Situation Chip */
 .jlpt-situation-chip {
-  background: #FFF9EE;
-  border: 1px solid #FFE6AF;
+  background: #1C1A24;
+  border: 1px solid rgba(255, 224, 46, 0.25);
   border-radius: 10px;
   padding: 7px 10px;
   display: flex;
@@ -331,7 +331,7 @@
   gap: 6px;
   font-size: 12px;
   line-height: 1.4;
-  color: #735118;
+  color: #FDE68A;
 }
 
 .jlpt-sit-icon {
@@ -476,14 +476,14 @@
 .jlpt-question-ja {
   font-size: 16px;
   font-weight: 800;
-  color: #241A11;
+  color: #FFFFFF;
   line-height: 1.45;
   margin: 0 0 4px;
 }
 
 .jlpt-question-id {
   font-size: 12.5px;
-  color: var(--text-muted, #7A6F64);
+  color: #CBD5E1;
   line-height: 1.4;
   margin: 0;
 }
@@ -526,14 +526,15 @@
   width: 26px;
   height: 26px;
   border-radius: 50%;
-  background: #EDE4D5;
-  color: #241A11;
+  background: #252536;
+  color: #FFFFFF;
   font-weight: 800;
   font-size: 12px;
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
+  border: 1px solid rgba(255, 255, 255, 0.12);
   transition: all 0.15s ease;
 }
 
@@ -547,13 +548,13 @@
 .jlpt-opt-ja {
   font-size: 14px;
   font-weight: 700;
-  color: #241A11;
+  color: #FFFFFF;
   line-height: 1.35;
 }
 
 .jlpt-opt-id {
   font-size: 11.5px;
-  color: var(--text-muted, #7A6F64);
+  color: #CBD5E1;
   line-height: 1.3;
 }
 
@@ -1726,12 +1727,12 @@
 .jlpt-answer-opt-details .opt-ja {
   font-weight: 700;
   font-size: 13.5px;
-  color: #241A11;
+  color: #FFFFFF;
 }
 
 .jlpt-answer-opt-details .opt-id {
   font-size: 11.5px;
-  color: #7A6F64;
+  color: #CBD5E1;
 }
 
 .jlpt-explain-article {
