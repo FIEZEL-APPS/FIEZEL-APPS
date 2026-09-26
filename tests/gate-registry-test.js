@@ -145,6 +145,26 @@ const EXCLUSIONS = new Map([
     class: 'gerbang-pra-rilis-fitur',
     reason:
       'Gerbang pra-rilis fitur antarmuka JLPT Bottom Sheet Drawer untuk menampilkan naskah dialog percakapan, terjemahan Indonesia, analisis kunci, dan kosakata secara ergonomis.'
+  }],
+  ['tests/kelasku-public-surface-test.js', {
+    class: 'gerbang-pra-rilis-fitur',
+    reason:
+      'Gerbang validasi permukaan publik KelasKu untuk memverifikasi kanonikalitas H1, kelengkapan metadata, validitas JSON-LD Schema.org (SoftwareApplication, WebPage, FAQPage), kecocokan 100% FAQ visual dengan schema, serta isolasi rute privat guru.'
+  }],
+  ['tests/seo-hardening-audit-test.js', {
+    class: 'gerbang-pra-rilis-fitur',
+    reason:
+      'Gerbang audit kepatuhan SEO/AEO/GEO untuk memastikan tidak adanya regresi semantik diesel/fizzle di halaman materi, pencegahan klaim hiperbolik pada mesin Braincore, penegakan disclaimer non-akreditasi CEFR, dan integritas structured data.'
+  }],
+  ['tests/buku-928-bank-test.js', {
+    class: 'gerbang-pra-rilis-fitur',
+    reason:
+      'Gerbang pengujian bank soal 928 butir Fase D lintas 50 bab untuk mata pelajaran IPA, Bahasa Indonesia, Bahasa Inggris, Matematika, dan IPS sesuai kurikulum merdeka tanpa posisi opsi jawaban statis.'
+  }],
+  ['tests/braincore-living-system-test.js', {
+    class: 'gerbang-pra-rilis-fitur',
+    reason:
+      'Gerbang pengujian sistem kecerdasan kognitif hidup (Living Intelligence) Braincore untuk memvalidasi determinisme runtime trace, prinsip keheningan kehadiran (Presence Engine), deteksi miskonsepsi berulang, dan isolasi penuh 100% luring tanpa dependensi jaringan.'
   }]
 ]);
 

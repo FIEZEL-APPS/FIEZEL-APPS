@@ -8951,6 +8951,8 @@ function dismissBootSplash(){
     setTimeout(dismissBootSplash,60);
     return true;
   }
+  try{self.__fiezelBootSplash?.clearRecovery?.()}catch(_){}
+  try{const r=self.document?.getElementById?.('fiezelBootRecovery');if(r)r.remove()}catch(_){}
   try{if(self.FiezelSplash?.disposeBootSplash?.(self))return true}catch(_){}
   try{
     self.__fiezelBootSplash?.dismiss?.();
@@ -11494,6 +11496,7 @@ function quizLoop(cfg){
     q.__predicted=quizPredictedSuccess(q);
     if(q.type==='listening'){q.__plays=0;q.__replayCount=0;q.__listeningPolicy=listeningAdaptivePolicy()}
   }catch{}
+  try{if(self.FiezelPresenceEngine&&typeof self.FiezelPresenceEngine.determine==='function'){const pres=self.FiezelPresenceEngine.determine({phase:'presenting',type:q.type,passage:!!q.passage});self.FiezelPresenceEngine.apply(pres,{motion:pawMotionAllowed()})}}catch(_){}
   answer.locked=false;answer.retryOf='';answer.scaffold='';answer.timing='';
   const opts=q.options||[];
   /* [FASE 7] Slot PAW panel (12-lesson-layer.md tabel §4: kartu soal HADIR — peek di
@@ -11818,6 +11821,56 @@ function quizLoop(cfg){
    if(decision.move==='reteach'){forceConcept=quizConcept(q);pendingCard=tutorConceptCard(q,j)}
    if(decision.move==='breathe')answer.breathe=true;
   }
+  try{
+    if(self.FiezelDecisionTrace&&typeof self.FiezelDecisionTrace.recordDecision==='function'){
+      const cState=self.FiezelDecisionTrace.getCanonicalState(state,Date.now());
+      const obs=self.FiezelDecisionTrace.createObservation({
+        itemId:q.id,
+        concept:quizConcept(q),
+        family:quizFamily(q),
+        difficulty:q.difficulty,
+        ok:ok,
+        ms:ms,
+        distractor:j!==q.answerIndex?j:null,
+        retryCount:firstTry?0:1,
+        nowMs:Date.now()
+      });
+      const understanding=self.FiezelDecisionTrace.analyzePattern(obs,cState);
+      if(cfg.__lastTraceId){
+        self.FiezelDecisionTrace.evaluateOutcome(cfg.__lastTraceId,obs);
+        cfg.__lastTraceId=null;
+      }
+      let pAction=ok?'continue_practice':'scaffold_hint';
+      if(answer.move==='reteach')pAction='reinforce_concept';
+      else if(answer.move==='breathe')pAction='recommend_break';
+      else if(understanding.pattern==='fluent_mastery'||understanding.pattern==='mastery_milestone')pAction='increase_challenge';
+
+      const pres=self.FiezelPresenceEngine&&typeof self.FiezelPresenceEngine.determine==='function'?self.FiezelPresenceEngine.determine({
+        ok:ok,
+        firstTry:firstTry,
+        move:answer.move,
+        scaffold:answer.scaffold,
+        timing:answer.timing,
+        streak:gemStreak,
+        isMilestone:understanding.isMasteryMilestone,
+        isFatigued:answer.move==='breathe'
+      }):null;
+      if(pres&&self.FiezelPresenceEngine&&typeof self.FiezelPresenceEngine.apply==='function'){
+        self.FiezelPresenceEngine.apply(pres,{motion:pawMotionAllowed()});
+      }
+      const rec=self.FiezelDecisionTrace.recordDecision({
+        action:pAction,
+        targetSkill:quizConcept(q),
+        targetDifficulty:q.difficulty,
+        scaffold:answer.scaffold,
+        presenceState:pres?pres.state:'silent',
+        rationale:pres?pres.rationale:'brain4_decision_standard',
+        observation:obs,
+        understanding:understanding
+      });
+      if(rec&&rec.traceId)cfg.__lastTraceId=rec.traceId;
+    }
+  }catch(_){}
 
   // Kesalahan PERTAMA tidak dibuka jawabannya: satu pijakan, lalu coba lagi. Pilihan yang
   // barusan dipilih dimatikan supaya percobaan kedua benar-benar pilihan baru, bukan klik
@@ -11920,6 +11973,55 @@ function quizLoop(cfg){
    forceConcept=quizConcept(q);
    pendingCard={concept:friendlySkillName(quizConcept(q)),why:FiezelI18n.t('quiz.you-menulis-kata-dasarnya-done',{typed:typed}),rule:q.explain?.rule||FiezelI18n.t('quiz.bentuk-tepat',{clozeAnswer:q.clozeAnswer}),cue:q.explain?.memory||''};
   }
+  try{
+    if(self.FiezelDecisionTrace&&typeof self.FiezelDecisionTrace.recordDecision==='function'){
+      const cState=self.FiezelDecisionTrace.getCanonicalState(state,Date.now());
+      const obs=self.FiezelDecisionTrace.createObservation({
+        itemId:q.id,
+        concept:quizConcept(q),
+        family:quizFamily(q),
+        difficulty:q.difficulty,
+        ok:ok,
+        ms:ms,
+        retryCount:0,
+        nowMs:Date.now()
+      });
+      const understanding=self.FiezelDecisionTrace.analyzePattern(obs,cState);
+      if(cfg.__lastTraceId){
+        self.FiezelDecisionTrace.evaluateOutcome(cfg.__lastTraceId,obs);
+        cfg.__lastTraceId=null;
+      }
+      let pAction=ok?'continue_practice':'scaffold_hint';
+      if(answer.move==='reteach')pAction='reinforce_concept';
+      else if(answer.move==='breathe')pAction='recommend_break';
+      else if(understanding.pattern==='fluent_mastery'||understanding.pattern==='mastery_milestone')pAction='increase_challenge';
+
+      const pres=self.FiezelPresenceEngine&&typeof self.FiezelPresenceEngine.determine==='function'?self.FiezelPresenceEngine.determine({
+        ok:ok,
+        firstTry:true,
+        move:answer.move,
+        scaffold:answer.scaffold,
+        timing:answer.timing,
+        streak:0,
+        isMilestone:understanding.isMasteryMilestone,
+        isFatigued:answer.move==='breathe'
+      }):null;
+      if(pres&&self.FiezelPresenceEngine&&typeof self.FiezelPresenceEngine.apply==='function'){
+        self.FiezelPresenceEngine.apply(pres,{motion:pawMotionAllowed()});
+      }
+      const rec=self.FiezelDecisionTrace.recordDecision({
+        action:pAction,
+        targetSkill:quizConcept(q),
+        targetDifficulty:q.difficulty,
+        scaffold:answer.scaffold,
+        presenceState:pres?pres.state:'silent',
+        rationale:pres?pres.rationale:'brain4_decision_standard',
+        observation:obs,
+        understanding:understanding
+      });
+      if(rec&&rec.traceId)cfg.__lastTraceId=rec.traceId;
+    }
+  }catch(_){}
   revealCloze(q,typed,ok,res,input,btn);
  }
 
@@ -15219,7 +15321,7 @@ if(typeof document!=='undefined'&&document.addEventListener){
   });
 }
 /* ============================== akhir blok SOSIAL (SLOT 7) ========================== */
-window.istilahMurid=istilahMurid;/* dipapar untuk gerbang QA: penerjemah enum harus bisa disapu penuh */window.__getFiezelData=()=>({vocab:V.length,reading:R.length,grammar:Object.keys(G).length});window.__fiezelAudit={showBrandSplash,showOnboarding,prefersReducedMotion,readInstallHealth,installHealthReportMarkup,buildBackupFile,previewRestoreForState,applyRestore,continuitySettingsMarkup,academicReadinessMarkup,unifiedSkillsMarkup,buildPersonalJourney,journeyMarkup,setGoalProfile,loadState,sanitizeState,validateQuestion,makeGrammarQuestion,makeReadingQuestion,makeVocabQuestion,buildGrammarLessonQuestions,buildPlacement,/* m025-246: dipapar untuk regression-test - gerbang itu harus bisa MENANYAKAN ukuran rencana penempatan, bukan memaku 25 dan merah setiap kali ukurannya berubah dengan sengaja. */placementSize,placementBlueprint,/* cetak biru PENUH dipapar terpisah: gerbang harus tetap bisa menjaga invarian 'penempatan penuh memuat ketiga jenis konten' walau jalur murid memakai cetak biru lite */PLACEMENT_BLUEPRINT_FULL:PLACEMENT_BLUEPRINT,buildAdaptivePool,getScenePalette,getCelestialState,getDiagnosticProfile,buildLearningSnapshot,buildLearnerEvidenceModel,remoteLearnerEvidenceSnapshot,deriveAdaptivePolicy,buildAdaptivePolicy,adaptivePolicyRequestPayload,sanitizeAdaptivePolicy,/* m025-201: dipapar untuk tests/core-policy-parity-test.js - gerbang paritas tidak bisa membandingkan apa yang tidak bisa ia panggil */capRationaleCodes,policyEffectiveness,sanitizePolicyEffectiveness,resolveAdaptivePolicy,evaluatePolicyOutcome,sanitizePolicyOutcome,recordPolicyOutcomeFromSession,backfillPolicyOutcomes,recentPolicyOutcomes,policyOutcomeSummary,buildALRSContext,selectALRSDecision,buildCreatorReport,validReportEndpoint,forgettingProbability,scheduleNext,coreBrainMemory,tutorSession,tutorObserve,misconceptionLedgerRead,misconceptionLedgerActive,coreBrainAttempts,quizPredictedSuccess,evidenceKappa,bktRead,bktRecord,bktShadowMarkup,brainManifestMarkup,learningTelemetryMode,learningTelemetryEmitAnswer,learningTelemetryStudyDay,braincoreEvidenceMode,braincoreEvidenceCohort,braincoreEvidenceCohortForBuild,braincoreEvidenceDay,braincoreEvidenceEmitSnapshot,activeLevelOverallMastery,braincoreEvidenceEmitDecision,braincoreEvidenceFlush,braincoreEvidenceObserveSession,braincoreDecisionReason,braincoreEvidenceAnyLaneActive,identityEvidenceMode,learnerNameSyncToServer,maybeSyncLearnerName,identityEvidenceActive,identityEvidenceMirror,identityEvidenceFlush,forgetLearnerEvidence,confusionMatrixRead,confusionMatrixRecord,affectObserve,affectSessionSync,affectTargetSuccess,listeningAdaptivePolicy,olmPanelMarkup,coreBrainPanelMarkup,diagnosticEvidenceReady,skillTimeline,errorPatterns,confusionPairs,diagnosticReport,confidenceCalibration,dueItems,selectLoginMessage,notificationPermission,checkStudyReminders,lastLearningAt,beginLearningSession,abandonActiveSession,completeActiveSession,/* Fase 3 (C5): kalibrasi item, cloze, OLM negotiated, SRL, speaking adaptif, step tutor */itemCalibrationRead,itemCalibrationObserve,itemCalibrationEffective,calibrationItemId,ensureClozeBank,makeClozeQuestion,clozeAdaptivePicks,clozeSkillReady,clozeProductionRecord,olmSummarizeInput,olmDispute,olmProbeNextSkill,olmProbeConsume,olmNegotiationRead,srlSessionPlan,srlPredictPrompt,srlCaptureConfidence,srlReflect,srlSessionSync,speakingCoverageRows,speakingAdaptiveEvidence,speakingAdaptivePolicy,stepTutorGuidance,stepTutorGuidanceMarkup,record,quizLoop,startAdaptive,/* m025-308: dipapar untuk tests/th-content-overlay-test.js. Gerbang itu harus bisa memanggil overlay yang SUNGGUHAN lalu membacanya lewat jalur baca yang dipakai penyaji - kalau ia hanya boleh memeriksa isi sidecar, ia mengulang kebutaan yang justru membiarkan 45 petunjuk writing dan 96 umpan balik reading-exam menganggur. */applyContentLocale,writingPromptPool,writingExamTask,readingExamSets,makeExamReadingQuestion,/* m025-314: dipapar untuk tests/target-lang-surface-guard-test.js. Gerbang itu harus bisa MEMANGGIL daftar kartu yang sungguhan lalu membacanya, bukan menebak dari pola teks di app.js - penjaga yang hanya diuji lewat grep akan tetap hijau saat kartunya dipindah ke fungsi lain. */latihanCards,skillHubModel,skillHubMarkup,continueLearningCard,aiBoosterCard,targetLangSurfaceBlocked,targetLangVoiceBlocked,courseLanguageLabel,/* `state` adalah binding modul, jadi ia TIDAK muncul sebagai properti global di vm - gerbang yang perlu menggeser bahasa target atau membaca layar aktif tidak punya jalan lain. Diekspor sebagai FUNGSI, bukan nilai: salinan yang diambil saat berkas dimuat akan basi begitu state ditugaskan ulang (loadState dipanggil lagi saat akun berpindah). */liveState:()=>state,/* B1 (m025-317): dipapar untuk tests/target-lang-progress-isolation-test.js. Gerbang itu harus MENJALANKAN jalur simpan/muat yang sungguhan di kedua bahasa - sumbu yang hanya diuji lewat modulnya adalah persis cara cacat ini bertahan berbulan-bulan. */saveFlushWrite,switchTargetLangStorage,progressStorageKey,pickProgress,sideStateKey,PROGRESS_STATE_FIELDS,PROGRESS_PREF_FIELDS,/* Migrasi sekali-jalan saat murid masuk akun. Dipapar karena inilah satu-satunya jalur yang bisa MENELANTARKAN progres bahasa: ia lahir sebelum ruang nama @lang ada. Gerbang harus menjalankannya, bukan membaca namanya. */activateAccountStateFromPuter,migrateSideStateToAccount,FIEZEL_TARGET_COURSE_KEY};
+window.istilahMurid=istilahMurid;/* dipapar untuk gerbang QA: penerjemah enum harus bisa disapu penuh */window.__getFiezelData=()=>({vocab:V.length,reading:R.length,grammar:Object.keys(G).length});window.__fiezelAudit={showBrandSplash,showOnboarding,prefersReducedMotion,readInstallHealth,installHealthReportMarkup,buildBackupFile,previewRestoreForState,applyRestore,continuitySettingsMarkup,academicReadinessMarkup,unifiedSkillsMarkup,buildPersonalJourney,journeyMarkup,setGoalProfile,loadState,sanitizeState,validateQuestion,makeGrammarQuestion,makeReadingQuestion,makeVocabQuestion,buildGrammarLessonQuestions,buildPlacement,/* m025-246: dipapar untuk regression-test - gerbang itu harus bisa MENANYAKAN ukuran rencana penempatan, bukan memaku 25 dan merah setiap kali ukurannya berubah dengan sengaja. */placementSize,placementBlueprint,/* cetak biru PENUH dipapar terpisah: gerbang harus tetap bisa menjaga invarian 'penempatan penuh memuat ketiga jenis konten' walau jalur murid memakai cetak biru lite */PLACEMENT_BLUEPRINT_FULL:PLACEMENT_BLUEPRINT,buildAdaptivePool,getScenePalette,getCelestialState,getDiagnosticProfile,buildLearningSnapshot,buildLearnerEvidenceModel,remoteLearnerEvidenceSnapshot,deriveAdaptivePolicy,buildAdaptivePolicy,adaptivePolicyRequestPayload,sanitizeAdaptivePolicy,/* m025-201: dipapar untuk tests/core-policy-parity-test.js - gerbang paritas tidak bisa membandingkan apa yang tidak bisa ia panggil */capRationaleCodes,policyEffectiveness,sanitizePolicyEffectiveness,resolveAdaptivePolicy,evaluatePolicyOutcome,sanitizePolicyOutcome,recordPolicyOutcomeFromSession,backfillPolicyOutcomes,recentPolicyOutcomes,policyOutcomeSummary,buildALRSContext,selectALRSDecision,buildCreatorReport,validReportEndpoint,forgettingProbability,scheduleNext,coreBrainMemory,tutorSession,tutorObserve,misconceptionLedgerRead,misconceptionLedgerActive,coreBrainAttempts,quizPredictedSuccess,evidenceKappa,bktRead,bktRecord,bktShadowMarkup,brainManifestMarkup,learningTelemetryMode,learningTelemetryEmitAnswer,learningTelemetryStudyDay,braincoreEvidenceMode,braincoreEvidenceCohort,braincoreEvidenceCohortForBuild,braincoreEvidenceDay,braincoreEvidenceEmitSnapshot,activeLevelOverallMastery,braincoreEvidenceEmitDecision,braincoreEvidenceFlush,braincoreEvidenceObserveSession,braincoreDecisionReason,braincoreEvidenceAnyLaneActive,identityEvidenceMode,learnerNameSyncToServer,maybeSyncLearnerName,identityEvidenceActive,identityEvidenceMirror,identityEvidenceFlush,forgetLearnerEvidence,confusionMatrixRead,confusionMatrixRecord,affectObserve,affectSessionSync,affectTargetSuccess,listeningAdaptivePolicy,olmPanelMarkup,coreBrainPanelMarkup,diagnosticEvidenceReady,skillTimeline,errorPatterns,confusionPairs,diagnosticReport,confidenceCalibration,dueItems,selectLoginMessage,notificationPermission,checkStudyReminders,lastLearningAt,beginLearningSession,abandonActiveSession,completeActiveSession,/* Fase 3 (C5): kalibrasi item, cloze, OLM negotiated, SRL, speaking adaptif, step tutor */itemCalibrationRead,itemCalibrationObserve,itemCalibrationEffective,calibrationItemId,ensureClozeBank,makeClozeQuestion,clozeAdaptivePicks,clozeSkillReady,clozeProductionRecord,olmSummarizeInput,olmDispute,olmProbeNextSkill,olmProbeConsume,olmNegotiationRead,srlSessionPlan,srlPredictPrompt,srlCaptureConfidence,srlReflect,srlSessionSync,speakingCoverageRows,speakingAdaptiveEvidence,speakingAdaptivePolicy,stepTutorGuidance,stepTutorGuidanceMarkup,record,quizLoop,startAdaptive,/* m025-308: dipapar untuk tests/th-content-overlay-test.js. Gerbang itu harus bisa memanggil overlay yang SUNGGUHAN lalu membacanya lewat jalur baca yang dipakai penyaji - kalau ia hanya boleh memeriksa isi sidecar, ia mengulang kebutaan yang justru membiarkan 45 petunjuk writing dan 96 umpan balik reading-exam menganggur. */applyContentLocale,writingPromptPool,writingExamTask,readingExamSets,makeExamReadingQuestion,/* m025-314: dipapar untuk tests/target-lang-surface-guard-test.js. Gerbang itu harus bisa MEMANGGIL daftar kartu yang sungguhan lalu membacanya, bukan menebak dari pola teks di app.js - penjaga yang hanya diuji lewat grep akan tetap hijau saat kartunya dipindah ke fungsi lain. */latihanCards,skillHubModel,skillHubMarkup,continueLearningCard,aiBoosterCard,targetLangSurfaceBlocked,targetLangVoiceBlocked,courseLanguageLabel,/* `state` adalah binding modul, jadi ia TIDAK muncul sebagai properti global di vm - gerbang yang perlu menggeser bahasa target atau membaca layar aktif tidak punya jalan lain. Diekspor sebagai FUNGSI, bukan nilai: salinan yang diambil saat berkas dimuat akan basi begitu state ditugaskan ulang (loadState dipanggil lagi saat akun berpindah). */liveState:()=>state,/* B1 (m025-317): dipapar untuk tests/target-lang-progress-isolation-test.js. Gerbang itu harus MENJALANKAN jalur simpan/muat yang sungguhan di kedua bahasa - sumbu yang hanya diuji lewat modulnya adalah persis cara cacat ini bertahan berbulan-bulan. */saveFlushWrite,switchTargetLangStorage,progressStorageKey,pickProgress,sideStateKey,PROGRESS_STATE_FIELDS,PROGRESS_PREF_FIELDS,/* Migrasi sekali-jalan saat murid masuk akun. Dipapar karena inilah satu-satunya jalur yang bisa MENELANTARKAN progres bahasa: ia lahir sebelum ruang nama @lang ada. Gerbang harus menjalankannya, bukan membaca namanya. */activateAccountStateFromPuter,migrateSideStateToAccount,FIEZEL_TARGET_COURSE_KEY,decisionTrace:()=>self.FiezelDecisionTrace,presenceEngine:()=>self.FiezelPresenceEngine};
 window.FIEZEL_TARGET_COURSE_KEY=FIEZEL_TARGET_COURSE_KEY;
 window.startVocabQuiz=startVocabQuiz;window.buildAdaptivePool=buildAdaptivePool;window.buildGrammarLessonQuestions=buildGrammarLessonQuestions;window.getScenePalette=getScenePalette;window.getCelestialState=getCelestialState;window.playFeedbackSound=playFeedbackSound;window.updateMastery=updateMastery;window.markMastered=markMastered;window.__getFiezelState=()=>state;window.__fiezelValidViews=()=>[...VALID_VIEWS];window.__fiezelDueReviews=()=>dueItems().length;window.buildAdaptivePolicy=buildAdaptivePolicy;window.studyDayKey=studyDayKey;window.startAdaptive=startAdaptive;window.showToast=showToast;window.answerFeedbackSignal=answerFeedbackSignal;window.practiceSkill=practiceSkill;window.openReadingLevel=openReadingLevel;window.startReadingRandom=startReadingRandom;window.startReadingAdaptive=startReadingAdaptive;window.startPlacement=startPlacement;window.startLevelPractice=startLevelPractice;window.startAdaptive=startAdaptive;window.resetProgress=resetProgress;window.closeModal=closeModal;window.openSettings=openSettings;window.openReportPreview=openReportPreview;window.sendCreatorReport=sendCreatorReport;window.askCoachAI=askCoachAI;window.dismissWelcome=dismissWelcome;window.requestStudyNotificationPermission=requestStudyNotificationPermission;window.declineStudyNotifications=declineStudyNotifications;window.skipPuterSignIn=skipPuterSignIn;window.attemptGoogleSignIn=attemptGoogleSignIn;window.shouldPresentPuterPopup=shouldPresentPuterPopup;window.notifyAppUpdateIfNew=notifyAppUpdateIfNew;window.setConfidence=setConfidence;window.explainWithAI=explainWithAI;window.explainWordWithAI=explainWordWithAI;window.olmDispute=olmDispute;/* Fase 3 (C5 butir 3): handler tombol sanggah di panel OLM */
 // m025-84: dipasang di ujung berkas, saat go()/state/VALID_VIEWS sudah ada, dan SEBELUM

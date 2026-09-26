@@ -19,28 +19,10 @@
     },
 
     chokai: function (size) {
-      var s = size || 54;
-      return '<svg class="fz-3d-emblem fz-3d-chokai" viewBox="0 0 54 54" width="' + s + '" height="' + s + '" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">' +
-        /* 2D Royal Navy & Gold Premier League Audio Shield */
-        '<path d="M9 5 C21 3.5 33 3.5 45 5 C46.5 21 43 36 27 50 C11 36 7.5 21 9 5 Z" fill="#FFD700"/>' +
-        '<path d="M10.8 7 C21.6 5.8 32.4 5.8 43.2 7 C44.5 21 41.2 34.5 27 47 C12.8 34.5 9.5 21 10.8 7 Z" fill="#0A2540"/>' +
-        '<path d="M12.5 8.8 C22 7.8 32 7.8 41.5 8.8 C42.6 21 39.5 33 27 44.5 C14.5 33 11.4 21 12.5 8.8 Z" stroke="#FFD700" stroke-width="0.8" fill="none"/>' +
-        /* Flanking Gold Stars */
-        '<polygon points="15.5,12 16.3,13.6 18.1,13.8 16.7,15 17.1,16.8 15.5,15.8 13.9,16.8 14.3,15 12.9,13.8 14.7,13.6" fill="#FFD700"/>' +
-        '<polygon points="38.5,12 39.3,13.6 41.1,13.8 39.7,15 40.1,16.8 38.5,15.8 36.9,16.8 37.3,15 35.9,13.8 37.7,13.6" fill="#FFD700"/>' +
-        /* 2D Audio Headphones */
-        '<path d="M17 26 C17 18 21.5 13 27 13 C32.5 13 37 18 37 26" stroke="#FFFFFF" stroke-width="3.2" stroke-linecap="round"/>' +
-        '<rect x="14" y="23" width="6.5" height="11" rx="3.2" fill="#38BDF8"/>' +
-        '<rect x="15.2" y="24" width="1.8" height="9" rx="0.9" fill="#FFFFFF"/>' +
-        '<rect x="33.5" y="23" width="6.5" height="11" rx="3.2" fill="#38BDF8"/>' +
-        '<rect x="37" y="24" width="1.8" height="9" rx="0.9" fill="#FFFFFF"/>' +
-        /* 2D Equalizer Audio Bars */
-        '<rect x="23" y="27" width="2" height="7" rx="1" fill="#38BDF8"/>' +
-        '<rect x="26" y="22" width="2" height="12" rx="1" fill="#FFD700"/>' +
-        '<rect x="29" y="25" width="2" height="9" rx="1" fill="#38BDF8"/>' +
-        /* Base Laurel Garland */
-        '<path d="M17 38 C20 41 24 43 27 44 C30 43 34 41 37 38" stroke="#FFD700" stroke-width="1.6" stroke-linecap="round" fill="none"/>' +
-        '<circle cx="27" cy="44.2" r="1.6" fill="#FFD700"/>' +
+      var s = size || 24;
+      return '<svg class="fz-vector-emblem fz-vector-chokai" viewBox="0 0 24 24" width="' + s + '" height="' + s + '" fill="none" stroke="#FFE02E" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">' +
+        '<path d="M3 18v-6a9 9 0 0 1 18 0v6"/>' +
+        '<path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"/>' +
       '</svg>';
     },
 
