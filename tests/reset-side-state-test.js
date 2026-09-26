@@ -63,7 +63,10 @@ const DIHAPUS_SAAT_RESET = [
   // terikat `sub` yang TIDAK berubah saat reset, jadi sisa antrean/penanda dari sebelum reset
   // akan muncul sebagai bukti murid yang sama sesudahnya.
   'IDENTITY_EVIDENCE_ATTEMPT_KEY',
-  'LEARNER_NAME_SYNC_KEY'
+  'LEARNER_NAME_SYNC_KEY',
+  // m025-374: Penyetelan-diri berbatas (self-tune) menyimpan ledger parameter adaptif dan
+  // override konfigurasi per-murid. Reset progres harus mengembalikan parameter ke bawaan.
+  'SELF_TUNE_KEY'
 ];
 
 /**
