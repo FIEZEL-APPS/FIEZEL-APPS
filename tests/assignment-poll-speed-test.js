@@ -48,7 +48,9 @@ test('3. Boot delay startNotifPolling <= 2000ms (bukan 6500ms)', () => {
 });
 
 test('4. learnerName() di fiezel-inbox.js tangguh dan tidak pernah ""', () => {
-  assert.ok(inboxSrc.includes("return first || 'Murid';"), 'fallback ke Murid jika kosong');
+  // m025-373 memindahkan fallback ke copy-map i18n (murid Thai tidak lagi disapa "Murid");
+  // yang dijaga tetap sama: nama kosong tidak pernah lolos, ada cadangan "Murid".
+  assert.ok(inboxSrc.includes("return first || t('inbox.default_student_name', 'Murid');"), 'fallback ke Murid (lewat i18n) jika kosong');
   assert.ok(inboxSrc.includes("/^(sobat|murid|teman)(\\s+.*)?$/i"), 'menangani variasi Sobat FIEZEL dsb');
 });
 
