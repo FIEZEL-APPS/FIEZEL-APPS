@@ -194,9 +194,9 @@
   }
   function chokaiCardMarkup() {
     var label = t('jepang.chokai') + ' JLPT (N5 & N4)';
-    var emblem = (typeof self !== 'undefined' && self.Fiezel3DEmblems) ? self.Fiezel3DEmblems.chokai(38) : '🎧';
+    var emblem = '<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#FFE02E" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 18v-6a9 9 0 0 1 18 0v6"></path><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"></path></svg>';
     return '<button type="button" class="launch-card ja-chokai-card" onclick="openListeningPanel()" aria-label="' + esc(label) + '">' +
-      '<span class="launch-icon ja-glyph fz-launch-3d" aria-hidden="true">' + emblem + '</span><span><small>' +
+      '<span class="launch-icon ja-glyph" aria-hidden="true">' + emblem + '</span><span><small>' +
       esc(t('jepang.chokai-note')) + ' · 30 Audio JEES</small><b>' + esc(label) + '</b></span><i data-lucide="arrow-up-right"></i></button>';
   }
   function comingSoonMarkup() {

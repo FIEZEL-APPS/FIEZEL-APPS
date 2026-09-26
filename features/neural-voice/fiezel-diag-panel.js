@@ -127,6 +127,11 @@
         if (!gate || typeof gate.snapshot !== 'function') return '(kill switch CF belum dimuat)';
         return gate.snapshot();
       }),
+      braincoreDecisionTrace: safe(function(){
+        var dt = root.FiezelDecisionTrace;
+        if (!dt || typeof dt.getDiagnosticsSummary !== 'function') return '(FiezelDecisionTrace belum dimuat)';
+        return dt.getDiagnosticsSummary();
+      }),
       localStorageKeys: safe(function(){ return Object.keys(root.localStorage); }, []),
       target: safe(function(){ return root.localStorage.getItem(KEY); }, null),
       runtimeStatus: safe(function(){

@@ -263,7 +263,7 @@ html.fz-booting body{overflow:hidden}
   <link rel="stylesheet" href="./features/ui/fiezel-lux.css">
   <link rel="stylesheet" href="./fiezel-2.css">
   <link rel="stylesheet" href="./features/speaking-listening/jlpt-listening.css">
-  <link rel="stylesheet" href="./features/ui/mobile-edge-fit.css?v=contrast-v12">
+  <link rel="stylesheet" href="./features/ui/mobile-edge-fit.css?v=contrast-v19">
   <!-- m025-308: <link> ke ./features/ui/fiezel-marshmallow.css DIBUANG. Berkasnya TIDAK
        PERNAH ADA di repo (nol di riwayat git, nol di origin/main), jadi baris ini adalah
        404 pada setiap pemuatan halaman sejak ia ditulis.
@@ -371,6 +371,7 @@ html.fz-booting body{overflow:hidden}
       var timer = 0;
       function dismiss() {
         if (timer) { clearTimeout(timer); timer = 0; }
+        clearRecovery();
         try { doc.documentElement.classList.remove('fz-booting'); } catch (e) {}
         try { el.setAttribute('data-fiezel-boot-claimed', 'disposed'); } catch (e) {}
         try { if (el.parentNode) el.parentNode.removeChild(el); } catch (e) {}
@@ -762,7 +763,7 @@ html.fz-booting body{overflow:hidden}
        SEBELUM app.js karena app.js memanggil keduanya pada cat pertama (refreshIcons dan
        syncCoachBubble). Keduanya ringan dan tidak menyentuh jaringan sama sekali. -->
   <script defer src="./features/ui/fiezel-icons.js"></script>
-  <script defer src="./features/ui/fiezel-3d-emblems.js"></script>
+  <script defer src="./features/ui/fiezel-3d-emblems.js?v=clean-v5"></script>
   <!-- m026-01: <fiezel-mascot> WAJIB terdaftar sebelum dua berkas di bawahnya.
        fiezel-coach-bubble.js memutuskan bentuk wajah gelembung saat install(), dan
        app.js memutuskan wajah panel "Kata FIEZEL" saat cat pertama; keduanya membaca
@@ -779,6 +780,8 @@ html.fz-booting body{overflow:hidden}
        bukan ekonomi hadiah; kill switch localStorage fzPawOutfits. Tanpa berkas
        ini PAW tampil polos - tidak ada yang patah. -->
   <script defer src="./features/mascot/fiezel-paw-outfit.js"></script>
+  <!-- Living Intelligence: Braincore Presence Engine (FiezelPresenceEngine) -->
+  <script defer src="./features/mascot/fiezel-presence-engine.js"></script>
   <script defer src="./features/ui/fiezel-coach-bubble.js"></script>
   <!-- m025-117 Core Brain v2. Dimuat SEBELUM app.js dan tidak ikut dimuat malas: kebijakan
        sesi pertama sudah membutuhkannya, dan tanpa itu murid akan mendapat satu sesi dengan
@@ -840,7 +843,7 @@ html.fz-booting body{overflow:hidden}
        awalan, jadi kunci murid Inggris identik byte per byte dengan sebelum modul ini ada. -->
   <script defer src="./features/brain/fiezel-target-language.js"></script>
   <!-- Permukaan khusus kursus Jepang: furigana/romaji, tabel kana, kartu segera hadir. -->
-  <script defer src="./features/japanese/fiezel-ja-ui.js"></script>
+  <script defer src="./features/japanese/fiezel-ja-ui.js?v=clean-v5"></script>
   <script defer src="./features/brain/fiezel-question-allocator.js"></script>
   <!-- brain-learning-infra: lane telemetri belajar (config → events → queue → transport).
        Urutan penting: transport membaca queue, queue membaca events, semuanya membaca
@@ -977,6 +980,8 @@ html.fz-booting body{overflow:hidden}
   <!-- m025-276: orkestrator PAW ARENA (view sendiri; kartu aturan per-sesi; ?duel= lama tetap hidup). -->
   <script defer src="./features/learner-flow/fiezel-paw-arena.js"></script>
   <script defer src="./features/learner-flow/fiezel-learner-flow.js"></script>
+  <!-- Living Intelligence: Braincore Decision Trace & Bounded Autonomous Controller -->
+  <script defer src="./features/learner-flow/fiezel-decision-trace.js"></script>
   <script defer src="./features/tutor-action-center/fiezel-tutor-action-center.js"></script>
   <!-- Ruang Guru (cangkang guru terpisah). Wajib SEBELUM app.js: tutorCenterView() memasangnya,
        dan isVerifiedTeacher() menanyakan previewAllowed() saat Home digambar pertama kali. -->
@@ -994,7 +999,7 @@ html.fz-booting body{overflow:hidden}
   <!-- F28: shell + kurikulum guru (±600 KB) dimuat malas; pemuat kecil ini menyediakan
        previewAllowed() seketika dan mengambil modul penuh hanya untuk guru/demo guru. -->
   <script defer src="./features/teacher/fiezel-teacher-loader.js"></script>
-  <script defer src="./app.js?v=m025-badge-free-v4"></script>
+  <script defer src="./app.js"></script>
   <script defer src="./features/skills-evidence/fiezel-skills-evidence.js"></script>
   <script defer src="./features/academic-readiness/fiezel-academic-readiness.js"></script>
   <script defer src="./features/continuity/fiezel-continuity.js"></script>

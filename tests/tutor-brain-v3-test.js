@@ -508,7 +508,7 @@ test('modul tutor ikut dimuat halaman dan ikut di-precache service worker', () =
   assert.ok(html.indexOf('features/brain/fiezel-tutor-brain.js') >= 0, 'index.html tidak memuat modul tutor');
   assert.ok(sw.indexOf('features/brain/fiezel-tutor-brain.js') >= 0, 'sw.js tidak mem-precache modul tutor');
   // Dicocokkan ke TAG-nya, bukan ke teks 'app.js' yang juga muncul di komentar penjelasan.
-  const app = html.indexOf('src="./app.js"'), tutor = html.indexOf('src="./features/brain/fiezel-tutor-brain.js"');
+  const app = html.indexOf('src="./app.js'), tutor = html.indexOf('src="./features/brain/fiezel-tutor-brain.js"');
   assert.ok(app > 0 && tutor > 0, 'tag skrip tidak ditemukan di index.html');
   assert.ok(tutor < app, 'modul tutor harus dimuat sebelum app.js');
 });
