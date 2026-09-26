@@ -51,21 +51,33 @@ setTimeout(()=>{try{
   const runtimeState=context.__getFiezelState();
   const previousActiveLevel=runtimeState.preferences.activeLevel||'';
   const previousLevelMode=runtimeState.preferences.levelMode||'placement';
-  const expectedModes=['apply_form','complete_sentence','justify_correct','recognize_rule','recognize_objective','sequence_reasoning','identify_misconception','recall_memory_cue','choose_avoidance','diagnose_distractor_1','diagnose_distractor_2','diagnose_distractor_3','label_misconception_1','label_misconception_2','label_misconception_3','repair_distractor_1','repair_distractor_2','repair_distractor_3','contrast_distractor_1','contrast_distractor_2','contrast_distractor_3','classify_family','locate_decision_cue','teach_back','mastery_check'];
+  /* m025-375: kontrak sesi lesson BUKAN lagi 25 soal x 25 mode. 50+ murid melaporkan soal
+     grammar susah dipahami; 20 dari 25 soal lama adalah soal teori (tujuan belajar, langkah
+     berpikir, label keluarga) dengan pilihan pinjaman dari lesson lain. Sesi sekarang maksimal
+     10 soal dari GRAMMAR_LESSON_MODES, mayoritas latihan bentuk, semua pilihan milik lesson. */
+  const LESSON_MODES=['apply_form','justify_correct','complete_sentence','diagnose_distractor_1','repair_distractor_1','repair_distractor_2','diagnose_distractor_2','repair_distractor_3','diagnose_distractor_3'];
+  const FORM_MODES=new Set(['apply_form','complete_sentence','repair_distractor_1','repair_distractor_2','repair_distractor_3']);
   const globalSignatures=new Map(),sourceOwners=new Map();
   let generated=0;
   for(const template of grammar.templates){
     const skill=template.subskill;
     runtimeState.preferences={...runtimeState.preferences,activeLevel:template.cefr,levelMode:'manual'};
-    const questions=context.buildGrammarLessonQuestions(skill,25);
-    assert(questions.length===25,`${skill} generated ${questions.length}/25 questions`);
-    assert(new Set(questions.map(signature)).size===25,`${skill} contains duplicate runtime questions`);
-    assert(new Set(questions.map(q=>q.question)).size===25,`${skill} repeats question wording across practice modes`);
+    const questions=context.buildGrammarLessonQuestions(skill);
+    const templateCount=grammar.templates.filter(t=>t.subskill===skill).length;
+    assert(questions.length>=5&&questions.length<=10,`${skill} generated ${questions.length} questions (kontrak 5..10)`);
+    if(templateCount>=2)assert(questions.length===10,`${skill} (${templateCount} templat) generated ${questions.length}/10 questions`);
+    assert(new Set(questions.map(signature)).size===questions.length,`${skill} contains duplicate runtime questions`);
+    assert(new Set(questions.map(q=>q.question)).size===questions.length,`${skill} repeats question wording across practice modes`);
     assert(questions.every(q=>context.__fiezelAudit.validateQuestion(q).ok),`${skill} contains an invalid question`);
     assert(questions.every(q=>q.lessonSkill===skill),`${skill} lost its lesson identity`);
     const lessonIds=new Set(grammar.templates.filter(t=>t.subskill===skill).map(t=>t.id));
     assert(questions.every(q=>q.skill===skill&&lessonIds.has(q.sourceId)&&lessonIds.has(q.conceptId)),`${skill} leaks a peer concept into the lesson`);
-    assert(new Set(questions.map(q=>q.practiceMode)).size===25&&expectedModes.every(mode=>questions.some(q=>q.practiceMode===mode)),`${skill} does not cover all 25 pedagogical modes`);
+    assert(questions.every(q=>LESSON_MODES.includes(q.practiceMode)),`${skill} still serves a theory-only mode: ${questions.map(q=>q.practiceMode).filter(m=>!LESSON_MODES.includes(m)).join(',')}`);
+    assert(questions.every(q=>(q.optionSources||[]).every(x=>x.origin==='own')),`${skill} offers an option borrowed from another lesson`);
+    assert(questions.filter(q=>FORM_MODES.has(q.practiceMode)).length*2>=questions.length,`${skill}: kurang dari separuh soal adalah latihan bahasa Inggris`);
+    // Lesson berdua templat dibuka dengan isian kalimat yang BELUM dijawab di layar materi; lesson
+    // bertemplat tunggal memindahkan contohnya ke akhir (Audit F10), jadi soal pertamanya soal kenapa.
+    if(templateCount>=2)assert(questions[0]&&questions[0].practiceMode==='apply_form',`${skill} does not open with a plain fill-in question`);
     for(const q of questions){
       const sig=signature(q);const prevOwner=globalSignatures.get(sig);assert(!prevOwner||prevOwner===skill,`${skill} repeats a runtime question from ${prevOwner}`);globalSignatures.set(sig,skill);
       const owner=sourceOwners.get(q.sourceId);assert(!owner||owner===skill,`${skill} reuses source concept ${q.sourceId} from ${owner}`);sourceOwners.set(q.sourceId,skill);
@@ -124,6 +136,6 @@ setTimeout(()=>{try{
   setTimeout(()=>{try{
     assert(bufferSourceStarts>=2,`feedback samples fetched but never started (${bufferSourceStarts} starts)`);
     console.log('FIEZEL lesson experience: PASS');
-    console.log(JSON.stringify({grammarLessons:skills.length,questionsPerLesson:25,practiceModesPerLesson:25,generatedQuestionsChecked:generated,crossLessonDuplicates:0,focusLeaks:0,correctWrongSamples:bufferSourceStarts,sfxFilesFetched:[...new Set(sfxRequests)].length,realtimeCycle:['sunrise','noon','sunset','moonrise','midnight'],naturalIndonesian:true}));
+    console.log(JSON.stringify({grammarLessons:skills.length,questionsPerLesson:'5..10',lessonModes:9,generatedQuestionsChecked:generated,crossLessonDuplicates:0,focusLeaks:0,correctWrongSamples:bufferSourceStarts,sfxFilesFetched:[...new Set(sfxRequests)].length,realtimeCycle:['sunrise','noon','sunset','moonrise','midnight'],naturalIndonesian:true}));
   }catch(error){console.error('FIEZEL lesson experience: FAIL\n'+error.stack);process.exitCode=1}},120);
 }catch(error){console.error('FIEZEL lesson experience: FAIL\n'+error.stack);process.exitCode=1}},260);

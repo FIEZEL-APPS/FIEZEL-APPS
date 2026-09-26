@@ -213,15 +213,18 @@ test('accepts Indonesian explanations that quote English grammar terms', () => {
 
 /* --- the repaired banks must stay repaired -------------------------------- */
 
-test('every grammar lesson still fills all 25 practice modes through the gate', () => {
+// m025-375: sesi lesson = maks 10 soal dari GRAMMAR_LESSON_MODES (bukan 25 mode). Lesson dua
+// templat wajib penuh 10; lesson bertemplat tunggal (C1/C2) minimal GRAMMAR_SESSION_MIN.
+test('every grammar lesson still fills its practice-first session through the gate', () => {
   const templates = JSON.parse(fs.readFileSync(path.join(root, 'grammar-templates.json'), 'utf8')).templates;
   const state = context.__getFiezelState();
   const previous = { activeLevel: state.preferences.activeLevel || '', levelMode: state.preferences.levelMode || 'placement' };
   const short = [];
   for (const t of templates) {
     state.preferences = { ...state.preferences, activeLevel: t.cefr, levelMode: 'manual' };
-    const questions = context.buildGrammarLessonQuestions(t.subskill, 25);
-    if (questions.length !== 25) short.push(`${t.id}/${t.subskill}=${questions.length}`);
+    const questions = context.buildGrammarLessonQuestions(t.subskill);
+    const siblings = templates.filter(x => x.subskill === t.subskill).length;
+    if (questions.length < (siblings >= 2 ? 10 : 5) || questions.length > 10) short.push(`${t.id}/${t.subskill}=${questions.length}`);
   }
   state.preferences = { ...state.preferences, ...previous };
   assert(!short.length, `lessons underfilled after gating: ${short.slice(0, 5).join(', ')}`);
