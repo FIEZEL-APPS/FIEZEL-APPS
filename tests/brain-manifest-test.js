@@ -68,7 +68,7 @@ test('bundleVersion dan minAppVersion bisa diparse semver-ish', () => {
   assert.ok(SEMVERISH.test(manifest.minAppVersion), 'minAppVersion tidak semver-ish: ' + manifest.minAppVersion);
 });
 
-test('bundleVersion 3.11.0 (retentionProbe + learningMetrics shadow -> active, m025-341)', () => {
+test('bundleVersion 3.12.0 (selfTune + paramLedger + brainConfig off -> active, m025-374)', () => {
   // Literal ini sengaja dipatok, bukan dilonggarkan jadi pola semver: gunanya memaksa
   // perubahan versi bundle menjadi keputusan SADAR yang ikut dalam diff, bukan efek
   // samping. 3.0.0 -> 3.1.0 karena peta otoritas bergerak (Langkah 1 roadmap otonomi:
@@ -77,7 +77,10 @@ test('bundleVersion 3.11.0 (retentionProbe + learningMetrics shadow -> active, m
   // jangan di bekukan" — otoritas dibuka, parameter BKT sendiri tetap beku).
   // 3.9.0 -> 3.10.0: gelombang kedua permintaan OWNER ("tingkatkan braincore lebih
   // powerful") — confusionMap dan olmInsight ikut naik ke active.
-  assert.strictEqual(manifest.bundleVersion, '3.11.0');
+  // 3.10.0 -> 3.11.0: retentionProbe + learningMetrics shadow -> active (m025-341).
+  // 3.11.0 -> 3.12.0: OWNER authorization (2026-09-27) mengaktifkan bounded self-tuning
+  // (Langkah 5 roadmap otonomi): selfTune, paramLedger, brainConfig -> active.
+  assert.strictEqual(manifest.bundleVersion, '3.12.0');
 });
 
 test('minAppVersion sama dengan FIEZEL_VERSION di version.js (dibaca, bukan dikarang)', () => {
@@ -126,6 +129,10 @@ test('klaim otoritas kunci: memory aktif, bktUnlock aktif sejak m025-337', () =>
   // yang sama dan memang bukan pengambil keputusan belajar. Menaikkannya supaya "genap
   // tiga" akan lolos hitungan pemanggil tanpa ada perilaku yang berubah.
   assert.strictEqual(manifest.authorityMap.attemptRecord, 'shadow');
+  // m025-374: OWNER mengizinkan penyetelan-diri berbatas (Langkah 5 roadmap).
+  assert.strictEqual(manifest.authorityMap.selfTune, 'active');
+  assert.strictEqual(manifest.authorityMap.paramLedger, 'active');
+  assert.strictEqual(manifest.authorityMap.brainConfig, 'active');
 });
 
 test('otoritas off DITURUNKAN dari permukaan aplikasi, bukan dihafal sebagai literal', () => {
