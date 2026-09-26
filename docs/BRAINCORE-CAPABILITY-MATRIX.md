@@ -38,7 +38,7 @@ Setiap kemampuan dalam FIEZEL Braincore ditandai dan diaudit berdasarkan **peril
 | 14 | **Flow Silence Principle (Zero-Distraction)** | `features/mascot/fiezel-presence-engine.js` | `determine({ move: 'continue' }) -> SILENT` | `PROVEN & ACTIVE` | ✅ 0ms | `tests/braincore-runtime-e2e-proof.js` (Inv 1) |
 | 15 | **Cognitive Decision Trace & Cryptographic Hash Chain** | `features/learner-flow/fiezel-decision-trace.js` | `recordDecision()` & 64-bit FNV-1a/fmix32 chain | `PROVEN & ACTIVE` | ✅ 0ms | `tests/braincore-runtime-e2e-proof.js` (Inv 9), `tests/braincore-living-system-test.js` |
 | 16 | **Closed-Loop Outcome Evaluation (Keep/Modify/Rollback)** | `features/learner-flow/fiezel-decision-trace.js` | `evaluateOutcome(traceId, observation)` | `PROVEN & ACTIVE` | ✅ 0ms | `tests/braincore-runtime-e2e-proof.js` (Inv 4 & 5) |
-| 17 | **Bounded Self-Tuning Parameter Engine** | `features/learner-flow/fiezel-decision-trace.js` | `targetSuccess` dynamic tuning ($[0.70, 0.90]$) | `PROVEN & ACTIVE` | ✅ 0ms | `tests/braincore-runtime-e2e-proof.js` (Inv 10), `tests/braincore-living-system-test.js` |
+| 17 | **~~Bounded Self-Tuning Parameter Engine~~** | `features/learner-flow/fiezel-decision-trace.js` | `targetSuccess` dynamic tuning — **DIMATIKAN OWNER 2026-09-26 (m025-375)**: tanpa stat-gate/halt/ledger, mengunci murid di 0.90 (audit A1, `reports/BRAINCORE-AUDIT-2026-09-26.md`) | `DISABLED` | — | `tests/braincore-living-system-test.js` (Scenario K/K2 membuktikan parameter TIDAK bergeser) |
 | 18 | **Local-First Zero-Latency Architecture** | `app.js`, `fiezel-decision-trace.js` | 100% client execution, 0ms, zero network calls | `PROVEN & ACTIVE` | ✅ 0ms | `tests/braincore-runtime-e2e-proof.js` (Inv 8), `tests/session-security-test.js` |
 | 19 | **Bankor Item Allocator & Anti-Repeat Memory** | `features/brain/fiezel-question-allocator.js` | `FiezelQuestionAllocator.allocate()` | `PROVEN & ACTIVE` | ✅ 0ms | `tests/bankor-latihan-test.js` |
 | 20 | **Listening Adaptive Pacing** | `features/brain/fiezel-listening-adaptive.js` | `listeningAdaptivePolicy()` (rate & replays) | `PROVEN & ACTIVE` | ✅ 0ms | `tests/listening-adaptive-test.js` |
@@ -89,7 +89,7 @@ Runtime E2E Proof Gate: 10/10 PASS
 ```
 
 ### Bukti Nyata Perubahan Soal (Invariant 10):
-Ketika target keberhasilan berada pada baseline $0.80$, soal yang dipilih adalah `item_challenging` (prediksi peluang $0.801$). Setelah murid menjawab 3 kali benar berturut-turut, mesin self-tuning otonom menaikkan target kesulitan ke $0.84$. Pada giliran berikutnya, Braincore secara otomatis memilih `item_easy` (prediksi peluang $0.842$). **Ini membuktikan secara matematis bahwa keputusan Braincore benar-benar mengubah soal berikutnya di runtime.**
+Sejak m025-375 (OWNER 2026-09-26) bukti tidak lagi menggeser target — penyetel otomatis yang dulu menaikkan target ke $0.84$ (dan memilih soal *lebih mudah*) dimatikan. Bukti kini bekerja lewat jalur yang semestinya: dua belas jawaban benar pada soal tingkat 3 menaikkan taksiran kemampuan dari $2.0$ ke $\approx 3.49$, dan dengan target yang sama $0.80$ Braincore beralih dari `item_foundation` ke `item_stretch` (soal yang lebih menantang).
 
 ---
 
@@ -100,8 +100,8 @@ Ketika target keberhasilan berada pada baseline $0.80$, soal yang dipilih adalah
 2. **Kerendahan Hati Statistik (Statistical Humility)**:
    Modul evaluasi kebijakan (`fiezel-policy-verdict.js` & `fiezel-stat-gate.js`) menggunakan interval kepercayaan Wilson dan Newcombe. Jika ukuran sampel tidak memadai untuk mendeteksi perbedaan non-inferioritas pada margin $\pm 5\%$, Braincore mengeluarkan status `hold` (tidak mengambil keputusan gegabah).
 3. **Otonomi Belajar Berbatas (Bounded Authority)**:
-   - Self-tuning hanya diizinkan untuk parameter yang telah terdaftar dalam daftar putih (`difficulty.targetSuccess` terikat ketat dalam rentang $[0.70, 0.90]$ dengan langkah $\pm 0.02$).
-   - Regresi seketika memicu rollback otomatis ke parameter kanonik sebelumnya.
+   - Penyetelan `difficulty.targetSuccess` otomatis di `fiezel-decision-trace.js` **dimatikan** (OWNER 2026-09-26, m025-375). Satu-satunya geseran target yang tersisa adalah afek sesi berjalan (frustrasi 0.90 / bosan 0.75), yang tidak pernah disimpan.
+   - Jalur penyetelan resmi (`fiezel-self-tune.js` + `fiezel-param-ledger.js`) tetap berpagar dan belum menyentuh pemilihan soal runtime (audit A3).
    - Otak dilarang mengubah silabus atau menerbitkan materi baru (`ownerDecisionRequired: true`).
 4. **Privasi Tingkat Tinggi (Differential Privacy & K-Anonymity)**:
    - Tidak ada pengiriman nama murid, nomor induk, atau transkrip interaksi mentah ke server.

@@ -8,9 +8,14 @@
  *    OBSERVE -> UNDERSTAND -> DECIDE -> ACT -> EVALUATE OUTCOME -> KEEP / ROLLBACK.
  * 3. Mengoperasikan rantai hash kriptografis anti-rusak (tamper-evident hash chain)
  *    untuk mencatat setiap peristiwa keputusan kognitif dan perubahan parameter.
- * 4. Mesin Self-Tuning Berbatas (Bounded Self-Tuning Parameter Engine):
- *    Menyesuaikan parameter targetSuccess dan bkt.T di dalam batas yang aman dan
- *    melakukan rollback otomatis ketika regresi performa terdeteksi.
+ * 4. (DIMATIKAN OWNER 2026-09-26, m025-375) Penyetelan parameter otomatis. Modul ini dulu
+ *    menaikkan difficulty.targetSuccess +0.02 setiap tiga hasil 'positive' kumulatif, tanpa
+ *    stat-gate, halt, maupun ledger berantai - dan dialah satu-satunya penyetel yang benar-
+ *    benar dibaca pemilihan soal (app.js affectTargetSuccess). Audit braincore 2026-09-26
+ *    (reports/BRAINCORE-AUDIT-2026-09-26.md, A1) mengukurnya: murid berakurasi 60-85% mentok
+ *    di 0.90 pada median jawaban ke-16..31, lalu disodori soal "latihan pemulihan" selamanya.
+ *    Sekarang modul ini HANYA merekam dan mengevaluasi; readParams() selalu mengembalikan
+ *    nilai bawaan dan mengabaikan sisa setelan lama di perangkat murid.
  * 5. Alokasi eksperimen N-of-1 within-subject (control vs candidate) deterministik.
  * 6. Menyediakan potret tunggal Learner State Kanonik (Canonical Learner State) yang
  *    mengonsolidasikan BKT mastery, FSRS memory stability, belief miskonsepsi, dan status afek.
@@ -31,9 +36,9 @@
 
   // In-memory buffer fallback jika localStorage tidak tersedia
   var memoryBuffer = [];
-  var memoryParams = null;
 
-  // Parameter yang boleh disetel sendiri (TUNABLE) di dalam batas kanonik
+  // Batas kanonik parameter yang DULU disetel modul ini. Dipertahankan hanya sebagai rujukan
+  // nilai bawaan; tidak ada lagi jalur yang menggeser nilainya (lihat butir 4 header).
   var TUNABLE = Object.freeze({
     'difficulty.targetSuccess': { default: 0.80, min: 0.70, max: 0.90, step: 0.02 },
     'bkt.T': { default: 0.15, min: 0.05, max: 0.35, step: 0.02 }
@@ -86,33 +91,22 @@
     } catch (_) {}
   }
 
+  /**
+   * Parameter hidup = nilai bawaan, SELALU. Kunci PARAM_STORAGE_KEY sengaja TIDAK dibaca:
+   * perangkat yang sudah dipakai sebelum m025-375 menyimpan targetSuccess hasil penyetel lama
+   * (sering 0.90), dan membacanya berarti murid itu tetap terkunci di soal mudah walau
+   * penyetelnya sudah dimatikan. Kunci itu dihapus saat reset progres (app.js) dan clear().
+   */
   function readParams() {
-    var store = safeStorage();
-    if (!store && memoryParams) return Object.assign({}, memoryParams);
-    try {
-      var raw = store ? store.getItem(PARAM_STORAGE_KEY) : null;
-      if (raw) {
-        var parsed = JSON.parse(raw);
-        if (parsed && typeof parsed === 'object') return parsed;
-      }
-    } catch (_) {}
     return {
       'difficulty.targetSuccess': TUNABLE['difficulty.targetSuccess'].default,
       'bkt.T': TUNABLE['bkt.T'].default,
+      selfTuning: false,
       consecutivePositives: 0,
       consecutiveNegatives: 0,
       activeChange: null,
       adaptationHistory: []
     };
-  }
-
-  function writeParams(params) {
-    memoryParams = Object.assign({}, params);
-    var store = safeStorage();
-    if (!store) return;
-    try {
-      store.setItem(PARAM_STORAGE_KEY, JSON.stringify(params));
-    } catch (_) {}
   }
 
   /**
@@ -309,9 +303,10 @@
   }
 
   /**
-   * 5. BOUNDED AUTONOMOUS LOOP & OUTCOME EVALUATION
-   * Mengukur hasil nyata sesudah keputusan dijalankan dan mengevaluasi keep vs rollback,
-   * serta mengeksekusi self-tuning parameter secara mandiri dan aman.
+   * 5. OUTCOME EVALUATION
+   * Mengukur hasil nyata sesudah keputusan dijalankan dan mencatat rekomendasinya
+   * (keep / modify / rollback) di jejak keputusan. Rekomendasi itu TIDAK lagi menggeser
+   * parameter apa pun - penyetelan otomatis dimatikan owner (butir 4 header).
    */
   function evaluateOutcome(traceId, subsequentObservation) {
     var records = readStore();
@@ -368,54 +363,6 @@
 
     records[idx] = decision;
     writeStore(records);
-
-    // =========================================================================
-    // BOUNDED SELF-TUNING ENGINE (Otonom & Terpagar)
-    // =========================================================================
-    var params = readParams();
-    if (outcomeStatus === 'positive') {
-      params.consecutivePositives = (params.consecutivePositives || 0) + 1;
-      params.consecutiveNegatives = 0;
-
-      // Jika 3 keberhasilan berturut-turut tercatat, coba naikkan targetSuccess secara aman
-      if (params.consecutivePositives >= 3) {
-        var spec = TUNABLE['difficulty.targetSuccess'];
-        var currentTarget = params['difficulty.targetSuccess'] || spec.default;
-        if (currentTarget < spec.max) {
-          var newTarget = Math.min(spec.max, Math.round((currentTarget + spec.step) * 100) / 100);
-          params['difficulty.targetSuccess'] = newTarget;
-          params.activeChange = {
-            path: 'difficulty.targetSuccess',
-            from: currentTarget,
-            to: newTarget,
-            at: Date.now(),
-            reason: 'autonomous_consecutive_success'
-          };
-          params.adaptationHistory.push(Object.assign({}, params.activeChange));
-          params.consecutivePositives = 0; // reset cooldown
-        }
-      }
-    } else if (outcomeStatus === 'negative' || recommendation === 'rollback') {
-      params.consecutiveNegatives = (params.consecutiveNegatives || 0) + 1;
-      params.consecutivePositives = 0;
-
-      // Regresi terdeteksi -> Lakukan ROLLBACK otomatis
-      if (params.activeChange) {
-        var rolled = Object.assign({}, params.activeChange);
-        var rollbackTarget = rolled.from;
-        params[rolled.path] = rollbackTarget;
-        params.adaptationHistory.push({
-          path: rolled.path,
-          from: rolled.to,
-          to: rollbackTarget,
-          at: Date.now(),
-          reason: 'autonomous_regression_rollback'
-        });
-        params.activeChange = null;
-        params.consecutiveNegatives = 0;
-      }
-    }
-    writeParams(params);
 
     return decision;
   }
@@ -490,6 +437,7 @@
       byPresenceState: {},
       byOutcome: { positive: 0, neutral: 0, negative: 0, pending: 0 },
       selfTuning: {
+        enabled: false,
         liveTargetSuccess: params['difficulty.targetSuccess'],
         liveBktT: params['bkt.T'],
         totalAdaptations: (params.adaptationHistory || []).length,
@@ -523,7 +471,6 @@
     assignNof1: assignNof1,
     verifyLedger: verifyLedger,
     readParams: readParams,
-    writeParams: writeParams,
     getDiagnosticsSummary: getDiagnosticsSummary,
     getRecent: function (limit) {
       var n = Number(limit) || 10;
@@ -534,7 +481,6 @@
       if (safeStorage()) {
         try { safeStorage().removeItem(PARAM_STORAGE_KEY); } catch (_) {}
       }
-      memoryParams = null;
     }
   };
 });

@@ -5398,6 +5398,58 @@ html body #app .social-home-launcher .launch-card{background:var(--pz-sky);borde
   transition: width 0.4s var(--ease);
 }
 
+/* m025-375: panel "hasil latihanmu belum bisa dinilai" di Home (OWNER 2026-09-26). */
+.fz-evidence-panel {
+  margin: 10px 0 14px;
+  padding: 12px 14px;
+  background: var(--panel-soft);
+  border: 1px solid var(--surface-edge);
+  border-radius: var(--radius-md);
+}
+.fz-evidence-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  color: var(--text);
+}
+.fz-evidence-body {
+  margin: 6px 0 10px;
+  font-size: 13px;
+  line-height: 1.45;
+}
+.fz-evidence-track {
+  height: 8px;
+  background: var(--line);
+  border-radius: 99px;
+  overflow: hidden;
+}
+.fz-evidence-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--sun), var(--gold));
+  border-radius: 99px;
+  transition: width 0.4s var(--ease);
+}
+.fz-evidence-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-top: 10px;
+  font-size: 12px;
+  flex-wrap: wrap;
+}
+.fz-evidence-cta {
+  min-height: 44px;
+  padding: 0 16px;
+  border-radius: 99px;
+  border: 1px solid var(--surface-edge);
+  background: var(--panel);
+  color: var(--text);
+  font-weight: 700;
+  cursor: pointer;
+}
+
 /* Quick Practice Chips */
 .quick-practice-section {
   margin-top: 18px;

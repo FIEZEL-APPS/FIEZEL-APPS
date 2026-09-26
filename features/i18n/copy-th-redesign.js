@@ -171,6 +171,12 @@
     'today.quiz_suffix': 'ข้อ',
     'today.start_practice_btn': 'เริ่มฝึกฝนตอนนี้ ➔',
     'today.vocab_suffix': 'คำศัพท์',
-    'splash.tagline_for_teacher': 'สำหรับครู'
+    'splash.tagline_for_teacher': 'สำหรับครู',
+    /* m025-375 (OWNER 2026-09-26): panel Home saat hasil latihan masih mengumpulkan jawaban. */
+    'home.bukti-judul': 'ยังประเมินผลการฝึกของคุณไม่ได้',
+    'home.bukti-isi': 'ทำอีก {sisa} ข้อใน {materi} เพื่อให้ FIEZEL ประเมินผลการฝึกของคุณได้อย่างแม่นยำ',
+    'home.bukti-hitung': 'เก็บคำตอบแล้ว {n}/{target} ข้อ',
+    'home.bukti-cta': 'ฝึกต่อ',
+    'home.bukti-aria': 'ความคืบหน้าการเก็บคำตอบเพื่อประเมินผลการฝึก'
   });
 }());

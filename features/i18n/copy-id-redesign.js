@@ -179,6 +179,12 @@
     'today.quiz_suffix': 'Soal',
     'today.start_practice_btn': 'Mulai Latihan Sekarang ➔',
     'today.vocab_suffix': 'Kosakata',
-    'splash.tagline_for_teacher': 'untuk Guru'
+    'splash.tagline_for_teacher': 'untuk Guru',
+    /* m025-375 (OWNER 2026-09-26): panel Home saat hasil latihan masih mengumpulkan jawaban. */
+    'home.bukti-judul': 'Hasil latihanmu belum bisa dinilai',
+    'home.bukti-isi': 'Kerjakan {sisa} soal lagi di {materi} supaya FIEZEL bisa menilai hasil latihanmu dengan akurat.',
+    'home.bukti-hitung': '{n}/{target} jawaban terkumpul',
+    'home.bukti-cta': 'Lanjut latihan',
+    'home.bukti-aria': 'Kemajuan pengumpulan jawaban untuk penilaian latihan'
   });
 }());

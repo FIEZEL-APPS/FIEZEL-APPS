@@ -530,6 +530,11 @@ jobs:
           node tests/brain-sync-failclosed-test.js
           node tests/brain-sync-rebuild-test.js
           node tests/policy-verdict-test.js
+          # m025-375 (OWNER 2026-09-26): hasil sesi dinilai setelah >= 25 jawaban sasaran terkumpul
+          # lintas sesi, dan panel Home memberi tahu murid sisanya. Satu-satunya gerbang yang
+          # memuat stat-gate + policy-verdict bersama app.js - tanpa keduanya verdict selalu null
+          # dan lubang A2 (semua sesi 'mixed') tidak terlihat.
+          node tests/policy-evidence-window-test.js
           node tests/nof1-test.js
           node tests/param-ledger-test.js
           node tests/self-tune-test.js

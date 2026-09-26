@@ -66,7 +66,7 @@
       '    <div id="hud-presence" style="font-weight:800;font-size:12px;color:#2563EB;margin-top:2px;">SILENT (Flow)</div>',
       '  </div>',
       '  <div style="background:#FFF;border:1px solid #E5E7EB;border-radius:8px;padding:6px 10px;">',
-      '    <div style="color:#6B7280;font-size:10px;font-weight:600;">SELF-TUNING</div>',
+      '    <div style="color:#6B7280;font-size:10px;font-weight:600;">TARGET SUKSES</div>',
       '    <div id="hud-target-success" style="font-weight:800;font-size:12px;color:#059669;margin-top:2px;">Target: 80%</div>',
       '  </div>',
       '  <div style="background:#FFF;border:1px solid #E5E7EB;border-radius:8px;padding:6px 10px;">',
@@ -158,7 +158,7 @@
 
   var SIMULATION_STEPS = [
     {
-      learner: '<strong>Andi (Flow Learner)</strong><br><span style="font-size:10px;color:#B45309;">Latency 2.1s · High Accuracy · Self-Tuning</span>',
+      learner: '<strong>Andi (Flow Learner)</strong><br><span style="font-size:10px;color:#B45309;">Latency 2.1s · High Accuracy · Target Tetap</span>',
       action: 'start_quiz',
       delayBefore: 1200
     },
@@ -196,7 +196,8 @@
       choiceIdx: 0,
       delayBefore: 2200,
       onAfter: function () {
-        // Memicu self-tuning
+        // OWNER 2026-09-26 (m025-375): penyetelan targetSuccess otomatis dimatikan - tiga
+        // sukses tidak lagi menaikkan target. HUD menampilkan nilai hidup apa adanya.
         if (root.FiezelDecisionTrace) {
           var params = root.FiezelDecisionTrace.readParams();
           updateHUD({
@@ -204,7 +205,7 @@
             pattern: 'fluent_mastery',
             targetSuccess: params['difficulty.targetSuccess'],
             hash: 'Seq #3 · ' + (root.FiezelDecisionTrace.verifyLedger().latestHash || '').slice(0, 8),
-            alert: '🚀 SELF-TUNING OTONOM: Target naik 0.80 -> ' + params['difficulty.targetSuccess'] + '!'
+            alert: 'Target tetap ' + params['difficulty.targetSuccess'] + ' (penyetel otomatis dimatikan owner).'
           });
         }
       }
@@ -218,7 +219,7 @@
         updateHUD({
           presence: 'CORRECTING (Halus)',
           pattern: 'careless_slip',
-          targetSuccess: 0.82,
+          targetSuccess: 0.80,
           hash: 'Seq #4',
           alert: '⚠️ Kesalahan Pertama: PAW mengoreksi halus, tanpa vonis panik.',
           keepAlert: true
@@ -234,7 +235,7 @@
         updateHUD({
           presence: 'REINFORCING (Ajar Ulang)',
           pattern: 'recurrent_misconception',
-          targetSuccess: 0.82,
+          targetSuccess: 0.80,
           hash: 'Seq #5',
           alert: '📚 Miskonsepsi Terdeteksi! Perancah naik ke worked-example.',
           keepAlert: true
@@ -254,7 +255,7 @@
             pattern: 'cognitive_struggle',
             targetSuccess: params['difficulty.targetSuccess'],
             hash: 'Seq #6',
-            alert: '🛑 REGRESI TERDETEKSI: Rollback parameter targetSuccess kembali ke 0.80!',
+            alert: '🛑 REGRESI TERDETEKSI: rekomendasi rollback dicatat di jejak; parameter tidak digeser.',
             alertType: 'rollback',
             keepAlert: true
           });

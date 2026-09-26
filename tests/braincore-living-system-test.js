@@ -391,48 +391,64 @@ test('Scenario J · Rantai hash kriptografis anti-rusak (tamper-evident): verifi
 });
 
 // =========================================================================
-// Scenario K: Autonomous Bounded Self-Tuning & Rollback
+// Scenario K: Penyetelan targetSuccess otomatis DIMATIKAN (OWNER 2026-09-26, m025-375)
 // =========================================================================
-test('Scenario K · Mesin self-tuning otonom: adaptasi parameter targetSuccess pada 3 sukses berturut-turut & rollback saat regresi', () => {
+// Skenario ini dulu membuktikan kebalikannya: tiga sukses menaikkan targetSuccess 0.80 -> 0.82.
+// Audit braincore A1 menunjukkan penyetel itu tanpa pagar dan mengunci murid di soal mudah
+// (median jawaban ke-16..31 sudah mentok 0.90), lalu owner mematikannya. Yang dijaga sekarang:
+// hasil sebanyak apa pun tidak menggeser parameter, dan sisa setelan lama di perangkat diabaikan.
+test('Scenario K · Penyetelan targetSuccess otomatis mati: sukses beruntun maupun regresi tidak menggeser parameter', () => {
   decisionTrace.clear();
 
   const initialParams = decisionTrace.readParams();
   assert.strictEqual(initialParams['difficulty.targetSuccess'], 0.80);
-  assert.strictEqual(initialParams.consecutivePositives, 0);
+  assert.strictEqual(initialParams.selfTuning, false);
 
-  // 3 Keputusan sukses berturut-turut
-  const d1 = decisionTrace.recordDecision({ action: 'practice', nowMs: 1700000030000 });
-  decisionTrace.evaluateOutcome(d1.traceId, { correct: true, latencyMs: 2200 });
+  // Sepuluh keputusan sukses beruntun - dulu cukup tiga untuk menaikkan target.
+  for (let i = 0; i < 10; i++) {
+    const d = decisionTrace.recordDecision({ action: 'practice', nowMs: 1700000030000 + i * 1000 });
+    const evaluated = decisionTrace.evaluateOutcome(d.traceId, { correct: true, latencyMs: 2200 });
+    assert.strictEqual(evaluated.outcome.status, 'positive', 'evaluasi hasil tetap berjalan');
+  }
+  let afterSuccess = decisionTrace.readParams();
+  assert.strictEqual(afterSuccess['difficulty.targetSuccess'], 0.80, 'sukses beruntun tidak boleh menaikkan targetSuccess');
+  assert.strictEqual(afterSuccess.activeChange, null);
+  assert.strictEqual(afterSuccess.adaptationHistory.length, 0);
 
-  const d2 = decisionTrace.recordDecision({ action: 'practice', nowMs: 1700000031000 });
-  decisionTrace.evaluateOutcome(d2.traceId, { correct: true, latencyMs: 2100 });
+  // Regresi pun tidak menulis apa pun.
+  const d4 = decisionTrace.recordDecision({ action: 'scaffold_hint', nowMs: 1700000045000 });
+  const failed = decisionTrace.evaluateOutcome(d4.traceId, { correct: false, latencyMs: 8500 });
+  assert.strictEqual(failed.outcome.recommendation, 'modify', 'rekomendasi tetap tercatat di jejak');
+  assert.strictEqual(decisionTrace.readParams()['difficulty.targetSuccess'], 0.80);
 
-  let midParams = decisionTrace.readParams();
-  assert.strictEqual(midParams['difficulty.targetSuccess'], 0.80);
-  assert.strictEqual(midParams.consecutivePositives, 2);
+  const summary = decisionTrace.getDiagnosticsSummary();
+  assert.strictEqual(summary.selfTuning.enabled, false);
+  assert.strictEqual(summary.selfTuning.totalAdaptations, 0);
+  assert.strictEqual(typeof decisionTrace.writeParams, 'undefined', 'tidak ada lagi pintu tulis parameter');
 
-  // Sukses ke-3 memicu adaptasi otonom (+0.02)
-  const d3 = decisionTrace.recordDecision({ action: 'practice', nowMs: 1700000032000 });
-  decisionTrace.evaluateOutcome(d3.traceId, { correct: true, latencyMs: 2300 });
+  decisionTrace.clear();
+});
 
-  let tunedParams = decisionTrace.readParams();
-  assert.strictEqual(tunedParams['difficulty.targetSuccess'], 0.82);
-  assert.strictEqual(tunedParams.consecutivePositives, 0); // cooldown reset
-  assert.ok(tunedParams.activeChange);
-  assert.strictEqual(tunedParams.activeChange.path, 'difficulty.targetSuccess');
-  assert.strictEqual(tunedParams.activeChange.from, 0.80);
-  assert.strictEqual(tunedParams.activeChange.to, 0.82);
-  assert.strictEqual(tunedParams.adaptationHistory.length, 1);
-
-  // Muncul kegagalan intervensi / regresi
-  const d4 = decisionTrace.recordDecision({ action: 'scaffold_hint', nowMs: 1700000033000 });
-  decisionTrace.evaluateOutcome(d4.traceId, { correct: false, latencyMs: 8500 }); // regresi terdeteksi!
-
-  let rolledParams = decisionTrace.readParams();
-  assert.strictEqual(rolledParams['difficulty.targetSuccess'], 0.80); // Rollback sukses dieksekusi!
-  assert.strictEqual(rolledParams.activeChange, null);
-  assert.strictEqual(rolledParams.adaptationHistory.length, 2);
-  assert.strictEqual(rolledParams.adaptationHistory[1].reason, 'autonomous_regression_rollback');
+test('Scenario K2 · Setelan lama 0.90 yang tersisa di perangkat diabaikan', () => {
+  // Perangkat yang dipakai sebelum m025-375 masih menyimpan targetSuccess hasil penyetel lama.
+  // Membacanya berarti murid itu tetap terkunci di soal mudah walau penyetelnya sudah mati.
+  const store = {};
+  const prev = globalThis.localStorage;
+  globalThis.localStorage = {
+    getItem: (k) => (Object.prototype.hasOwnProperty.call(store, k) ? store[k] : null),
+    setItem: (k, v) => { store[k] = String(v); },
+    removeItem: (k) => { delete store[k]; }
+  };
+  try {
+    store['fiezel-live-params-v1'] = JSON.stringify({ 'difficulty.targetSuccess': 0.9, consecutivePositives: 2, activeChange: { path: 'difficulty.targetSuccess', from: 0.88, to: 0.9 }, adaptationHistory: [{}, {}] });
+    const params = decisionTrace.readParams();
+    assert.strictEqual(params['difficulty.targetSuccess'], 0.80, 'sisa setelan lama tidak boleh dibaca');
+    assert.strictEqual(params.activeChange, null);
+    decisionTrace.clear();
+    assert.strictEqual(store['fiezel-live-params-v1'], undefined, 'clear() membuang sisa setelan lama');
+  } finally {
+    if (prev === undefined) delete globalThis.localStorage; else globalThis.localStorage = prev;
+  }
 });
 
 // =========================================================================

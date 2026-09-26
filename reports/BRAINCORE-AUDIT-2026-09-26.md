@@ -33,8 +33,8 @@ Dengan kata lain: jalur "otonom yang aman" mati, jalur "otonom tanpa pagar" hidu
 
 | ID | Tingkat | Area | Temuan | Status |
 |----|---------|------|--------|--------|
-| A1 | **Tinggi** | learner-flow | Penyetel kedua tanpa pagar menaikkan `targetSuccess` hidup ke 0.90 | Butuh keputusan owner |
-| A2 | **Tinggi** | app.js / stat-gate | Verdict kebijakan selalu `hold` → outcome sesi terkunci `mixed`, `FiezelSelfTune` tidak pernah apply/rollback | Butuh keputusan owner |
+| A1 | **Tinggi** | learner-flow | Penyetel kedua tanpa pagar menaikkan `targetSuccess` hidup ke 0.90 | **Diperbaiki** (owner: matikan) — §7 |
+| A2 | **Tinggi** | app.js / stat-gate | Verdict kebijakan selalu `hold` → outcome sesi terkunci `mixed`, `FiezelSelfTune` tidak pernah apply/rollback | **Diperbaiki** (owner: kumpulkan lintas sesi + panel Home) — §7 |
 | A3 | Sedang | app.js self-tune | Override self-tune tidak dibaca runtime; rollback menghapus override alih-alih memulihkan `from` (ledger ≠ nilai efektif) | Butuh keputusan owner (satu paket dengan A2) |
 | B1 | Sedang | app.js + i18n | Kartu "akar masalah" menyebut prasyarat dua kali, gejalanya hilang | **Diperbaiki** + gerbang baru |
 | B2 | Sedang | reset progres | Kunci decision trace & parameter hidup selamat dari "Reset progres" | **Diperbaiki** + gerbang R5 |
@@ -240,3 +240,35 @@ terbaca "45% murid belum mastery" padahal 100%. Rekomendasi: hitung murid, bukan
 3. **A3:** satu sumber parameter hidup — `FiezelSelfTune` + ledger — dan rollback yang memulihkan nilai.
 4. **B6:** apakah mastery/unlock boleh meluruh?
 5. **B8:** tambah langkah CI Python untuk `backend/unit_test.py`?
+
+---
+
+## 7. Keputusan owner 2026-09-26 dan yang sudah dikerjakan
+
+**A1 — dimatikan.** `FiezelDecisionTrace.evaluateOutcome()` tidak lagi menulis parameter;
+`readParams()` selalu mengembalikan bawaan (0.80) dan mengabaikan sisa setelan lama di perangkat
+(banyak murid sudah tersimpan 0.90); `affectTargetSuccess()` memakai base tetap 0.80 — satu-satunya
+geseran yang tersisa adalah afek sesi berjalan, dan tidak disimpan. Scenario K/K2
+(`braincore-living-system-test`) dan Invariant 5/10 (`braincore-runtime-e2e-proof`) ditulis ulang:
+Invariant 10 kini membuktikan bukti mengubah soal berikutnya lewat **kemampuan** (2.0 → ≈3.49,
+target tetap 0.80, soal yang lebih menantang terpilih), bukan lewat target yang dimudahkan.
+
+**A2 — bukti dikumpulkan lintas sesi.** Satu jendela per sasaran: kandidat = sesi-sesi yang masih
+mengumpulkan + sesi ini; kontrol = semua outcome sasaran itu sebelum jendela. Di bawah 25 jawaban
+sasaran (lantai `FiezelStatGate`) sesi berstatus `insufficient` / `collect_more_evidence`
+("Belum cukup data" / "Perlu lebih banyak latihan dulu") dan kebijakan tetap bertindak atas
+penilaian terakhir. Pada ≥ 25 jendela dinilai sekali lalu ditutup: verdict bila ada pembanding
+yang cukup, status deskriptif bila belum. Gerbang baru `tests/policy-evidence-window-test.js`
+(W1–W9) — satu-satunya gerbang yang memuat stat-gate + policy-verdict bersama app.js.
+
+**Panel Home.** Selama jendela mengumpulkan, Home menampilkan "Hasil latihanmu belum bisa dinilai
+— kerjakan N soal lagi di {materi}", bilah kemajuan `n/25`, dan tombol "Lanjut latihan"
+(id + th). Panel hilang begitu penilaian keluar.
+
+**Catatan untuk A3.** `sanitizePolicyOutcome` membuang field `verdict` dari riwayat, sehingga
+`selfTuneAfterOutcome` selalu menerima `verdict=null` — alasan KETIGA `FiezelSelfTune` diam. Ini
+sengaja dibiarkan: satu-satunya langkah self-tune adalah menaikkan `targetSuccess` (soal lebih
+mudah) setiap verdict `promote` yang diukur dari akurasi — kelas cacat yang sama dengan A1.
+Penyambungannya menunggu keputusan owner tentang ukuran yang tidak bisa "dimenangkan" dengan
+memudahkan soal.
+
