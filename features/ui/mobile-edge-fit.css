@@ -1,0 +1,2583 @@
+/* ==========================================================================
+   FIEZEL MOBILE EDGE-FIT & DUOLINGO-GRADE LAYOUT REFINEMENTS
+   Enforces 100% full-width edge-to-edge topbar, docked bottombar, and
+   viewport-fitted login screen for mobile devices.
+   ========================================================================== */
+
+/* 1. Viewport & App Container */
+@media (max-width: 768px) {
+  html, body {
+    overflow-x: hidden !important;
+    background: #0A0A0E !important;
+  }
+
+  main.app,
+  .app,
+  body.fz-lux .app,
+  html body.fz-lang-ja .app {
+    max-width: 100% !important;
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 0 0 calc(84px + env(safe-area-inset-bottom)) 0 !important;
+    box-sizing: border-box !important;
+  }
+
+  /* Inner view content below topbar gets comfortable screen padding */
+  .app > *:not(.topbar):not(#globalSky):not(.notification-panel):not(.auth-panel):not(.modal-panel):not(.listening-modal),
+  #appInner,
+  .home-today,
+  .section-head,
+  .quick-practice-section {
+    padding-left: 16px !important;
+    padding-right: 16px !important;
+    box-sizing: border-box !important;
+  }
+}
+
+/* 2. Topbar: 100% Full-Width Edge-to-Edge */
+.topbar,
+header.topbar,
+body.fz-lux .topbar,
+html body.fz-lang-ja .topbar {
+  position: sticky !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  margin: 0 !important;
+  border-radius: 0 !important;
+  border-left: none !important;
+  border-right: none !important;
+  border-top: none !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.45) !important;
+  padding: max(10px, env(safe-area-inset-top)) 16px 10px 16px !important;
+  background: rgba(14, 14, 20, 0.94) !important;
+  backdrop-filter: blur(24px) !important;
+  -webkit-backdrop-filter: blur(24px) !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 12px !important;
+  z-index: 100 !important;
+  box-sizing: border-box !important;
+}
+
+/* Universal topbar is used across all screens including Home; hide duplicate in-page topbar */
+.fz-home-topbar,
+.fz-sports-topbar {
+  display: none !important;
+}
+
+.fz-home-brand-wrap {
+  display: inline-flex !important;
+  align-items: center !important;
+  cursor: pointer !important;
+}
+
+.fz-home-brand-wrap svg.fiezel-wordmark {
+  height: 24px !important;
+  width: auto !important;
+  max-width: 110px !important;
+  display: block !important;
+  filter: drop-shadow(0 2px 8px rgba(255, 217, 79, 0.35)) !important;
+}
+
+/* 3. Bottom Navigation Bar: Docked Full-Width (Duolingo Style) */
+nav.bottomnav,
+.bottomnav,
+html body nav.bottomnav,
+html body.fz-lang-ja nav.bottomnav,
+html body.fz-lux nav.bottomnav,
+html.fiezel-ui-v6 body.fz-lux .bottomnav {
+  position: fixed !important;
+  bottom: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  margin: 0 !important;
+  border-radius: 0 !important;
+  border-left: none !important;
+  border-right: none !important;
+  border-bottom: none !important;
+  border-top: 1px solid rgba(255, 255, 255, 0.08) !important;
+  background: rgba(14, 14, 20, 0.96) !important;
+  backdrop-filter: blur(24px) !important;
+  -webkit-backdrop-filter: blur(24px) !important;
+  box-shadow: 0 -4px 24px rgba(0, 0, 0, 0.5) !important;
+  padding: 6px 0 max(10px, env(safe-area-inset-bottom)) 0 !important;
+  display: grid !important;
+  grid-template-columns: repeat(5, 1fr) !important;
+  gap: 0 !important;
+  transform: none !important;
+  z-index: 1000 !important;
+  box-sizing: border-box !important;
+}
+
+nav.bottomnav .nav,
+.bottomnav .nav,
+html body.fz-lang-ja nav.bottomnav .nav {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 3px !important;
+  padding: 4px 2px !important;
+  min-height: 48px !important;
+  background: transparent !important;
+  border: none !important;
+  border-radius: 0 !important;
+  transform: none !important;
+  box-shadow: none !important;
+  color: #8E8E98 !important;
+  cursor: pointer !important;
+  outline: none !important;
+  transition: color 0.15s ease, transform 0.15s ease !important;
+}
+
+nav.bottomnav .nav:active,
+.bottomnav .nav:active {
+  transform: scale(0.92) !important;
+}
+
+nav.bottomnav .nav.active,
+.bottomnav .nav.active,
+html body.fz-lang-ja nav.bottomnav .nav.active {
+  color: #FFE02E !important;
+  background: transparent !important;
+  transform: none !important;
+}
+
+nav.bottomnav .nav .fz-i,
+.bottomnav .nav .fz-i,
+html body.fz-lang-ja nav.bottomnav .nav .fz-i {
+  width: 22px !important;
+  height: 22px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  --fz-i-fill: transparent !important;
+  --fz-i-line: #8E8E98 !important;
+  transition: all 0.15s ease !important;
+}
+
+nav.bottomnav .nav.active .fz-i,
+.bottomnav .nav.active .fz-i,
+html body.fz-lang-ja nav.bottomnav .nav.active .fz-i {
+  --fz-i-fill: #FFE02E !important;
+  --fz-i-line: #FFE02E !important;
+  filter: drop-shadow(0 2px 8px rgba(255, 224, 46, 0.45)) !important;
+}
+
+nav.bottomnav .nav span,
+.bottomnav .nav span,
+html body.fz-lang-ja nav.bottomnav .nav span {
+  font-size: 11px !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.01em !important;
+  line-height: 1 !important;
+  color: inherit !important;
+}
+
+nav.bottomnav .nav.active span,
+.bottomnav .nav.active span,
+html body.fz-lang-ja nav.bottomnav .nav.active span {
+  color: #FFE02E !important;
+}
+
+/* 4. Auth & Login Screen: 100% Viewport-Fit (No Scroll Required) */
+body:has(.fz-auth) {
+  overflow: hidden !important;
+  height: 100vh !important;
+}
+
+.fz-auth {
+  position: fixed !important;
+  inset: 0 !important;
+  width: 100% !important;
+  height: 100dvh !important;
+  max-height: 100dvh !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: space-between !important;
+  overflow-y: auto !important;
+  overscroll-behavior: contain !important;
+  scrollbar-width: none !important;
+  background: #FBF7F3 !important;
+  box-sizing: border-box !important;
+  z-index: 2147481950 !important;
+}
+
+.fz-auth::-webkit-scrollbar {
+  display: none !important;
+}
+
+.fz-auth-hero.is-masuk {
+  flex: 0 0 auto !important;
+  min-height: 14vh !important;
+  max-height: 16vh !important;
+  padding: max(14px, calc(env(safe-area-inset-top) + 8px)) 20px 24px !important;
+}
+
+.fz-auth-hero.is-masuk .fz-auth-brand .fiezel-wordmark {
+  width: min(36vw, 140px) !important;
+}
+
+.fz-auth-wave {
+  height: 32px !important;
+}
+
+.fz-auth-body {
+  flex: 1 1 auto !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: space-between !important;
+  padding: 4px 20px max(16px, env(safe-area-inset-bottom)) 20px !important;
+  max-width: 440px !important;
+  margin: 0 auto !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+}
+
+.fz-auth-title {
+  font-size: 1.6rem !important;
+  line-height: 1.1 !important;
+  margin: 0 0 8px 0 !important;
+}
+
+.fz-auth-roles {
+  margin: 0 0 8px !important;
+  padding: 3px !important;
+}
+
+.fz-auth-role {
+  padding: 7px 10px !important;
+  font-size: 0.88rem !important;
+}
+
+.fz-auth-google {
+  min-height: 38px !important;
+  height: 38px !important;
+}
+
+.fz-auth-or {
+  margin: 6px 0 2px !important;
+  font-size: 0.75rem !important;
+}
+
+.fz-auth-form {
+  gap: 8px !important;
+  margin-top: 2px !important;
+}
+
+.fz-auth-field {
+  gap: 3px !important;
+}
+
+.fz-auth-label {
+  font-size: 0.82rem !important;
+}
+
+.fz-auth-input {
+  padding: 2px 0 !important;
+}
+
+.fz-auth .fz-auth-input input[name] {
+  min-height: 34px !important;
+  padding: 4px 0 !important;
+  font-size: 0.92rem !important;
+}
+
+.fz-auth-row {
+  margin-top: -2px !important;
+}
+
+.fz-auth .fz-auth-link {
+  font-size: 0.8rem !important;
+}
+
+.fz-auth .fz-auth-submit {
+  width: 100% !important;
+  margin-top: 10px !important;
+  padding: 13px 20px !important;
+  font-size: 1rem !important;
+  font-weight: 800 !important;
+  border-radius: 9999px !important;
+  background: linear-gradient(135deg, #FFE048 0%, #FFB800 100%) !important;
+  color: #0F0E11 !important;
+  border: none !important;
+  box-shadow: 0 4px 18px rgba(255, 184, 0, 0.35) !important;
+  cursor: pointer !important;
+}
+
+/* 5. Welcome Screen Compactness */
+.fz-auth-hero.is-welcome {
+  min-height: 45vh !important;
+  max-height: 50vh !important;
+}
+.fz-auth-hero.is-welcome .fz-auth-paw {
+  width: 90px !important;
+  height: 90px !important;
+}
+
+/* 6. Topbar Flag Switch Button (media_1790431262884.jpg) */
+.course-switch-btn,
+#fzCourseSwitchBtn {
+  width: 44px !important;
+  height: 44px !important;
+  min-width: 44px !important;
+  border-radius: 50% !important;
+  background: #181822 !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 0 !important;
+  cursor: pointer !important;
+  outline: none !important;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.35) !important;
+  transition: all 0.2s ease !important;
+}
+
+.course-switch-btn:hover {
+  background: #222230 !important;
+  border-color: rgba(255, 224, 46, 0.4) !important;
+}
+
+.course-switch-flag {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 100% !important;
+  height: 100% !important;
+}
+
+.course-switch-flag svg {
+  display: block !important;
+  width: 22px !important;
+  height: 15px !important;
+  border-radius: 2px !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4) !important;
+}
+
+.course-switch-label {
+  display: none !important;
+}
+
+/* 7. Stadium Match Cards (media_1790431262884.jpg) */
+/* 7. Greeting & Motivational Header */
+.fz-welcome-header {
+  padding: 6px 4px 18px 4px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 6px !important;
+  text-align: left !important;
+}
+
+.fz-greet-title {
+  font-size: 26px !important;
+  font-weight: 800 !important;
+  color: #FFFFFF !important;
+  letter-spacing: -0.02em !important;
+  line-height: 1.2 !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+}
+
+.fz-greet-motivation {
+  font-size: 13.5px !important;
+  line-height: 1.5 !important;
+  color: rgba(255, 255, 255, 0.75) !important;
+  margin: 0 !important;
+  font-weight: 500 !important;
+}
+
+.fz-stadium-card {
+  width: 100% !important;
+  border-radius: 26px !important;
+  overflow: hidden !important;
+  position: relative !important;
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.6) !important;
+  margin-bottom: 16px !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  cursor: pointer !important;
+  transition: transform 0.18s ease, box-shadow 0.18s ease !important;
+  background: #14141A !important;
+}
+
+.fz-stadium-card:active {
+  transform: scale(0.985) !important;
+}
+
+/* Recessed Notch at top center */
+.fz-stadium-notch {
+  position: absolute !important;
+  top: 0 !important;
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+  width: 92px !important;
+  height: 9px !important;
+  background: #0A0A0E !important;
+  border-radius: 0 0 10px 10px !important;
+  z-index: 10 !important;
+}
+
+/* Top Header Section */
+.fz-stadium-header {
+  background: linear-gradient(180deg, #FFE02E 0%, #FFD41D 100%) !important;
+  padding: 24px 20px 18px 20px !important;
+  position: relative !important;
+  color: #0A0A0E !important;
+}
+
+.fz-stadium-header.is-silver {
+  background: linear-gradient(180deg, #E6EAF0 0%, #CBD3E1 100%) !important;
+  color: #0A0A0E !important;
+}
+
+.fz-stadium-header.is-dark {
+  background: linear-gradient(180deg, #1E293B 0%, #0F172A 100%) !important;
+  color: #FFFFFF !important;
+}
+
+/* Vocab Header for Card 1 (Badge-free) */
+.fz-stadium-vocab-header {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: flex-start !important;
+  gap: 8px !important;
+  text-align: left !important;
+}
+
+.fz-stadium-vocab-top {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  width: 100% !important;
+  margin-bottom: 2px !important;
+}
+
+.fz-vocab-kicker-tag {
+  font-size: 11px !important;
+  font-weight: 800 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.06em !important;
+  color: #0A0A0E !important;
+  background: rgba(0, 0, 0, 0.08) !important;
+  border-radius: 9999px !important;
+  padding: 3px 10px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 4px !important;
+}
+
+.fz-vocab-kicker-tag.is-silver-tag {
+  color: #1E293B !important;
+  background: rgba(0, 0, 0, 0.07) !important;
+}
+
+.fz-vocab-kicker-tag.is-dark-tag {
+  color: #38BDF8 !important;
+  background: rgba(56, 189, 248, 0.15) !important;
+}
+
+.fz-vocab-level-tag {
+  font-size: 11px !important;
+  font-weight: 800 !important;
+  color: #0A0A0E !important;
+  background: rgba(0, 0, 0, 0.08) !important;
+  border-radius: 9999px !important;
+  padding: 3px 8px !important;
+}
+
+.fz-vocab-level-tag.is-silver-tag {
+  color: #475569 !important;
+  background: rgba(0, 0, 0, 0.06) !important;
+}
+
+.fz-vocab-level-tag.is-dark-tag {
+  color: #E2E8F0 !important;
+  background: rgba(255, 255, 255, 0.1) !important;
+}
+
+.fz-vocab-hero-content {
+  width: 100% !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 3px !important;
+}
+
+.fz-vocab-word-title {
+  font-size: 24px !important;
+  font-weight: 900 !important;
+  letter-spacing: -0.02em !important;
+  color: #0A0A0E !important;
+  line-height: 1.15 !important;
+}
+
+.fz-vocab-word-phonetic {
+  font-size: 12px !important;
+  font-weight: 600 !important;
+  color: rgba(10, 10, 14, 0.65) !important;
+  margin-bottom: 2px !important;
+}
+
+.fz-vocab-word-meaning {
+  font-size: 13.5px !important;
+  font-weight: 700 !important;
+  color: #1E293B !important;
+  line-height: 1.35 !important;
+}
+
+.fz-vocab-word-example {
+  font-size: 12px !important;
+  font-style: italic !important;
+  color: rgba(10, 10, 14, 0.72) !important;
+  line-height: 1.4 !important;
+  margin-top: 4px !important;
+  padding-left: 8px !important;
+  border-left: 2.5px solid rgba(0, 0, 0, 0.25) !important;
+}
+
+/* Clean Header for Cards 2 and 3 */
+.fz-stadium-clean-header {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: flex-start !important;
+  gap: 8px !important;
+}
+
+.fz-clean-header-content {
+  width: 100% !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 4px !important;
+  text-align: left !important;
+}
+
+.fz-clean-header-title {
+  font-size: 20px !important;
+  font-weight: 800 !important;
+  letter-spacing: -0.01em !important;
+  line-height: 1.2 !important;
+}
+
+.fz-stadium-header.is-silver .fz-clean-header-title {
+  color: #0F172A !important;
+}
+
+.fz-stadium-header.is-dark .fz-clean-header-title {
+  color: #F8FAFC !important;
+}
+
+.fz-clean-header-sub {
+  font-size: 12.5px !important;
+  line-height: 1.4 !important;
+  font-weight: 500 !important;
+}
+
+.fz-stadium-header.is-silver .fz-clean-header-sub {
+  color: #475569 !important;
+}
+
+.fz-stadium-header.is-dark .fz-clean-header-sub {
+  color: #94A3B8 !important;
+}
+
+.fz-stadium-vs {
+  width: 36px !important;
+  height: 36px !important;
+  border-radius: 50% !important;
+  background: #0A0A0E !important;
+  color: #FFFFFF !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  font-size: 12px !important;
+  font-weight: 900 !important;
+  letter-spacing: 0.05em !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35) !important;
+  border: 2px solid rgba(255, 255, 255, 0.2) !important;
+  flex-shrink: 0 !important;
+}
+
+/* White Base Section */
+.fz-stadium-body {
+  background: #FFFFFF !important;
+  color: #0A0A0E !important;
+  padding: 18px 20px 20px 20px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 14px !important;
+}
+
+.fz-stadium-metrics-row {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 8px !important;
+}
+
+.fz-stadium-chip {
+  border: 1.5px dashed rgba(0, 0, 0, 0.22) !important;
+  border-radius: 9999px !important;
+  padding: 9px 14px !important;
+  font-size: 12px !important;
+  font-weight: 800 !important;
+  color: #0A0A0E !important;
+  letter-spacing: 0.03em !important;
+  white-space: nowrap !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+.fz-stadium-chip.is-xp {
+  color: #0A0A0E !important;
+  background: rgba(255, 224, 46, 0.14) !important;
+  border-color: rgba(220, 170, 0, 0.45) !important;
+}
+
+.fz-stadium-chip.is-gain {
+  color: #059669 !important;
+  border-color: rgba(5, 150, 105, 0.4) !important;
+  background: rgba(5, 150, 105, 0.08) !important;
+}
+
+.fz-stadium-chip.is-streak {
+  color: #EA580C !important;
+  border-color: rgba(234, 88, 12, 0.4) !important;
+  background: rgba(234, 88, 12, 0.08) !important;
+}
+
+.fz-stadium-center-time {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  text-align: center !important;
+}
+
+.fz-stadium-center-time .fz-time-val {
+  font-size: 28px !important;
+  font-weight: 900 !important;
+  letter-spacing: -0.04em !important;
+  color: #0A0A0E !important;
+  line-height: 1 !important;
+}
+
+.fz-stadium-center-time .fz-date-val {
+  font-size: 9.5px !important;
+  font-weight: 800 !important;
+  color: #64748B !important;
+  letter-spacing: 0.06em !important;
+  text-transform: uppercase !important;
+  margin-top: 4px !important;
+}
+
+.fz-stadium-info-desc {
+  font-size: 12.5px !important;
+  line-height: 1.45 !important;
+  color: #475569 !important;
+  margin: 0 !important;
+}
+
+.fz-stadium-info-desc strong {
+  color: #0A0A0E !important;
+  font-weight: 800 !important;
+}
+
+.fz-stadium-cta-btn {
+  width: 100% !important;
+  padding: 14px 20px !important;
+  border-radius: 9999px !important;
+  background: #FFE02E !important;
+  color: #0A0A0E !important;
+  font-size: 13.5px !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.02em !important;
+  border: none !important;
+  cursor: pointer !important;
+  box-shadow: 0 4px 14px rgba(255, 224, 46, 0.45) !important;
+  transition: transform 0.15s ease !important;
+  text-align: center !important;
+}
+
+.fz-stadium-cta-btn:active {
+  transform: scale(0.97) !important;
+}
+
+.fz-stadium-cta-btn.is-silver-btn {
+  background: #0A0A0E !important;
+  color: #FFFFFF !important;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25) !important;
+}
+
+.fz-stadium-cta-btn.is-dark-btn {
+  background: #0F172A !important;
+  color: #FFE02E !important;
+  box-shadow: 0 4px 14px rgba(15, 23, 42, 0.3) !important;
+}
+
+/* Footer notch bar */
+.fz-stadium-footer-notch {
+  background: #F8FAFC !important;
+  border-top: 1px solid #E2E8F0 !important;
+  padding: 10px 18px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  font-size: 11px !important;
+  font-weight: 800 !important;
+  color: #64748B !important;
+  letter-spacing: 0.04em !important;
+  position: relative !important;
+}
+
+.fz-stadium-footer-notch::after {
+  content: '' !important;
+  position: absolute !important;
+  bottom: 0 !important;
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+  width: 76px !important;
+  height: 6px !important;
+  background: #0A0A0E !important;
+  border-radius: 8px 8px 0 0 !important;
+}
+
+/* ==========================================================================
+   HIGH-CONTRAST DARK THEME OVERHAUL
+   Ensures zero invisible dark-on-dark text across the entire application.
+   ========================================================================== */
+
+:root {
+  --bg: #0A0A0E !important;
+  --text: #F8FAFC !important;
+  --ink: #F8FAFC !important;
+  --black: #F8FAFC !important;
+  --muted: #94A3B8 !important;
+  --muted-soft: #64748B !important;
+  --ambient-text: #F8FAFC !important;
+  --ambient-muted: #94A3B8 !important;
+  --panel: #14141E !important;
+  --panel-soft: #1E1E2A !important;
+  --surface: #14141E !important;
+  --surface-solid: #14141E !important;
+  --line: rgba(255, 255, 255, 0.12) !important;
+  --line-soft: rgba(255, 255, 255, 0.08) !important;
+  --line-strong: rgba(255, 255, 255, 0.2) !important;
+}
+
+html, body {
+  background: #0A0A0E !important;
+  color: #F8FAFC !important;
+}
+
+/* Headings on dark backgrounds */
+h1, h2, h3, h4, h5, h6 {
+  color: #FFFFFF !important;
+}
+
+/* Common text elements defaulting to readable light colors on dark surfaces */
+.home-page,
+.section-head,
+.home-section-head,
+.learning-launcher,
+.home-today {
+  color: #F8FAFC !important;
+}
+
+.home-section-head h2,
+.section-head h1 {
+  color: #FFFFFF !important;
+  font-weight: 800 !important;
+}
+
+.section-head p,
+.home-section-head p,
+p.muted,
+span.muted,
+small.muted,
+.quick-practice-hint {
+  color: #94A3B8 !important;
+  font-weight: 500 !important;
+}
+
+/* Launch Cards (Latihan & Home) */
+.launch-card,
+button.launch-card {
+  background: #151520 !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  color: #F8FAFC !important;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35) !important;
+}
+
+.launch-card:active {
+  background: #1C1C2C !important;
+}
+
+.launch-card span b,
+.launch-card b {
+  color: #FFFFFF !important;
+  font-weight: 800 !important;
+}
+
+.launch-card span small,
+.launch-card small {
+  color: #94A3B8 !important;
+  font-weight: 600 !important;
+}
+
+.launch-card .launch-icon {
+  background: #202030 !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+}
+
+.launch-card i[data-lucide],
+.launch-card .launch-arrow {
+  color: #94A3B8 !important;
+}
+
+/* Active Level Control Pill (in Latihan & Home) */
+.active-level-control {
+  background: #151520 !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  color: #F8FAFC !important;
+}
+
+.active-level-control span {
+  color: #94A3B8 !important;
+  font-weight: 700 !important;
+}
+
+.active-level-control strong {
+  color: #FFE02E !important;
+  font-weight: 900 !important;
+}
+
+.active-level-control small {
+  color: #E2E8F0 !important;
+  font-weight: 700 !important;
+}
+
+/* Details Drawer below stadium cards */
+.fz-card-drawer {
+  background: #151520 !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  border-radius: 20px !important;
+  overflow: hidden !important;
+  margin-top: 14px !important;
+}
+
+.fz-drawer-toggle {
+  background: #1A1A28 !important;
+  color: #F8FAFC !important;
+  font-weight: 800 !important;
+  padding: 14px 18px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  cursor: pointer !important;
+}
+
+.fz-drawer-toggle span {
+  color: #F8FAFC !important;
+  font-weight: 800 !important;
+}
+
+.fz-drawer-inner {
+  padding: 16px 18px !important;
+  color: #F8FAFC !important;
+}
+
+.fz-drawer-inner .today-eyebrow {
+  color: #94A3B8 !important;
+  font-weight: 800 !important;
+}
+
+.fz-drawer-inner .today-title {
+  color: #FFFFFF !important;
+  font-weight: 800 !important;
+}
+
+.fz-drawer-inner .today-lead {
+  color: #CBD5E1 !important;
+}
+
+.fz-drawer-inner .today-isi-head {
+  color: #FFFFFF !important;
+  font-weight: 800 !important;
+}
+
+.fz-drawer-inner .today-blocks li {
+  background: #202030 !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  color: #FFFFFF !important;
+}
+
+.fz-drawer-inner .today-blocks li b {
+  color: #FFFFFF !important;
+}
+
+.fz-drawer-inner .today-blocks li span {
+  color: #94A3B8 !important;
+}
+
+.fz-drawer-inner .today-rhythm-bar {
+  color: #F8FAFC !important;
+  font-weight: 700 !important;
+}
+
+.fz-drawer-inner .today-rhythm-bar span {
+  color: #F8FAFC !important;
+}
+
+.fz-drawer-inner .today-rhythm-bar span b {
+  color: #FFFFFF !important;
+}
+
+.fz-drawer-inner .today-streak {
+  color: #F97316 !important;
+  font-weight: 800 !important;
+}
+
+/* Mascot Speech Bubble & Coach Strip */
+.paw-hero-cockpit {
+  background: #151520 !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  border-radius: 20px !important;
+  margin-top: 14px !important;
+}
+
+.paw-speech-bubble {
+  background: #202030 !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  color: #F8FAFC !important;
+}
+
+.paw-bubble-title {
+  color: #FFE02E !important;
+  font-weight: 800 !important;
+}
+
+.paw-bubble-text {
+  color: #F8FAFC !important;
+  font-weight: 600 !important;
+}
+
+/* Progres CEFR level card */
+.fz2-level.card {
+  background: #151520 !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  border-radius: 20px !important;
+  color: #F8FAFC !important;
+}
+
+.fz2-level-big {
+  color: #FFE02E !important;
+  font-weight: 900 !important;
+}
+
+.fz2-level-lead {
+  color: #E2E8F0 !important;
+  font-weight: 600 !important;
+}
+
+.fz2-level-head .eyebrow {
+  color: #94A3B8 !important;
+  font-weight: 800 !important;
+}
+
+.fz2-lvls span {
+  background: #202030 !important;
+  color: #94A3B8 !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+}
+
+.fz2-lvls span.is-now,
+.fz2-lvl.is-now,
+span.fz2-lvl.is-now {
+  background: #FFE02E !important;
+  color: #0A0A0E !important;
+  font-weight: 900 !important;
+}
+
+.fz2-lvls span.is-done {
+  background: #10B981 !important;
+  color: #FFFFFF !important;
+  font-weight: 800 !important;
+}
+
+/* Generic Cards across all views */
+.card,
+section.card,
+div.card {
+  background: #151520 !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  color: #F8FAFC !important;
+}
+
+.card h1, .card h2, .card h3, .card h4, .card b, .card strong {
+  color: #FFFFFF !important;
+}
+
+.card p {
+  color: #CBD5E1 !important;
+}
+
+.card > span,
+.card p > span,
+.card div > span:not([class*="badge"]):not([class*="tag"]):not([class*="btn"]):not([class*="act"]):not([class*="avatar"]) {
+  color: #CBD5E1 !important;
+}
+
+.social-avatar,
+span.social-avatar,
+.social-me .social-avatar,
+.social-friend .social-avatar,
+.social-boardrow .social-avatar,
+.card .social-avatar,
+.card div > span.social-avatar {
+  background: #FFE02E !important;
+  color: #101018 !important;
+  font-weight: 900 !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  border-radius: 50% !important;
+  border: none !important;
+}
+
+/* Quick practice section & Target Lang Chip (Zero Invisible Text) */
+.quick-practice-section .target-lang-chip,
+.target-lang-chip {
+  background: #181824 !important;
+  border: 1px solid rgba(255, 255, 255, 0.14) !important;
+  color: #FFFFFF !important;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4) !important;
+}
+
+.target-lang-chip .chip-label {
+  color: #FFFFFF !important;
+  font-weight: 800 !important;
+}
+
+.target-lang-chip .chip-sub {
+  color: #94A3B8 !important;
+  font-weight: 600 !important;
+}
+
+/* Social & Community cards */
+.fz2-social.card,
+.fz2-social-card,
+.social-card,
+.card.social-card {
+  background: #151520 !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+.fz2-social-title,
+.social-card h3 {
+  color: #FFFFFF !important;
+  font-weight: 800 !important;
+}
+
+.fz2-social-sub {
+  color: #94A3B8 !important;
+  font-weight: 500 !important;
+}
+
+.fz2-social .fz2-act {
+  background: #202032 !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  color: #FFFFFF !important;
+}
+
+.fz2-social .fz2-act:active {
+  background: #2A2A42 !important;
+}
+
+.fz2-social .fz2-act span,
+.fz2-social .fz2-act b {
+  color: #FFFFFF !important;
+  font-weight: 700 !important;
+}
+
+.fz2-social .fz2-link,
+.fz2-link {
+  color: #FFE02E !important;
+  font-weight: 700 !important;
+  text-decoration: none !important;
+}
+
+/* STADIUM CARDS HIGH-CONTRAST PRECISION (Zero Invisible Text) */
+
+/* Card 1: Yellow Header */
+.fz-card-yellow .fz-stadium-header {
+  background-color: #FFE02E !important;
+  background-image: linear-gradient(180deg, #FFE02E 0%, #FFD41D 100%) !important;
+  color: #0A0A0E !important;
+}
+
+.fz-card-yellow .fz-vocab-kicker-tag,
+.fz-card-yellow .fz-vocab-level-tag {
+  color: #0A0A0E !important;
+  background-color: rgba(0, 0, 0, 0.14) !important;
+  font-weight: 800 !important;
+}
+
+.fz-card-yellow .fz-vocab-word-title {
+  color: #0A0A0E !important;
+  font-weight: 900 !important;
+}
+
+.fz-card-yellow .fz-vocab-word-phonetic {
+  color: #1F2937 !important;
+  font-weight: 700 !important;
+}
+
+.fz-card-yellow .fz-vocab-word-meaning {
+  color: #0F172A !important;
+  font-weight: 800 !important;
+}
+
+.fz-card-yellow .fz-vocab-word-example {
+  color: #111827 !important;
+  font-weight: 600 !important;
+  border-left: 3px solid #0A0A0E !important;
+}
+
+.fz-card-yellow .fz-vocab-word-example em {
+  color: #1F2937 !important;
+  font-weight: 700 !important;
+}
+
+/* Card 2: Silver Header */
+.fz-card-silver .fz-stadium-header {
+  background-color: #CBD5E1 !important;
+  background-image: linear-gradient(180deg, #E2E8F0 0%, #CBD5E1 100%) !important;
+  color: #0A0A0E !important;
+}
+
+.fz-card-silver .fz-vocab-kicker-tag,
+.fz-card-silver .fz-vocab-level-tag {
+  color: #0A0A0E !important;
+  background-color: rgba(0, 0, 0, 0.12) !important;
+  font-weight: 800 !important;
+}
+
+.fz-card-silver .fz-clean-header-title {
+  color: #0A0A0E !important;
+  font-weight: 900 !important;
+}
+
+.fz-card-silver .fz-clean-header-sub {
+  color: #0F172A !important;
+  font-weight: 700 !important;
+}
+
+/* Card 3: Dark Header */
+.fz-card-dark .fz-stadium-header {
+  background-color: #0F172A !important;
+  background-image: linear-gradient(180deg, #1E293B 0%, #0F172A 100%) !important;
+  color: #FFFFFF !important;
+}
+
+.fz-card-dark .fz-vocab-kicker-tag {
+  color: #38BDF8 !important;
+  background: rgba(56, 189, 248, 0.2) !important;
+  font-weight: 800 !important;
+}
+
+.fz-card-dark .fz-vocab-level-tag {
+  color: #FFFFFF !important;
+  background: rgba(255, 255, 255, 0.16) !important;
+  font-weight: 800 !important;
+}
+
+.fz-card-dark .fz-clean-header-title {
+  color: #FFFFFF !important;
+  font-weight: 900 !important;
+}
+
+.fz-card-dark .fz-clean-header-sub {
+  color: #E2E8F0 !important;
+  font-weight: 600 !important;
+}
+
+/* All Stadium Card Bodies (Pure Crisp White) */
+.fz-stadium-body {
+  background: #FFFFFF !important;
+  color: #0A0A0E !important;
+}
+
+.fz-stadium-body .fz-stadium-chip {
+  color: #0A0A0E !important;
+  font-weight: 800 !important;
+  border-color: rgba(10, 10, 14, 0.3) !important;
+}
+
+.fz-stadium-body .fz-time-val {
+  color: #0A0A0E !important;
+  font-weight: 900 !important;
+}
+
+.fz-stadium-body .fz-date-val {
+  color: #334155 !important;
+  font-weight: 800 !important;
+}
+
+.fz-stadium-footer-notch {
+  background: #F1F5F9 !important;
+  border-top: 1px solid #CBD5E1 !important;
+  color: #1E293B !important;
+  font-weight: 800 !important;
+}
+
+.fz-stadium-footer-notch span {
+  color: #1E293B !important;
+  font-weight: 800 !important;
+}
+
+/* 4. MODALS, SHEETS & NOTIFICATION GATE (Rich Dark Theme, Zero White-on-White) */
+body.fz-lux .welcome-panel,
+body.fz-lux .modal-panel,
+body.fz-lux .notification-panel,
+.welcome-panel,
+.modal-panel,
+.notification-panel {
+  background: #14141E !important;
+  border: 1px solid rgba(255, 255, 255, 0.15) !important;
+  color: #F8FAFC !important;
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.75) !important;
+}
+
+.welcome-mark,
+.modal-mark {
+  color: #FFE02E !important;
+  font-weight: 800 !important;
+}
+
+.welcome-panel h1, .welcome-panel h2, .welcome-panel h3,
+.modal-panel h1, .modal-panel h2, .modal-panel h3,
+.notification-panel h1, .notification-panel h2, .notification-panel h3 {
+  color: #FFFFFF !important;
+  font-weight: 800 !important;
+}
+
+.welcome-panel p,
+.modal-panel p,
+.notification-panel p {
+  color: #CBD5E1 !important;
+  line-height: 1.6 !important;
+}
+
+.notification-requirement {
+  background: #1E1E2C !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  color: #E2E8F0 !important;
+}
+
+.notification-requirement span {
+  color: #E2E8F0 !important;
+  font-weight: 600 !important;
+}
+
+.notification-requirement svg {
+  color: #FFE02E !important;
+}
+
+.notification-status {
+  background: #1E1E2C !important;
+  color: #94A3B8 !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  font-weight: 700 !important;
+}
+
+.notification-status.success {
+  background: rgba(16, 185, 129, 0.15) !important;
+  color: #34D399 !important;
+}
+
+.notification-help {
+  color: #94A3B8 !important;
+  font-weight: 500 !important;
+}
+
+.welcome-panel .text-button,
+.modal-panel .text-button,
+.notification-panel .text-button {
+  color: #94A3B8 !important;
+  font-weight: 700 !important;
+}
+
+.welcome-panel .text-button:hover,
+.welcome-panel .text-button:active,
+.notification-panel .text-button:hover,
+.notification-panel .text-button:active {
+  color: #FFFFFF !important;
+}
+
+/* Settings Modal & Rows */
+.setting-row {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+}
+
+.setting-row b {
+  color: #FFFFFF !important;
+  font-weight: 700 !important;
+}
+
+.setting-row small {
+  color: #94A3B8 !important;
+}
+
+.setting-icon {
+  background: #202032 !important;
+  color: #FFE02E !important;
+}
+
+.setting-row select,
+.setting-row input:not([type="checkbox"]) {
+  background: #202032 !important;
+  color: #FFFFFF !important;
+  border: 1px solid rgba(255, 255, 255, 0.15) !important;
+}
+
+/* Listening Modal High Contrast */
+.listening-modal-box {
+  background: #121218 !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  color: #FFFFFF !important;
+}
+
+.listening-modal-box .f-tag {
+  color: #FFE02E !important;
+  background: rgba(255, 224, 46, 0.15) !important;
+}
+
+.listening-modal-box b,
+.listening-modal-box strong {
+  color: #FFFFFF !important;
+}
+
+.listening-modal-box p,
+.listening-modal-box span {
+  color: #CBD5E1 !important;
+}
+
+/* 5. PRODUCT TOUR (High Contrast Dark Bubble) */
+.fz-tour-card {
+  background: #181824 !important;
+  border: 1px solid rgba(255, 255, 255, 0.16) !important;
+  color: #FFFFFF !important;
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.8) !important;
+}
+
+.fz-tour-card h2 {
+  color: #FFFFFF !important;
+  font-weight: 800 !important;
+}
+
+.fz-tour-card p {
+  color: #CBD5E1 !important;
+}
+
+.fz-tour-dot {
+  background: rgba(255, 255, 255, 0.2) !important;
+}
+
+.fz-tour-dot.is-active {
+  background: #FFE02E !important;
+}
+
+.fz-tour-skip {
+  background: transparent !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+  color: #94A3B8 !important;
+  font-weight: 700 !important;
+}
+
+.fz-tour-skip:hover {
+  color: #FFFFFF !important;
+  border-color: rgba(255, 255, 255, 0.4) !important;
+}
+
+.fz-tour-next {
+  background: #FFE02E !important;
+  border: none !important;
+  color: #0A0A0E !important;
+  font-weight: 800 !important;
+}
+
+/* 6. ONBOARDING SHEETS (High Contrast Dark Theme) */
+.fiezel-sheet {
+  background: #14141E !important;
+  border: 1px solid rgba(255, 255, 255, 0.14) !important;
+  color: #F8FAFC !important;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.7) !important;
+}
+
+.fiezel-title {
+  color: #FFFFFF !important;
+  font-weight: 800 !important;
+}
+
+.fiezel-body {
+  color: #CBD5E1 !important;
+}
+
+.fiezel-note {
+  color: #94A3B8 !important;
+}
+
+.fiezel-language-kicker {
+  color: #FFE02E !important;
+}
+
+.fiezel-goal-choice,
+.fiezel-language-grid button {
+  background: #202030 !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  color: #FFFFFF !important;
+}
+
+.fiezel-goal-choice.is-selected,
+.fiezel-language-grid button.is-selected {
+  border-color: #FFE02E !important;
+  background: #2A2A40 !important;
+}
+
+.fiezel-goal-choice b,
+.fiezel-language-copy b {
+  color: #FFFFFF !important;
+}
+
+.fiezel-goal-choice small,
+.fiezel-language-copy small {
+  color: #94A3B8 !important;
+}
+
+.fiezel-field input {
+  background: #202030 !important;
+  border: 1px solid rgba(255, 255, 255, 0.15) !important;
+  color: #FFFFFF !important;
+}
+
+.fiezel-field span {
+  color: #CBD5E1 !important;
+}
+
+/* 7. Universal Primary Button High-Contrast */
+button.primary,
+.primary {
+  background-color: #FFE02E !important;
+  color: #0A0A0E !important;
+  font-weight: 800 !important;
+}
+
+/* =========================================================================
+   COMPREHENSIVE UI/UX AUDIT ENHANCEMENTS:
+   - Settings Modal text/password/url inputs
+   - Quiz Mode (Hide bottomnav, floating dock z-index, furigana contrast)
+   - JLPT Listening Modal & Bottom Sheet (Backdrop z-index, dark theme cards, options)
+   ========================================================================= */
+
+/* 1. Settings & Form Inputs */
+.modal input[type="text"],
+.modal input[type="password"],
+.modal input[type="url"],
+.modal input[type="email"],
+.modal input[type="number"],
+.modal textarea,
+.endpoint-label input,
+.setting-row input[type="text"],
+.setting-row input[type="password"],
+.setting-row input[type="url"],
+#settingLearnerName,
+#backupPassphrase,
+#reportEndpoint {
+  background-color: #1C1C2A !important;
+  color: #FFFFFF !important;
+  border: 1px solid rgba(255, 255, 255, 0.16) !important;
+  border-radius: 12px !important;
+}
+
+.modal input::placeholder,
+.endpoint-label input::placeholder,
+#settingLearnerName::placeholder {
+  color: #64748B !important;
+}
+
+/* 2. Quiz Session: Hide bottom nav completely to prevent overlap and accidental tab switching */
+html body.fz-stage-quiz nav.bottomnav,
+html body.fz-stage-quiz .bottomnav,
+html body:has(.quiz-shell) nav.bottomnav,
+html body:has(.quiz-shell) .bottomnav,
+html body.fz-lux.fz-stage-quiz nav.bottomnav,
+html body.fz-lux.fz-stage-quiz .bottomnav,
+html.fiezel-ui-v6 body.fz-stage-quiz nav.bottomnav,
+html.fiezel-ui-v6 body:has(.quiz-shell) nav.bottomnav,
+body.fz-stage-quiz nav.bottomnav,
+body.fz-stage-quiz .bottomnav,
+body:has(.quiz-shell) nav.bottomnav,
+body:has(.quiz-shell) .bottomnav {
+  display: none !important;
+}
+
+/* Level Cards (e.g. Mulai latihan level A1, A2, etc.) */
+button.level-card,
+.level-card,
+html.fiezel-ui-v6 body.fz-lux button.level-card {
+  background: #181826 !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  border-radius: 16px !important;
+  color: #FFFFFF !important;
+}
+button.level-card *,
+.level-card * {
+  color: #FFFFFF !important;
+}
+button.level-card p,
+.level-card p {
+  color: #E2E8F0 !important;
+  font-weight: 600 !important;
+}
+button.level-card .level-number,
+.level-card .level-number,
+button.level-card .level-num,
+.level-card .level-num,
+.level-number {
+  background: #FFE02E !important;
+  color: #101018 !important;
+  font-weight: 800 !important;
+  border-radius: 999px !important;
+  width: 34px !important;
+  height: 34px !important;
+  display: inline-grid !important;
+  place-items: center !important;
+  flex-shrink: 0 !important;
+}
+.level-card strong {
+  background: rgba(255, 224, 46, 0.15) !important;
+  color: #FFE02E !important;
+  font-weight: 800 !important;
+}
+
+/* Quiz Floating Next Action Bar */
+#quizFloatingBar,
+.quiz-floating-bar {
+  position: fixed !important;
+  bottom: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  padding: 12px 16px max(14px, env(safe-area-inset-bottom)) 16px !important;
+  background: rgba(14, 14, 20, 0.96) !important;
+  backdrop-filter: blur(20px) !important;
+  -webkit-backdrop-filter: blur(20px) !important;
+  border-top: 1px solid rgba(255, 255, 255, 0.12) !important;
+  box-shadow: 0 -4px 24px rgba(0, 0, 0, 0.6) !important;
+  z-index: 2000 !important;
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+  box-sizing: border-box !important;
+}
+
+#quizFloatingBar .quiz-floating-next-btn,
+.quiz-floating-bar button {
+  width: 100% !important;
+  max-width: 480px !important;
+  height: 52px !important;
+  min-height: 52px !important;
+  border-radius: 999px !important;
+  background: linear-gradient(135deg, #FFE02E 0%, #F59E0B 100%) !important;
+  color: #101018 !important;
+  font-size: 16px !important;
+  font-weight: 800 !important;
+  border: none !important;
+  box-shadow: 0 4px 16px rgba(255, 224, 46, 0.4) !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 8px !important;
+  cursor: pointer !important;
+}
+
+/* Furigana Ruby Pronunciation High Contrast */
+ruby rt,
+.ja-word rt,
+.furigana {
+  color: #FBBF24 !important;
+  font-weight: 600 !important;
+}
+
+/* Level scope note badge */
+.level-scope-note {
+  background: #181824 !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  color: #CBD5E1 !important;
+  border-radius: 12px !important;
+}
+.level-scope-note b {
+  color: #FFE02E !important;
+  font-weight: 800 !important;
+}
+.level-scope-note span {
+  color: #94A3B8 !important;
+}
+
+/* Feedback Drawer in Quiz */
+.feedback,
+#feedback {
+  background: #181826 !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  color: #F8FAFC !important;
+  border-radius: 18px !important;
+  padding: 16px 18px 24px 18px !important;
+  margin-top: 16px !important;
+  margin-bottom: 84px !important;
+}
+.feedback.feedback-success {
+  border-left: 4px solid #10B981 !important;
+}
+.feedback.feedback-error {
+  border-left: 4px solid #EF4444 !important;
+}
+.feedback p,
+.feedback span,
+.feedback .feedback-title b {
+  color: #F8FAFC !important;
+}
+.feedback details summary {
+  color: #38BDF8 !important;
+  cursor: pointer !important;
+  font-weight: 600 !important;
+}
+.feedback details p {
+  color: #94A3B8 !important;
+}
+.feedback .memory-tip {
+  background: rgba(255, 224, 46, 0.08) !important;
+  border: 1px solid rgba(255, 224, 46, 0.2) !important;
+  border-radius: 12px !important;
+  padding: 10px 14px !important;
+  color: #FEF08A !important;
+}
+.feedback .memory-tip span {
+  color: #FEF08A !important;
+}
+.feedback .ai-btn {
+  background: rgba(255, 255, 255, 0.06) !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  color: #CBD5E1 !important;
+  border-radius: 999px !important;
+  font-size: 13px !important;
+  font-weight: 600 !important;
+  padding: 10px 16px !important;
+  cursor: pointer !important;
+  margin-top: 12px !important;
+}
+
+/* 3. JLPT Listening Modal & Detail Sheet Dark Theme */
+.jlpt-badge-mondai {
+  background: #1E1E2C !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  color: #F8FAFC !important;
+}
+.jlpt-badge-mondai span {
+  color: #F8FAFC !important;
+}
+.jlpt-counter-pill {
+  background: #1E1E2C !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  color: #F8FAFC !important;
+}
+
+/* JLPT Primary Play Button */
+.jlpt-primary-play-btn,
+.jlpt-primary-play-btn *,
+.jlpt-primary-play-btn span,
+#jlptPlayText,
+#jlptPlayIcon,
+#jlptMainPlayBtn,
+#jlptMainPlayBtn * {
+  color: #101018 !important;
+  font-weight: 800 !important;
+}
+
+/* JLPT Options Correct & Wrong States */
+.jlpt-opt-btn.correct {
+  background: rgba(16, 185, 129, 0.22) !important;
+  border: 2px solid #10B981 !important;
+}
+.jlpt-opt-btn.correct .jlpt-opt-badge {
+  background: #10B981 !important;
+  color: #FFFFFF !important;
+}
+.jlpt-opt-btn.correct .jlpt-opt-ja {
+  color: #FFFFFF !important;
+  font-weight: 700 !important;
+}
+.jlpt-opt-btn.correct .jlpt-opt-id {
+  color: #A7F3D0 !important;
+  font-weight: 500 !important;
+}
+
+.jlpt-opt-btn.wrong {
+  background: rgba(239, 68, 68, 0.22) !important;
+  border: 2px solid #EF4444 !important;
+}
+.jlpt-opt-btn.wrong .jlpt-opt-badge {
+  background: #EF4444 !important;
+  color: #FFFFFF !important;
+}
+.jlpt-opt-btn.wrong .jlpt-opt-ja {
+  color: #FFFFFF !important;
+}
+.jlpt-opt-btn.wrong .jlpt-opt-id {
+  color: #FCA5A5 !important;
+}
+
+.jlpt-opt-btn.revealed-correct {
+  background: rgba(16, 185, 129, 0.18) !important;
+  border: 2px solid #10B981 !important;
+}
+
+/* JLPT Answer Feedback Banner */
+.jlpt-feedback-banner {
+  background: rgba(16, 185, 129, 0.16) !important;
+  border: 1px solid rgba(16, 185, 129, 0.4) !important;
+  border-radius: 14px !important;
+  color: #FFFFFF !important;
+}
+.jlpt-feedback-banner * {
+  color: #FFFFFF !important;
+}
+.jlpt-feedback-link {
+  color: #FFE02E !important;
+  font-weight: 700 !important;
+}
+
+/* JLPT Bottom Sheet Drawer */
+#jlptDetailSheet {
+  z-index: 2650 !important;
+}
+#jlptSheetBackdrop {
+  z-index: 2660 !important;
+}
+.jlpt-sheet-container {
+  z-index: 2700 !important;
+  background: #14141E !important;
+  border-top: 1.5px solid rgba(255, 255, 255, 0.12) !important;
+  box-shadow: 0 -12px 40px rgba(0, 0, 0, 0.75) !important;
+  color: #F8FAFC !important;
+}
+
+.jlpt-sheet-header {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+}
+.jlpt-sheet-title {
+  color: #FFFFFF !important;
+  font-weight: 800 !important;
+}
+.jlpt-sheet-subtitle {
+  color: #94A3B8 !important;
+}
+.jlpt-sheet-close {
+  background: #202032 !important;
+  color: #FFFFFF !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  border-radius: 999px !important;
+}
+
+/* JLPT Sheet Tabs */
+.jlpt-sheet-tabs {
+  background: #181826 !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+}
+.jlpt-tab-chip {
+  background: transparent !important;
+  color: #94A3B8 !important;
+}
+.jlpt-tab-chip.active {
+  background: #FFE02E !important;
+  color: #101018 !important;
+  font-weight: 800 !important;
+}
+
+/* JLPT Sheet Naskah Tab */
+.jlpt-transcript-tag {
+  background: #1E1E2C !important;
+  color: #38BDF8 !important;
+  border: 1px solid rgba(56, 189, 248, 0.3) !important;
+  border-radius: 6px !important;
+}
+.jlpt-dialogue-turn {
+  background: transparent !important;
+}
+.jlpt-turn-bubble {
+  background: #1C1C2C !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  border-radius: 12px !important;
+}
+.jlpt-bubble-ja {
+  color: #FFFFFF !important;
+  font-weight: 700 !important;
+}
+.jlpt-bubble-ro {
+  color: #94A3B8 !important;
+}
+.jlpt-bubble-id {
+  color: #CBD5E1 !important;
+  border-top: 1px dashed rgba(255, 255, 255, 0.12) !important;
+}
+
+/* JLPT Sheet Pembahasan Tab */
+.jlpt-explain-article {
+  background: #1C1C2C !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  border-radius: 14px !important;
+  color: #F8FAFC !important;
+}
+.jlpt-explain-article-title {
+  color: #FFE02E !important;
+  font-weight: 800 !important;
+}
+.jlpt-explain-body {
+  color: #CBD5E1 !important;
+  line-height: 1.65 !important;
+}
+.jlpt-explain-tip-box {
+  background: rgba(56, 189, 248, 0.1) !important;
+  border: 1px solid rgba(56, 189, 248, 0.25) !important;
+  border-radius: 10px !important;
+  color: #BAE6FD !important;
+}
+
+/* JLPT Sheet Kosakata Tab */
+.jlpt-vocab-card-item {
+  background: #1C1C2C !important;
+  border: 1.5px solid rgba(255, 255, 255, 0.08) !important;
+  border-radius: 12px !important;
+}
+.jlpt-vocab-card-item:hover {
+  background: #252538 !important;
+  border-color: rgba(255, 255, 255, 0.15) !important;
+}
+.jlpt-vocab-term {
+  color: #FFE02E !important;
+  font-weight: 800 !important;
+}
+.jlpt-vocab-meaning {
+  color: #CBD5E1 !important;
+}
+
+/* ==========================================================================
+   AUDIT FIX 1: ZERO MASCOT HARD ENFORCEMENT (ALL VIEWS)
+   ========================================================================== */
+.path-mascot,
+.writing-stage,
+.writing-mascot,
+.fz2-level-paw,
+fiezel-mascot,
+.coach-strip-face,
+.fz-paw-slot,
+.fz-paw-peek,
+.fz-paw-head,
+.quiz-mascot,
+[data-mascot],
+.mascot-wrap,
+.fsl-mascot-slot,
+.fsl-mascot,
+.paw-avatar,
+.paw-face {
+  display: none !important;
+  visibility: hidden !important;
+  width: 0 !important;
+  height: 0 !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+
+/* ==========================================================================
+   AUDIT FIX 2: PREVENT BOOT SPLASH CANVAS LEAK
+   ========================================================================== */
+body:not(.fz-booting) .fz-splash-canvas,
+html:not(.fz-booting) .fz-splash-canvas,
+#fiezelBootSplash.is-leaving .fz-splash-canvas,
+body:not(.fz-booting) #fiezelBootSplash {
+  display: none !important;
+  pointer-events: none !important;
+  visibility: hidden !important;
+}
+
+/* ==========================================================================
+   AUDIT FIX 3: SKILLS LAB (BICARA & DENGAR) HIGH CONTRAST DARK THEME
+   ========================================================================== */
+.fsl-card,
+article.fsl-card,
+.fsl-shell .fsl-card {
+  background: #181826 !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  border-radius: 20px !important;
+  color: #FFFFFF !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4) !important;
+}
+.fsl-card h1,
+.fsl-card h2,
+.fsl-card h3,
+.fsl-head h1 {
+  color: #FFFFFF !important;
+  font-weight: 800 !important;
+}
+.fsl-card p,
+.fsl-head p,
+.fsl-card span:not(.fsl-kicker):not(.fsl-gem-mark) {
+  color: #CBD5E1 !important;
+}
+.fsl-card .fsl-kicker,
+.fsl-kicker {
+  color: #FFE02E !important;
+  font-weight: 800 !important;
+}
+.fsl-card button.fsl-primary,
+.fsl-primary,
+.fsl-actions button.fsl-primary {
+  background: #FFE02E !important;
+  color: #101018 !important;
+  font-weight: 800 !important;
+  border: none !important;
+  border-radius: 999px !important;
+}
+.fsl-card button:not(.fsl-primary),
+.fsl-actions button:not(.fsl-primary) {
+  background: #222234 !important;
+  color: #FFFFFF !important;
+  border: 1px solid rgba(255, 255, 255, 0.15) !important;
+  border-radius: 999px !important;
+}
+.fsl-player {
+  background: #12121C !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  border-radius: 16px !important;
+}
+.fsl-player .fsl-replays {
+  color: #94A3B8 !important;
+}
+.fsl-player .fsl-wave {
+  color: #FFE02E !important;
+}
+.fsl-gem-chip {
+  background: #1E1E2E !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  color: #FFFFFF !important;
+}
+.fsl-gem-chip b {
+  color: #FFE02E !important;
+}
+.fsl-gem-chip small {
+  color: #94A3B8 !important;
+}
+.fsl-gem-toggle {
+  background: #1E1E2E !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  color: #CBD5E1 !important;
+}
+.fsl-gem-toggle[aria-pressed="true"] {
+  background: rgba(255, 224, 46, 0.15) !important;
+  border-color: #FFE02E !important;
+  color: #FFE02E !important;
+}
+.fsl-gem-empty {
+  background: #181826 !important;
+  border: 1px dashed rgba(255, 255, 255, 0.15) !important;
+  color: #94A3B8 !important;
+}
+.fsl-gem-empty b {
+  color: #FFFFFF !important;
+}
+.fsl-status,
+.fsl-feedback {
+  background: #141420 !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  color: #F8FAFC !important;
+}
+.fsl-option {
+  background: #1C1C2A !important;
+  border: 1.5px solid rgba(255, 255, 255, 0.12) !important;
+  color: #FFFFFF !important;
+}
+.fsl-option.is-correct {
+  background: rgba(16, 185, 129, 0.2) !important;
+  border-color: #10B981 !important;
+  color: #FFFFFF !important;
+}
+.fsl-option.is-wrong {
+  background: rgba(239, 68, 68, 0.2) !important;
+  border-color: #EF4444 !important;
+  color: #FFFFFF !important;
+}
+.fsl-work:disabled .fsl-input,
+.fsl-work:disabled .fsl-option {
+  background: #12121C !important;
+  color: #64748B !important;
+  border-color: rgba(255, 255, 255, 0.08) !important;
+}
+.fsl-input {
+  background: #12121C !important;
+  border: 1.5px solid rgba(255, 255, 255, 0.16) !important;
+  color: #FFFFFF !important;
+  border-radius: 12px !important;
+}
+.fsl-prompt {
+  color: #FFFFFF !important;
+}
+.fsl-transcript {
+  background: #101018 !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  color: #CBD5E1 !important;
+}
+
+/* ==========================================================================
+   AUDIT FIX 4: WRITING VIEW DARK THEME & ZERO MASCOT
+   ========================================================================== */
+.skill-page-hero,
+.skill-writing,
+.skill-help-panel {
+  background: #181826 !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  border-radius: 20px !important;
+  color: #FFFFFF !important;
+}
+.skill-page-hero h1,
+.skill-page-hero h2,
+.skill-page-hero h3,
+.skill-help-panel h2 {
+  color: #FFFFFF !important;
+  font-weight: 800 !important;
+}
+.skill-page-hero p,
+.skill-help-panel p {
+  color: #CBD5E1 !important;
+}
+.skill-page-hero .skill-badge {
+  background: rgba(255, 224, 46, 0.15) !important;
+  color: #FFE02E !important;
+  border: 1px solid rgba(255, 224, 46, 0.3) !important;
+  font-weight: 800 !important;
+}
+.writing-prompt textarea,
+.writing-input,
+textarea.writing-area {
+  background: #12121C !important;
+  border: 1.5px solid rgba(255, 255, 255, 0.16) !important;
+  color: #FFFFFF !important;
+  border-radius: 14px !important;
+}
+.writing-prompt textarea:focus,
+.writing-input:focus,
+textarea.writing-area:focus {
+  border-color: #FFE02E !important;
+  outline: none !important;
+}
+.writing-meta {
+  color: #94A3B8 !important;
+}
+.writing-feedback .card {
+  background: #181826 !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  color: #FFFFFF !important;
+}
+
+/* ==========================================================================
+   AUDIT FIX 5: GRAMMAR VIEW PATH & RING DARK THEME
+   ========================================================================== */
+body.fz-lux .fz2-path-summary,
+body .fz2-path-summary,
+.fz2-path-summary,
+.grammar-level-note {
+  background: #181826 !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  border-radius: 18px !important;
+  color: #FFFFFF !important;
+}
+.fz2-path-summary b,
+.fz2-path-summary>div>b {
+  color: #FFFFFF !important;
+  font-weight: 800 !important;
+}
+.fz2-path-summary span,
+.fz2-path-summary>div>span {
+  color: #FFE02E !important;
+  font-weight: 700 !important;
+}
+.fz2-path-summary small,
+.fz2-path-summary>div>small {
+  color: #94A3B8 !important;
+}
+body .fz2-path-ring {
+  background: conic-gradient(#FFE02E calc(var(--p, 0) * 1%), rgba(255, 255, 255, 0.1) 0) !important;
+}
+body .fz2-path-ring::after {
+  background: #181826 !important;
+}
+body .fz2-path-ring b,
+body .fz2-path-ring .fz2-path-ring-count {
+  color: #FFE02E !important;
+  font-weight: 800 !important;
+  font-size: 0.85rem !important;
+}
+body.fz-lux .path-label,
+body .path-label,
+.path-label {
+  background: #181826 !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  color: #FFFFFF !important;
+}
+body.fz-lux .path-label b,
+body .path-label b {
+  color: #FFFFFF !important;
+}
+body.fz-lux .path-label>span,
+body .path-label>span {
+  color: #94A3B8 !important;
+}
+body.fz-lux .path-step.is-current .path-label,
+body .path-step.is-current .path-label {
+  border: 2px solid #FFE02E !important;
+  box-shadow: 0 4px 16px rgba(255, 224, 46, 0.2) !important;
+}
+body.fz-lux .path-step.is-mastered .path-label::after,
+body .path-step.is-mastered .path-label::after {
+  background: rgba(16, 185, 129, 0.2) !important;
+  color: #10B981 !important;
+}
+
+/* ==========================================================================
+   AUDIT FIX 6: LEARNER FLOW & ARENA HIGH CONTRAST DARK THEME
+   ========================================================================== */
+.lf-card,
+.today-card,
+.paw-lobby-card,
+.duel-hero,
+.duel-play,
+.duel-result,
+.paw-rules-card,
+.paw-stories,
+.paw-story-full,
+.paw-help-inner,
+.paw-artifact,
+.paw-code-share {
+  background: #181826 !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  border-radius: 18px !important;
+  color: #FFFFFF !important;
+}
+.lf-card h1, .lf-card h2, .lf-card h3, .lf-card h4, .lf-card b, .lf-card strong,
+.duel-hero h2, .duel-hero b,
+.paw-lobby-card b,
+.paw-rules-card b,
+.paw-story-full b {
+  color: #FFFFFF !important;
+  font-weight: 800 !important;
+}
+.lf-card p,
+.lf-muted,
+.tac-muted,
+.paw-rules-goal,
+.paw-story-text {
+  color: #CBD5E1 !important;
+}
+.lf-kicker,
+.tac-kicker {
+  color: #FFE02E !important;
+  font-weight: 800 !important;
+}
+.lf-tabs,
+.tac-tabs {
+  background: #12121C !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  border-radius: 999px !important;
+}
+.lf-tab,
+.tac-tab {
+  background: transparent !important;
+  color: #94A3B8 !important;
+}
+.lf-tab.is-active,
+.tac-tab.is-active {
+  background: #FFE02E !important;
+  color: #101018 !important;
+  font-weight: 800 !important;
+}
+.lf-primary,
+button.lf-primary,
+.paw-lobby-actions button.lf-mini.paw-lobby-cta,
+button[data-arena="pick"] {
+  background: #FFE02E !important;
+  color: #101018 !important;
+  font-weight: 800 !important;
+  border: none !important;
+  border-radius: 999px !important;
+}
+.lf-ghost,
+button.lf-ghost {
+  background: rgba(255, 255, 255, 0.08) !important;
+  color: #FFFFFF !important;
+  border: 1px solid rgba(255, 255, 255, 0.15) !important;
+  border-radius: 999px !important;
+}
+.lf-mini.paw-lobby-friend,
+span.paw-lobby-friend {
+  background: rgba(255, 224, 46, 0.15) !important;
+  color: #FFE02E !important;
+  border: 1px solid rgba(255, 224, 46, 0.3) !important;
+  border-radius: 999px !important;
+}
+.lf-option {
+  background: #1C1C2A !important;
+  border: 1.5px solid rgba(255, 255, 255, 0.12) !important;
+  color: #FFFFFF !important;
+}
+.lf-option.is-correct {
+  background: rgba(16, 185, 129, 0.22) !important;
+  border-color: #10B981 !important;
+  color: #FFFFFF !important;
+}
+.lf-option.is-wrong {
+  background: rgba(239, 68, 68, 0.22) !important;
+  border-color: #EF4444 !important;
+  color: #FFFFFF !important;
+}
+.paw-scores {
+  background: #141420 !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+.paw-scores .duel-p {
+  color: #CBD5E1 !important;
+}
+.paw-scores .duel-p b {
+  color: #FFE02E !important;
+}
+.paw-rules-steps li {
+  color: #CBD5E1 !important;
+}
+.paw-rules-steps li span {
+  background: #FFE02E !important;
+  color: #101018 !important;
+  font-weight: 800 !important;
+}
+.paw-clue-card {
+  background: #1E1E2E !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  color: #CBD5E1 !important;
+}
+.paw-clue-card.is-picked {
+  background: rgba(255, 224, 46, 0.15) !important;
+  border-color: #FFE02E !important;
+  color: #FFE02E !important;
+}
+.lf-stepper li {
+  background: #1E1E2E !important;
+  color: #CBD5E1 !important;
+}
+.lf-stepper li span {
+  background: #2A2A3E !important;
+  color: #FFFFFF !important;
+}
+.lf-stepper li.is-current {
+  background: #FFE02E !important;
+  color: #101018 !important;
+}
+.lf-stepper li.is-current span {
+  background: #101018 !important;
+  color: #FFE02E !important;
+}
+
+/* ==========================================================================
+   AUDIT FIX 7: LIBRARY CARDS & READER DOCK CONTRAST
+   ========================================================================== */
+.library-card,
+button.library-card,
+.library-item {
+  background: #181826 !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  border-radius: 16px !important;
+  color: #FFFFFF !important;
+}
+.library-card b,
+.library-card h2,
+.library-card h3,
+.library-title {
+  color: #FFFFFF !important;
+  font-weight: 800 !important;
+}
+.library-card p,
+.library-card span,
+.library-card small,
+.library-desc,
+.library-meta {
+  color: #CBD5E1 !important;
+}
+.library-dock {
+  background: rgba(20, 20, 30, 0.97) !important;
+  backdrop-filter: blur(20px) !important;
+  -webkit-backdrop-filter: blur(20px) !important;
+  border-top: 1px solid rgba(255, 255, 255, 0.12) !important;
+  box-shadow: 0 -8px 24px rgba(0, 0, 0, 0.6) !important;
+  color: #FFFFFF !important;
+  z-index: 3000 !important;
+  bottom: 0 !important;
+  padding-bottom: max(14px, env(safe-area-inset-bottom)) !important;
+}
+.library-dock * {
+  color: #FFFFFF !important;
+}
+.library-dock .library-status {
+  color: #CBD5E1 !important;
+}
+.library-dock button {
+  background: #FFE02E !important;
+  color: #101018 !important;
+  font-weight: 800 !important;
+  border: none !important;
+  border-radius: 999px !important;
+}
+.library-sentence {
+  background: #181826 !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  color: #FFFFFF !important;
+  border-radius: 12px !important;
+}
+.library-sentence.is-active {
+  border-color: #FFE02E !important;
+  background: rgba(255, 224, 46, 0.1) !important;
+}
+html body:has(.library-reader) nav.bottomnav,
+html body.fz-lux:has(.library-reader) nav.bottomnav,
+html.fiezel-ui-v6 body:has(.library-reader) nav.bottomnav,
+html body:has(.library-reader) .bottomnav,
+body:has(.library-reader) nav.bottomnav,
+body:has(.library-reader) .bottomnav,
+body.has-library-reader nav.bottomnav,
+html:has(.library-reader) nav.bottomnav {
+  display: none !important;
+}
+
+/* Learner flow goal cards */
+.lf-goal,
+button.lf-goal,
+html body .lf-goal,
+html body.fz-lux .lf-goal {
+  background: #1E1E2E !important;
+  border: 1.5px solid rgba(255, 255, 255, 0.12) !important;
+  border-radius: 16px !important;
+  color: #FFFFFF !important;
+}
+.lf-goal b,
+html body .lf-goal b {
+  color: #FFFFFF !important;
+  font-weight: 800 !important;
+}
+.lf-goal small,
+html body .lf-goal small {
+  color: #CBD5E1 !important;
+  font-weight: 500 !important;
+}
+.lf-goal:hover,
+html body .lf-goal:hover {
+  background: #252538 !important;
+  border-color: rgba(255, 255, 255, 0.25) !important;
+}
+.lf-goal.is-selected,
+html body .lf-goal.is-selected {
+  background: rgba(255, 224, 46, 0.15) !important;
+  border-color: #FFE02E !important;
+}
+.lf-goal.is-selected b,
+html body .lf-goal.is-selected b {
+  color: #FFE02E !important;
+}
+.lf-goal.is-selected small,
+html body .lf-goal.is-selected small {
+  color: #FEF08A !important;
+}
+
+/* ==========================================================================
+   AUDIT FIX 8: JAPANESE KANA CHART HIGH CONTRAST DARK THEME
+   ========================================================================== */
+.ja-kana .kana-tabs {
+  background: #141420 !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  border-radius: 12px !important;
+}
+html body .ja-kana .kana-tab {
+  color: #94A3B8 !important;
+}
+html body .ja-kana .kana-tab[aria-selected="true"] {
+  background: #FFE02E !important;
+  color: #101018 !important;
+  font-weight: 800 !important;
+}
+.ja-kana .kana-heading {
+  color: #FFFFFF !important;
+  font-weight: 800 !important;
+}
+.ja-kana .kana-cell {
+  background: #181826 !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  box-shadow: none !important;
+}
+.ja-kana .kana-cell b {
+  color: #FFFFFF !important;
+}
+.ja-kana .kana-cell small {
+  color: #FFE02E !important;
+  font-weight: 700 !important;
+}
+
+/* ==========================================================================
+   AUDIT FIX 9: LEVEL PICKER MODAL HIGH CONTRAST DARK THEME
+   ========================================================================== */
+.level-picker-card,
+button.level-picker-card {
+  background: #181826 !important;
+  border: 1.5px solid rgba(255, 255, 255, 0.12) !important;
+  border-radius: 16px !important;
+  color: #FFFFFF !important;
+}
+.level-picker-card strong {
+  color: #FFE02E !important;
+  font-weight: 800 !important;
+  font-size: 1.25rem !important;
+}
+.level-picker-card span {
+  color: #CBD5E1 !important;
+}
+.level-picker-card.is-active {
+  background: rgba(255, 224, 46, 0.12) !important;
+  border-color: #FFE02E !important;
+  box-shadow: 0 0 0 2px rgba(255, 224, 46, 0.25) !important;
+}
+.level-picker-card.is-locked {
+  background: #14141E !important;
+  border-color: rgba(255, 255, 255, 0.08) !important;
+  opacity: 0.65 !important;
+}
+.level-trust-badge {
+  background: #222234 !important;
+  color: #94A3B8 !important;
+  border-radius: 6px !important;
+  font-size: 0.68rem !important;
+  font-weight: 700 !important;
+}
+.level-trust-badge.is-verified {
+  background: rgba(16, 185, 129, 0.2) !important;
+  color: #10B981 !important;
+}
+.level-exam-cta {
+  background: #181826 !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  border-radius: 16px !important;
+  color: #FFFFFF !important;
+}
+.level-exam-cta b {
+  color: #FFFFFF !important;
+  font-weight: 800 !important;
+}
+.level-exam-cta span {
+  color: #CBD5E1 !important;
+}
+.level-exam-cta button.primary,
+#openLevelExam {
+  background: #FFE02E !important;
+  color: #101018 !important;
+  font-weight: 800 !important;
+  border: none !important;
+  border-radius: 999px !important;
+}
+.level-source-note {
+  background: #141420 !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  border-radius: 14px !important;
+  color: #CBD5E1 !important;
+}
+.level-source-note b {
+  color: #FFE02E !important;
+  font-weight: 800 !important;
+}
+.level-lock-note {
+  background: #181826 !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  color: #FFFFFF !important;
+}
+.level-lock-note b {
+  color: #FFE02E !important;
+}
+
+/* ==========================================================================
+   THAI TYPOGRAPHY SAFE-ZONE & ZERO-CLIPPING RULES (:lang(th))
+   ========================================================================== */
+:lang(th) body,
+:lang(th) .app,
+:lang(th) .fz-stadium-card,
+:lang(th) .card,
+:lang(th) .launch-card,
+:lang(th) .modal-panel {
+  font-family: 'Noto Sans Thai Looped', 'Plus Jakarta Sans', -apple-system, sans-serif !important;
+}
+
+:lang(th) .fz-greet-title,
+:lang(th) .fz-clean-header-title,
+:lang(th) .fz-vocab-word-title {
+  font-family: 'Noto Sans Thai Looped', 'Plus Jakarta Sans', sans-serif !important;
+  line-height: 1.4 !important;
+  letter-spacing: normal !important;
+}
+
+:lang(th) .fz-greet-motivation,
+:lang(th) .fz-clean-header-sub,
+:lang(th) .fz-vocab-word-meaning,
+:lang(th) .fz-vocab-word-example {
+  font-family: 'Noto Sans Thai Looped', 'Plus Jakarta Sans', sans-serif !important;
+  line-height: 1.55 !important;
+  letter-spacing: normal !important;
+}
+
+:lang(th) .fz-stadium-cta-btn,
+:lang(th) button.primary,
+:lang(th) .btn-primary,
+:lang(th) .fz-action-card b,
+:lang(th) .fz-action-card span,
+:lang(th) .launch-card b,
+:lang(th) .launch-card small {
+  font-family: 'Noto Sans Thai Looped', 'Plus Jakarta Sans', sans-serif !important;
+  line-height: 1.45 !important;
+  letter-spacing: normal !important;
+  padding-top: 3px !important;
+  padding-bottom: 3px !important;
+}
+
+:lang(th) .fz-stadium-chip,
+:lang(th) .fz-vocab-kicker-tag,
+:lang(th) .fz-vocab-level-tag,
+:lang(th) .badge,
+:lang(th) .chip {
+  font-family: 'Noto Sans Thai Looped', 'Plus Jakarta Sans', sans-serif !important;
+  line-height: 1.35 !important;
+  letter-spacing: normal !important;
+  overflow: visible !important;
+}
+
+:lang(th) nav.bottomnav .nav span,
+:lang(th) .bottomnav button span {
+  font-family: 'Noto Sans Thai Looped', 'Plus Jakarta Sans', sans-serif !important;
+  line-height: 1.3 !important;
+}
