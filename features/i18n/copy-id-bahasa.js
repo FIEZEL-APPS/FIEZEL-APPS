@@ -84,7 +84,24 @@
     'jlpt.mundur': 'Mundur',
     'jlpt.maju': 'Maju',
     'jlpt.geser-kartu': 'Geser kartu',
-    'jlpt.dari': '{cur} dari {total}'
+    'jlpt.dari': '{cur} dari {total}',
+    'jlpt.close-sheet': 'Tutup Sheet',
+    'jlpt.correct-title': 'Jawaban Benar!',
+    'jlpt.explain-title': '💡 Analisis & Pembahasan Soal:',
+    'jlpt.first-question': 'Soal Pertama (1/',
+    'jlpt.last-question': 'Soal Terakhir (',
+    'jlpt.next-question': 'Soal Berikutnya ▶',
+    'jlpt.not-quite-right': 'Kurang Tepat',
+    'jlpt.open-vocab-aria': 'Buka Daftar Kosakata',
+    'jlpt.prev-question': '◀ Soal Sebelumnya',
+    'jlpt.sheet-dialog-aria': 'Naskah dan Pembahasan Soal JLPT',
+    'jlpt.status-correct': '✓ Jawaban Anda Benar!',
+    'jlpt.status-pending': 'Belum Dijawab',
+    'jlpt.status-wrong': '✗ Jawaban Anda: Pilihan ',
+    'jlpt.tab-explain-aria': 'Buka Kunci dan Pembahasan',
+    'jlpt.tab-explain-btn': '💡 Pembahasan',
+    'jlpt.tab-script-aria': 'Buka Naskah Dialog',
+    'jlpt.wrong-title': 'Belum Tepat'
   });
   /* Lapisan kursus Bahasa Jepang (FiezelI18n.setCourse('ja')): saat kursus Jepang aktif,
      kunci 'kursus-ja.<kunci>' menang atas <kunci>. Nama bagian memakai istilah Jepang yang

@@ -74,7 +74,24 @@
     'jlpt.mundur': 'ก่อนหน้า',
     'jlpt.maju': 'ถัดไป',
     'jlpt.geser-kartu': 'เลื่อนการ์ด',
-    'jlpt.dari': '{cur} จาก {total}'
+    'jlpt.dari': '{cur} จาก {total}',
+    'jlpt.close-sheet': 'ปิด Sheet',
+    'jlpt.correct-title': 'คำตอบถูกต้อง!',
+    'jlpt.explain-title': '💡 การวิเคราะห์และคำอธิบายข้อสอบ:',
+    'jlpt.first-question': 'ข้อแรก (1/',
+    'jlpt.last-question': 'ข้อสุดท้าย (',
+    'jlpt.next-question': 'ข้อถัดไป ▶',
+    'jlpt.not-quite-right': 'ยังไม่ถูกต้อง',
+    'jlpt.open-vocab-aria': 'เปิดรายการคำศัพท์',
+    'jlpt.prev-question': '◀ ข้อก่อนหน้า',
+    'jlpt.sheet-dialog-aria': 'บทพูดและคำอธิบายข้อสอบ JLPT',
+    'jlpt.status-correct': '✓ คำตอบของคุณถูกต้อง!',
+    'jlpt.status-pending': 'ยังไม่ได้ตอบ',
+    'jlpt.status-wrong': '✗ คำตอบของคุณ: ตัวเลือก ',
+    'jlpt.tab-explain-aria': 'เปิดเฉลยและคำอธิบาย',
+    'jlpt.tab-explain-btn': '💡 คำอธิบาย',
+    'jlpt.tab-script-aria': 'เปิดบทพูดบทสนทนา',
+    'jlpt.wrong-title': 'ยังไม่ถูกต้อง'
   });
   /* Lapisan kursus Bahasa Jepang (FiezelI18n.setCourse('ja')): saat kursus Jepang aktif,
      kunci 'kursus-ja.<kunci>' menang atas <kunci>. Nama bagian memakai istilah Jepang yang
