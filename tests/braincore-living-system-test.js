@@ -349,6 +349,117 @@ test('Scenario I · Kesiapan agregasi diagnostik: rekapitulasi keputusan tanpa k
   assert.ok(!/email|userId|userName|studentName|deviceFingerprint/i.test(json));
 });
 
+// =========================================================================
+// Scenario J: Cryptographic Tamper-Evident Hash Chain Verification
+// =========================================================================
+test('Scenario J · Rantai hash kriptografis anti-rusak (tamper-evident): verifikasi integritas & deteksi manipulasi data', () => {
+  decisionTrace.clear();
+
+  // Buat 4 keputusan berturut-turut
+  const d1 = decisionTrace.recordDecision({ action: 'observe', targetSkill: 'verb_forms', targetDifficulty: 2.0, nowMs: 1700000020000 });
+  const d2 = decisionTrace.recordDecision({ action: 'scaffold_hint', targetSkill: 'verb_forms', targetDifficulty: 2.2, nowMs: 1700000021000 });
+  const d3 = decisionTrace.recordDecision({ action: 'reinforce_concept', targetSkill: 'verb_forms', targetDifficulty: 2.4, nowMs: 1700000022000 });
+  const d4 = decisionTrace.recordDecision({ action: 'increase_challenge', targetSkill: 'verb_forms', targetDifficulty: 2.6, nowMs: 1700000023000 });
+
+  // 1. Verifikasi rantai murni valid
+  const check1 = decisionTrace.verifyLedger();
+  assert.strictEqual(check1.ok, true);
+  assert.strictEqual(check1.length, 4);
+  assert.strictEqual(check1.brokenAt, null);
+  assert.strictEqual(check1.message, 'tamper_evident_chain_verified');
+
+  // 2. Manipulasi data pada simpul ke-2 (tampering)
+  const store = decisionTrace.getRecent(10);
+  const originalDifficulty = store[1].targetDifficulty;
+  store[1].targetDifficulty = 99.9; // data dirusak secara ilegal!
+
+  // Tulis paksa data manipulasi
+  if (typeof window !== 'undefined' && window.localStorage) {
+    window.localStorage.setItem(decisionTrace.STORAGE_KEY, JSON.stringify(store));
+  }
+
+  // Verifikasi bahwa auditor kriptografis langsung menangkap kecurangan
+  // Pada environment Node tanpa localStorage, memoryBuffer diuji
+  const checkTamper = decisionTrace.verifyLedger();
+  // Catatan: Jika memoryBuffer store dirubah langsung by reference
+  assert.strictEqual(checkTamper.ok, false);
+  assert.strictEqual(checkTamper.brokenAt, 1);
+  assert.strictEqual(checkTamper.error, 'tampered_data_hash_mismatch');
+
+  // Kembalikan ke nilai asli untuk membersihkan
+  decisionTrace.clear();
+});
+
+// =========================================================================
+// Scenario K: Autonomous Bounded Self-Tuning & Rollback
+// =========================================================================
+test('Scenario K · Mesin self-tuning otonom: adaptasi parameter targetSuccess pada 3 sukses berturut-turut & rollback saat regresi', () => {
+  decisionTrace.clear();
+
+  const initialParams = decisionTrace.readParams();
+  assert.strictEqual(initialParams['difficulty.targetSuccess'], 0.80);
+  assert.strictEqual(initialParams.consecutivePositives, 0);
+
+  // 3 Keputusan sukses berturut-turut
+  const d1 = decisionTrace.recordDecision({ action: 'practice', nowMs: 1700000030000 });
+  decisionTrace.evaluateOutcome(d1.traceId, { correct: true, latencyMs: 2200 });
+
+  const d2 = decisionTrace.recordDecision({ action: 'practice', nowMs: 1700000031000 });
+  decisionTrace.evaluateOutcome(d2.traceId, { correct: true, latencyMs: 2100 });
+
+  let midParams = decisionTrace.readParams();
+  assert.strictEqual(midParams['difficulty.targetSuccess'], 0.80);
+  assert.strictEqual(midParams.consecutivePositives, 2);
+
+  // Sukses ke-3 memicu adaptasi otonom (+0.02)
+  const d3 = decisionTrace.recordDecision({ action: 'practice', nowMs: 1700000032000 });
+  decisionTrace.evaluateOutcome(d3.traceId, { correct: true, latencyMs: 2300 });
+
+  let tunedParams = decisionTrace.readParams();
+  assert.strictEqual(tunedParams['difficulty.targetSuccess'], 0.82);
+  assert.strictEqual(tunedParams.consecutivePositives, 0); // cooldown reset
+  assert.ok(tunedParams.activeChange);
+  assert.strictEqual(tunedParams.activeChange.path, 'difficulty.targetSuccess');
+  assert.strictEqual(tunedParams.activeChange.from, 0.80);
+  assert.strictEqual(tunedParams.activeChange.to, 0.82);
+  assert.strictEqual(tunedParams.adaptationHistory.length, 1);
+
+  // Muncul kegagalan intervensi / regresi
+  const d4 = decisionTrace.recordDecision({ action: 'scaffold_hint', nowMs: 1700000033000 });
+  decisionTrace.evaluateOutcome(d4.traceId, { correct: false, latencyMs: 8500 }); // regresi terdeteksi!
+
+  let rolledParams = decisionTrace.readParams();
+  assert.strictEqual(rolledParams['difficulty.targetSuccess'], 0.80); // Rollback sukses dieksekusi!
+  assert.strictEqual(rolledParams.activeChange, null);
+  assert.strictEqual(rolledParams.adaptationHistory.length, 2);
+  assert.strictEqual(rolledParams.adaptationHistory[1].reason, 'autonomous_regression_rollback');
+});
+
+// =========================================================================
+// Scenario L: Deterministic N-of-1 Interleaved Micro-Trial Assignment
+// =========================================================================
+test('Scenario L · Alokasi eksperimen N-of-1 within-subject: determinisme hash FNV-1a dan distribusi seimbang', () => {
+  // Determinisme: masukan sama menghasilkan kelompok yang sama
+  const groupA1 = decisionTrace.assignNof1('item_verb_01', 'exp_scaffold_timing');
+  const groupA2 = decisionTrace.assignNof1('item_verb_01', 'exp_scaffold_timing');
+  assert.strictEqual(groupA1, groupA2);
+  assert.ok(groupA1 === 'control' || groupA1 === 'candidate');
+
+  // Variasi: kelompok berbeda untuk item berbeda dalam eksperimen yang sama
+  let controls = 0;
+  let candidates = 0;
+  for (let i = 0; i < 20; i++) {
+    const grp = decisionTrace.assignNof1('item_q_' + i, 'exp_scaffold_timing');
+    if (grp === 'control') controls++;
+    else if (grp === 'candidate') candidates++;
+  }
+
+  // Kedua kelompok harus menerima alokasi (tidak boleh 0% pada salah satu)
+  assert.ok(controls > 0, 'Harus ada alokasi control');
+  assert.ok(candidates > 0, 'Harus ada alokasi candidate');
+  assert.strictEqual(controls + candidates, 20);
+});
+
 console.log('\n======================================================');
 console.log(`FIEZEL Living Intelligence Test: ${passes}/${passes + failures} PASS`);
 console.log('======================================================\n');
@@ -356,3 +467,4 @@ console.log('======================================================\n');
 if (failures > 0) {
   process.exit(1);
 }
+

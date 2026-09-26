@@ -66,13 +66,21 @@
     var timing = String(ctx.timing || '');
     var isFatigued = ctx.isFatigued === true || affect === 'fatigued';
 
+    function t(key, fallback) {
+      if (typeof FiezelI18n !== 'undefined' && FiezelI18n && typeof FiezelI18n.t === 'function') {
+        var res = FiezelI18n.t(key);
+        if (res && res !== key) return res;
+      }
+      return fallback;
+    }
+
     // 1. Prioritas Keselamatan & Kelelahan (CONCERNED)
     if (isFatigued || move === 'breathe') {
       return {
         state: STATES.CONCERNED,
         pawState: PAW_MAP.concerned.pawState,
         pawPose: PAW_MAP.concerned.pawPose,
-        microcopy: 'Fokusmu sudah luar biasa. Istirahat sejenak bila mulai lelah.',
+        microcopy: t('presence.concerned', 'Fokusmu sudah luar biasa. Istirahat sejenak bila mulai lelah.'),
         silent: false,
         rationale: 'presence_affect_fatigue_or_breathe'
       };
@@ -84,7 +92,7 @@
         state: STATES.CELEBRATING,
         pawState: PAW_MAP.celebrating.pawState,
         pawPose: PAW_MAP.celebrating.pawPose,
-        microcopy: 'Luar biasa! Materi ini berhasil kamu tuntaskan.',
+        microcopy: t('presence.celebrating', 'Luar biasa! Materi ini berhasil kamu tuntaskan.'),
         silent: false,
         rationale: 'presence_mastery_celebration'
       };
@@ -96,7 +104,7 @@
         state: STATES.REINFORCING,
         pawState: PAW_MAP.reinforcing.pawState,
         pawPose: PAW_MAP.reinforcing.pawPose,
-        microcopy: 'Yuk kita cermati polanya bersama sebelum mencoba lagi.',
+        microcopy: t('presence.reinforcing', 'Yuk kita cermati polanya bersama sebelum mencoba lagi.'),
         silent: false,
         rationale: 'presence_reteach_reinforcing'
       };
@@ -108,7 +116,7 @@
         state: STATES.HINTING,
         pawState: PAW_MAP.hinting.pawState,
         pawPose: PAW_MAP.hinting.pawPose,
-        microcopy: 'Perhatikan kata petunjuknya, lalu coba sekali lagi.',
+        microcopy: t('presence.hinting', 'Perhatikan kata petunjuknya, lalu coba sekali lagi.'),
         silent: false,
         rationale: 'presence_scaffold_hinting'
       };
@@ -120,7 +128,7 @@
         state: STATES.CORRECTING,
         pawState: PAW_MAP.correcting.pawState,
         pawPose: PAW_MAP.correcting.pawPose,
-        microcopy: 'Hampir tepat. Coba periksa lagi pilihan lainnya.',
+        microcopy: t('presence.correcting', 'Hampir tepat. Coba periksa lagi pilihan lainnya.'),
         silent: false,
         rationale: 'presence_first_mistake_correcting'
       };
@@ -132,7 +140,7 @@
         state: STATES.CHALLENGING,
         pawState: PAW_MAP.challenging.pawState,
         pawPose: PAW_MAP.challenging.pawPose,
-        microcopy: 'Latihan ini tampak mudah bagimu. Siap tantangan berikutnya?',
+        microcopy: t('presence.challenging', 'Latihan ini tampak mudah bagimu. Siap tantangan berikutnya?'),
         silent: false,
         rationale: 'presence_streak_challenge'
       };
@@ -144,7 +152,7 @@
         state: STATES.ENCOURAGING,
         pawState: PAW_MAP.encouraging.pawState,
         pawPose: PAW_MAP.encouraging.pawPose,
-        microcopy: 'Bagus sekali! Kamu berhasil menyelesaikannya sendiri.',
+        microcopy: t('presence.encouraging', 'Bagus sekali! Kamu berhasil menyelesaikannya sendiri.'),
         silent: false,
         rationale: 'presence_recovery_encouraging'
       };

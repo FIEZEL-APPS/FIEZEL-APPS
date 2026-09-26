@@ -121,7 +121,15 @@
      Kunci 'kursus-ja.<kunci>' didaftarkan id + th di copy-*-bahasa.js; bila ada, ia menang
      atas kunci biasanya. Kunci tanpa padanan kursus tetap jatuh ke kalimat umum. */
   var course = null;
-  function setCourse(next) { course = next === 'ja' ? 'ja' : null; return course; }
+  function setCourse(next) {
+    var normalized = next === 'ja' ? 'ja' : null;
+    if (normalized === course) return course;
+    course = normalized;
+    listeners.forEach(function (fn) {
+      try { fn(current); } catch (e) { /* listener rusak ≠ boot rusak */ }
+    });
+    return course;
+  }
   function getCourse() { return course; }
   function t(key, params) {
     var s;
