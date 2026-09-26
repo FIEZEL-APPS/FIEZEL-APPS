@@ -266,7 +266,7 @@ membaca §7 sebagai keadaan hari ini.
 | 3 — eksperimen N-of-1 | selesai | `fiezel-nof1.js` + `tests/nof1-test.js` (blok RED: hash lama seimbang SEMPURNA dan tetap cacat) |
 | 4 — parameter jadi permukaan + ledger | selesai | `fiezel-param-ledger.js` + `tests/param-ledger-test.js` |
 | 5 — penyetelan-diri berbatas | **ACTIVE (OWNER-authorized m025-374)** | `fiezel-self-tune.js` + `fiezel-param-ledger.js` + wiring app.js; izin OWNER 2026-09-27 |
-| 6 — perpanjangan-diri konten | **diblokir keputusan OWNER, bukan kode** | lihat §5 Langkah 6 |
+| 6 — perpanjangan-diri konten & rilis | **SELESAI (Level 5 Charter + Level 6 Autopilot)** | `BRAINCORE-AUTONOMY-GOVERNANCE.md` + `tools/autonomous-autopilot-release.mjs` (izin penuh OWNER 2026-09-27) |
 
 ### Sisipan yang tidak ada di peta asli: sinkron antar-perangkat (S1–S6)
 
