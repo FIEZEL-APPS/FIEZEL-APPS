@@ -308,6 +308,10 @@ jobs:
           node tests/student-single-registration-test.js
           node tests/th-ui-leak-test.js
           node tests/i18n-kunci-hantu-test.js
+          # Arah ketiga cacat i18n: kunci terdaftar DAN dipanggil, tetapi objek parameternya
+          # memuat nama placeholder kembar — nilai pertama hilang tanpa suara. Lahir dari
+          # kartu akar masalah Core Brain yang menyebut prasyaratnya dua kali (audit 2026-09-26).
+          node tests/i18n-param-collision-test.js
           # Lapis AKUN sisi murid (masuk/daftar/aktivasi guru). Ditempatkan tepat sesudah
           # gerbang sosial karena keduanya memakai lane transport yang sama (panggilan
           # langsung ke Worker dengan cookie fz_id), dan cacat di lane itu akan memerahkan

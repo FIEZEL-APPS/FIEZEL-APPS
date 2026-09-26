@@ -2996,6 +2996,13 @@ function queuePolicyOutcomeSync(outcome){const clean=sanitizePolicyOutcome(outco
  * FAIL-QUIET: modul absen, state korup, atau exception = perilaku identik sebelum m025-374.
  * Tidak ada satu pun jalur yang membuat aplikasi berperilaku berbeda saat modul tidak ada. */
 const SELF_TUNE_KEY='fiezel-self-tune-v1';
+/* Audit braincore 2026-09-26: FiezelDecisionTrace (features/learner-flow/fiezel-decision-trace.js)
+ * menulis dua kunci SENDIRI - rantai keputusan per jawaban dan parameter hidup yang ia setel
+ * (difficulty.targetSuccess, dibaca affectTargetSuccess). Karena yang menulis modulnya, bukan
+ * app.js, gerbang reset R2 tidak pernah melihatnya: murid yang mereset progres mewarisi
+ * targetSuccess hasil setelan murid sebelumnya. Literalnya dikunci ke konstanta modul oleh
+ * tests/reset-side-state-test.js (R5). */
+const DECISION_TRACE_KEY='fiezel-decision-trace-v2',LIVE_PARAMS_KEY='fiezel-live-params-v1';
 function selfTuneAvailable(){return !!(self.FiezelSelfTune&&typeof self.FiezelSelfTune.propose==='function')}
 function paramLedgerAvailable(){return !!(self.FiezelParamLedger&&typeof self.FiezelParamLedger.append==='function')}
 function brainConfigAvailable(){return !!(self.FiezelBrainConfig&&typeof self.FiezelBrainConfig.resolve==='function')}
@@ -12745,7 +12752,7 @@ function coreBrainPanelMarkup(){
     return card(`<h3>${FiezelI18n.t('progress.kartu-cara-menilai')}</h3><p>${FiezelI18n.t('progress.still-mengumpulkan-bukti-answer-terbaca',{evidence:ability.evidence||0})}</p><p class="muted">${FiezelI18n.t('progress.sampai-saat-kebijakan-adaptif-deterministik')}</p>`)+detailTeknisMarkup()+olmPanelMarkup()+confusionInsightMarkup()+affectSuggestionMarkup();
   }
   const rootCause=snapshot.rootCause&&snapshot.rootCause.isRoot===false
-    ? `<p><b>${FiezelI18n.t('progress.akar-masalah')}</b> ${FiezelI18n.t('progress.kesulitan-kemungkinan-besar-berasal-jadi',{skillName:esc(friendlySkillName(snapshot.rootCause.symptomSkill||snapshot.rootCause.symptomFamily)),skillName:esc(friendlySkillName(snapshot.rootCause.skill))})}</p>`
+    ? `<p><b>${FiezelI18n.t('progress.akar-masalah')}</b> ${FiezelI18n.t('progress.kesulitan-kemungkinan-besar-berasal-jadi',{symptomSkill:esc(friendlySkillName(snapshot.rootCause.symptomSkill||snapshot.rootCause.symptomFamily)),rootSkill:esc(friendlySkillName(snapshot.rootCause.skill))})}</p>`
     : '';
   const bestWindow=chrono.confident&&chrono.best?FiezelI18n.t('progress.div-jam-paling-produktif-br',{id:esc(chrono.best.id),akurasi:chrono.best.accuracy}):'';
   return card(`<h3>${FiezelI18n.t('progress.kartu-cara-menilai')}</h3>
@@ -14034,7 +14041,7 @@ function resetProgress(){openModal(`<div class="modal-mark">FIEZEL</div><h2>${Fi
      Komentar ini sengaja DI LUAR literal array: tests/reset-side-state-test.js mengurai
      daftar itu dengan split(','), jadi satu koma di dalam komentar membuat gerbangnya
      membaca kunci yang salah. */
-  for(const k of [BKT_KEY,MISCONCEPTION_LEDGER_KEY,ITEM_CALIBRATION_KEY,CONFUSION_MATRIX_KEY,OLM_NEGOTIATION_KEY,SRL_KEY,EVIDENCE_COHORT_KEY,EVIDENCE_LAST_KEY,EVIDENCE_ATTEMPT_KEY,RETENTION_PROBE_KEY,SL_STATE_KEY,IDENTITY_EVIDENCE_ATTEMPT_KEY,LEARNER_NAME_SYNC_KEY,ACCOUNT_NUDGE_KEY,SELF_TUNE_KEY]){
+  for(const k of [BKT_KEY,MISCONCEPTION_LEDGER_KEY,ITEM_CALIBRATION_KEY,CONFUSION_MATRIX_KEY,OLM_NEGOTIATION_KEY,SRL_KEY,EVIDENCE_COHORT_KEY,EVIDENCE_LAST_KEY,EVIDENCE_ATTEMPT_KEY,RETENTION_PROBE_KEY,SL_STATE_KEY,IDENTITY_EVIDENCE_ATTEMPT_KEY,LEARNER_NAME_SYNC_KEY,ACCOUNT_NUDGE_KEY,SELF_TUNE_KEY,DECISION_TRACE_KEY,LIVE_PARAMS_KEY]){
     try{localStorage.removeItem(sideStateKey(k))}catch{}
     try{localStorage.removeItem(k)}catch{}
   }

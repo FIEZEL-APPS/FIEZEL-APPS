@@ -1,7 +1,7 @@
 {
-  "version": "m025-374",
-  "claimedBy": "branch main",
-  "claimedAt": "2026-09-26T21:48:08.720Z",
-  "reason": "fix kurikulum html cache version m025-374",
+  "version": "m025-375",
+  "claimedBy": "branch claude/happy-bohr-iteg9g",
+  "claimedAt": "2026-09-26T22:20:35.251Z",
+  "reason": "audit braincore: akar-masalah i18n, reset decision trace, backend state",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }

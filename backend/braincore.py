@@ -88,7 +88,11 @@ async def get_state(student_id: str, competency_id: str) -> dict:
 def bkt_update(p: float, correct: bool, hints: int = 0, confidence: float | None = None) -> float:
     """Posterior BKT + koreksi kecil dari perilaku (hint & confidence adalah evidence tambahan)."""
     slip, guess = P_SLIP, P_GUESS
-    if hints:
+    # Hint hanya MELEMAHKAN bukti jawaban BENAR. Menaikkan slip pada jawaban SALAH justru
+    # membuat "salah walau sudah dibantu" terbaca sebagai kelalaian, sehingga posterior turun
+    # LEBIH SEDIKIT daripada salah tanpa bantuan (p=0.5, 2 hint: 0.38 vs 0.27) - arah yang
+    # terbalik: gagal meski sudah diberi petunjuk adalah bukti belum-menguasai yang lebih kuat.
+    if hints and correct:
         slip = min(0.35, P_SLIP + 0.08 * hints)   # benar setelah hint = bukti lebih lemah
     if confidence is not None:
         if correct and confidence <= 0.34:
@@ -116,11 +120,17 @@ def retrievability(st: dict) -> float | None:
 def derive_state(st: dict) -> str:
     if st["attempts"] == 0:
         return "NOT_EXPOSED" if st["exposures"] == 0 else "EXPOSED"
-    if st.get("transferred_at"):
+    # RETAINED dan TRANSFERRED adalah tingkat DI ATAS mastery, bukan medali permanen. Dulu
+    # keduanya dicek lebih dulu tanpa syarat, dan transferred_at tidak pernah dihapus: murid
+    # yang sekali lolos soal transfer tetap berlabel "Bisa diterapkan di situasi baru" walau
+    # posteriornya jatuh ke 0.2, lalu masuk kelompok pengayaan dan rekomendasi guru.
+    # Stempel waktunya tetap disimpan sebagai riwayat; labelnya kembali begitu mastery pulih.
+    still_mastered = st["p_mastery"] >= MASTERY_T and st["correct"] >= MIN_CORRECT_FOR_MASTERY
+    if st.get("transferred_at") and still_mastered:
         return "TRANSFERRED"
-    if st.get("retained_at"):
+    if st.get("retained_at") and still_mastered:
         return "RETAINED"
-    if st["p_mastery"] >= MASTERY_T and st["correct"] >= MIN_CORRECT_FOR_MASTERY:
+    if still_mastered:
         return "MASTERED"
     if st["p_mastery"] >= DEVELOPING_T:
         return "DEVELOPING"

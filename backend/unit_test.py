@@ -75,6 +75,10 @@ def test_bkt():
     check("benar-tapi-tidak-yakin naik lebih sedikit dari benar-yakin", lucky < sure, (lucky, sure))
     hinted = bc.bkt_update(0.5, True, hints=2)
     check("benar dengan hint = evidence lebih lemah", hinted < sure, (hinted, sure))
+    wrong_plain = bc.bkt_update(0.5, False)
+    wrong_hinted = bc.bkt_update(0.5, False, hints=2)
+    check("salah walau dibantu hint tidak dihukum lebih ringan dari salah tanpa hint",
+          wrong_hinted <= wrong_plain, (wrong_hinted, wrong_plain))
 
 
 # ---------- IRT 3PL & Decay Parity ----------
@@ -117,6 +121,12 @@ def test_states():
     check("retensi terbukti = RETAINED", bc.derive_state(st) == "RETAINED")
     st["transferred_at"] = bc.now()
     check("transfer terbukti = TRANSFERRED", bc.derive_state(st) == "TRANSFERRED")
+    st_drop = dict(st, p_mastery=0.2)
+    check("TRANSFERRED tidak lengket saat posterior jatuh di bawah mastery",
+          bc.derive_state(st_drop) == "PRACTICING", bc.derive_state(st_drop))
+    check("RETAINED tidak lengket saat posterior jatuh di bawah mastery",
+          bc.derive_state(dict(st_drop, transferred_at=None, p_mastery=0.7)) == "DEVELOPING")
+    check("TRANSFERRED kembali saat mastery pulih", bc.derive_state(dict(st_drop, p_mastery=0.9)) == "TRANSFERRED")
     st2 = dict(st, attempts=3, correct=3, p_mastery=0.9, state="MASTERED",
                last_at=bc.now() - timedelta(days=30), stability_days=3.0,
                retained_at=None, transferred_at=None)
