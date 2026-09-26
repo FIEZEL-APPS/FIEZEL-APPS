@@ -27,7 +27,12 @@ const bodyClasses=classList();
 const document={baseURI:'http://localhost/',body:{classList:bodyClasses},visibilityState:'visible',getElementById:element,querySelector(){return null},querySelectorAll(){return[]},createElement(){return{className:'',textContent:'',disabled:false,onclick:null,classList:classList(),append(){},addEventListener(){}}},addEventListener(){}};
 const store={};const localStorage={getItem:k=>Object.prototype.hasOwnProperty.call(store,k)?store[k]:null,setItem:(k,v)=>store[k]=String(v),removeItem:k=>delete store[k]};
 const notifications=[];const Notification=function(title,options){notifications.push({title,options});this.close=()=>{};};Notification.permission='denied';Notification.requestPermission=async()=>Notification.permission;
-const fetch=async u=>{const file=String(u).split('/').pop();return{ok:true,json:async()=>JSON.parse(fs.readFileSync(path.join(root,file),'utf8'))}};
+const fetch=async u=>{
+  const s=String(u);
+  if(s.includes('ipwho.is'))return{ok:false,status:404,json:async()=>null};
+  const file=s.split('/').pop().split('?')[0];
+  return{ok:true,json:async()=>JSON.parse(fs.readFileSync(path.join(root,file),'utf8'))};
+};
 const noopTimer=()=>({unref(){}});
 const navigator={vibrate(){return true}};
 const context={console,document,localStorage,Notification,navigator,fetch,location:{href:'http://localhost/'},window:null,self:null,Date,Intl,Math,URL,Error,Promise,setTimeout,clearTimeout,setInterval:noopTimer,clearInterval(){},SpeechSynthesisUtterance:function(){},speechSynthesis:{cancel(){},speak(){}},FIEZEL_REQUIRE_NOTIFICATIONS:false};context.window=context;context.self=context;context.window.scrollTo=()=>{};context.window.focus=()=>{};
@@ -44,8 +49,16 @@ if(fs.existsSync(path.join(i18nDir,'fiezel-i18n.js'))){
     vm.runInContext(fs.readFileSync(path.join(i18nDir,f),'utf8'),context,{filename:f});
 }
 vm.runInContext(app,context,{filename:'app.js'});
+async function waitForRender(timeoutMs=3500){
+  const start=Date.now();
+  while(Date.now()-start<timeoutMs){
+    if(/home-page/.test(element('app').innerHTML))return;
+    await new Promise(r=>setTimeout(r,25));
+  }
+}
 setTimeout(async()=>{
   try{
+    await waitForRender();
     // WAJIB -> DIUNDANG, TIDAK DIPAKSA: izin 'denied' tidak boleh mengunci apa pun.
     assert(!bodyClasses.contains('notification-locked'),'izin ditolak TIDAK boleh mengunci aplikasi lagi');
     /* m025-246: yang diuji adalah "Home TERGAMBAR", bukan tata letak tertentu. Pola lama
