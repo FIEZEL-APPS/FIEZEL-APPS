@@ -2977,12 +2977,67 @@ function evaluatePolicyOutcome(session,now=Date.now()){
 }
 function sanitizePolicyOutcome(raw){if(!raw||raw.schema!==POLICY_OUTCOME_SCHEMA)return null;const statuses=new Set(['positive','mixed','negative','insufficient']),recs=new Set(['keep_or_progress','adjust','reduce_load','collect_more_evidence']);if(!statuses.has(raw.status)||!recs.has(raw.recommendation))return null;const clamp=(v,min,max)=>Math.max(min,Math.min(max,Number(v)||0));return{schema:POLICY_OUTCOME_SCHEMA,outcomeId:String(raw.outcomeId||'').slice(0,160),sessionId:String(raw.sessionId||'').slice(0,120),policyId:String(raw.policyId||'').slice(0,120),evaluatedAt:String(raw.evaluatedAt||'').slice(0,40),policyMode:String(raw.policyMode||'').slice(0,30),targetSkill:String(raw.targetSkill||'').slice(0,80),primaryDomain:normalizePolicyDomain(raw.primaryDomain),completed:!!raw.completed,abandoned:!!raw.abandoned,planned:clamp(raw.planned,0,100),answered:clamp(raw.answered,0,100),completionRate:clamp(raw.completionRate,0,100),accuracy:raw.accuracy==null?null:clamp(raw.accuracy,0,100),targetAttempts:clamp(raw.targetAttempts,0,100),targetAccuracy:raw.targetAccuracy==null?null:clamp(raw.targetAccuracy,0,100),targetAdherence:clamp(raw.targetAdherence,0,100),medianResponseMs:raw.medianResponseMs==null?null:clamp(raw.medianResponseMs,0,300000),confidenceGap:raw.confidenceGap==null?null:clamp(raw.confidenceGap,0,100),masteryBefore:raw.masteryBefore==null?null:clamp(raw.masteryBefore,0,100),masteryAfter:raw.masteryAfter==null?null:clamp(raw.masteryAfter,0,100),masteryDelta:raw.masteryDelta==null?null:Math.max(-100,Math.min(100,Number(raw.masteryDelta)||0)),baselineTargetAccuracy:raw.baselineTargetAccuracy==null?null:clamp(raw.baselineTargetAccuracy,0,100),accuracyDelta:raw.accuracyDelta==null?null:Math.max(-100,Math.min(100,Number(raw.accuracyDelta)||0)),score:clamp(raw.score,0,100),status:raw.status,recommendation:raw.recommendation,privacy:{rawAnswersIncluded:false,rawHistoryIncluded:false}}
 }
-function recordPolicyOutcomeFromSession(session,now=Date.now()){const outcome=evaluatePolicyOutcome(session,now);if(!outcome)return null;const clean=sanitizePolicyOutcome(outcome);if(!clean)return null;const previous=(state.policyOutcomeMeta?.history||[]).filter(x=>x?.outcomeId!==clean.outcomeId&&(!clean.sessionId||x?.sessionId!==clean.sessionId));state.policyOutcomeMeta={last:clean,history:[...previous,clean].slice(-POLICY_OUTCOME_LOG_LIMIT),queue:Array.isArray(state.policyOutcomeMeta?.queue)?state.policyOutcomeMeta.queue.slice(-10):[]};return clean}
+function recordPolicyOutcomeFromSession(session,now=Date.now()){const outcome=evaluatePolicyOutcome(session,now);if(!outcome)return null;const clean=sanitizePolicyOutcome(outcome);if(!clean)return null;const previous=(state.policyOutcomeMeta?.history||[]).filter(x=>x?.outcomeId!==clean.outcomeId&&(!clean.sessionId||x?.sessionId!==clean.sessionId));state.policyOutcomeMeta={last:clean,history:[...previous,clean].slice(-POLICY_OUTCOME_LOG_LIMIT),queue:Array.isArray(state.policyOutcomeMeta?.queue)?state.policyOutcomeMeta.queue.slice(-10):[]};/* m025-374: selfTune dievaluasi setiap kali outcome dicatat. */try{selfTuneAfterOutcome(clean,now)}catch{/* fail-quiet */}return clean}
 function backfillPolicyOutcomes(now=Date.now()){const sessions=(state.sessionHistory||[]).slice(-30),existing=new Set((state.policyOutcomeMeta?.history||[]).map(x=>String(x?.sessionId||'')).filter(Boolean));let added=0;for(const session of sessions){const sid=String(session?.id||'');if(!session?.policyId||!sid||existing.has(sid))continue;const at=Date.parse(session?.at||'')||now,outcome=recordPolicyOutcomeFromSession(session,at);if(!outcome)continue;existing.add(sid);const q=(state.policyOutcomeMeta?.queue||[]).filter(x=>x?.outcomeId!==outcome.outcomeId&&x?.sessionId!==sid);state.policyOutcomeMeta.queue=[...q,outcome].slice(-10);added++}if(added){save();if(CORE_WORKER_URL)setTimeout(()=>flushPolicyOutcomeQueue(),0)}return added}
 function recentPolicyOutcomes(limit=5){return(state.policyOutcomeMeta?.history||[]).slice(-Math.max(1,Math.min(10,limit))).map(sanitizePolicyOutcome).filter(Boolean)}
 function policyOutcomeSummary(){const rows=recentPolicyOutcomes(5);return{schema:POLICY_OUTCOME_SCHEMA,count:rows.length,latest:rows.at(-1)||null,positive:rows.filter(x=>x.status==='positive').length,mixed:rows.filter(x=>x.status==='mixed').length,negative:rows.filter(x=>x.status==='negative').length,insufficient:rows.filter(x=>x.status==='insufficient').length,rows}}
 async function flushPolicyOutcomeQueue(){if(!CORE_WORKER_URL)return false;const queue=[...(state.policyOutcomeMeta?.queue||[])];if(!queue.length)return true;const remain=[];for(const outcome of queue.slice(-10)){try{const r=await coreWorkerExec('/api/policy/outcome',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({outcome})});if(!r.ok)remain.push(outcome)}catch{remain.push(outcome)}}state.policyOutcomeMeta.queue=remain.slice(-10);save();return !remain.length}
 function queuePolicyOutcomeSync(outcome){const clean=sanitizePolicyOutcome(outcome);if(!clean)return;const q=(state.policyOutcomeMeta?.queue||[]).filter(x=>x?.outcomeId!==clean.outcomeId);state.policyOutcomeMeta.queue=[...q,clean].slice(-10);save();if(CORE_WORKER_URL)flushPolicyOutcomeQueue()}
+/* ---- m025-374 Langkah 4+5 roadmap otonomi: penyetelan-diri berbatas (OWNER 2026-09-27) --------
+ *
+ * selfTune.propose() dievaluasi SETELAH setiap policy outcome dicatat. Ia mengembalikan
+ * USULAN — modul murni yang tidak menulis apa pun. Pemanggilnya (di sini) yang menerapkan,
+ * mencatat ke ledger, dan menyimpannya.
+ *
+ * STATE tersimpan di kunci localStorage BARU 'fiezel-self-tune-v1' — fiezel-sl-v1-state
+ * TIDAK disentuh (kontrak §1 butir 6 dan butir integrasi). Kunci baru ini berisi:
+ *   { activeChange, sessionsSinceChange, ledger, halt }
+ *
+ * FAIL-QUIET: modul absen, state korup, atau exception = perilaku identik sebelum m025-374.
+ * Tidak ada satu pun jalur yang membuat aplikasi berperilaku berbeda saat modul tidak ada. */
+const SELF_TUNE_KEY='fiezel-self-tune-v1';
+function selfTuneAvailable(){return !!(self.FiezelSelfTune&&typeof self.FiezelSelfTune.propose==='function')}
+function paramLedgerAvailable(){return !!(self.FiezelParamLedger&&typeof self.FiezelParamLedger.append==='function')}
+function brainConfigAvailable(){return !!(self.FiezelBrainConfig&&typeof self.FiezelBrainConfig.resolve==='function')}
+function loadSelfTuneState(){try{const raw=localStorage.getItem(SELF_TUNE_KEY);return raw?JSON.parse(raw):null}catch{return null}}
+function saveSelfTuneState(st){try{localStorage.setItem(SELF_TUNE_KEY,JSON.stringify(st))}catch{}}
+function selfTuneAfterOutcome(outcome,now=Date.now()){
+  if(!selfTuneAvailable())return null;
+  try{
+    const st=loadSelfTuneState()||{};
+    // Sesi dihitung untuk cooldown: setiap outcome yang bukan 'insufficient' = satu sesi.
+    if(outcome&&outcome.status!=='insufficient')st.sessionsSinceChange=(st.sessionsSinceChange||0)+1;
+    // Config efektif: BOUNDS + sanitize menjaga invarian.
+    const config=brainConfigAvailable()?self.FiezelBrainConfig.resolve(st.configOverrides||{},now):null;
+    if(!config){saveSelfTuneState(st);return null}
+    // Verdict dari outcome terakhir — selfTune butuh ini untuk memutuskan.
+    const verdict=outcome?.verdict||null;
+    const proposal=self.FiezelSelfTune.propose(st,{config:config.effective||config,verdict},now);
+    if(!proposal||proposal.decision==='hold'){saveSelfTuneState(st);return proposal}
+    // APPLY atau ROLLBACK: catat di param ledger, perbarui state.
+    if(paramLedgerAvailable()){
+      const entry={event:proposal.decision==='apply'?'param_applied':'param_rolled_back',path:proposal.change?.path,from:proposal.change?.from,to:proposal.change?.to,rationale:proposal.rationale,at:new Date(now).toISOString()};
+      st.ledger=self.FiezelParamLedger.append(st.ledger||self.FiezelParamLedger.genesis(now),entry,now).chain||st.ledger;
+    }
+    if(proposal.decision==='apply'){
+      st.activeChange=proposal.change;st.sessionsSinceChange=0;
+      st.configOverrides=st.configOverrides||{};
+      // Terapkan: tulis ke overrides yang akan dibaca resolve() berikutnya.
+      const parts=String(proposal.change.path).split('.');
+      let cur=st.configOverrides;for(let i=0;i<parts.length-1;i++){cur[parts[i]]=cur[parts[i]]||{};cur=cur[parts[i]]}
+      cur[parts[parts.length-1]]=proposal.change.to;
+    }else if(proposal.decision==='rollback'){
+      // Rollback: hapus override yang di-rollback.
+      st.activeChange=null;
+      if(st.configOverrides&&proposal.change){
+        const parts=String(proposal.change.path).split('.');
+        let cur=st.configOverrides;for(let i=0;i<parts.length-1;i++){if(!cur[parts[i]])break;cur=cur[parts[i]]}
+        if(cur)delete cur[parts[parts.length-1]];
+      }
+    }
+    saveSelfTuneState(st);save();return proposal;
+  }catch{return null}
+}
 /* ---- m025-201 Kapasitas kode rasional yang tidak melaparkan lapisan otak -------------
  *
  * Worker mengirim sampai 12 kode; klien memotong di 8. Pemotongan itu TIDAK netral:
