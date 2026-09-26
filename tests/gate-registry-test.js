@@ -165,6 +165,16 @@ const EXCLUSIONS = new Map([
     class: 'gerbang-pra-rilis-fitur',
     reason:
       'Gerbang pengujian sistem kecerdasan kognitif hidup (Living Intelligence) Braincore untuk memvalidasi determinisme runtime trace, prinsip keheningan kehadiran (Presence Engine), deteksi miskonsepsi berulang, dan isolasi penuh 100% luring tanpa dependensi jaringan.'
+  }],
+  ['tests/assignment-poll-speed-test.js', {
+    class: 'gerbang-pra-rilis-fitur',
+    reason:
+      'Gerbang pra-rilis validasi latensi polling notifikasi tugas murid di fiezel-inbox.js dan app.js (MIN_GAP_MS 5s, NOTIF_POLL_MS 6s, boot delay <= 2s) serta sinkronisasi lintas-tab via BroadcastChannel.'
+  }],
+  ['tests/session-security-test.js', {
+    class: 'gerbang-pra-rilis-fitur',
+    reason:
+      'Gerbang pra-rilis verifikasi keamanan sesi HMAC, toleransi clock skew 120s, penolakan token kadaluarsa 180 hari, dan pembersihan memori serta isolasi multi-akun pada aktivasi/deaktivasi akun di klien.'
   }]
 ]);
 
