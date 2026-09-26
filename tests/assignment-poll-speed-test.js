@@ -48,7 +48,7 @@ test('3. Boot delay startNotifPolling <= 2000ms (bukan 6500ms)', () => {
 });
 
 test('4. learnerName() di fiezel-inbox.js tangguh dan tidak pernah ""', () => {
-  assert.ok(inboxSrc.includes("return first || 'Murid';"), 'fallback ke Murid jika kosong');
+  assert.ok(inboxSrc.includes("return first || t('inbox.default_student_name', 'Murid');") || inboxSrc.includes("return first || 'Murid';"), 'fallback ke Murid jika kosong');
   assert.ok(inboxSrc.includes("/^(sobat|murid|teman)(\\s+.*)?$/i"), 'menangani variasi Sobat FIEZEL dsb');
 });
 
