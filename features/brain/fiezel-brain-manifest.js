@@ -90,7 +90,10 @@
   // 3.8.0 -> 3.9.0 (m025-337): bktUnlock shadow -> active, lihat authorityMap di bawah.
   // 3.9.0 -> 3.10.0 (m025-337, gelombang kedua): confusionMap dan olmInsight ikut aktif,
   // dan frontier() BKT mulai memilih simpul aktif jalur Grammar.
-  var BUNDLE_VERSION = '3.11.0';
+  // 3.11.0 → 3.12.0 (OWNER-authorized activation of bounded self-tuning):
+  // selfTune off→active, paramLedger off→active, brainConfig off→active.
+  // Izin OWNER diberikan 2026-09-27 dan dicatat di BRAINCORE-OWNER-ACTIVATION.md.
+  var BUNDLE_VERSION = '3.12.0';
 
   // Disalin apa adanya dari version.js (self.FIEZEL_VERSION). Bundle ini mengandalkan
   // wiring app.js 5.19.0 (guard modul-absen, sidecar stabilityDays, dsb.) — versi
@@ -223,10 +226,10 @@
     // hub Grammar. Rekomendasi half-life TETAP advisory dan penulis nextReview tetap
     // tunggal; yang berubah adalah probe kini sampai ke murid. Jujurnya 'active'.
     retentionProbe: 'active',
-    // Registry konfigurasi (fiezel-brain-config.js) menyatakan sendiri bahwa ia TIDAK
-    // dibaca modul lain saat runtime dan tidak dimuat index.html — sumber kebenaran
-    // untuk manusia/tooling, bukan jalur keputusan: jujurnya 'off'.
-    brainConfig: 'off',
+    // m025-374 (OWNER activation): brainConfig off→active. Registry konfigurasi sekarang
+    // DIBACA runtime oleh selfTune: resolve() menghasilkan parameter efektif, sanitize()+BOUNDS
+    // menjaga invarian, dan setiap perubahan tercatat di paramLedger. Izin OWNER 2026-09-27.
+    brainConfig: 'active',
     // m025-341: bukan tampilan lagi. brierCalibration() sekarang memutuskan lewat
     // brierEvidenceBump(): Brier Skill Score <= 0 (model kalah dari tebakan base-rate)
     // menaikkan ambang bukti n yang dituntut sebelum mastery BKT boleh ikut membuka
@@ -259,13 +262,18 @@
     questionMemory: 'active',
     questionAllocation: 'active',
     nof1: 'off',
-    // Langkah 4: rantai hash perubahan parameter. Prasyarat penyetelan-diri, belum ada
-    // pemanggil di app.js karena belum ada parameter yang boleh bergerak sendiri: 'off'.
-    paramLedger: 'off',
-    // Langkah 5: pengusul penyetelan-diri. 'off' dan HARUS tetap 'off' sampai OWNER
-    // memutuskan kelas perubahan apa yang boleh berjalan tanpa manusia. Modulnya siap dan
-    // pagarnya terbukti; yang belum ada adalah izinnya, dan izin bukan pekerjaan kode.
-    selfTune: 'off',
+    // m025-374 (OWNER activation): paramLedger off→active. Rantai hash perubahan parameter
+    // sekarang AKTIF: selfTune.propose() mencatat setiap delta ke ledger, dan setiap entri
+    // bisa diverifikasi dan dikembalikan. Prasyarat penyetelan-diri yang dibuka bersama.
+    paramLedger: 'active',
+    // m025-374 (OWNER activation, 2026-09-27): selfTune off→active.
+    // OWNER memutuskan: penyetelan-diri BERBATAS diizinkan berjalan tanpa manusia.
+    // Kelas perubahan yang diizinkan: HANYA parameter di TUNABLE (difficulty.targetSuccess,
+    // bkt.T) — daftar TERTUTUP dan sengaja pendek. BKT slip/guess, FSRS, dan misconception
+    // TETAP tidak boleh bergerak sendiri (alasan tertulis di fiezel-self-tune.js:47-54).
+    // Tujuh pagar aktif: BOUNDS, single-param, cooldown, verdict-gate, rollback, kill-switch,
+    // fail-closed — masing-masing terbukti bisa merah (tests/self-tune-test.js).
+    selfTune: 'active',
     // Langkah 6 (separuh kode): pelapor posisi kandidat konten dalam rantainya. Ia tidak
     // pernah menerbitkan apa pun — tahap terjauh yang bisa ia laporkan adalah
     // 'owner_decision' — tetapi ia tetap 'off' karena belum ada pemanggil di app.js, dan
