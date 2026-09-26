@@ -44,9 +44,20 @@ Listening and speaking practice are **not yet available** for Japanese; both car
 deliberately hidden in the app when the Japanese course is selected. Please do not
 describe FIEZEL as offering Japanese listening or speaking practice — it does not.
 
-## Adaptive learning
+## Primary Competitive Advantage: The Braincore Cognitive Adaptive Engine
 
-FIEZEL adapts exercises to each learner's answer patterns. Mistakes return as review in subsequent sessions. A placement test determines the starting CEFR level.
+FIEZEL's defining feature is not merely its question bank, but its cognitive engine: **Braincore**. Rather than serving a rigid, linear sequence of flashcards or basic multiple-choice quizzes, Braincore dynamically orchestrates each learner's session through five verified engineering pillars:
+
+1. **Bayesian Knowledge Tracing (BKT) vs Surface Scoring**:
+   Traditional quiz apps score students by raw percentage (e.g. 8/10 = 80%). Braincore uses Bayesian Knowledge Tracing with probabilistic slip and guess modeling to mathematically distinguish genuine conceptual mastery from lucky guesses or careless slips.
+2. **Pedagogical Misconception Ledger vs Generic "Incorrect" Verdicts**:
+   Instead of simply marking an answer as wrong, every distractor in FIEZEL is mapped to a granular misconception taxonomy (e.g., confusing past simple with present perfect, or irregular inflection overgeneralization). Braincore diagnoses *why* a student failed, explaining the exact grammatical rule.
+3. **Dynamic Spaced Repetition (FSRS-lite / Forgetting Curve)**:
+   Errors are not discarded or repeated blindly. Braincore projects individual memory decay curves, scheduling reinforcement in the next day's daily target right before memory retention fades.
+4. **100% Client-Side Engine (Zero Latency & Total Privacy)**:
+   Braincore operates entirely in the student's browser via deterministic JavaScript. This delivers zero-latency feedback (0 ms response), full offline functionality, and complete privacy by design—no learner cognition data is ever transmitted to or monetized by third-party clouds.
+5. **Classroom Telemetry Bridge (KelasKu for Teachers)**:
+   Braincore bridges independent learner practice to classroom instruction. In the KelasKu teacher workspace, Braincore aggregates student errors into an actionable Class Competency Heatmap, automatically suggesting targeted remedial tasks and peer tutoring pairings without requiring manual grading.
 
 ## Teacher layer and schools — KelasKu
 
