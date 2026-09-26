@@ -28,7 +28,7 @@ const ok = (c, m) => { assert.ok(c, m); n++; console.log('ok - ' + m); };
 
 ok(html.indexOf('features/teacher/fiezel-teacher-shell.js') < 0 && html.indexOf('features/teacher/fiezel-teacher-curriculum.js') < 0,
   'L1 shell & kurikulum guru tidak dimuat saat boot');
-ok(html.indexOf('fiezel-teacher-loader.js') > 0 && html.indexOf('fiezel-teacher-loader.js') < html.indexOf('src="./app.js"'),
+ok(html.indexOf('fiezel-teacher-loader.js') > 0 && html.indexOf('fiezel-teacher-loader.js') < html.indexOf('src="./app.js'),
   'L1 pemuat guru dimuat sebelum app.js');
 ok(/BUNDLE = \['\.\/features\/teacher\/fiezel-teacher-curriculum\.js', '\.\/features\/teacher\/fiezel-teacher-shell\.js'\]/.test(loader),
   'L2 urutan bundel: kurikulum lalu shell');

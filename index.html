@@ -263,6 +263,7 @@ html.fz-booting body{overflow:hidden}
   <link rel="stylesheet" href="./features/ui/fiezel-lux.css">
   <link rel="stylesheet" href="./fiezel-2.css">
   <link rel="stylesheet" href="./features/speaking-listening/jlpt-listening.css">
+  <link rel="stylesheet" href="./features/ui/mobile-edge-fit.css?v=contrast-v12">
   <!-- m025-308: <link> ke ./features/ui/fiezel-marshmallow.css DIBUANG. Berkasnya TIDAK
        PERNAH ADA di repo (nol di riwayat git, nol di origin/main), jadi baris ini adalah
        404 pada setiap pemuatan halaman sejak ia ditulis.
@@ -438,8 +439,8 @@ html.fz-booting body{overflow:hidden}
       </button>
       <div class="topbar-actions">
         <button type="button" id="fzCourseSwitchBtn" class="course-switch-btn" onclick="toggleTargetCourse()" aria-label="Ganti Bahasa Kursus" data-i18n-aria-label="topbar.course-switch-aria" title="Ganti Kursus (Jepang / Inggris)">
-          <span class="course-switch-flag" id="fzCourseFlag">🇯🇵</span>
-          <span class="course-switch-label" id="fzCourseLabel">JA</span>
+          <span class="course-switch-flag" id="fzCourseFlag"><svg class="fiezel-flag-svg" viewBox="0 0 60 40" width="22" height="15" aria-hidden="true" focusable="false" style="display:inline-block;vertical-align:middle;border-radius:3px;box-shadow:0 0 1px rgba(0,0,0,0.6)"><clipPath id="fz-flag-en-topbar"><rect width="60" height="40" rx="3"/></clipPath><g clip-path="url(#fz-flag-en-topbar)"><path d="M0 0v40h60V0z" fill="#012169"/><path d="M0 0l60 40m0-40L0 40" stroke="#fff" stroke-width="6.67"/><path d="M0 0l60 40m0-40L0 40" stroke="#c8102e" stroke-width="4.44"/><path d="M30 0v40M0 20h60" stroke="#fff" stroke-width="11.11"/><path d="M30 0v40M0 20h60" stroke="#c8102e" stroke-width="6.67"/></g></svg></span>
+          <span class="course-switch-label" id="fzCourseLabel" style="display:none">EN</span>
         </button>
         <!-- Lonceng notifikasi: tugas dari guru, teman baru, sorakan, undangan. Menggantikan
              pintu topbar "Tanya FIEZEL" (askView tetap ada; aksesnya lewat pembimbing PAW).
@@ -546,13 +547,13 @@ html.fz-booting body{overflow:hidden}
         <div id="listeningQuestionSlot"></div>
 
         <!-- Official Download Section Footer -->
-        <div style="background:#F6EFE3;border-radius:12px;padding:12px 14px;border:1px solid var(--line, #E8DFD3);">
-          <b style="font-size:12px;color:var(--text, var(--ink));display:block;margin-bottom:4px;" data-i18n="jlpt.download-title">📥 Unduh Bahan Asli JLPT:</b>
+        <div style="background:#181824;border-radius:12px;padding:12px 14px;border:1px solid rgba(255,255,255,0.12);">
+          <b style="font-size:12px;color:#FFFFFF;display:block;margin-bottom:4px;" data-i18n="jlpt.download-title">📥 Unduh Bahan Asli JLPT:</b>
           <div style="display:flex;flex-wrap:wrap;gap:8px;font-size:11.5px;">
-            <a href="https://www.jlpt.jp/samples/sample2018/pdf/N5L.pdf" target="_blank" rel="noopener noreferrer" style="color:#B45309;text-decoration:none;font-weight:700;" data-i18n="jlpt.download-n5-pdf">📄 PDF Soal N5</a> ·
-            <a href="https://www.jlpt.jp/samples/sample2018/pdf/N5script.pdf" target="_blank" rel="noopener noreferrer" style="color:#B45309;text-decoration:none;font-weight:700;" data-i18n="jlpt.download-n5-script">📝 Naskah N5</a> ·
-            <a href="https://www.jlpt.jp/samples/sample2018/pdf/N4L.pdf" target="_blank" rel="noopener noreferrer" style="color:#B45309;text-decoration:none;font-weight:700;" data-i18n="jlpt.download-n4-pdf">📄 PDF Soal N4</a> ·
-            <a href="https://www.jlpt.jp/samples/sample2018/pdf/N4script.pdf" target="_blank" rel="noopener noreferrer" style="color:#B45309;text-decoration:none;font-weight:700;" data-i18n="jlpt.download-n4-script">📝 Naskah N4</a>
+            <a href="https://www.jlpt.jp/samples/sample2018/pdf/N5L.pdf" target="_blank" rel="noopener noreferrer" style="color:#FFE02E;text-decoration:none;font-weight:700;" data-i18n="jlpt.download-n5-pdf">📄 PDF Soal N5</a> ·
+            <a href="https://www.jlpt.jp/samples/sample2018/pdf/N5script.pdf" target="_blank" rel="noopener noreferrer" style="color:#FFE02E;text-decoration:none;font-weight:700;" data-i18n="jlpt.download-n5-script">📝 Naskah N5</a> ·
+            <a href="https://www.jlpt.jp/samples/sample2018/pdf/N4L.pdf" target="_blank" rel="noopener noreferrer" style="color:#FFE02E;text-decoration:none;font-weight:700;" data-i18n="jlpt.download-n4-pdf">📄 PDF Soal N4</a> ·
+            <a href="https://www.jlpt.jp/samples/sample2018/pdf/N4script.pdf" target="_blank" rel="noopener noreferrer" style="color:#FFE02E;text-decoration:none;font-weight:700;" data-i18n="jlpt.download-n4-script">📝 Naskah N4</a>
           </div>
         </div>
       </div>
@@ -993,7 +994,7 @@ html.fz-booting body{overflow:hidden}
   <!-- F28: shell + kurikulum guru (±600 KB) dimuat malas; pemuat kecil ini menyediakan
        previewAllowed() seketika dan mengambil modul penuh hanya untuk guru/demo guru. -->
   <script defer src="./features/teacher/fiezel-teacher-loader.js"></script>
-  <script defer src="./app.js"></script>
+  <script defer src="./app.js?v=m025-badge-free-v4"></script>
   <script defer src="./features/skills-evidence/fiezel-skills-evidence.js"></script>
   <script defer src="./features/academic-readiness/fiezel-academic-readiness.js"></script>
   <script defer src="./features/continuity/fiezel-continuity.js"></script>
