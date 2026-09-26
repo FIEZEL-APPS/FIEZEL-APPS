@@ -306,6 +306,7 @@
     'progress2.week-note': 'ทำไป {items} ข้อใน 7 วันที่ผ่านมา',
     'progress2.week-empty': 'สัปดาห์นี้ยังไม่ได้ฝึก เริ่มด้วยเซสชันเล็ก ๆ ก็พอ',
     'progress2.days': 'จ,อ,พ,พฤ,ศ,ส,อา',
-    'inbox.default_student_name': 'นักเรียน'
+    'inbox.default_student_name': 'นักเรียน',
+    'social.profile-tag': 'โปรไฟล์ผู้เรียน FIEZEL'
   });
 })();

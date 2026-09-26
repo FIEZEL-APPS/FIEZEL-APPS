@@ -101,7 +101,9 @@
     'jlpt.tab-explain-aria': 'Buka Kunci dan Pembahasan',
     'jlpt.tab-explain-btn': '💡 Pembahasan',
     'jlpt.tab-script-aria': 'Buka Naskah Dialog',
-    'jlpt.wrong-title': 'Belum Tepat'
+    'jlpt.wrong-title': 'Belum Tepat',
+    'jlpt.play-audio': 'Putar Audio',
+    'jlpt.pause-audio': 'Jeda Audio'
   });
   /* Lapisan kursus Bahasa Jepang (FiezelI18n.setCourse('ja')): saat kursus Jepang aktif,
      kunci 'kursus-ja.<kunci>' menang atas <kunci>. Nama bagian memakai istilah Jepang yang

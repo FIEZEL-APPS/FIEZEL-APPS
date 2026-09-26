@@ -321,6 +321,7 @@
     'progress2.week-note': '{items} soal dikerjakan 7 hari terakhir.',
     'progress2.week-empty': 'Belum ada latihan minggu ini. Satu sesi kecil sudah cukup untuk mulai.',
     'progress2.days': 'Sen,Sel,Rab,Kam,Jum,Sab,Min',
-    'inbox.default_student_name': 'Murid'
+    'inbox.default_student_name': 'Murid',
+    'social.profile-tag': 'Profil Pengguna FIEZEL'
   });
 })();
