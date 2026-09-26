@@ -75,7 +75,7 @@ export async function signIdentity(env, sub, nowMs) {
  * Verifikasi cookie identitas.
  * @returns {{ok:true,payload:object}|{ok:false}}
  */
-export async function verifyIdentity(env, raw) {
+export async function verifyIdentity(env, raw, nowMs = Date.now()) {
   if (typeof raw !== 'string' || raw.length < 8 || raw.length > 512) return { ok: false };
   const dot = raw.indexOf('.');
   if (dot < 1 || dot === raw.length - 1) return { ok: false };
@@ -95,7 +95,10 @@ export async function verifyIdentity(env, raw) {
   for (const key of keys) if (!COOKIE_PAYLOAD_KEYS.includes(key)) return { ok: false };
   if (payload.v !== 1) return { ok: false };
   if (typeof payload.sub !== 'string' || !/^[0-9a-f-]{36}$/.test(payload.sub)) return { ok: false };
-  if (typeof payload.iat !== 'number' || !Number.isFinite(payload.iat)) return { ok: false };
+  if (typeof payload.iat !== 'number' || !Number.isFinite(payload.iat) || payload.iat < 0) return { ok: false };
+  const nowSec = Math.floor(nowMs / 1000);
+  if (payload.iat > nowSec + 300) return { ok: false };
+  if (nowSec - payload.iat > COOKIE.MAX_AGE) return { ok: false };
   const secret = secretForKid(env, payload.kid);
   if (!secret) return { ok: false }; // kid tak dikenal: JANGAN fallback ke current
   const ok = await hmacVerify(secret, encoded, sig);
@@ -152,7 +155,7 @@ export async function touchLastSeen(env, sub, nowMs, currentDay) {
 export async function identityMiddleware(ctx) {
   const jar = parseCookies(ctx.request.headers.get('cookie'));
   const raw = jar[COOKIE.IDENTITY];
-  const verified = await verifyIdentity(ctx.env, raw);
+  const verified = await verifyIdentity(ctx.env, raw, ctx.now || Date.now());
   if (verified.ok) {
     ctx.identity = { sub: verified.payload.sub, kid: verified.payload.kid, issued: false, verified: true };
     return null;

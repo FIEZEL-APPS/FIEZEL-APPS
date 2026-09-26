@@ -1768,6 +1768,23 @@ async function activateAccountStateFromPuter(sdk=self.puter){
     if(appOpened)render();return true;
   }catch{return false}
 }
+function activeAccountIdentifier(){return activeAccountUuid||''}
+function activateAccountState(rawId){
+  const uuid=String(rawId||'').replace(/[^A-Za-z0-9_-]/g,'').slice(0,128);
+  const key=accountStateKey(uuid);
+  if(!uuid||!key)return false;
+  activeAccountUuid=uuid;activeStateStorageKey=key;
+  migrateSideStateToAccount(uuid);
+  state=loadState(key);state.ownerUuid=uuid;coreBrainCache=null;save();
+  try{self.FiezelI18n?.setLocale?.(state?.preferences?.learnerLocale)}catch(_){}
+  if(appOpened)render();return true;
+}
+function deactivateAccountState(){
+  try{save()}catch(_){}
+  activeAccountUuid='';activeStateStorageKey=LEGACY_STATE_KEY;
+  state=loadState(LEGACY_STATE_KEY);coreBrainCache=null;
+  if(appOpened)render();
+}
 function dayKey(ts){return new Date(ts).toISOString().slice(0,10)}
 function studyTimeZone(sourceState=null){const prefs=sourceState?.preferences||(stateReady?state?.preferences:null)||defaultPreferences;return validTimeZone(prefs?.timeZone||detectedTimeZone())}
 /* D4 bottleneck #1: formatter Intl di-CACHE per timeZone di level modul. Sebelumnya
@@ -6754,6 +6771,7 @@ async function verifyAuthSession(){
   try{if(navigator.onLine===false)return}catch(_){}
   const r=await A.checkServer(self);
   if(r&&r.ok&&r.signedIn===false){
+    deactivateAccountState();
     A.clearSession(self);
     try{self.FiezelGoogle?.forget?.()}catch(_){}
     showAuthGate(Date.now(),()=>{try{render()}catch(_){}});
@@ -8273,14 +8291,14 @@ function todayHomeMarkup(){
     `หายไปไหนมา คิดถึงจัง! มาฝึกกันต่อเพื่อรักษาจังหวะการเรียนรู้นะ 🔥`,
     `ถ้าไม่เริ่มเรียนตั้งแต่วันนี้ พรุ่งนี้จะยากขึ้นนะ สู้ต่อไป! 💪`,
     `แค่ 10 นาทีวันนี้ ช่วยรักษาจังหวะการเรียนให้ยอดเยี่ยม อย่าเพิ่งผัดวันประกันพรุ่งนะ! 🚀`,
-    `ก้าวเล็ก ๆ ที่สม่ำเสมอในวันนี้ คือการก้าวกระโดดที่ยิ่งใหญ่ในวันพรุ่งนี้ ✨`,
+    `ก้าวเล็ก ๆ ที่สม่ำเสมอในวันนี้ คือการก้าวกระโดดที่ยิ่งใหญ่ในวันพรุ่งนี้ ⭐`,
     `คำศัพท์ใหม่ทุกคำที่คุณเรียนรู้ จะเปิดโอกาสใหม่ ๆ ในอนาคต สู้ ๆ นะ! 🌟`,
     `การเดินทางนับพันไมล์เริ่มต้นจากก้าวเล็ก ๆ ก้าวแรกเสมอ เดินหน้าต่อไป! 🌸`
   ] : [
     `Kemana aja nih, kok baru kelihatan lagi! Yuk latihan sekarang biar ritmemu tetap terjaga. 🔥`,
     `Kalau kamu ga belajar mulai dari sekarang, kamu akan susah di kemudian hari. Semangat terus! 💪`,
     `10 menit latihan hari ini menjaga ritme belajarmu tetap prima. Jangan tunda lagi ya! 🚀`,
-    `Konsistensi kecil hari ini adalah lompatan besar esok hari. Let's do this! ✨`,
+    `Konsistensi kecil hari ini adalah lompatan besar esok hari. Let's do this! ⭐`,
     `Setiap kata baru yang kamu kuasai membuka peluang baru di masa depan. Semangat! 🌟`,
     `Perjalanan ribuan mil selalu dimulai dari satu langkah kecil hari ini. Terus melangkah! 🌸`
   ];
@@ -8336,7 +8354,7 @@ function todayHomeMarkup(){
 
   /* CARD 1: STADIUM CARD (Kuning Emas) - KOSAKATA HARIAN & MULAI LATIHAN (Zero Badges) */
   const card1Hero = `
-    <div class="fz-stadium-card fz-card-yellow" onclick="${primaryBtnAction}" role="button" tabindex="0">
+    <div class="today-card fz-stadium-card fz-card-yellow" onclick="${primaryBtnAction}" role="button" tabindex="0">
       <div class="fz-stadium-notch"></div>
       <div class="fz-stadium-header fz-stadium-vocab-header">
         <div class="fz-stadium-vocab-top">
@@ -8375,7 +8393,7 @@ function todayHomeMarkup(){
       <div class="fz-stadium-notch"></div>
       <div class="fz-stadium-header is-silver fz-stadium-clean-header">
         <div class="fz-stadium-vocab-top">
-          <span class="fz-vocab-kicker-tag is-silver-tag">${isTh ? '📚 แฟลชการ์ด &amp; ทบทวนซ้ำ' : '📚 FLASHCARD &amp; REPETISI'}</span>
+          <span class="fz-vocab-kicker-tag is-silver-tag">${isTh ? '📖 แฟลชการ์ด &amp; ทบทวนซ้ำ' : '📖 FLASHCARD &amp; REPETISI'}</span>
           <span class="fz-vocab-level-tag is-silver-tag">${isTh ? 'ระบบจำ SRS' : 'SRS MEMORY'}</span>
         </div>
         <div class="fz-clean-header-content">
@@ -8408,7 +8426,7 @@ function todayHomeMarkup(){
       <div class="fz-stadium-notch"></div>
       <div class="fz-stadium-header is-dark fz-stadium-clean-header">
         <div class="fz-stadium-vocab-top">
-          <span class="fz-vocab-kicker-tag is-dark-tag">${isTh ? '📈 พัฒนาการเรียนรู้' : '📈 PROGRES BELAJAR'}</span>
+          <span class="fz-vocab-kicker-tag is-dark-tag">${isTh ? '📊 พัฒนาการเรียนรู้' : '📊 PROGRES BELAJAR'}</span>
           <span class="fz-vocab-level-tag is-dark-tag">${todayLevel} ➔ A2</span>
         </div>
         <div class="fz-clean-header-content">
@@ -8430,7 +8448,7 @@ function todayHomeMarkup(){
         </button>
       </div>
       <div class="fz-stadium-footer-notch">
-        <span>${isTh ? '📈 บทวิเคราะห์ &amp; แผนที่การเรียน' : '📈 ANALISIS &amp; PETA BELAJAR'}</span>
+        <span>${isTh ? '📊 บทวิเคราะห์ &amp; แผนที่การเรียน' : '📊 ANALISIS &amp; PETA BELAJAR'}</span>
         <span class="fz-footer-caret">▾</span>
       </div>
     </div>`;
@@ -9267,6 +9285,7 @@ function bindFiezelAccountControls(){
   });
 
   $('btnFiezelLogout')?.addEventListener('click',async()=>{
+    deactivateAccountState();
     const btn=$('btnFiezelLogout');
     if(btn)btn.disabled=true;
     try{localStorage.removeItem('fz_teacher_mode')}catch(_){}
@@ -15197,6 +15216,7 @@ async function accountSubmit(){
 }
 /** Keluar akun. Cookie identitas TIDAK disentuh: ia pembawa progres anonim, bukan sesi akun. */
 async function fiezelAccountLogout(){
+  deactivateAccountState();
   const core=accountCore();if(!core)return false;
   try{localStorage.removeItem('fz_teacher_mode')}catch(_){}
   try{sessionStorage.removeItem('fz-teacher-preview');sessionStorage.removeItem('fiezel-teacher-v1-preview')}catch(_){}

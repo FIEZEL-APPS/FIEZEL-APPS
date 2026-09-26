@@ -110,7 +110,7 @@
       try { var onb = String(JSON.parse(storage().getItem('fiezel-onboarding-v1') || '{}').name || '').trim(); if (onb) n = onb; } catch (_) {}
     }
     var first = (n || '').trim().split(/\s+/)[0] || '';
-    return first || (typeof t === 'function' ? t('inbox.default_student_name', 'Murid') : 'Murid');
+    return first || 'Murid';
   }
   function account() { var A = root.FiezelAccount; return A && typeof A.api === 'function' ? A : null; }
   function isTeacher() { try { return !!(root.FiezelAccount && root.FiezelAccount.isTeacher && root.FiezelAccount.isTeacher()); } catch (_) { return false; } }
