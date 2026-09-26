@@ -29,7 +29,8 @@ function test(name, fn) {
   antrian.push([name, fn]);
 }
 
-function createEnv(initialStore = {}, fetchMock = null) {
+function createEnv(initialStore = {}, customFetch = null) {
+  const fetchMock = customFetch;
   const store = { ...initialStore };
   const els = {};
   const el = (id) => els[id] || (els[id] = {

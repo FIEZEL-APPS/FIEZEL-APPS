@@ -8309,7 +8309,7 @@ function todayHomeMarkup(){
     + `<button type="button" class="fz-learning-pill" onclick="openLevelPanel()" role="tab">🏆 Level ${esc(jaCourseOn() ? FiezelJaUi.jlptLabel(todayLevel) : todayLevel)}</button>`
     + `</div>`;
 
-  const _t = (k, d) => {
+  const t = (k, d) => {
     try {
       if (typeof FiezelI18n !== 'undefined' && FiezelI18n && typeof FiezelI18n.t === 'function') {
         const val = FiezelI18n.t(k);
@@ -8328,10 +8328,10 @@ function todayHomeMarkup(){
     + `<p class="fz-edu-desc">${jaCourseOn() ? 'Latih kepekaan telinga dengan audio penutur asli Jepang untuk menjaga ritme harianmu.' : 'Improve your listening comprehension and maintain your daily learning rhythm.'}</p>`
     + `<div class="fz-edu-stats-row">`
     + `<span class="fz-edu-stat-item"><i class="fz-i" data-fz-icon="clock" style="width:13px;height:13px"></i> ${shape.menit}:00 Menit</span>`
-    + `<span class="fz-edu-stat-item"><i class="fz-i" data-fz-icon="quiz" style="width:13px;height:13px"></i> ${shape.soal} ${_t('today.quiz_suffix', 'Soal')}</span>`
+    + `<span class="fz-edu-stat-item"><i class="fz-i" data-fz-icon="quiz" style="width:13px;height:13px"></i> ${shape.soal} ${t('today.quiz_suffix', 'Soal')}</span>`
     + `<span class="fz-edu-stat-item is-reward">✨ +50 XP</span>`
     + `</div>`
-    + `<button type="button" class="fz-edu-primary-btn" onclick="event.stopPropagation();${aksi}">${_t('today.start_practice_btn', 'Mulai Latihan Sekarang ➔')}</button>`
+    + `<button type="button" class="fz-edu-primary-btn" onclick="event.stopPropagation();${aksi}">${t('today.start_practice_btn', 'Mulai Latihan Sekarang ➔')}</button>`
     + `</div>`;
 
   const card2Hero = `<div class="fz-edu-card fz-card-neutral" onclick="go('vocab')" role="button" tabindex="0" aria-label="Kotoba Flashcards">`
@@ -8343,7 +8343,7 @@ function todayHomeMarkup(){
     + `<h3 class="fz-edu-title">${jaCourseOn() ? 'Flashcard Kosakata & Pola Kalimat' : 'Vocabulary Flashcards & Syntax'}</h3>`
     + `<p class="fz-edu-desc">${jaCourseOn() ? '25 kata aktif dengan sistem pengulangan berjarak (Spaced Repetition System) agar tersimpan di memori jangka panjang.' : 'Active flashcards with spaced repetition system to reinforce long-term memory.'}</p>`
     + `<div class="fz-edu-stats-row">`
-    + `<span class="fz-edu-stat-item">🗂️ 25 ${_t('today.vocab_suffix', 'Kosakata')}</span>`
+    + `<span class="fz-edu-stat-item">🗂️ 25 ${t('today.vocab_suffix', 'Kosakata')}</span>`
     + `<span class="fz-edu-stat-item">⏱️ 05:00 Menit</span>`
     + `<span class="fz-edu-stat-item">🧠 SRS Memory</span>`
     + `</div>`
@@ -15205,6 +15205,7 @@ try{self.FiezelUiSfx?.prepare?.('splash_intro',self)}catch(_){}
 // supaya bisa dicoba lagi kunjungan berikutnya.
 function fetchCountryCode(timeoutMs){
   if(typeof fetch!=='function')return Promise.resolve(null);
+  if(typeof location!=='undefined'&&(location.hostname==='localhost'||location.hostname==='127.0.0.1'||location.protocol==='file:'))return Promise.resolve(null);
   var ctrl=typeof AbortController!=='undefined'?new AbortController():null;
   var timer=setTimeout(function(){try{ctrl&&ctrl.abort()}catch(_){}},timeoutMs);
   return fetch('https://ipwho.is/?fields=success,country_code',ctrl?{signal:ctrl.signal}:{})
