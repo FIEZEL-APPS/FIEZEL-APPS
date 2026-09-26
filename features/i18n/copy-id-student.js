@@ -322,6 +322,13 @@
     'progress2.week-empty': 'Belum ada latihan minggu ini. Satu sesi kecil sudah cukup untuk mulai.',
     'progress2.days': 'Sen,Sel,Rab,Kam,Jum,Sab,Min',
     'inbox.default_student_name': 'Murid',
-    'social.profile-tag': 'Profil Pengguna FIEZEL'
+    'social.profile-tag': 'Profil Pengguna FIEZEL',
+    'presence.concerned': 'Fokusmu sudah luar biasa. Istirahat sejenak bila mulai lelah.',
+    'presence.celebrating': 'Luar biasa! Materi ini berhasil kamu tuntaskan.',
+    'presence.reinforcing': 'Yuk kita cermati polanya bersama sebelum mencoba lagi.',
+    'presence.hinting': 'Perhatikan kata petunjuknya, lalu coba sekali lagi.',
+    'presence.correcting': 'Hampir tepat. Coba periksa lagi pilihan lainnya.',
+    'presence.challenging': 'Latihan ini tampak mudah bagimu. Siap tantangan berikutnya?',
+    'presence.encouraging': 'Bagus sekali! Kamu berhasil menyelesaikannya sendiri.'
   });
 })();

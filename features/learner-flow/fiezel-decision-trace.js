@@ -258,7 +258,7 @@
   function recordDecision(params) {
     var p = params || {};
     var nowMs = Number(p.nowMs) || Date.now();
-    var traceId = 'trc_' + nowMs + '_' + Math.random().toString(36).substr(2, 6);
+    var traceId = p.traceId || ('trc_' + nowMs + '_' + (p.seed != null ? hex8(fmix32(Number(p.seed))) : Math.random().toString(36).substr(2, 6)));
 
     var current = readStore();
     var prevHash = GENESIS_HASH;
