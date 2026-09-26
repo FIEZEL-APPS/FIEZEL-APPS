@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>KelasKu untuk Guru — Workspace Kelas &amp; Tugas | FIEZEL</title>
+<meta name="description" content="KelasKu adalah ruang kerja guru di dalam FIEZEL untuk membuat kelas, membagikan tugas terstruktur berbasis Kurikulum Nasional &amp; CEFR, serta memantau perkembangan belajar murid tanpa mengoreksi manual.">
+<meta name="theme-color" content="#FFF9EE">
+<link rel="icon" href="../assets/brand/fiezel-icon.svg" type="image/svg+xml">
+<link rel="icon" href="../assets/brand/fiezel-icon-192.png" type="image/png">
+<link rel="apple-touch-icon" href="../assets/brand/fiezel-icon-192.png">
+
+<link rel="canonical" href="https://fiezel.my.id/kelasku/">
+
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://fiezel.my.id/kelasku/">
+<meta property="og:locale" content="id_ID">
+<meta property="og:site_name" content="FIEZEL">
+<meta property="og:title" content="KelasKu untuk Guru — Workspace Kelas &amp; Tugas | FIEZEL">
+<meta property="og:description" content="KelasKu adalah ruang kerja guru di dalam FIEZEL: kelola kelas, bagikan tugas adaptif, dan pantau progres murid tanpa mengoreksi manual.">
+<meta property="og:image" content="https://fiezel.my.id/assets/shots/teacher-desktop.png">
+<meta property="og:image:width" content="1440">
+<meta property="og:image:height" content="900">
+<meta property="og:image:alt" content="Dashboard KelasKu untuk Guru dengan Ringkasan Hari Ini, daftar kelas, dan analitik kompetensi">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="KelasKu untuk Guru — Workspace Kelas &amp; Tugas | FIEZEL">
+<meta name="twitter:description" content="Ruang kerja guru FIEZEL: buat kelas dengan kode unik, tugas kurikulum otomatis tergradasi, dan analitik kompetensi murid.">
+<meta name="twitter:image" content="https://fiezel.my.id/assets/shots/teacher-desktop.png">
+<meta name="twitter:image:alt" content="Dashboard KelasKu untuk Guru">
+<meta name="author" content="FIEZEL">
+<meta name="creator" content="fitrarustqi">
+<meta name="publisher" content="FIEZEL">
+<meta name="application-name" content="FIEZEL">
+<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1">
+<meta name="googlebot" content="index, follow, max-image-preview:large, max-snippet:-1">
+
+<link rel="preload" href="../assets/fonts/PlusJakartaSans-700.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="../assets/fonts/PlusJakartaSans-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="../tokens.css?v=20260903-hula02">
+<link rel="stylesheet" href="../style.css?v=20260906-fzflow02">
+
+<style>
+  .brand-text{font-weight:800;letter-spacing:.02em;font-size:1.15rem;color:var(--maroon-mid,#8C2233)}
+  .crumbs{font-size:.86rem;opacity:.75;margin:0 0 18px}
+  .crumbs a{color:inherit;text-decoration:underline}
+  .list-plain{margin:0 0 18px;padding-left:1.25rem;line-height:1.75;max-width:68ch}
+  .list-plain li{margin:0 0 .5rem}
+  .callout{border:1px solid rgba(140,34,51,.22);border-radius:16px;padding:18px 20px;margin:0 0 20px;background:rgba(255,222,89,.10)}
+  .callout p:last-child{margin-bottom:0}
+  .kelasku-pill{display:inline-flex;align-items:center;gap:6px;background:#E6F4EA;color:#137333;font-weight:700;font-size:.82rem;padding:4px 10px;border-radius:999px;border:1px solid #CEEAD6;margin-bottom:12px}
+  .grid-2col{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:20px;margin:24px 0}
+  .card-feat{background:var(--cream-warm,#FFFDF8);border:1px solid var(--line,#EFE0C6);border-radius:14px;padding:22px;box-shadow:0 2px 8px rgba(51,32,31,.04)}
+  .card-feat h3{font-size:1.15rem;margin:0 0 8px;color:var(--maroon-deep,#6D1926)}
+  .card-feat p{font-size:.93rem;line-height:1.6;color:var(--body,#7E3742);margin:0}
+  .step-box{display:flex;gap:16px;margin-bottom:20px;align-items:flex-start}
+  .step-num{display:flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:50%;background:var(--maroon-mid,#8C2233);color:#FFF9EE;font-weight:800;flex-shrink:0}
+  .step-content h3{font-size:1.1rem;margin:0 0 6px;color:var(--maroon-deep,#6D1926)}
+  .step-content p{font-size:.92rem;line-height:1.6;color:var(--body,#7E3742);margin:0}
+  .faq-card{background:var(--cream-warm,#FFFDF8);border:1px solid var(--line,#EFE0C6);border-radius:12px;padding:18px 22px;margin-bottom:14px}
+  .faq-card h3{font-size:1.05rem;margin:0 0 8px;color:var(--maroon-deep,#6D1926)}
+  .faq-card p{margin:0;font-size:.93rem;line-height:1.65;color:var(--body,#7E3742)}
+</style>
+
+<script type="application/ld+json">
+[
+  {
+    "@context": "https://schema.org",
+    "@type": "WebPage",
+    "@id": "https://fiezel.my.id/kelasku/#webpage",
+    "url": "https://fiezel.my.id/kelasku/",
+    "name": "KelasKu untuk Guru — Workspace Kelas & Tugas | FIEZEL",
+    "description": "KelasKu adalah ruang kerja guru di dalam FIEZEL untuk membuat kelas, membagikan tugas terstruktur berbasis Kurikulum Nasional & CEFR, serta memantau perkembangan belajar murid tanpa mengoreksi manual.",
+    "inLanguage": "id",
+    "isPartOf": {"@id": "https://fiezel.my.id/#website"},
+    "about": {"@id": "https://fiezel.my.id/#app"},
+    "publisher": {"@id": "https://fiezel.my.id/#org"},
+    "primaryImageOfPage": {
+      "@type": "ImageObject",
+      "url": "https://fiezel.my.id/assets/shots/teacher-desktop.png",
+      "caption": "Dashboard KelasKu untuk Guru",
+      "width": 1440,
+      "height": 900
+    }
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "@id": "https://fiezel.my.id/kelasku/#software",
+    "name": "KelasKu by FIEZEL",
+    "alternateName": ["KelasKu", "KelasKu untuk Guru", "FIEZEL KelasKu"],
+    "applicationCategory": "EducationalApplication",
+    "applicationSubCategory": "Classroom Workspace & Learning Analytics",
+    "operatingSystem": "Any (Web PWA)",
+    "url": "https://fiezel.my.id/kelasku/",
+    "isPartOf": {"@id": "https://fiezel.my.id/#app"},
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "IDR"
+    },
+    "description": "Ruang kerja guru dan manajemen kelas berbasis web untuk menerbitkan tugas adaptif berstandar kurikulum, asesmen ujian berwaktu, dan membaca analitik siswa tanpa koreksi manual."
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "@id": "https://fiezel.my.id/kelasku/#breadcrumb",
+    "itemListElement": [
+      {"@type": "ListItem", "position": 1, "name": "Beranda", "item": "https://fiezel.my.id/"},
+      {"@type": "ListItem", "position": 2, "name": "KelasKu untuk Guru", "item": "https://fiezel.my.id/kelasku/"}
+    ]
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "@id": "https://fiezel.my.id/kelasku/#faq",
+    "inLanguage": "id",
+    "isPartOf": {"@id": "https://fiezel.my.id/kelasku/#webpage"},
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "Apa itu KelasKu?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "KelasKu adalah ruang kerja (classroom workspace) FIEZEL untuk guru dan tutor. Dengan KelasKu, guru dapat membuat kelas digital dengan kode unik, menerbitkan tugas latihan atau ujian berwaktu yang menempel pada Kurikulum Nasional dan CEFR, serta memantau analitik penguasaan materi murid tanpa mengoreksi manual."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Apakah KelasKu merupakan aplikasi terpisah dari FIEZEL?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Bukan. KelasKu adalah lapisan produk guru di dalam ekosistem FIEZEL (KelasKu by FIEZEL). Guru dan murid menggunakan web app yang sama, sehingga tidak memerlukan instalasi perangkat lunak atau aplikasi sekunder."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Siapa saja yang bisa menggunakan KelasKu?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "KelasKu dirancang untuk guru sekolah (khususnya guru Bahasa Inggris SMP/SMA Fase D–F), tutor bimbingan belajar, guru privat, dan kelompok belajar mandiri yang membutuhkan asesmen terstruktur."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Bagaimana cara murid bergabung ke kelas guru?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Guru membuat kelas di KelasKu dan mendapatkan kode 6 karakter (misalnya FZ-ABCDEF). Murid cukup memasukkan kode tersebut di aplikasi FIEZEL mereka pada tab KelasKu. Murid tidak perlu mendaftarkan email, nomor telepon, atau akun yang rumit."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Apakah tugas dan ujian dinilai secara otomatis?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Ya, 100% otomatis. Setiap latihan atau ujian yang diselesaikan murid langsung diperiksa oleh sistem, dan hasilnya teragregasi seketika ke dalam dashboard guru."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Apa yang dimaksud dengan fitur Pengawasan Fokus (Focus Exit Detection)?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Saat murid mengerjakan ujian berwaktu, sistem mencatat jika murid meninggalkan layar atau berpindah ke tab lain. Guru melihat frekuensi dan durasi keluar layar secara faktual tanpa vonis otomatis, sehingga keputusan pedagogis tetap di tangan guru."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Bagaimana hubungan mesin adaptif Braincore dengan KelasKu?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Di sisi murid, Braincore mengadaptasi soal dan menjadwalkan review berdasarkan kesalahan. Di sisi guru, KelasKu mengagregasi data tersebut menjadi peta keterampilan kelas, diagnosis miskonsepsi terendah, dan pembagian kelompok belajar teman sebaya (peer tutoring)."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Bagaimana privasi dan keamanan data murid terjaga di KelasKu?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "FIEZEL memegang prinsip minim data. Seluruh progres belajar tersimpan secara lokal di perangkat murid. Data yang dikirimkan ke guru hanya berupa nama depan/panggilan, akurasi per kompetensi, dan status tugas. FIEZEL tidak mengumpulkan nomor telepon, kata sandi, atau data pelacakan di luar sesi belajar."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Apakah KelasKu gratis?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Ya, KelasKu gratis digunakan tanpa biaya lisensi, langganan, ataupun biaya tersembunyi."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Berapa kapasitas kelas yang didukung saat ini?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Kapasitas terpasang saat ini adalah 250 pengguna aktif, dirancang optimal untuk satu atau dua kelas mandiri (sekitar 30–60 murid). FIEZEL belum ditujukan untuk adopsi serentak satu sekolah utuh (600–900 murid)."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Apakah KelasKu menggantikan Learning Management System (LMS) sekolah?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Tidak. KelasKu bukan pengganti LMS lengkap seperti Google Classroom atau Moodle. KelasKu adalah suplemen latihan dan asesmen kompetensi bahasa adaptif yang berfokus pada penguasaan materi dan diagnosis belajar harian."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Bisakah guru mengekspor data nilai siswa?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Bisa. Guru dapat mengekspor rekapitulasi nilai dan status risiko siswa ke dalam format CSV kapan saja melalui dashboard KelasKu."
+        }
+      }
+    ]
+  }
+]
+</script>
+</head>
+<body>
+<a class="skip" href="#main">Lewati ke konten utama</a>
+
+<header class="topbar">
+  <div class="wrap topbar-in">
+    <a class="brand" href="../" aria-label="FIEZEL — halaman utama">
+      <svg class="brand-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><g fill="currentColor"><rect x="4.6" y="7.5" width="3.1" height="4.6" rx="1.55"/><rect x="8.9" y="5.1" width="3.1" height="7" rx="1.55"/><rect x="13.2" y="3.4" width="3.1" height="8.7" rx="1.55"/><rect x="17.5" y="6.2" width="3.1" height="5.9" rx="1.55"/><path d="M12.6 14c3.5 0 5.9 1.9 5.9 4.1 0 2-2 3.4-5.9 3.4s-5.9-1.4-5.9-3.4c0-2.2 2.4-4.1 5.9-4.1Z"/></g></svg>
+      <strong class="brand-text">FIEZEL</strong>
+    </a>
+    <nav class="topnav" aria-label="Navigasi utama">
+      <div class="topnav-links">
+        <a href="../">Beranda</a>
+        <a href="../tentang.html">Tentang</a>
+        <a href="./" style="font-weight:700;color:var(--maroon-deep,#6D1926)">KelasKu</a>
+        <a href="../cefr/">CEFR</a>
+        <a href="../faq/">FAQ</a>
+        <a href="../untuk-sekolah.html">Untuk Sekolah</a>
+      </div>
+      <a class="btn btn-sm btn-primary" href="../app/?teacher=preview">Buka KelasKu</a>
+      <details class="topnav-more"><summary aria-label="Menu"><span aria-hidden="true">☰</span> Menu</summary><div class="topnav-sheet">
+        <a href="../">Beranda</a>
+        <a href="../tentang.html">Tentang</a>
+        <a href="./">KelasKu</a>
+        <a href="../cefr/">CEFR</a>
+        <a href="../faq/">FAQ</a>
+        <a href="../untuk-sekolah.html">Untuk Sekolah</a>
+        <a href="../app/">Aplikasi Murid</a>
+      </div></details>
+    </nav>
+  </div>
+</header>
+
+<main id="main">
+
+  <!-- ============ HERO KELASKU ============ -->
+  <section class="sec">
+    <div class="wrap">
+      <nav class="crumbs" aria-label="Remah roti">
+        <a href="../">Beranda</a> <span aria-hidden="true">›</span> <span>KelasKu untuk Guru</span>
+      </nav>
+
+      <div class="kelasku-pill">KelasKu by FIEZEL · Ruang Kerja Guru</div>
+      <div class="sec-head">
+        <h1>KelasKu untuk Guru</h1>
+      </div>
+
+      <p class="body-lg"><strong>Kelola kelas, terbitkan tugas terstruktur yang menempel pada kurikulum, dan pantau perkembangan belajar murid bersama FIEZEL — tanpa beban mengoreksi manual.</strong></p>
+
+      <p><a class="btn btn-primary" href="../app/?teacher=preview">Buka KelasKu (Demo Interaktif)</a> <a class="btn btn-ghost" href="#cara-kerja">Pelajari Alur Kerja</a></p>
+
+      <figure style="margin-top:28px">
+        <img src="../assets/shots/teacher-desktop.png" alt="Tampilan antarmuka Dashboard KelasKu untuk Guru dengan Ringkasan Hari Ini, daftar kelas, dan tugas siswa" width="1440" height="900" loading="lazy" decoding="async" style="max-width:100%;height:auto;border-radius:16px;border:1px solid var(--line,#EFE0C6);box-shadow:0 8px 24px rgba(51,32,31,.06)">
+      </figure>
+    </div>
+  </section>
+
+  <!-- ============ APA ITU KELASKU ============ -->
+  <section class="sec" id="apa-itu">
+    <div class="wrap">
+      <div class="sec-head">
+        <h2 class="sec-title">Apa Itu KelasKu?</h2>
+        <hr class="rule" aria-hidden="true">
+      </div>
+      <p class="body-lg"><strong>KelasKu adalah ruang kerja (classroom workspace) FIEZEL untuk guru dan tutor.</strong> KelasKu dirancang agar pendidik dapat mendampingi murid belajar bahasa secara terarah tanpa menambah beban administratif pemeriksaan soal.</p>
+      <p>Di dalam FIEZEL, murid berlatih secara personal dengan mesin adaptif Braincore. Lewat KelasKu, guru menghubungkan latihan mandiri tersebut ke dalam ritme pengajaran di kelas: menetapkan materi bab yang sedang diajarkan, menentukan tenggat waktu, dan langsung melihat siapa siswa yang sudah tuntas serta siapa yang memerlukan bimbingan tambahan.</p>
+      
+      <div class="callout">
+        <p><strong>Hierarki Produk:</strong> FIEZEL adalah ekosistem aplikasi pembelajaran bahasa adaptif. KelasKu adalah ruang kerja guru di dalamnya. Bukan perusahaan terpisah, dan tidak memerlukan aplikasi tambahan.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ UNTUK SIAPA KELASKU ============ -->
+  <section class="sec" id="untuk-siapa">
+    <div class="wrap">
+      <div class="sec-head">
+        <h2 class="sec-title">Untuk Siapa KelasKu Dirancang?</h2>
+        <hr class="rule" aria-hidden="true">
+      </div>
+      <div class="grid-2col">
+        <div class="card-feat">
+          <h3>1. Guru Bahasa Inggris Sekolah</h3>
+          <p>Guru SMP dan SMA yang ingin memberikan pekerjaan rumah atau kuis harian yang langsung menempel pada materi bab Kurikulum Nasional (Fase D–F) dan kompetensi CEFR tanpa membuang waktu memeriksa ratusan lembar jawaban.</p>
+        </div>
+        <div class="card-feat">
+          <h3>2. Guru Privat &amp; Tutor Bimbingan Belajar</h3>
+          <p>Pendidik independen yang mendampingi kelompok kecil (5–30 siswa) dan membutuhkan bukti belajar objektif serta kartu laporan berkala yang siap dikirimkan kepada orang tua murid.</p>
+        </div>
+        <div class="card-feat">
+          <h3>3. Kelas Belajar Mandiri</h3>
+          <p>Komunitas dan mentor bahasa yang mengelola kelompok latihan intensif dengan memanfaatkan pengelompokan teman sebaya (peer tutoring) otomatis berdasarkan kelemahan spesifik anggota.</p>
+        </div>
+        <div class="card-feat">
+          <h3>4. Sekolah Penyelenggara Pilot</h3>
+          <p>Institusi pendidikan yang ingin menguji coba metode blended learning adaptif pada satu kelas percontohan tanpa biaya perangkat lunak tambahan.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ KEMAMPUAN UTAMA GURU ============ -->
+  <section class="sec" id="fitur-guru">
+    <div class="wrap">
+      <div class="sec-head">
+        <h2 class="sec-title">Kemampuan Utama Ruang Kerja Guru</h2>
+        <hr class="rule" aria-hidden="true">
+      </div>
+      <p class="body-lg">Seluruh kemampuan di bawah ini telah terverifikasi dan aktif di dalam sistem produksi KelasKu:</p>
+
+      <div class="grid-2col">
+        <div class="card-feat">
+          <h3>Ruang Kelas &amp; Kode Masuk Instan</h3>
+          <p>Guru membuat kelas dengan satu klik dan menerima kode kelas 6 karakter unik (contoh: <code>FZ-K9X2P4</code>). Murid bergabung hanya dengan mengetik kode tersebut di aplikasi mereka tanpa perlu akun email ataupun nomor telepon.</p>
+        </div>
+        <div class="card-feat">
+          <h3>Penerbitan Tugas &amp; Ujian Berwaktu</h3>
+          <p>Guru dapat menerbitkan tugas bertarget: memilih materi dari bab Kurikulum Nasional atau bank CEFR (Grammar, Vocabulary, Reading, Listening). Tersedia mode <em>Latihan</em> (santai) dan mode <em>Ujian</em> (dilengkapi batas waktu hitung mundur dan pengacakan opsi).</p>
+        </div>
+        <div class="card-feat">
+          <h3>Koreksi Otomatis Seketika</h3>
+          <p>Setiap jawaban murid diperiksa dan dihitung secara otomatis saat tugas diselesaikan. Nilai, persentase akurasi, dan butir yang salah langsung tersusun tanpa intervensi manual guru.</p>
+        </div>
+        <div class="card-feat">
+          <h3>Ringkasan Hari Ini &amp; Indikator Risiko</h3>
+          <p>Dashboard utama menyajikan skor risiko siswa (0–100) yang dihitung dari hari tidak aktif, akurasi di bawah 50%, dan keterlambatan tugas. Guru langsung mengetahui siapa yang perlu disapa hari ini.</p>
+        </div>
+        <div class="card-feat">
+          <h3>Peta Kompetensi &amp; Deteksi Miskonsepsi</h3>
+          <p>Melihat matriks keterampilan seluruh siswa dalam satu layar (Heatmap). Sistem mendeteksi pola miskonsepsi umum di kelas sehingga guru tahu materi mana yang perlu dibahas ulang di papan tulis.</p>
+        </div>
+        <div class="card-feat">
+          <h3>Kelompok Belajar Teman Sebaya (Peer Tutoring)</h3>
+          <p>KelasKu dapat memasangkan siswa yang kuat dengan siswa yang masih membutuhkan bantuan pada satu kompetensi tertentu secara otomatis, menciptakan sinergi belajar kolaboratif.</p>
+        </div>
+        <div class="card-feat">
+          <h3>Rapor WhatsApp untuk Orang Tua</h3>
+          <p>Menghasilkan teks laporan kemajuan belajar yang santun dan siap dibagikan ke orang tua melalui tautan WhatsApp langsung, lengkap dengan ringkasan kekuatan dan materi yang perlu dilatih.</p>
+        </div>
+        <div class="card-feat">
+          <h3>Ekspor &amp; Rekapitulasi CSV</h3>
+          <p>Guru dapat mengunduh seluruh data kelas, tingkat kehadiran, nilai per skill, dan riwayat tugas ke dalam berkas CSV untuk keperluan arsip administrasi sekolah.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ PENGAWASAN FOKUS ============ -->
+  <section class="sec" id="integritas">
+    <div class="wrap">
+      <div class="sec-head">
+        <h2 class="sec-title">Integritas Ujian &amp; Pengawasan Layar</h2>
+        <hr class="rule" aria-hidden="true">
+      </div>
+      <p class="body-lg"><strong>Pengawasan etis tanpa kamera pengintai.</strong> Untuk menjaga kejujuran saat murid mengerjakan tugas berwaktu atau ujian mini, KelasKu dilengkapi modul <em>Focus Guard</em>:</p>
+      
+      <ul class="list-plain">
+        <li><strong>Deteksi Keluar Layar:</strong> Sistem mencatat secara otomatis apabila murid berpindah tab, membuka jendela aplikasi lain, atau meminimalkan browser selama ujian berlangsung.</li>
+        <li><strong>Data Faktual &amp; Transparan:</strong> Guru menerima laporan berapa kali murid meninggalkan layar dan total durasi kepergiannya (misal: <em>Keluar layar 2× · 15 dtk</em>).</li>
+        <li><strong>Prinsip Pedagogis:</strong> Sistem tidak menjatuhkan hukuman otomatis. Angka disajikan kepada guru sebagai bahan dialog pembinaan, bukan vonis sepihak.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ============ BRAINCORE & KELASKU ============ -->
+  <section class="sec" id="braincore">
+    <div class="wrap">
+      <div class="sec-head">
+        <h2 class="sec-title">Hubungan Braincore &amp; KelasKu</h2>
+        <hr class="rule" aria-hidden="true">
+      </div>
+      <p class="body-lg">Untuk memastikan kejelasan arsitektur produk, peran kecerdasan adaptif Braincore dipisahkan secara tegas antara pengalaman murid dan ruang kerja guru:</p>
+
+      <div class="grid-2col">
+        <div class="card-feat">
+          <h3>1. Sisi Murid (Adaptasi Pembelajaran)</h3>
+          <p>Mesin Braincore berjalan secara lokal di perangkat murid menggunakan model <strong>Bayesian Knowledge Tracing (BKT)</strong> dan algoritma pengulangan berjarak (spaced repetition). Braincore mendiagnosis letak kesalahan konsep dan menjadwalkan review otomatis pada sesi berikutnya.</p>
+        </div>
+        <div class="card-feat">
+          <h3>2. Sisi Guru (Wawasan Pengajaran)</h3>
+          <p>KelasKu membaca agregat penguasaan kompetensi yang dihasilkan oleh latihan murid, lalu merangkumnya menjadi peta kelemahan kelas. Guru mendapatkan masukan topik mana yang perlu diajarkan ulang secara klasikal di depan kelas.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ PRIVASI ============ -->
+  <section class="sec" id="privasi">
+    <div class="wrap">
+      <div class="sec-head">
+        <h2 class="sec-title">Privasi Murid &amp; Batas Visibilitas Data</h2>
+        <hr class="rule" aria-hidden="true">
+      </div>
+      <p class="body-lg">Privasi adalah fondasi FIEZEL. Kami menerapkan batas data yang sangat ketat:</p>
+      
+      <div class="callout">
+        <p><strong>Yang Bisa Dilihat Guru:</strong> Nama depan/panggilan murid, persentase akurasi per skill yang ditugaskan, riwayat penyelesaian tugas, skor risiko keaktifan, dan durasi keluar layar saat ujian.</p>
+        <p><strong>Yang TIDAK Pernah Dilihat Guru &amp; Server:</strong> Password murid, nomor telepon pribadi murid, riwayat pencarian web di luar aplikasi, data lokasi, atau berkas pribadi perangkat. Seluruh detail pengerjaan soal tersimpan lokal di memori browser murid.</p>
+      </div>
+
+      <p>Untuk membaca rincian komitmen privasi lengkap, silakan kunjungi halaman <a href="../privacy/">Kebijakan Privasi FIEZEL</a>.</p>
+    </div>
+  </section>
+
+  <!-- ============ CARA MEMULAI ============ -->
+  <section class="sec" id="cara-kerja">
+    <div class="wrap">
+      <div class="sec-head">
+        <h2 class="sec-title">Cara Memulai Mengajar dalam 3 Langkah</h2>
+        <hr class="rule" aria-hidden="true">
+      </div>
+
+      <div class="step-box">
+        <div class="step-num">1</div>
+        <div class="step-content">
+          <h3>Buka Ruang Kerja KelasKu</h3>
+          <p>Akses cangkang guru melalui browser Anda di komputer, tablet, atau ponsel pintar. Anda dapat mencoba mode demo langsung atau masuk menggunakan akun guru terverifikasi.</p>
+        </div>
+      </div>
+
+      <div class="step-box">
+        <div class="step-num">2</div>
+        <div class="step-content">
+          <h3>Buat Kelas &amp; Terbitkan Tugas</h3>
+          <p>Tentukan nama kelas dan pilih mata pelajaran. Bagikan kode kelas 6 karakter kepada murid Anda, lalu pilih materi bab yang ingin Anda tugaskan sebagai latihan atau ujian.</p>
+        </div>
+      </div>
+
+      <div class="step-box">
+        <div class="step-num">3</div>
+        <div class="step-content">
+          <h3>Murid Belajar &amp; Pantau Hasilnya</h3>
+          <p>Murid memasukkan kode kelas di HP mereka dan mulai berlatih. Seluruh progres terkoreksi otomatis dan langsung tampil di layar Ringkasan Hari Ini Anda.</p>
+        </div>
+      </div>
+
+      <p style="margin-top:20px"><a class="btn btn-primary" href="../app/?teacher=preview">Buka KelasKu Sekarang</a></p>
+    </div>
+  </section>
+
+  <!-- ============ BATASAN TRANSPARAN ============ -->
+  <section class="sec" id="batasan">
+    <div class="wrap">
+      <div class="sec-head">
+        <h2 class="sec-title">Kapasitas &amp; Batasan Transparan</h2>
+        <hr class="rule" aria-hidden="true">
+      </div>
+      <p class="body-lg">Kami tidak membuat klaim berlebihan. Berikut adalah batasan teknis yang berlaku saat ini:</p>
+
+      <ul class="list-plain">
+        <li><strong>Kapasitas Pengguna:</strong> Kapasitas terpasang saat ini adalah 250 pengguna aktif. Ini sangat ideal untuk 1 sampai 3 kelas percontohan (30–90 murid), namun belum mencukupi untuk adopsi seluruh sekolah secara serentak (600–900 murid).</li>
+        <li><strong>Fokus Kurikulum:</strong> Bank kurikulum yang terverifikasi dan paling lengkap saat ini adalah mata pelajaran Bahasa Inggris Fase D (SMP Kelas 7–9) dan tingkat kemahiran CEFR A1–C2.</li>
+        <li><strong>Bukan Pengganti LMS:</strong> KelasKu difungsikan sebagai instrumen latihan adaptif dan asesmen formatif harian, bukan sebagai pengganti sistem administrasi sekolah berskala besar.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ============ FAQ KELASKU ============ -->
+  <section class="sec sec-faq" id="faq">
+    <div class="wrap wrap-narrow">
+      <div class="sec-head">
+        <h2 class="sec-title">Pertanyaan yang Sering Diajukan Guru (FAQ)</h2>
+        <hr class="rule" aria-hidden="true">
+      </div>
+
+      <div class="faq-card">
+        <h3>Apa itu KelasKu?</h3>
+        <p>KelasKu adalah ruang kerja (classroom workspace) FIEZEL untuk guru dan tutor. Dengan KelasKu, guru dapat membuat kelas digital dengan kode unik, menerbitkan tugas latihan atau ujian berwaktu yang menempel pada Kurikulum Nasional dan CEFR, serta memantau analitik penguasaan materi murid tanpa mengoreksi manual.</p>
+      </div>
+
+      <div class="faq-card">
+        <h3>Apakah KelasKu merupakan aplikasi terpisah dari FIEZEL?</h3>
+        <p>Bukan. KelasKu adalah lapisan produk guru di dalam ekosistem FIEZEL (KelasKu by FIEZEL). Guru dan murid menggunakan web app yang sama, sehingga tidak memerlukan instalasi perangkat lunak atau aplikasi sekunder.</p>
+      </div>
+
+      <div class="faq-card">
+        <h3>Siapa saja yang bisa menggunakan KelasKu?</h3>
+        <p>KelasKu dirancang untuk guru sekolah (khususnya guru Bahasa Inggris SMP/SMA Fase D–F), tutor bimbingan belajar, guru privat, dan kelompok belajar mandiri yang membutuhkan asesmen terstruktur.</p>
+      </div>
+
+      <div class="faq-card">
+        <h3>Bagaimana cara murid bergabung ke kelas guru?</h3>
+        <p>Guru membuat kelas di KelasKu dan mendapatkan kode 6 karakter (misalnya FZ-ABCDEF). Murid cukup memasukkan kode tersebut di aplikasi FIEZEL mereka pada tab KelasKu. Murid tidak perlu mendaftarkan email, nomor telepon, atau akun yang rumit.</p>
+      </div>
+
+      <div class="faq-card">
+        <h3>Apakah tugas dan ujian dinilai secara otomatis?</h3>
+        <p>Ya, 100% otomatis. Setiap latihan atau ujian yang diselesaikan murid langsung diperiksa oleh sistem, dan hasilnya teragregasi seketika ke dalam dashboard guru.</p>
+      </div>
+
+      <div class="faq-card">
+        <h3>Apa yang dimaksud dengan fitur Pengawasan Fokus (Focus Exit Detection)?</h3>
+        <p>Saat murid mengerjakan ujian berwaktu, sistem mencatat jika murid meninggalkan layar atau berpindah ke tab lain. Guru melihat frekuensi dan durasi keluar layar secara faktual tanpa vonis otomatis, sehingga keputusan pedagogis tetap di tangan guru.</p>
+      </div>
+
+      <div class="faq-card">
+        <h3>Bagaimana hubungan mesin adaptif Braincore dengan KelasKu?</h3>
+        <p>Di sisi murid, Braincore mengadaptasi soal dan menjadwalkan review berdasarkan kesalahan. Di sisi guru, KelasKu mengagregasi data tersebut menjadi peta keterampilan kelas, diagnosis miskonsepsi terendah, dan pembagian kelompok belajar teman sebaya (peer tutoring).</p>
+      </div>
+
+      <div class="faq-card">
+        <h3>Bagaimana privasi dan keamanan data murid terjaga di KelasKu?</h3>
+        <p>FIEZEL memegang prinsip minim data. Seluruh progres belajar tersimpan secara lokal di perangkat murid. Data yang dikirimkan ke guru hanya berupa nama depan/panggilan, akurasi per kompetensi, dan status tugas. FIEZEL tidak mengumpulkan nomor telepon, kata sandi, atau data pelacakan di luar sesi belajar.</p>
+      </div>
+
+      <div class="faq-card">
+        <h3>Apakah KelasKu gratis?</h3>
+        <p>Ya, KelasKu gratis digunakan tanpa biaya lisensi, langganan, ataupun biaya tersembunyi.</p>
+      </div>
+
+      <div class="faq-card">
+        <h3>Berapa kapasitas kelas yang didukung saat ini?</h3>
+        <p>Kapasitas terpasang saat ini adalah 250 pengguna aktif, dirancang optimal untuk satu atau dua kelas mandiri (sekitar 30–60 murid). FIEZEL belum ditujukan untuk adopsi serentak satu sekolah utuh (600–900 murid).</p>
+      </div>
+
+      <div class="faq-card">
+        <h3>Apakah KelasKu menggantikan Learning Management System (LMS) sekolah?</h3>
+        <p>Tidak. KelasKu bukan pengganti LMS lengkap seperti Google Classroom atau Moodle. KelasKu adalah suplemen latihan dan asesmen kompetensi bahasa adaptif yang berfokus pada penguasaan materi dan diagnosis belajar harian.</p>
+      </div>
+
+      <div class="faq-card">
+        <h3>Bisakah guru mengekspor data nilai siswa?</h3>
+        <p>Bisa. Guru dapat mengekspor rekapitulasi nilai dan status risiko siswa ke dalam format CSV kapan saja melalui dashboard KelasKu.</p>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ============ CTA AKHIR ============ -->
+  <section class="sec sec-final">
+    <div class="wrap">
+      <div class="stage final reveal">
+        <h2>Mulai Menggunakan KelasKu Hari Ini</h2>
+        <p>Buka ruang kelas digital Anda, terbitkan latihan mandiri untuk murid, dan lihat perkembangan belajar mereka secara nyata.</p>
+        <div class="cta-row cta-center">
+          <a class="btn btn-primary" href="../app/?teacher=preview">Buka KelasKu untuk Guru</a>
+          <a class="btn btn-ghost" href="../untuk-sekolah.html">Pelajari Program Pilot Sekolah</a>
+        </div>
+        <hr class="rule rule-center" aria-hidden="true">
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="foot">
+  <div class="wrap foot-in">
+    <div class="foot-brand">
+      <svg class="foot-word" viewBox="0 0 1000 260" role="img" aria-label="FIEZEL"><defs><linearGradient id="fzwMaroon-foot" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#8C2233"/><stop offset="100%" stop-color="#6D1926"/></linearGradient><linearGradient id="fzwGold-foot" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#FFDE59"/><stop offset="45%" stop-color="#FFC700"/><stop offset="100%" stop-color="#E6A800"/></linearGradient></defs><g fill="url(#fzwMaroon-foot)"><rect x="30" y="30" width="42" height="200" rx="21"/><rect x="30" y="30" width="144" height="42" rx="21"/><rect x="30" y="109" width="116" height="42" rx="21"/><rect x="300" y="30" width="42" height="200" rx="21"/><rect x="300" y="30" width="144" height="42" rx="21"/><rect x="300" y="109" width="100" height="42" rx="21"/><rect x="300" y="188" width="130" height="42" rx="21"/><rect x="478" y="30" width="150" height="42" rx="21"/><rect x="478" y="188" width="150" height="42" rx="21"/><rect x="607" y="30" width="191.38" height="42" rx="21" transform="rotate(124.354 607 51)"/><rect x="662" y="30" width="42" height="200" rx="21"/><rect x="662" y="30" width="144" height="42" rx="21"/><rect x="662" y="109" width="100" height="42" rx="21"/><rect x="662" y="188" width="130" height="42" rx="21"/><rect x="840" y="30" width="42" height="200" rx="21"/><rect x="840" y="188" width="130" height="42" rx="21"/></g><g fill="url(#fzwGold-foot)"><rect x="192" y="30" width="26" height="200" rx="13"/><rect x="240" y="106" width="26" height="124" rx="13"/></g></svg>
+      <p class="foot-tag">KelasKu — Ruang Kerja Guru &amp; Kelas oleh FIEZEL.</p>
+      <nav class="foot-links" aria-label="Tautan footer">
+        <a href="../">Beranda</a>
+        <span aria-hidden="true">·</span>
+        <a href="../tentang.html">Tentang FIEZEL</a>
+        <span aria-hidden="true">·</span>
+        <a href="./">KelasKu untuk Guru</a>
+        <span aria-hidden="true">·</span>
+        <a href="../cefr/">Tingkat CEFR</a>
+        <span aria-hidden="true">·</span>
+        <a href="../faq/">FAQ Guru &amp; Murid</a>
+        <span aria-hidden="true">·</span>
+        <a href="../untuk-sekolah.html">Untuk Sekolah</a>
+        <span aria-hidden="true">·</span>
+        <a href="../privacy/">Kebijakan Privasi</a>
+        <span aria-hidden="true">·</span>
+        <a href="../terms/">Syarat Penggunaan</a>
+      </nav>
+    </div>
+    <div class="foot-notes">
+      <p>KelasKu adalah lapisan produk guru FIEZEL. Bukan pengganti kurikulum sekolah atau LMS utuh.</p>
+      <p>Kapasitas terpasang saat ini 250 pengguna — optimal untuk 1–3 kelas mandiri.</p>
+      <p>Data belajar tersimpan secara lokal dan aman di perangkat pengguna.</p>
+    </div>
+  </div>
+  <div class="wrap foot-copy"><p>© 2026 FIEZEL</p></div>
+</footer>
+</body>
+</html>

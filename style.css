@@ -5886,9 +5886,7 @@ body:has(.home-today) main.app {
   background: transparent !important;
 }
 
-body:has(.home-today) .topbar,
 body:has(.home-today) #globalSky,
-html.has-home-today .topbar,
 html.has-home-today #globalSky {
   display: none !important;
 }
@@ -5917,16 +5915,15 @@ html.has-home-today #globalSky {
   padding-bottom: 140px !important;
 }
 
-/* /* ==========================================================================
+/* ==========================================================================
    FIEZEL STUDENT DASHBOARD (Warm Obsidian & Educational Learning Cockpit)
    ========================================================================== */
 
-/* Topbar inside Home Dashboard */
-.fz-home-topbar {
-  display: flex !important;
-  align-items: center !important;
-  justify-content: space-between !important;
-  padding: 8px 4px 10px 4px !important;
+/* Universal topbar is used across all screens including Home; hide duplicate in-page topbar */
+.fz-home-topbar,
+.fz-sports-topbar,
+.today-home-cockpit .fz-home-topbar {
+  display: none !important;
 }
 
 .fz-home-brand-wrap {
@@ -8272,6 +8269,296 @@ button.fz-coach-bubble,
   width: 100% !important;
 }
 
+/* ==========================================================================
+   DUOLINGO-GRADE EDGE-TO-EDGE FULL-WIDTH APP SHELL OVERHAUL
+   ========================================================================== */
+
+/* 1. Viewport & App Container */
+@media (max-width: 768px) {
+  html, body {
+    overflow-x: hidden !important;
+    background: #0A0A0E !important;
+  }
+
+  main.app,
+  .app,
+  body.fz-lux .app {
+    max-width: 100% !important;
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 0 0 calc(84px + env(safe-area-inset-bottom)) 0 !important;
+    box-sizing: border-box !important;
+  }
+
+  /* Inner view content below topbar gets comfortable screen padding */
+  .app > *:not(.topbar):not(#globalSky):not(.notification-panel):not(.auth-panel):not(.modal-panel):not(.listening-modal),
+  #appInner,
+  .home-today,
+  .section-head,
+  .quick-practice-section {
+    padding-left: 16px !important;
+    padding-right: 16px !important;
+    box-sizing: border-box !important;
+  }
+}
+
+/* 2. Topbar: 100% Full-Width Edge-to-Edge */
+.topbar,
+header.topbar {
+  position: sticky !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  margin: 0 !important;
+  border-radius: 0 !important;
+  border-left: none !important;
+  border-right: none !important;
+  border-top: none !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.45) !important;
+  padding: max(10px, env(safe-area-inset-top)) 16px 10px 16px !important;
+  background: rgba(14, 14, 20, 0.94) !important;
+  backdrop-filter: blur(24px) !important;
+  -webkit-backdrop-filter: blur(24px) !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 12px !important;
+  z-index: 100 !important;
+  box-sizing: border-box !important;
+}
 
 
+.fz-home-brand-wrap {
+  display: inline-flex !important;
+  align-items: center !important;
+  cursor: pointer !important;
+}
 
+.fz-home-brand-wrap svg.fiezel-wordmark {
+  height: 24px !important;
+  width: auto !important;
+  max-width: 110px !important;
+  display: block !important;
+  filter: drop-shadow(0 2px 8px rgba(255, 217, 79, 0.35)) !important;
+}
+
+/* 3. Bottom Navigation Bar: Docked Full-Width (Duolingo Style) */
+nav.bottomnav,
+.bottomnav,
+html.fiezel-ui-v6 body.fz-lux .bottomnav {
+  position: fixed !important;
+  bottom: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  margin: 0 !important;
+  border-radius: 0 !important;
+  border-left: none !important;
+  border-right: none !important;
+  border-bottom: none !important;
+  border-top: 1px solid rgba(255, 255, 255, 0.08) !important;
+  background: rgba(14, 14, 20, 0.96) !important;
+  backdrop-filter: blur(24px) !important;
+  -webkit-backdrop-filter: blur(24px) !important;
+  box-shadow: 0 -4px 24px rgba(0, 0, 0, 0.5) !important;
+  padding: 8px 0 max(10px, env(safe-area-inset-bottom)) 0 !important;
+  display: grid !important;
+  grid-template-columns: repeat(5, 1fr) !important;
+  gap: 0 !important;
+  transform: none !important;
+  z-index: 1000 !important;
+  box-sizing: border-box !important;
+}
+
+nav.bottomnav .nav,
+.bottomnav .nav {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 4px !important;
+  padding: 4px 2px !important;
+  min-height: 48px !important;
+  background: transparent !important;
+  border: none !important;
+  border-radius: 0 !important;
+  transform: none !important;
+  box-shadow: none !important;
+  color: #8E8E98 !important;
+  cursor: pointer !important;
+  outline: none !important;
+  transition: color 0.15s ease, transform 0.15s ease !important;
+}
+
+nav.bottomnav .nav:active,
+.bottomnav .nav:active {
+  transform: scale(0.92) !important;
+}
+
+nav.bottomnav .nav.active,
+.bottomnav .nav.active {
+  color: #FFE02E !important;
+  background: transparent !important;
+  transform: none !important;
+}
+
+nav.bottomnav .nav .fz-i,
+.bottomnav .nav .fz-i {
+  width: 24px !important;
+  height: 24px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  --fz-i-fill: transparent !important;
+  --fz-i-line: #8E8E98 !important;
+  transition: all 0.15s ease !important;
+}
+
+nav.bottomnav .nav.active .fz-i,
+.bottomnav .nav.active .fz-i {
+  --fz-i-fill: #FFE02E !important;
+  --fz-i-line: #FFE02E !important;
+  filter: drop-shadow(0 2px 8px rgba(255, 224, 46, 0.45)) !important;
+}
+
+nav.bottomnav .nav span,
+.bottomnav .nav span {
+  font-size: 11px !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.01em !important;
+  line-height: 1 !important;
+}
+
+nav.bottomnav .nav.active span,
+.bottomnav .nav.active span {
+  color: #FFE02E !important;
+}
+
+/* 4. Auth & Login Screen: 100% Viewport-Fit (No Scroll Required) */
+.fz-auth {
+  position: fixed !important;
+  inset: 0 !important;
+  width: 100% !important;
+  height: 100dvh !important;
+  max-height: 100dvh !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: space-between !important;
+  overflow-y: auto !important;
+  overscroll-behavior: contain !important;
+  background: #FBF7F3 !important;
+  box-sizing: border-box !important;
+  z-index: 2147481950 !important;
+}
+
+.fz-auth-hero.is-masuk {
+  flex: 0 0 auto !important;
+  min-height: 14vh !important;
+  max-height: 16vh !important;
+  padding: max(14px, calc(env(safe-area-inset-top) + 8px)) 20px 24px !important;
+}
+
+.fz-auth-hero.is-masuk .fz-auth-brand .fiezel-wordmark {
+  width: min(36vw, 140px) !important;
+}
+
+.fz-auth-wave {
+  height: 32px !important;
+}
+
+.fz-auth-body {
+  flex: 1 1 auto !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: space-between !important;
+  padding: 4px 20px max(16px, env(safe-area-inset-bottom)) 20px !important;
+  max-width: 440px !important;
+  margin: 0 auto !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+}
+
+.fz-auth-title {
+  font-size: 1.6rem !important;
+  line-height: 1.1 !important;
+  margin: 0 0 8px 0 !important;
+}
+
+.fz-auth-roles {
+  margin: 0 0 8px !important;
+  padding: 3px !important;
+}
+
+.fz-auth-role {
+  padding: 7px 10px !important;
+  font-size: 0.88rem !important;
+}
+
+.fz-auth-google {
+  min-height: 38px !important;
+  height: 38px !important;
+}
+
+.fz-auth-or {
+  margin: 6px 0 2px !important;
+  font-size: 0.75rem !important;
+}
+
+.fz-auth-form {
+  gap: 8px !important;
+  margin-top: 2px !important;
+}
+
+.fz-auth-field {
+  gap: 3px !important;
+}
+
+.fz-auth-label {
+  font-size: 0.82rem !important;
+}
+
+.fz-auth-input {
+  padding: 2px 0 !important;
+}
+
+.fz-auth .fz-auth-input input[name] {
+  min-height: 34px !important;
+  padding: 4px 0 !important;
+  font-size: 0.92rem !important;
+}
+
+.fz-auth-row {
+  margin-top: -2px !important;
+}
+
+.fz-auth .fz-auth-link {
+  font-size: 0.8rem !important;
+}
+
+.fz-auth .fz-auth-submit {
+  width: 100% !important;
+  margin-top: 10px !important;
+  padding: 13px 20px !important;
+  font-size: 1rem !important;
+  font-weight: 800 !important;
+  border-radius: 9999px !important;
+  background: linear-gradient(135deg, #FFE048 0%, #FFB800 100%) !important;
+  color: #0F0E11 !important;
+  border: none !important;
+  box-shadow: 0 4px 18px rgba(255, 184, 0, 0.35) !important;
+  cursor: pointer !important;
+}
+
+/* 5. Welcome Screen Compactness */
+.fz-auth-hero.is-welcome {
+  min-height: 45vh !important;
+  max-height: 50vh !important;
+}
+.fz-auth-hero.is-welcome .fz-auth-paw {
+  width: 90px !important;
+  height: 90px !important;
+}

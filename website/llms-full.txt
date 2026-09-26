@@ -80,12 +80,16 @@ KelasKu is a teacher surface inside the same app students use; there is no secon
 install. A teacher can:
 
 - Create a class that students join with a class code (no student name, email or phone required)
-- Publish assignments by picking Phase → Chapter → Sub-chapter → language feature
-- Read a daily summary of who is falling behind
-- See per-student and per-competency analytics
-- Share parent reports
+- Publish assignments by picking Phase → Chapter → Sub-chapter → language feature, or CEFR competency
+- Choose between untimed practice and timed exam modes with option shuffling
+- Detect window blur / tab switching during exams (Focus Exit Detection)
+- Read a daily briefing of who is falling behind and see who needs greeting
+- See per-student and per-competency analytics (heatmaps and collective misconception diagnosis)
+- Form peer tutoring study groups pairing strong and struggling students
+- Share formatted parent progress reports via WhatsApp
+- Export class roster and performance data to CSV
 
-Assignments are graded automatically.
+Assignments are graded automatically. Dedicated documentation: https://fiezel.my.id/kelasku/
 
 ### Curriculum bank size
 
@@ -195,3 +199,6 @@ Your learning records — completed lessons, answers, and level progress — are
 
 **How many exercises are available?**
 Each grammar lesson has 25 focused exercises, across 180 total lessons. Reading adds 1,560 comprehension questions across 312 graded passages. Plus 1,400+ listening exercises and 36 speaking sessions.
+
+**What is KelasKu?**
+KelasKu is FIEZEL's classroom workspace for teachers and tutors. It allows teachers to create classes via 6-character codes, assign curriculum-aligned tasks, monitor student mastery without manual grading, detect tab switching during exams, and export grade rosters to CSV. Canonical documentation: https://fiezel.my.id/kelasku/

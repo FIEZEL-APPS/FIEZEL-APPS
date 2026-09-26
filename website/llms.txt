@@ -80,6 +80,7 @@ content source misrepresents it by an order of magnitude.
 ## Links
  
 - About FIEZEL (English): https://fiezel.my.id/about/
+- KelasKu Teacher Workspace: https://fiezel.my.id/kelasku/
 - English Grammar Hub: https://fiezel.my.id/grammar/
 - English Vocabulary Hub: https://fiezel.my.id/vocabulary/
 - English Reading Hub: https://fiezel.my.id/reading/

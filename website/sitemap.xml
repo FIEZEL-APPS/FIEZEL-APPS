@@ -100,6 +100,13 @@
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
+  <!-- SEO/AEO/GEO KelasKu: Ruang Kerja Guru & Kelas FIEZEL -->
+  <url>
+    <loc>https://fiezel.my.id/kelasku/</loc>
+    <lastmod>2026-09-26</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
   <!-- Halaman Untuk Sekolah (id + th). Ditambahkan saat rebrand m025-357: pintu masuk
        pencarian untuk guru dan kepala sekolah, yang kata kuncinya sama sekali berbeda
        dari kata kunci murid. Ia JUJUR menyatakan pilot belum berjalan — tidak ada klaim

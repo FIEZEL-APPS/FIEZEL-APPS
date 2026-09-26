@@ -7876,16 +7876,7 @@ function latihanCards(){
   const kanaCard=jaCourseOn()?FiezelJaUi.kanaCardMarkup():'';
   const chokaiCard=jaCourseOn()?FiezelJaUi.chokaiCardMarkup():'';
   return kanaCard+chokaiCard+cards.map(c=>{
-    let emb=null;
-    if(typeof Fiezel3DEmblems!=='undefined'){
-      if(c.view==='vocab'||c.icon==='vocab')emb=Fiezel3DEmblems.kotoba(44);
-      else if(c.view==='grammar'||c.icon==='grammar')emb=Fiezel3DEmblems.bunpo(44);
-      else if(c.view==='reading'||c.icon==='reading')emb=Fiezel3DEmblems.dokkai(44);
-      else if(c.view==='skills'||c.icon==='skills'||c.icon==='listening')emb=Fiezel3DEmblems.chokai(44);
-    }
-    const iconSpan = emb
-      ? `<span class="launch-icon fz-launch-3d">${emb}</span>`
-      : `<span class="launch-icon"><i class="fz-i" data-fz-icon="${esc(c.icon)}" aria-hidden="true"></i></span>`;
+    const iconSpan = `<span class="launch-icon"><i class="fz-i" data-fz-icon="${esc(c.icon)}" aria-hidden="true"></i></span>`;
     return `<button class="launch-card" onclick="go('${esc(c.view)}')" aria-label="${esc(c.label)}">${iconSpan}<span><small>${esc(c.note)}</small><b>${esc(c.label)}</b></span><i data-lucide="arrow-up-right"></i></button>`;
   }).join('');
 }
@@ -8270,119 +8261,176 @@ function todayHomeMarkup(){
     ? self.FiezelSplash.wordmarkMarkup('fzhm')
     : '<span class="fz-home-wordmark-text">FIEZEL</span>';
 
-  const timeGreeting = () => {
-    const h = new Date().getHours();
-    if (h >= 4 && h < 11) return 'Selamat Pagi';
-    if (h >= 11 && h < 15) return 'Selamat Siang';
-    if (h >= 15 && h < 18) return 'Selamat Sore';
-    return 'Selamat Malam';
-  };
+  /* Sapaan ramah personal & kata penyemangat harian */
+  const currentLearner = (state?.userName && state.userName !== 'Murid' && state.userName !== 'Belajar' && state.userName !== 'Budi') ? state.userName : 'Fitra';
+  const getGreetingMessages = (nama) => [
+    `Kemana aja nih, kok baru kelihatan lagi! Yuk latihan sekarang biar ritmemu tetap terjaga. 🔥`,
+    `Kalau kamu ga belajar mulai dari sekarang, kamu akan susah di kemudian hari. Semangat terus! 💪`,
+    `10 menit latihan hari ini menjaga ritme belajarmu tetap prima. Jangan tunda lagi ya! 🚀`,
+    `Konsistensi kecil hari ini adalah lompatan besar esok hari. Let's do this! ✨`,
+    `Setiap kata baru yang kamu kuasai membuka peluang baru di masa depan. Semangat! 🌟`,
+    `Perjalanan ribuan mil selalu dimulai dari satu langkah kecil hari ini. Terus melangkah! 🌸`
+  ];
+  const greetMessages = getGreetingMessages(currentLearner);
+  const dayIndex = Math.floor(Date.now() / 86400000) % greetMessages.length;
+  const currentMotivation = greetMessages[dayIndex];
 
-  const getMotivationQuote = () => {
-    const quotes = [
-      'Konsistensi kecil hari ini adalah lompatan besar esok hari. Tetap semangat! ✨',
-      'Setiap kata baru yang kamu pelajari membuka pintu dunia baru. Semangat! 🌟',
-      '10 menit latihan hari ini menjaga ritme belajarmu tetap prima. 🚀',
-      'Langkah hebat dibangun dari ketekunan harian. Terus melangkah! 💪',
-      '千里の行も足下に始まる — Perjalanan ribuan mil dimulai dari satu langkah. 🌸'
-    ];
-    const day = Math.floor(Date.now() / 86400000);
-    return quotes[day % quotes.length];
-  };
+  /* State apakah sudah pernah melakukan test level / placement */
+  const hasTestedLevel = !!(state && (state.placementDone || (state.history && state.history.some(h => h.type === 'placement' || h.type === 'test'))));
+  const primaryBtnText = hasTestedLevel
+    ? 'MULAI LATIHAN SEKARANG ➔'
+    : 'MULAI LATIHAN TEST LEVEL SEKARANG ➔';
+  const primaryBtnAction = hasTestedLevel
+    ? (aksi || 'startAdaptive()')
+    : "go('test')";
 
-  const homeTop = `<div class="fz-home-topbar">`
-    + `<div class="fz-home-brand-wrap" onclick="pawReact('wake');uiSfx('paw_greet')" role="button" tabindex="0" aria-label="FIEZEL Home">${homeWordmark}</div>`
-    + `<div class="fz-home-actions">`
-    + `<button type="button" id="fzCourseSwitchBtnHome" class="course-switch-btn fz-home-course-btn" onclick="toggleTargetCourse()" aria-label="Course"><span class="course-switch-flag" id="fzCourseFlagHome">${jaCourseOn() ? '🇯🇵' : '🇬🇧'}</span><span class="course-switch-label" id="fzCourseLabelHome" style="display:none">${jaCourseOn() ? 'JA' : 'EN'}</span></button>`
-    + `<button type="button" class="fz-home-action-btn" onclick="go('vocab')" aria-label="Search"><i data-lucide="search"></i></button>`
-    + `<button type="button" class="fz-home-action-btn" onclick="openNotifications()" aria-label="Notifications"><i data-lucide="bell"></i></button>`
-    + `</div></div>`
-    + `<div class="fz-welcome-header">`
-    + `<div class="fz-welcome-greeting">${timeGreeting()}, <span class="fz-welcome-name">${esc(learnerName())}</span>! ✨</div>`
-    + `<p class="fz-welcome-quote">${esc(getMotivationQuote())}</p>`
-    + `</div>`
-    + `<div class="fz-learning-pills-bar" role="tablist">`
-    + '<button type="button" class="fz-learning-pill is-active" role="tab">🎯 Target Harian</button>'
-    + `<button type="button" class="fz-learning-pill" onclick="openListeningPanel()" role="tab">🎧 Chōkai (Audio)</button>`
-    + `<button type="button" class="fz-learning-pill" onclick="go('vocab')" role="tab">📖 Kotoba (単語)</button>`
-    + `<button type="button" class="fz-learning-pill" onclick="go('grammar')" role="tab">⚡ Bunpō (文法)</button>`
-    + `<button type="button" class="fz-learning-pill" onclick="openLevelPanel()" role="tab">🏆 Level ${esc(jaCourseOn() ? FiezelJaUi.jlptLabel(todayLevel) : todayLevel)}</button>`
+  /* Format tanggal & waktu saat ini */
+  const nowObj = new Date();
+  const daysId = ['MINGGU', 'SENIN', 'SELASA', 'RABU', 'KAMIS', 'JUMAT', 'SABTU'];
+  const monthsId = ['JANUARI', 'FEBRUARI', 'MARET', 'APRIL', 'MEI', 'JUNI', 'JULI', 'AGUSTUS', 'SEPTEMBER', 'OKTOBER', 'NOVEMBER', 'DESEMBER'];
+  const dayName = daysId[nowObj.getDay()];
+  const dateNum = nowObj.getDate();
+  const monthName = monthsId[nowObj.getMonth()];
+  const formattedDate = `${dayName}, ${dateNum} ${monthName}`;
+  const formattedTime = `${nowObj.getHours()}:${String(nowObj.getMinutes()).padStart(2, '0')}`;
+
+  /* Header Sambutan: Hi Fitra! + Kata Penyemangat Harian (Tanpa Pills) */
+  const homeTop = `<div class="fz-welcome-header">`
+    + `<div class="fz-greet-title">Hi ${esc(currentLearner)}! <span class="fz-wave-hand">👋</span></div>`
+    + `<p class="fz-greet-motivation">${esc(currentMotivation)}</p>`
     + `</div>`;
 
-  const t = (k, d) => {
-    try {
-      if (typeof FiezelI18n !== 'undefined' && FiezelI18n && typeof FiezelI18n.t === 'function') {
-        const val = FiezelI18n.t(k);
-        if (val && val !== k) return val;
-      }
-    } catch (_) {}
-    return d;
-  };
+  /* Kosakata Harian untuk bagian atas Kartu 1 */
+  let dailyWord = null;
+  try {
+    const list = (Array.isArray(V) && V.length) ? V.filter(v => v.word && v.meaning) : [];
+    if (list.length > 0) {
+      const idx = Math.floor(Date.now() / 86400000) % list.length;
+      dailyWord = list[idx];
+    }
+  } catch(_) {}
+  if (!dailyWord) {
+    dailyWord = jaCourseOn()
+      ? { word: '頑張る', phonetic: 'がんばる (ganbaru)', meaning: 'Berusaha keras, bersemangat pantang menyerah.', example: '毎日少しずつ頑張りましょう。', exampleTranslation: 'Mari berusaha setiap hari sedikit demi sedikit.' }
+      : { word: 'Accomplish', phonetic: '/əˈkʌm.plɪʃ/ • Verb', meaning: 'Meraih, menuntaskan, atau berhasil mencapai target.', example: 'You can accomplish anything with consistent practice.', exampleTranslation: 'Kamu bisa meraih apa saja dengan latihan yang konsisten.' };
+  }
 
-  const card1Hero = `<div class="fz-edu-card-content" onclick="${aksi}" role="button" tabindex="0">`
-    + `<div class="fz-edu-badge-row">`
-    + `<span class="fz-edu-tag is-primary"><i class="fz-i" data-fz-icon="listening" style="width:13px;height:13px"></i> ${jaCourseOn() ? 'CHŌKAI (AUDIO)' : 'LISTENING PRACTICE'}</span>`
-    + `<span class="fz-edu-level-badge">Level ${esc(jaCourseOn() ? FiezelJaUi.jlptLabel(todayLevel) : todayLevel)}</span>`
-    + `</div>`
-    + `<h3 class="fz-edu-title">${jaCourseOn() ? 'Sesi Pendengaran & Pemahaman' : 'Daily Listening & Practice'}</h3>`
-    + `<p class="fz-edu-desc">${jaCourseOn() ? 'Latih kepekaan telinga dengan audio penutur asli Jepang untuk menjaga ritme harianmu.' : 'Improve your listening comprehension and maintain your daily learning rhythm.'}</p>`
-    + `<div class="fz-edu-stats-row">`
-    + `<span class="fz-edu-stat-item"><i class="fz-i" data-fz-icon="clock" style="width:13px;height:13px"></i> ${shape.menit}:00 Menit</span>`
-    + `<span class="fz-edu-stat-item"><i class="fz-i" data-fz-icon="quiz" style="width:13px;height:13px"></i> ${shape.soal} ${t('today.quiz_suffix', 'Soal')}</span>`
-    + `<span class="fz-edu-stat-item is-reward">✨ +50 XP</span>`
-    + `</div>`
-    + `<button type="button" class="fz-edu-primary-btn" onclick="event.stopPropagation();${aksi}">${t('today.start_practice_btn', 'Mulai Latihan Sekarang ➔')}</button>`
-    + `</div>`;
+  /* CARD 1: STADIUM CARD (Kuning Emas) - KOSAKATA HARIAN & MULAI LATIHAN (Zero Badges) */
+  const card1Hero = `
+    <div class="fz-stadium-card fz-card-yellow" onclick="${primaryBtnAction}" role="button" tabindex="0">
+      <div class="fz-stadium-notch"></div>
+      <div class="fz-stadium-header fz-stadium-vocab-header">
+        <div class="fz-stadium-vocab-top">
+          <span class="fz-vocab-kicker-tag">📖 KOSAKATA HARIAN</span>
+          <span class="fz-vocab-level-tag">${esc(jaCourseOn() ? 'JLPT N5' : ('LEVEL ' + todayLevel))}</span>
+        </div>
+        <div class="fz-vocab-hero-content">
+          <div class="fz-vocab-word-title">${esc(dailyWord.word)}</div>
+          ${dailyWord.phonetic ? `<div class="fz-vocab-word-phonetic">${esc(dailyWord.phonetic)}</div>` : ''}
+          <div class="fz-vocab-word-meaning">${esc(dailyWord.meaning)}</div>
+          ${dailyWord.example ? `<div class="fz-vocab-word-example">"${esc(dailyWord.example)}"${dailyWord.exampleTranslation ? ` &mdash; <em>${esc(dailyWord.exampleTranslation)}</em>` : ''}</div>` : ''}
+        </div>
+      </div>
+      <div class="fz-stadium-body">
+        <div class="fz-stadium-metrics-row">
+          <div class="fz-stadium-chip">${shape.soal || 10} SOAL</div>
+          <div class="fz-stadium-center-time">
+            <span class="fz-time-val">${formattedTime}</span>
+            <span class="fz-date-val">${formattedDate}</span>
+          </div>
+          <div class="fz-stadium-chip is-xp">+50 XP</div>
+        </div>
+        <button type="button" class="fz-stadium-cta-btn" onclick="event.stopPropagation();${primaryBtnAction}">
+          ${primaryBtnText}
+        </button>
+      </div>
+      <div class="fz-stadium-footer-notch">
+        <span>${jaCourseOn() ? '⛩️ ' : '⚡ '}LATIHAN BERIKUTNYA</span>
+        <span class="fz-footer-caret">▾</span>
+      </div>
+    </div>`;
 
-  const card2Hero = `<div class="fz-edu-card fz-card-neutral" onclick="go('vocab')" role="button" tabindex="0" aria-label="Kotoba Flashcards">`
-    + `<div class="fz-edu-card-content">`
-    + `<div class="fz-edu-badge-row">`
-    + `<span class="fz-edu-tag is-emerald"><i class="fz-i" data-fz-icon="vocab" style="width:13px;height:13px"></i> ${jaCourseOn() ? 'KOTOBA & BUNPŌ' : 'VOCABULARY & GRAMMAR'}</span>`
-    + `<span class="fz-edu-sub-badge">REVIEW HARIAN</span>`
-    + `</div>`
-    + `<h3 class="fz-edu-title">${jaCourseOn() ? 'Flashcard Kosakata & Pola Kalimat' : 'Vocabulary Flashcards & Syntax'}</h3>`
-    + `<p class="fz-edu-desc">${jaCourseOn() ? '25 kata aktif dengan sistem pengulangan berjarak (Spaced Repetition System) agar tersimpan di memori jangka panjang.' : 'Active flashcards with spaced repetition system to reinforce long-term memory.'}</p>`
-    + `<div class="fz-edu-stats-row">`
-    + `<span class="fz-edu-stat-item">🗂️ 25 ${t('today.vocab_suffix', 'Kosakata')}</span>`
-    + `<span class="fz-edu-stat-item">⏱️ 05:00 Menit</span>`
-    + `<span class="fz-edu-stat-item">🧠 SRS Memory</span>`
-    + `</div>`
-    + `<button type="button" class="fz-edu-secondary-btn" onclick="event.stopPropagation();go('vocab')">Buka Flashcard ➔</button>`
-    + `</div></div>`;
+  /* CARD 2: STADIUM CARD (Silver Gradient) - KOSA KATA HARIAN (FLASHCARD & REPETISI) (Zero Badges) */
+  const card2Hero = `
+    <div class="fz-stadium-card fz-card-silver" onclick="go('vocab')" role="button" tabindex="0">
+      <div class="fz-stadium-notch"></div>
+      <div class="fz-stadium-header is-silver fz-stadium-clean-header">
+        <div class="fz-stadium-vocab-top">
+          <span class="fz-vocab-kicker-tag is-silver-tag">📚 FLASHCARD &amp; REPETISI</span>
+          <span class="fz-vocab-level-tag is-silver-tag">SRS MEMORY</span>
+        </div>
+        <div class="fz-clean-header-content">
+          <div class="fz-clean-header-title">Kosa Kata Harian</div>
+          <div class="fz-clean-header-sub">25 kosakata aktif dan pola kalimat dengan spaced repetition system agar tersimpan di memori permanen.</div>
+        </div>
+      </div>
+      <div class="fz-stadium-body">
+        <div class="fz-stadium-metrics-row">
+          <div class="fz-stadium-chip">25 KATA</div>
+          <div class="fz-stadium-center-time">
+            <span class="fz-time-val">05:00</span>
+            <span class="fz-date-val">SRS MEMORY</span>
+          </div>
+          <div class="fz-stadium-chip is-xp">+30 XP</div>
+        </div>
+        <button type="button" class="fz-stadium-cta-btn is-silver-btn" onclick="event.stopPropagation();go('vocab')">
+          BUKA KOSA KATA HARIAN ➔
+        </button>
+      </div>
+      <div class="fz-stadium-footer-notch">
+        <span>📖 REPETISI KOSA KATA</span>
+        <span class="fz-footer-caret">▾</span>
+      </div>
+    </div>`;
 
-  const card3Hero = `<div class="fz-edu-card fz-card-obsidian" onclick="openListeningPanel()" role="button" tabindex="0" aria-label="Dokkai dan Simulasi">`
-    + `<div class="fz-edu-card-content">`
-    + `<div class="fz-edu-badge-row">`
-    + `<span class="fz-edu-tag is-gold"><i class="fz-i" data-fz-icon="reading" style="width:13px;height:13px"></i> ${jaCourseOn() ? 'DOKKAI & SIMULASI' : 'READING & EXAM PREP'}</span>`
-    + `<span class="fz-edu-sub-badge">JLPT N5/N4</span>`
-    + `</div>`
-    + `<h3 class="fz-edu-title">${jaCourseOn() ? 'Simulasi Ujian & Bacaan Teks' : 'Exam Simulation & Reading Comprehension'}</h3>`
-    + `<p class="fz-edu-desc">${jaCourseOn() ? 'Uji pemahaman wacana dan kecepatan membaca dengan format simulasi ujian standar resmi.' : 'Test reading comprehension and pacing with standardized test simulation.'}</p>`
-    + `<div class="fz-edu-stats-row">`
-    + `<span class="fz-edu-stat-item">⏱️ 20 Menit</span>`
-    + `<span class="fz-edu-stat-item">🎯 Target: 88%</span>`
-    + `<span class="fz-edu-stat-item">🏆 Try Out Resmi</span>`
-    + `</div>`
-    + `<button type="button" class="fz-edu-secondary-btn" onclick="event.stopPropagation();openListeningPanel()">Mulai Simulasi ➔</button>`
-    + `</div></div>`;
+  /* CARD 3: STADIUM CARD (Dark Obsidian) - KETERANGAN PENINGKATAN (Zero Badges) */
+  const card3Hero = `
+    <div class="fz-stadium-card fz-card-dark" onclick="go('progress')" role="button" tabindex="0">
+      <div class="fz-stadium-notch"></div>
+      <div class="fz-stadium-header is-dark fz-stadium-clean-header">
+        <div class="fz-stadium-vocab-top">
+          <span class="fz-vocab-kicker-tag is-dark-tag">📈 PROGRES BELAJAR</span>
+          <span class="fz-vocab-level-tag is-dark-tag">${todayLevel} ➔ A2</span>
+        </div>
+        <div class="fz-clean-header-content">
+          <div class="fz-clean-header-title">Keterangan Peningkatan</div>
+          <div class="fz-clean-header-sub">Akurasi dan ritme belajarmu meningkat konsisten. Selesaikan 1 sesi lagi hari ini untuk mengunci kenaikan level!</div>
+        </div>
+      </div>
+      <div class="fz-stadium-body">
+        <div class="fz-stadium-metrics-row">
+          <div class="fz-stadium-chip is-gain">+15% AKURASI</div>
+          <div class="fz-stadium-center-time">
+            <span class="fz-time-val" style="color:#059669">+15%</span>
+            <span class="fz-date-val">PENINGKATAN MINGGU INI</span>
+          </div>
+          <div class="fz-stadium-chip is-streak">🔥 ${streak || 1} HARI</div>
+        </div>
+        <button type="button" class="fz-stadium-cta-btn is-dark-btn" onclick="event.stopPropagation();go('progress')">
+          LIHAT DETAIL PENINGKATAN ➔
+        </button>
+      </div>
+      <div class="fz-stadium-footer-notch">
+        <span>📈 ANALISIS &amp; PETA BELAJAR</span>
+        <span class="fz-footer-caret">▾</span>
+      </div>
+    </div>`;
 
   return `<div class="today-home-cockpit fz-edu-cockpit">
   ${homeTop}
-  <section class="today-card fz-edu-card fz-card-primary" aria-label="${esc(FiezelI18n.t('today.aria-kartu'))}">
-    ${card1Hero}
-    <details class="fz-card-drawer">
-      <summary class="fz-drawer-toggle"><span>${jaCourseOn() ? '⛩️ ' : '⚡ '}${esc(FiezelI18n.t('home.sesi-next') || 'DETAIL MATERI & RITME')}</span><span class="fz-drawer-arrow">▾</span></summary>
-      <div class="fz-drawer-inner">
-        <div class="today-head"><span class="today-eyebrow">${FiezelI18n.t('today.eyebrow')}</span>${todayHeadChips}</div>
-        ${rhythmBar}
-        ${badan}
-        ${streak>0?`<p class="today-streak"><i class="fz-i" data-fz-icon="flame" aria-hidden="true"></i> ${esc(FiezelI18n.t('today.streak',{days:streak}))}</p>`:''}
-        ${activeLevelTrustLineMarkup()}
-      </div>
-    </details>
-  </section>
+  ${card1Hero}
   ${card2Hero}
   ${card3Hero}
+  <details class="fz-card-drawer" style="margin-top:4px">
+    <summary class="fz-drawer-toggle"><span>${jaCourseOn() ? '⛩️ ' : '⚡ '}${esc(FiezelI18n.t('home.sesi-next') || 'DETAIL MATERI & RITME')}</span><span class="fz-drawer-arrow">▾</span></summary>
+    <div class="fz-drawer-inner">
+      <div class="today-head"><span class="today-eyebrow">${FiezelI18n.t('today.eyebrow')}</span>${todayHeadChips}</div>
+      ${rhythmBar}
+      ${badan}
+      ${streak>0?`<p class="today-streak"><i class="fz-i" data-fz-icon="flame" aria-hidden="true"></i> ${esc(FiezelI18n.t('today.streak',{days:streak}))}</p>`:''}
+      ${activeLevelTrustLineMarkup()}
+    </div>
+  </details>
   ${heroMascotMarkup}
   ${jaCourseOn()?FiezelJaUi.wordOfDayMarkup(V.filter(v=>v.level===getActiveLevel())):''}
   ${learnerFlowHomeMarkup()}
@@ -11466,6 +11514,7 @@ function quizLoop(cfg){
   $('quizFloatingBar')?.remove();
   setApp(`<section class="fade quiz-shell${pawSlot?pawSlot.shellClass:''}"><div class="quiz-topbar"><button id="quizExit" class="quiz-exit" aria-label="${FiezelI18n.t('quiz.exit-aria')}"><i data-lucide="x"></i><span class="quiz-exit-label">${FiezelI18n.t('quiz.exit-label')}</span></button><div class="quiz-progress" role="progressbar" aria-valuemin="0" aria-valuemax="${planned}" aria-valuenow="${asked+1}" aria-label="${FiezelI18n.t('quiz.progress-aria',{asked:asked+1,planned})}"><span>${asked+1}</span><em>/ ${planned}</em><i class="quiz-progress-bar" aria-hidden="true" style="--p:${(asked/Math.max(1,planned)).toFixed(3)}"><b></b></i></div><button id="quizNext" class="quiz-next" disabled>${FiezelI18n.t('quiz.next-btn')} <i data-lucide="arrow-right"></i></button></div>${pawSlot?'':`<div class="quiz-mascot" aria-hidden="true">${pawFaceMarkup()}</div>`}${q.passage?card(`<div class="passage passage-reading" id="quizPassage"><div class="eyebrow">${FiezelI18n.t('quiz.reading-eyebrow')}</div><h3>${esc(q.passage.title)}</h3><p>${esc(q.passage.text)}</p></div>`,'card-reading'):(cfg.context?card(`<div class="passage" id="quizPassage"><b>${esc(cfg.context.title)}</b><p>${esc(cfg.context.text)}</p></div>`):'')}${card(`${pawSlot?pawSlot.peek:''}${pawSlot&&pawSlot.above?`<div class="quiz-stage">${pawSlot.above}<div class="quiz-bubble"><h2 class="question" id="quizStem">${esc(q.question)}</h2></div></div>`:''}${q.focus?`<div class="vocab-focus"><span class="vocab-focus-word">${jaWord(q.focus.word,q.focus.phonetic)}</span>${q.focus.phonetic?`<span class="phonetic">${jaPhonetic(q.focus.phonetic,'')}</span>`:''}</div>`:''}${q.passage?`<div class="reading-jump-bar"><button type="button" id="readingJumpBtn" class="reading-jump-btn"><i data-lucide="book-open"></i> <span>${FiezelI18n.t('quiz.reading-eyebrow')}</span> <i data-lucide="arrow-up-right"></i></button></div>`:''}${q.type==='listening'?`<div class="quiz-listen quiz-listen-hero"><div class="quiz-listen-controls"><button id="quizListen" class="quiz-listen-btn quiz-listen-btn-hero"><i data-lucide="volume-2"></i> ${FiezelI18n.t('quiz.listen-btn')}</button><button type="button" id="quizListenSpeed" class="quiz-listen-speed-btn" aria-label="Kecepatan Audio"><span id="quizListenSpeedLabel">1.0x</span></button></div><div class="quiz-audio-wave hidden" id="quizAudioWave" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></div><span id="quizListenNote" class="muted">${FiezelI18n.t('quiz.listen-note')}</span></div>`:''}${pawSlot&&pawSlot.above?'':`<h2 class="question" id="quizStem">${esc(q.question)}</h2>`}<div id="options" class="options"></div><div id="feedback" class="feedback hidden"></div><div id="tutorTurn" class="tutor-turn hidden"></div>`,pawSlot?pawSlot.cardClass:'')}${pawSlot?pawSlot.side:''} </section>`);
   $('quizExit').onclick=()=>confirmQuizExit();/* W1 P1-2: keluar lewat konfirmasi, bukan seketika. */
+  try{window.scrollTo(0,0);document.documentElement.scrollTop=0;document.body.scrollTop=0;document.querySelector('.quiz-topbar, #quizExit')?.scrollIntoView({block:'start',behavior:'auto'})}catch(_){}
   $('options').append(...opts.map((o,j)=>{const b=document.createElement('button');b.className='option';b.textContent=o;b.onclick=()=>answer(q,j,b);return b}));
   if(q.passage){
    const jump=$('readingJumpBtn');
@@ -13060,8 +13109,11 @@ function updateTopbarCourseButton(){
   try{
     const currentLang=activeTargetLang();
     const isJa=(currentLang==='ja');
-    document.querySelectorAll('.course-switch-flag').forEach(el => { el.textContent = isJa ? '🇯🇵' : '🇬🇧'; });
-    document.querySelectorAll('.course-switch-label').forEach(el => { el.textContent = isJa ? 'JA' : 'EN'; });
+    const flagSvg = isJa
+      ? '<svg class="fiezel-flag-svg" viewBox="0 0 36 24" width="22" height="15" aria-hidden="true" focusable="false" style="display:inline-block;vertical-align:middle;border-radius:3px;box-shadow:0 0 1px rgba(0,0,0,0.6)"><rect width="36" height="24" rx="3" fill="#FFFFFF"/><circle cx="18" cy="12" r="7.2" fill="#BC002D"/></svg>'
+      : '<svg class="fiezel-flag-svg" viewBox="0 0 60 40" width="22" height="15" aria-hidden="true" focusable="false" style="display:inline-block;vertical-align:middle;border-radius:3px;box-shadow:0 0 1px rgba(0,0,0,0.6)"><clipPath id="fz-flag-en-topbar"><rect width="60" height="40" rx="3"/></clipPath><g clip-path="url(#fz-flag-en-topbar)"><path d="M0 0v40h60V0z" fill="#012169"/><path d="M0 0l60 40m0-40L0 40" stroke="#fff" stroke-width="6.67"/><path d="M0 0l60 40m0-40L0 40" stroke="#c8102e" stroke-width="4.44"/><path d="M30 0v40M0 20h60" stroke="#fff" stroke-width="11.11"/><path d="M30 0v40M0 20h60" stroke="#c8102e" stroke-width="6.67"/></g></svg>';
+    document.querySelectorAll('.course-switch-flag').forEach(el => { el.innerHTML = flagSvg; });
+    document.querySelectorAll('.course-switch-label').forEach(el => { el.style.display = 'none'; });
     document.querySelectorAll('.course-switch-btn').forEach(btn => {
       btn.setAttribute('data-target-lang',currentLang);
       const activeName=isJa?FiezelI18n.t('bahasa.ja'):FiezelI18n.t('bahasa.en');
@@ -13893,6 +13945,38 @@ async function renderOnlineTab(){
   const put=html=>{if(seq!==onlineSeq||state.view!=='online')return;const el=$('onlineRoot');if(el){el.innerHTML=html;enhanceUI()}};
   const core=socialCore();
   const extra=onlineTab==='teman'?socialClassCardMarkup():'';
+  if(onlineTab==='profil'){
+    const localName = (typeof learnerName === 'function' ? learnerName() : state.userName) || 'Fitra';
+    const localLevel = (typeof getActiveLevel === 'function' ? getActiveLevel() : 'A1') || 'A1';
+    const streak = state.streak || 0;
+    const initial = localName.charAt(0).toUpperCase();
+    const localProfileCard = card(`
+      <div class="social-me" style="display:flex;align-items:center;gap:16px;margin-bottom:18px">
+        <span class="social-avatar" style="width:52px;height:52px;border-radius:50%;background:#FFE02E;color:#0A0A0E;font-size:24px;font-weight:900;display:flex;align-items:center;justify-content:center" aria-hidden="true">${esc(initial)}</span>
+        <div>
+          <h3 style="margin:0 0 4px 0;font-size:1.3rem;font-weight:800;color:#FFFFFF">${esc(localName)}</h3>
+          <p class="muted" style="margin:0;font-size:0.88rem;color:#94A3B8">Profil Murid FIEZEL · Level ${esc(localLevel)}</p>
+        </div>
+      </div>
+      <div class="stats social-stats" style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:16px">
+        <div style="background:#202030;padding:10px;border-radius:12px;text-align:center"><div style="font-size:0.75rem;color:#94A3B8;font-weight:700">LEVEL</div><div style="font-size:1.2rem;font-weight:900;color:#FFE02E">${esc(localLevel)}</div></div>
+        <div style="background:#202030;padding:10px;border-radius:12px;text-align:center"><div style="font-size:0.75rem;color:#94A3B8;font-weight:700">STREAK</div><div style="font-size:1.2rem;font-weight:900;color:#FFFFFF">${streak} hari</div></div>
+        <div style="background:#202030;padding:10px;border-radius:12px;text-align:center"><div style="font-size:0.75rem;color:#94A3B8;font-weight:700">AKUN</div><div style="font-size:1.2rem;font-weight:900;color:#38BDF8">Lokal</div></div>
+      </div>
+    `, 'profile-summary-card');
+    
+    const settingsCard = card(`
+      <div style="display:flex;align-items:center;justify-content:space-between">
+        <div>
+          <h3 style="margin:0;font-size:16px;font-weight:800;color:#FFFFFF">${FiezelI18n.t('settings.online-pengaturan-judul')}</h3>
+          <small style="color:#94A3B8;font-weight:500">Kecepatan suara, notifikasi, tema, dan akun</small>
+        </div>
+        <button type="button" class="primary" onclick="openSettings()" style="font-weight:800;padding:8px 16px;border-radius:10px">Buka</button>
+      </div>
+    `, 'profile-settings-card');
+
+    return put(localProfileCard + settingsCard);
+  }
   if(!core)return put(card(`<h3>${FiezelI18n.t('social.not-loaded-title')}</h3><p class="muted">${FiezelI18n.t('social.not-loaded-body')}</p>`,'social-card')+extra);
   if(typeof navigator!=='undefined'&&navigator.onLine===false)return put(socialOfflineCard()+extra);
   let flag='off';try{flag=await core.probeFlag()}catch(_){flag='off'}
