@@ -83,6 +83,7 @@
     var modal = document.getElementById('listeningPanelModal');
     if (modal) {
       modal.classList.add('open');
+      modal.setAttribute('aria-hidden', 'false');
       document.body.style.overflow = 'hidden';
     }
     curIndex = 0;
@@ -100,6 +101,7 @@
     var modal = document.getElementById('listeningPanelModal');
     if (modal) {
       modal.classList.remove('open');
+      modal.setAttribute('aria-hidden', 'true');
       document.body.style.overflow = '';
     }
     closeJlptDetailSheet();

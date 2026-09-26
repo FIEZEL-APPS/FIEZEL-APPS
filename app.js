@@ -1768,6 +1768,7 @@ async function activateAccountStateFromPuter(sdk=self.puter){
     if(appOpened)render();return true;
   }catch{return false}
 }
+function dayKey(ts){return new Date(ts).toISOString().slice(0,10)}
 function activeAccountIdentifier(){return activeAccountUuid||''}
 function activateAccountState(rawId){
   const uuid=String(rawId||'').replace(/[^A-Za-z0-9_-]/g,'').slice(0,128);
@@ -1785,7 +1786,6 @@ function deactivateAccountState(){
   state=loadState(LEGACY_STATE_KEY);coreBrainCache=null;
   if(appOpened)render();
 }
-function dayKey(ts){return new Date(ts).toISOString().slice(0,10)}
 function studyTimeZone(sourceState=null){const prefs=sourceState?.preferences||(stateReady?state?.preferences:null)||defaultPreferences;return validTimeZone(prefs?.timeZone||detectedTimeZone())}
 /* D4 bottleneck #1: formatter Intl di-CACHE per timeZone di level modul. Sebelumnya
    jakartaStudyParts membuat `new Intl.DateTimeFormat` BARU untuk setiap baris riwayat pada
