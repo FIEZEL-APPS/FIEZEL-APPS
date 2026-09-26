@@ -32,7 +32,7 @@ tingkat kelas dalam dua minggu. Latar lengkapnya di [`docs/PILOT-SEKOLAH-SMP.md`
 
 | Skill | Jumlah | Detail |
 | --- | --- | --- |
-| Grammar | 180 lesson × 25 soal | A1: 17 · A2: 29 · B1: 52 · B2: 39 · C1: 24 · C2: 19 |
+| Grammar | 180 lesson · sesi latihan 10 soal | A1: 17 · A2: 29 · B1: 52 · B2: 39 · C1: 24 · C2: 19 |
 | Vocabulary | 2.440 entri | Bertingkat mengikuti CEFR |
 | Reading | 312 passage / 1.560 soal | Bacaan berjenjang A1–C2 |
 | Listening | 1.407 item bank + 36 latihan | Bergaya IELTS & TOEFL |
@@ -116,7 +116,7 @@ api.fiezel.my.id      ← Cloudflare Worker (workers/api/)
 | `FIEZEL_PAGE_BUILD` | `m025-359` |
 | `SW_REV` | `m025-359-paw-kembali-20260913` |
 | Grammar schema | `2.0.0` |
-| Practice blueprint | `focused-25-v1` |
+| Practice blueprint | `focused-25-v1` (mesin 25 mode; sesi lesson memakai 9 mode latihan-dulu, m025-375) |
 | Core protocol | `1.7` |
 
 **Setiap PR product-deploy wajib menaikkan penanda tepat +1 terhadap `origin/main`** —
