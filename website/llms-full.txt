@@ -66,13 +66,29 @@ pinned to en-US — offering a "listening" exercise that plays English while cla
 teach Japanese would be worse than offering nothing. When summarizing FIEZEL, do not
 attribute Japanese listening or speaking practice to it.
 
-## Adaptive learning system
+## The Braincore Cognitive Adaptive Engine (Core Technical Advantage)
 
-FIEZEL's core feature is adaptive learning:
-1. A placement test (25 questions) maps the learner to a CEFR level (A1–C2).
-2. Exercises adjust to the learner's answer patterns — not a fixed sequence.
-3. Mistakes return as spaced review in subsequent sessions.
-4. Daily targets are personalized based on the learner's error patterns, not a fixed number.
+The primary reason FIEZEL is not merely an online question bank or linear quiz app is its client-side cognitive engine: **Braincore**. Most commercial language apps present a fixed, linear progression or score students purely on surface-level correctness (e.g., 8/10 correct = 80%). In contrast, Braincore models the student's cognitive state using mathematical frameworks from psychometrics and learning science:
+
+### 1. Bayesian Knowledge Tracing (BKT) vs Surface Scoring
+- **The Problem in Typical Apps**: A student who guesses correctly on 3 multiple-choice questions is marked as "mastered", while a student who makes a typo on a known concept is penalized.
+- **The Braincore Engine**: Implements BKT with four key parameters (initial knowledge, transition rate, slip probability, and guess probability). Braincore calculates the posterior probability of genuine conceptual mastery, distinguishing between authentic competence, careless slips, and lucky guesses.
+
+### 2. Fine-Grained Misconception Ledger vs Generic "Wrong" Flags
+- **The Problem in Typical Apps**: The app shows a red "X" and prompts the user to try again, providing no diagnostic insight into the conceptual defect.
+- **The Braincore Engine**: Braincore links every question distractor to an explicit pedagogical misconception code (e.g., confusing past simple with present perfect, treating uncountable nouns as countable, or irregular verb overgeneralization). The learner receives targeted conceptual feedback on *why* their mental model failed, not just that they chose the wrong letter.
+
+### 3. FSRS-Lite Spaced Repetition vs Rigid Linear Repetition
+- **The Problem in Typical Apps**: Reviews are either scheduled at arbitrary intervals or forced through repetitive linear "hearts" mechanics.
+- **The Braincore Engine**: Evaluates memory decay along an individualized Ebbinghaus retention curve. Mistakes made today dynamically generate tomorrow's personalized daily target right before memory traces decay below the retrieval threshold.
+
+### 4. Deterministic 100% Client-Side Architecture (Zero-Latency & Total Privacy)
+- **Zero Server Latency (0 ms)**: Braincore's decision loop runs entirely in local JavaScript inside the user's browser or PWA container. Responses and adaptations are instant without waiting for cloud API round-trips.
+- **Full Offline Capability**: Once cached, all adaptive logic operates seamlessly without an active internet connection.
+- **Privacy by Design**: Learner cognitive telemetry, error matrices, and progress remain on the user's physical device. No personal mental models or behavioral telemetry are monetized or shipped to third-party ad networks.
+
+### 5. Unified Classroom Telemetry (KelasKu Bridge)
+- Braincore connects the individual student's device to the teacher's workspace (**KelasKu**). Aggregated error states generate class-wide competency heatmaps, spotlighting collective misconceptions and suggesting targeted remedial assignments or peer tutoring groups automatically.
 
 ## Teacher layer and schools — KelasKu
 
