@@ -8262,8 +8262,16 @@ function todayHomeMarkup(){
     : '<span class="fz-home-wordmark-text">FIEZEL</span>';
 
   /* Sapaan ramah personal & kata penyemangat harian */
-  const currentLearner = (state?.userName && state.userName !== 'Murid' && state.userName !== 'Belajar' && state.userName !== 'Budi') ? state.userName : 'Fitra';
-  const getGreetingMessages = (nama) => [
+  const isTh = (typeof FiezelI18n !== 'undefined' && FiezelI18n && FiezelI18n.getLocale && FiezelI18n.getLocale() === 'th');
+  const currentLearner = (state?.userName && !/^(Murid|Belajar|Budi)$/i.test(state.userName)) ? state.userName : 'Fitra';
+  const getGreetingMessages = (nama) => isTh ? [
+    `หายไปไหนมา คิดถึงจัง! มาฝึกกันต่อเพื่อรักษาจังหวะการเรียนรู้นะ 🔥`,
+    `ถ้าไม่เริ่มเรียนตั้งแต่วันนี้ พรุ่งนี้จะยากขึ้นนะ สู้ต่อไป! 💪`,
+    `แค่ 10 นาทีวันนี้ ช่วยรักษาจังหวะการเรียนให้ยอดเยี่ยม อย่าเพิ่งผัดวันประกันพรุ่งนะ! 🚀`,
+    `ก้าวเล็ก ๆ ที่สม่ำเสมอในวันนี้ คือการก้าวกระโดดที่ยิ่งใหญ่ในวันพรุ่งนี้ ✨`,
+    `คำศัพท์ใหม่ทุกคำที่คุณเรียนรู้ จะเปิดโอกาสใหม่ ๆ ในอนาคต สู้ ๆ นะ! 🌟`,
+    `การเดินทางนับพันไมล์เริ่มต้นจากก้าวเล็ก ๆ ก้าวแรกเสมอ เดินหน้าต่อไป! 🌸`
+  ] : [
     `Kemana aja nih, kok baru kelihatan lagi! Yuk latihan sekarang biar ritmemu tetap terjaga. 🔥`,
     `Kalau kamu ga belajar mulai dari sekarang, kamu akan susah di kemudian hari. Semangat terus! 💪`,
     `10 menit latihan hari ini menjaga ritme belajarmu tetap prima. Jangan tunda lagi ya! 🚀`,
@@ -8277,9 +8285,9 @@ function todayHomeMarkup(){
 
   /* State apakah sudah pernah melakukan test level / placement */
   const hasTestedLevel = !!(state && (state.placementDone || (state.history && state.history.some(h => h.type === 'placement' || h.type === 'test'))));
-  const primaryBtnText = hasTestedLevel
-    ? 'MULAI LATIHAN SEKARANG ➔'
-    : 'MULAI LATIHAN TEST LEVEL SEKARANG ➔';
+  const primaryBtnText = isTh
+    ? (hasTestedLevel ? 'เริ่มฝึกฝนทันที ➔' : 'เริ่มทำแบบทดสอบวัดระดับเลย ➔')
+    : (hasTestedLevel ? 'MULAI LATIHAN SEKARANG ➔' : 'MULAI LATIHAN TEST LEVEL SEKARANG ➔');
   const primaryBtnAction = hasTestedLevel
     ? (aksi || 'startAdaptive()')
     : "go('test')";
@@ -8288,15 +8296,17 @@ function todayHomeMarkup(){
   const nowObj = new Date();
   const daysId = ['MINGGU', 'SENIN', 'SELASA', 'RABU', 'KAMIS', 'JUMAT', 'SABTU'];
   const monthsId = ['JANUARI', 'FEBRUARI', 'MARET', 'APRIL', 'MEI', 'JUNI', 'JULI', 'AGUSTUS', 'SEPTEMBER', 'OKTOBER', 'NOVEMBER', 'DESEMBER'];
-  const dayName = daysId[nowObj.getDay()];
+  const daysTh = ['วันอาทิตย์', 'วันจันทร์', 'วันอังคาร', 'วันพุธ', 'วันพฤหัสบดี', 'วันศุกร์', 'วันเสาร์'];
+  const monthsTh = ['มกราคม', 'กุมภาพันธ์', 'มีนาคม', 'เมษายน', 'พฤษภาคม', 'มิถุนายน', 'กรกฎาคม', 'สิงหาคม', 'กันยายน', 'ตุลาคม', 'พฤศจิกายน', 'ธันวาคม'];
+  const dayName = isTh ? daysTh[nowObj.getDay()] : daysId[nowObj.getDay()];
   const dateNum = nowObj.getDate();
-  const monthName = monthsId[nowObj.getMonth()];
+  const monthName = isTh ? monthsTh[nowObj.getMonth()] : monthsId[nowObj.getMonth()];
   const formattedDate = `${dayName}, ${dateNum} ${monthName}`;
   const formattedTime = `${nowObj.getHours()}:${String(nowObj.getMinutes()).padStart(2, '0')}`;
 
   /* Header Sambutan: Hi Fitra! + Kata Penyemangat Harian (Tanpa Pills) */
   const homeTop = `<div class="fz-welcome-header">`
-    + `<div class="fz-greet-title">Hi ${esc(currentLearner)}! <span class="fz-wave-hand">👋</span></div>`
+    + `<div class="fz-greet-title">${isTh ? 'สวัสดี ' : 'Hi '}${esc(currentLearner)}! <span class="fz-wave-hand">👋</span></div>`
     + `<p class="fz-greet-motivation">${esc(currentMotivation)}</p>`
     + `</div>`;
 
@@ -8311,8 +8321,12 @@ function todayHomeMarkup(){
   } catch(_) {}
   if (!dailyWord) {
     dailyWord = jaCourseOn()
-      ? { word: '頑張る', phonetic: 'がんばる (ganbaru)', meaning: 'Berusaha keras, bersemangat pantang menyerah.', example: '毎日少しずつ頑張りましょう。', exampleTranslation: 'Mari berusaha setiap hari sedikit demi sedikit.' }
-      : { word: 'Accomplish', phonetic: '/əˈkʌm.plɪʃ/ • Verb', meaning: 'Meraih, menuntaskan, atau berhasil mencapai target.', example: 'You can accomplish anything with consistent practice.', exampleTranslation: 'Kamu bisa meraih apa saja dengan latihan yang konsisten.' };
+      ? (isTh
+          ? { word: '頑張る', phonetic: 'がんばる (ganbaru)', meaning: 'พยายามอย่างเต็มที่, มุ่งมั่นไม่ยอมแพ้', example: '毎日少しずつ頑張りましょう。', exampleTranslation: 'มาพยายามไปด้วยกันทีละนิดในทุก ๆ วันนะ' }
+          : { word: '頑張る', phonetic: 'がんばる (ganbaru)', meaning: 'Berusaha keras, bersemangat pantang menyerah.', example: '毎日少しずつ頑張りましょう。', exampleTranslation: 'Mari berusaha setiap hari sedikit demi sedikit.' })
+      : (isTh
+          ? { word: 'Accomplish', phonetic: '/əˈkʌm.plɪʃ/ • Verb', meaning: 'ทำสำเร็จ, บรรลุเป้าหมายที่ตั้งไว้', example: 'You can accomplish anything with consistent practice.', exampleTranslation: 'คุณสามารถทำทุกสิ่งให้สำเร็จได้ด้วยการฝึกฝนอย่างสม่ำเสมอ' }
+          : { word: 'Accomplish', phonetic: '/əˈkʌm.plɪʃ/ • Verb', meaning: 'Meraih, menuntaskan, atau berhasil mencapai target.', example: 'You can accomplish anything with consistent practice.', exampleTranslation: 'Kamu bisa meraih apa saja dengan latihan yang konsisten.' });
   }
 
   /* CARD 1: STADIUM CARD (Kuning Emas) - KOSAKATA HARIAN & MULAI LATIHAN (Zero Badges) */
@@ -8321,8 +8335,8 @@ function todayHomeMarkup(){
       <div class="fz-stadium-notch"></div>
       <div class="fz-stadium-header fz-stadium-vocab-header">
         <div class="fz-stadium-vocab-top">
-          <span class="fz-vocab-kicker-tag">📖 KOSAKATA HARIAN</span>
-          <span class="fz-vocab-level-tag">${esc(jaCourseOn() ? 'JLPT N5' : ('LEVEL ' + todayLevel))}</span>
+          <span class="fz-vocab-kicker-tag">${isTh ? '📖 คำศัพท์ประจำวัน' : '📖 KOSAKATA HARIAN'}</span>
+          <span class="fz-vocab-level-tag">${esc(jaCourseOn() ? 'JLPT N5' : ((isTh ? 'ระดับ ' : 'LEVEL ') + todayLevel))}</span>
         </div>
         <div class="fz-vocab-hero-content">
           <div class="fz-vocab-word-title">${esc(dailyWord.word)}</div>
@@ -8333,7 +8347,7 @@ function todayHomeMarkup(){
       </div>
       <div class="fz-stadium-body">
         <div class="fz-stadium-metrics-row">
-          <div class="fz-stadium-chip">${shape.soal || 10} SOAL</div>
+          <div class="fz-stadium-chip">${shape.soal || 10} ${isTh ? 'ข้อ' : 'SOAL'}</div>
           <div class="fz-stadium-center-time">
             <span class="fz-time-val">${formattedTime}</span>
             <span class="fz-date-val">${formattedDate}</span>
@@ -8345,7 +8359,7 @@ function todayHomeMarkup(){
         </button>
       </div>
       <div class="fz-stadium-footer-notch">
-        <span>${jaCourseOn() ? '⛩️ ' : '⚡ '}LATIHAN BERIKUTNYA</span>
+        <span>${jaCourseOn() ? '⛩️ ' : '⚡ '}${isTh ? 'แบบฝึกหัดถัดไป' : 'LATIHAN BERIKUTNYA'}</span>
         <span class="fz-footer-caret">▾</span>
       </div>
     </div>`;
@@ -8356,29 +8370,29 @@ function todayHomeMarkup(){
       <div class="fz-stadium-notch"></div>
       <div class="fz-stadium-header is-silver fz-stadium-clean-header">
         <div class="fz-stadium-vocab-top">
-          <span class="fz-vocab-kicker-tag is-silver-tag">📚 FLASHCARD &amp; REPETISI</span>
-          <span class="fz-vocab-level-tag is-silver-tag">SRS MEMORY</span>
+          <span class="fz-vocab-kicker-tag is-silver-tag">${isTh ? '📚 แฟลชการ์ด &amp; ทบทวนซ้ำ' : '📚 FLASHCARD &amp; REPETISI'}</span>
+          <span class="fz-vocab-level-tag is-silver-tag">${isTh ? 'ระบบจำ SRS' : 'SRS MEMORY'}</span>
         </div>
         <div class="fz-clean-header-content">
-          <div class="fz-clean-header-title">Kosa Kata Harian</div>
-          <div class="fz-clean-header-sub">25 kosakata aktif dan pola kalimat dengan spaced repetition system agar tersimpan di memori permanen.</div>
+          <div class="fz-clean-header-title">${isTh ? 'คำศัพท์ประจำวัน' : 'Kosa Kata Harian'}</div>
+          <div class="fz-clean-header-sub">${isTh ? '25 คำศัพท์พร้อมระบบเว้นระยะทบทวน (SRS) เพื่อจดจำได้ยาวนานยิ่งขึ้น' : '25 kosakata aktif dan pola kalimat dengan spaced repetition system agar tersimpan di memori permanen.'}</div>
         </div>
       </div>
       <div class="fz-stadium-body">
         <div class="fz-stadium-metrics-row">
-          <div class="fz-stadium-chip">25 KATA</div>
+          <div class="fz-stadium-chip">${isTh ? '25 คำ' : '25 KATA'}</div>
           <div class="fz-stadium-center-time">
             <span class="fz-time-val">05:00</span>
-            <span class="fz-date-val">SRS MEMORY</span>
+            <span class="fz-date-val">${isTh ? 'ระบบจำ SRS' : 'SRS MEMORY'}</span>
           </div>
           <div class="fz-stadium-chip is-xp">+30 XP</div>
         </div>
         <button type="button" class="fz-stadium-cta-btn is-silver-btn" onclick="event.stopPropagation();go('vocab')">
-          BUKA KOSA KATA HARIAN ➔
+          ${isTh ? 'เปิดคำศัพท์ประจำวัน ➔' : 'BUKA KOSA KATA HARIAN ➔'}
         </button>
       </div>
       <div class="fz-stadium-footer-notch">
-        <span>📖 REPETISI KOSA KATA</span>
+        <span>${isTh ? '📖 ทบทวนคำศัพท์' : '📖 REPETISI KOSA KATA'}</span>
         <span class="fz-footer-caret">▾</span>
       </div>
     </div>`;
@@ -8389,29 +8403,29 @@ function todayHomeMarkup(){
       <div class="fz-stadium-notch"></div>
       <div class="fz-stadium-header is-dark fz-stadium-clean-header">
         <div class="fz-stadium-vocab-top">
-          <span class="fz-vocab-kicker-tag is-dark-tag">📈 PROGRES BELAJAR</span>
+          <span class="fz-vocab-kicker-tag is-dark-tag">${isTh ? '📈 พัฒนาการเรียนรู้' : '📈 PROGRES BELAJAR'}</span>
           <span class="fz-vocab-level-tag is-dark-tag">${todayLevel} ➔ A2</span>
         </div>
         <div class="fz-clean-header-content">
-          <div class="fz-clean-header-title">Keterangan Peningkatan</div>
-          <div class="fz-clean-header-sub">Akurasi dan ritme belajarmu meningkat konsisten. Selesaikan 1 sesi lagi hari ini untuk mengunci kenaikan level!</div>
+          <div class="fz-clean-header-title">${isTh ? 'คำอธิบายพัฒนาการ' : 'Keterangan Peningkatan'}</div>
+          <div class="fz-clean-header-sub">${isTh ? 'ความแม่นยำและจังหวะการเรียนของคุณพัฒนาอย่างต่อเนื่อง เรียนอีก 1 รอบวันนี้เพื่อเลื่อนระดับ!' : 'Akurasi dan ritme belajarmu meningkat konsisten. Selesaikan 1 sesi lagi hari ini untuk mengunci kenaikan level!'}</div>
         </div>
       </div>
       <div class="fz-stadium-body">
         <div class="fz-stadium-metrics-row">
-          <div class="fz-stadium-chip is-gain">+15% AKURASI</div>
+          <div class="fz-stadium-chip is-gain">${isTh ? '+15% ความแม่นยำ' : '+15% AKURASI'}</div>
           <div class="fz-stadium-center-time">
             <span class="fz-time-val" style="color:#059669">+15%</span>
-            <span class="fz-date-val">PENINGKATAN MINGGU INI</span>
+            <span class="fz-date-val">${isTh ? 'พัฒนาการสัปดาห์นี้' : 'PENINGKATAN MINGGU INI'}</span>
           </div>
-          <div class="fz-stadium-chip is-streak">🔥 ${streak || 1} HARI</div>
+          <div class="fz-stadium-chip is-streak">🔥 ${streak || 1} ${isTh ? 'วัน' : 'HARI'}</div>
         </div>
         <button type="button" class="fz-stadium-cta-btn is-dark-btn" onclick="event.stopPropagation();go('progress')">
-          LIHAT DETAIL PENINGKATAN ➔
+          ${isTh ? 'ดูรายละเอียดพัฒนาการ ➔' : 'LIHAT DETAIL PENINGKATAN ➔'}
         </button>
       </div>
       <div class="fz-stadium-footer-notch">
-        <span>📈 ANALISIS &amp; PETA BELAJAR</span>
+        <span>${isTh ? '📈 บทวิเคราะห์ &amp; แผนที่การเรียน' : '📈 ANALISIS &amp; PETA BELAJAR'}</span>
         <span class="fz-footer-caret">▾</span>
       </div>
     </div>`;
@@ -8422,7 +8436,7 @@ function todayHomeMarkup(){
   ${card2Hero}
   ${card3Hero}
   <details class="fz-card-drawer" style="margin-top:4px">
-    <summary class="fz-drawer-toggle"><span>${jaCourseOn() ? '⛩️ ' : '⚡ '}${esc(FiezelI18n.t('home.sesi-next') || 'DETAIL MATERI & RITME')}</span><span class="fz-drawer-arrow">▾</span></summary>
+    <summary class="fz-drawer-toggle"><span>${jaCourseOn() ? '⛩️ ' : '⚡ '}${esc(FiezelI18n.t('home.sesi-next') || (isTh ? 'รายละเอียดเนื้อหา & จังหวะ' : 'DETAIL MATERI & RITME'))}</span><span class="fz-drawer-arrow">▾</span></summary>
     <div class="fz-drawer-inner">
       <div class="today-head"><span class="today-eyebrow">${FiezelI18n.t('today.eyebrow')}</span>${todayHeadChips}</div>
       ${rhythmBar}
@@ -13458,7 +13472,7 @@ function bindUiSfxDelegation(){
 // benar-benar BARU dibuka yang mendorong entri: openSettings -> openReportPreview ->
 // openSettings hanya menukar isi panel yang sama, dan tiga entri untuk satu dialog akan
 // membuang dua tekanan kembali pada layar yang sudah tidak ada.
-function openModal(html){const wasOpen=modalOpen;modalOpen=true;uiSfx('open');modalEpoch++;clearTimeout(modalCloseTimer);const modal=$('modal');$('modalPanel').innerHTML=html;modal.classList.remove('hidden');enhanceUI();try{const appEl=$('app');if(appEl){appEl.setAttribute('aria-hidden','true');if('inert' in appEl)appEl.inert=true}const nav=document.querySelector?.('.bottomnav,.nav-bar');if(nav){nav.setAttribute('aria-hidden','true');if('inert' in nav)nav.inert=true}}catch(_){}/* q17-S1 2026-08-29: dialog wajib mengelola fokus \u2014 fokus awal ke tombol pertama, dan fokus dikembalikan saat tutup (lihat closeModalNow). Trap Tab ada di modalTrapKeydown. */if(!wasOpen)modalReturnFocus=document.activeElement;(window.requestAnimationFrame||setTimeout)(()=>{modal.classList.add('show');try{const first=modal.querySelector('#modalPanel button,#modalPanel [href],#modalPanel input,#modalPanel select,#modalPanel textarea');(first||modal.querySelector('#modalPanel'))?.focus?.({preventScroll:true})}catch(_){}});if(!wasOpen)try{self.FiezelBackNav?.pushLayer?.({id:'modal',close:closeModalNow})}catch{}return modalEpoch}
+function openModal(html){const wasOpen=modalOpen;modalOpen=true;uiSfx('open');modalEpoch++;clearTimeout(modalCloseTimer);const modal=$('modal');const panel=$('modalPanel');if(panel){panel.innerHTML=html;panel.scrollTop=0;}modal.classList.remove('hidden');enhanceUI();try{const appEl=$('app');if(appEl){appEl.setAttribute('aria-hidden','true');if('inert' in appEl)appEl.inert=true}const nav=document.querySelector?.('.bottomnav,.nav-bar');if(nav){nav.setAttribute('aria-hidden','true');if('inert' in nav)nav.inert=true}}catch(_){}/* q17-S1 2026-08-29: dialog wajib mengelola fokus — fokus awal ke tombol pertama, dan fokus dikembalikan saat tutup (lihat closeModalNow). Trap Tab ada di modalTrapKeydown. */if(!wasOpen)modalReturnFocus=document.activeElement;(window.requestAnimationFrame||setTimeout)(()=>{modal.classList.add('show');try{const first=modal.querySelector('#modalPanel button,#modalPanel [href],#modalPanel input,#modalPanel select,#modalPanel textarea');(first||modal.querySelector('#modalPanel'))?.focus?.({preventScroll:true});if(panel)panel.scrollTop=0;}catch(_){}});if(!wasOpen)try{self.FiezelBackNav?.pushLayer?.({id:'modal',close:closeModalNow})}catch{}return modalEpoch}
 // Penutup mentah. Ini yang dipegang riwayat, jadi ia TIDAK BOLEH menyentuh riwayat lagi -
 // kalau ia melakukannya, satu tekanan kembali akan memakan dua entri. Mengembalikan false
 // bila memang tidak ada modal terbuka, supaya jalur kembali tahu tekanan itu belum terpakai
@@ -14047,38 +14061,6 @@ async function renderOnlineTab(){
   const put=html=>{if(seq!==onlineSeq||state.view!=='online')return;const el=$('onlineRoot');if(el){el.innerHTML=html;enhanceUI()}};
   const core=socialCore();
   const extra=onlineTab==='teman'?socialClassCardMarkup():'';
-  if(onlineTab==='profil'){
-    const localName = (typeof learnerName === 'function' ? learnerName() : state.userName) || 'Fitra';
-    const localLevel = (typeof getActiveLevel === 'function' ? getActiveLevel() : 'A1') || 'A1';
-    const streak = state.streak || 0;
-    const initial = localName.charAt(0).toUpperCase();
-    const localProfileCard = card(`
-      <div class="social-me" style="display:flex;align-items:center;gap:16px;margin-bottom:18px">
-        <span class="social-avatar" style="width:52px;height:52px;border-radius:50%;background:#FFE02E;color:#0A0A0E;font-size:24px;font-weight:900;display:flex;align-items:center;justify-content:center" aria-hidden="true">${esc(initial)}</span>
-        <div>
-          <h3 style="margin:0 0 4px 0;font-size:1.3rem;font-weight:800;color:#FFFFFF">${esc(localName)}</h3>
-          <p class="muted" style="margin:0;font-size:0.88rem;color:#94A3B8">Profil Murid FIEZEL · Level ${esc(localLevel)}</p>
-        </div>
-      </div>
-      <div class="stats social-stats" style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:16px">
-        <div style="background:#202030;padding:10px;border-radius:12px;text-align:center"><div style="font-size:0.75rem;color:#94A3B8;font-weight:700">LEVEL</div><div style="font-size:1.2rem;font-weight:900;color:#FFE02E">${esc(localLevel)}</div></div>
-        <div style="background:#202030;padding:10px;border-radius:12px;text-align:center"><div style="font-size:0.75rem;color:#94A3B8;font-weight:700">STREAK</div><div style="font-size:1.2rem;font-weight:900;color:#FFFFFF">${streak} hari</div></div>
-        <div style="background:#202030;padding:10px;border-radius:12px;text-align:center"><div style="font-size:0.75rem;color:#94A3B8;font-weight:700">AKUN</div><div style="font-size:1.2rem;font-weight:900;color:#38BDF8">Lokal</div></div>
-      </div>
-    `, 'profile-summary-card');
-    
-    const settingsCard = card(`
-      <div style="display:flex;align-items:center;justify-content:space-between">
-        <div>
-          <h3 style="margin:0;font-size:16px;font-weight:800;color:#FFFFFF">${FiezelI18n.t('settings.online-pengaturan-judul')}</h3>
-          <small style="color:#94A3B8;font-weight:500">Kecepatan suara, notifikasi, tema, dan akun</small>
-        </div>
-        <button type="button" class="primary" onclick="openSettings()" style="font-weight:800;padding:8px 16px;border-radius:10px">Buka</button>
-      </div>
-    `, 'profile-settings-card');
-
-    return put(localProfileCard + settingsCard);
-  }
   if(!core)return put(card(`<h3>${FiezelI18n.t('social.not-loaded-title')}</h3><p class="muted">${FiezelI18n.t('social.not-loaded-body')}</p>`,'social-card')+extra);
   if(typeof navigator!=='undefined'&&navigator.onLine===false)return put(socialOfflineCard()+extra);
   let flag='off';try{flag=await core.probeFlag()}catch(_){flag='off'}

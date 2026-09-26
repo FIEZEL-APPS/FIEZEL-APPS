@@ -263,7 +263,7 @@ html.fz-booting body{overflow:hidden}
   <link rel="stylesheet" href="./features/ui/fiezel-lux.css">
   <link rel="stylesheet" href="./fiezel-2.css">
   <link rel="stylesheet" href="./features/speaking-listening/jlpt-listening.css">
-  <link rel="stylesheet" href="./features/ui/mobile-edge-fit.css?v=contrast-v19">
+  <link rel="stylesheet" href="./features/ui/mobile-edge-fit.css?v=contrast-v20">
   <!-- m025-308: <link> ke ./features/ui/fiezel-marshmallow.css DIBUANG. Berkasnya TIDAK
        PERNAH ADA di repo (nol di riwayat git, nol di origin/main), jadi baris ini adalah
        404 pada setiap pemuatan halaman sejak ia ditulis.
@@ -753,6 +753,7 @@ html.fz-booting body{overflow:hidden}
   <script defer src="./features/diagnostics/fiezel-diagnostic-bus.js"></script>
   <script defer src="./features/diagnostics/fiezel-module-selftests.js"></script>
   <script defer src="./features/diagnostics/fiezel-diagnostic-register.js"></script>
+  <script defer src="./features/diagnostics/fiezel-live-chrome-runner.js"></script>
   <!-- Sengaja dimuat sebelum app.js: kalau app.js throw, tombol Diagnostics tetap ada.
        Karena itu Diagnostics TIDAK ikut dimuat malas bersama tumpukan suara lainnya -
        nilainya justru terletak pada tersedia lebih dulu daripada yang ia periksa. -->
@@ -999,7 +1000,7 @@ html.fz-booting body{overflow:hidden}
   <!-- F28: shell + kurikulum guru (±600 KB) dimuat malas; pemuat kecil ini menyediakan
        previewAllowed() seketika dan mengambil modul penuh hanya untuk guru/demo guru. -->
   <script defer src="./features/teacher/fiezel-teacher-loader.js"></script>
-  <script defer src="./app.js"></script>
+  <script defer src="./app.js?v=m025-badge-free-v8"></script>
   <script defer src="./features/skills-evidence/fiezel-skills-evidence.js"></script>
   <script defer src="./features/academic-readiness/fiezel-academic-readiness.js"></script>
   <script defer src="./features/continuity/fiezel-continuity.js"></script>
