@@ -128,9 +128,7 @@
     return '<div class="fz-auth-brand">' + wm + '</div>';
   }
   function paw(env, pose) {
-    var ok = false;
-    try { ok = !!(env && env.customElements && env.customElements.get && env.customElements.get('fiezel-mascot')); } catch (_) {}
-    return ok ? '<fiezel-mascot class="fz-auth-paw st-' + esc(pose) + '" aria-hidden="true"></fiezel-mascot>' : '';
+    return '';
   }
   function langSwitch() {
     var cur = locale();
@@ -142,7 +140,7 @@
   }
   function hero(env, screen) {
     return '<header class="fz-auth-hero is-' + screen + '">' + topo() + langSwitch() + brand(env)
-      + (screen === 'welcome' ? paw(env, 'greeting') : '') + wave() + '</header>';
+      + wave() + '</header>';
   }
   function field(o) {
     return '<label class="fz-auth-field">'
@@ -169,7 +167,7 @@
 
   function welcomeBody() {
     return '<h1 class="fz-auth-title">' + esc(t('auth.layar.selamat-datang', 'Selamat datang')) + '</h1>'
-      + '<p class="fz-auth-lead">' + esc(t('auth.layar.welcome-lead', 'Belajar Bahasa Inggris dan Bahasa Jepang bersama PAW. Masuk sekali, progresmu ikut ke HP mana pun.')) + '</p>'
+      + '<p class="fz-auth-lead">' + esc(t('auth.layar.welcome-lead', 'Belajar Bahasa Inggris dan Bahasa Jepang adaptif. Masuk sekali, progresmu ikut ke HP mana pun.')) + '</p>'
       + '<div class="fz-auth-next-row"><button type="button" class="fz-auth-next fz-plain" data-auth-go="masuk" data-testid="auth-continue">'
       + '<span>' + esc(t('auth.layar.lanjut', 'Lanjut')) + '</span><span class="fz-auth-next-dot">' + icon('arrow') + '</span></button></div>';
   }

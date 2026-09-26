@@ -85,6 +85,6 @@
     'auth.layar.sudah-akun': 'Sudah punya akun?',
     'auth.layar.sudah-guru': 'Sudah punya akun guru?',
     'auth.layar.ulangi-sandi': 'Ulangi kata sandi',
-    'auth.layar.welcome-lead': 'Belajar Bahasa Inggris dan Bahasa Jepang bersama PAW. Masuk sekali, progresmu ikut ke HP mana pun.'
+    'auth.layar.welcome-lead': 'Belajar Bahasa Inggris dan Bahasa Jepang adaptif. Masuk sekali, progresmu ikut ke HP mana pun.'
   });
 }());

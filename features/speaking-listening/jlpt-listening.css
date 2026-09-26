@@ -16,12 +16,19 @@
   padding: 14px;
   opacity: 0;
   pointer-events: none;
-  transition: opacity 0.22s ease;
+  visibility: hidden;
+  transition: opacity 0.22s ease, visibility 0.22s ease;
+}
+
+.listening-modal:not(.open) {
+  display: none !important;
 }
 
 .listening-modal.open {
+  display: flex !important;
   opacity: 1;
   pointer-events: auto;
+  visibility: visible;
 }
 
 .listening-modal-box {
