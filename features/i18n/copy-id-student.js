@@ -320,6 +320,7 @@
     'progress2.week-pill': '{days}/7 hari aktif',
     'progress2.week-note': '{items} soal dikerjakan 7 hari terakhir.',
     'progress2.week-empty': 'Belum ada latihan minggu ini. Satu sesi kecil sudah cukup untuk mulai.',
-    'progress2.days': 'Sen,Sel,Rab,Kam,Jum,Sab,Min'
+    'progress2.days': 'Sen,Sel,Rab,Kam,Jum,Sab,Min',
+    'inbox.default_student_name': 'Murid'
   });
 })();

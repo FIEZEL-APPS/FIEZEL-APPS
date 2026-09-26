@@ -167,6 +167,10 @@
     'latihan.booster-sub-tertukar': '{persen}% ของข้อผิดพลาดตรงนี้ใช้กฎของ {lawan} มาฝึกแยกความต่างกัน',
     'latihan.booster-cta': 'ฝึก',
 
-    'flash.suara-belum-ada': 'ยังไม่มีเสียงสำหรับ{bahasa} เราจึงซ่อนปุ่มฟังไว้ก่อน เพื่อไม่ให้คุณจำคำอ่านที่ผิดไป'
+    'flash.suara-belum-ada': 'ยังไม่มีเสียงสำหรับ{bahasa} เราจึงซ่อนปุ่มฟังไว้ก่อน เพื่อไม่ให้คุณจำคำอ่านที่ผิดไป',
+    'today.quiz_suffix': 'ข้อ',
+    'today.start_practice_btn': 'เริ่มฝึกฝนตอนนี้ ➔',
+    'today.vocab_suffix': 'คำศัพท์',
+    'splash.tagline_for_teacher': 'สำหรับครู'
   });
 }());

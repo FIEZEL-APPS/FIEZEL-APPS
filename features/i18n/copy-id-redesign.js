@@ -175,6 +175,10 @@
 
     /* Flashcard: tombol dengar disembunyikan saat kursusnya belum punya suara sendiri,
        dan alasannya dikatakan — tombol yang hilang tanpa penjelasan terbaca sebagai bug. */
-    'flash.suara-belum-ada': 'Suara untuk {bahasa} belum tersedia, jadi tombol dengar disembunyikan supaya kamu tidak menirukan pelafalan yang salah.'
+    'flash.suara-belum-ada': 'Suara untuk {bahasa} belum tersedia, jadi tombol dengar disembunyikan supaya kamu tidak menirukan pelafalan yang salah.',
+    'today.quiz_suffix': 'Soal',
+    'today.start_practice_btn': 'Mulai Latihan Sekarang ➔',
+    'today.vocab_suffix': 'Kosakata',
+    'splash.tagline_for_teacher': 'untuk Guru'
   });
 }());
