@@ -85,6 +85,11 @@
       availabilityWaiters.splice(i, 1);
       try { waiter.resolve(box[waiter.key]); } catch (_) {}
     }
+    if (normalizedLocale === current) {
+      listeners.forEach(function (fn) {
+        try { fn(current); } catch (e) { /* listener rusak ≠ boot rusak */ }
+      });
+    }
   }
 
   /** Timpa kalimat yang sudah terdaftar (lapisan "bahasa murid"). Tidak melempar pada kunci ganda. */

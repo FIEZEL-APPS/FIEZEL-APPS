@@ -373,6 +373,14 @@
         var loc = b.getAttribute('data-auth-locale');
         if (typeof o.onLocale === 'function') { try { o.onLocale(loc); } catch (_) {} }
         paint();
+        try {
+          var i18n = I();
+          if (i18n && typeof i18n.whenAvailable === 'function') {
+            i18n.whenAvailable(loc, 'auth.layar.selamat-datang').then(function () {
+              if (!closed && !ui.busy) paint();
+            });
+          }
+        } catch (_) {}
       }
     }
     function focusFirst() {
