@@ -1,7 +1,7 @@
 {
-  "version": "m025-373",
+  "version": "m025-374",
   "claimedBy": "branch main",
-  "claimedAt": "2026-09-25T15:42:08.415Z",
-  "reason": "chokai persistence, topbar switcher, audio multi-karakter dan responsive layout",
+  "claimedAt": "2026-09-26T21:48:08.720Z",
+  "reason": "fix kurikulum html cache version m025-374",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }
