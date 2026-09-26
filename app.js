@@ -3955,15 +3955,20 @@ function affectObserve(q,ok,ms,timing){
     return res||null;
   }catch{return null}
 }
-/** Target sukses pemilih soal, digeser TERBATAS oleh afek: frustrasi -> 0.90 (soal lebih
- *  mudah dulu), bosan -> 0.75 (tantangan naik), netral/curious -> 0.80 (default lama). */
 function affectTargetSuccess(){
+  let base = .80;
+  try{
+    if(self.FiezelDecisionTrace&&typeof self.FiezelDecisionTrace.readParams==='function'){
+      const live=self.FiezelDecisionTrace.readParams();
+      if(live&&typeof live['difficulty.targetSuccess']==='number')base=live['difficulty.targetSuccess'];
+    }
+  }catch(_){}
   try{
     const st=affectSessionSync();
-    if(st.state==='frustrated')return .90;
-    if(st.state==='bored')return .75;
+    if(st.state==='frustrated')return Math.min(0.90, base + 0.10);
+    if(st.state==='bored')return Math.max(0.70, base - 0.05);
   }catch{}
-  return .80;
+  return base;
 }
 /* ---- Butir 6: kebijakan listening adaptif (rateBand/replayQuota/clipLength) ---- */
 function listeningAdaptivePolicy(){

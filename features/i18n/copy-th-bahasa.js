@@ -91,7 +91,9 @@
     'jlpt.tab-explain-aria': 'เปิดเฉลยและคำอธิบาย',
     'jlpt.tab-explain-btn': '💡 คำอธิบาย',
     'jlpt.tab-script-aria': 'เปิดบทพูดบทสนทนา',
-    'jlpt.wrong-title': 'ยังไม่ถูกต้อง'
+    'jlpt.wrong-title': 'ยังไม่ถูกต้อง',
+    'jlpt.play-audio': 'เล่นเสียง',
+    'jlpt.pause-audio': 'หยุดชั่วคราว'
   });
   /* Lapisan kursus Bahasa Jepang (FiezelI18n.setCourse('ja')): saat kursus Jepang aktif,
      kunci 'kursus-ja.<kunci>' menang atas <kunci>. Nama bagian memakai istilah Jepang yang

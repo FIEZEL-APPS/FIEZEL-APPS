@@ -155,7 +155,7 @@
     if (mainBtn) {
       mainBtn.classList.toggle('playing', isPrimaryPlaying);
       if (playIcon) playIcon.textContent = isPrimaryPlaying ? '❚❚' : '▶';
-      if (playText) playText.textContent = isPrimaryPlaying ? 'Jeda Audio' : 'Putar Audio';
+      if (playText) playText.textContent = isPrimaryPlaying ? t('jlpt.pause-audio', 'Jeda Audio') : t('jlpt.play-audio', 'Putar Audio');
       if (miniWave) miniWave.classList.toggle('playing', isPrimaryPlaying);
     }
     if (legacyAiBtn) {
@@ -1045,9 +1045,9 @@
 
           '<!-- Streamlined Single Audio Player Strip -->' +
           '<div class="jlpt-audio-row">' +
-            '<button type="button" class="jlpt-primary-play-btn" id="jlptMainPlayBtn" onclick="togglePlayJlptPrimaryAudio()" aria-label="Putar Audio">' +
+            '<button type="button" class="jlpt-primary-play-btn" id="jlptMainPlayBtn" onclick="togglePlayJlptPrimaryAudio()" aria-label="' + escapeHtml(t('jlpt.play-audio', 'Putar Audio')) + '">' +
               '<span class="jlpt-play-icon" id="jlptPlayIcon">▶</span>' +
-              '<span id="jlptPlayText">Putar Audio</span>' +
+              '<span id="jlptPlayText">' + escapeHtml(t('jlpt.play-audio', 'Putar Audio')) + '</span>' +
               '<span class="jlpt-mini-wave" id="jlptMiniWave">' +
                 '<span></span><span></span><span></span><span></span>' +
               '</span>' +
