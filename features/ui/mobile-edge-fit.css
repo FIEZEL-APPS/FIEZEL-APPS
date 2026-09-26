@@ -659,51 +659,51 @@ html.fz-booting header.topbar {
   font-weight: 500 !important;
 }
 
-.fz-stadium-card {
+.fz-stadium-card,
+.today-card.fz-stadium-card,
+html body #app .today-card.fz-stadium-card {
   width: 100% !important;
-  border-radius: 26px !important;
+  max-width: 100% !important;
+  box-sizing: border-box !important;
+  padding: 0 !important;
+  gap: 0 !important;
+  border-radius: 24px !important;
   overflow: hidden !important;
   position: relative !important;
   box-shadow: 0 16px 36px rgba(0, 0, 0, 0.6) !important;
-  margin-bottom: 16px !important;
-  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  margin: 0 auto 16px auto !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
   cursor: pointer !important;
   transition: transform 0.18s ease, box-shadow 0.18s ease !important;
   background: #14141A !important;
+  display: block !important;
 }
 
-.fz-stadium-card:active {
+.fz-stadium-card:active,
+.today-card.fz-stadium-card:active {
   transform: scale(0.985) !important;
 }
 
-/* Recessed Notch at top center */
+/* Recessed Notch at top center - hidden to eliminate faux-phone cutouts */
 .fz-stadium-notch {
-  position: absolute !important;
-  top: 0 !important;
-  left: 50% !important;
-  transform: translateX(-50%) !important;
-  width: 92px !important;
-  height: 9px !important;
-  background: #0A0A0E !important;
-  border-radius: 0 0 10px 10px !important;
-  z-index: 10 !important;
+  display: none !important;
 }
 
 /* Top Header Section */
 .fz-stadium-header {
-  background: linear-gradient(180deg, #FFE02E 0%, #FFD41D 100%) !important;
-  padding: 24px 20px 18px 20px !important;
+  background: linear-gradient(135deg, #FFD94F 0%, #FFB800 100%) !important;
+  padding: 22px 20px 18px 20px !important;
   position: relative !important;
   color: #0A0A0E !important;
 }
 
 .fz-stadium-header.is-silver {
-  background: linear-gradient(180deg, #E6EAF0 0%, #CBD3E1 100%) !important;
+  background: linear-gradient(135deg, #EEF2F6 0%, #DDE3EA 100%) !important;
   color: #0A0A0E !important;
 }
 
 .fz-stadium-header.is-dark {
-  background: linear-gradient(180deg, #1E293B 0%, #0F172A 100%) !important;
+  background: linear-gradient(135deg, #1E293B 0%, #0F172A 100%) !important;
   color: #FFFFFF !important;
 }
 
@@ -956,18 +956,23 @@ html.fz-booting header.topbar {
 
 .fz-stadium-cta-btn {
   width: 100% !important;
+  min-height: 48px !important;
   padding: 14px 20px !important;
   border-radius: 9999px !important;
   background: #FFE02E !important;
   color: #0A0A0E !important;
-  font-size: 13.5px !important;
+  font-size: 14px !important;
   font-weight: 800 !important;
   letter-spacing: 0.02em !important;
   border: none !important;
   cursor: pointer !important;
   box-shadow: 0 4px 14px rgba(255, 224, 46, 0.45) !important;
-  transition: transform 0.15s ease !important;
+  transition: transform 0.15s ease, box-shadow 0.15s ease !important;
   text-align: center !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 8px !important;
 }
 
 .fz-stadium-cta-btn:active {
@@ -975,9 +980,9 @@ html.fz-booting header.topbar {
 }
 
 .fz-stadium-cta-btn.is-silver-btn {
-  background: #0A0A0E !important;
+  background: #0F172A !important;
   color: #FFFFFF !important;
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25) !important;
+  box-shadow: 0 4px 14px rgba(15, 23, 42, 0.25) !important;
 }
 
 .fz-stadium-cta-btn.is-dark-btn {
@@ -986,31 +991,11 @@ html.fz-booting header.topbar {
   box-shadow: 0 4px 14px rgba(15, 23, 42, 0.3) !important;
 }
 
-/* Footer notch bar */
-.fz-stadium-footer-notch {
-  background: #F8FAFC !important;
-  border-top: 1px solid #E2E8F0 !important;
-  padding: 10px 18px !important;
-  display: flex !important;
-  align-items: center !important;
-  justify-content: space-between !important;
-  font-size: 11px !important;
-  font-weight: 800 !important;
-  color: #64748B !important;
-  letter-spacing: 0.04em !important;
-  position: relative !important;
-}
-
-.fz-stadium-footer-notch::after {
-  content: '' !important;
-  position: absolute !important;
-  bottom: 0 !important;
-  left: 50% !important;
-  transform: translateX(-50%) !important;
-  width: 76px !important;
-  height: 6px !important;
-  background: #0A0A0E !important;
-  border-radius: 8px 8px 0 0 !important;
+/* Footer notch bar - hidden to eliminate faux-phone cutouts and redundant carets */
+.fz-stadium-footer-notch,
+.fz-stadium-footer-notch::after,
+.fz-footer-caret {
+  display: none !important;
 }
 
 /* ==========================================================================
@@ -1422,8 +1407,8 @@ span.social-avatar,
 
 /* Card 2: Silver Header */
 .fz-card-silver .fz-stadium-header {
-  background-color: #CBD5E1 !important;
-  background-image: linear-gradient(180deg, #E2E8F0 0%, #CBD5E1 100%) !important;
+  background-color: #EEF2F6 !important;
+  background-image: linear-gradient(135deg, #EEF2F6 0%, #DDE3EA 100%) !important;
   color: #0A0A0E !important;
 }
 
@@ -1447,7 +1432,7 @@ span.social-avatar,
 /* Card 3: Dark Header */
 .fz-card-dark .fz-stadium-header {
   background-color: #0F172A !important;
-  background-image: linear-gradient(180deg, #1E293B 0%, #0F172A 100%) !important;
+  background-image: linear-gradient(135deg, #1E293B 0%, #0F172A 100%) !important;
   color: #FFFFFF !important;
 }
 
@@ -1477,6 +1462,10 @@ span.social-avatar,
 .fz-stadium-body {
   background: #FFFFFF !important;
   color: #0A0A0E !important;
+  padding: 18px 20px 22px 20px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 16px !important;
 }
 
 .fz-stadium-body .fz-stadium-chip {
@@ -1496,15 +1485,7 @@ span.social-avatar,
 }
 
 .fz-stadium-footer-notch {
-  background: #F1F5F9 !important;
-  border-top: 1px solid #CBD5E1 !important;
-  color: #1E293B !important;
-  font-weight: 800 !important;
-}
-
-.fz-stadium-footer-notch span {
-  color: #1E293B !important;
-  font-weight: 800 !important;
+  display: none !important;
 }
 
 /* 4. MODALS, SHEETS & NOTIFICATION GATE (Rich Dark Theme, Zero White-on-White) */
@@ -2433,7 +2414,7 @@ body .path-step.is-mastered .path-label::after {
    AUDIT FIX 6: LEARNER FLOW & ARENA HIGH CONTRAST DARK THEME
    ========================================================================== */
 .lf-card,
-.today-card,
+.today-card:not(.fz-stadium-card),
 .paw-lobby-card,
 .duel-hero,
 .duel-play,
