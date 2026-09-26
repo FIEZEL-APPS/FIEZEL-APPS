@@ -22,8 +22,9 @@
 
   function t(k, fallback) {
     try {
-      if (typeof window !== 'undefined' && window.FiezelI18n && window.FiezelI18n.t) {
-        var res = window.FiezelI18n.t(k);
+      var I = (typeof self !== 'undefined' ? self : (typeof window !== 'undefined' ? window : this)).FiezelI18n;
+      if (I && typeof I.t === 'function') {
+        var res = I.t(k);
         if (res && res !== k) return res;
       }
     } catch (_) {}

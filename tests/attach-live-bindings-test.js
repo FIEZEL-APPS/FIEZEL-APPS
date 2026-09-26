@@ -28,15 +28,13 @@ function check(name, ok, detail) {
 
 const TOML = require('fs').readFileSync(path.join(__fzRoot, 'workers', 'api', 'wrangler.toml'), 'utf8');
 
+const { pathToFileURL } = require('url');
+
 // Modul ESM: jalankan lewat --input-type=module supaya gerbang ini tetap CJS
 // seperti gerbang lain di root repo, tanpa mengubah package.json.
 function loadCore() {
-  const script = `
-    import { computeAttachedToml, AttachError } from ${JSON.stringify(path.join(__fzRoot, 'workers', 'api', 'tools', 'attach-live-bindings-core.mjs'))};
-    globalThis.__attach = { computeAttachedToml, AttachError };
-  `;
-  // vm ESM dynamic import via data: URL, dieksekusi di proses ini lewat top-level await.
-  return import(path.join(__fzRoot, 'workers', 'api', 'tools', 'attach-live-bindings-core.mjs'));
+  const targetPath = path.join(__fzRoot, 'workers', 'api', 'tools', 'attach-live-bindings-core.mjs');
+  return import(pathToFileURL(targetPath).href);
 }
 
 async function main() {

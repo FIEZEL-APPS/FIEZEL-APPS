@@ -67,11 +67,14 @@
     var isFatigued = ctx.isFatigued === true || affect === 'fatigued';
 
     function t(key, fallback) {
-      if (typeof FiezelI18n !== 'undefined' && FiezelI18n && typeof FiezelI18n.t === 'function') {
-        var res = FiezelI18n.t(key);
-        if (res && res !== key) return res;
-      }
-      return fallback;
+      try {
+        var I = (typeof self !== 'undefined' ? self : (typeof window !== 'undefined' ? window : this)).FiezelI18n;
+        if (I && typeof I.t === 'function') {
+          var res = I.t(key);
+          if (res && res !== key) return res;
+        }
+      } catch (_) {}
+      return fallback !== undefined ? fallback : key;
     }
 
     // 1. Prioritas Keselamatan & Kelelahan (CONCERNED)

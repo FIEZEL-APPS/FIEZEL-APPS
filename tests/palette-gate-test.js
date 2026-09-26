@@ -110,6 +110,7 @@ const UTANG_TANPA_PALET = [
   'assets/brand/mascot/paw-mascot-hawaiian-sunglasses.svg', // palet Material, tidak dikapalkan
   'assets/brand/mascot/paw-mascot-hello.svg',               // kuning tetangga, hanya .png-nya di mockups/
   'website/assets/brand/paw-mascot-hello.svg',              // kembar website dari yang di atas
+  'assets/brand/mascot/paw-mascot-explorer-study.svg',      // studi eksplorasi karakter, tidak dikapalkan
 ];
 /* design/ dan remotion/ adalah prototipe/studio video yang tidak pernah dimuat produksi
    (sama seperti pengecualian di css-keyframe-uniq-test dan deploy/site-exclude.txt), jadi di luar lingkup. */
