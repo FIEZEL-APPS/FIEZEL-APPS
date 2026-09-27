@@ -1,4 +1,4 @@
-# m025-376 — Soal latihan grammar baru A1–A2
+# m025-377 — Soal latihan grammar baru A1–A2
 
 Lanjutan m025-375 (sesi lesson "latihan dulu", 10 soal). Di sana tercatat utang terbesar: tiap lesson hanya
 punya 1–2 kalimat Inggris, jadi sesi 10 soal memakai kalimat yang sama ±5× dalam bentuk berbeda. Owner meminta
@@ -59,7 +59,7 @@ Setelah itu setiap soal dibaca ulang sebagai murid, dalam bahasa Indonesia dan T
 - Label yang teks diagnosisnya tidak cocok dengan pilihan diganti label yang tepat atau label baru (132 label baru,
   dipetakan ke 49 kode taksonomi yang sudah ada).
 
-## Perubahan kode (m025-376)
+## Perubahan kode (m025-377)
 
 - **Rencana sesi berbasis slot** (`buildGrammarLessonQuestions`): 10 slot, 7 latihan bentuk + 3 soal "kenapa".
   Slot latihan mengambil kalimat yang paling jarang muncul; kalimat yang sama tidak muncul dua kali berturut-turut;
