@@ -85,7 +85,7 @@
     // app.js:644 — grammarExercise v21 correctWhy
     'grammar.mode-family-benar': `Fokus {judulLesson} masuk keluarga {labelKeluarga}.`,
     // app.js:612 — grammarExercise v2 correctWhy
-    'grammar.mode-justify-benar': 'Alasan ini nyambungin jawabannya sama konteks kalimat dan aturannya.',
+    'grammar.mode-justify-benar': 'Alasan yang benar selalu menunjuk petunjuk di kalimat itu sendiri.',
     // app.js:634 — grammarExercise v12-14 OPSI
     'grammar.mode-label-opsi-benar': 'jawaban benar, nggak ada kesalahan mikir.',
     // app.js:653 — grammarExercise v24 correctWhy
@@ -101,7 +101,7 @@
     // app.js:619 — grammarExercise v5 correctWhy
     'grammar.mode-reasoning-benar': 'Urutan ini bawa kamu dari petunjuk kalimat ke bentuk yang bener.',
     // app.js:635 — grammarExercise v15-17 (joinQuoteReason head)
-    'grammar.mode-repair-benar-head': `Perbaikannya {kunciDikutip};`,
+    'grammar.mode-repair-benar-head': `Yang benar {kunciDikutip}:`,
     // app.js:635 — grammarExercise v15-17 (joinQuoteReason tail)
     'grammar.mode-repair-benar-tail': 'bentuk itu yang cocok sama kalimat aslinya.',
     // app.js:617 — grammarExercise v3 correctWhy
@@ -796,7 +796,7 @@
     // app.js:630 — grammarExercise v8 stem
     'grammar.mode-avoid-stem': `Strategi apa yang mencegah kesalahan di {judulLesson}?`,
     // app.js:581 — grammarExercise v1 stem
-    'grammar.mode-complete-stem': `Lengkapi kalimat sesuai pola {judulLesson}:\n{stem}`,
+    'grammar.mode-complete-stem': `Pilih kalimat yang benar:\n{stem}`,
     // app.js:636 — grammarExercise v18-20 correctWhy
     'grammar.mode-contrast-benar': `Perbandingan yang bener nunjukin {kunciDikutip} jawabannya, terus nunjuk di mana {opsiDikutip} melesetnya.`,
     // app.js:636 — grammarExercise v18-20 expl
@@ -840,7 +840,7 @@
     // app.js:619 — grammarExercise v5 stem
     'grammar.mode-reasoning-stem': `Langkah berpikir mana yang paling tepat sebelum menjawab?\n{stem}`,
     // app.js:635 — grammarExercise v15-17 stem (repair_distractor)
-    'grammar.mode-repair-stem': `{opsiDikutip} belum tepat. Perbaikan mana yang benar?\n{stem}`,
+    'grammar.mode-repair-stem': `{opsiDikutip} masih salah. Yang benar yang mana?\n{stem}`,
     // app.js:617 — grammarExercise v3 stem
     'grammar.mode-rule-stem': `Aturan tata bahasa mana yang berlaku di sini?\n{stem}`,
     // app.js:652 — grammarExercise v23 stem (teach_back)

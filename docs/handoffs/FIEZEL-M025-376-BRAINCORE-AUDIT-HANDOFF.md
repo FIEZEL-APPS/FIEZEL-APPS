@@ -1,7 +1,10 @@
-# FIEZEL m025-375 — Audit Braincore & Fondasi (Langkah 1) Handoff
+# FIEZEL m025-376 — Audit Braincore & Fondasi (Langkah 1) Handoff
 
 Tanggal: 2026-09-27 WIB
-Release: `FIEZEL_PAGE_BUILD=m025-375`, `DIAG_BUILD=m025-375`, `SW_REV=m025-375-braincore-audit-20260927`
+Release: `FIEZEL_PAGE_BUILD=m025-376`, `DIAG_BUILD=m025-376`, `SW_REV=m025-376-braincore-audit-20260927`
+(semula disiapkan sebagai m025-375; nomor itu keburu dipakai #471 "Grammar latihan-dulu", jadi
+`main` digabung ke branch ini dan build dinaikkan lewat `tools/bump-build.mjs`. Label "m025-375"
+di komentar kode perubahan ini merujuk rilis yang sama.)
 Base: `origin/main`
 Laporan lengkap: `reports/BRAINCORE-AUDIT-2026-09-26.md` (temuan A1–A3, B1–B8, C1–C6)
 Otoritas: OWNER meminta audit Braincore (2026-09-26) lalu memutuskan A1 (matikan), A2
@@ -38,7 +41,7 @@ keputusan OWNER (lihat "Berikutnya").
 ```yaml
 files_added:
   - reports/BRAINCORE-AUDIT-2026-09-26.md
-  - docs/handoffs/FIEZEL-M025-375-BRAINCORE-AUDIT-HANDOFF.md
+  - docs/handoffs/FIEZEL-M025-376-BRAINCORE-AUDIT-HANDOFF.md
   - tests/i18n-param-collision-test.js
   - tests/policy-evidence-window-test.js
   - tools/dev/braincore-audit-2026-09-26-probe.js
