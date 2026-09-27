@@ -25,7 +25,10 @@ concurrency:
 
 jobs:
   table-and-tuning:
-    if: github.repository == 'FIEZEL-APPS/FIEZEL-APPS'
+    # Penjaga aktor (tests/workflow-actor-gate-test.js): job ini memegang token Cloudflare.
+    # Jadwal harian boleh jalan sendiri (pola push-reminders.yml); dijalankan manual HANYA
+    # oleh owner.
+    if: github.repository == 'FIEZEL-APPS/FIEZEL-APPS' && (github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && github.actor == 'FIEZEL-APPS'))
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:

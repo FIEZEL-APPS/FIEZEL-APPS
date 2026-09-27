@@ -247,7 +247,7 @@ const MIG16 = path.join(root, 'workers/api/migrations/0016_item_pool_probe.sql')
     assert.match(plan[0].sql, /\('PR-101:apply_form',-350,44,'2026-10-30'\)/);
   });
 
-  await test('W1 · workflow: terjadwal + manual, contents:read saja, rahasia hanya di langkah job', () => {
+  await test('W1 · workflow: terjadwal + manual (owner saja), contents:read saja, rahasia hanya di langkah job', () => {
     const wf = fs.readFileSync(path.join(root, '.github/workflows/braincore-item-pool.yml'), 'utf8');
     assert.match(wf, /schedule:\s*\n\s*- cron:/);
     assert.match(wf, /workflow_dispatch:/);
@@ -255,6 +255,7 @@ const MIG16 = path.join(root, 'workers/api/migrations/0016_item_pool_probe.sql')
     assert.ok(!/pull-requests:\s*write|contents:\s*write|issues:\s*write/.test(wf), 'workflow meminta izin tulis');
     assert.match(wf, /node tools\/item-pool-job\.mjs/);
     assert.strictEqual((wf.match(/secrets\.CLOUDFLARE_API_TOKEN/g) || []).length, 1);
+    assert.match(wf, /\n    if: [^\n]*github\.actor == 'FIEZEL-APPS'/, 'job pemegang token tanpa penjaga aktor tingkat job');
   });
 
   await test('P1 · perangkat: probe teragregasi per hari [bucket R -> n, benar], tanpa ID soal/lesson', () => {
