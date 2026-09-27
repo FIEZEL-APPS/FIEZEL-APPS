@@ -8348,10 +8348,30 @@ function evidenceProgressPanelMarkup(){
   const pct=Math.round(p.n/p.needed*100);
   return `<section class="fz-evidence-panel" aria-label="${esc(FiezelI18n.t('home.bukti-aria'))}">
     <div class="fz-evidence-head"><i class="fz-i" data-fz-icon="paw" aria-hidden="true" style="width:16px;height:16px"></i><b>${esc(FiezelI18n.t('home.bukti-judul'))}</b></div>
-    <p class="fz-evidence-body">${esc(FiezelI18n.t('home.bukti-isi',{sisa:p.remaining,materi}))}</p>
+    ${materi?`<p class="fz-evidence-materi">${esc(FiezelI18n.t('home.bukti-materi',{materi}))}</p>`:''}
+    <p class="fz-evidence-body">${esc(FiezelI18n.t('home.bukti-isi',{sisa:p.remaining}))}</p>
     <div class="fz-evidence-track" role="progressbar" aria-valuemin="0" aria-valuemax="${p.needed}" aria-valuenow="${p.n}"><div class="fz-evidence-fill" style="width:${pct}%"></div></div>
     <div class="fz-evidence-foot"><span>${esc(FiezelI18n.t('home.bukti-hitung',{n:p.n,target:p.needed}))}</span><button type="button" class="fz-evidence-cta" onclick="startAdaptive()">${esc(FiezelI18n.t('home.bukti-cta'))}</button></div>
   </section>`
+}
+/* Audit UI/UX Home 2026-09-27: angka kartu Home dihitung dari state, bukan ditulis tangan. */
+const HOME_WEEK_MIN=10;
+/** Akurasi 7 hari terakhir vs 7 hari sebelumnya (poin persen). null bila salah satu jendela di
+ *  bawah HOME_WEEK_MIN jawaban - perbandingan dua segelintir jawaban hanyalah derau. */
+function homeWeekStats(now=Date.now()){
+  const D=86400000,cur={n:0,ok:0},prev={n:0,ok:0};
+  for(const h of (state.history||[])){const at=Number(h?.at)||0;if(!at)continue;const age=now-at;
+    if(age>=0&&age<7*D){cur.n++;if(h.ok)cur.ok++}else if(age>=7*D&&age<14*D){prev.n++;if(h.ok)prev.ok++}}
+  const acc=x=>x.n?Math.round(x.ok/x.n*100):null;
+  const accuracy=cur.n>=HOME_WEEK_MIN?acc(cur):null;
+  const delta=accuracy!=null&&prev.n>=HOME_WEEK_MIN?accuracy-acc(prev):null;
+  return{answers:cur.n,accuracy,delta}
+}
+/** Kosakata level aktif: yang sudah pernah dilatih, dan yang jatuh tempo diulang sekarang. */
+function homeVocabStats(now=Date.now()){
+  const level=getActiveLevel();let practised=0,due=0;
+  for(const [key,x] of Object.entries(state.vocab||{})){if(!x?.total||contentLevelFor('vocab',key)!==level)continue;practised++;if(x.nextReview&&x.nextReview<=now)due++}
+  return{practised,due}
 }
 function todayHomeMarkup(){
   const trust=levelTrustState(state),locked=trust.locked===true;
@@ -8489,52 +8509,47 @@ function todayHomeMarkup(){
     ? self.FiezelSplash.wordmarkMarkup('fzhm')
     : '<span class="fz-home-wordmark-text">FIEZEL</span>';
 
-  /* Sapaan ramah personal & kata penyemangat harian */
+  /* ---- Audit UI/UX Home 2026-09-27 (m025-376) -------------------------------------------
+     Sapaan, tiga kartu, dan angkanya dulu ditulis langsung di sini sebagai ternary id/th, dan
+     sebagian angkanya REKAAN: "+15% akurasi", "meningkat konsisten", "{level} -> A2", runtun
+     `|| 1`, "+50 XP"/"+30 XP" (FIEZEL tidak punya XP), "05:00", dan sapaan "Hi Fitra!" untuk
+     murid tanpa nama. Murid baru yang belum menjawab satu soal pun membaca bahwa akurasinya
+     naik 15%. Sekarang: semua teks lewat FiezelI18n (copy-*-redesign.js, id + th), semua angka
+     dihitung dari state (homeWeekStats / homeVocabStats), dan yang belum bisa dihitung tampil
+     jujur sebagai "belum cukup data". */
   const isTh = (typeof FiezelI18n !== 'undefined' && FiezelI18n && FiezelI18n.getLocale && FiezelI18n.getLocale() === 'th');
-  const currentLearner = (state?.userName && !/^(Murid|Belajar|Budi)$/i.test(state.userName)) ? state.userName : 'Fitra';
-  const getGreetingMessages = (nama) => isTh ? [
-    `หายไปไหนมา คิดถึงจัง! มาฝึกกันต่อเพื่อรักษาจังหวะการเรียนรู้นะ 🔥`,
-    `ถ้าไม่เริ่มเรียนตั้งแต่วันนี้ พรุ่งนี้จะยากขึ้นนะ สู้ต่อไป! 💪`,
-    `แค่ 10 นาทีวันนี้ ช่วยรักษาจังหวะการเรียนให้ยอดเยี่ยม อย่าเพิ่งผัดวันประกันพรุ่งนะ! 🚀`,
-    `ก้าวเล็ก ๆ ที่สม่ำเสมอในวันนี้ คือการก้าวกระโดดที่ยิ่งใหญ่ในวันพรุ่งนี้ ⭐`,
-    `คำศัพท์ใหม่ทุกคำที่คุณเรียนรู้ จะเปิดโอกาสใหม่ ๆ ในอนาคต สู้ ๆ นะ! 🌟`,
-    `การเดินทางนับพันไมล์เริ่มต้นจากก้าวเล็ก ๆ ก้าวแรกเสมอ เดินหน้าต่อไป! 🌸`
-  ] : [
-    `Kemana aja nih, kok baru kelihatan lagi! Yuk latihan sekarang biar ritmemu tetap terjaga. 🔥`,
-    `Kalau kamu ga belajar mulai dari sekarang, kamu akan susah di kemudian hari. Semangat terus! 💪`,
-    `10 menit latihan hari ini menjaga ritme belajarmu tetap prima. Jangan tunda lagi ya! 🚀`,
-    `Konsistensi kecil hari ini adalah lompatan besar esok hari. Let's do this! ⭐`,
-    `Setiap kata baru yang kamu kuasai membuka peluang baru di masa depan. Semangat! 🌟`,
-    `Perjalanan ribuan mil selalu dimulai dari satu langkah kecil hari ini. Terus melangkah! 🌸`
-  ];
-  const greetMessages = getGreetingMessages(currentLearner);
-  const dayIndex = Math.floor(Date.now() / 86400000) % greetMessages.length;
-  const currentMotivation = greetMessages[dayIndex];
+  const currentLearner = learnerName();
+  /* Motivasi: pesan "kemana aja" hanya untuk murid yang memang sudah >= 2 hari tidak berlatih;
+     selain itu berputar harian di antara pesan lainnya. */
+  const lastAt = (state.history || []).reduce((m, h) => Math.max(m, Number(h?.at) || 0), 0);
+  const kembali = lastAt > 0 && Date.now() - lastAt >= 2 * 86400000;
+  const motivasiKeys = ['home.motivasi-2', 'home.motivasi-3', 'home.motivasi-4', 'home.motivasi-5', 'home.motivasi-6'];
+  const currentMotivation = FiezelI18n.t(kembali ? 'home.motivasi-kembali' : motivasiKeys[Math.floor(Date.now() / 86400000) % motivasiKeys.length]);
 
   /* State apakah sudah pernah melakukan test level / placement */
   const hasTestedLevel = !!(state && (state.placementDone || (state.history && state.history.some(h => h.type === 'placement' || h.type === 'test'))));
-  const primaryBtnText = isTh
-    ? (hasTestedLevel ? 'เริ่มฝึกฝนทันที ➔' : 'เริ่มทำแบบทดสอบวัดระดับเลย ➔')
-    : (hasTestedLevel ? 'MULAI LATIHAN SEKARANG ➔' : 'MULAI LATIHAN TEST LEVEL SEKARANG ➔');
+  /* Label tombol kartu 1 = label aksi yang SAMA dengan tombol utama (ujian level saat terkunci,
+     "lanjutkan" saat sesi tertunda). Dulu teksnya selalu "Mulai latihan" walau tombolnya
+     membuka ujian level. */
+  const primaryBtnText = hasTestedLevel ? label : FiezelI18n.t('home.kartu1-cta-tes');
   const primaryBtnAction = hasTestedLevel
     ? (aksi || 'startAdaptive()')
     : "go('test')";
 
-  /* Format tanggal & waktu saat ini */
+  /* Tanggal & jam menurut locale murid (Intl), bukan tabel nama hari/bulan buatan tangan. */
   const nowObj = new Date();
-  const daysId = ['MINGGU', 'SENIN', 'SELASA', 'RABU', 'KAMIS', 'JUMAT', 'SABTU'];
-  const monthsId = ['JANUARI', 'FEBRUARI', 'MARET', 'APRIL', 'MEI', 'JUNI', 'JULI', 'AGUSTUS', 'SEPTEMBER', 'OKTOBER', 'NOVEMBER', 'DESEMBER'];
-  const daysTh = ['วันอาทิตย์', 'วันจันทร์', 'วันอังคาร', 'วันพุธ', 'วันพฤหัสบดี', 'วันศุกร์', 'วันเสาร์'];
-  const monthsTh = ['มกราคม', 'กุมภาพันธ์', 'มีนาคม', 'เมษายน', 'พฤษภาคม', 'มิถุนายน', 'กรกฎาคม', 'สิงหาคม', 'กันยายน', 'ตุลาคม', 'พฤศจิกายน', 'ธันวาคม'];
-  const dayName = isTh ? daysTh[nowObj.getDay()] : daysId[nowObj.getDay()];
-  const dateNum = nowObj.getDate();
-  const monthName = isTh ? monthsTh[nowObj.getMonth()] : monthsId[nowObj.getMonth()];
-  const formattedDate = `${dayName}, ${dateNum} ${monthName}`;
-  const formattedTime = `${nowObj.getHours()}:${String(nowObj.getMinutes()).padStart(2, '0')}`;
+  let formattedDate = '', formattedTime = '';
+  try {
+    const bcp = (FiezelI18n.getBcp47 && FiezelI18n.getBcp47()) || (isTh ? 'th-TH' : 'id-ID');
+    formattedDate = new Intl.DateTimeFormat(bcp, { weekday: 'long', day: 'numeric', month: 'long' }).format(nowObj);
+    formattedTime = new Intl.DateTimeFormat(bcp, { hour: 'numeric', minute: '2-digit' }).format(nowObj);
+  } catch (_) {
+    formattedDate = nowObj.toDateString();
+    formattedTime = `${nowObj.getHours()}:${String(nowObj.getMinutes()).padStart(2, '0')}`;
+  }
 
-  /* Header Sambutan: Hi Fitra! + Kata Penyemangat Harian (Tanpa Pills) */
   const homeTop = `<div class="fz-welcome-header">`
-    + `<div class="fz-greet-title">${isTh ? 'สวัสดี ' : 'Hi '}${esc(currentLearner)}! <span class="fz-wave-hand">👋</span></div>`
+    + `<div class="fz-greet-title">${esc(FiezelI18n.t('home.sapa', { nama: currentLearner }))} <span class="fz-wave-hand" aria-hidden="true">👋</span></div>`
     + `<p class="fz-greet-motivation">${esc(currentMotivation)}</p>`
     + `</div>`;
 
@@ -8557,14 +8572,21 @@ function todayHomeMarkup(){
           : { word: 'Accomplish', phonetic: '/əˈkʌm.plɪʃ/ • Verb', meaning: 'Meraih, menuntaskan, atau berhasil mencapai target.', example: 'You can accomplish anything with consistent practice.', exampleTranslation: 'Kamu bisa meraih apa saja dengan latihan yang konsisten.' });
   }
 
-  /* CARD 1: STADIUM CARD (Kuning Emas) - KOSAKATA HARIAN & MULAI LATIHAN (Zero Badges) */
+  const week = homeWeekStats();
+  const vocabStats = homeVocabStats();
+  const nextLevel = LEVELS[LEVELS.indexOf(todayLevel) + 1] || '';
+
+  /* Kartu tidak lagi ber-role=button: tombol di dalamnya adalah kontrol yang sebenarnya, dan
+     role=button yang membungkus tombol lain adalah kontrol bersarang (pembaca layar membaca
+     dua tombol untuk satu aksi, dan kartu tanpa onkeydown tidak bisa dipakai lewat keyboard).
+     Klik di mana pun pada kartu tetap berfungsi untuk tetikus/sentuh. */
+  /* CARD 1: kata hari ini + tombol latihan utama */
   const card1Hero = `
-    <div class="today-card fz-stadium-card fz-card-yellow" onclick="${primaryBtnAction}" role="button" tabindex="0">
-      <div class="fz-stadium-notch"></div>
+    <div class="today-card fz-stadium-card fz-card-yellow" onclick="${primaryBtnAction}">
       <div class="fz-stadium-header fz-stadium-vocab-header">
         <div class="fz-stadium-vocab-top">
-          <span class="fz-vocab-kicker-tag">${isTh ? '📖 คำศัพท์ประจำวัน' : '📖 KOSAKATA HARIAN'}</span>
-          <span class="fz-vocab-level-tag">${esc(jaCourseOn() ? 'JLPT N5' : ((isTh ? 'ระดับ ' : 'LEVEL ') + todayLevel))}</span>
+          <span class="fz-vocab-kicker-tag">${esc(FiezelI18n.t('home.kartu1-kicker'))}</span>
+          <span class="fz-vocab-level-tag">${esc(jaCourseOn() ? 'JLPT N5' : FiezelI18n.t('home.kartu-level', { level: todayLevel }))}</span>
         </div>
         <div class="fz-vocab-hero-content">
           <div class="fz-vocab-word-title">${esc(dailyWord.word)}</div>
@@ -8575,86 +8597,77 @@ function todayHomeMarkup(){
       </div>
       <div class="fz-stadium-body">
         <div class="fz-stadium-metrics-row">
-          <div class="fz-stadium-chip">${shape.soal || 10} ${isTh ? 'ข้อ' : 'SOAL'}</div>
+          <div class="fz-stadium-chip">${esc(FiezelI18n.t('home.kartu1-soal', { n: shape.soal || 10 }))}</div>
           <div class="fz-stadium-center-time">
-            <span class="fz-time-val">${formattedTime}</span>
-            <span class="fz-date-val">${formattedDate}</span>
+            <span class="fz-time-val">${esc(formattedTime)}</span>
+            <span class="fz-date-val">${esc(formattedDate)}</span>
           </div>
-          <div class="fz-stadium-chip is-xp">+50 XP</div>
+          <div class="fz-stadium-chip is-xp">${esc(FiezelI18n.t('home.kartu1-menit', { n: shape.menit || 5 }))}</div>
         </div>
         <button type="button" class="fz-stadium-cta-btn" onclick="event.stopPropagation();${primaryBtnAction}">
-          ${primaryBtnText}
+          ${esc(primaryBtnText)} <span aria-hidden="true">➔</span>
         </button>
-      </div>
-      <div class="fz-stadium-footer-notch">
-        <span>${jaCourseOn() ? '⛩️ ' : '⚡ '}${isTh ? 'แบบฝึกหัดถัดไป' : 'LATIHAN BERIKUTNYA'}</span>
-        <span class="fz-footer-caret">▾</span>
       </div>
     </div>`;
 
-  /* CARD 2: STADIUM CARD (Silver Gradient) - KOSA KATA HARIAN (FLASHCARD & REPETISI) (Zero Badges) */
+  /* CARD 2: kosakata berulang (SRS) — angka dari state.vocab level aktif */
   const card2Hero = `
-    <div class="fz-stadium-card fz-card-silver" onclick="go('vocab')" role="button" tabindex="0">
-      <div class="fz-stadium-notch"></div>
+    <div class="fz-stadium-card fz-card-silver" onclick="go('vocab')">
       <div class="fz-stadium-header is-silver fz-stadium-clean-header">
         <div class="fz-stadium-vocab-top">
-          <span class="fz-vocab-kicker-tag is-silver-tag">${isTh ? '📖 แฟลชการ์ด &amp; ทบทวนซ้ำ' : '📖 FLASHCARD &amp; REPETISI'}</span>
-          <span class="fz-vocab-level-tag is-silver-tag">${isTh ? 'ระบบจำ SRS' : 'SRS MEMORY'}</span>
+          <span class="fz-vocab-kicker-tag is-silver-tag">${esc(FiezelI18n.t('home.kartu2-kicker'))}</span>
+          <span class="fz-vocab-level-tag is-silver-tag">${esc(FiezelI18n.t('home.kartu-level', { level: todayLevel }))}</span>
         </div>
         <div class="fz-clean-header-content">
-          <div class="fz-clean-header-title">${isTh ? 'คำศัพท์ประจำวัน' : 'Kosa Kata Harian'}</div>
-          <div class="fz-clean-header-sub">${isTh ? '25 คำศัพท์พร้อมระบบเว้นระยะทบทวน (SRS) เพื่อจดจำได้ยาวนานยิ่งขึ้น' : '25 kosakata aktif dan pola kalimat dengan spaced repetition system agar tersimpan di memori permanen.'}</div>
+          <div class="fz-clean-header-title">${esc(FiezelI18n.t('home.kartu2-judul'))}</div>
+          <div class="fz-clean-header-sub">${esc(vocabStats.practised ? FiezelI18n.t('home.kartu2-isi', { n: vocabStats.practised, level: todayLevel }) : FiezelI18n.t('home.kartu2-isi-baru', { level: todayLevel }))}</div>
         </div>
       </div>
       <div class="fz-stadium-body">
         <div class="fz-stadium-metrics-row">
-          <div class="fz-stadium-chip">${isTh ? '25 คำ' : '25 KATA'}</div>
+          <div class="fz-stadium-chip">${esc(FiezelI18n.t('home.kartu2-kata', { n: vocabStats.practised }))}</div>
           <div class="fz-stadium-center-time">
-            <span class="fz-time-val">05:00</span>
-            <span class="fz-date-val">${isTh ? 'ระบบจำ SRS' : 'SRS MEMORY'}</span>
+            <span class="fz-time-val">${vocabStats.due}</span>
+            <span class="fz-date-val">${esc(FiezelI18n.t('home.kartu2-jatuh-tempo'))}</span>
           </div>
-          <div class="fz-stadium-chip is-xp">+30 XP</div>
         </div>
         <button type="button" class="fz-stadium-cta-btn is-silver-btn" onclick="event.stopPropagation();go('vocab')">
-          ${isTh ? 'เปิดคำศัพท์ประจำวัน ➔' : 'BUKA KOSA KATA HARIAN ➔'}
+          ${esc(FiezelI18n.t('home.kartu2-cta'))} <span aria-hidden="true">➔</span>
         </button>
-      </div>
-      <div class="fz-stadium-footer-notch">
-        <span>${isTh ? '📖 ทบทวนคำศัพท์' : '📖 REPETISI KOSA KATA'}</span>
-        <span class="fz-footer-caret">▾</span>
       </div>
     </div>`;
 
-  /* CARD 3: STADIUM CARD (Dark Obsidian) - KETERANGAN PENINGKATAN (Zero Badges) */
+  /* CARD 3: perkembangan minggu ini — akurasi 7 hari terakhir vs 7 hari sebelumnya.
+     Di bawah HOME_WEEK_MIN jawaban per jendela tidak ada angka perubahan: yang tampil adalah
+     ajakan jujur untuk mengumpulkan jawaban, bukan persentase karangan. */
+  const weekDelta = week.delta;
+  const weekTone = weekDelta == null ? 'kurang' : weekDelta >= 3 ? 'naik' : weekDelta <= -3 ? 'turun' : 'stabil';
+  /* Kunci literal, bukan disambung: gerbang kunci-hantu hanya bisa menjaga kunci yang tertulis utuh. */
+  const weekKey = { naik: 'home.kartu3-isi-naik', turun: 'home.kartu3-isi-turun', stabil: 'home.kartu3-isi-stabil', kurang: 'home.kartu3-isi-kurang' }[weekTone];
   const card3Hero = `
-    <div class="fz-stadium-card fz-card-dark" onclick="go('progress')" role="button" tabindex="0">
-      <div class="fz-stadium-notch"></div>
+    <div class="fz-stadium-card fz-card-dark" onclick="go('progress')">
       <div class="fz-stadium-header is-dark fz-stadium-clean-header">
         <div class="fz-stadium-vocab-top">
-          <span class="fz-vocab-kicker-tag is-dark-tag">${isTh ? '📊 พัฒนาการเรียนรู้' : '📊 PROGRES BELAJAR'}</span>
-          <span class="fz-vocab-level-tag is-dark-tag">${todayLevel} ➔ A2</span>
+          <span class="fz-vocab-kicker-tag is-dark-tag">${esc(FiezelI18n.t('home.kartu3-kicker'))}</span>
+          <span class="fz-vocab-level-tag is-dark-tag">${esc(nextLevel ? `${todayLevel} ➔ ${nextLevel}` : todayLevel)}</span>
         </div>
         <div class="fz-clean-header-content">
-          <div class="fz-clean-header-title">${isTh ? 'คำอธิบายพัฒนาการ' : 'Keterangan Peningkatan'}</div>
-          <div class="fz-clean-header-sub">${isTh ? 'ความแม่นยำและจังหวะการเรียนของคุณพัฒนาอย่างต่อเนื่อง เรียนอีก 1 รอบวันนี้เพื่อเลื่อนระดับ!' : 'Akurasi dan ritme belajarmu meningkat konsisten. Selesaikan 1 sesi lagi hari ini untuk mengunci kenaikan level!'}</div>
+          <div class="fz-clean-header-title">${esc(FiezelI18n.t('home.kartu3-judul'))}</div>
+          <div class="fz-clean-header-sub">${esc(FiezelI18n.t(weekKey, { delta: Math.abs(weekDelta || 0), min: HOME_WEEK_MIN }))}</div>
         </div>
       </div>
       <div class="fz-stadium-body">
         <div class="fz-stadium-metrics-row">
-          <div class="fz-stadium-chip is-gain">${isTh ? '+15% ความแม่นยำ' : '+15% AKURASI'}</div>
+          <div class="fz-stadium-chip is-gain">${esc(week.accuracy == null ? FiezelI18n.t('home.kartu3-akurasi-kosong') : FiezelI18n.t('home.kartu3-akurasi', { n: week.accuracy }))}</div>
           <div class="fz-stadium-center-time">
-            <span class="fz-time-val" style="color:#059669">+15%</span>
-            <span class="fz-date-val">${isTh ? 'พัฒนาการสัปดาห์นี้' : 'PENINGKATAN MINGGU INI'}</span>
+            <span class="fz-time-val is-${weekTone}">${weekDelta == null ? '—' : (weekDelta > 0 ? '+' : weekDelta < 0 ? '−' : '') + Math.abs(weekDelta)}</span>
+            <span class="fz-date-val">${esc(FiezelI18n.t('home.kartu3-perubahan'))}</span>
           </div>
-          <div class="fz-stadium-chip is-streak">🔥 ${streak || 1} ${isTh ? 'วัน' : 'HARI'}</div>
+          <div class="fz-stadium-chip is-streak">${esc(FiezelI18n.t('home.kartu3-runtun', { n: streak }))}</div>
         </div>
         <button type="button" class="fz-stadium-cta-btn is-dark-btn" onclick="event.stopPropagation();go('progress')">
-          ${isTh ? 'ดูรายละเอียดพัฒนาการ ➔' : 'LIHAT DETAIL PENINGKATAN ➔'}
+          ${esc(FiezelI18n.t('home.kartu3-cta'))} <span aria-hidden="true">➔</span>
         </button>
-      </div>
-      <div class="fz-stadium-footer-notch">
-        <span>${isTh ? '📊 บทวิเคราะห์ &amp; แผนที่การเรียน' : '📊 ANALISIS &amp; PETA BELAJAR'}</span>
-        <span class="fz-footer-caret">▾</span>
       </div>
     </div>`;
 
@@ -15586,7 +15599,7 @@ if(typeof document!=='undefined'&&document.addEventListener){
   });
 }
 /* ============================== akhir blok SOSIAL (SLOT 7) ========================== */
-window.istilahMurid=istilahMurid;/* dipapar untuk gerbang QA: penerjemah enum harus bisa disapu penuh */window.__getFiezelData=()=>({vocab:V.length,reading:R.length,grammar:Object.keys(G).length});window.__fiezelAudit={showBrandSplash,showOnboarding,prefersReducedMotion,readInstallHealth,installHealthReportMarkup,buildBackupFile,previewRestoreForState,applyRestore,continuitySettingsMarkup,academicReadinessMarkup,unifiedSkillsMarkup,buildPersonalJourney,journeyMarkup,setGoalProfile,loadState,sanitizeState,validateQuestion,makeGrammarQuestion,makeReadingQuestion,makeVocabQuestion,buildGrammarLessonQuestions,buildPlacement,/* m025-246: dipapar untuk regression-test - gerbang itu harus bisa MENANYAKAN ukuran rencana penempatan, bukan memaku 25 dan merah setiap kali ukurannya berubah dengan sengaja. */placementSize,placementBlueprint,/* cetak biru PENUH dipapar terpisah: gerbang harus tetap bisa menjaga invarian 'penempatan penuh memuat ketiga jenis konten' walau jalur murid memakai cetak biru lite */PLACEMENT_BLUEPRINT_FULL:PLACEMENT_BLUEPRINT,buildAdaptivePool,getScenePalette,getCelestialState,getDiagnosticProfile,buildLearningSnapshot,buildLearnerEvidenceModel,remoteLearnerEvidenceSnapshot,deriveAdaptivePolicy,buildAdaptivePolicy,adaptivePolicyRequestPayload,sanitizeAdaptivePolicy,/* m025-201: dipapar untuk tests/core-policy-parity-test.js - gerbang paritas tidak bisa membandingkan apa yang tidak bisa ia panggil */capRationaleCodes,policyEffectiveness,sanitizePolicyEffectiveness,resolveAdaptivePolicy,evaluatePolicyOutcome,sanitizePolicyOutcome,recordPolicyOutcomeFromSession,backfillPolicyOutcomes,recentPolicyOutcomes,policyOutcomeSummary,buildALRSContext,selectALRSDecision,buildCreatorReport,validReportEndpoint,forgettingProbability,scheduleNext,coreBrainMemory,tutorSession,tutorObserve,misconceptionLedgerRead,misconceptionLedgerActive,coreBrainAttempts,quizPredictedSuccess,evidenceKappa,bktRead,bktRecord,bktShadowMarkup,brainManifestMarkup,learningTelemetryMode,learningTelemetryEmitAnswer,learningTelemetryStudyDay,braincoreEvidenceMode,braincoreEvidenceCohort,braincoreEvidenceCohortForBuild,braincoreEvidenceDay,braincoreEvidenceEmitSnapshot,activeLevelOverallMastery,braincoreEvidenceEmitDecision,braincoreEvidenceFlush,braincoreEvidenceObserveSession,braincoreDecisionReason,braincoreEvidenceAnyLaneActive,identityEvidenceMode,learnerNameSyncToServer,maybeSyncLearnerName,identityEvidenceActive,identityEvidenceMirror,identityEvidenceFlush,forgetLearnerEvidence,confusionMatrixRead,confusionMatrixRecord,affectObserve,affectSessionSync,affectTargetSuccess,listeningAdaptivePolicy,olmPanelMarkup,coreBrainPanelMarkup,diagnosticEvidenceReady,skillTimeline,errorPatterns,confusionPairs,diagnosticReport,confidenceCalibration,dueItems,selectLoginMessage,notificationPermission,checkStudyReminders,lastLearningAt,beginLearningSession,abandonActiveSession,completeActiveSession,/* Fase 3 (C5): kalibrasi item, cloze, OLM negotiated, SRL, speaking adaptif, step tutor */itemCalibrationRead,itemCalibrationObserve,itemCalibrationEffective,calibrationItemId,ensureClozeBank,makeClozeQuestion,clozeAdaptivePicks,clozeSkillReady,clozeProductionRecord,olmSummarizeInput,olmDispute,olmProbeNextSkill,olmProbeConsume,olmNegotiationRead,srlSessionPlan,srlPredictPrompt,srlCaptureConfidence,srlReflect,srlSessionSync,speakingCoverageRows,speakingAdaptiveEvidence,speakingAdaptivePolicy,stepTutorGuidance,stepTutorGuidanceMarkup,record,quizLoop,startAdaptive,/* m025-308: dipapar untuk tests/th-content-overlay-test.js. Gerbang itu harus bisa memanggil overlay yang SUNGGUHAN lalu membacanya lewat jalur baca yang dipakai penyaji - kalau ia hanya boleh memeriksa isi sidecar, ia mengulang kebutaan yang justru membiarkan 45 petunjuk writing dan 96 umpan balik reading-exam menganggur. */applyContentLocale,writingPromptPool,writingExamTask,readingExamSets,makeExamReadingQuestion,/* m025-314: dipapar untuk tests/target-lang-surface-guard-test.js. Gerbang itu harus bisa MEMANGGIL daftar kartu yang sungguhan lalu membacanya, bukan menebak dari pola teks di app.js - penjaga yang hanya diuji lewat grep akan tetap hijau saat kartunya dipindah ke fungsi lain. */latihanCards,skillHubModel,skillHubMarkup,continueLearningCard,aiBoosterCard,targetLangSurfaceBlocked,targetLangVoiceBlocked,courseLanguageLabel,/* `state` adalah binding modul, jadi ia TIDAK muncul sebagai properti global di vm - gerbang yang perlu menggeser bahasa target atau membaca layar aktif tidak punya jalan lain. Diekspor sebagai FUNGSI, bukan nilai: salinan yang diambil saat berkas dimuat akan basi begitu state ditugaskan ulang (loadState dipanggil lagi saat akun berpindah). */liveState:()=>state,/* B1 (m025-317): dipapar untuk tests/target-lang-progress-isolation-test.js. Gerbang itu harus MENJALANKAN jalur simpan/muat yang sungguhan di kedua bahasa - sumbu yang hanya diuji lewat modulnya adalah persis cara cacat ini bertahan berbulan-bulan. */saveFlushWrite,switchTargetLangStorage,progressStorageKey,pickProgress,sideStateKey,PROGRESS_STATE_FIELDS,PROGRESS_PREF_FIELDS,/* Migrasi sekali-jalan saat murid masuk akun. Dipapar karena inilah satu-satunya jalur yang bisa MENELANTARKAN progres bahasa: ia lahir sebelum ruang nama @lang ada. Gerbang harus menjalankannya, bukan membaca namanya. */activateAccountStateFromPuter,migrateSideStateToAccount,FIEZEL_TARGET_COURSE_KEY,decisionTrace:()=>self.FiezelDecisionTrace,presenceEngine:()=>self.FiezelPresenceEngine,/* m025-375: dipapar untuk tests/policy-evidence-window-test.js - gerbang harus bisa memanggil jendela bukti dan panel Home yang sungguhan. */policyEvidenceArms,policyEvidenceMin,policyEvidenceProgress,evidenceProgressPanelMarkup,todayHomeMarkup,/* m025-376: dipapar untuk tests/self-tune-retention-test.js. */selfTuneAfterOutcome,selfTuneTargetFor,selfTuneRetentionArms,loadSelfTuneState,retentionProbeResults,RETENTION_PROBE_KEY,SELF_TUNE_KEY};
+window.istilahMurid=istilahMurid;/* dipapar untuk gerbang QA: penerjemah enum harus bisa disapu penuh */window.__getFiezelData=()=>({vocab:V.length,reading:R.length,grammar:Object.keys(G).length});window.__fiezelAudit={showBrandSplash,showOnboarding,prefersReducedMotion,readInstallHealth,installHealthReportMarkup,buildBackupFile,previewRestoreForState,applyRestore,continuitySettingsMarkup,academicReadinessMarkup,unifiedSkillsMarkup,buildPersonalJourney,journeyMarkup,setGoalProfile,loadState,sanitizeState,validateQuestion,makeGrammarQuestion,makeReadingQuestion,makeVocabQuestion,buildGrammarLessonQuestions,buildPlacement,/* m025-246: dipapar untuk regression-test - gerbang itu harus bisa MENANYAKAN ukuran rencana penempatan, bukan memaku 25 dan merah setiap kali ukurannya berubah dengan sengaja. */placementSize,placementBlueprint,/* cetak biru PENUH dipapar terpisah: gerbang harus tetap bisa menjaga invarian 'penempatan penuh memuat ketiga jenis konten' walau jalur murid memakai cetak biru lite */PLACEMENT_BLUEPRINT_FULL:PLACEMENT_BLUEPRINT,buildAdaptivePool,getScenePalette,getCelestialState,getDiagnosticProfile,buildLearningSnapshot,buildLearnerEvidenceModel,remoteLearnerEvidenceSnapshot,deriveAdaptivePolicy,buildAdaptivePolicy,adaptivePolicyRequestPayload,sanitizeAdaptivePolicy,/* m025-201: dipapar untuk tests/core-policy-parity-test.js - gerbang paritas tidak bisa membandingkan apa yang tidak bisa ia panggil */capRationaleCodes,policyEffectiveness,sanitizePolicyEffectiveness,resolveAdaptivePolicy,evaluatePolicyOutcome,sanitizePolicyOutcome,recordPolicyOutcomeFromSession,backfillPolicyOutcomes,recentPolicyOutcomes,policyOutcomeSummary,buildALRSContext,selectALRSDecision,buildCreatorReport,validReportEndpoint,forgettingProbability,scheduleNext,coreBrainMemory,tutorSession,tutorObserve,misconceptionLedgerRead,misconceptionLedgerActive,coreBrainAttempts,quizPredictedSuccess,evidenceKappa,bktRead,bktRecord,bktShadowMarkup,brainManifestMarkup,learningTelemetryMode,learningTelemetryEmitAnswer,learningTelemetryStudyDay,braincoreEvidenceMode,braincoreEvidenceCohort,braincoreEvidenceCohortForBuild,braincoreEvidenceDay,braincoreEvidenceEmitSnapshot,activeLevelOverallMastery,braincoreEvidenceEmitDecision,braincoreEvidenceFlush,braincoreEvidenceObserveSession,braincoreDecisionReason,braincoreEvidenceAnyLaneActive,identityEvidenceMode,learnerNameSyncToServer,maybeSyncLearnerName,identityEvidenceActive,identityEvidenceMirror,identityEvidenceFlush,forgetLearnerEvidence,confusionMatrixRead,confusionMatrixRecord,affectObserve,affectSessionSync,affectTargetSuccess,listeningAdaptivePolicy,olmPanelMarkup,coreBrainPanelMarkup,diagnosticEvidenceReady,skillTimeline,errorPatterns,confusionPairs,diagnosticReport,confidenceCalibration,dueItems,selectLoginMessage,notificationPermission,checkStudyReminders,lastLearningAt,beginLearningSession,abandonActiveSession,completeActiveSession,/* Fase 3 (C5): kalibrasi item, cloze, OLM negotiated, SRL, speaking adaptif, step tutor */itemCalibrationRead,itemCalibrationObserve,itemCalibrationEffective,calibrationItemId,ensureClozeBank,makeClozeQuestion,clozeAdaptivePicks,clozeSkillReady,clozeProductionRecord,olmSummarizeInput,olmDispute,olmProbeNextSkill,olmProbeConsume,olmNegotiationRead,srlSessionPlan,srlPredictPrompt,srlCaptureConfidence,srlReflect,srlSessionSync,speakingCoverageRows,speakingAdaptiveEvidence,speakingAdaptivePolicy,stepTutorGuidance,stepTutorGuidanceMarkup,record,quizLoop,startAdaptive,/* m025-308: dipapar untuk tests/th-content-overlay-test.js. Gerbang itu harus bisa memanggil overlay yang SUNGGUHAN lalu membacanya lewat jalur baca yang dipakai penyaji - kalau ia hanya boleh memeriksa isi sidecar, ia mengulang kebutaan yang justru membiarkan 45 petunjuk writing dan 96 umpan balik reading-exam menganggur. */applyContentLocale,writingPromptPool,writingExamTask,readingExamSets,makeExamReadingQuestion,/* m025-314: dipapar untuk tests/target-lang-surface-guard-test.js. Gerbang itu harus bisa MEMANGGIL daftar kartu yang sungguhan lalu membacanya, bukan menebak dari pola teks di app.js - penjaga yang hanya diuji lewat grep akan tetap hijau saat kartunya dipindah ke fungsi lain. */latihanCards,skillHubModel,skillHubMarkup,continueLearningCard,aiBoosterCard,targetLangSurfaceBlocked,targetLangVoiceBlocked,courseLanguageLabel,/* `state` adalah binding modul, jadi ia TIDAK muncul sebagai properti global di vm - gerbang yang perlu menggeser bahasa target atau membaca layar aktif tidak punya jalan lain. Diekspor sebagai FUNGSI, bukan nilai: salinan yang diambil saat berkas dimuat akan basi begitu state ditugaskan ulang (loadState dipanggil lagi saat akun berpindah). */liveState:()=>state,/* B1 (m025-317): dipapar untuk tests/target-lang-progress-isolation-test.js. Gerbang itu harus MENJALANKAN jalur simpan/muat yang sungguhan di kedua bahasa - sumbu yang hanya diuji lewat modulnya adalah persis cara cacat ini bertahan berbulan-bulan. */saveFlushWrite,switchTargetLangStorage,progressStorageKey,pickProgress,sideStateKey,PROGRESS_STATE_FIELDS,PROGRESS_PREF_FIELDS,/* Migrasi sekali-jalan saat murid masuk akun. Dipapar karena inilah satu-satunya jalur yang bisa MENELANTARKAN progres bahasa: ia lahir sebelum ruang nama @lang ada. Gerbang harus menjalankannya, bukan membaca namanya. */activateAccountStateFromPuter,migrateSideStateToAccount,FIEZEL_TARGET_COURSE_KEY,decisionTrace:()=>self.FiezelDecisionTrace,presenceEngine:()=>self.FiezelPresenceEngine,/* m025-375: dipapar untuk tests/policy-evidence-window-test.js - gerbang harus bisa memanggil jendela bukti dan panel Home yang sungguhan. */policyEvidenceArms,policyEvidenceMin,policyEvidenceProgress,evidenceProgressPanelMarkup,todayHomeMarkup,/* m025-376: dipapar untuk tests/self-tune-retention-test.js. */selfTuneAfterOutcome,selfTuneTargetFor,selfTuneRetentionArms,loadSelfTuneState,retentionProbeResults,RETENTION_PROBE_KEY,SELF_TUNE_KEY,/* Audit UI/UX Home 2026-09-27: dipapar untuk tests/home-honesty-test.js. */homeWeekStats,homeVocabStats,HOME_WEEK_MIN};
 window.FIEZEL_TARGET_COURSE_KEY=FIEZEL_TARGET_COURSE_KEY;
 window.startVocabQuiz=startVocabQuiz;window.buildAdaptivePool=buildAdaptivePool;window.buildGrammarLessonQuestions=buildGrammarLessonQuestions;window.getScenePalette=getScenePalette;window.getCelestialState=getCelestialState;window.playFeedbackSound=playFeedbackSound;window.updateMastery=updateMastery;window.markMastered=markMastered;window.__getFiezelState=()=>state;window.__fiezelValidViews=()=>[...VALID_VIEWS];window.__fiezelDueReviews=()=>dueItems().length;window.buildAdaptivePolicy=buildAdaptivePolicy;window.studyDayKey=studyDayKey;window.startAdaptive=startAdaptive;window.showToast=showToast;window.answerFeedbackSignal=answerFeedbackSignal;window.practiceSkill=practiceSkill;window.openReadingLevel=openReadingLevel;window.startReadingRandom=startReadingRandom;window.startReadingAdaptive=startReadingAdaptive;window.startPlacement=startPlacement;window.startLevelPractice=startLevelPractice;window.startAdaptive=startAdaptive;window.resetProgress=resetProgress;window.closeModal=closeModal;window.openSettings=openSettings;window.openReportPreview=openReportPreview;window.sendCreatorReport=sendCreatorReport;window.askCoachAI=askCoachAI;window.dismissWelcome=dismissWelcome;window.requestStudyNotificationPermission=requestStudyNotificationPermission;window.declineStudyNotifications=declineStudyNotifications;window.skipPuterSignIn=skipPuterSignIn;window.attemptGoogleSignIn=attemptGoogleSignIn;window.shouldPresentPuterPopup=shouldPresentPuterPopup;window.notifyAppUpdateIfNew=notifyAppUpdateIfNew;window.setConfidence=setConfidence;window.explainWithAI=explainWithAI;window.explainWordWithAI=explainWordWithAI;window.olmDispute=olmDispute;/* Fase 3 (C5 butir 3): handler tombol sanggah di panel OLM */
 // m025-84: dipasang di ujung berkas, saat go()/state/VALID_VIEWS sudah ada, dan SEBELUM

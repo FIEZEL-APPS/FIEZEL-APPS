@@ -5418,6 +5418,25 @@ html body #app .social-home-launcher .launch-card{background:var(--pz-sky);borde
   font-size: 13px;
   line-height: 1.45;
 }
+/* Nama materi bisa panjang ("Waktu lampau yang jelas atau masih terhubung sekarang: ...");
+   di baris sendiri, kalimat ajakannya tetap pendek dan terbaca sekali lirik. */
+.fz-evidence-materi {
+  margin: 6px 0 0;
+  font-size: 12px;
+  line-height: 1.4;
+  color: var(--muted);
+}
+
+/* Audit UI/UX Home 2026-09-27: kartu Home. */
+/* Perubahan akurasi mingguan diwarnai menurut arahnya (dulu hijau mati untuk angka rekaan). */
+.fz-stadium-card .fz-time-val.is-naik { color: #059669 !important; }
+.fz-stadium-card .fz-time-val.is-turun { color: #DC2626 !important; }
+/* Label di bawah angka dulu 9.5px - di bawah ukuran terbaca di ponsel. */
+.fz-stadium-card .fz-date-val { font-size: 11px !important; }
+/* Ikon peluncur "Rencana belajar" dulu gelap di atas petak gelap (nyaris tak terlihat). */
+.today-home-cockpit .launch-icon { color: var(--sun, #FFD94F); }
+.today-home-cockpit .launch-icon .fz-line { stroke: currentColor; }
+.today-home-cockpit .launch-icon .fz-fill { fill: currentColor; fill-opacity: .22; }
 .fz-evidence-track {
   height: 8px;
   background: var(--line);

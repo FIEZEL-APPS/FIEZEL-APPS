@@ -42,6 +42,16 @@ B5, B6, dan A3 (OWNER memilih "ganti ukuran dulu", 2026-09-27).
    percobaan ±0.02, lesson dibagi `FiezelNof1.assign`, diputus retensi probe 3/7/21 hari; sulit =
    non-inferioritas, mudah = superioritas; penjaga Brier; kadaluwarsa 120 hari; ledger). State per
    murid (`sideStateKey`). Manifest 3.13.0 (`nof1` active). Gerbang `tests/self-tune-retention-test.js`.
+8. **Audit UI/UX Home (permintaan OWNER 2026-09-26).** Kartu perkembangan dulu mengarang angka
+   ("+15% akurasi", "meningkat konsisten", "{level} ➔ A2", runtun `|| 1`, "+50/+30 XP", "05:00")
+   dan menyapa murid tanpa nama sebagai "Fitra". Sekarang semua angka dari state
+   (`homeWeekStats` 7 hari vs 7 hari sebelumnya, minimal 10 jawaban; `homeVocabStats`), yang
+   belum bisa dihitung tampil "belum cukup data", level tujuan = level berikutnya, sapaan lewat
+   `learnerName()`. Semua teks Home pindah ke `copy-{id,th}-redesign.js` (bukan ternary id/th).
+   Desktop ≥ 1100px: sisa aturan sticky dua-kolom di `fiezel-2.css` menggeser kartu 1 sebesar
+   88px dan kartu 2 MENUTUPI tombol utamanya — dihapus. Kartu tidak lagi `role=button` yang
+   membungkus tombol (kontrol bersarang). Pesan "kemana aja?" hanya untuk murid yang absen ≥ 2 hari.
+   Gerbang `tests/home-honesty-test.js` (H1–H7 + RED; merah terhadap kode `main` lama, 7/9).
 
 ```yaml
 files_added:
@@ -50,10 +60,13 @@ files_added:
   - tests/i18n-param-collision-test.js
   - tests/policy-evidence-window-test.js
   - tests/self-tune-retention-test.js
+  - tests/home-honesty-test.js
   - tools/dev/braincore-audit-2026-09-26-probe.js
 files_touched:
   - app.js
   - style.css
+  - fiezel-2.css
+  - id-golden-baseline.json
   - features/brain/fiezel-core-brain.js
   - features/brain/fiezel-mastery-bkt.js
   - features/brain/fiezel-self-tune.js
@@ -80,4 +93,5 @@ files_touched:
 5. Retensi murid (streak, target harian, pengingat, Pau) — panel bukti Home termasuk di sini.
 6. Dua ukuran rutin di dashboard owner: ketepatan prediksi (Brier) dan retensi 7/30 hari.
 
-Setelah fondasi: audit & perbaikan UI/UX halaman Home (permintaan OWNER 2026-09-26).
+Audit & perbaikan UI/UX Home: selesai di rilis ini (butir 8). Sisa yang sengaja belum disentuh
+ada di `reports/BRAINCORE-AUDIT-2026-09-26.md` §8.

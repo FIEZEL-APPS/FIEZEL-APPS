@@ -575,6 +575,7 @@ jobs:
           node tests/ux-flags-test.js
           node tests/ux-redesign-test.js
           node tests/today-home-test.js
+          node tests/home-honesty-test.js
           node tests/night-theme-test.js
           # pwa-release-coherence memeriksa keempat penanda SELARAS satu sama lain; ia tidak
           # bisa tahu nomornya sudah dipakai jalur lain. Itu celah yang meloloskan tabrakan

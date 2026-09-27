@@ -298,3 +298,30 @@ bahasa (`sideStateKey`). `affectTargetSuccess()` membaca nilai lesson sasaran da
 Manifest 3.12.0 → 3.13.0 (`nof1` off → active). Gerbang baru `tests/self-tune-retention-test.js`
 (M1–M9, A1–A5). Karena probe butuh hari-hari, putusan pertama realistisnya baru keluar setelah
 beberapa minggu pemakaian — sebelum itu nilai berlaku tetap 0.80.
+
+## 8. Audit UI/UX Home (permintaan owner, dikerjakan 2026-09-27)
+
+Diperiksa lewat kode (`todayHomeMarkup`, CSS lintas lima berkas) dan tangkapan layar Chromium di
+390px dan 1280px, bahasa id dan th, murid baru dan murid aktif.
+
+| # | Temuan | Dampak ke murid | Perbaikan |
+|---|---|---|---|
+| H1 | Kartu 3 menulis "+15% akurasi", "meningkat konsisten" apa adanya | Murid baru (0 jawaban) membaca akurasinya naik 15% | `homeWeekStats()`: akurasi 7 hari vs 7 hari sebelumnya, minimal 10 jawaban per minggu; kurang dari itu tampil "—" dan ajakan menjawab |
+| H2 | Label level "{level} ➔ A2" mati | Murid B1 membaca "B1 ➔ A2" (seolah turun) | Level tujuan = level berikutnya |
+| H3 | Runtun `streak \|\| 1`, "+50 XP"/"+30 XP", jam "05:00" | Angka yang tidak ada di FIEZEL (tidak ada XP) | Runtun apa adanya (0 boleh), XP dan jam dibuang; kartu 1 menampilkan jumlah soal dan perkiraan menit sesi |
+| H4 | Sapaan "Hi Fitra!" untuk murid tanpa nama | Murid disapa dengan nama orang lain | `learnerName()` (cadangan netral dari i18n) |
+| H5 | Kartu 2 "Kosakata" angkanya statis | Tidak mencerminkan latihan murid | `homeVocabStats()`: kata yang sudah dilatih dan yang jatuh tempo di level aktif |
+| H6 | Desktop ≥ 1100px: aturan sticky dua-kolom lama di `fiezel-2.css` memberi kartu 1 `top:88px` | Kartu 2 MENUTUPI tombol utama kartu 1 | Aturan lama dihapus; ketiga kartu selebar sama (440px) |
+| H7 | Kartu ber-`role=button` + `tabindex` yang membungkus tombol lain | Kontrol bersarang: pembaca layar mengumumkan dua tombol, Tab berhenti dua kali | Kartu jadi wadah biasa; hanya tombolnya yang bisa ditekan |
+| H8 | Semua teks hero/kartu ditulis sebagai ternary id/th di app.js | Melanggar aturan dua bahasa; teks baru mudah lahir satu bahasa | Pindah ke `copy-{id,th}-redesign.js` (kunci `home.sapa`, `home.motivasi-*`, `home.kartu1-*`..`kartu3-*`) |
+| H9 | Pesan "kemana aja?" muncul bergiliran untuk semua murid | Murid yang rajin ditegur seolah menghilang | Hanya bila aktivitas terakhir ≥ 2 hari; selain itu motivasi harian bergiliran |
+| H10 | Ikon kartu kontras rendah di atas latar terang; tanggal/jam ditulis manual | Sulit dibaca; format tanggal tidak mengikuti bahasa | Ikon `var(--sun)`; tanggal/jam lewat `Intl.DateTimeFormat(FiezelI18n.getBcp47())` |
+
+Gerbang baru `tests/home-honesty-test.js` mengunci H1–H7 (terbukti merah 7/9 terhadap kode
+`main` lama). Baseline emas Indonesia dibuat ulang setelah selisihnya ditinjau (semua perubahan
+disengaja).
+
+**Sengaja belum disentuh:** kata-hari-ini cadangan (dipakai bila bank kosakata gagal dimuat)
+masih objek id/th di app.js — isinya konten, sudah dua bahasa, dan layak dipindah bersama konten
+kosakata, bukan copy UI; empat kebocoran Indonesia di `reports/th-ui-leak-report.json` adalah
+anggaran lama di luar Home.
