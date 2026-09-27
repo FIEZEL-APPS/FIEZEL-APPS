@@ -96,7 +96,11 @@
   // 3.12.0 → 3.13.0 (m025-376, audit braincore A3, keputusan OWNER 2026-09-27): nof1 off→active.
   // selfTune kini diukur RETENSI tertunda per lesson (experiment()), dan FiezelNof1.assign
   // yang membagi lesson ke lengan kontrol/kandidat dipanggil app.js.
-  var BUNDLE_VERSION = '3.13.0';
+  // 3.13.0 → 3.14.0 (m025-377, Braincore langkah 2): itemPool baru, langsung active.
+  // Kesulitan soal dihitung dari SEMUA murid: FiezelItemPool mencatat jawaban-pertama per
+  // soal (app.js itemPoolObserve) dan menerapkan tabel koreksi gabungan di
+  // itemCalibrationEffective. Tabel kosong (server belum dinyalakan) = perilaku 3.13.0.
+  var BUNDLE_VERSION = '3.14.0';
 
   // Disalin apa adanya dari version.js (self.FIEZEL_VERSION). Bundle ini mengandalkan
   // wiring app.js 5.19.0 (guard modul-absen, sidecar stabilityDays, dsb.) — versi
@@ -135,6 +139,7 @@
     { file: 'fiezel-core-brain.js', global: 'FiezelCoreBrain', schema: 'fiezel-core-brain-v2', authorityKey: 'memory' },
     { file: 'fiezel-evidence-credibility.js', global: 'FiezelEvidenceCredibility', schema: 'fiezel-evidence-credibility-v1', authorityKey: 'evidenceCredibility' },
     { file: 'fiezel-item-calibration.js', global: 'FiezelItemCalibration', schema: 'fiezel-item-calibration-v1', authorityKey: 'itemCalibration' },
+    { file: 'fiezel-item-pool.js', global: 'FiezelItemPool', schema: 'fiezel-item-pool-v1', authorityKey: 'itemPool' },
     { file: 'fiezel-item-prior.js', global: 'FiezelItemPrior', schema: null, authorityKey: 'itemDifficultyPrior' },
     { file: 'fiezel-learning-metrics.js', global: 'FiezelLearningMetrics', schema: 'fiezel-learning-metrics-v1', authorityKey: 'learningMetrics' },
     { file: 'fiezel-listening-adaptive.js', global: 'FiezelListeningAdaptive', schema: 'fiezel-listening-adaptive-v1', authorityKey: 'listeningPolicy' },
@@ -198,6 +203,11 @@
     // adaptive: evidence/policy dibaca hook Speaking Lab, addon yang memutuskan
     // kapan memakainya (app.js:2045-2048) — jalur keputusan belum pasti: 'shadow'.
     itemCalibration: 'active',
+    // m025-377 (Braincore langkah 2): koreksi kesulitan dari SEMUA murid. 'active' karena
+    // app.js memanggilnya di jalur yang sama dengan itemCalibration dan ia MENANG atas
+    // kalibrasi N=1 bila soal sudah dijawab >= 20 murid. Sebelum server menerbitkan tabel,
+    // effective() selalu applied:false dan kalibrasi lokal berjalan seperti sebelumnya.
+    itemPool: 'active',
     srlCoach: 'active',
     speakingPolicy: 'shadow',
     // m025-337 (permintaan OWNER: "BKT nya jangan di bekukan"): shadow -> active.

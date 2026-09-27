@@ -19,12 +19,15 @@ tidak bisa bocor, dan tidak bisa diminta siapa pun.**
 | `session_summary` (bucket kasar) | Apakah kebijakan menghasilkan sesi selesai di jendela akurasi target | Sama: counter agregat | 90 hari | Sama |
 | `eventId` / `batchId` (UUID acak) | Idempotency saja | Tabel dedup retensi-pendek | 7 hari | Dihapus setelah jendela retry ([BRAIN-TELEMETRY-SCHEMA.md](BRAIN-TELEMETRY-SCHEMA.md) §5.3) |
 | `metrics_daily` / `usage_daily` / `retention_daily` / `dau_dedup` (eksisting) | Analitik produk | Counter tanpa individu | Permanen / 90 hari / 400 hari / dihapus tiap malam (`PRIVACY.md:104–108`) | Sesuai kontrak eksisting |
+| `item_pool_daily` — jawaban PERTAMA per soal (Braincore langkah 2, §7c) | Kesulitan soal dihitung dari semua murid, bukan per HP | Counter per (hari × ID templat soal × bucket prediksi): n, benar. Tanpa pengenal apa pun | 120 hari | Purge cron harian (`purgeItemPool`) |
+| `item_pool_table` — koreksi kesulitan per soal | Dibaca balik semua perangkat | Satu baris per soal yang dijawab ≥ 20 murid | Dibangun ulang utuh tiap hari | Diganti setiap rebuild |
 | Riwayat belajar lengkap (attempt, timing, prediksi, miskonsepsi, state BKT/memori) | Adaptivitas untuk murid itu sendiri | **localStorage perangkat murid — tidak pernah diunggah** | Selama aplikasi terinstal | Hapus data situs / uninstal = hilang total; tidak ada salinan server |
 
 Yang TIDAK dikumpulkan, titik: nama, email, IP (tidak disimpan server), user agent, GPS,
 timestamp presisi (`at` diterima tapi TIDAK PERNAH disimpan —
 `workers/api/analytics/analytics-core.js:197`), teks jawaban, ID lesson individual, dan
-identifier stabil apa pun (§7).
+identifier stabil apa pun (§7). Satu pengecualian yang DITULIS: lane kesulitan soal gabungan
+membawa ID TEMPLAT soal (konten bank bersama, bukan data murid) — batasnya di §7c.
 
 ## 2. Arsitektur penghapusan: erasure-by-construction
 
@@ -234,6 +237,37 @@ Tanpa aturan itu, satu SELECT akan memetakan cohort anonim ke akun — dan §7 b
 seluruh populasi, bukan hanya untuk yang menyetujui.
 
 Gerbang: `tests/braincore-learner-identity-test.js`.
+
+## 7c. Lane KESULITAN SOAL GABUNGAN (Braincore langkah 2) — ID soal, tanpa pengenal murid
+
+Roadmap OWNER langkah 2: kesulitan soal dihitung dari semua murid, bukan per HP. Satu
+perangkat tidak bisa memisahkan "murid ini pintar" dari "soal ini mudah"
+(`features/brain/fiezel-item-calibration.js`, kepala berkas); populasi bisa.
+
+**Yang keluar dari perangkat**, per soal: `[itemId, bucket prediksi 0..19, benar 0/1]` dan
+HARI UTC jawaban. Hanya JAWABAN PERTAMA murid pada soal itu — satu murid menyumbang paling
+banyak satu jawaban per soal, jadi "20 jawaban" di server berarti 20 murid.
+
+**Kenapa ini bukan "ID lesson individual" yang dilarang §1.** Larangan itu melindungi dari
+field yang bisa membawa isi pribadi atau menyambung murid lintas event. `itemId` di sini:
+1. hanya lolos bila bentuknya ID templat bank (`^[A-Za-z0-9]{1,4}(?:[-_][A-Za-z0-9]{1,4}){0,2}[-_][0-9]{2,3}$`)
+   + mode dari daftar TERTUTUP (28 mode) — divalidasi di perangkat DAN server
+   (`validItemId`), jadi tidak ada teks bebas yang bisa menumpang;
+2. menunjuk KONTEN yang sama untuk semua murid, bukan sesuatu milik murid;
+3. tidak disertai pengenal apa pun: tanpa `cohort`, tanpa cookie (`credentials:'omit'`),
+   tanpa installId. Rute server tidak membaca identitas sama sekali
+   (`tests/item-pool-test.js` P3/P4).
+
+**Yang disimpan server:** penghitung `(day, item_id, pb) → n, k` di `fiezel-evidence`
+(migrasi `0015_item_pool.sql`); event mentah mati di memori Worker. Tabel yang diterbitkan
+publik (`GET /api/braincore/item-difficulty`) hanya memuat soal dengan **≥ 20 jawaban-pertama**
+— ambang yang sama dengan aturan supresi sel kecil §4 (k = 20).
+
+**Tidak boleh disambungkan** ke `evidence_learner_day` (satu-satunya tabel di database yang
+sama yang memegang pengenal) — larangannya dikunci `ITEM_POOL_FORBIDDEN_TABLES` + gerbang P2.
+
+**Saklar:** perangkat `FiezelTelemetryConfig.CONFIG.itemPool.mode`, server
+`ITEM_POOL_ENABLED` (default `off`). Retensi di `docs/D1-RETENTION.md`.
 
 ## 8. Batas kejujuran dokumen ini
 
