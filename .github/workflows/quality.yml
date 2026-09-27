@@ -308,6 +308,10 @@ jobs:
           node tests/student-single-registration-test.js
           node tests/th-ui-leak-test.js
           node tests/i18n-kunci-hantu-test.js
+          # Arah ketiga cacat i18n: kunci terdaftar DAN dipanggil, tetapi objek parameternya
+          # memuat nama placeholder kembar — nilai pertama hilang tanpa suara. Lahir dari
+          # kartu akar masalah Core Brain yang menyebut prasyaratnya dua kali (audit 2026-09-26).
+          node tests/i18n-param-collision-test.js
           # Lapis AKUN sisi murid (masuk/daftar/aktivasi guru). Ditempatkan tepat sesudah
           # gerbang sosial karena keduanya memakai lane transport yang sama (panggilan
           # langsung ke Worker dengan cookie fz_id), dan cacat di lane itu akan memerahkan
@@ -526,9 +530,17 @@ jobs:
           node tests/brain-sync-failclosed-test.js
           node tests/brain-sync-rebuild-test.js
           node tests/policy-verdict-test.js
+          # m025-375 (OWNER 2026-09-26): hasil sesi dinilai setelah >= 25 jawaban sasaran terkumpul
+          # lintas sesi, dan panel Home memberi tahu murid sisanya. Satu-satunya gerbang yang
+          # memuat stat-gate + policy-verdict bersama app.js - tanpa keduanya verdict selalu null
+          # dan lubang A2 (semua sesi 'mixed') tidak terlihat.
+          node tests/policy-evidence-window-test.js
           node tests/nof1-test.js
           node tests/param-ledger-test.js
           node tests/self-tune-test.js
+          # m025-376 (audit braincore A3, OWNER 2026-09-27): penyetel resmi disambung ke pemilihan
+          # soal, diukur RETENSI tertunda per lesson (bukan akurasi sesi), dua arah, berpagar.
+          node tests/self-tune-retention-test.js
           node tests/content-chain-test.js
           node tests/content-chain-report-test.js
           node tests/learner-evidence-test.js
@@ -563,6 +575,7 @@ jobs:
           node tests/ux-flags-test.js
           node tests/ux-redesign-test.js
           node tests/today-home-test.js
+          node tests/home-honesty-test.js
           node tests/night-theme-test.js
           # pwa-release-coherence memeriksa keempat penanda SELARAS satu sama lain; ia tidak
           # bisa tahu nomornya sudah dipakai jalur lain. Itu celah yang meloloskan tabrakan

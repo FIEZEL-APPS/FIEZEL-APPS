@@ -3000,28 +3000,60 @@ function policyOutcomeSessionRows(session){const start=Date.parse(session?.start
  * saat ia punya cukup bukti untuk berpendapat. Tidak ada riwayat pembanding -> status
  * deskriptif berlaku (fase awal; menolak maju selamanya lebih buruk daripada maju dengan
  * heuristik yang wajar). Ada pembanding dan verdict 'promote'/'reject' -> verdict menang.
- * Verdict 'hold' -> 'mixed': jangan naikkan, jangan turunkan, kumpulkan bukti lagi. */
+ * Verdict 'hold' -> 'mixed': jangan naikkan, jangan turunkan, kumpulkan bukti lagi.
+ *
+ * m025-375 — BUKTI DIKUMPULKAN LINTAS SESI (OWNER 2026-09-26, audit braincore A2)
+ * ------------------------------------------------------------------------------
+ * Bentuk di atas punya lubang yang tidak terlihat dari satu sesi: lengan kandidat SELALU satu
+ * sesi (sesi adaptif dijepit 5..16 soal), sedangkan FiezelStatGate menolak memutus di bawah
+ * 25 per lengan. Verdict karenanya selalu 'hold/underpowered', dan sejak sesi kedua pada satu
+ * sasaran SEMUA sesi berstatus 'mixed' - sesi skor 93 pun. Jalur positif/negatif yang
+ * komentar di atas bela mati lagi, hanya satu sesi lebih lambat.
+ *
+ * Keputusan owner: jangan menilai sebelum datanya cukup; kumpulkan dulu dari beberapa sesi,
+ * dan beri tahu murid di Home berapa latihan lagi yang dibutuhkan (evidenceProgressPanelMarkup).
+ * Mekanismenya satu JENDELA per sasaran:
+ *   - Jendela = outcome berurutan terakhir pada sasaran yang sama yang masih
+ *     evidence.state==='collecting'. Lengan kandidat = jendela + sesi ini.
+ *   - Lengan kontrol = semua outcome sasaran itu SEBELUM jendela (outcome lama tanpa field
+ *     evidence dihitung sebagai kontrol).
+ *   - Kandidat < policyEvidenceMin() (lantai stat-gate, 25) -> 'insufficient' +
+ *     'collect_more_evidence' ("Belum cukup data" / "Perlu lebih banyak latihan dulu").
+ *     deriveAdaptivePolicy melewati outcome ini dan tetap bertindak atas penilaian terakhir.
+ *   - Kandidat >= 25 -> dinilai SEKALI, jendela ditutup: verdict promote/reject/hold bila ada
+ *     kontrol yang cukup; tanpa kontrol (jendela pertama) atau kontrol yang masih
+ *     underpowered -> status deskriptif seperti fase awal di atas.
+ *   - Sesi pendek dan sesi yang ditinggalkan tetap menyumbang jawabannya ke jendela; status
+ *     'negative' karena ditinggalkan tetap berlaku seketika - itu sinyal perilaku, bukan
+ *     klaim statistik. */
 function policyVerdictAvailable(){return !!(self.FiezelPolicyVerdict&&typeof self.FiezelPolicyVerdict.verdict==='function')}
-/** Lengan kontrol: akumulasi attempt+benar pada sasaran yang sama dari riwayat outcome. */
-function policyControlArm(target,domain){
-  const rows=(state.policyOutcomeMeta?.history||[]).filter(o=>o&&Number(o.targetAttempts)>0&&
-    (target?String(o.targetSkill||'')===String(target):String(o.primaryDomain||'')===String(domain||'')));
-  let n=0,ok=0;
-  for(const o of rows){
-    const a=Math.max(0,Number(o.targetAttempts)||0);
-    const acc=Number(o.targetAccuracy);
-    if(!a||!Number.isFinite(acc))continue;
-    n+=a;ok+=Math.round(a*Math.max(0,Math.min(100,acc))/100);
-  }
-  return n>0?{n,ok}:null;
+/** Lantai bukti per lengan - SAMA dengan FiezelStatGate.DEFAULTS.minNPerArm, supaya "cukup" di
+ *  sini berarti "cukup untuk diputus". Ditulis sebagai konstanta, bukan dibaca dari modulnya:
+ *  app.js hanya berbicara ke stat-gate LEWAT FiezelPolicyVerdict (peta otoritas brain-manifest
+ *  mencatat stat-gate 'off' di permukaan app). Kesamaan angkanya dikunci
+ *  tests/policy-evidence-window-test.js, jadi keduanya tidak bisa menyimpang diam-diam. */
+const POLICY_EVIDENCE_MIN=25;
+function policyEvidenceMin(){return POLICY_EVIDENCE_MIN}
+function policyOutcomeOnTarget(o,target,domain){return target?String(o?.targetSkill||'')===String(target):String(o?.primaryDomain||'')===String(domain||'')}
+/** Jawaban sasaran satu outcome sebagai {n, ok}, atau null bila outcome itu tidak membawanya. */
+function policyArmCount(o){const a=Math.max(0,Number(o?.targetAttempts)||0),acc=Number(o?.targetAccuracy);if(!a||o?.targetAccuracy==null||!Number.isFinite(acc))return null;return{n:a,ok:Math.round(a*Math.max(0,Math.min(100,acc))/100)}}
+/** Kontrol (sebelum jendela) dan jendela terbuka (masih mengumpulkan) pada sasaran yang sama.
+ *  Outcome milik sesi yang sedang dinilai ulang dikecualikan supaya penilaian ulang idempoten. */
+function policyEvidenceArms(target,domain,sessionId){
+  const rows=(state.policyOutcomeMeta?.history||[]).filter(o=>o&&policyOutcomeOnTarget(o,target,domain)&&(!sessionId||String(o.sessionId||'')!==String(sessionId)));
+  let cut=rows.length;
+  while(cut>0&&rows[cut-1]?.evidence?.state==='collecting')cut--;
+  const sum=list=>{let n=0,ok=0;for(const o of list){const c=policyArmCount(o);if(c){n+=c.n;ok+=c.ok}}return{n,ok}};
+  const control=sum(rows.slice(0,cut));
+  return{control:control.n>0?control:null,window:sum(rows.slice(cut))}
 }
 function evaluatePolicyOutcome(session,now=Date.now()){
   if(!session?.policyId)return null;const rows=policyOutcomeSessionRows(session),planned=Math.max(1,Number(session.planned||session.total||1)),answered=Math.max(0,Number(session.answered??rows.length)),completionRate=Math.round(Math.min(1,answered/planned)*100),accuracy=session.accuracy==null?(rows.length?Math.round(rows.filter(x=>x.ok).length/rows.length*100):null):Math.max(0,Math.min(100,Number(session.accuracy)||0)),target=String(session.targetSkill||''),domain=normalizePolicyDomain(session.primaryDomain)||normalizePolicyDomain(rows[0]?.type),targetRows=target?rows.filter(h=>String(h.skill||'')===target||String(h.target||'')===target):rows.filter(h=>normalizePolicyDomain(h.type)===domain),targetAccuracy=targetRows.length?Math.round(targetRows.filter(x=>x.ok).length/targetRows.length*100):null,targetAdherence=rows.length?Math.round(targetRows.length/rows.length*100):0,masteryAfter=policyTargetMastery({primaryDomain:domain,targetSkill:target}),masteryBefore=session.baselineTargetMastery==null?null:Number(session.baselineTargetMastery),masteryDelta=masteryAfter==null||masteryBefore==null?null:Math.round((masteryAfter-masteryBefore)*10)/10,baselineAccuracy=session.baselineTargetAccuracy==null?null:Number(session.baselineTargetAccuracy),accuracyDelta=targetAccuracy==null||baselineAccuracy==null?null:targetAccuracy-baselineAccuracy;
   const confRows=rows.filter(x=>[1,2,3].includes(Number(x.confidence))),expected=confRows.length?confRows.reduce((n,x)=>n+Number(x.confidence)/3,0)/confRows.length:null,actual=confRows.length?confRows.filter(x=>x.ok).length/confRows.length:null,confidenceGap=expected==null?null:Math.round(Math.abs(expected-actual)*100),medianResponseMs=medianNumber(rows.map(x=>x.ms));
-  const improvement=masteryDelta!=null?Math.max(0,Math.min(100,50+masteryDelta*8)):accuracyDelta!=null?Math.max(0,Math.min(100,50+accuracyDelta*2)):50,calibration=confidenceGap==null?50:100-confidenceGap,score=Math.round(completionRate*.30+(accuracy??0)*.35+targetAdherence*.15+calibration*.10+improvement*.10);let status='mixed',recommendation='adjust',verdict=null;if(answered<Math.min(3,planned)||completionRate<40)status='insufficient',recommendation='collect_more_evidence';else if(session.abandoned)status='negative',recommendation='reduce_load';else{if(score<45)status='negative',recommendation='reduce_load';else if(score>=72&&completionRate>=80)status='positive',recommendation='keep_or_progress';const kandidat=targetRows.length&&targetAccuracy!=null?{n:targetRows.length,ok:Math.round(targetRows.length*targetAccuracy/100)}:null;const kontrol=policyControlArm(target,domain);if(policyVerdictAvailable()&&kandidat&&kontrol){try{verdict=self.FiezelPolicyVerdict.verdict({control:kontrol,candidate:kandidat})}catch{verdict=null}}if(verdict){if(verdict.decision==='promote')status='positive',recommendation='keep_or_progress';else if(verdict.decision==='reject')status='negative',recommendation='reduce_load';else status='mixed',recommendation='adjust';}}
-  return{schema:POLICY_OUTCOME_SCHEMA,outcomeId:`${String(session.id||session.policyId)}-${Math.floor(now/1000)}`.slice(0,160),sessionId:String(session.id||'').slice(0,120),policyId:String(session.policyId||'').slice(0,120),evaluatedAt:new Date(now).toISOString(),policyMode:String(session.policyMode||'').slice(0,30),targetSkill:target.slice(0,80),primaryDomain:domain,completed:!!session.completed,abandoned:!!session.abandoned,planned,answered,completionRate,accuracy,targetAttempts:targetRows.length,targetAccuracy,targetAdherence,medianResponseMs,confidenceGap,masteryBefore,masteryAfter,masteryDelta,baselineTargetAccuracy:baselineAccuracy,accuracyDelta,score:Math.max(0,Math.min(100,score)),status,recommendation,...(verdict?{verdict:{decision:verdict.decision,rationale:verdict.rationale,basis:verdict.basis,confidence:verdict.confidence,diff:verdict.diff??null,ci:verdict.ci||null,n:verdict.n||null}}:{}),privacy:{rawAnswersIncluded:false,rawHistoryIncluded:false}}
+  const improvement=masteryDelta!=null?Math.max(0,Math.min(100,50+masteryDelta*8)):accuracyDelta!=null?Math.max(0,Math.min(100,50+accuracyDelta*2)):50,calibration=confidenceGap==null?50:100-confidenceGap,score=Math.round(completionRate*.30+(accuracy??0)*.35+targetAdherence*.15+calibration*.10+improvement*.10);let status='mixed',recommendation='adjust',verdict=null,evidence=null;const arms=policyEvidenceArms(target,domain,session.id),sesiArm=policyArmCount({targetAttempts:targetRows.length,targetAccuracy}),kandidat={n:arms.window.n+(sesiArm?sesiArm.n:0),ok:arms.window.ok+(sesiArm?sesiArm.ok:0)},cukup=policyEvidenceMin(),kumpul=basis=>({state:'collecting',n:kandidat.n,needed:cukup,basis});if(answered<Math.min(3,planned)||completionRate<40)status='insufficient',recommendation='collect_more_evidence',evidence=kumpul('short');else if(session.abandoned)status='negative',recommendation='reduce_load',evidence=kumpul('behavior');else if(kandidat.n<cukup)status='insufficient',recommendation='collect_more_evidence',evidence=kumpul('window');else{if(score<45)status='negative',recommendation='reduce_load';else if(score>=72&&completionRate>=80)status='positive',recommendation='keep_or_progress';evidence={state:'judged',n:kandidat.n,needed:cukup,basis:'descriptive'};if(policyVerdictAvailable()&&arms.control){try{verdict=self.FiezelPolicyVerdict.verdict({control:arms.control,candidate:kandidat})}catch{verdict=null}}if(verdict&&!/underpowered/.test(String(verdict.basis||''))){evidence.basis='verdict';if(verdict.decision==='promote')status='positive',recommendation='keep_or_progress';else if(verdict.decision==='reject')status='negative',recommendation='reduce_load';else status='mixed',recommendation='adjust';}}
+  return{schema:POLICY_OUTCOME_SCHEMA,outcomeId:`${String(session.id||session.policyId)}-${Math.floor(now/1000)}`.slice(0,160),sessionId:String(session.id||'').slice(0,120),policyId:String(session.policyId||'').slice(0,120),evaluatedAt:new Date(now).toISOString(),policyMode:String(session.policyMode||'').slice(0,30),targetSkill:target.slice(0,80),primaryDomain:domain,completed:!!session.completed,abandoned:!!session.abandoned,planned,answered,completionRate,accuracy,targetAttempts:targetRows.length,targetAccuracy,targetAdherence,medianResponseMs,confidenceGap,masteryBefore,masteryAfter,masteryDelta,baselineTargetAccuracy:baselineAccuracy,accuracyDelta,score:Math.max(0,Math.min(100,score)),status,recommendation,...(evidence?{evidence}:{}),...(verdict?{verdict:{decision:verdict.decision,rationale:verdict.rationale,basis:verdict.basis,confidence:verdict.confidence,diff:verdict.diff??null,ci:verdict.ci||null,n:verdict.n||null}}:{}),privacy:{rawAnswersIncluded:false,rawHistoryIncluded:false}}
 }
-function sanitizePolicyOutcome(raw){if(!raw||raw.schema!==POLICY_OUTCOME_SCHEMA)return null;const statuses=new Set(['positive','mixed','negative','insufficient']),recs=new Set(['keep_or_progress','adjust','reduce_load','collect_more_evidence']);if(!statuses.has(raw.status)||!recs.has(raw.recommendation))return null;const clamp=(v,min,max)=>Math.max(min,Math.min(max,Number(v)||0));return{schema:POLICY_OUTCOME_SCHEMA,outcomeId:String(raw.outcomeId||'').slice(0,160),sessionId:String(raw.sessionId||'').slice(0,120),policyId:String(raw.policyId||'').slice(0,120),evaluatedAt:String(raw.evaluatedAt||'').slice(0,40),policyMode:String(raw.policyMode||'').slice(0,30),targetSkill:String(raw.targetSkill||'').slice(0,80),primaryDomain:normalizePolicyDomain(raw.primaryDomain),completed:!!raw.completed,abandoned:!!raw.abandoned,planned:clamp(raw.planned,0,100),answered:clamp(raw.answered,0,100),completionRate:clamp(raw.completionRate,0,100),accuracy:raw.accuracy==null?null:clamp(raw.accuracy,0,100),targetAttempts:clamp(raw.targetAttempts,0,100),targetAccuracy:raw.targetAccuracy==null?null:clamp(raw.targetAccuracy,0,100),targetAdherence:clamp(raw.targetAdherence,0,100),medianResponseMs:raw.medianResponseMs==null?null:clamp(raw.medianResponseMs,0,300000),confidenceGap:raw.confidenceGap==null?null:clamp(raw.confidenceGap,0,100),masteryBefore:raw.masteryBefore==null?null:clamp(raw.masteryBefore,0,100),masteryAfter:raw.masteryAfter==null?null:clamp(raw.masteryAfter,0,100),masteryDelta:raw.masteryDelta==null?null:Math.max(-100,Math.min(100,Number(raw.masteryDelta)||0)),baselineTargetAccuracy:raw.baselineTargetAccuracy==null?null:clamp(raw.baselineTargetAccuracy,0,100),accuracyDelta:raw.accuracyDelta==null?null:Math.max(-100,Math.min(100,Number(raw.accuracyDelta)||0)),score:clamp(raw.score,0,100),status:raw.status,recommendation:raw.recommendation,privacy:{rawAnswersIncluded:false,rawHistoryIncluded:false}}
+function sanitizePolicyOutcome(raw){if(!raw||raw.schema!==POLICY_OUTCOME_SCHEMA)return null;const statuses=new Set(['positive','mixed','negative','insufficient']),recs=new Set(['keep_or_progress','adjust','reduce_load','collect_more_evidence']);if(!statuses.has(raw.status)||!recs.has(raw.recommendation))return null;const clamp=(v,min,max)=>Math.max(min,Math.min(max,Number(v)||0));return{schema:POLICY_OUTCOME_SCHEMA,outcomeId:String(raw.outcomeId||'').slice(0,160),sessionId:String(raw.sessionId||'').slice(0,120),policyId:String(raw.policyId||'').slice(0,120),evaluatedAt:String(raw.evaluatedAt||'').slice(0,40),policyMode:String(raw.policyMode||'').slice(0,30),targetSkill:String(raw.targetSkill||'').slice(0,80),primaryDomain:normalizePolicyDomain(raw.primaryDomain),completed:!!raw.completed,abandoned:!!raw.abandoned,planned:clamp(raw.planned,0,100),answered:clamp(raw.answered,0,100),completionRate:clamp(raw.completionRate,0,100),accuracy:raw.accuracy==null?null:clamp(raw.accuracy,0,100),targetAttempts:clamp(raw.targetAttempts,0,100),targetAccuracy:raw.targetAccuracy==null?null:clamp(raw.targetAccuracy,0,100),targetAdherence:clamp(raw.targetAdherence,0,100),medianResponseMs:raw.medianResponseMs==null?null:clamp(raw.medianResponseMs,0,300000),confidenceGap:raw.confidenceGap==null?null:clamp(raw.confidenceGap,0,100),masteryBefore:raw.masteryBefore==null?null:clamp(raw.masteryBefore,0,100),masteryAfter:raw.masteryAfter==null?null:clamp(raw.masteryAfter,0,100),masteryDelta:raw.masteryDelta==null?null:Math.max(-100,Math.min(100,Number(raw.masteryDelta)||0)),baselineTargetAccuracy:raw.baselineTargetAccuracy==null?null:clamp(raw.baselineTargetAccuracy,0,100),accuracyDelta:raw.accuracyDelta==null?null:Math.max(-100,Math.min(100,Number(raw.accuracyDelta)||0)),score:clamp(raw.score,0,100),status:raw.status,recommendation:raw.recommendation,...(raw.evidence&&typeof raw.evidence==='object'&&(raw.evidence.state==='collecting'||raw.evidence.state==='judged')?{evidence:{state:raw.evidence.state,n:clamp(raw.evidence.n,0,1000),needed:Math.max(1,clamp(raw.evidence.needed,0,100)),basis:['window','short','behavior','descriptive','verdict'].includes(raw.evidence.basis)?raw.evidence.basis:'window'}}:{}),privacy:{rawAnswersIncluded:false,rawHistoryIncluded:false}}
 }
 function recordPolicyOutcomeFromSession(session,now=Date.now()){const outcome=evaluatePolicyOutcome(session,now);if(!outcome)return null;const clean=sanitizePolicyOutcome(outcome);if(!clean)return null;const previous=(state.policyOutcomeMeta?.history||[]).filter(x=>x?.outcomeId!==clean.outcomeId&&(!clean.sessionId||x?.sessionId!==clean.sessionId));state.policyOutcomeMeta={last:clean,history:[...previous,clean].slice(-POLICY_OUTCOME_LOG_LIMIT),queue:Array.isArray(state.policyOutcomeMeta?.queue)?state.policyOutcomeMeta.queue.slice(-10):[]};/* m025-374: selfTune dievaluasi setiap kali outcome dicatat. */try{selfTuneAfterOutcome(clean,now)}catch{/* fail-quiet */}return clean}
 function backfillPolicyOutcomes(now=Date.now()){const sessions=(state.sessionHistory||[]).slice(-30),existing=new Set((state.policyOutcomeMeta?.history||[]).map(x=>String(x?.sessionId||'')).filter(Boolean));let added=0;for(const session of sessions){const sid=String(session?.id||'');if(!session?.policyId||!sid||existing.has(sid))continue;const at=Date.parse(session?.at||'')||now,outcome=recordPolicyOutcomeFromSession(session,at);if(!outcome)continue;existing.add(sid);const q=(state.policyOutcomeMeta?.queue||[]).filter(x=>x?.outcomeId!==outcome.outcomeId&&x?.sessionId!==sid);state.policyOutcomeMeta.queue=[...q,outcome].slice(-10);added++}if(added){save();if(CORE_WORKER_URL)setTimeout(()=>flushPolicyOutcomeQueue(),0)}return added}
@@ -3042,46 +3074,82 @@ function queuePolicyOutcomeSync(outcome){const clean=sanitizePolicyOutcome(outco
  * FAIL-QUIET: modul absen, state korup, atau exception = perilaku identik sebelum m025-374.
  * Tidak ada satu pun jalur yang membuat aplikasi berperilaku berbeda saat modul tidak ada. */
 const SELF_TUNE_KEY='fiezel-self-tune-v1';
+/* Audit braincore 2026-09-26: FiezelDecisionTrace (features/learner-flow/fiezel-decision-trace.js)
+ * menulis dua kunci SENDIRI - rantai keputusan per jawaban dan parameter hidup yang ia setel
+ * (difficulty.targetSuccess, dibaca affectTargetSuccess). Karena yang menulis modulnya, bukan
+ * app.js, gerbang reset R2 tidak pernah melihatnya: murid yang mereset progres mewarisi
+ * targetSuccess hasil setelan murid sebelumnya. Literalnya dikunci ke konstanta modul oleh
+ * tests/reset-side-state-test.js (R5). */
+const DECISION_TRACE_KEY='fiezel-decision-trace-v2',LIVE_PARAMS_KEY='fiezel-live-params-v1';
 function selfTuneAvailable(){return !!(self.FiezelSelfTune&&typeof self.FiezelSelfTune.propose==='function')}
 function paramLedgerAvailable(){return !!(self.FiezelParamLedger&&typeof self.FiezelParamLedger.append==='function')}
 function brainConfigAvailable(){return !!(self.FiezelBrainConfig&&typeof self.FiezelBrainConfig.resolve==='function')}
-function loadSelfTuneState(){try{const raw=localStorage.getItem(SELF_TUNE_KEY);return raw?JSON.parse(raw):null}catch{return null}}
-function saveSelfTuneState(st){try{localStorage.setItem(SELF_TUNE_KEY,JSON.stringify(st))}catch{}}
-function selfTuneAfterOutcome(outcome,now=Date.now()){
-  if(!selfTuneAvailable())return null;
+/* m025-376 (A3): state penyetel kini MENGUBAH pemilihan soal, jadi ia milik SATU murid dan
+   SATU bahasa - disimpan lewat sideStateKey seperti BKT dan ledger miskonsepsi. Kunci datar
+   lama hanya berisi jalur propose() yang tidak pernah bergerak, dan ikut dihapus reset. */
+function loadSelfTuneState(){try{const raw=localStorage.getItem(sideStateKey(SELF_TUNE_KEY));return raw?JSON.parse(raw):null}catch{return null}}
+function saveSelfTuneState(st){try{localStorage.setItem(sideStateKey(SELF_TUNE_KEY),JSON.stringify(st))}catch{}}
+function nof1Available(){return !!(self.FiezelNof1&&typeof self.FiezelNof1.assign==='function')}
+/** Lengan retensi percobaan: hasil probe 3/7/21 hari pada lesson yang DIKUASAI sesudah
+ *  percobaan dimulai, dibagi per lesson lewat FiezelNof1.assign. Brier ikut dihitung per
+ *  lengan untuk penjaga prediksi. */
+function selfTuneRetentionArms(exp,now=Date.now()){
+  const arms={control:{n:0,ok:0,brier:0},candidate:{n:0,ok:0,brier:0}};
+  if(!exp||!nof1Available())return arms;
   try{
-    const st=loadSelfTuneState()||{};
-    // Sesi dihitung untuk cooldown: setiap outcome yang bukan 'insufficient' = satu sesi.
-    if(outcome&&outcome.status!=='insufficient')st.sessionsSinceChange=(st.sessionsSinceChange||0)+1;
-    // Config efektif: BOUNDS + sanitize menjaga invarian.
-    const config=brainConfigAvailable()?self.FiezelBrainConfig.resolve(st.configOverrides||{},now):null;
-    if(!config){saveSelfTuneState(st);return null}
-    // Verdict dari outcome terakhir — selfTune butuh ini untuk memutuskan.
-    const verdict=outcome?.verdict||null;
-    const proposal=self.FiezelSelfTune.propose(st,{config:config.effective||config,verdict},now);
-    if(!proposal||proposal.decision==='hold'){saveSelfTuneState(st);return proposal}
-    // APPLY atau ROLLBACK: catat di param ledger, perbarui state.
-    if(paramLedgerAvailable()){
-      const entry={event:proposal.decision==='apply'?'param_applied':'param_rolled_back',path:proposal.change?.path,from:proposal.change?.from,to:proposal.change?.to,rationale:proposal.rationale,at:new Date(now).toISOString()};
-      st.ledger=self.FiezelParamLedger.append(st.ledger||self.FiezelParamLedger.genesis(now),entry,now).chain||st.ledger;
+    const st=retentionProbeRead();if(!st?.probes)return arms;
+    for(const r of retentionProbeResults(st,now)){
+      if(!(Number(r.masteredAt)>=Number(exp.startedAt)))continue;
+      const arm=self.FiezelNof1.assign(String(r.lesson),String(exp.id));
+      if(!arms[arm])continue;
+      arms[arm].n++;if(r.correct)arms[arm].ok++;arms[arm].brier+=Math.pow(Number(r.predicted)-(r.correct?1:0),2);
     }
-    if(proposal.decision==='apply'){
-      st.activeChange=proposal.change;st.sessionsSinceChange=0;
-      st.configOverrides=st.configOverrides||{};
-      // Terapkan: tulis ke overrides yang akan dibaca resolve() berikutnya.
-      const parts=String(proposal.change.path).split('.');
-      let cur=st.configOverrides;for(let i=0;i<parts.length-1;i++){cur[parts[i]]=cur[parts[i]]||{};cur=cur[parts[i]]}
-      cur[parts[parts.length-1]]=proposal.change.to;
-    }else if(proposal.decision==='rollback'){
-      // Rollback: hapus override yang di-rollback.
-      st.activeChange=null;
-      if(st.configOverrides&&proposal.change){
-        const parts=String(proposal.change.path).split('.');
-        let cur=st.configOverrides;for(let i=0;i<parts.length-1;i++){if(!cur[parts[i]])break;cur=cur[parts[i]]}
-        if(cur)delete cur[parts[parts.length-1]];
+  }catch{}
+  return arms;
+}
+/** targetSuccess dasar untuk sebuah lesson: nilai berlaku, atau nilai kandidat bila lesson itu
+ *  jatuh ke lengan kandidat percobaan yang sedang berjalan. Selalu di dalam batas TUNABLE. */
+function selfTuneTargetFor(lesson){
+  const T=self.FiezelSelfTune;
+  if(!T||typeof T.baselineOf!=='function')return .80;
+  try{
+    const st=loadSelfTuneState()||{},path=T.EXPERIMENT_PATH||'difficulty.targetSuccess',base=T.baselineOf(st,path),e=st.experiment;
+    if(e&&e.path===path&&lesson&&nof1Available()&&self.FiezelNof1.assign(String(lesson),String(e.id))==='candidate'){
+      const spec=T.TUNABLE?.[path],c=Number(e.candidate);
+      if(spec&&Number.isFinite(c))return Math.min(spec.max,Math.max(spec.min,c));
+    }
+    return base;
+  }catch{return .80}
+}
+/* m025-376 (A3, keputusan OWNER 2026-09-27): jalur yang disambung adalah
+   FiezelSelfTune.experiment(), BUKAN propose(). Ukurannya retensi tertunda per lengan
+   (selfTuneRetentionArms), diputus FiezelPolicyVerdict dengan margin menurut arah: arah sulit
+   non-inferioritas, arah mudah superioritas. Setiap mulai/terima/tolak/kadaluwarsa dicatat di
+   FiezelParamLedger. Fail-quiet: modul absen/state rusak = perilaku bawaan 0.80. */
+function selfTuneAfterOutcome(outcome,now=Date.now()){
+  const T=self.FiezelSelfTune;
+  if(!T||typeof T.experiment!=='function')return null;
+  try{
+    const st=loadSelfTuneState()||{},exp=st.experiment||null;
+    let verdict=null,brier=null;
+    if(exp&&policyVerdictAvailable()){
+      const a=selfTuneRetentionArms(exp,now);
+      if(a.control.n&&a.candidate.n){
+        try{verdict=self.FiezelPolicyVerdict.verdict({control:{n:a.control.n,ok:a.control.ok},candidate:{n:a.candidate.n,ok:a.candidate.ok},margin:T.marginFor(exp.direction)})}catch{verdict=null}
+        brier={control:a.control.brier/a.control.n,candidate:a.candidate.brier/a.candidate.n};
       }
     }
-    saveSelfTuneState(st);save();return proposal;
+    const res=T.experiment(st,{verdict,brier},now);
+    if(!res||!res.state)return null;
+    const next=res.state;
+    if(res.decision!=='hold'&&res.change&&paramLedgerAvailable()){
+      const L=self.FiezelParamLedger,event=res.decision==='start'?'experiment_started':res.decision==='promote'?'param_applied':'param_rolled_back';
+      const evidence=verdict?{verdict:verdict.decision,n:verdict.n||null,ci:verdict.ci||null}:null;
+      next.ledger=L.append(st.ledger||L.genesis(now),{event,path:res.change.path,from:res.change.from,to:res.change.to,reason:res.rationale,evidence},now);
+      if(res.decision!=='start')next.ledger=L.append(next.ledger,{event:'experiment_ended',path:res.change.path,from:null,to:null,reason:res.decision},now);
+    }
+    saveSelfTuneState(next);
+    return res;
   }catch{return null}
 }
 /* ---- m025-201 Kapasitas kode rasional yang tidak melaparkan lapisan otak -------------
@@ -3125,7 +3193,10 @@ function policyEffectiveness(outcomes){
   const rows=(Array.isArray(outcomes)?outcomes:[]).filter(Boolean);
   const counts={positive:0,mixed:0,negative:0,insufficient:0};
   for(const o of rows)if(counts[o.status]!=null)counts[o.status]++;
-  const scored=rows.filter(o=>o.status!=='insufficient'&&Number.isFinite(Number(o.score)));
+  /* m025-375: sesi penuh yang statusnya 'insufficient' karena jendela buktinya belum cukup
+     (evidence.basis 'window') tetap sesi yang utuh - skornya ikut tren. Yang dikecualikan
+     tetap hanya sesi pendek/terputus. */
+  const scored=rows.filter(o=>(o.status!=='insufficient'||o.evidence?.basis==='window')&&Number.isFinite(Number(o.score)));
   const base={schema:POLICY_EFFECTIVENESS_SCHEMA,sampled:rows.length,scored:scored.length,positive:counts.positive,mixed:counts.mixed,negative:counts.negative,insufficient:counts.insufficient,meanScore:null,earlyScore:null,lateScore:null,delta:null,trend:'unknown',confidence:0};
   if(scored.length<POLICY_TREND_MIN_SAMPLE)return base;
   const round1=n=>Math.round(n*10)/10,mean=list=>round1(list.reduce((n,o)=>n+Number(o.score),0)/list.length);
@@ -3164,7 +3235,7 @@ function deriveAdaptivePolicy(input={}){
      beban berat tidak berubah satu angka pun). Kalau highRiskCount tidak ada (bukti lama),
      nilainya null dan seluruh blok ini dilewati: perilaku lama utuh. */
   if(mode==='review'&&highRiskCount!=null&&sessionSize>0)reviewShare=Math.max(.35,Math.min(.65,Math.round((riskyReviews/sessionSize)*100)/100));
-  const rationaleCodes=[];if(dueReviews)rationaleCodes.push('due_reviews');if(maxRisk>=60)rationaleCodes.push('forgetting_risk');if(weak&&weak.errorRate>=40)rationaleCodes.push('weak_skill');if(weak&&weak.recurringErrors>=2)rationaleCodes.push('recurring_error');if(abandonment>=25)rationaleCodes.push('abandonment_risk');if(consistency<30)rationaleCodes.push('consistency_risk');if(confidenceCheck)rationaleCodes.push('confidence_gap');if(medianResponse>=16000)rationaleCodes.push('calm_pacing');if(highRiskCount!=null&&riskyReviews>=5)rationaleCodes.push('memory_high_risk_load');if(highRiskCount!=null&&dueReviews>=8&&riskyReviews<=2)rationaleCodes.push('due_backlog_low_risk');const relevantOutcomes=outcomes.filter(o=>(targetSkill&&o.targetSkill===targetSkill)||(!targetSkill&&o.primaryDomain===primaryDomain)),latestOutcome=relevantOutcomes.at(-1)||outcomes.at(-1)||null,positiveRun=relevantOutcomes.slice(-2).length===2&&relevantOutcomes.slice(-2).every(o=>o.status==='positive');if(latestOutcome?.status==='negative'){sessionSize=Math.max(5,Math.min(sessionSize,Math.round(sessionSize*.75)));targetDifficulty=Math.max(1,targetDifficulty-1);difficultyLowered=true;pace='calm';avoidNewContent=true;rationaleCodes.push('recent_policy_outcome_negative')}else if(latestOutcome?.status==='mixed'){sessionSize=Math.max(5,Math.min(sessionSize,10));rationaleCodes.push('recent_policy_outcome_mixed')}else if(positiveRun&&mode==='balance'){targetDifficulty=Math.min(6,targetDifficulty+1);avoidNewContent=false;rationaleCodes.push('recent_policy_outcome_positive')}if(!rationaleCodes.length)rationaleCodes.push('balanced_progression');
+  const rationaleCodes=[];if(dueReviews)rationaleCodes.push('due_reviews');if(maxRisk>=60)rationaleCodes.push('forgetting_risk');if(weak&&weak.errorRate>=40)rationaleCodes.push('weak_skill');if(weak&&weak.recurringErrors>=2)rationaleCodes.push('recurring_error');if(abandonment>=25)rationaleCodes.push('abandonment_risk');if(consistency<30)rationaleCodes.push('consistency_risk');if(confidenceCheck)rationaleCodes.push('confidence_gap');if(medianResponse>=16000)rationaleCodes.push('calm_pacing');if(highRiskCount!=null&&riskyReviews>=5)rationaleCodes.push('memory_high_risk_load');if(highRiskCount!=null&&dueReviews>=8&&riskyReviews<=2)rationaleCodes.push('due_backlog_low_risk');const relevantOutcomes=outcomes.filter(o=>(targetSkill&&o.targetSkill===targetSkill)||(!targetSkill&&o.primaryDomain===primaryDomain)),/* m025-375: outcome yang masih mengumpulkan bukti (collect_more_evidence) belum MENILAI apa pun - kebijakan tetap bertindak atas penilaian terakhir, dan dua penilaian positif beruntun dihitung di antara penilaian saja. */judgedOutcomes=relevantOutcomes.filter(o=>o.recommendation!=='collect_more_evidence'),latestOutcome=judgedOutcomes.at(-1)||outcomes.filter(o=>o.recommendation!=='collect_more_evidence').at(-1)||null,positiveRun=judgedOutcomes.slice(-2).length===2&&judgedOutcomes.slice(-2).every(o=>o.status==='positive');if(latestOutcome?.status==='negative'){sessionSize=Math.max(5,Math.min(sessionSize,Math.round(sessionSize*.75)));targetDifficulty=Math.max(1,targetDifficulty-1);difficultyLowered=true;pace='calm';avoidNewContent=true;rationaleCodes.push('recent_policy_outcome_negative')}else if(latestOutcome?.status==='mixed'){sessionSize=Math.max(5,Math.min(sessionSize,10));rationaleCodes.push('recent_policy_outcome_mixed')}else if(positiveRun&&mode==='balance'){targetDifficulty=Math.min(6,targetDifficulty+1);avoidNewContent=false;rationaleCodes.push('recent_policy_outcome_positive')}if(!rationaleCodes.length)rationaleCodes.push('balanced_progression');
   /* m025-201 (celah 5): SEPULUH hasil kebijakan tersimpan, satu yang dibaca. Blok di atas
      hanya melihat hasil TERAKHIR (plus runtun dua positif); sisanya dibuang. Di sini seluruh
      riwayat yang relevan dinilai sebagai TREN - jawaban atas pertanyaan yang paling ingin
@@ -3574,8 +3645,12 @@ function bktMasteredSkills(bktState=bktRead()){
      semua kegagalan) membuat baris ini tidak berpengaruh sama sekali - perilakunya identik
      dengan sebelum kewenangan kalibrasi ada. Arahnya satu: hanya menambah tuntutan. */
   const bump=brierEvidenceBump();
+  /* m025-375 (audit B6): update() kini meluruhkan L sebelum melangkah, jadi L tersimpan bisa
+     turun di bawah gerbang setelah jeda panjang. Pembukaan lesson harus AWET (BKT hanya membuka,
+     tidak pernah mengunci): yang dibaca di sini "pernah lolos gerbang", bukan L hari ini. */
+  const lolos=typeof B.gateEverPassed==='function'?(st,k)=>B.gateEverPassed(st,k):(st,k)=>B.masteryGate(st,k);
   for(const skill in bktState.lessons){try{
-    if(!B.masteryGate(bktState,skill))continue;
+    if(!lolos(bktState,skill))continue;
     if(bump>0){const m=B.mastery(bktState,skill);if(!(Number(m?.n)>=Number(B.GATE?.minN||0)+bump))continue}
     out.add(skill)
   }catch{}}
@@ -3733,7 +3808,7 @@ function retentionProbeResults(st,now=Date.now()){
       if(!Number.isFinite(due)||due>now)continue;
       const hit=rows.find(h=>String(h.skill||'')===lesson&&Number(h.at)>=due);
       if(!hit)continue;
-      out.push({lesson,predicted:Math.max(0,Math.min(1,Number(hit.predicted))),correct:hit.ok===true});
+      out.push({lesson,predicted:Math.max(0,Math.min(1,Number(hit.predicted))),correct:hit.ok===true,masteredAt:Number(probes[lesson]?.masteredAt)||0});
     }
   }
   return out;
@@ -4073,14 +4148,15 @@ function affectObserve(q,ok,ms,timing){
     return res||null;
   }catch{return null}
 }
+/* OWNER 2026-09-26 (m025-375): base TIDAK lagi dibaca dari parameter hidup FiezelDecisionTrace,
+   yang digeser naik oleh penyetel tanpa pagar sampai 0.90 - murid terkunci di soal mudah (audit
+   braincore A1). Satu-satunya yang boleh menggeser base adalah penyetel resmi berpagar yang
+   diukur retensi (A3, m025-376); afek sesi di bawah hanya bergeser sementara, tidak disimpan. */
 function affectTargetSuccess(){
-  let base = .80;
-  try{
-    if(self.FiezelDecisionTrace&&typeof self.FiezelDecisionTrace.readParams==='function'){
-      const live=self.FiezelDecisionTrace.readParams();
-      if(live&&typeof live['difficulty.targetSuccess']==='number')base=live['difficulty.targetSuccess'];
-    }
-  }catch(_){}
+  /* m025-376 (A3): base dari penyetel resmi yang diukur RETENSI (selfTuneTargetFor), per lesson
+     sasaran sesi - bawaan 0.80 selama belum ada percobaan yang diterima. Tetap TIDAK membaca
+     FiezelDecisionTrace (A1). */
+  const base=selfTuneTargetFor(String(state.activeSession?.targetSkill||''));
   try{
     const st=affectSessionSync();
     if(st.state==='frustrated')return Math.min(0.90, base + 0.10);
@@ -4771,7 +4847,8 @@ function applyCoreBrain(policy,now=Date.now()){
   }catch{return policy}
 }
 window.__fiezelCoreBrainSnapshot=()=>coreBrainSnapshot();
-function buildAdaptivePolicy(now=Date.now()){return applyCoreBrain(deriveAdaptivePolicy({snapshot:buildLearningSnapshot(),evidence:remoteLearnerEvidenceSnapshot(now),outcomes:recentPolicyOutcomes(5),now}),now)}
+/* m025-375: 10, bukan 5 - satu jendela bukti bisa memakan 3-4 sesi, dan penilaian terakhir tidak boleh jatuh keluar dari yang dibaca kebijakan. */
+function buildAdaptivePolicy(now=Date.now()){return applyCoreBrain(deriveAdaptivePolicy({snapshot:buildLearningSnapshot(),evidence:remoteLearnerEvidenceSnapshot(now),outcomes:recentPolicyOutcomes(10),now}),now)}
 function adaptivePolicyRequestPayload(now=Date.now()){const s=buildLearningSnapshot();return{snapshot:{activeLevel:s.activeLevel||getActiveLevel(),adaptiveReady:!!s.adaptiveReady,totalAttempts:s.totalAttempts||0,estimatedLevel:s.estimatedLevel||'A1',dueReviews:s.dueReviews||0,domains:s.domains,weakSkills:(s.weakSkills||[]).slice(0,3)},evidence:remoteLearnerEvidenceSnapshot(now),outcomes:recentPolicyOutcomes(10),brain:coreBrainDigest(now)}}
 function sanitizeAdaptivePolicy(raw,fallback){if(!raw||raw.schema!==ADAPTIVE_POLICY_SCHEMA)return fallback;const modes=new Set(['diagnostic','recovery','review','repair','balance']),domains=new Set(['vocabulary','grammar','reading']),bands=new Set(['foundation','standard','stretch']),paces=new Set(['calm','normal']);if(!modes.has(raw.mode)||!domains.has(raw.primaryDomain)||!bands.has(raw.difficultyBand)||!paces.has(raw.pace))return fallback;return{schema:ADAPTIVE_POLICY_SCHEMA,policyId:String(raw.policyId||fallback.policyId).slice(0,120),generatedAt:String(raw.generatedAt||new Date().toISOString()).slice(0,40),mode:raw.mode,title:String(raw.title||fallback.title).slice(0,120),summary:String(raw.summary||fallback.summary).slice(0,360),cta:String(raw.cta||fallback.cta).slice(0,80),sessionSize:Math.round(adaptivePolicyClamp(raw.sessionSize,5,16)),estimatedMinutes:Math.round(adaptivePolicyClamp(raw.estimatedMinutes,5,30)),primaryDomain:raw.primaryDomain,secondaryDomain:domains.has(raw.secondaryDomain)?raw.secondaryDomain:fallback.secondaryDomain,targetSkill:String(raw.targetSkill||'').slice(0,80),targetDifficulty:Math.round(adaptivePolicyClamp(raw.targetDifficulty,1,6)),difficultyBand:raw.difficultyBand,reviewShare:adaptivePolicyClamp(raw.reviewShare,0,1),pace:raw.pace,confidenceCheck:!!raw.confidenceCheck,avoidNewContent:!!raw.avoidNewContent,domainMix:{primary:55,secondary:25,other:20},rationaleCodes:Array.isArray(raw.rationaleCodes)?capRationaleCodes(raw.rationaleCodes):fallback.rationaleCodes,policyEffectiveness:sanitizePolicyEffectiveness(raw.policyEffectiveness)||fallback.policyEffectiveness||null,brainSource:['client-digest','server-mirror','none'].includes(String(raw.brainSource))?String(raw.brainSource):'none',steps:Array.isArray(raw.steps)?raw.steps.slice(0,4).map(x=>String(x).slice(0,180)):fallback.steps,outcomeContext:raw.outcomeContext&&typeof raw.outcomeContext==='object'?{status:String(raw.outcomeContext.status||'').slice(0,20),score:adaptivePolicyClamp(raw.outcomeContext.score,0,100),recommendation:String(raw.outcomeContext.recommendation||'').slice(0,40),policyId:String(raw.outcomeContext.policyId||'').slice(0,120)}:null,source:String(raw.source||'core-worker').slice(0,40)}}
 // m025-117: kebijakan dari Core Worker tetap lewat sanitizeAdaptivePolicy (yang memang
@@ -8249,6 +8326,53 @@ function dailySessionDone(target){
     return (Number(d.attempts)||0)>=perlu;
   }catch(_){return false}
 }
+/* m025-375 (OWNER 2026-09-26): "kalau data belum cukup, tunggu kumpul beberapa sesi dulu baru
+   dinilai, tapi ada panel pemberitahuan di Home, jadi murid tahu harus mengerjakan lebih banyak
+   lagi - karena kalau tidak ada pemberitahuan, murid tidak akan melanjutkannya lagi."
+   Sumbernya jendela bukti outcome terakhir (policyEvidenceArms / evaluatePolicyOutcome): selama
+   jendela itu masih 'collecting', murid melihat berapa jawaban lagi yang dibutuhkan di materi
+   yang sama. Begitu penilaian keluar (jendela 'judged'), panelnya hilang sendiri. */
+function policyEvidenceProgress(){
+  const last=(state.policyOutcomeMeta?.history||[]).at(-1),ev=last?.evidence;
+  if(!ev||ev.state!=='collecting')return null;
+  const needed=Math.max(1,Math.round(Number(ev.needed)||policyEvidenceMin())),n=Math.max(0,Math.min(needed,Math.round(Number(ev.n)||0)));
+  if(n>=needed)return null;
+  return{n,needed,remaining:needed-n,skill:String(last.targetSkill||''),domain:normalizePolicyDomain(last.primaryDomain)}
+}
+function evidenceProgressPanelMarkup(){
+  if(jaCourseOn())return '';
+  let p=null;try{p=policyEvidenceProgress()}catch(_){p=null}
+  if(!p)return '';
+  const domainLabel={vocabulary:'skill.vocab',grammar:'skill.grammar',reading:'skill.reading'}[p.domain];
+  const materi=p.skill?friendlySkillName(p.skill):(domainLabel?FiezelI18n.t(domainLabel):'');
+  const pct=Math.round(p.n/p.needed*100);
+  return `<section class="fz-evidence-panel" aria-label="${esc(FiezelI18n.t('home.bukti-aria'))}">
+    <div class="fz-evidence-head"><i class="fz-i" data-fz-icon="paw" aria-hidden="true" style="width:16px;height:16px"></i><b>${esc(FiezelI18n.t('home.bukti-judul'))}</b></div>
+    ${materi?`<p class="fz-evidence-materi">${esc(FiezelI18n.t('home.bukti-materi',{materi}))}</p>`:''}
+    <p class="fz-evidence-body">${esc(FiezelI18n.t('home.bukti-isi',{sisa:p.remaining}))}</p>
+    <div class="fz-evidence-track" role="progressbar" aria-valuemin="0" aria-valuemax="${p.needed}" aria-valuenow="${p.n}"><div class="fz-evidence-fill" style="width:${pct}%"></div></div>
+    <div class="fz-evidence-foot"><span>${esc(FiezelI18n.t('home.bukti-hitung',{n:p.n,target:p.needed}))}</span><button type="button" class="fz-evidence-cta" onclick="startAdaptive()">${esc(FiezelI18n.t('home.bukti-cta'))}</button></div>
+  </section>`
+}
+/* Audit UI/UX Home 2026-09-27: angka kartu Home dihitung dari state, bukan ditulis tangan. */
+const HOME_WEEK_MIN=10;
+/** Akurasi 7 hari terakhir vs 7 hari sebelumnya (poin persen). null bila salah satu jendela di
+ *  bawah HOME_WEEK_MIN jawaban - perbandingan dua segelintir jawaban hanyalah derau. */
+function homeWeekStats(now=Date.now()){
+  const D=86400000,cur={n:0,ok:0},prev={n:0,ok:0};
+  for(const h of (state.history||[])){const at=Number(h?.at)||0;if(!at)continue;const age=now-at;
+    if(age>=0&&age<7*D){cur.n++;if(h.ok)cur.ok++}else if(age>=7*D&&age<14*D){prev.n++;if(h.ok)prev.ok++}}
+  const acc=x=>x.n?Math.round(x.ok/x.n*100):null;
+  const accuracy=cur.n>=HOME_WEEK_MIN?acc(cur):null;
+  const delta=accuracy!=null&&prev.n>=HOME_WEEK_MIN?accuracy-acc(prev):null;
+  return{answers:cur.n,accuracy,delta}
+}
+/** Kosakata level aktif: yang sudah pernah dilatih, dan yang jatuh tempo diulang sekarang. */
+function homeVocabStats(now=Date.now()){
+  const level=getActiveLevel();let practised=0,due=0;
+  for(const [key,x] of Object.entries(state.vocab||{})){if(!x?.total||contentLevelFor('vocab',key)!==level)continue;practised++;if(x.nextReview&&x.nextReview<=now)due++}
+  return{practised,due}
+}
 function todayHomeMarkup(){
   const trust=levelTrustState(state),locked=trust.locked===true;
   const examLevel=nextVerifiableLevel(state)||verifiedLevel(state);
@@ -8385,52 +8509,47 @@ function todayHomeMarkup(){
     ? self.FiezelSplash.wordmarkMarkup('fzhm')
     : '<span class="fz-home-wordmark-text">FIEZEL</span>';
 
-  /* Sapaan ramah personal & kata penyemangat harian */
+  /* ---- Audit UI/UX Home 2026-09-27 (m025-376) -------------------------------------------
+     Sapaan, tiga kartu, dan angkanya dulu ditulis langsung di sini sebagai ternary id/th, dan
+     sebagian angkanya REKAAN: "+15% akurasi", "meningkat konsisten", "{level} -> A2", runtun
+     `|| 1`, "+50 XP"/"+30 XP" (FIEZEL tidak punya XP), "05:00", dan sapaan "Hi Fitra!" untuk
+     murid tanpa nama. Murid baru yang belum menjawab satu soal pun membaca bahwa akurasinya
+     naik 15%. Sekarang: semua teks lewat FiezelI18n (copy-*-redesign.js, id + th), semua angka
+     dihitung dari state (homeWeekStats / homeVocabStats), dan yang belum bisa dihitung tampil
+     jujur sebagai "belum cukup data". */
   const isTh = (typeof FiezelI18n !== 'undefined' && FiezelI18n && FiezelI18n.getLocale && FiezelI18n.getLocale() === 'th');
-  const currentLearner = (state?.userName && !/^(Murid|Belajar|Budi)$/i.test(state.userName)) ? state.userName : 'Fitra';
-  const getGreetingMessages = (nama) => isTh ? [
-    `หายไปไหนมา คิดถึงจัง! มาฝึกกันต่อเพื่อรักษาจังหวะการเรียนรู้นะ 🔥`,
-    `ถ้าไม่เริ่มเรียนตั้งแต่วันนี้ พรุ่งนี้จะยากขึ้นนะ สู้ต่อไป! 💪`,
-    `แค่ 10 นาทีวันนี้ ช่วยรักษาจังหวะการเรียนให้ยอดเยี่ยม อย่าเพิ่งผัดวันประกันพรุ่งนะ! 🚀`,
-    `ก้าวเล็ก ๆ ที่สม่ำเสมอในวันนี้ คือการก้าวกระโดดที่ยิ่งใหญ่ในวันพรุ่งนี้ ⭐`,
-    `คำศัพท์ใหม่ทุกคำที่คุณเรียนรู้ จะเปิดโอกาสใหม่ ๆ ในอนาคต สู้ ๆ นะ! 🌟`,
-    `การเดินทางนับพันไมล์เริ่มต้นจากก้าวเล็ก ๆ ก้าวแรกเสมอ เดินหน้าต่อไป! 🌸`
-  ] : [
-    `Kemana aja nih, kok baru kelihatan lagi! Yuk latihan sekarang biar ritmemu tetap terjaga. 🔥`,
-    `Kalau kamu ga belajar mulai dari sekarang, kamu akan susah di kemudian hari. Semangat terus! 💪`,
-    `10 menit latihan hari ini menjaga ritme belajarmu tetap prima. Jangan tunda lagi ya! 🚀`,
-    `Konsistensi kecil hari ini adalah lompatan besar esok hari. Let's do this! ⭐`,
-    `Setiap kata baru yang kamu kuasai membuka peluang baru di masa depan. Semangat! 🌟`,
-    `Perjalanan ribuan mil selalu dimulai dari satu langkah kecil hari ini. Terus melangkah! 🌸`
-  ];
-  const greetMessages = getGreetingMessages(currentLearner);
-  const dayIndex = Math.floor(Date.now() / 86400000) % greetMessages.length;
-  const currentMotivation = greetMessages[dayIndex];
+  const currentLearner = learnerName();
+  /* Motivasi: pesan "kemana aja" hanya untuk murid yang memang sudah >= 2 hari tidak berlatih;
+     selain itu berputar harian di antara pesan lainnya. */
+  const lastAt = (state.history || []).reduce((m, h) => Math.max(m, Number(h?.at) || 0), 0);
+  const kembali = lastAt > 0 && Date.now() - lastAt >= 2 * 86400000;
+  const motivasiKeys = ['home.motivasi-2', 'home.motivasi-3', 'home.motivasi-4', 'home.motivasi-5', 'home.motivasi-6'];
+  const currentMotivation = FiezelI18n.t(kembali ? 'home.motivasi-kembali' : motivasiKeys[Math.floor(Date.now() / 86400000) % motivasiKeys.length]);
 
   /* State apakah sudah pernah melakukan test level / placement */
   const hasTestedLevel = !!(state && (state.placementDone || (state.history && state.history.some(h => h.type === 'placement' || h.type === 'test'))));
-  const primaryBtnText = isTh
-    ? (hasTestedLevel ? 'เริ่มฝึกฝนทันที ➔' : 'เริ่มทำแบบทดสอบวัดระดับเลย ➔')
-    : (hasTestedLevel ? 'MULAI LATIHAN SEKARANG ➔' : 'MULAI LATIHAN TEST LEVEL SEKARANG ➔');
+  /* Label tombol kartu 1 = label aksi yang SAMA dengan tombol utama (ujian level saat terkunci,
+     "lanjutkan" saat sesi tertunda). Dulu teksnya selalu "Mulai latihan" walau tombolnya
+     membuka ujian level. */
+  const primaryBtnText = hasTestedLevel ? label : FiezelI18n.t('home.kartu1-cta-tes');
   const primaryBtnAction = hasTestedLevel
     ? (aksi || 'startAdaptive()')
     : "go('test')";
 
-  /* Format tanggal & waktu saat ini */
+  /* Tanggal & jam menurut locale murid (Intl), bukan tabel nama hari/bulan buatan tangan. */
   const nowObj = new Date();
-  const daysId = ['MINGGU', 'SENIN', 'SELASA', 'RABU', 'KAMIS', 'JUMAT', 'SABTU'];
-  const monthsId = ['JANUARI', 'FEBRUARI', 'MARET', 'APRIL', 'MEI', 'JUNI', 'JULI', 'AGUSTUS', 'SEPTEMBER', 'OKTOBER', 'NOVEMBER', 'DESEMBER'];
-  const daysTh = ['วันอาทิตย์', 'วันจันทร์', 'วันอังคาร', 'วันพุธ', 'วันพฤหัสบดี', 'วันศุกร์', 'วันเสาร์'];
-  const monthsTh = ['มกราคม', 'กุมภาพันธ์', 'มีนาคม', 'เมษายน', 'พฤษภาคม', 'มิถุนายน', 'กรกฎาคม', 'สิงหาคม', 'กันยายน', 'ตุลาคม', 'พฤศจิกายน', 'ธันวาคม'];
-  const dayName = isTh ? daysTh[nowObj.getDay()] : daysId[nowObj.getDay()];
-  const dateNum = nowObj.getDate();
-  const monthName = isTh ? monthsTh[nowObj.getMonth()] : monthsId[nowObj.getMonth()];
-  const formattedDate = `${dayName}, ${dateNum} ${monthName}`;
-  const formattedTime = `${nowObj.getHours()}:${String(nowObj.getMinutes()).padStart(2, '0')}`;
+  let formattedDate = '', formattedTime = '';
+  try {
+    const bcp = (FiezelI18n.getBcp47 && FiezelI18n.getBcp47()) || (isTh ? 'th-TH' : 'id-ID');
+    formattedDate = new Intl.DateTimeFormat(bcp, { weekday: 'long', day: 'numeric', month: 'long' }).format(nowObj);
+    formattedTime = new Intl.DateTimeFormat(bcp, { hour: 'numeric', minute: '2-digit' }).format(nowObj);
+  } catch (_) {
+    formattedDate = nowObj.toDateString();
+    formattedTime = `${nowObj.getHours()}:${String(nowObj.getMinutes()).padStart(2, '0')}`;
+  }
 
-  /* Header Sambutan: Hi Fitra! + Kata Penyemangat Harian (Tanpa Pills) */
   const homeTop = `<div class="fz-welcome-header">`
-    + `<div class="fz-greet-title">${isTh ? 'สวัสดี ' : 'Hi '}${esc(currentLearner)}! <span class="fz-wave-hand">👋</span></div>`
+    + `<div class="fz-greet-title">${esc(FiezelI18n.t('home.sapa', { nama: currentLearner }))} <span class="fz-wave-hand" aria-hidden="true">👋</span></div>`
     + `<p class="fz-greet-motivation">${esc(currentMotivation)}</p>`
     + `</div>`;
 
@@ -8453,14 +8572,21 @@ function todayHomeMarkup(){
           : { word: 'Accomplish', phonetic: '/əˈkʌm.plɪʃ/ • Verb', meaning: 'Meraih, menuntaskan, atau berhasil mencapai target.', example: 'You can accomplish anything with consistent practice.', exampleTranslation: 'Kamu bisa meraih apa saja dengan latihan yang konsisten.' });
   }
 
-  /* CARD 1: STADIUM CARD (Kuning Emas) - KOSAKATA HARIAN & MULAI LATIHAN (Zero Badges) */
+  const week = homeWeekStats();
+  const vocabStats = homeVocabStats();
+  const nextLevel = LEVELS[LEVELS.indexOf(todayLevel) + 1] || '';
+
+  /* Kartu tidak lagi ber-role=button: tombol di dalamnya adalah kontrol yang sebenarnya, dan
+     role=button yang membungkus tombol lain adalah kontrol bersarang (pembaca layar membaca
+     dua tombol untuk satu aksi, dan kartu tanpa onkeydown tidak bisa dipakai lewat keyboard).
+     Klik di mana pun pada kartu tetap berfungsi untuk tetikus/sentuh. */
+  /* CARD 1: kata hari ini + tombol latihan utama */
   const card1Hero = `
-    <div class="today-card fz-stadium-card fz-card-yellow" onclick="${primaryBtnAction}" role="button" tabindex="0">
-      <div class="fz-stadium-notch"></div>
+    <div class="today-card fz-stadium-card fz-card-yellow" onclick="${primaryBtnAction}">
       <div class="fz-stadium-header fz-stadium-vocab-header">
         <div class="fz-stadium-vocab-top">
-          <span class="fz-vocab-kicker-tag">${isTh ? '📖 คำศัพท์ประจำวัน' : '📖 KOSAKATA HARIAN'}</span>
-          <span class="fz-vocab-level-tag">${esc(jaCourseOn() ? 'JLPT N5' : ((isTh ? 'ระดับ ' : 'LEVEL ') + todayLevel))}</span>
+          <span class="fz-vocab-kicker-tag">${esc(FiezelI18n.t('home.kartu1-kicker'))}</span>
+          <span class="fz-vocab-level-tag">${esc(jaCourseOn() ? 'JLPT N5' : FiezelI18n.t('home.kartu-level', { level: todayLevel }))}</span>
         </div>
         <div class="fz-vocab-hero-content">
           <div class="fz-vocab-word-title">${esc(dailyWord.word)}</div>
@@ -8471,91 +8597,83 @@ function todayHomeMarkup(){
       </div>
       <div class="fz-stadium-body">
         <div class="fz-stadium-metrics-row">
-          <div class="fz-stadium-chip">${shape.soal || 10} ${isTh ? 'ข้อ' : 'SOAL'}</div>
+          <div class="fz-stadium-chip">${esc(FiezelI18n.t('home.kartu1-soal', { n: shape.soal || 10 }))}</div>
           <div class="fz-stadium-center-time">
-            <span class="fz-time-val">${formattedTime}</span>
-            <span class="fz-date-val">${formattedDate}</span>
+            <span class="fz-time-val">${esc(formattedTime)}</span>
+            <span class="fz-date-val">${esc(formattedDate)}</span>
           </div>
-          <div class="fz-stadium-chip is-xp">+50 XP</div>
+          <div class="fz-stadium-chip is-xp">${esc(FiezelI18n.t('home.kartu1-menit', { n: shape.menit || 5 }))}</div>
         </div>
         <button type="button" class="fz-stadium-cta-btn" onclick="event.stopPropagation();${primaryBtnAction}">
-          ${primaryBtnText}
+          ${esc(primaryBtnText)} <span aria-hidden="true">➔</span>
         </button>
-      </div>
-      <div class="fz-stadium-footer-notch">
-        <span>${jaCourseOn() ? '⛩️ ' : '⚡ '}${isTh ? 'แบบฝึกหัดถัดไป' : 'LATIHAN BERIKUTNYA'}</span>
-        <span class="fz-footer-caret">▾</span>
       </div>
     </div>`;
 
-  /* CARD 2: STADIUM CARD (Silver Gradient) - KOSA KATA HARIAN (FLASHCARD & REPETISI) (Zero Badges) */
+  /* CARD 2: kosakata berulang (SRS) — angka dari state.vocab level aktif */
   const card2Hero = `
-    <div class="fz-stadium-card fz-card-silver" onclick="go('vocab')" role="button" tabindex="0">
-      <div class="fz-stadium-notch"></div>
+    <div class="fz-stadium-card fz-card-silver" onclick="go('vocab')">
       <div class="fz-stadium-header is-silver fz-stadium-clean-header">
         <div class="fz-stadium-vocab-top">
-          <span class="fz-vocab-kicker-tag is-silver-tag">${isTh ? '📖 แฟลชการ์ด &amp; ทบทวนซ้ำ' : '📖 FLASHCARD &amp; REPETISI'}</span>
-          <span class="fz-vocab-level-tag is-silver-tag">${isTh ? 'ระบบจำ SRS' : 'SRS MEMORY'}</span>
+          <span class="fz-vocab-kicker-tag is-silver-tag">${esc(FiezelI18n.t('home.kartu2-kicker'))}</span>
+          <span class="fz-vocab-level-tag is-silver-tag">${esc(FiezelI18n.t('home.kartu-level', { level: todayLevel }))}</span>
         </div>
         <div class="fz-clean-header-content">
-          <div class="fz-clean-header-title">${isTh ? 'คำศัพท์ประจำวัน' : 'Kosa Kata Harian'}</div>
-          <div class="fz-clean-header-sub">${isTh ? '25 คำศัพท์พร้อมระบบเว้นระยะทบทวน (SRS) เพื่อจดจำได้ยาวนานยิ่งขึ้น' : '25 kosakata aktif dan pola kalimat dengan spaced repetition system agar tersimpan di memori permanen.'}</div>
+          <div class="fz-clean-header-title">${esc(FiezelI18n.t('home.kartu2-judul'))}</div>
+          <div class="fz-clean-header-sub">${esc(vocabStats.practised ? FiezelI18n.t('home.kartu2-isi', { n: vocabStats.practised, level: todayLevel }) : FiezelI18n.t('home.kartu2-isi-baru', { level: todayLevel }))}</div>
         </div>
       </div>
       <div class="fz-stadium-body">
         <div class="fz-stadium-metrics-row">
-          <div class="fz-stadium-chip">${isTh ? '25 คำ' : '25 KATA'}</div>
+          <div class="fz-stadium-chip">${esc(FiezelI18n.t('home.kartu2-kata', { n: vocabStats.practised }))}</div>
           <div class="fz-stadium-center-time">
-            <span class="fz-time-val">05:00</span>
-            <span class="fz-date-val">${isTh ? 'ระบบจำ SRS' : 'SRS MEMORY'}</span>
+            <span class="fz-time-val">${vocabStats.due}</span>
+            <span class="fz-date-val">${esc(FiezelI18n.t('home.kartu2-jatuh-tempo'))}</span>
           </div>
-          <div class="fz-stadium-chip is-xp">+30 XP</div>
         </div>
         <button type="button" class="fz-stadium-cta-btn is-silver-btn" onclick="event.stopPropagation();go('vocab')">
-          ${isTh ? 'เปิดคำศัพท์ประจำวัน ➔' : 'BUKA KOSA KATA HARIAN ➔'}
+          ${esc(FiezelI18n.t('home.kartu2-cta'))} <span aria-hidden="true">➔</span>
         </button>
-      </div>
-      <div class="fz-stadium-footer-notch">
-        <span>${isTh ? '📖 ทบทวนคำศัพท์' : '📖 REPETISI KOSA KATA'}</span>
-        <span class="fz-footer-caret">▾</span>
       </div>
     </div>`;
 
-  /* CARD 3: STADIUM CARD (Dark Obsidian) - KETERANGAN PENINGKATAN (Zero Badges) */
+  /* CARD 3: perkembangan minggu ini — akurasi 7 hari terakhir vs 7 hari sebelumnya.
+     Di bawah HOME_WEEK_MIN jawaban per jendela tidak ada angka perubahan: yang tampil adalah
+     ajakan jujur untuk mengumpulkan jawaban, bukan persentase karangan. */
+  const weekDelta = week.delta;
+  const weekTone = weekDelta == null ? 'kurang' : weekDelta >= 3 ? 'naik' : weekDelta <= -3 ? 'turun' : 'stabil';
+  /* Kunci literal, bukan disambung: gerbang kunci-hantu hanya bisa menjaga kunci yang tertulis utuh. */
+  const weekKey = { naik: 'home.kartu3-isi-naik', turun: 'home.kartu3-isi-turun', stabil: 'home.kartu3-isi-stabil', kurang: 'home.kartu3-isi-kurang' }[weekTone];
   const card3Hero = `
-    <div class="fz-stadium-card fz-card-dark" onclick="go('progress')" role="button" tabindex="0">
-      <div class="fz-stadium-notch"></div>
+    <div class="fz-stadium-card fz-card-dark" onclick="go('progress')">
       <div class="fz-stadium-header is-dark fz-stadium-clean-header">
         <div class="fz-stadium-vocab-top">
-          <span class="fz-vocab-kicker-tag is-dark-tag">${isTh ? '📊 พัฒนาการเรียนรู้' : '📊 PROGRES BELAJAR'}</span>
-          <span class="fz-vocab-level-tag is-dark-tag">${todayLevel} ➔ A2</span>
+          <span class="fz-vocab-kicker-tag is-dark-tag">${esc(FiezelI18n.t('home.kartu3-kicker'))}</span>
+          <span class="fz-vocab-level-tag is-dark-tag">${esc(nextLevel ? `${todayLevel} ➔ ${nextLevel}` : todayLevel)}</span>
         </div>
         <div class="fz-clean-header-content">
-          <div class="fz-clean-header-title">${isTh ? 'คำอธิบายพัฒนาการ' : 'Keterangan Peningkatan'}</div>
-          <div class="fz-clean-header-sub">${isTh ? 'ความแม่นยำและจังหวะการเรียนของคุณพัฒนาอย่างต่อเนื่อง เรียนอีก 1 รอบวันนี้เพื่อเลื่อนระดับ!' : 'Akurasi dan ritme belajarmu meningkat konsisten. Selesaikan 1 sesi lagi hari ini untuk mengunci kenaikan level!'}</div>
+          <div class="fz-clean-header-title">${esc(FiezelI18n.t('home.kartu3-judul'))}</div>
+          <div class="fz-clean-header-sub">${esc(FiezelI18n.t(weekKey, { delta: Math.abs(weekDelta || 0), min: HOME_WEEK_MIN }))}</div>
         </div>
       </div>
       <div class="fz-stadium-body">
         <div class="fz-stadium-metrics-row">
-          <div class="fz-stadium-chip is-gain">${isTh ? '+15% ความแม่นยำ' : '+15% AKURASI'}</div>
+          <div class="fz-stadium-chip is-gain">${esc(week.accuracy == null ? FiezelI18n.t('home.kartu3-akurasi-kosong') : FiezelI18n.t('home.kartu3-akurasi', { n: week.accuracy }))}</div>
           <div class="fz-stadium-center-time">
-            <span class="fz-time-val" style="color:#059669">+15%</span>
-            <span class="fz-date-val">${isTh ? 'พัฒนาการสัปดาห์นี้' : 'PENINGKATAN MINGGU INI'}</span>
+            <span class="fz-time-val is-${weekTone}">${weekDelta == null ? '—' : (weekDelta > 0 ? '+' : weekDelta < 0 ? '−' : '') + Math.abs(weekDelta)}</span>
+            <span class="fz-date-val">${esc(FiezelI18n.t('home.kartu3-perubahan'))}</span>
           </div>
-          <div class="fz-stadium-chip is-streak">🔥 ${streak || 1} ${isTh ? 'วัน' : 'HARI'}</div>
+          <div class="fz-stadium-chip is-streak">${esc(FiezelI18n.t('home.kartu3-runtun', { n: streak }))}</div>
         </div>
         <button type="button" class="fz-stadium-cta-btn is-dark-btn" onclick="event.stopPropagation();go('progress')">
-          ${isTh ? 'ดูรายละเอียดพัฒนาการ ➔' : 'LIHAT DETAIL PENINGKATAN ➔'}
+          ${esc(FiezelI18n.t('home.kartu3-cta'))} <span aria-hidden="true">➔</span>
         </button>
-      </div>
-      <div class="fz-stadium-footer-notch">
-        <span>${isTh ? '📊 บทวิเคราะห์ &amp; แผนที่การเรียน' : '📊 ANALISIS &amp; PETA BELAJAR'}</span>
-        <span class="fz-footer-caret">▾</span>
       </div>
     </div>`;
 
   return `<div class="today-home-cockpit fz-edu-cockpit">
   ${homeTop}
+  ${evidenceProgressPanelMarkup()}
   ${card1Hero}
   ${card2Hero}
   ${card3Hero}
@@ -12601,7 +12719,8 @@ function bktShadowMarkup(){
       ):null;
     const frontier=predict?B.frontier(st,GRAMMAR_CURRICULUM,predict).slice(0,3):[];
     const weak=coreBrainWeakTarget();
-    const root=weak?.skill&&typeof B.rootCause==='function'?B.rootCause(st,GRAMMAR_CURRICULUM,String(weak.skill)):null;
+    // m025-375 (B6): dengan waktu sekarang, prasyarat yang dulu kuat tetapi lama tidak dilatih ikut terbaca meluruh.
+    const root=weak?.skill&&typeof B.rootCause==='function'?B.rootCause(st,GRAMMAR_CURRICULUM,String(weak.skill),Date.now()):null;
     const tracked=Object.keys(st.lessons||{}).length;
     const frontierHtml=frontier.length
       ?`<p><b>Frontier ZPD:</b> ${frontier.map(f=>`${esc(friendlySkillName(f.lesson))} (L ${Math.round(f.L*100)}% · prediksi ${Math.round(f.predicted*100)}%)`).join(', ')}</p>`
@@ -12842,7 +12961,7 @@ function coreBrainPanelMarkup(){
     return card(`<h3>${FiezelI18n.t('progress.kartu-cara-menilai')}</h3><p>${FiezelI18n.t('progress.still-mengumpulkan-bukti-answer-terbaca',{evidence:ability.evidence||0})}</p><p class="muted">${FiezelI18n.t('progress.sampai-saat-kebijakan-adaptif-deterministik')}</p>`)+detailTeknisMarkup()+olmPanelMarkup()+confusionInsightMarkup()+affectSuggestionMarkup();
   }
   const rootCause=snapshot.rootCause&&snapshot.rootCause.isRoot===false
-    ? `<p><b>${FiezelI18n.t('progress.akar-masalah')}</b> ${FiezelI18n.t('progress.kesulitan-kemungkinan-besar-berasal-jadi',{skillName:esc(friendlySkillName(snapshot.rootCause.symptomSkill||snapshot.rootCause.symptomFamily)),skillName:esc(friendlySkillName(snapshot.rootCause.skill))})}</p>`
+    ? `<p><b>${FiezelI18n.t('progress.akar-masalah')}</b> ${FiezelI18n.t('progress.kesulitan-kemungkinan-besar-berasal-jadi',{symptomSkill:esc(friendlySkillName(snapshot.rootCause.symptomSkill||snapshot.rootCause.symptomFamily)),rootSkill:esc(friendlySkillName(snapshot.rootCause.skill))})}</p>`
     : '';
   const bestWindow=chrono.confident&&chrono.best?FiezelI18n.t('progress.div-jam-paling-produktif-br',{id:esc(chrono.best.id),akurasi:chrono.best.accuracy}):'';
   return card(`<h3>${FiezelI18n.t('progress.kartu-cara-menilai')}</h3>
@@ -14131,7 +14250,7 @@ function resetProgress(){openModal(`<div class="modal-mark">FIEZEL</div><h2>${Fi
      Komentar ini sengaja DI LUAR literal array: tests/reset-side-state-test.js mengurai
      daftar itu dengan split(','), jadi satu koma di dalam komentar membuat gerbangnya
      membaca kunci yang salah. */
-  for(const k of [BKT_KEY,MISCONCEPTION_LEDGER_KEY,ITEM_CALIBRATION_KEY,CONFUSION_MATRIX_KEY,OLM_NEGOTIATION_KEY,SRL_KEY,EVIDENCE_COHORT_KEY,EVIDENCE_LAST_KEY,EVIDENCE_ATTEMPT_KEY,RETENTION_PROBE_KEY,SL_STATE_KEY,IDENTITY_EVIDENCE_ATTEMPT_KEY,LEARNER_NAME_SYNC_KEY,ACCOUNT_NUDGE_KEY,SELF_TUNE_KEY]){
+  for(const k of [BKT_KEY,MISCONCEPTION_LEDGER_KEY,ITEM_CALIBRATION_KEY,CONFUSION_MATRIX_KEY,OLM_NEGOTIATION_KEY,SRL_KEY,EVIDENCE_COHORT_KEY,EVIDENCE_LAST_KEY,EVIDENCE_ATTEMPT_KEY,RETENTION_PROBE_KEY,SL_STATE_KEY,IDENTITY_EVIDENCE_ATTEMPT_KEY,LEARNER_NAME_SYNC_KEY,ACCOUNT_NUDGE_KEY,SELF_TUNE_KEY,DECISION_TRACE_KEY,LIVE_PARAMS_KEY]){
     try{localStorage.removeItem(sideStateKey(k))}catch{}
     try{localStorage.removeItem(k)}catch{}
   }
@@ -15480,7 +15599,7 @@ if(typeof document!=='undefined'&&document.addEventListener){
   });
 }
 /* ============================== akhir blok SOSIAL (SLOT 7) ========================== */
-window.istilahMurid=istilahMurid;/* dipapar untuk gerbang QA: penerjemah enum harus bisa disapu penuh */window.__getFiezelData=()=>({vocab:V.length,reading:R.length,grammar:Object.keys(G).length});window.__fiezelAudit={showBrandSplash,showOnboarding,prefersReducedMotion,readInstallHealth,installHealthReportMarkup,buildBackupFile,previewRestoreForState,applyRestore,continuitySettingsMarkup,academicReadinessMarkup,unifiedSkillsMarkup,buildPersonalJourney,journeyMarkup,setGoalProfile,loadState,sanitizeState,validateQuestion,makeGrammarQuestion,makeReadingQuestion,makeVocabQuestion,buildGrammarLessonQuestions,buildPlacement,/* m025-246: dipapar untuk regression-test - gerbang itu harus bisa MENANYAKAN ukuran rencana penempatan, bukan memaku 25 dan merah setiap kali ukurannya berubah dengan sengaja. */placementSize,placementBlueprint,/* cetak biru PENUH dipapar terpisah: gerbang harus tetap bisa menjaga invarian 'penempatan penuh memuat ketiga jenis konten' walau jalur murid memakai cetak biru lite */PLACEMENT_BLUEPRINT_FULL:PLACEMENT_BLUEPRINT,buildAdaptivePool,getScenePalette,getCelestialState,getDiagnosticProfile,buildLearningSnapshot,buildLearnerEvidenceModel,remoteLearnerEvidenceSnapshot,deriveAdaptivePolicy,buildAdaptivePolicy,adaptivePolicyRequestPayload,sanitizeAdaptivePolicy,/* m025-201: dipapar untuk tests/core-policy-parity-test.js - gerbang paritas tidak bisa membandingkan apa yang tidak bisa ia panggil */capRationaleCodes,policyEffectiveness,sanitizePolicyEffectiveness,resolveAdaptivePolicy,evaluatePolicyOutcome,sanitizePolicyOutcome,recordPolicyOutcomeFromSession,backfillPolicyOutcomes,recentPolicyOutcomes,policyOutcomeSummary,buildALRSContext,selectALRSDecision,buildCreatorReport,validReportEndpoint,forgettingProbability,scheduleNext,coreBrainMemory,tutorSession,tutorObserve,misconceptionLedgerRead,misconceptionLedgerActive,coreBrainAttempts,quizPredictedSuccess,evidenceKappa,bktRead,bktRecord,bktShadowMarkup,brainManifestMarkup,learningTelemetryMode,learningTelemetryEmitAnswer,learningTelemetryStudyDay,braincoreEvidenceMode,braincoreEvidenceCohort,braincoreEvidenceCohortForBuild,braincoreEvidenceDay,braincoreEvidenceEmitSnapshot,activeLevelOverallMastery,braincoreEvidenceEmitDecision,braincoreEvidenceFlush,braincoreEvidenceObserveSession,braincoreDecisionReason,braincoreEvidenceAnyLaneActive,identityEvidenceMode,learnerNameSyncToServer,maybeSyncLearnerName,identityEvidenceActive,identityEvidenceMirror,identityEvidenceFlush,forgetLearnerEvidence,confusionMatrixRead,confusionMatrixRecord,affectObserve,affectSessionSync,affectTargetSuccess,listeningAdaptivePolicy,olmPanelMarkup,coreBrainPanelMarkup,diagnosticEvidenceReady,skillTimeline,errorPatterns,confusionPairs,diagnosticReport,confidenceCalibration,dueItems,selectLoginMessage,notificationPermission,checkStudyReminders,lastLearningAt,beginLearningSession,abandonActiveSession,completeActiveSession,/* Fase 3 (C5): kalibrasi item, cloze, OLM negotiated, SRL, speaking adaptif, step tutor */itemCalibrationRead,itemCalibrationObserve,itemCalibrationEffective,calibrationItemId,ensureClozeBank,makeClozeQuestion,clozeAdaptivePicks,clozeSkillReady,clozeProductionRecord,olmSummarizeInput,olmDispute,olmProbeNextSkill,olmProbeConsume,olmNegotiationRead,srlSessionPlan,srlPredictPrompt,srlCaptureConfidence,srlReflect,srlSessionSync,speakingCoverageRows,speakingAdaptiveEvidence,speakingAdaptivePolicy,stepTutorGuidance,stepTutorGuidanceMarkup,record,quizLoop,startAdaptive,/* m025-308: dipapar untuk tests/th-content-overlay-test.js. Gerbang itu harus bisa memanggil overlay yang SUNGGUHAN lalu membacanya lewat jalur baca yang dipakai penyaji - kalau ia hanya boleh memeriksa isi sidecar, ia mengulang kebutaan yang justru membiarkan 45 petunjuk writing dan 96 umpan balik reading-exam menganggur. */applyContentLocale,writingPromptPool,writingExamTask,readingExamSets,makeExamReadingQuestion,/* m025-314: dipapar untuk tests/target-lang-surface-guard-test.js. Gerbang itu harus bisa MEMANGGIL daftar kartu yang sungguhan lalu membacanya, bukan menebak dari pola teks di app.js - penjaga yang hanya diuji lewat grep akan tetap hijau saat kartunya dipindah ke fungsi lain. */latihanCards,skillHubModel,skillHubMarkup,continueLearningCard,aiBoosterCard,targetLangSurfaceBlocked,targetLangVoiceBlocked,courseLanguageLabel,/* `state` adalah binding modul, jadi ia TIDAK muncul sebagai properti global di vm - gerbang yang perlu menggeser bahasa target atau membaca layar aktif tidak punya jalan lain. Diekspor sebagai FUNGSI, bukan nilai: salinan yang diambil saat berkas dimuat akan basi begitu state ditugaskan ulang (loadState dipanggil lagi saat akun berpindah). */liveState:()=>state,/* B1 (m025-317): dipapar untuk tests/target-lang-progress-isolation-test.js. Gerbang itu harus MENJALANKAN jalur simpan/muat yang sungguhan di kedua bahasa - sumbu yang hanya diuji lewat modulnya adalah persis cara cacat ini bertahan berbulan-bulan. */saveFlushWrite,switchTargetLangStorage,progressStorageKey,pickProgress,sideStateKey,PROGRESS_STATE_FIELDS,PROGRESS_PREF_FIELDS,/* Migrasi sekali-jalan saat murid masuk akun. Dipapar karena inilah satu-satunya jalur yang bisa MENELANTARKAN progres bahasa: ia lahir sebelum ruang nama @lang ada. Gerbang harus menjalankannya, bukan membaca namanya. */activateAccountStateFromPuter,migrateSideStateToAccount,FIEZEL_TARGET_COURSE_KEY,decisionTrace:()=>self.FiezelDecisionTrace,presenceEngine:()=>self.FiezelPresenceEngine};
+window.istilahMurid=istilahMurid;/* dipapar untuk gerbang QA: penerjemah enum harus bisa disapu penuh */window.__getFiezelData=()=>({vocab:V.length,reading:R.length,grammar:Object.keys(G).length});window.__fiezelAudit={showBrandSplash,showOnboarding,prefersReducedMotion,readInstallHealth,installHealthReportMarkup,buildBackupFile,previewRestoreForState,applyRestore,continuitySettingsMarkup,academicReadinessMarkup,unifiedSkillsMarkup,buildPersonalJourney,journeyMarkup,setGoalProfile,loadState,sanitizeState,validateQuestion,makeGrammarQuestion,makeReadingQuestion,makeVocabQuestion,buildGrammarLessonQuestions,buildPlacement,/* m025-246: dipapar untuk regression-test - gerbang itu harus bisa MENANYAKAN ukuran rencana penempatan, bukan memaku 25 dan merah setiap kali ukurannya berubah dengan sengaja. */placementSize,placementBlueprint,/* cetak biru PENUH dipapar terpisah: gerbang harus tetap bisa menjaga invarian 'penempatan penuh memuat ketiga jenis konten' walau jalur murid memakai cetak biru lite */PLACEMENT_BLUEPRINT_FULL:PLACEMENT_BLUEPRINT,buildAdaptivePool,getScenePalette,getCelestialState,getDiagnosticProfile,buildLearningSnapshot,buildLearnerEvidenceModel,remoteLearnerEvidenceSnapshot,deriveAdaptivePolicy,buildAdaptivePolicy,adaptivePolicyRequestPayload,sanitizeAdaptivePolicy,/* m025-201: dipapar untuk tests/core-policy-parity-test.js - gerbang paritas tidak bisa membandingkan apa yang tidak bisa ia panggil */capRationaleCodes,policyEffectiveness,sanitizePolicyEffectiveness,resolveAdaptivePolicy,evaluatePolicyOutcome,sanitizePolicyOutcome,recordPolicyOutcomeFromSession,backfillPolicyOutcomes,recentPolicyOutcomes,policyOutcomeSummary,buildALRSContext,selectALRSDecision,buildCreatorReport,validReportEndpoint,forgettingProbability,scheduleNext,coreBrainMemory,tutorSession,tutorObserve,misconceptionLedgerRead,misconceptionLedgerActive,coreBrainAttempts,quizPredictedSuccess,evidenceKappa,bktRead,bktRecord,bktShadowMarkup,brainManifestMarkup,learningTelemetryMode,learningTelemetryEmitAnswer,learningTelemetryStudyDay,braincoreEvidenceMode,braincoreEvidenceCohort,braincoreEvidenceCohortForBuild,braincoreEvidenceDay,braincoreEvidenceEmitSnapshot,activeLevelOverallMastery,braincoreEvidenceEmitDecision,braincoreEvidenceFlush,braincoreEvidenceObserveSession,braincoreDecisionReason,braincoreEvidenceAnyLaneActive,identityEvidenceMode,learnerNameSyncToServer,maybeSyncLearnerName,identityEvidenceActive,identityEvidenceMirror,identityEvidenceFlush,forgetLearnerEvidence,confusionMatrixRead,confusionMatrixRecord,affectObserve,affectSessionSync,affectTargetSuccess,listeningAdaptivePolicy,olmPanelMarkup,coreBrainPanelMarkup,diagnosticEvidenceReady,skillTimeline,errorPatterns,confusionPairs,diagnosticReport,confidenceCalibration,dueItems,selectLoginMessage,notificationPermission,checkStudyReminders,lastLearningAt,beginLearningSession,abandonActiveSession,completeActiveSession,/* Fase 3 (C5): kalibrasi item, cloze, OLM negotiated, SRL, speaking adaptif, step tutor */itemCalibrationRead,itemCalibrationObserve,itemCalibrationEffective,calibrationItemId,ensureClozeBank,makeClozeQuestion,clozeAdaptivePicks,clozeSkillReady,clozeProductionRecord,olmSummarizeInput,olmDispute,olmProbeNextSkill,olmProbeConsume,olmNegotiationRead,srlSessionPlan,srlPredictPrompt,srlCaptureConfidence,srlReflect,srlSessionSync,speakingCoverageRows,speakingAdaptiveEvidence,speakingAdaptivePolicy,stepTutorGuidance,stepTutorGuidanceMarkup,record,quizLoop,startAdaptive,/* m025-308: dipapar untuk tests/th-content-overlay-test.js. Gerbang itu harus bisa memanggil overlay yang SUNGGUHAN lalu membacanya lewat jalur baca yang dipakai penyaji - kalau ia hanya boleh memeriksa isi sidecar, ia mengulang kebutaan yang justru membiarkan 45 petunjuk writing dan 96 umpan balik reading-exam menganggur. */applyContentLocale,writingPromptPool,writingExamTask,readingExamSets,makeExamReadingQuestion,/* m025-314: dipapar untuk tests/target-lang-surface-guard-test.js. Gerbang itu harus bisa MEMANGGIL daftar kartu yang sungguhan lalu membacanya, bukan menebak dari pola teks di app.js - penjaga yang hanya diuji lewat grep akan tetap hijau saat kartunya dipindah ke fungsi lain. */latihanCards,skillHubModel,skillHubMarkup,continueLearningCard,aiBoosterCard,targetLangSurfaceBlocked,targetLangVoiceBlocked,courseLanguageLabel,/* `state` adalah binding modul, jadi ia TIDAK muncul sebagai properti global di vm - gerbang yang perlu menggeser bahasa target atau membaca layar aktif tidak punya jalan lain. Diekspor sebagai FUNGSI, bukan nilai: salinan yang diambil saat berkas dimuat akan basi begitu state ditugaskan ulang (loadState dipanggil lagi saat akun berpindah). */liveState:()=>state,/* B1 (m025-317): dipapar untuk tests/target-lang-progress-isolation-test.js. Gerbang itu harus MENJALANKAN jalur simpan/muat yang sungguhan di kedua bahasa - sumbu yang hanya diuji lewat modulnya adalah persis cara cacat ini bertahan berbulan-bulan. */saveFlushWrite,switchTargetLangStorage,progressStorageKey,pickProgress,sideStateKey,PROGRESS_STATE_FIELDS,PROGRESS_PREF_FIELDS,/* Migrasi sekali-jalan saat murid masuk akun. Dipapar karena inilah satu-satunya jalur yang bisa MENELANTARKAN progres bahasa: ia lahir sebelum ruang nama @lang ada. Gerbang harus menjalankannya, bukan membaca namanya. */activateAccountStateFromPuter,migrateSideStateToAccount,FIEZEL_TARGET_COURSE_KEY,decisionTrace:()=>self.FiezelDecisionTrace,presenceEngine:()=>self.FiezelPresenceEngine,/* m025-375: dipapar untuk tests/policy-evidence-window-test.js - gerbang harus bisa memanggil jendela bukti dan panel Home yang sungguhan. */policyEvidenceArms,policyEvidenceMin,policyEvidenceProgress,evidenceProgressPanelMarkup,todayHomeMarkup,/* m025-376: dipapar untuk tests/self-tune-retention-test.js. */selfTuneAfterOutcome,selfTuneTargetFor,selfTuneRetentionArms,loadSelfTuneState,retentionProbeResults,RETENTION_PROBE_KEY,SELF_TUNE_KEY,/* Audit UI/UX Home 2026-09-27: dipapar untuk tests/home-honesty-test.js. */homeWeekStats,homeVocabStats,HOME_WEEK_MIN};
 window.FIEZEL_TARGET_COURSE_KEY=FIEZEL_TARGET_COURSE_KEY;
 window.startVocabQuiz=startVocabQuiz;window.buildAdaptivePool=buildAdaptivePool;window.buildGrammarLessonQuestions=buildGrammarLessonQuestions;window.getScenePalette=getScenePalette;window.getCelestialState=getCelestialState;window.playFeedbackSound=playFeedbackSound;window.updateMastery=updateMastery;window.markMastered=markMastered;window.__getFiezelState=()=>state;window.__fiezelValidViews=()=>[...VALID_VIEWS];window.__fiezelDueReviews=()=>dueItems().length;window.buildAdaptivePolicy=buildAdaptivePolicy;window.studyDayKey=studyDayKey;window.startAdaptive=startAdaptive;window.showToast=showToast;window.answerFeedbackSignal=answerFeedbackSignal;window.practiceSkill=practiceSkill;window.openReadingLevel=openReadingLevel;window.startReadingRandom=startReadingRandom;window.startReadingAdaptive=startReadingAdaptive;window.startPlacement=startPlacement;window.startLevelPractice=startLevelPractice;window.startAdaptive=startAdaptive;window.resetProgress=resetProgress;window.closeModal=closeModal;window.openSettings=openSettings;window.openReportPreview=openReportPreview;window.sendCreatorReport=sendCreatorReport;window.askCoachAI=askCoachAI;window.dismissWelcome=dismissWelcome;window.requestStudyNotificationPermission=requestStudyNotificationPermission;window.declineStudyNotifications=declineStudyNotifications;window.skipPuterSignIn=skipPuterSignIn;window.attemptGoogleSignIn=attemptGoogleSignIn;window.shouldPresentPuterPopup=shouldPresentPuterPopup;window.notifyAppUpdateIfNew=notifyAppUpdateIfNew;window.setConfidence=setConfidence;window.explainWithAI=explainWithAI;window.explainWordWithAI=explainWordWithAI;window.olmDispute=olmDispute;/* Fase 3 (C5 butir 3): handler tombol sanggah di panel OLM */
 // m025-84: dipasang di ujung berkas, saat go()/state/VALID_VIEWS sudah ada, dan SEBELUM

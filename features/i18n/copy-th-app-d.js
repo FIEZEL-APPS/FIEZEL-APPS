@@ -196,7 +196,7 @@
     'progress.kebingungan-antar-lesson': 'ความสับสนระหว่าง lesson',
     'progress.kesiapan-skills': 'ความพร้อม & Skills',
     'progress.kesulitan-dipilih-model-kemampuan-peluang': 'ข้อสอบถูกเลือกในระดับที่เธอน่าจะตอบถูกราว 8 ใน 10 ข้อ ท้าทายพอให้ได้เรียนรู้ แต่ไม่ถึงกับทำให้ถอดใจ เวลาทบทวนคำนวณจากช่วงที่เธอมักเริ่มลืม ทั้งหมดคำนวณในเครื่องของเธอเอง',
-    'progress.kesulitan-kemungkinan-besar-berasal-jadi': 'ความยากลำบากใน {skillName} น่าจะมาจาก {skillName} ดังนั้นจึงฝึกตัวนั้นก่อน',
+    'progress.kesulitan-kemungkinan-besar-berasal-jadi': 'ความยากลำบากใน {symptomSkill} น่าจะมาจาก {rootSkill} ดังนั้นจึงฝึกตัวนั้นก่อน',
     'progress.konsistensi-hari': 'ความสม่ำเสมอ (14 วัน)',
     'progress.lab-kesalahan': 'แล็บความผิดพลาด',
     'progress.lapisan-penalaran-belum-termuat-perangkat': 'ส่วนนี้ยังไม่ทำงานในเครื่องของเธอ แบบฝึกหัดยังใช้ได้ตามปกติ ตอนนี้ใช้ตัวเลือกข้อสอบแบบง่ายกว่าไปก่อน',

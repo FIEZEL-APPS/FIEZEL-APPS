@@ -66,7 +66,13 @@ const DIHAPUS_SAAT_RESET = [
   'LEARNER_NAME_SYNC_KEY',
   // m025-374: Penyetelan-diri berbatas (self-tune) menyimpan ledger parameter adaptif dan
   // override konfigurasi per-murid. Reset progres harus mengembalikan parameter ke bawaan.
-  'SELF_TUNE_KEY'
+  'SELF_TUNE_KEY',
+  // Audit braincore 2026-09-26: dua kunci yang ditulis FiezelDecisionTrace sendiri (bukan
+  // app.js), sehingga R2 buta terhadapnya. LIVE_PARAMS_KEY memegang targetSuccess hidup yang
+  // menyetir pemilihan soal; tanpa ini murid yang mereset mewarisi setelan lamanya. R5 di
+  // bawah mengunci literalnya ke konstanta modul supaya penggantian nama tidak lolos diam.
+  'DECISION_TRACE_KEY',
+  'LIVE_PARAMS_KEY'
 ];
 
 /**
@@ -204,6 +210,19 @@ test('RED · detektor terbukti merah saat kunci dikeluarkan dari daftar reset / 
     const yatim = [...written].filter(k => !list.includes(k) && !Object.prototype.hasOwnProperty.call(SENGAJA_TIDAK_DIRESET, k));
     assert.deepStrictEqual(yatim, []);
   });
+});
+
+test('R5 · kunci yang ditulis modul learner-flow sama dengan konstanta yang dihapus reset', () => {
+  // R2 hanya membaca localStorage.setItem di app.js. Modul yang menulis penyimpanannya sendiri
+  // lolos dari R2 — itu persis cara kunci keputusan & parameter hidup luput dari reset. Gerbang
+  // ini mengikat literal app.js ke konstanta di modulnya: kalau modulnya ganti kunci (v3),
+  // reset yang menghapus kunci lama akan bohong, dan baris ini yang merah.
+  const trace = fs.readFileSync(path.join(ROOT, 'features', 'learner-flow', 'fiezel-decision-trace.js'), 'utf8');
+  const modul = name => { const m = trace.match(new RegExp('\\b' + name + "\\s*=\\s*'([^']*)'")); return m ? m[1] : null; };
+  assert.strictEqual(declaredLiteral(appSource, 'DECISION_TRACE_KEY'), modul('STORAGE_KEY'),
+    'DECISION_TRACE_KEY di app.js tidak sama dengan STORAGE_KEY FiezelDecisionTrace');
+  assert.strictEqual(declaredLiteral(appSource, 'LIVE_PARAMS_KEY'), modul('PARAM_STORAGE_KEY'),
+    'LIVE_PARAMS_KEY di app.js tidak sama dengan PARAM_STORAGE_KEY FiezelDecisionTrace');
 });
 
 test('gate ini terdaftar di CI', () => {

@@ -393,12 +393,15 @@ body.fz-ja-no-romaji .ja-run{display:inline}
 @media (min-width:1100px){
   html.fiezel-ui-v6 body.fz-lux .app{max-width:1240px;padding-left:136px;padding-right:32px}
   html.fiezel-ui-v6 body.fz-lux .bottomnav{left:max(20px,calc(50% - 620px + 28px));top:112px;transform:none}
-  .today-home-cockpit{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);column-gap:28px;align-items:start}
-  .today-home-cockpit>*{grid-column:2;min-width:0}
-  .today-home-cockpit>.paw-hero-cockpit{grid-column:1/-1}
-  .today-home-cockpit>.today-card{grid-column:1;grid-row:2/span 12;position:sticky;top:88px;align-self:start;width:100%;max-width:none;margin-left:0;margin-right:0;box-sizing:border-box}
+  /* Audit UI/UX Home 2026-09-27: aturan dua-kolom Home (grid + kartu sticky top:88px) DICABUT.
+     Home sejak redesign kokpit dipaku satu kolom flex 440px (.home-today .today-home-cockpit,
+     style.css, !important), jadi grid ini tidak pernah terjadi - tetapi sisa-sisanya tetap
+     berlaku: kartu pertama (position dipaksa relative oleh mobile-edge-fit.css) bergeser 88px
+     ke bawah dan MENUTUPI tombol utamanya di bawah kartu kedua, dan align-items:start membuat
+     setiap blok di bawahnya selebar isinya sendiri (198/139/296/381px dalam kolom 440px). */
   .quiz-shell,.lesson-page,.reading-stage{max-width:780px;margin-left:auto;margin-right:auto}
-  .learning-launcher{grid-template-columns:repeat(3,minmax(0,1fr))}
+  /* Tiga kolom hanya untuk hub Latihan; peluncur di Home hidup di kolom kokpit 440px. */
+  .learning-launcher:not(.learner-flow-launcher){grid-template-columns:repeat(3,minmax(0,1fr))}
   #app .stats:has(> :nth-child(5):last-child){grid-template-columns:repeat(5,minmax(0,1fr))}
 }
 /* Audit F15: galeri Prasasti terlipat untuk murid baru (lencana redup semua), terbuka bagi yang sudah punya riwayat. */

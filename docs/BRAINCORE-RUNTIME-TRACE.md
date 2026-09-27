@@ -17,9 +17,9 @@ flowchart TD
     S5 --> S7["7. PAW / PRESENCE\n(determine: Silent, Correcting, Cheering)"]
     S6 --> S8["8. OBSERVE OUTCOME\n(Jawaban Murid pada Soal Berikutnya)"]
     S8 --> S9["9. EVALUATE\n(evaluateOutcome: Positive / Negative / Neutral)"]
-    S9 --> S10["10. KEEP / MODIFY / ROLLBACK\n(Self-Tuning Target / Auto-Rollback)"]
+    S9 --> S10["10. KEEP / MODIFY / ROLLBACK\n(Dicatat di Jejak; Parameter Tidak Digeser)"]
     S10 --> S11["11. STORE EVIDENCE\n(Tamper-Evident Hash Chain 64-bit)"]
-    S11 --> S12["12. NEXT DECISION\n(Parameter Baru Mengendalikan Soal Berikutnya)"]
+    S11 --> S12["12. NEXT DECISION\n(Kemampuan Baru Mengendalikan Soal Berikutnya)"]
     S12 -.-> S1
 ```
 
@@ -147,20 +147,13 @@ flowchart TD
   - Intervensi perancah gagal $\to$ `status: 'negative'`, `recommendation: 'modify'`.
   - Peningkatan tantangan gagal $\to$ `status: 'neutral'`, `recommendation: 'rollback'`.
 
-### Tahap 10: KEEP / MODIFY / ROLLBACK (Autonomous Self-Tuning)
-* **Logika:**
-  - Jika tercatat 3 keberhasilan berturut-turut pada intervensi positif: target kesulitan `difficulty.targetSuccess` dinaikkan secara aman sebesar $+0.02$ (maksimal $0.90$).
-  - Jika terjadi regresi atau rekomendasi `rollback`: parameter seketika dikembalikan (*auto-rollback*) ke nilai kanonik dasar.
-* **Catatan Adaptasi Parameter:**
-  ```json
-  {
-    "path": "difficulty.targetSuccess",
-    "from": 0.80,
-    "to": 0.82,
-    "at": 1710000045000,
-    "reason": "autonomous_consecutive_success"
-  }
-  ```
+### Tahap 10: KEEP / MODIFY / ROLLBACK
+* **Logika:** rekomendasi `keep` / `modify` / `rollback` dari Tahap 9 dicatat di jejak keputusan.
+* **Penyetelan parameter otomatis DIMATIKAN (OWNER 2026-09-26, m025-375).** Versi sebelumnya
+  menaikkan `difficulty.targetSuccess` +0.02 setiap tiga hasil positif kumulatif, tanpa stat-gate,
+  halt, maupun ledger berantai, sampai mentok 0.90 (audit A1, `reports/BRAINCORE-AUDIT-2026-09-26.md`).
+  Sekarang `readParams()` selalu mengembalikan nilai bawaan (0.80) dan mengabaikan sisa setelan
+  lama di perangkat; `affectTargetSuccess()` di app.js memakai base tetap 0.80.
 
 ### Tahap 11: STORE EVIDENCE
 * **Logika:** Seluruh catatan keputusan dan hasil evaluasi dikaitkan dalam rantai hash 64-bit anti-manipulasi (*tamper-evident hash chain*).
@@ -168,7 +161,7 @@ flowchart TD
 
 ### Tahap 12: NEXT DECISION
 * **Bukti Nyata Pengaruh:**
-  Ketika `targetSuccess` dinaikkan dari $0.80$ ke $0.84$ melalui adaptasi otonom, fungsi seleksi item `FiezelTutorBrain.selectNext()` secara langsung mengubah soal yang disajikan kepada murid: dari `item_challenging` (jarak probabilitas optimal pada 0.80) beralih ke `item_easy` (jarak probabilitas optimal pada 0.84). Terbukti deterministik dan terverifikasi di runtime.
+  Bukti jawaban menaikkan taksiran kemampuan (2.0 → ≈3.49 setelah dua belas jawaban benar pada soal tingkat 3). Dengan target tetap $0.80$, `FiezelTutorBrain.selectNext()` beralih dari soal dasar ke soal yang lebih menantang — bukti memengaruhi keputusan berikutnya lewat kemampuan, bukan lewat target yang dimudahkan (`tests/braincore-runtime-e2e-proof.js` Inv 10).
 
 ---
 

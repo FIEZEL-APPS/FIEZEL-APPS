@@ -68,7 +68,7 @@ test('bundleVersion dan minAppVersion bisa diparse semver-ish', () => {
   assert.ok(SEMVERISH.test(manifest.minAppVersion), 'minAppVersion tidak semver-ish: ' + manifest.minAppVersion);
 });
 
-test('bundleVersion 3.12.0 (selfTune + paramLedger + brainConfig off -> active, m025-374)', () => {
+test('bundleVersion 3.13.0 (nof1 off -> active, selfTune diukur retensi, m025-376)', () => {
   // Literal ini sengaja dipatok, bukan dilonggarkan jadi pola semver: gunanya memaksa
   // perubahan versi bundle menjadi keputusan SADAR yang ikut dalam diff, bukan efek
   // samping. 3.0.0 -> 3.1.0 karena peta otoritas bergerak (Langkah 1 roadmap otonomi:
@@ -80,7 +80,8 @@ test('bundleVersion 3.12.0 (selfTune + paramLedger + brainConfig off -> active, 
   // 3.10.0 -> 3.11.0: retentionProbe + learningMetrics shadow -> active (m025-341).
   // 3.11.0 -> 3.12.0: OWNER authorization (2026-09-27) mengaktifkan bounded self-tuning
   // (Langkah 5 roadmap otonomi): selfTune, paramLedger, brainConfig -> active.
-  assert.strictEqual(manifest.bundleVersion, '3.12.0');
+  // 3.12.0 -> 3.13.0 (m025-376): nof1 off -> active, selfTune diukur retensi (audit braincore A3).
+  assert.strictEqual(manifest.bundleVersion, '3.13.0');
 });
 
 test('minAppVersion sama dengan FIEZEL_VERSION di version.js (dibaca, bukan dikarang)', () => {

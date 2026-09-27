@@ -75,6 +75,10 @@ def test_bkt():
     check("benar-tapi-tidak-yakin naik lebih sedikit dari benar-yakin", lucky < sure, (lucky, sure))
     hinted = bc.bkt_update(0.5, True, hints=2)
     check("benar dengan hint = evidence lebih lemah", hinted < sure, (hinted, sure))
+    wrong_plain = bc.bkt_update(0.5, False)
+    wrong_hinted = bc.bkt_update(0.5, False, hints=2)
+    check("salah walau dibantu hint tidak dihukum lebih ringan dari salah tanpa hint",
+          wrong_hinted <= wrong_plain, (wrong_hinted, wrong_plain))
 
 
 # ---------- IRT 3PL & Decay Parity ----------
@@ -101,6 +105,34 @@ def test_bkt_decay():
     check("di bawah P_INIT tidak meluruh lagi", bc.bkt_decay(0.20, 30.0) == 0.20)
 
 
+# ---------- m025-375 (B6): apply_attempt melangkah dari posterior yang sudah meluruh ----------
+async def test_apply_attempt_decays_first():
+    saved = {}
+    class _Col:
+        async def find_one(self, *a, **k):
+            return dict(saved["doc"]) if "doc" in saved else None
+        async def update_one(self, q, upd, upsert=False):
+            saved["written"] = dict(upd.get("$set", {}))
+        async def update_many(self, *a, **k):
+            return None
+    class _DB:
+        learner_competency = _Col()
+        misconception_ledger = _Col()
+    real = bc.db
+    bc.db = _DB()
+    try:
+        long_ago = bc.now() - timedelta(days=90)
+        saved["doc"] = dict(bc.blank_state("s", "c"), attempts=12, correct=11, p_mastery=0.97,
+                            state="MASTERED", last_at=long_ago, mastered_at=long_ago - timedelta(days=5),
+                            stability_days=3.0)
+        res = await bc.apply_attempt({"student_id": "s", "competency_id": "c", "correct": False})
+        p = res["state"]["p_mastery"]
+        check("salah setelah 90 hari melangkah dari posterior yang sudah meluruh", p < 0.5, p)
+        check("p_mastery_decayed tidak ikut tersimpan ke DB", "p_mastery_decayed" not in saved["written"])
+    finally:
+        bc.db = real
+
+
 # ---------- state machine ----------
 def test_states():
     st = bc.blank_state("s", "c")
@@ -117,6 +149,12 @@ def test_states():
     check("retensi terbukti = RETAINED", bc.derive_state(st) == "RETAINED")
     st["transferred_at"] = bc.now()
     check("transfer terbukti = TRANSFERRED", bc.derive_state(st) == "TRANSFERRED")
+    st_drop = dict(st, p_mastery=0.2)
+    check("TRANSFERRED tidak lengket saat posterior jatuh di bawah mastery",
+          bc.derive_state(st_drop) == "PRACTICING", bc.derive_state(st_drop))
+    check("RETAINED tidak lengket saat posterior jatuh di bawah mastery",
+          bc.derive_state(dict(st_drop, transferred_at=None, p_mastery=0.7)) == "DEVELOPING")
+    check("TRANSFERRED kembali saat mastery pulih", bc.derive_state(dict(st_drop, p_mastery=0.9)) == "TRANSFERRED")
     st2 = dict(st, attempts=3, correct=3, p_mastery=0.9, state="MASTERED",
                last_at=bc.now() - timedelta(days=30), stability_days=3.0,
                retained_at=None, transferred_at=None)
@@ -257,6 +295,7 @@ async def main():
     test_irt_3pl()
     test_bkt_decay()
     test_states()
+    await test_apply_attempt_decays_first()
     test_diagnosis()
     test_parser()
     await test_validation()

@@ -119,11 +119,12 @@
   /** Rekaman satu lesson dalam bentuk aman: angka korup jatuh ke default yang jujur. */
   function readLesson(lessons, id) {
     var row = lessons && typeof lessons === 'object' ? lessons[id] : null;
-    if (!row || typeof row !== 'object') return { L: PARAMS.L0, n: 0, lastAt: 0 };
+    if (!row || typeof row !== 'object') return { L: PARAMS.L0, n: 0, lastAt: 0, gatePassedAt: 0 };
     return {
       L: clamp(num(row.L, PARAMS.L0), EPS, 1 - EPS),
       n: Math.max(0, Math.floor(num(row.n, 0))),
-      lastAt: Math.max(0, num(row.lastAt, 0))
+      lastAt: Math.max(0, num(row.lastAt, 0)),
+      gatePassedAt: Math.max(0, num(row.gatePassedAt, 0))
     };
   }
 
@@ -142,6 +143,19 @@
    * Murni dan immutable: st milik pemanggil tidak disentuh; salinan baru dikembalikan.
    * nowMs opsional (aturan v3: waktu selalu argumen, TANPA Date.now fallback) — tanpa
    * nowMs, lastAt lama dipertahankan agar tidak ada jam diam-diam.
+   *
+   * m025-375 (audit braincore B6, keputusan owner 2026-09-26): LUPA DULU, BARU MELANGKAH.
+   * calculateDecay() sudah ada dan teruji, tetapi tidak satu pun jalur runtime memakainya, dan
+   * update() melangkah dari L tersimpan yang belum diluruhkan. Akibatnya, kalau peluruhan kelak
+   * disambung di tampilan, satu jawaban SALAH setelah jeda 90 hari justru menaikkan mastery
+   * yang tampil dari ~0.30 ke ~0.94 (L lama 0.99 jadi titik awal, lastAt diperbarui). Sekarang
+   * L diluruhkan ke nowMs lebih dulu, jadi lupa ikut tercatat di state.
+   *
+   * gatePassedAt: saat pertama kali gerbang mastery lolos (L >= 0.95, n >= 5). Gerbang itu
+   * membuka lesson berikutnya (bktMasteredSkills di app.js), dan pembukaan harus AWET - lupa
+   * boleh menurunkan L, tetapi tidak boleh MENGUNCI ULANG lesson yang sudah terbuka (prinsip
+   * yang sama dengan skippedAt, m025-177). Baris lama yang sudah lolos gerbang sebelum
+   * m025-375 dicap saat update berikutnya, SEBELUM peluruhan menurunkan L-nya.
    */
   function update(st, obs, nowMs) {
     var base = normalizeState(st);
@@ -158,15 +172,18 @@
     if (weight <= 0) return next;
 
     var prev = readLesson(base.lessons, lesson);
-    var classic = bktStep(prev.L, !!(obs && obs.correct));
+    var at = num(nowMs, prev.lastAt);
+    // Migrasi: baris yang sudah lolos gerbang sebelum field ini ada dicap dari bukti lamanya.
+    var passedAt = prev.gatePassedAt || ((prev.L >= GATE.L && prev.n >= GATE.minN) ? (prev.lastAt || at || 1) : 0);
+    var start = calculateDecay(prev.L, prev.lastAt, nowMs);
+    var classic = bktStep(start, !!(obs && obs.correct));
     // Penskalaan bukti di ruang log-odds: weight=1 persis BKT klasik, weight=0 diam.
-    var L2 = sigmoid(logit(prev.L) + weight * (logit(classic) - logit(prev.L)));
+    var L2 = clamp(sigmoid(logit(start) + weight * (logit(classic) - logit(start))), EPS, 1 - EPS);
+    if (!passedAt && L2 >= GATE.L && prev.n + 1 >= GATE.minN) passedAt = at || 1;
 
-    next.lessons[lesson] = {
-      L: clamp(L2, EPS, 1 - EPS),
-      n: prev.n + 1,
-      lastAt: num(nowMs, prev.lastAt)
-    };
+    var row = { L: L2, n: prev.n + 1, lastAt: at };
+    if (passedAt) row.gatePassedAt = passedAt;
+    next.lessons[lesson] = row;
     return next;
   }
 
@@ -185,6 +202,7 @@
         n: row.n,
         lastAt: row.lastAt
       };
+      if (num(row.gatePassedAt, 0) > 0) next.lessons[k].gatePassedAt = row.gatePassedAt;
     }
     return next;
   }
@@ -209,6 +227,15 @@
     var m = mastery(st, lesson, nowMs, halfLifeDays);
     return m.L >= GATE.L && m.n >= GATE.minN;
   }
+  /**
+   * Apakah gerbang mastery lesson ini PERNAH lolos (m025-375). Dipakai untuk pembukaan lesson,
+   * yang harus awet walau L kemudian meluruh; diagnosis dan tampilan tetap membaca L terkini.
+   */
+  function gateEverPassed(st, lesson) {
+    var row = readLesson(normalizeState(st).lessons, str(lesson));
+    return row.gatePassedAt > 0 || (row.L >= GATE.L && row.n >= GATE.minN);
+  }
+
 
   /**
    * graphRows -> peta lessonId -> [prasyarat]. Menerima dua bentuk yang sama dengan
@@ -272,7 +299,9 @@
       var parents = idx[id];
       var ready = true;
       for (var i = 0; i < parents.length; i++) {
-        if (!masteryGate(st, parents[i])) { ready = false; break; }
+        // Prasyarat yang pernah lolos gerbang tetap membuka jalan (m025-375): lupa menurunkan L,
+        // bukan menutup ulang frontier yang sudah terbuka.
+        if (!gateEverPassed(st, parents[i])) { ready = false; break; }
       }
       if (!ready) continue;
       var p = NaN;
@@ -304,14 +333,16 @@
    * Tanpa prasyarat lemah -> null: gejala ini akarnya sendiri, dan berkata jujur soal
    * itu lebih berguna daripada memaksakan kambing hitam.
    */
-  function rootCause(st, graphRows, lesson) {
+  function rootCause(st, graphRows, lesson, nowMs) {
     var target = str(lesson);
     if (!target) return null;
     var idx = graphIndex(graphRows);
     var chain = prerequisiteChain(idx, target);
     var worst = null;
     for (var i = 0; i < chain.length; i++) {
-      var m = mastery(st, chain[i]);
+      // nowMs opsional (m025-375): dengan waktu, prasyarat yang dulu kuat tetapi lama tidak
+      // disentuh ikut terbaca meluruh - "sudah lupa" adalah akar masalah yang sah.
+      var m = mastery(st, chain[i], nowMs);
       if (m.L >= GATE.L && m.n >= GATE.minN) continue; // prasyarat ini sehat
       if (!worst || m.L < worst.L) worst = { lesson: chain[i], L: m.L, n: m.n };
     }
@@ -333,6 +364,7 @@
     update: update,
     mastery: mastery,
     masteryGate: masteryGate,
+    gateEverPassed: gateEverPassed,
     frontier: frontier,
     rootCause: rootCause,
     decay: decay,

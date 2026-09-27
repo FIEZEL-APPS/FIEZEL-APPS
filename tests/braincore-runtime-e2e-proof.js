@@ -8,12 +8,12 @@
  *   2. single mistake -> gentle correction (CORRECTING, no reveal, retry enabled)
  *   3. repeated misconception -> strategy changes (reteach card, forceConcept, REINFORCING)
  *   4. intervention -> learner improves (subsequent success -> evaluateOutcome: 'keep')
- *   5. intervention fails -> strategy changes or rollback (fatigue + regression -> rollback targetSuccess, CONCERNED)
+ *   5. intervention fails -> rollback recommended in the trace, parameters untouched (tuner off, OWNER 2026-09-26), CONCERNED
  *   6. mastery -> intervention fades and challenge increases (mastery_milestone -> CELEBRATING, avoidConcept)
  *   7. identical event stream -> identical Braincore result (replay determinism)
  *   8. offline execution -> core loop still works (zero network dependencies)
  *   9. decision -> evidence trace (tamper-evident 64-bit cryptographic chaining & verifyLedger)
- *  10. evidence -> subsequent Braincore behavior (prove Braincore decision ACTUALLY changes next learning item)
+ *  10. evidence -> subsequent Braincore behavior (evidence raises ability; same 0.80 target picks a harder next item)
  */
 'use strict';
 
@@ -278,20 +278,14 @@ test('Invariant 4 · Intervention -> Learner improves (evaluateOutcome: POSITIVE
 // -------------------------------------------------------------------------
 // Invariant 5: Intervention Fails -> Strategy Changes / Rollback
 // -------------------------------------------------------------------------
-test('Invariant 5 · Intervention fails -> Autonomous regression rollback & CONCERNED presence', () => {
+test('Invariant 5 · Intervention fails -> rollback recommended, parameters untouched & CONCERNED presence', () => {
   decisionTrace.clear();
 
-  // Setel parameter adaptasi awal (misalnya sudah pernah naik ke 0.82)
-  const initialParams = decisionTrace.readParams();
-  initialParams['difficulty.targetSuccess'] = 0.82;
-  initialParams.activeChange = {
-    path: 'difficulty.targetSuccess',
-    from: 0.80,
-    to: 0.82,
-    at: 1710000045000,
-    reason: 'test_adaptation'
-  };
-  decisionTrace.writeParams(initialParams);
+  // OWNER 2026-09-26 (m025-375): penyetelan targetSuccess otomatis dimatikan (audit braincore
+  // A1). Kegagalan intervensi tetap dievaluasi dan rekomendasinya ('rollback') tetap tercatat
+  // di jejak, tetapi tidak ada parameter yang bergeser - dulu invarian ini membuktikan rollback
+  // 0.82 -> 0.80, yang hanya ada karena penyetel tanpa pagar lebih dulu menaikkannya.
+  assert.strictEqual(decisionTrace.readParams()['difficulty.targetSuccess'], 0.80);
 
   // Keputusan peningkatan tantangan
   const challengeDec = decisionTrace.recordDecision({
@@ -315,10 +309,10 @@ test('Invariant 5 · Intervention fails -> Autonomous regression rollback & CONC
   const evalResult = decisionTrace.evaluateOutcome(challengeDec.traceId, fatigueObs);
   assert.strictEqual(evalResult.outcome.recommendation, 'rollback');
 
-  // Verifikasi rollback otomatis parameter ke 0.80
-  const postRollbackParams = decisionTrace.readParams();
-  assert.strictEqual(postRollbackParams['difficulty.targetSuccess'], 0.80);
-  assert.strictEqual(postRollbackParams.activeChange, null);
+  // Parameter tidak disentuh: tetap bawaan, tanpa perubahan aktif.
+  const postParams = decisionTrace.readParams();
+  assert.strictEqual(postParams['difficulty.targetSuccess'], 0.80);
+  assert.strictEqual(postParams.activeChange, null);
 
   // Presence Engine merespons kelelahan murid
   const pres = presenceEngine.determine({
@@ -472,54 +466,44 @@ test('Invariant 9 · Decision -> Evidence trace (cryptographic chain & tamper de
 test('Invariant 10 · Evidence -> Subsequent Braincore behavior (PROVE Braincore decision changes NEXT learning item)', () => {
   decisionTrace.clear();
 
-  // Kolam soal dengan dua opsi terkalibrasi IRT 3PL:
-  // - item_challenging (difficulty 1.32 -> p = 0.801, jarak ke target 0.80 hanya 0.001)
-  // - item_easy (difficulty 1.12 -> p = 0.842, jarak ke target 0.84 hanya 0.002)
+  // OWNER 2026-09-26 (m025-375): invarian ini dulu dibuktikan lewat penyetel targetSuccess
+  // otomatis (0.80 -> 0.84 membuat soal MUDAH terpilih). Penyetel itu dimatikan (audit
+  // braincore A1). Jalur yang sah - dan yang memang dimaksud "bukti mengubah langkah
+  // berikutnya" - adalah bukti menggeser TAKSIRAN KEMAMPUAN, sementara target tetap 0.80.
+  const NOW = 1710000000000;
   const pool = [
-    { id: 'item_challenging', concept: 'grammar_advanced', difficulty: 1.32 },
-    { id: 'item_easy', concept: 'grammar_basics', difficulty: 1.12 }
+    { id: 'item_foundation', concept: 'grammar_basics', difficulty: 1.33 },
+    { id: 'item_stretch', concept: 'grammar_advanced', difficulty: 2.33 }
   ];
+  const pick = (ability) => tutorBrain.selectNext(pool, {}, {
+    predict: (item) => coreBrain.successProbability(ability, item.difficulty),
+    targetSuccess: 0.80
+  });
 
-  const learnerAbility = 2.0;
-  const predictFn = (item) => coreBrain.successProbability(learnerAbility, item.difficulty);
+  // Kasus A: belum ada bukti -> kemampuan = prior 2.0 -> soal dasar (p ~ 0.80) yang dipilih.
+  const before = coreBrain.estimateAbility([], { now: NOW, prior: 2.0 });
+  const selectedBefore = pick(before.ability);
+  assert.strictEqual(selectedBefore.id, 'item_foundation', 'Tanpa bukti, soal setingkat kemampuan awal yang dipilih');
 
-  // Prediksi peluang benar:
-  const pChallenging = predictFn(pool[0]); // 0.8012
-  const pEasy = predictFn(pool[1]);        // 0.8419
+  // Kasus B: dua belas jawaban benar pada soal tingkat 3 dicatat sebagai bukti.
+  const evidence = [];
+  for (let i = 0; i < 12; i++) {
+    evidence.push({ at: NOW - (12 - i) * 60000, ok: true, difficulty: 3 });
+    const d = decisionTrace.recordDecision({ action: 'practice', nowMs: NOW - (12 - i) * 60000 });
+    decisionTrace.evaluateOutcome(d.traceId, { correct: true });
+  }
+  const after = coreBrain.estimateAbility(evidence, { now: NOW, prior: 2.0 });
+  assert.ok(after.ability > before.ability + 1, 'Bukti benar pada soal sulit menaikkan taksiran kemampuan');
 
-  // Kasus A: targetSuccess = 0.80 (baseline)
-  // Skor item_challenging (-|0.801 - 0.80|^2 = -0.0000015) lebih dekat ke 0.80 daripada item_easy (-|0.842 - 0.80|^2 = -0.00175)
-  const selectedAt80 = tutorBrain.selectNext(pool, {}, { predict: predictFn, targetSuccess: 0.80 });
-  assert.strictEqual(selectedAt80.id, 'item_challenging', 'Pada target 0.80, soal tantangan harus dipilih');
+  // Target TIDAK bergeser oleh bukti yang sama - tidak ada lagi penyetel yang memudahkan soal.
+  assert.strictEqual(decisionTrace.readParams()['difficulty.targetSuccess'], 0.80);
 
-  // Kasus B: 3 Sukses beruntun memicu Self-Tuning menaikkan targetSuccess ke 0.84!
-  const d1 = decisionTrace.recordDecision({ action: 'practice' });
-  decisionTrace.evaluateOutcome(d1.traceId, { correct: true });
-  const d2 = decisionTrace.recordDecision({ action: 'practice' });
-  decisionTrace.evaluateOutcome(d2.traceId, { correct: true });
-  const d3 = decisionTrace.recordDecision({ action: 'practice' });
-  decisionTrace.evaluateOutcome(d3.traceId, { correct: true });
+  // Kasus C: dengan kemampuan baru dan target yang sama, soal berikutnya BERUBAH ke yang lebih menantang.
+  const selectedAfter = pick(after.ability);
+  assert.strictEqual(selectedAfter.id, 'item_stretch', 'Kemampuan naik -> soal yang lebih menantang dipilih');
+  assert.notStrictEqual(selectedBefore.id, selectedAfter.id, 'Keputusan Braincore TERBUKTI mengubah soal belajar berikutnya');
 
-  const tunedParams = decisionTrace.readParams();
-  assert.strictEqual(tunedParams['difficulty.targetSuccess'], 0.82);
-
-  // Lanjutkan adaptasi ke 0.84
-  const d4 = decisionTrace.recordDecision({ action: 'practice' });
-  decisionTrace.evaluateOutcome(d4.traceId, { correct: true });
-  const d5 = decisionTrace.recordDecision({ action: 'practice' });
-  decisionTrace.evaluateOutcome(d5.traceId, { correct: true });
-  const d6 = decisionTrace.recordDecision({ action: 'practice' });
-  decisionTrace.evaluateOutcome(d6.traceId, { correct: true });
-
-  const tunedParams84 = decisionTrace.readParams();
-  assert.strictEqual(tunedParams84['difficulty.targetSuccess'], 0.84);
-
-  // Kasus C: Dengan targetSuccess 0.84 hasil self-tuning, item yang dipilih BERUBAH!
-  // Sekarang item_easy (-|0.84 - 0.84|^2 = 0) MENANG mutlak atas item_challenging!
-  const selectedAt84 = tutorBrain.selectNext(pool, {}, { predict: predictFn, targetSuccess: tunedParams84['difficulty.targetSuccess'] });
-  assert.strictEqual(selectedAt84.id, 'item_easy', 'Pada target 0.84, soal mudah HARUS dipilih — terbukti mengubah aksi belajar berikutnya!');
-
-  assert.notStrictEqual(selectedAt80.id, selectedAt84.id, 'Keputusan Braincore TERBUKTI secara matematis mengubah soal belajar berikutnya!');
+  decisionTrace.clear();
 });
 
 console.log('\n======================================================');
