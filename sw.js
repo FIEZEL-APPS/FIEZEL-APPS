@@ -53,7 +53,7 @@ const CACHE=`fiezel-v${self.FIEZEL_VERSION}`;
 // dilayani dan kedua berkas baru tidak pernah sampai ke pengguna lama - aplikasi mereka
 // akan menjalankan app.js baru tanpa berkas benderanya, dan seluruh bendera jatuh ke
 // salinan bawaan di app.js. Naik SEKALI untuk seluruh gelombang.
-const SW_REV='m025-377-grammar-soal-baru-20260927';
+const SW_REV='m025-378-grammar-soal-baru-20260927';
 const SHELL_CACHE=`fiezel-shell-${SW_REV}`;
 // m025-61: health check menanyakan revisi shell langsung ke worker yang sedang aktif.
 // Menebaknya dari nama cache tidak cukup: cache lama bisa tertinggal, sedangkan jawaban ini
@@ -102,7 +102,7 @@ const ASSETS=['./','./index.html','./style.css','./features/mascot/fiezel-motion
   // SRL coach (C4). Aturan yang sama dengan modul brain lain: masuk precache HANYA setelah
   // berkasnya ada di repo, karena cache.addAll gagal total bila satu saja 404. Berkas-berkas
   // ini dijanjikan kontrak Fase 3 dan wajib mendarat bersama rilis ini.
-  './features/brain/fiezel-item-calibration.js','./features/brain/fiezel-speaking-adaptive.js','./features/brain/fiezel-srl-coach.js',
+  './features/brain/fiezel-item-calibration.js','./features/brain/fiezel-item-pool.js','./features/brain/fiezel-speaking-adaptive.js','./features/brain/fiezel-srl-coach.js',
   // Wave 1 i18n (AI-02 / AI-13 F02): runtime i18n + copy-map Indonesia ikut shell - PWA ini
   // offline-first dan copy-map yang tidak ter-precache berarti murid id offline kehilangan
   // seluruh naskah antarmukanya. Daftar domain copy-id di bawah adalah daftar FINAL Wave 2

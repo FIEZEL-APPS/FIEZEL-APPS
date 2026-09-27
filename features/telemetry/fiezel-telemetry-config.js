@@ -83,6 +83,28 @@
       // Sama dengan lane agregat: sekali sehari sudah memuat seluruh informasi
       // yang bucket sekasar ini bisa bawa.
       minIntervalMs: 86400000
+    }),
+    /* Lane KELIMA: kesulitan soal GABUNGAN (`fiezel-item-evidence-v1`, Braincore
+     * langkah 2). Perangkat mengirim jawaban PERTAMA murid pada setiap soal
+     * ([itemId, bucket prediksi, benar] + hari) dan membaca balik tabel koreksi
+     * kesulitan yang dihitung dari semua murid.
+     *
+     * Saklarnya SENDIRI lagi, dan lane ini yang PALING TIPIS identitasnya: tanpa
+     * cohort, tanpa cookie (credentials:'omit'), tanpa pengenal apa pun — yang ada
+     * hanya ID templat soal dari daftar tertutup.
+     *
+     * 'on' di sini aman sebelum server siap: saat `ITEM_POOL_ENABLED` server mati,
+     * server menjawab `{disabled:true}` dan perangkat MENYIMPAN catatannya (maks.
+     * 56 hari) untuk dikirim setelah owner menyalakan lane — lihat
+     * reports/ITEM_POOL_ACTIVATION.md. 'local' = catat saja, tidak pernah kirim/baca;
+     * 'off' = tidak ada apa pun, kesulitan soal persis seperti sebelum langkah 2. */
+    itemPool: Object.freeze({
+      schema: 'fiezel-item-evidence-v1',
+      mode: 'on',
+      endpoint: 'https://api.fiezel.my.id/api/braincore/item-evidence',
+      tableEndpoint: 'https://api.fiezel.my.id/api/braincore/item-difficulty',
+      // Tabel dibangun ulang server sekali sehari; membacanya lebih sering sia-sia.
+      tableRefreshMs: 86400000
     })
   });
   return Object.freeze({ CONFIG: CONFIG, SCHEMA: CONFIG.schema });

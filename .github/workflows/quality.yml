@@ -1046,6 +1046,7 @@ jobs:
           node tests/r2-ux-overhaul-smoke-test.js
           node tests/step-tutor-test.js
           node tests/item-calibration-test.js
+          node tests/item-pool-test.js
           node tests/speaking-adaptive-test.js
           node tests/srl-coach-test.js
           node tests/cors-envelope-test.js
