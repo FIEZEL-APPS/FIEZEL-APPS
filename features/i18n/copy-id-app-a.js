@@ -110,6 +110,9 @@
     'grammar.mode-teach-benar': 'Ringkasan itu nyatuin tujuan lesson sama aturan yang bener.',
     // app.js:581 — grammarExercise v1 (joinQuoteReason head)
     'grammar.versi-pakai': `Versi pakai {opsiDikutip}`,
+    // app.js — grammarVersionReason (alasan pilihan salah, mode kalimat lengkap)
+    'grammar.versi-salah-pakai': `Di kalimat ini, {opsiDikutip}`,
+    'grammar.versi-salah-awal': 'Di kalimat ini,',
     // app.js:1436 — dailyBrief() weak fallback
     'home.brief-belum-pola': 'Belum ada pola',
     // app.js:1436 — dailyBrief() goal
