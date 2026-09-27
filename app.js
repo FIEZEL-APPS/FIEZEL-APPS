@@ -640,11 +640,16 @@ function quoteEmbedShort(s,maxWords=QUOTE_EMBED_MAX_WORDS){
 /* m025-376: alasan kartu disambung ke "Yang benar “on”: ..." jadi huruf pertamanya dikecilkan -
    tapi bukan kalau kata itu nama/hari yang juga tertulis di kalimat soal ("Monday", "Nadia") atau
    "I": sebelum ini murid membaca "monday morning itu hari tertentu" dan "nadia nggak bisa...". */
+/* m025-377: alasan yang dibuka dengan kutipan Inggris ("“Expensive” kata panjang…") ikut dikecilkan,
+   karena sebelum ini murid membaca "pas di sini — “Expensive” kata panjang". Yang dicocokkan ke kalimat
+   soal adalah seluruh isi kutipan, jadi “The heavy rain” tetap dikecilkan walau soalnya dibuka "The". */
 function grammarCausalKey(whyCorrect,stem){
   const w=String(whyCorrect||'').trim();if(!w)return '';
-  const first=(w.match(/^[A-ZÀ-Ü][A-Za-zÀ-ÿ'’-]*/)||[''])[0];if(!first)return w;
-  const keep=first==='I'||new RegExp('(^|[^A-Za-z])'+first.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+'([^A-Za-z]|$)').test(String(stem||''));
-  return keep?w:w.charAt(0).toLowerCase()+w.slice(1);
+  const lead=(w.match(/^[\u201c\u2018"']/)||[''])[0],body=w.slice(lead.length);
+  const first=(body.match(/^[A-ZÀ-Ü][A-Za-zÀ-ÿ'’-]*/)||[''])[0];if(!first)return w;
+  const quoted=lead?(body.match(/^[^\u201d\u2019"']+/)||[''])[0].trim():'',probe=quoted||first;
+  const keep=/^I(?:['’]|$)/.test(first)||new RegExp('(^|[^A-Za-z])'+probe.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+'([^A-Za-z]|$)').test(String(stem||''));
+  return keep?w:lead+body.charAt(0).toLowerCase()+body.slice(1);
 }
 function joinQuoteReason(quoted,tail){
   const q=String(quoted||'').trim(),t=String(tail||'').trim();
@@ -671,8 +676,20 @@ function grammarReasonForLearner(option,rawReason,isTh){
   if(isTh){const thai=(own.match(/[\u0E00-\u0E7F]/g)||[]).length,letters=(own.match(/[A-Za-z\u0E00-\u0E7F]/g)||[]).length;if(!letters||thai*2<letters)return ''}
   else if(!tutorIndonesian(own))return '';
   const bare=own.replace(/^[\s\u201c"'\u2018]+/,'').toLowerCase(),opt=stripQuotes(option).toLowerCase();
-  if(opt&&bare.startsWith(opt))return grammarCapFirst(own);
+  /* m025-377: awalan harus berhenti di batas kata. Alasan bentuk dasar untuk opsi be, atau artinya untuk
+     opsi a, belum menyebut opsinya, jadi tetap diberi kutipan opsi. */
+  if(opt&&bare.startsWith(opt)&&!/[a-z0-9\u00c0-\u024f]/.test(bare.charAt(opt.length)))return grammarCapFirst(own);
   return joinQuoteReason(quoteEmbedShort(option),own);
+}
+/* m025-377: alasan pilihan salah di mode kalimat lengkap. Subjeknya opsi itu sendiri, bukan versinya:
+   "Versi pakai “beauty” kata benda" terbaca seolah versinya yang kata benda. Alasan yang sudah dibuka
+   dengan opsinya tidak dikutip ulang, karena sebelum ini 206 alasan tampil sebagai
+   "Versi pakai “less” “less” disediain…". */
+function grammarVersionReason(option,rawReason){
+  const own=String(rawReason||'').trim();if(!own)return '';
+  const bare=own.replace(/^[\s\u201c"'\u2018]+/,'').toLowerCase(),opt=stripQuotes(option).toLowerCase();
+  if(opt&&bare.startsWith(opt)&&!/[a-z0-9\u00c0-\u024f]/.test(bare.charAt(opt.length)))return `${FiezelI18n.t('grammar.versi-salah-awal')} ${own}`;
+  return joinQuoteReason(FiezelI18n.t('grammar.versi-salah-pakai',{opsiDikutip:quoteEmbedShort(option)}),own);
 }
 function grammarOptionReason(option,isCorrect,rawReason='',misconception=''){if(isCorrect)return joinQuoteReason(quoteEmbedShort(option),FiezelI18n.t('grammar.alasan-opsi-benar'));const isTh=(self.FiezelI18n?.getLocale?.()==='th');const ownReason=grammarReasonForLearner(option,rawReason,isTh);if(ownReason)return ownReason;const named=!isTh?grammarMisconceptionReason(misconception):'';if(named)return joinQuoteReason(quoteEmbedShort(option),named);const raw=String(rawReason).toLowerCase();if(/specific|definite past|dated past|finished point/.test(raw))return joinQuoteReason(quoteEmbedShort(option),FiezelI18n.t('grammar.alasan-opsi-waktu-lampau'));if(/habit|routine|general truth/.test(raw))return joinQuoteReason(quoteEmbedShort(option),FiezelI18n.t('grammar.alasan-opsi-kebiasaan'));if(/permission/.test(raw))return joinQuoteReason(quoteEmbedShort(option),FiezelI18n.t('grammar.alasan-opsi-izin'));if(/obligation|requirement|rule/.test(raw))return joinQuoteReason(quoteEmbedShort(option),FiezelI18n.t('grammar.alasan-opsi-kewajiban'));if(/prohibition/.test(raw))return joinQuoteReason(quoteEmbedShort(option),FiezelI18n.t('grammar.alasan-opsi-larangan'));if(/singular|plural|agreement/.test(raw))return joinQuoteReason(quoteEmbedShort(option),FiezelI18n.t('grammar.alasan-opsi-agreement'));if(/superlative/.test(raw))return joinQuoteReason(quoteEmbedShort(option),FiezelI18n.t('grammar.alasan-opsi-superlative'));if(/comparative/.test(raw))return joinQuoteReason(quoteEmbedShort(option),FiezelI18n.t('grammar.alasan-opsi-comparative'));if(/word order|order/.test(raw))return joinQuoteReason(quoteEmbedShort(option),FiezelI18n.t('grammar.alasan-opsi-urutan-kata'));if(/infinitive/.test(raw))return joinQuoteReason(quoteEmbedShort(option),FiezelI18n.t('grammar.alasan-opsi-infinitive'));if(/gerund/.test(raw))return joinQuoteReason(quoteEmbedShort(option),FiezelI18n.t('grammar.alasan-opsi-gerund'));if(/passive|agent/.test(raw))return joinQuoteReason(quoteEmbedShort(option),FiezelI18n.t('grammar.alasan-opsi-pasif'));if(/article|identif/.test(raw))return joinQuoteReason(quoteEmbedShort(option),FiezelI18n.t('grammar.alasan-opsi-artikel'));if(/auxiliary/.test(raw))return joinQuoteReason(quoteEmbedShort(option),FiezelI18n.t('grammar.alasan-opsi-auxiliary'));return joinQuoteReason(quoteEmbedShort(option),FiezelI18n.t('grammar.alasan-opsi-umum'))}
 function grammarMeta(item){const explanation=item?.[12]||{};const p=(...v)=>String(v.find(x=>x)||'');return{stem:String(item?.[0]||''),options:Array.isArray(item?.[1])?item[1]:[],correctIndex:item?.[2],rule:p(explanation.ruleId,explanation.rule,item?.[3]),whyCorrect:p(explanation.whyCorrectId,explanation.whyCorrect,item?.[7]),objective:p(item?.[16]?.objectiveId,item?.[9]),misconception:p(item?.[16]?.misconceptionId,item?.[10]),reasoning:p(item?.[16]?.reasoningId,item?.[11]),whyOthers:p(explanation.whyOthersFailId,explanation.whyOthersFail),avoid:p(explanation.howToAvoidId,explanation.howToAvoid),memory:p(explanation.memoryCueId,explanation.memoryCue),id:String(item?.[8]||''),family:String(item?.[6]||'core_grammar')}}
@@ -833,7 +850,7 @@ function grammarExercise(skill,item,variant){const meta=grammarMeta(item),correc
   // m025-162 (S3/M3): alasan opsi complete_sentence dipetakan lewat INDEKS (kanal verbatim),
   // bukan pencocokan teks opsi terisi yang gagal senyap di stem multi-blank; jangkar kutipannya
   // isi opsi itu sendiri, bukan 8 kata pertama stem yang identik untuk keempat opsi.
-  if(variant===1)return direct(FiezelI18n.t('grammar.mode-complete-stem',{judulLesson:title.toLowerCase(),stem:base}),meta.options.map(option=>completeGrammarStem(grammarOptionStem(base),option)),meta.correctIndex,joinQuoteReason(FiezelI18n.t('grammar.versi-pakai',{opsiDikutip:quoteEmbedShort(correct)}),causalKey?FiezelI18n.t('quiz.grammar-causal-pas',{reason:causalKey}):FiezelI18n.t('grammar.alasan-versi-pas')),reasons,[],meta.options.map((option,i)=>i===meta.correctIndex?'':(reasons[i]?joinQuoteReason(FiezelI18n.t('grammar.versi-pakai',{opsiDikutip:quoteEmbedShort(option)}),String(reasons[i])):'')));
+  if(variant===1)return direct(FiezelI18n.t('grammar.mode-complete-stem',{judulLesson:title.toLowerCase(),stem:base}),meta.options.map(option=>completeGrammarStem(grammarOptionStem(base),option)),meta.correctIndex,joinQuoteReason(FiezelI18n.t('grammar.versi-pakai',{opsiDikutip:quoteEmbedShort(correct)}),causalKey?FiezelI18n.t('quiz.grammar-causal-pas',{reason:causalKey}):FiezelI18n.t('grammar.alasan-versi-pas')),reasons,[],meta.options.map((option,i)=>i===meta.correctIndex?'':grammarVersionReason(option,reasons[i])));
   // m025-155: mode beropsi KALIMAT (justify/diagnose/label/contrast) tidak boleh jatuh ke
   // heuristik bentuk kata kerja di grammarOptionReason(); tiap opsi salah diberi penjelasan
   // verbatim yang menyebut peran sebenarnya dari kalimat itu.

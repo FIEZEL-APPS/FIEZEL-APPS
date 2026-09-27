@@ -11,6 +11,7 @@ paket JSON-nya: paket selalu dibangun ulang dari sumber.
 | --- | --- | --- |
 | g | `sources/a1_part1.py` … `a1_part3.py` | A1 lesson 1–17, A1-301..368 (4 kalimat per lesson) |
 | h | `sources/a2_part1.py`, `a2_part2.py` | A2 lesson 18–31, A2-301..356 (4 kalimat per lesson) |
+| i | `sources/a2_part3.py`, `a2_part4.py` | A2 lesson 32–46, A2-357..416 (4 kalimat per lesson) |
 
 ## Alur kerja
 

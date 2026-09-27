@@ -9,14 +9,13 @@ sebagai murid, termasuk ketepatan bahasa Indonesianya.
 
 | | Sebelum | Sesudah |
 | --- | --- | --- |
-| Templat grammar | 328 | 452 (+124) |
+| Templat grammar | 328 | 512 (+184) |
 | Kalimat per lesson A1 (17 lesson) | 2 | 6 |
-| Kalimat per lesson A2 18–31 (14 lesson) | 2 | 6 |
-| Kalimat per lesson A2 32–46 (15 lesson) | 2 | 2 — **belum**, lihat "Sisa pekerjaan" |
-| Nama label miskonsepsi berdiagnosis | 682 | 814 (+132, semua punya kode taksonomi) |
-| Butir cloze (dibangun dari templat) | 279 | 378 |
+| Kalimat per lesson A2 (lesson 18–46, 29 lesson) | 2 | 6 |
+| Nama label miskonsepsi berdiagnosis | 682 | 865 (+183, semua punya kode taksonomi) |
+| Butir cloze (dibangun dari templat) | 279 | 436 |
 
-Soal baru: A1-301..368 (paket `new-templates-g.json`) dan A2-301..356 (paket `new-templates-h.json`). Setiap soal
+Soal baru: A1-301..368 (paket `new-templates-g.json`), A2-301..356 (`new-templates-h.json`), dan A2-357..416 (`new-templates-i.json`). Setiap soal
 membawa teks Inggris, Indonesia, dan Thai: tujuan, miskonsepsi, aturan, alasan benar, alasan tiap pilihan salah,
 perbandingan pilihan, cara cek, pengingat, dan 3 langkah penalaran.
 
@@ -54,9 +53,10 @@ Setelah itu setiap soal dibaca ulang sebagai murid, dalam bahasa Indonesia dan T
 
 - Pengecoh yang ternyata masih sah di bahasa Inggris nyata dibuang: *you will get purple* untuk fakta umum,
   *some old photo* (lisan), *Which is big, a cat or a dog?*, *Some apples were sweet* (dibaca "sebagian"),
-  *so fast like*.
+  *so fast like*, dan *so that* sebagai pengecoh akibat (A2-410: *The shop was closed, so that we went home* sah
+  dalam ragam resmi, jadi diganti *but*).
 - Istilah yang tidak dikenal murid diganti: "kata kerja polos/kata sifat polos" → "bentuk dasar".
-- Label yang teks diagnosisnya tidak cocok dengan pilihan diganti label yang tepat atau label baru (132 label baru,
+- Label yang teks diagnosisnya tidak cocok dengan pilihan diganti label yang tepat atau label baru (183 label baru,
   dipetakan ke 49 kode taksonomi yang sudah ada).
 
 ## Perubahan kode (m025-377)
@@ -72,15 +72,23 @@ Setelah itu setiap soal dibaca ulang sebagai murid, dalam bahasa Indonesia dan T
   jawaban. Tanpa ini kandidat grammar melipat tiga dan mendesak reading keluar dari pool (`regression-test`).
 - `tools/grammar-upgrade/stem-rewrites.json` disamakan dengan bank: 19 stem yang diedit sesudah paket rewrite ditulis
   selama ini dikembalikan diam-diam setiap pipa dijalankan.
-- `tools/apply-grammar-upgrade.js` membaca paket a..h.
+- `tools/apply-grammar-upgrade.js` membaca paket a..i.
+- `grammarReasonForLearner`: pencocokan "alasan sudah diawali opsinya" kini berhenti di batas kata. Sebelumnya alasan
+  "bentuk dasar…" untuk opsi *be* dan "artinya…" untuk opsi *a* tampil tanpa kutipan opsi (12 alasan, 5 di antaranya lama).
+- `grammarVersionReason` (mode "pilih kalimat yang benar"): alasan pilihan salah kini dibuka "Di kalimat ini, “opsi” …"
+  (Thai "ในประโยคนี้ …"). Sebelumnya "Versi pakai “beauty” kata benda" terbaca seolah versinya yang kata benda, dan 206
+  alasan lama yang sudah diawali opsinya tampil dobel: "Versi pakai “less” “less” disediain…". Baris jawaban benar tetap
+  "Versi pakai “X” pas — …".
+- `grammarCausalKey`: alasan yang dibuka dengan kutipan Inggris ikut dikecilkan saat disambung di tengah kalimat
+  ("pas di sini — “expensive” kata panjang", bukan "“Expensive”"). Yang dicocokkan ke soal adalah seluruh isi kutipan,
+  jadi kutipan yang memang tertulis begitu di soal ("Look!", "My dad", "July") tetap berhuruf besar.
 
 ## Gerbang
 
 Semua dijalankan dari checkout ini. Daftar lengkap `quality.yml`: lihat deskripsi PR untuk hasil terakhir.
 Yang langsung menyentuh konten baru: `grammar-quality-audit.js`, `content-integrity-audit.js` (0 kritis;
-8 MAJOR lama yang juga ada di `main`), `tests/misconception-diagnosis-test.js` (814 nama, cakupan 100%),
-`tests/misconception-taxonomy-test.js`, `tests/lesson-experience-test.js` (4.480 soal dirakit, 0 duplikat lintas
-lesson), `tests/th-coverage-test.js`, `tests/th-bank-purity-test.js`, `tests/step-tutor-test.js`,
+8 MAJOR lama yang juga ada di `main`), `tests/misconception-diagnosis-test.js` (865 nama, cakupan 100%),
+`tests/misconception-taxonomy-test.js`, `tests/lesson-experience-test.js` (0 duplikat lintas lesson), `tests/th-coverage-test.js`, `tests/th-bank-purity-test.js`, `tests/step-tutor-test.js`,
 `tests/content-integrity-gate-test.js`, `tests/regression-test.js`, `tests/cloze-bank-test.js`,
 `tests/id-golden-snapshot-test.js` (baseline diregenerasi karena perubahan disengaja).
 
@@ -97,7 +105,5 @@ lesson), `tests/th-coverage-test.js`, `tests/th-bank-purity-test.js`, `tests/ste
 
 ## Sisa pekerjaan
 
-- A2 lesson 32–46 (A2-357..416, 60 kalimat) masih 2 kalimat per lesson. Rancangan lesson 32–38 sudah ada;
-  akan menyusul sebagai paket `new-templates-i.json` di PR yang sama atau PR berikutnya (tambahkan `'i'` ke daftar
-  paket di `tools/apply-grammar-upgrade.js`).
-- B1–C2 belum disentuh.
+- Semua lesson A1 dan A2 sudah 6 kalimat. B1–C2 belum disentuh: alurnya sama (sumber baru di
+  `tools/dev/grammar-authoring/sources/`, paket baru, lalu dimainkan sebagai murid dalam Indonesia dan Thai).

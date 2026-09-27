@@ -2,11 +2,11 @@
   "schema": "fiezel-cloze-bank-v1",
   "generatedFrom": "grammar-templates.json",
   "counts": {
-    "templates": 452,
-    "items": 378,
-    "rejected": 74,
+    "templates": 512,
+    "items": 436,
+    "rejected": 76,
     "byLevel": {
-      "A2": 98,
+      "A2": 156,
       "B1": 86,
       "B2": 70,
       "C1": 30,
@@ -384,6 +384,16 @@
       "templateId": "A2-352",
       "reason": "answer_too_short",
       "detail": "jawaban \"at\" <3 karakter: grading edit-distance tidak andal"
+    },
+    {
+      "templateId": "A2-360",
+      "reason": "answer_too_short",
+      "detail": "jawaban \"is\" <3 karakter: grading edit-distance tidak andal"
+    },
+    {
+      "templateId": "A2-410",
+      "reason": "answer_too_short",
+      "detail": "jawaban \"so\" <3 karakter: grading edit-distance tidak andal"
     }
   ],
   "items": [
@@ -15133,6 +15143,2210 @@
         "rule": "Sama: “as” + kata sifat bentuk dasar + “as” (“as tall as”). Kalah: “not as … as”. Jangan pakai “than”, -er, atau “more” di dalamnya.",
         "memory": "Harga sama: “as expensive as”. Kata sifat panjang pun tetap bentuk dasar di dalamnya.",
         "avoid": "Sama atau beda? Kalau sama: “as … as”. Lalu cek kedua “as” dan kata sifat bentuk dasarnya."
+      }
+    },
+    {
+      "id": "A2-357-cz0",
+      "templateId": "A2-357",
+      "skill": "article_omission_with_uncountable",
+      "level": "A2",
+      "sentence": "Can you give me ___ about my English test?",
+      "blank": {
+        "answer": "some advice",
+        "alternates": [],
+        "position": 16
+      },
+      "distractors": [
+        {
+          "text": "an advice",
+          "misconception": "singular-article-with-uncountable",
+          "whyFailsId": "memakai “an”, padahal “advice” nggak bisa dihitung.",
+          "misconceptionId": "“an” dipakai untuk “advice” yang nggak bisa dihitung."
+        },
+        {
+          "text": "some advices",
+          "misconception": "removes the article correctly but incorrectly pluralizes the uncountable noun",
+          "whyFailsId": "sudah benar memakai “some”, tapi “advice” nggak pernah diberi -s.",
+          "misconceptionId": "“some” sudah benar, tapi “advice” malah diberi -s."
+        },
+        {
+          "text": "an advices",
+          "misconception": "keeps the indefinite article and also incorrectly pluralizes an uncountable noun",
+          "whyFailsId": "punya dua kesalahan: “an” di depan “advice” dan -s di belakangnya.",
+          "misconceptionId": "“an” dan -s dipakai bersamaan untuk “advice”."
+        }
+      ],
+      "explain": {
+        "why": "“Advice” nggak bisa dihitung, jadi tanpa “a/an” dan tanpa -s. Untuk jumlah yang nggak disebut, pakai “some”.",
+        "rule": "Benda yang nggak bisa dihitung (“advice”, “bread”, “information”) nggak pakai “a/an” dan nggak diberi -s. Pakai “some” atau “a piece of”, dan kata kerjanya tunggal.",
+        "memory": "“Advice”, “information”, “homework”: tanpa “a/an”, tanpa -s.",
+        "avoid": "Sebelum menulis “a/an”, tanya: benda ini bisa dihitung satu per satu?"
+      }
+    },
+    {
+      "id": "A2-358-cz0",
+      "templateId": "A2-358",
+      "skill": "article_omission_with_uncountable",
+      "level": "A2",
+      "sentence": "I'd like ___ rice with my chicken, please.",
+      "blank": {
+        "answer": "some",
+        "alternates": [],
+        "position": 9
+      },
+      "distractors": [
+        {
+          "text": "a",
+          "misconception": "singular-article-with-uncountable",
+          "whyFailsId": "butuh benda yang bisa dihitung; kalau mau menghitung nasi, bilang “a plate of rice”.",
+          "misconceptionId": "“a” dipakai untuk “rice” yang nggak bisa dihitung."
+        },
+        {
+          "text": "many",
+          "misconception": "countable-quantity-substitution",
+          "whyFailsId": "untuk benda yang bisa dihitung, padahal “rice” nggak bisa dihitung.",
+          "misconceptionId": "“many” dipakai untuk “rice”."
+        },
+        {
+          "text": "a few",
+          "misconception": "few or a few used with an uncountable noun",
+          "whyFailsId": "untuk benda jamak yang bisa dihitung, seperti telur, bukan untuk nasi.",
+          "misconceptionId": "“a few” dipakai untuk “rice”."
+        }
+      ],
+      "explain": {
+        "why": "“Rice” nggak bisa dihitung, jadi pakai “some”, bukan “a”.",
+        "rule": "Benda yang nggak bisa dihitung (“advice”, “bread”, “information”) nggak pakai “a/an” dan nggak diberi -s. Pakai “some” atau “a piece of”, dan kata kerjanya tunggal.",
+        "memory": "Makanan yang nggak bisa dihitung: “some rice”, “some bread”, “some water”.",
+        "avoid": "Sebelum menulis “a/an”, tanya: benda ini bisa dihitung satu per satu?"
+      }
+    },
+    {
+      "id": "A2-359-cz0",
+      "templateId": "A2-359",
+      "skill": "article_omission_with_uncountable",
+      "level": "A2",
+      "sentence": "I'm hungry. Can I have ___ bread, please?",
+      "blank": {
+        "answer": "a piece of",
+        "alternates": [],
+        "position": 23
+      },
+      "distractors": [
+        {
+          "text": "a",
+          "misconception": "singular-article-with-uncountable",
+          "whyFailsId": "ditaruh langsung di depan “bread”, padahal “bread” nggak bisa dihitung.",
+          "misconceptionId": "“a” dipakai langsung untuk “bread”."
+        },
+        {
+          "text": "a pieces of",
+          "misconception": "a used with the plural pieces",
+          "whyFailsId": "memasangkan “a” dengan “pieces”, padahal untuk satu potong, kata “piece” nggak diberi -s.",
+          "misconceptionId": "“a” dipasangkan dengan “pieces” yang jamak."
+        },
+        {
+          "text": "one",
+          "misconception": "number used directly with an uncountable noun",
+          "whyFailsId": "nggak bisa menghitung “bread” secara langsung; yang dihitung potongannya.",
+          "misconceptionId": "angka dipakai langsung untuk benda yang nggak bisa dihitung."
+        }
+      ],
+      "explain": {
+        "why": "“Bread” nggak bisa dihitung langsung, jadi yang dihitung potongannya dengan “a piece of”.",
+        "rule": "Benda yang nggak bisa dihitung (“advice”, “bread”, “information”) nggak pakai “a/an” dan nggak diberi -s. Pakai “some” atau “a piece of”, dan kata kerjanya tunggal.",
+        "memory": "Hitung potongan atau wadahnya: “a piece of bread”, “a glass of water”.",
+        "avoid": "Sebelum menulis “a/an”, tanya: benda ini bisa dihitung satu per satu?"
+      }
+    },
+    {
+      "id": "A2-361-cz0",
+      "templateId": "A2-361",
+      "skill": "definite_article_with_unique_referents_and_superlatives",
+      "level": "A2",
+      "sentence": "Jakarta is ___ city in Indonesia.",
+      "blank": {
+        "answer": "the biggest",
+        "alternates": [],
+        "position": 11
+      },
+      "distractors": [
+        {
+          "text": "a biggest",
+          "misconception": "treating a superlative noun phrase as an ordinary indefinite first mention",
+          "whyFailsId": "memakai “a”, padahal kota terbesar cuma ada satu.",
+          "misconceptionId": "“a” dipakai sebelum bentuk “paling”."
+        },
+        {
+          "text": "biggest",
+          "misconception": "the dropped before a superlative",
+          "whyFailsId": "tanpa “the”, padahal bentuk -est selalu datang bersama “the”.",
+          "misconceptionId": "'the' hilang sebelum bentuk 'paling'."
+        },
+        {
+          "text": "the bigest",
+          "misconception": "final consonant not doubled before -est",
+          "whyFailsId": "lupa menggandakan huruf g sebelum -est.",
+          "misconceptionId": "huruf mati terakhir nggak digandakan sebelum -est."
+        }
+      ],
+      "explain": {
+        "why": "Jakarta nomor satu di antara semua kota, jadi pakai “the” + bentuk “paling”, yaitu “the biggest”.",
+        "rule": "Kalau bendanya cuma bisa ada satu, pakai “the”: untuk bentuk “paling”, kata urutan seperti “first”, kata “same”, dan benda seperti matahari.",
+        "memory": "Nomor satu di kelompoknya: “the” + -est.",
+        "avoid": "Tanya: mungkinkah ada dua? Kalau nggak, pakai “the”."
+      }
+    },
+    {
+      "id": "A2-362-cz0",
+      "templateId": "A2-362",
+      "skill": "definite_article_with_unique_referents_and_superlatives",
+      "level": "A2",
+      "sentence": "Never look straight at ___ sun. It can hurt your eyes.",
+      "blank": {
+        "answer": "the",
+        "alternates": [],
+        "position": 23
+      },
+      "distractors": [
+        {
+          "text": "a",
+          "misconception": "a used for something there is only one of",
+          "whyFailsId": "berarti salah satu dari banyak matahari, padahal di langit kita cuma ada satu.",
+          "misconceptionId": "“a” dipakai untuk benda yang cuma ada satu."
+        },
+        {
+          "text": "an",
+          "misconception": "same indefinite-article error as 'a', plus a vowel-sound trigger confusion",
+          "whyFailsId": "untuk bunyi vokal, dan mataharinya pun cuma satu.",
+          "misconceptionId": "“an” dipakai untuk “sun”, padahal bendanya cuma satu dan bunyi awalnya konsonan."
+        },
+        {
+          "text": "some",
+          "misconception": "quantifier substituted for a singular countable reference",
+          "whyFailsId": "untuk menyebut jumlah, padahal mataharinya cuma satu.",
+          "misconceptionId": "kata jumlah dipakai untuk satu-satunya matahari."
+        }
+      ],
+      "explain": {
+        "why": "Matahari di langit kita cuma satu, jadi pakai “the”.",
+        "rule": "Kalau bendanya cuma bisa ada satu, pakai “the”: untuk bentuk “paling”, kata urutan seperti “first”, kata “same”, dan benda seperti matahari.",
+        "memory": "Benda yang cuma ada satu di dunia selalu pakai “the”, misalnya “the sun”.",
+        "avoid": "Tanya: mungkinkah ada dua? Kalau nggak, pakai “the”."
+      }
+    },
+    {
+      "id": "A2-363-cz0",
+      "templateId": "A2-363",
+      "skill": "definite_article_with_unique_referents_and_superlatives",
+      "level": "A2",
+      "sentence": "December is ___ month of the year.",
+      "blank": {
+        "answer": "the last",
+        "alternates": [],
+        "position": 12
+      },
+      "distractors": [
+        {
+          "text": "a last",
+          "misconception": "uses the indefinite article before 'first'",
+          "whyFailsId": "memakai “a”, padahal bulan penutup cuma ada satu.",
+          "misconceptionId": "“a” dipakai sebelum kata urutan “last”."
+        },
+        {
+          "text": "last",
+          "misconception": "the dropped before an order word",
+          "whyFailsId": "lupa “the”, padahal kata urutan selalu butuh “the”.",
+          "misconceptionId": "'the' hilang sebelum kata urutan seperti 'first' atau 'last'."
+        },
+        {
+          "text": "the latest",
+          "misconception": "latest used to mean the final one",
+          "whyFailsId": "artinya yang terbaru, seperti ponsel keluaran terbaru, bukan yang terakhir dalam urutan.",
+          "misconceptionId": "“latest” (terbaru) dipakai untuk yang terakhir dalam urutan."
+        }
+      ],
+      "explain": {
+        "why": "Bulan Desember itu bulan penutup, dan bulan penutup cuma ada satu, jadi pakai “the last”.",
+        "rule": "Kalau bendanya cuma bisa ada satu, pakai “the”: untuk bentuk “paling”, kata urutan seperti “first”, kata “same”, dan benda seperti matahari.",
+        "memory": "Kata urutan seperti “first” dan “last” selalu didahului “the”.",
+        "avoid": "Tanya: mungkinkah ada dua? Kalau nggak, pakai “the”."
+      }
+    },
+    {
+      "id": "A2-364-cz0",
+      "templateId": "A2-364",
+      "skill": "definite_article_with_unique_referents_and_superlatives",
+      "level": "A2",
+      "sentence": "Look! Your bag is ___ mine.",
+      "blank": {
+        "answer": "the same as",
+        "alternates": [],
+        "position": 18
+      },
+      "distractors": [
+        {
+          "text": "the same with",
+          "misconception": "same followed by with instead of as",
+          "whyFailsId": "meniru “sama dengan”, padahal sesudah “same” bahasa Inggris memakai “as”.",
+          "misconceptionId": "'same' disambung dengan 'with', meniru 'sama dengan'."
+        },
+        {
+          "text": "same as",
+          "misconception": "the dropped before same",
+          "whyFailsId": "lupa “the”, padahal “same” selalu butuh “the”.",
+          "misconceptionId": "'the' hilang sebelum kata 'same'."
+        },
+        {
+          "text": "a same as",
+          "misconception": "a used before same",
+          "whyFailsId": "memakai “a”, padahal “same” selalu memakai “the”.",
+          "misconceptionId": "“a” dipakai sebelum kata “same”."
+        }
+      ],
+      "explain": {
+        "why": "“Same” selalu didahului “the” dan disambung dengan “as”.",
+        "rule": "Kalau bendanya cuma bisa ada satu, pakai “the”: untuk bentuk “paling”, kata urutan seperti “first”, kata “same”, dan benda seperti matahari.",
+        "memory": "“The same as”, bukan “same with”.",
+        "avoid": "Tanya: mungkinkah ada dua? Kalau nggak, pakai “the”."
+      }
+    },
+    {
+      "id": "A2-365-cz0",
+      "templateId": "A2-365",
+      "skill": "movement_prepositions_through_across_along_over",
+      "level": "A2",
+      "sentence": "Rudi swam ___ the lake to the small island.",
+      "blank": {
+        "answer": "across",
+        "alternates": [],
+        "position": 10
+      },
+      "distractors": [
+        {
+          "text": "through",
+          "misconception": "through used for crossing an open surface",
+          "whyFailsId": "untuk menembus bagian dalam sesuatu, seperti terowongan, padahal danau itu permukaan terbuka.",
+          "misconceptionId": "kata depan untuk menembus dipakai untuk menyeberangi permukaan terbuka."
+        },
+        {
+          "text": "along",
+          "misconception": "along used for crossing to the other side",
+          "whyFailsId": "untuk menyusuri tepi atau panjang sesuatu, bukan menyeberang ke sisi lain.",
+          "misconceptionId": "kata depan untuk menyusuri dipakai untuk menyeberang ke sisi lain."
+        },
+        {
+          "text": "over",
+          "misconception": "over used for moving through water, not above it",
+          "whyFailsId": "untuk lewat di atas sesuatu, padahal Rudi berenang di dalam air.",
+          "misconceptionId": "kata depan untuk lewat di atas dipakai untuk gerak di dalam air."
+        }
+      ],
+      "explain": {
+        "why": "Rudi pergi dari satu sisi danau ke sisi lain, jadi pakai “across”.",
+        "rule": "“Across”: dari sisi ke sisi. “Through”: menembus bagian dalam, seperti terowongan. “Along”: menyusuri garis, seperti jalan. “Over”: lewat di atas.",
+        "memory": "Dari satu sisi ke sisi lain: “across”.",
+        "avoid": "Bayangkan jalurnya: ke seberang, menembus, menyusuri, atau lewat atas?"
+      }
+    },
+    {
+      "id": "A2-366-cz0",
+      "templateId": "A2-366",
+      "skill": "movement_prepositions_through_across_along_over",
+      "level": "A2",
+      "sentence": "The ball flew ___ the window and broke the glass.",
+      "blank": {
+        "answer": "through",
+        "alternates": [],
+        "position": 14
+      },
+      "distractors": [
+        {
+          "text": "across",
+          "misconception": "using the flat-open-surface preposition for an enclosed three-dimensional space",
+          "whyFailsId": "untuk menyeberangi permukaan seperti jalan, padahal bolanya menembus jendela.",
+          "misconceptionId": "kata depan untuk menyeberang dipakai untuk bola yang menembus jendela."
+        },
+        {
+          "text": "along",
+          "misconception": "using the linear-edge preposition (following a line such as a river or street) for movement inside an enclosed space",
+          "whyFailsId": "untuk menyusuri garis seperti jalan, bukan untuk menembus kaca.",
+          "misconceptionId": "kata depan untuk menyusuri dipakai untuk bola yang menembus jendela."
+        },
+        {
+          "text": "over",
+          "misconception": "using the above-and-across preposition for movement inside a space, not above it",
+          "whyFailsId": "artinya lewat di atas jendela, jadi kacanya nggak akan pecah.",
+          "misconceptionId": "kata depan untuk lewat di atas dipakai untuk bola yang menembus jendela."
+        }
+      ],
+      "explain": {
+        "why": "Bolanya menembus jendela sampai kacanya pecah, jadi pakai “through”.",
+        "rule": "“Across”: dari sisi ke sisi. “Through”: menembus bagian dalam, seperti terowongan. “Along”: menyusuri garis, seperti jalan. “Over”: lewat di atas.",
+        "memory": "Masuk dari satu sisi, keluar di sisi lain: “through”.",
+        "avoid": "Bayangkan jalurnya: ke seberang, menembus, menyusuri, atau lewat atas?"
+      }
+    },
+    {
+      "id": "A2-367-cz0",
+      "templateId": "A2-367",
+      "skill": "movement_prepositions_through_across_along_over",
+      "level": "A2",
+      "sentence": "The ball flew ___ my head and landed behind me.",
+      "blank": {
+        "answer": "over",
+        "alternates": [],
+        "position": 14
+      },
+      "distractors": [
+        {
+          "text": "through",
+          "misconception": "through used for passing above something",
+          "whyFailsId": "berarti bolanya menembus kepalaku, padahal bolanya lewat di atas.",
+          "misconceptionId": "kata depan untuk menembus dipakai untuk benda yang lewat di atas."
+        },
+        {
+          "text": "across",
+          "misconception": "across used for passing above something",
+          "whyFailsId": "untuk menyeberangi permukaan seperti jalan, bukan untuk lewat di atas.",
+          "misconceptionId": "kata depan untuk menyeberang dipakai untuk benda yang lewat di atas."
+        },
+        {
+          "text": "along",
+          "misconception": "along used for passing above something",
+          "whyFailsId": "untuk menyusuri garis seperti sungai, bukan untuk lewat di atas.",
+          "misconceptionId": "kata depan untuk menyusuri dipakai untuk benda yang lewat di atas."
+        }
+      ],
+      "explain": {
+        "why": "Bolanya lewat di atas kepalaku, jadi pakai “over”.",
+        "rule": "“Across”: dari sisi ke sisi. “Through”: menembus bagian dalam, seperti terowongan. “Along”: menyusuri garis, seperti jalan. “Over”: lewat di atas.",
+        "memory": "Lewat di atas lalu ke sisi lain: “over the wall”, “over my head”.",
+        "avoid": "Bayangkan jalurnya: ke seberang, menembus, menyusuri, atau lewat atas?"
+      }
+    },
+    {
+      "id": "A2-368-cz0",
+      "templateId": "A2-368",
+      "skill": "movement_prepositions_through_across_along_over",
+      "level": "A2",
+      "sentence": "Go ___ this road until you see the big mosque.",
+      "blank": {
+        "answer": "along",
+        "alternates": [],
+        "position": 3
+      },
+      "distractors": [
+        {
+          "text": "across",
+          "misconception": "uses the side-to-side crossing preposition for movement that follows a line",
+          "whyFailsId": "membawamu ke seberang jalan, bukan terus menyusurinya.",
+          "misconceptionId": "kata depan untuk menyeberang dipakai untuk menyusuri jalan."
+        },
+        {
+          "text": "through",
+          "misconception": "uses the enclosed-space movement preposition for a path along an open line",
+          "whyFailsId": "untuk menembus bagian dalam seperti terowongan, padahal jalan itu garis terbuka.",
+          "misconceptionId": "kata depan untuk menembus dipakai untuk menyusuri jalan."
+        },
+        {
+          "text": "over",
+          "misconception": "uses the above-and-across preposition for movement following a line, not over an obstacle",
+          "whyFailsId": "untuk lewat di atas sesuatu, seperti jembatan di atas jalan.",
+          "misconceptionId": "kata depan untuk lewat di atas dipakai untuk menyusuri jalan."
+        }
+      ],
+      "explain": {
+        "why": "Kamu menyusuri jalan itu sampai ketemu masjid, jadi pakai “along”.",
+        "rule": "“Across”: dari sisi ke sisi. “Through”: menembus bagian dalam, seperti terowongan. “Along”: menyusuri garis, seperti jalan. “Over”: lewat di atas.",
+        "memory": "Menyusuri garis: “along the road”, “along the river”.",
+        "avoid": "Bayangkan jalurnya: ke seberang, menembus, menyusuri, atau lewat atas?"
+      }
+    },
+    {
+      "id": "A2-369-cz0",
+      "templateId": "A2-369",
+      "skill": "double_negative_avoidance_single_negation_rule",
+      "level": "A2",
+      "sentence": "Don't ask me. I ___ about cars.",
+      "blank": {
+        "answer": "know nothing",
+        "alternates": [],
+        "position": 16
+      },
+      "distractors": [
+        {
+          "text": "don't know nothing",
+          "misconception": "combining a negated verb ('didn't') with a negative pronoun, creating a non-standard double negative",
+          "whyFailsId": "punya dua negatif, “don't” dan “nothing”, padahal bahasa Inggris cuma memakai satu.",
+          "misconceptionId": "“don't” dan “nothing” dipakai bersamaan."
+        },
+        {
+          "text": "know anything",
+          "misconception": "negative quantifier used in a positive sentence",
+          "whyFailsId": "nggak punya negatif sama sekali, jadi nggak bisa berarti “aku nggak tahu apa-apa”.",
+          "misconceptionId": "“anything” dipakai di kalimat positif."
+        },
+        {
+          "text": "not know anything",
+          "misconception": "not used without a helper verb in a negative",
+          "whyFailsId": "memakai “not” tanpa kata bantu, padahal bahasa Inggris butuh “don't”.",
+          "misconceptionId": "“not” dipakai tanpa “don't”."
+        }
+      ],
+      "explain": {
+        "why": "“Nothing” sudah bermakna negatif, jadi kata kerjanya dibiarkan positif.",
+        "rule": "Satu negatif saja. Kata kerja negatif + “any”: “I don't know anything”. Kata kerja positif + kata “no”: “I know nothing”. “Never” dan “nobody” sudah negatif.",
+        "memory": "Negatifnya satu saja: “know nothing” = “don't know anything”.",
+        "avoid": "Hitung kata negatifnya: harus tepat satu."
+      }
+    },
+    {
+      "id": "A2-370-cz0",
+      "templateId": "A2-370",
+      "skill": "double_negative_avoidance_single_negation_rule",
+      "level": "A2",
+      "sentence": "I called Dina's house, but ___ answered the phone.",
+      "blank": {
+        "answer": "nobody",
+        "alternates": [],
+        "position": 27
+      },
+      "distractors": [
+        {
+          "text": "anybody",
+          "misconception": "any- word used as the subject for no one",
+          "whyFailsId": "belum bermakna negatif, jadi kalimatnya nggak berarti “nggak ada yang mengangkat”.",
+          "misconceptionId": "kata berawalan “any” dipakai sebagai subjek untuk makna “tak seorang pun”."
+        },
+        {
+          "text": "no body",
+          "misconception": "incorrectly splitting the compound negative pronoun into two words",
+          "whyFailsId": "memecah satu kata jadi dua, dan artinya berubah jadi “nggak ada tubuh”.",
+          "misconceptionId": "“nobody” dipecah jadi dua kata."
+        },
+        {
+          "text": "not anybody",
+          "misconception": "not anybody used as a subject",
+          "whyFailsId": "menaruh “not” di depan subjek, padahal bahasa Inggris memakai satu kata negatif di posisi itu.",
+          "misconceptionId": "“not anybody” dipakai sebagai subjek kalimat."
+        }
+      ],
+      "explain": {
+        "why": "“Nobody” jadi subjek dan sudah bermakna negatif, jadi “answered” tetap positif.",
+        "rule": "Satu negatif saja. Kata kerja negatif + “any”: “I don't know anything”. Kata kerja positif + kata “no”: “I know nothing”. “Never” dan “nobody” sudah negatif.",
+        "memory": "Di posisi subjek: “nobody”, “nothing”.",
+        "avoid": "Hitung kata negatifnya: harus tepat satu."
+      }
+    },
+    {
+      "id": "A2-371-cz0",
+      "templateId": "A2-371",
+      "skill": "double_negative_avoidance_single_negation_rule",
+      "level": "A2",
+      "sentence": "My little brother never ___ his vegetables.",
+      "blank": {
+        "answer": "eats",
+        "alternates": [],
+        "position": 24
+      },
+      "distractors": [
+        {
+          "text": "doesn't eat",
+          "misconception": "combining a negated verb ('didn't') with a negative pronoun, creating a non-standard double negative",
+          "whyFailsId": "menambah negatif kedua, padahal “never” saja sudah cukup.",
+          "misconceptionId": "“never” dan “doesn't” dipakai bersamaan."
+        },
+        {
+          "text": "eat",
+          "misconception": "missing subject-verb agreement / bare form",
+          "whyFailsId": "lupa -s, padahal “my little brother” sama dengan “he”.",
+          "misconceptionId": "bentuk dasar dipakai untuk “my little brother”."
+        },
+        {
+          "text": "not eats",
+          "misconception": "not used without a helper verb in a negative",
+          "whyFailsId": "menambah “not” tanpa kata bantu, padahal “never” sudah membuatnya negatif.",
+          "misconceptionId": "“not” ditaruh sesudah “never” tanpa kata bantu."
+        }
+      ],
+      "explain": {
+        "why": "“Never” sudah bermakna negatif, dan “my little brother” sama dengan “he”, jadi pakai “eats”.",
+        "rule": "Satu negatif saja. Kata kerja negatif + “any”: “I don't know anything”. Kata kerja positif + kata “no”: “I know nothing”. “Never” dan “nobody” sudah negatif.",
+        "memory": "“Never” + kata kerja ber-s: “he never eats”.",
+        "avoid": "Hitung kata negatifnya: harus tepat satu."
+      }
+    },
+    {
+      "id": "A2-372-cz0",
+      "templateId": "A2-372",
+      "skill": "double_negative_avoidance_single_negation_rule",
+      "level": "A2",
+      "sentence": "There aren't ___ buses after ten at night.",
+      "blank": {
+        "answer": "any",
+        "alternates": [],
+        "position": 13
+      },
+      "distractors": [
+        {
+          "text": "no",
+          "misconception": "uses 'no' before a verb already negated with 'not'",
+          "whyFailsId": "menambah negatif kedua, padahal dengan “aren't” satu negatif sudah cukup.",
+          "misconceptionId": "“no” dipakai sesudah “aren't”."
+        },
+        {
+          "text": "none",
+          "misconception": "none used before a noun",
+          "whyFailsId": "dipakai sendirian, nggak bisa ditaruh sebelum kata benda seperti “buses”.",
+          "misconceptionId": "“none” dipakai langsung sebelum kata benda."
+        },
+        {
+          "text": "some",
+          "misconception": "positive-quantifier-in-negative",
+          "whyFailsId": "untuk kalimat positif, padahal “aren't” membuat kalimat ini negatif.",
+          "misconceptionId": "“some” dipakai di kalimat negatif."
+        }
+      ],
+      "explain": {
+        "why": "“Aren't” sudah negatif, jadi pakai “any”, bukan negatif kedua.",
+        "rule": "Satu negatif saja. Kata kerja negatif + “any”: “I don't know anything”. Kata kerja positif + kata “no”: “I know nothing”. “Never” dan “nobody” sudah negatif.",
+        "memory": "“Not” + “any”: “there aren't any buses” = “there are no buses”.",
+        "avoid": "Hitung kata negatifnya: harus tepat satu."
+      }
+    },
+    {
+      "id": "A2-373-cz0",
+      "templateId": "A2-373",
+      "skill": "state_verbs_resist_continuous_form",
+      "level": "A2",
+      "sentence": "I ___ what you mean now. Thanks!",
+      "blank": {
+        "answer": "understand",
+        "alternates": [],
+        "position": 2
+      },
+      "distractors": [
+        {
+          "text": "am understanding",
+          "misconception": "Assumes present time always requires present continuous.",
+          "whyFailsId": "memakai -ing karena ada “now”, padahal kata kerja pikiran seperti ini nggak memakai -ing.",
+          "misconceptionId": "bentuk -ing dipakai untuk kata kerja pikiran karena ada “now”."
+        },
+        {
+          "text": "understanding",
+          "misconception": "reduces the sentence to a fragment: an -ing form with no finite verb to carry the tense",
+          "whyFailsId": "nggak punya kata bantu, jadi nggak bisa jadi kata kerja kalimat.",
+          "misconceptionId": "bentuk -ing dipakai sendirian sesudah “I”."
+        },
+        {
+          "text": "understands",
+          "misconception": "-s added to the verb after I",
+          "whyFailsId": "menambah -s, padahal kata kerja untuk “I” nggak pernah diberi -s.",
+          "misconceptionId": "akhiran -s ditambahkan ke kata kerja untuk “I”."
+        }
+      ],
+      "explain": {
+        "why": "“Understand” itu keadaan pikiran, jadi tetap bentuk biasa walaupun ada “now”.",
+        "rule": "Kata kerja untuk pikiran, perasaan, dan kepemilikan adalah keadaan: “know”, “understand”, “like”, “want”, “have”. Pakai bentuk biasa: “I understand”.",
+        "memory": "Kata kerja pikiran dan perasaan tetap bentuk biasa: “I understand”, “I know”.",
+        "avoid": "Tanya: ini kegiatan yang kelihatan, atau keadaan di pikiran dan perasaan?"
+      }
+    },
+    {
+      "id": "A2-374-cz0",
+      "templateId": "A2-374",
+      "skill": "state_verbs_resist_continuous_form",
+      "level": "A2",
+      "sentence": "My little sister ___ a new doll for her birthday.",
+      "blank": {
+        "answer": "wants",
+        "alternates": [],
+        "position": 17
+      },
+      "distractors": [
+        {
+          "text": "is wanting",
+          "misconception": "forcing a stative desire verb into the progressive to sound ongoing",
+          "whyFailsId": "memakai -ing, padahal “want” itu perasaan, bukan kegiatan.",
+          "misconceptionId": "bentuk -ing dipakai untuk “want”."
+        },
+        {
+          "text": "want",
+          "misconception": "missing subject-verb agreement / bare form",
+          "whyFailsId": "lupa -s, padahal “my little sister” sama dengan “she”.",
+          "misconceptionId": "bentuk dasar dipakai untuk “my little sister”."
+        },
+        {
+          "text": "wanting",
+          "misconception": "reduces the sentence to a fragment: an -ing form with no finite verb to carry the tense",
+          "whyFailsId": "cuma bentuk -ing tanpa kata bantu, jadi kalimatnya belum punya kata kerja.",
+          "misconceptionId": "bentuk -ing dipakai sendirian sebagai kata kerja kalimat."
+        }
+      ],
+      "explain": {
+        "why": "“Want” itu perasaan, bukan kegiatan, dan “my little sister” sama dengan “she”, jadi pakai “wants”.",
+        "rule": "Kata kerja untuk pikiran, perasaan, dan kepemilikan adalah keadaan: “know”, “understand”, “like”, “want”, “have”. Pakai bentuk biasa: “I understand”.",
+        "memory": "“Want”, “need”, “like”: tanpa -ing. “She wants”.",
+        "avoid": "Tanya: ini kegiatan yang kelihatan, atau keadaan di pikiran dan perasaan?"
+      }
+    },
+    {
+      "id": "A2-375-cz0",
+      "templateId": "A2-375",
+      "skill": "state_verbs_resist_continuous_form",
+      "level": "A2",
+      "sentence": "Rina ___ spicy food. She never eats sambal.",
+      "blank": {
+        "answer": "doesn't like",
+        "alternates": [],
+        "position": 5
+      },
+      "distractors": [
+        {
+          "text": "isn't liking",
+          "misconception": "Assumes present time always requires present continuous.",
+          "whyFailsId": "memberi -ing pada “like”, padahal perasaan nggak memakai bentuk -ing.",
+          "misconceptionId": "bentuk -ing dipakai untuk “like”."
+        },
+        {
+          "text": "don't like",
+          "misconception": "don't used with he, she, or it",
+          "whyFailsId": "untuk “I”, “you”, “we”, dan “they”, padahal Rina sama dengan “she”.",
+          "misconceptionId": "“don't” dipakai untuk “Rina”."
+        },
+        {
+          "text": "not likes",
+          "misconception": "not used without a helper verb in a negative",
+          "whyFailsId": "menaruh “not” tanpa kata bantu, padahal kalimat negatif untuk “she” butuh “doesn't”.",
+          "misconceptionId": "“not” dipakai tanpa “doesn't”."
+        }
+      ],
+      "explain": {
+        "why": "“Like” itu perasaan, jadi tanpa -ing, dan bentuk negatif untuk “she” adalah “doesn't like”.",
+        "rule": "Kata kerja untuk pikiran, perasaan, dan kepemilikan adalah keadaan: “know”, “understand”, “like”, “want”, “have”. Pakai bentuk biasa: “I understand”.",
+        "memory": "Perasaan tetap bentuk biasa: “she doesn't like”, “she loves”.",
+        "avoid": "Tanya: ini kegiatan yang kelihatan, atau keadaan di pikiran dan perasaan?"
+      }
+    },
+    {
+      "id": "A2-376-cz0",
+      "templateId": "A2-376",
+      "skill": "state_verbs_resist_continuous_form",
+      "level": "A2",
+      "sentence": "We ___ two cats and a dog at home.",
+      "blank": {
+        "answer": "have",
+        "alternates": [],
+        "position": 3
+      },
+      "distractors": [
+        {
+          "text": "are having",
+          "misconception": "Assumes present time always requires present continuous.",
+          "whyFailsId": "memakai -ing, padahal kata kerja ini di sini artinya memiliki, yaitu keadaan.",
+          "misconceptionId": "bentuk -ing dipakai untuk kata kerja yang artinya memiliki."
+        },
+        {
+          "text": "has",
+          "misconception": "he-she-it have form used with a plural subject",
+          "whyFailsId": "untuk “he”, “she”, atau “it”, padahal subjeknya “we”.",
+          "misconceptionId": "“has” dipakai untuk “we”."
+        },
+        {
+          "text": "are have",
+          "misconception": "inserting 'is' before a main verb, blending the 'be' pattern with the present simple",
+          "whyFailsId": "menyelipkan “are” di depan kata kerja utama, padahal satu kata kerja sudah cukup.",
+          "misconceptionId": "“are” diselipkan di depan kata kerja utama."
+        }
+      ],
+      "explain": {
+        "why": "“Have” di sini artinya memiliki, yaitu keadaan, dan “we” pakai “have”.",
+        "rule": "Kata kerja untuk pikiran, perasaan, dan kepemilikan adalah keadaan: “know”, “understand”, “like”, “want”, “have”. Pakai bentuk biasa: “I understand”.",
+        "memory": "“Have” untuk memiliki: tanpa -ing. “We have a cat”.",
+        "avoid": "Tanya: ini kegiatan yang kelihatan, atau keadaan di pikiran dan perasaan?"
+      }
+    },
+    {
+      "id": "A2-377-cz0",
+      "templateId": "A2-377",
+      "skill": "preposition_of_time_duration_for_vs_since_vs_during",
+      "level": "A2",
+      "sentence": "I have lived in this town ___ five years.",
+      "blank": {
+        "answer": "for",
+        "alternates": [],
+        "position": 26
+      },
+      "distractors": [
+        {
+          "text": "since",
+          "misconception": "since used with a length of time",
+          "whyFailsId": "butuh titik mulai seperti “2020”, bukan lamanya waktu.",
+          "misconceptionId": "“since” dipakai untuk lamanya waktu."
+        },
+        {
+          "text": "during",
+          "misconception": "during used with a length of time",
+          "whyFailsId": "meniru “selama”, padahal kata ini dipakai untuk acara, bukan untuk jumlah tahun.",
+          "misconceptionId": "“during” dipakai untuk lamanya waktu, meniru “selama”."
+        },
+        {
+          "text": "while",
+          "misconception": "Uses the conjunction 'while' where a preposition is grammatically required before a noun phrase.",
+          "whyFailsId": "butuh subjek dan kata kerja sesudahnya, padahal “five years” cuma kata benda.",
+          "misconceptionId": "“while” dipakai sebelum “five years”."
+        }
+      ],
+      "explain": {
+        "why": "“Five years” itu lamanya waktu, jadi pakai “for”.",
+        "rule": "“For” + berapa lama (“for five years”). “Since” + kapan mulainya (“since Monday”). “During” + di tengah suatu acara (“during the exam”).",
+        "memory": "Berapa lama? “for”: “for five years”, “for two hours”.",
+        "avoid": "Tanya: berapa lama, sejak kapan, atau di tengah acara apa?"
+      }
+    },
+    {
+      "id": "A2-378-cz0",
+      "templateId": "A2-378",
+      "skill": "preposition_of_time_duration_for_vs_since_vs_during",
+      "level": "A2",
+      "sentence": "We have been best friends ___ primary school.",
+      "blank": {
+        "answer": "since",
+        "alternates": [],
+        "position": 26
+      },
+      "distractors": [
+        {
+          "text": "for",
+          "misconception": "Applies duration preposition 'for' to a point-in-time event rather than a length of time.",
+          "whyFailsId": "butuh lamanya waktu, misalnya sepuluh tahun, bukan titik mulai.",
+          "misconceptionId": "“for” dipakai untuk titik mulai."
+        },
+        {
+          "text": "during",
+          "misconception": "uses the within-a-period preposition 'during' where a starting point needs 'since'",
+          "whyFailsId": "untuk hal yang terjadi di dalam satu masa, padahal persahabatannya masih berlanjut sampai sekarang.",
+          "misconceptionId": "“during” dipakai untuk titik mulai yang berlanjut sampai sekarang."
+        },
+        {
+          "text": "while",
+          "misconception": "Uses the conjunction 'while' where a preposition is grammatically required before a noun phrase.",
+          "whyFailsId": "butuh subjek dan kata kerja sesudahnya, padahal “primary school” cuma kata benda.",
+          "misconceptionId": "“while” dipakai sebelum “primary school”."
+        }
+      ],
+      "explain": {
+        "why": "Persahabatan kami mulai sejak SD dan masih berlanjut, jadi pakai “since”.",
+        "rule": "“For” + berapa lama (“for five years”). “Since” + kapan mulainya (“since Monday”). “During” + di tengah suatu acara (“during the exam”).",
+        "memory": "Mulai waktu itu dan masih sampai sekarang: “since”.",
+        "avoid": "Tanya: berapa lama, sejak kapan, atau di tengah acara apa?"
+      }
+    },
+    {
+      "id": "A2-379-cz0",
+      "templateId": "A2-379",
+      "skill": "preposition_of_time_duration_for_vs_since_vs_during",
+      "level": "A2",
+      "sentence": "My phone rang ___ the exam. I was so embarrassed!",
+      "blank": {
+        "answer": "during",
+        "alternates": [],
+        "position": 14
+      },
+      "distractors": [
+        {
+          "text": "for",
+          "misconception": "Applies duration preposition 'for' to a point-in-time event rather than a length of time.",
+          "whyFailsId": "butuh lamanya waktu, misalnya satu jam, padahal “the exam” itu acara.",
+          "misconceptionId": "“for” dipakai untuk sebuah acara, bukan lamanya waktu."
+        },
+        {
+          "text": "since",
+          "misconception": "Confuses 'during' (within a period) with 'since' (marking a starting point).",
+          "whyFailsId": "menandai kapan sesuatu mulai, padahal ponselnya berdering di tengah ujian.",
+          "misconceptionId": "“since” dipakai untuk kejadian di tengah ujian."
+        },
+        {
+          "text": "while",
+          "misconception": "Uses the conjunction 'while' where a preposition is grammatically required before a noun phrase.",
+          "whyFailsId": "butuh subjek dan kata kerja sesudahnya, padahal “the exam” cuma kata benda.",
+          "misconceptionId": "“while” dipakai sebelum “the exam”."
+        }
+      ],
+      "explain": {
+        "why": "Deringnya terjadi di tengah ujian, jadi pakai “during” + “the exam”.",
+        "rule": "“For” + berapa lama (“for five years”). “Since” + kapan mulainya (“since Monday”). “During” + di tengah suatu acara (“during the exam”).",
+        "memory": "Di tengah suatu acara: “during the exam”, “during the film”.",
+        "avoid": "Tanya: berapa lama, sejak kapan, atau di tengah acara apa?"
+      }
+    },
+    {
+      "id": "A2-380-cz0",
+      "templateId": "A2-380",
+      "skill": "preposition_of_time_duration_for_vs_since_vs_during",
+      "level": "A2",
+      "sentence": "I have been sick ___ Monday, so I missed two days of school.",
+      "blank": {
+        "answer": "since",
+        "alternates": [],
+        "position": 17
+      },
+      "distractors": [
+        {
+          "text": "for",
+          "misconception": "Applies duration preposition 'for' to a point-in-time event rather than a length of time.",
+          "whyFailsId": "butuh lamanya waktu, misalnya tiga hari, bukan nama hari.",
+          "misconceptionId": "“for” dipakai untuk hari Senin, sebuah titik waktu."
+        },
+        {
+          "text": "during",
+          "misconception": "uses the within-a-period preposition 'during' where a starting point needs 'since'",
+          "whyFailsId": "untuk hal di dalam satu masa, bukan untuk kapan sakitnya mulai.",
+          "misconceptionId": "“during” dipakai untuk titik mulai sakit yang berlanjut sampai sekarang."
+        },
+        {
+          "text": "from",
+          "misconception": "from used alone for a start that continues until now",
+          "whyFailsId": "nggak dipakai sendirian untuk titik mulai yang masih berlanjut sampai sekarang.",
+          "misconceptionId": "“from” dipakai sendirian untuk titik mulai yang masih berlanjut sampai sekarang."
+        }
+      ],
+      "explain": {
+        "why": "Sakitnya mulai hari Senin dan sampai sekarang masih sakit, jadi pakai “since”.",
+        "rule": "“For” + berapa lama (“for five years”). “Since” + kapan mulainya (“since Monday”). “During” + di tengah suatu acara (“during the exam”).",
+        "memory": "“Have been” + “since” + titik mulai: “since Monday”, “since 2020”.",
+        "avoid": "Tanya: berapa lama, sejak kapan, atau di tengah acara apa?"
+      }
+    },
+    {
+      "id": "A2-381-cz0",
+      "templateId": "A2-381",
+      "skill": "subject_vs_object_questions_word_order",
+      "level": "A2",
+      "sentence": "Who ___ you to school every day?",
+      "blank": {
+        "answer": "takes",
+        "alternates": [],
+        "position": 4
+      },
+      "distractors": [
+        {
+          "text": "does take",
+          "misconception": "Adds the auxiliary 'did' as if this were an object question, following the standard question-formation rule mechanically.",
+          "whyFailsId": "menambah “does”, padahal “who” di sini pelakunya, jadi nggak perlu kata bantu.",
+          "misconceptionId": "“does” ditambahkan, padahal “who” di sini subjeknya."
+        },
+        {
+          "text": "take",
+          "misconception": "missing subject-verb agreement / bare form",
+          "whyFailsId": "lupa -s, padahal “who” sebagai pelaku diperlakukan seperti “he”.",
+          "misconceptionId": "bentuk dasar dipakai untuk “who”."
+        },
+        {
+          "text": "does takes",
+          "misconception": "does combined with a verb that already has -s",
+          "whyFailsId": "memakai “does” dan -s sekaligus, padahal di sini “who” nggak butuh “does”.",
+          "misconceptionId": "'does' dipasangkan dengan kata kerja yang sudah ber-s."
+        }
+      ],
+      "explain": {
+        "why": "“Who” di sini pelakunya, jadi tanpa “does”, dan “who” diperlakukan seperti “he”.",
+        "rule": "Kalau “who/what” pelakunya: tanpa “do” (“Who called you?”). Kalau “who/what” objeknya: tambah “do/does/did” (“Who did you call?”).",
+        "memory": "“Who” pelakunya? “Who” + kata kerja ber-s: “Who takes you?”",
+        "avoid": "Tanya: kata tanyanya melakukan kegiatan, atau dikenai kegiatan?"
+      }
+    },
+    {
+      "id": "A2-382-cz0",
+      "templateId": "A2-382",
+      "skill": "subject_vs_object_questions_word_order",
+      "level": "A2",
+      "sentence": "What ___ for dinner yesterday?",
+      "blank": {
+        "answer": "did you eat",
+        "alternates": [],
+        "position": 5
+      },
+      "distractors": [
+        {
+          "text": "you ate",
+          "misconception": "drops the auxiliary 'did' required in an object question",
+          "whyFailsId": "nggak punya “did”, padahal pertanyaan tentang makanannya membutuhkannya.",
+          "misconceptionId": "“did” hilang dari pertanyaan tentang objek."
+        },
+        {
+          "text": "did you ate",
+          "misconception": "Adds 'did' and keeps the past-tense main verb form together.",
+          "whyFailsId": "menandai lampau dua kali, padahal sesudah “did” kata kerjanya bentuk dasar.",
+          "misconceptionId": "“did” dan “ate” dipakai bersamaan."
+        },
+        {
+          "text": "do you eat",
+          "misconception": "Uses present-tense auxiliary 'does' for a clearly past-time event ('last night').",
+          "whyFailsId": "bentuk sekarang, padahal “yesterday” sudah lewat.",
+          "misconceptionId": "kata bantu bentuk sekarang dipakai untuk “yesterday”."
+        }
+      ],
+      "explain": {
+        "why": "“What” di sini makanannya, bukan yang makan, jadi butuh “did” + “you” + kata kerja dasar.",
+        "rule": "Kalau “who/what” pelakunya: tanpa “do” (“Who called you?”). Kalau “who/what” objeknya: tambah “do/does/did” (“Who did you call?”).",
+        "memory": "Menanyakan objek: “did” + subjek + kata kerja dasar.",
+        "avoid": "Tanya: kata tanyanya melakukan kegiatan, atau dikenai kegiatan?"
+      }
+    },
+    {
+      "id": "A2-383-cz0",
+      "templateId": "A2-383",
+      "skill": "subject_vs_object_questions_word_order",
+      "level": "A2",
+      "sentence": "What ___ to your arm? It's all red.",
+      "blank": {
+        "answer": "happened",
+        "alternates": [],
+        "position": 5
+      },
+      "distractors": [
+        {
+          "text": "did happen",
+          "misconception": "Adds the auxiliary 'did' as if this were an object question, following the standard question-formation rule mechanically.",
+          "whyFailsId": "menambah “did”, padahal “what” di sini subjeknya.",
+          "misconceptionId": "“did” ditambahkan, padahal “what” di sini subjeknya."
+        },
+        {
+          "text": "was happened",
+          "misconception": "be added before happened",
+          "whyFailsId": "menambah “was”, padahal “happen” nggak pernah memakai “was” untuk bentuk lampau.",
+          "misconceptionId": "'was' ditambahkan sebelum 'happened'."
+        },
+        {
+          "text": "happen",
+          "misconception": "bare present form used for a past narrative",
+          "whyFailsId": "bukan bentuk lampau, padahal lengannya merah karena kejadiannya sudah lewat.",
+          "misconceptionId": "bentuk sekarang dipakai untuk kejadian yang sudah lewat."
+        }
+      ],
+      "explain": {
+        "why": "“What” di sini subjeknya, yaitu hal yang terjadi, jadi nggak perlu “did”.",
+        "rule": "Kalau “who/what” pelakunya: tanpa “do” (“Who called you?”). Kalau “who/what” objeknya: tambah “do/does/did” (“Who did you call?”).",
+        "memory": "“What happened?” tanpa “did”, tanpa “was”.",
+        "avoid": "Tanya: kata tanyanya melakukan kegiatan, atau dikenai kegiatan?"
+      }
+    },
+    {
+      "id": "A2-384-cz0",
+      "templateId": "A2-384",
+      "skill": "subject_vs_object_questions_word_order",
+      "level": "A2",
+      "sentence": "Doni wants to call someone. Who ___ to call?",
+      "blank": {
+        "answer": "does he want",
+        "alternates": [],
+        "position": 32
+      },
+      "distractors": [
+        {
+          "text": "he wants",
+          "misconception": "drops the auxiliary 'did' required in an object question",
+          "whyFailsId": "nggak punya “does”, padahal pertanyaan tentang orang yang ditelepon membutuhkannya.",
+          "misconceptionId": "“does” hilang dari pertanyaan tentang penerima."
+        },
+        {
+          "text": "does he wants",
+          "misconception": "does combined with a verb that already has -s",
+          "whyFailsId": "memakai “does” dan -s sekaligus, padahal sesudah “does” kata “want” nggak diberi -s.",
+          "misconceptionId": "'does' dipasangkan dengan kata kerja yang sudah ber-s."
+        },
+        {
+          "text": "wants",
+          "misconception": "reads an object question as a subject question, reversing who did what",
+          "whyFailsId": "menanyakan siapa yang mau menelepon, padahal kita sudah tahu orangnya Doni.",
+          "misconceptionId": "pertanyaan tentang penerima diubah jadi pertanyaan tentang pelaku."
+        }
+      ],
+      "explain": {
+        "why": "Kita sudah tahu Doni yang mau menelepon; “who” menanyakan orang yang ditelepon, jadi butuh “does” + “he” + “want”.",
+        "rule": "Kalau “who/what” pelakunya: tanpa “do” (“Who called you?”). Kalau “who/what” objeknya: tambah “do/does/did” (“Who did you call?”).",
+        "memory": "Menanyakan penerima: “Who does he want to call?”",
+        "avoid": "Tanya: kata tanyanya melakukan kegiatan, atau dikenai kegiatan?"
+      }
+    },
+    {
+      "id": "A2-385-cz0",
+      "templateId": "A2-385",
+      "skill": "present_perfect_experience_ever_never",
+      "level": "A2",
+      "sentence": "Have you ever ___ sushi? It's really good!",
+      "blank": {
+        "answer": "eaten",
+        "alternates": [],
+        "position": 14
+      },
+      "distractors": [
+        {
+          "text": "ate",
+          "misconception": "using the past-simple form inside a present perfect question frame",
+          "whyFailsId": "bentuk lampau, padahal sesudah “have” kata kerjanya bentuk ketiga.",
+          "misconceptionId": "bentuk lampau dipakai sesudah “have”."
+        },
+        {
+          "text": "eat",
+          "misconception": "leaving the bare verb although 'have' needs the past participle after it",
+          "whyFailsId": "bentuk dasar, padahal sesudah “have” kata kerjanya berubah jadi bentuk ketiga.",
+          "misconceptionId": "bentuk dasar dipakai sesudah “have”."
+        },
+        {
+          "text": "eating",
+          "misconception": "-ing form used after have in the present perfect",
+          "whyFailsId": "bentuk -ing, padahal “have” + -ing bukan pola untuk pengalaman.",
+          "misconceptionId": "bentuk -ing dipakai sesudah “have” untuk pengalaman."
+        }
+      ],
+      "explain": {
+        "why": "Sesudah “have”, pengalaman memakai kata kerja bentuk ketiga, yaitu “eaten”.",
+        "rule": "Pengalaman: “have/has” + bentuk ketiga (“been”, “eaten”, “seen”). “Ever” untuk bertanya, “never” untuk “belum pernah”.",
+        "memory": "“eat”, “ate”, “eaten”: sesudah “have”, ambil yang ketiga.",
+        "avoid": "Sesudah “have/has”, cek kata kerjanya: sudah bentuk ketiga?"
+      }
+    },
+    {
+      "id": "A2-386-cz0",
+      "templateId": "A2-386",
+      "skill": "present_perfect_experience_ever_never",
+      "level": "A2",
+      "sentence": "I ___ to Bali, but I'd love to go one day.",
+      "blank": {
+        "answer": "have never been",
+        "alternates": [],
+        "position": 2
+      },
+      "distractors": [
+        {
+          "text": "never went",
+          "misconception": "uses the past simple for a life experience without a time",
+          "whyFailsId": "bentuk lampau, padahal tanpa waktu lampau yang jelas, pengalaman memakai “have”.",
+          "misconceptionId": "bentuk lampau dipakai untuk pengalaman tanpa waktu."
+        },
+        {
+          "text": "have never go",
+          "misconception": "leaving the bare verb although 'have' needs the past participle after it",
+          "whyFailsId": "masih bentuk dasar, padahal sesudah “have” kata kerjanya bentuk ketiga.",
+          "misconceptionId": "bentuk dasar “go” dipakai sesudah “have never”."
+        },
+        {
+          "text": "has never been",
+          "misconception": "he-she-it have form used with I",
+          "whyFailsId": "untuk “he”, “she”, atau “it”, padahal subjeknya “I”.",
+          "misconceptionId": "“has” dipakai untuk “I”."
+        }
+      ],
+      "explain": {
+        "why": "Ini pengalaman hidup tanpa waktu tertentu, dan “I” pakai “have”, jadi “have never been”.",
+        "rule": "Pengalaman: “have/has” + bentuk ketiga (“been”, “eaten”, “seen”). “Ever” untuk bertanya, “never” untuk “belum pernah”.",
+        "memory": "Belum pernah seumur hidup: “I have never been”.",
+        "avoid": "Sesudah “have/has”, cek kata kerjanya: sudah bentuk ketiga?"
+      }
+    },
+    {
+      "id": "A2-387-cz0",
+      "templateId": "A2-387",
+      "skill": "present_perfect_experience_ever_never",
+      "level": "A2",
+      "sentence": "___ your brother ever ridden a horse?",
+      "blank": {
+        "answer": "Has",
+        "alternates": [],
+        "position": 0
+      },
+      "distractors": [
+        {
+          "text": "Have",
+          "misconception": "have used with he, she, or it",
+          "whyFailsId": "untuk “I”, “you”, “we”, dan “they”, padahal “your brother” sama dengan “he”.",
+          "misconceptionId": "“have” dipakai untuk “he”, “she”, atau “it”."
+        },
+        {
+          "text": "Did",
+          "misconception": "did used with a past participle",
+          "whyFailsId": "hanya dipasangkan dengan bentuk dasar, padahal di sini kata kerjanya bentuk ketiga.",
+          "misconceptionId": "“did” dipasangkan dengan kata kerja bentuk ketiga."
+        },
+        {
+          "text": "Is",
+          "misconception": "be used instead of have for an experience",
+          "whyFailsId": "nggak bisa dipasangkan dengan “ridden”; pengalaman memakai kata bantu lain.",
+          "misconceptionId": "bentuk “be” dipakai sebagai pengganti “have” untuk pengalaman."
+        }
+      ],
+      "explain": {
+        "why": "“Your brother” sama dengan “he”, dan “ridden” bentuk ketiga, jadi pertanyaannya diawali “Has”.",
+        "rule": "Pengalaman: “have/has” + bentuk ketiga (“been”, “eaten”, “seen”). “Ever” untuk bertanya, “never” untuk “belum pernah”.",
+        "memory": "“He”, “she”, “it” + “ever”: “Has he ever…?”",
+        "avoid": "Sesudah “have/has”, cek kata kerjanya: sudah bentuk ketiga?"
+      }
+    },
+    {
+      "id": "A2-388-cz0",
+      "templateId": "A2-388",
+      "skill": "present_perfect_experience_ever_never",
+      "level": "A2",
+      "sentence": "My dad has ___ been on a plane. He is scared of flying.",
+      "blank": {
+        "answer": "never",
+        "alternates": [],
+        "position": 11
+      },
+      "distractors": [
+        {
+          "text": "ever",
+          "misconception": "ever used in a positive statement",
+          "whyFailsId": "dipakai di kalimat tanya tentang pengalaman, dan artinya bukan “belum pernah”.",
+          "misconceptionId": "“ever” dipakai di kalimat pernyataan positif."
+        },
+        {
+          "text": "no",
+          "misconception": "no used to make a verb negative",
+          "whyFailsId": "dipakai sebelum kata benda, bukan sebelum kata kerja seperti “been”.",
+          "misconceptionId": "“no” dipakai untuk menegatifkan kata kerja."
+        },
+        {
+          "text": "yet",
+          "misconception": "yet placed in the middle before the verb",
+          "whyFailsId": "ditaruh di akhir kalimat negatif atau tanya, dan artinya “sampai sekarang”, bukan “belum pernah”.",
+          "misconceptionId": "“yet” ditaruh di tengah kalimat, sebelum kata kerja."
+        }
+      ],
+      "explain": {
+        "why": "Ayah takut naik pesawat, jadi maksudnya belum pernah sekali pun. Kata untuk itu adalah “never”.",
+        "rule": "Pengalaman: “have/has” + bentuk ketiga (“been”, “eaten”, “seen”). “Ever” untuk bertanya, “never” untuk “belum pernah”.",
+        "memory": "Belum pernah sekali pun: “never”.",
+        "avoid": "Sesudah “have/has”, cek kata kerjanya: sudah bentuk ketiga?"
+      }
+    },
+    {
+      "id": "A2-389-cz0",
+      "templateId": "A2-389",
+      "skill": "present_perfect_with_for_since_duration",
+      "level": "A2",
+      "sentence": "My parents ___ married for twenty years, and they are still happy.",
+      "blank": {
+        "answer": "have been",
+        "alternates": [],
+        "position": 11
+      },
+      "distractors": [
+        {
+          "text": "are",
+          "misconception": "using the plain present as a habit statement, ignoring the stretch of time that began in the past",
+          "whyFailsId": "cuma menggambarkan sekarang, padahal “for twenty years” butuh kata kerja yang menjangkau masa lalu.",
+          "misconceptionId": "bentuk sekarang dipakai untuk rentang dua puluh tahun."
+        },
+        {
+          "text": "were",
+          "misconception": "sealing the period off as a completed event, though the family still lives there",
+          "whyFailsId": "terdengar sudah selesai, padahal mereka masih menikah dan bahagia.",
+          "misconceptionId": "bentuk lampau dipakai untuk pernikahan yang masih berlangsung."
+        },
+        {
+          "text": "have",
+          "misconception": "have used without a past participle",
+          "whyFailsId": "kurang satu kata kerja; keadaan “married” masih butuh “been”.",
+          "misconceptionId": "“have” dipakai tanpa kata kerja bentuk ketiga sesudahnya."
+        }
+      ],
+      "explain": {
+        "why": "Mereka menikah dua puluh tahun lalu dan masih menikah sampai sekarang, jadi pakai “have been” bersama “for”.",
+        "rule": "Mulai di masa lalu dan masih berlaku: “have/has” + bentuk ketiga + “for” (lamanya) atau “since” (titik mulai).",
+        "memory": "“For” + rentang sampai sekarang: “have been”.",
+        "avoid": "Ada “for” atau “since”? Cek kata kerjanya sudah “have/has” + bentuk ketiga."
+      }
+    },
+    {
+      "id": "A2-390-cz0",
+      "templateId": "A2-390",
+      "skill": "present_perfect_with_for_since_duration",
+      "level": "A2",
+      "sentence": "I ___ this phone for two years, and it still works well.",
+      "blank": {
+        "answer": "have had",
+        "alternates": [],
+        "position": 2
+      },
+      "distractors": [
+        {
+          "text": "have",
+          "misconception": "using the plain present as a habit statement, ignoring the stretch of time that began in the past",
+          "whyFailsId": "cuma membicarakan sekarang, padahal “for two years” butuh kata bantu + bentuk ketiga.",
+          "misconceptionId": "bentuk sekarang dipakai untuk rentang dua tahun."
+        },
+        {
+          "text": "am having",
+          "misconception": "Assumes present time always requires present continuous.",
+          "whyFailsId": "memakai -ing, padahal memiliki itu keadaan, dan “for two years” menjangkau masa lalu.",
+          "misconceptionId": "bentuk -ing dipakai untuk memiliki ponsel."
+        },
+        {
+          "text": "had",
+          "misconception": "sealing the period off as a completed event, though the family still lives there",
+          "whyFailsId": "terdengar sudah selesai, padahal ponselnya masih dipakai sampai sekarang.",
+          "misconceptionId": "bentuk lampau dipakai untuk ponsel yang masih dimiliki."
+        }
+      ],
+      "explain": {
+        "why": "Ponselnya kumiliki sejak dua tahun lalu dan masih kupakai, jadi pakai “have had”.",
+        "rule": "Mulai di masa lalu dan masih berlaku: “have/has” + bentuk ketiga + “for” (lamanya) atau “since” (titik mulai).",
+        "memory": "Dimiliki dari dulu sampai sekarang: “have had”.",
+        "avoid": "Ada “for” atau “since”? Cek kata kerjanya sudah “have/has” + bentuk ketiga."
+      }
+    },
+    {
+      "id": "A2-391-cz0",
+      "templateId": "A2-391",
+      "skill": "present_perfect_with_for_since_duration",
+      "level": "A2",
+      "sentence": "“How long ___ here?” “Since last year.”",
+      "blank": {
+        "answer": "have you lived",
+        "alternates": [],
+        "position": 10
+      },
+      "distractors": [
+        {
+          "text": "do you live",
+          "misconception": "using the plain present as a habit statement, ignoring the stretch of time that began in the past",
+          "whyFailsId": "cuma menanyakan sekarang, padahal “since last year” menjangkau masa lalu.",
+          "misconceptionId": "bentuk sekarang dipakai untuk pertanyaan “How long”."
+        },
+        {
+          "text": "are you living",
+          "misconception": "choosing the present progressive for right now, though the span from 2019 needs a past-to-present link",
+          "whyFailsId": "cuma soal saat ini, padahal rentang sejak tahun lalu butuh “have” + bentuk ketiga.",
+          "misconceptionId": "bentuk -ing dipakai untuk rentang sejak tahun lalu."
+        },
+        {
+          "text": "did you live",
+          "misconception": "sealing the period off as a completed event, though the family still lives there",
+          "whyFailsId": "terdengar sudah selesai, padahal orangnya masih tinggal di sini.",
+          "misconceptionId": "bentuk lampau dipakai untuk rentang yang masih berlangsung."
+        }
+      ],
+      "explain": {
+        "why": "Jawaban “Since last year” menunjukkan rentang sampai sekarang, jadi pertanyaannya “have you lived”.",
+        "rule": "Mulai di masa lalu dan masih berlaku: “have/has” + bentuk ketiga + “for” (lamanya) atau “since” (titik mulai).",
+        "memory": "Berapa lama sampai sekarang? “How long have you…?”",
+        "avoid": "Ada “for” atau “since”? Cek kata kerjanya sudah “have/has” + bentuk ketiga."
+      }
+    },
+    {
+      "id": "A2-392-cz0",
+      "templateId": "A2-392",
+      "skill": "present_perfect_with_for_since_duration",
+      "level": "A2",
+      "sentence": "I ___ swimming since I was six.",
+      "blank": {
+        "answer": "have loved",
+        "alternates": [],
+        "position": 2
+      },
+      "distractors": [
+        {
+          "text": "love",
+          "misconception": "using the plain present as a habit statement, ignoring the stretch of time that began in the past",
+          "whyFailsId": "cuma membicarakan sekarang, padahal “since” butuh “have” + bentuk ketiga.",
+          "misconceptionId": "bentuk sekarang dipakai bersama “since”."
+        },
+        {
+          "text": "am loving",
+          "misconception": "Assumes present time always requires present continuous.",
+          "whyFailsId": "memakai -ing, padahal “love” itu perasaan dan nggak memakai -ing.",
+          "misconceptionId": "bentuk -ing dipakai untuk perasaan “love”."
+        },
+        {
+          "text": "loved",
+          "misconception": "sealing the period off as a completed event, though the family still lives there",
+          "whyFailsId": "terdengar sudah selesai, padahal sampai sekarang aku masih suka berenang.",
+          "misconceptionId": "bentuk lampau dipakai untuk perasaan yang masih ada."
+        }
+      ],
+      "explain": {
+        "why": "Rasa suka itu mulai waktu umur enam tahun dan masih ada sampai sekarang, jadi pakai “have loved” bersama “since”.",
+        "rule": "Mulai di masa lalu dan masih berlaku: “have/has” + bentuk ketiga + “for” (lamanya) atau “since” (titik mulai).",
+        "memory": "“Since” + titik mulai sampai sekarang: “have loved”, “have known”.",
+        "avoid": "Ada “for” atau “since”? Cek kata kerjanya sudah “have/has” + bentuk ketiga."
+      }
+    },
+    {
+      "id": "A2-393-cz0",
+      "templateId": "A2-393",
+      "skill": "comparative_formation_er_vs_more_no_double_marking",
+      "level": "A2",
+      "sentence": "Today is ___ than yesterday. Let's go swimming!",
+      "blank": {
+        "answer": "hotter",
+        "alternates": [],
+        "position": 9
+      },
+      "distractors": [
+        {
+          "text": "hoter",
+          "misconception": "final consonant not doubled before -er",
+          "whyFailsId": "lupa menggandakan huruf t sebelum -er.",
+          "misconceptionId": "huruf mati terakhir nggak digandakan sebelum -er."
+        },
+        {
+          "text": "more hot",
+          "misconception": "applies the periphrastic 'more + adjective' pattern to a short one-syllable adjective that takes '-er'",
+          "whyFailsId": "memakai “more”, padahal kata pendek seperti “hot” cukup diberi -er.",
+          "misconceptionId": "pola “more” dipakai untuk kata pendek “hot”."
+        },
+        {
+          "text": "more hotter",
+          "misconception": "doubles the comparative marking by putting 'more' before an adjective already ending in '-er'",
+          "whyFailsId": "menandai perbandingan dua kali, padahal -er saja sudah cukup.",
+          "misconceptionId": "“more” ditumpuk di depan bentuk -er."
+        }
+      ],
+      "explain": {
+        "why": "“Hot” kata pendek, jadi tambah -er dan gandakan huruf t, yaitu “hotter”.",
+        "rule": "Kata pendek: -er (“hot” → “hotter”, “easy” → “easier”). Kata panjang: “more” (“more beautiful”). Jangan “more” + -er.",
+        "memory": "“hot” → “hotter”, “big” → “bigger”: gandakan huruf terakhirnya.",
+        "avoid": "Hitung suku katanya: satu suku kata atau berakhiran -y pakai -er; lebih panjang pakai “more”."
+      }
+    },
+    {
+      "id": "A2-394-cz0",
+      "templateId": "A2-394",
+      "skill": "comparative_formation_er_vs_more_no_double_marking",
+      "level": "A2",
+      "sentence": "This test is ___ than the last one. I finished it in ten minutes!",
+      "blank": {
+        "answer": "easier",
+        "alternates": [],
+        "position": 13
+      },
+      "distractors": [
+        {
+          "text": "easyer",
+          "misconception": "-er added to a consonant + y adjective without changing y",
+          "whyFailsId": "mempertahankan huruf y, padahal sesudah konsonan huruf y berubah jadi i sebelum -er.",
+          "misconceptionId": "kata sifat berakhiran konsonan + y diberi -er tanpa mengubah y jadi i."
+        },
+        {
+          "text": "more easy",
+          "misconception": "applies the periphrastic 'more + adjective' pattern to a short one-syllable adjective that takes '-er'",
+          "whyFailsId": "memakai “more”, padahal “easy” cukup diberi -er.",
+          "misconceptionId": "pola “more” dipakai untuk “easy”."
+        },
+        {
+          "text": "more easier",
+          "misconception": "doubles the comparative marking by putting 'more' before an adjective already ending in '-er'",
+          "whyFailsId": "menandai perbandingan dua kali, padahal bentuk -er saja sudah cukup.",
+          "misconceptionId": "“more” ditumpuk di depan bentuk -er."
+        }
+      ],
+      "explain": {
+        "why": "“Easy” berakhiran konsonan + y, jadi y diganti i lalu ditambah -er, yaitu “easier”.",
+        "rule": "Kata pendek: -er (“hot” → “hotter”, “easy” → “easier”). Kata panjang: “more” (“more beautiful”). Jangan “more” + -er.",
+        "memory": "“easy” → “easier”: y berubah jadi i sebelum -er.",
+        "avoid": "Hitung suku katanya: satu suku kata atau berakhiran -y pakai -er; lebih panjang pakai “more”."
+      }
+    },
+    {
+      "id": "A2-395-cz0",
+      "templateId": "A2-395",
+      "skill": "comparative_formation_er_vs_more_no_double_marking",
+      "level": "A2",
+      "sentence": "This dress is ___ than that one. I'll buy it!",
+      "blank": {
+        "answer": "more beautiful",
+        "alternates": [],
+        "position": 14
+      },
+      "distractors": [
+        {
+          "text": "beautifuller",
+          "misconception": "adds -er to a long adjective",
+          "whyFailsId": "memakai -er, padahal kata panjang memakai “more”.",
+          "misconceptionId": "akhiran -er ditambahkan ke “beautiful”."
+        },
+        {
+          "text": "more beautifuller",
+          "misconception": "doubles the comparative marking by putting 'more' before an adjective already ending in '-er'",
+          "whyFailsId": "memakai “more” dan -er sekaligus, padahal cukup salah satu.",
+          "misconceptionId": "“more” dan -er dipakai bersamaan."
+        },
+        {
+          "text": "most beautiful",
+          "misconception": "superlative used for a two-item comparison",
+          "whyFailsId": "untuk juara satu kelompok, padahal “than” membandingkan dua baju.",
+          "misconceptionId": "bentuk “paling” dipakai untuk dua baju."
+        }
+      ],
+      "explain": {
+        "why": "“Beautiful” kata panjang, jadi pakai “more” di depannya.",
+        "rule": "Kata pendek: -er (“hot” → “hotter”, “easy” → “easier”). Kata panjang: “more” (“more beautiful”). Jangan “more” + -er.",
+        "memory": "Kata panjang: “more beautiful”, “more expensive”.",
+        "avoid": "Hitung suku katanya: satu suku kata atau berakhiran -y pakai -er; lebih panjang pakai “more”."
+      }
+    },
+    {
+      "id": "A2-396-cz0",
+      "templateId": "A2-396",
+      "skill": "comparative_formation_er_vs_more_no_double_marking",
+      "level": "A2",
+      "sentence": "Taking a taxi is ___ than taking the bus.",
+      "blank": {
+        "answer": "more expensive",
+        "alternates": [],
+        "position": 17
+      },
+      "distractors": [
+        {
+          "text": "expensiver",
+          "misconception": "adds -er to a long adjective",
+          "whyFailsId": "menambah -er ke kata panjang, padahal kata panjang memakai “more”.",
+          "misconceptionId": "akhiran -er ditambahkan ke “expensive”."
+        },
+        {
+          "text": "the most expensive",
+          "misconception": "superlative used for a two-item comparison",
+          "whyFailsId": "untuk juara satu kelompok, padahal “than” cuma membandingkan dua cara bepergian.",
+          "misconceptionId": "bentuk “paling” dipakai untuk dua cara bepergian."
+        },
+        {
+          "text": "expensive",
+          "misconception": "base adjective used without comparative marking",
+          "whyFailsId": "nggak membandingkan, padahal “than” butuh bentuk “lebih”.",
+          "misconceptionId": "kata sifat bentuk dasar dipakai sebelum “than”."
+        }
+      ],
+      "explain": {
+        "why": "“Expensive” kata panjang, jadi bentuk “lebih”-nya “more expensive”.",
+        "rule": "Kata pendek: -er (“hot” → “hotter”, “easy” → “easier”). Kata panjang: “more” (“more beautiful”). Jangan “more” + -er.",
+        "memory": "Tiga suku kata atau lebih: “more” + kata sifat.",
+        "avoid": "Hitung suku katanya: satu suku kata atau berakhiran -y pakai -er; lebih panjang pakai “more”."
+      }
+    },
+    {
+      "id": "A2-397-cz0",
+      "templateId": "A2-397",
+      "skill": "adverb_of_manner_ly_vs_adjective_after_verb",
+      "level": "A2",
+      "sentence": "My brother drives very ___. I'm always scared!",
+      "blank": {
+        "answer": "fast",
+        "alternates": [],
+        "position": 23
+      },
+      "distractors": [
+        {
+          "text": "fastly",
+          "misconception": "-ly added to an adverb that has no -ly form",
+          "whyFailsId": "bukan kata bahasa Inggris, karena kata keterangan ini nggak pernah diberi -ly.",
+          "misconceptionId": "akhiran -ly ditambahkan ke kata keterangan yang nggak memakai -ly."
+        },
+        {
+          "text": "faster",
+          "misconception": "switches to a comparative adjective although nothing is being compared and the slot needs an adverb",
+          "whyFailsId": "membandingkan, padahal nggak ada “than” dan nggak ada yang dibandingkan.",
+          "misconceptionId": "bentuk “lebih” dipakai tanpa ada yang dibandingkan."
+        },
+        {
+          "text": "speed",
+          "misconception": "noun used where an adverb is needed",
+          "whyFailsId": "kata benda, padahal sesudah “drives very” dibutuhkan kata yang menjelaskan cara.",
+          "misconceptionId": "kata benda “speed” dipakai untuk menjelaskan cara menyetir."
+        }
+      ],
+      "explain": {
+        "why": "“Fast” bisa jadi kata sifat sekaligus kata keterangan, jadi cara menyetirnya cukup “fast”, tanpa -ly.",
+        "rule": "Kata kerja aksi + kata keterangan -ly: “sings beautifully”. “Be”, “look”, “feel” + kata sifat: “looks beautiful”. Ada yang tanpa -ly: “fast”, “well”.",
+        "memory": "“fast” tetap “fast”, “good” jadi “well”: tanpa -ly.",
+        "avoid": "Tanya: kata itu menjelaskan orang atau bendanya, atau cara kegiatannya dilakukan?"
+      }
+    },
+    {
+      "id": "A2-398-cz0",
+      "templateId": "A2-398",
+      "skill": "adverb_of_manner_ly_vs_adjective_after_verb",
+      "level": "A2",
+      "sentence": "You look ___ today! Is that a new dress?",
+      "blank": {
+        "answer": "beautiful",
+        "alternates": [],
+        "position": 9
+      },
+      "distractors": [
+        {
+          "text": "beautifully",
+          "misconception": "uses the adverb where an adjective after 'be' is needed",
+          "whyFailsId": "menjelaskan cara melakukan kegiatan, padahal “look” di sini butuh kata sifat.",
+          "misconceptionId": "kata keterangan -ly dipakai sesudah “look”."
+        },
+        {
+          "text": "beauty",
+          "misconception": "noun used where an adjective is needed",
+          "whyFailsId": "kata benda, padahal sesudah “look” dibutuhkan kata sifat.",
+          "misconceptionId": "kata benda dipakai di tempat kata sifat."
+        },
+        {
+          "text": "like beautiful",
+          "misconception": "like added before an adjective after look",
+          "whyFailsId": "menambah “like”, padahal “look like” diikuti kata benda, seperti “look like a princess”.",
+          "misconceptionId": "“like” ditambahkan sebelum kata sifat sesudah “look”."
+        }
+      ],
+      "explain": {
+        "why": "“Look” di sini artinya “kelihatan”, jadi diikuti kata sifat, yaitu “beautiful”.",
+        "rule": "Kata kerja aksi + kata keterangan -ly: “sings beautifully”. “Be”, “look”, “feel” + kata sifat: “looks beautiful”. Ada yang tanpa -ly: “fast”, “well”.",
+        "memory": "“Look”, “feel”, “be” + kata sifat: “you look beautiful”.",
+        "avoid": "Tanya: kata itu menjelaskan orang atau bendanya, atau cara kegiatannya dilakukan?"
+      }
+    },
+    {
+      "id": "A2-399-cz0",
+      "templateId": "A2-399",
+      "skill": "adverb_of_manner_ly_vs_adjective_after_verb",
+      "level": "A2",
+      "sentence": "Sinta sings ___. Everyone loves her voice.",
+      "blank": {
+        "answer": "beautifully",
+        "alternates": [],
+        "position": 12
+      },
+      "distractors": [
+        {
+          "text": "beautiful",
+          "misconception": "uses the bare adjective after an action verb where a manner adverb in '-ly' is required",
+          "whyFailsId": "menjelaskan benda, seperti lagu yang indah; sesudah “sings” pakai -ly.",
+          "misconceptionId": "kata sifat dipakai sesudah “sings”."
+        },
+        {
+          "text": "beauty",
+          "misconception": "noun used where an adverb is needed",
+          "whyFailsId": "kata benda, padahal sesudah “sings” dibutuhkan kata yang menjelaskan cara.",
+          "misconceptionId": "kata benda “beauty” dipakai sesudah “sings”."
+        },
+        {
+          "text": "with beautiful",
+          "misconception": "builds the manner phrase as 'with' plus a bare adjective, copying Indonesian 'dengan hati-hati'",
+          "whyFailsId": "meniru “dengan indah”, padahal bahasa Inggris cukup memakai satu kata ber-ly.",
+          "misconceptionId": "pola “with” + kata sifat meniru “dengan indah”."
+        }
+      ],
+      "explain": {
+        "why": "Kata ini menjelaskan cara Sinta bernyanyi, dan “sings” kata kerja aksi, jadi pakai kata keterangan -ly, yaitu “beautifully”.",
+        "rule": "Kata kerja aksi + kata keterangan -ly: “sings beautifully”. “Be”, “look”, “feel” + kata sifat: “looks beautiful”. Ada yang tanpa -ly: “fast”, “well”.",
+        "memory": "Kata kerja aksi + -ly: “sings beautifully”, “drives carefully”.",
+        "avoid": "Tanya: kata itu menjelaskan orang atau bendanya, atau cara kegiatannya dilakukan?"
+      }
+    },
+    {
+      "id": "A2-400-cz0",
+      "templateId": "A2-400",
+      "skill": "adverb_of_manner_ly_vs_adjective_after_verb",
+      "level": "A2",
+      "sentence": "Please close the door ___. The baby is sleeping.",
+      "blank": {
+        "answer": "quietly",
+        "alternates": [],
+        "position": 22
+      },
+      "distractors": [
+        {
+          "text": "quiet",
+          "misconception": "uses the bare adjective after an action verb where a manner adverb in '-ly' is required",
+          "whyFailsId": "menjelaskan benda, seperti ruangan yang tenang; untuk cara menutup pintu pakai -ly.",
+          "misconceptionId": "kata sifat dipakai sesudah “close the door”."
+        },
+        {
+          "text": "quite",
+          "misconception": "quite confused with quiet",
+          "whyFailsId": "artinya “cukup”, seperti “cukup besar”; tulisannya cuma mirip dengan “quiet”.",
+          "misconceptionId": "“quite” (cukup) tertukar dengan “quiet” (tenang)."
+        },
+        {
+          "text": "quietness",
+          "misconception": "noun used where an adverb is needed",
+          "whyFailsId": "kata benda, padahal untuk menjelaskan cara menutup pintu dibutuhkan bentuk -ly.",
+          "misconceptionId": "kata benda “quietness” dipakai untuk menjelaskan cara."
+        }
+      ],
+      "explain": {
+        "why": "Kata ini menjelaskan cara menutup pintu, jadi pakai kata keterangan -ly, yaitu “quietly”.",
+        "rule": "Kata kerja aksi + kata keterangan -ly: “sings beautifully”. “Be”, “look”, “feel” + kata sifat: “looks beautiful”. Ada yang tanpa -ly: “fast”, “well”.",
+        "memory": "Bagaimana caranya? Tambah -ly: “quietly”, “slowly”, “carefully”.",
+        "avoid": "Tanya: kata itu menjelaskan orang atau bendanya, atau cara kegiatannya dilakukan?"
+      }
+    },
+    {
+      "id": "A2-401-cz0",
+      "templateId": "A2-401",
+      "skill": "how_much_vs_how_many_quantity_questions",
+      "level": "A2",
+      "sentence": "“___ eggs do we need?” “Six.”",
+      "blank": {
+        "answer": "How many",
+        "alternates": [],
+        "position": 1
+      },
+      "distractors": [
+        {
+          "text": "How much",
+          "misconception": "asks about a countable plural noun with 'how much'",
+          "whyFailsId": "untuk benda yang nggak bisa dihitung, padahal telur bisa dihitung.",
+          "misconceptionId": "“how much” dipakai untuk “eggs”."
+        },
+        {
+          "text": "How long",
+          "misconception": "how long used to ask about an amount",
+          "whyFailsId": "menanyakan lama waktu, bukan jumlah telur.",
+          "misconceptionId": "“how long” (berapa lama) dipakai untuk menanyakan jumlah atau harga."
+        },
+        {
+          "text": "How often",
+          "misconception": "how often used to ask about a number",
+          "whyFailsId": "menanyakan seberapa sering sesuatu terjadi, bukan berapa telur yang dibutuhkan.",
+          "misconceptionId": "“how often” (seberapa sering) dipakai untuk menanyakan jumlah."
+        }
+      ],
+      "explain": {
+        "why": "Telur bisa dihitung dan jawabannya angka, jadi bertanya dengan “How many”.",
+        "rule": "“How many” + benda jamak yang bisa dihitung (“How many eggs?”). “How much” + benda yang nggak bisa dihitung (“How much milk?”) atau harga.",
+        "memory": "Bisa dihitung? “How many eggs”, “how many books”.",
+        "avoid": "Lihat kata benda sesudah titik-titik: bisa dihitung satu per satu?"
+      }
+    },
+    {
+      "id": "A2-402-cz0",
+      "templateId": "A2-402",
+      "skill": "how_much_vs_how_many_quantity_questions",
+      "level": "A2",
+      "sentence": "“___ is this T-shirt?” “Ten dollars.”",
+      "blank": {
+        "answer": "How much",
+        "alternates": [],
+        "position": 1
+      },
+      "distractors": [
+        {
+          "text": "How many",
+          "misconception": "how many used to ask a price",
+          "whyFailsId": "dipakai untuk menghitung benda, padahal di sini yang ditanya harga.",
+          "misconceptionId": "“how many” dipakai untuk menanyakan harga."
+        },
+        {
+          "text": "How price",
+          "misconception": "price used after how instead of much",
+          "whyFailsId": "meniru “berapa harganya” kata per kata, padahal bahasa Inggris nggak berkata begitu.",
+          "misconceptionId": "“how price” dipakai untuk menanyakan harga, meniru “berapa harganya”."
+        },
+        {
+          "text": "How long",
+          "misconception": "how long used to ask about an amount",
+          "whyFailsId": "menanyakan lama waktu, bukan harga.",
+          "misconceptionId": "“how long” dipakai untuk menanyakan harga."
+        }
+      ],
+      "explain": {
+        "why": "Jawabannya harga, dan harga ditanyakan dengan “How much”.",
+        "rule": "“How many” + benda jamak yang bisa dihitung (“How many eggs?”). “How much” + benda yang nggak bisa dihitung (“How much milk?”) atau harga.",
+        "memory": "Menanyakan harga: “How much is it?”",
+        "avoid": "Lihat kata benda sesudah titik-titik: bisa dihitung satu per satu?"
+      }
+    },
+    {
+      "id": "A2-403-cz0",
+      "templateId": "A2-403",
+      "skill": "how_much_vs_how_many_quantity_questions",
+      "level": "A2",
+      "sentence": "___ milk do you want in your coffee?",
+      "blank": {
+        "answer": "How much",
+        "alternates": [],
+        "position": 0
+      },
+      "distractors": [
+        {
+          "text": "How many",
+          "misconception": "asks about an uncountable noun with 'how many'",
+          "whyFailsId": "untuk benda yang bisa dihitung, padahal susu nggak bisa dihitung.",
+          "misconceptionId": "“how many” dipakai untuk “milk”."
+        },
+        {
+          "text": "How",
+          "misconception": "asks quantity with bare 'how' and drops the quantity word entirely",
+          "whyFailsId": "menanyakan bagaimana caranya, jadi makna jumlahnya hilang.",
+          "misconceptionId": "“how” saja dipakai untuk menanyakan jumlah susu."
+        },
+        {
+          "text": "How much of",
+          "misconception": "adds a partitive 'of' straight after 'how much' before a bare noun",
+          "whyFailsId": "menambah “of”, padahal “of” butuh kata seperti “the” sesudahnya.",
+          "misconceptionId": "“of” diselipkan sebelum “milk”."
+        }
+      ],
+      "explain": {
+        "why": "Susu nggak bisa dihitung, jadi bertanya dengan “How much”.",
+        "rule": "“How many” + benda jamak yang bisa dihitung (“How many eggs?”). “How much” + benda yang nggak bisa dihitung (“How much milk?”) atau harga.",
+        "memory": "Susu, air, gula: “How much?”",
+        "avoid": "Lihat kata benda sesudah titik-titik: bisa dihitung satu per satu?"
+      }
+    },
+    {
+      "id": "A2-404-cz0",
+      "templateId": "A2-404",
+      "skill": "how_much_vs_how_many_quantity_questions",
+      "level": "A2",
+      "sentence": "How many ___ do you drink every day?",
+      "blank": {
+        "answer": "glasses of water",
+        "alternates": [],
+        "position": 9
+      },
+      "distractors": [
+        {
+          "text": "water",
+          "misconception": "asks about an uncountable noun with 'how many'",
+          "whyFailsId": "nggak bisa dihitung, jadi nggak bisa langsung dipakai sesudah “how many”.",
+          "misconceptionId": "“how many” dipakai langsung untuk “water”."
+        },
+        {
+          "text": "waters",
+          "misconception": "removes the article correctly but incorrectly pluralizes the uncountable noun",
+          "whyFailsId": "menambah -s ke benda yang nggak bisa dihitung, padahal yang dihitung gelasnya.",
+          "misconceptionId": "“water” diberi -s supaya bisa dihitung."
+        },
+        {
+          "text": "glass of water",
+          "misconception": "container noun left singular after how many",
+          "whyFailsId": "masih tunggal, padahal “how many” butuh bentuk jamak seperti “glasses”.",
+          "misconceptionId": "kata wadah dibiarkan tunggal sesudah “how many”."
+        }
+      ],
+      "explain": {
+        "why": "Air nggak bisa dihitung, jadi yang dihitung gelasnya, dan “how many” butuh bentuk jamak.",
+        "rule": "“How many” + benda jamak yang bisa dihitung (“How many eggs?”). “How much” + benda yang nggak bisa dihitung (“How much milk?”) atau harga.",
+        "memory": "Hitung wadahnya: “glasses of water”, “cups of tea”.",
+        "avoid": "Lihat kata benda sesudah titik-titik: bisa dihitung satu per satu?"
+      }
+    },
+    {
+      "id": "A2-405-cz0",
+      "templateId": "A2-405",
+      "skill": "indefinite_compounds_something_anything_nothing",
+      "level": "A2",
+      "sentence": "There is ___ under my bed. I can hear it moving!",
+      "blank": {
+        "answer": "something",
+        "alternates": [],
+        "position": 9
+      },
+      "distractors": [
+        {
+          "text": "anything",
+          "misconception": "uses 'anything' in a positive clause that has no negative word to license it",
+          "whyFailsId": "butuh kata kerja negatif atau kalimat tanya, padahal kalimat ini positif.",
+          "misconceptionId": "“anything” dipakai di kalimat positif."
+        },
+        {
+          "text": "nothing",
+          "misconception": "nothing used for something that is there",
+          "whyFailsId": "menyatakan nggak ada apa-apa, padahal suaranya terdengar bergerak.",
+          "misconceptionId": "“nothing” dipakai padahal ada sesuatu di sana."
+        },
+        {
+          "text": "some thing",
+          "misconception": "compound word split into two",
+          "whyFailsId": "memecah satu kata jadi dua, padahal bahasa Inggris menulisnya sebagai satu kata.",
+          "misconceptionId": "satu kata gabungan dipecah jadi dua kata."
+        }
+      ],
+      "explain": {
+        "why": "Kalimatnya positif dan suaranya terdengar, jadi memang ada sesuatu, yaitu “something”.",
+        "rule": "Positif: “something”. Kata kerja negatif: “anything” (“I can't see anything”). Kata kerja positif dengan arti “tidak ada”: “nothing” (“There is nothing”).",
+        "memory": "Positif dan benar-benar ada: “something”.",
+        "avoid": "Cari kata kerjanya: negatif? Pakai “anything”. Positif tapi artinya “tidak ada”? Pakai “nothing”."
+      }
+    },
+    {
+      "id": "A2-406-cz0",
+      "templateId": "A2-406",
+      "skill": "indefinite_compounds_something_anything_nothing",
+      "level": "A2",
+      "sentence": "She hasn't eaten ___ today. She must be very hungry.",
+      "blank": {
+        "answer": "anything",
+        "alternates": [],
+        "position": 17
+      },
+      "distractors": [
+        {
+          "text": "nothing",
+          "misconception": "combining a negated verb ('didn't') with a negative pronoun, creating a non-standard double negative",
+          "whyFailsId": "menambah negatif kedua, padahal “hasn't” sudah negatif.",
+          "misconceptionId": "“hasn't” dan “nothing” dipakai bersamaan."
+        },
+        {
+          "text": "something",
+          "misconception": "using a positive indefinite pronoun that contradicts the negative context",
+          "whyFailsId": "untuk kalimat positif, padahal “hasn't” membuat kalimat ini negatif.",
+          "misconceptionId": "“something” dipakai di kalimat negatif."
+        },
+        {
+          "text": "no",
+          "misconception": "uses 'no' before a verb already negated with 'not'",
+          "whyFailsId": "menambah negatif kedua dan butuh kata benda sesudahnya.",
+          "misconceptionId": "“no” dipakai sesudah “hasn't” tanpa kata benda."
+        }
+      ],
+      "explain": {
+        "why": "“Hasn't” sudah negatif, jadi pakai “anything”.",
+        "rule": "Positif: “something”. Kata kerja negatif: “anything” (“I can't see anything”). Kata kerja positif dengan arti “tidak ada”: “nothing” (“There is nothing”).",
+        "memory": "“hasn't … anything” = “has … nothing”.",
+        "avoid": "Cari kata kerjanya: negatif? Pakai “anything”. Positif tapi artinya “tidak ada”? Pakai “nothing”."
+      }
+    },
+    {
+      "id": "A2-407-cz0",
+      "templateId": "A2-407",
+      "skill": "indefinite_compounds_something_anything_nothing",
+      "level": "A2",
+      "sentence": "___ happened at school today. It was a boring day.",
+      "blank": {
+        "answer": "Nothing",
+        "alternates": [],
+        "position": 0
+      },
+      "distractors": [
+        {
+          "text": "Anything",
+          "misconception": "uses 'anything' in a positive clause that has no negative word to license it",
+          "whyFailsId": "butuh kata kerja negatif atau kalimat tanya, padahal “happened” positif.",
+          "misconceptionId": "“anything” dipakai sebagai subjek kalimat positif."
+        },
+        {
+          "text": "Something",
+          "misconception": "using a positive indefinite pronoun that contradicts the negative context",
+          "whyFailsId": "berarti ada kejadian, padahal harinya membosankan.",
+          "misconceptionId": "“something” dipakai padahal harinya membosankan."
+        },
+        {
+          "text": "None",
+          "misconception": "none used instead of nothing",
+          "whyFailsId": "merujuk ke orang atau benda yang sudah disebut, bukan ke kejadian secara umum.",
+          "misconceptionId": "“none” dipakai sebagai pengganti “nothing”."
+        }
+      ],
+      "explain": {
+        "why": "Harinya membosankan, jadi nggak ada kejadian apa-apa, dan kata kerja “happened” berbentuk positif.",
+        "rule": "Positif: “something”. Kata kerja negatif: “anything” (“I can't see anything”). Kata kerja positif dengan arti “tidak ada”: “nothing” (“There is nothing”).",
+        "memory": "Nggak ada kejadian + kata kerja positif: “Nothing happened”.",
+        "avoid": "Cari kata kerjanya: negatif? Pakai “anything”. Positif tapi artinya “tidak ada”? Pakai “nothing”."
+      }
+    },
+    {
+      "id": "A2-408-cz0",
+      "templateId": "A2-408",
+      "skill": "indefinite_compounds_something_anything_nothing",
+      "level": "A2",
+      "sentence": "I can't see ___. It's too dark in here.",
+      "blank": {
+        "answer": "anything",
+        "alternates": [],
+        "position": 12
+      },
+      "distractors": [
+        {
+          "text": "nothing",
+          "misconception": "combining a negated verb ('didn't') with a negative pronoun, creating a non-standard double negative",
+          "whyFailsId": "menambah negatif kedua, padahal “can't” sudah negatif.",
+          "misconceptionId": "“can't” dan “nothing” dipakai bersamaan."
+        },
+        {
+          "text": "something",
+          "misconception": "using a positive indefinite pronoun that contradicts the negative context",
+          "whyFailsId": "untuk kalimat positif, padahal “can't” membuat kalimat ini negatif.",
+          "misconceptionId": "“something” dipakai sesudah “can't”."
+        },
+        {
+          "text": "no thing",
+          "misconception": "incorrectly splitting the compound negative pronoun into two words",
+          "whyFailsId": "memecah satu kata jadi dua dan menambah negatif kedua.",
+          "misconceptionId": "kata negatif dipecah jadi dua kata."
+        }
+      ],
+      "explain": {
+        "why": "“Can't” sudah negatif, jadi pakai “anything”, bukan negatif kedua.",
+        "rule": "Positif: “something”. Kata kerja negatif: “anything” (“I can't see anything”). Kata kerja positif dengan arti “tidak ada”: “nothing” (“There is nothing”).",
+        "memory": "“can't see anything” = “can see nothing”.",
+        "avoid": "Cari kata kerjanya: negatif? Pakai “anything”. Positif tapi artinya “tidak ada”? Pakai “nothing”."
+      }
+    },
+    {
+      "id": "A2-409-cz0",
+      "templateId": "A2-409",
+      "skill": "cause_result_connectors_because_vs_so",
+      "level": "A2",
+      "sentence": "We stayed inside ___ it was raining.",
+      "blank": {
+        "answer": "because",
+        "alternates": [],
+        "position": 17
+      },
+      "distractors": [
+        {
+          "text": "so",
+          "misconception": "introduces the reason clause with the result connector 'so'",
+          "whyFailsId": "dipakai sebelum akibat, padahal hujan itu alasannya.",
+          "misconceptionId": "“so” dipakai sebelum alasan."
+        },
+        {
+          "text": "because of",
+          "misconception": "puts 'because of' before a full clause although it only takes a noun phrase",
+          "whyFailsId": "butuh kata benda, seperti “the rain”, bukan kalimat utuh.",
+          "misconceptionId": "“because of” dipakai sebelum kalimat utuh."
+        },
+        {
+          "text": "so that",
+          "misconception": "uses the purpose connector 'so that' where a plain reason connector is needed",
+          "whyFailsId": "menyatakan tujuan, yaitu hal yang ingin dicapai, bukan alasan.",
+          "misconceptionId": "“so that” dipakai untuk alasan."
+        }
+      ],
+      "explain": {
+        "why": "“It was raining” adalah alasan kami tetap di dalam, jadi pakai “because”.",
+        "rule": "Alasan dibuka dengan “because”, akibat dibuka dengan “so”, dan kata benda didahului “because of”.",
+        "memory": "Akibat + “because” + alasan.",
+        "avoid": "Tanya: bagian sesudahnya alasan atau akibat? Kalimat utuh atau cuma kata benda?"
+      }
+    },
+    {
+      "id": "A2-411-cz0",
+      "templateId": "A2-411",
+      "skill": "cause_result_connectors_because_vs_so",
+      "level": "A2",
+      "sentence": "The football match was cancelled ___ the heavy rain.",
+      "blank": {
+        "answer": "because of",
+        "alternates": [],
+        "position": 33
+      },
+      "distractors": [
+        {
+          "text": "because",
+          "misconception": "because used directly before a noun",
+          "whyFailsId": "butuh subjek dan kata kerja sesudahnya, padahal di sini cuma ada kata benda.",
+          "misconceptionId": "'because' dipakai langsung sebelum kata benda."
+        },
+        {
+          "text": "so",
+          "misconception": "so used before a noun as a reason",
+          "whyFailsId": "membawa akibat, padahal hujan itu alasannya.",
+          "misconceptionId": "“so” dipakai sebelum kata benda untuk menyebut alasan."
+        },
+        {
+          "text": "so that",
+          "misconception": "uses the purpose connector 'so that' where a plain reason connector is needed",
+          "whyFailsId": "menyatakan tujuan, padahal hujan bukan sesuatu yang diinginkan.",
+          "misconceptionId": "“so that” dipakai sebelum kata benda untuk alasan."
+        }
+      ],
+      "explain": {
+        "why": "“The heavy rain” kata benda, bukan kalimat utuh, jadi pakai “because of”.",
+        "rule": "Alasan dibuka dengan “because”, akibat dibuka dengan “so”, dan kata benda didahului “because of”.",
+        "memory": "Sesudahnya kata benda? “because of the rain”.",
+        "avoid": "Tanya: bagian sesudahnya alasan atau akibat? Kalimat utuh atau cuma kata benda?"
+      }
+    },
+    {
+      "id": "A2-412-cz0",
+      "templateId": "A2-412",
+      "skill": "cause_result_connectors_because_vs_so",
+      "level": "A2",
+      "sentence": "___ it was very hot, we went swimming.",
+      "blank": {
+        "answer": "Because",
+        "alternates": [],
+        "position": 0
+      },
+      "distractors": [
+        {
+          "text": "So",
+          "misconception": "so used to open a reason at the start",
+          "whyFailsId": "membawa akibat, jadi nggak bisa membuka alasan di awal kalimat.",
+          "misconceptionId": "“so” dipakai di awal kalimat untuk membuka alasan."
+        },
+        {
+          "text": "Because of",
+          "misconception": "puts 'because of' before a full clause although it only takes a noun phrase",
+          "whyFailsId": "butuh kata benda, seperti “the heat”, bukan kalimat utuh.",
+          "misconceptionId": "“because of” dipakai sebelum kalimat utuh."
+        },
+        {
+          "text": "So that",
+          "misconception": "uses the purpose connector 'so that' where a plain reason connector is needed",
+          "whyFailsId": "menyatakan tujuan, padahal cuaca panas itu alasan.",
+          "misconceptionId": "“so that” dipakai untuk alasan di awal kalimat."
+        }
+      ],
+      "explain": {
+        "why": "“It was very hot” adalah alasan, dan alasan boleh ditaruh di depan dengan “Because”.",
+        "rule": "Alasan dibuka dengan “because”, akibat dibuka dengan “so”, dan kata benda didahului “because of”.",
+        "memory": "Alasan di depan: “Because it was hot, we swam”.",
+        "avoid": "Tanya: bagian sesudahnya alasan atau akibat? Kalimat utuh atau cuma kata benda?"
+      }
+    },
+    {
+      "id": "A2-413-cz0",
+      "templateId": "A2-413",
+      "skill": "irregular_comparative_better_worse_forms",
+      "level": "A2",
+      "sentence": "My English is ___ now than last year. I practise every day.",
+      "blank": {
+        "answer": "better",
+        "alternates": [],
+        "position": 14
+      },
+      "distractors": [
+        {
+          "text": "gooder",
+          "misconception": "regular -er ending forced onto an irregular adjective",
+          "whyFailsId": "bukan kata bahasa Inggris, karena “good” punya bentuk khusus sendiri.",
+          "misconceptionId": "akhiran -er ditempel ke “good”."
+        },
+        {
+          "text": "more better",
+          "misconception": "doubles the comparative marking by putting 'more' before an adjective already ending in '-er'",
+          "whyFailsId": "menandai perbandingan dua kali, padahal bentuk khususnya saja sudah cukup.",
+          "misconceptionId": "“more” ditumpuk di depan bentuk khusus."
+        },
+        {
+          "text": "best",
+          "misconception": "superlative 'best' used where 'than' demands a comparative",
+          "whyFailsId": "untuk juara satu kelompok, padahal “than” membandingkan dua hal.",
+          "misconceptionId": "bentuk “paling” dipakai sebelum “than”."
+        }
+      ],
+      "explain": {
+        "why": "“Good” punya bentuk “lebih” yang khusus, yaitu “better”, dan “than” butuh bentuk “lebih”.",
+        "rule": "“good” → “better” → “the best”; “bad” → “worse” → “the worst”. Tanpa -er, tanpa “more”.",
+        "memory": "“good” → “better” → “the best”.",
+        "avoid": "Sebelum menambah -er atau “more”, cek: kata sifatnya “good” atau “bad”?"
+      }
+    },
+    {
+      "id": "A2-414-cz0",
+      "templateId": "A2-414",
+      "skill": "irregular_comparative_better_worse_forms",
+      "level": "A2",
+      "sentence": "This is the ___ day of my life! I got a new puppy!",
+      "blank": {
+        "answer": "best",
+        "alternates": [],
+        "position": 12
+      },
+      "distractors": [
+        {
+          "text": "better",
+          "misconception": "the used with a comparative for a group",
+          "whyFailsId": "membandingkan dua hal, padahal di sini harinya dibandingkan dengan semua hari dalam hidupku.",
+          "misconceptionId": "bentuk “lebih” dipakai untuk semua hari dalam hidup."
+        },
+        {
+          "text": "most good",
+          "misconception": "regular 'more + adjective' pattern applied to an irregular adjective",
+          "whyFailsId": "memakai “most”, padahal “good” punya bentuk khusus sendiri.",
+          "misconceptionId": "“most” dipakai untuk “good”."
+        },
+        {
+          "text": "goodest",
+          "misconception": "regular -est ending forced onto an irregular adjective",
+          "whyFailsId": "bukan kata bahasa Inggris, karena “good” punya bentuk khusus untuk satu kelompok.",
+          "misconceptionId": "akhiran -est dipaksakan ke kata sifat yang bentuknya khusus."
+        }
+      ],
+      "explain": {
+        "why": "Hari ini nomor satu di antara semua hari dalam hidupku, jadi pakai “the best”.",
+        "rule": "“good” → “better” → “the best”; “bad” → “worse” → “the worst”. Tanpa -er, tanpa “more”.",
+        "memory": "Nomor satu dari semuanya: “the best”.",
+        "avoid": "Sebelum menambah -er atau “more”, cek: kata sifatnya “good” atau “bad”?"
+      }
+    },
+    {
+      "id": "A2-415-cz0",
+      "templateId": "A2-415",
+      "skill": "irregular_comparative_better_worse_forms",
+      "level": "A2",
+      "sentence": "My cold is ___ today. I feel terrible!",
+      "blank": {
+        "answer": "worse",
+        "alternates": [],
+        "position": 11
+      },
+      "distractors": [
+        {
+          "text": "badder",
+          "misconception": "regular -er ending forced onto an irregular adjective",
+          "whyFailsId": "bukan kata bahasa Inggris, karena “bad” punya bentuk khusus sendiri.",
+          "misconceptionId": "akhiran -er ditempel ke “bad”."
+        },
+        {
+          "text": "more bad",
+          "misconception": "regular 'more + adjective' pattern applied to an irregular adjective",
+          "whyFailsId": "memakai “more”, padahal “bad” punya bentuk khusus sendiri.",
+          "misconceptionId": "“more” dipakai untuk “bad”."
+        },
+        {
+          "text": "more worse",
+          "misconception": "doubles the comparative marking by putting 'more' before an adjective already ending in '-er'",
+          "whyFailsId": "menandai perbandingan dua kali, padahal bentuk khususnya saja sudah cukup.",
+          "misconceptionId": "“more” ditumpuk di depan bentuk khusus."
+        }
+      ],
+      "explain": {
+        "why": "Aku merasa sangat nggak enak badan, jadi pilek hari ini lebih parah dari sebelumnya, dan bentuk khusus “bad” adalah “worse”.",
+        "rule": "“good” → “better” → “the best”; “bad” → “worse” → “the worst”. Tanpa -er, tanpa “more”.",
+        "memory": "“bad” → “worse” → “the worst”.",
+        "avoid": "Sebelum menambah -er atau “more”, cek: kata sifatnya “good” atau “bad”?"
+      }
+    },
+    {
+      "id": "A2-416-cz0",
+      "templateId": "A2-416",
+      "skill": "irregular_comparative_better_worse_forms",
+      "level": "A2",
+      "sentence": "Walking is ___ for your health than taking the bus.",
+      "blank": {
+        "answer": "better",
+        "alternates": [],
+        "position": 11
+      },
+      "distractors": [
+        {
+          "text": "more good",
+          "misconception": "regular 'more + adjective' pattern applied to an irregular adjective",
+          "whyFailsId": "memakai “more”, padahal “good” punya bentuk “lebih” yang khusus.",
+          "misconceptionId": "“more” dipakai untuk “good”."
+        },
+        {
+          "text": "best",
+          "misconception": "superlative 'best' used where 'than' demands a comparative",
+          "whyFailsId": "untuk juara satu kelompok, padahal “than” cuma membandingkan dua cara bepergian.",
+          "misconceptionId": "bentuk “paling” dipakai sebelum “than”."
+        },
+        {
+          "text": "good",
+          "misconception": "base adjective used without comparative marking",
+          "whyFailsId": "nggak membandingkan, padahal “than” butuh bentuk “lebih”.",
+          "misconceptionId": "kata sifat bentuk dasar dipakai sebelum “than”."
+        }
+      ],
+      "explain": {
+        "why": "Dua hal dibandingkan dengan “than”, dan bentuk “lebih” dari “good” adalah “better”.",
+        "rule": "“good” → “better” → “the best”; “bad” → “worse” → “the worst”. Tanpa -er, tanpa “more”.",
+        "memory": "“good” + “than”? “better than”.",
+        "avoid": "Sebelum menambah -er atau “more”, cek: kata sifatnya “good” atau “bad”?"
       }
     }
   ]

@@ -1,25 +1,25 @@
 {
   "schema": "fiezel-th-ui-leak-v1",
-  "generatedAt": "2026-09-27T13:20:39.927Z",
+  "generatedAt": "2026-09-27T18:09:18.351Z",
   "files": {
     "app.js": {
       "leaks": 4,
       "budget": 4,
       "sample": [
         {
-          "line": 8785,
+          "line": 8802,
           "text": "Selesaikan ritme hari ini"
         },
         {
-          "line": 9621,
+          "line": 9638,
           "text": "— Penugasan latihan dan pemantauan capaian murid."
         },
         {
-          "line": 10234,
+          "line": 10251,
           "text": "Nama kriteria: n/4 - satu kalimat alasan yang menunjuk bukti di tulisannya"
         },
         {
-          "line": 15329,
+          "line": 15346,
           "text": "Latihan"
         }
       ]
@@ -472,8 +472,8 @@
     }
   },
   "copyKeys": {
-    "id": 3434,
-    "th": 3436,
+    "id": 3436,
+    "th": 3438,
     "idTanpaTh": 0
   },
   "pass": true

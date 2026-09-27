@@ -10849,6 +10849,1446 @@
           "whyFails": "lupa “as” yang pertama, padahal bingkainya butuh “as” di kedua sisi."
         }
       }
+    },
+    "A2-357": {
+      "objective": "Jangan pakai “a/an” untuk benda yang nggak bisa dihitung seperti “advice”, “bread”, dan “information”; pakai “some” atau “a piece of”. Contoh: “Can you give me some advice about my English test?”",
+      "misconception": "Kamu menaruh “a/an” atau menambah -s pada benda yang nggak bisa dihitung, karena dalam bahasa Indonesia “sebuah nasihat” atau “dua roti” biasa saja.",
+      "reasoning": "cek “advice” bisa dihitung atau nggak → buang “a/an” → biarkan “advice” tanpa -s",
+      "rule": "Benda yang nggak bisa dihitung (“advice”, “bread”, “information”) nggak pakai “a/an” dan nggak diberi -s. Pakai “some” atau “a piece of”, dan kata kerjanya tunggal.",
+      "whyCorrect": "“Advice” nggak bisa dihitung, jadi tanpa “a/an” dan tanpa -s. Untuk jumlah yang nggak disebut, pakai “some”.",
+      "whyOthersFail": "“An advice” menambah “an”, “some advices” menambah -s, dan “an advices” melakukan dua kesalahan itu sekaligus.",
+      "howToAvoid": "Sebelum menulis “a/an”, tanya: benda ini bisa dihitung satu per satu?",
+      "memoryCue": "“Advice”, “information”, “homework”: tanpa “a/an”, tanpa -s.",
+      "distractors": {
+        "an advice": {
+          "misconception": "“an” dipakai untuk “advice” yang nggak bisa dihitung.",
+          "whyFails": "memakai “an”, padahal “advice” nggak bisa dihitung."
+        },
+        "some advices": {
+          "misconception": "“some” sudah benar, tapi “advice” malah diberi -s.",
+          "whyFails": "sudah benar memakai “some”, tapi “advice” nggak pernah diberi -s."
+        },
+        "an advices": {
+          "misconception": "“an” dan -s dipakai bersamaan untuk “advice”.",
+          "whyFails": "punya dua kesalahan: “an” di depan “advice” dan -s di belakangnya."
+        }
+      }
+    },
+    "A2-358": {
+      "objective": "Jangan pakai “a/an” untuk benda yang nggak bisa dihitung seperti “advice”, “bread”, dan “information”; pakai “some” atau “a piece of”. Contoh: “I'd like some rice with my chicken, please.”",
+      "misconception": "Kamu menaruh “a/an” atau menambah -s pada benda yang nggak bisa dihitung, karena dalam bahasa Indonesia “sebuah nasihat” atau “dua roti” biasa saja.",
+      "reasoning": "cek “rice” bisa dihitung atau nggak → ingat benda yang nggak bisa dihitung nggak pakai “a/an” → pilih kata untuk jumlah benda yang nggak bisa dihitung",
+      "rule": "Benda yang nggak bisa dihitung (“advice”, “bread”, “information”) nggak pakai “a/an” dan nggak diberi -s. Pakai “some” atau “a piece of”, dan kata kerjanya tunggal.",
+      "whyCorrect": "“Rice” nggak bisa dihitung, jadi pakai “some”, bukan “a”.",
+      "whyOthersFail": "“A” butuh benda yang bisa dihitung, sedangkan “many” dan “a few” untuk benda jamak yang bisa dihitung.",
+      "howToAvoid": "Sebelum menulis “a/an”, tanya: benda ini bisa dihitung satu per satu?",
+      "memoryCue": "Makanan yang nggak bisa dihitung: “some rice”, “some bread”, “some water”.",
+      "distractors": {
+        "a": {
+          "misconception": "“a” dipakai untuk “rice” yang nggak bisa dihitung.",
+          "whyFails": "butuh benda yang bisa dihitung; kalau mau menghitung nasi, bilang “a plate of rice”."
+        },
+        "many": {
+          "misconception": "“many” dipakai untuk “rice”.",
+          "whyFails": "untuk benda yang bisa dihitung, padahal “rice” nggak bisa dihitung."
+        },
+        "a few": {
+          "misconception": "“a few” dipakai untuk “rice”.",
+          "whyFails": "untuk benda jamak yang bisa dihitung, seperti telur, bukan untuk nasi."
+        }
+      }
+    },
+    "A2-359": {
+      "objective": "Jangan pakai “a/an” untuk benda yang nggak bisa dihitung seperti “advice”, “bread”, dan “information”; pakai “some” atau “a piece of”. Contoh: “I'm hungry. Can I have a piece of bread, please?”",
+      "misconception": "Kamu menaruh “a/an” atau menambah -s pada benda yang nggak bisa dihitung, karena dalam bahasa Indonesia “sebuah nasihat” atau “dua roti” biasa saja.",
+      "reasoning": "cek “bread” bisa dihitung atau nggak → ingat benda seperti ini dihitung per potong atau per wadah → pastikan “piece” tetap tunggal sesudah “a”",
+      "rule": "Benda yang nggak bisa dihitung (“advice”, “bread”, “information”) nggak pakai “a/an” dan nggak diberi -s. Pakai “some” atau “a piece of”, dan kata kerjanya tunggal.",
+      "whyCorrect": "“Bread” nggak bisa dihitung langsung, jadi yang dihitung potongannya dengan “a piece of”.",
+      "whyOthersFail": "“A” nggak bisa langsung di depan “bread”, “a pieces of” mencampur satu dan banyak, dan “one” nggak bisa menghitung “bread” secara langsung.",
+      "howToAvoid": "Sebelum menulis “a/an”, tanya: benda ini bisa dihitung satu per satu?",
+      "memoryCue": "Hitung potongan atau wadahnya: “a piece of bread”, “a glass of water”.",
+      "distractors": {
+        "a": {
+          "misconception": "“a” dipakai langsung untuk “bread”.",
+          "whyFails": "ditaruh langsung di depan “bread”, padahal “bread” nggak bisa dihitung."
+        },
+        "a pieces of": {
+          "misconception": "“a” dipasangkan dengan “pieces” yang jamak.",
+          "whyFails": "memasangkan “a” dengan “pieces”, padahal untuk satu potong, kata “piece” nggak diberi -s."
+        },
+        "one": {
+          "misconception": "angka dipakai langsung untuk benda yang nggak bisa dihitung.",
+          "whyFails": "nggak bisa menghitung “bread” secara langsung; yang dihitung potongannya."
+        }
+      }
+    },
+    "A2-360": {
+      "objective": "Jangan pakai “a/an” untuk benda yang nggak bisa dihitung seperti “advice”, “bread”, dan “information”; pakai “some” atau “a piece of”. Contoh: “This information is very useful for my project.”",
+      "misconception": "Kamu menaruh “a/an” atau menambah -s pada benda yang nggak bisa dihitung, karena dalam bahasa Indonesia “sebuah nasihat” atau “dua roti” biasa saja.",
+      "reasoning": "kenali “information” sebagai benda yang nggak bisa dihitung → ingat benda seperti ini memakai kata kerja tunggal → pilih bentuk “be” tunggal untuk sekarang",
+      "rule": "Benda yang nggak bisa dihitung (“advice”, “bread”, “information”) nggak pakai “a/an” dan nggak diberi -s. Pakai “some” atau “a piece of”, dan kata kerjanya tunggal.",
+      "whyCorrect": "“Information” nggak bisa dihitung, jadi kata kerjanya tunggal, yaitu “is”.",
+      "whyOthersFail": "“Are” dan “were” bentuk jamak, sedangkan “be” belum diubah sesuai subjeknya.",
+      "howToAvoid": "Sebelum menulis “a/an”, tanya: benda ini bisa dihitung satu per satu?",
+      "memoryCue": "Benda yang nggak bisa dihitung pakai kata kerja tunggal, misalnya “information is” dan “news is”.",
+      "distractors": {
+        "are": {
+          "misconception": "“are” dipakai untuk “information”.",
+          "whyFails": "bentuk jamak, padahal “information” nggak bisa dihitung dan memakai kata kerja tunggal."
+        },
+        "were": {
+          "misconception": "“were” dipakai untuk “information”.",
+          "whyFails": "bentuk lampau untuk subjek jamak, padahal “information” selalu memakai kata kerja tunggal."
+        },
+        "be": {
+          "misconception": "bentuk dasar 'be' dipakai tanpa diubah sesuai subjek.",
+          "whyFails": "bentuk dasar, padahal sesudah subjek kata kerja ini harus diubah sesuai subjeknya."
+        }
+      }
+    },
+    "A2-361": {
+      "objective": "Pakai “the” sebelum bentuk “paling”, kata urutan seperti “first” dan “last”, kata “same”, dan benda yang cuma ada satu, seperti “the sun”. Contoh: “Jakarta is the biggest city in Indonesia.”",
+      "misconception": "Kamu menghilangkan “the” atau memakai “a”, karena bahasa Indonesia nggak punya kata seperti “the”.",
+      "reasoning": "perhatikan “in Indonesia” → pastikan Jakarta nomor satu di kelompoknya → gabungkan “the” dengan bentuk -est",
+      "rule": "Kalau bendanya cuma bisa ada satu, pakai “the”: untuk bentuk “paling”, kata urutan seperti “first”, kata “same”, dan benda seperti matahari.",
+      "whyCorrect": "Jakarta nomor satu di antara semua kota, jadi pakai “the” + bentuk “paling”, yaitu “the biggest”.",
+      "whyOthersFail": "“A biggest” memakai “a” untuk sesuatu yang cuma bisa satu, “biggest” lupa “the”, dan “the bigest” lupa menggandakan huruf g.",
+      "howToAvoid": "Tanya: mungkinkah ada dua? Kalau nggak, pakai “the”.",
+      "memoryCue": "Nomor satu di kelompoknya: “the” + -est.",
+      "distractors": {
+        "a biggest": {
+          "misconception": "“a” dipakai sebelum bentuk “paling”.",
+          "whyFails": "memakai “a”, padahal kota terbesar cuma ada satu."
+        },
+        "biggest": {
+          "misconception": "'the' hilang sebelum bentuk 'paling'.",
+          "whyFails": "tanpa “the”, padahal bentuk -est selalu datang bersama “the”."
+        },
+        "the bigest": {
+          "misconception": "huruf mati terakhir nggak digandakan sebelum -est.",
+          "whyFails": "lupa menggandakan huruf g sebelum -est."
+        }
+      }
+    },
+    "A2-362": {
+      "objective": "Pakai “the” sebelum bentuk “paling”, kata urutan seperti “first” dan “last”, kata “same”, dan benda yang cuma ada satu, seperti “the sun”. Contoh: “Never look straight at the sun. It can hurt your eyes.”",
+      "misconception": "Kamu menghilangkan “the” atau memakai “a”, karena bahasa Indonesia nggak punya kata seperti “the”.",
+      "reasoning": "kenali matahari sebagai satu-satunya → ingat benda yang cuma satu memakai “the” → pakai kata itu sebelum “sun”",
+      "rule": "Kalau bendanya cuma bisa ada satu, pakai “the”: untuk bentuk “paling”, kata urutan seperti “first”, kata “same”, dan benda seperti matahari.",
+      "whyCorrect": "Matahari di langit kita cuma satu, jadi pakai “the”.",
+      "whyOthersFail": "“A” dan “an” untuk salah satu dari banyak benda, sedangkan “some” untuk jumlah.",
+      "howToAvoid": "Tanya: mungkinkah ada dua? Kalau nggak, pakai “the”.",
+      "memoryCue": "Benda yang cuma ada satu di dunia selalu pakai “the”, misalnya “the sun”.",
+      "distractors": {
+        "a": {
+          "misconception": "“a” dipakai untuk benda yang cuma ada satu.",
+          "whyFails": "berarti salah satu dari banyak matahari, padahal di langit kita cuma ada satu."
+        },
+        "an": {
+          "misconception": "“an” dipakai untuk “sun”, padahal bendanya cuma satu dan bunyi awalnya konsonan.",
+          "whyFails": "untuk bunyi vokal, dan mataharinya pun cuma satu."
+        },
+        "some": {
+          "misconception": "kata jumlah dipakai untuk satu-satunya matahari.",
+          "whyFails": "untuk menyebut jumlah, padahal mataharinya cuma satu."
+        }
+      }
+    },
+    "A2-363": {
+      "objective": "Pakai “the” sebelum bentuk “paling”, kata urutan seperti “first” dan “last”, kata “same”, dan benda yang cuma ada satu, seperti “the sun”. Contoh: “December is the last month of the year.”",
+      "misconception": "Kamu menghilangkan “the” atau memakai “a”, karena bahasa Indonesia nggak punya kata seperti “the”.",
+      "reasoning": "kenali Desember sebagai bulan penutup → ingat kata urutan memakai “the” → cek beda arti “last” dan “latest”",
+      "rule": "Kalau bendanya cuma bisa ada satu, pakai “the”: untuk bentuk “paling”, kata urutan seperti “first”, kata “same”, dan benda seperti matahari.",
+      "whyCorrect": "Bulan Desember itu bulan penutup, dan bulan penutup cuma ada satu, jadi pakai “the last”.",
+      "whyOthersFail": "“A last” memakai “a” untuk sesuatu yang cuma bisa satu, “last” lupa “the”, dan “the latest” artinya yang terbaru.",
+      "howToAvoid": "Tanya: mungkinkah ada dua? Kalau nggak, pakai “the”.",
+      "memoryCue": "Kata urutan seperti “first” dan “last” selalu didahului “the”.",
+      "distractors": {
+        "a last": {
+          "misconception": "“a” dipakai sebelum kata urutan “last”.",
+          "whyFails": "memakai “a”, padahal bulan penutup cuma ada satu."
+        },
+        "last": {
+          "misconception": "'the' hilang sebelum kata urutan seperti 'first' atau 'last'.",
+          "whyFails": "lupa “the”, padahal kata urutan selalu butuh “the”."
+        },
+        "the latest": {
+          "misconception": "“latest” (terbaru) dipakai untuk yang terakhir dalam urutan.",
+          "whyFails": "artinya yang terbaru, seperti ponsel keluaran terbaru, bukan yang terakhir dalam urutan."
+        }
+      }
+    },
+    "A2-364": {
+      "objective": "Pakai “the” sebelum bentuk “paling”, kata urutan seperti “first” dan “last”, kata “same”, dan benda yang cuma ada satu, seperti “the sun”. Contoh: “Look! Your bag is the same as mine.”",
+      "misconception": "Kamu menghilangkan “the” atau memakai “a”, karena bahasa Indonesia nggak punya kata seperti “the”.",
+      "reasoning": "perhatikan kata “same” → ingat “same” selalu didahului “the” → cek kata yang datang sesudah “same”",
+      "rule": "Kalau bendanya cuma bisa ada satu, pakai “the”: untuk bentuk “paling”, kata urutan seperti “first”, kata “same”, dan benda seperti matahari.",
+      "whyCorrect": "“Same” selalu didahului “the” dan disambung dengan “as”.",
+      "whyOthersFail": "Pilihan dengan “with” meniru “sama dengan”, “same as” lupa “the”, dan “a same as” memakai “a”.",
+      "howToAvoid": "Tanya: mungkinkah ada dua? Kalau nggak, pakai “the”.",
+      "memoryCue": "“The same as”, bukan “same with”.",
+      "distractors": {
+        "the same with": {
+          "misconception": "'same' disambung dengan 'with', meniru 'sama dengan'.",
+          "whyFails": "meniru “sama dengan”, padahal sesudah “same” bahasa Inggris memakai “as”."
+        },
+        "same as": {
+          "misconception": "'the' hilang sebelum kata 'same'.",
+          "whyFails": "lupa “the”, padahal “same” selalu butuh “the”."
+        },
+        "a same as": {
+          "misconception": "“a” dipakai sebelum kata “same”.",
+          "whyFails": "memakai “a”, padahal “same” selalu memakai “the”."
+        }
+      }
+    },
+    "A2-365": {
+      "objective": "Pilih “across” untuk menyeberang dari sisi ke sisi, “through” untuk menembus bagian dalam, “along” untuk menyusuri garis, dan “over” untuk lewat di atas. Contoh: “Rudi swam across the lake to the small island.”",
+      "misconception": "Kamu memakai satu kata untuk semua arah gerak, karena kata “lewat” bisa berarti keempatnya.",
+      "reasoning": "kenali jalurnya dari tepi ke pulau → ingat kata depan untuk menyeberang dari sisi ke sisi → pakai kata itu sebelum “the lake”",
+      "rule": "“Across”: dari sisi ke sisi. “Through”: menembus bagian dalam, seperti terowongan. “Along”: menyusuri garis, seperti jalan. “Over”: lewat di atas.",
+      "whyCorrect": "Rudi pergi dari satu sisi danau ke sisi lain, jadi pakai “across”.",
+      "whyOthersFail": "“Through” untuk menembus bagian dalam, “along” untuk menyusuri, dan “over” untuk lewat di atas.",
+      "howToAvoid": "Bayangkan jalurnya: ke seberang, menembus, menyusuri, atau lewat atas?",
+      "memoryCue": "Dari satu sisi ke sisi lain: “across”.",
+      "distractors": {
+        "through": {
+          "misconception": "kata depan untuk menembus dipakai untuk menyeberangi permukaan terbuka.",
+          "whyFails": "untuk menembus bagian dalam sesuatu, seperti terowongan, padahal danau itu permukaan terbuka."
+        },
+        "along": {
+          "misconception": "kata depan untuk menyusuri dipakai untuk menyeberang ke sisi lain.",
+          "whyFails": "untuk menyusuri tepi atau panjang sesuatu, bukan menyeberang ke sisi lain."
+        },
+        "over": {
+          "misconception": "kata depan untuk lewat di atas dipakai untuk gerak di dalam air.",
+          "whyFails": "untuk lewat di atas sesuatu, padahal Rudi berenang di dalam air."
+        }
+      }
+    },
+    "A2-366": {
+      "objective": "Pilih “across” untuk menyeberang dari sisi ke sisi, “through” untuk menembus bagian dalam, “along” untuk menyusuri garis, dan “over” untuk lewat di atas. Contoh: “The ball flew through the window and broke the glass.”",
+      "misconception": "Kamu memakai satu kata untuk semua arah gerak, karena kata “lewat” bisa berarti keempatnya.",
+      "reasoning": "perhatikan “broke the glass” → pastikan bolanya menembus jendela → ingat kata depan untuk menembus bagian dalam",
+      "rule": "“Across”: dari sisi ke sisi. “Through”: menembus bagian dalam, seperti terowongan. “Along”: menyusuri garis, seperti jalan. “Over”: lewat di atas.",
+      "whyCorrect": "Bolanya menembus jendela sampai kacanya pecah, jadi pakai “through”.",
+      "whyOthersFail": "“Across” untuk menyeberangi permukaan, “along” untuk menyusuri garis, dan “over” lewat di atas jendela tanpa memecahkannya.",
+      "howToAvoid": "Bayangkan jalurnya: ke seberang, menembus, menyusuri, atau lewat atas?",
+      "memoryCue": "Masuk dari satu sisi, keluar di sisi lain: “through”.",
+      "distractors": {
+        "across": {
+          "misconception": "kata depan untuk menyeberang dipakai untuk bola yang menembus jendela.",
+          "whyFails": "untuk menyeberangi permukaan seperti jalan, padahal bolanya menembus jendela."
+        },
+        "along": {
+          "misconception": "kata depan untuk menyusuri dipakai untuk bola yang menembus jendela.",
+          "whyFails": "untuk menyusuri garis seperti jalan, bukan untuk menembus kaca."
+        },
+        "over": {
+          "misconception": "kata depan untuk lewat di atas dipakai untuk bola yang menembus jendela.",
+          "whyFails": "artinya lewat di atas jendela, jadi kacanya nggak akan pecah."
+        }
+      }
+    },
+    "A2-367": {
+      "objective": "Pilih “across” untuk menyeberang dari sisi ke sisi, “through” untuk menembus bagian dalam, “along” untuk menyusuri garis, dan “over” untuk lewat di atas. Contoh: “The ball flew over my head and landed behind me.”",
+      "misconception": "Kamu memakai satu kata untuk semua arah gerak, karena kata “lewat” bisa berarti keempatnya.",
+      "reasoning": "perhatikan “landed behind me” → pastikan bolanya lewat di atas kepala → ingat kata depan untuk lewat di atas",
+      "rule": "“Across”: dari sisi ke sisi. “Through”: menembus bagian dalam, seperti terowongan. “Along”: menyusuri garis, seperti jalan. “Over”: lewat di atas.",
+      "whyCorrect": "Bolanya lewat di atas kepalaku, jadi pakai “over”.",
+      "whyOthersFail": "“Through” berarti menembus kepala, “across” untuk menyeberangi permukaan, dan “along” untuk menyusuri garis.",
+      "howToAvoid": "Bayangkan jalurnya: ke seberang, menembus, menyusuri, atau lewat atas?",
+      "memoryCue": "Lewat di atas lalu ke sisi lain: “over the wall”, “over my head”.",
+      "distractors": {
+        "through": {
+          "misconception": "kata depan untuk menembus dipakai untuk benda yang lewat di atas.",
+          "whyFails": "berarti bolanya menembus kepalaku, padahal bolanya lewat di atas."
+        },
+        "across": {
+          "misconception": "kata depan untuk menyeberang dipakai untuk benda yang lewat di atas.",
+          "whyFails": "untuk menyeberangi permukaan seperti jalan, bukan untuk lewat di atas."
+        },
+        "along": {
+          "misconception": "kata depan untuk menyusuri dipakai untuk benda yang lewat di atas.",
+          "whyFails": "untuk menyusuri garis seperti sungai, bukan untuk lewat di atas."
+        }
+      }
+    },
+    "A2-368": {
+      "objective": "Pilih “across” untuk menyeberang dari sisi ke sisi, “through” untuk menembus bagian dalam, “along” untuk menyusuri garis, dan “over” untuk lewat di atas. Contoh: “Go along this road until you see the big mosque.”",
+      "misconception": "Kamu memakai satu kata untuk semua arah gerak, karena kata “lewat” bisa berarti keempatnya.",
+      "reasoning": "perhatikan “until you see” → pastikan jalurnya menyusuri jalan → ingat kata depan untuk menyusuri garis",
+      "rule": "“Across”: dari sisi ke sisi. “Through”: menembus bagian dalam, seperti terowongan. “Along”: menyusuri garis, seperti jalan. “Over”: lewat di atas.",
+      "whyCorrect": "Kamu menyusuri jalan itu sampai ketemu masjid, jadi pakai “along”.",
+      "whyOthersFail": "“Across” membawamu ke seberang, “through” untuk menembus bagian dalam, dan “over” lewat di atas.",
+      "howToAvoid": "Bayangkan jalurnya: ke seberang, menembus, menyusuri, atau lewat atas?",
+      "memoryCue": "Menyusuri garis: “along the road”, “along the river”.",
+      "distractors": {
+        "across": {
+          "misconception": "kata depan untuk menyeberang dipakai untuk menyusuri jalan.",
+          "whyFails": "membawamu ke seberang jalan, bukan terus menyusurinya."
+        },
+        "through": {
+          "misconception": "kata depan untuk menembus dipakai untuk menyusuri jalan.",
+          "whyFails": "untuk menembus bagian dalam seperti terowongan, padahal jalan itu garis terbuka."
+        },
+        "over": {
+          "misconception": "kata depan untuk lewat di atas dipakai untuk menyusuri jalan.",
+          "whyFails": "untuk lewat di atas sesuatu, seperti jembatan di atas jalan."
+        }
+      }
+    },
+    "A2-369": {
+      "objective": "Pakai satu kata negatif saja dalam satu kalimat: “don't” + “anything”, atau “nothing” saja. Contoh: “Don't ask me. I know nothing about cars.”",
+      "misconception": "Kamu memakai dua kata negatif sekaligus, seperti “don't … nothing”, atau memakai “not” tanpa kata bantu.",
+      "reasoning": "hitung kata negatif di tiap pilihan → pertahankan tepat satu negatif → cek “not” punya kata bantu",
+      "rule": "Satu negatif saja. Kata kerja negatif + “any”: “I don't know anything”. Kata kerja positif + kata “no”: “I know nothing”. “Never” dan “nobody” sudah negatif.",
+      "whyCorrect": "“Nothing” sudah bermakna negatif, jadi kata kerjanya dibiarkan positif.",
+      "whyOthersFail": "“Don't know nothing” punya dua negatif, “know anything” nggak punya negatif sama sekali, dan “not know anything” nggak punya kata bantu.",
+      "howToAvoid": "Hitung kata negatifnya: harus tepat satu.",
+      "memoryCue": "Negatifnya satu saja: “know nothing” = “don't know anything”.",
+      "distractors": {
+        "don't know nothing": {
+          "misconception": "“don't” dan “nothing” dipakai bersamaan.",
+          "whyFails": "punya dua negatif, “don't” dan “nothing”, padahal bahasa Inggris cuma memakai satu."
+        },
+        "know anything": {
+          "misconception": "“anything” dipakai di kalimat positif.",
+          "whyFails": "nggak punya negatif sama sekali, jadi nggak bisa berarti “aku nggak tahu apa-apa”."
+        },
+        "not know anything": {
+          "misconception": "“not” dipakai tanpa “don't”.",
+          "whyFails": "memakai “not” tanpa kata bantu, padahal bahasa Inggris butuh “don't”."
+        }
+      }
+    },
+    "A2-370": {
+      "objective": "Pakai satu kata negatif saja dalam satu kalimat: “don't” + “anything”, atau “nothing” saja. Contoh: “I called Dina's house, but nobody answered the phone.”",
+      "misconception": "Kamu memakai dua kata negatif sekaligus, seperti “don't … nothing”, atau memakai “not” tanpa kata bantu.",
+      "reasoning": "kenali titik-titik sebagai subjek “answered” → perhatikan “answered” berbentuk positif → pilih kata negatif satu kata untuk orang",
+      "rule": "Satu negatif saja. Kata kerja negatif + “any”: “I don't know anything”. Kata kerja positif + kata “no”: “I know nothing”. “Never” dan “nobody” sudah negatif.",
+      "whyCorrect": "“Nobody” jadi subjek dan sudah bermakna negatif, jadi “answered” tetap positif.",
+      "whyOthersFail": "“Anybody” sendiri belum negatif, “no body” dipisah jadi dua kata, dan “not anybody” nggak bisa jadi subjek.",
+      "howToAvoid": "Hitung kata negatifnya: harus tepat satu.",
+      "memoryCue": "Di posisi subjek: “nobody”, “nothing”.",
+      "distractors": {
+        "anybody": {
+          "misconception": "kata berawalan “any” dipakai sebagai subjek untuk makna “tak seorang pun”.",
+          "whyFails": "belum bermakna negatif, jadi kalimatnya nggak berarti “nggak ada yang mengangkat”."
+        },
+        "no body": {
+          "misconception": "“nobody” dipecah jadi dua kata.",
+          "whyFails": "memecah satu kata jadi dua, dan artinya berubah jadi “nggak ada tubuh”."
+        },
+        "not anybody": {
+          "misconception": "“not anybody” dipakai sebagai subjek kalimat.",
+          "whyFails": "menaruh “not” di depan subjek, padahal bahasa Inggris memakai satu kata negatif di posisi itu."
+        }
+      }
+    },
+    "A2-371": {
+      "objective": "Pakai satu kata negatif saja dalam satu kalimat: “don't” + “anything”, atau “nothing” saja. Contoh: “My little brother never eats his vegetables.”",
+      "misconception": "Kamu memakai dua kata negatif sekaligus, seperti “don't … nothing”, atau memakai “not” tanpa kata bantu.",
+      "reasoning": "perhatikan “never” → ingat “never” sudah negatif → tambah -s untuk “he”",
+      "rule": "Satu negatif saja. Kata kerja negatif + “any”: “I don't know anything”. Kata kerja positif + kata “no”: “I know nothing”. “Never” dan “nobody” sudah negatif.",
+      "whyCorrect": "“Never” sudah bermakna negatif, dan “my little brother” sama dengan “he”, jadi pakai “eats”.",
+      "whyOthersFail": "“Doesn't eat” menambah negatif kedua, “eat” lupa -s, dan “not eats” menambah “not” tanpa kata bantu.",
+      "howToAvoid": "Hitung kata negatifnya: harus tepat satu.",
+      "memoryCue": "“Never” + kata kerja ber-s: “he never eats”.",
+      "distractors": {
+        "doesn't eat": {
+          "misconception": "“never” dan “doesn't” dipakai bersamaan.",
+          "whyFails": "menambah negatif kedua, padahal “never” saja sudah cukup."
+        },
+        "eat": {
+          "misconception": "bentuk dasar dipakai untuk “my little brother”.",
+          "whyFails": "lupa -s, padahal “my little brother” sama dengan “he”."
+        },
+        "not eats": {
+          "misconception": "“not” ditaruh sesudah “never” tanpa kata bantu.",
+          "whyFails": "menambah “not” tanpa kata bantu, padahal “never” sudah membuatnya negatif."
+        }
+      }
+    },
+    "A2-372": {
+      "objective": "Pakai satu kata negatif saja dalam satu kalimat: “don't” + “anything”, atau “nothing” saja. Contoh: “There aren't any buses after ten at night.”",
+      "misconception": "Kamu memakai dua kata negatif sekaligus, seperti “don't … nothing”, atau memakai “not” tanpa kata bantu.",
+      "reasoning": "perhatikan bentuk negatif “aren't” → ingat satu negatif sudah cukup → pilih kata untuk kalimat negatif dan tanya",
+      "rule": "Satu negatif saja. Kata kerja negatif + “any”: “I don't know anything”. Kata kerja positif + kata “no”: “I know nothing”. “Never” dan “nobody” sudah negatif.",
+      "whyCorrect": "“Aren't” sudah negatif, jadi pakai “any”, bukan negatif kedua.",
+      "whyOthersFail": "“No” menambah negatif kedua, “none” nggak bisa ditaruh sebelum kata benda, dan “some” untuk kalimat positif.",
+      "howToAvoid": "Hitung kata negatifnya: harus tepat satu.",
+      "memoryCue": "“Not” + “any”: “there aren't any buses” = “there are no buses”.",
+      "distractors": {
+        "no": {
+          "misconception": "“no” dipakai sesudah “aren't”.",
+          "whyFails": "menambah negatif kedua, padahal dengan “aren't” satu negatif sudah cukup."
+        },
+        "none": {
+          "misconception": "“none” dipakai langsung sebelum kata benda.",
+          "whyFails": "dipakai sendirian, nggak bisa ditaruh sebelum kata benda seperti “buses”."
+        },
+        "some": {
+          "misconception": "“some” dipakai di kalimat negatif.",
+          "whyFails": "untuk kalimat positif, padahal “aren't” membuat kalimat ini negatif."
+        }
+      }
+    },
+    "A2-373": {
+      "objective": "Pakai bentuk biasa (bukan -ing) untuk kata kerja keadaan seperti “know”, “like”, “want”, “understand”, dan “have” (memiliki), walaupun membicarakan saat ini. Contoh: “I understand what you mean now. Thanks!”",
+      "misconception": "Kamu memberi -ing pada semua kata kerja yang terjadi sekarang, karena kata “sedang” terasa cocok.",
+      "reasoning": "kenali “understand” sebagai keadaan pikiran → ingat keadaan nggak memakai -ing → pilih bentuk biasa untuk “I”",
+      "rule": "Kata kerja untuk pikiran, perasaan, dan kepemilikan adalah keadaan: “know”, “understand”, “like”, “want”, “have”. Pakai bentuk biasa: “I understand”.",
+      "whyCorrect": "“Understand” itu keadaan pikiran, jadi tetap bentuk biasa walaupun ada “now”.",
+      "whyOthersFail": "“Am understanding” memakai -ing untuk keadaan, “understanding” nggak punya kata bantu, dan “understands” menambah -s untuk “I”.",
+      "howToAvoid": "Tanya: ini kegiatan yang kelihatan, atau keadaan di pikiran dan perasaan?",
+      "memoryCue": "Kata kerja pikiran dan perasaan tetap bentuk biasa: “I understand”, “I know”.",
+      "distractors": {
+        "am understanding": {
+          "misconception": "bentuk -ing dipakai untuk kata kerja pikiran karena ada “now”.",
+          "whyFails": "memakai -ing karena ada “now”, padahal kata kerja pikiran seperti ini nggak memakai -ing."
+        },
+        "understanding": {
+          "misconception": "bentuk -ing dipakai sendirian sesudah “I”.",
+          "whyFails": "nggak punya kata bantu, jadi nggak bisa jadi kata kerja kalimat."
+        },
+        "understands": {
+          "misconception": "akhiran -s ditambahkan ke kata kerja untuk “I”.",
+          "whyFails": "menambah -s, padahal kata kerja untuk “I” nggak pernah diberi -s."
+        }
+      }
+    },
+    "A2-374": {
+      "objective": "Pakai bentuk biasa (bukan -ing) untuk kata kerja keadaan seperti “know”, “like”, “want”, “understand”, dan “have” (memiliki), walaupun membicarakan saat ini. Contoh: “My little sister wants a new doll for her birthday.”",
+      "misconception": "Kamu memberi -ing pada semua kata kerja yang terjadi sekarang, karena kata “sedang” terasa cocok.",
+      "reasoning": "kenali “want” sebagai perasaan → ingat perasaan nggak memakai -ing → tambah -s untuk “she”",
+      "rule": "Kata kerja untuk pikiran, perasaan, dan kepemilikan adalah keadaan: “know”, “understand”, “like”, “want”, “have”. Pakai bentuk biasa: “I understand”.",
+      "whyCorrect": "“Want” itu perasaan, bukan kegiatan, dan “my little sister” sama dengan “she”, jadi pakai “wants”.",
+      "whyOthersFail": "“Is wanting” memakai -ing untuk perasaan, “want” lupa -s, dan “wanting” nggak punya kata bantu.",
+      "howToAvoid": "Tanya: ini kegiatan yang kelihatan, atau keadaan di pikiran dan perasaan?",
+      "memoryCue": "“Want”, “need”, “like”: tanpa -ing. “She wants”.",
+      "distractors": {
+        "is wanting": {
+          "misconception": "bentuk -ing dipakai untuk “want”.",
+          "whyFails": "memakai -ing, padahal “want” itu perasaan, bukan kegiatan."
+        },
+        "want": {
+          "misconception": "bentuk dasar dipakai untuk “my little sister”.",
+          "whyFails": "lupa -s, padahal “my little sister” sama dengan “she”."
+        },
+        "wanting": {
+          "misconception": "bentuk -ing dipakai sendirian sebagai kata kerja kalimat.",
+          "whyFails": "cuma bentuk -ing tanpa kata bantu, jadi kalimatnya belum punya kata kerja."
+        }
+      }
+    },
+    "A2-375": {
+      "objective": "Pakai bentuk biasa (bukan -ing) untuk kata kerja keadaan seperti “know”, “like”, “want”, “understand”, dan “have” (memiliki), walaupun membicarakan saat ini. Contoh: “Rina doesn't like spicy food. She never eats sambal.”",
+      "misconception": "Kamu memberi -ing pada semua kata kerja yang terjadi sekarang, karena kata “sedang” terasa cocok.",
+      "reasoning": "kenali “like” sebagai perasaan → ingat perasaan nggak memakai -ing → pilih kata bantu negatif untuk “she”",
+      "rule": "Kata kerja untuk pikiran, perasaan, dan kepemilikan adalah keadaan: “know”, “understand”, “like”, “want”, “have”. Pakai bentuk biasa: “I understand”.",
+      "whyCorrect": "“Like” itu perasaan, jadi tanpa -ing, dan bentuk negatif untuk “she” adalah “doesn't like”.",
+      "whyOthersFail": "“Isn't liking” memakai -ing untuk perasaan, “don't like” untuk “I”, “you”, “we”, “they”, dan “not likes” nggak punya kata bantu.",
+      "howToAvoid": "Tanya: ini kegiatan yang kelihatan, atau keadaan di pikiran dan perasaan?",
+      "memoryCue": "Perasaan tetap bentuk biasa: “she doesn't like”, “she loves”.",
+      "distractors": {
+        "isn't liking": {
+          "misconception": "bentuk -ing dipakai untuk “like”.",
+          "whyFails": "memberi -ing pada “like”, padahal perasaan nggak memakai bentuk -ing."
+        },
+        "don't like": {
+          "misconception": "“don't” dipakai untuk “Rina”.",
+          "whyFails": "untuk “I”, “you”, “we”, dan “they”, padahal Rina sama dengan “she”."
+        },
+        "not likes": {
+          "misconception": "“not” dipakai tanpa “doesn't”.",
+          "whyFails": "menaruh “not” tanpa kata bantu, padahal kalimat negatif untuk “she” butuh “doesn't”."
+        }
+      }
+    },
+    "A2-376": {
+      "objective": "Pakai bentuk biasa (bukan -ing) untuk kata kerja keadaan seperti “know”, “like”, “want”, “understand”, dan “have” (memiliki), walaupun membicarakan saat ini. Contoh: “We have two cats and a dog at home.”",
+      "misconception": "Kamu memberi -ing pada semua kata kerja yang terjadi sekarang, karena kata “sedang” terasa cocok.",
+      "reasoning": "kenali kata kerjanya sebagai memiliki → ingat memiliki itu keadaan → pilih bentuk biasa untuk “we”",
+      "rule": "Kata kerja untuk pikiran, perasaan, dan kepemilikan adalah keadaan: “know”, “understand”, “like”, “want”, “have”. Pakai bentuk biasa: “I understand”.",
+      "whyCorrect": "“Have” di sini artinya memiliki, yaitu keadaan, dan “we” pakai “have”.",
+      "whyOthersFail": "“Are having” memakai -ing untuk kepemilikan, “has” untuk “he”, “she”, “it”, dan “are have” mencampur “are” dengan “have”.",
+      "howToAvoid": "Tanya: ini kegiatan yang kelihatan, atau keadaan di pikiran dan perasaan?",
+      "memoryCue": "“Have” untuk memiliki: tanpa -ing. “We have a cat”.",
+      "distractors": {
+        "are having": {
+          "misconception": "bentuk -ing dipakai untuk kata kerja yang artinya memiliki.",
+          "whyFails": "memakai -ing, padahal kata kerja ini di sini artinya memiliki, yaitu keadaan."
+        },
+        "has": {
+          "misconception": "“has” dipakai untuk “we”.",
+          "whyFails": "untuk “he”, “she”, atau “it”, padahal subjeknya “we”."
+        },
+        "are have": {
+          "misconception": "“are” diselipkan di depan kata kerja utama.",
+          "whyFails": "menyelipkan “are” di depan kata kerja utama, padahal satu kata kerja sudah cukup."
+        }
+      }
+    },
+    "A2-377": {
+      "objective": "Pakai “for” + lamanya waktu, “since” + titik mulai, dan “during” + acara atau masa tertentu. Contoh: “I have lived in this town for five years.”",
+      "misconception": "Kamu memakai “during” untuk lamanya waktu, karena kata “selama” dikira sama dengan “during”.",
+      "reasoning": "perhatikan “five years” → pastikan itu lamanya waktu → ingat kata untuk menyebut berapa lama",
+      "rule": "“For” + berapa lama (“for five years”). “Since” + kapan mulainya (“since Monday”). “During” + di tengah suatu acara (“during the exam”).",
+      "whyCorrect": "“Five years” itu lamanya waktu, jadi pakai “for”.",
+      "whyOthersFail": "“Since” butuh titik mulai, “during” butuh acara, dan “while” butuh subjek dan kata kerja sesudahnya.",
+      "howToAvoid": "Tanya: berapa lama, sejak kapan, atau di tengah acara apa?",
+      "memoryCue": "Berapa lama? “for”: “for five years”, “for two hours”.",
+      "distractors": {
+        "since": {
+          "misconception": "“since” dipakai untuk lamanya waktu.",
+          "whyFails": "butuh titik mulai seperti “2020”, bukan lamanya waktu."
+        },
+        "during": {
+          "misconception": "“during” dipakai untuk lamanya waktu, meniru “selama”.",
+          "whyFails": "meniru “selama”, padahal kata ini dipakai untuk acara, bukan untuk jumlah tahun."
+        },
+        "while": {
+          "misconception": "“while” dipakai sebelum “five years”.",
+          "whyFails": "butuh subjek dan kata kerja sesudahnya, padahal “five years” cuma kata benda."
+        }
+      }
+    },
+    "A2-378": {
+      "objective": "Pakai “for” + lamanya waktu, “since” + titik mulai, dan “during” + acara atau masa tertentu. Contoh: “We have been best friends since primary school.”",
+      "misconception": "Kamu memakai “during” untuk lamanya waktu, karena kata “selama” dikira sama dengan “during”.",
+      "reasoning": "perhatikan “have been” → pastikan SD itu titik mulainya → ingat kata untuk menyebut sejak kapan",
+      "rule": "“For” + berapa lama (“for five years”). “Since” + kapan mulainya (“since Monday”). “During” + di tengah suatu acara (“during the exam”).",
+      "whyCorrect": "Persahabatan kami mulai sejak SD dan masih berlanjut, jadi pakai “since”.",
+      "whyOthersFail": "“For” butuh lamanya waktu, “during” nggak menjangkau sampai sekarang, dan “while” butuh subjek dan kata kerja.",
+      "howToAvoid": "Tanya: berapa lama, sejak kapan, atau di tengah acara apa?",
+      "memoryCue": "Mulai waktu itu dan masih sampai sekarang: “since”.",
+      "distractors": {
+        "for": {
+          "misconception": "“for” dipakai untuk titik mulai.",
+          "whyFails": "butuh lamanya waktu, misalnya sepuluh tahun, bukan titik mulai."
+        },
+        "during": {
+          "misconception": "“during” dipakai untuk titik mulai yang berlanjut sampai sekarang.",
+          "whyFails": "untuk hal yang terjadi di dalam satu masa, padahal persahabatannya masih berlanjut sampai sekarang."
+        },
+        "while": {
+          "misconception": "“while” dipakai sebelum “primary school”.",
+          "whyFails": "butuh subjek dan kata kerja sesudahnya, padahal “primary school” cuma kata benda."
+        }
+      }
+    },
+    "A2-379": {
+      "objective": "Pakai “for” + lamanya waktu, “since” + titik mulai, dan “during” + acara atau masa tertentu. Contoh: “My phone rang during the exam. I was so embarrassed!”",
+      "misconception": "Kamu memakai “during” untuk lamanya waktu, karena kata “selama” dikira sama dengan “during”.",
+      "reasoning": "perhatikan “the exam” → pastikan itu sebuah acara → ingat kata untuk menyebut di tengah acara",
+      "rule": "“For” + berapa lama (“for five years”). “Since” + kapan mulainya (“since Monday”). “During” + di tengah suatu acara (“during the exam”).",
+      "whyCorrect": "Deringnya terjadi di tengah ujian, jadi pakai “during” + “the exam”.",
+      "whyOthersFail": "“For” butuh lamanya waktu, “since” butuh titik mulai, dan “while” butuh subjek dan kata kerja.",
+      "howToAvoid": "Tanya: berapa lama, sejak kapan, atau di tengah acara apa?",
+      "memoryCue": "Di tengah suatu acara: “during the exam”, “during the film”.",
+      "distractors": {
+        "for": {
+          "misconception": "“for” dipakai untuk sebuah acara, bukan lamanya waktu.",
+          "whyFails": "butuh lamanya waktu, misalnya satu jam, padahal “the exam” itu acara."
+        },
+        "since": {
+          "misconception": "“since” dipakai untuk kejadian di tengah ujian.",
+          "whyFails": "menandai kapan sesuatu mulai, padahal ponselnya berdering di tengah ujian."
+        },
+        "while": {
+          "misconception": "“while” dipakai sebelum “the exam”.",
+          "whyFails": "butuh subjek dan kata kerja sesudahnya, padahal “the exam” cuma kata benda."
+        }
+      }
+    },
+    "A2-380": {
+      "objective": "Pakai “for” + lamanya waktu, “since” + titik mulai, dan “during” + acara atau masa tertentu. Contoh: “I have been sick since Monday, so I missed two days of school.”",
+      "misconception": "Kamu memakai “during” untuk lamanya waktu, karena kata “selama” dikira sama dengan “during”.",
+      "reasoning": "perhatikan “have been” dan “Monday” → cek sakitnya masih berlangsung → pilih kata untuk titik mulai",
+      "rule": "“For” + berapa lama (“for five years”). “Since” + kapan mulainya (“since Monday”). “During” + di tengah suatu acara (“during the exam”).",
+      "whyCorrect": "Sakitnya mulai hari Senin dan sampai sekarang masih sakit, jadi pakai “since”.",
+      "whyOthersFail": "“For” butuh lamanya waktu, “during” untuk hal di dalam satu acara, dan “from” nggak dipakai sendirian untuk titik mulai yang berlanjut sampai sekarang.",
+      "howToAvoid": "Tanya: berapa lama, sejak kapan, atau di tengah acara apa?",
+      "memoryCue": "“Have been” + “since” + titik mulai: “since Monday”, “since 2020”.",
+      "distractors": {
+        "for": {
+          "misconception": "“for” dipakai untuk hari Senin, sebuah titik waktu.",
+          "whyFails": "butuh lamanya waktu, misalnya tiga hari, bukan nama hari."
+        },
+        "during": {
+          "misconception": "“during” dipakai untuk titik mulai sakit yang berlanjut sampai sekarang.",
+          "whyFails": "untuk hal di dalam satu masa, bukan untuk kapan sakitnya mulai."
+        },
+        "from": {
+          "misconception": "“from” dipakai sendirian untuk titik mulai yang masih berlanjut sampai sekarang.",
+          "whyFails": "nggak dipakai sendirian untuk titik mulai yang masih berlanjut sampai sekarang."
+        }
+      }
+    },
+    "A2-381": {
+      "objective": "Tanya pelaku dengan “Who/What” + kata kerja, dan tanya penerima atau objek dengan “Who/What” + “do/does/did” + subjek + kata kerja dasar. Contoh: “Who takes you to school every day?”",
+      "misconception": "Kamu menambah “do/did” di semua kalimat tanya, atau melupakannya saat kata tanyanya menanyakan objek.",
+      "reasoning": "kenali “who” sebagai pelaku → buang “does” dari pertanyaannya → tambah -s seperti untuk “he”",
+      "rule": "Kalau “who/what” pelakunya: tanpa “do” (“Who called you?”). Kalau “who/what” objeknya: tambah “do/does/did” (“Who did you call?”).",
+      "whyCorrect": "“Who” di sini pelakunya, jadi tanpa “does”, dan “who” diperlakukan seperti “he”.",
+      "whyOthersFail": "“Does take” menambah kata bantu ke pertanyaan tentang pelaku, “take” lupa -s, dan “does takes” memakai kata bantu dan -s sekaligus.",
+      "howToAvoid": "Tanya: kata tanyanya melakukan kegiatan, atau dikenai kegiatan?",
+      "memoryCue": "“Who” pelakunya? “Who” + kata kerja ber-s: “Who takes you?”",
+      "distractors": {
+        "does take": {
+          "misconception": "“does” ditambahkan, padahal “who” di sini subjeknya.",
+          "whyFails": "menambah “does”, padahal “who” di sini pelakunya, jadi nggak perlu kata bantu."
+        },
+        "take": {
+          "misconception": "bentuk dasar dipakai untuk “who”.",
+          "whyFails": "lupa -s, padahal “who” sebagai pelaku diperlakukan seperti “he”."
+        },
+        "does takes": {
+          "misconception": "'does' dipasangkan dengan kata kerja yang sudah ber-s.",
+          "whyFails": "memakai “does” dan -s sekaligus, padahal di sini “who” nggak butuh “does”."
+        }
+      }
+    },
+    "A2-382": {
+      "objective": "Tanya pelaku dengan “Who/What” + kata kerja, dan tanya penerima atau objek dengan “Who/What” + “do/does/did” + subjek + kata kerja dasar. Contoh: “What did you eat for dinner yesterday?”",
+      "misconception": "Kamu menambah “do/did” di semua kalimat tanya, atau melupakannya saat kata tanyanya menanyakan objek.",
+      "reasoning": "kenali “what” sebagai makanan yang dimakan → perhatikan “yesterday” → gabungkan “did” dengan “you” dan kata kerja dasar",
+      "rule": "Kalau “who/what” pelakunya: tanpa “do” (“Who called you?”). Kalau “who/what” objeknya: tambah “do/does/did” (“Who did you call?”).",
+      "whyCorrect": "“What” di sini makanannya, bukan yang makan, jadi butuh “did” + “you” + kata kerja dasar.",
+      "whyOthersFail": "“You ate” nggak punya “did”, “did you ate” menandai lampau dua kali, dan “do you eat” bentuk sekarang.",
+      "howToAvoid": "Tanya: kata tanyanya melakukan kegiatan, atau dikenai kegiatan?",
+      "memoryCue": "Menanyakan objek: “did” + subjek + kata kerja dasar.",
+      "distractors": {
+        "you ate": {
+          "misconception": "“did” hilang dari pertanyaan tentang objek.",
+          "whyFails": "nggak punya “did”, padahal pertanyaan tentang makanannya membutuhkannya."
+        },
+        "did you ate": {
+          "misconception": "“did” dan “ate” dipakai bersamaan.",
+          "whyFails": "menandai lampau dua kali, padahal sesudah “did” kata kerjanya bentuk dasar."
+        },
+        "do you eat": {
+          "misconception": "kata bantu bentuk sekarang dipakai untuk “yesterday”.",
+          "whyFails": "bentuk sekarang, padahal “yesterday” sudah lewat."
+        }
+      }
+    },
+    "A2-383": {
+      "objective": "Tanya pelaku dengan “Who/What” + kata kerja, dan tanya penerima atau objek dengan “Who/What” + “do/does/did” + subjek + kata kerja dasar. Contoh: “What happened to your arm? It's all red.”",
+      "misconception": "Kamu menambah “do/did” di semua kalimat tanya, atau melupakannya saat kata tanyanya menanyakan objek.",
+      "reasoning": "kenali “what” sebagai hal yang terjadi → ingat pertanyaan tentang subjek nggak butuh “did” → pilih bentuk lampau dari “happen”",
+      "rule": "Kalau “who/what” pelakunya: tanpa “do” (“Who called you?”). Kalau “who/what” objeknya: tambah “do/does/did” (“Who did you call?”).",
+      "whyCorrect": "“What” di sini subjeknya, yaitu hal yang terjadi, jadi nggak perlu “did”.",
+      "whyOthersFail": "“Did happen” menambah “did” ke pertanyaan tentang subjek, “was happened” menambah “was”, dan “happen” bukan bentuk lampau.",
+      "howToAvoid": "Tanya: kata tanyanya melakukan kegiatan, atau dikenai kegiatan?",
+      "memoryCue": "“What happened?” tanpa “did”, tanpa “was”.",
+      "distractors": {
+        "did happen": {
+          "misconception": "“did” ditambahkan, padahal “what” di sini subjeknya.",
+          "whyFails": "menambah “did”, padahal “what” di sini subjeknya."
+        },
+        "was happened": {
+          "misconception": "'was' ditambahkan sebelum 'happened'.",
+          "whyFails": "menambah “was”, padahal “happen” nggak pernah memakai “was” untuk bentuk lampau."
+        },
+        "happen": {
+          "misconception": "bentuk sekarang dipakai untuk kejadian yang sudah lewat.",
+          "whyFails": "bukan bentuk lampau, padahal lengannya merah karena kejadiannya sudah lewat."
+        }
+      }
+    },
+    "A2-384": {
+      "objective": "Tanya pelaku dengan “Who/What” + kata kerja, dan tanya penerima atau objek dengan “Who/What” + “do/does/did” + subjek + kata kerja dasar. Contoh: “Doni wants to call someone. Who does he want to call?”",
+      "misconception": "Kamu menambah “do/did” di semua kalimat tanya, atau melupakannya saat kata tanyanya menanyakan objek.",
+      "reasoning": "kenali “who” sebagai orang yang ditelepon → ingat pertanyaan tentang penerima butuh “does” → pastikan “want” tetap bentuk dasar sesudah “does”",
+      "rule": "Kalau “who/what” pelakunya: tanpa “do” (“Who called you?”). Kalau “who/what” objeknya: tambah “do/does/did” (“Who did you call?”).",
+      "whyCorrect": "Kita sudah tahu Doni yang mau menelepon; “who” menanyakan orang yang ditelepon, jadi butuh “does” + “he” + “want”.",
+      "whyOthersFail": "“He wants” nggak punya “does”, “does he wants” memakai “does” dan -s sekaligus, dan “wants” malah menanyakan siapa yang mau menelepon.",
+      "howToAvoid": "Tanya: kata tanyanya melakukan kegiatan, atau dikenai kegiatan?",
+      "memoryCue": "Menanyakan penerima: “Who does he want to call?”",
+      "distractors": {
+        "he wants": {
+          "misconception": "“does” hilang dari pertanyaan tentang penerima.",
+          "whyFails": "nggak punya “does”, padahal pertanyaan tentang orang yang ditelepon membutuhkannya."
+        },
+        "does he wants": {
+          "misconception": "'does' dipasangkan dengan kata kerja yang sudah ber-s.",
+          "whyFails": "memakai “does” dan -s sekaligus, padahal sesudah “does” kata “want” nggak diberi -s."
+        },
+        "wants": {
+          "misconception": "pertanyaan tentang penerima diubah jadi pertanyaan tentang pelaku.",
+          "whyFails": "menanyakan siapa yang mau menelepon, padahal kita sudah tahu orangnya Doni."
+        }
+      }
+    },
+    "A2-385": {
+      "objective": "Pakai “have/has” + bentuk ketiga dengan “ever” dan “never” untuk menceritakan pengalaman sampai sekarang. Contoh: “Have you ever eaten sushi? It's really good!”",
+      "misconception": "Kamu memakai bentuk lampau atau bentuk dasar sesudah “have”, karena kata “pernah” nggak mengubah kata kerjanya.",
+      "reasoning": "perhatikan “have” dan “ever” → ingat pengalaman memakai “have” + bentuk ketiga → pilih bentuk ketiga dari “eat”",
+      "rule": "Pengalaman: “have/has” + bentuk ketiga (“been”, “eaten”, “seen”). “Ever” untuk bertanya, “never” untuk “belum pernah”.",
+      "whyCorrect": "Sesudah “have”, pengalaman memakai kata kerja bentuk ketiga, yaitu “eaten”.",
+      "whyOthersFail": "“Ate” bentuk lampau, “eat” bentuk dasar, dan “eating” bentuk -ing.",
+      "howToAvoid": "Sesudah “have/has”, cek kata kerjanya: sudah bentuk ketiga?",
+      "memoryCue": "“eat”, “ate”, “eaten”: sesudah “have”, ambil yang ketiga.",
+      "distractors": {
+        "ate": {
+          "misconception": "bentuk lampau dipakai sesudah “have”.",
+          "whyFails": "bentuk lampau, padahal sesudah “have” kata kerjanya bentuk ketiga."
+        },
+        "eat": {
+          "misconception": "bentuk dasar dipakai sesudah “have”.",
+          "whyFails": "bentuk dasar, padahal sesudah “have” kata kerjanya berubah jadi bentuk ketiga."
+        },
+        "eating": {
+          "misconception": "bentuk -ing dipakai sesudah “have” untuk pengalaman.",
+          "whyFails": "bentuk -ing, padahal “have” + -ing bukan pola untuk pengalaman."
+        }
+      }
+    },
+    "A2-386": {
+      "objective": "Pakai “have/has” + bentuk ketiga dengan “ever” dan “never” untuk menceritakan pengalaman sampai sekarang. Contoh: “I have never been to Bali, but I'd love to go one day.”",
+      "misconception": "Kamu memakai bentuk lampau atau bentuk dasar sesudah “have”, karena kata “pernah” nggak mengubah kata kerjanya.",
+      "reasoning": "perhatikan nggak ada waktu yang disebut → pilih “have” untuk subjek “I” → taruh “never” sebelum bentuk ketiga",
+      "rule": "Pengalaman: “have/has” + bentuk ketiga (“been”, “eaten”, “seen”). “Ever” untuk bertanya, “never” untuk “belum pernah”.",
+      "whyCorrect": "Ini pengalaman hidup tanpa waktu tertentu, dan “I” pakai “have”, jadi “have never been”.",
+      "whyOthersFail": "“Never went” butuh waktu lampau yang jelas, “have never go” masih bentuk dasar, dan “has never been” untuk “he”, “she”, atau “it”.",
+      "howToAvoid": "Sesudah “have/has”, cek kata kerjanya: sudah bentuk ketiga?",
+      "memoryCue": "Belum pernah seumur hidup: “I have never been”.",
+      "distractors": {
+        "never went": {
+          "misconception": "bentuk lampau dipakai untuk pengalaman tanpa waktu.",
+          "whyFails": "bentuk lampau, padahal tanpa waktu lampau yang jelas, pengalaman memakai “have”."
+        },
+        "have never go": {
+          "misconception": "bentuk dasar “go” dipakai sesudah “have never”.",
+          "whyFails": "masih bentuk dasar, padahal sesudah “have” kata kerjanya bentuk ketiga."
+        },
+        "has never been": {
+          "misconception": "“has” dipakai untuk “I”.",
+          "whyFails": "untuk “he”, “she”, atau “it”, padahal subjeknya “I”."
+        }
+      }
+    },
+    "A2-387": {
+      "objective": "Pakai “have/has” + bentuk ketiga dengan “ever” dan “never” untuk menceritakan pengalaman sampai sekarang. Contoh: “Has your brother ever ridden a horse?”",
+      "misconception": "Kamu memakai bentuk lampau atau bentuk dasar sesudah “have”, karena kata “pernah” nggak mengubah kata kerjanya.",
+      "reasoning": "kenali “your brother” sebagai “he” → perhatikan bentuk ketiga “ridden” → pilih kata bantu untuk “he” di bentuk ini",
+      "rule": "Pengalaman: “have/has” + bentuk ketiga (“been”, “eaten”, “seen”). “Ever” untuk bertanya, “never” untuk “belum pernah”.",
+      "whyCorrect": "“Your brother” sama dengan “he”, dan “ridden” bentuk ketiga, jadi pertanyaannya diawali “Has”.",
+      "whyOthersFail": "“Have” untuk “I”, “you”, “we”, “they”, “Did” dipasangkan dengan bentuk dasar, dan “Is” nggak bisa dipasangkan dengan “ridden”.",
+      "howToAvoid": "Sesudah “have/has”, cek kata kerjanya: sudah bentuk ketiga?",
+      "memoryCue": "“He”, “she”, “it” + “ever”: “Has he ever…?”",
+      "distractors": {
+        "Have": {
+          "misconception": "“have” dipakai untuk “he”, “she”, atau “it”.",
+          "whyFails": "untuk “I”, “you”, “we”, dan “they”, padahal “your brother” sama dengan “he”."
+        },
+        "Did": {
+          "misconception": "“did” dipasangkan dengan kata kerja bentuk ketiga.",
+          "whyFails": "hanya dipasangkan dengan bentuk dasar, padahal di sini kata kerjanya bentuk ketiga."
+        },
+        "Is": {
+          "misconception": "bentuk “be” dipakai sebagai pengganti “have” untuk pengalaman.",
+          "whyFails": "nggak bisa dipasangkan dengan “ridden”; pengalaman memakai kata bantu lain."
+        }
+      }
+    },
+    "A2-388": {
+      "objective": "Pakai “have/has” + bentuk ketiga dengan “ever” dan “never” untuk menceritakan pengalaman sampai sekarang. Contoh: “My dad has never been on a plane. He is scared of flying.”",
+      "misconception": "Kamu memakai bentuk lampau atau bentuk dasar sesudah “have”, karena kata “pernah” nggak mengubah kata kerjanya.",
+      "reasoning": "perhatikan “scared of flying” → pastikan maksudnya belum pernah sekali pun → pilih kata untuk “belum pernah”",
+      "rule": "Pengalaman: “have/has” + bentuk ketiga (“been”, “eaten”, “seen”). “Ever” untuk bertanya, “never” untuk “belum pernah”.",
+      "whyCorrect": "Ayah takut naik pesawat, jadi maksudnya belum pernah sekali pun. Kata untuk itu adalah “never”.",
+      "whyOthersFail": "“Ever” untuk kalimat tanya, “no” nggak bisa ditaruh sebelum kata kerja seperti “been”, dan “yet” ditaruh di akhir kalimat negatif atau tanya.",
+      "howToAvoid": "Sesudah “have/has”, cek kata kerjanya: sudah bentuk ketiga?",
+      "memoryCue": "Belum pernah sekali pun: “never”.",
+      "distractors": {
+        "ever": {
+          "misconception": "“ever” dipakai di kalimat pernyataan positif.",
+          "whyFails": "dipakai di kalimat tanya tentang pengalaman, dan artinya bukan “belum pernah”."
+        },
+        "no": {
+          "misconception": "“no” dipakai untuk menegatifkan kata kerja.",
+          "whyFails": "dipakai sebelum kata benda, bukan sebelum kata kerja seperti “been”."
+        },
+        "yet": {
+          "misconception": "“yet” ditaruh di tengah kalimat, sebelum kata kerja.",
+          "whyFails": "ditaruh di akhir kalimat negatif atau tanya, dan artinya “sampai sekarang”, bukan “belum pernah”."
+        }
+      }
+    },
+    "A2-389": {
+      "objective": "Pakai “have/has” + bentuk ketiga dengan “for” atau “since” untuk hal yang mulai di masa lalu dan masih berlaku sekarang. Contoh: “My parents have been married for twenty years, and they are still happy.”",
+      "misconception": "Kamu memakai present simple, karena kalimat seperti “aku tinggal di sini sejak 2020” nggak mengubah kata kerjanya.",
+      "reasoning": "perhatikan “for twenty years” → cek mereka masih menikah sekarang → gabungkan “have” dengan bentuk ketiga dari “be”",
+      "rule": "Mulai di masa lalu dan masih berlaku: “have/has” + bentuk ketiga + “for” (lamanya) atau “since” (titik mulai).",
+      "whyCorrect": "Mereka menikah dua puluh tahun lalu dan masih menikah sampai sekarang, jadi pakai “have been” bersama “for”.",
+      "whyOthersFail": "“Are” mengabaikan rentang dua puluh tahun, “were” terdengar sudah selesai, dan “have” butuh “been” sesudahnya.",
+      "howToAvoid": "Ada “for” atau “since”? Cek kata kerjanya sudah “have/has” + bentuk ketiga.",
+      "memoryCue": "“For” + rentang sampai sekarang: “have been”.",
+      "distractors": {
+        "are": {
+          "misconception": "bentuk sekarang dipakai untuk rentang dua puluh tahun.",
+          "whyFails": "cuma menggambarkan sekarang, padahal “for twenty years” butuh kata kerja yang menjangkau masa lalu."
+        },
+        "were": {
+          "misconception": "bentuk lampau dipakai untuk pernikahan yang masih berlangsung.",
+          "whyFails": "terdengar sudah selesai, padahal mereka masih menikah dan bahagia."
+        },
+        "have": {
+          "misconception": "“have” dipakai tanpa kata kerja bentuk ketiga sesudahnya.",
+          "whyFails": "kurang satu kata kerja; keadaan “married” masih butuh “been”."
+        }
+      }
+    },
+    "A2-390": {
+      "objective": "Pakai “have/has” + bentuk ketiga dengan “for” atau “since” untuk hal yang mulai di masa lalu dan masih berlaku sekarang. Contoh: “I have had this phone for two years, and it still works well.”",
+      "misconception": "Kamu memakai present simple, karena kalimat seperti “aku tinggal di sini sejak 2020” nggak mengubah kata kerjanya.",
+      "reasoning": "perhatikan “for two years” → cek ponselnya masih kupunya → gabungkan “have” dengan bentuk ketiga dari “have”",
+      "rule": "Mulai di masa lalu dan masih berlaku: “have/has” + bentuk ketiga + “for” (lamanya) atau “since” (titik mulai).",
+      "whyCorrect": "Ponselnya kumiliki sejak dua tahun lalu dan masih kupakai, jadi pakai “have had”.",
+      "whyOthersFail": "“Have” mengabaikan rentang dua tahun, “am having” memakai -ing untuk kepemilikan, dan “had” terdengar sudah selesai.",
+      "howToAvoid": "Ada “for” atau “since”? Cek kata kerjanya sudah “have/has” + bentuk ketiga.",
+      "memoryCue": "Dimiliki dari dulu sampai sekarang: “have had”.",
+      "distractors": {
+        "have": {
+          "misconception": "bentuk sekarang dipakai untuk rentang dua tahun.",
+          "whyFails": "cuma membicarakan sekarang, padahal “for two years” butuh kata bantu + bentuk ketiga."
+        },
+        "am having": {
+          "misconception": "bentuk -ing dipakai untuk memiliki ponsel.",
+          "whyFails": "memakai -ing, padahal memiliki itu keadaan, dan “for two years” menjangkau masa lalu."
+        },
+        "had": {
+          "misconception": "bentuk lampau dipakai untuk ponsel yang masih dimiliki.",
+          "whyFails": "terdengar sudah selesai, padahal ponselnya masih dipakai sampai sekarang."
+        }
+      }
+    },
+    "A2-391": {
+      "objective": "Pakai “have/has” + bentuk ketiga dengan “for” atau “since” untuk hal yang mulai di masa lalu dan masih berlaku sekarang. Contoh: “How long have you lived here?” “Since last year.”",
+      "misconception": "Kamu memakai present simple, karena kalimat seperti “aku tinggal di sini sejak 2020” nggak mengubah kata kerjanya.",
+      "reasoning": "perhatikan jawaban “Since last year” → pastikan rentangnya sampai sekarang → taruh “have” sebelum “you” dan bentuk ketiga sesudahnya",
+      "rule": "Mulai di masa lalu dan masih berlaku: “have/has” + bentuk ketiga + “for” (lamanya) atau “since” (titik mulai).",
+      "whyCorrect": "Jawaban “Since last year” menunjukkan rentang sampai sekarang, jadi pertanyaannya “have you lived”.",
+      "whyOthersFail": "“Do you live” cuma menanyakan sekarang, “are you living” memakai -ing, dan “did you live” terdengar sudah selesai.",
+      "howToAvoid": "Ada “for” atau “since”? Cek kata kerjanya sudah “have/has” + bentuk ketiga.",
+      "memoryCue": "Berapa lama sampai sekarang? “How long have you…?”",
+      "distractors": {
+        "do you live": {
+          "misconception": "bentuk sekarang dipakai untuk pertanyaan “How long”.",
+          "whyFails": "cuma menanyakan sekarang, padahal “since last year” menjangkau masa lalu."
+        },
+        "are you living": {
+          "misconception": "bentuk -ing dipakai untuk rentang sejak tahun lalu.",
+          "whyFails": "cuma soal saat ini, padahal rentang sejak tahun lalu butuh “have” + bentuk ketiga."
+        },
+        "did you live": {
+          "misconception": "bentuk lampau dipakai untuk rentang yang masih berlangsung.",
+          "whyFails": "terdengar sudah selesai, padahal orangnya masih tinggal di sini."
+        }
+      }
+    },
+    "A2-392": {
+      "objective": "Pakai “have/has” + bentuk ketiga dengan “for” atau “since” untuk hal yang mulai di masa lalu dan masih berlaku sekarang. Contoh: “I have loved swimming since I was six.”",
+      "misconception": "Kamu memakai present simple, karena kalimat seperti “aku tinggal di sini sejak 2020” nggak mengubah kata kerjanya.",
+      "reasoning": "perhatikan “since I was six” → cek perasaannya masih ada → gabungkan “have” dengan bentuk ketiga dari “love”",
+      "rule": "Mulai di masa lalu dan masih berlaku: “have/has” + bentuk ketiga + “for” (lamanya) atau “since” (titik mulai).",
+      "whyCorrect": "Rasa suka itu mulai waktu umur enam tahun dan masih ada sampai sekarang, jadi pakai “have loved” bersama “since”.",
+      "whyOthersFail": "“Love” mengabaikan “since”, “am loving” memakai -ing untuk perasaan, dan “loved” terdengar sudah selesai.",
+      "howToAvoid": "Ada “for” atau “since”? Cek kata kerjanya sudah “have/has” + bentuk ketiga.",
+      "memoryCue": "“Since” + titik mulai sampai sekarang: “have loved”, “have known”.",
+      "distractors": {
+        "love": {
+          "misconception": "bentuk sekarang dipakai bersama “since”.",
+          "whyFails": "cuma membicarakan sekarang, padahal “since” butuh “have” + bentuk ketiga."
+        },
+        "am loving": {
+          "misconception": "bentuk -ing dipakai untuk perasaan “love”.",
+          "whyFails": "memakai -ing, padahal “love” itu perasaan dan nggak memakai -ing."
+        },
+        "loved": {
+          "misconception": "bentuk lampau dipakai untuk perasaan yang masih ada.",
+          "whyFails": "terdengar sudah selesai, padahal sampai sekarang aku masih suka berenang."
+        }
+      }
+    },
+    "A2-393": {
+      "objective": "Bentuk perbandingan dengan -er untuk kata sifat pendek (“hotter”, “easier”) dan “more” untuk kata sifat panjang (“more expensive”), jangan keduanya. Contoh: “Today is hotter than yesterday. Let's go swimming!”",
+      "misconception": "Kamu memakai “more” untuk kata pendek, -er untuk kata panjang, atau keduanya sekaligus, karena kata “lebih” bisa dipakai untuk semua kata.",
+      "reasoning": "perhatikan “than” → kenali “hot” sebagai kata pendek → tambahkan satu huruf t lagi sebelum -er",
+      "rule": "Kata pendek: -er (“hot” → “hotter”, “easy” → “easier”). Kata panjang: “more” (“more beautiful”). Jangan “more” + -er.",
+      "whyCorrect": "“Hot” kata pendek, jadi tambah -er dan gandakan huruf t, yaitu “hotter”.",
+      "whyOthersFail": "“Hoter” lupa menggandakan huruf t, “more hot” memakai “more” untuk kata pendek, dan “more hotter” menandai perbandingan dua kali.",
+      "howToAvoid": "Hitung suku katanya: satu suku kata atau berakhiran -y pakai -er; lebih panjang pakai “more”.",
+      "memoryCue": "“hot” → “hotter”, “big” → “bigger”: gandakan huruf terakhirnya.",
+      "distractors": {
+        "hoter": {
+          "misconception": "huruf mati terakhir nggak digandakan sebelum -er.",
+          "whyFails": "lupa menggandakan huruf t sebelum -er."
+        },
+        "more hot": {
+          "misconception": "pola “more” dipakai untuk kata pendek “hot”.",
+          "whyFails": "memakai “more”, padahal kata pendek seperti “hot” cukup diberi -er."
+        },
+        "more hotter": {
+          "misconception": "“more” ditumpuk di depan bentuk -er.",
+          "whyFails": "menandai perbandingan dua kali, padahal -er saja sudah cukup."
+        }
+      }
+    },
+    "A2-394": {
+      "objective": "Bentuk perbandingan dengan -er untuk kata sifat pendek (“hotter”, “easier”) dan “more” untuk kata sifat panjang (“more expensive”), jangan keduanya. Contoh: “This test is easier than the last one. I finished it in ten minutes!”",
+      "misconception": "Kamu memakai “more” untuk kata pendek, -er untuk kata panjang, atau keduanya sekaligus, karena kata “lebih” bisa dipakai untuk semua kata.",
+      "reasoning": "perhatikan “than” → cek huruf y di akhir “easy” → ubah y jadi i sebelum -er",
+      "rule": "Kata pendek: -er (“hot” → “hotter”, “easy” → “easier”). Kata panjang: “more” (“more beautiful”). Jangan “more” + -er.",
+      "whyCorrect": "“Easy” berakhiran konsonan + y, jadi y diganti i lalu ditambah -er, yaitu “easier”.",
+      "whyOthersFail": "“Easyer” mempertahankan huruf y, “more easy” memakai “more” untuk kata pendek, dan “more easier” menandai perbandingan dua kali.",
+      "howToAvoid": "Hitung suku katanya: satu suku kata atau berakhiran -y pakai -er; lebih panjang pakai “more”.",
+      "memoryCue": "“easy” → “easier”: y berubah jadi i sebelum -er.",
+      "distractors": {
+        "easyer": {
+          "misconception": "kata sifat berakhiran konsonan + y diberi -er tanpa mengubah y jadi i.",
+          "whyFails": "mempertahankan huruf y, padahal sesudah konsonan huruf y berubah jadi i sebelum -er."
+        },
+        "more easy": {
+          "misconception": "pola “more” dipakai untuk “easy”.",
+          "whyFails": "memakai “more”, padahal “easy” cukup diberi -er."
+        },
+        "more easier": {
+          "misconception": "“more” ditumpuk di depan bentuk -er.",
+          "whyFails": "menandai perbandingan dua kali, padahal bentuk -er saja sudah cukup."
+        }
+      }
+    },
+    "A2-395": {
+      "objective": "Bentuk perbandingan dengan -er untuk kata sifat pendek (“hotter”, “easier”) dan “more” untuk kata sifat panjang (“more expensive”), jangan keduanya. Contoh: “This dress is more beautiful than that one. I'll buy it!”",
+      "misconception": "Kamu memakai “more” untuk kata pendek, -er untuk kata panjang, atau keduanya sekaligus, karena kata “lebih” bisa dipakai untuk semua kata.",
+      "reasoning": "perhatikan “than” → hitung suku kata “beautiful” → pakai “more” sebelum kata panjang",
+      "rule": "Kata pendek: -er (“hot” → “hotter”, “easy” → “easier”). Kata panjang: “more” (“more beautiful”). Jangan “more” + -er.",
+      "whyCorrect": "“Beautiful” kata panjang, jadi pakai “more” di depannya.",
+      "whyOthersFail": "“Beautifuller” menambah -er ke kata panjang, “more beautifuller” memakai keduanya, dan “most beautiful” untuk satu kelompok.",
+      "howToAvoid": "Hitung suku katanya: satu suku kata atau berakhiran -y pakai -er; lebih panjang pakai “more”.",
+      "memoryCue": "Kata panjang: “more beautiful”, “more expensive”.",
+      "distractors": {
+        "beautifuller": {
+          "misconception": "akhiran -er ditambahkan ke “beautiful”.",
+          "whyFails": "memakai -er, padahal kata panjang memakai “more”."
+        },
+        "more beautifuller": {
+          "misconception": "“more” dan -er dipakai bersamaan.",
+          "whyFails": "memakai “more” dan -er sekaligus, padahal cukup salah satu."
+        },
+        "most beautiful": {
+          "misconception": "bentuk “paling” dipakai untuk dua baju.",
+          "whyFails": "untuk juara satu kelompok, padahal “than” membandingkan dua baju."
+        }
+      }
+    },
+    "A2-396": {
+      "objective": "Bentuk perbandingan dengan -er untuk kata sifat pendek (“hotter”, “easier”) dan “more” untuk kata sifat panjang (“more expensive”), jangan keduanya. Contoh: “Taking a taxi is more expensive than taking the bus.”",
+      "misconception": "Kamu memakai “more” untuk kata pendek, -er untuk kata panjang, atau keduanya sekaligus, karena kata “lebih” bisa dipakai untuk semua kata.",
+      "reasoning": "perhatikan “than” dan dua cara bepergian → kenali “expensive” sebagai kata panjang → pakai “more” di depannya",
+      "rule": "Kata pendek: -er (“hot” → “hotter”, “easy” → “easier”). Kata panjang: “more” (“more beautiful”). Jangan “more” + -er.",
+      "whyCorrect": "“Expensive” kata panjang, jadi bentuk “lebih”-nya “more expensive”.",
+      "whyOthersFail": "“Expensiver” menambah -er ke kata panjang, “the most expensive” untuk satu kelompok, dan “expensive” nggak membandingkan.",
+      "howToAvoid": "Hitung suku katanya: satu suku kata atau berakhiran -y pakai -er; lebih panjang pakai “more”.",
+      "memoryCue": "Tiga suku kata atau lebih: “more” + kata sifat.",
+      "distractors": {
+        "expensiver": {
+          "misconception": "akhiran -er ditambahkan ke “expensive”.",
+          "whyFails": "menambah -er ke kata panjang, padahal kata panjang memakai “more”."
+        },
+        "the most expensive": {
+          "misconception": "bentuk “paling” dipakai untuk dua cara bepergian.",
+          "whyFails": "untuk juara satu kelompok, padahal “than” cuma membandingkan dua cara bepergian."
+        },
+        "expensive": {
+          "misconception": "kata sifat bentuk dasar dipakai sebelum “than”.",
+          "whyFails": "nggak membandingkan, padahal “than” butuh bentuk “lebih”."
+        }
+      }
+    },
+    "A2-397": {
+      "objective": "Pakai kata sifat sesudah “be”, “look”, dan “feel”, dan kata keterangan -ly untuk menjelaskan cara seseorang melakukan sesuatu. Contoh: “My brother drives very fast. I'm always scared!”",
+      "misconception": "Kamu memakai kata sifat sesudah kata kerja aksi, karena “baju yang indah” dan “bernyanyi dengan indah” memakai kata yang sama.",
+      "reasoning": "kenali katanya menjelaskan cara menyetir → ingat ada kata keterangan yang tanpa -ly → cek nggak ada yang dibandingkan",
+      "rule": "Kata kerja aksi + kata keterangan -ly: “sings beautifully”. “Be”, “look”, “feel” + kata sifat: “looks beautiful”. Ada yang tanpa -ly: “fast”, “well”.",
+      "whyCorrect": "“Fast” bisa jadi kata sifat sekaligus kata keterangan, jadi cara menyetirnya cukup “fast”, tanpa -ly.",
+      "whyOthersFail": "“Fastly” bukan kata bahasa Inggris, “faster” membandingkan padahal nggak ada yang dibandingkan, dan “speed” kata benda.",
+      "howToAvoid": "Tanya: kata itu menjelaskan orang atau bendanya, atau cara kegiatannya dilakukan?",
+      "memoryCue": "“fast” tetap “fast”, “good” jadi “well”: tanpa -ly.",
+      "distractors": {
+        "fastly": {
+          "misconception": "akhiran -ly ditambahkan ke kata keterangan yang nggak memakai -ly.",
+          "whyFails": "bukan kata bahasa Inggris, karena kata keterangan ini nggak pernah diberi -ly."
+        },
+        "faster": {
+          "misconception": "bentuk “lebih” dipakai tanpa ada yang dibandingkan.",
+          "whyFails": "membandingkan, padahal nggak ada “than” dan nggak ada yang dibandingkan."
+        },
+        "speed": {
+          "misconception": "kata benda “speed” dipakai untuk menjelaskan cara menyetir.",
+          "whyFails": "kata benda, padahal sesudah “drives very” dibutuhkan kata yang menjelaskan cara."
+        }
+      }
+    },
+    "A2-398": {
+      "objective": "Pakai kata sifat sesudah “be”, “look”, dan “feel”, dan kata keterangan -ly untuk menjelaskan cara seseorang melakukan sesuatu. Contoh: “You look beautiful today! Is that a new dress?”",
+      "misconception": "Kamu memakai kata sifat sesudah kata kerja aksi, karena “baju yang indah” dan “bernyanyi dengan indah” memakai kata yang sama.",
+      "reasoning": "kenali “look” sebagai “kelihatan” → ingat “look” diikuti kata sifat → pilih bentuk kata sifat",
+      "rule": "Kata kerja aksi + kata keterangan -ly: “sings beautifully”. “Be”, “look”, “feel” + kata sifat: “looks beautiful”. Ada yang tanpa -ly: “fast”, “well”.",
+      "whyCorrect": "“Look” di sini artinya “kelihatan”, jadi diikuti kata sifat, yaitu “beautiful”.",
+      "whyOthersFail": "“Beautifully” menjelaskan cara melakukan kegiatan, “beauty” kata benda, dan “like beautiful” menambah “like” sebelum kata sifat.",
+      "howToAvoid": "Tanya: kata itu menjelaskan orang atau bendanya, atau cara kegiatannya dilakukan?",
+      "memoryCue": "“Look”, “feel”, “be” + kata sifat: “you look beautiful”.",
+      "distractors": {
+        "beautifully": {
+          "misconception": "kata keterangan -ly dipakai sesudah “look”.",
+          "whyFails": "menjelaskan cara melakukan kegiatan, padahal “look” di sini butuh kata sifat."
+        },
+        "beauty": {
+          "misconception": "kata benda dipakai di tempat kata sifat.",
+          "whyFails": "kata benda, padahal sesudah “look” dibutuhkan kata sifat."
+        },
+        "like beautiful": {
+          "misconception": "“like” ditambahkan sebelum kata sifat sesudah “look”.",
+          "whyFails": "menambah “like”, padahal “look like” diikuti kata benda, seperti “look like a princess”."
+        }
+      }
+    },
+    "A2-399": {
+      "objective": "Pakai kata sifat sesudah “be”, “look”, dan “feel”, dan kata keterangan -ly untuk menjelaskan cara seseorang melakukan sesuatu. Contoh: “Sinta sings beautifully. Everyone loves her voice.”",
+      "misconception": "Kamu memakai kata sifat sesudah kata kerja aksi, karena “baju yang indah” dan “bernyanyi dengan indah” memakai kata yang sama.",
+      "reasoning": "kenali “sings” sebagai kata kerja aksi → ingat cara melakukan kegiatan memakai -ly → tambahkan -ly ke “beautiful”",
+      "rule": "Kata kerja aksi + kata keterangan -ly: “sings beautifully”. “Be”, “look”, “feel” + kata sifat: “looks beautiful”. Ada yang tanpa -ly: “fast”, “well”.",
+      "whyCorrect": "Kata ini menjelaskan cara Sinta bernyanyi, dan “sings” kata kerja aksi, jadi pakai kata keterangan -ly, yaitu “beautifully”.",
+      "whyOthersFail": "“Beautiful” menjelaskan benda, bukan kegiatan, “beauty” kata benda, dan “with beautiful” meniru “dengan indah”.",
+      "howToAvoid": "Tanya: kata itu menjelaskan orang atau bendanya, atau cara kegiatannya dilakukan?",
+      "memoryCue": "Kata kerja aksi + -ly: “sings beautifully”, “drives carefully”.",
+      "distractors": {
+        "beautiful": {
+          "misconception": "kata sifat dipakai sesudah “sings”.",
+          "whyFails": "menjelaskan benda, seperti lagu yang indah; sesudah “sings” pakai -ly."
+        },
+        "beauty": {
+          "misconception": "kata benda “beauty” dipakai sesudah “sings”.",
+          "whyFails": "kata benda, padahal sesudah “sings” dibutuhkan kata yang menjelaskan cara."
+        },
+        "with beautiful": {
+          "misconception": "pola “with” + kata sifat meniru “dengan indah”.",
+          "whyFails": "meniru “dengan indah”, padahal bahasa Inggris cukup memakai satu kata ber-ly."
+        }
+      }
+    },
+    "A2-400": {
+      "objective": "Pakai kata sifat sesudah “be”, “look”, dan “feel”, dan kata keterangan -ly untuk menjelaskan cara seseorang melakukan sesuatu. Contoh: “Please close the door quietly. The baby is sleeping.”",
+      "misconception": "Kamu memakai kata sifat sesudah kata kerja aksi, karena “baju yang indah” dan “bernyanyi dengan indah” memakai kata yang sama.",
+      "reasoning": "kenali “close” sebagai kata kerja aksi → ingat cara melakukan kegiatan memakai -ly → cek ejaan “quiet”",
+      "rule": "Kata kerja aksi + kata keterangan -ly: “sings beautifully”. “Be”, “look”, “feel” + kata sifat: “looks beautiful”. Ada yang tanpa -ly: “fast”, “well”.",
+      "whyCorrect": "Kata ini menjelaskan cara menutup pintu, jadi pakai kata keterangan -ly, yaitu “quietly”.",
+      "whyOthersFail": "“Quiet” menjelaskan benda, “quite” artinya “cukup”, dan “quietness” kata benda.",
+      "howToAvoid": "Tanya: kata itu menjelaskan orang atau bendanya, atau cara kegiatannya dilakukan?",
+      "memoryCue": "Bagaimana caranya? Tambah -ly: “quietly”, “slowly”, “carefully”.",
+      "distractors": {
+        "quiet": {
+          "misconception": "kata sifat dipakai sesudah “close the door”.",
+          "whyFails": "menjelaskan benda, seperti ruangan yang tenang; untuk cara menutup pintu pakai -ly."
+        },
+        "quite": {
+          "misconception": "“quite” (cukup) tertukar dengan “quiet” (tenang).",
+          "whyFails": "artinya “cukup”, seperti “cukup besar”; tulisannya cuma mirip dengan “quiet”."
+        },
+        "quietness": {
+          "misconception": "kata benda “quietness” dipakai untuk menjelaskan cara.",
+          "whyFails": "kata benda, padahal untuk menjelaskan cara menutup pintu dibutuhkan bentuk -ly."
+        }
+      }
+    },
+    "A2-401": {
+      "objective": "Tanya “How many” + benda jamak yang bisa dihitung, dan “How much” + benda yang nggak bisa dihitung atau harga. Contoh: “How many eggs do we need?” “Six.”",
+      "misconception": "Kamu memakai satu kata tanya untuk semua benda, karena kata “berapa” bisa dipakai untuk apa saja.",
+      "reasoning": "perhatikan jawaban “Six” → cek telur bisa dihitung → pilih kata tanya untuk jumlah benda",
+      "rule": "“How many” + benda jamak yang bisa dihitung (“How many eggs?”). “How much” + benda yang nggak bisa dihitung (“How much milk?”) atau harga.",
+      "whyCorrect": "Telur bisa dihitung dan jawabannya angka, jadi bertanya dengan “How many”.",
+      "whyOthersFail": "“How much” untuk benda yang nggak bisa dihitung, “how long” menanyakan lama waktu, dan “how often” menanyakan seberapa sering.",
+      "howToAvoid": "Lihat kata benda sesudah titik-titik: bisa dihitung satu per satu?",
+      "memoryCue": "Bisa dihitung? “How many eggs”, “how many books”.",
+      "distractors": {
+        "How much": {
+          "misconception": "“how much” dipakai untuk “eggs”.",
+          "whyFails": "untuk benda yang nggak bisa dihitung, padahal telur bisa dihitung."
+        },
+        "How long": {
+          "misconception": "“how long” (berapa lama) dipakai untuk menanyakan jumlah atau harga.",
+          "whyFails": "menanyakan lama waktu, bukan jumlah telur."
+        },
+        "How often": {
+          "misconception": "“how often” (seberapa sering) dipakai untuk menanyakan jumlah.",
+          "whyFails": "menanyakan seberapa sering sesuatu terjadi, bukan berapa telur yang dibutuhkan."
+        }
+      }
+    },
+    "A2-402": {
+      "objective": "Tanya “How many” + benda jamak yang bisa dihitung, dan “How much” + benda yang nggak bisa dihitung atau harga. Contoh: “How much is this T-shirt?” “Ten dollars.”",
+      "misconception": "Kamu memakai satu kata tanya untuk semua benda, karena kata “berapa” bisa dipakai untuk apa saja.",
+      "reasoning": "perhatikan jawaban “Ten dollars” → pastikan yang ditanyakan harga → pilih kata tanya untuk harga",
+      "rule": "“How many” + benda jamak yang bisa dihitung (“How many eggs?”). “How much” + benda yang nggak bisa dihitung (“How much milk?”) atau harga.",
+      "whyCorrect": "Jawabannya harga, dan harga ditanyakan dengan “How much”.",
+      "whyOthersFail": "“How many” untuk menghitung benda, “how price” meniru “berapa harganya”, dan “how long” menanyakan lama waktu.",
+      "howToAvoid": "Lihat kata benda sesudah titik-titik: bisa dihitung satu per satu?",
+      "memoryCue": "Menanyakan harga: “How much is it?”",
+      "distractors": {
+        "How many": {
+          "misconception": "“how many” dipakai untuk menanyakan harga.",
+          "whyFails": "dipakai untuk menghitung benda, padahal di sini yang ditanya harga."
+        },
+        "How price": {
+          "misconception": "“how price” dipakai untuk menanyakan harga, meniru “berapa harganya”.",
+          "whyFails": "meniru “berapa harganya” kata per kata, padahal bahasa Inggris nggak berkata begitu."
+        },
+        "How long": {
+          "misconception": "“how long” dipakai untuk menanyakan harga.",
+          "whyFails": "menanyakan lama waktu, bukan harga."
+        }
+      }
+    },
+    "A2-403": {
+      "objective": "Tanya “How many” + benda jamak yang bisa dihitung, dan “How much” + benda yang nggak bisa dihitung atau harga. Contoh: “How much milk do you want in your coffee?”",
+      "misconception": "Kamu memakai satu kata tanya untuk semua benda, karena kata “berapa” bisa dipakai untuk apa saja.",
+      "reasoning": "cek susu bisa dihitung atau nggak → ingat kata tanya untuk jumlah yang nggak bisa dihitung → jangan tambah kata lain sebelum “milk”",
+      "rule": "“How many” + benda jamak yang bisa dihitung (“How many eggs?”). “How much” + benda yang nggak bisa dihitung (“How much milk?”) atau harga.",
+      "whyCorrect": "Susu nggak bisa dihitung, jadi bertanya dengan “How much”.",
+      "whyOthersFail": "“How many” untuk benda jamak yang bisa dihitung, “how” saja kehilangan makna jumlah, dan “how much of” menambah “of” yang berlebihan.",
+      "howToAvoid": "Lihat kata benda sesudah titik-titik: bisa dihitung satu per satu?",
+      "memoryCue": "Susu, air, gula: “How much?”",
+      "distractors": {
+        "How many": {
+          "misconception": "“how many” dipakai untuk “milk”.",
+          "whyFails": "untuk benda yang bisa dihitung, padahal susu nggak bisa dihitung."
+        },
+        "How": {
+          "misconception": "“how” saja dipakai untuk menanyakan jumlah susu.",
+          "whyFails": "menanyakan bagaimana caranya, jadi makna jumlahnya hilang."
+        },
+        "How much of": {
+          "misconception": "“of” diselipkan sebelum “milk”.",
+          "whyFails": "menambah “of”, padahal “of” butuh kata seperti “the” sesudahnya."
+        }
+      }
+    },
+    "A2-404": {
+      "objective": "Tanya “How many” + benda jamak yang bisa dihitung, dan “How much” + benda yang nggak bisa dihitung atau harga. Contoh: “How many glasses of water do you drink every day?”",
+      "misconception": "Kamu memakai satu kata tanya untuk semua benda, karena kata “berapa” bisa dipakai untuk apa saja.",
+      "reasoning": "perhatikan “how many” → cek air sendiri nggak bisa dihitung → buat kata wadahnya jadi jamak",
+      "rule": "“How many” + benda jamak yang bisa dihitung (“How many eggs?”). “How much” + benda yang nggak bisa dihitung (“How much milk?”) atau harga.",
+      "whyCorrect": "Air nggak bisa dihitung, jadi yang dihitung gelasnya, dan “how many” butuh bentuk jamak.",
+      "whyOthersFail": "“Water” nggak bisa dipakai sesudah “how many”, “waters” menambah -s ke benda yang nggak bisa dihitung, dan “glass of water” masih tunggal.",
+      "howToAvoid": "Lihat kata benda sesudah titik-titik: bisa dihitung satu per satu?",
+      "memoryCue": "Hitung wadahnya: “glasses of water”, “cups of tea”.",
+      "distractors": {
+        "water": {
+          "misconception": "“how many” dipakai langsung untuk “water”.",
+          "whyFails": "nggak bisa dihitung, jadi nggak bisa langsung dipakai sesudah “how many”."
+        },
+        "waters": {
+          "misconception": "“water” diberi -s supaya bisa dihitung.",
+          "whyFails": "menambah -s ke benda yang nggak bisa dihitung, padahal yang dihitung gelasnya."
+        },
+        "glass of water": {
+          "misconception": "kata wadah dibiarkan tunggal sesudah “how many”.",
+          "whyFails": "masih tunggal, padahal “how many” butuh bentuk jamak seperti “glasses”."
+        }
+      }
+    },
+    "A2-405": {
+      "objective": "Pakai “something” di kalimat positif, “anything” sesudah kata kerja negatif, dan “nothing” dengan kata kerja positif untuk arti “tidak ada apa-apa”. Contoh: “There is something under my bed. I can hear it moving!”",
+      "misconception": "Kamu memakai “anything” di kalimat positif atau “nothing” sesudah kata kerja negatif, karena kata “apa-apa” cocok untuk keduanya.",
+      "reasoning": "perhatikan kata kerja positif “is” → cek suaranya memang terdengar → pilih bentuk positif satu kata",
+      "rule": "Positif: “something”. Kata kerja negatif: “anything” (“I can't see anything”). Kata kerja positif dengan arti “tidak ada”: “nothing” (“There is nothing”).",
+      "whyCorrect": "Kalimatnya positif dan suaranya terdengar, jadi memang ada sesuatu, yaitu “something”.",
+      "whyOthersFail": "“Anything” butuh kalimat negatif atau tanya, “nothing” menyatakan nggak ada apa-apa, dan “some thing” seharusnya satu kata.",
+      "howToAvoid": "Cari kata kerjanya: negatif? Pakai “anything”. Positif tapi artinya “tidak ada”? Pakai “nothing”.",
+      "memoryCue": "Positif dan benar-benar ada: “something”.",
+      "distractors": {
+        "anything": {
+          "misconception": "“anything” dipakai di kalimat positif.",
+          "whyFails": "butuh kata kerja negatif atau kalimat tanya, padahal kalimat ini positif."
+        },
+        "nothing": {
+          "misconception": "“nothing” dipakai padahal ada sesuatu di sana.",
+          "whyFails": "menyatakan nggak ada apa-apa, padahal suaranya terdengar bergerak."
+        },
+        "some thing": {
+          "misconception": "satu kata gabungan dipecah jadi dua kata.",
+          "whyFails": "memecah satu kata jadi dua, padahal bahasa Inggris menulisnya sebagai satu kata."
+        }
+      }
+    },
+    "A2-406": {
+      "objective": "Pakai “something” di kalimat positif, “anything” sesudah kata kerja negatif, dan “nothing” dengan kata kerja positif untuk arti “tidak ada apa-apa”. Contoh: “She hasn't eaten anything today. She must be very hungry.”",
+      "misconception": "Kamu memakai “anything” di kalimat positif atau “nothing” sesudah kata kerja negatif, karena kata “apa-apa” cocok untuk keduanya.",
+      "reasoning": "perhatikan bentuk negatif “hasn't” → ingat satu negatif sudah cukup → pilih kata untuk kalimat negatif",
+      "rule": "Positif: “something”. Kata kerja negatif: “anything” (“I can't see anything”). Kata kerja positif dengan arti “tidak ada”: “nothing” (“There is nothing”).",
+      "whyCorrect": "“Hasn't” sudah negatif, jadi pakai “anything”.",
+      "whyOthersFail": "“Nothing” menambah negatif kedua, “something” untuk kalimat positif, dan “no” butuh kata benda sesudahnya.",
+      "howToAvoid": "Cari kata kerjanya: negatif? Pakai “anything”. Positif tapi artinya “tidak ada”? Pakai “nothing”.",
+      "memoryCue": "“hasn't … anything” = “has … nothing”.",
+      "distractors": {
+        "nothing": {
+          "misconception": "“hasn't” dan “nothing” dipakai bersamaan.",
+          "whyFails": "menambah negatif kedua, padahal “hasn't” sudah negatif."
+        },
+        "something": {
+          "misconception": "“something” dipakai di kalimat negatif.",
+          "whyFails": "untuk kalimat positif, padahal “hasn't” membuat kalimat ini negatif."
+        },
+        "no": {
+          "misconception": "“no” dipakai sesudah “hasn't” tanpa kata benda.",
+          "whyFails": "menambah negatif kedua dan butuh kata benda sesudahnya."
+        }
+      }
+    },
+    "A2-407": {
+      "objective": "Pakai “something” di kalimat positif, “anything” sesudah kata kerja negatif, dan “nothing” dengan kata kerja positif untuk arti “tidak ada apa-apa”. Contoh: “Nothing happened at school today. It was a boring day.”",
+      "misconception": "Kamu memakai “anything” di kalimat positif atau “nothing” sesudah kata kerja negatif, karena kata “apa-apa” cocok untuk keduanya.",
+      "reasoning": "perhatikan “a boring day” → pastikan maksudnya nggak ada kejadian → cek “happened” berbentuk positif",
+      "rule": "Positif: “something”. Kata kerja negatif: “anything” (“I can't see anything”). Kata kerja positif dengan arti “tidak ada”: “nothing” (“There is nothing”).",
+      "whyCorrect": "Harinya membosankan, jadi nggak ada kejadian apa-apa, dan kata kerja “happened” berbentuk positif.",
+      "whyOthersFail": "“Anything” nggak bisa jadi subjek kalimat positif seperti ini, “something” berarti ada kejadian, dan “none” nggak dipakai begini untuk benda.",
+      "howToAvoid": "Cari kata kerjanya: negatif? Pakai “anything”. Positif tapi artinya “tidak ada”? Pakai “nothing”.",
+      "memoryCue": "Nggak ada kejadian + kata kerja positif: “Nothing happened”.",
+      "distractors": {
+        "Anything": {
+          "misconception": "“anything” dipakai sebagai subjek kalimat positif.",
+          "whyFails": "butuh kata kerja negatif atau kalimat tanya, padahal “happened” positif."
+        },
+        "Something": {
+          "misconception": "“something” dipakai padahal harinya membosankan.",
+          "whyFails": "berarti ada kejadian, padahal harinya membosankan."
+        },
+        "None": {
+          "misconception": "“none” dipakai sebagai pengganti “nothing”.",
+          "whyFails": "merujuk ke orang atau benda yang sudah disebut, bukan ke kejadian secara umum."
+        }
+      }
+    },
+    "A2-408": {
+      "objective": "Pakai “something” di kalimat positif, “anything” sesudah kata kerja negatif, dan “nothing” dengan kata kerja positif untuk arti “tidak ada apa-apa”. Contoh: “I can't see anything. It's too dark in here.”",
+      "misconception": "Kamu memakai “anything” di kalimat positif atau “nothing” sesudah kata kerja negatif, karena kata “apa-apa” cocok untuk keduanya.",
+      "reasoning": "perhatikan bentuk negatif “can't” → ingat satu negatif sudah cukup → pilih bentuk satu kata untuk kalimat negatif",
+      "rule": "Positif: “something”. Kata kerja negatif: “anything” (“I can't see anything”). Kata kerja positif dengan arti “tidak ada”: “nothing” (“There is nothing”).",
+      "whyCorrect": "“Can't” sudah negatif, jadi pakai “anything”, bukan negatif kedua.",
+      "whyOthersFail": "“Nothing” menambah negatif kedua, “something” untuk kalimat positif, dan “no thing” memecah satu kata.",
+      "howToAvoid": "Cari kata kerjanya: negatif? Pakai “anything”. Positif tapi artinya “tidak ada”? Pakai “nothing”.",
+      "memoryCue": "“can't see anything” = “can see nothing”.",
+      "distractors": {
+        "nothing": {
+          "misconception": "“can't” dan “nothing” dipakai bersamaan.",
+          "whyFails": "menambah negatif kedua, padahal “can't” sudah negatif."
+        },
+        "something": {
+          "misconception": "“something” dipakai sesudah “can't”.",
+          "whyFails": "untuk kalimat positif, padahal “can't” membuat kalimat ini negatif."
+        },
+        "no thing": {
+          "misconception": "kata negatif dipecah jadi dua kata.",
+          "whyFails": "memecah satu kata jadi dua dan menambah negatif kedua."
+        }
+      }
+    },
+    "A2-409": {
+      "objective": "Pakai “because” sebelum alasan, “so” sebelum akibat, dan “because of” sebelum kata benda. Contoh: “We stayed inside because it was raining.”",
+      "misconception": "Kamu tertukar antara alasan dan akibat, karena dalam bahasa Indonesia “karena … maka” boleh dipakai bersamaan.",
+      "reasoning": "kenali “it was raining” sebagai alasan → perhatikan bagian itu kalimat utuh → pilih kata yang membawa alasan",
+      "rule": "Alasan dibuka dengan “because”, akibat dibuka dengan “so”, dan kata benda didahului “because of”.",
+      "whyCorrect": "“It was raining” adalah alasan kami tetap di dalam, jadi pakai “because”.",
+      "whyOthersFail": "“So” dipakai sebelum akibat, “because of” butuh kata benda, dan “so that” menyatakan tujuan.",
+      "howToAvoid": "Tanya: bagian sesudahnya alasan atau akibat? Kalimat utuh atau cuma kata benda?",
+      "memoryCue": "Akibat + “because” + alasan.",
+      "distractors": {
+        "so": {
+          "misconception": "“so” dipakai sebelum alasan.",
+          "whyFails": "dipakai sebelum akibat, padahal hujan itu alasannya."
+        },
+        "because of": {
+          "misconception": "“because of” dipakai sebelum kalimat utuh.",
+          "whyFails": "butuh kata benda, seperti “the rain”, bukan kalimat utuh."
+        },
+        "so that": {
+          "misconception": "“so that” dipakai untuk alasan.",
+          "whyFails": "menyatakan tujuan, yaitu hal yang ingin dicapai, bukan alasan."
+        }
+      }
+    },
+    "A2-410": {
+      "objective": "Pakai “because” sebelum alasan, “so” sebelum akibat, dan “because of” sebelum kata benda. Contoh: “The shop was closed, so we went home.”",
+      "misconception": "Kamu tertukar antara alasan dan akibat, karena dalam bahasa Indonesia “karena … maka” boleh dipakai bersamaan.",
+      "reasoning": "kenali “the shop was closed” sebagai alasan → kenali “we went home” sebagai akibat → pilih kata yang membawa akibat",
+      "rule": "Alasan dibuka dengan “because”, akibat dibuka dengan “so”, dan kata benda didahului “because of”.",
+      "whyCorrect": "“We went home” adalah akibat dari toko yang tutup, jadi pakai “so”.",
+      "whyOthersFail": "Pilihan “because” membawa alasan, “because of” butuh kata benda, dan “but” menandai pertentangan.",
+      "howToAvoid": "Tanya: bagian sesudahnya alasan atau akibat? Kalimat utuh atau cuma kata benda?",
+      "memoryCue": "Alasan + “so” + akibat.",
+      "distractors": {
+        "because": {
+          "misconception": "“because” dipakai sebelum akibat.",
+          "whyFails": "dipakai sebelum alasan, padahal pulang itu akibatnya."
+        },
+        "because of": {
+          "misconception": "“because of” dipakai sebelum kalimat utuh.",
+          "whyFails": "butuh kata benda dan membawa alasan, padahal di sini kalimat utuhnya berisi akibat."
+        },
+        "but": {
+          "misconception": "“but” dipakai untuk menyambung akibat, padahal “but” menandai pertentangan.",
+          "whyFails": "menandai pertentangan, padahal pulang justru akibat wajar dari toko yang tutup."
+        }
+      }
+    },
+    "A2-411": {
+      "objective": "Pakai “because” sebelum alasan, “so” sebelum akibat, dan “because of” sebelum kata benda. Contoh: “The football match was cancelled because of the heavy rain.”",
+      "misconception": "Kamu tertukar antara alasan dan akibat, karena dalam bahasa Indonesia “karena … maka” boleh dipakai bersamaan.",
+      "reasoning": "kenali “the heavy rain” sebagai alasan → perhatikan itu kata benda, bukan kalimat → pilih kata alasan yang dipakai sebelum kata benda",
+      "rule": "Alasan dibuka dengan “because”, akibat dibuka dengan “so”, dan kata benda didahului “because of”.",
+      "whyCorrect": "“The heavy rain” kata benda, bukan kalimat utuh, jadi pakai “because of”.",
+      "whyOthersFail": "“Because” butuh subjek dan kata kerja sesudahnya, “so” membawa akibat, dan “so that” menyatakan tujuan.",
+      "howToAvoid": "Tanya: bagian sesudahnya alasan atau akibat? Kalimat utuh atau cuma kata benda?",
+      "memoryCue": "Sesudahnya kata benda? “because of the rain”.",
+      "distractors": {
+        "because": {
+          "misconception": "'because' dipakai langsung sebelum kata benda.",
+          "whyFails": "butuh subjek dan kata kerja sesudahnya, padahal di sini cuma ada kata benda."
+        },
+        "so": {
+          "misconception": "“so” dipakai sebelum kata benda untuk menyebut alasan.",
+          "whyFails": "membawa akibat, padahal hujan itu alasannya."
+        },
+        "so that": {
+          "misconception": "“so that” dipakai sebelum kata benda untuk alasan.",
+          "whyFails": "menyatakan tujuan, padahal hujan bukan sesuatu yang diinginkan."
+        }
+      }
+    },
+    "A2-412": {
+      "objective": "Pakai “because” sebelum alasan, “so” sebelum akibat, dan “because of” sebelum kata benda. Contoh: “Because it was very hot, we went swimming.”",
+      "misconception": "Kamu tertukar antara alasan dan akibat, karena dalam bahasa Indonesia “karena … maka” boleh dipakai bersamaan.",
+      "reasoning": "kenali “it was very hot” sebagai alasan → perhatikan alasannya ada di depan → pilih kata yang membawa alasan",
+      "rule": "Alasan dibuka dengan “because”, akibat dibuka dengan “so”, dan kata benda didahului “because of”.",
+      "whyCorrect": "“It was very hot” adalah alasan, dan alasan boleh ditaruh di depan dengan “Because”.",
+      "whyOthersFail": "“So” nggak bisa membuka alasan, “because of” butuh kata benda, dan “so that” menyatakan tujuan.",
+      "howToAvoid": "Tanya: bagian sesudahnya alasan atau akibat? Kalimat utuh atau cuma kata benda?",
+      "memoryCue": "Alasan di depan: “Because it was hot, we swam”.",
+      "distractors": {
+        "So": {
+          "misconception": "“so” dipakai di awal kalimat untuk membuka alasan.",
+          "whyFails": "membawa akibat, jadi nggak bisa membuka alasan di awal kalimat."
+        },
+        "Because of": {
+          "misconception": "“because of” dipakai sebelum kalimat utuh.",
+          "whyFails": "butuh kata benda, seperti “the heat”, bukan kalimat utuh."
+        },
+        "So that": {
+          "misconception": "“so that” dipakai untuk alasan di awal kalimat.",
+          "whyFails": "menyatakan tujuan, padahal cuaca panas itu alasan."
+        }
+      }
+    },
+    "A2-413": {
+      "objective": "Pakai bentuk khusus “better”, “best”, “worse”, dan “worst” untuk “good” dan “bad”, bukan “gooder” atau “more good”. Contoh: “My English is better now than last year. I practise every day.”",
+      "misconception": "Kamu menambah -er atau “more” pada “good” dan “bad”, seperti kata sifat lain.",
+      "reasoning": "perhatikan “than” → ingat “good” punya bentuk khusus → cek nggak ada kata tambahan di depannya",
+      "rule": "“good” → “better” → “the best”; “bad” → “worse” → “the worst”. Tanpa -er, tanpa “more”.",
+      "whyCorrect": "“Good” punya bentuk “lebih” yang khusus, yaitu “better”, dan “than” butuh bentuk “lebih”.",
+      "whyOthersFail": "“Gooder” bukan kata bahasa Inggris, “more better” menandai perbandingan dua kali, dan “best” untuk satu kelompok.",
+      "howToAvoid": "Sebelum menambah -er atau “more”, cek: kata sifatnya “good” atau “bad”?",
+      "memoryCue": "“good” → “better” → “the best”.",
+      "distractors": {
+        "gooder": {
+          "misconception": "akhiran -er ditempel ke “good”.",
+          "whyFails": "bukan kata bahasa Inggris, karena “good” punya bentuk khusus sendiri."
+        },
+        "more better": {
+          "misconception": "“more” ditumpuk di depan bentuk khusus.",
+          "whyFails": "menandai perbandingan dua kali, padahal bentuk khususnya saja sudah cukup."
+        },
+        "best": {
+          "misconception": "bentuk “paling” dipakai sebelum “than”.",
+          "whyFails": "untuk juara satu kelompok, padahal “than” membandingkan dua hal."
+        }
+      }
+    },
+    "A2-414": {
+      "objective": "Pakai bentuk khusus “better”, “best”, “worse”, dan “worst” untuk “good” dan “bad”, bukan “gooder” atau “more good”. Contoh: “This is the best day of my life! I got a new puppy!”",
+      "misconception": "Kamu menambah -er atau “more” pada “good” dan “bad”, seperti kata sifat lain.",
+      "reasoning": "perhatikan “the” dan “of my life” → pastikan harinya nomor satu dari semuanya → ingat bentuk khusus “good” untuk satu kelompok",
+      "rule": "“good” → “better” → “the best”; “bad” → “worse” → “the worst”. Tanpa -er, tanpa “more”.",
+      "whyCorrect": "Hari ini nomor satu di antara semua hari dalam hidupku, jadi pakai “the best”.",
+      "whyOthersFail": "“Better” membandingkan dua hal, “most good” memakai “most” untuk “good”, dan “goodest” bukan kata bahasa Inggris.",
+      "howToAvoid": "Sebelum menambah -er atau “more”, cek: kata sifatnya “good” atau “bad”?",
+      "memoryCue": "Nomor satu dari semuanya: “the best”.",
+      "distractors": {
+        "better": {
+          "misconception": "bentuk “lebih” dipakai untuk semua hari dalam hidup.",
+          "whyFails": "membandingkan dua hal, padahal di sini harinya dibandingkan dengan semua hari dalam hidupku."
+        },
+        "most good": {
+          "misconception": "“most” dipakai untuk “good”.",
+          "whyFails": "memakai “most”, padahal “good” punya bentuk khusus sendiri."
+        },
+        "goodest": {
+          "misconception": "akhiran -est dipaksakan ke kata sifat yang bentuknya khusus.",
+          "whyFails": "bukan kata bahasa Inggris, karena “good” punya bentuk khusus untuk satu kelompok."
+        }
+      }
+    },
+    "A2-415": {
+      "objective": "Pakai bentuk khusus “better”, “best”, “worse”, dan “worst” untuk “good” dan “bad”, bukan “gooder” atau “more good”. Contoh: “My cold is worse today. I feel terrible!”",
+      "misconception": "Kamu menambah -er atau “more” pada “good” dan “bad”, seperti kata sifat lain.",
+      "reasoning": "perhatikan “today” dan “I feel terrible” → pastikan ada perbandingan dengan sebelumnya → ingat bentuk khusus “bad”",
+      "rule": "“good” → “better” → “the best”; “bad” → “worse” → “the worst”. Tanpa -er, tanpa “more”.",
+      "whyCorrect": "Aku merasa sangat nggak enak badan, jadi pilek hari ini lebih parah dari sebelumnya, dan bentuk khusus “bad” adalah “worse”.",
+      "whyOthersFail": "“Badder” bukan kata bahasa Inggris, “more bad” memakai “more” untuk “bad”, dan “more worse” menandai perbandingan dua kali.",
+      "howToAvoid": "Sebelum menambah -er atau “more”, cek: kata sifatnya “good” atau “bad”?",
+      "memoryCue": "“bad” → “worse” → “the worst”.",
+      "distractors": {
+        "badder": {
+          "misconception": "akhiran -er ditempel ke “bad”.",
+          "whyFails": "bukan kata bahasa Inggris, karena “bad” punya bentuk khusus sendiri."
+        },
+        "more bad": {
+          "misconception": "“more” dipakai untuk “bad”.",
+          "whyFails": "memakai “more”, padahal “bad” punya bentuk khusus sendiri."
+        },
+        "more worse": {
+          "misconception": "“more” ditumpuk di depan bentuk khusus.",
+          "whyFails": "menandai perbandingan dua kali, padahal bentuk khususnya saja sudah cukup."
+        }
+      }
+    },
+    "A2-416": {
+      "objective": "Pakai bentuk khusus “better”, “best”, “worse”, dan “worst” untuk “good” dan “bad”, bukan “gooder” atau “more good”. Contoh: “Walking is better for your health than taking the bus.”",
+      "misconception": "Kamu menambah -er atau “more” pada “good” dan “bad”, seperti kata sifat lain.",
+      "reasoning": "perhatikan “than” dan dua pilihannya → ingat “good” punya bentuk “lebih” yang khusus → cek nggak ada kata tambahan di depannya",
+      "rule": "“good” → “better” → “the best”; “bad” → “worse” → “the worst”. Tanpa -er, tanpa “more”.",
+      "whyCorrect": "Dua hal dibandingkan dengan “than”, dan bentuk “lebih” dari “good” adalah “better”.",
+      "whyOthersFail": "“More good” memakai “more” untuk “good”, “best” untuk satu kelompok, dan “good” nggak membandingkan.",
+      "howToAvoid": "Sebelum menambah -er atau “more”, cek: kata sifatnya “good” atau “bad”?",
+      "memoryCue": "“good” + “than”? “better than”.",
+      "distractors": {
+        "more good": {
+          "misconception": "“more” dipakai untuk “good”.",
+          "whyFails": "memakai “more”, padahal “good” punya bentuk “lebih” yang khusus."
+        },
+        "best": {
+          "misconception": "bentuk “paling” dipakai sebelum “than”.",
+          "whyFails": "untuk juara satu kelompok, padahal “than” cuma membandingkan dua cara bepergian."
+        },
+        "good": {
+          "misconception": "kata sifat bentuk dasar dipakai sebelum “than”.",
+          "whyFails": "nggak membandingkan, padahal “than” butuh bentuk “lebih”."
+        }
+      }
     }
   }
 }
