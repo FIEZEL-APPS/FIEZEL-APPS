@@ -2981,9 +2981,13 @@ function policyOutcomeSessionRows(session){const start=Date.parse(session?.start
  *     'negative' karena ditinggalkan tetap berlaku seketika - itu sinyal perilaku, bukan
  *     klaim statistik. */
 function policyVerdictAvailable(){return !!(self.FiezelPolicyVerdict&&typeof self.FiezelPolicyVerdict.verdict==='function')}
-/** Lantai bukti per lengan - SAMA dengan lantai FiezelStatGate, supaya "cukup" di sini berarti
- *  "cukup untuk diputus", bukan angka kedua yang bisa menyimpang. */
-function policyEvidenceMin(){const n=Number(self.FiezelStatGate?.DEFAULTS?.minNPerArm);return Number.isFinite(n)&&n>=1?Math.round(n):25}
+/** Lantai bukti per lengan - SAMA dengan FiezelStatGate.DEFAULTS.minNPerArm, supaya "cukup" di
+ *  sini berarti "cukup untuk diputus". Ditulis sebagai konstanta, bukan dibaca dari modulnya:
+ *  app.js hanya berbicara ke stat-gate LEWAT FiezelPolicyVerdict (peta otoritas brain-manifest
+ *  mencatat stat-gate 'off' di permukaan app). Kesamaan angkanya dikunci
+ *  tests/policy-evidence-window-test.js, jadi keduanya tidak bisa menyimpang diam-diam. */
+const POLICY_EVIDENCE_MIN=25;
+function policyEvidenceMin(){return POLICY_EVIDENCE_MIN}
 function policyOutcomeOnTarget(o,target,domain){return target?String(o?.targetSkill||'')===String(target):String(o?.primaryDomain||'')===String(domain||'')}
 /** Jawaban sasaran satu outcome sebagai {n, ok}, atau null bila outcome itu tidak membawanya. */
 function policyArmCount(o){const a=Math.max(0,Number(o?.targetAttempts)||0),acc=Number(o?.targetAccuracy);if(!a||o?.targetAccuracy==null||!Number.isFinite(acc))return null;return{n:a,ok:Math.round(a*Math.max(0,Math.min(100,acc))/100)}}
@@ -3566,8 +3570,12 @@ function bktMasteredSkills(bktState=bktRead()){
      semua kegagalan) membuat baris ini tidak berpengaruh sama sekali - perilakunya identik
      dengan sebelum kewenangan kalibrasi ada. Arahnya satu: hanya menambah tuntutan. */
   const bump=brierEvidenceBump();
+  /* m025-375 (audit B6): update() kini meluruhkan L sebelum melangkah, jadi L tersimpan bisa
+     turun di bawah gerbang setelah jeda panjang. Pembukaan lesson harus AWET (BKT hanya membuka,
+     tidak pernah mengunci): yang dibaca di sini "pernah lolos gerbang", bukan L hari ini. */
+  const lolos=typeof B.gateEverPassed==='function'?(st,k)=>B.gateEverPassed(st,k):(st,k)=>B.masteryGate(st,k);
   for(const skill in bktState.lessons){try{
-    if(!B.masteryGate(bktState,skill))continue;
+    if(!lolos(bktState,skill))continue;
     if(bump>0){const m=B.mastery(bktState,skill);if(!(Number(m?.n)>=Number(B.GATE?.minN||0)+bump))continue}
     out.add(skill)
   }catch{}}
@@ -12569,7 +12577,8 @@ function bktShadowMarkup(){
       ):null;
     const frontier=predict?B.frontier(st,GRAMMAR_CURRICULUM,predict).slice(0,3):[];
     const weak=coreBrainWeakTarget();
-    const root=weak?.skill&&typeof B.rootCause==='function'?B.rootCause(st,GRAMMAR_CURRICULUM,String(weak.skill)):null;
+    // m025-375 (B6): dengan waktu sekarang, prasyarat yang dulu kuat tetapi lama tidak dilatih ikut terbaca meluruh.
+    const root=weak?.skill&&typeof B.rootCause==='function'?B.rootCause(st,GRAMMAR_CURRICULUM,String(weak.skill),Date.now()):null;
     const tracked=Object.keys(st.lessons||{}).length;
     const frontierHtml=frontier.length
       ?`<p><b>Frontier ZPD:</b> ${frontier.map(f=>`${esc(friendlySkillName(f.lesson))} (L ${Math.round(f.L*100)}% · prediksi ${Math.round(f.predicted*100)}%)`).join(', ')}</p>`

@@ -105,6 +105,34 @@ def test_bkt_decay():
     check("di bawah P_INIT tidak meluruh lagi", bc.bkt_decay(0.20, 30.0) == 0.20)
 
 
+# ---------- m025-375 (B6): apply_attempt melangkah dari posterior yang sudah meluruh ----------
+async def test_apply_attempt_decays_first():
+    saved = {}
+    class _Col:
+        async def find_one(self, *a, **k):
+            return dict(saved["doc"]) if "doc" in saved else None
+        async def update_one(self, q, upd, upsert=False):
+            saved["written"] = dict(upd.get("$set", {}))
+        async def update_many(self, *a, **k):
+            return None
+    class _DB:
+        learner_competency = _Col()
+        misconception_ledger = _Col()
+    real = bc.db
+    bc.db = _DB()
+    try:
+        long_ago = bc.now() - timedelta(days=90)
+        saved["doc"] = dict(bc.blank_state("s", "c"), attempts=12, correct=11, p_mastery=0.97,
+                            state="MASTERED", last_at=long_ago, mastered_at=long_ago - timedelta(days=5),
+                            stability_days=3.0)
+        res = await bc.apply_attempt({"student_id": "s", "competency_id": "c", "correct": False})
+        p = res["state"]["p_mastery"]
+        check("salah setelah 90 hari melangkah dari posterior yang sudah meluruh", p < 0.5, p)
+        check("p_mastery_decayed tidak ikut tersimpan ke DB", "p_mastery_decayed" not in saved["written"])
+    finally:
+        bc.db = real
+
+
 # ---------- state machine ----------
 def test_states():
     st = bc.blank_state("s", "c")
@@ -267,6 +295,7 @@ async def main():
     test_irt_3pl()
     test_bkt_decay()
     test_states()
+    await test_apply_attempt_decays_first()
     test_diagnosis()
     test_parser()
     await test_validation()

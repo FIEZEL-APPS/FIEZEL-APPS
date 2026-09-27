@@ -182,7 +182,12 @@ async def apply_attempt(attempt: dict) -> dict:
         st["streak"] += 1
     else:
         st["streak"] = 0
-    st["p_mastery"] = round(bkt_update(st["p_mastery"], correct, attempt.get("hints_used", 0), conf), 4)
+    # m025-375 (audit braincore B6): lupa DULU, baru melangkah. p_mastery_decayed dihitung
+    # get_state() tetapi dulu tidak dipakai - posterior melangkah dari nilai lama, jadi jeda
+    # panjang tidak pernah tercatat dan satu jawaban salah bisa "memulihkan" mastery yang sudah
+    # luntur. Sama persis dengan FiezelMasteryBKT.update() di klien.
+    start = st.get("p_mastery_decayed", st["p_mastery"])
+    st["p_mastery"] = round(bkt_update(start, correct, attempt.get("hints_used", 0), conf), 4)
     st["tp_id"] = attempt.get("tp_id") or st.get("tp_id")
 
     prev_mastered = aware(st.get("mastered_at"))
@@ -205,6 +210,8 @@ async def apply_attempt(attempt: dict) -> dict:
         st["transferred_at"] = st.get("transferred_at") or now()
     st["last_at"] = now()
     st["state"] = derive_state(st)
+    # Nilai turunan waktu-baca: tidak disimpan, supaya DB tidak memegang angka basi.
+    st.pop("p_mastery_decayed", None)
     await db.learner_competency.update_one({"student_id": sid, "competency_id": cid},
                                            {"$set": st}, upsert=True)
 
@@ -229,6 +236,7 @@ async def mark_exposure(student_id: str, competency_id: str, tp_id: str | None =
         st["exposures"] += 1
         st["state"] = derive_state(st)
         st["tp_id"] = tp_id or st.get("tp_id")
+        st.pop("p_mastery_decayed", None)
         await db.learner_competency.update_one({"student_id": student_id, "competency_id": competency_id},
                                                 {"$set": st}, upsert=True)
 
@@ -245,15 +253,18 @@ async def next_best_item(student_id: str, competency_ids: list[str], served_ids:
                          allow_prerequisite: bool = True) -> dict | None:
     """Guru menentukan GOAL (kompetensi), Braincore menentukan PATH (item & urutan)."""
     states = {cid: await get_state(student_id, cid) for cid in competency_ids}
-    target = sorted(competency_ids, key=lambda c: (states[c]["p_mastery"], states[c]["attempts"]))[0]
+    # m025-375 (B6): pilih dan tangga-kan dari penguasaan HARI INI (sudah meluruh), bukan dari
+    # angka terakhir yang tercatat - kompetensi yang lama tidak disentuh memang lebih lemah.
+    cur = {cid: states[cid].get("p_mastery_decayed", states[cid]["p_mastery"]) for cid in competency_ids}
+    target = sorted(competency_ids, key=lambda c: (cur[c], states[c]["attempts"]))[0]
     st = states[target]
 
     # 1) prasyarat lemah -> turun ke prasyarat lebih dulu
-    if allow_prerequisite and st["p_mastery"] < 0.5:
+    if allow_prerequisite and cur[target] < 0.5:
         comp = await db.curriculum_nodes.find_one({"id": target}, {"_id": 0}) or {}
         for pid in ((comp.get("meta") or {}).get("prerequisite_competency_ids") or []):
             pst = await get_state(student_id, pid)
-            if pst["p_mastery"] < 0.6:
+            if pst.get("p_mastery_decayed", pst["p_mastery"]) < 0.6:
                 pool = [q for q in await _pool([pid], transfer=False) if q["question_id"] not in served_ids]
                 if pool:
                     pool.sort(key=lambda q: q["difficulty"])
@@ -262,7 +273,7 @@ async def next_best_item(student_id: str, competency_ids: list[str], served_ids:
                             "reason": f"Sebelum lanjut, kita kuatkan dulu dasarnya: {pnode.get('name', 'kompetensi prasyarat')}. Kalau bagian ini kokoh, sisanya jauh lebih mudah.",
                             "competency_id": pid, "phase": "warm-up"}
 
-    p = st["p_mastery"]
+    p = cur[target]
     # 2) sudah kuat -> uji transfer
     if p >= MASTERY_T and st["correct"] >= MIN_CORRECT_FOR_MASTERY:
         pool = [q for q in await _pool([target], transfer=True) if q["question_id"] not in served_ids]

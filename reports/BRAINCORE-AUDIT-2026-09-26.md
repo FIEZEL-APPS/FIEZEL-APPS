@@ -40,8 +40,8 @@ Dengan kata lain: jalur "otonom yang aman" mati, jalur "otonom tanpa pagar" hidu
 | B2 | Sedang | reset progres | Kunci decision trace & parameter hidup selamat dari "Reset progres" | **Diperbaiki** + gerbang R5 |
 | B3 | Sedang | backend | Status `TRANSFERRED` lengket selamanya (dan `RETAINED` sampai salah berikutnya) walau posterior jatuh | **Diperbaiki** + unit test |
 | B4 | Sedang | backend | Hint melunakkan hukuman jawaban SALAH (arah terbalik) | **Diperbaiki** + unit test |
-| B5 | Sedang | core-brain | Perbaikan T6 `reviewPriority` tidak efektif; gerbangnya lolos karena fixture 5 item | Rekomendasi |
-| B6 | Sedang | BKT klien + backend | Peluruhan (decay) BKT tidak pernah dipakai runtime; `update()` mulai dari L yang belum diluruhkan | Rekomendasi |
+| B5 | Sedang | core-brain | Perbaikan T6 `reviewPriority` tidak efektif; gerbangnya lolos karena fixture 5 item | **Diperbaiki** (owner) — §7 |
+| B6 | Sedang | BKT klien + backend | Peluruhan (decay) BKT tidak pernah dipakai runtime; `update()` mulai dari L yang belum diluruhkan | **Diperbaiki** (owner) — §7 |
 | B7 | Rendah | backend | Catatan GAP guru: "X% murid belum mastery" padahal X = 100 − rerata posterior | Rekomendasi |
 | B8 | Rendah | CI | `backend/unit_test.py` (54 cek) tidak dijalankan CI | Rekomendasi |
 | C1–C6 | Rendah | dokumen / paritas | Klaim "kriptografis", paritas BKT/retrievability, state global modul, kerja ganda | Catatan |
@@ -271,4 +271,17 @@ sengaja dibiarkan: satu-satunya langkah self-tune adalah menaikkan `targetSucces
 mudah) setiap verdict `promote` yang diukur dari akurasi — kelas cacat yang sama dengan A1.
 Penyambungannya menunggu keputusan owner tentang ukuran yang tidak bisa "dimenangkan" dengan
 memudahkan soal.
+
+**B5 — urutan materi hampir lupa.** Kurva `reviewPriority` kini asimetris: r ≥ 0.75 tetap
+Gauss (makin segar makin sia-sia), r < 0.75 turun landai `0.45 + 0.55·r/0.75`. Urutan hasilnya:
+ambang lupa > rawan > runtuh (dangkal di atas dalam) > belum jatuh tempo > baru dilihat; ambang
+lupa tetap unggul > 1.5×. Dua gerbang lama yang mengunci "materi hilang paling bawah" diubah
+sesuai keputusan owner; gerbang B5 baru terbukti merah di rumus lama.
+
+**B6 — model lupa BKT dipakai.** `update()` meluruhkan L ke `nowMs` sebelum melangkah (salah
+setelah 90 hari: 0.30 → di bawah 0.5, bukan 0.94). Pembukaan lesson dijaga awet lewat
+`gatePassedAt` / `gateEverPassed()` (baris lama yang sudah lolos dicap dari bukti lamanya);
+`frontier` memakainya, `rootCause(..., nowMs)` melihat prasyarat yang terlupa. Backend
+`apply_attempt` dan `next_best_item` membaca posterior yang sudah meluruh, dan
+`p_mastery_decayed` tidak lagi tersimpan ke DB.
 

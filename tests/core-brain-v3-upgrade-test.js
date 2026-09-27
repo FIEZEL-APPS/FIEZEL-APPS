@@ -124,6 +124,27 @@ test('item runtuh (r≈0.03) tidak lagi berskor 0 dan masuk 3 teratas antrean', 
   assert.ok(at('runtuh') < at('runtuh-dalam') || of('runtuh').score > of('runtuh-dalam').score,
     'ekor bawah harus tetap terurut: runtuh dangkal di atas runtuh dalam');
   assert.strictEqual(ranked[0].id, 'ambang-lupa', 'puncak efisiensi di ambang lupa tetap nomor satu');
+  // m025-375 (B5): "masuk 3 teratas" dulu lolos hanya karena fixture ini punya dua item sehat.
+  // Yang benar-benar dijanjikan T6: materi runtuh di ATAS materi yang baru dilihat.
+  assert.ok(at('runtuh') < at('masih-segar'), 'r~0.03 harus di atas materi segar r~0.98, dapat posisi ' + (at('runtuh') + 1));
+  assert.ok(at('runtuh-total') < at('masih-segar'), 'bahkan runtuh total tidak boleh terkubur di bawah materi segar');
+});
+
+test('B5 · zona rawan dan materi runtuh tidak kalah dari materi yang belum jatuh tempo', () => {
+  // Audit braincore 2026-09-26 (B5): dengan Gauss simetris sigma 0.22, r=0.45 (rawan) kalah dari
+  // r=0.95 (belum jatuh tempo), dan r=0.03 berskor 0.0001 vs 0.32 untuk materi yang baru dilihat.
+  const ranked = brain.reviewPriority([
+    { id: 'belum-jatuh-tempo', halfLifeDays: 10, lastSeenAt: NOW - 0.75 * DAY },  // r ~ 0.95
+    { id: 'baru-dilihat', halfLifeDays: 10, lastSeenAt: NOW - 0.2 * DAY },        // r ~ 0.99
+    { id: 'rawan', halfLifeDays: 10, lastSeenAt: NOW - 11.5 * DAY },              // r ~ 0.45
+    { id: 'runtuh', halfLifeDays: 10, lastSeenAt: NOW - 50.6 * DAY },             // r ~ 0.03
+    { id: 'ambang', halfLifeDays: 10, lastSeenAt: NOW - 4.15 * DAY }              // r ~ 0.75
+  ], { now: NOW });
+  const ids = ranked.map(r => r.id);
+  assert.deepStrictEqual(ids, ['ambang', 'rawan', 'runtuh', 'belum-jatuh-tempo', 'baru-dilihat'],
+    'urutan: ambang > rawan > runtuh > belum jatuh tempo > baru dilihat, dapat ' + ids.join(' > '));
+  const of = id => ranked.find(r => r.id === id).score;
+  assert.ok(of('ambang') > 1.5 * of('runtuh'), 'ambang lupa tetap unggul jauh: efisiensi penguatan tidak hilang');
 });
 
 test('faktor penyelamatan tidak menggeser urutan antrean sehat (kompat gate v2)', () => {
@@ -136,7 +157,10 @@ test('faktor penyelamatan tidak menggeser urutan antrean sehat (kompat gate v2)'
     { id: 'sudah-hilang', successes: 0, lapses: 3, difficulty: 6, lastSeenAt: NOW - 60 * DAY }
   ], { now: NOW });
   assert.strictEqual(ranked[0].id, 'ambang-lupa');
-  assert.strictEqual(ranked[2].id, 'sudah-hilang');
+  // m025-375 (B5, keputusan owner): dulu dikunci 'sudah-hilang' paling bawah - absorbing state.
+  // Sekarang materi segar (r~0.98) yang paling bawah; yang runtuh naik di atasnya.
+  assert.strictEqual(ranked[1].id, 'sudah-hilang');
+  assert.strictEqual(ranked[2].id, 'masih-segar');
 });
 
 // ---- 4. momentum: minimal tiga blok --------------------------------------------------------
