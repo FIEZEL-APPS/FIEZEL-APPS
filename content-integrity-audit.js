@@ -557,10 +557,13 @@ function auditGrammarRuntime(ctx, templates) {
       for (const [a, b] of [[sib.pedagogicalObjective, e.rule], [sib.pedagogicalObjectiveId, e.ruleId], [e.howToAvoid, e.memoryCue], [e.howToAvoidId, e.memoryCueId]]) if (a && b) ownText.add(norm(`${a} ${b}`));
     }
     let questions = [];
-    try { questions = ctx.buildGrammarLessonQuestions(t.subskill, 25) || []; }
+    try { questions = ctx.buildGrammarLessonQuestions(t.subskill) || []; }
     catch (e) { critical('grammar', 'GENERATOR_THREW', t.id, `buildGrammarLessonQuestions crashed for "${t.subskill}"`, e.message); continue; }
-    if (questions.length < 25) {
-      critical('grammar', 'LESSON_UNDERFILLED', t.id, `lesson "${t.subskill}" produced ${questions.length}/25 valid questions`);
+    // m025-375: sesi lesson maks 10 soal (GRAMMAR_LESSON_MODES); dua templat = penuh 10,
+    // satu templat minimal 5 (GRAMMAR_SESSION_MIN) - di bawah itu murid tidak bisa membukanya.
+    const lessonTarget = templates.filter(x => x.subskill === t.subskill).length >= 2 ? 10 : 5;
+    if (questions.length < lessonTarget) {
+      critical('grammar', 'LESSON_UNDERFILLED', t.id, `lesson "${t.subskill}" produced ${questions.length}/${lessonTarget} valid questions`);
     }
     for (const q of questions) {
       n++;

@@ -110,8 +110,8 @@
     'grammar.lesson-belum-memiliki-materi': 'Materi ini belum punya isi.',
     'grammar.lesson-hanya-tersedia-pada-level': 'Materi ini hanya ada di level {level}.',
     'grammar.pilih-lesson-terlebih-dahulu': 'Pilih materi {level} dulu.',
-    'grammar.mode-practice-terfokus': '{jumlahSoal} jenis latihan',
-    'grammar.urutan-mode-practice': '{level} · nomor {sequence} · {fondasi} · {jumlahSoal} jenis latihan',
+    'grammar.mode-practice-terfokus': '{jumlahSoal} soal latihan singkat',
+    'grammar.urutan-mode-practice': '{level} · nomor {sequence} · {fondasi} · {jumlahSoal} soal',
     'grammar.pahami-dulu-urutan': 'PAHAMI DULU · NOMOR {sequence}',
 
     // ── Level ──
