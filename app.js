@@ -651,7 +651,12 @@ function grammarCapFirst(text){return String(text??'').replace(/^(\s*)([a-z])/,(
    penjelasan PALING spesifik yang dimiliki FIEZEL. Heuristik kategori di bawah ("belum cocok dengan
    waktu, fungsi, atau susunan...") hanya cadangan untuk alasan yang masih berbahasa Inggris. Di
    Thai jalur nama miskonsepsi (Indonesia) dilewati, jadi dulu SETIAP pilihan salah jatuh ke
-   kalimat umum itu - persis penjelasan kabur yang dikeluhkan murid. */
+   kalimat umum itu - persis penjelasan kabur yang dikeluhkan murid.
+   m025-376: alasan kartu ini kini juga didahulukan di atas diagnosis SEKELUARGA per nama label
+   (grammar-misconception-id.json). Label dipakai bersama banyak soal, jadi kalimatnya umum dan
+   kadang salah alamat ("nyampur 'have' sama bentuk lampau 'was'" untuk pilihan "never has
+   flying"); alasan kartu ditulis untuk pilihan itu di kalimat itu. Nama label tetap menjadi
+   cadangan kedua, dan tetap dicoba sebelum pola teks Inggris. */
 function grammarReasonForLearner(option,rawReason,isTh){
   const own=String(rawReason||'').trim();if(!own)return '';
   if(isTh){const thai=(own.match(/[\u0E00-\u0E7F]/g)||[]).length,letters=(own.match(/[A-Za-z\u0E00-\u0E7F]/g)||[]).length;if(!letters||thai*2<letters)return ''}
@@ -660,7 +665,7 @@ function grammarReasonForLearner(option,rawReason,isTh){
   if(opt&&bare.startsWith(opt))return grammarCapFirst(own);
   return joinQuoteReason(quoteEmbedShort(option),own);
 }
-function grammarOptionReason(option,isCorrect,rawReason='',misconception=''){if(isCorrect)return joinQuoteReason(quoteEmbedShort(option),FiezelI18n.t('grammar.alasan-opsi-benar'));const isTh=(self.FiezelI18n?.getLocale?.()==='th');const named=!isTh?grammarMisconceptionReason(misconception):'';if(named)return joinQuoteReason(quoteEmbedShort(option),named);const ownReason=grammarReasonForLearner(option,rawReason,isTh);if(ownReason)return ownReason;const raw=String(rawReason).toLowerCase();if(/specific|definite past|dated past|finished point/.test(raw))return joinQuoteReason(quoteEmbedShort(option),FiezelI18n.t('grammar.alasan-opsi-waktu-lampau'));if(/habit|routine|general truth/.test(raw))return joinQuoteReason(quoteEmbedShort(option),FiezelI18n.t('grammar.alasan-opsi-kebiasaan'));if(/permission/.test(raw))return joinQuoteReason(quoteEmbedShort(option),FiezelI18n.t('grammar.alasan-opsi-izin'));if(/obligation|requirement|rule/.test(raw))return joinQuoteReason(quoteEmbedShort(option),FiezelI18n.t('grammar.alasan-opsi-kewajiban'));if(/prohibition/.test(raw))return joinQuoteReason(quoteEmbedShort(option),FiezelI18n.t('grammar.alasan-opsi-larangan'));if(/singular|plural|agreement/.test(raw))return joinQuoteReason(quoteEmbedShort(option),FiezelI18n.t('grammar.alasan-opsi-agreement'));if(/superlative/.test(raw))return joinQuoteReason(quoteEmbedShort(option),FiezelI18n.t('grammar.alasan-opsi-superlative'));if(/comparative/.test(raw))return joinQuoteReason(quoteEmbedShort(option),FiezelI18n.t('grammar.alasan-opsi-comparative'));if(/word order|order/.test(raw))return joinQuoteReason(quoteEmbedShort(option),FiezelI18n.t('grammar.alasan-opsi-urutan-kata'));if(/infinitive/.test(raw))return joinQuoteReason(quoteEmbedShort(option),FiezelI18n.t('grammar.alasan-opsi-infinitive'));if(/gerund/.test(raw))return joinQuoteReason(quoteEmbedShort(option),FiezelI18n.t('grammar.alasan-opsi-gerund'));if(/passive|agent/.test(raw))return joinQuoteReason(quoteEmbedShort(option),FiezelI18n.t('grammar.alasan-opsi-pasif'));if(/article|identif/.test(raw))return joinQuoteReason(quoteEmbedShort(option),FiezelI18n.t('grammar.alasan-opsi-artikel'));if(/auxiliary/.test(raw))return joinQuoteReason(quoteEmbedShort(option),FiezelI18n.t('grammar.alasan-opsi-auxiliary'));return joinQuoteReason(quoteEmbedShort(option),FiezelI18n.t('grammar.alasan-opsi-umum'))}
+function grammarOptionReason(option,isCorrect,rawReason='',misconception=''){if(isCorrect)return joinQuoteReason(quoteEmbedShort(option),FiezelI18n.t('grammar.alasan-opsi-benar'));const isTh=(self.FiezelI18n?.getLocale?.()==='th');const ownReason=grammarReasonForLearner(option,rawReason,isTh);if(ownReason)return ownReason;const named=!isTh?grammarMisconceptionReason(misconception):'';if(named)return joinQuoteReason(quoteEmbedShort(option),named);const raw=String(rawReason).toLowerCase();if(/specific|definite past|dated past|finished point/.test(raw))return joinQuoteReason(quoteEmbedShort(option),FiezelI18n.t('grammar.alasan-opsi-waktu-lampau'));if(/habit|routine|general truth/.test(raw))return joinQuoteReason(quoteEmbedShort(option),FiezelI18n.t('grammar.alasan-opsi-kebiasaan'));if(/permission/.test(raw))return joinQuoteReason(quoteEmbedShort(option),FiezelI18n.t('grammar.alasan-opsi-izin'));if(/obligation|requirement|rule/.test(raw))return joinQuoteReason(quoteEmbedShort(option),FiezelI18n.t('grammar.alasan-opsi-kewajiban'));if(/prohibition/.test(raw))return joinQuoteReason(quoteEmbedShort(option),FiezelI18n.t('grammar.alasan-opsi-larangan'));if(/singular|plural|agreement/.test(raw))return joinQuoteReason(quoteEmbedShort(option),FiezelI18n.t('grammar.alasan-opsi-agreement'));if(/superlative/.test(raw))return joinQuoteReason(quoteEmbedShort(option),FiezelI18n.t('grammar.alasan-opsi-superlative'));if(/comparative/.test(raw))return joinQuoteReason(quoteEmbedShort(option),FiezelI18n.t('grammar.alasan-opsi-comparative'));if(/word order|order/.test(raw))return joinQuoteReason(quoteEmbedShort(option),FiezelI18n.t('grammar.alasan-opsi-urutan-kata'));if(/infinitive/.test(raw))return joinQuoteReason(quoteEmbedShort(option),FiezelI18n.t('grammar.alasan-opsi-infinitive'));if(/gerund/.test(raw))return joinQuoteReason(quoteEmbedShort(option),FiezelI18n.t('grammar.alasan-opsi-gerund'));if(/passive|agent/.test(raw))return joinQuoteReason(quoteEmbedShort(option),FiezelI18n.t('grammar.alasan-opsi-pasif'));if(/article|identif/.test(raw))return joinQuoteReason(quoteEmbedShort(option),FiezelI18n.t('grammar.alasan-opsi-artikel'));if(/auxiliary/.test(raw))return joinQuoteReason(quoteEmbedShort(option),FiezelI18n.t('grammar.alasan-opsi-auxiliary'));return joinQuoteReason(quoteEmbedShort(option),FiezelI18n.t('grammar.alasan-opsi-umum'))}
 function grammarMeta(item){const explanation=item?.[12]||{};const p=(...v)=>String(v.find(x=>x)||'');return{stem:String(item?.[0]||''),options:Array.isArray(item?.[1])?item[1]:[],correctIndex:item?.[2],rule:p(explanation.ruleId,explanation.rule,item?.[3]),whyCorrect:p(explanation.whyCorrectId,explanation.whyCorrect,item?.[7]),objective:p(item?.[16]?.objectiveId,item?.[9]),misconception:p(item?.[16]?.misconceptionId,item?.[10]),reasoning:p(item?.[16]?.reasoningId,item?.[11]),whyOthers:p(explanation.whyOthersFailId,explanation.whyOthersFail),avoid:p(explanation.howToAvoidId,explanation.howToAvoid),memory:p(explanation.memoryCueId,explanation.memoryCue),id:String(item?.[8]||''),family:String(item?.[6]||'core_grammar')}}
 function stableGrammarHash(value){let h=2166136261;for(const c of String(value)){h^=c.charCodeAt(0);h=Math.imul(h,16777619)}return h>>>0}
 // m025-149: pengecoh untuk mode "aturan/tujuan/penalaran mana yang cocok" diambil dari
@@ -4629,7 +4634,7 @@ function stepTutorGuidance(q){
     if(!reasoning)return null;
     const out=S.decompose(String(q.question||''),{reasoningOperation:reasoning,stem:String(q.question||'')});
     if(!(out&&Array.isArray(out.steps)&&out.steps.length))return null;
-    return stepTutorThai(out,String(q.question||''));
+    return stepTutorThai(stepTutorLocalSteps(item,out),String(q.question||''));
   }catch{return null}
 }
 /* W3-BRAIN-TH: rakit ulang ask/finalAsk step-tutor untuk locale th DI SISI APP.
@@ -4639,12 +4644,26 @@ function stepTutorGuidance(q){
  * langkah dibaca dari step.rationale ('brain3_step_<kategori>') dan kalimat Thai-nya dirakit
  * dari peta naskah-th-brain dengan logika yang SAMA dengan askFor. Locale id: T null,
  * objek dekomposisi kembali apa adanya (byte-identik dengan jalur lama). */
+/* m025-376: LANGKAH TUNTUNAN DALAM BAHASA MURID.
+ * decompose() menyisipkan OBJEK Inggris dari reasoningOperation ke kerangka Indonesia:
+ * "Langkah 1: coba kenali dulu — identify time-frame marker — yang mana di kalimat ini?". Murid
+ * membaca dua bahasa dalam satu kalimat, tepat di anak tangga saat ia paling butuh kejelasan.
+ * Tiap templat sudah membawa langkah yang sama dalam bahasa murid (item[16].reasoningId: Indonesia,
+ * atau Thai lewat overlay th), jadi langkahnya diambil dari sana ("Langkah 1: Cari subjeknya.").
+ * Kategori & expect modul tetap dibawa (telemetri); tanpa reasoningId, jalur lama dipakai. */
+function stepTutorLocalSteps(item,out){
+  const raw=String(item?.[16]?.reasoningId||'').trim();if(!raw||!Array.isArray(out?.steps))return out;
+  const parts=raw.split(/\s*(?:→|->|;)\s*/).map(x=>x.trim()).filter(Boolean).slice(0,3);if(!parts.length)return out;
+  const steps=parts.map((part,i)=>Object.assign({expect:'',rationale:'brain3_step_local'},out.steps[i]||{},{ask:FiezelI18n.t('brain-step.step-prefix',{n:i+1})+grammarCapFirst(part).replace(/[.!?]+$/,'')+'.',localized:true}));
+  return{...out,steps};
+}
 function stepTutorThai(out,question){
   const T=brainNaskahTh('step');
   if(!T)return out;
   try{
     const stem=String(question||'').trim();
     const steps=out.steps.map((s,i)=>{
+      if(s?.localized)return s; // m025-376: langkah sudah berbahasa Thai dari reasoning th
       const cat=String(s?.rationale||'').replace(/^brain3_step_/,'');
       const obj=String(s?.expect||'');
       const prefix=naskahIsi(T['brain-step.step-prefix'],{n:i+1});
@@ -10976,8 +10995,50 @@ function buildGrammarModeQuestions(skill,modes,count){const meta=GRAMMAR_ITEMS.f
 /* m025-375: jumlah soal yang dijanjikan layar materi. Dua templat -> 10; satu templat -> 9
    (sembilan mode lesson). Dihitung dari data, tidak merakit soal hanya untuk menampilkan angka. */
 function grammarLessonSessionTarget(skill){return Math.min(GRAMMAR_SESSION_SIZE,GRAMMAR_LESSON_MODES.length*Math.max(1,(G[String(skill||'')]||[]).length))}
-function buildGrammarLessonQuestions(skill,count=GRAMMAR_SESSION_SIZE){return buildGrammarModeQuestions(skill,GRAMMAR_LESSON_MODES,count)}
-function practiceSkill(skill){if((GRAMMAR_ITEMS.find(x=>x.skill===skill)?.level||'')!==getActiveLevel())return showToast(FiezelI18n.t('grammar.pilih-lesson-terlebih-dahulu',{level:getActiveLevel()}));const unlock=lessonUnlockState(skill,state,bktMasteredSkills());if(unlock.locked)return showToast(lessonLockMessage(unlock));const questions=buildGrammarLessonQuestions(skill,GRAMMAR_SESSION_SIZE);if(questions.length<GRAMMAR_SESSION_MIN)return showToast(FiezelI18n.t('grammar.lesson-new-memiliki-item-valid',{jumlahSoal:questions.length}));quizLoop({type:'grammar',count:Math.min(GRAMMAR_SESSION_SIZE,questions.length)/* m025-375: lesson bertemplat tunggal = 9 soal */,pool:questions,factory:item=>item,preserveOrder:true})}
+/* m025-376: RENCANA SESI PER SLOT - BANYAK KALIMAT, FORMAT BERGANTI.
+ * Sejak m025-376 tiap lesson A1-A2 punya enam kalimat (dua templat lama + empat baru). Putaran
+ * mode-major m025-375 akan menghabiskan satu mode untuk semua templat dulu (enam isian beruntun,
+ * lalu empat "kenapa"), jadi sesinya kembali monoton - justru yang ingin dihindari riset
+ * interleaving/retrieval. Sesi sekarang mengikuti sepuluh slot: tujuh latihan bentuk dan tiga soal
+ * "kenapa" yang diselipkan. Slot latihan memilih kalimat yang PALING JARANG muncul; slot "kenapa"
+ * memilih kalimat yang SUDAH dikerjakan (refleksi atas jawaban sendiri); kalimat yang sama tidak
+ * dipakai dua kali beruntun. Slot yang modenya habis untuk semua kalimat turun ke mode sejenis,
+ * lalu ke jenis lain - lesson dua templat tetap 10 soal, lesson satu templat tetap 9.
+ * `opts.rotation` menggeser kalimat pembuka antar-sesi (dihitung practiceSkill dari jumlah
+ * jawaban), jadi sesi kedua tidak dibuka dengan kalimat yang sama. Tanpa opts (audit, gerbang
+ * Lewati Materi) hasilnya deterministik. count di atas rencana diisi semua kombinasi sisa. */
+const GRAMMAR_LESSON_SLOTS=['apply_form','apply_form','justify_correct','apply_form','complete_sentence','diagnose_distractor_1','apply_form','justify_correct','repair_distractor_1','complete_sentence'];
+const GRAMMAR_PRACTICE_SLOT_MODES=['apply_form','complete_sentence','repair_distractor_1','repair_distractor_2','repair_distractor_3'];
+const GRAMMAR_WHY_SLOT_MODES=['justify_correct','diagnose_distractor_1','diagnose_distractor_2','diagnose_distractor_3'];
+function buildGrammarLessonQuestions(skill,count=GRAMMAR_SESSION_SIZE,opts={}){
+  const meta=GRAMMAR_ITEMS.find(x=>x.skill===skill);if(!meta||meta.level!==getActiveLevel())return[];
+  const own=G[skill]||[],n=own.length;if(!n)return[];
+  const rotation=Math.max(0,Math.floor(Number(opts?.rotation)||0));
+  /* Audit F10: own[0] adalah contoh yang jawabannya dipajang di layar materi - urutan
+     kalimat dimulai dari item berikutnya. */
+  const start=((n>1?1:0)+rotation)%n,order=Array.from({length:n},(_,i)=>(start+i)%n);
+  const cache=new Map(),card=(ti,mode)=>{const key=ti+':'+mode;if(!cache.has(key)){const variant=GRAMMAR_PRACTICE_MODES.indexOf(mode);let q=variant<0?null:makeGrammarQuestion(skill,own[ti],variant,skill);if(q&&!(grammarLessonQuestionOwnOnly(q)&&validateQuestion(q).ok))q=null;cache.set(key,q)}return cache.get(key)};
+  const used=new Set(),seen=new Set(),uses=new Array(n).fill(0),out=[];let prev=-1;
+  const push=(ti,mode)=>{const q=card(ti,mode);if(!q)return false;const signature=sigQ(q);used.add(ti+':'+mode);if(seen.has(signature))return false;seen.add(signature);uses[ti]++;prev=ti;out.push(q);return true};
+  const pick=(mode,reflect)=>{
+    const cands=order.filter(ti=>!used.has(ti+':'+mode)&&card(ti,mode));
+    cands.sort((a,b)=>(reflect?(uses[a]?0:1)-(uses[b]?0:1):0)||((a===prev)-(b===prev))||(uses[a]-uses[b])||(order.indexOf(a)-order.indexOf(b)));
+    for(const ti of cands)if(push(ti,mode))return true;
+    return false;
+  };
+  for(const slot of GRAMMAR_LESSON_SLOTS){
+    if(out.length>=count)break;
+    const why=GRAMMAR_WHY_SLOT_MODES.includes(slot),same=why?GRAMMAR_WHY_SLOT_MODES:GRAMMAR_PRACTICE_SLOT_MODES,other=why?GRAMMAR_PRACTICE_SLOT_MODES:GRAMMAR_WHY_SLOT_MODES;
+    if(pick(slot,why)||same.some(m=>m!==slot&&pick(m,why)))continue;
+    other.some(m=>pick(m,!why));
+  }
+  for(const mode of GRAMMAR_LESSON_MODES)for(const ti of order){if(out.length>=count)break;if(!used.has(ti+':'+mode))push(ti,mode)}
+  /* Audit F10: materi bertemplat tunggal memakai kalimatnya sebagai contoh di intro; kartu yang
+     memajang kalimat contoh itu apa adanya dipindah ke akhir sesi. */
+  const exampleStem=String(own[0]?.[0]||'').replace(/\s+/g,' ').trim().toLowerCase();
+  if(exampleStem&&out.length>1){const idx=out.findIndex(q=>String(q.question||'').replace(/\s+/g,' ').trim().toLowerCase().includes(exampleStem));if(idx===0)out.push(out.shift())}
+  return out}
+function practiceSkill(skill){if((GRAMMAR_ITEMS.find(x=>x.skill===skill)?.level||'')!==getActiveLevel())return showToast(FiezelI18n.t('grammar.pilih-lesson-terlebih-dahulu',{level:getActiveLevel()}));const unlock=lessonUnlockState(skill,state,bktMasteredSkills());if(unlock.locked)return showToast(lessonLockMessage(unlock));const questions=buildGrammarLessonQuestions(skill,GRAMMAR_SESSION_SIZE,{rotation:Math.floor((Number(state.grammar[skill]?.total)||0)/GRAMMAR_SESSION_SIZE)}/* m025-376: sesi berikutnya dibuka kalimat lain */);if(questions.length<GRAMMAR_SESSION_MIN)return showToast(FiezelI18n.t('grammar.lesson-new-memiliki-item-valid',{jumlahSoal:questions.length}));quizLoop({type:'grammar',count:Math.min(GRAMMAR_SESSION_SIZE,questions.length)/* m025-375: lesson bertemplat tunggal = 9 soal */,pool:questions,factory:item=>item,preserveOrder:true})}
 /* ---- Sesi Kilat: 10 soal grammar campuran lintas lesson satu level ----------------------
  * Latihan singkat harian. Hanya lesson yang sudah terbuka di level aktif; soal dirotasi antar
  * lesson (satu per lesson per putaran) dan dibatasi ke mode BENTUK (apply/complete/repair)
