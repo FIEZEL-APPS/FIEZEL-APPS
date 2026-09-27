@@ -70,6 +70,8 @@
     'grammar.mode-rule-benar': 'กฎนี้อธิบายรูปที่กำลังทดสอบได้พอดี โดยไม่หลุดออกนอก lesson นี้',
     'grammar.mode-teach-benar': 'สรุปนั้นรวมเป้าหมายของ lesson เข้ากับกฎที่ถูกต้อง',
     'grammar.versi-pakai': 'เวอร์ชันที่ใช้ {opsiDikutip}',
+    'grammar.versi-salah-pakai': 'ในประโยคนี้ {opsiDikutip}',
+    'grammar.versi-salah-awal': 'ในประโยคนี้',
     'home.brief-belum-pola': 'ยังไม่เห็นรูปแบบ',
     'home.brief-goal-adaptif': 'โจทย์ปรับตามระดับ 12 ข้อ',
     'home.brief-goal-tes-awal': 'เริ่มแบบทดสอบแรก',

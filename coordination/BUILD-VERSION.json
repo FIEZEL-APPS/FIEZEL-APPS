@@ -1,7 +1,7 @@
 {
-  "version": "m025-377",
-  "claimedBy": "branch claude/happy-bohr-iteg9g",
-  "claimedAt": "2026-09-27T13:47:22.008Z",
-  "reason": "braincore langkah 2: kesulitan soal dari semua murid",
+  "version": "m025-378",
+  "claimedBy": "branch claude/sharp-pascal-g12f2y",
+  "claimedAt": "2026-09-27T18:32:17.163Z",
+  "reason": "grammar: soal latihan baru A1-A2 (184 soal, id+th), 6 kalimat per lesson, umpan balik pilih-kalimat",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }
