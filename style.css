@@ -5431,8 +5431,10 @@ html body #app .social-home-launcher .launch-card{background:var(--pz-sky);borde
 /* Perubahan akurasi mingguan diwarnai menurut arahnya (dulu hijau mati untuk angka rekaan). */
 .fz-stadium-card .fz-time-val.is-naik { color: #059669 !important; }
 .fz-stadium-card .fz-time-val.is-turun { color: #DC2626 !important; }
-/* Label di bawah angka dulu 9.5px - di bawah ukuran terbaca di ponsel. */
-.fz-stadium-card .fz-date-val { font-size: 11px !important; }
+/* Label di bawah angka dulu 9.5px - di bawah ukuran terbaca di ponsel. Selektor sengaja tiga
+   kelas: mobile-edge-fit.css dimuat SESUDAH style.css dan `.fz-stadium-center-time .fz-date-val`
+   (dua kelas) di sana menang pada spesifisitas yang sama. */
+.fz-stadium-card .fz-stadium-center-time .fz-date-val { font-size: 11px !important; }
 /* Ikon peluncur "Rencana belajar" dulu gelap di atas petak gelap (nyaris tak terlihat). */
 .today-home-cockpit .launch-icon { color: var(--sun, #FFD94F); }
 .today-home-cockpit .launch-icon .fz-line { stroke: currentColor; }
