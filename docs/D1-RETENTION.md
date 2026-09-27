@@ -66,7 +66,8 @@ lewat `EXPLAIN QUERY PLAN` — bukti per kueri ada di
 | `learner_name` | `fiezel-core` | **180 hari** tanpa penulisan (`name_day < hari_ini − 180`) | `runLearnerEvidencePurge()` — cron `5 17 * * *` | **YA** (lihat §2.8) |
 | `item_pool_daily` | `fiezel-evidence` | **120 hari** (`day < hari_ini − 120`); penaksir hanya membaca 56 hari terakhir | `runItemPoolRollup()` → `purgeItemPool()` — cron `5 17 * * *` | **YA** — purge jalan walau saklar dimatikan lagi |
 | `item_pool_dedup` | `fiezel-evidence` | **60 hari** (`day < hari_ini − 60`) — lebih lama dari jendela kirim ulang perangkat (56 hari) | `runItemPoolRollup()` → `purgeItemPool()` — cron `5 17 * * *` | **YA** — purge jalan walau saklar dimatikan lagi |
-| `item_pool_table` | `fiezel-evidence` | diganti UTUH setiap hari (hasil, bukan arsip) | `runItemPoolRollup()` → `rebuildItemPoolTable()` | **YA** saat `ITEM_POOL_ENABLED=on` |
+| `item_pool_table` | `fiezel-evidence` | diganti setiap hari (hasil, bukan arsip): upsert per soal lalu hapus yang tidak terbit lagi | `tools/item-pool-job.mjs` di GitHub Actions (`braincore-item-pool.yml`, 01:20 WIB) — **bukan** cron Worker: penaksirnya melewati 10 ms CPU Worker gratis | **YA** saat `ITEM_POOL_ENABLED=on` |
+| `item_pool_probe_daily` | `fiezel-evidence` | **120 hari** (`day < hari_ini − 120`) | `runItemPoolRollup()` → `purgeItemPool()` — cron `5 17 * * *` | **YA** — purge jalan walau saklar dimatikan lagi |
 
 **Tidak ada trigger cron baru yang dibutuhkan.** Kedua ekspresi cron di
 `workers/api/wrangler.toml` sudah ada (`*/5 * * * *` dan `5 17 * * *`).

@@ -78,7 +78,7 @@ import { registerEvidenceRoutes } from './evidence/route-evidence.js';
 import { purgeEvidence } from './evidence/evidence-store-d1.js';
 import { purgeLearnerEvidence } from './evidence/learner-evidence-store-d1.js';
 import { registerItemPoolRoutes } from './evidence/route-item-pool.js';
-import { rebuildItemPoolTable, purgeItemPool } from './evidence/item-pool-store-d1.js';
+import { purgeItemPool } from './evidence/item-pool-store-d1.js';
 import { jsonResponse, jsonError, unauthenticated, ERR } from './errors.js';
 // A3: pencatat hasil cron. Satu-satunya alasan berkas ini diubah paket kerja A3.
 import { withCronRun, CRON_JOBS } from './cron-status.js';
@@ -854,24 +854,19 @@ export async function runEvidencePurge(env, now) {
 }
 
 /**
- * (d) Kesulitan soal gabungan (Braincore langkah 2): bangun ulang `item_pool_table` dari
- *     56 hari penghitung, lalu purge dedup (60 hari) dan penghitung (120 hari).
- *     Pembangunan tabel hanya saat `ITEM_POOL_ENABLED=on`; PURGE jalan selama binding ada,
- *     walau saklar dimatikan lagi - lane yang dimatikan setelah mengumpulkan data tidak
- *     boleh meninggalkan penghitungnya selamanya. Migrasi yang belum diterapkan membuat
- *     purge gagal dengan `{error}` yang tertangkap, bukan menjatuhkan cron.
+ * (d) Kesulitan soal gabungan (Braincore langkah 2/3): cron Worker HANYA mempurge dedup
+ *     (60 hari) dan penghitung soal + probe (120 hari). Pembangunan `item_pool_table` dan
+ *     penyetelan angka rumus berjalan di GitHub Actions (tools/item-pool-job.mjs): penaksirnya
+ *     butuh ~9-19 ms CPU untuk 1.000-3.000 soal, melewati batas 10 ms Worker gratis.
+ *     Purge jalan selama binding ada, walau saklar dimatikan lagi - lane yang dimatikan setelah
+ *     mengumpulkan data tidak boleh meninggalkan penghitungnya selamanya. Migrasi yang belum
+ *     diterapkan membuat purge gagal dengan `{error}` yang tertangkap, bukan menjatuhkan cron.
  */
 export async function runItemPoolRollup(env, now) {
   const db = (env && env.EVIDENCE_DB) || null;
   if (!db) return { skipped: 'no_binding' };
   const today = new Date(Number.isFinite(now) ? now : Date.now()).toISOString().slice(0, 10);
-  const on = String((env && env.ITEM_POOL_ENABLED) || 'off') === 'on';
-  const out = { table: on ? null : { skipped: 'disabled' }, purge: null };
-  if (on) {
-    try { out.table = await rebuildItemPoolTable(db, today); } catch (e) { out.table = { error: e && e.name }; }
-  }
-  try { out.purge = await purgeItemPool(db, today); } catch (e) { out.purge = { error: e && e.name }; }
-  return out;
+  try { return { purge: await purgeItemPool(db, today) }; } catch (e) { return { purge: { error: e && e.name } }; }
 }
 
 /**

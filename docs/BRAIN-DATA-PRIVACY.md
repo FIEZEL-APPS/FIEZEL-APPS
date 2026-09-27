@@ -21,6 +21,7 @@ tidak bisa bocor, dan tidak bisa diminta siapa pun.**
 | `metrics_daily` / `usage_daily` / `retention_daily` / `dau_dedup` (eksisting) | Analitik produk | Counter tanpa individu | Permanen / 90 hari / 400 hari / dihapus tiap malam (`PRIVACY.md:104–108`) | Sesuai kontrak eksisting |
 | `item_pool_daily` — jawaban PERTAMA per soal (Braincore langkah 2, §7c) | Kesulitan soal dihitung dari semua murid, bukan per HP | Counter per (hari × ID templat soal × bucket prediksi): n, benar. Tanpa pengenal apa pun | 120 hari | Purge cron harian (`purgeItemPool`) |
 | `item_pool_table` — koreksi kesulitan per soal | Dibaca balik semua perangkat | Satu baris per soal yang dijawab ≥ 20 murid | Dibangun ulang utuh tiap hari | Diganti setiap rebuild |
+| `item_pool_probe_daily` — hasil PROBE RETENSI (Braincore langkah 3, §7c) | Paruh-waktu ingatan disetel dari data | Counter per (hari × bucket retrievability prediksi): n, benar. Tanpa ID soal/lesson, tanpa pengenal | 120 hari | Purge cron harian (`purgeItemPool`) |
 | Riwayat belajar lengkap (attempt, timing, prediksi, miskonsepsi, state BKT/memori) | Adaptivitas untuk murid itu sendiri | **localStorage perangkat murid — tidak pernah diunggah** | Selama aplikasi terinstal | Hapus data situs / uninstal = hilang total; tidak ada salinan server |
 
 Yang TIDAK dikumpulkan, titik: nama, email, IP (tidak disimpan server), user agent, GPS,
@@ -265,6 +266,19 @@ publik (`GET /api/braincore/item-difficulty`) hanya memuat soal dengan **≥ 20 
 
 **Tidak boleh disambungkan** ke `evidence_learner_day` (satu-satunya tabel di database yang
 sama yang memegang pengenal) — larangannya dikunci `ITEM_POOL_FORBIDDEN_TABLES` + gerbang P2.
+
+**Langkah 3 — probe retensi.** Lane yang sama membawa hasil probe retensi (jawaban pertama
+pada lesson yang sudah dikuasai setelah probe 3/7/21 harinya jatuh tempo) sebagai
+`[bucket retrievability 0..19, n, benar]` per hari — **tanpa** ID soal, ID lesson, atau
+pengenal apa pun, lebih tipis lagi dari baris soal. Amplop membawa `pv` (versi konstanta
+perangkat, mis. `a1.5-c0.25-h1.6`) supaya server bisa membuang bucket yang dibentuk dengan
+konstanta lain; `pv` sama untuk semua murid di satu versi aplikasi, jadi bukan pengenal.
+
+**Penaksiran di luar Worker.** Tabel kesulitan soal dan usulan penyetelan angka rumus dihitung
+GitHub Actions (`tools/item-pool-job.mjs`) yang membaca penghitung lewat API D1 dengan token
+owner. Yang keluar dari job: tabel publik (≥ 20 murid per soal) dan laporan usulan berisi
+angka agregat populasi (a, c, paruh-waktu + selangnya) — tidak ada angka per murid atau per sel
+kecil.
 
 **Saklar:** perangkat `FiezelTelemetryConfig.CONFIG.itemPool.mode`, server
 `ITEM_POOL_ENABLED` (default `off`). Retensi di `docs/D1-RETENTION.md`.

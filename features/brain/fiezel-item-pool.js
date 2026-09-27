@@ -20,9 +20,13 @@
  *                   jalan, dengan eventId acak supaya kiriman ulang dide-dup server;
  *   3. healTable()/effective() — membaca tabel kesulitan gabungan dari server dan
  *                   menerapkannya ke soal.
- * Penaksirnya (Fisher scoring per soal + pemusatan median) hidup di SERVER:
- * workers/api/evidence/item-pool-core.js. Konstanta yang harus sama di kedua sisi dikunci
- * tests/item-pool-test.js.
+ *   4. observeProbe() (Braincore langkah 3) — hasil PROBE RETENSI (3/7/21 hari setelah
+ *                   lesson dikuasai) sebagai penghitung [bucket retrievability -> n, benar]
+ *                   per hari, tanpa ID soal/lesson, untuk menyetel paruh-waktu ingatan.
+ * Penaksirnya (Fisher scoring per soal + pemusatan median) dan penyetel angka rumus berjalan
+ * di GitHub Actions (tools/item-pool-job.mjs, tools/brain-param-tune.mjs), memakai inti yang
+ * sama dengan server: workers/api/evidence/item-pool-core.js. Konstanta yang harus sama di
+ * kedua sisi (termasuk PARAM_VERSION di amplop) dikunci tests/item-pool-test.js.
  *
  * KENAPA HANYA JAWABAN PERTAMA
  * ----------------------------
@@ -80,6 +84,11 @@
     'cloze_production', 'grammar', 'cloze'
   ]);
 
+  /* Braincore langkah 3: versi konstanta yang membentuk bucket prediksi. Server membuang
+   * kiriman versi lain (bucket dengan a/c/paruh-waktu berbeda tidak bisa dibaca bersama).
+   * WAJIB identik dengan PARAM_VERSION di workers/api/evidence/item-pool-core.js. */
+  var PARAM_VERSION = 'a1.5-c0.25-h1.6';
+
   var LIMITS = Object.freeze({
     MAX_SEEN: 5000,             // soal yang pernah dijawab; penuh = berhenti berkontribusi
     MAX_PENDING_PER_DAY: 120,   // soal BARU per hari yang dicatat; lebih = diabaikan
@@ -92,7 +101,10 @@
      * MENAHAN catatannya bila server belum dinyalakan, supaya jawaban-pertama murid yang
      * terkumpul sebelum owner menyalakan lane tidak terbuang (soalnya sudah ditandai terlihat
      * dan tidak akan pernah menghasilkan jawaban-pertama lagi). */
-    OUTBOX_DAYS: 56
+    OUTBOX_DAYS: 56,
+    /* Probe retensi (langkah 3): paling banyak 50 jawaban probe per bucket per hari (batas
+     * server PROBE_LIMITS.MAX_PROBE_N) — lebih dari itu bukan pemakaian yang wajar. */
+    MAX_PROBE_N: 50
   });
 
   var APPLY = Object.freeze({
@@ -133,7 +145,7 @@
     return n;
   }
 
-  function emptyState() { return { schema: SCHEMA, seen: {}, pending: {}, outbox: [], nextTryAt: 0, attempt: 0 }; }
+  function emptyState() { return { schema: SCHEMA, seen: {}, pending: {}, probes: {}, outbox: [], nextTryAt: 0, attempt: 0 }; }
 
   /** State korup/asing -> state kosong; field yang rusak dibuang satu per satu. */
   function healState(raw) {
@@ -162,6 +174,21 @@
       }
       if (k) st.pending[day] = clean;
     }
+    var probes = raw.probes && typeof raw.probes === 'object' ? raw.probes : {};
+    for (var pday in probes) {
+      if (!hasOwn(probes, pday) || !DAY_RE.test(pday)) continue;
+      var pbag = probes[pday], pclean = {}, any = false;
+      if (!pbag || typeof pbag !== 'object') continue;
+      for (var rbKey in pbag) {
+        if (!hasOwn(pbag, rbKey)) continue;
+        var rb = Number(rbKey), cell = pbag[rbKey];
+        if (!(rb >= 0 && rb < P_BUCKETS && rb === Math.floor(rb)) || !Array.isArray(cell) || cell.length !== 2) continue;
+        var pn = cell[0], pk = cell[1];
+        if (!(pn >= 1 && pn <= LIMITS.MAX_PROBE_N && pn === Math.floor(pn)) || !(pk >= 0 && pk <= pn && pk === Math.floor(pk))) continue;
+        pclean[rb] = [pn, pk]; any = true;
+      }
+      if (any) st.probes[pday] = pclean;
+    }
     var outbox = Array.isArray(raw.outbox) ? raw.outbox : [];
     for (var i = 0; i < outbox.length && st.outbox.length < LIMITS.MAX_OUTBOX_EVENTS; i++) {
       var ev = healEvent(outbox[i]);
@@ -182,7 +209,19 @@
       if (!(r[1] >= 0 && r[1] < P_BUCKETS && r[1] === Math.floor(r[1])) || (r[2] !== 0 && r[2] !== 1)) continue;
       items.push([r[0], r[1], r[2]]);
     }
-    return items.length ? { eventId: ev.eventId, day: ev.day, items: items } : null;
+    var probes = [];
+    var psrc = Array.isArray(ev.probes) ? ev.probes : [];
+    for (var j = 0; j < psrc.length && probes.length < P_BUCKETS; j++) {
+      var q = psrc[j];
+      if (!Array.isArray(q) || q.length !== 3) continue;
+      if (!(q[0] >= 0 && q[0] < P_BUCKETS && q[0] === Math.floor(q[0]))) continue;
+      if (!(q[1] >= 1 && q[1] <= LIMITS.MAX_PROBE_N && q[1] === Math.floor(q[1])) || !(q[2] >= 0 && q[2] <= q[1] && q[2] === Math.floor(q[2]))) continue;
+      probes.push([q[0], q[1], q[2]]);
+    }
+    if (!items.length && !probes.length) return null;
+    var out = { eventId: ev.eventId, day: ev.day, items: items };
+    if (probes.length) out.probes = probes;
+    return out;
   }
 
   /**
@@ -218,6 +257,26 @@
   }
 
   /**
+   * Braincore langkah 3: satu jawaban PROBE RETENSI (jawaban pertama pada lesson yang sudah
+   * dikuasai setelah probe 3/7/21 harinya jatuh tempo). `rProbe` = retrievability yang
+   * DIPREDIKSI model ingatan saat soal disajikan. Yang disimpan hanya penghitung
+   * [bucket R -> n, benar] per hari — tanpa ID soal atau lesson. Probe tidak memakai aturan
+   * "jawaban pertama per soal": setiap probe memang satu pengukuran tersendiri.
+   */
+  function observeProbe(state, input, nowMs) {
+    var st = healState(state);
+    var rb = bucketOf(input && input.rProbe);
+    if (rb < 0) return { state: st, recorded: false, reason: 'no_prediction' };
+    if (typeof (input && input.ok) !== 'boolean') return { state: st, recorded: false, reason: 'no_outcome' };
+    var day = dayOf(nowMs);
+    var bag = st.probes[day] || (st.probes[day] = {});
+    var cell = bag[rb] || [0, 0];
+    if (cell[0] >= LIMITS.MAX_PROBE_N) return { state: st, recorded: false, reason: 'bucket_full' };
+    bag[rb] = [cell[0] + 1, cell[1] + (input.ok ? 1 : 0)];
+    return { state: st, recorded: true, reason: 'recorded' };
+  }
+
+  /**
    * Pindahkan catatan tertunda ke outbox sebagai event bereventId (dipotong per
    * MAX_ITEMS_PER_EVENT). eventId dibuat SEKALI di sini dan ikut setiap kiriman ulang,
    * sehingga respons yang hilang di jalan tidak menjadi hitungan ganda di server.
@@ -227,24 +286,35 @@
     var st = healState(state);
     var cutoff = dayOf((isFiniteNumber(nowMs) ? nowMs : 0) - LIMITS.OUTBOX_DAYS * DAY_MS);
     st.outbox = st.outbox.filter(function (ev) { return ev.day >= cutoff; });
-    var days = Object.keys(st.pending).sort();
+    var dayset = {};
+    Object.keys(st.pending).forEach(function (d) { dayset[d] = 1; });
+    Object.keys(st.probes).forEach(function (d) { dayset[d] = 1; });
+    var days = Object.keys(dayset).sort();
     for (var d = 0; d < days.length; d++) {
       var day = days[d];
-      if (day < cutoff) { delete st.pending[day]; continue; }
+      if (day < cutoff) { delete st.pending[day]; delete st.probes[day]; continue; }
       var rows = [];
-      var bag = st.pending[day];
+      var bag = st.pending[day] || {};
       for (var item in bag) if (hasOwn(bag, item)) rows.push([item, bag[item][0], bag[item][1]]);
+      var probeRows = [];
+      var pbag = st.probes[day] || {};
+      for (var rbKey in pbag) if (hasOwn(pbag, rbKey)) probeRows.push([Number(rbKey), pbag[rbKey][0], pbag[rbKey][1]]);
       var chunks = [];
       for (var i = 0; i < rows.length; i += LIMITS.MAX_ITEMS_PER_EVENT) chunks.push(rows.slice(i, i + LIMITS.MAX_ITEMS_PER_EVENT));
+      if (!chunks.length) chunks.push([]);
       if (st.outbox.length + chunks.length > LIMITS.MAX_OUTBOX_EVENTS) break;
       var events = [];
       for (var c = 0; c < chunks.length; c++) {
         var id = typeof uuidFn === 'function' ? String(uuidFn() || '') : '';
         if (!UUID_RE.test(id)) return st;
-        events.push({ eventId: id, day: day, items: chunks[c] });
+        var ev = { eventId: id, day: day, items: chunks[c] };
+        // Probe hari itu menumpang di event PERTAMA hari itu (satu kali, bukan per potongan).
+        if (c === 0 && probeRows.length) ev.probes = probeRows;
+        if (ev.items.length || ev.probes) events.push(ev);
       }
       Array.prototype.push.apply(st.outbox, events);
       delete st.pending[day];
+      delete st.probes[day];
     }
     return st;
   }
@@ -262,8 +332,11 @@
     return {
       schema: EVIDENCE_SCHEMA,
       batchId: String(batchId),
+      pv: PARAM_VERSION,
       events: st.outbox.slice(0, LIMITS.MAX_EVENTS_PER_BATCH).map(function (ev) {
-        return { eventId: ev.eventId, day: ev.day, items: ev.items.map(function (r) { return r.slice(); }) };
+        var out = { eventId: ev.eventId, day: ev.day, items: ev.items.map(function (r) { return r.slice(); }) };
+        if (ev.probes && ev.probes.length) out.probes = ev.probes.map(function (r) { return r.slice(); });
+        return out;
       })
     };
   }
@@ -343,6 +416,7 @@
   return {
     SCHEMA: SCHEMA,
     EVIDENCE_SCHEMA: EVIDENCE_SCHEMA,
+    PARAM_VERSION: PARAM_VERSION,
     TABLE_SCHEMA: TABLE_SCHEMA,
     DISCRIMINATION: DISCRIMINATION,
     GUESS_FLOOR: GUESS_FLOOR,
@@ -355,6 +429,7 @@
     bucketOf: bucketOf,
     healState: healState,
     observe: observe,
+    observeProbe: observeProbe,
     seal: seal,
     due: due,
     envelope: envelope,

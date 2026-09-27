@@ -18,7 +18,7 @@
  *   R1-R3  rute: saklar mati = 202 disabled / tabel kosong; hidup = tulis + baca;
  *   P1-P4  privasi: tanpa kolom penghubung, tanpa cookie, tanpa tabel lane lain, amplop tertutup;
  *   K1     paritas konstanta perangkat <-> server;
- *   A1-A5  app.js sungguhan (vm): catat, penempatan, kirim (disabled/ok/400/5xx), terapkan tabel;
+ *   A1-A5  app.js sungguhan (vm): catat, penempatan, kirim (disabled/ok/400/unknown_field/5xx), terapkan tabel;
  *   CI     gerbang terdaftar di quality.yml.
  *
  * Konvensi repo: tanpa dependensi, exit 1 saat gagal, baris akhir '<Nama>: PASS'.
@@ -106,6 +106,7 @@ function makeD1(files) {
   };
 }
 const MIG = path.join(root, 'workers/api/migrations/0015_item_pool.sql');
+const MIG16 = path.join(root, 'workers/api/migrations/0016_item_pool_probe.sql');
 
 (async () => {
   const core = await import(pathToFileURL(path.join(root, 'workers/api/evidence/item-pool-core.js')).href);
@@ -153,7 +154,8 @@ const MIG = path.join(root, 'workers/api/migrations/0015_item_pool.sql');
     st = Pool.seal(st, NOW + 2 * 3600000, uuid);
     const e2 = Pool.envelope(st, uuid());
     assert.strictEqual(e1.events[0].eventId, e2.events[0].eventId);
-    assert.deepStrictEqual(Object.keys(e1).sort(), ['batchId', 'events', 'schema']);
+    assert.deepStrictEqual(Object.keys(e1).sort(), ['batchId', 'events', 'pv', 'schema']);
+    assert.strictEqual(e1.pv, core.PARAM_VERSION, 'versi konstanta perangkat berbeda dari server');
     assert.deepStrictEqual(Object.keys(e1.events[0]).sort(), ['day', 'eventId', 'items']);
     st = Pool.ack(st, [e2.events[0].eventId]);
     assert.strictEqual(st.outbox.length, 0);
@@ -308,35 +310,47 @@ const MIG = path.join(root, 'workers/api/migrations/0015_item_pool.sql');
       const { it, rows } = world(4);
       const agg = new Map();
       for (const r of rows) { const k = r.item_id + '|' + r.pb; const a = agg.get(k) || { item_id: r.item_id, pb: r.pb, n: 0, k: 0 }; a.n++; a.k += r.k; agg.set(k, a); }
-      for (const a of agg.values()) await db.prepare(store.SQL.upsertItemPoolDaily).bind('2026-09-20', a.item_id, a.pb, a.n, a.k).run();
-      const res = await store.rebuildItemPoolTable(db, '2026-09-27');
+      for (const a of agg.values()) await db.prepare(store.SQL.upsertItemPoolDaily).bind('2026-10-01', a.item_id, a.pb, a.n, a.k).run();
+      const res = await store.rebuildItemPoolTable(db, '2026-10-10');
       assert.ok(res.items > 20, 'terlalu sedikit soal diterbitkan: ' + res.items);
-      const table = Pool.healTable(plain(await store.readItemPoolTable(db)), NOW);
-      assert.strictEqual(table.day, '2026-09-27');
+      const table = Pool.healTable(plain(await store.readItemPoolTable(db)), Date.parse('2026-10-10T10:00:00Z'));
+      assert.strictEqual(table.day, '2026-10-10');
       const m = rmse(it, table);
       assert.ok(m.pooled < m.prior * 0.8, `pooled ${m.pooled} vs prior ${m.prior}`);
       // Rebuild kedua mengganti UTUH: soal yang hilang dari jendela hilang dari tabel.
       await db.prepare('DELETE FROM item_pool_daily').run();
-      await store.rebuildItemPoolTable(db, '2026-09-27');
+      await store.rebuildItemPoolTable(db, '2026-10-11');
       assert.strictEqual(Object.keys((await store.readItemPoolTable(db)).items).length, 0);
+    });
+    await test('D2b · penghitung SEBELUM PARAM_EPOCH_DAY (konstanta lama) tidak ikut ditaksir', async () => {
+      const db = makeD1([MIG]);
+      for (let i = 0; i < 40; i++) await db.prepare(store.SQL.upsertItemPoolDaily).bind('2026-09-20', 'PR-101:apply_form', 14, 1, 0).run();
+      const res = await store.rebuildItemPoolTable(db, '2026-10-10');
+      assert.strictEqual(res.answers, 0);
+      assert.strictEqual(store.estimatorSince('2026-10-10'), core.PARAM_EPOCH_DAY);
+      assert.strictEqual(store.estimatorSince('2027-01-10'), '2026-11-15');
     });
     await test('D3 · jendela 56 hari: penghitung lebih tua tidak ikut ditaksir', async () => {
       const db = makeD1([MIG]);
-      for (let i = 0; i < 40; i++) await db.prepare(store.SQL.upsertItemPoolDaily).bind('2026-07-01', 'PR-101:apply_form', 14, 1, 0).run();
-      const res = await store.rebuildItemPoolTable(db, '2026-09-27');
+      for (let i = 0; i < 40; i++) await db.prepare(store.SQL.upsertItemPoolDaily).bind('2026-10-01', 'PR-101:apply_form', 14, 1, 0).run();
+      const res = await store.rebuildItemPoolTable(db, '2026-11-30');
       assert.strictEqual(res.answers, 0);
     });
-    await test('D5 · cron: saklar MATI tetap mempurge (tanpa membangun tabel); HIDUP membangun + mempurge', async () => {
+    await test('D5 · cron Worker HANYA mempurge (tabel dibangun GitHub Actions), saklar apa pun', async () => {
       const W = await import(pathToFileURL(path.join(root, 'workers/api/route-wiring.js')).href);
-      const db = makeD1([MIG]);
+      const db = makeD1([MIG, MIG16]);
       await db.prepare(store.SQL.upsertItemPoolDaily).bind('2026-05-01', 'PR-101:apply_form', 14, 1, 1).run();
+      await db.prepare(store.SQL.upsertItemPoolProbeDaily).bind('2026-05-01', 12, 3, 2).run();
       const off = await W.runItemPoolRollup({ EVIDENCE_DB: db }, NOW);
-      assert.deepStrictEqual(plain(off), { table: { skipped: 'disabled' }, purge: { dedup: 0, daily: 1 } });
+      assert.deepStrictEqual(plain(off), { purge: { dedup: 0, daily: 1, probe: 1 } });
       const on = await W.runItemPoolRollup({ EVIDENCE_DB: db, ITEM_POOL_ENABLED: 'on' }, NOW);
-      assert.strictEqual(on.table.items, 0); assert.deepStrictEqual(plain(on.purge), { dedup: 0, daily: 0 });
+      assert.deepStrictEqual(plain(on), { purge: { dedup: 0, daily: 0, probe: 0 } });
       assert.deepStrictEqual(plain(await W.runItemPoolRollup({}, NOW)), { skipped: 'no_binding' });
       const bare = await W.runItemPoolRollup({ EVIDENCE_DB: makeD1([]) }, NOW);
       assert.ok(bare.purge && bare.purge.error, 'migrasi belum diterapkan harus tertangkap sebagai {error}, bukan melempar');
+      const only15 = await W.runItemPoolRollup({ EVIDENCE_DB: makeD1([MIG]) }, NOW);
+      assert.deepStrictEqual(plain(only15), { purge: { dedup: 0, daily: 0, probe: null } }, 'tabel probe belum ada tidak boleh menggagalkan purge lainnya');
+      assert.ok(!/rebuildItemPoolTable/.test(wiring), 'cron Worker masih membangun tabel (melewati 10 ms CPU)');
     });
     await test('D4 · purge: dedup > 60 hari dan penghitung > 120 hari terhapus, yang baru tetap', async () => {
       const db = makeD1([MIG]);
@@ -346,7 +360,7 @@ const MIG = path.join(root, 'workers/api/migrations/0015_item_pool.sql');
       await db.prepare(store.SQL.upsertItemPoolDaily).bind('2026-05-01', 'PR-101:apply_form', 14, 1, 1).run();
       await db.prepare(store.SQL.upsertItemPoolDaily).bind('2026-09-01', 'PR-101:apply_form', 14, 1, 1).run();
       const out = await store.purgeItemPool(db, '2026-09-27');
-      assert.deepStrictEqual(out, { dedup: 1, daily: 1 });
+      assert.deepStrictEqual(out, { dedup: 1, daily: 1, probe: null });
     });
 
     /* ---------------------------------------------------------- rute */
@@ -508,7 +522,7 @@ const MIG = path.join(root, 'workers/api/migrations/0015_item_pool.sql');
     assert.ok(st.nextTryAt >= NOW + 12 * 3600000 - 1);
     const sent = JSON.parse(calls[calls.length - 1].init.body);
     assert.strictEqual(calls[calls.length - 1].init.credentials, 'omit');
-    assert.deepStrictEqual(Object.keys(sent).sort(), ['batchId', 'events', 'schema']);
+    assert.deepStrictEqual(Object.keys(sent).sort(), ['batchId', 'events', 'pv', 'schema']);
     reply = { status: 202, body: { ok: true, accepted: 1 } };
     r = await A.itemPoolFlush(NOW + 13 * 3600000);
     st = JSON.parse(store2[poolKey()]);
@@ -523,6 +537,24 @@ const MIG = path.join(root, 'workers/api/migrations/0015_item_pool.sql');
     reply = { status: 400, body: { ok: false, error: 'bad_items' } };
     await A.itemPoolFlush(st.nextTryAt + 1);
     assert.strictEqual(JSON.parse(store2[poolKey()]).outbox.length, 0, 'batch cacat diulang selamanya');
+  });
+  await test('A4b · 400 unknown_field (Worker lebih tua dari aplikasi) -> SIMPAN + backoff, lalu terkirim', async () => {
+    // Urutan rilis: situs terbit otomatis sesudah main hijau, Worker di-deploy owner belakangan.
+    // Worker lama menolak field baru (`pv`) dengan unknown_field; jawaban-pertama tidak boleh hilang.
+    A.itemPoolObserve(q('PR-104', 'apply_form', { __predictedPrior: 0.5 }), true);
+    const t0 = JSON.parse(store2[poolKey()]).nextTryAt || 0;
+    const at = Math.max(NOW + 20 * 3600000, t0 + 1);
+    reply = { status: 400, body: { ok: false, error: 'unknown_field', field: 'pv' } };
+    await A.itemPoolFlush(at);
+    let st = JSON.parse(store2[poolKey()]);
+    assert.strictEqual(st.outbox.length, 1, 'jawaban-pertama dibuang karena Worker belum di-deploy');
+    assert.ok(st.nextTryAt > at, 'harus menunggu (backoff), bukan mengulang terus');
+    const held = JSON.parse(calls[calls.length - 1].init.body).events[0].eventId;
+    reply = { status: 202, body: { ok: true, accepted: 1 } };
+    await A.itemPoolFlush(st.nextTryAt + 1);
+    st = JSON.parse(store2[poolKey()]);
+    assert.strictEqual(st.outbox.length, 0);
+    assert.strictEqual(JSON.parse(calls[calls.length - 1].init.body).events[0].eventId, held);
   });
   await test('A5 · tabel gabungan diterapkan lewat itemCalibrationEffective; tabel kosong = perilaku lama', async () => {
     const it = q('PR-101', 'apply_form');
