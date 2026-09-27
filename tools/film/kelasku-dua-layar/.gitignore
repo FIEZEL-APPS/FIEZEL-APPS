@@ -1,0 +1,8 @@
+# Keluaran render & VO
+out/
+node_modules/
+# Stem audio hasil sintesis (besar). Paket ZIP untuk owner sudah menyertakannya;
+# di repo, bangun ulang dengan: cd audio && python score.py && python sfx.py && python mix.py
+audio/stems/
+audio/mix-tanpa-vo.flac
+audio/__pycache__/
