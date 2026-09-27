@@ -2,15 +2,15 @@
   "schema": "fiezel-cloze-bank-v1",
   "generatedFrom": "grammar-templates.json",
   "counts": {
-    "templates": 328,
-    "items": 279,
-    "rejected": 49,
+    "templates": 452,
+    "items": 378,
+    "rejected": 74,
     "byLevel": {
-      "A2": 49,
+      "A2": 98,
       "B1": 86,
       "B2": 70,
       "C1": 30,
-      "A1": 25,
+      "A1": 75,
       "C2": 19
     }
   },
@@ -259,6 +259,131 @@
       "templateId": "EC-205",
       "reason": "no_blank_marker",
       "detail": "stem tidak memuat ___: jawaban template bukan token/frasa di dalam kalimat target"
+    },
+    {
+      "templateId": "A1-301",
+      "reason": "answer_too_short",
+      "detail": "jawaban \"He\" <3 karakter: grading edit-distance tidak andal"
+    },
+    {
+      "templateId": "A1-303",
+      "reason": "answer_too_short",
+      "detail": "jawaban \"My\" <3 karakter: grading edit-distance tidak andal"
+    },
+    {
+      "templateId": "A1-305",
+      "reason": "answer_too_short",
+      "detail": "jawaban \"is\" <3 karakter: grading edit-distance tidak andal"
+    },
+    {
+      "templateId": "A1-309",
+      "reason": "answer_too_short",
+      "detail": "jawaban \"an\" <3 karakter: grading edit-distance tidak andal"
+    },
+    {
+      "templateId": "A1-310",
+      "reason": "answer_too_short",
+      "detail": "jawaban \"a\" <3 karakter: grading edit-distance tidak andal"
+    },
+    {
+      "templateId": "A1-312",
+      "reason": "answer_too_short",
+      "detail": "jawaban \"a\" <3 karakter: grading edit-distance tidak andal"
+    },
+    {
+      "templateId": "A1-324",
+      "reason": "answer_ambiguous",
+      "detail": "jawaban \"your\" muncul 2x sebagai frasa utuh di kalimat target"
+    },
+    {
+      "templateId": "A1-327",
+      "reason": "answer_ambiguous",
+      "detail": "jawaban \"Has\" muncul 2x sebagai frasa utuh di kalimat target"
+    },
+    {
+      "templateId": "A1-329",
+      "reason": "answer_too_short",
+      "detail": "jawaban \"is\" <3 karakter: grading edit-distance tidak andal"
+    },
+    {
+      "templateId": "A1-331",
+      "reason": "answer_too_short",
+      "detail": "jawaban \"Is\" <3 karakter: grading edit-distance tidak andal"
+    },
+    {
+      "templateId": "A1-333",
+      "reason": "answer_too_short",
+      "detail": "jawaban \"in\" <3 karakter: grading edit-distance tidak andal"
+    },
+    {
+      "templateId": "A1-335",
+      "reason": "answer_too_short",
+      "detail": "jawaban \"on\" <3 karakter: grading edit-distance tidak andal"
+    },
+    {
+      "templateId": "A1-346",
+      "reason": "answer_ambiguous",
+      "detail": "jawaban \"Can\" muncul 2x sebagai frasa utuh di kalimat target"
+    },
+    {
+      "templateId": "A1-355",
+      "reason": "answer_ambiguous",
+      "detail": "jawaban \"Was\" muncul 2x sebagai frasa utuh di kalimat target"
+    },
+    {
+      "templateId": "A1-365",
+      "reason": "answer_too_short",
+      "detail": "jawaban \"in\" <3 karakter: grading edit-distance tidak andal"
+    },
+    {
+      "templateId": "A1-366",
+      "reason": "answer_too_short",
+      "detail": "jawaban \"on\" <3 karakter: grading edit-distance tidak andal"
+    },
+    {
+      "templateId": "A1-367",
+      "reason": "answer_too_short",
+      "detail": "jawaban \"at\" <3 karakter: grading edit-distance tidak andal"
+    },
+    {
+      "templateId": "A1-368",
+      "reason": "answer_too_short",
+      "detail": "jawaban \"in\" <3 karakter: grading edit-distance tidak andal"
+    },
+    {
+      "templateId": "A2-302",
+      "reason": "answer_too_short",
+      "detail": "jawaban \"be\" <3 karakter: grading edit-distance tidak andal"
+    },
+    {
+      "templateId": "A2-304",
+      "reason": "answer_too_short",
+      "detail": "jawaban \"go\" <3 karakter: grading edit-distance tidak andal"
+    },
+    {
+      "templateId": "A2-334",
+      "reason": "answer_too_short",
+      "detail": "jawaban \"an\" <3 karakter: grading edit-distance tidak andal"
+    },
+    {
+      "templateId": "A2-349",
+      "reason": "answer_too_short",
+      "detail": "jawaban \"in\" <3 karakter: grading edit-distance tidak andal"
+    },
+    {
+      "templateId": "A2-350",
+      "reason": "answer_too_short",
+      "detail": "jawaban \"at\" <3 karakter: grading edit-distance tidak andal"
+    },
+    {
+      "templateId": "A2-351",
+      "reason": "answer_too_short",
+      "detail": "jawaban \"on\" <3 karakter: grading edit-distance tidak andal"
+    },
+    {
+      "templateId": "A2-352",
+      "reason": "answer_too_short",
+      "detail": "jawaban \"at\" <3 karakter: grading edit-distance tidak andal"
     }
   ],
   "items": [
@@ -11246,6 +11371,3768 @@
         "rule": "Pengandaian formal kecil kemungkinan: Were + subjek + to + kata kerja dasar, … would + kata kerja dasar.",
         "memory": "If she were to → Were she to.",
         "avoid": "Tulis “If she were to accept”, lalu hapus “if” dan tuker: Were she to accept."
+      }
+    },
+    {
+      "id": "A1-302-cz0",
+      "templateId": "A1-302",
+      "skill": "subject_object_pronouns_and_possessives",
+      "level": "A1",
+      "sentence": "Ms. Rina is our teacher. We like ___ very much.",
+      "blank": {
+        "answer": "her",
+        "alternates": [],
+        "position": 33
+      },
+      "distractors": [
+        {
+          "text": "she",
+          "misconception": "subject-pronoun-in-object-position",
+          "whyFailsId": "bentuk subjek, padahal sesudah “like” butuh bentuk objek.",
+          "misconceptionId": "kata ganti subjek ditaruh di posisi objek."
+        },
+        {
+          "text": "hers",
+          "misconception": "possessive-form-as-person-object",
+          "whyFailsId": "artinya “punya dia”, bukan orangnya.",
+          "misconceptionId": "bentuk pemilik dipakai untuk menggantikan orangnya."
+        },
+        {
+          "text": "him",
+          "misconception": "pronoun gender does not match the person",
+          "whyFailsId": "untuk laki-laki, padahal “Ms. Rina” perempuan.",
+          "misconceptionId": "kata ganti untuk laki-laki dan perempuan tertukar."
+        }
+      ],
+      "explain": {
+        "why": "Titik-titiknya ada sesudah kata kerja “like” dan menunjuk “Ms. Rina”. Bentuk objeknya “her”.",
+        "rule": "Subjek: “I”, “he”, “she”. Sesudah kata kerja: “me”, “him”, “her”. Sebelum kata benda: “my”, “his”, “her”. Berdiri sendiri: “mine”, “his”, “hers”.",
+        "memory": "Sesudah kata kerja: “me”, “him”, “her”, “us”, “them”.",
+        "avoid": "Cek dulu posisi titik-titiknya: sebelum kata kerja, sesudah kata kerja, atau sebelum kata benda."
+      }
+    },
+    {
+      "id": "A1-304-cz0",
+      "templateId": "A1-304",
+      "skill": "subject_object_pronouns_and_possessives",
+      "level": "A1",
+      "sentence": "“Whose bag is this?” “It's ___. My name is on it.”",
+      "blank": {
+        "answer": "mine",
+        "alternates": [],
+        "position": 27
+      },
+      "distractors": [
+        {
+          "text": "my",
+          "misconception": "possessive adjective used without a noun",
+          "whyFailsId": "harus diikuti kata benda, padahal kalimatnya selesai di situ.",
+          "misconceptionId": "“my” dipakai tanpa kata benda sesudahnya."
+        },
+        {
+          "text": "me",
+          "misconception": "object-pronoun-substitution",
+          "whyFailsId": "bentuk objek, artinya bukan “punyaku”.",
+          "misconceptionId": "bentuk objek dipakai untuk menyebut pemilik."
+        },
+        {
+          "text": "I",
+          "misconception": "subject pronoun used to show ownership",
+          "whyFailsId": "bentuk subjek, nggak bisa menunjukkan pemilik tas.",
+          "misconceptionId": "kata ganti subjek dipakai untuk menunjukkan pemilik."
+        }
+      ],
+      "explain": {
+        "why": "Nggak ada kata benda sesudah titik-titik, jadi kata pemiliknya harus berdiri sendiri, yaitu “mine”.",
+        "rule": "Subjek: “I”, “he”, “she”. Sesudah kata kerja: “me”, “him”, “her”. Sebelum kata benda: “my”, “his”, “her”. Berdiri sendiri: “mine”, “his”, “hers”.",
+        "memory": "“My bag”, tapi “the bag is mine”.",
+        "avoid": "Cek dulu posisi titik-titiknya: sebelum kata kerja, sesudah kata kerja, atau sebelum kata benda."
+      }
+    },
+    {
+      "id": "A1-306-cz0",
+      "templateId": "A1-306",
+      "skill": "be_subject_agreement",
+      "level": "A1",
+      "sentence": "Rudi and I ___ in the same class.",
+      "blank": {
+        "answer": "are",
+        "alternates": [],
+        "position": 11
+      },
+      "distractors": [
+        {
+          "text": "am",
+          "misconception": "be verb matched to the nearest word instead of the whole subject",
+          "whyFailsId": "cuma cocok dengan kata “I”, padahal subjeknya “Rudi and I”.",
+          "misconceptionId": "“be” dicocokkan dengan kata terdekat, bukan dengan seluruh subjek."
+        },
+        {
+          "text": "is",
+          "misconception": "singular be",
+          "whyFailsId": "untuk satu orang, padahal di sini ada dua orang.",
+          "misconceptionId": "bentuk tunggal “is” dipakai untuk dua orang."
+        },
+        {
+          "text": "be",
+          "misconception": "base form",
+          "whyFailsId": "bentuk dasar, nggak bisa langsung dipakai sesudah subjek.",
+          "misconceptionId": "bentuk dasar “be” dipakai sebagai kata kerja utama."
+        }
+      ],
+      "explain": {
+        "why": "“Rudi and I” artinya dua orang, sama seperti “we”, jadi pakai “are”.",
+        "rule": "Subjek “I” pakai “am”. Subjek “he”, “she”, “it”, atau satu benda pakai “is”. Subjek “you”, “we”, “they”, atau lebih dari satu benda pakai “are”.",
+        "memory": "“Rudi and I” = “we”, jadi “we are”.",
+        "avoid": "Cari subjeknya dulu, lalu tanya: “I”, satu orang atau benda, atau lebih dari satu?"
+      }
+    },
+    {
+      "id": "A1-307-cz0",
+      "templateId": "A1-307",
+      "skill": "be_subject_agreement",
+      "level": "A1",
+      "sentence": "___ you ready for the test?",
+      "blank": {
+        "answer": "Are",
+        "alternates": [],
+        "position": 0
+      },
+      "distractors": [
+        {
+          "text": "Is",
+          "misconception": "he-she-it be form used with you",
+          "whyFailsId": "untuk “he”, “she”, atau “it”, bukan untuk “you”.",
+          "misconceptionId": "bentuk untuk “he”, “she”, “it” dipakai untuk “you”."
+        },
+        {
+          "text": "Am",
+          "misconception": "first-person be",
+          "whyFailsId": "cuma dipakai bersama “I”.",
+          "misconceptionId": "bentuk “am” dipakai untuk subjek selain “I”."
+        },
+        {
+          "text": "Do",
+          "misconception": "do added to a present be question",
+          "whyFailsId": "dipakai untuk kata kerja aksi, padahal “ready” butuh bentuk “be”.",
+          "misconceptionId": "kata bantu “do” dipakai di kalimat tanya yang butuh bentuk “be”."
+        }
+      ],
+      "explain": {
+        "why": "Subjeknya “you”, dan “you” selalu pakai “are”, termasuk di kalimat tanya.",
+        "rule": "Subjek “I” pakai “am”. Subjek “he”, “she”, “it”, atau satu benda pakai “is”. Subjek “you”, “we”, “they”, atau lebih dari satu benda pakai “are”.",
+        "memory": "“You are ready” jadi “Are you ready?”",
+        "avoid": "Cari subjeknya dulu, lalu tanya: “I”, satu orang atau benda, atau lebih dari satu?"
+      }
+    },
+    {
+      "id": "A1-308-cz0",
+      "templateId": "A1-308",
+      "skill": "be_subject_agreement",
+      "level": "A1",
+      "sentence": "These cookies ___ delicious!",
+      "blank": {
+        "answer": "are",
+        "alternates": [],
+        "position": 14
+      },
+      "distractors": [
+        {
+          "text": "is",
+          "misconception": "singular be",
+          "whyFailsId": "untuk satu benda, padahal “these cookies” banyak.",
+          "misconceptionId": "bentuk tunggal “is” dipakai untuk benda jamak."
+        },
+        {
+          "text": "am",
+          "misconception": "first-person be",
+          "whyFailsId": "cuma dipakai bersama “I”.",
+          "misconceptionId": "bentuk “am” dipakai untuk subjek selain “I”."
+        },
+        {
+          "text": "be",
+          "misconception": "base form",
+          "whyFailsId": "bentuk dasar, nggak bisa langsung dipakai sesudah subjek.",
+          "misconceptionId": "bentuk dasar “be” dipakai sebagai kata kerja utama."
+        }
+      ],
+      "explain": {
+        "why": "“These cookies” lebih dari satu, jadi pakai “are”.",
+        "rule": "Subjek “I” pakai “am”. Subjek “he”, “she”, “it”, atau satu benda pakai “is”. Subjek “you”, “we”, “they”, atau lebih dari satu benda pakai “are”.",
+        "memory": "Lihat akhiran -s: “cookies are”, “a cookie is”.",
+        "avoid": "Cari subjeknya dulu, lalu tanya: “I”, satu orang atau benda, atau lebih dari satu?"
+      }
+    },
+    {
+      "id": "A1-311-cz0",
+      "templateId": "A1-311",
+      "skill": "articles_a_an_the",
+      "level": "A1",
+      "sentence": "Close ___ door, please. It's cold.",
+      "blank": {
+        "answer": "the",
+        "alternates": [],
+        "position": 6
+      },
+      "distractors": [
+        {
+          "text": "a",
+          "misconception": "first-mention article reused",
+          "whyFailsId": "artinya pintu mana saja, padahal yang dimaksud pintu di ruangan ini.",
+          "misconceptionId": "“a” dipakai untuk benda yang sudah jelas yang mana."
+        },
+        {
+          "text": "an",
+          "misconception": "vowel-article before consonant sound",
+          "whyFailsId": "untuk bunyi vokal, padahal “door” diawali bunyi konsonan.",
+          "misconceptionId": "“an” dipakai tanpa mengecek bunyi awal katanya."
+        },
+        {
+          "text": "some",
+          "misconception": "plural-or-uncountable quantifier",
+          "whyFailsId": "untuk benda jamak atau yang nggak bisa dihitung, padahal pintunya satu.",
+          "misconceptionId": "kata jumlah untuk benda jamak dipakai untuk satu benda."
+        }
+      ],
+      "explain": {
+        "why": "Kita sama-sama tahu pintu yang mana: pintu di ruangan ini. Jadi pakai “the”.",
+        "rule": "“A” sebelum bunyi konsonan (“a cat”). “An” sebelum bunyi vokal (“an apple”, “an hour”). “The” kalau sudah jelas yang mana.",
+        "memory": "Sudah jelas yang mana? Pakai “the”, seperti “the door” di ruangan ini.",
+        "avoid": "Ucapkan kata sesudahnya dan dengarkan bunyi awalnya, bukan huruf awalnya."
+      }
+    },
+    {
+      "id": "A1-313-cz0",
+      "templateId": "A1-313",
+      "skill": "plural_nouns_basic",
+      "level": "A1",
+      "sentence": "There are three ___ on the table.",
+      "blank": {
+        "answer": "boxes",
+        "alternates": [],
+        "position": 16
+      },
+      "distractors": [
+        {
+          "text": "boxs",
+          "misconception": "simple-s-overgeneralization",
+          "whyFailsId": "cuma diberi -s, padahal sesudah huruf x harus -es.",
+          "misconceptionId": "akhiran -s dipakai ke semua kata tanpa melihat huruf akhirnya."
+        },
+        {
+          "text": "box",
+          "misconception": "singular-retention",
+          "whyFailsId": "masih bentuk tunggal, padahal “three” berarti lebih dari satu.",
+          "misconceptionId": "kata benda dibiarkan tunggal sesudah kata jumlah."
+        },
+        {
+          "text": "boxies",
+          "misconception": "-ies ending added to a word that does not end in consonant + y",
+          "whyFailsId": "memakai -ies, padahal -ies cuma untuk kata yang berakhiran konsonan + y.",
+          "misconceptionId": "akhiran -ies dipakai untuk kata yang nggak berakhiran konsonan + y."
+        }
+      ],
+      "explain": {
+        "why": "“Box” berakhiran x, jadi jamaknya tambah -es. Hasilnya “boxes”.",
+        "rule": "Kebanyakan kata benda tambah -s. Akhiran s, x, ch, sh tambah -es. Konsonan + y jadi -ies. Ada yang berubah: “child” jadi “children”, “man” jadi “men”.",
+        "memory": "Sesudah x, s, ch, sh: tambah -es. “Box” jadi “boxes”.",
+        "avoid": "Sesudah “two”, “three”, atau “many”, cek huruf terakhirnya, lalu pilih -s, -es, atau -ies."
+      }
+    },
+    {
+      "id": "A1-314-cz0",
+      "templateId": "A1-314",
+      "skill": "plural_nouns_basic",
+      "level": "A1",
+      "sentence": "My aunt has two ___.",
+      "blank": {
+        "answer": "babies",
+        "alternates": [],
+        "position": 16
+      },
+      "distractors": [
+        {
+          "text": "babys",
+          "misconception": "simple-s-overgeneralization",
+          "whyFailsId": "masih menyimpan huruf y, padahal sesudah konsonan, y harus jadi i dulu.",
+          "misconceptionId": "akhiran -s ditambah tanpa mengubah huruf y."
+        },
+        {
+          "text": "baby",
+          "misconception": "singular-retention",
+          "whyFailsId": "masih bentuk tunggal, padahal “two” berarti lebih dari satu.",
+          "misconceptionId": "kata benda dibiarkan tunggal sesudah kata jumlah."
+        },
+        {
+          "text": "babyes",
+          "misconception": "add-es-without-spelling-change",
+          "whyFailsId": "lupa mengubah huruf y jadi i sebelum -es.",
+          "misconceptionId": "akhiran -es ditambah tanpa mengubah y jadi i."
+        }
+      ],
+      "explain": {
+        "why": "“Baby” berakhiran konsonan + y, jadi y berubah jadi i lalu tambah -es. Hasilnya “babies”.",
+        "rule": "Kebanyakan kata benda tambah -s. Akhiran s, x, ch, sh tambah -es. Konsonan + y jadi -ies. Ada yang berubah: “child” jadi “children”, “man” jadi “men”.",
+        "memory": "Konsonan + y jadi -ies: “baby” jadi “babies”.",
+        "avoid": "Sesudah “two”, “three”, atau “many”, cek huruf terakhirnya, lalu pilih -s, -es, atau -ies."
+      }
+    },
+    {
+      "id": "A1-315-cz0",
+      "templateId": "A1-315",
+      "skill": "plural_nouns_basic",
+      "level": "A1",
+      "sentence": "Five ___ are playing football in the park.",
+      "blank": {
+        "answer": "men",
+        "alternates": [],
+        "position": 5
+      },
+      "distractors": [
+        {
+          "text": "mans",
+          "misconception": "simple-s-overgeneralization",
+          "whyFailsId": "memakai -s, padahal jamak kata ini berupa kata lain.",
+          "misconceptionId": "akhiran -s dipakai ke kata yang bentuk jamaknya khusus."
+        },
+        {
+          "text": "man",
+          "misconception": "singular-retention",
+          "whyFailsId": "masih bentuk tunggal, padahal “five” berarti lebih dari satu.",
+          "misconceptionId": "kata benda dibiarkan tunggal sesudah kata jumlah."
+        },
+        {
+          "text": "mens",
+          "misconception": "plural marked twice",
+          "whyFailsId": "menambah -s ke bentuk yang sudah jamak, jadi tanda jamaknya dobel.",
+          "misconceptionId": "tanda jamak dipakai dua kali."
+        }
+      ],
+      "explain": {
+        "why": "“Man” nggak beraturan: jamaknya “men”, tanpa -s.",
+        "rule": "Kebanyakan kata benda tambah -s. Akhiran s, x, ch, sh tambah -es. Konsonan + y jadi -ies. Ada yang berubah: “child” jadi “children”, “man” jadi “men”.",
+        "memory": "Satu “man”, dua “men”; satu “woman”, dua “women”.",
+        "avoid": "Sesudah “two”, “three”, atau “many”, cek huruf terakhirnya, lalu pilih -s, -es, atau -ies."
+      }
+    },
+    {
+      "id": "A1-316-cz0",
+      "templateId": "A1-316",
+      "skill": "plural_nouns_basic",
+      "level": "A1",
+      "sentence": "How many ___ are in your class?",
+      "blank": {
+        "answer": "students",
+        "alternates": [],
+        "position": 9
+      },
+      "distractors": [
+        {
+          "text": "student",
+          "misconception": "singular-retention",
+          "whyFailsId": "masih bentuk tunggal, padahal “how many” butuh kata benda jamak.",
+          "misconceptionId": "kata benda dibiarkan tunggal sesudah kata jumlah."
+        },
+        {
+          "text": "studentes",
+          "misconception": "-es added to a word that only needs -s",
+          "whyFailsId": "memakai -es, padahal -es cuma untuk kata berakhiran s, x, ch, atau sh.",
+          "misconceptionId": "akhiran -es ditambahkan ke kata yang cukup diberi -s."
+        },
+        {
+          "text": "studenties",
+          "misconception": "-ies ending added to a word that does not end in consonant + y",
+          "whyFailsId": "memakai -ies, padahal -ies cuma untuk kata yang berakhiran konsonan + y.",
+          "misconceptionId": "akhiran -ies dipakai untuk kata yang nggak berakhiran konsonan + y."
+        }
+      ],
+      "explain": {
+        "why": "“How many” menanyakan jumlah yang lebih dari satu, dan kebanyakan kata benda cukup tambah -s. Hasilnya “students”.",
+        "rule": "Kebanyakan kata benda tambah -s. Akhiran s, x, ch, sh tambah -es. Konsonan + y jadi -ies. Ada yang berubah: “child” jadi “children”, “man” jadi “men”.",
+        "memory": "“How many” + jamak: “how many students?”",
+        "avoid": "Sesudah “two”, “three”, atau “many”, cek huruf terakhirnya, lalu pilih -s, -es, atau -ies."
+      }
+    },
+    {
+      "id": "A1-317-cz0",
+      "templateId": "A1-317",
+      "skill": "demonstrative_reference_distance_this_these_that_those",
+      "level": "A1",
+      "sentence": "Look at ___ birds up in the sky!",
+      "blank": {
+        "answer": "those",
+        "alternates": [],
+        "position": 8
+      },
+      "distractors": [
+        {
+          "text": "these",
+          "misconception": "correctly matching plural but ignoring the distance cue",
+          "whyFailsId": "untuk benda dekat, padahal burungnya jauh di langit.",
+          "misconceptionId": "sudah benar soal banyaknya, tapi lupa letaknya jauh."
+        },
+        {
+          "text": "that",
+          "misconception": "correctly matching distance but ignoring plural agreement",
+          "whyFailsId": "untuk satu benda, padahal burungnya banyak.",
+          "misconceptionId": "sudah benar letaknya jauh, tapi lupa bendanya lebih dari satu."
+        },
+        {
+          "text": "this",
+          "misconception": "using a singular near demonstrative with a plural, distant noun",
+          "whyFailsId": "untuk satu benda dekat, padahal burungnya banyak dan jauh.",
+          "misconceptionId": "bentuk dekat untuk satu benda dipakai untuk banyak benda yang jauh."
+        }
+      ],
+      "explain": {
+        "why": "Burungnya jauh di langit dan jumlahnya banyak, jadi pakai “those”.",
+        "rule": "Dekat: “this” (satu), “these” (banyak). Jauh: “that” (satu), “those” (banyak).",
+        "memory": "Jauh dan banyak: “those birds”.",
+        "avoid": "Tanya dua hal: dekat atau jauh? Satu atau banyak?"
+      }
+    },
+    {
+      "id": "A1-318-cz0",
+      "templateId": "A1-318",
+      "skill": "demonstrative_reference_distance_this_these_that_those",
+      "level": "A1",
+      "sentence": "___ shoes on my feet are new.",
+      "blank": {
+        "answer": "These",
+        "alternates": [],
+        "position": 0
+      },
+      "distractors": [
+        {
+          "text": "Those",
+          "misconception": "correctly matching plural but ignoring the nearness cue",
+          "whyFailsId": "untuk benda jauh, padahal sepatunya ada di kakiku.",
+          "misconceptionId": "sudah benar soal banyaknya, tapi lupa letaknya dekat."
+        },
+        {
+          "text": "This",
+          "misconception": "correctly matching nearness but ignoring plural agreement",
+          "whyFailsId": "untuk satu benda, padahal sepatunya sepasang.",
+          "misconceptionId": "sudah benar letaknya dekat, tapi lupa bendanya lebih dari satu."
+        },
+        {
+          "text": "That",
+          "misconception": "using a singular far demonstrative with a plural, near noun",
+          "whyFailsId": "untuk satu benda jauh, padahal sepatunya dekat dan ada dua.",
+          "misconceptionId": "bentuk jauh untuk satu benda dipakai untuk banyak benda yang dekat."
+        }
+      ],
+      "explain": {
+        "why": "Sepatunya ada di kakiku, jadi dekat, dan jumlahnya dua. Karena itu pakai “These”.",
+        "rule": "Dekat: “this” (satu), “these” (banyak). Jauh: “that” (satu), “those” (banyak).",
+        "memory": "Dekat dan banyak: “these shoes”.",
+        "avoid": "Tanya dua hal: dekat atau jauh? Satu atau banyak?"
+      }
+    },
+    {
+      "id": "A1-319-cz0",
+      "templateId": "A1-319",
+      "skill": "demonstrative_reference_distance_this_these_that_those",
+      "level": "A1",
+      "sentence": "Can you see ___ house on the hill? My grandma lives there.",
+      "blank": {
+        "answer": "that",
+        "alternates": [],
+        "position": 12
+      },
+      "distractors": [
+        {
+          "text": "this",
+          "misconception": "correctly matching singular but ignoring the distance cue",
+          "whyFailsId": "untuk benda dekat, padahal rumahnya jauh di atas bukit.",
+          "misconceptionId": "sudah benar bendanya cuma satu, tapi lupa letaknya jauh."
+        },
+        {
+          "text": "those",
+          "misconception": "correctly matching distance but ignoring singular agreement",
+          "whyFailsId": "untuk banyak benda, padahal rumahnya cuma satu.",
+          "misconceptionId": "sudah benar letaknya jauh, tapi lupa bendanya cuma satu."
+        },
+        {
+          "text": "these",
+          "misconception": "using a plural near demonstrative with a singular, distant noun",
+          "whyFailsId": "untuk banyak benda dekat, padahal rumahnya satu dan jauh.",
+          "misconceptionId": "bentuk dekat untuk banyak benda dipakai untuk satu benda yang jauh."
+        }
+      ],
+      "explain": {
+        "why": "Rumahnya jauh di atas bukit dan cuma satu, jadi pakai “that”.",
+        "rule": "Dekat: “this” (satu), “these” (banyak). Jauh: “that” (satu), “those” (banyak).",
+        "memory": "Jauh dan satu: “that house”.",
+        "avoid": "Tanya dua hal: dekat atau jauh? Satu atau banyak?"
+      }
+    },
+    {
+      "id": "A1-320-cz0",
+      "templateId": "A1-320",
+      "skill": "demonstrative_reference_distance_this_these_that_those",
+      "level": "A1",
+      "sentence": "___ pencil in my hand is broken.",
+      "blank": {
+        "answer": "This",
+        "alternates": [],
+        "position": 0
+      },
+      "distractors": [
+        {
+          "text": "That",
+          "misconception": "correctly matching singular but ignoring the nearness cue",
+          "whyFailsId": "untuk benda jauh, padahal pensilnya ada di tanganku.",
+          "misconceptionId": "sudah benar bendanya cuma satu, tapi lupa letaknya dekat."
+        },
+        {
+          "text": "These",
+          "misconception": "correctly matching nearness but ignoring singular agreement",
+          "whyFailsId": "untuk banyak benda, padahal pensilnya cuma satu.",
+          "misconceptionId": "sudah benar letaknya dekat, tapi lupa bendanya cuma satu."
+        },
+        {
+          "text": "Those",
+          "misconception": "using a plural far demonstrative with a singular, near noun",
+          "whyFailsId": "untuk banyak benda jauh, padahal pensilnya satu dan dekat.",
+          "misconceptionId": "bentuk jauh untuk banyak benda dipakai untuk satu benda yang dekat."
+        }
+      ],
+      "explain": {
+        "why": "Pensilnya ada di tanganku, jadi dekat, dan cuma satu. Karena itu pakai “This”.",
+        "rule": "Dekat: “this” (satu), “these” (banyak). Jauh: “that” (satu), “those” (banyak).",
+        "memory": "Dekat dan satu: “this pencil”.",
+        "avoid": "Tanya dua hal: dekat atau jauh? Satu atau banyak?"
+      }
+    },
+    {
+      "id": "A1-321-cz0",
+      "templateId": "A1-321",
+      "skill": "possessive_adjectives",
+      "level": "A1",
+      "sentence": "The dog is happy. ___ tail is moving fast.",
+      "blank": {
+        "answer": "Its",
+        "alternates": [],
+        "position": 18
+      },
+      "distractors": [
+        {
+          "text": "It's",
+          "misconception": "its and it's confused",
+          "whyFailsId": "singkatan dari “it is”, bukan kata milik.",
+          "misconceptionId": "“its” (miliknya) tertukar dengan “it's” (dia adalah)."
+        },
+        {
+          "text": "It",
+          "misconception": "subject pronoun",
+          "whyFailsId": "bentuk subjek, padahal sebelum “tail” butuh bentuk pemilik.",
+          "misconceptionId": "kata ganti subjek ditaruh sebelum kata benda."
+        },
+        {
+          "text": "Their",
+          "misconception": "owner form does not match the number of owners",
+          "whyFailsId": "untuk pemilik yang banyak, padahal anjingnya cuma satu.",
+          "misconceptionId": "bentuk pemilik nggak cocok dengan jumlah pemiliknya."
+        }
+      ],
+      "explain": {
+        "why": "Pemiliknya anjing (“it”), dan ada kata benda sesudahnya, jadi pakai “Its” tanpa apostrof.",
+        "rule": "Sebelum kata benda, pakai bentuk pemilik: “I” jadi “my”, “he” jadi “his”, “she” jadi “her”, “it” jadi “its”, “we” jadi “our”, “they” jadi “their”.",
+        "memory": "“Its tail” = ekor si anjing. “It's” = “it is”.",
+        "avoid": "Cari pemiliknya dulu, lalu pastikan ada kata benda sesudah titik-titik."
+      }
+    },
+    {
+      "id": "A1-322-cz0",
+      "templateId": "A1-322",
+      "skill": "possessive_adjectives",
+      "level": "A1",
+      "sentence": "We love ___ new classroom. It is big and bright.",
+      "blank": {
+        "answer": "our",
+        "alternates": [],
+        "position": 8
+      },
+      "distractors": [
+        {
+          "text": "us",
+          "misconception": "object pronoun",
+          "whyFailsId": "bentuk objek, nggak bisa ditaruh sebelum kata benda.",
+          "misconceptionId": "kata ganti objek ditaruh sebelum kata benda."
+        },
+        {
+          "text": "we",
+          "misconception": "subject pronoun",
+          "whyFailsId": "bentuk subjek, padahal sebelum kata benda butuh bentuk pemilik.",
+          "misconceptionId": "kata ganti subjek ditaruh sebelum kata benda."
+        },
+        {
+          "text": "ours",
+          "misconception": "possessive pronoun",
+          "whyFailsId": "dipakai berdiri sendiri, bukan sebelum kata benda seperti “classroom”.",
+          "misconceptionId": "bentuk pemilik yang berdiri sendiri ditaruh sebelum kata benda."
+        }
+      ],
+      "explain": {
+        "why": "Pemiliknya “we”, dan sesudahnya ada kata benda “classroom”, jadi pakai “our”.",
+        "rule": "Sebelum kata benda, pakai bentuk pemilik: “I” jadi “my”, “he” jadi “his”, “she” jadi “her”, “it” jadi “its”, “we” jadi “our”, “they” jadi “their”.",
+        "memory": "“We” jadi “our”: “our class”, “our teacher”.",
+        "avoid": "Cari pemiliknya dulu, lalu pastikan ada kata benda sesudah titik-titik."
+      }
+    },
+    {
+      "id": "A1-323-cz0",
+      "templateId": "A1-323",
+      "skill": "possessive_adjectives",
+      "level": "A1",
+      "sentence": "Budi and Sari are washing ___ bikes.",
+      "blank": {
+        "answer": "their",
+        "alternates": [],
+        "position": 26
+      },
+      "distractors": [
+        {
+          "text": "they",
+          "misconception": "subject pronoun",
+          "whyFailsId": "bentuk subjek, padahal sebelum “bikes” butuh bentuk pemilik.",
+          "misconceptionId": "kata ganti subjek ditaruh sebelum kata benda."
+        },
+        {
+          "text": "them",
+          "misconception": "object pronoun",
+          "whyFailsId": "bentuk objek, nggak bisa ditaruh sebelum kata benda.",
+          "misconceptionId": "kata ganti objek ditaruh sebelum kata benda."
+        },
+        {
+          "text": "there",
+          "misconception": "their and there confused",
+          "whyFailsId": "bunyinya sama, tapi artinya tempat, bukan pemilik.",
+          "misconceptionId": "“their” (milik mereka) tertukar dengan “there” (di sana)."
+        }
+      ],
+      "explain": {
+        "why": "Pemiliknya Budi dan Sari (“they”), jadi sebelum “bikes” pakai “their”.",
+        "rule": "Sebelum kata benda, pakai bentuk pemilik: “I” jadi “my”, “he” jadi “his”, “she” jadi “her”, “it” jadi “its”, “we” jadi “our”, “they” jadi “their”.",
+        "memory": "“They” jadi “their”: “their bikes”.",
+        "avoid": "Cari pemiliknya dulu, lalu pastikan ada kata benda sesudah titik-titik."
+      }
+    },
+    {
+      "id": "A1-325-cz0",
+      "templateId": "A1-325",
+      "skill": "have_got_has_got",
+      "level": "A1",
+      "sentence": "My grandparents ___ got a big garden.",
+      "blank": {
+        "answer": "have",
+        "alternates": [],
+        "position": 16
+      },
+      "distractors": [
+        {
+          "text": "has",
+          "misconception": "he-she-it have form used with a plural subject",
+          "whyFailsId": "cuma untuk “he”, “she”, atau “it”, padahal “my grandparents” sama dengan “they”.",
+          "misconceptionId": "bentuk “has” untuk “he”, “she”, “it” dipakai untuk subjek jamak."
+        },
+        {
+          "text": "are",
+          "misconception": "be-verb substitution",
+          "whyFailsId": "menyatakan keadaan, bukan punya, jadi nggak bisa dipasangkan dengan “got”.",
+          "misconceptionId": "bentuk “be” dipakai untuk menyatakan punya."
+        },
+        {
+          "text": "do",
+          "misconception": "double-auxiliary construction",
+          "whyFailsId": "nggak pernah dipasangkan dengan “got”.",
+          "misconceptionId": "kata bantu “do” dipasangkan dengan “got”."
+        }
+      ],
+      "explain": {
+        "why": "“My grandparents” itu lebih dari satu orang, sama seperti “they”, jadi pakai “have got”.",
+        "rule": "“I”, “you”, “we”, “they” pakai “have got”. “He”, “she”, “it” pakai “has got”. Untuk bertanya, “have/has” pindah ke depan. Negatifnya “haven't/hasn't got”.",
+        "memory": "“They have got”, tapi “he has got”.",
+        "avoid": "Cari subjeknya dulu: “he”, “she”, “it” pakai “has”, yang lain pakai “have”. Jangan tambah “do”."
+      }
+    },
+    {
+      "id": "A1-326-cz0",
+      "templateId": "A1-326",
+      "skill": "have_got_has_got",
+      "level": "A1",
+      "sentence": "Dimas ___ got a bad cold today.",
+      "blank": {
+        "answer": "has",
+        "alternates": [],
+        "position": 6
+      },
+      "distractors": [
+        {
+          "text": "have",
+          "misconception": "plural-form transfer",
+          "whyFailsId": "untuk “I”, “you”, “we”, atau “they”, padahal Dimas cuma satu orang.",
+          "misconceptionId": "bentuk “have” dipakai untuk satu orang."
+        },
+        {
+          "text": "is",
+          "misconception": "be-verb substitution",
+          "whyFailsId": "menyatakan keadaan, bukan punya, jadi nggak bisa dipasangkan dengan “got”.",
+          "misconceptionId": "bentuk “be” dipakai untuk menyatakan punya."
+        },
+        {
+          "text": "does",
+          "misconception": "double-auxiliary construction",
+          "whyFailsId": "nggak pernah dipasangkan dengan “got” di kalimat biasa.",
+          "misconceptionId": "kata bantu “does” dipasangkan dengan “got”."
+        }
+      ],
+      "explain": {
+        "why": "“Dimas” itu satu orang, sama seperti “he”, jadi pakai “has got”.",
+        "rule": "“I”, “you”, “we”, “they” pakai “have got”. “He”, “she”, “it” pakai “has got”. Untuk bertanya, “have/has” pindah ke depan. Negatifnya “haven't/hasn't got”.",
+        "memory": "“He”, “she”, “it”: “has got a cold”.",
+        "avoid": "Cari subjeknya dulu: “he”, “she”, “it” pakai “has”, yang lain pakai “have”. Jangan tambah “do”."
+      }
+    },
+    {
+      "id": "A1-328-cz0",
+      "templateId": "A1-328",
+      "skill": "have_got_has_got",
+      "level": "A1",
+      "sentence": "Sorry, I ___ got any money with me today.",
+      "blank": {
+        "answer": "haven't",
+        "alternates": [],
+        "position": 9
+      },
+      "distractors": [
+        {
+          "text": "hasn't",
+          "misconception": "he-she-it have form used with I",
+          "whyFailsId": "untuk “he”, “she”, atau “it”, bukan untuk “I”.",
+          "misconceptionId": "bentuk “has” untuk “he”, “she”, “it” dipakai bersama “I”."
+        },
+        {
+          "text": "don't",
+          "misconception": "do-support with have got",
+          "whyFailsId": "nggak dipasangkan dengan “got”. Kalau ada “got”, negatifnya dibuat dari “have”.",
+          "misconceptionId": "“don't” dipakai untuk membuat negatif “have got”."
+        },
+        {
+          "text": "am not",
+          "misconception": "be-verb substitution",
+          "whyFailsId": "menyatakan keadaan, jadi nggak bisa dipasangkan dengan “got” untuk bilang nggak punya.",
+          "misconceptionId": "bentuk “be” dipakai untuk menyatakan nggak punya."
+        }
+      ],
+      "explain": {
+        "why": "Subjeknya “I”, dan bentuk negatif “have got” adalah “haven't got”.",
+        "rule": "“I”, “you”, “we”, “they” pakai “have got”. “He”, “she”, “it” pakai “has got”. Untuk bertanya, “have/has” pindah ke depan. Negatifnya “haven't/hasn't got”.",
+        "memory": "“I haven't got”, tapi “she hasn't got”.",
+        "avoid": "Cari subjeknya dulu: “he”, “she”, “it” pakai “has”, yang lain pakai “have”. Jangan tambah “do”."
+      }
+    },
+    {
+      "id": "A1-330-cz0",
+      "templateId": "A1-330",
+      "skill": "there_is_are",
+      "level": "A1",
+      "sentence": "There ___ five people in my family.",
+      "blank": {
+        "answer": "are",
+        "alternates": [],
+        "position": 6
+      },
+      "distractors": [
+        {
+          "text": "is",
+          "misconception": "singular agreement",
+          "whyFailsId": "untuk satu benda, padahal orangnya lima.",
+          "misconceptionId": "bentuk tunggal dipakai untuk banyak orang."
+        },
+        {
+          "text": "have",
+          "misconception": "have used to say that something exists",
+          "whyFailsId": "artinya “punya”, bukan “ada”. Arti “ada” di sini dibentuk dengan “there” + bentuk “be”.",
+          "misconceptionId": "“have” dipakai untuk bilang ada sesuatu di suatu tempat, seperti kata “ada”."
+        },
+        {
+          "text": "am",
+          "misconception": "first-person be",
+          "whyFailsId": "cuma dipakai bersama “I”.",
+          "misconceptionId": "bentuk “am” dipakai sesudah “there”."
+        }
+      ],
+      "explain": {
+        "why": "“Five people” lebih dari satu, jadi pakai “are”.",
+        "rule": "“There is” untuk satu benda atau benda yang nggak bisa dihitung, seperti “milk”. “There are” untuk banyak benda. Kalau bertanya, kata kerjanya pindah ke depan “there”.",
+        "memory": "Lima orang atau banyak benda: “there are”.",
+        "avoid": "Lihat benda sesudah titik-titik: satu benda atau benda seperti “milk” pakai “is”, banyak benda pakai “are”."
+      }
+    },
+    {
+      "id": "A1-332-cz0",
+      "templateId": "A1-332",
+      "skill": "there_is_are",
+      "level": "A1",
+      "sentence": "“___ there any cookies in the jar?” “No, there aren't.”",
+      "blank": {
+        "answer": "Are",
+        "alternates": [],
+        "position": 1
+      },
+      "distractors": [
+        {
+          "text": "Is",
+          "misconception": "singular agreement",
+          "whyFailsId": "untuk satu benda, padahal “cookies” banyak.",
+          "misconceptionId": "bentuk tunggal dipakai untuk banyak benda."
+        },
+        {
+          "text": "Have",
+          "misconception": "have used to say that something exists",
+          "whyFailsId": "nggak bisa dipakai untuk bertanya “ada nggak?”. Pertanyaan itu memakai bentuk “be” + “there”.",
+          "misconceptionId": "“have” dipakai untuk bilang ada sesuatu di suatu tempat, seperti kata “ada”."
+        },
+        {
+          "text": "Do",
+          "misconception": "do added to a present be question",
+          "whyFailsId": "nggak dipakai bersama “there”, dan jawabannya pun memakai “there aren't”, bukan “don't”.",
+          "misconceptionId": "kata bantu “do” dipakai di kalimat tanya yang butuh bentuk “be”."
+        }
+      ],
+      "explain": {
+        "why": "“Cookies” itu banyak benda, jadi kalimat tanyanya diawali “Are”. Jawaban “there aren't” juga menunjukkannya.",
+        "rule": "“There is” untuk satu benda atau benda yang nggak bisa dihitung, seperti “milk”. “There are” untuk banyak benda. Kalau bertanya, kata kerjanya pindah ke depan “there”.",
+        "memory": "Banyak benda: “Are there any…?”",
+        "avoid": "Lihat benda sesudah titik-titik: satu benda atau benda seperti “milk” pakai “is”, banyak benda pakai “are”."
+      }
+    },
+    {
+      "id": "A1-334-cz0",
+      "templateId": "A1-334",
+      "skill": "place_prepositions_basic",
+      "level": "A1",
+      "sentence": "Sit ___ me, Rina. This chair is empty.",
+      "blank": {
+        "answer": "next to",
+        "alternates": [],
+        "position": 4
+      },
+      "distractors": [
+        {
+          "text": "on",
+          "misconception": "surface preposition used for a position beside",
+          "whyFailsId": "artinya duduk di atas badanku, bukan di kursi sebelahku.",
+          "misconceptionId": "kata untuk “di atas permukaan” dipakai untuk posisi di samping."
+        },
+        {
+          "text": "in",
+          "misconception": "inside preposition used for a position beside",
+          "whyFailsId": "artinya masuk ke dalam badanku, dan itu nggak mungkin.",
+          "misconceptionId": "kata untuk “di dalam” dipakai untuk posisi di samping."
+        },
+        {
+          "text": "under",
+          "misconception": "below preposition used for a position beside",
+          "whyFailsId": "artinya di bawahku, padahal kursinya ada di sampingku.",
+          "misconceptionId": "kata untuk “di bawah” dipakai untuk posisi di samping."
+        }
+      ],
+      "explain": {
+        "why": "Kursi kosongnya ada di sampingku, jadi pakai “next to”.",
+        "rule": "“In” artinya di dalam, “on” artinya menempel di permukaan, “under” artinya di bawah, dan “next to” artinya di samping. Contoh: “in the box”, “on the wall”.",
+        "memory": "Di sampingmu, di kursi sebelah: “next to”.",
+        "avoid": "Bayangkan dulu posisinya: di dalam, di permukaan, di bawah, atau di samping?"
+      }
+    },
+    {
+      "id": "A1-336-cz0",
+      "templateId": "A1-336",
+      "skill": "place_prepositions_basic",
+      "level": "A1",
+      "sentence": "Your pencil fell. Look ___ your chair!",
+      "blank": {
+        "answer": "under",
+        "alternates": [],
+        "position": 23
+      },
+      "distractors": [
+        {
+          "text": "on",
+          "misconception": "surface-reading despite hidden cue",
+          "whyFailsId": "artinya di atas dudukan kursi, padahal pensil yang jatuh ada di lantai.",
+          "misconceptionId": "letak di bawah kursi dibaca sebagai di atas kursi."
+        },
+        {
+          "text": "in",
+          "misconception": "container-reading",
+          "whyFailsId": "berarti di dalam, padahal kursi nggak punya bagian dalam. Pensilnya ada di bawah kursi.",
+          "misconceptionId": "kursi dianggap wadah, padahal pensilnya jatuh ke bawah."
+        },
+        {
+          "text": "to",
+          "misconception": "movement-preposition-substitution",
+          "whyFailsId": "menunjukkan arah gerak, bukan letak pensilnya.",
+          "misconceptionId": "kata depan gerak dipakai untuk menunjuk letak benda."
+        }
+      ],
+      "explain": {
+        "why": "Pensil yang jatuh ada di lantai, di bawah kursi, jadi pakai “under”.",
+        "rule": "“In” artinya di dalam, “on” artinya menempel di permukaan, “under” artinya di bawah, dan “next to” artinya di samping. Contoh: “in the box”, “on the wall”.",
+        "memory": "Barangnya jatuh? Cari di bawah: “under”.",
+        "avoid": "Bayangkan dulu posisinya: di dalam, di permukaan, di bawah, atau di samping?"
+      }
+    },
+    {
+      "id": "A1-337-cz0",
+      "templateId": "A1-337",
+      "skill": "present_simple_basics",
+      "level": "A1",
+      "sentence": "My dad ___ the news every evening.",
+      "blank": {
+        "answer": "watches",
+        "alternates": [],
+        "position": 7
+      },
+      "distractors": [
+        {
+          "text": "watch",
+          "misconception": "base-form overuse",
+          "whyFailsId": "nggak punya akhiran, padahal “my dad” sama dengan “he”.",
+          "misconceptionId": "bentuk dasar dipakai untuk “he”."
+        },
+        {
+          "text": "watchs",
+          "misconception": "-s added where the verb needs -es",
+          "whyFailsId": "cuma diberi -s, padahal sesudah ch harus -es.",
+          "misconceptionId": "akhiran -s ditambahkan, padahal kata kerja ini butuh -es."
+        },
+        {
+          "text": "watching",
+          "misconception": "progressive confusion",
+          "whyFailsId": "bentuk -ing butuh “is” di depannya, dan “every evening” menunjukkan kebiasaan.",
+          "misconceptionId": "bentuk -ing dipakai tanpa “is” untuk kebiasaan."
+        }
+      ],
+      "explain": {
+        "why": "“My dad” sama dengan “he”, dan “watch” berakhiran ch, jadi tambah -es. Hasilnya “watches”.",
+        "rule": "Subjek “he”, “she”, “it” + kata kerja -s (“plays”). Akhiran s, sh, ch, x, o tambah -es (“watches”). Konsonan + y jadi -ies (“cries”). Subjek lain pakai bentuk dasar.",
+        "memory": "Akhiran ch, sh, s, x, o: tambah -es. “He watches”, “she goes”.",
+        "avoid": "Cari subjeknya dulu: “he”, “she”, “it”, atau satu orang? Tambah -s. Kalau bukan, pakai bentuk dasar."
+      }
+    },
+    {
+      "id": "A1-338-cz0",
+      "templateId": "A1-338",
+      "skill": "present_simple_basics",
+      "level": "A1",
+      "sentence": "My friends ___ badminton on Saturdays.",
+      "blank": {
+        "answer": "play",
+        "alternates": [],
+        "position": 11
+      },
+      "distractors": [
+        {
+          "text": "plays",
+          "misconception": "adds -s to the verb although the subject is plural",
+          "whyFailsId": "memakai -s, padahal -s cuma untuk “he”, “she”, atau “it”, dan “my friends” banyak.",
+          "misconceptionId": "akhiran -s ditambahkan untuk subjek jamak."
+        },
+        {
+          "text": "playing",
+          "misconception": "progressive confusion",
+          "whyFailsId": "bentuk -ing butuh “are” di depannya, dan “on Saturdays” menunjukkan kebiasaan.",
+          "misconceptionId": "bentuk -ing dipakai tanpa kata bantu untuk kebiasaan."
+        },
+        {
+          "text": "is playing",
+          "misconception": "singular progressive used for a plural habit",
+          "whyFailsId": "untuk satu orang yang sedang melakukan sesuatu sekarang, padahal ini kebiasaan banyak teman.",
+          "misconceptionId": "bentuk yang sedang berlangsung dipakai untuk kebiasaan, dan bentuk satu orangnya pun nggak cocok."
+        }
+      ],
+      "explain": {
+        "why": "“My friends” sama dengan “they”, jadi kata kerjanya tetap bentuk dasar, yaitu “play”.",
+        "rule": "Subjek “he”, “she”, “it” + kata kerja -s (“plays”). Akhiran s, sh, ch, x, o tambah -es (“watches”). Konsonan + y jadi -ies (“cries”). Subjek lain pakai bentuk dasar.",
+        "memory": "“They play”, tapi “he plays”.",
+        "avoid": "Cari subjeknya dulu: “he”, “she”, “it”, atau satu orang? Tambah -s. Kalau bukan, pakai bentuk dasar."
+      }
+    },
+    {
+      "id": "A1-339-cz0",
+      "templateId": "A1-339",
+      "skill": "present_simple_basics",
+      "level": "A1",
+      "sentence": "Sinta ___ to school at 6:30 every day.",
+      "blank": {
+        "answer": "goes",
+        "alternates": [],
+        "position": 6
+      },
+      "distractors": [
+        {
+          "text": "go",
+          "misconception": "base-form overuse",
+          "whyFailsId": "nggak punya akhiran, padahal Sinta sama dengan “she”.",
+          "misconceptionId": "bentuk dasar dipakai untuk “she”."
+        },
+        {
+          "text": "gos",
+          "misconception": "-s added where the verb needs -es",
+          "whyFailsId": "cuma diberi -s, padahal sesudah o harus -es.",
+          "misconceptionId": "akhiran -s ditambahkan, padahal kata kerja ini butuh -es."
+        },
+        {
+          "text": "going",
+          "misconception": "progressive confusion",
+          "whyFailsId": "bentuk -ing butuh “is” di depannya, dan “every day” menunjukkan kebiasaan.",
+          "misconceptionId": "bentuk -ing dipakai tanpa “is” untuk kebiasaan."
+        }
+      ],
+      "explain": {
+        "why": "“Sinta” sama dengan “she”, dan “go” berakhiran o, jadi tambah -es. Hasilnya “goes”.",
+        "rule": "Subjek “he”, “she”, “it” + kata kerja -s (“plays”). Akhiran s, sh, ch, x, o tambah -es (“watches”). Konsonan + y jadi -ies (“cries”). Subjek lain pakai bentuk dasar.",
+        "memory": "“Go” jadi “goes”, “do” jadi “does”.",
+        "avoid": "Cari subjeknya dulu: “he”, “she”, “it”, atau satu orang? Tambah -s. Kalau bukan, pakai bentuk dasar."
+      }
+    },
+    {
+      "id": "A1-340-cz0",
+      "templateId": "A1-340",
+      "skill": "present_simple_basics",
+      "level": "A1",
+      "sentence": "The baby ___ a lot at night.",
+      "blank": {
+        "answer": "cries",
+        "alternates": [],
+        "position": 9
+      },
+      "distractors": [
+        {
+          "text": "crys",
+          "misconception": "-s added to a consonant + y verb without changing y",
+          "whyFailsId": "masih menyimpan huruf y, padahal sesudah konsonan, y harus jadi i dulu.",
+          "misconceptionId": "kata kerja berakhiran konsonan + y diberi -s tanpa mengubah y jadi i."
+        },
+        {
+          "text": "cry",
+          "misconception": "base-form overuse",
+          "whyFailsId": "nggak punya akhiran, padahal “the baby” itu satu orang.",
+          "misconceptionId": "bentuk dasar dipakai untuk satu orang."
+        },
+        {
+          "text": "crying",
+          "misconception": "progressive confusion",
+          "whyFailsId": "bentuk -ing butuh “is” di depannya, dan “a lot at night” menunjukkan kebiasaan.",
+          "misconceptionId": "bentuk -ing dipakai tanpa “is” untuk kebiasaan."
+        }
+      ],
+      "explain": {
+        "why": "“The baby” itu satu orang, dan “cry” berakhiran konsonan + y, jadi tulisannya “cries”.",
+        "rule": "Subjek “he”, “she”, “it” + kata kerja -s (“plays”). Akhiran s, sh, ch, x, o tambah -es (“watches”). Konsonan + y jadi -ies (“cries”). Subjek lain pakai bentuk dasar.",
+        "memory": "Konsonan + y: “cry” jadi “cries”, “study” jadi “studies”.",
+        "avoid": "Cari subjeknya dulu: “he”, “she”, “it”, atau satu orang? Tambah -s. Kalau bukan, pakai bentuk dasar."
+      }
+    },
+    {
+      "id": "A1-341-cz0",
+      "templateId": "A1-341",
+      "skill": "question_words_basic",
+      "level": "A1",
+      "sentence": "“___ is your English teacher?” “Mr. Budi.”",
+      "blank": {
+        "answer": "Who",
+        "alternates": [],
+        "position": 1
+      },
+      "distractors": [
+        {
+          "text": "What",
+          "misconception": "what used when the answer is not a thing",
+          "whyFailsId": "menanyakan benda, padahal jawabannya orang.",
+          "misconceptionId": "kata tanya untuk benda dipakai untuk menanyakan orang."
+        },
+        {
+          "text": "Where",
+          "misconception": "where used when the answer is not a place",
+          "whyFailsId": "menanyakan tempat, padahal jawabannya orang.",
+          "misconceptionId": "kata tanya untuk tempat dipakai untuk menanyakan orang."
+        },
+        {
+          "text": "When",
+          "misconception": "when used when the answer is not a time",
+          "whyFailsId": "menanyakan waktu, padahal jawabannya orang.",
+          "misconceptionId": "kata tanya untuk waktu dipakai untuk menanyakan orang."
+        }
+      ],
+      "explain": {
+        "why": "Jawabannya “Mr. Budi”, yaitu orang, jadi bertanya dengan “Who”.",
+        "rule": "“Who” menanyakan orang, “what” benda, “where” tempat, “when” waktu, “why” alasan, dan “how” cara.",
+        "memory": "Jawabannya orang? Tanya dengan “Who”.",
+        "avoid": "Baca jawabannya dulu. Isinya orang, benda, tempat, waktu, alasan, atau cara?"
+      }
+    },
+    {
+      "id": "A1-342-cz0",
+      "templateId": "A1-342",
+      "skill": "question_words_basic",
+      "level": "A1",
+      "sentence": "“___ are you sad?” “Because my cat is sick.”",
+      "blank": {
+        "answer": "Why",
+        "alternates": [],
+        "position": 1
+      },
+      "distractors": [
+        {
+          "text": "What",
+          "misconception": "what used when the answer is not a thing",
+          "whyFailsId": "menanyakan benda, padahal jawabannya alasan.",
+          "misconceptionId": "kata tanya untuk benda dipakai untuk menanyakan alasan."
+        },
+        {
+          "text": "Where",
+          "misconception": "where used when the answer is not a place",
+          "whyFailsId": "menanyakan tempat, padahal jawabannya alasan.",
+          "misconceptionId": "kata tanya untuk tempat dipakai untuk menanyakan alasan."
+        },
+        {
+          "text": "When",
+          "misconception": "when used when the answer is not a time",
+          "whyFailsId": "menanyakan waktu, padahal jawabannya alasan.",
+          "misconceptionId": "kata tanya untuk waktu dipakai untuk menanyakan alasan."
+        }
+      ],
+      "explain": {
+        "why": "Jawabannya diawali “Because”, yaitu alasan, jadi bertanya dengan “Why”.",
+        "rule": "“Who” menanyakan orang, “what” benda, “where” tempat, “when” waktu, “why” alasan, dan “how” cara.",
+        "memory": "Ada “because” di jawabannya? Tanya dengan “Why”.",
+        "avoid": "Baca jawabannya dulu. Isinya orang, benda, tempat, waktu, alasan, atau cara?"
+      }
+    },
+    {
+      "id": "A1-343-cz0",
+      "templateId": "A1-343",
+      "skill": "question_words_basic",
+      "level": "A1",
+      "sentence": "“___ do you go to school?” “By bus.”",
+      "blank": {
+        "answer": "How",
+        "alternates": [],
+        "position": 1
+      },
+      "distractors": [
+        {
+          "text": "What",
+          "misconception": "what used when the answer is not a thing",
+          "whyFailsId": "menanyakan benda, padahal jawabannya cara pergi.",
+          "misconceptionId": "kata tanya untuk benda dipakai untuk menanyakan cara."
+        },
+        {
+          "text": "Where",
+          "misconception": "where used when the answer is not a place",
+          "whyFailsId": "menanyakan tempat, padahal jawabannya cara pergi, bukan tujuannya.",
+          "misconceptionId": "kata tanya untuk tempat dipakai untuk menanyakan cara."
+        },
+        {
+          "text": "When",
+          "misconception": "when used when the answer is not a time",
+          "whyFailsId": "menanyakan waktu, padahal jawabannya cara pergi.",
+          "misconceptionId": "kata tanya untuk waktu dipakai untuk menanyakan cara."
+        }
+      ],
+      "explain": {
+        "why": "“By bus” menjelaskan caranya pergi, jadi bertanya dengan “How”.",
+        "rule": "“Who” menanyakan orang, “what” benda, “where” tempat, “when” waktu, “why” alasan, dan “how” cara.",
+        "memory": "“By bus”, “by bike”, “on foot”: tanya dengan “How”.",
+        "avoid": "Baca jawabannya dulu. Isinya orang, benda, tempat, waktu, alasan, atau cara?"
+      }
+    },
+    {
+      "id": "A1-344-cz0",
+      "templateId": "A1-344",
+      "skill": "question_words_basic",
+      "level": "A1",
+      "sentence": "“___ is in your bag?” “My lunch box.”",
+      "blank": {
+        "answer": "What",
+        "alternates": [],
+        "position": 1
+      },
+      "distractors": [
+        {
+          "text": "Who",
+          "misconception": "who used when the answer is not a person",
+          "whyFailsId": "menanyakan orang, padahal jawabannya benda.",
+          "misconceptionId": "kata tanya untuk orang dipakai untuk menanyakan benda."
+        },
+        {
+          "text": "Where",
+          "misconception": "where used when the answer is not a place",
+          "whyFailsId": "menanyakan tempat, padahal jawabannya benda.",
+          "misconceptionId": "kata tanya untuk tempat dipakai untuk menanyakan benda."
+        },
+        {
+          "text": "When",
+          "misconception": "when used when the answer is not a time",
+          "whyFailsId": "menanyakan waktu, padahal jawabannya benda.",
+          "misconceptionId": "kata tanya untuk waktu dipakai untuk menanyakan benda."
+        }
+      ],
+      "explain": {
+        "why": "“My lunch box” itu benda, jadi bertanya dengan “What”.",
+        "rule": "“Who” menanyakan orang, “what” benda, “where” tempat, “when” waktu, “why” alasan, dan “how” cara.",
+        "memory": "Jawabannya benda? Tanya dengan “What”.",
+        "avoid": "Baca jawabannya dulu. Isinya orang, benda, tempat, waktu, alasan, atau cara?"
+      }
+    },
+    {
+      "id": "A1-345-cz0",
+      "templateId": "A1-345",
+      "skill": "can_ability",
+      "level": "A1",
+      "sentence": "My little brother can ___ to ten in English.",
+      "blank": {
+        "answer": "count",
+        "alternates": [],
+        "position": 22
+      },
+      "distractors": [
+        {
+          "text": "counts",
+          "misconception": "-s added to the verb after can",
+          "whyFailsId": "memakai -s, padahal sesudah “can” nggak ada -s, walaupun subjeknya “he” atau “she”.",
+          "misconceptionId": "akhiran -s ditambahkan ke kata kerja sesudah “can”."
+        },
+        {
+          "text": "to count",
+          "misconception": "adds 'to' after the modal can",
+          "whyFailsId": "memakai “to”, padahal “can” nggak pernah diikuti “to”.",
+          "misconceptionId": "kata “to” ditambahkan sesudah “can”."
+        },
+        {
+          "text": "counting",
+          "misconception": "-ing form used after can",
+          "whyFailsId": "memakai -ing, padahal sesudah “can” kata kerjanya harus bentuk dasar.",
+          "misconceptionId": "bentuk -ing dipakai sesudah “can”."
+        }
+      ],
+      "explain": {
+        "why": "Sesudah “can”, kata kerjanya bentuk dasar tanpa tambahan, jadi “can count”.",
+        "rule": "“Can” + kata kerja dasar, sama untuk semua subjek: “I can swim”, “she can swim”. Negatifnya “can't swim”. Untuk bertanya: “Can you swim?”",
+        "memory": "“Can” + kata kerja bentuk dasar: “can count”, “can swim”.",
+        "avoid": "Sesudah “can” atau “can't”, tulis kata kerjanya persis seperti di kamus: tanpa “to”, tanpa -s, tanpa -ing."
+      }
+    },
+    {
+      "id": "A1-347-cz0",
+      "templateId": "A1-347",
+      "skill": "can_ability",
+      "level": "A1",
+      "sentence": "Nadia ___ play the guitar, but she can sing.",
+      "blank": {
+        "answer": "can't",
+        "alternates": [],
+        "position": 6
+      },
+      "distractors": [
+        {
+          "text": "doesn't can",
+          "misconception": "do auxiliary",
+          "whyFailsId": "salah karena “can” membuat negatifnya sendiri, tanpa bantuan “doesn't”.",
+          "misconceptionId": "“doesn't” dipakai untuk membuat negatif “can”."
+        },
+        {
+          "text": "can't to",
+          "misconception": "adds 'to' after the modal can",
+          "whyFailsId": "menambah “to”, padahal sesudah bentuk negatif “can” kata kerjanya langsung menyusul.",
+          "misconceptionId": "kata “to” ditambahkan sesudah bentuk negatif “can”."
+        },
+        {
+          "text": "not can",
+          "misconception": "not placed before can",
+          "whyFailsId": "menaruh “not” di depan, padahal “not” harus sesudah “can” dan menyatu jadi satu kata.",
+          "misconceptionId": "kata “not” ditaruh sebelum “can”."
+        }
+      ],
+      "explain": {
+        "why": "Nadia nggak bisa main gitar, jadi pakai “can't” + kata kerja dasar. Hasilnya “can't play”.",
+        "rule": "“Can” + kata kerja dasar, sama untuk semua subjek: “I can swim”, “she can swim”. Negatifnya “can't swim”. Untuk bertanya: “Can you swim?”",
+        "memory": "Nggak bisa? Cukup tambah n't: “can't play”.",
+        "avoid": "Sesudah “can” atau “can't”, tulis kata kerjanya persis seperti di kamus: tanpa “to”, tanpa -s, tanpa -ing."
+      }
+    },
+    {
+      "id": "A1-348-cz0",
+      "templateId": "A1-348",
+      "skill": "can_ability",
+      "level": "A1",
+      "sentence": "My grandmother is 80, but she ___ still ride a bike.",
+      "blank": {
+        "answer": "can",
+        "alternates": [],
+        "position": 30
+      },
+      "distractors": [
+        {
+          "text": "cans",
+          "misconception": "-s added to can",
+          "whyFailsId": "memakai -s, padahal kata bantu kemampuan nggak pernah diberi -s, walaupun subjeknya “she”.",
+          "misconceptionId": "akhiran -s ditambahkan ke kata bantu “can”."
+        },
+        {
+          "text": "can to",
+          "misconception": "adds 'to' after the modal can",
+          "whyFailsId": "menambah “to”, padahal sesudah kata bantu kemampuan kata kerjanya langsung menyusul.",
+          "misconceptionId": "kata “to” ditambahkan sesudah “can”."
+        },
+        {
+          "text": "is can",
+          "misconception": "be added before can",
+          "whyFailsId": "memakai dua kata bantu sekaligus, jadi bentuk “be”-nya harus dibuang.",
+          "misconceptionId": "bentuk “be” ditambahkan di depan “can”."
+        }
+      ],
+      "explain": {
+        "why": "Nenek masih mampu naik sepeda, jadi pakai “can” + kata kerja dasar. “Can” nggak pernah berubah bentuk.",
+        "rule": "“Can” + kata kerja dasar, sama untuk semua subjek: “I can swim”, “she can swim”. Negatifnya “can't swim”. Untuk bertanya: “Can you swim?”",
+        "memory": "“Can” nggak pernah berubah: “I can”, “she can”, “they can”.",
+        "avoid": "Sesudah “can” atau “can't”, tulis kata kerjanya persis seperti di kamus: tanpa “to”, tanpa -s, tanpa -ing."
+      }
+    },
+    {
+      "id": "A1-349-cz0",
+      "templateId": "A1-349",
+      "skill": "present_continuous_basics",
+      "level": "A1",
+      "sentence": "Shh! The baby ___ now.",
+      "blank": {
+        "answer": "is sleeping",
+        "alternates": [],
+        "position": 14
+      },
+      "distractors": [
+        {
+          "text": "sleeping",
+          "misconception": "missing-be-auxiliary",
+          "whyFailsId": "kata kerja -ing nggak bisa berdiri sendiri, butuh bentuk “be” di depannya.",
+          "misconceptionId": "kata bantu “is” dihilangkan di depan kata kerja -ing."
+        },
+        {
+          "text": "sleeps",
+          "misconception": "present-simple-habit",
+          "whyFailsId": "untuk kebiasaan, padahal “now” menunjukkan kejadiannya sedang berlangsung.",
+          "misconceptionId": "bentuk kebiasaan dipakai untuk kejadian yang sedang berlangsung."
+        },
+        {
+          "text": "are sleeping",
+          "misconception": "plural be used in present continuous with a singular subject",
+          "whyFailsId": "bentuk “be”-nya untuk lebih dari satu, padahal “the baby” cuma satu.",
+          "misconceptionId": "bentuk “be” jamak dipakai untuk satu orang yang sedang melakukan sesuatu."
+        }
+      ],
+      "explain": {
+        "why": "“Now” menunjukkan kejadiannya sedang berlangsung, dan “the baby” cuma satu, jadi “is sleeping”.",
+        "rule": "Untuk kejadian yang sedang berlangsung, pakai “am”, “is”, atau “are” sesuai subjeknya, lalu tambahkan kata kerja -ing. Petunjuknya: “now”, “look!”, “at the moment”.",
+        "memory": "“Shh!” + “now” = sedang terjadi: “is sleeping”.",
+        "avoid": "Cek dua bagian: bentuk “be” yang cocok dengan subjeknya, dan akhiran -ing pada kata kerjanya."
+      }
+    },
+    {
+      "id": "A1-350-cz0",
+      "templateId": "A1-350",
+      "skill": "present_continuous_basics",
+      "level": "A1",
+      "sentence": "Look! My friends ___ a sandcastle on the beach.",
+      "blank": {
+        "answer": "are building",
+        "alternates": [],
+        "position": 17
+      },
+      "distractors": [
+        {
+          "text": "is building",
+          "misconception": "singular be used in present continuous with a plural subject",
+          "whyFailsId": "bentuk “be”-nya untuk satu orang, padahal “my friends” banyak.",
+          "misconceptionId": "bentuk “be” tunggal dipakai untuk banyak orang yang sedang melakukan sesuatu."
+        },
+        {
+          "text": "building",
+          "misconception": "missing-be-auxiliary",
+          "whyFailsId": "nggak punya bentuk “be”, padahal kata kerja -ing selalu butuh itu.",
+          "misconceptionId": "kata bantu “are” dihilangkan di depan kata kerja -ing."
+        },
+        {
+          "text": "build",
+          "misconception": "present-simple-habit",
+          "whyFailsId": "untuk kebiasaan, padahal “Look!” menunjukkan kejadiannya sedang berlangsung.",
+          "misconceptionId": "bentuk kebiasaan dipakai untuk kejadian yang sedang terlihat."
+        }
+      ],
+      "explain": {
+        "why": "“Look!” menunjukkan kejadiannya sedang berlangsung, dan “my friends” banyak, jadi “are building”.",
+        "rule": "Untuk kejadian yang sedang berlangsung, pakai “am”, “is”, atau “are” sesuai subjeknya, lalu tambahkan kata kerja -ing. Petunjuknya: “now”, “look!”, “at the moment”.",
+        "memory": "“Look!” + banyak orang: “are” + -ing.",
+        "avoid": "Cek dua bagian: bentuk “be” yang cocok dengan subjeknya, dan akhiran -ing pada kata kerjanya."
+      }
+    },
+    {
+      "id": "A1-351-cz0",
+      "templateId": "A1-351",
+      "skill": "present_continuous_basics",
+      "level": "A1",
+      "sentence": "I ___ my homework at the moment, so I can't play.",
+      "blank": {
+        "answer": "am doing",
+        "alternates": [],
+        "position": 2
+      },
+      "distractors": [
+        {
+          "text": "is doing",
+          "misconception": "he-she-it be form used with I",
+          "whyFailsId": "bentuk “be” ini untuk “he”, “she”, atau “it”, bukan untuk “I”.",
+          "misconceptionId": "bentuk “be” untuk “he”, “she”, “it” dipakai bersama “I”."
+        },
+        {
+          "text": "doing",
+          "misconception": "missing-be-auxiliary",
+          "whyFailsId": "nggak punya bentuk “be”, jadi kalimatnya belum lengkap.",
+          "misconceptionId": "kata bantu “am” dihilangkan di depan kata kerja -ing."
+        },
+        {
+          "text": "do",
+          "misconception": "present-simple-habit",
+          "whyFailsId": "untuk kebiasaan, padahal “at the moment” artinya sekarang.",
+          "misconceptionId": "bentuk kebiasaan dipakai untuk kejadian yang sedang berlangsung."
+        }
+      ],
+      "explain": {
+        "why": "“At the moment” artinya sekarang, dan subjeknya “I”, jadi “am doing”.",
+        "rule": "Untuk kejadian yang sedang berlangsung, pakai “am”, “is”, atau “are” sesuai subjeknya, lalu tambahkan kata kerja -ing. Petunjuknya: “now”, “look!”, “at the moment”.",
+        "memory": "“I am” + -ing: “I am doing”, “I am reading”.",
+        "avoid": "Cek dua bagian: bentuk “be” yang cocok dengan subjeknya, dan akhiran -ing pada kata kerjanya."
+      }
+    },
+    {
+      "id": "A1-352-cz0",
+      "templateId": "A1-352",
+      "skill": "present_continuous_basics",
+      "level": "A1",
+      "sentence": "“What are you doing?” “I ___ for my pen.”",
+      "blank": {
+        "answer": "am looking",
+        "alternates": [],
+        "position": 25
+      },
+      "distractors": [
+        {
+          "text": "look",
+          "misconception": "present-simple-habit",
+          "whyFailsId": "untuk kebiasaan, padahal pertanyaannya tentang yang sedang terjadi.",
+          "misconceptionId": "bentuk kebiasaan dipakai untuk menjawab pertanyaan tentang sekarang."
+        },
+        {
+          "text": "looking",
+          "misconception": "missing-be-auxiliary",
+          "whyFailsId": "nggak punya bentuk “be”, padahal “I” butuh “am” di depan kata kerja -ing.",
+          "misconceptionId": "kata bantu “am” dihilangkan di depan kata kerja -ing."
+        },
+        {
+          "text": "am look",
+          "misconception": "-ing missing after am, is, or are",
+          "whyFailsId": "lupa -ing, padahal sesudah “am” kata kerjanya butuh -ing.",
+          "misconceptionId": "akhiran -ing lupa ditambahkan sesudah bentuk “be”."
+        }
+      ],
+      "explain": {
+        "why": "Pertanyaan “What are you doing?” menanyakan yang sedang terjadi, jadi jawabannya “am” + -ing. Hasilnya “am looking”.",
+        "rule": "Untuk kejadian yang sedang berlangsung, pakai “am”, “is”, atau “are” sesuai subjeknya, lalu tambahkan kata kerja -ing. Petunjuknya: “now”, “look!”, “at the moment”.",
+        "memory": "Jawab dengan pola yang sama: “are you doing?” → “I am looking”.",
+        "avoid": "Cek dua bagian: bentuk “be” yang cocok dengan subjeknya, dan akhiran -ing pada kata kerjanya."
+      }
+    },
+    {
+      "id": "A1-353-cz0",
+      "templateId": "A1-353",
+      "skill": "past_be_was_were",
+      "level": "A1",
+      "sentence": "I ___ sick yesterday, so I stayed at home.",
+      "blank": {
+        "answer": "was",
+        "alternates": [],
+        "position": 2
+      },
+      "distractors": [
+        {
+          "text": "were",
+          "misconception": "plural past be used with I",
+          "whyFailsId": "untuk “you”, “we”, atau “they”, bukan untuk “I”.",
+          "misconceptionId": "bentuk lampau untuk “you”, “we”, “they” dipakai bersama “I”."
+        },
+        {
+          "text": "am",
+          "misconception": "present-tense substitution",
+          "whyFailsId": "bentuk sekarang, padahal “yesterday” sudah lewat.",
+          "misconceptionId": "bentuk sekarang dipakai untuk kejadian kemarin."
+        },
+        {
+          "text": "is",
+          "misconception": "present he-she-it be used for I in the past",
+          "whyFailsId": "bentuk sekarang, dan nggak cocok dengan “I”.",
+          "misconceptionId": "bentuk sekarang untuk “he”, “she”, “it” dipakai untuk “I” di masa lalu."
+        }
+      ],
+      "explain": {
+        "why": "“Yesterday” menunjukkan masa lalu, dan subjeknya “I”, jadi pakai “was”.",
+        "rule": "Subjek “I”, “he”, “she”, “it” pakai “was”, sedangkan “you”, “we”, “they” pakai “were”. Kalau bertanya, kata itu pindah ke depan subjek.",
+        "memory": "“Yesterday” + “I” jadi “I was”.",
+        "avoid": "Cari kata waktu lampau (“yesterday”, “last…”, “ago”), lalu cocokkan “was” atau “were” dengan subjeknya."
+      }
+    },
+    {
+      "id": "A1-354-cz0",
+      "templateId": "A1-354",
+      "skill": "past_be_was_were",
+      "level": "A1",
+      "sentence": "We ___ at the beach last Sunday. It was fun!",
+      "blank": {
+        "answer": "were",
+        "alternates": [],
+        "position": 3
+      },
+      "distractors": [
+        {
+          "text": "was",
+          "misconception": "singular-past transfer",
+          "whyFailsId": "untuk “I”, “he”, “she”, atau “it”, padahal subjeknya “we”.",
+          "misconceptionId": "bentuk tunggal “was” dipakai untuk “we”."
+        },
+        {
+          "text": "are",
+          "misconception": "present-tense substitution",
+          "whyFailsId": "bentuk sekarang, padahal “last Sunday” sudah lewat.",
+          "misconceptionId": "bentuk sekarang dipakai untuk hari Minggu lalu."
+        },
+        {
+          "text": "did",
+          "misconception": "did used in place of a past be verb",
+          "whyFailsId": "nggak bisa langsung diikuti keterangan tempat. Untuk bilang “berada di pantai”, butuh bentuk “be”.",
+          "misconceptionId": "“did” dipakai di tempat yang butuh bentuk lampau dari “be”."
+        }
+      ],
+      "explain": {
+        "why": "“Last Sunday” menunjukkan masa lalu, dan subjeknya “we”, jadi pakai “were”.",
+        "rule": "Subjek “I”, “he”, “she”, “it” pakai “was”, sedangkan “you”, “we”, “they” pakai “were”. Kalau bertanya, kata itu pindah ke depan subjek.",
+        "memory": "“We”, “you”, “they” di masa lalu: “were”.",
+        "avoid": "Cari kata waktu lampau (“yesterday”, “last…”, “ago”), lalu cocokkan “was” atau “were” dengan subjeknya."
+      }
+    },
+    {
+      "id": "A1-356-cz0",
+      "templateId": "A1-356",
+      "skill": "past_be_was_were",
+      "level": "A1",
+      "sentence": "Ten years ago, this town ___ very small.",
+      "blank": {
+        "answer": "was",
+        "alternates": [],
+        "position": 25
+      },
+      "distractors": [
+        {
+          "text": "were",
+          "misconception": "plural past be used with a singular subject",
+          "whyFailsId": "untuk lebih dari satu, padahal “this town” cuma satu tempat.",
+          "misconceptionId": "bentuk lampau jamak dipakai untuk satu orang atau satu benda."
+        },
+        {
+          "text": "is",
+          "misconception": "present-tense substitution",
+          "whyFailsId": "bentuk sekarang, padahal “ten years ago” sudah lewat.",
+          "misconceptionId": "bentuk sekarang dipakai untuk keadaan sepuluh tahun lalu."
+        },
+        {
+          "text": "be",
+          "misconception": "bare-infinitive substitution",
+          "whyFailsId": "bentuk dasar, padahal “ten years ago” butuh bentuk lampau.",
+          "misconceptionId": "bentuk dasar dipakai untuk keadaan di masa lalu."
+        }
+      ],
+      "explain": {
+        "why": "“Ten years ago” menunjukkan masa lalu, dan “this town” cuma satu tempat, jadi pakai “was”.",
+        "rule": "Subjek “I”, “he”, “she”, “it” pakai “was”, sedangkan “you”, “we”, “they” pakai “were”. Kalau bertanya, kata itu pindah ke depan subjek.",
+        "memory": "Ada “ago”? Itu masa lalu: “it was”.",
+        "avoid": "Cari kata waktu lampau (“yesterday”, “last…”, “ago”), lalu cocokkan “was” atau “were” dengan subjeknya."
+      }
+    },
+    {
+      "id": "A1-357-cz0",
+      "templateId": "A1-357",
+      "skill": "past_simple_regular_forms",
+      "level": "A1",
+      "sentence": "We ___ at the school party last Friday.",
+      "blank": {
+        "answer": "danced",
+        "alternates": [],
+        "position": 3
+      },
+      "distractors": [
+        {
+          "text": "dance",
+          "misconception": "missing-past-marking",
+          "whyFailsId": "nggak punya tanda lampau, padahal “last Friday” sudah lewat.",
+          "misconceptionId": "tanda lampau hilang walaupun ada “last Friday”."
+        },
+        {
+          "text": "danceed",
+          "misconception": "-ed added to a verb ending in e",
+          "whyFailsId": "menambah e lagi, padahal “dance” sudah berakhiran e, jadi cukup -d.",
+          "misconceptionId": "akhiran -ed ditambahkan penuh ke kata kerja yang sudah berakhiran e."
+        },
+        {
+          "text": "dancing",
+          "misconception": "progressive-form substitution",
+          "whyFailsId": "bentuk -ing butuh bentuk “be”, dan pestanya sudah selesai.",
+          "misconceptionId": "bentuk -ing dipakai tanpa kata bantu untuk kejadian yang sudah selesai."
+        }
+      ],
+      "explain": {
+        "why": "“Last Friday” menunjukkan masa lalu, dan “dance” berakhiran e, jadi cukup tambah -d. Hasilnya “danced”.",
+        "rule": "Lampau: kata kerja + -ed (“played”). Akhiran e cukup tambah -d (“danced”). Konsonan + y jadi -ied (“studied”). Sesudah “did” atau “didn't”, pakai bentuk dasar.",
+        "memory": "Berakhiran e? Cukup tambah -d: “dance” jadi “danced”.",
+        "avoid": "Ada kata waktu lampau? Tambah -ed sekali saja. Ada “did”? Kembali ke bentuk dasar."
+      }
+    },
+    {
+      "id": "A1-358-cz0",
+      "templateId": "A1-358",
+      "skill": "past_simple_regular_forms",
+      "level": "A1",
+      "sentence": "Ali ___ for his math test two days ago.",
+      "blank": {
+        "answer": "studied",
+        "alternates": [],
+        "position": 4
+      },
+      "distractors": [
+        {
+          "text": "studyed",
+          "misconception": "-ed added to a consonant + y verb without changing y",
+          "whyFailsId": "masih menyimpan huruf y, padahal sesudah konsonan, y harus jadi i dulu.",
+          "misconceptionId": "kata kerja berakhiran konsonan + y diberi -ed tanpa mengubah y jadi i."
+        },
+        {
+          "text": "studies",
+          "misconception": "third-person-present form",
+          "whyFailsId": "bentuk sekarang, padahal “two days ago” sudah lewat.",
+          "misconceptionId": "bentuk sekarang dipakai untuk kejadian dua hari lalu."
+        },
+        {
+          "text": "study",
+          "misconception": "missing-past-marking",
+          "whyFailsId": "nggak punya tanda lampau, padahal kejadiannya dua hari lalu.",
+          "misconceptionId": "tanda lampau hilang walaupun ada “two days ago”."
+        }
+      ],
+      "explain": {
+        "why": "“Two days ago” menunjukkan masa lalu, dan “study” berakhiran konsonan + y, jadi y berubah jadi i. Hasilnya “studied”.",
+        "rule": "Lampau: kata kerja + -ed (“played”). Akhiran e cukup tambah -d (“danced”). Konsonan + y jadi -ied (“studied”). Sesudah “did” atau “didn't”, pakai bentuk dasar.",
+        "memory": "Konsonan + y: “study” jadi “studied”, “cry” jadi “cried”.",
+        "avoid": "Ada kata waktu lampau? Tambah -ed sekali saja. Ada “did”? Kembali ke bentuk dasar."
+      }
+    },
+    {
+      "id": "A1-359-cz0",
+      "templateId": "A1-359",
+      "skill": "past_simple_regular_forms",
+      "level": "A1",
+      "sentence": "Did you ___ your grandma yesterday?",
+      "blank": {
+        "answer": "visit",
+        "alternates": [],
+        "position": 8
+      },
+      "distractors": [
+        {
+          "text": "visited",
+          "misconception": "doubles the past marking with 'did' plus -ed",
+          "whyFailsId": "memakai -ed, padahal “did” sudah menunjukkan lampau, jadi tandanya dobel.",
+          "misconceptionId": "tanda lampau dipakai dua kali: “did” dan -ed."
+        },
+        {
+          "text": "visits",
+          "misconception": "-s added to the verb after did",
+          "whyFailsId": "memakai -s, padahal sesudah “did” kata kerjanya harus bentuk dasar.",
+          "misconceptionId": "akhiran -s ditambahkan ke kata kerja sesudah “did”."
+        },
+        {
+          "text": "visiting",
+          "misconception": "-ing form used after did",
+          "whyFailsId": "memakai -ing, padahal sesudah “did” kata kerjanya harus bentuk dasar.",
+          "misconceptionId": "bentuk -ing dipakai sesudah “did”."
+        }
+      ],
+      "explain": {
+        "why": "“Did” sudah menunjukkan masa lalu, jadi kata kerjanya kembali ke bentuk dasar, yaitu “visit”.",
+        "rule": "Lampau: kata kerja + -ed (“played”). Akhiran e cukup tambah -d (“danced”). Konsonan + y jadi -ied (“studied”). Sesudah “did” atau “didn't”, pakai bentuk dasar.",
+        "memory": "“Did” + bentuk dasar: “Did you visit?”, “Did she play?”",
+        "avoid": "Ada kata waktu lampau? Tambah -ed sekali saja. Ada “did”? Kembali ke bentuk dasar."
+      }
+    },
+    {
+      "id": "A1-360-cz0",
+      "templateId": "A1-360",
+      "skill": "past_simple_regular_forms",
+      "level": "A1",
+      "sentence": "The shop ___ at nine o'clock yesterday.",
+      "blank": {
+        "answer": "opened",
+        "alternates": [],
+        "position": 9
+      },
+      "distractors": [
+        {
+          "text": "opens",
+          "misconception": "third-person-present form",
+          "whyFailsId": "bentuk sekarang, padahal “yesterday” sudah lewat.",
+          "misconceptionId": "bentuk sekarang dipakai untuk kejadian kemarin."
+        },
+        {
+          "text": "open",
+          "misconception": "missing-past-marking",
+          "whyFailsId": "nggak punya tanda lampau, padahal kejadiannya kemarin.",
+          "misconceptionId": "tanda lampau hilang walaupun ada “yesterday”."
+        },
+        {
+          "text": "opening",
+          "misconception": "progressive-form substitution",
+          "whyFailsId": "bentuk -ing butuh bentuk “be”, dan kejadiannya cuma sekali, kemarin.",
+          "misconceptionId": "bentuk -ing dipakai tanpa kata bantu untuk kejadian kemarin."
+        }
+      ],
+      "explain": {
+        "why": "“Yesterday” menunjukkan masa lalu, jadi kata kerja beraturan “open” diberi -ed. Hasilnya “opened”.",
+        "rule": "Lampau: kata kerja + -ed (“played”). Akhiran e cukup tambah -d (“danced”). Konsonan + y jadi -ied (“studied”). Sesudah “did” atau “didn't”, pakai bentuk dasar.",
+        "memory": "Ada “yesterday”? “Open” jadi “opened”.",
+        "avoid": "Ada kata waktu lampau? Tambah -ed sekali saja. Ada “did”? Kembali ke bentuk dasar."
+      }
+    },
+    {
+      "id": "A1-361-cz0",
+      "templateId": "A1-361",
+      "skill": "some_any_countable_uncountable",
+      "level": "A1",
+      "sentence": "There isn't ___ bread left. Let's buy some.",
+      "blank": {
+        "answer": "any",
+        "alternates": [],
+        "position": 12
+      },
+      "distractors": [
+        {
+          "text": "some",
+          "misconception": "positive-quantifier-in-negative",
+          "whyFailsId": "untuk kalimat positif, padahal “isn't” membuat kalimat ini negatif.",
+          "misconceptionId": "“some” dipakai di kalimat negatif."
+        },
+        {
+          "text": "a",
+          "misconception": "singular-article-with-uncountable",
+          "whyFailsId": "untuk satu benda yang bisa dihitung, padahal “bread” nggak bisa dihitung.",
+          "misconceptionId": "kata sandang untuk satu benda dipakai untuk “bread”."
+        },
+        {
+          "text": "many",
+          "misconception": "countable-quantity-substitution",
+          "whyFailsId": "untuk benda yang bisa dihitung, padahal “bread” nggak bisa dihitung.",
+          "misconceptionId": "“many” dipakai untuk benda yang nggak bisa dihitung."
+        }
+      ],
+      "explain": {
+        "why": "“Isn't” membuat kalimatnya negatif, jadi pakai “any”. “Bread” juga nggak bisa dihitung.",
+        "rule": "Kalimat positif: “some”. Kalimat negatif dan tanya: “any”. Benda seperti “bread”, “milk”, “rice”, dan “money” nggak bisa dihitung, jadi tanpa “a” dan tanpa “many”.",
+        "memory": "Kalimat dengan “not” pakai “any”: “There isn't any bread”.",
+        "avoid": "Cek dua hal: kalimatnya positif atau negatif? Bendanya bisa dihitung atau nggak?"
+      }
+    },
+    {
+      "id": "A1-362-cz0",
+      "templateId": "A1-362",
+      "skill": "some_any_countable_uncountable",
+      "level": "A1",
+      "sentence": "I need ___ eggs for the cake.",
+      "blank": {
+        "answer": "some",
+        "alternates": [],
+        "position": 7
+      },
+      "distractors": [
+        {
+          "text": "any",
+          "misconception": "negative quantifier used in a positive sentence",
+          "whyFailsId": "untuk kalimat negatif dan tanya, padahal kalimat ini positif.",
+          "misconceptionId": "kata jumlah untuk kalimat negatif dipakai di kalimat positif."
+        },
+        {
+          "text": "an",
+          "misconception": "applies a singular indefinite article to a plural noun",
+          "whyFailsId": "untuk satu benda, padahal “eggs” banyak.",
+          "misconceptionId": "kata sandang untuk satu benda dipakai sebelum benda jamak."
+        },
+        {
+          "text": "much",
+          "misconception": "applies the uncountable-noun quantifier to a countable plural noun",
+          "whyFailsId": "untuk benda yang nggak bisa dihitung, padahal telur bisa dihitung.",
+          "misconceptionId": "“much” dipakai untuk benda yang bisa dihitung."
+        }
+      ],
+      "explain": {
+        "why": "Kalimatnya positif dan “eggs” jamak, jadi pakai “some”.",
+        "rule": "Kalimat positif: “some”. Kalimat negatif dan tanya: “any”. Benda seperti “bread”, “milk”, “rice”, dan “money” nggak bisa dihitung, jadi tanpa “a” dan tanpa “many”.",
+        "memory": "Positif + jamak: “I need some eggs”.",
+        "avoid": "Cek dua hal: kalimatnya positif atau negatif? Bendanya bisa dihitung atau nggak?"
+      }
+    },
+    {
+      "id": "A1-363-cz0",
+      "templateId": "A1-363",
+      "skill": "some_any_countable_uncountable",
+      "level": "A1",
+      "sentence": "We don't have ___ tomatoes. Can you buy some?",
+      "blank": {
+        "answer": "any",
+        "alternates": [],
+        "position": 14
+      },
+      "distractors": [
+        {
+          "text": "some",
+          "misconception": "positive-quantifier-in-negative",
+          "whyFailsId": "untuk kalimat positif, padahal “don't” membuat kalimat ini negatif.",
+          "misconceptionId": "“some” dipakai di kalimat negatif."
+        },
+        {
+          "text": "a",
+          "misconception": "applies a singular indefinite article to a plural noun",
+          "whyFailsId": "untuk satu benda, padahal “tomatoes” banyak.",
+          "misconceptionId": "kata sandang untuk satu benda dipakai sebelum benda jamak."
+        },
+        {
+          "text": "much",
+          "misconception": "applies the uncountable-noun quantifier to a countable plural noun",
+          "whyFailsId": "untuk benda yang nggak bisa dihitung, padahal tomat bisa dihitung.",
+          "misconceptionId": "“much” dipakai untuk benda yang bisa dihitung."
+        }
+      ],
+      "explain": {
+        "why": "“Don't” membuat kalimatnya negatif, jadi pakai “any” untuk “tomatoes”.",
+        "rule": "Kalimat positif: “some”. Kalimat negatif dan tanya: “any”. Benda seperti “bread”, “milk”, “rice”, dan “money” nggak bisa dihitung, jadi tanpa “a” dan tanpa “many”.",
+        "memory": "“Don't have any”, lalu “buy some”.",
+        "avoid": "Cek dua hal: kalimatnya positif atau negatif? Bendanya bisa dihitung atau nggak?"
+      }
+    },
+    {
+      "id": "A1-364-cz0",
+      "templateId": "A1-364",
+      "skill": "some_any_countable_uncountable",
+      "level": "A1",
+      "sentence": "Grandma cooked ___ rice for us.",
+      "blank": {
+        "answer": "some",
+        "alternates": [],
+        "position": 15
+      },
+      "distractors": [
+        {
+          "text": "any",
+          "misconception": "negative quantifier used in a positive sentence",
+          "whyFailsId": "untuk kalimat negatif dan tanya, padahal nenek memang memasak nasi.",
+          "misconceptionId": "kata jumlah untuk kalimat negatif dipakai di kalimat positif."
+        },
+        {
+          "text": "a",
+          "misconception": "singular-article-with-uncountable",
+          "whyFailsId": "untuk satu benda yang bisa dihitung, padahal “rice” nggak bisa dihitung.",
+          "misconceptionId": "kata sandang untuk satu benda dipakai untuk “rice”."
+        },
+        {
+          "text": "many",
+          "misconception": "countable-quantity-substitution",
+          "whyFailsId": "untuk benda yang bisa dihitung, padahal “rice” nggak bisa dihitung.",
+          "misconceptionId": "“many” dipakai untuk benda yang nggak bisa dihitung."
+        }
+      ],
+      "explain": {
+        "why": "Kalimatnya positif dan “rice” nggak bisa dihitung, jadi pakai “some”.",
+        "rule": "Kalimat positif: “some”. Kalimat negatif dan tanya: “any”. Benda seperti “bread”, “milk”, “rice”, dan “money” nggak bisa dihitung, jadi tanpa “a” dan tanpa “many”.",
+        "memory": "“Rice”, “milk”, “water” di kalimat positif: “some”.",
+        "avoid": "Cek dua hal: kalimatnya positif atau negatif? Bendanya bisa dihitung atau nggak?"
+      }
+    },
+    {
+      "id": "A2-301-cz0",
+      "templateId": "A2-301",
+      "skill": "imperative_commands_base_form",
+      "level": "A2",
+      "sentence": "It's cold outside. ___ your jacket!",
+      "blank": {
+        "answer": "Put on",
+        "alternates": [],
+        "position": 19
+      },
+      "distractors": [
+        {
+          "text": "Puts on",
+          "misconception": "adding -s as if the command needed subject-verb agreement with a singular subject",
+          "whyFailsId": "memakai -s, padahal kalimat perintah nggak punya subjek yang perlu dicocokkan.",
+          "misconceptionId": "akhiran -s ditambahkan ke kata perintah."
+        },
+        {
+          "text": "Putting on",
+          "misconception": "using the -ing form on its own, which describes an activity instead of telling someone to act",
+          "whyFailsId": "cuma menyebut kegiatan, bukan menyuruh orang melakukannya.",
+          "misconceptionId": "bentuk -ing dipakai untuk memberi perintah."
+        },
+        {
+          "text": "To put on",
+          "misconception": "using a to-infinitive where a direct command is required",
+          "whyFailsId": "memakai “to”, padahal perintah dimulai langsung dari kata kerjanya.",
+          "misconceptionId": "“to” + kata kerja dipakai untuk memberi perintah."
+        }
+      ],
+      "explain": {
+        "why": "Ini perintah untuk kamu, jadi langsung dimulai dengan kata kerja bentuk dasar, yaitu “Put on”.",
+        "rule": "Perintah: kata kerja bentuk dasar (“Open”, “Sit”). Larangan: “Don't” + bentuk dasar (“Don't run”). Ajakan: “Let's” + bentuk dasar (“Let's go”).",
+        "memory": "Perintah dimulai dengan kata kerja bentuk dasar: “Put on”, “Sit down”, “Look”.",
+        "avoid": "Mulai langsung dari kata kerjanya: tanpa subjek, tanpa -s, tanpa -ing, tanpa “to”."
+      }
+    },
+    {
+      "id": "A2-303-cz0",
+      "templateId": "A2-303",
+      "skill": "imperative_commands_base_form",
+      "level": "A2",
+      "sentence": "The soup is very hot. ___ it yet!",
+      "blank": {
+        "answer": "Don't eat",
+        "alternates": [],
+        "position": 22
+      },
+      "distractors": [
+        {
+          "text": "Not eat",
+          "misconception": "not used without do in a negative command",
+          "whyFailsId": "nggak punya kata bantu, padahal larangan butuh “Don't”.",
+          "misconceptionId": "“not” dipakai tanpa “do” untuk melarang."
+        },
+        {
+          "text": "Doesn't eat",
+          "misconception": "adding -s as if the command needed subject-verb agreement with a singular subject",
+          "whyFailsId": "untuk “he”, “she”, atau “it”, padahal kalimat perintah nggak punya subjek.",
+          "misconceptionId": "“doesn't” dipakai di kalimat larangan."
+        },
+        {
+          "text": "Don't eating",
+          "misconception": "-ing form used after don't in a command",
+          "whyFailsId": "memakai -ing, padahal sesudah “Don't” kata kerjanya tetap bentuk dasar.",
+          "misconceptionId": "bentuk -ing dipakai sesudah “don't” di kalimat larangan."
+        }
+      ],
+      "explain": {
+        "why": "Untuk melarang, pakai “Don't” + bentuk dasar, jadi “Don't eat”.",
+        "rule": "Perintah: kata kerja bentuk dasar (“Open”, “Sit”). Larangan: “Don't” + bentuk dasar (“Don't run”). Ajakan: “Let's” + bentuk dasar (“Let's go”).",
+        "memory": "Mau melarang? “Don't” + kata kerja: “Don't eat”, “Don't touch”.",
+        "avoid": "Mulai langsung dari kata kerjanya: tanpa subjek, tanpa -s, tanpa -ing, tanpa “to”."
+      }
+    },
+    {
+      "id": "A2-305-cz0",
+      "templateId": "A2-305",
+      "skill": "adverbs_of_frequency_mid_position",
+      "level": "A2",
+      "sentence": "I ___ my teeth before bed.",
+      "blank": {
+        "answer": "always brush",
+        "alternates": [],
+        "position": 2
+      },
+      "distractors": [
+        {
+          "text": "brush always",
+          "misconception": "moves the adverb between the verb and its object, copying Indonesian word order",
+          "whyFailsId": "menaruh “always” sesudah kata kerja, padahal tempatnya sebelum kata kerja.",
+          "misconceptionId": "kata frekuensi ditaruh sesudah kata kerja."
+        },
+        {
+          "text": "always brushes",
+          "misconception": "-s added to the verb after I",
+          "whyFailsId": "memakai -s, padahal subjek “I” nggak pernah pakai -s.",
+          "misconceptionId": "akhiran -s ditambahkan ke kata kerja untuk subjek “I”."
+        },
+        {
+          "text": "am always brush",
+          "misconception": "am inserted before a main verb",
+          "whyFailsId": "menambah “am”, padahal “brush” sudah jadi kata kerja utamanya.",
+          "misconceptionId": "“am” diselipkan di depan kata kerja utama."
+        }
+      ],
+      "explain": {
+        "why": "“Always” ditaruh sebelum kata kerja utama, dan subjek “I” pakai bentuk dasar. Hasilnya “always brush”.",
+        "rule": "Kata frekuensi ditaruh sebelum kata kerja utama (“She often reads”), tapi sesudah “am/is/are” (“He is always late”). Di kalimat tanya: “Do you usually…?”",
+        "memory": "“Always” sebelum aksinya: “I always brush”, “I never eat”.",
+        "avoid": "Cari kata kerjanya. Kalau “be”, taruh kata frekuensi sesudahnya. Kalau kata kerja lain, taruh sebelumnya."
+      }
+    },
+    {
+      "id": "A2-306-cz0",
+      "templateId": "A2-306",
+      "skill": "adverbs_of_frequency_mid_position",
+      "level": "A2",
+      "sentence": "My little sister ___ scared of the dark.",
+      "blank": {
+        "answer": "is often",
+        "alternates": [],
+        "position": 17
+      },
+      "distractors": [
+        {
+          "text": "often is",
+          "misconception": "puts the frequency adverb before the verb be",
+          "whyFailsId": "menaruh “often” sebelum “be”, padahal dengan “be” tempatnya sesudahnya.",
+          "misconceptionId": "kata frekuensi ditaruh sebelum “be”."
+        },
+        {
+          "text": "often",
+          "misconception": "missing-be-auxiliary",
+          "whyFailsId": "nggak punya “be”, padahal “scared” kata sifat dan butuh “be”.",
+          "misconceptionId": "“be” dihilangkan sebelum kata sifat “scared”."
+        },
+        {
+          "text": "often be",
+          "misconception": "base form",
+          "whyFailsId": "memakai bentuk dasar “be”, padahal “my little sister” butuh “is”.",
+          "misconceptionId": "bentuk dasar “be” dipakai untuk “my little sister”."
+        }
+      ],
+      "explain": {
+        "why": "“Scared” butuh “be”, dan kata frekuensi ditaruh sesudah “be”, jadi “is often”.",
+        "rule": "Kata frekuensi ditaruh sebelum kata kerja utama (“She often reads”), tapi sesudah “am/is/are” (“He is always late”). Di kalimat tanya: “Do you usually…?”",
+        "memory": "Dengan “be”, kata frekuensi di belakangnya: “is often”, “are never”.",
+        "avoid": "Cari kata kerjanya. Kalau “be”, taruh kata frekuensi sesudahnya. Kalau kata kerja lain, taruh sebelumnya."
+      }
+    },
+    {
+      "id": "A2-307-cz0",
+      "templateId": "A2-307",
+      "skill": "adverbs_of_frequency_mid_position",
+      "level": "A2",
+      "sentence": "Budi ___ his homework on time. The teacher is angry.",
+      "blank": {
+        "answer": "never does",
+        "alternates": [],
+        "position": 5
+      },
+      "distractors": [
+        {
+          "text": "does never",
+          "misconception": "moves the adverb between the verb and its object, copying Indonesian word order",
+          "whyFailsId": "menaruh “never” sesudah kata kerja, padahal tempatnya sebelum kata kerja.",
+          "misconceptionId": "kata frekuensi ditaruh sesudah kata kerja."
+        },
+        {
+          "text": "never do",
+          "misconception": "leaving the bare verb with no third-person marking after a singular subject",
+          "whyFailsId": "lupa -s, padahal Budi sama dengan “he”.",
+          "misconceptionId": "bentuk dasar dipakai untuk Budi."
+        },
+        {
+          "text": "is never do",
+          "misconception": "inserting 'is' before a main verb, blending the 'be' pattern with the present simple",
+          "whyFailsId": "menambah “is”, padahal “do” sudah jadi kata kerja utamanya.",
+          "misconceptionId": "“is” diselipkan di depan kata kerja utama."
+        }
+      ],
+      "explain": {
+        "why": "“Never” ditaruh sebelum kata kerja utama, dan Budi butuh bentuk -s. Hasilnya “never does”.",
+        "rule": "Kata frekuensi ditaruh sebelum kata kerja utama (“She often reads”), tapi sesudah “am/is/are” (“He is always late”). Di kalimat tanya: “Do you usually…?”",
+        "memory": "“Never” sebelum aksinya: “he never does”, “she never eats”.",
+        "avoid": "Cari kata kerjanya. Kalau “be”, taruh kata frekuensi sesudahnya. Kalau kata kerja lain, taruh sebelumnya."
+      }
+    },
+    {
+      "id": "A2-308-cz0",
+      "templateId": "A2-308",
+      "skill": "adverbs_of_frequency_mid_position",
+      "level": "A2",
+      "sentence": "“___ ride your bike to school?” “Yes, almost every day.”",
+      "blank": {
+        "answer": "Do you usually",
+        "alternates": [],
+        "position": 1
+      },
+      "distractors": [
+        {
+          "text": "Usually do you",
+          "misconception": "frequency word moved to the front of a question",
+          "whyFailsId": "memindah “usually” ke depan, padahal di kalimat tanya tempatnya sesudah subjek.",
+          "misconceptionId": "kata frekuensi dipindah ke awal kalimat tanya."
+        },
+        {
+          "text": "Do usually you",
+          "misconception": "frequency word placed before the subject in a question",
+          "whyFailsId": "menaruh “usually” sebelum “you”, padahal tempatnya sesudah subjek.",
+          "misconceptionId": "kata frekuensi ditaruh sebelum subjek di kalimat tanya."
+        },
+        {
+          "text": "You usually do",
+          "misconception": "statement order used for a question",
+          "whyFailsId": "memakai susunan kalimat berita, jadi nggak terdengar seperti pertanyaan.",
+          "misconceptionId": "susunan kalimat berita dipakai untuk kalimat tanya."
+        }
+      ],
+      "explain": {
+        "why": "Di kalimat tanya urutannya “Do” + subjek + kata frekuensi + kata kerja, jadi “Do you usually ride”.",
+        "rule": "Kata frekuensi ditaruh sebelum kata kerja utama (“She often reads”), tapi sesudah “am/is/are” (“He is always late”). Di kalimat tanya: “Do you usually…?”",
+        "memory": "Kalimat tanya: “Do you usually…?”, “Does she often…?”",
+        "avoid": "Cari kata kerjanya. Kalau “be”, taruh kata frekuensi sesudahnya. Kalau kata kerja lain, taruh sebelumnya."
+      }
+    },
+    {
+      "id": "A2-309-cz0",
+      "templateId": "A2-309",
+      "skill": "possessive_s_noun_ownership",
+      "level": "A2",
+      "sentence": "The ___ bowl is empty. Can you feed it?",
+      "blank": {
+        "answer": "cat's",
+        "alternates": [],
+        "position": 4
+      },
+      "distractors": [
+        {
+          "text": "cat",
+          "misconception": "drops the marker of ownership entirely, lining up two nouns as Indonesian does",
+          "whyFailsId": "nggak punya tanda pemilik, jadi terbaca seperti dua kata benda yang ditempel.",
+          "misconceptionId": "tanda pemilik hilang, dua kata benda ditempel begitu saja."
+        },
+        {
+          "text": "cats",
+          "misconception": "writes a plain -s ending that superficially resembles the possessive but loses the apostrophe",
+          "whyFailsId": "tanpa apostrof terbaca seperti “banyak kucing”, bukan pemiliknya.",
+          "misconceptionId": "akhiran -s ditulis tanpa apostrof."
+        },
+        {
+          "text": "cat its",
+          "misconception": "inserting a duplicate owner pronoun after the name, marking possession twice",
+          "whyFailsId": "menandai pemilik dua kali, padahal 's saja sudah cukup.",
+          "misconceptionId": "kata pemilik ditambahkan sesudah kata bendanya."
+        }
+      ],
+      "explain": {
+        "why": "Mangkuknya milik si kucing, satu pemilik, jadi “cat” ditambah 's.",
+        "rule": "Pemilik + 's + barangnya (“Sinta's bag”). Pemilik jamak berakhiran s cukup ditambah apostrof (“my parents' car”). Jamak tanpa s tetap 's (“children's”).",
+        "memory": "Pemilik + 's + barang: “the cat's bowl”.",
+        "avoid": "Cari pemiliknya dulu. Satu pemilik? Tambah 's. Lebih dari satu dan berakhiran s? Cukup tambah apostrof."
+      }
+    },
+    {
+      "id": "A2-310-cz0",
+      "templateId": "A2-310",
+      "skill": "possessive_s_noun_ownership",
+      "level": "A2",
+      "sentence": "My two ___ room is next to mine.",
+      "blank": {
+        "answer": "brothers'",
+        "alternates": [],
+        "position": 7
+      },
+      "distractors": [
+        {
+          "text": "brother's",
+          "misconception": "singular owner form used for plural owners",
+          "whyFailsId": "untuk satu saudara, padahal jumlahnya dua.",
+          "misconceptionId": "bentuk pemilik untuk satu orang dipakai untuk pemilik yang banyak."
+        },
+        {
+          "text": "brother",
+          "misconception": "drops the marker of ownership entirely, lining up two nouns as Indonesian does",
+          "whyFailsId": "nggak punya -s jamak dan apostrof, jadi nggak menunjukkan dua pemilik.",
+          "misconceptionId": "tanda jamak dan tanda pemilik sama-sama hilang."
+        },
+        {
+          "text": "brothers's",
+          "misconception": "'s added to a plural that already ends in s",
+          "whyFailsId": "menambah s lagi, padahal sesudah s jamak cukup apostrof saja.",
+          "misconceptionId": "akhiran 's ditambahkan ke bentuk jamak yang sudah berakhiran s."
+        }
+      ],
+      "explain": {
+        "why": "“Two brothers” jamak dan sudah berakhiran s, jadi cukup tambah apostrof sesudah huruf s.",
+        "rule": "Pemilik + 's + barangnya (“Sinta's bag”). Pemilik jamak berakhiran s cukup ditambah apostrof (“my parents' car”). Jamak tanpa s tetap 's (“children's”).",
+        "memory": "Pemilik jamak berakhiran s cukup ditambah apostrof.",
+        "avoid": "Cari pemiliknya dulu. Satu pemilik? Tambah 's. Lebih dari satu dan berakhiran s? Cukup tambah apostrof."
+      }
+    },
+    {
+      "id": "A2-311-cz0",
+      "templateId": "A2-311",
+      "skill": "possessive_s_noun_ownership",
+      "level": "A2",
+      "sentence": "The ___ toys are all over the floor!",
+      "blank": {
+        "answer": "children's",
+        "alternates": [],
+        "position": 4
+      },
+      "distractors": [
+        {
+          "text": "childrens'",
+          "misconception": "s added to a plural that does not take s",
+          "whyFailsId": "menambah s, padahal “children” nggak pernah memakai s.",
+          "misconceptionId": "huruf s ditambahkan ke bentuk jamak yang nggak memakai s."
+        },
+        {
+          "text": "children",
+          "misconception": "drops the marker of ownership entirely, lining up two nouns as Indonesian does",
+          "whyFailsId": "nggak punya tanda pemilik, jadi mainannya nggak jelas milik siapa.",
+          "misconceptionId": "tanda pemilik hilang."
+        },
+        {
+          "text": "childs'",
+          "misconception": "regular plural rule used for an irregular plural",
+          "whyFailsId": "bukan kata yang benar, karena jamak dari “child” adalah “children”.",
+          "misconceptionId": "aturan jamak biasa dipakai untuk kata yang jamaknya khusus."
+        }
+      ],
+      "explain": {
+        "why": "“Children” sudah jamak tapi nggak berakhiran s, jadi tetap ditambah 's.",
+        "rule": "Pemilik + 's + barangnya (“Sinta's bag”). Pemilik jamak berakhiran s cukup ditambah apostrof (“my parents' car”). Jamak tanpa s tetap 's (“children's”).",
+        "memory": "Jamak tanpa akhiran s tetap ditambah 's: “children's”, “men's”.",
+        "avoid": "Cari pemiliknya dulu. Satu pemilik? Tambah 's. Lebih dari satu dan berakhiran s? Cukup tambah apostrof."
+      }
+    },
+    {
+      "id": "A2-312-cz0",
+      "templateId": "A2-312",
+      "skill": "possessive_s_noun_ownership",
+      "level": "A2",
+      "sentence": "“Whose bag is this?” “It's ___.”",
+      "blank": {
+        "answer": "Maya's",
+        "alternates": [],
+        "position": 27
+      },
+      "distractors": [
+        {
+          "text": "Maya",
+          "misconception": "owner named without any ownership marker",
+          "whyFailsId": "cuma menyebut orangnya, bukan menyatakan tas itu miliknya.",
+          "misconceptionId": "nama pemilik disebut tanpa tanda kepemilikan."
+        },
+        {
+          "text": "Mayas",
+          "misconception": "writes a plain -s ending that superficially resembles the possessive but loses the apostrophe",
+          "whyFailsId": "tanpa apostrof, jadi belum jadi bentuk pemilik.",
+          "misconceptionId": "akhiran -s ditulis tanpa apostrof."
+        },
+        {
+          "text": "of Maya",
+          "misconception": "of + name used for a person's belongings",
+          "whyFailsId": "meniru “punya Maya”, padahal bahasa Inggris memakai 's untuk barang milik orang.",
+          "misconceptionId": "pola “of” + nama dipakai untuk barang milik seseorang."
+        }
+      ],
+      "explain": {
+        "why": "Jawabannya menyebut pemiliknya, Maya, jadi namanya ditambah 's walaupun nggak ada kata benda sesudahnya.",
+        "rule": "Pemilik + 's + barangnya (“Sinta's bag”). Pemilik jamak berakhiran s cukup ditambah apostrof (“my parents' car”). Jamak tanpa s tetap 's (“children's”).",
+        "memory": "“It's Maya's” = barang itu milik Maya.",
+        "avoid": "Cari pemiliknya dulu. Satu pemilik? Tambah 's. Lebih dari satu dan berakhiran s? Cukup tambah apostrof."
+      }
+    },
+    {
+      "id": "A2-313-cz0",
+      "templateId": "A2-313",
+      "skill": "would_like_polite_requests",
+      "level": "A2",
+      "sentence": "I would like ___ a table for four, please.",
+      "blank": {
+        "answer": "to book",
+        "alternates": [],
+        "position": 13
+      },
+      "distractors": [
+        {
+          "text": "book",
+          "misconception": "to dropped after would like",
+          "whyFailsId": "nggak memakai “to”, padahal kata kerja sesudah “would like” butuh “to”.",
+          "misconceptionId": "kata “to” hilang sesudah 'would like'."
+        },
+        {
+          "text": "booking",
+          "misconception": "-ing form used after would like",
+          "whyFailsId": "memakai -ing, padahal “would like” diikuti “to” + bentuk dasar.",
+          "misconceptionId": "bentuk -ing dipakai sesudah 'would like'."
+        },
+        {
+          "text": "to booking",
+          "misconception": "mixes the to-infinitive and the -ing ending into one broken shape",
+          "whyFailsId": "mencampur “to” dengan -ing, padahal sesudah “to” kata kerjanya tetap bentuk dasar.",
+          "misconceptionId": "“to” dicampur dengan -ing."
+        }
+      ],
+      "explain": {
+        "why": "Sesudah “would like”, kata kerja berikutnya butuh “to”, jadi “would like to book”.",
+        "rule": "Meminta: “I would like” + benda, atau + “to” + kata kerja. Menawarkan: “Would you like…?”. Menyuruh orang lain: “would like me to” + kata kerja.",
+        "memory": "“Would like” + “to” + kata kerja: “I'd like to book”.",
+        "avoid": "Lagi memesan atau menawarkan? Pakai “would like”. Kalau sesudahnya kata kerja, taruh “to” di depannya."
+      }
+    },
+    {
+      "id": "A2-314-cz0",
+      "templateId": "A2-314",
+      "skill": "would_like_polite_requests",
+      "level": "A2",
+      "sentence": "___ you like some cake? I made it myself!",
+      "blank": {
+        "answer": "Would",
+        "alternates": [],
+        "position": 0
+      },
+      "distractors": [
+        {
+          "text": "Do",
+          "misconception": "stating a general preference in casual flat form instead of the polite request formula",
+          "whyFailsId": "menanyakan selera secara umum, bukan menawarkan kue sekarang.",
+          "misconceptionId": "“do you like” dipakai untuk menawarkan."
+        },
+        {
+          "text": "Are",
+          "misconception": "be used with like in an offer",
+          "whyFailsId": "termasuk bentuk “be”, padahal bentuk “be” nggak bisa dipasangkan dengan “like”.",
+          "misconceptionId": "bentuk “be” dipasangkan dengan “like” untuk menawarkan."
+        },
+        {
+          "text": "Will",
+          "misconception": "will used for a polite offer",
+          "whyFailsId": "membicarakan masa depan, padahal tawaran sopan memakai kata lain.",
+          "misconceptionId": "“will” dipakai untuk tawaran sopan."
+        }
+      ],
+      "explain": {
+        "why": "Ini tawaran, dan tawaran sopan memakai “Would you like…?”",
+        "rule": "Meminta: “I would like” + benda, atau + “to” + kata kerja. Menawarkan: “Would you like…?”. Menyuruh orang lain: “would like me to” + kata kerja.",
+        "memory": "Mau menawarkan sesuatu? “Would you like…?”",
+        "avoid": "Lagi memesan atau menawarkan? Pakai “would like”. Kalau sesudahnya kata kerja, taruh “to” di depannya."
+      }
+    },
+    {
+      "id": "A2-315-cz0",
+      "templateId": "A2-315",
+      "skill": "would_like_polite_requests",
+      "level": "A2",
+      "sentence": "My mum would like me ___ my room today.",
+      "blank": {
+        "answer": "to clean",
+        "alternates": [],
+        "position": 21
+      },
+      "distractors": [
+        {
+          "text": "clean",
+          "misconception": "to dropped after would like + person",
+          "whyFailsId": "nggak memakai “to”, padahal sesudah “would like me” kata kerjanya butuh “to”.",
+          "misconceptionId": "kata “to” hilang sesudah 'would like' + orang."
+        },
+        {
+          "text": "cleaning",
+          "misconception": "-ing form used after would like",
+          "whyFailsId": "memakai -ing, padahal pola ini diikuti “to” + bentuk dasar.",
+          "misconceptionId": "bentuk -ing dipakai sesudah 'would like'."
+        },
+        {
+          "text": "cleaned",
+          "misconception": "past form used after would like",
+          "whyFailsId": "bentuk lampau, padahal ibu ingin kamarnya dibersihkan hari ini.",
+          "misconceptionId": "bentuk lampau dipakai sesudah 'would like'."
+        }
+      ],
+      "explain": {
+        "why": "Polanya “would like” + orang + “to” + kata kerja, jadi “would like me to clean”.",
+        "rule": "Meminta: “I would like” + benda, atau + “to” + kata kerja. Menawarkan: “Would you like…?”. Menyuruh orang lain: “would like me to” + kata kerja.",
+        "memory": "Mau orang lain melakukan sesuatu? “would like” + “me/you” + “to” + kata kerja.",
+        "avoid": "Lagi memesan atau menawarkan? Pakai “would like”. Kalau sesudahnya kata kerja, taruh “to” di depannya."
+      }
+    },
+    {
+      "id": "A2-316-cz0",
+      "templateId": "A2-316",
+      "skill": "would_like_polite_requests",
+      "level": "A2",
+      "sentence": "What ___ for your birthday?",
+      "blank": {
+        "answer": "would you like",
+        "alternates": [],
+        "position": 5
+      },
+      "distractors": [
+        {
+          "text": "you would like",
+          "misconception": "statement order used for a question",
+          "whyFailsId": "memakai susunan kalimat berita, jadi belum jadi pertanyaan.",
+          "misconceptionId": "susunan kalimat berita dipakai untuk kalimat tanya."
+        },
+        {
+          "text": "do you would like",
+          "misconception": "do added to a question that already has would",
+          "whyFailsId": "menambah “do”, padahal “would” sudah membentuk pertanyaannya.",
+          "misconceptionId": "'do' ditambahkan ke pertanyaan yang sudah punya 'would'."
+        },
+        {
+          "text": "would you liking",
+          "misconception": "gluing an -ing onto the verb after 'would', a blend of two separate patterns",
+          "whyFailsId": "memakai -ing, padahal sesudah “would” kata kerjanya tetap bentuk dasar.",
+          "misconceptionId": "-ing ditempel pada kata kerja sesudah “would”."
+        }
+      ],
+      "explain": {
+        "why": "Di pertanyaan dengan “what”, “would” ditaruh sebelum subjek, jadi “What would you like”.",
+        "rule": "Meminta: “I would like” + benda, atau + “to” + kata kerja. Menawarkan: “Would you like…?”. Menyuruh orang lain: “would like me to” + kata kerja.",
+        "memory": "“What would you like?” = “Kamu mau apa?”",
+        "avoid": "Lagi memesan atau menawarkan? Pakai “would like”. Kalau sesudahnya kata kerja, taruh “to” di depannya."
+      }
+    },
+    {
+      "id": "A2-317-cz0",
+      "templateId": "A2-317",
+      "skill": "like_love_hate_plus_gerund_preferences",
+      "level": "A2",
+      "sentence": "Nadia loves ___ in the sea.",
+      "blank": {
+        "answer": "swimming",
+        "alternates": [],
+        "position": 12
+      },
+      "distractors": [
+        {
+          "text": "swim",
+          "misconception": "following the feeling verb with a bare infinitive, chaining verbs directly as Indonesian does",
+          "whyFailsId": "belum diberi -ing, padahal sesudah “loves” kata kerjanya butuh -ing.",
+          "misconceptionId": "kata kerja dasar langsung ditaruh sesudah “loves”."
+        },
+        {
+          "text": "swiming",
+          "misconception": "consonant not doubled before -ing",
+          "whyFailsId": "lupa menggandakan huruf m sebelum -ing.",
+          "misconceptionId": "huruf mati terakhir nggak digandakan sebelum -ing."
+        },
+        {
+          "text": "to swimming",
+          "misconception": "mixes the to-infinitive and the -ing ending into one broken shape",
+          "whyFailsId": "mencampur “to” dengan -ing dalam satu bentuk.",
+          "misconceptionId": "“to” dicampur dengan -ing."
+        }
+      ],
+      "explain": {
+        "why": "Sesudah “loves” pakai -ing, dan “swim” menggandakan huruf m. Hasilnya “swimming”.",
+        "rule": "“Like”, “love”, “hate”, “enjoy” + kata kerja -ing (“I love swimming”). “Enjoy” selalu diikuti -ing. Ejaan: “swim” jadi “swimming”, “dance” jadi “dancing”.",
+        "memory": "Kata pendek berakhiran satu vokal + satu konsonan: gandakan hurufnya. “Swim” jadi “swimming”, “run” jadi “running”.",
+        "avoid": "Sesudah kata kerja perasaan, beri kata kerja berikutnya -ing dan periksa ejaannya."
+      }
+    },
+    {
+      "id": "A2-318-cz0",
+      "templateId": "A2-318",
+      "skill": "like_love_hate_plus_gerund_preferences",
+      "level": "A2",
+      "sentence": "My dad hates ___ in traffic jams.",
+      "blank": {
+        "answer": "waiting",
+        "alternates": [],
+        "position": 13
+      },
+      "distractors": [
+        {
+          "text": "wait",
+          "misconception": "following the feeling verb with a bare infinitive, chaining verbs directly as Indonesian does",
+          "whyFailsId": "belum diberi -ing, padahal sesudah “hates” kata kerjanya butuh -ing.",
+          "misconceptionId": "kata kerja dasar langsung ditaruh sesudah “hates”."
+        },
+        {
+          "text": "waits",
+          "misconception": "-s added to the second verb",
+          "whyFailsId": "memakai -s, padahal -s sudah ada di “hates” dan kata kerja kedua butuh -ing.",
+          "misconceptionId": "akhiran -s ditambahkan ke kata kerja kedua."
+        },
+        {
+          "text": "is waiting",
+          "misconception": "second main verb added after a feeling verb",
+          "whyFailsId": "menambah “is”, jadi ada dua kata kerja utama dalam satu kalimat.",
+          "misconceptionId": "kata kerja utama kedua ditambahkan sesudah kata kerja perasaan."
+        }
+      ],
+      "explain": {
+        "why": "Sesudah “hates” pakai bentuk -ing, jadi “hates waiting”.",
+        "rule": "“Like”, “love”, “hate”, “enjoy” + kata kerja -ing (“I love swimming”). “Enjoy” selalu diikuti -ing. Ejaan: “swim” jadi “swimming”, “dance” jadi “dancing”.",
+        "memory": "“Hate” + -ing: “hate waiting”, “hate cleaning”.",
+        "avoid": "Sesudah kata kerja perasaan, beri kata kerja berikutnya -ing dan periksa ejaannya."
+      }
+    },
+    {
+      "id": "A2-319-cz0",
+      "templateId": "A2-319",
+      "skill": "like_love_hate_plus_gerund_preferences",
+      "level": "A2",
+      "sentence": "My little sister loves ___ to K-pop songs.",
+      "blank": {
+        "answer": "dancing",
+        "alternates": [],
+        "position": 23
+      },
+      "distractors": [
+        {
+          "text": "danceing",
+          "misconception": "final e kept before -ing",
+          "whyFailsId": "masih menyimpan huruf e, padahal huruf e dibuang sebelum -ing.",
+          "misconceptionId": "huruf e di akhir kata dipertahankan sebelum -ing."
+        },
+        {
+          "text": "dance",
+          "misconception": "following the feeling verb with a bare infinitive, chaining verbs directly as Indonesian does",
+          "whyFailsId": "belum diberi -ing, padahal sesudah “loves” kata kerjanya butuh -ing.",
+          "misconceptionId": "kata kerja dasar langsung ditaruh sesudah “loves”."
+        },
+        {
+          "text": "to dancing",
+          "misconception": "mixes the to-infinitive and the -ing ending into one broken shape",
+          "whyFailsId": "mencampur “to” dengan -ing dalam satu bentuk.",
+          "misconceptionId": "“to” dicampur dengan -ing."
+        }
+      ],
+      "explain": {
+        "why": "Sesudah “loves” pakai -ing, dan huruf e di akhir “dance” dibuang sebelum -ing.",
+        "rule": "“Like”, “love”, “hate”, “enjoy” + kata kerja -ing (“I love swimming”). “Enjoy” selalu diikuti -ing. Ejaan: “swim” jadi “swimming”, “dance” jadi “dancing”.",
+        "memory": "Huruf e di akhir dibuang sebelum -ing: “dance” jadi “dancing”, “make” jadi “making”.",
+        "avoid": "Sesudah kata kerja perasaan, beri kata kerja berikutnya -ing dan periksa ejaannya."
+      }
+    },
+    {
+      "id": "A2-320-cz0",
+      "templateId": "A2-320",
+      "skill": "like_love_hate_plus_gerund_preferences",
+      "level": "A2",
+      "sentence": "Rafi doesn't enjoy ___ homework on Sundays.",
+      "blank": {
+        "answer": "doing",
+        "alternates": [],
+        "position": 19
+      },
+      "distractors": [
+        {
+          "text": "do",
+          "misconception": "following the feeling verb with a bare infinitive, chaining verbs directly as Indonesian does",
+          "whyFailsId": "belum diberi -ing, padahal sesudah “enjoy” kata kerjanya butuh -ing.",
+          "misconceptionId": "kata kerja dasar langsung ditaruh sesudah “enjoy”."
+        },
+        {
+          "text": "to do",
+          "misconception": "uses a to-infinitive after 'enjoy'",
+          "whyFailsId": "memakai “to”, padahal “enjoy” nggak pernah diikuti “to”.",
+          "misconceptionId": "“to” dipakai sesudah “enjoy”."
+        },
+        {
+          "text": "does",
+          "misconception": "-s added to the second verb",
+          "whyFailsId": "memakai -s, padahal kata kerja kedua butuh -ing, bukan -s.",
+          "misconceptionId": "akhiran -s ditambahkan ke kata kerja kedua."
+        }
+      ],
+      "explain": {
+        "why": "“Enjoy” selalu diikuti -ing, termasuk di kalimat negatif, jadi “doesn't enjoy doing”.",
+        "rule": "“Like”, “love”, “hate”, “enjoy” + kata kerja -ing (“I love swimming”). “Enjoy” selalu diikuti -ing. Ejaan: “swim” jadi “swimming”, “dance” jadi “dancing”.",
+        "memory": "“Enjoy” selalu + -ing: “enjoy doing”, “enjoy playing”.",
+        "avoid": "Sesudah kata kerja perasaan, beri kata kerja berikutnya -ing dan periksa ejaannya."
+      }
+    },
+    {
+      "id": "A2-321-cz0",
+      "templateId": "A2-321",
+      "skill": "present_simple_vs_continuous",
+      "level": "A2",
+      "sentence": "Dina usually ___ to school, but today she is taking the bus.",
+      "blank": {
+        "answer": "walks",
+        "alternates": [],
+        "position": 13
+      },
+      "distractors": [
+        {
+          "text": "is walking",
+          "misconception": "progressive form used for a habit",
+          "whyFailsId": "untuk kejadian sekarang, padahal “usually” menunjukkan kebiasaan.",
+          "misconceptionId": "bentuk yang sedang berlangsung dipakai untuk kebiasaan."
+        },
+        {
+          "text": "walk",
+          "misconception": "missing subject-verb agreement / bare form",
+          "whyFailsId": "lupa -s, padahal Dina sama dengan “she”.",
+          "misconceptionId": "bentuk dasar dipakai untuk Dina."
+        },
+        {
+          "text": "walked",
+          "misconception": "past tense used for a timeless fact",
+          "whyFailsId": "bentuk lampau, padahal “usually” membicarakan kebiasaannya sekarang.",
+          "misconceptionId": "bentuk lampau dipakai untuk kebiasaan sekarang."
+        }
+      ],
+      "explain": {
+        "why": "“Usually” menunjukkan kebiasaan, dan Dina sama dengan “she”, jadi “walks”.",
+        "rule": "Untuk kebiasaan (“every day”, “usually”) pakai present simple. Untuk yang sedang terjadi (“now”, “look!”) pakai bentuk “be” + -ing.",
+        "memory": "“Usually” = kebiasaan = “walks”. “Today” = sekarang = “is taking”.",
+        "avoid": "Lingkari kata waktunya dulu: kata kebiasaan atau kata “sekarang”?"
+      }
+    },
+    {
+      "id": "A2-322-cz0",
+      "templateId": "A2-322",
+      "skill": "present_simple_vs_continuous",
+      "level": "A2",
+      "sentence": "Be quiet! The students ___ an exam at the moment.",
+      "blank": {
+        "answer": "are taking",
+        "alternates": [],
+        "position": 23
+      },
+      "distractors": [
+        {
+          "text": "take",
+          "misconception": "habitual-aspect overgeneralization",
+          "whyFailsId": "untuk kebiasaan, padahal “at the moment” artinya sekarang.",
+          "misconceptionId": "bentuk kebiasaan dipakai untuk kejadian sekarang."
+        },
+        {
+          "text": "is taking",
+          "misconception": "singular be used in present continuous with a plural subject",
+          "whyFailsId": "bentuk “be”-nya untuk satu orang, padahal murid-muridnya banyak.",
+          "misconceptionId": "bentuk “be” tunggal dipakai untuk banyak orang yang sedang melakukan sesuatu."
+        },
+        {
+          "text": "takes",
+          "misconception": "singular habit form used for a plural action now",
+          "whyFailsId": "bentuk kebiasaan untuk satu orang, padahal banyak murid sedang mengerjakannya sekarang.",
+          "misconceptionId": "bentuk kebiasaan untuk satu orang dipakai untuk banyak orang yang sedang beraksi."
+        }
+      ],
+      "explain": {
+        "why": "“At the moment” artinya sekarang, dan muridnya banyak, jadi pakai “are taking”.",
+        "rule": "Untuk kebiasaan (“every day”, “usually”) pakai present simple. Untuk yang sedang terjadi (“now”, “look!”) pakai bentuk “be” + -ing.",
+        "memory": "“At the moment” = sekarang = “be” + -ing.",
+        "avoid": "Lingkari kata waktunya dulu: kata kebiasaan atau kata “sekarang”?"
+      }
+    },
+    {
+      "id": "A2-323-cz0",
+      "templateId": "A2-323",
+      "skill": "present_simple_vs_continuous",
+      "level": "A2",
+      "sentence": "My mum ___ coffee. She only drinks tea.",
+      "blank": {
+        "answer": "doesn't drink",
+        "alternates": [],
+        "position": 7
+      },
+      "distractors": [
+        {
+          "text": "isn't drinking",
+          "misconception": "progressive negative used for a general habit",
+          "whyFailsId": "cuma soal saat ini, padahal kalimatnya membicarakan kebiasaannya.",
+          "misconceptionId": "bentuk negatif yang sedang berlangsung dipakai untuk kebiasaan umum."
+        },
+        {
+          "text": "don't drink",
+          "misconception": "don't used with he, she, or it",
+          "whyFailsId": "untuk “I”, “you”, “we”, dan “they”, padahal “my mum” sama dengan “she”.",
+          "misconceptionId": "“don't” dipakai untuk “he”, “she”, atau “it”."
+        },
+        {
+          "text": "not drinks",
+          "misconception": "not used without a helper verb in a negative",
+          "whyFailsId": "nggak punya kata bantu, padahal kalimat negatif ini butuh “doesn't”.",
+          "misconceptionId": "“not” dipakai tanpa kata bantu di kalimat negatif."
+        }
+      ],
+      "explain": {
+        "why": "“She only drinks tea” adalah kebiasaan umum, jadi bentuk negatifnya “doesn't drink”.",
+        "rule": "Untuk kebiasaan (“every day”, “usually”) pakai present simple. Untuk yang sedang terjadi (“now”, “look!”) pakai bentuk “be” + -ing.",
+        "memory": "Kebiasaan, bukan cuma saat ini: “she doesn't drink”.",
+        "avoid": "Lingkari kata waktunya dulu: kata kebiasaan atau kata “sekarang”?"
+      }
+    },
+    {
+      "id": "A2-324-cz0",
+      "templateId": "A2-324",
+      "skill": "present_simple_vs_continuous",
+      "level": "A2",
+      "sentence": "Why ___ an umbrella? It isn't raining.",
+      "blank": {
+        "answer": "are you carrying",
+        "alternates": [],
+        "position": 4
+      },
+      "distractors": [
+        {
+          "text": "you are carrying",
+          "misconception": "statement order used for a question",
+          "whyFailsId": "memakai susunan kalimat berita, jadi belum jadi pertanyaan.",
+          "misconceptionId": "susunan kalimat berita dipakai untuk kalimat tanya."
+        },
+        {
+          "text": "are you carry",
+          "misconception": "-ing missing after am, is, or are",
+          "whyFailsId": "lupa -ing, padahal sesudah “are” kata kerjanya butuh -ing.",
+          "misconceptionId": "akhiran -ing lupa ditambahkan sesudah bentuk “be”."
+        },
+        {
+          "text": "do you carrying",
+          "misconception": "do mixed with an -ing verb",
+          "whyFailsId": "mencampur “do” dengan -ing, padahal kata kerja -ing butuh bentuk “be”.",
+          "misconceptionId": "kata bantu “do” dicampur dengan kata kerja -ing."
+        }
+      ],
+      "explain": {
+        "why": "Kejadiannya sekarang, jadi kalimat tanyanya “are” + “you” + -ing, yaitu “are you carrying”.",
+        "rule": "Untuk kebiasaan (“every day”, “usually”) pakai present simple. Untuk yang sedang terjadi (“now”, “look!”) pakai bentuk “be” + -ing.",
+        "memory": "Tanya soal sekarang: “Why are you” + -ing?",
+        "avoid": "Lingkari kata waktunya dulu: kata kebiasaan atau kata “sekarang”?"
+      }
+    },
+    {
+      "id": "A2-325-cz0",
+      "templateId": "A2-325",
+      "skill": "obligation_vs_permission",
+      "level": "A2",
+      "sentence": "You ___ use your phone during the test. It's against the rules.",
+      "blank": {
+        "answer": "mustn't",
+        "alternates": [],
+        "position": 4
+      },
+      "distractors": [
+        {
+          "text": "don't have to",
+          "misconception": "don't have to used for a ban",
+          "whyFailsId": "artinya “nggak perlu”, jadi terdengar seperti pilihan bebas, bukan larangan.",
+          "misconceptionId": "“don't have to” (nggak perlu) dipakai untuk larangan."
+        },
+        {
+          "text": "must",
+          "misconception": "must used where the rule forbids the action",
+          "whyFailsId": "artinya wajib memakai ponsel, kebalikan dari aturannya.",
+          "misconceptionId": "“must” (wajib) dipakai untuk hal yang justru dilarang."
+        },
+        {
+          "text": "can",
+          "misconception": "can used for something the rules forbid",
+          "whyFailsId": "memberi izin, padahal aturannya melarang.",
+          "misconceptionId": "“can” (boleh) dipakai untuk hal yang dilarang aturan."
+        }
+      ],
+      "explain": {
+        "why": "“Against the rules” artinya dilarang, jadi pakai “mustn't”.",
+        "rule": "“Must”/“have to” = wajib. “Can” = boleh. “Mustn't” = dilarang. “Don't have to” = nggak wajib, boleh memilih.",
+        "memory": "Melanggar aturan = “mustn't” = dilarang.",
+        "avoid": "Tanya dirimu: ini aturan, izin, larangan, atau pilihan bebas?"
+      }
+    },
+    {
+      "id": "A2-326-cz0",
+      "templateId": "A2-326",
+      "skill": "obligation_vs_permission",
+      "level": "A2",
+      "sentence": "Tomorrow is a holiday, so we ___ go to school.",
+      "blank": {
+        "answer": "don't have to",
+        "alternates": [],
+        "position": 29
+      },
+      "distractors": [
+        {
+          "text": "mustn't",
+          "misconception": "treats 'mustn't' as the negation of obligation rather than prohibition",
+          "whyFailsId": "artinya dilarang ke sekolah, padahal libur cuma berarti nggak perlu.",
+          "misconceptionId": "“mustn't” dibaca sebagai “nggak perlu”."
+        },
+        {
+          "text": "have to",
+          "misconception": "have to used when there is no need",
+          "whyFailsId": "artinya wajib pergi, padahal besok libur.",
+          "misconceptionId": "“have to” (wajib) dipakai saat nggak ada keharusan."
+        },
+        {
+          "text": "can't",
+          "misconception": "confuses lack of requirement with lack of permission/ability",
+          "whyFailsId": "artinya nggak bisa atau nggak boleh, padahal nggak ada yang melarang.",
+          "misconceptionId": "“can't” dipakai untuk hal yang cuma nggak perlu."
+        }
+      ],
+      "explain": {
+        "why": "Hari libur artinya nggak perlu ke sekolah, jadi pakai “don't have to”.",
+        "rule": "“Must”/“have to” = wajib. “Can” = boleh. “Mustn't” = dilarang. “Don't have to” = nggak wajib, boleh memilih.",
+        "memory": "Nggak perlu = “don't have to”. Dilarang = “mustn't”.",
+        "avoid": "Tanya dirimu: ini aturan, izin, larangan, atau pilihan bebas?"
+      }
+    },
+    {
+      "id": "A2-327-cz0",
+      "templateId": "A2-327",
+      "skill": "obligation_vs_permission",
+      "level": "A2",
+      "sentence": "“___ I borrow your pen?” “Sure, here you are.”",
+      "blank": {
+        "answer": "Can",
+        "alternates": [],
+        "position": 1
+      },
+      "distractors": [
+        {
+          "text": "Must",
+          "misconception": "must used to ask for permission",
+          "whyFailsId": "menanyakan apakah kamu wajib, bukan apakah kamu boleh.",
+          "misconceptionId": "“must” (wajib) dipakai untuk minta izin."
+        },
+        {
+          "text": "Have",
+          "misconception": "have used without to in a question",
+          "whyFailsId": "butuh “to” dan artinya “wajib”, jadi nggak bisa dipakai untuk minta izin.",
+          "misconceptionId": "“have” dipakai tanpa “to” di kalimat tanya."
+        },
+        {
+          "text": "Do",
+          "misconception": "do used to ask for permission",
+          "whyFailsId": "menanyakan kebiasaan, bukan minta izin.",
+          "misconceptionId": "“do” dipakai untuk minta izin."
+        }
+      ],
+      "explain": {
+        "why": "Minta izin memakai “Can I…?”, dan jawaban “Sure” memberi izin itu.",
+        "rule": "“Must”/“have to” = wajib. “Can” = boleh. “Mustn't” = dilarang. “Don't have to” = nggak wajib, boleh memilih.",
+        "memory": "Minta izin: “Can I…?” atau “May I…?”",
+        "avoid": "Tanya dirimu: ini aturan, izin, larangan, atau pilihan bebas?"
+      }
+    },
+    {
+      "id": "A2-328-cz0",
+      "templateId": "A2-328",
+      "skill": "obligation_vs_permission",
+      "level": "A2",
+      "sentence": "In Indonesia, drivers ___ drive on the left. It's the law.",
+      "blank": {
+        "answer": "have to",
+        "alternates": [],
+        "position": 22
+      },
+      "distractors": [
+        {
+          "text": "don't have to",
+          "misconception": "don't have to used for a law",
+          "whyFailsId": "membuat menyetir di kiri jadi pilihan bebas, padahal itu hukum.",
+          "misconceptionId": "“don't have to” (nggak perlu) dipakai untuk hal yang diwajibkan hukum."
+        },
+        {
+          "text": "can",
+          "misconception": "obligation read as ability/permission",
+          "whyFailsId": "cuma bilang pengemudi boleh, padahal hukum mewajibkannya.",
+          "misconceptionId": "“can” dipakai untuk kewajiban."
+        },
+        {
+          "text": "mustn't",
+          "misconception": "mustn't used for something that is required",
+          "whyFailsId": "melarang menyetir di kiri, kebalikan dari hukumnya.",
+          "misconceptionId": "“mustn't” (dilarang) dipakai untuk hal yang wajib."
+        }
+      ],
+      "explain": {
+        "why": "“It's the law” artinya wajib, jadi pengemudi “have to” menyetir di kiri.",
+        "rule": "“Must”/“have to” = wajib. “Can” = boleh. “Mustn't” = dilarang. “Don't have to” = nggak wajib, boleh memilih.",
+        "memory": "Diatur hukum = “have to” atau “must”.",
+        "avoid": "Tanya dirimu: ini aturan, izin, larangan, atau pilihan bebas?"
+      }
+    },
+    {
+      "id": "A2-329-cz0",
+      "templateId": "A2-329",
+      "skill": "zero_vs_first_conditional",
+      "level": "A2",
+      "sentence": "If it ___ tomorrow, we won't go to the beach.",
+      "blank": {
+        "answer": "rains",
+        "alternates": [],
+        "position": 6
+      },
+      "distractors": [
+        {
+          "text": "will rain",
+          "misconception": "will used after if",
+          "whyFailsId": "menaruh “will” sesudah “if”, padahal bagian “if” memakai present.",
+          "misconceptionId": "“will” dipakai di bagian “if”."
+        },
+        {
+          "text": "rained",
+          "misconception": "uses simple past for an explicitly future consequence",
+          "whyFailsId": "bentuk lampau, padahal “tomorrow” masih di masa depan.",
+          "misconceptionId": "bentuk lampau dipakai untuk hari esok."
+        },
+        {
+          "text": "rain",
+          "misconception": "missing subject-verb agreement / bare form",
+          "whyFailsId": "lupa -s, padahal subjeknya “it”.",
+          "misconceptionId": "bentuk dasar dipakai untuk “it”."
+        }
+      ],
+      "explain": {
+        "why": "Sesudah “if” pakai present simple, walaupun kejadiannya besok, jadi “rains”.",
+        "rule": "Selalu benar: “If” + present, present (“If you heat ice, it melts”). Akibat di masa depan: “If” + present, “will” + kata kerja. Sesudah “if” jangan pakai “will”.",
+        "memory": "“If” + present, “will” + kata kerja: “If it rains, we will stay”.",
+        "avoid": "Tanya: ini selalu benar, atau satu kejadian nanti? Lalu pastikan nggak ada “will” sesudah “if”."
+      }
+    },
+    {
+      "id": "A2-330-cz0",
+      "templateId": "A2-330",
+      "skill": "zero_vs_first_conditional",
+      "level": "A2",
+      "sentence": "If you mix red and blue, you ___ purple.",
+      "blank": {
+        "answer": "get",
+        "alternates": [],
+        "position": 29
+      },
+      "distractors": [
+        {
+          "text": "would get",
+          "misconception": "real condition treated as hypothetical",
+          "whyFailsId": "untuk hal yang cuma diandaikan, padahal ini benar-benar terjadi.",
+          "misconceptionId": "fakta yang nyata diperlakukan sebagai andai-andai."
+        },
+        {
+          "text": "got",
+          "misconception": "past tense used for a timeless fact",
+          "whyFailsId": "bentuk lampau, padahal fakta ini benar kapan saja.",
+          "misconceptionId": "bentuk lampau dipakai untuk fakta yang selalu benar."
+        },
+        {
+          "text": "getting",
+          "misconception": "reduces the sentence to a fragment: an -ing form with no finite verb to carry the tense",
+          "whyFailsId": "nggak bisa berdiri sendiri sebagai kata kerja kalimat.",
+          "misconceptionId": "bentuk -ing dipakai sendirian sebagai kata kerja kalimat."
+        }
+      ],
+      "explain": {
+        "why": "Merah dicampur biru selalu jadi ungu. Fakta yang selalu benar pakai present, jadi “get”.",
+        "rule": "Selalu benar: “If” + present, present (“If you heat ice, it melts”). Akibat di masa depan: “If” + present, “will” + kata kerja. Sesudah “if” jangan pakai “will”.",
+        "memory": "Selalu benar? Present ketemu present.",
+        "avoid": "Tanya: ini selalu benar, atau satu kejadian nanti? Lalu pastikan nggak ada “will” sesudah “if”."
+      }
+    },
+    {
+      "id": "A2-331-cz0",
+      "templateId": "A2-331",
+      "skill": "zero_vs_first_conditional",
+      "level": "A2",
+      "sentence": "Hurry up! If you don't leave now, you ___ the bus.",
+      "blank": {
+        "answer": "will miss",
+        "alternates": [],
+        "position": 38
+      },
+      "distractors": [
+        {
+          "text": "miss",
+          "misconception": "drops the future marker entirely, defaulting to present simple",
+          "whyFailsId": "nggak punya “will”, jadi terdengar seperti fakta umum, bukan peringatan soal bus ini.",
+          "misconceptionId": "penanda masa depan hilang dari bagian akibatnya."
+        },
+        {
+          "text": "missed",
+          "misconception": "uses simple past for an explicitly future consequence",
+          "whyFailsId": "bentuk lampau, padahal busnya belum berangkat.",
+          "misconceptionId": "bentuk lampau dipakai untuk akibat yang belum terjadi."
+        },
+        {
+          "text": "will missing",
+          "misconception": "-ing form used after will",
+          "whyFailsId": "memakai -ing, padahal sesudah “will” kata kerjanya tetap bentuk dasar.",
+          "misconceptionId": "bentuk -ing dipakai sesudah “will”."
+        }
+      ],
+      "explain": {
+        "why": "Ini peringatan tentang satu akibat nanti, jadi bagian akibatnya pakai “will” + kata kerja dasar.",
+        "rule": "Selalu benar: “If” + present, present (“If you heat ice, it melts”). Akibat di masa depan: “If” + present, “will” + kata kerja. Sesudah “if” jangan pakai “will”.",
+        "memory": "Peringatan untuk nanti: “If you…, you will…”",
+        "avoid": "Tanya: ini selalu benar, atau satu kejadian nanti? Lalu pastikan nggak ada “will” sesudah “if”."
+      }
+    },
+    {
+      "id": "A2-332-cz0",
+      "templateId": "A2-332",
+      "skill": "zero_vs_first_conditional",
+      "level": "A2",
+      "sentence": "Plants die if they ___ water.",
+      "blank": {
+        "answer": "don't get",
+        "alternates": [],
+        "position": 19
+      },
+      "distractors": [
+        {
+          "text": "won't get",
+          "misconception": "will used after if",
+          "whyFailsId": "menaruh “won't” (will not) di bagian “if”, padahal bagian itu memakai present.",
+          "misconceptionId": "“will” dipakai di bagian “if”."
+        },
+        {
+          "text": "didn't get",
+          "misconception": "past tense used for a timeless fact",
+          "whyFailsId": "bentuk lampau, padahal fakta ini selalu benar.",
+          "misconceptionId": "bentuk lampau dipakai untuk fakta ilmiah."
+        },
+        {
+          "text": "doesn't get",
+          "misconception": "doesn't used with a plural subject",
+          "whyFailsId": "untuk “he”, “she”, atau “it”, padahal “they” artinya tanaman-tanaman itu.",
+          "misconceptionId": "“doesn't” dipakai untuk subjek jamak."
+        }
+      ],
+      "explain": {
+        "why": "Ini selalu benar, jadi kedua bagiannya pakai present, dan “they” pakai “don't”.",
+        "rule": "Selalu benar: “If” + present, present (“If you heat ice, it melts”). Akibat di masa depan: “If” + present, “will” + kata kerja. Sesudah “if” jangan pakai “will”.",
+        "memory": "Fakta ilmiah pakai present di kedua bagian.",
+        "avoid": "Tanya: ini selalu benar, atau satu kejadian nanti? Lalu pastikan nggak ada “will” sesudah “if”."
+      }
+    },
+    {
+      "id": "A2-333-cz0",
+      "templateId": "A2-333",
+      "skill": "first_vs_subsequent_mention",
+      "level": "A2",
+      "sentence": "Rina has a cat and a rabbit. ___ rabbit is white.",
+      "blank": {
+        "answer": "The",
+        "alternates": [],
+        "position": 29
+      },
+      "distractors": [
+        {
+          "text": "A",
+          "misconception": "indefinite article reused for an already-identified noun",
+          "whyFailsId": "memperkenalkan kelinci baru, padahal kelinci ini sudah kita kenal.",
+          "misconceptionId": "“a” dipakai lagi untuk kelinci yang sudah disebut."
+        },
+        {
+          "text": "An",
+          "misconception": "wrong article form regardless of identifiability (vowel-sound rule misapplied)",
+          "whyFailsId": "untuk bunyi vokal, dan kelincinya pun sudah dikenal.",
+          "misconceptionId": "“an” dipakai sebelum bunyi konsonan."
+        },
+        {
+          "text": "Some",
+          "misconception": "quantifier substituted for a singular countable reference",
+          "whyFailsId": "untuk lebih dari satu, padahal kelincinya cuma satu.",
+          "misconceptionId": "kata jumlah dipakai untuk satu kelinci tertentu."
+        }
+      ],
+      "explain": {
+        "why": "Kelincinya sudah disebut di kalimat pertama, jadi sekarang pakai “The”.",
+        "rule": "Pertama kali disebut: “a” atau “an” (“I bought a hat”). Disebut lagi: “the” (“The hat is blue”), karena pendengar sudah tahu yang mana.",
+        "memory": "Sudah disebut? Pakai “the”.",
+        "avoid": "Lihat kalimat sebelumnya: benda ini sudah muncul? Belum: “a/an”. Sudah: “the”."
+      }
+    },
+    {
+      "id": "A2-335-cz0",
+      "templateId": "A2-335",
+      "skill": "first_vs_subsequent_mention",
+      "level": "A2",
+      "sentence": "We watched a film last night. ___ ending was very sad.",
+      "blank": {
+        "answer": "The",
+        "alternates": [],
+        "position": 30
+      },
+      "distractors": [
+        {
+          "text": "A",
+          "misconception": "indefinite article reused for an already-identified noun",
+          "whyFailsId": "artinya akhir cerita yang mana saja, padahal yang dimaksud akhir film ini.",
+          "misconceptionId": "“a” dipakai untuk akhir film yang sudah jelas yang mana."
+        },
+        {
+          "text": "An",
+          "misconception": "an used for something the listener can already identify",
+          "whyFailsId": "cocok dengan bunyi vokal, tapi tetap berarti akhir cerita yang mana saja.",
+          "misconceptionId": "“an” dipakai untuk benda yang sudah jelas yang mana."
+        },
+        {
+          "text": "Some",
+          "misconception": "quantifier substituted for a singular countable reference",
+          "whyFailsId": "untuk lebih dari satu, padahal filmnya punya satu akhir cerita.",
+          "misconceptionId": "kata jumlah dipakai untuk satu akhir cerita."
+        }
+      ],
+      "explain": {
+        "why": "Kita tahu akhir cerita yang mana, yaitu akhir film yang baru disebut, jadi pakai “The”.",
+        "rule": "Pertama kali disebut: “a” atau “an” (“I bought a hat”). Disebut lagi: “the” (“The hat is blue”), karena pendengar sudah tahu yang mana.",
+        "memory": "Bagian dari benda yang sudah disebut? Pakai “the”: “the ending”, “the actors”.",
+        "avoid": "Lihat kalimat sebelumnya: benda ini sudah muncul? Belum: “a/an”. Sudah: “the”."
+      }
+    },
+    {
+      "id": "A2-336-cz0",
+      "templateId": "A2-336",
+      "skill": "first_vs_subsequent_mention",
+      "level": "A2",
+      "sentence": "My mum bought some apples yesterday. ___ apples were all sweet.",
+      "blank": {
+        "answer": "The",
+        "alternates": [],
+        "position": 37
+      },
+      "distractors": [
+        {
+          "text": "Some",
+          "misconception": "some reused for things already mentioned",
+          "whyFailsId": "berarti apel lain atau cuma sebagian, padahal “all” menunjuk semua apel yang tadi dibeli Ibu.",
+          "misconceptionId": "“some” dipakai lagi untuk benda yang sudah disebut."
+        },
+        {
+          "text": "A",
+          "misconception": "applies a singular indefinite article to a plural noun",
+          "whyFailsId": "untuk satu benda, padahal “apples” banyak.",
+          "misconceptionId": "“a” dipakai sebelum “apples” yang jamak."
+        },
+        {
+          "text": "An",
+          "misconception": "applies a singular indefinite article to a plural noun and ignores that the noun is already specific",
+          "whyFailsId": "cocok dengan bunyi vokal, tapi untuk satu benda, padahal apelnya banyak.",
+          "misconceptionId": "“an” dipakai sebelum “apples” yang jamak dan sudah disebut."
+        }
+      ],
+      "explain": {
+        "why": "Apelnya sudah disebut, jadi pakai “The”, termasuk untuk benda jamak.",
+        "rule": "Pertama kali disebut: “a” atau “an” (“I bought a hat”). Disebut lagi: “the” (“The hat is blue”), karena pendengar sudah tahu yang mana.",
+        "memory": "Sudah disebut, satu atau banyak: “the”.",
+        "avoid": "Lihat kalimat sebelumnya: benda ini sudah muncul? Belum: “a/an”. Sudah: “the”."
+      }
+    },
+    {
+      "id": "A2-337-cz0",
+      "templateId": "A2-337",
+      "skill": "comparative_vs_superlative_scope",
+      "level": "A2",
+      "sentence": "Which is ___, a cat or a dog?",
+      "blank": {
+        "answer": "bigger",
+        "alternates": [],
+        "position": 9
+      },
+      "distractors": [
+        {
+          "text": "the biggest",
+          "misconception": "superlative used for a two-item comparison",
+          "whyFailsId": "untuk kelompok tiga atau lebih, padahal yang dibandingkan cuma dua hewan.",
+          "misconceptionId": "bentuk “paling” dipakai untuk dua hewan."
+        },
+        {
+          "text": "biger",
+          "misconception": "final consonant not doubled before -er",
+          "whyFailsId": "lupa menggandakan huruf g sebelum -er.",
+          "misconceptionId": "huruf mati terakhir nggak digandakan sebelum -er."
+        },
+        {
+          "text": "more big",
+          "misconception": "applies the periphrastic 'more + adjective' pattern to a short one-syllable adjective that takes '-er'",
+          "whyFailsId": "memakai “more”, padahal kata pendek seperti “big” cukup diberi -er.",
+          "misconceptionId": "pola “more” dipakai untuk kata sifat pendek."
+        }
+      ],
+      "explain": {
+        "why": "Cuma dua hewan yang dibandingkan, jadi pakai bentuk “lebih”, yaitu “bigger”.",
+        "rule": "Dua hal: -er atau “more” + “than”. Juara dari satu kelompok yang lebih besar: “the” + -est atau “the most”.",
+        "memory": "Pilih A atau B? Pakai -er: “big” jadi “bigger”, “fast” jadi “faster”.",
+        "avoid": "Hitung yang dibandingkan: dua hal, atau satu kelompok?"
+      }
+    },
+    {
+      "id": "A2-338-cz0",
+      "templateId": "A2-338",
+      "skill": "comparative_vs_superlative_scope",
+      "level": "A2",
+      "sentence": "Andi is ___ student in our class. He always gets 100!",
+      "blank": {
+        "answer": "the smartest",
+        "alternates": [],
+        "position": 8
+      },
+      "distractors": [
+        {
+          "text": "smarter",
+          "misconception": "comparative used for a ranking within a group of three or more",
+          "whyFailsId": "membandingkan dua orang, padahal Andi dibandingkan dengan seluruh kelas.",
+          "misconceptionId": "bentuk “lebih” dipakai untuk satu kelas."
+        },
+        {
+          "text": "smartest",
+          "misconception": "the dropped before a superlative",
+          "whyFailsId": "lupa “the”, padahal bentuk “paling” selalu butuh “the”.",
+          "misconceptionId": "'the' hilang sebelum bentuk 'paling'."
+        },
+        {
+          "text": "the smarter",
+          "misconception": "the used with a comparative for a group",
+          "whyFailsId": "mencampur “the” dengan bentuk untuk dua hal, padahal kelompok butuh -est.",
+          "misconceptionId": "'the' dipasangkan dengan bentuk 'lebih' untuk satu kelompok."
+        }
+      ],
+      "explain": {
+        "why": "Andi dibandingkan dengan seluruh kelas, jadi pakai “the” + -est, yaitu “the smartest”.",
+        "rule": "Dua hal: -er atau “more” + “than”. Juara dari satu kelompok yang lebih besar: “the” + -est atau “the most”.",
+        "memory": "Di kelas, di dunia: “the” + -est.",
+        "avoid": "Hitung yang dibandingkan: dua hal, atau satu kelompok?"
+      }
+    },
+    {
+      "id": "A2-339-cz0",
+      "templateId": "A2-339",
+      "skill": "comparative_vs_superlative_scope",
+      "level": "A2",
+      "sentence": "My phone is ___ than yours, but Dita's is the cheapest.",
+      "blank": {
+        "answer": "cheaper",
+        "alternates": [],
+        "position": 12
+      },
+      "distractors": [
+        {
+          "text": "the cheapest",
+          "misconception": "superlative used for a two-item comparison",
+          "whyFailsId": "untuk juara satu kelompok, padahal “than” cuma membandingkan dua ponsel.",
+          "misconceptionId": "bentuk “paling” dipakai untuk dua ponsel."
+        },
+        {
+          "text": "cheap",
+          "misconception": "base adjective used without comparative marking",
+          "whyFailsId": "nggak membandingkan, padahal “than” butuh bentuk “lebih”.",
+          "misconceptionId": "kata sifat bentuk dasar dipakai sebelum “than”."
+        },
+        {
+          "text": "more cheaper",
+          "misconception": "doubles the comparative marking by putting 'more' before an adjective already ending in '-er'",
+          "whyFailsId": "menandai perbandingan dua kali, padahal -er saja sudah cukup.",
+          "misconceptionId": "“more” ditumpuk di depan kata sifat yang sudah ber-er."
+        }
+      ],
+      "explain": {
+        "why": "“Than” membandingkan dua ponsel, jadi pakai “cheaper”.",
+        "rule": "Dua hal: -er atau “more” + “than”. Juara dari satu kelompok yang lebih besar: “the” + -est atau “the most”.",
+        "memory": "Ada “than” = dua hal = -er.",
+        "avoid": "Hitung yang dibandingkan: dua hal, atau satu kelompok?"
+      }
+    },
+    {
+      "id": "A2-340-cz0",
+      "templateId": "A2-340",
+      "skill": "comparative_vs_superlative_scope",
+      "level": "A2",
+      "sentence": "This is ___ book in the library.",
+      "blank": {
+        "answer": "the most interesting",
+        "alternates": [],
+        "position": 8
+      },
+      "distractors": [
+        {
+          "text": "more interesting",
+          "misconception": "comparative used for a ranking within a group of three or more",
+          "whyFailsId": "membandingkan dua hal, padahal bukunya dibandingkan dengan seisi perpustakaan.",
+          "misconceptionId": "bentuk “lebih” dipakai untuk semua buku di perpustakaan."
+        },
+        {
+          "text": "the interestingest",
+          "misconception": "-est added to a long adjective",
+          "whyFailsId": "memakai -est, padahal kata sifat panjang memakai “most”.",
+          "misconceptionId": "akhiran -est ditambahkan ke kata sifat panjang."
+        },
+        {
+          "text": "most interesting",
+          "misconception": "the dropped before a superlative",
+          "whyFailsId": "lupa “the” sebelum “most”.",
+          "misconceptionId": "'the' hilang sebelum bentuk 'paling'."
+        }
+      ],
+      "explain": {
+        "why": "Bukunya dibandingkan dengan semua buku di perpustakaan, dan “interesting” kata panjang, jadi “the most interesting”.",
+        "rule": "Dua hal: -er atau “more” + “than”. Juara dari satu kelompok yang lebih besar: “the” + -est atau “the most”.",
+        "memory": "Kata panjang + satu kelompok: “the most” + kata sifat.",
+        "avoid": "Hitung yang dibandingkan: dua hal, atau satu kelompok?"
+      }
+    },
+    {
+      "id": "A2-341-cz0",
+      "templateId": "A2-341",
+      "skill": "past_continuous_vs_past_simple_interrupted_action",
+      "level": "A2",
+      "sentence": "We ___ TV when the lights went out.",
+      "blank": {
+        "answer": "were watching",
+        "alternates": [],
+        "position": 3
+      },
+      "distractors": [
+        {
+          "text": "watched",
+          "misconception": "treats both clauses as sequential completed events",
+          "whyFailsId": "membuat kegiatan menonton jadi kejadian singkat yang selesai, jadi makna terpotongnya hilang.",
+          "misconceptionId": "kegiatan panjang ditulis sebagai kejadian singkat yang selesai."
+        },
+        {
+          "text": "was watching",
+          "misconception": "singular-past transfer",
+          "whyFailsId": "untuk “I”, “he”, “she”, atau “it”, padahal subjeknya “we”.",
+          "misconceptionId": "bentuk tunggal “was” dipakai untuk “we”."
+        },
+        {
+          "text": "are watching",
+          "misconception": "present-tense substitution",
+          "whyFailsId": "bentuk sekarang, padahal “went out” menunjukkan ceritanya di masa lalu.",
+          "misconceptionId": "bentuk sekarang dipakai untuk cerita masa lalu."
+        }
+      ],
+      "explain": {
+        "why": "Menonton TV adalah kegiatan panjang yang sedang berlangsung, dan “we” pakai “were”, jadi “were watching”.",
+        "rule": "Kegiatan panjang yang sedang berlangsung pakai “was/were” + -ing. Kejadian singkat yang memotongnya pakai past simple.",
+        "memory": "Kegiatan panjang: “were” + -ing. Kejadian singkat: “went out”.",
+        "avoid": "Cari dua kejadiannya: mana yang sedang berlangsung, dan mana yang terjadi tiba-tiba?"
+      }
+    },
+    {
+      "id": "A2-342-cz0",
+      "templateId": "A2-342",
+      "skill": "past_continuous_vs_past_simple_interrupted_action",
+      "level": "A2",
+      "sentence": "I was sleeping when my phone suddenly ___.",
+      "blank": {
+        "answer": "rang",
+        "alternates": [],
+        "position": 38
+      },
+      "distractors": [
+        {
+          "text": "was ringing",
+          "misconception": "aspect confusion (progressive for a single completed trip)",
+          "whyFailsId": "membuat deringnya jadi kegiatan panjang, padahal “suddenly” menunjukkan kejadian singkat.",
+          "misconceptionId": "bentuk sedang berlangsung dipakai untuk kejadian singkat."
+        },
+        {
+          "text": "rings",
+          "misconception": "present-tense substitution",
+          "whyFailsId": "bentuk sekarang, padahal “was sleeping” menunjukkan masa lalu.",
+          "misconceptionId": "bentuk sekarang dipakai untuk cerita masa lalu."
+        },
+        {
+          "text": "ringed",
+          "misconception": "regular -ed added to an irregular verb",
+          "whyFailsId": "memakai -ed, padahal “ring” punya bentuk lampau khusus.",
+          "misconceptionId": "akhiran -ed dipakai untuk kata kerja yang bentuk lampaunya khusus."
+        }
+      ],
+      "explain": {
+        "why": "“Suddenly” menunjukkan kejadian singkat yang memotong tidurku, jadi pakai past simple, yaitu “rang”.",
+        "rule": "Kegiatan panjang yang sedang berlangsung pakai “was/were” + -ing. Kejadian singkat yang memotongnya pakai past simple.",
+        "memory": "“Suddenly” = kejadian singkat = past simple.",
+        "avoid": "Cari dua kejadiannya: mana yang sedang berlangsung, dan mana yang terjadi tiba-tiba?"
+      }
+    },
+    {
+      "id": "A2-343-cz0",
+      "templateId": "A2-343",
+      "skill": "past_continuous_vs_past_simple_interrupted_action",
+      "level": "A2",
+      "sentence": "What ___ when the teacher came in?",
+      "blank": {
+        "answer": "were you doing",
+        "alternates": [],
+        "position": 5
+      },
+      "distractors": [
+        {
+          "text": "was you doing",
+          "misconception": "singular past be used with you",
+          "whyFailsId": "salah untuk “you”, karena “you” selalu memakai “were”, walaupun cuma satu orang.",
+          "misconceptionId": "bentuk lampau 'was' dipakai untuk 'you'."
+        },
+        {
+          "text": "you were doing",
+          "misconception": "statement order used for a question",
+          "whyFailsId": "memakai susunan kalimat berita, jadi belum jadi pertanyaan.",
+          "misconceptionId": "susunan kalimat berita dipakai untuk kalimat tanya."
+        },
+        {
+          "text": "are you doing",
+          "misconception": "present-tense substitution",
+          "whyFailsId": "bentuk sekarang, padahal “came in” menunjukkan masa lalu.",
+          "misconceptionId": "bentuk sekarang dipakai untuk pertanyaan tentang masa lalu."
+        }
+      ],
+      "explain": {
+        "why": "Pertanyaannya menanyakan kegiatan yang sedang berlangsung saat guru masuk, dan “you” pakai “were”, jadi “were you doing”.",
+        "rule": "Kegiatan panjang yang sedang berlangsung pakai “was/were” + -ing. Kejadian singkat yang memotongnya pakai past simple.",
+        "memory": "Sedang berlangsung di masa lalu? “Were you” + -ing?",
+        "avoid": "Cari dua kejadiannya: mana yang sedang berlangsung, dan mana yang terjadi tiba-tiba?"
+      }
+    },
+    {
+      "id": "A2-344-cz0",
+      "templateId": "A2-344",
+      "skill": "past_continuous_vs_past_simple_interrupted_action",
+      "level": "A2",
+      "sentence": "Rani ___ her arm while she was playing basketball.",
+      "blank": {
+        "answer": "broke",
+        "alternates": [],
+        "position": 5
+      },
+      "distractors": [
+        {
+          "text": "was breaking",
+          "misconception": "aspect confusion (progressive for a single completed trip)",
+          "whyFailsId": "membuat patahnya jadi kegiatan panjang, padahal terjadi dalam sekejap.",
+          "misconceptionId": "bentuk sedang berlangsung dipakai untuk kejadian singkat."
+        },
+        {
+          "text": "breaked",
+          "misconception": "regular -ed added to an irregular verb",
+          "whyFailsId": "memakai -ed, padahal “break” punya bentuk lampau khusus.",
+          "misconceptionId": "akhiran -ed dipakai untuk kata kerja yang bentuk lampaunya khusus."
+        },
+        {
+          "text": "has broken",
+          "misconception": "confuses interrupted past action with present perfect result",
+          "whyFailsId": "nggak cocok dengan “while she was playing”, waktu lampau yang sudah selesai.",
+          "misconceptionId": "bentuk “has” + kata kerja bentuk ketiga dipakai untuk kejadian lampau yang jelas waktunya."
+        }
+      ],
+      "explain": {
+        "why": "Patah tangan itu kejadian singkat di tengah permainan yang panjang, jadi pakai past simple, yaitu “broke”.",
+        "rule": "Kegiatan panjang yang sedang berlangsung pakai “was/were” + -ing. Kejadian singkat yang memotongnya pakai past simple.",
+        "memory": "Kejadian singkat di tengah kegiatan panjang: past simple.",
+        "avoid": "Cari dua kejadiannya: mana yang sedang berlangsung, dan mana yang terjadi tiba-tiba?"
+      }
+    },
+    {
+      "id": "A2-345-cz0",
+      "templateId": "A2-345",
+      "skill": "much_many_little_few_countability",
+      "level": "A2",
+      "sentence": "There are too ___ people on this bus. I can't sit down.",
+      "blank": {
+        "answer": "many",
+        "alternates": [],
+        "position": 14
+      },
+      "distractors": [
+        {
+          "text": "much",
+          "misconception": "applies the uncountable-noun quantifier to a countable plural noun",
+          "whyFailsId": "untuk benda yang nggak bisa dihitung, padahal orang bisa dihitung.",
+          "misconceptionId": "“much” dipakai untuk “people”."
+        },
+        {
+          "text": "little",
+          "misconception": "applies the uncountable-noun quantifier ('little') to a countable plural noun, and also confuses scarcity type",
+          "whyFailsId": "untuk benda yang nggak bisa dihitung, dan artinya “sedikit”.",
+          "misconceptionId": "“little” dipakai untuk “people”."
+        },
+        {
+          "text": "few",
+          "misconception": "few used when the meaning needs a large number",
+          "whyFailsId": "cocok untuk benda yang bisa dihitung, tapi artinya busnya hampir kosong.",
+          "misconceptionId": "“few” (sedikit) dipakai padahal maksudnya jumlah yang banyak."
+        }
+      ],
+      "explain": {
+        "why": "“People” bisa dihitung, dan busnya penuh, jadi pakai “many”.",
+        "rule": "Benda jamak yang bisa dihitung (“books”, “friends”): “many”, “few”. Benda yang nggak bisa dihitung (“water”, “money”, “time”): “much”, “little”.",
+        "memory": "Orang bisa dihitung: “too many people”.",
+        "avoid": "Bendanya bisa dihitung satu per satu? Bisa: “many/few”. Nggak bisa: “much/little”."
+      }
+    },
+    {
+      "id": "A2-346-cz0",
+      "templateId": "A2-346",
+      "skill": "much_many_little_few_countability",
+      "level": "A2",
+      "sentence": "My brother doesn't drink ___ water. He only drinks soda.",
+      "blank": {
+        "answer": "much",
+        "alternates": [],
+        "position": 25
+      },
+      "distractors": [
+        {
+          "text": "many",
+          "misconception": "countable-quantity-substitution",
+          "whyFailsId": "untuk benda yang bisa dihitung, padahal “water” nggak bisa dihitung.",
+          "misconceptionId": "“many” dipakai untuk “water”."
+        },
+        {
+          "text": "few",
+          "misconception": "few or a few used with an uncountable noun",
+          "whyFailsId": "untuk benda jamak yang bisa dihitung, bukan untuk “water”.",
+          "misconceptionId": "“few” dipakai untuk “water” yang nggak bisa dihitung."
+        },
+        {
+          "text": "a lot",
+          "misconception": "of dropped after a lot",
+          "whyFailsId": "kurang “of”, padahal ungkapan ini butuh “of” sebelum kata benda.",
+          "misconceptionId": "kata “of” hilang sesudah “a lot”."
+        }
+      ],
+      "explain": {
+        "why": "“Water” nggak bisa dihitung, dan di kalimat negatif kita pakai “much”.",
+        "rule": "Benda jamak yang bisa dihitung (“books”, “friends”): “many”, “few”. Benda yang nggak bisa dihitung (“water”, “money”, “time”): “much”, “little”.",
+        "memory": "“Not much water”, “not many bottles”.",
+        "avoid": "Bendanya bisa dihitung satu per satu? Bisa: “many/few”. Nggak bisa: “much/little”."
+      }
+    },
+    {
+      "id": "A2-347-cz0",
+      "templateId": "A2-347",
+      "skill": "much_many_little_few_countability",
+      "level": "A2",
+      "sentence": "There are only a ___ cookies left. Take one!",
+      "blank": {
+        "answer": "few",
+        "alternates": [],
+        "position": 17
+      },
+      "distractors": [
+        {
+          "text": "little",
+          "misconception": "applies the uncountable-noun quantifier ('little') to a countable plural noun, and also confuses scarcity type",
+          "whyFailsId": "untuk benda yang nggak bisa dihitung seperti susu, padahal kue bisa dihitung.",
+          "misconceptionId": "“a little” dipakai untuk “cookies” yang bisa dihitung."
+        },
+        {
+          "text": "many",
+          "misconception": "a placed before many",
+          "whyFailsId": "nggak bisa didahului “a”, dan artinya banyak, bukan sedikit.",
+          "misconceptionId": "“a” ditaruh sebelum “many”."
+        },
+        {
+          "text": "much",
+          "misconception": "applies the uncountable-noun quantifier to a countable plural noun",
+          "whyFailsId": "nggak bisa didahului “a”, dan untuk benda yang nggak bisa dihitung.",
+          "misconceptionId": "“much” dipakai untuk “cookies” yang bisa dihitung."
+        }
+      ],
+      "explain": {
+        "why": "“Cookies” bisa dihitung, jadi jumlah yang sedikit pakai “a few”.",
+        "rule": "Benda jamak yang bisa dihitung (“books”, “friends”): “many”, “few”. Benda yang nggak bisa dihitung (“water”, “money”, “time”): “much”, “little”.",
+        "memory": "“A few cookies”, “a little milk”.",
+        "avoid": "Bendanya bisa dihitung satu per satu? Bisa: “many/few”. Nggak bisa: “much/little”."
+      }
+    },
+    {
+      "id": "A2-348-cz0",
+      "templateId": "A2-348",
+      "skill": "much_many_little_few_countability",
+      "level": "A2",
+      "sentence": "Can I have a ___ sugar in my tea, please?",
+      "blank": {
+        "answer": "little",
+        "alternates": [],
+        "position": 13
+      },
+      "distractors": [
+        {
+          "text": "few",
+          "misconception": "few or a few used with an uncountable noun",
+          "whyFailsId": "untuk benda jamak yang bisa dihitung, padahal gula nggak bisa dihitung.",
+          "misconceptionId": "“a few” dipakai untuk “sugar” yang nggak bisa dihitung."
+        },
+        {
+          "text": "many",
+          "misconception": "a placed before many",
+          "whyFailsId": "nggak bisa didahului “a”, dan untuk benda yang bisa dihitung.",
+          "misconceptionId": "“a” ditaruh sebelum “many”."
+        },
+        {
+          "text": "lot",
+          "misconception": "of dropped after a lot",
+          "whyFailsId": "butuh “of” sesudahnya, dan artinya pun banyak, bukan sedikit.",
+          "misconceptionId": "kata “of” hilang sesudah “a lot”."
+        }
+      ],
+      "explain": {
+        "why": "“Sugar” nggak bisa dihitung, jadi jumlah yang sedikit pakai “a little”.",
+        "rule": "Benda jamak yang bisa dihitung (“books”, “friends”): “many”, “few”. Benda yang nggak bisa dihitung (“water”, “money”, “time”): “much”, “little”.",
+        "memory": "“A little sugar”, “a little milk”, “a little time”.",
+        "avoid": "Bendanya bisa dihitung satu per satu? Bisa: “many/few”. Nggak bisa: “much/little”."
+      }
+    },
+    {
+      "id": "A2-353-cz0",
+      "templateId": "A2-353",
+      "skill": "as_as_equality_vs_comparative",
+      "level": "A2",
+      "sentence": "Nina is 150 cm, and Tari is 150 cm too. Nina is ___ Tari.",
+      "blank": {
+        "answer": "as tall as",
+        "alternates": [],
+        "position": 48
+      },
+      "distractors": [
+        {
+          "text": "taller than",
+          "misconception": "defaults to the comparative form even though the context implies equality, not difference",
+          "whyFailsId": "menyatakan Nina lebih tinggi, padahal tinggi mereka sama.",
+          "misconceptionId": "bentuk “lebih” dipakai untuk dua tinggi yang sama."
+        },
+        {
+          "text": "as taller as",
+          "misconception": "comparative form used inside as ... as",
+          "whyFailsId": "menambah -er di dalamnya, padahal “as … as” memakai kata sifat bentuk dasar.",
+          "misconceptionId": "akhiran -er ditambahkan di dalam “as … as”."
+        },
+        {
+          "text": "as tall than",
+          "misconception": "mixes the equality frame 'as ... as' with comparative 'than'",
+          "whyFailsId": "mencampur “as” dengan “than”, padahal bingkainya ditutup dengan “as”.",
+          "misconceptionId": "bingkai “as … as” ditutup dengan “than”."
+        }
+      ],
+      "explain": {
+        "why": "Tinggi mereka sama, jadi pakai “as” + kata sifat bentuk dasar + “as”.",
+        "rule": "Sama: “as” + kata sifat bentuk dasar + “as” (“as tall as”). Kalah: “not as … as”. Jangan pakai “than”, -er, atau “more” di dalamnya.",
+        "memory": "Tingginya sama: “as tall as”.",
+        "avoid": "Sama atau beda? Kalau sama: “as … as”. Lalu cek kedua “as” dan kata sifat bentuk dasarnya."
+      }
+    },
+    {
+      "id": "A2-354-cz0",
+      "templateId": "A2-354",
+      "skill": "as_as_equality_vs_comparative",
+      "level": "A2",
+      "sentence": "The train is fast, but it isn't ___ a plane.",
+      "blank": {
+        "answer": "as fast as",
+        "alternates": [],
+        "position": 32
+      },
+      "distractors": [
+        {
+          "text": "as fast than",
+          "misconception": "mixes the equality frame 'as ... as' with comparative 'than'",
+          "whyFailsId": "dibuka dengan “as” tapi ditutup dengan “than”, padahal keduanya nggak bisa dicampur.",
+          "misconceptionId": "bingkai “as … as” ditutup dengan “than”."
+        },
+        {
+          "text": "as fast like",
+          "misconception": "like used to close an as ... as comparison",
+          "whyFailsId": "menutup bingkainya dengan “like” (seperti), padahal “as … as” harus ditutup dengan “as” juga.",
+          "misconceptionId": "“like” dipakai untuk menutup perbandingan “as … as”."
+        },
+        {
+          "text": "faster as",
+          "misconception": "comparative -er closed with as instead of than",
+          "whyFailsId": "mencampur -er dengan “as”, padahal pilihannya “faster than” atau bentuk “as … as”.",
+          "misconceptionId": "bentuk -er ditutup dengan “as”, bukan dengan “than”."
+        }
+      ],
+      "explain": {
+        "why": "Di kalimat negatif tetap pakai “as … as”, jadi “isn't as fast as”.",
+        "rule": "Sama: “as” + kata sifat bentuk dasar + “as” (“as tall as”). Kalah: “not as … as”. Jangan pakai “than”, -er, atau “more” di dalamnya.",
+        "memory": "Kalah? “not as … as”: “not as fast as”.",
+        "avoid": "Sama atau beda? Kalau sama: “as … as”. Lalu cek kedua “as” dan kata sifat bentuk dasarnya."
+      }
+    },
+    {
+      "id": "A2-355-cz0",
+      "templateId": "A2-355",
+      "skill": "as_as_equality_vs_comparative",
+      "level": "A2",
+      "sentence": "My room isn't ___ my sister's room. Hers is bigger.",
+      "blank": {
+        "answer": "as big as",
+        "alternates": [],
+        "position": 14
+      },
+      "distractors": [
+        {
+          "text": "as big than",
+          "misconception": "mixes the equality frame 'as ... as' with comparative 'than'",
+          "whyFailsId": "ditutup dengan “than”, padahal bingkai yang dibuka dengan “as” harus ditutup dengan “as” juga.",
+          "misconceptionId": "bingkai “as … as” ditutup dengan “than”."
+        },
+        {
+          "text": "as bigger as",
+          "misconception": "comparative form used inside as ... as",
+          "whyFailsId": "menambah -er di dalamnya, padahal “as … as” memakai kata sifat bentuk dasar.",
+          "misconceptionId": "akhiran -er ditambahkan di dalam “as … as”."
+        },
+        {
+          "text": "big as",
+          "misconception": "first as dropped in an as ... as comparison",
+          "whyFailsId": "lupa “as” yang pertama, padahal bingkainya butuh “as” di kedua sisi.",
+          "misconceptionId": "“as” yang pertama hilang dalam perbandingan “as … as”."
+        }
+      ],
+      "explain": {
+        "why": "Di bingkai negatif tetap “as” + kata sifat bentuk dasar + “as”, jadi “isn't as big as”.",
+        "rule": "Sama: “as” + kata sifat bentuk dasar + “as” (“as tall as”). Kalah: “not as … as”. Jangan pakai “than”, -er, atau “more” di dalamnya.",
+        "memory": "“as … as” itu pasangan kembar: buka dengan “as”, tutup dengan “as”.",
+        "avoid": "Sama atau beda? Kalau sama: “as … as”. Lalu cek kedua “as” dan kata sifat bentuk dasarnya."
+      }
+    },
+    {
+      "id": "A2-356-cz0",
+      "templateId": "A2-356",
+      "skill": "as_as_equality_vs_comparative",
+      "level": "A2",
+      "sentence": "Both bikes cost the same. The red one is ___ the blue one.",
+      "blank": {
+        "answer": "as expensive as",
+        "alternates": [],
+        "position": 41
+      },
+      "distractors": [
+        {
+          "text": "more expensive than",
+          "misconception": "defaults to the comparative form even though the context implies equality, not difference",
+          "whyFailsId": "menyatakan sepeda merah lebih mahal, padahal harganya sama.",
+          "misconceptionId": "bentuk “lebih” dipakai untuk dua harga yang sama."
+        },
+        {
+          "text": "as more expensive as",
+          "misconception": "comparative form used inside as ... as",
+          "whyFailsId": "menambah “more” di dalamnya, padahal “as … as” memakai kata sifat bentuk dasar.",
+          "misconceptionId": "kata “more” ditambahkan di dalam “as … as”."
+        },
+        {
+          "text": "expensive as",
+          "misconception": "first as dropped in an as ... as comparison",
+          "whyFailsId": "lupa “as” yang pertama, padahal bingkainya butuh “as” di kedua sisi.",
+          "misconceptionId": "“as” yang pertama hilang dalam perbandingan “as … as”."
+        }
+      ],
+      "explain": {
+        "why": "Harganya sama, jadi pakai “as” + kata sifat bentuk dasar + “as”, tanpa “more”.",
+        "rule": "Sama: “as” + kata sifat bentuk dasar + “as” (“as tall as”). Kalah: “not as … as”. Jangan pakai “than”, -er, atau “more” di dalamnya.",
+        "memory": "Harga sama: “as expensive as”. Kata sifat panjang pun tetap bentuk dasar di dalamnya.",
+        "avoid": "Sama atau beda? Kalau sama: “as … as”. Lalu cek kedua “as” dan kata sifat bentuk dasarnya."
       }
     }
   ]

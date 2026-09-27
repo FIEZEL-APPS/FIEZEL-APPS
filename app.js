@@ -637,6 +637,15 @@ function quoteEmbedShort(s,maxWords=QUOTE_EMBED_MAX_WORDS){
 // m025-161 (F1-5b): PEREKATAN (77 kartu A1 + 86 kartu A2). Kalau kutipan opsi berakhir tanda
 // kalimat, diagnosis huruf kecil di belakangnya tidak boleh ditempel dengan spasi biasa
 // ("…they are at home.” sebenarnya bener") - sambungannya pakai em dash.
+/* m025-376: alasan kartu disambung ke "Yang benar “on”: ..." jadi huruf pertamanya dikecilkan -
+   tapi bukan kalau kata itu nama/hari yang juga tertulis di kalimat soal ("Monday", "Nadia") atau
+   "I": sebelum ini murid membaca "monday morning itu hari tertentu" dan "nadia nggak bisa...". */
+function grammarCausalKey(whyCorrect,stem){
+  const w=String(whyCorrect||'').trim();if(!w)return '';
+  const first=(w.match(/^[A-ZÀ-Ü][A-Za-zÀ-ÿ'’-]*/)||[''])[0];if(!first)return w;
+  const keep=first==='I'||new RegExp('(^|[^A-Za-z])'+first.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+'([^A-Za-z]|$)').test(String(stem||''));
+  return keep?w:w.charAt(0).toLowerCase()+w.slice(1);
+}
 function joinQuoteReason(quoted,tail){
   const q=String(quoted||'').trim(),t=String(tail||'').trim();
   if(!q)return t;if(!t)return q;
@@ -819,7 +828,7 @@ function grammarExercise(skill,item,variant){const meta=grammarMeta(item),correc
   // "merupakan", "menegaskan/mendiagnosis", dan "tersebut" dibuang dari teks tampil-siswa.
   // m025-162 (S2/M5): alasan kunci tidak lagi menempel judul lesson (tautologi yang bahkan
   // bisa membantah kartunya sendiri, TA-002) - pakai whyCorrect kartu, yang menyebut isyarat stem.
-  const causalKey=meta.whyCorrect?String(meta.whyCorrect).trim().replace(/^([A-ZÀ-Ü])/,m=>m.toLowerCase()):'';
+  const causalKey=grammarCausalKey(meta.whyCorrect,meta.stem);
   if(variant===0)return direct(base,meta.options,meta.correctIndex,joinQuoteReason(quoteEmbedShort(correct),causalKey?FiezelI18n.t('grammar.alasan-benar-kausal',{alasan:causalKey}):FiezelI18n.t('grammar.alasan-benar-pola',{judulLesson:title.toLowerCase()})),reasons);
   // m025-162 (S3/M3): alasan opsi complete_sentence dipetakan lewat INDEKS (kanal verbatim),
   // bukan pencocokan teks opsi terisi yang gagal senyap di stem multi-blank; jangkar kutipannya
@@ -4654,7 +4663,8 @@ function stepTutorGuidance(q){
 function stepTutorLocalSteps(item,out){
   const raw=String(item?.[16]?.reasoningId||'').trim();if(!raw||!Array.isArray(out?.steps))return out;
   const parts=raw.split(/\s*(?:→|->|;)\s*/).map(x=>x.trim()).filter(Boolean).slice(0,3);if(!parts.length)return out;
-  const steps=parts.map((part,i)=>Object.assign({expect:'',rationale:'brain3_step_local'},out.steps[i]||{},{ask:FiezelI18n.t('brain-step.step-prefix',{n:i+1})+grammarCapFirst(part).replace(/[.!?]+$/,'')+'.',localized:true}));
+  let isTh=false;try{isTh=FiezelI18n.getLocale()==='th'}catch{}
+  const steps=parts.map((part,i)=>Object.assign({expect:'',rationale:'brain3_step_local'},out.steps[i]||{},{ask:FiezelI18n.t('brain-step.step-prefix',{n:i+1})+grammarCapFirst(part).replace(/[.!?]+$/,'')+(isTh?'':'.')/* bahasa Thai tidak memakai titik akhir kalimat */,localized:true}));
   return{...out,steps};
 }
 function stepTutorThai(out,question){
@@ -4891,6 +4901,12 @@ function reportStatusLabel(){if(!state.preferences?.reportConsent)return FiezelI
 /* `reservoirMultiplier`: kolam yang lebih besar dari jumlah soal sesi. Tutor Brain memilih
    soal berikutnya dari SISA kolam, jadi kolam sebesar sesi berarti pilihan terakhir tidak
    pernah benar-benar dipilih - ia satu-satunya yang tersisa. Panjang sesi tidak berubah. */
+/* m025-376: sejak lesson A1-A2 punya enam kalimat, mengambil SEMUA templat per lesson melipat-
+   tigakan kandidat grammar di pool adaptif dan mendesak reading/vocab keluar dari campuran
+   (regression-test: pool 12 soal tanpa satu pun reading). Jumlah kalimat per lesson dikunci
+   seperti sebelum konten bertambah - dua, atau tiga untuk lesson sasaran - dan dipilih bergilir
+   dari jumlah jawaban murid di lesson itu, jadi review berikutnya membawa kalimat lain. */
+function adaptiveGrammarItems(skill,bucket,isTarget){const own=G[skill]||[],n=own.length;if(!n)return[];const take=Math.min(n,isTarget?3:2),start=(Math.floor(Number(bucket?.total)||0))%n;return Array.from({length:take},(_,i)=>own[(start+i)%n])}
 function buildAdaptivePool(count,policy=buildAdaptivePolicy(),reservoirMultiplier=1){
  if(!state.adaptiveReady)return [];const profile=getDiagnosticProfile(),level=getActiveLevel(),candidates=[],seen=new Set(),now=Date.now(),primary=normalizePolicyDomain(policy?.primaryDomain),secondary=normalizePolicyDomain(policy?.secondaryDomain),targetSkill=String(policy?.targetSkill||'');
  const add=(q,baseScore,meta={})=>{if(!q||!q.options||q.answerIndex<0||seen.has(sigQ(q)))return;seen.add(sigQ(q));const domain=normalizePolicyDomain(q.type),skill=String(q.lessonSkill||q.skill||''),difficulty=Number(q.difficulty||LEVELS.indexOf(level)+1),measured=!!meta.measured,due=!!meta.due,risk=Number(meta.risk||0);let score=Number(baseScore||0);if(domain===primary)score+=8;if(domain===secondary)score+=3;if(targetSkill&&(skill===targetSkill||skill.includes(targetSkill)||targetSkill.includes(skill)))score+=14;if(due)score+=8+Number(policy?.reviewShare||0)*8;score+=risk*7;if(policy?.avoidNewContent&&!measured)score-=10;
@@ -4905,7 +4921,7 @@ function buildAdaptivePool(count,policy=buildAdaptivePolicy(),reservoirMultiplie
     yang SUDAH mastered ke kolam review - sebagai review biasa, bukan layar terpisah. Set
     kosong (modul absen / state rusak / belum ada jadwal) = kolam persis seperti sebelumnya. */
  const probeDue=retentionProbeDueLessons(now),probeFragile=retentionFragileLessons(now);
- for(const [skill,b] of Object.entries(state.grammar)){const grammarMeta=GRAMMAR_ITEMS.find(x=>x.skill===skill);if(grammarMeta?.level!==level)continue;const probeHit=probeDue.has(skill)||probeFragile.has(skill),due=!!(b?.nextReview&&b.nextReview<=now)||probeHit;if(!b?.total||(b.mastery>=MASTERY_THRESHOLD&&!due))continue;for(const item of (G[skill]||[])){const risk=forgettingProbability(b),score=(profile.weakSkills[skill]?.score||0)*10+risk*6+(100-b.mastery)*.04,variants=targetSkill===skill?GRAMMAR_LESSON_MODES.slice(0,5):['apply_form'];/* m025-375: sasaran adaptif memakai mode sesi lesson (tanpa soal teori/pinjaman), bukan varian 0..7 */for(const [rank,modeName] of variants.entries()){const variant=GRAMMAR_PRACTICE_MODES.indexOf(modeName);const q=makeGrammarQuestion(skill,item,variant,skill);if(!grammarLessonQuestionOwnOnly(q))continue;
+ for(const [skill,b] of Object.entries(state.grammar)){const grammarMeta=GRAMMAR_ITEMS.find(x=>x.skill===skill);if(grammarMeta?.level!==level)continue;const probeHit=probeDue.has(skill)||probeFragile.has(skill),due=!!(b?.nextReview&&b.nextReview<=now)||probeHit;if(!b?.total||(b.mastery>=MASTERY_THRESHOLD&&!due))continue;for(const item of adaptiveGrammarItems(skill,b,targetSkill===skill)){const risk=forgettingProbability(b),score=(profile.weakSkills[skill]?.score||0)*10+risk*6+(100-b.mastery)*.04,variants=targetSkill===skill?GRAMMAR_LESSON_MODES.slice(0,5):['apply_form'];/* m025-375: sasaran adaptif memakai mode sesi lesson (tanpa soal teori/pinjaman), bukan varian 0..7 */for(const [rank,modeName] of variants.entries()){const variant=GRAMMAR_PRACTICE_MODES.indexOf(modeName);const q=makeGrammarQuestion(skill,item,variant,skill);if(!grammarLessonQuestionOwnOnly(q))continue;
   /* Braincore v3 (temuan T1 council): semua item ber-difficulty = indeks level CEFR, jadi IRT
      berdegenerasi menjadi pelacak akurasi. FiezelItemPrior memberi variansi kesulitan NYATA
      per mode latihan (teach_back lebih berat daripada recognition dasar). Dijaga penuh:
