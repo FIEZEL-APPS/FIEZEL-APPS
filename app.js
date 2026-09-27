@@ -4409,6 +4409,9 @@ function itemPoolFlush(nowMs=Date.now()){
       let body=null;try{body=await r.json()}catch{}
       const cur=itemPoolRead(key);
       if(r.ok&&body&&body.disabled)itemPoolWrite(M.defer(cur,nowMs,12*3600000),key);
+      // Field yang tidak dikenal = Worker lebih tua dari aplikasi (situs terbit dulu, Worker
+      // di-deploy owner belakangan). Simpan dan coba lagi; batch cacat lain tetap dibuang.
+      else if(r.status===400&&body&&body.error==='unknown_field')itemPoolWrite(M.defer(cur,nowMs),key);
       else if(r.ok||r.status===400)itemPoolWrite(M.ack(cur,ids),key);
       else itemPoolWrite(M.defer(cur,nowMs),key);
       return {status:r.status,disabled:!!(body&&body.disabled)};

@@ -18,7 +18,7 @@
  *   R1-R3  rute: saklar mati = 202 disabled / tabel kosong; hidup = tulis + baca;
  *   P1-P4  privasi: tanpa kolom penghubung, tanpa cookie, tanpa tabel lane lain, amplop tertutup;
  *   K1     paritas konstanta perangkat <-> server;
- *   A1-A5  app.js sungguhan (vm): catat, penempatan, kirim (disabled/ok/400/5xx), terapkan tabel;
+ *   A1-A5  app.js sungguhan (vm): catat, penempatan, kirim (disabled/ok/400/unknown_field/5xx), terapkan tabel;
  *   CI     gerbang terdaftar di quality.yml.
  *
  * Konvensi repo: tanpa dependensi, exit 1 saat gagal, baris akhir '<Nama>: PASS'.
@@ -537,6 +537,24 @@ const MIG16 = path.join(root, 'workers/api/migrations/0016_item_pool_probe.sql')
     reply = { status: 400, body: { ok: false, error: 'bad_items' } };
     await A.itemPoolFlush(st.nextTryAt + 1);
     assert.strictEqual(JSON.parse(store2[poolKey()]).outbox.length, 0, 'batch cacat diulang selamanya');
+  });
+  await test('A4b · 400 unknown_field (Worker lebih tua dari aplikasi) -> SIMPAN + backoff, lalu terkirim', async () => {
+    // Urutan rilis: situs terbit otomatis sesudah main hijau, Worker di-deploy owner belakangan.
+    // Worker lama menolak field baru (`pv`) dengan unknown_field; jawaban-pertama tidak boleh hilang.
+    A.itemPoolObserve(q('PR-104', 'apply_form', { __predictedPrior: 0.5 }), true);
+    const t0 = JSON.parse(store2[poolKey()]).nextTryAt || 0;
+    const at = Math.max(NOW + 20 * 3600000, t0 + 1);
+    reply = { status: 400, body: { ok: false, error: 'unknown_field', field: 'pv' } };
+    await A.itemPoolFlush(at);
+    let st = JSON.parse(store2[poolKey()]);
+    assert.strictEqual(st.outbox.length, 1, 'jawaban-pertama dibuang karena Worker belum di-deploy');
+    assert.ok(st.nextTryAt > at, 'harus menunggu (backoff), bukan mengulang terus');
+    const held = JSON.parse(calls[calls.length - 1].init.body).events[0].eventId;
+    reply = { status: 202, body: { ok: true, accepted: 1 } };
+    await A.itemPoolFlush(st.nextTryAt + 1);
+    st = JSON.parse(store2[poolKey()]);
+    assert.strictEqual(st.outbox.length, 0);
+    assert.strictEqual(JSON.parse(calls[calls.length - 1].init.body).events[0].eventId, held);
   });
   await test('A5 · tabel gabungan diterapkan lewat itemCalibrationEffective; tabel kosong = perilaku lama', async () => {
     const it = q('PR-101', 'apply_form');

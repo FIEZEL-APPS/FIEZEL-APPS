@@ -10,6 +10,8 @@ Panduan untuk Owner. Semua langkah dikerjakan sekali saja.
   2. deploy Worker (langkah 3 di bawah).
   Sampai migrasi 0016 diterapkan, jawaban soal tetap tercatat seperti biasa; hanya hasil probe
   ingatan yang belum tersimpan.
+  Sampai Worker di-deploy, HP murid yang sudah memakai versi baru **menyimpan** kirimannya dan
+  mencoba lagi paling lambat sehari sekali — tidak ada yang hilang, hanya tertunda.
 - Mulai m025-378, tabel kesulitan soal dibangun **GitHub Actions** (workflow
   **Braincore Item Pool**), bukan server lagi. Tidak perlu langkah apa pun — rahasia yang dipakai
   sama dengan workflow deploy.

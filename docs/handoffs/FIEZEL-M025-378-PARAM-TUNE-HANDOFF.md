@@ -10,7 +10,7 @@ ditebak." OWNER: "LANJUTKAN".
 ## STATUS
 
 Machine-verified lokal: seluruh perintah gerbang `.github/workflows/quality.yml`; gerbang baru
-`tests/brain-param-tune-test.js` 19/19, `tests/item-pool-test.js` 42/42. Tidak ada angka rumus
+`tests/brain-param-tune-test.js` 19/19, `tests/item-pool-test.js` 43/43. Tidak ada angka rumus
 yang berubah di rilis ini — rilis ini membangun jalur pengukurannya.
 
 **Sisa langkah OWNER** (`reports/ITEM_POOL_ACTIVATION.md`): terapkan migrasi
@@ -34,12 +34,20 @@ yang berubah di rilis ini — rilis ini membangun jalur pengukurannya.
 3. **Paruh-waktu tidak boleh diukur dari jawaban ulangan biasa** (lupa tercampur belajar). Ia
    diukur dari **probe retensi** (3/7/21 hari setelah lesson dikuasai) dengan model
    p = c + (1-c)·q·R^(1/k).
+4. **Urutan rilis situs → Worker membuang data.** Situs terbit otomatis sesudah main hijau;
+   Worker di-deploy owner belakangan. Worker langkah 2 menjawab amplop baru (ber-`pv`) dengan
+   `400 unknown_field` (dibuktikan dengan `item-pool-core.js` dari main), dan perangkat
+   membuang batch ber-400 — jadi jawaban-pertama di sela itu hilang untuk selamanya (soalnya
+   sudah ditandai terlihat). Perbaikan: `400 unknown_field` = "Worker lebih tua dari aplikasi",
+   batch DISIMPAN dan dicoba lagi dengan backoff (gerbang A4b, terbukti merah tanpa perbaikan).
+   Batch cacat lain tetap dibuang.
 
 ## APA YANG BERUBAH
 
 1. **Perangkat** — `FiezelItemPool.observeProbe` (penghitung `[bucket R -> n, benar]` per hari,
    tanpa ID); amplop membawa `pv` (versi konstanta). app.js: `draw()` → `q.__probeR` (bukan saat
-   penempatan), `record()` → `itemPoolObserveProbe`.
+   penempatan), `record()` → `itemPoolObserveProbe`; `itemPoolFlush` menyimpan batch yang
+   ditolak `unknown_field` (temuan 4).
 2. **Server** — probe diterima di `POST /api/braincore/item-evidence` (≤ 20 baris/event);
    `pv` lain dibuang seluruhnya (diterima supaya perangkat berhenti mengulang); tulis soal dan
    probe dua batch terpisah (tabel probe yang belum ada tidak menghilangkan hitungan soal).
