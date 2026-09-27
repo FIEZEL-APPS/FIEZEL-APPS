@@ -31,7 +31,8 @@ import {
 export const ITEM_EVIDENCE_PATH = '/api/braincore/item-evidence';
 export const ITEM_DIFFICULTY_PATH = '/api/braincore/item-difficulty';
 export const LIMITS = ITEM_POOL_LIMITS;
-/** Tabel berubah sekali sehari (cron); satu jam cache edge memotong beban D1 tanpa basi. */
+/** Tabel berubah sekali sehari (job GitHub Actions, tools/item-pool-job.mjs); satu jam cache
+ *  edge memotong beban D1 tanpa basi. */
 export const TABLE_CACHE_SECONDS = 3600;
 
 function json(body, status = 200, cacheControl = 'no-store') {
