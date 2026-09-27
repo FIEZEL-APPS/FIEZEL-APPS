@@ -196,7 +196,7 @@
     'progress.kebingungan-antar-lesson': 'Kebingungan antar-lesson',
     'progress.kesiapan-skills': 'Kesiapan & Skills',
     'progress.kesulitan-dipilih-model-kemampuan-peluang': 'Soal dipilih di tingkat yang bikin kamu benar sekitar 8 dari 10 kali - cukup menantang untuk belajar, tidak sampai bikin nyerah. Waktu mengulang dihitung dari kapan kamu biasanya mulai lupa. Semua dihitung di HP-mu sendiri.',
-    'progress.kesulitan-kemungkinan-besar-berasal-jadi': 'kesulitan di {skillName} kemungkinan besar berasal dari {skillName}, jadi itu yang dilatih lebih dulu.',
+    'progress.kesulitan-kemungkinan-besar-berasal-jadi': 'kesulitan di {symptomSkill} kemungkinan besar berasal dari {rootSkill}, jadi itu yang dilatih lebih dulu.',
     'progress.konsistensi-hari': 'Rutin belajar (14 hari)',
     'progress.lab-kesalahan': 'Lab Kesalahan',
     'progress.lapisan-penalaran-belum-termuat-perangkat': 'Bagian ini belum aktif di HP-mu. Latihanmu tetap jalan normal; yang memilih soal untuk sementara bagian yang lebih sederhana.',
