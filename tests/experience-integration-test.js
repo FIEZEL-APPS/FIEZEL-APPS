@@ -53,7 +53,8 @@ check(!/classList\?\.add\?\.\('notification-locked'\)/.test(app),'nothing may lo
 check(/\.notification-locked/.test(css),'kelas kunci lama sengaja dibiarkan di stylesheet: sesi lama masih bisa memegangnya sampai halaman dimuat ulang');
 check(/checkStudyReminders/.test(app)&&/showStudyNotification/.test(app)&&/NOTIFICATION_REMINDER_INTERVAL_MS/.test(app)&&/notificationclick/.test(read('sw.js')),'Study reminder notification engine missing');
 check(/function getCelestialState/.test(app)&&/function getScenePalette/.test(app)&&/SUNRISE_MINUTE/.test(app)&&/global-sky/.test(css)&&/sky-light/.test(css)&&/id="globalSky"/.test(html),'Full-screen real-time sun/moon cycle missing');
-check(/GRAMMAR_SESSION_SIZE=25/.test(app)&&/function buildGrammarLessonQuestions/.test(app)&&/count:GRAMMAR_SESSION_SIZE/.test(app),'Grammar lesson contract is not fixed at 25 questions');
+// m025-375: sesi lesson maksimal 10 soal (lesson bertemplat tunggal 9), mode latihan-dulu.
+check(/GRAMMAR_SESSION_SIZE=10/.test(app)&&/GRAMMAR_SESSION_MIN=5/.test(app)&&/function buildGrammarLessonQuestions/.test(app)&&/count:Math\.min\(GRAMMAR_SESSION_SIZE,questions\.length\)/.test(app),'Grammar lesson contract is not the practice-first 10-question session');
 check(/NATURAL_AI_STYLE/.test(app)&&/Hindari gaya buku teks/.test(idCorpus)&&/readingFocusLabel/.test(app),'Natural Indonesian explanation contract missing');
 check(/function buildCreatorReport/.test(app)&&/session_complete/.test(app)&&/daily_access/.test(app),'Automatic access/session reporting missing');
 check(/queueCreatorReport/.test(app)&&/flushReportQueue/.test(app),'Report retry queue missing');
@@ -93,4 +94,4 @@ if(failures.length){
   process.exit(1);
 }
 console.log('FIEZEL experience integration: PASS');
-console.log(JSON.stringify({aiSkillProfile:true,haptics:true,answerSounds:true,answerPopups:true,realtimeSky:true,grammarQuestionsPerLesson:25,naturalIndonesian:true,motion:true,creatorHub:true,rotatingLoginReminder:true,notificationsInvitedNotForced:true,studyReminderEngine:true,apiKeyBundled:false}));
+console.log(JSON.stringify({aiSkillProfile:true,haptics:true,answerSounds:true,answerPopups:true,realtimeSky:true,grammarQuestionsPerLesson:10,naturalIndonesian:true,motion:true,creatorHub:true,rotatingLoginReminder:true,notificationsInvitedNotForced:true,studyReminderEngine:true,apiKeyBundled:false}));

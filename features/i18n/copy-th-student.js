@@ -102,8 +102,8 @@
     'grammar.lesson-belum-memiliki-materi': 'บทเรียนนี้ยังไม่มีเนื้อหา',
     'grammar.lesson-hanya-tersedia-pada-level': 'บทเรียนนี้มีเฉพาะระดับ {level}',
     'grammar.pilih-lesson-terlebih-dahulu': 'เลือกบทเรียน {level} ก่อน',
-    'grammar.mode-practice-terfokus': 'แบบฝึก {jumlahSoal} รูปแบบ',
-    'grammar.urutan-mode-practice': '{level} · บทที่ {sequence} · {fondasi} · แบบฝึก {jumlahSoal} รูปแบบ',
+    'grammar.mode-practice-terfokus': 'แบบฝึกสั้น ๆ {jumlahSoal} ข้อ',
+    'grammar.urutan-mode-practice': '{level} · บทที่ {sequence} · {fondasi} · {jumlahSoal} ข้อ',
     'grammar.pahami-dulu-urutan': 'ทำความเข้าใจก่อน · บทที่ {sequence}',
 
     'level.ujian-judul': 'สอบเลื่อนระดับ',

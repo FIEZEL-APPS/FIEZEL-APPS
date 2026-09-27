@@ -166,7 +166,7 @@ check(
 
 // --- penolakan harus ada di SETIAP pintu, bukan hanya di tombol -------------------------
 // buildGrammarLessonQuestions() sengaja TIDAK ada di daftar ini. Ia pembangun konten, bukan
-// pintu murid: audit inventaris soal harus tetap bisa bertanya "lesson ini punya 25 soal valid
+// pintu murid: audit inventaris soal harus tetap bisa bertanya "lesson ini punya cukup soal valid
 // atau tidak" tanpa bergantung pada progres siapa pun. Yang menutup sesi adalah practiceSkill().
 for (const entry of ['openGrammarLesson', 'renderGrammarLesson', 'practiceSkill']) {
   const block = sourceBlock(entry);

@@ -67,7 +67,13 @@ setTimeout(() => {
   const previous={activeLevel:state.preferences.activeLevel||'',levelMode:state.preferences.levelMode||'placement'};
   for (const lesson of templates) {
     state.preferences={...state.preferences,activeLevel:lesson.cefr,levelMode:'manual'};
-    const qs=context.buildGrammarLessonQuestions(lesson.subskill,25);
+    /* m025-375: sesi lesson tidak lagi menyajikan recall_memory_cue (mode teori dengan pengecoh
+       pinjaman dikeluarkan dari GRAMMAR_LESSON_MODES). Generatornya tetap hidup di mesin
+       grammarExercise, jadi invarian provenansinya dijaga langsung di generator itu - bukan
+       lewat sesi lesson yang kini memang tidak pernah memanggilnya. */
+    const buckets=vm.runInContext('G',context),variant=vm.runInContext("GRAMMAR_PRACTICE_MODES.indexOf('recall_memory_cue')",context);
+    const item=(buckets[lesson.subskill]||[]).find(x=>String(x?.[8]||'')===String(lesson.id));
+    const qs=item&&variant>=0?[context.makeGrammarQuestion(lesson.subskill,item,variant,lesson.subskill)]:[];
     for (const q of qs) {
       if (q.practiceMode!=='recall_memory_cue' && q.mode!=='recall_memory_cue') continue;
       checked++;
