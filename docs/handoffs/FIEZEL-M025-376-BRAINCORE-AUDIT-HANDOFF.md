@@ -14,8 +14,8 @@ fondasi (A1, A2, B5, B6, A3).
 ## STATUS
 
 Machine-verified lokal. Seluruh perintah gerbang `.github/workflows/quality.yml` dijalankan
-(3 paralel); unit backend `backend/unit_test.py` 56/56. A3 **belum** dikerjakan — menunggu
-keputusan OWNER (lihat "Berikutnya").
+(3 paralel); unit backend `backend/unit_test.py` 56/56. Langkah 1 (fondasi) lengkap: A1, A2,
+B5, B6, dan A3 (OWNER memilih "ganti ukuran dulu", 2026-09-27).
 
 ## APA YANG BERUBAH
 
@@ -25,7 +25,8 @@ keputusan OWNER (lihat "Berikutnya").
    hint tidak lagi melunakkan hukuman jawaban salah.
 2. **A1 — penyetel soal-gampang dimatikan.** `FiezelDecisionTrace.evaluateOutcome()` tidak
    menulis parameter; `readParams()` selalu bawaan dan mengabaikan sisa 0.90 di perangkat;
-   `affectTargetSuccess()` base tetap 0.80.
+   `affectTargetSuccess()` tidak lagi membaca parameter DecisionTrace (base 0.80 sampai A3 menerima
+   nilai baru lewat bukti retensi).
 3. **A2 — hasil sesi dinilai setelah ≥ 25 jawaban sasaran** terkumpul lintas sesi (jendela
    bukti per sasaran), kebijakan bertindak atas penilaian terakhir; gerbang baru
    `tests/policy-evidence-window-test.js` (W1–W9).
@@ -37,6 +38,10 @@ keputusan OWNER (lihat "Berikutnya").
    melangkah; `gatePassedAt` + `gateEverPassed()` menjaga pembukaan lesson tetap awet;
    `rootCause(..., nowMs)` melihat prasyarat yang terlupa. Backend sepadan
    (`apply_attempt`, `next_best_item`).
+7. **A3 — penyetel resmi disambung, diukur retensi.** `FiezelSelfTune.experiment()` (satu
+   percobaan ±0.02, lesson dibagi `FiezelNof1.assign`, diputus retensi probe 3/7/21 hari; sulit =
+   non-inferioritas, mudah = superioritas; penjaga Brier; kadaluwarsa 120 hari; ledger). State per
+   murid (`sideStateKey`). Manifest 3.13.0 (`nof1` active). Gerbang `tests/self-tune-retention-test.js`.
 
 ```yaml
 files_added:
@@ -44,12 +49,16 @@ files_added:
   - docs/handoffs/FIEZEL-M025-376-BRAINCORE-AUDIT-HANDOFF.md
   - tests/i18n-param-collision-test.js
   - tests/policy-evidence-window-test.js
+  - tests/self-tune-retention-test.js
   - tools/dev/braincore-audit-2026-09-26-probe.js
 files_touched:
   - app.js
   - style.css
   - features/brain/fiezel-core-brain.js
   - features/brain/fiezel-mastery-bkt.js
+  - features/brain/fiezel-self-tune.js
+  - features/brain/fiezel-brain-manifest.js
+  - index.html
   - features/learner-flow/fiezel-decision-trace.js
   - features/diagnostics/fiezel-live-chrome-runner.js
   - features/i18n/copy-{id,th}-app-d.js
@@ -63,9 +72,8 @@ files_touched:
 
 ## BERIKUTNYA (roadmap OWNER, urutan tetap)
 
-1. **Fondasi — sisa A3.** `FiezelSelfTune` hanya bisa menaikkan `targetSuccess` (soal lebih
-   mudah) setiap verdict `promote` yang diukur dari akurasi — kelas cacat yang sama dengan A1.
-   Menunggu keputusan OWNER tentang ukurannya sebelum disambung ke pemilihan soal.
+1. **Fondasi — selesai** (A1, A2, B5, B6, A3). Pantau di ledger kapan percobaan retensi
+   pertama diputus; putusan butuh ≥ 25 probe per lengan, jadi realistisnya beberapa minggu.
 2. Kesulitan soal dihitung dari semua murid (agregasi anonim lewat cohort 14 hari).
 3. Angka-angka rumus disetel dari data (a, c, pertumbuhan memori, dst.).
 4. Uji A/B antar murid, dibagi server, diukur retensi D1/D7/D30.

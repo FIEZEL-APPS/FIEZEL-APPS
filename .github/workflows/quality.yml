@@ -538,6 +538,9 @@ jobs:
           node tests/nof1-test.js
           node tests/param-ledger-test.js
           node tests/self-tune-test.js
+          # m025-376 (audit braincore A3, OWNER 2026-09-27): penyetel resmi disambung ke pemilihan
+          # soal, diukur RETENSI tertunda per lesson (bukan akurasi sesi), dua arah, berpagar.
+          node tests/self-tune-retention-test.js
           node tests/content-chain-test.js
           node tests/content-chain-report-test.js
           node tests/learner-evidence-test.js

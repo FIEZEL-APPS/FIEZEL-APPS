@@ -93,7 +93,10 @@
   // 3.11.0 → 3.12.0 (OWNER-authorized activation of bounded self-tuning):
   // selfTune off→active, paramLedger off→active, brainConfig off→active.
   // Izin OWNER diberikan 2026-09-27 dan dicatat di BRAINCORE-OWNER-ACTIVATION.md.
-  var BUNDLE_VERSION = '3.12.0';
+  // 3.12.0 → 3.13.0 (m025-376, audit braincore A3, keputusan OWNER 2026-09-27): nof1 off→active.
+  // selfTune kini diukur RETENSI tertunda per lesson (experiment()), dan FiezelNof1.assign
+  // yang membagi lesson ke lengan kontrol/kandidat dipanggil app.js.
+  var BUNDLE_VERSION = '3.13.0';
 
   // Disalin apa adanya dari version.js (self.FIEZEL_VERSION). Bundle ini mengandalkan
   // wiring app.js 5.19.0 (guard modul-absen, sidecar stabilityDays, dsb.) — versi
@@ -261,7 +264,9 @@
        dan itu sengaja: langkah 2-4 handoff masih terbuka. */
     questionMemory: 'active',
     questionAllocation: 'active',
-    nof1: 'off',
+    // m025-376 (A3): off→active. selfTuneTargetFor/selfTuneRetentionArms di app.js membagi
+    // LESSON ke lengan kontrol/kandidat percobaan retensi lewat assign(); tally() belum dipakai.
+    nof1: 'active',
     // m025-374 (OWNER activation): paramLedger off→active. Rantai hash perubahan parameter
     // sekarang AKTIF: selfTune.propose() mencatat setiap delta ke ledger, dan setiap entri
     // bisa diverifikasi dan dikembalikan. Prasyarat penyetelan-diri yang dibuka bersama.

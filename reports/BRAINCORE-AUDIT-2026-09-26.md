@@ -35,7 +35,7 @@ Dengan kata lain: jalur "otonom yang aman" mati, jalur "otonom tanpa pagar" hidu
 |----|---------|------|--------|--------|
 | A1 | **Tinggi** | learner-flow | Penyetel kedua tanpa pagar menaikkan `targetSuccess` hidup ke 0.90 | **Diperbaiki** (owner: matikan) — §7 |
 | A2 | **Tinggi** | app.js / stat-gate | Verdict kebijakan selalu `hold` → outcome sesi terkunci `mixed`, `FiezelSelfTune` tidak pernah apply/rollback | **Diperbaiki** (owner: kumpulkan lintas sesi + panel Home) — §7 |
-| A3 | Sedang | app.js self-tune | Override self-tune tidak dibaca runtime; rollback menghapus override alih-alih memulihkan `from` (ledger ≠ nilai efektif) | Butuh keputusan owner (satu paket dengan A2) |
+| A3 | Sedang | app.js self-tune | Override self-tune tidak dibaca runtime; rollback menghapus override alih-alih memulihkan `from` (ledger ≠ nilai efektif) | **Diperbaiki** (owner: ganti ukuran dulu) — §7 |
 | B1 | Sedang | app.js + i18n | Kartu "akar masalah" menyebut prasyarat dua kali, gejalanya hilang | **Diperbaiki** + gerbang baru |
 | B2 | Sedang | reset progres | Kunci decision trace & parameter hidup selamat dari "Reset progres" | **Diperbaiki** + gerbang R5 |
 | B3 | Sedang | backend | Status `TRANSFERRED` lengket selamanya (dan `RETAINED` sampai salah berikutnya) walau posterior jatuh | **Diperbaiki** + unit test |
@@ -284,3 +284,17 @@ setelah 90 hari: 0.30 → di bawah 0.5, bukan 0.94). Pembukaan lesson dijaga awe
 `frontier` memakainya, `rootCause(..., nowMs)` melihat prasyarat yang terlupa. Backend
 `apply_attempt` dan `next_best_item` membaca posterior yang sudah meluruh, dan
 `p_mastery_decayed` tidak lagi tersimpan ke DB.
+
+**A3 — penyetel resmi disambung, ukurannya diganti (owner: "ganti ukuran dulu").** app.js tidak
+lagi memanggil `propose()` (akurasi sesi, satu arah). Jalurnya `FiezelSelfTune.experiment()`:
+satu percobaan `difficulty.targetSuccess` ±0.02 pada satu waktu, LESSON dibagi ke lengan
+kontrol/kandidat lewat `FiezelNof1.assign`, dan pemutusnya retensi tertunda (probe 3/7/21 hari)
+pada lesson yang dikuasai sesudah percobaan dimulai, lewat `FiezelPolicyVerdict`. Percobaan
+pertama mencoba lebih sulit; arah sulit diterima bila retensi tidak memburuk (non-inferioritas
+5pp), arah mudah hanya bila retensi terbukti lebih baik (superioritas). Kandidat yang membuat
+Brier probe naik > 0.05 ditolak; percobaan tanpa putusan 120 hari kadaluwarsa. Setiap mulai,
+terima, tolak, dan kadaluwarsa tercatat di `FiezelParamLedger`; state disimpan per murid dan per
+bahasa (`sideStateKey`). `affectTargetSuccess()` membaca nilai lesson sasaran dari sini.
+Manifest 3.12.0 → 3.13.0 (`nof1` off → active). Gerbang baru `tests/self-tune-retention-test.js`
+(M1–M9, A1–A5). Karena probe butuh hari-hari, putusan pertama realistisnya baru keluar setelah
+beberapa minggu pemakaian — sebelum itu nilai berlaku tetap 0.80.
