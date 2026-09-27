@@ -2332,6 +2332,9 @@ function braincoreEvidenceFlush(nowMs=Date.now()){
 }
 /** Satu pintu untuk jalur akhir sesi: emisi + flush, keduanya senyap. */
 function braincoreEvidenceObserveSession(outcome,nowMs=Date.now()){
+  // Kesulitan soal gabungan punya saklarnya sendiri - lane bukti yang mati tidak boleh
+  // ikut mematikannya, jadi ia jalan SEBELUM gerbang lane bukti.
+  itemPoolSync(nowMs);
   if(!braincoreEvidenceAnyLaneActive())return;
   try{
     braincoreEvidenceEmitDecision(outcome,nowMs);
@@ -2652,6 +2655,9 @@ function record(q,ok,ms,selectedIndex){
     // Fase 3 (C5 butir 1): jawaban yang sama juga bukti KALIBRASI ITEM - seberapa sulit
     // soal ini sebenarnya, diukur dari murid nyata. Guarded di dalam helper-nya.
     try{itemCalibrationObserve(q,ok,h.kappa)}catch{}
+    // Braincore langkah 2: jawaban PERTAMA murid pada soal ini juga menjadi satu catatan
+    // anonim untuk kesulitan soal gabungan (dijaga penuh di dalam helper-nya).
+    try{itemPoolObserve(q,ok)}catch{}
     // Gelombang 4 (Lane B): jawaban ternilai yang sama juga menjadi (paling banyak) SATU
     // event answer_outcome di antrean telemetri LOKAL — observasi murni, guarded penuh,
     // dan mode 'off' (default) keluar sebelum kerja apa pun di dalam helper-nya.
@@ -2664,6 +2670,7 @@ function record(q,ok,ms,selectedIndex){
   if(q.type==='cloze'){
     try{bktRecord(q,ok,h.kappa,1.5)}catch{}
     try{itemCalibrationObserve(q,ok,h.kappa)}catch{}
+    try{itemPoolObserve(q,ok)}catch{}
   }
   if(!ok)state.wrongAnswers.push({question:q.question,selectedAnswer:selected,correct:q.options?.[q.answerIndex],skill:q.skill,target:q.target||q.id,type:q.type,errorTag:h.errorTag,at:now});
   if(state.wrongAnswers.length>300)state.wrongAnswers.shift();
@@ -4220,12 +4227,150 @@ function itemCalibrationObserve(q,ok,kappa){
 /** Kesulitan efektif sebuah item: prior + delta kalibrasi HANYA bila bukti >= 8 (modul yang
  *  menegakkan ambangnya). Mengembalikan angka, atau null bila modul absen/tidak diterapkan. */
 function itemCalibrationEffective(q,prior){
+  /* Braincore langkah 2: koreksi dari SEMUA murid menang atas koreksi N=1 perangkat ini
+     bila soal itu sudah dijawab cukup banyak murid (ditegakkan FiezelItemPool.effective).
+     Keduanya tidak dijumlahkan: kalibrasi lokal mengukur delta dari prior yang sama, jadi
+     menjumlahkannya menghitung pergeseran yang sama dua kali. */
+  const pooled=itemPoolEffective(q);
+  if(pooled!=null)return pooled;
   if(!itemCalibrationAvailable())return null;
   try{
     const out=self.FiezelItemCalibration.effective(itemCalibrationRead(),calibrationItemId(q),Number(prior));
     const d=Number(out?.difficulty);
     return out&&out.applied&&Number.isFinite(d)&&d>0?d:null;
   }catch{return null}
+}
+/* ---- Braincore langkah 2: KESULITAN SOAL GABUNGAN (FiezelItemPool) ----
+ * KENAPA: kalibrasi di atas hanya melihat SATU murid, dan di N=1 kesulitan soal tidak bisa
+ * dipisahkan dari kemampuan murid (lihat kepala fiezel-item-calibration.js). Di sini
+ * perangkat menyumbang JAWABAN PERTAMA muridnya pada setiap soal ke penghitung anonim di
+ * server, dan membaca balik tabel koreksi yang dihitung dari semua murid.
+ *
+ * TIGA ATURAN YANG MEMBUATNYA SAH:
+ *  (1) prediksi diambil SAAT PENYAJIAN (draw -> q.__predictedPrior), sebelum jawaban
+ *      menggeser kemampuan, dan dari PRIOR KANONIK (level + mode) - bukan dari kesulitan yang
+ *      sudah dikoreksi dan bukan dari varian prior per jalur, supaya semua jalur latihan
+ *      mengukur soal yang sama terhadap patokan yang sama;
+ *  (2) tanpa prediksi (tes penempatan, kemampuan belum yakin) jawaban tidak dikirim, tetapi
+ *      soalnya tetap ditandai terlihat - modul menegakkan "hanya jawaban pertama";
+ *  (3) mode 'off' = tidak ada apa pun; server mati = catatan disimpan, bukan dibuang.
+ * Semua helper guarded + try/catch: modul/jaringan absen = perilaku sebelum langkah 2. */
+const ITEM_POOL_KEY='fiezel-item-pool-v1',ITEM_POOL_TABLE_KEY='fiezel-item-pool-table-v1';
+/** Keyakinan kemampuan minimum (FiezelCoreBrain: bukti berbobot/24) sebelum prediksi prior
+ *  dianggap cukup jujur untuk disumbangkan. 0.5 = kira-kira 12 jawaban berbobot. */
+const ITEM_POOL_MIN_CONFIDENCE=0.5;
+let __itemPoolTableCache=null,__itemPoolFlushing=false,__itemPoolFetching=false;
+function itemPoolCfg(){try{return self.FiezelTelemetryConfig?.CONFIG?.itemPool||null}catch{return null}}
+function itemPoolMode(){const m=String(itemPoolCfg()?.mode||'');return m==='local'||m==='on'?m:'off'}
+function itemPoolAvailable(){const M=self.FiezelItemPool;return !!(M&&typeof M.observe==='function'&&typeof M.effective==='function')}
+function itemPoolRead(key=sideStateKey(ITEM_POOL_KEY)){try{const raw=localStorage.getItem(key);return raw?JSON.parse(raw):null}catch{return null}}
+function itemPoolWrite(st,key=sideStateKey(ITEM_POOL_KEY)){if(!st)return;try{localStorage.setItem(key,JSON.stringify(st))}catch{}}
+/** Prior KANONIK soal untuk jalur gabungan: FiezelItemPrior dari level + mode saja. Cloze
+ *  memakai mode yang sama dengan pembangunnya (makeClozeQuestion: complete_sentence). */
+function itemPoolCanonicalPrior(q){
+  try{
+    const P=self.FiezelItemPrior;if(!P||typeof P.difficultyFor!=='function')return null;
+    const type=String(q?.type||'');
+    if(type!=='grammar'&&type!=='cloze')return null;
+    const mode=type==='cloze'?'complete_sentence':String(q?.practiceMode||'');
+    const p=Number(P.difficultyFor({level:String(q?.level||getActiveLevel()),mode,domain:'grammar'}));
+    return Number.isFinite(p)&&p>0?p:null;
+  }catch{return null}
+}
+/** Peluang benar SAAT PENYAJIAN dari prior kanonik, atau null bila kemampuan belum yakin. */
+function itemPoolPriorPrediction(q){
+  try{
+    const brain=self.FiezelCoreBrain,ab=coreBrainSnapshot()?.ability;
+    if(!brain||typeof brain.successProbability!=='function')return null;
+    const ability=Number(ab?.ability),conf=Number(ab?.confidence);
+    if(!Number.isFinite(ability)||!(conf>=ITEM_POOL_MIN_CONFIDENCE))return null;
+    const prior=itemPoolCanonicalPrior(q);if(prior==null)return null;
+    const p=Number(brain.successProbability(ability,prior));
+    return Number.isFinite(p)?Math.max(0,Math.min(1,p)):null;
+  }catch{return null}
+}
+/** Satu jawaban grammar/cloze -> paling banyak satu catatan jawaban-pertama. */
+function itemPoolObserve(q,ok){
+  if(itemPoolMode()==='off'||!itemPoolAvailable())return false;
+  try{
+    const key=sideStateKey(ITEM_POOL_KEY);
+    const p=q?.__predictedPrior==null?NaN:Number(q.__predictedPrior);
+    const res=self.FiezelItemPool.observe(itemPoolRead(key),{itemId:calibrationItemId(q),pPrior:p,ok:!!ok},Date.now());
+    if(res&&res.state&&res.reason!=='invalid_item'&&res.reason!=='not_first_exposure')itemPoolWrite(res.state,key);
+    return !!(res&&res.recorded);
+  }catch{return false}
+}
+function itemPoolTable(){
+  if(__itemPoolTableCache)return __itemPoolTableCache;
+  if(!itemPoolAvailable())return null;
+  try{const raw=JSON.parse(localStorage.getItem(ITEM_POOL_TABLE_KEY)||'null');__itemPoolTableCache=self.FiezelItemPool.healTable(raw?.table,Date.now())}catch{__itemPoolTableCache=null}
+  return __itemPoolTableCache;
+}
+/** Kesulitan dari tabel gabungan (prior kanonik + koreksi populasi), atau null. */
+function itemPoolEffective(q){
+  if(itemPoolMode()!=='on'||!itemPoolAvailable())return null;
+  try{
+    const prior=itemPoolCanonicalPrior(q);if(prior==null)return null;
+    const out=self.FiezelItemPool.effective(itemPoolTable(),calibrationItemId(q),prior);
+    const d=Number(out?.difficulty);
+    return out&&out.applied&&Number.isFinite(d)&&d>0?d:null;
+  }catch{return null}
+}
+/**
+ * Kirim catatan jawaban-pertama. 2xx = selesai (ack); 2xx {disabled} = server belum
+ * dinyalakan, SIMPAN dan coba lagi 12 jam lagi; 400 = batch cacat yang tidak akan pernah
+ * diterima, buang supaya tidak mengulang selamanya; lainnya = backoff. Tanpa cookie.
+ */
+function itemPoolFlush(nowMs=Date.now()){
+  if(itemPoolMode()!=='on'||!itemPoolAvailable()||__itemPoolFlushing)return Promise.resolve(null);
+  const url=String(itemPoolCfg()?.endpoint||'');
+  if(!url||typeof fetch!=='function')return Promise.resolve(null);
+  const M=self.FiezelItemPool,key=sideStateKey(ITEM_POOL_KEY);
+  let st;
+  try{st=M.seal(itemPoolRead(key),nowMs,braincoreEvidenceUuid);itemPoolWrite(st,key)}catch{return Promise.resolve(null)}
+  if(!M.due(st,nowMs))return Promise.resolve(null);
+  const env=M.envelope(st,braincoreEvidenceUuid());
+  if(!env)return Promise.resolve(null);
+  const ids=env.events.map(e=>e.eventId);
+  __itemPoolFlushing=true;
+  return fetch(url,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(env),credentials:'omit',keepalive:true})
+    .then(async r=>{
+      let body=null;try{body=await r.json()}catch{}
+      const cur=itemPoolRead(key);
+      if(r.ok&&body&&body.disabled)itemPoolWrite(M.defer(cur,nowMs,12*3600000),key);
+      else if(r.ok||r.status===400)itemPoolWrite(M.ack(cur,ids),key);
+      else itemPoolWrite(M.defer(cur,nowMs),key);
+      return {status:r.status,disabled:!!(body&&body.disabled)};
+    })
+    .catch(()=>{try{itemPoolWrite(M.defer(itemPoolRead(key),nowMs),key)}catch{}return null})
+    .finally(()=>{__itemPoolFlushing=false});
+}
+/** Baca tabel gabungan paling sering sekali per tableRefreshMs. Gagal = tabel lama tetap
+ *  dipakai dan dicoba lagi 6 jam kemudian; jawaban server (termasuk tabel kosong saat lane
+ *  dimatikan) MENGGANTI tabel lama, supaya lane yang dimatikan berhenti berefek. */
+function itemPoolRefreshTable(nowMs=Date.now()){
+  if(itemPoolMode()!=='on'||!itemPoolAvailable()||__itemPoolFetching)return Promise.resolve(null);
+  const cfg=itemPoolCfg(),url=String(cfg?.tableEndpoint||'');
+  if(!url||typeof fetch!=='function')return Promise.resolve(null);
+  let cached=null;try{cached=JSON.parse(localStorage.getItem(ITEM_POOL_TABLE_KEY)||'null')}catch{}
+  const every=Number(cfg?.tableRefreshMs)||86400000;
+  if(cached&&Number(cached.checkedAt)>0&&nowMs-Number(cached.checkedAt)<every)return Promise.resolve(null);
+  const store=(table,checkedAt)=>{try{localStorage.setItem(ITEM_POOL_TABLE_KEY,JSON.stringify({checkedAt,table}))}catch{}__itemPoolTableCache=null};
+  __itemPoolFetching=true;
+  return fetch(url,{method:'GET',credentials:'omit'})
+    .then(r=>r.ok?r.json():Promise.reject(new Error('http '+r.status)))
+    .then(j=>{
+      if(!j||j.schema!==self.FiezelItemPool.TABLE_SCHEMA)throw new Error('schema');
+      store(j,nowMs);
+      return itemPoolTable();
+    })
+    .catch(()=>{store(cached?.table||null,nowMs-every+6*3600000);return null})
+    .finally(()=>{__itemPoolFetching=false});
+}
+/** Satu pintu untuk akhir sesi dan boot: kirim + baca, keduanya senyap. */
+function itemPoolSync(nowMs=Date.now()){
+  try{const a=itemPoolFlush(nowMs);if(a&&typeof a.catch==='function')a.catch(()=>{})}catch{}
+  try{const b=itemPoolRefreshTable(nowMs);if(b&&typeof b.catch==='function')b.catch(()=>{})}catch{}
 }
 /* ---- C5 butir 2: mode latihan cloze (produksi ketik, bank B7) ----
  * Recall produksi baru dibuka setelah recognition stabil (gerbang BKT L>=0.6, P8 Fable).
@@ -11804,6 +11949,10 @@ function quizLoop(cfg){
     q.__predicted=quizPredictedSuccess(q);
     if(q.type==='listening'){q.__plays=0;q.__replayCount=0;q.__listeningPolicy=listeningAdaptivePolicy()}
   }catch{}
+  /* Braincore langkah 2: prediksi dari PRIOR KANONIK, juga saat penyajian, untuk jalur
+     kesulitan soal gabungan. Tes penempatan sengaja tanpa prediksi (kemampuan masih
+     ditebak) - jawabannya tidak dikirim, tetapi soalnya tetap tercatat pernah dijawab. */
+  try{q.__predictedPrior=(!cfg.placement&&(q.type==='grammar'||q.type==='cloze'))?itemPoolPriorPrediction(q):null}catch{}
   try{if(self.FiezelPresenceEngine&&typeof self.FiezelPresenceEngine.determine==='function'){const pres=self.FiezelPresenceEngine.determine({phase:'presenting',type:q.type,passage:!!q.passage});self.FiezelPresenceEngine.apply(pres,{motion:pawMotionAllowed()})}}catch(_){}
   answer.locked=false;answer.retryOf='';answer.scaffold='';answer.timing='';
   const opts=q.options||[];
@@ -14250,7 +14399,7 @@ function resetProgress(){openModal(`<div class="modal-mark">FIEZEL</div><h2>${Fi
      Komentar ini sengaja DI LUAR literal array: tests/reset-side-state-test.js mengurai
      daftar itu dengan split(','), jadi satu koma di dalam komentar membuat gerbangnya
      membaca kunci yang salah. */
-  for(const k of [BKT_KEY,MISCONCEPTION_LEDGER_KEY,ITEM_CALIBRATION_KEY,CONFUSION_MATRIX_KEY,OLM_NEGOTIATION_KEY,SRL_KEY,EVIDENCE_COHORT_KEY,EVIDENCE_LAST_KEY,EVIDENCE_ATTEMPT_KEY,RETENTION_PROBE_KEY,SL_STATE_KEY,IDENTITY_EVIDENCE_ATTEMPT_KEY,LEARNER_NAME_SYNC_KEY,ACCOUNT_NUDGE_KEY,SELF_TUNE_KEY,DECISION_TRACE_KEY,LIVE_PARAMS_KEY]){
+  for(const k of [BKT_KEY,MISCONCEPTION_LEDGER_KEY,ITEM_CALIBRATION_KEY,CONFUSION_MATRIX_KEY,OLM_NEGOTIATION_KEY,SRL_KEY,EVIDENCE_COHORT_KEY,EVIDENCE_LAST_KEY,EVIDENCE_ATTEMPT_KEY,RETENTION_PROBE_KEY,SL_STATE_KEY,IDENTITY_EVIDENCE_ATTEMPT_KEY,LEARNER_NAME_SYNC_KEY,ACCOUNT_NUDGE_KEY,SELF_TUNE_KEY,DECISION_TRACE_KEY,LIVE_PARAMS_KEY,ITEM_POOL_KEY]){
     try{localStorage.removeItem(sideStateKey(k))}catch{}
     try{localStorage.removeItem(k)}catch{}
   }
@@ -15578,6 +15727,7 @@ setTimeout(()=>{
     if(braincoreEvidenceMode()==='on')braincoreEvidenceFlush();
     maybeSyncLearnerName();
   }catch(_){}
+  try{itemPoolSync()}catch(_){}
 },2500);
 if(typeof window!=='undefined'&&window.addEventListener){
   window.addEventListener('online',()=>{
@@ -15586,6 +15736,7 @@ if(typeof window!=='undefined'&&window.addEventListener){
       if(braincoreEvidenceMode()==='on')braincoreEvidenceFlush();
       maybeSyncLearnerName();
     }catch(_){}
+    try{itemPoolSync()}catch(_){}
   });
 }
 if(typeof document!=='undefined'&&document.addEventListener){
@@ -15599,7 +15750,7 @@ if(typeof document!=='undefined'&&document.addEventListener){
   });
 }
 /* ============================== akhir blok SOSIAL (SLOT 7) ========================== */
-window.istilahMurid=istilahMurid;/* dipapar untuk gerbang QA: penerjemah enum harus bisa disapu penuh */window.__getFiezelData=()=>({vocab:V.length,reading:R.length,grammar:Object.keys(G).length});window.__fiezelAudit={showBrandSplash,showOnboarding,prefersReducedMotion,readInstallHealth,installHealthReportMarkup,buildBackupFile,previewRestoreForState,applyRestore,continuitySettingsMarkup,academicReadinessMarkup,unifiedSkillsMarkup,buildPersonalJourney,journeyMarkup,setGoalProfile,loadState,sanitizeState,validateQuestion,makeGrammarQuestion,makeReadingQuestion,makeVocabQuestion,buildGrammarLessonQuestions,buildPlacement,/* m025-246: dipapar untuk regression-test - gerbang itu harus bisa MENANYAKAN ukuran rencana penempatan, bukan memaku 25 dan merah setiap kali ukurannya berubah dengan sengaja. */placementSize,placementBlueprint,/* cetak biru PENUH dipapar terpisah: gerbang harus tetap bisa menjaga invarian 'penempatan penuh memuat ketiga jenis konten' walau jalur murid memakai cetak biru lite */PLACEMENT_BLUEPRINT_FULL:PLACEMENT_BLUEPRINT,buildAdaptivePool,getScenePalette,getCelestialState,getDiagnosticProfile,buildLearningSnapshot,buildLearnerEvidenceModel,remoteLearnerEvidenceSnapshot,deriveAdaptivePolicy,buildAdaptivePolicy,adaptivePolicyRequestPayload,sanitizeAdaptivePolicy,/* m025-201: dipapar untuk tests/core-policy-parity-test.js - gerbang paritas tidak bisa membandingkan apa yang tidak bisa ia panggil */capRationaleCodes,policyEffectiveness,sanitizePolicyEffectiveness,resolveAdaptivePolicy,evaluatePolicyOutcome,sanitizePolicyOutcome,recordPolicyOutcomeFromSession,backfillPolicyOutcomes,recentPolicyOutcomes,policyOutcomeSummary,buildALRSContext,selectALRSDecision,buildCreatorReport,validReportEndpoint,forgettingProbability,scheduleNext,coreBrainMemory,tutorSession,tutorObserve,misconceptionLedgerRead,misconceptionLedgerActive,coreBrainAttempts,quizPredictedSuccess,evidenceKappa,bktRead,bktRecord,bktShadowMarkup,brainManifestMarkup,learningTelemetryMode,learningTelemetryEmitAnswer,learningTelemetryStudyDay,braincoreEvidenceMode,braincoreEvidenceCohort,braincoreEvidenceCohortForBuild,braincoreEvidenceDay,braincoreEvidenceEmitSnapshot,activeLevelOverallMastery,braincoreEvidenceEmitDecision,braincoreEvidenceFlush,braincoreEvidenceObserveSession,braincoreDecisionReason,braincoreEvidenceAnyLaneActive,identityEvidenceMode,learnerNameSyncToServer,maybeSyncLearnerName,identityEvidenceActive,identityEvidenceMirror,identityEvidenceFlush,forgetLearnerEvidence,confusionMatrixRead,confusionMatrixRecord,affectObserve,affectSessionSync,affectTargetSuccess,listeningAdaptivePolicy,olmPanelMarkup,coreBrainPanelMarkup,diagnosticEvidenceReady,skillTimeline,errorPatterns,confusionPairs,diagnosticReport,confidenceCalibration,dueItems,selectLoginMessage,notificationPermission,checkStudyReminders,lastLearningAt,beginLearningSession,abandonActiveSession,completeActiveSession,/* Fase 3 (C5): kalibrasi item, cloze, OLM negotiated, SRL, speaking adaptif, step tutor */itemCalibrationRead,itemCalibrationObserve,itemCalibrationEffective,calibrationItemId,ensureClozeBank,makeClozeQuestion,clozeAdaptivePicks,clozeSkillReady,clozeProductionRecord,olmSummarizeInput,olmDispute,olmProbeNextSkill,olmProbeConsume,olmNegotiationRead,srlSessionPlan,srlPredictPrompt,srlCaptureConfidence,srlReflect,srlSessionSync,speakingCoverageRows,speakingAdaptiveEvidence,speakingAdaptivePolicy,stepTutorGuidance,stepTutorGuidanceMarkup,record,quizLoop,startAdaptive,/* m025-308: dipapar untuk tests/th-content-overlay-test.js. Gerbang itu harus bisa memanggil overlay yang SUNGGUHAN lalu membacanya lewat jalur baca yang dipakai penyaji - kalau ia hanya boleh memeriksa isi sidecar, ia mengulang kebutaan yang justru membiarkan 45 petunjuk writing dan 96 umpan balik reading-exam menganggur. */applyContentLocale,writingPromptPool,writingExamTask,readingExamSets,makeExamReadingQuestion,/* m025-314: dipapar untuk tests/target-lang-surface-guard-test.js. Gerbang itu harus bisa MEMANGGIL daftar kartu yang sungguhan lalu membacanya, bukan menebak dari pola teks di app.js - penjaga yang hanya diuji lewat grep akan tetap hijau saat kartunya dipindah ke fungsi lain. */latihanCards,skillHubModel,skillHubMarkup,continueLearningCard,aiBoosterCard,targetLangSurfaceBlocked,targetLangVoiceBlocked,courseLanguageLabel,/* `state` adalah binding modul, jadi ia TIDAK muncul sebagai properti global di vm - gerbang yang perlu menggeser bahasa target atau membaca layar aktif tidak punya jalan lain. Diekspor sebagai FUNGSI, bukan nilai: salinan yang diambil saat berkas dimuat akan basi begitu state ditugaskan ulang (loadState dipanggil lagi saat akun berpindah). */liveState:()=>state,/* B1 (m025-317): dipapar untuk tests/target-lang-progress-isolation-test.js. Gerbang itu harus MENJALANKAN jalur simpan/muat yang sungguhan di kedua bahasa - sumbu yang hanya diuji lewat modulnya adalah persis cara cacat ini bertahan berbulan-bulan. */saveFlushWrite,switchTargetLangStorage,progressStorageKey,pickProgress,sideStateKey,PROGRESS_STATE_FIELDS,PROGRESS_PREF_FIELDS,/* Migrasi sekali-jalan saat murid masuk akun. Dipapar karena inilah satu-satunya jalur yang bisa MENELANTARKAN progres bahasa: ia lahir sebelum ruang nama @lang ada. Gerbang harus menjalankannya, bukan membaca namanya. */activateAccountStateFromPuter,migrateSideStateToAccount,FIEZEL_TARGET_COURSE_KEY,decisionTrace:()=>self.FiezelDecisionTrace,presenceEngine:()=>self.FiezelPresenceEngine,/* m025-375: dipapar untuk tests/policy-evidence-window-test.js - gerbang harus bisa memanggil jendela bukti dan panel Home yang sungguhan. */policyEvidenceArms,policyEvidenceMin,policyEvidenceProgress,evidenceProgressPanelMarkup,todayHomeMarkup,/* m025-376: dipapar untuk tests/self-tune-retention-test.js. */selfTuneAfterOutcome,selfTuneTargetFor,selfTuneRetentionArms,loadSelfTuneState,retentionProbeResults,RETENTION_PROBE_KEY,SELF_TUNE_KEY,/* Audit UI/UX Home 2026-09-27: dipapar untuk tests/home-honesty-test.js. */homeWeekStats,homeVocabStats,HOME_WEEK_MIN};
+window.istilahMurid=istilahMurid;/* dipapar untuk gerbang QA: penerjemah enum harus bisa disapu penuh */window.__getFiezelData=()=>({vocab:V.length,reading:R.length,grammar:Object.keys(G).length});window.__fiezelAudit={showBrandSplash,showOnboarding,prefersReducedMotion,readInstallHealth,installHealthReportMarkup,buildBackupFile,previewRestoreForState,applyRestore,continuitySettingsMarkup,academicReadinessMarkup,unifiedSkillsMarkup,buildPersonalJourney,journeyMarkup,setGoalProfile,loadState,sanitizeState,validateQuestion,makeGrammarQuestion,makeReadingQuestion,makeVocabQuestion,buildGrammarLessonQuestions,buildPlacement,/* m025-246: dipapar untuk regression-test - gerbang itu harus bisa MENANYAKAN ukuran rencana penempatan, bukan memaku 25 dan merah setiap kali ukurannya berubah dengan sengaja. */placementSize,placementBlueprint,/* cetak biru PENUH dipapar terpisah: gerbang harus tetap bisa menjaga invarian 'penempatan penuh memuat ketiga jenis konten' walau jalur murid memakai cetak biru lite */PLACEMENT_BLUEPRINT_FULL:PLACEMENT_BLUEPRINT,buildAdaptivePool,getScenePalette,getCelestialState,getDiagnosticProfile,buildLearningSnapshot,buildLearnerEvidenceModel,remoteLearnerEvidenceSnapshot,deriveAdaptivePolicy,buildAdaptivePolicy,adaptivePolicyRequestPayload,sanitizeAdaptivePolicy,/* m025-201: dipapar untuk tests/core-policy-parity-test.js - gerbang paritas tidak bisa membandingkan apa yang tidak bisa ia panggil */capRationaleCodes,policyEffectiveness,sanitizePolicyEffectiveness,resolveAdaptivePolicy,evaluatePolicyOutcome,sanitizePolicyOutcome,recordPolicyOutcomeFromSession,backfillPolicyOutcomes,recentPolicyOutcomes,policyOutcomeSummary,buildALRSContext,selectALRSDecision,buildCreatorReport,validReportEndpoint,forgettingProbability,scheduleNext,coreBrainMemory,tutorSession,tutorObserve,misconceptionLedgerRead,misconceptionLedgerActive,coreBrainAttempts,quizPredictedSuccess,evidenceKappa,bktRead,bktRecord,bktShadowMarkup,brainManifestMarkup,learningTelemetryMode,learningTelemetryEmitAnswer,learningTelemetryStudyDay,braincoreEvidenceMode,braincoreEvidenceCohort,braincoreEvidenceCohortForBuild,braincoreEvidenceDay,braincoreEvidenceEmitSnapshot,activeLevelOverallMastery,braincoreEvidenceEmitDecision,braincoreEvidenceFlush,braincoreEvidenceObserveSession,braincoreDecisionReason,braincoreEvidenceAnyLaneActive,identityEvidenceMode,learnerNameSyncToServer,maybeSyncLearnerName,identityEvidenceActive,identityEvidenceMirror,identityEvidenceFlush,forgetLearnerEvidence,confusionMatrixRead,confusionMatrixRecord,affectObserve,affectSessionSync,affectTargetSuccess,listeningAdaptivePolicy,olmPanelMarkup,coreBrainPanelMarkup,diagnosticEvidenceReady,skillTimeline,errorPatterns,confusionPairs,diagnosticReport,confidenceCalibration,dueItems,selectLoginMessage,notificationPermission,checkStudyReminders,lastLearningAt,beginLearningSession,abandonActiveSession,completeActiveSession,/* Fase 3 (C5): kalibrasi item, cloze, OLM negotiated, SRL, speaking adaptif, step tutor */itemCalibrationRead,itemCalibrationObserve,itemCalibrationEffective,calibrationItemId,ensureClozeBank,makeClozeQuestion,clozeAdaptivePicks,clozeSkillReady,clozeProductionRecord,olmSummarizeInput,olmDispute,olmProbeNextSkill,olmProbeConsume,olmNegotiationRead,srlSessionPlan,srlPredictPrompt,srlCaptureConfidence,srlReflect,srlSessionSync,speakingCoverageRows,speakingAdaptiveEvidence,speakingAdaptivePolicy,stepTutorGuidance,stepTutorGuidanceMarkup,record,quizLoop,startAdaptive,/* m025-308: dipapar untuk tests/th-content-overlay-test.js. Gerbang itu harus bisa memanggil overlay yang SUNGGUHAN lalu membacanya lewat jalur baca yang dipakai penyaji - kalau ia hanya boleh memeriksa isi sidecar, ia mengulang kebutaan yang justru membiarkan 45 petunjuk writing dan 96 umpan balik reading-exam menganggur. */applyContentLocale,writingPromptPool,writingExamTask,readingExamSets,makeExamReadingQuestion,/* m025-314: dipapar untuk tests/target-lang-surface-guard-test.js. Gerbang itu harus bisa MEMANGGIL daftar kartu yang sungguhan lalu membacanya, bukan menebak dari pola teks di app.js - penjaga yang hanya diuji lewat grep akan tetap hijau saat kartunya dipindah ke fungsi lain. */latihanCards,skillHubModel,skillHubMarkup,continueLearningCard,aiBoosterCard,targetLangSurfaceBlocked,targetLangVoiceBlocked,courseLanguageLabel,/* `state` adalah binding modul, jadi ia TIDAK muncul sebagai properti global di vm - gerbang yang perlu menggeser bahasa target atau membaca layar aktif tidak punya jalan lain. Diekspor sebagai FUNGSI, bukan nilai: salinan yang diambil saat berkas dimuat akan basi begitu state ditugaskan ulang (loadState dipanggil lagi saat akun berpindah). */liveState:()=>state,/* B1 (m025-317): dipapar untuk tests/target-lang-progress-isolation-test.js. Gerbang itu harus MENJALANKAN jalur simpan/muat yang sungguhan di kedua bahasa - sumbu yang hanya diuji lewat modulnya adalah persis cara cacat ini bertahan berbulan-bulan. */saveFlushWrite,switchTargetLangStorage,progressStorageKey,pickProgress,sideStateKey,PROGRESS_STATE_FIELDS,PROGRESS_PREF_FIELDS,/* Migrasi sekali-jalan saat murid masuk akun. Dipapar karena inilah satu-satunya jalur yang bisa MENELANTARKAN progres bahasa: ia lahir sebelum ruang nama @lang ada. Gerbang harus menjalankannya, bukan membaca namanya. */activateAccountStateFromPuter,migrateSideStateToAccount,FIEZEL_TARGET_COURSE_KEY,decisionTrace:()=>self.FiezelDecisionTrace,presenceEngine:()=>self.FiezelPresenceEngine,/* m025-375: dipapar untuk tests/policy-evidence-window-test.js - gerbang harus bisa memanggil jendela bukti dan panel Home yang sungguhan. */policyEvidenceArms,policyEvidenceMin,policyEvidenceProgress,evidenceProgressPanelMarkup,todayHomeMarkup,/* m025-376: dipapar untuk tests/self-tune-retention-test.js. */selfTuneAfterOutcome,selfTuneTargetFor,selfTuneRetentionArms,loadSelfTuneState,retentionProbeResults,RETENTION_PROBE_KEY,SELF_TUNE_KEY,/* Audit UI/UX Home 2026-09-27: dipapar untuk tests/home-honesty-test.js. */homeWeekStats,homeVocabStats,HOME_WEEK_MIN,/* Braincore langkah 2: dipapar untuk tests/item-pool-test.js - gerbang harus menjalankan jalur catat/kirim/baca yang sungguhan. */itemPoolObserve,itemPoolFlush,itemPoolRefreshTable,itemPoolEffective,itemPoolCanonicalPrior,itemPoolPriorPrediction,itemPoolTable,ITEM_POOL_KEY,ITEM_POOL_TABLE_KEY};
 window.FIEZEL_TARGET_COURSE_KEY=FIEZEL_TARGET_COURSE_KEY;
 window.startVocabQuiz=startVocabQuiz;window.buildAdaptivePool=buildAdaptivePool;window.buildGrammarLessonQuestions=buildGrammarLessonQuestions;window.getScenePalette=getScenePalette;window.getCelestialState=getCelestialState;window.playFeedbackSound=playFeedbackSound;window.updateMastery=updateMastery;window.markMastered=markMastered;window.__getFiezelState=()=>state;window.__fiezelValidViews=()=>[...VALID_VIEWS];window.__fiezelDueReviews=()=>dueItems().length;window.buildAdaptivePolicy=buildAdaptivePolicy;window.studyDayKey=studyDayKey;window.startAdaptive=startAdaptive;window.showToast=showToast;window.answerFeedbackSignal=answerFeedbackSignal;window.practiceSkill=practiceSkill;window.openReadingLevel=openReadingLevel;window.startReadingRandom=startReadingRandom;window.startReadingAdaptive=startReadingAdaptive;window.startPlacement=startPlacement;window.startLevelPractice=startLevelPractice;window.startAdaptive=startAdaptive;window.resetProgress=resetProgress;window.closeModal=closeModal;window.openSettings=openSettings;window.openReportPreview=openReportPreview;window.sendCreatorReport=sendCreatorReport;window.askCoachAI=askCoachAI;window.dismissWelcome=dismissWelcome;window.requestStudyNotificationPermission=requestStudyNotificationPermission;window.declineStudyNotifications=declineStudyNotifications;window.skipPuterSignIn=skipPuterSignIn;window.attemptGoogleSignIn=attemptGoogleSignIn;window.shouldPresentPuterPopup=shouldPresentPuterPopup;window.notifyAppUpdateIfNew=notifyAppUpdateIfNew;window.setConfidence=setConfidence;window.explainWithAI=explainWithAI;window.explainWordWithAI=explainWordWithAI;window.olmDispute=olmDispute;/* Fase 3 (C5 butir 3): handler tombol sanggah di panel OLM */
 // m025-84: dipasang di ujung berkas, saat go()/state/VALID_VIEWS sudah ada, dan SEBELUM

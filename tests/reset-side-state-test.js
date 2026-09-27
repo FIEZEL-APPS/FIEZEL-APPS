@@ -72,7 +72,11 @@ const DIHAPUS_SAAT_RESET = [
   // menyetir pemilihan soal; tanpa ini murid yang mereset mewarisi setelan lamanya. R5 di
   // bawah mengunci literalnya ke konstanta modul supaya penggantian nama tidak lolos diam.
   'DECISION_TRACE_KEY',
-  'LIVE_PARAMS_KEY'
+  'LIVE_PARAMS_KEY',
+  // Braincore langkah 2: catatan jawaban-pertama untuk kesulitan soal gabungan (daftar soal
+  // yang pernah dijawab + kiriman yang belum terkirim). Reset = murid mulai dari nol; sisa
+  // kiriman dari sebelum reset tidak boleh berangkat atas nama progres yang sudah dihapus.
+  'ITEM_POOL_KEY'
 ];
 
 /**
@@ -93,7 +97,8 @@ const SENGAJA_TIDAK_DIRESET = {
   // pertanyaan produk yang belum dijawab siapa pun. Dicatat di sini, bukan diputuskan.
   LEARNING_TELEMETRY_DAY0_KEY: { literal: 'fiezel-lt-day0-v1', alasan: 'jangkar hari-0 lane telemetri; lane itu punya jalur opt-out purge sendiri (lihat catatan OWNER di atas)' },
   KEY: { literal: 'fiezel.seenAppVersion', alasan: 'penanda versi aplikasi yang sudah dilihat di perangkat ini, bukan progres belajar' },
-  FIEZEL_TARGET_COURSE_KEY: { literal: 'fz_target_course', alasan: 'preferensi kursus target aktif (Jepang/Inggris) per perangkat, bukan progres belajar' }
+  FIEZEL_TARGET_COURSE_KEY: { literal: 'fz_target_course', alasan: 'preferensi kursus target aktif (Jepang/Inggris) per perangkat, bukan progres belajar' },
+  ITEM_POOL_TABLE_KEY: { literal: 'fiezel-item-pool-table-v1', alasan: 'tabel koreksi kesulitan soal dari server, SAMA untuk semua murid (Braincore langkah 2); bukan bukti murid ini' }
 };
 
 /** Isi daftar removeItem di dalam resetProgress(), dibaca dari sumber sungguhan. */

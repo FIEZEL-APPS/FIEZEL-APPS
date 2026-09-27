@@ -77,6 +77,8 @@ import { registerLearningRoutes } from './learning/route-learning-events.js';
 import { registerEvidenceRoutes } from './evidence/route-evidence.js';
 import { purgeEvidence } from './evidence/evidence-store-d1.js';
 import { purgeLearnerEvidence } from './evidence/learner-evidence-store-d1.js';
+import { registerItemPoolRoutes } from './evidence/route-item-pool.js';
+import { rebuildItemPoolTable, purgeItemPool } from './evidence/item-pool-store-d1.js';
 import { jsonResponse, jsonError, unauthenticated, ERR } from './errors.js';
 // A3: pencatat hasil cron. Satu-satunya alasan berkas ini diubah paket kerja A3.
 import { withCronRun, CRON_JOBS } from './cron-status.js';
@@ -690,6 +692,14 @@ export function buildExtraRoutes() {
   //      dibuat perangkat.
   registerEvidenceRoutes(collector(routes, wrapEvidence));
 
+  // [BRAIN] KESULITAN SOAL GABUNGAN (Braincore langkah 2) -
+  //      POST /api/braincore/item-evidence + GET /api/braincore/item-difficulty.
+  //      Database yang SAMA dengan lane bukti (EVIDENCE_DB, migrasi 0015), saklar
+  //      SENDIRI (`ITEM_POOL_ENABLED`, default off). Terdaftar walau mati: modulnya
+  //      menjawab 202 `{disabled:true}` / tabel kosong. Identitas SENGAJA tidak
+  //      dituntut - payload-nya tidak punya pengenal apa pun, bahkan cohort.
+  registerItemPoolRoutes(collector(routes, wrapEvidence));
+
   // [E5] AI + TTS. `deps.enforceQuota` diselesaikan PER PERMINTAAN.
   const aiSink = [];
   const ttsSink = [];
@@ -844,6 +854,27 @@ export async function runEvidencePurge(env, now) {
 }
 
 /**
+ * (d) Kesulitan soal gabungan (Braincore langkah 2): bangun ulang `item_pool_table` dari
+ *     56 hari penghitung, lalu purge dedup (60 hari) dan penghitung (120 hari).
+ *     Pembangunan tabel hanya saat `ITEM_POOL_ENABLED=on`; PURGE jalan selama binding ada,
+ *     walau saklar dimatikan lagi - lane yang dimatikan setelah mengumpulkan data tidak
+ *     boleh meninggalkan penghitungnya selamanya. Migrasi yang belum diterapkan membuat
+ *     purge gagal dengan `{error}` yang tertangkap, bukan menjatuhkan cron.
+ */
+export async function runItemPoolRollup(env, now) {
+  const db = (env && env.EVIDENCE_DB) || null;
+  if (!db) return { skipped: 'no_binding' };
+  const today = new Date(Number.isFinite(now) ? now : Date.now()).toISOString().slice(0, 10);
+  const on = String((env && env.ITEM_POOL_ENABLED) || 'off') === 'on';
+  const out = { table: on ? null : { skipped: 'disabled' }, purge: null };
+  if (on) {
+    try { out.table = await rebuildItemPoolTable(db, today); } catch (e) { out.table = { error: e && e.name }; }
+  }
+  try { out.purge = await purgeItemPool(db, today); } catch (e) { out.purge = { error: e && e.name }; }
+  return out;
+}
+
+/**
  * Pemetaan cron -> job. Cron yang tidak dikenal (atau kosong, seperti saat
  * dipanggil gerbang) menjalankan KEDUANYA: lebih baik satu job jalan dua kali
  * (keduanya idempoten) daripada tidak jalan karena ekspresi cron diubah di
@@ -871,7 +902,7 @@ export const CRON_ANALYTICS_ROLLUP = '5 17 * * *';
 export async function runScheduled(event, env, executionCtx, now) {
   const cron = String((event && event.cron) || '');
   const at = Number.isFinite(now) ? now : Number((event && event.scheduledTime)) || Date.now();
-  const out = { cron, quotaSweep: null, analyticsRollup: null, evidencePurge: null, learnerEvidencePurge: null };
+  const out = { cron, quotaSweep: null, analyticsRollup: null, evidencePurge: null, learnerEvidencePurge: null, itemPool: null };
 
   const wantSweep = cron === CRON_QUOTA_SWEEP || cron !== CRON_ANALYTICS_ROLLUP;
   const wantRollup = cron === CRON_ANALYTICS_ROLLUP || cron !== CRON_QUOTA_SWEEP;
@@ -904,6 +935,10 @@ export async function runScheduled(event, env, executionCtx, now) {
     try {
       out.learnerEvidencePurge = await runLearnerEvidencePurge(env, at);
     } catch (e) { out.learnerEvidencePurge = { error: e && e.name }; }
+    // Kesulitan soal gabungan: irama harian yang sama, kegagalan sendiri.
+    try {
+      out.itemPool = await runItemPoolRollup(env, at);
+    } catch (e) { out.itemPool = { error: e && e.name }; }
   }
   return out;
 }
