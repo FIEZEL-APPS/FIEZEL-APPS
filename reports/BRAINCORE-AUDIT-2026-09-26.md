@@ -284,4 +284,3 @@ setelah 90 hari: 0.30 → di bawah 0.5, bukan 0.94). Pembukaan lesson dijaga awe
 `frontier` memakainya, `rootCause(..., nowMs)` melihat prasyarat yang terlupa. Backend
 `apply_attempt` dan `next_best_item` membaca posterior yang sudah meluruh, dan
 `p_mastery_decayed` tidak lagi tersimpan ke DB.
-
