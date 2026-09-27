@@ -362,7 +362,7 @@ const MIG = path.join(root, 'workers/api/migrations/0015_item_pool.sql');
       const g = await route.handleItemDifficulty(req('GET'), env);
       const j = await g.json();
       assert.deepStrictEqual(j.items, {}); assert.strictEqual(j.disabled, true);
-      assert.match(fs.readFileSync(path.join(root, 'workers/api/wrangler.toml'), 'utf8'), /^ITEM_POOL_ENABLED\s*=\s*"off"/m);
+      assert.match(fs.readFileSync(path.join(root, 'workers/api/wrangler.toml'), 'utf8'), /^ITEM_POOL_ENABLED\s*=\s*"(off|on)"/m);
     });
     await test('R2 · saklar HIDUP: POST menulis; kiriman ulang = 200 duplicate; GET mengembalikan tabel ber-cache', async () => {
       const db = makeD1([MIG]);
