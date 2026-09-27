@@ -24,6 +24,7 @@ sini yang menjadi urutan resmi.
 | `0013_oauth_email.sql` | `fiezel-core` (binding `CORE_DB`) | `auth_oauth_identity`, `auth_email`, `ux_auth_oauth_sub_provider` |
 | `0014_legacy_puter.sql` | `fiezel-core` (binding `CORE_DB`) | `push_subscriptions`, `brain_attempts`, `policy_outcomes`, `feedback`, `evolution_ledger` |
 | `0015_item_pool.sql` | `fiezel-evidence` (binding `EVIDENCE_DB`) | `item_pool_daily`, `item_pool_dedup`, `item_pool_table` |
+| `0016_item_pool_probe.sql` | `fiezel-evidence` (binding `EVIDENCE_DB`) | `item_pool_probe_daily` |
 
 Tabel di atas adalah **satu-satunya** daftar berkas→database yang ditulis manusia.
 `tools/d1-schema-check.mjs` dan `tests/d1-schema-contract-test.js` **menurunkan** peta itu
@@ -106,6 +107,8 @@ wrangler d1 execute fiezel-core --remote --file=migrations/0013_oauth_email.sql
 wrangler d1 execute fiezel-core --remote --file=migrations/0014_legacy_puter.sql
 # --- fiezel-evidence: kesulitan soal gabungan (Braincore langkah 2) ---
 wrangler d1 execute fiezel-evidence --remote --file=migrations/0015_item_pool.sql
+# --- fiezel-evidence: probe retensi untuk penyetelan paruh-waktu (Braincore langkah 3) ---
+wrangler d1 execute fiezel-evidence --remote --file=migrations/0016_item_pool_probe.sql
 ```
 
 `0009_learner_evidence.sql` masuk `fiezel-core` dan **bukan** `fiezel-evidence`,
