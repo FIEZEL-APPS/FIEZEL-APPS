@@ -2,7 +2,7 @@
 name: fiezel-pau-mascot-redesign
 description: "FIEZEL Mascot Redesign & Character Motion Designer. Use when the user asks to redesign, evolve, animate, or build the character system around Pau (the FIEZEL paw-mascot): mascot redesign, expression/pose/state libraries, character motion, splash and onboarding character animation, Pau around question panels, correct/incorrect reactions, character SFX, and voice/viseme integration. Orchestrates 15 parallel subagents over the FIEZEL-APPS/FIEZEL-APPS GitHub repo. Do NOT use for FIEZEL game mechanics, XP, quests, rewards, or progression design."
 metadata:
-  author: pilna-refa
+  author: fitrajft
   version: '1.0'
 ---
 

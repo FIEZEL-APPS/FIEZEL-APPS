@@ -14,7 +14,7 @@ BUILD-VERSION.json — keempatnya selaras, `--check` PASS).
 
 ## OTORITAS
 
-OWNER (pilnarefa@gmail.com) memerintahkan secara eksplisit pada sesi Perplexity
+OWNER (fitrajft@gmail.com) memerintahkan secara eksplisit pada sesi Perplexity
 Computer 2026-08-28 ±19:21 WIB: lanjutkan sampai selesai — commit, push, merge, dan
 deploy agar perubahan langsung dirasakan pengguna. Atas perintah itu, penanda
 `FIEZEL_PHYSICAL_ACCEPTANCE: WAIVED_BY_OWNER` dan `FIEZEL_OWNER_RELEASE: AUTHORIZED`

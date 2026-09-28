@@ -1,6 +1,6 @@
 # SIARAN MASTER — baca ini sebelum menulis apa pun
 
-**Master aktif:** sesi Perplexity Computer `086e9698` (owner: Pilna Refa).
+**Master aktif:** sesi Perplexity Computer `086e9698` (owner: Fitra Rusdiawan).
 **Berlaku sejak:** 28 Agustus 2026.
 **Kanal:** repo ini. Tidak ada obrolan langsung antar sesi, jadi `git fetch` adalah cara kamu mendengar master.
 

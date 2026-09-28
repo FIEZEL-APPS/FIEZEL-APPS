@@ -80,7 +80,7 @@ Seeded streak 3. `.fz-ritual-streak .fz-i` measured **20×20 px**; all 16 render
 | Normal lesson option highlight + pembahasan | PASS — `.option.correct` applied on tap; feedback class `feedback feedback-success`; pembahasan text (`Intinya…/paling tepat`) present | `verify-2g-practice-reveal-visible-390.png` |
 | Confidence popup in practice | PASS — `#confidencePop` appears after answering; scale + "go" flow works | `verify-3-practice-confidence-pop-390.png` |
 | Retry (second chance) after wrong answer | PASS — wrong tap → `.option.wrong`, 3 options remain enabled, tutor coaching turn shown ("Tadi cepat sekali jawabnya…"), no confidence pop until resolved | `verify-3-practice-retry-after-wrong-390.png` |
-| Onboarding completes (fresh user) | PASS — LANGKAH 1→6 walked, ends at "Mulai tes penempatan"; `fiezel-onboarding-v1 = {done:true, via:'placement', name:'Pilna', goal:'exam_foundation'}`; app renders; zero pageerrors | `verify-3-onboarding-final-390.png` |
+| Onboarding completes (fresh user) | PASS — LANGKAH 1→6 walked, ends at "Mulai tes penempatan"; `fiezel-onboarding-v1 = {done:true, via:'placement', name:'Fitra', goal:'exam_foundation'}`; app renders; zero pageerrors | `verify-3-onboarding-final-390.png` |
 | Offline reload | PASS — SW context: caches `fiezel-shell-m025-179-…` + `fiezel-v5.19.0` populated; `setOffline(true)` + reload → app renders home (853 chars content, home CTA present) | `verify-3-offline-reload-390.png` |
 | Splash appears and leaves | PASS — `#fiezelBootSplash` present+visible at first paint, detached within 30s | `verify-3-splash-after-leave-390.png` |
 
