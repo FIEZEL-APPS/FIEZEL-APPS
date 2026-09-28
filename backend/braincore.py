@@ -10,13 +10,17 @@ from typing import Any
 
 from db import db
 
-# --- parameter BKT (deterministik, satu sumber kebenaran) ---
+# --- parameter BKT (deterministik, satu sumber kebenaran untuk layanan kelas ini) ---
+# Konstanta BKT, gerbang penguasaan dan kurva lupa di berkas ini BERBEDA dari client JS
+# (features/brain/: L0 0,20, T 0,15, guess 0,25, dikuasai pada L >= 0,95 dengan n >= 5,
+# lupa 2^(-t/h)). Jangan menyebut keduanya "paritas": untuk angka yang identik dengan client,
+# jalankan mesin JS-nya.
 P_INIT, P_LEARN, P_SLIP, P_GUESS = 0.25, 0.18, 0.10, 0.20
 MASTERY_T, DEVELOPING_T = 0.80, 0.60
 MIN_CORRECT_FOR_MASTERY = 3
 RETENTION_DAYS = 3
 
-# --- parameter IRT 3PL & Psikometri (paritas kanonik dengan client brain v3) ---
+# --- parameter IRT 3PL (sama dengan client: a = 1,5, c = 0,25, target 0,80) ---
 DISCRIMINATION = 1.5
 GUESS_FLOOR = 0.25
 TARGET_SUCCESS = 0.80
@@ -30,27 +34,54 @@ STATE_LABEL = {
 }
 
 
+def _finite(x: Any, default: float) -> float:
+    """Angka yang pasti hingga. NaN dan tak hingga diganti nilai bawaan: tanpa ini
+    min(0.99, nan) mengembalikan 0.99, jadi nilai rusak terbaca "sudah dikuasai"."""
+    try:
+        v = float(x)
+    except (TypeError, ValueError):
+        return default
+    return v if math.isfinite(v) else default
+
+
+def _logistic(z: float) -> float:
+    """sigma(z) tanpa OverflowError. math.exp meluap di atas ~709; selama exp(-z) aman, rumus
+    lama dipakai apa adanya (hasilnya identik bit demi bit), dan di bawah z = -700 dihitung
+    lewat exp(z), yang paling buruk hanya turun ke 0."""
+    if z >= -700.0:
+        return 1.0 / (1.0 + math.exp(-z))
+    e = math.exp(z)
+    return e / (1.0 + e)
+
+
+def _discrimination(value: Any) -> float:
+    """Ketajaman soal dijepit ke 0,2..4 (0 atau kosong = bawaan), sama seperti client."""
+    return min(4.0, max(0.2, _finite(value, DISCRIMINATION) or DISCRIMINATION))
+
+
 def success_probability(ability: float, difficulty: float, discrimination: float = DISCRIMINATION) -> float:
     """Model IRT 3PL: P = c + (1 - c) / (1 + exp(-a * (theta - b)))."""
-    a = float(discrimination or DISCRIMINATION)
-    latent = 1.0 / (1.0 + math.exp(-a * (float(ability) - float(difficulty))))
+    a = _discrimination(discrimination)
+    latent = _logistic(a * (_finite(ability, 1.5) - _finite(difficulty, 3.0)))
     return GUESS_FLOOR + (1.0 - GUESS_FLOOR) * latent
 
 
 def optimal_difficulty(ability: float, target_success: float = TARGET_SUCCESS, discrimination: float = DISCRIMINATION) -> float:
     """Inversi model 3PL: b = theta - logit((p - c) / (1 - c)) / a."""
-    p = max(GUESS_FLOOR + 0.05, min(0.97, float(target_success or TARGET_SUCCESS)))
-    a = float(discrimination or DISCRIMINATION)
+    p = max(GUESS_FLOOR + 0.05, min(0.97, _finite(target_success, TARGET_SUCCESS) or TARGET_SUCCESS))
+    a = _discrimination(discrimination)
     latent = max(0.01, min(0.99, (p - GUESS_FLOOR) / (1.0 - GUESS_FLOOR)))
-    return round(float(ability) - math.log(latent / (1.0 - latent)) / a, 3)
+    return round(_finite(ability, 1.5) - math.log(latent / (1.0 - latent)) / a, 3)
 
 
 def bkt_decay(p: float, elapsed_days: float, half_life_days: float = BKT_HALF_LIFE_DAYS) -> float:
     """Model lupa eksponensial BKT-FSRS: L(t) = L_0 + (L_last - L_0) * exp(-dt / tau)."""
-    if elapsed_days <= 0 or p <= P_INIT:
+    p = _finite(p, P_INIT)
+    elapsed = _finite(elapsed_days, 0.0)
+    if elapsed <= 0 or p <= P_INIT:
         return p
-    tau = max(1.0, float(half_life_days)) / math.log(2.0)
-    decayed = P_INIT + (p - P_INIT) * math.exp(-float(elapsed_days) / tau)
+    tau = max(1.0, _finite(half_life_days, BKT_HALF_LIFE_DAYS)) / math.log(2.0)
+    decayed = P_INIT + (p - P_INIT) * math.exp(-elapsed / tau)
     return round(max(0.01, min(0.99, decayed)), 4)
 
 
@@ -87,6 +118,7 @@ async def get_state(student_id: str, competency_id: str) -> dict:
 
 def bkt_update(p: float, correct: bool, hints: int = 0, confidence: float | None = None) -> float:
     """Posterior BKT + koreksi kecil dari perilaku (hint & confidence adalah evidence tambahan)."""
+    p = _finite(p, P_INIT)
     slip, guess = P_SLIP, P_GUESS
     # Hint hanya MELEMAHKAN bukti jawaban BENAR. Menaikkan slip pada jawaban SALAH justru
     # membuat "salah walau sudah dibantu" terbaca sebagai kelalaian, sehingga posterior turun

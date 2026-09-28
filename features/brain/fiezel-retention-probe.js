@@ -91,7 +91,8 @@
   function str(x) { return typeof x === 'string' ? x.trim() : ''; }
   function round(x, digits) {
     var f = Math.pow(10, digits);
-    return Math.round(x * f) / f;
+    // Di atas 1e15 tidak ada pecahan lagi yang bisa dibulatkan, dan x * f bisa meluap jadi Infinity.
+    return Math.abs(x) > 1e15 ? x : Math.round(x * f) / f;
   }
 
   // =================================================================================

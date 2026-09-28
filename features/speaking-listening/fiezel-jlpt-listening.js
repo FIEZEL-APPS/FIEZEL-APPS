@@ -1,7 +1,7 @@
 /**
  * FIEZEL · features/speaking-listening/fiezel-jlpt-listening.js
  * Engine Interaktif Bank Soal Listening (Chōkai / 聴解) JLPT N5 & N4
- * Berdasarkan Data Ujian Resmi Japan Foundation & JEES
+ * Latihan berformat JLPT N5/N4; bukan materi resmi Japan Foundation/JEES
  * Redesigned Mobile-First Card UX with Bottom Sheet Drawer
  */
 
@@ -300,14 +300,14 @@
     }
   }
 
-  // Primary stream: Studio audio (highest quality multi-voice) with fallback to JEES/Speech
+  // Primary stream: studio AI audio (multi-voice), with speech synthesis as the fallback
   function togglePlayJlptPrimaryAudio() {
     var qs = getFilteredQuestions();
     if (!qs || qs.length === 0) return;
     var q = qs[curIndex];
     if (!q) return;
 
-    var url = q.aiAudioUrl || q.audioUrl || ('./features/speaking-listening/audio-jlpt/' + q.id + '.mp3');
+    var url = q.aiAudioUrl || ('./features/speaking-listening/audio-jlpt/' + q.id + '.mp3');
     var fallbackScript = q.scriptJapanese || q.script || '';
     playAudioStream(url, 'primary', fallbackScript);
   }
@@ -317,26 +317,14 @@
     togglePlayJlptPrimaryAudio();
   }
 
-  // Secondary stream: Official JEES broadcast audio
+  // The official JEES sample recordings are no longer played: they are copyrighted by the
+  // Japan Foundation/JEES. Both names stay as aliases so older callers keep working.
   function togglePlayJlptJeesAudio() {
-    var qs = getFilteredQuestions();
-    if (!qs || qs.length === 0) return;
-    var q = qs[curIndex];
-    if (!q) return;
-
-    var url = q.audioUrl || q.audio_url || '';
-    var fallbackScript = q.scriptJapanese || q.script || '';
-    playAudioStream(url, 'jees', fallbackScript);
+    togglePlayJlptPrimaryAudio();
   }
 
-  function togglePlayJlptAudio(url, fallbackScript) {
-    var qs = getFilteredQuestions();
-    var q = (qs && qs[curIndex]) ? qs[curIndex] : null;
-    if (q && url && url === (q.audioUrl || q.audio_url)) {
-      togglePlayJlptJeesAudio();
-    } else {
-      togglePlayJlptPrimaryAudio();
-    }
+  function togglePlayJlptAudio() {
+    togglePlayJlptPrimaryAudio();
   }
 
   function selectJlptChoice(optId, correctOptId) {
@@ -998,7 +986,6 @@
     var qSituation = q.situation || '';
     var qJa = q.questionJapanese || q.question || '';
     var qId = q.questionIndonesian || '';
-    var hasJees = !!(q.audioUrl || q.audio_url);
     var mondaiShortLabel = q.mondaiLabel ? q.mondaiLabel.replace(/Mondai\s*\d+\s*:\s*/i, '') : (q.mondai || 'Mondai');
 
     var optionsHtml = (q.options || []).map(function (opt, i) {
@@ -1055,11 +1042,6 @@
                 '<span></span><span></span><span></span><span></span>' +
               '</span>' +
             '</button>' +
-            (hasJees ?
-              '<button type="button" class="jlpt-jees-chip" id="jlptJeesChip" onclick="togglePlayJlptJeesAudio()" title="Dengarkan rekaman siaran resmi JEES">' +
-                '📻 JEES' +
-              '</button>'
-            : '') +
             '<span class="jlpt-replay-pill" id="jlptReplayPill"></span>' +
           '</div>' +
 

@@ -1,6 +1,6 @@
 {
   "schema": "id-golden-baseline/1",
-  "generatedAt": "2026-09-27T20:54:05.685Z",
+  "generatedAt": "2026-09-28T00:22:36.887Z",
   "root": "C:\\Users\\hp\\fiezel-apps",
   "files": {
     "grammar-explanations-id.json": "e0e1b1690d61d11c6b8c640002a0fe3da8a6fdd96168a3c16d399358d60dc1a2",
@@ -18,8 +18,8 @@
     "features/audio-assets/fiezel-audio-key.js": "11624e303917fe0df881ac3f410911587766fd6f4d2491ca6687ec42de8d457d"
   },
   "literals": {
-    "count": 4520,
-    "sha256": "ff85043cdae4782e6622d33e476c9d75c982983d96d19ef61138aa313f8e0022",
+    "count": 4527,
+    "sha256": "7383f834f9d9228e6ae448c7c92173b15062f8faca2bdbea7aabf981e264160d",
     "list": [
       "\n      ?self.FiezelPostTest.evaluate(st,results):null;\n    let dueCount=0,scheduledCount=0;\n    for(const lesson of Object.keys(st.probes)){\n      const list=Array.isArray(st.probes[lesson]?.probes)?st.probes[lesson].probes:[];\n      scheduledCount+=list.length;\n      for(const p of list)if(Number(p?.dueAt)<=now)dueCount++;\n    }\n    return {lessons:Object.keys(st.probes).length,scheduled:scheduledCount,due:dueCount,measured:results.length,evaluation:evalOut};\n  }catch{return null}\n}\n/* KEWENANGAN kalibrasi (Langkah 1, m025-341): otak menilai ramalannya sendiri, lalu\n * bertindak atas penilaian itu.\n *\n * brierCalibration() sudah dihitung sejak lama tetapi hasilnya hanya dipajang. Brier Skill\n * Score = 1 - brier/baseline: > 0 berarti prediksi model mengalahkan tebakan base-rate,\n * <= 0 berarti TIDAK - model ini, untuk murid ini, tidak lebih baik daripada menebak.\n *\n * Kalau model tidak bisa dipercaya meramal, ia juga tidak boleh dipercaya MEMBUKA lesson\n * dengan bukti seadanya. Maka vonis buruk menaikkan ambang bukti (n) yang dituntut sebelum\n * mastery BKT boleh ikut membuka prasyarat.\n *\n * DUA PAGAR YANG MENENTUKAN BENTUK FUNGSI INI:\n *   1. SATU ARAH. Kembaliannya selalu >= 0. Kalibrasi buruk hanya bisa membuat sistem\n *      lebih KETAT; tidak ada jalan bagi fungsi ini untuk melonggarkan apa pun. Kalibrasi\n *      yang bagus bukan alasan membuka lesson lebih mudah.\n *   2. FAIL-QUIET. Modul absen, riwayat tipis (modul menahan di bawah brierMinTotal=10),\n *      baseline nol, atau apa pun yang melempar => 0, dan perilaku persis seperti sebelum\n *      langkah ini. */\nfunction brierEvidenceBump(now=Date.now()){\n  const M=self.FiezelLearningMetrics;\n  if(!M||typeof M.brierCalibration!==",
       "\n      SETELAH beat concern ≤1000ms selesai (13 §2.2), bukan menimpanya. Tanpa bunyi:\n      SFX hint sudah dipensiunkan (20 §4); cooldown 8 detiknya dijaga komponen. */\n   setTimeout(()=>{try{pawReact(",
@@ -311,6 +311,7 @@
       "));\n  // m025-149: satu-satunya mode yang teks soalnya TIDAK menyebut lesson mana pun. Selama\n  // pengecohnya diambil dari seluruh bank, dua lesson hampir tidak mungkin menghasilkan\n  // empat pilihan yang sama; setelah kolamnya dipersempit ke satu keluarga, itu jadi mungkin\n  // dan dua lesson conditionals benar-benar menghasilkan soal yang identik. Menyebut nama\n  // lesson-nya memulihkan identitas soal sekaligus memberi tahu murid strategi lesson mana\n  // yang sedang ditanyakan.\n  if(variant===8)return metaChoice(FiezelI18n.t(",
       "));\n  // m025-159: istilah internal (miskonsepsi, distraktor) dilarang tampil ke siswa;\n  // naskah generator memakai bahasa sehari-hari sesuai aturan gaya persona (issue #75).\n  if(variant===6)return metaChoice(FiezelI18n.t(",
       "));\n  // m025-161 (F1-3): narasi orang ketiga \"Seorang siswa\" (236× di 78 kartu) diganti skenario\n  // teman — pembacanya tetap \"kamu\", dan yang milih di dalam soal bukan lagi \"siswa\".\n  if(variant>=9&&variant<=11){const target=wrong[variant-9],others=wrong.filter(x=>x!==target);return direct(FiezelI18n.t(",
+      "));\n  return idx<0?undefined:Math.max(1.5,idx+1)\n}\nfunction coreBrainSnapshot(now=Date.now()){\n  if(!coreBrainAvailable())return null;\n  const key=`${state.stateRevision||0}:${Math.floor(now/60000)}:${getActiveLevel()}`;\n  if(coreBrainCache&&coreBrainCache.key===key)return coreBrainCache.value;\n  let value=null;\n  try{\n    value=self.FiezelCoreBrain.analyze({\n      now,\n      priorAbility:coreBrainPriorAbility(),\n      attempts:coreBrainAttempts(),\n      memory:coreBrainMemory(),\n      sessionAttempts:coreBrainSessionAttempts(),\n      abandonmentRate:Number(remoteLearnerEvidenceSnapshot(now)?.behavior?.abandonmentRate||0),\n      weakTarget:coreBrainWeakTarget(),\n      skillEvidence:coreBrainSkillEvidence()\n    });\n  }catch{value=null}\n  coreBrainCache={key,value};\n  return value\n}\n/** Ringkasan yang aman dikirim ke Core Worker: keputusan dan alasannya, bukan jawabannya. */\nfunction coreBrainDigest(now=Date.now()){\n  const snapshot=coreBrainSnapshot(now);\n  if(!snapshot)return null;\n  return{\n    schema:snapshot.schema,\n    ability:snapshot.ability?.ability??null,\n    abilityLevel:snapshot.ability?.level||",
       "));\n  });\n  __learningTelemetryDbPromise.catch(()=>{__learningTelemetryDbPromise=null});\n  return __learningTelemetryDbPromise;\n}\n/** Adaptor idbLike TIPIS di atas IndexedDB nyata — memenuhi kontrak persis yang didefinisikan\n *  createMemoryIdb() di features/telemetry/fiezel-learning-queue.js: getAll/put/delete/clear,\n *  semuanya Promise. `delete` mengembalikan boolean \"tadinya ada\" karena ack() antrean\n *  menghitung berapa record yang benar-benar terhapus. */\nfunction learningTelemetryIdb(){\n  const tx=(mode,run)=>learningTelemetryDb().then(db=>new Promise((resolve,reject)=>{\n    let r;\n    try{r=run(db.transaction(LEARNING_TELEMETRY_STORE,mode).objectStore(LEARNING_TELEMETRY_STORE),resolve,reject)}catch(e){reject(e);return}\n    if(r){r.onsuccess=()=>resolve(r.result);r.onerror=()=>reject(r.error)}\n  }));\n  return{\n    kind:",
       "));\n  }finally{clearTimeout(timer)}\n}\n// Galat yang membawa kode kami sendiri + naskah yang sudah dipilih. Isi galat provider\n// tidak pernah masuk ke sini.\nfunction aiTaskError(code,copy,extra){const e=new Error(String(code));e.code=code;e.error=code;if(copy)e.copy=copy;if(extra)Object.assign(e,extra);return e}\n// Jalur CF: INPUT TERSTRUKTUR, prompt tidak ikut.\nasync function askCloudflareAITask(clientTask,ctx){\n  const body=aiTaskRequestBody(clientTask,ctx);\n  if(!body)throw aiTaskError(",
       "));\n /* Fase 3 (C5 butir 2): sesi adaptif menyisipkan 1-2 soal cloze PRODUKSI bila bank tersedia\n    dan skill-nya lolos gerbang BKT L>=0.6 - recall produksi hanya untuk materi yang\n    recognition-nya sudah stabil. Disisipkan di posisi 2 dan 5 (bukan soal pembuka: sesi\n    tetap dibuka soal pilihan yang familiar). Guarded penuh: tanpa grader/BKT/bank, pool\n    tidak berubah sama sekali. */\n try{\n  await ensureClozeBank();\n  const clozeQs=clozeAdaptivePicks(2);\n  clozeQs.forEach((cq,i)=>pool.splice(Math.min(pool.length,1+i*3),0,cq));\n }catch{}\n recordAdaptivePolicy(policy);showToast(FiezelI18n.t(",
@@ -359,7 +360,7 @@
       "),blocked=grammarPeerBlocked(item);\n  // m025-155: salt membedakan seed antar-mode (locate_decision_cue tak lagi kembar dengan\n  // sequence_reasoning); exclude menolak value (norm) yang sudah dipakai mode lain. Salt\n  // kosong tetap memakai seed lama `${own.id}:${field}` supaya v3-v8 deterministik sama.\n  const salt=String(opts.salt||",
       "),difficulty=Number(q.difficulty||LEVELS.indexOf(level)+1),measured=!!meta.measured,due=!!meta.due,risk=Number(meta.risk||0);let score=Number(baseScore||0);if(domain===primary)score+=8;if(domain===secondary)score+=3;if(targetSkill&&(skill===targetSkill||skill.includes(targetSkill)||targetSkill.includes(skill)))score+=14;if(due)score+=8+Number(policy?.reviewShare||0)*8;score+=risk*7;if(policy?.avoidNewContent&&!measured)score-=10;\n /* Braincore v3 (temuan T2/T3 council): targetDifficulty yang dibulatkan ke integer membuat\n    target sukses aktual berayun 0,47..0,89. Term penalti memakai target KONTINU\n    (exactDifficulty dari jendela tantangan Core Brain) bila ada; targetDifficulty integer\n    tetap jadi cadangan supaya perilaku tanpa modul identik. */\n const targetD=Number(policy?.exactDifficulty??policy?.targetDifficulty);\n score-=Math.abs(difficulty-(Number.isFinite(targetD)&&targetD>0?targetD:difficulty))*1.4;candidates.push({q,score,domain,skill,measured,due,risk})};\n for(const v of V){if(v.level!==level)continue;const b=state.vocab[v.id],due=!!(b?.nextReview&&b.nextReview<=now);if(!b?.total||(b.mastery>=MASTERY_THRESHOLD&&!due))continue;const risk=forgettingProbability(b),score=(profile.weakTargets[v.id]||0)*3+risk*6+(100-(b.mastery||0))*.04;const q=makeVocabQuestion(v);q.difficulty=LEVELS.indexOf(v.level)+1;add(q,score,{measured:true,due,risk})}\n /* Langkah 1 (m025-341): probe retensi jatuh tempo dan vonis rapuh mengembalikan lesson\n    yang SUDAH mastered ke kolam review - sebagai review biasa, bukan layar terpisah. Set\n    kosong (modul absen / state rusak / belum ada jadwal) = kolam persis seperti sebelumnya. */\n const probeDue=retentionProbeDueLessons(now),probeFragile=retentionFragileLessons(now);\n for(const [skill,b] of Object.entries(state.grammar)){const grammarMeta=GRAMMAR_ITEMS.find(x=>x.skill===skill);if(grammarMeta?.level!==level)continue;const probeHit=probeDue.has(skill)||probeFragile.has(skill),due=!!(b?.nextReview&&b.nextReview<=now)||probeHit;if(!b?.total||(b.mastery>=MASTERY_THRESHOLD&&!due))continue;for(const item of adaptiveGrammarItems(skill,b,targetSkill===skill)){const risk=forgettingProbability(b),score=(profile.weakSkills[skill]?.score||0)*10+risk*6+(100-b.mastery)*.04,variants=targetSkill===skill?GRAMMAR_LESSON_MODES.slice(0,5):[",
       "),emit:pawReact,isLocked:()=>answer.locked,motion:pawMotionAllowed()})}catch(_){}\n  /* Fase 3 (C5 butir 2): soal cloze tidak punya opsi - murid MENGETIK jawabannya. Satu\n     percobaan (produksi dinilai grader, bukan tebak-ulang), Enter atau tombol Periksa. */\n  if(q.type===",
-      "),mastery:Number(state.grammar?.[skill]?.mastery||0)}\n}\n/**\n * Potret penalaran, di-cache per (jumlah jawaban, menit) supaya render Home yang memanggil\n * kebijakan berkali-kali tidak menjalankan seluruh model berulang kali. Cache-nya sengaja\n * ikut kedaluwarsa oleh waktu: model ingatan bergantung pada usia materi, jadi potret satu\n * jam lalu bukan potret yang sama.\n */\nfunction coreBrainSnapshot(now=Date.now()){\n  if(!coreBrainAvailable())return null;\n  const key=`${state.stateRevision||0}:${Math.floor(now/60000)}`;\n  if(coreBrainCache&&coreBrainCache.key===key)return coreBrainCache.value;\n  let value=null;\n  try{\n    value=self.FiezelCoreBrain.analyze({\n      now,\n      attempts:coreBrainAttempts(),\n      memory:coreBrainMemory(),\n      sessionAttempts:coreBrainSessionAttempts(),\n      abandonmentRate:Number(remoteLearnerEvidenceSnapshot(now)?.behavior?.abandonmentRate||0),\n      weakTarget:coreBrainWeakTarget(),\n      skillEvidence:coreBrainSkillEvidence()\n    });\n  }catch{value=null}\n  coreBrainCache={key,value};\n  return value\n}\n/** Ringkasan yang aman dikirim ke Core Worker: keputusan dan alasannya, bukan jawabannya. */\nfunction coreBrainDigest(now=Date.now()){\n  const snapshot=coreBrainSnapshot(now);\n  if(!snapshot)return null;\n  return{\n    schema:snapshot.schema,\n    ability:snapshot.ability?.ability??null,\n    abilityLevel:snapshot.ability?.level||",
+      "),mastery:Number(state.grammar?.[skill]?.mastery||0)}\n}\n/**\n * Potret penalaran, di-cache per (jumlah jawaban, menit) supaya render Home yang memanggil\n * kebijakan berkali-kali tidak menjalankan seluruh model berulang kali. Cache-nya sengaja\n * ikut kedaluwarsa oleh waktu: model ingatan bergantung pada usia materi, jadi potret satu\n * jam lalu bukan potret yang sama.\n */\n/**\n * Kemampuan awal (prior) diambil dari level aktif murid: A2 = 2, B1 = 3, ... C2 = 6, tidak pernah\n * di bawah 1,5 (bawaan mesin, jadi murid A1 tidak berubah). Tanpa ini semua murid mulai dari 1,5,\n * dan simulasi audit Braincore 2026-09-28 menunjukkan murid C1 masih terbaca B1 setelah 50 jawaban\n * dan B2 setelah 100. Dengan prior dari level, bias murid yang levelnya tepat di bawah 0,1 sejak\n * 20 jawaban, dan di bawah 0,15 bila kemampuannya persis di batas dua level (gerbang\n * tests/brain-prior-seed-test.js).\n */\nfunction coreBrainPriorAbility(level=getActiveLevel()){\n  const idx=LEVELS.indexOf(String(level||",
       "),ok:!!ok});\n   /* W1 P1-1: bahan review per-soal untuk layar hasil mode ukur. */\n   if(MEASURE)(cfg.__measureReview??=[]).push({q,chosen:j});\n   record(q,ok,ms,j);\n   const h=state.history[state.history.length-1];\n   if(q.type===",
       "),ok:!!ok});\n   /* m025-186: tally per seksi Ujian Skip Level — dikumpulkan di titik yang sama dengan skor,\n      percobaan pertama saja, supaya lantai per seksi menilai bukti yang sama dengan akurasi. */\n   if(cfg.type===",
       "),{toast:showToast,appVersion:APP_VERSION,learnerName,afterRender:enhanceUI})}\n/* m025-277: PAW ARENA sebagai view sendiri (§4 opsi a) — tanpa tab baru. ?duel= lama tetap\n   dilayani jalur learner-flow; view ini pintu ruang permainan tersendiri. */\nfunction arenaView(){setApp(",
@@ -737,6 +738,8 @@
       "25 soal, sekitar sepuluh menit.",
       "3. Pilih jumlah soal (5 butir latihan cepat atau 10 butir ulangan), lalu terbitkan.",
       "3. Terbitkan untuk Murid",
+      "30 soal dengan audio",
+      "30 soal interaktif dengan audio",
       "34% salah karena pembilang dan penyebut dibaca sebagai angka 34.",
       "3–20 karakter: huruf kecil a-z, angka, garis bawah. Mulai dengan huruf.",
       "4 cm x 500.000 = 2.000.000 cm, dan 2.000.000 cm sama dengan 20 km.",
@@ -1909,7 +1912,6 @@
       "Dengar dulu, baru jawab. Kalau belum nangkep, ulang - itu bagian dari latihannya.",
       "Dengarkan",
       "Dengarkan aku dulu, lalu tiru: {firstExample}. Ucapkan pelan, jangan dikejar cepat.",
-      "Dengarkan rekaman siaran resmi JEES",
       "Detail ini disebutkan langsung di audio: “",
       "Detail mana yang benar-benar didukung oleh bacaan?",
       "Detail mana yang menjadi bukti paling kuat untuk kesimpulan itu?",
@@ -2651,8 +2653,11 @@
       "Latihan bicara dan mendengar. Suaramu tidak disimpan, jadi santai saja.",
       "Latihan bicara dan mendengar. Yang dinilai: seberapa banyak kamu pakai bahasa Inggris, bukan logat.",
       "Latihan cepat per skill (A2)",
+      "Latihan format JLPT",
       "Latihan ini belum ada untuk {bahasa}. Suaranya masih bahasa Inggris, jadi latihannya disembunyikan dulu.",
       "Latihan ini tampak mudah bagimu. Siap tantangan berikutnya?",
+      "Latihan listening JLPT N5 / N4",
+      "Latihan listening dengan format soal JLPT N5 & N4",
       "Latihan luring selesai",
       "Latihan mandiri dan skill",
       "Latihan membaca terpandu",
@@ -4532,6 +4537,7 @@
       "勉強計画 · rencana belajar",
       "文法 · tata bahasa",
       "言葉 · kosakata",
+      "🎧 LATIHAN FORMAT JLPT",
       "💡 Analisis & Pembahasan Soal:",
       "💡 Rekomendasi Guru Hari Ini",
       "📄 PDF Soal N4",
@@ -4539,6 +4545,7 @@
       "📊 PROGRES BELAJAR",
       "📖 KATA HARI INI",
       "📚 Kosakata",
+      "📥 Contoh soal dari situs resmi JLPT:",
       "🚀 Mulai Mengajar di Ruang Ini",
       "🚀 Terbitkan Kuis untuk Murid"
     ]

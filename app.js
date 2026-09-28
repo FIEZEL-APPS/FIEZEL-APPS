@@ -3399,14 +3399,27 @@ function coreBrainWeakTarget(){
  * ikut kedaluwarsa oleh waktu: model ingatan bergantung pada usia materi, jadi potret satu
  * jam lalu bukan potret yang sama.
  */
+/**
+ * Kemampuan awal (prior) diambil dari level aktif murid: A2 = 2, B1 = 3, ... C2 = 6, tidak pernah
+ * di bawah 1,5 (bawaan mesin, jadi murid A1 tidak berubah). Tanpa ini semua murid mulai dari 1,5,
+ * dan simulasi audit Braincore 2026-09-28 menunjukkan murid C1 masih terbaca B1 setelah 50 jawaban
+ * dan B2 setelah 100. Dengan prior dari level, bias murid yang levelnya tepat di bawah 0,1 sejak
+ * 20 jawaban, dan di bawah 0,15 bila kemampuannya persis di batas dua level (gerbang
+ * tests/brain-prior-seed-test.js).
+ */
+function coreBrainPriorAbility(level=getActiveLevel()){
+  const idx=LEVELS.indexOf(String(level||''));
+  return idx<0?undefined:Math.max(1.5,idx+1)
+}
 function coreBrainSnapshot(now=Date.now()){
   if(!coreBrainAvailable())return null;
-  const key=`${state.stateRevision||0}:${Math.floor(now/60000)}`;
+  const key=`${state.stateRevision||0}:${Math.floor(now/60000)}:${getActiveLevel()}`;
   if(coreBrainCache&&coreBrainCache.key===key)return coreBrainCache.value;
   let value=null;
   try{
     value=self.FiezelCoreBrain.analyze({
       now,
+      priorAbility:coreBrainPriorAbility(),
       attempts:coreBrainAttempts(),
       memory:coreBrainMemory(),
       sessionAttempts:coreBrainSessionAttempts(),
@@ -8936,16 +8949,16 @@ function todayHomeMarkup(){
 }
 function jaChokaiHomeBannerMarkup(){
   if(!jaCourseOn())return '';
-  return `<div class="card ja-chokai-banner" onclick="openListeningPanel()" role="button" tabindex="0" aria-label="Chōkai JLPT N5 / N4" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openListeningPanel();}">
+  return `<div class="card ja-chokai-banner" onclick="openListeningPanel()" role="button" tabindex="0" aria-label="${esc(FiezelI18n.t('jlpt.banner-aria'))}" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openListeningPanel();}">
     <div class="ja-chokai-banner-left">
       <span class="ja-chokai-banner-icon" aria-hidden="true">${typeof Fiezel3DEmblems!=='undefined'?Fiezel3DEmblems.chokai(44):'🎧'}</span>
       <div>
-        <span class="ja-chokai-banner-eyebrow">Japan Foundation &amp; JEES</span>
-        <b class="ja-chokai-banner-title">Listening &amp; Chōkai (JLPT N5 &amp; N4)</b>
-        <span class="ja-chokai-banner-sub">30 Item Interaktif + Audio JEES</span>
+        <span class="ja-chokai-banner-eyebrow">${esc(FiezelI18n.t('jlpt.banner-eyebrow'))}</span>
+        <b class="ja-chokai-banner-title">${esc(FiezelI18n.t('jlpt.banner-title'))}</b>
+        <span class="ja-chokai-banner-sub">${esc(FiezelI18n.t('jlpt.banner-sub'))}</span>
       </div>
     </div>
-    <button type="button" class="today-cta-soft ja-chokai-btn" onclick="event.stopPropagation();openListeningPanel();">Mulai ➔</button>
+    <button type="button" class="today-cta-soft ja-chokai-btn" onclick="event.stopPropagation();openListeningPanel();">${esc(FiezelI18n.t('jlpt.banner-cta'))}</button>
   </div>`;
 }
 function home(){pawStreakWatch();/* m028-06: kabar demosi yang tertahan selama kuis dibuka di sini, bukan di tengah soal. */if(!state.activeSession&&levelTrustState(state).pendingNotice)setTimeout(()=>{try{flushLevelGuardNotice()}catch(_){}},280);/* W1 P1-2: kabar percobaan-terputus dari boot (sanitizeState) diumumkan SEKALI di beranda. */if(state.pendingInterruptNotice){const iNotice=state.pendingInterruptNotice;state.pendingInterruptNotice='';save();setTimeout(()=>{try{showToast(iNotice)}catch(_){}},900)}/* m025-166: gerbang level yang dipasang di perkenalan muncul di sini - saat murid sudah

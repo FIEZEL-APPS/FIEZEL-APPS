@@ -57,7 +57,8 @@
   function num(v, d) { var n = Number(v); return isFinite(n) ? n : (d === undefined ? 0 : d); }
   function clamp(v, a, b) { return Math.max(a, Math.min(b, num(v, a))); }
   function str(v) { return v == null ? '' : String(v); }
-  function round(v, d) { var f = Math.pow(10, d === undefined ? 2 : d); return Math.round(num(v) * f) / f; }
+  // Di atas 1e15 tidak ada pecahan lagi yang bisa dibulatkan, dan n * f bisa meluap jadi Infinity.
+  function round(v, d) { var n = num(v), f = Math.pow(10, d === undefined ? 2 : d); return Math.abs(n) > 1e15 ? n : Math.round(n * f) / f; }
   // Naskah tutor dirangkai dari potongan yang sebagian sudah berakhiran titik dan sebagian
   // belum. Tanpa ini kalimatnya keluar dengan titik ganda, dan tutor yang menulis ".." terbaca
   // seperti mesin - persis kesan yang sedang dihindari berkas ini.

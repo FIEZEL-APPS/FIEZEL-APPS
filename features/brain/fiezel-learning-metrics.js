@@ -99,8 +99,9 @@
   }
   function str(value) { return value == null ? '' : String(value).trim(); }
   function round(value, digits) {
-    var f = Math.pow(10, digits === undefined ? 4 : digits);
-    return Math.round(num(value) * f) / f;
+    var v = num(value), f = Math.pow(10, digits === undefined ? 4 : digits);
+    // Di atas 1e15 tidak ada pecahan lagi yang bisa dibulatkan, dan v * f bisa meluap jadi Infinity.
+    return Math.abs(v) > 1e15 ? v : Math.round(v * f) / f;
   }
   function logit(p) { return Math.log(p / (1 - p)); }
   function sigmoid(l) { return 1 / (1 + Math.exp(-l)); }

@@ -68,8 +68,9 @@
   function clamp(value, min, max) { return Math.max(min, Math.min(max, num(value, min))); }
   function str(value) { return value == null ? '' : String(value); }
   function round(value, digits) {
-    var f = Math.pow(10, digits === undefined ? 2 : digits);
-    return Math.round(num(value) * f) / f;
+    var v = num(value), f = Math.pow(10, digits === undefined ? 2 : digits);
+    // Di atas 1e15 tidak ada pecahan lagi yang bisa dibulatkan, dan v * f bisa meluap jadi Infinity.
+    return Math.abs(v) > 1e15 ? v : Math.round(v * f) / f;
   }
   function levelIndex(level) {
     var at = LEVELS.indexOf(str(level).toUpperCase());
@@ -118,8 +119,13 @@
    */
   var DISCRIMINATION = 1.5;
   var GUESS_FLOOR = 0.25;
+  // Ketajaman soal dijepit ke 0,2..4: nilai negatif akan membalik kurva, dan nilai mendekati 0
+  // membuat optimalDifficulty() melempar kesulitan ke miliaran. 0 atau kosong = bawaan 1,5.
+  function discriminationOf(discrimination) {
+    return clamp(num(discrimination, DISCRIMINATION) || DISCRIMINATION, 0.2, 4);
+  }
   function successProbability(ability, difficulty, discrimination) {
-    var a = num(discrimination, DISCRIMINATION) || DISCRIMINATION;
+    var a = discriminationOf(discrimination);
     var latent = 1 / (1 + Math.exp(-a * (num(ability) - num(difficulty))));
     return GUESS_FLOOR + (1 - GUESS_FLOOR) * latent;
   }
@@ -275,7 +281,7 @@
   var TARGET_SUCCESS = 0.8;
   function optimalDifficulty(ability, targetSuccess, discrimination) {
     var p = clamp(num(targetSuccess, TARGET_SUCCESS), GUESS_FLOOR + 0.05, 0.97);
-    var a = num(discrimination, DISCRIMINATION) || DISCRIMINATION;
+    var a = discriminationOf(discrimination);
     var latent = clamp((p - GUESS_FLOOR) / (1 - GUESS_FLOOR), 0.01, 0.99);
     return round(num(ability) - Math.log(latent / (1 - latent)) / a, 3);
   }

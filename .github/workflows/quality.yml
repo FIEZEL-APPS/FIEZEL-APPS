@@ -1048,6 +1048,9 @@ jobs:
           node tests/item-calibration-test.js
           node tests/item-pool-test.js
           node tests/brain-param-tune-test.js
+          node tests/brain-prior-seed-test.js
+          node tests/braincore-py-guards-test.js
+          node tests/brain-extreme-inputs-test.js
           node tests/speaking-adaptive-test.js
           node tests/srl-coach-test.js
           node tests/cors-envelope-test.js

@@ -381,8 +381,10 @@
   }
 
   /**
-   * 7. CRYPTOGRAPHIC INTEGRITY VERIFIER
-   * Memvalidasi keutuhan seluruh rantai keputusan dan parameter.
+   * 7. INTEGRITY CHECKSUM VERIFIER
+   * Memvalidasi keutuhan seluruh rantai keputusan dan parameter. Rantainya checksum FNV-1a/fmix32
+   * 64-bit: ia menangkap kerusakan dan suntingan biasa, tetapi bukan hash kriptografis, jadi
+   * belum tahan terhadap pemalsuan yang disengaja (untuk itu: SHA-256 + kepala rantai di server).
    */
   function verifyLedger() {
     var records = readStore();

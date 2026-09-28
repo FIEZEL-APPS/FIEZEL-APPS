@@ -11,8 +11,9 @@
  *   5. intervention fails -> rollback recommended in the trace, parameters untouched (tuner off, OWNER 2026-09-26), CONCERNED
  *   6. mastery -> intervention fades and challenge increases (mastery_milestone -> CELEBRATING, avoidConcept)
  *   7. identical event stream -> identical Braincore result (replay determinism)
- *   8. offline execution -> core loop still works (zero network dependencies)
- *   9. decision -> evidence trace (tamper-evident 64-bit cryptographic chaining & verifyLedger)
+ *   8. offline execution -> core loop still works (every network and process API trapped, 0 attempts)
+ *   9. decision -> evidence trace (64-bit FNV-1a/fmix32 integrity chain & verifyLedger; it detects
+ *      edits, but it is a checksum, not a cryptographic hash)
  *  10. evidence -> subsequent Braincore behavior (evidence raises ability; same 0.80 target picks a harder next item)
  */
 'use strict';
@@ -102,8 +103,13 @@ test('Invariant 1 · Normal correct answer -> Braincore stays quiet (prinsip keh
   assert.strictEqual(understanding.pattern, 'fluent_mastery');
   assert.strictEqual(understanding.isFluency, true);
 
-  // 5. Braincore Decision
-  const pAction = 'continue_practice';
+  // 5. Braincore Decision: the move comes from the tutor brain itself, not from this test
+  const tutorSession = tutorBrain.createSession({});
+  let diagnosis = null;
+  for (let k = 0; k < 3; k++) diagnosis = tutorBrain.record(tutorSession, { concept: q.concept, correct: ok, ms: ms });
+  const tutorMove = tutorBrain.decideMove(tutorSession, diagnosis, { remaining: 8 });
+  assert.strictEqual(tutorMove.move, 'continue');
+  const pAction = tutorMove.move === 'continue' ? 'continue_practice' : tutorMove.move;
   const dec = decisionTrace.recordDecision({
     action: pAction,
     targetSkill: q.concept,
@@ -122,10 +128,10 @@ test('Invariant 1 · Normal correct answer -> Braincore stays quiet (prinsip keh
   const pres = presenceEngine.determine({
     ok: ok,
     firstTry: firstTry,
-    move: 'continue',
+    move: tutorMove.move,
     scaffold: 'none',
     timing: obs.timing,
-    streak: 3
+    streak: tutorSession.streak
   });
   assert.strictEqual(pres.state, presenceEngine.STATES.SILENT);
   assert.strictEqual(pres.silent, true);
@@ -413,27 +419,76 @@ test('Invariant 7 · Identical event stream -> Identical Braincore result (repla
 // Invariant 8: Offline Execution -> Core Loop Still Works (Zero Network)
 // -------------------------------------------------------------------------
 test('Invariant 8 · Offline execution -> Core loop works 100% locally with zero network calls', () => {
-  // Matikan akses fetch/network global jika ada
-  const origFetch = global.fetch;
-  global.fetch = () => { throw new Error('NETWORK CALL DETECTED IN OFFLINE RUNTIME'); };
+  // Every network and process API Node offers is trapped first. The modules are then loaded
+  // afresh inside the trap, so loading is covered too, and a 20-answer loop runs through
+  // ability, tutor move, presence and the decision trace.
+  const attempts = [];
+  const restore = [];
+  function trap(owner, name, label) {
+    if (!owner) return;
+    const had = Object.prototype.hasOwnProperty.call(owner, name);
+    const orig = owner[name];
+    owner[name] = function () { attempts.push(label); throw new Error('NETWORK CALL DETECTED IN OFFLINE RUNTIME: ' + label); };
+    restore.push(() => { if (had) owner[name] = orig; else delete owner[name]; });
+  }
+  trap(global, 'fetch', 'fetch');
+  trap(global, 'XMLHttpRequest', 'XMLHttpRequest');
+  trap(global, 'WebSocket', 'WebSocket');
+  for (const mod of ['http', 'https']) {
+    const m = require(mod);
+    trap(m, 'request', mod + '.request');
+    trap(m, 'get', mod + '.get');
+  }
+  const net = require('net');
+  trap(net, 'connect', 'net.connect');
+  trap(net, 'createConnection', 'net.createConnection');
+  trap(require('tls'), 'connect', 'tls.connect');
+  const dns = require('dns');
+  trap(dns, 'lookup', 'dns.lookup');
+  trap(dns, 'resolve', 'dns.resolve');
+  const cp = require('child_process');
+  for (const f of ['spawn', 'exec', 'execFile', 'fork', 'spawnSync', 'execSync']) trap(cp, f, 'child_process.' + f);
 
+  const files = [
+    'features/brain/fiezel-core-brain.js',
+    'features/brain/fiezel-tutor-brain.js',
+    'features/mascot/fiezel-presence-engine.js',
+    'features/learner-flow/fiezel-decision-trace.js'
+  ].map((f) => require.resolve(path.join(root, f)));
+  const cached = files.map((f) => require.cache[f]);
   try {
-    const obs = decisionTrace.createObservation({ itemId: 'off_01', ok: true, ms: 2400 });
-    const dec = decisionTrace.recordDecision({ action: 'practice', observation: obs });
-    const ev = decisionTrace.evaluateOutcome(dec.traceId, { correct: true, latencyMs: 2300 });
-    const audit = decisionTrace.verifyLedger();
-
-    assert.ok(obs && dec && ev);
-    assert.strictEqual(audit.ok, true);
+    files.forEach((f) => { delete require.cache[f]; });
+    const [core, tutor, presence, trace] = files.map((f) => require(f));
+    trace.clear();
+    const tSession = tutor.createSession({});
+    const history = [];
+    for (let n = 0; n < 20; n++) {
+      const now = 1710000400000 + n * 30000;
+      const est = core.estimateAbility(history, { now: now, prior: 2 });
+      assert.ok(Number.isFinite(est.ability));
+      const difficulty = 2 + (n % 5) * 0.3;
+      const ok = n % 4 !== 3;
+      history.push({ ok: ok, difficulty: difficulty, at: now });
+      const diagnosis = tutor.record(tSession, { concept: 'past_simple', correct: ok, ms: 2400 });
+      const move = tutor.decideMove(tSession, diagnosis, { remaining: 20 - n });
+      presence.determine({ ok: ok, firstTry: true, move: move.move, scaffold: 'none', timing: 'fluent', streak: tSession.streak });
+      const obs = trace.createObservation({ itemId: 'off_' + n, ok: ok, ms: 2400, nowMs: now });
+      const dec = trace.recordDecision({ action: move.move, targetDifficulty: difficulty, observation: obs, nowMs: now });
+      trace.evaluateOutcome(dec.traceId, { correct: ok, latencyMs: 2300 });
+    }
+    assert.strictEqual(trace.verifyLedger().ok, true);
+    assert.deepStrictEqual(attempts, []);
+    trace.clear();
   } finally {
-    global.fetch = origFetch;
+    restore.reverse().forEach((fn) => fn());
+    files.forEach((f, i) => { if (cached[i]) require.cache[f] = cached[i]; else delete require.cache[f]; });
   }
 });
 
 // -------------------------------------------------------------------------
 // Invariant 9: Decision -> Evidence Trace (Tamper-Evident Ledger Integrity)
 // -------------------------------------------------------------------------
-test('Invariant 9 · Decision -> Evidence trace (cryptographic chain & tamper detection)', () => {
+test('Invariant 9 · Decision -> Evidence trace (integrity checksum chain & tamper detection)', () => {
   decisionTrace.clear();
 
   const d1 = decisionTrace.recordDecision({ action: 'a1', targetSkill: 's1', targetDifficulty: 2.0, nowMs: 1710000200000 });

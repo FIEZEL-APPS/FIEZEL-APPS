@@ -71,7 +71,7 @@ Every significant learner interaction flows through a closed-loop, deterministic
                          ▼
                ┌────────────────────┐
                │ 9. STORE EVIDENCE  │ (Machine-readable Decision Trace,
-               └─────────┬──────────┘  cryptographic param ledger, local evidence)
+               └─────────┬──────────┘  checksummed param ledger, local evidence)
                          ▼
                  ┌───────────────┐
                  │  10. REPEAT   │ (Next item in session or cross-session FSRS)

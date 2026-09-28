@@ -69,8 +69,9 @@
   }
   function clamp(value, min, max) { return Math.max(min, Math.min(max, num(value, min))); }
   function round(value, digits) {
-    var f = Math.pow(10, digits === undefined ? 2 : digits);
-    return Math.round(num(value) * f) / f;
+    var v = num(value), f = Math.pow(10, digits === undefined ? 2 : digits);
+    // Di atas 1e15 tidak ada pecahan lagi yang bisa dibulatkan, dan v * f bisa meluap jadi Infinity.
+    return Math.abs(v) > 1e15 ? v : Math.round(v * f) / f;
   }
 
   /**
