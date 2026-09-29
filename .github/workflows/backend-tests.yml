@@ -43,7 +43,7 @@ jobs:
           python -m pip install --upgrade pip
           pip install "fastapi==0.110.1" "starlette==0.37.2" "uvicorn==0.25.0" "motor==3.3.1" \
             "pymongo==4.6.3" "pydantic==2.13.5" "PyJWT==2.13.0" "python-dotenv==1.2.3" \
-            "httpx==0.28.1" "pytest==9.1.1" "email-validator==2.3.0"
+            "httpx==0.28.1" "pytest==9.1.1" "email-validator==2.3.0" "python-multipart==0.0.32"
       - name: Unit test murni (BKT/IRT/decay/paritas klien/validasi)
         run: python unit_test.py
       - name: Probe fungsional Braincore (stub Mongo)
