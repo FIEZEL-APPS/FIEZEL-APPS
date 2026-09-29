@@ -13449,9 +13449,12 @@ function istilahMurid(prefix,nilai){
    mengembalikannya berarti mengulang keluhan yang sudah pernah diselesaikan. Yang
    diminta owner adalah satu TUJUAN bernama Progres, bukan satu gulungan tanpa dasar. */
 const PROGRESS_TABS=__fzI18nTable([],()=>{
-  const tabs=[['overview',FiezelI18n.t('progress.ringkasan')],['analysis',FiezelI18n.t('progress.analisis')],['adaptive',FiezelI18n.t('progress.tab-cara-soal-dipilih')]];
-  if(uxOn('personalJourneyTab'))tabs.push(['readiness',FiezelI18n.t('progress.kesiapan-skills')]);
-  return tabs;
+  return [
+    ['overview',FiezelI18n.t('progress.ringkasan')],
+    ['readiness',FiezelI18n.t('progress.kesiapan-skills')],
+    ['analysis',FiezelI18n.t('progress.analisis')],
+    ['adaptive',FiezelI18n.t('progress.tab-cara-soal-dipilih')]
+  ];
 });
 let progressTab='overview';
 /* Bendera bisa berganti antar rilis dan `progressTab` hidup di memori modul, jadi nilai
@@ -13664,36 +13667,38 @@ function progress(){
     kedua modul itu diganti SATU kalimat yang menjelaskan kapan mereka muncul. */
  const progressFresh=!(Array.isArray(state.history)&&state.history.length);
  const tabContent={
-  overview:`<div class="grid">${cefrRoadmapMarkup()}${weeklyActivityChartMarkup()}${nextSessionPanelMarkup()}${uxOn('personalJourneyTab')?journeyMarkup():''}${socialSummaryCardMarkup()}${/* Audit F15: modul kosong disembunyikan sampai ada bukti; murid baru membaca ringkasan di atas + satu kalimat di bawah, bukan belasan 0%. */progressFresh?'':`<div><h3>${FiezelI18n.t('progress.peta-study')}</h3>${mapCards}</div>`}
-   ${uxOn('personalJourneyTab')?'':progressFresh?card(`<h3>${FiezelI18n.t('progress.modul-menunggu-judul')}</h3><p class="muted">${FiezelI18n.t('progress.modul-menunggu-isi')}</p>`):card(`<h3>${FiezelI18n.t('progress.readiness-heading')}</h3>${academicReadinessMarkup()}`)+card(`<h3>${FiezelI18n.t('progress.skills-heading')}</h3>${unifiedSkillsMarkup()}`)}
+  overview:`<div class="grid progress-grid">${cefrRoadmapMarkup()}${weeklyActivityChartMarkup()}${nextSessionPanelMarkup()}${uxOn('personalJourneyTab')?journeyMarkup():''}${socialSummaryCardMarkup()}${/* Audit F15: modul kosong disembunyikan sampai ada bukti; murid baru membaca ringkasan di atas + satu kalimat di bawah, bukan belasan 0%. */progressFresh?'':`<div><h3>${FiezelI18n.t('progress.peta-study')}</h3>${mapCards}</div>`}
    ${progressFresh&&!due.length?'':card(`<h3>${FiezelI18n.t('progress.ulangan-pintar')}</h3>${due.length?due.map(([k,x])=>`<div class="row"><span>${esc(friendlySkillName(k))}</span><span>${FiezelI18n.t('progress.dikuasai-risiko-lupa',{mastery:x.mastery||0,x:Math.round(forgettingProbability(x)*100)})}</span></div>`).join('<hr>')+`<div style="margin-top:12px"><button class="primary" onclick="reviewVocab()"><i data-lucide="history"></i> ${FiezelI18n.t('progress.mulai-review-btn',{jumlah:due.length})}</button></div>`:'<p class="muted">'+FiezelI18n.t('progress.belum-ada-materi-perlu-diulang')+'</p>'}`)}
-   ${card(`<details class="prasasti-fold"${progressFresh?'':' open'}><summary><h3>${FiezelI18n.t('progress.prasasti-judul')}</h3><i data-lucide="chevron-down" aria-hidden="true"></i></summary><p class="muted">${FiezelI18n.t('progress.lencana-bukti-study-redup-menunjukkan')}</p>${prasastiGalleryMarkup()}</details>`,'prasasti-gallery-card')}
+   ${card(`<details class="prasasti-fold"><summary><h3>${FiezelI18n.t('progress.prasasti-judul')}</h3><i data-lucide="chevron-down" aria-hidden="true"></i></summary><p class="muted">${FiezelI18n.t('progress.lencana-bukti-study-redup-menunjukkan')}</p>${prasastiGalleryMarkup()}</details>`,'prasasti-gallery-card')}
    </div>`,
-  analysis:`<div class="grid">
+  analysis:`<div class="grid progress-grid">
    ${card(`<h3>${FiezelI18n.t('progress.lab-kesalahan')}</h3>${patterns.length?patterns.map(x=>`<div class="row"><span>${esc(friendlySkillName(x.key))}</span><b>${FiezelI18n.t('progress.salah',{errors:x.errors,rate:Math.round(x.rate*100)})}</b></div>${x.common?`<p class="muted">${FiezelI18n.t('progress.pilihan-paling-sering-muncul-kali',{common:esc(x.common),count:x.count})}</p>`:''}`).join('<hr>'):'<p class="muted">'+FiezelI18n.t('progress.belum-ada-pola-kesalahan-berulang')+'</p>'}`)}
+   ${card(`<h3>${FiezelI18n.t('progress.pola-kesalahan')}</h3>${patterns.length?patterns.slice(0,4).map(x=>`<p><b>${esc(friendlySkillName(x.key))}</b>: ${FiezelI18n.t('progress.error-pattern',{errors:x.errors,common:x.common?FiezelI18n.t('progress.error-common-choice',{choice:esc(x.common),count:x.count}):FiezelI18n.t('progress.error-no-common')})}</p>`).join(''):'<p class="muted">'+FiezelI18n.t('progress.bukti-pending-cukup-for-menemukan')+'</p>'}`)}
    ${card(`<h3>${FiezelI18n.t('progress.weakness-heading')}</h3>${timelineHtml}`)}
    ${card(`<h3>${FiezelI18n.t('progress.calibration-heading')}</h3>${conf.map(x=>`<div class="row"><span>${x.level===1?FiezelI18n.t('progress.calibration-1'):x.level===2?FiezelI18n.t('progress.calibration-2'):FiezelI18n.t('progress.calibration-3')}</span><span>${x.n?FiezelI18n.t('progress.calibration-stat',{accuracy:x.accuracy,gap:x.gap}):'—'}</span></div>`).join('<hr>')}<p class="muted">${FiezelI18n.t('progress.selisih-menunjukkan-jarak-antara-rasa')}</p>`)}
-   ${card(`<h3>${FiezelI18n.t('progress.pola-kesalahan')}</h3>${patterns.length?patterns.slice(0,4).map(x=>`<p><b>${esc(friendlySkillName(x.key))}</b>: ${FiezelI18n.t('progress.error-pattern',{errors:x.errors,common:x.common?FiezelI18n.t('progress.error-common-choice',{choice:esc(x.common),count:x.count}):FiezelI18n.t('progress.error-no-common')})}</p>`).join(''):'<p class="muted">'+FiezelI18n.t('progress.bukti-pending-cukup-for-menemukan')+'</p>'}`)}
    ${card(`<h3>${FiezelI18n.t('progress.jaringan-kekeliruan-vocab')}</h3>${pairs.length?`<div class="confusion-network">${pairs.map(x=>`<div class="confusion-node"><span>${esc(x.a)}</span><b><i data-lucide="arrow-left-right"></i></b><span>${esc(x.b)}</span><small>${x.count} tanda kebingungan</small></div>`).join('')}</div>`:'<p class="muted">'+FiezelI18n.t('progress.belum-ada-pasangan-kata-terlihat')+'</p>'}`)}
-   ${card(`<h3>${FiezelI18n.t('progress.peta-skill-reading')}</h3>${readingHtml}`)}
    </div>`,
-  adaptive:`<div class="grid">
+  adaptive:`<div class="grid progress-grid">
    ${coreBrainPanelMarkup()}
    ${card(`<h3>${FiezelI18n.t('progress.kartu-rencana-latihan')}</h3>${(()=>{const p=buildAdaptivePolicy();const tahap=istilahMurid('mode',p.mode),band=istilahMurid('band',p.difficultyBand),tempo=istilahMurid('pace',p.pace);return `<div class="diag-grid">${tahap?`<div><b>${FiezelI18n.t('progress.label-tahap')}</b><br>${esc(tahap)}</div>`:''}<div><b>${FiezelI18n.t('progress.fokus')}</b><br>${esc(p.targetSkill?friendlySkillName(p.targetSkill):friendlySkillName(p.primaryDomain))}</div><div><b>${FiezelI18n.t('progress.label-panjang-sesi')}</b><br>${FiezelI18n.t('progress.item-menit-2',{sessionSize:p.sessionSize,estimatedMinutes:p.estimatedMinutes})}</div>${band?`<div><b>${FiezelI18n.t('progress.label-tingkat-soal')}</b><br>${esc(band)}</div>`:''}<div><b>${FiezelI18n.t('progress.label-porsi-ulangan')}</b><br>${Math.round(p.reviewShare*100)}%</div>${tempo?`<div><b>${FiezelI18n.t('progress.label-tempo')}</b><br>${esc(tempo)}</div>`:''}</div><p>${esc(p.summary)}</p><p class="muted">${FiezelI18n.t('progress.policy-bersifat-deterministik-dapat-diaudit')}</p>`})()}`)}
    ${card(`<h3>${FiezelI18n.t('progress.kartu-hasil-sesi')}</h3>${(()=>{const o=state.policyOutcomeMeta?.last;if(!o)return '<p>'+FiezelI18n.t('progress.belum-ada-sesi-adaptive-punya')+'</p>';const hasil=istilahMurid('hasil',o.status),saran=istilahMurid('saran',o.recommendation);return `<div class="diag-grid">${hasil?`<div><b>${FiezelI18n.t('progress.label-hasil')}</b><br>${esc(hasil)}</div>`:''}<div><b>${FiezelI18n.t('progress.label-nilai')}</b><br>${Math.round(o.score)}/100</div><div><b>${FiezelI18n.t('progress.label-selesai')}</b><br>${Math.round(o.completionRate)}%</div><div><b>${FiezelI18n.t('progress.stat-accuracy')}</b><br>${o.accuracy==null?'-':Math.round(o.accuracy)+'%'}</div><div><b>${FiezelI18n.t('progress.target-hit')}</b><br>${Math.round(o.targetAdherence)}%</div>${saran?`<div><b>${FiezelI18n.t('progress.rekomendasi')}</b><br>${esc(saran)}</div>`:''}</div><p class="muted">${FiezelI18n.t('progress.outcome-menjadi-evidence-policy-upcoming')}</p>`})()}`)}
    ${card(`<h3>${FiezelI18n.t('progress.kartu-kebiasaan')}</h3><div class="diag-grid"><div><b>${FiezelI18n.t('progress.konsistensi-hari')}</b><br>${FiezelI18n.t('progress.hari-aktif',{consistency14d:evidence.behavior.consistency14d,activeDays14:evidence.behavior.activeDays14})}</div><div><b>${FiezelI18n.t('progress.evidence-speed-label')}</b><br>${evidence.behavior.medianResponseMs==null?FiezelI18n.t('progress.evidence-speed-na'):FiezelI18n.t('progress.evidence-speed-value',{seconds:Math.round(evidence.behavior.medianResponseMs/100)/10})}</div>${evidence.confidence.gap==null?''/* baris kalibrasi disembunyikan saat kosong: sumbernya state.confidenceHistory, dan sejak popup keyakinan dicabut dari semua sesi tidak ada lagi yang mengisinya - sama persis dengan alasan di panel OLM. Murid lama yang punya riwayat tetap melihat angkanya. */:`<div><b>${FiezelI18n.t('progress.evidence-calibration-label')}</b><br>${FiezelI18n.t('progress.evidence-calibration-gap',{gap:evidence.confidence.gap})}</div>`}<div><b>${FiezelI18n.t('progress.label-sesi-ditinggal')}</b><br>${FiezelI18n.t('progress.sesi',{abandonmentRate:evidence.behavior.abandonmentRate,sessions30d:evidence.behavior.sessions30d})}</div><div><b>${FiezelI18n.t('progress.waktu-study-dominan')}</b><br>${esc(FiezelI18n.t({'pagi':'progress.jendela-pagi','siang':'progress.jendela-siang','sore':'progress.jendela-sore','malam':'progress.jendela-malam','larut':'progress.jendela-larut','belum terbaca':'progress.jendela-belum-terbaca'}[evidence.behavior.preferredStudyWindow]||'progress.jendela-belum-terbaca'))}</div><div><b>${FiezelI18n.t('progress.evidence-risk-label')}</b><br>${evidence.memory.maxForgettingRisk}% · ${FiezelI18n.t('progress.rawan-materi',{count:evidence.memory.highRiskCount})}</div></div><p class="muted">${FiezelI18n.t('progress.model-memakai-agregat-perilaku-hasil')}</p>`)}
    </div>`,
-  readiness:`<div class="grid">
-   ${card(`<h3>${FiezelI18n.t('progress.readiness-heading')}</h3>${academicReadinessMarkup()}`)}
-   ${card(`<h3>${FiezelI18n.t('progress.skills-heading')}</h3>${unifiedSkillsMarkup()}`)}
+  readiness:`<div class="grid progress-grid">
+   ${progressFresh?card(`<h3>${FiezelI18n.t('progress.modul-menunggu-judul')}</h3><p class="muted">${FiezelI18n.t('progress.modul-menunggu-isi')}</p>`):`
+    ${card(`<h3>${FiezelI18n.t('progress.readiness-heading')}</h3>${academicReadinessMarkup()}`)}
+    ${card(`<h3>${FiezelI18n.t('progress.skills-heading')}</h3>${unifiedSkillsMarkup()}`)}
+    ${card(`<h3>${FiezelI18n.t('progress.peta-skill-reading')}</h3>${readingHtml}`)}
+   `}
    </div>`
  };
  shell(FiezelI18n.t('progress.peta-study-lab'),FiezelI18n.t('progress.lihat-bagian-sudah-kuat-pola'),`
- ${card(`<div class="stats"><div>${stat(FiezelI18n.t('progress.stat-accuracy'),acc+'%')}</div><div>${stat(FiezelI18n.t('progress.stat-streak'),FiezelI18n.t('progress.stat-streak-days',{days:state.streak}))}</div><div>${stat(FiezelI18n.t('progress.stat-today'),FiezelI18n.t('progress.stat-today-value',{count:state.daily.attempts}))}</div><div>${stat(FiezelI18n.t('progress.stat-review'),due.length)}</div><div>${stat(FiezelI18n.t('progress.stat-gem'),gemsBalance())}</div></div>`)}
+ ${card(`<div class="stats progress-stats"><div>${stat(FiezelI18n.t('progress.stat-accuracy'),acc+'%')}</div><div>${stat(FiezelI18n.t('progress.stat-streak'),FiezelI18n.t('progress.stat-streak-days',{days:state.streak}))}</div><div>${stat(FiezelI18n.t('progress.stat-today'),FiezelI18n.t('progress.stat-today-value',{count:state.daily.attempts}))}</div><div>${stat(FiezelI18n.t('progress.stat-review'),due.length)}</div><div class="stat-gem-span">${stat(FiezelI18n.t('progress.stat-gem'),gemsBalance())}</div></div>`)}
  <div class="progress-tabs" role="tablist">${PROGRESS_TABS.map(([id,label])=>`<button type="button" class="progress-tab${progressTabSafe()===id?' active':''}" role="tab" aria-selected="${progressTabSafe()===id}" onclick="switchProgressTab('${id}')">${esc(label)}</button>`).join('')}</div>
  ${tabContent[progressTabSafe()]}
  ${card(`<div class="row"><b><!-- Dibuat oleh Fitrarustqi -->${FiezelI18n.t('footer.dibuat-oleh',{nama:'Fitrarustqi'})}</b><a href="https://instagram.com/fitrarustqi" target="_blank" rel="noopener noreferrer" class="creator-link"><img src="./instagram.svg" alt="Instagram" width="22" height="22"> @fitrarustqi</a></div>`)}
- `)
+ `);
+ try{const c=document.querySelector('.progress-tabs'),b=document.querySelector('.progress-tab.active');if(c&&b&&b.offsetLeft>0){c.scrollLeft=Math.max(0,b.offsetLeft-(c.clientWidth-b.clientWidth)/2)}}catch(_){}
 }
 function validReportEndpoint(value){try{const u=new URL(String(value||'').trim());return u.protocol==='https:'&&u.hostname.endsWith('.puter.work')}catch{return false}}
 function reportId(){try{return crypto.randomUUID()}catch{return`${Date.now()}-${Math.random().toString(36).slice(2)}`}}

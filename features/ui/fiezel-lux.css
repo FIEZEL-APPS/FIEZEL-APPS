@@ -278,8 +278,6 @@ body.fz-lux .level-picker-grid button,body.fz-lux .level-picker-grid .level-pick
 body.fz-lux .nav-scrim{height:calc(110px + env(safe-area-inset-bottom));background:linear-gradient(to top,var(--lux-cream) 40%,rgba(255,249,238,0))}
 
 /* ---------- menyembunyikan panel yang tidak penting bagi murid ---------- */
-body.fz-lux .progress-tab[onclick*="'analysis'"],
-body.fz-lux .progress-tab[onclick*="'adaptive'"],
 body.fz-lux .launch-card.classroom-launch.is-coming-soon,
 body.fz-lux .launcher-meta .celestial-status,
 body.fz-lux .card:has(> .row > .creator-link),

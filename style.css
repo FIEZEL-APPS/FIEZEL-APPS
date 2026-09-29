@@ -7158,9 +7158,15 @@ html body #app .learning-launcher .launch-card svg,
   border-radius: 9999px !important;
   padding: 4px !important;
   display: flex !important;
-  gap: 4px !important;
+  gap: 6px !important;
   overflow-x: auto !important;
+  scrollbar-width: none !important;
+  -webkit-overflow-scrolling: touch !important;
   margin-bottom: 16px !important;
+}
+
+.progress-tabs::-webkit-scrollbar {
+  display: none !important;
 }
 
 .progress-tab {
@@ -7169,12 +7175,13 @@ html body #app .learning-launcher .launch-card svg,
   border: none !important;
   box-shadow: none !important;
   border-radius: 9999px !important;
-  padding: 8px 16px !important;
+  padding: 9px 18px !important;
   font-size: 0.88rem !important;
-  font-weight: 600 !important;
+  font-weight: 700 !important;
   cursor: pointer !important;
-  transition: all 0.2s ease !important;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
   white-space: nowrap !important;
+  flex: 0 0 auto !important;
 }
 
 .progress-tab:not(.active) {
@@ -7183,7 +7190,7 @@ html body #app .learning-launcher .launch-card svg,
 
 .progress-tab:hover:not(.active) {
   color: #FFFFFF !important;
-  background: rgba(255, 255, 255, 0.05) !important;
+  background: rgba(255, 255, 255, 0.06) !important;
   box-shadow: none !important;
 }
 
@@ -7194,6 +7201,32 @@ html body #app .learning-launcher .launch-card svg,
   box-shadow: 0 4px 14px rgba(255, 224, 46, 0.35) !important;
 }
 
+.progress-grid {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 14px !important;
+}
+
+.prasasti-fold summary {
+  cursor: pointer !important;
+  user-select: none !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+}
+
+.prasasti-fold summary h3 {
+  margin: 0 !important;
+}
+
+.prasasti-fold summary i[data-lucide="chevron-down"] {
+  transition: transform 0.25s ease !important;
+}
+
+.prasasti-fold[open] summary i[data-lucide="chevron-down"] {
+  transform: rotate(180deg) !important;
+}
+
 .stats {
   background: transparent !important;
   border: none !important;
@@ -7201,6 +7234,16 @@ html body #app .learning-launcher .launch-card svg,
   display: grid !important;
   grid-template-columns: repeat(auto-fit, minmax(90px, 1fr)) !important;
   gap: 10px !important;
+}
+
+.stats.progress-stats {
+  grid-template-columns: repeat(2, 1fr) !important;
+}
+
+@media (min-width: 520px) {
+  .stats.progress-stats {
+    grid-template-columns: repeat(4, 1fr) !important;
+  }
 }
 
 .stats > div {
@@ -7213,6 +7256,36 @@ html body #app .learning-launcher .launch-card svg,
   flex-direction: column !important;
   justify-content: center !important;
   text-align: center !important;
+}
+
+.stats.progress-stats > div.stat-gem-span {
+  grid-column: span 2 !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  padding: 11px 18px !important;
+  background: linear-gradient(135deg, rgba(255, 215, 0, 0.12), rgba(255, 199, 0, 0.04)) !important;
+  border: 1px solid rgba(255, 215, 0, 0.3) !important;
+}
+
+@media (min-width: 520px) {
+  .stats.progress-stats > div.stat-gem-span {
+    grid-column: span 4 !important;
+  }
+}
+
+.stats.progress-stats > div.stat-gem-span small {
+  margin: 0 !important;
+  color: #FFD700 !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.06em !important;
+  font-size: 12px !important;
+}
+
+.stats.progress-stats > div.stat-gem-span strong {
+  margin: 0 !important;
+  color: #FFFFFF !important;
+  font-size: 1.25rem !important;
 }
 
 .stats small {
