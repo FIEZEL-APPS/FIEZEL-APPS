@@ -1,0 +1,45 @@
+# B8 fix — jalankan test backend Braincore di CI.
+# Simpan sebagai: .github/workflows/backend-tests.yml di repo FIEZEL-APPS.
+#
+# CATATAN owner: sesuaikan `Run backend tests` dengan cara unit_test.py dijalankan.
+# Diasumsikan backend/unit_test.py adalah skrip standalone (54 cek) yang butuh MongoDB.
+name: backend-tests
+
+on:
+  push:
+    paths:
+      - "backend/**"
+      - ".github/workflows/backend-tests.yml"
+  pull_request:
+    paths:
+      - "backend/**"
+      - ".github/workflows/backend-tests.yml"
+
+jobs:
+  braincore-tests:
+    runs-on: ubuntu-latest
+    services:
+      mongodb:
+        image: mongo:7
+        ports:
+          - 27017:27017
+    env:
+      MONGO_URL: mongodb://localhost:27017
+      DB_NAME: fiezel_test
+      JWT_SECRET: ci-test-secret-not-for-prod
+      CORS_ORIGINS: "*"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install deps
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r backend/requirements.txt
+      - name: Run backend tests (Braincore unit_test.py — 54 cek)
+        working-directory: backend
+        run: python unit_test.py
+      - name: Run Braincore functional probe
+        working-directory: backend
+        run: python probe.py
