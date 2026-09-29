@@ -1,0 +1,239 @@
+/* FIEZEL landing — lapisan "VIVID SOLAR" (audit UI/UX 2026).
+   Dimuat SETELAH style.css. Identitas tetap: krem · solar · maroon, tanpa latar gelap.
+   Aksen baru diambil dari palet maskot PAW (rose #D9536A, pink #F0A0AC, sky #9CC7E8)
+   + hijau KelasKu #1F7A63, supaya tiap skill punya warna dan halaman tidak lagi datar. */
+:root{
+  --vv-sun:#FFC700;
+  --vv-sun-2:#FFD94F;
+  --vv-sun-soft:#FFF1B8;
+  --vv-rose:#D9536A;
+  --vv-rose-ink:#A3263B;
+  --vv-pink-soft:#FDE4E8;
+  --vv-teal:#1F7A63;
+  --vv-teal-soft:#DDF3EA;
+  --vv-sky:#9CC7E8;
+  --vv-sky-ink:#1F5C87;
+  --vv-sky-soft:#E4F1FB;
+  --vv-ink:#5E1420;
+  --vv-line:#6D1926;
+  --vv-hard:4px 5px 0 var(--vv-line);
+  --vv-hard-lg:7px 9px 0 var(--vv-line);
+}
+body{color:#6A2230}
+
+/* ---------- ritme: jeda antarseksi dipadatkan (dulu 104px + reveal = lubang kosong) ---------- */
+.sec{padding:56px 0}
+@media (min-width:900px){.sec{padding:84px 0}.sec-final{padding:72px 0 96px}}
+
+/* reveal lebih cepat & pendek: konten tidak lagi terlihat pudar saat di-scroll */
+.anim .reveal{transform:translate3d(0,12px,0);transition-duration:.42s,.42s;transition-delay:calc(var(--i,0) * 45ms)}
+
+/* ---------- kepala seksi: nomor jadi pil, judul lebih besar, garis jadi bar solar ---------- */
+.sec-num{display:inline-flex;align-items:center;gap:8px;width:auto;padding:6px 14px 6px 10px;margin-bottom:16px;
+  background:#fff;border:1.5px solid var(--vv-line);border-radius:999px;color:var(--vv-ink);
+  letter-spacing:.14em;box-shadow:0 2px 0 var(--vv-line)}
+.sec-num::before{content:"";width:9px;height:9px;border-radius:50%;background:var(--vv-rose);box-shadow:0 0 0 3px var(--vv-pink-soft)}
+.sec-title{font-size:clamp(2rem,6.6vw,3.1rem);color:var(--vv-ink);letter-spacing:-.035em}
+.sec-head .rule{width:72px;height:6px;border-radius:6px;background:linear-gradient(90deg,var(--vv-sun),var(--vv-rose))}
+.sec-dek{font-size:1.02rem;color:#6A2230;max-width:58ch}
+
+/* ---------- tombol: lebih "timbul" dan kontras ---------- */
+.btn{border-color:var(--vv-line)}
+.btn-primary{background:linear-gradient(180deg,#FFE066 0%,var(--vv-sun) 55%,#FFB300 100%);color:var(--vv-ink);
+  box-shadow:0 4px 0 var(--vv-line),0 10px 24px -8px rgba(255,170,0,.65)}
+.anim .btn-primary:hover{box-shadow:0 7px 0 var(--vv-line),0 16px 30px -10px rgba(255,170,0,.75)}
+.btn-ghost{background:#fff;box-shadow:0 4px 0 var(--vv-line)}
+.anim .btn-ghost:hover{box-shadow:0 7px 0 var(--vv-line)}
+
+/* ---------- topbar ---------- */
+.topbar{background:rgba(255,249,238,.9);border-bottom:1.5px solid rgba(109,25,38,.14)}
+.topnav-links a:not(.lang-switch){position:relative}
+.topnav-links a:not(.lang-switch)::after{content:"";position:absolute;left:0;right:0;bottom:-4px;height:3px;border-radius:3px;
+  background:var(--vv-sun);transform:scaleX(0);transform-origin:left;transition:transform .25s var(--fz-out)}
+.topnav-links a:not(.lang-switch):hover{text-decoration:none}
+.topnav-links a:not(.lang-switch):hover::after{transform:scaleX(1)}
+
+/* ============ HERO: sinar matahari solar + judul besar ============ */
+.hero{background:
+  radial-gradient(120% 70% at 50% -8%,#FFD94F 0%,#FFE58A 26%,rgba(255,241,184,.85) 46%,rgba(255,249,238,0) 72%),
+  linear-gradient(180deg,#FFF1B8 0%,var(--cream) 78%)}
+.hero::before{content:"";position:absolute;left:50%;top:-38vmax;width:120vmax;height:120vmax;transform:translateX(-50%);
+  pointer-events:none;z-index:0;opacity:.42;
+  background:repeating-conic-gradient(from 0deg,rgba(255,255,255,.75) 0deg 5deg,transparent 5deg 15deg);
+  -webkit-mask-image:radial-gradient(circle at 50% 50%,#000 0%,transparent 44%);
+  mask-image:radial-gradient(circle at 50% 50%,#000 0%,transparent 44%)}
+.anim .hero::before{animation:vvSpin 120s linear infinite}
+@keyframes vvSpin{to{transform:translateX(-50%) rotate(360deg)}}
+.hero>.wrap{position:relative;z-index:1}
+
+.mast-h1{max-width:18ch;font-size:clamp(2.05rem,7.4vw,3.7rem);line-height:1.04;letter-spacing:-.04em;color:var(--vv-ink)}
+.mast-h1 .vv-hl{position:relative;white-space:nowrap;z-index:0}
+.mast-h1 .vv-hl::after{content:"";position:absolute;left:-.12em;right:-.12em;bottom:.04em;height:.36em;z-index:-1;
+  border-radius:.2em;background:var(--vv-rose);opacity:.28;transform:skewX(-8deg)}
+.mast-sub{white-space:normal;text-transform:none!important;letter-spacing:0!important;
+  font-size:clamp(1rem,3.8vw,1.18rem);font-weight:600;line-height:1.55;color:#6A2230;
+  max-width:52ch;margin:14px auto 0;text-wrap:balance}
+
+.mast-cta{gap:12px}
+.mast-cta .btn-primary{min-height:58px;padding:15px 34px;font-size:1.1rem;font-weight:800}
+.vv-trust{display:flex;flex-wrap:wrap;justify-content:center;gap:8px 10px;margin:20px auto 0;padding:0;list-style:none}
+.vv-trust li{display:inline-flex;align-items:center;gap:7px;padding:6px 13px 6px 8px;border-radius:999px;
+  background:rgba(255,255,255,.82);border:1.5px solid rgba(109,25,38,.22);
+  font-size:var(--fs-label);font-weight:700;color:var(--vv-ink)}
+.vv-trust li::before{content:"";width:18px;height:18px;border-radius:50%;flex:none;
+  background:var(--vv-teal) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='3.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 12.5l4.5 4.5L19 7.5'/%3E%3C/svg%3E") center/11px no-repeat}
+
+@media (max-width:559px){
+  .masthead{padding-left:20px!important;padding-right:20px!important}
+  .mast-h1{max-width:16ch}
+  .mast-cta{display:grid;grid-template-columns:1fr;gap:10px}
+  .mast-cta .btn{width:100%;min-width:0;padding-left:12px;padding-right:12px}
+  .mast-cta .btn-ghost{min-height:46px}
+  .vv-trust li{font-size:var(--fs-micro)}
+}
+
+/* ============ LOOP ADAPTIF: tiap langkah punya warna sendiri ============ */
+.loop-step{border:1.5px solid var(--vv-line);box-shadow:var(--vv-hard);background:#fff;position:relative;overflow:hidden}
+.loop-step::before{content:"";position:absolute;left:0;right:0;top:0;height:6px}
+.loop-step:nth-child(1)::before{background:var(--vv-rose)}
+.loop-step:nth-child(2){background:var(--vv-sun-soft);border-color:var(--vv-line)}
+.loop-step:nth-child(2)::before{background:var(--vv-sun)}
+.loop-step:nth-child(3){background:var(--vv-teal-soft)}
+.loop-step:nth-child(3)::before{background:var(--vv-teal)}
+.loop-n{color:var(--vv-ink);padding-top:4px}
+.loop-step:nth-child(1) .loop-n span{background:var(--vv-rose-ink)}
+.loop-step:nth-child(2) .loop-n span{background:var(--vv-ink)}
+.loop-step:nth-child(3) .loop-n span{background:var(--vv-teal)}
+.loop-step:nth-child(3) .loop-plan-k{color:var(--vv-teal)}
+.loop-q{background:#FFF9EE;border:1.5px dashed rgba(109,25,38,.3)}
+.loop-q b{background:var(--vv-sun-2)}
+.loop-verdict-bad{background:var(--vv-pink-soft);border-color:var(--vv-rose);color:var(--vv-rose-ink)}
+.loop-rule{border-left-color:var(--vv-rose)}
+.anim .loop-step:hover{transform:translate(-2px,-4px);box-shadow:var(--vv-hard-lg)}
+
+/* ============ RINGKASAN + STATISTIK ============ */
+.sec-intro{overflow:hidden}
+.intro-copy .eyebrow{background:var(--vv-teal-soft);border-color:rgba(31,122,99,.45);color:#145A48}
+.intro-note{background:var(--vv-sky-soft);border:1.5px solid var(--vv-line);box-shadow:var(--vv-hard)}
+.intro-note .tagline .t-2{color:var(--vv-rose-ink)}
+.stats li{border:1.5px solid var(--vv-line);box-shadow:var(--vv-hard);padding:20px 18px}
+.stats li::after{display:none}
+.stats li:nth-child(1){background:var(--vv-sun-2)}
+.stats li:nth-child(2){background:var(--vv-pink-soft)}
+.stats li:nth-child(3){background:var(--vv-teal-soft)}
+.stats li:nth-child(4){background:var(--vv-sky-soft)}
+.stats b{font-size:clamp(2.2rem,9vw,3.2rem);color:var(--vv-ink)}
+.stats span{color:var(--vv-ink);font-weight:600}
+.anim .stats li:hover{transform:translate(-2px,-4px);box-shadow:var(--vv-hard-lg)}
+
+/* ticker: pita solar miring — dulu garis tipis yang nyaris tak terlihat */
+.ticker{margin-top:44px;padding:14px 0;background:var(--vv-sun);border-top:2px solid var(--vv-line);border-bottom:2px solid var(--vv-line);
+  transform:rotate(-1.4deg) scale(1.03)}
+.ticker li{color:var(--vv-ink);font-weight:800}
+.ticker li::after{background:var(--vv-rose);width:7px;height:7px}
+
+/* ============ TENTANG ============ */
+.disambiguation-note{background:var(--vv-pink-soft)!important;border:1.5px solid rgba(163,38,59,.35)!important;border-radius:16px!important}
+.sec-about .body-lg a{color:var(--vv-rose-ink);font-weight:700;border-bottom:2px solid rgba(217,83,106,.35)}
+.sec-about .body-lg a:hover{text-decoration:none;border-color:var(--vv-rose)}
+.phone{border:1.5px solid var(--vv-line);box-shadow:var(--vv-hard)}
+.shot-pair{position:relative}
+.shot-pair::before{content:"";position:absolute;inset:8% 4% 0;border-radius:40% 60% 55% 45%;z-index:0;
+  background:radial-gradient(circle at 40% 40%,var(--vv-sun-2),rgba(255,217,79,.35) 60%,transparent 72%)}
+.shot-pair>*{position:relative;z-index:1}
+
+/* ============ FITUR: kartu stiker + ubin ikon berwarna per skill ============ */
+.feat{background:#fff!important;border:1.5px solid var(--vv-line)!important;box-shadow:var(--vv-hard);--vv-tile:var(--vv-sun-2);--vv-tile-ink:var(--vv-ink)}
+.anim .feat:hover{transform:translate(-2px,-5px);box-shadow:var(--vv-hard-lg)}
+.feat .ico,.feat .ico-img{box-sizing:content-box;width:26px;height:26px;padding:11px;border-radius:14px;
+  background:var(--vv-tile);color:var(--vv-tile-ink);border:1.5px solid var(--vv-line)}
+.feat .ico-img{width:30px;height:30px;padding:9px}
+.feat h3{font-size:1.16rem;color:var(--vv-ink);margin-top:16px}
+.feat p{color:#6A2230}
+.feat-grid>.feat:nth-child(1){background:var(--vv-sun-2)!important;--vv-tile:#fff}
+.feat-grid>.feat:nth-child(2){--vv-tile:var(--vv-sky);--vv-tile-ink:#0F3552}
+.feat-grid>.feat:nth-child(3){--vv-tile:var(--vv-pink-soft);--vv-tile-ink:var(--vv-rose-ink)}
+.feat-grid>.feat:nth-child(4){--vv-tile:var(--vv-teal-soft);--vv-tile-ink:var(--vv-teal)}
+.feat-grid>.feat:nth-child(5){--vv-tile:var(--vv-sun-soft)}
+.feat-grid>.feat:nth-child(6){--vv-tile:var(--vv-rose);--vv-tile-ink:#fff}
+.feat-grid>.feat:nth-child(7){--vv-tile:var(--vv-sky-soft);--vv-tile-ink:var(--vv-sky-ink)}
+.feat-grid>.feat:nth-child(8){background:var(--vv-pink-soft)!important;--vv-tile:#fff;--vv-tile-ink:var(--vv-rose-ink)}
+.feat-grid>.feat:nth-child(9){--vv-tile:var(--vv-teal);--vv-tile-ink:#fff}
+.feat-grid>.feat:nth-child(10){--vv-tile:var(--vv-sun);--vv-tile-ink:var(--vv-ink)}
+.feat-grid>.feat:nth-child(9) a{color:var(--vv-teal);font-weight:700}
+.chiplist li{background:#fff;border:1.5px solid var(--vv-line);box-shadow:0 2px 0 var(--vv-line)}
+/* perbaikan grid: kartu terakhir dulu dipaku ke kolom 1 sehingga KelasKu tertinggal sendirian */
+@media (min-width:900px){.feat-grid>.feat:last-child{grid-column:span 2}}
+
+/* ============ CARA PAKAI: nomor besar + garis penghubung ============ */
+.steps{position:relative;counter-reset:none}
+.step{border:1.5px solid var(--vv-line);box-shadow:var(--vv-hard);background:#fff}
+.step-n{width:46px;height:46px;font-size:1.2rem;background:var(--vv-sun);color:var(--vv-ink);border:1.5px solid var(--vv-line);box-shadow:0 3px 0 var(--vv-line)}
+.steps>li:nth-child(2) .step-n{background:var(--vv-pink-soft)}
+.steps>li:nth-child(3) .step-n{background:var(--vv-teal-soft)}
+.steps>li:nth-child(4) .step-n{background:var(--vv-sky-soft)}
+.step p{color:#6A2230;padding-top:10px}
+.anim .step:hover{transform:translate(-2px,-4px);box-shadow:var(--vv-hard-lg)}
+@media (min-width:900px){
+  .steps::before{content:"";position:absolute;left:6%;right:6%;top:45px;height:0;border-top:2.5px dashed rgba(109,25,38,.35);z-index:0}
+  .steps>li{position:relative;z-index:1}
+  .step{grid-template-columns:1fr;gap:6px;padding:22px 20px 24px}
+}
+
+/* ============ INSTALL ============ */
+.install-card{background:var(--vv-sky-soft)!important;border:1.5px solid var(--vv-line)!important;box-shadow:var(--vv-hard-lg)}
+.howlist li{background:#fff;border:1.5px solid rgba(109,25,38,.22);padding-left:44px;position:relative}
+.howlist li::before{content:"";position:absolute;left:14px;top:50%;width:18px;height:18px;transform:translateY(-50%);border-radius:50%;
+  background:var(--vv-teal) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='3.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 12.5l4.5 4.5L19 7.5'/%3E%3C/svg%3E") center/11px no-repeat}
+.install-card .link-arrow{color:var(--vv-sky-ink);border-color:rgba(31,92,135,.4)}
+
+/* ============ FAQ ============ */
+.sec-faq{background:var(--vv-sun-soft);
+  background-image:radial-gradient(rgba(109,25,38,.10) 1.2px,transparent 1.4px);background-size:22px 22px}
+.faq details{border:1.5px solid var(--vv-line);box-shadow:0 4px 0 var(--vv-line)}
+.faq details[open]{box-shadow:var(--vv-hard)}
+.faq details[open] summary{background:var(--vv-sun-2)}
+.anim .faq summary{transition:background-color .2s var(--fz-out)}
+.faq summary:hover{background:#FFF7D6}
+.faq-body{padding-top:16px}
+
+/* ============ CTA AKHIR: bidang solar penuh ============ */
+.final{background:var(--vv-sun)!important;border:2px solid var(--vv-line)!important;box-shadow:var(--vv-hard-lg)!important}
+.final::before{inset:-60% -30% auto -30%;height:220%;opacity:.5;
+  background:repeating-conic-gradient(from 0deg at 50% 50%,rgba(255,255,255,.55) 0deg 6deg,transparent 6deg 18deg)!important;
+  -webkit-mask-image:radial-gradient(circle at 50% 50%,#000 0%,transparent 55%);mask-image:radial-gradient(circle at 50% 50%,#000 0%,transparent 55%)}
+.final::after{display:none}
+.final h2{font-size:clamp(2rem,6.8vw,3.2rem);color:var(--vv-ink)}
+.final p{color:var(--vv-ink);font-weight:600}
+.final .tagline .t-1{color:var(--vv-ink);opacity:.75}
+.final .tagline .t-2{color:var(--vv-ink)}
+.final .btn-primary{background:var(--vv-ink);color:#FFF9EE;box-shadow:0 4px 0 #3A0B14}
+.anim .final .btn-primary:hover{box-shadow:0 7px 0 #3A0B14}
+.final-paw{width:92px}
+.final .rule{display:none}
+
+/* ============ FOOTER ============ */
+.foot{border-top:2px solid var(--vv-line)}
+
+/* ============ DOK CTA MOBILE: muncul setelah hero lewat, hilang di CTA akhir ============ */
+.vv-dock{position:fixed;left:12px;right:12px;bottom:calc(12px + env(safe-area-inset-bottom,0px));z-index:45;
+  display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 10px 10px 16px;
+  background:#fff;border:1.5px solid var(--vv-line);border-radius:20px;box-shadow:var(--vv-hard);
+  transform:translateY(160%);opacity:0;pointer-events:none;
+  transition:transform .36s var(--fz-out),opacity .36s var(--fz-out)}
+.vv-dock.is-on{transform:none;opacity:1;pointer-events:auto}
+.vv-dock-copy{display:grid;line-height:1.25;min-width:0}
+.vv-dock-copy b{font-size:.95rem;color:var(--vv-ink)}
+.vv-dock-copy span{font-size:var(--fs-micro);color:#6A2230;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.vv-dock .btn{min-height:46px;padding:10px 20px;font-size:.95rem;flex:none}
+@media (min-width:760px){.vv-dock{display:none}}
+@media (prefers-reduced-motion:reduce){.hero::before{animation:none}.vv-dock{transition:none}}
+
+/* penyesuaian pasca-tinjau */
+@media (min-width:900px){.mast-h1{max-width:21ch}}
+.step{align-content:start;align-items:start}
+#pasang{padding-top:0}
+.sec-head .rule{margin-top:18px}
+.final .tagline{max-width:none}
+@media (min-width:900px){.sec-about{padding-top:56px}}
+:lang(th) .mast-h1{line-height:1.28}

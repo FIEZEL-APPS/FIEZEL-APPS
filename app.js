@@ -13877,9 +13877,11 @@ function targetLangChipMarkup(){
   const tujuan=ja?'en':'ja';
   const judul=ja?FiezelI18n.t('bahasa.chip-aktif-ja'):FiezelI18n.t('bahasa.chip-coba-ja');
   const sub=ja?FiezelI18n.t('bahasa.chip-kembali-en'):FiezelI18n.t('bahasa.chip-coba-ja-sub');
-  return `<button type="button" class="target-lang-chip${ja?' is-active':''}" onclick="setTargetLangPreference('${tujuan}')" aria-label="${esc(FiezelI18n.t('bahasa.chip-aria'))}">
-      <span class="chip-label"><i class="fz-i" data-fz-icon="graduation-cap" style="width:14px;height:14px;display:inline-flex"></i> ${esc(judul)}</span>
+  return `<button type="button" class="target-lang-chip${ja?' is-active':''}" onclick="setTargetLangPreference('${tujuan}')" aria-label="${esc(FiezelI18n.t('bahasa.chip-aria'))}" data-testid="home-target-lang-chip">
+      <span class="chip-ja-badge" aria-hidden="true">${ja?'A':'あ'}</span>
+      <span class="chip-label">${esc(judul)}</span>
       <span class="chip-sub">${esc(sub)}</span>
+      <i class="chip-go" data-lucide="arrow-right" aria-hidden="true"></i>
     </button>`;
 }
 function targetLangRowMarkup(){
@@ -14877,10 +14879,10 @@ function onlineView(){
   shell(FiezelI18n.t('social.shell-title'),FiezelI18n.t('social.shell-desc'),`${arenaDoor}${tabs}<div id="onlineRoot">${card(`<p class="muted">${FiezelI18n.t('social.loading')}</p>`)}</div>`);
   renderOnlineTab();
 }
+function socialOfflineCard(){const pending=(()=>{try{return socialCore()?.outboxPending()||0}catch(_){return 0}})();return card(`<h3>${FiezelI18n.t('social.offline-title')}</h3><p class="muted">${FiezelI18n.t('social.offline-body',{pendingNote:pending?FiezelI18n.t('social.offline-pending',{count:pending}):''})}</p>`,'social-card')}
 // Kartu keadaan yang dijanjikan spec: dua kalimat jujur, nol nada gagal. Belajar tidak
 // pernah butuh fitur ini, dan kartunya mengatakan itu.
-function socialOfflineCard(){const pending=(()=>{try{return socialCore()?.outboxPending()||0}catch(_){return 0}})();return card(`<h3>${FiezelI18n.t('social.offline-title')}</h3><p class="muted">${FiezelI18n.t('social.offline-body',{pendingNote:pending?FiezelI18n.t('social.offline-pending',{count:pending}):''})}</p>`,'social-card')}
-function socialFlagOffCard(flag){return flag==='offline'?socialOfflineCard():card(`<h3>${FiezelI18n.t('social.flag-off-title')}</h3><p class="muted">${FiezelI18n.t('social.flag-off-body')}</p>`,'social-card')}
+function socialFlagOffCard(flag){return flag==='offline'?socialOfflineCard():card(`<div class="social-soon" data-testid="social-soon"><span class="social-soon-icon"><i class="fz-i" data-fz-icon="speaking" aria-hidden="true"></i></span><h3>${FiezelI18n.t('social.flag-off-title')}</h3><p class="muted">${FiezelI18n.t('social.segera-body')}</p><button class="primary" onclick="go('latihan')" data-testid="social-soon-cta">${FiezelI18n.t('social.segera-cta')}</button></div>`,'social-card')}
 async function renderOnlineTab(){
   const seq=++onlineSeq;
   const put=html=>{if(seq!==onlineSeq||state.view!=='online')return;const el=$('onlineRoot');if(el){el.innerHTML=html;enhanceUI()}};

@@ -1,0 +1,34 @@
+{
+  "summary": "Frontend-only verification of FIEZEL PWA UI/UX overhaul at http://localhost:3000. All 9 specified acceptance criteria verified end-to-end via Playwright at mobile 390x844 and desktop 1440x900. Quiz header regression (critical bug fix) verified: header.topbar has display:none while body has class fz-lesson-mode; .quiz-topbar (grid, z-index 30) is visible at y=8, .quiz-exit visible+clickable at (27,17) 44x44 and exits back to home. Vocab focus word renders in Plus Jakarta Sans display font (35.1px, rgb(255,217,79) yellow) — NOT Times serif. After wrong answer, option gets class 'option was-tried' with rose tint bg rgba(255,107,138,0.08) border rgba(255,107,138,0.45); after correct answer, class 'option correct' with teal bg rgba(45,212,167,0.12) border rgba(45,212,167,0.7). Latihan: 6 .launch-card color-coded per skill (yellow vocab, teal grammar, blue reading, rose skills, orange writing, lime library), 2×173px grid on mobile with equal 166.8125px row heights, section-head left=16 aligned to firstCard left=16, 3-column grid (3×349px) on desktop 1440. Home: 4 stitch cards color-coded, [data-testid=home-hero-cta] present as the strong yellow primary CTA, .fz-aurora-cta-btn is outlined (bg rgba(255,199,0,0.08) with 1px border), [data-testid=home-learn-flow] and [data-testid=home-paw-arena] present with icon top-left + arrow top-right + text below, no 'ga belajar...susah' motivational text found. Profil (go('online')): [data-testid=social-soon] visible with title 'Fitur online belum aktif' and body copy; [data-testid=social-soon-cta] 'Lanjut latihan' clickable and correctly navigates to Latihan (nav-latihan active); .progress-tabs display:none in this state. Desktop 1440: nav.bottomnav is a floating pill (position:fixed, border-radius:22px, width 620px, centered at left=410,right=1030). Thai locale copy verified via FiezelI18n.t(): home.motivasi-2 = 'เรียนทีละนิดทุกวัน...มาเริ่มกันเลย! 💪', social.segera-body = 'อีกไม่นานคุณจะเรียนไปพร้อมเพื่อนได้ด้วยชื่อเล่น...', social.segera-cta = 'ฝึกต่อเลย' — Profil card renders correctly in Thai with no Indonesian leaks. Marketing regression: /website/index.html and /website/th/index.html load with no horizontal overflow at 390 (scrollWidth==390==clientWidth), sticky [data-vv-dock] gets 'is-on' after scrolling past hero, and is display:none on viewport >=760. Console errors present are all CORS blocks against api.fiezel.my.id (expected in localhost dev — production API not reachable), no JS runtime errors from the app itself.",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": [
+      {"screen": "Home / global (mobile)", "issues": [
+        "A coach-mark tour (.fz-tour with 'Halo, Sobat.' / 'Mulai dari Hari ini' cards) auto-appears on first visit after bypass and overlays home/latihan/profil, partially obscuring the launch cards until dismissed with 'Lewati' or 'Nanti dulu'. It is dismissible and correct behaviorally, but on 390px it sits at the bottom half and covers the Rencana belajar cards. Not blocking the fixes under review; noted for polish."
+      ]},
+      {"screen": "Website landing (mobile, /website/index.html)", "issues": [
+        "After scrolling from top (y=800) the [data-vv-dock] correctly toggles class 'is-on', but when the final CTA section (.sec-final) is scrolled into center, the dock still had 'is-on'. The 'hide near final CTA' behavior may need a small IntersectionObserver threshold tweak, or my scrollIntoView({block:'center'}) placed .sec-final just below fold rather than in-view. Low priority; recommend re-test manually."
+      ]}
+    ]
+  },
+  "test_report_links": [],
+  "action_items": [
+    "Optional polish: on mobile home, the auto coach-mark tour overlays the 'Rencana belajar' launch cards on first visit; consider positioning the tour tooltip below the fold or dimming without covering the target cards.",
+    "Verify [data-vv-dock] hides when .sec-final is fully in the viewport (may already be correct — depends on the IO threshold used in /app/website/site.js)."
+  ],
+  "critical_code_review_comments": [
+    "Locale storage: state.preferences.learnerLocale is the source of truth for i18n; setting fiezel-onboarding-v1.locale='th' alone does NOT switch UI language — a test/QA note in the review request would be helpful. All Thai copy exists and renders correctly when locale is switched via FiezelI18n.setLocale('th') or via the settings flow.",
+    "CORS: on localhost:3000 the app fires many requests to https://api.fiezel.my.id (account/me, config, auth/anon, braincore/item-difficulty, health) which all fail with CORS. These are non-fatal (app degrades gracefully), but a dev proxy or a loud one-time console notice would improve DX for local reviewers.",
+    "Excellent use of data-testid across critical elements (home-hero-cta, home-learn-flow, home-paw-arena, social-soon, social-soon-cta, nav-latihan/classroom/home/progress/profile) — made this audit fast and reliable."
+  ],
+  "updated_files": [],
+  "success_rate": {"backend": "n/a (frontend-only per request)", "frontend": "100% of the 9 stated acceptance criteria pass"},
+  "test_credentials": "n/a — localStorage bypass per request (fiezel-auth-v1 + fiezel-onboarding-v1)",
+  "seed_data_creation": "none",
+  "retest_needed": false,
+  "should_main_agent_self_test": true,
+  "context_for_next_testing_agent": "Use http://localhost:3000 (public URL is behind Cloudflare challenge). The auth+onboarding localStorage bypass in the request works but ONLY covers auth/onboarding gate; to switch locale you must ALSO call self.FiezelI18n.setLocale('th') OR go through Pengaturan (which writes state.preferences.learnerLocale). Coach-mark tour auto-appears; remove with document.querySelectorAll('.fz-tour, .fz-tour-overlay, .fz-coachmark').forEach(el=>el.remove()). Vocab quiz options have class 'option' (not 'vocab-option'); after wrong click class becomes 'option was-tried', after correct 'option correct'. Real Playwright .locator().click() works; page.evaluate + .click() also works. Screenshots saved to .screenshots/ (01-12).",
+  "rca of the issue": "N/A — this iteration verifies fixes. Prior bug (global header covering quiz header) is confirmed FIXED: /app/features/ui/fiezel-student-mode.js and CSS in fiezel-vivid.css correctly set header.topbar { display:none } when body has class fz-lesson-mode, so the .quiz-topbar (z-index 30) is no longer occluded by header.topbar (z-index 100 but display:none)."
+}

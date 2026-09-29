@@ -15,6 +15,8 @@
     'social.offline-pending': ' {count} bukti belajar sudah antre dan terkirim otomatis begitu online.',
     'social.flag-off-title': 'Fitur online belum aktif',
     'social.flag-off-body': 'Bagian ini sedang disiapkan dan belum dinyalakan. Tidak ada yang hilang — semua belajarmu jalan seperti biasa.',
+    'social.segera-body': 'Sebentar lagi kamu bisa belajar bareng teman pakai nama samaran. Sambil menunggu, progresmu tetap tersimpan dan semua latihan terbuka.',
+    'social.segera-cta': 'Lanjut latihan',
     'social.not-loaded-title': 'Fitur online belum termuat',
     'social.not-loaded-body': 'Muat ulang aplikasi saat tersambung internet, lalu coba lagi.',
     'social.degraded-title': 'Jalur online lagi tersendat',

@@ -47,6 +47,24 @@
     }
   }
 
+  /* ---------- 2b. dok CTA mobile: tampil setelah CTA hero lewat, sembunyi di CTA akhir ---------- */
+  var dock = document.querySelector('[data-vv-dock]');
+  var heroCta = document.querySelector('.mast-cta');
+  var finalSec = document.querySelector('.sec-final');
+  if (dock && heroCta && 'IntersectionObserver' in window) {
+    var heroOut = false, finalIn = false;
+    var sync = function () {
+      var on = heroOut && !finalIn;
+      dock.classList.toggle('is-on', on);
+      dock.setAttribute('aria-hidden', on ? 'false' : 'true');
+      var a = dock.querySelector('a');
+      if (a) a.tabIndex = on ? 0 : -1;
+    };
+    new IntersectionObserver(function (en) {
+      heroOut = !en[0].isIntersecting && en[0].boundingClientRect.top < 0; sync();
+    }).observe(heroCta);
+    if (finalSec) new IntersectionObserver(function (en) { finalIn = en[0].isIntersecting || en[0].boundingClientRect.top < 0; sync(); }).observe(finalSec);
+  }
   /* ---------- 3. maskot PAW interaktif: Hawaiian Hula Dance (3s dynamic cycle) ---------- */
   function initHulaPaw() {
     var hulaPaw = document.querySelector('.hula-paw');

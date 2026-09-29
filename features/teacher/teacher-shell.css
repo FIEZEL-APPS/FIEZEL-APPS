@@ -694,3 +694,92 @@ html.fiezel-ui-v6 body.fz-teacher-mode .tg button.tg-seg-btn:not(.primary):not(.
 /* Audit F25: satu lapis navigasi. Di Ruang Guru tab hub disembunyikan; sidebar (desktop) dan
    nav bawah (ponsel) membuka tab hub lewat data-hub-tab. */
 .tg .ch-tabs.is-teacher{display:none}
+
+/* ==========================================================================
+   AUDIT WARNA KelasKu untuk Guru (2026-09-29) — HANYA warna teks & latar, tanpa ubah tata letak.
+   Akar masalah: features/ui/mobile-edge-fit.css memaksa tema gelap murid secara global
+   (:root --bg/--panel/--text !important, html/body #0A0A0E, h1–h6 #fff !important). Di Ruang
+   Guru itu membuat latar utama & kartu .ch-* gelap, judul putih di atas kartu terang (tak
+   terlihat), dan kicker hijau-abu di atas hitam (2,8:1). Arahan owner: latar bersih & cerah.
+   Kontras hasil (WCAG): teks #182220 di #FFFFFF 16,6:1 · muted #4E5C58 di #FFFFFF 6,9:1 ·
+   status amber #8A5A0B di #FBEBCF 5,6:1 · merah #9A2F1E di #F7DDD6 6,3:1 · hijau #145C4B di #DDEFE7 7,1:1.
+   ========================================================================== */
+html:has(body.fz-teacher-mode),html body.fz-teacher-mode{background:#F6F4EE!important;color:#182220!important}
+html body.fz-teacher-mode{
+  --bg:#F6F4EE!important;--text:#182220!important;--ink:#182220!important;--black:#12211F!important;
+  --muted:#4E5C58!important;--muted-soft:#56645F!important;--ambient-text:#182220!important;--ambient-muted:#4E5C58!important;
+  --panel:#FFFFFF!important;--panel-soft:#F4F1EA!important;--surface:#FFFFFF!important;--surface-solid:#FFFFFF!important;
+  --line:#E2DCCE!important;--line-soft:#ECE7DC!important;--line-strong:#CFC7B6!important;
+  --tg-paper:#F6F4EE;--tg-paper-2:#FFFFFF}
+html body.fz-teacher-mode .tg,html body.fz-teacher-mode .tg-main{background:#F6F4EE!important;color:#182220!important}
+html body.fz-teacher-mode .tg-top{background:#FFFFFF!important;border-bottom-color:#E2DCCE!important}
+html body.fz-teacher-mode .tg :is(h1,h2,h3,h5,h6){color:#12211F!important}
+html body.fz-teacher-mode .tg h4,html body.fz-teacher-mode .tg .tg-kicker,html body.fz-teacher-mode .tg .ch-kicker,
+html body.fz-teacher-mode .tg .ch-principle{color:#4E5C58!important}
+html body.fz-teacher-mode .tg :is(p.muted,span.muted,small.muted,.ch-muted){color:#4E5C58!important}
+
+/* kartu .ch-* & input: dulu #14141E (dari --panel gelap) */
+html body.fz-teacher-mode .tg :is(.ch-card,.ch-kpi,.ch-student){background:#FFFFFF!important;color:#182220!important;border-color:#E2DCCE!important}
+html body.fz-teacher-mode .tg :is(.ch-card,.ch-kpi,.ch-student) :is(b,strong,span:not(.ch-status):not(.tg-avatar),small){color:inherit}
+html body.fz-teacher-mode .tg :is(.ch-card,.ch-kpi,.ch-student) small{color:#4E5C58!important}
+html body.fz-teacher-mode .tg :is(select,input,textarea){background:#FFFFFF!important;color:#182220!important;border-color:#CFC7B6!important}
+html body.fz-teacher-mode .tg :is(input,textarea)::placeholder{color:#6B7773!important}
+html body.fz-teacher-mode .tg li:not(.tg-nav-item){color:inherit}
+html body.fz-teacher-mode .tg .ch-bar{background:#ECE7DC!important}
+html body.fz-teacher-mode .tg .ch-sync{color:#4E5C58!important}
+
+/* status: teks dipergelap supaya ≥4,5:1 di atas bidang lembutnya */
+html body.fz-teacher-mode .tg .ch-status{background:#EFEBE2!important;color:#4E5C58!important}
+html body.fz-teacher-mode .tg .ch-status.is-selesai{background:#DDEFE7!important;color:#145C4B!important}
+html body.fz-teacher-mode .tg .ch-status.is-sedang{background:#FBEBCF!important;color:#8A5A0B!important}
+html body.fz-teacher-mode .tg .ch-status.is-terlambat{background:#F7DDD6!important;color:#9A2F1E!important}
+html body.fz-teacher-mode .tg-demo-tag{background:#8A5A0B!important;color:#FFFFFF!important}
+
+/* sidebar: dari hijau-tinta pekat jadi putih bersih, tinta hijau-gelap */
+html body.fz-teacher-mode .tg-side{background:#FFFFFF!important;color:#182220!important;border-right:1px solid #E2DCCE!important}
+html body.fz-teacher-mode .tg-side .kelasku-brand .kelasku-main{color:#1F7A63!important}
+html body.fz-teacher-mode .tg-side .kelasku-brand .kelasku-tag,
+html body.fz-teacher-mode .tg-side .tg-kicker,html body.fz-teacher-mode .tg-class-switch,
+html body.fz-teacher-mode .tg-teacher small,html body.fz-teacher-mode .tg-saved small{color:#4E5C58!important}
+html body.fz-teacher-mode .tg-teacher,html body.fz-teacher-mode .tg-saved{background:#F4F1EA!important;border-color:#E2DCCE!important;color:#182220!important}
+html body.fz-teacher-mode .tg-teacher svg{color:#1F7A63!important}
+html body.fz-teacher-mode .tg-class-switch select{background:#FFFFFF!important;color:#182220!important;border-color:#CFC7B6!important}
+html body.fz-teacher-mode .tg-nav-item{background:transparent!important;color:#2C3B38!important}
+html body.fz-teacher-mode .tg-nav-item:hover{background:#EEF6F2!important;color:#12211F!important}
+html body.fz-teacher-mode .tg-nav-item.is-active{background:#1F7A63!important;color:#FFFFFF!important}
+html body.fz-teacher-mode .tg-exit{background:#FFFFFF!important;color:#2C3B38!important;border-color:#CFC7B6!important}
+html body.fz-teacher-mode .tg-exit:hover{background:#F4F1EA!important;color:#12211F!important}
+
+/* kartu "ink" (sorotan): dari hitam-hijau jadi bidang sage lembut, teks gelap */
+html body.fz-teacher-mode .tg :is(.tg-card-ink,.ch-card-ink){background:#E9F4EF!important;color:#12211F!important;border-color:#BFDCCF!important}
+html body.fz-teacher-mode .tg :is(.tg-card-ink,.ch-card-ink) :is(p,.tg-kicker,.ch-kicker,.ch-muted){color:#2F4A44!important}
+html body.fz-teacher-mode .tg .tg-card-ink h3 span{color:#8A5A0B!important}
+html body.fz-teacher-mode .tg .tg-card-ink .tg-bar{background:#CFE5DB!important}
+html body.fz-teacher-mode .tg .tg-card-ink .tg-bar i{background:#1F7A63!important}
+html body.fz-teacher-mode .tg .tg-plan{background:#FFFFFF!important;color:#182220!important;border:1px solid #BFDCCF}
+html body.fz-teacher-mode .tg .tg-plan svg{color:#8A5A0B!important}
+html body.fz-teacher-mode .tg .tg-count{background:#1F7A63!important;color:#FFFFFF!important}
+html body.fz-teacher-mode .tg .tg-tab.is-active{background:#1F7A63!important;color:#FFFFFF!important}
+/* sisa temuan audit kontras */
+html body.fz-teacher-mode .tg .tg-avatar{background:hsl(var(--h) 38% 32%)!important;color:#FFFFFF!important}
+html body.fz-teacher-mode .tg .tg-pill.is-risiko{color:#9A2F1E!important}
+html body.fz-teacher-mode .tg .tg-pill.is-aman{color:#145C4B!important}
+html body.fz-teacher-mode .tg .tg-btn.is-ghost-light{background:#FFFFFF!important;color:#1F7A63!important;border-color:#1F7A63!important}
+html body.fz-teacher-mode .tg :is(.tg-card-ink,.ch-card-ink) :is(h2,h3,h4) span:not(.tg-pill):not(.tg-count){color:#8A5A0B!important}
+html body.fz-teacher-mode .tg :is(.tg-card-ink,.ch-card-ink) :is(small,em){color:#2F4A44!important}
+html body.fz-teacher-mode .tg :is(.ch-card,.ch-body) p:not([class]){color:#4E5C58!important}
+html body.fz-teacher-mode .tg .ch-mini-list li{background:#F4F1EA!important;color:#182220!important}
+html body.fz-teacher-mode .tg :is(h1,h2,h3,.ch-h2) small{color:#4E5C58!important}
+/* bar navigasi murid gelap ikut tampil di Ruang Guru (aturan display:none di atas kalah oleh
+   mobile-edge-fit). Dikembalikan ke niat asli: tidak tampil. */
+html body.fz-teacher-mode nav.bottomnav.bottomnav{display:none!important}
+/* nav bawah guru (mobile): dari hijau-tinta pekat jadi putih bersih */
+html body.fz-teacher-mode .tg .tg-mnav{background:#FFFFFF!important;border-top:1px solid #E2DCCE!important;box-shadow:0 -8px 24px -18px rgba(18,33,31,.35)!important}
+html body.fz-teacher-mode .tg .tg-mnav button{background:transparent!important;color:#2C3B38!important;border-color:transparent!important;box-shadow:none!important}
+html body.fz-teacher-mode .tg .tg-mnav button :is(span,small,b){color:inherit!important}
+html body.fz-teacher-mode .tg .tg-mnav button:is(.is-active,[aria-current="page"]){background:#1F7A63!important;color:#FFFFFF!important}
+html body.fz-teacher-mode .tg .tg-mnav-more>summary{color:#2C3B38!important}
+html body.fz-teacher-mode .tg .tg-mnav-more:is(.is-active,[open])>summary{background:#E9F4EF!important;color:#12211F!important}
+html body.fz-teacher-mode .tg .tg-mnav-more .tg-mnav-sheet{background:#FFFFFF!important;border:1px solid #E2DCCE!important}
+html body.fz-teacher-mode .tg .tg-mnav-more .tg-mnav-sheet button{color:#182220!important}
+html body.fz-teacher-mode .tg .tg-mnav-more .tg-mnav-sheet button.is-active{background:#1F7A63!important;color:#FFFFFF!important}

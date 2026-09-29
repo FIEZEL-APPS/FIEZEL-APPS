@@ -122,3 +122,35 @@ P1: paritas BKT klien-server, CI backend tests, hapus dead code. P2: refactor N+
   `avg_posterior_pct` di API + konsol guru (saran testing agent, bukan bug).
 - Ops: jalankan workflow di GitHub setelah "Save to GitHub"; pasang `.env` produksi sesuai
   `backend/.env.example` (DB_NAME kini wajib).
+
+---
+## Audit UI/UX 2026-09-29 (sesi Emergent) — m025-384
+Permintaan: audit & tingkatkan UI/UX FIEZEL; peningkatan sedang, identitas dipertahankan, warna lebih eye-catching, mobile + desktop.
+Workspace disinkronkan dari GitHub main terbaru (rsync) sebelum mulai.
+
+### Website landing (website/)
+- `website/vivid.css` (dimuat setelah style.css, id + th): hero sinar solar, judul besar + sorotan, chip kepercayaan, kartu "stiker" berwarna per skill (aksen dari palet PAW), statistik berwarna, ticker solar, FAQ & CTA akhir solar penuh, ritme seksi dipadatkan, reveal lebih cepat.
+- Perbaikan: sub-judul hero terpotong di mobile, lubang grid fitur (KelasKu sendirian), jarak kosong antar seksi.
+- UX: dok CTA melayang di mobile (site.js) setelah hero lewat, sembunyi di CTA akhir.
+
+### PWA (akar)
+- `features/ui/fiezel-vivid.css` (dimuat terakhir, di-precache sw.js): warna per skill pada kartu peluncur & latihan singkat, panah pojok (bukan melayang), kisi seragam, judul sejajar kartu, aurora latar, CTA hero berkilau, hierarki satu CTA utama, bottom nav melayang di desktop.
+- BUG kritis: header global menutupi tombol Keluar + progres kuis (mobile-edge-fit memaksa display:flex) → dipulihkan.
+- Kata target kuis jatuh ke Times (font tak dimuat) → font display besar kuning; opsi was-tried rose, correct teal.
+- Profil kosong total saat fitur online mati → kartu keadaan kosong ramah + CTA "Lanjut latihan" (i18n id+th: social.segera-body/cta).
+- Copy motivasi bernada menakut-nakuti (home.motivasi-2) diganti positif (id+th). Baseline emas id diregenerasi.
+- Build dinaikkan m025-383 → m025-384 via tools/bump-build.mjs.
+
+### Backlog
+- P1: tur coach-mark menutupi kartu Rencana belajar di 390px.
+- P1: pengatur ukuran teks di dalam aplikasi (utang WCAG zoom-lock).
+- P2: chip "Coba Bahasa Jepang" tanpa ikon; toast "Hampir!" menimpa soal.
+
+## Audit warna KelasKu untuk Guru (2026-09-29) — m025-385
+Lingkup: HANYA warna teks & latar (arahan: latar bersih cerah, tanpa redesign).
+- Akar masalah: mobile-edge-fit.css memaksa tema gelap murid global (:root --panel/--text !important, body #0A0A0E, h1–h6 #fff) → bocor ke Ruang Guru.
+- Perbaikan di akhir features/teacher/teacher-shell.css (scope body.fz-teacher-mode): latar #F6F4EE, kartu putih, sidebar & nav bawah mobile putih, kartu "ink" jadi sage lembut, judul tinta gelap, status chip/pill/avatar dipergelap ≥4,5:1, tombol ghost-light terlihat, bottom nav murid disembunyikan (niat asli CSS guru).
+- Hasil audit otomatis: 0 teks < 4,5:1 di 10 tab desktop + mobile (sebelumnya puluhan elemen gelap/tak terbaca).
+
+## Chip Kursus Jepang (2026-09-29) — m025-386
+- Ikon graduation-cap (tidak ada di set fz-i → kosong) diganti lencana あ merah-sakura; saat kursus Jepang aktif jadi lencana A biru (kembali ke Inggris). Kartu berwarna sendiri + panah; data-testid home-target-lang-chip.
