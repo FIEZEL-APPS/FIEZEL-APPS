@@ -70,15 +70,16 @@ def teacher():
     s = requests.Session()
     s.headers.update({"Authorization": f"Bearer {data['access_token']}",
                       "Content-Type": "application/json"})
-    # Ensure demo seed exists
-    s.post(f"{BASE}/api/seed/bootstrap", timeout=60)
+    # Ensure demo seed exists (kelas demo kini milik guru ini; kodenya bisa berbeda dari FZ-DEMO7A)
+    boot = s.post(f"{BASE}/api/seed/bootstrap", timeout=60)
+    s.demo_code = (boot.json().get("class") or {}).get("code") if boot.status_code == 200 else None
     return s
 
 
 @pytest.fixture(scope="module")
 def student(teacher):
     sub = f"sub_murid_{uuid.uuid4().hex[:8]}"
-    data = masuk(sub, "learner", "Murid QA", class_code="FZ-DEMO7A")
+    data = masuk(sub, "learner", "Murid QA", class_code=teacher.demo_code or "FZ-DEMO7A")
     s = requests.Session()
     s.headers.update({"Authorization": f"Bearer {data['access_token']}",
                       "Content-Type": "application/json"})
@@ -239,7 +240,7 @@ class TestAssessmentCoverage:
         cid = None
         if c.status_code == 200:
             for cls in c.json():
-                if cls.get("code") == "FZ-DEMO7A":
+                if cls.get("demo"):
                     cid = cls["id"]; break
         if not cid:
             pytest.skip("no demo class")
@@ -273,7 +274,7 @@ class TestBraincoreAccess:
         other = None
         if c.status_code == 200:
             for cls in c.json():
-                if cls.get("code") == "FZ-DEMO7A":
+                if cls.get("demo"):
                     for sid in cls.get("student_ids", []):
                         if sid != student["user_id"]:
                             other = sid; break

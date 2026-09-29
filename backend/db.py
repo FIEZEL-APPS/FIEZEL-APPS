@@ -2,8 +2,10 @@
 import os
 from motor.motor_asyncio import AsyncIOMotorClient
 
-_mongo_url = os.environ.get("MONGO_URL", "mongodb://localhost:27017")
-_db_name = os.environ.get("DB_NAME", "fiezel")
+# Fail-fast: tanpa MONGO_URL/DB_NAME server mati saat impor, bukan diam-diam menyambung ke
+# localhost dan tampil sebagai "DB kosong" (bootstrap.py & .env.example menyebut keduanya WAJIB).
+_mongo_url = os.environ["MONGO_URL"]
+_db_name = os.environ["DB_NAME"]
 _client = AsyncIOMotorClient(_mongo_url)
 db = _client[_db_name]
 

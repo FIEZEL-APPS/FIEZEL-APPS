@@ -16,6 +16,7 @@ from db import db
 from auth import current_user
 import braincore as bc
 from assessment import ASSESSMENT_TYPES
+from access import assert_student_access, assert_class_teacher, student_targeted
 
 router = APIRouter(prefix="/api/learning", tags=["learning"])
 
@@ -191,7 +192,16 @@ async def offline_batch(body: OfflineBatchIn, u=Depends(current_user)):
 
 @router.get("/events")
 async def list_events(student_id: str | None = None, limit: int = 100, u=Depends(current_user)):
-    sid = student_id if u["role"] in ("teacher", "owner") else u["user_id"]
+    if u["role"] == "student":
+        sid = u["user_id"]
+    else:
+        # Guru WAJIB menyebut murid, dan hanya murid di kelas yang diampunya (dulu: murid siapa pun,
+        # atau tanpa student_id = seluruh event sekolah). Owner tetap boleh tanpa filter.
+        if not student_id and u["role"] != "owner":
+            raise HTTPException(400, "student_id wajib diisi")
+        sid = student_id
+        if sid:
+            await assert_student_access(sid, u)
     q = {"student_id": sid} if sid else {}
     return await db.learning_events.find(q, {"_id": 0}).sort("at", -1).to_list(min(limit, 500))
 
@@ -227,12 +237,12 @@ class StartIn(BaseModel):
 async def build_mission(a: dict, student_id: str) -> dict:
     tps = await db.curriculum_nodes.find({"id": {"$in": a.get("tp_ids") or []}}, {"_id": 0}).to_list(50)
     cfg = ASSESSMENT_TYPES.get(a["assessment_type"], {})
-    states = []
-    for cid in (a.get("competency_ids") or [])[:20]:
-        st = await bc.get_state(student_id, cid)
-        comp = await db.curriculum_nodes.find_one({"id": cid}, {"_id": 0}) or {}
-        states.append({"competency_id": cid, "name": comp.get("name"),
-                       "state": st["state"], "state_label": bc.STATE_LABEL.get(st["state"])})
+    cids = (a.get("competency_ids") or [])[:20]
+    sts = await bc.get_states(student_id, cids)
+    names = await bc.nodes_by_id(cids)
+    states = [{"competency_id": cid, "name": names.get(cid, {}).get("name"),
+               "state": sts[cid]["state"], "state_label": bc.STATE_LABEL.get(sts[cid]["state"])}
+              for cid in cids]
     weakest = min(states, key=lambda s: 0) if states else None
     goal_names = [t["name"] for t in tps] or [s["name"] for s in states[:2]]
     why = {
@@ -257,11 +267,11 @@ async def start_session(body: StartIn, u=Depends(current_user)):
     a = await db.assessments.find_one({"id": body.assessment_id}, {"_id": 0})
     if not a:
         raise HTTPException(404, "asesmen tidak ditemukan")
-    if u["role"] == "student" and u["user_id"] not in (a.get("student_ids") or []):
-        member = a.get("for_whole_class") and a.get("class_id") in (u.get("class_ids") or [])
-        if not member:
+    if u["role"] == "student":
+        if not student_targeted(a, u):
             raise HTTPException(403, "Asesmen ini bukan untukmu")
-        await db.assessments.update_one({"id": a["id"]}, {"$addToSet": {"student_ids": u["user_id"]}})
+        if u["user_id"] not in (a.get("student_ids") or []):
+            await db.assessments.update_one({"id": a["id"]}, {"$addToSet": {"student_ids": u["user_id"]}})
     existing = await db.sessions.find_one({"assessment_id": a["id"], "student_id": u["user_id"],
                                            "state": "active"}, {"_id": 0})
     if existing:
@@ -284,9 +294,9 @@ async def start_session(body: StartIn, u=Depends(current_user)):
            "started_at": now(), "finished_at": None}
     await db.sessions.insert_one(dict(doc))
     doc.pop("_id", None)
+    tp_of = await bc.nodes_by_id(doc["competency_ids"])
     for cid in doc["competency_ids"]:
-        comp = await db.curriculum_nodes.find_one({"id": cid}, {"_id": 0}) or {}
-        await bc.mark_exposure(u["user_id"], cid, comp.get("tp_id"))
+        await bc.mark_exposure(u["user_id"], cid, tp_of.get(cid, {}).get("tp_id"))
     await record_event("lesson_started", u["user_id"],
                        {"session_id": doc["id"], "assessment_id": a["id"],
                         "assessment_type": a["assessment_type"]})
@@ -299,6 +309,8 @@ async def _session(session_id: str, u: dict) -> dict:
         raise HTTPException(404, "sesi tidak ditemukan")
     if u["role"] == "student" and s["student_id"] != u["user_id"]:
         raise HTTPException(403, "Bukan sesimu")
+    if u["role"] == "teacher" and s.get("class_id"):
+        await assert_class_teacher(s["class_id"], u)
     return s
 
 
@@ -592,14 +604,13 @@ async def finish_session(session_id: str, u=Depends(current_user)):
                            {"session_id": session_id, "assessment_id": s["assessment_id"],
                             "score": score, "answered": s["answered_count"]})
         s = await _session(session_id, u)
-    states = []
-    for cid in s["competency_ids"]:
-        st = await bc.get_state(s["student_id"], cid)
-        comp = await db.curriculum_nodes.find_one({"id": cid}, {"_id": 0}) or {}
-        states.append({"competency_id": cid, "name": comp.get("name"), "state": st["state"],
-                       "state_label": bc.STATE_LABEL.get(st["state"]),
-                       "progress_pct": round(st["p_mastery"] * 100),
-                       "retrievability": bc.retrievability(st)})
+    sts = await bc.get_states(s["student_id"], s["competency_ids"])
+    names = await bc.nodes_by_id(s["competency_ids"])
+    states = [{"competency_id": cid, "name": names.get(cid, {}).get("name"), "state": st["state"],
+               "state_label": bc.STATE_LABEL.get(st["state"]),
+               "progress_pct": round(st["p_mastery"] * 100),
+               "retrievability": bc.retrievability(st)}
+              for cid, st in ((c, sts[c]) for c in s["competency_ids"])]
     return {"done": True, "session": s, "summary": {
         "answered": s["answered_count"], "correct": s["correct_count"], "score": s.get("score"),
         "hints": s.get("hint_count"), "retries": s.get("retry_count"),
@@ -673,6 +684,7 @@ async def sync_state(body: StateSyncIn, u=Depends(current_user)):
             if item.tp_id:
                 st["tp_id"] = item.tp_id
             st["state"] = bc.derive_state(st)
+            st.pop("p_mastery_decayed", None)
             await db.learner_competency.update_one(
                 {"student_id": sid, "competency_id": item.competency_id},
                 {"$set": st}, upsert=True

@@ -105,6 +105,29 @@ def test_bkt_decay():
     check("di bawah P_INIT tidak meluruh lagi", bc.bkt_decay(0.20, 30.0) == 0.20)
 
 
+# ---------- C3: paritas RUMUS dengan klien features/brain/fiezel-mastery-bkt.js ----------
+# Konstanta klien (L0=0.20, T=0.15, slip=0.10, guess=0.25; gerbang L>=0.95 & n>=5) SENGAJA
+# berbeda dari server (P_INIT=0.25, P_LEARN=0.18, P_GUESS=0.20; gerbang 0.80 & 3 benar):
+# klien menilai *lesson* luring dengan prior konservatif, server menilai *kompetensi* dengan
+# angka yang disetel dari data (m025-379). Yang WAJIB identik adalah BENTUK rumusnya, dan
+# itulah yang dijaga di sini: bkt_step & bkt_decay dijalankan dengan konstanta klien dan
+# harus menghasilkan angka yang sama dengan bktStep()/calculateDecay() JS (dihitung manual).
+def test_client_parity():
+    L0, T, s, g = 0.20, 0.15, 0.10, 0.25
+    # bktStep(0.5, benar): posterior = 0.45/(0.45+0.125)=0.782608..; +T*(1-post) = 0.815217..
+    check("bkt_step benar == klien bktStep", abs(bc.bkt_step(0.5, True, s, g, T) - 0.8152173913) < 1e-9)
+    # bktStep(0.5, salah): posterior = 0.05/(0.05+0.375)=0.117647..; +T*(1-post) = 0.25
+    check("bkt_step salah == klien bktStep", abs(bc.bkt_step(0.5, False, s, g, T) - 0.25) < 1e-9)
+    # calculateDecay: L0 + (L-L0)*exp(-days*ln2/hl). L=0.9, 30 hari, hl 30 -> L0 + 0.7*0.5 = 0.55
+    import math
+    expect = L0 + (0.9 - L0) * math.exp(-30 * math.log(2) / 30)
+    got = bc.P_INIT + (0.9 - bc.P_INIT) * math.exp(-30 / (30 / math.log(2)))
+    check("bentuk decay server == klien calculateDecay (half-life eksak)", abs((got - bc.P_INIT) / (0.9 - bc.P_INIT) - (expect - L0) / (0.9 - L0)) < 1e-12)
+    check("bkt_decay server konsisten dengan bentuk itu", abs(bc.bkt_decay(0.9, 30.0, 30.0) - round(got, 4)) < 1e-9)
+    check("bkt_update memakai bkt_step (tanpa hint/confidence identik)",
+          abs(bc.bkt_update(0.5, True) - min(0.99, bc.bkt_step(0.5, True))) < 1e-12)
+
+
 # ---------- m025-375 (B6): apply_attempt melangkah dari posterior yang sudah meluruh ----------
 async def test_apply_attempt_decays_first():
     saved = {}
@@ -294,6 +317,7 @@ async def main():
     test_bkt()
     test_irt_3pl()
     test_bkt_decay()
+    test_client_parity()
     test_states()
     await test_apply_attempt_decays_first()
     test_diagnosis()
