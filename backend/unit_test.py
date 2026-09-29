@@ -3,13 +3,51 @@ import asyncio
 import sys
 from datetime import datetime, timezone, timedelta
 
+import os
+_here = os.path.dirname(os.path.abspath(__file__))
+sys.path.insert(0, _here)
 sys.path.insert(0, "/app/backend")
 from dotenv import load_dotenv
+load_dotenv(os.path.join(_here, ".env"))
 load_dotenv("/app/backend/.env")
 
 import braincore as bc
 from questions import parse_paste, validate_doc, stem_hash
 from assessment import check_blueprint, assemble
+import db as db_module
+
+# Mock DB untuk unit test murni tanpa server live
+class _MockCollection:
+    def __init__(self, name=""):
+        self.name = name
+    async def find_one(self, *args, **kwargs):
+        if self.name == "curriculum_nodes":
+            return {"id": "TP-MAT-D-7-BIL-01", "code": "BIL-01", "name": "Bilangan"}
+        return None
+    async def count_documents(self, *args, **kwargs):
+        return 10
+    async def update_one(self, *args, **kwargs):
+        return None
+    def find(self, *args, **kwargs):
+        return self
+    def sort(self, *args, **kwargs):
+        return self
+    async def to_list(self, limit=100):
+        return [{"question_id": f"Q-BIL-{i}", "version": 1, "tp_id": "TP-MAT-D-7-BIL-01",
+                 "competency_id": "COMP-1", "difficulty": 2, "cognitive_level": "C2",
+                 "question_type": "mcq", "is_transfer": False, "status": "PUBLISHED",
+                 "is_current": True} for i in range(10)]
+
+class _MockDB:
+    def __getattr__(self, name):
+        return _MockCollection(name)
+
+db_module.db = _MockDB()
+import questions
+questions.db = db_module.db
+import assessment
+assessment.db = db_module.db
+bc.db = db_module.db
 
 ok, fail = 0, 0
 
@@ -37,6 +75,85 @@ def test_bkt():
     check("benar-tapi-tidak-yakin naik lebih sedikit dari benar-yakin", lucky < sure, (lucky, sure))
     hinted = bc.bkt_update(0.5, True, hints=2)
     check("benar dengan hint = evidence lebih lemah", hinted < sure, (hinted, sure))
+    wrong_plain = bc.bkt_update(0.5, False)
+    wrong_hinted = bc.bkt_update(0.5, False, hints=2)
+    check("salah walau dibantu hint tidak dihukum lebih ringan dari salah tanpa hint",
+          wrong_hinted <= wrong_plain, (wrong_hinted, wrong_plain))
+
+
+# ---------- IRT 3PL & Decay Parity ----------
+def test_irt_3pl():
+    p_equal = bc.success_probability(3.0, 3.0)
+    check("3PL P(theta=b) == 0.625 saat c=0.25", abs(p_equal - 0.625) < 1e-4, p_equal)
+    p_harder = bc.success_probability(2.0, 3.0)
+    p_easier = bc.success_probability(4.0, 3.0)
+    check("kemampuan lebih tinggi menghasilkan P lebih tinggi", p_easier > p_equal > p_harder, (p_harder, p_equal, p_easier))
+
+    # Inversi optimal difficulty
+    b_opt = bc.optimal_difficulty(3.5, target_success=0.80)
+    p_check = bc.success_probability(3.5, b_opt)
+    check("optimal_difficulty menghasilkan P mendekati target 0.80", abs(p_check - 0.80) < 0.02, (b_opt, p_check))
+    check("kemampuan lebih tinggi menargetkan soal lebih sulit", bc.optimal_difficulty(4.5) > bc.optimal_difficulty(2.5))
+
+
+def test_bkt_decay():
+    check("decay 0 hari tidak mengubah posterior", bc.bkt_decay(0.85, 0) == 0.85)
+    d30 = bc.bkt_decay(0.85, 30.0, half_life_days=30.0)
+    check("decay 30 hari meluruh separuh jarak ke P_INIT (0.55)", abs(d30 - 0.55) < 0.01, d30)
+    d90 = bc.bkt_decay(0.85, 90.0, half_life_days=30.0)
+    check("decay 90 hari semakin mendekati P_INIT (0.25)", d90 < d30 and d90 > 0.25, d90)
+    check("di bawah P_INIT tidak meluruh lagi", bc.bkt_decay(0.20, 30.0) == 0.20)
+
+
+# ---------- C3: paritas RUMUS dengan klien features/brain/fiezel-mastery-bkt.js ----------
+# Konstanta klien (L0=0.20, T=0.15, slip=0.10, guess=0.25; gerbang L>=0.95 & n>=5) SENGAJA
+# berbeda dari server (P_INIT=0.25, P_LEARN=0.18, P_GUESS=0.20; gerbang 0.80 & 3 benar):
+# klien menilai *lesson* luring dengan prior konservatif, server menilai *kompetensi* dengan
+# angka yang disetel dari data (m025-379). Yang WAJIB identik adalah BENTUK rumusnya, dan
+# itulah yang dijaga di sini: bkt_step & bkt_decay dijalankan dengan konstanta klien dan
+# harus menghasilkan angka yang sama dengan bktStep()/calculateDecay() JS (dihitung manual).
+def test_client_parity():
+    L0, T, s, g = 0.20, 0.15, 0.10, 0.25
+    # bktStep(0.5, benar): posterior = 0.45/(0.45+0.125)=0.782608..; +T*(1-post) = 0.815217..
+    check("bkt_step benar == klien bktStep", abs(bc.bkt_step(0.5, True, s, g, T) - 0.8152173913) < 1e-9)
+    # bktStep(0.5, salah): posterior = 0.05/(0.05+0.375)=0.117647..; +T*(1-post) = 0.25
+    check("bkt_step salah == klien bktStep", abs(bc.bkt_step(0.5, False, s, g, T) - 0.25) < 1e-9)
+    # calculateDecay: L0 + (L-L0)*exp(-days*ln2/hl). L=0.9, 30 hari, hl 30 -> L0 + 0.7*0.5 = 0.55
+    import math
+    expect = L0 + (0.9 - L0) * math.exp(-30 * math.log(2) / 30)
+    got = bc.P_INIT + (0.9 - bc.P_INIT) * math.exp(-30 / (30 / math.log(2)))
+    check("bentuk decay server == klien calculateDecay (half-life eksak)", abs((got - bc.P_INIT) / (0.9 - bc.P_INIT) - (expect - L0) / (0.9 - L0)) < 1e-12)
+    check("bkt_decay server konsisten dengan bentuk itu", abs(bc.bkt_decay(0.9, 30.0, 30.0) - round(got, 4)) < 1e-9)
+    check("bkt_update memakai bkt_step (tanpa hint/confidence identik)",
+          abs(bc.bkt_update(0.5, True) - min(0.99, bc.bkt_step(0.5, True))) < 1e-12)
+
+
+# ---------- m025-375 (B6): apply_attempt melangkah dari posterior yang sudah meluruh ----------
+async def test_apply_attempt_decays_first():
+    saved = {}
+    class _Col:
+        async def find_one(self, *a, **k):
+            return dict(saved["doc"]) if "doc" in saved else None
+        async def update_one(self, q, upd, upsert=False):
+            saved["written"] = dict(upd.get("$set", {}))
+        async def update_many(self, *a, **k):
+            return None
+    class _DB:
+        learner_competency = _Col()
+        misconception_ledger = _Col()
+    real = bc.db
+    bc.db = _DB()
+    try:
+        long_ago = bc.now() - timedelta(days=90)
+        saved["doc"] = dict(bc.blank_state("s", "c"), attempts=12, correct=11, p_mastery=0.97,
+                            state="MASTERED", last_at=long_ago, mastered_at=long_ago - timedelta(days=5),
+                            stability_days=3.0)
+        res = await bc.apply_attempt({"student_id": "s", "competency_id": "c", "correct": False})
+        p = res["state"]["p_mastery"]
+        check("salah setelah 90 hari melangkah dari posterior yang sudah meluruh", p < 0.5, p)
+        check("p_mastery_decayed tidak ikut tersimpan ke DB", "p_mastery_decayed" not in saved["written"])
+    finally:
+        bc.db = real
 
 
 # ---------- state machine ----------
@@ -55,6 +172,12 @@ def test_states():
     check("retensi terbukti = RETAINED", bc.derive_state(st) == "RETAINED")
     st["transferred_at"] = bc.now()
     check("transfer terbukti = TRANSFERRED", bc.derive_state(st) == "TRANSFERRED")
+    st_drop = dict(st, p_mastery=0.2)
+    check("TRANSFERRED tidak lengket saat posterior jatuh di bawah mastery",
+          bc.derive_state(st_drop) == "PRACTICING", bc.derive_state(st_drop))
+    check("RETAINED tidak lengket saat posterior jatuh di bawah mastery",
+          bc.derive_state(dict(st_drop, transferred_at=None, p_mastery=0.7)) == "DEVELOPING")
+    check("TRANSFERRED kembali saat mastery pulih", bc.derive_state(dict(st_drop, p_mastery=0.9)) == "TRANSFERRED")
     st2 = dict(st, attempts=3, correct=3, p_mastery=0.9, state="MASTERED",
                last_at=bc.now() - timedelta(days=30), stability_days=3.0,
                retained_at=None, transferred_at=None)
@@ -145,13 +268,64 @@ async def test_blueprint():
     check("perakitan tidak duplikat", len(set(asm["question_ids"])) == len(asm["question_ids"]))
 
 
+import learning
+learning.db = db_module.db
+from learning import CompetencySyncIn, StateSyncIn, sync_state
+
+
+# ---------- state sync ----------
+async def test_state_sync():
+    user = {"user_id": "STUDENT-1", "role": "student"}
+    payload = StateSyncIn(
+        theta=3.2,
+        sd=0.45,
+        competencies=[
+            CompetencySyncIn(
+                competency_id="COMP-BIL-01",
+                p_mastery=0.82,
+                attempts=5,
+                correct=4,
+                streak=3,
+                stability_days=3.0
+            )
+        ],
+        misconceptions=[{"competency_id": "COMP-BIL-01", "misconception_id": "MIS-SIGN", "frequency": 1}]
+    )
+    res = await sync_state(payload, u=user)
+    check("sync_state berhasil tersinkron", res["synced"] is True)
+    check("sync_state merekonsiliasi kompetensi klien", res["client_competencies_received"] == 1)
+    check("sync_state mencatat pembaruan server", res["server_updated_count"] >= 1)
+
+
+def test_shuffled_questions_and_options():
+    q = {
+        "question_id": "Q-TEST-1",
+        "version": 1,
+        "question_type": "mcq",
+        "options": ["Aplikasi 1", "Aplikasi 2", "Aplikasi 3", "Aplikasi 4"],
+        "answer_key": "A"
+    }
+    q1 = learning.get_shuffled_question_data("SES-STUDENT-1", q)
+    q2 = learning.get_shuffled_question_data("SES-STUDENT-2", q)
+    
+    check("shuffled options tetap memiliki 4 opsi", len(q1["options"]) == 4)
+    check("kunci jawaban menyesuaikan opsi yang diacak", q1["answer_key"] in ["A", "B", "C", "D"])
+    check("shuffling berbeda antar siswa (anti-cheating)", q1["options"] != q2["options"] or q1["answer_key"] != q2["answer_key"])
+
+
 async def main():
     test_bkt()
+    test_irt_3pl()
+    test_bkt_decay()
+    test_client_parity()
     test_states()
+    await test_apply_attempt_decays_first()
     test_diagnosis()
     test_parser()
     await test_validation()
     await test_blueprint()
+    await test_state_sync()
+    test_shuffled_questions_and_options()
     print(f"\n=== {ok} PASS / {fail} FAIL ===")
     if fail:
         sys.exit(1)

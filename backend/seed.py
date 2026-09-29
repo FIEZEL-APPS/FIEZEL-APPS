@@ -239,9 +239,15 @@ async def seed_questions(actor="seed"):
 
 
 async def seed_demo_class(teacher_id: str):
-    cls = await db.classes.find_one({"code": "FZ-DEMO7A"}, {"_id": 0})
+    """Kelas demo MILIK guru ini. Dulu kelas demo tunggal (kode FZ-DEMO7A) dicari berdasarkan
+    kode lalu teacher_id-nya DITIMPA oleh guru mana pun yang menekan bootstrap belakangan —
+    guru pertama kehilangan kelas (dan seluruh evidence-nya) tanpa satu pun error."""
+    cls = await db.classes.find_one({"demo": True, "teacher_id": teacher_id}, {"_id": 0})
     if cls:
         return cls
+    code = "FZ-DEMO7A"
+    if await db.classes.find_one({"code": code}):
+        code = f"FZ-DEMO{uuid.uuid4().hex[:4].upper()}"
     names = ["Rina", "Dimas", "Sari", "Bagas", "Nadia", "Fikri", "Rizky", "Ayu", "Bayu", "Citra",
              "Dewi", "Eko", "Farel", "Gita", "Hana", "Ilham", "Joko", "Kirana"]
     student_ids = []
@@ -249,7 +255,7 @@ async def seed_demo_class(teacher_id: str):
         uid = f"user_{uuid.uuid4().hex[:12]}"
         await db.users.insert_one({"user_id": uid, "name": n, "role": "student", "provider": "roster", "class_ids": [], "created_at": now()})
         student_ids.append(uid)
-    doc = {"id": f"CLS-{uuid.uuid4().hex[:8].upper()}", "code": "FZ-DEMO7A",
+    doc = {"id": f"CLS-{uuid.uuid4().hex[:8].upper()}", "code": code,
            "name": "Matematika — Kelas 7A (demo)", "grade_id": "KELAS-7", "subject_id": "MAT-7",
            "teacher_id": teacher_id, "student_ids": student_ids, "demo": True, "created_at": now()}
     await db.classes.insert_one(dict(doc))
@@ -324,9 +330,6 @@ async def bootstrap(u=Depends(teacher_user)):
     if existing:
         return {"questions_created": n, "class": existing, "evidence_created": 0}
     cls = await seed_demo_class(u["user_id"])
-    if cls.get("teacher_id") != u["user_id"]:
-        await db.classes.update_one({"id": cls["id"]}, {"$set": {"teacher_id": u["user_id"]}})
-        cls["teacher_id"] = u["user_id"]
     ev = await seed_demo_evidence(cls["id"])
     return {"questions_created": n, "class": cls, "evidence_created": ev}
 
@@ -348,6 +351,11 @@ async def migrate_legacy(body: LegacyIn, u=Depends(teacher_user)):
     for c in (body.teacher_state.get("classes") or []):
         code = (c.get("code") or "").upper() or f"FZ-LEG{uuid.uuid4().hex[:4].upper()}"
         cls = await db.classes.find_one({"code": code}, {"_id": 0})
+        if cls and u["role"] != "owner" and cls.get("teacher_id") != u["user_id"]:
+            # Kode kelas impor bertabrakan dengan kelas guru LAIN: jangan menumpang ke kelas
+            # orang (anti-IDOR tulis) — buat kelas baru dengan kode segar.
+            code = f"FZ-LEG{uuid.uuid4().hex[:4].upper()}"
+            cls = None
         if not cls:
             cls = {"id": f"CLS-{uuid.uuid4().hex[:8].upper()}", "code": code,
                    "name": c.get("name") or "Kelas impor", "grade_id": "KELAS-7", "subject_id": "ENG-7",
@@ -388,6 +396,7 @@ async def migrate_legacy(body: LegacyIn, u=Depends(teacher_user)):
                 st["tp_id"] = comp.get("tp_id")
                 st["last_at"] = now()
                 st["state"] = bc.derive_state(st)
+                st.pop("p_mastery_decayed", None)  # nilai turunan waktu-baca, jangan disimpan
                 await db.learner_competency.update_one(
                     {"student_id": sid, "competency_id": comp["id"]},
                     {"$set": {**st, "migrated_from": "legacy_skill_aggregate"}}, upsert=True)

@@ -129,9 +129,14 @@ async def list_nodes(type: str | None = None, parent_id: str | None = None,
                      grade_id: str | None = None, include_archived: bool = False):
     q: dict[str, Any] = {}
     for k, v in (("type", type), ("parent_id", parent_id), ("tp_id", tp_id),
-                 ("subject_id", subject_id), ("grade_id", grade_id)):
+                 ("grade_id", grade_id)):
         if v:
             q[k] = v
+    if subject_id and subject_id != "ALL":
+        if "-" not in subject_id and subject_id != "SD-ALL":
+            q["subject_id"] = {"$regex": f"^{re.escape(subject_id)}(-.*)?$"}
+        else:
+            q["subject_id"] = subject_id
     if not include_archived:
         q["status"] = "active"
     return await db.curriculum_nodes.find(q, {"_id": 0}).sort([("order", 1), ("code", 1)]).to_list(2000)
@@ -170,10 +175,12 @@ async def tree(curriculum_id: str | None = None, subject_id: str | None = None,
         q["$or"] = [{"id": curriculum_id}, {"curriculum_id": curriculum_id}]
     nodes = await db.curriculum_nodes.find(q, {"_id": 0}).sort([("order", 1), ("code", 1)]).to_list(5000)
     nodes = [n for n in nodes if TYPES.index(n["type"]) <= limit]
-    if subject_id:
+    if subject_id and subject_id != "ALL":
+        prefix = subject_id.split("-")[0] if "-" in subject_id else subject_id
         nodes = [n for n in nodes if n.get("subject_id") == subject_id or n["id"] == subject_id
+                 or (n.get("subject_id") and n.get("subject_id").startswith(prefix + "-"))
                  or TYPES.index(n["type"]) < TYPES.index("subject")]
-    if grade_id:
+    if grade_id and grade_id != "ALL":
         nodes = [n for n in nodes if n.get("grade_id") == grade_id or n["id"] == grade_id
                  or TYPES.index(n["type"]) < TYPES.index("grade")]
     by_parent: dict[str | None, list] = {}
@@ -198,9 +205,12 @@ async def competencies(tp_id: str | None = None, subject_id: str | None = None,
     q: dict[str, Any] = {"type": "competency", "status": "active"}
     if tp_id:
         q["tp_id"] = tp_id
-    if subject_id:
-        q["subject_id"] = subject_id
-    if grade_id:
+    if subject_id and subject_id != "ALL":
+        if "-" not in subject_id and subject_id != "SD-ALL":
+            q["subject_id"] = {"$regex": f"^{re.escape(subject_id)}(-.*)?$"}
+        else:
+            q["subject_id"] = subject_id
+    if grade_id and grade_id != "ALL":
         q["grade_id"] = grade_id
     return await db.curriculum_nodes.find(q, {"_id": 0}).sort("code", 1).to_list(2000)
 

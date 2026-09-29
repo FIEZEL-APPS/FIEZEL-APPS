@@ -16,12 +16,42 @@ MASTERY_T, DEVELOPING_T = 0.80, 0.60
 MIN_CORRECT_FOR_MASTERY = 3
 RETENTION_DAYS = 3
 
+# --- parameter IRT 3PL & Psikometri (paritas kanonik dengan client brain v3) ---
+DISCRIMINATION = 1.5
+GUESS_FLOOR = 0.25
+TARGET_SUCCESS = 0.80
+BKT_HALF_LIFE_DAYS = 30.0
+
 STATES = ["NOT_EXPOSED", "EXPOSED", "PRACTICING", "DEVELOPING", "MASTERED", "RETAINED", "TRANSFERRED"]
 STATE_LABEL = {
     "NOT_EXPOSED": "Belum dipelajari", "EXPOSED": "Baru dikenalkan", "PRACTICING": "Perlu latihan",
     "DEVELOPING": "Sedang berkembang", "MASTERED": "Sudah dikuasai", "RETAINED": "Dikuasai & bertahan",
     "TRANSFERRED": "Bisa diterapkan di situasi baru",
 }
+
+
+def success_probability(ability: float, difficulty: float, discrimination: float = DISCRIMINATION) -> float:
+    """Model IRT 3PL: P = c + (1 - c) / (1 + exp(-a * (theta - b)))."""
+    a = float(discrimination or DISCRIMINATION)
+    latent = 1.0 / (1.0 + math.exp(-a * (float(ability) - float(difficulty))))
+    return GUESS_FLOOR + (1.0 - GUESS_FLOOR) * latent
+
+
+def optimal_difficulty(ability: float, target_success: float = TARGET_SUCCESS, discrimination: float = DISCRIMINATION) -> float:
+    """Inversi model 3PL: b = theta - logit((p - c) / (1 - c)) / a."""
+    p = max(GUESS_FLOOR + 0.05, min(0.97, float(target_success or TARGET_SUCCESS)))
+    a = float(discrimination or DISCRIMINATION)
+    latent = max(0.01, min(0.99, (p - GUESS_FLOOR) / (1.0 - GUESS_FLOOR)))
+    return round(float(ability) - math.log(latent / (1.0 - latent)) / a, 3)
+
+
+def bkt_decay(p: float, elapsed_days: float, half_life_days: float = BKT_HALF_LIFE_DAYS) -> float:
+    """Model lupa eksponensial BKT-FSRS: L(t) = L_0 + (L_last - L_0) * exp(-dt / tau)."""
+    if elapsed_days <= 0 or p <= P_INIT:
+        return p
+    tau = max(1.0, float(half_life_days)) / math.log(2.0)
+    decayed = P_INIT + (p - P_INIT) * math.exp(-float(elapsed_days) / tau)
+    return round(max(0.01, min(0.99, decayed)), 4)
 
 
 def now():
@@ -45,19 +75,40 @@ def blank_state(student_id: str, competency_id: str) -> dict:
 async def get_state(student_id: str, competency_id: str) -> dict:
     doc = await db.learner_competency.find_one(
         {"student_id": student_id, "competency_id": competency_id}, {"_id": 0})
-    return doc or blank_state(student_id, competency_id)
+    st = doc or blank_state(student_id, competency_id)
+    last = aware(st.get("last_at"))
+    if last:
+        elapsed = max(0.0, (now() - last).total_seconds() / 86400)
+        st["p_mastery_decayed"] = bkt_decay(st["p_mastery"], elapsed)
+    else:
+        st["p_mastery_decayed"] = st["p_mastery"]
+    return st
 
 
-def bkt_update(p: float, correct: bool, hints: int = 0, confidence: float | None = None) -> float:
-    """Posterior BKT + koreksi kecil dari perilaku (hint & confidence adalah evidence tambahan)."""
-    slip, guess = P_SLIP, P_GUESS
-    if hints:
-        slip = min(0.35, P_SLIP + 0.08 * hints)   # benar setelah hint = bukti lebih lemah
-    if confidence is not None:
-        if correct and confidence <= 0.34:
-            guess = min(0.45, guess + 0.15)       # benar tapi tidak yakin -> mungkin menebak
-        if not correct and confidence >= 0.9:
-            slip = max(0.04, slip - 0.05)         # salah tapi sangat yakin -> miskonsepsi, bukan lalai
+async def get_states(student_id: str, competency_ids: list[str]) -> dict[str, dict]:
+    """Ambil banyak state dalam SATU query $in (hindari N+1 get_state per kompetensi)."""
+    cids = list(competency_ids)
+    docs = await db.learner_competency.find(
+        {"student_id": student_id, "competency_id": {"$in": cids}}, {"_id": 0}).to_list(len(cids) or 1)
+    by_cid = {d["competency_id"]: d for d in docs}
+    out: dict[str, dict] = {}
+    for cid in cids:
+        st = by_cid.get(cid) or blank_state(student_id, cid)
+        last = aware(st.get("last_at"))
+        if last:
+            elapsed = max(0.0, (now() - last).total_seconds() / 86400)
+            st["p_mastery_decayed"] = bkt_decay(st["p_mastery"], elapsed)
+        else:
+            st["p_mastery_decayed"] = st["p_mastery"]
+        out[cid] = st
+    return out
+
+
+def bkt_step(p: float, correct: bool, slip: float = P_SLIP, guess: float = P_GUESS,
+             learn: float = P_LEARN) -> float:
+    """Langkah BKT klasik (posterior Bayes lalu transisi belajar) — bentuk yang SAMA dengan
+    FiezelMasteryBKT.bktStep() di klien; konstanta sengaja parameter supaya gerbang paritas
+    bisa menjalankan kedua sisi atas angka yang sama (lihat unit_test.py::test_client_parity)."""
     if correct:
         num = p * (1 - slip)
         den = num + (1 - p) * guess
@@ -65,7 +116,24 @@ def bkt_update(p: float, correct: bool, hints: int = 0, confidence: float | None
         num = p * slip
         den = num + (1 - p) * (1 - guess)
     post = num / den if den else p
-    return max(0.01, min(0.99, post + (1 - post) * P_LEARN))
+    return post + (1 - post) * learn
+
+
+def bkt_update(p: float, correct: bool, hints: int = 0, confidence: float | None = None) -> float:
+    """Posterior BKT + koreksi kecil dari perilaku (hint & confidence adalah evidence tambahan)."""
+    slip, guess = P_SLIP, P_GUESS
+    # Hint hanya MELEMAHKAN bukti jawaban BENAR. Menaikkan slip pada jawaban SALAH justru
+    # membuat "salah walau sudah dibantu" terbaca sebagai kelalaian, sehingga posterior turun
+    # LEBIH SEDIKIT daripada salah tanpa bantuan (p=0.5, 2 hint: 0.38 vs 0.27) - arah yang
+    # terbalik: gagal meski sudah diberi petunjuk adalah bukti belum-menguasai yang lebih kuat.
+    if hints and correct:
+        slip = min(0.35, P_SLIP + 0.08 * hints)   # benar setelah hint = bukti lebih lemah
+    if confidence is not None:
+        if correct and confidence <= 0.34:
+            guess = min(0.45, guess + 0.15)       # benar tapi tidak yakin -> mungkin menebak
+        if not correct and confidence >= 0.9:
+            slip = max(0.04, slip - 0.05)         # salah tapi sangat yakin -> miskonsepsi, bukan lalai
+    return max(0.01, min(0.99, bkt_step(p, correct, slip, guess, P_LEARN)))
 
 
 def retrievability(st: dict) -> float | None:
@@ -79,11 +147,17 @@ def retrievability(st: dict) -> float | None:
 def derive_state(st: dict) -> str:
     if st["attempts"] == 0:
         return "NOT_EXPOSED" if st["exposures"] == 0 else "EXPOSED"
-    if st.get("transferred_at"):
+    # RETAINED dan TRANSFERRED adalah tingkat DI ATAS mastery, bukan medali permanen. Dulu
+    # keduanya dicek lebih dulu tanpa syarat, dan transferred_at tidak pernah dihapus: murid
+    # yang sekali lolos soal transfer tetap berlabel "Bisa diterapkan di situasi baru" walau
+    # posteriornya jatuh ke 0.2, lalu masuk kelompok pengayaan dan rekomendasi guru.
+    # Stempel waktunya tetap disimpan sebagai riwayat; labelnya kembali begitu mastery pulih.
+    still_mastered = st["p_mastery"] >= MASTERY_T and st["correct"] >= MIN_CORRECT_FOR_MASTERY
+    if st.get("transferred_at") and still_mastered:
         return "TRANSFERRED"
-    if st.get("retained_at"):
+    if st.get("retained_at") and still_mastered:
         return "RETAINED"
-    if st["p_mastery"] >= MASTERY_T and st["correct"] >= MIN_CORRECT_FOR_MASTERY:
+    if still_mastered:
         return "MASTERED"
     if st["p_mastery"] >= DEVELOPING_T:
         return "DEVELOPING"
@@ -135,7 +209,12 @@ async def apply_attempt(attempt: dict) -> dict:
         st["streak"] += 1
     else:
         st["streak"] = 0
-    st["p_mastery"] = round(bkt_update(st["p_mastery"], correct, attempt.get("hints_used", 0), conf), 4)
+    # m025-375 (audit braincore B6): lupa DULU, baru melangkah. p_mastery_decayed dihitung
+    # get_state() tetapi dulu tidak dipakai - posterior melangkah dari nilai lama, jadi jeda
+    # panjang tidak pernah tercatat dan satu jawaban salah bisa "memulihkan" mastery yang sudah
+    # luntur. Sama persis dengan FiezelMasteryBKT.update() di klien.
+    start = st.get("p_mastery_decayed", st["p_mastery"])
+    st["p_mastery"] = round(bkt_update(start, correct, attempt.get("hints_used", 0), conf), 4)
     st["tp_id"] = attempt.get("tp_id") or st.get("tp_id")
 
     prev_mastered = aware(st.get("mastered_at"))
@@ -158,6 +237,8 @@ async def apply_attempt(attempt: dict) -> dict:
         st["transferred_at"] = st.get("transferred_at") or now()
     st["last_at"] = now()
     st["state"] = derive_state(st)
+    # Nilai turunan waktu-baca: tidak disimpan, supaya DB tidak memegang angka basi.
+    st.pop("p_mastery_decayed", None)
     await db.learner_competency.update_one({"student_id": sid, "competency_id": cid},
                                            {"$set": st}, upsert=True)
 
@@ -182,31 +263,46 @@ async def mark_exposure(student_id: str, competency_id: str, tp_id: str | None =
         st["exposures"] += 1
         st["state"] = derive_state(st)
         st["tp_id"] = tp_id or st.get("tp_id")
+        st.pop("p_mastery_decayed", None)
         await db.learner_competency.update_one({"student_id": student_id, "competency_id": competency_id},
                                                 {"$set": st}, upsert=True)
 
 
 # ------------------- pemilihan item adaptif -------------------
+# Batas pool eksplisit. Dulu to_list(500) SENYAP: kompetensi dengan >500 soal terbit akan
+# kehilangan soal ke-501 dst tanpa jejak. Kini batasnya konstanta bernama, jauh di atas
+# ukuran bank per kompetensi, dan _pool menandai bila tercapai supaya terlihat di log.
+POOL_CAP = 2000
+
+
 async def _pool(competency_ids: list[str], transfer: bool | None = None) -> list[dict]:
     q: dict[str, Any] = {"competency_id": {"$in": competency_ids}, "is_current": True, "status": "PUBLISHED"}
     if transfer is not None:
         q["is_transfer"] = transfer
-    return await db.questions.find(q, {"_id": 0}).to_list(500)
+    pool = await db.questions.find(q, {"_id": 0}).to_list(POOL_CAP)
+    if len(pool) >= POOL_CAP:
+        print(f"[braincore] pool {competency_ids} mencapai POOL_CAP={POOL_CAP}; sebagian soal tidak dipertimbangkan")
+    return pool
 
 
 async def next_best_item(student_id: str, competency_ids: list[str], served_ids: list[str],
                          allow_prerequisite: bool = True) -> dict | None:
     """Guru menentukan GOAL (kompetensi), Braincore menentukan PATH (item & urutan)."""
-    states = {cid: await get_state(student_id, cid) for cid in competency_ids}
-    target = sorted(competency_ids, key=lambda c: (states[c]["p_mastery"], states[c]["attempts"]))[0]
+    states = await get_states(student_id, competency_ids)
+    # m025-375 (B6): pilih dan tangga-kan dari penguasaan HARI INI (sudah meluruh), bukan dari
+    # angka terakhir yang tercatat - kompetensi yang lama tidak disentuh memang lebih lemah.
+    cur = {cid: states[cid].get("p_mastery_decayed", states[cid]["p_mastery"]) for cid in competency_ids}
+    target = sorted(competency_ids, key=lambda c: (cur[c], states[c]["attempts"]))[0]
     st = states[target]
 
     # 1) prasyarat lemah -> turun ke prasyarat lebih dulu
-    if allow_prerequisite and st["p_mastery"] < 0.5:
+    if allow_prerequisite and cur[target] < 0.5:
         comp = await db.curriculum_nodes.find_one({"id": target}, {"_id": 0}) or {}
-        for pid in ((comp.get("meta") or {}).get("prerequisite_competency_ids") or []):
-            pst = await get_state(student_id, pid)
-            if pst["p_mastery"] < 0.6:
+        prereq_ids = list((comp.get("meta") or {}).get("prerequisite_competency_ids") or [])
+        pstates = await get_states(student_id, prereq_ids) if prereq_ids else {}
+        for pid in prereq_ids:
+            pst = pstates[pid]
+            if pst.get("p_mastery_decayed", pst["p_mastery"]) < 0.6:
                 pool = [q for q in await _pool([pid], transfer=False) if q["question_id"] not in served_ids]
                 if pool:
                     pool.sort(key=lambda q: q["difficulty"])
@@ -215,7 +311,7 @@ async def next_best_item(student_id: str, competency_ids: list[str], served_ids:
                             "reason": f"Sebelum lanjut, kita kuatkan dulu dasarnya: {pnode.get('name', 'kompetensi prasyarat')}. Kalau bagian ini kokoh, sisanya jauh lebih mudah.",
                             "competency_id": pid, "phase": "warm-up"}
 
-    p = st["p_mastery"]
+    p = cur[target]
     # 2) sudah kuat -> uji transfer
     if p >= MASTERY_T and st["correct"] >= MIN_CORRECT_FOR_MASTERY:
         pool = [q for q in await _pool([target], transfer=True) if q["question_id"] not in served_ids]
@@ -225,17 +321,18 @@ async def next_best_item(student_id: str, competency_ids: list[str], served_ids:
                     "reason": "Kamu sudah cukup kuat di konsep dasarnya. Sekarang kita coba situasi yang sedikit berbeda untuk memastikan kamu benar-benar bisa memakainya.",
                     "competency_id": target, "phase": "transfer"}
 
-    # 3) tangga kesulitan sesuai posterior
-    want = 1 if p < 0.35 else 2 if p < 0.55 else 3 if p < 0.72 else 4
+    # 3) pencocokan kesulitan kontinu IRT 3PL desirable difficulty (target success ~0.80)
+    theta = 1.0 + 4.0 * max(0.0, min(1.0, p))
+    target_difficulty = optimal_difficulty(theta, target_success=TARGET_SUCCESS)
     pool = [q for q in await _pool([target], transfer=False) if q["question_id"] not in served_ids]
     if not pool:
         pool = [q for q in await _pool([target]) if q["question_id"] not in served_ids]
     if not pool:
         return None
-    pool.sort(key=lambda q: (abs(q["difficulty"] - want), q["difficulty"]))
+    pool.sort(key=lambda q: (abs(q["difficulty"] - target_difficulty), q["difficulty"]))
     chosen = pool[0]
     if p < 0.35:
-        reason = "Kita mulai dari soal yang lebih ringan supaya kamu dapat pijakan yang jelas."
+        reason = "Kita mulai dari soal yang pas untuk membangun pijakan — cukup menantang supaya kamu belajar, tapi masih sangat bisa kamu kerjakan."
     elif p < 0.72:
         reason = "Jawabanmu tadi menunjukkan bagian ini masih perlu diperkuat, jadi kita latihan satu lagi di tingkat yang sama."
     else:
@@ -266,17 +363,96 @@ async def remediation_item(student_id: str, competency_id: str, served_ids: list
 
 
 # ------------------- agregat kelas & rekomendasi guru -------------------
+# Semua fungsi di bagian ini dulu N+1: satu query per TP, per murid, atau per kompetensi
+# (coverage 18 murid x 12 TP = ratusan round-trip Mongo per klik guru). Kini tiap fungsi
+# menarik data dalam hitungan query TETAP ($in / batch) lalu mengelompokkan di memori.
+MASTERED_STATES = ("MASTERED", "RETAINED", "TRANSFERRED")
+
+
 async def class_students(class_id: str) -> list[dict]:
     cls = await db.classes.find_one({"id": class_id}, {"_id": 0})
     if not cls:
         return []
     ids = cls.get("student_ids") or []
-    return await db.users.find({"user_id": {"$in": ids}}, {"_id": 0}).to_list(500)
+    return await db.users.find({"user_id": {"$in": ids}}, {"_id": 0}).to_list(len(ids) or 1)
+
+
+async def nodes_by_id(ids: list[str]) -> dict[str, dict]:
+    ids = sorted({i for i in ids if i})
+    if not ids:
+        return {}
+    rows = await db.curriculum_nodes.find({"id": {"$in": ids}}, {"_id": 0}).to_list(len(ids))
+    return {r["id"]: r for r in rows}
+
+
+async def _competencies_by_tp(tp_ids: list[str], active_only: bool = True) -> dict[str, list[dict]]:
+    q: dict[str, Any] = {"type": "competency", "tp_id": {"$in": tp_ids}}
+    if active_only:
+        q["status"] = "active"
+    comps = await db.curriculum_nodes.find(q, {"_id": 0}).to_list(max(1, len(tp_ids)) * 200)
+    out: dict[str, list[dict]] = {t: [] for t in tp_ids}
+    for c in comps:
+        out.setdefault(c["tp_id"], []).append(c)
+    return out
+
+
+async def _class_records(sids: list[str], comp_ids: list[str]) -> dict[str, list[dict]]:
+    """learner_competency untuk seluruh murid x kompetensi dalam SATU query, dikelompokkan per murid."""
+    if not sids or not comp_ids:
+        return {}
+    recs = await db.learner_competency.find(
+        {"student_id": {"$in": sids}, "competency_id": {"$in": comp_ids}},
+        {"_id": 0}).to_list(len(sids) * len(comp_ids))
+    by_student: dict[str, list[dict]] = {}
+    for r in recs:
+        by_student.setdefault(r["student_id"], []).append(r)
+    return by_student
+
+
+def _coverage_row(tp: dict, comp_ids: list[str], sids: list[str], by_student: dict[str, list[dict]],
+                  n_pub: int, n_draft: int) -> dict:
+    cset = set(comp_ids)
+    rows_of = {s: [x for x in by_student.get(s, []) if x["competency_id"] in cset] for s in sids}
+    exposed = sum(1 for s in sids if any(x["attempts"] > 0 or x["exposures"] > 0 for x in rows_of[s]))
+    mastered = sum(1 for s in sids if rows_of[s] and all(
+        next((x for x in rows_of[s] if x["competency_id"] == c), {}).get("state") in MASTERED_STATES
+        for c in comp_ids))
+    developing = sum(1 for s in sids if any(x["state"] == "DEVELOPING" for x in rows_of[s]))
+    needs = sum(1 for s in sids if any(
+        x["state"] in ("PRACTICING", "EXPOSED") and x["p_mastery"] < DEVELOPING_T for x in rows_of[s]))
+    avg = [sum(x["p_mastery"] for x in rows_of[s]) / len(comp_ids) for s in sids if rows_of[s] and comp_ids]
+    mastery_pct = round(100 * (sum(avg) / len(avg)), 0) if avg else None
+    if n_pub == 0 and n_draft == 0:
+        status, note = "MISSING", "Belum ada soal untuk TP ini."
+    elif exposed == 0:
+        status, note = "NOT_TAUGHT", "Belum ada evidence pembelajaran untuk TP ini."
+    elif mastery_pct is not None and mastery_pct < 60:
+        status = "GAP"
+        # B7 fix: laporkan PROPORSI MURID nyata (bukan 100 − rerata posterior). "mastered"
+        # menghitung murid yang menguasai SELURUH kompetensi TP; not_mastered adalah murid
+        # yang sudah punya evidence tetapi belum tuntas.
+        not_mastered = max(0, exposed - mastered)
+        pct_students = round(100 * not_mastered / exposed) if exposed else 0
+        note = (f"TP sudah dipelajari, tetapi {pct_students}% murid "
+                f"({not_mastered} dari {exposed} yang aktif) belum mencapai mastery.")
+    elif mastery_pct is not None and mastery_pct < 80:
+        status, note = "DEVELOPING", "Sebagian murid masih berkembang."
+    else:
+        status, note = "GOOD", "Cakupan dan penguasaan sehat."
+    return {"tp_id": tp["id"], "tp_code": tp["code"], "tp_name": tp["name"],
+            "cp_id": tp.get("cp_id"), "competency_count": len(comp_ids),
+            "questions_published": n_pub, "questions_pending": n_draft,
+            "students_total": len(sids), "students_exposed": exposed,
+            "students_mastered": mastered, "students_developing": developing,
+            "students_needs_help": needs, "mastery_pct": mastery_pct,
+            "status": status, "note": note}
 
 
 async def coverage_matrix(class_id: str, subject_id: str | None = None,
                           grade_id: str | None = None) -> dict:
-    """Peta cakupan kurikulum: TP x (soal, exposure, mastery, gap) — bedakan belum diajarkan vs belum dikuasai."""
+    """Peta cakupan kurikulum: TP x (soal, exposure, mastery, gap) — bedakan belum diajarkan vs belum dikuasai.
+
+    Jumlah query TETAP (5) berapa pun banyaknya TP/murid; dulu 4 query per TP."""
     cls = await db.classes.find_one({"id": class_id}, {"_id": 0}) or {}
     subject_id = subject_id or cls.get("subject_id")
     grade_id = grade_id or cls.get("grade_id")
@@ -286,75 +462,38 @@ async def coverage_matrix(class_id: str, subject_id: str | None = None,
     if grade_id:
         q["grade_id"] = grade_id
     tps = await db.curriculum_nodes.find(q, {"_id": 0}).sort("code", 1).to_list(500)
+    tp_ids = [t["id"] for t in tps]
     students = await class_students(class_id)
     sids = [s["user_id"] for s in students]
-    rows = []
-    for tp in tps:
-        comps = await db.curriculum_nodes.find({"type": "competency", "tp_id": tp["id"], "status": "active"},
-                                                {"_id": 0, "id": 1, "name": 1}).to_list(200)
-        comp_ids = [c["id"] for c in comps]
-        n_pub = await db.questions.count_documents({"tp_id": tp["id"], "is_current": True, "status": "PUBLISHED"})
-        n_draft = await db.questions.count_documents({"tp_id": tp["id"], "is_current": True,
-                                                       "status": {"$in": ["DRAFT", "REVIEW", "APPROVED"]}})
-        recs = await db.learner_competency.find({"student_id": {"$in": sids},
-                                                 "competency_id": {"$in": comp_ids}}, {"_id": 0}).to_list(5000)
-        by_student: dict[str, list] = {}
-        for r in recs:
-            by_student.setdefault(r["student_id"], []).append(r)
-        exposed = sum(1 for s in sids if any(x["attempts"] > 0 or x["exposures"] > 0
-                                             for x in by_student.get(s, [])))
-        def agg(sid):
-            xs = by_student.get(sid, [])
-            if not xs or not comp_ids:
-                return None
-            return sum(x["p_mastery"] for x in xs) / len(comp_ids)
-        mastered = sum(1 for s in sids if all(
-            (next((x for x in by_student.get(s, []) if x["competency_id"] == c), {}).get("state")
-             in ("MASTERED", "RETAINED", "TRANSFERRED")) for c in comp_ids) and by_student.get(s))
-        developing = sum(1 for s in sids if by_student.get(s) and any(
-            x["state"] in ("DEVELOPING",) for x in by_student.get(s, [])) and s not in [])
-        needs = sum(1 for s in sids if by_student.get(s) and any(
-            x["state"] in ("PRACTICING", "EXPOSED") and x["p_mastery"] < DEVELOPING_T
-            for x in by_student.get(s, [])))
-        avg = [agg(s) for s in sids]
-        avg = [a for a in avg if a is not None]
-        mastery_pct = round(100 * (sum(avg) / len(avg)), 0) if avg else None
-        if n_pub == 0 and n_draft == 0:
-            status, note = "MISSING", "Belum ada soal untuk TP ini."
-        elif exposed == 0:
-            status, note = "NOT_TAUGHT", "Belum ada evidence pembelajaran untuk TP ini."
-        elif mastery_pct is not None and mastery_pct < 60:
-            status = "GAP"
-            note = f"TP sudah dipelajari, tetapi {100 - int(mastery_pct)}% murid belum mencapai mastery."
-        elif mastery_pct is not None and mastery_pct < 80:
-            status, note = "DEVELOPING", "Sebagian murid masih berkembang."
-        else:
-            status, note = "GOOD", "Cakupan dan penguasaan sehat."
-        rows.append({"tp_id": tp["id"], "tp_code": tp["code"], "tp_name": tp["name"],
-                     "cp_id": tp.get("cp_id"), "competency_count": len(comp_ids),
-                     "questions_published": n_pub, "questions_pending": n_draft,
-                     "students_total": len(sids), "students_exposed": exposed,
-                     "students_mastered": mastered, "students_developing": developing,
-                     "students_needs_help": needs, "mastery_pct": mastery_pct,
-                     "status": status, "note": note})
+    comps_by_tp = await _competencies_by_tp(tp_ids)
+    all_comp_ids = [c["id"] for cs in comps_by_tp.values() for c in cs]
+    by_student = await _class_records(sids, all_comp_ids)
+    qrows = await db.questions.find({"tp_id": {"$in": tp_ids}, "is_current": True,
+                                     "status": {"$in": ["PUBLISHED", "DRAFT", "REVIEW", "APPROVED"]}},
+                                    {"_id": 0, "tp_id": 1, "status": 1}).to_list(POOL_CAP * 10)
+    n_pub: dict[str, int] = {}
+    n_draft: dict[str, int] = {}
+    for r in qrows:
+        bucket = n_pub if r.get("status") == "PUBLISHED" else n_draft
+        bucket[r["tp_id"]] = bucket.get(r["tp_id"], 0) + 1
+    rows = [_coverage_row(tp, [c["id"] for c in comps_by_tp.get(tp["id"], [])], sids, by_student,
+                          n_pub.get(tp["id"], 0), n_draft.get(tp["id"], 0)) for tp in tps]
     return {"class_id": class_id, "subject_id": subject_id, "grade_id": grade_id, "rows": rows}
 
 
-async def student_tp_summary(class_id: str, tp_id: str) -> dict:
-    comps = await db.curriculum_nodes.find({"type": "competency", "tp_id": tp_id}, {"_id": 0}).to_list(200)
-    comp_ids = [c["id"] for c in comps]
-    students = await class_students(class_id)
+def _tp_summary_from(tp_id: str, comps: list[dict], students: list[dict],
+                     by_student: dict[str, list[dict]]) -> dict:
+    comp_ids = {c["id"] for c in comps}
     out = {"mastered": [], "developing": [], "needs_remediation": [], "not_started": [],
            "ready_enrichment": [], "tp_id": tp_id, "competencies": comps}
     for s in students:
-        recs = await db.learner_competency.find({"student_id": s["user_id"],
-                                                 "competency_id": {"$in": comp_ids}}, {"_id": 0}).to_list(200)
+        recs = [r for r in by_student.get(s["user_id"], []) if r["competency_id"] in comp_ids]
         item = {"student_id": s["user_id"], "name": s.get("name"),
                 "p": round(sum(r["p_mastery"] for r in recs) / len(recs), 3) if recs else None,
                 "states": {r["competency_id"]: r["state"] for r in recs}}
         if not recs or all(r["attempts"] == 0 for r in recs):
             out["not_started"].append(item)
-        elif all(r["state"] in ("MASTERED", "RETAINED", "TRANSFERRED") for r in recs):
+        elif all(r["state"] in MASTERED_STATES for r in recs):
             (out["ready_enrichment"] if any(r["state"] in ("RETAINED", "TRANSFERRED") for r in recs)
              else out["mastered"]).append(item)
         elif item["p"] is not None and item["p"] < DEVELOPING_T:
@@ -362,6 +501,19 @@ async def student_tp_summary(class_id: str, tp_id: str) -> dict:
         else:
             out["developing"].append(item)
     return out
+
+
+async def student_tp_summaries(class_id: str, tp_ids: list[str]) -> dict[str, dict]:
+    """Ringkasan per-murid untuk BANYAK TP sekaligus: 3 query, bukan (1 + murid) per TP."""
+    students = await class_students(class_id)
+    comps_by_tp = await _competencies_by_tp(tp_ids, active_only=False)
+    all_comp_ids = [c["id"] for cs in comps_by_tp.values() for c in cs]
+    by_student = await _class_records([s["user_id"] for s in students], all_comp_ids)
+    return {t: _tp_summary_from(t, comps_by_tp.get(t, []), students, by_student) for t in tp_ids}
+
+
+async def student_tp_summary(class_id: str, tp_id: str) -> dict:
+    return (await student_tp_summaries(class_id, [tp_id]))[tp_id]
 
 
 async def class_misconceptions(class_id: str, tp_id: str | None = None) -> list[dict]:
@@ -383,9 +535,9 @@ async def class_misconceptions(class_id: str, tp_id: str | None = None) -> list[
         if r.get("last_at") and (not a["last_at"] or aware(r["last_at"]) > aware(a["last_at"])):
             a["last_at"] = r["last_at"]
     out = list(agg.values())
+    nodes = await nodes_by_id([a["competency_id"] for a in out])
     for a in out:
-        comp = await db.curriculum_nodes.find_one({"id": a["competency_id"]}, {"_id": 0})
-        a["competency_name"] = (comp or {}).get("name")
+        a["competency_name"] = nodes.get(a["competency_id"], {}).get("name")
         a["student_count"] = len(a["students"])
         a["headline"] = f"{len(a['students'])} dari {len(sids)} murid masih keliru pada {a['misconception_id']}"
     out.sort(key=lambda x: -x["student_count"])
@@ -394,17 +546,18 @@ async def class_misconceptions(class_id: str, tp_id: str | None = None) -> list[
 
 async def due_reviews(student_id: str) -> list[dict]:
     rows = await db.learner_competency.find({"student_id": student_id,
-                                             "state": {"$in": ["MASTERED", "RETAINED", "TRANSFERRED"]}},
+                                             "state": {"$in": list(MASTERED_STATES)}},
                                             {"_id": 0}).to_list(1000)
-    out = []
+    due_rows = []
     for r in rows:
         due = aware(r.get("due_at"))
         rt = retrievability(r)
         if (due and due <= now()) or (rt is not None and rt < 0.85):
-            comp = await db.curriculum_nodes.find_one({"id": r["competency_id"]}, {"_id": 0})
-            out.append({"competency_id": r["competency_id"], "name": (comp or {}).get("name"),
-                        "tp_id": r.get("tp_id"), "retrievability": rt, "due_at": r.get("due_at")})
-    return out
+            due_rows.append((r, rt))
+    nodes = await nodes_by_id([r["competency_id"] for r, _ in due_rows])
+    return [{"competency_id": r["competency_id"], "name": nodes.get(r["competency_id"], {}).get("name"),
+             "tp_id": r.get("tp_id"), "retrievability": rt, "due_at": r.get("due_at")}
+            for r, rt in due_rows]
 
 
 async def recommendations(class_id: str) -> list[dict]:
@@ -414,10 +567,13 @@ async def recommendations(class_id: str) -> list[dict]:
     recs: list[dict] = []
     gaps = [r for r in cov["rows"] if r["status"] == "GAP"]
     gaps.sort(key=lambda r: (r["mastery_pct"] or 0))
+    ready_rows = [r for r in cov["rows"] if r["status"] in ("GOOD", "DEVELOPING") and r["students_mastered"]]
+    # Satu batch ringkasan untuk semua TP yang dibutuhkan (dulu: 1 + N murid query per TP).
+    need_ids = ([gaps[0]["tp_id"]] if gaps else []) + [r["tp_id"] for r in ready_rows]
+    summaries = await student_tp_summaries(class_id, sorted(set(need_ids))) if need_ids else {}
     if gaps:
         g = gaps[0]
-        detail = await student_tp_summary(class_id, g["tp_id"])
-        who = detail["needs_remediation"]
+        who = summaries[g["tp_id"]]["needs_remediation"]
         recs.append({"priority": 1, "kind": "remedial", "tp_id": g["tp_id"], "tp_code": g["tp_code"],
                      "title": f"Remedial {g['tp_code']} untuk {len(who)} murid",
                      "why": g["note"], "student_ids": [w["student_id"] for w in who],
@@ -440,12 +596,11 @@ async def recommendations(class_id: str) -> list[dict]:
                                  {"label": "Review Konsep di Kelas", "endpoint": "/api/braincore/lesson-plan",
                                   "payload": {"class_id": class_id, "tp_id": m.get("tp_id"), "minutes": 45}}]})
     ready = []
-    for r in cov["rows"]:
-        if r["status"] in ("GOOD", "DEVELOPING") and r["students_mastered"]:
-            d = await student_tp_summary(class_id, r["tp_id"])
-            cand = d["mastered"] + d["ready_enrichment"]
-            if cand:
-                ready.append((r, cand))
+    for r in ready_rows:
+        d = summaries[r["tp_id"]]
+        cand = d["mastered"] + d["ready_enrichment"]
+        if cand:
+            ready.append((r, cand))
     if ready:
         r, cand = max(ready, key=lambda x: len(x[1]))
         recs.append({"priority": 3, "kind": "enrichment", "tp_id": r["tp_id"], "tp_code": r["tp_code"],
@@ -557,16 +712,20 @@ async def lesson_plan(class_id: str, tp_id: str, minutes: int = 45) -> dict:
 async def learning_passport(student_id: str) -> dict:
     recs = await db.learner_competency.find({"student_id": student_id}, {"_id": 0}).to_list(2000)
     user = await db.users.find_one({"user_id": student_id}, {"_id": 0}) or {}
+    # Dulu 2-3 query PER kompetensi (comp, tp, cp). Kini dua batch $in: kompetensi, lalu TP+CP.
+    comps = await nodes_by_id([r["competency_id"] for r in recs])
+    parent_ids = [c.get("tp_id") for c in comps.values()] + [c.get("cp_id") for c in comps.values()] \
+        + [r.get("tp_id") for r in recs]
+    parents = await nodes_by_id(parent_ids)
     by_tp: dict[str, dict] = {}
     for r in recs:
-        comp = await db.curriculum_nodes.find_one({"id": r["competency_id"]}, {"_id": 0}) or {}
+        comp = comps.get(r["competency_id"], {})
         tp_id = comp.get("tp_id") or r.get("tp_id") or "lainnya"
-        tp = await db.curriculum_nodes.find_one({"id": tp_id}, {"_id": 0}) or {}
+        tp = parents.get(tp_id, {})
         row = by_tp.setdefault(tp_id, {"tp_id": tp_id, "tp_code": tp.get("code"), "tp_name": tp.get("name"),
                                         "cp_name": None, "competencies": []})
         if row["cp_name"] is None and comp.get("cp_id"):
-            cp = await db.curriculum_nodes.find_one({"id": comp["cp_id"]}, {"_id": 0}) or {}
-            row["cp_name"] = cp.get("name")
+            row["cp_name"] = parents.get(comp["cp_id"], {}).get("name")
         row["competencies"].append({
             "competency_id": r["competency_id"], "name": comp.get("name"),
             "state": r["state"], "state_label": STATE_LABEL.get(r["state"], r["state"]),
@@ -587,7 +746,7 @@ async def learning_passport(student_id: str) -> dict:
     return {"student_id": student_id, "name": user.get("name"), "rows": rows,
             "due_reviews": due, "open_misconceptions": mis,
             "totals": {"competencies": len(recs),
-                       "mastered": sum(1 for r in recs if r["state"] in ("MASTERED", "RETAINED", "TRANSFERRED")),
+                       "mastered": sum(1 for r in recs if r["state"] in MASTERED_STATES),
                        "transferred": sum(1 for r in recs if r.get("transferred_at")),
                        "retained": sum(1 for r in recs if r.get("retained_at"))}}
 

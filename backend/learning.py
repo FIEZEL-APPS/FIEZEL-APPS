@@ -4,7 +4,8 @@ hint, retry, evidence, mastery, retensi, transfer. Termasuk telemetry idempoten.
 import re
 import uuid
 import hashlib
-from datetime import datetime, timezone
+import random
+from datetime import datetime, timezone, timedelta
 from typing import Any
 
 from fastapi import APIRouter, Depends, HTTPException
@@ -15,6 +16,7 @@ from db import db
 from auth import current_user
 import braincore as bc
 from assessment import ASSESSMENT_TYPES
+from access import assert_student_access, assert_class_teacher, student_targeted
 
 router = APIRouter(prefix="/api/learning", tags=["learning"])
 
@@ -28,6 +30,36 @@ EVENT_TYPES = [
 
 def now():
     return datetime.now(timezone.utc)
+
+
+def get_shuffled_question_data(session_id: str, q: dict) -> dict:
+    if not q:
+        return q
+    q_copy = dict(q)
+    if q_copy.get("question_type") == "mcq" and q_copy.get("options"):
+        opts = list(q_copy["options"])
+        key_letter = (q_copy.get("answer_key") or "A").upper()[:1]
+        orig_correct_idx = ord(key_letter) - ord('A')
+        if 0 <= orig_correct_idx < len(opts):
+            correct_val = opts[orig_correct_idx]
+        else:
+            correct_val = opts[0] if opts else ""
+
+        rng = random.Random(f"{session_id}:{q_copy['question_id']}")
+        indexed_opts = list(enumerate(opts))
+        rng.shuffle(indexed_opts)
+        
+        shuffled_opts = [item[1] for item in indexed_opts]
+        new_correct_idx = 0
+        for i, (orig_idx, val) in enumerate(indexed_opts):
+            if orig_idx == orig_correct_idx or val == correct_val:
+                new_correct_idx = i
+                break
+        new_key_letter = chr(65 + new_correct_idx)
+        
+        q_copy["options"] = shuffled_opts
+        q_copy["answer_key"] = new_key_letter
+    return q_copy
 
 
 async def record_event(event_type: str, student_id: str, payload: dict,
@@ -66,9 +98,110 @@ async def post_event(body: EventIn, u=Depends(current_user)):
     return await record_event(body.type, u["user_id"], body.payload, body.event_id)
 
 
+try:
+    from offline_static_map import STATIC_COMPETENCY
+except ImportError:  # dijalankan sebagai paket backend.*
+    try:
+        from backend.offline_static_map import STATIC_COMPETENCY
+    except ImportError:
+        STATIC_COMPETENCY = {}
+
+
+class OfflineAttemptIn(BaseModel):
+    event_id: str
+    static_item_id: str
+    unit_id: str | None = None
+    subchapter_id: str | None = None
+    client_correct: bool = False
+    at: str = ""
+
+
+class OfflineBatchIn(BaseModel):
+    attempts: list[OfflineAttemptIn] = Field(default_factory=list)
+
+
+def _parse_at(v: str):
+    try:
+        d = datetime.fromisoformat(str(v).replace("Z", "+00:00"))
+        if d.tzinfo is None:
+            d = d.replace(tzinfo=timezone.utc)
+        return d
+    except (ValueError, TypeError):
+        return None
+
+
+@router.post("/offline-batch")
+async def offline_batch(body: OfflineBatchIn, u=Depends(current_user)):
+    """F9 fase 2: bukti luring = PAPARAN + AKTIVITAS, bukan penguasaan.
+
+    Kontrak yang dikunci di sini (dan diuji):
+    - skor klien TIDAK PERNAH dinilai/diagnois/diterapkan ke mastery; ia disimpan
+      apa adanya berlabel client_correct supaya guru bisa membacanya sebagai klaim,
+      bukan fakta. Kunci jawaban ikut terkirim dalam bundle offline, jadi bukti
+      luring pada dasarnya bisa di-game — menggerakkannya ke mastery berarti
+      memberi nilai pada contekan.
+    - bukti yang terpetakan ke kompetensi (peta eksak) menandai exposure lewat
+      bc.mark_exposure — fungsi yang SAMA dipakai sesi online saat mulai; yang
+      tak terpetakan tetap terrekam sebagai aktivitas tanpa kompetensi.
+    - idempoten per event_id: kirim ulang tidak double-count.
+    - hanya murid pemilik tiket yang boleh mengirim untuk dirinya sendiri.
+    """
+    if u["role"] != "student":
+        raise HTTPException(403, "Batch luring hanya untuk murid pemilik tiket")
+    sid = u["user_id"]
+    items = body.attempts or []
+    if len(items) > 200:
+        raise HTTPException(400, "Maksimal 200 butir per batch")
+    sekarang = now()
+    for n, a in enumerate(items):
+        if not (isinstance(a.event_id, str) and 8 <= len(a.event_id) <= 120):
+            raise HTTPException(400, f"Butir {n}: event_id tidak sah")
+        if not (isinstance(a.static_item_id, str) and 1 <= len(a.static_item_id) <= 80):
+            raise HTTPException(400, f"Butir {n}: static_item_id tidak sah")
+        d = _parse_at(a.at)
+        if not d:
+            raise HTTPException(400, f"Butir {n}: cap waktu tidak sah")
+        if d > sekarang + timedelta(minutes=5):
+            raise HTTPException(400, f"Butir {n}: cap waktu di masa depan")
+        if (sekarang - d).days > 60:
+            raise HTTPException(400, f"Butir {n}: bukti lebih tua dari 60 hari")
+    hasil, terpapar, tanpa_peta = [], 0, 0
+    for a in items:
+        cid = STATIC_COMPETENCY.get(a.static_item_id)
+        tp = None
+        if cid:
+            comp = await db.curriculum_nodes.find_one({"id": cid}, {"_id": 0, "tp_id": 1})
+            tp = (comp or {}).get("tp_id")
+        ev = await record_event("question_answered", sid, {
+            "question_id": a.static_item_id, "unit_id": a.unit_id,
+            "subchapter_id": a.subchapter_id, "competency_id": cid,
+            "client_correct": bool(a.client_correct), "offline": True, "at": a.at,
+        }, a.event_id)
+        status = "stored" if ev.get("stored") else "duplicate"
+        if ev.get("stored") and cid:
+            await bc.mark_exposure(sid, cid, tp)
+            terpapar += 1
+        if not cid:
+            tanpa_peta += 1
+        hasil.append({"event_id": a.event_id, "status": status,
+                      "competency_id": cid})
+    disimpan = sum(1 for r in hasil if r["status"] == "stored")
+    return {"stored": disimpan, "duplicates": len(hasil) - disimpan,
+            "exposed": terpapar, "unmapped": tanpa_peta, "results": hasil}
+
+
 @router.get("/events")
 async def list_events(student_id: str | None = None, limit: int = 100, u=Depends(current_user)):
-    sid = student_id if u["role"] in ("teacher", "owner") else u["user_id"]
+    if u["role"] == "student":
+        sid = u["user_id"]
+    else:
+        # Guru WAJIB menyebut murid, dan hanya murid di kelas yang diampunya (dulu: murid siapa pun,
+        # atau tanpa student_id = seluruh event sekolah). Owner tetap boleh tanpa filter.
+        if not student_id and u["role"] != "owner":
+            raise HTTPException(400, "student_id wajib diisi")
+        sid = student_id
+        if sid:
+            await assert_student_access(sid, u)
     q = {"student_id": sid} if sid else {}
     return await db.learning_events.find(q, {"_id": 0}).sort("at", -1).to_list(min(limit, 500))
 
@@ -104,12 +237,12 @@ class StartIn(BaseModel):
 async def build_mission(a: dict, student_id: str) -> dict:
     tps = await db.curriculum_nodes.find({"id": {"$in": a.get("tp_ids") or []}}, {"_id": 0}).to_list(50)
     cfg = ASSESSMENT_TYPES.get(a["assessment_type"], {})
-    states = []
-    for cid in (a.get("competency_ids") or [])[:20]:
-        st = await bc.get_state(student_id, cid)
-        comp = await db.curriculum_nodes.find_one({"id": cid}, {"_id": 0}) or {}
-        states.append({"competency_id": cid, "name": comp.get("name"),
-                       "state": st["state"], "state_label": bc.STATE_LABEL.get(st["state"])})
+    cids = (a.get("competency_ids") or [])[:20]
+    sts = await bc.get_states(student_id, cids)
+    names = await bc.nodes_by_id(cids)
+    states = [{"competency_id": cid, "name": names.get(cid, {}).get("name"),
+               "state": sts[cid]["state"], "state_label": bc.STATE_LABEL.get(sts[cid]["state"])}
+              for cid in cids]
     weakest = min(states, key=lambda s: 0) if states else None
     goal_names = [t["name"] for t in tps] or [s["name"] for s in states[:2]]
     why = {
@@ -134,21 +267,26 @@ async def start_session(body: StartIn, u=Depends(current_user)):
     a = await db.assessments.find_one({"id": body.assessment_id}, {"_id": 0})
     if not a:
         raise HTTPException(404, "asesmen tidak ditemukan")
-    if u["role"] == "student" and u["user_id"] not in (a.get("student_ids") or []):
-        member = a.get("for_whole_class") and a.get("class_id") in (u.get("class_ids") or [])
-        if not member:
+    if u["role"] == "student":
+        if not student_targeted(a, u):
             raise HTTPException(403, "Asesmen ini bukan untukmu")
-        await db.assessments.update_one({"id": a["id"]}, {"$addToSet": {"student_ids": u["user_id"]}})
+        if u["user_id"] not in (a.get("student_ids") or []):
+            await db.assessments.update_one({"id": a["id"]}, {"$addToSet": {"student_ids": u["user_id"]}})
     existing = await db.sessions.find_one({"assessment_id": a["id"], "student_id": u["user_id"],
                                            "state": "active"}, {"_id": 0})
     if existing:
         return existing
     mission = await build_mission(a, u["user_id"])
-    doc = {"id": f"SES-{uuid.uuid4().hex[:10].upper()}", "assessment_id": a["id"],
+    session_id = f"SES-{uuid.uuid4().hex[:10].upper()}"
+    q_ids = list(a.get("question_ids") or [])
+    rng_q = random.Random(f"{session_id}:{u['user_id']}")
+    rng_q.shuffle(q_ids)
+
+    doc = {"id": session_id, "assessment_id": a["id"],
            "assessment_type": a["assessment_type"], "adaptive": a.get("adaptive", True),
            "class_id": a.get("class_id"), "student_id": u["user_id"],
            "competency_ids": a.get("competency_ids") or [], "tp_ids": a.get("tp_ids") or [],
-           "queue": list(a.get("question_ids") or []), "served": [], "state": "active",
+           "queue": q_ids, "served": [], "state": "active",
            "target_count": a.get("question_count") or len(a.get("question_ids") or []) or 10,
            "answered_count": 0, "correct_count": 0, "hint_count": 0, "retry_count": 0,
            "transfer_attempts": 0, "transfer_correct": 0, "score": None,
@@ -156,9 +294,9 @@ async def start_session(body: StartIn, u=Depends(current_user)):
            "started_at": now(), "finished_at": None}
     await db.sessions.insert_one(dict(doc))
     doc.pop("_id", None)
+    tp_of = await bc.nodes_by_id(doc["competency_ids"])
     for cid in doc["competency_ids"]:
-        comp = await db.curriculum_nodes.find_one({"id": cid}, {"_id": 0}) or {}
-        await bc.mark_exposure(u["user_id"], cid, comp.get("tp_id"))
+        await bc.mark_exposure(u["user_id"], cid, tp_of.get(cid, {}).get("tp_id"))
     await record_event("lesson_started", u["user_id"],
                        {"session_id": doc["id"], "assessment_id": a["id"],
                         "assessment_type": a["assessment_type"]})
@@ -171,6 +309,8 @@ async def _session(session_id: str, u: dict) -> dict:
         raise HTTPException(404, "sesi tidak ditemukan")
     if u["role"] == "student" and s["student_id"] != u["user_id"]:
         raise HTTPException(403, "Bukan sesimu")
+    if u["role"] == "teacher" and s.get("class_id"):
+        await assert_class_teacher(s["class_id"], u)
     return s
 
 
@@ -192,7 +332,8 @@ async def next_question(session_id: str, u=Depends(current_user)):
         q = await db.questions.find_one({"question_id": s["current"]["question_id"], "is_current": True},
                                          {"_id": 0})
         if q:
-            return {"done": False, "question": _public_question(q), "reason": s["current"].get("reason"),
+            shuffled_q = get_shuffled_question_data(session_id, q)
+            return {"done": False, "question": _public_question(shuffled_q), "reason": s["current"].get("reason"),
                     "phase": s["current"].get("phase"), "progress": _progress(s), "resumed": True}
     if s["answered_count"] >= s["target_count"]:
         return await finish_session(session_id, u)
@@ -211,21 +352,22 @@ async def next_question(session_id: str, u=Depends(current_user)):
         pick = {"question": q, "reason": "Soal berikutnya dari daftar guru.", "reason_code": "fixed_queue",
                 "competency_id": q["competency_id"], "phase": "practice"}
     q = pick["question"]
-    current = {"question_id": q["question_id"], "version": q["version"],
+    shuffled_q = get_shuffled_question_data(session_id, q)
+    current = {"question_id": shuffled_q["question_id"], "version": shuffled_q["version"],
                "competency_id": pick["competency_id"], "reason": pick["reason"],
                "reason_code": pick["reason_code"], "phase": pick.get("phase"),
                "served_at": now(), "attempt_count": 0, "hints_used": 0}
     await db.sessions.update_one({"id": session_id}, {"$set": {"current": current}})
     await record_event("question_presented", s["student_id"],
-                       {"session_id": session_id, "question_id": q["question_id"],
+                       {"session_id": session_id, "question_id": shuffled_q["question_id"],
                         "competency_id": pick["competency_id"], "reason_code": pick["reason_code"],
                         "seq": s["answered_count"]})
-    if q.get("is_transfer"):
+    if shuffled_q.get("is_transfer"):
         await record_event("transfer_attempted", s["student_id"],
-                           {"session_id": session_id, "question_id": q["question_id"],
+                           {"session_id": session_id, "question_id": shuffled_q["question_id"],
                             "competency_id": pick["competency_id"], "seq": s["answered_count"]})
     s = await _session(session_id, u)
-    return {"done": False, "question": _public_question(q), "reason": pick["reason"],
+    return {"done": False, "question": _public_question(shuffled_q), "reason": pick["reason"],
             "phase": pick.get("phase"), "progress": _progress(s)}
 
 
@@ -242,7 +384,8 @@ async def request_hint(session_id: str, u=Depends(current_user)):
     if not cur:
         raise HTTPException(400, "Belum ada soal aktif")
     q = await db.questions.find_one({"question_id": cur["question_id"], "is_current": True}, {"_id": 0})
-    hints = (q or {}).get("hints") or []
+    shuffled_q = get_shuffled_question_data(session_id, q)
+    hints = (shuffled_q or {}).get("hints") or []
     idx = min(cur.get("hints_used", 0), max(0, len(hints) - 1))
     text = hints[idx] if hints else "Coba baca ulang soalnya dan tandai informasi yang diketahui lebih dulu."
     await db.sessions.update_one({"id": session_id},
@@ -297,31 +440,32 @@ async def submit_answer(session_id: str, body: AnswerIn, u=Depends(current_user)
     q = await db.questions.find_one({"question_id": body.question_id, "is_current": True}, {"_id": 0})
     if not q:
         raise HTTPException(404, "soal tidak ditemukan")
+    shuffled_q = get_shuffled_question_data(session_id, q)
     cfg = ASSESSMENT_TYPES.get(s["assessment_type"], {})
     conf = body.confidence
     if isinstance(conf, str):
         conf = CONF_MAP.get(conf.lower())
-    correct = grade(q, body.answer)
-    chosen_letter = norm_answer(body.answer)[:1].upper() if q["question_type"] == "mcq" else ""
+    correct = grade(shuffled_q, body.answer)
+    chosen_letter = norm_answer(body.answer)[:1].upper() if shuffled_q["question_type"] == "mcq" else ""
     misconception = None
     if correct is False:
-        misconception = (q.get("distractor_misconceptions") or {}).get(chosen_letter) or q.get("misconception_id")
+        misconception = (shuffled_q.get("distractor_misconceptions") or {}).get(chosen_letter) or shuffled_q.get("misconception_id")
     diag = bc.diagnose(bool(correct), conf, body.time_ms, cur.get("hints_used", 0),
-                       q["estimated_time"], misconception) if correct is not None else {
+                       shuffled_q["estimated_time"], misconception) if correct is not None else {
         "label": "needs_teacher_grading", "message": "Jawaban esai kamu menunggu penilaian guru."}
 
     attempt_id = f"AT-{uuid.uuid4().hex[:12].upper()}"
     idem = body.idempotency_key or f"{session_id}:{body.question_id}:{cur.get('attempt_count', 0)}"
     attempt = {"id": attempt_id, "idempotency_key": idem, "session_id": session_id,
                "assessment_id": s["assessment_id"], "student_id": s["student_id"],
-               "class_id": s.get("class_id"), "question_id": q["question_id"],
-               "question_version": q["version"], "competency_id": q["competency_id"],
-               "tp_id": q.get("tp_id"), "cp_id": q.get("cp_id"), "indicator_id": q.get("indicator_id"),
-               "curriculum_id": q.get("curriculum_id"), "difficulty": q["difficulty"],
-               "cognitive_level": q["cognitive_level"], "chosen": chosen_letter or None,
+               "class_id": s.get("class_id"), "question_id": shuffled_q["question_id"],
+               "question_version": shuffled_q["version"], "competency_id": shuffled_q["competency_id"],
+               "tp_id": shuffled_q.get("tp_id"), "cp_id": shuffled_q.get("cp_id"), "indicator_id": shuffled_q.get("indicator_id"),
+               "curriculum_id": shuffled_q.get("curriculum_id"), "difficulty": shuffled_q["difficulty"],
+               "cognitive_level": shuffled_q["cognitive_level"], "chosen": chosen_letter or None,
                "correct": correct, "confidence": conf, "time_ms": body.time_ms,
                "hints_used": cur.get("hints_used", 0), "retry_of": body.retry_of,
-               "is_transfer": q.get("is_transfer", False), "misconception_id": misconception,
+               "is_transfer": shuffled_q.get("is_transfer", False), "misconception_id": misconception,
                "diagnosis": diag["label"], "at": now()}
     try:
         await db.attempts.insert_one(dict(attempt))
@@ -330,10 +474,10 @@ async def submit_answer(session_id: str, body: AnswerIn, u=Depends(current_user)
         return {"duplicate": True, "attempt": prev, "note": "Attempt ini sudah tercatat (idempoten)."}
 
     update: dict[str, Any] = {"$inc": {"answered_count": 1, "current.attempt_count": 1},
-                              "$push": {"served": q["question_id"]}}
+                              "$push": {"served": shuffled_q["question_id"]}}
     if correct:
         update["$inc"]["correct_count"] = 1
-    if q.get("is_transfer"):
+    if shuffled_q.get("is_transfer"):
         update["$inc"]["transfer_attempts"] = 1
         if correct:
             update["$inc"]["transfer_correct"] = 1
@@ -341,91 +485,93 @@ async def submit_answer(session_id: str, body: AnswerIn, u=Depends(current_user)
         update["$inc"]["retry_count"] = 1
     await db.sessions.update_one({"id": session_id}, update)
 
-    result = {"state": await bc.get_state(s["student_id"], q["competency_id"]),
+    result = {"state": await bc.get_state(s["student_id"], shuffled_q["competency_id"]),
               "state_changed": False, "previous_state": None}
     if correct is not None:
         result = await bc.apply_attempt(attempt)
 
     await record_event("question_answered", s["student_id"],
-                       {"session_id": session_id, "question_id": q["question_id"],
-                        "competency_id": q["competency_id"], "correct": correct,
+                       {"session_id": session_id, "question_id": shuffled_q["question_id"],
+                        "competency_id": shuffled_q["competency_id"], "correct": correct,
                         "diagnosis": diag["label"], "seq": s["answered_count"]})
     if conf is not None:
         await record_event("confidence_submitted", s["student_id"],
-                           {"session_id": session_id, "question_id": q["question_id"],
+                           {"session_id": session_id, "question_id": shuffled_q["question_id"],
                             "confidence": conf, "seq": s["answered_count"]})
     if misconception:
         await record_event("misconception_detected", s["student_id"],
-                           {"session_id": session_id, "competency_id": q["competency_id"],
+                           {"session_id": session_id, "competency_id": shuffled_q["competency_id"],
                             "misconception_id": misconception, "seq": s["answered_count"]})
     await record_event("competency_updated", s["student_id"],
-                       {"session_id": session_id, "competency_id": q["competency_id"],
+                       {"session_id": session_id, "competency_id": shuffled_q["competency_id"],
                         "p_mastery": result["state"]["p_mastery"], "state": result["state"]["state"],
                         "seq": s["answered_count"]})
     if result.get("state_changed"):
         await record_event("mastery_changed", s["student_id"],
-                           {"session_id": session_id, "competency_id": q["competency_id"],
+                           {"session_id": session_id, "competency_id": shuffled_q["competency_id"],
                             "from": result.get("previous_state"), "to": result["state"]["state"],
                             "seq": s["answered_count"]})
         if result["state"]["state"] in ("MASTERED", "RETAINED"):
             await record_event("review_scheduled", s["student_id"],
-                               {"session_id": session_id, "competency_id": q["competency_id"],
+                               {"session_id": session_id, "competency_id": shuffled_q["competency_id"],
                                 "due_at": str(result["state"].get("due_at")), "seq": s["answered_count"]})
-    if q.get("is_transfer") and correct:
+    if shuffled_q.get("is_transfer") and correct:
         await record_event("transfer_completed", s["student_id"],
-                           {"session_id": session_id, "question_id": q["question_id"],
-                            "competency_id": q["competency_id"], "seq": s["answered_count"]})
+                           {"session_id": session_id, "question_id": shuffled_q["question_id"],
+                            "competency_id": shuffled_q["competency_id"], "seq": s["answered_count"]})
 
     # ---- loop penjelasan: salah -> diagnosis -> penjelasan -> hint -> retry terarah ----
     wrong_streak = dict(s.get("wrong_streak") or {})
     next_action: dict[str, Any] = {"kind": "next_question"}
     explanation = None
     if correct is False:
-        wrong_streak[q["competency_id"]] = wrong_streak.get(q["competency_id"], 0) + 1
-        explanation = q.get("explanation") or "Perhatikan kembali langkah kuncinya."
+        wrong_streak[shuffled_q["competency_id"]] = wrong_streak.get(shuffled_q["competency_id"], 0) + 1
+        explanation = shuffled_q.get("explanation") or "Perhatikan kembali langkah kuncinya."
         await record_event("explanation_viewed", s["student_id"],
-                           {"session_id": session_id, "question_id": q["question_id"],
+                           {"session_id": session_id, "question_id": shuffled_q["question_id"],
                             "seq": s["answered_count"]})
-        if wrong_streak[q["competency_id"]] >= 2:
-            rem = await bc.remediation_item(s["student_id"], q["competency_id"], s["served"] + [q["question_id"]])
+        if wrong_streak[shuffled_q["competency_id"]] >= 2:
+            rem = await bc.remediation_item(s["student_id"], shuffled_q["competency_id"], s["served"] + [shuffled_q["question_id"]])
             if rem:
+                shuffled_rem_q = get_shuffled_question_data(session_id, rem["question"])
                 next_action = {"kind": "micro_remediation", "reason": rem["reason"],
-                               "question": _public_question(rem["question"]),
+                               "question": _public_question(shuffled_rem_q),
                                "prerequisite_check": rem["reason_code"] == "micro_remediation"}
                 await db.sessions.update_one({"id": session_id}, {"$set": {"current": {
-                    "question_id": rem["question"]["question_id"], "version": rem["question"]["version"],
-                    "competency_id": rem["competency_id"], "reason": rem["reason"],
-                    "reason_code": rem["reason_code"], "phase": rem.get("phase"),
+                    "question_id": shuffled_rem_q["question_id"], "version": shuffled_rem_q["version"],
+                    "competency_id": shuffled_rem_q["competency_id"], "reason": rem["reason"],
+                    "reason_code": rem["reason_code"], "phase": shuffled_rem_q.get("phase"),
                     "served_at": now(), "attempt_count": 0, "hints_used": 0}}})
         elif cfg.get("allow_retry"):
             variants = await db.questions.find(
-                {"variant_group_id": q.get("variant_group_id"), "is_current": True,
-                 "status": "PUBLISHED", "question_id": {"$ne": q["question_id"]}}, {"_id": 0}).to_list(10)
+                {"variant_group_id": shuffled_q.get("variant_group_id"), "is_current": True,
+                 "status": "PUBLISHED", "question_id": {"$ne": shuffled_q["question_id"]}}, {"_id": 0}).to_list(10)
             retry_q = variants[0] if variants else None
             if not retry_q:
                 same = await db.questions.find(
-                    {"competency_id": q["competency_id"], "is_current": True, "status": "PUBLISHED",
-                     "is_transfer": False, "question_id": {"$nin": s["served"] + [q["question_id"]]}},
+                    {"competency_id": shuffled_q["competency_id"], "is_current": True, "status": "PUBLISHED",
+                     "is_transfer": False, "question_id": {"$nin": s["served"] + [shuffled_q["question_id"]]}},
                     {"_id": 0}).to_list(20)
-                same.sort(key=lambda x: abs(x["difficulty"] - q["difficulty"]))
+                same.sort(key=lambda x: abs(x["difficulty"] - shuffled_q["difficulty"]))
                 retry_q = same[0] if same else None
             if retry_q:
+                shuffled_retry_q = get_shuffled_question_data(session_id, retry_q)
                 next_action = {"kind": "targeted_retry", "reason":
                                "Kita coba soal serupa dengan angka/konteks berbeda supaya kamu bisa langsung mempraktikkan penjelasan tadi.",
-                               "question": _public_question(retry_q), "retry_of": q["question_id"]}
+                               "question": _public_question(shuffled_retry_q), "retry_of": shuffled_q["question_id"]}
                 await db.sessions.update_one({"id": session_id}, {"$set": {"current": {
-                    "question_id": retry_q["question_id"], "version": retry_q["version"],
-                    "competency_id": retry_q["competency_id"],
+                    "question_id": shuffled_retry_q["question_id"], "version": shuffled_retry_q["version"],
+                    "competency_id": shuffled_retry_q["competency_id"],
                     "reason": next_action["reason"], "reason_code": "targeted_retry",
                     "phase": "practice", "served_at": now(), "attempt_count": 0, "hints_used": 0}}})
                 await record_event("retry_started", s["student_id"],
-                                   {"session_id": session_id, "question_id": retry_q["question_id"],
-                                    "retry_of": q["question_id"], "seq": s["answered_count"]})
+                                   {"session_id": session_id, "question_id": shuffled_retry_q["question_id"],
+                                    "retry_of": shuffled_q["question_id"], "seq": s["answered_count"]})
     else:
-        wrong_streak[q["competency_id"]] = 0
+        wrong_streak[shuffled_q["competency_id"]] = 0
         if body.retry_of:
             await record_event("retry_completed", s["student_id"],
-                               {"session_id": session_id, "question_id": q["question_id"],
+                               {"session_id": session_id, "question_id": shuffled_q["question_id"],
                                 "retry_of": body.retry_of, "seq": s["answered_count"]})
     if next_action["kind"] == "next_question":
         await db.sessions.update_one({"id": session_id}, {"$set": {"current": None}})
@@ -434,12 +580,12 @@ async def submit_answer(session_id: str, body: AnswerIn, u=Depends(current_user)
     st = result["state"]
     return {
         "correct": correct,
-        "answer_key": q.get("answer_key") if cfg.get("immediate_feedback") else None,
+        "answer_key": shuffled_q.get("answer_key") if cfg.get("immediate_feedback") else None,
         "diagnosis": diag,
         "explanation": explanation if cfg.get("immediate_feedback") else None,
         "misconception_id": misconception,
         "next_action": next_action,
-        "learner_state": {"competency_id": q["competency_id"], "state": st["state"],
+        "learner_state": {"competency_id": shuffled_q["competency_id"], "state": st["state"],
                           "state_label": bc.STATE_LABEL.get(st["state"]),
                           "progress_pct": round(st["p_mastery"] * 100)},
         "attempt_id": attempt_id,
@@ -458,14 +604,13 @@ async def finish_session(session_id: str, u=Depends(current_user)):
                            {"session_id": session_id, "assessment_id": s["assessment_id"],
                             "score": score, "answered": s["answered_count"]})
         s = await _session(session_id, u)
-    states = []
-    for cid in s["competency_ids"]:
-        st = await bc.get_state(s["student_id"], cid)
-        comp = await db.curriculum_nodes.find_one({"id": cid}, {"_id": 0}) or {}
-        states.append({"competency_id": cid, "name": comp.get("name"), "state": st["state"],
-                       "state_label": bc.STATE_LABEL.get(st["state"]),
-                       "progress_pct": round(st["p_mastery"] * 100),
-                       "retrievability": bc.retrievability(st)})
+    sts = await bc.get_states(s["student_id"], s["competency_ids"])
+    names = await bc.nodes_by_id(s["competency_ids"])
+    states = [{"competency_id": cid, "name": names.get(cid, {}).get("name"), "state": st["state"],
+               "state_label": bc.STATE_LABEL.get(st["state"]),
+               "progress_pct": round(st["p_mastery"] * 100),
+               "retrievability": bc.retrievability(st)}
+              for cid, st in ((c, sts[c]) for c in s["competency_ids"])]
     return {"done": True, "session": s, "summary": {
         "answered": s["answered_count"], "correct": s["correct_count"], "score": s.get("score"),
         "hints": s.get("hint_count"), "retries": s.get("retry_count"),
@@ -484,3 +629,90 @@ async def get_session(session_id: str, u=Depends(current_user)):
 @router.get("/passport")
 async def my_passport(u=Depends(current_user)):
     return await bc.learning_passport(u["user_id"])
+
+
+# ------------------------- two-way state sync -------------------------
+class CompetencySyncIn(BaseModel):
+    competency_id: str
+    p_mastery: float
+    state: str | None = None
+    attempts: int = 0
+    correct: int = 0
+    streak: int = 0
+    hints_used: int = 0
+    retries: int = 0
+    stability_days: float = 1.0
+    due_at: datetime | None = None
+    last_at: datetime | None = None
+    tp_id: str | None = None
+
+
+class StateSyncIn(BaseModel):
+    theta: float | None = None
+    sd: float | None = None
+    competencies: list[CompetencySyncIn] = Field(default_factory=list)
+    misconceptions: list[dict[str, Any]] = Field(default_factory=list)
+    client_timestamp: datetime | None = None
+
+
+@router.post("/sync-state")
+async def sync_state(body: StateSyncIn, u=Depends(current_user)):
+    """Rekonsiliasi state dua arah (klien offline <-> database server).
+
+    Menerapkan pembaruan non-destruktif:
+    1. Jika klien memiliki jumlah percobaan lebih tinggi, catat riwayat offline ke server.
+    2. Jika server memiliki data lebih baru, pertahankan kemajuan server.
+    3. Kembalikan state gabungan yang otoritatif ke klien.
+    """
+    sid = u["user_id"]
+    updated_cids = []
+
+    for item in body.competencies:
+        st = await bc.get_state(sid, item.competency_id)
+        if item.attempts > st.get("attempts", 0):
+            st["attempts"] = item.attempts
+            st["correct"] = max(st.get("correct", 0), item.correct)
+            st["streak"] = item.streak
+            st["hints_used"] = max(st.get("hints_used", 0), item.hints_used)
+            st["retries"] = max(st.get("retries", 0), item.retries)
+            st["p_mastery"] = round(max(0.01, min(0.99, item.p_mastery)), 4)
+            st["stability_days"] = max(0.5, item.stability_days)
+            if item.due_at:
+                st["due_at"] = item.due_at
+            if item.last_at:
+                st["last_at"] = item.last_at
+            if item.tp_id:
+                st["tp_id"] = item.tp_id
+            st["state"] = bc.derive_state(st)
+            st.pop("p_mastery_decayed", None)
+            await db.learner_competency.update_one(
+                {"student_id": sid, "competency_id": item.competency_id},
+                {"$set": st}, upsert=True
+            )
+            updated_cids.append(item.competency_id)
+
+    for mis in body.misconceptions:
+        cid = mis.get("competency_id")
+        mid = mis.get("misconception_id")
+        if cid and mid and not mis.get("resolved"):
+            await db.misconception_ledger.update_one(
+                {"student_id": sid, "competency_id": cid, "misconception_id": mid},
+                {"$inc": {"frequency": mis.get("frequency", 1)},
+                 "$set": {"last_at": bc.now(), "resolved": False, "tp_id": mis.get("tp_id")},
+                 "$setOnInsert": {"first_at": bc.now()}},
+                upsert=True
+            )
+
+    server_recs = await db.learner_competency.find({"student_id": sid}, {"_id": 0}).to_list(1000)
+    open_mis = await db.misconception_ledger.find({"student_id": sid, "resolved": False}, {"_id": 0}).to_list(200)
+
+    return {
+        "synced": True,
+        "student_id": sid,
+        "client_competencies_received": len(body.competencies),
+        "server_updated_count": len(updated_cids),
+        "total_server_competencies": len(server_recs),
+        "competencies": server_recs,
+        "open_misconceptions": open_mis,
+        "server_time": bc.now()
+    }

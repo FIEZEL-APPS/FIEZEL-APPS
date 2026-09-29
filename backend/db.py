@@ -2,16 +2,28 @@
 import os
 from motor.motor_asyncio import AsyncIOMotorClient
 
-_client = AsyncIOMotorClient(os.environ["MONGO_URL"])
-db = _client[os.environ["DB_NAME"]]
+# Fail-fast: tanpa MONGO_URL/DB_NAME server mati saat impor, bukan diam-diam menyambung ke
+# localhost dan tampil sebagai "DB kosong" (bootstrap.py & .env.example menyebut keduanya WAJIB).
+_mongo_url = os.environ["MONGO_URL"]
+_db_name = os.environ["DB_NAME"]
+_client = AsyncIOMotorClient(_mongo_url)
+db = _client[_db_name]
 
 
 async def ensure_indexes():
     await db.users.create_index("email", unique=True,
                                 partialFilterExpression={"email": {"$type": "string"}})
     await db.users.create_index("user_id", unique=True)
+    # Kunci akun mesin kurikulum = identitas KelasKu. Unik supaya satu orang tidak
+    # pernah punya dua akun di sini hanya karena dua permintaan tiba bersamaan.
+    await db.users.create_index("kelasku_sub", unique=True,
+                                partialFilterExpression={"kelasku_sub": {"$type": "string"}})
     await db.user_sessions.create_index("session_token", unique=True)
-    await db.teacher_invites.create_index("token", unique=True)
+    # Tiket KelasKu yang sudah ditukar. `jti` unik menutup pemakaian ulang, dan
+    # indeks TTL membuang barisnya sendiri begitu tiketnya mati — tanpa itu koleksi
+    # ini tumbuh selamanya demi jendela dua menit.
+    await db.kelasku_tickets.create_index("jti", unique=True)
+    await db.kelasku_tickets.create_index("expires_at", expireAfterSeconds=0)
     await db.curriculum_nodes.create_index("id", unique=True)
     await db.curriculum_nodes.create_index([("type", 1), ("parent_id", 1)])
     await db.curriculum_nodes.create_index([("type", 1), ("tp_id", 1)])
