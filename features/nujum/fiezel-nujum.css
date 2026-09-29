@@ -1,0 +1,691 @@
+/* ==========================================================================
+   FIEZEL NUJUM — Mesin yang Bertaruh Melawanmu (Dark Ink Obsidian Duel)
+   Zero Cartoon, Zero Poin Murahan, Pure Cognitive Tension.
+   ========================================================================== */
+
+:root {
+  --nj-bg: #09080B;
+  --nj-surface: #141118;
+  --nj-surface-high: #1E1924;
+  --nj-border: #2A2433;
+  --nj-maroon: #8C2233;
+  --nj-maroon-glow: rgba(140, 34, 51, 0.4);
+  --nj-gold: #FFD700;
+  --nj-gold-glow: rgba(255, 215, 0, 0.35);
+  --nj-emerald: #10B981;
+  --nj-text: #F3F0F7;
+  --nj-text-muted: #9E96A8;
+  --nj-font: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+  --nj-font-serif: 'Instrument Serif', Georgia, serif;
+}
+
+body.fz-view-nujum {
+  background-color: var(--nj-bg) !important;
+  color: var(--nj-text) !important;
+}
+
+body.fz-view-nujum .bottomnav,
+body.fz-view-nujum .topbar {
+  display: none !important;
+}
+
+/* NUJUM Viewport Frame */
+.nujum-screen {
+  min-height: 100vh;
+  min-height: 100dvh;
+  background: radial-gradient(circle at 50% 10%, #1F1522 0%, #09080B 75%);
+  color: var(--nj-text);
+  font-family: var(--nj-font);
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  padding: 16px 20px 32px;
+  max-width: 600px;
+  margin: 0 auto;
+  position: relative;
+  overflow-x: hidden;
+}
+
+/* Top Telemetry Header */
+.nujum-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--nj-border);
+  margin-bottom: 20px;
+}
+
+.nujum-back-btn {
+  background: none;
+  border: 1px solid var(--nj-border);
+  color: var(--nj-text-muted);
+  border-radius: 8px;
+  padding: 6px 12px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.nujum-back-btn:hover {
+  background: var(--nj-surface-high);
+  color: var(--nj-text);
+  border-color: #443B52;
+}
+
+.nujum-pill-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--nj-gold);
+  font-weight: 700;
+  background: rgba(255, 215, 0, 0.08);
+  border: 1px solid rgba(255, 215, 0, 0.25);
+  padding: 4px 10px;
+  border-radius: 999px;
+}
+
+.nujum-pill-tag .pulse-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--nj-gold);
+  box-shadow: 0 0 8px var(--nj-gold);
+  animation: njPulse 1.8s infinite;
+}
+
+@keyframes njPulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.3; transform: scale(0.85); }
+}
+
+.nujum-score-pill {
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: var(--nj-text);
+  background: var(--nj-surface);
+  border: 1px solid var(--nj-border);
+  padding: 4px 12px;
+  border-radius: 8px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.nujum-score-pill .score-mesin {
+  color: #F43F5E;
+}
+
+.nujum-score-pill .score-kamu {
+  color: var(--nj-emerald);
+}
+
+/* BET DISPLAY CARD */
+.nujum-bet-card {
+  background: linear-gradient(180deg, var(--nj-surface) 0%, #0F0D13 100%);
+  border: 1px solid var(--nj-border);
+  border-radius: 16px;
+  padding: 24px 20px;
+  margin-bottom: 24px;
+  position: relative;
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.45);
+}
+
+.nujum-bet-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: 14px;
+}
+
+.nujum-bet-label {
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--nj-maroon);
+}
+
+.nujum-bet-pct {
+  font-family: var(--nj-font-serif);
+  font-size: 3.5rem;
+  line-height: 1;
+  font-weight: 800;
+  color: var(--nj-gold);
+  text-shadow: 0 0 24px var(--nj-gold-glow);
+  letter-spacing: -0.02em;
+}
+
+.nujum-bet-pct small {
+  font-family: var(--nj-font);
+  font-size: 1.5rem;
+  color: rgba(255, 215, 0, 0.7);
+  margin-left: 2px;
+}
+
+.nujum-claim-statement {
+  font-size: 1.15rem;
+  line-height: 1.55;
+  color: var(--nj-text);
+  font-weight: 600;
+  margin-bottom: 12px;
+}
+
+.nujum-claim-trap {
+  color: #FB7185;
+  background: rgba(244, 63, 94, 0.12);
+  padding: 2px 8px;
+  border-radius: 4px;
+  border: 1px solid rgba(244, 63, 94, 0.25);
+  font-family: monospace;
+  font-weight: 700;
+}
+
+.nujum-claim-target {
+  color: #34D399;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+.nujum-bet-rationale {
+  font-size: 0.88rem;
+  color: var(--nj-text-muted);
+  line-height: 1.5;
+  padding-left: 12px;
+  border-left: 2px solid var(--nj-border);
+}
+
+/* STEM & TARGET DISPLAY */
+.nujum-stem-box {
+  margin-bottom: 24px;
+  text-align: center;
+  padding: 18px 12px;
+}
+
+.nujum-stem-text {
+  font-size: 1.45rem;
+  line-height: 1.6;
+  font-weight: 700;
+  color: #FFFFFF;
+}
+
+.nujum-stem-blank {
+  display: inline-block;
+  min-width: 90px;
+  border-bottom: 2px dashed var(--nj-gold);
+  color: var(--nj-gold);
+  padding: 0 8px;
+  margin: 0 4px;
+  font-weight: 800;
+}
+
+/* AUDIO WAVE VISUALIZER */
+.nujum-wave-wrap {
+  height: 54px;
+  width: 100%;
+  margin: 10px 0 20px;
+  position: relative;
+  border-radius: 12px;
+  background: rgba(0, 0, 0, 0.35);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  overflow: hidden;
+}
+
+.nujum-wave-canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.nujum-stt-preview {
+  min-height: 38px;
+  font-size: 0.95rem;
+  text-align: center;
+  color: var(--nj-gold);
+  font-style: italic;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 10px;
+}
+
+/* MIC & ACTION CONTROLS */
+.nujum-actions-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.nujum-mic-btn {
+  width: 82px;
+  height: 82px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #BA1B38, #6B1123);
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  color: #FFFFFF;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 8px 28px var(--nj-maroon-glow);
+  transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  position: relative;
+}
+
+.nujum-mic-btn:hover {
+  transform: scale(1.05);
+  box-shadow: 0 12px 34px var(--nj-maroon-glow);
+}
+
+.nujum-mic-btn.is-listening {
+  background: radial-gradient(circle at 35% 30%, #EF4444, #991B1B);
+  box-shadow: 0 0 35px rgba(239, 68, 68, 0.6);
+  animation: njMicRipple 1.2s infinite;
+}
+
+@keyframes njMicRipple {
+  0% { transform: scale(1); box-shadow: 0 0 15px rgba(239, 68, 68, 0.5); }
+  50% { transform: scale(1.08); box-shadow: 0 0 40px rgba(239, 68, 68, 0.8); }
+  100% { transform: scale(1); box-shadow: 0 0 15px rgba(239, 68, 68, 0.5); }
+}
+
+.nujum-mic-hint {
+  font-size: 0.8rem;
+  color: var(--nj-text-muted);
+  text-align: center;
+}
+
+/* TAP FALLBACK CHIPS */
+.nujum-fallback-wrap {
+  width: 100%;
+  margin-top: 6px;
+}
+
+.nujum-fallback-head {
+  font-size: 0.74rem;
+  color: var(--nj-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  text-align: center;
+  margin-bottom: 10px;
+}
+
+.nujum-options-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+}
+
+.nujum-opt-btn {
+  background: var(--nj-surface);
+  border: 1px solid var(--nj-border);
+  color: var(--nj-text);
+  padding: 14px 12px;
+  border-radius: 12px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  text-align: center;
+}
+
+.nujum-opt-btn:hover {
+  background: var(--nj-surface-high);
+  border-color: #4C415C;
+  transform: translateY(-2px);
+}
+
+.nujum-opt-btn:active {
+  transform: translateY(0);
+}
+
+/* BKT UNCERTAINTY RIBBON */
+.nujum-bkt-card {
+  background: var(--nj-surface);
+  border: 1px solid var(--nj-border);
+  border-radius: 14px;
+  padding: 16px;
+  margin-top: auto;
+}
+
+.nujum-bkt-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.8rem;
+  color: var(--nj-text-muted);
+  margin-bottom: 8px;
+}
+
+.nujum-bkt-track {
+  height: 12px;
+  background: #050406;
+  border-radius: 6px;
+  position: relative;
+  overflow: hidden;
+  margin-bottom: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.nujum-bkt-ribbon {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  background: linear-gradient(90deg, #9333EA, #C084FC);
+  border-radius: 6px;
+  transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 0 12px rgba(192, 132, 252, 0.4);
+}
+
+.nujum-bkt-mean-dot {
+  position: absolute;
+  top: -2px;
+  width: 4px;
+  height: 16px;
+  background: #FFFFFF;
+  border-radius: 2px;
+  transform: translateX(-50%);
+  transition: left 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.nujum-bkt-foot {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.75rem;
+  color: var(--nj-text-muted);
+}
+
+/* SANGGAH (OLM DISPUTE) BANNER */
+.nujum-dispute-row {
+  margin-top: 14px;
+  text-align: center;
+}
+
+.nujum-dispute-btn {
+  background: none;
+  border: 1px dashed rgba(255, 215, 0, 0.4);
+  color: var(--nj-gold);
+  font-size: 0.8rem;
+  font-weight: 700;
+  padding: 6px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.nujum-dispute-btn:hover {
+  background: rgba(255, 215, 0, 0.1);
+  border-color: var(--nj-gold);
+}
+
+/* VERDICT OVERLAY / TOAST */
+.nujum-verdict-banner {
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  animation: njSlideDown 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes njSlideDown {
+  from { opacity: 0; transform: translateY(-12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.nujum-verdict-banner.is-win {
+  background: rgba(16, 185, 129, 0.12);
+  border: 1px solid rgba(16, 185, 129, 0.35);
+  color: #A7F3D0;
+}
+
+.nujum-verdict-banner.is-loss {
+  background: rgba(244, 63, 94, 0.12);
+  border: 1px solid rgba(244, 63, 94, 0.35);
+  color: #FECDD3;
+}
+
+.nujum-verdict-title {
+  font-size: 1.05rem;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.nujum-verdict-body {
+  font-size: 0.88rem;
+  line-height: 1.5;
+  color: var(--nj-text);
+}
+
+/* DUEL SUMMARY SCREEN */
+.nujum-duel-wrap {
+  text-align: center;
+  padding: 30px 10px;
+}
+
+.nujum-duel-score-big {
+  font-size: 4.5rem;
+  font-family: var(--nj-font-serif);
+  font-weight: 800;
+  line-height: 1;
+  margin: 20px 0 10px;
+}
+
+.nujum-broken-claims {
+  text-align: left;
+  background: var(--nj-surface);
+  border: 1px solid var(--nj-border);
+  border-radius: 14px;
+  padding: 18px;
+  margin: 24px 0;
+}
+
+.nujum-broken-title {
+  font-size: 0.8rem;
+  color: var(--nj-gold);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-weight: 700;
+  margin-bottom: 12px;
+}
+
+.nujum-broken-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.nujum-broken-item {
+  font-size: 0.9rem;
+  line-height: 1.45;
+  padding-left: 20px;
+  position: relative;
+  color: var(--nj-text);
+}
+
+.nujum-broken-item::before {
+  content: "✕";
+  position: absolute;
+  left: 0;
+  color: #FB7185;
+  font-weight: 800;
+}
+
+/* HOME CARD LAUNCHER */
+.nujum-home-card {
+  margin: 20px 0;
+  background: linear-gradient(135deg, #180D1A 0%, #0A080C 100%);
+  border: 1px solid #3F1926;
+  border-radius: 16px;
+  padding: 22px 18px;
+  color: #FFFFFF;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.4);
+  transition: transform 0.2s ease, border-color 0.2s ease;
+}
+
+.nujum-home-card:hover {
+  transform: translateY(-2px);
+  border-color: #8C2233;
+}
+
+.nujum-home-card::after {
+  content: "";
+  position: absolute;
+  right: -20px;
+  bottom: -20px;
+  width: 120px;
+  height: 120px;
+  background: radial-gradient(circle, rgba(140, 34, 51, 0.25) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.nujum-home-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.72rem;
+  letter-spacing: 0.1em;
+  font-weight: 800;
+  text-transform: uppercase;
+  color: var(--nj-gold);
+  margin-bottom: 8px;
+}
+
+.nujum-home-title {
+  font-size: 1.25rem;
+  font-weight: 800;
+  margin: 0 0 6px;
+  color: #FFFFFF;
+}
+
+.nujum-home-desc {
+  font-size: 0.88rem;
+  color: var(--nj-text-muted);
+  line-height: 1.5;
+  margin: 0 0 14px;
+}
+
+.nujum-home-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 700;
+  font-size: 0.88rem;
+  color: #FFDE59;
+}
+
+/* HONEST SURRENDER & ECHO REDEMPTION */
+.nujum-surrender-btn {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px dashed rgba(255, 255, 255, 0.22);
+  color: var(--nj-text-muted);
+  border-radius: 12px;
+  padding: 12px 16px;
+  font-size: 0.88rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  margin-top: 14px;
+  box-sizing: border-box;
+  transition: all 0.2s ease;
+}
+
+.nujum-surrender-btn:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: #FFFFFF;
+  border-color: rgba(255, 255, 255, 0.45);
+}
+
+.nujum-surrender-banner {
+  background: rgba(16, 185, 129, 0.09);
+  border: 1px solid rgba(16, 185, 129, 0.35);
+  border-radius: 12px;
+  padding: 18px;
+  margin: 16px 0;
+  animation: nujumFadeIn 0.3s ease-out;
+}
+
+.nujum-surrender-title {
+  color: #34D399;
+  font-weight: 800;
+  font-size: 0.95rem;
+  letter-spacing: 0.05em;
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.nujum-surrender-body {
+  font-size: 0.9rem;
+  line-height: 1.5;
+  color: #E2E8F0;
+  margin-bottom: 12px;
+}
+
+.nujum-echo-box {
+  background: var(--nj-surface-high);
+  border: 1px solid rgba(255, 215, 0, 0.3);
+  border-radius: 10px;
+  padding: 14px 16px;
+  margin: 12px 0;
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: #FFD700;
+  font-family: var(--nj-font-serif);
+  letter-spacing: 0.02em;
+  text-align: center;
+}
+
+.nujum-teleport-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 14px;
+  flex-wrap: wrap;
+}
+
+.nujum-teleport-btn {
+  background: #2563EB;
+  border: 1px solid #3B82F6;
+  color: #FFFFFF;
+  border-radius: 10px;
+  padding: 12px 20px;
+  font-weight: 700;
+  font-size: 0.92rem;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.2s ease;
+}
+
+.nujum-teleport-btn:hover {
+  background: #1D4ED8;
+  transform: translateY(-1px);
+}
+
