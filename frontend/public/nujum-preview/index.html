@@ -1,0 +1,19 @@
+<!doctype html><html lang="id"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>NUJUM preview</title>
+<link rel="stylesheet" href="./features/nujum/fiezel-nujum.css">
+<style>body{margin:0;background:#F6F1EA;font-family:system-ui,sans-serif;padding:20px;max-width:560px;margin:auto}h4{color:#555;font-weight:600;margin:24px 0 8px}</style>
+</head><body>
+<h4>Home hero</h4><div id="hero"></div>
+<h4>Panggung duel</h4><div id="stage"></div>
+<script>
+window.go=function(v){document.getElementById('stage').scrollIntoView()};
+var bkt={schema:'bkt',lessons:{'present-simple-habits':{L:0.31,n:6,lastAt:Date.now()}}};
+window.__fiezelNujumBridge={getActiveLevel:()=>'B1',learnerName:()=>'Fitra',showToast:(m)=>console.log('toast',m),bktRead:()=>bkt,bktWrite:s=>{bkt=s}};
+</script>
+<script src="./features/nujum/fiezel-nujum.js"></script>
+<script>
+document.getElementById('hero').innerHTML=FiezelNujum.heroMarkup();
+FiezelNujum.setSpeaker(()=>new Promise(r=>setTimeout(r,1500)));
+FiezelNujum.mount(document.getElementById('stage'));
+</script>
+</body></html>

@@ -1,0 +1,208 @@
+/* =============================================================================
+   FIEZEL NUJUM — The Ruthless Mentor
+   Tema: tinta obsidian (#09080B), maroon FIEZEL (#8C2233), emas taruhan (#FFD700),
+   emerald (murid menang). Berlaku hanya di dalam .nj-host / .nj-hero.
+   ============================================================================= */
+@import url("https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,800&display=swap");
+.nj-host,.nj-hero{
+  --nj-ink:#09080B;--nj-ink-2:#121016;--nj-ink-3:#1B1720;
+  --nj-maroon:#8C2233;--nj-maroon-2:#B0304A;--nj-maroon-soft:rgba(140,34,51,.22);
+  --nj-gold:#FFD700;--nj-gold-2:#F5C400;--nj-gold-soft:rgba(255,215,0,.16);
+  --nj-emerald:#10B981;--nj-emerald-soft:rgba(16,185,129,.18);
+  --nj-fg:#F4EFE8;--nj-fg-2:rgba(244,239,232,.68);--nj-fg-3:rgba(244,239,232,.42);
+  --nj-line:rgba(255,255,255,.08);
+  --nj-display:"Fraunces","Playfair Display","Georgia",serif;
+  --nj-body:inherit;
+  color:var(--nj-fg);
+}
+
+/* ---------- Panggung duel ---------- */
+.nj-host{display:block;margin:0 -4px}
+.nj-stage{
+  position:relative;background:var(--nj-ink);border-radius:26px;padding:18px 18px 26px;
+  border:1px solid var(--nj-line);overflow:hidden;isolation:isolate;
+  box-shadow:0 30px 80px -30px rgba(0,0,0,.8),inset 0 1px 0 rgba(255,255,255,.05);
+  animation:nj-rise .55s cubic-bezier(.2,.8,.2,1) both;
+}
+.nj-stage::before{content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;
+  background:radial-gradient(60% 40% at 20% 0%,var(--nj-maroon-soft),transparent 60%),radial-gradient(40% 30% at 90% 10%,rgba(255,215,0,.07),transparent 60%);}
+.nj-stage::after{content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;opacity:.22;mix-blend-mode:overlay;
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 .55 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");}
+@keyframes nj-rise{from{opacity:0;transform:translateY(14px) scale(.985)}to{opacity:1;transform:none}}
+
+.nj-head{display:flex;align-items:baseline;gap:12px;margin-bottom:14px}
+.nj-brand{font-family:var(--nj-display);font-weight:800;font-size:1.35rem;letter-spacing:.14em;color:var(--nj-gold)}
+.nj-sub{font-size:.78rem;color:var(--nj-fg-3);letter-spacing:.04em}
+.nj-exit{margin-left:auto;width:34px;height:34px;border-radius:50%;border:1px solid var(--nj-line);background:transparent;color:var(--nj-fg-2);cursor:pointer;transition:background-color .2s,transform .2s}
+.nj-exit:hover{background:rgba(255,255,255,.06);transform:rotate(90deg)}
+
+/* ---------- Mentor: sigil + waveform + kalimat ---------- */
+.nj-mentor{display:grid;grid-template-columns:52px 1fr;gap:14px;align-items:start;padding:14px 0 6px}
+.nj-mentor-sigil{width:52px;height:52px;border-radius:50%;position:relative;background:radial-gradient(circle at 35% 30%,var(--nj-maroon-2),var(--nj-maroon) 55%,#4A101B);box-shadow:0 0 0 1px rgba(255,215,0,.35),0 0 24px var(--nj-maroon-soft)}
+.nj-mentor-sigil span{position:absolute;inset:18px;border-radius:50%;background:var(--nj-gold);box-shadow:0 0 16px var(--nj-gold);animation:nj-blink 4.2s infinite}
+@keyframes nj-blink{0%,92%,100%{transform:scaleY(1)}95%{transform:scaleY(.08)}}
+.nj-wave{display:block;width:100%;height:44px;grid-column:2;border-radius:10px;background:rgba(255,255,255,.025)}
+.nj-line{grid-column:2;margin:8px 0 0;font-size:1.02rem;line-height:1.6;color:var(--nj-fg);font-weight:500;animation:nj-fade .5s ease both}
+@keyframes nj-fade{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+.nj-teleport-note{grid-column:2;color:var(--nj-fg-3);font-size:.85rem}
+
+/* ---------- Angka taruhan raksasa ---------- */
+.nj-bet{display:grid;gap:8px;margin:6px 0 10px}
+.nj-bet-num,.nj-intro-num{display:flex;flex-direction:column;align-items:flex-start}
+.nj-bet-num b,.nj-intro-num b,.nj-hero-num b{
+  font-family:var(--nj-display);font-weight:800;font-size:clamp(4.2rem,16vw,7.5rem);line-height:.86;letter-spacing:-.05em;
+  color:var(--nj-gold);text-shadow:0 0 34px rgba(255,215,0,.25);font-variation-settings:"opsz" 144;
+  animation:nj-count .7s cubic-bezier(.2,.9,.2,1.2) both;
+}
+.nj-bet-num b i,.nj-intro-num b i,.nj-hero-num b i{font-style:normal;font-size:.42em;color:var(--nj-gold-2);letter-spacing:0;margin-left:2px;vertical-align:top}
+.nj-bet-num span,.nj-intro-num span{margin-top:6px;font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;color:var(--nj-fg-3)}
+.nj-bet-num em{font-style:normal;font-weight:700;color:var(--nj-fg);font-size:1.15rem;margin-top:2px;padding:4px 10px;border-radius:999px;background:var(--nj-maroon-soft);border:1px solid rgba(176,48,74,.4)}
+@keyframes nj-count{from{opacity:0;transform:translateY(18px) scale(.9)}to{opacity:1;transform:none}}
+.nj-intro-num{margin:10px 0 18px}
+
+/* ---------- Soal & pilihan ---------- */
+.nj-item{margin-top:8px}
+.nj-stem{font-size:1.2rem;line-height:1.5;font-weight:600;margin:0 0 4px;color:var(--nj-fg)}
+.nj-item-meta{display:block;color:var(--nj-fg-3);font-size:.74rem;margin-bottom:12px}
+.nj-options{display:grid;gap:8px}
+.nj-opt{display:flex;align-items:center;gap:12px;text-align:left;padding:13px 14px;border-radius:14px;border:1px solid var(--nj-line);
+  background:var(--nj-ink-2);color:var(--nj-fg);font-size:1rem;cursor:pointer;
+  transition:transform .18s cubic-bezier(.2,.8,.2,1),background-color .18s,border-color .18s}
+.nj-opt:hover:not([disabled]){transform:translateX(4px);background:var(--nj-ink-3);border-color:rgba(255,255,255,.18)}
+.nj-opt:active:not([disabled]){transform:scale(.985)}
+.nj-opt-key{width:28px;height:28px;border-radius:8px;display:grid;place-items:center;font-size:.8rem;font-weight:800;background:rgba(255,255,255,.06);color:var(--nj-fg-2);flex:none}
+.nj-opt.is-marked{border-color:rgba(255,215,0,.45);box-shadow:inset 0 0 0 1px rgba(255,215,0,.2)}
+.nj-opt.is-marked .nj-opt-key{background:var(--nj-gold-soft);color:var(--nj-gold)}
+.nj-opt.is-correct{border-color:var(--nj-emerald);background:var(--nj-emerald-soft)}
+.nj-opt.is-correct .nj-opt-key{background:var(--nj-emerald);color:#05231A}
+.nj-opt.is-wrong{border-color:var(--nj-maroon-2);background:var(--nj-maroon-soft);text-decoration:line-through;text-decoration-color:rgba(255,255,255,.5)}
+.nj-opt[disabled]{cursor:default;opacity:.92}
+.nj-rule{margin:12px 2px 0;padding:12px 14px;border-left:3px solid var(--nj-gold);background:rgba(255,215,0,.05);color:var(--nj-fg-2);font-size:.92rem;line-height:1.55;border-radius:0 12px 12px 0}
+
+/* ---------- Mic berdenyut ---------- */
+.nj-voice-row{display:flex;align-items:center;gap:12px;margin:16px 0 4px}
+.nj-mic{position:relative;width:56px;height:56px;border-radius:50%;border:1px solid rgba(255,215,0,.35);background:var(--nj-ink-2);color:var(--nj-gold);cursor:pointer;display:grid;place-items:center;transition:transform .2s,background-color .2s}
+.nj-mic:hover{transform:scale(1.05);background:var(--nj-ink-3)}
+.nj-mic-ring{position:absolute;inset:-1px;border-radius:50%;border:1px solid var(--nj-gold);opacity:0}
+.nj-mic.is-live{background:var(--nj-emerald-soft);border-color:var(--nj-emerald);color:var(--nj-emerald)}
+.nj-mic.is-live .nj-mic-ring{animation:nj-ripple 1.4s ease-out infinite;border-color:var(--nj-emerald)}
+.nj-mic.is-live::after{content:"";position:absolute;inset:-1px;border-radius:50%;border:1px solid var(--nj-emerald);animation:nj-ripple 1.4s .5s ease-out infinite}
+@keyframes nj-ripple{0%{transform:scale(1);opacity:.8}100%{transform:scale(1.9);opacity:0}}
+.nj-mic-label,.nj-mic-fallback{font-size:.82rem;color:var(--nj-fg-2)}
+
+/* ---------- Tombol ---------- */
+.nj-actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:16px}
+.nj-actions.is-secondary{margin-top:10px}
+.nj-btn{appearance:none;border:1px solid transparent;border-radius:999px;padding:13px 20px;font-weight:700;font-size:.95rem;cursor:pointer;letter-spacing:.01em;
+  transition:transform .18s cubic-bezier(.2,.8,.2,1),background-color .18s,box-shadow .18s,border-color .18s}
+.nj-btn:active{transform:scale(.97)}
+.nj-btn.is-gold{background:var(--nj-gold);color:#1A1400;box-shadow:0 10px 30px -10px rgba(255,215,0,.55)}
+.nj-btn.is-gold:hover{background:#FFE23A;transform:translateY(-1px)}
+.nj-btn.is-outline{background:transparent;color:var(--nj-fg);border-color:rgba(255,255,255,.22)}
+.nj-btn.is-outline:hover{border-color:var(--nj-gold);color:var(--nj-gold)}
+.nj-btn.is-ghost{background:rgba(255,255,255,.04);color:var(--nj-fg-2);border-color:var(--nj-line)}
+.nj-btn.is-ghost:hover{color:var(--nj-fg);background:rgba(255,255,255,.08)}
+.nj-btn.is-teleport{color:#F3C9D1;border-color:rgba(176,48,74,.5)}
+.nj-btn.is-teleport:hover{background:var(--nj-maroon-soft);color:#fff}
+
+/* ---------- Pita ketidakpastian BKT ---------- */
+.nj-ribbon{margin-top:18px}
+.nj-ribbon-track{position:relative;height:10px;border-radius:999px;background:rgba(255,255,255,.06);overflow:hidden}
+.nj-ribbon-band{position:absolute;top:0;bottom:0;border-radius:999px;background:linear-gradient(90deg,rgba(255,215,0,.25),rgba(255,215,0,.55),rgba(255,215,0,.25));transition:left .6s cubic-bezier(.2,.8,.2,1),width .6s cubic-bezier(.2,.8,.2,1)}
+.nj-ribbon-mean{position:absolute;top:-3px;width:3px;height:16px;margin-left:-1.5px;background:var(--nj-gold);box-shadow:0 0 10px var(--nj-gold);border-radius:2px;transition:left .6s cubic-bezier(.2,.8,.2,1)}
+.nj-ribbon-meta{display:flex;justify-content:space-between;margin-top:6px;font-size:.72rem;letter-spacing:.06em;text-transform:uppercase;color:var(--nj-fg-3)}
+
+/* ---------- Skor & ronde ---------- */
+.nj-score{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:14px;padding:10px 12px;border-radius:14px;background:var(--nj-ink-2);border:1px solid var(--nj-line);margin-bottom:8px}
+.nj-score-side{display:flex;flex-direction:column;align-items:center;line-height:1}
+.nj-score-side small{font-size:.62rem;letter-spacing:.16em;color:var(--nj-fg-3)}
+.nj-score-side b{font-family:var(--nj-display);font-size:1.9rem;font-weight:800}
+.nj-score-side.is-machine b{color:var(--nj-maroon-2)}
+.nj-score-side.is-student b{color:var(--nj-emerald)}
+.nj-score-rounds{display:flex;gap:5px;justify-content:center}
+.nj-score-rounds i{width:14px;height:6px;border-radius:3px;background:rgba(255,255,255,.1);transition:background-color .3s}
+.nj-score-rounds i.is-machine{background:var(--nj-maroon-2)}
+.nj-score-rounds i.is-student{background:var(--nj-emerald)}
+.nj-score-rounds i.is-neutral{background:var(--nj-fg-3)}
+.nj-score-rounds i.is-live{background:var(--nj-gold);animation:nj-pulse 1.2s infinite}
+@keyframes nj-pulse{0%,100%{opacity:1}50%{opacity:.35}}
+
+.nj-verdict{display:inline-block;margin:8px 0 2px;padding:6px 12px;border-radius:8px;font-size:.72rem;font-weight:800;letter-spacing:.16em}
+.nj-verdict.is-machine{background:var(--nj-maroon-soft);color:#FFB3C0;border:1px solid rgba(176,48,74,.5)}
+.nj-verdict.is-student{background:var(--nj-emerald-soft);color:#7FF0C6;border:1px solid rgba(16,185,129,.5)}
+
+/* ---------- Echo redemption ---------- */
+.nj-echo{display:flex;flex-direction:column;gap:4px;margin-top:12px;padding:16px;border-radius:16px;border:1px dashed rgba(255,215,0,.35);background:rgba(255,215,0,.04)}
+.nj-echo-label{font-size:.7rem;letter-spacing:.16em;text-transform:uppercase;color:var(--nj-fg-3)}
+.nj-echo-target{font-family:var(--nj-display);font-size:2.2rem;color:var(--nj-gold);letter-spacing:-.01em}
+.nj-echo small{color:var(--nj-fg-3)}
+
+/* ---------- Sanggahan ---------- */
+.nj-dispute{margin-top:10px;padding:16px;border-radius:16px;border:1px solid rgba(255,255,255,.14);background:var(--nj-ink-2)}
+.nj-dispute-head{display:flex;justify-content:space-between;align-items:center;font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;color:var(--nj-fg-3);margin-bottom:10px}
+.nj-dispute-head i{display:inline-block;width:10px;height:10px;border-radius:50%;background:rgba(255,255,255,.12);margin-left:5px}
+.nj-dispute-head i.ok{background:var(--nj-emerald)}
+.nj-dispute-head i.ko{background:var(--nj-maroon-2)}
+
+/* ---------- Papan duel akhir ---------- */
+.nj-board-score{display:flex;align-items:center;justify-content:center;gap:22px;padding:18px 0 4px}
+.nj-board-score>div{display:flex;flex-direction:column;align-items:center;line-height:1}
+.nj-board-score small{font-size:.66rem;letter-spacing:.18em;color:var(--nj-fg-3)}
+.nj-board-score b{font-family:var(--nj-display);font-weight:800;font-size:clamp(3.6rem,14vw,6rem);letter-spacing:-.05em;animation:nj-count .7s both}
+.nj-board-score .is-machine b{color:var(--nj-maroon-2)}
+.nj-board-score .is-student b{color:var(--nj-emerald)}
+.nj-board-vs{font-family:var(--nj-display);font-style:italic;color:var(--nj-fg-3);font-size:1.2rem}
+.nj-board-cols{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:10px}
+.nj-board-col{padding:14px;border-radius:14px;background:var(--nj-ink-2);border:1px solid var(--nj-line)}
+.nj-board-col h3{margin:0 0 8px;font-size:.7rem;letter-spacing:.16em;text-transform:uppercase;color:var(--nj-fg-3)}
+.nj-board-col ul{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+.nj-board-col li{display:flex;flex-direction:column;gap:2px;font-size:.88rem}
+.nj-board-col li span{color:var(--nj-fg-3);font-size:.76rem}
+.nj-board-col:first-child li b{color:#7FF0C6}
+.nj-board-col:last-child li b{color:#FFB3C0}
+.nj-empty{margin:0;color:var(--nj-fg-3);font-size:.86rem}
+.nj-log{list-style:none;margin:14px 0 0;padding:0;display:grid;gap:6px}
+.nj-log li{display:grid;grid-template-columns:34px 1fr auto 44px;gap:10px;align-items:center;padding:8px 10px;border-radius:10px;background:rgba(255,255,255,.03);font-size:.82rem;border-left:3px solid var(--nj-fg-3)}
+.nj-log li.is-student{border-left-color:var(--nj-emerald)}
+.nj-log li.is-machine{border-left-color:var(--nj-maroon-2)}
+.nj-log li span{color:var(--nj-fg-3);font-weight:700}
+.nj-log li em{font-style:normal;color:var(--nj-fg-2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.nj-log li b{color:var(--nj-fg)}
+.nj-log li small{text-align:right;color:var(--nj-gold)}
+
+/* ---------- HERO HOME: kartu magnetik NUJUM ---------- */
+.nj-hero{position:relative;overflow:hidden;isolation:isolate;border-radius:24px;padding:20px 20px 18px;margin:0 0 16px;
+  background:var(--nj-ink);border:1px solid rgba(255,215,0,.22);
+  box-shadow:0 24px 60px -28px rgba(140,34,51,.7),inset 0 1px 0 rgba(255,255,255,.06);
+  animation:nj-rise .6s cubic-bezier(.2,.8,.2,1) both;transition:transform .35s cubic-bezier(.2,.8,.2,1),box-shadow .35s}
+.nj-hero:hover{transform:translateY(-2px);box-shadow:0 30px 70px -26px rgba(140,34,51,.9),inset 0 1px 0 rgba(255,255,255,.08)}
+.nj-hero-glow{position:absolute;z-index:-1;inset:auto -30% -60% -30%;height:120%;pointer-events:none;
+  background:radial-gradient(50% 60% at 30% 100%,var(--nj-maroon-soft),transparent 70%),radial-gradient(35% 45% at 85% 20%,rgba(255,215,0,.12),transparent 70%);
+  animation:nj-drift 9s ease-in-out infinite alternate}
+@keyframes nj-drift{from{transform:translateX(-3%) rotate(-2deg)}to{transform:translateX(3%) rotate(2deg)}}
+.nj-hero-top{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+.nj-hero-brand{font-family:var(--nj-display);font-weight:800;letter-spacing:.16em;color:var(--nj-gold);font-size:1.05rem}
+.nj-hero-tag{font-size:.72rem;color:var(--nj-fg-3);letter-spacing:.06em}
+.nj-hero-last{margin-left:auto;font-size:.7rem;padding:3px 9px;border-radius:999px;border:1px solid var(--nj-line);color:var(--nj-fg-2)}
+.nj-hero-body{display:grid;grid-template-columns:auto 1fr;gap:16px;align-items:center;margin:12px 0 14px}
+.nj-hero-num b{font-size:clamp(3.4rem,13vw,5.4rem)}
+.nj-hero-line{margin:0;font-size:1.02rem;line-height:1.5;color:var(--nj-fg-2)}
+.nj-hero-line b{color:var(--nj-fg)}
+.nj-hero-foot{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.nj-hero-cta{padding:12px 18px}
+.nj-hero-hint{font-size:.74rem;color:var(--nj-fg-3)}
+
+/* ---------- Responsif ---------- */
+@media (max-width:480px){
+  .nj-stage{padding:14px 14px 22px;border-radius:20px}
+  .nj-mentor{grid-template-columns:44px 1fr;gap:10px}
+  .nj-mentor-sigil{width:44px;height:44px}
+  .nj-board-cols{grid-template-columns:1fr}
+  .nj-log li{grid-template-columns:30px 1fr auto 40px;font-size:.78rem}
+  .nj-hero-body{grid-template-columns:1fr;gap:6px}
+  .nj-actions .nj-btn{flex:1 1 auto;text-align:center}
+}
+@media (prefers-reduced-motion:reduce){
+  .nj-stage,.nj-hero,.nj-bet-num b,.nj-intro-num b,.nj-hero-num b,.nj-board-score b,.nj-line{animation:none}
+  .nj-hero-glow,.nj-mic.is-live .nj-mic-ring,.nj-mic.is-live::after,.nj-score-rounds i.is-live,.nj-mentor-sigil span{animation:none}
+}
