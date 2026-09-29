@@ -56,8 +56,8 @@ jobs:
             sleep 1
           done
           curl -sf http://127.0.0.1:8001/api/health
-      - name: E2E anti-IDOR (2 guru, 2 kelas, 2 murid)
-        run: python -m pytest tests/test_idor_e2e.py -q
+      - name: E2E anti-IDOR (2 guru, 2 kelas, 2 murid) + kasus tepi
+        run: python -m pytest tests/test_idor_e2e.py tests/test_edge_cases.py -q
       - name: Regresi backend (auth tiket, kurikulum, soal, asesmen, luring, migrasi)
         env:
           REACT_APP_BACKEND_URL: http://127.0.0.1:8001

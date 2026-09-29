@@ -1,39 +1,43 @@
-# PRD — Analisis Braincore Engine FIEZEL
+# PRD — Braincore Engine FIEZEL (audit → perbaikan)
 
 ## Problem statement asli
 "https://github.com/FIEZEL-APPS/FIEZEL-APPS — analisa braincore enginenya, apa yang tidak
-berfungsi, apa yang perlu ditingkatkan dan lain-lain" (Bahasa Indonesia).
+berfungsi, apa yang perlu ditingkatkan dan lain-lain" → lalu: "P0: tutup IDOR + perbaiki B7.
+P1: paritas BKT klien-server, CI backend tests, hapus dead code. P2: refactor N+1" → lalu:
+"perbaiki semua yang perlu diperbaiki, tingkatkan semua yang perlu ditingkatkan".
 
-## Yang sudah dikerjakan (2026-09-29)
-- Analisis statis backend/braincore.py (672 baris), braincore-bridge.js,
-  fiezel-braincore-evidence.js, fiezel-braincore-review.js, wiring learning.py/assessment.py.
-- Probe fungsional 15 cek (stub Mongo in-memory): 14 PASS — matematika inti sehat.
-- Konfirmasi temuan: B7 (note GAP salah makna, MASIH ADA), IDOR pada student-state &
-  endpoint guru (BARU), kode mati C6, paritas BKT klien-server (C3), N+1 query.
-- Laporan lengkap: /app/memory/braincore-analysis-2026-09.md
+## Arsitektur
+- `/app` = clone repo FIEZEL-APPS. `/app/backend` (FastAPI + Motor/MongoDB) **disinkronkan ke
+  `origin/main`** pada 2026-06 (sebelumnya tertinggal ~2.300 commit) lalu dipatch.
+- Auth: satu pintu tiket KelasKu (`POST /api/auth/kelasku`, HMAC `CURRICULUM_TICKET_KEY`).
+- Env lokal `/app/backend/.env` (tidak di-commit): MONGO_URL, DB_NAME, JWT_SECRET,
+  CURRICULUM_TICKET_KEY, CORS_ORIGINS. Preview: https://f81f2326-e070-4c8a-b861-6393b0133dcd.preview.emergentagent.com/api/health
+- Frontend repo = halaman statis (kurikulum.html, misi.html, features/*) — tidak disentuh.
 
-## Backlog prioritas
-- ~~P0: Fix IDOR (ownership kelas + self-check student-state); fix B7.~~ ✅ 2026-06
-- P1: ~~Hapus dead code C6~~ ✅; paritas parameter BKT (C3) ⚠️ file klien tak ada lokal;
-  ~~CI untuk backend/unit_test.py (B8)~~ ✅ (workflow disiapkan).
-- P2: ~~fail-fast MONGO_URL~~ ✅; ~~N+1 next_best_item~~ ✅; N+1 jalur guru lain ⏳;
-  satuan retrievability (C2) ⚠️ klien; cap senyap _pool ⏳.
+## Yang sudah dikerjakan
+- 2026-09-29: audit statis + probe (laporan `/app/memory/braincore-analysis-2026-09.md`).
+- 2026-06 (sesi lalu): patch drop-in di salinan lokal (kini dihapus, digantikan patch langsung).
+- 2026-06 (sesi ini) — diterapkan di `/app/backend`, rincian di `/app/memory/braincore-fixes/PATCH-NOTES.md`:
+  - P0 IDOR: `access.py` baru; guard di SEMUA endpoint guru/murid (coverage, recommendations,
+    groups, lesson-plan, tp-detail, passport, evidence-graph, student-state, classes/{id}, roster,
+    assessments create/list/get/analytics/from-recommendation, blueprints, learning events,
+    sessions). Bootstrap tidak lagi mencuri kelas demo guru lain (kelas demo per guru).
+  - P0 B7: note GAP = proporsi murid nyata.
+  - P1: dead code dihapus; copy murid baru selaras IRT; `bkt_step()` + `test_client_parity`
+    (bentuk rumus identik dengan klien; konstanta server dipertahankan, disetel dari data).
+  - P1 CI: `.github/workflows/backend-tests.yml` (unit → probe → uvicorn+Mongo → E2E IDOR →
+    kasus tepi → regresi).
+  - P2: N+1 → batch `$in` di coverage/recommendations/tp-detail/passport/due_reviews/
+    misconceptions/next_best_item/list_assessments/analytics/build_mission; `POOL_CAP` eksplisit;
+    fail-fast MONGO_URL & DB_NAME; `p_mastery_decayed` tidak bocor ke DB (sync_state, migrasi).
+  - Uji: unit 61/61, probe 15/15, pytest `test_idor_e2e` 7, `test_edge_cases` 15 (testing agent),
+    `test_fiezel_backend` 23 pass/1 skip. Laporan: `/app/test_reports/iteration_3.json`.
 
-## Patch diterapkan (2026-06) — repo eksternal, TIDAK bisa push
-Perbaikan diterapkan pada salinan sumber lokal, diverifikasi probe **15 PASS / 0 FAIL**,
-dikemas untuk owner terapkan ke `FIEZEL-APPS`:
-- P0 IDOR (assessment.py): helper `_assert_class_teacher` / `_assert_student_access` pada
-  student-state, coverage, recommendations, groups, lesson-plan, tp-detail, passport,
-  evidence-graph, classes/{id}.
-- P0 B7 (braincore.py coverage_matrix): note GAP kini proporsi MURID nyata (exposed−mastered),
-  bukan 100−rerata posterior.
-- P1 dead code C6 dihapus; P1 copy vs perilaku #4 diselaraskan (murid baru).
-- P2 N+1 `get_states` ($in tunggal) di next_best_item; P2 fail-fast MONGO_URL (db.py).
-- P1 B8: `.github/workflows/backend-tests.yml`.
-- Deliverable: /app/memory/braincore-fixes/ (braincore.py, assessment.py, db.py, probe.py,
-  backend-tests.yml, PATCH-NOTES.md).
-
-## Next action items
-- Owner terapkan patch ke repo & uji IDOR end-to-end 2 akun (guru A vs B, murid X vs Y).
-- C3/C2: samakan konstanta & retrievability brain KLIEN dengan server (file klien belum diaudit lokal).
-- P2 lanjut: N+1 coverage_matrix/learning_passport → aggregation; cap _pool.
+## Backlog
+- P1 (keputusan owner): `POST /api/learning/sync-state` mempercayai `p_mastery` klien → murid
+  bisa menyetel dirinya MASTERED. Opsi: hitung ulang BKT dari delta attempts/correct di server.
+- P2: satukan gerbang mastery klien (0,95 & n≥5) vs server (0,80 & 3 benar) bila owner ingin satu angka.
+- P2: `mastery_pct` di coverage = rerata posterior (bukan proporsi murid) — pertimbangkan rename
+  `avg_posterior_pct` di API + konsol guru (saran testing agent, bukan bug).
+- Ops: jalankan workflow di GitHub setelah "Save to GitHub"; pasang `.env` produksi sesuai
+  `backend/.env.example` (DB_NAME kini wajib).

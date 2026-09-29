@@ -1,0 +1,49 @@
+{
+  "summary": "Independent verification of FIEZEL backend patches (anti-IDOR guards, B7 note fix, N+1 refactor, per-teacher demo bootstrap). Ran all four suites requested by the main agent AND authored 15 new independent edge-case tests focusing on cases the review-note flagged: owner bypass, 404-vs-403 semantics, empty class (0 students) + zero-evidence class regression after N+1 refactor, assessment for_whole_class vs explicit student_ids targeting, blueprint scoping, B7 field completeness + invariants, and full session start\u2192next\u2192answer round-trip. Everything is green.",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {"ui_bugs": [], "integration_issues": [], "design_issues": []},
+  "test_report_links": [
+    "/app/backend/tests/test_edge_cases.py",
+    "/app/backend/tests/test_idor_e2e.py",
+    "/app/backend/tests/test_fiezel_backend.py",
+    "/app/test_reports/pytest/edge_cases.xml",
+    "/app/test_reports/pytest/fiezel_backend.xml"
+  ],
+  "suite_results": {
+    "unit_test.py": "61 PASS / 0 FAIL",
+    "probe.py": "15 PASS / 0 FAIL",
+    "tests/test_idor_e2e.py": "7 passed",
+    "tests/test_fiezel_backend.py": "23 passed, 1 skipped (parser-produced-no-rows guard)",
+    "tests/test_edge_cases.py (NEW, this iteration)": "15 passed"
+  },
+  "coverage_added_this_iteration": [
+    "Owner bypass across coverage/recommendations/tp-detail/classes/blueprints listing.",
+    "404 (not 403) for non-existent class_id and assessment_id on GET /api/classes/{id}, /api/coverage, /api/braincore/recommendations, /api/assessments/{id}, /api/assessments/{id}/analytics.",
+    "Coverage + recommendations + tp-detail on ZERO-student class do not error (N+1 refactor regression).",
+    "Coverage on class with roster but ZERO evidence: students_total>=2, students_mastered==0, mastery_pct is None/0 (BKT posterior average semantics confirmed \u2014 not mastered/exposed ratio).",
+    "Lesson-plan blocks minutes sum to requested minutes (within \u00b15 slack).",
+    "Two teachers each bootstrap: each owns its own demo class, first teacher does NOT lose its class (teacher_id stays), demo codes differ when FZ-DEMO7A already exists, roster is 18.",
+    "Assessment with explicit student_ids: for_whole_class=false, only target listed.",
+    "Assessment without student_ids: for_whole_class defaults to true.",
+    "B7 fields present on every coverage row: students_total, students_exposed, students_mastered, students_developing, students_needs_help, mastery_pct. Invariant mastered<=exposed<=total holds. GAP note contains 'dari' and 'yang aktif'. MISSING rows have exposed=0 and mastered=0.",
+    "End-to-end learner session: start(200) \u2192 next(200 with question) \u2192 answer(200 with learner_state)."
+  ],
+  "critical_code_review_comments": [
+    "assessment.py list_assessments (line ~349-354) correctly ORs {student_ids: user_id} with {for_whole_class: true, class_id: $in class_ids}. This is the right shape and matches the review request \u2014 explicit targeting takes precedence and whole-class fallback is scoped to enrolled classes. Verified via TestAssessmentTargeting.",
+    "braincore.py _coverage_row (line ~424) computes mastery_pct as average posterior mastery across exposed students, not (mastered/exposed). This is coherent with BKT semantics but the naming 'mastery_pct' can be misread. Consider renaming to 'avg_posterior_pct' or adding a doc comment; not a bug, purely clarity.",
+    "GAP note format 'N dari M yang aktif' is stable and testable (TestB7Fields asserts substring). Good.",
+    "kelasku tickets one-shot (jti burned) is verified idempotent; second use \u2192 401. Solid.",
+    "Owner role short-circuits at access.py helpers (assert_class_teacher / assert_class_member) and at list_blueprints. Cross-verified via TestOwnerBypass.",
+    "Bootstrap demo picks alt code (FZ-DEMOxxxx) when FZ-DEMO7A occupied \u2014 confirmed. Second teacher no longer steals first teacher's demo class (main P2 fix). teacher_id integrity preserved on subsequent /api/classes reads.",
+    "N+1 refactor: coverage on class with zero students returns 200 with empty stats (all zeros); on class with roster but zero evidence returns 200 with students_mastered=0 and mastery_pct None/0. No exception, no divide-by-zero. Solid.",
+    "Latency ~45ms/request on --reload workers is uvicorn reload overhead as noted \u2014 not investigated further."
+  ],
+  "updated_files": ["/app/backend/tests/test_edge_cases.py (new)"],
+  "success_rate": {"backend": "100% (61+15+7+23+15 = 121 tests pass, 1 skipped)", "frontend": "n/a (backend-only per request)"},
+  "test_credentials": "No static creds. Local tickets minted with CURRICULUM_TICKET_KEY from /app/backend/.env via kelasku.sign_ticket. See /app/memory/test_credentials.md.",
+  "seed_data_creation": "Each bootstrap-related test calls POST /api/seed/bootstrap under a fresh teacher ticket; produces one demo class + 18 students + evidence per teacher.",
+  "retest_needed": false,
+  "should_main_agent_self_test": false,
+  "context_for_next_testing_agent": "Backend patches (P0 IDOR guards, P0 B7 note, P1 BKT parity, P2 N+1 refactor + per-teacher demo bootstrap) are all green under 121 independent assertions. Question objects returned by /api/learning/sessions/{id}/next use key 'question_id' (not 'id') \u2014 tests updated accordingly. 'mastery_pct' in coverage rows is BKT posterior average, NOT mastered/exposed ratio; don't assert the latter identity. Owner bypasses class scoping in access.py. When a class has zero exposed students, mastery_pct is None (not 0) \u2014 accept both.",
+  "rca of the issue": "N/A this iteration \u2014 no bugs found. Two initial test-script mistakes on my end (missing 'title' on BlueprintIn, wrong mastery_pct semantics) were fixed in the test file; not backend defects."
+}
