@@ -91,8 +91,10 @@
        sendiri. `skills` (lima batang tipis) dan `map` (lipatan + dua garis) melanggar
        itu - yang satu terlalu ringan, yang lain terlalu ramai - jadi tab Latihan dan
        Progres pindah ke dua ikon ini. Keduanya TETAP tersedia untuk kartu di dalam layar. */
-    practice: '<polygon class="fz-fill" points="12,2.5 15.1,8.8 22,9.8 17,14.6 18.2,21.5 12,18.2 5.8,21.5 7,14.6 2,9.8 8.9,8.8" opacity="0.15"/>' +
-      '<polygon class="fz-line" points="12,2.5 15.1,8.8 22,9.8 17,14.6 18.2,21.5 12,18.2 5.8,21.5 7,14.6 2,9.8 8.9,8.8"/>',
+    practice: '<circle class="fz-fill" cx="12" cy="12" r="8.5" opacity="0.16"/>' +
+      '<circle class="fz-line" cx="12" cy="12" r="8.5"/>' +
+      '<circle class="fz-line" cx="12" cy="12" r="5.2"/>' +
+      '<circle class="fz-fill" cx="12" cy="12" r="2.2"/>',
     progress: '<circle class="fz-fill" cx="12" cy="12" r="9" opacity="0.15"/>' +
       '<circle class="fz-line" cx="12" cy="12" r="9"/>' +
       '<path class="fz-line" d="m7.5 12h2.5l1.6-3.8 2.4 7.6 1.8-3.8h2.7"/>',

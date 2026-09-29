@@ -7685,7 +7685,7 @@ function examWatchSync(){
 }
 try{document.addEventListener('fiezel-exam-lock',examWatchSync)}catch(_){}
 
-function go(v,opts){if((v==='ask'||v==='search')&&!aiDoorAllowed())return false;if(isVerifiedTeacher()&&v!=='tutor'){v='tutor'}if(!VALID_VIEWS.has(v)){showToast(FiezelI18n.t('nav.halaman-tak-tersedia'));return false}/* m025-314: penolakan berbahasa duduk DI SINI, bukan di daftar kartu — setiap pintu ke permukaan yang belum punya isi bahasa target lewat go(), termasuk pintu yang belum ditulis. */if(targetLangSurfaceBlocked(v)){showToast(FiezelI18n.t('bahasa.permukaan-terkunci',{bahasa:FiezelI18n.t('bahasa.'+activeTargetLang())}));return false}uiSfx('nav');dropStages();if(opts?.viaHistory!==true)pushBackNavView(v);state.view=v;if(v==='classroom'||v==='home'){try{inboxPoll(v==='classroom')}catch(_){}}const swap=()=>{save();render()};if(document.startViewTransition&&state.preferences?.motion!==false&&!prefersReducedMotion())document.startViewTransition(swap);else swap();return true} window.go=go;
+function go(v,opts){if((v==='ask'||v==='search')&&!aiDoorAllowed())return false;if(isVerifiedTeacher()&&v!=='tutor'){v='tutor'}if(!VALID_VIEWS.has(v)){showToast(FiezelI18n.t('nav.halaman-tak-tersedia'));return false}/* m025-314: penolakan berbahasa duduk DI SINI, bukan di daftar kartu — setiap pintu ke permukaan yang belum punya isi bahasa target lewat go(), termasuk pintu yang belum ditulis. */if(targetLangSurfaceBlocked(v)){showToast(FiezelI18n.t('bahasa.permukaan-terkunci',{bahasa:FiezelI18n.t('bahasa.'+activeTargetLang())}));return false}uiSfx('nav');dropStages();if(opts?.viaHistory!==true)pushBackNavView(v);state.view=v;if(v==='classroom'||v==='home'){try{inboxPoll(v==='classroom')}catch(_){}if(v==='home'){try{const cur=Number(sessionStorage.getItem('fz_today_vocab_visit')||0);sessionStorage.setItem('fz_today_vocab_visit',String(cur+1))}catch(_){}}}const swap=()=>{save();render()};if(document.startViewTransition&&state.preferences?.motion!==false&&!prefersReducedMotion())document.startViewTransition(swap);else swap();return true} window.go=go;
 function pushBackNavView(v){try{return self.FiezelBackNav?.pushView?.(v)===true}catch{return false}}
 /* ---- m025-117 lapisan layar-di-dalam-view (stage) ---------------------------------
  * OWNER: "misalnya sudah masuk ke dalam folder, dan ingin kembali, ketika swipe back malah
@@ -8714,24 +8714,7 @@ function todayHomeMarkup(){
      mana pun — chip Dengar tetap mengantar ke hub Skills Lab. Disaring benderanya, sama
      seperti ia sudah disaring targetLangSurfaceBlocked(). OWNER dapat mengembalikan pintu
      ini kapan saja dengan menyalakan benderanya; tidak ada kode yang perlu ditulis ulang. */
-  const quickChipRows=[
-    {view:'vocab',icon:'vocab',label:FiezelI18n.t('skill.vocab'),sub:FiezelI18n.t('home.chip-vocab-sub')},
-    {view:'grammar',icon:'grammar',label:FiezelI18n.t('skill.grammar'),sub:FiezelI18n.t('home.chip-grammar-sub')},
-    {view:'skills',icon:'listening',label:FiezelI18n.t('home.chip-dengar'),sub:FiezelI18n.t('home.chip-dengar-sub')}
-  ].filter(c=>!targetLangSurfaceBlocked(c.view)&&(c.view!=='skills'||uxOn('skillsLabDestination')));
-  const quickChips=`<section class="quick-practice-section" aria-label="${esc(FiezelI18n.t('home.latihan-singkat'))}">
-    <div class="quick-practice-head">
-      <h2 class="quick-practice-title">${esc(FiezelI18n.t('home.latihan-singkat'))}</h2>
-      <small class="quick-practice-hint">${FiezelI18n.t('home.pilih-fokus-label')}</small>
-    </div>
-    ${targetLangChipMarkup()}
-    <div class="quick-chips-grid">${quickChipRows.map(c=>`
-      <button type="button" class="quick-chip" onclick="go('${esc(c.view)}')">
-        <span class="chip-label"><i class="fz-i" data-fz-icon="${esc(c.icon)}" style="width:14px;height:14px;display:inline-flex"></i> ${esc(c.label)}</span>
-        <span class="chip-sub">${esc(c.sub)}</span>
-      </button>`).join('')}
-    </div>
-  </section>`;
+
 
   /* AUDIT-2026-09-21 T5: keping LEVEL + REVIEW hidup di today-head. homeStatStripMarkup()
      mati di cabang todayHome (pemanggilnya di cabang else), jadi murid tidak pernah melihat
@@ -8789,63 +8772,140 @@ function todayHomeMarkup(){
   }
 
   const homeTop = `<div class="fz-welcome-header">`
-    + `<div class="fz-greet-title">${esc(FiezelI18n.t('home.sapa', { nama: currentLearner }))} <span class="fz-wave-hand" aria-hidden="true">👋</span></div>`
+    + `<div class="fz-greet-title">${esc(FiezelI18n.t('home.sapa', { nama: currentLearner }))}</div>`
     + `<p class="fz-greet-motivation">${esc(currentMotivation)}</p>`
     + `</div>`;
 
-  /* Kosakata Harian untuk bagian atas Kartu 1 */
-  let dailyWord = null;
+  /* Kosakata Harian untuk bagian atas Kartu 1:
+     - Memuat 5 kata per hari berdasarkan level aktif
+     - Menampilkan 1 kata per kunjungan/entry
+     - Berputar di antara 5 kata tersebut setiap entri baru atau saat tombol audio/rotasi diklik */
+  let dailyFiveWords = [];
   try {
-    const list = (Array.isArray(V) && V.length) ? V.filter(v => v.word && v.meaning) : [];
-    if (list.length > 0) {
-      const idx = Math.floor(Date.now() / 86400000) % list.length;
-      dailyWord = list[idx];
+    const activeLvl = (typeof getActiveLevel === 'function' ? getActiveLevel() : (todayLevel || 'A1'));
+    const list = (Array.isArray(V) && V.length)
+      ? V.filter(v => v.word && v.meaning && (v.level === activeLvl || !v.level))
+      : [];
+    const sourceList = list.length >= 5 ? list : ((Array.isArray(V) && V.length) ? V.filter(v => v.word && v.meaning) : []);
+    if (sourceList.length >= 5) {
+      const dayEpoch = Math.floor(Date.now() / 86400000);
+      for (let i = 0; i < 5; i++) {
+        const idx = Math.abs((dayEpoch * 17 + i * 29) % sourceList.length);
+        dailyFiveWords.push(sourceList[idx]);
+      }
     }
   } catch(_) {}
-  if (!dailyWord) {
-    dailyWord = jaCourseOn()
-      ? (isTh
-          ? { word: '頑張る', phonetic: 'がんばる (ganbaru)', meaning: 'พยายามอย่างเต็มที่, มุ่งมั่นไม่ยอมแพ้', example: '毎日少しずつ頑張りましょう。', exampleTranslation: 'มาพยายามไปด้วยกันทีละนิดในทุก ๆ วันนะ' }
-          : { word: '頑張る', phonetic: 'がんばる (ganbaru)', meaning: 'Berusaha keras, bersemangat pantang menyerah.', example: '毎日少しずつ頑張りましょう。', exampleTranslation: 'Mari berusaha setiap hari sedikit demi sedikit.' })
-      : (isTh
-          ? { word: 'Accomplish', phonetic: '/əˈkʌm.plɪʃ/ • Verb', meaning: 'ทำสำเร็จ, บรรลุเป้าหมายที่ตั้งไว้', example: 'You can accomplish anything with consistent practice.', exampleTranslation: 'คุณสามารถทำทุกสิ่งให้สำเร็จได้ด้วยการฝึกฝนอย่างสม่ำเสมอ' }
-          : { word: 'Accomplish', phonetic: '/əˈkʌm.plɪʃ/ • Verb', meaning: 'Meraih, menuntaskan, atau berhasil mencapai target.', example: 'You can accomplish anything with consistent practice.', exampleTranslation: 'Kamu bisa meraih apa saja dengan latihan yang konsisten.' });
+
+  if (!dailyFiveWords.length) {
+    dailyFiveWords = jaCourseOn()
+      ? [
+          { word: '頑張る', phonetic: 'がんばる (ganbaru)', meaning: isTh ? 'พยายามอย่างเต็มที่, มุ่งมั่นไม่ยอมแพ้' : 'Berusaha keras, bersemangat pantang menyerah.', example: '毎日少しずつ頑張りましょう。', exampleTranslation: isTh ? 'มาพยายามไปด้วยกันนะ' : 'Mari berusaha setiap hari sedikit demi sedikit.' },
+          { word: '約束', phonetic: 'やくそく (yakusoku)', meaning: isTh ? 'สัญญา' : 'Janji atau kesepakatan.', example: '約束を守ります。', exampleTranslation: 'Menepati janji.' },
+          { word: '大切', phonetic: 'たいせつ (taisetsu)', meaning: isTh ? 'สำคัญ' : 'Penting atau sangat berharga.', example: '時間を大切にする。', exampleTranslation: 'Menghargai waktu.' },
+          { word: '準備', phonetic: 'じゅんび (junbi)', meaning: isTh ? 'เตรียมตัว' : 'Persiapan atau bersiap-siap.', example: '試験の準備をする。', exampleTranslation: 'Mempersiapkan ujian.' },
+          { word: '感謝', phonetic: 'かんしゃ (kansha)', meaning: isTh ? 'ขอบคุณ' : 'Rasa syukur atau terima kasih.', example: 'いつも感謝しています。', exampleTranslation: 'Selalu bersyukur.' }
+        ]
+      : [
+          { word: 'Accomplish', phonetic: '/əˈkʌm.plɪʃ/ • Verb', meaning: isTh ? 'ทำสำเร็จ, บรรลุเป้าหมายที่ตั้งไว้' : 'Meraih, menuntaskan, atau berhasil mencapai target.', example: 'You can accomplish anything with consistent practice.', exampleTranslation: isTh ? 'คุณสามารถทำทุกสิ่งให้สำเร็จได้' : 'Kamu bisa meraih apa saja dengan latihan konsisten.' },
+          { word: 'Consistent', phonetic: '/kənˈsɪs.tənt/ • Adj', meaning: isTh ? 'สม่ำเสมอ' : 'Konsisten dan berkelanjutan.', example: 'Consistent effort brings great results.', exampleTranslation: 'Usaha yang konsisten membawa hasil besar.' },
+          { word: 'Opportunity', phonetic: '/ˌɒp.əˈtjuː.nə.ti/ • Noun', meaning: isTh ? 'โอกาส' : 'Peluang emas atau kesempatan baru.', example: 'Every challenge is a new opportunity.', exampleTranslation: 'Setiap tantangan adalah peluang baru.' },
+          { word: 'Persistent', phonetic: '/pəˈzɪs.tənt/ • Adj', meaning: isTh ? 'ไม่ย่อท้อ' : 'Gigih, tekun, dan pantang menyerah.', example: 'Be persistent in pursuing your goals.', exampleTranslation: 'Gigihlah dalam mengejar impianmu.' },
+          { word: 'Enhance', phonetic: '/ɪnˈhɑːns/ • Verb', meaning: isTh ? 'เพิ่มพูน' : 'Meningkatkan mutu, nilai, atau kemampuan.', example: 'Reading helps enhance your vocabulary.', exampleTranslation: 'Membaca membantu meningkatkan kosakatamu.' }
+        ];
+  }
+
+  let vocabVisitIdx = 0;
+  try {
+    if (typeof window !== 'undefined' && window.sessionStorage) {
+      const stored = Number(window.sessionStorage.getItem('fz_today_vocab_visit') || 0);
+      vocabVisitIdx = isNaN(stored) ? 0 : Math.abs(stored) % dailyFiveWords.length;
+    }
+  } catch(_) {}
+  const dailyWord = dailyFiveWords[vocabVisitIdx] || dailyFiveWords[0];
+  const vocabOrderNum = vocabVisitIdx + 1;
+
+  if (typeof window !== 'undefined') {
+    window.nextTodayVocabWord = function() {
+      try {
+        if (window.sessionStorage) {
+          const cur = Number(window.sessionStorage.getItem('fz_today_vocab_visit') || 0);
+          window.sessionStorage.setItem('fz_today_vocab_visit', String(cur + 1));
+        }
+      } catch(_) {}
+      if (typeof render === 'function') {
+        render();
+      }
+    };
+    window.playTodayVocabAudio = function() {
+      try {
+        if (typeof audio !== 'undefined' && audio.play && dailyWord && dailyWord.word) {
+          audio.play(dailyWord.word, { contentType: 'word' });
+        }
+      } catch(_) {}
+    };
+    window.rotateTodayVocab = function() {
+      window.nextTodayVocabWord();
+    };
   }
 
   const week = homeWeekStats();
   const vocabStats = homeVocabStats();
   const nextLevel = LEVELS[LEVELS.indexOf(todayLevel) + 1] || '';
 
-  /* Kartu tidak lagi ber-role=button: tombol di dalamnya adalah kontrol yang sebenarnya, dan
-     role=button yang membungkus tombol lain adalah kontrol bersarang (pembaca layar membaca
-     dua tombol untuk satu aksi, dan kartu tanpa onkeydown tidak bisa dipakai lewat keyboard).
-     Klik di mana pun pada kartu tetap berfungsi untuk tetikus/sentuh. */
-  /* CARD 1: kata hari ini + tombol latihan utama */
+  /* CARD 1: Solusi B - Dual Zone Obsidian Aurora Glass */
   const card1Hero = `
-    <div class="today-card fz-stadium-card fz-card-yellow" onclick="${primaryBtnAction}">
-      <div class="fz-stadium-header fz-stadium-vocab-header">
-        <div class="fz-stadium-vocab-top">
-          <span class="fz-vocab-kicker-tag">${esc(FiezelI18n.t('home.kartu1-kicker'))}</span>
-          <span class="fz-vocab-level-tag">${esc(jaCourseOn() ? 'JLPT N5' : FiezelI18n.t('home.kartu-level', { level: todayLevel }))}</span>
+    <div class="today-card fz-stadium-card fz-aurora-card" onclick="${primaryBtnAction}">
+      <div class="fz-aurora-vocab-zone">
+        <div class="fz-aurora-zone-header">
+          <div class="fz-aurora-kicker">
+            <span class="fz-aurora-dot"></span>
+            <span>${esc(isTh ? 'คำศัพท์ประจำวัน' : 'KOSAKATA HARIAN')}</span>
+          </div>
+          <div class="fz-aurora-stepper" onclick="event.stopPropagation();if(window.nextTodayVocabWord)window.nextTodayVocabWord();" title="${isTh ? 'เปลี่ยนคำถัดไป' : 'Klik untuk ganti kata berikutnya'}" style="cursor:pointer">
+            <span class="fz-aurora-step-text">${isTh ? `คำที่ ${vocabOrderNum} จาก 5` : `KATA ${vocabOrderNum} DARI 5`}</span>
+            <div class="fz-aurora-dots">
+              ${[1,2,3,4,5].map(n => `<span class="fz-aurora-dot-item${n === vocabOrderNum ? ' is-active' : ''}"></span>`).join('')}
+            </div>
+          </div>
         </div>
-        <div class="fz-vocab-hero-content">
-          <div class="fz-vocab-word-title">${esc(dailyWord.word)}</div>
-          ${dailyWord.phonetic ? `<div class="fz-vocab-word-phonetic">${esc(dailyWord.phonetic)}</div>` : ''}
-          <div class="fz-vocab-word-meaning">${esc(dailyWord.meaning)}</div>
-          ${dailyWord.example ? `<div class="fz-vocab-word-example">"${esc(dailyWord.example)}"${dailyWord.exampleTranslation ? ` &mdash; <em>${esc(dailyWord.exampleTranslation)}</em>` : ''}</div>` : ''}
+        <div class="fz-aurora-glass-pod">
+          <div class="fz-aurora-word-group">
+            <div class="fz-aurora-word-row">
+              <span class="fz-aurora-word">${esc(dailyWord.word)}</span>
+              ${dailyWord.phonetic ? `<span class="fz-aurora-pos">${esc(dailyWord.phonetic.includes('•') ? dailyWord.phonetic.split('•')[1].trim() : (dailyWord.partOfSpeech || (jaCourseOn() ? 'KOSA KATA' : 'WORD')))}</span>` : ''}
+            </div>
+            ${dailyWord.phonetic && dailyWord.phonetic.includes('/') ? `<div class="fz-aurora-phonetic">${esc(dailyWord.phonetic.split('•')[0].trim())}</div>` : (dailyWord.phonetic && !dailyWord.phonetic.includes('•') ? `<div class="fz-aurora-phonetic">${esc(dailyWord.phonetic)}</div>` : '')}
+            <div class="fz-aurora-meaning">${esc(dailyWord.meaning)}</div>
+          </div>
+          <button type="button" class="fz-aurora-audio-btn" onclick="event.stopPropagation();if(window.playTodayVocabAudio)window.playTodayVocabAudio();" title="${isTh ? 'ฟังการออกเสียง' : 'Putar audio pengucapan'}">
+            <svg class="fz-svg" viewBox="0 0 24 24" style="width:20px;height:20px;display:inline-block;vertical-align:middle" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5L6 9H2v6h4l5 4V5z"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg>
+          </button>
         </div>
       </div>
-      <div class="fz-stadium-body">
-        <div class="fz-stadium-metrics-row">
-          <div class="fz-stadium-chip">${esc(FiezelI18n.t('home.kartu1-soal', { n: shape.soal || 10 }))}</div>
-          <div class="fz-stadium-center-time">
-            <span class="fz-time-val">${esc(formattedTime)}</span>
-            <span class="fz-date-val">${esc(formattedDate)}</span>
+      <div class="fz-aurora-session-zone">
+        <div class="fz-aurora-session-header">
+          <div class="fz-aurora-session-badge">
+            <i class="fz-i" data-fz-icon="practice" style="width:13px;height:13px"></i>
+            <span>${isTh ? 'เซสชันรายวันแบบปรับตัว' : 'SESI ADAPTIF HARIAN'}</span>
           </div>
-          <div class="fz-stadium-chip is-xp">${esc(FiezelI18n.t('home.kartu1-menit', { n: shape.menit || 5 }))}</div>
+          <div class="fz-aurora-session-time">${esc(FiezelI18n.t('home.kartu1-soal', { n: shape.soal || 10 }))} • ${esc(FiezelI18n.t('home.kartu1-menit', { n: shape.menit || 5 }))}</div>
         </div>
-        <button type="button" class="fz-stadium-cta-btn" onclick="event.stopPropagation();${primaryBtnAction}">
-          ${esc(primaryBtnText)} <span aria-hidden="true">➔</span>
+        <div class="fz-aurora-session-info">
+          <div class="fz-aurora-session-title">${isTh ? 'เป้าหมายฝึกฝนหลากหลายทักษะ' : 'Target Latihan Multi-Topik'}</div>
+          <p class="fz-aurora-session-desc">${isTh ? 'การฝึกฝนแบบปรับตัวรวมไวยากรณ์ การอ่าน และคำศัพท์' : 'Latihan adaptif gabungan Tata Bahasa, Membaca &amp; Kosakata.'}</p>
+        </div>
+        <div class="fz-aurora-progress-block">
+          <div class="fz-aurora-progress-labels">
+            <span>${esc(FiezelI18n.t('home.ritme-harian'))} (${rhythmShown}/${rhythmTarget} ${isTh ? 'ข้อเสร็จแล้ว' : 'Soal Selesai'})</span>
+            <b>${rhythmPct}%</b>
+          </div>
+          <div class="fz-aurora-track">
+            <div class="fz-aurora-track-fill" style="width:${rhythmPct}%"></div>
+          </div>
+        </div>
+        <button type="button" class="fz-aurora-cta-btn" onclick="event.stopPropagation();${primaryBtnAction}">
+          <span>${hasTestedLevel ? (isTh ? 'เริ่มเซสชันเต็มรูปแบบทันที' : 'MULAI SESI LENGKAP SEKARANG') : esc(primaryBtnText)}</span>
+          <span aria-hidden="true">➔</span>
         </button>
       </div>
     </div>`;
@@ -8882,7 +8942,6 @@ function todayHomeMarkup(){
      ajakan jujur untuk mengumpulkan jawaban, bukan persentase karangan. */
   const weekDelta = week.delta;
   const weekTone = weekDelta == null ? 'kurang' : weekDelta >= 3 ? 'naik' : weekDelta <= -3 ? 'turun' : 'stabil';
-  /* Kunci literal, bukan disambung: gerbang kunci-hantu hanya bisa menjaga kunci yang tertulis utuh. */
   const weekKey = { naik: 'home.kartu3-isi-naik', turun: 'home.kartu3-isi-turun', stabil: 'home.kartu3-isi-stabil', kurang: 'home.kartu3-isi-kurang' }[weekTone];
   const card3Hero = `
     <div class="fz-stadium-card fz-card-dark" onclick="go('progress')">
@@ -8911,26 +8970,111 @@ function todayHomeMarkup(){
       </div>
     </div>`;
 
+  /* 2x2 Bento Learning Hub */
+  const quickChips = `<section class="quick-practice-section fz-stitch-section" aria-label="${esc(FiezelI18n.t('home.latihan-singkat'))}">
+    <div class="quick-practice-head">
+      <h2 class="quick-practice-title">${esc(FiezelI18n.t('home.latihan-singkat'))}</h2>
+      <small class="quick-practice-hint">${FiezelI18n.t('home.pilih-fokus-label')}</small>
+    </div>
+    ${targetLangChipMarkup()}
+    <div class="fz-stitch-grid">
+      <div class="fz-stitch-card" onclick="go('vocab')">
+        <div class="fz-stitch-card-top">
+          <div class="fz-stitch-icon is-yellow"><i class="fz-i" data-fz-icon="vocab"></i></div>
+          <span class="fz-stitch-badge is-yellow">${esc(vocabStats.due ? vocabStats.due + ' Ulang' : (todayLevel || 'A1'))}</span>
+        </div>
+        <div class="fz-stitch-card-bottom">
+          <h3>${esc(FiezelI18n.t('skill.vocab'))}</h3>
+          <p>${esc(FiezelI18n.t('home.chip-vocab-sub'))}</p>
+        </div>
+      </div>
+      <div class="fz-stitch-card" onclick="go('grammar')">
+        <div class="fz-stitch-card-top">
+          <div class="fz-stitch-icon is-green"><i class="fz-i" data-fz-icon="grammar"></i></div>
+          <span class="fz-stitch-badge">Pola</span>
+        </div>
+        <div class="fz-stitch-card-bottom">
+          <h3>${esc(FiezelI18n.t('skill.grammar'))}</h3>
+          <p>${esc(FiezelI18n.t('home.chip-grammar-sub'))}</p>
+        </div>
+      </div>
+      <div class="fz-stitch-card" onclick="go('reading')">
+        <div class="fz-stitch-card-top">
+          <div class="fz-stitch-icon is-blue"><i class="fz-i" data-fz-icon="reading"></i></div>
+          <span class="fz-stitch-badge">Teks</span>
+        </div>
+        <div class="fz-stitch-card-bottom">
+          <h3>${esc(FiezelI18n.t('skill.reading'))}</h3>
+          <p>Cerita &amp; Artikel</p>
+        </div>
+      </div>
+      ${(uxOn('skillsLabDestination') && !targetLangSurfaceBlocked('skills')) ? `
+      <div class="fz-stitch-card" onclick="go('skills')">
+        <div class="fz-stitch-card-top">
+          <div class="fz-stitch-icon is-rose"><i class="fz-i" data-fz-icon="listening"></i></div>
+          <span class="fz-stitch-badge">Audio</span>
+        </div>
+        <div class="fz-stitch-card-bottom">
+          <h3>${esc(FiezelI18n.t('home.chip-dengar'))}</h3>
+          <p>${esc(FiezelI18n.t('home.chip-dengar-sub'))}</p>
+        </div>
+      </div>` : `
+      <div class="fz-stitch-card" onclick="go('latihan')">
+        <div class="fz-stitch-card-top">
+          <div class="fz-stitch-icon is-rose"><i class="fz-i" data-fz-icon="practice"></i></div>
+          <span class="fz-stitch-badge">Fokus</span>
+        </div>
+        <div class="fz-stitch-card-bottom">
+          <h3>Latihan Soal</h3>
+          <p>Semua Modul</p>
+        </div>
+      </div>`}
+    </div>
+  </section>`;
+
+  /* KelasKu Task Strip */
+  const kelaskuStrip = `<section class="fz-stitch-kelasku" onclick="go('classroom')">
+    <div class="kelasku-strip-left">
+      <div class="kelasku-strip-icon">
+        <i class="fz-i" data-fz-icon="classroom"></i>
+      </div>
+      <div class="kelasku-strip-text">
+        <div class="kelasku-strip-meta">
+          <span class="kelasku-meta-brand">KelasKu</span>
+          <span>•</span>
+          <span class="kelasku-meta-due">Tugas Aktif</span>
+        </div>
+        <div class="kelasku-strip-title">Latihan &amp; Materi Kelas</div>
+        <div class="kelasku-strip-sub">Sinkronisasi Kurikulum &amp; Guru</div>
+      </div>
+    </div>
+    <button type="button" class="kelasku-strip-btn" onclick="event.stopPropagation();go('classroom')">
+      <span>Buka</span>
+      <span aria-hidden="true">➔</span>
+    </button>
+  </section>`;
+
   return `<div class="today-home-cockpit fz-edu-cockpit">
   ${homeTop}
-  ${evidenceProgressPanelMarkup()}
   ${card1Hero}
-  ${card2Hero}
-  ${card3Hero}
+  ${quickChips}
+  ${kelaskuStrip}
   <details class="fz-card-drawer" style="margin-top:4px">
-    <summary class="fz-drawer-toggle"><span>${jaCourseOn() ? '⛩️ ' : '⚡ '}${esc(FiezelI18n.t('home.sesi-next') || (isTh ? 'รายละเอียดเนื้อหา & จังหวะ' : 'DETAIL MATERI & RITME'))}</span><span class="fz-drawer-arrow">▾</span></summary>
+    <summary class="fz-drawer-toggle"><span>${esc(FiezelI18n.t('home.sesi-next') || (isTh ? 'รายละเอียดเนื้อหา & จังหวะ' : 'DETAIL MATERI & RITME'))}</span><span class="fz-drawer-arrow">▾</span></summary>
     <div class="fz-drawer-inner">
+      ${card2Hero}
+      ${card3Hero}
       <div class="today-head"><span class="today-eyebrow">${FiezelI18n.t('today.eyebrow')}</span>${todayHeadChips}</div>
       ${rhythmBar}
       ${badan}
       ${streak>0?`<p class="today-streak"><i class="fz-i" data-fz-icon="flame" aria-hidden="true"></i> ${esc(FiezelI18n.t('today.streak',{days:streak}))}</p>`:''}
       ${activeLevelTrustLineMarkup()}
+      ${evidenceProgressPanelMarkup()}
     </div>
   </details>
   ${heroMascotMarkup}
   ${jaCourseOn()?FiezelJaUi.wordOfDayMarkup(V.filter(v=>v.level===getActiveLevel())):''}
   ${learnerFlowHomeMarkup()}
-  ${quickChips}
   ${socialHomeMarkup()}
 </div>`;
 }
