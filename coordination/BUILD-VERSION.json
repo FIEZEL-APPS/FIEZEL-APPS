@@ -1,7 +1,7 @@
 {
-  "version": "m025-384",
+  "version": "m025-385",
   "claimedBy": "branch agent/a3-gate-audit-remediation-20260815",
-  "claimedAt": "2026-09-29T15:07:55.816Z",
-  "reason": "audit UI/UX: lapisan vivid, perbaikan header kuis, keadaan kosong Profil",
+  "claimedAt": "2026-09-29T15:29:17.111Z",
+  "reason": "audit warna KelasKu guru: latar cerah, kontras teks",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }
