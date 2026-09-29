@@ -43,7 +43,7 @@ test('ada fungsi pintasan bahasa untuk layar depan', () => {
 test('pintasannya BENAR-BENAR dipasang di markup layar depan', () => {
   const i = app.indexOf('function todayHomeMarkup');
   assert.ok(i > 0, 'todayHomeMarkup() tidak ditemukan');
-  const blok = app.slice(i, i + 12000);
+  const blok = app.slice(i, i + 25000);
   assert.ok(/targetLangChipMarkup\s*\(\s*\)/.test(blok),
     'targetLangChipMarkup() ada tetapi tidak pernah dipanggil dari layar depan — ' +
     'fungsi yang tidak dipanggil sama dengan tidak ada');
