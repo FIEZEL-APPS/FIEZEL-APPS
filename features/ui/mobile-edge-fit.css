@@ -3387,3 +3387,85 @@ button.level-picker-card {
   font-family: 'Noto Sans Thai Looped', 'Plus Jakarta Sans', sans-serif !important;
   line-height: 1.3 !important;
 }
+
+/* ==========================================================================
+   ZERO VOID SPACE (Anti-Ruang Hampa) - Stop Scroll Snapping Into Empty Voids
+   Eliminate stacked padding-bottom and artificial min-height that create
+   empty black void space below cards across all panels and screens.
+   ========================================================================== */
+body,
+body.fz-lux,
+body.fz-stage-map .app,
+body.fz-stage-quiz .app,
+body.fz-stage-sl .app,
+body.fz-stage-hub .app,
+main.app,
+.app,
+.view-container,
+#app {
+  padding-bottom: 0 !important;
+}
+
+/* Screen containers: bottom padding exactly matches fixed bottombar (~60px) + safe-area breathing space */
+#app > section,
+#app > div,
+#app > article,
+main.app > section,
+main.app > div,
+section.fade,
+.classroom-page,
+.home-page,
+.home-today,
+.learner-flow-page,
+.skills-lab-page,
+.skills-page,
+.writing-page,
+.library-page,
+.ask-page,
+.progress-page,
+.profile-page,
+.settings-page,
+.view-page,
+.view-container {
+  min-height: auto !important;
+  padding-bottom: calc(76px + env(safe-area-inset-bottom, 12px)) !important;
+  scroll-padding-bottom: calc(76px + env(safe-area-inset-bottom, 12px)) !important;
+}
+
+/* Remove any nested padding-bottom on child wrappers */
+.home-today .today-home-cockpit,
+.today-home-cockpit,
+.ch-student,
+.classroom-shell,
+.learner-flow-shell,
+.paw-arena-shell,
+.tutor-center-shell,
+.teacher-shell-root,
+.progress-container,
+#socialHomeSlot,
+.fz2-social,
+.learning-launcher,
+.fz-card-drawer,
+.library-reader,
+.fsl-feedback,
+.grid,
+#fzClassHub,
+#fzLearnerFlow,
+#fzPawArena,
+#fzTeacherShell,
+#fzTutorCenter {
+  padding-bottom: 0 !important;
+  margin-bottom: 0 !important;
+}
+
+/* Modals & popup panels: snug fit without endless trailing void */
+.modal-panel,
+.welcome-panel,
+.notification-panel,
+.listening-modal-box {
+  max-height: min(720px, 86vh) !important;
+  padding-bottom: 20px !important;
+  margin-bottom: 0 !important;
+}
+
+

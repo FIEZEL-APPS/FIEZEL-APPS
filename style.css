@@ -5946,7 +5946,7 @@ html, body {
 /* Home Page Canvas & Shell Resets */
 html:has(.home-today),
 body:has(.home-today) {
-  scroll-padding-bottom: 140px !important;
+  scroll-padding-bottom: calc(76px + env(safe-area-inset-bottom, 12px)) !important;
   background: #0A0A0E !important;
   color: #FFFFFF !important;
 }
@@ -5967,14 +5967,14 @@ html.has-home-today #globalSky {
 .home-today {
   background: radial-gradient(ellipse 90% 40% at 50% -5%, rgba(255, 224, 46, 0.12) 0%, transparent 60%), #0A0A0E !important;
   color: #FFFFFF !important;
-  min-height: 100vh !important;
-  padding: 16px 14px 160px 14px !important;
+  min-height: auto !important;
+  padding: 16px 14px calc(80px + env(safe-area-inset-bottom, 12px)) 14px !important;
   position: relative !important;
   box-sizing: border-box !important;
   width: 100% !important;
   max-width: 100% !important;
   overflow-x: hidden !important;
-  scroll-padding-bottom: 140px !important;
+  scroll-padding-bottom: calc(80px + env(safe-area-inset-bottom, 12px)) !important;
 }
 
 .home-today .today-home-cockpit {
@@ -5985,7 +5985,7 @@ html.has-home-today #globalSky {
   flex-direction: column !important;
   gap: 16px !important;
   box-sizing: border-box !important;
-  padding-bottom: 140px !important;
+  padding-bottom: 0 !important;
 }
 
 /* ==========================================================================
@@ -6629,7 +6629,7 @@ body.fz-lux,
 main.app,
 .view-container,
 #app {
-  padding-bottom: 96px !important;
+  padding-bottom: 0 !important;
 }
 
 /* Hide bottomnav when listening modal or detail sheet is active or in lesson mode */
@@ -6828,8 +6828,8 @@ section.fade,
 .home-page {
   background: radial-gradient(ellipse 90% 40% at 50% -5%, rgba(255, 224, 46, 0.08) 0%, transparent 60%), #0A0A0E !important;
   color: #FFFFFF !important;
-  min-height: calc(100vh - 64px) !important;
-  padding-bottom: 140px !important;
+  min-height: auto !important;
+  padding-bottom: calc(80px + env(safe-area-inset-bottom, 12px)) !important;
 }
 
 /* Bottom Nav Scrim */
@@ -7073,7 +7073,7 @@ html body #app .learning-launcher .launch-card svg,
 }
 
 .ch-student {
-  padding-bottom: 140px !important;
+  padding-bottom: 0 !important;
 }
 
 .ch-head h1,

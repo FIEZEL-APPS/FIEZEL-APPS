@@ -1,7 +1,7 @@
 {
-  "version": "m025-379",
-  "claimedBy": "branch claude/happy-bohr-iteg9g",
-  "claimedAt": "2026-09-27T20:53:49.715Z",
-  "reason": "feat(braincore): langkah 3 — angka rumus disetel dari data",
+  "version": "m025-381",
+  "claimedBy": "branch main",
+  "claimedAt": "2026-09-29T08:04:09.164Z",
+  "reason": "eliminate bottom void space (anti-ruang hampa) across all screens and panels",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }
