@@ -57,7 +57,7 @@ assert(/Jaringan Kekeliruan Kosakata/.test(appCopyUnion)&&/Peta Skill Reading/.t
 // W2-INT: 'Laporan Diagnostik' juga PINDAH byte-identik ke copy-id-app-d.js (union sama).
 // Kredit pembuat tetap dicek di app.js langsung — ia bukan naskah murid yang boleh pindah.
 assert(/Laporan Diagnostik/.test(appCopyUnion)&&(/Dibuat oleh Fitrarustqi/.test(appCopyUnion)||/Dibuat oleh Fitrarustqi/.test(app)),'diagnostic/creator product surface missing');
-assert(/GRAMMAR_SESSION_SIZE=10/.test(app)&&/GRAMMAR_LESSON_MODES=/.test(app)&&/buildGrammarLessonQuestions/.test(app),'practice-first 10-question grammar lesson contract missing (m025-375)');
+assert(/GRAMMAR_SESSION_SIZE=20/.test(app)&&/GRAMMAR_LESSON_MODES=/.test(app)&&/buildGrammarLessonQuestions/.test(app),'practice-first 20-question grammar lesson contract missing (m025-375)');
 assert(/getCelestialState/.test(app)&&/playFeedbackSound/.test(app)&&/showAnswerBurst/.test(app),'realtime sky or answer feedback system missing');
 assert(/if\(!state\.adaptiveReady\)return \[\]/.test(app),'adaptive pool must be locked before diagnosis');
 assert(/passage:\{id:r\.id/.test(app),'reading questions do not carry their passage');

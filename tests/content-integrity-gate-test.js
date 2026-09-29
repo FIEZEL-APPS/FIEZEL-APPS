@@ -224,7 +224,7 @@ test('every grammar lesson still fills its practice-first session through the ga
     state.preferences = { ...state.preferences, activeLevel: t.cefr, levelMode: 'manual' };
     const questions = context.buildGrammarLessonQuestions(t.subskill);
     const siblings = templates.filter(x => x.subskill === t.subskill).length;
-    if (questions.length < (siblings >= 2 ? 10 : 5) || questions.length > 10) short.push(`${t.id}/${t.subskill}=${questions.length}`);
+    if (questions.length < Math.min(20, 5 * siblings) || questions.length > 20) short.push(`${t.id}/${t.subskill}=${questions.length}`);
   }
   state.preferences = { ...state.preferences, ...previous };
   assert(!short.length, `lessons underfilled after gating: ${short.slice(0, 5).join(', ')}`);

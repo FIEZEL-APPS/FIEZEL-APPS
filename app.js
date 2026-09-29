@@ -166,8 +166,11 @@ const GRAMMAR_UNLOCK_MASTERY=60;
  * yang belum pernah dipelajari murid. Sesinya sekarang GRAMMAR_LESSON_MODES di bawah: isi kalimat,
  * pilih kalimat yang benar, perbaiki pilihan teman, dan satu-dua soal "kenapa" yang semua
  * pilihannya berasal dari kalimat lesson itu sendiri. Lesson bertemplat tunggal (C1/C2)
- * menghasilkan 9 soal; GRAMMAR_SESSION_MIN adalah batas bawah sesi yang masih layak dibuka. */
-const GRAMMAR_SESSION_SIZE=10;
+ * menghasilkan 9 soal; GRAMMAR_SESSION_MIN adalah batas bawah sesi yang masih layak dibuka.
+ * m025-378 (permintaan OWNER): sesi lesson 20 soal, diacak tiap kali dibuka. Templat lesson
+ * sendiri dipakai dulu (5 mode bentuk x jumlah templat); sisanya diisi soal ulangan dari lesson
+ * lain yang sudah terbuka di level yang sama (buildGrammarSessionQuestions). */
+const GRAMMAR_SESSION_SIZE=20;
 const GRAMMAR_SESSION_MIN=5;
 /* R2-2: gerbang "Lewati materi" — 5 soal dari templat lesson itu sendiri, tanpa petunjuk,
    lulus minimal 4. Filosofi level-trust yang sama dengan Ujian Skip Level: tidak ada
@@ -5385,6 +5388,17 @@ burst.innerHTML=`<span class="answer-burst-icon"><i data-lucide="${ok?'circle-ch
 // HANYA saat suara tutor sedang diam (14 §3.1 aturan 2). Jatah 2×/sesi · jeda ≥20 dtk
 // tetap dijaga manifest mesin SFX, jadi penghitung ini tidak perlu menjatah sendiri.
 let wrongRunCount=0;
+/* UX-BRIEF §3 (Anti-Bosan): lencana combo di tengah layar saat benar beruntun >=2 kali.
+   Terpisah dari kilas "Benar!" di atas (showAnswerBurst) supaya dua kabar tidak berebut
+   satu pil. Elemen dibuat sekali, dipakai ulang; hilang sendiri 1,4 dtk. */
+function showComboBadge(n){if(typeof document==='undefined'||!document.body||typeof document.createElement!=='function')return false;let el=$('comboBadge');if(!el){el=document.createElement('div');el.id='comboBadge';el.className='combo-badge hidden';el.setAttribute('aria-live','polite');el.setAttribute('data-testid','combo-badge');document.body.appendChild(el)}clearTimeout(showComboBadge.timer);const key=n>=10?'quiz.combo-10':n>=5?'quiz.combo-5':n>=3?'quiz.combo-3':'quiz.combo-2';el.innerHTML=`<span class="combo-badge-flame"><i data-lucide="flame"></i></span><b>${esc(FiezelI18n.t('quiz.combo-count',{n}))}</b><span class="combo-badge-note">${esc(FiezelI18n.t(key))}</span>`;el.classList.remove('hidden','show');refreshIcons();void el.offsetWidth;el.classList.add('show');if(n>=3)haptic('confirm');showComboBadge.timer=setTimeout(()=>{el.classList.remove('show');setTimeout(()=>el.classList.add('hidden'),320)},1400);return true}
+/* UX-BRIEF §1 (Zero-Friction Home): satu tombol, satu ketukan, langsung latihan. Tidak
+   memaksa tes penempatan dulu - murid yang belum dites langsung berlatih di level aktifnya
+   (A1 bawaan); tes level tetap tersedia dari kartu sesi. Level terkunci tetap ke ujian level. */
+function homeQuickStart(){try{uiSfx('nav')}catch(_){}const trust=levelTrustState(state);if(trust.locked===true)return openActiveLevelExamPanel(nextVerifiableLevel(state)||verifiedLevel(state));if(state.adaptiveReady)return startAdaptive();return startLevelPractice(getActiveLevel())}
+/* UX-BRIEF §4: "Lanjut Materi Baru" - lesson berikutnya yang terbuka & belum dikuasai di level
+   aktif, dimulai dari lesson sesudah yang baru saja dilatih (melingkar). */
+function grammarNextLessonSkill(after){try{const bkt=bktMasteredSkills();const list=grammarItemsForLevel(getActiveLevel()).map(x=>x.skill).filter((x,i,a)=>a.indexOf(x)===i);const i=list.indexOf(String(after||''));const order=i>=0?[...list.slice(i+1),...list.slice(0,i)]:list;return order.find(s=>(G[s]||[]).length&&!(bkt&&typeof bkt.has==='function'&&bkt.has(s))&&!lessonUnlockState(s,state,bkt).locked)||''}catch(_){return ''}}
 function answerFeedbackSignal(ok){const kind=ok?'success':'error';haptic(kind);playFeedbackSound(kind);showAnswerBurst(ok);pawReact(ok?'correct':'wrong');
   if(ok){wrongRunCount=0}
   else{wrongRunCount++;if(wrongRunCount>=2)setTimeout(()=>{if(!voiceIsSpeaking())uiSfx('paw_encourage')},1100)}}
@@ -8775,6 +8789,14 @@ function todayHomeMarkup(){
     + `<div class="fz-greet-title">${esc(FiezelI18n.t('home.sapa', { nama: currentLearner }))}</div>`
     + `<p class="fz-greet-motivation">${esc(currentMotivation)}</p>`
     + `</div>`;
+  /* UX-BRIEF §1: tombol aksi utama yang mencolok di lipatan pertama - "Mulai Belajar Sekarang"
+     atau "Lanjutkan Misi" kalau ada sesi yang tertunda. Satu ketukan → homeQuickStart(). */
+  const heroResume = !!(state.activeSession && state.adaptiveReady);
+  const heroCta = `<button type="button" class="fz-hero-cta${heroResume ? ' is-resume' : ''}" data-testid="home-hero-cta" onclick="homeQuickStart()">`
+    + `<span class="fz-hero-cta-icon" aria-hidden="true"><i class="fz-i" data-fz-icon="${heroResume ? 'flame' : 'practice'}"></i></span>`
+    + `<span class="fz-hero-cta-text"><b>${esc(FiezelI18n.t(heroResume ? 'home.hero-cta-lanjut' : 'home.hero-cta-mulai'))}</b>`
+    + `<small>${esc(FiezelI18n.t('home.hero-cta-sub', { soal: shape.soal || 10, menit: shape.menit || 5 }))}</small></span>`
+    + `<span class="fz-hero-cta-arrow" aria-hidden="true"><i data-lucide="arrow-right"></i></span></button>`;
 
   /* Kosakata Harian untuk bagian atas Kartu 1:
      - Memuat 5 kata per hari berdasarkan level aktif
@@ -9056,6 +9078,7 @@ function todayHomeMarkup(){
 
   return `<div class="today-home-cockpit fz-edu-cockpit">
   ${homeTop}
+  ${heroCta}
   ${card1Hero}
   ${quickChips}
   ${kelaskuStrip}
@@ -11359,7 +11382,10 @@ function buildGrammarModeQuestions(skill,modes,count){const meta=GRAMMAR_ITEMS.f
   return unique}
 /* m025-375: jumlah soal yang dijanjikan layar materi. Dua templat -> 10; satu templat -> 9
    (sembilan mode lesson). Dihitung dari data, tidak merakit soal hanya untuk menampilkan angka. */
-function grammarLessonSessionTarget(skill){return Math.min(GRAMMAR_SESSION_SIZE,GRAMMAR_LESSON_MODES.length*Math.max(1,(G[String(skill||'')]||[]).length))}
+/* m025-378: hitungan sesi 20 = 5 mode bentuk x templat lesson sendiri + ulangan lesson lain yang
+   sudah terbuka di level yang sama (lihat buildGrammarSessionQuestions). Dihitung dari data. */
+function grammarLessonReviewSkills(skill){const key=String(skill||''),meta=GRAMMAR_ITEMS.find(x=>x.skill===key);if(!meta)return[];const bktMastered=bktMasteredSkills();return grammarItemsForLevel(meta.level).map(x=>x.skill).filter((x,i,a)=>a.indexOf(x)===i&&x!==key&&(G[x]||[]).length&&!lessonUnlockState(x,state,bktMastered).locked)}
+function grammarLessonSessionTarget(skill){const own=GRAMMAR_PRACTICE_SLOT_MODES.length*Math.max(1,(G[String(skill||'')]||[]).length);if(own>=GRAMMAR_SESSION_SIZE)return GRAMMAR_SESSION_SIZE;const review=grammarLessonReviewSkills(skill).reduce((n,x)=>n+GRAMMAR_PRACTICE_SLOT_MODES.length*(G[x]||[]).length,0);return Math.min(GRAMMAR_SESSION_SIZE,own+review)}
 /* m025-376: RENCANA SESI PER SLOT - BANYAK KALIMAT, FORMAT BERGANTI.
  * Sejak m025-376 tiap lesson A1-A2 punya enam kalimat (dua templat lama + empat baru). Putaran
  * mode-major m025-375 akan menghabiskan satu mode untuk semua templat dulu (enam isian beruntun,
@@ -11372,7 +11398,14 @@ function grammarLessonSessionTarget(skill){return Math.min(GRAMMAR_SESSION_SIZE,
  * `opts.rotation` menggeser kalimat pembuka antar-sesi (dihitung practiceSkill dari jumlah
  * jawaban), jadi sesi kedua tidak dibuka dengan kalimat yang sama. Tanpa opts (audit, gerbang
  * Lewati Materi) hasilnya deterministik. count di atas rencana diisi semua kombinasi sisa. */
-const GRAMMAR_LESSON_SLOTS=['apply_form','apply_form','justify_correct','apply_form','complete_sentence','diagnose_distractor_1','apply_form','justify_correct','repair_distractor_1','complete_sentence'];
+/* m025-377: OPSI 1 (100% praktis & natural). 50+ murid melapor sesi grammar terasa seperti
+ * "ujian teori": 3 dari 10 soal dulu adalah mode "kenapa" (justify_correct + diagnose_*) berupa
+ * paragraf bahasa Indonesia panjang yang melelahkan di layar HP. Slot sesi lesson harian kini
+ * 100% latihan BENTUK bahasa target (apply_form / complete_sentence / repair_distractor_*),
+ * dengan ritme selang-seling supaya tidak monoton. Alasan teorinya TIDAK dibuang - ia pindah
+ * ke kartu pembahasan setelah murid menjawab (whyCorrectId untuk yang benar, whyFailsId untuk
+ * pilihan yang diklik). Sejalan dengan GRAMMAR_QUICK_MODES (Sesi Kilat) yang sudah bebas teori. */
+const GRAMMAR_LESSON_SLOTS=['apply_form','complete_sentence','repair_distractor_1','apply_form','repair_distractor_2','complete_sentence','repair_distractor_3','apply_form','complete_sentence','repair_distractor_1','apply_form','repair_distractor_2','complete_sentence','apply_form','repair_distractor_3','complete_sentence','repair_distractor_1','apply_form','repair_distractor_2','complete_sentence'];
 const GRAMMAR_PRACTICE_SLOT_MODES=['apply_form','complete_sentence','repair_distractor_1','repair_distractor_2','repair_distractor_3'];
 const GRAMMAR_WHY_SLOT_MODES=['justify_correct','diagnose_distractor_1','diagnose_distractor_2','diagnose_distractor_3'];
 function buildGrammarLessonQuestions(skill,count=GRAMMAR_SESSION_SIZE,opts={}){
@@ -11380,8 +11413,11 @@ function buildGrammarLessonQuestions(skill,count=GRAMMAR_SESSION_SIZE,opts={}){
   const own=G[skill]||[],n=own.length;if(!n)return[];
   const rotation=Math.max(0,Math.floor(Number(opts?.rotation)||0));
   /* Audit F10: own[0] adalah contoh yang jawabannya dipajang di layar materi - urutan
-     kalimat dimulai dari item berikutnya. */
-  const start=((n>1?1:0)+rotation)%n,order=Array.from({length:n},(_,i)=>(start+i)%n);
+     kalimat dimulai dari item berikutnya. m025-378: opts.shuffle mengacak urutan templat dan
+     ritme slot (slot pertama tetap isian biasa), jadi tiap kali sesi dibuka soalnya berbeda. */
+  const start=((n>1?1:0)+rotation)%n;let order=Array.from({length:n},(_,i)=>(start+i)%n);
+  if(opts?.shuffle){order=shuffle(order);if(n>1&&order[0]===0)order.push(order.shift())}
+  const slots=opts?.shuffle?[GRAMMAR_LESSON_SLOTS[0],...shuffle(GRAMMAR_LESSON_SLOTS.slice(1))]:GRAMMAR_LESSON_SLOTS;
   const cache=new Map(),card=(ti,mode)=>{const key=ti+':'+mode;if(!cache.has(key)){const variant=GRAMMAR_PRACTICE_MODES.indexOf(mode);let q=variant<0?null:makeGrammarQuestion(skill,own[ti],variant,skill);if(q&&!(grammarLessonQuestionOwnOnly(q)&&validateQuestion(q).ok))q=null;cache.set(key,q)}return cache.get(key)};
   const used=new Set(),seen=new Set(),uses=new Array(n).fill(0),out=[];let prev=-1;
   const push=(ti,mode)=>{const q=card(ti,mode);if(!q)return false;const signature=sigQ(q);used.add(ti+':'+mode);if(seen.has(signature))return false;seen.add(signature);uses[ti]++;prev=ti;out.push(q);return true};
@@ -11391,25 +11427,58 @@ function buildGrammarLessonQuestions(skill,count=GRAMMAR_SESSION_SIZE,opts={}){
     for(const ti of cands)if(push(ti,mode))return true;
     return false;
   };
-  for(const slot of GRAMMAR_LESSON_SLOTS){
+  for(const slot of slots){
     if(out.length>=count)break;
-    const why=GRAMMAR_WHY_SLOT_MODES.includes(slot),same=why?GRAMMAR_WHY_SLOT_MODES:GRAMMAR_PRACTICE_SLOT_MODES,other=why?GRAMMAR_PRACTICE_SLOT_MODES:GRAMMAR_WHY_SLOT_MODES;
-    if(pick(slot,why)||same.some(m=>m!==slot&&pick(m,why)))continue;
-    other.some(m=>pick(m,!why));
+    /* m025-377: slot sesi lesson = mode bentuk saja. Kalau mode slot ini sudah habis di semua
+       templat, pinjam mode bentuk lain (bukan mode "kenapa") supaya sesi tetap latihan. */
+    if(pick(slot,false))continue;
+    GRAMMAR_PRACTICE_SLOT_MODES.some(m=>m!==slot&&pick(m,false));
   }
-  for(const mode of GRAMMAR_LESSON_MODES)for(const ti of order){if(out.length>=count)break;if(!used.has(ti+':'+mode))push(ti,mode)}
+  /* Isi sisa hitungan dari mode bentuk lain yang belum terpakai (variasi antar-templat). */
+  for(const mode of GRAMMAR_PRACTICE_SLOT_MODES)for(const ti of order){if(out.length>=count)break;if(!used.has(ti+':'+mode))push(ti,mode)}
+  /* Jaring pengaman edge-case templat tunggal/mode-bentuk cacat: HANYA kalau kalimatnya tak
+     sanggup memberi cukup latihan bentuk untuk sesi minimum, mode "kenapa" ikut menambal agar
+     sesi tetap layak dibuka (kontrak 5..10). Normalnya cabang ini tak pernah tersentuh. */
+  if(out.length<GRAMMAR_SESSION_MIN)for(const mode of GRAMMAR_WHY_SLOT_MODES)for(const ti of order){if(out.length>=GRAMMAR_SESSION_MIN)break;if(!used.has(ti+':'+mode))push(ti,mode)}
   /* Audit F10: materi bertemplat tunggal memakai kalimatnya sebagai contoh di intro; kartu yang
      memajang kalimat contoh itu apa adanya dipindah ke akhir sesi. */
   const exampleStem=String(own[0]?.[0]||'').replace(/\s+/g,' ').trim().toLowerCase();
   if(exampleStem&&out.length>1){const idx=out.findIndex(q=>String(q.question||'').replace(/\s+/g,' ').trim().toLowerCase().includes(exampleStem));if(idx===0)out.push(out.shift())}
   return out}
-function practiceSkill(skill){if((GRAMMAR_ITEMS.find(x=>x.skill===skill)?.level||'')!==getActiveLevel())return showToast(FiezelI18n.t('grammar.pilih-lesson-terlebih-dahulu',{level:getActiveLevel()}));const unlock=lessonUnlockState(skill,state,bktMasteredSkills());if(unlock.locked)return showToast(lessonLockMessage(unlock));const questions=buildGrammarLessonQuestions(skill,GRAMMAR_SESSION_SIZE,{rotation:Math.floor((Number(state.grammar[skill]?.total)||0)/GRAMMAR_SESSION_SIZE)}/* m025-376: sesi berikutnya dibuka kalimat lain */);if(questions.length<GRAMMAR_SESSION_MIN)return showToast(FiezelI18n.t('grammar.lesson-new-memiliki-item-valid',{jumlahSoal:questions.length}));quizLoop({type:'grammar',count:Math.min(GRAMMAR_SESSION_SIZE,questions.length)/* m025-375: lesson bertemplat tunggal = 9 soal */,pool:questions,factory:item=>item,preserveOrder:true})}
-/* ---- Sesi Kilat: 10 soal grammar campuran lintas lesson satu level ----------------------
+/* m025-378: SESI LESSON 20 SOAL, DIACAK TIAP DIBUKA. Soal milik lesson dulu (acak templat &
+ * ritme slot), lalu sisanya diisi ULANGAN dari lesson lain yang sudah terbuka di level yang sama:
+ * satu soal per lesson per putaran, lesson diacak, stem tak boleh kembar. Soal ulangan ditandai
+ * `reviewOf` (ditampilkan sebagai label kecil di kartu soal) dan tetap dicatat ke lesson asalnya,
+ * jadi mastery lesson lain ikut terpelihara (retrieval berjarak). Soal pertama tetap isian biasa
+ * milik lesson ini; soal ulangan disebar merata di antara soal lesson. */
+function buildGrammarSessionQuestions(skill,count=GRAMMAR_SESSION_SIZE){
+  const own=buildGrammarLessonQuestions(skill,count,{shuffle:true});
+  if(!own.length||own.length>=count)return own;
+  const seen=new Set(own.map(q=>String(q.question||'').toLowerCase().replace(/\s+/g,' ').trim()));
+  const pools=shuffle(grammarLessonReviewSkills(skill)).map(x=>[x,shuffle(buildGrammarModeQuestions(x,GRAMMAR_PRACTICE_SLOT_MODES,Number.MAX_SAFE_INTEGER))]).filter(([,p])=>p.length);
+  const reviews=[];
+  while(reviews.length+own.length<count&&pools.some(([,p])=>p.length)){
+    for(const [from,pool] of pools){
+      if(reviews.length+own.length>=count)break;
+      let q;while(pool.length&&!q){const cand=pool.shift();const key=String(cand.question||'').toLowerCase().replace(/\s+/g,' ').trim();if(!seen.has(key)){seen.add(key);q=cand}}
+      if(q)reviews.push({...q,reviewOf:from});
+    }
+  }
+  if(!reviews.length)return own;
+  const out=[own[0]],rest=own.slice(1),step=(rest.length+reviews.length)/reviews.length;
+  let nextReview=step/2;
+  for(let i=0,r=0,k=0;r<rest.length||k<reviews.length;i++){
+    if(k<reviews.length&&(i>=nextReview||r>=rest.length)){out.push(reviews[k++]);nextReview+=step}
+    else out.push(rest[r++]);
+  }
+  return out}
+function practiceSkill(skill){if((GRAMMAR_ITEMS.find(x=>x.skill===skill)?.level||'')!==getActiveLevel())return showToast(FiezelI18n.t('grammar.pilih-lesson-terlebih-dahulu',{level:getActiveLevel()}));const unlock=lessonUnlockState(skill,state,bktMasteredSkills());if(unlock.locked)return showToast(lessonLockMessage(unlock));const questions=buildGrammarSessionQuestions(skill,GRAMMAR_SESSION_SIZE);if(questions.length<GRAMMAR_SESSION_MIN)return showToast(FiezelI18n.t('grammar.lesson-new-memiliki-item-valid',{jumlahSoal:questions.length}));quizLoop({type:'grammar',count:Math.min(GRAMMAR_SESSION_SIZE,questions.length),pool:questions,factory:item=>item,preserveOrder:true})}
+/* ---- Sesi Kilat: 20 soal grammar campuran lintas lesson satu level ----------------------
  * Latihan singkat harian. Hanya lesson yang sudah terbuka di level aktif; soal dirotasi antar
  * lesson (satu per lesson per putaran) dan dibatasi ke mode BENTUK (apply/complete/repair)
  * supaya cepat dijawab - grammar-nya yang menantang, bukan bacaannya. Direkam sebagai sesi
  * 'grammar' biasa, jadi mastery per lesson tetap ikut naik. */
-const GRAMMAR_QUICK_SIZE=10;
+const GRAMMAR_QUICK_SIZE=20;
 const GRAMMAR_QUICK_MODES=new Set(['apply_form','complete_sentence','repair_distractor_1','repair_distractor_2','repair_distractor_3']);
 function buildGrammarQuickQuestions(level=getActiveLevel(),count=GRAMMAR_QUICK_SIZE){
   const bktMastered=bktMasteredSkills();
@@ -12090,6 +12159,8 @@ function startLevelPractice(level){
  *    menghitungnya sebagai benar akan membuat penguasaan yang dilaporkan lebih tinggi
  *    daripada yang sebenarnya, dan seluruh model kemampuan di atasnya ikut keliru.
  */
+/* m025-378: label kecil untuk soal ulangan lesson lain di sesi lesson 20 soal. */
+function quizReviewTag(q){return q?.reviewOf?`<span class="quiz-review-tag" data-testid="quiz-review-tag"><i data-lucide="rotate-ccw"></i> ${esc(FiezelI18n.t('grammar.ulangan-dari',{lesson:friendlySkillName(q.reviewOf)}))}</span>`:''}
 function quizLoop(cfg){
  if(document.body?.classList?.contains?.('auth-locked')){pendingAfterGateFn=()=>quizLoop(cfg);return}
  /* Audit F01 (2026-09-22): "Mulai tes awal" menutup perkenalan dengan fade 260 ms, dan kuis
@@ -12144,7 +12215,7 @@ function quizLoop(cfg){
  // closure sesi ini — placement dan Ujian Skip Level dikecualikan karena keduanya alat
  // UKUR, bukan sesi latihan; hadiah di tengah pengukuran mengubah perilaku yang diukur.
  quizMajorFired=false;
- let gemStreak=0,gemAwards=0;
+ let gemStreak=0,gemAwards=0,comboRun=0;/* UX-BRIEF §3: combo = jawaban benar beruntun percobaan pertama, untuk lencana "3x Combo!" */
  // R2-2: gerbang "Lewati materi" juga alat UKUR — gem di tengah gerbang mengubah perilaku
  // yang sedang diukur, aturan yang sama dengan placement dan Ujian Skip Level.
  const gemSessionId=`qz-${Date.now().toString(36)}`,gemsEligible=!cfg.placement&&cfg.type!=='level-exam'&&cfg.type!=='grammar-skip';
@@ -12256,7 +12327,7 @@ function quizLoop(cfg){
      Semua id (quizExit/quizNext/quizListen/quizListenNote/quizStem/options/feedback/tutorTurn)
      dan literal quiz-shell/quiz-mascot TETAP — kontrak r2/paw/lesson-experience. */
   $('quizFloatingBar')?.remove();
-  setApp(`<section class="fade quiz-shell${pawSlot?pawSlot.shellClass:''}"><div class="quiz-topbar"><button id="quizExit" class="quiz-exit" aria-label="${FiezelI18n.t('quiz.exit-aria')}"><i data-lucide="x"></i><span class="quiz-exit-label">${FiezelI18n.t('quiz.exit-label')}</span></button><div class="quiz-progress" role="progressbar" aria-valuemin="0" aria-valuemax="${planned}" aria-valuenow="${asked+1}" aria-label="${FiezelI18n.t('quiz.progress-aria',{asked:asked+1,planned})}"><span>${asked+1}</span><em>/ ${planned}</em><i class="quiz-progress-bar" aria-hidden="true" style="--p:${(asked/Math.max(1,planned)).toFixed(3)}"><b></b></i></div><button id="quizNext" class="quiz-next" disabled>${FiezelI18n.t('quiz.next-btn')} <i data-lucide="arrow-right"></i></button></div>${pawSlot?'':`<div class="quiz-mascot" aria-hidden="true">${pawFaceMarkup()}</div>`}${q.passage?card(`<div class="passage passage-reading" id="quizPassage"><div class="eyebrow">${FiezelI18n.t('quiz.reading-eyebrow')}</div><h3>${esc(q.passage.title)}</h3><p>${esc(q.passage.text)}</p></div>`,'card-reading'):(cfg.context?card(`<div class="passage" id="quizPassage"><b>${esc(cfg.context.title)}</b><p>${esc(cfg.context.text)}</p></div>`):'')}${card(`${pawSlot?pawSlot.peek:''}${pawSlot&&pawSlot.above?`<div class="quiz-stage">${pawSlot.above}<div class="quiz-bubble"><h2 class="question" id="quizStem">${esc(q.question)}</h2></div></div>`:''}${q.focus?`<div class="vocab-focus"><span class="vocab-focus-word">${jaWord(q.focus.word,q.focus.phonetic)}</span>${q.focus.phonetic?`<span class="phonetic">${jaPhonetic(q.focus.phonetic,'')}</span>`:''}</div>`:''}${q.passage?`<div class="reading-jump-bar"><button type="button" id="readingJumpBtn" class="reading-jump-btn"><i data-lucide="book-open"></i> <span>${FiezelI18n.t('quiz.reading-eyebrow')}</span> <i data-lucide="arrow-up-right"></i></button></div>`:''}${q.type==='listening'?`<div class="quiz-listen quiz-listen-hero"><div class="quiz-listen-controls"><button id="quizListen" class="quiz-listen-btn quiz-listen-btn-hero"><i data-lucide="volume-2"></i> ${FiezelI18n.t('quiz.listen-btn')}</button><button type="button" id="quizListenSpeed" class="quiz-listen-speed-btn" aria-label="Kecepatan Audio"><span id="quizListenSpeedLabel">1.0x</span></button></div><div class="quiz-audio-wave hidden" id="quizAudioWave" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></div><span id="quizListenNote" class="muted">${FiezelI18n.t('quiz.listen-note')}</span></div>`:''}${pawSlot&&pawSlot.above?'':`<h2 class="question" id="quizStem">${esc(q.question)}</h2>`}<div id="options" class="options"></div><div id="feedback" class="feedback hidden"></div><div id="tutorTurn" class="tutor-turn hidden"></div>`,pawSlot?pawSlot.cardClass:'')}${pawSlot?pawSlot.side:''} </section>`);
+  setApp(`<section class="fade quiz-shell${pawSlot?pawSlot.shellClass:''}"><div class="quiz-topbar"><button id="quizExit" class="quiz-exit" aria-label="${FiezelI18n.t('quiz.exit-aria')}"><i data-lucide="x"></i><span class="quiz-exit-label">${FiezelI18n.t('quiz.exit-label')}</span></button><div class="quiz-progress" role="progressbar" aria-valuemin="0" aria-valuemax="${planned}" aria-valuenow="${asked+1}" aria-label="${FiezelI18n.t('quiz.progress-aria',{asked:asked+1,planned})}"><span>${asked+1}</span><em>/ ${planned}</em><i class="quiz-progress-bar" aria-hidden="true" style="--p:${(asked/Math.max(1,planned)).toFixed(3)}"><b></b></i></div><button id="quizNext" class="quiz-next" disabled>${FiezelI18n.t('quiz.next-btn')} <i data-lucide="arrow-right"></i></button></div>${pawSlot?'':`<div class="quiz-mascot" aria-hidden="true">${pawFaceMarkup()}</div>`}${q.passage?card(`<div class="passage passage-reading" id="quizPassage"><div class="eyebrow">${FiezelI18n.t('quiz.reading-eyebrow')}</div><h3>${esc(q.passage.title)}</h3><p>${esc(q.passage.text)}</p></div>`,'card-reading'):(cfg.context?card(`<div class="passage" id="quizPassage"><b>${esc(cfg.context.title)}</b><p>${esc(cfg.context.text)}</p></div>`):'')}${card(`${pawSlot?pawSlot.peek:''}${pawSlot&&pawSlot.above?`<div class="quiz-stage">${pawSlot.above}<div class="quiz-bubble">${quizReviewTag(q)}<h2 class="question" id="quizStem">${esc(q.question)}</h2></div></div>`:''}${q.focus?`<div class="vocab-focus"><span class="vocab-focus-word">${jaWord(q.focus.word,q.focus.phonetic)}</span>${q.focus.phonetic?`<span class="phonetic">${jaPhonetic(q.focus.phonetic,'')}</span>`:''}</div>`:''}${q.passage?`<div class="reading-jump-bar"><button type="button" id="readingJumpBtn" class="reading-jump-btn"><i data-lucide="book-open"></i> <span>${FiezelI18n.t('quiz.reading-eyebrow')}</span> <i data-lucide="arrow-up-right"></i></button></div>`:''}${q.type==='listening'?`<div class="quiz-listen quiz-listen-hero"><div class="quiz-listen-controls"><button id="quizListen" class="quiz-listen-btn quiz-listen-btn-hero"><i data-lucide="volume-2"></i> ${FiezelI18n.t('quiz.listen-btn')}</button><button type="button" id="quizListenSpeed" class="quiz-listen-speed-btn" aria-label="Kecepatan Audio"><span id="quizListenSpeedLabel">1.0x</span></button></div><div class="quiz-audio-wave hidden" id="quizAudioWave" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></div><span id="quizListenNote" class="muted">${FiezelI18n.t('quiz.listen-note')}</span></div>`:''}${pawSlot&&pawSlot.above?'':`${quizReviewTag(q)}<h2 class="question" id="quizStem">${esc(q.question)}</h2>`}<div id="options" class="options"></div><div id="feedback" class="feedback hidden"></div><div id="tutorTurn" class="tutor-turn hidden"></div>`,pawSlot?pawSlot.cardClass:'')}${pawSlot?pawSlot.side:''} </section>`);
   $('quizExit').onclick=()=>confirmQuizExit();/* W1 P1-2: keluar lewat konfirmasi, bukan seketika. */
   try{window.scrollTo(0,0);document.documentElement.scrollTop=0;document.body.scrollTop=0;document.querySelector('.quiz-topbar, #quizExit')?.scrollIntoView({block:'start',behavior:'auto'})}catch(_){}
   $('options').append(...opts.map((o,j)=>{const b=document.createElement('button');b.className='option';b.textContent=o;b.onclick=()=>answer(q,j,b);return b}));
@@ -12449,6 +12520,10 @@ function quizLoop(cfg){
   document.querySelectorAll('.option')[q.answerIndex]?.classList.add('correct');
   const turn=tutorCompose(q,j,ok,answer.scaffold||'tell',forced?'reteach':answer.move,answer.timing);
   const f=$('feedback');f.classList.remove('hidden','feedback-success','feedback-error');f.classList.add(ok?'feedback-success':'feedback-error');
+  /* m025-377 (Opsi 1, bagian C): saat jawaban SALAH, tampilkan langsung alasan kenapa pilihan
+     yang DIKLIK murid belum tepat (whyFailsId pilihan itu), bukan cuma menyembunyikannya di
+     lipatan "bandingkan pilihan lain". Alasan benar tetap tampil lewat "Intinya" di bawah. */
+  const pickedWhyFails=(!ok&&q.type==='grammar'&&Array.isArray(q.explain?.distractors))?String((q.explain.distractors.find(x=>norm(String(x.option))===norm(String(q.options[j])))||{}).reason||'').trim():'';
   /* Audit F09: giliran tutor dari percobaan PERTAMA (yang salah) dulu tetap terpampang di
      bawah pembahasan jawaban yang sudah benar - dua vonis yang saling membantah. */
   /* Audit F09: yang terbuka hanya kalimat inti (aturan + alasan) dan pegangan ingatan;
@@ -12458,7 +12533,7 @@ function quizLoop(cfg){
      tepat adalah X." mengulang string yang sama dua kali — kini satu kalimat konfirmasi.
      Cabang salah tetap memakai literal "Jawaban yang paling tepat" (jangkar r2 smoke:109
      memastikan literal ini TIDAK bocor di mode ukur — cabang MEASURE di atas tak tersentuh). */
-  f.innerHTML=`<div class="feedback-title"><i data-lucide="${ok?'circle-check-big':'circle-x'}"></i><b>${ok?FiezelI18n.t('quiz.verdict-correct'):FiezelI18n.t('quiz.verdict-wrong')}</b></div><p>${ok?FiezelI18n.t('quiz.correct-answer',{answer:`<strong>${esc(q.options[j])}</strong>`}):`${FiezelI18n.t('quiz.jawabanmu')} <strong>${esc(q.options[j])}</strong>${FiezelI18n.t('quiz.answer-paling-tepat-adalah')} <strong>${esc(q.options[q.answerIndex])}</strong>`}</p>${q.type==='grammar'&&q.explain?.rule/* m025-375: alasan dan aturan grammar di dua baris, bukan satu paragraf panjang */?`<p><strong>${FiezelI18n.t('quiz.intinya')}</strong> ${esc(q.explain?.why||FiezelI18n.t('quiz.fallback-context'))}</p><p class="feedback-rule"><strong>${FiezelI18n.t('quiz.aturannya')}</strong> ${esc(q.explain.rule)}</p>`:`<p><strong>${FiezelI18n.t('quiz.intinya')}</strong> ${esc(q.explain?.why||FiezelI18n.t('quiz.fallback-context'))} ${q.explain?.rule?esc(q.explain.rule):''}</p>`}<details class="acc"><summary>${FiezelI18n.t(q.explain?.distractors?'quiz.bandingkan-pilihan-lain':'quiz.pembahasan-lengkap')}</summary><p class="muted">${esc(q.explain?.distractor||FiezelI18n.t('quiz.fallback-unsupported'))} ${esc(q.explain?.avoid||FiezelI18n.t('quiz.fallback-hint-check'))}</p>${q.explain?.distractors?`<div class="distractor-breakdown">${q.explain.distractors.map(x=>`<p><b>${esc(x.option)}:</b> ${esc(x.reason)}</p>`).join('')}</div>`:''}</details><p class="memory-tip"><i data-lucide="lightbulb"></i><span>${esc(q.explain?.memory||FiezelI18n.t('quiz.fallback-hint-connect'))}</span></p><button class="ai-btn" id="aiExplainBtn"><i data-lucide="sparkles"></i> ${FiezelI18n.t('quiz.jelaskan-dengan-cara-lebih-sederhana')}</button>`;
+  f.innerHTML=`<div class="feedback-title"><i data-lucide="${ok?'circle-check-big':'circle-x'}"></i><b>${ok?FiezelI18n.t('quiz.verdict-correct'):FiezelI18n.t('quiz.verdict-wrong')}</b></div><p>${ok?FiezelI18n.t('quiz.correct-answer',{answer:`<strong>${esc(q.options[j])}</strong>`}):`${FiezelI18n.t('quiz.jawabanmu')} <strong>${esc(q.options[j])}</strong>${FiezelI18n.t('quiz.answer-paling-tepat-adalah')} <strong>${esc(q.options[q.answerIndex])}</strong>`}</p>${pickedWhyFails?`<p class="feedback-your-pick"><strong>${FiezelI18n.t('quiz.jawabanmu')}</strong> ${esc(pickedWhyFails)}</p>`:''}${q.type==='grammar'&&q.explain?.rule/* m025-375: alasan dan aturan grammar di dua baris, bukan satu paragraf panjang */?`<p><strong>${FiezelI18n.t('quiz.intinya')}</strong> ${esc(q.explain?.why||FiezelI18n.t('quiz.fallback-context'))}</p><p class="feedback-rule"><strong>${FiezelI18n.t('quiz.aturannya')}</strong> ${esc(q.explain.rule)}</p>`:`<p><strong>${FiezelI18n.t('quiz.intinya')}</strong> ${esc(q.explain?.why||FiezelI18n.t('quiz.fallback-context'))} ${q.explain?.rule?esc(q.explain.rule):''}</p>`}<details class="acc"><summary>${FiezelI18n.t(q.explain?.distractors?'quiz.bandingkan-pilihan-lain':'quiz.pembahasan-lengkap')}</summary><p class="muted">${esc(q.explain?.distractor||FiezelI18n.t('quiz.fallback-unsupported'))} ${esc(q.explain?.avoid||FiezelI18n.t('quiz.fallback-hint-check'))}</p>${q.explain?.distractors?`<div class="distractor-breakdown">${q.explain.distractors.map(x=>`<p><b>${esc(x.option)}:</b> ${esc(x.reason)}</p>`).join('')}</div>`:''}</details><p class="memory-tip"><i data-lucide="lightbulb"></i><span>${esc(q.explain?.memory||FiezelI18n.t('quiz.fallback-hint-connect'))}</span></p><button class="ai-btn" id="aiExplainBtn"><i data-lucide="sparkles"></i> ${FiezelI18n.t('quiz.jelaskan-dengan-cara-lebih-sederhana')}</button>`;
   speak(turn);
   answer.locked=true;
   $('quizNext').disabled=false;
@@ -12528,10 +12603,13 @@ function quizLoop(cfg){
   // dan model kemampuan yang berdiri di atasnya ikut keliru.
   if(firstTry){
    if(ok)score++;
+   /* UX-BRIEF §3: combo streak + rekam gem/combo terbaik sesi untuk Layar Kemenangan. */
+   comboRun=ok?comboRun+1:0;cfg.__bestCombo=Math.max(Number(cfg.__bestCombo)||0,comboRun);
+   if(!MEASURE&&ok&&comboRun>=2)try{showComboBadge(comboRun)}catch(_){}
    // P0-3: runtun dihitung dari jawaban percobaan pertama — sinyal yang sama dengan skor.
    // Kartu reteach tidak lewat sini (ia layar mengajar, bukan jawaban), jadi runtun otomatis
    // beku selama jeda mengajar. Salah = reset runtun, tanpa penalti lain.
-   if(gemsEligible){if(ok){gemStreak++;if(awardQuizGems(gemStreak,gemAwards,gemSessionId))gemAwards++}else gemStreak=0}
+   if(gemsEligible){if(ok){gemStreak++;const got=awardQuizGems(gemStreak,gemAwards,gemSessionId);if(got){gemAwards++;cfg.__gemsEarned=(Number(cfg.__gemsEarned)||0)+(Number(got)||0)}}else gemStreak=0}
    // F1 placement: bukti per band dikumpulkan di titik yang sama dengan skor, jadi tidak ada
    // jalur jawaban yang bisa lupa melaporkannya. Hanya percobaan pertama - sama seperti skor.
    if(cfg.placement)(cfg.__placementAnswers??=[]).push({level:String(q.level||''),ok:!!ok});
@@ -13049,7 +13127,21 @@ function finishQuiz(cfg,score,total,tutorReport){
      konfeti quizMajorCelebrate di atas (accuracy>=70). Literal vonis & CTA (r2 smoke:
      'Tes level selesai', 'Gerbang lewati materi selesai', 'ditandai selesai') tetap. */
   const resultProud=accuracy>=70;
-  setApp(`<section class="fade center result-stage">${card(`<div class="result-icon"><i data-lucide="${resultProud?'trophy':'book-open'}"></i></div><div class="modal-mark">${resultProud?FiezelI18n.t('quiz.result-proud-mark'):FiezelI18n.t('quiz.result-review-mark')}</div><h2>${cfg.placement?FiezelI18n.t('quiz.result-placement-done'):cfg.type==='level-exam'?FiezelI18n.t('quiz.result-exam-done',{title:esc(LEVEL_GUARD_COPY.examTitle),scope:esc(cfg.levelScope||'')}):cfg.type==='grammar-skip'?FiezelI18n.t('quiz.result-skip-done'):FiezelI18n.t('quiz.result-practice-done')}</h2><div class="ring-row"><div class="score" role="img" aria-label="${accuracy}%"><span id="quizScoreCount" aria-hidden="true">${accuracy}%</span></div>${pawFaceMarkup()}</div><p>${FiezelI18n.t('quiz.result-score',{score,total})}</p>${placementLevelBlock}${tutorLine}${examVerdict?`<p class=\"level-exam-verdict ${examVerdict.passed?'is-pass':'is-fail'}\">${esc(examVerdict.message)}</p>`:''}${skipVerdict?`<p class=\"level-exam-verdict ${skipVerdict.passed?'is-pass':'is-fail'}\">${esc(skipVerdict.message)}</p>`:''}${measureReviewBlock}${outcomeLine}${srlLine}${sessionSummaryMarkup(cfg&&cfg.__masteryBefore)}${placementAdoptButton?`<div class="result-actions">${placementAdoptButton}<button class="ghost" onclick="go('home')">${FiezelI18n.t('quiz.result-home-btn')}</button></div>`:nextDomain?`<div class="result-actions"><button class="primary" onclick="go('${nextDomain}')">${FiezelI18n.t('quiz.result-next-btn')} <i data-lucide="arrow-right"></i></button><button class="ghost" onclick="go('home')">${FiezelI18n.t('quiz.result-home-btn')}</button></div>`:`<button class="primary" onclick="go('home')">${FiezelI18n.t('quiz.result-home-btn')} <i data-lucide="arrow-right"></i></button>`}`,'hero result-card')}</section>`);
+  /* UX-BRIEF §4 (Layar Kemenangan): satu kartu penuh tanpa scroll - bintang (0-3) animasi,
+     ringkasan hadiah (permata sesi ini, benar/total, combo terbaik), CTA "Lanjut Materi Baru"
+     ke lesson berikutnya yang terbuka. Rincian analitik (laporan tutor, hasil sesi, ringkasan
+     mastery) dilipat ke <details> untuk sesi latihan biasa; tes/ujian/gerbang tetap terbuka
+     karena vonisnya adalah isi utamanya. */
+  const compactResult=!cfg.placement&&!['level-exam','grammar-skip','placement'].includes(String(cfg.type||''));
+  const stars=accuracy>=90?3:accuracy>=70?2:accuracy>=40?1:0;
+  const starsBlock=`<div class="result-stars" role="img" aria-label="${esc(FiezelI18n.t('quiz.result-stars-aria',{n:stars}))}" data-testid="result-stars" data-stars="${stars}">${[1,2,3].map(i=>`<i data-lucide="star" class="${i<=stars?'is-lit':''}" style="--si:${i}"></i>`).join('')}</div>`;
+  const gemsEarned=Number(cfg.__gemsEarned)||0,bestCombo=Number(cfg.__bestCombo)||0;
+  const rewardBlock=compactResult?`<div class="result-rewards" data-testid="result-rewards">${gemsEarned>0?`<span class="result-reward-chip is-gem"><i data-lucide="gem"></i> +${gemsEarned}</span>`:''}<span class="result-reward-chip is-score"><i data-lucide="circle-check-big"></i> ${score}/${total}</span>${bestCombo>=3?`<span class="result-reward-chip is-combo"><i data-lucide="flame"></i> ${esc(FiezelI18n.t('quiz.combo-count',{n:bestCombo}))}</span>`:''}</div>`:'';
+  const nextLessonSkill=compactResult&&cfg.type==='grammar'?grammarNextLessonSkill(cfg.pool?.[0]?.lessonSkill||cfg.pool?.[0]?.skill||''):'';
+  const detailBlocks=`${tutorLine}${measureReviewBlock}${outcomeLine}${srlLine}${sessionSummaryMarkup(cfg&&cfg.__masteryBefore)}`;
+  const detailsMarkup=compactResult?`<details class="acc result-details" data-testid="result-details"><summary>${FiezelI18n.t('quiz.result-details-summary')}</summary><div class="result-details-body">${detailBlocks}</div></details>`:detailBlocks;
+  const primaryNext=nextLessonSkill?`<button class="primary" data-testid="result-next-lesson-btn" onclick="openGrammarLesson('${esc(nextLessonSkill)}')">${FiezelI18n.t('quiz.result-next-lesson-btn')} <i data-lucide="arrow-right"></i></button>`:nextDomain?`<button class="primary" data-testid="result-next-btn" onclick="go('${nextDomain}')">${FiezelI18n.t('quiz.result-next-btn')} <i data-lucide="arrow-right"></i></button>`:'';
+  setApp(`<section class="fade center result-stage${compactResult?' is-compact':''}">${card(`<div class="result-icon"><i data-lucide="${resultProud?'trophy':'book-open'}"></i></div>${starsBlock}<div class="modal-mark">${resultProud?FiezelI18n.t('quiz.result-proud-mark'):FiezelI18n.t('quiz.result-review-mark')}</div><h2>${cfg.placement?FiezelI18n.t('quiz.result-placement-done'):cfg.type==='level-exam'?FiezelI18n.t('quiz.result-exam-done',{title:esc(LEVEL_GUARD_COPY.examTitle),scope:esc(cfg.levelScope||'')}):cfg.type==='grammar-skip'?FiezelI18n.t('quiz.result-skip-done'):FiezelI18n.t('quiz.result-practice-done')}</h2><div class="ring-row"><div class="score" role="img" aria-label="${accuracy}%"><span id="quizScoreCount" aria-hidden="true">${accuracy}%</span></div>${pawFaceMarkup()}</div><p>${FiezelI18n.t('quiz.result-score',{score,total})}</p>${rewardBlock}${placementLevelBlock}${examVerdict?`<p class=\"level-exam-verdict ${examVerdict.passed?'is-pass':'is-fail'}\">${esc(examVerdict.message)}</p>`:''}${skipVerdict?`<p class=\"level-exam-verdict ${skipVerdict.passed?'is-pass':'is-fail'}\">${esc(skipVerdict.message)}</p>`:''}${detailsMarkup}${placementAdoptButton?`<div class="result-actions">${placementAdoptButton}<button class="ghost" onclick="go('home')">${FiezelI18n.t('quiz.result-home-btn')}</button></div>`:primaryNext?`<div class="result-actions">${primaryNext}<button class="ghost" onclick="go('home')">${FiezelI18n.t('quiz.result-home-btn')}</button></div>`:`<button class="primary" onclick="go('home')">${FiezelI18n.t('quiz.result-home-btn')} <i data-lucide="arrow-right"></i></button>`}`,'hero result-card')}</section>`);
   // P0-1: skor count-up 0→n% (audit §5: angka tidak pernah melompat). Markup sudah memuat
   // nilai final, jadi lingkungan tanpa animasi tetap benar tanpa satu frame pun berjalan.
   try{countUpScore($('quizScoreCount'),accuracy)}catch(_){}

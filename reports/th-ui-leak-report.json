@@ -1,26 +1,30 @@
 {
   "schema": "fiezel-th-ui-leak-v1",
-  "generatedAt": "2026-09-27T18:32:22.375Z",
+  "generatedAt": "2026-09-29T12:16:02.932Z",
   "files": {
     "app.js": {
-      "leaks": 4,
+      "leaks": 11,
       "budget": 4,
       "sample": [
         {
-          "line": 8947,
-          "text": "Selesaikan ritme hari ini"
+          "line": 8916,
+          "text": "Target Latihan Multi-Topik"
         },
         {
-          "line": 9783,
-          "text": "— Penugasan latihan dan pemantauan capaian murid."
+          "line": 8917,
+          "text": "Latihan adaptif gabungan Tata Bahasa, Membaca &amp; Kosakata."
         },
         {
-          "line": 10396,
-          "text": "Nama kriteria: n/4 - satu kalimat alasan yang menunjuk bukti di tulisannya"
+          "line": 8921,
+          "text": "Soal Selesai"
         },
         {
-          "line": 15495,
-          "text": "Latihan"
+          "line": 9050,
+          "text": "Latihan Soal"
+        },
+        {
+          "line": 9067,
+          "text": "Tugas Aktif"
         }
       ]
     },
@@ -472,9 +476,9 @@
     }
   },
   "copyKeys": {
-    "id": 3436,
-    "th": 3438,
+    "id": 3444,
+    "th": 3446,
     "idTanpaTh": 0
   },
-  "pass": true
+  "pass": false
 }

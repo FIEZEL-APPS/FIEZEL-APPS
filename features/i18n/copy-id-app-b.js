@@ -167,7 +167,7 @@
     // app.js:2038 — olmDispute() toast konfirmasi remeasure (precompute jumlahSoal, mini-desain plan)
     'progress.olm-ukur-ulang': 'Oke. Kita ukur ulang {skill} lewat {jumlahSoal} soal di sesi berikutnya.',
     // app.js:2608 — vonis kilas jawaban salah
-    'quiz.burst-miss': 'Belum tepat',
+    'quiz.burst-miss': 'Hampir!',
     // app.js:2608 — subteks vonis salah
     'quiz.burst-miss-sub': 'Tenang, kita bedah jawabannya.',
     // app.js:2608 — vonis kilas jawaban benar

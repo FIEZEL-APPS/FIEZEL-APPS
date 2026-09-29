@@ -54,7 +54,7 @@ check(/\.notification-locked/.test(css),'kelas kunci lama sengaja dibiarkan di s
 check(/checkStudyReminders/.test(app)&&/showStudyNotification/.test(app)&&/NOTIFICATION_REMINDER_INTERVAL_MS/.test(app)&&/notificationclick/.test(read('sw.js')),'Study reminder notification engine missing');
 check(/function getCelestialState/.test(app)&&/function getScenePalette/.test(app)&&/SUNRISE_MINUTE/.test(app)&&/global-sky/.test(css)&&/sky-light/.test(css)&&/id="globalSky"/.test(html),'Full-screen real-time sun/moon cycle missing');
 // m025-375: sesi lesson maksimal 10 soal (lesson bertemplat tunggal 9), mode latihan-dulu.
-check(/GRAMMAR_SESSION_SIZE=10/.test(app)&&/GRAMMAR_SESSION_MIN=5/.test(app)&&/function buildGrammarLessonQuestions/.test(app)&&/count:Math\.min\(GRAMMAR_SESSION_SIZE,questions\.length\)/.test(app),'Grammar lesson contract is not the practice-first 10-question session');
+check(/GRAMMAR_SESSION_SIZE=20/.test(app)&&/GRAMMAR_SESSION_MIN=5/.test(app)&&/function buildGrammarLessonQuestions/.test(app)&&/count:Math\.min\(GRAMMAR_SESSION_SIZE,questions\.length\)/.test(app),'Grammar lesson contract is not the practice-first 20-question session');
 check(/NATURAL_AI_STYLE/.test(app)&&/Hindari gaya buku teks/.test(idCorpus)&&/readingFocusLabel/.test(app),'Natural Indonesian explanation contract missing');
 check(/function buildCreatorReport/.test(app)&&/session_complete/.test(app)&&/daily_access/.test(app),'Automatic access/session reporting missing');
 check(/queueCreatorReport/.test(app)&&/flushReportQueue/.test(app),'Report retry queue missing');

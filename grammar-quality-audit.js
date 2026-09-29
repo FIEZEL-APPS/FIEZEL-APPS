@@ -13,7 +13,7 @@ const expectedModes=[
   'repair_distractor_2','diagnose_distractor_2','repair_distractor_3','diagnose_distractor_3'
 ];
 const REQUIRED_LESSON_MODES=['apply_form','complete_sentence','repair_distractor_1'];
-const LESSON_SESSION_MAX=10,LESSON_SESSION_MIN=5;
+const LESSON_SESSION_MAX=20,LESSON_SESSION_MIN=5,LESSON_FORM_MODES=5; // m025-378: sesi 20 soal; 5 mode bentuk per templat
 const checks=[];
 let pass=true;
 const check=(name,ok,details)=>{checks.push({name,status:ok?'PASS':'FAIL',details});if(!ok)pass=false};
@@ -146,8 +146,8 @@ setTimeout(()=>{
       const questions=context.buildGrammarLessonQuestions(template.subskill);
       totalQuestions+=questions.length;
       const siblingTemplates=(lessonTemplateIdsV18.get(template.subskill)||new Set([template.id])).size;
-      const expectedSize=siblingTemplates>=2?LESSON_SESSION_MAX:LESSON_SESSION_MIN;
-      if(questions.length<expectedSize||questions.length>LESSON_SESSION_MAX)shortLessons.push({skill:template.subskill,count:questions.length,expected:siblingTemplates>=2?LESSON_SESSION_MAX:`${LESSON_SESSION_MIN}..${LESSON_SESSION_MAX}`});
+      const expectedSize=Math.min(LESSON_SESSION_MAX,LESSON_FORM_MODES*siblingTemplates);
+      if(questions.length<expectedSize||questions.length>LESSON_SESSION_MAX)shortLessons.push({skill:template.subskill,count:questions.length,expected:expectedSize});
       for(const q of questions)if((q.optionSources||[]).some(x=>x&&x.origin!=='own'))borrowedOptions.push({lesson:template.subskill,question:q.id,mode:q.practiceMode});
       if(template.cefr==='A1'||template.cefr==='A2'){
         const idFields=[template.pedagogicalObjectiveId,template.misconceptionTargetedId,template.reasoningOperationId,template.explanation?.whyCorrectId,template.explanation?.ruleId,template.explanation?.whyOthersFailId,template.explanation?.howToAvoidId,template.explanation?.memoryCueId,...(template.distractors||[]).flatMap(d=>[d.whyFailsId,d.misconceptionId])];
@@ -216,7 +216,7 @@ setTimeout(()=>{
     const crossLessonDuplicates=[...crossSignatures.entries()].filter(([,owners])=>owners.size>1);
     const sourceReuse=[...sourceOwners.entries()].filter(([,owners])=>owners.size>1);
     check('Runtime question inventory',totalQuestions>=lessonCount*LESSON_SESSION_MIN&&totalQuestions<=lessonCount*LESSON_SESSION_MAX,`generated=${totalQuestions} range=${lessonCount*LESSON_SESSION_MIN}..${lessonCount*LESSON_SESSION_MAX}`);
-    check('Lesson session size (m025-375)',shortLessons.length===0,shortLessons.length?shortLessons.slice(0,10):`${lessonCount}/${lessonCount} lessons: 10 soal (2 templat) / >=${LESSON_SESSION_MIN} (1 templat)`);
+    check('Lesson session size (m025-375)',shortLessons.length===0,shortLessons.length?shortLessons.slice(0,10):`${lessonCount}/${lessonCount} lessons: min(20, 5 x templat) soal`);
     check('Lesson modes are practice-first (m025-375)',modeFailures.length===0,modeFailures.length?modeFailures.slice(0,10):`hanya ${expectedModes.length} mode lesson; ${REQUIRED_LESSON_MODES.join('/')} hadir di tiap lesson`);
     check('Lesson options are the lesson\'s own text (m025-375)',borrowedOptions.length===0,borrowedOptions.length?{violations:borrowedOptions.length,samples:borrowedOptions.slice(0,10)}:'nol pilihan pinjaman lesson lain di sesi lesson');
     check('Within-lesson question uniqueness',withinDuplicates.length===0,withinDuplicates.length?withinDuplicates:'no repeated question or option signature');

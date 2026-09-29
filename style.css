@@ -1288,6 +1288,7 @@ button svg,.creator-link svg{width:17px;height:17px;flex:0 0 auto}
 .feedback.feedback-success{border-color:var(--line);box-shadow:inset 4px 0 0 var(--good)}
 .feedback.feedback-error{border-color:#F5C6BC;box-shadow:inset 4px 0 0 #D9534F;background:#FFF5F2}
 .feedback-title{display:flex;align-items:center;gap:9px;margin-bottom:6px}.feedback-title svg{width:21px;height:21px}.feedback-success .feedback-title{color:var(--good)}.feedback-error .feedback-title{color:#B23B2A}
+.feedback-your-pick{margin:2px 0 6px;padding:8px 12px;border-radius:10px;background:rgba(217,83,52,.08);border-left:3px solid #D9534F;font-size:var(--fs-body,15px);line-height:1.5}.feedback-your-pick strong{color:#B23B2A;margin-right:4px}
 .grammar-grid .card{display:grid;gap:10px}.lesson-card-foot{display:flex;align-items:center;justify-content:space-between;gap:12px}.lesson-card-foot>span{font-size:var(--fs-caption);color:var(--muted)}
 .lesson-title{font-size:var(--fs-h1);margin:8px 0 10px}.grammar-lesson-card>p{line-height:1.7}
 /* v6.1 (O4 §3): maks DUA dari {border, bayangan, bg tint} — panel inset cukup tint. */
@@ -8711,4 +8712,108 @@ nav.bottomnav .nav.active span,
 .fz-auth-hero.is-welcome .fz-auth-paw {
   width: 90px !important;
   height: 90px !important;
+}
+
+/* m025-378: label soal ulangan lesson lain di sesi lesson 20 soal */
+.quiz-review-tag{display:inline-flex;align-items:center;gap:6px;margin:0 0 6px;padding:4px 10px;border-radius:var(--radius-pill);font-size:.75rem;font-weight:700;letter-spacing:.02em;background:var(--sun-soft);color:var(--info)}
+.quiz-review-tag i,.quiz-review-tag svg{width:13px;height:13px}
+
+/* ==========================================================================
+   UX-BRIEF (Anti-Ribet & Anti-Bosan) — 2026-06
+   §1 tombol aksi utama beranda · §2 kuis 100dvh tanpa scroll di HP · §3 combo,
+   bounce/shake · §4 layar kemenangan satu kartu · (naskah §5 di copy-id-*.js)
+   ========================================================================== */
+/* §1 Zero-friction home CTA */
+/* body.fz-lux button (fiezel-lux.css) menimpa bg/warna semua tombol - tombol ini dikunci. */
+body .fz-hero-cta,body.fz-lux .fz-hero-cta{
+  width:100%;display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:14px;
+  margin:6px 0 14px;padding:14px 16px 14px 14px;border:none!important;border-radius:20px!important;text-align:left;cursor:pointer;
+  color:#0A0A0E!important;background:linear-gradient(135deg,#FFD94F 0%,#FFB800 55%,#FF9F1C 100%)!important;
+  box-shadow:0 10px 28px -6px rgba(255,184,0,.45),0 2px 6px rgba(0,0,0,.18)!important;
+  transition:transform .14s var(--ease-spring),box-shadow .14s ease;
+  animation:heroCtaIn .55s var(--ease-spring) both;
+}
+.fz-hero-cta:hover{box-shadow:0 14px 32px -6px rgba(255,184,0,.55),0 2px 6px rgba(0,0,0,.18);transform:translateY(-1px)}
+.fz-hero-cta:active{transform:scale(.975)}
+.fz-hero-cta:focus-visible{outline:3px solid #fff;outline-offset:2px}
+.fz-hero-cta-icon{width:46px;height:46px;display:grid;place-items:center;border-radius:14px;background:rgba(10,10,14,.12);color:#0A0A0E}
+.fz-hero-cta-icon .fz-i,.fz-hero-cta-icon svg{width:24px;height:24px}
+.fz-hero-cta-text{display:grid;gap:2px;min-width:0}
+.fz-hero-cta-text b{font-size:1.02rem;font-weight:800;letter-spacing:-.01em;line-height:1.2}
+.fz-hero-cta-text small{font-size:.78rem;font-weight:600;opacity:.78;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.fz-hero-cta-arrow{width:36px;height:36px;display:grid;place-items:center;border-radius:999px;background:#0A0A0E;color:#FFD94F;transition:transform .2s var(--ease-spring)}
+.fz-hero-cta-arrow svg{width:18px;height:18px}
+.fz-hero-cta:hover .fz-hero-cta-arrow{transform:translateX(3px)}
+body .fz-hero-cta.is-resume,body.fz-lux .fz-hero-cta.is-resume{background:linear-gradient(135deg,#FF8A5B 0%,#EA580C 60%,#C2410C 100%)!important;color:#fff!important;box-shadow:0 10px 28px -6px rgba(234,88,12,.5),0 2px 6px rgba(0,0,0,.2)!important}
+.fz-hero-cta.is-resume .fz-hero-cta-icon{background:rgba(255,255,255,.18)}
+.fz-hero-cta.is-resume .fz-hero-cta-arrow{background:#fff;color:#C2410C}
+@keyframes heroCtaIn{from{opacity:0;transform:translateY(12px) scale(.97)}to{opacity:1;transform:none}}
+
+/* §2 Kuis di HP: seluruh shell = tinggi layar; kartu soal melar sampai bawah, jadi tidak ada
+   ruang hampa di bawah pilihan. Bilah "Lanjut" melayang tetap di zona jempol (fixed). Isi yang
+   panjang (pembahasan) tetap bisa digulir DI DALAM halaman, bukan lompat dari ruang kosong. */
+@media(max-width:640px){
+  /* mobile-edge-fit.css: `#app > section{min-height:auto!important}` - dilawan dengan spesifisitas + !important */
+  #app>section.quiz-shell,.quiz-shell{min-height:calc(100vh - var(--fz-topbar-h,65px))!important;min-height:calc(100dvh - var(--fz-topbar-h,65px))!important;display:flex;flex-direction:column;box-sizing:border-box}
+  .quiz-shell>.card:last-of-type{flex:1 1 auto;display:flex;flex-direction:column;margin-bottom:0}
+  .quiz-shell .quiz-mascot{flex:0 0 auto}
+  .quiz-shell .options{gap:10px}
+  .quiz-shell .option{min-height:56px}
+}
+@media(max-width:640px) and (max-height:700px){
+  .quiz-shell .quiz-mascot{display:none}
+  .quiz-shell .question{margin:4px 0 12px}
+}
+
+/* §3 Umpan balik instan: centang memantul saat benar, getar saat salah, lencana combo. */
+@keyframes optionBounce{0%{transform:scale(1)}30%{transform:scale(1.035) translateY(-3px)}60%{transform:scale(.985) translateY(0)}100%{transform:none}}
+@keyframes optionShake{0%,100%{transform:translateX(0)}15%{transform:translateX(-7px)}35%{transform:translateX(6px)}55%{transform:translateX(-4px)}75%{transform:translateX(3px)}}
+@keyframes tagPop{0%{transform:scale(.4);opacity:0}60%{transform:scale(1.15);opacity:1}100%{transform:scale(1)}}
+.option.correct{animation:optionBounce .55s var(--ease-spring)}
+.option.wrong{animation:optionShake .45s var(--ease)}
+.option.correct::after,.option.wrong::after{animation:tagPop .45s var(--ease-spring) both}
+.combo-badge{
+  position:fixed;left:50%;top:22%;z-index:2147481600;pointer-events:none; /* di atas scrim popup keyakinan (2147481400) */
+  display:grid;grid-auto-flow:column;align-items:center;gap:10px;padding:12px 20px;
+  border-radius:999px;color:#fff;background:linear-gradient(135deg,#FF8A5B,#EA580C 55%,#C2410C);
+  box-shadow:0 14px 36px -8px rgba(234,88,12,.6),0 0 0 4px rgba(255,255,255,.12);
+  opacity:0;transform:translate(-50%,10px) scale(.6);
+  transition:opacity .28s var(--ease),transform .38s var(--ease-spring);
+}
+.combo-badge.hidden{display:none}
+.combo-badge.show{opacity:1;transform:translate(-50%,0) scale(1)}
+.combo-badge-flame{width:34px;height:34px;display:grid;place-items:center;border-radius:999px;background:rgba(255,255,255,.2);animation:comboFlame .9s ease-in-out infinite alternate}
+.combo-badge-flame svg{width:20px;height:20px}
+.combo-badge b{font-size:1.25rem;font-weight:900;letter-spacing:-.01em;white-space:nowrap}
+.combo-badge-note{font-size:.82rem;font-weight:700;opacity:.92;white-space:nowrap}
+@keyframes comboFlame{from{transform:scale(1) rotate(-6deg)}to{transform:scale(1.12) rotate(6deg)}}
+
+/* §4 Layar Kemenangan: satu kartu penuh, bintang animasi bertahap, chip hadiah, rincian dilipat. */
+.result-stars{display:flex;justify-content:center;gap:8px;margin:-4px 0 10px}
+.result-stars svg{width:34px;height:34px;color:var(--line);fill:transparent;transform:scale(.6);opacity:.55;transition:none}
+.result-stars svg.is-lit{color:#FFB800;fill:#FFD94F;opacity:1;animation:starPop .6s var(--ease-spring) both;animation-delay:calc(var(--si,1)*140ms + 200ms)}
+.result-stars svg:nth-child(2){width:42px;height:42px;margin-top:-6px}
+@keyframes starPop{0%{transform:scale(.3) rotate(-20deg);opacity:0}65%{transform:scale(1.2) rotate(6deg);opacity:1}100%{transform:scale(1) rotate(0)}}
+.result-rewards{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;margin:2px 0 8px}
+.result-reward-chip{display:inline-flex;align-items:center;gap:6px;padding:7px 12px;border-radius:999px;font-weight:800;font-size:.9rem;
+  background:var(--panel-soft);border:1px solid var(--line);color:var(--text);animation:riseIn .5s var(--ease) both;animation-delay:.5s}
+.result-reward-chip svg{width:16px;height:16px}
+.result-reward-chip.is-gem{background:rgba(56,189,248,.16);border-color:rgba(125,211,252,.55);color:#38BDF8}
+.result-reward-chip.is-combo{background:rgba(251,146,60,.16);border-color:rgba(253,186,116,.55);color:#FB923C}
+.result-details{margin-top:8px;text-align:left}
+.result-details>summary{cursor:pointer;font-weight:700;color:var(--muted);font-size:.9rem;list-style:none;display:flex;align-items:center;justify-content:center;gap:6px;padding:8px}
+.result-details>summary::-webkit-details-marker{display:none}
+.result-details>summary::after{content:"▾";transition:transform .2s ease}
+.result-details[open]>summary::after{transform:rotate(180deg)}
+.result-details-body{padding-top:6px}
+@media(max-width:640px){
+  #app>section.result-stage.is-compact,.result-stage.is-compact{min-height:calc(100vh - var(--fz-topbar-h,65px))!important;min-height:calc(100dvh - var(--fz-topbar-h,65px))!important;display:flex;flex-direction:column;justify-content:center;padding-top:0;box-sizing:border-box}
+  .result-stage.is-compact .result-card{margin:0;padding:22px 18px}
+  .result-stage.is-compact .result-icon{width:52px;height:52px;margin-bottom:8px}
+  .result-stage.is-compact h2{margin:6px 0 4px}
+  .result-stage.is-compact .result-actions{margin-top:12px}
+}
+@media(prefers-reduced-motion:reduce){
+  .fz-hero-cta,.option.correct,.option.wrong,.option.correct::after,.option.wrong::after,.combo-badge-flame,.result-stars svg.is-lit,.result-reward-chip{animation:none}
+  .result-stars svg.is-lit{transform:none;opacity:1}
 }
