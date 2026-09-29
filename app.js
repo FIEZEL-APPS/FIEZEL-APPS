@@ -8913,12 +8913,12 @@ function todayHomeMarkup(){
           <div class="fz-aurora-session-time">${esc(FiezelI18n.t('home.kartu1-soal', { n: shape.soal || 10 }))} • ${esc(FiezelI18n.t('home.kartu1-menit', { n: shape.menit || 5 }))}</div>
         </div>
         <div class="fz-aurora-session-info">
-          <div class="fz-aurora-session-title">${isTh ? 'เป้าหมายฝึกฝนหลากหลายทักษะ' : 'Target Latihan Multi-Topik'}</div>
-          <p class="fz-aurora-session-desc">${isTh ? 'การฝึกฝนแบบปรับตัวรวมไวยากรณ์ การอ่าน และคำศัพท์' : 'Latihan adaptif gabungan Tata Bahasa, Membaca &amp; Kosakata.'}</p>
+          <div class="fz-aurora-session-title">${esc(FiezelI18n.t('home.aurora-target-title'))}</div>
+          <p class="fz-aurora-session-desc">${FiezelI18n.t('home.aurora-target-desc')}</p>
         </div>
         <div class="fz-aurora-progress-block">
           <div class="fz-aurora-progress-labels">
-            <span>${esc(FiezelI18n.t('home.ritme-harian'))} (${rhythmShown}/${rhythmTarget} ${isTh ? 'ข้อเสร็จแล้ว' : 'Soal Selesai'})</span>
+            <span>${esc(FiezelI18n.t('home.ritme-harian'))} (${rhythmShown}/${rhythmTarget} ${esc(FiezelI18n.t('home.soal-selesai'))})</span>
             <b>${rhythmPct}%</b>
           </div>
           <div class="fz-aurora-track">
@@ -9047,15 +9047,15 @@ function todayHomeMarkup(){
           <span class="fz-stitch-badge">Fokus</span>
         </div>
         <div class="fz-stitch-card-bottom">
-          <h3>Latihan Soal</h3>
-          <p>Semua Modul</p>
+          <h3>${esc(FiezelI18n.t('home.latihan-soal-title'))}</h3>
+          <p>${esc(FiezelI18n.t('home.latihan-soal-sub'))}</p>
         </div>
       </div>`}
     </div>
   </section>`;
 
   /* KelasKu Task Strip */
-  const kelaskuStrip = `<section class="fz-stitch-kelasku" onclick="go('classroom')">
+  const kelaskuStrip = `<section class="fz-stitch-kelasku" onclick="showToast(FiezelI18n.t('home.classroom-tutup'))">
     <div class="kelasku-strip-left">
       <div class="kelasku-strip-icon">
         <i class="fz-i" data-fz-icon="classroom"></i>
@@ -9064,14 +9064,14 @@ function todayHomeMarkup(){
         <div class="kelasku-strip-meta">
           <span class="kelasku-meta-brand">KelasKu</span>
           <span>•</span>
-          <span class="kelasku-meta-due">Tugas Aktif</span>
+          <span class="kelasku-meta-due">${esc(FiezelI18n.t('kelasku.strip-tugas-aktif'))}</span>
         </div>
-        <div class="kelasku-strip-title">Latihan &amp; Materi Kelas</div>
-        <div class="kelasku-strip-sub">Sinkronisasi Kurikulum &amp; Guru</div>
+        <div class="kelasku-strip-title">${FiezelI18n.t('kelasku.strip-latihan-materi')}</div>
+        <div class="kelasku-strip-sub">${FiezelI18n.t('kelasku.strip-sinkron-guru')}</div>
       </div>
     </div>
-    <button type="button" class="kelasku-strip-btn" onclick="event.stopPropagation();go('classroom')">
-      <span>Buka</span>
+    <button type="button" class="kelasku-strip-btn" onclick="event.stopPropagation();showToast(FiezelI18n.t('home.classroom-tutup'))">
+      <span>${esc(FiezelI18n.t('home.segera'))}</span>
       <span aria-hidden="true">➔</span>
     </button>
   </section>`;
